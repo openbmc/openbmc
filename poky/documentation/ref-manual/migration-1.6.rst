@@ -12,7 +12,7 @@ Project 1.6 Release from the prior release.
 The :ref:`archiver <ref-classes-archiver>` class has been rewritten
 and its configuration has been simplified. For more details on the
 source archiver, see the
-":ref:`dev-manual/dev-manual-common-tasks:maintaining open source license compliance during your product's lifecycle`"
+":ref:`dev-manual/common-tasks:maintaining open source license compliance during your product's lifecycle`"
 section in the Yocto Project Development Tasks Manual.
 
 .. _migration-1.6-packaging-changes:
@@ -126,7 +126,7 @@ Changes to Variables
 --------------------
 
 The following variables have changed. For information on the
-OpenEmbedded build system variables, see the ":doc:`ref-variables`" Chapter.
+OpenEmbedded build system variables, see the ":doc:`/ref-manual/variables`" Chapter.
 
 .. _migration-1.6-variable-changes-TMPDIR:
 
@@ -148,7 +148,7 @@ NFS mount, an error occurs.
 The ``PRINC`` variable has been deprecated and triggers a warning if
 detected during a build. For :term:`PR` increments on changes,
 use the PR service instead. You can find out more about this service in
-the ":ref:`dev-manual/dev-manual-common-tasks:working with a pr service`"
+the ":ref:`dev-manual/common-tasks:working with a pr service`"
 section in the Yocto Project Development Tasks Manual.
 
 .. _migration-1.6-variable-changes-IMAGE_TYPES:
@@ -221,7 +221,7 @@ Package Test (ptest)
 
 Package Tests (ptest) are built but not installed by default. For
 information on using Package Tests, see the
-":ref:`dev-manual/dev-manual-common-tasks:testing packages with ptest`"
+":ref:`dev-manual/common-tasks:testing packages with ptest`"
 section in the Yocto Project Development Tasks Manual. For information on the
 ``ptest`` class, see the ":ref:`ptest.bbclass <ref-classes-ptest>`"
 section.
@@ -411,6 +411,6 @@ The previous reference BSPs for the ``beagleboard`` and
 ``routerstationpro`` machines are still available in a new
 ``meta-yocto-bsp-old`` layer in the
 :yocto_git:`Source Repositories <>` at
-:yocto_git:`/cgit/cgit.cgi/meta-yocto-bsp-old/`.
+:yocto_git:`/meta-yocto-bsp-old/`.
 
 

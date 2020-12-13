@@ -8,6 +8,8 @@ SRC_URI[sha256sum] = "a8994582e716ec690f33fec70cca0f85bd23ec974e3f783233e4879090
 PYPI_PACKAGE = "setuptools_scm"
 inherit pypi setuptools3
 
+UPSTREAM_CHECK_REGEX = "setuptools_scm-(?P<pver>.*)\.tar"
+
 RDEPENDS_${PN} = "\
     ${PYTHON_PN}-debugger \
     ${PYTHON_PN}-json \

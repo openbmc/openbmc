@@ -278,7 +278,7 @@ The following changes have occurred:
    specifying list items to remove, be aware that leading and trailing
    whitespace resulting from the removal is retained.
 
-   See the ":ref:`bitbake:removing-override-style-syntax`"
+   See the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:removal (override style syntax)`"
    section in the BitBake User Manual for a detailed example.
 
 .. _migration-2.6-systemd-configuration-now-split-out-to-system-conf:
@@ -372,7 +372,7 @@ Any failure of a ``pkg_postinst()`` script (including exit 1) triggers
 an error during the :ref:`ref-tasks-rootfs` task.
 
 For more information on post-installation behavior, see the
-":ref:`dev-manual/dev-manual-common-tasks:post-installation scripts`"
+":ref:`dev-manual/common-tasks:post-installation scripts`"
 section in the Yocto Project Development Tasks Manual.
 
 .. _migration-2.6-python-3-profile-guided-optimizations:

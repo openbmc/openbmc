@@ -1,0 +1,27 @@
+From 9985a03f13da4d7bb0a433f7305d2ffae3d82a27 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 10 Nov 2020 15:57:03 +0000
+Subject: [PATCH] src/lib/log/logger_unittest_support.cc: do not write build
+ path into binary
+
+This breaks reproducibility and is needed only in unit testing.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ src/lib/log/logger_unittest_support.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/log/logger_unittest_support.cc b/src/lib/log/logger_unittest_support.cc
+index 58dbef8..9a2929c 100644
+--- a/src/lib/log/logger_unittest_support.cc
++++ b/src/lib/log/logger_unittest_support.cc
+@@ -84,7 +84,7 @@ void initLogger(isc::log::Severity severity, int dbglevel) {
+     const char* localfile = getenv("KEA_LOGGER_LOCALMSG");
+ 
+     // Set a directory for creating lockfiles when running tests
+-    setenv("KEA_LOCKFILE_DIR", TOP_BUILDDIR, 0);
++    //setenv("KEA_LOCKFILE_DIR", TOP_BUILDDIR, 0);
+ 
+     // Initialize logging
+     initLogger(root, isc::log::DEBUG, isc::log::MAX_DEBUG_LEVEL, localfile);

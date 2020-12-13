@@ -79,7 +79,7 @@ particular, users need to ensure that ``${S}`` (source files) and
 inherit from ``kernel-yocto`` or include ``linux-yocto.inc``, you might
 wish to refer to the ``linux.inc`` file in the ``meta-oe`` layer for the
 kinds of changes you need to make. For reference, here is the
-`commit <http://cgit.openembedded.org/meta-openembedded/commit/meta-oe/recipes-kernel/linux/linux.inc?id=fc7132ede27ac67669448d3d2845ce7d46c6a1ee>`__
+:oe_git:`commit </meta-openembedded/commit/meta-oe/recipes-kernel/linux/linux.inc?id=fc7132ede27ac67669448d3d2845ce7d46c6a1ee>`
 where the ``linux.inc`` file in ``meta-oe`` was updated.
 
 Recipes that rely on the kernel source code and do not inherit the

@@ -23,7 +23,8 @@ def _run_server(server, idx):
     sys.stderr = sys.stdout
     server.serve_forever()
 
-class TestHashEquivalenceServer(object):
+
+class HashEquivalenceTestSetup(object):
     METHOD = 'TestMethod'
 
     server_index = 0
@@ -65,6 +66,8 @@ class TestHashEquivalenceServer(object):
         result = client.get_unihash(self.METHOD, taskhash)
         self.assertEqual(result, unihash)
 
+
+class HashEquivalenceCommonTests(object):
     def test_create_hash(self):
         # Simple test that hashes can be created
         taskhash = '35788efcb8dfb0a02659d81cf2bfd695fb30faf9'
@@ -240,15 +243,33 @@ class TestHashEquivalenceServer(object):
         self.assertClientGetHash(self.client, taskhash4, None)
 
 
-class TestHashEquivalenceUnixServer(TestHashEquivalenceServer, unittest.TestCase):
+class TestHashEquivalenceUnixServer(HashEquivalenceTestSetup, HashEquivalenceCommonTests, unittest.TestCase):
     def get_server_addr(self, server_idx):
         return "unix://" + os.path.join(self.temp_dir.name, 'sock%d' % server_idx)
 
 
-class TestHashEquivalenceTCPServer(TestHashEquivalenceServer, unittest.TestCase):
+class TestHashEquivalenceUnixServerLongPath(HashEquivalenceTestSetup, unittest.TestCase):
+    DEEP_DIRECTORY = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb/ccccccccccccccccccccccccccccccccccccccccccc"
+    def get_server_addr(self, server_idx):
+        os.makedirs(os.path.join(self.temp_dir.name, self.DEEP_DIRECTORY), exist_ok=True)
+        return "unix://" + os.path.join(self.temp_dir.name, self.DEEP_DIRECTORY, 'sock%d' % server_idx)
+
+
+    def test_long_sock_path(self):
+        # Simple test that hashes can be created
+        taskhash = '35788efcb8dfb0a02659d81cf2bfd695fb30faf9'
+        outhash = '2765d4a5884be49b28601445c2760c5f21e7e5c0ee2b7e3fce98fd7e5970796f'
+        unihash = 'f46d3fbb439bd9b921095da657a4de906510d2cd'
+
+        self.assertClientGetHash(self.client, taskhash, None)
+
+        result = self.client.report_unihash(taskhash, self.METHOD, outhash, unihash)
+        self.assertEqual(result['unihash'], unihash, 'Server returned bad unihash')
+
+
+class TestHashEquivalenceTCPServer(HashEquivalenceTestSetup, HashEquivalenceCommonTests, unittest.TestCase):
     def get_server_addr(self, server_idx):
         # Some hosts cause asyncio module to misbehave, when IPv6 is not enabled.
         # If IPv6 is enabled, it should be safe to use localhost directly, in general
         # case it is more reliable to resolve the IP address explicitly.
         return socket.gethostbyname("localhost") + ":0"
-            

@@ -217,7 +217,7 @@ The following changes have been made to the build system user interface:
 -  *Hob GTK+-based UI*: Removed because it is unmaintained and based on
    the outdated GTK+ 2 library. The Toaster web-based UI is much more
    capable and is actively maintained. See the
-   ":ref:`toaster-manual/toaster-manual-setup-and-use:using the toaster web interface`"
+   ":ref:`toaster-manual/setup-and-use:using the toaster web interface`"
    section in the Toaster User Manual for more information on this
    interface.
 
@@ -231,10 +231,10 @@ ADT Removed
 
 The Application Development Toolkit (ADT) has been removed because its
 functionality almost completely overlapped with the :ref:`standard
-SDK <sdk-manual/sdk-using:using the standard sdk>` and the
-:ref:`extensible SDK <sdk-manual/sdk-extensible:using the extensible sdk>`. For
+SDK <sdk-manual/using:using the standard sdk>` and the
+:ref:`extensible SDK <sdk-manual/extensible:using the extensible sdk>`. For
 information on these SDKs and how to build and use them, see the
-:doc:`../sdk-manual/sdk-manual` manual.
+:doc:`/sdk-manual/index` manual.
 
 .. note::
 
@@ -346,7 +346,7 @@ This release supports generation of GLib Introspective Repository (GIR)
 files through GObject introspection, which is the standard mechanism for
 accessing GObject-based software from runtime environments. You can
 enable, disable, and test the generation of this data. See the
-":ref:`dev-manual/dev-manual-common-tasks:enabling gobject introspection support`"
+":ref:`dev-manual/common-tasks:enabling gobject introspection support`"
 section in the Yocto Project Development Tasks Manual for more
 information.
 
@@ -360,7 +360,7 @@ These additional changes exist:
 -  The minimum Git version has been increased to 1.8.3.1. If your host
    distribution does not provide a sufficiently recent version, you can
    install the buildtools, which will provide it. See the
-   :ref:`ref-manual/ref-system-requirements:required git, tar, python and gcc versions`
+   :ref:`ref-manual/system-requirements:required git, tar, python and gcc versions`
    section for more information on the buildtools tarball.
 
 -  The buggy and incomplete support for the RPM version 4 package
@@ -386,7 +386,7 @@ These additional changes exist:
    removed at runtime).
 
 -  The
-   :ref:`devtool modify <sdk-manual/sdk-extensible:use \`\`devtool modify\`\` to modify the source of an existing component>`
+   :ref:`devtool modify <sdk-manual/extensible:use \`\`devtool modify\`\` to modify the source of an existing component>`
    command now defaults to extracting the source since that is most
    commonly expected. The "-x" or "--extract" options are now no-ops. If
    you wish to provide your own existing source tree, you will now need

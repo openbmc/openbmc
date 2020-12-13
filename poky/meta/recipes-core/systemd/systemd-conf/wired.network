@@ -1,5 +1,5 @@
 [Match]
-Name=en* eth*
+Type=ether
 KernelCommandLine=!nfsroot
 
 [Network]

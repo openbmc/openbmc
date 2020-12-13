@@ -1,4 +1,4 @@
-From 2e1f8ca0b67c1d1991c14d509938c347e09bae94 Mon Sep 17 00:00:00 2001
+From f4ca9db9d38f865505322595a8a1e8f69d5bb87c Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:18:47 +0800
 Subject: [PATCH] musl-libs
@@ -21,8 +21,8 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  lib/libeu.h                    |  1 +
  libdwfl/dwfl_error.c           |  9 +++++++++
  libdwfl/linux-kernel-modules.c |  1 +
- libelf/elf.h                   |  9 ++++++---
- 6 files changed, 44 insertions(+), 4 deletions(-)
+ libelf/elf.h                   |  7 +++++++
+ 6 files changed, 45 insertions(+), 1 deletion(-)
  create mode 100644 lib/error.h
 
 diff --git a/lib/error.h b/lib/error.h
@@ -104,7 +104,7 @@ index 7bcf61c..11dcc8b 100644
        return elf_errmsg (error & 0xffff);
      case OTHER_ERROR (LIBDW):
 diff --git a/libdwfl/linux-kernel-modules.c b/libdwfl/linux-kernel-modules.c
-index 0434f1e..5afaee8 100644
+index 6edb27f..f331e3c 100644
 --- a/libdwfl/linux-kernel-modules.c
 +++ b/libdwfl/linux-kernel-modules.c
 @@ -50,6 +50,7 @@
@@ -116,26 +116,24 @@ index 0434f1e..5afaee8 100644
  /* If fts.h is included before config.h, its indirect inclusions may not
     give us the right LFS aliases of these functions, so map them manually.  */
 diff --git a/libelf/elf.h b/libelf/elf.h
-index 197b557..8e5b94c 100644
+index 6439c1a..a87c589 100644
 --- a/libelf/elf.h
 +++ b/libelf/elf.h
-@@ -21,7 +21,9 @@
+@@ -19,6 +19,10 @@
+ #ifndef _ELF_H
+ #define	_ELF_H 1
  
- #include <features.h>
- 
--__BEGIN_DECLS
 +#ifdef __cplusplus
 +extern "C" {
 +#endif
- 
++
  /* Standard ELF types.  */
  
-@@ -4103,6 +4105,7 @@ enum
+ #include <stdint.h>
+@@ -4101,4 +4105,7 @@ enum
  #define R_ARC_TLS_LE_S9		0x4a
  #define R_ARC_TLS_LE_32		0x4b
  
--__END_DECLS
--
 +#ifdef __cplusplus
 +}
 +#endif

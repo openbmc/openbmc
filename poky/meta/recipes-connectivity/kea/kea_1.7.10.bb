@@ -7,18 +7,18 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=68d95543d2096459290a4e6b9ceccffa"
 
 DEPENDS = "boost log4cplus openssl"
 
-SRC_URI = "\
-    http://ftp.isc.org/isc/kea/${PV}/${BP}.tar.gz \
-    file://0001-keactrl.in-create-var-lib-kea-and-var-run-kea-folder.patch \
-    file://kea-dhcp4.service \
-    file://kea-dhcp6.service \
-    file://kea-dhcp-ddns.service \
-    file://kea-dhcp4-server \
-    file://kea-dhcp6-server \
-    file://kea-dhcp-ddns-server \
-    file://fix-multilib-conflict.patch \
-    file://fix_pid_keactrl.patch \
-"
+SRC_URI = "http://ftp.isc.org/isc/kea/${PV}/${BP}.tar.gz \
+           file://0001-keactrl.in-create-var-lib-kea-and-var-run-kea-folder.patch \
+           file://kea-dhcp4.service \
+           file://kea-dhcp6.service \
+           file://kea-dhcp-ddns.service \
+           file://kea-dhcp4-server \
+           file://kea-dhcp6-server \
+           file://kea-dhcp-ddns-server \
+           file://fix-multilib-conflict.patch \
+           file://fix_pid_keactrl.patch \
+           file://0001-src-lib-log-logger_unittest_support.cc-do-not-write-.patch \
+           "
 SRC_URI[sha256sum] = "4e121f0e58b175a827581c69cb1d60778647049fa47f142940dddc9ce58f3c82"
 
 inherit autotools systemd update-rc.d upstream-version-is-even
@@ -48,6 +48,11 @@ do_configure_prepend() {
     # don't expand the abs_top_builddir on the target as the abs_top_builddir is meanlingless on the target
     find ${S} -type f -name *.sh.in | xargs sed -i  "s:@abs_top_builddir@:@abs_top_builddir_placeholder@:g"
     sed -i "s:@abs_top_srcdir@:@abs_top_srcdir_placeholder@:g" ${S}/src/bin/admin/kea-admin.in
+}
+
+# patch out build host paths for reproducibility
+do_compile_prepend_class-target() {
+        sed -i -e "s,${WORKDIR},,g" ${B}/config.report
 }
 
 do_install_append() {

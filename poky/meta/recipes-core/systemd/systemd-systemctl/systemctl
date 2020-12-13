@@ -282,7 +282,7 @@ def main():
         sys.exit("Python 3.4 or greater is required")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', nargs=1, choices=['enable', 'mask',
+    parser.add_argument('command', nargs='?', choices=['enable', 'mask',
                                                      'preset-all'])
     parser.add_argument('service', nargs=argparse.REMAINDER)
     parser.add_argument('--root')
@@ -300,7 +300,11 @@ def main():
         locations.append(BASE_LIBDIR / "systemd")
     locations.append(LIBDIR / "systemd")
 
-    command = args.command[0]
+    command = args.command
+    if not command:
+        parser.print_help()
+        return 0
+
     if command == "mask":
         for service in args.service:
             SystemdUnit(root, service).mask()

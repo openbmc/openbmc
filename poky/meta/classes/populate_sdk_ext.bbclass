@@ -24,6 +24,7 @@ SDK_INCLUDE_NATIVESDK ?= "0"
 SDK_INCLUDE_BUILDTOOLS ?= '1'
 
 SDK_RECRDEP_TASKS ?= ""
+SDK_CUSTOM_TEMPLATECONF ?= "0"
 
 SDK_LOCAL_CONF_WHITELIST ?= ""
 SDK_LOCAL_CONF_BLACKLIST ?= "CONF_VERSION \
@@ -198,6 +199,9 @@ python copy_buildsystem () {
     # Copy in all metadata layers + bitbake (as repositories)
     buildsystem = oe.copy_buildsystem.BuildSystem('extensible SDK', d)
     baseoutpath = d.getVar('SDK_OUTPUT') + '/' + d.getVar('SDKPATH')
+
+    #check if custome templateconf path is set
+    use_custom_templateconf = d.getVar('SDK_CUSTOM_TEMPLATECONF')
 
     # Determine if we're building a derivative extensible SDK (from devtool build-sdk)
     derivative = (d.getVar('SDK_DERIVATIVE') or '') == '1'
@@ -390,7 +394,7 @@ python copy_buildsystem () {
         shutil.copyfile(builddir + '/cache/bb_unihashes.dat', baseoutpath + '/cache/bb_unihashes.dat')
 
     # Use templateconf.cfg file from builddir if exists
-    if os.path.exists(builddir + '/conf/templateconf.cfg'):
+    if os.path.exists(builddir + '/conf/templateconf.cfg') and use_custom_templateconf == '1':
         shutil.copyfile(builddir + '/conf/templateconf.cfg', baseoutpath + '/conf/templateconf.cfg')
     else:
         # Write a templateconf.cfg

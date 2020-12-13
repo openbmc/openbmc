@@ -1,4 +1,4 @@
-From 9311844b6c422479556e83b89a8e675ebcb2056c Mon Sep 17 00:00:00 2001
+From 110a525e5ebed2fca138d72da493c39510311c1f Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 3 Jul 2018 13:59:09 +0100
 Subject: [PATCH] Make CPU family warnings fatal
@@ -12,10 +12,10 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  2 files changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/mesonbuild/envconfig.py b/mesonbuild/envconfig.py
-index 219b62e..d1be65b 100644
+index 13d0ba5..5ba3a1a 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
-@@ -199,7 +199,7 @@ class MachineInfo:
+@@ -254,7 +254,7 @@ class MachineInfo:
 
          cpu_family = literal['cpu_family']
          if cpu_family not in known_cpu_families:
@@ -25,11 +25,11 @@ index 219b62e..d1be65b 100644
          endian = literal['endian']
          if endian not in ('little', 'big'):
 diff --git a/mesonbuild/environment.py b/mesonbuild/environment.py
-index bf09a88..8eabe78 100644
+index 588005b..988e3ea 100644
 --- a/mesonbuild/environment.py
 +++ b/mesonbuild/environment.py
-@@ -375,9 +375,7 @@ def detect_cpu_family(compilers: CompilersDict) -> str:
-         trial = 'parisc'
+@@ -400,9 +400,7 @@ def detect_cpu_family(compilers: CompilersDict) -> str:
+             trial = 'ppc64'
 
      if trial not in known_cpu_families:
 -        mlog.warning('Unknown CPU family {!r}, please report this at '

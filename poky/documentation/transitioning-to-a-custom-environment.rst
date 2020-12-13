@@ -8,7 +8,7 @@ Transitioning to a custom environment for systems development
 
 .. note::
 
-   So you've finished the :doc:`brief-yoctoprojectqs/brief-yoctoprojectqs` and
+   So you've finished the :doc:`brief-yoctoprojectqs/index` and
    glanced over the document :doc:`what-i-wish-id-known`, the latter contains
    important information learned from other users. You're well prepared. But
    now, as you are starting your own project, it isn't exactly straightforward what
@@ -42,7 +42,7 @@ Transitioning to a custom environment for systems development
    You might want to start with the build specification that Poky provides
    (which is reference embedded distribution) and then add your newly chosen
    layers to that. Here is the information :ref:`about adding layers
-   <dev-manual/dev-manual-common-tasks:Understanding and Creating Layers>`.
+   <dev-manual/common-tasks:Understanding and Creating Layers>`.
 
 #. **Based on the layers you've chosen, make needed changes in your
    configuration**.
@@ -58,7 +58,7 @@ Transitioning to a custom environment for systems development
    releases. If you are using a Yocto Project release earlier than 2.4, use the
    ``yocto-layer create`` tool. The ``bitbake-layers`` tool also provides a number
    of other useful layer-related commands. See
-   :ref:`dev-manual/dev-manual-common-tasks:creating a general layer using the
+   :ref:`dev-manual/common-tasks:creating a general layer using the
    \`\`bitbake-layers\`\` script` section.
 
 #. **Create your own layer for the BSP you're going to use**.
@@ -79,7 +79,7 @@ Transitioning to a custom environment for systems development
    process of refinement. Start by getting each step of the build process
    working beginning with fetching all the way through packaging. Next, run the
    software on your target and refine further as needed. See :ref:`Writing a New
-   Recipe <dev-manual/dev-manual-common-tasks:writing a new recipe>` in the
+   Recipe <dev-manual/common-tasks:writing a new recipe>` in the
    Yocto Project Development Tasks Manual for more information.
 
 #. **Now you're ready to create an image recipe**.
@@ -90,7 +90,7 @@ Transitioning to a custom environment for systems development
 
 #. **Build your image and refine it**.
    Add what's missing and fix anything that's broken using your knowledge of the
-   :ref:`workflow <sdk-manual/sdk-extensible:using \`\`devtool\`\` in your sdk
+   :ref:`workflow <sdk-manual/extensible:using \`\`devtool\`\` in your sdk
    workflow>` to identify where issues might be occurring.
 
 #. **Consider creating your own distribution**.
@@ -103,7 +103,7 @@ Transitioning to a custom environment for systems development
    needs to change for your distribution. If you find yourself adding a lot of
    configuration to your local.conf file aside from paths and other typical
    local settings, it's time to :ref:`consider creating your own distribution
-   <dev-manual/dev-manual-common-tasks:creating your own distribution>`.
+   <dev-manual/common-tasks:creating your own distribution>`.
 
    You can add product specifications that can customize the distribution if
    needed in other layers. You can also add other functionality specific to the

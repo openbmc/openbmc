@@ -278,7 +278,7 @@ def setLoggingConfig(defaultconfig, userconfigfile=None):
         with open(os.path.normpath(userconfigfile), 'r') as f:
             if userconfigfile.endswith('.yml') or userconfigfile.endswith('.yaml'):
                 import yaml
-                userconfig = yaml.load(f)
+                userconfig = yaml.safe_load(f)
             elif userconfigfile.endswith('.json') or userconfigfile.endswith('.cfg'):
                 import json
                 userconfig = json.load(f)

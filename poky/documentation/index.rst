@@ -14,7 +14,7 @@ Welcome to the Yocto Project Documentation
    :maxdepth: 1
    :caption: Introduction and Overview
 
-   Quick Build <brief-yoctoprojectqs/brief-yoctoprojectqs>
+   Quick Build <brief-yoctoprojectqs/index>
    what-i-wish-id-known
    transitioning-to-a-custom-environment
    Yocto Project Software Overview <https://www.yoctoproject.org/software-overview/>
@@ -25,15 +25,15 @@ Welcome to the Yocto Project Documentation
    :maxdepth: 1
    :caption: Manuals
 
-   Overview and Concepts Manual <overview-manual/overview-manual>
-   Reference Manual <ref-manual/ref-manual>
-   Board Support Package (BSP) Developer's guide <bsp-guide/bsp-guide>
-   Development Tasks Manual <dev-manual/dev-manual>
-   Linux Kernel Development Manual <kernel-dev/kernel-dev>
-   Profile and Tracing Manual <profile-manual/profile-manual>
-   Application Development and the Extensible SDK (eSDK) <sdk-manual/sdk-manual>
-   Toaster Manual <toaster-manual/toaster-manual>
-   Test Environment Manual <test-manual/test-manual>
+   Overview and Concepts Manual <overview-manual/index>
+   Reference Manual <ref-manual/index>
+   Board Support Package (BSP) Developer's guide <bsp-guide/index>
+   Development Tasks Manual <dev-manual/index>
+   Linux Kernel Development Manual <kernel-dev/index>
+   Profile and Tracing Manual <profile-manual/index>
+   Application Development and the Extensible SDK (eSDK) <sdk-manual/index>
+   Toaster Manual <toaster-manual/index>
+   Test Environment Manual <test-manual/index>
    Bitbake User Manual <https://docs.yoctoproject.org/bitbake>
 
 .. toctree::

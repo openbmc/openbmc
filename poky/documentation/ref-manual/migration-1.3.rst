@@ -173,7 +173,7 @@ the OpenEmbedded community layers such as ``meta-oe`` and
 ``meta-gnome``. For the remainder, you can now find them in the
 ``meta-extras`` repository, which is in the
 :yocto_git:`Source Repositories <>` at
-:yocto_git:`/cgit/cgit.cgi/meta-extras/`.
+:yocto_git:`/meta-extras/`.
 
 .. _1.3-linux-kernel-naming:
 

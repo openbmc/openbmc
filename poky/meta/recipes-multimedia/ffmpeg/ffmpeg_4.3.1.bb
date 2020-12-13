@@ -26,6 +26,7 @@ LIC_FILES_CHKSUM = "file://COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 SRC_URI = "https://www.ffmpeg.org/releases/${BP}.tar.xz \
            file://mips64_cpu_detection.patch \
            file://0001-lavf-srt-fix-build-fail-when-used-the-libsrt-1.4.1.patch \
+           file://0001-libavutil-include-assembly-with-full-path-from-sourc.patch \
            "
 SRC_URI[sha256sum] = "ad009240d46e307b4e03a213a0f49c11b650e445b1f8be0dda2a9212b34d2ffb"
 
@@ -128,6 +129,11 @@ EXTRA_OEMAKE = "V=1"
 
 do_configure() {
     ${S}/configure ${EXTRA_OECONF}
+}
+
+# patch out build host paths for reproducibility
+do_compile_prepend_class-target() {
+        sed -i -e "s,${WORKDIR},,g" ${B}/config.h
 }
 
 PACKAGES =+ "libavcodec \

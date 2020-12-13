@@ -29,6 +29,9 @@ TOOLCHAIN_HOST_TASK += "\
     nativesdk-pkgconfig \
     nativesdk-glibc-utils \
     nativesdk-libxcrypt-dev \
+    nativesdk-parted \
+    nativesdk-dosfstools \
+    nativesdk-gptfdisk \
     "
 
 TOOLCHAIN_OUTPUTNAME = "${SDK_ARCH}-buildtools-extended-nativesdk-standalone-${DISTRO_VERSION}"

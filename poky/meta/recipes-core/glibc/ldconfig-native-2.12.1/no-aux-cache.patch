@@ -1,0 +1,19 @@
+The ldconfig auxiliary cache is a dictionary where the keys include inode, so
+there is no point in writing these files on the build host. 
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/ldconfig.c b/ldconfig.c
+index 2c4eb57..2d6dc92 100644
+--- a/ldconfig.c
++++ b/ldconfig.c
+@@ -1399,8 +1399,6 @@ main (int argc, char **argv)
+   if (opt_build_cache)
+     {
+       save_cache (cache_file);
+-      if (aux_cache_file)
+-        save_aux_cache (aux_cache_file);
+     }
+ 
+   return 0;

@@ -292,9 +292,9 @@ The following changes took place for BitBake:
    functionality. These changes will affect external tools that use
    BitBake's tinfoil module. For information on these changes, see the
    changes made to the scripts supplied with OpenEmbedded-Core:
-   `1 <http://git.yoctoproject.org/cgit/cgit.cgi/poky/commit/?id=189371f8393971d00bca0fceffd67cc07784f6ee>`__
+   :yocto_git:`1 </poky/commit/?id=189371f8393971d00bca0fceffd67cc07784f6ee>`
    and
-   `2 <http://git.yoctoproject.org/cgit/cgit.cgi/poky/commit/?id=4a5aa7ea4d07c2c90a1654b174873abb018acc67>`__.
+   :yocto_git:`2 </poky/commit/?id=4a5aa7ea4d07c2c90a1654b174873abb018acc67>`.
 
 -  The task management code has been rewritten to avoid using ID
    indirection in order to improve performance. This change is unlikely

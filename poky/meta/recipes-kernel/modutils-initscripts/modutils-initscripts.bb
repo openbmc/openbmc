@@ -10,7 +10,7 @@ PR = "r7"
 S = "${WORKDIR}"
 
 INITSCRIPT_NAME = "modutils.sh"
-INITSCRIPT_PARAMS = "start 05 S ."
+INITSCRIPT_PARAMS = "start 06 S ."
 
 inherit update-rc.d
 

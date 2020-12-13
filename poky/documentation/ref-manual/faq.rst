@@ -22,7 +22,7 @@ Can I still use the Yocto Project?
 **A:** You can get the required tools on your host development system a
 couple different ways (i.e. building a tarball or downloading a
 tarball). See the
-":ref:`ref-manual/ref-system-requirements:required git, tar, python and gcc versions`"
+":ref:`ref-manual/system-requirements:required git, tar, python and gcc versions`"
 section for steps on how to update your build tools.
 
 **Q:** How can you claim Poky / OpenEmbedded-Core is stable?
@@ -45,9 +45,9 @@ section for steps on how to update your build tools.
 **A:** Support for an additional board is added by creating a Board
 Support Package (BSP) layer for it. For more information on how to
 create a BSP layer, see the
-":ref:`dev-manual/dev-manual-common-tasks:understanding and creating layers`"
+":ref:`dev-manual/common-tasks:understanding and creating layers`"
 section in the Yocto Project Development Tasks Manual and the
-:doc:`../bsp-guide/bsp-guide`.
+:doc:`/bsp-guide/index`.
 
 Usually, if the board is not completely exotic, adding support in the
 Yocto Project is fairly straightforward.
@@ -73,7 +73,7 @@ device.
 
 **A:** To add a package, you need to create a BitBake recipe. For
 information on how to create a BitBake recipe, see the
-":ref:`dev-manual/dev-manual-common-tasks:writing a new recipe`"
+":ref:`dev-manual/common-tasks:writing a new recipe`"
 section in the Yocto Project Development Tasks Manual.
 
 **Q:** Do I have to reflash my entire board with a new Yocto Project
@@ -140,7 +140,7 @@ The Yocto Project also includes a
 ``meta-poky/conf/site.conf.sample`` file that shows how to configure CVS
 and Git proxy servers if needed. For more information on setting up
 various proxy types and configuring proxy servers, see the
-":yocto_wiki:`Working Behind a Network Proxy </wiki/Working_Behind_a_Network_Proxy>`"
+":yocto_wiki:`Working Behind a Network Proxy </Working_Behind_a_Network_Proxy>`"
 Wiki page.
 
 **Q:** What's the difference between target and target\ ``-native``?
@@ -198,10 +198,10 @@ and also any configuration information about how that package was
 configured and built.
 
 You can find more information on licensing in the
-":ref:`overview-manual/overview-manual-development-environment:licensing`"
+":ref:`overview-manual/development-environment:licensing`"
 section in the Yocto
 Project Overview and Concepts Manual and also in the
-":ref:`dev-manual/dev-manual-common-tasks:maintaining open source license compliance during your product's lifecycle`"
+":ref:`dev-manual/common-tasks:maintaining open source license compliance during your product's lifecycle`"
 section in the Yocto Project Development Tasks Manual.
 
 **Q:** How do I disable the cursor on my touchscreen device?
@@ -362,7 +362,7 @@ redirect requests through proxy servers.
 .. note::
 
    You can find more information on the
-   ":yocto_wiki:`Working Behind a Network Proxy </wiki/Working_Behind_a_Network_Proxy>`"
+   ":yocto_wiki:`Working Behind a Network Proxy </Working_Behind_a_Network_Proxy>`"
    Wiki page.
 
 **Q:** Can I get rid of build output so I can start over?

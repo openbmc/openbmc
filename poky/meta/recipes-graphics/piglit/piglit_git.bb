@@ -8,10 +8,15 @@ SRC_URI = "git://gitlab.freedesktop.org/mesa/piglit.git;protocol=https \
            file://0001-cmake-install-bash-completions-in-the-right-place.patch \
            file://0001-cmake-use-proper-WAYLAND_INCLUDE_DIRS-variable.patch \
            file://0001-Add-a-missing-include-for-htobe32-definition.patch \
+           file://0001-generated_tests-gen_tcs-tes_input_tests.py-do-not-ha.patch \
+           file://0002-tests-util-piglit-shader.c-do-not-hardcode-build-pat.patch \
+           file://0001-serializer.py-make-.gz-files-reproducible.patch \
+           file://0001-framework-profile.py-make-test-lists-reproducible.patch \
+           file://0001-tests-shader.py-sort-the-file-list-before-working-on.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRCREV = "59e695c16fdcdd4ea4f16365f0e397a93cef7b80"
+SRCREV = "0fda9f67a782edec640998286e7b6058e8933d17"
 # (when PV goes above 1.0 remove the trailing r)
 PV = "1.0+gitr${SRCPV}"
 
@@ -37,6 +42,7 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 PACKAGECONFIG[freeglut] = "-DPIGLIT_USE_GLUT=1,-DPIGLIT_USE_GLUT=0,freeglut,"
 PACKAGECONFIG[x11] = "-DPIGLIT_BUILD_GL_TESTS=ON,-DPIGLIT_BUILD_GL_TESTS=OFF,${X11_DEPS}, ${X11_RDEPS}"
 
+export PIGLIT_BUILD_DIR = "../../../../git"
 
 do_configure_prepend() {
    if [ "${@bb.utils.contains('PACKAGECONFIG', 'freeglut', 'yes', 'no', d)}" = "no" ]; then

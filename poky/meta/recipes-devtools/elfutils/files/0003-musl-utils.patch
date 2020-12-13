@@ -1,4 +1,4 @@
-From 9b237f19f82d5ab1e0702637fece1866b1ef6681 Mon Sep 17 00:00:00 2001
+From e7e5333ed2e19f25ecbd7121f424eec99d61265a Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:19:48 +0800
 Subject: [PATCH] musl-utils
@@ -58,7 +58,7 @@ index 6ba6af4..0c7674b 100644
  ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
  
 diff --git a/src/readelf.c b/src/readelf.c
-index 685d0b1..a842b10 100644
+index 64067a5..630739c 100644
 --- a/src/readelf.c
 +++ b/src/readelf.c
 @@ -4829,10 +4829,11 @@ listptr_base (struct listptr *p)
@@ -142,7 +142,7 @@ index 48792a7..198a2e4 100644
  
  /* Name and version of program.  */
 diff --git a/src/unstrip.c b/src/unstrip.c
-index 9b8c09a..1fb5063 100644
+index a855038..df6fc1c 100644
 --- a/src/unstrip.c
 +++ b/src/unstrip.c
 @@ -56,6 +56,15 @@

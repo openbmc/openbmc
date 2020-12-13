@@ -40,7 +40,7 @@ class AsyncClient(object):
 
         self._connect_sock = connect_sock
 
-    async def _connect(self):
+    async def connect(self):
         if self.reader is None or self.writer is None:
             (self.reader, self.writer) = await self._connect_sock()
 
@@ -62,7 +62,7 @@ class AsyncClient(object):
         count = 0
         while True:
             try:
-                await self._connect()
+                await self.connect()
                 return await proc()
             except (
                 OSError,
@@ -190,7 +190,6 @@ class Client(object):
 
         for call in (
             "connect_tcp",
-            "connect_unix",
             "close",
             "get_unihash",
             "report_unihash",
@@ -208,6 +207,16 @@ class Client(object):
             return self.loop.run_until_complete(downcall(*args, **kwargs))
 
         return wrapper
+
+    def connect_unix(self, path):
+        # AF_UNIX has path length issues so chdir here to workaround
+        cwd = os.getcwd()
+        try:
+            os.chdir(os.path.dirname(path))
+            self.loop.run_until_complete(self.client.connect_unix(os.path.basename(path)))
+            self.loop.run_until_complete(self.client.connect())
+        finally:
+            os.chdir(cwd)
 
     @property
     def max_chunk(self):

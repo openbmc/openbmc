@@ -24,16 +24,16 @@ python __anonymous() {
         d.setVar("INHIBIT_UPDATERCD_BBCLASS", "1")
 }
 
-USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --home ${localstatedir}/lib/dbus \
-                       --no-create-home --shell /bin/false \
-                       --user-group messagebus"
+PACKAGES =+ "${PN}-lib ${PN}-common ${PN}-tools"
+
+USERADD_PACKAGES = "dbus-common"
+USERADD_PARAM_dbus-common = "--system --home ${localstatedir}/lib/dbus \
+                             --no-create-home --shell /bin/false \
+                             --user-group messagebus"
 
 CONFFILES_${PN} = "${sysconfdir}/dbus-1/system.conf ${sysconfdir}/dbus-1/session.conf"
 
 DEBIANNAME_${PN} = "dbus-1"
-
-PACKAGES =+ "${PN}-lib ${PN}-common ${PN}-tools"
 
 OLDPKGNAME = "dbus-x11"
 OLDPKGNAME_class-nativesdk = ""

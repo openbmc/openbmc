@@ -71,7 +71,7 @@ be monitoring.
 In addition, pseudo's behaviour on mismatches has now been changed - rather
 than doing what turns out to be a rather dangerous "fixup" if it sees a file
 with a different path but the same inode as another file it has previously seen,
-pseudo will throw an ``abort()`` and direct you to a :yocto_wiki:`wiki page </wiki/Pseudo_Abort>`
+pseudo will throw an ``abort()`` and direct you to a :yocto_wiki:`wiki page </Pseudo_Abort>`
 that explains how to deal with this.
 
 

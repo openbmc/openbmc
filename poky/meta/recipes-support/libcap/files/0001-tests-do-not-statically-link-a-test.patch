@@ -1,4 +1,4 @@
-From 03e925f0d68bc51e1acf1ac2014a9c2452c664bf Mon Sep 17 00:00:00 2001
+From c22c6c16362c7dbc8d6faea06edee5e07759c5fa Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 15 Jan 2020 17:16:28 +0100
 Subject: [PATCH] tests: do not statically link a test
@@ -9,23 +9,37 @@ Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
+ progs/Makefile | 2 +-
  tests/Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/progs/Makefile b/progs/Makefile
+index 1d7fc7a..37db8f7 100644
+--- a/progs/Makefile
++++ b/progs/Makefile
+@@ -42,7 +42,7 @@ endif
+ test: $(PROGS)
+ 
+ tcapsh-static: capsh.c $(DEPS)
+-	$(CC) $(IPATH) $(CAPSH_SHELL) $(CFLAGS) -o $@ $< $(LIBCAPLIB) $(LDFLAGS) --static
++	$(CC) $(IPATH) $(CAPSH_SHELL) $(CFLAGS) -o $@ $< $(LIBCAPLIB) $(LDFLAGS)
+ 
+ sudotest: test tcapsh-static
+ 	sudo $(LDPATH) ./quicktest.sh
 diff --git a/tests/Makefile b/tests/Makefile
-index d569650..f5ca377 100644
+index 3431df9..727fb86 100644
 --- a/tests/Makefile
 +++ b/tests/Makefile
-@@ -11,7 +11,7 @@ ifeq ($(DYNAMIC),yes)
- LDPATH = LD_LIBRARY_PATH=../libcap
- DEPSBUILD = all
+@@ -22,7 +22,7 @@ ifeq ($(PTHREADS),yes)
+ DEPS += ../libcap/libpsx.so
+ endif
  else
 -LDFLAGS += --static
-+LDFLAGS += 
- DEPSBUILD = libcap.a libpsx.a
- endif
- 
-@@ -51,7 +51,7 @@ libcap_psx_launch_test: libcap_launch_test.c $(DEPS)
++LDFLAGS +=
+ DEPS=../libcap/libcap.a ../progs/tcapsh-static
+ ifeq ($(PTHREADS),yes)
+ DEPS +=  ../libcap/libpsx.a
+@@ -106,7 +106,7 @@ noexploit: exploit.o $(DEPS)
  
  # This one runs in a chroot with no shared library files.
  noop: noop.c

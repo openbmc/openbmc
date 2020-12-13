@@ -49,7 +49,7 @@ contact us with other suggestions.
    their silicon. These layers have names such as "meta-intel" or "meta-ti". Try
    not to build layers from scratch. If you do have custom silicon, use one of
    these layers as a guide or template and familiarize yourself with the
-   :doc:`bsp-guide/bsp-guide`.
+   :doc:`bsp-guide/index`.
 
 #. **Do not put everything into one layer:**
    Use different layers to logically separate information in your build. As an
@@ -126,16 +126,16 @@ contact us with other suggestions.
    You can build and run a specific task for a specific package (including
    devshell) or even a single recipe. When developers first start using the
    Yocto Project, the instructions found in the
-   :doc:`brief-yoctoprojectqs/brief-yoctoprojectqs` show how to create an image
+   :doc:`brief-yoctoprojectqs/index` show how to create an image
    and then run or flash that image.  However, you can actually build just a
    single recipe. Thus, if some dependency or recipe isn't working, you can just
    say "bitbake foo" where "foo" is the name for a specific recipe.  As you
    become more advanced using the Yocto Project, and if builds are failing, it
    can be useful to make sure the fetch itself works as desired. Here are some
-   valuable links: :ref:`dev-manual/dev-manual-common-tasks:Using a Development
+   valuable links: :ref:`dev-manual/common-tasks:Using a Development
    Shell` for information on how to build and run a specific task using
    devshell. Also, the :ref:`SDK manual shows how to build out a specific recipe
-   <sdk-manual/sdk-extensible:use \`\`devtool modify\`\` to modify the source of an existing component>`.
+   <sdk-manual/extensible:use \`\`devtool modify\`\` to modify the source of an existing component>`.
 
 #. **An ambiguous definition: Package vs Recipe:**
    A recipe contains instructions the build system uses to create
@@ -190,28 +190,28 @@ contact us with other suggestions.
      contains procedural information grouped to help you get set up, work with
      layers, customize images, write new recipes, work with libraries, and use
      QEMU. The information is task-based and spans the breadth of the Yocto
-     Project. See the :doc:`../dev-manual/dev-manual`.
+     Project. See the :doc:`/dev-manual/index`.
 
    * **Look Through the Yocto Project Application Development and the Extensible
      Software Development Kit (eSDK) manual**: This manual describes how to use
      both the standard SDK and the extensible SDK, which are used primarily for
-     application development. The :doc:`../sdk-manual/sdk-extensible` also provides
+     application development. The :doc:`/sdk-manual/extensible` also provides
      example workflows that use devtool. See the section
-     :ref:`sdk-manual/sdk-extensible:using \`\`devtool\`\` in your sdk workflow`
+     :ref:`sdk-manual/extensible:using \`\`devtool\`\` in your sdk workflow`
      for more information.
 
    * **Learn About Kernel Development**: If you want to see how to work with the
-     kernel and understand Yocto Linux kernels, see the :doc:`../kernel-dev/kernel-dev`.
+     kernel and understand Yocto Linux kernels, see the :doc:`/kernel-dev/index`.
      This manual provides information on how to patch the kernel, modify kernel
      recipes, and configure the kernel.
 
    * **Learn About Board Support Packages (BSPs)**: If you want to learn about
-     BSPs, see the :doc:`../bsp-guide/bsp-guide`. This manual also provides an
-     example BSP creation workflow. See the :doc:`../bsp-guide/bsp` section.
+     BSPs, see the :doc:`/bsp-guide/index`. This manual also provides an
+     example BSP creation workflow. See the :doc:`/bsp-guide/bsp` section.
 
    * **Learn About Toaster**: Toaster is a web interface to the Yocto Project's
      OpenEmbedded build system. If you are interested in using this type of
-     interface to create images, see the :doc:`../toaster-manual/toaster-manual`.
+     interface to create images, see the :doc:`/toaster-manual/index`.
 
    * **Have Available the Yocto Project Reference Manual**: Unlike the rest of
      the Yocto Project manual set, this manual is comprised of material suited
@@ -219,7 +219,7 @@ contact us with other suggestions.
      look at how the pieces of the Yocto Project development environment work
      together, information on various technical details, guidance on migrating
      to a newer Yocto Project release, reference material on the directory
-     structure, classes, and tasks. The :doc:`../ref-manual/ref-manual` also
+     structure, classes, and tasks. The :doc:`/ref-manual/index` also
      contains a fairly comprehensive glossary of variables used within the Yocto
      Project.
 

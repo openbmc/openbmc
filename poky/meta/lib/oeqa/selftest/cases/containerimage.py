@@ -60,11 +60,7 @@ IMAGE_INSTALL_remove = "ssh-pregen-hostkeys"
                     '.{sysconfdir}/version',
                     './run/',
                     '.{localstatedir}/cache/',
-                    '.{localstatedir}/cache/ldconfig/',
-                    '.{localstatedir}/cache/ldconfig/aux-cache',
-                    '.{localstatedir}/cache/opkg/',
-                    '.{localstatedir}/lib/',
-                    '.{localstatedir}/lib/opkg/'
+                    '.{localstatedir}/lib/'
                 ]
 
         expected_files = [ x.format(bindir=bbvars['bindir'],

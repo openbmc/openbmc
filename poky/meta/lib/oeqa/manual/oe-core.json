@@ -80,7 +80,7 @@
           "expected_results": ""
         },
         "7": {
-          "action": "Run command:./configure && make ",
+          "action": "Run command:./configure ${CONFIGUREOPTS} && make ",
           "expected_results": "Verify that \"matchbox-desktop\" binary file was created successfully under \"src/\" directory "
         },
         "8": {

@@ -180,7 +180,7 @@ or ::
 The earlier build-time provides behavior was a quirk of the
 way the Python manifest file was created. For more information on this
 change please see :yocto_git:`this commit
-</cgit/cgit.cgi/poky/commit/?id=8d94b9db221d1def42f091b991903faa2d1651ce>`.
+</poky/commit/?id=8d94b9db221d1def42f091b991903faa2d1651ce>`.
 
 .. _migration-2.5-miscellaneous-changes:
 
@@ -266,7 +266,7 @@ The following are additional changes:
    will trigger a warning during ``do_rootfs``.
 
    For more information, see the
-   ":ref:`dev-manual/dev-manual-common-tasks:post-installation scripts`"
+   ":ref:`dev-manual/common-tasks:post-installation scripts`"
    section in the Yocto Project Development Tasks Manual.
 
 -  The ``elf`` image type has been removed. This image type was removed
@@ -293,8 +293,8 @@ The following are additional changes:
 
 -  Patches whose context does not match exactly (i.e. where patch
    reports "fuzz" when applying) will generate a warning. For an example
-   of this see `this
-   commit <http://git.yoctoproject.org/cgit/cgit.cgi/poky/commit/?id=cc97bc08125b63821ce3f616771830f77c456f57>`__.
+   of this see :yocto_git:`this commit
+   </poky/commit/?id=cc97bc08125b63821ce3f616771830f77c456f57>`.
 
 -  Layers are expected to set ``LAYERSERIES_COMPAT_layername`` to match
    the version(s) of OpenEmbedded-Core they are compatible with. This is

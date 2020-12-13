@@ -23,7 +23,7 @@ python __anonymous() {
 }
 
 systemd_postinst() {
-if type systemctl >/dev/null 2>/dev/null; then
+if systemctl >/dev/null 2>/dev/null; then
 	OPTS=""
 
 	if [ -n "$D" ]; then
@@ -48,7 +48,7 @@ fi
 }
 
 systemd_prerm() {
-if type systemctl >/dev/null 2>/dev/null; then
+if systemctl >/dev/null 2>/dev/null; then
 	if [ -z "$D" ]; then
 		systemctl stop ${SYSTEMD_SERVICE_ESCAPED}
 
