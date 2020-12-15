@@ -1,0 +1,32 @@
+From 1893f4b5b945e05dbfe9c8a7b3894a9d05ebd179 Mon Sep 17 00:00:00 2001
+From: Hieu Huynh <hieu.huynh@amperecomputing.com>
+Date: Tue, 15 Dec 2020 09:19:29 +0000
+Subject: [PATCH] Correct the power limit value
+
+This commit correct the power limit value:
+min = 90
+max = 500
+
+Signed-off-by: Hieu Huynh <hieu.huynh@amperecomputing.com>
+---
+ app/server-control/controllers/power-usage-controller.html | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/app/server-control/controllers/power-usage-controller.html b/app/server-control/controllers/power-usage-controller.html
+index 1a2a4b5..112d560 100644
+--- a/app/server-control/controllers/power-usage-controller.html
++++ b/app/server-control/controllers/power-usage-controller.html
+@@ -51,8 +51,8 @@
+         <input
+           id="power-cap"
+           type="number"
+-          min="100"
+-          max="10000"
++          min="90"
++          max="500"
+           step="1"
+           ng-disabled="!power_cap.PowerCapEnable"
+           ng-model="power_cap.PowerCap"
+-- 
+2.17.1
+
