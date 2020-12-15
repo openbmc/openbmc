@@ -332,6 +332,14 @@ make_signatures() {
 		openssl dgst -sha256 -sign ${SIGNING_KEY} -out "${file}.sig" $file
 		signature_files="${signature_files} ${file}.sig"
 	done
+
+	if [ -n "$signature_files" ]; then
+		sort_signature_files=`echo "$signature_files" | tr ' ' '\n' | sort | tr '\n' ' '`
+		cat $sort_signature_files > image-full
+		openssl dgst -sha256 -sign ${SIGNING_KEY} -out image-full.sig image-full
+		signature_files="${signature_files} image-full.sig"
+		rm -rf image-full
+	fi
 }
 
 do_generate_static_alltar() {
