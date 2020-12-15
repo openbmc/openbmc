@@ -1,0 +1,35 @@
+From 086b098ea4160963cd09405fbdf6816bef095d16 Mon Sep 17 00:00:00 2001
+From: Lei YU <yulei.sh@bytedance.com>
+Date: Tue, 15 Dec 2020 16:50:31 +0800
+Subject: [PATCH] Remove Total_Power sensor
+
+The Total_Power sensor is not used on g220a system. Remove it.
+The sensor will be replaced by a virtual sensor.
+
+Tested: Verify the Total_Power sensor is gone on DBus.
+
+Signed-off-by: Lei YU <yulei.sh@bytedance.com>
+---
+ NodeManagerProxy.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/NodeManagerProxy.cpp b/NodeManagerProxy.cpp
+index d9fb760..9dbd5da 100644
+--- a/NodeManagerProxy.cpp
++++ b/NodeManagerProxy.cpp
+@@ -120,9 +120,9 @@ void createSensors()
+     // NM Statistics
+     // Global power statistics
+     configuredSensors.push_back(std::make_unique<PowerMetric>(server));
+-    configuredSensors.push_back(std::make_unique<GlobalPowerPlatform>(
+-        server, 0, 2040, "power", "Total_Power", globalPowerStats,
+-        entirePlatform, 0));
++//    configuredSensors.push_back(std::make_unique<GlobalPowerPlatform>(
++//        server, 0, 2040, "power", "Total_Power", globalPowerStats,
++//        entirePlatform, 0));
+     configuredSensors.push_back(
+         std::make_unique<GlobalPowerCpu>(server, 0, 510, "power", "CPU_Power",
+                                          globalPowerStats, cpuSubsystem, 0));
+-- 
+2.25.1
+

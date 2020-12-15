@@ -17,3 +17,7 @@ DEPENDS = "sdbusplus \
 
 S = "${WORKDIR}/git/"
 inherit cmake systemd
+
+SRC_URI_append = " \
+    file://0001-Remove-Total_Power-sensor.patch \
+"
