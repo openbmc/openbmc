@@ -1,0 +1,9 @@
+[Unit]
+Description=Ampere Computing LLC warm reset host
+Conflicts=obmc-chassis-poweroff@0.target
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/usr/bin/env ampere_power_util.sh mb graceful_reset
+SyslogIdentifier=ampere_power_util.sh
