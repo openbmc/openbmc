@@ -148,7 +148,7 @@ HOST_LINK_ACTION_FMT = "${HOST_ACTION_FMT}:obmc-host-{0}@{1}.target"
 FAN_LINK_FMT = "obmc-fan-control-ready@.target:obmc-fan-control-ready@{0}.target"
 
 # Targets to be executed on checkstop and watchdog timeout
-HOST_ERROR_TARGETS = "crash timeout"
+HOST_ERROR_TARGETS = "timeout"
 
 QUIESCE_TMPL = "obmc-host-quiesce@.target"
 CRASH_TIMEOUT_TGTFMT = "obmc-host-{0}@{1}.target"
