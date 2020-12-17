@@ -83,11 +83,6 @@ pkg_postinst_${PN}-obmc-targets_append() {
     TARGET="../obmc-host-force-warm-reboot@.target"
     ln -s $TARGET $LINK
 
-    mkdir -p $D$systemd_system_unitdir/obmc-host-diagnostic-mode@0.target.requires
-    LINK="$D$systemd_system_unitdir/obmc-host-diagnostic-mode@0.target.requires/obmc-host-force-warm-reboot@0.target"
-    TARGET="../obmc-host-force-warm-reboot@.target"
-    ln -s $TARGET $LINK
-
     mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.wants
     LINK="$D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.wants/phosphor-clear-one-time@0.service"
     TARGET="../phosphor-clear-one-time@.service"
@@ -148,9 +143,6 @@ pkg_prerm_${PN}-obmc-targets_append() {
     rm $LINK
 
     LINK="$D$systemd_system_unitdir/obmc-host-warm-reboot@0.target.requires/obmc-host-force-warm-reboot@0.target"
-    rm $LINK
-
-    LINK="$D$systemd_system_unitdir/obmc-host-diagnostic-mode@0.target.requires/obmc-host-force-warm-reboot@0.target"
     rm $LINK
 
     LINK="$D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.wants/phosphor-clear-one-time@0.service"
