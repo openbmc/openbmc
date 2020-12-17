@@ -4,9 +4,14 @@
 # Author : Hoang Nguyen  <hnguyen@amperecomputing.com>
 # Modify : Chanh Nguyen  <chnguyen@amperecomputing.com>
 
-ETHERNET_INTERFACE="eth0"
+ETHERNET_INTERFACE="eth1"
+ETHERNET_NCSI="eth0"
 ENV_ETH="eth1addr"
 ENV_MAC_ADDR=`fw_printenv`
+
+# Workaround to dhcp NC-SI eth0 interface when BMC boot up
+ifconfig ${ETHERNET_NCSI} down
+ifconfig ${ETHERNET_NCSI} up
 
 # Check if BMC MAC address is exported
 if [[ $ENV_MAC_ADDR =~ $ENV_ETH ]]; then

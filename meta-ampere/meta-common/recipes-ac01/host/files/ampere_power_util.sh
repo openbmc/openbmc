@@ -1,16 +1,41 @@
 #!/bin/bash
 # Usage of this utility
+function set_gpio_active_low() {
+  if [ $# -ne 2 ]; then
+    echo "set_gpio_active_low: need both GPIO# and initial level";
+    return;
+  fi
+
+  if [ ! -d /sys/class/gpio/gpio$1 ]; then
+    echo $1 > /sys/class/gpio/export
+  fi
+  echo $2 > /sys/class/gpio/gpio$1/direction
+
+  if [ -d /sys/class/gpio/gpio$1 ]; then
+    echo $1 > /sys/class/gpio/unexport
+  fi
+}
+
+GPIO_OCP_AUX_PWREN=139
+GPIO_OCP_MAIN_PWREN=140
+
+GPIO_BASE=$(cat /sys/class/gpio/gpio*/base)
+
 function usage() {
   echo "usage: power-util mb [on|off|status|cycle|reset|graceful_shutdown|graceful_reset|force_reset]";
 }
 
 power_off() {
   echo "Shutting down Server $2"
+  set_gpio_active_low $((${GPIO_BASE} + ${GPIO_OCP_AUX_PWREN})) high
+  set_gpio_active_low $((${GPIO_BASE} + ${GPIO_OCP_MAIN_PWREN})) low
   busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.Off
 }
 
 power_on() {
   echo "Powering on Server $2"
+  set_gpio_active_low $((${GPIO_BASE} + ${GPIO_OCP_AUX_PWREN})) high
+  set_gpio_active_low $((${GPIO_BASE} + ${GPIO_OCP_MAIN_PWREN})) high
   busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.On
 }
 
