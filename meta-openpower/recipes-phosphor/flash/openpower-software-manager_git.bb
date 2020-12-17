@@ -59,7 +59,7 @@ S = "${WORKDIR}/git"
 
 SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
 
-SRCREV = "4dcf55d4e933c121c41f3b9461066bf3bd601ad9"
+SRCREV = "0529d284b008fa4b4ff9512da5f375decfd62740"
 
 DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
 
