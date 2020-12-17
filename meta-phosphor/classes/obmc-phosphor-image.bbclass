@@ -86,11 +86,6 @@ remove_etc_version() {
         rm ${IMAGE_ROOTFS}${sysconfdir}/version
 }
 
-disable_systemd_pager() {
-        echo "SYSTEMD_PAGER=" >> ${IMAGE_ROOTFS}${sysconfdir}/profile
-        echo "export SYSTEMD_PAGER" >> ${IMAGE_ROOTFS}${sysconfdir}/profile
-}
-
 enable_ldap_nsswitch() {
     sed -i 's/\(\(passwd\|group\|shadow\):\s*\).*/\1files ldap/' \
         "${IMAGE_ROOTFS}${sysconfdir}/nsswitch.conf"
