@@ -1,0 +1,12 @@
+[Unit]
+Description=Ampere Computing LLC SCP failover service
+Wants=obmc-power-on@0.target
+After=obmc-power-on@0.target
+Conflicts=obmc-chassis-powered-off@0.target
+
+[Service]
+ExecStart=/usr/bin/ampere-scp-failover
+SyslogIdentifier=ampere-scp-failover
+
+[Install]
+WantedBy=obmc-chassis-poweron@0.target
