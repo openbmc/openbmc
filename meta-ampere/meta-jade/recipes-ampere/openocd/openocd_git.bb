@@ -6,7 +6,7 @@ RDEPENDS_${PN} = "libusb1"
 
 #Remote Git Repository
 SRC_URI = "git://github.com/AmpereComputing/ampere-openocd.git;protocol=https"
-SRCREV = "f176c6de410601570d9b351fb98d6e204e83140e"
+SRCREV = "48b4d06598991b07165111a6ad5a3293e4579212"
 
 S = "${WORKDIR}/git"
 
