@@ -12,9 +12,13 @@ SRC_URI[sha256sum] = "c77a9812751f114490a28a6839b16aac8b020c8d9fd6aa22bf3880c054
 
 EXTRA_OECONF_append_libc-musl = " --embedded-libc"
 
-inherit autotools-brokensep
+inherit autotools-brokensep update-alternatives
 
 do_configure() {
     oe_runconf
 }
 
+ALTERNATIVE_PRIORITY = "100"
+
+ALTERNATIVE_${PN} = "pimd"
+ALTERNATIVE_LINK_NAME[pimd] = "${sbindir}/pimd"

@@ -1,0 +1,118 @@
+From 6c6de7c07290248a3c72a50c7790885ee4bc13a2 Mon Sep 17 00:00:00 2001
+From: Robin Lee <cheeselee@fedoraproject.org>
+Date: Mon, 24 Feb 2020 17:52:39 +0800
+Subject: [PATCH] Fix multiple definition errors under GCC 10.0
+
+Fixes #16436, RHBZ#1800268
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/sensors-interface-common.h | 22 ++++++++++++++--------
+ lib/sensors-interface-common.c     |  1 +
+ 2 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/include/sensors-interface-common.h b/include/sensors-interface-common.h
+index 62a27eb..05146c5 100644
+--- a/include/sensors-interface-common.h
++++ b/include/sensors-interface-common.h
+@@ -146,6 +146,12 @@ t_sensors_dialog;
+ 
+ 
+ 
++#ifdef XFCE4_SENSORS_INTERFACE_COMMON_DEFINING
++#define EXTERN
++#else
++#define EXTERN extern
++#endif
++
+ /* Extern functions that need to be re-implemented in the sensors-viewer and
+  * the panel code.
+  * They kind of need to be registered at the library by any software
+@@ -157,7 +163,7 @@ t_sensors_dialog;
+  * @param ptr_widget: Pointer to original widget, i.e, the update timer box
+  * @param ptr_sensorsdialog: argument pointer to sensors dialog data
+  */
+-void
++EXTERN void
+ (*adjustment_value_changed) (GtkWidget *ptr_widget,
+                              t_sensors_dialog *ptr_sensorsdialog);
+ 
+@@ -167,7 +173,7 @@ void
+  * @param ptr_widget: Pointer to original widget, i.e, the sensor entry combobox
+  * @param ptr_sensorsdialog: argument pointer to sensors dialog data
+  */
+-void
++EXTERN void
+ (*sensor_entry_changed) (GtkWidget *ptr_widget,
+                          t_sensors_dialog *ptr_sensorsdialog);
+ 
+@@ -178,7 +184,7 @@ void
+  * @param ptr_str_newtext: Pointer to the string containing the new label
+  * @param ptr_sensorsdialog: argument pointer to sensors dialog data
+  */
+-void
++EXTERN void
+ (*list_cell_text_edited) (GtkCellRendererText *ptr_cellrenderertext,
+                           gchar *ptr_str_path, gchar *ptr_str_newtext,
+                           t_sensors_dialog *ptr_sensorsdialog);
+@@ -189,7 +195,7 @@ void
+  * @param ptr_str_path: pointer to the string with the path of the changed item
+  * @param ptr_sensorsdialog: argument pointer to sensors dialog data
+  */
+-void
++EXTERN void
+ (*list_cell_toggle) (GtkCellRendererToggle *ptr_cellrenderertoggle, gchar *ptr_str_path,
+                      t_sensors_dialog *ptr_sensorsdialog);
+ 
+@@ -201,7 +207,7 @@ void
+  *                          hexadecimal rgb format #0011ff
+  * @param ptr_sensorsdialog: argument pointer to sensors dialog data
+  */
+-void
++EXTERN void
+ (*list_cell_color_edited) (GtkCellRendererText *ptr_cellrenderertext,
+                            gchar *ptr_str_path, gchar *ptr_str_newcolor,
+                            t_sensors_dialog *ptr_sensorsdialog);
+@@ -214,7 +220,7 @@ void
+  *                        temperature
+  * @param ptr_sensorsdialog: argument pointer to sensors dialog data
+  */
+-void
++EXTERN void
+ (*minimum_changed) (GtkCellRendererText *ptr_cellrenderertext, gchar *ptr_str_path,
+                     gchar *ptr_str_newmin, t_sensors_dialog *ptr_sensorsdialog);
+ 
+@@ -226,7 +232,7 @@ void
+  *                        temperature
+  * @param ptr_sensorsdialog: argument pointer to sensors dialog data
+  */
+-void
++EXTERN void
+ (*maximum_changed) (GtkCellRendererText *ptr_cellrenderertext, gchar *ptr_str_path,
+                     gchar *ptr_str_newmax, t_sensors_dialog *ptr_sensorsdialog);
+ 
+@@ -236,7 +242,7 @@ void
+  * @param ptr_widget: Pointer to original widget, i.e, the update timer box
+  * @param ptr_sensorsdialog: argument pointer to sensors dialog data
+  */
+-void
++EXTERN void
+ (*temperature_unit_change) (GtkWidget *ptr_widget,
+                             t_sensors_dialog *ptr_sensorsdialog);
+ 
+diff --git a/lib/sensors-interface-common.c b/lib/sensors-interface-common.c
+index 70aa154..8c79f1d 100644
+--- a/lib/sensors-interface-common.c
++++ b/lib/sensors-interface-common.c
+@@ -28,6 +28,7 @@
+ #include <libxfce4panel/xfce-panel-plugin.h>
+ 
+ /* Local/package includes */
++#define XFCE4_SENSORS_INTERFACE_COMMON_DEFINING
+ #include <configuration.h>
+ #include <sensors-interface-common.h>
+ #include <middlelayer.h>
+-- 
+2.24.1
+

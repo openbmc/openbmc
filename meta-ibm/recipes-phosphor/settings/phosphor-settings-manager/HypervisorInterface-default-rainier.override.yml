@@ -1,0 +1,74 @@
+/xyz/openbmc_project/network/hypervisor:
+    - Interface: xyz.openbmc_project.Network.SystemConfiguration
+      Properties:
+          HostName:
+              Default: '""'
+          DefaultGateway:
+              Default: '"0.0.0.0"'
+
+/xyz/openbmc_project/network/hypervisor/eth0:
+    - Interface: xyz.openbmc_project.Network.MACAddress
+      Properties:
+          MACAddress:
+              Default: '"00:00:00:00:00:00"'
+              Validation:
+                  Type: "regex"
+                  Validator: '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
+    - Interface: xyz.openbmc_project.Network.EthernetInterface
+      Properties:
+          DHCPEnabled:
+              Default: EthernetInterface::DHCPConf::none
+
+/xyz/openbmc_project/network/hypervisor/eth0/ipv4/addr0:
+    - Interface: xyz.openbmc_project.Network.IP
+      Properties:
+          Address:
+              Default: '"0.0.0.0"'
+          PrefixLength:
+              Default: 0
+              Validation:
+                  Type: "range"
+                  Validator: 0..32
+                  Unit: "bits"
+          Origin:
+              Default: IP::AddressOrigin::Static
+          Type:
+              Default: IP::Protocol::IPv4
+    - Interface: xyz.openbmc_project.Object.Enable
+      Properties:
+          Enabled:
+              Default: 'false'
+
+/xyz/openbmc_project/network/hypervisor/eth1:
+    - Interface: xyz.openbmc_project.Network.MACAddress
+      Properties:
+          MACAddress:
+              Default: '"00:00:00:00:00:00"'
+              Validation:
+                  Type: "regex"
+                  Validator: '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
+    - Interface: xyz.openbmc_project.Network.EthernetInterface
+      Properties:
+          DHCPEnabled:
+              Default: EthernetInterface::DHCPConf::none
+
+/xyz/openbmc_project/network/hypervisor/eth1/ipv4/addr0:
+    - Interface: xyz.openbmc_project.Network.IP
+      Properties:
+          Address:
+              Default: '"0.0.0.0"'
+          PrefixLength:
+              Default: 0
+              Validation:
+                  Type: "range"
+                  Validator: 0..32
+                  Unit: "bits"
+          Origin:
+              Default: IP::AddressOrigin::Static
+          Type:
+              Default: IP::Protocol::IPv4
+    - Interface: xyz.openbmc_project.Object.Enable
+      Properties:
+          Enabled:
+              Default: 'false'
+

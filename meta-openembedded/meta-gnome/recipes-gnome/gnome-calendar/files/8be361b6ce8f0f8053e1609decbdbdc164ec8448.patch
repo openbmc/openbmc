@@ -1,0 +1,242 @@
+From 8be361b6ce8f0f8053e1609decbdbdc164ec8448 Mon Sep 17 00:00:00 2001
+From: Evangelos Ribeiro Tzaras <devrtz@fortysixandtwo.eu>
+Date: Sat, 5 Sep 2020 02:06:34 +0200
+Subject: [PATCH] project: Switch to libhandy-1
+
+This commit updates the dependencies for libhandy to the tagged 1.0
+release and changes the code to accomodate the changes from
+libhandy-0 to libhandy-1.
+
+Notable changes:
+edit-dialog: HdyDialog has been dropped in [1]
+alarm-row: action child type in HdyActionRow has been removed.
+
+[1] https://gitlab.gnome.org/GNOME/libhandy/-/merge_requests/434
+Upstream-Status: Backport
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ build-aux/flatpak/org.gnome.Calendar.json |  4 ++--
+ meson.build                               |  2 +-
+ src/gui/gcal-alarm-row.c                  |  2 +-
+ src/gui/gcal-alarm-row.ui                 |  2 +-
+ src/gui/gcal-application.c                |  4 ++++
+ src/gui/gcal-edit-dialog.c                |  4 ++--
+ src/gui/gcal-edit-dialog.h                |  3 +--
+ src/gui/gcal-edit-dialog.ui               | 20 ++++++++++----------
+ 8 files changed, 22 insertions(+), 19 deletions(-)
+
+diff --git a/build-aux/flatpak/org.gnome.Calendar.json b/build-aux/flatpak/org.gnome.Calendar.json
+index 18893ad6..0772ca8d 100644
+--- a/build-aux/flatpak/org.gnome.Calendar.json
++++ b/build-aux/flatpak/org.gnome.Calendar.json
+@@ -174,8 +174,8 @@
+             "sources" : [
+                 {
+                     "type" : "git",
+-                    "url" : "https://source.puri.sm/Librem5/libhandy.git",
+-                    "branch" : "libhandy-0-0"
++                    "url" : "https://gitlab.gnome.org/GNOME/libhandy.git",
++                    "tag" : "1.0.0"
+                 }
+             ]
+         },
+diff --git a/meson.build b/meson.build
+index 2a546252..b81b95c9 100644
+--- a/meson.build
++++ b/meson.build
+@@ -165,7 +165,7 @@ libedataserver_dep = dependency('libedataserver-1.2', version: '>= 3.17.1')
+ libecal_dep = dependency('libecal-2.0', version: '>= 3.33.2')
+ libsoup_dep = dependency('libsoup-2.4')
+ libdazzle_dep = dependency('libdazzle-1.0', version: '>= 3.33.1')
+-libhandy_dep = dependency('libhandy-0.0', version: '>= 0.0.9')
++libhandy_dep = dependency('libhandy-1', version: '>= 1.0.0')
+ glib_dep = dependency('glib-2.0', version: '>= 2.58.0')
+ gtk_dep = dependency('gtk+-3.0', version: '>= 3.22.20')
+ gio_dep = dependency('gio-2.0', version: '>= 2.58.0')
+diff --git a/src/gui/gcal-alarm-row.c b/src/gui/gcal-alarm-row.c
+index 1f95426c..1ada82f4 100644
+--- a/src/gui/gcal-alarm-row.c
++++ b/src/gui/gcal-alarm-row.c
+@@ -214,7 +214,7 @@ setup_alarm (GcalAlarmRow *self)
+   duration = e_cal_component_alarm_trigger_get_duration (trigger);
+   formatted_duration = format_alarm_duration (duration);
+ 
+-  hdy_action_row_set_title (HDY_ACTION_ROW (self), formatted_duration);
++  hdy_preferences_row_set_title (HDY_PREFERENCES_ROW (self), formatted_duration);
+ 
+   action = e_cal_component_alarm_get_action (self->alarm);
+   gtk_toggle_button_set_active (self->volume_button, action == E_CAL_COMPONENT_ALARM_AUDIO);
+diff --git a/src/gui/gcal-alarm-row.ui b/src/gui/gcal-alarm-row.ui
+index 7d416c4c..bca8af50 100644
+--- a/src/gui/gcal-alarm-row.ui
++++ b/src/gui/gcal-alarm-row.ui
+@@ -3,7 +3,7 @@
+   <template class="GcalAlarmRow" parent="HdyActionRow">
+     <property name="visible">True</property>
+     <property name="can_focus">False</property>
+-    <child type="action">
++    <child>
+       <object class="GtkBox">
+         <property name="visible">True</property>
+         <property name="can_focus">False</property>
+diff --git a/src/gui/gcal-application.c b/src/gui/gcal-application.c
+index b9d46cec..591b95c8 100644
+--- a/src/gui/gcal-application.c
++++ b/src/gui/gcal-application.c
+@@ -34,6 +34,7 @@
+ #include <glib-object.h>
+ #include <gio/gio.h>
+ #include <glib/gi18n.h>
++#include <handy.h>
+ 
+ struct _GcalApplication
+ {
+@@ -446,6 +447,9 @@ gcal_application_startup (GApplication *app)
+   if ((g_application_get_flags (app) & G_APPLICATION_IS_SERVICE) != 0)
+     g_application_set_inactivity_timeout (app, 3 * 60 * 1000);
+ 
++  /*  initialize libhandy */
++  hdy_init();
++
+   GCAL_EXIT;
+ }
+ 
+diff --git a/src/gui/gcal-edit-dialog.c b/src/gui/gcal-edit-dialog.c
+index ae2b6714..5494a700 100644
+--- a/src/gui/gcal-edit-dialog.c
++++ b/src/gui/gcal-edit-dialog.c
+@@ -47,7 +47,7 @@
+ 
+ struct _GcalEditDialog
+ {
+-  HdyDialog         parent;
++  GtkDialog         parent;
+ 
+   gboolean          writable;
+ 
+@@ -133,7 +133,7 @@ static void          on_location_entry_changed_cb                (GtkEntry
+ static void          on_add_alarm_button_clicked_cb              (GtkWidget          *button,
+                                                                   GcalEditDialog     *self);
+ 
+-G_DEFINE_TYPE (GcalEditDialog, gcal_edit_dialog, HDY_TYPE_DIALOG)
++G_DEFINE_TYPE (GcalEditDialog, gcal_edit_dialog, GTK_TYPE_DIALOG)
+ 
+ enum
+ {
+diff --git a/src/gui/gcal-edit-dialog.h b/src/gui/gcal-edit-dialog.h
+index e4f44ec5..a557916b 100644
+--- a/src/gui/gcal-edit-dialog.h
++++ b/src/gui/gcal-edit-dialog.h
+@@ -22,7 +22,6 @@
+ #include "gcal-event.h"
+ #include "gcal-manager.h"
+ 
+-#include <handy.h>
+ 
+ G_BEGIN_DECLS
+ 
+@@ -32,7 +31,7 @@ G_BEGIN_DECLS
+ 
+ #define GCAL_TYPE_EDIT_DIALOG                (gcal_edit_dialog_get_type ())
+ 
+-G_DECLARE_FINAL_TYPE (GcalEditDialog, gcal_edit_dialog, GCAL, EDIT_DIALOG, HdyDialog);
++G_DECLARE_FINAL_TYPE (GcalEditDialog, gcal_edit_dialog, GCAL, EDIT_DIALOG, GtkDialog);
+ 
+ GtkWidget*           gcal_edit_dialog_new                     (void);
+ 
+diff --git a/src/gui/gcal-edit-dialog.ui b/src/gui/gcal-edit-dialog.ui
+index a36d8ae6..c28c22bb 100644
+--- a/src/gui/gcal-edit-dialog.ui
++++ b/src/gui/gcal-edit-dialog.ui
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <interface>
+-  <template class="GcalEditDialog" parent="HdyDialog">
++  <template class="GcalEditDialog" parent="GtkDialog">
+     <property name="can_focus">False</property>
+     <property name="resizable">False</property>
+     <property name="modal">True</property>
+@@ -156,7 +156,7 @@
+                         <property name="title" translatable="yes">Title</property>
+                         <property name="activatable-widget">summary_entry</property>
+ 
+-                        <child type="action">
++                        <child>
+                           <object class="GtkEntry" id="summary_entry">
+                             <property name="visible">True</property>
+                             <property name="valign">center</property>
+@@ -177,7 +177,7 @@
+                         <property name="title" translatable="yes">Location</property>
+                         <property name="activatable-widget">location_entry</property>
+ 
+-                        <child type="action">
++                        <child>
+                           <object class="GtkEntry" id="location_entry">
+                             <property name="visible">True</property>
+                             <property name="valign">center</property>
+@@ -226,7 +226,7 @@
+                         <property name="title" translatable="yes">All Day</property>
+                         <property name="activatable-widget">all_day_switch</property>
+ 
+-                        <child type="action">
++                        <child>
+                           <object class="GtkSwitch" id="all_day_switch">
+                             <property name="visible">True</property>
+                             <property name="can_focus">True</property>
+@@ -246,7 +246,7 @@
+                         <property name="visible">True</property>
+                         <property name="title" translatable="yes">Starts</property>
+ 
+-                        <child type="action">
++                        <child>
+                           <object class="GtkLabel" id="event_start_label">
+                             <property name="visible">True</property>
+                             <property name="can_focus">False</property>
+@@ -294,7 +294,7 @@
+                         <property name="visible">True</property>
+                         <property name="title" translatable="yes">Ends</property>
+ 
+-                        <child type="action">
++                        <child>
+                           <object class="GtkLabel" id="event_end_label">
+                             <property name="visible">True</property>
+                             <property name="can_focus">False</property>
+@@ -343,7 +343,7 @@
+                         <property name="title" translatable="yes">Repeat</property>
+                         <property name="activatable-widget">repeat_combo</property>
+ 
+-                        <child type="action">
++                        <child>
+                           <object class="GtkComboBoxText" id="repeat_combo">
+                             <property name="visible">True</property>
+                             <property name="can_focus">False</property>
+@@ -372,7 +372,7 @@
+                         <property name="title" translatable="yes">End Repeat</property>
+                         <property name="activatable-widget">repeat_combo</property>
+ 
+-                        <child type="action">
++                        <child>
+                           <object class="GtkComboBoxText" id="repeat_duration_combo">
+                             <property name="visible">True</property>
+                             <property name="can_focus">False</property>
+@@ -397,7 +397,7 @@
+                         <property name="title" translatable="yes">Number of Occurrences</property>
+                         <property name="activatable-widget">number_of_occurrences_spin</property>
+ 
+-                        <child type="action">
++                        <child>
+                           <object class = "GtkSpinButton" id="number_of_occurrences_spin">
+                             <property name="input_purpose">number</property>
+                             <property name="input-hints">no-emoji</property>
+@@ -415,7 +415,7 @@
+                         <property name="title" translatable="yes">End Repeat Date</property>
+                         <property name="activatable-widget">until_date_selector</property>
+ 
+-                        <child type="action">
++                        <child>
+                           <object class = "GcalDateSelector" id="until_date_selector">
+                             <property name="valign">center</property>
+                           </object>
+-- 
+GitLab
+

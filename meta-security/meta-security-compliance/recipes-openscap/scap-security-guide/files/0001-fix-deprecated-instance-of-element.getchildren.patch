@@ -1,0 +1,43 @@
+From e435bf2dc59d652710104a1c59332e410b12bb64 Mon Sep 17 00:00:00 2001
+From: Vojtech Polasek <vpolasek@redhat.com>
+Date: Mon, 8 Jun 2020 12:33:48 +0200
+Subject: [PATCH] fix deprecated instance of element.getchildren
+
+Upstream-Status: Backport
+[https://github.com/ComplianceAsCode/content/commit/e435bf2dc59d652710104a1c59332e410b12bb64]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ ssg/build_remediations.py | 2 +-
+ ssg/build_stig.py         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ssg/build_remediations.py b/ssg/build_remediations.py
+index fdde0f268..c18d6bd54 100644
+--- a/ssg/build_remediations.py
++++ b/ssg/build_remediations.py
+@@ -735,7 +735,7 @@ def expand_xccdf_subs(fix, remediation_type, remediation_functions):
+         # First concat output form of modified fix text (including text appended
+         # to all children of the fix)
+         modfix = [fix.text]
+-        for child in fix.getchildren():
++        for child in list(fix):
+             if child is not None and child.text is not None:
+                 modfix.append(child.text)
+         modfixtext = "".join(modfix)
+diff --git a/ssg/build_stig.py b/ssg/build_stig.py
+index 528285f3d..6122981fc 100644
+--- a/ssg/build_stig.py
++++ b/ssg/build_stig.py
+@@ -38,7 +38,7 @@ def add_references(reference, destination):
+         for ref in refs:
+             if (ref.get('href').startswith(stig_refs) and
+                     ref.text in dictionary):
+-                index = rule.getchildren().index(ref)
++                index = list(rule).index(ref)
+                 new_ref = ET.Element(
+                     '{%s}reference' % XCCDF11_NS, {'href': stig_ns})
+                 new_ref.text = dictionary[ref.text]
+-- 
+2.17.1
+

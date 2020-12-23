@@ -10,7 +10,7 @@ DESCRIPTION = "Utility to write IPMI SEL records to the journal"
 #      Monitors and logs SEL records for threshold sensor events
 
 inherit cmake systemd
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
@@ -18,7 +18,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 DEPENDS += "systemd sdbusplus boost phosphor-ipmi-host"
 
 SRC_URI = "git://github.com/openbmc/phosphor-sel-logger.git;protocol=git"
-SRCREV = "761bf202ba9db9fe644f8f400a5e768abe1a70cf"
+SRCREV = "df7bc1c6951fb7dd2776008aa0b7dc6bea44bed4"
 
 PV = "0.1+git${SRCPV}"
 

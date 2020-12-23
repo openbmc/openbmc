@@ -6,6 +6,10 @@ DEPENDS += "mtd-utils"
 PROVIDES += "u-boot-fw-utils"
 
 SRC_URI += "file://fw_env_ast2600_nor.config"
+SRC_URI += "file://fw_env_ast2600_mmc.config"
+
+ENV_CONFIG_FILE = "fw_env_ast2600_nor.config"
+ENV_CONFIG_FILE_df-phosphor-mmc = "fw_env_ast2600_mmc.config"
 
 INSANE_SKIP_${PN} = "already-stripped"
 EXTRA_OEMAKE_class-target = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${CC} ${CFLAGS} ${LDFLAGS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" V=1'
@@ -23,7 +27,8 @@ do_install () {
 	install -d ${D}${sysconfdir}
 	install -m 755 ${S}/tools/env/fw_printenv ${D}${base_sbindir}/fw_printenv
 	install -m 755 ${S}/tools/env/fw_printenv ${D}${base_sbindir}/fw_setenv
-	install -m 644 ${WORKDIR}/fw_env_ast2600_nor.config ${D}${sysconfdir}/fw_env.config
+
+	install -m 644 ${WORKDIR}/${ENV_CONFIG_FILE} ${D}${sysconfdir}/fw_env.config
 }
 
 do_install_class-cross () {

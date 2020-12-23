@@ -1,0 +1,214 @@
+From ca96f60a2c0d45c728c214c14e4fb254d5346777 Mon Sep 17 00:00:00 2001
+From: Hieu Huynh <hieu.huynh@amperecomputing.com>
+Date: Wed, 9 Dec 2020 04:10:25 +0000
+Subject: [PATCH] Support polulate and parser Multirecord
+
+This patch support populate and parser UUID from fru multirecord.
+
+Signed-off-by: Hieu Huynh <hieu.huynh@amperecomputing.com>
+---
+ frup.cpp         | 100 ++++++++++++++++++++++++++++++++++++++++++++++-
+ frup.hpp         |  13 ++++++
+ writefrudata.cpp |   9 ++++-
+ 3 files changed, 119 insertions(+), 3 deletions(-)
+
+diff --git a/frup.cpp b/frup.cpp
+index 9ddb0f6..bba28c0 100644
+--- a/frup.cpp
++++ b/frup.cpp
+@@ -80,6 +80,9 @@
+ 
+ #define OPENBMC_VPD_KEY_LEN 64
+ #define OPENBMC_VPD_VAL_LEN 512
++#define UUID_DATA_LENGTH 16
++#define UUID_RECORD_TYPE 0x03
++#define MULTI_RECORD_HEADER_SIZE 5
+ 
+ struct ipmi_fru_field
+ {
+@@ -155,6 +158,8 @@ const char* vpd_key_names[] = {
+     "Custom Field 7", /*OPENBMC_VPD_KEY_PRODUCT_CUSTOM7,*/
+     "Custom Field 8", /*OPENBMC_VPD_KEY_PRODUCT_CUSTOM8,*/
+ 
++    "UUID",           /*OPENBMC_VPD_KEY_MULTI_RECORD_UUID,*/
++
+     "Key Names Table End" /*OPENBMC_VPD_KEY_MAX,*/
+ };
+ 
+@@ -691,6 +696,93 @@ void _append_to_dict(uint8_t vpd_key_id, uint8_t* vpd_key_val,
+     }
+ }
+ 
++static void parseMultirecord(const uint8_t* recordData, const size_t dataLen,
++                             IPMIFruInfo& info)
++{
++    int i;
++    std::string uuidStr;
++    char hexString[20];
++    uint8_t recordType;
++    unsigned char uuidReorder[] = {};
++    const unsigned char* uuidBin;
++    unsigned char uuidCharOrder[UUID_DATA_LENGTH] = {3, 2, 1, 0, 5, 4, 7, 6, 8,
++                                                     9, 15, 14, 13, 12, 11, 10};
++
++    if (dataLen < MULTI_RECORD_HEADER_SIZE)
++    {
++        printf("Data shorter than header length\n");
++        recordData = nullptr; /* Bail out, indicate that further data
++                                 processing is impossible. */
++        return;
++    }
++
++    /* Verify header checksum */
++    uint8_t checksum = calculateCRC(recordData, MULTI_RECORD_HEADER_SIZE);
++    if (checksum)
++    {
++        printf("Invalid header checksum\n");
++        recordData = nullptr; /* Bail out, indicate that further data
++                                 processing is impossible. */
++        return;
++    }
++
++    /* As per IPMI Platform Management FRU Information Storage Definition v1.0
++     * revision 1.2.
++     * The Record Header has the following format:
++     * Byte 0: Record Type ID
++     * Byte 1: Record Format version
++     * Byte 2: Record Length
++     * Byte 3: Record Checksum
++     * Byte 4: Header Checksum
++     *
++     * The Multirecord area has the following format:
++     * 5 Bytes for Record Header
++     * 1 Bytes for System Unique ID Sub-Record Type: 0x07
++     * 16 bytes for UUID data
++     * */
++
++    /* Get record type */
++    recordType = recordData[0];
++
++    /* Skip first 6 bytes to get UUID data */
++    recordData += 6;
++
++    /*
++    * Layout of UUID:
++    * source: https://www.ietf.org/rfc/rfc4122.txt
++    *
++    * UUID binary format (16 bytes):
++    *
++    * 4B-2B-2B-2B-6B (big endian)
++    *
++    * UUID string is 36 length of characters (36 bytes):
++    *
++    * 0        9    14   19   24
++    * xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
++    *    be     be   be   be       be
++    * be means it should be converted to big endian.
++    */
++   /* Reformat the UUID data folow the RFC4122 */
++    for(i = 0; i < UUID_DATA_LENGTH; i++)
++    {
++        uuidReorder[i] = recordData[uuidCharOrder[i]];
++    }
++
++    uuidBin = (unsigned char*)uuidReorder;
++
++    /* Get UUID bytes to UUID string */
++    for(i = 0; i < UUID_DATA_LENGTH; i++)
++    {
++        sprintf(hexString, "%02x", uuidBin[i]);
++        uuidStr += hexString;
++    }
++
++    if(recordType == UUID_RECORD_TYPE){
++        info[OPENBMC_VPD_KEY_MULTI_RECORD_UUID] = std::make_pair(
++            vpd_key_names[OPENBMC_VPD_KEY_MULTI_RECORD_UUID], uuidStr);
++    }
++}
++
+ int parse_fru_area(const uint8_t area, const void* msgbuf, const size_t len,
+                    IPMIFruInfo& info)
+ {
+@@ -804,8 +896,14 @@ int parse_fru_area(const uint8_t area, const void* msgbuf, const size_t len,
+                 _append_to_dict(i, vpd_info[i].type_length_field, info);
+             }
+             break;
++        case IPMI_FRU_AREA_MULTI_RECORD:
++#if IPMI_FRU_PARSER_DEBUG
++            printf("Multi-record : Buf len = [%d]\n", len);
++#endif
++            parseMultirecord(static_cast<const uint8_t*>(msgbuf), len, info);
++            break;
+         default:
+-            /* TODO: Parse Multi Rec / Internal use area */
++            /* TODO: Internal use area */
+             break;
+     }
+ 
+diff --git a/frup.hpp b/frup.hpp
+index 6afd621..2f920fc 100644
+--- a/frup.hpp
++++ b/frup.hpp
+@@ -69,6 +69,18 @@ enum openbmc_vpd_key_id
+     OPENBMC_VPD_KEY_PRODUCT_CUSTOM8,
+     OPENBMC_VPD_KEY_PRODUCT_MAX = OPENBMC_VPD_KEY_PRODUCT_CUSTOM8,
+ 
++    /* Multi-record */
++    OPENBMC_VPD_KEY_MULTI_RECORD_UUID,
++    OPENBMC_VPD_KEY_MULTI_RECORD_CUSTOM1,
++    OPENBMC_VPD_KEY_MULTI_RECORD_CUSTOM2,
++    OPENBMC_VPD_KEY_MULTI_RECORD_CUSTOM3,
++    OPENBMC_VPD_KEY_MULTI_RECORD_CUSTOM4,
++    OPENBMC_VPD_KEY_MULTI_RECORD_CUSTOM5,
++    OPENBMC_VPD_KEY_MULTI_RECORD_CUSTOM6,
++    OPENBMC_VPD_KEY_MULTI_RECORD_CUSTOM7,
++    OPENBMC_VPD_KEY_MULTI_RECORD_CUSTOM8,
++    OPENBMC_VPD_KEY_MULTI_RECORD_MAX = OPENBMC_VPD_KEY_MULTI_RECORD_CUSTOM8,
++
+     OPENBMC_VPD_KEY_MAX,
+     OPENBMC_VPD_KEY_CUSTOM_FIELDS_MAX = 8,
+ 
+@@ -111,5 +123,6 @@ int parse_fru(const void* msgbuf, sd_bus_message* vpdtbl);
+ 
+ int parse_fru_area(const uint8_t area, const void* msgbuf, const size_t len,
+                    IPMIFruInfo& info);
++uint8_t calculateCRC(const unsigned char* data, size_t len);
+ 
+ #endif
+diff --git a/writefrudata.cpp b/writefrudata.cpp
+index 6cdcb3f..67e28a1 100644
+--- a/writefrudata.cpp
++++ b/writefrudata.cpp
+@@ -87,6 +87,11 @@ std::string getFRUValue(const std::string& section, const std::string& key,
+         minIndexValue = OPENBMC_VPD_KEY_CHASSIS_TYPE;
+         maxIndexValue = OPENBMC_VPD_KEY_CHASSIS_MAX;
+     }
++    else if (section == "MultiRecord")
++    {
++        minIndexValue = OPENBMC_VPD_KEY_MULTI_RECORD_UUID;
++        maxIndexValue = OPENBMC_VPD_KEY_MULTI_RECORD_MAX;
++    }
+ 
+     auto first = fruData.cbegin() + minIndexValue;
+     auto last = first + (maxIndexValue - minIndexValue) + 1;
+@@ -479,7 +484,7 @@ int ipmiPopulateFruAreas(uint8_t* fruData, const size_t dataLen,
+     // than the offset of any if the FRU areas mentioned in the common header,
+     // then we do not have a complete file.
+     for (uint8_t fruEntry = IPMI_FRU_INTERNAL_OFFSET;
+-         fruEntry < (sizeof(struct common_header) - 2); fruEntry++)
++         fruEntry < (sizeof(struct common_header) - 1); fruEntry++)
+     {
+         int rc = -1;
+         // Actual offset in the payload is the offset mentioned in common header
+@@ -622,7 +627,7 @@ int validateFRUArea(const uint8_t fruid, const char* fruFilename,
+     FruAreaVector fruAreaVec;
+ 
+     for (uint8_t fruEntry = IPMI_FRU_INTERNAL_OFFSET;
+-         fruEntry < (sizeof(struct common_header) - 2); fruEntry++)
++         fruEntry < (sizeof(struct common_header) - 1); fruEntry++)
+     {
+         // Create an object and push onto a vector.
+         std::unique_ptr<IPMIFruArea> fruArea = std::make_unique<IPMIFruArea>(
+-- 
+2.17.1
+

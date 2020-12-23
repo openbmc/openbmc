@@ -11,6 +11,7 @@ SECTION = "libs"
 SRC_URI = " \
     https://github.com/${BPN}/${BPN}/releases/download/v${PV}/${BP}.tar.gz \
     file://0001-Use-our-hand-build-native-src-generator.patch \
+    file://0001-Fix-build-with-icu-68.1.patch \
 "
 SRC_URI[md5sum] = "41bd1f1fcdcb4779cea478bb55cf07bf"
 SRC_URI[sha256sum] = "09fecacaf75ba5a242159e3a9758a5446b5ce4d0ab684f98a7040864e1d1286f"

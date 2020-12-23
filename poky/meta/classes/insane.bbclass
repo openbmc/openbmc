@@ -27,6 +27,7 @@ WARN_QA ?= " libdir xorg-driver-abi \
             infodir build-deps src-uri-bad symlink-to-sysroot multilib \
             invalid-packageconfig host-user-contaminated uppercase-pn patch-fuzz \
             mime mime-xdg unlisted-pkg-lics unhandled-features-check \
+            missing-update-alternatives \
             "
 ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             perms dep-cmp pkgvarcheck perm-config perm-line perm-link \
@@ -364,14 +365,14 @@ def package_qa_check_arch(path,name,d, elf, messages):
             target_os == "linux-gnu_ilp32" or re.match(r'mips64.*32', d.getVar('DEFAULTTUNE')))
     is_bpf = (oe.qa.elf_machine_to_string(elf.machine()) == "BPF")
     if not ((machine == elf.machine()) or is_32 or is_bpf):
-        package_qa_add_message(messages, "arch", "Architecture did not match (%s, expected %s) on %s" % \
-                 (oe.qa.elf_machine_to_string(elf.machine()), oe.qa.elf_machine_to_string(machine), package_qa_clean_path(path,d)))
+        package_qa_add_message(messages, "arch", "Architecture did not match (%s, expected %s) in %s" % \
+                 (oe.qa.elf_machine_to_string(elf.machine()), oe.qa.elf_machine_to_string(machine), package_qa_clean_path(path, d, name)))
     elif not ((bits == elf.abiSize()) or is_32 or is_bpf):
-        package_qa_add_message(messages, "arch", "Bit size did not match (%d to %d) %s on %s" % \
-                 (bits, elf.abiSize(), bpn, package_qa_clean_path(path,d)))
+        package_qa_add_message(messages, "arch", "Bit size did not match (%d, expected %d) in %s" % \
+                 (elf.abiSize(), bits, package_qa_clean_path(path, d, name)))
     elif not ((littleendian == elf.isLittleEndian()) or is_bpf):
-        package_qa_add_message(messages, "arch", "Endiannes did not match (%d to %d) on %s" % \
-                 (littleendian, elf.isLittleEndian(), package_qa_clean_path(path,d)))
+        package_qa_add_message(messages, "arch", "Endiannes did not match (%d, expected %d) in %s" % \
+                 (elf.isLittleEndian(), littleendian, package_qa_clean_path(path,d, name)))
 
 QAPATHTEST[desktop] = "package_qa_check_desktop"
 def package_qa_check_desktop(path, name, d, elf, messages):
@@ -438,12 +439,13 @@ def package_qa_hash_style(path, name, d, elf, messages):
     for line in phdrs.split("\n"):
         if "SYMTAB" in line:
             has_syms = True
-        if "GNU_HASH" or "DT_MIPS_XHASH" in line:
+        if "GNU_HASH" in line or "DT_MIPS_XHASH" in line:
             sane = True
         if ("[mips32]" in line or "[mips64]" in line) and d.getVar('TCLIBC') == "musl":
             sane = True
     if has_syms and not sane:
-        package_qa_add_message(messages, "ldflags", "No GNU_HASH in the ELF binary %s, didn't pass LDFLAGS?" % path)
+        path = package_qa_clean_path(path, d, name)
+        package_qa_add_message(messages, "ldflags", "File %s in package %s doesn't have GNU_HASH (didn't pass LDFLAGS?)" % (path, name))
 
 
 QAPATHTEST[buildpaths] = "package_qa_check_buildpaths"
@@ -457,10 +459,6 @@ def package_qa_check_buildpaths(path, name, d, elf, messages):
 
     # Ignore symlinks
     if os.path.islink(path):
-        return
-
-    # Ignore ipk and deb's CONTROL dir
-    if path.find(name + "/CONTROL/") != -1 or path.find(name + "/DEBIAN/") != -1:
         return
 
     tmpdir = bytes(d.getVar('TMPDIR'), encoding="utf-8")
@@ -712,12 +710,13 @@ def package_qa_walk(warnfuncs, errorfuncs, package, d):
     warnings = {}
     errors = {}
     for path in pkgfiles[package]:
-            elf = oe.qa.ELFFile(path)
-            try:
-                elf.open()
-            except (IOError, oe.qa.NotELFFileError):
-                # IOError can happen if the packaging control files disappear,
-                elf = None
+            elf = None
+            if os.path.isfile(path):
+                elf = oe.qa.ELFFile(path)
+                try:
+                    elf.open()
+                except oe.qa.NotELFFileError:
+                    elf = None
             for func in warnfuncs:
                 func(path, package, d, elf, warnings)
             for func in errorfuncs:
@@ -977,8 +976,8 @@ def package_qa_check_src_uri(pn, d, messages):
         package_qa_handle_error("src-uri-bad", "%s: SRC_URI uses PN not BPN" % pn, d)
 
     for url in d.getVar("SRC_URI").split():
-        if re.search(r"github\.com/.+/.+/archive/.+", url):
-            package_qa_handle_error("src-uri-bad", "%s: SRC_URI uses unstable GitHub archives" % pn, d)
+        if re.search(r"git(hu|la)b\.com/.+/.+/archive/.+", url):
+            package_qa_handle_error("src-uri-bad", "%s: SRC_URI uses unstable GitHub/GitLab archives, convert recipe to use git protocol" % pn, d)
 
 QARECIPETEST[unhandled-features-check] = "package_qa_check_unhandled_features_check"
 def package_qa_check_unhandled_features_check(pn, d, messages):
@@ -990,6 +989,14 @@ def package_qa_check_unhandled_features_check(pn, d, messages):
                     var_set = True
         if var_set:
             package_qa_handle_error("unhandled-features-check", "%s: recipe doesn't inherit features_check" % pn, d)
+
+QARECIPETEST[missing-update-alternatives] = "package_qa_check_missing_update_alternatives"
+def package_qa_check_missing_update_alternatives(pn, d, messages):
+    # Look at all packages and find out if any of those sets ALTERNATIVE variable
+    # without inheriting update-alternatives class
+    for pkg in (d.getVar('PACKAGES') or '').split():
+        if d.getVar('ALTERNATIVE_%s' % pkg) and not bb.data.inherits_class('update-alternatives', d):
+            package_qa_handle_error("missing-update-alternatives", "%s: recipe defines ALTERNATIVE_%s but doesn't inherit update-alternatives. This might fail during do_rootfs later!" % (pn, pkg), d)
 
 # The PACKAGE FUNC to scan each package
 python do_package_qa () {
@@ -1034,7 +1041,14 @@ python do_package_qa () {
     pkgfiles = {}
     for pkg in packages:
         pkgfiles[pkg] = []
-        for walkroot, dirs, files in os.walk(os.path.join(pkgdest, pkg)):
+        pkgdir = os.path.join(pkgdest, pkg)
+        for walkroot, dirs, files in os.walk(pkgdir):
+            # Don't walk into top-level CONTROL or DEBIAN directories as these
+            # are temporary directories created by do_package.
+            if walkroot == pkgdir:
+                for control in ("CONTROL", "DEBIAN"):
+                    if control in dirs:
+                        dirs.remove(control)
             for file in files:
                 pkgfiles[pkg].append(os.path.join(walkroot, file))
 

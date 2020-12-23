@@ -19,7 +19,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/rpcbind/rpcbind-${PV}.tar.bz2 \
 SRC_URI[md5sum] = "ed46f09b9c0fa2d49015f6431bc5ea7b"
 SRC_URI[sha256sum] = "2ce360683963b35c19c43f0ee2c7f18aa5b81ef41c3fdbd15ffcb00b8bffda7a"
 
-inherit autotools update-rc.d systemd pkgconfig
+inherit autotools update-rc.d systemd pkgconfig update-alternatives
 
 PACKAGECONFIG ??= "tcp-wrappers"
 PACKAGECONFIG[tcp-wrappers] = "--enable-libwrap,--disable-libwrap,tcp-wrappers"
@@ -50,3 +50,6 @@ do_install_append () {
 		${WORKDIR}/init.d > ${D}${sysconfdir}/init.d/rpcbind
 	chmod 0755 ${D}${sysconfdir}/init.d/rpcbind
 }
+
+ALTERNATIVE_${PN} = "rpcinfo"
+ALTERNATIVE_LINK_NAME[rpcinfo] = "${bindir}/rpcinfo"

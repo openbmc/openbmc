@@ -11,3 +11,4 @@ Type=oneshot
 ExecStart=@BASE_BINDIR@/mkdir -p ${DROPBEAR_RSAKEY_DIR}
 ExecStart=@SBINDIR@/dropbearkey -t rsa -f ${DROPBEAR_RSAKEY_DIR}/dropbear_rsa_host_key
 RemainAfterExit=yes
+Nice=10

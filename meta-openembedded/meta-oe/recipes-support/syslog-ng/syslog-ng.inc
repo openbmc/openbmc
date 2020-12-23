@@ -131,10 +131,6 @@ RDEPENDS_${PN} += "${PN}-libs"
 
 CONFFILES_${PN} = "${sysconfdir}/${BPN}.conf ${sysconfdir}/scl.conf"
 
-# syslog initscript is handled explicitly because order of
-# update-rc.d and update-alternatives is important
-RDEPENDS_${PN} += " ${@oe.utils.conditional("ONLINE_PACKAGE_MANAGEMENT", "none", "", "update-rc.d", d)}"
-
 RCONFLICTS_${PN} = "busybox-syslog sysklogd rsyslog"
 RCONFLICTS_${PN}-libs = "busybox-syslog sysklogd rsyslog"
 

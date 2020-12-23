@@ -1,0 +1,31 @@
+From f148d4f1b5b13288b254ead07f1d008d997e2342 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 2 Nov 2020 23:23:53 +0100
+Subject: [PATCH] anv: fix a build race between generating a header and using
+ it
+
+anv_batch_chain.c includes genX_bits.h but doesn't ensure it gets
+generated first. This causes build failures, as observed here:
+https://autobuilder.yoctoproject.org/typhoon/#/builders/86/builds/1501/steps/8/logs/step2d
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/7412]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ src/intel/vulkan/meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/intel/vulkan/meson.build b/src/intel/vulkan/meson.build
+index 36e1689314e..b713d8eade3 100644
+--- a/src/intel/vulkan/meson.build
++++ b/src/intel/vulkan/meson.build
+@@ -131,6 +131,7 @@ libanv_files = files(
+ anv_deps = [
+   dep_libdrm,
+   dep_valgrind,
++  idep_genxml,
+   idep_nir_headers,
+   idep_vulkan_util_headers,
+ ]
+-- 
+2.29.0
+

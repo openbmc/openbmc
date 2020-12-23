@@ -2,7 +2,6 @@ SUMMARY = "OpenBMC for OpenPOWER - Applications"
 PR = "r1"
 
 inherit packagegroup
-inherit obmc-phosphor-utils
 
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
@@ -30,10 +29,10 @@ RDEPENDS_${PN}-chassis = " \
         obmc-host-failure-reboots \
         "
 #Pull in obmc-fsi on all P9 OpenPOWER systems
-RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'op-fsi', 'op-fsi')}"
+RDEPENDS_${PN}-chassis += "${@bb.utils.contains('MACHINE_FEATURES', 'op-fsi', 'op-fsi', '', d)}"
 
 #Pull in p9-cfam-override on all P9 OpenPOWER systems
-RDEPENDS_${PN}-chassis += "${@mf_enabled(d, 'p9-cfam-override', 'p9-cfam-override')}"
+RDEPENDS_${PN}-chassis += "${@bb.utils.contains('MACHINE_FEATURES', 'p9-cfam-override', 'p9-cfam-override', '', d)}"
 
 SUMMARY_${PN}-fans = "OpenPOWER Fans"
 RDEPENDS_${PN}-fans = " \

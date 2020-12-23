@@ -42,9 +42,9 @@ inline static void help(char *name)
 {
   printf("%s is app to save Log for Hightemp/Overtemp event from SCP \n"
         "Example : \n"
-        "%s hightempstart : to save log for hightemp event starting"
-        "%s hightempstop : to save log for hightemp event stoping"
-        "%s overtempstop : to save log for overtemp event"
+        "%s Hightemp start : to save log for hightemp event starting"
+        "%s Hightemp stop : to save log for hightemp event stoping"
+        "%s Overtemp : to save log for overtemp event"
         , name,name,name,name);
 }
 
@@ -58,11 +58,12 @@ inline static void sendLogtoRedfish(std::string msgId) {
   eventData[2] = 0x00;
 
   std::string msg = "Hightemp/Overtemp Event";
-  std::string redMsgID = "OpenBMC " + msgId;
+  std::string severity = "Critical";
+  std::string redMsgID = "OpenBMC.0.1.AmpereCritical.Critical";
 
   selAddOemRecord(msg, LOG_ALERT, eventData, IPMI_SEL_OEM_RECORD_TYPE,
                 "REDFISH_MESSAGE_ID=%s",redMsgID.c_str(),
-                "REDFISH_MESSAGE_ARGS=%s", msg.c_str());
+                "REDFISH_MESSAGE_ARGS=%s Event,%s", msgId.c_str(),severity.c_str());
 }
 
 }  // namespace tempevent_log
@@ -72,11 +73,14 @@ int main(int argc, char *argv[]) {
   std::string message;
 
   // Parse argurment
-  if (argc <= 1) {
+  if ((argc <= 1) || (argc >3)) {
     tempevent_log::help(argv[0]);
     return -1;
   } else {
     message = argv[1];
+    if(argv[2]!=NULL){
+      message = message + " " + argv[2];
+    }
   }
 
   tempevent_log::sendLogtoRedfish(message.c_str());

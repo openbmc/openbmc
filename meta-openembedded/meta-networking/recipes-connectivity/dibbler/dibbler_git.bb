@@ -5,11 +5,10 @@ HOMEPAGE = "http://klub.com.pl/dhcpv6"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7236695bb6d4461c105d685a8b61c4e3"
 
-SRCREV = "c4b0ed52e751da7823dd9a36e91f93a6310e5525"
+SRCREV = "a7c6cf58a88a510cb00841351e75030ce78d36bf"
 
 SRC_URI = "git://github.com/tomaszmrugalski/dibbler \
            file://dibbler_fix_getSize_crash.patch \
-           file://0001-linux-port-Rename-pthread_mutex_t-variable-lock.patch \
            "
 PV = "1.0.1+1.0.2RC1+git${SRCREV}"
 

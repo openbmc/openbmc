@@ -1,0 +1,38 @@
+From 8ebcf5f2dd27dbeb6c81e9c40a5d17916cb243e6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Nov 2020 15:26:31 -0800
+Subject: [PATCH] heaptrack_inject: Include dlfcn.h for dlopen/dlclose
+
+Do not use __WORDSIZE which is for libc internal use
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/track/heaptrack_inject.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/track/heaptrack_inject.cpp b/src/track/heaptrack_inject.cpp
+index 325d87e..fb1c154 100644
+--- a/src/track/heaptrack_inject.cpp
++++ b/src/track/heaptrack_inject.cpp
+@@ -28,6 +28,7 @@
+ #include <link.h>
+ #include <malloc.h>
+ #include <unistd.h>
++#include <dlfcn.h>
+ 
+ #include <sys/mman.h>
+ 
+@@ -39,9 +40,10 @@
+  * @brief Experimental support for symbol overloading after runtime injection.
+  */
+ 
+-#if __WORDSIZE == 64
++#include <limits.h>
++#if ULONG_MAX == 0xffffffffffffffff
+ #define ELF_R_SYM(i) ELF64_R_SYM(i)
+-#elif __WORDSIZE == 32
++#elif ULONG_MAX == 0xffffffff
+ #define ELF_R_SYM(i) ELF32_R_SYM(i)
+ #else
+ #error unsupported word size

@@ -16,7 +16,7 @@ DEPENDS = " \
     tepl \
 "
 
-inherit gnomebase gsettings itstool gnome-help gobject-introspection gtk-doc vala gettext features_check upstream-version-is-even mime-xdg
+inherit gnomebase gsettings itstool gnome-help gobject-introspection gtk-doc vala gettext features_check upstream-version-is-even mime-xdg python3targetconfig
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
@@ -36,3 +36,5 @@ FILES_${PN}-python += " \
     ${PYTHON_SITEPACKAGES_DIR} \
 "
 
+RDEPENDS_${PN} += "gsettings-desktop-schemas"
+RRECOMMENDS_${PN} += "source-code-pro-fonts"

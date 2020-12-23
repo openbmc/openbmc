@@ -10,6 +10,12 @@
           AutoReboot:
              Default: 'true'
 
+/xyz/openbmc_project/control/host0/auto_reboot/one_time:
+    - Interface: xyz.openbmc_project.Control.Boot.RebootPolicy
+      Properties:
+          AutoReboot:
+             Default: 'true'
+
 /xyz/openbmc_project/control/host0/boot:
     - Interface: xyz.openbmc_project.Control.Boot.Source
       Properties:

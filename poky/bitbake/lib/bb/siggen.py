@@ -14,6 +14,7 @@ import simplediff
 from bb.checksum import FileChecksumCache
 from bb import runqueue
 import hashserv
+import hashserv.client
 
 logger = logging.getLogger('BitBake.SigGen')
 hashequiv_logger = logging.getLogger('BitBake.SigGen.HashEquiv')
@@ -310,13 +311,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
         data = self.basehash[tid]
         for dep in self.runtaskdeps[tid]:
-            if dep in self.unihash:
-                if self.unihash[dep] is None:
-                    data = data + self.taskhash[dep]
-                else:
-                    data = data + self.unihash[dep]
-            else:
-                data = data + self.get_unihash(dep)
+            data = data + self.get_unihash(dep)
 
         for (f, cs) in self.file_checksum_values[tid]:
             if cs:
@@ -357,7 +352,8 @@ class SignatureGeneratorBasic(SignatureGenerator):
         else:
             sigfile = stampbase + "." + task + ".sigbasedata" + "." + self.basehash[tid]
 
-        bb.utils.mkdirhier(os.path.dirname(sigfile))
+        with bb.utils.umask(0o002):
+            bb.utils.mkdirhier(os.path.dirname(sigfile))
 
         data = {}
         data['task'] = task
@@ -745,16 +741,26 @@ def list_inline_diff(oldlist, newlist, colors=None):
             ret.append(item)
     return '[%s]' % (', '.join(ret))
 
-def clean_basepath(a):
-    mc = None
-    if a.startswith("mc:"):
-        _, mc, a = a.split(":", 2)
-    b = a.rsplit("/", 2)[1] + '/' + a.rsplit("/", 2)[2]
-    if a.startswith("virtual:"):
-        b = b + ":" + a.rsplit(":", 1)[0]
-    if mc:
-        b = b + ":mc:" + mc
-    return b
+def clean_basepath(basepath):
+    basepath, dir, recipe_task = basepath.rsplit("/", 2)
+    cleaned = dir + '/' + recipe_task
+
+    if basepath[0] == '/':
+        return cleaned
+
+    if basepath.startswith("mc:"):
+        mc, mc_name, basepath = basepath.split(":", 2)
+        mc_suffix = ':mc:' + mc_name
+    else:
+        mc_suffix = ''
+
+    # mc stuff now removed from basepath. Whatever was next, if present will be the first
+    # suffix. ':/', recipe path start, marks the end of this. Something like
+    # 'virtual:a[:b[:c]]:/path...' (b and c being optional)
+    if basepath[0] != '/':
+        cleaned += ':' + basepath.split(':/', 1)[0]
+
+    return cleaned + mc_suffix
 
 def clean_basepaths(a):
     b = {}

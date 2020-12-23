@@ -1,0 +1,16 @@
+[Unit]
+Description=Phosphor Watchdog
+
+[Service]
+ExecStart=/usr/bin/env phosphor-watchdog --continue --service=xyz.openbmc_project.Watchdog \
+         --path=/xyz/openbmc_project/watchdog/host0 \
+         --action_target=xyz.openbmc_project.State.Watchdog.Action.HardReset=xyz.openbmc_project.State.Chassis.Transition.Reset \
+         --action_target=xyz.openbmc_project.State.Watchdog.Action.PowerOff=xyz.openbmc_project.State.Chassis.Transition.Off \
+         --action_target=xyz.openbmc_project.State.Watchdog.Action.PowerCycle=xyz.openbmc_project.State.Chassis.Transition.PowerCycle
+
+SyslogIdentifier=phosphor-watchdog
+BusName =xyz.openbmc_project.Watchdog
+Type=dbus
+
+[Install]
+WantedBy=basic.target

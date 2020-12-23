@@ -13,7 +13,17 @@ KERNEL_CLASSES ?= "kernel-fitimage"
 INITRAMFS_IMAGE ?= "aspeed-image-initramfs"
 INITRAMFS_FSTYPES ?= "cpio.xz"
 
+WKS_FILE ?= "emmc-aspeed.wks.in"
+WKS_FILE_DEPENDS ?= " \
+    phosphor-hostfw-image \
+    virtual/bootloader \
+    virtual/kernel \
+"
+WKS_HOSTFW_SIZE ?= "5G"
+IMAGE_BOOT_FILES ?= "fitImage-${INITRAMFS_IMAGE}-${MACHINE}-${MACHINE};fitImage"
+
 MACHINE_EXTRA_RRECOMMENDS += "udev-aspeed-vuart udev-aspeed-mtd-partitions"
+MACHINE_FEATURES += "hw-rng"
 
 MACHINEOVERRIDES =. "aspeed:"
 

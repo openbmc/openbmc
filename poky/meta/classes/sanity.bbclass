@@ -619,6 +619,9 @@ def sanity_handle_abichanges(status, d):
                 f.write(current_abi)
         elif int(abi) <= 11 and current_abi == "12":
             status.addresult("The layout of TMPDIR changed for Recipe Specific Sysroots.\nConversion doesn't make sense and this change will rebuild everything so please delete TMPDIR (%s).\n" % d.getVar("TMPDIR"))
+        elif int(abi) <= 13 and current_abi == "14":
+            status.addresult("TMPDIR changed to include path filtering from the pseudo database.\nIt is recommended to use a clean TMPDIR with the new pseudo path filtering so TMPDIR (%s) would need to be removed to continue.\n" % d.getVar("TMPDIR"))
+
         elif (abi != current_abi):
             # Code to convert from one ABI to another could go here if possible.
             status.addresult("Error, TMPDIR has changed its layout version number (%s to %s) and you need to either rebuild, revert or adjust it at your own risk.\n" % (abi, current_abi))
@@ -769,8 +772,8 @@ def check_sanity_everybuild(status, d):
 
     # Check the Python version, we now have a minimum of Python 3.4
     import sys
-    if sys.hexversion < 0x03040000:
-        status.addresult('The system requires at least Python 3.4 to run. Please update your Python interpreter.\n')
+    if sys.hexversion < 0x030500F0:
+        status.addresult('The system requires at least Python 3.5 to run. Please update your Python interpreter.\n')
 
     # Check the bitbake version meets minimum requirements
     from distutils.version import LooseVersion

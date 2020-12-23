@@ -1,0 +1,29 @@
+Mark extern variables with 'extern' keyword
+
+This ensures that compilers with -fno-common does not generate multiple definitions
+
+Upstream-Status: Pending
+Signedd-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/lib/wfa_cs.c
++++ b/lib/wfa_cs.c
+@@ -71,7 +71,7 @@ int wfaExecuteCLI(char *CLI);
+ 
+ /* Since the two definitions are used all over the CA function */
+ char gCmdStr[WFA_CMD_STR_SZ];
+-dutCmdResponse_t gGenericResp;
++extern dutCmdResponse_t gGenericResp;
+ int wfaTGSetPrio(int sockfd, int tgClass);
+ void create_apts_msg(int msg, unsigned int txbuf[],int id);
+ 
+--- a/lib/wfa_thr.c
++++ b/lib/wfa_thr.c
+@@ -41,7 +41,7 @@
+ /*
+  * external global thread sync variables
+  */
+-tgWMM_t wmm_thr[WFA_THREADS_NUM];
++extern tgWMM_t wmm_thr[WFA_THREADS_NUM];
+ extern int resetsnd;
+ extern int resetrcv;
+ extern int newCmdOn;

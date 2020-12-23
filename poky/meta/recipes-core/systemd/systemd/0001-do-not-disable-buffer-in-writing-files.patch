@@ -40,11 +40,11 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  src/vconsole/vconsole-setup.c           |  2 +-
  18 files changed, 35 insertions(+), 35 deletions(-)
 
-diff --git a/src/basic/cgroup-util.c b/src/basic/cgroup-util.c
-index a5141f4cbedd..04c06e7a55cb 100644
---- a/src/basic/cgroup-util.c
-+++ b/src/basic/cgroup-util.c
-@@ -739,7 +739,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
+Index: systemd-stable/src/basic/cgroup-util.c
+===================================================================
+--- systemd-stable.orig/src/basic/cgroup-util.c
++++ systemd-stable/src/basic/cgroup-util.c
+@@ -769,7 +769,7 @@ int cg_install_release_agent(const char
  
          sc = strstrip(contents);
          if (isempty(sc)) {
@@ -53,7 +53,7 @@ index a5141f4cbedd..04c06e7a55cb 100644
                  if (r < 0)
                          return r;
          } else if (!path_equal(sc, agent))
-@@ -757,7 +757,7 @@ int cg_install_release_agent(const char *controller, const char *agent) {
+@@ -787,7 +787,7 @@ int cg_install_release_agent(const char
  
          sc = strstrip(contents);
          if (streq(sc, "0")) {
@@ -62,7 +62,7 @@ index a5141f4cbedd..04c06e7a55cb 100644
                  if (r < 0)
                          return r;
  
-@@ -784,7 +784,7 @@ int cg_uninstall_release_agent(const char *controller) {
+@@ -814,7 +814,7 @@ int cg_uninstall_release_agent(const cha
          if (r < 0)
                  return r;
  
@@ -71,7 +71,7 @@ index a5141f4cbedd..04c06e7a55cb 100644
          if (r < 0)
                  return r;
  
-@@ -794,7 +794,7 @@ int cg_uninstall_release_agent(const char *controller) {
+@@ -824,7 +824,7 @@ int cg_uninstall_release_agent(const cha
          if (r < 0)
                  return r;
  
@@ -80,7 +80,7 @@ index a5141f4cbedd..04c06e7a55cb 100644
          if (r < 0)
                  return r;
  
-@@ -1650,7 +1650,7 @@ int cg_set_attribute(const char *controller, const char *path, const char *attri
+@@ -1656,7 +1656,7 @@ int cg_set_attribute(const char *control
          if (r < 0)
                  return r;
  
@@ -89,11 +89,11 @@ index a5141f4cbedd..04c06e7a55cb 100644
  }
  
  int cg_get_attribute(const char *controller, const char *path, const char *attribute, char **ret) {
-diff --git a/src/basic/procfs-util.c b/src/basic/procfs-util.c
-index da7e836f143e..2138f20bcc03 100644
---- a/src/basic/procfs-util.c
-+++ b/src/basic/procfs-util.c
-@@ -86,13 +86,13 @@ int procfs_tasks_set_limit(uint64_t limit) {
+Index: systemd-stable/src/basic/procfs-util.c
+===================================================================
+--- systemd-stable.orig/src/basic/procfs-util.c
++++ systemd-stable/src/basic/procfs-util.c
+@@ -86,13 +86,13 @@ int procfs_tasks_set_limit(uint64_t limi
           * decrease it, as threads-max is the much more relevant sysctl. */
          if (limit > pid_max-1) {
                  sprintf(buffer, "%" PRIu64, limit+1); /* Add one, since PID 0 is not a valid PID */
@@ -109,11 +109,11 @@ index da7e836f143e..2138f20bcc03 100644
          if (r < 0) {
                  uint64_t threads_max;
  
-diff --git a/src/basic/smack-util.c b/src/basic/smack-util.c
-index da9a2139d31a..5e91f5b8f5d9 100644
---- a/src/basic/smack-util.c
-+++ b/src/basic/smack-util.c
-@@ -114,7 +114,7 @@ int mac_smack_apply_pid(pid_t pid, const char *label) {
+Index: systemd-stable/src/basic/smack-util.c
+===================================================================
+--- systemd-stable.orig/src/basic/smack-util.c
++++ systemd-stable/src/basic/smack-util.c
+@@ -114,7 +114,7 @@ int mac_smack_apply_pid(pid_t pid, const
                  return 0;
  
          p = procfs_file_alloca(pid, "attr/current");
@@ -122,10 +122,10 @@ index da9a2139d31a..5e91f5b8f5d9 100644
          if (r < 0)
                  return r;
  
-diff --git a/src/basic/util.c b/src/basic/util.c
-index 2b3b3918a32f..aff8d0fcd473 100644
---- a/src/basic/util.c
-+++ b/src/basic/util.c
+Index: systemd-stable/src/basic/util.c
+===================================================================
+--- systemd-stable.orig/src/basic/util.c
++++ systemd-stable/src/basic/util.c
 @@ -267,7 +267,7 @@ void disable_coredumps(void) {
          if (detect_container() > 0)
                  return;
@@ -135,11 +135,11 @@ index 2b3b3918a32f..aff8d0fcd473 100644
          if (r < 0)
                  log_debug_errno(r, "Failed to turn off coredumps, ignoring: %m");
  }
-diff --git a/src/binfmt/binfmt.c b/src/binfmt/binfmt.c
-index 7ff844c78c3a..5c5721d7c2f7 100644
---- a/src/binfmt/binfmt.c
-+++ b/src/binfmt/binfmt.c
-@@ -47,7 +47,7 @@ static int delete_rule(const char *rule) {
+Index: systemd-stable/src/binfmt/binfmt.c
+===================================================================
+--- systemd-stable.orig/src/binfmt/binfmt.c
++++ systemd-stable/src/binfmt/binfmt.c
+@@ -48,7 +48,7 @@ static int delete_rule(const char *rule)
          if (!fn)
                  return log_oom();
  
@@ -148,7 +148,7 @@ index 7ff844c78c3a..5c5721d7c2f7 100644
  }
  
  static int apply_rule(const char *rule) {
-@@ -55,7 +55,7 @@ static int apply_rule(const char *rule) {
+@@ -56,7 +56,7 @@ static int apply_rule(const char *rule)
  
          (void) delete_rule(rule);
  
@@ -157,7 +157,7 @@ index 7ff844c78c3a..5c5721d7c2f7 100644
          if (r < 0)
                  return log_error_errno(r, "Failed to add binary format: %m");
  
-@@ -212,7 +212,7 @@ static int run(int argc, char *argv[]) {
+@@ -223,7 +223,7 @@ static int run(int argc, char *argv[]) {
                  }
  
                  /* Flush out all rules */
@@ -166,11 +166,11 @@ index 7ff844c78c3a..5c5721d7c2f7 100644
  
                  STRV_FOREACH(f, files) {
                          k = apply_file(*f, true);
-diff --git a/src/core/main.c b/src/core/main.c
-index 3c6b66e89c8e..c39ebe56a5b3 100644
---- a/src/core/main.c
-+++ b/src/core/main.c
-@@ -1312,7 +1312,7 @@ static int bump_unix_max_dgram_qlen(void) {
+Index: systemd-stable/src/core/main.c
+===================================================================
+--- systemd-stable.orig/src/core/main.c
++++ systemd-stable/src/core/main.c
+@@ -1382,7 +1382,7 @@ static int bump_unix_max_dgram_qlen(void
          if (v >= DEFAULT_UNIX_MAX_DGRAM_QLEN)
                  return 0;
  
@@ -179,7 +179,7 @@ index 3c6b66e89c8e..c39ebe56a5b3 100644
          if (r < 0)
                  return log_full_errno(IN_SET(r, -EROFS, -EPERM, -EACCES) ? LOG_DEBUG : LOG_WARNING, r,
                                        "Failed to bump AF_UNIX datagram queue length, ignoring: %m");
-@@ -1536,7 +1536,7 @@ static void initialize_core_pattern(bool skip_setup) {
+@@ -1668,7 +1668,7 @@ static void initialize_core_pattern(bool
          if (getpid_cached() != 1)
                  return;
  
@@ -188,11 +188,11 @@ index 3c6b66e89c8e..c39ebe56a5b3 100644
          if (r < 0)
                  log_warning_errno(r, "Failed to write '%s' to /proc/sys/kernel/core_pattern, ignoring: %m", arg_early_core_pattern);
  }
-diff --git a/src/core/smack-setup.c b/src/core/smack-setup.c
-index 4427397f2715..8aeb5c829513 100644
---- a/src/core/smack-setup.c
-+++ b/src/core/smack-setup.c
-@@ -325,17 +325,17 @@ int mac_smack_setup(bool *loaded_policy) {
+Index: systemd-stable/src/core/smack-setup.c
+===================================================================
+--- systemd-stable.orig/src/core/smack-setup.c
++++ systemd-stable/src/core/smack-setup.c
+@@ -325,17 +325,17 @@ int mac_smack_setup(bool *loaded_policy)
          }
  
  #ifdef SMACK_RUN_LABEL
@@ -214,10 +214,10 @@ index 4427397f2715..8aeb5c829513 100644
          if (r < 0)
                  log_warning_errno(r, "Failed to set SMACK netlabel rule \"127.0.0.1 -CIPSO\": %m");
  #endif
-diff --git a/src/hibernate-resume/hibernate-resume.c b/src/hibernate-resume/hibernate-resume.c
-index 17e7cd1a009b..87a766771663 100644
---- a/src/hibernate-resume/hibernate-resume.c
-+++ b/src/hibernate-resume/hibernate-resume.c
+Index: systemd-stable/src/hibernate-resume/hibernate-resume.c
+===================================================================
+--- systemd-stable.orig/src/hibernate-resume/hibernate-resume.c
++++ systemd-stable/src/hibernate-resume/hibernate-resume.c
 @@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
                  return EXIT_FAILURE;
          }
@@ -227,11 +227,11 @@ index 17e7cd1a009b..87a766771663 100644
          if (r < 0) {
                  log_error_errno(r, "Failed to write '%s' to /sys/power/resume: %m", major_minor);
                  return EXIT_FAILURE;
-diff --git a/src/libsystemd/sd-device/sd-device.c b/src/libsystemd/sd-device/sd-device.c
-index 1f2451f8e1b4..3f676ec2841a 100644
---- a/src/libsystemd/sd-device/sd-device.c
-+++ b/src/libsystemd/sd-device/sd-device.c
-@@ -1849,7 +1849,7 @@ _public_ int sd_device_set_sysattr_value(sd_device *device, const char *sysattr,
+Index: systemd-stable/src/libsystemd/sd-device/sd-device.c
+===================================================================
+--- systemd-stable.orig/src/libsystemd/sd-device/sd-device.c
++++ systemd-stable/src/libsystemd/sd-device/sd-device.c
+@@ -1877,7 +1877,7 @@ _public_ int sd_device_set_sysattr_value
          if (!value)
                  return -ENOMEM;
  
@@ -240,11 +240,11 @@ index 1f2451f8e1b4..3f676ec2841a 100644
          if (r < 0) {
                  if (r == -ELOOP)
                          return -EINVAL;
-diff --git a/src/login/logind-dbus.c b/src/login/logind-dbus.c
-index 52a7ea3c77e9..9703de0dabee 100644
---- a/src/login/logind-dbus.c
-+++ b/src/login/logind-dbus.c
-@@ -1339,7 +1339,7 @@ static int trigger_device(Manager *m, sd_device *d) {
+Index: systemd-stable/src/login/logind-dbus.c
+===================================================================
+--- systemd-stable.orig/src/login/logind-dbus.c
++++ systemd-stable/src/login/logind-dbus.c
+@@ -1341,7 +1341,7 @@ static int trigger_device(Manager *m, sd
                  if (!t)
                          return -ENOMEM;
  
@@ -253,11 +253,11 @@ index 52a7ea3c77e9..9703de0dabee 100644
          }
  
          return 0;
-diff --git a/src/nspawn/nspawn-cgroup.c b/src/nspawn/nspawn-cgroup.c
-index f5048d9473cb..b6383ab5c97e 100644
---- a/src/nspawn/nspawn-cgroup.c
-+++ b/src/nspawn/nspawn-cgroup.c
-@@ -124,7 +124,7 @@ int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
+Index: systemd-stable/src/nspawn/nspawn-cgroup.c
+===================================================================
+--- systemd-stable.orig/src/nspawn/nspawn-cgroup.c
++++ systemd-stable/src/nspawn/nspawn-cgroup.c
+@@ -124,7 +124,7 @@ int sync_cgroup(pid_t pid, CGroupUnified
          fn = strjoina(tree, cgroup, "/cgroup.procs");
  
          sprintf(pid_string, PID_FMT, pid);
@@ -266,11 +266,11 @@ index f5048d9473cb..b6383ab5c97e 100644
          if (r < 0) {
                  log_error_errno(r, "Failed to move process: %m");
                  goto finish;
-diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
-index 734dee1130e0..71add9a055d2 100644
---- a/src/nspawn/nspawn.c
-+++ b/src/nspawn/nspawn.c
-@@ -2440,7 +2440,7 @@ static int reset_audit_loginuid(void) {
+Index: systemd-stable/src/nspawn/nspawn.c
+===================================================================
+--- systemd-stable.orig/src/nspawn/nspawn.c
++++ systemd-stable/src/nspawn/nspawn.c
+@@ -2493,7 +2493,7 @@ static int reset_audit_loginuid(void) {
          if (streq(p, "4294967295"))
                  return 0;
  
@@ -279,7 +279,7 @@ index 734dee1130e0..71add9a055d2 100644
          if (r < 0) {
                  log_error_errno(r,
                                  "Failed to reset audit login UID. This probably means that your kernel is too\n"
-@@ -3665,13 +3665,13 @@ static int setup_uid_map(pid_t pid) {
+@@ -3726,13 +3726,13 @@ static int setup_uid_map(pid_t pid) {
  
          xsprintf(uid_map, "/proc/" PID_FMT "/uid_map", pid);
          xsprintf(line, UID_FMT " " UID_FMT " " UID_FMT "\n", 0, arg_uid_shift, arg_uid_range);
@@ -295,11 +295,11 @@ index 734dee1130e0..71add9a055d2 100644
          if (r < 0)
                  return log_error_errno(r, "Failed to write GID map: %m");
  
-diff --git a/src/shared/cgroup-setup.c b/src/shared/cgroup-setup.c
-index e8398cbde5ba..ba682ec0c9e7 100644
---- a/src/shared/cgroup-setup.c
-+++ b/src/shared/cgroup-setup.c
-@@ -267,7 +267,7 @@ int cg_attach(const char *controller, const char *path, pid_t pid) {
+Index: systemd-stable/src/shared/cgroup-setup.c
+===================================================================
+--- systemd-stable.orig/src/shared/cgroup-setup.c
++++ systemd-stable/src/shared/cgroup-setup.c
+@@ -267,7 +267,7 @@ int cg_attach(const char *controller, co
  
          xsprintf(c, PID_FMT "\n", pid);
  
@@ -317,11 +317,11 @@ index e8398cbde5ba..ba682ec0c9e7 100644
                          if (r < 0) {
                                  log_debug_errno(r, "Failed to %s controller %s for %s (%s): %m",
                                                  FLAGS_SET(mask, bit) ? "enable" : "disable", n, p, fs);
-diff --git a/src/shared/sysctl-util.c b/src/shared/sysctl-util.c
-index 8543dbd2d05f..76162599817e 100644
---- a/src/shared/sysctl-util.c
-+++ b/src/shared/sysctl-util.c
-@@ -93,7 +93,7 @@ int sysctl_write_ip_property(int af, const char *ifname, const char *property, c
+Index: systemd-stable/src/shared/sysctl-util.c
+===================================================================
+--- systemd-stable.orig/src/shared/sysctl-util.c
++++ systemd-stable/src/shared/sysctl-util.c
+@@ -93,7 +93,7 @@ int sysctl_write_ip_property(int af, con
  
          log_debug("Setting '%s' to '%s'", p, value);
  
@@ -330,11 +330,11 @@ index 8543dbd2d05f..76162599817e 100644
  }
  
  int sysctl_read(const char *property, char **content) {
-diff --git a/src/sleep/sleep.c b/src/sleep/sleep.c
-index fbfddc0262fc..7cc2902154e9 100644
---- a/src/sleep/sleep.c
-+++ b/src/sleep/sleep.c
-@@ -47,7 +47,7 @@ static int write_hibernate_location_info(const HibernateLocation *hibernate_loca
+Index: systemd-stable/src/sleep/sleep.c
+===================================================================
+--- systemd-stable.orig/src/sleep/sleep.c
++++ systemd-stable/src/sleep/sleep.c
+@@ -48,7 +48,7 @@ static int write_hibernate_location_info
          assert(hibernate_location->swap);
  
          xsprintf(resume_str, "%u:%u", major(hibernate_location->devno), minor(hibernate_location->devno));
@@ -343,7 +343,7 @@ index fbfddc0262fc..7cc2902154e9 100644
          if (r < 0)
                  return log_debug_errno(r, "Failed to write partition device to /sys/power/resume for '%s': '%s': %m",
                                         hibernate_location->swap->device, resume_str);
-@@ -74,7 +74,7 @@ static int write_hibernate_location_info(const HibernateLocation *hibernate_loca
+@@ -75,7 +75,7 @@ static int write_hibernate_location_info
          }
  
          xsprintf(offset_str, "%" PRIu64, hibernate_location->offset);
@@ -352,7 +352,7 @@ index fbfddc0262fc..7cc2902154e9 100644
          if (r < 0)
                  return log_debug_errno(r, "Failed to write swap file offset to /sys/power/resume_offset for '%s': '%s': %m",
                                         hibernate_location->swap->device, offset_str);
-@@ -91,7 +91,7 @@ static int write_mode(char **modes) {
+@@ -92,7 +92,7 @@ static int write_mode(char **modes) {
          STRV_FOREACH(mode, modes) {
                  int k;
  
@@ -361,7 +361,7 @@ index fbfddc0262fc..7cc2902154e9 100644
                  if (k >= 0)
                          return 0;
  
-@@ -110,7 +110,7 @@ static int write_state(FILE **f, char **states) {
+@@ -114,7 +114,7 @@ static int write_state(FILE **f, char **
          STRV_FOREACH(state, states) {
                  int k;
  
@@ -370,11 +370,11 @@ index fbfddc0262fc..7cc2902154e9 100644
                  if (k >= 0)
                          return 0;
                  log_debug_errno(k, "Failed to write '%s' to /sys/power/state: %m", *state);
-diff --git a/src/udev/udevadm-trigger.c b/src/udev/udevadm-trigger.c
-index 60c68b5029cf..fdca03d3d42c 100644
---- a/src/udev/udevadm-trigger.c
-+++ b/src/udev/udevadm-trigger.c
-@@ -43,7 +43,7 @@ static int exec_list(sd_device_enumerator *e, const char *action, Set *settle_se
+Index: systemd-stable/src/udev/udevadm-trigger.c
+===================================================================
+--- systemd-stable.orig/src/udev/udevadm-trigger.c
++++ systemd-stable/src/udev/udevadm-trigger.c
+@@ -43,7 +43,7 @@ static int exec_list(sd_device_enumerato
                  if (!filename)
                          return log_oom();
  
@@ -383,11 +383,11 @@ index 60c68b5029cf..fdca03d3d42c 100644
                  if (r < 0) {
                          bool ignore = IN_SET(r, -ENOENT, -EACCES, -ENODEV, -EROFS);
  
-diff --git a/src/udev/udevd.c b/src/udev/udevd.c
-index ca65474f2763..38780681431a 100644
---- a/src/udev/udevd.c
-+++ b/src/udev/udevd.c
-@@ -1089,7 +1089,7 @@ static int synthesize_change_one(sd_device *dev, const char *syspath) {
+Index: systemd-stable/src/udev/udevd.c
+===================================================================
+--- systemd-stable.orig/src/udev/udevd.c
++++ systemd-stable/src/udev/udevd.c
+@@ -1153,7 +1153,7 @@ static int synthesize_change_one(sd_devi
  
          filename = strjoina(syspath, "/uevent");
          log_device_debug(dev, "device is closed, synthesising 'change' on %s", syspath);
@@ -396,11 +396,11 @@ index ca65474f2763..38780681431a 100644
          if (r < 0)
                  return log_device_debug_errno(dev, r, "Failed to write 'change' to %s: %m", filename);
          return 0;
-diff --git a/src/vconsole/vconsole-setup.c b/src/vconsole/vconsole-setup.c
-index 9d706085fb47..30dcfa86f4d0 100644
---- a/src/vconsole/vconsole-setup.c
-+++ b/src/vconsole/vconsole-setup.c
-@@ -116,7 +116,7 @@ static int toggle_utf8_vc(const char *name, int fd, bool utf8) {
+Index: systemd-stable/src/vconsole/vconsole-setup.c
+===================================================================
+--- systemd-stable.orig/src/vconsole/vconsole-setup.c
++++ systemd-stable/src/vconsole/vconsole-setup.c
+@@ -116,7 +116,7 @@ static int toggle_utf8_vc(const char *na
  static int toggle_utf8_sysfs(bool utf8) {
          int r;
  

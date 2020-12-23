@@ -125,28 +125,6 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-hw.shutdown_system",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "boot system",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "launch terminal and run \"shutdown -h now\" or \"poweroff\"",
-                    "expected_results": "System can be shutdown successfully . "
-                }
-            },
-            "summary": "shutdown_system"
-        }
-    },
-    {
-        "test": {
             "@alias": "bsps-hw.bsps-hw.switch_among_multi_applications_and_desktop",
             "author": [
                 {
@@ -259,28 +237,6 @@
                 }
             },
             "summary": "connman_offline_mode_in_connman-gnome"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-hw.X_server_can_start_up_with_runlevel_5_boot",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "boot up system with default runlevel  \n\n",
-                    "expected_results": "X server can start up well and desktop display has no problem .  \n\n"
-                },
-                "2": {
-                    "action": "type runlevel at command prompt",
-                    "expected_results": "Output:N 5"
-                }
-            },
-            "summary": "X_server_can_start_up_with_runlevel_5_boot"
         }
     },
     {

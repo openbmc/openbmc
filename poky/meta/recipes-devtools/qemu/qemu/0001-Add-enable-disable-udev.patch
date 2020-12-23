@@ -12,13 +12,13 @@ Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
  configure | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/configure b/configure
-index 36646e7b..48912a94 100755
---- a/configure
-+++ b/configure
-@@ -1601,6 +1601,10 @@ for opt do
+Index: qemu-5.1.0/configure
+===================================================================
+--- qemu-5.1.0.orig/configure
++++ qemu-5.1.0/configure
+@@ -1640,6 +1640,10 @@ for opt do
    ;;
-   --gdb=*) gdb_bin="$optarg"
+   --disable-libdaxctl) libdaxctl=no
    ;;
 +  --enable-libudev) libudev="yes"
 +  ;;
@@ -27,6 +27,3 @@ index 36646e7b..48912a94 100755
    *)
        echo "ERROR: unknown option $opt"
        echo "Try '$0 --help' for more information"
--- 
-2.24.0
-

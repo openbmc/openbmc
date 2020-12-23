@@ -45,6 +45,14 @@ CHIPS_mihawk = " \
                bus@1e78a000/i2c-bus@140/ir35221@72 \
                bus@1e78a000/i2c-bus@180/ir35221@70 \
                bus@1e78a000/i2c-bus@180/ir35221@72 \
+               bus@1e78a000/i2c-bus@380/pca9545riser@70/i2c@0/tmp431@4c \
+               bus@1e78a000/i2c-bus@380/pca9545riser@70/i2c@1/tmp431@4c \
+               bus@1e78a000/i2c-bus@380/pca9545@71/i2c@0/tmp431@4c \
+               bus@1e78a000/i2c-bus@380/pca9545@71/i2c@1/tmp431@4c \
+               bus@1e78a000/i2c-bus@3c0/pca9545riser@70/i2c@0/tmp431@4c \
+               bus@1e78a000/i2c-bus@3c0/pca9545riser@70/i2c@1/tmp431@4c \
+               bus@1e78a000/i2c-bus@3c0/pca9545@71/i2c@0/tmp431@4c \
+               bus@1e78a000/i2c-bus@3c0/pca9545@71/i2c@1/tmp431@4c \
                bus@1e78a000/i2c-bus@400/tmp275@48 \
                bus@1e78a000/i2c-bus@400/tmp275@49 \
                pwm-tacho-controller@1e786000 \
@@ -97,6 +105,8 @@ SYSTEMD_ENVIRONMENT_FILE_${PN}_append_ibm-ac-server = " ${@compose_list(d, 'ENVS
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_mihawk = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_mihawk = " ${@compose_list(d, 'ENVS', 'OCCITEMS')}"
 
+# Enable and install the max31785-msl package
+PACKAGECONFIG_append_ibm-ac-server = " max31785-msl"
 SYSTEMD_ENVIRONMENT_FILE_max31785-msl_append_ibm-ac-server = " obmc/hwmon-max31785/max31785.conf"
 SYSTEMD_LINK_max31785-msl_append_ibm-ac-server = " ../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@${MACHINE}.service"
 
@@ -104,7 +114,7 @@ SYSTEMD_SERVICE_${PN}_append_ibm-ac-server = " max31785-hwmon-helper@.service"
 
 do_install_append_ibm-ac-server() {
     install -d ${D}/${base_libdir}/udev/rules.d/
-    install ${WORKDIR}/70-max31785-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
+    install -m 0644 ${WORKDIR}/70-max31785-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
 
     install -d ${D}${bindir}
     install -m 0755 ${WORKDIR}/start_max31785_hwmon.sh ${D}${bindir}

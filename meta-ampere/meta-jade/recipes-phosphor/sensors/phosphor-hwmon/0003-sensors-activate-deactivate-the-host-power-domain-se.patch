@@ -1,0 +1,553 @@
+From 3cb90d8f97bbf501e66a59a5f95d98c9b8609e6c Mon Sep 17 00:00:00 2001
+From: Thu B Nguyen <tbnguyen@amperecomputing.com>
+Date: Tue, 8 Dec 2020 00:29:55 +0700
+Subject: [PATCH] sensors: activate/deactivate the host power domain sensors
+
+There are two types of the host sensors:
+1. The host sensors which only work when the host already is running.
+   Ex: The virtual sensors which read thru SCP registers map.
+2. The sensors which use the same power domain with the host.
+   These sensors starts when power on the host. They still run when
+   the host failed to boot up. Ex: The chassis fans.
+The current code treats these types as type 1th. This is incorrected.
+
+This commit seperates the type 1th and type 2th sensors.
+The sensors with "HOSTON_<type><idx>=1" option in configuration will be
+treated as the type 1th sensors.
+The ones with "POWERON_<type><idx>=1" option in configuration will be
+treated as the type 2th sensors.
+
+This commit also supports activate/deactivate the type 2th sensors.
+
+Testing:
+	1. Power off the host.
+	2. Make sure the host power domain sensors is removed.
+	3. Power on the host. Force the host failed to boot.
+	4. The host power domain sensors should be in the sensors list.
+
+Signed-off-by: Thu B Nguyen <tbnguyen@amperecomputing.com>
+---
+ mainloop.cpp | 187 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ mainloop.hpp |  60 ++++++++++++++++-
+ sensor.cpp   |  16 ++++-
+ sensor.hpp   |  17 ++++-
+ 4 files changed, 259 insertions(+), 21 deletions(-)
+
+diff --git a/mainloop.cpp b/mainloop.cpp
+index 05b6907..8211afa 100644
+--- a/mainloop.cpp
++++ b/mainloop.cpp
+@@ -187,11 +187,21 @@ std::optional<ObjectStateData>
+     auto sensorObj =
+         std::make_unique<sensor::Sensor>(sensorSetKey, _ioAccess, _devPath);
+ 
+-    /* Add the concerned host sensors to _hostSensors list */
++    /* Add the host sensors to _hostSensors list */
+     if (sensorObj->isHostSensor() &&
+         _hostSensors.find(sensorSetKey) == _hostSensors.end())
+         _hostSensors[std::move(sensorSetKey)] = std::move(sensorAttrs);
+ 
++    /* Add the sensors use the host power domain to _hostPowerDomainSensors */
++    if (sensorObj->isHostPowerDomainSensor() &&
++        (_hostPowerDomainSensors.find(sensorSetKey) ==
++        _hostPowerDomainSensors.end()))
++    {
++        _hostPowerDomainSensors[std::move(sensorSetKey)] =
++            std::move(sensorAttrs);
++    }
++
++
+     // Get list of return codes for removing sensors on device
+     auto devRmRCs = env::getEnv("REMOVERCS");
+     // Add sensor removal return codes defined at the device level
+@@ -206,7 +216,7 @@ std::optional<ObjectStateData>
+     ObjectInfo info(&_bus, std::move(objectPath), InterfaceMap());
+     RetryIO retryIO(hwmonio::retries, hwmonio::delay);
+     if ((_rmSensors.find(sensorSetKey) != _rmSensors.end()) ||
+-        sensorObj->isHostSensor())
++        sensorObj->isHostSensor() || sensorObj->isHostPowerDomainSensor())
+     {
+         // When adding a sensor that was purposely removed,
+         // don't retry on errors when reading its value
+@@ -366,11 +376,54 @@ std::unique_ptr<sdbusplus::bus::match::match>
+         });
+ }
+ 
++std::unique_ptr<sdbusplus::bus::match::match>
++    MainLoop::startPGoodPropSignal()
++{
++    return std::make_unique<sdbusplus::bus::match::match>(
++        _bus,
++        "type='signal',interface='" + std::string(properties::interface)
++            + "',path='" + std::string(hoststate::powerPath) + "',arg0='"
++            + std::string(hoststate::powerStateIntf) + "'",
++        [this](sdbusplus::message::message& message) {
++            std::string objectName;
++            boost::container::flat_map<std::string, std::variant<int>>
++                values;
++            message.read(objectName, values);
++            auto findState = values.find(hoststate::pGoodProp);
++            if (findState != values.end()) {
++                pGoodState = std::get<int>(findState->second);
++                haveChassisTrans = 0;
++                return;
++            }
++        });
++}
++
++int MainLoop::getPGoodState()
++{
++    auto method = _bus.new_method_call(hoststate::powerStateService,
++                                        hoststate::powerPath,
++                                        "org.freedesktop.DBus.Properties",
++                                        "Get");
++    method.append(hoststate::powerStateIntf, hoststate::pGoodProp);
++    try
++    {
++        std::variant<int> values;
++        auto reply = _bus.call(method);
++        reply.read(values);
++        return std::get<int>(values);
++    }
++    catch (const sdbusplus::exception::SdBusError& e)
++    {
++        // If property is not found simply return empty value
++    }
++    return 0;
++}
++
+ void MainLoop::run()
+ {
+     init();
+ 
+-    if (haveHostSensors) {
++    if (haveHostPowerDomainSensors || haveHostSensors) {
+         /*
+          * Create the callback to signal CurrentHostState and
+          * RequestHostStateTransition.
+@@ -383,6 +436,13 @@ void MainLoop::run()
+          */
+         stateMonitor = startChassisPropSignal();
+         matches.emplace_back(std::move(stateMonitor));
++        /*
++         * Create the callback to signal pgood property
++         */
++        stateMonitor = startPGoodPropSignal();
++        matches.emplace_back(std::move(stateMonitor));
++
++        pGoodState = getPGoodState();
+     }
+ 
+     std::function<void()> callback(std::bind(&MainLoop::read, this));
+@@ -436,7 +496,9 @@ void MainLoop::init()
+     }
+ 
+     /* If there are no sensors specified by labels, exit. */
+-    if (0 == (_state.size() + _hostSensors.size()))
++    if (0 == (_state.size() +
++              _hostSensors.size() +
++              _hostPowerDomainSensors.size()))
+     {
+         exit(0);
+     }
+@@ -464,9 +526,19 @@ void MainLoop::init()
+         /*
+          * The service will start with none host sensors
+          */
+-        removeHostSensors();
++        removeHostSensors(_hostSensors);
+         removedHostSensors = true;
+     }
++
++    if (_hostPowerDomainSensors.size() != 0)
++    {
++        haveHostPowerDomainSensors = true;
++        /*
++         * The service will start with none host power domain sensors
++         */
++        removeHostSensors(_hostPowerDomainSensors);
++        removedHostPowerDomainSensors = true;
++    }
+ }
+ 
+ bool MainLoop::isHostOn()
+@@ -485,6 +557,11 @@ bool MainLoop::isHostOn()
+     return true;
+ }
+ 
++bool MainLoop::isPowerOn()
++{
++    return pGoodState == 1 ? true : false;
++}
++
+ void MainLoop::verifyHostState()
+ {
+     bool hostOn = isHostOn();
+@@ -512,7 +589,7 @@ void MainLoop::verifyHostState()
+         haveHostTrans = 0;
+         haveChassisTrans = 0;
+ 
+-        removeHostSensors();
++        removeHostSensors(_hostSensors);
+         removedHostSensors = true;
+         return;
+     }
+@@ -531,13 +608,68 @@ void MainLoop::verifyHostState()
+         }
+         log<level::INFO>("The host is already on. "\
+             "Adding back the host sensors");
+-        addDroppedHostSensors();
++        addDroppedHostSensors(_hostSensors);
+         removedHostSensors = false;
+         return;
+     }
+     return;
+ }
+ 
++void MainLoop::verifyPowerState()
++{
++    bool powerOn = isPowerOn();
++    /*
++     * Remove all host power domain sensors
++     * when the power is off or going to off
++     */
++    if (haveChassisTrans || !powerOn) {
++        /* reset count down when remove the host sensors */
++        countDownPowerState = powerOnDelay;
++        /*
++         * The host power domain sensors is removed from reading list
++         */
++        if (removedHostPowerDomainSensors)
++        {
++            return;
++        }
++
++        if (haveChassisTrans)
++        {
++            log<level::INFO>("The power state is changing."\
++            "Removing the host power domain sensors");
++        }
++        else
++        {
++            log<level::INFO>("The power is off."\
++            "Removing the host power domain sensors");
++        }
++
++        removeHostSensors(_hostPowerDomainSensors);
++        removedHostPowerDomainSensors = true;
++        return;
++    }
++
++    /* Power changed state from Off to On */
++    if (powerOn && removedHostPowerDomainSensors) {
++        /*
++         * Prevent the glitch in CurrentPowerState
++         * Apply the count down DELAY_INTERVAL seconds before add
++         * the host power domain sensors back to the reading list.
++         */
++        if (countDownPowerState > 0)
++        {
++            countDownPowerState--;
++            return;
++        }
++        log<level::INFO>("The power is already on. "\
++            "Adding back the host power domain sensors");
++        addDroppedHostSensors(_hostPowerDomainSensors);
++        removedHostPowerDomainSensors = false;
++        return;
++    }
++    return;
++}
++
+ void MainLoop::read()
+ {
+     // TODO: Issue#3 - Need to make calls to the dbus sensor cache here to
+@@ -547,6 +679,14 @@ void MainLoop::read()
+         /* Verify the host state to add/remove the host sensors */
+         verifyHostState();
+ 
++    if (haveHostPowerDomainSensors)
++    {
++        /* Verify the host power state to add/remove
++         * the host power state sensors
++         */
++        verifyPowerState();
++    }
++
+     // Iterate through all the sensors.
+     for (auto& [sensorSetKey, sensorStateTuple] : _state)
+     {
+@@ -583,6 +723,13 @@ void MainLoop::read()
+         {
+             continue;
+         }
++        /*
++         * Check the power state before read the host power domain sensors
++         */
++        if (sensor->isHostPowerDomainSensor() && !isPowerOn())
++        {
++            continue;
++        }
+ 
+         auto& statusIface = std::any_cast<std::shared_ptr<StatusObject>&>(
+             obj[InterfaceType::STATUS]);
+@@ -614,12 +761,19 @@ void MainLoop::read()
+                 value = _ioAccess->read(sensorSysfsType, sensorSysfsNum, input,
+                                         hwmonio::retries, hwmonio::delay);
+ 
+-                /* Read the host sensors when it starts off */
+-                if (value < 0 && sensor->isHostSensor() &&
+-                    !isHostOn())
++                /* Read the sensors when it starts off */
++                if (value < 0)
+                 {
+-                    continue;
++                    if (sensor->isHostSensor() && !isHostOn())
++                    {
++                        continue;
++                    }
++                    if (sensor->isHostPowerDomainSensor() && !isPowerOn())
++                    {
++                        continue;
++                    }
+                 }
++
+                 // Set functional property to true if we could read sensor
+                 statusIface->functional(true);
+ 
+@@ -787,10 +941,11 @@ void MainLoop::addDroppedSensors()
+     }
+ }
+ 
+-void MainLoop::removeHostSensors()
++void MainLoop::removeHostSensors(
++        std::map<SensorSet::key_type, SensorSet::mapped_type> sensorsList)
+ {
+     // Remove any host sensors when the host is Off
+-    for (const auto& i : _hostSensors)
++    for (const auto& i : sensorsList)
+     {
+         // Remove sensor object from dbus using emit_object_removed()
+         auto& objInfo = std::get<ObjectInfo>(_state[i.first]);
+@@ -803,12 +958,14 @@ void MainLoop::removeHostSensors()
+     }
+ }
+ 
+-void MainLoop::addDroppedHostSensors()
++void MainLoop::addDroppedHostSensors(
++        std::map<SensorSet::key_type, SensorSet::mapped_type> sensorsList
++)
+ {
+     // Attempt to add the host sensors when the host is ON
+     std::map<SensorSet::key_type, SensorSet::mapped_type> listSensors;
+ 
+-    listSensors = _hostSensors;
++    listSensors = sensorsList;
+     auto it = listSensors.begin();
+     while (it != listSensors.end())
+     {
+diff --git a/mainloop.hpp b/mainloop.hpp
+index bed6f4b..ddb0970 100644
+--- a/mainloop.hpp
++++ b/mainloop.hpp
+@@ -20,6 +20,7 @@
+ 
+ static constexpr auto default_interval = 1000000;
+ static constexpr int DELAY_INTERVAL  = 5;
++static constexpr int powerOnDelay    = 0;
+ 
+ static constexpr auto sensorID = 0;
+ static constexpr auto sensorLabel = 1;
+@@ -50,6 +51,14 @@ namespace hoststate
+                                 "xyz.openbmc_project.State.Chassis";
+   const static constexpr char* chassisTransProp = "RequestedPowerTransition";
+ 
++  const static constexpr char* powerStateService =
++                                "org.openbmc.control.Power";
++  const static constexpr char* powerPath      =
++                                "/org/openbmc/control/power0";
++  const static constexpr char* powerStateIntf =
++                                "org.openbmc.control.Power";
++  const static constexpr char* pGoodProp   = "pgood";
++
+ }
+ 
+ /** @class MainLoop
+@@ -107,12 +116,16 @@ class MainLoop
+     /**
+      * @brief Remove Host sensors slated for removal.
+      */
+-    void removeHostSensors();
++    void removeHostSensors(
++          std::map<SensorSet::key_type, SensorSet::mapped_type> sensorsList
++    );
+ 
+     /**
+      * @brief Attempt to add Host sensors back that had been removed.
+      */
+-    void addDroppedHostSensors();
++    void addDroppedHostSensors(
++          std::map<SensorSet::key_type, SensorSet::mapped_type> sensorsList
++    );
+ 
+   private:
+     using mapped_type =
+@@ -128,15 +141,28 @@ class MainLoop
+     /** @brief Check if the host is on */
+     bool isHostOn();
+ 
++    /** @brief Check if the host power is on */
++    bool isPowerOn();
++
+     /** @brief Verify the host state, add/remove the host sensors */
+     void verifyHostState();
+ 
++    /** @brief Verify the power state
++     * add/remove the host power domain sensors */
++    void verifyPowerState();
++
+     /** @brief Add dbus signal to monitor the host properties */
+     std::unique_ptr<sdbusplus::bus::match::match> startHostPropSignal();
+ 
+     /** @brief Add dbus signal to monitor the chassis properties */
+     std::unique_ptr<sdbusplus::bus::match::match> startChassisPropSignal();
+ 
++    /** @brief Add dbus signal to monitor the pgood power properties */
++    std::unique_ptr<sdbusplus::bus::match::match> startPGoodPropSignal();
++
++    /** @brief Get current state of PGood */
++    int getPGoodState();
++
+     /** @brief sdbusplus bus client connection. */
+     sdbusplus::bus::bus _bus;
+     /** @brief sdbusplus freedesktop.ObjectManager storage. */
+@@ -186,6 +212,17 @@ class MainLoop
+      */
+     bool haveHostSensors  = false;
+ 
++    /**
++     * @brief Have the host power domain sensors is removed from Dbus
++     */
++    bool removedHostPowerDomainSensors = false;
++
++    /**
++     * @brief Have the host power domain sensors
++     */
++    bool haveHostPowerDomainSensors  = false;
++
++
+     /**
+      * @brief have request host state transition
+      */
+@@ -201,16 +238,33 @@ class MainLoop
+      */
+     std::string curHostState = "";
+ 
++    /**
++     * @brief The pGood state
++     */
++    int pGoodState = 0;
++
+     /**
+      * @brief count down before add the host sensors to the reading list
+      */
+     u_int8_t countDown = DELAY_INTERVAL;
+ 
+     /**
+-     * @brief Map of the concerned host sensors
++     * @brief count down before add the host power domain sensors
++     * to the reading list
++     */
++    u_int8_t countDownPowerState = powerOnDelay;
++
++    /**
++     * @brief Map of the host sensors
+      */
+     std::map<SensorSet::key_type, SensorSet::mapped_type> _hostSensors;
+ 
++    /**
++     * @brief Map of the sensors use the host power domain
++     */
++    std::map<SensorSet::key_type, SensorSet::mapped_type>
++                                                _hostPowerDomainSensors;
++
+ 
+     /** @brief Object of class Average, to handle with average related process
+      */
+diff --git a/sensor.cpp b/sensor.cpp
+index 5e88867..3eca269 100644
+--- a/sensor.cpp
++++ b/sensor.cpp
+@@ -48,10 +48,24 @@ Sensor::Sensor(const SensorSet::key_type& sensor,
+ 
+     auto sPower = env::getEnv("POWERON", sensor);
+     /*
+-     * only set _hostSensor to true
++     * only set _hostPowerDomainSensor to true
+      * when POWERON_<type>* equal 1
+      */
+     if (!sPower.empty() && std::stoi(sPower) == 1)
++    {
++        _hostPowerDomainSensor = true;
++    }
++    else
++    {
++        _hostPowerDomainSensor = false;
++    }
++
++    auto sHost = env::getEnv("HOSTON", sensor);
++    /*
++     * only set _hostSensor to true
++     * when HOSTON_<type>* equal 1
++     */
++    if (!sHost.empty() && std::stoi(sHost) == 1)
+     {
+         _hostSensor = true;
+     }
+diff --git a/sensor.hpp b/sensor.hpp
+index 4d09f9c..b71c4fe 100644
+--- a/sensor.hpp
++++ b/sensor.hpp
+@@ -136,7 +136,7 @@ class Sensor
+     }
+ 
+     /**
+-     * @brief Get whether the concerned host sensor.
++     * @brief Get whether the host sensor.
+      *
+      * @return - Boolean on whether the concerned host sensor.
+      */
+@@ -145,6 +145,16 @@ class Sensor
+         return _hostSensor;
+     }
+ 
++    /**
++     * @brief Get whether the sensors use the host power domain.
++     *
++     * @return - Boolean on whether the sensors use the host power domain.
++     */
++    inline bool isHostPowerDomainSensor(void) const
++    {
++        return _hostPowerDomainSensor;
++    }
++
+   private:
+     /** @brief Sensor object's identifiers */
+     SensorSet::key_type _sensor;
+@@ -155,9 +165,12 @@ class Sensor
+     /** @brief Physical device sysfs path. */
+     const std::string& _devPath;
+ 
+-    /** @brief Read when the host power is On. */
++    /** @brief Read when the host is running. */
+     bool _hostSensor;
+ 
++    /** @brief Read when power on the host. */
++    bool _hostPowerDomainSensor;
++
+     /** @brief Structure for storing sensor adjustments */
+     valueAdjust _sensorAdjusts;
+ 
+-- 
+2.17.1
+

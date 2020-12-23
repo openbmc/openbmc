@@ -1,0 +1,100 @@
+From fccbb85beb89b9ca35cac87fb553ef124a6c516b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Aug 2020 17:26:14 -0700
+Subject: [PATCH] Avoid variable definition in header files
+
+This can cause multiple definitions to be emitted into objects and link
+fail as a result with gcc-10+ since it defaults to -fno-common, patch
+moves the definitions to source files
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ control.h     | 2 +-
+ providerMgr.c | 1 +
+ providerMgr.h | 2 +-
+ sfcBroker.c   | 2 +-
+ trace.c       | 1 +
+ trace.h       | 2 +-
+ 6 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/control.h b/control.h
+index e41e4b9..5e15363 100644
+--- a/control.h
++++ b/control.h
+@@ -28,7 +28,7 @@ int             getControlUNum(char *id, unsigned int *val);
+ int             getControlULong(char *id, unsigned long *val);
+ int             getControlNum(char *id, long *val);
+ int             getControlBool(char *id, int *val);
+-const char      * sfcBrokerStart;
++extern const char * sfcBrokerStart;
+ 
+ #endif
+ /* MODELINES */
+diff --git a/providerMgr.c b/providerMgr.c
+index c38a7d3..ff6d38d 100644
+--- a/providerMgr.c
++++ b/providerMgr.c
+@@ -53,6 +53,7 @@
+ #define SFCB_ASM(x)
+ #endif
+ 
++sigset_t mask, old_mask;
+ static pthread_mutex_t resultsocketMutex = PTHREAD_MUTEX_INITIALIZER;
+ 
+ extern CMPIBroker *Broker;
+diff --git a/providerMgr.h b/providerMgr.h
+index 3cc7745..fbbfecd 100644
+--- a/providerMgr.h
++++ b/providerMgr.h
+@@ -398,7 +398,7 @@ BinResponseHdr **invokeProviders(BinRequestContext * binCtx, int *err,
+ BinResponseHdr *invokeProvider(BinRequestContext * ctx);
+ void            freeResponseHeaders(BinResponseHdr ** resp,
+                                     BinRequestContext * ctx);
+-sigset_t mask, old_mask;
++extern sigset_t mask, old_mask;
+ 
+ #endif
+ /* MODELINES */
+diff --git a/sfcBroker.c b/sfcBroker.c
+index ca043c9..85581f5 100644
+--- a/sfcBroker.c
++++ b/sfcBroker.c
+@@ -53,7 +53,7 @@
+ #endif
+ 
+ int             sfcBrokerPid = 0;
+-
++const char     *sfcBrokerStart;
+ extern int      sfcbUseSyslog;
+ 
+ extern void     setExFlag(unsigned long f);
+diff --git a/trace.c b/trace.c
+index 438af46..23597e1 100644
+--- a/trace.c
++++ b/trace.c
+@@ -52,6 +52,7 @@ char           *processName = NULL;
+ int             providerProcess = 0;
+ int             idleThreadId = 0;
+ int             terminating = 0;
++int             colorTrace;
+ 
+ int             _sfcb_debug = 0;
+ unsigned long   _sfcb_trace_mask = 0;
+diff --git a/trace.h b/trace.h
+index 2c6d8be..ea39850 100644
+--- a/trace.h
++++ b/trace.h
+@@ -130,7 +130,7 @@ typedef struct traceId {
+ #define CYAN            6
+ #define WHITE           7
+ void            changeTextColor(int reset);
+-int             colorTrace;
++extern int      colorTrace;
+ 
+ #define MAX_MSG_SIZE 1024       /* max length of trace message */
+ 
+-- 
+2.28.0
+

@@ -1,0 +1,15 @@
+Index: git/external/glslang/src/glslang/Include/PoolAlloc.h
+===================================================================
+--- git.orig/external/glslang/src/glslang/Include/PoolAlloc.h
++++ git/external/glslang/src/glslang/Include/PoolAlloc.h
+@@ -240,8 +240,9 @@ protected:
+ 
+     int numCalls;           // just an interesting statistic
+     size_t totalBytes;      // just an interesting statistic
+-private:
++public:
+     TPoolAllocator& operator=(const TPoolAllocator&);  // don't allow assignment operator
++private:
+     TPoolAllocator(const TPoolAllocator&);  // don't allow default copy constructor
+ };
+ 

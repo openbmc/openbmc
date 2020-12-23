@@ -557,7 +557,7 @@ python write_specfile () {
 
     print_deps(srcrrecommends, "Recommends", spec_preamble_top, d)
     print_deps(srcrsuggests, "Suggests", spec_preamble_top, d)
-    print_deps(srcrprovides + (" /bin/sh" if srcname.startswith("nativesdk-") else ""), "Provides", spec_preamble_top, d)
+    print_deps(srcrprovides, "Provides", spec_preamble_top, d)
     print_deps(srcrobsoletes, "Obsoletes", spec_preamble_top, d)
     print_deps(srcrconflicts, "Conflicts", spec_preamble_top, d)
 

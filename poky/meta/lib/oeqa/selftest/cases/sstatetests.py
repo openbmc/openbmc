@@ -19,10 +19,13 @@ class SStateTests(SStateBase):
         # Test that a git repository which changes is correctly handled by SRCREV = ${AUTOREV}
         # when PV does not contain SRCPV
 
-        tempdir = tempfile.mkdtemp(prefix='oeqa')
+        tempdir = tempfile.mkdtemp(prefix='sstate_autorev')
+        tempdldir = tempfile.mkdtemp(prefix='sstate_autorev_dldir')
         self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(tempdldir)
         create_temp_layer(tempdir, 'selftestrecipetool')
         self.add_command_to_tearDown('bitbake-layers remove-layer %s' % tempdir)
+        self.append_config("DL_DIR = \"%s\"" % tempdldir)
         runCmd('bitbake-layers add-layer %s' % tempdir)
 
         # Use dbus-wait as a local git repo we can add a commit between two builds in

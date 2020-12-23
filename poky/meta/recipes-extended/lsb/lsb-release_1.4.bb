@@ -1,6 +1,6 @@
 SUMMARY = "lsb_release support for OpenEmbedded"
 SECTION = "console/utils"
-HOMEPAGE = "http://prdownloads.sourceforge.net/lsb"
+HOMEPAGE = "https://sourceforge.net/projects/lsb/files"
 LICENSE = "GPLv2+"
 
 # lsb_release needs getopt

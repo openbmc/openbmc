@@ -1,11 +1,12 @@
 SUMMARY  = "OpenCL API Headers"
 DESCRIPTION = "OpenCL compute API headers from Khronos Group"
-LICENSE  = "Khronos"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=dcefc90f4c3c689ec0c2489064e7273b"
+LICENSE  = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 SECTION = "base"
 
 S = "${WORKDIR}/git"
-SRCREV = "40c5d226c7c0706f0176884e9b94b3886679c983"
+# v2020.06.16
+SRCREV = "b04034a17e214322772c19e7ccd2adf0cd306920"
 SRC_URI = "git://github.com/KhronosGroup/OpenCL-Headers.git"
 
 do_configure[noexec] = "1"

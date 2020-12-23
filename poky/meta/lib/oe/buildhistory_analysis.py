@@ -373,8 +373,10 @@ def compare_file_lists(alines, blines, compare_ownership=True):
                                 removals.remove(removal2)
                     continue
             filechanges.append(FileChange(removal, FileChange.changetype_move, addition))
-            additions.remove(addition)
-            removals.remove(removal)
+            if addition in additions:
+                additions.remove(addition)
+            if removal in removals:
+                removals.remove(removal)
     for rename in renames:
         filechanges.append(FileChange(renames[rename], FileChange.changetype_move, rename))
 

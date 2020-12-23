@@ -41,7 +41,7 @@ index 3e7e0bf..fa95034 100644
 @@ -185,6 +185,11 @@ std::optional<ObjectStateData>
      auto sensorObj =
          std::make_unique<sensor::Sensor>(sensorSetKey, _ioAccess, _devPath);
-
+ 
 +    /* Add the concerned host sensors to _hostSensors list */
 +    if (sensorObj->isHostSensor() &&
 +        _hostSensors.find(sensorSetKey) == _hostSensors.end())
@@ -51,7 +51,7 @@ index 3e7e0bf..fa95034 100644
      auto devRmRCs = env::getEnv("REMOVERCS");
      // Add sensor removal return codes defined at the device level
 @@ -198,7 +203,8 @@ std::optional<ObjectStateData>
-
+ 
      ObjectInfo info(&_bus, std::move(objectPath), InterfaceMap());
      RetryIO retryIO(hwmonio::retries, hwmonio::delay);
 -    if (_rmSensors.find(sensorSetKey) != _rmSensors.end())
@@ -62,7 +62,7 @@ index 3e7e0bf..fa95034 100644
          // don't retry on errors when reading its value
 @@ -363,7 +369,7 @@ void MainLoop::init()
      }
-
+ 
      /* If there are no sensors specified by labels, exit. */
 -    if (0 == _state.size())
 +    if (0 == (_state.size() + _hostSensors.size()))
@@ -76,7 +76,7 @@ index b3de022..3130322 100644
 @@ -122,6 +122,12 @@ class MainLoop
       */
      std::map<SensorSet::key_type, SensorSet::mapped_type> _rmSensors;
-
+ 
 +    /**
 +     * @brief Map of the concerned host sensors
 +     */
@@ -93,7 +93,7 @@ index 09aeca6..5e88867 100644
 @@ -46,6 +46,20 @@ Sensor::Sensor(const SensorSet::key_type& sensor,
          }
      }
-
+ 
 +    auto sPower = env::getEnv("POWERON", sensor);
 +    /*
 +     * only set _hostSensor to true
@@ -118,7 +118,7 @@ index 4b2d281..4d09f9c 100644
 @@ -135,6 +135,16 @@ class Sensor
          return _hasFaultFile;
      }
-
+ 
 +    /**
 +     * @brief Get whether the concerned host sensor.
 +     *
@@ -135,13 +135,13 @@ index 4b2d281..4d09f9c 100644
 @@ -145,6 +155,9 @@ class Sensor
      /** @brief Physical device sysfs path. */
      const std::string& _devPath;
-
+ 
 +    /** @brief Read when the host power is On. */
 +    bool _hostSensor;
 +
      /** @brief Structure for storing sensor adjustments */
      valueAdjust _sensorAdjusts;
-
---
+ 
+-- 
 2.17.1
 

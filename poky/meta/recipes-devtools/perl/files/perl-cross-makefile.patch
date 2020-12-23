@@ -1,0 +1,29 @@
+Makefile: Avoid continual rebuilds of miniperl and associated races 
+
+In the Yocto Project, when we run "make install" we notice miniperl
+rebuilding multiple times. Usually this is harmless however sometimes
+race issues occur such as miniperl not being executable.
+
+The issue is that crosspatch is a phony target so it always rebuilds.
+Adding this as a dependency of miniperl means miniperl always rebuilds
+too.
+
+Avoid this by injecting a direct dependency avoiding the phony target.
+miniperl is then only rebuilt when its input changes as desired.
+
+Signed-off-by: Richard Purdie richard.purdie@linuxfoundation.org
+Upstream-Status: Submitted [https://github.com/arsv/perl-cross/pull/95]
+
+Index: perl-5.32.0/Makefile
+===================================================================
+--- perl-5.32.0.orig/Makefile
++++ perl-5.32.0/Makefile
+@@ -56,7 +56,7 @@ crosspatch: $(CROSSPATCHED)
+ 
+ # A minor fix for buildroot, force crosspatching when running "make perl modules"
+ # instead of "make all".
+-miniperlmain$O: crosspatch
++miniperlmain$O: $(CROSSPATCHED)
+ 
+ # Original versions are not saved anymore; patch generally takes care of this,
+ # and if that fails, reaching for the source tarball is the safest option.

@@ -1,4 +1,4 @@
-From b880e78bf4a1852e260188e6df3ec6034403d2fc Mon Sep 17 00:00:00 2001
+From 9da913bf5f39c6fe737219af7419170574d6fbfb Mon Sep 17 00:00:00 2001
 From: Jeremy Puhlman <jpuhlman@mvista.com>
 Date: Wed, 4 Mar 2020 00:06:42 +0000
 Subject: [PATCH] Don't search system for headers/libraries
@@ -11,7 +11,7 @@ Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index 7208cd0..c0bd0ad 100644
+index a0bf9ea..da099bf 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -674,8 +674,8 @@ class PyBuildExt(build_ext):

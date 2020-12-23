@@ -1,0 +1,47 @@
+From eead0c589b71d4256bf9f16492164786b0ee07e4 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Mon, 9 Nov 2020 04:05:25 +0000
+Subject: [PATCH] configure.seed: not check clang on host
+
+Don't check clang on host to avoid host contamination.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ configure.seed | 19 -------------------
+ 1 file changed, 19 deletions(-)
+
+diff --git a/configure.seed b/configure.seed
+index d0335b599..cb97adca2 100644
+--- a/configure.seed
++++ b/configure.seed
+@@ -509,25 +509,6 @@ if test $SYSTEM = "Darwin"; then
+             CFLAGS="-fno-color-diagnostics $CFLAGS"
+       fi
+    fi
+-else
+-  if test $SYSTEM = "Linux"; then
+-    if [ test -f /usr/bin/clang++ ]; then
+-      CC=clang
+-      CXX=clang++
+-      AC_MSG_RESULT(Using clang++ compiler)
+-    fi
+-    
+-    if [ test -f /etc/redhat-release ]; then
+-       if [ test -f /usr/bin/lsb_release ]; then
+-       	  dnl> CentOS 7
+-	  CENTOS_N2N_DEP=", n2n"
+-       fi
+-    else
+-        if [ test -f /usr/bin/lsb_release ]; then
+-         OS=`/usr/bin/lsb_release -d|cut -d ':' -f 2`
+-        fi
+-    fi
+-  fi
+ fi
+ 
+ dnl> Remove spaces
+-- 
+2.26.2
+

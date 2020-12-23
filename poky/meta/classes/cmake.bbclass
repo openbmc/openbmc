@@ -21,23 +21,6 @@ python() {
         d.setVarFlag("do_compile", "progress", r"outof:^\[(\d+)/(\d+)\]\s+")
     else:
         bb.fatal("Unknown CMake Generator %s" % generator)
-
-    # C/C++ Compiler (without cpu arch/tune arguments)
-    if not d.getVar('OECMAKE_C_COMPILER'):
-        cc_list = d.getVar('CC').split()
-        if cc_list[0] == 'ccache':
-            d.setVar('OECMAKE_C_COMPILER_LAUNCHER', cc_list[0])
-            d.setVar('OECMAKE_C_COMPILER', cc_list[1])
-        else:
-            d.setVar('OECMAKE_C_COMPILER', cc_list[0])
-
-    if not d.getVar('OECMAKE_CXX_COMPILER'):
-        cxx_list = d.getVar('CXX').split()
-        if cxx_list[0] == 'ccache':
-            d.setVar('OECMAKE_CXX_COMPILER_LAUNCHER', cxx_list[0])
-            d.setVar('OECMAKE_CXX_COMPILER', cxx_list[1])
-        else:
-            d.setVar('OECMAKE_CXX_COMPILER', cxx_list[0])
 }
 OECMAKE_AR ?= "${AR}"
 
@@ -51,8 +34,23 @@ OECMAKE_CXX_LINK_FLAGS ?= "${HOST_CC_ARCH} ${TOOLCHAIN_OPTIONS} ${CXXFLAGS} ${LD
 CXXFLAGS += "${HOST_CC_ARCH} ${TOOLCHAIN_OPTIONS}"
 CFLAGS += "${HOST_CC_ARCH} ${TOOLCHAIN_OPTIONS}"
 
-OECMAKE_C_COMPILER_LAUNCHER ?= ""
-OECMAKE_CXX_COMPILER_LAUNCHER ?= ""
+def oecmake_map_compiler(compiler, d):
+    args = d.getVar(compiler).split()
+    if args[0] == "ccache":
+        return args[1], args[0]
+    return args[0], ""
+
+# C/C++ Compiler (without cpu arch/tune arguments)
+OECMAKE_C_COMPILER ?= "${@oecmake_map_compiler('CC', d)[0]}"
+OECMAKE_C_COMPILER_LAUNCHER ?= "${@oecmake_map_compiler('CC', d)[1]}"
+OECMAKE_CXX_COMPILER ?= "${@oecmake_map_compiler('CXX', d)[0]}"
+OECMAKE_CXX_COMPILER_LAUNCHER ?= "${@oecmake_map_compiler('CXX', d)[1]}"
+
+# clear compiler vars for allarch to avoid sig hash difference
+OECMAKE_C_COMPILER_allarch = ""
+OECMAKE_C_COMPILER_LAUNCHER_allarch = ""
+OECMAKE_CXX_COMPILER_allarch = ""
+OECMAKE_CXX_COMPILER_LAUNCHER_allarch = ""
 
 OECMAKE_RPATH ?= ""
 OECMAKE_PERLNATIVE_DIR ??= ""
@@ -70,15 +68,22 @@ CMAKE_BUILD_PARALLEL_LEVEL_task-install = "${@oe.utils.parallel_make(d, True)}"
 OECMAKE_TARGET_COMPILE ?= "all"
 OECMAKE_TARGET_INSTALL ?= "install"
 
+def map_host_os_to_system_name(host_os):
+    if host_os.startswith('mingw'):
+        return 'Windows'
+    if host_os.startswith('linux'):
+        return 'Linux'
+    return host_os
+
 # CMake expects target architectures in the format of uname(2),
 # which do not always match TARGET_ARCH, so all the necessary
 # conversions should happen here.
-def map_target_arch_to_uname_arch(target_arch):
-    if target_arch == "powerpc":
+def map_host_arch_to_uname_arch(host_arch):
+    if host_arch == "powerpc":
         return "ppc"
-    if target_arch == "powerpc64":
+    if host_arch == "powerpc64":
         return "ppc64"
-    return target_arch
+    return host_arch
 
 cmake_do_generate_toolchain_file() {
 	if [ "${BUILD_SYS}" = "${HOST_SYS}" ]; then
@@ -88,8 +93,8 @@ cmake_do_generate_toolchain_file() {
 # CMake system name must be something like "Linux".
 # This is important for cross-compiling.
 $cmake_crosscompiling
-set( CMAKE_SYSTEM_NAME `echo ${TARGET_OS} | sed -e 's/^./\u&/' -e 's/^\(Linux\).*/\1/'` )
-set( CMAKE_SYSTEM_PROCESSOR ${@map_target_arch_to_uname_arch(d.getVar('TARGET_ARCH'))} )
+set( CMAKE_SYSTEM_NAME ${@map_host_os_to_system_name(d.getVar('HOST_OS'))} )
+set( CMAKE_SYSTEM_PROCESSOR ${@map_host_arch_to_uname_arch(d.getVar('HOST_ARCH'))} )
 set( CMAKE_C_COMPILER ${OECMAKE_C_COMPILER} )
 set( CMAKE_CXX_COMPILER ${OECMAKE_CXX_COMPILER} )
 set( CMAKE_C_COMPILER_LAUNCHER ${OECMAKE_C_COMPILER_LAUNCHER} )

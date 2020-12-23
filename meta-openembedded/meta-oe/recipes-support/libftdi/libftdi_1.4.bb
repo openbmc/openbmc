@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM= "\
     file://COPYING.LIB;md5=5f30f0716dfdd0d91eb439ebec522ec2 \
 "
 
-DEPENDS = "libusb1 python3"
+DEPENDS = "libusb1 python3 swig-native"
 
 SRC_URI = "http://www.intra2net.com/en/developer/${BPN}/download/${BPN}1-${PV}.tar.bz2"
 SRC_URI[md5sum] = "0c09fb2bb19a57c839fa6845c6c780a2"

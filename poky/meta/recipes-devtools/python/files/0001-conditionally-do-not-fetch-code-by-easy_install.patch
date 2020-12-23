@@ -1,4 +1,4 @@
-From a8f871c9ebc4fcb99d4163b226aabeef26567099 Mon Sep 17 00:00:00 2001
+From d2633b49275b20e7acf724567fe0189aab25771e Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 17 Jul 2018 10:13:38 +0800
 Subject: [PATCH] conditionally do not fetch code by easy_install
@@ -15,11 +15,11 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/setuptools/command/easy_install.py b/setuptools/command/easy_install.py
-index 426301d..55c8062 100644
+index 9ec83b7..7e97a07 100644
 --- a/setuptools/command/easy_install.py
 +++ b/setuptools/command/easy_install.py
-@@ -649,6 +649,11 @@ class easy_install(Command):
-             os.path.exists(tmpdir) and rmtree(rmtree_safe(tmpdir))
+@@ -636,6 +636,11 @@ class easy_install(Command):
+             os.path.exists(tmpdir) and rmtree(tmpdir)
  
      def easy_install(self, spec, deps=False):
 +        if os.environ.get('NO_FETCH_BUILD', None):
@@ -27,6 +27,6 @@ index 426301d..55c8062 100644
 +                      "Please add its native recipe to DEPENDS." % spec)
 +            return None
 +
-         if not self.editable:
-             self.install_site_py()
- 
+         with self._tmpdir() as tmpdir:
+             if not isinstance(spec, Requirement):
+                 if URL_SCHEME(spec):

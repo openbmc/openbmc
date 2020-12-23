@@ -12,6 +12,7 @@ DEPENDS = "fuse virtual/libusb0"
 SRCREV = "3744375dfaa350e31c9b360eb1e1a517bbeb5c47"
 SRC_URI = "git://github.com/owfs/owfs \
            file://0001-Add-build-rule-for-README.patch \
+           file://0001-Fix-compilation-with-GCC10.patch \
            file://owhttpd \
            file://owserver \
            "

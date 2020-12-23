@@ -5,9 +5,8 @@ file that lists the operating system features that the package can use, in the f
 LICENSE = "GPLv3"
 HOMEPAGE = "http://www.gnu.org/software/autoconf/"
 SECTION = "devel"
-DEPENDS += "m4-native"
-DEPENDS_class-native = "m4-native gnu-config-native"
-DEPENDS_class-nativesdk = "nativesdk-m4 nativesdk-gnu-config"
+DEPENDS = "m4-native gnu-config-native"
+
 RDEPENDS_${PN} = "m4 gnu-config \
 		  perl \
 		  perl-module-bytes \
@@ -61,11 +60,6 @@ RDEPENDS_${PN}_class-nativesdk = "\
 		  nativesdk-perl-module-thread-queue \
 		  nativesdk-perl-module-threads \
                   "
-
-
-
-SRC_URI = "${GNU_MIRROR}/autoconf/autoconf-${PV}.tar.gz \
-	   file://program_prefix.patch"
 
 inherit autotools texinfo
 

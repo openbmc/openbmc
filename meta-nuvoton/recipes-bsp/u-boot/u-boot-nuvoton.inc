@@ -68,6 +68,10 @@ UBOOT_EXTLINUX_INSTALL_DIR ?= "/boot/extlinux"
 UBOOT_EXTLINUX_CONF_NAME ?= "extlinux.conf"
 UBOOT_EXTLINUX_SYMLINK ?= "${UBOOT_EXTLINUX_CONF_NAME}-${MACHINE}-${PR}"
 
+# Set Device tree from the machine config automatically
+UBOOT_MAKE_TARGET += '${@"" if d.getVar("UBOOT_DEVICETREE") is None \
+    else " DEVICE_TREE=" + d.getVar("UBOOT_DEVICETREE")}'
+
 # returns all the elements from the src uri that are .cfg files
 def find_cfgs(d):
     sources=src_patches(d, True)

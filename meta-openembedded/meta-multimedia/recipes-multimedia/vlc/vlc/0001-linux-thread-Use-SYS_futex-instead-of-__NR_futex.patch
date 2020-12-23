@@ -1,0 +1,46 @@
+From f7957c35654222e5bd1038341612bbb40a88e98b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 16 Nov 2020 12:08:43 -0800
+Subject: [PATCH] linux/thread: Use SYS_futex instead of __NR_futex
+
+SYS_futex it expected from system C library.
+in glibc (/usr/include/bits/syscall.h defines it in terms of of NR_futex)
+some newer 32bit architectures e.g. riscv32 are using 64bit time_t from
+get go unlike other 32bit architectures in glibc, therefore it wont have
+NR_futex defined but just NR_futex_time64 this aliases it to NR_futex so
+that SYS_futex is then defined for rv32
+
+Upstream-Status: Submitted [https://github.com/videolan/vlc/pull/117]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/linux/thread.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/linux/thread.c b/src/linux/thread.c
+index 20da296..30639a3 100644
+--- a/src/linux/thread.c
++++ b/src/linux/thread.c
+@@ -30,6 +30,11 @@
+ #include <sys/syscall.h>
+ #include <linux/futex.h>
+ 
++/* 32bit architectures with 64bit time_t do not define __NR_futex syscall */
++#if !defined(SYS_futex) && defined(SYS_futex_time64)
++#define SYS_futex SYS_futex_time64
++#endif
++
+ #ifndef FUTEX_PRIVATE_FLAG
+ #define FUTEX_WAKE_PRIVATE FUTEX_WAKE
+ #define FUTEX_WAIT_PRIVATE FUTEX_WAIT
+@@ -50,7 +55,7 @@ unsigned long vlc_thread_id(void)
+ static int sys_futex(void *addr, int op, unsigned val,
+                      const struct timespec *to, void *addr2, int val3)
+ {
+-    return syscall(__NR_futex, addr, op, val, to, addr2, val3);
++    return syscall(SYS_futex, addr, op, val, to, addr2, val3);
+ }
+ 
+ static int vlc_futex_wake(void *addr, int nr)
+-- 
+2.29.2
+

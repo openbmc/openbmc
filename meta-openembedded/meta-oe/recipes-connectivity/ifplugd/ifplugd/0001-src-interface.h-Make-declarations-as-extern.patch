@@ -1,0 +1,31 @@
+From b990146a149e1729c12e4541a67e32ed1dd6e578 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Aug 2020 19:41:08 -0700
+Subject: [PATCH] src/interface.h: Make declarations as extern
+
+Fixed build with -fno-common
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/interface.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/interface.h b/src/interface.h
+index d223b1f..fd4a5f4 100644
+--- a/src/interface.h
++++ b/src/interface.h
+@@ -21,8 +21,8 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+  */
+ 
+-int interface_auto_up;
+-int interface_do_message;
++extern int interface_auto_up;
++extern int interface_do_message;
+ 
+ typedef enum { IFSTATUS_UP, IFSTATUS_DOWN, IFSTATUS_ERR } interface_status_t;
+ 
+-- 
+2.28.0
+

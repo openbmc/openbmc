@@ -15,6 +15,8 @@ PYTHON_OPTION = "am_cv_python_pyexecdir='${PYTHON_SITEPACKAGES_DIR}' \
 
 inherit autotools lib_package manpages python3native
 
+include lttng-platforms.inc
+
 EXTRA_OECONF = "--disable-numa"
 
 DEPENDS = "liburcu util-linux"

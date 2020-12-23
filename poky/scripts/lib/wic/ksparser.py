@@ -51,11 +51,11 @@ class KickStartParser(ArgumentParser):
     def error(self, message):
         raise ArgumentError(None, message)
 
-def sizetype(default):
+def sizetype(default, size_in_bytes=False):
     def f(arg):
         """
         Custom type for ArgumentParser
-        Converts size string in <num>[K|k|M|G] format into the integer value
+        Converts size string in <num>[S|s|K|k|M|G] format into the integer value
         """
         try:
             suffix = default
@@ -67,12 +67,20 @@ def sizetype(default):
             except ValueError:
                 raise ArgumentTypeError("Invalid size: %r" % arg)
 
+
+        if size_in_bytes:
+            if suffix == 's' or suffix == 'S':
+                return size * 512
+            mult = 1024
+        else:
+            mult = 1
+
         if suffix == "k" or suffix == "K":
-            return size
+            return size * mult
         if suffix == "M":
-            return size * 1024
+            return size * mult * 1024
         if suffix == "G":
-            return size * 1024 * 1024
+            return size * mult * 1024 * 1024
 
         raise ArgumentTypeError("Invalid size: %r" % arg)
     return f
@@ -141,7 +149,7 @@ class KickStart():
         part.add_argument('mountpoint', nargs='?')
         part.add_argument('--active', action='store_true')
         part.add_argument('--align', type=int)
-        part.add_argument('--offset', type=sizetype("K"))
+        part.add_argument('--offset', type=sizetype("K", True))
         part.add_argument('--exclude-path', nargs='+')
         part.add_argument('--include-path', nargs='+', action='append')
         part.add_argument('--change-directory')

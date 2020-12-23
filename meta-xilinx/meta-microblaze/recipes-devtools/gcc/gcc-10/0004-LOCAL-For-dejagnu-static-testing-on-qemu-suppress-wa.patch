@@ -1,0 +1,30 @@
+From f8809fdebc3ef3927695c84224d3446fa13447d6 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 11 Jan 2017 15:46:28 +0530
+Subject: [PATCH 04/58] [LOCAL]: For dejagnu static testing on qemu, suppress
+ warnings
+
+about multiple definitions from the test function and libc in line
+with method used by powerpc. Dynamic linking and using a qemu binary
+which understands sysroot resolves all test failures with builtins
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+---
+ gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp b/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp
+index 4103d43748d..d7c9b281d01 100644
+--- a/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp
++++ b/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp
+@@ -50,7 +50,6 @@ if { [istarget *-*-eabi*]
+ 
+ if [istarget "microblaze*-*-linux*"] {
+    lappend additional_flags "-Wl,-zmuldefs"
+-   lappend additional_flags "-fPIC"
+ }
+ 
+ foreach src [lsort [find $srcdir/$subdir *.c]] {
+-- 
+2.17.1
+

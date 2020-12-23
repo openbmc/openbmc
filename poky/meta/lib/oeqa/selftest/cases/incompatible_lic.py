@@ -85,7 +85,7 @@ class IncompatibleLicenseTests(OESelftestTestCase):
 class IncompatibleLicensePerImageTests(OESelftestTestCase):
     def default_config(self):
         return """
-IMAGE_INSTALL_append = "bash"
+IMAGE_INSTALL_append = " bash"
 INCOMPATIBLE_LICENSE_pn-core-image-minimal = "GPL-3.0 LGPL-3.0"
 """
 

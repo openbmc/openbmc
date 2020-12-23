@@ -1,0 +1,13 @@
+[Unit]
+Description = Systemd service for Thingsboard Gateway
+After       = network.target
+
+[Service]
+ExecStart   = /usr/bin/python3 /usr/bin/thingsboard-gateway
+ExecStop    = /bin/kill -INT $MAINPID
+ExecReload  = /bin/kill -TERM $MAINPID
+Restart     = always
+Type        = simple
+
+[Install]
+WantedBy=multi-user.target

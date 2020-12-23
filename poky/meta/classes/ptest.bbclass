@@ -6,7 +6,7 @@ PTEST_PATH ?= "${libdir}/${BPN}/ptest"
 PTEST_BUILD_HOST_FILES ?= "Makefile"
 PTEST_BUILD_HOST_PATTERN ?= ""
 
-FILES_${PN}-ptest = "${PTEST_PATH}"
+FILES_${PN}-ptest += "${PTEST_PATH}"
 SECTION_${PN}-ptest = "devel"
 ALLOW_EMPTY_${PN}-ptest = "1"
 PTEST_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', '1', '0', d)}"

@@ -1,0 +1,26 @@
+From 5e8ebf1c926945ce6efee5a5abb990a144ab701f Mon Sep 17 00:00:00 2001
+From: Tung Nguyen <tung.nguyen@amperecomputing.com>
+Date: Tue, 8 Dec 2020 14:54:55 +0700
+Subject: [PATCH] correct the hard reset command
+
+Signed-off-by: Tung Nguyen <tung.nguyen@amperecomputing.com>
+---
+ chassishandler.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/chassishandler.cpp b/chassishandler.cpp
+index 3250b2c..4f2aee9 100644
+--- a/chassishandler.cpp
++++ b/chassishandler.cpp
+@@ -1418,6 +1418,8 @@ ipmi::RspType<> ipmiChassisControl(uint8_t chassisControl)
+             break;
+ 
+         case CMD_HARD_RESET:
++            rc = initiate_state_transition(State::Host::Transition::ForceWarmReboot);
++            break;
+         case CMD_POWER_CYCLE:
+             // SPEC has a section that says certain implementations can trigger
+             // PowerOn if power is Off when a command to power cycle is
+-- 
+2.17.1
+

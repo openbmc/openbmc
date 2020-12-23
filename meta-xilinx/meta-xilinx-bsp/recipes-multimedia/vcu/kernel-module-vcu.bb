@@ -9,9 +9,9 @@ PV = "${XILINX_VCU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-BRANCH ?= "release-2020.1"
+BRANCH ?= "release-2020.2"
 REPO ?= "git://github.com/xilinx/vcu-modules.git;protocol=https"
-SRCREV ?= "38827a9172cfb1f0243547c04b2babc045d411ee"
+SRCREV ?= "844d4c4292e08ad8c3f22ac78e9a937395c1db4b"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"

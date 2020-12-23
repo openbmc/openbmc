@@ -28,7 +28,7 @@ The core BSP part of meta-raspberrypi should work with different
 OpenEmbedded/Yocto distributions and layer stacks, such as:
 
 * Distro-less (only with OE-Core).
-* Angstrom.
+* Yoe Disto (Video and Camera Products).
 * Yocto/Poky (main focus of testing).
 
 ## Dependencies

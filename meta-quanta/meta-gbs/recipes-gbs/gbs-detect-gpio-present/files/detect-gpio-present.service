@@ -1,0 +1,12 @@
+[Unit]
+Description=Detect GPIO Present Manager
+After=phosphor-gpio-presence@.service
+Wants=phosphor-gpio-presence@.service
+
+[Service]
+ExecStart=/usr/bin/detect-gpio-present.sh
+StandardOutput=syslog
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

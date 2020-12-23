@@ -3,4 +3,4 @@ Description=Don't verify the image, just stage it for update
 
 [Service]
 Type=oneshot
-ExecStart=/bin/mv /run/initramfs/bmc-image /run/initramfs/image-bmc
+ExecStart=/bin/mv /run/initramfs/bmc-image /run/initramfs/bmc-image-verified

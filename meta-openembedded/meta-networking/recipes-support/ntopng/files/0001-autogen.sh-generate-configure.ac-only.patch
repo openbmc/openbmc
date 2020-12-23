@@ -1,0 +1,36 @@
+From 22f0bec462763f1b0b92daa33133e274d3b45f4f Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 5 Nov 2020 00:05:21 -0800
+Subject: [PATCH] autogen.sh: generate configure.ac only
+
+The autogen.sh should only generate configure.ac and the
+logic used to generate configure script should follow the
+autotools.bbclass in oe. Otherwise there may comes below
+do_configure error:
+ | checking whether we are cross compiling... configure: error: in `/path/tmp/work/core2-64-poky-linux/ndpi/3.4-r0/git':
+ | configure: error: cannot run C compiled programs.
+ | If you meant to cross compile, use `--host'.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ autogen.sh | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/autogen.sh b/autogen.sh
+index 73f8d0ebe..15ff0aa84 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -73,8 +73,3 @@ cat configure.seed | sed \
+     > configure.ac
+ 
+ rm -f config.h config.h.in *~ #*
+-
+-echo "Wait please..."
+-autoreconf -if
+-echo ""
+-echo "Now run ./configure"
+-- 
+2.17.1
+

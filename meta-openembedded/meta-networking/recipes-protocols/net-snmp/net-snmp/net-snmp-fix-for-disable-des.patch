@@ -1,4 +1,4 @@
-From 068952c0e0cdda5a91250b91c5fcc9b85b43daab Mon Sep 17 00:00:00 2001
+From 3ca4335ec1d6b7b384c134fc85d7a9e513c68376 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Thu, 22 Jun 2017 10:25:08 +0800
 Subject: [PATCH] net-snmp: fix for --disable-des
@@ -15,10 +15,10 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/snmplib/scapi.c b/snmplib/scapi.c
-index 8ad1d70..43caddf 100644
+index 00c9174..c6875e1 100644
 --- a/snmplib/scapi.c
 +++ b/snmplib/scapi.c
-@@ -84,7 +84,9 @@ netsnmp_feature_child_of(usm_scapi, usm_support)
+@@ -85,7 +85,9 @@ netsnmp_feature_child_of(usm_scapi, usm_support);
  #include <openssl/hmac.h>
  #include <openssl/evp.h>
  #include <openssl/rand.h>

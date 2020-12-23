@@ -33,6 +33,7 @@ PACKAGECONFIG[vulkan] = "-Dvulkan=true,-Dvulkan=false,vulkan-loader"
 
 LDFLAGS_append_mipsarch = " -latomic"
 LDFLAGS_append_x86 = " -latomic"
+LDFLAGS_append_riscv32 = " -latomic"
 
 PACKAGES =+ "\
     ${PN}-spa-plugins \

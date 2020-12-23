@@ -1,4 +1,4 @@
-require xorg-lib-common.inc
+require recipes-graphics/xorg-lib/xorg-lib-common.inc
 
 DESCRIPTION = "X11 Pixmap library"
 LICENSE = "X-BSD"

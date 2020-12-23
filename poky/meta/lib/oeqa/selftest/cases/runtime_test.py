@@ -156,11 +156,12 @@ class TestImage(OESelftestTestCase):
         self.gpg_home = tempfile.mkdtemp(prefix="oeqa-feed-sign-")
         self.track_for_cleanup(self.gpg_home)
         signing_key_dir = os.path.join(self.testlayer_path, 'files', 'signing')
-        runCmd('gpg --batch --homedir %s --import %s' % (self.gpg_home, os.path.join(signing_key_dir, 'key.secret')), native_sysroot=get_bb_var("RECIPE_SYSROOT_NATIVE", "gnupg-native"))
+        runCmd('gpgconf --list-dirs --homedir %s; gpg -v --batch --homedir %s --import %s' % (self.gpg_home, self.gpg_home, os.path.join(signing_key_dir, 'key.secret')), native_sysroot=get_bb_var("RECIPE_SYSROOT_NATIVE", "gnupg-native"), shell=True)
         features += 'INHERIT += "sign_package_feed"\n'
         features += 'PACKAGE_FEED_GPG_NAME = "testuser"\n'
         features += 'PACKAGE_FEED_GPG_PASSPHRASE_FILE = "%s"\n' % os.path.join(signing_key_dir, 'key.passphrase')
         features += 'GPG_PATH = "%s"\n' % self.gpg_home
+        features += 'PSEUDO_IGNORE_PATHS .= ",%s"\n' % self.gpg_home
         self.write_config(features)
 
         # Build core-image-sato and testimage
@@ -383,7 +384,7 @@ KERNEL_EXTRA_FEATURES_append = " features/debug/debug-kernel.scc"
 KERNEL_EXTRA_FEATURES_append = " features/systemtap/systemtap.scc"
 
 # add systemtap run-time into target image if it is not there yet
-IMAGE_INSTALL_append = " systemtap"
+IMAGE_INSTALL_append = " systemtap-runtime"
 """
 
         def test_crosstap_helloworld(self):

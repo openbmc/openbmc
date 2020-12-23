@@ -1,0 +1,40 @@
+From 35421d03898ac1b38f97a76241e6a29086d0c9f1 Mon Sep 17 00:00:00 2001
+From: Geoff Parker <geoffrey.parker@arthrex.com>
+Date: Fri, 9 Oct 2020 17:48:47 +0000
+Subject: [PATCH] libdmmp/Makefile: replace perl with sed in install target to
+ work with pseudo
+
+The multipath-tools libdmmp/Makefile install target uses 'perl -i' instead
+of 'sed -i' for string substitutions. The perl method creates a temporary file
+and overwrites the original which changes the inodes and corrupts the pseudo
+db. Changes to pseduo cause a build abort rather than allow possible bad
+ownership or permissions settings on the files. 'sed -i' is compatible
+with pseudo.
+
+Signed-off-by: Geoff Parker <geoffrey.parker@arthrex.com>
+---
+ libdmmp/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libdmmp/Makefile b/libdmmp/Makefile
+index 1dd3f340..8166075c 100644
+--- a/libdmmp/Makefile
++++ b/libdmmp/Makefile
+@@ -34,11 +34,11 @@ install:
+ 	$(LN) $(LIBS) $(DESTDIR)$(usrlibdir)/$(DEVLIB)
+ 	$(INSTALL_PROGRAM) -m 644 -D \
+ 		$(PKGFILE).in $(DESTDIR)$(pkgconfdir)/$(PKGFILE)
+-	perl -i -pe 's|__VERSION__|$(LIBDMMP_VERSION)|g' \
++	sed -i 's|__VERSION__|$(LIBDMMP_VERSION)|g' \
+ 		$(DESTDIR)$(pkgconfdir)/$(PKGFILE)
+-	perl -i -pe 's|__LIBDIR__|$(usrlibdir)|g' \
++	sed -i 's|__LIBDIR__|$(usrlibdir)|g' \
+ 		$(DESTDIR)$(pkgconfdir)/$(PKGFILE)
+-	perl -i -pe 's|__INCLUDEDIR__|$(includedir)|g' \
++	sed -i 's|__INCLUDEDIR__|$(includedir)|g' \
+ 		$(DESTDIR)$(pkgconfdir)/$(PKGFILE)
+ 	@for file in docs/man/*.3.gz; do \
+ 		$(INSTALL_PROGRAM) -m 644 -D \
+-- 
+2.20.1
+

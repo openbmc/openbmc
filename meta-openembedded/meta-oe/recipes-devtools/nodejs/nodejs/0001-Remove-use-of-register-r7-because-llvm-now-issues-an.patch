@@ -1,0 +1,53 @@
+From be8d3cd6eab4b8f9849133060abb1aba4400276b Mon Sep 17 00:00:00 2001
+From: Amy Huang <akhuang@google.com>
+Date: Thu, 23 Apr 2020 11:25:53 -0700
+Subject: [PATCH] Remove use of register r7 because llvm now issues an error
+ when "r7" is used (starting in commit d85b3877)
+
+Bug: chromium:1073270
+Change-Id: I7ec8112f170b98d2edaf92bc9341e738f8de07a3
+Reviewed-on: https://chromium-review.googlesource.com/c/v8/v8/+/2163435
+Reviewed-by: Nico Weber <thakis@chromium.org>
+Reviewed-by: Ross McIlroy <rmcilroy@chromium.org>
+Commit-Queue: Nico Weber <thakis@chromium.org>
+Cr-Commit-Position: refs/heads/master@{#67371}
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Backport [https://chromium.googlesource.com/v8/v8/+/00604cd2806b5d26bef592dd19989a234bd07a4b%5E%21/]
+ deps/v8/src/codegen/arm/cpu-arm.cc | 13 -------------
+ 1 file changed, 13 deletions(-)
+
+diff --git a/deps/v8/src/codegen/arm/cpu-arm.cc b/deps/v8/src/codegen/arm/cpu-arm.cc
+index 868f360..654d68f 100644
+--- a/deps/v8/src/codegen/arm/cpu-arm.cc
++++ b/deps/v8/src/codegen/arm/cpu-arm.cc
+@@ -30,18 +30,6 @@ V8_NOINLINE void CpuFeatures::FlushICache(void* start, size_t size) {
+   register uint32_t end asm("r1") = beg + size;
+   register uint32_t flg asm("r2") = 0;
+ 
+-#ifdef __clang__
+-  // This variant of the asm avoids a constant pool entry, which can be
+-  // problematic when LTO'ing. It is also slightly shorter.
+-  register uint32_t scno asm("r7") = __ARM_NR_cacheflush;
+-
+-  asm volatile("svc 0\n"
+-               :
+-               : "r"(beg), "r"(end), "r"(flg), "r"(scno)
+-               : "memory");
+-#else
+-  // Use a different variant of the asm with GCC because some versions doesn't
+-  // support r7 as an asm input.
+   asm volatile(
+       // This assembly works for both ARM and Thumb targets.
+ 
+@@ -59,7 +47,6 @@ V8_NOINLINE void CpuFeatures::FlushICache(void* start, size_t size) {
+       : "r"(beg), "r"(end), "r"(flg), [scno] "i"(__ARM_NR_cacheflush)
+       : "memory");
+ #endif
+-#endif
+ #endif  // !USE_SIMULATOR
+ }
+ 
+-- 
+2.29.2
+

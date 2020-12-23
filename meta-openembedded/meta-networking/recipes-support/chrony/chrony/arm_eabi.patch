@@ -18,45 +18,60 @@ Subject: [PATCH] chrony: fix build failure for arma9
     Refresh patch for new upstream version.
 
     Signed-off-by: Robert Joslyn <robert.joslyn@redrectangle.org>
+
+    Refreshed for 4.0
+
+    Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  sys_linux.c | 20 ++++++++++++++------
  1 file changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/sys_linux.c b/sys_linux.c
-index 898dc7a..b268ad1 100644
 --- a/sys_linux.c
 +++ b/sys_linux.c
-@@ -479,14 +479,14 @@ SYS_Linux_EnableSystemCallFilter(int level)
-   const int syscalls[] = {
-     /* Clock */
-     SCMP_SYS(adjtimex), SCMP_SYS(clock_gettime), SCMP_SYS(gettimeofday),
--    SCMP_SYS(settimeofday), SCMP_SYS(time),
-+    SCMP_SYS(settimeofday),
+@@ -499,14 +499,12 @@ SYS_Linux_EnableSystemCallFilter(int lev
+ #endif
+     SCMP_SYS(gettimeofday),
+     SCMP_SYS(settimeofday),
+-    SCMP_SYS(time),
+
      /* Process */
-     SCMP_SYS(clone), SCMP_SYS(exit), SCMP_SYS(exit_group), SCMP_SYS(getpid),
--    SCMP_SYS(getrlimit), SCMP_SYS(rt_sigaction), SCMP_SYS(rt_sigreturn),
-+    SCMP_SYS(rt_sigaction), SCMP_SYS(rt_sigreturn),
-     SCMP_SYS(rt_sigprocmask), SCMP_SYS(set_tid_address), SCMP_SYS(sigreturn),
-     SCMP_SYS(wait4), SCMP_SYS(waitpid),
+     SCMP_SYS(clone),
+     SCMP_SYS(exit),
+     SCMP_SYS(exit_group),
+     SCMP_SYS(getpid),
+-    SCMP_SYS(getrlimit),
+     SCMP_SYS(getuid),
+     SCMP_SYS(rt_sigaction),
+     SCMP_SYS(rt_sigreturn),
+@@ -519,7 +517,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
      /* Memory */
--    SCMP_SYS(brk), SCMP_SYS(madvise), SCMP_SYS(mmap), SCMP_SYS(mmap2),
-+    SCMP_SYS(brk), SCMP_SYS(madvise), SCMP_SYS(mmap2),
-     SCMP_SYS(mprotect), SCMP_SYS(mremap), SCMP_SYS(munmap), SCMP_SYS(shmdt),
-     /* Filesystem */
-     SCMP_SYS(_llseek), SCMP_SYS(access), SCMP_SYS(chmod), SCMP_SYS(chown),
-@@ -499,14 +499,22 @@ SYS_Linux_EnableSystemCallFilter(int level)
-     SCMP_SYS(bind), SCMP_SYS(connect), SCMP_SYS(getsockname), SCMP_SYS(getsockopt),
-     SCMP_SYS(recv), SCMP_SYS(recvfrom), SCMP_SYS(recvmmsg), SCMP_SYS(recvmsg),
-     SCMP_SYS(send), SCMP_SYS(sendmmsg), SCMP_SYS(sendmsg), SCMP_SYS(sendto),
+     SCMP_SYS(brk),
+     SCMP_SYS(madvise),
+-    SCMP_SYS(mmap),
+     SCMP_SYS(mmap2),
+     SCMP_SYS(mprotect),
+     SCMP_SYS(mremap),
+@@ -573,8 +570,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
+     SCMP_SYS(sendmsg),
+     SCMP_SYS(sendto),
+     SCMP_SYS(shutdown),
 -    /* TODO: check socketcall arguments */
 -    SCMP_SYS(socketcall),
+
      /* General I/O */
-     SCMP_SYS(_newselect), SCMP_SYS(close), SCMP_SYS(open), SCMP_SYS(openat), SCMP_SYS(pipe),
-     SCMP_SYS(pipe2), SCMP_SYS(poll), SCMP_SYS(ppoll), SCMP_SYS(pselect6), SCMP_SYS(read),
--    SCMP_SYS(futex), SCMP_SYS(select), SCMP_SYS(set_robust_list), SCMP_SYS(write),
-+    SCMP_SYS(futex), SCMP_SYS(set_robust_list), SCMP_SYS(write),
-     /* Miscellaneous */
-     SCMP_SYS(getrandom), SCMP_SYS(sysinfo), SCMP_SYS(uname),
+     SCMP_SYS(_newselect),
+@@ -597,7 +592,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
+ #ifdef __NR_futex_time64
+     SCMP_SYS(futex_time64),
+ #endif
+-    SCMP_SYS(select),
+     SCMP_SYS(set_robust_list),
+     SCMP_SYS(write),
+
+@@ -605,6 +599,15 @@ SYS_Linux_EnableSystemCallFilter(int lev
+     SCMP_SYS(getrandom),
+     SCMP_SYS(sysinfo),
+     SCMP_SYS(uname),
 +    /* not always available */
 +#if ! defined(__ARM_EABI__)
 +    SCMP_SYS(time),
@@ -66,10 +81,6 @@ index 898dc7a..b268ad1 100644
 +    /* TODO: check socketcall arguments */
 +    SCMP_SYS(socketcall),
 +#endif
-+
    };
- 
-   const int socket_domains[] = {
--- 
-2.17.1
 
+   const int socket_domains[] = {

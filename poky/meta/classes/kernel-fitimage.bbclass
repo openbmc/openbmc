@@ -56,6 +56,22 @@ FIT_HASH_ALG ?= "sha256"
 # fitImage Signature Algo
 FIT_SIGN_ALG ?= "rsa2048"
 
+# Generate keys for signing fitImage
+FIT_GENERATE_KEYS ?= "0"
+
+# Size of private key in number of bits
+FIT_SIGN_NUMBITS ?= "2048"
+
+# args to openssl genrsa (Default is just the public exponent)
+FIT_KEY_GENRSA_ARGS ?= "-F4"
+
+# args to openssl req (Default is -batch for non interactive mode and
+# -new for new certificate)
+FIT_KEY_REQ_ARGS ?= "-batch -new"
+
+# Standard format for public key certificate
+FIT_KEY_SIGN_PKCS ?= "-x509"
+
 #
 # Emit the fitImage ITS header
 #
@@ -257,11 +273,20 @@ fitimage_emit_section_config() {
 	# Test if we have any DTBs at all
 	sep=""
 	conf_desc=""
+	conf_node="conf@"
 	kernel_line=""
 	fdt_line=""
 	ramdisk_line=""
 	setup_line=""
 	default_line=""
+
+	# conf node name is selected based on dtb ID if it is present,
+	# otherwise its selected based on kernel ID
+	if [ -n "${3}" ]; then
+		conf_node=$conf_node${3}
+	else
+		conf_node=$conf_node${2}
+	fi
 
 	if [ -n "${2}" ]; then
 		conf_desc="Linux kernel"
@@ -287,12 +312,18 @@ fitimage_emit_section_config() {
 	fi
 
 	if [ "${6}" = "1" ]; then
-		default_line="default = \"conf@${3}\";"
+		# default node is selected based on dtb ID if it is present,
+		# otherwise its selected based on kernel ID
+		if [ -n "${3}" ]; then
+			default_line="default = \"conf@${3}\";"
+		else
+			default_line="default = \"conf@${2}\";"
+		fi
 	fi
 
 	cat << EOF >> ${1}
                 ${default_line}
-                conf@${3} {
+                $conf_node {
 			description = "${6} ${conf_desc}";
 			${kernel_line}
 			${fdt_line}
@@ -434,6 +465,13 @@ fitimage_assemble() {
 	#
 	fitimage_emit_section_maint ${1} confstart
 
+	# kernel-fitimage.bbclass currently only supports a single kernel (no less or
+	# more) to be added to the FIT image along with 0 or more device trees and
+	# 0 or 1 ramdisk.
+	# If a device tree is to be part of the FIT image, then select
+	# the default configuration to be used is based on the dtbcount. If there is
+	# no dtb present than select the default configuation to be based on
+	# the kernelcount.
 	if [ -n "${DTBS}" ]; then
 		i=1
 		for DTB in ${DTBS}; do
@@ -445,6 +483,9 @@ fitimage_assemble() {
 			fi
 			i=`expr ${i} + 1`
 		done
+	else
+		defaultconfigcount=1
+		fitimage_emit_section_config ${1} "${kernelcount}" "" "${ramdiskcount}" "${setupcount}" "${defaultconfigcount}"
 	fi
 
 	fitimage_emit_section_maint ${1} sectend
@@ -497,6 +538,34 @@ do_assemble_fitimage_initramfs() {
 
 addtask assemble_fitimage_initramfs before do_deploy after do_bundle_initramfs
 
+do_generate_rsa_keys() {
+	if [ "${UBOOT_SIGN_ENABLE}" = "0" ] && [ "${FIT_GENERATE_KEYS}" = "1" ]; then
+		bbwarn "FIT_GENERATE_KEYS is set to 1 eventhough UBOOT_SIGN_ENABLE is set to 0. The keys will not be generated as they won't be used."
+	fi
+
+	if [ "${UBOOT_SIGN_ENABLE}" = "1" ] && [ "${FIT_GENERATE_KEYS}" = "1" ]; then
+
+		# Generate keys only if they don't already exist
+		if [ ! -f "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".key ] || \
+			[ ! -f "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".crt]; then
+
+			# make directory if it does not already exist
+			mkdir -p "${UBOOT_SIGN_KEYDIR}"
+
+			echo "Generating RSA private key for signing fitImage"
+			openssl genrsa ${FIT_KEY_GENRSA_ARGS} -out \
+				"${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".key \
+				"${FIT_SIGN_NUMBITS}"
+
+			echo "Generating certificate for signing fitImage"
+			openssl req ${FIT_KEY_REQ_ARGS} "${FIT_KEY_SIGN_PKCS}" \
+				-key "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".key \
+				-out "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".crt
+		fi
+	fi
+}
+
+addtask generate_rsa_keys before do_assemble_fitimage after do_compile
 
 kernel_do_deploy[vardepsexclude] = "DATETIME"
 kernel_do_deploy_append() {

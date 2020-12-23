@@ -26,7 +26,7 @@ class OESDKTestCase(OETestCase):
                 return tarball
 
         tarball = os.path.join(workdir, archive)
-        subprocess.check_output(["wget", "-O", tarball, url])
+        subprocess.check_output(["wget", "-O", tarball, url], stderr=subprocess.STDOUT)
         return tarball
 
     def check_elf(self, path, target_os=None, target_arch=None):

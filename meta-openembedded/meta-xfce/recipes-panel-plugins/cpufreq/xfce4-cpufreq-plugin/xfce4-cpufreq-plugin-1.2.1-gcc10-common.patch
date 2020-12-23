@@ -1,0 +1,41 @@
+Fix build with -fno-common
+
+Part of Patch from https://src.fedoraproject.org/rpms/xfce4-cpufreq-plugin/raw/master/f/xfce4-cpufreq-plugin-1.2.1-gcc10-common.patch
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Refresh for xfce4-cpufreq-plugin 1.2.2.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ panel-plugin/xfce4-cpufreq-plugin.c | 1 +
+ panel-plugin/xfce4-cpufreq-plugin.h | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/panel-plugin/xfce4-cpufreq-plugin.c b/panel-plugin/xfce4-cpufreq-plugin.c
+index 1e33492..ce9e302 100644
+--- a/panel-plugin/xfce4-cpufreq-plugin.c
++++ b/panel-plugin/xfce4-cpufreq-plugin.c
+@@ -38,6 +38,7 @@
+ #endif /* __linux__ */
+ 
+ CpuFreqPlugin *cpuFreq;
++GtkCssProvider *currentProvider;
+ 
+ void
+ cpufreq_label_set_font (void)
+diff --git a/panel-plugin/xfce4-cpufreq-plugin.h b/panel-plugin/xfce4-cpufreq-plugin.h
+index 8cd0d33..7dbccef 100644
+--- a/panel-plugin/xfce4-cpufreq-plugin.h
++++ b/panel-plugin/xfce4-cpufreq-plugin.h
+@@ -95,7 +95,7 @@ typedef struct
+ 
+ extern CpuFreqPlugin *cpuFreq;
+ 
+-GtkCssProvider *currentProvider;
++extern GtkCssProvider *currentProvider;
+ 
+ G_BEGIN_DECLS
+ 

@@ -1,0 +1,47 @@
+From 98d277655e411f56fba705c0bf2efc6562c23807 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Nov 2020 11:37:33 -0800
+Subject: [PATCH] Add support of arch riscv32
+
+Upstream-Status: Submitted [https://github.com/pocoproject/poco/pull/3138]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Foundation/include/Poco/Platform.h | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/Foundation/include/Poco/Platform.h b/Foundation/include/Poco/Platform.h
+index 799db417e..b8506a248 100644
+--- a/Foundation/include/Poco/Platform.h
++++ b/Foundation/include/Poco/Platform.h
+@@ -135,6 +135,7 @@
+ #define POCO_ARCH_AARCH64 0x0f
+ #define POCO_ARCH_ARM64   0x0f // same as POCO_ARCH_AARCH64
+ #define POCO_ARCH_RISCV64 0x10
++#define POCO_ARCH_RISCV32 0x11
+ 
+ 
+ #if defined(__ALPHA) || defined(__alpha) || defined(__alpha__) || defined(_M_ALPHA)
+@@ -225,12 +226,16 @@
+ #elif defined(__AARCH64EB__)
+ 	#define POCO_ARCH POCO_ARCH_AARCH64
+ 	#define POCO_ARCH_BIG_ENDIAN 1
+-#elif defined(__riscv) && (__riscv_xlen == 64)
+-	#define POCO_ARCH POCO_ARCH_RISCV64
+-	#define POCO_ARCH_LITTLE_ENDIAN 1
++#elif defined(__riscv)
++	#if (__riscv_xlen == 64)
++		#define POCO_ARCH POCO_ARCH_RISCV64
++		#define POCO_ARCH_LITTLE_ENDIAN 1
++	#elif(__riscv_xlen == 32)
++		#define POCO_ARCH POCO_ARCH_RISCV32
++		#define POCO_ARCH_LITTLE_ENDIAN 1
++	#endif
+ #endif
+ 
+-
+ #if defined(__clang__)
+ 	#define POCO_COMPILER_CLANG
+ #elif defined(_MSC_VER)
+-- 
+2.29.2
+

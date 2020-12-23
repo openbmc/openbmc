@@ -29,14 +29,20 @@ power_reset() {
 }
 
 graceful_shutdown() {
-  echo "Triggering graceful shutdown"
-  gpioset -l 0 49=1
-  sleep 1
-  gpioset -l 0 49=0
+  if [ -f "/run/openbmc/host@0-request" ]; then
+    echo "shutdown host immediately"
+    power_off
+  else
+    echo "Triggering graceful shutdown"
+    gpioset -l 0 49=1
+    sleep 1
+    gpioset -l 0 49=0
+    sleep 30s
+  fi
 }
 
 force_reset() {
-  echo "Triggering force reset"
+  echo "Triggering sysreset pin"
   gpioset -l 0 91=1
   sleep 1
   gpioset -l 0 91=0
@@ -57,33 +63,40 @@ fi
 
 if [ $2 = "on" ]; then
   if [ $(power_status) == "off" ]; then
-  power_on
+    power_on
   fi
 elif [ $2 = "off" ]; then
   if [ $(power_status) == "on" ]; then
-  power_off
+    power_off
+  fi
+  # If any request of graceful reset, need to power on
+  if [ -f "/run/openbmc/host@0-graceful-reset" ]; then
+    sleep 20s
+    power_on
+    rm -f "/run/openbmc/host@0-graceful-reset"
   fi
 elif [ $2 == "cycle" ]; then
   if [ $(power_status) == "on" ]; then
     echo "Powering off server"
     power_off
-    sleep 20
+    sleep 20s
+    power_on
   else
-    echo "Powering on server"
+    echo "Host is already off, do nothing"
   fi
-  power_on
 elif [ $2 == "reset" ]; then
   if [ $(power_status) == "on" ]; then
-  power_reset
+    power_reset
   else
-  echo "ERROR: Server not powered on"
+    echo "ERROR: Server not powered on"
   fi
 elif [[ $2 == "graceful_shutdown" ]]; then
   graceful_shutdown
 elif [ $2 == "graceful_reset" ]; then
+  mkdir -p "/run/openbmc/"
+  touch "/run/openbmc/host@0-graceful-reset"
   graceful_shutdown
-  sleep 20
-  power_on
+  sleep 20s
 elif [ $2 == "status" ]; then
   power_status
 elif [ $2 == "force_reset" ]; then

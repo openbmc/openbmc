@@ -2,6 +2,13 @@ inherit obmc-phosphor-systemd
 
 FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
 
+DEPENDS_append_olympus-nuvoton = " olympus-nuvoton-yaml-config"
+
+EXTRA_OECONF_olympus-nuvoton = " \
+    YAML_GEN=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-fru-read.yaml \
+    PROP_YAML=${STAGING_DIR_HOST}${datadir}/olympus-nuvoton-yaml-config/ipmi-extra-properties.yaml \
+    "
+
 EEPROM_NAMES = "motherboard bmc"
 
 EEPROMFMT = "system/chassis/{0}"
@@ -18,5 +25,3 @@ INSTFMT = "obmc-read-eeprom@{0}.service"
 FMT = "../${TMPL}:${TGT}.wants/${INSTFMT}"
 
 SYSTEMD_LINK_${PN}_append_olympus-nuvoton := " ${@compose_list(d, 'FMT', 'EEPROMS_ESCAPED')}"
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-

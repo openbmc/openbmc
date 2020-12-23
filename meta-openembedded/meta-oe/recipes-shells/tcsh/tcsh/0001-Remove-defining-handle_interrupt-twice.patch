@@ -1,0 +1,28 @@
+From 2c77b61506aa867a873e3691214983b3eb7f652d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Aug 2020 19:49:35 -0700
+Subject: [PATCH] Remove defining handle_interrupt twice
+
+Fixes build with -fno-common
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tc.sig.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tc.sig.c b/tc.sig.c
+index 77659ca..576605a 100644
+--- a/tc.sig.c
++++ b/tc.sig.c
+@@ -56,7 +56,6 @@ int alrmcatch_disabled; /* = 0; */
+ int phup_disabled; /* = 0; */
+ int pchild_disabled; /* = 0; */
+ int pintr_disabled; /* = 0; */
+-int handle_interrupt; /* = 0; */
+ 
+ int
+ handle_pending_signals(void)
+-- 
+2.28.0
+

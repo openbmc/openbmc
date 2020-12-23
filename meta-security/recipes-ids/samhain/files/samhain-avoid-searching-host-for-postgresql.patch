@@ -10,11 +10,11 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  configure.ac | 101 +++--------------------------------------------------------
  1 file changed, 5 insertions(+), 96 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index a224c68..f658d53 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -1278,90 +1278,11 @@ AC_ARG_WITH(database,
+Index: samhain-4.4.2/configure.ac
+===================================================================
+--- samhain-4.4.2.orig/configure.ac
++++ samhain-4.4.2/configure.ac
+@@ -1290,90 +1290,11 @@ AC_ARG_WITH(database,
            AC_DEFINE(WITH_POSTGRES)
            AC_DEFINE(WITH_DATABASE)
  	  #
@@ -110,7 +110,7 @@ index a224c68..f658d53 100644
  	    LIBS="$LIBS -L${PGSQL_LIB_DIR} -lpq -lm"
  	    if test x"$enable_static" = xyes; then
  	      LIBS="$LIBS -L${PGSQL_LIB_DIR} -lpq -lcrypt -lm"
-@@ -1370,18 +1291,6 @@ AC_ARG_WITH(database,
+@@ -1382,18 +1303,6 @@ AC_ARG_WITH(database,
  	    fi
  	    # CFLAGS="$CFLAGS -I${PGSQL_INC_DIR}"
  	    CPPFLAGS="$CPPFLAGS -I${PGSQL_INC_DIR}"
@@ -129,6 +129,3 @@ index a224c68..f658d53 100644
  	  fi
  	elif test "x${withval}" = "xodbc"; then
  	  AC_MSG_CHECKING(for odbc in /usr /usr/local ODBC_HOME)
--- 
-2.11.0
-

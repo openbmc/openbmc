@@ -12,7 +12,9 @@ def get_package_manager(d, root_path):
     """
     Returns an OE package manager that can install packages in root_path.
     """
-    from oe.package_manager import RpmPM, OpkgPM, DpkgPM
+    from oe.package_manager.rpm import RpmPM
+    from oe.package_manager.ipk import OpkgPM
+    from oe.package_manager.deb import DpkgPM
 
     pkg_class = d.getVar("IMAGE_PKGTYPE")
     if pkg_class == "rpm":

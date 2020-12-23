@@ -17,6 +17,7 @@ PACKAGE_INSTALL = "${INITRAMFS_SCRIPTS} ${VIRTUAL-RUNTIME_base-utils} udev base-
 IMAGE_FEATURES = ""
 
 export IMAGE_BASENAME = "${MLPREFIX}core-image-minimal-initramfs"
+IMAGE_NAME_SUFFIX ?= ""
 IMAGE_LINGUAS = ""
 
 LICENSE = "MIT"

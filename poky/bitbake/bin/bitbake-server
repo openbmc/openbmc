@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Copyright (C) 2020        Richard Purdie
+#
+
+import os
+import sys
+import warnings
+import logging
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), 'lib'))
+
+if sys.getfilesystemencoding() != "utf-8":
+    sys.exit("Please use a locale setting which supports UTF-8 (such as LANG=en_US.UTF-8).\nPython can't change the filesystem locale after loading so we need a UTF-8 when Python starts or things won't work.")
+
+# Users shouldn't be running this code directly
+if len(sys.argv) != 10 or not sys.argv[1].startswith("decafbad"):
+    print("bitbake-server is meant for internal execution by bitbake itself, please don't use it standalone.")
+    sys.exit(1)
+
+import bb.server.process
+
+lockfd = int(sys.argv[2])
+readypipeinfd = int(sys.argv[3])
+logfile = sys.argv[4]
+lockname = sys.argv[5]
+sockname = sys.argv[6]
+timeout = sys.argv[7]
+xmlrpcinterface = (sys.argv[8], int(sys.argv[9]))
+if xmlrpcinterface[0] == "None":
+    xmlrpcinterface = (None, xmlrpcinterface[1])
+if timeout == "None":
+    timeout = None
+
+# Replace standard fds with our own
+with open('/dev/null', 'r') as si:
+    os.dup2(si.fileno(), sys.stdin.fileno())
+
+so = open(logfile, 'a+')
+os.dup2(so.fileno(), sys.stdout.fileno())
+os.dup2(so.fileno(), sys.stderr.fileno())
+
+# Have stdout and stderr be the same so log output matches chronologically
+# and there aren't two seperate buffers
+sys.stderr = sys.stdout
+
+logger = logging.getLogger("BitBake")
+# Ensure logging messages get sent to the UI as events
+handler = bb.event.LogHandler()
+logger.addHandler(handler)
+
+bb.server.process.execServer(lockfd, readypipeinfd, lockname, sockname, timeout, xmlrpcinterface)
+

@@ -27,3 +27,5 @@ LDFLAGS += "${TOOLCHAIN_OPTIONS}"
 do_install_ptest() {
 	cp -r ${S}/testing ${D}${PTEST_PATH}
 }
+
+BBCLASSEXTEND = "nativesdk"

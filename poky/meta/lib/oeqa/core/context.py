@@ -31,6 +31,9 @@ class OETestContext(object):
         self._registry = {}
         self._registry['cases'] = collections.OrderedDict()
 
+        self.results = unittest.TestResult()
+        unittest.registerResult(self.results)
+
     def _read_modules_from_manifest(self, manifest):
         if not os.path.exists(manifest):
             raise OEQAMissingManifest("Manifest does not exist on %s" % manifest)
@@ -82,6 +85,7 @@ class OETestContext(object):
         self.skipTests(skips)
 
         self._run_start_time = time.time()
+        self._run_end_time = self._run_start_time
         if not processes:
             self.runner.buffer = True
         result = self.runner.run(self.prepareSuite(self.suites, processes))

@@ -1,6 +1,3 @@
-From b4a354ae8d4f7c2ec3ec421c7d8a790cc57e77a9 Mon Sep 17 00:00:00 2001
-From: Li xin <lixin.fnst@cn.fujitsu.com>
-Date: Sat, 18 Jul 2015 23:03:30 +0900
 Subject: [PATCH] configure.ac - Avoid an incorrect check for python.
  Makefile.am - avoid hard coded host include paths.
 
@@ -9,6 +6,8 @@ Upstream-Status: pending
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+
 ---
  bindings/python/Makefile.am |  4 +++-
  configure.ac                | 17 ++---------------
@@ -30,12 +29,12 @@ index 999b184..c8e49db 100644
  SWIG_INCLUDES = ${AM_CPPFLAGS}
  pyexec_PYTHON = capng.py
 diff --git a/configure.ac b/configure.ac
-index 7f66179..079d026 100644
+index 8b46f51..2d7e00c 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -123,21 +123,8 @@ if test x$use_python = xno ; then
- else
- AC_MSG_RESULT(testing)
+@@ -141,21 +141,8 @@ fi
+ 
+ # Setup Python2 with the interpreter found previously.
  AM_PATH_PYTHON
 -PYINCLUDEDIR=`python${am_cv_python_version} -c "from distutils import sysconfig; print(sysconfig.get_config_var('INCLUDEPY'))"`
 -if test -f ${PYINCLUDEDIR}/Python.h ; then
@@ -46,7 +45,7 @@ index 7f66179..079d026 100644
 -	AC_MSG_NOTICE(Python bindings will be built)
 -else
 -	python_found="no"
--	if test x$use_python = xyes ; then
+-	if test "x$use_python" = xyes ; then
 -		AC_MSG_ERROR([Python explicitly requested and python headers were not found])
 -	else
 -		AC_MSG_WARN("Python headers not found - python bindings will not be made")
@@ -58,5 +57,4 @@ index 7f66179..079d026 100644
  AM_CONDITIONAL(HAVE_PYTHON, test ${python_found} = "yes")
  
 -- 
-2.7.4
-
+2.25.1

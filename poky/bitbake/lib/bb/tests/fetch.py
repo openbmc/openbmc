@@ -223,6 +223,21 @@ class URITest(unittest.TestCase):
             'query': {},
             'relative': False
         },
+        "git://tfs-example.org:22/tfs/example%20path/example.git": {
+            'uri': 'git://tfs-example.org:22/tfs/example%20path/example.git',
+            'scheme': 'git',
+            'hostname': 'tfs-example.org',
+            'port': 22,
+            'hostport': 'tfs-example.org:22',
+            'path': '/tfs/example path/example.git',
+            'userinfo': '',
+            'userinfo': '',
+            'username': '',
+            'password': '',
+            'params': {},
+            'query': {},
+            'relative': False
+        },
         "http://somesite.net;someparam=1": {
             'uri': 'http://somesite.net;someparam=1',
             'scheme': 'http',
@@ -584,6 +599,7 @@ class FetcherLocalTest(FetcherTest):
         touch(os.path.join(self.localsrcdir, 'dir', 'd'))
         os.makedirs(os.path.join(self.localsrcdir, 'dir', 'subdir'))
         touch(os.path.join(self.localsrcdir, 'dir', 'subdir', 'e'))
+        touch(os.path.join(self.localsrcdir, r'backslash\x2dsystemd-unit.device'))
         self.d.setVar("FILESPATH", self.localsrcdir)
 
     def fetchUnpack(self, uris):
@@ -601,9 +617,13 @@ class FetcherLocalTest(FetcherTest):
         tree = self.fetchUnpack(['file://a', 'file://dir/c'])
         self.assertEqual(tree, ['a', 'dir/c'])
 
+    def test_local_backslash(self):
+        tree = self.fetchUnpack([r'file://backslash\x2dsystemd-unit.device'])
+        self.assertEqual(tree, [r'backslash\x2dsystemd-unit.device'])
+
     def test_local_wildcard(self):
-        tree = self.fetchUnpack(['file://a', 'file://dir/*'])
-        self.assertEqual(tree, ['a',  'dir/c', 'dir/d', 'dir/subdir/e'])
+        with self.assertRaises(bb.fetch2.ParameterError):
+            tree = self.fetchUnpack(['file://a', 'file://dir/*'])
 
     def test_local_dir(self):
         tree = self.fetchUnpack(['file://a', 'file://dir'])
@@ -903,7 +923,7 @@ class FetcherNetworkTest(FetcherTest):
     def test_git_submodule_dbus_broker(self):
         # The following external repositories have show failures in fetch and unpack operations
         # We want to avoid regressions!
-        url = "gitsm://github.com/bus1/dbus-broker;protocol=git;rev=fc874afa0992d0c75ec25acb43d344679f0ee7d2"
+        url = "gitsm://github.com/bus1/dbus-broker;protocol=git;rev=fc874afa0992d0c75ec25acb43d344679f0ee7d2;branch=main"
         fetcher = bb.fetch.Fetch([url], self.d)
         fetcher.download()
         # Previous cwd has been deleted
@@ -1031,7 +1051,7 @@ class SVNTest(FetcherTest):
 
         bb.process.run("svn co %s svnfetch_co" % self.repo_url, cwd=self.tempdir)
         # Github will emulate SVN.  Use this to check if we're downloding...
-        bb.process.run("svn propset svn:externals 'bitbake http://github.com/openembedded/bitbake' .",
+        bb.process.run("svn propset svn:externals 'bitbake svn://vcs.pcre.org/pcre2/code' .",
                        cwd=os.path.join(self.tempdir, 'svnfetch_co', 'trunk'))
         bb.process.run("svn commit --non-interactive -m 'Add external'",
                        cwd=os.path.join(self.tempdir, 'svnfetch_co', 'trunk'))
@@ -1156,7 +1176,8 @@ class FetchLatestVersionTest(FetcherTest):
         ("mtd-utils", "git://git.yoctoproject.org/mtd-utils.git", "ca39eb1d98e736109c64ff9c1aa2a6ecca222d8f", "")
             : "1.5.0",
         # version pattern "pkg_name-X.Y"
-        ("presentproto", "git://anongit.freedesktop.org/git/xorg/proto/presentproto", "24f3a56e541b0a9e6c6ee76081f441221a120ef9", "")
+        # mirror of git://anongit.freedesktop.org/git/xorg/proto/presentproto since network issues interfered with testing
+        ("presentproto", "git://git.yoctoproject.org/bbfetchtests-presentproto", "24f3a56e541b0a9e6c6ee76081f441221a120ef9", "")
             : "1.0",
         # version pattern "pkg_name-vX.Y.Z"
         ("dtc", "git://git.qemu.org/dtc.git", "65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf", "")
@@ -1170,7 +1191,8 @@ class FetchLatestVersionTest(FetcherTest):
         ("mobile-broadband-provider-info", "git://gitlab.gnome.org/GNOME/mobile-broadband-provider-info.git;protocol=https", "4ed19e11c2975105b71b956440acdb25d46a347d", "")
             : "20120614",
         # packages with a valid UPSTREAM_CHECK_GITTAGREGEX
-        ("xf86-video-omap", "git://anongit.freedesktop.org/xorg/driver/xf86-video-omap", "ae0394e687f1a77e966cf72f895da91840dffb8f", "(?P<pver>(\d+\.(\d\.?)*))")
+                # mirror of git://anongit.freedesktop.org/xorg/driver/xf86-video-omap since network issues interfered with testing
+        ("xf86-video-omap", "git://git.yoctoproject.org/bbfetchtests-xf86-video-omap", "ae0394e687f1a77e966cf72f895da91840dffb8f", "(?P<pver>(\d+\.(\d\.?)*))")
             : "0.4.3",
         ("build-appliance-image", "git://git.yoctoproject.org/poky", "b37dd451a52622d5b570183a81583cc34c2ff555", "(?P<pver>(([0-9][\.|_]?)+[0-9]))")
             : "11.0.0",
@@ -1262,9 +1284,7 @@ class FetchLatestVersionTest(FetcherTest):
 
 
 class FetchCheckStatusTest(FetcherTest):
-    test_wget_uris = ["http://www.cups.org/software/1.7.2/cups-1.7.2-source.tar.bz2",
-                      "http://www.cups.org/",
-                      "http://downloads.yoctoproject.org/releases/sato/sato-engine-0.1.tar.gz",
+    test_wget_uris = ["http://downloads.yoctoproject.org/releases/sato/sato-engine-0.1.tar.gz",
                       "http://downloads.yoctoproject.org/releases/sato/sato-engine-0.2.tar.gz",
                       "http://downloads.yoctoproject.org/releases/sato/sato-engine-0.3.tar.gz",
                       "https://yoctoproject.org/",
@@ -2079,6 +2099,38 @@ class GitLfsTest(FetcherTest):
         ud.method._find_git_lfs = lambda d: False
         shutil.rmtree(self.gitdir, ignore_errors=True)
         fetcher.unpack(self.d.getVar('WORKDIR'))
+
+class GitURLWithSpacesTest(FetcherTest):
+    test_git_urls = {
+        "git://tfs-example.org:22/tfs/example%20path/example.git" : {
+            'url': 'git://tfs-example.org:22/tfs/example%20path/example.git',
+            'gitsrcname': 'tfs-example.org.22.tfs.example_path.example.git',
+            'path': '/tfs/example path/example.git'
+        },
+        "git://tfs-example.org:22/tfs/example%20path/example%20repo.git" : {
+            'url': 'git://tfs-example.org:22/tfs/example%20path/example%20repo.git',
+            'gitsrcname': 'tfs-example.org.22.tfs.example_path.example_repo.git',
+            'path': '/tfs/example path/example repo.git'
+        }
+    }
+
+    def test_urls(self):
+
+        # Set fake SRCREV to stop git fetcher from trying to contact non-existent git repo
+        self.d.setVar('SRCREV', '82ea737a0b42a8b53e11c9cde141e9e9c0bd8c40')
+
+        for test_git_url, ref in self.test_git_urls.items():
+
+            fetcher = bb.fetch.Fetch([test_git_url], self.d)
+            ud = fetcher.ud[fetcher.urls[0]]
+
+            self.assertEqual(ud.url, ref['url'])
+            self.assertEqual(ud.path, ref['path'])
+            self.assertEqual(ud.localfile, os.path.join(self.dldir, "git2", ref['gitsrcname']))
+            self.assertEqual(ud.localpath, os.path.join(self.dldir, "git2", ref['gitsrcname']))
+            self.assertEqual(ud.lockfile, os.path.join(self.dldir, "git2", ref['gitsrcname'] + '.lock'))
+            self.assertEqual(ud.clonedir, os.path.join(self.dldir, "git2", ref['gitsrcname']))
+            self.assertEqual(ud.fullmirror, os.path.join(self.dldir, "git2_" + ref['gitsrcname'] + '.tar.gz'))
 
 class NPMTest(FetcherTest):
     def skipIfNoNpm():

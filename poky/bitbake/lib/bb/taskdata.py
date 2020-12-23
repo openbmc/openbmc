@@ -21,8 +21,13 @@ def re_match_strings(target, strings):
     Whether or not the string 'target' matches
     any one string of the strings which can be regular expression string
     """
-    return any(name == target or re.match(name, target)
-               for name in strings)
+    for name in strings:
+        if name.startswith("^") or name.endswith("$"):
+            if re.match(name, target):
+                return True
+        elif name == target:
+            return True
+    return False
 
 class TaskEntry:
     def __init__(self):

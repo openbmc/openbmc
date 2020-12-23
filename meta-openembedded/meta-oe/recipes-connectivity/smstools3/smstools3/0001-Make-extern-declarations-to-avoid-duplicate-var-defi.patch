@@ -1,0 +1,606 @@
+From 77532d2e99252e3e07afa0f918bb8c9d73798f39 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Aug 2020 16:56:22 -0700
+Subject: [PATCH] Make extern declarations to avoid duplicate var definitions
+
+gcc-10+ defaults to -fno-common which flags these errors about mulitple
+definitions since the variables are defined in header files which are
+included from multiple sources, this patch ensures that extern
+declaration is added appropriately
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/blacklist.c |   2 +-
+ src/blacklist.h |   2 +-
+ src/charset.c   |   2 +-
+ src/charshift.c |   2 +-
+ src/logging.c   |   2 +-
+ src/logging.h   |   4 +-
+ src/modeminit.c |   6 +-
+ src/smsd_cfg.c  |   2 +
+ src/smsd_cfg.h  | 274 ++++++++++++++++++++++++------------------------
+ src/stats.h     |  22 ++--
+ src/whitelist.c |   2 +-
+ src/whitelist.h |   2 +-
+ 12 files changed, 164 insertions(+), 158 deletions(-)
+
+diff --git a/src/blacklist.c b/src/blacklist.c
+index 7440cca..0c00dd9 100755
+--- a/src/blacklist.c
++++ b/src/blacklist.c
+@@ -17,11 +17,11 @@ Either version 2 of the License, or (at your option) any later version.
+ #include <stdlib.h>
+ #include <string.h>
+ #include <signal.h>
++#include "smsd_cfg.h"
+ #include "blacklist.h"
+ #include "extras.h"
+ #include "logging.h"
+ #include "alarm.h"
+-#include "smsd_cfg.h"
+ 
+ int inblacklist(char* msisdn)
+ {
+diff --git a/src/blacklist.h b/src/blacklist.h
+index 4f99050..61fd294 100755
+--- a/src/blacklist.h
++++ b/src/blacklist.h
+@@ -15,7 +15,7 @@ Either version 2 of the License, or (at your option) any later version.
+ #ifndef BLACK_H
+ #define BLACK_H
+ 
+-char blacklist[256];	// Filename of the black-list
++EXTERN char blacklist[256];	// Filename of the black-list
+ 
+ int inblacklist(char* msisdn);
+ 
+diff --git a/src/charset.c b/src/charset.c
+index cd7c997..1716d70 100755
+--- a/src/charset.c
++++ b/src/charset.c
+@@ -19,9 +19,9 @@ Either version 2 of the License, or (at your option) any later version.
+ #include <syslog.h>
+ #include <ctype.h>
+ 
++#include "smsd_cfg.h"
+ #include "charset.h"
+ #include "logging.h"
+-#include "smsd_cfg.h"
+ #include "pdu.h"
+ #include "extras.h"
+ #include "charshift.h"
+diff --git a/src/charshift.c b/src/charshift.c
+index 48ba340..2d7b26c 100755
+--- a/src/charshift.c
++++ b/src/charshift.c
+@@ -25,8 +25,8 @@ Either version 2 of the License, or (at your option) any later version.
+ #include <stdio.h>
+ #include <stdarg.h>
+ 
+-#include "logging.h"
+ #include "smsd_cfg.h"
++#include "logging.h"
+ #include "pdu.h"
+ #include "charset.h"
+ #include "extras.h"
+diff --git a/src/logging.c b/src/logging.c
+index 6ee2c4e..4af341f 100755
+--- a/src/logging.c
++++ b/src/logging.c
+@@ -12,6 +12,7 @@ the GNU General Public License as published by the Free Software Foundation.
+ Either version 2 of the License, or (at your option) any later version.
+ */
+ 
++#include "smsd_cfg.h"
+ #include "logging.h"
+ #include "extras.h"
+ #include <stdio.h>
+@@ -22,7 +23,6 @@ Either version 2 of the License, or (at your option) any later version.
+ #include <time.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+-#include "smsd_cfg.h"
+ #include "stats.h"
+ 
+ int Filehandle = -1;
+diff --git a/src/logging.h b/src/logging.h
+index 4f27906..4550234 100755
+--- a/src/logging.h
++++ b/src/logging.h
+@@ -18,7 +18,7 @@ Either version 2 of the License, or (at your option) any later version.
+ #include <time.h>
+ 
+ // 3.1.16beta2: Moved logch() and prch() from charset.c to logging.c:
+-char logch_buffer[8192];
++EXTERN char logch_buffer[8192];
+ 
+ #ifdef __GNUC__
+ void logch(char* format, ...) __attribute__ ((format(printf, 1, 2)));
+@@ -30,7 +30,7 @@ char prch(char ch);
+ 
+ // 3.1.16beta: changed type:
+ //int trouble_logging_started;
+-time_t trouble_logging_started;
++EXTERN time_t trouble_logging_started;
+ 
+ int change_loglevel(int new_level);
+ void restore_loglevel();
+diff --git a/src/modeminit.c b/src/modeminit.c
+index 42ff6b4..0d05fe9 100755
+--- a/src/modeminit.c
++++ b/src/modeminit.c
+@@ -19,8 +19,6 @@ Either version 2 of the License, or (at your option) any later version.
+ #include <regex.h>
+ #include <ctype.h>
+ #include <time.h>
+-#include "logging.h"
+-#include "alarm.h"
+ 
+ #ifdef SOLARIS
+ #include <sys/filio.h>
+@@ -42,9 +40,11 @@ Either version 2 of the License, or (at your option) any later version.
+ #include <netdb.h>
+ #endif
+ 
++#include "smsd_cfg.h"
++#include "logging.h"
++#include "alarm.h"
+ #include "extras.h"
+ #include "modeminit.h"
+-#include "smsd_cfg.h"
+ #include "version.h"
+ #include "pdu.h"
+ #include "stats.h"
+diff --git a/src/smsd_cfg.c b/src/smsd_cfg.c
+index 35c1198..32472b4 100755
+--- a/src/smsd_cfg.c
++++ b/src/smsd_cfg.c
+@@ -26,6 +26,8 @@ Either version 2 of the License, or (at your option) any later version.
+ #include <ctype.h>
+ #include <grp.h>
+ 
++#define EXTERN
++
+ #include "extras.h"
+ #include "cfgfile.h"
+ #include "smsd_cfg.h"
+diff --git a/src/smsd_cfg.h b/src/smsd_cfg.h
+index 8ae208d..d6ece37 100755
+--- a/src/smsd_cfg.h
++++ b/src/smsd_cfg.h
+@@ -15,6 +15,10 @@ Either version 2 of the License, or (at your option) any later version.
+ #ifndef SMSD_CFG_H
+ #define SMSD_CFG_H
+ 
++#ifndef EXTERN
++#define EXTERN extern
++#endif
++
+ #include <limits.h>
+ #include <sys/types.h>
+ #include <time.h>
+@@ -126,17 +130,17 @@ Either version 2 of the License, or (at your option) any later version.
+ #define ALPHABET_UNKNOWN        4
+ #define ALPHABET_DEFAULT        0
+ 
+-char process_title[32];         // smsd for main task, NOTIFIER or CHILD, name of a modem for other tasks.
+-int process_id;                 // -1 for main task, all modems have numbers starting with 0.
++EXTERN char process_title[32];         // smsd for main task, NOTIFIER or CHILD, name of a modem for other tasks.
++EXTERN int process_id;                 // -1 for main task, all modems have numbers starting with 0.
+                                 // This is the same as device, can be used like devices[process_id] if IS_MODEM_PROCESS.
+ 
+-time_t process_start_time;
++EXTERN time_t process_start_time;
+ 
+-int modem_handle;               // Handle for modem.
++EXTERN int modem_handle;               // Handle for modem.
+ 
+-int put_command_timeouts;
+-unsigned long long put_command_sent; // 3.1.16beta.
+-char tmpdir[PATH_MAX];          // 3.1.16beta.
++EXTERN int put_command_timeouts;
++EXTERN unsigned long long put_command_sent; // 3.1.16beta.
++EXTERN char tmpdir[PATH_MAX];          // 3.1.16beta.
+ 
+ typedef struct
+ {
+@@ -284,204 +288,204 @@ typedef struct
+ 
+ // NOTE for regular run intervals: effective value is at least delaytime.
+ 
+-char configfile[PATH_MAX];	// Path to config file
+-char d_spool[PATH_MAX];		// Spool directory
+-char d_failed[PATH_MAX];	// Failed spool directory
+-char d_failed_copy[PATH_MAX];	// 3.1.17.
+-char d_incoming[PATH_MAX];	// Incoming spool directory
+-char d_incoming_copy[PATH_MAX]; // 3.1.16beta2.
+-char d_report[PATH_MAX];	// Incoming report spool directory
+-char d_report_copy[PATH_MAX];	// 3.1.17.
+-char d_phonecalls[PATH_MAX];    // Incoming phonecalls data directory
+-char d_saved[PATH_MAX];         // Directory for smsd's internal use, concatenation storage files etc.
+-char d_sent[PATH_MAX];		// Sent spool directory
+-char d_sent_copy[PATH_MAX];	// 3.1.17.
+-char d_checked[PATH_MAX];	// Spool directory for checked messages (only used when no provider queues used)
+-char eventhandler[PATH_MAX];	// Global event handler program or script
+-char alarmhandler[PATH_MAX];	// Global alarm handler program or script
+-char checkhandler[PATH_MAX];    // Handler that checks if the sms file is valid.
+-int alarmlevel;			// Alarm Level (9=highest). Verbosity of alarm handler.
+-char logfile[PATH_MAX];		// Name or Handle of Log File
+-int  loglevel;			// Log Level (9=highest). Verbosity of log file.
+-_queue queues[NUMBER_OF_MODEMS]; // Queues
+-_device devices[NUMBER_OF_MODEMS]; // Modem devices
+-int delaytime;			// sleep-time after workless
+-int delaytime_mainprocess;      // sleep-time after workless, main process. If -1, delaytime is used.
+-int blocktime;			// sleep-time after multiple errors
+-int blockafter;                 // Block modem after n errors
+-int errorsleeptime;		// sleep-time after each error
+-int autosplit;			// Splitting of large text messages 0=no, 1=yes 2=number with text, 3=number with UDH
+-int receive_before_send;	// if 1 smsd tries to receive one message before sending
+-int store_received_pdu;         // 0=no, 1=unsupported pdu's only, 2=unsupported and 8bit/unicode, 3=all
+-int store_sent_pdu;             // 0=no, 1=failed pdu's only, 2=failed and 8bit/unicode, 3=all
+-int validity_period;            // Validity period for messages.
+-int decode_unicode_text;        // 1 if unicode text is decoded internally.
+-int internal_combine;           // 1 if multipart message is combined internally.
+-int internal_combine_binary;    // 1 if multipart binary message is combined internally. Defaults to internal_combine.
+-int keep_filename;              // 0 if unique filename is created to each directory when a message file is moved.
+-int store_original_filename;    // 1 if an original filename is saved to message file when it's moved from
++EXTERN char configfile[PATH_MAX];	// Path to config file
++EXTERN char d_spool[PATH_MAX];		// Spool directory
++EXTERN char d_failed[PATH_MAX];	// Failed spool directory
++EXTERN char d_failed_copy[PATH_MAX];	// 3.1.17.
++EXTERN char d_incoming[PATH_MAX];	// Incoming spool directory
++EXTERN char d_incoming_copy[PATH_MAX]; // 3.1.16beta2.
++EXTERN char d_report[PATH_MAX];	// Incoming report spool directory
++EXTERN char d_report_copy[PATH_MAX];	// 3.1.17.
++EXTERN char d_phonecalls[PATH_MAX];    // Incoming phonecalls data directory
++EXTERN char d_saved[PATH_MAX];         // Directory for smsd's internal use, concatenation storage files etc.
++EXTERN char d_sent[PATH_MAX];		// Sent spool directory
++EXTERN char d_sent_copy[PATH_MAX];	// 3.1.17.
++EXTERN char d_checked[PATH_MAX];	// Spool directory for checked messages (only used when no provider queues used)
++EXTERN char eventhandler[PATH_MAX];	// Global event handler program or script
++EXTERN char alarmhandler[PATH_MAX];	// Global alarm handler program or script
++EXTERN char checkhandler[PATH_MAX];    // Handler that checks if the sms file is valid.
++EXTERN int alarmlevel;			// Alarm Level (9=highest). Verbosity of alarm handler.
++EXTERN char logfile[PATH_MAX];		// Name or Handle of Log File
++EXTERN int  loglevel;			// Log Level (9=highest). Verbosity of log file.
++EXTERN _queue queues[NUMBER_OF_MODEMS]; // Queues
++EXTERN _device devices[NUMBER_OF_MODEMS]; // Modem devices
++EXTERN int delaytime;			// sleep-time after workless
++EXTERN int delaytime_mainprocess;      // sleep-time after workless, main process. If -1, delaytime is used.
++EXTERN int blocktime;			// sleep-time after multiple errors
++EXTERN int blockafter;                 // Block modem after n errors
++EXTERN int errorsleeptime;		// sleep-time after each error
++EXTERN int autosplit;			// Splitting of large text messages 0=no, 1=yes 2=number with text, 3=number with UDH
++EXTERN int receive_before_send;	// if 1 smsd tries to receive one message before sending
++EXTERN int store_received_pdu;         // 0=no, 1=unsupported pdu's only, 2=unsupported and 8bit/unicode, 3=all
++EXTERN int store_sent_pdu;             // 0=no, 1=failed pdu's only, 2=failed and 8bit/unicode, 3=all
++EXTERN int validity_period;            // Validity period for messages.
++EXTERN int decode_unicode_text;        // 1 if unicode text is decoded internally.
++EXTERN int internal_combine;           // 1 if multipart message is combined internally.
++EXTERN int internal_combine_binary;    // 1 if multipart binary message is combined internally. Defaults to internal_combine.
++EXTERN int keep_filename;              // 0 if unique filename is created to each directory when a message file is moved.
++EXTERN int store_original_filename;    // 1 if an original filename is saved to message file when it's moved from
+                                 // outgoing directory to spooler. Works together with keep_filename.
+-int date_filename;              // 1 or 2 if YYYYMMDD is included to the filename of incoming message.
+-char regular_run[PATH_MAX];     // Script/program which is run regularly.
+-int regular_run_interval;       // Number of seconds between running a regular_run script/progdam.
+-char admin_to[SIZE_TO];         // Destination number for administrative messages.
+-int filename_preview;           // Number of chars of message text to concatenate to filename.
+-int incoming_utf8;              // 1 if incoming files are saved using UTF-8 character set.
+-int outgoing_utf8;              // 1 if outgoing files are automatically converted from UTF-8 to ISO and GSM.
+-int log_charconv;               // 1 if character set conversion is logged.
+-int log_single_lines;           // 1 if linefeeds are removed from the modem response to be logged.
+-int executable_check;           // 0 if eventhandler and other executables are NOT checked during the startup checking.
+-int keep_messages;              // For testing purposes: messages are not deleted and smsd stops after first run.
+-char priviledged_numbers[SIZE_PRIVILEDGED_NUMBERS]; // Priviledged numbers in incoming messages.
+-int ic_purge_hours;             // If internal_combine is used, concatenation storage is checked every ic_purge_interval minutes
+-int ic_purge_minutes;           // and if there is message parts older than defined, they are handled or deleted.
+-int ic_purge_read;              // 1 = message parts are stored as single messages. 0 = parts are just deleted.
+-int ic_purge_interval;          // 
+-char shell[PATH_MAX];           // Shell used to run eventhandler, defaults to /bin/sh
+-char adminmessage_device[32];   // Name of device used to send administrative messages of mainspooler.
+-int smart_logging;              // 1 = if loglevel is less than 7, degug log is written is there has been any errors.
+-int status_signal_quality;      // 1 = signal quality is written to status file.
+-int status_include_counters;    // 1 = succeeded, failed and received counters are included in the status line.
+-int status_include_uptime;      // 3.1.16beta: 1 = include started & uptime line in the status file.
+-int hangup_incoming_call;       // 1 = if detected unexpected input contains RING and we want to end call.
+-int max_continuous_sending;     // Defines when sending is breaked to do check/do other tasks. Time in minutes.
+-int voicecall_hangup_ath;       // If ATH is used instead of AT+CHUP.
++EXTERN int date_filename;              // 1 or 2 if YYYYMMDD is included to the filename of incoming message.
++EXTERN char regular_run[PATH_MAX];     // Script/program which is run regularly.
++EXTERN int regular_run_interval;       // Number of seconds between running a regular_run script/progdam.
++EXTERN char admin_to[SIZE_TO];         // Destination number for administrative messages.
++EXTERN int filename_preview;           // Number of chars of message text to concatenate to filename.
++EXTERN int incoming_utf8;              // 1 if incoming files are saved using UTF-8 character set.
++EXTERN int outgoing_utf8;              // 1 if outgoing files are automatically converted from UTF-8 to ISO and GSM.
++EXTERN int log_charconv;               // 1 if character set conversion is logged.
++EXTERN int log_single_lines;           // 1 if linefeeds are removed from the modem response to be logged.
++EXTERN int executable_check;           // 0 if eventhandler and other executables are NOT checked during the startup checking.
++EXTERN int keep_messages;              // For testing purposes: messages are not deleted and smsd stops after first run.
++EXTERN char priviledged_numbers[SIZE_PRIVILEDGED_NUMBERS]; // Priviledged numbers in incoming messages.
++EXTERN int ic_purge_hours;             // If internal_combine is used, concatenation storage is checked every ic_purge_interval minutes
++EXTERN int ic_purge_minutes;           // and if there is message parts older than defined, they are handled or deleted.
++EXTERN int ic_purge_read;              // 1 = message parts are stored as single messages. 0 = parts are just deleted.
++EXTERN int ic_purge_interval;          // 
++EXTERN char shell[PATH_MAX];           // Shell used to run eventhandler, defaults to /bin/sh
++EXTERN char adminmessage_device[32];   // Name of device used to send administrative messages of mainspooler.
++EXTERN int smart_logging;              // 1 = if loglevel is less than 7, degug log is written is there has been any errors.
++EXTERN int status_signal_quality;      // 1 = signal quality is written to status file.
++EXTERN int status_include_counters;    // 1 = succeeded, failed and received counters are included in the status line.
++EXTERN int status_include_uptime;      // 3.1.16beta: 1 = include started & uptime line in the status file.
++EXTERN int hangup_incoming_call;       // 1 = if detected unexpected input contains RING and we want to end call.
++EXTERN int max_continuous_sending;     // Defines when sending is breaked to do check/do other tasks. Time in minutes.
++EXTERN int voicecall_hangup_ath;       // If ATH is used instead of AT+CHUP.
+ 
+ // 3.1.5:
+-int trust_outgoing;             // 1 = it's _sure_ that files are created by rename AND permissions are correct. Speeds up spooling.
++EXTERN int trust_outgoing;             // 1 = it's _sure_ that files are created by rename AND permissions are correct. Speeds up spooling.
+ 
+ // 3.1.5:
+-int ignore_outgoing_priority;   // 1 = Priority: high header is not checked. Speeds up spooling.
++EXTERN int ignore_outgoing_priority;   // 1 = Priority: high header is not checked. Speeds up spooling.
+ 
+ // 3.1.7:
+-int ignore_exec_output;         // 1 = stdout and stderr of eventhandlers is _not_ checked.
++EXTERN int ignore_exec_output;         // 1 = stdout and stderr of eventhandlers is _not_ checked.
+ 
+ // 3.1.7:
+-mode_t conf_umask;              // File mode creation mask for smsd and modem processes.
++EXTERN mode_t conf_umask;              // File mode creation mask for smsd and modem processes.
+ 
+ // 3.1.7:
+-int trim_text;                  // 1 = trailing whitespaces are removed from text:
++EXTERN int trim_text;                  // 1 = trailing whitespaces are removed from text:
+ 
+ // 3.1.7:
+-int use_linux_ps_trick;         // 1 = change argv[0] to "smsd: MAINPROCESS", "smsd: GSM1" etc.
++EXTERN int use_linux_ps_trick;         // 1 = change argv[0] to "smsd: MAINPROCESS", "smsd: GSM1" etc.
+ 
+ // 3.1.7:
+-int log_unmodified;
++EXTERN int log_unmodified;
+ 
+ // 3.1.7:
+-char suspend_filename[PATH_MAX];
++EXTERN char suspend_filename[PATH_MAX];
+ 
+ // 3.1.9:
+-int spool_directory_order;
++EXTERN int spool_directory_order;
+ 
+ // 3.1.9: 1 if read_from_modem is logged.
+-int log_read_from_modem;
++EXTERN int log_read_from_modem;
+ 
+ // 3.1.16beta2: log_read_timing for performance tuning.
+-int log_read_timing;
++EXTERN int log_read_timing;
+ 
+ // 3.1.16beta:
+-int log_response_time;
++EXTERN int log_response_time;
+ 
+ // 3.1.16beta2:
+-int default_alphabet;
++EXTERN int default_alphabet;
+ 
+ // 3.1.17: Child process for the mainprocess:
+-char mainprocess_child[PATH_MAX];
+-char mainprocess_child_args[PATH_MAX];
++EXTERN char mainprocess_child[PATH_MAX];
++EXTERN char mainprocess_child_args[PATH_MAX];
+ 
+ // 3.1.17: Notifier for the mainprocess:
+-int mainprocess_notifier;
++EXTERN int mainprocess_notifier;
+ 
+ // 3.1.17: If *_copy was made, evenhandler can use it instead of original file:
+-int eventhandler_use_copy;
++EXTERN int eventhandler_use_copy;
+ 
+ // 3.1.17: This defines how long to sleep while looping:
+-int sleeptime_mainprocess;
++EXTERN int sleeptime_mainprocess;
+ 
+ // 3.1.17: Defines how often PID is checked to detect if another smsd is running:
+-int check_pid_interval;
++EXTERN int check_pid_interval;
+ 
+ // 3.1.18: start script/program for mainprocess:
+-char mainprocess_start[PATH_MAX];
+-char mainprocess_start_args[PATH_MAX];
++EXTERN char mainprocess_start[PATH_MAX];
++EXTERN char mainprocess_start_args[PATH_MAX];
+ 
+-int message_count;              // Counter for sent messages. Multipart message is one message.
++EXTERN int message_count;              // Counter for sent messages. Multipart message is one message.
+ 
+-volatile sig_atomic_t break_workless_delay; // To break the delay when SIGCONT is received.
+-volatile sig_atomic_t terminate; // To terminate when SIGTERM is received.
++EXTERN volatile sig_atomic_t break_workless_delay; // To break the delay when SIGCONT is received.
++EXTERN volatile sig_atomic_t terminate; // To terminate when SIGTERM is received.
+ 
+-char username[65];              // user and group name which are used to run.
+-char groupname[65];             // (max length is just a guess)
++EXTERN char username[65];              // user and group name which are used to run.
++EXTERN char groupname[65];             // (max length is just a guess)
+ 
+-char infofile[PATH_MAX];        // Hepler file for stopping the smsd smoothly.
+-char pidfile[PATH_MAX];         // File where a process id is stored.
++EXTERN char infofile[PATH_MAX];        // Hepler file for stopping the smsd smoothly.
++EXTERN char pidfile[PATH_MAX];         // File where a process id is stored.
+ 
+ // Command line arguments:
+-char arg_username[65];
+-char arg_groupname[65];
+-char arg_infofile[PATH_MAX];
+-char arg_pidfile[PATH_MAX];
+-char arg_logfile[PATH_MAX];
+-int arg_terminal;
++EXTERN char arg_username[65];
++EXTERN char arg_groupname[65];
++EXTERN char arg_infofile[PATH_MAX];
++EXTERN char arg_pidfile[PATH_MAX];
++EXTERN char arg_logfile[PATH_MAX];
++EXTERN int arg_terminal;
+ // 3.1.7:
+-char arg_7bit_packed[512];
+-int do_encode_decode_arg_7bit_packed;
++EXTERN char arg_7bit_packed[512];
++EXTERN int do_encode_decode_arg_7bit_packed;
+ 
+-int terminal;                   // 1 if smsd is communicating with terminal.
+-pid_t device_pids[NUMBER_OF_MODEMS]; // Pid's of modem processes.
+-char run_info[PATH_MAX];        // Information about external script/program execution.
++EXTERN int terminal;                   // 1 if smsd is communicating with terminal.
++EXTERN pid_t device_pids[NUMBER_OF_MODEMS]; // Pid's of modem processes.
++EXTERN char run_info[PATH_MAX];        // Information about external script/program execution.
+ 
+-char communicate[32];           // Device name for terminal communication mode.
++EXTERN char communicate[32];           // Device name for terminal communication mode.
+ 
+-char international_prefixes[PATH_MAX +1];
+-char national_prefixes[PATH_MAX +1];
++EXTERN char international_prefixes[PATH_MAX +1];
++EXTERN char national_prefixes[PATH_MAX +1];
+ 
+ // Storage for startup errors:
+-char *startup_err_str;
+-int startup_err_count;
++EXTERN char *startup_err_str;
++EXTERN int startup_err_count;
+ 
+ // Storage for PDU's:
+-char *incoming_pdu_store;
+-char *outgoing_pdu_store;
+-char *routed_pdu_store;
++EXTERN char *incoming_pdu_store;
++EXTERN char *outgoing_pdu_store;
++EXTERN char *routed_pdu_store;
+ 
+ // Storage for getfile errors:
+-char *getfile_err_store;
++EXTERN char *getfile_err_store;
+ 
+ // Text buffer for error messages:
+-char tb[SIZE_TB];
++EXTERN char tb[SIZE_TB];
+ 
+ // Buffer for SIM memory checking:
+-char *check_memory_buffer;
+-size_t check_memory_buffer_size;
++EXTERN char *check_memory_buffer;
++EXTERN size_t check_memory_buffer_size;
+ 
+-int os_cygwin;                  // 1 if we are on Cygwin.
++EXTERN int os_cygwin;                  // 1 if we are on Cygwin.
+ 
+-char language_file[PATH_MAX];   // File name of translated headers.
+-char yes_chars[SIZE_HEADER];    // Characters which mean "yes" in the yesno() question.
+-char no_chars[SIZE_HEADER];     // See details inside read_translation() function.
+-char yes_word[SIZE_HEADER];     // "yes" printed as an output.
+-char no_word[SIZE_HEADER];      // "no"
+-char datetime_format[SIZE_HEADER]; // strftime format string for time stamps (not inside status reports).
+-char logtime_format[SIZE_HEADER]; // 3.1.7: strftime format string for logging time stamps
+-char date_filename_format[SIZE_HEADER]; // 3.1.7: strftime format string for date_filename
+-int translate_incoming;         // 0 if incoming message headers are NOT transtaled.
++EXTERN char language_file[PATH_MAX];   // File name of translated headers.
++EXTERN char yes_chars[SIZE_HEADER];    // Characters which mean "yes" in the yesno() question.
++EXTERN char no_chars[SIZE_HEADER];     // See details inside read_translation() function.
++EXTERN char yes_word[SIZE_HEADER];     // "yes" printed as an output.
++EXTERN char no_word[SIZE_HEADER];      // "no"
++EXTERN char datetime_format[SIZE_HEADER]; // strftime format string for time stamps (not inside status reports).
++EXTERN char logtime_format[SIZE_HEADER]; // 3.1.7: strftime format string for logging time stamps
++EXTERN char date_filename_format[SIZE_HEADER]; // 3.1.7: strftime format string for date_filename
++EXTERN int translate_incoming;         // 0 if incoming message headers are NOT transtaled.
+ 
+ // 3.1.14:
+-int logtime_us;
+-int logtime_ms;
++EXTERN int logtime_us;
++EXTERN int logtime_ms;
+ 
+ // 3.1.14:
+-int shell_test;
++EXTERN int shell_test;
+ 
+ // Next two are for debugging purposes:
+-int enable_smsd_debug;
+-char smsd_debug[SIZE_SMSD_DEBUG]; // Header of an outgoing message file.
++EXTERN int enable_smsd_debug;
++EXTERN char smsd_debug[SIZE_SMSD_DEBUG]; // Header of an outgoing message file.
+ 
+ // 3.1.20: Alt keys in communication mode:
+ #define COMMUNICATE_A_KEY_COUNT 10
+-char communicate_a_keys[COMMUNICATE_A_KEY_COUNT][256];
++EXTERN char communicate_a_keys[COMMUNICATE_A_KEY_COUNT][256];
+ 
+ /* initialize all variable with default values */
+ 
+diff --git a/src/stats.h b/src/stats.h
+index bd5cdc9..a614af1 100755
+--- a/src/stats.h
++++ b/src/stats.h
+@@ -33,17 +33,17 @@ typedef struct
+   int ber;
+ } _stats;
+ 
+-_stats* statistics[NUMBER_OF_MODEMS]; // Statistic data (shared memory!)
+-int rejected_counter;		// Statistic counter, rejected SM, number does not fit into any queue
+-time_t start_time;		// Start time of smsd, allows statistic functions
+-int printstatus;		// if 1 smsd outputs status on stdout
+-time_t last_stats;		// time when the last stats file was created
+-char d_stats[PATH_MAX];		// path to statistic files
+-int stats_interval;		// time between statistic files in seconds.
+-int stats_no_zeroes;		// Suppress files that contain only zeroes
+-int status_interval;            // time between updating status file in seconds
+-
+-char *shared_buffer;
++EXTERN _stats* statistics[NUMBER_OF_MODEMS]; // Statistic data (shared memory!)
++EXTERN int rejected_counter;		// Statistic counter, rejected SM, number does not fit into any queue
++EXTERN time_t start_time;		// Start time of smsd, allows statistic functions
++EXTERN int printstatus;		// if 1 smsd outputs status on stdout
++EXTERN time_t last_stats;		// time when the last stats file was created
++EXTERN char d_stats[PATH_MAX];		// path to statistic files
++EXTERN int stats_interval;		// time between statistic files in seconds.
++EXTERN int stats_no_zeroes;		// Suppress files that contain only zeroes
++EXTERN int status_interval;            // time between updating status file in seconds
++
++EXTERN char *shared_buffer;
+ 
+ /* Creates shared memory variables for statistic data */
+ 
+diff --git a/src/whitelist.c b/src/whitelist.c
+index 4ee7a69..3d90bf4 100755
+--- a/src/whitelist.c
++++ b/src/whitelist.c
+@@ -17,11 +17,11 @@ Either version 2 of the License, or (at your option) any later version.
+ #include <stdlib.h>
+ #include <string.h>
+ #include <signal.h>
++#include "smsd_cfg.h"
+ #include "whitelist.h"
+ #include "extras.h"
+ #include "logging.h"
+ #include "alarm.h"
+-#include "smsd_cfg.h"
+ 
+ /* Used with >= 3.1x */
+ int inwhitelist_q(char* msisdn, char *queuename)
+diff --git a/src/whitelist.h b/src/whitelist.h
+index 88aea86..3f904f4 100755
+--- a/src/whitelist.h
++++ b/src/whitelist.h
+@@ -15,7 +15,7 @@ Either version 2 of the License, or (at your option) any later version.
+ #ifndef WHITE_H
+ #define WHITE_H
+ 
+-char whitelist[256];	// Filename of the white-list
++EXTERN char whitelist[256];	// Filename of the white-list
+ 
+ /* Used with >= 3.1x */
+ int inwhitelist_q(char* msisdn, char *queuename);
+-- 
+2.28.0
+

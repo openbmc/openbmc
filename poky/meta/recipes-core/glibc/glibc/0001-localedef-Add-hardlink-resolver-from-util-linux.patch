@@ -1,7 +1,7 @@
-From 3dcf144e998aed17b3fb957a255b1e923ba07d71 Mon Sep 17 00:00:00 2001
+From 5db90855621a81d02f1434d5602cefea8c45de1c Mon Sep 17 00:00:00 2001
 From: Jason Wessel <jason.wessel@windriver.com>
 Date: Sat, 7 Dec 2019 09:59:22 -0800
-Subject: [PATCH] localedef: Add hardlink resolver from util-linux
+Subject: [PATCH 01/29] localedef: Add hardlink resolver from util-linux
 
 The hard link resolver that is built into localedef cannot be run in
 parallel.  It will search sibling directories (which are be processed
@@ -1128,3 +1128,6 @@ index 0000000000..0129a85e2e
 +}
 +
 +#endif
+-- 
+2.27.0
+

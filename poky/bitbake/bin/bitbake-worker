@@ -413,9 +413,9 @@ class BitbakeWorker(object):
 
     def handle_workerdata(self, data):
         self.workerdata = pickle.loads(data)
+        bb.build.verboseShellLogging = self.workerdata["build_verbose_shell"]
+        bb.build.verboseStdoutLogging = self.workerdata["build_verbose_stdout"]
         bb.msg.loggerDefaultLogLevel = self.workerdata["logdefaultlevel"]
-        bb.msg.loggerDefaultVerbose = self.workerdata["logdefaultverbose"]
-        bb.msg.loggerVerboseLogs = self.workerdata["logdefaultverboselogs"]
         bb.msg.loggerDefaultDomains = self.workerdata["logdefaultdomain"]
         for mc in self.databuilder.mcdata:
             self.databuilder.mcdata[mc].setVar("PRSERV_HOST", self.workerdata["prhost"])

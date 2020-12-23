@@ -5,10 +5,12 @@
 IMAGE_CLASSES += "qemuboot-xilinx"
 
 # depend on qemu-helper-native, which will depend on QEMU
-EXTRA_IMAGEDEPENDS += "qemu-xilinx-helper-native"
+EXTRA_IMAGEDEPENDS += "qemu-helper-native"
 
 PREFERRED_PROVIDER_qemu-helper-native = "qemu-xilinx-helper-native"
 PREFERRED_PROVIDER_qemu = "qemu-xilinx"
+PREFERRED_PROVIDER_qemu-native = "qemu-xilinx-native"
+PREFERRED_PROVIDER_nativesdk-qemu = "nativesdk-qemu-xilinx"
 
 def qemu_default_dtb(d):
     if d.getVar("IMAGE_BOOT_FILES", True):

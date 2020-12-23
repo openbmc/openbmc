@@ -1,0 +1,50 @@
+1) Allow recipe to overide optimization.
+
+fixes:
+
+397 | #  warning _FORTIFY_SOURCE requires compiling with optimization (-O)
+|       |    ^~~~~~~
+| cc1: all warnings being treated as errors
+
+2) Allow recipe to override OE related compile-/link-flags
+
+fixes:
+
+ERROR: QA Issue: File /usr/bin/tpm_server in package ibmswtpm2 doesn't have GNU_HASH (didn't pass LDFLAGS?) [ldflags]
+
+Upstream-Status: OE specific
+
+Signed-off-by: Jens Rehsack <sno@NetBSD.org>
+
+Index: src/makefile
+===================================================================
+--- src.orig/makefile
++++ src/makefile
+@@ -38,12 +38,10 @@
+ #################################################################################
+ 
+ 
+-CC = /usr/bin/gcc
+-
+ CCFLAGS = -Wall  			\
+ 	-Wmissing-declarations -Wmissing-prototypes -Wnested-externs \
+ 	-Werror -Wsign-compare \
+-	 -c -ggdb -O0 			\
++	 -c -ggdb -O 			\
+ 	-DTPM_POSIX			\
+ 	-D_POSIX_			\
+ 	-DTPM_NUVOTON
+@@ -79,11 +77,11 @@
+ .PRECIOUS:	%.o
+ 
+ tpm_server:	$(OBJFILES)
+-		$(CC) $(OBJFILES) $(LNFLAGS) -o tpm_server
++		$(CCLD) $(OBJFILES) $(LDFLAGS) $(LNFLAGS) -o tpm_server
+ 
+ clean:		
+ 		rm -f *.o tpm_server *~
+ 
+ %.o:		%.c
+-		$(CC) $(CCFLAGS) $< -o $@
++		$(CC) $(CCFLAGS) $(CFLAGS) $< -o $@
+ 

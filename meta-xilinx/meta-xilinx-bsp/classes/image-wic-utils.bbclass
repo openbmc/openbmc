@@ -9,7 +9,7 @@ def boot_files_split_expand(d):
     # IMAGE_BOOT_FILES has extra renaming info in the format '<source>;<target>'
     for f in (d.getVar("IMAGE_BOOT_FILES") or "").split(" "):
         parts = f.split(";", 1)
-        sources = [parts[0]]
+        sources = [parts[0].strip()]
         if "*" in parts[0]:
             # has glob part
             import glob
@@ -21,7 +21,7 @@ def boot_files_split_expand(d):
         # for all sources, yield an entry
         for s in sources:
             if len(parts) == 2:
-                yield s, parts[1]
+                yield s, parts[1].strip()
             yield s, s
 
 def boot_files_bitstream(d):

@@ -25,6 +25,7 @@ SRC_URI = "git://github.com/crash-utility/${BPN}.git \
            file://remove-unrecognized-gcc-option-m32-for-mips.patch \
            file://0002-crash-fix-build-error-unknown-type-name-gdb_fpregset.patch \
            file://0003-crash-detect-the-sysroot-s-glibc-header-file.patch \
+           file://0001-Fix-for-an-ARM64-gcc-10-compilation-error.-Without-t.patch \
            "
 SRCREV = "24f4801f8c8871a2e3e660fe9fa8fdd86bb29876"
 

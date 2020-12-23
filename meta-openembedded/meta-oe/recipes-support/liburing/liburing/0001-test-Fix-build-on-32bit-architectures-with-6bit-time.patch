@@ -1,0 +1,35 @@
+From 0a9b12eda0f6e487398dad004121bdd1be792428 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 14 Nov 2020 16:18:44 -0800
+Subject: [PATCH] test: Fix build on 32bit architectures with 6bit time_t
+
+It uses SYS_futex, which it expects from system C library.
+in glibc (/usr/include/bits/syscall.h defines it in terms of of NR_futex)
+rv32 is using 64bit time_t from get go unlike other 32bit architectures
+in glibc, therefore it wont have NR_futex defined but just NR_futex_time64
+this aliases it to NR_futex so that SYS_futex is then defined for rv32
+
+Upstream-Status: Submitted [https://github.com/axboe/liburing/pull/237]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/35fa71a030ca-test.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/test/35fa71a030ca-test.c b/test/35fa71a030ca-test.c
+index 4ecf211..7f2124b 100644
+--- a/test/35fa71a030ca-test.c
++++ b/test/35fa71a030ca-test.c
+@@ -24,6 +24,10 @@
+ 
+ #include <linux/futex.h>
+ 
++#if !defined(SYS_futex) && defined(SYS_futex_time64)
++# define SYS_futex SYS_futex_time64
++#endif
++
+ static void sleep_ms(uint64_t ms)
+ {
+   usleep(ms * 1000);
+-- 
+2.29.2
+

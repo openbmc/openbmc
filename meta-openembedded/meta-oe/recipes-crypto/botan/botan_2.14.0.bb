@@ -49,3 +49,5 @@ PACKAGES += "${PN}-python3"
 FILES_${PN}-python3 = "${libdir}/python3"
 
 RDEPENDS_${PN}-python3 += "python3"
+
+COMPATIBLE_HOST_riscv32 = "null"

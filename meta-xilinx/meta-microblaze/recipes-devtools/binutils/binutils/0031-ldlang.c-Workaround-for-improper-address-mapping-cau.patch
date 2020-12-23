@@ -1,0 +1,38 @@
+From 23f0f6e8281b5cd481ef7636739c07b446828f7e Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 17 Jun 2020 21:20:26 +0530
+Subject: [PATCH 31/40] ldlang.c: Workaround for improper address mapping
+ causing runtime loops
+
+[Patch,MicroBlaze] : improper address mapping of PROVIDE directive
+symbols[DTOR_END] are causing runtime loops and we don't need to override
+PROVIDE symbols if symbols are defined in libraries and linker so I am
+disabling override for PROVIDE symbols.
+---
+ ld/ldlang.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/ld/ldlang.c b/ld/ldlang.c
+index 9977195074a..9e2c1da066e 100644
+--- a/ld/ldlang.c
++++ b/ld/ldlang.c
+@@ -3657,9 +3657,15 @@ open_input_bfds (lang_statement_union_type *s, enum open_bfd_mode mode)
+ 	    plugin_insert = NULL;
+ #endif
+ 	  break;
++	/* This is from a --defsym on the command line.  */
+ 	case lang_assignment_statement_enum:
+ 	  if (s->assignment_statement.exp->type.node_class != etree_assert)
+-	    exp_fold_tree_no_dot (s->assignment_statement.exp);
++	    {
++	      if(!(s->assignment_statement.exp->assign.defsym) && (s->assignment_statement.exp->type.node_class == etree_provide))
++		;
++	      else
++		exp_fold_tree_no_dot (s->assignment_statement.exp);
++	    }
+ 	  break;
+ 	default:
+ 	  break;
+-- 
+2.17.1
+

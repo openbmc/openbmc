@@ -1,4 +1,4 @@
-From 53ef88cdb879050fc6f5247e7ca05260af69f2e8 Mon Sep 17 00:00:00 2001
+From 73e338f99f89bc85fe384759a385d95e904adb7f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 10 Aug 2015 02:38:27 -0700
 Subject: [PATCH] wayland-egl: Add bcm_host to dependencies

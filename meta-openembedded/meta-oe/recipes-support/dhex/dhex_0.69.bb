@@ -1,5 +1,6 @@
 SUMMARY = "dhex is a hex editor that includes a diff mode"
 SECTION = "console/utils"
+HOMEPAGE = "http://www.dettus.net/dhex/"
 
 DEPENDS = "ncurses"
 

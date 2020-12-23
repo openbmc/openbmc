@@ -1,0 +1,138 @@
+From 9deb72959477700216326c033c930236e58f965f Mon Sep 17 00:00:00 2001
+From: Ren Yu <yux.ren@intel.com>
+Date: Tue, 28 May 2019 17:11:17 +0800
+Subject: [PATCH] Save the pre-timeout interrupt in dbus property
+
+Get the watchdog pre-timeout interrupt value from ipmi watchdog set command,
+and store it into dbus property.
+
+Tested:
+Config IPMI watchdog: BIOS FRB2 Power Cycle after 1 seconds:
+ipmitool raw 0x06 0x24 0x01 0x13 0x0 0x2 0xa 0x00
+Start watchdog:
+Ipmitool mc watchdog reset
+Check the watchdog pre-timeout interrupt in below:
+https://BMCIP/redfish/v1/Systems/system/LogServices/EventLog/Entries
+
+Signed-off-by: Ren Yu <yux.ren@intel.com>
+
+---
+ app/watchdog.cpp         | 47 ++++++++++++++++++++++++++++++++++++++++
+ app/watchdog_service.cpp |  6 +++++
+ app/watchdog_service.hpp |  9 ++++++++
+ 3 files changed, 62 insertions(+)
+
+diff --git a/app/watchdog.cpp b/app/watchdog.cpp
+index 03c373e..cb0b1fd 100644
+--- a/app/watchdog.cpp
++++ b/app/watchdog.cpp
+@@ -80,6 +80,7 @@ ipmi::RspType<> ipmiAppResetWatchdogTimer()
+ 
+ static constexpr uint8_t wd_dont_stop = 0x1 << 6;
+ static constexpr uint8_t wd_timeout_action_mask = 0x3;
++static constexpr uint8_t wdPreTimeoutInterruptMask = 0x3;
+ 
+ static constexpr uint8_t wdTimerUseResTimer1 = 0x0;
+ static constexpr uint8_t wdTimerUseResTimer2 = 0x6;
+@@ -127,6 +128,45 @@ WatchdogService::Action ipmiActionToWdAction(IpmiAction ipmi_action)
+     }
+ }
+ 
++enum class IpmiPreTimeoutInterrupt : uint8_t
++{
++    None = 0x0,
++    SMI = 0x1,
++    NMI = 0x2,
++    MI = 0x3,
++};
++/** @brief Converts an IPMI Watchdog PreTimeoutInterrupt to DBUS defined action
++ *  @param[in] ipmi_action The IPMI Watchdog PreTimeoutInterrupt
++ *  @return The Watchdog PreTimeoutInterrupt that the ipmi_action maps to
++ */
++WatchdogService::PreTimeoutInterruptAction ipmiPreTimeoutInterruptToWdAction(
++    IpmiPreTimeoutInterrupt ipmiPreTimeOutInterrupt)
++{
++    switch (ipmiPreTimeOutInterrupt)
++    {
++        case IpmiPreTimeoutInterrupt::None:
++        {
++            return WatchdogService::PreTimeoutInterruptAction::None;
++        }
++        case IpmiPreTimeoutInterrupt::SMI:
++        {
++            return WatchdogService::PreTimeoutInterruptAction::SMI;
++        }
++        case IpmiPreTimeoutInterrupt::NMI:
++        {
++            return WatchdogService::PreTimeoutInterruptAction::NMI;
++        }
++        case IpmiPreTimeoutInterrupt::MI:
++        {
++            return WatchdogService::PreTimeoutInterruptAction::MI;
++        }
++        default:
++        {
++            throw std::domain_error("IPMI PreTimeoutInterrupt is invalid");
++        }
++    }
++}
++
+ enum class IpmiTimerUse : uint8_t
+ {
+     Reserved = 0x0,
+@@ -250,6 +290,13 @@ ipmi::RspType<>
+         // Mark as initialized so that future resets behave correctly
+         wd_service.setInitialized(true);
+ 
++        // pretimeOutAction
++        const auto ipmiPreTimeoutInterrupt =
++            static_cast<IpmiPreTimeoutInterrupt>(wdPreTimeoutInterruptMask &
++                (static_cast<uint8_t>(preTimeoutInterrupt)));
++        wd_service.setPreTimeoutInterrupt(
++            ipmiPreTimeoutInterruptToWdAction(ipmiPreTimeoutInterrupt));
++
+         lastCallSuccessful = true;
+         return ipmi::responseSuccess();
+     }
+diff --git a/app/watchdog_service.cpp b/app/watchdog_service.cpp
+index 3534e89..4df1ab6 100644
+--- a/app/watchdog_service.cpp
++++ b/app/watchdog_service.cpp
+@@ -198,3 +198,9 @@ void WatchdogService::setInterval(uint64_t interval)
+ {
+     setProperty("Interval", interval);
+ }
++
++void WatchdogService::setPreTimeoutInterrupt(
++    PreTimeoutInterruptAction preTimeoutInterrupt)
++{
++    setProperty("PreTimeoutInterrupt", convertForMessage(preTimeoutInterrupt));
++}
+\ No newline at end of file
+diff --git a/app/watchdog_service.hpp b/app/watchdog_service.hpp
+index 141bdb7..32b7461 100644
+--- a/app/watchdog_service.hpp
++++ b/app/watchdog_service.hpp
+@@ -15,6 +15,8 @@ class WatchdogService
+ 
+     using Action =
+         sdbusplus::xyz::openbmc_project::State::server::Watchdog::Action;
++    using PreTimeoutInterruptAction = sdbusplus::xyz::openbmc_project::State::
++        server::Watchdog::PreTimeoutInterruptAction;
+     using TimerUse =
+         sdbusplus::xyz::openbmc_project::State::server::Watchdog::TimerUse;
+ 
+@@ -92,6 +94,13 @@ class WatchdogService
+      */
+     void setInterval(uint64_t interval);
+ 
++    /** @brief Sets the value of the PreTimeoutInterrupt property on the host
++     * watchdog
++     *
++     *  @param[in] PreTimeoutInterrupt - The new PreTimeoutInterrupt value
++     */
++    void setPreTimeoutInterrupt(PreTimeoutInterruptAction preTimeoutInterrupt);
++
+   private:
+     /** @brief sdbusplus handle */
+     sdbusplus::bus::bus bus;

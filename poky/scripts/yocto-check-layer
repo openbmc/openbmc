@@ -24,7 +24,7 @@ import scriptpath
 scriptpath.add_oe_lib_path()
 scriptpath.add_bitbake_lib_path()
 
-from checklayer import LayerType, detect_layers, add_layers, add_layer_dependencies, get_signatures
+from checklayer import LayerType, detect_layers, add_layers, add_layer_dependencies, get_signatures, check_bblayers
 from oeqa.utils.commands import get_bb_vars
 
 PROGNAME = 'yocto-check-layer'
@@ -136,6 +136,13 @@ def main():
     for layer in layers:
         if layer['type'] == LayerType.ERROR_NO_LAYER_CONF or \
                 layer['type'] == LayerType.ERROR_BSP_DISTRO:
+            continue
+
+        if check_bblayers(bblayersconf, layer['path'], logger):
+            logger.info("%s already in %s. To capture initial signatures, layer under test should not present "
+               "in BBLAYERS. Please remove %s from BBLAYERS." % (layer['name'], bblayersconf, layer['name']))
+            results[layer['name']] = None
+            results_status[layer['name']] = 'SKIPPED (Layer under test should not present in BBLAYERS)'
             continue
 
         logger.info('')

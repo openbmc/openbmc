@@ -1,0 +1,42 @@
+From 2b74a5b160c0500291c554ab5c0944f502e72a42 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linaro.org>
+Date: Thu, 9 Jul 2020 20:00:53 +0200
+Subject: [PATCH] meson.build: WORKAROUND Remove vulkan dependency
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We need a patch in the source code to allow enable when DISTRO_FEATURES
+contains vulkan.
+
+Signed-off-by: Aníbal Limón <anibal.limon@linaro.org>
+---
+ meson.build | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index db97c26..4c1b865 100644
+--- a/meson.build
++++ b/meson.build
+@@ -3,21 +3,15 @@ project('parallel-deqp-runner', ['c', 'cpp'],
+ cpp = meson.get_compiler('cpp')
+ 
+ thread_dep = dependency('threads')
+-vulkan_dep = dependency('vulkan')
+ 
+ fs_dep = cpp.find_library('stdc++fs', required : false)
+ if not fs_dep.found()
+     fs_dep = cpp.find_library('c++fs')
+ endif
+ 
+-
+ deqp_runner = executable('deqp-runner',
+            'src/deqp-runner.cc',
+            dependencies : [thread_dep, fs_dep],
+            install : true)
+ 
+-executable('hang-detection',
+-           'src/hang_detection.c',
+-           dependencies: [vulkan_dep])
+-
+ subdir('test')

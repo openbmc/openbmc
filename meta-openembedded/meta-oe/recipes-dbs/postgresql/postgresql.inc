@@ -36,7 +36,7 @@ LEAD_SONAME = "libpq.so"
 # LDFLAGS for shared libraries
 export LDFLAGS_SL = "${LDFLAGS}"
 
-inherit autotools pkgconfig perlnative python3native useradd update-rc.d systemd gettext cpan-base
+inherit autotools pkgconfig perlnative python3native python3targetconfig useradd update-rc.d systemd gettext cpan-base
 
 CFLAGS += "-I${STAGING_INCDIR}/${PYTHON_DIR} -I${STAGING_INCDIR}/tcl8.6"
 
@@ -247,10 +247,8 @@ FILES_${PN} += "${sysconfdir}/init.d/${BPN}-server \
 
 FILES_${PN}-client = "${bindir}/clusterdb \
     ${bindir}/createdb \
-    ${bindir}/createlang \
     ${bindir}/createuser \
     ${bindir}/dropdb \
-    ${bindir}/droplang \
     ${bindir}/dropuser \
     ${bindir}/pg_dump \
     ${bindir}/pg_dumpall \
@@ -310,7 +308,7 @@ FILES_libpgtypes-staticdev = "${libdir}/libpgtypes*.a"
 FILES_libpgtypes-dev = "${libdir}/libpgtypes*${SOLIBS} ${includedir}/pgtypes*.h"
 
 FILES_${PN}-contrib = " ${bindir}/oid2name ${bindir}/pg_standby \
-    ${bindir}/pgbench ${bindir}/vacuumlo \
+    ${bindir}/pgbench \
     ${S}/contrib/spi/*.example \
     ${libdir}/${BPN}/_int.so ${libdir}/${BPN}/adminpack.so \
     ${libdir}/${BPN}/autoinc.so ${libdir}/${BPN}/auto_explain.so \
@@ -332,7 +330,7 @@ FILES_${PN}-contrib = " ${bindir}/oid2name ${bindir}/pg_standby \
     ${libdir}/${BPN}/sslinfo.so \
     ${libdir}/${BPN}/tablefunc.so \
     ${libdir}/${BPN}/test_parser.so ${libdir}/${BPN}/timetravel.so \
-    ${libdir}/${BPN}/tsearch2.so ${libdir}/${BPN}/uuid-ossp.so \
+    ${libdir}/${BPN}/uuid-ossp.so \
     ${libdir}/${BPN}/pgxml.so ${libdir}/${BPN}/passwordcheck.so \
     ${libdir}/${BPN}/pg_upgrade_support.so ${libdir}/${BPN}/.so \
     ${libdir}/${BPN}/unaccent.so \

@@ -1,4 +1,4 @@
-From 126994379ea75c8826874656bb55f955182ae911 Mon Sep 17 00:00:00 2001
+From 106cf5134d22db889e4ddf2f98ec302d5f4b9ca7 Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Wed, 17 Jan 2018 10:02:14 -0200
 Subject: [PATCH] cmake: Prevent the detection of Qt5
@@ -38,7 +38,7 @@ index 98dd0e2..252302b 100644
    include_directories(${Qt5Widgets_INCLUDE_DIRS})
    add_definitions(${Qt5Widgets_DEFINITONS})
 diff --git a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
-index aff7383..e220503 100644
+index db6dbf3..5b26879 100644
 --- a/Tests/CMakeLists.txt
 +++ b/Tests/CMakeLists.txt
 @@ -215,7 +215,7 @@ if(BUILD_TESTING)
@@ -96,11 +96,11 @@ index c08efc4..87e25d9 100644
  set(CMAKE_CXX_STANDARD 11)
  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/bin)
 diff --git a/Tests/RunCMake/CMakeLists.txt b/Tests/RunCMake/CMakeLists.txt
-index e9f8bca..3a2da34 100644
+index 10e66c3..ecc4eeb 100644
 --- a/Tests/RunCMake/CMakeLists.txt
 +++ b/Tests/RunCMake/CMakeLists.txt
-@@ -396,7 +396,7 @@ else()
- endif()
+@@ -440,7 +440,7 @@ if(NOT WIN32)
+ endif ()
  
  find_package(Qt4 QUIET)
 -find_package(Qt5Core QUIET)

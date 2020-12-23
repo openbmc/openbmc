@@ -1,0 +1,28 @@
+From 9203dec731e53fb72e1c0d62639e6e54378f66cc Mon Sep 17 00:00:00 2001
+From: Aaron Conole <aconole@redhat.com>
+Date: Mon, 3 Aug 2020 15:20:59 -0400
+Subject: [PATCH 5/9] cisco_oui: match encode handler prototypes
+
+The EXTERN_FN prototype generated requires size_t be the third parameter.
+
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+---
+ vdptool_cisco_oui.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/vdptool_cisco_oui.c b/vdptool_cisco_oui.c
+index 7003521..3f88c76 100644
+--- a/vdptool_cisco_oui.c
++++ b/vdptool_cisco_oui.c
+@@ -28,7 +28,7 @@
+ #include "lldp_util.h"
+ #include "vdp_cisco.h"
+ 
+-bool cisco_oui_encode_hndlr(char *dst, char *src, int len)
++bool cisco_oui_encode_hndlr(char *dst, char *src, size_t len)
+ {
+ 	char *src_temp = strdup(src);
+ 	char *key, *data;
+-- 
+2.28.0
+

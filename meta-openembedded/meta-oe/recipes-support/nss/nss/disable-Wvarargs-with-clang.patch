@@ -1,3 +1,8 @@
+From c5b2c6327f3692ed07bf8d212123e0bf08485722 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 7 Mar 2020 08:34:02 -0800
+Subject: [PATCH] nss,nspr: Add recipes
+
 clang 3.9 add this warning to rightly flag undefined
 behavior, we relegate this to be just a warning instead
 of error and keep the behavior as it was. Right fix would
@@ -18,10 +23,14 @@ for more details
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
 
-Index: nss-3.37.1/nss/coreconf/Werror.mk
-===================================================================
---- nss-3.37.1.orig/nss/coreconf/Werror.mk
-+++ nss-3.37.1/nss/coreconf/Werror.mk
+---
+ nss/coreconf/Werror.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nss/coreconf/Werror.mk b/nss/coreconf/Werror.mk
+index a569a49..687fe58 100644
+--- a/nss/coreconf/Werror.mk
++++ b/nss/coreconf/Werror.mk
 @@ -56,7 +56,7 @@ ifndef WARNING_CFLAGS
      ifdef CC_IS_CLANG
        # -Qunused-arguments : clang objects to arguments that it doesn't understand

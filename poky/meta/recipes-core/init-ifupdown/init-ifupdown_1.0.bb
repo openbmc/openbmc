@@ -34,7 +34,7 @@ do_install_append_qemuall () {
 	touch ${D}${sysconfdir}/network/nm-disabled-eth0
 }
 
-PACKAGE_ARCH_qemuall = "${MACHINE_ARCH}"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 RDEPENDS_${PN} = "netbase"
 RCONFLICTS_${PN} = "netbase (< 1:5.0)"
 

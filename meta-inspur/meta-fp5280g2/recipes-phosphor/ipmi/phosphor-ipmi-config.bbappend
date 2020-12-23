@@ -25,6 +25,9 @@ python do_patch() {
     # count from the commit version
     count = re.findall("-(\d{1,4})-", version_id)
 
+    if not count:
+        return
+
     release = re.findall("-r(\d{1,4})", version_id)
     if release:
         auxVer = count[0] + "{0:0>4}".format(release[0])

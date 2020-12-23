@@ -6,7 +6,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
 IMAGE_INSTALL = "packagegroup-core-boot packagegroup-core-ssh-openssh packagegroup-self-hosted \
-                 kernel-dev kernel-devsrc connman connman-plugin-ethernet dhcp-client \
+                 kernel-dev kernel-devsrc connman connman-plugin-ethernet dhcpcd \
                  tzdata python3-pip perl-misc"
 
 IMAGE_FEATURES += "x11-base package-management splash"
@@ -24,7 +24,7 @@ IMAGE_FSTYPES = "wic.vmdk"
 
 inherit core-image module-base setuptools3
 
-SRCREV ?= "33903932ad87bfa8e8bf7baf2256781714993b79"
+SRCREV ?= "1dfd37d30953208fd998cef79483f371330a754e"
 SRC_URI = "git://git.yoctoproject.org/poky \
            file://Yocto_Build_Appliance.vmx \
            file://Yocto_Build_Appliance.vmxf \

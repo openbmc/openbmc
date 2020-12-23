@@ -14,7 +14,6 @@ import logging
 import os
 import sys
 import argparse
-import signal
 
 bindir = os.path.dirname(__file__)
 topdir = os.path.dirname(bindir)
@@ -26,7 +25,6 @@ import bb.msg
 logger = bb.msg.logger_create('bitbake-layers', sys.stdout)
 
 def main():
-    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     parser = argparse.ArgumentParser(
         description="BitBake layers utility",
         epilog="Use %(prog)s <subcommand> --help to get help on a specific command",

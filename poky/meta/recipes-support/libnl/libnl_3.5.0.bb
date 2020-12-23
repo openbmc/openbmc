@@ -40,3 +40,5 @@ FILES_${PN}-route = "${libdir}/libnl-route-3.so.*"
 FILES_${PN}-xfrm  = "${libdir}/libnl-xfrm-3.so.*"
 RREPLACES_${PN}-genl = "libnl-genl2"
 RCONFLICTS_${PN}-genl = "libnl-genl2"
+
+BBCLASSEXTEND = "native nativesdk"

@@ -456,6 +456,10 @@ class BaseConfig(object):
             if arg in self.fstypes + self.vmtypes + self.wictypes:
                 self.check_arg_fstype(arg)
             elif arg == 'nographic':
+                if ('sdl' in sys.argv):
+                    raise RunQemuError('Option nographic makes no sense alongside the sdl option.' % (arg))
+                if ('gtk' in sys.argv):
+                    raise RunQemuError('Option nographic makes no sense alongside the gtk option.' % (arg))
                 self.qemu_opt_script += ' -nographic'
                 self.kernel_cmdline_script += ' console=ttyS0'
             elif arg == 'sdl':
@@ -478,7 +482,8 @@ class BaseConfig(object):
                     self.qemu_opt_script += ' -display gtk,show-cursor=on'
             elif arg == 'gl' or arg == 'gl-es':
                 # These args are handled inside sdl or gtk blocks above
-                pass
+                if ('gtk' not in sys.argv) and ('sdl' not in sys.argv):
+                    raise RunQemuError('Option %s also needs gtk or sdl option.' % (arg))
             elif arg == 'egl-headless':
                 self.set_dri_path()
                 self.qemu_opt_script += ' -vga virtio -display egl-headless,show-cursor=on'
@@ -585,10 +590,10 @@ class BaseConfig(object):
                 logger.error("For further help see:")
                 raise RunQemuError(yocto_paravirt_kvm_wiki)
 
-        if not os.access(dev_kvm, os.W_OK|os.R_OK):
+            if not os.access(dev_vhost, os.W_OK|os.R_OK):
                 logger.error("You have no read or write permission on /dev/vhost-net.")
                 logger.error("Please change the ownership of this file as described at:")
-                raise RunQemuError(yocto_kvm_wiki)
+                raise RunQemuError(yocto_paravirt_kvm_wiki)
 
     def check_fstype(self):
         """Check and setup FSTYPE"""
@@ -1241,7 +1246,9 @@ class BaseConfig(object):
                         vm_drive = '-drive if=virtio,file=%s,format=%s' % (self.rootfs, rootfs_format)
 
                 # All branches above set vm_drive.
-                self.rootfs_options = '%s -no-reboot' % vm_drive
+                self.rootfs_options = vm_drive
+                if not self.fstype in self.vmtypes:
+                    self.rootfs_options += ' -no-reboot'
             self.kernel_cmdline = 'root=%s rw' % (self.get('QB_KERNEL_ROOT'))
 
         if self.fstype == 'nfs':
@@ -1329,7 +1336,7 @@ class BaseConfig(object):
         if not os.access(qemu_bin, os.X_OK):
             raise OEPathError("No QEMU binary '%s' could be found" % qemu_bin)
 
-        self.qemu_opt = "%s %s %s %s" % (qemu_bin, self.get('NETWORK_CMD'), self.get('ROOTFS_OPTIONS'), self.get('QB_OPT_APPEND'))
+        self.qemu_opt = "%s %s %s %s %s" % (qemu_bin, self.get('NETWORK_CMD'), self.get('QB_RNG'), self.get('ROOTFS_OPTIONS'), self.get('QB_OPT_APPEND'))
 
         for ovmf in self.ovmf_bios:
             format = ovmf.rsplit('.', 1)[-1]
@@ -1511,6 +1518,11 @@ def main():
         return 0
     try:
         config = BaseConfig()
+
+        renice = os.path.expanduser("~/bin/runqemu-renice")
+        if os.path.exists(renice):
+            logger.info('Using %s to renice' % renice)
+            subprocess.check_call([renice, str(os.getpid())])
 
         def sigterm_handler(signum, frame):
             logger.info("SIGTERM received")

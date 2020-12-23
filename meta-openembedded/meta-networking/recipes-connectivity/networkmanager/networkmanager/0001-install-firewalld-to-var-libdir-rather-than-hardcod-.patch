@@ -1,0 +1,30 @@
+From 6388b16b93ba805f8877a94f47509f701250812f Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 6 Jul 2020 19:33:54 -0700
+Subject: [PATCH] install firewalld to var-libdir rather than hardcod lib
+
+The oe install firewalld (split packages) to ${libdir}/firewalld/zones
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 358b01a..5745339 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -4778,7 +4778,7 @@ data/server.conf: $(srcdir)/data/server.conf.in
+ 	$(AM_V_GEN) $(data_edit) $< >$@
+ 
+ if WITH_FIREWALLD_ZONE
+-firewalldzonedir = $(prefix)/lib/firewalld/zones
++firewalldzonedir = $(libdir)/firewalld/zones
+ firewalldzone_DATA = data/nm-shared.xml
+ endif
+ 
+-- 
+2.21.0
+

@@ -1,0 +1,46 @@
+How to use this list:
+    Find the most specific section entry (described below) that matches where
+    your change lives and add the reviewers (R) and maintainers (M) as
+    reviewers. You can use the same method to track down who knows a particular
+    code base best.
+
+    Your change/query may span multiple entries; that is okay.
+
+    If you do not find an entry that describes your request at all, someone
+    forgot to update this list; please at least file an issue or send an email
+    to a maintainer, but preferably you should just update this document.
+
+Description of section entries:
+
+    Section entries are structured according to the following scheme:
+
+    X:  NAME <EMAIL_USERNAME@DOMAIN> <IRC_USERNAME!>
+    X:  ...
+    .
+    .
+    .
+
+    Where REPO_NAME is the name of the repository within the OpenBMC GitHub
+    organization; FILE_PATH is a file path within the repository, possibly with
+    wildcards; X is a tag of one of the following types:
+
+    M:  Denotes maintainer; has fields NAME <EMAIL_USERNAME@DOMAIN> <IRC_USERNAME!>;
+        if omitted from an entry, assume one of the maintainers from the
+        MAINTAINERS entry.
+    R:  Denotes reviewer; has fields NAME <EMAIL_USERNAME@DOMAIN> <IRC_USERNAME!>;
+        these people are to be added as reviewers for a change matching the repo
+        path.
+    F:  Denotes forked from an external repository; has fields URL.
+
+    Line comments are to be denoted "# SOME COMMENT" (typical shell style
+    comment); it is important to follow the correct syntax and semantics as we
+    may want to use automated tools with this file in the future.
+
+    A change cannot be added to an OpenBMC repository without a MAINTAINER's
+    approval; thus, a MAINTAINER should always be listed as a reviewer.
+
+START OF MAINTAINERS LIST
+-------------------------
+
+M:  Amithash Prasad <amithash@fb.com>
+M:  Patrick Williams <patrick@stwcx.xyz> <stwcx!>

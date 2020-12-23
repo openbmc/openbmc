@@ -1,0 +1,27 @@
+From 01a3a35631ba3996f7e912def66b4053a4f21df9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 3 Nov 2020 10:52:17 -0800
+Subject: [PATCH] Fix arguments in GLib.DBusSignalCallback for Vala 0.50
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/main.vala | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/main.vala b/src/main.vala
+index 6d7132b0..b3183217 100644
+--- a/src/main.vala
++++ b/src/main.vala
+@@ -403,7 +403,7 @@ class Commands : Object
+         return false;
+     }
+ 
+-    public void signalHandler( GLib.DBusConnection conn, string sender, string path, string iface, string name, Variant params )
++    public void signalHandler( GLib.DBusConnection conn, string? sender, string path, string iface, string name, Variant params )
+     {
+         var line = "[SIGNAL] %s.%s  %s  %s\n%s".printf(
+           iface,
+-- 
+2.29.2
+

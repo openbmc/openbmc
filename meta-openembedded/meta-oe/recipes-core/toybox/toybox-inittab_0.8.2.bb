@@ -2,10 +2,12 @@ SUMMARY = "Toybox Inittab Configuration"
 LICENSE = "BSD-0-Clause"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-0-Clause;md5=81eeb0083e31f11ab1e33ded846d521c"
 
+# Unpack to ${S}/orig
+#
 SRC_URI = "\
-    file://inittab \
-    file://rcK \
-    file://rcS \
+    file://inittab;subdir=${BP}/orig \
+    file://rcK;subdir=${BP}/orig \
+    file://rcS;subdir=${BP}/orig \
 "
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -14,6 +16,9 @@ RCONFLICTS_${PN} = "\
     busybox-inittab \
     sysvinit-inittab \
 "
+
+# Just being sure.
+B = "${S}"
 
 # most users may want to have getty enabled by default
 PACKAGECONFIG ??= "getty"
@@ -26,9 +31,7 @@ do_patch[noexec] = "1"
 
 do_configure() {
 	# copy over files now to have a fresh start on each config
-	for f in inittab rcK rcS; do
-		cp ${WORKDIR}/$f ${S}
-	done
+	cp orig/* .
 
 	for config in ${PACKAGECONFIG_CONFARGS}; do
 		if [[ ${config} == "enable_getty" ]]; then

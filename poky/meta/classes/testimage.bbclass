@@ -3,6 +3,8 @@
 # Released under the MIT license (see COPYING.MIT)
 
 inherit metadata_scm
+inherit image-artifact-names
+
 # testimage.bbclass enables testing of qemu images using python unittests.
 # Most of the tests are commands run on target image over ssh.
 # To use it add testimage to global inherit and call your target image with -c testimage
@@ -317,6 +319,7 @@ def testimage_main(d):
     target_kwargs['powercontrol_extra_args'] = d.getVar("TEST_POWERCONTROL_EXTRA_ARGS") or ""
     target_kwargs['serialcontrol_cmd'] = d.getVar("TEST_SERIALCONTROL_CMD") or None
     target_kwargs['serialcontrol_extra_args'] = d.getVar("TEST_SERIALCONTROL_EXTRA_ARGS") or ""
+    target_kwargs['testimage_dump_target'] = d.getVar("testimage_dump_target") or ""
 
     def export_ssh_agent(d):
         import os
@@ -364,6 +367,7 @@ def testimage_main(d):
     package_extraction(d, tc.suites)
 
     results = None
+    complete = False
     orig_sigterm_handler = signal.signal(signal.SIGTERM, sigterm_exception)
     try:
         # We need to check if runqemu ends unexpectedly
@@ -375,6 +379,7 @@ def testimage_main(d):
         except ValueError:
             pass
         results = tc.runTests()
+        complete = True
     except (KeyboardInterrupt, BlockingIOError) as err:
         if isinstance(err, KeyboardInterrupt):
             bb.error('testimage interrupted, shutting down...')
@@ -382,20 +387,21 @@ def testimage_main(d):
             bb.error('runqemu failed, shutting down...')
         if results:
             results.stop()
-            results = None
+        results = tc.results
     finally:
         signal.signal(signal.SIGTERM, orig_sigterm_handler)
         tc.target.stop()
 
     # Show results (if we have them)
-    if not results:
+    if results:
+        configuration = get_testimage_configuration(d, 'runtime', machine)
+        results.logDetails(get_testimage_json_result_dir(d),
+                        configuration,
+                        get_testimage_result_id(configuration),
+                        dump_streams=d.getVar('TESTREPORT_FULLLOGS'))
+        results.logSummary(pn)
+    if not results or not complete:
         bb.fatal('%s - FAILED - tests were interrupted during execution' % pn, forcelog=True)
-    configuration = get_testimage_configuration(d, 'runtime', machine)
-    results.logDetails(get_testimage_json_result_dir(d),
-                       configuration,
-                       get_testimage_result_id(configuration),
-                       dump_streams=d.getVar('TESTREPORT_FULLLOGS'))
-    results.logSummary(pn)
     if not results.wasSuccessful():
         bb.fatal('%s - FAILED - check the task log and the ssh log' % pn, forcelog=True)
 

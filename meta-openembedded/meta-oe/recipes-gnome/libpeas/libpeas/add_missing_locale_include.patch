@@ -1,0 +1,21 @@
+From 3cc69f1eaa86163c3816265fa64cb660f4def364 Mon Sep 17 00:00:00 2001
+From: Christian Hergert <chergert@redhat.com>
+Date: Fri, 13 Mar 2020 10:32:21 -0700
+Subject: [PATCH] demo: add missing locale.h include
+
+Fixes #39
+
+Upstream-Status: backport
+
+diff --git a/peas-demo/peas-demo.c b/peas-demo/peas-demo.c
+index 47ac005..466a392 100644
+--- a/peas-demo/peas-demo.c
++++ b/peas-demo/peas-demo.c
+@@ -26,6 +26,7 @@
+ #include <girepository.h>
+ #include <glib/gi18n.h>
+ #include <gtk/gtk.h>
++#include <locale.h>
+ 
+ #include <libpeas/peas.h>
+ #include <libpeas-gtk/peas-gtk.h>

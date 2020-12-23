@@ -1,4 +1,7 @@
-Detect warning options during configure
+From 1ab0c326405c6daa06f1a7eb4b0b60bf4e0584c2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 31 Dec 2019 08:15:34 -0800
+Subject: [PATCH] Detect warning options during configure
 
 Certain options maybe compiler specific therefore its better
 to detect them before use.
@@ -12,28 +15,12 @@ Wdiscarded-qualifiers is gcc specific and this is no longer needed
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
---- a/configure.ac
-+++ b/configure.ac
-@@ -599,7 +599,6 @@ my_am_cflags="\
-  -Werror=parentheses \
-  -Werror=aggregate-return \
-  -Werror=unused-result \
-- -Wno-cast-function-type \
-  -fno-strict-aliasing \
- "
- 
-@@ -619,9 +618,10 @@ CHECK_CCSUPPORT([-Werror=format-overflow
- CHECK_CCSUPPORT([-Werror=int-conversion], [flg2])
- CHECK_CCSUPPORT([-Werror=incompatible-pointer-types], [flg3])
- CHECK_CCSUPPORT([-Werror=misleading-indentation], [flg4])
-+CHECK_CCSUPPORT([-Wno-cast-function-type], [flg5])
- AX_GCC_FUNC_ATTRIBUTE([format])
- 
--AC_SUBST([AM_CFLAGS], ["$my_am_cflags $flg1 $flg2 $flg3 $flg4"])
-+AC_SUBST([AM_CFLAGS], ["$my_am_cflags $flg1 $flg2 $flg3 $flg4 $flg5"])
- 
- # Make sure that $ACLOCAL_FLAGS are used during a rebuild
- AC_SUBST([ACLOCAL_AMFLAGS], ["-I $ac_macro_dir \$(ACLOCAL_FLAGS)"])
+---
+ support/nfs/xcommon.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/support/nfs/xcommon.c b/support/nfs/xcommon.c
+index 3989f0b..e080423 100644
 --- a/support/nfs/xcommon.c
 +++ b/support/nfs/xcommon.c
 @@ -98,7 +98,10 @@ nfs_error (const char *fmt, ...) {
@@ -47,15 +34,3 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
       va_end (args);
       free (fmt2);
  }
---- a/utils/mount/stropts.c
-+++ b/utils/mount/stropts.c
-@@ -1094,9 +1094,7 @@ static int nfsmount_fg(struct nfsmount_i
- 		if (nfs_try_mount(mi))
- 			return EX_SUCCESS;
- 
--#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
- 		if (errno == EBUSY && is_mountpoint(mi->node)) {
--#pragma GCC diagnostic warning "-Wdiscarded-qualifiers"
- 			/*
- 			 * EBUSY can happen when mounting a filesystem that
- 			 * is already mounted or when the context= are

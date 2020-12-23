@@ -6,25 +6,33 @@ S = "${WORKDIR}/git"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-inherit autotools pkgconfig
-inherit python3native
+inherit meson
+inherit obmc-phosphor-utils
 inherit phosphor-dbus-yaml
+inherit python3native
 
-DEPENDS += "autoconf-archive-native"
-DEPENDS += "${PYTHON_PN}-sdbus++-native"
-
-SRC_URI = "git://github.com/openbmc/phosphor-dbus-interfaces"
-SRCREV = "12a8ca89d996ecebe09f70d107d8a63f9cbd441a"
-
-PACKAGECONFIG ??= "libphosphor_dbus"
-PACKAGECONFIG[libphosphor_dbus] = " \
-        --enable-libphosphor_dbus, \
-        --disable-libphosphor_dbus, \
-        systemd sdbusplus, \
-        libsystemd \
+DEPENDS += " \
+        ${PYTHON_PN}-sdbus++-native \
+        sdbusplus \
+        systemd \
         "
 
-PACKAGECONFIG_remove_class-native = "libphosphor_dbus"
-PACKAGECONFIG_remove_class-nativesdk = "libphosphor_dbus"
+SRC_URI = "git://github.com/openbmc/phosphor-dbus-interfaces"
+SRCREV = "a1e0916223000127a575e6d7154fc2f9117c4f1c"
 
-BBCLASSEXTEND += "native nativesdk"
+# Process OBMC_ORG_YAML_SUBDIRS to create Meson config options.
+# ex. xyz/openbmc_project -> -Ddata_xyz_openbmc_project=true
+def pdi_meson_config(d):
+    return ' '.join([
+        '-Ddata_' + x.replace('/', '_') + '=true' \
+                for x in listvar_to_list(d, 'OBMC_ORG_YAML_SUBDIRS')
+        ])
+pdi_meson_config[vardeps] = "OBMC_ORG_YAML_SUBDIRS"
+
+# Markdown files are installed into /usr/share/phosphor-dbus-interfaces so
+# add them to the 'doc' subpackage.
+FILES_${PN}-doc += "${datadir}/${BPN}"
+
+EXTRA_OEMESON_append = " \
+        -Db_lto=true \
+        ${@pdi_meson_config(d)}"

@@ -10,7 +10,7 @@ LICENSE = "wxWidgets"
 LIC_FILES_CHKSUM = "file://docs/licence.txt;md5=981f50a934828620b08f44d75db557c6"
 
 inherit ${@bb.utils.contains('PACKAGECONFIG', 'qt', 'cmake_qt5', 'cmake', d)}
-inherit features_check lib_package
+inherit features_check lib_package binconfig
 
 # All toolkit-configs except 'no_gui' require x11 explicitly (see toolkit.cmake)
 REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('PACKAGECONFIG', 'no_gui', '', 'x11', d)}"
@@ -21,9 +21,12 @@ DEPENDS += " \
     tiff \
 "
 
-SRC_URI = "git://github.com/wxWidgets/wxWidgets.git"
-PV = "3.1.3"
-SRCREV= "8a40d23b27ed1c80b5a2ca9f7e8461df4fbc1a31"
+SRC_URI = " \
+    git://github.com/wxWidgets/wxWidgets.git \
+    file://0001-wx-config.in-Disable-cross-magic-it-does-not-work-fo.patch \
+"
+PV = "3.1.4"
+SRCREV= "6cdaedd42ba59331b3dc4ead50e0bac76ae14c19"
 S = "${WORKDIR}/git"
 
 # These can be either 'builtin' or 'sys' and builtin means cloned soures are
@@ -39,10 +42,10 @@ EXTRA_OECMAKE_append_libc-musl = " \
     -DHAVE_LOCALE_T=OFF \
 "
 
-PACKAGECONFIG ?= "gtk"
+PACKAGECONFIG ?= "gtk ${@bb.utils.filter('DISTRO_FEATURES', 'opengl', d)}"
 
 # Note on toolkit-PACKAGECONFIGs: select exactly one of 'no_gui' / 'gtk' / 'qt'
-PACKAGECONFIG[no_gui] = "-DwxUSE_GUI=OFF,,,,,qt gtk"
+PACKAGECONFIG[no_gui] = "-DwxUSE_GUI=OFF,,,,,qt gtk opengl"
 PACKAGECONFIG[gtk] = "-DwxBUILD_TOOLKIT=gtk3 -DwxUSE_GUI=ON,,gtk+3,,,no_gui qt"
 PACKAGECONFIG[qt] = "-DwxBUILD_TOOLKIT=qt  -DwxUSE_GUI=ON,,qtbase,,,no_gui gtk"
 python () {
@@ -63,8 +66,27 @@ PACKAGECONFIG[gstreamer] = "-DwxUSE_MEDIACTRL=ON,-DwxUSE_MEDIACTRL=OFF,gstreamer
 PACKAGECONFIG[libsecret] = "-DwxUSE_SECRETSTORE=ON,-DwxUSE_SECRETSTORE=OFF,libsecret,,,no_gui"
 PACKAGECONFIG[lzma] = "-DwxUSE_LIBLZMA=ON,-DwxUSE_LIBLZMA=OFF,xz"
 PACKAGECONFIG[mspack] = "-DwxUSE_LIBMSPACK=ON,-DwxUSE_LIBMSPACK=OFF,libmspack"
+PACKAGECONFIG[opengl] = ",,libglu"
 PACKAGECONFIG[sdl_audio] = "-DwxUSE_LIBSDL=ON,-DwxUSE_LIBSDL=OFF,libsdl2"
 PACKAGECONFIG[webkit] = "-DwxUSE_WEBVIEW_WEBKIT=ON,-DwxUSE_WEBVIEW_WEBKIT=OFF,webkitgtk,,,no_gui"
+
+do_compile_append() {
+    # if not at re-compile
+    if [ -L ${B}/wx-config ]; then
+        # ${B}/wx-config is a symlink for build and not needed after compile
+        # So for our purposes do:
+        # 1. make a file out of wx-config so that binconfig.bbclass detects it
+        # 2. make sure we do not move the file used for compiling into sysroot
+        cp --remove-destination `readlink ${B}/wx-config | sed 's:inplace-::'` ${B}/wx-config
+    fi
+    # 3. Set full sysroot paths so sstate can translate them when setting
+    #    up wxwidgets's consumer sysroots
+    sed -i \
+        -e 's,^includedir=.*,includedir="${STAGING_INCDIR}",g' \
+        -e 's,^libdir=.*",libdir="${STAGING_LIBDIR}",g' \
+        -e 's,^bindir=.*",bindir="${STAGING_BINDIR}",g' \
+        ${B}/wx-config
+}
 
 do_install_append() {
     # do not ship bindir if empty

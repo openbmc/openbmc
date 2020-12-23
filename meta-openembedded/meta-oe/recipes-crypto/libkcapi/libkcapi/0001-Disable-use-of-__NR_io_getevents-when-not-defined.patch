@@ -1,0 +1,36 @@
+From 771dd6aa45dd0bbbb7d7c7a7b116e1b5666fbd7a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Nov 2020 18:05:48 -0800
+Subject: [PATCH] Disable use of __NR_io_getevents when not defined
+
+Architectures like riscv32 do not define this syscall, therefore return
+ENOSYS on such architectures
+
+Upstream-Status: Submitted [https://github.com/smuellerDD/libkcapi/pull/100]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/internal.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+--- a/lib/internal.h
++++ b/lib/internal.h
+@@ -325,10 +325,17 @@ static inline int io_submit(aio_context_
+     return syscall(__NR_io_submit, ctx, n, iocb);
+ }
+ 
+-static inline int io_getevents(aio_context_t ctx, long min, long max,
+-            struct io_event *events, struct timespec *timeout)
++static inline int io_getevents(__attribute__((unused)) aio_context_t ctx,
++            __attribute__((unused)) long min,
++            __attribute__((unused)) long max,
++            __attribute__((unused)) struct io_event *events,
++            __attribute__((unused)) struct timespec *timeout)
+ {
++#ifdef __NR_io_getevents
+     return syscall(__NR_io_getevents, ctx, min, max, events, timeout);
++#else
++    return -ENOSYS;
++#endif
+ }
+ 
+ /************************************************************

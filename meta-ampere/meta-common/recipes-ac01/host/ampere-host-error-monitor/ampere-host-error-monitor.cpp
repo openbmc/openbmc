@@ -383,12 +383,13 @@ namespace ras
         } else if (apiIdx == errors_mem_ue || apiIdx == errors_mem_ce) {
             char dimCh[MAX_MSG_LEN] = {'\0'};
             snprintf(dimCh, MAX_MSG_LEN, "%x", (inst_13_0 & 0x7ff));
+            u_int8_t rank = (eFields.address >> 20) & 0xF;
             /* Only detect DIMM Idx for MCU_ERROR_1 or MCU_ERROR_2 Type */
             if (temp == MCU_ERR_1_TYPE || temp == MCU_ERR_2_TYPE)
                 sd_journal_send("REDFISH_MESSAGE_ID=%s", redFishMsgID,
                         "REDFISH_MESSAGE_ARGS=%d,%s,%d,%d", socket,
                         dimCh, (inst_13_0 & 0x3800) >> 11,
-                        (u_int8_t) ((eFields.address >> 20) & 0xF) , NULL);
+                        rank , NULL);
             else
                 sd_journal_send("REDFISH_MESSAGE_ID=%s", redFishMsgID,
                         "REDFISH_MESSAGE_ARGS=%d,%s,%d,%d", socket,

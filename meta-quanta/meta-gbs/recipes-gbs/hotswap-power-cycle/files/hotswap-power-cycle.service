@@ -2,13 +2,9 @@
 Description=Power Cycle by Hotswap Controller
 
 [Service]
-EnvironmentFile=/run/psu_timedelay
-ExecStartPre=sleep $PSU_HARDRESET_DELAY
-ExecStart=gpioset gpiochip6 26=1
-Restart=no
 Type=oneshot
-RemainAfterExit=true
-StandardOutput=syslog
+EnvironmentFile=-/run/psu_timedelay
+ExecStart=/usr/bin/tray_powercycle.sh
 
 [Install]
 WantedBy=gbmc-psu-hardreset.target

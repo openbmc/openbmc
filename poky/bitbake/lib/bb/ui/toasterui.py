@@ -131,6 +131,10 @@ def main(server, eventHandler, params):
 
     helper = uihelper.BBUIHelper()
 
+    if not params.observe_only:
+        params.updateToServer(server, os.environ.copy())
+        params.updateFromServer(server)
+
     # TODO don't use log output to determine when bitbake has started
     #
     # WARNING: this log handler cannot be removed, as localhostbecontroller
@@ -162,8 +166,6 @@ def main(server, eventHandler, params):
         logger.warning("buildstats is not enabled. Please enable INHERIT += \"buildstats\" to generate build statistics.")
 
     if not params.observe_only:
-        params.updateFromServer(server)
-        params.updateToServer(server, os.environ.copy())
         cmdline = params.parseActions()
         if not cmdline:
             print("Nothing to do.  Use 'bitbake world' to build everything, or run 'bitbake --help' for usage information.")

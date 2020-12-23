@@ -24,8 +24,7 @@ REPO ?= "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}-${DATETIME}"
-ATF_BASE_NAME[vardepsexclude] = "DATETIME"
+ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
 
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE_zynqmp = ".*"

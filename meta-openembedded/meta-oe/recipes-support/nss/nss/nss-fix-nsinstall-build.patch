@@ -1,4 +1,7 @@
-Fix nss multilib build on openSUSE 11.x 32bit
+From 2701905e689cf7c1ee7ca2d116f20b5bbc146431 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Sat, 7 Mar 2020 08:34:02 -0800
+Subject: [PATCH] Fix nss multilib build on openSUSE 11.x 32bit
 
 While building lib64-nss on openSUSE 11.x 32bit, the nsinstall will
 fail with error:
@@ -16,10 +19,15 @@ Upstream-Status: Pending
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ===================================================
-Index: nss-3.24/nss/coreconf/nsinstall/Makefile
-===================================================================
---- nss-3.24.orig/nss/coreconf/nsinstall/Makefile
-+++ nss-3.24/nss/coreconf/nsinstall/Makefile
+
+---
+ nss/coreconf/nsinstall/Makefile | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/nss/coreconf/nsinstall/Makefile b/nss/coreconf/nsinstall/Makefile
+index 08dfbc2..e97fb5f 100644
+--- a/nss/coreconf/nsinstall/Makefile
++++ b/nss/coreconf/nsinstall/Makefile
 @@ -18,6 +18,13 @@ INTERNAL_TOOLS  = 1
  
  include $(DEPTH)/coreconf/config.mk
@@ -33,4 +41,4 @@ Index: nss-3.24/nss/coreconf/nsinstall/Makefile
 +
  ifeq (,$(filter-out OS2 WIN%,$(OS_TARGET)))
  PROGRAM		=
- else
+ TARGETS		=

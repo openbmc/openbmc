@@ -11,7 +11,7 @@ inherit obmc-phosphor-systemd
 OBMC_HOST_MONITOR_INSTANCES = "shutdown_ack reboot_ack"
 SYSTEMD_ENVIRONMENT_FILE_${PN} +="obmc/gpio/shutdown_ack obmc/gpio/reboot_ack"
 
-S = "${WORKDIR}/"
+S = "${WORKDIR}"
 
 SRC_URI = "file://ampere-host-shutdown.service \
           file://ampere-host-reset.service \
@@ -20,6 +20,7 @@ SRC_URI = "file://ampere-host-shutdown.service \
           file://ampere-chassis-poweron.service \
           file://ampere-host-reset-ack.service \
           file://ampere-host-force-reset.service \
+          file://ampere-host-power-cycle.service \
           "
 
 DEPENDS = "systemd virtual/obmc-gpio-monitor"
@@ -33,6 +34,7 @@ SYSTEMD_SERVICE_${PN} = " \
         ampere-chassis-poweron.service \
         ampere-host-reset-ack.service \
         ampere-host-force-reset.service \
+        ampere-host-power-cycle.service \
         "
 # host power control
 # overwrite the host shutdown to graceful shutdown
@@ -41,17 +43,17 @@ HOST_SHUTDOWN_TGTFMT = "obmc-host-shutdown@{0}.target"
 HOST_SHUTDOWN_FMT = "../${HOST_SHUTDOWN_TMPL}:${HOST_SHUTDOWN_TGTFMT}.requires/${HOST_SHUTDOWN_TMPL}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_SHUTDOWN_FMT', 'OBMC_HOST_INSTANCES')}"
 
+# Force the power cycle target to run the ampere power cycle
+HOST_REBOOT_SVC = "ampere-host-power-cycle.service"
+HOST_REBOOT_SVC_TGTFMT = "obmc-host-reboot@{0}.target"
+HOST_REBOOT_SVC_FMT = "../${HOST_REBOOT_SVC}:${HOST_REBOOT_SVC_TGTFMT}.requires/${HOST_REBOOT_SVC}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_REBOOT_SVC_FMT', 'OBMC_HOST_INSTANCES')}"
+
 # overwrite the host reset to graceful reset
 HOST_WARM_REBOOT_SOFT_SVC = "ampere-host-reset.service"
 HOST_WARM_REBOOT_TGTFMT = "obmc-host-warm-reboot@{0}.target"
 HOST_WARM_REBOOT_SOFT_SVC_FMT = "../${HOST_WARM_REBOOT_SOFT_SVC}:${HOST_WARM_REBOOT_TGTFMT}.requires/${HOST_WARM_REBOOT_SOFT_SVC}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_WARM_REBOOT_SOFT_SVC_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# Force the power cycle target to run the ampere power cycle
-HOST_REBOOT_SVC = "ampere-host-reset-ack.service"
-HOST_REBOOT_SVC_TGTFMT = "obmc-host-reboot@{0}.target"
-HOST_REBOOT_SVC_FMT = "../${HOST_REBOOT_SVC}:${HOST_REBOOT_SVC_TGTFMT}.requires/${HOST_REBOOT_SVC}"
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_REBOOT_SVC_FMT', 'OBMC_HOST_INSTANCES')}"
 
 # overwrite force reboot
 HOST_WARM_REBOOT_FORCE_TGT = "ampere-host-force-reset.service"

@@ -1,0 +1,38 @@
+From 0a504852ed6e56620d1df26b503c4aa2b5b74760 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 31 Oct 2020 16:12:36 -0700
+Subject: [PATCH] profile-handler: Specify libc specific thread_id
+
+We need to know internal _sigev_un is glibc specific, add an else for
+musl case
+
+Fixes build issue
+../git/src/profile-handler.cc:275:8: error: no member named '_sigev_un' in 'sigevent'
+  sevp._sigev_un._tid = sys_gettid();
+  ~~~~ ^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/profile-handler.cc | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/profile-handler.cc b/src/profile-handler.cc
+index 7fdcb69..5867118 100644
+--- a/src/profile-handler.cc
++++ b/src/profile-handler.cc
+@@ -272,7 +272,11 @@ static void StartLinuxThreadTimer(int timer_type, int signal_number,
+   struct itimerspec its;
+   memset(&sevp, 0, sizeof(sevp));
+   sevp.sigev_notify = SIGEV_THREAD_ID;
++#ifdef __GLIBC__
+   sevp._sigev_un._tid = sys_gettid();
++#else
++  sevp.sigev_notify_thread_id = sys_gettid();
++#endif
+   sevp.sigev_signo = signal_number;
+   clockid_t clock = CLOCK_THREAD_CPUTIME_ID;
+   if (timer_type == ITIMER_REAL) {
+-- 
+2.29.2
+

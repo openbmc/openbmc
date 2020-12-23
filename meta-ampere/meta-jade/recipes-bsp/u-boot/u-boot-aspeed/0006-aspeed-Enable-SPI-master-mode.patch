@@ -1,0 +1,33 @@
+From 05958f26a0aa423c91f1034bb5848dd3efcaa0fb Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chnguyen@amperecomputing.com>
+Date: Wed, 9 Dec 2020 11:38:04 +0700
+Subject: [PATCH] aspeed: Enable SPI master mode
+
+Currently, some systems design the strap pin,
+which was shared pin with another function.
+That makes the board strapping does not reflect the intended use of the system.
+
+This patch will enable SPI master mode by default.
+
+Signed-off-by: Chanh Nguyen <chnguyen@amperecomputing.com>
+---
+ board/aspeed/ast-g5/ast-g5.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/board/aspeed/ast-g5/ast-g5.c b/board/aspeed/ast-g5/ast-g5.c
+index 1164592f84..b6d648e4b9 100644
+--- a/board/aspeed/ast-g5/ast-g5.c
++++ b/board/aspeed/ast-g5/ast-g5.c
+@@ -23,6 +23,9 @@ int board_init(void)
+ 	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
+ 	gd->flags = 0;
+ 
++	/* enable SPI master */
++	ast_scu_spi_master(1);
++
+ 	/* Switch PWM to GPIO mode */
+ 	ast_scu_switch_pwm_to_gpio_mode();
+ 
+-- 
+2.17.1
+

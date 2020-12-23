@@ -59,9 +59,22 @@ fi
 
 if [[ $TYPE == "smpmpro" ]]; then
 
-	echo "turning chassis off"
-	obmcutil chassisoff
-	sleep 20
+	# Turn off the Host if it is currently ON
+	chassisstate=$(obmcutil chassisstate | awk -F. '{print $NF}')
+	echo "Current Chassis State: $chassisstate"
+	if [ "$chassisstate" == 'On' ];
+	then
+		echo "Turning the Chassis off"
+		obmcutil chassisoff
+		sleep 15
+		# Check if HOST was OFF
+		chassisstate_off=$(obmcutil chassisstate | awk -F. '{print $NF}')
+		if [ "$chassisstate_off" == 'On' ];
+		then
+			echo "Error : Failed turning the Chassis off"
+			exit 1
+		fi
+	fi
 
 	# Switch EEPROM control to BMC AST2500 I2C
 	# 226 is BMC_GPIOAC2_SPI0_PROGRAM_SEL
@@ -88,6 +101,12 @@ if [[ $TYPE == "smpmpro" ]]; then
 	# 226 is BMC_GPIOAC2_SPI0_PROGRAM_SEL
 	gpioset 0 226=1
 
+	if [ "$chassisstate" == 'On' ];
+	then
+		sleep 5
+		echo "Turn on the Host"
+		obmcutil chassison
+	fi
 fi
 
 if [[ $TYPE == "fru" ]]; then

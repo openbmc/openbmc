@@ -1,7 +1,7 @@
-From 3d6700d38153a0ec8e0800de703a5089a8cd3d2d Mon Sep 17 00:00:00 2001
+From 63df98fa78c8a6e12b40ebdc5c155838d2bf8b5f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 29 Nov 2018 18:00:23 -0800
-Subject: [PATCH] gdbserver ctrl-c handling
+Subject: [PATCH 11/11] gdbserver ctrl-c handling
 
 This problem was created by the upstream commit 78708b7c8c
 After applying the commit, it will send SIGINT to the process
@@ -19,21 +19,22 @@ Author: Josh Gao
 Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- gdb/gdbserver/linux-low.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ gdbserver/linux-low.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gdb/gdbserver/linux-low.c b/gdb/gdbserver/linux-low.c
-index 4255795ea6..762f8bafb6 100644
---- a/gdb/gdbserver/linux-low.c
-+++ b/gdb/gdbserver/linux-low.c
-@@ -5904,9 +5904,7 @@ linux_look_up_symbols (void)
- static void
- linux_request_interrupt (void)
+diff --git a/gdbserver/linux-low.cc b/gdbserver/linux-low.cc
+index e45493339d2..aabc099b456 100644
+--- a/gdbserver/linux-low.cc
++++ b/gdbserver/linux-low.cc
+@@ -5714,7 +5714,7 @@ linux_process_target::request_interrupt ()
  {
--  /* Send a SIGINT to the process group.  This acts just like the user
--     typed a ^C on the controlling terminal.  */
--  kill (-signal_pid, SIGINT);
-+  kill (signal_pid, SIGINT);
+   /* Send a SIGINT to the process group.  This acts just like the user
+      typed a ^C on the controlling terminal.  */
+-  ::kill (-signal_pid, SIGINT);
++  ::kill (signal_pid, SIGINT);
  }
  
- /* Copy LEN bytes from inferior's auxiliary vector starting at OFFSET
+ bool
+-- 
+2.29.2
+

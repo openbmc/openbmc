@@ -61,17 +61,9 @@ class _NamedTupleABCMeta(ABCMeta):
         return ABCMeta.__new__(mcls, name, bases, namespace)
 
 
-exec(
-    # Python 2.x metaclass declaration syntax
-    """class _NamedTupleABC(object):
-        '''The abstract base class + mix-in for named tuples.'''
-        __metaclass__ = _NamedTupleABCMeta
-        _fields = abstractproperty()""" if version_info[0] < 3 else
-    # Python 3.x metaclass declaration syntax
-    """class _NamedTupleABC(metaclass=_NamedTupleABCMeta):
-        '''The abstract base class + mix-in for named tuples.'''
-        _fields = abstractproperty()"""
-)
+class _NamedTupleABC(metaclass=_NamedTupleABCMeta):
+    '''The abstract base class + mix-in for named tuples.'''
+    _fields = abstractproperty()
 
 
 _namedtuple.abc = _NamedTupleABC

@@ -12,6 +12,7 @@ PV = "${BASEPV}+git${SRCPV}"
 SRCREV = "358cc758948be788284d5faba46ccf4cc1813796"
 SRC_URI = "git://github.com/Drive-Trust-Alliance/sedutil.git \
 	file://0001-Fix-build-on-big-endian-architectures.patch \
+        file://0001-DtaAnnotatedDump-Add-typedef-name-to-the-union.patch \
 "
 
 S = "${WORKDIR}/git"

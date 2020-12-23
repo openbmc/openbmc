@@ -1,0 +1,46 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 0
+  XZ_DEFAULTS: '-T 0'
+  OBMCBIN: BUILDS/openbmc
+
+CI-MR:
+  tags:
+  - obmc
+  only:
+  - merge_requests
+  # Uncomment if you allow cr-mr failure
+  # allow_failure: true
+  script:
+  - QEMU_TIMER=${QEMU_TIMER:-200}
+  - QEMU=${QEMU:-1}
+  - OBMC_READY=${OBMC_READY:-mtjade tty}
+  - git obmc build jade
+  - OBMCBINDIR=`pwd`/${OBMCBIN}
+  - OBMCIMG=obmc-phosphor-image-mtjade.static.mtd
+  - mkdir -p ${OBMCBINDIR}
+  - cd ./jade_build/tmp/deploy/images/mtjade && cp -vf ${OBMCIMG} ${OBMCIMG}.tar ${OBMCBINDIR}
+  - cd ${OBMCBINDIR} && md5sum *
+  - >
+    if [[ "${QEMU}" = "1" ]]; then
+      obmc_qemu_docker=$(git obmc load-obmc ${OBMCIMG})
+      delay=10
+      attempt=$(( $QEMU_TIMER / ${delay} ))
+      failure=1
+      while [ ${attempt} -gt 0 ]; do
+        attempt=$(( ${attempt} - 1 ))
+        echo "Waiting for qemu to get to standby (attempt: ${attempt})..."
+        result=$(docker logs ${obmc_qemu_docker})
+        if grep -q "${OBMC_READY}" <<< ${result} ; then
+           echo "QEMU is ready!"
+           # Give QEMU a few secs to stabilize
+           sleep ${delay}
+           failure=0
+           break
+        fi
+        sleep ${delay}
+      done
+      docker container rm -f ${obmc_qemu_docker}
+      exit $failure
+    fi

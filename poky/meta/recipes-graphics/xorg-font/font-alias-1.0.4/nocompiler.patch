@@ -1,0 +1,42 @@
+From fa2bbd48a55d54bd2dae30edf7936e3ab7587c96 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 17 May 2011 23:03:02 +0000
+Subject: [PATCH] Improve handling of 'all' architecture recipes and their
+
+Upstream-Status: Inappropriate [configuration]
+
+XORG_DEFAULT_OPTIONS pulls in the following dependency chains:
+
+XORG_CWARNFLAGS -> AC_PROG_CC_C99
+XORG_STRICT_OPTION -> AC_PROG_CC_C99, XORG_CWARNFLAGS
+XORG_MANPAGE_SECTIONS -> AC_CANONICAL_HOST -> Checks host
+
+each of which triggers the use of the host compiler. As an "all"
+architecture package, it shouldn't need a compiler (and doesn't).
+
+RP 17/5/2011
+
+---
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3407c69..9fe1f89 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -27,12 +27,12 @@ AC_INIT([font-alias], [1.0.4],
+         [font-alias])
+ AM_INIT_AUTOMAKE([foreign dist-bzip2])
+ 
+-# Require xorg-macros: XORG_DEFAULT_OPTIONS
+ m4_ifndef([XORG_MACROS_VERSION],
+ 	  [m4_fatal([must install xorg-macros 1.3 or later before running autoconf/autogen])])
+ XORG_MACROS_VERSION(1.3)
+-XORG_DEFAULT_OPTIONS
+-
++XORG_RELEASE_VERSION
++XORG_CHANGELOG
++XORG_INSTALL
+ AC_PROG_INSTALL
+ 
+ # Require X.Org's font util macros 1.2 or later

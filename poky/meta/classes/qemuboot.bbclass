@@ -29,6 +29,9 @@
 # QB_AUDIO_OPT: qemu audio option, e.g., "-soundhw ac97,es1370", used
 #               when QB_AUDIO_DRV is set.
 #
+# QB_RNG: Pass-through for host random number generator, it can speedup boot
+#         in system mode, where system is experiencing entropy starvation
+#
 # QB_KERNEL_ROOT: kernel's root, e.g., /dev/vda
 #
 # QB_NETWORK_DEVICE: network device, e.g., "-device virtio-net-pci,netdev=net0,mac=@MAC@",
@@ -40,7 +43,7 @@
 #                          QB_NETWORK_DEVICE_prepend might be used, since Qemu enumerates the eth*
 #                          devices in reverse order to -device arguments.
 #
-# QB_TAP_OPT: netowrk option for 'tap' mode, e.g.,
+# QB_TAP_OPT: network option for 'tap' mode, e.g.,
 #             "-netdev tap,id=net0,ifname=@TAP@,script=no,downscript=no"
 #              Note, runqemu will replace "@TAP@" with the one which is used, such as tap0, tap1 ...
 #
@@ -77,6 +80,7 @@ QB_MEM ?= "-m 256"
 QB_SERIAL_OPT ?= "-serial mon:stdio -serial null"
 QB_DEFAULT_KERNEL ?= "${KERNEL_IMAGETYPE}"
 QB_DEFAULT_FSTYPE ?= "ext4"
+QB_RNG ?= "-object rng-random,filename=/dev/urandom,id=rng0 -device virtio-rng-pci,rng=rng0"
 QB_OPT_APPEND ?= ""
 QB_NETWORK_DEVICE ?= "-device virtio-net-pci,netdev=net0,mac=@MAC@"
 QB_CMDLINE_IP_SLIRP ?= "ip=dhcp"
@@ -85,6 +89,8 @@ QB_ROOTFS_EXTRA_OPT ?= ""
 
 # This should be kept align with ROOT_VM
 QB_DRIVE_TYPE ?= "/dev/sd"
+
+inherit image-artifact-names
 
 # Create qemuboot.conf
 addtask do_write_qemuboot_conf after do_rootfs before do_image

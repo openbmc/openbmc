@@ -178,7 +178,10 @@ python () {
 addtask do_patch after do_foo after do_unpack before do_configure before do_compile
 addtask do_fetch do_patch
 
-deltask do_fetch do_patch
+MYVAR = "do_patch"
+EMPTYVAR = ""
+deltask do_fetch ${MYVAR} ${EMPTYVAR}
+deltask ${EMPTYVAR}
 """
     def test_parse_addtask_deltask(self):
         import sys
@@ -189,6 +192,5 @@ deltask do_fetch do_patch
         self.assertTrue("addtask contained multiple 'before' keywords" in stdout)
         self.assertTrue("addtask contained multiple 'after' keywords" in stdout)
         self.assertTrue('addtask ignored: " do_patch"' in stdout)
-        self.assertTrue('deltask ignored: " do_patch"' in stdout)
         #self.assertTrue('dependent task do_foo for do_patch does not exist' in stdout)
 

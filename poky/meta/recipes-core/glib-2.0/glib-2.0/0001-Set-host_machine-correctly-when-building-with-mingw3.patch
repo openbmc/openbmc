@@ -1,4 +1,4 @@
-From d3334e83ae0da9ca184eb9c8daf0854544ece023 Mon Sep 17 00:00:00 2001
+From 333809ded70ad4e3470b7134e3fac1a42ff48e61 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 13 Feb 2019 15:32:05 +0100
 Subject: [PATCH] Set host_machine correctly when building with mingw32
@@ -14,7 +14,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  4 files changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/gio/tests/meson.build b/gio/tests/meson.build
-index dab65d2..e8bb2ee 100644
+index 3a19c82..b762835 100644
 --- a/gio/tests/meson.build
 +++ b/gio/tests/meson.build
 @@ -12,7 +12,7 @@ test_c_args = [
@@ -26,7 +26,7 @@ index dab65d2..e8bb2ee 100644
    common_gio_tests_deps += [iphlpapi_dep, winsock2, cc.find_library ('secur32')]
  endif
  
-@@ -132,7 +132,7 @@ else
+@@ -133,7 +133,7 @@ else
  endif
  
  #  Test programs buildable on UNIX only
@@ -35,7 +35,7 @@ index dab65d2..e8bb2ee 100644
    gio_tests += {
      'file' : {},
      'gdbus-peer' : {
-@@ -384,7 +384,7 @@ if host_machine.system() != 'windows'
+@@ -385,7 +385,7 @@ if host_machine.system() != 'windows'
  endif # unix
  
  #  Test programs buildable on Windows only
@@ -44,7 +44,7 @@ index dab65d2..e8bb2ee 100644
    gio_tests += {'win32-streams' : {}}
  endif
  
-@@ -454,7 +454,7 @@ if cc.get_id() != 'msvc' and cc.get_id() != 'clang-cl'
+@@ -455,7 +455,7 @@ if cc.get_id() != 'msvc' and cc.get_id() != 'clang-cl'
    }
  endif
  
@@ -54,10 +54,10 @@ index dab65d2..e8bb2ee 100644
      'gdbus-example-unix-fd-client' : {
        'install' : false,
 diff --git a/glib/tests/meson.build b/glib/tests/meson.build
-index 3dedafc..94605e6 100644
+index 6eb23e8..36eb919 100644
 --- a/glib/tests/meson.build
 +++ b/glib/tests/meson.build
-@@ -134,7 +134,7 @@ if glib_conf.has('HAVE_EVENTFD')
+@@ -137,7 +137,7 @@ if glib_conf.has('HAVE_EVENTFD')
    }
  endif
  
@@ -67,7 +67,7 @@ index 3dedafc..94605e6 100644
      glib_tests += {
        'gpoll' : {
 diff --git a/meson.build b/meson.build
-index e1b4b79..afb6eaa 100644
+index 47f3a5c..7ea7ad1 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -32,6 +32,9 @@ else
@@ -78,8 +78,8 @@ index e1b4b79..afb6eaa 100644
 +  host_system = 'windows'
 +endif
  
- glib_version = meson.project_version()
- glib_api_version = '2.0'
+ if host_system == 'darwin'
+   ios_test_code = '''#include <TargetConditionals.h>
 diff --git a/tests/meson.build b/tests/meson.build
 index 6741f8f..12fdc90 100644
 --- a/tests/meson.build

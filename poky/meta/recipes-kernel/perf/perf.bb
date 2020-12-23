@@ -26,6 +26,8 @@ PACKAGECONFIG[jvmti] = ",NO_JVMTI=1"
 PACKAGECONFIG[audit] = ",NO_LIBAUDIT=1,audit"
 PACKAGECONFIG[manpages] = ",,xmlto-native asciidoc-native"
 PACKAGECONFIG[cap] = ",,libcap"
+# Arm CoreSight
+PACKAGECONFIG[coresight] = "CORESIGHT=1,,opencsd"
 
 # libunwind is not yet ported for some architectures
 PACKAGECONFIG_remove_arc = "libunwind"
@@ -68,6 +70,7 @@ SPDX_S = "${S}/tools/perf"
 LDFLAGS="-ldl -lutil"
 
 EXTRA_OEMAKE = '\
+    V=1 \
     -C ${S}/tools/perf \
     O=${B} \
     CROSS_COMPILE=${TARGET_PREFIX} \
@@ -198,6 +201,9 @@ do_configure_prepend () {
         sed -i -e 's,\ .config-detected, $(OUTPUT)/config-detected,g' \
             ${S}/tools/perf/Makefile.perf
         sed -i -e "s,prefix='\$(DESTDIR_SQ)/usr'$,prefix='\$(DESTDIR_SQ)/usr' --install-lib='\$(DESTDIR)\$(PYTHON_SITEPACKAGES_DIR)',g" \
+            ${S}/tools/perf/Makefile.perf
+        # backport https://github.com/torvalds/linux/commit/e4ffd066ff440a57097e9140fa9e16ceef905de8
+        sed -i -e 's,\($(Q)$(SHELL) .$(arch_errno_tbl).\) $(CC) $(arch_errno_hdr_dir),\1 $(firstword $(CC)) $(arch_errno_hdr_dir),g' \
             ${S}/tools/perf/Makefile.perf
     fi
     sed -i -e "s,--root='/\$(DESTDIR_SQ)',--prefix='\$(DESTDIR_SQ)/usr' --install-lib='\$(DESTDIR)\$(PYTHON_SITEPACKAGES_DIR)',g" \

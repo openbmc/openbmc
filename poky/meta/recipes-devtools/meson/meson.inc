@@ -15,9 +15,8 @@ SRC_URI = "https://github.com/mesonbuild/meson/releases/download/${PV}/meson-${P
            file://cross-prop-default.patch \
            file://0001-modules-python.py-do-not-substitute-python-s-install.patch \
            file://0001-gnome.py-prefix-g-i-paths-with-PKG_CONFIG_SYSROOT_DI.patch \
-           file://0001-boost-Always-sort-shared-before-static-fixes-7171.patch \
            "
-SRC_URI[sha256sum] = "a7716eeae8f8dff002e4147642589ab6496ff839e4376a5aed761f83c1fa0455"
+SRC_URI[sha256sum] = "3b5741f884e04928bdfa1947467ff06afa6c98e623c25cef75adf71ca39ce080"
 
 SRC_URI_append_class-native = " \
     file://0001-Make-CPU-family-warnings-fatal.patch \

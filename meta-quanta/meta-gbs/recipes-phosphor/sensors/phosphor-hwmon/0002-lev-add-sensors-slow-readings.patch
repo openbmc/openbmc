@@ -1,0 +1,295 @@
+From 8eafa1b0513dd2f5898182487b4524a485bf1e21 Mon Sep 17 00:00:00 2001
+From: Eddielu <Eddie.Lu@quantatw.com>
+Date: Mon, 27 Jul 2020 20:54:28 +0800
+Subject: [PATCH] Update add sensors slow readings patch.
+
+---
+ mainloop.cpp | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ mainloop.hpp |  3 +++
+ meson.build  |  1 +
+ sensor.cpp   | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ sensor.hpp   | 20 ++++++++++++++--
+ 5 files changed, 158 insertions(+), 14 deletions(-)
+
+diff --git a/mainloop.cpp b/mainloop.cpp
+index 4789a80..98d0658 100644
+--- a/mainloop.cpp
++++ b/mainloop.cpp
+@@ -34,6 +34,7 @@
+ #include <cassert>
+ #include <cstdlib>
+ #include <functional>
++#include <future>
+ #include <iostream>
+ #include <memory>
+ #include <phosphor-logging/elog-errors.hpp>
+@@ -299,7 +300,7 @@ std::optional<ObjectStateData>
+     {
+         // Add status interface based on _fault file being present
+         sensorObj->addStatus(info);
+-        valueInterface = sensorObj->addValue(retryIO, info);
++        valueInterface = sensorObj->addValue(retryIO, info, _timedoutMap);
+     }
+     catch (const std::system_error& e)
+     {
+@@ -542,10 +543,74 @@ void MainLoop::read()
+                 // RAII object for GPIO unlock / lock
+                 auto locker = sensor::gpioUnlock(sensor->getGpio());
+ 
+-                // Retry for up to a second if device is busy
+-                // or has a transient error.
+-                value = _ioAccess->read(sensorSysfsType, sensorSysfsNum, input,
++                // For sensors with attribute ASYNC_READ_TIMEOUT,
++                // spawn a thread with timeout
++                auto asyncRead =
++                    env::getEnv("ASYNC_READ_TIMEOUT", sensorSetKey);
++                if (!asyncRead.empty())
++                {
++                    // Default async read timeout
++                    std::chrono::milliseconds asyncReadTimeout{
++                        std::stoi(asyncRead)};
++                    bool valueIsValid = false;
++                    std::future<int64_t> asyncThread;
++
++                    auto asyncIter = _timedoutMap.find(sensorSetKey);
++                    if (asyncIter == _timedoutMap.end())
++                    {
++                        // If sensor not found in timedoutMap, spawn an async
++                        // thread
++                        asyncThread = std::async(
++                            std::launch::async,
++                            &hwmonio::HwmonIOInterface::read, _ioAccess,
++                            sensorSysfsType, sensorSysfsNum, input,
++                            hwmonio::retries, hwmonio::delay);
++                        valueIsValid = true;
++                    }
++                    else
++                    {
++                        // If we already have the async thread in the
++                        // timedoutMap, it means this sensor has already timed
++                        // out in the previous reads. No need to wait on
++                        // subsequent reads
++                        asyncReadTimeout = std::chrono::seconds(0);
++                        asyncThread = std::move(asyncIter->second);
++                    }
++
++                    std::future_status status =
++                        asyncThread.wait_for(asyncReadTimeout);
++                    switch (status)
++                    {
++                        // Read has finished
++                        case std::future_status::ready:
++                            // Read has finished
++                            if (valueIsValid)
++                            {
++                                value = asyncThread.get();
++                                break;
++                                // Good sensor reads should skip the code below
++                            }
++                            // Async read thread has completed, erase from
++                            // timedoutMap to allow retry then throw
++                            _timedoutMap.erase(sensorSetKey);
++                            throw sensor::AsyncSensorReadTimeOut();
++                        default:
++                            // Read timed out so add the thread to the
++                            // timedoutMap (if the entry already exists,
++                            // operator[] updates it)
++                            _timedoutMap[sensorSetKey] = std::move(asyncThread);
++                            throw sensor::AsyncSensorReadTimeOut();
++                    }
++                }
++                else
++                {
++                    // Retry for up to a second if device is busy
++                    // or has a transient error.
++                    value =
++                        _ioAccess->read(sensorSysfsType, sensorSysfsNum, input,
+                                         hwmonio::retries, hwmonio::delay);
++                }
++
+                 // Set functional property to true if we could read sensor
+                 statusIface->functional(true);
+ 
+diff --git a/mainloop.hpp b/mainloop.hpp
+index b3de022..6803c4b 100644
+--- a/mainloop.hpp
++++ b/mainloop.hpp
+@@ -9,6 +9,7 @@
+ #include "types.hpp"
+ 
+ #include <any>
++#include <future>
+ #include <memory>
+ #include <optional>
+ #include <sdbusplus/server.hpp>
+@@ -116,6 +117,8 @@ class MainLoop
+     /** @brief Store the specifications of sensor objects */
+     std::map<SensorSet::key_type, std::unique_ptr<sensor::Sensor>>
+         _sensorObjects;
++    /** @brief Store the async futures of timed out sensor objects */
++    std::map<SensorSet::key_type, std::future<int64_t>> _timedoutMap;
+ 
+     /**
+      * @brief Map of removed sensors
+diff --git a/meson.build b/meson.build
+index 66e6801..d6a92f8 100644
+--- a/meson.build
++++ b/meson.build
+@@ -84,6 +84,7 @@ libhwmon_all = static_library(
+         gpioplus,
+         phosphor_dbus_interfaces,
+         phosphor_logging,
++        threads,
+     ],
+     link_with: [
+         libaverage,
+diff --git a/sensor.cpp b/sensor.cpp
+index b1cb470..72b45f8 100644
+--- a/sensor.cpp
++++ b/sensor.cpp
+@@ -15,6 +15,7 @@
+ #include <cmath>
+ #include <cstring>
+ #include <filesystem>
++#include <future>
+ #include <phosphor-logging/elog-errors.hpp>
+ #include <thread>
+ #include <xyz/openbmc_project/Common/error.hpp>
+@@ -125,8 +126,9 @@ SensorValueType Sensor::adjustValue(SensorValueType value)
+     return value;
+ }
+ 
+-std::shared_ptr<ValueObject> Sensor::addValue(const RetryIO& retryIO,
+-                                              ObjectInfo& info)
++std::shared_ptr<ValueObject> Sensor::addValue(
++    const RetryIO& retryIO, ObjectInfo& info,
++    std::map<SensorSet::key_type, std::future<int64_t>>& timedoutMap)
+ {
+     static constexpr bool deferSignals = true;
+ 
+@@ -153,12 +155,69 @@ std::shared_ptr<ValueObject> Sensor::addValue(const RetryIO& retryIO,
+             // RAII object for GPIO unlock / lock
+             auto locker = gpioUnlock(getGpio());
+ 
+-            // Retry for up to a second if device is busy
+-            // or has a transient error.
+-            val =
+-                _ioAccess->read(_sensor.first, _sensor.second,
+-                                hwmon::entry::cinput, std::get<size_t>(retryIO),
+-                                std::get<std::chrono::milliseconds>(retryIO));
++            // For sensors with attribute ASYNC_READ_TIMEOUT,
++            // spawn a thread with timeout
++            auto asyncRead = env::getEnv("ASYNC_READ_TIMEOUT", _sensor);
++            if (!asyncRead.empty())
++            {
++                // Default async read timeout
++                std::chrono::milliseconds asyncReadTimeout{
++                    std::stoi(asyncRead)};
++                bool valueIsValid = false;
++                std::future<int64_t> asyncThread;
++
++                auto asyncIter = timedoutMap.find(_sensor);
++                if (asyncIter == timedoutMap.end())
++                {
++                    // If sensor not found in timedoutMap, spawn an async thread
++                    asyncThread = std::async(
++                        std::launch::async, &hwmonio::HwmonIOInterface::read,
++                        _ioAccess, _sensor.first, _sensor.second,
++                        hwmon::entry::cinput, std::get<size_t>(retryIO),
++                        std::get<std::chrono::milliseconds>(retryIO));
++                    valueIsValid = true;
++                }
++                else
++                {
++                    // If we already have the async thread in the timedoutMap,
++                    // it means this sensor has already timed out in the
++                    // previous reads. No need to wait on subsequent reads
++                    asyncReadTimeout = std::chrono::seconds(0);
++                    asyncThread = std::move(asyncIter->second);
++                }
++
++                std::future_status status =
++                    asyncThread.wait_for(asyncReadTimeout);
++                switch (status)
++                {
++                    case std::future_status::ready:
++                        // Read has finished
++                        if (valueIsValid)
++                        {
++                            val = asyncThread.get();
++                            break;
++                            // Good sensor reads should skip the code below
++                        }
++                        // Async read thread has completed, erase from
++                        // timedoutMap to allow retry then throw
++                        timedoutMap.erase(_sensor);
++                        throw AsyncSensorReadTimeOut();
++                    default:
++                        // Read timed out so add the thread to the timedoutMap
++                        // (if the entry already exists, operator[] updates it)
++                        timedoutMap[_sensor] = std::move(asyncThread);
++                        throw AsyncSensorReadTimeOut();
++                }
++            }
++            else
++            {
++                // Retry for up to a second if device is busy
++                // or has a transient error.
++                val = _ioAccess->read(
++                    _sensor.first, _sensor.second, hwmon::entry::cinput,
++                    std::get<size_t>(retryIO),
++                    std::get<std::chrono::milliseconds>(retryIO));
++            }
+         }
+ #ifdef UPDATE_FUNCTIONAL_ON_FAIL
+         catch (const std::system_error& e)
+diff --git a/sensor.hpp b/sensor.hpp
+index 369a252..41c0fe7 100644
+--- a/sensor.hpp
++++ b/sensor.hpp
+@@ -4,6 +4,8 @@
+ #include "sensorset.hpp"
+ #include "types.hpp"
+ 
++#include <cerrno>
++#include <future>
+ #include <gpioplus/handle.hpp>
+ #include <memory>
+ #include <optional>
+@@ -20,6 +22,17 @@ struct valueAdjust
+     std::unordered_set<int> rmRCs;
+ };
+ 
++/** @brief Custom exception for async sensor reading timeout
++ */
++struct AsyncSensorReadTimeOut : public std::system_error
++{
++    AsyncSensorReadTimeOut() :
++        system_error(std::error_code(ETIMEDOUT, std::system_category()),
++                     "Async sensor read timed out")
++    {
++    }
++};
++
+ /** @class Sensor
+  *  @brief Sensor object based on a SensorSet container's key type
+  *  @details Sensor object to create and modify an associated device's sensor
+@@ -87,10 +100,13 @@ class Sensor
+      *                      (number of and delay between)
+      * @param[in] info - Sensor object information
+      *
++     * @param[in] timedoutMap - Map to track timed out threads
++     *
+      * @return - Shared pointer to the value object
+      */
+-    std::shared_ptr<ValueObject> addValue(const RetryIO& retryIO,
+-                                          ObjectInfo& info);
++    std::shared_ptr<ValueObject> addValue(
++        const RetryIO& retryIO, ObjectInfo& info,
++        std::map<SensorSet::key_type, std::future<int64_t>>& timedoutMap);
+ 
+     /**
+      * @brief Add status interface and functional property for sensor
+-- 
+2.7.4
+

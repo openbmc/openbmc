@@ -1,5 +1,5 @@
 SUMMARY = "New GNU Portable Threads library"
-HOMEPAGE = "http://www.gnupg.org/software/pth/"
+HOMEPAGE = "https://www.gnu.org/software/pth/"
 SECTION = "libs"
 LICENSE = "LGPLv2+"
 LIC_FILES_CHKSUM = "\
@@ -15,7 +15,7 @@ SRC_URI[sha256sum] = "1393abd9adcf0762d34798dc34fdcf4d0d22a8410721e76f1e3afcd1da
 
 BINCONFIG = "${bindir}/npth-config"
 
-inherit autotools binconfig-disabled multilib_header 
+inherit autotools binconfig-disabled multilib_header
 
 FILES_${PN} = "${libdir}/libnpth.so.*"
 FILES_${PN}-dev += "${bindir}/npth-config"

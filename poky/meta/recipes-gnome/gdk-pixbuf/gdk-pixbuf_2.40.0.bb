@@ -5,7 +5,7 @@ loading (ie. animated GIFs)"
 HOMEPAGE = "https://wiki.gnome.org/Projects/GdkPixbuf"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/gdk-pixbuf/issues"
 
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
                     file://gdk-pixbuf/gdk-pixbuf.h;endline=26;md5=72b39da7cbdde2e665329fef618e1d6b \
                     "
@@ -40,20 +40,20 @@ inherit meson pkgconfig gettext pixbufcache ptest-gnome upstream-version-is-even
 
 GIR_MESON_OPTION = 'gir'
 
-EXTRA_OEMESON_append = " ${@bb.utils.contains('PTEST_ENABLED', '1', '-Dinstalled_tests=true', '-Dinstalled_tests=false', d)}"
-
 LIBV = "2.10.0"
 
 GDK_PIXBUF_LOADERS ?= "png jpeg"
 
-PACKAGECONFIG = "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)} ${GDK_PIXBUF_LOADERS}"
+PACKAGECONFIG = "${GDK_PIXBUF_LOADERS} \
+                 ${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)} \
+                 ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)}"
 PACKAGECONFIG_class-native = "${GDK_PIXBUF_LOADERS}"
 
 PACKAGECONFIG[png] = "-Dpng=true,-Dpng=false,libpng"
 PACKAGECONFIG[jpeg] = "-Djpeg=true,-Djpeg=false,jpeg"
 PACKAGECONFIG[tiff] = "-Dtiff=true,-Dtiff=false,tiff"
 PACKAGECONFIG[jpeg2000] = "-Djasper=true,-Djasper=false,jasper"
-
+PACKAGECONFIG[tests] = "-Dinstalled_tests=true,-Dinstalled_tests=false"
 PACKAGECONFIG[x11] = "-Dx11=true,-Dx11=false,virtual/libx11"
 
 PACKAGES =+ "${PN}-xlib"

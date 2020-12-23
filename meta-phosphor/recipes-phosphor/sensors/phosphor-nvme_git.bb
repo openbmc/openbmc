@@ -15,7 +15,7 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "nlohmann-json"
 
 SRC_URI = "git://github.com/openbmc/phosphor-nvme.git;protocol=git"
-SRCREV = "188ad95e369c8cad47bda4a100d74cec71a8e8ad"
+SRCREV = "9b771e221e3854bbbf45a56bbcab97c62b0a05ec"
 S = "${WORKDIR}/git"
 
 SYSTEMD_SERVICE_${PN} = "xyz.openbmc_project.nvme.manager.service"

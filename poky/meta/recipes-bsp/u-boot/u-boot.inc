@@ -70,16 +70,6 @@ UBOOT_EXTLINUX_INSTALL_DIR ?= "/boot/extlinux"
 UBOOT_EXTLINUX_CONF_NAME ?= "extlinux.conf"
 UBOOT_EXTLINUX_SYMLINK ?= "${UBOOT_EXTLINUX_CONF_NAME}-${MACHINE}-${PR}"
 
-# returns all the elements from the src uri that are .cfg files
-def find_cfgs(d):
-    sources=src_patches(d, True)
-    sources_list=[]
-    for s in sources:
-        if s.endswith('.cfg'):
-            sources_list.append(s)
-
-    return sources_list
-
 do_configure () {
     if [ -n "${UBOOT_CONFIG}" ]; then
         unset i j
@@ -89,7 +79,7 @@ do_configure () {
                 j=$(expr $j + 1);
                 if [ $j -eq $i ]; then
                     oe_runmake -C ${S} O=${B}/${config} ${config}
-                    if [ test -n "${@' '.join(find_cfgs(d))}" ]; then
+                    if [ -n "${@' '.join(find_cfgs(d))}" ]; then
                         merge_config.sh -m -O ${B}/${config} ${B}/${config}/.config ${@" ".join(find_cfgs(d))}
                         oe_runmake -C ${S} O=${B}/${config} oldconfig
                     fi

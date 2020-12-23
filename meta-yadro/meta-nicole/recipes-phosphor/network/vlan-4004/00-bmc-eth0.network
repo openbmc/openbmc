@@ -1,9 +1,0 @@
-[Match]
-Name=eth0
-[Network]
-VLAN=eth0.4004
-DHCP=true
-LinkLocalAddressing=yes
-IPv6AcceptRA=false
-[DHCP]
-ClientIdentifier=mac

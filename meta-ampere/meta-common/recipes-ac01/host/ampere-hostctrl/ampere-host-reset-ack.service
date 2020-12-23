@@ -6,5 +6,5 @@ OnFailure=obmc-chassis-powerreset@0.target
 [Service]
 RemainAfterExit=no
 Type=oneshot
-ExecStart=/usr/bin/env ampere_power_util.sh mb cycle
+ExecStart=/usr/bin/env ampere_power_util.sh mb force_reset
 SyslogIdentifier=ampere_power_util.sh

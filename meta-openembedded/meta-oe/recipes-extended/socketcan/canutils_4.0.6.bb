@@ -12,9 +12,17 @@ SRC_URI = "git://git.pengutronix.de/git/tools/canutils.git;protocol=git \
     file://0001-canutils-candump-Add-error-frame-s-handling.patch \
 "
 
+inherit update-alternatives
+
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
 
 # Busybox ip doesn't support can interface configuration, use the real thing
 RDEPENDS_${PN} += "iproute2"
+
+ALTERNATIVE_PRIORITY = "90"
+ALTERNATIVE_${PN} = "candump cansend cansequence"
+ALTERNATIVE_LINK_NAME[candump] = "${bindir}/candump"
+ALTERNATIVE_LINK_NAME[cansend] = "${bindir}/cansend"
+ALTERNATIVE_LINK_NAME[cansequence] = "${bindir}/cansequence"

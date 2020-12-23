@@ -9,14 +9,13 @@ SRC_URI = " \
     git://repo.or.cz/r/git2cl.git;protocol=http;destsuffix=tools/git2cl;name=git2cl \
     git://repo.or.cz/r/jimtcl.git;protocol=http;destsuffix=git/jimtcl;name=jimtcl \
     git://repo.or.cz/r/libjaylink.git;protocol=http;destsuffix=git/src/jtag/drivers/libjaylink;name=libjaylink \
-    file://0001-Do-not-include-syscrtl.h-with-glibc.patch \
 "
 
 SRCREV_FORMAT = "openocd"
-SRCREV_openocd = "ded67990255cc1e63c77832ffd6e6bef9120873d"
+SRCREV_openocd = "d46f28c2ea2611f5fbbc679a5eed253d3dcd2fe3"
 SRCREV_git2cl = "8373c9f74993e218a08819cbcdbab3f3564bbeba"
-SRCREV_jimtcl = "dc4ba7770d580800634f90b67a24e077b4a26d98"
-SRCREV_libjaylink = "3322dfa5e7aa56f5b12b7f2197e3e6b850b7b66e"
+SRCREV_jimtcl = "0aa0fb4e3a38d38a49de9eb585d93d63a370dcf6"
+SRCREV_libjaylink = "9aa7a5957c07bb6e862fc1a6d3153d109c7407e4"
 
 PV = "0.10+gitr${SRCPV}"
 S = "${WORKDIR}/git"

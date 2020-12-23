@@ -3,15 +3,42 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import asyncio
 from contextlib import closing
 import re
 import sqlite3
+import itertools
+import json
 
 UNIX_PREFIX = "unix://"
 
 ADDR_TYPE_UNIX = 0
 ADDR_TYPE_TCP = 1
 
+# The Python async server defaults to a 64K receive buffer, so we hardcode our
+# maximum chunk size. It would be better if the client and server reported to
+# each other what the maximum chunk sizes were, but that will slow down the
+# connection setup with a round trip delay so I'd rather not do that unless it
+# is necessary
+DEFAULT_MAX_CHUNK = 32 * 1024
+
+TABLE_DEFINITION = (
+    ("method", "TEXT NOT NULL"),
+    ("outhash", "TEXT NOT NULL"),
+    ("taskhash", "TEXT NOT NULL"),
+    ("unihash", "TEXT NOT NULL"),
+    ("created", "DATETIME"),
+
+    # Optional fields
+    ("owner", "TEXT"),
+    ("PN", "TEXT"),
+    ("PV", "TEXT"),
+    ("PR", "TEXT"),
+    ("task", "TEXT"),
+    ("outhash_siginfo", "TEXT"),
+)
+
+TABLE_COLUMNS = tuple(name for name, _ in TABLE_DEFINITION)
 
 def setup_database(database, sync=True):
     db = sqlite3.connect(database)
@@ -21,23 +48,10 @@ def setup_database(database, sync=True):
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS tasks_v2 (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                method TEXT NOT NULL,
-                outhash TEXT NOT NULL,
-                taskhash TEXT NOT NULL,
-                unihash TEXT NOT NULL,
-                created DATETIME,
-
-                -- Optional fields
-                owner TEXT,
-                PN TEXT,
-                PV TEXT,
-                PR TEXT,
-                task TEXT,
-                outhash_siginfo TEXT,
-
+                %s
                 UNIQUE(method, outhash, taskhash)
                 )
-            ''')
+            ''' % " ".join("%s %s," % (name, typ) for name, typ in TABLE_DEFINITION))
         cursor.execute('PRAGMA journal_mode = WAL')
         cursor.execute('PRAGMA synchronous = %s' % ('NORMAL' if sync else 'OFF'))
 
@@ -66,10 +80,24 @@ def parse_address(addr):
         return (ADDR_TYPE_TCP, (host, int(port)))
 
 
-def create_server(addr, dbname, *, sync=True):
+def chunkify(msg, max_chunk):
+    if len(msg) < max_chunk - 1:
+        yield ''.join((msg, "\n"))
+    else:
+        yield ''.join((json.dumps({
+                'chunk-stream': None
+            }), "\n"))
+
+        args = [iter(msg)] * (max_chunk - 1)
+        for m in map(''.join, itertools.zip_longest(*args, fillvalue='')):
+            yield ''.join(itertools.chain(m, "\n"))
+        yield "\n"
+
+
+def create_server(addr, dbname, *, sync=True, upstream=None):
     from . import server
     db = setup_database(dbname, sync=sync)
-    s = server.Server(db)
+    s = server.Server(db, upstream=upstream)
 
     (typ, a) = parse_address(addr)
     if typ == ADDR_TYPE_UNIX:
@@ -89,5 +117,17 @@ def create_client(addr):
         c.connect_unix(*a)
     else:
         c.connect_tcp(*a)
+
+    return c
+
+async def create_async_client(addr):
+    from . import client
+    c = client.AsyncClient()
+
+    (typ, a) = parse_address(addr)
+    if typ == ADDR_TYPE_UNIX:
+        await c.connect_unix(*a)
+    else:
+        await c.connect_tcp(*a)
 
     return c

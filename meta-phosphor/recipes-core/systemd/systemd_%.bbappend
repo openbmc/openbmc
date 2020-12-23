@@ -25,3 +25,5 @@ ALTERNATIVE_${PN} += "init"
 ALTERNATIVE_TARGET[init] = "${rootlibexecdir}/systemd/systemd"
 ALTERNATIVE_LINK_NAME[init] = "${base_sbindir}/init"
 ALTERNATIVE_PRIORITY[init] ?= "300"
+
+RRECOMMENDS_${PN}_append_openbmc-phosphor = " phosphor-systemd-policy"

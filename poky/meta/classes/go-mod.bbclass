@@ -12,7 +12,7 @@
 
 # The '-modcacherw' option ensures we have write access to the cached objects so
 # we avoid errors during clean task as well as when removing the TMPDIR.
-export GOBUILDFLAGS ?= "-v ${GO_LDFLAGS} -modcacherw"
+GOBUILDFLAGS_append = " -modcacherw"
 
 inherit go
 

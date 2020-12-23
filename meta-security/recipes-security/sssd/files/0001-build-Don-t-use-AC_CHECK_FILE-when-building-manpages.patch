@@ -1,0 +1,34 @@
+From d54aa109600bcd02bf72cfe64c01935890a102a1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonatan=20P=C3=A5lsson?= <jonatan.p@gmail.com>
+Date: Fri, 21 Aug 2020 14:45:10 +0200
+Subject: [PATCH] build: Don't use AC_CHECK_FILE when building manpages
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+AC_CHECK_FILE does not support cross-compilation, and will only check
+the host rootfs. Replace AC_CHECK_FILE with a 'test -f <FILE>' instead,
+to allow building manpages when cross-compiling.
+
+Upstream-status: Submitted [https://github.com/SSSD/sssd/pull/5289]
+Signed-off-by: Jonatan Pålsson <jonatan.p@gmail.com>
+---
+ src/external/docbook.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/external/docbook.m4 b/src/external/docbook.m4
+index deb8632fa..acdc89a68 100644
+--- a/src/external/docbook.m4
++++ b/src/external/docbook.m4
+@@ -18,7 +18,7 @@ dnl Checks if the XML catalog given by FILE exists and
+ dnl if a particular URI appears in the XML catalog
+ AC_DEFUN([CHECK_STYLESHEET],
+ [
+-  AC_CHECK_FILE($1, [], [AC_MSG_ERROR([could not find XML catalog])])
++  AS_IF([test -f "$1"], [], [AC_MSG_ERROR([could not find XML catalog])])
+ 
+   AC_MSG_CHECKING([for ifelse([$3],,[$2],[$3]) in XML catalog])
+   if AC_RUN_LOG([$XSLTPROC --catalogs --nonet --noout "$2" >&2]); then
+-- 
+2.26.1
+

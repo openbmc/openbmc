@@ -16,7 +16,8 @@ inherit autotools binconfig-disabled multilib_header pkgconfig
 SRC_URI = "git://salsa.debian.org/debian/ncurses.git;protocol=https"
 
 EXTRA_AUTORECONF = "-I m4"
-CONFIG_SITE =+ "${WORKDIR}/config.cache"
+
+CACHED_CONFIGUREVARS = "cf_cv_func_nanosleep=yes"
 
 EXTRASITECONFIG = "CFLAGS='${CFLAGS} -I${SYSROOT_DESTDIR}${includedir}'"
 
@@ -272,6 +273,11 @@ inherit update-alternatives
 ALTERNATIVE_PRIORITY = "100"
 
 ALTERNATIVE_ncurses-tools_class-target = "clear reset"
+ALTERNATIVE_ncurses-terminfo_class-target = "st st-256color"
+
+ALTERNATIVE_LINK_NAME[st] = "${datadir}/terminfo/s/st"
+
+ALTERNATIVE_LINK_NAME[st-256color] = "${datadir}/terminfo/s/st-256color"
 
 BBCLASSEXTEND = "native nativesdk"
 

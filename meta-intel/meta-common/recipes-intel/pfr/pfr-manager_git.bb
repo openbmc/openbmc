@@ -8,7 +8,7 @@ inherit cmake systemd
 SRC_URI = "git://github.com/openbmc/pfr-manager"
 
 PV = "0.1+git${SRCPV}"
-SRCREV = "019ad89d45eb953746766143f55f683f4b8b3d8d"
+SRCREV = "0884191b6478bdd787852ab9d290caaeb7816454"
 
 S = "${WORKDIR}/git"
 
@@ -19,4 +19,5 @@ DEPENDS += " \
     phosphor-logging \
     boost \
     i2c-tools \
+    libgpiod \
     "

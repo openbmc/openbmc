@@ -31,11 +31,11 @@ Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
  networking/udhcp/dhcpc.c                       | 29 ++++++++++++++++------
  1 file changed, 21 insertions(+), 8 deletions(-)
 
-Index: busybox-1.31.0/networking/udhcp/dhcpc.c
+Index: busybox-1.32.0/networking/udhcp/dhcpc.c
 ===================================================================
---- busybox-1.31.0.orig/networking/udhcp/dhcpc.c
-+++ busybox-1.31.0/networking/udhcp/dhcpc.c
-@@ -48,6 +48,8 @@
+--- busybox-1.32.0.orig/networking/udhcp/dhcpc.c
++++ busybox-1.32.0/networking/udhcp/dhcpc.c
+@@ -48,6 +48,8 @@ struct tpacket_auxdata {
  };
  #endif
  
@@ -55,7 +55,7 @@ Index: busybox-1.31.0/networking/udhcp/dhcpc.c
  	USE_FOR_MMU(             OPTBIT_b,)
  	IF_FEATURE_UDHCPC_ARPING(OPTBIT_a,)
  	IF_FEATURE_UDHCP_PORT(   OPTBIT_P,)
-@@ -1124,7 +1128,8 @@
+@@ -1084,7 +1088,8 @@
  		client_data.state = RENEW_REQUESTED;
  		break;
  	case RENEW_REQUESTED: /* impatient are we? fine, square 1 */
@@ -65,7 +65,7 @@ Index: busybox-1.31.0/networking/udhcp/dhcpc.c
  	case REQUESTING:
  	case RELEASED:
  		change_listen_mode(LISTEN_RAW);
-@@ -1160,7 +1165,8 @@
+@@ -1120,7 +1125,8 @@ static void perform_release(uint32_t server_addr, uint32_t requested_ip)
   * Users requested to be notified in all cases, even if not in one
   * of the states above.
   */
@@ -75,7 +75,7 @@ Index: busybox-1.31.0/networking/udhcp/dhcpc.c
  
  	change_listen_mode(LISTEN_NONE);
  	client_data.state = RELEASED;
-@@ -1278,7 +1284,7 @@
+@@ -1238,7 +1244,7 @@
  	/* Parse command line */
  	opt = getopt32long(argv, "^"
  		/* O,x: list; -T,-t,-A take numeric param */
@@ -84,7 +84,7 @@ Index: busybox-1.31.0/networking/udhcp/dhcpc.c
  		USE_FOR_MMU("b")
  		IF_FEATURE_UDHCPC_ARPING("a::")
  		IF_FEATURE_UDHCP_PORT("P:")
-@@ -1389,6 +1395,10 @@
+@@ -1349,6 +1355,10 @@
  		logmode |= LOGMODE_SYSLOG;
  	}
  
@@ -95,7 +95,7 @@ Index: busybox-1.31.0/networking/udhcp/dhcpc.c
  	/* Create pidfile */
  	write_pidfile(client_data.pidfile);
  	/* Goes to stdout (unless NOMMU) and possibly syslog */
-@@ -1397,7 +1407,8 @@
+@@ -1357,7 +1367,8 @@
  	srand(monotonic_us());
  
  	client_data.state = INIT_SELECTING;
@@ -105,17 +105,17 @@ Index: busybox-1.31.0/networking/udhcp/dhcpc.c
  	change_listen_mode(LISTEN_RAW);
  	packet_num = 0;
  	timeout = 0;
-@@ -1570,7 +1581,8 @@
+@@ -1530,7 +1541,8 @@
  				}
  				/* Timed out, enter init state */
- 				bb_info_msg("lease lost, entering init state");
+ 				bb_simple_info_msg("lease lost, entering init state");
 -				udhcp_run_script(NULL, "deconfig");
 +				if (allow_deconfig)
 +					udhcp_run_script(NULL, "deconfig");
  				client_data.state = INIT_SELECTING;
  				client_data.first_secs = 0; /* make secs field count from 0 */
  				/*timeout = 0; - already is */
-@@ -1762,8 +1774,10 @@
+@@ -1722,8 +1734,10 @@
  							"(got ARP reply), declining");
  						send_decline(/*xid,*/ server_addr, packet.yiaddr);
  
@@ -128,7 +128,7 @@ Index: busybox-1.31.0/networking/udhcp/dhcpc.c
  						change_listen_mode(LISTEN_RAW);
  						client_data.state = INIT_SELECTING;
  						client_data.first_secs = 0; /* make secs field count from 0 */
-@@ -1832,8 +1846,10 @@
+@@ -1792,8 +1806,10 @@
  				/* return to init state */
  				bb_info_msg("received %s", "DHCP NAK");
  				udhcp_run_script(&packet, "nak");

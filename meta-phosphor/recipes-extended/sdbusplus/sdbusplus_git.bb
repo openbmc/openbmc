@@ -18,3 +18,8 @@ DEPENDS += " \
         googletest \
         systemd \
         "
+
+EXTRA_OEMESON += " \
+        -Dtests=disabled \
+        -Dexamples=disabled \
+        "

@@ -177,13 +177,19 @@ def deploy(args, config, basepath, workspace):
                         rd.getVar('base_libdir'), rd)
 
         filelist = []
+        inodes = set({})
         ftotalsize = 0
         for root, _, files in os.walk(recipe_outdir):
             for fn in files:
+                fstat = os.lstat(os.path.join(root, fn))
                 # Get the size in kiB (since we'll be comparing it to the output of du -k)
                 # MUST use lstat() here not stat() or getfilesize() since we don't want to
                 # dereference symlinks
-                fsize = int(math.ceil(float(os.lstat(os.path.join(root, fn)).st_size)/1024))
+                if fstat.st_ino in inodes:
+                    fsize = 0
+                else:
+                    fsize = int(math.ceil(float(fstat.st_size)/1024))
+                inodes.add(fstat.st_ino)
                 ftotalsize += fsize
                 # The path as it would appear on the target
                 fpath = os.path.join(destdir, os.path.relpath(root, recipe_outdir), fn)

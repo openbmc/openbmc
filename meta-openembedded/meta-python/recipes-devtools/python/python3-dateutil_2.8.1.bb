@@ -22,4 +22,4 @@ RDEPENDS_${PN} = "\
     ${PYTHON_PN}-stringold \
 "
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

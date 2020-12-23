@@ -15,7 +15,6 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-openpower \
   ##OEROOT##/meta-facebook \
   ##OEROOT##/meta-facebook/meta-tiogapass \
   "
@@ -29,7 +28,6 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-openpower \
   ##OEROOT##/meta-facebook \
   ##OEROOT##/meta-facebook/meta-tiogapass \
   "

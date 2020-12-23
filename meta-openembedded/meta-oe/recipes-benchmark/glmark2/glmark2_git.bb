@@ -14,8 +14,7 @@ PV = "20191226+${SRCPV}"
 
 COMPATIBLE_HOST_rpi  = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '.*-linux*', 'null', d)}"
 
-SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https \
-           file://python3.patch"
+SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https"
 SRCREV = "72dabc5d72b49c6d45badeb8a941ba4d829b0bd6"
 
 S = "${WORKDIR}/git"
@@ -24,9 +23,9 @@ inherit waf pkgconfig features_check
 
 REQUIRED_DISTRO_FEATURES += "opengl"
 
-PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'x11-gl x11-gles2', '', d)} \
-                  ${@bb.utils.contains('DISTRO_FEATURES', 'wayland opengl', 'wayland-gl wayland-gles2', '', d)} \
-                  drm-gl drm-gles2"
+PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'x11-gles2', '', d)} \
+                  ${@bb.utils.contains('DISTRO_FEATURES', 'wayland opengl', 'wayland-gles2', '', d)} \
+                  drm-gles2"
 
 PACKAGECONFIG[x11-gl] = ",,virtual/libgl virtual/libx11"
 PACKAGECONFIG[x11-gles2] = ",,virtual/libgles2 virtual/libx11"

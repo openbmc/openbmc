@@ -19,8 +19,6 @@ add_definitions (-DBOOST_ASIO_DISABLE_THREADS)
 add_executable (ampere-host-state ampere-host-state.cpp)
 target_link_libraries (ampere-host-state systemd sdbusplus -lsystemd gpiodcxx)
 install (TARGETS ampere-host-state DESTINATION bin)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-rtti")
 
 # service file
 set (

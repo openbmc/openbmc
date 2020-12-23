@@ -1,21 +1,28 @@
 SUMMARY = "Free peer-reviewed portable C++ source libraries"
 SECTION = "libs"
-DEPENDS = "bjam-native zlib bzip2"
+DEPENDS = "boost-build-native zlib bzip2"
 
 CVE_PRODUCT = "boost:boost"
 
 ARM_INSTRUCTION_SET_armv4 = "arm"
 ARM_INSTRUCTION_SET_armv5 = "arm"
 
+B = "${WORKDIR}/build"
+do_configure[cleandirs] = "${B}"
+
 BOOST_LIBS = "\
 	atomic \
 	chrono \
 	container \
+	context \
 	contract \
+	coroutine \
 	date_time \
 	exception \
+	fiber \
 	filesystem \
 	graph \
+	headers \
 	iostreams \
 	log \
 	math \
@@ -24,22 +31,12 @@ BOOST_LIBS = "\
 	regex \
 	serialization \
 	system \
-	timer \
 	test \
 	thread \
+	timer \
+	type_erasure \
 	wave \
 	"
-
-# only supported by x86 and powerpc
-BOOST_LIBS_append_x86 = " context coroutine"
-BOOST_LIBS_append_x86-64 = " context coroutine"
-BOOST_LIBS_append_powerpc = " context coroutine"
-BOOST_LIBS_append_arm = " context coroutine"
-BOOST_LIBS_append_aarch64 = " context coroutine"
-# need consistent settings for native builds (x86 override not applied for native)
-BOOST_LIBS_remove_class-native = " context coroutine"
-# does not compile
-BOOST_LIBS_remove_mips16e = "wave"
 
 # optional libraries
 PACKAGECONFIG ??= "locale python"
@@ -146,7 +143,7 @@ BOOST_PARALLEL_MAKE = "${@oe.utils.parallel_make_argument(d, '-j%d')}"
 BJAM_OPTS    = '${BOOST_PARALLEL_MAKE} -d+2 -q \
 		${BJAM_TOOLS} \
 		-sBOOST_BUILD_USER_CONFIG=${WORKDIR}/user-config.jam \
-		--build-dir=${S}/${TARGET_SYS} \
+		--build-dir=${B} \
 		--disable-icu \
 		${BJAM_EXTRA}'
 
@@ -161,11 +158,12 @@ BJAM_OPTS_append_arm = " abi=aapcs architecture=arm"
 BJAM_OPTS_append_aarch64 = " abi=aapcs address-model=64 architecture=arm"
 
 do_configure() {
+	cd ${S}
 	cp -f ${S}/boost/config/platform/linux.hpp ${S}/boost/config/platform/linux-gnueabi.hpp
 
 	# D2194:Fixing the failure of "error: duplicate initialization of gcc with the following parameters" during compilation.
 	rm -f ${WORKDIR}/user-config.jam
-	echo 'using gcc : 4.3.1 : ${CXX} : <cflags>"${CFLAGS}" <cxxflags>"${CXXFLAGS}" <linkflags>"${LDFLAGS}" ;' >> ${WORKDIR}/user-config.jam
+	echo 'using gcc : : ${CXX} : <cflags>"${CFLAGS}" <cxxflags>"${CXXFLAGS}" <linkflags>"${LDFLAGS}" ;' >> ${WORKDIR}/user-config.jam
 
 	# If we want Python then we need to tell Boost *exactly* where to find it
 	if ${@bb.utils.contains('BOOST_LIBS', 'python', 'true', 'false', d)}; then
@@ -176,7 +174,7 @@ do_configure() {
 		echo "using mpi : : <find-shared-library>mpi ;" >> ${WORKDIR}/user-config.jam
 	fi
 
-	CC="${BUILD_CC}" CFLAGS="${BUILD_CFLAGS}" ./bootstrap.sh --with-bjam=bjam --with-toolset=gcc
+	CC="${BUILD_CC}" CFLAGS="${BUILD_CFLAGS}" ./bootstrap.sh --with-bjam=b2 --with-toolset=gcc
 
 	# Boost can't be trusted to find Python on it's own, so remove any mention
 	# of it from the boost configuration
@@ -184,8 +182,9 @@ do_configure() {
 }
 
 do_compile() {
-	rm -rf ${S}/${TARGET_SYS}
-	bjam ${BJAM_OPTS} --prefix=${prefix} \
+	cd ${S}
+	b2 ${BJAM_OPTS} \
+		--prefix=${prefix} \
 		--exec-prefix=${exec_prefix} \
 		--libdir=${libdir} \
 		--includedir=${includedir} \
@@ -193,7 +192,8 @@ do_compile() {
 }
 
 do_install() {
-	bjam ${BJAM_OPTS} \
+	cd ${S}
+	b2 ${BJAM_OPTS} \
 		--libdir=${D}${libdir} \
 		--includedir=${D}${includedir} \
 		install

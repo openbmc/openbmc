@@ -12,11 +12,21 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}
 
 DEPENDS = "libnl libconfig readline"
 
-SRCREV = "36d729de7ce5b56cf061d94d610cf0510154820c"
+SRCREV = "b71bfb87fefb31c4b1a6a7ae351791c90966c3a8"
+PV .= "+git${SRCPV}"
 SRC_URI = "git://github.com/intel/openlldp.git;protocol=https;branch=master \
            file://0001-Fix-musl-libc-build-issue.patch \
            file://0001-autotools-Add-include-path-to-generated-version.h.patch \
            file://0001-autotools-Add-option-to-disable-installation-of-syst.patch \
+           file://0001-cmds-fix-enum-conversion.patch \
+           file://0002-lldp_head-rename-and-make-extern.patch \
+           file://0003-lldp-add-packed-struct-definition.patch \
+           file://0004-lldptool-make-extern.patch \
+           file://0005-cisco_oui-match-encode-handler-prototypes.patch \
+           file://0006-ecp22-make-enum-a-type-rather-than-instance.patch \
+           file://0007-lldp_8021qaz-extern-config-object.patch \
+           file://0008-stringops-fix-some-string-copy-errors.patch \
+           file://0009-8021qaz-mark-prio-map-functions-static.patch \
            "
 
 # Makefile.am adds -Werror to AM_CFLAGS. There are warnings so disable it.

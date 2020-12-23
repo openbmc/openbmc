@@ -14,29 +14,14 @@ to avoid host contamination.
 Upstream-Status: Inappropriate [cross compile specific]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
----
- aclocal.m4   |  2 +-
- configure.ac | 60 ++++++++++--------------------------------------------------
- 2 files changed, 11 insertions(+), 51 deletions(-)
+[AK: refactored for 4.4.3]
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
 
-diff --git a/aclocal.m4 b/aclocal.m4
-index a2e59a6..cd20a2f 100644
---- a/aclocal.m4
-+++ b/aclocal.m4
-@@ -409,7 +409,7 @@ x_includes=NONE
- x_libraries=NONE
- DESTDIR=
- SH_ENABLE_OPTS="selinux posix-acl asm ssp db-reload xml-log message-queue login-watch process-check port-check mounts-check logfile-monitor userfiles debug ptrace static network udp nocl stealth micro-stealth install-name identity khide suidcheck base largefile mail external-scripts encrypt srp dnmalloc ipv6 shellexpand suid"
--SH_WITH_OPTS="prelude libprelude-prefix database libwrap cflags libs console altconsole timeserver alttimeserver rnd egd-socket port logserver altlogserver kcheck gpg keyid checksum fp recipient sender trusted tmp-dir config-file log-file pid-file state-dir data-file html-file"
-+SH_WITH_OPTS="prelude libprelude-prefix database libwrap cflags libs console altconsole timeserver alttimeserver rnd egd-socket port logserver altlogserver kcheck gpg keyid checksum fp recipient sender trusted tmp-dir config-file log-file pid-file state-dir data-file html-file ps-path"
- 
- # Installation directory options.
- # These are left unexpanded so users can "make install exec_prefix=/foo"
-diff --git a/configure.ac b/configure.ac
-index 5910b1f..8c3e087 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -730,56 +730,16 @@ then
+Index: samhain-4.4.2/configure.ac
+===================================================================
+--- samhain-4.4.2.orig/configure.ac
++++ samhain-4.4.2/configure.ac
+@@ -743,56 +743,16 @@ then
  fi
  AC_CHECK_HEADERS(gmp.h)
  
@@ -55,7 +40,16 @@ index 5910b1f..8c3e087 100644
 -	AC_MSG_ERROR([Cannot find ps in any of /usr/ucb /bin /usr/bin])
 -fi
 -AC_DEFINE_UNQUOTED([PSPATH], _("$PS"), [Path to ps])
--
++AC_ARG_WITH(ps-path,
++   [  --with-ps-path=PATH         set path to ps command ],
++   [
++   if test "x${withval}" != xno; then
++       pspath="${withval}"
++       AC_DEFINE_UNQUOTED([PSPATH], _("${pspath}"), [Path to ps])
++       AC_DEFINE_UNQUOTED([PSARG], _("ax"), [Argument for ps])
++   fi
++   ])
+ 
 -AC_MSG_CHECKING([how to use ps])
 -$PS ax >/dev/null 2>&1
 -if test $? -eq 0; then
@@ -90,19 +84,19 @@ index 5910b1f..8c3e087 100644
 -	PSARG="-e"
 -fi
 -AC_DEFINE_UNQUOTED([PSARG], _("$PSARG"), [Argument for ps])
-+AC_ARG_WITH(ps-path,
-+	[  --with-ps-path=PATH         set path to ps command ],
-+	[
-+	if test "x${withval}" != xno; then
-+		pspath="${withval}"
-+		AC_DEFINE_UNQUOTED([PSPATH], _("${pspath}"), [Path to ps])
-+		AC_DEFINE_UNQUOTED([PSARG], _("ax"), [Argument for ps])
-+	fi
-+	])
-+
  AC_MSG_RESULT([$PS $PSARG])
  
  dnl *****************************************
--- 
-1.9.1
-
+Index: samhain-4.4.2/aclocal.m4
+===================================================================
+--- samhain-4.4.2.orig/aclocal.m4
++++ samhain-4.4.2/aclocal.m4
+@@ -409,7 +409,7 @@ x_includes=NONE
+ x_libraries=NONE
+ DESTDIR=
+ SH_ENABLE_OPTS="selinux posix-acl asm ssp db-reload xml-log message-queue login-watch process-check port-check mounts-check logfile-monitor userfiles debug ptrace static network udp nocl stealth micro-stealth install-name identity khide suidcheck base largefile mail external-scripts encrypt srp dnmalloc ipv6 shellexpand suid"
+-SH_WITH_OPTS="prelude libprelude-prefix database libwrap cflags libs console altconsole timeserver alttimeserver rnd egd-socket port logserver altlogserver signify pubkey-checksum gpg keyid checksum fp recipient sender trusted tmp-dir config-file log-file pid-file state-dir data-file html-file"
++SH_WITH_OPTS="prelude libprelude-prefix database libwrap cflags libs console altconsole timeserver alttimeserver rnd egd-socket port logserver altlogserver kcheck gpg keyid checksum fp recipient sender trusted tmp-dir config-file log-file pid-file state-dir data-file html-file ps-path"
+ 
+ # Installation directory options.
+ # These are left unexpanded so users can "make install exec_prefix=/foo"

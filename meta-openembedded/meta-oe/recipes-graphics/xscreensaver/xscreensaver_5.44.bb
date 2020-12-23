@@ -1,5 +1,5 @@
 SUMMARY = "X screen saver and locker"
-
+HOMEPAGE = "https://www.jwz.org/xscreensaver/"
 LICENSE = "BSD-0-Clause"
 LIC_FILES_CHKSUM = "file://driver/xscreensaver.h;endline=10;md5=2b97002f72fbfc9329b4336e798f2463"
 

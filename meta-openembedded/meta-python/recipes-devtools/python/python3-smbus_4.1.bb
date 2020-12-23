@@ -9,5 +9,5 @@ SRC_URI[sha256sum] = "ef8f77afc70e7dbfd1171bfeae87a8a7f10074829370ce8d9ccd585a01
 
 DEPENDS += "i2c-tools"
 
-S = "${WORKDIR}/i2c-tools-${PV}/py-smbus/"
+S = "${WORKDIR}/i2c-tools-${PV}/py-smbus"
 inherit distutils3

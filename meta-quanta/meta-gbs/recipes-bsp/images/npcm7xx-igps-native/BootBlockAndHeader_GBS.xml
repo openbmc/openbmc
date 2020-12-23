@@ -1,0 +1,276 @@
+<!-- SPDX-License-Identifier: GPL-2.0
+#
+# Nuvoton IGPS: Image Generation And Programming Scripts For Poleg BMC
+#
+# Copyright (C) 2018 Nuvoton Technologies, All Rights Reserved
+#--------------------------------------------------------------------------->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Bin_Ecc_Map>
+	<!-- BMC mandatory fields -->
+	<ImageProperties>
+		<BinSize>0</BinSize>         <!-- If 0 the binary size will be calculated by the tool -->
+		<PadValue>0xFF</PadValue>	<!-- Byte value to pad the empty areas, default is 0 -->
+	</ImageProperties>
+		
+	<BinField>
+		<!-- BootBlock tag (0x50 0x07 0x55 0xAA 0x54 0x4F 0x4F 0x42) or 
+			     uboot tag (0x55 0x42 0x4F 0x4F 0x54 0x42 0x4C 0x4B) -->
+		<name>StartTag</name>         <!-- name of field -->
+		<config>
+			<offset>0</offset>           
+			<size>0x8</size> 
+		</config>
+		<content format='bytes'>0x50 0x07 0x55 0xAA 0x54 0x4F 0x4F 0x42</content>  <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Code destination address, 32-bit aligned: for BootBlock should be 0xFFFD5E00 so code will run in 0xFFFD6000 as linked for -->
+		<name>DestAddr</name>         <!-- name of field -->
+		<config>
+			<offset>0x140</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0xFFFD5E00</content>     <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- BootBlock or u-boot Code size -->
+		<name>CodeSize</name>         <!-- name of field -->
+		<config>
+			<offset>0x144</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='FileSize'>Poleg_bootblock.bin</content>	<!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- The BootBlock or u-boot binary file -->
+		<name>Code</name>             <!-- name of field -->
+		<config>
+			<offset>0x200</offset>       
+			<size format='FileSize'>Poleg_bootblock.bin</size>                 <!-- size in the header calculated by tool-->
+		</config>
+		<content format='FileContent'>Poleg_bootblock.bin</content>  <!-- content the user should fill -->
+	</BinField>	
+	
+	<!-- BMC optional fields -->
+	<BinField>
+		<!-- Word contents copied by ROM code to FIU0 FIU_DRD_CFG register -->
+		<name>FIU0_DRD_CFG_Set</name>  <!-- name of field -->
+		<config>
+			<offset>0x108</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0x0300100B</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Defines the clock divide ratio from AHB to FIU0 clock -->
+		<name>FIU_Clk_Divider</name>  <!-- name of field -->
+		<config>
+			<offset>0x10C</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='bytes'>0x0A</content>               <!-- content the user should fill -->
+	</BinField>
+	
+	<BinField>
+		<!-- Version (Major.Minor) -->
+		<name>Version</name>          <!-- name of field -->
+		<config>
+			<offset>0x148</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0x0201</content>               <!-- content the user should fill -->
+	</BinField>
+		
+	<BinField>
+		<!-- Board manufaturer ( Dell = 0, Nuvoton = 100, Google = 1, MS = 2) -->
+		<name>BOARD_VENDOR</name>          <!-- name of field -->
+		<config>
+			<offset>0x14C</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>100</content>                              <!--Board_manufacturer: Nuvoton-->
+	</BinField>
+	<BinField>
+		<!-- Board type ( DRB = 0, SVB = 1, EB = 2,HORIZON = 3, SANDSTORM = 4, ROCKAWAY = 100 RunBMC = 10) -->
+		<!-- WARNING: Currently this value is only printed to serial. Set BOARD_VENDOR to 1 get Dell specific customization. -->
+		<name>BOARD_TYPE</name>          <!-- name of field -->
+		<config>
+			<offset>0x150</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0x64</content>                                   <!--Board_type: EB-->
+	</BinField>
+	
+	<!-- the next two fields are available since version 10.7.0 -->
+	<BinField>
+		<!-- supported values: 333,444,500,600,666,700,720,750,775,787,800,825,850,900,950,1000,1060 -->
+		<name>MC_FREQ_IN_MHZ</name>          <!-- name of field -->
+		<config>
+			<offset>0x11C</offset>       
+			<size>0x2</size> 
+		</config>
+		<content format='32bit'>800</content> 
+	</BinField>
+	<BinField>
+		<!-- supporeted values: 333,500,600,666,700,720,750,800,825,850,900,950,1000,1060 -->
+		<name>CPU_FREQ_IN_MHZ</name>          <!-- name of field -->
+		<config>
+			<offset>0x154</offset>       
+			<size>0x2</size> 
+		</config>
+		<content format='32bit'>800</content>
+	</BinField>
+	
+	<BinField>
+		<!-- MC_CONFIG. 
+			Bit 0: MC_DISABLE_CAPABILITY_INPUT_DQS_ENHANCE_TRAINING (0x01)
+			Bit 1:  MC_CAPABILITY_IGNORE_ECC_DEVICE         (0x02) -->
+		<name>MC_CONFIG</name>          <!-- name of field -->
+		<config>
+			<offset>0x156</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0x01</content>  
+	</BinField>
+
+	<BinField>
+		<!-- HOST_IF.
+			0xFF: LPC backward compatible
+			0x00: LPC. 
+			0x01: eSPI
+			0x02: GPIOs TRIS.  -->
+		<name>HOST_IF</name>          <!-- name of field -->
+		<config>
+			<offset>0x157</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0x00</content>
+	</BinField>
+	
+	<BinField>
+		<!-- SECURITY_LEVEL_T.
+			0xFF: SECURITY_LEVEL_UNKNOWN: backward compatible
+			0x00: SECURITY_LEVEL_NONE. 
+			0x01: SECURITY_LEVEL_STANDARD
+			0x02: SECURITY_LEVEL_NIST. (require BootBlock with NIST support) -->
+		<name>SECURITY_LEVEL_T</name>          <!-- name of field -->
+		<config>
+			<offset>0x15C</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='32bit'>0xFF</content>
+	</BinField>
+		
+	<BinField>
+		<!-- Key revoke (bitwise). Set bit 0 to revoke key 0 etc. -->
+		<name>SECURITY_REVOKE_KEYS</name>          <!-- name of field -->
+		<config>
+			<offset>0x1D7</offset>       
+			<size>0x1</size> 
+		</config>
+		<content format='bytes'>0x00</content>
+	</BinField>
+	
+	<BinField>
+		<!-- security log offset -->
+		<name>SECURITY_LOG</name>          <!-- name of field -->
+		<config>
+			<offset>0x1D8</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0x090000</content>
+	</BinField>
+	<BinField>
+		<!-- hole 0 size: used for NIST security. -->
+		<name>SECURITY_LOG_SIZE</name>          <!-- name of field -->
+		<config>
+			<offset>0x1DC</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0x3000</content>
+	</BinField>	
+	
+	
+	<BinField>
+		<!-- hole 0: used for NIST security. -->
+		<name>HOLE0</name>          <!-- name of field -->
+		<config>
+			<offset>0x1E0</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0x0A0000</content>
+	</BinField>
+	<BinField>
+		<!-- hole 0 size: used for NIST security. -->
+		<name>HOLE0_SIZE</name>          <!-- name of field -->
+		<config>
+			<offset>0x1E4</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0xF70000</content>
+	</BinField>
+	
+	<BinField>
+		<!-- hole 1: used for NIST security. -->
+		<name>HOLE1</name>          <!-- name of field -->
+		<config>
+			<offset>0x1E8</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0</content>
+	</BinField>
+	<BinField>
+		<!-- hole 1 size: used for NIST security. -->
+		<name>HOLE1_SIZE</name>          <!-- name of field -->
+		<config>
+			<offset>0x1EC</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0</content>
+	</BinField>
+	
+	
+	<BinField>
+		<!-- hole 2: used for NIST security. -->
+		<name>HOLE2</name>          <!-- name of field -->
+		<config>
+			<offset>0x1F0</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0xFFFFFFFF</content>
+	</BinField>
+	<BinField>
+		<!-- hole 2 size: used for NIST security. -->
+		<name>HOLE2_SIZE</name>          <!-- name of field -->
+		<config>
+			<offset>0x1F4</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0</content>
+	</BinField>
+	
+	<BinField>
+		<!-- hole 3: used for NIST security. -->
+		<name>HOLE3</name>          <!-- name of field -->
+		<config>
+			<offset>0x1F8</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0</content>
+	</BinField>
+	<BinField>
+		<!-- hole 3 size: used for NIST security. -->
+		<name>HOLE3_SIZE</name>          <!-- name of field -->
+		<config>
+			<offset>0x1FC</offset>       
+			<size>0x4</size> 
+		</config>
+		<content format='32bit'>0</content>
+	</BinField>
+	
+</Bin_Ecc_Map>

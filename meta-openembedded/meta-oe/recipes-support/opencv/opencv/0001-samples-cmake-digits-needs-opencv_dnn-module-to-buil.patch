@@ -1,0 +1,28 @@
+From 114af1ca23ff9bf2e521b2969e343e74cdd8eac1 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sun, 1 Nov 2020 12:29:56 +0000
+Subject: [PATCH] samples: cmake: digits needs opencv_dnn module to build
+
+Intrudeced in commit 397ba2d9aafb5312e777ce2f886d7b568109e931:
+add OpenCV sample for digit and text recongnition, and provide multiple OCR models.
+https://github.com/opencv/opencv/commit/397ba2d9aafb5312e777ce2f886d7b568109e931
+
+Upstream-Status: Backport [https://github.com/opencv/opencv/commit/79a82013ad2af04269891ce15281c9fdc31d3f66]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ samples/cpp/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/samples/cpp/CMakeLists.txt b/samples/cpp/CMakeLists.txt
+index 617629df2e..14ab6141df 100644
+--- a/samples/cpp/CMakeLists.txt
++++ b/samples/cpp/CMakeLists.txt
+@@ -14,6 +14,7 @@ set(OPENCV_CPP_SAMPLES_REQUIRED_DEPS
+   opencv_features2d
+   opencv_calib3d
+   opencv_stitching
++  opencv_dnn
+   ${OPENCV_MODULES_PUBLIC}
+   ${OpenCV_LIB_COMPONENTS})
+ ocv_check_dependencies(${OPENCV_CPP_SAMPLES_REQUIRED_DEPS})

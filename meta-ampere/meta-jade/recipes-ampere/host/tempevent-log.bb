@@ -9,7 +9,7 @@ S = "${WORKDIR}"
 
 SRC_URI += " \
             file://LICENSE \
-            file://include/* \
+            file://include/utils.hpp \
             file://src/tempevent_log.cpp \
             file://CMakeLists.txt \
            "

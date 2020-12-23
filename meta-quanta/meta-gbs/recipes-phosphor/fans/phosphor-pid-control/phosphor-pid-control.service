@@ -1,0 +1,15 @@
+[Unit]
+Description=Swampd Margin-based Fan Control Daemon
+After=xyz.openbmc_project.Hwmon@-ahb-apb-pwm\x2dfan\x2dcontroller\x40103000.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/fan-table-init.sh
+ExecStart=/usr/bin/swampd
+Restart=always
+RestartSec=5
+StartLimitInterval=0
+ExecStopPost=/usr/bin/fan-default-speed.sh
+
+[Install]
+WantedBy=basic.target

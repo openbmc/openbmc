@@ -11,6 +11,11 @@ SUMMARY_packagegroup-security-tpm = "Security TPM support"
 RDEPENDS_packagegroup-security-tpm = " \
     tpm-tools \
     trousers \
+    pcr-extend \
+    tpm-quote-tools \
+    swtpm \
+    openssl-tpm-engine \
+    libtpm \
     ${X86_TPM_MODULES} \
     "
 

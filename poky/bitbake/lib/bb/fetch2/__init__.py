@@ -853,11 +853,6 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None):
         if val:
             cmd = 'export ' + var + '=\"%s\"; %s' % (val, cmd)
 
-    # Ensure that a _PYTHON_SYSCONFIGDATA_NAME value set by a recipe
-    # (for example via python3native.bbclass since warrior) is not set for
-    # host Python (otherwise tools like git-make-shallow will fail)
-    cmd = 'unset _PYTHON_SYSCONFIGDATA_NAME; ' + cmd
-
     # Disable pseudo as it may affect ssh, potentially causing it to hang.
     cmd = 'export PSEUDO_DISABLED=1; ' + cmd
 
@@ -1026,7 +1021,8 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
                     origud.method.build_mirror_data(origud, ld)
             return origud.localpath
         # Otherwise the result is a local file:// and we symlink to it
-        ensure_symlink(ud.localpath, origud.localpath)
+        ensure_symlink(ud.localpath, origud.localpath, relative=True)
+
         update_stamp(origud, ld)
         return ud.localpath
 
@@ -1060,7 +1056,7 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
             bb.utils.unlockfile(lf)
 
 
-def ensure_symlink(target, link_name):
+def ensure_symlink(target, link_name, relative=False):
     if not os.path.exists(link_name):
         if os.path.islink(link_name):
             # Broken symbolic link
@@ -1071,6 +1067,8 @@ def ensure_symlink(target, link_name):
         # same time, in which case we do not want the second task to
         # fail when the link has already been created by the first task.
         try:
+            if relative is True:
+                target = os.path.relpath(target, os.path.dirname(link_name))
             os.symlink(target, link_name)
         except FileExistsError:
             pass
@@ -1195,8 +1193,6 @@ def get_checksum_file_list(d):
             paths = ud.method.localpaths(ud, d)
             for f in paths:
                 pth = ud.decodedurl
-                if '*' in pth:
-                    f = os.path.join(os.path.abspath(f), pth)
                 if f.startswith(dl_dir):
                     # The local fetcher's behaviour is to return a path under DL_DIR if it couldn't find the file anywhere else
                     if os.path.exists(f):
@@ -1365,9 +1361,6 @@ class FetchMethod(object):
         # We cannot compute checksums for directories
         if os.path.isdir(urldata.localpath):
             return False
-        if urldata.localpath.find("*") != -1:
-            return False
-
         return True
 
     def recommends_checksum(self, urldata):
@@ -1430,11 +1423,6 @@ class FetchMethod(object):
         iterate = False
         file = urldata.localpath
 
-        # Localpath can't deal with 'dir/*' entries, so it converts them to '.',
-        # but it must be corrected back for local files copying
-        if urldata.basename == '*' and file.endswith('/.'):
-            file = '%s/%s' % (file.rstrip('/.'), urldata.path)
-
         try:
             unpack = bb.utils.to_boolean(urldata.parm.get('unpack'), True)
         except ValueError as exc:
@@ -1471,6 +1459,10 @@ class FetchMethod(object):
                 cmd = '7z x -so %s | tar x --no-same-owner -f -' % file
             elif file.endswith('.7z'):
                 cmd = '7za x -y %s 1>/dev/null' % file
+            elif file.endswith('.tzst') or file.endswith('.tar.zst'):
+                cmd = 'zstd --decompress --stdout %s | tar x --no-same-owner -f -' % file
+            elif file.endswith('.zst'):
+                cmd = 'zstd --decompress --stdout %s > %s' % (file, efile)
             elif file.endswith('.zip') or file.endswith('.jar'):
                 try:
                     dos = bb.utils.to_boolean(urldata.parm.get('dos'), False)
@@ -1530,7 +1522,7 @@ class FetchMethod(object):
                     if urlpath.find("/") != -1:
                         destdir = urlpath.rsplit("/", 1)[0] + '/'
                         bb.utils.mkdirhier("%s/%s" % (unpackdir, destdir))
-                cmd = 'cp -fpPRH %s %s' % (file, destdir)
+                cmd = 'cp -fpPRH "%s" "%s"' % (file, destdir)
 
         if not cmd:
             return
@@ -1612,8 +1604,6 @@ class FetchMethod(object):
         Is the download done ?
         """
         if os.path.exists(ud.localpath):
-            return True
-        if ud.localpath.find("*") != -1:
             return True
         return False
 

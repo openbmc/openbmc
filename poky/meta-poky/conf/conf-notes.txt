@@ -5,7 +5,9 @@ You can now run 'bitbake <target>'
 
 Common targets are:
     core-image-minimal
+    core-image-full-cmdline
     core-image-sato
+    core-image-weston
     meta-toolchain
     meta-ide-support
 

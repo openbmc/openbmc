@@ -1,0 +1,67 @@
+From d48ec5e1a5fb7907520dee71b1d94045486a0c29 Mon Sep 17 00:00:00 2001
+From: Alexander Kamensky <alexander.kamensky42@gmail.com>
+Date: Thu, 12 Nov 2020 12:56:46 -0800
+Subject: [PATCH] arm64: kexec: disabled check if kaslr-seed dtb property was
+ wiped
+
+Kexec when loading arm64 kernel checks if chosen/kaslr-seed dtb property is
+wiped. It's a good assertion to verify proper behavior of kernel. However,
+if bootloader creates and fills kaslr-seed property and kernel is not
+configured with CONFIG_RANDOMIZE_BASE then logic of reading and wiping
+kaslr-seed does not run. As a result kaslr-seed property is not zero and when
+kexec tries to load secondary kernel it fails with the following message:
+
+setup_2nd_dtb: kaslr-seed is not wiped to 0.
+kexec: setup_2nd_dtb failed.
+kexec: load failed.
+
+This was observed on Yocto Project on qemuarm64 machine with 5.8 kernel,
+qemu 5.1.0. Qemu created kaslr-seed property but kernel was not configured
+with CONFIG_RANDOMIZE_BASE.
+
+Although check has some value, there is a use-case where it breaks kexec,
+this patch removes it.
+
+Note in described use-case the fact that kaslr-seed is not wiped and user
+readable through /sys/firmware/fdt or
+/sys/firmware/devicetree/base/chosen/kaslr-seed is not a security problem
+as kaslr is disabled anyway.
+
+Signed-off-by: Alexander Kamensky <alexander.kamensky42@gmail.com>
+Upstream-Status: Submitted [http://lists.infradead.org/pipermail/kexec/2020-November/021740.html]
+---
+ kexec/arch/arm64/kexec-arm64.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
+
+Index: kexec-tools-2.0.20/kexec/arch/arm64/kexec-arm64.c
+===================================================================
+--- kexec-tools-2.0.20.orig/kexec/arch/arm64/kexec-arm64.c
++++ kexec-tools-2.0.20/kexec/arch/arm64/kexec-arm64.c
+@@ -428,7 +428,7 @@ static int setup_2nd_dtb(struct dtb *dtb
+ 	int len, range_len;
+ 	int nodeoffset;
+ 	int new_size;
+-	int result, kaslr_seed;
++	int result;
+ 
+ 	result = fdt_check_header(dtb->buf);
+ 
+@@ -499,18 +499,6 @@ static int setup_2nd_dtb(struct dtb *dtb
+ 			return result;
+ 		}
+ 	} else {
+-		kaslr_seed = fdt64_to_cpu(*prop);
+-
+-		/* kaslr_seed must be wiped clean by primary
+-		 * kernel during boot
+-		 */
+-		if (kaslr_seed != 0) {
+-			dbgprintf("%s: kaslr-seed is not wiped to 0.\n",
+-					__func__);
+-			result = -EINVAL;
+-			goto on_error;
+-		}
+-
+ 		/*
+ 		 * Invoke the getrandom system call with
+ 		 * GRND_NONBLOCK, to make sure we

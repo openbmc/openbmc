@@ -26,6 +26,10 @@ python __anonymous () {
         grubtarget = 'arm64'
     elif re.match('arm', target):
         grubtarget = 'arm'
+    elif re.match('riscv64', target):
+        grubtarget = 'riscv64'
+    elif re.match('riscv32', target):
+        grubtarget = 'riscv32'
     else:
         raise bb.parse.SkipRecipe("grub-efi is incompatible with target %s" % target)
     grubimage = prefix + d.getVar("EFI_BOOT_IMAGE")

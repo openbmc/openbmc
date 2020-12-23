@@ -19,5 +19,4 @@ RDEPENDS_packagegroup-security-tpm2 = " \
     tpm2-abrmd \
     tpm2-pkcs11 \
     ibmswtpm2 \
-    cryptsetup-tpm-incubator \
     "

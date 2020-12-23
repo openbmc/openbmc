@@ -112,7 +112,7 @@ class LayerIndexWebRestApiTest(LayersTest):
                     break
             else:
                 self.logger.debug(1, "meta-python was not found")
-                self.assetTrue(False)
+                raise self.failureException
 
             # Only check the first element...
             break

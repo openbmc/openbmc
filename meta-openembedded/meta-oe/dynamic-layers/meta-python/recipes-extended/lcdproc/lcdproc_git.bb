@@ -15,6 +15,7 @@ SRC_URI = "git://github.com/lcdproc/lcdproc \
            file://0001-Fix-parallel-build-fix-port-internal-make-dependenci.patch \
            file://0002-Include-limits.h-for-PATH_MAX-definition.patch \
            file://0003-Fix-non-x86-platforms-on-musl.patch \
+           file://0001-Fix-compilation-with-GCC-10.x.patch \
            "
 
 S = "${WORKDIR}/git"

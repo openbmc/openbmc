@@ -64,12 +64,12 @@ class RunCmdTests(OESelftestTestCase):
                                 runCmd, "echo foobar >&2; false", shell=True, assert_error=False)
 
     def test_output(self):
-        result = runCmd("echo stdout; echo stderr >&2", shell=True)
+        result = runCmd("echo stdout; echo stderr >&2", shell=True, sync=False)
         self.assertEqual("stdout\nstderr", result.output)
         self.assertEqual("", result.error)
 
     def test_output_split(self):
-        result = runCmd("echo stdout; echo stderr >&2", shell=True, stderr=subprocess.PIPE)
+        result = runCmd("echo stdout; echo stderr >&2", shell=True, stderr=subprocess.PIPE, sync=False)
         self.assertEqual("stdout", result.output)
         self.assertEqual("stderr", result.error)
 
@@ -77,7 +77,7 @@ class RunCmdTests(OESelftestTestCase):
         numthreads = threading.active_count()
         start = time.time()
         # Killing a hanging process only works when not using a shell?!
-        result = runCmd(['sleep', '60'], timeout=self.TIMEOUT, ignore_status=True)
+        result = runCmd(['sleep', '60'], timeout=self.TIMEOUT, ignore_status=True, sync=False)
         self.assertEqual(result.status, -signal.SIGTERM)
         end = time.time()
         self.assertLess(end - start, self.TIMEOUT + self.DELTA)
@@ -87,7 +87,7 @@ class RunCmdTests(OESelftestTestCase):
         numthreads = threading.active_count()
         start = time.time()
         # Killing a hanging process only works when not using a shell?!
-        result = runCmd(['sleep', '60'], timeout=self.TIMEOUT, ignore_status=True, stderr=subprocess.PIPE)
+        result = runCmd(['sleep', '60'], timeout=self.TIMEOUT, ignore_status=True, stderr=subprocess.PIPE, sync=False)
         self.assertEqual(result.status, -signal.SIGTERM)
         end = time.time()
         self.assertLess(end - start, self.TIMEOUT + self.DELTA)
@@ -95,7 +95,7 @@ class RunCmdTests(OESelftestTestCase):
 
     def test_stdin(self):
         numthreads = threading.active_count()
-        result = runCmd("cat", data=b"hello world", timeout=self.TIMEOUT)
+        result = runCmd("cat", data=b"hello world", timeout=self.TIMEOUT, sync=False)
         self.assertEqual("hello world", result.output)
         self.assertEqual(numthreads, threading.active_count(), msg="Thread counts were not equal before (%s) and after (%s), active threads: %s" % (numthreads, threading.active_count(), threading.enumerate()))
         self.assertEqual(numthreads, 1)
@@ -103,7 +103,7 @@ class RunCmdTests(OESelftestTestCase):
     def test_stdin_timeout(self):
         numthreads = threading.active_count()
         start = time.time()
-        result = runCmd(['sleep', '60'], data=b"hello world", timeout=self.TIMEOUT, ignore_status=True)
+        result = runCmd(['sleep', '60'], data=b"hello world", timeout=self.TIMEOUT, ignore_status=True, sync=False)
         self.assertEqual(result.status, -signal.SIGTERM)
         end = time.time()
         self.assertLess(end - start, self.TIMEOUT + self.DELTA)
@@ -111,12 +111,12 @@ class RunCmdTests(OESelftestTestCase):
 
     def test_log(self):
         log = MemLogger()
-        result = runCmd("echo stdout; echo stderr >&2", shell=True, output_log=log)
+        result = runCmd("echo stdout; echo stderr >&2", shell=True, output_log=log, sync=False)
         self.assertEqual(["Running: echo stdout; echo stderr >&2", "stdout", "stderr"], log.info_msgs)
         self.assertEqual([], log.error_msgs)
 
     def test_log_split(self):
         log = MemLogger()
-        result = runCmd("echo stdout; echo stderr >&2", shell=True, output_log=log, stderr=subprocess.PIPE)
+        result = runCmd("echo stdout; echo stderr >&2", shell=True, output_log=log, stderr=subprocess.PIPE, sync=False)
         self.assertEqual(["Running: echo stdout; echo stderr >&2", "stdout"], log.info_msgs)
         self.assertEqual(["stderr"], log.error_msgs)

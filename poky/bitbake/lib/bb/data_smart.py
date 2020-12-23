@@ -189,7 +189,7 @@ class IncludeHistory(object):
         if self.current.parent:
             self.current = self.current.parent
         else:
-            bb.warn("Include log: Tried to finish '%s' at top level." % filename)
+            bb.warn("Include log: Tried to finish '%s' at top level." % self.filename)
         return False
 
     def emit(self, o, level = 0):

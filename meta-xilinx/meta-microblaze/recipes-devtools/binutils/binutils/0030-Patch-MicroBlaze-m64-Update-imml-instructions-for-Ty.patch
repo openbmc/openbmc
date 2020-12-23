@@ -1,0 +1,47 @@
+From 0afa4ba2af8d63cb70771f1c7e235af920603533 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Thu, 16 Apr 2020 18:08:58 +0530
+Subject: [PATCH 30/40] [Patch,MicroBlaze m64]: Update imml instructions for
+ Type A branch EA
+
+This patch will remove imml 0 and imml -1 instructions when the offset is less than 16 bit for Type A branch EA instructions.
+---
+ gas/config/tc-microblaze.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index efd1a42769e..1d838abfefa 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -2164,13 +2164,13 @@ md_assemble (char * str)
+       if (exp.X_op != O_constant)
+ 	{
+ 	  char *opc;
+-          if (microblaze_arch_size == 64 && (streq (name, "breai") ||
+-		 streq (name, "breaid") ||
+-	         streq (name, "brai") || streq (name, "braid")))
+-            opc = strdup(str_microblaze_64);
++	   /* removal of imml 0 and imml -1 for bea type A insns.
++	      if offset is 16 bit then imml instructions are redundant */
++	  if (microblaze_arch_size == 64 && (streq (name, "brai") || streq (name, "braid")))
++	    opc = strdup(str_microblaze_64);
+ 	  else
+-            opc = NULL;
+-          relax_substateT subtype;
++	    opc = NULL;
++	  relax_substateT subtype;
+ 
+ 	  if (exp.X_md != 0)
+ 	    subtype = get_imm_otype(exp.X_md);
+@@ -2930,7 +2930,7 @@ md_apply_fix (fixS *   fixP,
+     case BFD_RELOC_MICROBLAZE_64:
+     case BFD_RELOC_MICROBLAZE_64_PCREL:
+       if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64
+-            || fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL)
++            || fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL || (fixP->fx_r_type == BFD_RELOC_64_PCREL && microblaze_arch_size == 64))
+         {
+           /* Generate the imm instruction.  */
+            if (((long long)val) > (long long)-549755813888 && ((long long)val) < (long long)549755813887)
+-- 
+2.17.1
+

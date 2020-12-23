@@ -12,6 +12,9 @@ DEPENDS += "autoconf-archive-native"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append = " file://mac-address.service"
+SRC_URI_append = " file://config.txt"
+
+FILES_${PN}_append = " ${datadir}/mac-address/config.txt"
 
 HASHSTYLE = "gnu"
 S = "${WORKDIR}/git"
@@ -21,6 +24,10 @@ do_install_append() {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${WORKDIR}/mac-address.service \
         ${D}${systemd_unitdir}/system
+
+    install -d ${D}${datadir}/mac-address
+    install -m 0644 -D ${WORKDIR}/config.txt \
+        ${D}${datadir}/mac-address/config.txt
 }
 
 SYSTEMD_PACKAGES = "${PN}"

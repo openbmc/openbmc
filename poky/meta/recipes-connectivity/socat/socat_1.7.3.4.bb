@@ -5,8 +5,6 @@ HOMEPAGE = "http://www.dest-unreach.org/socat/"
 
 SECTION = "console/network"
 
-DEPENDS = "openssl"
-
 LICENSE = "GPL-2.0-with-OpenSSL-exception"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://README;beginline=257;endline=287;md5=338c05eadd013872abb1d6e198e10a3f"
@@ -39,10 +37,11 @@ TERMBITS_SHIFTS_powerpc64 = "sc_cv_sys_crdly_shift=12 \
                              sc_cv_sys_tabdly_shift=10 \
                              sc_cv_sys_csize_shift=8"
 
-PACKAGECONFIG_class-target ??= "tcp-wrappers readline"
-PACKAGECONFIG ??= "readline"
+PACKAGECONFIG_class-target ??= "tcp-wrappers readline openssl"
+PACKAGECONFIG ??= "readline openssl"
 PACKAGECONFIG[tcp-wrappers] = "--enable-libwrap,--disable-libwrap,tcp-wrappers"
 PACKAGECONFIG[readline] = "--enable-readline,--disable-readline,readline"
+PACKAGECONFIG[openssl] = "--enable-openssl,--disable-openssl,openssl"
 
 CFLAGS += "-fcommon"
 

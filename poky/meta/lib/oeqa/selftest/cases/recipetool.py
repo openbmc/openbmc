@@ -226,19 +226,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-subdir', self.testfile, '', expectedlines, ['testfile'])
         self.assertNotIn('WARNING: ', output)
 
-    def test_recipetool_appendfile_src_glob(self):
-        # A file that's in SRC_URI as a glob
-        expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
-                         '\n',
-                         'SRC_URI += "file://testfile"\n',
-                         '\n',
-                         'do_install_append() {\n',
-                         '    install -d ${D}${datadir}\n',
-                         '    install -m 0644 ${WORKDIR}/testfile ${D}${datadir}/selftest-replaceme-src-globfile\n',
-                         '}\n']
-        _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-src-globfile', self.testfile, '', expectedlines, ['testfile'])
-        self.assertNotIn('WARNING: ', output)
-
     def test_recipetool_appendfile_inst_glob(self):
         # A file that's in do_install as a glob
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -422,6 +409,10 @@ class RecipetoolTests(RecipetoolBase):
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
     def test_recipetool_create_npm(self):
+        collections = get_bb_var('BBFILE_COLLECTIONS').split()
+        if "openembedded-layer" not in collections:
+            self.skipTest("Test needs meta-oe for nodejs")
+
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
         recipefile = os.path.join(temprecipe, 'savoirfairelinux-node-server-example_1.0.0.bb')
@@ -534,7 +525,11 @@ class RecipetoolTests(RecipetoolBase):
             dstdir = os.path.join(dstdir, p)
             if not os.path.exists(dstdir):
                 os.makedirs(dstdir)
-                self.track_for_cleanup(dstdir)
+                if p == "lib":
+                    # Can race with other tests
+                    self.add_command_to_tearDown('rmdir --ignore-fail-on-non-empty %s' % dstdir)
+                else:
+                    self.track_for_cleanup(dstdir)
         dstfile = os.path.join(dstdir, os.path.basename(srcfile))
         if srcfile != dstfile:
             shutil.copy(srcfile, dstfile)

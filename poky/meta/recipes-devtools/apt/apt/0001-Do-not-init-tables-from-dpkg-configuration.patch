@@ -1,4 +1,4 @@
-From b18d7aa7d71b53b86bac21cd1d8c3accabb28f2b Mon Sep 17 00:00:00 2001
+From bf45c314867e5fb12141803fba06f3e45679d628 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 10 May 2019 16:47:38 +0200
 Subject: [PATCH] Do not init tables from dpkg configuration

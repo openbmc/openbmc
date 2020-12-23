@@ -1,0 +1,40 @@
+From 28e389a0d1275e7693df84a7d4a58b28364be1a9 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 22 Oct 2020 17:33:38 +0200
+Subject: [PATCH] test/libapt: do not use gtest from the host
+
+This really does not work when cross-compiling.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ test/libapt/CMakeLists.txt | 16 ----------------
+ 1 file changed, 16 deletions(-)
+
+diff --git a/test/libapt/CMakeLists.txt b/test/libapt/CMakeLists.txt
+index 035ff07..280b83c 100644
+--- a/test/libapt/CMakeLists.txt
++++ b/test/libapt/CMakeLists.txt
+@@ -6,22 +6,6 @@ find_path(GTEST_ROOT src/gtest.cc
+ find_package(GTest)
+ set(GTEST_DEPENDENCIES)
+ 
+-if(NOT GTEST_FOUND AND EXISTS ${GTEST_ROOT})
+-   include(ExternalProject)
+-   ExternalProject_Add(gtest PREFIX ./gtest
+-                             SOURCE_DIR ${GTEST_ROOT}
+-                             INSTALL_COMMAND true)
+-
+-   link_directories(${CMAKE_CURRENT_BINARY_DIR}/gtest/src/gtest-build)
+-
+-   set(GTEST_LIBRARIES "-lgtest")
+-   set(GTEST_DEPENDENCIES "gtest")
+-   set(GTEST_FOUND TRUE)
+-   find_path(GTEST_INCLUDE_DIRS NAMES gtest/gtest.h PATHS ${GTEST_ROOT}/include)
+-
+-   message(STATUS "Found GTest at ${GTEST_ROOT}, headers at ${GTEST_INCLUDE_DIRS}")
+-endif()
+-
+ if(GTEST_FOUND)
+    # gtest produces some warnings with the set of warnings we activate,
+    # so disable the offending warnings while compiling tests for now

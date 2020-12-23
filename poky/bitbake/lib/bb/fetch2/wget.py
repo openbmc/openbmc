@@ -208,10 +208,7 @@ class Wget(FetchMethod):
                         fetch.connection_cache.remove_connection(h.host, h.port)
                     raise urllib.error.URLError(err)
                 else:
-                    try:
-                        r = h.getresponse(buffering=True)
-                    except TypeError: # buffering kw not supported
-                        r = h.getresponse()
+                    r = h.getresponse()
 
                 # Pick apart the HTTPResponse object to get the addinfourl
                 # object initialized properly.

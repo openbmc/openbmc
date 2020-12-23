@@ -1,0 +1,27 @@
+From 5aea816f27a71e6c88ad50e7326fa6584eeb7ad9 Mon Sep 17 00:00:00 2001
+From: Francois Marier <francois@debian.org>
+Date: Fri, 24 Jul 2020 21:22:47 -0700
+Subject: [PATCH] Fix compilation with GCC's -fno-common flag (fixes #305)
+
+Upstream-Status: Submitted [https://github.com/mrash/fwknop/pull/319]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ client/log_msg.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/log_msg.h b/client/log_msg.h
+index cc17716..3dda161 100644
+--- a/client/log_msg.h
++++ b/client/log_msg.h
+@@ -38,7 +38,7 @@ enum
+     LOG_VERBOSITY_INFO,         /*!< Constant to define a INFO message */
+     LOG_VERBOSITY_DEBUG,        /*!< Constant to define a DEBUG message */
+     LOG_LAST_VERBOSITY
+-} log_level_t;
++};
+ 
+ #define LOG_DEFAULT_VERBOSITY   LOG_VERBOSITY_NORMAL    /*!< Default verbosity to use */
+ 
+-- 
+2.28.0
+

@@ -23,6 +23,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = "http://www.freedesktop.org/software/startup-notification/releases/${BPN}-${PV}.tar.gz \
            file://obsolete_automake_macros.patch \
+           file://time_t.patch \
 "
 
 SRC_URI[md5sum] = "2cd77326d4dcaed9a5a23a1232fb38e9"

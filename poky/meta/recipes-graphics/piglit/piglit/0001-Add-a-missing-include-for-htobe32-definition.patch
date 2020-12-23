@@ -1,0 +1,27 @@
+From d623e9797b7ee9b3739a8a4afe1a01f7e03754aa Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 1 Nov 2020 20:08:49 +0000
+Subject: [PATCH] Add a missing include for htobe32 definition
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/spec/nv_copy_depth_to_color/nv_copy_depth_to_color.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/spec/nv_copy_depth_to_color/nv_copy_depth_to_color.c b/tests/spec/nv_copy_depth_to_color/nv_copy_depth_to_color.c
+index 5f45e0c23..c755ee29a 100644
+--- a/tests/spec/nv_copy_depth_to_color/nv_copy_depth_to_color.c
++++ b/tests/spec/nv_copy_depth_to_color/nv_copy_depth_to_color.c
+@@ -34,6 +34,8 @@
+ 
+ #include "piglit-util-gl.h"
+ 
++#include <endian.h>
++
+ #define IMAGE_WIDTH 60
+ #define IMAGE_HEIGHT 60
+ 
+-- 
+2.17.1
+

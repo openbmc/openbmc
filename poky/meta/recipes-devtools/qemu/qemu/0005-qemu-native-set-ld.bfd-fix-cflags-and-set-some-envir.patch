@@ -11,11 +11,11 @@ Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
  configure | 4 ----
  1 file changed, 4 deletions(-)
 
-diff --git a/configure b/configure
-index 83c65439..6bdf488c 100755
---- a/configure
-+++ b/configure
-@@ -6251,10 +6251,6 @@ write_c_skeleton
+Index: qemu-5.1.0/configure
+===================================================================
+--- qemu-5.1.0.orig/configure
++++ qemu-5.1.0/configure
+@@ -6515,10 +6515,6 @@ write_c_skeleton
  if test "$gcov" = "yes" ; then
    QEMU_CFLAGS="-fprofile-arcs -ftest-coverage -g $QEMU_CFLAGS"
    QEMU_LDFLAGS="-fprofile-arcs -ftest-coverage $QEMU_LDFLAGS"
@@ -26,6 +26,3 @@ index 83c65439..6bdf488c 100755
  fi
  
  if test "$have_asan" = "yes"; then
--- 
-2.24.0
-

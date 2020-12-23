@@ -1,0 +1,30 @@
+Fixed host contamination of include files
+
+python3-icu-2.5-r0 do_package_qa: QA Issue: python3-icu: The compile log indicates that host include and/or library paths were used.
+
+Also, don't use icu-config
+
+Upstream-Status: [inappropriate] OE specific
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: PyICU-2.5/setup.py
+===================================================================
+--- PyICU-2.5.orig/setup.py
++++ PyICU-2.5/setup.py
+@@ -81,7 +81,7 @@ Building PyICU %s for ICU %s (max ICU ma
+ 
+ CONFIGURE_WITH_ICU_CONFIG = {
+     'darwin': True,
+-    'linux': True,
++    'linux': False,
+     'freebsd': False, # not tested
+     'win32': False,   # no icu-config
+     'sunos5': False,  # not tested
+@@ -274,7 +274,6 @@ setup(name="PyICU",
+       ext_modules=[Extension('_icu',
+                              [filename for filename in sorted(os.listdir(os.curdir))
+                               if filename.endswith('.cpp')],
+-                             include_dirs=_includes,
+                              extra_compile_args=_cflags,
+                              extra_link_args=_lflags,
+                              libraries=_libraries)],

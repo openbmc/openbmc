@@ -28,6 +28,10 @@
         CustomField1:
           IPMIFruProperty: FRU File ID
           IPMIFruSection: Board
+      xyz.openbmc_project.Common.UUID:
+        UUID:
+          IPMIFruProperty: UUID
+          IPMIFruSection: MultiRecord
   /system/chassis:
     entityID: 23
     entityInstance: 1

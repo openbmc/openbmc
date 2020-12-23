@@ -84,4 +84,7 @@ RDEPENDS_${PN} += "flac mpg123"
 # Mycroft can do this itself on the target, but it's quicker to do it here
 RDEPENDS_${PN} += "mimic"
 
+# pgrep is used by stop-mycroft.sh
+RDEPENDS_${PN} += "procps"
+
 SYSTEMD_SERVICE_${PN} = "mycroft-setup.service mycroft.service"

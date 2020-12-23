@@ -3,7 +3,7 @@ require vim.inc
 PROVIDES = "xxd"
 
 PACKAGECONFIG_class-native = ""
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 ALTERNATIVE_${PN}_append = " xxd"
 ALTERNATIVE_TARGET[xxd] = "${bindir}/xxd"

@@ -1,0 +1,63 @@
+#!/bin/sh
+
+dmverity_enabled() {
+    return 0
+}
+
+dmverity_run() {
+    DATA_SIZE="__not_set__"
+    ROOT_HASH="__not_set__"
+
+    . /usr/share/misc/dm-verity.env
+
+    C=0
+    delay=${bootparam_rootdelay:-1}
+    timeout=${bootparam_roottimeout:-5}
+    RDEV="$(realpath /dev/disk/by-partuuid/${bootparam_root#PARTUUID=})"
+    while [ ! -b "${RDEV}" ]; do
+        if [ $(( $C * $delay )) -gt $timeout ]; then
+            fatal "Root device resolution failed"
+            exit 1
+        fi
+
+        case "${bootparam_root}" in
+            ID=*)
+                RDEV="$(realpath /dev/disk/by-id/${bootparam_root#ID=})"
+                ;;
+            LABEL=*)
+                RDEV="$(realpath /dev/disk/by-label/${bootparam_root#LABEL=})"
+                ;;
+            PARTLABEL=*)
+                RDEV="$(realpath /dev/disk/by-partlabel/${bootparam_root#PARTLABEL=})"
+                ;;
+            PARTUUID=*)
+                RDEV="$(realpath /dev/disk/by-partuuid/${bootparam_root#PARTUUID=})"
+                ;;
+            PATH=*)
+                RDEV="$(realpath /dev/disk/by-path/${bootparam_root#PATH=})"
+                ;;
+            UUID=*)
+                RDEV="$(realpath /dev/disk/by-uuid/${bootparam_root#UUID=})"
+                ;;
+            *)
+                RDEV="${bootparam_root}"
+        esac
+        debug "Sleeping for $delay second(s) to wait root to settle..."
+        sleep $delay
+        C=$(( $C + 1 ))
+
+    done
+
+    veritysetup \
+        --data-block-size=1024 \
+        --hash-offset=${DATA_SIZE} \
+        create rootfs \
+        ${RDEV} \
+        ${RDEV} \
+        ${ROOT_HASH}
+
+    mount \
+        -o ro \
+        /dev/mapper/rootfs \
+        ${ROOTFS_DIR} || exit 2
+}

@@ -13,7 +13,7 @@ YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=met
 SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
 
 SRCREV_machine ?= "${SRCREV}"
-SRCREV_meta ?= "93b1325e4b9bff0d1ce7a2dd85aed0b26e3e76d7"
+SRCREV_meta ?= "33bd5e8ac6fa46d5d7891b6e850603159f095b1a"
 SRCREV_FORMAT = "machine"
 
 require recipes-kernel/linux/linux-yocto.inc
@@ -46,24 +46,20 @@ COMPATIBLE_MACHINE_versal = ".*"
 
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
-KBUILD_DEFCONFIG_zynqmp = "xilinx_zynqmp_defconfig"
+KBUILD_DEFCONFIG_zynqmp = "xilinx_defconfig"
 KBUILD_DEFCONFIG_zynq = "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG_microblaze = "mmu_defconfig"
-KBUILD_DEFCONFIG_versal = "xilinx_versal_defconfig"
-
-# Add meta-xilinx kmeta, used for MicroBlaze BSP fragments
-FILESEXTRAPATHS_prepend := "${THISDIR}:"
-SRC_URI_append = " file://xilinx-kmeta;type=kmeta;name=xilinx-kmeta;destsuffix=xilinx-kmeta"
+KBUILD_DEFCONFIG_versal = "xilinx_defconfig"
 
 # MicroBlaze BSP fragments
-KERNEL_FEATURES_append_kc705-microblazeel = " bsp/kc705-microblazeel/kc705-microblazeel.scc"
+KERNEL_FEATURES_append_kc705-microblazeel = " bsp/xilinx/kc705-microblazeel-features/kc705-microblazeel-features.scc"
 
 KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
 
-KERNEL_FEATURES_append_zynqmp = "${@' features/overlay/overlay.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
+KERNEL_FEATURES_append_zynqmp = "${@' features/xilinx/overlay/overlay_of.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
 
-KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
+KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc"
 
-KERNEL_FEATURES_append_ultra96-zynqmp = " bsp/ultra96-zynqmp/mipi-config-ultra96.scc"
+KERNEL_FEATURES_append_ultra96-zynqmp = " bsp/xilinx/ultra96-zynqmp/mipi-config-ultra96.scc"
 
 KERNEL_FEATURES_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"

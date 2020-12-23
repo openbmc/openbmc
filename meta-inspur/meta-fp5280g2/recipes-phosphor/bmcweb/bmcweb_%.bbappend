@@ -1,3 +1,3 @@
-EXTRA_OECMAKE_append = " \
-    -DBMCWEB_INSECURE_ENABLE_REDFISH_FW_TFTP_UPDATE=ON \
+EXTRA_OEMESON_append = " \
+    -Dinsecure-tftp-update=enabled \
     "

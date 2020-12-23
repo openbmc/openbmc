@@ -8,7 +8,7 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'thunderx', ' -mcpu=thunde
 require conf/machine/include/arm/arch-armv8a.inc
 
 ARMPKGARCH_tune-thunderx ?= "thunderx"
-ARMPKGARCH_tune-thunderx_be ?= "thunderx_be"
+ARMPKGARCH_tune-thunderx_be ?= "thunderx"
 
 TUNE_FEATURES_tune-thunderx = "${TUNE_FEATURES_tune-aarch64} thunderx"
 TUNE_FEATURES_tune-thunderx_be = "${TUNE_FEATURES_tune-thunderx} bigendian"

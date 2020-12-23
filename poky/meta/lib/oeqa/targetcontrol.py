@@ -187,6 +187,7 @@ class QemuTarget(BaseTarget):
         except:
             pass
         self.logger.removeHandler(self.loggerhandler)
+        self.loggerhandler.close()
         self.connection = None
         self.ip = None
         self.server_ip = None

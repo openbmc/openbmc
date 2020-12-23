@@ -24,11 +24,11 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  src/basic/process-util.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/basic/process-util.c b/src/basic/process-util.c
-index 644f53aee005..acaf13591396 100644
---- a/src/basic/process-util.c
-+++ b/src/basic/process-util.c
-@@ -1500,7 +1500,7 @@ int set_oom_score_adjust(int value) {
+Index: systemd-stable/src/basic/process-util.c
+===================================================================
+--- systemd-stable.orig/src/basic/process-util.c
++++ systemd-stable/src/basic/process-util.c
+@@ -1536,7 +1536,7 @@ int set_oom_score_adjust(int value) {
          sprintf(t, "%i", value);
  
          return write_string_file("/proc/self/oom_score_adj", t,

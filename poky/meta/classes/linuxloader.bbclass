@@ -4,7 +4,7 @@ def get_musl_loader_arch(d):
 
     targetarch = d.getVar("TARGET_ARCH")
     if targetarch.startswith("microblaze"):
-        ldso_arch = "microblaze${@bb.utils.contains('TUNE_FEATURES', 'bigendian', '', 'el' ,d)}"
+        ldso_arch = "microblaze${@bb.utils.contains('TUNE_FEATURES', 'bigendian', '', 'el', d)}"
     elif targetarch.startswith("mips"):
         ldso_arch = "mips${ABIEXTENSION}${MIPSPKGSFX_BYTE}${MIPSPKGSFX_R6}${MIPSPKGSFX_ENDIAN}${@['', '-sf'][d.getVar('TARGET_FPU') == 'soft']}"
     elif targetarch == "powerpc":
@@ -21,6 +21,8 @@ def get_musl_loader_arch(d):
         ldso_arch = "aarch64${ARMPKGSFX_ENDIAN_64}"
     elif targetarch.startswith("riscv64"):
         ldso_arch = "riscv64${@['', '-sf'][d.getVar('TARGET_FPU') == 'soft']}"
+    elif targetarch.startswith("riscv32"):
+        ldso_arch = "riscv32${@['', '-sf'][d.getVar('TARGET_FPU') == 'soft']}"
     return ldso_arch
 
 def get_musl_loader(d):

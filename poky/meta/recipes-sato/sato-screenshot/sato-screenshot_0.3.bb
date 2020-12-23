@@ -21,7 +21,7 @@ inherit autotools pkgconfig features_check
 FILES_${PN} += "${libdir}/matchbox-panel/*.so"
 
 do_install_append () {
-	rm ${D}${libdir}/matchbox-panel/*.la
+	rm -f ${D}${libdir}/matchbox-panel/*.la
 }
 
 # The matchbox-panel-2 requires x11 in DISTRO_FEATURES

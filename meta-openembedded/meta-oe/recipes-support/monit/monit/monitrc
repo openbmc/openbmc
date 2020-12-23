@@ -21,6 +21,12 @@ set daemon  30              # check services at 30 seconds intervals
 #                           # default Monit check immediately after Monit start)
 #
 #
+
+# set monit files in temporary locations
+set pidfile /var/run/.monit.pid
+set statefile /var/run/.monit.state
+set idfile /var/run/.monit.id
+
 ## Set syslog logging. If you want to log to a standalone log file instead,
 ## specify the full path to the log file
 #

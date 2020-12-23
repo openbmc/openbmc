@@ -68,7 +68,7 @@ cpucore_temp_sensor:
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -110,7 +110,7 @@ dimm_temp_sensor:
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -188,7 +188,7 @@ gpu_temp_sensor:
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -221,7 +221,7 @@ memory_temp_sensor:
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -327,7 +327,7 @@ vrm_vdd_temp_sensor:
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127

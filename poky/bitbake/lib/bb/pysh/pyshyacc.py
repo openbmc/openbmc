@@ -570,6 +570,7 @@ def p_linebreak(p):
 
 def p_separator_op(p):                 
     """separator_op : COMMA
+                    | COMMA COMMA
                     | AMP"""
     p[0] = p[1]
 

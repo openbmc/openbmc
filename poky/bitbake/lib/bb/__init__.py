@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-__version__ = "1.47.0"
+__version__ = "1.49.0"
 
 import sys
 if sys.version_info < (3, 5, 0):
@@ -93,7 +93,7 @@ class BBLoggerAdapter(logging.LoggerAdapter, BBLoggerMixin):
 
         def __repr__(self):
             logger = self.logger
-            level = getLevelName(logger.getEffectiveLevel())
+            level = logger.getLevelName(logger.getEffectiveLevel())
             return '<%s %s (%s)>' % (self.__class__.__name__, logger.name, level)
 
 logging.LoggerAdapter = BBLoggerAdapter

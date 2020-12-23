@@ -1,27 +1,42 @@
-From ffe923437a592adb21cbfb7635fc6f4bd1b4dca8 Mon Sep 17 00:00:00 2001
+From 4cf6ca4fc2abe2d9ed4b74dba1124ba5f192c015 Mon Sep 17 00:00:00 2001
 From: Hieu Vu <hvu@amperecomputing.com>
-Date: Thu, 10 Sep 2020 15:53:39 +0700
-Subject: [PATCH] Redfish: Add message registries for Ampere event
+Date: Fri, 27 Nov 2020 06:49:20 +0000
+Subject: [PATCH] meta-ampere:redfish Add registries for Ampere events
+
+This patch adds 2 message registries: AmpereCritical and AmpereWarning
+to /redfish/v1/Registries/OpenBMC/OpenBMC. The other applications can use
+these registries to add logs to EventLog service, for example:
+
+sd_journal_send("MESSAGE=%s", "Text", "PRIORITY=%i", LOG_ERR,
+                "REDFISH_MESSAGE_ID=%s", "OpenBMC.0.1.AmpereCritical",
+                "REDFISH_MESSAGE_ARGS=%s,%s", "SCP", "Boot failed", NULL);
+
+Test case:
+- GET /redfish/v1/Registries/OpenBMC/OpenBMC
+  Check if AmpereCritical and AmpereWarning exist.
+
+- Create an simple application using sd_journal_send (as above example)
+  Check if the log is in /redfish/v1/Systems/system/LogServices/EventLog/Entries
 
 Signed-off-by: Hieu Vu <hvu@amperecomputing.com>
 ---
- .../registries/openbmc_message_registry.hpp   | 28 ++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ .../registries/openbmc_message_registry.hpp   | 30 ++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/redfish-core/include/registries/openbmc_message_registry.hpp b/redfish-core/include/registries/openbmc_message_registry.hpp
-index ec0f068..97bb1e9 100644
+index 5eb9380..679895e 100644
 --- a/redfish-core/include/registries/openbmc_message_registry.hpp
 +++ b/redfish-core/include/registries/openbmc_message_registry.hpp
 @@ -29,7 +29,7 @@ const Header header = {
      "0.1.0",
      "OpenBMC",
  };
--constexpr std::array<MessageEntry, 182> registry = {
-+constexpr std::array<MessageEntry, 184> registry = {
+-constexpr std::array<MessageEntry, 187> registry = {
++constexpr std::array<MessageEntry, 189> registry = {
      MessageEntry{
          "ADDDCCorrectable",
          {
-@@ -45,6 +45,32 @@ constexpr std::array<MessageEntry, 182> registry = {
+@@ -46,6 +46,34 @@ constexpr std::array<MessageEntry, 187> registry = {
              },
              "None.",
          }},
@@ -30,6 +45,7 @@ index ec0f068..97bb1e9 100644
 +        {
 +            "Indicates an Ampere critical event",
 +            "%1: %2",
++            "Critical",
 +            "Critical",
 +            2,
 +            {
@@ -44,6 +60,7 @@ index ec0f068..97bb1e9 100644
 +            "Indicates an Ampere warning event",
 +            "%1: %2",
 +            "Warning",
++            "Warning",
 +            2,
 +            {
 +                "string",
@@ -54,6 +71,6 @@ index ec0f068..97bb1e9 100644
      MessageEntry{
          "AtScaleDebugFeatureEnabledAtHardware",
          {
---
-2.24.3 (Apple Git-128)
+-- 
+2.25.1
 

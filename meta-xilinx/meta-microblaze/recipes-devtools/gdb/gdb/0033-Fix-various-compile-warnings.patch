@@ -1,0 +1,60 @@
+From c59684852ecd37d6f82363f2cf0e1de1f770aab7 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@kernel.crashing.org>
+Date: Fri, 17 Jul 2020 09:20:54 -0500
+Subject: [PATCH 33/40] Fix various compile warnings
+
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+---
+ bfd/elf64-microblaze.c     |  9 +++++----
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index b002b414d64..8308f1ebd09 100644
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -692,7 +692,7 @@ microblaze_elf_reloc_name_lookup (bfd *abfd ATTRIBUTE_UNUSED,
+ /* Set the howto pointer for a RCE ELF reloc.  */
+ 
+ static bfd_boolean
+-microblaze_elf_info_to_howto (bfd * abfd ATTRIBUTE_UNUSED,
++microblaze_elf_info_to_howto (bfd * abfd,
+ 			      arelent * cache_ptr,
+ 			      Elf_Internal_Rela * dst)
+ {
+@@ -705,14 +705,14 @@ microblaze_elf_info_to_howto (bfd * abfd ATTRIBUTE_UNUSED,
+   r_type = ELF64_R_TYPE (dst->r_info);
+   if (r_type >= R_MICROBLAZE_max)
+     {
+-      (*_bfd_error_handler) (_("%pB: unrecognised MicroBlaze reloc number: %d"),
++      _bfd_error_handler (_("%pB: unsupported relocation type %#x"),
+ 			     abfd, r_type);
+       bfd_set_error (bfd_error_bad_value);
+       return FALSE;
+     }
+ 
+   cache_ptr->howto = microblaze_elf_howto_table [r_type];
+- return TRUE;
++  return TRUE;
+ }
+ 
+ /* Microblaze ELF local labels start with 'L.' or '$L', not '.L'.  */
+@@ -1560,7 +1560,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 			else
+ 			  {
+ 			    BFD_FAIL ();
+-			    (*_bfd_error_handler)
++			    _bfd_error_handler
+ 			      (_("%pB: probably compiled without -fPIC?"),
+ 			       input_bfd);
+ 			    bfd_set_error (bfd_error_bad_value);
+@@ -2554,6 +2554,7 @@ microblaze_elf_check_relocs (bfd * abfd,
+           goto dogottls;
+         case R_MICROBLAZE_TLSLD:
+           tls_type |= (TLS_TLS | TLS_LD);
++          /* Fall through. */
+         dogottls:
+           sec->has_tls_reloc = 1;
+           /* Fall through. */
+-- 
+2.17.1
+

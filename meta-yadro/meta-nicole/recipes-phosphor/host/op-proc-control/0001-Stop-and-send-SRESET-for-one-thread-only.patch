@@ -1,0 +1,60 @@
+From 53241d7be35fba23079504468090d770d4116831 Mon Sep 17 00:00:00 2001
+From: Artem Senichev <a.senichev@yadro.com>
+Date: Tue, 28 Jul 2020 17:38:17 +0300
+Subject: [PATCH] Stop and send SRESET for one thread only
+
+Fixes bugs preventing the host from creating a crash dump.
+
+Stopping all threads leads to errors in skiboot:
+[  163.237293219,3] Could not stop thread 0:0:1: Thread is quiesced already.
+If the kernel has xmon support, exiting the debugger causes the kernel
+to hang:
+[  235.694220] watchdog: CPU 97 TB:187362511366, last heartbeat TB:159120095297 (55160ms ago)
+[  235.694276] watchdog: CPU 101 Hard LOCKUP
+
+Sending SRESET to all threads causes kernel panic:
+[   50.495727] Kernel panic - not syncing: Unrecoverable nested System Reset
+
+Signed-off-by: Artem Senichev <a.senichev@yadro.com>
+---
+ nmi_interface.cpp | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/nmi_interface.cpp b/nmi_interface.cpp
+index fcce451..d022d7e 100644
+--- a/nmi_interface.cpp
++++ b/nmi_interface.cpp
+@@ -38,7 +38,7 @@ void NMI::nMI()
+     using InternalFailure =
+         sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
+ 
+-    struct pdbg_target* target;
++    struct pdbg_target* target = nullptr;
+ 
+     pdbg_for_each_class_target("thread", target)
+     {
+@@ -51,11 +51,19 @@ void NMI::nMI()
+             report<InternalFailure>();
+             return;
+         }
++        break;
+     }
+ 
+-    if (thread_sreset_all() < 0)
++    if (!target)
+     {
+-        log<level::ERR>("Failed to sreset all threads");
++        log<level::ERR>("Thread not found");
++        report<InternalFailure>();
++        return;
++    }
++
++    if (thread_sreset(target) < 0)
++    {
++        log<level::ERR>("Failed to sreset thread");
+         report<InternalFailure>();
+     }
+ }
+-- 
+2.27.0
+

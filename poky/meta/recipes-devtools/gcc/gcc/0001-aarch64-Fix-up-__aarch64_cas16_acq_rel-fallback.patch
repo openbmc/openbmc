@@ -1,0 +1,66 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From fd2ec4542fd2975e6d3f2f1c1a2639945a84f9e1 Mon Sep 17 00:00:00 2001
+From: Jakub Jelinek <jakub@redhat.com>
+Date: Mon, 3 Aug 2020 22:55:28 +0200
+Subject: [PATCH] aarch64: Fix up __aarch64_cas16_acq_rel fallback
+
+As mentioned in the PR, the fallback path when LSE is unavailable writes
+incorrect registers to the memory if the previous content compares equal
+to x0, x1 - it writes copy of x0, x1 from the start of function, but it
+should write x2, x3.
+
+2020-08-03  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/96402
+	* config/aarch64/lse.S (__aarch64_cas16_acq_rel): Use x2, x3 instead
+	of x(tmp0), x(tmp1) in STXP arguments.
+
+	* gcc.target/aarch64/pr96402.c: New test.
+
+(cherry picked from commit 90b43856fdff7d96d93d22970eca8a86c56e0ddc)
+---
+ gcc/testsuite/gcc.target/aarch64/pr96402.c | 16 ++++++++++++++++
+ libgcc/config/aarch64/lse.S                |  2 +-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+ create mode 100644 gcc/testsuite/gcc.target/aarch64/pr96402.c
+
+diff --git a/gcc/testsuite/gcc.target/aarch64/pr96402.c b/gcc/testsuite/gcc.target/aarch64/pr96402.c
+new file mode 100644
+index 00000000000..fa2dddfac15
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/aarch64/pr96402.c
+@@ -0,0 +1,16 @@
++/* PR target/96402 */
++/* { dg-do run { target int128 } } */
++/* { dg-options "-moutline-atomics" } */
++
++int
++main ()
++{
++  __int128 a = 0;
++  __sync_val_compare_and_swap (&a, (__int128) 0, (__int128) 1);
++  if (a != 1)
++    __builtin_abort ();
++  __sync_val_compare_and_swap (&a, (__int128) 1, (((__int128) 0xdeadbeeffeedbac1ULL) << 64) | 0xabadcafe00c0ffeeULL);
++  if (a != ((((__int128) 0xdeadbeeffeedbac1ULL) << 64) | 0xabadcafe00c0ffeeULL))
++    __builtin_abort ();
++  return 0;
++}
+diff --git a/libgcc/config/aarch64/lse.S b/libgcc/config/aarch64/lse.S
+index 64691c601c1..c8fbfbce4fd 100644
+--- a/libgcc/config/aarch64/lse.S
++++ b/libgcc/config/aarch64/lse.S
+@@ -203,7 +203,7 @@ STARTFN	NAME(cas)
+ 	cmp		x0, x(tmp0)
+ 	ccmp		x1, x(tmp1), #0, eq
+ 	bne		1f
+-	STXP		w(tmp2), x(tmp0), x(tmp1), [x4]
++	STXP		w(tmp2), x2, x3, [x4]
+ 	cbnz		w(tmp2), 0b
+ 1:	ret
+ 
+-- 
+2.26.2
+

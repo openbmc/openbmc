@@ -86,6 +86,12 @@ do_install() {
 	# be dealt with.
 	# cp -a scripts $kerneldir/build
 
+	# although module.lds can be regenerated on target via 'make modules_prepare'
+	# there are several places where 'makes scripts prepare' is done, and that won't
+	# regenerate the file. So we copy it onto the target as a migration to using
+	# modules_prepare
+	cp -a --parents scripts/module.lds $kerneldir/build/ 2>/dev/null || :
+
         if [ -d arch/${ARCH}/scripts ]; then
 	    cp -a arch/${ARCH}/scripts $kerneldir/build/arch/${ARCH}
 	fi
@@ -108,6 +114,15 @@ do_install() {
 	fi
 
 	cp -a include $kerneldir/build/include
+
+	# we don't usually copy generated files, since they can be rebuilt on the target,
+	# but without this file, we get a forced syncconfig run in v5.8+, which prompts and
+	# breaks workflows.
+	cp -a --parents include/generated/autoconf.h $kerneldir/build 2>/dev/null || :
+
+	if [ -e $kerneldir/include/generated/.vdso-offsets.h.cmd ]; then
+	    rm $kerneldir/include/generated/.vdso-offsets.h.cmd
+	fi
     )
 
     # now grab the chunks from the source tree that we need
@@ -249,6 +264,21 @@ do_install() {
     # Copy .config to include/config/auto.conf so "make prepare" is unnecessary.
     cp $kerneldir/build/.config $kerneldir/build/include/config/auto.conf
 
+    # make sure these are at least as old as the .config, or rebuilds will trigger
+    touch -r $kerneldir/build/.config $kerneldir/build/include/generated/autoconf.h 2>/dev/null || :
+    touch -r $kerneldir/build/.config $kerneldir/build/include/config/auto.conf* 2>/dev/null || :
+
+    if [ -e "$kerneldir/build/include/config/auto.conf.cmd" ]; then
+        sed -i 's/ifneq "$(CC)" ".*-linux-.*gcc.*$/ifneq "$(CC)" "gcc"/' "$kerneldir/build/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(LD)" ".*-linux-.*ld.bfd.*$/ifneq "$(LD)" "ld"/' "$kerneldir/build/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(HOSTCXX)" ".*$/ifneq "$(HOSTCXX)" "g++"/' "$kerneldir/build/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(HOSTCC)" ".*$/ifneq "$(HOSTCC)" "gcc"/' "$kerneldir/build/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(CC_VERSION_TEXT)".*\(gcc.*\)"/ifneq "$(CC_VERSION_TEXT)" "\1"/' "$kerneldir/build/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(srctree)" ".*"/ifneq "$(srctree)" "."/' "$kerneldir/build/include/config/auto.conf.cmd"
+        # we don't build against the defconfig, so make sure it isn't the trigger for syncconfig
+        sed -i 's/ifneq "$(KBUILD_DEFCONFIG)".*"\(.*\)"/ifneq "\1" "\1"/' "$kerneldir/build/include/config/auto.conf.cmd"
+    fi
+
     # make the scripts python3 safe. We won't be running these, and if they are
     # left as /usr/bin/python rootfs assembly will fail, since we only have python3
     # in the RDEPENDS (and the python3 package does not include /usr/bin/python)
@@ -272,3 +302,5 @@ RDEPENDS_${PN} = "bc python3 flex bison ${TCLIBC}-utils"
 RDEPENDS_${PN} += "openssl-dev util-linux"
 # and x86 needs a bit more for 4.15+
 RDEPENDS_${PN} += "${@bb.utils.contains('ARCH', 'x86', 'elfutils', '', d)}"
+# 5.8+ needs gcc-plugins libmpc-dev
+RDEPENDS_${PN} += "gcc-plugins libmpc-dev"

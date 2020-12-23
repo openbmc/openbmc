@@ -11,14 +11,15 @@ LIC_FILES_CHKSUM = "file://COPYING;beginline=2;md5=0251eaec1188b20d9a72c502ecfdd
 DEPENDS = "file-replacement-native"
 DEPENDS_class-native = "bzip2-replacement-native"
 
-SRC_URI = "git://github.com/file/file.git"
+SRC_URI = "git://github.com/file/file.git \
+           file://0001-src-compress.c-correct-header-define-for-xz-lzma.patch"
 
 SRCREV = "87731415de945660b00f02207d8e9d986ef9b82e"
 S = "${WORKDIR}/git"
 
 inherit autotools update-alternatives
 
-PACKAGECONFIG ??= "zlib"
+PACKAGECONFIG ??= "bz2 lzma zlib"
 PACKAGECONFIG[bz2] = "--enable-bzlib, --disable-bzlib, bzip2"
 PACKAGECONFIG[lzma] = "--enable-xzlib, --disable-xzlib, xz"
 PACKAGECONFIG[zlib] = "--enable-zlib, --disable-zlib, zlib"

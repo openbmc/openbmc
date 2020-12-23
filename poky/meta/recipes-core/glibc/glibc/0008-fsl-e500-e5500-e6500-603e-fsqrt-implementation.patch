@@ -1,7 +1,7 @@
-From 61b6c9737897c5828ef4b40699ee0a74c570034a Mon Sep 17 00:00:00 2001
+From 59b0a78ae706a540dbd8905bc97c875220d6aeb2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:01:50 +0000
-Subject: [PATCH] fsl e500/e5500/e6500/603e fsqrt implementation
+Subject: [PATCH 08/29] fsl e500/e5500/e6500/603e fsqrt implementation
 
 Upstream-Status: Pending
 Signed-off-by: Edmar Wienskoski <edmar@freescale.com>
@@ -1579,3 +1579,6 @@ index 0000000000..04ff8cc181
 +++ b/sysdeps/unix/sysv/linux/powerpc/powerpc64/e6500/fpu/Implies
 @@ -0,0 +1 @@
 +powerpc/powerpc64/e6500/fpu
+-- 
+2.27.0
+

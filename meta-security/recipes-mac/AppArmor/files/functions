@@ -144,7 +144,7 @@ clear_cache_var() {
 
 read_features_dir()
 {
-	for f in `ls -AU "$1"` ; do
+	for f in `ls -A "$1"` ; do
 		if [ -f "$1/$f" ] ; then
 			read -r KF < "$1/$f" || true
 			echo -n "$f {$KF } "

@@ -23,7 +23,9 @@ do_install () {
     if [ "${base_bindir}" != "${bindir}" ]; then
         install -d ${D}${base_bindir}/
         mv "${D}${bindir}/cpio" "${D}${base_bindir}/cpio"
-        rmdir ${D}${bindir}/
+        if [ "${sbindir}" != "${bindir}" ]; then
+            rmdir ${D}${bindir}/
+        fi
     fi
 
     # Avoid conflicts with the version from tar
@@ -46,4 +48,4 @@ ALTERNATIVE_LINK_NAME[cpio] = "${base_bindir}/cpio"
 ALTERNATIVE_PRIORITY[rmt] = "50"
 ALTERNATIVE_LINK_NAME[rmt] = "${sbindir}/rmt"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

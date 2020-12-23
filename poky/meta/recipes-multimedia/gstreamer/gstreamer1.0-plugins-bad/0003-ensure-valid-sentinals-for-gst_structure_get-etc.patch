@@ -1,0 +1,88 @@
+From 5ed27de9f662fe063b8b3d5d4335aa64cd4718c9 Mon Sep 17 00:00:00 2001
+From: Andre McCurdy <armccurdy@gmail.com>
+Date: Tue, 9 Feb 2016 14:00:00 -0800
+Subject: [PATCH 3/4] ensure valid sentinals for gst_structure_get() etc
+
+For GStreamer functions declared with G_GNUC_NULL_TERMINATED,
+ie __attribute__((__sentinel__)), gcc will generate a warning if the
+last parameter passed to the function is not NULL (where a valid NULL
+in this context is defined as zero with any pointer type).
+
+The C callers to such functions within gst-plugins-bad use the C NULL
+definition (ie ((void*)0)), which is a valid sentinel.
+
+However the C++ NULL definition (ie 0L), is not a valid sentinel
+without an explicit cast to a pointer type.
+
+Upstream-Status: Pending
+
+Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+---
+ sys/decklink/gstdecklink.cpp          | 10 +++++-----
+ sys/decklink/gstdecklinkaudiosrc.cpp  |  2 +-
+ sys/decklink/gstdecklinkvideosink.cpp |  2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/sys/decklink/gstdecklink.cpp b/sys/decklink/gstdecklink.cpp
+index 4dac7e1..43762ce 100644
+--- a/sys/decklink/gstdecklink.cpp
++++ b/sys/decklink/gstdecklink.cpp
+@@ -674,7 +674,7 @@ gst_decklink_mode_get_generic_structure (GstDecklinkModeEnum e)
+       "pixel-aspect-ratio", GST_TYPE_FRACTION, mode->par_n, mode->par_d,
+       "interlace-mode", G_TYPE_STRING,
+       mode->interlaced ? "interleaved" : "progressive",
+-      "framerate", GST_TYPE_FRACTION, mode->fps_n, mode->fps_d, NULL);
++      "framerate", GST_TYPE_FRACTION, mode->fps_n, mode->fps_d, (void*)NULL);
+ 
+   return s;
+ }
+@@ -699,16 +699,16 @@ gst_decklink_mode_get_structure (GstDecklinkModeEnum e, BMDPixelFormat f,
+     case bmdFormat8BitYUV:     /* '2vuy' */
+       gst_structure_set (s, "format", G_TYPE_STRING, "UYVY",
+           "colorimetry", G_TYPE_STRING, mode->colorimetry,
+-          "chroma-site", G_TYPE_STRING, "mpeg2", NULL);
++          "chroma-site", G_TYPE_STRING, "mpeg2", (void*)NULL);
+       break;
+     case bmdFormat10BitYUV:    /* 'v210' */
+-      gst_structure_set (s, "format", G_TYPE_STRING, "v210", NULL);
++      gst_structure_set (s, "format", G_TYPE_STRING, "v210", (void*)NULL);
+       break;
+     case bmdFormat8BitARGB:    /* 'ARGB' */
+-      gst_structure_set (s, "format", G_TYPE_STRING, "ARGB", NULL);
++      gst_structure_set (s, "format", G_TYPE_STRING, "ARGB", (void*)NULL);
+       break;
+     case bmdFormat8BitBGRA:    /* 'BGRA' */
+-      gst_structure_set (s, "format", G_TYPE_STRING, "BGRA", NULL);
++      gst_structure_set (s, "format", G_TYPE_STRING, "BGRA", (void*)NULL);
+       break;
+     case bmdFormat10BitRGB:    /* 'r210' Big-endian RGB 10-bit per component with SMPTE video levels (64-960). Packed as 2:10:10:10 */
+     case bmdFormat12BitRGB:    /* 'R12B' Big-endian RGB 12-bit per component with full range (0-4095). Packed as 12-bit per component */
+diff --git a/sys/decklink/gstdecklinkaudiosrc.cpp b/sys/decklink/gstdecklinkaudiosrc.cpp
+index 2fef934..c47229a 100644
+--- a/sys/decklink/gstdecklinkaudiosrc.cpp
++++ b/sys/decklink/gstdecklinkaudiosrc.cpp
+@@ -379,7 +379,7 @@ gst_decklink_audio_src_start (GstDecklinkAudioSrc * self)
+       g_mutex_unlock (&self->input->lock);
+ 
+       if (videosrc) {
+-        g_object_get (videosrc, "connection", &vconn, NULL);
++        g_object_get (videosrc, "connection", &vconn, (void *) NULL);
+         gst_object_unref (videosrc);
+ 
+         switch (vconn) {
+diff --git a/sys/decklink/gstdecklinkvideosink.cpp b/sys/decklink/gstdecklinkvideosink.cpp
+index e3a6775..f1a5aae 100644
+--- a/sys/decklink/gstdecklinkvideosink.cpp
++++ b/sys/decklink/gstdecklinkvideosink.cpp
+@@ -286,7 +286,7 @@ reset_framerate (GstCapsFeatures * features, GstStructure * structure,
+     gpointer user_data)
+ {
+   gst_structure_set (structure, "framerate", GST_TYPE_FRACTION_RANGE, 0, 1,
+-      G_MAXINT, 1, NULL);
++      G_MAXINT, 1, (void *) NULL);
+ 
+   return TRUE;
+ }
+-- 
+2.28.0
+

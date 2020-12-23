@@ -1,4 +1,4 @@
-From d4aa2dbdc69774ad668756586d59331ad215a2c6 Mon Sep 17 00:00:00 2001
+From dd0fe8d54def4684d360b3e9b10e963ef0208202 Mon Sep 17 00:00:00 2001
 From: Cody P Schafer <dev@codyps.com>
 Date: Thu, 27 Apr 2017 11:35:05 -0400
 Subject: [PATCH] CMakeDetermineSystem: use oe environment vars to load default
@@ -25,7 +25,7 @@ Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
  1 file changed, 7 insertions(+)
 
 diff --git a/Modules/CMakeDetermineSystem.cmake b/Modules/CMakeDetermineSystem.cmake
-index dc208c6..e0af4ca 100644
+index f3ec4da..bb05656 100644
 --- a/Modules/CMakeDetermineSystem.cmake
 +++ b/Modules/CMakeDetermineSystem.cmake
 @@ -81,6 +81,13 @@ else()

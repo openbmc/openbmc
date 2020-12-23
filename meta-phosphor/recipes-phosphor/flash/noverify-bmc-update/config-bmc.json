@@ -14,7 +14,7 @@
 		},
 		"update": {
 			"type": "systemd",
-			"unit": "reboot.target"
+			"unit": "noverify-bmc-update.service"
 		}
 	}
 }]

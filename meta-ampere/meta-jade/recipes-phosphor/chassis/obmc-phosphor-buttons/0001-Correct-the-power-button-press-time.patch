@@ -1,0 +1,26 @@
+From 4be2f4e890fddf55274325f0567e71b76bedf9df Mon Sep 17 00:00:00 2001
+From: Hieu Huynh <hieu.huynh@amperecomputing.com>
+Date: Thu, 10 Sep 2020 09:54:44 +0000
+Subject: [PATCH] Correct the power button press time
+
+Signed-off-by: Hieu Huynh <hieu.huynh@amperecomputing.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ff6638b..86c5bfd 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -11,7 +11,7 @@ set(POWER_DBUS_OBJECT_NAME "xyz/openbmc_project/Chassis/Buttons/Power")
+ set(RESET_DBUS_OBJECT_NAME "xyz/openbmc_project/Chassis/Buttons/Reset")
+ set(ID_DBUS_OBJECT_NAME "xyz/openbmc_project/Chassis/Buttons/ID")
+ set(GPIO_BASE_LABEL_NAME "1e780000.gpio")
+-set(LONG_PRESS_TIME_MS 3000)
++set(LONG_PRESS_TIME_MS 5000)
+ set(CHASSIS_STATE_OBJECT_NAME "xyz/openbmc_project/state/chassis")
+ set(HOST_STATE_OBJECT_NAME "xyz/openbmc_project/state/host")
+ set(ID_LED_GROUP "enclosure_identify" CACHE STRING "The identify LED group name")
+-- 
+2.17.1
+

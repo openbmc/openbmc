@@ -12,6 +12,7 @@ SOFTWARE_MGR_PACKAGES = " \
     ${PN}-download-mgr \
     ${PN}-updater \
     ${PN}-updater-ubi \
+    ${PN}-updater-mmc \
     ${PN}-sync \
 "
 PACKAGE_BEFORE_PN += "${SOFTWARE_MGR_PACKAGES}"
@@ -26,12 +27,14 @@ SYSTEMD_PACKAGES = ""
 PACKAGECONFIG[verify_signature] = "-Dverify-signature=enabled, -Dverify-signature=disabled"
 PACKAGECONFIG[sync_bmc_files] = "-Dsync-bmc-files=enabled, -Dsync-bmc-files=disabled"
 PACKAGECONFIG[ubifs_layout] = "-Dbmc-layout=ubi"
+PACKAGECONFIG[mmc_layout] = "-Dbmc-layout=mmc"
 PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled, -Dhost-bios-upgrade=disabled"
 
 inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
 inherit python3native
 inherit ${@bb.utils.contains('DISTRO_FEATURES', 'obmc-ubi-fs', 'phosphor-software-manager-ubi-fs', '', d)}
+inherit ${@bb.utils.contains('DISTRO_FEATURES', 'phosphor-mmc', 'phosphor-software-manager-mmc', '', d)}
 
 DEPENDS += " \
     openssl \
@@ -44,6 +47,7 @@ DEPENDS += " \
 RDEPENDS_${PN}-updater += " \
     bash \
     virtual-obmc-image-manager \
+    ${@bb.utils.contains('PACKAGECONFIG', 'verify_signature', 'phosphor-image-signing', '', d)} \
 "
 
 RPROVIDES_${PN}-version += " \

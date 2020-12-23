@@ -1,0 +1,12 @@
+[Unit]
+Description=Enable usb network
+After=phosphor-ipmi-host.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/usb-ctrl ecm usbeth0 on
+ExecStop=/usr/bin/usb-ctrl ecm usbeth0 off
+
+[Install]
+WantedBy=multi-user.target

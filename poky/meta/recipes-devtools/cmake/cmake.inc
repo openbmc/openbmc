@@ -22,6 +22,10 @@ SRC_URI = "https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${PV}.tar.gz \
            file://0004-Fail-silently-if-system-Qt-installation-is-broken.patch \
 "
 
-SRC_URI[sha256sum] = "0bd60d512275dc9f6ef2a2865426a184642ceb3761794e6b65bff233b91d8c40"
+SRC_URI[sha256sum] = "597c61358e6a92ecbfad42a9b5321ddd801fc7e7eca08441307c9138382d4f77"
 
 UPSTREAM_CHECK_REGEX = "cmake-(?P<pver>\d+(\.\d+)+)\.tar"
+
+# This is specific to the npm package that installs cmake, so isn't
+# relevant to OpenEmbedded
+CVE_CHECK_WHITELIST += "CVE-2016-10642"

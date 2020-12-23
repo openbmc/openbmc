@@ -10,6 +10,7 @@ SRC_URI = " \
     file://0002-Do-not-ask-cmake-to-export-binaries-they-don-t-make-.patch \
     file://CVE-2020-6851.patch \
     file://CVE-2020-8112.patch \
+    file://CVE-2020-15389.patch \
 "
 SRCREV = "57096325457f96d8cd07bd3af04fe81d7a2ba788"
 S = "${WORKDIR}/git"

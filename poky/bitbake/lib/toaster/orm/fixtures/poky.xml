@@ -26,9 +26,9 @@
     <field type="CharField" name="dirpath">bitbake</field>
   </object>
   <object model="orm.bitbakeversion" pk="4">
-    <field type="CharField" name="name">zeus</field>
+    <field type="CharField" name="name">gatesgarth</field>
     <field type="CharField" name="giturl">git://git.yoctoproject.org/poky</field>
-    <field type="CharField" name="branch">zeus</field>
+    <field type="CharField" name="branch">gatesgarth</field>
     <field type="CharField" name="dirpath">bitbake</field>
   </object>
 
@@ -56,11 +56,11 @@
     <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/"&gt;Yocto Project Master branch&lt;/a&gt;.</field>
   </object>
   <object model="orm.release" pk="4">
-    <field type="CharField" name="name">zeus</field>
-    <field type="CharField" name="description">Yocto Project 3.0 "Zeus"</field>
+    <field type="CharField" name="name">gatesgarth</field>
+    <field type="CharField" name="description">Yocto Project 3.2 "Gatesgarth"</field>
     <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">4</field>
-    <field type="CharField" name="branch_name">zeus</field>
-    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=zeus"&gt;Yocto Project Zeus branch&lt;/a&gt;.</field>
+    <field type="CharField" name="branch_name">gatesgarth</field>
+    <field type="TextField" name="helptext">Toaster will run your builds using the tip of the &lt;a href="http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=gatesgarth"&gt;Yocto Project Gatesgarth branch&lt;/a&gt;.</field>
   </object>
 
   <!-- Default project layers for each release -->
@@ -152,7 +152,7 @@
     <field rel="ManyToOneRel" to="orm.layer" name="layer">1</field>
     <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
-    <field type="CharField" name="branch">zeus</field>
+    <field type="CharField" name="branch">gatesgarth</field>
     <field type="CharField" name="dirpath">meta</field>
   </object>
 
@@ -190,7 +190,7 @@
     <field rel="ManyToOneRel" to="orm.layer" name="layer">2</field>
     <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
-    <field type="CharField" name="branch">zeus</field>
+    <field type="CharField" name="branch">gatesgarth</field>
     <field type="CharField" name="dirpath">meta-poky</field>
   </object>
 
@@ -228,7 +228,7 @@
     <field rel="ManyToOneRel" to="orm.layer" name="layer">3</field>
     <field type="IntegerField" name="layer_source">0</field>
     <field rel="ManyToOneRel" to="orm.release" name="release">4</field>
-    <field type="CharField" name="branch">zeus</field>
+    <field type="CharField" name="branch">gatesgarth</field>
     <field type="CharField" name="dirpath">meta-yocto-bsp</field>
   </object>
 </django-objects>

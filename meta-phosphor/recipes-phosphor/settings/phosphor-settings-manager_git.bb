@@ -17,7 +17,7 @@ DEPENDS += "${PYTHON_PN}-pyyaml-native"
 DEPENDS += "${PYTHON_PN}-mako-native"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "virtual/phosphor-settings-defaults"
-DEPENDS += "${@df_enabled(d, 'obmc-mrw', 'phosphor-settings-read-settings-mrw-native')}"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'obmc-mrw', 'phosphor-settings-read-settings-mrw-native', '', d)}"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
@@ -47,7 +47,7 @@ python do_merge_settings () {
     cmd.append(os.path.join(workdir, 'merge_settings.py'))
     cmd.append(os.path.join(settingsdir, 'defaults.yaml'))
     # Used for any settings from the MRW
-    use_mrw = df_enabled(d, 'obmc-mrw', 'true')
+    use_mrw = bb.utils.contains('DISTRO_FEATURES', 'obmc-mrw', 'true', '', d)
     if (use_mrw == 'true'):
         cmd.append(os.path.join(settingsdir, 'mrw-settings.override.yaml'))
 

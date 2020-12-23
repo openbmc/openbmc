@@ -89,6 +89,7 @@ class BitbakeTests(OESelftestTestCase):
         image_dir = bb_vars['D']
         pkgsplit_dir = bb_vars['PKGDEST']
         man_dir = bb_vars['mandir']
+        self.write_config("PACKAGE_CLASSES = \"package_rpm\"")
 
         bitbake('-c clean %s' % test_recipe)
         bitbake('-c package -f %s' % test_recipe)

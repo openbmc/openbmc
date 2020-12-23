@@ -1,0 +1,202 @@
+CVE: CVE-2020-13844
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From 1ff243934ac443b5f58cd02a5012ce58ecc31fb2 Mon Sep 17 00:00:00 2001
+From: Matthew Malcomson <matthew.malcomson@arm.com>
+Date: Thu, 9 Jul 2020 09:11:58 +0100
+Subject: [PATCH 1/3] aarch64: New Straight Line Speculation (SLS) mitigation
+ flags
+
+Here we introduce the flags that will be used for straight line speculation.
+
+The new flag introduced is `-mharden-sls=`.
+This flag can take arguments of `none`, `all`, or a comma seperated list of one
+or more of `retbr` or `blr`.
+`none` indicates no special mitigation of the straight line speculation
+vulnerability.
+`all` requests all mitigations currently implemented.
+`retbr` requests that the RET and BR instructions have a speculation barrier
+inserted after them.
+`blr` requests that BLR instructions are replaced by a BL to a function stub
+using a BR with a speculation barrier after it.
+
+Setting this on a per-function basis using attributes or the like is not
+enabled, but may be in the future.
+
+gcc/ChangeLog:
+
+2020-06-02  Matthew Malcomson  <matthew.malcomson@arm.com>
+
+	* config/aarch64/aarch64-protos.h (aarch64_harden_sls_retbr_p):
+	New.
+	(aarch64_harden_sls_blr_p): New.
+	* config/aarch64/aarch64.c (enum aarch64_sls_hardening_type):
+	New.
+	(aarch64_harden_sls_retbr_p): New.
+	(aarch64_harden_sls_blr_p): New.
+	(aarch64_validate_sls_mitigation): New.
+	(aarch64_override_options): Parse options for SLS mitigation.
+	* config/aarch64/aarch64.opt (-mharden-sls): New option.
+	* doc/invoke.texi: Document new option.
+---
+ gcc/config/aarch64/aarch64-protos.h |  3 ++
+ gcc/config/aarch64/aarch64.c        | 76 +++++++++++++++++++++++++++++++++++++
+ gcc/config/aarch64/aarch64.opt      |  4 ++
+ gcc/doc/invoke.texi                 | 12 ++++++
+ 4 files changed, 95 insertions(+)
+
+diff --git a/gcc/config/aarch64/aarch64-protos.h b/gcc/config/aarch64/aarch64-protos.h
+index 723d9ba..eb5f4b4 100644
+--- a/gcc/config/aarch64/aarch64-protos.h
++++ b/gcc/config/aarch64/aarch64-protos.h
+@@ -781,4 +781,7 @@ extern const atomic_ool_names aarch64_ool_ldeor_names;
+ 
+ tree aarch64_resolve_overloaded_builtin_general (location_t, tree, void *);
+ 
++extern bool aarch64_harden_sls_retbr_p (void);
++extern bool aarch64_harden_sls_blr_p (void);
++
+ #endif /* GCC_AARCH64_PROTOS_H */
+diff --git a/gcc/config/aarch64/aarch64.c b/gcc/config/aarch64/aarch64.c
+index b86434a..437a9cf 100644
+--- a/gcc/config/aarch64/aarch64.c
++++ b/gcc/config/aarch64/aarch64.c
+@@ -14494,6 +14494,79 @@ aarch64_validate_mcpu (const char *str, const struct processor **res,
+   return false;
+ }
+ 
++/* Straight line speculation indicators.  */
++enum aarch64_sls_hardening_type
++{
++  SLS_NONE = 0,
++  SLS_RETBR = 1,
++  SLS_BLR = 2,
++  SLS_ALL = 3,
++};
++static enum aarch64_sls_hardening_type aarch64_sls_hardening;
++
++/* Return whether we should mitigatate Straight Line Speculation for the RET
++   and BR instructions.  */
++bool
++aarch64_harden_sls_retbr_p (void)
++{
++  return aarch64_sls_hardening & SLS_RETBR;
++}
++
++/* Return whether we should mitigatate Straight Line Speculation for the BLR
++   instruction.  */
++bool
++aarch64_harden_sls_blr_p (void)
++{
++  return aarch64_sls_hardening & SLS_BLR;
++}
++
++/* As of yet we only allow setting these options globally, in the future we may
++   allow setting them per function.  */
++static void
++aarch64_validate_sls_mitigation (const char *const_str)
++{
++  char *token_save = NULL;
++  char *str = NULL;
++
++  if (strcmp (const_str, "none") == 0)
++    {
++      aarch64_sls_hardening = SLS_NONE;
++      return;
++    }
++  if (strcmp (const_str, "all") == 0)
++    {
++      aarch64_sls_hardening = SLS_ALL;
++      return;
++    }
++
++  char *str_root = xstrdup (const_str);
++  str = strtok_r (str_root, ",", &token_save);
++  if (!str)
++    error ("invalid argument given to %<-mharden-sls=%>");
++
++  int temp = SLS_NONE;
++  while (str)
++    {
++      if (strcmp (str, "blr") == 0)
++	temp |= SLS_BLR;
++      else if (strcmp (str, "retbr") == 0)
++	temp |= SLS_RETBR;
++      else if (strcmp (str, "none") == 0 || strcmp (str, "all") == 0)
++	{
++	  error ("%<%s%> must be by itself for %<-mharden-sls=%>", str);
++	  break;
++	}
++      else
++	{
++	  error ("invalid argument %<%s%> for %<-mharden-sls=%>", str);
++	  break;
++	}
++      str = strtok_r (NULL, ",", &token_save);
++    }
++  aarch64_sls_hardening = (aarch64_sls_hardening_type) temp;
++  free (str_root);
++}
++
+ /* Parses CONST_STR for branch protection features specified in
+    aarch64_branch_protect_types, and set any global variables required.  Returns
+    the parsing result and assigns LAST_STR to the last processed token from
+@@ -14738,6 +14811,9 @@ aarch64_override_options (void)
+   selected_arch = NULL;
+   selected_tune = NULL;
+ 
++  if (aarch64_harden_sls_string)
++    aarch64_validate_sls_mitigation (aarch64_harden_sls_string);
++
+   if (aarch64_branch_protection_string)
+     aarch64_validate_mbranch_protection (aarch64_branch_protection_string);
+ 
+diff --git a/gcc/config/aarch64/aarch64.opt b/gcc/config/aarch64/aarch64.opt
+index d99d14c..5170361 100644
+--- a/gcc/config/aarch64/aarch64.opt
++++ b/gcc/config/aarch64/aarch64.opt
+@@ -71,6 +71,10 @@ mgeneral-regs-only
+ Target Report RejectNegative Mask(GENERAL_REGS_ONLY) Save
+ Generate code which uses only the general registers.
+ 
++mharden-sls=
++Target RejectNegative Joined Var(aarch64_harden_sls_string)
++Generate code to mitigate against straight line speculation.
++
+ mfix-cortex-a53-835769
+ Target Report Var(aarch64_fix_a53_err835769) Init(2) Save
+ Workaround for ARM Cortex-A53 Erratum number 835769.
+diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
+index a2794a6..bd5b77a 100644
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -696,6 +696,7 @@ Objective-C and Objective-C++ Dialects}.
+ -msign-return-address=@var{scope} @gol
+ -mbranch-protection=@var{none}|@var{standard}|@var{pac-ret}[+@var{leaf}
+ +@var{b-key}]|@var{bti} @gol
++-mharden-sls=@var{opts} @gol
+ -march=@var{name}  -mcpu=@var{name}  -mtune=@var{name}  @gol
+ -moverride=@var{string}  -mverbose-cost-dump @gol
+ -mstack-protector-guard=@var{guard} -mstack-protector-guard-reg=@var{sysreg} @gol
+@@ -17065,6 +17066,17 @@ functions.  The optional argument @samp{b-key} can be used to sign the functions
+ with the B-key instead of the A-key.
+ @samp{bti} turns on branch target identification mechanism.
+ 
++@item -mharden-sls=@var{opts}
++@opindex mharden-sls
++Enable compiler hardening against straight line speculation (SLS).
++@var{opts} is a comma-separated list of the following options:
++@table @samp
++@item retbr
++@item blr
++@end table
++In addition, @samp{-mharden-sls=all} enables all SLS hardening while
++@samp{-mharden-sls=none} disables all SLS hardening.
++
+ @item -msve-vector-bits=@var{bits}
+ @opindex msve-vector-bits
+ Specify the number of bits in an SVE vector register.  This option only has
+-- 
+2.7.4
+

@@ -7,6 +7,7 @@ import datetime
 
 import logging
 import imp
+import os
 
 from collections import OrderedDict
 from layerindexlib.plugin import LayerIndexPluginUrlError
@@ -70,7 +71,7 @@ class LayerIndex():
 
         if self.__class__ != newIndex.__class__ or \
            other.__class__ != newIndex.__class__:
-            raise TypeException("Can not add different types.")
+            raise TypeError("Can not add different types.")
 
         for indexEnt in self.indexes:
             newIndex.indexes.append(indexEnt)
@@ -266,8 +267,8 @@ will write out the individual elements split by layer and related components.
                 logger.debug(1, "Store not implemented in %s" % plugin.type)
                 pass
         else:
-            logger.debug(1, "No plugins support %s" % url)
-            raise LayerIndexException("No plugins support %s" % url)
+            logger.debug(1, "No plugins support %s" % indexURI)
+            raise LayerIndexException("No plugins support %s" % indexURI)
 
 
     def is_empty(self):
@@ -657,7 +658,7 @@ class LayerIndexObj():
             if obj.id in self._index[indexname]:
                 if self._index[indexname][obj.id] == obj:
                     continue
-                raise LayerIndexError('Conflict adding object %s(%s) to index' % (indexname, obj.id))
+                raise LayerIndexException('Conflict adding object %s(%s) to index' % (indexname, obj.id))
             self._index[indexname][obj.id] = obj
 
     def add_raw_element(self, indexname, objtype, rawobjs):
@@ -842,11 +843,11 @@ class LayerIndexObj():
 
         def _resolve_dependencies(layerbranches, ignores, dependencies, invalid):
             for layerbranch in layerbranches:
-                if ignores and layerBranch.layer.name in ignores:
+                if ignores and layerbranch.layer.name in ignores:
                     continue
 
-                for layerdependency in layerbranch.index.layerDependencies_layerBranchId[layerBranch.id]:
-                    deplayerbranch = layerDependency.dependency_layerBranch
+                for layerdependency in layerbranch.index.layerDependencies_layerBranchId[layerbranch.id]:
+                    deplayerbranch = layerdependency.dependency_layerBranch
 
                     if ignores and deplayerbranch.layer.name in ignores:
                         continue

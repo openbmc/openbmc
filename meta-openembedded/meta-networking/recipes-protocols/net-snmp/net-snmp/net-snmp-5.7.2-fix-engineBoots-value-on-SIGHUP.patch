@@ -1,4 +1,4 @@
-From d619cd9fc01f336ff0ff55b18f9112789eb4d84c Mon Sep 17 00:00:00 2001
+From b6a3d6c8af35f1ef27b80b0516742fce89f4eb29 Mon Sep 17 00:00:00 2001
 From: Marian Florea <marian.florea@windriver.com>
 Date: Thu, 20 Jul 2017 16:55:24 +0800
 Subject: [PATCH] net snmp: fix engineBoots value on SIGHUP
@@ -14,10 +14,10 @@ Signed-off-by: Li Zhou <li.zhou@windriver.com>
  2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/agent/snmpd.c b/agent/snmpd.c
-index 6566354..eb0d4b4 100644
+index ae73eda..66b4560 100644
 --- a/agent/snmpd.c
 +++ b/agent/snmpd.c
-@@ -1239,6 +1239,7 @@ receive(void)
+@@ -1207,6 +1207,7 @@ receive(void)
  	    snmp_log(LOG_INFO, "NET-SNMP version %s restarted\n",
  		     netsnmp_get_version());
              update_config();
@@ -26,10 +26,10 @@ index 6566354..eb0d4b4 100644
  #if HAVE_SIGHOLD
              sigrelse(SIGHUP);
 diff --git a/snmplib/snmpv3.c b/snmplib/snmpv3.c
-index 771ba3b..5de05e7 100644
+index 29c2a0f..ada961c 100644
 --- a/snmplib/snmpv3.c
 +++ b/snmplib/snmpv3.c
-@@ -1060,9 +1060,9 @@ init_snmpv3_post_config(int majorid, int minorid, void *serverarg,
+@@ -1059,9 +1059,9 @@ init_snmpv3_post_config(int majorid, int minorid, void *serverarg,
      /*
       * if our engineID has changed at all, the boots record must be set to 1 
       */

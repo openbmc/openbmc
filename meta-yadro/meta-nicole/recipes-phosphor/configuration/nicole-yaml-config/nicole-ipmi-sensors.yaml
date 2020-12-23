@@ -189,14 +189,14 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 5
     mutability: Mutability::Write|Mutability::Read
     offsetB: 0
     path: /xyz/openbmc_project/sensors/temperature/dimm0_temp
     rExp: -1
     readingType: readingData
-    scale: -3
+    scale: 0
     sensorNamePattern: nameLeaf
     sensorReadingType: 1
     sensorType: 1
@@ -490,14 +490,14 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 5
     mutability: Mutability::Write|Mutability::Read
     offsetB: 0
     path: /xyz/openbmc_project/sensors/temperature/p0_core0_temp
     rExp: -1
     readingType: readingData
-    scale: -3
+    scale: 0
     sensorNamePattern: nameLeaf
     sensorReadingType: 1
     sensorType: 1

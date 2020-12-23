@@ -1,0 +1,12 @@
+[Unit]
+Description=Set Fan to Default Duty as Rebooting
+DefaultDependencies=no
+After=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/bin/fan-default-speed.sh
+
+[Install]
+WantedBy=shutdown.target

@@ -10,6 +10,8 @@ RRECOMMENDS_${PN} = "file"
 SRC_URI = "${DEBIAN_MIRROR}/main/m/mime-support/mime-support_${PV}-1.tar.gz"
 S = "${WORKDIR}/${BPN}"
 
+inherit update-alternatives
+
 FILES_${PN} += " ${libdir}/mime"
 
 docdir_append = "/${BPN}"
@@ -56,3 +58,7 @@ do_install () {
 
 SRC_URI[md5sum] = "d6e5d715e331147352c50c158dbdec6d"
 SRC_URI[sha256sum] = "a529c7892cb786f514af71f4ca5a4c3ebc58b538a49ff959c0d97592d38f040a"
+
+ALTERNATIVE_PRIORITY = "90"
+ALTERNATIVE_${PN} = "mime.types"
+ALTERNATIVE_LINK_NAME[mime.types] = "${sysconfdir}/mime.types"

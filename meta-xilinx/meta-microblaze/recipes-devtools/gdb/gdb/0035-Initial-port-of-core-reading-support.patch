@@ -1,0 +1,298 @@
+From f8cbcd1ef78f6ce9ae8d3382bf2bb0d1e770d201 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 24 Jan 2017 14:55:56 +0530
+Subject: [PATCH 35/40] Initial port of core reading support Added support for
+ reading notes in linux core dumps Support for reading of PRSTATUS and PSINFO
+ information for rebuilding ".reg" sections of core dumps at run time.
+
+Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
+Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
+---
+ bfd/elf32-microblaze.c      | 84 +++++++++++++++++++++++++++++++++++++
+ gdb/configure.tgt           |  2 +-
+ gdb/microblaze-linux-tdep.c | 17 +++++++-
+ gdb/microblaze-tdep.c       | 48 +++++++++++++++++++++
+ gdb/microblaze-tdep.h       | 27 ++++++++++++
+ 5 files changed, 176 insertions(+), 2 deletions(-)
+
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index 04816a4a187..cb7a98d307e 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -767,6 +767,87 @@ microblaze_elf_is_local_label_name (bfd *abfd, const char *name)
+   return _bfd_elf_is_local_label_name (abfd, name);
+ }
+ 
++/* Support for core dump NOTE sections.  */
++static bfd_boolean
++microblaze_elf_grok_prstatus (bfd *abfd, Elf_Internal_Note *note)
++{
++  int offset;
++  unsigned int size;
++
++  switch (note->descsz)
++    {
++      default:
++        return FALSE;
++
++      case 228:         /* Linux/MicroBlaze */
++        /* pr_cursig */
++        elf_tdata (abfd)->core->signal = bfd_get_16 (abfd, note->descdata + 12);
++
++        /* pr_pid */
++        elf_tdata (abfd)->core->pid = bfd_get_32 (abfd, note->descdata + 24);
++
++        /* pr_reg */
++        offset = 72;
++        size = 50 * 4;
++
++        break;
++    }
++
++  /* Make a ".reg/999" section.  */
++  return _bfd_elfcore_make_pseudosection (abfd, ".reg",
++                                          size, note->descpos + offset);
++}
++
++static bfd_boolean
++microblaze_elf_grok_psinfo (bfd *abfd, Elf_Internal_Note *note)
++{
++  switch (note->descsz)
++    {
++      default:
++        return FALSE;
++
++      case 128:         /* Linux/MicroBlaze elf_prpsinfo */
++        elf_tdata (abfd)->core->program
++         = _bfd_elfcore_strndup (abfd, note->descdata + 32, 16);
++        elf_tdata (abfd)->core->command
++         = _bfd_elfcore_strndup (abfd, note->descdata + 48, 80);
++    }
++
++  /* Note that for some reason, a spurious space is tacked
++     onto the end of the args in some (at least one anyway)
++     implementations, so strip it off if it exists.  */
++
++  {
++    char *command = elf_tdata (abfd)->core->command;
++    int n = strlen (command);
++
++    if (0 < n && command[n - 1] == ' ')
++      command[n - 1] = '\0';
++  }
++
++  return TRUE;
++}
++
++/* The microblaze linker (like many others) needs to keep track of
++   the number of relocs that it decides to copy as dynamic relocs in
++   check_relocs for each symbol. This is so that it can later discard
++   them if they are found to be unnecessary.  We store the information
++   in a field extending the regular ELF linker hash table.  */
++
++struct elf32_mb_dyn_relocs
++{
++  struct elf32_mb_dyn_relocs *next;
++
++  /* The input section of the reloc.  */
++  asection *sec;
++
++  /* Total number of relocs copied for the input section.  */
++  bfd_size_type count;
++
++  /* Number of pc-relative relocs copied for the input section.  */
++  bfd_size_type pc_count;
++};
++
+ /* ELF linker hash entry.  */
+ 
+ struct elf32_mb_link_hash_entry
+@@ -3673,4 +3754,7 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
+ #define elf_backend_size_dynamic_sections	microblaze_elf_size_dynamic_sections
+ #define elf_backend_add_symbol_hook		microblaze_elf_add_symbol_hook
+ 
++#define elf_backend_grok_prstatus               microblaze_elf_grok_prstatus
++#define elf_backend_grok_psinfo                 microblaze_elf_grok_psinfo
++
+ #include "elf32-target.h"
+diff --git a/gdb/configure.tgt b/gdb/configure.tgt
+index caa42be1c01..f0386568460 100644
+--- a/gdb/configure.tgt
++++ b/gdb/configure.tgt
+@@ -400,7 +400,7 @@ mep-*-*)
+ 
+ microblaze*-linux-*|microblaze*-*-linux*)
+ 	# Target: Xilinx MicroBlaze running Linux
+-	gdb_target_obs="microblaze-tdep.o microblaze-linux-tdep.o solib-svr4.o \
++	gdb_target_obs="microblaze-tdep.o microblaze-linux-tdep.o solib-svr4.o glibc-tdep.o \
+ 			symfile-mem.o linux-tdep.o"
+ 	gdb_sim=../sim/microblaze/libsim.a
+ 	;;
+diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
+index 42c219d32f3..0afb6efeba3 100644
+--- a/gdb/microblaze-linux-tdep.c
++++ b/gdb/microblaze-linux-tdep.c
+@@ -36,6 +36,7 @@
+ #include "frame-unwind.h"
+ #include "tramp-frame.h"
+ #include "linux-tdep.h"
++#include "glibc-tdep.h"
+ 
+ static int microblaze_debug_flag = 0;
+ 
+@@ -135,11 +136,14 @@ static struct tramp_frame microblaze_linux_sighandler_tramp_frame =
+   microblaze_linux_sighandler_cache_init
+ };
+ 
+-
+ static void
+ microblaze_linux_init_abi (struct gdbarch_info info,
+ 			   struct gdbarch *gdbarch)
+ {
++  struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
++
++  tdep->sizeof_gregset = 200;
++
+   linux_init_abi (info, gdbarch);
+ 
+   set_gdbarch_memory_remove_breakpoint (gdbarch,
+@@ -153,6 +157,17 @@ microblaze_linux_init_abi (struct gdbarch_info info,
+   tramp_frame_prepend_unwinder (gdbarch,
+ 				&microblaze_linux_sighandler_tramp_frame);
+ 
++  /* BFD target for core files.  */
++  if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
++    set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblaze");
++  else
++    set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblazeel");
++
++
++  /* Shared library handling.  */
++  set_gdbarch_skip_trampoline_code (gdbarch, find_solib_trampoline_target);
++  set_gdbarch_skip_solib_resolver (gdbarch, glibc_skip_solib_resolver);
++
+   /* Enable TLS support.  */
+   set_gdbarch_fetch_tls_load_module_address (gdbarch,
+                                              svr4_fetch_objfile_link_map);
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 0168e4881ed..98944f38d2a 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -677,6 +677,43 @@ microblaze_register_g_packet_guesses (struct gdbarch *gdbarch)
+                                   tdesc_microblaze_with_stack_protect);
+ }
+ 
++void
++microblaze_supply_gregset (const struct regset *regset,
++                        struct regcache *regcache,
++                        int regnum, const void *gregs)
++{
++  const unsigned int *regs = (const unsigned int *)gregs;
++  if (regnum >= 0)
++    regcache->raw_supply (regnum, regs + regnum);
++
++  if (regnum == -1) {
++    int i;
++
++    for (i = 0; i < 50; i++) {
++      regcache->raw_supply (i, regs + i);
++    }
++  }
++}
++
++
++/* Return the appropriate register set for the core section identified
++   by SECT_NAME and SECT_SIZE.  */
++
++static void
++microblaze_iterate_over_regset_sections (struct gdbarch *gdbarch,
++                                     iterate_over_regset_sections_cb *cb,
++                                     void *cb_data,
++                                     const struct regcache *regcache)
++{
++  struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
++
++  cb(".reg", tdep->sizeof_gregset, tdep->sizeof_gregset, tdep->gregset, NULL, cb_data);
++
++  cb(".reg2", tdep->sizeof_fpregset, tdep->sizeof_fpregset, tdep->fpregset, NULL, cb_data);
++}
++
++
++
+ static struct gdbarch *
+ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ {
+@@ -733,6 +770,10 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   tdep = XCNEW (struct gdbarch_tdep);
+   gdbarch = gdbarch_alloc (&info, tdep);
+ 
++  tdep->gregset = NULL;
++  tdep->sizeof_gregset = 0;
++  tdep->fpregset = NULL;
++  tdep->sizeof_fpregset = 0;
+   set_gdbarch_long_double_bit (gdbarch, 128);
+ 
+   set_gdbarch_num_regs (gdbarch, MICROBLAZE_NUM_REGS);
+@@ -781,6 +822,13 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   frame_base_append_sniffer (gdbarch, dwarf2_frame_base_sniffer);
+   if (tdesc_data != NULL)
+     tdesc_use_registers (gdbarch, tdesc, tdesc_data);
++  //frame_base_append_sniffer (gdbarch, microblaze_frame_sniffer);
++
++  /* If we have register sets, enable the generic core file support.  */
++  if (tdep->gregset) {
++    set_gdbarch_iterate_over_regset_sections (gdbarch,
++                                          microblaze_iterate_over_regset_sections);
++  }
+ 
+   return gdbarch;
+ }
+diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
+index db0772643dc..8f41ba19351 100644
+--- a/gdb/microblaze-tdep.h
++++ b/gdb/microblaze-tdep.h
+@@ -22,8 +22,22 @@
+ 
+ 
+ /* Microblaze architecture-specific information.  */
++struct microblaze_gregset
++{
++   unsigned int gregs[32];
++   unsigned int fpregs[32];
++   unsigned int pregs[16];
++};
++
+ struct gdbarch_tdep
+ {
++  int dummy;		// declare something.
++
++  /* Register sets.  */
++  struct regset *gregset;
++  size_t sizeof_gregset;
++  struct regset *fpregset;
++  size_t sizeof_fpregset;
+ };
+ 
+ /* Register numbers.  */
+@@ -120,5 +134,18 @@ struct microblaze_frame_cache
+ #define MICROBLAZE_BREAKPOINT {0xba, 0x0c, 0x00, 0x18}
+ #define MICROBLAZE_BREAKPOINT_LE {0x18, 0x00, 0x0c, 0xba}
+ 
++extern void microblaze_supply_gregset (const struct regset *regset,
++                                    struct regcache *regcache,
++                                    int regnum, const void *gregs);
++extern void microblaze_collect_gregset (const struct regset *regset,
++                                     const struct regcache *regcache,
++                                     int regnum, void *gregs);
++extern void microblaze_supply_fpregset (struct regcache *regcache,
++                                     int regnum, const void *fpregs);
++extern void microblaze_collect_fpregset (const struct regcache *regcache,
++                                      int regnum, void *fpregs);
++
++extern const struct regset * microblaze_regset_from_core_section (struct gdbarch *gdbarch,
++                                     const char *sect_name, size_t sect_size);
+ 
+ #endif /* microblaze-tdep.h */
+-- 
+2.17.1
+

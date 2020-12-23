@@ -29,24 +29,21 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/src/procattr.c
 +++ b/src/procattr.c
-@@ -8,7 +8,19 @@
+@@ -8,12 +8,16 @@
  #include "selinux_internal.h"
  #include "policy.h"
  
 -#ifndef __BIONIC__
 +/* Bionic and glibc >= 2.30 declare gettid() system call wrapper in unistd.h and
 + * has a definition for it */
-+#ifdef __BIONIC__
-+  #define OVERRIDE_GETTID 0
-+#elif !defined(__GLIBC_PREREQ)
-+  #define OVERRIDE_GETTID 1
-+#elif !__GLIBC_PREREQ(2,29)
-+  #define OVERRIDE_GETTID 1
-+#else
-+  #define OVERRIDE_GETTID 0
-+#endif
-+
-+#if OVERRIDE_GETTID
++#if defined(__GLIBC_)
++#if !__GLIBC_PREREQ(2,30)
  static pid_t gettid(void)
  {
  	return syscall(__NR_gettid);
+ }
+ #endif
++#endif
+ 
+ static int getprocattrcon(char ** context,
+ 			  pid_t pid, const char *attr)

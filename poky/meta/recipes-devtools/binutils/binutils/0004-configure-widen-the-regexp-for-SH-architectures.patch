@@ -1,7 +1,7 @@
-From f7ad8a44c10f01e03680f093fd7af71c9f5e8606 Mon Sep 17 00:00:00 2001
+From 361c2c313196c095d12d17cecf0a069107dd629b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:07:33 +0000
-Subject: [PATCH] configure: widen the regexp for SH architectures
+Subject: [PATCH 04/17] configure: widen the regexp for SH architectures
 
 gprof needs to know about uclibc
 
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index 91dc42f6c7..7c1b747e7c 100755
+index 54d0339ab9e..6782f8b6ab8 100755
 --- a/configure
 +++ b/configure
-@@ -3915,7 +3915,7 @@ case "${target}" in
+@@ -3937,7 +3937,7 @@ case "${target}" in
    nvptx*-*-*)
      noconfigdirs="$noconfigdirs target-libssp target-libstdc++-v3 target-libobjc"
      ;;
@@ -27,10 +27,10 @@ index 91dc42f6c7..7c1b747e7c 100755
        sh*-*-elf)
           ;;
 diff --git a/configure.ac b/configure.ac
-index 4bd869a63a..7187b34dfc 100644
+index a910c4fd6ba..55beb1dea46 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1159,7 +1159,7 @@ case "${target}" in
+@@ -1178,7 +1178,7 @@ case "${target}" in
    nvptx*-*-*)
      noconfigdirs="$noconfigdirs target-libssp target-libstdc++-v3 target-libobjc"
      ;;
@@ -39,3 +39,6 @@ index 4bd869a63a..7187b34dfc 100644
      case "${target}" in
        sh*-*-elf)
           ;;
+-- 
+2.28.0
+

@@ -9,7 +9,7 @@ inherit pkgconfig
 DEPENDS = "wvstreams"
 RDEPENDS_${PN} = "ppp"
 
-SRC_URI = "http://${BPN}.googlecode.com/files/${BP}.tar.bz2 \
+SRC_URI = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${BPN}/${BP}.tar.bz2 \
            file://typo_pon.wvdial.1.patch \
            file://musl-support.patch \
           "

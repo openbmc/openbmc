@@ -13,6 +13,8 @@ inherit autotools
 
 EXTRA_OECONF = "--enable-textui --enable-delay=2 --enable-evdev-rate=1000,250"
 
+CFLAGS += "-fcommon"
+
 do_install () {
     install -D -m 0755 ${B}/src/kexecboot ${D}${bindir}/kexecboot
     install -d ${D}/proc

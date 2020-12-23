@@ -5,6 +5,7 @@ EXTRA_OECONF_append_mtjade = " --enable-negative-errno-on-fail"
 SRC_URI += " \
         file://0001-sensor-create-the-concerned-host-sensors-list.patch \
         file://0002-mainloop-activate-deactivate-the-host-sensors.patch \
+	file://0003-sensors-activate-deactivate-the-host-power-domain-se.patch \
         "
 
 CHIPS_mtjade = " \
