@@ -1,0 +1,39 @@
+From e51bdd8bdbd631f5a5025eb8eb19df30488d2958 Mon Sep 17 00:00:00 2001
+From: Hieu Huynh <hieu.huynh@amperecomputing.com>
+Date: Thu, 24 Dec 2020 07:27:58 +0000
+Subject: [PATCH] Set PowerRestorePolicy to Restore.
+
+The phosphor-dbus-interfaces define the value of PowerRestoPolicy is
+Restore instead of LastState. This commit change this value to Restore
+as define of phosphor-dbus-interfaces.
+
+Signed-off-by: Hieu Huynh <hieu.huynh@amperecomputing.com>
+---
+ redfish-core/lib/systems.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/redfish-core/lib/systems.hpp b/redfish-core/lib/systems.hpp
+index 11d9de2..327bf24 100644
+--- a/redfish-core/lib/systems.hpp
++++ b/redfish-core/lib/systems.hpp
+@@ -1106,7 +1106,7 @@ inline void getPowerRestorePolicy(std::shared_ptr<AsyncResp> aResp)
+                      "AlwaysOff",
+                      "AlwaysOff"},
+                     {"xyz.openbmc_project.Control.Power.RestorePolicy.Policy."
+-                     "LastState",
++                     "Restore",
+                      "LastState"}};
+ 
+             const std::string* policyPtr = std::get_if<std::string>(&policy);
+@@ -1368,7 +1368,7 @@ inline void setPowerRestorePolicy(std::shared_ptr<AsyncResp> aResp,
+         {"AlwaysOff", "xyz.openbmc_project.Control.Power.RestorePolicy.Policy."
+                       "AlwaysOff"},
+         {"LastState", "xyz.openbmc_project.Control.Power.RestorePolicy.Policy."
+-                      "LastState"}};
++                      "Restore"}};
+ 
+     std::string powerRestorPolicy;
+ 
+-- 
+2.17.1
+
