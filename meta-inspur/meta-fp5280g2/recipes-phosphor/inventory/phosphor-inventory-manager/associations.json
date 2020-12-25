@@ -302,7 +302,7 @@
         ]
     },
     {
-        "path": "system/chassis/motherboard/cpu0/core0",
+        "path": "system/chassis/motherboard/cpu0",
         "endpoints":
         [
             {
@@ -324,7 +324,52 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/groups/core0_fault"
+                    "/xyz/openbmc_project/led/groups/cpu0_fault"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/cpu1",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "leds"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/led/physical/front-syshot"
+                ]
+            },
+            {
+                "types":
+                {
+                    "rType": "fru",
+                    "fType": "fault_led_group"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/led/groups/cpu1_fault"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/cpu0/core0",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/p0_core0_temp"
                 ]
             }
         ]
@@ -337,22 +382,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core1_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core1_temp"
                 ]
             }
         ]
@@ -365,22 +399,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core2_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core2_temp"
                 ]
             }
         ]
@@ -393,22 +416,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core3_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core3_temp"
                 ]
             }
         ]
@@ -421,22 +433,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core4_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core4_temp"
                 ]
             }
         ]
@@ -449,22 +450,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core5_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core5_temp"
                 ]
             }
         ]
@@ -477,22 +467,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core6_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core6_temp"
                 ]
             }
         ]
@@ -505,22 +484,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core7_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core7_temp"
                 ]
             }
         ]
@@ -533,22 +501,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core8_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core8_temp"
                 ]
             }
         ]
@@ -561,22 +518,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core9_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core9_temp"
                 ]
             }
         ]
@@ -589,22 +535,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core10_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core10_temp"
                 ]
             }
         ]
@@ -617,22 +552,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core11_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core11_temp"
                 ]
             }
         ]
@@ -645,22 +569,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core12_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core12_temp"
                 ]
             }
         ]
@@ -673,22 +586,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core13_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core13_temp"
                 ]
             }
         ]
@@ -701,22 +603,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core14_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core14_temp"
                 ]
             }
         ]
@@ -729,22 +620,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core15_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core15_temp"
                 ]
             }
         ]
@@ -757,22 +637,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core16_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core16_temp"
                 ]
             }
         ]
@@ -785,22 +654,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core17_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core17_temp"
                 ]
             }
         ]
@@ -813,22 +671,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core18_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core18_temp"
                 ]
             }
         ]
@@ -841,22 +688,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core19_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core19_temp"
                 ]
             }
         ]
@@ -869,22 +705,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core20_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core20_temp"
                 ]
             }
         ]
@@ -897,22 +722,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core21_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core21_temp"
                 ]
             }
         ]
@@ -925,22 +739,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core22_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core22_temp"
                 ]
             }
         ]
@@ -953,22 +756,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core23_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p0_core23_temp"
                 ]
             }
         ]
@@ -981,22 +773,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core0_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core0_temp"
                 ]
             }
         ]
@@ -1009,22 +790,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core1_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core1_temp"
                 ]
             }
         ]
@@ -1037,22 +807,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core2_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core2_temp"
                 ]
             }
         ]
@@ -1065,22 +824,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core3_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core3_temp"
                 ]
             }
         ]
@@ -1093,22 +841,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core4_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core4_temp"
                 ]
             }
         ]
@@ -1121,22 +858,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core5_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core5_temp"
                 ]
             }
         ]
@@ -1149,22 +875,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core6_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core6_temp"
                 ]
             }
         ]
@@ -1177,22 +892,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core7_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core7_temp"
                 ]
             }
         ]
@@ -1205,22 +909,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core8_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core8_temp"
                 ]
             }
         ]
@@ -1233,22 +926,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core9_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core9_temp"
                 ]
             }
         ]
@@ -1261,22 +943,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core10_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core10_temp"
                 ]
             }
         ]
@@ -1289,22 +960,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core11_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core11_temp"
                 ]
             }
         ]
@@ -1317,22 +977,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core12_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core12_temp"
                 ]
             }
         ]
@@ -1345,22 +994,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core13_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core13_temp"
                 ]
             }
         ]
@@ -1373,22 +1011,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core14_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core14_temp"
                 ]
             }
         ]
@@ -1401,22 +1028,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core15_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core15_temp"
                 ]
             }
         ]
@@ -1429,22 +1045,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core16_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core16_temp"
                 ]
             }
         ]
@@ -1457,22 +1062,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core17_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core17_temp"
                 ]
             }
         ]
@@ -1485,22 +1079,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core18_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core18_temp"
                 ]
             }
         ]
@@ -1513,22 +1096,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core19_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core19_temp"
                 ]
             }
         ]
@@ -1541,22 +1113,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core20_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core20_temp"
                 ]
             }
         ]
@@ -1569,22 +1130,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core21_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core21_temp"
                 ]
             }
         ]
@@ -1597,22 +1147,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core22_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core22_temp"
                 ]
             }
         ]
@@ -1625,22 +1164,11 @@
                 "types":
                 {
                     "rType": "inventory",
-                    "fType": "leds"
+                    "fType": "sensors"
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/led/physical/front-syshot"
-                ]
-            },
-            {
-                "types":
-                {
-                    "rType": "fru",
-                    "fType": "fault_led_group"
-                },
-                "paths":
-                [
-                    "/xyz/openbmc_project/led/groups/core23_fault"
+                    "/xyz/openbmc_project/sensors/temperature/p1_core23_temp"
                 ]
             }
         ]
@@ -1649,6 +1177,17 @@
         "path": "system/chassis/motherboard/dimm0",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm0_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1677,6 +1216,17 @@
         "path": "system/chassis/motherboard/dimm1",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm1_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1705,6 +1255,17 @@
         "path": "system/chassis/motherboard/dimm2",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm2_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1733,6 +1294,17 @@
         "path": "system/chassis/motherboard/dimm3",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm3_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1761,6 +1333,17 @@
         "path": "system/chassis/motherboard/dimm4",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm4_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1789,6 +1372,17 @@
         "path": "system/chassis/motherboard/dimm5",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm5_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1817,6 +1411,17 @@
         "path": "system/chassis/motherboard/dimm6",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm6_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1845,6 +1450,17 @@
         "path": "system/chassis/motherboard/dimm7",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm7_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1873,6 +1489,17 @@
         "path": "system/chassis/motherboard/dimm8",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm8_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1901,6 +1528,17 @@
         "path": "system/chassis/motherboard/dimm9",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm9_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1929,6 +1567,17 @@
         "path": "system/chassis/motherboard/dimm10",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm10_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1957,6 +1606,17 @@
         "path": "system/chassis/motherboard/dimm11",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm11_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -1985,6 +1645,17 @@
         "path": "system/chassis/motherboard/dimm12",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm12_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -2013,6 +1684,17 @@
         "path": "system/chassis/motherboard/dimm13",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm13_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -2041,6 +1723,17 @@
         "path": "system/chassis/motherboard/dimm14",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm14_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -2069,6 +1762,17 @@
         "path": "system/chassis/motherboard/dimm15",
         "endpoints":
         [
+			{
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/dimm15_temp"
+                ]
+            },
             {
                 "types":
                 {
@@ -2113,6 +1817,73 @@
                     "/xyz/openbmc_project/sensors/fan_tach/fan2_1",
                     "/xyz/openbmc_project/sensors/fan_tach/fan3_0",
                     "/xyz/openbmc_project/sensors/fan_tach/fan3_1",
+
+                    "/xyz/openbmc_project/sensors/temperature/p0_core0_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core1_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core2_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core3_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core4_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core5_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core6_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core7_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core8_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core9_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core10_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core11_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core12_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core13_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core14_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core15_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core16_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core17_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core18_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core19_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core20_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core21_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core22_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p0_core23_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core0_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core1_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core2_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core3_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core4_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core5_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core6_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core7_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core8_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core9_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core10_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core11_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core12_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core13_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core14_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core15_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core16_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core17_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core18_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core19_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core20_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core21_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core22_temp",
+                    "/xyz/openbmc_project/sensors/temperature/p1_core23_temp",
+
+                    "/xyz/openbmc_project/sensors/temperature/dimm0_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm1_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm2_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm3_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm4_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm5_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm6_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm7_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm8_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm9_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm10_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm11_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm12_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm13_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm14_temp",
+                    "/xyz/openbmc_project/sensors/temperature/dimm15_temp",
+
                     "/xyz/openbmc_project/sensors/temperature/inlet",
                     "/xyz/openbmc_project/sensors/temperature/outlet",
                     "/xyz/openbmc_project/sensors/temperature/ocp_zone",
