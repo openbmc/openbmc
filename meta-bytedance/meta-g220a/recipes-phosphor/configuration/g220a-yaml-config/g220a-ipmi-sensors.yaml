@@ -834,7 +834,7 @@
   sensorType: 4
   serviceInterface: org.freedesktop.DBus.Properties
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-165:
+150:
   bExp: 0
   entityID: 50
   entityInstance: 1
@@ -856,7 +856,7 @@
   sensorType: 11
   serviceInterface: org.freedesktop.DBus.Properties
   unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
-166:
+151:
   bExp: 0
   entityID: 50
   entityInstance: 1
@@ -869,6 +869,28 @@
   multiplierM: 96
   mutability: Mutability::Read
   path: /xyz/openbmc_project/sensors/power/Memory_Power
+  offsetB: 0
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 11
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+165:
+  bExp: 0
+  entityID: 10
+  entityInstance: 0
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 96
+  mutability: Mutability::Read
+  path: /xyz/openbmc_project/sensors/power/total_power
   offsetB: 0
   rExp: 0
   readingType: readingData
