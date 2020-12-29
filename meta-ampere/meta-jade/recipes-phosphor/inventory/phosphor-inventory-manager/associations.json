@@ -1,0 +1,72 @@
+[
+    {
+        "path": "system/chassis",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "chassis",
+                    "fType": "all_sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN3_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN3_2",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN4_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN4_2",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN5_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN5_2",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN6_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN6_2",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN7_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN7_2",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN8_1",
+                    "/xyz/openbmc_project/sensors/fan_tach/FAN8_2",
+                    "/xyz/openbmc_project/sensors/fan_tach/PSU0_fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/PSU1_fan1",
+
+                    "/xyz/openbmc_project/sensors/temperature/TS1_Temp",
+                    "/xyz/openbmc_project/sensors/temperature/TS2_Temp",
+                    "/xyz/openbmc_project/sensors/temperature/TS3_Temp",
+                    "/xyz/openbmc_project/sensors/temperature/TS4_Temp",
+                    "/xyz/openbmc_project/sensors/temperature/TS5_Temp",
+                    "/xyz/openbmc_project/sensors/temperature/TS6_Temp",
+                    "/xyz/openbmc_project/sensors/temperature/PSU0_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/PSU1_TEMP",
+
+                    "/xyz/openbmc_project/sensors/voltage/S0_0V6_VTT0123",
+                    "/xyz/openbmc_project/sensors/voltage/S0_0V6_VTT4567",
+                    "/xyz/openbmc_project/sensors/voltage/S0_0V75_PCP",
+                    "/xyz/openbmc_project/sensors/voltage/S0_0V8_VDDC_SOC",
+                    "/xyz/openbmc_project/sensors/voltage/S0_0V85_RCA",
+                    "/xyz/openbmc_project/sensors/voltage/S0_1V2_VDDQ0123",
+                    "/xyz/openbmc_project/sensors/voltage/S0_1V2_VDDQ4567",
+                    "/xyz/openbmc_project/sensors/voltage/S0_1V5_VDDH",
+                    "/xyz/openbmc_project/sensors/voltage/S0_1V8_VDDH",
+                    "/xyz/openbmc_project/sensors/voltage/S0_1V8_SOC",
+                    "/xyz/openbmc_project/sensors/voltage/S0_1V8_PCP",
+                    "/xyz/openbmc_project/sensors/voltage/S0_2V5_VPP0123",
+                    "/xyz/openbmc_project/sensors/voltage/S0_2V5_VPP4567",
+                    "/xyz/openbmc_project/sensors/voltage/S0_3V3_SOC",
+                    "/xyz/openbmc_project/sensors/voltage/S1_0V6_VTT0123",
+                    "/xyz/openbmc_project/sensors/voltage/S1_0V6_VTT4567",
+                    "/xyz/openbmc_project/sensors/voltage/S1_0V75_PCP",
+                    "/xyz/openbmc_project/sensors/voltage/S1_0V8_VDDC_SOC",
+                    "/xyz/openbmc_project/sensors/voltage/S1_0V85_RCA",
+                    "/xyz/openbmc_project/sensors/voltage/S1_1V2_VDDQ0123",
+                    "/xyz/openbmc_project/sensors/voltage/S1_1V2_VDDQ4567",
+                    "/xyz/openbmc_project/sensors/voltage/S1_1V5_VDDH",
+                    "/xyz/openbmc_project/sensors/voltage/S1_1V8_VDDH",
+                    "/xyz/openbmc_project/sensors/voltage/S1_1V8_SOC",
+                    "/xyz/openbmc_project/sensors/voltage/S1_1V8_PCP",
+                    "/xyz/openbmc_project/sensors/voltage/S1_2V5_VPP0123",
+                    "/xyz/openbmc_project/sensors/voltage/S1_2V5_VPP4567",
+                    "/xyz/openbmc_project/sensors/voltage/S1_3V3_SOC",
+                    "/xyz/openbmc_project/sensors/voltage/3V3_SB",
+                    "/xyz/openbmc_project/sensors/voltage/VBAT_RTC"
+                ]
+            }
+        ]
+    }
+]
