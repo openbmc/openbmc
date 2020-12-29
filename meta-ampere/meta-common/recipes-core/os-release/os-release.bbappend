@@ -7,7 +7,7 @@ def run_git(d, cmd):
         pass
 
 python() {
-    version_id = run_git(d, 'describe --dirty --long')
+    version_id = run_git(d, 'describe --dirty --long --tags')
     if version_id:
         versionList = version_id.split('-')
 
