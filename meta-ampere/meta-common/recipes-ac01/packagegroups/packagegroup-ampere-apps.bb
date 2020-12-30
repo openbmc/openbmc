@@ -23,6 +23,9 @@ SUMMARY_${PN}-chassis = "Ampere Chassis"
 RDEPENDS_${PN}-chassis = " \
         obmc-op-control-power \
         ampere-hostctrl \
+        phosphor-hostlogger \
+        phosphor-sel-logger \
+        phosphor-logging \
         "
 
 SUMMARY_${PN}-system = "Ampere System"
