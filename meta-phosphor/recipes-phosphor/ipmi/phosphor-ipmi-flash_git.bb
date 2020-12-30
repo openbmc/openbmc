@@ -17,6 +17,7 @@ DEPENDS += "sdbusplus"
 DEPENDS += "systemd"
 DEPENDS += "ipmi-blob-tool"
 DEPENDS += "pciutils"
+DEPENDS += "function2"
 
 PACKAGECONFIG ?= "cleanup-delete"
 PACKAGECONFIG[cleanup-delete] = "--enable-cleanup-delete, --disable-cleanup-delete"
