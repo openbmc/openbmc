@@ -53,17 +53,52 @@ power_reset() {
   busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s xyz.openbmc_project.State.Host.Transition.Reboot
 }
 
+timestamp() {
+  date +"%s" # current time
+}
+
+shutdown_ack() {
+  echo "Receive shutdown ACK triggered"
+  power_off
+
+  current_time="$(timestamp)"
+  if [ -f "/run/openbmc/host@0-shutdown-req-time" ]; then
+    request_time="$(cat /run/openbmc/host@0-shutdown-req-time)"
+    # shutdow request must be done in 30s
+    if [[ "$current_time" -lt "$request_time + 30" ]]; then
+      power_off
+      sleep 5s
+      if [ -f "/run/openbmc/host@0-graceful-reset-time" ]; then
+          req_reset="$(cat /run/openbmc/host@0-graceful-reset-time)"
+          if [[ "$current_time" -lt "$req_reset + 45" ]]; then
+            echo "powering on because of reset request"
+            power_on
+            rm -rf "/run/openbmc/host@0-graceful-reset-time"
+          fi
+      fi
+    fi
+    rm -rf "/run/openbmc/host@0-shutdown-req-time"
+  fi
+}
+
 graceful_shutdown() {
+  # the host@0-request created by ipmi, to indicate shutdown immediately
   if [ -f "/run/openbmc/host@0-request" ]; then
     echo "shutdown host immediately"
     power_off
   else
     echo "Triggering graceful shutdown"
+    echo "$(timestamp)" > "/run/openbmc/host@0-shutdown-req-time"
     gpioset -l 0 49=1
-    sleep 1
+    sleep 1s
     gpioset -l 0 49=0
     sleep 30s
   fi
+}
+
+graceful_reset() {
+  echo "$(timestamp)" > "/run/openbmc/host@0-graceful-reset-time"
+  graceful_shutdown
 }
 
 force_reset() {
@@ -102,18 +137,15 @@ if [ ! -d "/run/openbmc/" ]; then
 fi
 
 if [ $2 = "on" ]; then
+  rm -rf /run/openbmc/*
   if [ $(power_status) == "off" ]; then
     power_on
   fi
 elif [ $2 = "off" ]; then
   if [ $(power_status) == "on" ]; then
     power_off
-  fi
-  # If any request of graceful reset, need to power on
-  if [ -f "/run/openbmc/host@0-graceful-reset" ]; then
-    sleep 20s
-    power_on
-    rm -f "/run/openbmc/host@0-graceful-reset"
+  else
+    rm -rf /run/openbmc/host@0-request
   fi
 elif [ $2 == "cycle" ]; then
   if [ $(power_status) == "on" ]; then
@@ -131,12 +163,15 @@ elif [ $2 == "reset" ]; then
     echo "ERROR: Server not powered on"
   fi
 elif [[ $2 == "graceful_shutdown" ]]; then
-  graceful_shutdown
+  if [ $(power_status) == "on" ]; then
+    graceful_shutdown
+  fi
 elif [ $2 == "graceful_reset" ]; then
-  mkdir -p "/run/openbmc/"
-  touch "/run/openbmc/host@0-graceful-reset"
-  graceful_shutdown
-  sleep 20s
+  if [ $(power_status) == "on" ]; then
+      graceful_reset
+  fi
+elif [ $2 == "shutdown_ack" ]; then
+  shutdown_ack
 elif [ $2 == "status" ]; then
   power_status
 elif [ $2 == "force_reset" ]; then

@@ -21,6 +21,7 @@ SRC_URI = "file://ampere-host-shutdown.service \
           file://ampere-host-reset-ack.service \
           file://ampere-host-force-reset.service \
           file://ampere-host-power-cycle.service \
+          file://ampere-host-shutdown-ack.service \
           "
 
 DEPENDS = "systemd virtual/obmc-gpio-monitor"
@@ -35,6 +36,7 @@ SYSTEMD_SERVICE_${PN} = " \
         ampere-host-reset-ack.service \
         ampere-host-force-reset.service \
         ampere-host-power-cycle.service \
+        ampere-host-shutdown-ack.service \
         "
 # host power control
 # overwrite the host shutdown to graceful shutdown
