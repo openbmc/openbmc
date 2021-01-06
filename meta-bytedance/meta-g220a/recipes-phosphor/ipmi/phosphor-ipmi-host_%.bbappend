@@ -1,7 +1,5 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += "file://0001-Disable-isFruPresent.patch"
-
 DEPENDS_append_g220a= " g220a-yaml-config"
 
 EXTRA_OECONF_g220a= " \
