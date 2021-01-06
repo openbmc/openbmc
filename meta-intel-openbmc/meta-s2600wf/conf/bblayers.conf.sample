@@ -1,6 +1,6 @@
 # LAYER_CONF_VERSION is increased each time build/conf/bblayers.conf
 # changes incompatibly
-LCONF_VERSION = "8"
+LCONF_VERSION = "9"
 
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""
@@ -15,6 +15,6 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-webserver \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-intel \
-  ##OEROOT##/meta-intel/meta-s2600wf \
+  ##OEROOT##/meta-intel-openbmc \
+  ##OEROOT##/meta-intel-openbmc/meta-s2600wf \
 "
