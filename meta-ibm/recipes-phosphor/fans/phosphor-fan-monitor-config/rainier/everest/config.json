@@ -13,7 +13,7 @@
             },
             {
                "name": "fan0_1",
-               "has_target": false,
+               "has_target": false
             }
          ]
       },
@@ -30,7 +30,7 @@
             },
             {
                "name": "fan1_1",
-               "has_target": false,
+               "has_target": false
             }
          ]
       },
@@ -47,7 +47,7 @@
             },
             {
                "name": "fan2_1",
-               "has_target": false,
+               "has_target": false
             }
          ]
       },
@@ -64,7 +64,7 @@
             },
             {
                "name": "fan3_1",
-               "has_target": false,
+               "has_target": false
             }
          ]
       }
