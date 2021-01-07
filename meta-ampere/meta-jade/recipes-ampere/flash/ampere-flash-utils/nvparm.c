@@ -49,13 +49,7 @@ typedef unsigned int uint32_t;
 
 #define PROC_MTD_INFO           "/proc/mtd"
 #define HOST_SPI_FLASH_MTD_NAME "pnor"
-#define GPIO_BASE_PATH          "/sys/class/gpio"
-#define GPIO_LABEL              "1e780000.gpio"
 #define MTD_DEV_SIZE            20
-#define GPIO_SIZE               255
-#define GPIO_PIN                226
-#define GPIO_LOW                0
-#define GPIO_HIGH               1
 
 /* Option string of this application */
 #define OPTION_STRING	"cd:ef:hlo:rs:"
@@ -506,229 +500,6 @@ static int nvparam_get(int mtd_fd, ulong nvparam_base, void *nvparam_blob)
 }
 
 /*----------------------------------------------------------------------------
- * @fn gpioGetBase
- *
- * @brief Get gpio base
- * @params  None
- * @return  0 - Success
- *          -1 - Failure
- *--------------------------------------------------------------------------*/
-static int gpioGetBase()
-{
-	int gpio_base = -1;
-	char* label_name;
-	char label[14];
-	char* base_name;
-	struct dirent* entry;
-
-	DIR* dir = opendir(GPIO_BASE_PATH);
-	if (dir == NULL)
-	{
-		log_printf(LOG_ERROR, "Unable to open directory %s\n", GPIO_BASE_PATH);
-		return -1;
-	}
-
-	while ((entry = readdir(dir)) != NULL)
-	{
-		/* Look in the gpiochip<X> directories for a file called 'label' */
-		/* that contains '1e780000.gpio', then in that directory read */
-		/* the GPIO base out of the 'base' file. */
-
-		if (strncmp(entry->d_name, "gpiochip", 8) != 0)
-			continue;
-
-		asprintf(&label_name, "%s/%s/label", GPIO_BASE_PATH, entry->d_name);
-
-		FILE* fd = fopen(label_name, "r");
-		free(label_name);
-
-		if (!fd)
-			continue;
-
-		if (fgets(label, 14, fd) != NULL)
-			strcmp(label, GPIO_LABEL);
-		fclose(fd);
-
-		asprintf(&base_name, "%s/%s/base", GPIO_BASE_PATH, entry->d_name);
-
-		fd = fopen(base_name, "r");
-		free(base_name);
-
-		if (!fd)
-			continue;
-
-		if (fscanf(fd, "%d", &gpio_base) != 1) {
-			gpio_base = -1;
-		}
-		fclose(fd);
-
-		/* We found the right file. No need to continue. */
-		break;
-	}
-	closedir(dir);
-
-	if (gpio_base == -1) {
-		log_printf(LOG_ERROR, "Could not find GPIO base\n");
-		return -1;
-	}
-
-	return gpio_base;
-}
-
-/*----------------------------------------------------------------------------
- * @fn gpioExport
- *
- * @brief Export GPIO pin
- * @params  gpio [IN] - GPIO pin number
- * @return  0 - Success
- *          -1 - Failure
- *--------------------------------------------------------------------------*/
-static int gpioExport(unsigned gpio)
-{
-	int fd, len;
-	char buf[GPIO_SIZE];
-
-	fd = open("/sys/class/gpio/export", O_WRONLY);
-	if (fd < 0) {
-		log_printf(LOG_ERROR, "Fail to open for export\n");
-		return -1;
-	}
-	len = snprintf(buf, sizeof(buf), "%d", gpio);
-	if (write(fd, buf, len) == -1) {
-		log_printf(LOG_ERROR, "Fail to export\n");
-		return -1;
-	}
-	close(fd);
-
-return 0;
-}
-
-/*----------------------------------------------------------------------------
- * @fn gpioUnexport
- *
- * @brief Unexport GPIO pin
- * @params  gpio [IN] - GPIO pin number
- * @return  0 - Success
- *          -1 - Failure
- *--------------------------------------------------------------------------*/
-static int gpioUnexport(unsigned gpio)
-{
-	int fd, len;
-	char buf[GPIO_SIZE];
-
-	fd = open("/sys/class/gpio/unexport", O_WRONLY);
-	if (fd < 0) {
-		log_printf(LOG_ERROR, "Fail to open for unexport\n");
-		return -1;
-	}
-	len = snprintf(buf, sizeof(buf), "%d", gpio);
-	if (write(fd, buf, len) == -1) {
-		log_printf(LOG_ERROR, "Fail to unexport\n");
-		return -1;
-	}
-	close(fd);
-
-	return 0;
-}
-
-/*----------------------------------------------------------------------------
- * @fn gpioSetDirOutput
- *
- * @brief Set GPIO direction to out
- * @params  gpio [IN] - GPIO pin number
- * @return  0 - Success
- *          -1 - Failure
- *--------------------------------------------------------------------------*/
-static int gpioSetDirOutput(unsigned gpio)
-{
-	char path[GPIO_SIZE];
-	int fd;
-
-	snprintf(path, GPIO_SIZE, "/sys/class/gpio/gpio%d/direction", gpio);
-	fd = open(path, O_WRONLY);
-	if (fd < 0) {
-		log_printf(LOG_ERROR, "Failed to open gpio direction for writing\n");
-		return -1;
-	}
-
-	if (write(fd, "out", 4) == -1) {
-		log_printf(LOG_ERROR, "Failed to set direction\n");
-		return -1;
-	}
-
-	close(fd);
-
-	return 0;
-}
-
-/*----------------------------------------------------------------------------
- * @fn gpioSetValue
- *
- * @brief Set value to GPIO
- * @params  gpio [IN] - GPIO pin number
- * value [IN] - value set to GPIO
- * @return  0 - Success
- *          -1 - Failure
- *--------------------------------------------------------------------------*/
-static int gpioSetValue(unsigned gpio, int value)
-{
-	int fd;
-	char buf[GPIO_SIZE];
-
-	sprintf(buf, "/sys/class/gpio/gpio%d/value", gpio);
-	fd = open(buf, O_WRONLY);
-	if (fd < 0) {
-		log_printf(LOG_ERROR, "Fail to open for set value\n");
-		return -1;
-	}
-
-	/* Set direction of gpio to out to write the value */
-	if(gpioSetDirOutput(gpio) == -1) {
-		log_printf(LOG_ERROR, "Fail to set direction for writing\n");
-		return -1;
-	}
-
-	sprintf(buf, "%d", value);
-	if (write(fd, buf, 1) == -1) {
-		log_printf(LOG_ERROR, "Fail to write value\n");
-		return -1;
-	}
-	close(fd);
-
-	return 0;
-}
-
-/*----------------------------------------------------------------------------
- * @fn gpioGetValue
- *
- * @brief Get value to GPIO
- * @params  gpio [IN] - GPIO pin number
- * @return  0 - Success
- *          -1 - Failure
- *--------------------------------------------------------------------------*/
-static int gpioGetValue(int gpio)
-{
-	char path[GPIO_SIZE];
-	char value_str[3];
-	int fd;
-
-	snprintf(path, GPIO_SIZE, "/sys/class/gpio/gpio%d/value", gpio);
-	fd = open(path, O_RDONLY);
-	if (fd < 0) {
-		log_printf(LOG_ERROR, "Failed to open gpio value for reading\n");
-		return -1;
-	}
-
-	if (read(fd, value_str, 3) == -1) {
-		log_printf(LOG_ERROR, "Failed to read value\n");
-		return -1;
-	}
-	close(fd);
-
-	return(atoi(value_str));
-}
-
-/*----------------------------------------------------------------------------
  * @fn help
  *
  * @brief Display help for this application
@@ -766,12 +537,11 @@ int main(int argc, char *argv[])
 	char temp_mtd[4] = {0}, *temp;
 	FILE *proc_fp;
 	char proc_buf[80];
-	int argflag, gpio226Value, gpioNum;
+	int argflag;
 	int options_used[MAX_OPTIONS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }; /* c, d, f, h, o, r, s, l, e */
 	char *filepath = NULL;
 	char *input_offset = NULL;
 	char *input_value = NULL;
-	int gpioBase;
 
 	if (argc == 1) {
 		help(argv[0]);
@@ -892,33 +662,6 @@ int main(int argc, char *argv[])
 		value = strtoul(input_value, NULL, 16);
 		if ((value == ULONG_MAX) && (errno == ERANGE)) {
 			log_printf(LOG_ERROR, "Input %s is %s\n", input_offset, strerror(errno));
-			ret = 1;
-			goto exit_free;
-		}
-	}
-
-	/* Get gpio base */
-	if ((gpioBase = gpioGetBase()) == -1) {
-		ret = 1;
-		goto exit_free;
-	}
-	gpioNum = gpioBase + GPIO_PIN;
-
-	/* Export GPIO226 */
-	if (gpioExport(gpioNum) == -1) {
-		ret = 1;
-		goto exit_free;
-	}
-
-	/* Read the GPIO226 value */
-	if ((gpio226Value = gpioGetValue(gpioNum)) == -1) {
-		ret = 1;
-		goto exit_free;
-	}
-
-	/* Set the GPIO226 to high if it low */
-	if(gpio226Value == GPIO_LOW) {
-		if (gpioSetValue(gpioNum, GPIO_HIGH) == -1) {
 			ret = 1;
 			goto exit_free;
 		}
@@ -1193,18 +936,6 @@ int main(int argc, char *argv[])
 			log_printf(LOG_NORMAL, " (Mismatch! Calculated CRC16: %x)\n", cal_crc16);
 		else
 			log_printf(LOG_NORMAL, "\n");
-	}
-
-	/* Restore the GPIO226 value */
-	if (gpioSetValue(gpioNum, gpio226Value) == -1) {
-		ret = 1;
-		goto out;
-	}
-
-	/* Unexport the GPIO226 */
-	if (gpioUnexport(gpioNum) == -1) {
-		ret = 1;
-		goto out;
 	}
 
 out:
