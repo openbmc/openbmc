@@ -76,6 +76,7 @@ CHIPS_witherspoon-tacoma = " \
 
 CHIPS_rainier = " \
                bus@1e78a000/i2c-bus@400/max31785@52 \
+               bus@1e78a000/i2c-bus@780/i2c-switch@70/i2c@3/max31785@52 \
                "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
