@@ -4,12 +4,6 @@
       "path": "/system/chassis/motherboard/fan0",
       "methods": [
          {
-            "type": "gpio",
-            "key": 19,
-            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a780.i2c-bus/i2c-14/14-0061",
-            "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
-         },
-         {
             "type": "tach",
             "sensors": [
                "fan0_0",
@@ -25,12 +19,6 @@
       "name": "fan1",
       "path": "/system/chassis/motherboard/fan1",
       "methods": [
-         {
-            "type": "gpio",
-            "key": 18,
-            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a780.i2c-bus/i2c-14/14-0061",
-            "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
-         },
          {
             "type": "tach",
             "sensors": [
@@ -48,12 +36,6 @@
       "path": "/system/chassis/motherboard/fan2",
       "methods": [
          {
-            "type": "gpio",
-            "key": 17,
-            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a780.i2c-bus/i2c-14/14-0061",
-            "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
-         },
-         {
             "type": "tach",
             "sensors": [
                "fan2_0",
@@ -69,12 +51,6 @@
       "name": "fan3",
       "path": "/system/chassis/motherboard/fan3",
       "methods": [
-         {
-            "type": "gpio",
-            "key": 16,
-            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a780.i2c-bus/i2c-14/14-0061",
-            "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
-         },
          {
             "type": "tach",
             "sensors": [
