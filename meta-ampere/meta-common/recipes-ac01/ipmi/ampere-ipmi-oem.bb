@@ -24,7 +24,6 @@ SRC_URI += " \
   file://cmake-format.json \
   file://src/ipmi_to_redfish_hooks.cpp \
   file://src/storagecommands.cpp \
-  file://src/whitelist-filter.cpp \
   file://include/commandutils.hpp \
   file://include/ipmi_to_redfish_hooks.hpp \
   file://include/sdrutils.hpp \
