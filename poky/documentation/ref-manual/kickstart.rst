@@ -24,7 +24,7 @@ The information lists the commands, their syntax, and meanings.
 Kickstart commands are based on the Fedora kickstart versions but with
 modifications to reflect Wic capabilities. You can see the original
 documentation for those commands at the following link:
-http://pykickstart.readthedocs.io/en/latest/kickstart-docs.html
+https://pykickstart.readthedocs.io/en/latest/kickstart-docs.html
 
 Command: part or partition
 ==========================
@@ -164,7 +164,7 @@ the ``part`` and ``partition`` commands:
 -  ``--part-type``: This option is a Wic-specific option that
    specifies the partition type globally unique identifier (GUID) for
    GPT partitions. You can find the list of partition type GUIDs at
-   http://en.wikipedia.org/wiki/GUID_Partition_Table#Partition_type_GUIDs.
+   https://en.wikipedia.org/wiki/GUID_Partition_Table#Partition_type_GUIDs.
 
 -  ``--use-uuid``: This option is a Wic-specific option that causes
    Wic to generate a random GUID for the partition. The generated

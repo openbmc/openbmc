@@ -894,8 +894,8 @@ Yocto Project:
    ``recipes-*`` subdirectories specific to the recipe's function, or
    within a subdirectory containing a set of closely-related recipes.
    The recipes themselves should follow the general guidelines for
-   recipes used in the Yocto Project found in the "`OpenEmbedded Style
-   Guide <http://openembedded.org/wiki/Styleguide>`__".
+   recipes used in the Yocto Project found in the ":oe_wiki:`OpenEmbedded
+   Style Guide </Styleguide>`".
 
 -  *License File:* You must include a license file in the
    ``meta-bsp_root_name`` directory. This license covers the BSP

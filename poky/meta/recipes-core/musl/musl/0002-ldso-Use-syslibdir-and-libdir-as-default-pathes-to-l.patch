@@ -34,16 +34,16 @@ Signed-off-by: Serhey Popovych <serhe.popovych@gmail.com>
  LDFLAGS_ALL = $(LDFLAGS_AUTO) $(LDFLAGS)
 --- a/ldso/dynlink.c
 +++ b/ldso/dynlink.c
-@@ -24,6 +24,8 @@
- #include "libc.h"
- #include "dynlink.h"
+@@ -29,6 +29,8 @@
+ #define realloc __libc_realloc
+ #define free __libc_free
  
 +#define SYS_PATH_DFLT SYSLIBDIR ":" LIBDIR
 +
  static void error(const char *, ...);
  
  #define MAXP2(a,b) (-(-(a)&-(b)))
-@@ -1071,7 +1073,7 @@ static struct dso *load_library(const ch
+@@ -1094,7 +1096,7 @@ static struct dso *load_library(const ch
  					sys_path = "";
  				}
  			}

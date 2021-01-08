@@ -43,8 +43,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  crt/x86_64/crtn.s     | 1 +
  28 files changed, 28 insertions(+)
 
-diff --git a/crt/aarch64/crti.s b/crt/aarch64/crti.s
-index 775df0ac..0f7c23a9 100644
 --- a/crt/aarch64/crti.s
 +++ b/crt/aarch64/crti.s
 @@ -1,3 +1,4 @@
@@ -52,8 +50,6 @@ index 775df0ac..0f7c23a9 100644
  .section .init
  .global _init
  .type _init,%function
-diff --git a/crt/aarch64/crtn.s b/crt/aarch64/crtn.s
-index 73cab692..d62fc129 100644
 --- a/crt/aarch64/crtn.s
 +++ b/crt/aarch64/crtn.s
 @@ -1,3 +1,4 @@
@@ -61,8 +57,6 @@ index 73cab692..d62fc129 100644
  .section .init
  	ldp x29,x30,[sp],#16
  	ret
-diff --git a/crt/arm/crti.s b/crt/arm/crti.s
-index 18dc1e41..8df72979 100644
 --- a/crt/arm/crti.s
 +++ b/crt/arm/crti.s
 @@ -1,3 +1,4 @@
@@ -70,8 +64,6 @@ index 18dc1e41..8df72979 100644
  .syntax unified
  
  .section .init
-diff --git a/crt/arm/crtn.s b/crt/arm/crtn.s
-index dc020f92..7451355b 100644
 --- a/crt/arm/crtn.s
 +++ b/crt/arm/crtn.s
 @@ -1,3 +1,4 @@
@@ -79,8 +71,6 @@ index dc020f92..7451355b 100644
  .syntax unified
  
  .section .init
-diff --git a/crt/i386/crti.s b/crt/i386/crti.s
-index d2682a20..2823fc3b 100644
 --- a/crt/i386/crti.s
 +++ b/crt/i386/crti.s
 @@ -1,3 +1,4 @@
@@ -88,8 +78,6 @@ index d2682a20..2823fc3b 100644
  .section .init
  .global _init
  _init:
-diff --git a/crt/i386/crtn.s b/crt/i386/crtn.s
-index f3b61e01..04fb1646 100644
 --- a/crt/i386/crtn.s
 +++ b/crt/i386/crtn.s
 @@ -1,3 +1,4 @@
@@ -97,8 +85,6 @@ index f3b61e01..04fb1646 100644
  .section .init
  	add $12,%esp
  	ret
-diff --git a/crt/microblaze/crti.s b/crt/microblaze/crti.s
-index ed1c2fa4..29ee4733 100644
 --- a/crt/microblaze/crti.s
 +++ b/crt/microblaze/crti.s
 @@ -1,3 +1,4 @@
@@ -106,8 +92,6 @@ index ed1c2fa4..29ee4733 100644
  .section .init
  .global _init
  .align 2
-diff --git a/crt/microblaze/crtn.s b/crt/microblaze/crtn.s
-index 1e02c984..c2083749 100644
 --- a/crt/microblaze/crtn.s
 +++ b/crt/microblaze/crtn.s
 @@ -1,3 +1,4 @@
@@ -115,8 +99,6 @@ index 1e02c984..c2083749 100644
  .section .init
  	lwi r15, r1, 0
  	rtsd r15, 8
-diff --git a/crt/mips/crti.s b/crt/mips/crti.s
-index 39dee380..0211764e 100644
 --- a/crt/mips/crti.s
 +++ b/crt/mips/crti.s
 @@ -1,3 +1,4 @@
@@ -124,8 +106,6 @@ index 39dee380..0211764e 100644
  .set noreorder
  
  .section .init
-diff --git a/crt/mips/crtn.s b/crt/mips/crtn.s
-index 506a04b7..606490cf 100644
 --- a/crt/mips/crtn.s
 +++ b/crt/mips/crtn.s
 @@ -1,3 +1,4 @@
@@ -133,8 +113,6 @@ index 506a04b7..606490cf 100644
  .set noreorder
  
  .section .init
-diff --git a/crt/mips64/crti.s b/crt/mips64/crti.s
-index c962dd09..f2c19cdd 100644
 --- a/crt/mips64/crti.s
 +++ b/crt/mips64/crti.s
 @@ -1,3 +1,4 @@
@@ -142,8 +120,6 @@ index c962dd09..f2c19cdd 100644
  .set noreorder
  
  .section .init
-diff --git a/crt/mips64/crtn.s b/crt/mips64/crtn.s
-index f3930b24..68903ffa 100644
 --- a/crt/mips64/crtn.s
 +++ b/crt/mips64/crtn.s
 @@ -1,3 +1,4 @@
@@ -151,8 +127,6 @@ index f3930b24..68903ffa 100644
  .set noreorder
  
  .section .init
-diff --git a/crt/mipsn32/crti.s b/crt/mipsn32/crti.s
-index 14fa28d9..a35387d3 100644
 --- a/crt/mipsn32/crti.s
 +++ b/crt/mipsn32/crti.s
 @@ -1,3 +1,4 @@
@@ -160,8 +134,6 @@ index 14fa28d9..a35387d3 100644
  .set	noreorder
  .section	.init
  .global	_init
-diff --git a/crt/mipsn32/crtn.s b/crt/mipsn32/crtn.s
-index dccd7e89..bdb6e561 100644
 --- a/crt/mipsn32/crtn.s
 +++ b/crt/mipsn32/crtn.s
 @@ -1,3 +1,4 @@
@@ -169,8 +141,6 @@ index dccd7e89..bdb6e561 100644
  .set	noreorder
  .section	.init
  	ld	$gp, 16($sp)
-diff --git a/crt/or1k/crti.s b/crt/or1k/crti.s
-index 7e741459..919369ca 100644
 --- a/crt/or1k/crti.s
 +++ b/crt/or1k/crti.s
 @@ -1,3 +1,4 @@
@@ -178,8 +148,6 @@ index 7e741459..919369ca 100644
  .section .init
  .global _init
  _init:
-diff --git a/crt/or1k/crtn.s b/crt/or1k/crtn.s
-index 4185a027..d670b327 100644
 --- a/crt/or1k/crtn.s
 +++ b/crt/or1k/crtn.s
 @@ -1,3 +1,4 @@
@@ -187,8 +155,6 @@ index 4185a027..d670b327 100644
  .section .init
  	l.lwz	r9,0(r1)
  	l.jr	r9
-diff --git a/crt/powerpc/crti.s b/crt/powerpc/crti.s
-index 60461ca4..b748ca48 100644
 --- a/crt/powerpc/crti.s
 +++ b/crt/powerpc/crti.s
 @@ -1,3 +1,4 @@
@@ -196,8 +162,6 @@ index 60461ca4..b748ca48 100644
  .section .init
  .align 2
  .global _init
-diff --git a/crt/powerpc/crtn.s b/crt/powerpc/crtn.s
-index 2d14a6f0..d989e36f 100644
 --- a/crt/powerpc/crtn.s
 +++ b/crt/powerpc/crtn.s
 @@ -1,3 +1,4 @@
@@ -205,8 +169,6 @@ index 2d14a6f0..d989e36f 100644
  .section .init
  .align 2
  	lwz 0,36(1)
-diff --git a/crt/powerpc64/crti.s b/crt/powerpc64/crti.s
-index 9f712f0e..d3323a67 100644
 --- a/crt/powerpc64/crti.s
 +++ b/crt/powerpc64/crti.s
 @@ -1,3 +1,4 @@
@@ -214,8 +176,6 @@ index 9f712f0e..d3323a67 100644
  .section .init
  .align 2
  .global _init
-diff --git a/crt/powerpc64/crtn.s b/crt/powerpc64/crtn.s
-index a7a9f4a0..5e71ae66 100644
 --- a/crt/powerpc64/crtn.s
 +++ b/crt/powerpc64/crtn.s
 @@ -1,3 +1,4 @@
@@ -223,8 +183,6 @@ index a7a9f4a0..5e71ae66 100644
  .section .init
  .align 2
  	addi 1, 1, 32
-diff --git a/crt/s390x/crti.s b/crt/s390x/crti.s
-index f453205b..3da3c5e1 100644
 --- a/crt/s390x/crti.s
 +++ b/crt/s390x/crti.s
 @@ -1,3 +1,4 @@
@@ -232,8 +190,6 @@ index f453205b..3da3c5e1 100644
  .section .init
  .align 2
  .global _init
-diff --git a/crt/s390x/crtn.s b/crt/s390x/crtn.s
-index 06066dc9..bfd55caf 100644
 --- a/crt/s390x/crtn.s
 +++ b/crt/s390x/crtn.s
 @@ -1,3 +1,4 @@
@@ -241,8 +197,6 @@ index 06066dc9..bfd55caf 100644
  .section .init
  .align 2
  	lmg  %r14, %r15, 272(%r15)
-diff --git a/crt/sh/crti.s b/crt/sh/crti.s
-index d99bfd5c..77d61c51 100644
 --- a/crt/sh/crti.s
 +++ b/crt/sh/crti.s
 @@ -1,3 +1,4 @@
@@ -250,8 +204,6 @@ index d99bfd5c..77d61c51 100644
  .section .init
  .global  _init
  .type    _init, @function
-diff --git a/crt/sh/crtn.s b/crt/sh/crtn.s
-index 958ce951..29deb5be 100644
 --- a/crt/sh/crtn.s
 +++ b/crt/sh/crtn.s
 @@ -1,3 +1,4 @@
@@ -259,8 +211,6 @@ index 958ce951..29deb5be 100644
  .section .init
  	lds.l @r15+, pr
  	mov.l @r15+, r14
-diff --git a/crt/x32/crti.s b/crt/x32/crti.s
-index 4788968b..8668b7c7 100644
 --- a/crt/x32/crti.s
 +++ b/crt/x32/crti.s
 @@ -1,3 +1,4 @@
@@ -268,8 +218,6 @@ index 4788968b..8668b7c7 100644
  .section .init
  .global _init
  _init:
-diff --git a/crt/x32/crtn.s b/crt/x32/crtn.s
-index 29198b77..ef73d295 100644
 --- a/crt/x32/crtn.s
 +++ b/crt/x32/crtn.s
 @@ -1,3 +1,4 @@
@@ -277,8 +225,6 @@ index 29198b77..ef73d295 100644
  .section .init
  	pop %rax
  	ret
-diff --git a/crt/x86_64/crti.s b/crt/x86_64/crti.s
-index 4788968b..8668b7c7 100644
 --- a/crt/x86_64/crti.s
 +++ b/crt/x86_64/crti.s
 @@ -1,3 +1,4 @@
@@ -286,8 +232,6 @@ index 4788968b..8668b7c7 100644
  .section .init
  .global _init
  _init:
-diff --git a/crt/x86_64/crtn.s b/crt/x86_64/crtn.s
-index 29198b77..ef73d295 100644
 --- a/crt/x86_64/crtn.s
 +++ b/crt/x86_64/crtn.s
 @@ -1,3 +1,4 @@
@@ -295,6 +239,3 @@ index 29198b77..ef73d295 100644
  .section .init
  	pop %rax
  	ret
--- 
-2.29.1
-

@@ -40,7 +40,7 @@ project is the Windows family of operating systems developed by
 Microsoft Corporation.
 
 Wikipedia has a good historical description of the Open Source
-Philosophy `here <http://en.wikipedia.org/wiki/Open_source>`__. You can
+Philosophy `here <https://en.wikipedia.org/wiki/Open_source>`__. You can
 also find helpful information on how to participate in the Linux
 Community
 `here <https://www.kernel.org/doc/html/latest/process/index.html>`__.
@@ -291,7 +291,7 @@ While each development environment is unique, there are some best
 practices or methods that help development run smoothly. The following
 list describes some of these practices. For more information about Git
 workflows, see the workflow topics in the `Git Community
-Book <http://book.git-scm.com>`__.
+Book <https://book.git-scm.com>`__.
 
 -  *Make Small Changes:* It is best to keep the changes you commit small
    as compared to bundling many disparate changes into a single commit.
@@ -368,12 +368,12 @@ commands.
 .. note::
 
    -  For more information on Git, see
-      http://git-scm.com/documentation.
+      https://git-scm.com/documentation.
 
    -  If you need to download Git, it is recommended that you add Git to
       your system through your distribution's "software store" (e.g. for
       Ubuntu, use the Ubuntu Software feature). For the Git download
-      page, see http://git-scm.com/download.
+      page, see https://git-scm.com/download.
 
    -  For information beyond the introductory nature in this section,
       see the ":ref:`dev-manual/start:locating yocto project source files`"
@@ -507,7 +507,7 @@ you can manage with a small set of basic operations and workflows once
 you understand the basic philosophy behind Git. You do not have to be an
 expert in Git to be functional. A good place to look for instruction on
 a minimal set of Git commands is
-`here <http://git-scm.com/documentation>`__.
+`here <https://git-scm.com/documentation>`__.
 
 The following list of Git commands briefly describes some basic Git
 operations as a way to get started. As with any set of commands, this
@@ -614,10 +614,10 @@ and Free Software has an interesting history. If you are interested in
 this history, you can find basic information here:
 
 -  `Open source license
-   history <http://en.wikipedia.org/wiki/Open-source_license>`__
+   history <https://en.wikipedia.org/wiki/Open-source_license>`__
 
 -  `Free software license
-   history <http://en.wikipedia.org/wiki/Free_software_license>`__
+   history <https://en.wikipedia.org/wiki/Free_software_license>`__
 
 In general, the Yocto Project is broadly licensed under the
 Massachusetts Institute of Technology (MIT) License. MIT licensing
@@ -626,9 +626,9 @@ license is distributed with that software. MIT is also compatible with
 the GNU General Public License (GPL). Patches to the Yocto Project
 follow the upstream licensing scheme. You can find information on the
 MIT license
-`here <http://www.opensource.org/licenses/mit-license.php>`__. You can
+`here <https://www.opensource.org/licenses/mit-license.php>`__. You can
 find information on the GNU GPL
-`here <http://www.opensource.org/licenses/LGPL-3.0>`__.
+`here <https://www.opensource.org/licenses/LGPL-3.0>`__.
 
 When you build an image using the Yocto Project, the build process uses
 a known list of licenses to ensure compliance. You can find this list in
@@ -646,11 +646,11 @@ the developer to resolve potential licensing issues.
 
 The base list of licenses used by the build process is a combination of
 the Software Package Data Exchange (SPDX) list and the Open Source
-Initiative (OSI) projects. `SPDX Group <http://spdx.org>`__ is a working
+Initiative (OSI) projects. `SPDX Group <https://spdx.org>`__ is a working
 group of the Linux Foundation that maintains a specification for a
 standard format for communicating the components, licenses, and
 copyrights associated with a software package.
-`OSI <http://opensource.org>`__ is a corporation dedicated to the Open
+`OSI <https://opensource.org>`__ is a corporation dedicated to the Open
 Source Definition and the effort for reviewing and approving licenses
 that conform to the Open Source Definition (OSD).
 

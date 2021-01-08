@@ -33,10 +33,10 @@ class ImageOptionsTests(OESelftestTestCase):
         self.assertTrue(incremental_removed, msg = "Match failed in:\n%s" % log_data_removed)
 
     def test_ccache_tool(self):
-        bitbake("ccache-native")
-        bb_vars = get_bb_vars(['SYSROOT_DESTDIR', 'bindir'], 'ccache-native')
-        p = bb_vars['SYSROOT_DESTDIR'] + bb_vars['bindir'] + "/" + "ccache"
-        self.assertTrue(os.path.isfile(p), msg = "No ccache found (%s)" % p)
+        bb_vars = get_bb_vars(['HOSTTOOLS_DIR'], 'm4-native')
+        p = bb_vars['HOSTTOOLS_DIR'] + "/" + "ccache"
+        if not os.path.isfile(p):
+            self.skipTest("No ccache binary found in %s" % bb_vars['HOSTTOOLS_DIR'])
         self.write_config('INHERIT += "ccache"')
         self.add_command_to_tearDown('bitbake -c clean m4-native')
         bitbake("m4-native -c clean")

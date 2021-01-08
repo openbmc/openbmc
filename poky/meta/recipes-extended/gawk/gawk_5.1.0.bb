@@ -53,4 +53,8 @@ do_install_ptest() {
 
 RDEPENDS_${PN}-ptest += "make"
 
+RDEPENDS_${PN}-ptest_append_libc-glibc = "\
+     locale-base-en-us.iso-8859-1 \
+"
+
 BBCLASSEXTEND = "native nativesdk"

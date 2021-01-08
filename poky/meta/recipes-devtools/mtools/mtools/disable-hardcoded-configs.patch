@@ -1,4 +1,4 @@
-From c61a3df892ba88d9f3f84c1844481457a04b051f Mon Sep 17 00:00:00 2001
+From 9590860ba35cbd524cec51bdd009f0c63a7dd417 Mon Sep 17 00:00:00 2001
 From: Ed Bartosh <ed.bartosh@linux.intel.com>
 Date: Tue, 13 Jun 2017 14:55:52 +0300
 Subject: [PATCH] Disabled reading host configs.
@@ -12,10 +12,10 @@ Signed-off-by: Ed Bartosh <ed.bartosh@linux.intel.com>
  1 file changed, 8 deletions(-)
 
 diff --git a/config.c b/config.c
-index 46af755..5ed9114 100644
+index 415755f..b61a49d 100644
 --- a/config.c
 +++ b/config.c
-@@ -737,14 +737,6 @@ void read_config(void)
+@@ -774,14 +774,6 @@ void read_config(void)
  	memcpy(devices, const_devices,
  	       nr_const_devices*sizeof(struct device));
  

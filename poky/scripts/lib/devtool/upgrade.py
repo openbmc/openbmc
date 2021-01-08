@@ -178,7 +178,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
     uri, rev = _get_uri(crd)
     if srcrev:
         rev = srcrev
-    if uri.startswith('git://'):
+    if uri.startswith('git://') or uri.startswith('gitsm://'):
         __run('git fetch')
         __run('git checkout %s' % rev)
         __run('git tag -f devtool-base-new')
@@ -270,7 +270,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
             else:
                 logger.warning('Command \'%s\' failed:\n%s' % (e.command, e.stdout))
         if not skiptag:
-            if uri.startswith('git://'):
+            if uri.startswith('git://') or uri.startswith('gitsm://'):
                 suffix = 'new'
             else:
                 suffix = newpv

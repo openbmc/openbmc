@@ -55,9 +55,9 @@ Yocto Project is fairly straightforward.
 **Q:** Are there any products built using the OpenEmbedded build system?
 
 **A:** The software running on the `Vernier
-LabQuest <http://vernier.com/labquest/>`__ is built using the
+LabQuest <https://vernier.com/labquest/>`__ is built using the
 OpenEmbedded build system. See the `Vernier
-LabQuest <http://www.vernier.com/products/interfaces/labq/>`__ website
+LabQuest <https://www.vernier.com/products/interfaces/labq/>`__ website
 for more information. There are a number of pre-production devices using
 the OpenEmbedded build system and the Yocto Project team announces them
 as soon as they are released.
@@ -273,7 +273,7 @@ OpenEmbedded build system to use its internally built toolchain (i.e.
 particular, "external-\*" refers to external toolchains. One example is
 the Sourcery G++ Toolchain. The support for this toolchain resides in
 the separate ``meta-sourcery`` layer at
-http://github.com/MentorEmbedded/meta-sourcery/.
+https://github.com/MentorEmbedded/meta-sourcery/.
 
 In addition to the toolchain configuration, you also need a
 corresponding toolchain recipe file. This recipe file needs to package

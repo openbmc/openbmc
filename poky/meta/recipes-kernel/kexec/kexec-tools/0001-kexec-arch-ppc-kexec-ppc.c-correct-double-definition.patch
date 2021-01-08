@@ -1,0 +1,23 @@
+From ba2fb5baf6b0a8c882ac32301dd7a8d16de0dcf6 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 27 Dec 2020 23:39:29 +0100
+Subject: [PATCH] kexec/arch/ppc/kexec-ppc.c: correct double definition error
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ kexec/arch/ppc/kexec-ppc.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/kexec/arch/ppc/kexec-ppc.c b/kexec/arch/ppc/kexec-ppc.c
+index 03bec36..5b3e244 100644
+--- a/kexec/arch/ppc/kexec-ppc.c
++++ b/kexec/arch/ppc/kexec-ppc.c
+@@ -35,7 +35,6 @@ unsigned long long initrd_base = 0, initrd_size = 0;
+ unsigned long long ramdisk_base = 0, ramdisk_size = 0;
+ unsigned int rtas_base, rtas_size;
+ int max_memory_ranges;
+-const char *ramdisk;
+ 
+ /*
+  * Reads the #address-cells and #size-cells on this platform.

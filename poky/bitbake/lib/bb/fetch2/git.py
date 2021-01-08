@@ -220,7 +220,12 @@ class Git(FetchMethod):
             ud.shallow = False
 
         if ud.usehead:
-            ud.unresolvedrev['default'] = 'HEAD'
+            # When usehead is set let's associate 'HEAD' with the unresolved
+            # rev of this repository. This will get resolved into a revision
+            # later. If an actual revision happens to have also been provided
+            # then this setting will be overridden.
+            for name in ud.names:
+                ud.unresolvedrev[name] = 'HEAD'
 
         ud.basecmd = d.getVar("FETCHCMD_git") or "git -c core.fsyncobjectfiles=0"
 

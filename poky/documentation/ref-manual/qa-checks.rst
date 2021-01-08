@@ -227,7 +227,7 @@ Errors and Warnings
       CFLAGS_append = " -fPIC "
 
    For more information on text relocations at runtime, see
-   http://www.akkadia.org/drepper/textrelocs.html.
+   https://www.akkadia.org/drepper/textrelocs.html.
 
     
 .. _qa-check-ldflags:

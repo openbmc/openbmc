@@ -73,7 +73,9 @@ class SkippedPackage:
             self.pn = info.pn
             self.skipreason = info.skipreason
             self.provides = info.provides
-            self.rprovides = info.rprovides
+            self.rprovides = info.packages + info.rprovides
+            for package in info.packages:
+                self.rprovides += info.rprovides_pkg[package]
         elif reason:
             self.skipreason = reason
 

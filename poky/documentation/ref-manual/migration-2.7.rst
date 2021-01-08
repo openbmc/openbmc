@@ -159,7 +159,7 @@ The following miscellaneous changes occurred:
    from the top-level ``scripts`` directory.
 
 -  Perl now builds for the target using
-   `perl-cross <http://arsv.github.io/perl-cross/>`_ for better
+   `perl-cross <https://arsv.github.io/perl-cross/>`_ for better
    maintainability and improved build performance. This change should
    not present any problems unless you have heavily customized your Perl
    recipe.

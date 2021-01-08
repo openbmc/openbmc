@@ -1,4 +1,4 @@
-From 106cf5134d22db889e4ddf2f98ec302d5f4b9ca7 Mon Sep 17 00:00:00 2001
+From 98abade8cc119e076e4c5f1461c5188f6d49c1d8 Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Wed, 17 Jan 2018 10:02:14 -0200
 Subject: [PATCH] cmake: Prevent the detection of Qt5
@@ -25,23 +25,23 @@ Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
  7 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/Source/QtDialog/CMakeLists.txt b/Source/QtDialog/CMakeLists.txt
-index 98dd0e2..252302b 100644
+index 452a303..d0a9fb4 100644
 --- a/Source/QtDialog/CMakeLists.txt
 +++ b/Source/QtDialog/CMakeLists.txt
 @@ -3,7 +3,7 @@
  
  project(QtDialog)
  CMake_OPTIONAL_COMPONENT(cmake-gui)
--find_package(Qt5Widgets QUIET)
-+#find_package(Qt5Widgets QUIET)
- if (Qt5Widgets_FOUND)
-   include_directories(${Qt5Widgets_INCLUDE_DIRS})
-   add_definitions(${Qt5Widgets_DEFINITONS})
+-find_package(Qt5Widgets REQUIRED)
++#find_package(Qt5Widgets REQUIRED)
+ 
+ set(CMake_QT_EXTRA_LIBRARIES)
+ 
 diff --git a/Tests/CMakeLists.txt b/Tests/CMakeLists.txt
-index db6dbf3..5b26879 100644
+index 1fb47cb..e022229 100644
 --- a/Tests/CMakeLists.txt
 +++ b/Tests/CMakeLists.txt
-@@ -215,7 +215,7 @@ if(BUILD_TESTING)
+@@ -251,7 +251,7 @@ if(BUILD_TESTING)
      set(CMake_TEST_Qt5 1)
    endif()
    if(CMake_TEST_Qt5)
@@ -96,10 +96,10 @@ index c08efc4..87e25d9 100644
  set(CMAKE_CXX_STANDARD 11)
  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/bin)
 diff --git a/Tests/RunCMake/CMakeLists.txt b/Tests/RunCMake/CMakeLists.txt
-index 10e66c3..ecc4eeb 100644
+index 370dd76..6bacbff 100644
 --- a/Tests/RunCMake/CMakeLists.txt
 +++ b/Tests/RunCMake/CMakeLists.txt
-@@ -440,7 +440,7 @@ if(NOT WIN32)
+@@ -473,7 +473,7 @@ if(NOT WIN32)
  endif ()
  
  find_package(Qt4 QUIET)

@@ -1,0 +1,26 @@
+From b833254bcc9fcf4cdc2572027b1154d799535ca4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 20 Dec 2020 22:01:43 +0100
+Subject: [PATCH] gio/tests/codegen.py: bump timeout to 100 seconds
+
+This may be necessary on overloaded CI systems.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ gio/tests/codegen.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gio/tests/codegen.py b/gio/tests/codegen.py
+index 51de0ed..ca98c9d 100644
+--- a/gio/tests/codegen.py
++++ b/gio/tests/codegen.py
+@@ -51,7 +51,7 @@ class TestCodegen(unittest.TestCase):
+     cwd = ''
+ 
+     def setUp(self):
+-        self.timeout_seconds = 10  # seconds per test
++        self.timeout_seconds = 100  # seconds per test
+         self.tmpdir = tempfile.TemporaryDirectory()
+         self.cwd = os.getcwd()
+         os.chdir(self.tmpdir.name)

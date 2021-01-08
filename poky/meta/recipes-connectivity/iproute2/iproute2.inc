@@ -20,11 +20,13 @@ PACKAGECONFIG[tipc] = ",,libmnl,"
 PACKAGECONFIG[elf] = ",,elfutils,"
 PACKAGECONFIG[devlink] = ",,libmnl,"
 
+IPROUTE2_MAKE_SUBDIRS = "lib tc ip bridge misc genl ${@bb.utils.filter('PACKAGECONFIG', 'devlink tipc', d)}"
+
 EXTRA_OEMAKE = "\
     CC='${CC}' \
     KERNEL_INCLUDE=${STAGING_INCDIR} \
     DOCDIR=${docdir}/iproute2 \
-    SUBDIRS='lib tc ip bridge misc genl ${@bb.utils.filter('PACKAGECONFIG', 'devlink tipc', d)}' \
+    SUBDIRS='${IPROUTE2_MAKE_SUBDIRS}' \
     SBINDIR='${base_sbindir}' \
     LIBDIR='${libdir}' \
 "

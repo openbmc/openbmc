@@ -1,5 +1,7 @@
 #
 # Usage:
+# - Install ccache package on the host distribution and set up a build directory
+#
 # - Enable ccache
 #   Add the following line to a conffile such as conf/local.conf:
 #   INHERIT += "ccache"
@@ -33,6 +35,10 @@ export CCACHE_CONFIGPATH ?= "${COREBASE}/meta/conf/ccache.conf"
 
 export CCACHE_DIR ?= "${CCACHE_TOP_DIR}/${MULTIMACH_TARGET_SYS}/${PN}"
 
+# Fixed errors:
+# ccache: error: Failed to create directory /run/user/0/ccache-tmp: Permission denied
+export CCACHE_TEMPDIR ?= "${CCACHE_DIR}/tmp"
+
 # We need to stop ccache considering the current directory or the
 # debug-prefix-map target directory to be significant when calculating
 # its hash. Without this the cache would be invalidated every time
@@ -47,7 +53,6 @@ python() {
     # quilt-native doesn't need ccache since no c files
     if not (pn in ('ccache-native', 'quilt-native') or
             bb.utils.to_boolean(d.getVar('CCACHE_DISABLE'))):
-        d.appendVar('DEPENDS', ' ccache-native')
         d.setVar('CCACHE', 'ccache ')
 }
 

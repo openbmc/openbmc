@@ -343,6 +343,13 @@ class PartitionedImage():
                     part.fsuuid = '0x' + str(uuid.uuid4())[:8].upper()
                 else:
                     part.fsuuid = str(uuid.uuid4())
+            else:
+                #make sure the fsuuid for vfat/msdos align with format 0xYYYYYYYY
+                if part.fstype == 'vfat' or part.fstype == 'msdos':
+                    if part.fsuuid.upper().startswith("0X"):
+                        part.fsuuid = '0x' + part.fsuuid.upper()[2:].rjust(8,"0")
+                    else:
+                        part.fsuuid = '0x' + part.fsuuid.upper().rjust(8,"0")
 
     def prepare(self, imager):
         """Prepare an image. Call prepare method of all image partitions."""

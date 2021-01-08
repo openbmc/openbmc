@@ -1,20 +1,21 @@
-From d294c5039753a36506949ba5dc782a4c0b307b74 Mon Sep 17 00:00:00 2001
+From bb6a26371d15473b380459ac4404bf330634b585 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 20 Dec 2019 17:21:08 +0100
 Subject: [PATCH] kexec: un-break the build on 32 bit x86
 
 Upstream-Status: Pending
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  kexec/arch/i386/Makefile    | 1 +
  kexec/arch/i386/kexec-x86.h | 4 ++++
  2 files changed, 5 insertions(+)
 
 diff --git a/kexec/arch/i386/Makefile b/kexec/arch/i386/Makefile
-index 105cefd..25df57a 100644
+index f486103..5d560be 100644
 --- a/kexec/arch/i386/Makefile
 +++ b/kexec/arch/i386/Makefile
-@@ -11,6 +11,7 @@ i386_KEXEC_SRCS += kexec/arch/i386/kexec-beoboot-x86.c
+@@ -12,6 +12,7 @@ i386_KEXEC_SRCS += kexec/arch/i386/kexec-beoboot-x86.c
  i386_KEXEC_SRCS += kexec/arch/i386/kexec-nbi.c
  i386_KEXEC_SRCS += kexec/arch/i386/x86-linux-setup.c
  i386_KEXEC_SRCS += kexec/arch/i386/crashdump-x86.c
@@ -23,7 +24,7 @@ index 105cefd..25df57a 100644
  dist += kexec/arch/i386/Makefile $(i386_KEXEC_SRCS)			\
  	kexec/arch/i386/crashdump-x86.h					\
 diff --git a/kexec/arch/i386/kexec-x86.h b/kexec/arch/i386/kexec-x86.h
-index 1b58c3b..d6b10c0 100644
+index 0f941df..c423171 100644
 --- a/kexec/arch/i386/kexec-x86.h
 +++ b/kexec/arch/i386/kexec-x86.h
 @@ -56,9 +56,13 @@ struct arch_options_t {
@@ -38,5 +39,5 @@ index 1b58c3b..d6b10c0 100644
  void multiboot_x86_usage(void);
 +void multiboot2_x86_usage(void);
  
- int elf_x86_probe(const char *buf, off_t len);
- int elf_x86_load(int argc, char **argv, const char *buf, off_t len,
+ int multiboot2_x86_load(int argc, char **argv, const char *buf, off_t len,
+ 			struct kexec_info *info);

@@ -210,7 +210,7 @@ You just need to follow these general steps:
 3. *Develop and Test your Application:* At this point, you have the
    tools to develop your application. If you need to separately install
    and use the QEMU emulator, you can go to `QEMU Home
-   Page <http://wiki.qemu.org/Main_Page>`__ to download and learn about
+   Page <https://wiki.qemu.org/Main_Page>`__ to download and learn about
    the emulator. See the ":doc:`/dev-manual/qemu`" chapter in the
    Yocto Project Development Tasks Manual for information on using QEMU
    within the Yocto Project.

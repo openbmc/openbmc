@@ -87,7 +87,8 @@ def package_qa_add_message(messages, section, new_msg):
 
 QAPATHTEST[shebang-size] = "package_qa_check_shebang_size"
 def package_qa_check_shebang_size(path, name, d, elf, messages):
-    if os.path.islink(path) or elf:
+    import stat
+    if os.path.islink(path) or stat.S_ISFIFO(os.stat(path).st_mode) or elf:
         return
 
     try:

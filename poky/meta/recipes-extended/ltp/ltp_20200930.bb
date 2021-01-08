@@ -34,6 +34,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0007-Fix-test_proc_kill-hanging.patch \
            file://0001-Add-more-musl-exclusions.patch \
            file://0001-Remove-OOM-tests-from-runtest-mm.patch \
+           file://0001-ltp-pan-Use-long-long-int-to-print-time_t.patch \
            "
 
 S = "${WORKDIR}/git"

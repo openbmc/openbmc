@@ -74,7 +74,7 @@ test "$VERBOSE" != no && echo "Activating swap"
 #
 # Check the root filesystem.
 #
-if test -f /fastboot || test $rootcheck = no
+if test -f /fastboot || test "$rootcheck" = "no"
 then
   test $rootcheck = yes && echo "Fast boot, no filesystem check"
 else

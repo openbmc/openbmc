@@ -1,0 +1,40 @@
+From 5ae24ece75f2caa69216da7075334711642f5588 Mon Sep 17 00:00:00 2001
+From: Michel Zou <xantares09@hotmail.com>
+Date: Wed, 16 Dec 2020 15:03:23 +0100
+Subject: [PATCH] Rename LIB_SUFFIX to VULKAN_LIB_SUFFIX
+
+Closes #527
+
+Upstream-Status: Backport [https://github.com/KhronosGroup/Vulkan-Loader/commit/66a23ac8c566299343668f094de50798a5f4a0e4]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ loader/CMakeLists.txt | 2 +-
+ loader/vulkan.pc.in   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/loader/CMakeLists.txt b/loader/CMakeLists.txt
+index 659511855..ba9f460f1 100644
+--- a/loader/CMakeLists.txt
++++ b/loader/CMakeLists.txt
+@@ -327,7 +327,7 @@ if(PKG_CONFIG_FOUND)
+         set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
+     endforeach()
+     if(WIN32)
+-        set(LIB_SUFFIX "-1")
++        set(VULKAN_LIB_SUFFIX "-1")
+     endif ()
+     configure_file("vulkan.pc.in" "vulkan.pc" @ONLY)
+     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/vulkan.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+diff --git a/loader/vulkan.pc.in b/loader/vulkan.pc.in
+index fc17cb1f3..44049ee34 100644
+--- a/loader/vulkan.pc.in
++++ b/loader/vulkan.pc.in
+@@ -6,7 +6,7 @@ includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+ Name: @CMAKE_PROJECT_NAME@
+ Description: Vulkan Loader
+ Version: @VK_API_VERSION@
+-Libs: -L${libdir} -lvulkan@LIB_SUFFIX@
++Libs: -L${libdir} -lvulkan@VULKAN_LIB_SUFFIX@
+ Libs.private: @PRIVATE_LIBS@
+ Cflags: -I${includedir}
+ 

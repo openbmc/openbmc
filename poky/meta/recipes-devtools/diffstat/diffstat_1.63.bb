@@ -5,7 +5,7 @@ reviewing large, complex patch files."
 HOMEPAGE = "http://invisible-island.net/diffstat/"
 SECTION = "devel"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://install-sh;endline=42;md5=b3549726c1022bee09c174c72a0ca4a5"
+LIC_FILES_CHKSUM = "file://COPYING;md5=a3d0bb117493e804b0c1a868ddf23321"
 
 SRC_URI = "http://invisible-mirror.net/archives/${BPN}/${BP}.tgz \
            file://run-ptest \
@@ -15,8 +15,6 @@ SRC_URI = "http://invisible-mirror.net/archives/${BPN}/${BP}.tgz \
 
 SRC_URI[md5sum] = "b9272ec8af6257103261ec3622692991"
 SRC_URI[sha256sum] = "7eddd53401b99b90bac3f7ebf23dd583d7d99c6106e67a4f1161b7a20110dc6f"
-
-S = "${WORKDIR}/diffstat-${PV}"
 
 inherit autotools gettext ptest
 

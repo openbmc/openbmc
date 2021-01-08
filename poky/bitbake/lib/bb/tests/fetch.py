@@ -654,6 +654,58 @@ class FetcherLocalTest(FetcherTest):
         with self.assertRaises(bb.fetch2.UnpackError):
             self.fetchUnpack(['file://a;subdir=/bin/sh'])
 
+    def test_local_gitfetch_usehead(self):
+        # Create dummy local Git repo
+        src_dir = tempfile.mkdtemp(dir=self.tempdir,
+                                   prefix='gitfetch_localusehead_')
+        src_dir = os.path.abspath(src_dir)
+        bb.process.run("git init", cwd=src_dir)
+        bb.process.run("git commit --allow-empty -m'Dummy commit'",
+                       cwd=src_dir)
+        # Use other branch than master
+        bb.process.run("git checkout -b my-devel", cwd=src_dir)
+        bb.process.run("git commit --allow-empty -m'Dummy commit 2'",
+                       cwd=src_dir)
+        stdout = bb.process.run("git rev-parse HEAD", cwd=src_dir)
+        orig_rev = stdout[0].strip()
+
+        # Fetch and check revision
+        self.d.setVar("SRCREV", "AUTOINC")
+        url = "git://" + src_dir + ";protocol=file;usehead=1"
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+        fetcher.unpack(self.unpackdir)
+        stdout = bb.process.run("git rev-parse HEAD",
+                                cwd=os.path.join(self.unpackdir, 'git'))
+        unpack_rev = stdout[0].strip()
+        self.assertEqual(orig_rev, unpack_rev)
+
+    def test_local_gitfetch_usehead_withname(self):
+        # Create dummy local Git repo
+        src_dir = tempfile.mkdtemp(dir=self.tempdir,
+                                   prefix='gitfetch_localusehead_')
+        src_dir = os.path.abspath(src_dir)
+        bb.process.run("git init", cwd=src_dir)
+        bb.process.run("git commit --allow-empty -m'Dummy commit'",
+                       cwd=src_dir)
+        # Use other branch than master
+        bb.process.run("git checkout -b my-devel", cwd=src_dir)
+        bb.process.run("git commit --allow-empty -m'Dummy commit 2'",
+                       cwd=src_dir)
+        stdout = bb.process.run("git rev-parse HEAD", cwd=src_dir)
+        orig_rev = stdout[0].strip()
+
+        # Fetch and check revision
+        self.d.setVar("SRCREV", "AUTOINC")
+        url = "git://" + src_dir + ";protocol=file;usehead=1;name=newName"
+        fetcher = bb.fetch.Fetch([url], self.d)
+        fetcher.download()
+        fetcher.unpack(self.unpackdir)
+        stdout = bb.process.run("git rev-parse HEAD",
+                                cwd=os.path.join(self.unpackdir, 'git'))
+        unpack_rev = stdout[0].strip()
+        self.assertEqual(orig_rev, unpack_rev)
+
 class FetcherNoNetworkTest(FetcherTest):
     def setUp(self):
         super().setUp()
@@ -844,35 +896,21 @@ class FetcherNetworkTest(FetcherTest):
         self.assertRaises(bb.fetch.FetchError, self.gitfetcher, url1, url2)
 
     @skipIfNoNetwork()
-    def test_gitfetch_localusehead(self):
-        # Create dummy local Git repo
-        src_dir = tempfile.mkdtemp(dir=self.tempdir,
-                                   prefix='gitfetch_localusehead_')
-        src_dir = os.path.abspath(src_dir)
-        bb.process.run("git init", cwd=src_dir)
-        bb.process.run("git commit --allow-empty -m'Dummy commit'",
-                       cwd=src_dir)
-        # Use other branch than master
-        bb.process.run("git checkout -b my-devel", cwd=src_dir)
-        bb.process.run("git commit --allow-empty -m'Dummy commit 2'",
-                       cwd=src_dir)
-        stdout = bb.process.run("git rev-parse HEAD", cwd=src_dir)
-        orig_rev = stdout[0].strip()
-
-        # Fetch and check revision
-        self.d.setVar("SRCREV", "AUTOINC")
-        url = "git://" + src_dir + ";protocol=file;usehead=1"
-        fetcher = bb.fetch.Fetch([url], self.d)
-        fetcher.download()
-        fetcher.unpack(self.unpackdir)
-        stdout = bb.process.run("git rev-parse HEAD",
-                                cwd=os.path.join(self.unpackdir, 'git'))
-        unpack_rev = stdout[0].strip()
-        self.assertEqual(orig_rev, unpack_rev)
+    def test_gitfetch_usehead(self):
+        # Since self.gitfetcher() sets SRCREV we expect this to override
+        # `usehead=1' and instead fetch the specified SRCREV. See
+        # test_local_gitfetch_usehead() for a positive use of the usehead
+        # feature.
+        url = "git://git.openembedded.org/bitbake;usehead=1"
+        self.assertRaises(bb.fetch.ParameterError, self.gitfetcher, url, url)
 
     @skipIfNoNetwork()
-    def test_gitfetch_remoteusehead(self):
-        url = "git://git.openembedded.org/bitbake;usehead=1"
+    def test_gitfetch_usehead_withname(self):
+        # Since self.gitfetcher() sets SRCREV we expect this to override
+        # `usehead=1' and instead fetch the specified SRCREV. See
+        # test_local_gitfetch_usehead() for a positive use of the usehead
+        # feature.
+        url = "git://git.openembedded.org/bitbake;usehead=1;name=newName"
         self.assertRaises(bb.fetch.ParameterError, self.gitfetcher, url, url)
 
     @skipIfNoNetwork()

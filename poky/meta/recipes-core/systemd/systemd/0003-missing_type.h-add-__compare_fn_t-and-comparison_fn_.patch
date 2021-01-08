@@ -1,7 +1,7 @@
-From 233de872b9b033ec842c2135152d2e006ac44c16 Mon Sep 17 00:00:00 2001
+From 9f0d5996bbb2db3679a4075fa8301750b786c03b Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 13:55:12 +0800
-Subject: [PATCH] missing_type.h: add __compare_fn_t and comparison_fn_t
+Subject: [PATCH 03/26] missing_type.h: add __compare_fn_t and comparison_fn_t
 
 Make it work with musl where comparison_fn_t and __compare_fn_t
 is not provided.
@@ -13,7 +13,6 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 [Rebased for v242]
 Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
-
 ---
  src/basic/missing_type.h | 9 +++++++++
  src/basic/sort-util.h    | 1 +
@@ -22,7 +21,7 @@ Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
  4 files changed, 12 insertions(+)
 
 diff --git a/src/basic/missing_type.h b/src/basic/missing_type.h
-index bf8a6caa1b46..c487e65e7bde 100644
+index f6233090a9..aeaf6ad5ec 100644
 --- a/src/basic/missing_type.h
 +++ b/src/basic/missing_type.h
 @@ -10,3 +10,12 @@
@@ -39,7 +38,7 @@ index bf8a6caa1b46..c487e65e7bde 100644
 +typedef int (*__compar_fn_t)(const void *, const void *);
 +#endif
 diff --git a/src/basic/sort-util.h b/src/basic/sort-util.h
-index 27d68b341cf3..307ea4ac0e8e 100644
+index 3394c9eb72..d9cb2aecb6 100644
 --- a/src/basic/sort-util.h
 +++ b/src/basic/sort-util.h
 @@ -4,6 +4,7 @@
@@ -51,7 +50,7 @@ index 27d68b341cf3..307ea4ac0e8e 100644
  void *xbsearch_r(const void *key, const void *base, size_t nmemb, size_t size,
                   __compar_d_fn_t compar, void *arg);
 diff --git a/src/core/kmod-setup.c b/src/core/kmod-setup.c
-index 128674327362..09ccd613e32c 100644
+index 8a7f82812a..a56f12f47f 100644
 --- a/src/core/kmod-setup.c
 +++ b/src/core/kmod-setup.c
 @@ -10,6 +10,7 @@
@@ -63,7 +62,7 @@ index 128674327362..09ccd613e32c 100644
  #if HAVE_KMOD
  #include "module-util.h"
 diff --git a/src/journal/catalog.c b/src/journal/catalog.c
-index 70b2c8b46c4e..d574a64586f1 100644
+index 0f6ad8a29e..4e1077ade4 100644
 --- a/src/journal/catalog.c
 +++ b/src/journal/catalog.c
 @@ -28,6 +28,7 @@
@@ -74,3 +73,6 @@ index 70b2c8b46c4e..d574a64586f1 100644
  
  const char * const catalog_file_dirs[] = {
          "/usr/local/lib/systemd/catalog/",
+-- 
+2.27.0
+

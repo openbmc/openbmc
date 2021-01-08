@@ -349,7 +349,8 @@ universal, the list includes them just in case:
      Source Directory is derived from the Yocto Project release tarball.
      For example, downloading and unpacking
      :yocto_dl:`/releases/yocto/&DISTRO_REL_TAG;/&YOCTO_POKY;.tar.bz2`
-     results in a Source Directory whose root folder is named ``poky``.
+     results in a Source Directory whose root folder is named
+     ``&YOCTO_POKY;``.
 
      It is important to understand the differences between the Source
      Directory created by unpacking a released tarball as compared to

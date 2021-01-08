@@ -1,0 +1,55 @@
+From 31f8bf794172102e9758928b481856c4a8800a7f Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Mon, 23 Nov 2020 18:14:25 +0800
+Subject: [PATCH 16/19] fix: statedump: undefined symbols caused by incorrect
+ patch backport
+
+bb346792c2cb ("fix: tracepoint: Optimize using static_call() (v5.10)")
+misses three definitions and causes the following build failures.
+
+ERROR: "__tracepoint_lttng_statedump_process_net_ns" [lttng-statedump.ko] undefined!
+ERROR: "__tracepoint_lttng_statedump_process_user_ns" [lttng-statedump.ko] undefined!
+ERROR: "__tracepoint_lttng_statedump_process_uts_ns" [lttng-statedump.ko] undefined!
+
+Fixes: #1290
+
+Upstream-Status: Backport
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ lttng-statedump-impl.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/lttng-statedump-impl.c b/lttng-statedump-impl.c
+index 67ecd33c..cf803a73 100644
+--- a/lttng-statedump-impl.c
++++ b/lttng-statedump-impl.c
+@@ -116,6 +116,24 @@ LTTNG_DEFINE_TRACE(lttng_statedump_process_mnt_ns,
+ 	TP_ARGS(session, p, mnt_ns));
+ #endif
+ 
++LTTNG_DEFINE_TRACE(lttng_statedump_process_net_ns,
++	TP_PROTO(struct lttng_session *session,
++		struct task_struct *p,
++		struct net *net_ns),
++	TP_ARGS(session, p, net_ns));
++
++LTTNG_DEFINE_TRACE(lttng_statedump_process_user_ns,
++	TP_PROTO(struct lttng_session *session,
++		struct task_struct *p,
++		struct user_namespace *user_ns),
++	TP_ARGS(session, p, user_ns));
++
++LTTNG_DEFINE_TRACE(lttng_statedump_process_uts_ns,
++	TP_PROTO(struct lttng_session *session,
++		struct task_struct *p,
++		struct uts_namespace *uts_ns),
++	TP_ARGS(session, p, uts_ns));
++
+ LTTNG_DEFINE_TRACE(lttng_statedump_network_interface,
+ 	TP_PROTO(struct lttng_session *session,
+ 		struct net_device *dev, struct in_ifaddr *ifa),
+-- 
+2.19.1
+

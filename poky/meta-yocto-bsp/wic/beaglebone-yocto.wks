@@ -3,5 +3,5 @@
 # Boot files are located in the first vfat partition.
 
 part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --active --align 4 --size 16 --sourceparams="loader=u-boot" --use-uuid
-part / --source rootfs --ondisk mmcblk --fstype=ext4 --label root --align 4 --use-uuid
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label root --align 4 --use-uuid
 bootloader --append="console=ttyS0,115200"

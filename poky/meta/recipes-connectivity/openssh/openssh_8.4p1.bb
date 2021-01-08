@@ -67,8 +67,8 @@ EXTRA_OECONF = "'LOGIN_PROGRAM=${base_bindir}/login' \
                 --disable-strip \
                 "
 
-# musl doesn't implement wtmp/utmp
-EXTRA_OECONF_append_libc-musl = " --disable-wtmp"
+# musl doesn't implement wtmp/utmp and logwtmp
+EXTRA_OECONF_append_libc-musl = " --disable-wtmp --disable-lastlog"
 
 # Since we do not depend on libbsd, we do not want configure to use it
 # just because it finds libutil.h.  But, specifying --disable-libutil

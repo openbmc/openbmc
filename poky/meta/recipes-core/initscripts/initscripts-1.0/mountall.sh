@@ -19,15 +19,21 @@
 test "$VERBOSE" != no && echo "Mounting local filesystems..."
 mount -at nonfs,nosmbfs,noncpfs 2>/dev/null
 
-#
-# We might have mounted something over /dev, see if /dev/initctl is there.
-#
-if test ! -p /dev/initctl
-then
-	rm -f /dev/initctl
-	mknod -m 600 /dev/initctl p
+
+# We might have mounted something over /run; see if
+# /dev/initctl is present.  Look for
+# /sbin/init.sysvinit to verify that sysvinit (and
+# not busybox or systemd) is installed as default init).
+INITCTL="/dev/initctl"
+if [ ! -p "$INITCTL" ] && [ "${INIT_SYSTEM}" = "sysvinit" ]; then
+    # Create new control channel
+		rm -f "$INITCTL"
+		mknod -m 600 "$INITCTL" p
+
+		# Reopen control channel.
+		PID="$(pidof -s /sbin/init || echo 1)"
+		[ -n "$PID" ] && kill -s USR1 "$PID"
 fi
-kill -USR1 1
 
 #
 # Execute swapon command again, in case we want to swap to

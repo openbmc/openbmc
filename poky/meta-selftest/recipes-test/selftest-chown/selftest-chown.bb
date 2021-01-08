@@ -3,6 +3,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 LICENSE = "MIT"
 
+DEPENDS += "coreutils-native"
+
 S = "${WORKDIR}"
 
 inherit useradd allarch
@@ -16,10 +18,13 @@ do_install() {
 	install -d   ${TESTDIR}/dir
 	touch        ${TESTDIR}/file
 	ln -s ./file ${TESTDIR}/symlink
+	install -d   ${TESTDIR}/fifotest
+	mkfifo       ${TESTDIR}/fifotest/fifo
 
 	chown    test:test ${TESTDIR}/file
 	chown -R test:test ${TESTDIR}/dir
 	chown -h test:test ${TESTDIR}/symlink
+	chown -R test:test ${TESTDIR}/fifotest
 }
 
 FILES_${PN} = "${sysconfdir}/selftest-chown/*"

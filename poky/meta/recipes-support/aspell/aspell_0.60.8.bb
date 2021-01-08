@@ -1,4 +1,8 @@
 SUMMARY = "GNU Aspell spell-checker"
+DESCRIPTION = "GNU Aspell is a spell-checker which can be used either as a \
+standalone application or embedded in other programs. Its main feature is that \
+it does a much better job of suggesting possible spellings than just about any \
+other spell-checker available for the English language"
 SECTION = "console/utils"
 
 LICENSE = "LGPLv2 | LGPLv2.1"

@@ -8,7 +8,7 @@
 
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the `Creative Commons Attribution-Share Alike 2.0 UK: England & Wales
-<http://creativecommons.org/licenses/by-sa/2.0/uk/>`_ as published by Creative
+<https://creativecommons.org/licenses/by-sa/2.0/uk/>`_ as published by Creative
 Commons.
 
 To report any inaccuracies or problems with this (or any other Yocto Project)

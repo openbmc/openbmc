@@ -186,7 +186,7 @@ do_install() {
 	        cp -a --parents $SYSCALL_TOOLS $kerneldir/build/
             fi
 
-            cp -a --parents arch/arm/kernel/module.lds $kerneldir/build/
+            cp -a --parents arch/arm/kernel/module.lds $kerneldir/build/ 2>/dev/null || :
 	fi
 
 	if [ -d arch/${ARCH}/include ]; then

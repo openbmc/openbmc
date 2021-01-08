@@ -1,0 +1,44 @@
+From cbf27cd54071f788231e69d96dbaad563f1010d4 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@gmail.com>
+Date: Fri, 18 Dec 2020 13:15:08 -0500
+Subject: [PATCH] transport: protect include and callsite with same conditional
+
+transport.c has the following code block:
+
+  if (!debugfs_p && security_locked_down (LOCKDOWN_DEBUGFS))
+
+Which is protected by the conditional STAPCONF_LOCKDOWN_DEBUGFS.
+
+linux/security.h provides the definition of LOCKDOWN_DEBUGFS, and
+must be included or we have a compilation issue.
+
+The include of security.h is protected by #ifdef CONFIG_SECURITY_LOCKDOWN_LSM,
+which means that in some configurations we can get out of sync with
+the include and the callsite.
+
+If we protect the include and the callsite with the same #ifdef, we can
+be sure that they will be consistent.
+
+Upstream-status: Inappropriate (kernel-devsrc specific)
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ runtime/transport/transport.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/runtime/transport/transport.c b/runtime/transport/transport.c
+index bb4a98bd3..88e20ea28 100644
+--- a/runtime/transport/transport.c
++++ b/runtime/transport/transport.c
+@@ -21,7 +21,7 @@
+ #include <linux/namei.h>
+ #include <linux/delay.h>
+ #include <linux/mutex.h>
+-#ifdef CONFIG_SECURITY_LOCKDOWN_LSM
++#ifdef STAPCONF_LOCKDOWN_DEBUGFS
+ #include <linux/security.h>
+ #endif
+ #include "../uidgid_compatibility.h"
+-- 
+2.19.1
+

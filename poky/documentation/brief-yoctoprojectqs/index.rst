@@ -397,7 +397,7 @@ information including the website, wiki pages, and user manuals:
    Development Community into which you can tap.
 
 -  **Developer Screencast:** The `Getting Started with the Yocto Project -
-   New Developer Screencast Tutorial <http://vimeo.com/36450321>`__
+   New Developer Screencast Tutorial <https://vimeo.com/36450321>`__
    provides a 30-minute video created for users unfamiliar with the
    Yocto Project but familiar with Linux build hosts. While this
    screencast is somewhat dated, the introductory and fundamental

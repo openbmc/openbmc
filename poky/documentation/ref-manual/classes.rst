@@ -278,7 +278,7 @@ The ``ccache`` class enables the C/C++ Compiler Cache for the build.
 This class is used to give a minor performance boost during the build.
 However, using the class can lead to unexpected side-effects. Thus, it
 is recommended that you do not use this class. See
-http://ccache.samba.org/ for information on the C/C++ Compiler
+https://ccache.samba.org/ for information on the C/C++ Compiler
 Cache.
 
 .. _ref-classes-chrpath:
@@ -1374,36 +1374,36 @@ generation.
 ``kernel-fitimage.bbclass``
 ===========================
 
-The ``kernel-fitimage`` class provides support to pack a kernel Image,
+The ``kernel-fitimage`` class provides support to pack a kernel image,
 device trees and a RAM disk into a single FIT image. In theory, a FIT
-image can support any number of kernels, RAM disks and device-trees.
+image can support any number of kernels, RAM disks and device trees.
 However, ``kernel-fitimage`` currently only supports
 limited usescases: just one kernel image, an optional RAM disk, and
-any number of device tree.
+any number of device trees.
 
 To create a FIT image, it is required that :term:`KERNEL_CLASSES`
-is set to "kernel-fitimage" and :term:`KERNEL_IMAGETYPE`
+is set to include "kernel-fitimage" and :term:`KERNEL_IMAGETYPE`
 is set to "fitImage".
 
-The options for the device tree compiler passed to mkimage -D feature
+The options for the device tree compiler passed to ``mkimage -D``
 when creating the FIT image are specified using the
 :term:`UBOOT_MKIMAGE_DTCOPTS` variable.
 
 Only a single kernel can be added to the FIT image created by
 ``kernel-fitimage`` and the kernel image in FIT is mandatory. The
-address where the kernel image is to be loaded by U-boot is
+address where the kernel image is to be loaded by U-Boot is
 specified by :term:`UBOOT_LOADADDRESS` and the entrypoint by
 :term:`UBOOT_ENTRYPOINT`.
 
 Multiple device trees can be added to the FIT image created by
 ``kernel-fitimage`` and the device tree is optional.
-The address where the device tree is to be loaded by U-boot is
+The address where the device tree is to be loaded by U-Boot is
 specified by :term:`UBOOT_DTBO_LOADADDRESS` for device tree overlays
 and by :term:`UBOOT_DTB_LOADADDRESS` for device tree binaries.
 
 Only a single RAM disk can be added to the FIT image created by
 ``kernel-fitimage`` and the RAM disk in FIT is optional.
-The address where the RAM disk image is to be loaded by U-boot
+The address where the RAM disk image is to be loaded by U-Boot
 is specified by :term:`UBOOT_RD_LOADADDRESS` and the entrypoint by
 :term:`UBOOT_RD_ENTRYPOINT`. The ramdisk is added to FIT image when
 :term:`INITRAMFS_IMAGE` is specified.
@@ -2581,7 +2581,7 @@ the :term:`SYSTEMD_BOOT_CFG`,
 :term:`SYSTEMD_BOOT_TIMEOUT` variables.
 
 You can also see the `Systemd-boot
-documentation <http://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__
+documentation <https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__
 for more information.
 
 .. _ref-classes-terminal:

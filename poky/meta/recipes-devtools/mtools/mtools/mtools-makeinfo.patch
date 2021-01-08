@@ -1,9 +1,48 @@
+From 3cf56b36db78679273f61ba78fbbf7f3fab52f68 Mon Sep 17 00:00:00 2001
+From: Marcin Juszkiewicz <hrw@openedhand.com>
+Date: Fri, 8 Jun 2007 08:35:12 +0000
+Subject: [PATCH] mtools: imported from OE
+
 Upstream-Status: Inappropriate [licensing]
 
-Index: mtools-4.0.18/configure.in
-===================================================================
---- mtools-4.0.18.orig/configure.in
-+++ mtools-4.0.18/configure.in
+---
+ Makefile.in  | 11 ++++++-----
+ configure.in | 27 +++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 616d59f..85b5b1d 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -26,10 +26,11 @@ USERCFLAGS =
+ USERLDFLAGS =
+ USERLDLIBS =
+ 
+-MAKEINFO = makeinfo
+-TEXI2DVI = texi2dvi
+-TEXI2PDF = texi2pdf
+-TEXI2HTML = texi2html
++MAKEINFO = @MAKEINFO@
++TEXI2DVI = @TEXI2DVI@
++TEXI2PDF = @TEXI2PDF@
++TEXI2HTML = @TEXI2HTML@
++DVI2PS = @DVI2PS@
+ 
+ 
+ # do not edit below this line
+@@ -199,7 +200,7 @@ dvi: mtools.dvi
+ 
+ ps: mtools.ps
+ %.ps: %.dvi
+-	dvips -f < $< > $@
++	$(DVI2PS) -f < $< > $@
+ 
+ pdf: mtools.pdf
+ %.pdf: %.texi sysconfdir.texi
+diff --git a/configure.in b/configure.in
+index 5ff75c1..c0f7440 100644
+--- a/configure.in
++++ b/configure.in
 @@ -35,6 +35,33 @@ AC_CANONICAL_SYSTEM
  AC_C_CONST
  AC_C_INLINE
@@ -35,35 +74,6 @@ Index: mtools-4.0.18/configure.in
 +AC_SUBST(TEXI2HTML)
 +AC_SUBST(DVI2PS)
 +
- 
  dnl Check for configuration options
  dnl Enable OS/2 extended density format disks
-Index: mtools-4.0.18/Makefile.in
-===================================================================
---- mtools-4.0.18.orig/Makefile.in
-+++ mtools-4.0.18/Makefile.in
-@@ -26,10 +26,11 @@ USERCFLAGS =
- USERLDFLAGS =
- USERLDLIBS =
- 
--MAKEINFO = makeinfo
--TEXI2DVI = texi2dvi
--TEXI2PDF = texi2pdf
--TEXI2HTML = texi2html
-+MAKEINFO = @MAKEINFO@
-+TEXI2DVI = @TEXI2DVI@
-+TEXI2PDF = @TEXI2PDF@
-+TEXI2HTML = @TEXI2HTML@
-+DVI2PS = @DVI2PS@
- 
- 
- # do not edit below this line
-@@ -198,7 +199,7 @@ dvi: mtools.dvi
- 
- ps: mtools.ps
- %.ps: %.dvi
--	dvips -f < $< > $@
-+	$(DVI2PS) -f < $< > $@
- 
- pdf: mtools.pdf
- %.pdf: %.texi sysconfdir.texi
+ AC_ARG_ENABLE(xdf,

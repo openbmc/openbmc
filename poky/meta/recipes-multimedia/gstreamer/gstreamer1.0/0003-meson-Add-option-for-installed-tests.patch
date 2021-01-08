@@ -1,7 +1,7 @@
-From 24867db22a5cc35e7643bc218e959ce56c306aca Mon Sep 17 00:00:00 2001
+From cf8077a7e3ab0ae236ebde79b7fc0b02eac658de Mon Sep 17 00:00:00 2001
 From: Carlos Rafael Giani <crg7475@mailbox.org>
 Date: Fri, 25 Oct 2019 00:06:26 +0200
-Subject: [PATCH 3/4] meson: Add option for installed tests
+Subject: [PATCH 3/3] meson: Add option for installed tests
 
 This adds an option for producing installed versions of the unit tests.
 These versions don't need meson to run (only a small shell script). This
@@ -23,7 +23,7 @@ Signed-off-by: Carlos Rafael Giani <crg7475@mailbox.org>
 
 diff --git a/build-aux/gen-installed-test-desc.py b/build-aux/gen-installed-test-desc.py
 new file mode 100644
-index 0000000..69e8a0f
+index 000000000..69e8a0faf
 --- /dev/null
 +++ b/build-aux/gen-installed-test-desc.py
 @@ -0,0 +1,18 @@
@@ -47,7 +47,7 @@ index 0000000..69e8a0f
 +write_template(args.output, build_template(args.test_execdir, args.testname))
 diff --git a/build-aux/gen-installed-test-shscript.py b/build-aux/gen-installed-test-shscript.py
 new file mode 100644
-index 0000000..5da86fb
+index 000000000..5da86fb37
 --- /dev/null
 +++ b/build-aux/gen-installed-test-shscript.py
 @@ -0,0 +1,25 @@
@@ -77,7 +77,7 @@ index 0000000..5da86fb
 +write_template(args.output, build_template(args.test_execdir, args.testname))
 +os.chmod(args.output, 0o755)
 diff --git a/meson_options.txt b/meson_options.txt
-index 72c3997..346c423 100644
+index 72c3997e2..346c423d4 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -15,6 +15,8 @@ option('poisoning', type : 'boolean', value : false, description : 'Enable poiso
@@ -90,7 +90,7 @@ index 72c3997..346c423 100644
  # Feature options
  option('check', type : 'feature', value : 'auto', description : 'Build unit test libraries')
 diff --git a/tests/check/meson.build b/tests/check/meson.build
-index 372ea41..bb0dcfa 100644
+index a617cf159..e629131c5 100644
 --- a/tests/check/meson.build
 +++ b/tests/check/meson.build
 @@ -120,11 +120,17 @@ if add_languages('cpp', native: false, required: false)
@@ -168,7 +168,7 @@ index 372ea41..bb0dcfa 100644
      env.set('GST_PLUGIN_SYSTEM_PATH_1_0', '')
 diff --git a/tests/files/testfile b/tests/files/testfile
 new file mode 100644
-index 0000000..89954e0
+index 000000000..89954e0e2
 --- /dev/null
 +++ b/tests/files/testfile
 @@ -0,0 +1,80 @@
@@ -253,5 +253,5 @@ index 0000000..89954e0
 +................................................................................
 +................................................................................
 -- 
-2.28.0
+2.29.2
 

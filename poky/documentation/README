@@ -2,7 +2,7 @@ documentation
 =============
 
 This is the directory that contains the Yocto Project documentation.  The Yocto
-Project source repositories at http://git.yoctoproject.org/cgit.cgi have two
+Project source repositories at https://git.yoctoproject.org/cgit.cgi have two
 instances of the "documentation" directory.  You should understand each of
 these instances.
 
@@ -47,12 +47,12 @@ Folders exist for individual manuals as follows:
 Each folder is self-contained regarding content and figures.
 
 If you want to find HTML versions of the Yocto Project manuals on the web,
-go to http://www.yoctoproject.org and click on the "Documentation" tab.  From
+go to https://www.yoctoproject.org and click on the "Documentation" tab.  From
 there you have access to archived documentation from previous releases, current
 documentation for the latest release, and "Docs in Progress" for the release
 currently being developed.
 
-In general, the Yocto Project site (http://www.yoctoproject.org) is a great
+In general, the Yocto Project site (https://www.yoctoproject.org) is a great
 reference for both information and downloads.
 
 poky.yaml
@@ -228,7 +228,7 @@ content:
 
 Variables can be nested, like it was the case for DocBook:
 
-  YOCTO_HOME_URL : "http://www.yoctoproject.org"
+  YOCTO_HOME_URL : "https://www.yoctoproject.org"
   YOCTO_DOCS_URL : "&YOCTO_HOME_URL;/docs"
 
 Note directive

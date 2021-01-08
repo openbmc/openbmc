@@ -1,0 +1,24 @@
+From e21e68f6aa0f5249fce613e8fd4ac0edbd5cb7b0 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 22 Dec 2020 13:35:11 +0100
+Subject: [PATCH] render-ops.c: add missing format string
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/spec/ati_fragment_shader/render-ops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/spec/ati_fragment_shader/render-ops.c b/tests/spec/ati_fragment_shader/render-ops.c
+index 131334ba2..19a353d67 100644
+--- a/tests/spec/ati_fragment_shader/render-ops.c
++++ b/tests/spec/ati_fragment_shader/render-ops.c
+@@ -393,7 +393,7 @@ piglit_display(void)
+ 		bool ok = piglit_probe_rect_halves_equal_rgba(get_test_x(i), get_test_y(i),
+ 							      w * 2, h);
+ 		enum piglit_result sub_result = ok ? PIGLIT_PASS : PIGLIT_FAIL;
+-		piglit_report_subtest_result(sub_result, test->name);
++		piglit_report_subtest_result(sub_result, "%s", test->name);
+ 		piglit_merge_result(&result, sub_result);
+ 	}
+ 

@@ -1,0 +1,52 @@
+From 5547316c85cd45c0ea29c4c7c48eecd616783cd5 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <toscano.pino@tiscali.it>
+Date: Tue, 17 Nov 2020 11:27:48 +0100
+Subject: [PATCH] build-sys: do not build plymouth-ctrl.c w/ disabled plymouth
+
+Do not build plymouth-ctrl.c in agetty and sulogin in case the plymouth
+support is disabled.
+
+Upstream-Status: Backport [https://github.com/karelzak/util-linux/commit/5547316c85cd45c0ea29c4c7c48eecd616783cd5]
+Signed-off-by: Pino Toscano <toscano.pino@tiscali.it>
+---
+ login-utils/Makemodule.am | 6 ++++--
+ term-utils/Makemodule.am  | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/login-utils/Makemodule.am b/login-utils/Makemodule.am
+index 4f52cea3c..8bc3ee37e 100644
+--- a/login-utils/Makemodule.am
++++ b/login-utils/Makemodule.am
+@@ -31,8 +31,10 @@ dist_man_MANS += login-utils/sulogin.8
+ sulogin_SOURCES = \
+ 	login-utils/sulogin.c \
+ 	login-utils/sulogin-consoles.c \
+-	login-utils/sulogin-consoles.h \
+-	lib/plymouth-ctrl.c
++	login-utils/sulogin-consoles.h
++if USE_PLYMOUTH_SUPPORT
++sulogin_SOURCES += lib/plymouth-ctrl.c
++endif
+ sulogin_LDADD = $(LDADD) libcommon.la
+ 
+ if HAVE_LIBCRYPT
+diff --git a/term-utils/Makemodule.am b/term-utils/Makemodule.am
+index 92df7dbc8..c424dbdf8 100644
+--- a/term-utils/Makemodule.am
++++ b/term-utils/Makemodule.am
+@@ -42,8 +42,10 @@ endif # BUILD_SCRIPTLIVE
+ if BUILD_AGETTY
+ sbin_PROGRAMS += agetty
+ dist_man_MANS += term-utils/agetty.8
+-agetty_SOURCES = term-utils/agetty.c \
+-		 lib/plymouth-ctrl.c
++agetty_SOURCES = term-utils/agetty.c
++if USE_PLYMOUTH_SUPPORT
++agetty_SOURCES += lib/plymouth-ctrl.c
++endif
+ agetty_LDADD = $(LDADD) libcommon.la
+ if BSD
+ agetty_LDADD += -lutil
+-- 
+2.29.2
+

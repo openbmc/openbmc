@@ -17,6 +17,72 @@ import stat
 import os
 import datetime
 
+# For sample packages, see:
+# https://autobuilder.yocto.io/pub/repro-fail/oe-reproducible-20201127-0t7wr_oo/
+# https://autobuilder.yocto.io/pub/repro-fail/oe-reproducible-20201127-4s9ejwyp/
+# https://autobuilder.yocto.io/pub/repro-fail/oe-reproducible-20201127-haiwdlbr/
+# https://autobuilder.yocto.io/pub/repro-fail/oe-reproducible-20201127-hwds3mcl/
+# https://autobuilder.yocto.io/pub/repro-fail/oe-reproducible-20201203-sua0pzvc/
+# (both packages/ and packages-excluded/)
+exclude_packages = [
+	'acpica-src',
+	'babeltrace2-ptest',
+	'bootchart2-doc',
+	'cups',
+	'cwautomacros',
+	'dtc',
+	'efivar',
+	'epiphany',
+	'gcr',
+	'git',
+	'glide',
+	'go-dep',
+	'go-helloworld',
+	'go-runtime',
+	'go_',
+	'groff',
+	'gst-devtools',
+	'gstreamer1.0-python',
+	'gtk-doc',
+	'igt-gpu-tools',
+        'kernel-devsrc',
+	'libaprutil',
+	'libcap-ng',
+	'libhandy-1-src',
+	'libid3tag',
+	'libproxy',
+	'libsecret-dev',
+	'libsecret-src',
+	'lttng-tools-dbg',
+	'lttng-tools-ptest',
+	'ltp',
+	'meson',
+	'ovmf-shell-efi',
+	'parted-ptest',
+	'perf',
+	'python3-cython',
+	'qemu',
+	'quilt-ptest',
+	'rsync',
+	'ruby',
+	'spirv-tools-dev',
+	'swig',
+	'syslinux-misc',
+	'systemd-bootchart',
+	'valgrind-ptest',
+	'vim',
+	'watchdog',
+	'xmlto',
+	'xorg-minimal-fonts'
+	]
+
+def is_excluded(package):
+    package_name = os.path.basename(package)
+    for i in exclude_packages:
+        if package_name.startswith(i):
+            return True
+    return False
+
 MISSING = 'MISSING'
 DIFFERENT = 'DIFFERENT'
 SAME = 'SAME'
@@ -39,6 +105,7 @@ class PackageCompareResults(object):
         self.total = []
         self.missing = []
         self.different = []
+        self.different_excluded = []
         self.same = []
 
     def add_result(self, r):
@@ -46,7 +113,10 @@ class PackageCompareResults(object):
         if r.status == MISSING:
             self.missing.append(r)
         elif r.status == DIFFERENT:
-            self.different.append(r)
+            if is_excluded(r.reference):
+                self.different_excluded.append(r)
+            else:
+                self.different.append(r)
         else:
             self.same.append(r)
 
@@ -54,10 +124,11 @@ class PackageCompareResults(object):
         self.total.sort()
         self.missing.sort()
         self.different.sort()
+        self.different_excluded.sort()
         self.same.sort()
 
     def __str__(self):
-        return 'same=%i different=%i missing=%i total=%i' % (len(self.same), len(self.different), len(self.missing), len(self.total))
+        return 'same=%i different=%i different_excluded=%i missing=%i total=%i' % (len(self.same), len(self.different), len(self.different_excluded), len(self.missing), len(self.total))
 
 def compare_file(reference, test, diffutils_sysroot):
     result = CompareResult()
@@ -105,7 +176,7 @@ class DiffoscopeTests(OESelftestTestCase):
 
 class ReproducibleTests(OESelftestTestCase):
     package_classes = ['deb', 'ipk']
-    images = ['core-image-minimal', 'core-image-sato', 'core-image-full-cmdline']
+    images = ['core-image-minimal', 'core-image-sato', 'core-image-full-cmdline', 'world']
     save_results = False
     if 'OEQA_DEBUGGING_SAVED_OUTPUT' in os.environ:
         save_results = os.environ['OEQA_DEBUGGING_SAVED_OUTPUT']
@@ -176,6 +247,12 @@ class ReproducibleTests(OESelftestTestCase):
             PACKAGE_CLASSES = "{package_classes}"
             INHIBIT_PACKAGE_STRIP = "1"
             TMPDIR = "{tmpdir}"
+            LICENSE_FLAGS_WHITELIST = "commercial"
+            DISTRO_FEATURES_append = ' systemd pam'
+            USERADDEXTENSION = "useradd-staticids"
+            USERADD_ERROR_DYNAMIC = "skip"
+            USERADD_UID_TABLES += "files/static-passwd"
+            USERADD_GID_TABLES += "files/static-group"
             ''').format(package_classes=' '.join('package_%s' % c for c in self.package_classes),
                         tmpdir=tmpdir)
 
@@ -235,6 +312,7 @@ class ReproducibleTests(OESelftestTestCase):
 
                 self.write_package_list(package_class, 'missing', result.missing)
                 self.write_package_list(package_class, 'different', result.different)
+                self.write_package_list(package_class, 'different_excluded', result.different_excluded)
                 self.write_package_list(package_class, 'same', result.same)
 
                 if self.save_results:
@@ -242,8 +320,12 @@ class ReproducibleTests(OESelftestTestCase):
                         self.copy_file(d.reference, '/'.join([save_dir, 'packages', strip_topdir(d.reference)]))
                         self.copy_file(d.test, '/'.join([save_dir, 'packages', strip_topdir(d.test)]))
 
+                    for d in result.different_excluded:
+                        self.copy_file(d.reference, '/'.join([save_dir, 'packages-excluded', strip_topdir(d.reference)]))
+                        self.copy_file(d.test, '/'.join([save_dir, 'packages-excluded', strip_topdir(d.test)]))
+
                 if result.missing or result.different:
-                    fails.append("The following %s packages are missing or different: %s" %
+                    fails.append("The following %s packages are missing or different and not in exclusion list: %s" %
                             (c, '\n'.join(r.test for r in (result.missing + result.different))))
 
         # Clean up empty directories

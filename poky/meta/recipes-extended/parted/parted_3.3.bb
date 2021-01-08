@@ -3,7 +3,7 @@ HOMEPAGE = "http://www.gnu.org/software/parted/parted.html"
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2f31b266d3440dd7ee50f92cf67d8e6c"
 SECTION = "console/tools"
-DEPENDS = "ncurses readline util-linux virtual/libiconv"
+DEPENDS = "ncurses util-linux virtual/libiconv"
 
 SRC_URI = "${GNU_MIRROR}/parted/parted-${PV}.tar.xz \
            file://no_check.patch \
@@ -21,6 +21,9 @@ SRC_URI[sha256sum] = "57e2b4bd87018625c515421d4524f6e3b55175b472302056391c5f7ecc
 EXTRA_OECONF = "--disable-device-mapper"
 
 inherit autotools pkgconfig gettext texinfo ptest
+
+PACKAGECONFIG ?= "readline"
+PACKAGECONFIG[readline] = "--with-readline,--without-readline,readline"
 
 BBCLASSEXTEND = "native nativesdk"
 

@@ -1,0 +1,113 @@
+From 3776789cde95916f95deef48acf9532b0ebf91ae Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Tue, 15 Dec 2020 11:43:36 +1000
+Subject: [PATCH] lib*: Remove i*86 march overrides
+
+OE does not pass the '--with-arch' option to gccs configure, as such
+some gcc-runtime libraries try to override the value of '-march' and
+'-mtune' which OE already provides. This causes conflicts with other
+i*86 instruction/architecture flags (e.g. -msse* and -mfpmath=*).
+Additionally this caused the following libraries to be built with less
+optimized tune configurations.
+
+Upstream suggests that this should be detecting or otherwise checking if
+the target supports the desired functionality before overriding.
+
+    https://gcc.gnu.org/legacy-ml/gcc-patches/2016-04/msg01344.html
+
+libatomic also overrides the '-march' specifically for IFUNC objects.
+OE already supplies the correct march flag, so remove setting.
+
+Upstream-Status: Inappropriate [OE Specific]
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+---
+ libatomic/Makefile.am   | 1 -
+ libatomic/Makefile.in   | 1 -
+ libatomic/configure.tgt | 9 ---------
+ libgomp/configure.tgt   | 8 --------
+ libitm/configure.tgt    | 9 ---------
+ 5 files changed, 28 deletions(-)
+
+diff --git a/libatomic/Makefile.am b/libatomic/Makefile.am
+index ac1ca64587..5aa16e0699 100644
+--- a/libatomic/Makefile.am
++++ b/libatomic/Makefile.am
+@@ -133,7 +133,6 @@ libatomic_la_LIBADD += $(foreach s,$(SIZES),$(addsuffix _$(s)_1_.lo,$(SIZEOBJS))
+ libatomic_la_LIBADD += $(addsuffix _8_2_.lo,$(SIZEOBJS))
+ endif
+ if ARCH_I386
+-IFUNC_OPTIONS	     = -march=i586
+ libatomic_la_LIBADD += $(addsuffix _8_1_.lo,$(SIZEOBJS))
+ endif
+ if ARCH_X86_64
+diff --git a/libatomic/Makefile.in b/libatomic/Makefile.in
+index 97df2d7ff0..82c511d420 100644
+--- a/libatomic/Makefile.in
++++ b/libatomic/Makefile.in
+@@ -432,7 +432,6 @@ libatomic_la_LIBADD = $(foreach s,$(SIZES),$(addsuffix \
+ 	_$(s)_.lo,$(SIZEOBJS))) $(am__append_1) $(am__append_2) \
+ 	$(am__append_3) $(am__append_4)
+ @ARCH_ARM_LINUX_TRUE@@HAVE_IFUNC_TRUE@IFUNC_OPTIONS = -march=armv7-a+fp -DHAVE_KERNEL64
+-@ARCH_I386_TRUE@@HAVE_IFUNC_TRUE@IFUNC_OPTIONS = -march=i586
+ @ARCH_X86_64_TRUE@@HAVE_IFUNC_TRUE@IFUNC_OPTIONS = -mcx16
+ libatomic_convenience_la_SOURCES = $(libatomic_la_SOURCES)
+ libatomic_convenience_la_LIBADD = $(libatomic_la_LIBADD)
+diff --git a/libatomic/configure.tgt b/libatomic/configure.tgt
+index 5dd0926d20..3cc41773c3 100644
+--- a/libatomic/configure.tgt
++++ b/libatomic/configure.tgt
+@@ -82,15 +82,6 @@ case "${target_cpu}" in
+ 	;;
+ 
+   i[3456]86)
+-	case " ${CC} ${CFLAGS} " in
+-	  *" -m64 "*|*" -mx32 "*)
+-	    ;;
+-	  *)
+-	    if test -z "$with_arch"; then
+-	      XCFLAGS="${XCFLAGS} -march=i486 -mtune=${target_cpu}"
+-	      XCFLAGS="${XCFLAGS} -fomit-frame-pointer"
+-	    fi
+-	esac
+ 	ARCH=x86
+ 	# ??? Detect when -march=i686 is already enabled.
+ 	try_ifunc=yes
+diff --git a/libgomp/configure.tgt b/libgomp/configure.tgt
+index 4790a31e39..46c4c958e6 100644
+--- a/libgomp/configure.tgt
++++ b/libgomp/configure.tgt
+@@ -72,14 +72,6 @@ if test x$enable_linux_futex = xyes; then
+     # Note that bare i386 is not included here.  We need cmpxchg.
+     i[456]86-*-linux*)
+ 	config_path="linux/x86 linux posix"
+-	case " ${CC} ${CFLAGS} " in
+-	  *" -m64 "*|*" -mx32 "*)
+-	    ;;
+-	  *)
+-	    if test -z "$with_arch"; then
+-	      XCFLAGS="${XCFLAGS} -march=i486 -mtune=${target_cpu}"
+-	    fi
+-	esac
+ 	;;
+ 
+     # Similar jiggery-pokery for x86_64 multilibs, except here we
+diff --git a/libitm/configure.tgt b/libitm/configure.tgt
+index 04109160e9..3d78ea609d 100644
+--- a/libitm/configure.tgt
++++ b/libitm/configure.tgt
+@@ -59,15 +59,6 @@ case "${target_cpu}" in
+   arm*)		ARCH=arm ;;
+ 
+   i[3456]86)
+-	case " ${CC} ${CFLAGS} " in
+-	  *" -m64 "*|*" -mx32 "*)
+-	    ;;
+-	  *)
+-	    if test -z "$with_arch"; then
+-	      XCFLAGS="${XCFLAGS} -march=i486 -mtune=${target_cpu}"
+-	      XCFLAGS="${XCFLAGS} -fomit-frame-pointer"
+-	    fi
+-	esac
+ 	XCFLAGS="${XCFLAGS} -mrtm"
+ 	ARCH=x86
+ 	;;

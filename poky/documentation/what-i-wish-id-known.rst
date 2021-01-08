@@ -27,11 +27,10 @@ contact us with other suggestions.
    to be responsible for your own updates.
 
 #. **Get to know the layer index:**
-   All layers can be found in the `layer index
-   <https://layers.openembedded.org/>`_. Layers which have applied for Yocto
-   Project Compatible status (structure continuity assurance and testing) can be
-   found in the :yocto_home:`Yocto Project Compatible index
-   </software-over/layer/>`.  Generally check the Compatible layer index first,
+   All layers can be found in the :oe_layerindex:`layer index <>`. Layers which
+   have applied for Yocto Project Compatible status (structure continuity
+   assurance and testing) can be found in the :yocto_home:`Yocto Project Compatible index
+   </software-over/layer/>`. Generally check the Compatible layer index first,
    and if you don't find the necessary layer check the general layer index. The
    layer index is an original artifact from the Open Embedded Project. As such,
    that index doesn't have the curating and testing that the Yocto Project
@@ -172,7 +171,7 @@ contact us with other suggestions.
    * add an ssh server to an image (enable transferring of files to target)
    * know the anatomy of a recipe
    * know how to create and use layers
-   * find recipes (with the `OpenEmbedded Layer index <https://layers.openembedded.org>`_)
+   * find recipes (with the :oe_layerindex:`OpenEmbedded Layer index <>`)
    * understand difference between machine and distro settings
    * find and use the right BSP (machine) for your hardware
    * find examples of distro features and know where to set them

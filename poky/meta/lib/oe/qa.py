@@ -156,6 +156,7 @@ def elf_machine_to_string(machine):
     """
     try:
         return {
+            0x00: "Unset",
             0x02: "SPARC",
             0x03: "x86",
             0x08: "MIPS",

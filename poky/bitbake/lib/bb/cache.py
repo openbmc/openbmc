@@ -26,7 +26,7 @@ import re
 
 logger = logging.getLogger("BitBake.Cache")
 
-__cache_version__ = "153"
+__cache_version__ = "154"
 
 def getCacheFile(path, filename, mc, data_hash):
     mcspec = ''
@@ -94,6 +94,7 @@ class CoreRecipeInfo(RecipeInfoCommon):
         if not self.packages:
             self.packages.append(self.pn)
         self.packages_dynamic = self.listvar('PACKAGES_DYNAMIC', metadata)
+        self.rprovides_pkg = self.pkgvar('RPROVIDES', self.packages, metadata)
 
         self.skipreason = self.getvar('__SKIPPED', metadata)
         if self.skipreason:
@@ -120,7 +121,6 @@ class CoreRecipeInfo(RecipeInfoCommon):
         self.depends          = self.depvar('DEPENDS', metadata)
         self.rdepends         = self.depvar('RDEPENDS', metadata)
         self.rrecommends      = self.depvar('RRECOMMENDS', metadata)
-        self.rprovides_pkg    = self.pkgvar('RPROVIDES', self.packages, metadata)
         self.rdepends_pkg     = self.pkgvar('RDEPENDS', self.packages, metadata)
         self.rrecommends_pkg  = self.pkgvar('RRECOMMENDS', self.packages, metadata)
         self.inherits         = self.getvar('__inherit_cache', metadata, expand=False)
