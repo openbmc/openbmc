@@ -13,6 +13,9 @@ VBOX_NAME = "VirtualBox-${PV}"
 
 SRC_URI = "http://download.virtualbox.org/virtualbox/${PV}/${VBOX_NAME}.tar.bz2 \
     file://Makefile.utils \
+    file://0001-Additions-linux-drm-Adjustment-for-Linux-5.10.patch \
+    file://0001-Runtime-memobj-r0drv-linux.c-Changes-to-support-the-.patch \
+    file://0001-linser-vboxsf-Adjustment-for-linux-5.10-TASK_SIZE_MA.patch \
 "
 SRC_URI[md5sum] = "a12a647f6c114f2cb1571089b36841fe"
 SRC_URI[sha256sum] = "49c1990da16d8a3d5bda8cdb961ec8195a901e67e4c79aea44c1521a5fc2f9f1"

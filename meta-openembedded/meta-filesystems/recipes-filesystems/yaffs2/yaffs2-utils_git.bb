@@ -19,7 +19,7 @@ SRC_URI = "git://www.aleph1.co.uk/yaffs2;protocol=git;branch=master \
            file://0001-define-loff_t-if-not-already-defined.patch \
            "
 
-SRCREV = "b4ce1bb1b46accb1619dc07164ef6945feded9db"
+SRCREV = "9a6f486e56f927eeb8dc7e4e0d84f6bb95eeaa0f"
 
 UPSTREAM_CHECK_COMMITS = "1"
 

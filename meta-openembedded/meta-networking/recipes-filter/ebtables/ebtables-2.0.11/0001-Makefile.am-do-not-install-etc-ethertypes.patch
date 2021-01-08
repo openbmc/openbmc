@@ -1,0 +1,34 @@
+From a822e8dbca017e426a4c1c3ca835d0d03cbb4a4d Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 31 Dec 2020 16:09:56 +0800
+Subject: [PATCH] Makefile.am: do not install /etc/ethertypes
+
+The /etc/ethertypes is provided by netbase since 6.0[1].
+Do not instal the file in ebtables, otherwise there would be a conflict:
+Error: Transaction test error:
+  file /etc/ethertypes conflicts between attempted installs of netbase-1:6.2-r0.corei7_64 and ebtables-2.0.10+4-r4.corei7_64
+
+[1] https://salsa.debian.org/md/netbase/-/commit/316680c6a2c3641b6abc76b3eebf88781f609d35)
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index b879941..2237002 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -26,7 +26,6 @@ AM_CFLAGS = ${regular_CFLAGS}
+ 
+ sbin_PROGRAMS = ebtables-legacy ebtablesd ebtablesu ebtables-legacy-restore
+ EXTRA_PROGRAMS = static examples/ulog/test_ulog
+-sysconf_DATA = ethertypes
+ sbin_SCRIPTS = ebtables-legacy-save
+ man8_MANS = ebtables-legacy.8
+ lib_LTLIBRARIES = libebtc.la
+-- 
+2.17.1
+

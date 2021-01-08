@@ -17,6 +17,7 @@ SRC_URI = " \
     git://github.com/glmark2/glmark2.git;protocol=https \
     file://0001-fix-dispmanx-build.patch \
     file://0002-run-dispmanx-fullscreen.patch \
+    file://0003-fix-precision-handling-bugs.patch \
     "
 SRCREV = "784aca755a469b144acf3cae180b6e613b7b057a"
 

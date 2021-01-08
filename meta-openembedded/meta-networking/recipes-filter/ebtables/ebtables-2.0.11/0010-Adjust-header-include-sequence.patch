@@ -1,0 +1,84 @@
+From b7cee37734007fced7a4d5ed586c3a9e5ad92878 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 26 Mar 2017 13:12:21 -0700
+Subject: [PATCH 10/10] Adjust header include sequence
+
+This fixes the build with musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+---
+ extensions/ebt_among.c    | 2 +-
+ extensions/ebt_arpreply.c | 2 +-
+ extensions/ebt_nat.c      | 2 +-
+ useful_functions.c        | 4 ++--
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/extensions/ebt_among.c b/extensions/ebt_among.c
+index 30c098c..af73bd9 100644
+--- a/extensions/ebt_among.c
++++ b/extensions/ebt_among.c
+@@ -12,8 +12,8 @@
+ #include <getopt.h>
+ #include <ctype.h>
+ #include <unistd.h>
+-#include "../include/ebtables_u.h"
+ #include <netinet/ether.h>
++#include "../include/ebtables_u.h"
+ #include "../include/ethernetdb.h"
+ #include <linux/if_ether.h>
+ #include <linux/netfilter_bridge/ebt_among.h>
+diff --git a/extensions/ebt_arpreply.c b/extensions/ebt_arpreply.c
+index 399868b..7b6b5ae 100644
+--- a/extensions/ebt_arpreply.c
++++ b/extensions/ebt_arpreply.c
+@@ -11,8 +11,8 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <getopt.h>
+-#include "../include/ebtables_u.h"
+ #include <netinet/ether.h>
++#include "../include/ebtables_u.h"
+ #include <linux/netfilter_bridge/ebt_arpreply.h>
+
+ static int mac_supplied;
+diff --git a/extensions/ebt_nat.c b/extensions/ebt_nat.c
+index fe7e987..1899df3 100644
+--- a/extensions/ebt_nat.c
++++ b/extensions/ebt_nat.c
+@@ -10,8 +10,8 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <getopt.h>
+-#include "../include/ebtables_u.h"
+ #include <netinet/ether.h>
++#include "../include/ebtables_u.h"
+ #include <linux/netfilter_bridge/ebt_nat.h>
+
+ static int to_source_supplied, to_dest_supplied;
+diff --git a/useful_functions.c b/useful_functions.c
+index 133ae2f..c7adc66 100644
+--- a/useful_functions.c
++++ b/useful_functions.c
+@@ -22,8 +22,6 @@
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+-#include "include/ebtables_u.h"
+-#include "include/ethernetdb.h"
+ #include <errno.h>
+ #include <inttypes.h>
+ #include <limits.h>
+@@ -36,6 +34,8 @@
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <arpa/inet.h>
++#include "include/ebtables_u.h"
++#include "include/ethernetdb.h"
+
+
+ const unsigned char mac_type_unicast[ETH_ALEN] =   {0,0,0,0,0,0};
+--
+2.25.1
+
+

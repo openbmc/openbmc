@@ -6,14 +6,11 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 PE = "1"
-PV = "049"
+PV = "051"
 
-# v048 tag
-SRCREV = "225e4b94cbdb702cf512490dcd2ad9ca5f5b22c1"
+SRCREV = "e473057ae1de303340dec297c786c4a701cc61bd"
 SRC_URI = "git://git.kernel.org/pub/scm/boot/dracut/dracut.git;protocol=http \
            file://0001-util.h-include-sys-reg.h-when-libc-glibc.patch \
-           file://0001-dracut.sh-improve-udevdir.patch \
-           file://0001-set-viriable-_drv-not-local.patch \
            "
 
 DEPENDS += "kmod"

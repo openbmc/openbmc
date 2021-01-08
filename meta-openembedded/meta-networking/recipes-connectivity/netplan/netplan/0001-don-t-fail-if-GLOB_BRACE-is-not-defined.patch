@@ -1,0 +1,30 @@
+From ceb4111af317ecc54d97bb21878dcccbfdb2983e Mon Sep 17 00:00:00 2001
+From: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+Date: Fri, 25 Dec 2020 11:41:43 +0900
+Subject: [PATCH] don't fail if GLOB_BRACE is not defined
+
+Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+---
+ src/util.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/util.c b/src/util.c
+index 7e59985..eb8e573 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -23,6 +23,12 @@
+ 
+ #include "util.h"
+ 
++/* Don't fail if the standard library
++ * doesn't provide brace expansion */
++#ifndef GLOB_BRACE
++#define GLOB_BRACE 0
++#endif
++
+ GHashTable* wifi_frequency_24;
+ GHashTable* wifi_frequency_5;
+ 
+-- 
+2.25.1
+

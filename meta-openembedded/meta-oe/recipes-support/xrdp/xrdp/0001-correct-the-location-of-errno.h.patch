@@ -1,0 +1,30 @@
+From c8d3df40ece7d659ccc8212b18de916d28f4398a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Dec 2020 23:10:52 -0800
+Subject: [PATCH] correct the location of errno.h
+
+Fixes build on musl
+
+Upstream-Status: Submitted [https://github.com/neutrinolabs/xrdp/pull/1761]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sesman/chansrv/sound.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sesman/chansrv/sound.c b/sesman/chansrv/sound.c
+index b0480d33..45e17307 100644
+--- a/sesman/chansrv/sound.c
++++ b/sesman/chansrv/sound.c
+@@ -23,7 +23,7 @@
+ #include <stdio.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+-#include <sys/errno.h>
++#include <errno.h>
+ #include <signal.h>
+ #include <sys/un.h>
+ 
+-- 
+2.29.2
+

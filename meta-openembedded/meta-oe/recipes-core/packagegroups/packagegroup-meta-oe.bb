@@ -179,6 +179,7 @@ RDEPENDS_packagegroup-meta-oe-core = "\
     sdbus-c++ \
     toybox \
     usleep \
+    dbus-cxx \
 "
 RDEPENDS_packagegroup-meta-oe-core_append_libc-glibc = " glfw"
 RDEPENDS_packagegroup-meta-oe-core_remove_riscv64 = "safec"
@@ -307,6 +308,7 @@ RDEPENDS_packagegroup-meta-oe-devtools_remove_x86-64 = "${@bb.utils.contains("TU
 RDEPENDS_packagegroup-meta-oe-devtools_remove_x86 = "ply"
 
 RDEPENDS_packagegroup-meta-oe-extended ="\
+     bitwise \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 wayland opengl", "boinc-client", "", d)} \
      brotli \
      byacc \
@@ -365,6 +367,7 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
      canutils \
      libsocketcan \
      libconfig \
+     linuxconsole \
      uml-utilities \
      libidn \
      libqb \
@@ -446,11 +449,13 @@ RDEPENDS_packagegroup-meta-oe-graphics ="\
     ${@bb.utils.contains("PACKAGE_CLASSES", "package_rpm", "dnfdragora", "", d)} \
     fontforge \
     fbida \
+    feh \
     ${@bb.utils.contains("DISTRO_FEATURES", "opengl", "freeglut", "", d)} \
     ftgl \
     fvwm \
     gtkperf \
     gphoto2 \
+    imlib2 \
     libgphoto2 \
     graphviz \
     gtkwave \
@@ -458,6 +463,7 @@ RDEPENDS_packagegroup-meta-oe-graphics ="\
     libforms \
     lxdm \
     numlockx \
+    obconf \
     openbox \
     packagegroup-fonts-truetype \
     qrencode \
@@ -884,6 +890,7 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     liburing \
     zbar \
     libmicrohttpd \
+    yaml-cpp \
 "
 RDEPENDS_packagegroup-meta-oe-support_append_armv7a = " ne10"
 RDEPENDS_packagegroup-meta-oe-support_append_armv7ve = " ne10"

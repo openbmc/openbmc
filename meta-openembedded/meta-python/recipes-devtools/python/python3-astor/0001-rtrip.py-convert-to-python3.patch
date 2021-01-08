@@ -1,0 +1,36 @@
+From 1a477968593a14ee9c8597c1ed4e8b61a7731e15 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 23 Dec 2020 02:23:13 +0000
+Subject: [PATCH] rtrip.py: convert to python3
+
+As Python 2 reached end of life (EOL), so convert rtrip.py to python3.
+
+Upstream-Status: Submitted [https://github.com/berkerpeksag/astor/pull/192]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ astor/rtrip.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/astor/rtrip.py b/astor/rtrip.py
+index 8b108e7..e2e30a6 100755
+--- a/astor/rtrip.py
++++ b/astor/rtrip.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ """
+ Part of the astor library for Python AST manipulation.
+@@ -160,7 +160,7 @@ def usage(msg):
+ 
+         Usage:
+ 
+-            python -m astor.rtrip [readonly] [<source>]
++            python3 -m astor.rtrip [readonly] [<source>]
+ 
+ 
+         This utility tests round-tripping of Python source to AST
+-- 
+2.26.2
+

@@ -19,7 +19,7 @@ index 723a10d..e6502f3 100644
 --- a/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml
 +++ b/libxfce4kbd-private/xfce4-keyboard-shortcuts.xml
 @@ -75,4 +75,8 @@
-       <property name="&lt;Primary&gt;F12" type="string" value="workspace_12_key"/>
+       <property name="<Super>KP_Next" type="string" value="tile_down_right_key"/>
      </property>
    </property>
 +  <property name="providers" type="array">

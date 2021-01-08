@@ -89,7 +89,7 @@ ALTERNATIVE_LINK_NAME[tftp.1] = "${mandir}/man1/tftp.1"
 
 ALTERNATIVE_${PN} = "tftp"
 ALTERNATIVE_TARGET[tftp] = "${bindir}/tftp-hpa"
-ALTERNATIVE_PRIORITY = "60"
+ALTERNATIVE_PRIORITY = "100"
 
 
 SYSTEMD_PACKAGES = "tftp-hpa-server"

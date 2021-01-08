@@ -26,6 +26,7 @@ inherit pypi setuptools3 pkgconfig
 
 # LTO with clang needs lld
 LDFLAGS_append_toolchain-clang = " -fuse-ld=lld"
+LDFLAGS_remove_toolchain-clang_mips = "-fuse-ld=lld"
 
 RDEPENDS_${PN} = "\
     freetype \
@@ -40,6 +41,7 @@ RDEPENDS_${PN} = "\
 
 ENABLELTO_toolchain-clang_riscv64 = "echo enable_lto = False >> ${S}/setup.cfg"
 ENABLELTO_toolchain-clang_riscv32 = "echo enable_lto = False >> ${S}/setup.cfg"
+ENABLELTO_toolchain-clang_mips = "echo enable_lto = False >> ${S}/setup.cfg"
 do_compile_prepend() {
     echo [libs] > ${S}/setup.cfg
     echo system_freetype = true >> ${S}/setup.cfg

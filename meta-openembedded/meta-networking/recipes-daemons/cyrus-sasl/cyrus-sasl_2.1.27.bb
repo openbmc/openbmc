@@ -29,7 +29,7 @@ EXTRA_OECONF += "--with-dblib=berkeley \
                  --with-plugindir='${libdir}/sasl2' \
                  andrew_cv_runpath_switch=none"
 
-PACKAGECONFIG ??= "ntlm \
+PACKAGECONFIG ??= "\
     ${@bb.utils.filter('DISTRO_FEATURES', 'ldap pam', d)} \
 "
 PACKAGECONFIG[gssapi] = "--enable-gssapi=yes,--enable-gssapi=no,krb5,"

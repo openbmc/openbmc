@@ -8,8 +8,7 @@ HOMEPAGE = "https://sourceforge.net/projects/linuxconsole"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-DEPENDS = "libsdl2"
-DEPENDS += "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+DEPENDS = "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
 SRC_URI = "\
     ${SOURCEFORGE_MIRROR}/linuxconsole/linuxconsoletools-${PV}.tar.bz2 \
@@ -32,21 +31,32 @@ SYSTEMD_PACKAGES += "inputattach"
 SYSTEMD_SERVICE_inputattach = "inputattach.service"
 SYSTEMD_AUTO_ENABLE_inputattach = "enable"
 
+PROVIDES += "joystick"
+
+PACKAGECONFIG ??= "sdl"
+PACKAGECONFIG[sdl] = ",,libsdl2"
+
 do_compile() {
+    if ! ${@bb.utils.contains('PACKAGECONFIG', 'sdl', 'true', 'false', d)}; then
+        # drop ffmvforce so that we don't need libsdl2
+        sed '/^PROGRAMS/s/ffmvforce *//g' -i ${S}/utils/Makefile
+    fi
+    # respect nonarch_base_libdir path to keep QA check happy
+    sed 's#DESTDIR)/lib/udev#DESTDIR)/${nonarch_base_libdir}/udev#g' -i ${S}/utils/Makefile
     oe_runmake
 }
 
 do_install() {
     oe_runmake install
 
-    install -Dm 0644 ${WORKDIR}/51-these-are-not-joysticks-rm.rules ${D}${base_libdir}/udev/rules.d/51-these-are-not-joysticks-rm.rules
-    install -Dm 0644 ${WORKDIR}/60-joystick.rules ${D}${base_libdir}/udev/rules.d/60-joystick.rules
+    install -Dm 0644 ${WORKDIR}/51-these-are-not-joysticks-rm.rules ${D}${nonarch_base_libdir}/udev/rules.d/51-these-are-not-joysticks-rm.rules
+    install -Dm 0644 ${WORKDIR}/60-joystick.rules ${D}${nonarch_base_libdir}/udev/rules.d/60-joystick.rules
 
     install -Dm 0644 ${WORKDIR}/inputattach.service ${D}${systemd_system_unitdir}/inputattach.service
     install -Dm 0755 ${WORKDIR}/inputattachctl ${D}${bindir}/inputattachctl
 }
 
-PACKAGES += "inputattach joystick"
+PACKAGES += "inputattach joystick-jscal joystick"
 
 # We won't package any file here as we are following the same packaging schema
 # Debian does and we are splitting it in 'inputattach' and 'joystick' packages.
@@ -64,20 +74,23 @@ FILES_joystick += "\
     ${bindir}/ffmvforce \
     ${bindir}/ffset \
     ${bindir}/fftest \
+    ${bindir}/jstest \
+    ${nonarch_base_libdir}/udev/rules.d/51-these-are-not-joysticks-rm.rules \
+    ${nonarch_base_libdir}/udev/js-set-enum-leds \
+    ${nonarch_base_libdir}/udev/rules.d/60-joystick.rules \
+    ${nonarch_base_libdir}/udev/rules.d/80-stelladaptor-joystick.rules \
+"
+
+FILES_joystick-jscal = " \
+    ${datadir}/joystick \
     ${bindir}/jscal \
     ${bindir}/jscal-restore \
     ${bindir}/jscal-store \
-    ${bindir}/jstest \
-    ${datadir}/joystick \
-    ${base_libdir}/udev/rules.d/51-these-are-not-joysticks-rm.rules \
-    ${base_libdir}/udev/js-set-enum-leds \
-    ${base_libdir}/udev/rules.d/60-joystick.rules \
-    ${base_libdir}/udev/rules.d/80-stelladaptor-joystick.rules \
 "
 
 RDEPENDS_inputattach += "inputattach-config"
 
-RDEPENDS_joystick += "\
+RDEPENDS_joystick-jscal += "\
     bash \
     gawk \
 "

@@ -1,0 +1,36 @@
+From 3e4fe4c42d4d63c36df966baea87da6fbc032553 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Thu, 7 Jan 2021 16:05:28 +0900
+Subject: [PATCH] This patch fixed include dir to /usr/include/. Obviously, it
+ is not suitble for cross-compile. So, removed this patch temporarily.
+https://github.com/uclouvain/openjpeg/issues/1174
+
+Upsteam-Status: Pending
+https://github.com/uclouvain/openjpeg/issues/1320
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ cmake/OpenJPEGConfig.cmake.in | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/cmake/OpenJPEGConfig.cmake.in b/cmake/OpenJPEGConfig.cmake.in
+index 8a726697..2925108a 100644
+--- a/cmake/OpenJPEGConfig.cmake.in
++++ b/cmake/OpenJPEGConfig.cmake.in
+@@ -27,8 +27,12 @@ if(EXISTS ${SELF_DIR}/OpenJPEGTargets.cmake)
+   # This is an install tree
+   include(${SELF_DIR}/OpenJPEGTargets.cmake)
+ 
++  # We find a relative path from the PKG directory to header files.
++  set(PKG_DIR "@CMAKE_INSTALL_PREFIX@/@OPENJPEG_INSTALL_PACKAGE_DIR@")
+   set(INC_DIR "@CMAKE_INSTALL_PREFIX@/@OPENJPEG_INSTALL_INCLUDE_DIR@")
+-  get_filename_component(OPENJPEG_INCLUDE_DIRS "${INC_DIR}" ABSOLUTE)
++  file(RELATIVE_PATH PKG_TO_INC_RPATH "${PKG_DIR}" "${INC_DIR}")
++
++  get_filename_component(OPENJPEG_INCLUDE_DIRS "${SELF_DIR}/${PKG_TO_INC_RPATH}" ABSOLUTE)
+ 
+ else()
+   if(EXISTS ${SELF_DIR}/OpenJPEGExports.cmake)
+-- 
+2.25.1
+

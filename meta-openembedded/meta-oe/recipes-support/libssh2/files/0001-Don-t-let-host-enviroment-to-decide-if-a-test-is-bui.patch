@@ -1,0 +1,46 @@
+From f9e3e2ee7b18ba5bb8efe083171f3e701eb0a663 Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Mon, 28 Dec 2020 02:08:03 +0000
+Subject: [PATCH] Don't let host enviroment to decide if a test is build
+
+test ssh2.sh need sshd, for cross compile, we need it on target, so
+don't use SSHD on host to decide weither to build a test
+
+Upstream-Status: Inappropriate[oe specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ tests/Makefile.am | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index dc0922f..6cbc35d 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -1,16 +1,12 @@
+ AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/include -I$(top_builddir)/src
+ LDADD = ../src/libssh2.la
+ 
+-if SSHD
+ noinst_PROGRAMS = ssh2
+ ssh2_SOURCES = ssh2.c
+-endif
+ 
+ ctests = simple$(EXEEXT)
+ TESTS = $(ctests) mansyntax.sh
+-if SSHD
+ TESTS += ssh2.sh
+-endif
+ check_PROGRAMS = $(ctests)
+ 
+ TESTS_ENVIRONMENT = SSHD=$(SSHD) EXEEXT=$(EXEEXT)
+@@ -38,4 +34,4 @@ if OPENSSL
+ # EXTRA_DIST += test_public_key_auth_succeeds_with_correct_encrypted_ed25519_key.c
+ # EXTRA_DIST += test_public_key_auth_succeeds_with_correct_ed25519_key_from_mem.c
+ EXTRA_DIST += test_public_key_auth_succeeds_with_correct_rsa_openssh_key.c
+-endif
+\ No newline at end of file
++endif
+-- 
+2.20.1
+

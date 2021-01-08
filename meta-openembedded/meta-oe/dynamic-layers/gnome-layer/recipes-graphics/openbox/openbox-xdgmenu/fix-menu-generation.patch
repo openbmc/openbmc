@@ -1,0 +1,27 @@
+Index: openbox-xdgmenu-0.3/openbox-xdgmenu.c
+===================================================================
+--- openbox-xdgmenu-0.3.orig/openbox-xdgmenu.c
++++ openbox-xdgmenu-0.3/openbox-xdgmenu.c
+@@ -197,7 +197,7 @@ void process_entry(GMenuTreeEntry *entry
+ {
+     GDesktopAppInfo *appinfo = gmenu_tree_entry_get_app_info (entry);
+     char *name = g_strdup (g_app_info_get_name(G_APP_INFO(appinfo)));
+-    char *exec = g_strdup (g_app_info_get_executable(G_APP_INFO(appinfo)));
++    char *exec = g_strdup (g_app_info_get_commandline(G_APP_INFO(appinfo)));
+     int i;
+     
+     for (i = 0; i < strlen(exec) - 1; i++) {
+@@ -217,8 +217,11 @@ void process_entry(GMenuTreeEntry *entry
+         }
+     }
+     
+-    g_printf("<item label=\"%s\">\n", g_strjoinv("&amp;", g_strsplit(name,"&",0))),
+-    g_printf("<action name=\"Execute\"><command>%s</command></action>\n", exec),
++    g_printf("<item label=\"%s\">\n", g_strjoinv("&amp;", g_strsplit(name,"&",0)));
++    g_printf("<action name=\"Execute\"><command>%s%s</command></action>\n",
++            g_desktop_app_info_get_boolean(appinfo, G_KEY_FILE_DESKTOP_KEY_TERMINAL) ?
++            "x-terminal-emulator -e " : "",
++            exec);
+     g_printf("</item>\n");
+     
+     g_free(name);

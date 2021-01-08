@@ -9,8 +9,8 @@ DEPENDS += "opencl-headers"
 inherit pkgconfig cmake
 
 S = "${WORKDIR}/git"
-PV = "2020.06.16+git${SRCPV}"
-SRCREV = "862eebe7ca733c398334a8db8481172a7d3a3c47"
+PV = "2020.12.18+git${SRCPV}"
+SRCREV = "1d5315c3ed30d026acb79a1aa53a276fc833ffa7"
 SRC_URI = "git://github.com/KhronosGroup/OpenCL-ICD-Loader.git"
 
 do_install () {

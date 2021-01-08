@@ -67,7 +67,8 @@ COMPATIBLE_HOST_powerpc64le = "(null)"
 
 inherit systemd
 
-SYSTEMD_SERVICE_${PN} = "android-tools-adbd.service"
+SYSTEMD_PACKAGES = "${PN}-adbd"
+SYSTEMD_SERVICE_${PN}-adbd = "android-tools-adbd.service"
 
 # Find libbsd headers during native builds
 CC_append_class-native = " -I${STAGING_INCDIR}"
@@ -157,9 +158,15 @@ do_install() {
     fi
 }
 
-PACKAGES += "${PN}-fstools"
+PACKAGES =+ "${PN}-fstools ${PN}-adbd"
 
-RDEPENDS_${BPN} = "${BPN}-conf bash"
+RDEPENDS_${BPN}-adbd = "${BPN}-conf"
+RDEPENDS_${BPN}-fstools = "bash"
+
+FILES_${PN}-adbd = "\
+    ${bindir}/adbd \
+    ${systemd_unitdir}/system/android-tools-adbd.service \
+"
 
 FILES_${PN}-fstools = "\
     ${bindir}/ext2simg \

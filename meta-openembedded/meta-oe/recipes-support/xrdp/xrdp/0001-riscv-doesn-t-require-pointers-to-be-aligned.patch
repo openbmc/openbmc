@@ -1,0 +1,28 @@
+From 229206aa5e55a6e26a074a54a1b50139ab794b36 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Dec 2020 23:01:13 -0800
+Subject: [PATCH] riscv doesn't require pointers to be aligned
+
+Upstream-Status: Submitted [https://github.com/neutrinolabs/xrdp/pull/1761]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ common/arch.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/common/arch.h b/common/arch.h
+index ccccfa5a..8c2ac1a4 100644
+--- a/common/arch.h
++++ b/common/arch.h
+@@ -84,7 +84,8 @@ typedef int bool_t;
+ #define NEED_ALIGN
+ #elif defined(__x86__) || defined(__x86_64__) || \
+       defined(__AMD64__) || defined(_M_IX86) || defined (_M_AMD64) || \
+-      defined(__i386__) || defined(__aarch64__)
++      defined(__i386__) || defined(__aarch64__) || \
++      defined(__riscv)
+ #define NO_NEED_ALIGN
+ #else
+ #warning unknown arch
+-- 
+2.29.2
+

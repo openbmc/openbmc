@@ -13,3 +13,5 @@ RDEPENDS_${PN}_class-target += "\
     ${PYTHON_PN}-stringold \
     ${PYTHON_PN}-threading \
 "
+
+BBCLASSEXTEND = "native"

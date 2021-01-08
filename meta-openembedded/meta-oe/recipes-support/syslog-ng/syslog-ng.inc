@@ -13,7 +13,7 @@ LICENSE = "GPLv2 & LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=24c0c5cb2c83d9f2ab725481e4df5240"
 
 # util-linux added to get libuuid
-DEPENDS = "libpcre flex glib-2.0 openssl util-linux"
+DEPENDS = "libpcre flex glib-2.0 openssl util-linux bison-native"
 
 # We expect the recipe to add anything specific for that version to these defaults.
 #
