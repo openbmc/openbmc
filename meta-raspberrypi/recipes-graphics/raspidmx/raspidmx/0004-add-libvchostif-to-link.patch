@@ -1,0 +1,170 @@
+From bde71fc22bde61ef8fe319c60f478ec370f5bc5d Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Fri, 4 Dec 2020 02:13:39 -0500
+Subject: [PATCH] add libvchostif to link
+
+I end up with link errors of the type:
+
+	libvchostif.so: error adding symbols: DSO missing from command line
+
+Which is caused by not having -lvchostif in the link.
+
+Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ game/Makefile              | 2 +-
+ life/Makefile              | 2 +-
+ mandelbrot/Makefile        | 2 +-
+ offscreen/Makefile         | 2 +-
+ pngview/Makefile           | 2 +-
+ radar_sweep/Makefile       | 2 +-
+ radar_sweep_alpha/Makefile | 2 +-
+ rgb_triangle/Makefile      | 2 +-
+ spriteview/Makefile        | 2 +-
+ test_pattern/Makefile      | 2 +-
+ worms/Makefile             | 2 +-
+ 11 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/game/Makefile b/game/Makefile
+index 0a90a38..b756fa2 100644
+--- a/game/Makefile
++++ b/game/Makefile
+@@ -2,7 +2,7 @@ OBJS=main.o
+ BIN=game
+ 
+ CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/life/Makefile b/life/Makefile
+index 44f1edb..2addf69 100644
+--- a/life/Makefile
++++ b/life/Makefile
+@@ -2,7 +2,7 @@ OBJS=main.o life.o info.o
+ BIN=life
+ 
+ CFLAGS+=-Wall -g -O3 -I../common
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -L../lib -lraspidmx
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -L../lib -lraspidmx
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/mandelbrot/Makefile b/mandelbrot/Makefile
+index 82910bb..31097f2 100644
+--- a/mandelbrot/Makefile
++++ b/mandelbrot/Makefile
+@@ -2,7 +2,7 @@ OBJS=main.o mandelbrot.o info.o
+ BIN=mandelbrot
+ 
+ CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/offscreen/Makefile b/offscreen/Makefile
+index 0120796..4f13fd0 100644
+--- a/offscreen/Makefile
++++ b/offscreen/Makefile
+@@ -2,7 +2,7 @@ OBJS=pngresize.o resizeDispmanX.o
+ BIN=pngresize
+ 
+ CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/pngview/Makefile b/pngview/Makefile
+index 71a5d76..cce8d63 100644
+--- a/pngview/Makefile
++++ b/pngview/Makefile
+@@ -2,7 +2,7 @@ OBJS=pngview.o
+ BIN=pngview
+ 
+ CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/radar_sweep/Makefile b/radar_sweep/Makefile
+index 5f814b7..aa1d32c 100644
+--- a/radar_sweep/Makefile
++++ b/radar_sweep/Makefile
+@@ -2,7 +2,7 @@ OBJS=radar_sweep.o
+ BIN=radar_sweep
+ 
+ CFLAGS+=-Wall -O3 -g -I../common
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm -L../lib -lraspidmx
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/radar_sweep_alpha/Makefile b/radar_sweep_alpha/Makefile
+index f66c338..571d47b 100644
+--- a/radar_sweep_alpha/Makefile
++++ b/radar_sweep_alpha/Makefile
+@@ -2,7 +2,7 @@ OBJS=radar_sweep_alpha.o
+ BIN=radar_sweep_alpha
+ 
+ CFLAGS+=-Wall -O3 -g -I../common
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm -L../lib -lraspidmx
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/rgb_triangle/Makefile b/rgb_triangle/Makefile
+index 2ce779d..0266715 100644
+--- a/rgb_triangle/Makefile
++++ b/rgb_triangle/Makefile
+@@ -2,7 +2,7 @@ OBJS=rgb_triangle.o
+ BIN=rgb_triangle
+ 
+ CFLAGS+=-Wall -O3 -g -I../common
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm -L../lib -lraspidmx
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/spriteview/Makefile b/spriteview/Makefile
+index 904c1e8..d2fb3c8 100644
+--- a/spriteview/Makefile
++++ b/spriteview/Makefile
+@@ -2,7 +2,7 @@ OBJS=spriteview.o
+ BIN=spriteview
+ 
+ CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/test_pattern/Makefile b/test_pattern/Makefile
+index 1e02b0a..c231fb6 100644
+--- a/test_pattern/Makefile
++++ b/test_pattern/Makefile
+@@ -2,7 +2,7 @@ OBJS=test_pattern.o
+ BIN=test_pattern
+ 
+ CFLAGS+=-Wall -g -O3 -I../common
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm -L../lib -lraspidmx
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/worms/Makefile b/worms/Makefile
+index c249c8c..3b6c830 100644
+--- a/worms/Makefile
++++ b/worms/Makefile
+@@ -2,7 +2,7 @@ OBJS=main.o worms.o
+ BIN=worms
+ 
+ CFLAGS+=-Wall -g -O3 -I../common
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm -L../lib -lraspidmx
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
