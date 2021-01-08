@@ -35,103 +35,6 @@ namespace bootprogress
 
 namespace fs = std::filesystem;
 
-bool findFiles(const fs::path dirPath, const std::string &matchString,
-        std::vector<fs::path> &foundPaths, unsigned int symlinkDepth)
-{
-    if (!fs::exists(dirPath))
-        return false;
-
-    std::regex search(matchString);
-    std::smatch match;
-    for (auto &p : fs::recursive_directory_iterator(dirPath))
-    {
-        std::string path = p.path().string();
-        if (!is_directory(p))
-        {
-            if (std::regex_search(path, match, search))
-                foundPaths.emplace_back(p.path());
-        }
-        else if (is_symlink(p) && symlinkDepth)
-        {
-            findFiles(p.path(), matchString, foundPaths, symlinkDepth - 1);
-        }
-    }
-
-    return true;
-}
-
-/*
- * Method to find the socket 0 path
- */
-static std::string findSocket0Path()
-{
-    size_t bus = 0;
-    size_t addr = 0;
-    std::vector<fs::path> paths;
-
-    /* find the hwmon filesystem */
-    if (!findFiles(fs::path(HWMON_FS), "name", paths, 1))
-    {
-        std::cerr << "No hwmon devices in system\n";
-        return nullptr;
-    }
-
-    boost::container::flat_set<std::string> directories;
-    for (const auto &path : paths)
-    {
-        std::ifstream nameFile(path);
-        if (!nameFile.good())
-        {
-            std::cerr << "Failure finding path " << path << "\n";
-            continue;
-        }
-
-        // read the name
-        std::string name;
-        std::getline(nameFile, name);
-        nameFile.close();
-        if (name == AMPERE_FS)
-        {
-            auto directory = path.parent_path();
-            auto ret = directories.insert(directory.string());
-            // check if path has already been searched
-            if (!ret.second)
-            {
-                std::cerr << "Duplicate path " << directory.string() << "\n";
-                continue;
-            }
-
-            fs::path device = directory / "device";
-            std::string deviceName = fs::canonical(device).stem();
-            auto findHyphen = deviceName.find("-");
-            if (findHyphen == std::string::npos)
-            {
-                std::cerr << "found bad device" << deviceName << "\n";
-                continue;
-            }
-            std::string busStr = deviceName.substr(0, findHyphen);
-            std::string addrStr = deviceName.substr(findHyphen + 1);
-
-            try
-            {
-                bus = std::stoi(busStr);
-                addr = std::stoi(addrStr, 0, 16);
-            }
-            catch (std::invalid_argument&)
-            {
-                std::cerr << "Error parsing bus " << busStr << " addr " << addrStr
-                        << "\n";
-                continue;
-            }
-
-            if ((bus == SMPRO_I2C_BUS) && (addr == S0_SMPRO_I2C_ADDR))
-                return directory.string();
-        }
-    }
-
-    return nullptr;
-}
-
 /*
  * Method to read the system file
  */
@@ -184,19 +87,11 @@ static void handleBootProgress()
         "Os booting",
     };
 
-    std::string path = findSocket0Path();
-    if (path.empty())
-    {
-        std::cerr << "the smpro device not found" << std::endl;
-        return;
-    }
-    std::string bootprogress = path + "/" + BOOT_PROGRESS_FS;
-
     while (true)
     {
         try
         {
-            registerValues = readSystemFile(bootprogress);
+            registerValues = readSystemFile(BOOT_PROGRESS_FS);
             if (registerValues.empty())
             {
                 std::cerr << "cannot read/write the smpro filesystem!!!" << std::endl;

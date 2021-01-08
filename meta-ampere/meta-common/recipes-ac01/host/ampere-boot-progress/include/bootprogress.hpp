@@ -36,9 +36,7 @@
 
 namespace bootprogress
 {
-    const std::string HWMON_FS                  = "/sys/class/hwmon";
-    const std::string AMPERE_FS                 = "ac01-smpro";
-    const std::string BOOT_PROGRESS_FS          = "boot_progress";
+    const std::string BOOT_PROGRESS_FS          = "/sys/bus/i2c/devices/2-004f/1e78a0c0.i2c-bus:smpro@4f:misc/boot_progress";
 
     const uint8_t S0_SMPRO_I2C_ADDR             = 0x4F;
     const uint8_t S1_SMPRO_I2C_ADDR             = 0x4E;
