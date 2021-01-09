@@ -1,0 +1,237 @@
+From 9dec49a8d0f3a06b69ac010feb626f196a413309 Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chanh@amperemail.onmicrosoft.com>
+Date: Sat, 9 Jan 2021 14:08:47 +0700
+Subject: [PATCH 2/3] Add other image update support
+
+This patch will imeplement to support some other images update.
+
+To update any firmware, the MANIFEST in tarball must add
+the Purpose is "Other" and the ExtendedVersion is name of the service
+update with the format:
+
+    "obmc-update-" + extendedVersion + "@.service"
+
+Signed-off-by: Chanh Nguyen <chanh@amperemail.onmicrosoft.com>
+Change-Id: Idf9db7903c90efaae56910f4167edb569d8c939a
+---
+ activation.cpp    | 115 ++++++++++++++++++++++++++++++++++++++++++++++
+ activation.hpp    |   8 ++++
+ item_updater.cpp  |   1 +
+ meson.build       |   1 +
+ meson_options.txt |   3 ++
+ 5 files changed, 128 insertions(+)
+
+diff --git a/activation.cpp b/activation.cpp
+index c82e297..5043560 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -88,6 +88,7 @@ auto Activation::activation(Activations value) -> Activations
+ 
+     if (value == softwareServer::Activation::Activations::Activating)
+     {
++        std::string extendedVersion = parent.versions.find(versionId)->second->extendedVersion();
+ 
+ #ifdef HOST_BIOS_UPGRADE
+         auto purpose = parent.versions.find(versionId)->second->purpose();
+@@ -112,6 +113,28 @@ auto Activation::activation(Activations value) -> Activations
+         }
+ #endif
+ 
++#ifdef OTHER_UPGRADE
++        if (parent.versions.find(versionId)->second->purpose() == VersionPurpose::Other)
++        {
++            if (!activationProgress)
++            {
++                activationProgress =
++                    std::make_unique<ActivationProgress>(bus, path);
++            }
++
++            // Enable systemd signals
++            subscribeToSystemdSignals();
++
++            // Set initial progress
++            activationProgress->progress(20);
++
++            // Update the image to device
++            writeImageUpdate(extendedVersion);
++
++            return softwareServer::Activation::activation(value);
++        }
++#endif
++
+         auto versionStr = parent.versions.find(versionId)->second->version();
+ 
+         if (!minimum_ship_level::verify(versionStr))
+@@ -293,6 +316,8 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+         return;
+     }
+ 
++    std::string extendedVersion = parent.versions.find(versionId)->second->extendedVersion();
++
+ #ifdef HOST_BIOS_UPGRADE
+     auto purpose = parent.versions.find(versionId)->second->purpose();
+     if (purpose == VersionPurpose::Host)
+@@ -302,6 +327,14 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+     }
+ #endif
+ 
++#ifdef OTHER_UPGRADE
++    if (parent.versions.find(versionId)->second->purpose() == VersionPurpose::Other)
++    {
++        onStateChangesOtherUpdate(msg, extendedVersion);
++        return;
++    }
++#endif
++
+     onStateChanges(msg);
+ 
+     return;
+@@ -463,6 +496,88 @@ void Activation::rebootBmc()
+     }
+ }
+ 
++#ifdef OTHER_UPGRADE
++void Activation::writeImageUpdate(std::string extendedVersion)
++{
++    std::string updateServiceFile;
++    auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
++                                      SYSTEMD_INTERFACE, "StartUnit");
++
++    if(!extendedVersion.empty())
++    {
++        updateServiceFile = "obmc-update-" + extendedVersion + "@" + versionId + ".service";
++    }
++    else
++    {
++        log<level::ERR>("Error: ExtendedVersion is empty !");
++        report<InternalFailure>();
++    }
++
++    method.append(updateServiceFile, "replace");
++
++    try
++    {
++        auto reply = bus.call(method);
++    }
++    catch (const SdBusError& e)
++    {
++        log<level::ERR>("Error in trying to upgrade image.");
++        report<InternalFailure>();
++    }
++}
++
++void Activation::onStateChangesOtherUpdate(sdbusplus::message::message& msg, std::string extendedVersion)
++{
++    uint32_t newStateID{};
++    sdbusplus::message::object_path newStateObjPath;
++    std::string newStateUnit{};
++    std::string newStateResult{};
++    std::string updateServiceFile;
++
++    // Read the msg and populate each variable
++    msg.read(newStateID, newStateObjPath, newStateUnit, newStateResult);
++
++    if(!extendedVersion.empty())
++    {
++        updateServiceFile = "obmc-update-" + extendedVersion + "@" + versionId + ".service";
++    }
++    else
++    {
++        log<level::ERR>("Error: ExtendedVersion is empty !");
++        report<InternalFailure>();
++    }
++
++    if (newStateUnit == updateServiceFile)
++    {
++        // unsubscribe to systemd signals
++        unsubscribeFromSystemdSignals();
++
++        // Remove version object from image manager
++        deleteImageManagerObject();
++
++        if (newStateResult == "done")
++        {
++            // Set activation progress to 100
++            activationProgress->progress(100);
++
++            // Set Activation value to active
++            activation(softwareServer::Activation::Activations::Active);
++
++            log<level::INFO>("Image upgrade completed successfully.");
++        }
++        else if (newStateResult == "failed")
++        {
++            // Set Activation value to Failed
++            activation(softwareServer::Activation::Activations::Failed);
++
++            log<level::ERR>("Image upgrade failed.");
++        }
++    }
++
++    return;
++}
++#endif
++
+ } // namespace updater
+ } // namespace software
+ } // namespace phosphor
+diff --git a/activation.hpp b/activation.hpp
+index 90b32b7..e554742 100644
+--- a/activation.hpp
++++ b/activation.hpp
+@@ -247,6 +247,14 @@ class Activation : public ActivationInherit, public Flash
+     void onStateChangesBios(sdbusplus::message::message&);
+ #endif
+ 
++#ifdef OTHER_UPGRADE
++    /* @brief write image function */
++    void writeImageUpdate(std::string extendedVersion);
++
++    /** @brief Function that acts on fw image upgrade service file state changes */
++    void onStateChangesOtherUpdate(sdbusplus::message::message&, std::string extendedVersion);
++#endif
++
+     /** @brief Overloaded function that acts on service file state changes */
+     void onStateChanges(sdbusplus::message::message&) override;
+ 
+diff --git a/item_updater.cpp b/item_updater.cpp
+index 86ff6e7..70d3db6 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -69,6 +69,7 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+ #ifdef HOST_BIOS_UPGRADE
+                         value == VersionPurpose::Host ||
+ #endif
++                        value == VersionPurpose::Other ||
+                         value == VersionPurpose::System)
+                     {
+                         purpose = value;
+diff --git a/meson.build b/meson.build
+index 11d847a..20f4d91 100644
+--- a/meson.build
++++ b/meson.build
+@@ -54,6 +54,7 @@ conf.set('MMC_LAYOUT', get_option('bmc-layout').contains('mmc'))
+ 
+ # Configurable features
+ conf.set('HOST_BIOS_UPGRADE', get_option('host-bios-upgrade').enabled())
++conf.set('OTHER_UPGRADE', get_option('other-upgrade').enabled())
+ conf.set('WANT_SIGNATURE_VERIFY', get_option('verify-signature').enabled())
+ 
+ # Configurable variables
+diff --git a/meson_options.txt b/meson_options.txt
+index d37e681..af0b37e 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -12,6 +12,9 @@ option('bmc-layout', type: 'combo',
+ option('host-bios-upgrade', type: 'feature',
+     description: 'Enable host bios upgrade support.')
+ 
++option('other-upgrade', type: 'feature',
++    description: 'Enable other image upgrade support.')
++
+ option('sync-bmc-files', type: 'feature',
+     description: 'Enable sync of filesystem files.')
+ 
+-- 
+2.17.1
+

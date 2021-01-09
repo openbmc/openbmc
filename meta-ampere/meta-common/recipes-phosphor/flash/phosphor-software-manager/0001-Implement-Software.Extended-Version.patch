@@ -1,0 +1,211 @@
+From 4149d51019d8cb03a3aa21f4d1016022bf7dae69 Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chanh@amperemail.onmicrosoft.com>
+Date: Wed, 6 Jan 2021 11:09:09 +0700
+Subject: [PATCH 1/3] Implement Software.Extended Version
+
+- Populate the ExtendedVersion object from MANIFEST
+- Create an ExtendedVersion object
+
+Change-Id: I13e352d4cb8f4a73259a940f341a736fe7e9305f
+Signed-off-by: Chanh Nguyen <chanh@amperemail.onmicrosoft.com>
+---
+ image_manager.cpp |  5 ++++-
+ item_updater.cpp  | 19 +++++++++++++++++--
+ meson.build       |  1 +
+ version.cpp       | 21 +++++++++++++++++++++
+ version.hpp       | 17 ++++++++++++++++-
+ 5 files changed, 59 insertions(+), 4 deletions(-)
+
+diff --git a/image_manager.cpp b/image_manager.cpp
+index 36ec0bc..c963900 100644
+--- a/image_manager.cpp
++++ b/image_manager.cpp
+@@ -171,6 +171,9 @@ int Manager::processImage(const std::string& tarFilePath)
+                         " Setting to Unknown.");
+     }
+ 
++    // Get ExtendedVersion
++    std::string extendedVersion = Version::getValue(manifestPath.string(), "ExtendedVersion");
++
+     // Compute id
+     auto id = Version::getId(version);
+ 
+@@ -200,7 +203,7 @@ int Manager::processImage(const std::string& tarFilePath)
+     {
+         // Create Version object
+         auto versionPtr = std::make_unique<Version>(
+-            bus, objPath, version, purpose, imageDirPath.string(),
++            bus, objPath, version, purpose, extendedVersion, imageDirPath.string(),
+             std::bind(&Manager::erase, this, std::placeholders::_1));
+         versionPtr->deleteObject =
+             std::make_unique<phosphor::software::manager::Delete>(bus, objPath,
+diff --git a/item_updater.cpp b/item_updater.cpp
+index e6dd298..86ff6e7 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -6,6 +6,7 @@
+ #include "serialize.hpp"
+ #include "version.hpp"
+ #include "xyz/openbmc_project/Software/Version/server.hpp"
++#include "xyz/openbmc_project/Software/ExtendedVersion/server.hpp"
+ 
+ #include <phosphor-logging/elog-errors.hpp>
+ #include <phosphor-logging/elog.hpp>
+@@ -46,6 +47,7 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+ 
+     sdbusplus::message::object_path objPath;
+     auto purpose = VersionPurpose::Unknown;
++    std::string extendedVersion;
+     std::string version;
+     std::map<std::string, std::map<std::string, std::variant<std::string>>>
+         interfaces;
+@@ -88,6 +90,16 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+                 }
+             }
+         }
++        else if ( intf.first == EXTENDED_VERSION)
++        {
++            for (const auto& property : intf.second)
++            {
++                if (property.first == "ExtendedVersion")
++                {
++                    extendedVersion = std::get<std::string>(property.second);
++                }
++            }
++        }
+     }
+     if (version.empty() || filePath.empty() ||
+         purpose == VersionPurpose::Unknown)
+@@ -133,7 +145,7 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+                                          activationState, associations)));
+ 
+         auto versionPtr = std::make_unique<VersionClass>(
+-            bus, path, version, purpose, filePath,
++            bus, path, version, purpose, extendedVersion, filePath,
+             std::bind(&ItemUpdater::erase, this, std::placeholders::_1));
+         versionPtr->deleteObject =
+             std::make_unique<phosphor::software::manager::Delete>(bus, path,
+@@ -222,6 +234,9 @@ void ItemUpdater::processBMCImage()
+             auto purpose = server::Version::VersionPurpose::BMC;
+             restorePurpose(id, purpose);
+ 
++            // Read os-release from /etc/ to get the BMC extended version
++            std::string extendedVersion = VersionClass::getBMCExtendedVersion(osRelease);
++
+             auto path = fs::path(SOFTWARE_OBJPATH) / id;
+ 
+             // Create functional association if this is the functional
+@@ -250,7 +265,7 @@ void ItemUpdater::processBMCImage()
+ 
+             // Create Version instance for this version.
+             auto versionPtr = std::make_unique<VersionClass>(
+-                bus, path, version, purpose, "",
++                bus, path, version, purpose, extendedVersion,"",
+                 std::bind(&ItemUpdater::erase, this, std::placeholders::_1));
+             auto isVersionFunctional = versionPtr->isFunctional();
+             if (!isVersionFunctional)
+diff --git a/meson.build b/meson.build
+index c74a927..11d847a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -25,6 +25,7 @@ conf.set_quoted('SYSTEMD_PATH', '/org/freedesktop/systemd1')
+ conf.set_quoted('SYSTEMD_INTERFACE', 'org.freedesktop.systemd1.Manager')
+ conf.set_quoted('VERSION_BUSNAME', 'xyz.openbmc_project.Software.Version')
+ conf.set_quoted('VERSION_IFACE', 'xyz.openbmc_project.Software.Version')
++conf.set_quoted('EXTENDED_VERSION', 'xyz.openbmc_project.Software.ExtendedVersion')
+ 
+ # Names of the forward and reverse associations
+ conf.set_quoted('ACTIVATION_FWD_ASSOCIATION', 'inventory')
+diff --git a/version.cpp b/version.cpp
+index 18f3f4f..57f95c0 100644
+--- a/version.cpp
++++ b/version.cpp
+@@ -127,6 +127,27 @@ std::string Version::getBMCMachine(const std::string& releaseFilePath)
+     return machine;
+ }
+ 
++std::string Version::getBMCExtendedVersion(const std::string& releaseFilePath)
++{
++    std::string extendedVersionKey = "EXTENDED_VERSION=";
++    std::string extendedVersion{};
++    std::ifstream efile(releaseFilePath);
++    std::string line;
++
++    while (getline(efile, line))
++    {
++        if (line.substr(0, extendedVersionKey.size()).find(extendedVersionKey) !=
++            std::string::npos)
++        {
++            std::size_t pos = line.find_first_of('"') + 1;
++            extendedVersion = line.substr(pos, line.find_last_of('"') - pos);
++            break;
++        }
++    }
++
++    return extendedVersion;
++}
++
+ std::string Version::getBMCVersion(const std::string& releaseFilePath)
+ {
+     std::string versionKey = "VERSION_ID=";
+diff --git a/version.hpp b/version.hpp
+index 9cf76da..3c09f59 100644
+--- a/version.hpp
++++ b/version.hpp
+@@ -3,6 +3,7 @@
+ #include "xyz/openbmc_project/Common/FilePath/server.hpp"
+ #include "xyz/openbmc_project/Object/Delete/server.hpp"
+ #include "xyz/openbmc_project/Software/Version/server.hpp"
++#include "xyz/openbmc_project/Software/ExtendedVersion/server.hpp"
+ 
+ #include <sdbusplus/bus.hpp>
+ 
+@@ -19,6 +20,7 @@ namespace manager
+ typedef std::function<void(std::string)> eraseFunc;
+ 
+ using VersionInherit = sdbusplus::server::object::object<
++    sdbusplus::xyz::openbmc_project::Software::server::ExtendedVersion,
+     sdbusplus::xyz::openbmc_project::Software::server::Version,
+     sdbusplus::xyz::openbmc_project::Common::server::FilePath>;
+ using DeleteInherit = sdbusplus::server::object::object<
+@@ -70,16 +72,18 @@ class Version : public VersionInherit
+      * @param[in] objPath        - The D-Bus object path
+      * @param[in] versionString  - The version string
+      * @param[in] versionPurpose - The version purpose
++     * @param[in] extVersion     - The extended version
+      * @param[in] filePath       - The image filesystem path
+      * @param[in] callback       - The eraseFunc callback
+      */
+     Version(sdbusplus::bus::bus& bus, const std::string& objPath,
+-            const std::string& versionString, VersionPurpose versionPurpose,
++            const std::string& versionString, VersionPurpose versionPurpose, std::string& extVersion,
+             const std::string& filePath, eraseFunc callback) :
+         VersionInherit(bus, (objPath).c_str(), true),
+         eraseCallback(callback), versionStr(versionString)
+     {
+         // Set properties.
++        extendedVersion(extVersion);
+         purpose(versionPurpose);
+         version(versionString);
+         path(filePath);
+@@ -117,6 +121,17 @@ class Version : public VersionInherit
+      */
+     static std::string getBMCMachine(const std::string& releaseFilePath);
+ 
++
++    /**
++     * @brief Get the BMC Extended Version string.
++     *
++     * @param[in] releaseFilePath - The path to the file which contains
++     *                              the release machine string.
++     *
++     * @return The extended version string.
++     */
++    static std::string getBMCExtendedVersion(const std::string& releaseFilePath);
++
+     /**
+      * @brief Get the active BMC version string.
+      *
+-- 
+2.17.1
+
