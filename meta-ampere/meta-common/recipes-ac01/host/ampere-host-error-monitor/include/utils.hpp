@@ -43,98 +43,47 @@ namespace utils
 {
 using namespace phosphor::logging;
 namespace fs = std::filesystem;
-
-const static constexpr char *HWMON_ROOT_PATH    = "/sys/class/hwmon";
 const static constexpr u_int8_t NUM_SOCKET      = 2;
-constexpr size_t i2cScpAddr[2]  = {0x4f, 0x4e};
-constexpr size_t i2cScpBus      = 2;
-std::string hwmonRootDir[2]     = {"",""};
 
-static bool findFiles(const fs::path& dirPath, const std::string& matchString,
-                      std::vector<fs::path>& foundPaths,
-                      unsigned int symlinkDepth)
-{
-    if (!fs::exists(dirPath))
-        return false;
-
-    std::regex expr(matchString);
-    for (auto& p : fs::recursive_directory_iterator(dirPath))
-    {
-        std::string path = p.path().string();
-        if (!fs::is_directory(p))
-        {
-            if (std::regex_search(path, expr))
-                foundPaths.emplace_back(p.path());
-        }
-        else if (fs::is_symlink(p) && symlinkDepth)
-        {
-            findFiles(p.path(), matchString, foundPaths, symlinkDepth - 1);
-        }
-    }
-
-    return true;
-}
-
-static std::optional<std::string> getRootDir(const char* parentPath,
-    const char* fileName, unsigned int cpuSocket)
-{
-    if (cpuSocket > sizeof(i2cScpAddr)/sizeof(i2cScpAddr[0]))
-        return std::nullopt;
-
-    std::vector<fs::path> paths;
-    if (!findFiles(fs::path(parentPath), fileName, paths, 1))
-        return std::nullopt;
-
-    /* Get root path of RAS APIs corresponding to CPU socket */
-    for (const auto& path : paths)
-    {
-        fs::path device = path.parent_path() / "device";
-        std::string deviceName = fs::canonical(device).stem();
-        std::vector<std::string> parsedName;
-        boost::split(parsedName, deviceName, [](char c) { return c == '-'; });
-        if (parsedName.size() != 2)
-            continue;
-        size_t bus = 0;
-        size_t addr = 0;
-        try
-        {
-            bus = std::stoi(parsedName[0]);
-            addr = std::stoi(parsedName[1], 0, 16);
-        }
-        catch (std::invalid_argument&)
-        {
-            continue;
-        }
-
-        if ((bus == i2cScpBus) && (addr == i2cScpAddr[cpuSocket]))
-            return path.string().replace(path.string().find(fileName),
-                strlen(fileName), "");
-    }
-
-    return std::nullopt;
-}
+std::string hwmonRootDir[2]     = {
+        "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/"\
+        "1e78a0c0.i2c-bus/i2c-2/2-004f/1e78a0c0.i2c-bus:smpro@4f:errmon/",
+        "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/"\
+        "1e78a0c0.i2c-bus/i2c-2/2-004e/1e78a0c0.i2c-bus:smpro@4e:errmon/"
+        };
 
 static std::string getAbsolutePath(u_int8_t socket, std::string fileName)
 {
-    return hwmonRootDir[socket] + fileName;
+    if (hwmonRootDir[socket] != ""){
+        return hwmonRootDir[socket] + fileName;
+    }
+    return "";
 }
 
 static int initHwmonRootPath()
 {
     u_int8_t socket = 0;
-    char buff[128];
+    bool foundRootPath = false;
+    char path[256];
     for (u_int8_t socket=0; socket < NUM_SOCKET; socket++)
     {
-        auto path = getRootDir(HWMON_ROOT_PATH, "uevent", socket);
-        if (path == std::nullopt) {
-            sprintf(buff, "Unable to get root hwmon path of socket %d\n",
-               socket);
-            log<level::ERR>(buff);
-            return 0;
+        auto path = fs::path(hwmonRootDir[socket]);
+        if (fs::exists(path) && fs::is_directory(path))
+        {
+            path = fs::path(hwmonRootDir[socket] + "/errors_core_ce");
+            if (fs::exists(path))
+            {
+                foundRootPath = true;
+                continue;
+            }
         }
-        hwmonRootDir[socket] = path.value();
+        hwmonRootDir[socket] = "";
     }
-    return 1;
+    if (foundRootPath)
+    {
+        return 1;
+    }
+    return 0;
 }
 
 static u_int64_t parseHexStrToUInt64(std::string str)

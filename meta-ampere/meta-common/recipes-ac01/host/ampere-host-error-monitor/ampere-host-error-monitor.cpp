@@ -21,15 +21,12 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <regex>
-#include <gpiod.hpp>
+#include "internalErrors.hpp"
 #include "utils.hpp"
 #include "selUtils.hpp"
-#include "internalErrors.hpp"
-#include <map>
-#include <ctime>
-#include <chrono>
 
 using namespace phosphor::logging;
 
@@ -488,7 +485,10 @@ namespace ras
             ErrorData data = errorTypeTable[index];
             filePath = ampere::utils::getAbsolutePath(
                     data.socket, data.label);
-            logErrors(data, filePath.c_str());
+            if (filePath != "")
+            {
+                logErrors(data, filePath.c_str());
+            }
 
             index++;
             if (index >= NUMBER_OF_ERRORS) {
@@ -513,14 +513,10 @@ int main(int argc, char** argv)
     ret = ampere::utils::initHwmonRootPath();
     if (!ret) {
         log<level::ERR>("Failed to get Root Path of SMPro Hwmon\n");
-        return 0;
+        return 1;
     }
 
-    ret = ampere::ras::getErrors();
-    if (!ret) {
-        log<level::ERR>("Failed to retrieve errors from SMPro\n");
-        return 0;
-    }
+    ampere::ras::getErrors();
 
     return 0;
 }
