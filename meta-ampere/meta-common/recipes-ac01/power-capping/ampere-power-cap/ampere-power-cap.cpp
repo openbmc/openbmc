@@ -35,72 +35,20 @@ namespace power
 {
 
 namespace fs = std::filesystem;
-
-constexpr size_t i2cScpAddr[2] = {0x4f, 0x4e};
-constexpr size_t i2cScpBus = 2;
 constexpr size_t minScpPowerLimit = 90;
 constexpr size_t maxScpPowerLimit = 500;
 
-static bool findFiles(const fs::path& dirPath, const std::string& matchString,
-                      std::vector<fs::path>& foundPaths,
-                      unsigned int symlinkDepth)
-{
-    if (!fs::exists(dirPath))
-        return false;
-
-    std::regex expr(matchString);
-    for (auto& p : fs::recursive_directory_iterator(dirPath))
-    {
-        std::string path = p.path().string();
-        if (!fs::is_directory(p))
-        {
-            if (std::regex_search(path, expr))
-                foundPaths.emplace_back(p.path());
-        }
-        else if (fs::is_symlink(p) && symlinkDepth)
-        {
-            findFiles(p.path(), matchString, foundPaths, symlinkDepth - 1);
-        }
-    }
-
-    return true;
-}
+const std::vector<std::string> powerCapPath =  {
+    "/sys/bus/i2c/devices/2-004f/1e78a0c0.i2c-bus:smpro@4f:misc/acpi_power_limit",
+    "/sys/bus/i2c/devices/2-004e/1e78a0c0.i2c-bus:smpro@4e:misc/acpi_power_limit"
+};
 
 static std::optional<std::string> getPowerLimitDevPath(unsigned int cpuSocket)
 {
-    if (cpuSocket > sizeof(i2cScpAddr)/sizeof(i2cScpAddr[0]))
+    if (cpuSocket >= powerCapPath.size())
         return std::nullopt;
 
-    std::vector<fs::path> paths;
-    if (!findFiles(fs::path("/sys/class/hwmon"), "acpi_power_limit", paths, 1))
-        return std::nullopt;
-
-    // Get the power limit dev corresponding to CPU socket
-    for (const auto& path : paths)
-    {
-        fs::path device = path.parent_path() / "device";
-        std::string deviceName = fs::canonical(device).stem();
-        std::vector<std::string> parsedName;
-        boost::split(parsedName, deviceName, [](char c) { return c == '-'; });
-        if (parsedName.size() != 2)
-            continue;
-        size_t bus = 0;
-        size_t addr = 0;
-        try
-        {
-            bus = std::stoi(parsedName[0]);
-            addr = std::stoi(parsedName[1], 0, 16);
-        }
-        catch (std::invalid_argument&)
-        {
-            continue;
-        }
-
-        if ((bus == i2cScpBus) && (addr == i2cScpAddr[cpuSocket]))
-            return path.string();
-    }
-
-    return std::nullopt;
+    return powerCapPath[cpuSocket];
 }
 
 static uint32_t getScpPowerCap(std::string devPath)
