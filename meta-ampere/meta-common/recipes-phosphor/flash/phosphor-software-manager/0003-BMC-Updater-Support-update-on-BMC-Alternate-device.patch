@@ -1,0 +1,65 @@
+From a633c74a1f58b777a0251c781634de8d2fccf170 Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chanh@amperemail.onmicrosoft.com>
+Date: Mon, 11 Jan 2021 18:17:24 +0700
+Subject: [PATCH] BMC Updater: Support update on BMC Alternate device
+
+This patch support update for BMC Alternate device. It's based
+on the ExtendedVersion field in MANIFEST file.
+
+If the MANIFEST file include "ExtendedVersion=alternate", then image will
+be updated to BMC Alternate device.
+
+Signed-off-by: Chanh Nguyen <chanh@amperemail.onmicrosoft.com>
+Change-Id: I8470eb4ebcbec4d4239c0c4aad7b0f3855ea5fcb
+---
+ static/flash.cpp | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
+
+diff --git a/static/flash.cpp b/static/flash.cpp
+index 101828b..5b05918 100644
+--- a/static/flash.cpp
++++ b/static/flash.cpp
+@@ -25,15 +25,38 @@ using namespace phosphor::software::image;
+ 
+ void Activation::flashWrite()
+ {
++
++    // Define the bmcImageTargets by copy from bmcImages
++    std::vector<std::string> bmcImageTargets = bmcImages;
++
+     // For static layout code update, just put images in /run/initramfs.
+     // It expects user to trigger a reboot and an updater script will program
+     // the image to flash during reboot.
+     fs::path uploadDir(IMG_UPLOAD_DIR);
+     fs::path toPath(PATH_INITRAMFS);
+ 
+-    for (const auto& bmcImage : parent.imageUpdateList)
++    /* Set ALT BMC flash image file name list by insert the "alt" to the file name
++     *
++     * If the extendedVersion is Bmc or not mentioned, then the bmcImageTargets still is bmcImages as defined in images.hpp
++     * Ex : "image-kernel", "image-rofs","image-rwfs", "image-u-boot"
++     *
++     * If the extendedVersion is BmcAlt, then bmcImageTargets is bmcImages and inserted the "alt" string
++     * Ex : "image-alt-kernel", "image-alt-rofs","image-alt-rwfs", "image-alt-u-boot"
++     *
++     */
++    std::string extendedVersion = parent.versions.find(versionId)->second->extendedVersion();
++
++    if (extendedVersion == "alternate")
++    {
++        for (auto& bmcImageTarget : bmcImageTargets)
++        {
++            bmcImageTarget.insert(6, "alt-");
++        }
++     }
++
++    for (int i = 0; i < bmcImages.size() - 1;i++)
+     {
+-        fs::copy_file(uploadDir / versionId / bmcImage, toPath / bmcImage,
++        fs::copy_file(uploadDir / versionId / bmcImages[i], toPath / bmcImageTargets[i],
+                       fs::copy_options::overwrite_existing);
+     }
+ }
+-- 
+2.17.1
+
