@@ -1,4 +1,4 @@
-Sample meta-witherspoon build invocations:
+Example build invocations:
 
 mihawk:
 DISTRO=openbmc-witherspoon MACHINE=mihawk bitbake obmc-phosphor-image
