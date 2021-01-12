@@ -31,16 +31,32 @@ do_flash () {
 			exit 1
 		fi
 
+		# lock the power control
+		echo "--- Locking power control"
+		systemctl start reboot-guard-enable.service
+
 		echo "--- Flashing firmware to @/dev/$HOST_MTD"
 		flash_eraseall /dev/$HOST_MTD
 		flashcp -v $IMAGE /dev/$HOST_MTD
 
+		# unlock the power control
+		echo "--- Unlocking power control"
+		systemctl start reboot-guard-disable.service
+
 		echo "--- Unbind the ASpeed SMC driver"
 		echo 1e630000.spi > /sys/bus/platform/drivers/aspeed-smc/unbind
 	else
+		# lock the power control
+		echo "--- Locking power control"
+		systemctl start reboot-guard-enable.service
+
 		echo "--- Flashing firmware to @/dev/$HOST_MTD"
 		flash_eraseall /dev/$HOST_MTD
 		flashcp -v $IMAGE /dev/$HOST_MTD
+
+		# unlock the power control
+		echo "--- Unlocking power control"
+		systemctl start reboot-guard-disable.service
 	fi
 }
 

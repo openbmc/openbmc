@@ -86,6 +86,21 @@ if [ $1 != "mb" ]; then
   exit 0;
 fi
 
+# check if power guard enabled
+dir="/run/systemd/system/"
+file="reboot-guard.conf"
+units=("reboot" "poweroff" "halt")
+for unit in "${units[@]}"; do
+  if [ -f ${dir}${unit}.target.d/${file} ]; then
+    echo "PowerGuard enabled, cannot do power control, exit!!!"
+    exit -1
+  fi
+done
+
+if [ ! -d "/run/openbmc/" ]; then
+  mkdir -p "/run/openbmc/"
+fi
+
 if [ $2 = "on" ]; then
   if [ $(power_status) == "off" ]; then
     power_on

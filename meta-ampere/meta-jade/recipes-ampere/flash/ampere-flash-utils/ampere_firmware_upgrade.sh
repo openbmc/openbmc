@@ -39,8 +39,17 @@ do_smpmpro_upgrade() {
 	EEPROM_ADDR="0x50"
 	FIRMWARE_IMAGE=$IMAGE
 
+	# lock the power control
+	echo "--- Locking power control"
+	systemctl start reboot-guard-enable.service
+
 	# Write Firmware to EEPROM and read back for validation
 	ampere_eeprom_prog -b $I2C_BUS_DEV -s $EEPROM_ADDR -p -f $FIRMWARE_IMAGE
+
+	# unlock the power control
+	echo "--- Unlocking power control"
+	systemctl start reboot-guard-disable.service
+
 }
 
 do_fru_upgrade() {
