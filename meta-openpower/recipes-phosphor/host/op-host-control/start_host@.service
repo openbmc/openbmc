@@ -1,5 +1,6 @@
 [Unit]
 Description=Start host%i SBE
+Wants=obmc-host-start-pre@%i.target
 After=obmc-host-start-pre@%i.target
 Wants=obmc-host-starting@%i.target
 Before=obmc-host-starting@%i.target
