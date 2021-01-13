@@ -13,7 +13,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=bcd9ada3a943f58551867d72893cc9ab"
 
 SRC_URI = "git://github.com/openbmc/bios-settings-mgr"
-SRCREV = "8f706213ccc2900e1a02fedb26073065897b02c3"
+SRCREV = "c0f926d6cbf9636a42f4bc3d33b9602e4633c478"
 
 inherit meson pkgconfig systemd
 
