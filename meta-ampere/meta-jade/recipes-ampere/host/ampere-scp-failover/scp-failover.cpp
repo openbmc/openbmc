@@ -39,9 +39,11 @@
 
 static gpiod::line BMC_SELECT_EEPROM;
 static gpiod::line S0_SCP_AUTH_FAIL_L;
+static boost::asio::io_service io;
 
+static boost::asio::posix::stream_descriptor s0ScpAuthFailEvent(io);
 static std::shared_ptr<sdbusplus::asio::connection> conn;
-static bool stop = false;
+static bool released_gpio = false;
 
 static bool requestGPIOInput(const std::string& name, gpiod::line& gpioLine)
 {
@@ -98,9 +100,9 @@ static void requestGPIOs()
 {
     try
     {
-        requestGPIOInput("S0_SCP_AUTH_FAIL_L", S0_SCP_AUTH_FAIL_L);
-        requestGPIOOutput("BMC_SELECT_EEPROM", 0, BMC_SELECT_EEPROM);
-        sleep(2);
+        released_gpio = false;
+        requestGPIOOutput("BMC_SELECT_EEPROM", 1, BMC_SELECT_EEPROM);
+        sleep(5);
     }
     catch (std::exception& e)
     {
@@ -114,7 +116,7 @@ static void releaseGPIOs()
 {
     try
     {
-        S0_SCP_AUTH_FAIL_L.release();
+        released_gpio = true;
         BMC_SELECT_EEPROM.release();
     }
     catch (std::exception& e)
@@ -123,6 +125,53 @@ static void releaseGPIOs()
         sd_journal_send("MESSAGE=%s", message.c_str(), "PRIORITY=%i", LOG_ERR,
                         NULL);
     }
+}
+
+static bool requestGPIOEvents(
+    const std::string& name, const std::function<void()>& handler,
+    gpiod::line& gpioLine,
+    boost::asio::posix::stream_descriptor& gpioEventDescriptor)
+{
+    // Find the GPIO line
+    gpioLine = gpiod::find_line(name);
+    if (!gpioLine)
+    {
+        std::cerr << "Failed to find the " << name << " line\n";
+        return false;
+    }
+
+    try
+    {
+        gpioLine.request(
+            {"ampere-scp-failover", gpiod::line_request::EVENT_BOTH_EDGES});
+    }
+    catch (std::exception&)
+    {
+        std::cerr << "Failed to request events for " << name << "\n";
+        return false;
+    }
+
+    int gpioLineFd = gpioLine.event_get_fd();
+    if (gpioLineFd < 0)
+    {
+        std::cerr << "Failed to get " << name << " fd\n";
+        return false;
+    }
+
+    gpioEventDescriptor.assign(gpioLineFd);
+
+    gpioEventDescriptor.async_wait(
+        boost::asio::posix::stream_descriptor::wait_read,
+        [&name, handler](const boost::system::error_code ec) {
+            if (ec)
+            {
+                std::cerr << name << " fd handler error: " << ec.message()
+                          << "\n";
+                return;
+            }
+            handler();
+        });
+    return true;
 }
 
 static void doForceReset()
@@ -144,23 +193,33 @@ static void doForceReset()
         std::variant<std::string>{command});
 }
 
-static int handleSCPAuthFail()
+static void handleSCPAuthFail()
 {
-    int s0_auth_failure_value = -1;
     int i2c_backup_sel_value = -1;
     std::string message = "";
     std::stringstream stream;
-    int maxMessages = 10;
-    int counter = 0;
 
-    while (!stop)
+    gpiod::line_event gpioLineEvent = S0_SCP_AUTH_FAIL_L.event_read();
+    bool authFail = gpioLineEvent.event_type == gpiod::line_event::FALLING_EDGE;
+    if (authFail)
     {
         try
         {
+            if (released_gpio)
+            {
+                requestGPIOs();
+            }
             // Get the GPIO values
-            s0_auth_failure_value = S0_SCP_AUTH_FAIL_L.get_value();
             i2c_backup_sel_value = BMC_SELECT_EEPROM.get_value();
-            sleep(1);
+
+            stream << "scp auth failure signal: "
+                   << (i2c_backup_sel_value ? "boot main eeprom"
+                                            : "boot failover eeprom")
+                   << "(" << i2c_backup_sel_value << ")" << std::endl;
+
+            message = stream.str();
+            sd_journal_send("MESSAGE=%s", message.c_str(), "PRIORITY=%i",
+                            LOG_ERR, NULL);
         }
         catch (std::exception& e)
         {
@@ -169,66 +228,53 @@ static int handleSCPAuthFail()
                             LOG_ERR, NULL);
         }
 
-        // if detected auth_failure
-        if (!s0_auth_failure_value)
+        // 0 = failover, 1 = main
+        if (!i2c_backup_sel_value)
         {
-            stream << "scp authentication failure"
-                   << "(" << s0_auth_failure_value << ") - "
-                   << (i2c_backup_sel_value ? "boot failover eeprom"
-                                            : "boot main eeprom")
-                   << "(" << i2c_backup_sel_value << ")" << std::endl;
-            message = stream.str();
-            sd_journal_send("MESSAGE=%s", message.c_str(), "PRIORITY=%i",
-                            LOG_ERR, NULL);
-
-            // low is main, high is failover
-            if (i2c_backup_sel_value)
+            std::string msg = "scp authentication failure detected, failover "
+                              "eeprom boots fail";
+            sd_journal_send(
+                "MESSAGE=%s", msg.c_str(), "PRIORITY=%i", LOG_ERR,
+                "REDFISH_MESSAGE_ID=%s", "OpenBMC.0.1.AmpereCritical",
+                "REDFISH_MESSAGE_ARGS=%s, %s", "SCP", msg.c_str(), NULL);
+        }
+        else
+        {
+            try
             {
-                if (counter < maxMessages)
-                {
-                    std::string msg = "scp authentication failure detected, failover "
-                        "eeprom boots fail";
-                    sd_journal_send("MESSAGE=%s", msg.c_str(), "PRIORITY=%i",
-                                    LOG_ERR, "REDFISH_MESSAGE_ID=%s",
-                                    "OpenBMC.0.1.AmpereCritical",
-                                    "REDFISH_MESSAGE_ARGS=%s, %s", "SCP",
-                                    msg.c_str(), NULL);
+                // switch to failover
+                BMC_SELECT_EEPROM.set_value(0);
+                sleep(1);
 
-                    counter++;
-                    sleep(1);
-                }
+                // just add systemd log, no SEL or Redfish log
+                message = "scp authentication failure detected, switching to "
+                          "failover eeprom";
+                sd_journal_send("MESSAGE=%s", message.c_str(), "PRIORITY=%i",
+                                LOG_ERR, NULL);
+
+                // reset the host
+                doForceReset();
             }
-            else
+            catch (std::exception& e)
             {
-                try
-                {
-                    // switch to failover
-                    BMC_SELECT_EEPROM.set_value(1);
-                    sleep(1);
-
-                    // just add systemd log, no SEL or Redfish log
-                    message =
-                        "scp authentication failure detected, switching to "
-                        "failover eeprom";
-                    sd_journal_send("MESSAGE=%s", message.c_str(),
-                                    "PRIORITY=%i", LOG_ERR, NULL);
-
-                    // reset the host
-                    doForceReset();
-                }
-                catch (std::exception& e)
-                {
-                    message = "auth failure detected, but action failed";
-                    sd_journal_send("MESSAGE=%s", message.c_str(),
-                                    "PRIORITY=%i", LOG_ERR, NULL);
-                }
+                message = "auth failure detected, but action failed";
+                sd_journal_send("MESSAGE=%s", message.c_str(), "PRIORITY=%i",
+                                LOG_ERR, NULL);
             }
         }
-
-        usleep(500000);
     }
 
-    return 0;
+    s0ScpAuthFailEvent.async_wait(
+        boost::asio::posix::stream_descriptor::wait_read,
+        [](const boost::system::error_code ec) {
+            if (ec)
+            {
+                std::cerr << "SCP failover handler error: " << ec.message()
+                          << "\n";
+                return;
+            }
+            handleSCPAuthFail();
+        });
 }
 
 inline static sdbusplus::bus::match::match
@@ -257,11 +303,15 @@ inline static sdbusplus::bus::match::match
             // DC power is off
             if (value == 0)
             {
-                // set back to boot from main
-                BMC_SELECT_EEPROM.set_value(0);
-                sleep(1);
-                stop = true;
-                releaseGPIOs();
+                try
+                {
+                    // set back to boot from main
+                    BMC_SELECT_EEPROM.set_value(1);
+                    sleep(1);
+                    releaseGPIOs();
+                }
+                catch (std::exception& e)
+                {}
             }
         }
     };
@@ -278,12 +328,12 @@ inline static sdbusplus::bus::match::match
 
 int main(int argc, char* argv[])
 {
-    boost::asio::io_service io;
     conn = std::make_shared<sdbusplus::asio::connection>(io);
     sdbusplus::bus::match::match powerGoodMonitor = startPowerGoodMonitor(conn);
 
     requestGPIOs();
-    handleSCPAuthFail();
+    requestGPIOEvents("S0_SCP_AUTH_FAIL_L", handleSCPAuthFail,
+                      S0_SCP_AUTH_FAIL_L, s0ScpAuthFailEvent);
 
     io.run();
     return 0;

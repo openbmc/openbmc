@@ -83,10 +83,10 @@ if [[ $TYPE == "smpmpro" ]]; then
 	# 08 is BMC_GPIOB0_I2C_BACKUP_SEL
 	if [[ $DEV_SEL == 1 ]]; then
 		echo "Run update Main EEPROM"
-		gpioset 0 8=0       # Main EEPROM
+		gpioset 0 8=1       # Main EEPROM
 	elif [[ $DEV_SEL == 2 ]]; then
 		echo "Run update Second EEPROM"
-		gpioset 0 8=1       # Second EEPROM
+		gpioset 0 8=0       # Second EEPROM
 	else
 	echo "Please choose Main (1) or Second EEPROM (2)"
 		exit 0
@@ -97,7 +97,7 @@ if [[ $TYPE == "smpmpro" ]]; then
 
 	# Switch EEPROM control to Host
 	# 08 is BMC_GPIOB0_I2C_BACKUP_SEL
-	gpioset 0 8=0
+	gpioset 0 8=1
 	# 226 is BMC_GPIOAC2_SPI0_PROGRAM_SEL
 	gpioset 0 226=1
 

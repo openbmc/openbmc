@@ -16,11 +16,4 @@ SRC_URI += " \
            "
 
 # Run service after chassis power on
-TMPL_HOST_MNT = "ampere-scp-failover.service"
-INSTFMT_MNT = "ampere-scp-failover.service"
-POWERON_TGT = "obmc-chassis-poweron@{0}.target"
-FMT_MNT = "../${TMPL_HOST_MNT}:${POWERON_TGT}.requires/${INSTFMT_MNT}"
-
-FILES_${PN} = "${bindir}/ampere-scp-failover"
-SYSTEMD_SERVICE_${PN} += "${TMPL_HOST_MNT}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_MNT', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE_${PN} += "ampere-scp-failover.service"
