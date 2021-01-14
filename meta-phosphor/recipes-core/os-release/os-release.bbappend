@@ -15,7 +15,7 @@ def run_git(d, cmd):
         bb.warn("Unexpected exception from 'git' call: %s" % e)
         pass
 
-VERSION_ID := "${@run_git(d, 'describe --dirty --long')}"
+VERSION_ID := "${@run_git(d, 'describe --dirty')}"
 VERSION = "${@'-'.join(d.getVar('VERSION_ID').split('-')[0:2])}"
 
 BUILD_ID := "${@run_git(d, 'describe --abbrev=0')}"
