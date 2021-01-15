@@ -1,0 +1,7 @@
+[Unit]
+Description=Update image /tmp/images/%I/*.bin to FRU
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/ampere_firmware_upgrade.sh fru /tmp/images/%I/*.bin

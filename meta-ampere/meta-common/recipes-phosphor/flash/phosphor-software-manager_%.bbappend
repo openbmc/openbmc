@@ -10,6 +10,7 @@ SYSTEMD_SERVICE_${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_b
 SYSTEMD_SERVICE_${PN}-updater += " \
                                   obmc-update-scp-primary@.service \
                                   obmc-update-scp-secondary@.service \
+                                  obmc-update-fru@.service \
 				 "
 
 SRC_URI += " \
