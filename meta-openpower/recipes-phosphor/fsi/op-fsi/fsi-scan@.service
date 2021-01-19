@@ -5,6 +5,7 @@ After=obmc-power-on@%i.target
 Wants=obmc-host-start-pre@%i.target
 Before=obmc-host-start-pre@%i.target
 After=op-cfam-reset.service
+Before=start_host@%i.service
 Conflicts=obmc-chassis-poweroff@%i.target
 Conflicts=obmc-host-stop@%i.target
 ConditionPathExists=!/run/openbmc/mpreboot@%i
