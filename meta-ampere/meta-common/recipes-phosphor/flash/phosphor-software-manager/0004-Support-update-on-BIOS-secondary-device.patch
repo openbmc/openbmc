@@ -1,0 +1,69 @@
+From 0f56f00d98deb03f664b7b25658b03b7b8c1bd5f Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chanh@amperemail.onmicrosoft.com>
+Date: Tue, 19 Jan 2021 15:00:11 +0700
+Subject: [PATCH] Support update on BIOS secondary device
+
+This patch support update for Bios secondary device. It's based
+on the ExtendedVersion field in MANIFEST file.
+
+If the MANIFEST file include "ExtendedVersion=secondary", then image will
+be updated to Bios secondary device.
+
+Signed-off-by: Chanh Nguyen <chanh@amperemail.onmicrosoft.com>
+Change-Id: Icaa8bf1a2952d1baacfcab6695bc8a63273539c9
+---
+ activation.cpp | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/activation.cpp b/activation.cpp
+index 5043560..385e790 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -419,9 +419,21 @@ bool Activation::checkApplyTimeImmediate()
+ #ifdef HOST_BIOS_UPGRADE
+ void Activation::flashWriteHost()
+ {
++    std::string extendedVersion = parent.versions.find(versionId)->second->extendedVersion();
++    std::string biosServiceFile;
++
+     auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
+                                       SYSTEMD_INTERFACE, "StartUnit");
+-    auto biosServiceFile = "obmc-flash-host-bios@" + versionId + ".service";
++
++    if (extendedVersion == "secondary")
++    {
++        biosServiceFile = "obmc-flash-host-bios-secondary@" + versionId + ".service";
++    }
++    else
++    {
++        biosServiceFile = "obmc-flash-host-bios@" + versionId + ".service";
++    }
++
+     method.append(biosServiceFile, "replace");
+     try
+     {
+@@ -440,11 +452,20 @@ void Activation::onStateChangesBios(sdbusplus::message::message& msg)
+     sdbusplus::message::object_path newStateObjPath;
+     std::string newStateUnit{};
+     std::string newStateResult{};
++    std::string biosServiceFile;
++    std::string extendedVersion = parent.versions.find(versionId)->second->extendedVersion();
+ 
+     // Read the msg and populate each variable
+     msg.read(newStateID, newStateObjPath, newStateUnit, newStateResult);
+ 
+-    auto biosServiceFile = "obmc-flash-host-bios@" + versionId + ".service";
++    if (extendedVersion == "secondary")
++    {
++        biosServiceFile = "obmc-flash-host-bios-secondary@" + versionId + ".service";
++    }
++    else
++    {
++        biosServiceFile = "obmc-flash-host-bios@" + versionId + ".service";
++    }
+ 
+     if (newStateUnit == biosServiceFile)
+     {
+-- 
+2.17.1
+

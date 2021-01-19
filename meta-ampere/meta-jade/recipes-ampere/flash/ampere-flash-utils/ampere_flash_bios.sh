@@ -36,7 +36,6 @@ do_flash () {
 		systemctl start reboot-guard-enable.service
 
 		echo "--- Flashing firmware to @/dev/$HOST_MTD"
-		flash_eraseall /dev/$HOST_MTD
 		flashcp -v $IMAGE /dev/$HOST_MTD
 
 		# unlock the power control
@@ -51,7 +50,6 @@ do_flash () {
 		systemctl start reboot-guard-enable.service
 
 		echo "--- Flashing firmware to @/dev/$HOST_MTD"
-		flash_eraseall /dev/$HOST_MTD
 		flashcp -v $IMAGE /dev/$HOST_MTD
 
 		# unlock the power control
@@ -62,7 +60,8 @@ do_flash () {
 
 
 if [ $# -eq 0 ]; then
-	echo "Usage: $(basename $0) <BIOS image file>"
+	echo "Usage: $(basename $0) <BIOS image file> <Device selection>"
+	echo "<Device selection> : 1 is primary device; 2 is secondary device"
 	exit 0
 fi
 
@@ -71,6 +70,13 @@ if [ ! -f $IMAGE ]; then
 	echo $IMAGE
 	echo "The image file $IMAGE does not exist"
 	exit 1
+fi
+
+if [ -z "$2" ]
+then
+	DEV_SEL="1"    # by default, select primary device
+else
+	DEV_SEL=$2
 fi
 
 # Turn off the Host if it is currently ON
@@ -99,8 +105,35 @@ if [[ $? -ne 0 ]]; then
 	exit 1
 fi
 
+# Switch the host SPI bus (between primary and secondary)
+# 227 is BMC_SPI0_BACKUP_SEL
+if [[ $DEV_SEL == 1 ]]; then
+	echo "Run update Primary SPI"
+	gpioset 0 227=0       # Primary SPI
+elif [[ $DEV_SEL == 2 ]]; then
+	echo "Run update Second SPI"
+	gpioset 0 227=1       # Second SPI
+else
+	echo "Please choose primary SPI (1) or second SPI (2)"
+	exit 0
+fi
+
+if [[ $? -ne 0 ]]; then
+	echo "ERROR: Switch the host SPI bus (between primary and secondary) - GPIO 227. Please check gpio state"
+	exit 1
+fi
+
 # Flash the firmware
 do_flash
+
+# Switch to Primary SPI device
+echo "--- Switch to Primary SPI device"
+gpioset 0 227=0       # Primary SPI
+
+if [[ $? -ne 0 ]]; then
+	echo "ERROR: Switch the host SPI bus (between primary and secondary) - GPIO 227. Please check gpio state"
+	exit 1
+fi
 
 # Switch the host SPI bus to HOST."
 echo "--- Switch the host SPI bus to HOST."
