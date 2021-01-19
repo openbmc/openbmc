@@ -24,7 +24,9 @@ DBUS_PACKAGES = "${SOFTWARE_MGR_PACKAGES}"
 # handles the rest.
 SYSTEMD_PACKAGES = ""
 
-PACKAGECONFIG[verify_signature] = "-Dverify-signature=enabled, -Dverify-signature=disabled"
+PACKAGECONFIG[verify_signature] = " \
+    -Dverify-full-signature=enabled, \
+    -Dverify-full-signature=disabled"
 PACKAGECONFIG[sync_bmc_files] = "-Dsync-bmc-files=enabled, -Dsync-bmc-files=disabled"
 PACKAGECONFIG[ubifs_layout] = "-Dbmc-layout=ubi"
 PACKAGECONFIG[mmc_layout] = "-Dbmc-layout=mmc"
