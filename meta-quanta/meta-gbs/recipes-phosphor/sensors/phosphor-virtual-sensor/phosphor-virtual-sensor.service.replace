@@ -1,0 +1,16 @@
+[Unit]
+Description=Virtual sensors
+Wants=obmc-mapper.target
+After=obmc-mapper.target
+
+[Service]
+ExecStartPre=mapper wait /xyz/openbmc_project/sensors/temperature/inlet
+ExecStartPre=mapper wait /xyz/openbmc_project/sensors/temperature/outlet_0
+ExecStartPre=mapper wait /xyz/openbmc_project/sensors/temperature/outlet_1
+ExecStart=/usr/bin/virtual-sensor
+Type=dbus
+BusName=xyz.openbmc_project.VirtualSensor
+SyslogIdentifier=phosphor-virtual-sensor
+
+[Install]
+WantedBy=multi-user.target
