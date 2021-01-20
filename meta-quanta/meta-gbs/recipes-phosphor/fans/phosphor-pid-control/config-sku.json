@@ -1,6 +1,6 @@
 {
     "version": "R03",
-    "sensors" : [
+    "sensors": [
         {
             "name": "fan0",
             "type": "fan",
@@ -102,7 +102,7 @@
             "timeout": 0
         }
     ],
-    "zones" : [
+    "zones": [
         {
             "id": 0,
             "minThermalOutput": 0.0,
