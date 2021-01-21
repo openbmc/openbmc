@@ -20,6 +20,6 @@ RDEPENDS_${PN}-extras_append_fp5280g2 = " \
                                           mctp \
                                           phosphor-fp5280g2-psu-update \
                                           phosphor-psu-software-manager \
-                                          phosphor-webui \
+                                          webui-vue \
                                          "
 
