@@ -36,6 +36,9 @@ PACKAGE_BEFORE_PN += "${FAN_PACKAGES}"
 PACKAGECONFIG ?= "presence control monitor"
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
 
+# The control, monitor, and presence apps can either be JSON or YAML driven.
+PACKAGECONFIG[json] = "--enable-json, --disable-json"
+
 # --------------------------------------
 # ${PN}-presence-tach specific configuration
 PACKAGECONFIG[presence] = " \
@@ -46,15 +49,20 @@ PACKAGECONFIG[presence] = " \
         , \
 "
 
-# Needed to install into the obmc-chassis-poweron target
+MULTI_USR_TGT = "multi-user.target"
 TMPL_TACH = "phosphor-fan-presence-tach@.service"
 INSTFMT_TACH = "phosphor-fan-presence-tach@{0}.service"
 POWERON_TGT = "obmc-chassis-poweron@{0}.target"
 FMT_TACH = "../${TMPL_TACH}:${POWERON_TGT}.requires/${INSTFMT_TACH}"
+FMT_TACH_MUSR = "../${TMPL_TACH}:${MULTI_USR_TGT}.wants/${INSTFMT_TACH}"
 
 FILES_${PN}-presence-tach = "${bindir}/phosphor-fan-presence-tach"
 SYSTEMD_SERVICE_${PN}-presence-tach += "${TMPL_TACH}"
 SYSTEMD_LINK_${PN}-presence-tach += "${@compose_list(d, 'FMT_TACH', 'OBMC_CHASSIS_INSTANCES')}"
+
+# JSON mode also gets linked into multi-user
+SYSTEMD_LINK_${PN}-presence-tach += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+        compose_list(d, 'FMT_TACH_MUSR', 'OBMC_CHASSIS_INSTANCES'), '', d)}"
 
 # --------------------------------------
 # ${PN}-control specific configuration
