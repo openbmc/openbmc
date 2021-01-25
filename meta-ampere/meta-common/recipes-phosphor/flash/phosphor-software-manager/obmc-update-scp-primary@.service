@@ -1,0 +1,7 @@
+[Unit]
+Description=Program image /tmp/images/%I/*.slim to SCP Primary EEPROM
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/ampere_firmware_upgrade.sh smpmpro /tmp/images/%I/*.slim 1
