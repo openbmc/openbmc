@@ -48,6 +48,7 @@ python do_compile_prepend() {
         product_tagged = True
         versionList.pop(0)
 
+    rcdev = ""
     version = versionList[0] if len(versionList) > 0 else ''
     if versionList[1][:2] == 'rc' or versionList[1] == 'dev': # Remove the '-rcX' and '-dev' parts
         rcdev = versionList[1]
