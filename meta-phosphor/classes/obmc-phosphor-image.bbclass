@@ -33,7 +33,6 @@
 
 inherit core-image
 inherit obmc-phosphor-utils
-inherit phosphor-deploy-ssh-keys
 
 FEATURE_PACKAGES_obmc-bmc-state-mgmt ?= "packagegroup-obmc-apps-bmc-state-mgmt"
 FEATURE_PACKAGES_obmc-bmcweb ?= "packagegroup-obmc-apps-bmcweb"
