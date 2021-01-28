@@ -8,6 +8,7 @@
 # - obmc-chassis-state-mgmt           - OpenBMC chassis state management
 # - obmc-console                      - OpenBMC serial over LAN
 # - obmc-dbus-monitor                 - OpenBMC dbus monitoring
+# - obmc-debug-collector              - OpenBMC debug collector
 # - obmc-devtools                     - OpenBMC development and debugging tools
 # - obmc-fan-control                  - OpenBMC fan management
 # - obmc-fan-mgmt                     - Deprecated - use obmc-fan-control instead
@@ -27,9 +28,9 @@
 # - obmc-settings-mgmt                - OpenBMC settings management
 # - obmc-software                     - OpenBMC software management
 # - obmc-system-mgmt                  - OpenBMC system management
+# - obmc-telemetry                    - OpenBMC telemetry solution
 # - obmc-user-mgmt                    - OpenBMC user management
 # - obmc-user-mgmt-ldap               - OpenBMC LDAP users
-# - obmc-debug-collector              - OpenBMC debug collector
 
 inherit core-image
 inherit obmc-phosphor-utils
@@ -62,6 +63,7 @@ FEATURE_PACKAGES_obmc-system-mgmt ?= "${@bb.utils.contains('DISTRO_FEATURES', 'o
 FEATURE_PACKAGES_obmc-debug-collector ?= "packagegroup-obmc-apps-debug-collector"
 FEATURE_PACKAGES_obmc-settings-mgmt ?= "packagegroup-obmc-apps-settings"
 FEATURE_PACKAGES_obmc-network-mgmt ?= "packagegroup-obmc-apps-network"
+FEATURE_PACKAGES_obmc-telemetry ?= "packagegroup-obmc-apps-telemetry"
 FEATURE_PACKAGES_obmc-user-mgmt ?= "packagegroup-obmc-apps-user-mgmt"
 FEATURE_PACKAGES_obmc-user-mgmt-ldap ?= "packagegroup-obmc-apps-user-mgmt-ldap"
 

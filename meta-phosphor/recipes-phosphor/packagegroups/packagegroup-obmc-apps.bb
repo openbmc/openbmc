@@ -28,6 +28,7 @@ PACKAGES = " \
         ${PN}-debug-collector \
         ${PN}-settings \
         ${PN}-network \
+        ${PN}-telemetry \
         ${PN}-user-mgmt \
         ${PN}-user-mgmt-ldap \
         "
@@ -173,6 +174,11 @@ RDEPENDS_${PN}-settings = " \
 SUMMARY_${PN}-network = "BMC Network Manager"
 RDEPENDS_${PN}-network = " \
         ${VIRTUAL-RUNTIME_obmc-network-manager} \
+        "
+
+SUMMARY_${PN}-telemetry = "Telemetry solution"
+RDEPENDS_${PN}-telemetry = " \
+        telemetry \
         "
 
 SUMMARY_${PN}-user-mgmt = "User management applications"

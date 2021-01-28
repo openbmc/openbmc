@@ -38,6 +38,7 @@ IMAGE_FEATURES += " \
         obmc-debug-collector \
         obmc-network-mgmt \
         obmc-settings-mgmt \
+        obmc-telemetry \
         "
 
 LICENSE = "Apache-2.0"
