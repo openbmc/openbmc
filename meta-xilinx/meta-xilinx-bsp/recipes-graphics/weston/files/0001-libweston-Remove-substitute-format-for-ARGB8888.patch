@@ -1,6 +1,6 @@
-From 77afc64239199f75041ec344f8f886ee20bba0f8 Mon Sep 17 00:00:00 2001
+From 3fbb596e53524e78703b76c4fdc33cd6ac62f777 Mon Sep 17 00:00:00 2001
 From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
-Date: Tue, 11 Feb 2020 19:07:45 -0800
+Date: Fri, 11 Dec 2020 16:21:38 -0800
 Subject: [PATCH] libweston: Remove substitute format for ARGB8888
 
 Xilinx DP gfx layer does not support XRGB8888. Hence, remove the same
@@ -13,17 +13,17 @@ Upstream-Status : Inappropriate [Xilinx specific]
  1 file changed, 1 deletion(-)
 
 diff --git a/libweston/pixel-formats.c b/libweston/pixel-formats.c
-index b96f3b2..e2a7715 100644
+index 79dc709..ec2d3b7 100644
 --- a/libweston/pixel-formats.c
 +++ b/libweston/pixel-formats.c
-@@ -165,7 +165,6 @@ static const struct pixel_format_info pixel_format_table[] = {
- 	},
+@@ -193,7 +193,6 @@ static const struct pixel_format_info pixel_format_table[] = {
  	{
  		DRM_FORMAT(ARGB8888),
+ 		BITS_RGBA_FIXED(8, 8, 8, 8),
 -		.opaque_substitute = DRM_FORMAT_XRGB8888,
  		.depth = 32,
  		.bpp = 32,
  		GL_FORMAT(GL_BGRA_EXT),
 -- 
-2.7.4
+2.17.1
 

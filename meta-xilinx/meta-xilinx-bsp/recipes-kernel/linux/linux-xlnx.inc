@@ -56,10 +56,10 @@ KERNEL_FEATURES_append_kc705-microblazeel = " bsp/xilinx/kc705-microblazeel-feat
 
 KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
 
-KERNEL_FEATURES_append_zynqmp = "${@' features/xilinx/overlay/overlay_of.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
+KERNEL_FEATURES_append_zynqmp = "${@' features/xilinx/overlay_of/overlay_of.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
 
 KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc"
 
-KERNEL_FEATURES_append_ultra96-zynqmp = " bsp/xilinx/ultra96-zynqmp/mipi-config-ultra96.scc"
+KERNEL_FEATURES_append_ultra96 = " bsp/xilinx/ultra96-zynqmp/mipi-config-ultra96.scc"
 
 KERNEL_FEATURES_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"

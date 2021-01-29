@@ -22,7 +22,7 @@ RDEPENDS_${PN}-notebooks += "\
 "
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_ultra96-zynqmp = "ultra96-zynqmp"
+COMPATIBLE_MACHINE_ultra96 = "${MACHINE}"
 
 S = "${WORKDIR}/git"
 
@@ -55,3 +55,4 @@ do_install () {
     cp -r ${S}/notebooks/* ${JUPYTER_NOTEBOOKS}/bnn_examples/
 }
 
+PACKAGE_ARCH_ultra96 = "${BOARD_ARCH}"

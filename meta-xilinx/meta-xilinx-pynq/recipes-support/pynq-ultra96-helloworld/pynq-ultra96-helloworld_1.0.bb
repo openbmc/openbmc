@@ -15,7 +15,7 @@ SRC_URI = "git://github.com/Xilinx/PYNQ-HelloWorld.git;protocol=https \
 "
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_ultra96-zynqmp = "ultra96-zynqmp"
+COMPATIBLE_MACHINE_ultra96 = "${MACHINE}"
 
 SRC_URI[md5sum] = "ac1bfe94a18301b26ae5110ea26ca596"
 SRC_URI[sha256sum] = "f522c54c9418d1b1fdb6098cd7139439d47b041900000812c51200482d423460"
@@ -37,3 +37,4 @@ do_install() {
 
 }
 
+PACKAGE_ARCH_ultra96 = "${BOARD_ARCH}"
