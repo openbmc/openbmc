@@ -32,11 +32,6 @@ pkg_postinst_${PN} () {
     TARGET="../pldmSoftPowerOff.service"
     ln -s $TARGET $LINK
 
-    mkdir -p $D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants
-    LINK="$D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants/pldmSoftPowerOff.service"
-    TARGET="../pldmSoftPowerOff.service"
-    ln -s $TARGET $LINK
-
     mkdir -p $D$systemd_system_unitdir/obmc-host-warm-reboot@0.target.requires
     LINK="$D$systemd_system_unitdir/obmc-host-warm-reboot@0.target.requires/pldmSoftPowerOff.service"
     TARGET="../pldmSoftPowerOff.service"
@@ -46,9 +41,6 @@ pkg_postinst_${PN} () {
 pkg_prerm_${PN} () {
 
     LINK="$D$systemd_system_unitdir/obmc-host-shutdown@0.target.requires/pldmSoftPowerOff.service"
-    rm $LINK
-
-    LINK="$D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants/pldmSoftPowerOff.service"
     rm $LINK
 
     LINK="$D$systemd_system_unitdir/obmc-host-warm-reboot@0.target.requires/pldmSoftPowerOff.service"
