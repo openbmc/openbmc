@@ -21,7 +21,7 @@ VERSION = "${@'-'.join(d.getVar('VERSION_ID').split('-')[0:2])}"
 BUILD_ID := "${@run_git(d, 'describe --abbrev=0')}"
 OPENBMC_TARGET_MACHINE = "${MACHINE}"
 
-OS_RELEASE_FIELDS_append = " BUILD_ID OPENBMC_TARGET_MACHINE"
+OS_RELEASE_FIELDS_append = " BUILD_ID OPENBMC_TARGET_MACHINE EXTENDED_VERSION"
 
 # Ensure the git commands run every time bitbake is invoked.
 BB_DONT_CACHE = "1"
