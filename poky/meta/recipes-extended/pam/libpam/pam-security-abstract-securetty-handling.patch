@@ -1,0 +1,203 @@
+Description: extract the securetty logic for use with the "nullok_secure" option
+ introduced in the "055_pam_unix_nullok_secure" patch.
+
+Upstream-Status: Pending
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+===================================================================
+Index: Linux-PAM-1.3.0/modules/pam_securetty/Makefile.am
+===================================================================
+--- Linux-PAM-1.3.0.orig/modules/pam_securetty/Makefile.am
++++ Linux-PAM-1.3.0/modules/pam_securetty/Makefile.am
+@@ -24,6 +24,10 @@ endif
+ securelib_LTLIBRARIES = pam_securetty.la
+ pam_securetty_la_LIBADD = $(top_builddir)/libpam/libpam.la
+ 
++pam_securetty_la_SOURCES =	\
++	pam_securetty.c		\
++	tty_secure.c
++
+ if ENABLE_REGENERATE_MAN
+ noinst_DATA = README
+ README: pam_securetty.8.xml
+Index: Linux-PAM-1.3.0/modules/pam_securetty/pam_securetty.c
+===================================================================
+--- Linux-PAM-1.3.0.orig/modules/pam_securetty/pam_securetty.c
++++ Linux-PAM-1.3.0/modules/pam_securetty/pam_securetty.c
+@@ -1,7 +1,5 @@
+ /* pam_securetty module */
+ 
+-#define SECURETTY_FILE "/etc/securetty"
+-#define TTY_PREFIX     "/dev/"
+ #define CMDLINE_FILE   "/proc/cmdline"
+ #define CONSOLEACTIVE_FILE	"/sys/class/tty/console/active"
+ 
+@@ -40,6 +38,9 @@
+ #include <security/pam_modutil.h>
+ #include <security/pam_ext.h>
+ 
++extern int _pammodutil_tty_secure(const pam_handle_t *pamh,
++                                  const char *uttyname);
++
+ #define PAM_DEBUG_ARG       0x0001
+ #define PAM_NOCONSOLE_ARG   0x0002
+ 
+@@ -73,11 +74,7 @@ securetty_perform_check (pam_handle_t *p
+     const char *username;
+     const char *uttyname;
+     const void *void_uttyname;
+-    char ttyfileline[256];
+-    char ptname[256];
+-    struct stat ttyfileinfo;
+     struct passwd *user_pwd;
+-    FILE *ttyfile;
+ 
+     /* log a trail for debugging */
+     if (ctrl & PAM_DEBUG_ARG) {
+@@ -105,50 +102,7 @@ securetty_perform_check (pam_handle_t *p
+ 	return PAM_SERVICE_ERR;
+     }
+ 
+-    /* The PAM_TTY item may be prefixed with "/dev/" - skip that */
+-    if (strncmp(TTY_PREFIX, uttyname, sizeof(TTY_PREFIX)-1) == 0) {
+-	uttyname += sizeof(TTY_PREFIX)-1;
+-    }
+-
+-    if (stat(SECURETTY_FILE, &ttyfileinfo)) {
+-	pam_syslog(pamh, LOG_NOTICE, "Couldn't open %s: %m", SECURETTY_FILE);
+-	return PAM_SUCCESS; /* for compatibility with old securetty handling,
+-			       this needs to succeed.  But we still log the
+-			       error. */
+-    }
+-
+-    if ((ttyfileinfo.st_mode & S_IWOTH) || !S_ISREG(ttyfileinfo.st_mode)) {
+-	/* If the file is world writable or is not a
+-	   normal file, return error */
+-	pam_syslog(pamh, LOG_ERR,
+-		   "%s is either world writable or not a normal file",
+-		   SECURETTY_FILE);
+-	return PAM_AUTH_ERR;
+-    }
+-
+-    ttyfile = fopen(SECURETTY_FILE,"r");
+-    if (ttyfile == NULL) { /* Check that we opened it successfully */
+-	pam_syslog(pamh, LOG_ERR, "Error opening %s: %m", SECURETTY_FILE);
+-	return PAM_SERVICE_ERR;
+-    }
+-
+-    if (isdigit(uttyname[0])) {
+-	snprintf(ptname, sizeof(ptname), "pts/%s", uttyname);
+-    } else {
+-	ptname[0] = '\0';
+-    }
+-
+-    retval = 1;
+-
+-    while ((fgets(ttyfileline, sizeof(ttyfileline)-1, ttyfile) != NULL)
+-	   && retval) {
+-	if (ttyfileline[strlen(ttyfileline) - 1] == '\n')
+-	    ttyfileline[strlen(ttyfileline) - 1] = '\0';
+-
+-	retval = ( strcmp(ttyfileline, uttyname)
+-		   && (!ptname[0] || strcmp(ptname, uttyname)) );
+-    }
+-    fclose(ttyfile);
++    retval = _pammodutil_tty_secure(pamh, uttyname);
+ 
+     if (retval && !(ctrl & PAM_NOCONSOLE_ARG)) {
+         FILE *cmdlinefile;
+Index: Linux-PAM-1.3.0/modules/pam_securetty/tty_secure.c
+===================================================================
+--- /dev/null
++++ Linux-PAM-1.3.0/modules/pam_securetty/tty_secure.c
+@@ -0,0 +1,90 @@
++/*
++ * A function to determine if a particular line is in /etc/securetty
++ */
++
++
++#define SECURETTY_FILE "/etc/securetty"
++#define TTY_PREFIX     "/dev/"
++
++/* This function taken out of pam_securetty by Sam Hartman
++ * <hartmans@debian.org>*/
++/*
++ * by Elliot Lee <sopwith@redhat.com>, Red Hat Software.
++ * July 25, 1996.
++ * Slight modifications AGM. 1996/12/3
++ */
++
++#include <unistd.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <security/pam_modules.h>
++#include <stdarg.h>
++#include <syslog.h>
++#include <sys/syslog.h>
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++#include <ctype.h>
++#include <security/pam_modutil.h>
++#include <security/pam_ext.h>
++
++extern int _pammodutil_tty_secure(const pam_handle_t *pamh,
++                                  const char *uttyname);
++
++int _pammodutil_tty_secure(const pam_handle_t *pamh, const char *uttyname)
++{
++    int retval = PAM_AUTH_ERR;
++    char ttyfileline[256];
++    char ptname[256];
++    struct stat ttyfileinfo;
++    FILE *ttyfile;
++    /* The PAM_TTY item may be prefixed with "/dev/" - skip that */
++    if (strncmp(TTY_PREFIX, uttyname, sizeof(TTY_PREFIX)-1) == 0)
++	uttyname += sizeof(TTY_PREFIX)-1;
++
++    if (stat(SECURETTY_FILE, &ttyfileinfo)) {
++	pam_syslog(pamh, LOG_NOTICE, "Couldn't open %s: %m",
++	           SECURETTY_FILE);
++	return PAM_SUCCESS; /* for compatibility with old securetty handling,
++			       this needs to succeed.  But we still log the
++			       error. */
++    }
++
++    if ((ttyfileinfo.st_mode & S_IWOTH) || !S_ISREG(ttyfileinfo.st_mode)) {
++	/* If the file is world writable or is not a
++	   normal file, return error */
++	pam_syslog(pamh, LOG_ERR,
++	           "%s is either world writable or not a normal file",
++	           SECURETTY_FILE);
++	return PAM_AUTH_ERR;
++    }
++
++    ttyfile = fopen(SECURETTY_FILE,"r");
++    if(ttyfile == NULL) { /* Check that we opened it successfully */
++	pam_syslog(pamh, LOG_ERR, "Error opening %s: %m", SECURETTY_FILE);
++	return PAM_SERVICE_ERR;
++    }
++
++    if (isdigit(uttyname[0])) {
++	snprintf(ptname, sizeof(ptname), "pts/%s", uttyname);
++    } else {
++	ptname[0] = '\0';
++    }
++
++    retval = 1;
++
++    while ((fgets(ttyfileline,sizeof(ttyfileline)-1, ttyfile) != NULL) 
++	   && retval) {
++	if(ttyfileline[strlen(ttyfileline) - 1] == '\n')
++	    ttyfileline[strlen(ttyfileline) - 1] = '\0';
++	retval = ( strcmp(ttyfileline,uttyname)
++	           && (!ptname[0] || strcmp(ptname, uttyname)) );
++    }
++    fclose(ttyfile);
++
++    if(retval) {
++	retval = PAM_AUTH_ERR;
++    }
++
++    return retval;
++}

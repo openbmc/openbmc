@@ -21,11 +21,13 @@ SRC_URI = "https://github.com/linux-pam/linux-pam/releases/download/v${PV}/Linux
            file://pam.d/common-session-noninteractive \
            file://pam.d/other \
            file://libpam-xtests.patch \
-           file://0001-modules-pam_namespace-Makefile.am-correctly-install-.patch \
-           file://0001-Makefile.am-support-usrmage.patch \
-           "
+           file://pam-security-abstract-securetty-handling.patch \
+           file://pam-unix-nullok-secure.patch \
+           file://crypt_configure.patch \
+          "
 
-SRC_URI[sha256sum] = "201d40730b1135b1b3cdea09f2c28ac634d73181ccd0172ceddee3649c5792fc"
+SRC_URI[md5sum] = "558ff53b0fc0563ca97f79e911822165"
+SRC_URI[sha256sum] = "eff47a4ecd833fbf18de9686632a70ee8d0794b79aecb217ebd0ce11db4cd0db"
 
 DEPENDS = "bison-native flex flex-native cracklib libxml2-native virtual/crypt"
 
@@ -33,14 +35,13 @@ EXTRA_OECONF = "--includedir=${includedir}/security \
                 --libdir=${base_libdir} \
                 --disable-nis \
                 --disable-regenerate-docu \
-                --disable-doc \
 		--disable-prelude"
 
 CFLAGS_append = " -fPIC "
 
 S = "${WORKDIR}/Linux-PAM-${PV}"
 
-inherit autotools gettext pkgconfig systemd
+inherit autotools gettext pkgconfig
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[audit] = "--enable-audit,--disable-audit,audit,"
@@ -49,7 +50,7 @@ PACKAGECONFIG[userdb] = "--enable-db=db,--enable-db=no,db,"
 PACKAGES += "${PN}-runtime ${PN}-xtests"
 FILES_${PN} = "${base_libdir}/lib*${SOLIBS}"
 FILES_${PN}-dev += "${base_libdir}/security/*.la ${base_libdir}/*.la ${base_libdir}/lib*${SOLIBSDEV}"
-FILES_${PN}-runtime = "${sysconfdir} ${sbindir} ${systemd_system_unitdir}"
+FILES_${PN}-runtime = "${sysconfdir}"
 FILES_${PN}-xtests = "${datadir}/Linux-PAM/xtests"
 
 PACKAGES_DYNAMIC += "^${MLPREFIX}pam-plugin-.*"
@@ -72,10 +73,11 @@ RDEPENDS_${PN}-runtime = "${PN}-${libpam_suffix} \
 RDEPENDS_${PN}-xtests = "${PN}-${libpam_suffix} \
     ${MLPREFIX}pam-plugin-access-${libpam_suffix} \
     ${MLPREFIX}pam-plugin-debug-${libpam_suffix} \
+    ${MLPREFIX}pam-plugin-cracklib-${libpam_suffix} \
     ${MLPREFIX}pam-plugin-pwhistory-${libpam_suffix} \
     ${MLPREFIX}pam-plugin-succeed-if-${libpam_suffix} \
     ${MLPREFIX}pam-plugin-time-${libpam_suffix} \
-    bash coreutils"
+    coreutils"
 
 # FIXME: Native suffix breaks here, disable it for now
 RRECOMMENDS_${PN} = "${PN}-runtime-${libpam_suffix}"

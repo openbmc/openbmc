@@ -1,0 +1,40 @@
+From b86575ab4a0df07da160283459da270e1c0372a0 Mon Sep 17 00:00:00 2001
+From: "Maxin B. John" <maxin.john@intel.com>
+Date: Tue, 24 May 2016 14:11:09 +0300
+Subject: [PATCH] crypt_configure
+
+This patch fixes a case where it find crypt defined in libc (musl) but
+not in specified libraries then it ends up assigning
+LIBCRYPT="-l" which then goes into makefile cause all sort of problems
+e.g.
+
+ld: cannot find -l-m32
+| collect2: error: ld returned 1 exit status
+The reason is that -l appears on commandline with
+out any library and compiler treats the next argument as library name
+whatever it is.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Maxin B. John <maxin.john@intel.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index df39d07..e68d856 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -401,7 +401,7 @@ AS_IF([test "x$ac_cv_header_xcrypt_h" = "xyes"],
+   [crypt_libs="crypt"])
+ 
+ BACKUP_LIBS=$LIBS
+-AC_SEARCH_LIBS([crypt],[$crypt_libs], LIBCRYPT="${ac_lib:+-l$ac_lib}", LIBCRYPT="")
++AC_SEARCH_LIBS([crypt],[$crypt_libs], [test "$ac_cv_search_crypt" = "none required" || LIBCRYPT="$ac_cv_search_crypt"])
+ AC_CHECK_FUNCS(crypt_r crypt_gensalt_r)
+ LIBS=$BACKUP_LIBS
+ AC_SUBST(LIBCRYPT)
+-- 
+2.4.0
+
