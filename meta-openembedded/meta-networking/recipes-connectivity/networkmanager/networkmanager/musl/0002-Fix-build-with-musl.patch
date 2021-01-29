@@ -1,7 +1,12 @@
-From 877fbb4e848629ff57371b5bdb0d56369abe9d81 Mon Sep 17 00:00:00 2001
+From bacc14089c80ec757025789ff054a05e1f9c088d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Mon, 8 Apr 2019 23:10:43 +0200
 Subject: [PATCH] Fix build with musl
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -42,7 +47,7 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  5 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/clients/tui/nmt-device-entry.c b/clients/tui/nmt-device-entry.c
-index 4ab5932..915248c 100644
+index 692a467..cf9b32e 100644
 --- a/clients/tui/nmt-device-entry.c
 +++ b/clients/tui/nmt-device-entry.c
 @@ -26,7 +26,6 @@
@@ -54,11 +59,11 @@ index 4ab5932..915248c 100644
  #include "nmtui.h"
  
 diff --git a/libnm-core/nm-utils.h b/libnm-core/nm-utils.h
-index 5418a1e..f492da6 100644
+index 9589c51..b82c5cf 100644
 --- a/libnm-core/nm-utils.h
 +++ b/libnm-core/nm-utils.h
 @@ -10,6 +10,10 @@
- #error "Only <NetworkManager.h> can be included directly."
+     #error "Only <NetworkManager.h> can be included directly."
  #endif
  
 +/* include as early as possible for musl */
@@ -69,10 +74,10 @@ index 5418a1e..f492da6 100644
  
  #include <netinet/in.h>
 diff --git a/shared/nm-default.h b/shared/nm-default.h
-index ace6ede..25357da 100644
+index b322f1d..c287dbe 100644
 --- a/shared/nm-default.h
 +++ b/shared/nm-default.h
-@@ -182,6 +182,9 @@
+@@ -178,6 +178,9 @@
  #endif
  
  #include <stdlib.h>
@@ -83,7 +88,7 @@ index ace6ede..25357da 100644
  /*****************************************************************************/
  
 diff --git a/src/devices/nm-device.c b/src/devices/nm-device.c
-index 3bbc975..4e8a3f6 100644
+index 0be05f2..04061f9 100644
 --- a/src/devices/nm-device.c
 +++ b/src/devices/nm-device.c
 @@ -9,6 +9,7 @@
@@ -100,10 +105,10 @@ index 3bbc975..4e8a3f6 100644
  #include <linux/if_addr.h>
 -#include <linux/if_arp.h>
  #include <linux/rtnetlink.h>
- #include <linux/pkt_sched.h>
  
+ #include "nm-std-aux/unaligned.h"
 diff --git a/src/platform/nm-linux-platform.c b/src/platform/nm-linux-platform.c
-index 7abe4df..9f53147 100644
+index b377c85..87af59a 100644
 --- a/src/platform/nm-linux-platform.c
 +++ b/src/platform/nm-linux-platform.c
 @@ -14,7 +14,6 @@

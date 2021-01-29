@@ -1,0 +1,20 @@
+From f3713628fac72e45223013dcf8e37ac65d17d886 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 11 Jan 2021 15:16:57 -0800
+Subject: [PATCH] patch term module for mips ispeed/ospeed termios absense
+
+Upstream-Status: OE-Specific [needed on mips]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ go.mod | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/go.mod
++++ b/go.mod
+@@ -54,3 +54,5 @@ require (
+ 	gonum.org/v1/gonum v0.6.0 // indirect
+ 	google.golang.org/grpc v1.26.0
+ )
++
++replace github.com/pkg/term => github.com/kraj/term v0.0.0-20210111231523-7c42fcb0e627

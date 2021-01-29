@@ -1,13 +1,31 @@
+From b394003d31a7187767b7d6cc7b871968d2674be9 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Fri, 22 Jan 2021 11:41:12 +0200
+Subject: [PATCH] setup.py: Adjust _add_rpath
+
+Fix error: unrecognized command-line option '-R'
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ setup.py | 3 ---
+ 1 file changed, 3 deletions(-)
+
 diff --git a/setup.py b/setup.py
-index d243eaa..98099bc 100755
+index 22f582d..2d28655 100755
 --- a/setup.py
 +++ b/setup.py
-@@ -192,8 +192,6 @@ def _add_rpath(settings, path):
+@@ -231,9 +231,6 @@ def _add_rpath(settings, path):
      """
      if sys.platform == 'darwin':
-         settings['extra_link_args'].extend(['-Wl,-rpath','-Wl,%s' % path])
+         settings['extra_link_args'].extend(['-Wl,-rpath', '-Wl,%s' % path])
 -    else:
 -        settings['runtime_library_dirs'].append(path)
+-
  
  def settings_from_prefix(prefix=None, bundle_libzmq_dylib=False):
      """load appropriate library/include settings from ZMQ prefix"""
+-- 
+2.17.1
+

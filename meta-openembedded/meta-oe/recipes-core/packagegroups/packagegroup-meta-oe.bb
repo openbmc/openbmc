@@ -197,6 +197,7 @@ RDEPENDS_packagegroup-meta-oe-crypto ="\
 RDEPENDS_packagegroup-meta-oe-crypto_remove_riscv32 = "botan"
 
 RDEPENDS_packagegroup-meta-oe-dbs ="\
+    influxdb \
     leveldb \
     libdbi \
     mariadb \
@@ -843,6 +844,7 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     pps-tools \
     raptor2 \
     rdfind \
+    re2 \
     sdparm \
     serial-forward \
     read-edid \

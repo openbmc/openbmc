@@ -1,0 +1,23 @@
+Origin: https://www.mail-archive.com/pld-cvs-commit@lists.pld-linux.org/msg461494.html
+From 80bfab5ec8575703ef26b442a3af2d030793ebde Mon Sep 17 00:00:00 2001
+From: =?utf8?q?Jan=20R=C4=99korajski?= <baggins@pld-linux.org>
+Date: Thu, 24 Dec 2020 23:03:55 +0100
+Subject: [PATCH] - DECLCALLBACK generates incorrect code on ix86, remove it
+
+---
+ kernel-5.10.patch | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel-5.10.patch b/kernel-5.10.patch
+index b28d6e0..729235d 100644
+--- a/src/VBox/Runtime/r0drv/linux/memobj-r0drv-linux.c
++++ b/src/VBox/Runtime/r0drv/linux/memobj-r0drv-linux.c
+@@ -536,7 +536,7 @@ typedef const LNXAPPLYPGRANGE *PCLNXAPPLYPGRANGE;
+  * @param   uAddr               The address to apply the new protection to.
+  * @param   pvUser              The opaque user data.
+  */
+-static DECLCALLBACK(int) rtR0MemObjLinuxApplyPageRange(pte_t *pPte, unsigned long uAddr, void *pvUser)
++static int rtR0MemObjLinuxApplyPageRange(pte_t *pPte, unsigned long uAddr, void *pvUser)
+ {
+     PCLNXAPPLYPGRANGE pArgs = (PCLNXAPPLYPGRANGE)pvUser;
+     PRTR0MEMOBJLNX pMemLnx = pArgs->pMemLnx;

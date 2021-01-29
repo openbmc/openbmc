@@ -7,16 +7,12 @@ SECTION = "libs"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=df52c6edb7adc22e533b2bacc3bd3915"
 
-PV = "20190808+git${SRCPV}"
-SRCREV = "aa844899c937bde5d2b24f276b59997e5b668bde"
-BRANCH = "lts_2019_08_08"
-SRC_URI = "git://github.com/abseil/abseil-cpp;branch=${BRANCH}                \
-           file://0001-Remove-maes-option-from-cross-compilation.patch        \
-           file://0002-Add-forgotten-ABSL_HAVE_VDSO_SUPPORT-conditional.patch \
-           file://0003-Add-fPIC-option.patch                                  \
-           file://0001-Add-RISCV-support-to-GetProgramCounter.patch \
-           file://0001-absl-always-use-asm-sgidefs.h.patch \
-           file://0001-Fix-build-on-riscv32.patch \
+PV = "20200923+git${SRCPV}"
+SRCREV = "6f9d96a1f41439ac172ee2ef7ccd8edf0e5d068c"
+BRANCH = "lts_2020_09_23"
+SRC_URI = "git://github.com/abseil/abseil-cpp;branch=${BRANCH}         \
+           file://0001-absl-always-use-asm-sgidefs.h.patch             \
+           file://0002-Remove-maes-option-from-cross-compilation.patch \
           "
 
 S = "${WORKDIR}/git"
@@ -28,8 +24,15 @@ ASNEEDED_class-nativesdk = ""
 
 inherit cmake
 
+EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON \
+                 -DBUILD_TESTING=OFF    \
+                "
+
 BBCLASSEXTEND = "native nativesdk"
 ALLOW_EMPTY_${PN} = "1"
+
+FILES_${PN} = "${libdir}/libabsl_*.so ${libdir}/cmake"
+FILES_${PN}-dev = "${includedir}"
 
 python () {
     arch = d.getVar("TARGET_ARCH")
@@ -55,4 +58,3 @@ python () {
             raise bb.parse.SkipRecipe("%s-%s Needs support for corei7 on x86_64" % (pkgn, pkgv))
 
 }
-

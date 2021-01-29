@@ -1,0 +1,56 @@
+Makefile.in.in: remove bashisms
+
+The brace expansion is bash specific and fails with dash.
+
+Upstream-Status: Pending [No permission to folk repo and create pull request]
+
+https://gitlab.xfce.org/apps/xfce4-panel-profiles
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ Makefile.in.in | 15 ++++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.in.in b/Makefile.in.in
+index 73338f4..e08b218 100644
+--- a/Makefile.in.in
++++ b/Makefile.in.in
+@@ -73,8 +73,11 @@ install: all xfce4-panel-profiles.1
+ 
+ 	install -d $(DESTDIR)/$(MANDIR)/man1
+ 	install xfce4-panel-profiles.1 $(DESTDIR)/$(MANDIR)/man1
+-	
+-	install -d $(DESTDIR)/$(PREFIX)/share/icons/hicolor/{128x128,48x48,16x16,scalable}/apps
++
++	install -d $(DESTDIR)/$(PREFIX)/share/icons/hicolor/128x128/apps
++	install -d $(DESTDIR)/$(PREFIX)/share/icons/hicolor/48x48/apps
++	install -d $(DESTDIR)/$(PREFIX)/share/icons/hicolor/16x16/apps
++	install -d $(DESTDIR)/$(PREFIX)/share/icons/hicolor/scalable/apps
+ 	install data/icons/128x128/org.xfce.PanelProfiles.png $(DESTDIR)/$(PREFIX)/share/icons/hicolor/128x128/apps
+ 	install data/icons/48x48/org.xfce.PanelProfiles.png $(DESTDIR)/$(PREFIX)/share/icons/hicolor/48x48/apps
+ 	install data/icons/16x16/org.xfce.PanelProfiles.png $(DESTDIR)/$(PREFIX)/share/icons/hicolor/16x16/apps
+@@ -86,7 +89,9 @@ uninstall:
+ 	rm -rf $(DESTDIR)/$(DOCDIR)
+ 	# FIXME: Uninstall locales
+ 	rm -f $(DESTDIR)/$(PREFIX)/bin/$(APPNAME)
+-	rm -rf $(DESTDIR)/$(PREFIX)/share/icons/hicolor/{128x128,48x48,16x16}/apps/org.xfce.PanelProfiles.png
++	rm -rf $(DESTDIR)/$(PREFIX)/share/icons/hicolor/128x128/apps
++	rm -rf $(DESTDIR)/$(PREFIX)/share/icons/hicolor/48x48/apps
++	rm -rf $(DESTDIR)/$(PREFIX)/share/icons/hicolor/16x16/apps
+ 	rm -rf $(DESTDIR)/$(PREFIX)/share/icons/hicolor/scalable/apps/org.xfce.PanelProfiles.svg
+ 
+ distcheck: all
+@@ -106,7 +112,9 @@ clean:
+ 	rm -f bin/$(APPNAME)
+ 	rm -f data/metainfo/org.xfce.PanelProfiles.appdata.xml
+ 	rm -f data/layouts/*.tar.bz2
+-	rm -f data/icons/{128x128,48x48,16x16}/org.xfce.panelprofiles.png
++	rm -f data/icons/128x128/org.xfce.panelprofiles.png
++	rm -f data/icons/48x48/org.xfce.panelprofiles.png
++	rm -f data/icons/16x16/org.xfce.panelprofiles.png
+ 	rm -f data/icons/scalable/org.xfce.panelprofiles.svg
+ 	rm -f org.xfce.PanelProfiles.desktop
+ 	rm -f Makefile.in
+-- 
+2.25.1
+

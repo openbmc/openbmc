@@ -8,8 +8,11 @@ inherit xfce gtk-doc gobject-introspection features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
-# TODO: Check if this can go
-SRC_URI += "file://0001-libxfce4kbd-private-xfce4-keyboard-shortcuts.xml-fix.patch"
+# TODO: Check if 0001-... can go
+SRC_URI += " \
+    file://0001-libxfce4kbd-private-xfce4-keyboard-shortcuts.xml-fix.patch \
+    file://0002-Remove-GTK2-leftovers.patch \
+"
 SRC_URI[sha256sum] = "8b06c9e94f4be88a9d87c47592411b6cbc32073e7af9cbd64c7b2924ec90ceaa"
 
 EXTRA_OECONF += "--with-vendor-info=${DISTRO}"

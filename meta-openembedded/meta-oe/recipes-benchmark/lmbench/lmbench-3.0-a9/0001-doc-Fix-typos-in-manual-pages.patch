@@ -1,0 +1,100 @@
+From a8d86a2d994a008dab3c3ecad65528c0e5fc2cba Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Fri, 22 Jan 2021 11:22:48 +0800
+Subject: [PATCH] doc: Fix typos in manual pages
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ doc/bw_mem.8     | 2 +-
+ doc/lat_fcntl.8  | 2 +-
+ doc/lat_fifo.8   | 2 +-
+ doc/lat_http.8   | 6 +++---
+ doc/lat_select.8 | 2 +-
+ doc/lat_sig.8    | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/doc/bw_mem.8 b/doc/bw_mem.8
+index 33df417..9e84d73 100644
+--- a/doc/bw_mem.8
++++ b/doc/bw_mem.8
+@@ -3,7 +3,7 @@
+ .SH NAME
+ bw_mem \- time memory bandwidth
+ .SH SYNOPSIS
+-.B bw_mem_cp
++.B bw_mem
+ [
+ .I "-P <parallelism>"
+ ]
+diff --git a/doc/lat_fcntl.8 b/doc/lat_fcntl.8
+index cf3c93e..2e501d6 100644
+--- a/doc/lat_fcntl.8
++++ b/doc/lat_fcntl.8
+@@ -3,7 +3,7 @@
+ .SH NAME
+ lat_fcntl \- fcntl file locking benchmark
+ .SH SYNOPSIS
+-.B lat_ctx 
++.B lat_fcntl
+ [
+ .I "-P <parallelism>"
+ ]
+diff --git a/doc/lat_fifo.8 b/doc/lat_fifo.8
+index 65e5a08..90bc900 100644
+--- a/doc/lat_fifo.8
++++ b/doc/lat_fifo.8
+@@ -3,7 +3,7 @@
+ .SH NAME
+ lat_fifo \- FIFO benchmark
+ .SH SYNOPSIS
+-.B lat_ctx 
++.B lat_fifo
+ [
+ .I "-P <parallelism>"
+ ]
+diff --git a/doc/lat_http.8 b/doc/lat_http.8
+index a4bb459..99c5d4a 100644
+--- a/doc/lat_http.8
++++ b/doc/lat_http.8
+@@ -1,9 +1,9 @@
+ .\" $Id$
+-.TH LAT_FCNTL 8 "$Date$" "(c)1994-2000 Carl Staelin and Larry McVoy" "LMBENCH"
++.TH LAT_HTTP 8 "$Date$" "(c)1994-2000 Carl Staelin and Larry McVoy" "LMBENCH"
+ .SH NAME
+-lat_fcntl \- fcntl file locking benchmark
++lat_http \- http GET request latency
+ .SH SYNOPSIS
+-.B lat_ctx 
++.B lat_http
+ [
+ .I "-d"
+ ]
+diff --git a/doc/lat_select.8 b/doc/lat_select.8
+index 03f83bf..e13499f 100644
+--- a/doc/lat_select.8
++++ b/doc/lat_select.8
+@@ -3,7 +3,7 @@
+ .SH NAME
+ lat_select \- select benchmark
+ .SH SYNOPSIS
+-.B lat_ctx 
++.B lat_select
+ [
+ .I "-P <parallelism>"
+ ]
+diff --git a/doc/lat_sig.8 b/doc/lat_sig.8
+index 91baf78..19a8838 100644
+--- a/doc/lat_sig.8
++++ b/doc/lat_sig.8
+@@ -3,7 +3,7 @@
+ .SH NAME
+ lat_sig \- select benchmark
+ .SH SYNOPSIS
+-.B lat_ctx 
++.B lat_sig
+ [
+ .I "-P <parallelism>"
+ ]
+-- 
+2.17.1
+

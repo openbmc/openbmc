@@ -20,7 +20,7 @@ https://github.com/blueman-project/blueman/pull/1121
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- blueman/Functions.py                   | 12 +++++++++++-
+ blueman/Functions.py                   | 10 ++++++++++
  blueman/plugins/applet/PowerManager.py |  4 ++++
  2 files changed, 15 insertions(+), 1 deletion(-)
 
@@ -28,24 +28,15 @@ diff --git a/blueman/Functions.py b/blueman/Functions.py
 index 3b76271..c5eeb27 100644
 --- a/blueman/Functions.py
 +++ b/blueman/Functions.py
-@@ -17,7 +17,7 @@
- # You should have received a copy of the GNU General Public License
- # along with this program.  If not, see <http://www.gnu.org/licenses/>.
- #
--from time import sleep
-+from time import sleep, time
- import re
- import os
- import signal
 @@ -86,6 +86,16 @@ def check_bluetooth_status(message, exitfunc):
              return
  
      applet.SetBluetoothStatus('(b)', True)
 +
-+    timeout = time() + 10
++    timeout = time.time() + 10
 +    while applet.GetRequestStatus():
-+        sleep(0.1)
-+        if time() > timeout:
++        time.sleep(0.1)
++        if time.time() > timeout:
 +            # timeout 5s has been set in applet/PowerManager.py
 +            # so it should NOT reach timeout here
 +            logging.warning('Should NOT reach timeout.')

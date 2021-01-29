@@ -1,0 +1,77 @@
+From 353e8a62bf3cb5f1b9504efa16b8b974e93cac49 Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Fri, 22 Jan 2021 10:58:41 +0800
+Subject: [PATCH] lmbench: Point webpage-lm to target directory
+
+As webpage-lm.tar has been copied to ${datadir}\lmbench.
+Plus improve 'hello' copying in lmbench script.
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ scripts/lmbench | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/scripts/lmbench b/scripts/lmbench
+index 7a52cb1..82e36b6 100755
+--- a/scripts/lmbench
++++ b/scripts/lmbench
+@@ -167,7 +167,7 @@ if [ X$BENCHMARK_OS = XYES -o X$BENCHMARK_UNIX = XYES ]; then
+ 	lat_unix -P $SYNC_MAX
+ fi
+ if [ X$BENCHMARK_OS = XYES -o X$BENCHMARK_PROC = XYES ]; then
+-	cp hello /tmp/hello
++	cp `which hello` /tmp/hello
+ 	for i in fork exec shell
+ 	do	lat_proc -P $SYNC_MAX $i
+ 	done
+@@ -237,14 +237,14 @@ fi
+ 
+ date >> ${OUTPUT}
+ echo Local networking >> ${OUTPUT}
+-if [ ! -d ../../src/webpage-lm ]
+-then	(cd ../../src && tar xf webpage-lm.tar)
++if [ ! -d /usr/share/lmbench/webpage-lm ]
++then	(cd /usr/share/lmbench && tar xf webpage-lm.tar)
+ 	sync
+ 	sleep 1
+ fi
+ SERVERS="lat_udp lat_tcp lat_rpc lat_connect bw_tcp"
+ for server in $SERVERS; do $server -s; done
+-DOCROOT=../../src/webpage-lm lmhttp 8008 &
++DOCROOT=/usr/share/lmbench/webpage-lm lmhttp 8008 &
+ sleep 2;
+ 
+ if [ X$BENCHMARK_OS = XYES -o X$BENCHMARK_UDP = XYES ]; then
+@@ -280,15 +280,15 @@ bw_tcp -S localhost
+ 
+ if [ X$BENCHMARK_OS = XYES -o X$BENCHMARK_HTTP = XYES ]; then
+ 	# I want a hot cache number
+-	lat_http localhost 8008 < ../../src/webpage-lm/URLS > /dev/null 2>&1
+-	lat_http localhost 8008 < ../../src/webpage-lm/URLS
++	lat_http localhost 8008 < /usr/share/lmbench/webpage-lm/URLS > /dev/null 2>&1
++	lat_http localhost 8008 < /usr/share/lmbench/webpage-lm/URLS
+ fi
+ lat_http -S localhost 8008
+ 
+ for remote in $REMOTE 
+ do
+ 	echo Networking to $remote >> ${OUTPUT}
+-	$RCP $SERVERS lmhttp ../../src/webpage-lm.tar ${remote}:/tmp
++	$RCP $SERVERS lmhttp /usr/share/lmbench/webpage-lm.tar ${remote}:/tmp
+ 	for server in $SERVERS
+ 	do	$RSH $remote -n /tmp/$server -s &
+ 	done
+@@ -327,8 +327,8 @@ do
+ 
+ 	if [ X$BENCHMARK_OS = XYES -o X$BENCHMARK_HTTP = XYES ]; then
+ 		# I want a hot cache number
+-		lat_http $remote 8008 < ../../src/webpage-lm/URLS > /dev/null 2>&1
+-		lat_http $remote 8008 < ../../src/webpage-lm/URLS
++		lat_http $remote 8008 < /usr/share/lmbench/webpage-lm/URLS > /dev/null 2>&1
++		lat_http $remote 8008 < /usr/share/lmbench/webpage-lm/URLS
+ 	fi
+ 	lat_http -S $remote 8008
+ 
+-- 
+2.17.1
+

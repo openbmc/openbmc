@@ -19,7 +19,7 @@ S = "${WORKDIR}/${BPN}"
 SRC_URI[md5sum] = "9de56d4a161a723228220b0f425dc711"
 SRC_URI[sha256sum] = "f0611136bee505811e9ca11ca7ac188ef5323a8e2ef19cffd3edb3cf08fd791e"
 
-inherit native texinfo
+inherit texinfo native
 
 DEPENDS += "m4-native gnu-config-native"
 RDEPENDS_${PN} = "m4-native gnu-config-native"

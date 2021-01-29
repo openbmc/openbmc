@@ -34,7 +34,7 @@ index 2fbea04..d4b9af5 100755
 +#include <stddef.h> /* for NULL */
  #include "DNSCommon.h"                  // Defines general DNS utility routines
  #include "uDNS.h"                       // Defines entry points into unicast-specific routines
- #include "nsec.h"
+
 -- 
 2.20.1
 

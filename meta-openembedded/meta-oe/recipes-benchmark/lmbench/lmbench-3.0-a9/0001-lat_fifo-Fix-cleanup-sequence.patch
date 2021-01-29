@@ -1,0 +1,42 @@
+From 78912c0ac5e090095a2f2bd6226e02cce949e72e Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Fri, 22 Jan 2021 10:03:38 +0000
+Subject: [PATCH] lat_fifo: Fix cleanup sequence
+
+Files should be unlinked after all users exit.
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ src/lat_fifo.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/lat_fifo.c b/src/lat_fifo.c
+index c625161..85bb9d1 100644
+--- a/src/lat_fifo.c
++++ b/src/lat_fifo.c
+@@ -120,16 +120,16 @@ cleanup(iter_t iterations, void * cookie)
+ 
+ 	if (iterations) return;
+ 
+-	unlink(state->filename1);
+-	unlink(state->filename2);
+-	close(state->wr);
+-	close(state->rd);
+-
+ 	if (state->pid > 0) {
+-		kill(state->pid, 15);
++		kill(state->pid, SIGKILL);
+ 		waitpid(state->pid, NULL, 0);
+ 		state->pid = 0;
+ 	}
++
++	unlink(state->filename1);
++	unlink(state->filename2);
++	close(state->wr);
++	close(state->rd);
+ }
+ 
+ void 
+-- 
+2.29.2
+

@@ -1,0 +1,36 @@
+From 139177715a2d66ccd3e099be5d9d4dc86db30055 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Tue, 12 Jan 2021 03:05:38 +0000
+Subject: [PATCH] test: avoid the pfa test hang
+
+Per [1], the pfa test needs to install page-types and the pfa test
+will hang forever if there is no page-types installed.
+
+Improve the test script to avoid the pfa test hang.
+
+[1] https://git.kernel.org/pub/scm/utils/cpu/mce/mcelog.git/tree/tests/pfa/PFA_test_howto?id=7b776a8c005b60572f49797e81287540f99fff1f
+
+Upstream-Status: Submitted [https://github.com/andikleen/mcelog/pull/87]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ tests/test | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/test b/tests/test
+index 9623f4a..7c552a9 100755
+--- a/tests/test
++++ b/tests/test
+@@ -45,6 +45,9 @@ for conf in `ls *.conf`
+ do
+ 	log=`echo $conf | sed "s/conf/log/g"`
+ 	./inject $conf
++	if [ "$1" = "pfa" ] ; then
++		which page-types > /dev/null 2>&1 || continue
++	fi
+ 	$D ../../mcelog --foreground --daemon --debug-numerrors --config $conf --logfile $log >> result
+ 
+ 	# let triggers finish
+-- 
+2.29.2
+

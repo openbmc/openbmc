@@ -112,6 +112,7 @@ RDEPENDS_packagegroup-meta-networking-filter = "\
     libnftnl \
     conntrack-tools \
     ebtables \
+    ipset \
     libnetfilter-acct \
     libnetfilter-conntrack \
     libnetfilter-cthelper \

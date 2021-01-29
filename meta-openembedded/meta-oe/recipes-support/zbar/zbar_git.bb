@@ -1,31 +1,59 @@
-DESCRIPTION = "2D barcode scanner toolkit."
+HOMEPAGE = "https://github.com/mchehab/zbar"
+SUMMARY = "A bar code library"
+DESRIPTION = "ZBar is an open source software suite for reading bar codes \
+from various sources, such as video streams, image files and raw \
+intensity sensors. It supports EAN-13/UPC-A, UPC-E, EAN-8, Code 128, \
+Code 93, Code 39, Codabar, Interleaved 2 of 5, QR Code and SQ Code"
 SECTION = "graphics"
+
 LICENSE = "LGPL-2.1"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=5e9ee833a2118adc7d8b5ea38e5b1cef"
 
-DEPENDS = "pkgconfig intltool-native libpng jpeg"
-
-LIC_FILES_CHKSUM = "file://COPYING;md5=4015840237ca7f0175cd626f78714ca8"
-
-PV = "0.10+git${SRCPV}"
-
-#  iPhoneSDK-1.3.1 tag
-SRCREV = "67003d2a985b5f9627bee2d8e3e0b26d0c474b57"
-SRC_URI = "git://github.com/ZBar/Zbar \
-           file://0001-make-relies-GNU-extentions.patch \
+SRC_URI = "git://github.com/mchehab/zbar.git;branch=master \
+           file://0001-qt-Create-subdir-in-Makefile.patch \
+           file://0002-zbarcam-Create-subdir-in-Makefile.patch \
 "
+SRCREV = "89e7900d85dd54ef351a7ed582aec6a5a5d7fa37"
+
 S = "${WORKDIR}/git"
+PV = "0.23.1+git${SRCPV}"
 
-inherit autotools pkgconfig
+DEPENDS += "xmlto-native"
 
-PACKAGECONFIG = "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
+PACKAGECONFIG ??= "\
+        ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
+"
 
-PACKAGECONFIG[x11] = "--with-x,-without-x,libxcb libx11 libsm libxau libxext libxv libice libxdmcp"
+PACKAGECONFIG ??= "video python3"
 
-EXTRA_OECONF = "--without-imagemagick --without-qt --without-python --disable-video --without-gtk"
+inherit autotools pkgconfig gettext \
+        ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'python3native', '', d)} \
+        ${@bb.utils.contains('PACKAGECONFIG', 'gtk3', 'gobject-introspection',	'', d)} \
+        ${@bb.utils.contains('PACKAGECONFIG', 'qt5', 'qmake5_paths', '', d)}
 
-CPPFLAGS += "-Wno-error"
+PACKAGECONFIG[x11] = "--with-x, --without-x, libxv"
+PACKAGECONFIG[video] = "--enable-video, --disable-video, v4l-utils libv4l"
+PACKAGECONFIG[jpeg] = "--with-jpeg, --without-jpeg, jpeg"
+PACKAGECONFIG[python3] = "--with-python=auto, --without-python, python3"
+PACKAGECONFIG[gtk3] = "--with-gtk=gtk3, --without-gtk, gtk+3"
+PACKAGECONFIG[qt5] = "--with-qt5, --without-qt5, qtbase qtbase-native qtx11extras qtsvg, qtbase"
+PACKAGECONFIG[imagemagick] = "--with-imagemagick, --without-imagemagick, imagemagick"
 
-do_install_append() {
-    #remove usr/bin if empty
-    rmdir ${D}${bindir}
+FILES_${PN} += "${bindir} \
+        ${@bb.utils.contains('DEPENDS', 'python3-native', '${libdir}', '', d)} \
+"
+
+CPPFLAGS_append = "\
+        ${@bb.utils.contains('PACKAGECONFIG', 'qt5', '\
+        -I${STAGING_INCDIR}/QtX11Extras \
+        -I${STAGING_INCDIR}/dbus-1.0 \
+        -I${STAGING_LIBDIR}/dbus-1.0/include \
+        ', '', d)} \
+"
+
+TARGET_CXXFLAGS_append = " -fPIC"
+
+do_prepare_recipe_sysroot_gettext() {
+        install -m 755 ${STAGING_DATADIR_NATIVE}/gettext/ABOUT-NLS ${S}/
 }
+addtask do_prepare_recipe_sysroot_gettext after do_prepare_recipe_sysroot before do_configure

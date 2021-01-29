@@ -40,7 +40,7 @@ CCACHE = ""
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)} des"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)} des smux"
 PACKAGECONFIG[elfutils] = "--with-elf, --without-elf, elfutils"
 PACKAGECONFIG[libnl] = "--with-nl, --without-nl, libnl"
 
@@ -49,6 +49,7 @@ PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,,"
 PACKAGECONFIG[perl] = "--enable-embedded-perl --with-perl-modules=yes, --disable-embedded-perl --with-perl-modules=no,\
                        perl,"
 PACKAGECONFIG[des] = "--enable-des,--disable-des"
+PACKAGECONFIG[smux] = ""
 
 EXTRA_OECONF = "--enable-shared \
                 --disable-manuals \
@@ -57,10 +58,11 @@ EXTRA_OECONF = "--enable-shared \
                 --with-persistent-directory=${localstatedir}/lib/net-snmp \
                 ${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '--with-endianness=little', '--with-endianness=big', d)} \
                 --with-openssl=${STAGING_EXECPREFIXDIR} \
+                --with-mib-modules='${MIB_MODULES}' \
 "
 
-# net-snmp needs to have mib-modules=smux enabled to enable quagga to support snmp
-EXTRA_OECONF += "--with-mib-modules=smux"
+MIB_MODULES = ""
+MIB_MODULES_append = " ${@bb.utils.filter('PACKAGECONFIG', 'smux', d)}"
 
 CACHED_CONFIGUREVARS = " \
     ac_cv_header_valgrind_valgrind_h=no \

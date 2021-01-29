@@ -1,6 +1,6 @@
 require dfu-util_${PV}.bb
 
-inherit native deploy
+inherit deploy native
 
 DEPENDS = "libusb1-native"
 

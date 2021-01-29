@@ -6,8 +6,7 @@ SECTION = "net"
 
 DEPENDS = "file"
 
-SRC_URI = "${GNU_MIRROR}/libmicrohttpd/${BPN}-${PV}.tar.gz \
-"
+SRC_URI = "${GNU_MIRROR}/libmicrohttpd/${BPN}-${PV}.tar.gz"
 SRC_URI[md5sum] = "2a286193af88ab2ae3149748d4b46187"
 SRC_URI[sha256sum] = "0ae825f8e0d7f41201fd44a0df1cf454c1cb0bc50fe9d59c26552260264c2ff8"
 
@@ -28,3 +27,5 @@ PACKAGECONFIG[https] = "--enable-https,--disable-https,libgcrypt gnutls,"
 do_compile_append() {
     sed -i s:-L${STAGING_LIBDIR}::g libmicrohttpd.pc
 }
+
+BBCLASSEXTEND = "native nativesdk"

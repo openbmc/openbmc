@@ -1,7 +1,12 @@
-From e7ed91c48e1a07527a860637a7865eb67ce34cf3 Mon Sep 17 00:00:00 2001
+From 9597122867c22e949ef3b69c779e0facebce6eb5 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Tue, 2 Apr 2019 01:34:35 +0200
 Subject: [PATCH] Fix build with musl - systemd specific
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -23,7 +28,7 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  6 files changed, 27 insertions(+), 23 deletions(-)
 
 diff --git a/shared/systemd/src/basic/in-addr-util.c b/shared/systemd/src/basic/in-addr-util.c
-index 91d687c..8388304 100644
+index 1ea3e7f..1204393 100644
 --- a/shared/systemd/src/basic/in-addr-util.c
 +++ b/shared/systemd/src/basic/in-addr-util.c
 @@ -15,6 +15,7 @@
@@ -32,10 +37,10 @@ index 91d687c..8388304 100644
  #include "parse-util.h"
 +#include "string-util.h"
  #include "random-util.h"
+ #include "string-util.h"
  #include "strxcpyx.h"
- #include "util.h"
 diff --git a/shared/systemd/src/basic/process-util.c b/shared/systemd/src/basic/process-util.c
-index 1456167..42f51a0 100644
+index 03ca04e..be8bca8 100644
 --- a/shared/systemd/src/basic/process-util.c
 +++ b/shared/systemd/src/basic/process-util.c
 @@ -17,6 +17,9 @@
@@ -48,7 +53,7 @@ index 1456167..42f51a0 100644
  #if 0 /* NM_IGNORED */
  #if HAVE_VALGRIND_VALGRIND_H
  #include <valgrind/valgrind.h>
-@@ -1123,11 +1126,13 @@ void reset_cached_pid(void) {
+@@ -1152,11 +1155,13 @@ void reset_cached_pid(void) {
          cached_pid = CACHED_PID_UNSET;
  }
  
@@ -62,7 +67,7 @@ index 1456167..42f51a0 100644
  
  pid_t getpid_cached(void) {
          static bool installed = false;
-@@ -1156,7 +1161,11 @@ pid_t getpid_cached(void) {
+@@ -1185,7 +1190,11 @@ pid_t getpid_cached(void) {
                           * only half-documented (glibc doesn't document it but LSB does — though only superficially)
                           * we'll check for errors only in the most generic fashion possible. */
  
@@ -75,7 +80,7 @@ index 1456167..42f51a0 100644
                                  cached_pid = CACHED_PID_UNSET;
                                  return new_pid;
 diff --git a/shared/systemd/src/basic/socket-util.h b/shared/systemd/src/basic/socket-util.h
-index a0886e0..da47d14 100644
+index 1ece911..290e94c 100644
 --- a/shared/systemd/src/basic/socket-util.h
 +++ b/shared/systemd/src/basic/socket-util.h
 @@ -14,6 +14,12 @@
@@ -92,7 +97,7 @@ index a0886e0..da47d14 100644
  #include "missing_socket.h"
  #include "sparse-endian.h"
 diff --git a/shared/systemd/src/basic/sort-util.h b/shared/systemd/src/basic/sort-util.h
-index e029f86..1e8b6e1 100644
+index a8dc3bb..ff0aa88 100644
 --- a/shared/systemd/src/basic/sort-util.h
 +++ b/shared/systemd/src/basic/sort-util.h
 @@ -5,15 +5,10 @@
@@ -115,9 +120,9 @@ index e029f86..1e8b6e1 100644
  
  /**
   * Normal bsearch requires base to be nonnull. Here were require
-@@ -54,17 +49,3 @@ static inline void qsort_safe(void *base, size_t nmemb, size_t size, __compar_fn
+@@ -54,17 +49,3 @@ static inline void _qsort_safe(void *base, size_t nmemb, size_t size, __compar_f
                  int (*_func_)(const typeof(p[0])*, const typeof(p[0])*) = func; \
-                 qsort_safe((p), (n), sizeof((p)[0]), (__compar_fn_t) _func_); \
+                 _qsort_safe((p), (n), sizeof((p)[0]), (__compar_fn_t) _func_); \
          })
 -
 -static inline void qsort_r_safe(void *base, size_t nmemb, size_t size, __compar_d_fn_t compar, void *userdata) {
@@ -148,7 +153,7 @@ index c3b9448..e80a938 100644
  #include <stdio.h>
  #include <sys/types.h>
 diff --git a/shared/systemd/src/basic/string-util.h b/shared/systemd/src/basic/string-util.h
-index 04cc82b..2cf589a 100644
+index cefbda3..71e4dec 100644
 --- a/shared/systemd/src/basic/string-util.h
 +++ b/shared/systemd/src/basic/string-util.h
 @@ -26,6 +26,11 @@
@@ -161,5 +166,5 @@ index 04cc82b..2cf589a 100644
 +#endif
 +
  int strcmp_ptr(const char *a, const char *b) _pure_;
+ int strcasecmp_ptr(const char *a, const char *b) _pure_;
  
- static inline bool streq_ptr(const char *a, const char *b) {

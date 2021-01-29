@@ -1,0 +1,27 @@
+reallocarray() is coming from stdlib.h which maybe indirectly included
+by malloc.h but not on all libc implementations
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/meson.build
++++ b/meson.build
+@@ -114,7 +114,7 @@ config_h.set10('HAVE_GETRANDOM', use_sys
+                                                                                      #include <sys/wait.h>'''))
+ config_h.set('HAVE_SECURE_GETENV', cc.has_function('secure_getenv'))
+ config_h.set('HAVE___SECURE_GETENV', cc.has_function('__secure_getenv'))
+-config_h.set10('HAVE_DECL_REALLOCARRAY', cc.has_function('reallocarray', prefix: '#include <malloc.h>'))
++config_h.set10('HAVE_DECL_REALLOCARRAY', cc.has_function('reallocarray', prefix: '#include <stdlib.h>'))
+ config_h.set10('HAVE_DECL_EXPLICIT_BZERO', cc.has_function('explicit_bzero', prefix: '#include <string.h>'))
+ config_h.set10('HAVE_DECL_MEMFD_CREATE', cc.has_function('memfd_create', prefix: '#include <sys/mman.h>'))
+ 
+--- a/configure.ac
++++ b/configure.ac
+@@ -82,7 +82,7 @@ AC_CHECK_DECLS([
+ AC_CHECK_DECLS([
+ 	reallocarray],
+ 	[], [], [[
+-#include <malloc.h>
++#include <stdlib.h>
+ ]])
+ 
+ AC_CHECK_DECLS([

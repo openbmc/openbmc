@@ -6,6 +6,7 @@ HOMEPAGE = "http://mcelog.org/"
 SECTION = "System Environment/Base"
 
 SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mcelog.git;protocol=http; \
+    file://0001-test-avoid-the-pfa-test-hang.patch \
     file://run-ptest \
 "
 
