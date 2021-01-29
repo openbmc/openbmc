@@ -13,4 +13,4 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 # Source code repository
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-backup.git"
-SRCREV  = "dd29c8bdc222de004284faba37d278f8c443b531"
+SRCREV  = "1cb990bb16708ad488980d907387bd3e4d37eb3a"
