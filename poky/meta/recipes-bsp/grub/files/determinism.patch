@@ -1,0 +1,56 @@
+The output in moddep.lst generated from syminfo.lst using genmoddep.awk is
+not deterministic since the order of the dependencies on each line can vary
+depending on how awk sorts the values in the array.
+
+Be deterministic in the output by sorting the dependencies on each line.
+
+Also, the output of the SOURCES lines in grub-core/Makefile.core.am, generated
+from grub-core/Makefile.core.def with gentpl.py is not deterministic due to
+missing sorting of the list used to generate it. Add such a sort.
+
+Also ensure the generated unidata.c file is deterministic by sorting the
+keys of the dict.
+
+Upstream-Status: Pending
+Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: grub-2.04/grub-core/genmoddep.awk
+===================================================================
+--- grub-2.04.orig/grub-core/genmoddep.awk
++++ grub-2.04/grub-core/genmoddep.awk
+@@ -59,7 +59,9 @@ END {
+     }
+     modlist = ""
+     depcount[mod] = 0
+-    for (depmod in uniqmods) {
++    n = asorti(uniqmods, w)
++    for (i = 1; i <= n; i++) {
++      depmod = w[i]
+       modlist = modlist " " depmod;
+       inverse_dependencies[depmod] = inverse_dependencies[depmod] " " mod
+       depcount[mod]++
+Index: grub-2.04/gentpl.py
+===================================================================
+--- grub-2.04.orig/gentpl.py
++++ grub-2.04/gentpl.py
+@@ -568,6 +568,7 @@ def foreach_platform_value(defn, platfor
+     for group in RMAP[platform]:
+         for value in defn.find_all(group + suffix):
+             r.append(closure(value))
++    r.sort()
+     return ''.join(r)
+ 
+ def platform_conditional(platform, closure):
+Index: grub-2.04/util/import_unicode.py
+===================================================================
+--- grub-2.04.orig/util/import_unicode.py
++++ grub-2.04/util/import_unicode.py
+@@ -174,7 +174,7 @@ infile.close ()
+ 
+ outfile.write ("struct grub_unicode_arabic_shape grub_unicode_arabic_shapes[] = {\n ")
+ 
+-for x in arabicsubst:
++for x in sorted(arabicsubst):
+     try:
+         if arabicsubst[x]['join'] == "DUAL":
+             outfile.write ("{0x%x, 0x%x, 0x%x, 0x%x, 0x%x},\n " % (arabicsubst[x][0], arabicsubst[x][1], arabicsubst[x][2], arabicsubst[x][3], arabicsubst[x][4]))

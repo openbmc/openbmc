@@ -99,6 +99,11 @@ do_configure_prepend() {
 	sed -ri "s#lib/${LLVM_DIR}#${baselib}/${LLVM_DIR}#g" ${S}/tools/llvm-config/llvm-config.cpp
 }
 
+# patch out build host paths for reproducibility
+do_compile_prepend_class-target() {
+        sed -i -e "s,${WORKDIR},,g" ${B}/tools/llvm-config/BuildVariables.inc
+}
+
 do_compile() {
 	ninja -v ${PARALLEL_MAKE}
 }

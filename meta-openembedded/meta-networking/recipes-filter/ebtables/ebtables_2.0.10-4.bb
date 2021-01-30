@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=53b4a999993871a28ab1488fdbd2e73e"
 SECTION = "net"
 PR = "r4"
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS_${PN} += "bash netbase"
 
 RRECOMMENDS_${PN} += "kernel-module-ebtables \
     "
@@ -31,6 +31,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/ebtables/ebtables-v${PV}.tar.gz \
            file://0007-extensions-Use-stdint-types.patch \
            file://0008-ethernetdb.h-Remove-C-specific-compiler-hint-macro-_.patch \
            file://0009-ebtables-Allow-RETURN-target-rules-in-user-defined-c.patch \
+           file://0001-Makefile-do-not-install-etc-ethertypes.patch \
            "
 
 SRC_URI_append_libc-musl = " file://0010-Adjust-header-include-sequence.patch"

@@ -120,7 +120,10 @@ python split_kernel_module_packages () {
         files = d.getVar('FILES_%s' % pkg)
         files = "%s /etc/modules-load.d/%s.conf /etc/modprobe.d/%s.conf" % (files, basename, basename)
         d.setVar('FILES_%s' % pkg, files)
-        d.setVar('CONFFILES_%s' % pkg, files)
+
+        conffiles = d.getVar('CONFFILES_%s' % pkg)
+        conffiles = "%s /etc/modules-load.d/%s.conf /etc/modprobe.d/%s.conf" % (conffiles, basename, basename)
+        d.setVar('CONFFILES_%s' % pkg, conffiles)
 
         if "description" in vals:
             old_desc = d.getVar('DESCRIPTION_' + pkg) or ""

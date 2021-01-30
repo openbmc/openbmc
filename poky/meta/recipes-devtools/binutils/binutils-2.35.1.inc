@@ -16,15 +16,15 @@ def binutils_branch_version(d):
 
 # When upgrading to 2.35, please make sure there is no trailing .0, so
 # that upstream version check can work correctly.
-PV = "2.35"
-CVE_VERSION = "2.35"
+PV = "2.35.1"
+CVE_VERSION = "2.35.1"
 BINUPV = "${@binutils_branch_version(d)}"
 #BRANCH = "binutils-${BINUPV}-branch"
 BRANCH ?= "binutils-2_35-branch"
 
 UPSTREAM_CHECK_GITTAGREGEX = "binutils-(?P<pver>\d+_(\d_?)*)"
 
-SRCREV ?= "89a9065674a14a8bd94bb326b27d19a2f3583efb"
+SRCREV ?= "7e46a74aa3713c563940960e361e08defda019c2"
 BINUTILS_GIT_URI ?= "git://sourceware.org/git/binutils-gdb.git;branch=${BRANCH};protocol=git"
 SRC_URI = "\
      ${BINUTILS_GIT_URI} \
@@ -43,5 +43,6 @@ SRC_URI = "\
      file://0016-Check-for-clang-before-checking-gcc-version.patch \
      file://0017-gas-improve-reproducibility-for-stabs-debugging-data.patch \
      file://0001-aarch64-Return-an-error-on-conditional-branch-to-an-.patch \
+     file://CVE-2020-35448.patch \
 "
 S  = "${WORKDIR}/git"

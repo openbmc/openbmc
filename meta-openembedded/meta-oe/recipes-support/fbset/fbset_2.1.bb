@@ -14,7 +14,7 @@ DEPENDS = "bison-native flex-native"
 
 PR = "r4"
 
-SRC_URI = "http://ftp.debian.org/debian/pool/main/f/fbset/fbset_2.1.orig.tar.gz \
+SRC_URI = "${DEBIAN_MIRROR}/main/f/fbset/fbset_2.1.orig.tar.gz \
            file://makefile.patch \
            file://fbset-2.1-fix-makefile-dep.patch \
            file://0001-fbset-including-asm-types.h-is-needed-on-all-linux-s.patch \

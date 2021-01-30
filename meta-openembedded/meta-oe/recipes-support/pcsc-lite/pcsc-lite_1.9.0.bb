@@ -36,6 +36,7 @@ PACKAGES = "${PN} ${PN}-dbg ${PN}-dev ${PN}-lib ${PN}-doc ${PN}-spy ${PN}-spy-de
 
 RRECOMMENDS_${PN} = "ccid"
 RRECOMMENDS_${PN}_class-native = ""
+RPROVIDES_${PN}_class-native += "pcsc-lite-lib-native"
 
 FILES_${PN} = "${sbindir}/pcscd"
 FILES_${PN}-lib = "${libdir}/libpcsclite*${SOLIBS}"

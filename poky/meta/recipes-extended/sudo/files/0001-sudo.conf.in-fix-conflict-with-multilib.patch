@@ -1,0 +1,52 @@
+sudo.conf.in: fix conflict with multilib
+
+When pass ${libdir} to --libexecdir of sudo, it fails to install sudo
+and lib32-sudo at same time:
+
+| Error: Transaction test error:
+|  file /etc/sudo.conf conflicts between attempted installs of
+     sudo-1.9.3p1-r0.core2_64 and lib32-sudo-1.9.3p1-r0.core2_32
+
+Update the comments in sudo.conf.in to avoid the conflict.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Upstream-Status: Inappropriate [OE configuration specific]
+---
+ examples/sudo.conf.in | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/examples/sudo.conf.in b/examples/sudo.conf.in
+index 19e33ff..af78235 100644
+--- a/examples/sudo.conf.in
++++ b/examples/sudo.conf.in
+@@ -4,7 +4,7 @@
+ # Sudo plugins:
+ #   Plugin plugin_name plugin_path plugin_options ...
+ #
+-# The plugin_path is relative to @plugindir@ unless
++# The plugin_path is relative to $plugindir such as /usr/lib/sudo unless
+ #   fully qualified.
+ # The plugin_name corresponds to a global symbol in the plugin
+ #   that contains the plugin interface structure.
+@@ -50,7 +50,7 @@ Plugin sudoers_audit sudoers.so
+ # The compiled-in value is usually sufficient and should only be changed
+ # if you rename or move the sudo_noexec.so file.
+ #
+-#Path noexec @plugindir@/sudo_noexec.so
++#Path noexec $plugindir/sudo_noexec.so
+ 
+ #
+ # Sudo plugin directory:
+@@ -59,7 +59,7 @@ Plugin sudoers_audit sudoers.so
+ # The default directory to use when searching for plugins that are
+ # specified without a fully qualified path name.
+ #
+-#Path plugin_dir @plugindir@
++#Path plugin_dir $plugindir
+ 
+ #
+ # Sudo developer mode:
+--
+2.17.1
+

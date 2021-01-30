@@ -20,6 +20,8 @@ S = "${WORKDIR}/fuse-${PV}"
 UPSTREAM_CHECK_URI = "https://github.com/libfuse/libfuse/releases"
 UPSTREAM_CHECK_REGEX = "fuse\-(?P<pver>3(\.\d+)+).tar.xz"
 
+CVE_PRODUCT = "fuse_project:fuse"
+
 inherit meson pkgconfig ptest
 
 SRC_URI += " \

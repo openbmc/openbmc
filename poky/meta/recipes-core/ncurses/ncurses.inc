@@ -312,7 +312,7 @@ FILES_${PN}-tools = "\
 "
 
 # 'reset' is a symlink to 'tset' which is in the 'ncurses' package
-RDEPENDS_${PN}-tools = "${PN}"
+RDEPENDS_${PN}-tools = "${PN} ${PN}-terminfo-base"
 
 FILES_${PN}-terminfo = "\
   ${datadir}/terminfo \

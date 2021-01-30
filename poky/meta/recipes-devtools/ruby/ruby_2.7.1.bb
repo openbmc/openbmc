@@ -7,6 +7,7 @@ SRC_URI += " \
            file://run-ptest \
            file://0001-Modify-shebang-of-libexec-y2racc-and-libexec-racc2y.patch \
            file://CVE-2020-25613.patch \
+           file://0001-template-Makefile.in-do-not-write-host-cross-cc-item.patch \
            "
 
 SRC_URI[md5sum] = "debb9c325bf65021214451660f46e909"

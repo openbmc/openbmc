@@ -1,0 +1,35 @@
+From d3d72c9ca6a0ce2597adb02c786de28268973ccd Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 16 Dec 2020 15:49:24 +0800
+Subject: [PATCH] Makefile: do not install /etc/ethertypes
+
+The /etc/ethertypes is provided by netbase since 6.0[1].
+Do not instal the file in ebtables, otherwise there would be a conflict:
+Error: Transaction test error:
+  file /etc/ethertypes conflicts between attempted installs of netbase-1:6.2-r0.corei7_64 and ebtables-2.0.10+4-r4.corei7_64
+
+[1] https://salsa.debian.org/md/netbase/-/commit/316680c6a2c3641b6abc76b3eebf88781f609d35)
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 95651b6..85c5f98 100644
+--- a/Makefile
++++ b/Makefile
+@@ -184,7 +184,7 @@ exec: ebtables ebtables-restore
+ 	install -m 0755 ebtables-restore $(DESTDIR)$(BINDIR)/ebtables-restore
+ 
+ .PHONY: install
+-install: $(MANDIR)/man8/ebtables.8 $(DESTDIR)$(ETHERTYPESFILE) exec scripts
++install: $(MANDIR)/man8/ebtables.8 exec scripts
+ 	mkdir -p $(DESTDIR)$(LIBDIR)
+ 	install -m 0755 extensions/*.so $(DESTDIR)$(LIBDIR)
+ 	install -m 0755 *.so $(DESTDIR)$(LIBDIR)
+-- 
+2.17.1
+

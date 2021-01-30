@@ -12,6 +12,12 @@ SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://Makefile-Do-not-fail-if-CONFIG_TRACEPOINTS-is-not-en.patch \
            file://BUILD_RUNTIME_BUG_ON-vs-gcc7.patch \
            file://0001-fix-btrfs-tracepoints-output-proper-root-owner-for-t.patch \
+           file://0007-fix-objtool-Rename-frame.h-objtool.h-v5.10.patch \
+           file://0009-fix-btrfs-make-ordered-extent-tracepoint-take-btrfs_.patch \
+           file://0010-fix-ext4-fast-commit-recovery-path-v5.10.patch \
+           file://0012-fix-kvm-x86-mmu-Add-TDP-MMU-PF-handler-v5.10.patch \
+           file://0014-fix-tracepoint-Optimize-using-static_call-v5.10.patch \
+           file://0016-fix-statedump-undefined-symbols-caused-by-incorrect-.patch \
            "
 
 SRC_URI[sha256sum] = "673ef85c9f03e9b8fed10795e09d4e68add39404b70068d08b10f7b85754d7f0"
@@ -37,7 +43,7 @@ SRC_URI_class-devupstream = "git://git.lttng.org/lttng-modules;branch=stable-2.1
            file://Makefile-Do-not-fail-if-CONFIG_TRACEPOINTS-is-not-en.patch \
            file://BUILD_RUNTIME_BUG_ON-vs-gcc7.patch \
            "
-SRCREV_class-devupstream = "ad594e3a953db1b0c3c059fde45b5a5494f6be78"
-PV_class-devupstream = "2.12.2+git${SRCPV}"
+SRCREV_class-devupstream = "be71b60a327d7ad2588abc5cad2861177119972b"
+PV_class-devupstream = "2.12.3+git${SRCPV}"
 S_class-devupstream = "${WORKDIR}/git"
 SRCREV_FORMAT ?= "lttng_git"

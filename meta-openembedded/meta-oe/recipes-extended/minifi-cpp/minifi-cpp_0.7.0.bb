@@ -7,7 +7,7 @@ SECTION = "console/network"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f9534eb5f4ab800b573a37bffc62f3a7"
 
-DEPENDS = "virtual/crypt expat flex python3 bison-native libxml2"
+DEPENDS = "virtual/crypt expat flex python3 bison-native libxml2 nettle lz4"
 RDEPENDS_${PN} = "python3-core"
 
 SRCREV = "aa42957a2e227df41510047cece3cd606dc1cb6a"

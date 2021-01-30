@@ -7,6 +7,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=2e9fb35867314fe31c6a4977ef7dd531"
 
 SRC_URI = "https://curl.haxx.se/download/curl-${PV}.tar.bz2 \
            file://0001-replace-krb5-config-with-pkg-config.patch \
+           file://0002-remove-void-protop-create-union-p.patch \
+           file://CVE-2020-8284.patch \
+           file://CVE-2020-8285.patch \
+           file://CVE-2020-8286.patch \
 "
 
 SRC_URI[sha256sum] = "ad91970864102a59765e20ce16216efc9d6ad381471f7accceceab7d905703ef"

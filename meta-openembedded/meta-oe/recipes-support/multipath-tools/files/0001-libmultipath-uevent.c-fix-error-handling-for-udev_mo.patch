@@ -1,0 +1,39 @@
+From 8579d8a35886f91974e0ac4dbdf2edb7dac06d52 Mon Sep 17 00:00:00 2001
+From: Joe Slater <joe.slater@windriver.com>
+Date: Fri, 18 Dec 2020 11:17:50 +0800
+Subject: [PATCH] libmultipath/uevent.c: fix error handling for
+ udev_monitor_set_receive_buffer_size
+
+Since systemd v246.5[1], udev_monitor_set_receive_buffer_size() will
+return 0 or 1 if successful. We only need to check a negative value for
+the failure.
+
+[1] https://github.com/systemd/systemd-stable/commit/4dcae666889ae9469e4406c0bcaffadbc01c4f66
+    https://github.com/systemd/systemd-stable/commit/fe9b92e566f837665cc06c82374e4e42f9295c99
+    https://github.com/systemd/systemd-stable/commit/5dd4cc4b10daea5d2ba969425ba02d2098dd06a4
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ libmultipath/uevent.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libmultipath/uevent.c b/libmultipath/uevent.c
+index d38e8a7f..4b298052 100644
+--- a/libmultipath/uevent.c
++++ b/libmultipath/uevent.c
+@@ -810,7 +810,8 @@ int uevent_listen(struct udev *udev)
+ 	}
+ 	pthread_cleanup_push(monitor_cleanup, monitor);
+ #ifdef LIBUDEV_API_RECVBUF
+-	if (udev_monitor_set_receive_buffer_size(monitor, 128 * 1024 * 1024))
++	err = udev_monitor_set_receive_buffer_size(monitor, 128 * 1024 * 1024);
++	if (err < 0)
+ 		condlog(2, "failed to increase buffer size");
+ #endif
+ 	fd = udev_monitor_get_fd(monitor);
+-- 
+2.17.1
+

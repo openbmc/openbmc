@@ -1,0 +1,1609 @@
+From bfdb7ee65fc8b96f1fce10ef23871acb092b74b6 Mon Sep 17 00:00:00 2001
+From: Daniel Stenberg <daniel@haxx.se>
+Date: Mon, 23 Nov 2020 08:32:41 +0100
+Subject: [PATCH] urldata: remove 'void *protop' and create the union 'p'
+
+... to avoid the use of 'void *' for the protocol specific structs done
+per transfer.
+
+Closes #6238
+
+Upstream-Status: Backport [https://github.com/curl/curl/commit/a95a6ce6b809693a1195e3b4347a6cfa0fbc2ee7]
+
+CVE: CVE-2020-8285
+
+Signed-off-by: Daniel Stenberg <daniel@haxx.se>
+Signed-off-by: Khairul Rohaizzat Jamaluddin <khairul.rohaizzat.jamaluddin@intel.com>
+
+---
+ docs/INTERNALS.md  |  4 ++--
+ lib/file.c         | 14 +++++++-------
+ lib/ftp.c          | 36 ++++++++++++++++++------------------
+ lib/http.c         | 14 +++++++-------
+ lib/http2.c        | 50 +++++++++++++++++++++++++-------------------------
+ lib/http_proxy.c   |  6 +++---
+ lib/imap.c         | 26 +++++++++++++-------------
+ lib/mqtt.c         | 10 +++++-----
+ lib/openldap.c     |  8 ++++----
+ lib/pop3.c         | 14 +++++++-------
+ lib/rtsp.c         |  8 ++++----
+ lib/smb.c          | 20 ++++++++++----------
+ lib/smtp.c         | 22 +++++++++++-----------
+ lib/telnet.c       | 30 +++++++++++++++---------------
+ lib/transfer.c     |  8 ++++----
+ lib/url.c          |  2 +-
+ lib/urldata.h      | 19 +++++++++++++++++--
+ lib/vquic/ngtcp2.c | 24 ++++++++++++------------
+ lib/vquic/quiche.c | 10 +++++-----
+ lib/vssh/libssh.c  | 10 +++++-----
+ lib/vssh/libssh2.c |  8 ++++----
+ lib/vssh/wolfssh.c |  8 ++++----
+ 22 files changed, 183 insertions(+), 168 deletions(-)
+
+diff --git a/docs/INTERNALS.md b/docs/INTERNALS.md
+index 635e7b2..ca8988e 100644
+--- a/docs/INTERNALS.md
++++ b/docs/INTERNALS.md
+@@ -980,8 +980,8 @@ for older and later versions as things don't change drastically that often.
+   protocol specific data that then gets associated with that `Curl_easy` for
+   the rest of this transfer. It gets freed again at the end of the transfer.
+   It will be called before the `connectdata` for the transfer has been
+-  selected/created. Most protocols will allocate its private
+-  `struct [PROTOCOL]` here and assign `Curl_easy->req.protop` to point to it.
++  selected/created. Most protocols will allocate its private `struct
++  [PROTOCOL]` here and assign `Curl_easy->req.p.[protocol]` to it.
+ 
+   `->connect_it` allows a protocol to do some specific actions after the TCP
+   connect is done, that can still be considered part of the connection phase.
+diff --git a/lib/file.c b/lib/file.c
+index cd3e49c..110e5c2 100644
+--- a/lib/file.c
++++ b/lib/file.c
+@@ -119,8 +119,8 @@ const struct Curl_handler Curl_handler_file = {
+ static CURLcode file_setup_connection(struct connectdata *conn)
+ {
+   /* allocate the FILE specific struct */
+-  conn->data->req.protop = calloc(1, sizeof(struct FILEPROTO));
+-  if(!conn->data->req.protop)
++  conn->data->req.p.file = calloc(1, sizeof(struct FILEPROTO));
++  if(!conn->data->req.p.file)
+     return CURLE_OUT_OF_MEMORY;
+ 
+   return CURLE_OK;
+@@ -135,7 +135,7 @@ static CURLcode file_connect(struct connectdata *conn, bool *done)
+ {
+   struct Curl_easy *data = conn->data;
+   char *real_path;
+-  struct FILEPROTO *file = data->req.protop;
++  struct FILEPROTO *file = data->req.p.file;
+   int fd;
+ #ifdef DOS_FILESYSTEM
+   size_t i;
+@@ -209,7 +209,7 @@ static CURLcode file_connect(struct connectdata *conn, bool *done)
+ static CURLcode file_done(struct connectdata *conn,
+                                CURLcode status, bool premature)
+ {
+-  struct FILEPROTO *file = conn->data->req.protop;
++  struct FILEPROTO *file = conn->data->req.p.file;
+   (void)status; /* not used */
+   (void)premature; /* not used */
+ 
+@@ -227,7 +227,7 @@ static CURLcode file_done(struct connectdata *conn,
+ static CURLcode file_disconnect(struct connectdata *conn,
+                                 bool dead_connection)
+ {
+-  struct FILEPROTO *file = conn->data->req.protop;
++  struct FILEPROTO *file = conn->data->req.p.file;
+   (void)dead_connection; /* not used */
+ 
+   if(file) {
+@@ -249,7 +249,7 @@ static CURLcode file_disconnect(struct connectdata *conn,
+ 
+ static CURLcode file_upload(struct connectdata *conn)
+ {
+-  struct FILEPROTO *file = conn->data->req.protop;
++  struct FILEPROTO *file = conn->data->req.p.file;
+   const char *dir = strchr(file->path, DIRSEP);
+   int fd;
+   int mode;
+@@ -391,7 +391,7 @@ static CURLcode file_do(struct connectdata *conn, bool *done)
+   if(data->set.upload)
+     return file_upload(conn);
+ 
+-  file = conn->data->req.protop;
++  file = conn->data->req.p.file;
+ 
+   /* get the fd from the connection phase */
+   fd = file->fd;
+diff --git a/lib/ftp.c b/lib/ftp.c
+index 9fadac5..d1a9447 100644
+--- a/lib/ftp.c
++++ b/lib/ftp.c
+@@ -1345,7 +1345,7 @@ static CURLcode ftp_state_use_pasv(struct connectdata *conn)
+ static CURLcode ftp_state_prepare_transfer(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+-  struct FTP *ftp = conn->data->req.protop;
++  struct FTP *ftp = conn->data->req.p.ftp;
+   struct Curl_easy *data = conn->data;
+ 
+   if(ftp->transfer != FTPTRANSFER_BODY) {
+@@ -1388,7 +1388,7 @@ static CURLcode ftp_state_prepare_transfer(struct connectdata *conn)
+ static CURLcode ftp_state_rest(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+-  struct FTP *ftp = conn->data->req.protop;
++  struct FTP *ftp = conn->data->req.p.ftp;
+   struct ftp_conn *ftpc = &conn->proto.ftpc;
+ 
+   if((ftp->transfer != FTPTRANSFER_BODY) && ftpc->file) {
+@@ -1409,7 +1409,7 @@ static CURLcode ftp_state_rest(struct connectdata *conn)
+ static CURLcode ftp_state_size(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+-  struct FTP *ftp = conn->data->req.protop;
++  struct FTP *ftp = conn->data->req.p.ftp;
+   struct ftp_conn *ftpc = &conn->proto.ftpc;
+ 
+   if((ftp->transfer == FTPTRANSFER_INFO) && ftpc->file) {
+@@ -1430,7 +1430,7 @@ static CURLcode ftp_state_list(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct FTP *ftp = data->req.protop;
++  struct FTP *ftp = data->req.p.ftp;
+ 
+   /* If this output is to be machine-parsed, the NLST command might be better
+      to use, since the LIST command output is not specified or standard in any
+@@ -1508,7 +1508,7 @@ static CURLcode ftp_state_stor_prequote(struct connectdata *conn)
+ static CURLcode ftp_state_type(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+-  struct FTP *ftp = conn->data->req.protop;
++  struct FTP *ftp = conn->data->req.p.ftp;
+   struct Curl_easy *data = conn->data;
+   struct ftp_conn *ftpc = &conn->proto.ftpc;
+ 
+@@ -1565,7 +1565,7 @@ static CURLcode ftp_state_ul_setup(struct connectdata *conn,
+                                    bool sizechecked)
+ {
+   CURLcode result = CURLE_OK;
+-  struct FTP *ftp = conn->data->req.protop;
++  struct FTP *ftp = conn->data->req.p.ftp;
+   struct Curl_easy *data = conn->data;
+   struct ftp_conn *ftpc = &conn->proto.ftpc;
+ 
+@@ -1664,7 +1664,7 @@ static CURLcode ftp_state_quote(struct connectdata *conn,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct FTP *ftp = data->req.protop;
++  struct FTP *ftp = data->req.p.ftp;
+   struct ftp_conn *ftpc = &conn->proto.ftpc;
+   bool quote = FALSE;
+   struct curl_slist *item;
+@@ -2033,7 +2033,7 @@ static CURLcode ftp_state_mdtm_resp(struct connectdata *conn,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct FTP *ftp = data->req.protop;
++  struct FTP *ftp = data->req.p.ftp;
+   struct ftp_conn *ftpc = &conn->proto.ftpc;
+ 
+   switch(ftpcode) {
+@@ -2166,7 +2166,7 @@ static CURLcode ftp_state_retr(struct connectdata *conn,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct FTP *ftp = data->req.protop;
++  struct FTP *ftp = data->req.p.ftp;
+   struct ftp_conn *ftpc = &conn->proto.ftpc;
+ 
+   if(data->set.max_filesize && (filesize > data->set.max_filesize)) {
+@@ -2378,7 +2378,7 @@ static CURLcode ftp_state_get_resp(struct connectdata *conn,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct FTP *ftp = data->req.protop;
++  struct FTP *ftp = data->req.p.ftp;
+ 
+   if((ftpcode == 150) || (ftpcode == 125)) {
+ 
+@@ -3138,7 +3138,7 @@ static CURLcode ftp_done(struct connectdata *conn, CURLcode status,
+                          bool premature)
+ {
+   struct Curl_easy *data = conn->data;
+-  struct FTP *ftp = data->req.protop;
++  struct FTP *ftp = data->req.p.ftp;
+   struct ftp_conn *ftpc = &conn->proto.ftpc;
+   struct pingpong *pp = &ftpc->pp;
+   ssize_t nread;
+@@ -3492,7 +3492,7 @@ static CURLcode ftp_do_more(struct connectdata *conn, int *completep)
+   bool complete = FALSE;
+ 
+   /* the ftp struct is inited in ftp_connect() */
+-  struct FTP *ftp = data->req.protop;
++  struct FTP *ftp = data->req.p.ftp;
+ 
+   /* if the second connection isn't done yet, wait for it */
+   if(!conn->bits.tcpconnect[SECONDARYSOCKET]) {
+@@ -3657,7 +3657,7 @@ CURLcode ftp_perform(struct connectdata *conn,
+ 
+   if(conn->data->set.opt_no_body) {
+     /* requested no body means no transfer... */
+-    struct FTP *ftp = conn->data->req.protop;
++    struct FTP *ftp = conn->data->req.p.ftp;
+     ftp->transfer = FTPTRANSFER_INFO;
+   }
+ 
+@@ -3692,7 +3692,7 @@ static void wc_data_dtor(void *ptr)
+ static CURLcode init_wc_data(struct connectdata *conn)
+ {
+   char *last_slash;
+-  struct FTP *ftp = conn->data->req.protop;
++  struct FTP *ftp = conn->data->req.p.ftp;
+   char *path = ftp->path;
+   struct WildcardData *wildcard = &(conn->data->wildcard);
+   CURLcode result = CURLE_OK;
+@@ -3826,7 +3826,7 @@ static CURLcode wc_statemach(struct connectdata *conn)
+     /* filelist has at least one file, lets get first one */
+     struct ftp_conn *ftpc = &conn->proto.ftpc;
+     struct curl_fileinfo *finfo = wildcard->filelist.head->ptr;
+-    struct FTP *ftp = conn->data->req.protop;
++    struct FTP *ftp = conn->data->req.p.ftp;
+ 
+     char *tmp_path = aprintf("%s%s", wildcard->path, finfo->filename);
+     if(!tmp_path)
+@@ -4099,7 +4099,7 @@ CURLcode ftp_parse_url_path(struct connectdata *conn)
+ {
+   struct Curl_easy *data = conn->data;
+   /* the ftp struct is already inited in ftp_connect() */
+-  struct FTP *ftp = data->req.protop;
++  struct FTP *ftp = data->req.p.ftp;
+   struct ftp_conn *ftpc = &conn->proto.ftpc;
+   const char *slashPos = NULL;
+   const char *fileName = NULL;
+@@ -4244,7 +4244,7 @@ CURLcode ftp_parse_url_path(struct connectdata *conn)
+ static CURLcode ftp_dophase_done(struct connectdata *conn,
+                                  bool connected)
+ {
+-  struct FTP *ftp = conn->data->req.protop;
++  struct FTP *ftp = conn->data->req.p.ftp;
+   struct ftp_conn *ftpc = &conn->proto.ftpc;
+ 
+   if(connected) {
+@@ -4341,7 +4341,7 @@ static CURLcode ftp_setup_connection(struct connectdata *conn)
+   char *type;
+   struct FTP *ftp;
+ 
+-  conn->data->req.protop = ftp = calloc(sizeof(struct FTP), 1);
++  conn->data->req.p.ftp = ftp = calloc(sizeof(struct FTP), 1);
+   if(NULL == ftp)
+     return CURLE_OUT_OF_MEMORY;
+ 
+diff --git a/lib/http.c b/lib/http.c
+index 8fcdd43..31d9112 100644
+--- a/lib/http.c
++++ b/lib/http.c
+@@ -162,14 +162,14 @@ static CURLcode http_setup_conn(struct connectdata *conn)
+      during this request */
+   struct HTTP *http;
+   struct Curl_easy *data = conn->data;
+-  DEBUGASSERT(data->req.protop == NULL);
++  DEBUGASSERT(data->req.p.http == NULL);
+ 
+   http = calloc(1, sizeof(struct HTTP));
+   if(!http)
+     return CURLE_OUT_OF_MEMORY;
+ 
+   Curl_mime_initpart(&http->form, conn->data);
+-  data->req.protop = http;
++  data->req.p.http = http;
+ 
+   if(data->set.httpversion == CURL_HTTP_VERSION_3) {
+     if(conn->handler->flags & PROTOPT_SSL)
+@@ -425,7 +425,7 @@ static bool pickoneauth(struct auth *pick, unsigned long mask)
+ static CURLcode http_perhapsrewind(struct connectdata *conn)
+ {
+   struct Curl_easy *data = conn->data;
+-  struct HTTP *http = data->req.protop;
++  struct HTTP *http = data->req.p.http;
+   curl_off_t bytessent;
+   curl_off_t expectsend = -1; /* default is unknown */
+ 
+@@ -1109,7 +1109,7 @@ static size_t readmoredata(char *buffer,
+                            void *userp)
+ {
+   struct connectdata *conn = (struct connectdata *)userp;
+-  struct HTTP *http = conn->data->req.protop;
++  struct HTTP *http = conn->data->req.p.http;
+   size_t fullsize = size * nitems;
+ 
+   if(!http->postsize)
+@@ -1167,7 +1167,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
+   char *ptr;
+   size_t size;
+   struct Curl_easy *data = conn->data;
+-  struct HTTP *http = data->req.protop;
++  struct HTTP *http = data->req.p.http;
+   size_t sendsize;
+   curl_socket_t sockfd;
+   size_t headersize;
+@@ -1517,7 +1517,7 @@ CURLcode Curl_http_done(struct connectdata *conn,
+                         CURLcode status, bool premature)
+ {
+   struct Curl_easy *data = conn->data;
+-  struct HTTP *http = data->req.protop;
++  struct HTTP *http = data->req.p.http;
+ 
+   /* Clear multipass flag. If authentication isn't done yet, then it will get
+    * a chance to be set back to true when we output the next auth header */
+@@ -1978,7 +1978,7 @@ CURLcode Curl_http(struct connectdata *conn, bool *done)
+         return result;
+     }
+   }
+-  http = data->req.protop;
++  http = data->req.p.http;
+   DEBUGASSERT(http);
+ 
+   if(!data->state.this_is_a_follow) {
+diff --git a/lib/http2.c b/lib/http2.c
+index d316da8..c41a1c2 100644
+--- a/lib/http2.c
++++ b/lib/http2.c
+@@ -257,7 +257,7 @@ static unsigned int http2_conncheck(struct connectdata *check,
+ /* called from http_setup_conn */
+ void Curl_http2_setup_req(struct Curl_easy *data)
+ {
+-  struct HTTP *http = data->req.protop;
++  struct HTTP *http = data->req.p.http;
+   http->bodystarted = FALSE;
+   http->status_code = -1;
+   http->pausedata = NULL;
+@@ -391,7 +391,7 @@ char *curl_pushheader_bynum(struct curl_pushheaders *h, size_t num)
+   if(!h || !GOOD_EASY_HANDLE(h->data))
+     return NULL;
+   else {
+-    struct HTTP *stream = h->data->req.protop;
++    struct HTTP *stream = h->data->req.p.http;
+     if(num < stream->push_headers_used)
+       return stream->push_headers[num];
+   }
+@@ -413,7 +413,7 @@ char *curl_pushheader_byname(struct curl_pushheaders *h, const char *header)
+      !strcmp(header, ":") || strchr(header + 1, ':'))
+     return NULL;
+   else {
+-    struct HTTP *stream = h->data->req.protop;
++    struct HTTP *stream = h->data->req.p.http;
+     size_t len = strlen(header);
+     size_t i;
+     for(i = 0; i<stream->push_headers_used; i++) {
+@@ -460,7 +460,7 @@ static struct Curl_easy *duphandle(struct Curl_easy *data)
+       (void)Curl_close(&second);
+     }
+     else {
+-      second->req.protop = http;
++      second->req.p.http = http;
+       Curl_dyn_init(&http->header_recvbuf, DYN_H2_HEADERS);
+       Curl_http2_setup_req(second);
+       second->state.stream_weight = data->state.stream_weight;
+@@ -537,7 +537,7 @@ static int push_promise(struct Curl_easy *data,
+     /* ask the application */
+     H2BUGF(infof(data, "Got PUSH_PROMISE, ask application!\n"));
+ 
+-    stream = data->req.protop;
++    stream = data->req.p.http;
+     if(!stream) {
+       failf(data, "Internal NULL stream!\n");
+       (void)Curl_close(&newhandle);
+@@ -567,13 +567,13 @@ static int push_promise(struct Curl_easy *data,
+     if(rv) {
+       DEBUGASSERT((rv > CURL_PUSH_OK) && (rv <= CURL_PUSH_ERROROUT));
+       /* denied, kill off the new handle again */
+-      http2_stream_free(newhandle->req.protop);
+-      newhandle->req.protop = NULL;
++      http2_stream_free(newhandle->req.p.http);
++      newhandle->req.p.http = NULL;
+       (void)Curl_close(&newhandle);
+       goto fail;
+     }
+ 
+-    newstream = newhandle->req.protop;
++    newstream = newhandle->req.p.http;
+     newstream->stream_id = frame->promised_stream_id;
+     newhandle->req.maxdownload = -1;
+     newhandle->req.size = -1;
+@@ -583,8 +583,8 @@ static int push_promise(struct Curl_easy *data,
+     rc = Curl_multi_add_perform(data->multi, newhandle, conn);
+     if(rc) {
+       infof(data, "failed to add handle to multi\n");
+-      http2_stream_free(newhandle->req.protop);
+-      newhandle->req.protop = NULL;
++      http2_stream_free(newhandle->req.p.http);
++      newhandle->req.p.http = NULL;
+       Curl_close(&newhandle);
+       rv = CURL_PUSH_DENY;
+       goto fail;
+@@ -667,7 +667,7 @@ static int on_frame_recv(nghttp2_session *session, const nghttp2_frame *frame,
+     return 0;
+   }
+ 
+-  stream = data_s->req.protop;
++  stream = data_s->req.p.http;
+   if(!stream) {
+     H2BUGF(infof(data_s, "No proto pointer for stream: %x\n",
+                  stream_id));
+@@ -783,7 +783,7 @@ static int on_data_chunk_recv(nghttp2_session *session, uint8_t flags,
+        internal error more than anything else! */
+     return NGHTTP2_ERR_CALLBACK_FAILURE;
+ 
+-  stream = data_s->req.protop;
++  stream = data_s->req.p.http;
+   if(!stream)
+     return NGHTTP2_ERR_CALLBACK_FAILURE;
+ 
+@@ -849,7 +849,7 @@ static int on_stream_close(nghttp2_session *session, int32_t stream_id,
+     }
+     H2BUGF(infof(data_s, "on_stream_close(), %s (err %d), stream %u\n",
+                  nghttp2_http2_strerror(error_code), error_code, stream_id));
+-    stream = data_s->req.protop;
++    stream = data_s->req.p.http;
+     if(!stream)
+       return NGHTTP2_ERR_CALLBACK_FAILURE;
+ 
+@@ -894,7 +894,7 @@ static int on_begin_headers(nghttp2_session *session,
+     return 0;
+   }
+ 
+-  stream = data_s->req.protop;
++  stream = data_s->req.p.http;
+   if(!stream || !stream->bodystarted) {
+     return 0;
+   }
+@@ -952,7 +952,7 @@ static int on_header(nghttp2_session *session, const nghttp2_frame *frame,
+        internal error more than anything else! */
+     return NGHTTP2_ERR_CALLBACK_FAILURE;
+ 
+-  stream = data_s->req.protop;
++  stream = data_s->req.p.http;
+   if(!stream) {
+     failf(data_s, "Internal NULL stream! 5\n");
+     return NGHTTP2_ERR_CALLBACK_FAILURE;
+@@ -1100,7 +1100,7 @@ static ssize_t data_source_read_callback(nghttp2_session *session,
+          internal error more than anything else! */
+       return NGHTTP2_ERR_CALLBACK_FAILURE;
+ 
+-    stream = data_s->req.protop;
++    stream = data_s->req.p.http;
+     if(!stream)
+       return NGHTTP2_ERR_CALLBACK_FAILURE;
+   }
+@@ -1161,7 +1161,7 @@ static void populate_settings(struct connectdata *conn,
+ 
+ void Curl_http2_done(struct Curl_easy *data, bool premature)
+ {
+-  struct HTTP *http = data->req.protop;
++  struct HTTP *http = data->req.p.http;
+   struct http_conn *httpc = &data->conn->proto.httpc;
+ 
+   /* there might be allocated resources done before this got the 'h2' pointer
+@@ -1398,7 +1398,7 @@ CURLcode Curl_http2_done_sending(struct connectdata *conn)
+      (conn->handler == &Curl_handler_http2)) {
+     /* make sure this is only attempted for HTTP/2 transfers */
+ 
+-    struct HTTP *stream = conn->data->req.protop;
++    struct HTTP *stream = conn->data->req.p.http;
+ 
+     struct http_conn *httpc = &conn->proto.httpc;
+     nghttp2_session *h2 = httpc->h2;
+@@ -1522,7 +1522,7 @@ static void h2_pri_spec(struct Curl_easy *data,
+                         nghttp2_priority_spec *pri_spec)
+ {
+   struct HTTP *depstream = (data->set.stream_depends_on?
+-                            data->set.stream_depends_on->req.protop:NULL);
++                            data->set.stream_depends_on->req.p.http:NULL);
+   int32_t depstream_id = depstream? depstream->stream_id:0;
+   nghttp2_priority_spec_init(pri_spec, depstream_id, data->set.stream_weight,
+                              data->set.stream_depends_e);
+@@ -1539,7 +1539,7 @@ static void h2_pri_spec(struct Curl_easy *data,
+ static int h2_session_send(struct Curl_easy *data,
+                            nghttp2_session *h2)
+ {
+-  struct HTTP *stream = data->req.protop;
++  struct HTTP *stream = data->req.p.http;
+   if((data->set.stream_weight != data->state.stream_weight) ||
+      (data->set.stream_depends_e != data->state.stream_depends_e) ||
+      (data->set.stream_depends_on != data->state.stream_depends_on) ) {
+@@ -1569,7 +1569,7 @@ static ssize_t http2_recv(struct connectdata *conn, int sockindex,
+   ssize_t nread;
+   struct http_conn *httpc = &conn->proto.httpc;
+   struct Curl_easy *data = conn->data;
+-  struct HTTP *stream = data->req.protop;
++  struct HTTP *stream = data->req.p.http;
+ 
+   (void)sockindex; /* we always do HTTP2 on sockindex 0 */
+ 
+@@ -1874,7 +1874,7 @@ static ssize_t http2_send(struct connectdata *conn, int sockindex,
+    */
+   int rv;
+   struct http_conn *httpc = &conn->proto.httpc;
+-  struct HTTP *stream = conn->data->req.protop;
++  struct HTTP *stream = conn->data->req.p.http;
+   nghttp2_nv *nva = NULL;
+   size_t nheader;
+   size_t i;
+@@ -2183,7 +2183,7 @@ CURLcode Curl_http2_setup(struct connectdata *conn)
+ {
+   CURLcode result;
+   struct http_conn *httpc = &conn->proto.httpc;
+-  struct HTTP *stream = conn->data->req.protop;
++  struct HTTP *stream = conn->data->req.p.http;
+ 
+   DEBUGASSERT(conn->data->state.buffer);
+ 
+@@ -2238,7 +2238,7 @@ CURLcode Curl_http2_switched(struct connectdata *conn,
+   int rv;
+   ssize_t nproc;
+   struct Curl_easy *data = conn->data;
+-  struct HTTP *stream = conn->data->req.protop;
++  struct HTTP *stream = conn->data->req.p.http;
+ 
+   result = Curl_http2_setup(conn);
+   if(result)
+@@ -2358,7 +2358,7 @@ CURLcode Curl_http2_stream_pause(struct Curl_easy *data, bool pause)
+     return CURLE_OK;
+ #ifdef NGHTTP2_HAS_SET_LOCAL_WINDOW_SIZE
+   else {
+-    struct HTTP *stream = data->req.protop;
++    struct HTTP *stream = data->req.p.http;
+     struct http_conn *httpc = &data->conn->proto.httpc;
+     uint32_t window = !pause * HTTP2_HUGE_WINDOW_SIZE;
+     int rv = nghttp2_session_set_local_window_size(httpc->h2,
+diff --git a/lib/http_proxy.c b/lib/http_proxy.c
+index f188cbf..69aacb4 100644
+--- a/lib/http_proxy.c
++++ b/lib/http_proxy.c
+@@ -102,9 +102,9 @@ CURLcode Curl_proxy_connect(struct connectdata *conn, int sockindex)
+      * This function might be called several times in the multi interface case
+      * if the proxy's CONNECT response is not instant.
+      */
+-    prot_save = conn->data->req.protop;
++    prot_save = conn->data->req.p.http;
+     memset(&http_proxy, 0, sizeof(http_proxy));
+-    conn->data->req.protop = &http_proxy;
++    conn->data->req.p.http = &http_proxy;
+     connkeep(conn, "HTTP proxy CONNECT");
+ 
+     /* for the secondary socket (FTP), use the "connect to host"
+@@ -125,7 +125,7 @@ CURLcode Curl_proxy_connect(struct connectdata *conn, int sockindex)
+     else
+       remote_port = conn->remote_port;
+     result = Curl_proxyCONNECT(conn, sockindex, hostname, remote_port);
+-    conn->data->req.protop = prot_save;
++    conn->data->req.p.http = prot_save;
+     if(CURLE_OK != result)
+       return result;
+     Curl_safefree(data->state.aptr.proxyuserpwd);
+diff --git a/lib/imap.c b/lib/imap.c
+index cad0e59..bda23a5 100644
+--- a/lib/imap.c
++++ b/lib/imap.c
+@@ -244,7 +244,7 @@ static bool imap_matchresp(const char *line, size_t len, const char *cmd)
+ static bool imap_endofresp(struct connectdata *conn, char *line, size_t len,
+                            int *resp)
+ {
+-  struct IMAP *imap = conn->data->req.protop;
++  struct IMAP *imap = conn->data->req.p.imap;
+   struct imap_conn *imapc = &conn->proto.imapc;
+   const char *id = imapc->resptag;
+   size_t id_len = strlen(id);
+@@ -605,7 +605,7 @@ static CURLcode imap_perform_list(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct IMAP *imap = data->req.protop;
++  struct IMAP *imap = data->req.p.imap;
+ 
+   if(imap->custom)
+     /* Send the custom request */
+@@ -640,7 +640,7 @@ static CURLcode imap_perform_select(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct IMAP *imap = data->req.protop;
++  struct IMAP *imap = data->req.p.imap;
+   struct imap_conn *imapc = &conn->proto.imapc;
+   char *mailbox;
+ 
+@@ -679,7 +679,7 @@ static CURLcode imap_perform_select(struct connectdata *conn)
+ static CURLcode imap_perform_fetch(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+-  struct IMAP *imap = conn->data->req.protop;
++  struct IMAP *imap = conn->data->req.p.imap;
+   /* Check we have a UID */
+   if(imap->uid) {
+ 
+@@ -727,7 +727,7 @@ static CURLcode imap_perform_append(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct IMAP *imap = data->req.protop;
++  struct IMAP *imap = data->req.p.imap;
+   char *mailbox;
+ 
+   /* Check we have a mailbox */
+@@ -797,7 +797,7 @@ static CURLcode imap_perform_append(struct connectdata *conn)
+ static CURLcode imap_perform_search(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+-  struct IMAP *imap = conn->data->req.protop;
++  struct IMAP *imap = conn->data->req.p.imap;
+ 
+   /* Check we have a query string */
+   if(!imap->query) {
+@@ -1051,7 +1051,7 @@ static CURLcode imap_state_select_resp(struct connectdata *conn, int imapcode,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct IMAP *imap = conn->data->req.protop;
++  struct IMAP *imap = conn->data->req.p.imap;
+   struct imap_conn *imapc = &conn->proto.imapc;
+   const char *line = data->state.buffer;
+ 
+@@ -1380,7 +1380,7 @@ static CURLcode imap_init(struct connectdata *conn)
+   struct Curl_easy *data = conn->data;
+   struct IMAP *imap;
+ 
+-  imap = data->req.protop = calloc(sizeof(struct IMAP), 1);
++  imap = data->req.p.imap = calloc(sizeof(struct IMAP), 1);
+   if(!imap)
+     result = CURLE_OUT_OF_MEMORY;
+ 
+@@ -1457,7 +1457,7 @@ static CURLcode imap_done(struct connectdata *conn, CURLcode status,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct IMAP *imap = data->req.protop;
++  struct IMAP *imap = data->req.p.imap;
+ 
+   (void)premature;
+ 
+@@ -1517,7 +1517,7 @@ static CURLcode imap_perform(struct connectdata *conn, bool *connected,
+   /* This is IMAP and no proxy */
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct IMAP *imap = data->req.protop;
++  struct IMAP *imap = data->req.p.imap;
+   struct imap_conn *imapc = &conn->proto.imapc;
+   bool selected = FALSE;
+ 
+@@ -1640,7 +1640,7 @@ static CURLcode imap_disconnect(struct connectdata *conn, bool dead_connection)
+ /* Call this when the DO phase has completed */
+ static CURLcode imap_dophase_done(struct connectdata *conn, bool connected)
+ {
+-  struct IMAP *imap = conn->data->req.protop;
++  struct IMAP *imap = conn->data->req.p.imap;
+ 
+   (void)connected;
+ 
+@@ -1942,7 +1942,7 @@ static CURLcode imap_parse_url_path(struct connectdata *conn)
+   /* The imap struct is already initialised in imap_connect() */
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct IMAP *imap = data->req.protop;
++  struct IMAP *imap = data->req.p.imap;
+   const char *begin = &data->state.up.path[1]; /* skip leading slash */
+   const char *ptr = begin;
+ 
+@@ -2074,7 +2074,7 @@ static CURLcode imap_parse_custom_request(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct IMAP *imap = data->req.protop;
++  struct IMAP *imap = data->req.p.imap;
+   const char *custom = data->set.str[STRING_CUSTOMREQUEST];
+ 
+   if(custom) {
+diff --git a/lib/mqtt.c b/lib/mqtt.c
+index f6f4416..86b22b8 100644
+--- a/lib/mqtt.c
++++ b/lib/mqtt.c
+@@ -95,12 +95,12 @@ static CURLcode mqtt_setup_conn(struct connectdata *conn)
+      during this request */
+   struct MQTT *mq;
+   struct Curl_easy *data = conn->data;
+-  DEBUGASSERT(data->req.protop == NULL);
++  DEBUGASSERT(data->req.p.mqtt == NULL);
+ 
+   mq = calloc(1, sizeof(struct MQTT));
+   if(!mq)
+     return CURLE_OUT_OF_MEMORY;
+-  data->req.protop = mq;
++  data->req.p.mqtt = mq;
+   return CURLE_OK;
+ }
+ 
+@@ -110,7 +110,7 @@ static CURLcode mqtt_send(struct connectdata *conn,
+   CURLcode result = CURLE_OK;
+   curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
+   struct Curl_easy *data = conn->data;
+-  struct MQTT *mq = data->req.protop;
++  struct MQTT *mq = data->req.p.mqtt;
+   ssize_t n;
+   result = Curl_write(conn, sockfd, buf, len, &n);
+   if(!result && data->set.verbose)
+@@ -426,7 +426,7 @@ static CURLcode mqtt_read_publish(struct connectdata *conn,
+   unsigned char *pkt = (unsigned char *)data->state.buffer;
+   size_t remlen;
+   struct mqtt_conn *mqtt = &conn->proto.mqtt;
+-  struct MQTT *mq = data->req.protop;
++  struct MQTT *mq = data->req.p.mqtt;
+   unsigned char packet;
+ 
+   switch(mqtt->state) {
+@@ -533,7 +533,7 @@ static CURLcode mqtt_doing(struct connectdata *conn, bool *done)
+   CURLcode result = CURLE_OK;
+   struct mqtt_conn *mqtt = &conn->proto.mqtt;
+   struct Curl_easy *data = conn->data;
+-  struct MQTT *mq = data->req.protop;
++  struct MQTT *mq = data->req.p.mqtt;
+   ssize_t nread;
+   curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
+   unsigned char *pkt = (unsigned char *)data->state.buffer;
+diff --git a/lib/openldap.c b/lib/openldap.c
+index 782d6a0..c955df6 100644
+--- a/lib/openldap.c
++++ b/lib/openldap.c
+@@ -410,7 +410,7 @@ static CURLcode ldap_do(struct connectdata *conn, bool *done)
+   if(!lr)
+     return CURLE_OUT_OF_MEMORY;
+   lr->msgid = msgid;
+-  data->req.protop = lr;
++  data->req.p.ldap = lr;
+   Curl_setup_transfer(data, FIRSTSOCKET, -1, FALSE, -1);
+   *done = TRUE;
+   return CURLE_OK;
+@@ -419,7 +419,7 @@ static CURLcode ldap_do(struct connectdata *conn, bool *done)
+ static CURLcode ldap_done(struct connectdata *conn, CURLcode res,
+                           bool premature)
+ {
+-  struct ldapreqinfo *lr = conn->data->req.protop;
++  struct ldapreqinfo *lr = conn->data->req.p.ldap;
+ 
+   (void)res;
+   (void)premature;
+@@ -431,7 +431,7 @@ static CURLcode ldap_done(struct connectdata *conn, CURLcode res,
+       ldap_abandon_ext(li->ld, lr->msgid, NULL, NULL);
+       lr->msgid = 0;
+     }
+-    conn->data->req.protop = NULL;
++    conn->data->req.p.ldap = NULL;
+     free(lr);
+   }
+ 
+@@ -443,7 +443,7 @@ static ssize_t ldap_recv(struct connectdata *conn, int sockindex, char *buf,
+ {
+   struct ldapconninfo *li = conn->proto.ldapc;
+   struct Curl_easy *data = conn->data;
+-  struct ldapreqinfo *lr = data->req.protop;
++  struct ldapreqinfo *lr = data->req.p.ldap;
+   int rc, ret;
+   LDAPMessage *msg = NULL;
+   LDAPMessage *ent;
+diff --git a/lib/pop3.c b/lib/pop3.c
+index 9ff5c78..04cc887 100644
+--- a/lib/pop3.c
++++ b/lib/pop3.c
+@@ -551,7 +551,7 @@ static CURLcode pop3_perform_command(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct POP3 *pop3 = data->req.protop;
++  struct POP3 *pop3 = data->req.p.pop3;
+   const char *command = NULL;
+ 
+   /* Calculate the default command */
+@@ -884,7 +884,7 @@ static CURLcode pop3_state_command_resp(struct connectdata *conn,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct POP3 *pop3 = data->req.protop;
++  struct POP3 *pop3 = data->req.p.pop3;
+   struct pop3_conn *pop3c = &conn->proto.pop3c;
+   struct pingpong *pp = &pop3c->pp;
+ 
+@@ -1046,7 +1046,7 @@ static CURLcode pop3_init(struct connectdata *conn)
+   struct Curl_easy *data = conn->data;
+   struct POP3 *pop3;
+ 
+-  pop3 = data->req.protop = calloc(sizeof(struct POP3), 1);
++  pop3 = data->req.p.pop3 = calloc(sizeof(struct POP3), 1);
+   if(!pop3)
+     result = CURLE_OUT_OF_MEMORY;
+ 
+@@ -1120,7 +1120,7 @@ static CURLcode pop3_done(struct connectdata *conn, CURLcode status,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct POP3 *pop3 = data->req.protop;
++  struct POP3 *pop3 = data->req.p.pop3;
+ 
+   (void)premature;
+ 
+@@ -1154,7 +1154,7 @@ static CURLcode pop3_perform(struct connectdata *conn, bool *connected,
+ {
+   /* This is POP3 and no proxy */
+   CURLcode result = CURLE_OK;
+-  struct POP3 *pop3 = conn->data->req.protop;
++  struct POP3 *pop3 = conn->data->req.p.pop3;
+ 
+   DEBUGF(infof(conn->data, "DO phase starts\n"));
+ 
+@@ -1386,7 +1386,7 @@ static CURLcode pop3_parse_url_path(struct connectdata *conn)
+ {
+   /* The POP3 struct is already initialised in pop3_connect() */
+   struct Curl_easy *data = conn->data;
+-  struct POP3 *pop3 = data->req.protop;
++  struct POP3 *pop3 = data->req.p.pop3;
+   const char *path = &data->state.up.path[1]; /* skip leading path */
+ 
+   /* URL decode the path for the message ID */
+@@ -1403,7 +1403,7 @@ static CURLcode pop3_parse_custom_request(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct POP3 *pop3 = data->req.protop;
++  struct POP3 *pop3 = data->req.p.pop3;
+   const char *custom = data->set.str[STRING_CUSTOMREQUEST];
+ 
+   /* URL decode the custom request */
+diff --git a/lib/rtsp.c b/lib/rtsp.c
+index dbd7dc6..29e6d58 100644
+--- a/lib/rtsp.c
++++ b/lib/rtsp.c
+@@ -114,7 +114,7 @@ static CURLcode rtsp_setup_connection(struct connectdata *conn)
+ {
+   struct RTSP *rtsp;
+ 
+-  conn->data->req.protop = rtsp = calloc(1, sizeof(struct RTSP));
++  conn->data->req.p.rtsp = rtsp = calloc(1, sizeof(struct RTSP));
+   if(!rtsp)
+     return CURLE_OUT_OF_MEMORY;
+ 
+@@ -199,7 +199,7 @@ static CURLcode rtsp_done(struct connectdata *conn,
+                           CURLcode status, bool premature)
+ {
+   struct Curl_easy *data = conn->data;
+-  struct RTSP *rtsp = data->req.protop;
++  struct RTSP *rtsp = data->req.p.rtsp;
+   CURLcode httpStatus;
+ 
+   /* Bypass HTTP empty-reply checks on receive */
+@@ -232,7 +232,7 @@ static CURLcode rtsp_do(struct connectdata *conn, bool *done)
+   struct Curl_easy *data = conn->data;
+   CURLcode result = CURLE_OK;
+   Curl_RtspReq rtspreq = data->set.rtspreq;
+-  struct RTSP *rtsp = data->req.protop;
++  struct RTSP *rtsp = data->req.p.rtsp;
+   struct dynbuf req_buffer;
+   curl_off_t postsize = 0; /* for ANNOUNCE and SET_PARAMETER */
+   curl_off_t putsize = 0; /* for ANNOUNCE and SET_PARAMETER */
+@@ -764,7 +764,7 @@ CURLcode Curl_rtsp_parseheader(struct connectdata *conn,
+     /* Store the received CSeq. Match is verified in rtsp_done */
+     int nc = sscanf(&header[4], ": %ld", &CSeq);
+     if(nc == 1) {
+-      struct RTSP *rtsp = data->req.protop;
++      struct RTSP *rtsp = data->req.p.rtsp;
+       rtsp->CSeq_recv = CSeq; /* mark the request */
+       data->state.rtsp_CSeq_recv = CSeq; /* update the handle */
+     }
+diff --git a/lib/smb.c b/lib/smb.c
+index d493adc..9eba7ab 100644
+--- a/lib/smb.c
++++ b/lib/smb.c
+@@ -204,7 +204,7 @@ static void conn_state(struct connectdata *conn, enum smb_conn_state newstate)
+ static void request_state(struct connectdata *conn,
+                           enum smb_req_state newstate)
+ {
+-  struct smb_request *req = conn->data->req.protop;
++  struct smb_request *req = conn->data->req.p.smb;
+ #if defined(DEBUGBUILD) && !defined(CURL_DISABLE_VERBOSE_STRINGS)
+   /* For debug purposes */
+   static const char * const names[] = {
+@@ -234,7 +234,7 @@ static CURLcode smb_setup_connection(struct connectdata *conn)
+   struct smb_request *req;
+ 
+   /* Initialize the request state */
+-  conn->data->req.protop = req = calloc(1, sizeof(struct smb_request));
++  conn->data->req.p.smb = req = calloc(1, sizeof(struct smb_request));
+   if(!req)
+     return CURLE_OUT_OF_MEMORY;
+ 
+@@ -342,7 +342,7 @@ static void smb_format_message(struct connectdata *conn, struct smb_header *h,
+                                unsigned char cmd, size_t len)
+ {
+   struct smb_conn *smbc = &conn->proto.smbc;
+-  struct smb_request *req = conn->data->req.protop;
++  struct smb_request *req = conn->data->req.p.smb;
+   unsigned int pid;
+ 
+   memset(h, 0, sizeof(*h));
+@@ -505,7 +505,7 @@ static CURLcode smb_send_tree_connect(struct connectdata *conn)
+ 
+ static CURLcode smb_send_open(struct connectdata *conn)
+ {
+-  struct smb_request *req = conn->data->req.protop;
++  struct smb_request *req = conn->data->req.p.smb;
+   struct smb_nt_create msg;
+   size_t byte_count;
+ 
+@@ -535,7 +535,7 @@ static CURLcode smb_send_open(struct connectdata *conn)
+ 
+ static CURLcode smb_send_close(struct connectdata *conn)
+ {
+-  struct smb_request *req = conn->data->req.protop;
++  struct smb_request *req = conn->data->req.p.smb;
+   struct smb_close msg;
+ 
+   memset(&msg, 0, sizeof(msg));
+@@ -556,7 +556,7 @@ static CURLcode smb_send_tree_disconnect(struct connectdata *conn)
+ 
+ static CURLcode smb_send_read(struct connectdata *conn)
+ {
+-  struct smb_request *req = conn->data->req.protop;
++  struct smb_request *req = conn->data->req.p.smb;
+   curl_off_t offset = conn->data->req.offset;
+   struct smb_read msg;
+ 
+@@ -575,7 +575,7 @@ static CURLcode smb_send_read(struct connectdata *conn)
+ static CURLcode smb_send_write(struct connectdata *conn)
+ {
+   struct smb_write *msg;
+-  struct smb_request *req = conn->data->req.protop;
++  struct smb_request *req = conn->data->req.p.smb;
+   curl_off_t offset = conn->data->req.offset;
+   curl_off_t upload_size = conn->data->req.size - conn->data->req.bytecount;
+   CURLcode result = Curl_get_upload_buffer(conn->data);
+@@ -738,7 +738,7 @@ static void get_posix_time(time_t *out, curl_off_t timestamp)
+ 
+ static CURLcode smb_request_state(struct connectdata *conn, bool *done)
+ {
+-  struct smb_request *req = conn->data->req.protop;
++  struct smb_request *req = conn->data->req.p.smb;
+   struct smb_header *h;
+   struct smb_conn *smbc = &conn->proto.smbc;
+   enum smb_req_state next_state = SMB_DONE;
+@@ -923,7 +923,7 @@ static CURLcode smb_done(struct connectdata *conn, CURLcode status,
+                          bool premature)
+ {
+   (void) premature;
+-  Curl_safefree(conn->data->req.protop);
++  Curl_safefree(conn->data->req.p.smb);
+   return status;
+ }
+ 
+@@ -957,7 +957,7 @@ static CURLcode smb_do(struct connectdata *conn, bool *done)
+ static CURLcode smb_parse_url_path(struct connectdata *conn)
+ {
+   struct Curl_easy *data = conn->data;
+-  struct smb_request *req = data->req.protop;
++  struct smb_request *req = data->req.p.smb;
+   struct smb_conn *smbc = &conn->proto.smbc;
+   char *path;
+   char *slash;
+diff --git a/lib/smtp.c b/lib/smtp.c
+index aea41bb..c5d0296 100644
+--- a/lib/smtp.c
++++ b/lib/smtp.c
+@@ -484,7 +484,7 @@ static CURLcode smtp_perform_command(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct SMTP *smtp = data->req.protop;
++  struct SMTP *smtp = data->req.p.smtp;
+ 
+   if(smtp->rcpt) {
+     /* We notify the server we are sending UTF-8 data if a) it supports the
+@@ -697,7 +697,7 @@ static CURLcode smtp_perform_mail(struct connectdata *conn)
+      any there do, as we need to correctly identify our support for SMTPUTF8
+      in the envelope, as per RFC-6531 sect. 3.4 */
+   if(conn->proto.smtpc.utf8_supported && !utf8) {
+-    struct SMTP *smtp = data->req.protop;
++    struct SMTP *smtp = data->req.p.smtp;
+     struct curl_slist *rcpt = smtp->rcpt;
+ 
+     while(rcpt && !utf8) {
+@@ -741,7 +741,7 @@ static CURLcode smtp_perform_rcpt_to(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct SMTP *smtp = data->req.protop;
++  struct SMTP *smtp = data->req.p.smtp;
+   char *address = NULL;
+   struct hostname host = { NULL, NULL, NULL, NULL };
+ 
+@@ -989,7 +989,7 @@ static CURLcode smtp_state_command_resp(struct connectdata *conn, int smtpcode,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct SMTP *smtp = data->req.protop;
++  struct SMTP *smtp = data->req.p.smtp;
+   char *line = data->state.buffer;
+   size_t len = strlen(line);
+ 
+@@ -1055,7 +1055,7 @@ static CURLcode smtp_state_rcpt_resp(struct connectdata *conn, int smtpcode,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct SMTP *smtp = data->req.protop;
++  struct SMTP *smtp = data->req.p.smtp;
+   bool is_smtp_err = FALSE;
+   bool is_smtp_blocking_err = FALSE;
+ 
+@@ -1278,7 +1278,7 @@ static CURLcode smtp_init(struct connectdata *conn)
+   struct Curl_easy *data = conn->data;
+   struct SMTP *smtp;
+ 
+-  smtp = data->req.protop = calloc(sizeof(struct SMTP), 1);
++  smtp = data->req.p.smtp = calloc(sizeof(struct SMTP), 1);
+   if(!smtp)
+     result = CURLE_OUT_OF_MEMORY;
+ 
+@@ -1356,7 +1356,7 @@ static CURLcode smtp_done(struct connectdata *conn, CURLcode status,
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct SMTP *smtp = data->req.protop;
++  struct SMTP *smtp = data->req.p.smtp;
+   struct pingpong *pp = &conn->proto.smtpc.pp;
+   char *eob;
+   ssize_t len;
+@@ -1442,7 +1442,7 @@ static CURLcode smtp_perform(struct connectdata *conn, bool *connected,
+   /* This is SMTP and no proxy */
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct SMTP *smtp = data->req.protop;
++  struct SMTP *smtp = data->req.p.smtp;
+ 
+   DEBUGF(infof(conn->data, "DO phase starts\n"));
+ 
+@@ -1550,7 +1550,7 @@ static CURLcode smtp_disconnect(struct connectdata *conn, bool dead_connection)
+ /* Call this when the DO phase has completed */
+ static CURLcode smtp_dophase_done(struct connectdata *conn, bool connected)
+ {
+-  struct SMTP *smtp = conn->data->req.protop;
++  struct SMTP *smtp = conn->data->req.p.smtp;
+ 
+   (void)connected;
+ 
+@@ -1703,7 +1703,7 @@ static CURLcode smtp_parse_custom_request(struct connectdata *conn)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct SMTP *smtp = data->req.protop;
++  struct SMTP *smtp = data->req.p.smtp;
+   const char *custom = data->set.str[STRING_CUSTOMREQUEST];
+ 
+   /* URL decode the custom request */
+@@ -1796,7 +1796,7 @@ CURLcode Curl_smtp_escape_eob(struct connectdata *conn, const ssize_t nread)
+   ssize_t i;
+   ssize_t si;
+   struct Curl_easy *data = conn->data;
+-  struct SMTP *smtp = data->req.protop;
++  struct SMTP *smtp = data->req.p.smtp;
+   char *scratch = data->state.scratch;
+   char *newscratch = NULL;
+   char *oldscratch = NULL;
+diff --git a/lib/telnet.c b/lib/telnet.c
+index c3b58e5..1fc5af1 100644
+--- a/lib/telnet.c
++++ b/lib/telnet.c
+@@ -247,7 +247,7 @@ CURLcode init_telnet(struct connectdata *conn)
+   if(!tn)
+     return CURLE_OUT_OF_MEMORY;
+ 
+-  conn->data->req.protop = tn; /* make us known */
++  conn->data->req.p.telnet = tn; /* make us known */
+ 
+   tn->telrcv_state = CURL_TS_DATA;
+ 
+@@ -292,7 +292,7 @@ CURLcode init_telnet(struct connectdata *conn)
+ static void negotiate(struct connectdata *conn)
+ {
+   int i;
+-  struct TELNET *tn = (struct TELNET *) conn->data->req.protop;
++  struct TELNET *tn = (struct TELNET *) conn->data->req.p.telnet;
+ 
+   for(i = 0; i < CURL_NTELOPTS; i++) {
+     if(i == CURL_TELOPT_ECHO)
+@@ -365,7 +365,7 @@ static void send_negotiation(struct connectdata *conn, int cmd, int option)
+ static
+ void set_remote_option(struct connectdata *conn, int option, int newstate)
+ {
+-  struct TELNET *tn = (struct TELNET *)conn->data->req.protop;
++  struct TELNET *tn = (struct TELNET *)conn->data->req.p.telnet;
+   if(newstate == CURL_YES) {
+     switch(tn->him[option]) {
+     case CURL_NO:
+@@ -439,7 +439,7 @@ void set_remote_option(struct connectdata *conn, int option, int newstate)
+ static
+ void rec_will(struct connectdata *conn, int option)
+ {
+-  struct TELNET *tn = (struct TELNET *)conn->data->req.protop;
++  struct TELNET *tn = (struct TELNET *)conn->data->req.p.telnet;
+   switch(tn->him[option]) {
+   case CURL_NO:
+     if(tn->him_preferred[option] == CURL_YES) {
+@@ -487,7 +487,7 @@ void rec_will(struct connectdata *conn, int option)
+ static
+ void rec_wont(struct connectdata *conn, int option)
+ {
+-  struct TELNET *tn = (struct TELNET *)conn->data->req.protop;
++  struct TELNET *tn = (struct TELNET *)conn->data->req.p.telnet;
+   switch(tn->him[option]) {
+   case CURL_NO:
+     /* Already disabled */
+@@ -529,7 +529,7 @@ void rec_wont(struct connectdata *conn, int option)
+ static void
+ set_local_option(struct connectdata *conn, int option, int newstate)
+ {
+-  struct TELNET *tn = (struct TELNET *)conn->data->req.protop;
++  struct TELNET *tn = (struct TELNET *)conn->data->req.p.telnet;
+   if(newstate == CURL_YES) {
+     switch(tn->us[option]) {
+     case CURL_NO:
+@@ -603,7 +603,7 @@ set_local_option(struct connectdata *conn, int option, int newstate)
+ static
+ void rec_do(struct connectdata *conn, int option)
+ {
+-  struct TELNET *tn = (struct TELNET *)conn->data->req.protop;
++  struct TELNET *tn = (struct TELNET *)conn->data->req.p.telnet;
+   switch(tn->us[option]) {
+   case CURL_NO:
+     if(tn->us_preferred[option] == CURL_YES) {
+@@ -663,7 +663,7 @@ void rec_do(struct connectdata *conn, int option)
+ static
+ void rec_dont(struct connectdata *conn, int option)
+ {
+-  struct TELNET *tn = (struct TELNET *)conn->data->req.protop;
++  struct TELNET *tn = (struct TELNET *)conn->data->req.p.telnet;
+   switch(tn->us[option]) {
+   case CURL_NO:
+     /* Already disabled */
+@@ -822,7 +822,7 @@ static CURLcode check_telnet_options(struct connectdata *conn)
+   char option_keyword[128] = "";
+   char option_arg[256] = "";
+   struct Curl_easy *data = conn->data;
+-  struct TELNET *tn = (struct TELNET *)conn->data->req.protop;
++  struct TELNET *tn = (struct TELNET *)conn->data->req.p.telnet;
+   CURLcode result = CURLE_OK;
+   int binary_option;
+ 
+@@ -929,7 +929,7 @@ static void suboption(struct connectdata *conn)
+   char varname[128] = "";
+   char varval[128] = "";
+   struct Curl_easy *data = conn->data;
+-  struct TELNET *tn = (struct TELNET *)data->req.protop;
++  struct TELNET *tn = (struct TELNET *)data->req.p.telnet;
+ 
+   printsub(data, '<', (unsigned char *)tn->subbuffer, CURL_SB_LEN(tn) + 2);
+   switch(CURL_SB_GET(tn)) {
+@@ -1004,7 +1004,7 @@ static void sendsuboption(struct connectdata *conn, int option)
+   unsigned char *uc1, *uc2;
+ 
+   struct Curl_easy *data = conn->data;
+-  struct TELNET *tn = (struct TELNET *)data->req.protop;
++  struct TELNET *tn = (struct TELNET *)data->req.p.telnet;
+ 
+   switch(option) {
+   case CURL_TELOPT_NAWS:
+@@ -1062,7 +1062,7 @@ CURLcode telrcv(struct connectdata *conn,
+   int in = 0;
+   int startwrite = -1;
+   struct Curl_easy *data = conn->data;
+-  struct TELNET *tn = (struct TELNET *)data->req.protop;
++  struct TELNET *tn = (struct TELNET *)data->req.p.telnet;
+ 
+ #define startskipping()                                       \
+   if(startwrite >= 0) {                                       \
+@@ -1280,7 +1280,7 @@ static CURLcode send_telnet_data(struct connectdata *conn,
+ static CURLcode telnet_done(struct connectdata *conn,
+                                  CURLcode status, bool premature)
+ {
+-  struct TELNET *tn = (struct TELNET *)conn->data->req.protop;
++  struct TELNET *tn = (struct TELNET *)conn->data->req.p.telnet;
+   (void)status; /* unused */
+   (void)premature; /* not used */
+ 
+@@ -1290,7 +1290,7 @@ static CURLcode telnet_done(struct connectdata *conn,
+   curl_slist_free_all(tn->telnet_vars);
+   tn->telnet_vars = NULL;
+ 
+-  Curl_safefree(conn->data->req.protop);
++  Curl_safefree(conn->data->req.p.telnet);
+ 
+   return CURLE_OK;
+ }
+@@ -1333,7 +1333,7 @@ static CURLcode telnet_do(struct connectdata *conn, bool *done)
+   if(result)
+     return result;
+ 
+-  tn = (struct TELNET *)data->req.protop;
++  tn = data->req.p.telnet;
+ 
+   result = check_telnet_options(conn);
+   if(result)
+diff --git a/lib/transfer.c b/lib/transfer.c
+index a07c7af..4630609 100644
+--- a/lib/transfer.c
++++ b/lib/transfer.c
+@@ -167,7 +167,7 @@ CURLcode Curl_fillreadbuffer(struct connectdata *conn, size_t bytes,
+   bool sending_http_headers = FALSE;
+ 
+   if(conn->handler->protocol&(PROTO_FAMILY_HTTP|CURLPROTO_RTSP)) {
+-    const struct HTTP *http = data->req.protop;
++    const struct HTTP *http = data->req.p.http;
+ 
+     if(http->sending == HTTPSEND_REQUEST)
+       /* We're sending the HTTP request headers, not the data.
+@@ -426,7 +426,7 @@ CURLcode Curl_readrewind(struct connectdata *conn)
+      CURLOPT_HTTPPOST, call app to rewind
+   */
+   if(conn->handler->protocol & PROTO_FAMILY_HTTP) {
+-    struct HTTP *http = data->req.protop;
++    struct HTTP *http = data->req.p.http;
+ 
+     if(http->sendit)
+       mimepart = http->sendit;
+@@ -1028,7 +1028,7 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
+         /* HTTP pollution, this should be written nicer to become more
+            protocol agnostic. */
+         size_t fillcount;
+-        struct HTTP *http = k->protop;
++        struct HTTP *http = k->p.http;
+ 
+         if((k->exp100 == EXP100_SENDING_REQUEST) &&
+            (http->sending == HTTPSEND_BODY)) {
+@@ -1853,7 +1853,7 @@ Curl_setup_transfer(
+ {
+   struct SingleRequest *k = &data->req;
+   struct connectdata *conn = data->conn;
+-  struct HTTP *http = data->req.protop;
++  struct HTTP *http = data->req.p.http;
+   bool httpsending = ((conn->handler->protocol&PROTO_FAMILY_HTTP) &&
+                       (http->sending == HTTPSEND_REQUEST));
+   DEBUGASSERT(conn != NULL);
+diff --git a/lib/url.c b/lib/url.c
+index 150667a..849d527 100644
+--- a/lib/url.c
++++ b/lib/url.c
+@@ -2060,7 +2060,7 @@ static CURLcode setup_connection_internals(struct connectdata *conn)
+ 
+ void Curl_free_request_state(struct Curl_easy *data)
+ {
+-  Curl_safefree(data->req.protop);
++  Curl_safefree(data->req.p.http);
+   Curl_safefree(data->req.newurl);
+ 
+ #ifndef CURL_DISABLE_DOH
+diff --git a/lib/urldata.h b/lib/urldata.h
+index 0ae9269..76baee3 100644
+--- a/lib/urldata.h
++++ b/lib/urldata.h
+@@ -645,8 +645,23 @@ struct SingleRequest {
+      and the 'upload_present' contains the number of bytes available at this
+      position */
+   char *upload_fromhere;
+-  void *protop;       /* Allocated protocol-specific data. Each protocol
+-                         handler makes sure this points to data it needs. */
++
++  /* Allocated protocol-specific data. Each protocol handler makes sure this
++     points to data it needs. */
++  union {
++    struct FILEPROTO *file;
++    struct FTP *ftp;
++    struct HTTP *http;
++    struct IMAP *imap;
++    struct ldapreqinfo *ldap;
++    struct MQTT *mqtt;
++    struct POP3 *pop3;
++    struct RTSP *rtsp;
++    struct smb_request *smb;
++    struct SMTP *smtp;
++    struct SSHPROTO *ssh;
++    struct TELNET *telnet;
++  } p;
+ #ifndef CURL_DISABLE_DOH
+   struct dohdata doh; /* DoH specific data for this request */
+ #endif
+diff --git a/lib/vquic/ngtcp2.c b/lib/vquic/ngtcp2.c
+index 20ee08d..18eeda8 100644
+--- a/lib/vquic/ngtcp2.c
++++ b/lib/vquic/ngtcp2.c
+@@ -962,7 +962,7 @@ static int cb_h3_stream_close(nghttp3_conn *conn, int64_t stream_id,
+                               void *stream_user_data)
+ {
+   struct Curl_easy *data = stream_user_data;
+-  struct HTTP *stream = data->req.protop;
++  struct HTTP *stream = data->req.p.http;
+   (void)conn;
+   (void)stream_id;
+   (void)app_error_code;
+@@ -1008,7 +1008,7 @@ static int cb_h3_recv_data(nghttp3_conn *conn, int64_t stream_id,
+                            void *user_data, void *stream_user_data)
+ {
+   struct Curl_easy *data = stream_user_data;
+-  struct HTTP *stream = data->req.protop;
++  struct HTTP *stream = data->req.p.http;
+   CURLcode result = CURLE_OK;
+   (void)conn;
+ 
+@@ -1067,7 +1067,7 @@ static int cb_h3_end_headers(nghttp3_conn *conn, int64_t stream_id,
+                              void *user_data, void *stream_user_data)
+ {
+   struct Curl_easy *data = stream_user_data;
+-  struct HTTP *stream = data->req.protop;
++  struct HTTP *stream = data->req.p.http;
+   CURLcode result = CURLE_OK;
+   (void)conn;
+   (void)stream_id;
+@@ -1091,7 +1091,7 @@ static int cb_h3_recv_header(nghttp3_conn *conn, int64_t stream_id,
+   nghttp3_vec h3name = nghttp3_rcbuf_get_buf(name);
+   nghttp3_vec h3val = nghttp3_rcbuf_get_buf(value);
+   struct Curl_easy *data = stream_user_data;
+-  struct HTTP *stream = data->req.protop;
++  struct HTTP *stream = data->req.p.http;
+   CURLcode result = CURLE_OK;
+   (void)conn;
+   (void)stream_id;
+@@ -1255,7 +1255,7 @@ static ssize_t ngh3_stream_recv(struct connectdata *conn,
+                                 CURLcode *curlcode)
+ {
+   curl_socket_t sockfd = conn->sock[sockindex];
+-  struct HTTP *stream = conn->data->req.protop;
++  struct HTTP *stream = conn->data->req.p.http;
+   struct quicsocket *qs = conn->quic;
+ 
+   if(!stream->memlen) {
+@@ -1313,7 +1313,7 @@ static int cb_h3_acked_stream_data(nghttp3_conn *conn, int64_t stream_id,
+                                    void *stream_user_data)
+ {
+   struct Curl_easy *data = stream_user_data;
+-  struct HTTP *stream = data->req.protop;
++  struct HTTP *stream = data->req.p.http;
+   (void)conn;
+   (void)stream_id;
+   (void)user_data;
+@@ -1335,7 +1335,7 @@ static ssize_t cb_h3_readfunction(nghttp3_conn *conn, int64_t stream_id,
+ {
+   struct Curl_easy *data = stream_user_data;
+   size_t nread;
+-  struct HTTP *stream = data->req.protop;
++  struct HTTP *stream = data->req.p.http;
+   (void)conn;
+   (void)stream_id;
+   (void)user_data;
+@@ -1398,7 +1398,7 @@ static ssize_t cb_h3_readfunction(nghttp3_conn *conn, int64_t stream_id,
+ static CURLcode http_request(struct connectdata *conn, const void *mem,
+                              size_t len)
+ {
+-  struct HTTP *stream = conn->data->req.protop;
++  struct HTTP *stream = conn->data->req.p.http;
+   size_t nheader;
+   size_t i;
+   size_t authority_idx;
+@@ -1641,7 +1641,7 @@ static ssize_t ngh3_stream_send(struct connectdata *conn,
+   ssize_t sent;
+   struct quicsocket *qs = conn->quic;
+   curl_socket_t sockfd = conn->sock[sockindex];
+-  struct HTTP *stream = conn->data->req.protop;
++  struct HTTP *stream = conn->data->req.p.http;
+ 
+   if(!stream->h3req) {
+     CURLcode result = http_request(conn, mem, len);
+@@ -1909,7 +1909,7 @@ CURLcode Curl_quic_done_sending(struct connectdata *conn)
+ {
+   if(conn->handler == &Curl_handler_http3) {
+     /* only for HTTP/3 transfers */
+-    struct HTTP *stream = conn->data->req.protop;
++    struct HTTP *stream = conn->data->req.p.http;
+     struct quicsocket *qs = conn->quic;
+     stream->upload_done = TRUE;
+     (void)nghttp3_conn_resume_stream(qs->h3conn, stream->stream3_id);
+@@ -1926,7 +1926,7 @@ void Curl_quic_done(struct Curl_easy *data, bool premature)
+   (void)premature;
+   if(data->conn->handler == &Curl_handler_http3) {
+     /* only for HTTP/3 transfers */
+-    struct HTTP *stream = data->req.protop;
++    struct HTTP *stream = data->req.p.http;
+     Curl_dyn_free(&stream->overflow);
+   }
+ }
+@@ -1941,7 +1941,7 @@ bool Curl_quic_data_pending(const struct Curl_easy *data)
+      buffer and allocated an overflow buffer. Since it's possible that
+      there's no more data coming on the socket, we need to keep reading
+      until the overflow buffer is empty. */
+-  const struct HTTP *stream = data->req.protop;
++  const struct HTTP *stream = data->req.p.http;
+   return Curl_dyn_len(&stream->overflow) > 0;
+ }
+ 
+diff --git a/lib/vquic/quiche.c b/lib/vquic/quiche.c
+index fd9cb8b..c0e250d 100644
+--- a/lib/vquic/quiche.c
++++ b/lib/vquic/quiche.c
+@@ -131,7 +131,7 @@ static unsigned int quiche_conncheck(struct connectdata *conn,
+ 
+ static CURLcode quiche_do(struct connectdata *conn, bool *done)
+ {
+-  struct HTTP *stream = conn->data->req.protop;
++  struct HTTP *stream = conn->data->req.p.http;
+   stream->h3req = FALSE; /* not sent */
+   return Curl_http(conn, done);
+ }
+@@ -460,7 +460,7 @@ static ssize_t h3_stream_recv(struct connectdata *conn,
+   int rc;
+   struct h3h1header headers;
+   struct Curl_easy *data = conn->data;
+-  struct HTTP *stream = data->req.protop;
++  struct HTTP *stream = data->req.p.http;
+   headers.dest = buf;
+   headers.destlen = buffersize;
+   headers.nlen = 0;
+@@ -548,7 +548,7 @@ static ssize_t h3_stream_send(struct connectdata *conn,
+   ssize_t sent;
+   struct quicsocket *qs = conn->quic;
+   curl_socket_t sockfd = conn->sock[sockindex];
+-  struct HTTP *stream = conn->data->req.protop;
++  struct HTTP *stream = conn->data->req.p.http;
+ 
+   if(!stream->h3req) {
+     CURLcode result = http_request(conn, mem, len);
+@@ -596,7 +596,7 @@ static CURLcode http_request(struct connectdata *conn, const void *mem,
+ {
+   /*
+    */
+-  struct HTTP *stream = conn->data->req.protop;
++  struct HTTP *stream = conn->data->req.p.http;
+   size_t nheader;
+   size_t i;
+   size_t authority_idx;
+@@ -824,7 +824,7 @@ CURLcode Curl_quic_done_sending(struct connectdata *conn)
+   if(conn->handler == &Curl_handler_http3) {
+     /* only for HTTP/3 transfers */
+     ssize_t sent;
+-    struct HTTP *stream = conn->data->req.protop;
++    struct HTTP *stream = conn->data->req.p.http;
+     struct quicsocket *qs = conn->quic;
+     fprintf(stderr, "!!! Curl_quic_done_sending\n");
+     stream->upload_done = TRUE;
+diff --git a/lib/vssh/libssh.c b/lib/vssh/libssh.c
+index 8988e23..a84e1bf 100644
+--- a/lib/vssh/libssh.c
++++ b/lib/vssh/libssh.c
+@@ -662,7 +662,7 @@ static CURLcode myssh_statemach_act(struct connectdata *conn, bool *block)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct SSHPROTO *protop = data->req.protop;
++  struct SSHPROTO *protop = data->req.p.ssh;
+   struct ssh_conn *sshc = &conn->proto.sshc;
+   curl_socket_t sock = conn->sock[FIRSTSOCKET];
+   int rc = SSH_NO_ERROR, err;
+@@ -2129,7 +2129,7 @@ static CURLcode myssh_setup_connection(struct connectdata *conn)
+ {
+   struct SSHPROTO *ssh;
+ 
+-  conn->data->req.protop = ssh = calloc(1, sizeof(struct SSHPROTO));
++  conn->data->req.p.ssh = ssh = calloc(1, sizeof(struct SSHPROTO));
+   if(!ssh)
+     return CURLE_OUT_OF_MEMORY;
+ 
+@@ -2152,7 +2152,7 @@ static CURLcode myssh_connect(struct connectdata *conn, bool *done)
+   int rc;
+ 
+   /* initialize per-handle data if not already */
+-  if(!data->req.protop)
++  if(!data->req.p.ssh)
+     myssh_setup_connection(conn);
+ 
+   /* We default to persistent connections. We set this already in this connect
+@@ -2353,7 +2353,7 @@ static CURLcode scp_disconnect(struct connectdata *conn,
+ static CURLcode myssh_done(struct connectdata *conn, CURLcode status)
+ {
+   CURLcode result = CURLE_OK;
+-  struct SSHPROTO *protop = conn->data->req.protop;
++  struct SSHPROTO *protop = conn->data->req.p.ssh;
+ 
+   if(!status) {
+     /* run the state-machine */
+@@ -2606,7 +2606,7 @@ static void sftp_quote(struct connectdata *conn)
+ {
+   const char *cp;
+   struct Curl_easy *data = conn->data;
+-  struct SSHPROTO *protop = data->req.protop;
++  struct SSHPROTO *protop = data->req.p.ssh;
+   struct ssh_conn *sshc = &conn->proto.sshc;
+   CURLcode result;
+ 
+diff --git a/lib/vssh/libssh2.c b/lib/vssh/libssh2.c
+index 4f56bb4..3ed777f 100644
+--- a/lib/vssh/libssh2.c
++++ b/lib/vssh/libssh2.c
+@@ -789,7 +789,7 @@ static CURLcode ssh_statemach_act(struct connectdata *conn, bool *block)
+ {
+   CURLcode result = CURLE_OK;
+   struct Curl_easy *data = conn->data;
+-  struct SSHPROTO *sftp_scp = data->req.protop;
++  struct SSHPROTO *sftp_scp = data->req.p.ssh;
+   struct ssh_conn *sshc = &conn->proto.sshc;
+   curl_socket_t sock = conn->sock[FIRSTSOCKET];
+   int rc = LIBSSH2_ERROR_NONE;
+@@ -2989,7 +2989,7 @@ static CURLcode ssh_setup_connection(struct connectdata *conn)
+ {
+   struct SSHPROTO *ssh;
+ 
+-  conn->data->req.protop = ssh = calloc(1, sizeof(struct SSHPROTO));
++  conn->data->req.p.ssh = ssh = calloc(1, sizeof(struct SSHPROTO));
+   if(!ssh)
+     return CURLE_OUT_OF_MEMORY;
+ 
+@@ -3013,7 +3013,7 @@ static CURLcode ssh_connect(struct connectdata *conn, bool *done)
+   struct Curl_easy *data = conn->data;
+ 
+   /* initialize per-handle data if not already */
+-  if(!data->req.protop)
++  if(!data->req.p.ssh)
+     ssh_setup_connection(conn);
+ 
+   /* We default to persistent connections. We set this already in this connect
+@@ -3192,7 +3192,7 @@ static CURLcode scp_disconnect(struct connectdata *conn, bool dead_connection)
+ static CURLcode ssh_done(struct connectdata *conn, CURLcode status)
+ {
+   CURLcode result = CURLE_OK;
+-  struct SSHPROTO *sftp_scp = conn->data->req.protop;
++  struct SSHPROTO *sftp_scp = conn->data->req.p.ssh;
+ 
+   if(!status) {
+     /* run the state-machine */
+diff --git a/lib/vssh/wolfssh.c b/lib/vssh/wolfssh.c
+index dcbbab6..1b990e3 100644
+--- a/lib/vssh/wolfssh.c
++++ b/lib/vssh/wolfssh.c
+@@ -322,7 +322,7 @@ static CURLcode wssh_setup_connection(struct connectdata *conn)
+ {
+   struct SSHPROTO *ssh;
+ 
+-  conn->data->req.protop = ssh = calloc(1, sizeof(struct SSHPROTO));
++  conn->data->req.p.ssh = ssh = calloc(1, sizeof(struct SSHPROTO));
+   if(!ssh)
+     return CURLE_OUT_OF_MEMORY;
+ 
+@@ -356,7 +356,7 @@ static CURLcode wssh_connect(struct connectdata *conn, bool *done)
+   int rc;
+ 
+   /* initialize per-handle data if not already */
+-  if(!data->req.protop)
++  if(!data->req.p.ssh)
+     wssh_setup_connection(conn);
+ 
+   /* We default to persistent connections. We set this already in this connect
+@@ -429,7 +429,7 @@ static CURLcode wssh_statemach_act(struct connectdata *conn, bool *block)
+   CURLcode result = CURLE_OK;
+   struct ssh_conn *sshc = &conn->proto.sshc;
+   struct Curl_easy *data = conn->data;
+-  struct SSHPROTO *sftp_scp = data->req.protop;
++  struct SSHPROTO *sftp_scp = data->req.p.ssh;
+   WS_SFTPNAME *name;
+   int rc = 0;
+   *block = FALSE; /* we're not blocking by default */
+@@ -1027,7 +1027,7 @@ static CURLcode wssh_block_statemach(struct connectdata *conn,
+ static CURLcode wssh_done(struct connectdata *conn, CURLcode status)
+ {
+   CURLcode result = CURLE_OK;
+-  struct SSHPROTO *sftp_scp = conn->data->req.protop;
++  struct SSHPROTO *sftp_scp = conn->data->req.p.ssh;
+ 
+   if(!status) {
+     /* run the state-machine */

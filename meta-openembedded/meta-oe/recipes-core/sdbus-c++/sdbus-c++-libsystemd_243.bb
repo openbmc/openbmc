@@ -41,6 +41,7 @@ SRC_URI_MUSL = "\
                file://0002-src-login-brightness.c-include-sys-wait.h.patch \
                file://0003-src-basic-copy.c-include-signal.h.patch \
                file://0004-src-shared-cpu-set-util.h-add-__cpu_mask-definition.patch \
+               file://0001-meson-Fix-reallocarray-check.patch \
                "
 
 PACKAGECONFIG ??= "gshadow idn"

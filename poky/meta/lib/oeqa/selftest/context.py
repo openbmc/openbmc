@@ -34,7 +34,7 @@ class NonConcurrentTestSuite(unittest.TestSuite):
         (builddir, newbuilddir) = self.setupfunc("-st", None, self.suite)
         ret = super().run(result)
         os.chdir(builddir)
-        if newbuilddir and ret.wasSuccessful():
+        if newbuilddir and ret.wasSuccessful() and self.removefunc:
             self.removefunc(newbuilddir)
 
 def removebuilddir(d):
@@ -54,13 +54,18 @@ def removebuilddir(d):
     bb.utils.prunedir(d, ionice=True)
 
 class OESelftestTestContext(OETestContext):
-    def __init__(self, td=None, logger=None, machines=None, config_paths=None, newbuilddir=None):
+    def __init__(self, td=None, logger=None, machines=None, config_paths=None, newbuilddir=None, keep_builddir=None):
         super(OESelftestTestContext, self).__init__(td, logger)
 
         self.machines = machines
         self.custommachine = None
         self.config_paths = config_paths
         self.newbuilddir = newbuilddir
+
+        if keep_builddir:
+            self.removebuilddir = None
+        else:
+            self.removebuilddir = removebuilddir
 
     def setup_builddir(self, suffix, selftestdir, suite):
         builddir = os.environ['BUILDDIR']
@@ -119,9 +124,9 @@ class OESelftestTestContext(OETestContext):
         if processes:
             from oeqa.core.utils.concurrencytest import ConcurrentTestSuite
 
-            return ConcurrentTestSuite(suites, processes, self.setup_builddir, removebuilddir)
+            return ConcurrentTestSuite(suites, processes, self.setup_builddir, self.removebuilddir)
         else:
-            return NonConcurrentTestSuite(suites, processes, self.setup_builddir, removebuilddir)
+            return NonConcurrentTestSuite(suites, processes, self.setup_builddir, self.removebuilddir)
 
     def runTests(self, processes=None, machine=None, skips=[]):
         if machine:
@@ -178,6 +183,9 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
         parser.add_argument('-T', '--exclude-tag', dest="exclude_tags",
                 action='append', default=None,
                 help='Exclude all (unhidden) tests that match any of the specified tag(s). (exclude applies before select)')
+
+        parser.add_argument('-K', '--keep-builddir', action='store_true',
+                help='Keep the test build directory even if all tests pass')
 
         parser.add_argument('-B', '--newbuilddir', help='New build directory to use for tests.')
         parser.add_argument('-v', '--verbose', action='store_true')
@@ -236,6 +244,7 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
         self.tc_kwargs['init']['config_paths']['localconf'] = os.path.join(builddir, "conf/local.conf")
         self.tc_kwargs['init']['config_paths']['bblayers'] = os.path.join(builddir, "conf/bblayers.conf")
         self.tc_kwargs['init']['newbuilddir'] = args.newbuilddir
+        self.tc_kwargs['init']['keep_builddir'] = args.keep_builddir
 
         def tag_filter(tags):
             if args.exclude_tags:

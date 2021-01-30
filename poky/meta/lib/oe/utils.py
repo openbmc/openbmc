@@ -193,7 +193,7 @@ def parallel_make(d, makeinst=False):
 
         return int(v)
 
-    return None
+    return ''
 
 def parallel_make_argument(d, fmt, limit=None, makeinst=False):
     """
