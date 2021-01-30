@@ -256,7 +256,7 @@ fakeroot create_shar() {
 
 	rm -f ${T}/pre_install_command ${T}/post_install_command
 
-	if [ ${SDK_RELOCATE_AFTER_INSTALL} -eq 1 ] ; then
+	if [ "${SDK_RELOCATE_AFTER_INSTALL}" = "1" ] ; then
 		cp ${TOOLCHAIN_SHAR_REL_TMPL} ${T}/post_install_command
 	fi
 	cat << "EOF" >> ${T}/pre_install_command

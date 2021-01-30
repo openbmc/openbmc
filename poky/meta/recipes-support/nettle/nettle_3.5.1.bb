@@ -1,5 +1,8 @@
 SUMMARY = "A low level cryptographic library"
 HOMEPAGE = "http://www.lysator.liu.se/~nisse/nettle/"
+DESCRIPTION = "It tries to solve a problem of providing a common set of \
+cryptographic algorithms for higher-level applications by implementing a \
+context-independent set of cryptographic algorithms"
 SECTION = "libs"
 LICENSE = "LGPLv3+ | GPLv2+"
 

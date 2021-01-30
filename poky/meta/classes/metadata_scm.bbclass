@@ -1,5 +1,7 @@
 METADATA_BRANCH ?= "${@base_detect_branch(d)}"
+METADATA_BRANCH[vardepvalue] = "${METADATA_BRANCH}"
 METADATA_REVISION ?= "${@base_detect_revision(d)}"
+METADATA_REVISION[vardepvalue] = "${METADATA_REVISION}"
 
 def base_detect_revision(d):
     path = base_get_scmbasepath(d)

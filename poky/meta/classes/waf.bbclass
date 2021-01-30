@@ -1,9 +1,18 @@
 # avoids build breaks when using no-static-libs.inc
 DISABLE_STATIC = ""
 
+# What Python interpretter to use.  Defaults to Python 3 but can be
+# overridden if required.
+WAF_PYTHON ?= "python3"
+
 B = "${WORKDIR}/build"
 
 EXTRA_OECONF_append = " ${PACKAGECONFIG_CONFARGS}"
+
+EXTRA_OEWAF_BUILD ??= ""
+# In most cases, you want to pass the same arguments to `waf build` and `waf
+# install`, but you can override it if necessary
+EXTRA_OEWAF_INSTALL ??= "${EXTRA_OEWAF_BUILD}"
 
 def waflock_hash(d):
     # Calculates the hash used for the waf lock file. This should include
@@ -35,9 +44,10 @@ python waf_preconfigure() {
     import subprocess
     from distutils.version import StrictVersion
     subsrcdir = d.getVar('S')
+    python = d.getVar('WAF_PYTHON')
     wafbin = os.path.join(subsrcdir, 'waf')
     try:
-        result = subprocess.check_output([wafbin, '--version'], cwd=subsrcdir, stderr=subprocess.STDOUT)
+        result = subprocess.check_output([python, wafbin, '--version'], cwd=subsrcdir, stderr=subprocess.STDOUT)
         version = result.decode('utf-8').split()[1]
         if StrictVersion(version) >= StrictVersion("1.8.7"):
             d.setVar("WAF_EXTRA_CONF", "--bindir=${bindir} --libdir=${libdir}")
@@ -50,16 +60,16 @@ python waf_preconfigure() {
 do_configure[prefuncs] += "waf_preconfigure"
 
 waf_do_configure() {
-	(cd ${S} && ./waf configure -o ${B} --prefix=${prefix} ${WAF_EXTRA_CONF} ${EXTRA_OECONF})
+	(cd ${S} && ${WAF_PYTHON} ./waf configure -o ${B} --prefix=${prefix} ${WAF_EXTRA_CONF} ${EXTRA_OECONF})
 }
 
 do_compile[progress] = "outof:^\[\s*(\d+)/\s*(\d+)\]\s+"
 waf_do_compile()  {
-	(cd ${S} && ./waf build ${@oe.utils.parallel_make_argument(d, '-j%d', limit=64)})
+	(cd ${S} && ${WAF_PYTHON} ./waf build ${@oe.utils.parallel_make_argument(d, '-j%d', limit=64)} ${EXTRA_OEWAF_BUILD})
 }
 
 waf_do_install() {
-	(cd ${S} && ./waf install --destdir=${D})
+	(cd ${S} && ${WAF_PYTHON} ./waf install --destdir=${D} ${EXTRA_OEWAF_INSTALL})
 }
 
 EXPORT_FUNCTIONS do_configure do_compile do_install

@@ -1,0 +1,42 @@
+From cb78974394a9af865e1d2d606e838dbec0de80e8 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 5 Oct 2020 15:31:42 -0400
+Subject: [PATCH 01/16] fix: strncpy equals destination size warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Some versions of GCC when called with -Wstringop-truncation will warn
+when doing a copy of the same size as the destination buffer with
+strncpy :
+
+  ‘strncpy’ specified bound 256 equals destination size [-Werror=stringop-truncation]
+
+Since we unconditionally write '\0' in the last byte, reduce the copy
+size by one.
+
+Upstream-Status: Backport
+
+Change-Id: Idb907c9550817a06fc0dffc489740f63d440e7d4
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+---
+ lttng-syscalls.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lttng-syscalls.c b/lttng-syscalls.c
+index 49c0d81b..b43dd570 100644
+--- a/lttng-syscalls.c
++++ b/lttng-syscalls.c
+@@ -719,7 +719,7 @@ int fill_table(const struct trace_syscall_entry *table, size_t table_len,
+ 			ev.u.syscall.abi = LTTNG_KERNEL_SYSCALL_ABI_COMPAT;
+ 			break;
+ 		}
+-		strncpy(ev.name, desc->name, LTTNG_KERNEL_SYM_NAME_LEN);
++		strncpy(ev.name, desc->name, LTTNG_KERNEL_SYM_NAME_LEN - 1);
+ 		ev.name[LTTNG_KERNEL_SYM_NAME_LEN - 1] = '\0';
+ 		ev.instrumentation = LTTNG_KERNEL_SYSCALL;
+ 		chan_table[i] = _lttng_event_create(chan, &ev, filter,
+-- 
+2.25.1
+

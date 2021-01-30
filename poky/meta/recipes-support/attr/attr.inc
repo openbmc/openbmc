@@ -1,4 +1,8 @@
 SUMMARY = "Utilities for manipulating filesystem extended attributes"
+DESCRIPTION = "A set of tools for manipulating extended attributes on filesystem \
+objects, in particular getfattr(1) and setfattr(1). An attr(1) command \
+is also provided which is largely compatible with the SGI IRIX tool of \
+the same name."
 HOMEPAGE = "http://savannah.nongnu.org/projects/attr/"
 SECTION = "libs"
 

@@ -15,25 +15,41 @@ Each folder is self-contained regarding content and figures.
 If you want to find HTML versions of the BitBake manuals on the web, 
 go to http://www.openembedded.org/wiki/Documentation. 
 
-Makefile
-========
+Sphinx
+======
 
-The Makefile processes manual directories to create HTML, PDF,
-tarballs, etc.  Details on how the Makefile work are documented
-inside the Makefile.  See that file for more information.
+The BitBake documentation was migrated from the original DocBook
+format to Sphinx based documentation for the Yocto Project 3.2
+release.
 
-To build a manual, you run the make command and pass it the name
-of the folder containing the manual's contents. 
-For example, the following command run from the documentation directory 
-creates an HTML and a PDF version of the BitBake User Manual.
-The DOC variable specifies the manual you are making:
+Additional information related to the Sphinx migration, and guidelines
+for developers willing to contribute to the BitBake documentation can
+be found in the Yocto Project Documentation README file:
 
-     $ make DOC=bitbake-user-manual
+https://git.yoctoproject.org/cgit/cgit.cgi/yocto-docs/tree/documentation/README
 
-template
-========
-Contains various templates, fonts, and some old PNG files.
+How to build the Yocto Project documentation
+============================================
 
-tools
-=====
-Contains a tool to convert the DocBook files to PDF format.
+Sphinx is written in Python. While it might work with Python2, for
+obvious reasons, we will only support building the BitBake
+documentation with Python3.
+
+Sphinx might be available in your Linux distro packages repositories,
+however it is not recommend using distro packages, as they might be
+old versions, especially if you are using an LTS version of your
+distro. The recommended method to install Sphinx and all required
+dependencies is to use the Python Package Index (pip).
+
+To install all required packages run:
+
+ $ pip3 install sphinx sphinx_rtd_theme pyyaml
+
+To build the documentation locally, run:
+
+ $ cd documentation
+ $ make html
+
+The resulting HTML index page will be _build/html/index.html, and you
+can browse your own copy of the locally generated documentation with
+your browser.

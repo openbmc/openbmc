@@ -11,6 +11,22 @@ COMPATIBLE_HOST = '(x86_64|i.86|powerpc|aarch64|mips|nios2|arm|riscv).*-linux'
 SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://Makefile-Do-not-fail-if-CONFIG_TRACEPOINTS-is-not-en.patch \
            file://BUILD_RUNTIME_BUG_ON-vs-gcc7.patch \
+           file://0001-fix-strncpy-equals-destination-size-warning.patch \
+           file://0002-fix-objtool-Rename-frame.h-objtool.h-v5.10.patch \
+           file://0003-fix-btrfs-tracepoints-output-proper-root-owner-for-t.patch \
+           file://0004-fix-btrfs-make-ordered-extent-tracepoint-take-btrfs_.patch \
+           file://0005-fix-ext4-fast-commit-recovery-path-v5.10.patch \
+           file://0006-fix-KVM-x86-Add-intr-vectoring-info-and-error-code-t.patch \
+           file://0007-fix-kvm-x86-mmu-Add-TDP-MMU-PF-handler-v5.10.patch \
+           file://0008-fix-KVM-x86-mmu-Return-unique-RET_PF_-values-if-the-.patch \
+           file://0009-fix-tracepoint-Optimize-using-static_call-v5.10.patch \
+           file://0010-fix-include-order-for-older-kernels.patch \
+           file://0011-Add-release-maintainer-script.patch \
+           file://0012-Improve-the-release-script.patch \
+           file://0013-fix-backport-of-fix-ext4-fast-commit-recovery-path-v.patch \
+           file://0014-Revert-fix-include-order-for-older-kernels.patch \
+           file://0015-fix-backport-of-fix-tracepoint-Optimize-using-static.patch \
+           file://0016-fix-adjust-version-range-for-trace_find_free_extent.patch \
            "
 
 SRC_URI[md5sum] = "8ef09fdfcdec669d33f7fc1c1c80f2c4"

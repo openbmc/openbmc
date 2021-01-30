@@ -2225,7 +2225,7 @@ python do_package () {
     # cache.  This is useful if an item this class depends on changes in a
     # way that the output of this class changes.  rpmdeps is a good example
     # as any change to rpmdeps requires this to be rerun.
-    # PACKAGE_BBCLASS_VERSION = "2"
+    # PACKAGE_BBCLASS_VERSION = "4"
 
     # Init cachedpath
     global cpath

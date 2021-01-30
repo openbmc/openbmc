@@ -9,6 +9,10 @@ SRC_URI = "https://curl.haxx.se/download/curl-${PV}.tar.bz2 \
            file://0001-replace-krb5-config-with-pkg-config.patch \
            file://CVE-2020-8169.patch \
            file://CVE-2020-8177.patch \
+           file://CVE-2020-8231.patch \
+           file://CVE-2020-8284.patch \
+           file://CVE-2020-8285.patch \
+           file://CVE-2020-8286.patch \
 "
 
 SRC_URI[md5sum] = "ec5fc263f898a3dfef08e805f1ecca42"

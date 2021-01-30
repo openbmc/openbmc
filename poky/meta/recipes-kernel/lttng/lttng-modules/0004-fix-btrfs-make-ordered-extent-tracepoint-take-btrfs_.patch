@@ -1,0 +1,179 @@
+From d51a3332909ff034c8ec16ead0090bd6a4e2bc38 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 27 Oct 2020 12:10:05 -0400
+Subject: [PATCH 04/16] fix: btrfs: make ordered extent tracepoint take
+ btrfs_inode (v5.10)
+
+See upstream commit :
+
+  commit acbf1dd0fcbd10c67826a19958f55a053b32f532
+  Author: Nikolay Borisov <nborisov@suse.com>
+  Date:   Mon Aug 31 14:42:40 2020 +0300
+
+    btrfs: make ordered extent tracepoint take btrfs_inode
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: I096d0801ffe0ad826cfe414cdd1c0857cbd2b624
+---
+ instrumentation/events/lttng-module/btrfs.h | 120 +++++++++++++++-----
+ 1 file changed, 90 insertions(+), 30 deletions(-)
+
+diff --git a/instrumentation/events/lttng-module/btrfs.h b/instrumentation/events/lttng-module/btrfs.h
+index 52fcfd0d..d47f3280 100644
+--- a/instrumentation/events/lttng-module/btrfs.h
++++ b/instrumentation/events/lttng-module/btrfs.h
+@@ -346,7 +346,29 @@ LTTNG_TRACEPOINT_EVENT(btrfs_handle_em_exist,
+ )
+ #endif
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__ordered_extent,
++
++	TP_PROTO(const struct btrfs_inode *inode,
++		 const struct btrfs_ordered_extent *ordered),
++
++	TP_ARGS(inode, ordered),
++
++	TP_FIELDS(
++		ctf_array(u8, fsid, inode->root->lttng_fs_info_fsid, BTRFS_UUID_SIZE)
++		ctf_integer(ino_t, ino, btrfs_ino(inode))
++		ctf_integer(u64, file_offset, ordered->file_offset)
++		ctf_integer(u64, start, ordered->disk_bytenr)
++		ctf_integer(u64, len, ordered->num_bytes)
++		ctf_integer(u64, disk_len, ordered->disk_num_bytes)
++		ctf_integer(u64, bytes_left, ordered->bytes_left)
++		ctf_integer(unsigned long, flags, ordered->flags)
++		ctf_integer(int, compress_type, ordered->compress_type)
++		ctf_integer(int, refs, refcount_read(&ordered->refs))
++		ctf_integer(u64, root_objectid, inode->root->root_key.objectid)
++	)
++)
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__ordered_extent,
+ 
+ 	TP_PROTO(const struct inode *inode,
+@@ -458,7 +480,39 @@ LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__ordered_extent,
+ )
+ #endif
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0) || \
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_add,
++
++	TP_PROTO(const struct btrfs_inode *inode,
++		 const struct btrfs_ordered_extent *ordered),
++
++	TP_ARGS(inode, ordered)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_remove,
++
++	TP_PROTO(const struct btrfs_inode *inode,
++		 const struct btrfs_ordered_extent *ordered),
++
++	TP_ARGS(inode, ordered)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_start,
++
++	TP_PROTO(const struct btrfs_inode *inode,
++		 const struct btrfs_ordered_extent *ordered),
++
++	TP_ARGS(inode, ordered)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_put,
++
++	TP_PROTO(const struct btrfs_inode *inode,
++		 const struct btrfs_ordered_extent *ordered),
++
++	TP_ARGS(inode, ordered)
++)
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0) || \
+ 	LTTNG_SLE_KERNEL_RANGE(4,4,73,5,0,0, 4,4,73,6,0,0) || \
+ 	LTTNG_SLE_KERNEL_RANGE(4,4,82,6,0,0, 4,4,82,7,0,0) || \
+ 	LTTNG_SLE_KERNEL_RANGE(4,4,92,6,0,0, 4,4,92,7,0,0) || \
+@@ -494,7 +548,41 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_put,
+ 
+ 	TP_ARGS(inode, ordered)
+ )
++#else
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_add,
++
++	TP_PROTO(struct inode *inode, struct btrfs_ordered_extent *ordered),
++
++	TP_ARGS(inode, ordered)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_remove,
++
++	TP_PROTO(struct inode *inode, struct btrfs_ordered_extent *ordered),
++
++	TP_ARGS(inode, ordered)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_start,
++
++	TP_PROTO(struct inode *inode, struct btrfs_ordered_extent *ordered),
++
++	TP_ARGS(inode, ordered)
++)
+ 
++LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_put,
++
++	TP_PROTO(struct inode *inode, struct btrfs_ordered_extent *ordered),
++
++	TP_ARGS(inode, ordered)
++)
++#endif
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,14,0) || \
++	LTTNG_SLE_KERNEL_RANGE(4,4,73,5,0,0, 4,4,73,6,0,0) || \
++	LTTNG_SLE_KERNEL_RANGE(4,4,82,6,0,0, 4,4,82,7,0,0) || \
++	LTTNG_SLE_KERNEL_RANGE(4,4,92,6,0,0, 4,4,92,7,0,0) || \
++	LTTNG_SLE_KERNEL_RANGE(4,4,103,6,0,0, 4,5,0,0,0,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__writepage,
+ 
+ 	TP_PROTO(const struct page *page, const struct inode *inode,
+@@ -563,34 +651,6 @@ LTTNG_TRACEPOINT_EVENT(btrfs_sync_file,
+ 	)
+ )
+ #else
+-LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_add,
+-
+-	TP_PROTO(struct inode *inode, struct btrfs_ordered_extent *ordered),
+-
+-	TP_ARGS(inode, ordered)
+-)
+-
+-LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_remove,
+-
+-	TP_PROTO(struct inode *inode, struct btrfs_ordered_extent *ordered),
+-
+-	TP_ARGS(inode, ordered)
+-)
+-
+-LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_start,
+-
+-	TP_PROTO(struct inode *inode, struct btrfs_ordered_extent *ordered),
+-
+-	TP_ARGS(inode, ordered)
+-)
+-
+-LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__ordered_extent, btrfs_ordered_extent_put,
+-
+-	TP_PROTO(struct inode *inode, struct btrfs_ordered_extent *ordered),
+-
+-	TP_ARGS(inode, ordered)
+-)
+-
+ LTTNG_TRACEPOINT_EVENT_CLASS(btrfs__writepage,
+ 
+ 	TP_PROTO(struct page *page, struct inode *inode,
+-- 
+2.25.1
+

@@ -47,7 +47,7 @@ def find_git_folder(d, sourcedir):
     return None
 
 def get_source_date_epoch_from_git(d, sourcedir):
-    if not "git://" in d.getVar('SRC_URI'):
+    if not "git://" in d.getVar('SRC_URI') and not "gitsm://" in d.getVar('SRC_URI'):
         return None
 
     gitpath = find_git_folder(d, sourcedir)

@@ -15,11 +15,11 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  sql/CMakeLists.txt | 30 ++++++++++++++++++++----------
  1 file changed, 20 insertions(+), 10 deletions(-)
 
-diff --git a/sql/CMakeLists.txt b/sql/CMakeLists.txt
-index c6910f46..bf51f4cb 100644
---- a/sql/CMakeLists.txt
-+++ b/sql/CMakeLists.txt
-@@ -50,11 +50,16 @@ ${WSREP_INCLUDES}
+Index: mariadb-10.4.17/sql/CMakeLists.txt
+===================================================================
+--- mariadb-10.4.17.orig/sql/CMakeLists.txt
++++ mariadb-10.4.17/sql/CMakeLists.txt
+@@ -55,11 +55,16 @@ ${CMAKE_BINARY_DIR}/sql
  
  
  
@@ -41,7 +41,7 @@ index c6910f46..bf51f4cb 100644
  
  ADD_DEFINITIONS(-DMYSQL_SERVER -DHAVE_EVENT_SCHEDULER)
  
-@@ -370,11 +375,16 @@ IF(NOT CMAKE_CROSSCOMPILING)
+@@ -364,11 +369,16 @@ IF(NOT CMAKE_CROSSCOMPILING)
    ADD_EXECUTABLE(gen_lex_hash gen_lex_hash.cc)
  ENDIF()
  

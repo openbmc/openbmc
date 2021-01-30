@@ -1,0 +1,155 @@
+From c6b31b349fe901a8f586a66064f9e9b15449ac1c Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 26 Oct 2020 17:09:05 -0400
+Subject: [PATCH 09/16] fix: tracepoint: Optimize using static_call() (v5.10)
+
+See upstream commit :
+
+  commit d25e37d89dd2f41d7acae0429039d2f0ae8b4a07
+  Author: Steven Rostedt (VMware) <rostedt@goodmis.org>
+  Date:   Tue Aug 18 15:57:52 2020 +0200
+
+    tracepoint: Optimize using static_call()
+
+    Currently the tracepoint site will iterate a vector and issue indirect
+    calls to however many handlers are registered (ie. the vector is
+    long).
+
+    Using static_call() it is possible to optimize this for the common
+    case of only having a single handler registered. In this case the
+    static_call() can directly call this handler. Otherwise, if the vector
+    is longer than 1, call a function that iterates the whole vector like
+    the current code.
+
+Upstream-Status: Backport
+
+Change-Id: I739dd84d62cc1a821b8bd8acff74fa29aa25d22f
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ lttng-statedump-impl.c    | 44 ++++++++++++++++++++++++++++++++-------
+ probes/lttng.c            |  7 +++++--
+ tests/probes/lttng-test.c |  7 ++++++-
+ wrapper/tracepoint.h      |  8 +++++++
+ 4 files changed, 56 insertions(+), 10 deletions(-)
+
+diff --git a/lttng-statedump-impl.c b/lttng-statedump-impl.c
+index 54a309d1..e0b19b42 100644
+--- a/lttng-statedump-impl.c
++++ b/lttng-statedump-impl.c
+@@ -55,13 +55,43 @@
+ #define LTTNG_INSTRUMENTATION
+ #include <instrumentation/events/lttng-module/lttng-statedump.h>
+ 
+-DEFINE_TRACE(lttng_statedump_block_device);
+-DEFINE_TRACE(lttng_statedump_end);
+-DEFINE_TRACE(lttng_statedump_interrupt);
+-DEFINE_TRACE(lttng_statedump_file_descriptor);
+-DEFINE_TRACE(lttng_statedump_start);
+-DEFINE_TRACE(lttng_statedump_process_state);
+-DEFINE_TRACE(lttng_statedump_network_interface);
++LTTNG_DEFINE_TRACE(lttng_statedump_block_device,
++	TP_PROTO(struct lttng_session *session,
++		dev_t dev, const char *diskname),
++	TP_ARGS(session, dev, diskname));
++
++LTTNG_DEFINE_TRACE(lttng_statedump_end,
++	TP_PROTO(struct lttng_session *session),
++	TP_ARGS(session));
++
++LTTNG_DEFINE_TRACE(lttng_statedump_interrupt,
++	TP_PROTO(struct lttng_session *session,
++		unsigned int irq, const char *chip_name,
++		struct irqaction *action),
++	TP_ARGS(session, irq, chip_name, action));
++
++LTTNG_DEFINE_TRACE(lttng_statedump_file_descriptor,
++	TP_PROTO(struct lttng_session *session,
++		struct files_struct *files,
++		int fd, const char *filename,
++		unsigned int flags, fmode_t fmode),
++	TP_ARGS(session, files, fd, filename, flags, fmode));
++
++LTTNG_DEFINE_TRACE(lttng_statedump_start,
++	TP_PROTO(struct lttng_session *session),
++	TP_ARGS(session));
++
++LTTNG_DEFINE_TRACE(lttng_statedump_process_state,
++	TP_PROTO(struct lttng_session *session,
++		struct task_struct *p,
++		int type, int mode, int submode, int status,
++		struct files_struct *files),
++	TP_ARGS(session, p, type, mode, submode, status, files));
++
++LTTNG_DEFINE_TRACE(lttng_statedump_network_interface,
++	TP_PROTO(struct lttng_session *session,
++		struct net_device *dev, struct in_ifaddr *ifa),
++	TP_ARGS(session, dev, ifa));
+ 
+ struct lttng_fd_ctx {
+ 	char *page;
+diff --git a/probes/lttng.c b/probes/lttng.c
+index 05bc1388..7ddaa69f 100644
+--- a/probes/lttng.c
++++ b/probes/lttng.c
+@@ -8,7 +8,7 @@
+  */
+ 
+ #include <linux/module.h>
+-#include <linux/tracepoint.h>
++#include <wrapper/tracepoint.h>
+ #include <linux/uaccess.h>
+ #include <linux/gfp.h>
+ #include <linux/fs.h>
+@@ -32,7 +32,10 @@
+ #define LTTNG_LOGGER_COUNT_MAX	1024
+ #define LTTNG_LOGGER_FILE	"lttng-logger"
+ 
+-DEFINE_TRACE(lttng_logger);
++LTTNG_DEFINE_TRACE(lttng_logger,
++	PARAMS(const char __user *text, size_t len),
++	PARAMS(text, len)
++);
+ 
+ static struct proc_dir_entry *lttng_logger_dentry;
+ 
+diff --git a/tests/probes/lttng-test.c b/tests/probes/lttng-test.c
+index c728bed5..8f2d3feb 100644
+--- a/tests/probes/lttng-test.c
++++ b/tests/probes/lttng-test.c
+@@ -26,7 +26,12 @@
+ #define LTTNG_INSTRUMENTATION
+ #include <instrumentation/events/lttng-module/lttng-test.h>
+ 
+-DEFINE_TRACE(lttng_test_filter_event);
++LTTNG_DEFINE_TRACE(lttng_test_filter_event,
++	PARAMS(int anint, int netint, long *values,
++		char *text, size_t textlen,
++		char *etext, uint32_t * net_values),
++	PARAMS(anint, netint, values, text, textlen, etext, net_values)
++);
+ 
+ #define LTTNG_TEST_FILTER_EVENT_FILE	"lttng-test-filter-event"
+ 
+diff --git a/wrapper/tracepoint.h b/wrapper/tracepoint.h
+index 3883e11a..758038b6 100644
+--- a/wrapper/tracepoint.h
++++ b/wrapper/tracepoint.h
+@@ -20,6 +20,14 @@
+ 
+ #endif
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
++#define LTTNG_DEFINE_TRACE(name, proto, args)		\
++	DEFINE_TRACE(name, PARAMS(proto), PARAMS(args))
++#else
++#define LTTNG_DEFINE_TRACE(name, proto, args)		\
++	DEFINE_TRACE(name)
++#endif
++
+ #ifndef HAVE_KABI_2635_TRACEPOINT
+ 
+ #define kabi_2635_tracepoint_probe_register tracepoint_probe_register
+-- 
+2.25.1
+

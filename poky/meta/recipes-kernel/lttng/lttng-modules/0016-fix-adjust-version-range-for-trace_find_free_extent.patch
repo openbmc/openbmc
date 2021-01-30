@@ -1,0 +1,30 @@
+From 5c3e67d7994097cc75f45258b7518aacb55dde1b Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 24 Nov 2020 11:27:18 -0500
+Subject: [PATCH 16/16] fix: adjust version range for trace_find_free_extent()
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: Iaa6088092cf58b4d29d55f3ff9586c57ae272302
+---
+ instrumentation/events/lttng-module/btrfs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/instrumentation/events/lttng-module/btrfs.h b/instrumentation/events/lttng-module/btrfs.h
+index d47f3280..efe7af96 100644
+--- a/instrumentation/events/lttng-module/btrfs.h
++++ b/instrumentation/events/lttng-module/btrfs.h
+@@ -1917,7 +1917,7 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(btrfs__reserved_extent,  btrfs_reserved_extent_f
+ #endif /* #else #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,10,0)) */
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0) || \
+-	LTTNG_KERNEL_RANGE(5,9,6, 5,10,0) || \
++	LTTNG_KERNEL_RANGE(5,9,5, 5,10,0) || \
+ 	LTTNG_KERNEL_RANGE(5,4,78, 5,5,0))
+ LTTNG_TRACEPOINT_EVENT_MAP(find_free_extent,
+ 
+-- 
+2.25.1
+

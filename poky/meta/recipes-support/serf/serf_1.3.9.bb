@@ -30,4 +30,9 @@ EXTRA_OESCONS = " \
                   OPENSSL="${STAGING_EXECPREFIXDIR}" \
                   "
 
+# scons creates non-reproducible archives
+do_install_append() {
+	rm ${D}/${libdir}/*.a
+}
+
 BBCLASSEXTEND = "native nativesdk"

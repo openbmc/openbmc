@@ -18,6 +18,7 @@ SRC_URI = "git://github.com/GENIVI/${BPN}.git;protocol=https \
     file://0002-Don-t-execute-processes-as-a-specific-user.patch \
     file://0004-Modify-systemd-config-directory.patch \
     file://204.patch \
+    file://275.patch \
 "
 SRCREV = "14ea971be7e808b9c5099c7f404ed3cf341873c4"
 

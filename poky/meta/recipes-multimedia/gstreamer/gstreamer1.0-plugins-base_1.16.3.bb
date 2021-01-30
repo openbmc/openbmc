@@ -97,3 +97,5 @@ def get_opengl_cmdline_list(switch_name, options, d):
         return '-D' + switch_name + '=' + ','.join(selected_options)
     else:
         return ''
+
+CVE_PRODUCT += "gst-plugins-base"

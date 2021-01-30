@@ -1,0 +1,31 @@
+From 2ce89d35c9477d8c17c00489c72e1548e16af9b9 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Fri, 20 Nov 2020 11:42:30 -0500
+Subject: [PATCH 10/16] fix: include order for older kernels
+
+Fixes a build failure on v3.0 and v3.1.
+
+Upstream-Status: Backport
+
+Change-Id: Ic48512d2aa5ee46678e67d147b92dba6d0959615
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ lttng-events.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lttng-events.h b/lttng-events.h
+index 099fd78b..f5cc57c6 100644
+--- a/lttng-events.h
++++ b/lttng-events.h
+@@ -16,6 +16,7 @@
+ #include <linux/kref.h>
+ #include <lttng-cpuhotplug.h>
+ #include <linux/uuid.h>
++#include <linux/irq_work.h>
+ #include <wrapper/uprobes.h>
+ #include <lttng-tracer.h>
+ #include <lttng-abi.h>
+-- 
+2.25.1
+

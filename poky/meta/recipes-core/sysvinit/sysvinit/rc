@@ -63,7 +63,7 @@ startup() {
   stty onlcr 0>&1
 
   # Limit stack size for startup scripts
-  [ "$STACK_SIZE" == "" ] || ulimit -S -s $STACK_SIZE
+  [ "$STACK_SIZE" = "" ] || ulimit -S -s $STACK_SIZE
 
   # Now find out what the current and what the previous runlevel are.
 

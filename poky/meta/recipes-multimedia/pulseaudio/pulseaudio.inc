@@ -137,11 +137,6 @@ EXTRA_OECONF_append_armeb = "${@bb.utils.contains("TUNE_FEATURES", "neon", "", "
 
 export TARGET_PFPU = "${TARGET_FPU}"
 
-# TODO: Use more fine granular version
-#OE_LT_RPATH_ALLOW=":${libdir}/pulse-0.9:"
-OE_LT_RPATH_ALLOW = "any"
-OE_LT_RPATH_ALLOW[export]="1"
-
 set_cfg_value () {
 	sed -i -e "s/\(; *\)\?$2 =.*/$2 = $3/" "$1"
 	if ! grep -q "^$2 = $3\$" "$1"; then

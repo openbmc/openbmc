@@ -1,0 +1,173 @@
+From a241d30fa82ed0be1026f14e36e8bd2b0e65740d Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 23 Nov 2020 12:15:43 -0500
+Subject: [PATCH 12/16] Improve the release script
+
+  * Use git-archive, this removes all custom code to cleanup the repo, it
+    can now be used in an unclean repo as the code will be exported from
+    a specific tag.
+  * Add parameters, this will allow using the script on any machine
+    while keeping the default behavior for the maintainer.
+
+Upstream-Status: Backport
+
+Change-Id: I9f29d0e1afdbf475d0bbaeb9946ca3216f725e86
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ .gitattributes                   |   3 +
+ scripts/maintainer/do-release.sh | 121 +++++++++++++++++++++++++------
+ 2 files changed, 100 insertions(+), 24 deletions(-)
+ create mode 100644 .gitattributes
+
+diff --git a/.gitattributes b/.gitattributes
+new file mode 100644
+index 00000000..7839355a
+--- /dev/null
++++ b/.gitattributes
+@@ -0,0 +1,3 @@
++.gitattributes export-ignore
++.gitignore export-ignore
++.gitreview export-ignore
+diff --git a/scripts/maintainer/do-release.sh b/scripts/maintainer/do-release.sh
+index e0cec167..5e94e136 100755
+--- a/scripts/maintainer/do-release.sh
++++ b/scripts/maintainer/do-release.sh
+@@ -1,37 +1,110 @@
+-#!/bin/sh
++#!/bin/bash
++
++set -eu
++set -o pipefail
+ 
+ # invoke with do-release 2.N.M, or 2.N.M-rcXX
+ 
+-REL=$1
+-SRCDIR=~/git/lttng-modules
++# Default maintainer values
++SRCDIR="${HOME}/git/lttng-modules"
+ # The output files are created in ${HOME}/stable/
+-OUTPUTDIR=${HOME}/stable
++OUTPUTDIR="${HOME}/stable"
++SIGN="yes"
++VERBOSE=""
++
++usage() {
++	echo "Usage: do-release.sh [OPTION]... RELEASE"
++	echo
++	echo "Mandatory arguments to long options are mandatory for short options too."
++	echo "  -s, --srcdir DIR               source directory"
++	echo "  -o, --outputdir DIR            output directory, must exist"
++	echo "  -n, --no-sign                  don't GPG sign the output archive"
++	echo "  -v, --verbose                  verbose command output"
++}
++
++POS_ARGS=()
++while [[ $# -gt 0 ]]
++do
++	arg="$1"
++
++	case $arg in
++	-n|--no-sign)
++		SIGN="no"
++		shift 1
++	;;
++
++	-s|--srcdir)
++		SRCDIR="$2"
++		shift 2
++	;;
++
++	-o|--outputdir)
++		OUTPUTDIR="$2"
++		shift 2
++	;;
++
++	-v|--verbose)
++		VERBOSE="-v"
++		shift 1
++	;;
++
++	# Catch unknown arguments
++	-*)
++		usage
++		exit 1
++	;;
++
++	*)
++	POS_ARGS+=("$1")
++	shift
++	;;
++	esac
++done
++set -- "${POS_ARGS[@]}"
+ 
+-if [ x"$1" = x"" ]; then
+-	echo "1 arg : VERSION";
++REL=${1:-}
++
++if [ x"${REL}" = x"" ]; then
++	usage
+ 	exit 1;
+ fi
+ 
+-cd ${OUTPUTDIR}
++echo "Doing LTTng modules release ${REL}"
++echo "  Source dir: ${SRCDIR}"
++echo "  Output dir: ${OUTPUTDIR}"
++echo "  GPG sign: ${SIGN}"
+ 
+-echo Doing LTTng modules release ${REL}
++# Make sure the output directory exists
++if [ ! -d "${OUTPUTDIR}" ]; then
++	echo "Output directory '${OUTPUTDIR}' doesn't exist."
++	exit 1
++fi
+ 
+-mkdir lttng-modules-${REL}
+-cd lttng-modules-${REL}
+-cp -ax ${SRCDIR}/. .
++# Make sure the source directory is a git repository
++if [ ! -r "${SRCDIR}/.git/config" ]; then
++	echo "Source directory '${SRCDIR}' isn't a git repository."
++	exit 1
++fi
+ 
+-#cleanup
+-make clean
+-git clean -xdf
++# Set the git repo directory for all further git commands
++export GIT_DIR="${SRCDIR}/.git/"
+ 
+-for a in \*.orig \*.rej Module.markers Module.symvers; do
+-	find . -name "${a}" -exec rm '{}' \;;
+-done
+-for a in outgoing .tmp_versions .git .pc; do
+-	find . -name "${a}" -exec rm -rf '{}' \;;
+-done
++# Check if the release tag exists
++if ! git rev-parse "refs/tags/v${REL}" >/dev/null 2>&1; then
++	echo "Release tag 'v${REL}' doesn't exist."
++	exit 1
++fi
++
++# Generate the compressed tar archive, the git attributes from the tag will be used.
++git archive $VERBOSE --format=tar --prefix="lttng-modules-${REL}/" "v${REL}" | bzip2 > "${OUTPUTDIR}/lttng-modules-${REL}.tar.bz2"
+ 
+-cd ..
+-tar cvfj lttng-modules-${REL}.tar.bz2 lttng-modules-${REL}
+-mksums lttng-modules-${REL}.tar.bz2
+-signpkg lttng-modules-${REL}.tar.bz2
++pushd "${OUTPUTDIR}" >/dev/null
++# Generate the hashes
++md5sum "lttng-modules-${REL}.tar.bz2" > "lttng-modules-${REL}.tar.bz2.md5"
++sha256sum "lttng-modules-${REL}.tar.bz2" > "lttng-modules-${REL}.tar.bz2.sha256"
++
++if [ "x${SIGN}" = "xyes" ]; then
++	# Sign with the default key
++	gpg --armor -b "lttng-modules-${REL}.tar.bz2"
++fi
++popd >/dev/null
+-- 
+2.25.1
+

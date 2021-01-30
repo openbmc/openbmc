@@ -131,3 +131,15 @@ GI_DATA_ENABLED_libc-musl_armv7ve = "False"
 
 # Can't be built with ccache
 CCACHE_DISABLE = "1"
+
+PACKAGE_PREPROCESS_FUNCS += "src_package_preprocess"
+src_package_preprocess () {
+        # Trim build paths from comments in generated sources to ensure reproducibility
+        sed -i -e "s,${WORKDIR},,g" \
+            ${B}/DerivedSources/webkit2gtk/webkit2/*.cpp \
+            ${B}/DerivedSources/ForwardingHeaders/JavaScriptCore/*.h \
+            ${B}/DerivedSources/JavaScriptCore/*.h \
+            ${B}/DerivedSources/JavaScriptCore/yarr/*.h \
+            ${B}/DerivedSources/MiniBrowser/*.c
+}
+

@@ -1,0 +1,82 @@
+From 2f421c43c60b2c9d3ed63c1a363320e98a536a35 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 26 Oct 2020 14:28:35 -0400
+Subject: [PATCH 07/16] fix: kvm: x86/mmu: Add TDP MMU PF handler (v5.10)
+
+See upstream commit :
+
+  commit bb18842e21111a979e2e0e1c5d85c09646f18d51
+  Author: Ben Gardon <bgardon@google.com>
+  Date:   Wed Oct 14 11:26:50 2020 -0700
+
+    kvm: x86/mmu: Add TDP MMU PF handler
+
+    Add functions to handle page faults in the TDP MMU. These page faults
+    are currently handled in much the same way as the x86 shadow paging
+    based MMU, however the ordering of some operations is slightly
+    different. Future patches will add eager NX splitting, a fast page fault
+    handler, and parallel page faults.
+
+    Tested by running kvm-unit-tests and KVM selftests on an Intel Haswell
+    machine. This series introduced no new failures.
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: Ie56959cb6c77913d2f1188b0ca15da9114623a4e
+---
+ .../lttng-module/arch/x86/kvm/mmutrace.h      | 20 ++++++++++++++++++-
+ probes/lttng-probe-kvm-x86-mmu.c              |  5 +++++
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/instrumentation/events/lttng-module/arch/x86/kvm/mmutrace.h b/instrumentation/events/lttng-module/arch/x86/kvm/mmutrace.h
+index e5470400..86717835 100644
+--- a/instrumentation/events/lttng-module/arch/x86/kvm/mmutrace.h
++++ b/instrumentation/events/lttng-module/arch/x86/kvm/mmutrace.h
+@@ -163,7 +163,25 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(kvm_mmu_page_class, kvm_mmu_prepare_zap_page,
+ 	TP_ARGS(sp)
+ )
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
++
++LTTNG_TRACEPOINT_EVENT_MAP(
++	mark_mmio_spte,
++
++	kvm_mmu_mark_mmio_spte,
++
++	TP_PROTO(u64 *sptep, gfn_t gfn, u64 spte),
++	TP_ARGS(sptep, gfn, spte),
++
++	TP_FIELDS(
++		ctf_integer_hex(void *, sptep, sptep)
++		ctf_integer(gfn_t, gfn, gfn)
++		ctf_integer(unsigned, access, spte & ACC_ALL)
++		ctf_integer(unsigned int, gen, get_mmio_spte_generation(spte))
++	)
++)
++
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3,11,0))
+ 
+ LTTNG_TRACEPOINT_EVENT_MAP(
+ 	mark_mmio_spte,
+diff --git a/probes/lttng-probe-kvm-x86-mmu.c b/probes/lttng-probe-kvm-x86-mmu.c
+index 8f981865..5043c776 100644
+--- a/probes/lttng-probe-kvm-x86-mmu.c
++++ b/probes/lttng-probe-kvm-x86-mmu.c
+@@ -31,6 +31,11 @@
+ #include <../../arch/x86/kvm/mmutrace.h>
+ #endif
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
++#include <../arch/x86/kvm/mmu.h>
++#include <../arch/x86/kvm/mmu/spte.h>
++#endif
++
+ #undef TRACE_INCLUDE_PATH
+ #undef TRACE_INCLUDE_FILE
+ 
+-- 
+2.25.1
+

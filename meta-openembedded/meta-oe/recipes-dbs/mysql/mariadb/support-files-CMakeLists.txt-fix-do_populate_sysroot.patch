@@ -15,11 +15,11 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  support-files/CMakeLists.txt | 7 -------
  1 file changed, 7 deletions(-)
 
-diff --git a/support-files/CMakeLists.txt b/support-files/CMakeLists.txt
-index b5767432..56733de1 100644
---- a/support-files/CMakeLists.txt
-+++ b/support-files/CMakeLists.txt
-@@ -165,12 +165,5 @@ IF(UNIX)
+Index: mariadb-10.4.17/support-files/CMakeLists.txt
+===================================================================
+--- mariadb-10.4.17.orig/support-files/CMakeLists.txt
++++ mariadb-10.4.17/support-files/CMakeLists.txt
+@@ -192,12 +192,5 @@ IF(UNIX)
        INSTALL(FILES rpm/enable_encryption.preset DESTINATION ${INSTALL_SYSCONF2DIR}
                COMPONENT IniFiles)
      ENDIF()

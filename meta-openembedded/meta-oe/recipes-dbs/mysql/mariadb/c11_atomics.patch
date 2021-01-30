@@ -10,9 +10,11 @@ Date:   Fri Dec 21 19:14:04 2018 +0200
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
---- a/configure.cmake
-+++ b/configure.cmake
-@@ -926,7 +926,25 @@ int main()
+Index: mariadb-10.4.17/configure.cmake
+===================================================================
+--- mariadb-10.4.17.orig/configure.cmake
++++ mariadb-10.4.17/configure.cmake
+@@ -863,7 +863,25 @@ int main()
    long long int *ptr= &var;
    return (int)__atomic_load_n(ptr, __ATOMIC_SEQ_CST);
  }"
@@ -39,10 +41,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  IF(WITH_VALGRIND)
    SET(HAVE_valgrind 1)
---- a/mysys/CMakeLists.txt
-+++ b/mysys/CMakeLists.txt
+Index: mariadb-10.4.17/mysys/CMakeLists.txt
+===================================================================
+--- mariadb-10.4.17.orig/mysys/CMakeLists.txt
++++ mariadb-10.4.17/mysys/CMakeLists.txt
 @@ -78,6 +78,10 @@ TARGET_LINK_LIBRARIES(mysys dbug strings
-  ${LIBNSL} ${LIBM} ${LIBRT} ${LIBDL} ${LIBSOCKET} ${LIBEXECINFO} ${CRC32_LIBRARY})
+  ${LIBNSL} ${LIBM} ${LIBRT} ${CMAKE_DL_LIBS} ${LIBSOCKET} ${LIBEXECINFO} ${CRC32_LIBRARY})
  DTRACE_INSTRUMENT(mysys)
  
 +IF (HAVE_GCC_C11_ATOMICS_WITH_LIBATOMIC)
@@ -52,9 +56,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  IF(HAVE_BFD_H)
    TARGET_LINK_LIBRARIES(mysys bfd)  
  ENDIF(HAVE_BFD_H)
---- a/sql/CMakeLists.txt
-+++ b/sql/CMakeLists.txt
-@@ -178,6 +178,10 @@ ELSE()
+Index: mariadb-10.4.17/sql/CMakeLists.txt
+===================================================================
+--- mariadb-10.4.17.orig/sql/CMakeLists.txt
++++ mariadb-10.4.17/sql/CMakeLists.txt
+@@ -196,6 +196,10 @@ ELSE()
    SET(MYSQLD_SOURCE main.cc ${DTRACE_PROBES_ALL})
  ENDIF()
  

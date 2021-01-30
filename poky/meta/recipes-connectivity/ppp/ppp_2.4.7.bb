@@ -42,6 +42,10 @@ SRC_URI_append_libc-musl = "\
 SRC_URI[md5sum] = "78818f40e6d33a1d1de68a1551f6595a"
 SRC_URI[sha256sum] = "02e0a3dd3e4799e33103f70ec7df75348c8540966ee7c948e4ed8a42bbccfb30"
 
+# This CVE is specific to a patch applied by Ubuntu that is not used by
+# OpenEmbedded.
+CVE_CHECK_WHITELIST += "CVE-2020-15704"
+
 inherit autotools-brokensep systemd
 
 TARGET_CC_ARCH += " ${LDFLAGS}"

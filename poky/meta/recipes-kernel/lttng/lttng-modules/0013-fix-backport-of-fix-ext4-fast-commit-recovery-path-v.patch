@@ -1,0 +1,32 @@
+From 59fcc704bea8ecf4bd401e744df41e3331359524 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 23 Nov 2020 10:19:52 -0500
+Subject: [PATCH 13/16] fix: backport of fix: ext4: fast commit recovery path
+ (v5.10)
+
+Add missing '#endif'.
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: I43349d685d7ed740b32ce992be0c2e7e6f12c799
+---
+ instrumentation/events/lttng-module/ext4.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/instrumentation/events/lttng-module/ext4.h b/instrumentation/events/lttng-module/ext4.h
+index 5fddccad..d454fa6e 100644
+--- a/instrumentation/events/lttng-module/ext4.h
++++ b/instrumentation/events/lttng-module/ext4.h
+@@ -1446,6 +1446,7 @@ LTTNG_TRACEPOINT_EVENT(ext4_load_inode,
+ 	)
+ )
+ #endif
++#endif
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,5,0))
+ 
+-- 
+2.25.1
+

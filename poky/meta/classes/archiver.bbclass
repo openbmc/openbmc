@@ -591,6 +591,7 @@ addtask do_dumpdata
 addtask do_ar_recipe
 addtask do_deploy_archives
 do_build[recrdeptask] += "do_deploy_archives"
+do_rootfs[recrdeptask] += "do_deploy_archives"
 do_populate_sdk[recrdeptask] += "do_deploy_archives"
 
 python () {

@@ -41,7 +41,7 @@ ${includedir}		0755	root	root	true	0644	root	root
 ${oldincludedir}	0755	root	root	true	0644	root	root
 
 # Cleanup debug src
-/usr/src/debug		0755	root	root	true	-	root	root
+/usr/src/debug		0755	root	root	true	0644	root	root
 
 # Items from base-files
 # Links

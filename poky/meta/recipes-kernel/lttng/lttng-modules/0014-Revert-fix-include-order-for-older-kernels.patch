@@ -1,0 +1,32 @@
+From b2df75dd378ce5260bb51872e43ac1d76fbf4588 Mon Sep 17 00:00:00 2001
+From: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Date: Mon, 23 Nov 2020 14:21:51 -0500
+Subject: [PATCH 14/16] Revert "fix: include order for older kernels"
+
+This reverts commit 2ce89d35c9477d8c17c00489c72e1548e16af9b9.
+
+This commit is only needed for master and stable-2.12, because
+stable-2.11 does not include irq_work.h.
+
+Upstream-Status: Backport
+
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ lttng-events.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/lttng-events.h b/lttng-events.h
+index f5cc57c6..099fd78b 100644
+--- a/lttng-events.h
++++ b/lttng-events.h
+@@ -16,7 +16,6 @@
+ #include <linux/kref.h>
+ #include <lttng-cpuhotplug.h>
+ #include <linux/uuid.h>
+-#include <linux/irq_work.h>
+ #include <wrapper/uprobes.h>
+ #include <lttng-tracer.h>
+ #include <lttng-abi.h>
+-- 
+2.25.1
+

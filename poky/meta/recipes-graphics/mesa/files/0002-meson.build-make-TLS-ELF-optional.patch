@@ -6,6 +6,21 @@ Subject: [PATCH] meson.build: make TLS ELF optional
 USE_ELF_TLS has replaced GLX_USE_TLS so this patch is the original "make
 TLS GLX optional again" patch updated to the latest mesa.
 
+For details, see:
+https://gitlab.freedesktop.org/mesa/mesa/-/issues/966
+
+This prevents runtime segfault on musl:
+
+Traceback (most recent call last):
+  File "/home/pokybuild/yocto-worker/musl-qemux86/build/meta/lib/oeqa/core/decorator/__init__.py", line 36, in wrapped_f
+    return func(*args, **kwargs)
+  File "/home/pokybuild/yocto-worker/musl-qemux86/build/meta/lib/oeqa/runtime/cases/parselogs.py", line 378, in test_parselogs
+    self.assertEqual(errcount, 0, msg=self.msg)
+AssertionError: 1 != 0 : Log: /home/pokybuild/yocto-worker/musl-qemux86/build/build/tmp/work/qemux86-poky-linux-musl/core-image-sato-sdk/1.0-r0/target_logs/Xorg.0.log
+-----------------------
+Central error: [    10.477] (EE) Failed to load /usr/lib/xorg/modules/extensions/libglx.so: Error relocating /usr/lib/libGL.so.1: alphasort: initial-exec TLS resolves to dynamic definition in /usr/lib/libGL.so.1
+***********************
+
 Upstream-Status: Inappropriate [configuration]
 Signed-off-by: Alistair Francis <alistair@alistair23.me>
 

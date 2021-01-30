@@ -1,0 +1,29 @@
+From ce8faa3ee266ea69431805e6ed4bd7102d982508 Mon Sep 17 00:00:00 2001
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Thu, 12 Nov 2020 09:43:38 +0100
+Subject: [PATCH] compat: SYM_FUNC_{START,END} were backported to 5.4
+
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+
+Upstream-Status: Backport
+Fixes build failure in Dunfell.
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ compat/compat-asm.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: src/compat/compat-asm.h
+===================================================================
+--- src.orig/compat/compat-asm.h
++++ src/compat/compat-asm.h
+@@ -40,7 +40,7 @@
+ #undef pull
+ #endif
+ 
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 5, 0)
++#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 4, 76)
+ #define SYM_FUNC_START ENTRY
+ #define SYM_FUNC_END ENDPROC
+ #endif

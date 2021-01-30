@@ -128,6 +128,8 @@ do_compile_ptest() {
 }
 
 do_install_ptest() {
+	# This file's permissions depends on the host umask so be deterministic
+	chmod 0644 ${B}/tests/test_data.tmp
 	cp -R --no-dereference --preserve=mode,links -v ${B}/tests ${D}${PTEST_PATH}/test
 	cp -R --no-dereference --preserve=mode,links -v ${S}/tests/* ${D}${PTEST_PATH}/test
 	sed -e 's!../e2fsck/e2fsck!e2fsck!g' \

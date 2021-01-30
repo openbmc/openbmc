@@ -58,7 +58,12 @@ class PackageReverseDepView(Gtk.TreeView):
         self.current = None
         self.filter_model = model.filter_new()
         self.filter_model.set_visible_func(self._filter)
-        self.sort_model = self.filter_model.sort_new_with_model()
+        # The introspected API was fixed but we can't rely on a pygobject that hides this.
+        # https://gitlab.gnome.org/GNOME/pygobject/-/commit/9cdbc56fbac4db2de78dc080934b8f0a7efc892a
+        if hasattr(Gtk.TreeModelSort, "new_with_model"):
+            self.sort_model = Gtk.TreeModelSort.new_with_model(self.filter_model)
+        else:
+            self.sort_model = self.filter_model.sort_new_with_model()
         self.sort_model.set_sort_column_id(COL_DEP_PARENT, Gtk.SortType.ASCENDING)
         self.set_model(self.sort_model)
         self.append_column(Gtk.TreeViewColumn(label, Gtk.CellRendererText(), text=COL_DEP_PARENT))

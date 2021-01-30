@@ -21,11 +21,11 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  configure.cmake | 5 ++---
  1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/configure.cmake b/configure.cmake
-index 3cfc4b31..d017b3b3 100644
---- a/configure.cmake
-+++ b/configure.cmake
-@@ -930,10 +930,9 @@ HAVE_GCC_C11_ATOMICS)
+Index: mariadb-10.4.17/configure.cmake
+===================================================================
+--- mariadb-10.4.17.orig/configure.cmake
++++ mariadb-10.4.17/configure.cmake
+@@ -867,10 +867,9 @@ HAVE_GCC_C11_ATOMICS)
  
  IF(WITH_VALGRIND)
    SET(HAVE_valgrind 1)

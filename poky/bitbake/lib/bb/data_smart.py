@@ -1005,7 +1005,7 @@ class DataSmart(MutableMapping):
             else:
                 data.update({key:value})
 
-            varflags = d.getVarFlags(key, internalflags = True)
+            varflags = d.getVarFlags(key, internalflags = True, expand=["vardepvalue"])
             if not varflags:
                 continue
             for f in varflags:

@@ -1,0 +1,59 @@
+From 22ffa48439e617a32556365e00827fba062c5688 Mon Sep 17 00:00:00 2001
+From: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Date: Mon, 23 Nov 2020 10:49:57 -0500
+Subject: [PATCH 11/16] Add release maintainer script
+
+Upstream-Status: Backport
+
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ scripts/maintainer/do-release.sh | 37 ++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+ create mode 100755 scripts/maintainer/do-release.sh
+
+diff --git a/scripts/maintainer/do-release.sh b/scripts/maintainer/do-release.sh
+new file mode 100755
+index 00000000..e0cec167
+--- /dev/null
++++ b/scripts/maintainer/do-release.sh
+@@ -0,0 +1,37 @@
++#!/bin/sh
++
++# invoke with do-release 2.N.M, or 2.N.M-rcXX
++
++REL=$1
++SRCDIR=~/git/lttng-modules
++# The output files are created in ${HOME}/stable/
++OUTPUTDIR=${HOME}/stable
++
++if [ x"$1" = x"" ]; then
++	echo "1 arg : VERSION";
++	exit 1;
++fi
++
++cd ${OUTPUTDIR}
++
++echo Doing LTTng modules release ${REL}
++
++mkdir lttng-modules-${REL}
++cd lttng-modules-${REL}
++cp -ax ${SRCDIR}/. .
++
++#cleanup
++make clean
++git clean -xdf
++
++for a in \*.orig \*.rej Module.markers Module.symvers; do
++	find . -name "${a}" -exec rm '{}' \;;
++done
++for a in outgoing .tmp_versions .git .pc; do
++	find . -name "${a}" -exec rm -rf '{}' \;;
++done
++
++cd ..
++tar cvfj lttng-modules-${REL}.tar.bz2 lttng-modules-${REL}
++mksums lttng-modules-${REL}.tar.bz2
++signpkg lttng-modules-${REL}.tar.bz2
+-- 
+2.25.1
+

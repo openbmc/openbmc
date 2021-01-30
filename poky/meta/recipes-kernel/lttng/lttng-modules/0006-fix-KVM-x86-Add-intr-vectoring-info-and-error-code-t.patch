@@ -1,0 +1,124 @@
+From a6334775b763c187d84914e89a0b835a793ae0fd Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 26 Oct 2020 14:11:17 -0400
+Subject: [PATCH 06/16] fix: KVM: x86: Add intr/vectoring info and error code
+ to kvm_exit tracepoint (v5.10)
+
+See upstream commit :
+
+  commit 235ba74f008d2e0936b29f77f68d4e2f73ffd24a
+  Author: Sean Christopherson <sean.j.christopherson@intel.com>
+  Date:   Wed Sep 23 13:13:46 2020 -0700
+
+    KVM: x86: Add intr/vectoring info and error code to kvm_exit tracepoint
+
+    Extend the kvm_exit tracepoint to align it with kvm_nested_vmexit in
+    terms of what information is captured.  On SVM, add interrupt info and
+    error code, while on VMX it add IDT vectoring and error code.  This
+    sets the stage for macrofying the kvm_exit tracepoint definition so that
+    it can be reused for kvm_nested_vmexit without loss of information.
+
+    Opportunistically stuff a zero for VM_EXIT_INTR_INFO if the VM-Enter
+    failed, as the field is guaranteed to be invalid.  Note, it'd be
+    possible to further filter the interrupt/exception fields based on the
+    VM-Exit reason, but the helper is intended only for tracepoints, i.e.
+    an extra VMREAD or two is a non-issue, the failed VM-Enter case is just
+    low hanging fruit.
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: I638fa29ef7d8bb432de42a33f9ae4db43259b915
+---
+ .../events/lttng-module/arch/x86/kvm/trace.h  | 55 ++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 2 deletions(-)
+
+diff --git a/instrumentation/events/lttng-module/arch/x86/kvm/trace.h b/instrumentation/events/lttng-module/arch/x86/kvm/trace.h
+index 4416ae02..0917b51f 100644
+--- a/instrumentation/events/lttng-module/arch/x86/kvm/trace.h
++++ b/instrumentation/events/lttng-module/arch/x86/kvm/trace.h
+@@ -115,6 +115,37 @@ LTTNG_TRACEPOINT_EVENT_MAP(kvm_apic, kvm_x86_apic,
+ /*
+  * Tracepoint for kvm guest exit:
+  */
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
++LTTNG_TRACEPOINT_EVENT_CODE_MAP(kvm_exit, kvm_x86_exit,
++	TP_PROTO(unsigned int exit_reason, struct kvm_vcpu *vcpu, u32 isa),
++	TP_ARGS(exit_reason, vcpu, isa),
++
++	TP_locvar(
++		u64 info1, info2;
++		u32 intr_info, error_code;
++	),
++
++	TP_code_pre(
++		kvm_x86_ops.get_exit_info(vcpu, &tp_locvar->info1,
++				&tp_locvar->info2,
++				&tp_locvar->intr_info,
++				&tp_locvar->error_code);
++	),
++
++	TP_FIELDS(
++		ctf_integer(unsigned int, exit_reason, exit_reason)
++		ctf_integer(unsigned long, guest_rip, kvm_rip_read(vcpu))
++		ctf_integer(u32, isa, isa)
++		ctf_integer(u64, info1, tp_locvar->info1)
++		ctf_integer(u64, info2, tp_locvar->info2)
++		ctf_integer(u32, intr_info, tp_locvar->intr_info)
++		ctf_integer(u32, error_code, tp_locvar->error_code)
++		ctf_integer(unsigned int, vcpu_id, vcpu->vcpu_id)
++	),
++
++	TP_code_post()
++)
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0))
+ LTTNG_TRACEPOINT_EVENT_CODE_MAP(kvm_exit, kvm_x86_exit,
+ 	TP_PROTO(unsigned int exit_reason, struct kvm_vcpu *vcpu, u32 isa),
+ 	TP_ARGS(exit_reason, vcpu, isa),
+@@ -124,13 +155,32 @@ LTTNG_TRACEPOINT_EVENT_CODE_MAP(kvm_exit, kvm_x86_exit,
+ 	),
+ 
+ 	TP_code_pre(
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0))
+ 		kvm_x86_ops.get_exit_info(vcpu, &tp_locvar->info1,
+ 				&tp_locvar->info2);
++	),
++
++	TP_FIELDS(
++		ctf_integer(unsigned int, exit_reason, exit_reason)
++		ctf_integer(unsigned long, guest_rip, kvm_rip_read(vcpu))
++		ctf_integer(u32, isa, isa)
++		ctf_integer(u64, info1, tp_locvar->info1)
++		ctf_integer(u64, info2, tp_locvar->info2)
++	),
++
++	TP_code_post()
++)
+ #else
++LTTNG_TRACEPOINT_EVENT_CODE_MAP(kvm_exit, kvm_x86_exit,
++	TP_PROTO(unsigned int exit_reason, struct kvm_vcpu *vcpu, u32 isa),
++	TP_ARGS(exit_reason, vcpu, isa),
++
++	TP_locvar(
++		u64 info1, info2;
++	),
++
++	TP_code_pre(
+ 		kvm_x86_ops->get_exit_info(vcpu, &tp_locvar->info1,
+ 				&tp_locvar->info2);
+-#endif
+ 	),
+ 
+ 	TP_FIELDS(
+@@ -143,6 +193,7 @@ LTTNG_TRACEPOINT_EVENT_CODE_MAP(kvm_exit, kvm_x86_exit,
+ 
+ 	TP_code_post()
+ )
++#endif
+ 
+ /*
+  * Tracepoint for kvm interrupt injection:
+-- 
+2.25.1
+

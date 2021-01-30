@@ -1,0 +1,71 @@
+From 14bbccffa579f4d66e2900843d6afae1294ce7c8 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 26 Oct 2020 17:07:13 -0400
+Subject: [PATCH 08/16] fix: KVM: x86/mmu: Return unique RET_PF_* values if the
+ fault was fixed (v5.10)
+
+See upstream commit :
+
+  commit c4371c2a682e0da1ed2cd7e3c5496f055d873554
+  Author: Sean Christopherson <sean.j.christopherson@intel.com>
+  Date:   Wed Sep 23 15:04:24 2020 -0700
+
+    KVM: x86/mmu: Return unique RET_PF_* values if the fault was fixed
+
+    Introduce RET_PF_FIXED and RET_PF_SPURIOUS to provide unique return
+    values instead of overloading RET_PF_RETRY.  In the short term, the
+    unique values add clarity to the code and RET_PF_SPURIOUS will be used
+    by set_spte() to avoid unnecessary work for spurious faults.
+
+    In the long term, TDX will use RET_PF_FIXED to deterministically map
+    memory during pre-boot.  The page fault flow may bail early for benign
+    reasons, e.g. if the mmu_notifier fires for an unrelated address.  With
+    only RET_PF_RETRY, it's impossible for the caller to distinguish between
+    "cool, page is mapped" and "darn, need to try again", and thus cannot
+    handle benign cases like the mmu_notifier retry.
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: Ie0855c78852b45f588e131fe2463e15aae1bc023
+---
+ .../lttng-module/arch/x86/kvm/mmutrace.h      | 22 ++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/instrumentation/events/lttng-module/arch/x86/kvm/mmutrace.h b/instrumentation/events/lttng-module/arch/x86/kvm/mmutrace.h
+index 86717835..cdf0609f 100644
+--- a/instrumentation/events/lttng-module/arch/x86/kvm/mmutrace.h
++++ b/instrumentation/events/lttng-module/arch/x86/kvm/mmutrace.h
+@@ -233,7 +233,27 @@ LTTNG_TRACEPOINT_EVENT_MAP(
+ 	)
+ )
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0) || \
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
++LTTNG_TRACEPOINT_EVENT_MAP(
++	fast_page_fault,
++
++	kvm_mmu_fast_page_fault,
++
++	TP_PROTO(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u32 error_code,
++		 u64 *sptep, u64 old_spte, int ret),
++	TP_ARGS(vcpu, cr2_or_gpa, error_code, sptep, old_spte, ret),
++
++	TP_FIELDS(
++		ctf_integer(int, vcpu_id, vcpu->vcpu_id)
++		ctf_integer(gpa_t, cr2_or_gpa, cr2_or_gpa)
++		ctf_integer(u32, error_code, error_code)
++		ctf_integer_hex(u64 *, sptep, sptep)
++		ctf_integer(u64, old_spte, old_spte)
++		ctf_integer(u64, new_spte, *sptep)
++		ctf_integer(int, ret, ret)
++	)
++)
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0) || \
+ 	LTTNG_KERNEL_RANGE(4,19,103, 4,20,0) || \
+ 	LTTNG_KERNEL_RANGE(5,4,19, 5,5,0) || \
+ 	LTTNG_KERNEL_RANGE(5,5,3, 5,6,0) || \
+-- 
+2.25.1
+

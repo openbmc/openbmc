@@ -1,0 +1,46 @@
+From f8922333020aaa267e17fb23180b56c4c16ebe9e Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Tue, 24 Nov 2020 11:11:42 -0500
+Subject: [PATCH 15/16] fix: backport of fix: tracepoint: Optimize using
+ static_call() (v5.10)
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: I94f2b845f11654e639f03254185980de527a4ca8
+---
+ lttng-statedump-impl.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/lttng-statedump-impl.c b/lttng-statedump-impl.c
+index e0b19b42..a8c32db5 100644
+--- a/lttng-statedump-impl.c
++++ b/lttng-statedump-impl.c
+@@ -72,10 +72,9 @@ LTTNG_DEFINE_TRACE(lttng_statedump_interrupt,
+ 
+ LTTNG_DEFINE_TRACE(lttng_statedump_file_descriptor,
+ 	TP_PROTO(struct lttng_session *session,
+-		struct files_struct *files,
+-		int fd, const char *filename,
++		struct task_struct *p, int fd, const char *filename,
+ 		unsigned int flags, fmode_t fmode),
+-	TP_ARGS(session, files, fd, filename, flags, fmode));
++	TP_ARGS(session, p, fd, filename, flags, fmode));
+ 
+ LTTNG_DEFINE_TRACE(lttng_statedump_start,
+ 	TP_PROTO(struct lttng_session *session),
+@@ -85,8 +84,8 @@ LTTNG_DEFINE_TRACE(lttng_statedump_process_state,
+ 	TP_PROTO(struct lttng_session *session,
+ 		struct task_struct *p,
+ 		int type, int mode, int submode, int status,
+-		struct files_struct *files),
+-	TP_ARGS(session, p, type, mode, submode, status, files));
++		struct pid_namespace *pid_ns),
++	TP_ARGS(session, p, type, mode, submode, status, pid_ns));
+ 
+ LTTNG_DEFINE_TRACE(lttng_statedump_network_interface,
+ 	TP_PROTO(struct lttng_session *session,
+-- 
+2.25.1
+

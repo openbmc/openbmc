@@ -18,11 +18,9 @@ SRC_URI = "https://downloads.mariadb.org/interstitial/${BP}/source/${BP}.tar.gz 
            file://c11_atomics.patch \
            file://clang_version_header_conflict.patch \
            file://fix-arm-atomic.patch \
-           file://0001-Fix-build-breakage-from-lock_guard-error-6161.patch \
-           file://0001-Fix-library-LZ4-lookup.patch \
           "
-SRC_URI[md5sum] = "97d7c0f508c04a31c138fdb24e95dbc4"
-SRC_URI[sha256sum] = "fef1e1d38aa253dd8a51006bd15aad184912fce31c446bb69434fcde735aa208"
+SRC_URI[md5sum] = "e8193b9cd008b6d7f177f5a5c44c7a9f"
+SRC_URI[sha256sum] = "a7b104e264311cd46524ae546ff0c5107978373e4a01cf7fd8a241454548d16e"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 

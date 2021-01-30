@@ -1,0 +1,88 @@
+From 8e4e8641961df32bfe519fd18d899250951acd1a Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 26 Oct 2020 13:41:02 -0400
+Subject: [PATCH 02/16] fix: objtool: Rename frame.h -> objtool.h (v5.10)
+
+See upstream commit :
+
+  commit 00089c048eb4a8250325efb32a2724fd0da68cce
+  Author: Julien Thierry <jthierry@redhat.com>
+  Date:   Fri Sep 4 16:30:25 2020 +0100
+
+    objtool: Rename frame.h -> objtool.h
+
+    Header frame.h is getting more code annotations to help objtool analyze
+    object files.
+
+    Rename the file to objtool.h.
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: Ic2283161bebcbf1e33b72805eb4d2628f4ae3e89
+---
+ lttng-filter-interpreter.c     |  2 +-
+ wrapper/{frame.h => objtool.h} | 19 ++++++++++++-------
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+ rename wrapper/{frame.h => objtool.h} (50%)
+
+diff --git a/lttng-filter-interpreter.c b/lttng-filter-interpreter.c
+index 21169f01..5d572437 100644
+--- a/lttng-filter-interpreter.c
++++ b/lttng-filter-interpreter.c
+@@ -8,7 +8,7 @@
+  */
+ 
+ #include <wrapper/uaccess.h>
+-#include <wrapper/frame.h>
++#include <wrapper/objtool.h>
+ #include <wrapper/types.h>
+ #include <linux/swab.h>
+ 
+diff --git a/wrapper/frame.h b/wrapper/objtool.h
+similarity index 50%
+rename from wrapper/frame.h
+rename to wrapper/objtool.h
+index 6e6dc811..3b997cae 100644
+--- a/wrapper/frame.h
++++ b/wrapper/objtool.h
+@@ -1,18 +1,23 @@
+-/* SPDX-License-Identifier: (GPL-2.0 or LGPL-2.1)
++/* SPDX-License-Identifier: (GPL-2.0-only or LGPL-2.1-only)
+  *
+- * wrapper/frame.h
++ * wrapper/objtool.h
+  *
+  * Copyright (C) 2016 Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+  */
+ 
+-#ifndef _LTTNG_WRAPPER_FRAME_H
+-#define _LTTNG_WRAPPER_FRAME_H
++#ifndef _LTTNG_WRAPPER_OBJTOOL_H
++#define _LTTNG_WRAPPER_OBJTOOL_H
+ 
+ #include <linux/version.h>
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,6,0))
+-
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
++#include <linux/objtool.h>
++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4,6,0))
+ #include <linux/frame.h>
++#endif
++
++
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,6,0))
+ 
+ #define LTTNG_STACK_FRAME_NON_STANDARD(func) \
+ 	STACK_FRAME_NON_STANDARD(func)
+@@ -23,4 +28,4 @@
+ 
+ #endif
+ 
+-#endif /* _LTTNG_WRAPPER_FRAME_H */
++#endif /* _LTTNG_WRAPPER_OBJTOOL_H */
+-- 
+2.25.1
+

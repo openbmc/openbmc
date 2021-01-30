@@ -30,7 +30,7 @@ SRC_URI = "${GNU_MIRROR}/bash/${BP}.tar.gz;name=tarball \
            file://run-ptest \
            file://run-bash-ptests \
            file://fix-run-builtins.patch \
-           file://bash-CVE-2019-18276.patch \
+           file://CVE-2019-18276.patch \
            "
 
 SRC_URI[tarball.md5sum] = "2b44b47b905be16f45709648f671820b"

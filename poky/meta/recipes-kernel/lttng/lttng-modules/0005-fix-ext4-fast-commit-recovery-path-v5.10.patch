@@ -1,0 +1,91 @@
+From b96f5364ba4d5a8b9e8159fe0b9e20d598a1c0f5 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 26 Oct 2020 17:03:23 -0400
+Subject: [PATCH 05/16] fix: ext4: fast commit recovery path (v5.10)
+
+See upstream commit :
+
+  commit 8016e29f4362e285f0f7e38fadc61a5b7bdfdfa2
+  Author: Harshad Shirwadkar <harshadshirwadkar@gmail.com>
+  Date:   Thu Oct 15 13:37:59 2020 -0700
+
+    ext4: fast commit recovery path
+
+    This patch adds fast commit recovery path support for Ext4 file
+    system. We add several helper functions that are similar in spirit to
+    e2fsprogs journal recovery path handlers. Example of such functions
+    include - a simple block allocator, idempotent block bitmap update
+    function etc. Using these routines and the fast commit log in the fast
+    commit area, the recovery path (ext4_fc_replay()) performs fast commit
+    log recovery.
+
+Upstream-Status: Backport
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: Ia65cf44e108f2df0b458f0d335f33a8f18f50baa
+---
+ instrumentation/events/lttng-module/ext4.h | 40 ++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/instrumentation/events/lttng-module/ext4.h b/instrumentation/events/lttng-module/ext4.h
+index f9a55e29..5fddccad 100644
+--- a/instrumentation/events/lttng-module/ext4.h
++++ b/instrumentation/events/lttng-module/ext4.h
+@@ -1423,6 +1423,18 @@ LTTNG_TRACEPOINT_EVENT(ext4_ext_load_extent,
+ 	)
+ )
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
++LTTNG_TRACEPOINT_EVENT(ext4_load_inode,
++	TP_PROTO(struct super_block *sb, unsigned long ino),
++
++	TP_ARGS(sb, ino),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, sb->s_dev)
++		ctf_integer(ino_t, ino, ino)
++	)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT(ext4_load_inode,
+ 	TP_PROTO(struct inode *inode),
+ 
+@@ -2045,6 +2057,34 @@ LTTNG_TRACEPOINT_EVENT(ext4_es_shrink_exit,
+ 
+ #endif
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
++LTTNG_TRACEPOINT_EVENT(ext4_fc_replay_scan,
++	TP_PROTO(struct super_block *sb, int error, int off),
++
++	TP_ARGS(sb, error, off),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, sb->s_dev)
++		ctf_integer(int, error, error)
++		ctf_integer(int, off, off)
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT(ext4_fc_replay,
++	TP_PROTO(struct super_block *sb, int tag, int ino, int priv1, int priv2),
++
++	TP_ARGS(sb, tag, ino, priv1, priv2),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, sb->s_dev)
++		ctf_integer(int, tag, tag)
++		ctf_integer(int, ino, ino)
++		ctf_integer(int, priv1, priv1)
++		ctf_integer(int, priv2, priv2)
++	)
++)
++#endif
++
+ #endif /* LTTNG_TRACE_EXT4_H */
+ 
+ /* This part must be outside protection */
+-- 
+2.25.1
+

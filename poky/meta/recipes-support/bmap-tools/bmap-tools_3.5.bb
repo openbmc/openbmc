@@ -22,4 +22,4 @@ RDEPENDS_${PN} = "python3-core python3-compression python3-mmap python3-setuptoo
 inherit python3native
 inherit setuptools3
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

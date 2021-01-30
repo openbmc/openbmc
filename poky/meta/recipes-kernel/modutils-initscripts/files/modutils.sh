@@ -18,7 +18,7 @@ LOAD_MODULE=modprobe
 
 if [ ! -f /lib/modules/`uname -r`/modules.dep ]; then
 	[ "$VERBOSE" != no ] && echo "Calculating module dependencies ..."
-	depmod -Ae
+	depmod -a
 fi
 
 loaded_modules=" "
