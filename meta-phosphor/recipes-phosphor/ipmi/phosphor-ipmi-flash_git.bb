@@ -63,6 +63,7 @@ SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'host-bios', '${
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
 FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
+FILES_${PN}_append = " ${libdir}/tmpfiles.d"
 
 BLOBIPMI_PROVIDER_LIBRARY += "libfirmwareblob.so"
 BLOBIPMI_PROVIDER_LIBRARY += "libversionblob.so"
