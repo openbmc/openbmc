@@ -17,6 +17,8 @@ inherit cmake obmc-phosphor-ipmiprovider-symlink
 EXTRA_OECMAKE="-DENABLE_TEST=0 -DYOCTO=1"
 EXTRA_OECMAKE_append_yosemitev2 = " -DBIC=1"
 
+EXTRA_OECMAKE_append = " -DHOST_INSTANCES='${OBMC_HOST_INSTANCES}'"
+
 LIBRARY_NAMES = "libzfboemcmds.so"
 
 HOSTIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
