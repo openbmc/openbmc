@@ -265,20 +265,20 @@ namespace ras
         char redfishComp[MAX_MSG_LEN] = {'\0'};
 
         if (eFields.location < ampere::internalErrors::NUM_LOCAL_CODES)
-            snprintf(sLocation, MAX_MSG_LEN,
+            snprintf(sLocation, MAX_MSG_LEN, "%s",
                 ampere::internalErrors::localCodes[eFields.location]);
 
         if (eFields.imageCode < ampere::internalErrors::NUM_IMAGE_CODES)
-            snprintf(sImage, MAX_MSG_LEN,
+            snprintf(sImage, MAX_MSG_LEN, "%s",
                 ampere::internalErrors::imageCodes[eFields.imageCode]);
 
         if (eFields.errCode < ampere::internalErrors::NUM_ERROR_CODES)
-            snprintf(sErrorCode, MAX_MSG_LEN,
+            snprintf(sErrorCode, MAX_MSG_LEN, "%s",
                 ampere::internalErrors::errorCodes[eFields.errCode]\
                     .description);
 
         if (eFields.dir < ampere::internalErrors::NUM_DIRS)
-            snprintf(sDir, MAX_MSG_LEN,
+            snprintf(sDir, MAX_MSG_LEN, "%s",
                 ampere::internalErrors::directions[eFields.dir]);
 
         snprintf(redfishComp, MAX_MSG_LEN, "S%d_%s: %s %s %s with",
@@ -359,9 +359,9 @@ namespace ras
         if (mapOfOccur.size() != 0 && mapOfOccur.count(temp) > 0) {
             eInfo = mapOfOccur[temp];
             char str1[4] = {'\0'};
-            char str2[4] = {'\0'};
+            char str2[5] = {'\0'};
             snprintf(str1, 4, "%d", socket);
-            snprintf(str2, 4, "%d", inst_13_0);
+            snprintf(str2, 5, "%d", inst_13_0);
 
             if (eInfo.numPars == 1)
                 snprintf(redFishMsg, MAX_MSG_LEN, eInfo.errMsgFormat, str1);
