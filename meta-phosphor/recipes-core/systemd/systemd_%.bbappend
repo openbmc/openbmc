@@ -6,6 +6,7 @@ PACKAGECONFIG = "\
         hostnamed \
         kmod \
         networkd \
+        nss \
         pam \
         randomseed \
         resolved \

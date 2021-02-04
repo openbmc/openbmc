@@ -10,6 +10,8 @@ SRC_URI += " \
 "
 
 do_install_append() {
+    sed -i 's/\(\(passwd\|group\):\s*\).*/\1files systemd/' \
+        "${D}${sysconfdir}/nsswitch.conf"
 
     install -d ${D}/srv
 
