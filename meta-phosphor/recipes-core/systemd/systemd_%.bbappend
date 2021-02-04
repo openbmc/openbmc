@@ -10,6 +10,7 @@ PACKAGECONFIG = "\
         pam \
         randomseed \
         resolved \
+        seccomp \
         sysusers \
         sysvinit \
         timedated \
