@@ -2,7 +2,7 @@ SUMMARY = "dbus-sensors"
 DESCRIPTION = "Dbus Sensor Services Configured from D-Bus"
 
 SRC_URI = "git://github.com/openbmc/dbus-sensors.git"
-SRCREV = "feb19ef095c4ab9ec037b2f23ab6318f59a96eab"
+SRCREV = "3a18b860ec24e63ab98159abc46713dcf5acea49"
 
 PV = "0.1+git${SRCPV}"
 
@@ -30,7 +30,7 @@ PACKAGECONFIG[hwmontempsensor] = "-Dhwmon-temp=enabled, -Dhwmon-temp=disabled"
 PACKAGECONFIG[intrusionsensor] = "-Dintrusion=enabled, -Dintrusion=disabled"
 PACKAGECONFIG[ipmbsensor] = "-Dipmb=enabled, -Dipmb=disabled"
 PACKAGECONFIG[mcutempsensor] = "-Dmcu=enabled, -Dmcu=disabled"
-PACKAGECONFIG[psusensor] = "-Dpsu-temp=enabled, -Dpsu-temp=disabled"
+PACKAGECONFIG[psusensor] = "-Dpsu=enabled, -Dpsu=disabled"
 PACKAGECONFIG[nvmesensor] = "-Dnvme=enabled, -Dnvme=disabled"
 PACKAGECONFIG[external] = "-Dexternal=enabled, -Dexternal=disabled"
 
