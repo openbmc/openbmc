@@ -1,2 +1,0 @@
-SUBSYSTEM=="hwmon", ACTION=="add", RUN="/usr/bin/start_hwmon.sh start %p %E{OF_FULLNAME}"
-SUBSYSTEM=="hwmon", ACTION=="remove", RUN="/usr/bin/start_hwmon.sh stop %p %E{OF_FULLNAME}"
