@@ -174,12 +174,10 @@ python install_dreport_user_scripts() {
         install_dreport_user_script(srcname, d)
 }
 
-#Enable ubifs-workaround by DISTRO_FEATURE obmc-ubi-fs.
-PACKAGECONFIG_append_df-obmc-ubi-fs = " ubifs-workaround"
-PACKAGECONFIG[ubifs-workaround] = " \
-       -Dubifs-workaround=enabled, \
-       -Dubifs-workaround=disabled \
-"
+PACKAGECONFIG ??= "${@bb.utils.contains_any('DISTRO_FEATURES', \
+         'obmc-ubi-fs phosphor-mmc', '', 'jffs-workaround', d)}"
+PACKAGECONFIG[jffs-workaround] = "-Djffs-workaround=enabled, \
+        -Djffs-workaround=disabled"
 
 PACKAGECONFIG[host-dump-transport-pldm] = " \
         -Dhost-transport=pldm,, \
