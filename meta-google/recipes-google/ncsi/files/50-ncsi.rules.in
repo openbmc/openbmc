@@ -1,0 +1,14 @@
+table inet filter {
+    chain ncsi_input {
+        type filter hook input priority 0; policy drop;
+        iifname != @NCSI_IF@ accept
+        ct state established accept
+        tcp dport 3959 accept
+        udp dport 3959 accept
+        tcp dport 3967 accept
+        udp dport 3967 accept
+        icmpv6 type nd-neighbor-advert accept
+        icmpv6 type nd-neighbor-solicit accept
+        icmpv6 type nd-router-advert accept
+    }
+}
