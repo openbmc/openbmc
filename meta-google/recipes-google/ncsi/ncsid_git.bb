@@ -8,7 +8,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://../LICENSE;md5=34400b68072d710fecd0a2940a0d1658"
 
 SRC_URI += "git://github.com/openbmc/google-misc"
-SRCREV = "7d6fa42fd19cf708de1257414bb375d5a552b722"
+SRCREV = "a65b7b8174de2720b3abe97ebc95a4619bc1bd73"
 S = "${WORKDIR}/git/ncsid"
 
 inherit meson systemd
