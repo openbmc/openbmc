@@ -14,6 +14,11 @@ RDEPENDS_${PN} += "ncsid"
 FILES_${PN} += "${systemd_unitdir}"
 
 do_install_append() {
+  if [ -z "${NCSID_IF_NAME}" ]; then
+    echo "Missing NCSID_IF_NAME" >&2
+    exit 1
+  fi
+
   install -d -m0755 ${D}${sysconfdir}/sysctl.d
   echo "net.ipv6.conf.${NCSID_IF_NAME}.accept_dad=0" \
     >>${D}${sysconfdir}/sysctl.d/25-nodad.conf
