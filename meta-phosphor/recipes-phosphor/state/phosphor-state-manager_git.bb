@@ -14,6 +14,7 @@ STATE_MGR_PACKAGES = " \
     ${PN}-host \
     ${PN}-chassis \
     ${PN}-bmc \
+    ${PN}-hypervisor \
     ${PN}-discover \
     ${PN}-host-check \
     ${PN}-reset-sensor-states \
@@ -69,6 +70,9 @@ FILES_${PN}-chassis += "${bindir}/obmcutil"
 
 FILES_${PN}-bmc = "${bindir}/phosphor-bmc-state-manager"
 DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
+
+FILES_${PN}-hypervisor = "${bindir}/phosphor-hypervisor-state-manager"
+DBUS_SERVICE_${PN}-hypervisor += "xyz.openbmc_project.State.Hypervisor.service"
 
 FILES_${PN}-discover = "${bindir}/phosphor-discover-system-state"
 SYSTEMD_SERVICE_${PN}-discover += "phosphor-discover-system-state@.service"
@@ -176,6 +180,6 @@ SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'FAN_LINK_FMT', 'OBMC_CHA
 SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERROR_TARGETS', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "58477b52876afe889caa7d7ec89ce3fadb384ead"
+SRCREV = "75f38ee42d89272d076c20088b37e42b4fffff98"
 
 S = "${WORKDIR}/git"
