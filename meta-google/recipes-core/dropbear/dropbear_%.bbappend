@@ -1,3 +1,10 @@
+FILESEXTRAPATHS_prepend_gbmc := "${THISDIR}/${PN}:"
+SRC_URI_append_gbmc  = " file://dropbear.default"
+SYSTEMD_AUTO_ENABLE_${PN}_prod = "disable"
+
+FILESEXTRAPATHS_remove_gbmc_bandaid := "${THISDIR}/${PN}:"
+SYSTEMD_AUTO_ENABLE_${PN}_bandaid_prod = "enable"
+
 # Allow SSH to the mgmt node on DEV builds
 do_install_append_gbmc_dev() {
   nftables_dir=${D}${sysconfdir}/nftables
