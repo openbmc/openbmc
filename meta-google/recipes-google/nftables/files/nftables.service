@@ -1,0 +1,11 @@
+[Unit]
+Before=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/bash -c 'echo /etc/nftables/*.rules | xargs -n 1 nft -f'
+ExecStop=/bin/bash -c 'nft flush ruleset'
+
+[Install]
+WantedBy=multi-user.target
