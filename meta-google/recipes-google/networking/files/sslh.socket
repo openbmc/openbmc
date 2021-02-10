@@ -1,0 +1,8 @@
+[Unit]
+Before=sslh.service
+
+[Socket]
+ListenStream=3967
+
+[Install]
+WantedBy=sockets.target
