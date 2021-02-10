@@ -1,0 +1,52 @@
+From 98c236c535e6cd8cce3d08bb424f5f0d8a99617d Mon Sep 17 00:00:00 2001
+From: Benjamin Fair <benjaminfair@google.com>
+Date: Wed, 20 Nov 2019 14:20:38 -0800
+Subject: [PATCH] Set FIU0_DRD_CFG and FIU_Clk_divider for gbmc hoth
+
+This is to set the SPI frequency to 20MHz
+
+Signed-off-by: Benjamin Fair <benjaminfair@google.com>
+Signed-off-by: Brandon Kim <brandonkim@google.com>
+---
+ ImageGeneration/references/BootBlockAndHeader_EB.xml | 4 ++--
+ ImageGeneration/references/UbootHeader_EB.xml        | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ImageGeneration/references/BootBlockAndHeader_EB.xml b/ImageGeneration/references/BootBlockAndHeader_EB.xml
+index 775534f..4d5c053 100644
+--- a/ImageGeneration/references/BootBlockAndHeader_EB.xml
++++ b/ImageGeneration/references/BootBlockAndHeader_EB.xml
+@@ -63,7 +63,7 @@
+ 			<offset>0x108</offset>
+ 			<size>0x4</size>
+ 		</config>
+-		<content format='32bit'>0x030011BB</content>               <!-- content the user should fill -->
++		<content format='32bit'>0x0300100B</content>               <!-- content the user should fill -->
+ 	</BinField>
+
+ 	<BinField>
+@@ -73,7 +73,7 @@
+ 			<offset>0x10C</offset>
+ 			<size>0x1</size>
+ 		</config>
+-		<content format='bytes'>4</content>               <!-- content the user should fill -->
++		<content format='bytes'>10</content>               <!-- content the user should fill -->
+ 	</BinField>
+
+ 	<BinField>
+diff --git a/ImageGeneration/references/UbootHeader_EB.xml b/ImageGeneration/references/UbootHeader_EB.xml
+index 1e72e22..4434504 100644
+--- a/ImageGeneration/references/UbootHeader_EB.xml
++++ b/ImageGeneration/references/UbootHeader_EB.xml
+@@ -63,7 +63,7 @@
+ 			<offset>0x108</offset>        <!-- offset in the header -->
+ 			<size>0x4</size>              <!-- size in the header -->
+ 		</config>
+-		<content format='32bit'>0x030111BC</content>               <!-- content the user should fill 0x030032EB -->
++		<content format='32bit'>0x0300100B</content>               <!-- content the user should fill 0x030032EB -->
+ 	</BinField>
+
+ 	<BinField>
+--
+2.28.0.220.ged08abb693-goog
+
