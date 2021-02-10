@@ -1,0 +1,23 @@
+From b44f0d3dbcadb20396dc83a2aa307d54490388ea Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <wak@google.com>
+Date: Thu, 28 May 2020 23:07:58 -0700
+Subject: [PATCH] conf2struct: Use the right perl
+
+---
+ conf2struct | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/conf2struct b/conf2struct
+index 8d68741..b88a9b7 100755
+--- a/conf2struct
++++ b/conf2struct
+@@ -1,4 +1,5 @@
+-#! /usr/bin/perl -w
++#!/usr/bin/env perl
++use warnings;
+ 
+ my $license = <<EOF;
+ # conf2struct: generate libconf parsers that read to structs
+-- 
+2.27.0.rc0.183.gde8f92d652-goog
+

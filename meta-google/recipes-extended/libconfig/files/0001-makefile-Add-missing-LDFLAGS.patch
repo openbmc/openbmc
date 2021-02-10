@@ -1,0 +1,34 @@
+From 8fc429f59df50e1f468c8e9616a6e7ef42cc6ebf Mon Sep 17 00:00:00 2001
+From: "William A. Kennington III" <wak@google.com>
+Date: Thu, 28 May 2020 22:51:47 -0700
+Subject: [PATCH] makefile: Add missing LDFLAGS
+
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a4d5f10..4976726 100644
+--- a/Makefile
++++ b/Makefile
+@@ -6,7 +6,7 @@ all: example checker
+ CFLAGS=-g
+ 
+ checker: confcheck.o
+-	$(CC) $(CFLAGS) -o confcheck confcheck.o -lconfig
++	$(CC) $(CFLAGS) -o confcheck confcheck.o $(LDFLAGS) -lconfig
+ 
+ 
+ install:
+@@ -19,7 +19,7 @@ uninstall:
+ 	
+ EG_OBJ=example.o parser.o argtable3.o
+ example: $(EG_OBJ)
+-	$(CC) $(CFLAGS) -o example $(EG_OBJ) -lconfig
++	$(CC) $(CFLAGS) -o example $(EG_OBJ) $(LDFLAGS) -lconfig
+ 
+ example.c: eg_conf.cfg
+ 	./conf2struct eg_conf.cfg
+-- 
+2.27.0.rc0.183.gde8f92d652-goog
+
