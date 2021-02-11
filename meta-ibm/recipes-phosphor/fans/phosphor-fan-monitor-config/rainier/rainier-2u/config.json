@@ -154,30 +154,6 @@
             },
             {
                "name": "fan5_1"
-            },
-            {
-               "name": "fan0_0",
-               "in_trust": false
-            },
-            {
-               "name": "fan1_0",
-               "in_trust": false
-            },
-            {
-               "name": "fan2_0",
-               "in_trust": false
-            },
-            {
-               "name": "fan3_0",
-               "in_trust": false
-            },
-            {
-               "name": "fan4_0",
-               "in_trust": false
-            },
-            {
-               "name": "fan5_0",
-               "in_trust": false
             }
          ]
       }
