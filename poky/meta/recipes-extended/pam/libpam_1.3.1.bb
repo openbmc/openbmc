@@ -29,6 +29,10 @@ SRC_URI = "https://github.com/linux-pam/linux-pam/releases/download/v${PV}/Linux
 SRC_URI[md5sum] = "558ff53b0fc0563ca97f79e911822165"
 SRC_URI[sha256sum] = "eff47a4ecd833fbf18de9686632a70ee8d0794b79aecb217ebd0ce11db4cd0db"
 
+SRC_URI_append_libc-musl = " file://0001-Add-support-for-defining-missing-funcitonality.patch \
+                             file://include_paths_header.patch \
+                           "
+
 DEPENDS = "bison-native flex flex-native cracklib libxml2-native virtual/crypt"
 
 EXTRA_OECONF = "--includedir=${includedir}/security \

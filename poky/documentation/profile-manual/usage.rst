@@ -39,7 +39,7 @@ other tools when it seems useful to do so.
 The coverage below details some of the most common ways you'll likely
 want to apply the tool; full documentation can be found either within
 the tool itself or in the man pages at
-`perf(1) <https://linux.die.net/man/1/perf>`__.
+`perf(1) <http://linux.die.net/man/1/perf>`__.
 
 Perf Setup
 ----------
@@ -860,7 +860,7 @@ the right kind of trace data, higher-level profiling-type summaries can
 be derived from it.
 
 Documentation on using the `'perf script' python
-binding <https://linux.die.net/man/1/perf-script-python>`__.
+binding <http://linux.die.net/man/1/perf-script-python>`__.
 
 System-Wide Tracing and Profiling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1136,31 +1136,32 @@ Perf Documentation
 Online versions of the man pages for the commands discussed in this
 section can be found here:
 
--  The `'perf stat' manpage <https://linux.die.net/man/1/perf-stat>`__.
+-  The `'perf stat' manpage <http://linux.die.net/man/1/perf-stat>`__.
 
 -  The `'perf record'
-   manpage <https://linux.die.net/man/1/perf-record>`__.
+   manpage <http://linux.die.net/man/1/perf-record>`__.
 
 -  The `'perf report'
-   manpage <https://linux.die.net/man/1/perf-report>`__.
+   manpage <http://linux.die.net/man/1/perf-report>`__.
 
--  The `'perf probe' manpage <https://linux.die.net/man/1/perf-probe>`__.
+-  The `'perf probe' manpage <http://linux.die.net/man/1/perf-probe>`__.
 
 -  The `'perf script'
-   manpage <https://linux.die.net/man/1/perf-script>`__.
+   manpage <http://linux.die.net/man/1/perf-script>`__.
 
 -  Documentation on using the `'perf script' python
-   binding <https://linux.die.net/man/1/perf-script-python>`__.
+   binding <http://linux.die.net/man/1/perf-script-python>`__.
 
--  The top-level `perf(1) manpage <https://linux.die.net/man/1/perf>`__.
+-  The top-level `perf(1) manpage <http://linux.die.net/man/1/perf>`__.
 
 Normally, you should be able to invoke the man pages via perf itself
 e.g. 'perf help' or 'perf help record'.
 
 However, by default Yocto doesn't install man pages, but perf invokes
 the man pages for most help functionality. This is a bug and is being
-addressed by a Yocto bug: :yocto_bugs:`Bug 3388 - perf: enable man pages for
-basic 'help' functionality </show_bug.cgi?id=3388>`.
+addressed by a Yocto bug: `Bug 3388 - perf: enable man pages for basic
+'help'
+functionality <https://bugzilla.yoctoproject.org/show_bug.cgi?id=3388>`__.
 
 The man pages in text form, along with some other files, such as a set
 of examples, can be found in the 'perf' directory of the kernel tree: ::
@@ -1718,7 +1719,7 @@ events':
 
 The tool is pretty self-explanatory, but for more detailed information
 on navigating through the data, see the `kernelshark
-website <https://rostedt.homelinux.com/kernelshark/>`__.
+website <http://rostedt.homelinux.com/kernelshark/>`__.
 
 ftrace Documentation
 --------------------
@@ -1736,19 +1737,19 @@ Documentation directory: ::
 There is a nice series of articles on using ftrace and trace-cmd at LWN:
 
 -  `Debugging the kernel using Ftrace - part
-   1 <https://lwn.net/Articles/365835/>`__
+   1 <http://lwn.net/Articles/365835/>`__
 
 -  `Debugging the kernel using Ftrace - part
-   2 <https://lwn.net/Articles/366796/>`__
+   2 <http://lwn.net/Articles/366796/>`__
 
 -  `Secrets of the Ftrace function
-   tracer <https://lwn.net/Articles/370423/>`__
+   tracer <http://lwn.net/Articles/370423/>`__
 
 -  `trace-cmd: A front-end for
    Ftrace <https://lwn.net/Articles/410200/>`__
 
 There's more detailed documentation kernelshark usage here:
-`KernelShark <https://rostedt.homelinux.com/kernelshark/>`__
+`KernelShark <http://rostedt.homelinux.com/kernelshark/>`__
 
 An amusing yet useful README (a tracing mini-HOWTO) can be found in
 ``/sys/kernel/debug/tracing/README``.
@@ -1763,7 +1764,7 @@ gather/print/aggregate data extracted from the context they end up being
 invoked under.
 
 For example, this probe from the `SystemTap
-tutorial <https://sourceware.org/systemtap/tutorial/>`__ simply prints a
+tutorial <http://sourceware.org/systemtap/tutorial/>`__ simply prints a
 line every time any process on the system open()s a file. For each line,
 it prints the executable name of the program that opened the file, along
 with its PID, and the name of the file it opened (or tried to open),
@@ -1936,11 +1937,11 @@ systemtap Documentation
 -----------------------
 
 The SystemTap language reference can be found here: `SystemTap Language
-Reference <https://sourceware.org/systemtap/langref/>`__
+Reference <http://sourceware.org/systemtap/langref/>`__
 
 Links to other SystemTap documents, tutorials, and examples can be found
 here: `SystemTap documentation
-page <https://sourceware.org/systemtap/documentation.html>`__
+page <http://sourceware.org/systemtap/documentation.html>`__
 
 Sysprof
 =======
@@ -2214,7 +2215,7 @@ developers who are working in a Linux environment and are interested in
 efficient software tracing.
 
 For information on LTTng in general, visit the `LTTng
-Project <https://lttng.org/lttng2.0>`__ site. You can find a "Getting
+Project <http://lttng.org/lttng2.0>`__ site. You can find a "Getting
 Started" link on this site that takes you to an LTTng Quick Start.
 
 blktrace
@@ -2365,7 +2366,7 @@ first part of the filenames: ::
 The report shows each event that was
 found in the blktrace data, along with a summary of the overall block
 I/O traffic during the run. You can look at the
-`blkparse <https://linux.die.net/man/1/blkparse>`__ manpage to learn the
+`blkparse <http://linux.die.net/man/1/blkparse>`__ manpage to learn the
 meaning of each field displayed in the trace listing.
 
 Live Mode
@@ -2564,11 +2565,11 @@ blktrace Documentation
 Online versions of the man pages for the commands discussed in this
 section can be found here:
 
--  https://linux.die.net/man/8/blktrace
+-  http://linux.die.net/man/8/blktrace
 
--  https://linux.die.net/man/1/blkparse
+-  http://linux.die.net/man/1/blkparse
 
--  https://linux.die.net/man/8/btrace
+-  http://linux.die.net/man/8/btrace
 
 The above manpages, along with manpages for the other blktrace utilities
 (btt, blkiomon, etc) can be found in the /doc directory of the blktrace

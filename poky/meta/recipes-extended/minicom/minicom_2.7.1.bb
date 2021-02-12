@@ -29,5 +29,3 @@ do_install() {
 }
 
 RRECOMMENDS_${PN} += "lrzsz"
-
-RDEPENDS_${PN} += "ncurses-terminfo-base"

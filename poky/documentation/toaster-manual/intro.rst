@@ -27,7 +27,7 @@ extensive information about the build process.
    -  Browse layers listed in the various
       :ref:`layer sources <toaster-manual/reference:layer source>`
       that are available in your project (e.g. the OpenEmbedded Layer Index at
-      :oe_layerindex:`/`).
+      http://layers.openembedded.org/layerindex/).
 
    -  Browse images, recipes, and machines provided by those layers.
 

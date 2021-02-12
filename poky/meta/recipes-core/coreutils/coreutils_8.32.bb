@@ -39,9 +39,6 @@ PACKAGECONFIG_class-target ??= "\
 # The lib/oe/path.py requires xattr
 PACKAGECONFIG_class-native ??= "xattr"
 
-# oe-core builds need xattr support
-PACKAGECONFIG_class-nativesdk ??= "xattr"
-
 # with, without, depends, rdepends
 #
 PACKAGECONFIG[acl] = "--enable-acl,--disable-acl,acl,"

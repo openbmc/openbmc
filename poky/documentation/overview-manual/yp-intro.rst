@@ -221,7 +221,8 @@ your Metadata, the easier it is to cope with future changes.
 
    -  Familiarize yourself with the `Yocto Project curated layer
       index <https://www.yoctoproject.org/software-overview/layers/>`__
-      or the :oe_layerindex:`OpenEmbedded layer index <>`.
+      or the `OpenEmbedded layer
+      index <http://layers.openembedded.org/layerindex/branch/master/layers/>`__.
       The latter contains more layers but they are less universally
       validated.
 
@@ -363,12 +364,13 @@ activities using the Yocto Project:
    versions available for Yocto Project. The main purpose of the system
    is to help you manage the recipes you maintain and to offer a dynamic
    overview of the project. The Recipe Reporting System is built on top
-   of the :oe_layerindex:`OpenEmbedded Layer Index <>`, which
+   of the `OpenEmbedded Layer
+   Index <http://layers.openembedded.org/layerindex/layers/>`__, which
    is a website that indexes OpenEmbedded-Core layers.
 
 -  *Patchwork:* `Patchwork <http://jk.ozlabs.org/projects/patchwork/>`__
    is a fork of a project originally started by
-   `OzLabs <https://ozlabs.org/>`__. The project is a web-based tracking
+   `OzLabs <http://ozlabs.org/>`__. The project is a web-based tracking
    system designed to streamline the process of bringing contributions
    into a project. The Yocto Project uses Patchwork as an organizational
    tool to handle patches, which number in the thousands for every
@@ -400,7 +402,7 @@ activities using the Yocto Project:
 
    Historically, cross-prelink is a variant of prelink, which was
    conceived by `Jakub
-   Jelínek <https://people.redhat.com/jakub/prelink.pdf>`__ a number of
+   Jelínek <http://people.redhat.com/jakub/prelink.pdf>`__ a number of
    years ago. Both prelink and cross-prelink are maintained in the same
    repository albeit on separate branches. By providing an emulated
    runtime dynamic linker (i.e. ``glibc``-derived ``ld.so`` emulation),
@@ -529,7 +531,8 @@ targets:
    Debian Package (dpkg) in operation.
 
    Opkg is intended for use on embedded Linux devices and is used in
-   this capacity in the :oe_home:`OpenEmbedded <>` and
+   this capacity in the
+   `OpenEmbedded <http://www.openembedded.org/wiki/Main_Page>`__ and
    `OpenWrt <https://openwrt.org/>`__ projects, as well as the Yocto
    Project.
 

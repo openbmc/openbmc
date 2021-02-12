@@ -1,0 +1,43 @@
+commit cd90fd147844a0cfec101f1e2db7a3c59d236621
+Author: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date:   Wed Dec 28 14:11:22 2016 +0200
+
+pppol2tp plugin: Remove unneeded include
+
+The include is not required and will break compile on musl libc with
+    
+| In file included from pppol2tp.c:34:0:
+| /usr/include/linux/if.h:97:2: error: expected identifier before numeric constant
+|   IFF_LOWER_UP   = 1<<16, /* __volatile__ */
+
+Patch originally from Khem Raj.
+
+Upstream-Status: Pending [https://github.com/paulusmack/ppp/issues/73]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+diff --git a/pppd/plugins/pppol2tp/openl2tp.c b/pppd/plugins/pppol2tp/openl2tp.c
+index 9643b96..458316b 100644
+--- a/pppd/plugins/pppol2tp/openl2tp.c
++++ b/pppd/plugins/pppol2tp/openl2tp.c
+@@ -47,7 +47,6 @@
+ #include <linux/if_ether.h>
+ #include <linux/ppp_defs.h>
+ #include <linux/if_ppp.h>
+-#include <linux/if_pppox.h>
+ #include <linux/if_pppol2tp.h>
+ 
+ #include "l2tp_event.h"
+diff --git a/pppd/plugins/pppol2tp/pppol2tp.c b/pppd/plugins/pppol2tp/pppol2tp.c
+index 0e28606..4f6d98c 100644
+--- a/pppd/plugins/pppol2tp/pppol2tp.c
++++ b/pppd/plugins/pppol2tp/pppol2tp.c
+@@ -46,7 +46,6 @@
+ #include <linux/if_ether.h>
+ #include <linux/ppp_defs.h>
+ #include <linux/if_ppp.h>
+-#include <linux/if_pppox.h>
+ #include <linux/if_pppol2tp.h>
+ 
+ /* should be added to system's socket.h... */
+---
+

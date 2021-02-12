@@ -168,7 +168,6 @@ class PackageTests(OESelftestTestCase):
         with runqemu('core-image-minimal') as qemu:
             for path in [ sysconfdir + "/selftest-chown/file",
                           sysconfdir + "/selftest-chown/dir",
-                          sysconfdir + "/selftest-chown/symlink",
-                          sysconfdir + "/selftest-chown/fifotest/fifo"]:
+                          sysconfdir + "/selftest-chown/symlink"]:
                 if not check_ownership(qemu, "test", "test", path):
                     self.fail('Test ownership %s failed' % path)

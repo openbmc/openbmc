@@ -58,9 +58,6 @@ EXTRA_OECONF += "\
 # This is causing [textrel] QA warning
 EXTRA_OECONF += "--disable-harden"
 
-# musl does not implement wtmp/logwtmp APIs
-EXTRA_OECONF_append_libc-musl = " --disable-wtmp --disable-lastlog"
-
 do_install() {
 	install -d ${D}${sysconfdir} \
 		${D}${sysconfdir}/init.d \

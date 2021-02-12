@@ -1,7 +1,5 @@
 inherit linux-kernel-base kernel-module-split
 
-COMPATIBLE_HOST = ".*-linux"
-
 KERNEL_PACKAGE_NAME ??= "kernel"
 KERNEL_DEPLOYSUBDIR ??= "${@ "" if (d.getVar("KERNEL_PACKAGE_NAME") == "kernel") else d.getVar("KERNEL_PACKAGE_NAME") }"
 

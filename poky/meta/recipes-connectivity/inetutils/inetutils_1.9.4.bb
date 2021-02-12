@@ -71,7 +71,6 @@ do_install_append () {
          install -m 0755 -d ${D}${base_bindir}
          mv ${D}${bindir}/ping* ${D}${base_bindir}/
          mv ${D}${bindir}/hostname ${D}${base_bindir}/
-         mv ${D}${bindir}/dnsdomainname ${D}${base_bindir}/
     fi
     mv ${D}${bindir}/ifconfig ${D}${base_sbindir}/
     mv ${D}${libexecdir}/syslogd ${D}${base_sbindir}/
@@ -119,9 +118,8 @@ PACKAGES =+ "${PN}-tftpd-dbg ${PN}-telnetd-dbg ${PN}-rshd-dbg"
 NOAUTOPACKAGEDEBUG = "1"
 
 ALTERNATIVE_PRIORITY = "79"
-ALTERNATIVE_${PN} = "whois dnsdomainname"
+ALTERNATIVE_${PN} = "whois"
 ALTERNATIVE_LINK_NAME[uucpd]  = "${sbindir}/in.uucpd"
-ALTERNATIVE_LINK_NAME[dnsdomainname]  = "${base_bindir}/dnsdomainname"
 
 ALTERNATIVE_PRIORITY_${PN}-logger = "60"
 ALTERNATIVE_${PN}-logger = "logger"

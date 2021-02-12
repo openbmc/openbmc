@@ -9,7 +9,6 @@
 *******************************
 
 - :yocto_docs:`3.2 Documentation </3.2>`
-- :yocto_docs:`3.2.1 Documentation </3.2.1>`
 
 ****************************
 3.1 'dunfell' Release Series

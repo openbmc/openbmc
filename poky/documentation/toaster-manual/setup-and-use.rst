@@ -462,8 +462,9 @@ Using the Toaster Web Interface
 
 The Toaster web interface allows you to do the following:
 
--  Browse published layers in the :oe_layerindex:`OpenEmbedded Layer Index <>`
-   that are available for your selected version of the build system.
+-  Browse published layers in the `OpenEmbedded Layer
+   Index <http://layers.openembedded.org>`__ that are available for your
+   selected version of the build system.
 
 -  Import your own layers for building.
 
@@ -572,11 +573,11 @@ However, the "Local Yocto Project" release will not provide you with any
 compatible layers, other than the three core layers that come with the
 Yocto Project:
 
--  :oe_layer:`openembedded-core </openembedded-core>`
+-  `openembedded-core <http://layers.openembedded.org/layerindex/branch/master/layer/openembedded-core/>`__
 
--  :oe_layer:`meta-poky </meta-poky>`
+-  `meta-poky <http://layers.openembedded.org/layerindex/branch/master/layer/meta-poky/>`__
 
--  :oe_layer:`meta-yocto-bsp </meta-yocto-bsp>`
+-  `meta-yocto-bsp <http://layers.openembedded.org/layerindex/branch/master/layer/meta-yocto-bsp/>`__
 
 .. image:: figures/compatible-layers.png
    :align: center

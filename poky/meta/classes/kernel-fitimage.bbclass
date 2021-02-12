@@ -72,19 +72,6 @@ FIT_KEY_REQ_ARGS ?= "-batch -new"
 # Standard format for public key certificate
 FIT_KEY_SIGN_PKCS ?= "-x509"
 
-# Description string
-FIT_DESC ?= "U-Boot fitImage for ${DISTRO_NAME}/${PV}/${MACHINE}"
-
-# Sign individual images as well
-FIT_SIGN_INDIVIDUAL ?= "0"
-
-# mkimage command
-UBOOT_MKIMAGE ?= "uboot-mkimage"
-UBOOT_MKIMAGE_SIGN ?= "${UBOOT_MKIMAGE}"
-
-# Arguments passed to mkimage for signing
-UBOOT_MKIMAGE_SIGN_ARGS ?= ""
-
 #
 # Emit the fitImage ITS header
 #
@@ -94,7 +81,7 @@ fitimage_emit_fit_header() {
 /dts-v1/;
 
 / {
-        description = "${FIT_DESC}";
+        description = "U-Boot fitImage for ${DISTRO_NAME}/${PV}/${MACHINE}";
         #address-cells = <1>;
 EOF
 }
@@ -145,8 +132,6 @@ EOF
 fitimage_emit_section_kernel() {
 
 	kernel_csum="${FIT_HASH_ALG}"
-	kernel_sign_algo="${FIT_SIGN_ALG}"
-	kernel_sign_keyname="${UBOOT_SIGN_KEYNAME}"
 
 	ENTRYPOINT="${UBOOT_ENTRYPOINT}"
 	if [ -n "${UBOOT_ENTRYSYMBOL}" ]; then
@@ -169,17 +154,6 @@ fitimage_emit_section_kernel() {
                         };
                 };
 EOF
-
-	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a "${FIT_SIGN_INDIVIDUAL}" = "1" -a -n "${kernel_sign_keyname}" ] ; then
-		sed -i '$ d' ${1}
-		cat << EOF >> ${1}
-                        signature@1 {
-                                algo = "${kernel_csum},${kernel_sign_algo}";
-                                key-name-hint = "${kernel_sign_keyname}";
-                        };
-                };
-EOF
-	fi
 }
 
 #
@@ -191,8 +165,6 @@ EOF
 fitimage_emit_section_dtb() {
 
 	dtb_csum="${FIT_HASH_ALG}"
-	dtb_sign_algo="${FIT_SIGN_ALG}"
-	dtb_sign_keyname="${UBOOT_SIGN_KEYNAME}"
 
 	dtb_loadline=""
 	dtb_ext=${DTB##*.}
@@ -216,17 +188,6 @@ fitimage_emit_section_dtb() {
                         };
                 };
 EOF
-
-	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a "${FIT_SIGN_INDIVIDUAL}" = "1" -a -n "${dtb_sign_keyname}" ] ; then
-		sed -i '$ d' ${1}
-		cat << EOF >> ${1}
-                        signature@1 {
-                                algo = "${dtb_csum},${dtb_sign_algo}";
-                                key-name-hint = "${dtb_sign_keyname}";
-                        };
-                };
-EOF
-	fi
 }
 
 #
@@ -265,8 +226,6 @@ EOF
 fitimage_emit_section_ramdisk() {
 
 	ramdisk_csum="${FIT_HASH_ALG}"
-	ramdisk_sign_algo="${FIT_SIGN_ALG}"
-	ramdisk_sign_keyname="${UBOOT_SIGN_KEYNAME}"
 	ramdisk_loadline=""
 	ramdisk_entryline=""
 
@@ -292,17 +251,6 @@ fitimage_emit_section_ramdisk() {
                         };
                 };
 EOF
-
-	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a "${FIT_SIGN_INDIVIDUAL}" = "1" -a -n "${ramdisk_sign_keyname}" ] ; then
-		sed -i '$ d' ${1}
-		cat << EOF >> ${1}
-                        signature@1 {
-                                algo = "${ramdisk_csum},${ramdisk_sign_algo}";
-                                key-name-hint = "${ramdisk_sign_keyname}";
-                        };
-                };
-EOF
-	fi
 }
 
 #
@@ -322,13 +270,6 @@ fitimage_emit_section_config() {
 		conf_sign_keyname="${UBOOT_SIGN_KEYNAME}"
 	fi
 
-	its_file="${1}"
-	kernel_id="${2}"
-	dtb_image="${3}"
-	ramdisk_id="${4}"
-	config_id="${5}"
-	default_flag="${6}"
-
 	# Test if we have any DTBs at all
 	sep=""
 	conf_desc=""
@@ -341,49 +282,49 @@ fitimage_emit_section_config() {
 
 	# conf node name is selected based on dtb ID if it is present,
 	# otherwise its selected based on kernel ID
-	if [ -n "${dtb_image}" ]; then
-		conf_node=$conf_node${dtb_image}
+	if [ -n "${3}" ]; then
+		conf_node=$conf_node${3}
 	else
-		conf_node=$conf_node${kernel_id}
+		conf_node=$conf_node${2}
 	fi
 
-	if [ -n "${kernel_id}" ]; then
+	if [ -n "${2}" ]; then
 		conf_desc="Linux kernel"
 		sep=", "
-		kernel_line="kernel = \"kernel@${kernel_id}\";"
+		kernel_line="kernel = \"kernel@${2}\";"
 	fi
 
-	if [ -n "${dtb_image}" ]; then
+	if [ -n "${3}" ]; then
 		conf_desc="${conf_desc}${sep}FDT blob"
 		sep=", "
-		fdt_line="fdt = \"fdt@${dtb_image}\";"
+		fdt_line="fdt = \"fdt@${3}\";"
 	fi
 
-	if [ -n "${ramdisk_id}" ]; then
+	if [ -n "${4}" ]; then
 		conf_desc="${conf_desc}${sep}ramdisk"
 		sep=", "
-		ramdisk_line="ramdisk = \"ramdisk@${ramdisk_id}\";"
+		ramdisk_line="ramdisk = \"ramdisk@${4}\";"
 	fi
 
-	if [ -n "${config_id}" ]; then
+	if [ -n "${5}" ]; then
 		conf_desc="${conf_desc}${sep}setup"
-		setup_line="setup = \"setup@${config_id}\";"
+		setup_line="setup = \"setup@${5}\";"
 	fi
 
-	if [ "${default_flag}" = "1" ]; then
+	if [ "${6}" = "1" ]; then
 		# default node is selected based on dtb ID if it is present,
 		# otherwise its selected based on kernel ID
-		if [ -n "${dtb_image}" ]; then
-			default_line="default = \"conf@${dtb_image}\";"
+		if [ -n "${3}" ]; then
+			default_line="default = \"conf@${3}\";"
 		else
-			default_line="default = \"conf@${kernel_id}\";"
+			default_line="default = \"conf@${2}\";"
 		fi
 	fi
 
-	cat << EOF >> ${its_file}
+	cat << EOF >> ${1}
                 ${default_line}
                 $conf_node {
-			description = "${default_flag} ${conf_desc}";
+			description = "${6} ${conf_desc}";
 			${kernel_line}
 			${fdt_line}
 			${ramdisk_line}
@@ -398,28 +339,28 @@ EOF
 		sign_line="sign-images = "
 		sep=""
 
-		if [ -n "${kernel_id}" ]; then
+		if [ -n "${2}" ]; then
 			sign_line="${sign_line}${sep}\"kernel\""
 			sep=", "
 		fi
 
-		if [ -n "${dtb_image}" ]; then
+		if [ -n "${3}" ]; then
 			sign_line="${sign_line}${sep}\"fdt\""
 			sep=", "
 		fi
 
-		if [ -n "${ramdisk_id}" ]; then
+		if [ -n "${4}" ]; then
 			sign_line="${sign_line}${sep}\"ramdisk\""
 			sep=", "
 		fi
 
-		if [ -n "${config_id}" ]; then
+		if [ -n "${5}" ]; then
 			sign_line="${sign_line}${sep}\"setup\""
 		fi
 
 		sign_line="${sign_line};"
 
-		cat << EOF >> ${its_file}
+		cat << EOF >> ${1}
                         signature@1 {
                                 algo = "${conf_csum},${conf_sign_algo}";
                                 key-name-hint = "${conf_sign_keyname}";
@@ -428,7 +369,7 @@ EOF
 EOF
 	fi
 
-	cat << EOF >> ${its_file}
+	cat << EOF >> ${1}
                 };
 EOF
 }
@@ -554,7 +495,7 @@ fitimage_assemble() {
 	#
 	# Step 6: Assemble the image
 	#
-	${UBOOT_MKIMAGE} \
+	uboot-mkimage \
 		${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
 		-f ${1} \
 		arch/${ARCH}/boot/${2}
@@ -570,12 +511,11 @@ fitimage_assemble() {
 			cp -P ${STAGING_DATADIR}/u-boot*.dtb ${B}
 			add_key_to_u_boot="-K ${B}/${UBOOT_DTB_BINARY}"
 		fi
-		${UBOOT_MKIMAGE_SIGN} \
+		uboot-mkimage \
 			${@'-D "${UBOOT_MKIMAGE_DTCOPTS}"' if len('${UBOOT_MKIMAGE_DTCOPTS}') else ''} \
 			-F -k "${UBOOT_SIGN_KEYDIR}" \
 			$add_key_to_u_boot \
-			-r arch/${ARCH}/boot/${2} \
-			${UBOOT_MKIMAGE_SIGN_ARGS}
+			-r arch/${ARCH}/boot/${2}
 	fi
 }
 

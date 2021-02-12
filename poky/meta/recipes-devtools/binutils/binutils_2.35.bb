@@ -52,11 +52,9 @@ do_install_class-native () {
 	rmdir ${D}/${libdir}64 || :
 }
 
-# Split out libbfd-*.so and libopcodes-*.so so including perf doesn't include
-# extra stuff
-PACKAGE_BEFORE_PN += "libbfd libopcodes"
+# Split out libbfd-*.so so including perf doesn't include extra stuff
+PACKAGE_BEFORE_PN += "libbfd"
 FILES_libbfd = "${libdir}/libbfd-*.so.* ${libdir}/libbfd-*.so"
-FILES_libopcodes = "${libdir}/libopcodes-*.so.* ${libdir}/libopcodes-*.so"
 
 SRC_URI_append_class-nativesdk =  " file://0003-binutils-nativesdk-Search-for-alternative-ld.so.conf.patch "
 

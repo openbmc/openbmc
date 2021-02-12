@@ -137,9 +137,8 @@ do_install() {
     install lib/ExtUtils/typemap ${D}${libdir}/perl5/${PV}/ExtUtils/
 
     # Fix up shared library
-    dir=$(echo ${D}/${libdir}/perl5/${PV}/*/CORE)
-    rm $dir/libperl.so
-    ln -sf ../../../../libperl.so.${PERL_LIB_VER} $dir/libperl.so
+    rm ${D}/${libdir}/perl5/${PV}/*/CORE/libperl.so
+    ln -sf ../../../../libperl.so.${PERL_LIB_VER} $(echo ${D}/${libdir}/perl5/${PV}/*/CORE)/libperl.so
 
     # Try to catch Bug #13946
     if [ -e ${D}/${libdir}/perl5/${PV}/Storable.pm ]; then

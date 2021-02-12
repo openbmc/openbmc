@@ -1,6 +1,6 @@
 def get_musl_loader_arch(d):
     import re
-    ldso_arch = "NotSupported"
+    ldso_arch = None
 
     targetarch = d.getVar("TARGET_ARCH")
     if targetarch.startswith("microblaze"):
@@ -32,7 +32,7 @@ def get_musl_loader(d):
 def get_glibc_loader(d):
     import re
 
-    dynamic_loader = "NotSupported"
+    dynamic_loader = None
     targetarch = d.getVar("TARGET_ARCH")
     if targetarch in ["powerpc", "microblaze"]:
         dynamic_loader = "${base_libdir}/ld.so.1"
@@ -58,7 +58,7 @@ def get_linuxloader(d):
     overrides = d.getVar("OVERRIDES").split(":")
 
     if "libc-baremetal" in overrides:
-        return "NotSupported"
+        return None
 
     if "libc-musl" in overrides:
         dynamic_loader = get_musl_loader(d)

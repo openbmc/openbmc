@@ -1,0 +1,46 @@
+From 92b555aaabf710e0a672a7244e8c0e3963075133 Mon Sep 17 00:00:00 2001
+From: Purushottam choudhary <purushottam.choudhary@kpit.com>
+Date: Wed, 28 Oct 2020 22:11:49 +0530
+Subject: [PATCH] network: selinux hook handling to enumerate nexthop
+
+When selinux is enabled, the call of
+manager_rtnl_enumerate_nexthop() fails.
+
+This fix is to facilitate selinux hook handling for enumerating
+nexthop.
+
+In manager_rtnl_enumerate_nexthop() there is a check
+if "Not supported" is returned by the send_netlink() call.
+
+This check expects that -EOPNOTSUPP is returned,
+the selinux hook seems to return -EINVAL instead.
+
+This happens in kernel older than 5.3
+(more specificallytorvalds/linux@65ee00a) as it does not support
+nexthop handling through netlink.
+
+And if SELinux is enforced in the order kernel, callingRTM_GETNEXTHOP
+returns -EINVAL.
+
+Thus adding a call in the manager_rtnl_enumerate_nexthop for the
+extra return -EINVAL.
+
+Upstream-Status: Backport
+https://github.com/systemd/systemd/commit/92b555aaabf710e0a672a7244e8c0e3963075133
+---
+ src/network/networkd-manager.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/network/networkd-manager.c b/src/network/networkd-manager.c
+index a6c1a39..2a9be85 100644
+--- a/src/network/networkd-manager.c
++++ b/src/network/networkd-manager.c
+@@ -2121,7 +2121,7 @@ int manager_rtnl_enumerate_nexthop(Manager *m) {
+
+         r = sd_netlink_call(m->rtnl, req, 0, &reply);
+         if (r < 0) {
+-                if (r == -EOPNOTSUPP) {
++                if (r == -EOPNOTSUPP || r == -EINVAL) {
+                         log_debug("Nexthop are not supported by the kernel. Ignoring.");
+                         return 0;
+                 }

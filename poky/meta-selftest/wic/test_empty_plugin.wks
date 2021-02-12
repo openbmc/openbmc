@@ -1,4 +1,0 @@
-# short-description: image for checking empty partition creation
-
-part / --source rootfs --fstype=ext4 --align 1024 --use-uuid
-part empty --source empty --ondisk sda --size 1024 --align 1024
