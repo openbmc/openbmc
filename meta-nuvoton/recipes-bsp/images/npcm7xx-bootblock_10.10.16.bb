@@ -8,6 +8,7 @@ FILENAME = "Poleg_bootblock_${PV}.bin"
 
 S = "${WORKDIR}"
 
+SRCREV = "7bfef99f7a0354395519c4975f96d66cdda1fb67"
 SRC_URI = " \
     https://raw.githubusercontent.com/Nuvoton-Israel/bootblock/${SRCREV}/LICENSE;name=lic \
     https://github.com/Nuvoton-Israel/bootblock/releases/download/BootBlock_${PV}/Poleg_bootblock_basic.bin;downloadfilename=${FILENAME};name=bin \
