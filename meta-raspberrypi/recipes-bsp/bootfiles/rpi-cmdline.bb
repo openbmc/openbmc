@@ -37,7 +37,7 @@ CMDLINE = " \
     "
 
 do_compile() {
-    echo "${CMDLINE}" > "${WORKDIR}/cmdline.txt"
+    echo "${@' '.join('${CMDLINE}'.split())}" > "${WORKDIR}/cmdline.txt"
 }
 
 do_deploy() {

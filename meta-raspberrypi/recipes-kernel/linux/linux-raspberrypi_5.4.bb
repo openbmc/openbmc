@@ -1,8 +1,8 @@
-LINUX_VERSION ?= "5.4.79"
+LINUX_VERSION ?= "5.4.83"
 LINUX_RPI_BRANCH ?= "rpi-5.4.y"
 
-SRCREV_machine = "9797f1a4938c20139b00a25de93cc99efb5c291b"
-SRCREV_meta = "5d52d9eea95fa09d404053360c2351b2b91b323b"
+SRCREV_machine = "08ae2dd9e7dc89c20bff823a3ef045de09bfd090"
+SRCREV_meta = "d676bf5ff7b7071e14f44498d2482c0a596f14cd"
 
 KMETA = "kernel-meta"
 
@@ -19,4 +19,4 @@ require linux-raspberrypi.inc
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
-KERNEL_EXTRA_ARGS += "DTC_FLAGS='-@ -H epapr'"
+KERNEL_DTC_FLAGS += "-@ -H epapr"

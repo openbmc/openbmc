@@ -269,6 +269,15 @@ local.conf:
 
     ENABLE_DWC2_PERIPHERAL = "1"
 
+## Enable USB host support
+
+By default in case of the Compute Module 4 IO Board the standard USB driver
+that usually supports host mode operations is disabled for power saving reasons.
+Users who want to use the 2 USB built-in ports or the other ports provided via
+the header extension should set the following in local.conf:
+
+    ENABLE_DWC2_HOST = "1"
+
 ## Enable Openlabs 802.15.4 radio module
 
 When using device tree kernels, set this variable to enable the 802.15.4 hat:

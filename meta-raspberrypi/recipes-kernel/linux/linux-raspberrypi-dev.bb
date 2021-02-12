@@ -22,9 +22,7 @@ SRC_URI = " \
 
 require linux-raspberrypi.inc
 
-LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
-
-KERNEL_EXTRA_ARGS += "DTC_FLAGS='-@ -H epapr'"
+KERNEL_DTC_FLAGS += "-@ -H epapr"
 
 # Disable version check so that we don't have to edit this recipe every time
 # upstream bumps the version

@@ -34,210 +34,220 @@ inherit deploy nopackages
 
 do_deploy() {
     install -d ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}
+    CONFIG=${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
 
-    cp ${S}/config.txt ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/
+    cp ${S}/config.txt $CONFIG
 
     if [ -n "${KEY_DECODE_MPG2}" ]; then
-        sed -i '/#decode_MPG2=/ c\decode_MPG2=${KEY_DECODE_MPG2}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#decode_MPG2=/ c\decode_MPG2=${KEY_DECODE_MPG2}' $CONFIG
     fi
     if [ -n "${KEY_DECODE_WVC1}" ]; then
-        sed -i '/#decode_WVC1=/ c\decode_WVC1=${KEY_DECODE_WVC1}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#decode_WVC1=/ c\decode_WVC1=${KEY_DECODE_WVC1}' $CONFIG
     fi
     if [ -n "${DISABLE_OVERSCAN}" ]; then
-        sed -i '/#disable_overscan=/ c\disable_overscan=${DISABLE_OVERSCAN}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#disable_overscan=/ c\disable_overscan=${DISABLE_OVERSCAN}' $CONFIG
     fi
     if [ "${DISABLE_SPLASH}" = "1" ]; then
-        sed -i '/#disable_splash=/ c\disable_splash=${DISABLE_SPLASH}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#disable_splash=/ c\disable_splash=${DISABLE_SPLASH}' $CONFIG
     fi
 
     # Set overclocking options
     if [ -n "${ARM_FREQ}" ]; then
-        sed -i '/#arm_freq=/ c\arm_freq=${ARM_FREQ}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#arm_freq=/ c\arm_freq=${ARM_FREQ}' $CONFIG
     fi
     if [ -n "${GPU_FREQ}" ]; then
-        sed -i '/#gpu_freq=/ c\gpu_freq=${GPU_FREQ}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#gpu_freq=/ c\gpu_freq=${GPU_FREQ}' $CONFIG
     fi
     if [ -n "${CORE_FREQ}" ]; then
-        sed -i '/#core_freq=/ c\core_freq=${CORE_FREQ}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#core_freq=/ c\core_freq=${CORE_FREQ}' $CONFIG
     fi
     if [ -n "${SDRAM_FREQ}" ]; then
-        sed -i '/#sdram_freq=/ c\sdram_freq=${SDRAM_FREQ}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#sdram_freq=/ c\sdram_freq=${SDRAM_FREQ}' $CONFIG
     fi
     if [ -n "${OVER_VOLTAGE}" ]; then
-        sed -i '/#over_voltage=/ c\over_voltage=${OVER_VOLTAGE}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#over_voltage=/ c\over_voltage=${OVER_VOLTAGE}' $CONFIG
     fi
 
     # GPU memory
     if [ -n "${GPU_MEM}" ]; then
-        sed -i '/#gpu_mem=/ c\gpu_mem=${GPU_MEM}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#gpu_mem=/ c\gpu_mem=${GPU_MEM}' $CONFIG
     fi
     if [ -n "${GPU_MEM_256}" ]; then
-        sed -i '/#gpu_mem_256=/ c\gpu_mem_256=${GPU_MEM_256}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#gpu_mem_256=/ c\gpu_mem_256=${GPU_MEM_256}' $CONFIG
     fi
     if [ -n "${GPU_MEM_512}" ]; then
-        sed -i '/#gpu_mem_512=/ c\gpu_mem_512=${GPU_MEM_512}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#gpu_mem_512=/ c\gpu_mem_512=${GPU_MEM_512}' $CONFIG
     fi
     if [ -n "${GPU_MEM_1024}" ]; then
-        sed -i '/#gpu_mem_1024=/ c\gpu_mem_1024=${GPU_MEM_1024}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#gpu_mem_1024=/ c\gpu_mem_1024=${GPU_MEM_1024}' $CONFIG
     fi
 
     # Set boot delay
     if [ -n "${BOOT_DELAY}" ]; then
-        sed -i '/#boot_delay=/ c\boot_delay=${BOOT_DELAY}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#boot_delay=/ c\boot_delay=${BOOT_DELAY}' $CONFIG
     fi
     if [ -n "${BOOT_DELAY_MS}" ]; then
-        sed -i '/#boot_delay_ms=/ c\boot_delay_ms=${BOOT_DELAY_MS}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#boot_delay_ms=/ c\boot_delay_ms=${BOOT_DELAY_MS}' $CONFIG
     fi
 
     # Set HDMI and composite video options
     if [ -n "${HDMI_FORCE_HOTPLUG}" ]; then
-        sed -i '/#hdmi_force_hotplug=/ c\hdmi_force_hotplug=${HDMI_FORCE_HOTPLUG}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#hdmi_force_hotplug=/ c\hdmi_force_hotplug=${HDMI_FORCE_HOTPLUG}' $CONFIG
     fi
     if [ -n "${HDMI_DRIVE}" ]; then
-        sed -i '/#hdmi_drive=/ c\hdmi_drive=${HDMI_DRIVE}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#hdmi_drive=/ c\hdmi_drive=${HDMI_DRIVE}' $CONFIG
     fi
     if [ -n "${HDMI_GROUP}" ]; then
-        sed -i '/#hdmi_group=/ c\hdmi_group=${HDMI_GROUP}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#hdmi_group=/ c\hdmi_group=${HDMI_GROUP}' $CONFIG
     fi
     if [ -n "${HDMI_MODE}" ]; then
-        sed -i '/#hdmi_mode=/ c\hdmi_mode=${HDMI_MODE}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#hdmi_mode=/ c\hdmi_mode=${HDMI_MODE}' $CONFIG
     fi
     if [ -n "${CONFIG_HDMI_BOOST}" ]; then
-        sed -i '/#config_hdmi_boost=/ c\config_hdmi_boost=${CONFIG_HDMI_BOOST}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#config_hdmi_boost=/ c\config_hdmi_boost=${CONFIG_HDMI_BOOST}' $CONFIG
     fi
     if [ -n "${SDTV_MODE}" ]; then
-        sed -i '/#sdtv_mode=/ c\sdtv_mode=${SDTV_MODE}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#sdtv_mode=/ c\sdtv_mode=${SDTV_MODE}' $CONFIG
     fi
     if [ -n "${SDTV_ASPECT}" ]; then
-        sed -i '/#sdtv_aspect=/ c\sdtv_aspect=${SDTV_ASPECT}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#sdtv_aspect=/ c\sdtv_aspect=${SDTV_ASPECT}' $CONFIG
     fi
     if [ -n "${DISPLAY_ROTATE}" ]; then
-        sed -i '/#display_rotate=/ c\display_rotate=${DISPLAY_ROTATE}' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        sed -i '/#display_rotate=/ c\display_rotate=${DISPLAY_ROTATE}' $CONFIG
     fi
 
     # Video camera support
     if [ "${VIDEO_CAMERA}" = "1" ]; then
-        echo "# Enable video camera" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "start_x=1" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        # TODO: It has been observed that Raspberry Pi 4B 4GB may fail to enable the camera if "start_x=1" is at the end
+        #       of the file. The underlying cause is unknown, but it can be related with a file size limitation affecting
+        #       this variable. Therefore, "start_x=1" has been set to replace the original occurrence in config.txt,
+        #       which is at the middle of the file.
+        sed -i '/#start_x=/ c\start_x=1' $CONFIG
     fi
 
     # Offline compositing support
     if [ "${DISPMANX_OFFLINE}" = "1" ]; then
-        echo "# Enable offline compositing" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dispmanx_offline=1" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable offline compositing" >>$CONFIG
+        echo "dispmanx_offline=1" >>$CONFIG
     fi
 
     # SPI bus support
     if [ "${ENABLE_SPI_BUS}" = "1" ] || [ "${PITFT}" = "1" ]; then
-        echo "# Enable SPI bus" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtparam=spi=on" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable SPI bus" >>$CONFIG
+        echo "dtparam=spi=on" >>$CONFIG
     fi
 
     # I2C support
     if [ "${ENABLE_I2C}" = "1" ] || [ "${PITFT}" = "1" ]; then
-        echo "# Enable I2C" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtparam=i2c1=on" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtparam=i2c_arm=on" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable I2C" >>$CONFIG
+        echo "dtparam=i2c1=on" >>$CONFIG
+        echo "dtparam=i2c_arm=on" >>$CONFIG
     fi
 
     # PiTFT22 display support
     if [ "${PITFT22}" = "1" ]; then
-        echo "# Enable PITFT22 display" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=pitft22,rotate=270,speed=32000000,txbuflen=32768" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable PITFT22 display" >>$CONFIG
+        echo "dtoverlay=pitft22,rotate=270,speed=32000000,txbuflen=32768" >>$CONFIG
     fi
     if [ "${PITFT28r}" = "1" ]; then
-        echo "# Enable PITFT28r display" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=pitft28-resistive,rotate=90,speed=32000000,txbuflen=32768" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable PITFT28r display" >>$CONFIG
+        echo "dtoverlay=pitft28-resistive,rotate=90,speed=32000000,txbuflen=32768" >>$CONFIG
     fi
     if [ "${PITFT28c}" = "1" ]; then
-        echo "# Enable PITFT28c display" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=pitft28-capacitive,rotate=90,speed=32000000,txbuflen=32768" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=pitft28-capacitive,touch-swapxy,touch-invx" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable PITFT28c display" >>$CONFIG
+        echo "dtoverlay=pitft28-capacitive,rotate=90,speed=32000000,txbuflen=32768" >>$CONFIG
+        echo "dtoverlay=pitft28-capacitive,touch-swapxy,touch-invx" >>$CONFIG
     fi
     if [ "${PITFT35r}" = "1" ]; then
-        echo "# Enable PITFT35r display" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=pitft35-resistive,rotate=90,speed=42000000,fps=20" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable PITFT35r display" >>$CONFIG
+        echo "dtoverlay=pitft35-resistive,rotate=90,speed=42000000,fps=20" >>$CONFIG
     fi
 
     # UART support
     if [ "${ENABLE_UART}" = "1" ]; then
-        echo "# Enable UART" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "enable_uart=1" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable UART" >>$CONFIG
+        echo "enable_uart=1" >>$CONFIG
     fi
 
     # Infrared support
     if [ "${ENABLE_IR}" = "1" ]; then
-        echo "# Enable infrared" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=gpio-ir,gpio_pin=${GPIO_IR}" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=gpio-ir-tx,gpio_pin=${GPIO_IR_TX}" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable infrared" >>$CONFIG
+        echo "dtoverlay=gpio-ir,gpio_pin=${GPIO_IR}" >>$CONFIG
+        echo "dtoverlay=gpio-ir-tx,gpio_pin=${GPIO_IR_TX}" >>$CONFIG
     fi
 
     # VC4 Graphics support
     if [ "${VC4GRAPHICS}" = "1" ]; then
-        echo "# Enable VC4 Graphics" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=${VC4DTBO}" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable VC4 Graphics" >> $CONFIG
+        echo "dtoverlay=${VC4DTBO}" >> $CONFIG
     fi
 
     # Choose Camera Sensor to be used, default imx219 sensor
     if [ "${RASPBERRYPI_CAMERA_V2}" = "1" ]; then
-        echo "# Enable Sony RaspberryPi Camera" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=imx219" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable Sony RaspberryPi Camera" >> $CONFIG
+        echo "dtoverlay=imx219" >> $CONFIG
     fi
 
     # Waveshare "C" 1024x600 7" Rev2.1 IPS capacitive touch (http://www.waveshare.com/7inch-HDMI-LCD-C.htm)
     if [ "${WAVESHARE_1024X600_C_2_1}" = "1" ]; then
-        echo "# Waveshare \"C\" 1024x600 7\" Rev2.1 IPS capacitive touch screen" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "max_usb_current=1" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "hdmi_group=2" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "hdmi_mode=87" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "hdmi_cvt 1024 600 60 6 0 0 0" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "hdmi_drive=1" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Waveshare \"C\" 1024x600 7\" Rev2.1 IPS capacitive touch screen" >> $CONFIG
+        echo "max_usb_current=1" >> $CONFIG
+        echo "hdmi_group=2" >> $CONFIG
+        echo "hdmi_mode=87" >> $CONFIG
+        echo "hdmi_cvt 1024 600 60 6 0 0 0" >> $CONFIG
+        echo "hdmi_drive=1" >> $CONFIG
     fi
 
     # DWC2 USB peripheral support
     if [ "${ENABLE_DWC2_PERIPHERAL}" = "1" ]; then
-        echo "# Enable USB peripheral mode" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=dwc2,dr_mode=peripheral" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable USB peripheral mode" >> $CONFIG
+        echo "dtoverlay=dwc2,dr_mode=peripheral" >> $CONFIG
+    fi
+
+    # DWC2 USB host mode support
+    if [ "${ENABLE_DWC2_HOST}" = "1" ]; then
+        echo "# Enable USB host mode" >> $CONFIG
+        echo "dtoverlay=dwc2,dr_mode=host" >> $CONFIG
     fi
 
     # AT86RF23X support
     if [ "${ENABLE_AT86RF}" = "1" ]; then
-        echo "# Enable AT86RF23X" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=at86rf233,speed=3000000" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable AT86RF23X" >>$CONFIG
+        echo "dtoverlay=at86rf233,speed=3000000" >>$CONFIG
     fi
 
     # ENABLE DUAL CAN
     if [ "${ENABLE_DUAL_CAN}" = "1" ]; then
-        echo "# Enable DUAL CAN" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=mcp2515-can0,oscillator=${CAN_OSCILLATOR},interrupt=25" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=mcp2515-can1,oscillator=${CAN_OSCILLATOR},interrupt=24" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable DUAL CAN" >>$CONFIG
+        echo "dtoverlay=mcp2515-can0,oscillator=${CAN_OSCILLATOR},interrupt=25" >>$CONFIG
+        echo "dtoverlay=mcp2515-can1,oscillator=${CAN_OSCILLATOR},interrupt=24" >>$CONFIG
     # ENABLE CAN
     elif [ "${ENABLE_CAN}" = "1" ]; then
-        echo "# Enable CAN" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "dtoverlay=mcp2515-can0,oscillator=${CAN_OSCILLATOR},interrupt=25" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "# Enable CAN" >>$CONFIG
+        echo "dtoverlay=mcp2515-can0,oscillator=${CAN_OSCILLATOR},interrupt=25" >>$CONFIG
     fi
 
     # Append extra config if the user has provided any
-    printf "${RPI_EXTRA_CONFIG}\n" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+    printf "${RPI_EXTRA_CONFIG}\n" >> $CONFIG
 
     # Handle setup with armstub file
     if [ "${@bb.utils.contains("MACHINE_FEATURES", "armstub", "1", "0", d)}" = "1" ]; then
-        echo "\n# ARM stub configuration" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-        echo "armstub=${ARMSTUB}" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "\n# ARM stub configuration" >> $CONFIG
+        echo "armstub=${ARMSTUB}" >> $CONFIG
         case "${ARMSTUB}" in
             *-gic.bin)
-                echo  "enable_gic=1" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+                echo  "enable_gic=1" >> $CONFIG
                 ;;
         esac
     fi
 }
 
 do_deploy_append_raspberrypi3-64() {
-    echo "# have a properly sized image" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-    echo "disable_overscan=1" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+    echo "# have a properly sized image" >> $CONFIG
+    echo "disable_overscan=1" >> $CONFIG
 
-    echo "# Enable audio (loads snd_bcm2835)" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
-    echo "dtparam=audio=on" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+    echo "# Enable audio (loads snd_bcm2835)" >> $CONFIG
+    echo "dtparam=audio=on" >> $CONFIG
 }
 
 addtask deploy before do_build after do_install
