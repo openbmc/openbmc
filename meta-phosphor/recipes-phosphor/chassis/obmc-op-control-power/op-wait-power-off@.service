@@ -17,6 +17,7 @@ SyslogIdentifier=pgood_wait
 ExecStart=/bin/rm -f /run/openbmc/chassis@%i-on
 ExecStart=/bin/rm -f /run/openbmc/host@%i-on
 ExecStart=/bin/rm -f /run/openbmc/host@%i-request
+ExecStart=/bin/rm -f /run/openbmc/mpreboot@%i
 
 [Install]
 WantedBy=obmc-host-stop@%i.target
