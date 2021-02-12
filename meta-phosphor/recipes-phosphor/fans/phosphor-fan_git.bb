@@ -105,16 +105,26 @@ PACKAGECONFIG[monitor] = "--enable-monitor \
 
 TMPL_MONITOR = "phosphor-fan-monitor@.service"
 INSTFMT_MONITOR = "phosphor-fan-monitor@{0}.service"
-FMT_MONITOR = "../${TMPL_MONITOR}:${FAN_CONTROL_TGT}.requires/${INSTFMT_MONITOR}"
+FMT_MONITOR_FANSREADY = "../${TMPL_MONITOR}:${FAN_CONTROL_TGT}.requires/${INSTFMT_MONITOR}"
+FMT_MONITOR_PWRON = "../${TMPL_MONITOR}:${POWERON_TGT}.requires/${INSTFMT_MONITOR}"
+FMT_MONITOR_MUSR = "../${TMPL_MONITOR}:${MULTI_USR_TGT}.wants/${INSTFMT_MONITOR}"
 
 TMPL_MONITOR_INIT = "phosphor-fan-monitor-init@.service"
 INSTFMT_MONITOR_INIT = "phosphor-fan-monitor-init@{0}.service"
 FMT_MONITOR_INIT = "../${TMPL_MONITOR_INIT}:${POWERON_TGT}.wants/${INSTFMT_MONITOR_INIT}"
 
 FILES_${PN}-monitor = "${bindir}/phosphor-fan-monitor"
-SYSTEMD_SERVICE_${PN}-monitor += "${TMPL_MONITOR} ${TMPL_MONITOR_INIT}"
-SYSTEMD_LINK_${PN}-monitor += "${@compose_list(d, 'FMT_MONITOR', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN}-monitor += "${@compose_list(d, 'FMT_MONITOR_INIT', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE_${PN}-monitor += "${TMPL_MONITOR}"
+SYSTEMD_SERVICE_${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', '', '${TMPL_MONITOR_INIT}', d)}"
+
+# JSON: power on and multi-user links.  YAML: fans-ready and fan monitor init links
+SYSTEMD_LINK_${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+                                compose_list(d, 'FMT_MONITOR_PWRON', 'OBMC_CHASSIS_INSTANCES'), \
+                                compose_list(d, 'FMT_MONITOR_FANSREADY', 'OBMC_CHASSIS_INSTANCES'), d)}"
+
+SYSTEMD_LINK_${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+                                compose_list(d, 'FMT_MONITOR_MUSR', 'OBMC_CHASSIS_INSTANCES'), \
+                                compose_list(d, 'FMT_MONITOR_INIT', 'OBMC_CHASSIS_INSTANCES'), d)}"
 
 # --------------------------------------
 # phosphor-cooling-type specific configuration
