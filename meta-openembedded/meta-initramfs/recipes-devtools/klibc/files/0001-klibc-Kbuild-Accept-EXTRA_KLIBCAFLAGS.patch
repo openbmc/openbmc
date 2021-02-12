@@ -12,11 +12,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  usr/klibc/Kbuild | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/usr/klibc/Kbuild b/usr/klibc/Kbuild
-index 98caf2e9..b34521e0 100644
 --- a/usr/klibc/Kbuild
 +++ b/usr/klibc/Kbuild
-@@ -168,7 +168,8 @@ $(SOHASH): $(SOLIB) $(SOLIB).hash
+@@ -183,7 +183,8 @@ $(SOHASH): $(SOLIB) $(SOLIB).hash
  targets += interp.o
  
  quiet_cmd_interp = BUILD   $@
@@ -25,4 +23,4 @@ index 98caf2e9..b34521e0 100644
 +                             -D__ASSEMBLY__     \
                               -DLIBDIR=\"$(SHLIBDIR)\"         \
  			     -DSOHASH=\"$(SOLIBHASH)\" \
- 			     -c -o $@ $<
+                              $(KLIBCSTACKFLAGS) \

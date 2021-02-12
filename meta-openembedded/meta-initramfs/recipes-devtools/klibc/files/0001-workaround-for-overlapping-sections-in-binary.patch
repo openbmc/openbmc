@@ -1,0 +1,52 @@
+From 911130ce429cbf6a92d0fbd17f0ff638ec941df2 Mon Sep 17 00:00:00 2001
+From: Petr Ovtchenkov <ptr@void-ptr.info>
+Date: Sun, 7 Feb 2021 00:04:36 -0800
+Subject: [PATCH] workaround for overlapping sections in binary
+
+Problem: binary (typesize.bin) created from object file (typesize.o)
+with 'objcopy -O binary ... '. But typesize.o has relocatable objects that all
+copied with offset 0. This will lead to overlapping sections in binary.
+By fortunate syscalls.pl check magic bytes and ring the bell.
+
+This is naive workaround: skip .note.gnu.property section that overlap
+.rodata section.
+
+This not a bug of objcopy, https://sourceware.org/bugzilla/show_bug.cgi?id=27314
+
+Related commit:
+
+  commit de6f630e6be90d6d32d8bf2fed3f856b0c32f7ba
+  Author: H. Peter Anvin <hpa at zytor.com>
+  Date:   Sat Jun 10 11:15:19 2006 -0700
+
+      [klibc] Detect the sizes of various types, and make available to sysstub.ph.
+
+      This additional code effectively queries the C compiler for the sizes of
+      various types, and makes an associative array %typesize available to
+      sysstub.ph.  This is currently not used, but it's expected that some
+      architectures, e.g. s390, will need this to determine which registers
+      go where, and how many registers are needed.
+
+Upstream-Status: Submitted [https://lists.zytor.com/archives/klibc/2021-February/004583.html]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usr/klibc/syscalls/Kbuild | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/klibc/syscalls/Kbuild b/usr/klibc/syscalls/Kbuild
+index 2430b9b4..754d028e 100644
+--- a/usr/klibc/syscalls/Kbuild
++++ b/usr/klibc/syscalls/Kbuild
+@@ -71,7 +71,7 @@ $(obj)/typesize.c: $(srctree)/$(KLIBCSRC)/syscalls.pl $(obj)/SYSCALLS.i     \
+ 
+ # Convert typesize.o to typesize.bin
+ quiet_cmd_mkbin = OBJCOPY $@
+-      cmd_mkbin = $(KLIBCOBJCOPY) -O binary $< $@
++      cmd_mkbin = $(KLIBCOBJCOPY) -O binary --remove-section .note.gnu.property $< $@
+ 
+ $(obj)/typesize.bin: $(obj)/typesize.o FORCE
+ 	$(call if_changed,mkbin)
+-- 
+2.30.0
+

@@ -1,0 +1,49 @@
+From 861c8a63c36f9ee7d46238c9bc13a2c1f14372c3 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sun, 7 Feb 2021 14:35:14 +0000
+Subject: [PATCH] configure.ac: disable few languages not compatible with
+ modern gettext
+
+* as pidgin-3 development is moving to meson and probably
+  most of these changes won't be applicable there, lets just
+  disable them until someone interested steps-up to maintain it
+
+* these 3 fail with:
+cd ../../pidgin-2.14.1/po && rm -f brx.gmo && pidgin/2.14.1-r0/recipe-sysroot-native/usr/bin/msgmerge --for-msgfmt -o brx.1po brx.po pidgin.pot && pidgin/2.14.1-r0/recipe-sysroot-native/usr/bin/msgfmt -c --statistics --verbose -o brx.gmo brx.1po && rm -f brx.1po
+cd ../../pidgin-2.14.1/po && rm -f zh_HK.gmo && pidgin/2.14.1-r0/recipe-sysroot-native/usr/bin/msgmerge --for-msgfmt -o zh_HK.1po zh_HK.po pidgin.pot && pidgin/2.14.1-r0/recipe-sysroot-native/usr/bin/msgfmt -c --statistics --verbose -o zh_HK.gmo zh_HK.1po && rm -f zh_HK.1po
+cd ../../pidgin-2.14.1/po && rm -f zh_TW.gmo && pidgin/2.14.1-r0/recipe-sysroot-native/usr/bin/msgmerge --for-msgfmt -o zh_TW.1po zh_TW.po pidgin.pot && pidgin/2.14.1-r0/recipe-sysroot-native/usr/bin/msgfmt -c --statistics --verbose -o zh_TW.gmo zh_TW.1po && rm -f zh_TW.1po
+zh_HK.1po:2790: 'msgstr' is not a valid C format string, unlike 'msgid'. Reason: The string refers to arguments both through absolute argument numbers and through unnumbered argument specifications.
+pidgin/2.14.1-r0/recipe-sysroot-native/usr/bin/msgfmt: found 1 fatal error
+zh_TW.1po:2790: 'msgstr' is not a valid C format string, unlike 'msgid'. Reason: The string refers to arguments both through absolute argument numbers and through unnumbered argument specifications.
+pidgin/2.14.1-r0/recipe-sysroot-native/usr/bin/msgfmt: found 1 fatal error
+zh_HK.1po: 3234 translated messages.
+make[3]: *** [Makefile:415: ../../pidgin-2.14.1/po/zh_HK.gmo] Error 1
+make[3]: *** Waiting for unfinished jobs....
+zh_TW.1po: 3234 translated messages.
+make[3]: *** [Makefile:415: ../../pidgin-2.14.1/po/zh_TW.gmo] Error 1
+brx.1po:778: number of format specifications in 'msgid' and 'msgstr' does not match
+brx.1po:3179: number of format specifications in 'msgid' and 'msgstr' does not match
+brx.1po:5175: format specifications in 'msgid_plural' and 'msgstr[0]' for argument 1 are not the same
+brx.1po:5184: format specifications in 'msgid_plural' and 'msgstr[0]' for argument 1 are not the same
+brx.1po:7754: format specifications in 'msgid_plural' and 'msgstr[0]' for argument 1 are not the same
+pidgin/2.14.1-r0/recipe-sysroot-native/usr/bin/msgfmt: found 8 fatal errors
+brx.1po: 3246 translated messages.
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index e2280cd..9332932 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -260,7 +260,7 @@ if test x$enable_i18n = xyes; then
+ 	GETTEXT_PACKAGE=pidgin
+ 	AC_SUBST(GETTEXT_PACKAGE)
+ 
+-	ALL_LINGUAS="af am ar ar_SA as ast az be@latin bg bn_IN bn br brx bs ca ca@valencia cs da de dz el en_AU en_CA en_GB eo es_AR es et eu fa fi fr ga gl gu he hi hr hu id it ja ka kk km kn ko ks ku_IQ ku lt lv mai mhr mk ml mn mr ms_MY my_MM nb ne nl nn oc or pa pl ps pt_BR pt ro ru sd si sk sl sq sr@latin sr sv sw ta te th tr tt uk ur uz vi xh zh_CN zh_HK zh_TW"
++	ALL_LINGUAS="af am ar ar_SA as ast az be@latin bg bn_IN bn br bs ca ca@valencia cs da de dz el en_AU en_CA en_GB eo es_AR es et eu fa fi fr ga gl gu he hi hr hu id it ja ka kk km kn ko ks ku_IQ ku lt lv mai mhr mk ml mn mr ms_MY my_MM nb ne nl nn oc or pa pl ps pt_BR pt ro ru sd si sk sl sq sr@latin sr sv sw ta te th tr tt uk ur uz vi xh zh_CN"
+ 	AM_GNU_GETTEXT([external])
+ 	AM_GNU_GETTEXT_VERSION([0.21])
+ 

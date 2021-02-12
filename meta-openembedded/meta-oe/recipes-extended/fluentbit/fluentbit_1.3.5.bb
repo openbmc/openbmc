@@ -16,12 +16,16 @@ SRC_URI = "http://fluentbit.io/releases/1.3/fluent-bit-${PV}.tar.gz \
            file://cross-build-init-system-detection.patch \
            file://builtin-nan.patch \
            file://0001-ppc-Fix-signature-for-co_create-API.patch \
-          "
+           file://0001-bin-fix-SIGSEGV-caused-by-using-flb_free-instead-of-.patch \
+           file://0002-parser-Fix-SIGSEGV-caused-by-using-flb_free-instead-.patch \
+           "
 SRC_URI[md5sum] = "6eae6dfd0a874e5dd270c36e9c68f747"
 SRC_URI[sha256sum] = "e037c76c89269c8dc4027a08e442fefd2751b0f1e0f9c38f9a4b12d781a9c789"
 
 S = "${WORKDIR}/fluent-bit-${PV}"
 DEPENDS = "zlib bison-native flex-native"
+DEPENDS += "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+
 DEPENDS_append_libc-musl = " fts "
 
 INSANE_SKIP_${PN}-dev += "dev-elf"

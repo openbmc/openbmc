@@ -8,9 +8,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=751419260aa954499f7abaabaa882bbe"
 # AM_GLIB_GNU_GETTEXT macro in configure.ac. That macro is deprecated, so the
 # glib-2.0-native dependency may go away at some point (something to keep in
 # mind when doing version upgrades).
-DEPENDS = "intltool-native glib-2.0-native gtkmm3 libcanberra pulseaudio"
+DEPENDS = "libxml-parser-perl-native intltool-native glib-2.0-native gtkmm3 libcanberra pulseaudio"
 
-inherit autotools features_check
+inherit autotools features_check perlnative
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

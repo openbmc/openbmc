@@ -151,11 +151,13 @@ CPPFLAGS_append = " -D_GNU_SOURCE -DURANDOM_DEVICE=\'/dev/urandom\' -fPIC"
 LDFLAGS_append = " -pthread"
 
 do_configure() {
-    cp ${STAGING_DATADIR_NATIVE}/libtool/build-aux/ltmain.sh ${S}/build
     rm -f ${S}/libtool
     aclocal
     libtoolize --force --copy
     gnu-configize
+    cp ${STAGING_DATADIR_NATIVE}/libtool/build-aux/ltmain.sh ${S}/build
+    cp ${STAGING_DATADIR_NATIVE}/libtool/build-aux/missing ${S}/build
+    cp ${STAGING_DATADIR_NATIVE}/libtool/build-aux/compile ${S}/build
     autoconf
     oe_runconf
 }

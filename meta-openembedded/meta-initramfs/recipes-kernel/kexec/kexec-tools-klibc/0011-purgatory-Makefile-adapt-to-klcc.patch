@@ -10,11 +10,9 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  purgatory/Makefile | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/purgatory/Makefile b/purgatory/Makefile
-index 49ce80a..1542b3a 100644
 --- a/purgatory/Makefile
 +++ b/purgatory/Makefile
-@@ -47,7 +47,7 @@ purgatory/sha256.o: $(srcdir)/util_lib/sha256.c
+@@ -47,7 +47,7 @@ purgatory/sha256.o: $(srcdir)/util_lib/s
  $(PURGATORY): CC=$(TARGET_CC)
  $(PURGATORY): CFLAGS+=$(PURGATORY_EXTRA_CFLAGS) \
  		      $($(ARCH)_PURGATORY_EXTRA_CFLAGS) \
@@ -23,14 +21,14 @@ index 49ce80a..1542b3a 100644
  		      -fno-zero-initialized-in-bss \
  		      -fno-PIC -fno-PIE -fno-stack-protector
  
-@@ -59,8 +59,8 @@ $(PURGATORY): CPPFLAGS=$($(ARCH)_PURGATORY_EXTRA_CFLAGS) \
+@@ -59,8 +59,8 @@ $(PURGATORY): CPPFLAGS=$($(ARCH)_PURGATO
  			-Iinclude \
  			-I$(shell $(CC) -print-file-name=include)
  $(PURGATORY): LDFLAGS=$($(ARCH)_PURGATORY_EXTRA_CFLAGS)\
 -			-Wl,--no-undefined -nostartfiles -nostdlib \
 -			-nodefaultlibs -e purgatory_start -r \
-+			-Wl,--no-undefined -Wl,-no-pie -Wl,-nostartfiles -Wl,-nostdlib \
-+			-Wl,-nodefaultlibs -Wl,--entry=purgatory_start -Wl,-r \
++			-Wl,--no-undefined -no-pie -nostartfiles -nostdlib \
++			-nodefaultlibs -Wl,--entry=purgatory_start -Wl,-r \
  			-Wl,-Map=$(PURGATORY_MAP)
  
  $(PURGATORY): $(PURGATORY_OBJS)

@@ -32,7 +32,9 @@ KLIBC_PATCHES += " \
             file://0013-sha256.h-avoid-inclusion-of-sys-types.h.patch \
             file://0014-add-if_nameindex-from-musl.patch \
             file://0015-vmcore-dmesg-fix-warning.patch \
-            file://klibc-reboot.patch"
+            file://klibc-reboot.patch \
+            file://include_next.patch \
+            "
 
 WARNING_FIXES = ""
 FROM_OE_CORE = "file://arm_crashdump-fix-buffer-align.patch \

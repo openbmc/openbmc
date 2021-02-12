@@ -1,0 +1,28 @@
+From 3a3c5c644c9790cb3f88f3ce3757c2803cff90c5 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Thu, 17 Dec 2020 14:32:40 +0800
+Subject: [PATCH 2/8] greeter-gdk.c: fix typo
+
+Upstream-Status: Submitted [https://sourceforge.net/p/lxdm/code/merge-requests/1/]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ src/greeter-gdk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/greeter-gdk.c b/src/greeter-gdk.c
+index 1b27d2e..5aa3e7f 100644
+--- a/src/greeter-gdk.c
++++ b/src/greeter-gdk.c
+@@ -299,7 +299,7 @@ void ui_prepare(void)
+         attr.wclass = GDK_INPUT_OUTPUT;
+         win = gdk_window_new(root, &attr, mask);
+         gdk_window_set_decorations(win,0);
+-        gdk_window_set_title(win,"lxdm-greter-gdk");
++        gdk_window_set_title(win,"lxdm-greeter-gdk");
+         
+         scr=gdk_screen_get_default();
+         g_signal_connect(scr, "size-changed", G_CALLBACK(on_screen_size_changed), win);
+-- 
+2.25.1
+

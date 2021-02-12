@@ -1,0 +1,58 @@
+From 1b66e4cca6d95f4607599bcbdd4afeb601aee84e Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyfox@gentoo.org>
+Date: Sun, 25 Oct 2020 18:09:21 +0000
+Subject: [PATCH] configure.ac: fix `--with-linux-input` handling with upcoming autoconf-2.70
+
+Upcoming autoconf-2.70 exposes deficiency in configure.ac:
+
+```
+$ autoconf-2.70_beta2 && ./configure --host=x86_64-pc-linux-gnu
+./configure: line 1430: 5: Bad file descriptor
+checking whether  is declared... ./configure: line 1432: ${+y}: bad
+```
+
+It happens because macros are called with parameters using insufficient quoting.
+
+More details at https://lists.gnu.org/archive/html/bug-autoconf/2020-10/msg00027.html
+
+The fix only amends `--with-linux-input`. Other cases of underquoting
+will need to be handled separately.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gimp/-/commit/cebeb90a87105cd6e35bcb357d53cc04c828ca21]
+Fix-by: Zack Weinberg
+Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
+---
+ configure.ac | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6e2c193..afbcdd8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2138,15 +2138,14 @@ fi
+ AC_ARG_WITH(linux-input, [  --without-linux-input   don't build linux input event controller module])
+ 
+ have_linux_input="no (linux input support disabled)"
+-if test "x$with_linux_input" != "xno"; then
+-  AC_CHECK_HEADER(linux/input.h,
+-	AC_CHECK_DECL(KEY_OK,
+-		have_linux_input=yes,
+-		have_linux_input="no (needs Linux 2.6)",
+-		[#include <linux/input.h>]))
+-fi
+-
+-AM_CONDITIONAL(HAVE_LINUX_INPUT, test "x$have_linux_input" = xyes)
++AS_IF([test "x$with_linux_input" != "xno"],
++  [AC_CHECK_HEADER([linux/input.h],
++    [AC_CHECK_DECL([KEY_OK],
++                   [have_linux_input=yes],
++                   [have_linux_input="no (needs Linux 2.6)"],
++                   [#include <linux/input.h>])])])
++
++AM_CONDITIONAL([HAVE_LINUX_INPUT], [test "x$have_linux_input" = xyes])
+ 
+ 
+ ###############################
+-- 
+2.30.0
+

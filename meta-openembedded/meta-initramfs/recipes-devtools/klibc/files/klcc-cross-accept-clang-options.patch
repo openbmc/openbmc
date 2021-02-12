@@ -5,10 +5,22 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/klcc/klcc.in
 +++ b/klcc/klcc.in
-@@ -207,6 +207,12 @@ while ( defined($a = shift(@ARGV)) ) {
+@@ -207,6 +207,24 @@ while ( defined($a = shift(@ARGV)) ) {
      } elsif ( $a =~ /^--([sysroot=])(.*)$/ ) {
  	# Override gcc encoded sysroot
  	push(@ccopt, $a);
++    } elsif ( $a eq '-nostartfiles' ) {
++        # Allow clang options
++        push(@ccopt, $a);
++    } elsif ( $a eq '-nostdlib' ) {
++        # Allow clang options
++        push(@ccopt, $a);
++    } elsif ( $a eq '-nodefaultlibs' ) {
++        # Allow clang options
++        push(@ccopt, $a);
++    } elsif ( $a eq '-no-pie' ) {
++        # Allow clang options
++        push(@ccopt, $a);
 +    } elsif ( $a eq '-no-integrated-as' ) {
 +	# Allow clang options
 +	push(@ccopt, $a);

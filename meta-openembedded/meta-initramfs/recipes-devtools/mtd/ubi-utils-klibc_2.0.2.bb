@@ -16,6 +16,7 @@ SRC_URI = "git://git.infradead.org/mtd-utils.git \
              file://0003-Makefile.am-only-build-ubi-utils.patch \
              file://0004-mtd-utils-common.h-no-features.h-for-klibc-builds.patch \
              file://0005-common.h-replace-getline-with-fgets.patch \
+             file://0001-make-Add-compiler-includes-in-cflags.patch \
              "
 
 S = "${WORKDIR}/git"

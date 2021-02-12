@@ -15,13 +15,12 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/libs/klibc/2.0/klibc-${PV}.tar.xz \
            file://0001-include-linux-sysinfo.h-directly.patch \
            file://0001-mkfifo-Implement-mkfifo.patch \
            file://0001-always-use-bfd-linker.patch \
-           file://0001-Kbuild.klibc-Use-print-libgcc-file-name-instead-of-p.patch \
-           file://0001-Kbuild.klibc-Add-path-to-compiler-headers-via-isyste.patch \
            file://0001-arm-Do-not-set-a-fallback-march-and-mtune.patch \
            file://0001-klibc_2.0.4-add-kexec_file_load-syscall.patch \
            file://0001-klibc-add-getrandom-syscall.patch \
            file://0001-klibc-Kbuild-Accept-EXTRA_KLIBCAFLAGS.patch \
-           file://0001-Define-ulocked_-fgets-fread-fwrite-aliases.patch \
+           file://cross-clang.patch \
+           file://0001-workaround-for-overlapping-sections-in-binary.patch \
            "
 
 ARMPATCHES ?= ""
@@ -29,9 +28,7 @@ ARMPATCHES ?= ""
 ARMPATCHES_arm = " \
                   file://armv4-fix-v4bx.patch \
                  "
-
-SRC_URI[md5sum] = "712f8bc1a069e03d92584b7f5380c521"
-SRC_URI[sha256sum] = "abef2637ca823485d9c90ce9512e2b08a65047ec4da204635eeaef95a41a9122"
+SRC_URI[sha256sum] = "4e48f1398cfe3ce0b6df55ce6e70acf54fc8488e3aea3fb3610ee1622d9cb436"
 
 S = "${WORKDIR}/klibc-${PV}"
 

@@ -1,0 +1,32 @@
+From 7177d8334a3c28ab0ec5c90e0656f43414929659 Mon Sep 17 00:00:00 2001
+From: Yi Fan Yu <yifan.yu@windriver.com>
+Date: Fri, 5 Feb 2021 17:15:42 -0500
+Subject: [PATCH] configure.in: bypass autoconf 2.69 version check
+
+for upgrade to autoconf 2.71
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
+---
+ configure.in | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 8d4e9ac..75203c2 100644
+--- a/configure.in
++++ b/configure.in
+@@ -19,10 +19,6 @@ m4_pattern_forbid(^PGAC_)dnl to catch undefined macros
+ 
+ AC_INIT([PostgreSQL], [13.1], [pgsql-bugs@lists.postgresql.org], [], [https://www.postgresql.org/])
+ 
+-m4_if(m4_defn([m4_PACKAGE_VERSION]), [2.69], [], [m4_fatal([Autoconf version 2.69 is required.
+-Untested combinations of 'autoconf' and PostgreSQL versions are not
+-recommended.  You can remove the check from 'configure.in' but it is then
+-your responsibility whether the result works or not.])])
+ AC_COPYRIGHT([Copyright (c) 1996-2020, PostgreSQL Global Development Group])
+ AC_CONFIG_SRCDIR([src/backend/access/common/heaptuple.c])
+ AC_CONFIG_AUX_DIR(config)
+-- 
+2.29.2
+

@@ -9,6 +9,7 @@ SRC_URI[sha256sum] = "84412798925dc870ffd7107f045d7659e60f5d46d1c70c700375248bf6
 
 SRC_URI_append = " \
            file://0001-cross-compiling-support.patch \
+           file://0001-setup_build.py-avoid-absolute-path.patch \
           "
 
 inherit pypi setuptools3

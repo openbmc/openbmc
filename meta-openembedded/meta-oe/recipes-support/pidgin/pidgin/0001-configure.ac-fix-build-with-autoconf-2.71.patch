@@ -1,0 +1,229 @@
+From e03d3ef5aadd582ebf7102b7d5785fed177a0cb1 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Sun, 7 Feb 2021 13:25:29 +0100
+Subject: [PATCH] configure.ac: fix build with autoconf-2.71
+
+* fixes:
+  | autoreconf: running: intltoolize --copy --force
+  | ERROR: 'IT_PROG_INTLTOOL' must appear in configure.ac for intltool to work.
+  | autoreconf: error: intltoolize failed with exit status: 1
+
+* replace AM_GLIB_GNU_GETTEXT with AM_GNU_GETTEXT as suggested in:
+  https://wiki.gnome.org/Initiatives/GnomeGoals/GettextMigration
+  https://blogs.gnome.org/jjardon/2010/10/08/use-upstream-gettext-instead-the-glib-one/
+  because the former is causing issues with autoconf-2.71:
+
+  -m4trace:configure.ac:266: -1- _m4_warn([obsolete], [The macro `AC_TRY_LINK' is obsolete.
+  -You should run autoupdate.], [../autoconf-2.71/lib/autoconf/general.m4:2920: AC_TRY_LINK is expanded from...
+  -../autoconf-2.71/lib/m4sugar/m4sh.m4:699: AS_IF is expanded from...
+  -../autoconf-2.71/lib/autoconf/headers.m4:89: _AC_CHECK_HEADER_COMPILE is expanded from...
+  -../autoconf-2.71/lib/autoconf/headers.m4:56: AC_CHECK_HEADER is expanded from...
+  -pidgin/2.14.1-r0/recipe-sysroot-native/usr/share/aclocal/glib-gettext.m4:150: GLIB_WITH_NLS is expanded from...
+  -pidgin/2.14.1-r0/recipe-sysroot-native/usr/share/aclocal/glib-gettext.m4:370: GLIB_GNU_GETTEXT is expanded from...
+  -pidgin/2.14.1-r0/recipe-sysroot-native/usr/share/aclocal/glib-gettext.m4:470: AM_GLIB_GNU_GETTEXT is expanded from...
+  -configure.ac:266: the top level])
+  -m4trace:configure.ac:266: -1- m4_pattern_allow([^ENABLE_NLS$])
+  -m4trace:configure.ac:266: -1- _m4_warn([obsolete], [The macro `AC_OUTPUT_COMMANDS' is obsolete.
+  -You should run autoupdate.], [../autoconf-2.71/lib/autoconf/status.m4:1025: AC_OUTPUT_COMMANDS is expanded from...
+  -pidgin/2.14.1-r0/recipe-sysroot-native/usr/share/aclocal/glib-gettext.m4:150: GLIB_WITH_NLS is expanded from...
+  -pidgin/2.14.1-r0/recipe-sysroot-native/usr/share/aclocal/glib-gettext.m4:370: GLIB_GNU_GETTEXT is expanded from...
+  -pidgin/2.14.1-r0/recipe-sysroot-native/usr/share/aclocal/glib-gettext.m4:470: AM_GLIB_GNU_GETTEXT is expanded from...
+  -configure.ac:266: the top level])
+
+  and then configure fails with:
+
+  configure.ac:2621: error: `po/stamp-it' is already registered with AC_CONFIG_COMMANDS.
+  autoconf-2.71/lib/autoconf/status.m4:1008: AC_CONFIG_COMMANDS is expanded from...
+  configure.ac:2621: the top level
+
+* add AM_GNU_GETTEXT_VERSION as well to resolve warning with autoconf-2.71
+  configure.ac: warning: AM_GNU_GETTEXT is used, but not AM_GNU_GETTEXT_VERSION or AM_GNU_GETTEXT_REQUIRE_VERSION
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ ABOUT-NLS          |  1 +
+ Makefile.am        |  6 +---
+ configure.ac       |  6 ++--
+ pidgin/Makefile.am |  7 ++--
+ po/Makevars        | 82 ++++++++++++++++++++++++++++++++++++++++++++++
+ po/POTFILES.in     |  1 -
+ 6 files changed, 92 insertions(+), 11 deletions(-)
+ create mode 100644 ABOUT-NLS
+ create mode 100644 po/Makevars
+
+diff --git a/ABOUT-NLS b/ABOUT-NLS
+new file mode 100644
+index 0000000..0a9d56d
+--- /dev/null
++++ b/ABOUT-NLS
+@@ -0,0 +1 @@
++<https://www.gnu.org/software/gettext/manual/html_node/Users.html>
+diff --git a/Makefile.am b/Makefile.am
+index f8e2bc9..a74145f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -13,9 +13,6 @@ EXTRA_DIST = \
+ 		fix-casts.sh \
+ 		gaim.pc.in \
+ 		gaim-uninstalled.pc.in \
+-		intltool-extract.in \
+-		intltool-merge.in \
+-		intltool-update.in \
+ 		package_revision.h \
+ 		pidgin.apspec.in \
+ 		pidgin.spec.in \
+@@ -139,5 +136,4 @@ endif
+ distuninstallcheck_listfiles = \
+ 	find . -type f -print | grep -v perl | grep -v Purple.3pm | grep -v Pidgin.3pm
+ 
+-DISTCLEANFILES= intltool-extract intltool-merge intltool-update \
+-			package_revision_raw.txt
++DISTCLEANFILES=package_revision_raw.txt
+diff --git a/configure.ac b/configure.ac
+index 81d8592..e2280cd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -43,7 +43,7 @@ fi
+ 
+ AC_CANONICAL_HOST
+ AC_CONFIG_HEADERS([config.h])
+-AM_INIT_AUTOMAKE([1.9 -Wno-portability dist-bzip2])
++AM_INIT_AUTOMAKE([1.9 -Wno-portability dist-bzip2 foreign])
+ dnl TODO: Always use AM_SILENT_RULES when we depend on automake >= 1.11
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+ 
+@@ -257,12 +257,12 @@ dnl #######################################################################
+ AC_ARG_ENABLE(nls, AC_HELP_STRING([--disable-nls], [disable installation of translation files]), enable_i18n="$enableval", enable_i18n=yes)
+ 
+ if test x$enable_i18n = xyes; then
+-	AC_PROG_INTLTOOL
+ 	GETTEXT_PACKAGE=pidgin
+ 	AC_SUBST(GETTEXT_PACKAGE)
+ 
+ 	ALL_LINGUAS="af am ar ar_SA as ast az be@latin bg bn_IN bn br brx bs ca ca@valencia cs da de dz el en_AU en_CA en_GB eo es_AR es et eu fa fi fr ga gl gu he hi hr hu id it ja ka kk km kn ko ks ku_IQ ku lt lv mai mhr mk ml mn mr ms_MY my_MM nb ne nl nn oc or pa pl ps pt_BR pt ro ru sd si sk sl sq sr@latin sr sv sw ta te th tr tt uk ur uz vi xh zh_CN zh_HK zh_TW"
+-	AM_GLIB_GNU_GETTEXT
++	AM_GNU_GETTEXT([external])
++	AM_GNU_GETTEXT_VERSION([0.21])
+ 
+ 	dnl If we don't have msgfmt, then po/ is going to fail -- ensure that
+ 	dnl AM_GLIB_GNU_GETTEXT found it.
+diff --git a/pidgin/Makefile.am b/pidgin/Makefile.am
+index 2278b88..4d32c53 100644
+--- a/pidgin/Makefile.am
++++ b/pidgin/Makefile.am
+@@ -192,13 +192,16 @@ DESKTOP_FILE=data/pidgin.desktop
+ appsdir = $(datadir)/applications
+ apps_in_files = data/pidgin.desktop.in
+ apps_DATA = $(apps_in_files:.desktop.in=.desktop)
+-@INTLTOOL_DESKTOP_RULE@
++
++data/pidgin.desktop: data/pidgin.desktop.in
++	$(AM_V_GEN)$(MSGFMT) --desktop --template $< -d $(top_srcdir)/po -o $@
+ 
+ appdatadir = $(datarootdir)/appdata
+ appdata_DATA = $(appdata_in_files:.xml.in=.xml)
+ appdata_in_files = data/pidgin.appdata.xml.in
+ 
+-@INTLTOOL_XML_RULE@
++data/pidgin.appdata.xml: data/pidgin.appdata.xml.in
++	$(AM_V_GEN)$(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@ || cp $< $@
+ 
+ endif # INSTALL_I18N
+ 
+diff --git a/po/Makevars b/po/Makevars
+new file mode 100644
+index 0000000..970237a
+--- /dev/null
++++ b/po/Makevars
+@@ -0,0 +1,82 @@
++# Makefile variables for PO directory in any package using GNU gettext.
++#
++# Copyright (C) 2003-2019 Free Software Foundation, Inc.
++# This file is free software; the Free Software Foundation gives
++# unlimited permission to use, copy, distribute, and modify it.
++
++# Usually the message domain is the same as the package name.
++DOMAIN = $(PACKAGE)
++
++# These two variables depend on the location of this directory.
++subdir = po
++top_builddir = ..
++
++# These options get passed to xgettext.
++XGETTEXT_OPTIONS = --keyword=_ --keyword=N_ --from-code=UTF-8
++
++# This is the copyright holder that gets inserted into the header of the
++# $(DOMAIN).pot file.  Set this to the copyright holder of the surrounding
++# package.  (Note that the msgstr strings, extracted from the package's
++# sources, belong to the copyright holder of the package.)  Translators are
++# expected to transfer the copyright for their translations to this person
++# or entity, or to disclaim their copyright.  The empty string stands for
++# the public domain; in this case the translators are expected to disclaim
++# their copyright.
++COPYRIGHT_HOLDER = Free Software Foundation, Inc.
++
++# This tells whether or not to prepend "GNU " prefix to the package
++# name that gets inserted into the header of the $(DOMAIN).pot file.
++# Possible values are "yes", "no", or empty.  If it is empty, try to
++# detect it automatically by scanning the files in $(top_srcdir) for
++# "GNU packagename" string.
++PACKAGE_GNU =
++
++# This is the email address or URL to which the translators shall report
++# bugs in the untranslated strings:
++# - Strings which are not entire sentences, see the maintainer guidelines
++#   in the GNU gettext documentation, section 'Preparing Strings'.
++# - Strings which use unclear terms or require additional context to be
++#   understood.
++# - Strings which make invalid assumptions about notation of date, time or
++#   money.
++# - Pluralisation problems.
++# - Incorrect English spelling.
++# - Incorrect formatting.
++# It can be your email address, or a mailing list address where translators
++# can write to without being subscribed, or the URL of a web page through
++# which the translators can contact you.
++MSGID_BUGS_ADDRESS =
++
++# This is the list of locale categories, beyond LC_MESSAGES, for which the
++# message catalogs shall be used.  It is usually empty.
++EXTRA_LOCALE_CATEGORIES =
++
++# This tells whether the $(DOMAIN).pot file contains messages with an 'msgctxt'
++# context.  Possible values are "yes" and "no".  Set this to yes if the
++# package uses functions taking also a message context, like pgettext(), or
++# if in $(XGETTEXT_OPTIONS) you define keywords with a context argument.
++USE_MSGCTXT = no
++
++# These options get passed to msgmerge.
++# Useful options are in particular:
++#   --previous            to keep previous msgids of translated messages,
++#   --quiet               to reduce the verbosity.
++MSGMERGE_OPTIONS =
++
++# These options get passed to msginit.
++# If you want to disable line wrapping when writing PO files, add
++# --no-wrap to MSGMERGE_OPTIONS, XGETTEXT_OPTIONS, and
++# MSGINIT_OPTIONS.
++MSGINIT_OPTIONS =
++
++# This tells whether or not to regenerate a PO file when $(DOMAIN).pot
++# has changed.  Possible values are "yes" and "no".  Set this to no if
++# the POT file is checked in the repository and the version control
++# program ignores timestamps.
++PO_DEPENDS_ON_POT = no
++
++# This tells whether or not to forcibly update $(DOMAIN).pot and
++# regenerate PO files on "make dist".  Possible values are "yes" and
++# "no".  Set this to no if the POT file and PO files are maintained
++# externally.
++DIST_DEPENDS_ON_UPDATE_PO = no
+diff --git a/po/POTFILES.in b/po/POTFILES.in
+index a5691a1..b494bf3 100644
+--- a/po/POTFILES.in
++++ b/po/POTFILES.in
+@@ -1,4 +1,3 @@
+-[encoding: UTF-8]
+ finch/finch.c
+ finch/gntaccount.c
+ finch/gntblist.c

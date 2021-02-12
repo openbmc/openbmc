@@ -13,6 +13,8 @@ SRC_URI[archive.sha256sum] = "ddbb400ace804b59cc513611ce9701f7ef3f00de151dbbfb96
 
 # We don't not have ubuntu's appindicator (yet?)
 EXTRA_OEMESON = "-Dappindicator=no"
+# We currently don't build NetworkManager with libteamdctl support
+EXTRA_OEMESON += "-Dteam=false"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[modemmanager] = "-Dwwan=true, -Dwwan=false, modemmanager"

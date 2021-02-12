@@ -12,7 +12,9 @@ DEPENDS = " \
 
 inherit autotools gobject-introspection gettext python3native
 
-SRC_URI = "git://github.com/mypaint/libmypaint.git;protocol=https;branch=libmypaint-v1"
+SRC_URI = "git://github.com/mypaint/libmypaint.git;protocol=https;branch=libmypaint-v1 \
+           file://0001-make-build-compatible-w.-autoconf-2.7.patch \
+          "
 SRCREV = "2768251dacce3939136c839aeca413f4aa4241d0"
 PV = "1.6.1"
 S = "${WORKDIR}/git"

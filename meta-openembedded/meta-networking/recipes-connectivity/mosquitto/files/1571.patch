@@ -11,7 +11,7 @@ Signed-off-by: Gianfranco Costamagna <costamagnagianfranco@yahoo.it>
 
 --- a/lib/CMakeLists.txt
 +++ b/lib/CMakeLists.txt
-@@ -89,6 +89,8 @@
+@@ -94,6 +94,8 @@
  	OUTPUT_NAME mosquitto
  	VERSION ${VERSION}
  	SOVERSION 1

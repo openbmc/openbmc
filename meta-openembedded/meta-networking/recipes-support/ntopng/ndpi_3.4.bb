@@ -17,6 +17,8 @@ S = "${WORKDIR}/git"
 
 inherit autotools-brokensep pkgconfig
 
+CPPFLAGS += "${SELECTED_OPTIMIZATION}"
+
 do_configure_prepend() {
     ${S}/autogen.sh
 }

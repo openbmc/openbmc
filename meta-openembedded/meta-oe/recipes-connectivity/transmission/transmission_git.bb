@@ -18,7 +18,7 @@ PV = "3.00"
 
 S = "${WORKDIR}/git"
 
-inherit autotools gettext update-rc.d systemd mime-xdg
+inherit autotools-brokensep gettext update-rc.d systemd mime-xdg
 
 PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtk', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd','',d)}"
@@ -33,12 +33,16 @@ TRANSMISSION_GROUP ??= "root"
 
 # Configure aborts with:
 # config.status: error: po/Makefile.in.in was not created by intltoolize.
-B = "${S}"
-do_configure_prepend() {
+do_configure() {
 	sed -i /AM_GLIB_GNU_GETTEXT/d ${S}/configure.ac
 	cd ${S}
 	./update-version-h.sh
 	intltoolize --copy --force --automake
+        aclocal
+        libtoolize --automake --copy --force
+        autoconf
+        automake -a
+        oe_runconf
 }
 
 do_install_append() {

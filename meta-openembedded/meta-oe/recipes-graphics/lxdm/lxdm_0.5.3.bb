@@ -9,6 +9,15 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}%20${PV}/${BPN}-${PV}.tar.
            file://0002-let-autotools-create-lxdm.conf.patch \
            file://0003-check-for-libexecinfo-providing-backtrace-APIs.patch \
            file://0004-fix-css-under-gtk-3.20.patch \
+           file://0001-greeter-set-visible-when-switch-to-input-user.patch \
+           file://0002-greeter-gdk.c-fix-typo.patch \
+           file://0003-check-whether-password-expired-with-pam.patch \
+           file://0004-lxdm.c-add-function-to-change-password-with-pam.patch \
+           file://0005-ui.c-handle-password-expire-and-update-new-password.patch \
+           file://0006-themes-Industrial-add-info-label-in-ui.patch \
+           file://0007-greeter.c-support-to-update-expired-password.patch \
+           file://0008-greeter.c-show-information-on-gtk-label-info.patch \
+           file://0009-greeter.c-disallow-empty-new-password.patch \
            "
 SRC_URI[md5sum] = "061caae432634e6db38bbdc84bc6ffa0"
 SRC_URI[sha256sum] = "4891efee81c72a400cc6703e40aa76f3f3853833d048b72ec805da0f93567f2f"

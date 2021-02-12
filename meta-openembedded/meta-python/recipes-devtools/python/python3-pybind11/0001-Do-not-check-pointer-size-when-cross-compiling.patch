@@ -1,4 +1,4 @@
-From 3abfa65517959ad279481021fafefba28f955e76 Mon Sep 17 00:00:00 2001
+From 2e9318f7a70699eed239aee6301d1d0bbd2457ee Mon Sep 17 00:00:00 2001
 From: Philip Balister <philip@balister.org>
 Date: Fri, 10 Jul 2020 10:14:59 -0400
 Subject: [PATCH] Do not check pointer size when cross compiling.
@@ -8,23 +8,24 @@ It is reasonable to build for 32 machine on a 64 bit build machine. Prevents:
 |   Python config failure: Python is 64-bit, chosen compiler is 32-bit
 
 Signed-off-by: Philip Balister <philip@balister.org>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
  tools/FindPythonLibsNew.cmake | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/FindPythonLibsNew.cmake b/tools/FindPythonLibsNew.cmake
-index d0c8fa2..8479e70 100644
+index 3605aebc..67f4d4a0 100644
 --- a/tools/FindPythonLibsNew.cmake
 +++ b/tools/FindPythonLibsNew.cmake
-@@ -123,7 +123,7 @@ list(GET _PYTHON_VALUES 9 PYTHON_MULTIARCH)
+@@ -156,7 +156,7 @@ list(GET _PYTHON_VALUES 9 PYTHON_MULTIARCH)
  
  # Make sure the Python has the same pointer-size as the chosen compiler
  # Skip if CMAKE_SIZEOF_VOID_P is not defined
 -if(CMAKE_SIZEOF_VOID_P AND (NOT "${PYTHON_SIZEOF_VOID_P}" STREQUAL "${CMAKE_SIZEOF_VOID_P}"))
 +if((NOT CMAKE_CROSSCOMPILING) AND CMAKE_SIZEOF_VOID_P AND (NOT "${PYTHON_SIZEOF_VOID_P}" STREQUAL "${CMAKE_SIZEOF_VOID_P}"))
-     if(PythonLibsNew_FIND_REQUIRED)
-         math(EXPR _PYTHON_BITS "${PYTHON_SIZEOF_VOID_P} * 8")
-         math(EXPR _CMAKE_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
+   if(PythonLibsNew_FIND_REQUIRED)
+     math(EXPR _PYTHON_BITS "${PYTHON_SIZEOF_VOID_P} * 8")
+     math(EXPR _CMAKE_BITS "${CMAKE_SIZEOF_VOID_P} * 8")
 -- 
-2.25.4
+2.17.1
 

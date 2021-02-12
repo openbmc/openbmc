@@ -13,7 +13,7 @@ inherit setuptools3 pypi
 RDEPENDS_${PN} = "\
     ${PYTHON_PN}-docopt \
     ${PYTHON_PN}-dateutil \
-    ${PYTHON_PN}-pyyaml \
+    ${PYTHON_PN}-ruamel-yaml \
 "
 
 BBCLASSEXTEND = "native nativesdk"

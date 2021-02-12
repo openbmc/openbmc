@@ -17,7 +17,7 @@ SRC_URI[sha256sum] = "22f273f212481d71e0b5618c62710cd85f69aea74f5ea5c0093f7918b0
 
 ALTERNATIVE_${PN} = "x-session-manager"
 ALTERNATIVE_TARGET[x-session-manager] = "${bindir}/xfce4-session"
-ALTERNATIVE_PRIORITY_${PN} = "100"
+ALTERNATIVE_PRIORITY_${PN} = "150"
 
 FILES_${PN} += " \
     ${libdir}/xfce4/*/*/*.so \

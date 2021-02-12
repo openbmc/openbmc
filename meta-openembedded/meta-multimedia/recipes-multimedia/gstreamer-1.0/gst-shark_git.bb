@@ -10,9 +10,9 @@ DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad "
 
 SRCBRANCH ?= "master"
 
-PV = "0.6.1"
+PV = "0.7.2"
 
-SRCREV_base = "c41a05cc9e2310c2f73eda4b4f0b4477bf4479c5"
+SRCREV_base = "50e3dbd3b131de2a39d3917576e8f834631ec46b"
 SRCREV_common = "88e512ca7197a45c4114f7fa993108f23245bf50"
 
 SRC_URI = " \
@@ -22,7 +22,7 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 
-PACKAGECONFIG_CONFARGS = " \
+EXTRA_OECONF += " \
        --disable-graphviz \
        --enable-gtk-doc=no \
 "
@@ -33,8 +33,3 @@ FILES_${PN} += "\
 "
 
 inherit autotools gettext
-
-do_configure() {
-        ${S}/autogen.sh --noconfigure
-        oe_runconf
-}

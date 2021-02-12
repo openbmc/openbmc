@@ -1,0 +1,31 @@
+From 9389f472bc724abb6c6a8db696efb132215783cc Mon Sep 17 00:00:00 2001
+From: Andrew Zaborowski <andrew.zaborowski@intel.com>
+Date: Thu, 24 Dec 2020 00:22:15 +0100
+Subject: [PATCH] crypto: Update l_pkcs5_pbkdf2 call after rename
+
+---
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/?id=9ef3d51f8724c9b9f9fd4d4fffcc730f4bb1c806]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+ src/crypto.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/crypto.c b/src/crypto.c
+index f5f8e24d..563f17ce 100644
+--- a/src/crypto.c
++++ b/src/crypto.c
+@@ -552,8 +552,9 @@ int crypto_psk_from_passphrase(const char *passphrase,
+ 	if (ssid_len == 0 || ssid_len > 32)
+ 		return -ERANGE;
+ 
+-	result = l_pkcs5_pbkdf2(L_CHECKSUM_SHA1, passphrase, ssid, ssid_len,
+-				4096, psk, sizeof(psk));
++	result = l_cert_pkcs5_pbkdf2(L_CHECKSUM_SHA1, passphrase,
++					ssid, ssid_len, 4096,
++					psk, sizeof(psk));
+ 	if (!result)
+ 		return -ENOKEY;
+ 
+-- 
+2.30.0
+

@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c5cf34fc0acb44b082ef50ef5e4354ca"
 
 SRC_URI = "http://www.libssh2.org/download/${BP}.tar.gz \
            file://CVE-2019-17498.patch \
+           file://0001-configure-Conditionally-undefine-backend-m4-macro.patch \
            file://run-ptest \
 "
 

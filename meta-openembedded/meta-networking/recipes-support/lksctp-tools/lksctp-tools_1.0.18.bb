@@ -15,6 +15,7 @@ LK_REL = "1.0.18"
 
 SRC_URI = " \
     git://github.com/sctp/lksctp-tools.git \
+    file://0001-m4-sctp.m4-make-conpatible-to-autoconf-2.70.patch \
     file://run-ptest \
     file://v4test.sh \
     file://v6test.sh \

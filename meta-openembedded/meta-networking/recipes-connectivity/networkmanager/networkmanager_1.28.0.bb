@@ -15,7 +15,6 @@ DEPENDS = " \
     util-linux \
     libndp \
     libnewt \
-    jansson \
     curl \
 "
 
@@ -89,6 +88,7 @@ PACKAGECONFIG[ifupdown] = "--enable-ifupdown,--disable-ifupdown"
 PACKAGECONFIG[qt4-x11-free] = "--enable-qt,--disable-qt,qt4-x11-free"
 PACKAGECONFIG[cloud-setup] = "--with-nm-cloud-setup=yes,--with-nm-cloud-setup=no"
 PACKAGECONFIG[nmcli] = "--with-nmcli=yes,--with-nmcli=no,readline"
+PACKAGECONFIG[ovs] = "--enable-ovs,--disable-ovs,jansson"
 
 PACKAGES =+ " \
   ${PN}-nmcli ${PN}-nmcli-doc \

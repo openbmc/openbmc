@@ -1,0 +1,99 @@
+From bb4ff4b134383bfdadf7cb5353d3553a8a72d47e Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Wed, 13 Jan 2021 10:45:48 +0800
+Subject: [PATCH 8/8] greeter.c: show information on gtk label 'info'
+
+Show information on a gtk label 'info' which is added under label
+'prompt' in the .glade or .ui files.
+
+Upstream-Status: Submitted [https://sourceforge.net/p/lxdm/code/merge-requests/1/]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ src/greeter.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/src/greeter.c b/src/greeter.c
+index 804fca0..a4a2336 100644
+--- a/src/greeter.c
++++ b/src/greeter.c
+@@ -64,6 +64,7 @@ static GtkWidget* win;
+ static GtkWidget* alignment2;
+ static GtkWidget* prompt;
+ static GtkWidget* login_entry;
++static GtkWidget* info;
+ static GtkWidget* user_list_scrolled;
+ static GtkWidget* user_list;
+ 
+@@ -241,10 +242,12 @@ static void on_entry_activate(GtkEntry* entry)
+ 					new_pass = NULL;
+ 					// if new passwords not match, retry for 3 times at most
+ 					if (++count < 3) {
++						gtk_label_set_text((GtkLabel *)info, _("Passwords do not match, please retry."));
+ 						switch_to_input_passwd();
+ 					} else {
+ 						count = 0;
+ 						pass_expired = FALSE;
++						gtk_label_set_text((GtkLabel *)info, _("Maximum number of failed update password attempts exceeded."));
+ 						switch_to_input_user();
+ 					}
+ 				} else if (!strcmp(pass, g_base64_encode((guchar*)new_pass, strlen(new_pass) + 1))) {
+@@ -252,6 +255,7 @@ static void on_entry_activate(GtkEntry* entry)
+ 					g_free(new_pass);
+ 					new_pass = NULL;
+ 					if (++count < 3) {
++						gtk_label_set_text((GtkLabel *)info, _("New password is same as old one, password unchanged."));
+ 						switch_to_input_passwd();
+ 					} else {
+ 						count = 0;
+@@ -1146,6 +1150,9 @@ static void on_screen_size_changed(GdkScreen *screen,GtkWidget *win)
+ 
+ static gint login_entry_on_key_press (GtkWidget *widget,GdkEventKey *event)
+ {
++
++	gtk_label_set_text(GTK_LABEL(info), "");
++
+ 	if(event->keyval == GDK_Escape) {
+ 		g_free(new_pass);
+ 		new_pass = NULL;
+@@ -1211,11 +1218,14 @@ static void create_win()
+     login_entry = (GtkWidget*)gtk_builder_get_object(builder, "login_entry");
+     if(login_entry!=NULL)
+     {
+-		g_signal_connect_after(login_entry,"key-press-event",G_CALLBACK(login_entry_on_key_press),NULL);
++        g_signal_connect(login_entry,"key-press-event",G_CALLBACK(login_entry_on_key_press),NULL);
+ 	}
+ 
+     g_signal_connect(login_entry, "activate", G_CALLBACK(on_entry_activate), NULL);
+ 
++    info = (GtkWidget *)gtk_builder_get_object(builder, "info");
++    gtk_label_set_text(GTK_LABEL(info), "");
++
+     if( g_key_file_get_integer(config, "display", "bottom_pane", 0)==1)
+     {
+         /* hacks to let GtkEventBox paintable with gtk pixmap engine. */
+@@ -1359,11 +1369,13 @@ static gboolean on_lxdm_command(GIOChannel *source, GIOCondition condition, gpoi
+ 	gtk_main_quit();
+ 	else if( !strncmp(str, "reset", 5) )
+ 	{
++		gtk_label_set_text(GTK_LABEL(info), _("Authentication failed."));
+ 		switch_to_input_user();
+ 	}
+ 	else if (!strncmp(str, "password-expire", 15))
+ 	{
+ 		pass_expired = TRUE;
++		gtk_label_set_text(GTK_LABEL(info), _("You are required to change your password immediately."));
+ 		switch_to_input_passwd();
+ 	}
+ 	else if( !strncmp(str, "password", 8))
+@@ -1376,6 +1388,7 @@ static gboolean on_lxdm_command(GIOChannel *source, GIOCondition condition, gpoi
+ 		new_pass = NULL;
+ 
+ 		if (count++ < 3) {
++			gtk_label_set_text(GTK_LABEL(info), _("Invalid new password. Please input new password again."));
+ 			switch_to_input_passwd();
+ 		} else {
+ 			count = 0;
+-- 
+2.25.1
+

@@ -1,0 +1,27 @@
+From ce3ab6ba4b8176d100ac535a39e3d5b0c517989b Mon Sep 17 00:00:00 2001
+From: Jan Palus <atler@pld-linux.org>
+Date: Fri, 15 Jan 2021 14:32:14 +0100
+Subject: [PATCH] configure.ac: remove duplicate AC_CONFIG_MACRO_DIR (#226)
+
+fixes build with autoconf 2.70
+Upstream-Status: Backport [https://github.com/libusb/hidapi/pull/226]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 220909a..77da67a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -13,7 +13,6 @@ LTLDFLAGS="-version-info ${lt_current}:${lt_revision}:${lt_age}"
+ 
+ AC_CONFIG_MACRO_DIR([m4])
+ AM_INIT_AUTOMAKE([foreign -Wall -Werror])
+-AC_CONFIG_MACRO_DIR([m4])
+ 
+ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+ LT_INIT
+-- 
+2.30.0
+

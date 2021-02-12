@@ -13,6 +13,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b7fb682e9941a49f1214dcd7441410d7"
 
 SRC_URI = "git://github.com/esnet/iperf.git \
            file://0002-Remove-pg-from-profile_CFLAGS.patch \
+           file://0001-configure.ac-check-for-CPP-prog.patch \
            "
 
 SRCREV = "1f8fb13297f3e3e40169ebcd12e171167e394473"

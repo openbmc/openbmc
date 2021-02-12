@@ -1,0 +1,33 @@
+From a8502c5a7e336f1e5068f9dd3bdb359d787f9bdc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 5 Feb 2021 18:35:12 -0800
+Subject: [PATCH] configure.ac: Do not use single line comment
+
+autoconf 2.70+ does not like it and regenerating configure script fails
+
+| ../libstatgrab-0.92/configure: line 7818: syntax error near unexpected token `ac_fn_check_decl'
+| ../libstatgrab-0.92/configure: line 7818: `fi ac_fn_check_decl "$LINENO" "__sun" "ac_cv_have_decl___sun" "$ac_includes_default" "$ac_c_undeclared_builtin_options" "CFLAGS"'
+
+Upstream-Status: Submitted [https://github.com/libstatgrab/libstatgrab/pull/128]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 99518f8..74e7f0f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -100,7 +100,8 @@ AC_TYPE_UNSIGNED_LONG_LONG_INT
+ 
+ dnl Check for extra flags to enable some kind of behavior
+ AC_CHECK_DECL([_AIX],[ac_cv_need_minus_d_linux_source_compat="yes"; ac_cv_need_minus_d_all_source="yes"])
+-AC_CHECK_DECL([__linux],[ac_cv_need_minus_d_gnu_source="yes"]) dnl probably required by kfreebsd, too?
++dnl probably required by kfreebsd, too?
++AC_CHECK_DECL([__linux],[ac_cv_need_minus_d_gnu_source="yes"])
+ AC_CHECK_DECL([__sun],[ac_cv_need_minus_d_extensions="yes"; ac_cv_need_minus_d_posix_pthread_semantics="yes"])
+ AC_CHECK_DECL([__hpux],[ac_cv_need_minus_d_hpux_source="yes"])
+ 
+-- 
+2.30.0
+

@@ -20,13 +20,6 @@ DEPENDS_append_class-nativesdk = " ${BPN}-native"
 
 inherit autotools-brokensep pkgconfig gettext
 
-# The source tarball suggested at
-# https://graphviz.gitlab.io/_pages/Download/Download_source.html has no
-# version in its name. So once graphviz is updgraded, only first time users will
-# get checksum errors. Fedora people seem to expect same so they use a versioned
-# source - see https://src.fedoraproject.org/cgit/rpms/graphviz.git/tree/graphviz.spec
-
-SRCREV = "771bc4dbff3e6f358fa75cdc7774a413ccacad51"
 SRC_URI = "https://www2.graphviz.org/Packages/stable/portable_source/${BP}.tar.gz \
            file://0001-plugin-pango-Include-freetype-headers-explicitly.patch \
 "

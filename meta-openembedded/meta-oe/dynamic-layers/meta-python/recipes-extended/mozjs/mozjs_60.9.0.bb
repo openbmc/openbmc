@@ -125,6 +125,8 @@ MULTILIB_SCRIPTS += " ${PN}-dev:${bindir}/js60-config"
 
 do_install_append() {
        oe_multilib_header mozjs-60/js-config.h
+       sed -e 's@${STAGING_DIR_HOST}@@g' \
+           -i ${D}${bindir}/js60-config
 }
 
 PACKAGES =+ "lib${BPN}"

@@ -1,0 +1,22 @@
+--- a/kexec/Makefile
++++ b/kexec/Makefile
+@@ -110,7 +110,7 @@ $(KEXEC): $(KEXEC_OBJS) $(UTIL_LIB)
+ 	@$(MKDIR) -p $(@D)
+ 	$(LINK.o) -o $@ $^ $(CFLAGS) $(LIBS)
+ 
+-$(KEXEC): CPPFLAGS+=-I$(srcdir)/kexec/arch/$(ARCH)/include
++$(KEXEC): CPPFLAGS+=-I$(srcdir)/kexec/arch/$(ARCH)/include -I$(shell $(CC) -print-file-name=include)
+ 
+ kexec/fs2dt.o: CPPFLAGS+=$($(ARCH)_FS2DT_INCLUDE)
+ 
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -46,7 +46,7 @@ TARGET_CFLAGS	= @TARGET_CFLAGS@
+ # Base compiler flags. These are extended by the subcomponent-Makefiles
+ # where necessary.
+ CPPFLAGS	= @CPPFLAGS@ -I$(srcdir)/include -I$(srcdir)/util_lib/include \
+-			-Iinclude/ $($(ARCH)_CPPFLAGS)
++			-Iinclude/ $($(ARCH)_CPPFLAGS) -I$(shell $(CC) -print-file-name=include)
+ CFLAGS		= @CFLAGS@ -static -fno-strict-aliasing -Wall -Wstrict-prototypes
+ PURGATORY_EXTRA_CFLAGS = @PURGATORY_EXTRA_CFLAGS@
+ ASFLAGS		= @ASFLAGS@ $($(ARCH)_ASFLAGS)

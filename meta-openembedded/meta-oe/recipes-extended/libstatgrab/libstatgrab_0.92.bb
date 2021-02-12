@@ -10,6 +10,7 @@ PACKAGES_prepend = "statgrab statgrab-dbg saidar saidar-dbg ${PN}-mrtg "
 
 # don't use the git tag unless docbooc2x is available to build the manpages
 SRC_URI = "https://github.com/libstatgrab/libstatgrab/releases/download/LIBSTATGRAB_0_92/libstatgrab-0.92.tar.gz \
+           file://0001-configure.ac-Do-not-use-single-line-comment.patch \
           "
 SRC_URI[md5sum] = "5362b2ddbec54b3901e7d70c22cda249"
 SRC_URI[sha256sum] = "5bf1906aff9ffc3eeacf32567270f4d819055d8386d98b9c8c05519012d5a196"

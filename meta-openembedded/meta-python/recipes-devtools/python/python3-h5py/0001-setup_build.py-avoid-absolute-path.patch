@@ -1,0 +1,30 @@
+From b5d5a7efc7aaa2be830731001ed17c5b71bcefb1 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 29 Jan 2021 02:33:06 +0000
+Subject: [PATCH] setup_build.py: avoid absolute path
+
+Prevent absolute path from ending up in the egg-info SOURCES.txt.
+
+Upstream-Status: Submitted [https://github.com/h5py/h5py/pull/1803]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ setup_build.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup_build.py b/setup_build.py
+index ffd3bef..fb196c0 100644
+--- a/setup_build.py
++++ b/setup_build.py
+@@ -20,7 +20,7 @@ import api_gen
+ 
+ 
+ def localpath(*args):
+-    return op.abspath(op.join(op.dirname(__file__), *args))
++    return op.join(*args)
+ 
+ 
+ MODULES =  ['defs','_errors','_objects','_proxy', 'h5fd', 'h5z',
+-- 
+2.29.2
+

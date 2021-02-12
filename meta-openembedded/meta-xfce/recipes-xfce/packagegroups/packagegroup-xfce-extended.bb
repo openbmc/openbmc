@@ -40,6 +40,7 @@ RRECOMMENDS_${PN} = " \
     xfce4-mount-plugin \
     xfce4-powermanager-plugin \
     xfce4-closebutton-plugin \
+    xfce4-notes-plugin \
     xfce4-whiskermenu-plugin \
     xfce4-mailwatch-plugin \
     xfce4-smartbookmark-plugin \
