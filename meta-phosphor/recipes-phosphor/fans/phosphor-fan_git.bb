@@ -119,3 +119,11 @@ SYSTEMD_LINK_${PN}-monitor += "${@compose_list(d, 'FMT_MONITOR_INIT', 'OBMC_CHAS
 # --------------------------------------
 # phosphor-cooling-type specific configuration
 PACKAGECONFIG[cooling-type] = "--enable-cooling-type,--disable-cooling-type,,"
+
+# --------------------------------------
+# ${PN}-sensor-monitor specific configuration
+PACKAGECONFIG[sensor-monitor] = "--enable-sensor-monitor, --disable-sensor-monitor"
+
+FILES_sensor-monitor += " ${bindir}/sensor-monitor"
+SYSTEMD_SERVICE_sensor-monitor += "sensor-monitor.service"
+SYSTEMD_LINK_sensor-monitor += "../sensor-monitor.service:${MULTI_USR_TGT}.wants/sensor-monitor.service"
