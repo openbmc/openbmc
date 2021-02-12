@@ -120,3 +120,4 @@ python build_efi_cfg() {
 
     cfgfile.close()
 }
+build_efi_cfg[vardepsexclude] += "OVERRIDES"

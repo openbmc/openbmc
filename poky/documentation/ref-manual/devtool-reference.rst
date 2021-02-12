@@ -204,20 +204,20 @@ specify these options when using the ``devtool add`` command:
 -  To specify a source branch, use the ``--srcbranch`` option:
    ::
 
-      $ devtool add --srcbranch DISTRO_NAME_NO_CAP jackson /home/user/sources/jackson
+      $ devtool add --srcbranch &DISTRO_NAME_NO_CAP; jackson /home/user/sources/jackson
 
-   In the previous example, you are checking out the DISTRO_NAME_NO_CAP
+   In the previous example, you are checking out the &DISTRO_NAME_NO_CAP;
    branch.
 
 -  To specify a specific tag or commit hash, use the ``--srcrev``
    option:
    ::
 
-      $ devtool add --srcrev DISTRO_REL_TAG jackson /home/user/sources/jackson
+      $ devtool add --srcrev &DISTRO_REL_TAG; jackson /home/user/sources/jackson
       $ devtool add --srcrev some_commit_hash /home/user/sources/jackson
 
    The previous examples check out the
-   DISTRO_REL_TAG tag and the commit associated with the
+   &DISTRO_REL_TAG; tag and the commit associated with the
    some_commit_hash hash.
 
 .. note::

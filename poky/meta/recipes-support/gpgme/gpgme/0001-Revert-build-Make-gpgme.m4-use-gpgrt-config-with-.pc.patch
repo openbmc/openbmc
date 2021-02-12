@@ -11,11 +11,11 @@ Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- src/gpgme.m4 | 58 ++++++++++------------------------------------------------
+ src/gpgme.m4 | 58 +++++++++-------------------------------------------
  1 file changed, 10 insertions(+), 48 deletions(-)
 
 diff --git a/src/gpgme.m4 b/src/gpgme.m4
-index 2a72f18..6c2be44 100644
+index c749a5d..8579146 100644
 --- a/src/gpgme.m4
 +++ b/src/gpgme.m4
 @@ -1,5 +1,5 @@
@@ -29,7 +29,7 @@ index 2a72f18..6c2be44 100644
  # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
  # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  #
--# Last-changed: 2018-11-12
+-# Last-changed: 2020-11-20
 +# Last-changed: 2014-10-02
  
  
@@ -130,5 +130,5 @@ index 2a72f18..6c2be44 100644
      ifelse([$2], , :, [$2])
      _AM_PATH_GPGME_CONFIG_HOST_CHECK
 -- 
-2.7.4
+2.25.1
 

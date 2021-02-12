@@ -248,7 +248,7 @@ class PersistData(object):
                       stacklevel=2)
 
         self.data = persist(d)
-        logger.debug(1, "Using '%s' as the persistent data cache",
+        logger.debug("Using '%s' as the persistent data cache",
                      self.data.filename)
 
     def addDomain(self, domain):

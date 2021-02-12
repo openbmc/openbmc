@@ -79,7 +79,7 @@ class LayerIndexPlugin(ActionPlugin):
             branches = [args.branch]
         else:
             branches = (self.tinfoil.config_data.getVar('LAYERSERIES_CORENAMES') or 'master').split()
-        logger.debug(1, 'Trying branches: %s' % branches)
+        logger.debug('Trying branches: %s' % branches)
 
         ignore_layers = []
         if args.ignore:

@@ -118,7 +118,9 @@ def worker_child_fire(event, d):
     data = b"<event>" + pickle.dumps(event) + b"</event>"
     try:
         worker_pipe_lock.acquire()
-        worker_pipe.write(data)
+        while(len(data)):
+            written = worker_pipe.write(data)
+            data = data[written:]
         worker_pipe_lock.release()
     except IOError:
         sigterm_handler(None, None)
@@ -167,7 +169,7 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
         fakedirs = (workerdata["fakerootdirs"][fn] or "").split()
         for p in fakedirs:
             bb.utils.mkdirhier(p)
-        logger.debug(2, 'Running %s:%s under fakeroot, fakedirs: %s' %
+        logger.debug2('Running %s:%s under fakeroot, fakedirs: %s' %
                         (fn, taskname, ', '.join(fakedirs)))
     else:
         envvars = (workerdata["fakerootnoenv"][fn] or "").split()
@@ -321,7 +323,9 @@ class runQueueWorkerPipe():
         end = len(self.queue)
         index = self.queue.find(b"</event>")
         while index != -1:
-            worker_fire_prepickled(self.queue[:index+8])
+            msg = self.queue[:index+8]
+            assert msg.startswith(b"<event>") and msg.count(b"<event>") == 1
+            worker_fire_prepickled(msg)
             self.queue = self.queue[index+8:]
             index = self.queue.find(b"</event>")
         return (end > start)

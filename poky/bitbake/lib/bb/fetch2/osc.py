@@ -84,13 +84,13 @@ class Osc(FetchMethod):
         Fetch url
         """
 
-        logger.debug(2, "Fetch: checking for module directory '" + ud.moddir + "'")
+        logger.debug2("Fetch: checking for module directory '" + ud.moddir + "'")
 
         if os.access(os.path.join(d.getVar('OSCDIR'), ud.path, ud.module), os.R_OK):
             oscupdatecmd = self._buildosccommand(ud, d, "update")
             logger.info("Update "+ ud.url)
             # update sources there
-            logger.debug(1, "Running %s", oscupdatecmd)
+            logger.debug("Running %s", oscupdatecmd)
             bb.fetch2.check_network_access(d, oscupdatecmd, ud.url)
             runfetchcmd(oscupdatecmd, d, workdir=ud.moddir)
         else:
@@ -98,7 +98,7 @@ class Osc(FetchMethod):
             logger.info("Fetch " + ud.url)
             # check out sources there
             bb.utils.mkdirhier(ud.pkgdir)
-            logger.debug(1, "Running %s", oscfetchcmd)
+            logger.debug("Running %s", oscfetchcmd)
             bb.fetch2.check_network_access(d, oscfetchcmd, ud.url)
             runfetchcmd(oscfetchcmd, d, workdir=ud.pkgdir)
 

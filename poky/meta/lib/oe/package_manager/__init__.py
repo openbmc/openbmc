@@ -328,7 +328,11 @@ class PackageManager(object, metaclass=ABCMeta):
         try:
             bb.note("Installing globbed packages...")
             cmd = ["oe-pkgdata-util", "-p", pkgdatadir, "list-pkgs", globs]
-            pkgs = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode("utf-8")
+            bb.note('Running %s' % cmd)
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = proc.communicate()
+            if stderr: bb.note(stderr.decode("utf-8"))
+            pkgs = stdout.decode("utf-8")
             self.install(pkgs.split(), attempt_only=True)
         except subprocess.CalledProcessError as e:
             # Return code 1 means no packages matched
@@ -384,7 +388,10 @@ class PackageManager(object, metaclass=ABCMeta):
                 cmd.extend(['--exclude=' + '|'.join(exclude.split())])
             try:
                 bb.note('Running %s' % cmd)
-                complementary_pkgs = subprocess.check_output(cmd, stderr=subprocess.STDOUT).decode("utf-8")
+                proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = proc.communicate()
+                if stderr: bb.note(stderr.decode("utf-8"))
+                complementary_pkgs = stdout.decode("utf-8")
                 complementary_pkgs = set(complementary_pkgs.split())
                 skip_pkgs = sorted(complementary_pkgs & provided_pkgs)
                 install_pkgs = sorted(complementary_pkgs - provided_pkgs)

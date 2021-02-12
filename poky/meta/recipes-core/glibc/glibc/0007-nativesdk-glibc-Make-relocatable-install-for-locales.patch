@@ -1,7 +1,7 @@
-From 9a8bf11ea375a2fe5eddb30bc10943e64d3b96a4 Mon Sep 17 00:00:00 2001
+From 732d4f4954fe60718870048d0583a20a7a8a8540 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:55:12 -0700
-Subject: [PATCH 07/29] nativesdk-glibc: Make relocatable install for locales
+Subject: [PATCH] nativesdk-glibc: Make relocatable install for locales
 
 The glibc locale path is hard-coded to the install prefix, but in SDKs we need
 to be able to relocate the binaries.  Expand the strings to 4K and put them in a
@@ -19,7 +19,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  4 files changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/locale/findlocale.c b/locale/findlocale.c
-index 9cd3b71a6d..84272310e0 100644
+index ab09122b0c..f42cc75780 100644
 --- a/locale/findlocale.c
 +++ b/locale/findlocale.c
 @@ -56,7 +56,7 @@ struct __locale_data *const _nl_C[] attribute_hidden =
@@ -41,7 +41,7 @@ index 9cd3b71a6d..84272310e0 100644
    else
      /* We really have to load some data.  First see whether the name is
 diff --git a/locale/loadarchive.c b/locale/loadarchive.c
-index ba0fe45648..9737fd4cda 100644
+index 4177fc8972..40247b1e68 100644
 --- a/locale/loadarchive.c
 +++ b/locale/loadarchive.c
 @@ -42,7 +42,7 @@
@@ -54,7 +54,7 @@ index ba0fe45648..9737fd4cda 100644
  /* Size of initial mapping window, optimal if large enough to
     cover the header plus the initial locale.  */
 diff --git a/locale/localeinfo.h b/locale/localeinfo.h
-index 1bfe22aa7f..fdc283c69a 100644
+index b3d4da0185..22f9dc1140 100644
 --- a/locale/localeinfo.h
 +++ b/locale/localeinfo.h
 @@ -331,7 +331,7 @@ _nl_lookup_word (locale_t l, int category, int item)
@@ -67,7 +67,7 @@ index 1bfe22aa7f..fdc283c69a 100644
  /* Load the locale data for CATEGORY from the file specified by *NAME.
     If *NAME is "", use environment variables as specified by POSIX, and
 diff --git a/locale/programs/locale.c b/locale/programs/locale.c
-index e2e309c2a1..61a92cdcd1 100644
+index 575b208e82..5ec630c3a4 100644
 --- a/locale/programs/locale.c
 +++ b/locale/programs/locale.c
 @@ -632,6 +632,7 @@ nameentcmp (const void *a, const void *b)
@@ -98,6 +98,3 @@ index e2e309c2a1..61a92cdcd1 100644
  
  	  locrec = (struct locrecent *) (addr + names[cnt].locrec_offset);
  
--- 
-2.27.0
-

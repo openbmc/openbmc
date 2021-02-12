@@ -56,47 +56,47 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0e5cd938de1a7a53ea5adac38cc10c39 \
                     file://src/pulsecore/filter/biquad.h;beginline=1;endline=4;md5=6d46d1365206528a20137355924233c1 \
 "
 
+# libtool is needed for libltdl, used in module loading.
 DEPENDS = "libatomic-ops libsndfile1 libtool"
 # optional
 DEPENDS += "udev alsa-lib glib-2.0"
 DEPENDS += "speexdsp libxml-parser-perl-native libcap"
 
-inherit autotools bash-completion pkgconfig useradd gettext perlnative systemd manpages gsettings
+inherit bash-completion meson pkgconfig useradd gettext perlnative systemd manpages gsettings
 
 # *.desktop rules wont be generated during configure and build will fail
 # if using --disable-nls
 USE_NLS = "yes"
 
-EXTRA_OECONF = "\
-		--disable-hal-compat \
-		--disable-orc \
-		--enable-tcpwrap=no \
-		--with-access-group=audio \
-		--disable-openssl \
-		--with-database=simple \
-		--without-zsh-completion-dir \
-		--with-udev-rules-dir=`pkg-config --variable=udevdir udev`/rules.d \
-		ac_cv_header_valgrind_memcheck_h=no \
-		--disable-tests \
-		--disable-running-from-build-tree \
+EXTRA_OEMESON = "\
+		-Dhal-compat=false \
+		-Dorc=disabled \
+		-Daccess_group=audio \
+		-Dopenssl=disabled \
+		-Ddatabase=simple \
+		-Dzshcompletiondir=no \
+		-Dudevrulesdir=`pkg-config --variable=udevdir udev`/rules.d \
+		-Dvalgrind=disabled \
+		-Dtests=false \
+		-Drunning-from-build-tree=false \
 "
 
 # soxr (the SoX Resampler library) doesn't seem to be currently packaged in
 # oe-core nor meta-oe, so let's not add a PACKAGECONFIG entry for it for now.
-EXTRA_OECONF += "--without-soxr"
+EXTRA_OEMESON += "-Dsoxr=disabled"
 
 # The FFTW dependency (for module-equalizer-sink) was removed in commit
 # ddbd713293 without explaining why it was not made a PACKAGECONFIG item
 # instead. Oh well, let's keep it disabled until someone expresses some
 # interest in having it enabled.
-EXTRA_OECONF += "--without-fftw"
+EXTRA_OEMESON += "-Dfftw=disabled"
 
 # The "adrian" echo canceller implementation has a non-standard license
 # (src/modules/echo-cancel/adrian-license.txt). It's a permissive license, so
 # the licensing terms are probably not problematic, but it would be an extra
 # hassle to add the license to OE-Core's set of licenses. The canceller isn't
 # very good anyway, better alternatives exist (such as the webrtc canceller).
-EXTRA_OECONF += "--disable-adrian-aec"
+EXTRA_OEMESON += "-Dadrian-aec=false"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez5', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \
@@ -105,34 +105,24 @@ PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez5'
                    dbus gsettings \
                    "
 
-PACKAGECONFIG[dbus] = "--enable-dbus,--disable-dbus,dbus"
-PACKAGECONFIG[bluez5] = "--enable-bluez5,--disable-bluez5,bluez5 sbc"
-PACKAGECONFIG[gconf] = "--enable-gconf,--disable-gconf,gconf"
-PACKAGECONFIG[gsettings] = "--enable-gsettings,--disable-gsettings,glib-2.0-native glib-2.0"
-PACKAGECONFIG[ofono] = "--enable-bluez5-ofono-headset,--disable-bluez5-ofono-headset,ofono"
-PACKAGECONFIG[gtk] = "--enable-gtk3,--disable-gtk3,gtk+3"
-PACKAGECONFIG[systemd] = "--enable-systemd-daemon --enable-systemd-login --enable-systemd-journal --with-systemduserunitdir=${systemd_user_unitdir},--disable-systemd-daemon --disable-systemd-login --disable-systemd-journal,systemd"
-PACKAGECONFIG[x11] = "--enable-x11,--disable-x11,virtual/libx11 libxtst libice libsm libxcb"
-PACKAGECONFIG[avahi] = "--enable-avahi,--disable-avahi,avahi"
-PACKAGECONFIG[jack] = "--enable-jack,--disable-jack,jack"
+PACKAGECONFIG[dbus] = "-Ddbus=enabled,-Ddbus=disabled,dbus"
+PACKAGECONFIG[bluez5] = "-Dbluez5=true,-Dbluez5=false,bluez5 sbc"
+PACKAGECONFIG[gsettings] = "-Dgsettings=enabled,-Dgsettings=disabled,glib-2.0-native glib-2.0"
+PACKAGECONFIG[ofono] = "-Dbluez5-ofono-headset=true,-Dbluez5-ofono-headset=false,ofono"
+PACKAGECONFIG[gtk] = "-Dgtk=enabled,-Dgtk=disabled,gtk+3"
+PACKAGECONFIG[systemd] = "-Dsystemd=enabled -Dsystemduserunitdir=${systemd_user_unitdir},-Dsystemd=disabled,systemd"
+PACKAGECONFIG[x11] = "-Dx11=enabled,-Dx11=disabled,virtual/libx11 libxtst libice libsm libxcb"
+PACKAGECONFIG[avahi] = "-Davahi=enabled,-Davahi=disabled,avahi"
+PACKAGECONFIG[jack] = "-Djack=enabled,-Djack=disabled,jack"
 # Since many embedded systems don't have non-root users, it's useful to be
 # able to use pulseaudio autospawn for root as well.
 PACKAGECONFIG[autospawn-for-root] = ",,,"
-PACKAGECONFIG[lirc] = "--enable-lirc,--disable-lirc,lirc"
-PACKAGECONFIG[webrtc] = "--enable-webrtc-aec,--disable-webrtc-aec,webrtc-audio-processing"
-PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
-PACKAGECONFIG[manpages] = "--enable-manpages, --disable-manpages, "
-
-EXTRA_OECONF_append_arm = "${@bb.utils.contains("TUNE_FEATURES", "neon", "", " --enable-neon-opt=no", d)}"
-EXTRA_OECONF_append_armeb = "${@bb.utils.contains("TUNE_FEATURES", "neon", "", " --enable-neon-opt=no", d)}"
-
+PACKAGECONFIG[lirc] = "-Dlirc=enabled,-Dlirc=disabled,lirc"
+PACKAGECONFIG[webrtc] = "-Dwebrtc-aec=enabled,-Dwebrtc-aec=disabled,webrtc-audio-processing"
+PACKAGECONFIG[ipv6] = "-Dipv6=true,-Dipv6=false,"
+PACKAGECONFIG[manpages] = "-Dman=true,-Dman=false,"
 
 export TARGET_PFPU = "${TARGET_FPU}"
-
-# TODO: Use more fine granular version
-#OE_LT_RPATH_ALLOW=":${libdir}/pulse-0.9:"
-OE_LT_RPATH_ALLOW = "any"
-OE_LT_RPATH_ALLOW[export]="1"
 
 set_cfg_value () {
 	sed -i -e "s/\(; *\)\?$2 =.*/$2 = $3/" "$1"
@@ -143,7 +133,7 @@ set_cfg_value () {
 
 do_compile_append () {
 	if ${@bb.utils.contains('PACKAGECONFIG', 'autospawn-for-root', 'true', 'false', d)}; then
-		set_cfg_value src/client.conf allow-autospawn-for-root yes
+		set_cfg_value src/pulse/client.conf allow-autospawn-for-root yes
 	fi
 }
 
@@ -269,7 +259,6 @@ RDEPENDS_pulseaudio-module-console-kit =+ "${@bb.utils.contains('DISTRO_FEATURES
 RDEPENDS_pulseaudio-misc += "pulseaudio-module-cli-protocol-unix"
 
 FILES_${PN}-module-alsa-card += "${datadir}/pulseaudio/alsa-mixer"
-FILES_${PN}-module-gconf += "${libexecdir}/pulse/gconf-helper"
 
 GSETTINGS_PACKAGE = "${@bb.utils.contains('PACKAGECONFIG', 'gsettings', '${PN}-module-gsettings', '', d)}"
 FILES_${PN}-module-gsettings += "${libexecdir}/pulse/gsettings-helper ${datadir}/GConf/gsettings ${datadir}/glib-2.0/schemas"

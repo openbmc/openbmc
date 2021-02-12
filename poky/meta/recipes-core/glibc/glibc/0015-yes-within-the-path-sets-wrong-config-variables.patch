@@ -1,7 +1,7 @@
-From 17a602b89cbe53a5a92d0153ccb013a737f028cb Mon Sep 17 00:00:00 2001
+From 0bd39d8907953f18e01742f42b24647ac7689d0a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:31:06 +0000
-Subject: [PATCH 15/29] 'yes' within the path sets wrong config variables
+Subject: [PATCH] 'yes' within the path sets wrong config variables
 
 It seems that the 'AC_EGREP_CPP(yes...' example is quite popular
 but being such a short word to grep it is likely to produce
@@ -29,10 +29,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  12 files changed, 28 insertions(+), 28 deletions(-)
 
 diff --git a/sysdeps/aarch64/configure b/sysdeps/aarch64/configure
-index ac3cf6fd36..32add94df9 100644
+index 83c3a23e44..a68c946277 100644
 --- a/sysdeps/aarch64/configure
 +++ b/sysdeps/aarch64/configure
-@@ -148,12 +148,12 @@ else
+@@ -157,12 +157,12 @@ else
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
  #ifdef __AARCH64EB__
@@ -48,10 +48,10 @@ index ac3cf6fd36..32add94df9 100644
  else
    libc_cv_aarch64_be=no
 diff --git a/sysdeps/aarch64/configure.ac b/sysdeps/aarch64/configure.ac
-index 8b042d6d05..3cdd262951 100644
+index 66f755078a..a32b265bbe 100644
 --- a/sysdeps/aarch64/configure.ac
 +++ b/sysdeps/aarch64/configure.ac
-@@ -10,8 +10,8 @@ GLIBC_PROVIDES dnl See aclocal.m4 in the top level source directory.
+@@ -17,8 +17,8 @@ AC_DEFINE(SUPPORT_STATIC_PIE)
  # the dynamic linker via %ifdef.
  AC_CACHE_CHECK([for big endian],
    [libc_cv_aarch64_be],
@@ -165,7 +165,7 @@ index f05f43802b..dc8639902d 100644
    ], libc_cv_nios2_be=yes, libc_cv_nios2_be=no)])
  if test $libc_cv_nios2_be = yes; then
 diff --git a/sysdeps/unix/sysv/linux/mips/configure b/sysdeps/unix/sysv/linux/mips/configure
-index 25f98e0c7b..e95bfae359 100644
+index f25f2a3a65..1b7483e6c6 100644
 --- a/sysdeps/unix/sysv/linux/mips/configure
 +++ b/sysdeps/unix/sysv/linux/mips/configure
 @@ -414,11 +414,11 @@ else
@@ -183,7 +183,7 @@ index 25f98e0c7b..e95bfae359 100644
  else
    libc_cv_mips_nan2008=no
 diff --git a/sysdeps/unix/sysv/linux/mips/configure.ac b/sysdeps/unix/sysv/linux/mips/configure.ac
-index 3db1b32b08..f8cd375ebc 100644
+index 049a0f4bdf..005526d4e8 100644
 --- a/sysdeps/unix/sysv/linux/mips/configure.ac
 +++ b/sysdeps/unix/sysv/linux/mips/configure.ac
 @@ -105,9 +105,9 @@ AC_COMPILE_IFELSE(
@@ -258,6 +258,3 @@ index f9cba6e15d..b21f72f1e4 100644
                         #endif
      ], libc_cv_ppc64_def_call_elf=yes, libc_cv_ppc64_def_call_elf=no)])
    if test $libc_cv_ppc64_def_call_elf = no; then
--- 
-2.27.0
-

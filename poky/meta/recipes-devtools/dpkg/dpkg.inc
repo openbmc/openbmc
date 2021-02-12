@@ -26,6 +26,7 @@ EXTRA_OECONF = "\
 		"
 
 EXTRA_OECONF_append_class-target = " --disable-update-alternatives DEB_HOST_ARCH=${DPKG_ARCH}"
+EXTRA_OECONF_append_class-nativesdk = " --disable-update-alternatives DEB_HOST_ARCH=${DPKG_ARCH}"
 
 PACKAGECONFIG = "liblzma"
 PACKAGECONFIG[liblzma] = "--with-liblzma,--without-liblzma, xz"
@@ -46,14 +47,15 @@ do_install_append () {
 	if [ "${PN}" = "dpkg-native" ]; then
 		# update-alternatives doesn't have an offline mode
 		rm ${D}${bindir}/update-alternatives
-		sed -i -e 's|^#!.*${bindir}/perl-native.*/perl|#!/usr/bin/env nativeperl|' ${D}${bindir}/dpkg-*
+		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env nativeperl|' ${D}${bindir}/dpkg-*
 	else
-		sed -i -e 's|^#!.*${bindir}/perl-native.*/perl|#!/usr/bin/env perl|' ${D}${bindir}/dpkg-*
+		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env perl|' ${D}${bindir}/dpkg-*
 	fi
 }
 
 PROV = "virtual/update-alternatives"
 PROV_class-native = ""
+PROV_class-nativesdk = ""
 
 PROVIDES += "${PROV}"
 
@@ -93,7 +95,8 @@ ALTERNATIVE_${PN}-start-stop = "start-stop-daemon"
 ALTERNATIVE_LINK_NAME[start-stop-daemon] = "${sbindir}/start-stop-daemon"
 ALTERNATIVE_PRIORITY = "100"
 
-RDEPENDS_${PN} += "${PN}-start-stop"
+EXTRA_RDPENDS = "ldconfig"
+EXTRA_RDPENDS_libc-musl = ""
+RDEPENDS_${PN} += "${PN}-start-stop ${EXTRA_RDPENDS}"
 
-
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

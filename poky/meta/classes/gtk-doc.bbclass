@@ -7,6 +7,7 @@
 #
 # It should be used in recipes to determine whether gtk-doc based documentation should be built,
 # so that qemu use can be avoided when necessary.
+GTKDOC_ENABLED_class-native = "False"
 GTKDOC_ENABLED ?= "${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', \
                       bb.utils.contains('MACHINE_FEATURES', 'qemu-usermode', 'True', 'False', d), 'False', d)}"
 

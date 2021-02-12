@@ -78,7 +78,7 @@ class GitSM(Git):
                     module_hash = ""
 
                 if not module_hash:
-                    logger.debug(1, "submodule %s is defined, but is not initialized in the repository. Skipping", m)
+                    logger.debug("submodule %s is defined, but is not initialized in the repository. Skipping", m)
                     continue
 
                 submodules.append(m)
@@ -179,7 +179,7 @@ class GitSM(Git):
                             (ud.basecmd, ud.revisions[ud.names[0]]), d, workdir=ud.clonedir)
 
         if len(need_update_list) > 0:
-            logger.debug(1, 'gitsm: Submodules requiring update: %s' % (' '.join(need_update_list)))
+            logger.debug('gitsm: Submodules requiring update: %s' % (' '.join(need_update_list)))
             return True
 
         return False

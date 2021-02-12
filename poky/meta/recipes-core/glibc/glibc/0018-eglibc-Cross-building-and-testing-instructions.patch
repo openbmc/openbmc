@@ -1,7 +1,7 @@
-From 0bd1dedf77194151397c53b12e0355c2edb8bccc Mon Sep 17 00:00:00 2001
+From 060ba13b5ac5e90517d540f009ebdcdcf62f9685 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:42:58 +0000
-Subject: [PATCH 18/29] eglibc: Cross building and testing instructions
+Subject: [PATCH] eglibc: Cross building and testing instructions
 
 Ported from eglibc
 Upstream-Status: Pending
@@ -614,6 +614,3 @@ index 0000000000..b67b468466
 +- Some tests require access to libstdc++.so.6 and libgcc_s.so.1; we
 +  simply place copies of these libraries in the top GLIBC build
 +  directory.
--- 
-2.27.0
-

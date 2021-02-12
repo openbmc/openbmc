@@ -14,6 +14,12 @@ class PkgSdk(Sdk):
     def __init__(self, d, manifest_dir=None):
         super(PkgSdk, self).__init__(d, manifest_dir)
 
+        # In sdk_list_installed_packages the call to opkg is hardcoded to
+        # always use IPKGCONF_TARGET and there's no exposed API to change this
+        # so simply override IPKGCONF_TARGET to use this separated config file.
+        ipkgconf_sdk_target = d.getVar("IPKGCONF_SDK_TARGET")
+        d.setVar("IPKGCONF_TARGET", ipkgconf_sdk_target)
+
         self.target_conf = self.d.getVar("IPKGCONF_TARGET")
         self.host_conf = self.d.getVar("IPKGCONF_SDK")
 

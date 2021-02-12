@@ -1,0 +1,32 @@
+From b647d1df55c20772a9cc7ce96fcf323c500481bf Mon Sep 17 00:00:00 2001
+From: dorindabassey <dorindabassey@gmail.com>
+Date: Sat, 19 Dec 2020 01:11:46 +0100
+Subject: [PATCH] add support for ipkg to debuginfod.cxx
+
+added support for ipkg to the debuginfod scanner. 0.182 only supports RPM and scan .debs, with this patch, debuginfod scanner would be able to scan .ipk
+
+Upstream-status: Submitted [https://sourceware.org/pipermail/elfutils-devel/2020q4/003357.html]
+
+Signed-off-by: dorindabassey <dorindabassey@gmail.com>
+---
+ debuginfod/debuginfod.cxx | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/debuginfod/debuginfod.cxx b/debuginfod/debuginfod.cxx
+index 5621030..cc78c93 100644
+--- a/debuginfod/debuginfod.cxx
++++ b/debuginfod/debuginfod.cxx
+@@ -442,11 +442,13 @@ parse_opt (int key, char *arg,
+         {
+           scan_archives[".deb"]="dpkg-deb --fsys-tarfile";
+           scan_archives[".ddeb"]="dpkg-deb --fsys-tarfile";
++          scan_archives[".ipk"]="dpkg-deb --fsys-tarfile";
+         }
+       else
+         {
+           scan_archives[".deb"]="(bsdtar -O -x -f - data.tar.xz)<";
+           scan_archives[".ddeb"]="(bsdtar -O -x -f - data.tar.xz)<";
++          scan_archives[".ipk"]="(bsdtar -O -x -f - data.tar.xz)<";
+         }
+       // .udeb too?
+       break;

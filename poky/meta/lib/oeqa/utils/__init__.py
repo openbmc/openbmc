@@ -43,28 +43,12 @@ def make_logger_bitbake_compatible(logger):
     import logging
 
     """ 
-        Bitbake logger redifines debug() in order to
-        set a level within debug, this breaks compatibility
-        with vainilla logging, so we neeed to redifine debug()
-        method again also add info() method with INFO + 1 level.
+    We need to raise the log level of the info output so unittest 
+    messages are visible on the console.
     """
-    def _bitbake_log_debug(*args, **kwargs):
-        lvl = logging.DEBUG
-
-        if isinstance(args[0], int):
-            lvl = args[0]
-            msg = args[1]
-            args = args[2:]
-        else:
-            msg = args[0]
-            args = args[1:]
-
-        logger.log(lvl, msg, *args, **kwargs)
-    
     def _bitbake_log_info(msg, *args, **kwargs):
         logger.log(logging.INFO + 1, msg, *args, **kwargs)
 
-    logger.debug = _bitbake_log_debug
     logger.info = _bitbake_log_info
 
     return logger

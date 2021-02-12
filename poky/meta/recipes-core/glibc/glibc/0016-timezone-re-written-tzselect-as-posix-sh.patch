@@ -1,7 +1,7 @@
-From 4762386b599f5c3287310a69ad3555e0129e0c51 Mon Sep 17 00:00:00 2001
+From 3feb4213628f1485000ffe1d3fd26e37a7b14336 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:33:03 +0000
-Subject: [PATCH 16/29] timezone: re-written tzselect as posix sh
+Subject: [PATCH] timezone: re-written tzselect as posix sh
 
 To avoid the bash dependency.
 
@@ -15,10 +15,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/timezone/Makefile b/timezone/Makefile
-index 75f38df527..74e1ab7ff7 100644
+index 395abfeebd..2d939edf75 100644
 --- a/timezone/Makefile
 +++ b/timezone/Makefile
-@@ -122,7 +122,7 @@ $(testdata)/XT%: testdata/XT%
+@@ -123,7 +123,7 @@ $(testdata)/XT%: testdata/XT%
  	cp $< $@
  
  $(objpfx)tzselect: tzselect.ksh $(common-objpfx)config.make
@@ -40,6 +40,3 @@ index 18fce27e24..70745f9d36 100755
  
  # Output one argument as-is to standard output.
  # Safer than 'echo', which can mishandle '\' or leading '-'.
--- 
-2.27.0
-

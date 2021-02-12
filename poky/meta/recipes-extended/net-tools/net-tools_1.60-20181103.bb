@@ -16,8 +16,6 @@ SRC_URI = "git://git.code.sf.net/p/net-tools/code;protocol=https \
     file://Bug_541172-netstat.c-exit-codes.patch \
 "
 
-UPSTREAM_VERSION_UNKNOWN = "1"
-
 S = "${WORKDIR}/git"
 
 inherit gettext
@@ -106,5 +104,19 @@ python __anonymous() {
         d.setVarFlag('ALTERNATIVE_LINK_NAME', prog, '%s/%s' % (d.getVar('base_bindir'), prog))
 }
 ALTERNATIVE_PRIORITY = "100"
+
+NETTOOLS_PACKAGES = "${PN}-mii-tool"
+NETTOOLS_PACKAGES_class-native = ""
+
+PACKAGE_BEFORE_PN = "${NETTOOLS_PACKAGES}"
+RDEPENDS_${PN} += "${NETTOOLS_PACKAGES}"
+
+FILES_${PN}-mii-tool = "${base_sbindir}/mii-tool"
+
+ALTERNATIVE_${PN}_remove = "mii-tool"
+
+ALTERNATIVE_${PN}-mii-tool = "mii-tool"
+ALTERNATIVE_TARGET[mii-tool] = "${base_sbindir}/mii-tool"
+ALTERNATIVE_LINK_NAME[mii-tool] = "${base_sbindir}/mii-tool"
 
 BBCLASSEXTEND = "native nativesdk"

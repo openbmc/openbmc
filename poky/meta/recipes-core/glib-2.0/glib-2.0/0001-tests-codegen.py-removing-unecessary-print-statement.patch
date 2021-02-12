@@ -1,0 +1,38 @@
+From 6178df5658045a6253ef806e018fe80d99a8f5fb Mon Sep 17 00:00:00 2001
+From: Yi Fan Yu <yifan.yu@windriver.com>
+Date: Mon, 1 Feb 2021 16:10:28 -0500
+Subject: [PATCH] tests/codegen.py: removing unecessary print statement
+
+A huge amount of output(boiler-plate code) is
+printed to the console screen.
+This is not critical to the test results.
+
+This causes intermittent test failure when another process
+has to parse its output.
+
+Root cause is in ptest-runner, This is a workaround
+
+Uptream-Status: Inappropriate [other]
+
+
+
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
+---
+ gio/tests/codegen.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/gio/tests/codegen.py b/gio/tests/codegen.py
+index 51de0ede4..cfa4db42e 100644
+--- a/gio/tests/codegen.py
++++ b/gio/tests/codegen.py
+@@ -250,7 +250,6 @@ class TestCodegen(unittest.TestCase):
+ 
+         result = Result(info, out, err, subs)
+ 
+-        print('Output:', result.out)
+         return result
+ 
+     def runCodegenWithInterface(self, interface_contents, *args):
+-- 
+2.29.2
+

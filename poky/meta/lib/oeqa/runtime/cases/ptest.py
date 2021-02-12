@@ -108,4 +108,5 @@ class PtestRunnerTest(OERuntimeTestCase):
             failmsg = failmsg + "Failed ptests:\n%s" % pprint.pformat(failed_tests)
 
         if failmsg:
+            self.logger.warning("There were failing ptests.")
             self.fail(failmsg)

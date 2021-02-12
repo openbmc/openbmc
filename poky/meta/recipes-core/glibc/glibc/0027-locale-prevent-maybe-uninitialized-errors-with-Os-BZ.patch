@@ -1,7 +1,7 @@
-From 10aef8f0671d814aaf910ababc0225cf6f0a46e8 Mon Sep 17 00:00:00 2001
+From 881f5b8134afd9a30049b93fc79dda7a44947a5f Mon Sep 17 00:00:00 2001
 From: Martin Jansa <martin.jansa@gmail.com>
 Date: Mon, 17 Dec 2018 21:36:18 +0000
-Subject: [PATCH 27/29] locale: prevent maybe-uninitialized errors with -Os [BZ
+Subject: [PATCH] locale: prevent maybe-uninitialized errors with -Os [BZ
  #19444]
 
 Fixes following error when building for aarch64 with -Os:
@@ -33,7 +33,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 7 insertions(+)
 
 diff --git a/locale/weight.h b/locale/weight.h
-index e071253f85..2889c395f1 100644
+index 723e1fefda..f5798d379a 100644
 --- a/locale/weight.h
 +++ b/locale/weight.h
 @@ -28,7 +28,14 @@ findidx (const int32_t *table,
@@ -51,6 +51,3 @@ index e071253f85..2889c395f1 100644
    const unsigned char *cp;
    const unsigned char *usrc;
  
--- 
-2.27.0
-

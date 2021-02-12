@@ -583,7 +583,7 @@ def _exec_task(fn, task, d, quieterr):
         logger.error("No such task: %s" % task)
         return 1
 
-    logger.debug(1, "Executing task %s", task)
+    logger.debug("Executing task %s", task)
 
     localdata = _task_data(fn, task, d)
     tempdir = localdata.getVar('T')
@@ -596,7 +596,7 @@ def _exec_task(fn, task, d, quieterr):
         curnice = os.nice(0)
         nice = int(nice) - curnice
         newnice = os.nice(nice)
-        logger.debug(1, "Renice to %s " % newnice)
+        logger.debug("Renice to %s " % newnice)
     ionice = localdata.getVar("BB_TASK_IONICE_LEVEL")
     if ionice:
         try:
@@ -720,7 +720,7 @@ def _exec_task(fn, task, d, quieterr):
 
         logfile.close()
         if os.path.exists(logfn) and os.path.getsize(logfn) == 0:
-            logger.debug(2, "Zero size logfn %s, removing", logfn)
+            logger.debug2("Zero size logfn %s, removing", logfn)
             bb.utils.remove(logfn)
             bb.utils.remove(loglink)
     event.fire(TaskSucceeded(task, fn, logfn, localdata), localdata)

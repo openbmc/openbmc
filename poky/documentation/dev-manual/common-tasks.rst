@@ -38,9 +38,8 @@ Follow these general steps to create your layer without using tools:
 
 1. *Check Existing Layers:* Before creating a new layer, you should be
    sure someone has not already created a layer containing the Metadata
-   you need. You can see the `OpenEmbedded Metadata
-   Index <https://layers.openembedded.org/layerindex/layers/>`__ for a
-   list of layers from the OpenEmbedded community that can be used in
+   you need. You can see the :oe_layerindex:`OpenEmbedded Metadata Index <>`
+   for a list of layers from the OpenEmbedded community that can be used in
    the Yocto Project. You could find a layer that is identical or close
    to what you need.
 
@@ -322,7 +321,7 @@ Logo for your layer and application. The process consists of two parts:
    successful compatibility registration.
 
 2. Completion of an application acceptance form, which you can find at
-   https://www.yoctoproject.org/webform/yocto-project-compatible-registration.
+   :yocto_home:`/webform/yocto-project-compatible-registration`.
 
 To be granted permission to use the logo, you need to satisfy the
 following:
@@ -346,7 +345,7 @@ application, you can use the Yocto Project Compatibility Logo with your
 layer and the application that uses your layer.
 
 To access the form, use this link:
-https://www.yoctoproject.org/webform/yocto-project-compatible-registration.
+:yocto_home:`/webform/yocto-project-compatible-registration`.
 Follow the instructions on the form to complete your application.
 
 The application consists of the following sections:
@@ -1194,8 +1193,8 @@ Before writing a recipe from scratch, it is often useful to discover
 whether someone else has already written one that meets (or comes close
 to meeting) your needs. The Yocto Project and OpenEmbedded communities
 maintain many recipes that might be candidates for what you are doing.
-You can find a good central index of these recipes in the `OpenEmbedded
-Layer Index <https://layers.openembedded.org>`__.
+You can find a good central index of these recipes in the
+:oe_layerindex:`OpenEmbedded Layer Index <>`.
 
 Working from an existing recipe or a skeleton recipe is the best way to
 get started. Here are some points on both methods:
@@ -2076,6 +2075,12 @@ recipe:
 
    SYSROOT_DIRS += "/opt"
 
+.. note::
+
+   The `/sysroot-only` is to be used by recipes that generate artifacts
+   that are not included in the target filesystem, allowing them to share
+   these artifacts without needing to use the ``DEPLOY_DIR``.
+
 For a more complete description of the
 :ref:`ref-tasks-populate_sysroot`
 task and its associated functions, see the
@@ -2299,7 +2304,7 @@ directory BitBake uses for the build.
    S = "${WORKDIR}"
 
    do_compile() {
-       ${CC} helloworld.c -o helloworld
+       ${CC} ${LDFLAGS} helloworld.c -o helloworld
    }
 
    do_install() {
@@ -2540,7 +2545,7 @@ Following Recipe Style Guidelines
 ---------------------------------
 
 When writing recipes, it is good to conform to existing style
-guidelines. The :oe_home:`OpenEmbedded Styleguide </wiki/Styleguide>` wiki page
+guidelines. The :oe_wiki:`OpenEmbedded Styleguide </Styleguide>` wiki page
 provides rough guidelines for preferred recipe style.
 
 It is common for existing recipes to deviate a bit from this style.
@@ -6044,7 +6049,7 @@ the Internet:
    Botnet
 
 -  *"*\ `Security Issues for Embedded
-   Devices <http://elinux.org/images/6/6f/Security-issues.pdf>`__\ *"*
+   Devices <https://elinux.org/images/6/6f/Security-issues.pdf>`__\ *"*
    by Jake Edge
 
 When securing your image is of concern, there are steps, tools, and

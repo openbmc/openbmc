@@ -13,7 +13,6 @@ inherit cpan ptest-perl
 
 BBCLASSEXTEND = "native"
 
-RDEPENDS_${PN}_class-native = ""
 RDEPENDS_${PN} += "perl-module-carp perl-module-exporter perl-module-strict perl-module-time-local"
 RDEPENDS_${PN}-ptest += "perl-module-test-more perl-module-utf8"
 

@@ -1,4 +1,4 @@
-From 110a525e5ebed2fca138d72da493c39510311c1f Mon Sep 17 00:00:00 2001
+From 248d17b7221e7ebc9d84154eac11ae4ebb5189ab Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 3 Jul 2018 13:59:09 +0100
 Subject: [PATCH] Make CPU family warnings fatal

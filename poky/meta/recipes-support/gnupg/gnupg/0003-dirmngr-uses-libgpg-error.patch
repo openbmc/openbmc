@@ -1,4 +1,4 @@
-From 9a901dbb1c48685f2db6d7b55916c9484e871f16 Mon Sep 17 00:00:00 2001
+From 6c75656b68cb6e38b039ae532bd39437cd6daec5 Mon Sep 17 00:00:00 2001
 From: Saul Wold <sgw@linux.intel.com>
 Date: Wed, 16 Aug 2017 11:18:01 +0800
 Subject: [PATCH] dirmngr uses libgpg error
@@ -11,20 +11,18 @@ Rebase to 2.1.23
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 ---
- dirmngr/Makefile.am | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ dirmngr/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/dirmngr/Makefile.am b/dirmngr/Makefile.am
-index 208a813..292c036 100644
+index 00d3c42..450d873 100644
 --- a/dirmngr/Makefile.am
 +++ b/dirmngr/Makefile.am
-@@ -90,7 +90,8 @@ endif
- dirmngr_LDADD = $(libcommonpth) \
+@@ -101,6 +101,7 @@ dirmngr_LDADD = $(libcommonpth) \
          $(DNSLIBS) $(LIBASSUAN_LIBS) \
  	$(LIBGCRYPT_LIBS) $(KSBA_LIBS) $(NPTH_LIBS) \
--	$(NTBTLS_LIBS) $(LIBGNUTLS_LIBS) $(LIBINTL) $(LIBICONV) $(NETLIBS)
-+	$(NTBTLS_LIBS) $(LIBGNUTLS_LIBS) $(LIBINTL) $(LIBICONV) $(NETLIBS) \
-+	$(GPG_ERROR_LIBS)
+ 	$(NTBTLS_LIBS) $(LIBGNUTLS_LIBS) $(LIBINTL) $(LIBICONV) $(NETLIBS) \
++	$(GPG_ERROR_LIBS) \
+         $(dirmngr_robj)
  if USE_LDAP
  dirmngr_LDADD += $(ldaplibs)
- endif

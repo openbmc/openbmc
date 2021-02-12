@@ -74,16 +74,16 @@ class Bzr(FetchMethod):
 
         if os.access(os.path.join(ud.pkgdir, os.path.basename(ud.pkgdir), '.bzr'), os.R_OK):
             bzrcmd = self._buildbzrcommand(ud, d, "update")
-            logger.debug(1, "BZR Update %s", ud.url)
+            logger.debug("BZR Update %s", ud.url)
             bb.fetch2.check_network_access(d, bzrcmd, ud.url)
             runfetchcmd(bzrcmd, d, workdir=os.path.join(ud.pkgdir, os.path.basename(ud.path)))
         else:
             bb.utils.remove(os.path.join(ud.pkgdir, os.path.basename(ud.pkgdir)), True)
             bzrcmd = self._buildbzrcommand(ud, d, "fetch")
             bb.fetch2.check_network_access(d, bzrcmd, ud.url)
-            logger.debug(1, "BZR Checkout %s", ud.url)
+            logger.debug("BZR Checkout %s", ud.url)
             bb.utils.mkdirhier(ud.pkgdir)
-            logger.debug(1, "Running %s", bzrcmd)
+            logger.debug("Running %s", bzrcmd)
             runfetchcmd(bzrcmd, d, workdir=ud.pkgdir)
 
         scmdata = ud.parm.get("scmdata", "")
@@ -109,7 +109,7 @@ class Bzr(FetchMethod):
         """
         Return the latest upstream revision number
         """
-        logger.debug(2, "BZR fetcher hitting network for %s", ud.url)
+        logger.debug2("BZR fetcher hitting network for %s", ud.url)
 
         bb.fetch2.check_network_access(d, self._buildbzrcommand(ud, d, "revno"), ud.url)
 

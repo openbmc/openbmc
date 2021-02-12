@@ -1,8 +1,7 @@
-From de7a7c04a92dbc5d35cb37e47c471e12784cc95e Mon Sep 17 00:00:00 2001
+From 297bac9429260f8df495b81d3fae8ae4c6913f5f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:20:09 +0000
-Subject: [PATCH 11/29] Quote from bug 1443 which explains what the patch does
- :
+Subject: [PATCH] Quote from bug 1443 which explains what the patch does :
 
   We build some random program and link it with -lust.  When we run it,
   it dies with a SIGSEGV before reaching main().
@@ -45,7 +44,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/sysdeps/arm/dl-machine.h b/sysdeps/arm/dl-machine.h
-index 90856779b1..a29bb86c56 100644
+index ff5e09e207..d68bfe5cbe 100644
 --- a/sysdeps/arm/dl-machine.h
 +++ b/sysdeps/arm/dl-machine.h
 @@ -510,7 +510,7 @@ elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,
@@ -57,6 +56,3 @@ index 90856779b1..a29bb86c56 100644
  	  break;
  
  	case R_ARM_TLS_TPOFF32:
--- 
-2.27.0
-

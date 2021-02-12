@@ -1,8 +1,8 @@
-From 2b81508b9af76db292cd756432b03035cb8157e0 Mon Sep 17 00:00:00 2001
+From 091870218f192a5698c4420adf938e7178553c07 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:39:01 +0000
-Subject: [PATCH 07/17] don't let the distro compiler point to the wrong
- installation location
+Subject: [PATCH] don't let the distro compiler point to the wrong installation
+ location
 
 Thanks to RP for helping find the source code causing the issue.
 
@@ -17,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
-index 895f701bcd0..97a53f15bb6 100644
+index 788590957e1..1bca4aafeb7 100644
 --- a/libiberty/Makefile.in
 +++ b/libiberty/Makefile.in
 @@ -367,7 +367,8 @@ install-strip: install
@@ -30,6 +30,3 @@ index 895f701bcd0..97a53f15bb6 100644
  install_to_libdir: all
  	if test -n "${target_header_dir}"; then \
  		${mkinstalldirs} $(DESTDIR)$(libdir)/$(MULTIOSDIR); \
--- 
-2.28.0
-

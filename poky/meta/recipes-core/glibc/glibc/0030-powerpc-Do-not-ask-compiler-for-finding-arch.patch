@@ -1,7 +1,7 @@
-From 8b1d521290218df8ceeaf2e6ee44a54b19d8d328 Mon Sep 17 00:00:00 2001
+From 5cc14938f05ae1354c8062f017a21f39d5fc9729 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 7 Aug 2020 14:31:16 -0700
-Subject: [PATCH 30/30] powerpc: Do not ask compiler for finding arch
+Subject: [PATCH] powerpc: Do not ask compiler for finding arch
 
 This does not work well in cross compiling environments like OE
 and moreover it uses its own -mcpu/-march options via cflags
@@ -46,6 +46,3 @@ index 6c63bd8257..3e925f1d48 100644
    # Note if you add patterns here you must ensure that an appropriate
    # directory exists in sysdeps/powerpc.  Likewise, if we find a
    # cpu, don't let the generic configure append extra compiler options.
--- 
-2.28.0
-

@@ -7,14 +7,13 @@ It is simple, straight-forward, and extensible. \
 HOMEPAGE = "http://www.ruby-lang.org/"
 SECTION = "devel/ruby"
 LICENSE = "Ruby | BSD-2-Clause | BSD-3-Clause | GPLv2 | ISC | MIT"
-LIC_FILES_CHKSUM = "\
-    file://COPYING;md5=5b8c87559868796979806100db3f3805 \
-    file://BSDL;md5=19aaf65c88a40b508d17ae4be539c4b5\
-    file://GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263\
-    file://LEGAL;md5=2b6d62dc0d608f34d510ca3f428110ec \
-"
+LIC_FILES_CHKSUM = "file://COPYING;md5=5b8c87559868796979806100db3f3805 \
+                    file://BSDL;md5=8b50bc6de8f586dc66790ba11d064d75 \
+                    file://GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
+                    file://LEGAL;md5=cfe5b0bc9f051b58c7e78db882ca5f9b \
+                    "
 
-DEPENDS = "ruby-native zlib openssl tcl libyaml gdbm readline libffi"
+DEPENDS = "ruby-native zlib openssl libyaml gdbm readline libffi"
 DEPENDS_class-native = "openssl-native libyaml-native readline-native zlib-native"
 
 SHRT_VER = "${@oe.utils.trim_version("${PV}", 2)}"

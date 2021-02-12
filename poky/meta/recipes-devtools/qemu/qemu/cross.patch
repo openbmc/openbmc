@@ -1,0 +1,30 @@
+We need to be able to trigger configure's cross code but we don't want
+to set cross_prefix as it does other things we don't want. Patch things
+so we can do what we need in the target config case.
+
+Upstream-Status: Inappropriate [may be rewritten in a way upstream may accept?]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+
+Index: qemu-5.2.0/configure
+===================================================================
+--- qemu-5.2.0.orig/configure
++++ qemu-5.2.0/configure
+@@ -6973,7 +6973,6 @@ if has $sdl2_config; then
+ fi
+ echo "strip = [$(meson_quote $strip)]" >> $cross
+ echo "windres = [$(meson_quote $windres)]" >> $cross
+-if test -n "$cross_prefix"; then
+     cross_arg="--cross-file config-meson.cross"
+     echo "[host_machine]" >> $cross
+     if test "$mingw32" = "yes" ; then
+@@ -6999,9 +6998,6 @@ if test -n "$cross_prefix"; then
+     else
+         echo "endian = 'little'" >> $cross
+     fi
+-else
+-    cross_arg="--native-file config-meson.cross"
+-fi
+ mv $cross config-meson.cross
+ 
+ rm -rf meson-private meson-info meson-logs

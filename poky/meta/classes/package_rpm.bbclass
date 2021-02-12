@@ -300,13 +300,13 @@ python write_specfile () {
     srccustomtagschunk = get_package_additional_metadata("rpm", localdata)
 
     srcdepends     = d.getVar('DEPENDS')
-    srcrdepends    = []
-    srcrrecommends = []
-    srcrsuggests   = []
-    srcrprovides   = []
-    srcrreplaces   = []
-    srcrconflicts  = []
-    srcrobsoletes  = []
+    srcrdepends    = ""
+    srcrrecommends = ""
+    srcrsuggests   = ""
+    srcrprovides   = ""
+    srcrreplaces   = ""
+    srcrconflicts  = ""
+    srcrobsoletes  = ""
 
     srcrpreinst  = []
     srcrpostinst = []
@@ -365,13 +365,13 @@ python write_specfile () {
         # Map the dependencies into their final form
         mapping_rename_hook(localdata)
 
-        splitrdepends    = localdata.getVar('RDEPENDS')
-        splitrrecommends = localdata.getVar('RRECOMMENDS')
-        splitrsuggests   = localdata.getVar('RSUGGESTS')
-        splitrprovides   = localdata.getVar('RPROVIDES')
-        splitrreplaces   = localdata.getVar('RREPLACES')
-        splitrconflicts  = localdata.getVar('RCONFLICTS')
-        splitrobsoletes  = []
+        splitrdepends    = localdata.getVar('RDEPENDS') or ""
+        splitrrecommends = localdata.getVar('RRECOMMENDS') or ""
+        splitrsuggests   = localdata.getVar('RSUGGESTS') or ""
+        splitrprovides   = localdata.getVar('RPROVIDES') or ""
+        splitrreplaces   = localdata.getVar('RREPLACES') or ""
+        splitrconflicts  = localdata.getVar('RCONFLICTS') or ""
+        splitrobsoletes  = ""
 
         splitrpreinst  = localdata.getVar('pkg_preinst')
         splitrpostinst = localdata.getVar('pkg_postinst')
@@ -439,9 +439,9 @@ python write_specfile () {
             spec_preamble_bottom.append(splitcustomtagschunk)
 
         # Replaces == Obsoletes && Provides
-        robsoletes = bb.utils.explode_dep_versions2(splitrobsoletes or "")
-        rprovides = bb.utils.explode_dep_versions2(splitrprovides or "")
-        rreplaces = bb.utils.explode_dep_versions2(splitrreplaces or "")
+        robsoletes = bb.utils.explode_dep_versions2(splitrobsoletes)
+        rprovides = bb.utils.explode_dep_versions2(splitrprovides)
+        rreplaces = bb.utils.explode_dep_versions2(splitrreplaces)
         for dep in rreplaces:
             if not dep in robsoletes:
                 robsoletes[dep] = rreplaces[dep]
@@ -533,9 +533,9 @@ python write_specfile () {
     tail_source(d)
 
     # Replaces == Obsoletes && Provides
-    robsoletes = bb.utils.explode_dep_versions2(srcrobsoletes or "")
-    rprovides = bb.utils.explode_dep_versions2(srcrprovides or "")
-    rreplaces = bb.utils.explode_dep_versions2(srcrreplaces or "")
+    robsoletes = bb.utils.explode_dep_versions2(srcrobsoletes)
+    rprovides = bb.utils.explode_dep_versions2(srcrprovides)
+    rreplaces = bb.utils.explode_dep_versions2(srcrreplaces)
     for dep in rreplaces:
         if not dep in robsoletes:
             robsoletes[dep] = rreplaces[dep]

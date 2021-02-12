@@ -21,9 +21,12 @@ DUMMYPROVIDES_PACKAGES = "\
     nativesdk-perl-module-io-file \
     nativesdk-perl-module-overloading \
     nativesdk-perl-module-posix \
+    nativesdk-perl-module-strict \
+    nativesdk-perl-module-text-parsewords \
     nativesdk-perl-module-thread-queue \
     nativesdk-perl-module-threads \
     nativesdk-perl-module-warnings \
+    nativesdk-perl-module-vars \
 "
 
 DUMMYPROVIDES = "\

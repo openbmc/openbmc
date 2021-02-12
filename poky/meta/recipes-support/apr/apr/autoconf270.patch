@@ -1,0 +1,22 @@
+With autoconf 2.70 confdefs.h is already included. Including it twice generates
+compiler warnings and since this macros is to error on warnings, it breaks.
+
+Fix by not including the file.
+
+Upstream-Status: Pending
+RP - 2021/1/28
+
+Index: apr-1.7.0/build/apr_common.m4
+===================================================================
+--- apr-1.7.0.orig/build/apr_common.m4
++++ apr-1.7.0/build/apr_common.m4
+@@ -505,8 +505,7 @@ AC_DEFUN([APR_TRY_COMPILE_NO_WARNING],
+  fi
+  AC_COMPILE_IFELSE(
+   [AC_LANG_SOURCE(
+-   [#include "confdefs.h"
+-   ]
++   []
+    [[$1]]
+    [int main(int argc, const char *const *argv) {]
+    [[$2]]

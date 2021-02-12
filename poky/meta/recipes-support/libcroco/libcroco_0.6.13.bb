@@ -18,3 +18,6 @@ inherit gnomebase gtk-doc binconfig-disabled
 
 SRC_URI[archive.md5sum] = "c80c5a8385011a0260dce6bd0da93dce"
 SRC_URI[archive.sha256sum] = "767ec234ae7aa684695b3a735548224888132e063f92db585759b422570621d4"
+
+SRC_URI +="file://CVE-2020-12825.patch \
+"

@@ -1,6 +1,6 @@
-inherit native
-
 require qemu.inc
+
+inherit native
 
 EXTRA_OEMAKE_append = " LD='${LD}' AR='${AR}' OBJCOPY='${OBJCOPY}' LDFLAGS='${LDFLAGS}'"
 

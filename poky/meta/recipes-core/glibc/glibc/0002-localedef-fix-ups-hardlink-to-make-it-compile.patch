@@ -1,7 +1,7 @@
-From ab022ce3c1c01fd6c850f541a33efd0cacabe052 Mon Sep 17 00:00:00 2001
+From 14d256e2db009f8bac9a265e8393d7ed25050df9 Mon Sep 17 00:00:00 2001
 From: Jason Wessel <jason.wessel@windriver.com>
 Date: Sat, 7 Dec 2019 10:01:37 -0800
-Subject: [PATCH 02/29] localedef: fix-ups hardlink to make it compile
+Subject: [PATCH] localedef: fix-ups hardlink to make it compile
 
 Upstream-Status: Pending
 Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
@@ -236,6 +236,3 @@ index 63615896b0..726e6dd948 100644
  				}
  				continue;
  			}
--- 
-2.27.0
-

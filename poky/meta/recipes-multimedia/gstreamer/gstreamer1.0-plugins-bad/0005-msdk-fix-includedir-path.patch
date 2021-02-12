@@ -1,0 +1,31 @@
+From 1f00d5026118ebd48e4ccf83d32d67155c4e7f60 Mon Sep 17 00:00:00 2001
+From: Naveen Saini <naveen.kumar.saini@intel.com>
+Date: Wed, 30 Dec 2020 16:37:47 +0800
+Subject: [PATCH] msdk: fix includedir path
+
+In cross compilation, need to prepend PKG_CONFIG_SYSROOT_DIR to the dir path.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
+---
+ sys/msdk/meson.build | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/sys/msdk/meson.build b/sys/msdk/meson.build
+index 6346c9451..068f38548 100644
+--- a/sys/msdk/meson.build
++++ b/sys/msdk/meson.build
+@@ -40,7 +40,9 @@ endif
+ 
+ mfx_dep = dependency('libmfx', required: false)
+ if mfx_dep.found()
++  pkgconf_sysroot = run_command(python3, '-c', 'import os; print(os.environ.get("PKG_CONFIG_SYSROOT_DIR"))').stdout().strip()
+   mfx_incdir = mfx_dep.get_pkgconfig_variable('includedir')
++  mfx_incdir = pkgconf_sysroot +  mfx_incdir
+   mfx_inc = []
+ else
+   # Old versions of MediaSDK don't provide a pkg-config file
+-- 
+2.17.1
+

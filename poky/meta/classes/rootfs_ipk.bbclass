@@ -14,8 +14,8 @@ do_rootfs[recrdeptask] += "do_package_write_ipk do_package_qa"
 do_rootfs[vardeps] += "PACKAGE_FEED_URIS PACKAGE_FEED_BASE_PATHS PACKAGE_FEED_ARCHS"
 
 do_rootfs[lockfiles] += "${WORKDIR}/ipk.lock"
-do_populate_sdk[lockfiles] += "${WORKDIR}/ipk.lock"
-do_populate_sdk_ext[lockfiles] += "${WORKDIR}/ipk.lock"
+do_populate_sdk[lockfiles] += "${WORKDIR}/sdk-ipk.lock"
+do_populate_sdk_ext[lockfiles] += "${WORKDIR}/sdk-ipk.lock"
 
 OPKG_PREPROCESS_COMMANDS = ""
 

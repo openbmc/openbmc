@@ -116,7 +116,7 @@ class Svn(FetchMethod):
     def download(self, ud, d):
         """Fetch url"""
 
-        logger.debug(2, "Fetch: checking for module directory '" + ud.moddir + "'")
+        logger.debug2("Fetch: checking for module directory '" + ud.moddir + "'")
 
         lf = bb.utils.lockfile(ud.svnlock)
 
@@ -129,7 +129,7 @@ class Svn(FetchMethod):
                     runfetchcmd(ud.basecmd + " upgrade", d, workdir=ud.moddir)
                 except FetchError:
                     pass
-                logger.debug(1, "Running %s", svncmd)
+                logger.debug("Running %s", svncmd)
                 bb.fetch2.check_network_access(d, svncmd, ud.url)
                 runfetchcmd(svncmd, d, workdir=ud.moddir)
             else:
@@ -137,7 +137,7 @@ class Svn(FetchMethod):
                 logger.info("Fetch " + ud.url)
                 # check out sources there
                 bb.utils.mkdirhier(ud.pkgdir)
-                logger.debug(1, "Running %s", svncmd)
+                logger.debug("Running %s", svncmd)
                 bb.fetch2.check_network_access(d, svncmd, ud.url)
                 runfetchcmd(svncmd, d, workdir=ud.pkgdir)
 

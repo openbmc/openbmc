@@ -340,12 +340,12 @@ of the two methods by which you can get these tools:
    traditional installer:
    ::
 
-      $ sh ~/Downloads/x86_64-buildtools-nativesdk-standalone-DISTRO.sh
+      $ sh ~/Downloads/x86_64-buildtools-nativesdk-standalone-&DISTRO;.sh
 
    Here is an example for the extended installer:
    ::
 
-      $ sh ~/Downloads/x86_64-buildtools-extended-nativesdk-standalone-DISTRO.sh
+      $ sh ~/Downloads/x86_64-buildtools-extended-nativesdk-standalone-&DISTRO;.sh
 
    During execution, a prompt appears that allows you to choose the
    installation directory. For example, you could choose the following:

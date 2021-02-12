@@ -29,11 +29,11 @@ Signed-off-by: He Zhe <zhe.he@windriver.com>
  hw/intc/apic.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: qemu-5.1.0/hw/intc/apic.c
+Index: qemu-5.2.0/hw/intc/apic.c
 ===================================================================
---- qemu-5.1.0.orig/hw/intc/apic.c
-+++ qemu-5.1.0/hw/intc/apic.c
-@@ -603,7 +603,7 @@ int apic_accept_pic_intr(DeviceState *de
+--- qemu-5.2.0.orig/hw/intc/apic.c
++++ qemu-5.2.0/hw/intc/apic.c
+@@ -605,7 +605,7 @@ int apic_accept_pic_intr(DeviceState *de
      APICCommonState *s = APIC(dev);
      uint32_t lvt0;
  

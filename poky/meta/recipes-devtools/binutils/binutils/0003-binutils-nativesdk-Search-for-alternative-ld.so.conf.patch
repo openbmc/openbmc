@@ -1,8 +1,8 @@
-From 3bbec749ec9fe681ade6812c48c541a752fcffd5 Mon Sep 17 00:00:00 2001
+From 9701cab0fdf6a0c011978ae140c4c12a962956f6 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 19 Feb 2020 09:51:16 -0800
-Subject: [PATCH 03/17] binutils-nativesdk: Search for alternative ld.so.conf
- in SDK installation
+Subject: [PATCH] binutils-nativesdk: Search for alternative ld.so.conf in SDK
+ installation
 
 We need binutils to look at our ld.so.conf file within the SDK to ensure
 we search the SDK's libdirs as well as those from the host system.
@@ -29,7 +29,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  5 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/ld/Makefile.am b/ld/Makefile.am
-index 02c4fc16395..a5762227f0a 100644
+index 2c9a487335c..3b01357b651 100644
 --- a/ld/Makefile.am
 +++ b/ld/Makefile.am
 @@ -42,7 +42,8 @@ ZLIBINC = @zlibinc@
@@ -43,10 +43,10 @@ index 02c4fc16395..a5762227f0a 100644
  NO_WERROR = @NO_WERROR@
  AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS)
 diff --git a/ld/Makefile.in b/ld/Makefile.in
-index 2fe12e14f63..8f0c83ac8d2 100644
+index b41941c89e2..a6382bf2a45 100644
 --- a/ld/Makefile.in
 +++ b/ld/Makefile.in
-@@ -548,7 +548,8 @@ ZLIB = @zlibdir@ -lz
+@@ -554,7 +554,8 @@ ZLIB = @zlibdir@ -lz
  ZLIBINC = @zlibinc@
  ELF_CLFAGS = -DELF_LIST_OPTIONS=@elf_list_options@ \
  	   -DELF_SHLIB_LIST_OPTIONS=@elf_shlib_list_options@ \
@@ -57,7 +57,7 @@ index 2fe12e14f63..8f0c83ac8d2 100644
  AM_CFLAGS = $(WARN_CFLAGS) $(ELF_CLFAGS)
  
 diff --git a/ld/ldelf.c b/ld/ldelf.c
-index bada3ade2d7..b4784009d7a 100644
+index f7407ab55a7..b25781cc0c4 100644
 --- a/ld/ldelf.c
 +++ b/ld/ldelf.c
 @@ -911,7 +911,7 @@ ldelf_check_ld_so_conf (const struct bfd_link_needed_list *l, int force,
@@ -70,7 +70,7 @@ index bada3ade2d7..b4784009d7a 100644
        if (!ldelf_parse_ld_so_conf (&info, tmppath))
  	{
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index 08be9030cb5..f5c5a336320 100644
+index 863df0293ea..080b1c4c6c2 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
 @@ -70,6 +70,7 @@ char *program_name;
@@ -82,7 +82,7 @@ index 08be9030cb5..f5c5a336320 100644
  /* The canonical representation of ld_sysroot.  */
  char *ld_canon_sysroot;
 diff --git a/ld/ldmain.h b/ld/ldmain.h
-index ac7db5720d5..1cbe1771912 100644
+index 38e63922d31..0966914938c 100644
 --- a/ld/ldmain.h
 +++ b/ld/ldmain.h
 @@ -23,6 +23,7 @@
@@ -93,6 +93,3 @@ index ac7db5720d5..1cbe1771912 100644
  extern char *ld_canon_sysroot;
  extern int ld_canon_sysroot_len;
  extern FILE *saved_script_handle;
--- 
-2.28.0
-

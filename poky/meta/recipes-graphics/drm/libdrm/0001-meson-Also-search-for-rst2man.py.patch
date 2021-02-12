@@ -1,0 +1,30 @@
+From 4129a8c6911b6b0ef3665cb167da6b635c29614d Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@cn.fujitsu.com>
+Date: Mon, 8 Feb 2021 17:30:52 +0900
+Subject: [PATCH] meson: Also search for rst2man.py
+
+That's what upstream docutils installs by default.
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/mesa/drm/-/commit/62b9a3eee9bdaafa766e92d5bebeb4e59845c45a]
+
+Signed-off-by: Heiko Becker's avatarHeiko Becker <heirecka@exherbo.org>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index a4d8d70..07d2e08 100644
+--- a/meson.build
++++ b/meson.build
+@@ -261,7 +261,7 @@ else
+ endif
+ 
+ with_man_pages = get_option('man-pages')
+-prog_rst2man = find_program('rst2man', required: with_man_pages == 'true')
++prog_rst2man = find_program('rst2man', 'rst2man.py', required: with_man_pages == 'true')
+ with_man_pages = with_man_pages != 'false' and prog_rst2man.found()
+ 
+ config.set10('HAVE_VISIBILITY',
+-- 
+2.25.1
+

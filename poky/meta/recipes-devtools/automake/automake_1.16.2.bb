@@ -17,7 +17,6 @@ RDEPENDS_${PN} += "\
     perl-module-vars "
 
 RDEPENDS_${PN}_class-native = "autoconf-native hostperl-runtime-native"
-RDEPENDS_${PN}_class-nativesdk = "nativesdk-autoconf"
 
 SRC_URI += "file://python-libdir.patch \
             file://buildtest.patch \

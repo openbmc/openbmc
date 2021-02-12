@@ -292,11 +292,11 @@ example:
    the string "environment-setup" and contains the machine architecture,
    which is followed by the string "poky-linux". For this example, the
    command sources a script from the default SDK installation directory
-   that uses the 32-bit Intel x86 Architecture and the DISTRO_NAME Yocto
+   that uses the 32-bit Intel x86 Architecture and the &DISTRO_NAME; Yocto
    Project release:
    ::
 
-      $ source /opt/poky/DISTRO/environment-setup-i586-poky-linux
+      $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
 
 3. *Create the Makefile:* For this example, the Makefile contains
    two lines that can be used to set the ``CC`` variable. One line is

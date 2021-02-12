@@ -1,8 +1,7 @@
-From 59640ddf11104a604ccf7c078a48359d711c2f9c Mon Sep 17 00:00:00 2001
+From 8ad249270414a23a3e65c74fd67a8e4adaebec78 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:27:17 +0000
-Subject: [PATCH 06/17] Only generate an RPATH entry if LD_RUN_PATH is not
- empty
+Subject: [PATCH] Only generate an RPATH entry if LD_RUN_PATH is not empty
 
 for cases where -rpath isn't specified. debian (#151024)
 
@@ -15,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/ld/ldelf.c b/ld/ldelf.c
-index b4784009d7a..541772f4604 100644
+index b25781cc0c4..77d7fb8ff03 100644
 --- a/ld/ldelf.c
 +++ b/ld/ldelf.c
-@@ -1247,6 +1247,8 @@ ldelf_after_open (int use_libpath, int native, int is_linux, int is_freebsd,
+@@ -1248,6 +1248,8 @@ ldelf_after_open (int use_libpath, int native, int is_linux, int is_freebsd,
  		  && command_line.rpath == NULL)
  		{
  		  path = (const char *) getenv ("LD_RUN_PATH");
@@ -27,7 +26,7 @@ index b4784009d7a..541772f4604 100644
  		  if (path
  		      && ldelf_search_needed (path, &n, force,
  					      is_linux, elfsize))
-@@ -1605,6 +1607,8 @@ ldelf_before_allocation (char *audit, char *depaudit,
+@@ -1608,6 +1610,8 @@ ldelf_before_allocation (char *audit, char *depaudit,
    rpath = command_line.rpath;
    if (rpath == NULL)
      rpath = (const char *) getenv ("LD_RUN_PATH");
@@ -36,6 +35,3 @@ index b4784009d7a..541772f4604 100644
  
    for (abfd = link_info.input_bfds; abfd; abfd = abfd->link.next)
      if (bfd_get_flavour (abfd) == bfd_target_elf_flavour)
--- 
-2.28.0
-

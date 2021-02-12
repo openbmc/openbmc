@@ -95,7 +95,7 @@ def include_single_file(parentfn, fn, lineno, data, error_out):
         if exc.errno == errno.ENOENT:
             if error_out:
                 raise ParseError("Could not %s file %s" % (error_out, fn), parentfn, lineno)
-            logger.debug(2, "CONF file '%s' not found", fn)
+            logger.debug2("CONF file '%s' not found", fn)
         else:
             if error_out:
                 raise ParseError("Could not %s file %s: %s" % (error_out, fn, exc.strerror), parentfn, lineno)

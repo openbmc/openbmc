@@ -1,0 +1,34 @@
+From a4bdc0416134477e4eae386db04b1de7491163bb Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 14 Jan 2021 06:33:04 +0000
+Subject: [PATCH] tests/meson.build: use relative path to refer to files
+
+Fix error like:
+Fatal error: can't create tests/ptimer-test.p/..._qemu-5.2.0_hw_core_ptimer.c.o: File name too long
+
+when build path is too long, use meson.source_root() will make this
+filename too long. Fixed by using relative path to refer to files
+
+Upstream-Status: Submitted [send to qemu-devel]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ tests/meson.build   | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletion(-)
+
+diff --git a/tests/meson.build b/tests/meson.build
+index afeb6be..54684b5 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -113,7 +113,7 @@ tests = {
+   'test-keyval': [testqapi],
+   'test-logging': [],
+   'test-uuid': [],
+-  'ptimer-test': ['ptimer-test-stubs.c', meson.source_root() / 'hw/core/ptimer.c'],
++  'ptimer-test': ['ptimer-test-stubs.c', '../hw/core/ptimer.c'],
+   'test-qapi-util': [],
+ }
+ 
+-- 
+2.29.2
+

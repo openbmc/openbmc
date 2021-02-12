@@ -1,0 +1,26 @@
+From ca105727dc4862733c3aad09e9de819be63a7b6b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 27 Dec 2020 23:18:10 +0100
+Subject: [PATCH] cm_cxx_features.cmake: do not try to run the test binary
+
+This causes errors when cross compiling cmake.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Source/Checks/cm_cxx_features.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/Checks/cm_cxx_features.cmake b/Source/Checks/cm_cxx_features.cmake
+index 663d89a..e8dca3b 100644
+--- a/Source/Checks/cm_cxx_features.cmake
++++ b/Source/Checks/cm_cxx_features.cmake
+@@ -81,7 +81,7 @@ if(CMake_HAVE_CXX_MAKE_UNIQUE)
+ endif()
+ cm_check_cxx_feature(unique_ptr)
+ if (NOT CMAKE_CXX_STANDARD LESS "17")
+-  cm_check_cxx_feature(filesystem TRY_RUN)
++  cm_check_cxx_feature(filesystem)
+ else()
+   set(CMake_HAVE_CXX_FILESYSTEM FALSE)
+ endif()

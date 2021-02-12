@@ -1,8 +1,7 @@
-From de4322ef6d4dc9fc3ee9b69af1c10edbc64a66a3 Mon Sep 17 00:00:00 2001
+From 32a4b8ae046fe4bb1b19f61378d079d44deaede7 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:48:24 +0000
-Subject: [PATCH 03/29] nativesdk-glibc: Look for host system ld.so.cache as
- well
+Subject: [PATCH] nativesdk-glibc: Look for host system ld.so.cache as well
 
 Upstream-Status: Inappropriate [embedded specific]
 
@@ -31,10 +30,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index e39980fb19..565b039b23 100644
+index 9e2089cfaa..ad01674027 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -2160,6 +2160,14 @@ _dl_map_object (struct link_map *loader, const char *name,
+@@ -2175,6 +2175,14 @@ _dl_map_object (struct link_map *loader, const char *name,
              }
          }
  
@@ -42,14 +41,14 @@ index e39980fb19..565b039b23 100644
 +      if (fd == -1
 +	  && ((l = loader ?: GL(dl_ns)[nsid]._ns_loaded) == NULL
 +	   || __builtin_expect (!(l->l_flags_1 & DF_1_NODEFLIB), 1))
-+	 && rtld_search_dirs.dirs != (void *) -1)
-+	fd = open_path (name, namelen, mode & __RTLD_SECURE, &rtld_search_dirs,
++	 && __rtld_search_dirs.dirs != (void *) -1)
++	fd = open_path (name, namelen, mode & __RTLD_SECURE, &__rtld_search_dirs,
 +			&realname, &fb, l, LA_SER_DEFAULT, &found_other_class);
 +      /* Finally try ld.so.cache */
  #ifdef USE_LDCONFIG
        if (fd == -1
  	  && (__glibc_likely ((mode & __RTLD_SECURE) == 0)
-@@ -2218,14 +2226,6 @@ _dl_map_object (struct link_map *loader, const char *name,
+@@ -2233,14 +2241,6 @@ _dl_map_object (struct link_map *loader, const char *name,
  	}
  #endif
  
@@ -57,13 +56,10 @@ index e39980fb19..565b039b23 100644
 -      if (fd == -1
 -	  && ((l = loader ?: GL(dl_ns)[nsid]._ns_loaded) == NULL
 -	      || __glibc_likely (!(l->l_flags_1 & DF_1_NODEFLIB)))
--	  && rtld_search_dirs.dirs != (void *) -1)
--	fd = open_path (name, namelen, mode, &rtld_search_dirs,
+-	  && __rtld_search_dirs.dirs != (void *) -1)
+-	fd = open_path (name, namelen, mode, &__rtld_search_dirs,
 -			&realname, &fb, l, LA_SER_DEFAULT, &found_other_class);
 -
        /* Add another newline when we are tracing the library loading.  */
        if (__glibc_unlikely (GLRO(dl_debug_mask) & DL_DEBUG_LIBS))
  	_dl_debug_printf ("\n");
--- 
-2.27.0
-

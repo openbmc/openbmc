@@ -1,0 +1,21 @@
+OE assumes that mingw files are in a unix like file layout. The
+'flattening' done by configure in qemu for mingw32 breaks things
+for us. We are discussing with upstream but for now, hack this to
+disable it and use the unix like layout everywhere.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/qemu-devel/2021-01/msg01073.html]
+
+Index: qemu-5.2.0/configure
+===================================================================
+--- qemu-5.2.0.orig/configure
++++ qemu-5.2.0/configure
+@@ -1541,7 +1541,7 @@ libdir="${libdir:-$prefix/lib}"
+ libexecdir="${libexecdir:-$prefix/libexec}"
+ includedir="${includedir:-$prefix/include}"
+ 
+-if test "$mingw32" = "yes" ; then
++if test "$mingw32" = "dontwantthis" ; then
+     mandir="$prefix"
+     datadir="$prefix"
+     docdir="$prefix"

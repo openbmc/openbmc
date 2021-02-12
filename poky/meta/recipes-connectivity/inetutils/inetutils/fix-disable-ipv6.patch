@@ -1,17 +1,22 @@
-Upstream: http://www.mail-archive.com/bug-inetutils@gnu.org/msg02103.html
+From c7c27ba763c613f83c1561e56448b49315c271c5 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Wed, 6 Mar 2019 09:36:11 -0500
+Subject: [PATCH] Upstream:
+ http://www.mail-archive.com/bug-inetutils@gnu.org/msg02103.html
 
 Upstream-Status: Pending
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+
 ---
  ping/ping_common.h | 20 ++++++++++++++++++++
  1 file changed, 20 insertions(+)
 
 diff --git a/ping/ping_common.h b/ping/ping_common.h
-index 1dfd1b5..3bfbd12 100644
+index 65e3e60..3e84db0 100644
 --- a/ping/ping_common.h
 +++ b/ping/ping_common.h
-@@ -17,10 +17,14 @@
+@@ -18,10 +18,14 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see `http://www.gnu.org/licenses/'. */
  
@@ -26,7 +31,7 @@ index 1dfd1b5..3bfbd12 100644
  #include <icmp.h>
  #include <error.h>
  #include <progname.h>
-@@ -62,7 +66,12 @@ struct ping_stat
+@@ -63,7 +67,12 @@ struct ping_stat
     want to follow the traditional behaviour of ping.  */
  #define DEFAULT_PING_COUNT 0
  
@@ -39,9 +44,9 @@ index 1dfd1b5..3bfbd12 100644
  #define PING_TIMING(s)  ((s) >= sizeof (struct timeval))
  #define PING_DATALEN    (64 - PING_HEADER_LEN)  /* default data length */
  
-@@ -74,13 +83,20 @@ struct ping_stat
-   (t).tv_usec = ((i)%PING_PRECISION)*(1000000/PING_PRECISION) ;\
- } while (0)
+@@ -78,13 +87,20 @@ struct ping_stat
+ 
+ #define PING_MIN_USER_INTERVAL (200000/PING_PRECISION)
  
 +#ifdef HAVE_IPV6
  /* FIXME: Adjust IPv6 case for options and their consumption.  */
@@ -60,7 +65,7 @@ index 1dfd1b5..3bfbd12 100644
  
  typedef int (*ping_efp) (int code,
  			 void *closure,
-@@ -89,13 +105,17 @@ typedef int (*ping_efp) (int code,
+@@ -93,13 +109,17 @@ typedef int (*ping_efp) (int code,
  			 struct ip * ip, icmphdr_t * icmp, int datalen);
  
  union event {
@@ -78,6 +83,3 @@ index 1dfd1b5..3bfbd12 100644
  };
  
  typedef struct ping_data PING;
--- 
-2.8.3
-

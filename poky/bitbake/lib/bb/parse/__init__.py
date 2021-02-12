@@ -71,7 +71,7 @@ def update_mtime(f):
 
 def update_cache(f):
     if f in __mtime_cache:
-        logger.debug(1, "Updating mtime cache for %s" % f)
+        logger.debug("Updating mtime cache for %s" % f)
         update_mtime(f)
 
 def clear_cache():

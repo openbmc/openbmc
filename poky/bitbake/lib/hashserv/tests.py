@@ -6,6 +6,7 @@
 #
 
 from . import create_server, create_client
+from .client import HashConnectionError
 import hashlib
 import logging
 import multiprocessing
@@ -29,7 +30,7 @@ class HashEquivalenceTestSetup(object):
 
     server_index = 0
 
-    def start_server(self, dbpath=None, upstream=None):
+    def start_server(self, dbpath=None, upstream=None, read_only=False):
         self.server_index += 1
         if dbpath is None:
             dbpath = os.path.join(self.temp_dir.name, "db%d.sqlite" % self.server_index)
@@ -38,7 +39,10 @@ class HashEquivalenceTestSetup(object):
             thread.terminate()
             thread.join()
 
-        server = create_server(self.get_server_addr(self.server_index), dbpath, upstream=upstream)
+        server = create_server(self.get_server_addr(self.server_index),
+                               dbpath,
+                               upstream=upstream,
+                               read_only=read_only)
         server.dbpath = dbpath
 
         server.thread = multiprocessing.Process(target=_run_server, args=(server, self.server_index))
@@ -241,6 +245,43 @@ class HashEquivalenceCommonTests(object):
         self.assertClientGetHash(down_client, taskhash4, unihash4)
         self.assertClientGetHash(side_client, taskhash4, unihash4)
         self.assertClientGetHash(self.client, taskhash4, None)
+
+        # Test that reporting a unihash in the downstream is able to find a
+        # match which was previously reported to the upstream server
+        taskhash5 = '35788efcb8dfb0a02659d81cf2bfd695fb30faf9'
+        outhash5 = '2765d4a5884be49b28601445c2760c5f21e7e5c0ee2b7e3fce98fd7e5970796f'
+        unihash5 = 'f46d3fbb439bd9b921095da657a4de906510d2cd'
+        result = self.client.report_unihash(taskhash5, self.METHOD, outhash5, unihash5)
+
+        taskhash6 = '35788efcb8dfb0a02659d81cf2bfd695fb30fafa'
+        unihash6 = 'f46d3fbb439bd9b921095da657a4de906510d2ce'
+        result = down_client.report_unihash(taskhash6, self.METHOD, outhash5, unihash6)
+        self.assertEqual(result['unihash'], unihash5, 'Server failed to copy unihash from upstream')
+
+    def test_ro_server(self):
+        (ro_client, ro_server) = self.start_server(dbpath=self.server.dbpath, read_only=True)
+
+        # Report a hash via the read-write server
+        taskhash = '35788efcb8dfb0a02659d81cf2bfd695fb30faf9'
+        outhash = '2765d4a5884be49b28601445c2760c5f21e7e5c0ee2b7e3fce98fd7e5970796f'
+        unihash = 'f46d3fbb439bd9b921095da657a4de906510d2cd'
+
+        result = self.client.report_unihash(taskhash, self.METHOD, outhash, unihash)
+        self.assertEqual(result['unihash'], unihash, 'Server returned bad unihash')
+
+        # Check the hash via the read-only server
+        self.assertClientGetHash(ro_client, taskhash, unihash)
+
+        # Ensure that reporting via the read-only server fails
+        taskhash2 = 'c665584ee6817aa99edfc77a44dd853828279370'
+        outhash2 = '3c979c3db45c569f51ab7626a4651074be3a9d11a84b1db076f5b14f7d39db44'
+        unihash2 = '90e9bc1d1f094c51824adca7f8ea79a048d68824'
+
+        with self.assertRaises(HashConnectionError):
+            ro_client.report_unihash(taskhash2, self.METHOD, outhash2, unihash2)
+
+        # Ensure that the database was not modified
+        self.assertClientGetHash(self.client, taskhash2, None)
 
 
 class TestHashEquivalenceUnixServer(HashEquivalenceTestSetup, HashEquivalenceCommonTests, unittest.TestCase):

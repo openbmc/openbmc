@@ -8,7 +8,7 @@ SRC_URI = "file://helloworld.c"
 S = "${WORKDIR}"
 
 do_compile() {
-	${CC} helloworld.c -o helloworld
+	${CC} ${LDFLAGS} helloworld.c -o helloworld
 }
 
 do_install() {

@@ -11,18 +11,16 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 Refactored for 1.33
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
-
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
- configure.ac        |  1 +
- src/gpg-error.m4    | 71 +++--------------------------------------------------
- 4 files changed, 18 insertions(+), 69 deletions(-)
- create mode 100644 src/gpg-error.pc.in
+ src/gpg-error.m4 | 142 +----------------------------------------------
+ 1 file changed, 3 insertions(+), 139 deletions(-)
 
-Index: libgpg-error-1.33/src/gpg-error.m4
-===================================================================
---- libgpg-error-1.33.orig/src/gpg-error.m4
-+++ libgpg-error-1.33/src/gpg-error.m4
-@@ -26,139 +26,13 @@ dnl is added to the gpg_config_script_wa
+diff --git a/src/gpg-error.m4 b/src/gpg-error.m4
+index c9b235f..176bd6a 100644
+--- a/src/gpg-error.m4
++++ b/src/gpg-error.m4
+@@ -26,139 +26,12 @@ dnl is added to the gpg_config_script_warn variable.
  dnl
  AC_DEFUN([AM_PATH_GPG_ERROR],
  [ AC_REQUIRE([AC_CANONICAL_HOST])
@@ -31,12 +29,10 @@ Index: libgpg-error-1.33/src/gpg-error.m4
 -  dnl since that is consistent with how our three siblings use the directory/
 -  dnl package name in --with-$dir_name-prefix=PFX.
 -  AC_ARG_WITH(libgpg-error-prefix,
--              AC_HELP_STRING([--with-libgpg-error-prefix=PFX],
+-              AS_HELP_STRING([--with-libgpg-error-prefix=PFX],
 -                             [prefix where GPG Error is installed (optional)]),
 -              [gpg_error_config_prefix="$withval"])
-+  min_gpg_error_version=ifelse([$1], ,0.0,$1)
-+  PKG_CHECK_MODULES(GPG_ERROR, [gpg-error >= $min_gpg_error_version], [ok=yes], [ok=no])
- 
+-
 -  dnl Accept --with-gpg-error-prefix and make it work the same as
 -  dnl --with-libgpg-error-prefix above, for backwards compatibility,
 -  dnl but do not document this old, inconsistently-named option.
@@ -143,6 +139,8 @@ Index: libgpg-error-1.33/src/gpg-error.m4
 -    fi
 -  fi
 -  AC_MSG_CHECKING(for GPG Error - version >= $min_gpg_error_version)
++  min_gpg_error_version=ifelse([$1], ,0.0,$1)
++  PKG_CHECK_MODULES(GPG_ERROR, [gpg-error >= $min_gpg_error_version], [ok=yes], [ok=no])
    if test $ok = yes; then
 -    GPG_ERROR_CFLAGS=`$GPG_ERROR_CONFIG --cflags`
 -    GPG_ERROR_LIBS=`$GPG_ERROR_CONFIG --libs`
@@ -165,7 +163,7 @@ Index: libgpg-error-1.33/src/gpg-error.m4
      fi
      if test x"$gpg_error_config_host" != xnone ; then
        if test x"$gpg_error_config_host" != x"$host" ; then
-@@ -174,15 +48,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
+@@ -174,15 +47,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
        fi
      fi
    else
@@ -181,3 +179,6 @@ Index: libgpg-error-1.33/src/gpg-error.m4
 -  AC_SUBST(GPG_ERROR_MT_CFLAGS)
 -  AC_SUBST(GPG_ERROR_MT_LIBS)
  ])
+-- 
+2.25.1
+

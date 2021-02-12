@@ -90,13 +90,13 @@ universal, the list includes them just in case:
          -  Provide a directory path and specifically name the Build
             Directory. Any intermediate folders in the pathname must exist.
             This next example creates a Build Directory named
-            ``YP-POKYVERSION`` in your home directory within the existing
+            ``YP-&POKYVERSION;`` in your home directory within the existing
             directory ``mybuilds``:
 
             .. code-block:: shell
 
                $ cd $HOME
-               $ source $HOME/poky/oe-init-build-env $HOME/mybuilds/YP-POKYVERSION
+               $ source $HOME/poky/oe-init-build-env $HOME/mybuilds/YP-&POKYVERSION;
 
       .. note::
 
@@ -349,7 +349,8 @@ universal, the list includes them just in case:
      Source Directory is derived from the Yocto Project release tarball.
      For example, downloading and unpacking
      :yocto_dl:`/releases/yocto/&DISTRO_REL_TAG;/&YOCTO_POKY;.tar.bz2`
-     results in a Source Directory whose root folder is named ``poky``.
+     results in a Source Directory whose root folder is named
+     ``&YOCTO_POKY;``.
 
      It is important to understand the differences between the Source
      Directory created by unpacking a released tarball as compared to

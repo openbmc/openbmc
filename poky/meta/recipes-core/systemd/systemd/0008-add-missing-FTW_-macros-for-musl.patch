@@ -1,7 +1,7 @@
-From 7c440cfc53aa52c9dc91c3a8c105bcf314c53af6 Mon Sep 17 00:00:00 2001
+From 8caea3fe87d55fd16de7d1b8266239fa954cb498 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:00:06 +0800
-Subject: [PATCH] add missing FTW_ macros for musl
+Subject: [PATCH 08/26] add missing FTW_ macros for musl
 
 This is to avoid build failures like below for musl.
 
@@ -10,13 +10,12 @@ This is to avoid build failures like below for musl.
 Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
-
 ---
  src/basic/missing_type.h | 20 ++++++++++++++++++++
  1 file changed, 20 insertions(+)
 
 diff --git a/src/basic/missing_type.h b/src/basic/missing_type.h
-index c487e65e7bde..23602ebbd533 100644
+index aeaf6ad5ec..3df1084ef2 100644
 --- a/src/basic/missing_type.h
 +++ b/src/basic/missing_type.h
 @@ -19,3 +19,23 @@ typedef int (*comparison_fn_t)(const void *, const void *);
@@ -43,3 +42,6 @@ index c487e65e7bde..23602ebbd533 100644
 +#ifndef FTW_SKIP_SIBLINGS
 +#define FTW_SKIP_SIBLINGS 3
 +#endif
+-- 
+2.27.0
+

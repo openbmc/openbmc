@@ -99,7 +99,7 @@ class AsyncClient(object):
             l = await get_line()
 
             m = json.loads(l)
-            if "chunk-stream" in m:
+            if m and "chunk-stream" in m:
                 lines = []
                 while True:
                     l = (await get_line()).rstrip("\n")
@@ -168,6 +168,12 @@ class AsyncClient(object):
         await self._set_mode(self.MODE_NORMAL)
         return await self.send_message(
             {"get": {"taskhash": taskhash, "method": method, "all": all_properties}}
+        )
+
+    async def get_outhash(self, method, outhash, taskhash):
+        await self._set_mode(self.MODE_NORMAL)
+        return await self.send_message(
+            {"get-outhash": {"outhash": outhash, "taskhash": taskhash, "method": method}}
         )
 
     async def get_stats(self):

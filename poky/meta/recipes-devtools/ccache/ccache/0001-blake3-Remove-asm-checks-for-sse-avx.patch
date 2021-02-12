@@ -1,0 +1,35 @@
+From 0448eddcf2863ebf911e7dd445bca1c7eee2a239 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 5 Jan 2021 13:55:34 -0800
+Subject: [PATCH] blake3: Remove asm checks for sse/avx
+
+This ends up passing on clang/linux wrongly when building for aarch64
+the check in else part is good to detect the feature support and this
+check can be removed, it was setting
+
+HAVE_ASM_AVX* and HAVE_ASM_SSE* macros which are not used in the build
+anyway
+
+Upstream-Status: Submitted [https://github.com/ccache/ccache/pull/768]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/third_party/blake3/CMakeLists.txt | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/third_party/blake3/CMakeLists.txt b/src/third_party/blake3/CMakeLists.txt
+index cc24253c..856b5721 100644
+--- a/src/third_party/blake3/CMakeLists.txt
++++ b/src/third_party/blake3/CMakeLists.txt
+@@ -25,8 +25,6 @@ function(add_source_if_enabled feature compile_flags intrinsic)
+       AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+     message(STATUS "Detected unsupported compiler for ${have_feature} - disabled")
+     set(${have_feature} FALSE)
+-  elseif(${blake_source_type} STREQUAL "asm")
+-    check_asm_compiler_flag(${compile_flags} ${have_feature})
+   else()
+     set(CMAKE_REQUIRED_FLAGS ${compile_flags})
+     check_c_source_compiles(
+-- 
+2.30.0
+

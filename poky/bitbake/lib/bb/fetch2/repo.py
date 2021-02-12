@@ -47,7 +47,7 @@ class Repo(FetchMethod):
         """Fetch url"""
 
         if os.access(os.path.join(d.getVar("DL_DIR"), ud.localfile), os.R_OK):
-            logger.debug(1, "%s already exists (or was stashed). Skipping repo init / sync.", ud.localpath)
+            logger.debug("%s already exists (or was stashed). Skipping repo init / sync.", ud.localpath)
             return
 
         repodir = d.getVar("REPODIR") or (d.getVar("DL_DIR") + "/repo")

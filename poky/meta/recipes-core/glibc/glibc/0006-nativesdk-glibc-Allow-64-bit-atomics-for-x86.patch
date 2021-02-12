@@ -1,7 +1,7 @@
-From bd0486cab67c3441210aed48caab67418610a765 Mon Sep 17 00:00:00 2001
+From 19e3e45eb1838ee80af13c3d27fcff446773211e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 14:35:35 -0800
-Subject: [PATCH 06/29] nativesdk-glibc: Allow 64 bit atomics for x86
+Subject: [PATCH] nativesdk-glibc: Allow 64 bit atomics for x86
 
 The fix consist of allowing 64bit atomic ops for x86.
 This should be safe for i586 and newer CPUs.
@@ -17,11 +17,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/sysdeps/x86/atomic-machine.h b/sysdeps/x86/atomic-machine.h
-index bb49648374..aa08d3c0a7 100644
+index 695222e4fa..9d39bfdbd5 100644
 --- a/sysdeps/x86/atomic-machine.h
 +++ b/sysdeps/x86/atomic-machine.h
-@@ -58,15 +58,14 @@ typedef uintmax_t uatomic_max_t;
- #endif
+@@ -52,15 +52,14 @@ typedef uintmax_t uatomic_max_t;
+ #define LOCK_PREFIX "lock;"
  
  #define USE_ATOMIC_COMPILER_BUILTINS	1
 +# define __HAVE_64B_ATOMICS		1
@@ -37,6 +37,3 @@ index bb49648374..aa08d3c0a7 100644
  # define SP_REG				"esp"
  # define SEG_REG			"gs"
  # define BR_CONSTRAINT			"r"
--- 
-2.27.0
-

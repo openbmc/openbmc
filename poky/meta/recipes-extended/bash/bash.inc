@@ -6,13 +6,20 @@ DEPENDS = "ncurses bison-native virtual/libiconv"
 
 inherit autotools gettext texinfo update-alternatives ptest
 
-EXTRA_AUTORECONF += "--exclude=autoheader --exclude=aclocal"
+EXTRA_AUTORECONF += "--exclude=autoheader"
 EXTRA_OECONF = "--enable-job-control --without-bash-malloc bash_cv_wexitstatus_offset=8"
 
 # If NON_INTERACTIVE_LOGIN_SHELLS is defined, all login shells read the
 # startup files, even if they are not interactive.
 # This is what other major distros do. And this is what we wanted. See bug#5359 and bug#7137.
 CFLAGS += "-DNON_INTERACTIVE_LOGIN_SHELLS"
+
+# This can vary depending upon the host
+CFLAGS += "-DHEREDOC_PIPESIZE=65536"
+
+# Disable bracketed paste mode by default (enabled by default in bash 5.1). It
+# causes a lot of garbage in non-interactive shells
+CFLAGS += "-DBRACKETED_PASTE_DEFAULT=0"
 
 ALTERNATIVE_${PN} = "bash sh"
 ALTERNATIVE_LINK_NAME[bash] = "${base_bindir}/bash"
@@ -37,6 +44,12 @@ RDEPENDS_${PN}-ptest_append_libc-glibc = " \
 	"
 
 CACHED_CONFIGUREVARS += "headersdir=${includedir}/${PN}"
+
+do_configure_prepend () {
+    if [ ! -e ${S}/acinclude.m4 ]; then
+       cat ${S}/aclocal.m4 > ${S}/acinclude.m4
+    fi
+}
 
 do_compile_prepend() {
     # Remove any leftover .build files. This ensures that bash always has the

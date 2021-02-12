@@ -24,12 +24,12 @@ type of layer source called a "layer index."
 A layer index is a web application that contains information about a set
 of custom layers. A good example of an existing layer index is the
 OpenEmbedded Layer Index. A public instance of this layer index exists
-at http://layers.openembedded.org. You can find the code for this
+at :oe_layerindex:`/`. You can find the code for this
 layer index's web application at :yocto_git:`/layerindex-web/`.
 
 When you tie a layer source into Toaster, it can query the layer source
 through a
-`REST <http://en.wikipedia.org/wiki/Representational_state_transfer>`__
+`REST <https://en.wikipedia.org/wiki/Representational_state_transfer>`__
 API, store the information about the layers in the Toaster database, and
 then show the information to users. Users are then able to view that
 information and build layers from Toaster itself without worrying about
@@ -81,7 +81,7 @@ describes two methods by which you can configure and use your layer
 index.
 
 In the previous section, the code for the OpenEmbedded Metadata Index
-(i.e. http://layers.openembedded.org) was referenced. You can use
+(i.e. :oe_layerindex:`/`) was referenced. You can use
 this code, which is at :yocto_git:`/layerindex-web/`, as a base to create
 your own layer index.
 
@@ -370,7 +370,7 @@ Remote Toaster Monitoring
 Toaster has an API that allows remote management applications to
 directly query the state of the Toaster server and its builds in a
 machine-to-machine manner. This API uses the
-`REST <http://en.wikipedia.org/wiki/Representational_state_transfer>`__
+`REST <https://en.wikipedia.org/wiki/Representational_state_transfer>`__
 interface and the transfer of JSON files. For example, you might monitor
 a build inside a container through well supported known HTTP ports in
 order to easily access a Toaster server inside the container. In this

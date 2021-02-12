@@ -1,7 +1,7 @@
-From 413075afbdb16e7cc05511682ca9e3c880acb5a7 Mon Sep 17 00:00:00 2001
+From a1d0ca24d3bbdf4cb37537cd84d04a17bf0f813b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Jan 2016 06:31:09 +0000
-Subject: [PATCH 08/17] warn for uses of system directories when cross linking
+Subject: [PATCH] warn for uses of system directories when cross linking
 
 2008-07-02  Joseph Myers  <joseph@codesourcery.com>
 
@@ -57,13 +57,13 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  ld/ld.h         |  8 ++++++++
  ld/ld.texi      | 12 ++++++++++++
  ld/ldfile.c     | 17 +++++++++++++++++
- ld/ldlex.h      |  5 +++++
+ ld/ldlex.h      |  2 ++
  ld/ldmain.c     |  2 ++
- ld/lexsup.c     | 27 +++++++++++++++++++++++++++
- 9 files changed, 100 insertions(+)
+ ld/lexsup.c     | 15 +++++++++++++++
+ 9 files changed, 85 insertions(+)
 
 diff --git a/ld/config.in b/ld/config.in
-index f1712107367..308e0173c16 100644
+index 7b60d778587..37b8e9b6f6c 100644
 --- a/ld/config.in
 +++ b/ld/config.in
 @@ -40,6 +40,9 @@
@@ -77,10 +77,10 @@ index f1712107367..308e0173c16 100644
  #undef EXTRA_SHLIB_EXTENSION
  
 diff --git a/ld/configure b/ld/configure
-index f08ce9969ea..1c872c0db5f 100755
+index d399d08d0c4..8355c433c76 100755
 --- a/ld/configure
 +++ b/ld/configure
-@@ -826,6 +826,7 @@ with_lib_path
+@@ -828,6 +828,7 @@ with_lib_path
  enable_targets
  enable_64_bit_bfd
  with_sysroot
@@ -88,7 +88,7 @@ index f08ce9969ea..1c872c0db5f 100755
  enable_gold
  enable_got
  enable_compressed_debug_sections
-@@ -1493,6 +1494,8 @@ Optional Features:
+@@ -1496,6 +1497,8 @@ Optional Features:
    --disable-largefile     omit support for large files
    --enable-targets        alternative target configurations
    --enable-64-bit-bfd     64-bit support (on hosts with narrower word sizes)
@@ -97,7 +97,7 @@ index f08ce9969ea..1c872c0db5f 100755
    --enable-gold[=ARG]     build gold [ARG={default,yes,no}]
    --enable-got=<type>     GOT handling scheme (target, single, negative,
                            multigot)
-@@ -15793,6 +15796,19 @@ fi
+@@ -15820,6 +15823,19 @@ fi
  
  
  
@@ -118,7 +118,7 @@ index f08ce9969ea..1c872c0db5f 100755
  if test "${enable_gold+set}" = set; then :
    enableval=$enable_gold; case "${enableval}" in
 diff --git a/ld/configure.ac b/ld/configure.ac
-index 5a4938afdb0..dbbbde74b04 100644
+index c9c69ab9245..59dab0a6ac4 100644
 --- a/ld/configure.ac
 +++ b/ld/configure.ac
 @@ -94,6 +94,16 @@ AC_SUBST(use_sysroot)
@@ -139,7 +139,7 @@ index 5a4938afdb0..dbbbde74b04 100644
  dnl "install_as_default" is set to false if gold is the default linker.
  dnl "installed_linker" is the installed BFD linker name.
 diff --git a/ld/ld.h b/ld/ld.h
-index 1790dc81a66..73f832eb169 100644
+index 93f5af92c7d..ff7f71a7b66 100644
 --- a/ld/ld.h
 +++ b/ld/ld.h
 @@ -166,6 +166,14 @@ typedef struct
@@ -158,10 +158,10 @@ index 1790dc81a66..73f832eb169 100644
    enum endian_enum endian;
  
 diff --git a/ld/ld.texi b/ld/ld.texi
-index 2a93e9456ac..3eeb70607fd 100644
+index 7a602b9c6ab..cccbfbab3bb 100644
 --- a/ld/ld.texi
 +++ b/ld/ld.texi
-@@ -2655,6 +2655,18 @@ string identifying the original linked file does not change.
+@@ -2810,6 +2810,18 @@ string identifying the original linked file does not change.
  
  Passing @code{none} for @var{style} disables the setting from any
  @code{--build-id} options earlier on the command line.
@@ -181,7 +181,7 @@ index 2a93e9456ac..3eeb70607fd 100644
  
  @c man end
 diff --git a/ld/ldfile.c b/ld/ldfile.c
-index e39170b5d94..fadc248a140 100644
+index 81cb86d51e2..cd5c2752679 100644
 --- a/ld/ldfile.c
 +++ b/ld/ldfile.c
 @@ -117,6 +117,23 @@ ldfile_add_library_path (const char *name, bfd_boolean cmdline)
@@ -209,26 +209,23 @@ index e39170b5d94..fadc248a140 100644
  
  /* Try to open a BFD for a lang_input_statement.  */
 diff --git a/ld/ldlex.h b/ld/ldlex.h
-index 5ea083ebeb3..941dc5f3dc8 100644
+index b0101028321..77f5accb5d9 100644
 --- a/ld/ldlex.h
 +++ b/ld/ldlex.h
-@@ -155,6 +155,11 @@ enum option_values
-   OPTION_NON_CONTIGUOUS_REGIONS,
-   OPTION_NON_CONTIGUOUS_REGIONS_WARNINGS,
-   OPTION_DEPENDENCY_FILE,
-+  OPTION_CTF_VARIABLES,
-+  OPTION_NO_CTF_VARIABLES,
-+  OPTION_CTF_SHARE_TYPES,
+@@ -161,6 +161,8 @@ enum option_values
+   OPTION_CTF_VARIABLES,
+   OPTION_NO_CTF_VARIABLES,
+   OPTION_CTF_SHARE_TYPES,
 +  OPTION_NO_POISON_SYSTEM_DIRECTORIES,
 +  OPTION_ERROR_POISON_SYSTEM_DIRECTORIES,
  };
  
  /* The initial parser states.  */
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index f5c5a336320..516ba0360e2 100644
+index 080b1c4c6c2..78d8a2df278 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
-@@ -322,6 +322,8 @@ main (int argc, char **argv)
+@@ -324,6 +324,8 @@ main (int argc, char **argv)
    command_line.warn_mismatch = TRUE;
    command_line.warn_search_mismatch = TRUE;
    command_line.check_section_addresses = -1;
@@ -238,25 +235,13 @@ index f5c5a336320..516ba0360e2 100644
    /* We initialize DEMANGLING based on the environment variable
       COLLECT_NO_DEMANGLE.  The gcc collect2 program will demangle the
 diff --git a/ld/lexsup.c b/ld/lexsup.c
-index 58c6c078325..879e7bb7658 100644
+index f005a58a045..c83292a9427 100644
 --- a/ld/lexsup.c
 +++ b/ld/lexsup.c
-@@ -572,6 +572,26 @@ static const struct ld_option ld_options[] =
-   { {"no-print-map-discarded", no_argument, NULL, OPTION_NO_PRINT_MAP_DISCARDED},
-     '\0', NULL, N_("Do not show discarded sections in map file output"),
+@@ -591,6 +591,14 @@ static const struct ld_option ld_options[] =
+ 		   "                                <method> is: share-unconflicted (default),\n"
+ 		   "                                             share-duplicated"),
      TWO_DASHES },
-+  { {"ctf-variables", no_argument, NULL, OPTION_CTF_VARIABLES},
-+    '\0', NULL, N_("Emit names and types of static variables in CTF"),
-+    TWO_DASHES },
-+  { {"no-ctf-variables", no_argument, NULL, OPTION_NO_CTF_VARIABLES},
-+    '\0', NULL, N_("Do not emit names and types of static variables in CTF"),
-+    TWO_DASHES },
-+  { {"ctf-share-types=<method>", required_argument, NULL,
-+     OPTION_CTF_SHARE_TYPES},
-+    '\0', NULL, N_("How to share CTF types between translation units.\n"
-+		   "                                <method> is: share-unconflicted (default),\n"
-+		   "                                             share-duplicated"),
-+    TWO_DASHES },
 +  { {"no-poison-system-directories", no_argument, NULL,
 +     OPTION_NO_POISON_SYSTEM_DIRECTORIES},
 +    '\0', NULL, N_("Do not warn for -L options using system directories"),
@@ -268,7 +253,7 @@ index 58c6c078325..879e7bb7658 100644
  };
  
  #define OPTION_COUNT ARRAY_SIZE (ld_options)
-@@ -1632,6 +1652,13 @@ parse_args (unsigned argc, char **argv)
+@@ -1674,6 +1682,13 @@ parse_args (unsigned argc, char **argv)
  
  	case OPTION_PRINT_MAP_DISCARDED:
  	  config.print_map_discarded = TRUE;
@@ -282,6 +267,3 @@ index 58c6c078325..879e7bb7658 100644
  	  break;
  
  	case OPTION_DEPENDENCY_FILE:
--- 
-2.28.0
-

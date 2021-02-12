@@ -1,7 +1,7 @@
-From a0b23b160d6cfa7be4437c6e623633d76395f2ad Mon Sep 17 00:00:00 2001
+From 3b278a56a0e98d50ec62735598ee5f4b1834e8b3 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:58:54 +0000
-Subject: [PATCH 01/16] binutils-crosssdk: Generate relocatable SDKs
+Subject: [PATCH] binutils-crosssdk: Generate relocatable SDKs
 
 This patch will modify the ELF linker scripts so that the crosssdk
 linker will generate binaries with a 4096 bytes PT_INTERP section. When the binaries
@@ -21,10 +21,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/gold/layout.cc b/gold/layout.cc
-index 13e533aaf21..b0afff16e2e 100644
+index a27cb071c75..32b52890b39 100644
 --- a/gold/layout.cc
 +++ b/gold/layout.cc
-@@ -5019,7 +5019,7 @@ Layout::create_interp(const Target* target)
+@@ -5032,7 +5032,7 @@ Layout::create_interp(const Target* target)
        gold_assert(interp != NULL);
      }
  
@@ -34,7 +34,7 @@ index 13e533aaf21..b0afff16e2e 100644
    Output_section_data* odata = new Output_data_const(interp, len, 1);
  
 diff --git a/ld/genscripts.sh b/ld/genscripts.sh
-index 03392d265c7..435689ea144 100755
+index 088417ef2d5..46a2db7005c 100755
 --- a/ld/genscripts.sh
 +++ b/ld/genscripts.sh
 @@ -304,6 +304,7 @@ DATA_ALIGNMENT_u="${DATA_ALIGNMENT_u-${DATA_ALIGNMENT_r}}"
@@ -59,10 +59,10 @@ index 03392d265c7..435689ea144 100755
  DATA_ALIGNMENT=${DATA_ALIGNMENT_}
  RELOCATING=" "
 diff --git a/ld/scripttempl/elf.sc b/ld/scripttempl/elf.sc
-index eb74743e5c3..c9a8a47615f 100644
+index 29a8f0781d5..75e46f4adaf 100644
 --- a/ld/scripttempl/elf.sc
 +++ b/ld/scripttempl/elf.sc
-@@ -143,8 +143,8 @@ if test -z "$DATA_SEGMENT_ALIGN"; then
+@@ -147,8 +147,8 @@ if test -z "$DATA_SEGMENT_ALIGN"; then
      DATA_SEGMENT_RELRO_END=". = DATA_SEGMENT_RELRO_END (${SEPARATE_GOTPLT-0}, .);"
    fi
  fi
@@ -73,6 +73,3 @@ index eb74743e5c3..c9a8a47615f 100644
  fi
  if test -z "$PLT"; then
    IPLT=".iplt         ${RELOCATING-0} : { *(.iplt) }"
--- 
-2.28.0
-

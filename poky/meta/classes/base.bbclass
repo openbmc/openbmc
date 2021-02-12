@@ -596,62 +596,62 @@ python () {
 
     needsrcrev = False
     srcuri = d.getVar('SRC_URI')
-    for uri in srcuri.split():
-        (scheme, _ , path) = bb.fetch.decodeurl(uri)[:3]
+    for uri_string in srcuri.split():
+        uri = bb.fetch.URI(uri_string)
 
         # HTTP/FTP use the wget fetcher
-        if scheme in ("http", "https", "ftp"):
+        if uri.scheme in ("http", "https", "ftp"):
             d.appendVarFlag('do_fetch', 'depends', ' wget-native:do_populate_sysroot')
 
         # Svn packages should DEPEND on subversion-native
-        if scheme == "svn":
+        if uri.scheme == "svn":
             needsrcrev = True
             d.appendVarFlag('do_fetch', 'depends', ' subversion-native:do_populate_sysroot')
 
         # Git packages should DEPEND on git-native
-        elif scheme in ("git", "gitsm"):
+        elif uri.scheme in ("git", "gitsm"):
             needsrcrev = True
             d.appendVarFlag('do_fetch', 'depends', ' git-native:do_populate_sysroot')
 
         # Mercurial packages should DEPEND on mercurial-native
-        elif scheme == "hg":
+        elif uri.scheme == "hg":
             needsrcrev = True
             d.appendVar("EXTRANATIVEPATH", ' python3-native ')
             d.appendVarFlag('do_fetch', 'depends', ' mercurial-native:do_populate_sysroot')
 
         # Perforce packages support SRCREV = "${AUTOREV}"
-        elif scheme == "p4":
+        elif uri.scheme == "p4":
             needsrcrev = True
 
         # OSC packages should DEPEND on osc-native
-        elif scheme == "osc":
+        elif uri.scheme == "osc":
             d.appendVarFlag('do_fetch', 'depends', ' osc-native:do_populate_sysroot')
 
-        elif scheme == "npm":
+        elif uri.scheme == "npm":
             d.appendVarFlag('do_fetch', 'depends', ' nodejs-native:do_populate_sysroot')
 
         # *.lz4 should DEPEND on lz4-native for unpacking
-        if path.endswith('.lz4'):
+        if uri.path.endswith('.lz4'):
             d.appendVarFlag('do_unpack', 'depends', ' lz4-native:do_populate_sysroot')
 
         # *.lz should DEPEND on lzip-native for unpacking
-        elif path.endswith('.lz'):
+        elif uri.path.endswith('.lz'):
             d.appendVarFlag('do_unpack', 'depends', ' lzip-native:do_populate_sysroot')
 
         # *.xz should DEPEND on xz-native for unpacking
-        elif path.endswith('.xz') or path.endswith('.txz'):
+        elif uri.path.endswith('.xz') or uri.path.endswith('.txz'):
             d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
 
         # .zip should DEPEND on unzip-native for unpacking
-        elif path.endswith('.zip') or path.endswith('.jar'):
+        elif uri.path.endswith('.zip') or uri.path.endswith('.jar'):
             d.appendVarFlag('do_unpack', 'depends', ' unzip-native:do_populate_sysroot')
 
         # Some rpm files may be compressed internally using xz (for example, rpms from Fedora)
-        elif path.endswith('.rpm'):
+        elif uri.path.endswith('.rpm'):
             d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
 
         # *.deb should DEPEND on xz-native for unpacking
-        elif path.endswith('.deb'):
+        elif uri.path.endswith('.deb'):
             d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
 
     if needsrcrev:

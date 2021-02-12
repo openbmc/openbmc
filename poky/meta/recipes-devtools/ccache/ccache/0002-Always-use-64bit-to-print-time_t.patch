@@ -1,0 +1,33 @@
+From fa360ca8a457dafcae1d22df2b342d3ee291e8af Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 31 Dec 2020 14:28:39 -0800
+Subject: [PATCH 2/2] Always use 64bit to print time_t
+
+some 32bit architectures e.g. RISCV32 use 64bit time_t from beginning
+which does not fit into long int size on LP32 systems
+
+Upstream-Status: Submitted [https://github.com/ccache/ccache/pull/762]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/Logging.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/Logging.cpp b/src/Logging.cpp
+index 9a5d99b7..1a6e6264 100644
+--- a/src/Logging.cpp
++++ b/src/Logging.cpp
+@@ -88,7 +88,10 @@ do_log(string_view message, bool bulk)
+     if (tm) {
+       strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%S", &*tm);
+     } else {
+-      snprintf(timestamp, sizeof(timestamp), "%lu", tv.tv_sec);
++      snprintf(timestamp,
++               sizeof(timestamp),
++               "%llu",
++               (long long unsigned int)tv.tv_sec);
+     }
+     snprintf(prefix,
+              sizeof(prefix),
+-- 
+2.30.0
+

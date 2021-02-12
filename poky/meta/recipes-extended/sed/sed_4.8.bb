@@ -63,3 +63,5 @@ do_install_ptest() {
 }
 
 RPROVIDES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sed', '', d)}"
+
+BBCLASSEXTEND = "nativesdk"

@@ -190,7 +190,7 @@ Removed Recipes
 
 The following recipes have been removed:
 
--  ``x-load``: This recipe has been superseded by U-boot SPL for all
+-  ``x-load``: This recipe has been superseded by U-Boot SPL for all
    Cortex-based TI SoCs. For legacy boards, the ``meta-ti`` layer, which
    contains a maintained recipe, should be used instead.
 

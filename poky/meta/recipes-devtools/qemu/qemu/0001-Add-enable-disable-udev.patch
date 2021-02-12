@@ -12,11 +12,11 @@ Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
  configure | 4 ++++
  1 file changed, 4 insertions(+)
 
-Index: qemu-5.1.0/configure
+Index: qemu-5.2.0/configure
 ===================================================================
---- qemu-5.1.0.orig/configure
-+++ qemu-5.1.0/configure
-@@ -1640,6 +1640,10 @@ for opt do
+--- qemu-5.2.0.orig/configure
++++ qemu-5.2.0/configure
+@@ -1525,6 +1525,10 @@ for opt do
    ;;
    --disable-libdaxctl) libdaxctl=no
    ;;

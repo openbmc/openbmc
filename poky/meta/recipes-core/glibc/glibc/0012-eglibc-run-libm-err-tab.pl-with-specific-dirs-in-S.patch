@@ -1,7 +1,7 @@
-From c8807899367e64d803585e7dd4b56a1085d5893b Mon Sep 17 00:00:00 2001
+From f389babf3c920e68b7d7391556a78ebf62a21ebe Mon Sep 17 00:00:00 2001
 From: Ting Liu <b28495@freescale.com>
 Date: Wed, 19 Dec 2012 04:39:57 -0600
-Subject: [PATCH 12/29] eglibc: run libm-err-tab.pl with specific dirs in ${S}
+Subject: [PATCH] eglibc: run libm-err-tab.pl with specific dirs in ${S}
 
 libm-err-tab.pl will parse all the files named "libm-test-ulps"
 in the given dir recursively. To avoid parsing the one in
@@ -18,7 +18,7 @@ Signed-off-by: Ting Liu <b28495@freescale.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/manual/Makefile b/manual/Makefile
-index c61e11dcd7..5d859e6f84 100644
+index e83444341e..aa2645bc55 100644
 --- a/manual/Makefile
 +++ b/manual/Makefile
 @@ -103,7 +103,8 @@ $(objpfx)stamp-libm-err: $(..)math/gen-libm-test.py \
@@ -31,6 +31,3 @@ index c61e11dcd7..5d859e6f84 100644
  	$(move-if-change) $(objpfx)libm-err-tmp $(objpfx)libm-err.texi
  	touch $@
  
--- 
-2.27.0
-

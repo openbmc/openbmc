@@ -18,11 +18,11 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  hw/mips/malta.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: qemu-5.1.0/hw/mips/malta.c
+Index: qemu-5.2.0/hw/mips/malta.c
 ===================================================================
---- qemu-5.1.0.orig/hw/mips/malta.c
-+++ qemu-5.1.0/hw/mips/malta.c
-@@ -59,7 +59,7 @@
+--- qemu-5.2.0.orig/hw/mips/malta.c
++++ qemu-5.2.0/hw/mips/malta.c
+@@ -62,7 +62,7 @@
  
  #define ENVP_ADDR           0x80002000l
  #define ENVP_NB_ENTRIES     16

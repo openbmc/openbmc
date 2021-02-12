@@ -52,7 +52,7 @@ against the Yocto Project, see the following:
 
 -  The Yocto Project :yocto_wiki:`Bugzilla wiki page </Bugzilla_Configuration_and_Bug_Tracking>`
 
-For information on Bugzilla in general, see http://www.bugzilla.org/about/.
+For information on Bugzilla in general, see https://www.bugzilla.org/about/.
 
 .. _resources-mailinglist:
 
@@ -118,8 +118,7 @@ Here is a list of resources you might find helpful:
    distribution from which the Yocto Project derives its build system
    (Poky) and to which it contributes.
 
--  :oe_home:`BitBake </wiki/BitBake>`\ *:* The tool
-   used to process metadata.
+-  :oe_wiki:`BitBake </BitBake>`\ *:* The tool used to process metadata.
 
 -  :doc:`BitBake User Manual <bitbake:index>`\ *:* A comprehensive
    guide to the BitBake tool. If you want information on BitBake, see
@@ -194,5 +193,5 @@ Here is a list of resources you might find helpful:
    available for Yocto Project and Poky discussions: ``#yocto`` and
    ``#poky``, respectively.
 
--  `Quick EMUlator (QEMU) <http://wiki.qemu.org/Index.html>`__\ *:* An
+-  `Quick EMUlator (QEMU) <https://wiki.qemu.org/Index.html>`__\ *:* An
    open-source machine emulator and virtualizer.

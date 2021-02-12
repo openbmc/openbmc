@@ -112,6 +112,9 @@ class Stats(object):
 class ClientError(Exception):
     pass
 
+class ServerError(Exception):
+    pass
+
 def insert_task(cursor, data, ignore=False):
     keys = sorted(data.keys())
     query = '''INSERT%s INTO tasks_v2 (%s) VALUES (%s)''' % (
@@ -127,6 +130,18 @@ async def copy_from_upstream(client, db, method, taskhash):
         d = {k: v for k, v in d.items() if k in TABLE_COLUMNS}
         keys = sorted(d.keys())
 
+        with closing(db.cursor()) as cursor:
+            insert_task(cursor, d)
+            db.commit()
+
+    return d
+
+async def copy_outhash_from_upstream(client, db, method, outhash, taskhash):
+    d = await client.get_outhash(method, outhash, taskhash)
+    if d is not None:
+        # Filter out unknown columns
+        d = {k: v for k, v in d.items() if k in TABLE_COLUMNS}
+        keys = sorted(d.keys())
 
         with closing(db.cursor()) as cursor:
             insert_task(cursor, d)
@@ -137,8 +152,22 @@ async def copy_from_upstream(client, db, method, taskhash):
 class ServerClient(object):
     FAST_QUERY = 'SELECT taskhash, method, unihash FROM tasks_v2 WHERE method=:method AND taskhash=:taskhash ORDER BY created ASC LIMIT 1'
     ALL_QUERY =  'SELECT *                         FROM tasks_v2 WHERE method=:method AND taskhash=:taskhash ORDER BY created ASC LIMIT 1'
+    OUTHASH_QUERY = '''
+        -- Find tasks with a matching outhash (that is, tasks that
+        -- are equivalent)
+        SELECT * FROM tasks_v2 WHERE method=:method AND outhash=:outhash
 
-    def __init__(self, reader, writer, db, request_stats, backfill_queue, upstream):
+        -- If there is an exact match on the taskhash, return it.
+        -- Otherwise return the oldest matching outhash of any
+        -- taskhash
+        ORDER BY CASE WHEN taskhash=:taskhash THEN 1 ELSE 2 END,
+            created ASC
+
+        -- Only return one row
+        LIMIT 1
+        '''
+
+    def __init__(self, reader, writer, db, request_stats, backfill_queue, upstream, read_only):
         self.reader = reader
         self.writer = writer
         self.db = db
@@ -149,14 +178,19 @@ class ServerClient(object):
 
         self.handlers = {
             'get': self.handle_get,
-            'report': self.handle_report,
-            'report-equiv': self.handle_equivreport,
+            'get-outhash': self.handle_get_outhash,
             'get-stream': self.handle_get_stream,
             'get-stats': self.handle_get_stats,
-            'reset-stats': self.handle_reset_stats,
             'chunk-stream': self.handle_chunk,
-            'backfill-wait': self.handle_backfill_wait,
         }
+
+        if not read_only:
+            self.handlers.update({
+                'report': self.handle_report,
+                'report-equiv': self.handle_equivreport,
+                'reset-stats': self.handle_reset_stats,
+                'backfill-wait': self.handle_backfill_wait,
+            })
 
     async def process_requests(self):
         if self.upstream is not None:
@@ -282,6 +316,21 @@ class ServerClient(object):
 
         self.write_message(d)
 
+    async def handle_get_outhash(self, request):
+        with closing(self.db.cursor()) as cursor:
+            cursor.execute(self.OUTHASH_QUERY,
+                           {k: request[k] for k in ('method', 'outhash', 'taskhash')})
+
+            row = cursor.fetchone()
+
+        if row is not None:
+            logger.debug('Found equivalent outhash %s -> %s', (row['outhash'], row['unihash']))
+            d = {k: row[k] for k in row.keys()}
+        else:
+            d = None
+
+        self.write_message(d)
+
     async def handle_get_stream(self, request):
         self.write_message('ok')
 
@@ -335,22 +384,18 @@ class ServerClient(object):
 
     async def handle_report(self, data):
         with closing(self.db.cursor()) as cursor:
-            cursor.execute('''
-                -- Find tasks with a matching outhash (that is, tasks that
-                -- are equivalent)
-                SELECT taskhash, method, unihash FROM tasks_v2 WHERE method=:method AND outhash=:outhash
-
-                -- If there is an exact match on the taskhash, return it.
-                -- Otherwise return the oldest matching outhash of any
-                -- taskhash
-                ORDER BY CASE WHEN taskhash=:taskhash THEN 1 ELSE 2 END,
-                    created ASC
-
-                -- Only return one row
-                LIMIT 1
-                ''', {k: data[k] for k in ('method', 'outhash', 'taskhash')})
+            cursor.execute(self.OUTHASH_QUERY,
+                           {k: data[k] for k in ('method', 'outhash', 'taskhash')})
 
             row = cursor.fetchone()
+
+            if row is None and self.upstream_client:
+                # Try upstream
+                row = await copy_outhash_from_upstream(self.upstream_client,
+                                                       self.db,
+                                                       data['method'],
+                                                       data['outhash'],
+                                                       data['taskhash'])
 
             # If no matching outhash was found, or one *was* found but it
             # wasn't an exact match on the taskhash, a new entry for this
@@ -455,7 +500,10 @@ class ServerClient(object):
 
 
 class Server(object):
-    def __init__(self, db, loop=None, upstream=None):
+    def __init__(self, db, loop=None, upstream=None, read_only=False):
+        if upstream and read_only:
+            raise ServerError("Read-only hashserv cannot pull from an upstream server")
+
         self.request_stats = Stats()
         self.db = db
 
@@ -467,6 +515,7 @@ class Server(object):
             self.close_loop = False
 
         self.upstream = upstream
+        self.read_only = read_only
 
         self._cleanup_socket = None
 
@@ -510,7 +559,7 @@ class Server(object):
     async def handle_client(self, reader, writer):
         # writer.transport.set_write_buffer_limits(0)
         try:
-            client = ServerClient(reader, writer, self.db, self.request_stats, self.backfill_queue, self.upstream)
+            client = ServerClient(reader, writer, self.db, self.request_stats, self.backfill_queue, self.upstream, self.read_only)
             await client.process_requests()
         except Exception as e:
             import traceback

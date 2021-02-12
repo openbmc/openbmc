@@ -290,7 +290,7 @@ class URI(object):
 
     def _param_str_split(self, string, elmdelim, kvdelim="="):
         ret = collections.OrderedDict()
-        for k, v in [x.split(kvdelim, 1) for x in string.split(elmdelim)]:
+        for k, v in [x.split(kvdelim, 1) for x in string.split(elmdelim) if x]:
             ret[k] = v
         return ret
 
@@ -428,7 +428,7 @@ def uri_replace(ud, uri_find, uri_replace, replacements, d, mirrortarball=None):
     uri_decoded = list(decodeurl(ud.url))
     uri_find_decoded = list(decodeurl(uri_find))
     uri_replace_decoded = list(decodeurl(uri_replace))
-    logger.debug(2, "For url %s comparing %s to %s" % (uri_decoded, uri_find_decoded, uri_replace_decoded))
+    logger.debug2("For url %s comparing %s to %s" % (uri_decoded, uri_find_decoded, uri_replace_decoded))
     result_decoded = ['', '', '', '', '', {}]
     for loc, i in enumerate(uri_find_decoded):
         result_decoded[loc] = uri_decoded[loc]
@@ -474,7 +474,7 @@ def uri_replace(ud, uri_find, uri_replace, replacements, d, mirrortarball=None):
     result = encodeurl(result_decoded)
     if result == ud.url:
         return None
-    logger.debug(2, "For url %s returning %s" % (ud.url, result))
+    logger.debug2("For url %s returning %s" % (ud.url, result))
     return result
 
 methods = []
@@ -499,9 +499,9 @@ def fetcher_init(d):
     # When to drop SCM head revisions controlled by user policy
     srcrev_policy = d.getVar('BB_SRCREV_POLICY') or "clear"
     if srcrev_policy == "cache":
-        logger.debug(1, "Keeping SRCREV cache due to cache policy of: %s", srcrev_policy)
+        logger.debug("Keeping SRCREV cache due to cache policy of: %s", srcrev_policy)
     elif srcrev_policy == "clear":
-        logger.debug(1, "Clearing SRCREV cache due to cache policy of: %s", srcrev_policy)
+        logger.debug("Clearing SRCREV cache due to cache policy of: %s", srcrev_policy)
         revs.clear()
     else:
         raise FetchError("Invalid SRCREV cache policy of: %s" % srcrev_policy)
@@ -857,9 +857,9 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None):
     cmd = 'export PSEUDO_DISABLED=1; ' + cmd
 
     if workdir:
-        logger.debug(1, "Running '%s' in %s" % (cmd, workdir))
+        logger.debug("Running '%s' in %s" % (cmd, workdir))
     else:
-        logger.debug(1, "Running %s", cmd)
+        logger.debug("Running %s", cmd)
 
     success = False
     error_message = ""
@@ -900,7 +900,7 @@ def check_network_access(d, info, url):
     elif not trusted_network(d, url):
         raise UntrustedUrl(url, info)
     else:
-        logger.debug(1, "Fetcher accessed the network with the command %s" % info)
+        logger.debug("Fetcher accessed the network with the command %s" % info)
 
 def build_mirroruris(origud, mirrors, ld):
     uris = []
@@ -926,7 +926,7 @@ def build_mirroruris(origud, mirrors, ld):
                     continue
 
                 if not trusted_network(ld, newuri):
-                    logger.debug(1, "Mirror %s not in the list of trusted networks, skipping" %  (newuri))
+                    logger.debug("Mirror %s not in the list of trusted networks, skipping" %  (newuri))
                     continue
 
                 # Create a local copy of the mirrors minus the current line
@@ -939,8 +939,8 @@ def build_mirroruris(origud, mirrors, ld):
                     newud = FetchData(newuri, ld)
                     newud.setup_localpath(ld)
                 except bb.fetch2.BBFetchException as e:
-                    logger.debug(1, "Mirror fetch failure for url %s (original url: %s)" % (newuri, origud.url))
-                    logger.debug(1, str(e))
+                    logger.debug("Mirror fetch failure for url %s (original url: %s)" % (newuri, origud.url))
+                    logger.debug(str(e))
                     try:
                         # setup_localpath of file:// urls may fail, we should still see
                         # if mirrors of the url exist
@@ -1043,8 +1043,8 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
         elif isinstance(e, NoChecksumError):
             raise
         else:
-            logger.debug(1, "Mirror fetch failure for url %s (original url: %s)" % (ud.url, origud.url))
-            logger.debug(1, str(e))
+            logger.debug("Mirror fetch failure for url %s (original url: %s)" % (ud.url, origud.url))
+            logger.debug(str(e))
         try:
             ud.method.clean(ud, ld)
         except UnboundLocalError:
@@ -1688,7 +1688,7 @@ class Fetch(object):
                 if m.verify_donestamp(ud, self.d) and not m.need_update(ud, self.d):
                     done = True
                 elif m.try_premirror(ud, self.d):
-                    logger.debug(1, "Trying PREMIRRORS")
+                    logger.debug("Trying PREMIRRORS")
                     mirrors = mirror_from_string(self.d.getVar('PREMIRRORS'))
                     done = m.try_mirrors(self, ud, self.d, mirrors)
                     if done:
@@ -1698,7 +1698,7 @@ class Fetch(object):
                             m.update_donestamp(ud, self.d)
                         except ChecksumError as e:
                             logger.warning("Checksum failure encountered with premirror download of %s - will attempt other sources." % u)
-                            logger.debug(1, str(e))
+                            logger.debug(str(e))
                             done = False
 
                 if premirroronly:
@@ -1710,7 +1710,7 @@ class Fetch(object):
                     try:
                         if not trusted_network(self.d, ud.url):
                             raise UntrustedUrl(ud.url)
-                        logger.debug(1, "Trying Upstream")
+                        logger.debug("Trying Upstream")
                         m.download(ud, self.d)
                         if hasattr(m, "build_mirror_data"):
                             m.build_mirror_data(ud, self.d)
@@ -1725,19 +1725,19 @@ class Fetch(object):
                     except BBFetchException as e:
                         if isinstance(e, ChecksumError):
                             logger.warning("Checksum failure encountered with download of %s - will attempt other sources if available" % u)
-                            logger.debug(1, str(e))
+                            logger.debug(str(e))
                             if os.path.exists(ud.localpath):
                                 rename_bad_checksum(ud, e.checksum)
                         elif isinstance(e, NoChecksumError):
                             raise
                         else:
                             logger.warning('Failed to fetch URL %s, attempting MIRRORS if available' % u)
-                            logger.debug(1, str(e))
+                            logger.debug(str(e))
                         firsterr = e
                         # Remove any incomplete fetch
                         if not verified_stamp:
                             m.clean(ud, self.d)
-                        logger.debug(1, "Trying MIRRORS")
+                        logger.debug("Trying MIRRORS")
                         mirrors = mirror_from_string(self.d.getVar('MIRRORS'))
                         done = m.try_mirrors(self, ud, self.d, mirrors)
 
@@ -1774,7 +1774,7 @@ class Fetch(object):
             ud = self.ud[u]
             ud.setup_localpath(self.d)
             m = ud.method
-            logger.debug(1, "Testing URL %s", u)
+            logger.debug("Testing URL %s", u)
             # First try checking uri, u, from PREMIRRORS
             mirrors = mirror_from_string(self.d.getVar('PREMIRRORS'))
             ret = m.try_mirrors(self, ud, self.d, mirrors, True)

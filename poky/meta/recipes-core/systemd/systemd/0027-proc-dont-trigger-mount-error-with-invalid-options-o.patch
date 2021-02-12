@@ -1,0 +1,126 @@
+From 297aba739cd689e4dc9f43bb1422ec88d481099a Mon Sep 17 00:00:00 2001
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Date: Wed, 13 Jan 2021 21:09:33 +0000
+Subject: [PATCH] proc: dont trigger mount error with invalid options on old
+ kernels
+
+As of commit 4e39995371738b04d98d27b0d34ea8fe09ec9fab ("core: introduce
+ProtectProc= and ProcSubset= to expose hidepid= and subset= procfs
+mount options") kernels older than v5.8 generate multple warnings at
+boot, as seen in this Yocto build from today:
+
+     qemux86-64 login: root
+     [   65.829009] proc: Bad value for 'hidepid'
+     root@qemux86-64:~# dmesg|grep proc:
+     [   16.990706] proc: Bad value for 'hidepid'
+     [   28.060178] proc: Bad value for 'hidepid'
+     [   28.874229] proc: Bad value for 'hidepid'
+     [   32.685107] proc: Bad value for 'hidepid'
+     [   65.829009] proc: Bad value for 'hidepid'
+     root@qemux86-64:~#
+
+The systemd maintainer has dismissed this as something people should
+simply ignore[1] and has no interest in trying to avoid it by
+proactively checking the kernel version, so people can safely assume
+that they will never see this version check commit upstream.
+
+However, as can be seen above, telling people to just ignore it is not
+an option, as we'll end up answering the same question and dealing with
+the same bug over and over again.
+
+The commit that triggers this is systemd v247-rc1~378^2~3 -- so any
+systemd 247 and above plus kernel v5.7 or older will need this.
+
+[1] https://github.com/systemd/systemd/issues/16896
+
+Upstream-Status: Denied [https://github.com/systemd/systemd/issues/16896]
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+
+diff --git a/src/core/namespace.c b/src/core/namespace.c
+index cdf427a6ea93..f8fc33a89fc2 100644
+--- a/src/core/namespace.c
++++ b/src/core/namespace.c
+@@ -4,7 +4,9 @@
+ #include <linux/loop.h>
+ #include <sched.h>
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <sys/mount.h>
++#include <sys/utsname.h>
+ #include <unistd.h>
+ #include <linux/fs.h>
+ 
+@@ -859,14 +861,34 @@ static int mount_sysfs(const MountEntry *m) {
+ }
+ 
+ static int mount_procfs(const MountEntry *m, const NamespaceInfo *ns_info) {
++        _cleanup_free_ char *opts = NULL;
+         const char *entry_path;
+-        int r;
++        int r, major, minor;
++        struct utsname uts;
++        bool old = false;
+ 
+         assert(m);
+         assert(ns_info);
+ 
+         entry_path = mount_entry_path(m);
+ 
++        /* If uname says that the system is older than v5.8, then the textual hidepid= stuff is not
++         * supported by the kernel, and thus the per-instance hidepid= neither, which means we
++         * really don't want to use it, since it would affect our host's /proc * mount. Hence let's
++         * gracefully fallback to a classic, unrestricted version. */
++
++        r = uname(&uts);
++        if (r < 0)
++               return errno;
++
++        major = atoi(uts.release);
++        minor = atoi(strchr(uts.release, '.') + 1);
++
++        if (major < 5 || (major == 5 && minor < 8)) {
++                log_debug("Pre v5.8 kernel detected [v%d.%d] - skipping hidepid=", major, minor);
++                old = true;
++        }
++
+         /* Mount a new instance, so that we get the one that matches our user namespace, if we are running in
+          * one. i.e we don't reuse existing mounts here under any condition, we want a new instance owned by
+          * our user namespace and with our hidepid= settings applied. Hence, let's get rid of everything
+@@ -875,9 +897,8 @@ static int mount_procfs(const MountEntry *m, const NamespaceInfo *ns_info) {
+         (void) mkdir_p_label(entry_path, 0755);
+         (void) umount_recursive(entry_path, 0);
+ 
+-        if (ns_info->protect_proc != PROTECT_PROC_DEFAULT ||
+-            ns_info->proc_subset != PROC_SUBSET_ALL) {
+-                _cleanup_free_ char *opts = NULL;
++        if (!old && (ns_info->protect_proc != PROTECT_PROC_DEFAULT ||
++            ns_info->proc_subset != PROC_SUBSET_ALL)) {
+ 
+                 /* Starting with kernel 5.8 procfs' hidepid= logic is truly per-instance (previously it
+                  * pretended to be per-instance but actually was per-namespace), hence let's make use of it
+@@ -891,21 +912,9 @@ static int mount_procfs(const MountEntry *m, const NamespaceInfo *ns_info) {
+                                ns_info->proc_subset == PROC_SUBSET_PID ? ",subset=pid" : "");
+                 if (!opts)
+                         return -ENOMEM;
+-
+-                r = mount_nofollow_verbose(LOG_DEBUG, "proc", entry_path, "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, opts);
+-                if (r < 0) {
+-                        if (r != -EINVAL)
+-                                return r;
+-
+-                        /* If this failed with EINVAL then this likely means the textual hidepid= stuff is
+-                         * not supported by the kernel, and thus the per-instance hidepid= neither, which
+-                         * means we really don't want to use it, since it would affect our host's /proc
+-                         * mount. Hence let's gracefully fallback to a classic, unrestricted version. */
+-                } else
+-                        return 1;
+         }
+ 
+-        r = mount_nofollow_verbose(LOG_DEBUG, "proc", entry_path, "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL);
++        r = mount_nofollow_verbose(LOG_DEBUG, "proc", entry_path, "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, opts);
+         if (r < 0)
+                 return r;
+ 
+-- 
+2.29.2
+

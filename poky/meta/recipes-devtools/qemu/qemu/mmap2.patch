@@ -1,0 +1,26 @@
+When using qemu-i386 to build qemux86 webkitgtk on musl, it sits in an
+infinite loop of mremap calls of ever decreasing/increasing addresses.
+
+I suspect something in the musl memory allocation code loops indefinitely
+if it only sees ENOMEM and only exits when it hits EFAULT.
+
+According to the docs, trying to mremap outside the address space
+can/should return EFAULT and changing this allows the build to succeed.
+Whether this should be fixed in qemu and/or musl, not sure.
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
+
+Index: qemu-5.2.0/linux-user/mmap.c
+===================================================================
+--- qemu-5.2.0.orig/linux-user/mmap.c
++++ qemu-5.2.0/linux-user/mmap.c
+@@ -727,7 +727,7 @@ abi_long target_mremap(abi_ulong old_add
+          !guest_range_valid(new_addr, new_size)) ||
+         ((flags & MREMAP_MAYMOVE) == 0 &&
+          !guest_range_valid(old_addr, new_size))) {
+-        errno = ENOMEM;
++        errno = EFAULT;
+         return -1;
+     }
+ 

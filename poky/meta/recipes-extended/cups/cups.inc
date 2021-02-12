@@ -20,6 +20,10 @@ SRC_URI = "https://github.com/apple/cups/releases/download/v${PV}/${BP}-source.t
 UPSTREAM_CHECK_URI = "https://github.com/apple/cups/releases"
 UPSTREAM_CHECK_REGEX = "cups-(?P<pver>\d+\.\d+(\.\d+)?)-source.tar"
 
+# Issue only applies to MacOS
+CVE_CHECK_WHITELIST += "CVE-2008-1033"
+# Issue affects pdfdistiller plugin used with but not part of cups
+CVE_CHECK_WHITELIST += "CVE-2009-0032"
 # This is an Ubuntu only issue.
 CVE_CHECK_WHITELIST += "CVE-2018-6553"
 

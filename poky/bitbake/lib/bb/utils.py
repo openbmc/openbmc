@@ -129,6 +129,7 @@ def vercmp(ta, tb):
     return r
 
 def vercmp_string(a, b):
+    """ Split version strings and compare them """
     ta = split_version(a)
     tb = split_version(b)
     return vercmp(ta, tb)
@@ -247,6 +248,12 @@ def explode_dep_versions2(s, *, sort=True):
     return r
 
 def explode_dep_versions(s):
+    """
+    Take an RDEPENDS style string of format:
+    "DEPEND1 (optional version) DEPEND2 (optional version) ..."
+    skip null value and items appeared in dependancy string multiple times
+    and return a dictionary of dependencies and versions.
+    """
     r = explode_dep_versions2(s)
     for d in r:
         if not r[d]:
@@ -602,7 +609,7 @@ def filter_environment(good_vars):
     os.environ["LC_ALL"] = "en_US.UTF-8"
 
     if removed_vars:
-        logger.debug(1, "Removed the following variables from the environment: %s", ", ".join(removed_vars.keys()))
+        logger.debug("Removed the following variables from the environment: %s", ", ".join(removed_vars.keys()))
 
     return removed_vars
 
@@ -692,7 +699,7 @@ def remove(path, recurse=False, ionice=False):
                 raise
 
 def prunedir(topdir, ionice=False):
-    # Delete everything reachable from the directory named in 'topdir'.
+    """ Delete everything reachable from the directory named in 'topdir'. """
     # CAUTION:  This is dangerous!
     if _check_unsafe_delete_path(topdir):
         raise Exception('bb.utils.prunedir: called with dangerous path "%s", refusing to delete!' % topdir)
@@ -703,8 +710,10 @@ def prunedir(topdir, ionice=False):
 # but thats possibly insane and suffixes is probably going to be small
 #
 def prune_suffix(var, suffixes, d):
-    # See if var ends with any of the suffixes listed and
-    # remove it if found
+    """ 
+    See if var ends with any of the suffixes listed and
+    remove it if found 
+    """
     for suffix in suffixes:
         if suffix and var.endswith(suffix):
             return var[:-len(suffix)]
@@ -956,6 +965,10 @@ def umask(new_mask):
         os.umask(current_mask)
 
 def to_boolean(string, default=None):
+    """ 
+    Check input string and return boolean value True/False/None
+    depending upon the checks 
+    """
     if not string:
         return default
 
@@ -999,6 +1012,23 @@ def contains(variable, checkvalues, truevalue, falsevalue, d):
     return falsevalue
 
 def contains_any(variable, checkvalues, truevalue, falsevalue, d):
+    """Check if a variable contains any values specified.
+
+    Arguments:
+
+    variable -- the variable name. This will be fetched and expanded (using
+    d.getVar(variable)) and then split into a set().
+
+    checkvalues -- if this is a string it is split on whitespace into a set(),
+    otherwise coerced directly into a set().
+
+    truevalue -- the value to return if checkvalues is a subset of variable.
+
+    falsevalue -- the value to return if variable is empty or if checkvalues is
+    not a subset of variable.
+
+    d -- the data store.
+    """
     val = d.getVar(variable)
     if not val:
         return falsevalue
@@ -1560,8 +1590,8 @@ def set_process_name(name):
     except:
         pass
 
-# export common proxies variables from datastore to environment
 def export_proxies(d):
+    """ export common proxies variables from datastore to environment """
     import os
 
     variables = ['http_proxy', 'HTTP_PROXY', 'https_proxy', 'HTTPS_PROXY',
@@ -1583,12 +1613,12 @@ def export_proxies(d):
 
 def load_plugins(logger, plugins, pluginpath):
     def load_plugin(name):
-        logger.debug(1, 'Loading plugin %s' % name)
+        logger.debug('Loading plugin %s' % name)
         spec = importlib.machinery.PathFinder.find_spec(name, path=[pluginpath] )
         if spec:
             return spec.loader.load_module()
 
-    logger.debug(1, 'Loading plugins from %s...' % pluginpath)
+    logger.debug('Loading plugins from %s...' % pluginpath)
 
     expanded = (glob.glob(os.path.join(pluginpath, '*' + ext))
                 for ext in python_extensions)

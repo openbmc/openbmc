@@ -217,6 +217,9 @@ class Rootfs(object, metaclass=ABCMeta):
             self.progress_reporter.next_stage()
 
         if bb.utils.contains("IMAGE_FEATURES", "read-only-rootfs",
+                         True, False, self.d) and \
+           not bb.utils.contains("IMAGE_FEATURES",
+                         "read-only-rootfs-delayed-postinsts",
                          True, False, self.d):
             delayed_postinsts = self._get_delayed_postinsts()
             if delayed_postinsts is not None:

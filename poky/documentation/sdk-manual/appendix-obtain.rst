@@ -58,14 +58,14 @@ Follow these steps to locate and hand-install the toolchain:
    folder and download the following installer:
    ::
 
-      poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-DISTRO.sh
+      poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
 
 4. *Run the Installer:* Be sure you have execution privileges and run
    the installer. Following is an example from the ``Downloads``
    directory:
    ::
 
-      $ ~/Downloads/poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-DISTRO.sh
+      $ ~/Downloads/poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
 
    During execution of the script, you choose the root location for the
    toolchain. See the "`Installed Standard SDK Directory
@@ -174,7 +174,7 @@ build the SDK installer. Follow these steps:
    ::
 
       $ cd ~/poky/build/tmp/deploy/sdk
-      $ ./poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-DISTRO.sh
+      $ ./poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
 
    During execution of the script, you choose the root location for the
    toolchain. See the "`Installed Standard SDK Directory

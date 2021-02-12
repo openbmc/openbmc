@@ -1,0 +1,67 @@
+From 6d202833a5ae241eeb648631cf95090c452198f9 Mon Sep 17 00:00:00 2001
+From: Tanu Kaskinen <tanuk@iki.fi>
+Date: Fri, 14 Feb 2020 07:29:33 +0200
+Subject: [PATCH] build-sys: Add an option for enabling/disabling Valgrind
+
+In OpenEmbedded the PulseAudio recipe currently disables Valgrind
+support by passing "ac_cv_header_valgrind_memcheck_h=no" to the
+configure script (this was added to make it deterministic whether
+Valgrdind support gets enabled or not). I'm converting the PulseAudio
+recipe to use Meson, and I needed an option to disable Valgrind.
+
+Upstream-Status: Backport
+
+Signed-off-by: Tanu Kaskinen <tanuk@iki.fi>
+---
+ meson.build       | 6 +++++-
+ meson_options.txt | 3 +++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 658eeee57..258962724 100644
+--- a/meson.build
++++ b/meson.build
+@@ -220,7 +220,6 @@ check_headers = [
+   'sys/un.h',
+   'sys/wait.h',
+   'syslog.h',
+-  'valgrind/memcheck.h',
+   'xlocale.h',
+ ]
+ 
+@@ -231,6 +230,10 @@ foreach h : check_headers
+   endif
+ endforeach
+ 
++if cc.has_header('valgrind/memcheck.h', required: get_option('valgrind'))
++  cdata.set('HAVE_VALGRIND_MEMCHECK_H', 1)
++endif
++
+ # FIXME: move this to the above set
+ if cc.has_header('pthread.h')
+   cdata.set('HAVE_PTHREAD', 1)
+@@ -841,6 +844,7 @@ summary = [
+   'Enable SoXR (resampler):       @0@'.format(soxr_dep.found()),
+   'Enable WebRTC echo canceller:  @0@'.format(webrtc_dep.found()),
+   'Enable Gcov coverage:          @0@'.format(get_option('gcov')),
++  'Enable Valgrind:               @0@'.format(cdata.has('HAVE_VALGRIND_MEMCHECK_H')),
+   'Enable man pages:              @0@'.format(get_option('man')),
+   'Enable unit tests:             @0@'.format(get_option('tests')),
+   '',
+diff --git a/meson_options.txt b/meson_options.txt
+index 824f24e08..115cc84af 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -138,6 +138,9 @@ option('systemd',
+ option('udev',
+        type : 'feature', value : 'auto',
+        description : 'Optional udev support')
++option('valgrind',
++       type : 'feature', value : 'auto',
++       description : 'Optional Valgrind support')
+ option('x11',
+        type : 'feature', value : 'auto',
+        description : 'Optional X11 support')
+-- 
+2.20.1
+

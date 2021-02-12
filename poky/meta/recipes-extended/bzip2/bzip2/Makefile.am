@@ -46,7 +46,7 @@ runtest:
 	else echo "FAIL: sample2 decompress"; fi
 	@if cmp sample3.tst sample3.ref; then echo "PASS: sample3 decompress";\
 	else echo "FAIL: sample3 decompress"; fi
-	./bzip2-tests/run-tests.sh --tests-dir="$(PWD)/bzip2-tests"
+	./bzip2-tests/run-tests.sh --without-valgrind --tests-dir="$(PWD)/bzip2-tests"
 
 install-ptest:
 	sed  -n '/^runtest:/,/^install-ptest:/{/^install-ptest:/!p}' \

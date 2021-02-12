@@ -1,0 +1,30 @@
+From 367972fae13d170675768d63678577cae1890143 Mon Sep 17 00:00:00 2001
+From: Pino Toscano <toscano.pino@tiscali.it>
+Date: Tue, 17 Nov 2020 11:32:45 +0100
+Subject: [PATCH] hwclock: do not assume __NR_settimeofday_time32
+
+Check that __NR_settimeofday_time32 exists before trying to use it as
+syscall number.
+
+Upstream-Status: Backport [https://github.com/karelzak/util-linux/commit/367972fae13d170675768d63678577cae1890143]
+Signed-off-by: Pino Toscano <toscano.pino@tiscali.it>
+---
+ sys-utils/hwclock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sys-utils/hwclock.c b/sys-utils/hwclock.c
+index 1f7ef3317..db448687d 100644
+--- a/sys-utils/hwclock.c
++++ b/sys-utils/hwclock.c
+@@ -678,7 +678,7 @@ display_time(struct timeval hwctime)
+ #ifndef SYS_settimeofday
+ # ifdef __NR_settimeofday
+ #  define SYS_settimeofday	__NR_settimeofday
+-# else
++# elif defined(__NR_settimeofday_time32)
+ #  define SYS_settimeofday	__NR_settimeofday_time32
+ # endif
+ #endif
+-- 
+2.29.2
+

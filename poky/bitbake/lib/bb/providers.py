@@ -165,7 +165,7 @@ def findPreferredProvider(pn, cfgData, dataCache, pkg_pn = None, item = None):
                 available_vers.sort()
                 logger.warn("versions of %s available: %s", pn, ' '.join(available_vers))
         else:
-            logger.debug(1, "selecting %s as PREFERRED_VERSION %s of package %s%s", preferred_file, pv_str, pn, itemstr)
+            logger.debug("selecting %s as PREFERRED_VERSION %s of package %s%s", preferred_file, pv_str, pn, itemstr)
 
     return (preferred_ver, preferred_file)
 
@@ -232,7 +232,7 @@ def _filterProviders(providers, item, cfgData, dataCache):
             pkg_pn[pn] = []
         pkg_pn[pn].append(p)
 
-    logger.debug(1, "providers for %s are: %s", item, list(sorted(pkg_pn.keys())))
+    logger.debug("providers for %s are: %s", item, list(sorted(pkg_pn.keys())))
 
     # First add PREFERRED_VERSIONS
     for pn in sorted(pkg_pn):
@@ -291,7 +291,7 @@ def filterProviders(providers, item, cfgData, dataCache):
                 foundUnique = True
                 break
 
-    logger.debug(1, "sorted providers for %s are: %s", item, eligible)
+    logger.debug("sorted providers for %s are: %s", item, eligible)
 
     return eligible, foundUnique
 
@@ -333,7 +333,7 @@ def filterProvidersRunTime(providers, item, cfgData, dataCache):
             provides = dataCache.pn_provides[pn]
             for provide in provides:
                 prefervar = cfgData.getVar('PREFERRED_PROVIDER_%s' % provide)
-                #logger.debug(1, "checking PREFERRED_PROVIDER_%s (value %s) against %s", provide, prefervar, pns.keys())
+                #logger.debug("checking PREFERRED_PROVIDER_%s (value %s) against %s", provide, prefervar, pns.keys())
                 if prefervar in pns and pns[prefervar] not in preferred:
                     var = "PREFERRED_PROVIDER_%s = %s" % (provide, prefervar)
                     logger.verbose("selecting %s to satisfy runtime %s due to %s", prefervar, item, var)
@@ -349,7 +349,7 @@ def filterProvidersRunTime(providers, item, cfgData, dataCache):
     if numberPreferred > 1:
         logger.error("Trying to resolve runtime dependency %s resulted in conflicting PREFERRED_PROVIDER entries being found.\nThe providers found were: %s\nThe PREFERRED_PROVIDER entries resulting in this conflict were: %s. You could set PREFERRED_RPROVIDER_%s" % (item, preferred, preferred_vars, item))
 
-    logger.debug(1, "sorted runtime providers for %s are: %s", item, eligible)
+    logger.debug("sorted runtime providers for %s are: %s", item, eligible)
 
     return eligible, numberPreferred
 
@@ -384,7 +384,7 @@ def getRuntimeProviders(dataCache, rdepend):
             regexp_cache[pattern] = regexp
         if regexp.match(rdepend):
             rproviders += dataCache.packages_dynamic[pattern]
-            logger.debug(1, "Assuming %s is a dynamic package, but it may not exist" % rdepend)
+            logger.debug("Assuming %s is a dynamic package, but it may not exist" % rdepend)
 
     return rproviders
 
@@ -396,22 +396,22 @@ def buildWorldTargetList(dataCache, task=None):
     if dataCache.world_target:
         return
 
-    logger.debug(1, "collating packages for \"world\"")
+    logger.debug("collating packages for \"world\"")
     for f in dataCache.possible_world:
         terminal = True
         pn = dataCache.pkg_fn[f]
         if task and task not in dataCache.task_deps[f]['tasks']:
-            logger.debug(2, "World build skipping %s as task %s doesn't exist", f, task)
+            logger.debug2("World build skipping %s as task %s doesn't exist", f, task)
             terminal = False
 
         for p in dataCache.pn_provides[pn]:
             if p.startswith('virtual/'):
-                logger.debug(2, "World build skipping %s due to %s provider starting with virtual/", f, p)
+                logger.debug2("World build skipping %s due to %s provider starting with virtual/", f, p)
                 terminal = False
                 break
             for pf in dataCache.providers[p]:
                 if dataCache.pkg_fn[pf] != pn:
-                    logger.debug(2, "World build skipping %s due to both us and %s providing %s", f, pf, p)
+                    logger.debug2("World build skipping %s due to both us and %s providing %s", f, pf, p)
                     terminal = False
                     break
         if terminal:

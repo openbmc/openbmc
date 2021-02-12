@@ -24,6 +24,7 @@ SRC_URI = "http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${PV}.tar
            file://fix-potential-signed-overflow-in-pointer-arithmatic.patch \
            file://sshd_check_keys \
            file://add-test-support-for-busybox.patch \
+           file://0f90440ca70abab947acbd77795e9f130967956c.patch \
            "
 SRC_URI[sha256sum] = "5a01d22e407eb1c05ba8a8f7c654d388a13e9f226e4ed33bd38748dafa1d2b24"
 
@@ -67,8 +68,8 @@ EXTRA_OECONF = "'LOGIN_PROGRAM=${base_bindir}/login' \
                 --disable-strip \
                 "
 
-# musl doesn't implement wtmp/utmp
-EXTRA_OECONF_append_libc-musl = " --disable-wtmp"
+# musl doesn't implement wtmp/utmp and logwtmp
+EXTRA_OECONF_append_libc-musl = " --disable-wtmp --disable-lastlog"
 
 # Since we do not depend on libbsd, we do not want configure to use it
 # just because it finds libutil.h.  But, specifying --disable-libutil

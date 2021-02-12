@@ -12,7 +12,7 @@ stability.
 Major and Minor Release Cadence
 ===============================
 
-The Yocto Project delivers major releases (e.g. DISTRO) using a six
+The Yocto Project delivers major releases (e.g. &DISTRO;) using a six
 month cadence roughly timed each April and October of the year.
 Following are examples of some major YP releases with their codenames
 also shown. See the "`Major Release
@@ -57,7 +57,7 @@ codename are likely to be compatible and thus work together.
 .. note::
 
    Codenames are associated with major releases because a Yocto Project
-   release number (e.g. DISTRO) could conflict with a given layer or
+   release number (e.g. &DISTRO;) could conflict with a given layer or
    company versioning scheme. Codenames are unique, interesting, and
    easily identifiable.
 

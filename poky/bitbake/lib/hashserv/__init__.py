@@ -94,10 +94,10 @@ def chunkify(msg, max_chunk):
         yield "\n"
 
 
-def create_server(addr, dbname, *, sync=True, upstream=None):
+def create_server(addr, dbname, *, sync=True, upstream=None, read_only=False):
     from . import server
     db = setup_database(dbname, sync=sync)
-    s = server.Server(db, upstream=upstream)
+    s = server.Server(db, upstream=upstream, read_only=read_only)
 
     (typ, a) = parse_address(addr)
     if typ == ADDR_TYPE_UNIX:

@@ -139,7 +139,7 @@ section:
       ~/poky/build/tmp/deploy/sdk
 
    For this example, the installer file is named
-   ``poky-glibc-x86_64-core-image-minimal-i586-toolchain-ext-DISTRO.sh``.
+   ``poky-glibc-x86_64-core-image-minimal-i586-toolchain-ext-&DISTRO;.sh``.
 
 6. *Install the Extensible SDK:* Use the following command to install
    the SDK. For this example, install the SDK in the default

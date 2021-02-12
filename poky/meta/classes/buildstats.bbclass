@@ -104,14 +104,46 @@ def write_task_data(status, logfile, e, d):
             f.write("Status: FAILED \n")
         f.write("Ended: %0.2f \n" % e.time)
 
+def write_host_data(logfile, e, d):
+    import subprocess, os, datetime
+    cmds = d.getVar('BB_LOG_HOST_STAT_CMDS')
+    if cmds is None:
+        d.setVar("BB_LOG_HOST_STAT_ON_INTERVAL", "0")
+        d.setVar("BB_LOG_HOST_STAT_ON_FAILURE", "0")
+        bb.warn("buildstats: Collecting host data failed. Set BB_LOG_HOST_STAT_CMDS=\"command1 ; command2 ; ... \" in conf\/local.conf\n")
+        return
+    path = d.getVar("PATH")
+    opath = d.getVar("BB_ORIGENV", False).getVar("PATH")
+    ospath = os.environ['PATH']
+    os.environ['PATH'] = path + ":" + opath + ":" + ospath
+    with open(logfile, "a") as f:
+        f.write("Event Time: %f\nDate: %s\n" % (e.time, datetime.datetime.now()))
+        for cmd in cmds.split(";"):
+            if len(cmd) == 0:
+                continue
+            try:
+                output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT, timeout=1).decode('utf-8')
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError) as err:
+                output = "Error running command: %s\n%s\n" % (cmd, err)
+            f.write("%s\n%s\n" % (cmd, output))
+    os.environ['PATH'] = ospath
+
 python run_buildstats () {
     import bb.build
     import bb.event
     import time, subprocess, platform
 
     bn = d.getVar('BUILDNAME')
-    bsdir = os.path.join(d.getVar('BUILDSTATS_BASE'), bn)
-    taskdir = os.path.join(bsdir, d.getVar('PF'))
+    ########################################################################
+    # bitbake fires HeartbeatEvent even before a build has been
+    # triggered, causing BUILDNAME to be None
+    ########################################################################
+    if bn is not None:
+        bsdir = os.path.join(d.getVar('BUILDSTATS_BASE'), bn)
+        taskdir = os.path.join(bsdir, d.getVar('PF'))
+        if isinstance(e, bb.event.HeartbeatEvent) and bb.utils.to_boolean(d.getVar("BB_LOG_HOST_STAT_ON_INTERVAL")):
+            bb.utils.mkdirhier(bsdir)
+            write_host_data(os.path.join(bsdir, "host_stats"), e, d)
 
     if isinstance(e, bb.event.BuildStarted):
         ########################################################################
@@ -186,10 +218,12 @@ python run_buildstats () {
         build_status = os.path.join(bsdir, "build_stats")
         with open(build_status, "a") as f:
             f.write(d.expand("Failed at: ${PF} at task: %s \n" % e.task))
+            if bb.utils.to_boolean(d.getVar("BB_LOG_HOST_STAT_ON_FAILURE")):
+                write_host_data(build_status, e, d)
 }
 
 addhandler run_buildstats
-run_buildstats[eventmask] = "bb.event.BuildStarted bb.event.BuildCompleted bb.build.TaskStarted bb.build.TaskSucceeded bb.build.TaskFailed"
+run_buildstats[eventmask] = "bb.event.BuildStarted bb.event.BuildCompleted bb.event.HeartbeatEvent bb.build.TaskStarted bb.build.TaskSucceeded bb.build.TaskFailed"
 
 python runqueue_stats () {
     import buildstats

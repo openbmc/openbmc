@@ -234,7 +234,7 @@ build_hddimg() {
 				bberror "${HDDDIR}/rootfs.img rootfs size is greather than or equal to 4GB,"
 				bberror "and this doesn't work on a FAT filesystem. You can either:"
 				bberror "1) Reduce the size of rootfs.img, or,"
-				bbfatal "2) Use wic, vmdk or vdi instead of hddimg\n"
+				bbfatal "2) Use wic, vmdk,vhd, vhdx or vdi instead of hddimg\n"
 			fi
 		fi
 

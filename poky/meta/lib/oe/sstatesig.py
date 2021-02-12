@@ -552,9 +552,11 @@ def OEOuthashBasic(path, sigfile, task, d):
                     try:
                         update_hash(" %10s" % pwd.getpwuid(s.st_uid).pw_name)
                         update_hash(" %10s" % grp.getgrgid(s.st_gid).gr_name)
-                    except KeyError:
+                    except KeyError as e:
                         bb.warn("KeyError in %s" % path)
-                        raise
+                        msg = ("KeyError: %s\nPath %s is owned by uid %d, gid %d, which doesn't match "
+                            "any user/group on target. This may be due to host contamination." % (e, path, s.st_uid, s.st_gid))
+                        raise Exception(msg).with_traceback(e.__traceback__)
 
                 if include_timestamps:
                     update_hash(" %10d" % s.st_mtime)

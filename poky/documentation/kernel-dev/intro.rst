@@ -72,8 +72,7 @@ tools with your own kernel sources.
 
 The remainder of this manual provides instructions for completing
 specific Linux kernel development tasks. These instructions assume you
-are comfortable working with
-`BitBake <https://openembedded.org/wiki/Bitbake>`__ recipes and basic
+are comfortable working with :oe_wiki:`BitBake </Bitbake>` recipes and basic
 open-source development tools. Understanding these concepts will
 facilitate the process of working with the kernel recipes. If you find
 you need some additional background, please be sure to review and

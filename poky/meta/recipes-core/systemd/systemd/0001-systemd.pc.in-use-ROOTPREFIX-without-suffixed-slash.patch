@@ -14,8 +14,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/src/core/systemd.pc.in
 +++ b/src/core/systemd.pc.in
-@@ -65,16 +65,16 @@ systemdshutdowndir=${systemd_shutdown_di
- tmpfiles_dir=${prefix}/lib/tmpfiles.d
+@@ -65,16 +65,16 @@ systemdshutdowndir=${systemd_shutdown_dir}
+ tmpfiles_dir=/usr/lib/tmpfiles.d
  tmpfilesdir=${tmpfiles_dir}
  
 -sysusers_dir=${rootprefix}/lib/sysusers.d
@@ -34,4 +34,4 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +modules_load_dir=${prefix}/lib/modules-load.d
  modulesloaddir=${modules_load_dir}
  
- catalog_dir=${prefix}/lib/systemd/catalog
+ catalog_dir=/usr/lib/systemd/catalog

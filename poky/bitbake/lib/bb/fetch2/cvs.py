@@ -109,7 +109,7 @@ class Cvs(FetchMethod):
             cvsupdatecmd = "CVS_RSH=\"%s\" %s" % (cvs_rsh, cvsupdatecmd)
 
         # create module directory
-        logger.debug(2, "Fetch: checking for module directory")
+        logger.debug2("Fetch: checking for module directory")
         moddir = os.path.join(ud.pkgdir, localdir)
         workdir = None
         if os.access(os.path.join(moddir, 'CVS'), os.R_OK):
@@ -123,7 +123,7 @@ class Cvs(FetchMethod):
             # check out sources there
             bb.utils.mkdirhier(ud.pkgdir)
             workdir = ud.pkgdir
-            logger.debug(1, "Running %s", cvscmd)
+            logger.debug("Running %s", cvscmd)
             bb.fetch2.check_network_access(d, cvscmd, ud.url)
             cmd = cvscmd
 

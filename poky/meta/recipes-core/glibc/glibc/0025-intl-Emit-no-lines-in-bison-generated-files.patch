@@ -1,7 +1,7 @@
-From bc3380877bd2a1f9368a913fa6a2ca1ee88fd95f Mon Sep 17 00:00:00 2001
+From 3156464f9a95bf1dafd2e22d19d7bf89c520acc1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:44:00 -0700
-Subject: [PATCH 25/29] intl: Emit no lines in bison generated files
+Subject: [PATCH] intl: Emit no lines in bison generated files
 
 Improve reproducibility:
 Do not put any #line preprocessor commands in bison generated files.
@@ -17,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/intl/Makefile b/intl/Makefile
-index ce3072420f..58457840d9 100644
+index 93478d87e8..b27a7935eb 100644
 --- a/intl/Makefile
 +++ b/intl/Makefile
 @@ -155,7 +155,7 @@ $(objpfx)tst-gettext6.out: $(objpfx)tst-gettext.out
@@ -29,6 +29,3 @@ index ce3072420f..58457840d9 100644
  
  $(inst_localedir)/locale.alias: locale.alias $(+force)
  	$(do-install)
--- 
-2.27.0
-

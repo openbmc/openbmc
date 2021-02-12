@@ -74,3 +74,28 @@ python __anonymous() {
 # 'ps' isn't suitable for use as a security tool so whitelist this CVE.
 # https://bugzilla.redhat.com/show_bug.cgi?id=1575473#c3
 CVE_CHECK_WHITELIST += "CVE-2018-1121"
+
+PROCPS_PACKAGES = "${PN}-lib \
+                   ${PN}-ps \
+                   ${PN}-sysctl"
+
+PACKAGE_BEFORE_PN = "${PROCPS_PACKAGES}"
+RDEPENDS_${PN} += "${PROCPS_PACKAGES}"
+
+RDEPENDS_${PN}-ps += "${PN}-lib"
+RDEPENDS_${PN}-sysctl += "${PN}-lib"
+
+FILES_${PN}-lib = "${libdir}"
+FILES_${PN}-ps = "${base_bindir}/ps.${BPN}"
+FILES_${PN}-sysctl = "${base_sbindir}/sysctl.${BPN} ${sysconfdir}/sysctl.conf ${sysconfdir}/sysctl.d"
+
+ALTERNATIVE_${PN}_remove = "ps"
+ALTERNATIVE_${PN}_remove = "sysctl"
+
+ALTERNATIVE_${PN}-ps = "ps"
+ALTERNATIVE_TARGET[ps] = "${base_bindir}/ps"
+ALTERNATIVE_LINK_NAME[ps] = "${base_bindir}/ps"
+
+ALTERNATIVE_${PN}-sysctl = "sysctl"
+ALTERNATIVE_TARGET[sysctl] = "${base_sbindir}/sysctl"
+ALTERNATIVE_LINK_NAME[sysctl] = "${base_sbindir}/sysctl"

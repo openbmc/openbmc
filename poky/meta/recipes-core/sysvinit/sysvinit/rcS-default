@@ -27,3 +27,10 @@ VOLATILE_ENABLE_CACHE=yes
 # Setting ROOTFS_READ_ONLY to yes and rebooting will give you a read-only rootfs.
 # Normally you should not change this value.
 ROOTFS_READ_ONLY=no
+# rcS is also used when using busybox init and shares initscripts, some initscripts
+# need to have specific behavior depending on init system
+INIT_SYSTEM=sysvinit
+# set the psplash fifo directory
+PSPLASH_FIFO_DIR=/mnt
+# psplash textual updates knob
+PSPLASH_TEXT_UPDATES=#PSPLASH_TEXT#

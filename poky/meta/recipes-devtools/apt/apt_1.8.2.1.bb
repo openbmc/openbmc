@@ -17,6 +17,12 @@ SRC_URI_append_class-native = " \
            file://0001-Do-not-configure-packages-on-installation.patch \
            "
 
+SRC_URI_append_class-nativesdk = " \
+           file://0001-Do-not-init-tables-from-dpkg-configuration.patch \
+           file://0001-Revert-always-run-dpkg-configure-a-at-the-end-of-our.patch \
+           file://0001-Do-not-configure-packages-on-installation.patch \
+           "
+
 SRC_URI[sha256sum] = "6d447f2e9437ec24e78350b63bb0592bee1f050811d51990b0c783183b0983f8"
 LIC_FILES_CHKSUM = "file://COPYING.GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
@@ -24,13 +30,21 @@ LIC_FILES_CHKSUM = "file://COPYING.GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 # so we check the latest upstream from a directory that does get updated
 UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/a/apt/"
 
-inherit cmake perlnative bash-completion upstream-version-is-even
+inherit cmake perlnative bash-completion upstream-version-is-even useradd
 
-BBCLASSEXTEND = "native"
+# User is added to allow apt to drop privs, will runtime warn without
+USERADD_PACKAGES = "${PN}"
+USERADD_PARAM_${PN} = "--system --home /nonexistent --no-create-home _apt"
+
+BBCLASSEXTEND = "native nativesdk"
 
 DEPENDS += "virtual/libiconv virtual/libintl db gnutls lz4 zlib bzip2 xz"
 
-EXTRA_OECMAKE_append = " -DCURRENT_VENDOR=debian -DWITH_DOC=False -DUSE_NLS=False -DDPKG_DATADIR=${datadir}/dpkg -DTRIEHASH_EXECUTABLE=${WORKDIR}/triehash"
+EXTRA_OECMAKE_append = " -DCURRENT_VENDOR=debian -DWITH_DOC=False \
+    -DUSE_NLS=False -DDPKG_DATADIR=${datadir}/dpkg \
+    -DTRIEHASH_EXECUTABLE=${WORKDIR}/triehash \
+    -DCMAKE_DISABLE_FIND_PACKAGE_Zstd=True \
+"
 
 do_configure_prepend () {
     echo "set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH )" >>  ${WORKDIR}/toolchain.cmake
@@ -41,7 +55,7 @@ do_configure_prepend () {
 FILES_${PN} += "${prefix}/lib/dpkg ${prefix}/lib/apt"
 RDEPENDS_${PN} += "bash perl dpkg"
 
-do_install_append_class-native() {
+customize_apt_conf_sample() {
     cat > ${D}${sysconfdir}/apt/apt.conf.sample << EOF
 Dir "${STAGING_DIR_NATIVE}/"
 {
@@ -93,6 +107,15 @@ DPkg::Options {"--root=#ROOTFS#";"--admindir=#ROOTFS#/var/lib/dpkg";"--force-all
 DPkg::Path "";
 EOF
 }
+
+do_install_append_class-native() {
+    customize_apt_conf_sample
+}
+
+do_install_append_class-nativesdk() {
+    customize_apt_conf_sample
+}
+
 
 do_install_append_class-target() {
     #Write the correct apt-architecture to apt.conf

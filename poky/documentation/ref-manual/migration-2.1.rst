@@ -89,7 +89,7 @@ package-specific nesting should be done by the package itself. Finally,
 having ``libexecdir`` change between recipes makes it very difficult for
 different recipes to invoke binaries that have been installed into
 ``libexecdir``. The Filesystem Hierarchy Standard (i.e.
-http://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s07.html) now
+https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s07.html) now
 recognizes the use of ``${prefix}/libexec/``, giving distributions the
 choice between ``${prefix}/lib`` or ``${prefix}/libexec`` without
 breaking FHS.

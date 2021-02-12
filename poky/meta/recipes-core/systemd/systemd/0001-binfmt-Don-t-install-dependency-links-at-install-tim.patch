@@ -29,7 +29,7 @@ Index: systemd-stable/units/meson.build
 ===================================================================
 --- systemd-stable.orig/units/meson.build
 +++ systemd-stable/units/meson.build
-@@ -54,8 +54,7 @@ units = [
+@@ -55,8 +55,7 @@ units = [
          ['poweroff.target',                     '',
           (with_runlevels ? 'runlevel0.target' : '')],
          ['printer.target',                      ''],
@@ -38,8 +38,8 @@ Index: systemd-stable/units/meson.build
 +        ['proc-sys-fs-binfmt_misc.automount',   'ENABLE_BINFMT'],
          ['proc-sys-fs-binfmt_misc.mount',       'ENABLE_BINFMT'],
          ['reboot.target',                       '',
-          (with_runlevels ? 'runlevel6.target ctrl-alt-del.target' : 'ctrl-alt-del.target')],
-@@ -162,8 +161,7 @@ in_units = [
+          'ctrl-alt-del.target' + (with_runlevels ? ' runlevel6.target' : '')],
+@@ -166,8 +165,7 @@ in_units = [
          ['rc-local.service',                     'HAVE_SYSV_COMPAT'],
          ['rescue.service',                       ''],
          ['systemd-backlight@.service',           'ENABLE_BACKLIGHT'],
@@ -64,7 +64,7 @@ Index: systemd-stable/units/systemd-binfmt.service.in
 ===================================================================
 --- systemd-stable.orig/units/systemd-binfmt.service.in
 +++ systemd-stable/units/systemd-binfmt.service.in
-@@ -14,6 +14,7 @@ Documentation=https://www.kernel.org/doc
+@@ -14,6 +14,7 @@ Documentation=https://www.kernel.org/doc/html/latest/admin-guide/binfmt-misc.htm
  Documentation=https://www.freedesktop.org/wiki/Software/systemd/APIFileSystems
  DefaultDependencies=no
  Conflicts=shutdown.target

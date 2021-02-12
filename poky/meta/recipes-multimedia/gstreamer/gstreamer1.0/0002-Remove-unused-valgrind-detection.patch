@@ -1,7 +1,7 @@
-From 355dd938bfb2cd36d6c3c4ed59ba1dcafdc78d95 Mon Sep 17 00:00:00 2001
+From 598d108e2c438d8f2ecd3bf948fa3ebbd3681490 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Tim-Philipp=20M=C3=BCller?= <tim@centricular.com>
 Date: Fri, 14 Aug 2020 16:38:26 +0100
-Subject: [PATCH 2/4] Remove unused valgrind detection
+Subject: [PATCH 2/3] Remove unused valgrind detection
 
 Having this just to log a debug message in case we're
 running inside valgrind doesn't seem very useful, and
@@ -19,7 +19,7 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  3 files changed, 42 deletions(-)
 
 diff --git a/gst/gst_private.h b/gst/gst_private.h
-index 1b0f02b..a8897e1 100644
+index eefd044d9..8252ede51 100644
 --- a/gst/gst_private.h
 +++ b/gst/gst_private.h
 @@ -116,8 +116,6 @@ G_GNUC_INTERNAL  gboolean _priv_plugin_deps_env_vars_changed (GstPlugin * plugin
@@ -32,10 +32,10 @@ index 1b0f02b..a8897e1 100644
  G_GNUC_INTERNAL  void  _priv_gst_quarks_initialize (void);
  G_GNUC_INTERNAL  void  _priv_gst_mini_object_initialize (void);
 diff --git a/gst/gstinfo.c b/gst/gstinfo.c
-index 37987d3..15f522e 100644
+index 5d317877b..097f8b20d 100644
 --- a/gst/gstinfo.c
 +++ b/gst/gstinfo.c
-@@ -304,36 +304,6 @@ static gboolean pretty_tags = PRETTY_TAGS_DEFAULT;
+@@ -305,36 +305,6 @@ static gboolean pretty_tags = PRETTY_TAGS_DEFAULT;
  static volatile gint G_GNUC_MAY_ALIAS __default_level = GST_LEVEL_DEFAULT;
  static volatile gint G_GNUC_MAY_ALIAS __use_color = GST_DEBUG_COLOR_MODE_ON;
  
@@ -72,7 +72,7 @@ index 37987d3..15f522e 100644
  static gchar *
  _replace_pattern_in_gst_debug_file_name (gchar * name, const char *token,
      guint val)
-@@ -462,9 +432,6 @@ _priv_gst_debug_init (void)
+@@ -463,9 +433,6 @@ _priv_gst_debug_init (void)
    _priv_GST_CAT_PROTECTION =
        _gst_debug_category_new ("GST_PROTECTION", 0, "protection");
  
@@ -82,7 +82,7 @@ index 37987d3..15f522e 100644
    env = g_getenv ("GST_DEBUG_OPTIONS");
    if (env != NULL) {
      if (strstr (env, "full_tags") || strstr (env, "full-tags"))
-@@ -2502,12 +2469,6 @@ gst_debug_construct_win_color (guint colorinfo)
+@@ -2503,12 +2470,6 @@ gst_debug_construct_win_color (guint colorinfo)
    return 0;
  }
  
@@ -96,7 +96,7 @@ index 37987d3..15f522e 100644
  _gst_debug_dump_mem (GstDebugCategory * cat, const gchar * file,
      const gchar * func, gint line, GObject * obj, const gchar * msg,
 diff --git a/meson.build b/meson.build
-index f95b4f7..143c043 100644
+index ce1921aa4..7a84d0981 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -200,7 +200,6 @@ check_headers = [
@@ -108,5 +108,5 @@ index f95b4f7..143c043 100644
    'sys/uio.h',
  ]
 -- 
-2.28.0
+2.29.2
 

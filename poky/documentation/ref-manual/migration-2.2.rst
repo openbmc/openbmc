@@ -28,8 +28,8 @@ The way directories are staged in sysroot has been simplified and
 introduces the new :term:`SYSROOT_DIRS`,
 :term:`SYSROOT_DIRS_NATIVE`, and
 :term:`SYSROOT_DIRS_BLACKLIST`. See the
-`v2 patch series on the OE-Core Mailing
-List <http://lists.openembedded.org/pipermail/openembedded-core/2016-May/121365.html>`__
+:oe_lists:`v2 patch series on the OE-Core Mailing List
+</pipermail/openembedded-core/2016-May/121365.html>`
 for additional information.
 
 .. _migration-2.2-removal-of-old-images-from-tmp-deploy-now-enabled:

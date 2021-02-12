@@ -1,4 +1,8 @@
 SUMMARY = "Apache Portable Runtime (APR) library"
+DESCRIPTION = "The Apache Portable Runtime (APR) is a supporting library for the \
+Apache web server. It provides a set of APIs that map to the underlying \
+operating system (OS). Where the OS does not support a particular function, \
+APR will provide an emulation."
 HOMEPAGE = "http://apr.apache.org/"
 SECTION = "libs"
 DEPENDS = "util-linux"
@@ -19,6 +23,7 @@ SRC_URI = "${APACHE_MIRROR}/apr/${BPN}-${PV}.tar.bz2 \
            file://0007-explicitly-link-libapr-against-phtread-to-make-gold-.patch \
            file://libtoolize_check.patch \
            file://0001-Add-option-to-disable-timed-dependant-tests.patch \
+           file://autoconf270.patch \
            "
 
 SRC_URI[md5sum] = "7a14a83d664e87599ea25ff4432e48a7"

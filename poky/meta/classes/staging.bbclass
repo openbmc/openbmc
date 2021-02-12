@@ -5,6 +5,7 @@ SYSROOT_DIRS = " \
     ${base_libdir} \
     ${nonarch_base_libdir} \
     ${datadir} \
+    /sysroot-only \
 "
 
 # These directories are also staged in the sysroot when they contain files that
@@ -27,11 +28,15 @@ SYSROOT_DIRS_BLACKLIST = " \
     ${mandir} \
     ${docdir} \
     ${infodir} \
+    ${datadir}/X11/locale \
     ${datadir}/applications \
+    ${datadir}/bash-completion \
     ${datadir}/fonts \
     ${datadir}/gtk-doc/html \
+    ${datadir}/installed-tests \
     ${datadir}/locale \
     ${datadir}/pixmaps \
+    ${datadir}/terminfo \
     ${libdir}/${BPN}/ptest \
 "
 

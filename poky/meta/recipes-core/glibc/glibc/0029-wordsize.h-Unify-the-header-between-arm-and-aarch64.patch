@@ -1,7 +1,7 @@
-From bf1c4b2f01c5f86bb770fd1711a69ea727e0f56e Mon Sep 17 00:00:00 2001
+From 2ae3ff3ae28abb1d0d100b4722da7ff188de9a30 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 May 2020 17:05:45 -0700
-Subject: [PATCH 29/29] wordsize.h: Unify the header between arm and aarch64
+Subject: [PATCH] wordsize.h: Unify the header between arm and aarch64
 
 This helps OE multilibs to not sythesize this header which causes all
 kind of recursions and other issues since wordsize is fundamental header
@@ -11,13 +11,13 @@ Upstream-Status: Inappropriate [ OE-Specific ]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- sysdeps/aarch64/bits/wordsize.h          | 8 ++++++--
- sysdeps/{aarch64 => arm}/bits/wordsize.h | 8 ++++++--
- 2 files changed, 12 insertions(+), 4 deletions(-)
- copy sysdeps/{aarch64 => arm}/bits/wordsize.h (85%)
+ sysdeps/aarch64/bits/wordsize.h          |  8 ++++++--
+ sysdeps/{aarch64 => arm}/bits/wordsize.h | 10 +++++++---
+ 2 files changed, 13 insertions(+), 5 deletions(-)
+ copy sysdeps/{aarch64 => arm}/bits/wordsize.h (80%)
 
 diff --git a/sysdeps/aarch64/bits/wordsize.h b/sysdeps/aarch64/bits/wordsize.h
-index ee01841773..34fcdef1f1 100644
+index 91da566b74..9a754514b3 100644
 --- a/sysdeps/aarch64/bits/wordsize.h
 +++ b/sysdeps/aarch64/bits/wordsize.h
 @@ -17,12 +17,16 @@
@@ -40,12 +40,20 @@ index ee01841773..34fcdef1f1 100644
  
  #define __WORDSIZE_TIME64_COMPAT32	0
 diff --git a/sysdeps/aarch64/bits/wordsize.h b/sysdeps/arm/bits/wordsize.h
-similarity index 85%
+similarity index 80%
 copy from sysdeps/aarch64/bits/wordsize.h
 copy to sysdeps/arm/bits/wordsize.h
-index ee01841773..34fcdef1f1 100644
+index 91da566b74..34fcdef1f1 100644
 --- a/sysdeps/aarch64/bits/wordsize.h
 +++ b/sysdeps/arm/bits/wordsize.h
+@@ -1,6 +1,6 @@
+ /* Determine the wordsize from the preprocessor defines.
+ 
+-   Copyright (C) 2016-2021 Free Software Foundation, Inc.
++   Copyright (C) 2016-2020 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
 @@ -17,12 +17,16 @@
     License along with the GNU C Library; if not, see
     <https://www.gnu.org/licenses/>.  */
@@ -65,6 +73,3 @@ index ee01841773..34fcdef1f1 100644
  #endif
  
  #define __WORDSIZE_TIME64_COMPAT32	0
--- 
-2.27.0
-

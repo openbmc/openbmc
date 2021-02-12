@@ -807,9 +807,15 @@ python package_do_split_locales() {
 
 python perform_packagecopy () {
     import subprocess
+    import shutil
 
     dest = d.getVar('D')
     dvar = d.getVar('PKGD')
+
+    # Remove ${D}/sysroot-only if present
+    sysroot_only = os.path.join(dest, 'sysroot-only')
+    if cpath.exists(sysroot_only) and cpath.isdir(sysroot_only):
+        shutil.rmtree(sysroot_only)
 
     # Start by package population by taking a copy of the installed
     # files to operate on
@@ -2446,6 +2452,7 @@ python do_packagedata () {
 
     bb.build.exec_func("packagedata_translate_pr_autoinc", d)
 }
+do_packagedata[cleandirs] += "${WORKDIR}/pkgdata-pdata-input"
 
 # Translate the EXTENDPRAUTO and AUTOINC to the final values
 packagedata_translate_pr_autoinc() {

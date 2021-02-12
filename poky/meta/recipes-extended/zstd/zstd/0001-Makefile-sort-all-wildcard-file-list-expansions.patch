@@ -1,0 +1,80 @@
+From 8d01b0753162681dcdbb7cf56f1e393c261e3eb0 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 23 Dec 2020 19:14:32 +0100
+Subject: [PATCH] Makefile: sort all wildcard file list expansions
+
+Otherwise the order is non-deterministic and breaks
+reproducible builds.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ programs/Makefile   | 10 +++++-----
+ tests/Makefile      |  4 ++--
+ tests/fuzz/Makefile |  2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/programs/Makefile b/programs/Makefile
+index 8641d0ee..26fee45f 100644
+--- a/programs/Makefile
++++ b/programs/Makefile
+@@ -72,11 +72,11 @@ ZSTDLEGACY_DIR := $(ZSTDDIR)/legacy
+ 
+ vpath %.c $(ZSTDLIB_COMMON) $(ZSTDLIB_COMPRESS) $(ZSTDLIB_DECOMPRESS) $(ZDICT_DIR) $(ZSTDLEGACY_DIR)
+ 
+-ZSTDLIB_COMMON_C := $(wildcard $(ZSTDLIB_COMMON)/*.c)
+-ZSTDLIB_COMPRESS_C := $(wildcard $(ZSTDLIB_COMPRESS)/*.c)
+-ZSTDLIB_DECOMPRESS_C := $(wildcard $(ZSTDLIB_DECOMPRESS)/*.c)
++ZSTDLIB_COMMON_C := $(sort $(wildcard $(ZSTDLIB_COMMON)/*.c))
++ZSTDLIB_COMPRESS_C := $(sort $(wildcard $(ZSTDLIB_COMPRESS)/*.c))
++ZSTDLIB_DECOMPRESS_C := $(sort $(wildcard $(ZSTDLIB_DECOMPRESS)/*.c))
+ ZSTDLIB_CORE_SRC := $(ZSTDLIB_DECOMPRESS_C) $(ZSTDLIB_COMMON_C) $(ZSTDLIB_COMPRESS_C)
+-ZDICT_SRC := $(wildcard $(ZDICT_DIR)/*.c)
++ZDICT_SRC := $(sort $(wildcard $(ZDICT_DIR)/*.c))
+ 
+ ZSTD_LEGACY_SUPPORT ?= 5
+ ZSTDLEGACY_SRC :=
+@@ -91,7 +91,7 @@ ZSTDLIB_FULL_SRC = $(sort $(ZSTDLIB_CORE_SRC) $(ZSTDLEGACY_SRC) $(ZDICT_SRC))
+ ZSTDLIB_LOCAL_SRC := $(notdir $(ZSTDLIB_FULL_SRC))
+ ZSTDLIB_LOCAL_OBJ := $(ZSTDLIB_LOCAL_SRC:.c=.o)
+ 
+-ZSTD_CLI_SRC := $(wildcard *.c)
++ZSTD_CLI_SRC := $(sort $(wildcard *.c))
+ ZSTD_CLI_OBJ := $(ZSTD_CLI_SRC:.c=.o)
+ 
+ ZSTD_ALL_SRC := $(ZSTDLIB_LOCAL_SRC) $(ZSTD_CLI_SRC)
+diff --git a/tests/Makefile b/tests/Makefile
+index 42bc353c..5f5654f0 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -49,7 +49,7 @@ ZSTD_FILES  := $(ZSTDDECOMP_FILES) $(ZSTDCOMMON_FILES) $(ZSTDCOMP_FILES)
+ ZBUFF_FILES := $(ZSTDDIR)/deprecated/*.c
+ ZDICT_FILES := $(ZSTDDIR)/dictBuilder/*.c
+ 
+-ZSTD_F1 := $(wildcard $(ZSTD_FILES))
++ZSTD_F1 := $(sort $(wildcard $(ZSTD_FILES)))
+ ZSTD_OBJ1 := $(subst $(ZSTDDIR)/common/,zstdm_,$(ZSTD_F1))
+ ZSTD_OBJ2 := $(subst $(ZSTDDIR)/compress/,zstdc_,$(ZSTD_OBJ1))
+ ZSTD_OBJ3 := $(subst $(ZSTDDIR)/decompress/,zstdd_,$(ZSTD_OBJ2))
+@@ -212,7 +212,7 @@ bigdict: $(ZSTDMT_OBJECTS) $(PRGDIR)/datagen.c bigdict.c
+ invalidDictionaries : $(ZSTD_OBJECTS) invalidDictionaries.c
+ 
+ legacy : CPPFLAGS += -I$(ZSTDDIR)/legacy -DZSTD_LEGACY_SUPPORT=4
+-legacy : $(ZSTD_FILES) $(wildcard $(ZSTDDIR)/legacy/*.c) legacy.c
++legacy : $(ZSTD_FILES) $(sort $(wildcard $(ZSTDDIR)/legacy/*.c)) legacy.c
+ 
+ decodecorpus : LDLIBS += -lm
+ decodecorpus : $(filter-out zstdc_zstd_compress.o, $(ZSTD_OBJECTS)) $(ZDICT_FILES) $(PRGDIR)/util.c $(PRGDIR)/timefn.c decodecorpus.c
+diff --git a/tests/fuzz/Makefile b/tests/fuzz/Makefile
+index 36232a8c..574fe877 100644
+--- a/tests/fuzz/Makefile
++++ b/tests/fuzz/Makefile
+@@ -58,7 +58,7 @@ FUZZ_SRC       := \
+ 	$(ZSTDCOMP_SRC) \
+ 	$(ZSTDDICT_SRC) \
+ 	$(ZSTDLEGACY_SRC)
+-FUZZ_SRC := $(wildcard $(FUZZ_SRC))
++FUZZ_SRC := $(sort $(wildcard $(FUZZ_SRC)))
+ 
+ FUZZ_D_OBJ1 := $(subst $(ZSTDDIR)/common/,d_lib_common_,$(FUZZ_SRC))
+ FUZZ_D_OBJ2 := $(subst $(ZSTDDIR)/compress/,d_lib_compress_,$(FUZZ_D_OBJ1))

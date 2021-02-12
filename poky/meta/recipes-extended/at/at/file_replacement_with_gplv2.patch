@@ -10,11 +10,11 @@ update the Copyright file information to reflect the replaced files.
 Date: 2010/08/31
 Nitin A Kamble nitin.a.kamble@intel.com
 
-Index: at-3.1.12/Copyright
+Index: at-3.2.1/Copyright
 ===================================================================
---- at-3.1.12.orig/Copyright
-+++ at-3.1.12/Copyright
-@@ -31,10 +31,10 @@ The files posixtm.c and posixtm.h have t
+--- at-3.2.1.orig/Copyright
++++ at-3.2.1/Copyright
+@@ -34,10 +34,10 @@ The files posixtm.c and posixtm.h have t
     Copyright (C) 1989, 1990, 1991, 1998, 2000, 2001, 2002, 2003, 2004,
     2005, 2006, 2007 Free Software Foundation Inc.
  

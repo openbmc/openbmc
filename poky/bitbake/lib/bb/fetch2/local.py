@@ -54,12 +54,12 @@ class Local(FetchMethod):
             return [path]
         filespath = d.getVar('FILESPATH')
         if filespath:
-            logger.debug(2, "Searching for %s in paths:\n    %s" % (path, "\n    ".join(filespath.split(":"))))
+            logger.debug2("Searching for %s in paths:\n    %s" % (path, "\n    ".join(filespath.split(":"))))
             newpath, hist = bb.utils.which(filespath, path, history=True)
             searched.extend(hist)
         if not os.path.exists(newpath):
             dldirfile = os.path.join(d.getVar("DL_DIR"), path)
-            logger.debug(2, "Defaulting to %s for %s" % (dldirfile, path))
+            logger.debug2("Defaulting to %s for %s" % (dldirfile, path))
             bb.utils.mkdirhier(os.path.dirname(dldirfile))
             searched.append(dldirfile)
             return searched

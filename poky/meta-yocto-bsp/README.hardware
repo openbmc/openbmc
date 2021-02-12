@@ -120,7 +120,7 @@ USB Device:
 
 
 Texas Instruments Beaglebone (beaglebone-yocto)
-=========================================
+===============================================
 
 The Beaglebone is an ARM Cortex-A8 development board with USB, Ethernet, 2D/3D
 accelerated graphics, audio, serial, JTAG, and SD/MMC. The Black adds a faster
@@ -150,7 +150,7 @@ From a Linux system with access to the image files perform the following steps:
 
   2. Use the "dd" utility to write the image to the SD card. For example:
 
-     # dd core-image-minimal-beaglebone-yocto.wic of=/dev/sdb
+     # dd if=core-image-minimal-beaglebone-yocto.wic of=/dev/sdb
 
   3. Insert the SD card into the Beaglebone and boot the board.
 

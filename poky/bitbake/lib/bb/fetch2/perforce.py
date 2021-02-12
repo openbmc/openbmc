@@ -90,16 +90,16 @@ class Perforce(FetchMethod):
         p4port = d.getVar('P4PORT')
 
         if p4port:
-            logger.debug(1, 'Using recipe provided P4PORT: %s' % p4port)
+            logger.debug('Using recipe provided P4PORT: %s' % p4port)
             ud.host = p4port
         else:
-            logger.debug(1, 'Trying to use P4CONFIG to automatically set P4PORT...')
+            logger.debug('Trying to use P4CONFIG to automatically set P4PORT...')
             ud.usingp4config = True
             p4cmd = '%s info | grep "Server address"' % ud.basecmd
             bb.fetch2.check_network_access(d, p4cmd, ud.url)
             ud.host = runfetchcmd(p4cmd, d, True)
             ud.host = ud.host.split(': ')[1].strip()
-            logger.debug(1, 'Determined P4PORT to be: %s' % ud.host)
+            logger.debug('Determined P4PORT to be: %s' % ud.host)
             if not ud.host:
                 raise FetchError('Could not determine P4PORT from P4CONFIG')
 
@@ -119,6 +119,7 @@ class Perforce(FetchMethod):
         cleanedpath = ud.path.replace('/...', '').replace('/', '.')
         cleanedhost = ud.host.replace(':', '.')
 
+        cleanedmodule = ""
         # Merge the path and module into the final depot location
         if ud.module:
             if ud.module.find('/') == 0:
@@ -133,7 +134,7 @@ class Perforce(FetchMethod):
 
         ud.setup_revisions(d)
 
-        ud.localfile = d.expand('%s_%s_%s.tar.gz' % (cleanedhost, cleanedpath, ud.revision))
+        ud.localfile = d.expand('%s_%s_%s_%s.tar.gz' % (cleanedhost, cleanedpath, cleandedmodule, ud.revision))
 
     def _buildp4command(self, ud, d, command, depot_filename=None):
         """
@@ -207,7 +208,7 @@ class Perforce(FetchMethod):
         for filename in p4fileslist:
             item = filename.split(' - ')
             lastaction = item[1].split()
-            logger.debug(1, 'File: %s Last Action: %s' % (item[0], lastaction[0]))
+            logger.debug('File: %s Last Action: %s' % (item[0], lastaction[0]))
             if lastaction[0] == 'delete':
                 continue
             filelist.append(item[0])
@@ -254,7 +255,7 @@ class Perforce(FetchMethod):
             raise FetchError('Could not determine the latest perforce changelist')
 
         tipcset = tip.split(' ')[1]
-        logger.debug(1, 'p4 tip found to be changelist %s' % tipcset)
+        logger.debug('p4 tip found to be changelist %s' % tipcset)
         return tipcset
 
     def sortable_revision(self, ud, d, name):

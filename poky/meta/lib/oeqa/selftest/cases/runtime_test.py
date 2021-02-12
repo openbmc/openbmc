@@ -276,7 +276,7 @@ class Postinst(OESelftestTestCase):
                     # run_serial()'s status code is useless.'
                     for filename in ("rootfs", "delayed-a", "delayed-b"):
                         status, output = qemu.run_serial("test -f %s && echo found" % os.path.join(targettestdir, filename))
-                        self.assertEqual(output, "found", "%s was not present on boot" % filename)
+                        self.assertIn("found", output, "%s was not present on boot" % filename)
 
 
 

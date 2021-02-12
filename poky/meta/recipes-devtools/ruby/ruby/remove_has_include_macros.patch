@@ -1,4 +1,7 @@
-Filter out __has_include* compiler defines
+From 303fe0d20184203f1ac86d2a77b1447d47c8c29d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 26 Jan 2020 11:27:40 -0800
+Subject: [PATCH] Filter out __has_include* compiler defines
 
 They are internal to compiler and this header is later on includes in C
 files, but newer gcc >= 10 complains about it.
@@ -13,12 +16,18 @@ error in initial header file:
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
+---
+ common.mk | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/common.mk b/common.mk
+index 7633050..422aa9c 100644
 --- a/common.mk
 +++ b/common.mk
-@@ -221,6 +221,8 @@ $(TIMESTAMPDIR)/$(MJIT_HEADER:.h=)$(MJIT
- 		$(TIMESTAMPDIR)/$(arch)/.time
+@@ -233,6 +233,8 @@ $(TIMESTAMPDIR)/$(MJIT_HEADER:.h=)$(MJIT_HEADER_SUFFIX).time: probes.h vm.$(OBJE
  	$(ECHO) building $(@F:.time=.h)
- 	$(Q) $(CPP) -DMJIT_HEADER $(MJIT_HEADER_FLAGS) $(CFLAGS) $(XCFLAGS) $(CPPFLAGS) $(srcdir)/vm.c $(CPPOUTFLAG)$(@F:.time=.h).new
+ 	$(MINIRUBY) $(tooldir)/mjit_tabs.rb "$(MJIT_TABS)" \
+ 		$(CPP) -DMJIT_HEADER $(MJIT_HEADER_FLAGS) $(CFLAGS) $(XCFLAGS) $(CPPFLAGS) $(srcdir)/vm.c $(CPPOUTFLAG)$(@F:.time=.h).new
 +	$(Q)sed -i -e "/#define __has_include __has_include/d" $(@F:.time=.h).new
 +	$(Q)sed -i -e "/#define __has_include_next __has_include_next/d" $(@F:.time=.h).new
  	$(Q) $(IFCHANGE) "--timestamp=$@" $(@F:.time=.h) $(@F:.time=.h).new

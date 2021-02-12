@@ -1,7 +1,7 @@
-From ae5a7d622dc9addb2ca9fc85889c45964c025a9c Mon Sep 17 00:00:00 2001
+From 805e3ce0c20bee5049ff167ab6f620a230c6db51 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 15 Apr 2020 14:17:20 -0700
-Subject: [PATCH 16/17] Check for clang before checking gcc version
+Subject: [PATCH] Check for clang before checking gcc version
 
 Clang advertises itself to be gcc 4.2.1, so when compiling this test
 here fails since gcc < 4.4.5 did not support -static-libstdc++ but thats
@@ -18,10 +18,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index 6782f8b6ab8..72f5766b363 100755
+index 7b369071141..7da69e27ce9 100755
 --- a/configure
 +++ b/configure
-@@ -5143,7 +5143,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+@@ -5093,7 +5093,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
  
@@ -31,10 +31,10 @@ index 6782f8b6ab8..72f5766b363 100755
  #endif
  int main() {}
 diff --git a/configure.ac b/configure.ac
-index 55beb1dea46..3f9e613e2d9 100644
+index 92f01fb3ed7..e99d67ab86b 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1312,7 +1312,7 @@ if test "$GCC" = yes; then
+@@ -1311,7 +1311,7 @@ if test "$GCC" = yes; then
    AC_MSG_CHECKING([whether g++ accepts -static-libstdc++ -static-libgcc])
    AC_LANG_PUSH(C++)
    AC_LINK_IFELSE([AC_LANG_SOURCE([
@@ -43,6 +43,3 @@ index 55beb1dea46..3f9e613e2d9 100644
  #error -static-libstdc++ not implemented
  #endif
  int main() {}])],
--- 
-2.28.0
-

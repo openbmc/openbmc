@@ -117,7 +117,7 @@ def extract_packages(d, needed_packages):
             extract = package.get('extract', True)
 
             if extract:
-                #logger.debug(1, 'Extracting %s' % pkg)
+                #logger.debug('Extracting %s' % pkg)
                 dst_dir = os.path.join(extracted_path, pkg)
                 # Same package used for more than one test,
                 # don't need to extract again.
@@ -130,7 +130,7 @@ def extract_packages(d, needed_packages):
                 shutil.rmtree(pkg_dir)
 
             else:
-                #logger.debug(1, 'Copying %s' % pkg)
+                #logger.debug('Copying %s' % pkg)
                 _copy_package(d, pkg)
 
 def _extract_in_tmpdir(d, pkg):

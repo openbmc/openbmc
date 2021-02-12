@@ -173,7 +173,7 @@ class CookerPlugin(layerindexlib.plugin.IndexPlugin):
         else:
             branches = ['HEAD']
 
-        logger.debug(1, "Loading cooker data branches %s" % branches)
+        logger.debug("Loading cooker data branches %s" % branches)
 
         index = self._load_bblayers(branches=branches)
 
@@ -220,7 +220,7 @@ class CookerPlugin(layerindexlib.plugin.IndexPlugin):
                                         required=required, layerbranch=layerBranchId,
                                         dependency=depLayerBranch.layer_id)
 
-                        logger.debug(1, '%s requires %s' % (layerDependency.layer.name, layerDependency.dependency.name))
+                        logger.debug('%s requires %s' % (layerDependency.layer.name, layerDependency.dependency.name))
                         index.add_element("layerDependencies", [layerDependency])
 
                     return layerDependencyId

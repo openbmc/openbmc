@@ -2538,6 +2538,13 @@ system and gives an overview of their function and contents.
       For guidance on how to create your own file permissions settings
       table file, examine the existing ``fs-perms.txt``.
 
+   :term:`FIT_DESC`
+      Specifies the description string encoded into a fitImage. The default
+      value is set by the :ref:`kernel-fitimage <ref-classes-kernel-fitimage>`
+      class as follows::
+
+         FIT_DESC ?= "U-Boot fitImage for ${DISTRO_NAME}/${PV}/${MACHINE}"
+
    :term:`FIT_GENERATE_KEYS`
       Decides whether to generate the keys for signing fitImage if they
       don't already exist. The keys are created in ``UBOOT_SIGN_KEYDIR``.
@@ -2567,6 +2574,13 @@ system and gives an overview of their function and contents.
    :term:`FIT_SIGN_NUMBITS`
       Size of private key in number of bits used in fitImage. The default
       value is "2048".
+
+   :term:`FIT_SIGN_INDIVIDUAL`
+      If set to "1", then the :ref:`kernel-fitimage <ref-classes-kernel-fitimage>`
+      class will sign the kernel, dtb and ramdisk images individually in addition
+      to signing the fitImage itself. This could be useful if you are
+      intending to verify signatures in another context than booting via
+      U-Boot.
 
    :term:`FONT_EXTRA_RDEPENDS`
       When inheriting the :ref:`fontcache <ref-classes-fontcache>` class,
@@ -2648,7 +2662,7 @@ system and gives an overview of their function and contents.
          GROUPADD_PARAM_${PN} = "-r netdev"
 
       For information on the standard Linux shell command
-      ``groupadd``, see http://linux.die.net/man/8/groupadd.
+      ``groupadd``, see https://linux.die.net/man/8/groupadd.
 
    :term:`GROUPMEMS_PARAM`
       When inheriting the :ref:`useradd <ref-classes-useradd>` class,
@@ -2657,7 +2671,7 @@ system and gives an overview of their function and contents.
       of a group when the package is installed.
 
       For information on the standard Linux shell command ``groupmems``,
-      see http://linux.die.net/man/8/groupmems.
+      see https://linux.die.net/man/8/groupmems.
 
    :term:`GRUB_GFXSERIAL`
       Configures the GNU GRand Unified Bootloader (GRUB) to have graphics
@@ -3870,6 +3884,15 @@ system and gives an overview of their function and contents.
 
          KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
+   :term:`KERNEL_DTC_FLAGS`
+      Specifies the ``dtc`` flags that are passed to the Linux kernel build
+      system when generating the device trees (via ``DTC_FLAGS`` environment
+      variable).
+
+      In order to use this variable, the
+      :ref:`kernel-devicetree <ref-classes-kernel-devicetree>` class must
+      be inherited.
+
    :term:`KERNEL_EXTRA_ARGS`
       Specifies additional ``make`` command-line arguments the OpenEmbedded
       build system passes on when compiling the kernel.
@@ -3983,8 +4006,9 @@ system and gives an overview of their function and contents.
       when building the kernel and is passed to ``make`` as the target to
       build.
 
-      If you want to build an alternate kernel image type, use the
-      :term:`KERNEL_ALT_IMAGETYPE` variable.
+      If you want to build an alternate kernel image type in addition to that
+      specified by ``KERNEL_IMAGETYPE``, use the :term:`KERNEL_ALT_IMAGETYPE`
+      variable.
 
    :term:`KERNEL_MODULE_AUTOLOAD`
       Lists kernel modules that need to be auto-loaded during boot.
@@ -4178,11 +4202,11 @@ system and gives an overview of their function and contents.
       this variable in your layer's ``conf/layer.conf`` configuration file.
       For the list, use the Yocto Project
       :yocto_wiki:`Release Name </Releases>` (e.g.
-      DISTRO_NAME_NO_CAP). To specify multiple OE-Core versions for the
+      &DISTRO_NAME_NO_CAP;). To specify multiple OE-Core versions for the
       layer, use a space-separated list:
       ::
 
-         LAYERSERIES_COMPAT_layer_root_name = "DISTRO_NAME_NO_CAP DISTRO_NAME_NO_CAP_MINUS_ONE"
+         LAYERSERIES_COMPAT_layer_root_name = "&DISTRO_NAME_NO_CAP; &DISTRO_NAME_NO_CAP_MINUS_ONE;"
 
       .. note::
 
@@ -4679,7 +4703,7 @@ system and gives an overview of their function and contents.
       See the :term:`KERNEL_MODULE_AUTOLOAD` variable for more information.
 
    module_conf
-      Specifies `modprobe.d <http://linux.die.net/man/5/modprobe.d>`_
+      Specifies `modprobe.d <https://linux.die.net/man/5/modprobe.d>`_
       syntax lines for inclusion in the ``/etc/modprobe.d/modname.conf``
       file.
 
@@ -5891,23 +5915,16 @@ system and gives an overview of their function and contents.
       file ``eudev_3.2.9.bb``:
       ::
 
-         PROVIDES = "udev"
+         PROVIDES += "udev"
 
       The ``PROVIDES`` statement
       results in the "eudev" recipe also being available as simply "udev".
 
       .. note::
 
-         Given that a recipe's own recipe name is already implicitly in its
-         own PROVIDES list, it is unnecessary to add aliases with the "+=" operator;
-         using a simple assignment will be sufficient. In other words,
-         while you could write:
-         ::
-
-                 PROVIDES += "udev"
-
-
-         in the above, the "+=" is overkill and unnecessary.
+         A recipe's own recipe name (:term:`PN`) is always implicitly prepended
+         to `PROVIDES`, so while using "+=" in the above example may not be
+         strictly necessary it is recommended to avoid confusion.
 
       In addition to providing recipes under alternate names, the
       ``PROVIDES`` mechanism is also used to implement virtual targets. A
@@ -7604,7 +7621,7 @@ system and gives an overview of their function and contents.
          SYSTEMD_BOOT_CFG ?= "${:term:`S`}/loader.conf"
 
       For information on Systemd-boot, see the `Systemd-boot
-      documentation <http://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__.
+      documentation <https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__.
 
    :term:`SYSTEMD_BOOT_ENTRIES`
       When :term:`EFI_PROVIDER` is set to
@@ -7618,7 +7635,7 @@ system and gives an overview of their function and contents.
           SYSTEMD_BOOT_ENTRIES ?= ""
 
       For information on Systemd-boot, see the `Systemd-boot
-      documentation <http://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__.
+      documentation <https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__.
 
    :term:`SYSTEMD_BOOT_TIMEOUT`
       When :term:`EFI_PROVIDER` is set to
@@ -7631,7 +7648,7 @@ system and gives an overview of their function and contents.
          SYSTEMD_BOOT_TIMEOUT ?= "10"
 
       For information on Systemd-boot, see the `Systemd-boot
-      documentation <http://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__.
+      documentation <https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/>`__.
 
    :term:`SYSTEMD_PACKAGES`
       When inheriting the :ref:`systemd <ref-classes-systemd>` class,
@@ -7662,7 +7679,7 @@ system and gives an overview of their function and contents.
       When using
       :ref:`SysVinit <dev-manual/common-tasks:enabling system services>`,
       specifies a space-separated list of the virtual terminals that should
-      run a `getty <http://en.wikipedia.org/wiki/Getty_%28Unix%29>`__
+      run a `getty <https://en.wikipedia.org/wiki/Getty_%28Unix%29>`__
       (allowing login), assuming :term:`USE_VT` is not set to
       "0".
 
@@ -7886,7 +7903,7 @@ system and gives an overview of their function and contents.
       toolchain. One example is the Sourcery G++ Toolchain. The support for
       this toolchain resides in the separate Mentor Graphics
       ``meta-sourcery`` layer at
-      http://github.com/MentorEmbedded/meta-sourcery/.
+      https://github.com/MentorEmbedded/meta-sourcery/.
 
       The layer's ``README`` file contains information on how to use the
       Sourcery G++ Toolchain as an external toolchain. In summary, you must
@@ -8389,21 +8406,21 @@ system and gives an overview of their function and contents.
       In this example, "sd" is selected as the configuration of the possible four for the
       ``UBOOT_MACHINE``. The "sd" configuration defines
       "mx6qsabreauto_config" as the value for ``UBOOT_MACHINE``, while the
-      "sdcard" specifies the ``IMAGE_FSTYPES`` to use for the U-boot image.
+      "sdcard" specifies the ``IMAGE_FSTYPES`` to use for the U-Boot image.
 
       For more information on how the ``UBOOT_CONFIG`` is handled, see the
       :ref:`uboot-config <ref-classes-uboot-config>`
       class.
 
    :term:`UBOOT_DTB_LOADADDRESS`
-      Specifies the load address for the dtb image used by U-boot. During FIT
+      Specifies the load address for the dtb image used by U-Boot. During FIT
       image creation, the ``UBOOT_DTB_LOADADDRESS`` variable is used in
       :ref:`kernel-fitimage <ref-classes-kernel-fitimage>` class to specify
       the load address to be used in
       creating the dtb sections of Image Tree Source for the FIT image.
 
    :term:`UBOOT_DTBO_LOADADDRESS`
-      Specifies the load address for the dtbo image used by U-boot.  During FIT
+      Specifies the load address for the dtbo image used by U-Boot.  During FIT
       image creation, the ``UBOOT_DTBO_LOADADDRESS`` variable is used in
       :ref:`kernel-fitimage <ref-classes-kernel-fitimage>` class to specify the load address to be used in
       creating the dtbo sections of Image Tree Source for the FIT image.
@@ -8440,9 +8457,29 @@ system and gives an overview of their function and contents.
       Specifies the target called in the ``Makefile``. The default target
       is "all".
 
+   :term:`UBOOT_MKIMAGE`
+      Specifies the name of the mkimage command as used by the
+      :ref:`kernel-fitimage <ref-classes-kernel-fitimage>` class to assemble
+      the FIT image. This can be used to substitute an alternative command, wrapper
+      script or function if desired. The default is "uboot-mkimage".
+
    :term:`UBOOT_MKIMAGE_DTCOPTS`
       Options for the device tree compiler passed to mkimage '-D'
       feature while creating FIT image in :ref:`kernel-fitimage <ref-classes-kernel-fitimage>` class.
+      If ``UBOOT_MKIMAGE_DTCOPTS`` is not set then kernel-fitimage will not
+      pass the ``-D`` option to mkimage.
+
+   :term:`UBOOT_MKIMAGE_SIGN`
+      Specifies the name of the mkimage command as used by the
+      :ref:`kernel-fitimage <ref-classes-kernel-fitimage>` class to sign
+      the FIT image after it has been assembled (if enabled). This can be used
+      to substitute an alternative command, wrapper script or function if
+      desired. The default is "${:term:`UBOOT_MKIMAGE`}".
+
+   :term:`UBOOT_MKIMAGE_SIGN_ARGS`
+      Optionally specifies additional arguments for the
+      :ref:`kernel-fitimage <ref-classes-kernel-fitimage>` class to pass to the
+      mkimage command when signing the FIT image.
 
    :term:`UBOOT_RD_ENTRYPOINT`
       Specifies the entrypoint for the RAM disk image.
@@ -8468,7 +8505,7 @@ system and gives an overview of their function and contents.
       certificate used for signing FIT image.
 
    :term:`UBOOT_SIGN_KEYNAME`
-      The name of keys used for signing U-boot FIT image stored in
+      The name of keys used for signing U-Boot FIT image stored in
       :term:`UBOOT_SIGN_KEYDIR` directory. For e.g. dev.key key and dev.crt
       certificate stored in :term:`UBOOT_SIGN_KEYDIR` directory will have
       :term:`UBOOT_SIGN_KEYNAME` set to "dev".
@@ -8562,7 +8599,7 @@ system and gives an overview of their function and contents.
       When using
       :ref:`SysVinit <dev-manual/common-tasks:enabling system services>`,
       determines whether or not to run a
-      `getty <http://en.wikipedia.org/wiki/Getty_%28Unix%29>`__ on any
+      `getty <https://en.wikipedia.org/wiki/Getty_%28Unix%29>`__ on any
       virtual terminals in order to enable logging in through those
       terminals.
 
@@ -8673,7 +8710,7 @@ system and gives an overview of their function and contents.
 
       For information on the
       standard Linux shell command ``useradd``, see
-      http://linux.die.net/man/8/useradd.
+      https://linux.die.net/man/8/useradd.
 
    :term:`USERADD_UID_TABLES`
       Specifies a password file to use for obtaining static user

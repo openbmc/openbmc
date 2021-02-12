@@ -17,7 +17,7 @@ LOAD_MODULE=modprobe
 # Test if modules.dep exists and has a size greater than zero
 if [ ! -s /lib/modules/`uname -r`/modules.dep ]; then
 	[ "$VERBOSE" != no ] && echo "Calculating module dependencies ..."
-	depmod -Ae
+	depmod -a
 fi
 
 [ -f /etc/modules ] || [ -d /etc/modules-load.d ] || exit 0

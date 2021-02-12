@@ -1,0 +1,121 @@
+From 05d290165a3b61da09b715e6c8e62cebebab57cc Mon Sep 17 00:00:00 2001
+From: Erik Flodin <erik@ejohansson.se>
+Date: Mon, 7 Dec 2020 19:20:31 +0100
+Subject: [PATCH 1/2] Improve SIMD detection (#735)
+
+* Try to compile code to detect SSE/AVX support. Just checking if the compiler
+  supports the flag isn't enough as e.g. Clang on Apple's new ARM silicon seems
+  to accept the flag but then fails when building.
+* Try to detect and enable BLAKE3's Neon support.
+* Improve detection of AVX2 target attribute support and remove the explicit
+  compiler version check that hopefully shouldn't be needed.
+
+Fixes #734.
+Upstream-Status: Backport [https://github.com/ccache/ccache/commit/b438f50388dd00285083260f60450e6237b7d58f]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cmake/GenerateConfigurationFile.cmake | 25 +++++++++---------
+ src/third_party/blake3/CMakeLists.txt | 38 ++++++++++++++++++++-------
+ 2 files changed, 42 insertions(+), 21 deletions(-)
+
+diff --git a/cmake/GenerateConfigurationFile.cmake b/cmake/GenerateConfigurationFile.cmake
+index a21861f4..836ff9bb 100644
+--- a/cmake/GenerateConfigurationFile.cmake
++++ b/cmake/GenerateConfigurationFile.cmake
+@@ -67,18 +67,19 @@ check_struct_has_member("struct stat" st_mtim sys/stat.h
+ check_struct_has_member("struct statfs" f_fstypename sys/mount.h
+                         HAVE_STRUCT_STATFS_F_FSTYPENAME)
+ 
+-include(CheckCXXCompilerFlag)
+-
+-# Old GCC versions don't have the required header support.
+-# Old Apple Clang versions seem to support -mavx2 but not the target
+-# attribute that's used to enable AVX2 for a certain function.
+-if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
+-   OR (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0))
+-  message(STATUS "Detected unsupported compiler for HAVE_AVX2 - disabled")
+-  set(HAVE_AVX2 FALSE)
+-else()
+-  check_cxx_compiler_flag(-mavx2 HAVE_AVX2)
+-endif()
++include(CheckCXXSourceCompiles)
++check_cxx_source_compiles(
++  [=[
++    #include <immintrin.h>
++    void func() __attribute__((target("avx2")));
++    void func() { _mm256_abs_epi8(_mm256_set1_epi32(42)); }
++    int main()
++    {
++      func();
++      return 0;
++    }
++  ]=]
++  HAVE_AVX2)
+ 
+ list(APPEND CMAKE_REQUIRED_LIBRARIES ws2_32)
+ list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES ws2_32)
+diff --git a/src/third_party/blake3/CMakeLists.txt b/src/third_party/blake3/CMakeLists.txt
+index a75e5611..cc24253c 100644
+--- a/src/third_party/blake3/CMakeLists.txt
++++ b/src/third_party/blake3/CMakeLists.txt
+@@ -13,9 +13,9 @@ else()
+ endif()
+ 
+ include(CheckAsmCompilerFlag)
+-include(CheckCCompilerFlag)
++include(CheckCSourceCompiles)
+ 
+-function(add_source_if_enabled feature compile_flags)
++function(add_source_if_enabled feature compile_flags intrinsic)
+   string(TOUPPER "have_${blake_source_type}_${feature}" have_feature)
+ 
+   # AVX512 support fails to compile with old Apple Clang versions even though
+@@ -28,7 +28,14 @@ function(add_source_if_enabled feature compile_flags)
+   elseif(${blake_source_type} STREQUAL "asm")
+     check_asm_compiler_flag(${compile_flags} ${have_feature})
+   else()
+-    check_c_compiler_flag(${compile_flags} ${have_feature})
++    set(CMAKE_REQUIRED_FLAGS ${compile_flags})
++    check_c_source_compiles(
++      [=[
++        #include <immintrin.h>
++        int main() { ${intrinsic}; return 0; }
++      ]=]
++      ${have_feature})
++    unset(CMAKE_REQUIRED_FLAGS)
+   endif()
+ 
+   if(${have_feature})
+@@ -42,10 +49,23 @@ function(add_source_if_enabled feature compile_flags)
+   endif()
+ endfunction()
+ 
+-add_source_if_enabled(sse2 "-msse2")
+-add_source_if_enabled(sse41 "-msse4.1")
+-add_source_if_enabled(avx2 "-mavx2")
+-add_source_if_enabled(avx512 "-mavx512f -mavx512vl")
++# https://software.intel.com/sites/landingpage/IntrinsicsGuide/
++add_source_if_enabled(sse2 "-msse2" "_mm_set1_epi32(42)")
++add_source_if_enabled(sse41 "-msse4.1" "_mm_test_all_ones(_mm_set1_epi32(42))")
++add_source_if_enabled(avx2 "-mavx2" "_mm256_abs_epi8(_mm256_set1_epi32(42))")
++add_source_if_enabled(avx512 "-mavx512f -mavx512vl" "_mm256_abs_epi64(_mm256_set1_epi32(42))")
+ 
+-# TODO: how to detect ARM NEON support?
+-# If NEON, define BLAKE3_USE_NEON and build blake3_neon.c
++# Neon is always available on AArch64
++if(CMAKE_SIZEOF_VOID_P EQUAL 8)
++  # https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics
++  check_c_source_compiles(
++    [=[
++      #include <arm_neon.h>
++      int main() { vdupq_n_s32(42); return 0; }
++    ]=]
++    HAVE_NEON)
++  if(HAVE_NEON)
++    target_sources(blake3 PRIVATE blake3_neon.c)
++    target_compile_definitions(blake3 PRIVATE BLAKE3_USE_NEON)
++  endif()
++endif()
+-- 
+2.30.0
+

@@ -1,7 +1,7 @@
-From f791a5d84475c02356f16679b7f4ee9c9c3408aa Mon Sep 17 00:00:00 2001
+From 0e026a8758a5416b548de21d5245477cf8e33ed2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:42:38 +0000
-Subject: [PATCH 14/17] Fix rpath in libtool when sysroot is enabled
+Subject: [PATCH] Fix rpath in libtool when sysroot is enabled
 
 Enabling sysroot support in libtool exposed a bug where the final
 library had an RPATH encoded into it which still pointed to the
@@ -47,6 +47,3 @@ index 70e856e0659..11ee684cccf 100644
  	  if test -n "$hardcode_libdir_separator"; then
  	    if test -z "$hardcode_libdirs"; then
  	      hardcode_libdirs="$libdir"
--- 
-2.28.0
-

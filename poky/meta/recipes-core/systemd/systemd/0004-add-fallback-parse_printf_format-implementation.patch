@@ -1,7 +1,7 @@
-From 8af168cefca01f8f2da336f1c82620c284dc74f2 Mon Sep 17 00:00:00 2001
+From f3dbe29f7620a063af4d8eb3ea7c48ecd410200d Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 14:04:21 +0800
-Subject: [PATCH] add fallback parse_printf_format implementation
+Subject: [PATCH 04/26] add fallback parse_printf_format implementation
 
 Upstream-Status: Inappropriate [musl specific]
 
@@ -10,7 +10,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 [rebased for systemd 243]
 Signed-off-by: Scott Murray <scott.murray@konsulko.com>
-
 ---
  meson.build                     |   1 +
  src/basic/meson.build           |   5 +
@@ -22,11 +21,11 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  create mode 100644 src/basic/parse-printf-format.c
  create mode 100644 src/basic/parse-printf-format.h
 
-Index: systemd-stable/meson.build
-===================================================================
---- systemd-stable.orig/meson.build
-+++ systemd-stable/meson.build
-@@ -638,6 +638,7 @@ endif
+diff --git a/meson.build b/meson.build
+index f406d595e6..6aa47fc755 100644
+--- a/meson.build
++++ b/meson.build
+@@ -646,6 +646,7 @@ endif
  foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
@@ -34,11 +33,11 @@ Index: systemd-stable/meson.build
                    'sys/auxv.h',
                    'valgrind/memcheck.h',
                    'valgrind/valgrind.h',
-Index: systemd-stable/src/basic/meson.build
-===================================================================
---- systemd-stable.orig/src/basic/meson.build
-+++ systemd-stable/src/basic/meson.build
-@@ -317,6 +317,11 @@ foreach item : [['af',     af_list_txt,
+diff --git a/src/basic/meson.build b/src/basic/meson.build
+index 1183ea83ad..aa5c958850 100644
+--- a/src/basic/meson.build
++++ b/src/basic/meson.build
+@@ -322,6 +322,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
  endforeach
  
  basic_sources += generated_gperf_headers
@@ -50,10 +49,11 @@ Index: systemd-stable/src/basic/meson.build
  basic_gcrypt_sources = files(
          'gcrypt-util.c',
          'gcrypt-util.h')
-Index: systemd-stable/src/basic/parse-printf-format.c
-===================================================================
+diff --git a/src/basic/parse-printf-format.c b/src/basic/parse-printf-format.c
+new file mode 100644
+index 0000000000..49437e5445
 --- /dev/null
-+++ systemd-stable/src/basic/parse-printf-format.c
++++ b/src/basic/parse-printf-format.c
 @@ -0,0 +1,273 @@
 +/*-*- Mode: C; c-basic-offset: 8; indent-tabs-mode: nil -*-*/
 +
@@ -328,10 +328,11 @@ Index: systemd-stable/src/basic/parse-printf-format.c
 +
 +        return last;
 +}
-Index: systemd-stable/src/basic/parse-printf-format.h
-===================================================================
+diff --git a/src/basic/parse-printf-format.h b/src/basic/parse-printf-format.h
+new file mode 100644
+index 0000000000..47be7522d7
 --- /dev/null
-+++ systemd-stable/src/basic/parse-printf-format.h
++++ b/src/basic/parse-printf-format.h
 @@ -0,0 +1,57 @@
 +/*-*- Mode: C; c-basic-offset: 8; indent-tabs-mode: nil -*-*/
 +
@@ -390,12 +391,12 @@ Index: systemd-stable/src/basic/parse-printf-format.h
 +size_t parse_printf_format(const char *fmt, size_t n, int *types);
 +
 +#endif /* HAVE_PRINTF_H */
-Index: systemd-stable/src/basic/stdio-util.h
-===================================================================
---- systemd-stable.orig/src/basic/stdio-util.h
-+++ systemd-stable/src/basic/stdio-util.h
+diff --git a/src/basic/stdio-util.h b/src/basic/stdio-util.h
+index 6dc1e72312..cea76b36cf 100644
+--- a/src/basic/stdio-util.h
++++ b/src/basic/stdio-util.h
 @@ -1,13 +1,13 @@
- /* SPDX-License-Identifier: LGPL-2.1+ */
+ /* SPDX-License-Identifier: LGPL-2.1-or-later */
  #pragma once
  
 -#include <printf.h>
@@ -409,10 +410,10 @@ Index: systemd-stable/src/basic/stdio-util.h
  
  #define snprintf_ok(buf, len, fmt, ...) \
          ((size_t) snprintf(buf, len, fmt, __VA_ARGS__) < (len))
-Index: systemd-stable/src/journal/journal-send.c
-===================================================================
---- systemd-stable.orig/src/journal/journal-send.c
-+++ systemd-stable/src/journal/journal-send.c
+diff --git a/src/journal/journal-send.c b/src/journal/journal-send.c
+index fd3fd7ef9c..e8e6ad555b 100644
+--- a/src/journal/journal-send.c
++++ b/src/journal/journal-send.c
 @@ -2,7 +2,6 @@
  
  #include <errno.h>
@@ -429,3 +430,6 @@ Index: systemd-stable/src/journal/journal-send.c
  
  #define SNDBUF_SIZE (8*1024*1024)
  
+-- 
+2.27.0
+
