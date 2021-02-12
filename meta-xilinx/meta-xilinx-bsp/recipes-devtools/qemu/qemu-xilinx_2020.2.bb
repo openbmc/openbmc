@@ -1,4 +1,4 @@
-require recipes-devtools/qemu/qemu.inc
+require qemu.inc
 require qemu-xilinx.inc
 
 BBCLASSEXTEND = "nativesdk"

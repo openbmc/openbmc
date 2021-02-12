@@ -1,4 +1,4 @@
-require recipes-devtools/qemu/qemu-native.inc
+require qemu-native.inc
 require qemu-xilinx.inc
 
 DEPENDS = "glib-2.0-native zlib-native"
