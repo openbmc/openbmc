@@ -4,7 +4,7 @@ Before=network-pre.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/bash -c 'echo /etc/nftables/*.rules | xargs -n 1 nft -f'
+ExecStart=/bin/bash -c 'shopt -s nullglob; echo /etc/nftables/*.rules | xargs -r -n 1 nft -f'
 ExecStop=/bin/bash -c 'nft flush ruleset'
 
 [Install]
