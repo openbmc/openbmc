@@ -5,17 +5,28 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit systemd
 
-SRC_URI += "file://50-gbmc-ncsi.rules.in"
+SRC_URI += " \
+  file://50-gbmc-ncsi.rules.in \
+  file://gbmc-ncsi-sslh.socket.in \
+  file://gbmc-ncsi-sslh.service \
+  "
 
 S = "${WORKDIR}"
 
-RDEPENDS_${PN} += "ncsid"
-RDEPENDS_${PN} += "nftables-systemd"
-RDEPENDS_${PN} += "gbmc-sslh"
+RDEPENDS_${PN} += " \
+  ncsid \
+  nftables-systemd \
+  sslh \
+  "
 
 FILES_${PN} += "${systemd_unitdir}"
 
 RPROVIDES_${PN} += "ncsid-config"
+
+SYSTEMD_SERVICE_${PN} += " \
+  gbmc-ncsi-sslh.service \
+  gbmc-ncsi-sslh.socket \
+  "
 
 do_install_append() {
   if_name='${GBMC_NCSI_IF_NAME}'
@@ -49,4 +60,8 @@ do_install_append() {
   wantdir=${D}${systemd_system_unitdir}/multi-user.target.wants
   install -d -m0755 "$wantdir"
   ln -sv ../ncsid@.service "$wantdir"/ncsid@$if_name.service
+
+  install -m 0644 ${WORKDIR}/gbmc-ncsi-sslh.service ${D}${systemd_system_unitdir}
+  sed "s,@NCSI_IF@,$if_name," ${WORKDIR}/gbmc-ncsi-sslh.socket.in \
+    >${D}${systemd_system_unitdir}/gbmc-ncsi-sslh.socket
 }

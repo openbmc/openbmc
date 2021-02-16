@@ -2,6 +2,7 @@
 Before=sslh.service
 
 [Socket]
+BindToDevice=@NCSI_IF@
 ListenStream=3967
 
 [Install]
