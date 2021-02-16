@@ -10,6 +10,8 @@ SRC_URI += "file://50-gbmc-ncsi.rules.in"
 S = "${WORKDIR}"
 
 RDEPENDS_${PN} += "ncsid"
+RDEPENDS_${PN} += "nftables-systemd"
+RDEPENDS_${PN} += "gbmc-sslh"
 
 FILES_${PN} += "${systemd_unitdir}"
 
