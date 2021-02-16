@@ -5,3 +5,4 @@ OBMC_IMAGE_EXTRA_INSTALL_append = " phosphor-ipmi-ethstats"
 OBMC_IMAGE_EXTRA_INSTALL_append = " phosphor-ipmi-flash"
 
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " gbmc-systemd-config"
+OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " gbmc-iperf3"
