@@ -52,4 +52,5 @@ RDEPENDS_${PN}-system = " \
         ipmitool \
         phosphor-post-code-manager \
         phosphor-host-postd \
+        phosphor-virtual-sensor \
         "
