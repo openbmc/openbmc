@@ -18,7 +18,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 DEPENDS += "systemd sdbusplus boost phosphor-ipmi-host"
 
 SRC_URI = "git://github.com/openbmc/phosphor-sel-logger.git;protocol=git"
-SRCREV = "7d8a3003fb8038291f5e678cbfd74344ec6e62d2"
+SRCREV = "dbd77b9200c27d129443a7c567ec5a58e55bfeac"
 
 PV = "0.1+git${SRCPV}"
 
