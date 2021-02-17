@@ -30,6 +30,9 @@ HOSTIPMI_PROVIDER_LIBRARY += "libsyscmds.so"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "gbmc-psu-hardreset.target"
 
+CXXFLAGS_append_gbmc = '${@"" if not d.getVar("GBMC_NCSI_IF_NAME") else \
+  " -DNCSI_IPMI_CHANNEL=1 -DNCSI_IF_NAME=" + d.getVar("GBMC_NCSI_IF_NAME")}'
+
 do_install_append() {
 	install -d ${D}${systemd_system_unitdir}
 	install -m 0644 ${S}/gbmc-psu-hardreset.target ${D}${systemd_system_unitdir}
