@@ -1,5 +1,5 @@
 {
-    "version": "R03",
+    "version": "R04",
     "sensors": [
         {
             "name": "fan0",
@@ -55,6 +55,16 @@
             "name": "fleeting1",
             "type": "margin",
             "readPath": "/xyz/openbmc_project/extsensors/margin/fleeting1",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "fleeting2",
+            "type": "margin",
+            "readPath": "/xyz/openbmc_project/extsensors/margin/fleeting2",
             "writePath": "",
             "min": 0,
             "max": 0,
@@ -224,6 +234,29 @@
                     "type": "margin",
                     "inputs": [
                         "fleeting1"
+                    ],
+                    "setpoint": 10.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 536.0,
+                        "integralCoeff": 18.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "fleeting2",
+                    "type": "margin",
+                    "inputs": [
+                        "fleeting2"
                     ],
                     "setpoint": 10.0,
                     "pid": {

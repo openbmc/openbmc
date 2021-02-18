@@ -543,6 +543,12 @@
   entityInstance: 0x2e
   path: /xyz/openbmc_project/sensors/temperature/hotswap
 
+0x2E:
+  <<: *temperature
+  entityID: 0x1E
+  entityInstance: 0x02
+  path: /xyz/openbmc_project/extsensors/margin/fleeting2
+
 # fan/pwm mapping
 # fan0/1 on Mobo, fb_fan0/1/2 on fan board
 # PWM0 => fan tach 0
