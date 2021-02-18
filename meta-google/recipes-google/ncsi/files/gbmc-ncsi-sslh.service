@@ -1,6 +1,7 @@
 [Unit]
 Description=SSL/SSH multiplexer
-Requires=sslh.socket
+Requires=gbmc-ncsi-sslh.socket
+After=gbmc-ncsi-sslh.socket
 
 [Service]
 ExecStart=/usr/sbin/sslh -n -f --ssh [::1]:22 --http [::1]:80 --tls [::1]:443
