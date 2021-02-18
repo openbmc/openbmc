@@ -21,8 +21,6 @@ RDEPENDS_${PN} += " \
 
 FILES_${PN} += "${systemd_unitdir}"
 
-RPROVIDES_${PN} += "ncsid-config"
-
 SYSTEMD_SERVICE_${PN} += " \
   gbmc-ncsi-sslh.service \
   gbmc-ncsi-sslh.socket \
@@ -30,8 +28,6 @@ SYSTEMD_SERVICE_${PN} += " \
 
 do_install_append() {
   if_name='${GBMC_NCSI_IF_NAME}'
-  test -z "$if_name" && if_name='${NCSID_IF_NAME}'
-  test -z "$if_name" && if_name='${GOOGLE_NCSI_IF_NAME}'
   if [ -z "$if_name" ]; then
     echo "Missing if_name" >&2
     exit 1
