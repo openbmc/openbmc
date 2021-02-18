@@ -2,7 +2,7 @@ SUMMARY = "dbus-sensors"
 DESCRIPTION = "Dbus Sensor Services Configured from D-Bus"
 
 SRC_URI = "git://github.com/openbmc/dbus-sensors.git"
-SRCREV = "49d12d8955495d4091b4520605c9e4510fcd743b"
+SRCREV = "87bc67f7f526344a132aaacdaad3a49b43dda29d"
 
 PV = "0.1+git${SRCPV}"
 
@@ -61,7 +61,7 @@ SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'mcutempsensor',
 SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'psusensor', \
                                                'xyz.openbmc_project.psusensor.service', \
                                                '', d)}"
-SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'externalsensor', \
+SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'external', \
                                                'xyz.openbmc_project.externalsensor.service', \
                                                '', d)}"
 
