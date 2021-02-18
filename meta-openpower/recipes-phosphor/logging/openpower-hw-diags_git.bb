@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/openbmc/openpower-hw-diags"
 
 SYSTEMD_SERVICE_${PN} = "attn_handler.service"
 PV = "0.1+git${SRCPV}"
-SRCREV = "b3eba2992926f9fc55a836d2baab85adfdf9bc5d"
+SRCREV = "4ed4be5645dbadbe6c251012485a71a75ec9ae82"
 
 S = "${WORKDIR}/git"
 
