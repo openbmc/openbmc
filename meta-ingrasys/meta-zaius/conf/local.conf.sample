@@ -1,5 +1,5 @@
 MACHINE ??= "zaius"
-DISTRO ?= "openbmc-zaius"
+DISTRO ?= "openbmc-openpower"
 PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"
 EXTRA_IMAGE_FEATURES = "debug-tweaks"
