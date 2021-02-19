@@ -21,10 +21,10 @@ if [ -z "$ZSH_NAME" ] && [ "$(basename -- "$0")" = "setup" ]; then
 fi
 
 # Check if 'column' command is present
-COLUMN=`which column`
+COLUMN=$(which column || true)
 if [ -z "$COLUMN" ]; then
     # If it is not, use 'cat'
-	COLUMN=`which cat`
+    COLUMN=$(which cat)
 fi
 
 machine() {
