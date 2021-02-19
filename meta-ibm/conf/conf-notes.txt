@@ -8,3 +8,5 @@ witherspoon:
 DISTRO=openbmc-witherspoon MACHINE=witherspoon bitbake obmc-phosphor-image
 witherspoon-tacoma:
 DISTRO=openbmc-openpower MACHINE=witherspoon-tacoma bitbake obmc-phosphor-image
+rainier:
+DISTRO=openbmc-openpower MACHINE=rainier bitbake obmc-phosphor-image
