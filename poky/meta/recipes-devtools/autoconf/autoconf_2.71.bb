@@ -40,10 +40,13 @@ RDEPENDS_${PN} = "m4 gnu-config \
 		  perl-module-file-spec \
 		  perl-module-file-spec-unix \
 		  perl-module-file-stat \
+                  perl-module-file-temp \
 		  perl-module-getopt-long \
 		  perl-module-io-file \
+                  perl-module-list-util \
 		  perl-module-overloading \
 		  perl-module-posix \
+                  perl-module-scalar-util \
 		  perl-module-symbol \
 		  perl-module-thread-queue \
 		  perl-module-threads \

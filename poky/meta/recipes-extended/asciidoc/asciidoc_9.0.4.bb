@@ -29,3 +29,5 @@ RDEPENDS_${PN} += "python3"
 RDEPENDS_remove_class-native = "python3"
 
 BBCLASSEXTEND = "native nativesdk"
+
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))$"

@@ -1,0 +1,47 @@
+From f1064e4b6cfc5955bc7e2b036f2d05540da9f09b Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sat, 13 Feb 2021 00:45:56 +0000
+Subject: [PATCH 3/3] cmake: add option to skip build the examples
+
+Upstream-Status: Backport [https://github.com/google/shaderc/commit/8d081127ee28ff5df8123c994c00bc66a57e9e9c]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ CMakeLists.txt | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b358f6b..d8a5405 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,6 +40,16 @@ else()
+   message(STATUS "Configuring Shaderc to avoid building tests.")
+ endif()
+ 
++option(SHADERC_SKIP_EXAMPLES "Skip building examples" ${SHADERC_SKIP_EXAMPLES})
++if(NOT ${SHADERC_SKIP_EXAMPLES})
++  set(SHADERC_ENABLE_EXAMPLES ON)
++endif()
++if(${SHADERC_ENABLE_EXAMPLES})
++  message(STATUS "Configuring Shaderc to build examples.")
++else()
++  message(STATUS "Configuring Shaderc to avoid building examples.")
++endif()
++
+ option(SHADERC_ENABLE_WERROR_COMPILE "Enable passing -Werror to compiler, if available" ON)
+ option(BUILD_EXTERNAL "Build external dependencies in /third_party" ON)
+ 
+@@ -114,7 +124,9 @@ endif()
+ add_subdirectory(libshaderc_util)
+ add_subdirectory(libshaderc)
+ add_subdirectory(glslc)
+-add_subdirectory(examples)
++if(${SHADERC_ENABLE_EXAMPLES})
++    add_subdirectory(examples)
++endif()
+ 
+ add_custom_target(build-version
+   ${PYTHON_EXECUTABLE}
+-- 
+2.30.1
+

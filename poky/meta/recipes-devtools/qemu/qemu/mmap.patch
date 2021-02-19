@@ -9,7 +9,7 @@ avoid asserting binaries when reserved_va is set.
 This meant a test case now gives the same behaviour regardless of whether
 reserved_va is set or not.
 
-Upstream-Status: Pending
+Upstream-Status: Backport [https://github.com/qemu/qemu/commit/ccc5ccc17f8cfbfd87d9aede5d12a2d47c56e712]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
 
 Index: qemu-5.2.0/linux-user/mmap.c

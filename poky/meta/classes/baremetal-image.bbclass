@@ -56,7 +56,6 @@ python do_rootfs(){
 
 # Assure binaries, manifest and qemubootconf are populated on DEPLOY_DIR_IMAGE
 do_image_complete[dirs] = "${TOPDIR}"
-do_image_complete[umask] = "022"
 SSTATETASKS += "do_image_complete"
 SSTATE_SKIP_CREATION_task-image-complete = '1'
 do_image_complete[sstate-inputdirs] = "${IMGDEPLOYDIR}"

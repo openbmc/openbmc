@@ -12,6 +12,7 @@ NATIVESDKFIXES_class-nativesdk = "\
            file://0005-nativesdk-glibc-Raise-the-size-of-arrays-containing-.patch \
            file://0006-nativesdk-glibc-Allow-64-bit-atomics-for-x86.patch \
            file://0007-nativesdk-glibc-Make-relocatable-install-for-locales.patch \
+           file://faccessat2-perm.patch \
 "
 
 SRC_URI =  "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \

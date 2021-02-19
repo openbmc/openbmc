@@ -187,6 +187,7 @@ cmake_do_configure() {
 	  -DCMAKE_INSTALL_SO_NO_EXE=0 \
 	  -DCMAKE_TOOLCHAIN_FILE=${WORKDIR}/toolchain.cmake \
 	  -DCMAKE_NO_SYSTEM_FROM_IMPORTED=1 \
+	  -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON \
 	  ${EXTRA_OECMAKE} \
 	  -Wno-dev
 }

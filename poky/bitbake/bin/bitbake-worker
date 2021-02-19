@@ -150,11 +150,15 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
 
     taskdep = workerdata["taskdeps"][fn]
     if 'umask' in taskdep and taskname in taskdep['umask']:
+        umask = taskdep['umask'][taskname]
+    elif workerdata["umask"]:
+        umask = workerdata["umask"]
+    if umask:
         # umask might come in as a number or text string..
         try:
-             umask = int(taskdep['umask'][taskname],8)
+             umask = int(umask, 8)
         except TypeError:
-             umask = taskdep['umask'][taskname]
+             pass
 
     dry_run = cfg.dry_run or dry_run_exec
 

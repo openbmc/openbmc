@@ -12,7 +12,7 @@ VALGRIND_BIN=@bindir@/valgrind
 LOG="${VALGRIND_LIB}/ptest/valgrind_ptest_$(date +%Y%m%d-%H%M%S).log"
 
 TOOLS="memcheck cachegrind callgrind helgrind drd massif dhat lackey none"
-EXP_TOOLS="exp-bbv exp-dhat exp-sgcheck"
+EXP_TOOLS="exp-bbv"
 
 GDB_BIN=@bindir@/gdb
 cd ${VALGRIND_LIB}/ptest && ./gdbserver_tests/make_local_links ${GDB_BIN}

@@ -1,0 +1,28 @@
+From 046c3c2da9c4ff66f14db5bd68e9557504a49241 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sat, 13 Feb 2021 00:45:56 +0000
+Subject: [PATCH 2/3] libshaderc_util: fix glslang header file location
+
+Upstream-Status: Pending
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ libshaderc_util/src/compiler.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libshaderc_util/src/compiler.cc b/libshaderc_util/src/compiler.cc
+index c5ce37e..4703634 100644
+--- a/libshaderc_util/src/compiler.cc
++++ b/libshaderc_util/src/compiler.cc
+@@ -20,7 +20,7 @@
+ #include <thread>
+ #include <tuple>
+ 
+-#include "SPIRV/GlslangToSpv.h"
++#include "glslang/SPIRV/GlslangToSpv.h"
+ #include "libshaderc_util/format.h"
+ #include "libshaderc_util/io.h"
+ #include "libshaderc_util/message.h"
+-- 
+2.30.1
+

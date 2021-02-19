@@ -23,6 +23,13 @@
 #
 # For a quad-core machine, BB_NUMBER_THREADS = "4", PARALLEL_MAKE = "-j 4" would
 # be appropriate for example.
+#
+# Some users are behind firewalls or use servers where the number of parallel connections
+# is limited. In such cases you can limit the number of fetch tasks which run in parallel by
+# setting the option below, in this case limiting to a maximum of 4 fetch tasks in parallel:
+#
+#do_fetch[number_threads] = "4"
+#
 
 # If you want to get an image based on directfb without x11 alter
 # DISTRO_FEATURES:
@@ -87,10 +94,7 @@ DISTRO_FEATURES_remove = "x11"
 # PACKAGE_DEBUG_SPLIT_STYLE = 'debug-file-directory'
 
 # Uncomment these to build a package such that you can use gprof to profile it.
-# NOTE: This will only work with 'linux' targets, not
-# 'linux-uclibc', as uClibc doesn't provide the necessary
-# object files.  Also, don't build glibc itself with these
-# flags, or it'll fail to build.
+# NOTE: Don't build glibc itself with these flags, or it'll fail to build.
 #
 # PROFILE_OPTIMIZATION = "-pg"
 # SELECTED_OPTIMIZATION = "${PROFILE_OPTIMIZATION}"
@@ -188,7 +192,8 @@ DISTRO_FEATURES_remove = "x11"
 #                           commercial_lame \
 #                           commercial_libmad \
 #                           commercial_libomxil \
-#                           commercial_mpeg2dec"
+#                           commercial_mpeg2dec \
+#                           commercial_qmmp"
 
 
 #
@@ -325,7 +330,7 @@ DISTRO_FEATURES_remove = "x11"
 # The INITRAMFS_IMAGE image variable will cause an additional recipe to
 # be built as a dependency to the what ever rootfs recipe you might be
 # using such as core-image-sato.  The initramfs might be needed for
-# the initial boot of of the target system such as to load kernel
+# the initial boot of the target system such as to load kernel
 # modules prior to mounting the root file system.
 #
 # INITRAMFS_IMAGE_BUNDLE variable controls if the image recipe
@@ -365,20 +370,23 @@ DISTRO_FEATURES_remove = "x11"
 #
 
 #
-# Use busybox/mdev for system initialization
+# System initialization
 #
-#VIRTUAL-RUNTIME_dev_manager = "busybox-mdev"
-#VIRTUAL-RUNTIME_login_manager = "busybox"
-#VIRTUAL-RUNTIME_init_manager = "busybox"
-#VIRTUAL-RUNTIME_initscripts = "initscripts"
-#VIRTUAL-RUNTIME_keymaps = "keymaps"
-#DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
+#INIT_MANAGER = "none"
+#INIT_MANAGER = "sysvinit"
+#INIT_MANAGER = "systemd"
+#INIT_MANAGER = "mdev-busybox"
 
 #
-# Use systemd for system initialization
+# Use a full set of packages instead of busybox for base utils
 #
-#DISTRO_FEATURES_append = " systemd"
-#DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
-#VIRTUAL-RUNTIME_login_manager = "shadow-base"
-#VIRTUAL-RUNTIME_init_manager = "systemd"
-#VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
+#PREFERRED_PROVIDER_base-utils = "packagegroup-core-base-utils"
+#VIRTUAL-RUNTIME_base-utils = "packagegroup-core-base-utils"
+#VIRTUAL-RUNTIME_base-utils-hwclock = "util-linux-hwclock"
+#VIRTUAL-RUNTIME_base-utils-syslog = "syslog"
+
+#
+# Enable LTO system-wide
+#
+#require conf/distro/include/lto.inc
+#DISTRO_FEATURES_append = " lto"

@@ -32,4 +32,8 @@ python () {
          d.setVar('DEB_SDK_ARCH', 'amd64')
     elif darch == "arm":
          d.setVar('DEB_SDK_ARCH', 'armel')
+    elif darch == "aarch64":
+         d.setVar('DEB_SDK_ARCH', 'arm64')
+    else:
+         bb.fatal("Unhandled SDK_ARCH %s" % darch)
 }

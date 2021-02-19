@@ -1271,6 +1271,7 @@ class RunQueue:
             "date" : self.cfgData.getVar("DATE"),
             "time" : self.cfgData.getVar("TIME"),
             "hashservaddr" : self.cooker.hashservaddr,
+            "umask" : self.cfgData.getVar("BB_DEFAULT_UMASK"),
         }
 
         worker.stdin.write(b"<cookerconfig>" + pickle.dumps(self.cooker.configuration) + b"</cookerconfig>")
@@ -1466,7 +1467,7 @@ class RunQueue:
             if not self.dm_event_handler_registered:
                  res = bb.event.register(self.dm_event_handler_name,
                                          lambda x: self.dm.check(self) if self.state in [runQueueRunning, runQueueCleanUp] else False,
-                                         ('bb.event.HeartbeatEvent',))
+                                         ('bb.event.HeartbeatEvent',), data=self.cfgData)
                  self.dm_event_handler_registered = True
 
             dump = self.cooker.configuration.dump_signatures
@@ -1505,7 +1506,7 @@ class RunQueue:
         build_done = self.state is runQueueComplete or self.state is runQueueFailed
 
         if build_done and self.dm_event_handler_registered:
-            bb.event.remove(self.dm_event_handler_name, None)
+            bb.event.remove(self.dm_event_handler_name, None, data=self.cfgData)
             self.dm_event_handler_registered = False
 
         if build_done and self.rqexe:

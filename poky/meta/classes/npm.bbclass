@@ -20,7 +20,7 @@
 inherit python3native
 
 DEPENDS_prepend = "nodejs-native "
-RDEPENDS_${PN}_prepend = "nodejs "
+RDEPENDS_${PN}_append_class-target = " nodejs"
 
 NPM_INSTALL_DEV ?= "0"
 

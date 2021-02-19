@@ -506,15 +506,10 @@ python () {
     # in order to capture permissions, owners, groups and special files
     if not bb.data.inherits_class('native', d) and not bb.data.inherits_class('cross', d):
         d.appendVarFlag('do_prepare_recipe_sysroot', 'depends', ' virtual/fakeroot-native:do_populate_sysroot')
-        d.setVarFlag('do_unpack', 'umask', '022')
-        d.setVarFlag('do_configure', 'umask', '022')
-        d.setVarFlag('do_compile', 'umask', '022')
         d.appendVarFlag('do_install', 'depends', ' virtual/fakeroot-native:do_populate_sysroot')
         d.setVarFlag('do_install', 'fakeroot', '1')
-        d.setVarFlag('do_install', 'umask', '022')
         d.appendVarFlag('do_package', 'depends', ' virtual/fakeroot-native:do_populate_sysroot')
         d.setVarFlag('do_package', 'fakeroot', '1')
-        d.setVarFlag('do_package', 'umask', '022')
         d.setVarFlag('do_package_setscene', 'fakeroot', '1')
         d.appendVarFlag('do_package_setscene', 'depends', ' virtual/fakeroot-native:do_populate_sysroot')
         d.setVarFlag('do_devshell', 'fakeroot', '1')

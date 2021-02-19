@@ -160,7 +160,6 @@ python patch_do_patch() {
 patch_do_patch[vardepsexclude] = "PATCHRESOLVE"
 
 addtask patch after do_unpack
-do_patch[umask] = "022"
 do_patch[dirs] = "${WORKDIR}"
 do_patch[depends] = "${PATCHDEPENDENCY}"
 

@@ -34,6 +34,8 @@ EXTRA_OEMAKE = "CC='${CC}' \
                 PREFIX=${prefix} \
                 INSTALLDIR=${bindir} \
                 INSTALLFLAGS= \
+                YACC=bison \
+                YFLAGS='-y --file-prefix-map=${WORKDIR}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}' \
                 "
 
 do_install() {

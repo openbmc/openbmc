@@ -1,0 +1,36 @@
+From d8c19e0bb9ca2fd48f223e1fdeffcafeb0aa1745 Mon Sep 17 00:00:00 2001
+From: Yi Fan Yu <yifan.yu@windriver.com>
+Date: Wed, 17 Feb 2021 14:53:44 -0500
+Subject: [PATCH] gdbserver_tests: Disable nlcontrolc.vgtest for x86-64
+
+Test hangs after glibc 2.33 uprev
+
+Using gdb to modify the timeout argument no longer
+affects how long `select` wait.
+
+https://bugs.kde.org/show_bug.cgi?id=432870
+Upstream-Status: Pending
+Waiting for upstream to take action.
+
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
+---
+ gdbserver_tests/nlcontrolc.vgtest | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gdbserver_tests/nlcontrolc.vgtest b/gdbserver_tests/nlcontrolc.vgtest
+index bb5308403..96d2b52bb 100644
+--- a/gdbserver_tests/nlcontrolc.vgtest
++++ b/gdbserver_tests/nlcontrolc.vgtest
+@@ -13,7 +13,8 @@ args: 1000000000 1000000000 1000000000 BSBSBSBS 1
+ vgopts: --tool=none --vgdb=yes --vgdb-error=0 --vgdb-prefix=./vgdb-prefix-nlcontrolc
+ stderr_filter: filter_stderr
+ # Bug 338633 nlcontrol hangs on arm64 currently.
+-prereq: test -e gdb -a -f vgdb.invoker && ! ../tests/arch_test arm64 && ! ../tests/os_test solaris
++# Bug 432870 nlcontrolc hangs on x86-64 starting with glibc 2.33
++prereq: test -e gdb -a -f vgdb.invoker && ! ../tests/arch_test arm64 && ! ../tests/os_test solaris && ! ../tests/arch_test amd64
+ progB: gdb
+ argsB: --quiet -l 60 --nx ./sleepers
+ stdinB: nlcontrolc.stdinB.gdb
+-- 
+2.29.2
+

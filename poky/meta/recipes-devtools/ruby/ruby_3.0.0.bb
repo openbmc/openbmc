@@ -32,6 +32,13 @@ EXTRA_OECONF_append_libc-musl = "\
     ac_cv_func_isinf=yes \
 "
 
+EXTRA_OECONF_append_libc-musl_riscv64 = "\
+    --with-coroutine=copy \
+"
+EXTRA_OECONF_append_libc-musl_riscv32 = "\
+    --with-coroutine=copy \
+"
+
 do_install() {
     oe_runmake 'DESTDIR=${D}' install
 }

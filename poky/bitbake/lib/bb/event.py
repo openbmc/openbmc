@@ -118,6 +118,8 @@ def fire_class_handlers(event, d):
             if _eventfilter:
                 if not _eventfilter(name, handler, event, d):
                     continue
+            if d and not name in (d.getVar("__BBHANDLERS_MC") or []):
+                continue
             execute_handler(name, handler, event, d)
 
 ui_queue = []
@@ -227,8 +229,12 @@ def fire_from_worker(event, d):
     fire_ui_handlers(event, d)
 
 noop = lambda _: None
-def register(name, handler, mask=None, filename=None, lineno=None):
+def register(name, handler, mask=None, filename=None, lineno=None, data=None):
     """Register an Event handler"""
+
+    if data and data.getVar("BB_CURRENT_MC"):
+        mc = data.getVar("BB_CURRENT_MC")
+        name = '%s%s' % (mc, name)
 
     # already registered
     if name in _handlers:
@@ -268,16 +274,32 @@ def register(name, handler, mask=None, filename=None, lineno=None):
                     _event_handler_map[m] = {}
                 _event_handler_map[m][name] = True
 
+        if data:
+            bbhands_mc = (data.getVar("__BBHANDLERS_MC") or [])
+            bbhands_mc.append(name)
+            data.setVar("__BBHANDLERS_MC", bbhands_mc)
+
         return Registered
 
-def remove(name, handler):
+def remove(name, handler, data=None):
     """Remove an Event handler"""
+    if data:
+        if data.getVar("BB_CURRENT_MC"):
+            mc = data.getVar("BB_CURRENT_MC")
+            name = '%s%s' % (mc, name)
+
     _handlers.pop(name)
     if name in _catchall_handlers:
         _catchall_handlers.pop(name)
     for event in _event_handler_map.keys():
         if name in _event_handler_map[event]:
             _event_handler_map[event].pop(name)
+
+    if data:
+        bbhands_mc = (data.getVar("__BBHANDLERS_MC") or [])
+        if name in bbhands_mc:
+            bbhands_mc.remove(name)
+            data.setVar("__BBHANDLERS_MC", bbhands_mc)
 
 def get_handlers():
     return _handlers

@@ -248,7 +248,6 @@ fakeroot python do_rootfs () {
 }
 do_rootfs[dirs] = "${TOPDIR}"
 do_rootfs[cleandirs] += "${S} ${IMGDEPLOYDIR}"
-do_rootfs[umask] = "022"
 do_rootfs[file-checksums] += "${POSTINST_INTERCEPT_CHECKSUMS}"
 addtask rootfs after do_prepare_recipe_sysroot
 
@@ -261,7 +260,6 @@ fakeroot python do_image () {
     execute_pre_post_process(d, pre_process_cmds)
 }
 do_image[dirs] = "${TOPDIR}"
-do_image[umask] = "022"
 addtask do_image after do_rootfs
 
 fakeroot python do_image_complete () {
@@ -272,7 +270,6 @@ fakeroot python do_image_complete () {
     execute_pre_post_process(d, post_process_cmds)
 }
 do_image_complete[dirs] = "${TOPDIR}"
-do_image_complete[umask] = "022"
 SSTATETASKS += "do_image_complete"
 SSTATE_SKIP_CREATION_task-image-complete = '1'
 do_image_complete[sstate-inputdirs] = "${IMGDEPLOYDIR}"

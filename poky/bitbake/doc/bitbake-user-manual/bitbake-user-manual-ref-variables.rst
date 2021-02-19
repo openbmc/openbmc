@@ -108,6 +108,10 @@ overview of their function and contents.
       command line option). The task name specified should not include the
       ``do_`` prefix.
 
+   :term:`BB_DEFAULT_UMASK`
+      The default umask to apply to tasks if specified and no task specific
+      umask flag is set.
+
    :term:`BB_DISKMON_DIRS`
       Monitors disk space and available inodes during the build and allows
       you to control the build based on these parameters.

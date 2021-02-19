@@ -16,6 +16,8 @@ REQUIRED_DISTRO_FEATURES = "systemd"
 
 SRC_URI += "file://touchscreen.rules \
            file://00-create-volatile.conf \
+           ${@bb.utils.contains('PACKAGECONFIG', 'polkit_hostnamed_fallback', 'file://org.freedesktop.hostname1_no_polkit.conf', '', d)} \
+           ${@bb.utils.contains('PACKAGECONFIG', 'polkit_hostnamed_fallback', 'file://00-hostnamed-network-user.conf', '', d)} \
            file://init \
            file://99-default.preset \
            file://systemd-pager.sh \
@@ -51,8 +53,6 @@ SRC_URI_MUSL = "\
                file://0020-Fix-incompatible-pointer-type-struct-sockaddr_un.patch \
                file://0021-test-json.c-define-M_PIl.patch \
                file://0022-do-not-disable-buffer-in-writing-files.patch \
-               file://0023-Include-sys-wait.h.patch \
-               file://0024-Include-signal.h.patch \
                file://0025-Handle-__cpu_mask-usage.patch \
                file://0026-Handle-missing-gshadow.patch \
                "
@@ -166,6 +166,10 @@ PACKAGECONFIG[openssl] = "-Dopenssl=true,-Dopenssl=false,openssl"
 PACKAGECONFIG[pam] = "-Dpam=true,-Dpam=false,libpam,${PAM_PLUGINS}"
 PACKAGECONFIG[pcre2] = "-Dpcre2=true,-Dpcre2=false,libpcre2"
 PACKAGECONFIG[polkit] = "-Dpolkit=true,-Dpolkit=false"
+# If polkit is disabled and networkd+hostnamed are in use, enabling this option and
+# using dbus-broker will allow networkd to be authorized to change the
+# hostname without acquiring additional privileges
+PACKAGECONFIG[polkit_hostnamed_fallback] = ",,,,dbus-broker,polkit"
 PACKAGECONFIG[portabled] = "-Dportabled=true,-Dportabled=false"
 PACKAGECONFIG[qrencode] = "-Dqrencode=true,-Dqrencode=false,qrencode,,qrencode"
 PACKAGECONFIG[quotacheck] = "-Dquotacheck=true,-Dquotacheck=false"
@@ -308,6 +312,15 @@ do_install() {
 		fi
 	fi
 
+	# If polkit is not available and a fallback was requested, install a drop-in that allows networkd to
+	# request hostname changes via DBUS without elevating its privileges
+	if ${@bb.utils.contains('PACKAGECONFIG', 'polkit_hostnamed_fallback', 'true', 'false', d)}; then
+		install -d ${D}${systemd_unitdir}/system/systemd-hostnamed.service.d/
+		install -m 0644 ${WORKDIR}/00-hostnamed-network-user.conf ${D}${systemd_unitdir}/system/systemd-hostnamed.service.d/
+		install -d ${D}${datadir}/dbus-1/system.d/
+		install -m 0644 ${WORKDIR}/org.freedesktop.hostname1_no_polkit.conf ${D}${datadir}/dbus-1/system.d/
+	fi
+
 	# create link for existing udev rules
 	ln -s ${base_bindir}/udevadm ${D}${base_sbindir}/udevadm
 
@@ -372,7 +385,8 @@ USERADD_PACKAGES = "${PN} ${PN}-extra-utils \
                     ${@bb.utils.contains('PACKAGECONFIG', 'microhttpd', '${PN}-journal-remote', '', d)} \
                     ${@bb.utils.contains('PACKAGECONFIG', 'journal-upload', '${PN}-journal-upload', '', d)} \
 "
-GROUPADD_PARAM_${PN} = "-r systemd-journal"
+GROUPADD_PARAM_${PN} = "-r systemd-journal;"
+GROUPADD_PARAM_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'polkit_hostnamed_fallback', '-r systemd-hostname;', '', d)}"
 USERADD_PARAM_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'coredump', '--system -d / -M --shell /sbin/nologin systemd-coredump;', '', d)}"
 USERADD_PARAM_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'networkd', '--system -d / -M --shell /sbin/nologin systemd-network;', '', d)}"
 USERADD_PARAM_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'polkit', '--system --no-create-home --user-group --home-dir ${sysconfdir}/polkit-1 polkitd;', '', d)}"
@@ -591,6 +605,7 @@ FILES_${PN} = " ${base_bindir}/* \
                 ${datadir}/dbus-1/system.d/org.freedesktop.network1.conf \
                 ${datadir}/dbus-1/system.d/org.freedesktop.resolve1.conf \
                 ${datadir}/dbus-1/system.d/org.freedesktop.systemd1.conf \
+                ${@bb.utils.contains('PACKAGECONFIG', 'polkit_hostnamed_fallback', '${datadir}/dbus-1/system.d/org.freedesktop.hostname1_no_polkit.conf', '', d)} \
                 ${datadir}/dbus-1/system.d/org.freedesktop.hostname1.conf \
                 ${datadir}/dbus-1/system.d/org.freedesktop.login1.conf \
                 ${datadir}/dbus-1/system.d/org.freedesktop.timesync1.conf \

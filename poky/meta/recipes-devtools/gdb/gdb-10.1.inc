@@ -11,7 +11,6 @@ SRC_URI = "${GNU_MIRROR}/gdb/gdb-${PV}.tar.xz \
            file://0004-Add-support-for-Renesas-SH-sh4-architecture.patch \
            file://0005-Dont-disable-libreadline.a-when-using-disable-static.patch \
            file://0006-use-asm-sgidefs.h.patch \
-           file://0007-Use-exorted-definitions-of-SIGRTMIN.patch \
            file://0008-Change-order-of-CFLAGS.patch \
            file://0009-resolve-restrict-keyword-conflict.patch \
            file://0010-Fix-invalid-sigprocmask-call.patch \

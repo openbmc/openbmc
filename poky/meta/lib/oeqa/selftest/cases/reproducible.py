@@ -24,13 +24,13 @@ import datetime
 # https://autobuilder.yocto.io/pub/repro-fail/oe-reproducible-20201127-hwds3mcl/
 # https://autobuilder.yocto.io/pub/repro-fail/oe-reproducible-20201203-sua0pzvc/
 # (both packages/ and packages-excluded/)
+
+# ruby-ri-docs, meson:
+#https://autobuilder.yocto.io/pub/repro-fail/oe-reproducible-20210215-0_td9la2/packages/diff-html/
 exclude_packages = [
-	'acpica-src',
 	'babeltrace2-ptest',
 	'bootchart2-doc',
 	'cups',
-	'cwautomacros',
-	'dtc',
 	'efivar',
 	'epiphany',
 	'gcr',
@@ -45,7 +45,6 @@ exclude_packages = [
 	'gstreamer1.0-python',
 	'gtk-doc',
 	'igt-gpu-tools',
-        'kernel-devsrc',
 	'libaprutil',
 	'libcap-ng',
 	'libhandy-1-src',
@@ -56,31 +55,25 @@ exclude_packages = [
 	'lttng-tools-dbg',
 	'lttng-tools-ptest',
 	'ltp',
-	'meson',
+        'meson',
 	'ovmf-shell-efi',
 	'parted-ptest',
 	'perf',
 	'python3-cython',
 	'qemu',
-	'quilt-ptest',
 	'rsync',
-	'ruby',
+        'ruby-ri-docs',
 	'swig',
 	'syslinux-misc',
-	'systemd-bootchart',
-	'valgrind-ptest',
-	'vim',
-	'watchdog',
-	'xmlto',
-	'xorg-minimal-fonts'
+	'systemd-bootchart'
 	]
 
 def is_excluded(package):
     package_name = os.path.basename(package)
     for i in exclude_packages:
         if package_name.startswith(i):
-            return True
-    return False
+            return i
+    return None
 
 MISSING = 'MISSING'
 DIFFERENT = 'DIFFERENT'
@@ -106,14 +99,17 @@ class PackageCompareResults(object):
         self.different = []
         self.different_excluded = []
         self.same = []
+        self.active_exclusions = set()
 
     def add_result(self, r):
         self.total.append(r)
         if r.status == MISSING:
             self.missing.append(r)
         elif r.status == DIFFERENT:
-            if is_excluded(r.reference):
+            exclusion = is_excluded(r.reference)
+            if exclusion:
                 self.different_excluded.append(r)
+                self.active_exclusions.add(exclusion)
             else:
                 self.different.append(r)
         else:
@@ -127,7 +123,10 @@ class PackageCompareResults(object):
         self.same.sort()
 
     def __str__(self):
-        return 'same=%i different=%i different_excluded=%i missing=%i total=%i' % (len(self.same), len(self.different), len(self.different_excluded), len(self.missing), len(self.total))
+        return 'same=%i different=%i different_excluded=%i missing=%i total=%i\nunused_exclusions=%s' % (len(self.same), len(self.different), len(self.different_excluded), len(self.missing), len(self.total), self.unused_exclusions())
+
+    def unused_exclusions(self):
+        return sorted(set(exclude_packages) - self.active_exclusions)
 
 def compare_file(reference, test, diffutils_sysroot):
     result = CompareResult()
@@ -260,9 +259,10 @@ class ReproducibleTests(OESelftestTestCase):
             # mirror, forcing a complete build from scratch
             config += textwrap.dedent('''\
                 SSTATE_DIR = "${TMPDIR}/sstate"
-                SSTATE_MIRROR = ""
+                SSTATE_MIRRORS = ""
                 ''')
 
+        self.logger.info("Building %s (sstate%s allowed)..." % (name, '' if use_sstate else ' NOT'))
         self.write_config(config)
         d = get_bb_vars(capture_vars)
         bitbake(' '.join(self.images))
@@ -289,6 +289,7 @@ class ReproducibleTests(OESelftestTestCase):
             self.logger.info('Non-reproducible packages will be copied to %s', save_dir)
 
         vars_A = self.do_test_build('reproducibleA', self.build_from_sstate)
+
         vars_B = self.do_test_build('reproducibleB', False)
 
         # NOTE: The temp directories from the reproducible build are purposely
@@ -303,6 +304,7 @@ class ReproducibleTests(OESelftestTestCase):
                 deploy_A = vars_A['DEPLOY_DIR_' + c.upper()]
                 deploy_B = vars_B['DEPLOY_DIR_' + c.upper()]
 
+                self.logger.info('Checking %s packages for differences...' % c)
                 result = self.compare_packages(deploy_A, deploy_B, diffutils_sysroot)
 
                 self.logger.info('Reproducibility summary for %s: %s' % (c, result))
