@@ -47,6 +47,15 @@ machine() {
 		name=${cfg##*/}
 		name=${name%.conf}
 		tmpl=${cfg%/machine/*.conf}
+
+        # Skip any machines that don't support meta-phosphor.
+        if [ ! -e $tmpl/bblayers.conf.sample ]; then
+            continue
+        fi
+        if ! grep -q "##OEROOT##/meta-phosphor" $tmpl/bblayers.conf.sample; then
+            continue
+        fi
+
 		# If a target is specified, then check for a match,
 		# otherwise just list what we've discovered
 		if [ -n "$target" ]; then
@@ -62,9 +71,7 @@ machine() {
 				fi
 				return
 			fi
-		elif test -e $tmpl/bblayers.conf.sample && \
-			grep -q "##OEROOT##/meta-phosphor" $tmpl/bblayers.conf.sample;
-		then
+        else
 			echo "${name}"
 		fi
 	done
