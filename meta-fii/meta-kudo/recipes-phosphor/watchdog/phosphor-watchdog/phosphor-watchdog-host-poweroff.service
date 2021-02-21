@@ -1,0 +1,8 @@
+[Unit]
+Description=Watchdog power state power cycle shutdown
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/bin/env kudo.sh rst shutdown
+SyslogIdentifier=phosphor-watchdog
