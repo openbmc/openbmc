@@ -28,4 +28,5 @@ SUMMARY_${PN}-kudo-fw = "KUDO Firmware"
 RDEPENDS_${PN}-kudo-fw = " \
     kudo-fw \
     kudo-bios-update \
+    kudo-bmc-update \
     "
