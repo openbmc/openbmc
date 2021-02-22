@@ -1,0 +1,19 @@
+[{
+    "blob": "/flash/scp",
+    "handler": {
+        "type": "file",
+        "path": "/run/initramfs/scp-fw.slim"
+    },
+    "actions": {
+        "preparation": {
+            "type": "skip"
+        },
+        "verification": {
+            "type": "skip"
+        },
+        "update": {
+            "type": "systemd",
+            "unit": "phosphor-ipmi-flash-scp-update.service"
+        }
+    }
+}]

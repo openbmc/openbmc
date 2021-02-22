@@ -30,4 +30,5 @@ RDEPENDS_${PN}-kudo-fw = " \
     kudo-bios-update \
     kudo-bmc-update \
     kudo-cpld-update \
+    kudo-scp-update \
     "
