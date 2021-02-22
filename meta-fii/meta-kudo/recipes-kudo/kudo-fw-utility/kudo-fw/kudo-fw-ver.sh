@@ -19,6 +19,7 @@ function fw_rev() {
         ;;
     esac
 }
+
 fw_rev cpldb
 echo "BMC CPLD version : ${ver}"
 echo "${ver}" > "${BMC_CPLD_VER_FILE}"
