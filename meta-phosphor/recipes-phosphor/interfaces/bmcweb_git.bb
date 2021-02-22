@@ -31,6 +31,7 @@ DEPENDS = " \
 
 RDEPENDS_${PN} += " \
     jsnbd \
+    phosphor-mapper \
 "
 
 FILES_${PN} += "${datadir}/** "
