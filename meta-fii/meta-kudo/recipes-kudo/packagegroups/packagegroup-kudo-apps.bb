@@ -5,26 +5,27 @@ inherit packagegroup
 
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
-     ${PN}-kudo-system \
-     ${PN}-kudo-common-utils \
-     "
+    ${PN}-kudo-system \
+    ${PN}-kudo-fw \
+    "
 
 PROVIDES += "virtual/obmc-system-mgmt"
 
 RPROVIDES_${PN}-kudo-system += "virtual-obmc-system-mgmt"
+RPROVIDES_${PN}-kudo-fw += "virtual-obmc-system-mgmt"
 
 SUMMARY_${PN}-kudo-system = "KUDO System"
 RDEPENDS_${PN}-kudo-system = " \
-    google-ipmi-sys \
-    google-ipmi-i2c \
-    "
-
-SUMMARY_${PN}-kudo-common-utils = "KUDO common utils"
-RDEPENDS_${PN}-kudo-common-utils = " \
     ipmitool \
-    phosphor-webui \
-    phosphor-host-postd \
+    ethtool \
+    memtester \
     loadsvf \
     obmc-console \
-    phosphor-sel-logger \
+    usb-network \
+    "
+
+SUMMARY_${PN}-kudo-fw = "KUDO Firmware"
+RDEPENDS_${PN}-kudo-fw = " \
+    kudo-fw \
+    kudo-bios-update \
     "
