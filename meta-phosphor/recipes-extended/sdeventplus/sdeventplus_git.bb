@@ -20,6 +20,6 @@ EXTRA_OEMESON = " \
         "
 
 SRC_URI += "git://github.com/openbmc/sdeventplus"
-SRCREV = "159a35604ab9f5d90264837b5681b0acee68b32c"
+SRCREV = "a6f7ed7ae56e0ee02a647a4eb42e1b26afe3fe55"
 
 S = "${WORKDIR}/git"
