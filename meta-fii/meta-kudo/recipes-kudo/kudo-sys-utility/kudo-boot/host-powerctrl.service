@@ -1,0 +1,12 @@
+[Unit]
+Description = Ampere Host Power Control Sequence
+
+[Service]
+Restart=no
+RemainAfterExit=true
+Type=oneshot
+ExecStart=/usr/bin/init_once.sh
+StandardOutput=syslog
+
+[Install]
+WantedBy=sysinit.target
