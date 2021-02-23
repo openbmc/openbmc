@@ -20,6 +20,7 @@ RDEPENDS_${PN}-kudo-system = " \
     ethtool \
     memtester \
     loadsvf \
+    fii-ipmi-oem \
     kudo-entity-association-map \
     hotswap-power-cycle \
     obmc-console \
