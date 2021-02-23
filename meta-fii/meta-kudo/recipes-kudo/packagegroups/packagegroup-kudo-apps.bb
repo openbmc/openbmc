@@ -22,6 +22,7 @@ RDEPENDS_${PN}-kudo-system = " \
     loadsvf \
     obmc-console \
     usb-network \
+    gbmc-mac-config \
     "
 
 SUMMARY_${PN}-kudo-fw = "KUDO Firmware"
