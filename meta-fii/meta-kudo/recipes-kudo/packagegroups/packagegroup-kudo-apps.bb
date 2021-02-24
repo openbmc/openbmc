@@ -22,6 +22,7 @@ RDEPENDS_${PN}-kudo-system = " \
     loadsvf \
     obmc-console \
     usb-network \
+    ncsid \
     gbmc-mac-config \
     "
 
