@@ -27,6 +27,11 @@ DEPENDS += "libcereal"
 S = "${WORKDIR}/git"
 SRC_URI += "file://merge_settings.py"
 
+# 'boot_type' configuration parameter is used to add support for
+# the Legacy/EFI boot override selector for systems with x86 host
+PACKAGECONFIG[boot_type] = ""
+SRC_URI += "${@bb.utils.contains('PACKAGECONFIG', 'boot_type', 'file://boot_type.override.yml', '', d)}"
+
 EXTRA_OECONF = " \
              SETTINGS_YAML=${STAGING_DIR_NATIVE}${settings_datadir}/defaults.yaml \
              "
