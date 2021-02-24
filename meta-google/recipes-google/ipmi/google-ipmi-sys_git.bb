@@ -18,7 +18,7 @@ DEPENDS += "nlohmann-json"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/google-ipmi-sys"
-SRCREV = "96ad906981d1e32ecb77d1c75f30b18eeb9dd3d6"
+SRCREV = "ac4a16f73011c7b5f69b78dd1e8fe76764fc7288"
 
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
