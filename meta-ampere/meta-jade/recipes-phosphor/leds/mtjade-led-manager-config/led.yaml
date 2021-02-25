@@ -18,3 +18,15 @@ systemFault:
         DutyOn: 50
         Period: 0
         Priority: 'Blink'
+
+enclosure_identify:
+    identify:
+        Action: 'On'
+        DutyOn: 50
+        Period: 1000
+
+enclosure_identify_blink:
+    identify:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
