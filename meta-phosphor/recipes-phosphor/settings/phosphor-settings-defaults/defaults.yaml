@@ -62,7 +62,7 @@
     - Interface: xyz.openbmc_project.Control.Power.RestorePolicy
       Properties:
           PowerRestorePolicy:
-              Default: RestorePolicy::Policy::AlwaysOff
+              Default: RestorePolicy::Policy::None
 
 /xyz/openbmc_project/time/sync_method:
     - Interface: xyz.openbmc_project.Time.Synchronization
