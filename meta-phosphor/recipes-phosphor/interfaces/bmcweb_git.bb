@@ -17,6 +17,12 @@ SRCREV = "8f7e9c194f36a84f4e49ad142110f4f3d0f312be"
 
 S = "${WORKDIR}/git"
 
+inherit meson ptest
+
+SRC_URI += " \
+    file://run-ptest \
+"
+
 DEPENDS = " \
     openssl \
     zlib \
@@ -27,6 +33,8 @@ DEPENDS = " \
     gtest \
     nlohmann-json \
     libtinyxml2 \
+    ${@bb.utils.contains('PTEST_ENABLED', '1', 'gtest', '', d)} \
+    ${@bb.utils.contains('PTEST_ENABLED', '1', 'gmock', '', d)} \
 "
 
 RDEPENDS_${PN} += " \
@@ -34,11 +42,19 @@ RDEPENDS_${PN} += " \
     phosphor-mapper \
 "
 
+do_install_ptest() {
+        install -d ${D}${PTEST_PATH}/test
+        cp -rf ${B}*_test ${D}${PTEST_PATH}/test/
+}
+
 FILES_${PN} += "${datadir}/** "
 
-inherit meson
 
-EXTRA_OEMESON = "--buildtype=minsize -Dtests=disabled -Dyocto-deps=enabled"
+EXTRA_OEMESON = " \
+    --buildtype=minsize \
+    -Dtests=${@bb.utils.contains('PTEST_ENABLED', '1', 'enabled', 'disabled', d)} \
+    -Dyocto-deps=enabled \
+"
 
 SYSTEMD_SERVICE_${PN} += "bmcweb.service bmcweb.socket"
 
