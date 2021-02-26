@@ -2,8 +2,8 @@ SUMMARY = "Copy error yaml files to known path for elog parsing"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit native
 inherit phosphor-dbus-yaml
+inherit native
 
 require recipes-phosphor/power/phosphor-power.inc
 

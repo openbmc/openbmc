@@ -2,9 +2,9 @@ SUMMARY = "OpenPower OCC Control with example occ sensor IDs"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit native
 require openpower-occ-control.inc
 inherit openpower-occ-control
+inherit native
 
 PROVIDES += "virtual/openpower-occ-control-config-native"
 

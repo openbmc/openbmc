@@ -6,10 +6,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=d2794c0df5b907fdace235a619d80314"
 
 S = "${WORKDIR}/git"
 
-inherit native
 inherit perlnative
 inherit cpan-base
 inherit mrw-rev
+inherit native
 
 DEPENDS += "libxml-simple-perl-native json-perl-native"
 

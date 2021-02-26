@@ -2,9 +2,9 @@ SUMMARY = "Generate inventory map for phosphor-ipmi-fru from an MRW."
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit native
 inherit phosphor-ipmi-fru
 inherit mrw-xml
+inherit native
 
 require phosphor-ipmi-fru.inc
 
