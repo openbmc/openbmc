@@ -6,6 +6,7 @@
          "allowed_out_of_range_time": 30,
          "deviation": 15,
          "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 20,
          "sensors": [
             {
                "name": "fan0_0",
@@ -23,6 +24,7 @@
          "allowed_out_of_range_time": 30,
          "deviation": 15,
          "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 20,
          "sensors": [
             {
                "name": "fan1_0",
@@ -54,6 +56,7 @@
          "allowed_out_of_range_time": 30,
          "deviation": 15,
          "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 20,
          "sensors": [
             {
                "name": "fan2_0",
@@ -71,6 +74,7 @@
          "allowed_out_of_range_time": 30,
          "deviation": 15,
          "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 20,
          "sensors": [
             {
                "name": "fan3_0",
