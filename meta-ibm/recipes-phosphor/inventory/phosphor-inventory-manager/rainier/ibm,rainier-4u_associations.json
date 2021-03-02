@@ -1,0 +1,150 @@
+{
+    "condition":
+    {
+        "path": "system/chassis/motherboard",
+        "interface": "com.ibm.ipzvpd.VSBP",
+        "property": "IM",
+        "values": [
+            [80, 0, 16, 0],
+            [80, 0, 16, 2]
+        ]
+    },
+    "associations":
+    [
+        {
+            "path": "system/chassis/motherboard/fan0",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/fan_tach/fan0_0"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "leds"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/led/physical/fan0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/fan1",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/fan_tach/fan1_0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/fan2",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/fan_tach/fan2_0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/fan3",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/fan_tach/fan3_0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/fan4",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/fan_tach/fan4_0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/fan5",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/fan_tach/fan5_0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "chassis",
+                        "fType": "all_sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/fan_tach/fan0_0",
+                        "/xyz/openbmc_project/sensors/fan_tach/fan1_0",
+                        "/xyz/openbmc_project/sensors/fan_tach/fan2_0",
+                        "/xyz/openbmc_project/sensors/fan_tach/fan3_0",
+                        "/xyz/openbmc_project/sensors/fan_tach/fan4_0"
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
