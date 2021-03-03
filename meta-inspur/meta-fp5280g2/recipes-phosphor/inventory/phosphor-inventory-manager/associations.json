@@ -11,10 +11,12 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/sensors/power/psu0_pin",
-                    "/xyz/openbmc_project/sensors/power/psu0_pout",
-                    "/xyz/openbmc_project/sensors/voltage/psu0_vin",
-                    "/xyz/openbmc_project/sensors/voltage/psu0_vout",
+                    "/xyz/openbmc_project/sensors/power/ps0_input_power",
+                    "/xyz/openbmc_project/sensors/power/ps0_output_power",
+                    "/xyz/openbmc_project/sensors/voltage/ps0_input_voltage",
+                    "/xyz/openbmc_project/sensors/voltage/ps0_output_voltage",
+                    "/xyz/openbmc_project/sensors/current/ps0_input_current",
+                    "/xyz/openbmc_project/sensors/current/ps0_output_current",
                     "/xyz/openbmc_project/sensors/temperature/psu_inlet",
                     "/xyz/openbmc_project/sensors/voltage/P12V",
                     "/xyz/openbmc_project/sensors/voltage/P3V3"
@@ -56,10 +58,12 @@
                 },
                 "paths":
                 [
-                    "/xyz/openbmc_project/sensors/power/psu1_pin",
-                    "/xyz/openbmc_project/sensors/power/psu1_pout",
-                    "/xyz/openbmc_project/sensors/voltage/psu1_vin",
-                    "/xyz/openbmc_project/sensors/voltage/psu1_vout",
+                    "/xyz/openbmc_project/sensors/power/ps1_input_power",
+                    "/xyz/openbmc_project/sensors/power/ps1_output_power",
+                    "/xyz/openbmc_project/sensors/voltage/ps1_input_voltage",
+                    "/xyz/openbmc_project/sensors/voltage/ps1_output_voltage",
+                    "/xyz/openbmc_project/sensors/current/ps1_input_current",
+                    "/xyz/openbmc_project/sensors/current/ps1_output_current",
                     "/xyz/openbmc_project/sensors/temperature/psu_inlet",
                     "/xyz/openbmc_project/sensors/voltage/P12V",
                     "/xyz/openbmc_project/sensors/voltage/P3V3"
@@ -1903,14 +1907,18 @@
                     "/xyz/openbmc_project/sensors/voltage/PVDN_CPU1",
                     "/xyz/openbmc_project/sensors/voltage/PVIO_CPU0",
                     "/xyz/openbmc_project/sensors/voltage/PVIO_CPU1",
-                    "/xyz/openbmc_project/sensors/power/psu0_pin",
-                    "/xyz/openbmc_project/sensors/power/psu0_pout",
-                    "/xyz/openbmc_project/sensors/power/psu1_pin",
-                    "/xyz/openbmc_project/sensors/power/psu1_pout",
-                    "/xyz/openbmc_project/sensors/voltage/psu0_vin",
-                    "/xyz/openbmc_project/sensors/voltage/psu0_vout",
-                    "/xyz/openbmc_project/sensors/voltage/psu1_vin",
-                    "/xyz/openbmc_project/sensors/voltage/psu1_vout",
+                    "/xyz/openbmc_project/sensors/power/ps0_input_power",
+                    "/xyz/openbmc_project/sensors/power/ps0_output_power",
+                    "/xyz/openbmc_project/sensors/power/ps1_input_power",
+                    "/xyz/openbmc_project/sensors/power/ps1_output_power",
+                    "/xyz/openbmc_project/sensors/voltage/ps0_input_voltage",
+                    "/xyz/openbmc_project/sensors/voltage/ps0_output_voltage",
+                    "/xyz/openbmc_project/sensors/voltage/ps1_input_voltage",
+                    "/xyz/openbmc_project/sensors/voltage/ps1_output_voltage",
+                    "/xyz/openbmc_project/sensors/current/ps0_input_current",
+                    "/xyz/openbmc_project/sensors/current/ps0_output_current",
+                    "/xyz/openbmc_project/sensors/current/ps1_input_current",
+                    "/xyz/openbmc_project/sensors/current/ps1_output_current",
                     "/xyz/openbmc_project/sensors/temperature/psu_inlet"
                 ]
             }
