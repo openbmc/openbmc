@@ -33,7 +33,20 @@ install_dreport_header() {
     install -m 0755 ${S}/tools/dreport.d/ibm.d/gendumpheader ${D}${dreport_include_dir}/
 }
 
+#Install ibm bad vpd script from dreport/ibm.d to dreport/plugins.d
+install_ibm_bad_vpd() {
+    install -d ${D}${dreport_plugin_dir}
+    install -m 0755 ${S}/tools/dreport.d/ibm.d/badvpd ${D}${dreport_plugin_dir}
+}
+
+#Link in the plugins so dreport run them at the appropriate time based on the plugin type
+python link_ibm_bad_vpd() {
+    sourcedir = d.getVar('S', True)
+    script = os.path.join(sourcedir, "tools", "dreport.d", "ibm.d", "badvpd")
+    install_dreport_user_script(script, d)
+}
+
 IBM_INSTALL_POSTFUNCS = "install_ibm_plugins link_ibm_plugins"
-IBM_INSTALL_POSTFUNCS_p10bmc += "install_dreport_header"
+IBM_INSTALL_POSTFUNCS_p10bmc += "install_dreport_header install_ibm_bad_vpd link_ibm_bad_vpd"
 
 do_install[postfuncs] += "${IBM_INSTALL_POSTFUNCS}"
