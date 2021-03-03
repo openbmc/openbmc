@@ -30,7 +30,7 @@ python link_ibm_plugins() {
 #Install dump header script from dreport/ibm.d to dreport/include.d
 install_dreport_header() {
     install -d ${D}${dreport_include_dir}
-    install -m 0755 ${S}/tools/dreport.d/ibm.d/* ${D}${dreport_include_dir}/
+    install -m 0755 ${S}/tools/dreport.d/ibm.d/gendumpheader ${D}${dreport_include_dir}/
 }
 
 IBM_INSTALL_POSTFUNCS = "install_ibm_plugins link_ibm_plugins"
