@@ -27,6 +27,7 @@ SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.4 \
            file://1296.patch \
            file://0001-Fix-compilation-with-fno-common.patch \
            file://0001-stacktrace-Define-ARCH_BITS-for-x86.patch \
+           file://0001-include-needed-c-header.patch \
            "
 SRC_URI_append_libc-musl ="\
            file://0001-Mark-one-of-strerror_r-implementation-glibc-specific.patch \

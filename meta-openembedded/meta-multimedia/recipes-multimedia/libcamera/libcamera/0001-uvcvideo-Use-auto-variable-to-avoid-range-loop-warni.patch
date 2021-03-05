@@ -1,0 +1,38 @@
+From 767267ef69c001870d41caf9c60dd7fec89b0a13 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 3 Mar 2021 15:11:46 -0800
+Subject: [PATCH] uvcvideo: Use auto variable to avoid range loop warnings
+
+With c++17 loop range bases are defined where copy is obvious since
+iterator returns a copy and not reference, gcc11 will emit a warning
+about this
+
+uvcvideo.cpp:432:33: error: loop variable 'name' of type 'const string&' {aka 'const std::__cxx11::basic_string<cha
+r>&'} binds to a temporary constructed from type 'const char* const' [-Werror=range-loop-construct]
+|   432 |         for (const std::string &name : { "idVendor", "idProduct" }) {
+|       |                                 ^~~~
+
+Therefore making it explicit is better
+
+Upstream-Status: Submitted [https://lists.libcamera.org/pipermail/libcamera-devel/2021-March/017966.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libcamera/pipeline/uvcvideo/uvcvideo.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libcamera/pipeline/uvcvideo/uvcvideo.cpp b/src/libcamera/pipeline/uvcvideo/uvcvideo.cpp
+index 031f96e2..ef23ece7 100644
+--- a/src/libcamera/pipeline/uvcvideo/uvcvideo.cpp
++++ b/src/libcamera/pipeline/uvcvideo/uvcvideo.cpp
+@@ -429,7 +429,7 @@ std::string PipelineHandlerUVC::generateId(const UVCCameraData *data)
+ 
+ 	/* Creata a device ID from the USB devices vendor and product ID. */
+ 	std::string deviceId;
+-	for (const std::string &name : { "idVendor", "idProduct" }) {
++	for (const auto name : { "idVendor", "idProduct" }) {
+ 		std::ifstream file(path + "/../" + name);
+ 
+ 		if (!file.is_open())
+-- 
+2.30.1
+

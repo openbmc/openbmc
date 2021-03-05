@@ -21,6 +21,8 @@ S = "${WORKDIR}/HTML-Tree-${PV}"
 
 inherit cpan_build
 
+export PERL_USE_UNSAFE_INC = "1"
+
 DEPENDS += "libmodule-build-perl-native \
 "
 

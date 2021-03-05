@@ -25,6 +25,7 @@ SECTION = "libs"
 S = "${WORKDIR}/git"
 SRCREV = "1c54b5410fd48d6bcada97e30cac417c5c7eea67"
 SRC_URI = "git://github.com/ARMmbed/mbedtls.git;protocol=https;branch=development"
+SRC_URI += "file://0001-ssl_tls-Increase-size-of-padbuf-to-64.patch"
 
 inherit cmake
 

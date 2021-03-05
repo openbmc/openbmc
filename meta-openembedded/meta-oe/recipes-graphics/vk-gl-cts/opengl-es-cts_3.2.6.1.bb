@@ -9,6 +9,8 @@ SRCREV_spirv-headers = "e4322e3be589e1ddd44afb20ea842a977c1319b8"
 SRCREV_spirv-tools = "1eb89172a82b436d8037e8a8c29c80f7e1f7df74"
 SRC_URI[renderdoc.sha256sum] = "e7b5f0aa5b1b0eadc63a1c624c0ca7f5af133aa857d6a4271b0ef3d0bdb6868e"
 
+SRC_URI += "file://0001-Do-not-error-on-uninitialized-warnings.patch"
+
 S = "${WORKDIR}/git"
 
 do_install() {

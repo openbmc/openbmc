@@ -52,6 +52,14 @@ do_configure_prepend_libc-musl () {
     sed -i -e '/-DHAVE_SYS_CDEFS_H/d' ${S}/nss/lib/dbm/config/config.mk
 }
 
+do_configure_prepend_powerpc64le_toolchain-clang () {
+    sed -i -e 's/\-std=c99/\-std=gnu99/g' ${S}/nss/coreconf/command.mk
+}
+
+do_configure_prepend_powerpc64_toolchain-clang () {
+    sed -i -e 's/\-std=c99/\-std=gnu99/g' ${S}/nss/coreconf/command.mk
+}
+
 do_compile_prepend_class-native() {
     export NSPR_INCLUDE_DIR=${STAGING_INCDIR_NATIVE}/nspr
     export NSPR_LIB_DIR=${STAGING_LIBDIR_NATIVE}
@@ -68,13 +76,16 @@ do_compile_prepend_class-native() {
 
 do_compile() {
     export NSPR_INCLUDE_DIR=${STAGING_INCDIR}/nspr
-    export NSS_ENABLE_WERROR=0
 
     export CROSS_COMPILE=1
     export NATIVE_CC="${BUILD_CC}"
     # Additional defines needed on Centos 7
     export NATIVE_FLAGS="${BUILD_CFLAGS} -DLINUX -Dlinux"
     export BUILD_OPT=1
+
+    # POSIX.1-2001 states that the behaviour of getcwd() when passing a null
+    # pointer as the buf argument, is unspecified.
+    export NATIVE_FLAGS="${NATIVE_FLAGS} -DGETCWD_CANT_MALLOC"
 
     export FREEBL_NO_DEPEND=1
     export FREEBL_LOWHASH=1
@@ -93,7 +104,7 @@ do_compile() {
 
     if [ "${TARGET_ARCH}" = "powerpc" ]; then
         OS_TEST=ppc
-    elif [ "${TARGET_ARCH}" = "powerpc64" ]; then
+    elif [ "${TARGET_ARCH}" = "powerpc64" -o "${TARGET_ARCH}" = "powerpc64le" ]; then
         OS_TEST=ppc64
     elif [ "${TARGET_ARCH}" = "mips" -o "${TARGET_ARCH}" = "mipsel" -o "${TARGET_ARCH}" = "mips64" -o "${TARGET_ARCH}" = "mips64el" ]; then
         OS_TEST=mips
@@ -151,7 +162,7 @@ do_install() {
 
     if [ "${TARGET_ARCH}" = "powerpc" ]; then
         OS_TEST=ppc
-    elif [ "${TARGET_ARCH}" = "powerpc64" ]; then
+    elif [ "${TARGET_ARCH}" = "powerpc64" -o "${TARGET_ARCH}" = "powerpc64le" ]; then
         OS_TEST=ppc64
     elif [ "${TARGET_ARCH}" = "mips" -o "${TARGET_ARCH}" = "mipsel" -o "${TARGET_ARCH}" = "mips64" -o "${TARGET_ARCH}" = "mips64el" ]; then
         OS_TEST=mips

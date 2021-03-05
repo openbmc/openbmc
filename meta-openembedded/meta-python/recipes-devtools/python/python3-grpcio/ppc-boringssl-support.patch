@@ -3,8 +3,8 @@ Let boringSSL compile on ppc32 bit
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
---- a/third_party/boringssl/include/openssl/base.h
-+++ b/third_party/boringssl/include/openssl/base.h
+--- a/third_party/boringssl-with-bazel/src/include/openssl/base.h
++++ b/third_party/boringssl-with-bazel/src/include/openssl/base.h
 @@ -99,6 +99,9 @@ extern "C" {
  #elif (defined(__PPC64__) || defined(__powerpc64__)) && defined(_LITTLE_ENDIAN)
  #define OPENSSL_64_BIT

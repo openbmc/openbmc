@@ -5,6 +5,11 @@ LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e"
 
 DEPENDS = " \
+    alsa-lib \
+    atk \
+    cairo \
+    fontconfig \
+    freetype \
     gdk-pixbuf-native \
     intltool-native \
     libxslt-native \
@@ -17,6 +22,7 @@ DEPENDS = " \
     mypaint-brushes-1.0 \
     gexiv2 \
     jpeg \
+    libmng \
     libpng \
     libexif \
     tiff \
@@ -44,10 +50,11 @@ SRC_URI[sha256sum] = "2db84b57f3778d80b3466d7c21a21d22e315c7b062de2883cbaaeda9a0
 
 EXTRA_OECONF = "--disable-python \
                 --without-webkit \
+                --disable-check-update \
                 --without-wmf"
 
 EXTRA_OECONF_append_libc-musl_mipsarch = " --disable-vector-icons"
-EXTRA_OECONF_append_toolchain-clang_arm = " --disable-vector-icons"
+EXTRA_OECONF_append_arm = " --disable-vector-icons"
 
 do_configure_append() {
     find ${B} -name Makefile | xargs sed -i s:'-I$(includedir)':'-I.':g

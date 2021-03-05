@@ -1,26 +1,18 @@
-From 2ef8a85933f3ac36b289979ff9edd49dd12d0d16 Mon Sep 17 00:00:00 2001
+From de10fbc2386dcac3ab810c49b6977b2ee01bf426 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
-Date: Fri, 4 Aug 2017 09:04:07 -0700
+Date: Wed, 17 Feb 2021 13:30:23 -0800
 Subject: [PATCH] setup.py: Do not mix C and C++ compiler options
 
 EXTRA_ENV_COMPILE_ARGS is used both with CC and CXX
 so using -std=c++11 or -std=gnu99 together will cause
 build time errors espcially with clang
 
-error: invalid argument '-std=gnu99' not allowed with 'C++'
-
-gcc7 ( defaults are -std=gnu11 and -std=gnu++14 )
- as well clang default to these standards mode or newer
-anyway
-
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
-1. Keep '-std=c++11' and '-std=gnu99' to fix native build error
+Keep '-std=c++11' to fix native build error
 with old gcc (such as gcc 5.4.0 on ubuntu 16.04), for clang
 we will remove them through GRPC_PYTHON_CFLAGS at do_compile
 in bb recipe.
 
-2. While export CC="gcc ", cc_args is None, it will
+While export CC="gcc ", cc_args is None, it will
 cause subprocess.Popen always return 1. On centos 8, if you don't
 install package libatomic, there will be a native build error
 `cannot find /usr/lib64/libatomic.so.1.2.0'.
@@ -28,47 +20,57 @@ install package libatomic, there will be a native build error
 Add no harm '-g' to cc_args if cc_args is empty.
 
 Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- setup.py                      | 6 +++++-
+ setup.py                      | 9 ++++++---
  src/python/grpcio/commands.py | 5 ++++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index e950057..1b68221 100644
+index 4b8c9d4..271b7b1 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -144,9 +144,13 @@ ENABLE_DOCUMENTATION_BUILD = os.environ.get(
- 
- def check_linker_need_libatomic():
-   """Test if linker on system needs libatomic."""
-+  compiler, cc_args = os.environ.get('CC').split(' ', 1) or 'gcc'
-+  if not cc_args:
-+      cc_args = "-g"
+@@ -172,8 +172,11 @@ def check_linker_need_libatomic():
+     """Test if linker on system needs libatomic."""
+     code_test = (b'#include <atomic>\n' +
+                  b'int main() { return std::atomic<int64_t>{}; }')
+-    cxx = os.environ.get('CXX', 'c++')
+-    cpp_test = subprocess.Popen([cxx, '-x', 'c++', '-std=c++11', '-'],
++    cxx, cxx_args = os.environ.get('CXX').split(' ', 1) or 'c++'
++    if not cxx_args:
++      cxx_args = "-g"
 +
-   code_test = (b'#include <atomic>\n' +
-                b'int main() { return std::atomic<int64_t>{}; }')
--  cc_test = subprocess.Popen(['cc', '-x', 'c++', '-std=c++11', '-'],
-+  cc_test = subprocess.Popen([compiler, cc_args, '-x', 'c++', '-std=c++11', '-'],
-                              stdin=PIPE,
-                              stdout=PIPE,
-                              stderr=PIPE)
++    cpp_test = subprocess.Popen([cxx, cxx_args, '-x', 'c++', '-std=c++11', '-'],
+                                 stdin=PIPE,
+                                 stdout=PIPE,
+                                 stderr=PIPE)
+@@ -183,7 +186,7 @@ def check_linker_need_libatomic():
+     # Double-check to see if -latomic actually can solve the problem.
+     # https://github.com/grpc/grpc/issues/22491
+     cpp_test = subprocess.Popen(
+-        [cxx, '-x', 'c++', '-std=c++11', '-latomic', '-'],
++        [cxx, cxx_args, '-x', 'c++', '-std=c++11', '-latomic', '-'],
+         stdin=PIPE,
+         stdout=PIPE,
+         stderr=PIPE)
 diff --git a/src/python/grpcio/commands.py b/src/python/grpcio/commands.py
-index 064dda9..a75d8b9 100644
+index a8b2ff5..b928201 100644
 --- a/src/python/grpcio/commands.py
 +++ b/src/python/grpcio/commands.py
-@@ -216,7 +216,10 @@ class BuildExt(build_ext.build_ext):
-             when invoked in C mode. GCC is okay with this, while clang is not.
+@@ -219,7 +219,10 @@ class BuildExt(build_ext.build_ext):
              """
-             # TODO(lidiz) Remove the generated a.out for success tests.
--            cc_test = subprocess.Popen(['cc', '-x', 'c', '-std=c++11', '-'],
-+            compiler, cc_args = os.environ.get('CC').split(' ', 1) or 'gcc'
-+            if not cc_args:
-+                cc_args = "-g"
-+            cc_test = subprocess.Popen([compiler, cc_args, '-x', 'c', '-std=c++11', '-'],
-                                        stdin=subprocess.PIPE,
-                                        stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE)
+             try:
+                 # TODO(lidiz) Remove the generated a.out for success tests.
+-                cc_test = subprocess.Popen(['cc', '-x', 'c', '-std=c++11', '-'],
++                cc_test, cc_args = os.environ.get('CC').split(' ', 1) or 'gcc'
++                if not cc_args:
++                    cc_args = "-g"
++                cc_test = subprocess.Popen([cc_test, cc_args, '-x', 'c', '-std=c++11', '-'],
+                                            stdin=subprocess.PIPE,
+                                            stdout=subprocess.PIPE,
+                                            stderr=subprocess.PIPE)
 -- 
-2.7.4
+2.30.1
 

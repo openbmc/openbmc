@@ -1,6 +1,6 @@
-From 27b56cb6b5dfc75ea8ddb395dc9ef41fb7a09c93 Mon Sep 17 00:00:00 2001
+From ddf36613f3408ce42f15b03b4e9c6ad8478b97f8 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 2 Sep 2019 23:04:50 -0400
+Date: Tue, 2 Mar 2021 01:33:05 -0800
 Subject: [PATCH] fix command /bin/findmnt, /bin/lsblk, /bin/sort not found
 
 In oe-core (util-linux and coreutils), the commands locates in
@@ -15,10 +15,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index d1431e2..54e5a7b 100644
+index 4811d4a3d..137b31a82 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1495,6 +1495,8 @@ fi
+@@ -1611,6 +1611,8 @@ fi
  
  SYSCONFDIR="$(eval echo $(eval echo $sysconfdir))"
  
@@ -27,7 +27,7 @@ index d1431e2..54e5a7b 100644
  SBINDIR="$(eval echo $(eval echo $sbindir))"
  LVM_PATH="$SBINDIR/lvm"
  AC_DEFINE_UNQUOTED(LVM_PATH, ["$LVM_PATH"], [Path to lvm binary.])
-@@ -1721,6 +1723,7 @@ AC_SUBST(SACKPT_CFLAGS)
+@@ -1829,6 +1831,7 @@ AC_SUBST(SACKPT_CFLAGS)
  AC_SUBST(SACKPT_LIBS)
  AC_SUBST(SALCK_CFLAGS)
  AC_SUBST(SALCK_LIBS)
@@ -36,10 +36,10 @@ index d1431e2..54e5a7b 100644
  AC_SUBST(SELINUX_LIBS)
  AC_SUBST(SELINUX_PC)
 diff --git a/scripts/blkdeactivate.sh.in b/scripts/blkdeactivate.sh.in
-index a4b8a8f..3db4226 100644
+index 7c517b87b..7ef1bb766 100644
 --- a/scripts/blkdeactivate.sh.in
 +++ b/scripts/blkdeactivate.sh.in
-@@ -41,13 +41,14 @@ UMOUNT="/bin/umount"
+@@ -42,13 +42,14 @@ VDO="/bin/vdo"
  
  sbindir="@SBINDIR@"
  DMSETUP="$sbindir/dmsetup"
@@ -55,9 +55,9 @@ index a4b8a8f..3db4226 100644
  	FINDMNT_READ="read -r mnt"
  fi
  DMSETUP_OPTS=""
-@@ -55,10 +56,10 @@ LVM_OPTS=""
- MDADM_OPTS=""
+@@ -57,10 +58,10 @@ MDADM_OPTS=""
  MPATHD_OPTS=""
+ VDO_OPTS=""
  
 -LSBLK="/bin/lsblk -r --noheadings -o TYPE,KNAME,NAME,MOUNTPOINT"
 +LSBLK="$bindir/lsblk -r --noheadings -o TYPE,KNAME,NAME,MOUNTPOINT"
@@ -69,5 +69,5 @@ index a4b8a8f..3db4226 100644
  # Do not show tool errors by default (only done/skipping summary
  # message provided by this script) and no verbose mode by default.
 -- 
-2.8.1
+2.29.2
 

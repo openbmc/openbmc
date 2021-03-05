@@ -1,0 +1,52 @@
+From 152d295a28567ac87b0e6db2e62c0d914b1d7ef9 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Tue, 23 Feb 2021 08:47:54 +0000
+Subject: [PATCH] meson.build: use relative path
+
+Fixes:
+Fatal error: can't create
+gdk/gdkmm/libgdkmm-3.0.so.1.1.0.p/_buildarea1_master-wr_build_Userspace_auto-usrmerge_standalone_usrmerge_next_210222_lxbuilds_Har12345_platform_up_intel-x86-64-standard-glibc-std_wrlinux_build_tmp-glibc_work_corei7-64-wrs-linux_gtkmm3_3.24.3-r0_gtkmm-3.24.3_untracked_gdk_gdkmm_timecoord.cc.o: File name too long
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gtkmm/-/merge_requests/61]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ gdk/gdkmm/meson.build | 4 ++--
+ gtk/gtkmm/meson.build | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gdk/gdkmm/meson.build b/gdk/gdkmm/meson.build
+index afccaea..240ce4d 100644
+--- a/gdk/gdkmm/meson.build
++++ b/gdk/gdkmm/meson.build
+@@ -200,9 +200,9 @@ else # not maintainer_mode
+     gdkmm_hg_ccg_basenames,
+   )
+ 
+-  built_cc_files = [ src_untracked_gdkmm / 'wrap_init.cc' ]
++  built_cc_files = [ '../..' / untracked_gdkmm / 'wrap_init.cc' ]
+   foreach file : gdkmm_used_hg_ccg_basenames
+-    built_cc_files += src_untracked_gdkmm / file + '.cc'
++    built_cc_files += '../..' / untracked_gdkmm / file + '.cc'
+   endforeach
+ 
+   gdk_gen_sources = built_cc_files
+diff --git a/gtk/gtkmm/meson.build b/gtk/gtkmm/meson.build
+index ab96a22..cc0c050 100644
+--- a/gtk/gtkmm/meson.build
++++ b/gtk/gtkmm/meson.build
+@@ -464,9 +464,9 @@ else # not maintainer_mode
+     gtkmm_hg_ccg_basenames,
+   )
+ 
+-  built_cc_files = [ src_untracked_gtkmm / 'wrap_init.cc' ]
++  built_cc_files = [ '../..' / untracked_gtkmm / 'wrap_init.cc' ]
+   foreach file : gtkmm_used_hg_ccg_basenames
+-    built_cc_files += src_untracked_gtkmm / file + '.cc'
++    built_cc_files += '../..' / untracked_gtkmm / file + '.cc'
+   endforeach
+ 
+   gtk_gen_sources = built_cc_files
+-- 
+2.29.2
+

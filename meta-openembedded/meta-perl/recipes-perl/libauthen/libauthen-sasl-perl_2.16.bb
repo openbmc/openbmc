@@ -21,6 +21,8 @@ S = "${WORKDIR}/Authen-SASL-${PV}"
 
 inherit cpan ptest
 
+export PERL_USE_UNSAFE_INC = "1"
+
 do_install_ptest () {
     cp -r ${B}/t ${D}${PTEST_PATH}
 }

@@ -10,15 +10,16 @@ LIC_FILES_CHKSUM = "\
 
 SRC_URI = " \
         git://linuxtv.org/libcamera.git;protocol=git \
+        file://0001-uvcvideo-Use-auto-variable-to-avoid-range-loop-warni.patch \
 "
 
-SRCREV = "1e8c91b65695449c5246d17ba7dc439c8058b781"
+SRCREV = "f490a87fd339fc7443f5d8467ba56a35c750a5f7"
 
-PV = "202008+git${SRCPV}"
+PV = "202102+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "python3-pyyaml-native udev gnutls boost chrpath-native"
+DEPENDS = "python3-pyyaml-native python3-jinja2-native python3-ply-native python3-jinja2-native udev gnutls boost chrpath-native"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'qt', 'qtbase qtbase-native', '', d)}"
 
 PACKAGES =+ "${PN}-gst"

@@ -12,8 +12,6 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  build/mkversion | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/build/mkversion b/build/mkversion
-index 4e35723..9fa3bee 100755
 --- a/build/mkversion
 +++ b/build/mkversion
 @@ -53,8 +53,12 @@ APPLICATION=$1
@@ -39,6 +37,3 @@ index 4e35723..9fa3bee 100755
  "\t$WHOWHERE\n";
  
  __EOF__
--- 
-2.7.4
-

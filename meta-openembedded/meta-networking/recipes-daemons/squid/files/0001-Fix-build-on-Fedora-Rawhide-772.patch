@@ -1,0 +1,105 @@
+From 1f8b5f0e1cc27634a7310be4c9674112f919d974 Mon Sep 17 00:00:00 2001
+From: uhliarik <luhliari@redhat.com>
+Date: Thu, 18 Feb 2021 01:08:40 +0000
+Subject: [PATCH] Fix build on Fedora Rawhide (#772)
+
+* add SYSTEMD_LIBS to all binaries using client_side.cc, fixing linking
+* add `<limits>` to all sources using std::numeric_limits, fixing gcc-11
+  builds
+---
+Upstream-Status: Backport [https://github.com/kraj/squid/commit/1f8b5f0e1cc27634a7310be4c9674112f919d974]
+ src/Makefile.am               | 4 ++++
+ src/ip/QosConfig.cc           | 1 +
+ src/ipc/mem/PageStack.cc      | 1 +
+ src/proxyp/Parser.cc          | 1 +
+ src/security/ServerOptions.cc | 2 ++
+ src/ssl/helper.cc             | 2 ++
+ 6 files changed, 11 insertions(+)
+
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -2320,6 +2320,7 @@ tests_test_http_range_LDADD = \
+ 	$(SSLLIB) \
+ 	$(KRB5LIBS) \
+ 	$(LIBCPPUNIT_LIBS) \
++	$(SYSTEMD_LIBS) \
+ 	$(COMPAT_LIB) \
+ 	$(XTRA_LIBS)
+ tests_test_http_range_LDFLAGS = $(LIBADD_DL)
+@@ -2624,6 +2625,7 @@ tests_testHttpRequest_LDADD = \
+ 	$(SSLLIB) \
+ 	$(KRB5LIBS) \
+ 	$(LIBCPPUNIT_LIBS) \
++	$(SYSTEMD_LIBS) \
+ 	$(COMPAT_LIB) \
+ 	$(XTRA_LIBS)
+ tests_testHttpRequest_LDFLAGS = $(LIBADD_DL)
+@@ -3487,6 +3489,7 @@ tests_testURL_LDADD = \
+ 	$(SSLLIB) \
+ 	$(KRB5LIBS) \
+ 	$(LIBCPPUNIT_LIBS) \
++	$(SYSTEMD_LIBS) \
+ 	$(COMPAT_LIB) \
+ 	$(XTRA_LIBS)
+ tests_testURL_LDFLAGS = $(LIBADD_DL)
+@@ -3646,6 +3649,7 @@ nodist_tests_testYesNoNone_SOURCES = \
+ tests_testYesNoNone_LDADD= \
+ 	base/libbase.la \
+ 	$(LIBCPPUNIT_LIBS) \
++	$(SYSTEMD_LIBS) \
+ 	$(COMPAT_LIB) \
+ 	$(XTRA_LIBS)
+ tests_testYesNoNone_LDFLAGS = $(LIBADD_DL)
+--- a/src/ip/QosConfig.cc
++++ b/src/ip/QosConfig.cc
+@@ -21,6 +21,7 @@
+ #include "Parsing.h"
+ 
+ #include <cerrno>
++#include <limits>
+ 
+ CBDATA_CLASS_INIT(acl_tos);
+ 
+--- a/src/ipc/mem/PageStack.cc
++++ b/src/ipc/mem/PageStack.cc
+@@ -14,6 +14,7 @@
+ #include "Debug.h"
+ #include "ipc/mem/Page.h"
+ #include "ipc/mem/PageStack.h"
++#include <limits>
+ 
+ /// used to mark a stack slot available for storing free page offsets
+ const Ipc::Mem::PageStack::Value Writable = 0;
+--- a/src/security/ServerOptions.cc
++++ b/src/security/ServerOptions.cc
+@@ -24,6 +24,8 @@
+ #endif
+ #endif
+ 
++#include <limits>
++
+ Security::ServerOptions &
+ Security::ServerOptions::operator =(const Security::ServerOptions &old) {
+     if (this != &old) {
+--- a/src/ssl/helper.cc
++++ b/src/ssl/helper.cc
+@@ -19,6 +19,8 @@
+ #include "ssl/helper.h"
+ #include "wordlist.h"
+ 
++#include <limits>
++
+ Ssl::CertValidationHelper::LruCache *Ssl::CertValidationHelper::HelperCache = nullptr;
+ 
+ #if USE_SSL_CRTD
+--- a/src/acl/ConnMark.cc
++++ b/src/acl/ConnMark.cc
+@@ -16,6 +16,8 @@
+ #include "http/Stream.h"
+ #include "sbuf/Stream.h"
+ 
++#include <limits>
++
+ bool
+ Acl::ConnMark::empty() const
+ {

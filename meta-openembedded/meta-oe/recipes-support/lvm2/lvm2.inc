@@ -18,7 +18,7 @@ SRC_URI = "git://sourceware.org/git/lvm2.git;branch=main \
            file://reproducible-build.patch \
            "
 
-SRCREV = "b9391b1b9f0b73303fa21f8f92574d17ce4c2b02"
+SRCREV = "3e8bd8d1bd70691f09a170785836aeb4f83154e6"
 S = "${WORKDIR}/git"
 
 inherit autotools-brokensep pkgconfig systemd license

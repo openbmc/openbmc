@@ -4,9 +4,9 @@ Upstream-status: Pending
 
 --
 
---- openldap-2.4.28/configure.in.orig	2012-02-11 22:40:36.004360795 +0000
-+++ openldap-2.4.28/configure.in	2012-02-11 22:40:13.410986851 +0000
-@@ -1214,7 +1214,7 @@
+--- a/configure.in
++++ b/configure.in
+@@ -1227,7 +1227,7 @@ if test $ol_link_tls = no ; then
  				ol_with_tls=gnutls
  				ol_link_tls=yes
  

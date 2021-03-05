@@ -29,6 +29,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/lmbench/lmbench-${PV}.tgz \
            file://0001-lmbench-Point-webpage-lm-to-target-directory.patch \
            file://0001-doc-Fix-typos-in-manual-pages.patch \
            file://0001-lat_fifo-Fix-cleanup-sequence.patch \
+           file://0001-doc-Fix-typos-in-lat_unix_connect-manual-page.patch \
            "
 SRC_URI[md5sum] = "b3351a3294db66a72e2864a199d37cbf"
 SRC_URI[sha256sum] = "cbd5777d15f44eab7666dcac418054c3c09df99826961a397d9acf43d8a2a551"
@@ -73,6 +74,7 @@ do_install () {
             -C src install
     mv ${D}${bindir}/line ${D}${bindir}/lm_line
     install -m 0755 ${WORKDIR}/lmbench-run ${D}${bindir}/
+    install -m 0755 ${S}/bin/${TARGET_SYS}/cache ${D}${bindir}/
     sed -i -e 's,^SHAREDIR=.*$,SHAREDIR=${datadir}/${BPN},;' \
            -e 's,^CONFIG=.*$,CONFIG=`$SCRIPTSDIR/config`,;' \
            ${D}${bindir}/lmbench-run

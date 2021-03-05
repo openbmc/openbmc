@@ -9,8 +9,6 @@ extending the existing aarch64 macro works.
  src/include/storage/s_lock.h | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/src/include/storage/s_lock.h b/src/include/storage/s_lock.h
-index 3fe29ce..7cd578f 100644
 --- a/src/include/storage/s_lock.h
 +++ b/src/include/storage/s_lock.h
 @@ -316,11 +316,12 @@ tas(volatile slock_t *lock)
@@ -36,6 +34,3 @@ index 3fe29ce..7cd578f 100644
  
  
  /* S/390 and S/390x Linux (32- and 64-bit zSeries) */
--- 
-2.9.3
-

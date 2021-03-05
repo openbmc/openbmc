@@ -1,8 +1,7 @@
 From 528009f5ca0685c95ef27f6c8957160499c0576a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 10 May 2013 10:42:45 -0700
-Subject: [PATCH] Do not strip automatically, this leaves the stripping
- busines to OE
+Subject: [PATCH] Do not strip automatically, this leaves the stripping busines to OE
 
 Upstream-Status: Inappropriate [OE-Specific]
 

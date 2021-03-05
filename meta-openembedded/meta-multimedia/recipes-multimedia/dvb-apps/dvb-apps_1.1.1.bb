@@ -20,6 +20,8 @@ inherit perlnative
 
 export enable_static="no"
 
+export PERL_USE_UNSAFE_INC = "1"
+
 do_configure() {
     sed -i -e s:/usr/include:${STAGING_INCDIR}:g util/av7110_loadkeys/generate-keynames.sh
 }

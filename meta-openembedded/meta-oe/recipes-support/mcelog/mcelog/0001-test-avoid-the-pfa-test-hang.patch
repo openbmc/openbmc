@@ -1,6 +1,6 @@
-From 139177715a2d66ccd3e099be5d9d4dc86db30055 Mon Sep 17 00:00:00 2001
+From 3765b3a4cabf76f55c1c126ac64780a8c117d1d9 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
-Date: Tue, 12 Jan 2021 03:05:38 +0000
+Date: Tue, 12 Jan 2021 10:30:13 +0800
 Subject: [PATCH] test: avoid the pfa test hang
 
 Per [1], the pfa test needs to install page-types and the pfa test
@@ -18,13 +18,13 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/tests/test b/tests/test
-index 9623f4a..7c552a9 100755
+index 020ae2b..320f57f 100755
 --- a/tests/test
 +++ b/tests/test
-@@ -45,6 +45,9 @@ for conf in `ls *.conf`
- do
- 	log=`echo $conf | sed "s/conf/log/g"`
- 	./inject $conf
+@@ -47,6 +47,9 @@ do
+ 	# Inject mce records and run mcelog in parallel.
+ 	# So that the mce records can be consumed by mcelog in time (avoid mce record overflow).
+ 	./inject $conf &
 +	if [ "$1" = "pfa" ] ; then
 +		which page-types > /dev/null 2>&1 || continue
 +	fi

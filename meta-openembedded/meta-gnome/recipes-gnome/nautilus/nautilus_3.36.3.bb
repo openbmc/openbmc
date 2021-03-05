@@ -17,6 +17,7 @@ DEPENDS = " \
 
 inherit gnomebase gsettings gobject-introspection gtk-doc gettext features_check upstream-version-is-even mime-xdg
 
+SRC_URI += "file://0001-Drop-use-of-volatile.patch"
 SRC_URI[archive.md5sum] = "c3c8dbb90d8eeed6c127aa568e131395"
 SRC_URI[archive.sha256sum] = "b6cafc7ab1e70a64383de391b6097fcccbf36b208f8502d8c46423224fd30ef8"
 

@@ -9,6 +9,8 @@ LICENSE = "BSD-3-Clause & GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c7f0b161edbe52f5f345a3d1311d0b32 \
                     file://COPYING;md5=39bba7d2cf0ba1036f2a6e2be52fe3f0"
 
+inherit lib_package
+
 SRC_URI = "git://github.com/facebook/zstd.git;nobranch=1 \
            file://0001-Fix-legacy-build-after-2103.patch \
            "

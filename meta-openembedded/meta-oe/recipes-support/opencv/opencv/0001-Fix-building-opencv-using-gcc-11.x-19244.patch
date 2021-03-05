@@ -1,0 +1,28 @@
+From 67e1a5400383543b28fc69eb09c9429cb9d8c026 Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Sat, 2 Jan 2021 17:43:11 +0000
+Subject: [PATCH] Fix building opencv using gcc 11.x #19244
+
+Add missing `#include <thread>` in modules/gapi/test/test_precomp.hpp
+
+Upstream-Status: Backport [https://github.com/opencv/opencv/pull/19247]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ modules/gapi/test/test_precomp.hpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/modules/gapi/test/test_precomp.hpp b/modules/gapi/test/test_precomp.hpp
+index 7b3c695443..e92b1d03bf 100644
+--- a/modules/gapi/test/test_precomp.hpp
++++ b/modules/gapi/test/test_precomp.hpp
+@@ -11,6 +11,7 @@
+ #define __OPENCV_GAPI_TEST_PRECOMP_HPP__
+ 
+ #include <cstdint>
++#include <thread>
+ #include <vector>
+ 
+ #include <opencv2/ts.hpp>
+-- 
+2.30.1
+

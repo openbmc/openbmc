@@ -1,0 +1,33 @@
+From 867bf5c9d0fb64e1b4e64cb13b983674c270a6bf Mon Sep 17 00:00:00 2001
+From: Yi Fan Yu <yifan.yu@windriver.com>
+Date: Fri, 19 Feb 2021 00:52:35 -0500
+Subject: [PATCH] aclocal.m4: Skip checking for pcap-config
+
+Bitbake triggers an configure error
+saying we should look for pkg-config instead.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
+---
+ aclocal.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index bd4e27a5..136cb8ca 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -584,8 +584,8 @@ AC_DEFUN(AC_LBL_LIBPCAP,
+             # No pkg-config
+             # Look for an installed pcap-config.
+             #
+-            AC_PATH_TOOL(PCAP_CONFIG, pcap-config)
+-            if test -n "$PCAP_CONFIG" ; then
++            # AC_PATH_TOOL(PCAP_CONFIG, pcap-config)
++            if false; then
+                 #
+                 # Found - use it to get the include flags for
+                 # libpcap and the flags to link with libpcap.
+-- 
+2.29.2
+

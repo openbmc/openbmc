@@ -1,6 +1,6 @@
 SUMMARY = "Just-In-Time Compiler for Lua"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=d739bb9250a55c124a545b588fd76771"
+LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=abe9020de9c00909317d02d5c803810e"
 HOMEPAGE = "http://luajit.org"
 
 SRC_URI = "git://luajit.org/git/luajit-2.0.git;protocol=http;branch=v2.1 \
@@ -8,9 +8,9 @@ SRC_URI = "git://luajit.org/git/luajit-2.0.git;protocol=http;branch=v2.1 \
            file://clang.patch \
            "
 
-# Set PV to a version tag and date associated with SRCREV if it is later.
-PV = "2.1.0~beta3-200809"
-SRCREV = "94d4abcca966df2cc423e821bcacd04898f73117"
+# Set PV to a version tag and date (YYMMDD) associated with SRCREV if it is later.
+PV = "2.1.0~beta3-210112"
+SRCREV = "ec6edc5c39c25e4eb3fca51b753f9995e97215da"
 
 S = "${WORKDIR}/git"
 

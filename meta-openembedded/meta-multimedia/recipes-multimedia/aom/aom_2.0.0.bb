@@ -18,3 +18,5 @@ DEPENDS = " yasm-native"
 EXTRA_OECMAKE = " -DBUILD_SHARED_LIBS=1 -DENABLE_TESTS=0 \
                   -DPERL_EXECUTABLE=${HOSTTOOLS_DIR}/perl \
                 "
+
+EXTRA_OECMAKE_append_arm = " ${@bb.utils.contains("TUNE_FEATURES","neon","-DENABLE_NEON=ON","-DENABLE_NEON=OFF",d)}"

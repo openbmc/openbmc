@@ -25,6 +25,8 @@ SRC_URI = "git://github.com/crash-utility/${BPN}.git \
            file://remove-unrecognized-gcc-option-m32-for-mips.patch \
            file://0002-crash-fix-build-error-unknown-type-name-gdb_fpregset.patch \
            file://0003-crash-detect-the-sysroot-s-glibc-header-file.patch \
+           file://0001-printk-add-support-for-lockless-ringbuffer.patch \
+           file://0002-printk-use-committed-finalized-state-values.patch \
            "
 SRCREV = "a25aa4b649d339dd25c20d5413d81b851a77e0b2"
 

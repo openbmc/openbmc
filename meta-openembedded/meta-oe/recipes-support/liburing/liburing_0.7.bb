@@ -12,6 +12,9 @@ LIC_FILES_CHKSUM = "file://README;beginline=41;endline=44;md5=d51b5805e2a675685e
 SRC_URI = "git://github.com/axboe/liburing.git;branch=master;protocol=https \
            file://0001-test-Fix-build-on-32bit-architectures-with-6bit-time.patch \
            "
+SRC_URI_append_libc-musl_riscv64 = " file://0001-do-not-build-examples.patch "
+SRC_URI_append_libc-musl_riscv32 = " file://0001-do-not-build-examples.patch "
+
 SRCREV = "45f0735219a615ae848033c47c7e2d85d101d43e"
 S = "${WORKDIR}/git"
 
@@ -20,7 +23,9 @@ XCFLAGS = "-pthread"
 XCFLAGS_append_libc-musl = " -lucontext"
 
 EXTRA_OEMAKE = "'CC=${CC}' 'RANLIB=${RANLIB}' 'AR=${AR}' 'CFLAGS=${CFLAGS} -I${S}/include -DWITHOUT_XATTR' 'LDFLAGS=${LDFLAGS}' 'XCFLAGS=${XCFLAGS}' 'BUILDDIR=${S}'"
-
+do_configure() {
+    ${S}/configure --prefix=${prefix}
+}
 do_install () {
     oe_runmake install DESTDIR=${D} SBINDIR=${sbindir} MANDIR=${mandir} INCLUDEDIR=${includedir}
 }

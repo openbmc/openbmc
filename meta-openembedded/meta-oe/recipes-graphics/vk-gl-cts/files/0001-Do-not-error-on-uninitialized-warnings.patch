@@ -1,0 +1,28 @@
+From f9906a3a1b7f1ade7a6c4e1a8aa67cb3a5e663a9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 3 Mar 2021 11:33:15 -0800
+Subject: [PATCH] Do not error on uninitialized warnings
+
+code in verifier.cc violates C/C++ aliasing rules so code should be
+perhaps changed to use a union
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ external/amber/src/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/external/amber/src/CMakeLists.txt b/external/amber/src/CMakeLists.txt
+index 80a0df7..4323c81 100644
+--- a/external/amber/src/CMakeLists.txt
++++ b/external/amber/src/CMakeLists.txt
+@@ -133,6 +133,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+     -Werror
+     -Wextra
+     -Wno-unknown-pragmas
++    -Wno-error=uninitialized
+     -Wpedantic
+     -pedantic-errors)
+ elseif(MSVC)
+--
+2.30.1

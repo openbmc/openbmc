@@ -1,0 +1,31 @@
+From 7df10d91db6f533cc0f6c09f4ae8ad92918c6160 Mon Sep 17 00:00:00 2001
+From: Matteo Croce <mcroce@microsoft.com>
+Date: Tue, 26 Jan 2021 12:41:47 +0100
+Subject: [PATCH] install: don't preserve file owner
+
+'cp -p' preserve file ownership, this may leave files owned by the
+current in user in /lib .
+
+Upstream-status: Submitted (0.4 release) [https://github.com/libbpf/libbpf/commit/767d82caab7e54238f2fc6f40ab1e4af285f2abe]
+
+Signed-off-by: Matteo Croce <mcroce@microsoft.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index da33613..ab66edc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -130,7 +130,7 @@ define do_s_install
+ 	$(Q)if [ ! -d '$(DESTDIR)$2' ]; then		\
+ 		$(INSTALL) -d -m 755 '$(DESTDIR)$2';	\
+ 	fi;
+-	$(Q)cp -fpR $1 '$(DESTDIR)$2'
++	$(Q)cp -fR $1 '$(DESTDIR)$2'
+ endef
+ 
+ install: all install_headers install_pkgconfig
+-- 
+2.29.2
+

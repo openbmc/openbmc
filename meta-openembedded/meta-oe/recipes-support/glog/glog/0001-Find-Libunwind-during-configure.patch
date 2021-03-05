@@ -1,0 +1,118 @@
+--- /dev/null
++++ b/cmake/FindLibunwind.cmake
+@@ -0,0 +1,54 @@
++# - Try to find libunwind
++# Once done this will define
++#
++#  Libunwind_FOUND - system has libunwind
++#  unwind - cmake target for libunwind
++
++find_library (UNWIND_LIBRARY NAMES unwind DOC "unwind library")
++include (CheckIncludeFile)
++check_include_file (libunwind.h HAVE_LIBUNWIND_H)
++check_include_file (unwind.h HAVE_UNWIND_H)
++
++if (CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")
++    set(LIBUNWIND_ARCH "arm")
++elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
++    set(LIBUNWIND_ARCH "aarch64")
++elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR
++        CMAKE_SYSTEM_PROCESSOR STREQUAL "amd64" OR
++        CMAKE_SYSTEM_PROCESSOR STREQUAL "corei7-64")
++    set(LIBUNWIND_ARCH "x86_64")
++elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^i.86$")
++    set(LIBUNWIND_ARCH "x86")
++elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc64")
++    set(LIBUNWIND_ARCH "ppc64")
++elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc")
++    set(LIBUNWIND_ARCH "ppc32")
++elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^mips")
++    set(LIBUNWIND_ARCH "mips")
++elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^hppa")
++    set(LIBUNWIND_ARCH "hppa")
++elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^ia64")
++    set(LIBUNWIND_ARCH "ia64")
++endif()
++
++find_library (UNWIND_LIBRARY_PLATFORM NAMES "unwind-${LIBUNWIND_ARCH}" DOC "unwind library platform")
++if (UNWIND_LIBRARY_PLATFORM)
++    set(HAVE_LIB_UNWIND "1")
++endif()
++
++include(FindPackageHandleStandardArgs)
++# handle the QUIETLY and REQUIRED arguments and set Libunwind_FOUND to TRUE
++# if all listed variables are TRUE
++find_package_handle_standard_args(Libunwind DEFAULT_MSG
++    UNWIND_LIBRARY HAVE_LIBUNWIND_H HAVE_UNWIND_H HAVE_LIB_UNWIND)
++
++mark_as_advanced (UNWIND_LIBRARY UNWIND_LIBRARY_PLATFORM)
++
++if (Libunwind_FOUND)
++    add_library(unwind INTERFACE IMPORTED)
++    set_target_properties(unwind PROPERTIES
++        INTERFACE_LINK_LIBRARIES "${UNWIND_LIBRARY};${UNWIND_LIBRARY_PLATFORM}"
++    )
++else()
++    message("Can't find libunwind library")
++endif()
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -64,7 +64,6 @@ check_include_file (dlfcn.h HAVE_DLFCN_H
+ check_include_file (execinfo.h HAVE_EXECINFO_H)
+ check_include_file (glob.h HAVE_GLOB_H)
+ check_include_file (inttypes.h HAVE_INTTYPES_H)
+-check_include_file (libunwind.h HAVE_LIBUNWIND_H)
+ check_include_file (memory.h HAVE_MEMORY_H)
+ check_include_file (pwd.h HAVE_PWD_H)
+ check_include_file (stdint.h HAVE_STDINT_H)
+@@ -80,7 +79,6 @@ check_include_file (syscall.h HAVE_SYSCA
+ check_include_file (syslog.h HAVE_SYSLOG_H)
+ check_include_file (ucontext.h HAVE_UCONTEXT_H)
+ check_include_file (unistd.h HAVE_UNISTD_H)
+-check_include_file (unwind.h HAVE_UNWIND_H)
+ check_include_file (pwd.h HAVE_PWD_H)
+ 
+ check_include_file_cxx ("ext/hash_map" HAVE_EXT_HASH_MAP)
+@@ -116,11 +114,9 @@ check_cxx_compiler_flag (-Wunnamed-type-
+ # snprintf as an inline function
+ check_symbol_exists (snprintf stdio.h HAVE_SNPRINTF)
+ 
+-check_library_exists (unwind get_static_proc_name "" HAVE_LIB_UNWIND)
+ check_library_exists (dbghelp UnDecorateSymbolName "" HAVE_DBGHELP)
+ 
+-find_library (UNWIND_LIBRARY NAMES unwind DOC "unwind library")
+-mark_as_advanced (UNWIND_LIBRARY)
++find_package(Libunwind)
+ 
+ check_c_source_compiles ("
+ #include <stdlib.h>
+@@ -471,9 +467,9 @@ add_library(glog::glog ALIAS glog)
+ 
+ set_target_properties (glog PROPERTIES POSITION_INDEPENDENT_CODE ON)
+ 
+-if (UNWIND_LIBRARY)
+-  target_link_libraries (glog PUBLIC ${UNWIND_LIBRARY})
+-endif (UNWIND_LIBRARY)
++if (Libunwind_FOUND)
++  target_link_libraries (glog PUBLIC unwind)
++endif (Libunwind_FOUND)
+ 
+ if (HAVE_DBGHELP)
+    target_link_libraries (glog PUBLIC dbghelp)
+@@ -678,6 +674,7 @@ export (PACKAGE glog)
+ install (FILES
+   ${CMAKE_CURRENT_BINARY_DIR}/glog-config.cmake
+   ${CMAKE_CURRENT_BINARY_DIR}/glog-config-version.cmake
++  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindLibunwind.cmake
+   DESTINATION ${_glog_CMake_INSTALLDIR})
+ 
+ install (EXPORT glog-targets NAMESPACE glog:: DESTINATION
+--- a/glog-config.cmake.in
++++ b/glog-config.cmake.in
+@@ -8,4 +8,6 @@ include (CMakeFindDependencyMacro)
+ 
+ @gflags_DEPENDENCY@
+ 
++find_dependency (Libunwind)
++
+ include ("${CMAKE_CURRENT_LIST_DIR}/glog-targets.cmake")

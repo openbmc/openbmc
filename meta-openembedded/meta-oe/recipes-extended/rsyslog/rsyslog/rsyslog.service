@@ -1,0 +1,21 @@
+[Unit]
+Description=System Logging Service
+Requires=syslog.socket
+Wants=network.target network-online.target
+After=network.target network-online.target
+Documentation=man:rsyslogd(8)
+Documentation=http://www.rsyslog.com/doc/
+
+[Service]
+Type=notify
+ExecStart=@sbindir@/rsyslogd -n -iNONE
+StandardOutput=null
+Restart=on-failure
+
+# Increase the default a bit in order to allow many simultaneous
+# files to be monitored, we might need a lot of fds.
+LimitNOFILE=16384
+
+[Install]
+WantedBy=multi-user.target
+Alias=syslog.service

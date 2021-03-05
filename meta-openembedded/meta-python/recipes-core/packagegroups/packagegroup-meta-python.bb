@@ -170,6 +170,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-imageio \
     python3-incremental \
     python3-inflection \
+    python3-intelhex \
     python3-intervals \
     python3-ipaddress \
     python3-ipy \
@@ -288,6 +289,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-pycrypto \
     python3-pycurl \
     python3-pydbus \
+    python3-pydbus-manager \
     python3-pydicti \
     python3-pyephem \
     python3-pyexpect \

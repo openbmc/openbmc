@@ -14,6 +14,33 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig update-alternatives
 
+PACKAGES =+ "${PN}-access ${PN}-isotp ${PN}-j1939 ${PN}-cantest ${PN}-slcan ${PN}-log"
+
+FILES_${PN}-access = " \
+    ${bindir}/cangw \
+    ${bindir}/canlogserver \
+    ${bindir}/bcmserver \
+    ${bindir}/socketcand \
+    ${bindir}/cannelloni \
+"
+
+FILES_${PN}-isotp = "${bindir}/isotp*"
+
+FILES_${PN}-j1939 = " \
+    ${bindir}/j* \
+    ${bindir}/testj1939 \
+"
+
+FILES_${PN}-cantest = " \
+    ${bindir}/canbusload \
+    ${bindir}/can-calc-bit-timing \
+    ${bindir}/canfdtest \
+"
+
+FILES_${PN}-slcan = "${bindir}/slcan*"
+
+FILES_${PN}-log = "${bindir}/*log*"
+
 ALTERNATIVE_${PN} = "candump cansend cansequence"
 ALTERNATIVE_LINK_NAME[candump] = "${bindir}/candump"
 ALTERNATIVE_LINK_NAME[cansend] = "${bindir}/cansend"

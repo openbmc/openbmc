@@ -12,13 +12,11 @@ Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
  configure.in | 4 ----
  1 file changed, 4 deletions(-)
 
-diff --git a/configure.in b/configure.in
-index 8d4e9ac..75203c2 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -19,10 +19,6 @@ m4_pattern_forbid(^PGAC_)dnl to catch undefined macros
+@@ -19,10 +19,6 @@ m4_pattern_forbid(^PGAC_)dnl to catch un
  
- AC_INIT([PostgreSQL], [13.1], [pgsql-bugs@lists.postgresql.org], [], [https://www.postgresql.org/])
+ AC_INIT([PostgreSQL], [13.2], [pgsql-bugs@lists.postgresql.org], [], [https://www.postgresql.org/])
  
 -m4_if(m4_defn([m4_PACKAGE_VERSION]), [2.69], [], [m4_fatal([Autoconf version 2.69 is required.
 -Untested combinations of 'autoconf' and PostgreSQL versions are not
@@ -27,6 +25,3 @@ index 8d4e9ac..75203c2 100644
  AC_COPYRIGHT([Copyright (c) 1996-2020, PostgreSQL Global Development Group])
  AC_CONFIG_SRCDIR([src/backend/access/common/heaptuple.c])
  AC_CONFIG_AUX_DIR(config)
--- 
-2.29.2
-

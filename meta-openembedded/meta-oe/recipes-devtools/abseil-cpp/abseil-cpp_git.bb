@@ -17,8 +17,6 @@ SRC_URI = "git://github.com/abseil/abseil-cpp;branch=${BRANCH}         \
 
 S = "${WORKDIR}/git"
 
-DEPENDS_append_libc-musl = " libexecinfo "
-
 ASNEEDED_class-native = ""
 ASNEEDED_class-nativesdk = ""
 
@@ -26,6 +24,7 @@ inherit cmake
 
 EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON \
                  -DBUILD_TESTING=OFF    \
+                 -DCMAKE_CXX_STANDARD=14 \
                 "
 
 BBCLASSEXTEND = "native nativesdk"
@@ -33,28 +32,3 @@ ALLOW_EMPTY_${PN} = "1"
 
 FILES_${PN} = "${libdir}/libabsl_*.so ${libdir}/cmake"
 FILES_${PN}-dev = "${includedir}"
-
-python () {
-    arch = d.getVar("TARGET_ARCH")
-
-    if arch == "aarch64":
-        tunes = d.getVar("TUNE_FEATURES")
-        if not tunes:
-            raise bb.parse.SkipRecipe("%s-%s Needs support for crypto on armv8" % (pkgn, pkgv))
-            return
-        pkgn = d.getVar("PN")
-        pkgv = d.getVar("PV")
-        if "crypto" not in tunes:
-            raise bb.parse.SkipRecipe("%s-%s Needs support for crypto on armv8" % (pkgn, pkgv))
-
-    if arch == "x86_64":
-        tunes = d.getVar("TUNE_FEATURES")
-        if not tunes:
-           raise bb.parse.SkipRecipe("%s-%s Needs support for corei7 on x86_64" % (pkgn, pkgv))
-           return
-        pkgn = d.getVar("PN")
-        pkgv = d.getVar("PV")
-        if "corei7" not in tunes:
-            raise bb.parse.SkipRecipe("%s-%s Needs support for corei7 on x86_64" % (pkgn, pkgv))
-
-}

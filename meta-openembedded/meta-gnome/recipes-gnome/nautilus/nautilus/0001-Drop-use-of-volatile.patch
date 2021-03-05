@@ -1,0 +1,32 @@
+From 9ab5acb902a38b420592931ec9e46ccd0624035a Mon Sep 17 00:00:00 2001
+From: Ondrej Holy <oholy@redhat.com>
+Date: Wed, 13 Jan 2021 13:22:58 +0100
+Subject: [PATCH] Drop use of volatile
+
+The `fedora rawhide` CI job currently fails because of usage of the
+`volatile` qualifier. Let's drop the `volatile` qualifier as it doesn't
+help anyway. It was dropped in GLib as well, see:
+https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719
+
+Fixes: https://gitlab.gnome.org/GNOME/nautilus/-/issues/1741
+---
+Upstream-Status: Backport [https://github.com/GNOME/nautilus/commit/9b733dd9df9d6d9805c56749d05ada15a7560ef4]
+ src/nautilus-enum-types.c.template | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/nautilus-enum-types.c.template b/src/nautilus-enum-types.c.template
+index 00155ca..9d8ac83 100644
+--- a/src/nautilus-enum-types.c.template
++++ b/src/nautilus-enum-types.c.template
+@@ -13,7 +13,7 @@
+ GType
+ @enum_name@_get_type (void)
+ {
+-    static volatile GType type_once = 0;
++    static GType type_once = 0;
+ 
+     if (g_once_init_enter (&type_once))
+     {
+-- 
+2.30.1
+

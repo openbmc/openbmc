@@ -329,10 +329,10 @@ Upstream-Status: Submitted [https://github.com/libyui/libyui/pull/123]
  /**
 --- a/src/YMenuButton.h
 +++ b/src/YMenuButton.h
-@@ -29,7 +29,7 @@
+@@ -28,7 +28,7 @@
+ #include "YMenuWidget.h"
  #include "YMenuItem.h"
  
- class YMenuItem;
 -class YMenuButtonPrivate;
 +struct YMenuButtonPrivate;
  
@@ -428,7 +428,7 @@ Upstream-Status: Submitted [https://github.com/libyui/libyui/pull/123]
  typedef YRadioButtonList::iterator		YRadioButtonListIterator;
 --- a/src/YRichText.h
 +++ b/src/YRichText.h
-@@ -30,7 +30,7 @@
+@@ -31,7 +31,7 @@
  #include "ImplPtr.h"
  
  
@@ -538,7 +538,7 @@ Upstream-Status: Submitted [https://github.com/libyui/libyui/pull/123]
  /**
 --- a/src/YTimezoneSelector.cc
 +++ b/src/YTimezoneSelector.cc
-@@ -32,7 +32,7 @@
+@@ -34,7 +34,7 @@ using std::string;
  
  class YTimezoneSelectorPrivate
  {
@@ -560,7 +560,7 @@ Upstream-Status: Submitted [https://github.com/libyui/libyui/pull/123]
  /**
 --- a/src/YUILog.h
 +++ b/src/YUILog.h
-@@ -64,7 +64,7 @@
+@@ -66,7 +66,7 @@ using std::endl;
  
  
  
