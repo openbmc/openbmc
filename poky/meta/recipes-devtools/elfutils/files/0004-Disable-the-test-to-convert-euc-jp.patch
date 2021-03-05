@@ -1,4 +1,4 @@
-From e4ede22e28eaa38d81667ddcb19541ece1a83cf8 Mon Sep 17 00:00:00 2001
+From cd36f34c722dd0babd7beb13c968aa0780c9f726 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:24:06 +0800
 Subject: [PATCH] Disable the test to convert euc-jp
@@ -21,10 +21,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/m4/iconv.m4 b/m4/iconv.m4
-index a503646..299f1eb 100644
+index aa159c5..d16312b 100644
 --- a/m4/iconv.m4
 +++ b/m4/iconv.m4
-@@ -159,6 +159,7 @@ int main ()
+@@ -165,6 +165,7 @@ AC_DEFUN([AM_ICONV_LINK],
        }
    }
  #endif
@@ -32,11 +32,11 @@ index a503646..299f1eb 100644
    /* Test against HP-UX 11.11 bug: No converter from EUC-JP to UTF-8 is
       provided.  */
    if (/* Try standardized names.  */
-@@ -170,6 +171,7 @@ int main ()
+@@ -176,6 +177,7 @@ AC_DEFUN([AM_ICONV_LINK],
        /* Try HP-UX names.  */
        && iconv_open ("utf8", "eucJP") == (iconv_t)(-1))
      result |= 16;
 +#endif
    return result;
- }]])],
-         [am_cv_func_iconv_works=yes],
+ ]])],
+           [am_cv_func_iconv_works=yes], ,

@@ -1,18 +1,27 @@
-e2fsprogs: expand @mkdir_p@
+From e3a30baa5c1e2f0ac7e246539db1c7db5a2fe302 Mon Sep 17 00:00:00 2001
+From: Joe Slater <jslater@windriver.com>
+Date: Tue, 7 Mar 2017 14:53:19 -0800
+Subject: [PATCH] e2fsprogs: expand @mkdir_p@
 
 Add AC_SUBST to configure.ac.  @mkdir_p@ is currently
-not expanded so no locale data is written into usr/share/locale. 
+not expanded so no locale data is written into usr/share/locale.
 
 Upstream-Status: Pending
 
 Signed-off-by: Joe Slater <jslater@windriver.com>
 
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 4c4b5523..3475c707 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -811,6 +811,8 @@ AC_SUBST(PACKAGE)
+@@ -919,6 +919,8 @@ AC_SUBST(PACKAGE)
  AC_SUBST(VERSION)
  
- AM_GNU_GETTEXT
+ AM_GNU_GETTEXT([external])
 +dnl @MKDIR_P@ is expanded in AM_GNU_GETTEXT
 +AC_SUBST([mkdir_p],['$(MKDIR_P)'])
  dnl

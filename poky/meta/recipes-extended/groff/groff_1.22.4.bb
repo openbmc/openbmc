@@ -20,7 +20,6 @@ SRC_URI[sha256sum] = "e78e7b4cb7dec310849004fa88847c44701e8d133b5d4c13057d876c1b
 
 # Remove at the next upgrade
 PR = "r1"
-HASHEQUIV_HASH_VERSION .= ".1"
 
 DEPENDS = "bison-native"
 RDEPENDS_${PN} += "perl sed"

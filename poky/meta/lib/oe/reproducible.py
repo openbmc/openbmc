@@ -90,8 +90,12 @@ def get_source_date_epoch_from_youngest_file(d, sourcedir):
         bb.debug(1, "Newest file found: %s" % newest_file)
     return source_date_epoch
 
-def fixed_source_date_epoch():
+def fixed_source_date_epoch(d):
     bb.debug(1, "No tarball or git repo found to determine SOURCE_DATE_EPOCH")
+    source_date_epoch = d.getVar('SOURCE_DATE_EPOCH_FALLBACK')
+    if source_date_epoch:
+        bb.debug(1, "Using SOURCE_DATE_EPOCH_FALLBACK")
+        return int(source_date_epoch)
     return 0
 
 def get_source_date_epoch(d, sourcedir):
@@ -99,6 +103,6 @@ def get_source_date_epoch(d, sourcedir):
         get_source_date_epoch_from_git(d, sourcedir) or
         get_source_date_epoch_from_known_files(d, sourcedir) or
         get_source_date_epoch_from_youngest_file(d, sourcedir) or
-        fixed_source_date_epoch()       # Last resort
+        fixed_source_date_epoch(d)       # Last resort
     )
 

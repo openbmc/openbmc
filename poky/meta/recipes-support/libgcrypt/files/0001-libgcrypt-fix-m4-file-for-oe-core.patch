@@ -1,4 +1,4 @@
-From bee26d7c4ea0b4a397c289b819b89e78bc325ba0 Mon Sep 17 00:00:00 2001
+From 839f38e5ecc22b7f1b837284bbbffac8cb32ab1e Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <trevor.gamblin@windriver.com>
 Date: Tue, 29 Oct 2019 14:08:32 -0400
 Subject: [PATCH] libgcrypt: fix m4 file for oe-core
@@ -17,7 +17,7 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
  1 file changed, 4 insertions(+), 86 deletions(-)
 
 diff --git a/src/libgcrypt.m4 b/src/libgcrypt.m4
-index 37dfbea2..3d2e90a8 100644
+index 19d514f..21125c7 100644
 --- a/src/libgcrypt.m4
 +++ b/src/libgcrypt.m4
 @@ -29,41 +29,6 @@ dnl is added to the gpg_config_script_warn variable.
@@ -25,7 +25,7 @@ index 37dfbea2..3d2e90a8 100644
  AC_DEFUN([AM_PATH_LIBGCRYPT],
  [ AC_REQUIRE([AC_CANONICAL_HOST])
 -  AC_ARG_WITH(libgcrypt-prefix,
--            AC_HELP_STRING([--with-libgcrypt-prefix=PFX],
+-            AS_HELP_STRING([--with-libgcrypt-prefix=PFX],
 -                           [prefix where LIBGCRYPT is installed (optional)]),
 -     libgcrypt_config_prefix="$withval", libgcrypt_config_prefix="")
 -  if test x"${LIBGCRYPT_CONFIG}" = x ; then
@@ -144,6 +144,3 @@ index 37dfbea2..3d2e90a8 100644
      ifelse([$3], , :, [$3])
    fi
    AC_SUBST(LIBGCRYPT_CFLAGS)
--- 
-2.17.1
-

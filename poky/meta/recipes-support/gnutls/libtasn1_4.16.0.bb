@@ -1,4 +1,6 @@
 SUMMARY = "Library for ASN.1 and DER manipulation"
+DESCRIPTION = "A highly portable C library that encodes and decodes \
+DER/BER data following an ASN.1 schema. "
 HOMEPAGE = "http://www.gnu.org/software/libtasn1/"
 
 LICENSE = "GPLv3+ & LGPLv2.1+"

@@ -1,5 +1,7 @@
 SUMMARY = "IGT GPU Tools"
 DESCRIPTION = "IGT GPU Tools is a collection of tools for development and testing of the DRM drivers"
+HOMEPAGE = "https://gitlab.freedesktop.org/drm/igt-gpu-tools"
+BUGTRACKER = "https://gitlab.freedesktop.org/drm/igt-gpu-tools/-/issues"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=67bfee4df38fa6ecbe3a675c552d4c08"
 
@@ -10,7 +12,9 @@ inherit meson
 SRCREV = "d16ad07e7f2a028e14d61f570931c87fa5ce404c"
 PV = "1.25+git${SRCPV}"
 
-SRC_URI = "git://gitlab.freedesktop.org/drm/igt-gpu-tools.git;protocol=https"
+SRC_URI = "git://gitlab.freedesktop.org/drm/igt-gpu-tools.git;protocol=https \
+           file://0001-lib-igt_edid-Allocate-raw-8-bytes-for-VSDB.patch \
+           file://reproducibility.patch"
 
 S = "${WORKDIR}/git"
 
@@ -22,7 +26,7 @@ PACKAGE_BEFORE_PN = "${PN}-benchmarks ${PN}-tests"
 
 PACKAGECONFIG[chamelium] = "-Dchamelium=enabled,-Dchamelium=disabled,gsl xmlrpc-c"
 
-EXTRA_OEMESON = "-Ddocs=disabled -Drunner=enabled"
+EXTRA_OEMESON = "-Ddocs=disabled -Drunner=enabled -Dsrcdir=/usr/src/debug/${PN}/${PV}-${PR}/git/"
 COMPATIBLE_HOST = "(x86_64.*|i.86.*|arm.*|aarch64).*-linux"
 COMPATIBLE_HOST_libc-musl_class-target = "null"
 SECURITY_LDFLAGS = "${SECURITY_X_LDFLAGS}"

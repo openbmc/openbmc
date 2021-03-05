@@ -1,4 +1,9 @@
 SUMMARY = "Easy API to create and parse X.509 and CMS related objects"
+DESCRIPTION = "A library to make the tasks of working with X.509 certificates, \
+CMS data and related objects more easy. It provides a highlevel interface to \
+the implemented protocols and presents the data in a consistent way. The \
+library does not rely on another cryptographic library but provides \
+hooks for easy integration with Libgcrypt. "
 HOMEPAGE = "http://www.gnupg.org/related_software/libksba/"
 LICENSE = "GPLv3+ & (GPLv2+ | LGPLv3+)"
 LICENSE_${PN} = "GPLv2+ | LGPLv3+"

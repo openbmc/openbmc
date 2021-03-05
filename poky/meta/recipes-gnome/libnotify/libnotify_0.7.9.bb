@@ -1,4 +1,8 @@
 SUMMARY = "Library for sending desktop notifications to a notification daemon"
+DESCRIPTION = "It sends desktop notifications to a notification daemon, as defined \
+in the Desktop Notifications spec. These notifications can be used to inform \
+the user about an event or display some form of information without getting \
+in the user's way."
 HOMEPAGE = "https://gitlab.gnome.org/GNOME/libnotify"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/libnotify/issues"
 SECTION = "libs"

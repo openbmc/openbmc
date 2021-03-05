@@ -1,0 +1,64 @@
+This is a bit ugly. Specifing abs_builddir as an RPATH is plain wrong when
+cross compiling. Sadly, removing the rpath makes libtool/automake do
+weird things and breaks the build as shared libs are no longer generated.
+
+We already try and delete the RPATH at do_install with chrpath however
+that does leave the path in the string table so it doesn't help us
+with reproducibility.
+
+Instead, hack in a bogus but harmless path, then delete it later in
+our do_install. Ultimately we may want to pass a specific path to use
+to configure if we really do need to set an RPATH at all. It is unclear
+to me whether the tests need that or not.
+
+Fixes reproducibility issues for lttng-tools.
+
+Upstream-Status: Pending [needs discussion with upstream about the correct solution]
+RP 2021/3/1
+
+Index: lttng-tools-2.12.2/tests/regression/ust/ust-dl/Makefile.am
+===================================================================
+--- lttng-tools-2.12.2.orig/tests/regression/ust/ust-dl/Makefile.am
++++ lttng-tools-2.12.2/tests/regression/ust/ust-dl/Makefile.am
+@@ -27,16 +27,16 @@ noinst_LTLIBRARIES = libzzz.la libbar.la
+ 
+ libzzz_la_SOURCES = libzzz.c libzzz.h
+ libzzz_la_LDFLAGS = -module -shared -avoid-version \
+-		-rpath $(abs_builddir)
++		-rpath /usr/lib
+ 
+ libbar_la_SOURCES = libbar.c libbar.h
+ libbar_la_LDFLAGS = -module -shared -avoid-version \
+-		-rpath $(abs_builddir)
++		-rpath /usr/lib
+ libbar_la_LIBADD = libzzz.la
+ 
+ libfoo_la_SOURCES = libfoo.c libfoo.h
+ libfoo_la_LDFLAGS = -module -shared -avoid-version \
+-		-rpath $(abs_builddir)
++		-rpath /usr/lib
+ libfoo_la_LIBADD = libbar.la
+ 
+ CLEANFILES = libfoo.so libfoo.so.debug libbar.so libbar.so.debug \
+@@ -44,7 +44,7 @@ CLEANFILES = libfoo.so libfoo.so.debug l
+ 
+ libtp_la_SOURCES = libbar-tp.h libbar-tp.c libfoo-tp.h libfoo-tp.c \
+ 	libzzz-tp.h libzzz-tp.c
+-libtp_la_LDFLAGS = -module -shared -rpath $(abs_builddir)
++libtp_la_LDFLAGS = -module -shared -rpath /usr/lib
+ 
+ # Extract debug symbols
+ libfoo.so.debug: libfoo.la
+Index: lttng-tools-2.12.2/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am
+===================================================================
+--- lttng-tools-2.12.2.orig/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am
++++ lttng-tools-2.12.2/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am
+@@ -5,7 +5,7 @@ AM_CFLAGS += -O0
+ noinst_LTLIBRARIES = libfoo.la
+ 
+ libfoo_la_SOURCES = foo.c foo.h
+-libfoo_la_LDFLAGS = -shared -module -avoid-version -rpath $(abs_builddir)/.libs/
++libfoo_la_LDFLAGS = -shared -module -avoid-version -rpath /usr/lib
+ 
+ noinst_PROGRAMS = userspace-probe-elf-binary
+ userspace_probe_elf_binary_SOURCES = userspace-probe-elf-binary.c

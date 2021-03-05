@@ -1,10 +1,12 @@
+SUMMARY = "Tool to allow editing of RPATH and interpreter fields in ELF binaries"
+DESCRIPTION = "PatchELF is a simple utility for modifying existing ELF executables and libraries."
+HOMEPAGE = "https://github.com/NixOS/patchelf"
+
+LICENSE = "GPLv3"
+
 SRC_URI = "git://github.com/NixOS/patchelf;protocol=https \
            file://handle-read-only-files.patch \
            "
-
-LICENSE = "GPLv3"
-SUMMARY = "Tool to allow editing of RPATH and interpreter fields in ELF binaries"
-
 SRCREV = "8d3a16e97294e3c5521c61b4c8835499c9918264"
 
 S = "${WORKDIR}/git"

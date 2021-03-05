@@ -1,4 +1,6 @@
 SUMMARY = "Python bindings for GStreamer 1.0"
+DESCRIPTION = "GStreamer Python binding overrides (complementing the bindings \
+provided by python-gi) "
 HOMEPAGE = "http://cgit.freedesktop.org/gstreamer/gst-python/"
 SECTION = "multimedia"
 
@@ -14,6 +16,8 @@ RDEPENDS_${PN} += "gstreamer1.0 gstreamer1.0-plugins-base python3-pygobject"
 PNREAL = "gst-python"
 
 S = "${WORKDIR}/${PNREAL}-${PV}"
+
+EXTRA_OEMESON += "-Dlibpython-dir=${libdir}"
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"

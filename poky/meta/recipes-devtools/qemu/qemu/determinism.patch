@@ -1,0 +1,41 @@
+When sources are included within debug information, a couple of areas of the 
+qemu build are not reproducible due to either full buildpaths or timestamps.
+
+Replace the full paths with relative ones. I couldn't figure out how to get
+meson to pass relative paths but we can fix that in the script.
+
+For the keymaps, omit the timestamps as they don't matter to us.
+
+Upstream-Status: Pending [some version of all/part of this may be accepted]
+RP 2021/3/1
+
+Index: qemu-5.2.0/scripts/decodetree.py
+===================================================================
+--- qemu-5.2.0.orig/scripts/decodetree.py
++++ qemu-5.2.0/scripts/decodetree.py
+@@ -1303,8 +1303,8 @@ def main():
+     toppat = ExcMultiPattern(0)
+ 
+     for filename in args:
+-        input_file = filename
+-        f = open(filename, 'r')
++        input_file = os.path.relpath(filename)
++        f = open(input_file, 'r')
+         parse_file(f, toppat)
+         f.close()
+ 
+Index: qemu-5.2.0/ui/keycodemapdb/tools/keymap-gen
+===================================================================
+--- qemu-5.2.0.orig/ui/keycodemapdb/tools/keymap-gen
++++ qemu-5.2.0/ui/keycodemapdb/tools/keymap-gen
+@@ -317,9 +317,8 @@ class LanguageGenerator(object):
+         raise NotImplementedError()
+ 
+     def generate_header(self, database, args):
+-        today = time.strftime("%Y-%m-%d %H:%M")
+         self._boilerplate([
+-            "This file is auto-generated from keymaps.csv on %s" % today,
++            "This file is auto-generated from keymaps.csv",
+             "Database checksum sha256(%s)" % database.mapchecksum,
+             "To re-generate, run:",
+             "  %s" % args,

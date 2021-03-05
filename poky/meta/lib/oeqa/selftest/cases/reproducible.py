@@ -28,44 +28,16 @@ import datetime
 # ruby-ri-docs, meson:
 #https://autobuilder.yocto.io/pub/repro-fail/oe-reproducible-20210215-0_td9la2/packages/diff-html/
 exclude_packages = [
-	'babeltrace2-ptest',
-	'bootchart2-doc',
-	'cups',
-	'efivar',
-	'epiphany',
-	'gcr',
-	'git',
 	'glide',
 	'go-dep',
 	'go-helloworld',
 	'go-runtime',
 	'go_',
-	'groff',
-	'gst-devtools',
-	'gstreamer1.0-python',
-	'gtk-doc',
-	'igt-gpu-tools',
-	'libaprutil',
-	'libcap-ng',
-	'libhandy-1-src',
-	'libid3tag',
-	'libproxy',
-	'libsecret-dev',
-	'libsecret-src',
-	'lttng-tools-dbg',
-	'lttng-tools-ptest',
-	'ltp',
-        'meson',
+	'go-',
+	'meson',
 	'ovmf-shell-efi',
-	'parted-ptest',
 	'perf',
-	'python3-cython',
-	'qemu',
-	'rsync',
-        'ruby-ri-docs',
-	'swig',
-	'syslinux-misc',
-	'systemd-bootchart'
+	'ruby-ri-docs'
 	]
 
 def is_excluded(package):
@@ -137,7 +109,7 @@ def compare_file(reference, test, diffutils_sysroot):
         result.status = MISSING
         return result
 
-    r = runCmd(['cmp', '--quiet', reference, test], native_sysroot=diffutils_sysroot, ignore_status=True)
+    r = runCmd(['cmp', '--quiet', reference, test], native_sysroot=diffutils_sysroot, ignore_status=True, sync=False)
 
     if r.status:
         result.status = DIFFERENT
@@ -173,8 +145,14 @@ class DiffoscopeTests(OESelftestTestCase):
             self.assertTrue(os.path.exists(os.path.join(tmpdir, 'index.html')), "HTML index not found!")
 
 class ReproducibleTests(OESelftestTestCase):
-    package_classes = ['deb', 'ipk']
-    images = ['core-image-minimal', 'core-image-sato', 'core-image-full-cmdline', 'world']
+    # Test the reproducibility of whatever is built between sstate_targets and targets
+
+    package_classes = ['deb', 'ipk', 'rpm']
+
+    # targets are the things we want to test the reproducibility of
+    targets = ['core-image-minimal', 'core-image-sato', 'core-image-full-cmdline', 'core-image-weston', 'world']
+    # sstate targets are things to pull from sstate to potentially cut build/debugging time
+    sstate_targets = []
     save_results = False
     if 'OEQA_DEBUGGING_SAVED_OUTPUT' in os.environ:
         save_results = os.environ['OEQA_DEBUGGING_SAVED_OUTPUT']
@@ -255,6 +233,11 @@ class ReproducibleTests(OESelftestTestCase):
                         tmpdir=tmpdir)
 
         if not use_sstate:
+            if self.sstate_targets:
+               self.logger.info("Building prebuild for %s (sstate allowed)..." % (name))
+               self.write_config(config)
+               bitbake(' '.join(self.sstate_targets))
+
             # This config fragment will disable using shared and the sstate
             # mirror, forcing a complete build from scratch
             config += textwrap.dedent('''\
@@ -265,7 +248,8 @@ class ReproducibleTests(OESelftestTestCase):
         self.logger.info("Building %s (sstate%s allowed)..." % (name, '' if use_sstate else ' NOT'))
         self.write_config(config)
         d = get_bb_vars(capture_vars)
-        bitbake(' '.join(self.images))
+        # targets used to be called images
+        bitbake(' '.join(getattr(self, 'images', self.targets)))
         return d
 
     def test_reproducible_builds(self):

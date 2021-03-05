@@ -69,9 +69,9 @@ FIT_DESC = "A model description"
             'type = "ramdisk";',
             'load = <0x88000000>;',
             'entry = <0x88000000>;',
-            'default = "conf@1";',
-            'kernel = "kernel@1";',
-            'ramdisk = "ramdisk@1";'
+            'default = "conf-1";',
+            'kernel = "kernel-1";',
+            'ramdisk = "ramdisk-1";'
             ]
 
         with open(fitimage_its_path) as its_file:
@@ -137,12 +137,12 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
             "%s FIT image doesn't exist" % (fitimage_path))
 
         req_itspaths = [
-            ['/', 'images', 'kernel@1'],
-            ['/', 'images', 'kernel@1', 'signature@1'],
-            ['/', 'images', 'fdt@am335x-boneblack.dtb'],
-            ['/', 'images', 'fdt@am335x-boneblack.dtb', 'signature@1'],
-            ['/', 'configurations', 'conf@am335x-boneblack.dtb'],
-            ['/', 'configurations', 'conf@am335x-boneblack.dtb', 'signature@1'],
+            ['/', 'images', 'kernel-1'],
+            ['/', 'images', 'kernel-1', 'signature-1'],
+            ['/', 'images', 'fdt-am335x-boneblack.dtb'],
+            ['/', 'images', 'fdt-am335x-boneblack.dtb', 'signature-1'],
+            ['/', 'configurations', 'conf-am335x-boneblack.dtb'],
+            ['/', 'configurations', 'conf-am335x-boneblack.dtb', 'signature-1'],
         ]
 
         itspath = []
@@ -158,7 +158,7 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
                 elif line.endswith('{'):
                     itspath.append(line[:-1].strip())
                     itspaths.append(itspath[:])
-                elif itspath and itspath[-1] == 'signature@1':
+                elif itspath and itspath[-1] == 'signature-1':
                     itsdotpath = '.'.join(itspath)
                     if not itsdotpath in sigs:
                         sigs[itsdotpath] = {}
@@ -182,7 +182,7 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
         }
 
         for itspath, values in sigs.items():
-            if 'conf@' in itspath:
+            if 'conf-' in itspath:
                 reqsigvalues = reqsigvalues_config
             else:
                 reqsigvalues = reqsigvalues_image
@@ -210,9 +210,9 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
                     signed_sections[in_signed] = {}
                 key, value = line.split(':', 1)
                 signed_sections[in_signed][key.strip()] = value.strip()
-        self.assertIn('kernel@1', signed_sections)
-        self.assertIn('fdt@am335x-boneblack.dtb', signed_sections)
-        self.assertIn('conf@am335x-boneblack.dtb', signed_sections)
+        self.assertIn('kernel-1', signed_sections)
+        self.assertIn('fdt-am335x-boneblack.dtb', signed_sections)
+        self.assertIn('conf-am335x-boneblack.dtb', signed_sections)
         for signed_section, values in signed_sections.items():
             value = values.get('Sign algo', None)
             self.assertEqual(value, 'sha256,rsa2048:oe-selftest', 'Signature algorithm for %s not expected value' % signed_section)
@@ -298,7 +298,7 @@ FIT_HASH_ALG = "sha256"
         its_lines = [line.strip() for line in its_file.readlines()]
 
         exp_node_lines = [
-            'kernel@1 {',
+            'kernel-1 {',
             'description = "Linux kernel";',
             'data = /incbin/("' + initramfs_bundle + '");',
             'type = "kernel";',
@@ -307,7 +307,7 @@ FIT_HASH_ALG = "sha256"
             'compression = "none";',
             'load = <' + kernel_load + '>;',
             'entry = <' + kernel_entry + '>;',
-            'hash@1 {',
+            'hash-1 {',
             'algo = "' + fit_hash_alg +'";',
             '};',
             '};'
@@ -327,7 +327,7 @@ FIT_HASH_ALG = "sha256"
             else:
                 self.assertTrue(test_passed == True,"kernel node does not match expectation")
 
-        rx_configs = re.compile("^conf@.*")
+        rx_configs = re.compile("^conf-.*")
         its_configs = list(filter(rx_configs.match, its_lines))
 
         for cfg_str in its_configs:
@@ -348,7 +348,7 @@ FIT_HASH_ALG = "sha256"
             else:
                 print("kernel keyword found in the description line")
 
-            if 'kernel = "kernel@1";' not in node:
+            if 'kernel = "kernel-1";' not in node:
                 self.assertTrue(test_passed == True,"kernel line not found")
                 break
             else:

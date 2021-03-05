@@ -1,4 +1,4 @@
-From 9e3fcf192c1ca068d310c648c311f9d850214421 Mon Sep 17 00:00:00 2001
+From 27bbd3c9d8d86de545fcf6608564a14571c98a61 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Fri, 23 Nov 2018 15:28:28 +0000
 Subject: [PATCH] meson: Disable rpath stripping at install time
@@ -16,17 +16,17 @@ Upstream-Status: Submitted [https://github.com/mesonbuild/meson/issues/2567]
  1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/mesonbuild/minstall.py b/mesonbuild/minstall.py
-index 0be01fe..5406cab 100644
+index 212568a..06366d4 100644
 --- a/mesonbuild/minstall.py
 +++ b/mesonbuild/minstall.py
-@@ -512,8 +512,11 @@ class Installer:
+@@ -653,8 +653,11 @@ class Installer:
              if file_copied:
                  self.did_install_something = True
                  try:
--                    depfixer.fix_rpath(outname, t.rpath_dirs_to_remove, install_rpath, final_path,
--                                       install_name_mappings, verbose=False)
+-                    self.fix_rpath(outname, t.rpath_dirs_to_remove, install_rpath, final_path,
+-                                         install_name_mappings, verbose=False)
 +                    if install_rpath:
-+                        depfixer.fix_rpath(outname, t.rpath_dirs_to_remove, install_rpath, final_path,
++                        self.fix_rpath(outname, t.rpath_dirs_to_remove, install_rpath, final_path,
 +                                           install_name_mappings, verbose=False)
 +                    else:
 +                        print("RPATH changes at install time disabled")

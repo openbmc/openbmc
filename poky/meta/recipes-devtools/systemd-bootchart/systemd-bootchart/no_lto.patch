@@ -1,0 +1,19 @@
+LTO output is not reproducible. Until it is, disable this. Sadly
+there is no configuration option to do so at this time.
+
+Upstream-Status: Pending [may be accept addition of configuration option?]
+RP 2021/3/1
+
+Index: git/configure.ac
+===================================================================
+--- git.orig/configure.ac
++++ git/configure.ac
+@@ -124,7 +124,7 @@ AS_CASE([$CC], [*clang*],
+ 
+ AS_CASE([$CFLAGS], [*-O[[12345sz\ ]]*],
+         [CC_CHECK_FLAGS_APPEND([with_cflags], [CFLAGS], [\
+-               -flto -ffat-lto-objects])],
++               ])],
+         [AC_MSG_RESULT([skipping -flto, optimization not enabled])])
+ AC_SUBST([OUR_CFLAGS], "$with_cflags $sanitizer_cflags")
+ 

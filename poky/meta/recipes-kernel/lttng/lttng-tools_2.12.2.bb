@@ -3,6 +3,7 @@ SUMMARY = "Linux Trace Toolkit Control"
 DESCRIPTION = "The Linux trace toolkit is a suite of tools designed \
 to extract program execution details from the Linux operating system \
 and interpret them."
+HOMEPAGE = "https://github.com/lttng/lttng-tools"
 
 LICENSE = "GPLv2 & LGPLv2.1"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=40ef17463fbd6f377db3c47b1cbaded8 \
@@ -35,6 +36,7 @@ SRC_URI = "https://lttng.org/files/lttng-tools/lttng-tools-${PV}.tar.bz2 \
            file://run-ptest \
            file://lttng-sessiond.service \
            file://0001-tests-regression-disable-the-tools-live-tests.patch \
+           file://determinism.patch \
            "
 
 SRC_URI[sha256sum] = "9ed9161795ff023b076f9f95afaa4f1f822ec42495c0fa04c586ab8fa74e84f1"
@@ -113,6 +115,8 @@ do_install_ptest () {
     done
 
     chrpath --delete ${D}${PTEST_PATH}/tests/utils/testapp/userspace-probe-elf-binary/userspace-probe-elf-binary
+    chrpath --delete ${D}${PTEST_PATH}/tests/regression/ust/ust-dl/libbar.so
+    chrpath --delete ${D}${PTEST_PATH}/tests/regression/ust/ust-dl/libfoo.so
 
     #
     # Use the versioned libs of liblttng-ust-dl.
@@ -149,6 +153,10 @@ do_install_ptest () {
         -e 's#\(^test.*SOURCES.=\)#disable\1#g' \
         -e 's#\(^test.*LDADD.=\)#disable\1#g' \
         -i ${D}${PTEST_PATH}/tests/unit/Makefile
+
+    # Fix hardcoded build path
+    sed -e 's#TESTAPP_PATH=.*/tests/regression/#TESTAPP_PATH=${PTEST_PATH}/tests/regression/#' \
+        -i ${D}${PTEST_PATH}/tests/regression/ust/python-logging/test_python_logging
 
     # Substitute links to installed binaries.
     for prog in lttng lttng-relayd lttng-sessiond lttng-consumerd lttng-crash; do

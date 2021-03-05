@@ -1,5 +1,6 @@
 SUMMARY = "Distributed version control system"
 HOMEPAGE = "http://git-scm.com"
+DESCRIPTION = "Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
 SECTION = "console/utils"
 LICENSE = "GPLv2"
 DEPENDS = "openssl curl zlib expat"

@@ -38,5 +38,12 @@ EXTRA_OEMESON += " \
     ${@gettext_oemeson(d)} \
 "
 
+do_install_append () {
+     for fn in ${bindir}/gst-validate-launcher \
+         ${libdir}/gst-validate-launcher/python/launcher/config.py; do
+             sed -i -e 's,${B},/usr/src/debug/${PN},g' -e 's,${S},/usr/src/debug/${PN},g' ${D}$fn
+     done
+}
+
 GIR_MESON_ENABLE_FLAG = "enabled"
 GIR_MESON_DISABLE_FLAG = "disabled"

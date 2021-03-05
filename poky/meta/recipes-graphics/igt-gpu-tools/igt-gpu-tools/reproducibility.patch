@@ -1,0 +1,38 @@
+meson: Allow source location to be configurable
+
+Hardcoding a build source path into a binary when cross compiling isn't
+appropriate and breaks build reproducibility. Allow the srcdir to be
+specified by an optional configuration option to meson.
+
+Signed-off-by: Richard Purdie <richard.purdie at linuxfoundation.org>
+Upstream-Status: Submitted [https://lists.freedesktop.org/archives/igt-dev/2021-February/029443.html]
+
+Index: git/lib/meson.build
+===================================================================
+--- git.orig/lib/meson.build
++++ git/lib/meson.build
+@@ -122,7 +122,11 @@ if chamelium.found()
+ 	lib_sources += 'igt_chamelium_stream.c'
+ endif
+ 
+-srcdir = join_paths(meson.source_root(), 'tests')
++if get_option('srcdir') != ''
++    srcdir = join_paths(get_option('srcdir'), 'tests')
++else
++    srcdir = join_paths(meson.source_root(), 'tests')
++endif
+ 
+ lib_version = vcs_tag(input : 'version.h.in', output : 'version.h',
+ 		      fallback : 'NO-GIT',
+Index: git/meson_options.txt
+===================================================================
+--- git.orig/meson_options.txt
++++ git/meson_options.txt
+@@ -50,3 +50,7 @@ option('use_rpath',
+        type : 'boolean',
+        value : false,
+        description : 'Set runpath on installed executables for libigt.so')
++
++option('srcdir',
++       type : 'string',
++       description : 'Path to source code to be compiled into binaries (optional)')

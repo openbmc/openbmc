@@ -68,6 +68,7 @@ python () {
             url_data = fetch.ud[url]
             parm = url_data.parm
             if (url_data.type == 'file' or
+                    url_data.type == 'npmsw' or
                     'type' in parm and parm['type'] == 'kmeta'):
                 local_srcuri.append(url)
 

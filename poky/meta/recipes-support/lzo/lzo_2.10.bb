@@ -1,4 +1,6 @@
 SUMMARY = "Lossless data compression library"
+DESCRIPTION = "A portable lossless data compression library written in \
+ANSI C that offers pretty fast compression and *extremely* fast decompression. "
 HOMEPAGE = "http://www.oberhumer.com/opensource/lzo/"
 SECTION = "libs"
 LICENSE = "GPLv2+"

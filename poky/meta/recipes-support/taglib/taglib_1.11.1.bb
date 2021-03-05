@@ -1,4 +1,5 @@
 SUMMARY = "Library for reading and editing the meta-data of popular audio formats"
+DESCRIPTION = "Platform-independent library (tested on Windows/Linux) for reading and writing metadata in media files, including video, audio, and photo formats. This is a convenient one-stop-shop to present or tag all your media collection, regardless of which format/container these might use. You can read/write the standard or more common tags/properties of a media, or you can also create and retrieve your own custom tags."
 SECTION = "libs/multimedia"
 HOMEPAGE = "http://taglib.github.io/"
 LICENSE = "LGPLv2.1 | MPL-1.1"

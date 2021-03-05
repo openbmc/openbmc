@@ -4,14 +4,13 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/libcap-ng:"
 
 SUMMARY .= " - python"
 
-inherit lib_package autotools python3native
+inherit lib_package autotools python3targetconfig
 
 DEPENDS += "libcap-ng python3 swig-native"
 
 S = "${WORKDIR}/libcap-ng-${PV}"
 
 EXTRA_OECONF += "--with-python --with-python3"
-EXTRA_OEMAKE += "PYLIBVER='python${PYTHON_BASEVERSION}${PYTHON_ABI}' PYINC='${STAGING_INCDIR}/${PYLIBVER}'"
 
 do_install_append() {
     rm -rf ${D}${bindir}

@@ -1,4 +1,5 @@
 SUMMARY = "Sanitized set of kernel headers for the C library's use"
+DESCRIPTION = "Designed to maintain an Application Programming Interface (API) stable version of the Linux headers"
 SECTION = "devel"
 LICENSE = "GPLv2"
 

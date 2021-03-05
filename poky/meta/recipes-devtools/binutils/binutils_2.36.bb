@@ -25,6 +25,8 @@ EXTRA_OECONF_class-native = "--enable-targets=all \
                              --disable-sim \
                              --disable-werror"
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod, elfutils"
 # gcc9.0 end up mis-compiling libbfd.so with O2 which then crashes on target
 # So remove -O2 and use -Os as workaround
 SELECTED_OPTIMIZATION_remove_mipsarch = "-O2"

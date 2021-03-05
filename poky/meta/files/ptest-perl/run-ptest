@@ -1,7 +1,7 @@
 #!/bin/sh
 
 for case in `find t -type f -name '*.t'`; do
-    perl $case >$case.output 2>&1
+    perl -I . $case >$case.output 2>&1
     ret=$?
     cat $case.output
     if [ $ret -ne 0 ]; then

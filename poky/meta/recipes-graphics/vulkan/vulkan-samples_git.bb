@@ -1,4 +1,6 @@
 DESCRIPTION = "The Vulkan Samples is collection of resources to help develop optimized Vulkan applications."
+HOMEPAGE = "https://www.khronos.org/vulkan/"
+BUGTRACKER = "https://github.com/KhronosGroup/Vulkan-Samples/issues"
 LICENSE = "Apache-2.0"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=48aa35cefb768436223a6e7f18dc2a2a"
@@ -9,7 +11,7 @@ SRC_URI = "gitsm://github.com/KhronosGroup/Vulkan-Samples.git \
            "
 
 UPSTREAM_CHECK_COMMITS = "1"
-SRCREV = "524cdcd27005e7cd56e6694fa41e685519d7dbca"
+SRCREV = "55cebd9e7cc4153a3a7b3a45d42274c0e2a17815"
 
 UPSTREAM_CHECK_GITTAGREGEX = "These are not the releases you're looking for"
 S = "${WORKDIR}/git"

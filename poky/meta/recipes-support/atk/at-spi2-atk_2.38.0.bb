@@ -1,5 +1,7 @@
 SUMMARY = "AT-SPI 2 Toolkit Bridge"
+DESCRIPTION = "Contains a library that bridges ATK to At-Spi2 D-Bus service. Toolkit widgets use it to provide their content to screen readers such as Orca."
 HOMEPAGE = "https://wiki.linuxfoundation.org/accessibility/d-bus"
+BUGTRACKER = "http://bugzilla.gnome.org/"
 LICENSE = "LGPL-2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 

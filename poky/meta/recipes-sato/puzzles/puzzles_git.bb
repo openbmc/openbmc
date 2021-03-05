@@ -1,4 +1,5 @@
 SUMMARY = "Simon Tatham's Portable Puzzle Collection"
+DESCRIPTION = "Collection of small computer programs which implement one-player puzzle games."
 HOMEPAGE = "http://www.chiark.greenend.org.uk/~sgtatham/puzzles/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=6099f4981f9461d7f411091e69a7f07a"
@@ -15,6 +16,7 @@ SRC_URI = "git://git.tartarus.org/simon/puzzles.git \
            file://0001-pattern.c-Change-string-lenght-parameter-to-be-size_.patch \
            file://fix-ki-uninitialized.patch \
            file://0001-malloc-Check-for-excessive-values-to-malloc.patch \
+           file://0001-map-Fix-stringop-overflow-warning.patch \
            "
 
 UPSTREAM_CHECK_COMMITS = "1"

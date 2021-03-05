@@ -1,4 +1,5 @@
 SUMMARY = "Accessibility toolkit for GNOME"
+DESCRIPTION = "Provides application programming interfaces (APIs) for implementing accessibility support in software."
 HOMEPAGE = "https://wiki.gnome.org/Accessibility"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/atk/-/issues"
 SECTION = "x11/libs"

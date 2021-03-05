@@ -1,4 +1,5 @@
 SUMMARY = "A library for atomic integer operations"
+DESCRIPTION = "Package provides semi-portable access to hardware-provided atomic memory update operations on a number of architectures."
 HOMEPAGE = "https://github.com/ivmai/libatomic_ops/"
 SECTION = "optional"
 PROVIDES += "libatomics-ops"

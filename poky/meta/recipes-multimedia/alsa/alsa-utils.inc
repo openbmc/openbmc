@@ -1,4 +1,6 @@
 SUMMARY = "ALSA sound utilities"
+DESCRIPTION = "collection of small and often extremely powerful applications \
+designed to allow users to control the various parts of the ALSA system."
 HOMEPAGE = "http://www.alsa-project.org"
 BUGTRACKER = "http://alsa-project.org/main/index.php/Bug_Tracking"
 SECTION = "console/utils"

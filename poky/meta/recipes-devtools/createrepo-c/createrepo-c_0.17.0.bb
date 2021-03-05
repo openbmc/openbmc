@@ -24,11 +24,17 @@ BBCLASSEXTEND = "native nativesdk"
 # Direct createrepo to read rpm configuration from our sysroot, not the one it was compiled in
 do_install_append_class-native() {
         create_wrapper ${D}/${bindir}/createrepo_c \
-                RPM_CONFIGDIR=${STAGING_LIBDIR_NATIVE}/rpm
+                RPM_CONFIGDIR=${STAGING_LIBDIR_NATIVE}/rpm \
+                MAGIC=${STAGING_DIR_NATIVE}${datadir_native}/misc/magic.mgc
+        create_wrapper ${D}/${bindir}/modifyrepo_c \
+                MAGIC=${STAGING_DIR_NATIVE}${datadir_native}/misc/magic.mgc
 }
 
 do_install_append_class-nativesdk() {
         create_wrapper ${D}/${bindir}/createrepo_c \
-                RPM_CONFIGDIR=${SDKPATHNATIVE}${libdir_nativesdk}/rpm
+                RPM_CONFIGDIR=${SDKPATHNATIVE}${libdir_nativesdk}/rpm \
+                MAGIC=${SDKPATHNATIVE}${datadir}/misc/magic.mgc
+        create_wrapper ${D}/${bindir}/modifyrepo_c \
+                MAGIC=${SDKPATHNATIVE}${datadir}/misc/magic.mgc
         rm -rf ${D}/etc
 }

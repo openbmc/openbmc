@@ -234,7 +234,7 @@ def register(name, handler, mask=None, filename=None, lineno=None, data=None):
 
     if data and data.getVar("BB_CURRENT_MC"):
         mc = data.getVar("BB_CURRENT_MC")
-        name = '%s%s' % (mc, name)
+        name = '%s%s' % (mc.replace('-', '_'), name)
 
     # already registered
     if name in _handlers:
@@ -286,7 +286,7 @@ def remove(name, handler, data=None):
     if data:
         if data.getVar("BB_CURRENT_MC"):
             mc = data.getVar("BB_CURRENT_MC")
-            name = '%s%s' % (mc, name)
+            name = '%s%s' % (mc.replace('-', '_'), name)
 
     _handlers.pop(name)
     if name in _catchall_handlers:

@@ -1,4 +1,4 @@
-From 9aa68ad81b97847dda3493145f4b0a7cc580c551 Mon Sep 17 00:00:00 2001
+From 6e4c1644a3a8cacf7c1f5953cc378589bb046d5a Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Mon, 23 Dec 2013 13:38:34 +0000
 Subject: [PATCH] e2fsprogs: silence debugfs
@@ -14,10 +14,10 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/debugfs/debugfs.c b/debugfs/debugfs.c
-index 15b01214..15164df2 100644
+index 132c5f9d..98063727 100644
 --- a/debugfs/debugfs.c
 +++ b/debugfs/debugfs.c
-@@ -2492,7 +2492,7 @@ static int source_file(const char *cmd_file, int ss_idx)
+@@ -2510,7 +2510,7 @@ static int source_file(const char *cmd_file, int ss_idx)
  		cp = strchr(buf, '\r');
  		if (cp)
  			*cp = 0;

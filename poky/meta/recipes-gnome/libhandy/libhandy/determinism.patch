@@ -1,0 +1,35 @@
+hdy-enums*.c.in: Fix reproducibility issue
+
+When full filenames are used in generated sources it makes the resulting
+debug packages non-reproducible. Best practise is to use basename in
+comments instead.
+
+Signed-off-by: Richard Purdie richard.purdie@linuxfoundation.org
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/libhandy/-/merge_requests/734]
+
+Index: a/src/hdy-enums-private.c.in
+===================================================================
+--- a/src/hdy-enums-private.c.in
++++ b/src/hdy-enums-private.c.in
+@@ -7,7 +7,7 @@
+ /*** END file-header ***/
+ 
+ /*** BEGIN file-production ***/
+-/* enumerations from "@filename@" */
++/* enumerations from "@basename@" */
+ /*** END file-production ***/
+ 
+ /*** BEGIN value-header ***/
+Index: a/src/hdy-enums.c.in
+===================================================================
+--- a/src/hdy-enums.c.in
++++ b/src/hdy-enums.c.in
+@@ -13,7 +13,7 @@
+ /*** END file-header ***/
+ 
+ /*** BEGIN file-production ***/
+-/* enumerations from "@filename@" */
++/* enumerations from "@basename@" */
+ /*** END file-production ***/
+ 
+ /*** BEGIN value-header ***/

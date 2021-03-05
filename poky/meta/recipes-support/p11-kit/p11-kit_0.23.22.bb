@@ -1,4 +1,6 @@
 SUMMARY = "Provides a way to load and enumerate PKCS#11 modules"
+DESCRIPTION = " Provides a standard configuration setup for installing PKCS#11 modules in such a way that they're discoverable. Also solves problems with coordinating the use of PKCS#11 by different components or libraries living in the same process."
+HOMEPAGE = "https://p11-glue.github.io/p11-glue/p11-kit.html"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=02933887f609807fbb57aa4237d14a50"
 

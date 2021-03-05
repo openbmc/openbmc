@@ -1,0 +1,30 @@
+From efe7101786193eaddb749c0583af6b54aec6f289 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 2 Feb 2021 18:45:16 -0800
+Subject: [PATCH] configure: Conditionally undefine backend m4 macro
+
+Unlike the M4 builtin, this macro fails if macro is not defined
+therefore recover the behavior of the builtin.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index fe5054a..758f8c2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -127,7 +127,7 @@ fi
+ m4_set_foreach([crypto_backends], [backend],
+   [AM_CONDITIONAL(m4_toupper(backend), test "$found_crypto" = "backend")]
+ )
+-m4_undefine([backend])
++m4_ifdef([backend], [m4_undefine([backend])])
+ 
+ 
+ # libz
+-- 
+2.30.0
+

@@ -1,5 +1,6 @@
 SUMMARY = "ISC Internet Domain Name Server"
 HOMEPAGE = "https://www.isc.org/bind/"
+DESCRIPTION = "BIND 9 provides a full-featured Domain Name Server system"
 SECTION = "console/network"
 
 LICENSE = "MPL-2.0"

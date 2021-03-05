@@ -1,4 +1,9 @@
 SUMMARY = "Miscellaneous utilities specific to Debian"
+DESCRIPTION = "Provides a number of small utilities which are used \
+primarily by the installation scripts of Debian packages, although \
+you may use them directly. "
+HOMEPAGE = "https://packages.debian.org/sid/debianutils"
+BUGTRACKER = "https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=debianutils;dist=unstable"
 SECTION = "base"
 LICENSE = "GPLv2 & SMAIL_GPL"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=9b912cd0cc654134c0ef3424a0705b94"

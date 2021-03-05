@@ -1,5 +1,7 @@
 SUMMARY = "A library providing C and Python (libcURL like) API \
            for downloading linux repository metadata and packages."
+HOMEPAGE = "https://github.com/rpm-software-management/librepo"
+DESCRIPTION = "${SUMMARY}"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 

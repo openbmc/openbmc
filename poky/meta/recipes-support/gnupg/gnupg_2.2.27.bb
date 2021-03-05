@@ -1,4 +1,9 @@
 SUMMARY = "GNU Privacy Guard - encryption and signing tools (2.x)"
+DESCRIPTION = "A complete and free implementation of the OpenPGP standard \
+as defined by RFC4880 (also known as PGP). GnuPG allows you to encrypt \
+and sign your data and communications; it features a versatile key \
+management system, along with access modules for all kinds of public \
+key directories."
 HOMEPAGE = "http://www.gnupg.org/"
 LICENSE = "GPLv3 & LGPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=189af8afca6d6075ba6c9e0aa8077626 \

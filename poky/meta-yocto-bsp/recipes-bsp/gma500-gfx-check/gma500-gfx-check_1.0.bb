@@ -1,7 +1,7 @@
 SUMMARY = "Intel gma500_gfx fix for certain hardware"
 DESCRIPTION = "Avoid inserting gma500_gfx module for certain hardware devices."
 LICENSE="GPLv2"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
 SRC_URI = "file://gma500-gfx-check.conf \
 	file://gma500-gfx-check.sh "

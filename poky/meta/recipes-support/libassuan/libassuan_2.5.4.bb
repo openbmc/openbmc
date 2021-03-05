@@ -1,4 +1,7 @@
 SUMMARY = "IPC library used by GnuPG and GPGME"
+DESCRIPTION = "A small library implementing the so-called Assuan protocol. \
+This protocol is used for IPC between most newer GnuPG components. \
+Both, server and client side functions are provided. "
 HOMEPAGE = "http://www.gnupg.org/related_software/libassuan/"
 BUGTRACKER = "https://bugs.g10code.com/gnupg/index"
 

@@ -1,4 +1,7 @@
 SUMMARY = "ISO language, territory, currency, script codes and their translations"
+DESCRIPTION = "Provides lists of various ISO standards (e.g. country, \
+language, language scripts, and currency names) in one place, rather \
+than repeated in many programs throughout the system."
 HOMEPAGE = "https://salsa.debian.org/iso-codes-team/iso-codes"
 BUGTRACKER = "https://salsa.debian.org/iso-codes-team/iso-codes/issues"
 

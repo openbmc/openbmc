@@ -1,4 +1,6 @@
 SUMMARY = "Simple GTK+ based panel for handheld devices"
+DESCRIPTION = "A flexible always present 'window bar' for holding application \
+launchers and small 'applet' style applications"
 HOMEPAGE = "http://matchbox-project.org"
 BUGTRACKER = "http://bugzilla.yoctoproject.org/"
 

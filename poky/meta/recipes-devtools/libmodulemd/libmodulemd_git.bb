@@ -1,4 +1,6 @@
 SUMMARY = "C Library for manipulating module metadata files"
+HOMEPAGE = "https://github.com/fedora-modularity/libmodulemd"
+DESCRIPTION = "${SUMMARY}"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=25a3927bff3ee4f5b21bcb0ed3fcd6bb"
 

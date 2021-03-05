@@ -2,6 +2,7 @@ SUMMARY = "Open Package Manager"
 SUMMARY_libopkg = "Open Package Manager library"
 SECTION = "base"
 HOMEPAGE = "http://code.google.com/p/opkg/"
+DESCRIPTION = "Opkg is a lightweight package management system based on Ipkg."
 BUGTRACKER = "http://code.google.com/p/opkg/issues/list"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \

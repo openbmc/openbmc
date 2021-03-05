@@ -22,6 +22,9 @@ binpath_syslogd=/usr/sbin/syslogd
 
 test -x $binpath || exit 0
 
+# run secure by default
+SYSLOGD="-ss"
+
 test ! -r /etc/default/syslogd || . /etc/default/syslogd
 
 create_xconsole()

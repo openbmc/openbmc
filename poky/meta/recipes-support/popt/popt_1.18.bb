@@ -1,4 +1,5 @@
 SUMMARY = "Library for parsing command line options"
+DESCRIPTION = "Popt is a C library for parsing command line parameters. Popt was heavily influenced by the getopt() and getopt_long() functions, but it improves on them by allowing more powerful argument expansion. Popt can parse arbitrary argv[] style arrays and automatically set variables based on command line arguments."
 HOMEPAGE = "https://www.rpm.org/"
 SECTION = "libs"
 

@@ -1,4 +1,4 @@
-From cbc27ee1576b4d04ad8e9d80760c63a9d3b7f5ed Mon Sep 17 00:00:00 2001
+From 1546e1f95a119175b7a4e4272a26dd85505e5ede Mon Sep 17 00:00:00 2001
 From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 Date: Wed, 15 Nov 2017 15:05:01 +0100
 Subject: [PATCH] native_bindir
@@ -15,16 +15,17 @@ that is is OE only. https://github.com/mesonbuild/meson/issues/1849#issuecomment
 
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+
 ---
  mesonbuild/dependencies/base.py | 19 +++++++++++--------
  mesonbuild/dependencies/ui.py   |  6 +++---
  2 files changed, 14 insertions(+), 11 deletions(-)
 
 diff --git a/mesonbuild/dependencies/base.py b/mesonbuild/dependencies/base.py
-index 3a5f5f8..0af89f8 100644
+index cd77b4b..7e3f338 100644
 --- a/mesonbuild/dependencies/base.py
 +++ b/mesonbuild/dependencies/base.py
-@@ -183,7 +183,7 @@ class Dependency:
+@@ -192,7 +192,7 @@ class Dependency:
      def get_exe_args(self, compiler):
          return []
  
@@ -33,16 +34,16 @@ index 3a5f5f8..0af89f8 100644
          raise DependencyException('{!r} is not a pkgconfig dependency'.format(self.name))
  
      def get_configtool_variable(self, variable_name):
-@@ -261,7 +261,7 @@ class InternalDependency(Dependency):
-                 setattr(result, k, copy.deepcopy(v, memo))
-         return result
+@@ -280,7 +280,7 @@ class InternalDependency(Dependency):
+             return True
+         return any(d.is_built() for d in self.ext_deps)
  
 -    def get_pkgconfig_variable(self, variable_name: str, kwargs: T.Dict[str, T.Any]) -> str:
 +    def get_pkgconfig_variable(self, variable_name: str, kwargs: T.Dict[str, T.Any], use_native=False) -> str:
          raise DependencyException('Method "get_pkgconfig_variable()" is '
                                    'invalid for an internal dependency')
  
-@@ -639,8 +639,11 @@ class PkgConfigDependency(ExternalDependency):
+@@ -658,8 +658,11 @@ class PkgConfigDependency(ExternalDependency):
          return s.format(self.__class__.__name__, self.name, self.is_found,
                          self.version_reqs)
  
@@ -56,16 +57,16 @@ index 3a5f5f8..0af89f8 100644
          p, out, err = Popen_safe(cmd, env=env)
          rc, out, err = p.returncode, out.strip(), err.strip()
          call = ' '.join(cmd)
-@@ -666,7 +669,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -685,7 +688,7 @@ class PkgConfigDependency(ExternalDependency):
+             env['PKG_CONFIG_LIBDIR'] = new_pkg_config_libdir
              mlog.debug('PKG_CONFIG_LIBDIR: ' + new_pkg_config_libdir)
- 
  
 -    def _call_pkgbin(self, args, env=None):
 +    def _call_pkgbin(self, args, env=None, use_native=False):
          # Always copy the environment since we're going to modify it
          # with pkg-config variables
          if env is None:
-@@ -680,7 +683,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -699,7 +702,7 @@ class PkgConfigDependency(ExternalDependency):
          targs = tuple(args)
          cache = PkgConfigDependency.pkgbin_cache
          if (self.pkgbin, targs, fenv) not in cache:
@@ -74,7 +75,7 @@ index 3a5f5f8..0af89f8 100644
          return cache[(self.pkgbin, targs, fenv)]
  
      def _convert_mingw_paths(self, args: T.List[str]) -> T.List[str]:
-@@ -889,7 +892,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -905,7 +908,7 @@ class PkgConfigDependency(ExternalDependency):
                                        (self.name, out_raw))
          self.link_args, self.raw_link_args = self._search_libs(out, out_raw)
  
@@ -83,7 +84,7 @@ index 3a5f5f8..0af89f8 100644
          options = ['--variable=' + variable_name, self.name]
  
          if 'define_variable' in kwargs:
-@@ -902,7 +905,7 @@ class PkgConfigDependency(ExternalDependency):
+@@ -918,7 +921,7 @@ class PkgConfigDependency(ExternalDependency):
  
              options = ['--define-variable=' + '='.join(definition)] + options
  
@@ -93,7 +94,7 @@ index 3a5f5f8..0af89f8 100644
          if ret != 0:
              if self.required:
 diff --git a/mesonbuild/dependencies/ui.py b/mesonbuild/dependencies/ui.py
-index 5dffd3a..fb3a178 100644
+index d897d76..a598d2e 100644
 --- a/mesonbuild/dependencies/ui.py
 +++ b/mesonbuild/dependencies/ui.py
 @@ -325,7 +325,7 @@ class QtBaseDependency(ExternalDependency):

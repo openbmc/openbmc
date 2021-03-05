@@ -1,4 +1,7 @@
 SUMMARY = "Library for reading extended image information (EXIF) from JPEG files"
+DESCRIPTION = "libexif is a library for parsing, editing, and saving EXIF data. It is \
+intended to replace lots of redundant implementations in command-line \
+utilities and programs with GUIs."
 HOMEPAGE = "https://libexif.github.io/"
 SECTION = "libs"
 LICENSE = "LGPLv2.1"

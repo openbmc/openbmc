@@ -1,4 +1,6 @@
 SUMMARY = "Userspace library to access USB (version 1.0)"
+DESCRIPTION = "A cross-platform library to access USB devices from Linux, \
+macOS, Windows, OpenBSD/NetBSD, Haiku and Solaris userspace."
 HOMEPAGE = "http://libusb.sf.net"
 BUGTRACKER = "http://www.libusb.org/report"
 SECTION = "libs"

@@ -1,4 +1,10 @@
 SUMMARY = "Public Suffix List library"
+DESCRIPTION = "The libpsl package provides a library for accessing and \
+resolving information from the Public Suffix List (PSL). The PSL is a set of \
+domain names beyond the standard suffixes, such as .com."
+
+HOMEPAGE = "https://rockdaboot.github.io/libpsl/"
+BUGTRACKER = "https://github.com/rockdaboot/libpsl/issues"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5437030d9e4fbe7267ced058ddb8a7f5 \

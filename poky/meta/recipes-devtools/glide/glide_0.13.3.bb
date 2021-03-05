@@ -1,5 +1,6 @@
 SUMMARY = "Vendor Package Management for Golang"
-HOMEPAGE = "https://glide.sh"
+HOMEPAGE = "https://github.com/Masterminds/glide"
+DESCRIPTION = "Glide is a Vendor Package Management for Golang"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/LICENSE;md5=54905cf894f8cc416a92f4fc350c35b2"
 

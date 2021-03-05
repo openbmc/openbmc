@@ -1,7 +1,7 @@
-From e82a055f85e398cb03a4eaf5faf351a3a1f19344 Mon Sep 17 00:00:00 2001
+From 2fa52d61b1abdf4a3f3b153c771fb2081666430c Mon Sep 17 00:00:00 2001
 From: Mingli Yu <Mingli.Yu@windriver.com>
 Date: Tue, 21 May 2019 15:20:34 +0800
-Subject: [PATCH v2] skip the test when gcc not deployed
+Subject: [PATCH] skip the test when gcc not deployed
 
 Skip the tests which depend on gcc when
 gcc not deployed.
@@ -9,6 +9,7 @@ gcc not deployed.
 Upstream-Status: Submitted[https://sourceware.org/ml/elfutils-devel/2019-q2/msg00091.html]
 
 Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+
 ---
  tests/run-disasm-x86-64.sh | 2 ++
  tests/run-disasm-x86.sh    | 2 ++
@@ -17,7 +18,7 @@ Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
  4 files changed, 8 insertions(+)
 
 diff --git a/tests/run-disasm-x86-64.sh b/tests/run-disasm-x86-64.sh
-index a6be62b..c3ef238 100755
+index 07b612b..7a32996 100755
 --- a/tests/run-disasm-x86-64.sh
 +++ b/tests/run-disasm-x86-64.sh
 @@ -22,6 +22,8 @@ case "`uname -m`" in
@@ -26,11 +27,11 @@ index a6be62b..c3ef238 100755
      testfiles testfile45.S testfile45.expect
 +    # skip the case if no gcc deployed
 +    which gcc || exit 77
-     gcc -m64 -c -o testfile45.o testfile45.S
+     ${CC} -m64 -c -o testfile45.o testfile45.S
      testrun_compare ${abs_top_builddir}/src/objdump -d testfile45.o < testfile45.expect
      ;;
 diff --git a/tests/run-disasm-x86.sh b/tests/run-disasm-x86.sh
-index 28a3df7..544fc28 100755
+index 7ac73ad..f0d4796 100755
 --- a/tests/run-disasm-x86.sh
 +++ b/tests/run-disasm-x86.sh
 @@ -22,6 +22,8 @@ case "`uname -m`" in
@@ -39,11 +40,11 @@ index 28a3df7..544fc28 100755
      testfiles testfile44.S testfile44.expect
 +    # skip the case if no gcc deployed
 +    which gcc || exit 77
-     gcc -m32 -c -o testfile44.o testfile44.S
+     ${CC} -m32 -c -o testfile44.o testfile44.S
      testrun_compare ${abs_top_builddir}/src/objdump -d testfile44.o < testfile44.expect
      ;;
 diff --git a/tests/run-strip-g.sh b/tests/run-strip-g.sh
-index 1303819..a943dec 100755
+index 1592121..9b8157e 100755
 --- a/tests/run-strip-g.sh
 +++ b/tests/run-strip-g.sh
 @@ -24,6 +24,8 @@
@@ -53,10 +54,10 @@ index 1303819..a943dec 100755
 +# skip the test if gcc deployed
 +which gcc || exit 77
  echo Create debug a.out.
- echo "int main() { return 1; }" | gcc -g -xc -
+ echo "int main() { return 1; }" | ${CC} -g -xc -
  
 diff --git a/tests/run-strip-nothing.sh b/tests/run-strip-nothing.sh
-index 914fdfb..d03f734 100755
+index 710c200..3a81d8e 100755
 --- a/tests/run-strip-nothing.sh
 +++ b/tests/run-strip-nothing.sh
 @@ -22,6 +22,8 @@
@@ -66,8 +67,5 @@ index 914fdfb..d03f734 100755
 +# skip the case if no gcc deployed
 +which gcc || exit 77
  # Create no-debug a.out.
- echo "int main() { return 1; }" | gcc -s -xc -
+ echo "int main() { return 1; }" | ${CC} -s -xc -
  
--- 
-2.7.4
-

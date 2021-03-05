@@ -8,9 +8,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
 		    file://COPYING.LIB;md5=e3eda01d9815f8d24aae2dbd89b68b06"
 
 SRC_URI = "https://people.redhat.com/sgrubb/libcap-ng/libcap-ng-${PV}.tar.gz \
-           file://python.patch \
+           file://determinism.patch \
 "
 
 SRC_URI[sha256sum] = "52c083b77c2b0d8449dee141f9c3eba76e6d4c5ad44ef05df25891126cb85ae9"
+
+EXTRA_OECONF_append_class-target = " --with-capability_header=${STAGING_INCDIR}/linux/capability.h"
+EXTRA_OECONF_append_class-nativesdk = " --with-capability_header=${STAGING_INCDIR}/linux/capability.h"
 
 BBCLASSEXTEND = "native nativesdk"

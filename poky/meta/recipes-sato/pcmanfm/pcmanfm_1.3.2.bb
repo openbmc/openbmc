@@ -1,4 +1,5 @@
 SUMMARY = "Fast lightweight tabbed filemanager"
+DESCRIPTION = "A free file manager application and the standard file manager of LXDE."
 HOMEPAGE = "http://pcmanfm.sourceforge.net/"
 
 LICENSE = "GPLv2 & GPLv2+ & LGPLv2.1+"

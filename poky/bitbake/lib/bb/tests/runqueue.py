@@ -216,66 +216,66 @@ class RunQueueTests(unittest.TestCase):
     def test_multiconfig_setscene_optimise(self):
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             extraenv = {
-                "BBMULTICONFIG" : "mc1 mc2",
+                "BBMULTICONFIG" : "mc-1 mc_2",
                 "BB_SIGNATURE_HANDLER" : "basic"
             }
-            cmd = ["bitbake", "b1", "mc:mc1:b1", "mc:mc2:b1"]
+            cmd = ["bitbake", "b1", "mc:mc-1:b1", "mc:mc_2:b1"]
             setscenetasks = ['package_write_ipk_setscene', 'package_write_rpm_setscene', 'packagedata_setscene',
                              'populate_sysroot_setscene', 'package_qa_setscene']
             sstatevalid = ""
             tasks = self.run_bitbakecmd(cmd, tempdir, sstatevalid, extraenv=extraenv)
             expected = ['a1:' + x for x in self.alltasks] + ['b1:' + x for x in self.alltasks] + \
-                       ['mc1:b1:' + x for x in setscenetasks] + ['mc1:a1:' + x for x in setscenetasks] + \
-                       ['mc2:b1:' + x for x in setscenetasks] + ['mc2:a1:' + x for x in setscenetasks] + \
-                       ['mc1:b1:build', 'mc2:b1:build']
-            for x in ['mc1:a1:package_qa_setscene', 'mc2:a1:package_qa_setscene', 'a1:build', 'a1:package_qa']:
+                       ['mc-1:b1:' + x for x in setscenetasks] + ['mc-1:a1:' + x for x in setscenetasks] + \
+                       ['mc_2:b1:' + x for x in setscenetasks] + ['mc_2:a1:' + x for x in setscenetasks] + \
+                       ['mc-1:b1:build', 'mc_2:b1:build']
+            for x in ['mc-1:a1:package_qa_setscene', 'mc_2:a1:package_qa_setscene', 'a1:build', 'a1:package_qa']:
                 expected.remove(x)
             self.assertEqual(set(tasks), set(expected))
 
     def test_multiconfig_bbmask(self):
         # This test validates that multiconfigs can independently mask off
         # recipes they do not want with BBMASK. It works by having recipes
-        # that will fail to parse for mc1 and mc2, then making each multiconfig
+        # that will fail to parse for mc-1 and mc_2, then making each multiconfig
         # build the one that does parse. This ensures that the recipes are in
         # each multiconfigs BBFILES, but each is masking only the one that
         # doesn't parse
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             extraenv = {
-                "BBMULTICONFIG" : "mc1 mc2",
+                "BBMULTICONFIG" : "mc-1 mc_2",
                 "BB_SIGNATURE_HANDLER" : "basic",
                 "EXTRA_BBFILES": "${COREBASE}/recipes/fails-mc/*.bb",
             }
-            cmd = ["bitbake", "mc:mc1:fails-mc2", "mc:mc2:fails-mc1"]
+            cmd = ["bitbake", "mc:mc-1:fails-mc2", "mc:mc_2:fails-mc1"]
             self.run_bitbakecmd(cmd, tempdir, "", extraenv=extraenv)
 
     def test_multiconfig_mcdepends(self):
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             extraenv = {
-                "BBMULTICONFIG" : "mc1 mc2",
+                "BBMULTICONFIG" : "mc-1 mc_2",
                 "BB_SIGNATURE_HANDLER" : "TestMulticonfigDepends",
                 "EXTRA_BBFILES": "${COREBASE}/recipes/fails-mc/*.bb",
             }
-            tasks = self.run_bitbakecmd(["bitbake", "mc:mc1:f1"], tempdir, "", extraenv=extraenv, cleanup=True)
-            expected = ["mc1:f1:%s" % t for t in self.alltasks] + \
-                       ["mc2:a1:%s" % t for t in self.alltasks]
+            tasks = self.run_bitbakecmd(["bitbake", "mc:mc-1:f1"], tempdir, "", extraenv=extraenv, cleanup=True)
+            expected = ["mc-1:f1:%s" % t for t in self.alltasks] + \
+                       ["mc_2:a1:%s" % t for t in self.alltasks]
             self.assertEqual(set(tasks), set(expected))
 
             # A rebuild does nothing
-            tasks = self.run_bitbakecmd(["bitbake", "mc:mc1:f1"], tempdir, "", extraenv=extraenv, cleanup=True)
+            tasks = self.run_bitbakecmd(["bitbake", "mc:mc-1:f1"], tempdir, "", extraenv=extraenv, cleanup=True)
             self.assertEqual(set(tasks), set())
 
             # Test that a signature change in the dependent task causes
             # mcdepends to rebuild
-            tasks = self.run_bitbakecmd(["bitbake", "mc:mc2:a1", "-c", "compile", "-f"], tempdir, "", extraenv=extraenv, cleanup=True)
-            expected = ["mc2:a1:compile"]
+            tasks = self.run_bitbakecmd(["bitbake", "mc:mc_2:a1", "-c", "compile", "-f"], tempdir, "", extraenv=extraenv, cleanup=True)
+            expected = ["mc_2:a1:compile"]
             self.assertEqual(set(tasks), set(expected))
 
             rerun_tasks = self.alltasks[:]
             for x in ("fetch", "unpack", "patch", "prepare_recipe_sysroot", "configure", "compile"):
                 rerun_tasks.remove(x)
-            tasks = self.run_bitbakecmd(["bitbake", "mc:mc1:f1"], tempdir, "", extraenv=extraenv, cleanup=True)
-            expected = ["mc1:f1:%s" % t for t in rerun_tasks] + \
-                       ["mc2:a1:%s" % t for t in rerun_tasks]
+            tasks = self.run_bitbakecmd(["bitbake", "mc:mc-1:f1"], tempdir, "", extraenv=extraenv, cleanup=True)
+            expected = ["mc-1:f1:%s" % t for t in rerun_tasks] + \
+                       ["mc_2:a1:%s" % t for t in rerun_tasks]
             self.assertEqual(set(tasks), set(expected))
 
     @unittest.skipIf(sys.version_info < (3, 5, 0), 'Python 3.5 or later required')

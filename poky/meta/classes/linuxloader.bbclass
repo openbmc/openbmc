@@ -9,8 +9,8 @@ def get_musl_loader_arch(d):
         ldso_arch = "mips${ABIEXTENSION}${MIPSPKGSFX_BYTE}${MIPSPKGSFX_R6}${MIPSPKGSFX_ENDIAN}${@['', '-sf'][d.getVar('TARGET_FPU') == 'soft']}"
     elif targetarch == "powerpc":
         ldso_arch = "powerpc${@['', '-sf'][d.getVar('TARGET_FPU') == 'soft']}"
-    elif targetarch == "powerpc64":
-        ldso_arch = "powerpc64"
+    elif targetarch.startswith("powerpc64"):
+        ldso_arch = "powerpc64${@bb.utils.contains('TUNE_FEATURES', 'bigendian', '', 'le', d)}"
     elif targetarch == "x86_64":
         ldso_arch = "x86_64"
     elif re.search("i.86", targetarch):

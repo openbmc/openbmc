@@ -1,4 +1,4 @@
-From f4ca9db9d38f865505322595a8a1e8f69d5bb87c Mon Sep 17 00:00:00 2001
+From 18c527991deee93170a887b6da622560d5606913 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:18:47 +0800
 Subject: [PATCH] musl-libs
@@ -19,10 +19,9 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  lib/error.h                    | 27 +++++++++++++++++++++++++++
  lib/fixedsizehash.h            |  1 -
  lib/libeu.h                    |  1 +
- libdwfl/dwfl_error.c           |  9 +++++++++
  libdwfl/linux-kernel-modules.c |  1 +
  libelf/elf.h                   |  7 +++++++
- 6 files changed, 45 insertions(+), 1 deletion(-)
+ 5 files changed, 36 insertions(+), 1 deletion(-)
  create mode 100644 lib/error.h
 
 diff --git a/lib/error.h b/lib/error.h
@@ -82,27 +81,6 @@ index ecb4d01..edc85e3 100644
  #include <stddef.h>
  #include <stdint.h>
  
-diff --git a/libdwfl/dwfl_error.c b/libdwfl/dwfl_error.c
-index 7bcf61c..11dcc8b 100644
---- a/libdwfl/dwfl_error.c
-+++ b/libdwfl/dwfl_error.c
-@@ -154,7 +154,16 @@ dwfl_errmsg (int error)
-   switch (error &~ 0xffff)
-     {
-     case OTHER_ERROR (ERRNO):
-+#if defined(__GLIBC__)
-       return strerror_r (error & 0xffff, "bad", 0);
-+#else
-+      {
-+        static __thread char buf[128] = "";
-+        if (strerror_r (error & 0xffff, buf, sizeof(buf)) == 0)
-+          return buf;
-+      }
-+      return "strerror_r() failed";
-+#endif
-     case OTHER_ERROR (LIBELF):
-       return elf_errmsg (error & 0xffff);
-     case OTHER_ERROR (LIBDW):
 diff --git a/libdwfl/linux-kernel-modules.c b/libdwfl/linux-kernel-modules.c
 index 6edb27f..f331e3c 100644
 --- a/libdwfl/linux-kernel-modules.c
@@ -116,7 +94,7 @@ index 6edb27f..f331e3c 100644
  /* If fts.h is included before config.h, its indirect inclusions may not
     give us the right LFS aliases of these functions, so map them manually.  */
 diff --git a/libelf/elf.h b/libelf/elf.h
-index 6439c1a..a87c589 100644
+index 8e3e618..1353890 100644
 --- a/libelf/elf.h
 +++ b/libelf/elf.h
 @@ -19,6 +19,10 @@
@@ -130,7 +108,7 @@ index 6439c1a..a87c589 100644
  /* Standard ELF types.  */
  
  #include <stdint.h>
-@@ -4101,4 +4105,7 @@ enum
+@@ -4102,4 +4106,7 @@ enum
  #define R_ARC_TLS_LE_S9		0x4a
  #define R_ARC_TLS_LE_32		0x4b
  

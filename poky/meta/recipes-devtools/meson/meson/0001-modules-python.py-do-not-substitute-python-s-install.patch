@@ -1,4 +1,4 @@
-From 214e559d394491b1376e4cc370f75151117a3f83 Mon Sep 17 00:00:00 2001
+From f8f67c8d5c3f374b1e30e2d40cb56a79f0544471 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 18 Apr 2019 17:36:11 +0200
 Subject: [PATCH] modules/python.py: do not substitute python's install prefix
@@ -12,11 +12,11 @@ Upstream-Status: Pending
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
- mesonbuild/modules/python.py | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ mesonbuild/modules/python.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/mesonbuild/modules/python.py b/mesonbuild/modules/python.py
-index 2f0c644..d2aa565 100644
+index eda70ce..18edd15 100644
 --- a/mesonbuild/modules/python.py
 +++ b/mesonbuild/modules/python.py
 @@ -251,7 +251,7 @@ INTROSPECT_COMMAND = '''import sysconfig
@@ -28,11 +28,7 @@ index 2f0c644..d2aa565 100644
  
  def links_against_libpython():
      from distutils.core import Distribution, Extension
-@@ -276,12 +276,11 @@ class PythonInstallation(ExternalProgramHolder):
-         ExternalProgramHolder.__init__(self, python, interpreter.subproject)
-         self.interpreter = interpreter
-         self.subproject = self.interpreter.subproject
--        prefix = self.interpreter.environment.coredata.get_builtin_option('prefix')
+@@ -280,8 +280,8 @@ class PythonInstallation(ExternalProgramHolder):
          self.variables = info['variables']
          self.paths = info['paths']
          install_paths = info['install_paths']

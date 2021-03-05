@@ -1,4 +1,4 @@
-From e7e5333ed2e19f25ecbd7121f424eec99d61265a Mon Sep 17 00:00:00 2001
+From 2dab1a02a3cfd80629f3e0f380805a5e58dd0ac3 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:19:48 +0800
 Subject: [PATCH] musl-utils
@@ -15,12 +15,11 @@ Rebase to 0.177
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 ---
- src/arlib.h       |  6 ++++++
- src/elfcompress.c |  7 +++++++
- src/readelf.c     | 20 ++++++++++++--------
- src/strip.c       |  7 +++++++
- src/unstrip.c     |  9 +++++++++
- 5 files changed, 41 insertions(+), 8 deletions(-)
+ src/arlib.h       | 6 ++++++
+ src/elfcompress.c | 7 +++++++
+ src/strip.c       | 7 +++++++
+ src/unstrip.c     | 9 +++++++++
+ 4 files changed, 29 insertions(+)
 
 diff --git a/src/arlib.h b/src/arlib.h
 index e117166..8326f6c 100644
@@ -40,7 +39,7 @@ index e117166..8326f6c 100644
  /* State of -D/-U flags.  */
  extern bool arlib_deterministic_output;
 diff --git a/src/elfcompress.c b/src/elfcompress.c
-index 6ba6af4..0c7674b 100644
+index 1b5b1e3..21c9024 100644
 --- a/src/elfcompress.c
 +++ b/src/elfcompress.c
 @@ -37,6 +37,13 @@
@@ -57,74 +56,8 @@ index 6ba6af4..0c7674b 100644
  /* Name and version of program.  */
  ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
  
-diff --git a/src/readelf.c b/src/readelf.c
-index 64067a5..630739c 100644
---- a/src/readelf.c
-+++ b/src/readelf.c
-@@ -4829,10 +4829,11 @@ listptr_base (struct listptr *p)
-   return cudie_base (&cu);
- }
- 
-+static const char *listptr_name;
-+
- static int
--compare_listptr (const void *a, const void *b, void *arg)
-+compare_listptr (const void *a, const void *b)
- {
--  const char *name = arg;
-   struct listptr *p1 = (void *) a;
-   struct listptr *p2 = (void *) b;
- 
-@@ -4848,21 +4849,21 @@ compare_listptr (const void *a, const void *b, void *arg)
- 	  p1->warned = p2->warned = true;
- 	  error (0, 0,
- 		 gettext ("%s %#" PRIx64 " used with different address sizes"),
--		 name, (uint64_t) p1->offset);
-+		 listptr_name, (uint64_t) p1->offset);
- 	}
-       if (p1->dwarf64 != p2->dwarf64)
- 	{
- 	  p1->warned = p2->warned = true;
- 	  error (0, 0,
- 		 gettext ("%s %#" PRIx64 " used with different offset sizes"),
--		 name, (uint64_t) p1->offset);
-+		 listptr_name, (uint64_t) p1->offset);
- 	}
-       if (listptr_base (p1) != listptr_base (p2))
- 	{
- 	  p1->warned = p2->warned = true;
- 	  error (0, 0,
- 		 gettext ("%s %#" PRIx64 " used with different base addresses"),
--		 name, (uint64_t) p1->offset);
-+		 listptr_name, (uint64_t) p1->offset);
- 	}
-       if (p1->attr != p2 ->attr)
- 	{
-@@ -4870,7 +4871,7 @@ compare_listptr (const void *a, const void *b, void *arg)
- 	  error (0, 0,
- 		 gettext ("%s %#" PRIx64
- 			  " used with different attribute %s and %s"),
--		 name, (uint64_t) p1->offset, dwarf_attr_name (p2->attr),
-+		 listptr_name, (uint64_t) p1->offset, dwarf_attr_name (p2->attr),
- 		 dwarf_attr_name (p2->attr));
- 	}
-     }
-@@ -4942,8 +4943,11 @@ static void
- sort_listptr (struct listptr_table *table, const char *name)
- {
-   if (table->n > 0)
--    qsort_r (table->table, table->n, sizeof table->table[0],
--	     &compare_listptr, (void *) name);
-+    {
-+      listptr_name = name;
-+      qsort (table->table, table->n, sizeof table->table[0],
-+	    &compare_listptr);
-+    }
- }
- 
- static bool
 diff --git a/src/strip.c b/src/strip.c
-index 48792a7..198a2e4 100644
+index 7a5d4e4..81a0d57 100644
 --- a/src/strip.c
 +++ b/src/strip.c
 @@ -46,6 +46,13 @@
@@ -142,12 +75,12 @@ index 48792a7..198a2e4 100644
  
  /* Name and version of program.  */
 diff --git a/src/unstrip.c b/src/unstrip.c
-index a855038..df6fc1c 100644
+index 8580329..d547487 100644
 --- a/src/unstrip.c
 +++ b/src/unstrip.c
-@@ -56,6 +56,15 @@
- # define _(str) gettext (str)
- #endif
+@@ -52,6 +52,15 @@
+ #include "libeu.h"
+ #include "printversion.h"
  
 +#ifndef strndupa
 +#define strndupa(s, n) \

@@ -46,26 +46,25 @@ class oeGoToolchainSelfTest(OESelftestTestCase):
         shutil.rmtree(cls.tmpdir_SDKQA, ignore_errors=True)
         super(oeGoToolchainSelfTest, cls).tearDownClass()
 
-    def run_sdk_go_command(self, gocmd):
-        cmd = "cd %s; " % self.tmpdir_SDKQA
+    def run_sdk_go_command(self, gocmd, proj, name):
+        cmd = "cd %s/src/%s/%s; " % (self.go_path, proj, name)
         cmd = cmd + ". %s; " % self.env_SDK
         cmd = cmd + "export GOPATH=%s; " % self.go_path
         cmd = cmd + "${CROSS_COMPILE}go %s" % gocmd
         return runCmd(cmd).status
 
     def test_go_dep_build(self):
-        proj = "github.com/golang"
-        name = "dep"
-        ver = "v0.3.1"
+        proj = "github.com/direnv"
+        name = "direnv"
+        ver = "v2.27.0"
         archive = ".tar.gz"
         url = "https://%s/%s/archive/%s%s" % (proj, name, ver, archive)
 
         runCmd("cd %s; wget %s" % (self.tmpdir_SDKQA, url))
         runCmd("cd %s; tar -xf %s" % (self.tmpdir_SDKQA, ver+archive))
         runCmd("mkdir -p %s/src/%s" % (self.go_path, proj))
-        runCmd("mv %s/dep-0.3.1 %s/src/%s/%s"
+        runCmd("mv %s/direnv-2.27.0 %s/src/%s/%s"
                % (self.tmpdir_SDKQA, self.go_path, proj, name))
-        retv = self.run_sdk_go_command('build  %s/%s/cmd/dep'
-                                       % (proj, name))
+        retv = self.run_sdk_go_command('build', proj, name)
         self.assertEqual(retv, 0,
                          msg="Running go build failed for %s" % name)

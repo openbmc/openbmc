@@ -7,7 +7,7 @@ Otherwise, there are instances which are identical in
 every other field and therefore sort non-reproducibly
 (which breaks binary and source reproducibiliy).
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://reviews.llvm.org/D97477]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  llvm/utils/TableGen/AsmMatcherEmitter.cpp | 5 ++++-

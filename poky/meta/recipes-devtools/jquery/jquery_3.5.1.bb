@@ -1,5 +1,6 @@
 SUMMARY = "jQuery is a fast, small, and feature-rich JavaScript library"
 HOMEPAGE = "https://jquery.com/"
+DESCRIPTION = "${SUMMARY}"
 LICENSE = "MIT"
 SECTION = "devel"
 LIC_FILES_CHKSUM = "file://${S}/${BP}.js;beginline=8;endline=10;md5=ebd7bc5d23ab165188e526a0c65d24bb"

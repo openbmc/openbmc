@@ -8,7 +8,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=4e5d1baf6f20559e3bec172226a47e4e \
                     file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263 "
 
-SRC_URI = "git://github.com/asciidoc/asciidoc-py3;protocol=https \
+SRC_URI = "git://github.com/asciidoc/asciidoc-py3;protocol=https;branch=main \
            file://auto-catalogs.patch"
 SRCREV = "8de61a75572b5b8f90c1f87634aa3767472be7a7"
 

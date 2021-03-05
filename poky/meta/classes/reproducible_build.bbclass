@@ -37,9 +37,12 @@
 BUILD_REPRODUCIBLE_BINARIES ??= '1'
 inherit ${@oe.utils.ifelse(d.getVar('BUILD_REPRODUCIBLE_BINARIES') == '1', 'reproducible_build_simple', '')}
 
-SDE_DIR ="${WORKDIR}/source-date-epoch"
+SDE_DIR = "${WORKDIR}/source-date-epoch"
 SDE_FILE = "${SDE_DIR}/__source_date_epoch.txt"
 SDE_DEPLOYDIR = "${WORKDIR}/deploy-source-date-epoch"
+
+# A SOURCE_DATE_EPOCH of '0' might be misinterpreted as no SDE
+export SOURCE_DATE_EPOCH_FALLBACK ??= "1302044400"
 
 SSTATETASKS += "do_deploy_source_date_epoch"
 
@@ -93,15 +96,19 @@ def get_source_date_epoch_value(d):
         return cached
 
     epochfile = d.getVar('SDE_FILE')
-    source_date_epoch = 0
+    source_date_epoch = int(d.getVar('SOURCE_DATE_EPOCH_FALLBACK'))
     if os.path.isfile(epochfile):
         with open(epochfile, 'r') as f:
             s = f.read()
             try:
                 source_date_epoch = int(s)
+                # workaround for old sstate with SDE_FILE content being 0 - use SOURCE_DATE_EPOCH_FALLBACK
+                if source_date_epoch == 0 :
+                    source_date_epoch = int(d.getVar('SOURCE_DATE_EPOCH_FALLBACK'))
+                    bb.warn("SOURCE_DATE_EPOCH value from sstate '%s' is deprecated/invalid. Reverting to SOURCE_DATE_EPOCH_FALLBACK '%s'" % (s, source_date_epoch))
             except ValueError:
-                bb.warn("SOURCE_DATE_EPOCH value '%s' is invalid. Reverting to 0" % s)
-                source_date_epoch = 0
+                bb.warn("SOURCE_DATE_EPOCH value '%s' is invalid. Reverting to SOURCE_DATE_EPOCH_FALLBACK" % s)
+                source_date_epoch = int(d.getVar('SOURCE_DATE_EPOCH_FALLBACK'))
         bb.debug(1, "SOURCE_DATE_EPOCH: %d" % source_date_epoch)
     else:
         bb.debug(1, "Cannot find %s. SOURCE_DATE_EPOCH will default to %d" % (epochfile, source_date_epoch))

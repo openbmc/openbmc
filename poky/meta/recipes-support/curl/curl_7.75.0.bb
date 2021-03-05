@@ -1,4 +1,8 @@
 SUMMARY = "Command line tool and library for client-side URL transfers"
+DESCRIPTION = "It uses URL syntax to transfer data to and from servers. \
+curl is a widely used because of its ability to be flexible and complete \
+complex tasks. For example, you can use curl for things like user authentication, \
+HTTP post, SSL connections, proxy support, FTP uploads, and more!"
 HOMEPAGE = "http://curl.haxx.se/"
 BUGTRACKER = "http://curl.haxx.se/mail/list.cgi?list=curl-tracker"
 SECTION = "console/network"

@@ -1,4 +1,6 @@
 SUMMARY = "Utility scripts for internationalizing XML"
+HOMEPAGE = "https://launchpad.net/intltool"
+DESCRIPTION = "Utility scripts for internationalizing XML. This tool automatically extracts translatable strings from oaf, glade, bonobo ui, nautilus theme and other XML files into the po files."
 SECTION = "devel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"

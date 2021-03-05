@@ -1,5 +1,6 @@
 SUMMARY = "Tools for managing memory technology devices"
 HOMEPAGE = "http://www.linux-mtd.infradead.org/"
+DESCRIPTION = "mtd-utils tool is a generic Linux subsystem for memory devices, especially Flash devices."
 SECTION = "base"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \

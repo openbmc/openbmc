@@ -1,5 +1,9 @@
 SUMMARY = "Vi IMproved - enhanced vi editor"
+DESCRIPTION = "Vim is a greatly improved version of the good old UNIX editor Vi. Many new features have been added: multi-level undo, syntax highlighting, command line history, on-line help, spell checking, filename completion, block operations, script language, etc. There is also a Graphical User Interface (GUI) available."
 SECTION = "console/utils"
+
+HOMEPAGE = "https://www.vim.org/"
+BUGTRACKER = "https://github.com/vim/vim/issues"
 
 DEPENDS = "ncurses gettext-native"
 # vimdiff doesn't like busybox diff

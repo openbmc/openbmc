@@ -1,4 +1,4 @@
-From fa265ff686cb60e19aa607bda3752b6b2ee87a14 Mon Sep 17 00:00:00 2001
+From 22e0e1c01ec680a2970f4d5ca9e47f90259cbdcf Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 23 Jun 2020 07:49:35 +0000
 Subject: [PATCH] tests/Makefile.am: compile test_nlist with standard CFLAGS
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index 05fc9b4..11de0fc 100644
+index a2dfd43..40a0228 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -92,7 +92,7 @@ endif
+@@ -90,7 +90,7 @@ endif
  test-nlist$(EXEEXT): test-nlist.c
  	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
  	  $(AM_CPPFLAGS) $(CPPFLAGS) \

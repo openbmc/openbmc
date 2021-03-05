@@ -65,6 +65,7 @@ of the following environment variables (in any order):
   MACHINE - the machine name (optional, autodetected from KERNEL filename if unspecified)
   Simplified QEMU command-line options can be passed with:
     nographic - disable video console
+    novga - Disable VGA emulation completely
     sdl - choose the SDL UI frontend
     gtk - choose the Gtk UI frontend
     gl - enable virgl-based GL acceleration (also needs gtk or sdl options)
@@ -489,6 +490,8 @@ class BaseConfig(object):
             elif arg == 'egl-headless':
                 self.set_dri_path()
                 self.qemu_opt_script += ' -vga virtio -display egl-headless,show-cursor=on'
+            elif arg == 'novga':
+                self.qemu_opt_script += ' -vga none'
             elif arg == 'serial':
                 self.kernel_cmdline_script += ' console=ttyS0'
                 self.serialconsole = True

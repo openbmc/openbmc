@@ -1,4 +1,6 @@
 SUMMARY = "Framework for defining and tracking users, login sessions, and seats"
+DESCRIPTION = "It provides a mechanism for software to react to changes \
+of any of these items or of any of the metadata associated with them."
 HOMEPAGE = "http://www.freedesktop.org/wiki/Software/ConsoleKit"
 BUGTRACKER = "https://bugs.freedesktop.org/buglist.cgi?query_format=specific&product=ConsoleKit"
 

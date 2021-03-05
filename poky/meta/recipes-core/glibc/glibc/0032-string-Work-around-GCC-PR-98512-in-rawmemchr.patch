@@ -1,0 +1,58 @@
+From 044e603b698093cf48f6e6229e0b66acf05227e4 Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer@redhat.com>
+Date: Fri, 19 Feb 2021 13:29:00 +0100
+Subject: [PATCH] string: Work around GCC PR 98512 in rawmemchr
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=glibc.git;a=commit;h=044e603b698093cf48f6e6229e0b66acf05227e4]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ string/rawmemchr.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/string/rawmemchr.c b/string/rawmemchr.c
+index 59bbeeaa42..b8523118e5 100644
+--- a/string/rawmemchr.c
++++ b/string/rawmemchr.c
+@@ -22,24 +22,28 @@
+ # define RAWMEMCHR __rawmemchr
+ #endif
+ 
+-/* Find the first occurrence of C in S.  */
+-void *
+-RAWMEMCHR (const void *s, int c)
+-{
+-  DIAG_PUSH_NEEDS_COMMENT;
++/* The pragmata should be nested inside RAWMEMCHR below, but that
++   triggers GCC PR 98512.  */
++DIAG_PUSH_NEEDS_COMMENT;
+ #if __GNUC_PREREQ (7, 0)
+-  /* GCC 8 warns about the size passed to memchr being larger than
+-     PTRDIFF_MAX; the use of SIZE_MAX is deliberate here.  */
+-  DIAG_IGNORE_NEEDS_COMMENT (8, "-Wstringop-overflow=");
++/* GCC 8 warns about the size passed to memchr being larger than
++   PTRDIFF_MAX; the use of SIZE_MAX is deliberate here.  */
++DIAG_IGNORE_NEEDS_COMMENT (8, "-Wstringop-overflow=");
+ #endif
+ #if __GNUC_PREREQ (11, 0)
+-  /* Likewise GCC 11, with a different warning option.  */
+-  DIAG_IGNORE_NEEDS_COMMENT (11, "-Wstringop-overread");
++/* Likewise GCC 11, with a different warning option.  */
++DIAG_IGNORE_NEEDS_COMMENT (11, "-Wstringop-overread");
+ #endif
++
++/* Find the first occurrence of C in S.  */
++void *
++RAWMEMCHR (const void *s, int c)
++{
+   if (c != '\0')
+     return memchr (s, c, (size_t)-1);
+-  DIAG_POP_NEEDS_COMMENT;
+   return (char *)s + strlen (s);
+ }
+ libc_hidden_def (__rawmemchr)
+ weak_alias (__rawmemchr, rawmemchr)
++
++DIAG_POP_NEEDS_COMMENT;
+-- 
+2.30.1
+

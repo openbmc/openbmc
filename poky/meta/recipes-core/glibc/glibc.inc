@@ -20,6 +20,7 @@ CACHED_CONFIGUREVARS += " \
   libc_cv_ssp_strong=no \
   libc_cv_ssp_all=no \
   libc_cv_ssp=no \
+  libc_cv_include_x86_isa_level=no \
 "
 
 # ifunc doesn't appear to work on mips, casuses libbfd assertion failures

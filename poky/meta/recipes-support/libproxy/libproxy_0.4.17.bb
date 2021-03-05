@@ -1,4 +1,8 @@
 SUMMARY = "Library providing automatic proxy configuration management"
+DESCRIPTION = "libproxy  provides  interfaces  to  get  the proxy that will be \
+used to access network resources. It uses various plugins to get proxy \
+configuration  via different mechanisms (e.g. environment variables or \
+desktop settings)."
 HOMEPAGE = "https://github.com/libproxy/libproxy"
 BUGTRACKER = "https://github.com/libproxy/libproxy/issues"
 SECTION = "libs"
@@ -8,7 +12,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 
 DEPENDS = "glib-2.0"
 
-SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/${PV}/${BP}.tar.xz"
+SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/${PV}/${BP}.tar.xz \
+           file://determinism.patch"
 SRC_URI[sha256sum] = "bc89f842f654ee1985a31c0ba56dc7e2ce8044a0264ddca84e650f46cd7f8b05"
 
 UPSTREAM_CHECK_URI = "https://github.com/libproxy/libproxy/releases"
@@ -28,6 +33,7 @@ EXTRA_OECMAKE += " \
     -DWITH_PYTHON2=no \
     -DWITH_PYTHON3=no \
     -DWITH_WEBKIT=no \
+    -DWITH_SYSCONFIG=no \
     -DLIB_INSTALL_DIR=${libdir} \
     -DLIBEXEC_INSTALL_DIR=${libexecdir} \
 "

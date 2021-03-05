@@ -1,5 +1,6 @@
 SUMMARY = "User support binary for the uvesafb kernel module"
 HOMEPAGE = "https://tracker.debian.org/pkg/v86d"
+DESCRIPTION = "v86d provides a backend for kernel drivers that need to execute x86 BIOS code. The code is executed in a controlled environment and the results are passed back to the kernel via the netlink interface."
 
 # the copyright info is at the bottom of README, expect break
 LICENSE = "GPLv2"

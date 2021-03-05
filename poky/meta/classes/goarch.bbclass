@@ -47,7 +47,6 @@ COMPATIBLE_HOST_linux-gnux32 = "null"
 COMPATIBLE_HOST_linux-muslx32 = "null"
 COMPATIBLE_HOST_powerpc = "null"
 COMPATIBLE_HOST_powerpc64 = "null"
-COMPATIBLE_HOST_powerpc64le = "null"
 COMPATIBLE_HOST_mipsarchn32 = "null"
 
 ARM_INSTRUCTION_SET_armv4 = "arm"
@@ -79,10 +78,10 @@ def go_map_arch(a, d):
         return 'mips'
     elif a == 'mipsel':
         return 'mipsle'
+    elif re.match('p(pc|owerpc)(64le)', a):
+        return 'ppc64le'
     elif re.match('p(pc|owerpc)(64)', a):
         return 'ppc64'
-    elif re.match('p(pc|owerpc)(64el)', a):
-        return 'ppc64le'
     elif a == 'riscv64':
         return 'riscv64'
     else:
@@ -99,7 +98,7 @@ def go_map_386(a, f, d):
         if ('core2' in f) or ('corei7' in f):
             return 'sse2'
         else:
-            return '387'
+            return 'softfloat'
     return ''
 
 def go_map_mips(a, f, d):
@@ -115,5 +114,3 @@ def go_map_os(o, d):
     if o.startswith('linux'):
         return 'linux'
     return o
-
-

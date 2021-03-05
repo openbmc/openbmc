@@ -1,5 +1,7 @@
 SUMMARY = "GNU Transport Layer Security Library"
-HOMEPAGE = "http://www.gnu.org/software/gnutls/"
+DESCRIPTION = "a secure communications library implementing the SSL, \
+TLS and DTLS protocols and technologies around them."
+HOMEPAGE = "https://gnutls.org/"
 BUGTRACKER = "https://savannah.gnu.org/support/?group=gnutls"
 
 LICENSE = "GPLv3+ & LGPLv2.1+"

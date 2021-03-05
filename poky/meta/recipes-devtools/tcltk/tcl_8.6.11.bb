@@ -1,5 +1,6 @@
 SUMMARY = "Tool Command Language"
 HOMEPAGE = "http://tcl.sourceforge.net"
+DESCRIPTION = "Tool Command Language, is an open-source multi-purpose C library which includes a powerful dynamic scripting language. Together they provide ideal cross-platform development environment for any programming project."
 SECTION = "devel/tcltk"
 
 # http://www.tcl.tk/software/tcltk/license.html

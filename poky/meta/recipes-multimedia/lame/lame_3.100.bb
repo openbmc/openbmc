@@ -1,5 +1,6 @@
 SUMMARY = "High quality MP3 audio encoder"
-HOMEPAGE = "http://lame.sourceforge.net/"
+DESCRIPTION = "LAME is an educational tool to be used for learning about MP3 encoding."
+HOMEPAGE = "https://lame.sourceforge.io/"
 BUGTRACKER = "http://sourceforge.net/tracker/?group_id=290&atid=100290"
 SECTION = "console/utils"
 LICENSE = "LGPLv2+"

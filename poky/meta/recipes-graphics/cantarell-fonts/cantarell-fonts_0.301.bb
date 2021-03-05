@@ -13,6 +13,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fb1ef92b6909969a472a6ea3c4e99cb7"
 inherit gnomebase meson allarch fontcache pkgconfig
 SRC_URI[archive.sha256sum] = "3d35db0ac03f9e6b0d5a53577591b714238985f4cfc31a0aa17f26cd74675e83"
 
+# remove at next version upgrade or when output changes
+PR = "r1"
+HASHEQUIV_HASH_VERSION .= ".2"
+
 EXTRA_OEMESON += "-Duseprebuilt=true -Dbuildappstream=false"
 
 FILES_${PN} = "${datadir}/fonts ${datadir}/fontconfig"

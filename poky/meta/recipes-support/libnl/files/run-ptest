@@ -1,0 +1,16 @@
+#!/bin/sh
+
+num_fail=0
+
+for test in check*
+do
+    ./"$test" \
+         && echo "PASS: $test" \
+         || {
+            echo "FAIL: $test"
+            num_fail=$(( ${num_fail} + 1))
+         }
+
+done
+
+exit $num_fail

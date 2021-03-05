@@ -11,6 +11,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=55ca817ccb7d5b5b66355690e9abc605"
 DEPENDS = "gtk+3 p11-kit glib-2.0 libgcrypt gnupg-native \
            ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'libxslt-native', '', d)}"
 
+CACHED_CONFIGUREVARS += "ac_cv_path_GPG='gpg2'"
+
 GNOMEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk_doc"
 inherit gnomebase gtk-icon-cache gtk-doc features_check upstream-version-is-even vala gobject-introspection gettext mime mime-xdg
@@ -28,3 +30,11 @@ FILES_${PN} += " \
 ARM_INSTRUCTION_SET_armv4 = "arm"
 ARM_INSTRUCTION_SET_armv5 = "arm"
 ARM_INSTRUCTION_SET_armv6 = "arm"
+
+EXTRA_OEMESON += "--cross-file ${WORKDIR}/meson-${PN}.cross"
+do_write_config_append() {
+    cat >${WORKDIR}/meson-${PN}.cross <<EOF
+[binaries]
+gpg2 = '${bindir}/gpg2'
+EOF
+}

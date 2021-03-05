@@ -1,4 +1,8 @@
 SUMMARY = "Simple GTK+ Text Editor"
+DESCRIPTION = "L3afpad is a simple GTK+ text editor that emphasizes simplicity. As development \
+focuses on keeping weight down to a minimum, only the most essential features \
+are implemented in the editor. L3afpad is simple to use, is easily compiled, \
+requires few libraries, and starts up quickly."
 HOMEPAGE = "https://github.com/stevenhoneyman/l3afpad"
 
 # Note that COPYING seems to mistakenly contain LGPLv2.1.

@@ -248,9 +248,9 @@ def _filterProviders(providers, item, cfgData, dataCache):
         preferred_versions[pn] = findLatestProvider(pn, cfgData, dataCache, sortpkg_pn[pn][0])
         eligible.append(preferred_versions[pn][1])
 
-    if len(eligible) == 0:
+    if not eligible:
         logger.error("no eligible providers for %s", item)
-        return 0
+        return eligible
 
     # If pn == item, give it a slight default preference
     # This means PREFERRED_PROVIDER_foobar defaults to foobar if available

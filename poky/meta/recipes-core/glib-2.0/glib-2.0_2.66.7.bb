@@ -31,7 +31,7 @@ def find_meson_cross_files(d):
     if bb.data.inherits_class('native', d):
         return ""
 
-    corebase = d.getVar("COREBASE")
+    thisdir = d.getVar("THISDIR")
     import collections
     sitedata = siteinfo_data(d)
     # filename -> found
@@ -39,7 +39,11 @@ def find_meson_cross_files(d):
     for path in d.getVar("FILESPATH").split(":"):
         for element in sitedata:
             filename = os.path.normpath(os.path.join(path, "meson.cross.d", element))
-            files[filename.replace(corebase, "${COREBASE}")] = os.path.exists(filename)
+            sanitized_path = filename.replace(thisdir, "${THISDIR}")
+            if sanitized_path == filename:
+                bb.error("Cannot add '%s' to --cross-file, because it's not relative to THISDIR '%s' and sstate signature would contain this full path" % (filename, thisdir))
+                continue
+            files[filename.replace(thisdir, "${THISDIR}")] = os.path.exists(filename)
 
     items = ["--cross-file=" + k for k,v in files.items() if v]
     d.appendVar("EXTRA_OEMESON", " " + " ".join(items))

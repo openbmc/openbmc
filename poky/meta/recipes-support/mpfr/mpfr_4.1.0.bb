@@ -1,4 +1,5 @@
 SUMMARY = "C library for multiple-precision floating-point computations with exact rounding"
+DESCRIPTION = "The GNU Multiple Precision Floating-Point Reliable Library (GNU MPFR) is a GNU portable C library for arbitrary-precision binary floating-point computation with correct rounding, based on GNU Multi-Precision Library. MPFR's computation is both efficient and has a well-defined semantics: the functions are completely specified on all the possible operands and the results do not depend on the platform."
 HOMEPAGE = "https://www.mpfr.org/"
 LICENSE = "LGPLv3+"
 SECTION = "devel"

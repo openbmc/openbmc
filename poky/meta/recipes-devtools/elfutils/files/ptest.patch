@@ -1,4 +1,7 @@
-Changes to allow ptest to run standalone on target:
+From bfbf393e7d5b1b41df85ce1c37e887776c45d529 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Wed, 1 May 2019 16:37:48 +0100
+Subject: [PATCH] Changes to allow ptest to run standalone on target:
 
 a) Run the tests serially
 b) Use the standalone test mode which allows the tests to be run in their
@@ -12,11 +15,17 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 Upstream-Status: Inappropriate [oe specific]
 
-Index: elfutils-0.176/configure.ac
-===================================================================
---- elfutils-0.176.orig/configure.ac
-+++ elfutils-0.176/configure.ac
-@@ -45,7 +45,7 @@ AC_COPYRIGHT([Copyright (C) 1996-2018 Th
+---
+ configure.ac       | 2 +-
+ tests/Makefile.am  | 2 ++
+ tests/test-subr.sh | 6 ------
+ 3 files changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d345495..67933d1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -48,7 +48,7 @@ AC_COPYRIGHT([Copyright (C) 1996-2021 The elfutils developers.])
  AC_PREREQ(2.63)			dnl Minimum Autoconf version required.
  
  dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
@@ -25,42 +34,20 @@ Index: elfutils-0.176/configure.ac
  AM_MAINTAINER_MODE
  
  AM_SILENT_RULES([yes])
-Index: elfutils-0.176/tests/Makefile.am
-===================================================================
---- elfutils-0.176.orig/tests/Makefile.am
-+++ elfutils-0.176/tests/Makefile.am
-@@ -445,10 +445,10 @@ installed_TESTS_ENVIRONMENT = libdir=$(D
- installed_LOG_COMPILER = $(abs_srcdir)/test-wrapper.sh \
- 			 installed $(tests_rpath) \
- 			 '$(program_transform_name)'
--if STANDALONE
-+if !STANDALONE
- TESTS_ENVIRONMENT = $(installed_TESTS_ENVIRONMENT)
- LOG_COMPILER = $(installed_LOG_COMPILER)
--else !STANDALONE
-+else STANDALONE
- TESTS_ENVIRONMENT = LC_ALL=C; LANG=C; VALGRIND_CMD=$(valgrind_cmd); \
- 		    abs_srcdir=$(abs_srcdir);  abs_builddir=$(abs_builddir); \
- 		    abs_top_builddir=$(abs_top_builddir); \
-@@ -463,7 +463,7 @@ installcheck-local:
- 	$(MAKE) $(AM_MAKEFLAGS) \
- 		TESTS_ENVIRONMENT="$(installed_TESTS_ENVIRONMENT)" \
- 		LOG_COMPILER="$(installed_LOG_COMPILER)" check-TESTS
--endif !STANDALONE
-+endif STANDALONE
- 
- if STANDALONE
- libdw = -ldw
-@@ -612,3 +612,5 @@ check: check-am coverage
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 72afd0e..a2dfd43 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -698,3 +698,5 @@ check: check-am coverage
  coverage:
  	-$(srcdir)/coverage.sh
  endif
 +oecheck:
 +	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
-Index: elfutils-0.176/tests/test-subr.sh
-===================================================================
---- elfutils-0.176.orig/tests/test-subr.sh
-+++ elfutils-0.176/tests/test-subr.sh
+diff --git a/tests/test-subr.sh b/tests/test-subr.sh
+index 411e5f2..a638ff9 100644
+--- a/tests/test-subr.sh
++++ b/tests/test-subr.sh
 @@ -91,12 +91,6 @@ installed_testrun()
    program="$1"
    shift

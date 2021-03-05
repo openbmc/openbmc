@@ -1,4 +1,7 @@
 SUMMARY = "ALSA Use Case Manager configuration"
+DESCRIPTION = "This package contains ALSA Use Case Manager configuration \
+of audio input/output names and routing for specific audio hardware. \
+They can be used with the alsaucm tool. "
 HOMEPAGE = "https://alsa-project.org"
 BUGTRACKER = "https://alsa-project.org/wiki/Bug_Tracking"
 LICENSE = "BSD-3-Clause"

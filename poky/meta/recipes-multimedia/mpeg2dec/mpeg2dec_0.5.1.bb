@@ -1,5 +1,9 @@
 SUMMARY = "Library and test program for decoding MPEG-2 and MPEG-1 video streams"
-HOMEPAGE = "http://libmpeg2.sourceforge.net/"
+DESCRIPTION = "mpeg2dec is a test program for libmpeg2. It decodes \
+mpeg-1 and mpeg-2 video streams, and also includes a demultiplexer \
+for mpeg-1 and mpeg-2 program streams. The main purpose of mpeg2dec \
+is to have a simple test bed for libmpeg2."
+HOMEPAGE = "https://libmpeg2.sourceforge.io/"
 SECTION = "libs"
 LICENSE = "GPLv2+"
 LICENSE_FLAGS = "commercial"

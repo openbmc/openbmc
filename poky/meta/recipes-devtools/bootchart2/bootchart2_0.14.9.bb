@@ -139,6 +139,9 @@ do_install () {
 
    # Use python 3 instead of python 2
    sed -i -e '1s,#!.*python.*,#!${USRBINPATH}/env python3,' ${D}${bindir}/pybootchartgui
+
+    # The timestamps embedded in compressed man pages is not reproducible
+    gzip -d ${D}${mandir}/man1/*.gz
 }
 
 PACKAGES =+ "pybootchartgui"

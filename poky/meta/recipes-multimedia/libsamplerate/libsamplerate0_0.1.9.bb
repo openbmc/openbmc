@@ -1,4 +1,5 @@
 SUMMARY = "Audio Sample Rate Conversion library"
+DESCRIPTION = "Also known as Secret Rabbit Code - a library for performing sample rate conversion of audio data."
 HOMEPAGE = "http://www.mega-nerd.com/SRC/"
 SECTION = "libs"
 LICENSE = "BSD-2-Clause"

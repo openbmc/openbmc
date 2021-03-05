@@ -1,4 +1,7 @@
 SUMMARY = "WebKit based web browser for GNOME"
+DESCRIPTION = "Epiphany is an open source web browser for the Linux desktop environment. \
+It provides a simple and easy-to-use internet browsing experience."
+HOMEPAGE = "https://wiki.gnome.org/Apps/Web"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/epiphany"
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
@@ -13,6 +16,8 @@ REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
 SRC_URI = "${GNOME_MIRROR}/${GNOMEBN}/${@gnome_verdir("${PV}")}/${GNOMEBN}-${PV}.tar.${GNOME_COMPRESS_TYPE};name=archive \
            file://0002-help-meson.build-disable-the-use-of-yelp.patch \
+           file://migrator.patch \
+           file://distributor.patch \
            "
 SRC_URI[archive.sha256sum] = "8b05f2bcc1e80ecf4a10f6f01b3285087eb4cbdf5741dffb8c0355715ef5116d"
 

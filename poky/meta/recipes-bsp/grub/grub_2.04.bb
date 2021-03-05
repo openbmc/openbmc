@@ -16,12 +16,15 @@ FILES_${PN}-common = " \
     ${sbindir} \
     ${datadir}/grub \
 "
-
-FILES_${PN}-common_append_aarch64 = " \
-    ${libdir}/${BPN} \
-"
+ALLOW_EMPTY_${PN} = "1"
 
 do_install_append () {
+    # Avoid conflicts with the EFI package for systems such as arm64 where we
+    # need to build grub and grub-efi but only EFI is supported by removing EFI
+    # from this package.
+    rm -rf ${D}${libdir}/grub/*-efi/
+    rmdir --ignore-fail-on-non-empty ${D}${libdir}/grub ${D}${libdir}
+
     install -d ${D}${sysconfdir}/grub.d
     # Remove build host references...
     find "${D}" -name modinfo.sh -type f -exec \
