@@ -10,7 +10,7 @@ DEPENDS = "openscap-native python3 python3-pyyaml-native python3-jinja2-native l
 
 S = "${WORKDIR}/git"
 
-inherit cmake pkgconfig python3native
+inherit cmake pkgconfig python3native python3targetconfig
 
 STAGING_OSCAP_BUILDDIR = "${TMPDIR}/work-shared/openscap/oscap-build-artifacts"
 export OSCAP_CPE_PATH="${STAGING_OSCAP_BUILDDIR}${datadir_native}/openscap/cpe"

@@ -9,12 +9,11 @@ HOMEPAGE = "http://www.fail2ban.org"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ecabc31e90311da843753ba772885d9f"
 
-SRCREV ="3befbb177017957869425c81a560edb8e27db75a"
+SRCREV ="eea1881b734b73599a21df2bfbe58b11f78d0a46"
 SRC_URI = " git://github.com/fail2ban/fail2ban.git;branch=0.11 \
         file://initd \
         file://fail2ban_setup.py \
         file://run-ptest \
-        file://0001-python3-fail2ban-2-3-conversion.patch \
 "
 
 inherit update-rc.d ptest setuptools3
@@ -23,6 +22,8 @@ S = "${WORKDIR}/git"
 
 do_compile_prepend () {
     cp ${WORKDIR}/fail2ban_setup.py ${S}/setup.py
+    cd ${S}
+    ./fail2ban-2to3
 }
 
 do_install_append () {
@@ -35,7 +36,7 @@ do_install_append () {
 do_install_ptest_append () {
     install -d ${D}${PTEST_PATH}
     sed -i -e 's/##PYTHON##/${PYTHON_PN}/g' ${D}${PTEST_PATH}/run-ptest
-    install -D ${S}/bin/fail2ban-testcases ${D}${PTEST_PATH}
+    install -D ${S}/fail2ban-testcases-all-python3 ${D}${PTEST_PATH}
 }
 
 FILES_${PN} += "/run"

@@ -26,6 +26,7 @@ S = "${WORKDIR}/git"
 inherit pkgconfig autotools features_check
 
 REQUIRED_DISTRO_FEATURES = "ima"
+REQUIRED_DISTRO_FEATURES_class-native = ""
 
 EXTRA_OECONF_append_class-target = " --with-kernel-headers=${STAGING_KERNEL_BUILDDIR}"
 

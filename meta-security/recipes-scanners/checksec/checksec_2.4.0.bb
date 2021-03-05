@@ -4,9 +4,9 @@ SECTION = "security"
 LICENSE = "BSD"
 HOMEPAGE="https://github.com/slimm609/checksec.sh"
 
-LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=93fddcca19f6c897871f9b5f9a035f4a"
+LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=8d90285f711cf1f378e2c024457066d8"
 
-SRCREV = "04582bad41589ad479ca8b1f0170ed317475b5a5"
+SRCREV = "c3754e45e04f9104db93b2048afd094427102d48"
 SRC_URI = "git://github.com/slimm609/checksec.sh"
 
 S = "${WORKDIR}/git"

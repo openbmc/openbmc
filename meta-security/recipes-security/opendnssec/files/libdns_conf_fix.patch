@@ -4,14 +4,29 @@ Upstream-Status: OE specific
 
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
 
-Index: opendnssec-2.1.6/m4/acx_ldns.m4
+Index: opendnssec-2.1.8/configure.ac
 ===================================================================
---- opendnssec-2.1.6.orig/m4/acx_ldns.m4
-+++ opendnssec-2.1.6/m4/acx_ldns.m4
-@@ -1,128 +1,65 @@
+--- opendnssec-2.1.8.orig/configure.ac
++++ opendnssec-2.1.8/configure.ac
+@@ -133,9 +133,7 @@ AC_CHECK_MEMBER([struct sockaddr_un.sun_
+ 
+ # common dependencies
+ ACX_LIBXML2
+-ACX_LDNS(1,6,17)
+-ACX_LDNS_NOT(1,6,14, [binary incompatibility, see http://open.nlnetlabs.nl/pipermail/ldns-users/2012-October/000564.html])
+-ACX_LDNS_NOT(1,6,15, [fail to create NSEC3 bitmap for empty non-terminals, see http://www.nlnetlabs.nl/pipermail/ldns-users/2012-November/000565.html])
++ACX_LDNS(1.6.17)
+ ACX_PKCS11_MODULES
+ ACX_RT
+ ACX_LIBC
+Index: opendnssec-2.1.8/m4/acx_ldns.m4
+===================================================================
+--- opendnssec-2.1.8.orig/m4/acx_ldns.m4
++++ opendnssec-2.1.8/m4/acx_ldns.m4
+@@ -1,128 +1,63 @@
 -AC_DEFUN([ACX_LDNS],[
 -	AC_ARG_WITH(ldns, 
--		[AC_HELP_STRING([--with-ldns=PATH],[specify prefix of path of ldns library to use])],
+-		[AS_HELP_STRING([--with-ldns=PATH],[specify prefix of path of ldns library to use])],
 -        	[
 -			LDNS_PATH="$withval"
 -			AC_PATH_PROGS(LDNS_CONFIG, ldns-config, ldns-config, $LDNS_PATH/bin)
@@ -70,8 +85,7 @@ Index: opendnssec-2.1.6/m4/acx_ldns.m4
 -		AC_MSG_ERROR([ldns library too old ($1.$2.$3 or later required)])
 -	],[])
 -	AC_LANG_POP([C])
-+#serial 11
- 
+-
 -	CPPFLAGS=$tmp_CPPFLAGS
 -
 -	AC_SUBST(LDNS_INCLUDES)
@@ -81,7 +95,7 @@ Index: opendnssec-2.1.6/m4/acx_ldns.m4
 -
 -AC_DEFUN([ACX_LDNS_NOT],[
 -	AC_ARG_WITH(ldns, 
--		[AC_HELP_STRING([--with-ldns=PATH],[specify prefix of path of ldns library to use])],
+-		[AS_HELP_STRING([--with-ldns=PATH],[specify prefix of path of ldns library to use])],
 -        	[
 -			LDNS_PATH="$withval"
 -			AC_PATH_PROGS(LDNS_CONFIG, ldns-config, ldns-config, $LDNS_PATH/bin)
@@ -200,18 +214,3 @@ Index: opendnssec-2.1.6/m4/acx_ldns.m4
 +    AC_SUBST([LDNS_LIBS])
 +    AC_SUBST([LDNS_LDFLAGS])
  ])
-Index: opendnssec-2.1.6/configure.ac
-===================================================================
---- opendnssec-2.1.6.orig/configure.ac
-+++ opendnssec-2.1.6/configure.ac
-@@ -138,9 +138,7 @@ AC_CHECK_MEMBER([struct sockaddr_un.sun_
- 
- # common dependencies
- ACX_LIBXML2
--ACX_LDNS(1,6,17)
--ACX_LDNS_NOT(1,6,14, [binary incompatibility, see http://open.nlnetlabs.nl/pipermail/ldns-users/2012-October/000564.html])
--ACX_LDNS_NOT(1,6,15, [fail to create NSEC3 bitmap for empty non-terminals, see http://www.nlnetlabs.nl/pipermail/ldns-users/2012-November/000565.html])
-+ACX_LDNS(1.6.17)
- ACX_PKCS11_MODULES
- ACX_RT
- ACX_LIBC

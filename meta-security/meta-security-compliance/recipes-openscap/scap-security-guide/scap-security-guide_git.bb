@@ -7,6 +7,8 @@ SRC_URI = "git://github.com/akuster/scap-security-guide.git;branch=oe-0.1.44; \
            file://0001-fix-deprecated-instance-of-element.getchildren.patch \
            file://0002-fix-deprecated-getiterator-function.patch \
            file://0003-fix-remaining-getchildren-and-getiterator-functions.patch \
+           file://0001-Fix-platform-spec-file-check-tests-in-installed-OS-d.patch \
+           file://0002-Fix-missing-openembedded-from-ssg-constants.py.patch \
           "
 PV = "0.1.44+git${SRCPV}"
 

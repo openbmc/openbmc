@@ -73,8 +73,10 @@ Adding the layer only enables IMA (see below regarding EVM) during
 compilation of the Linux kernel. To also activate it when building
 the image, enable image signing in the local.conf like this:
 
-    INHERIT += "ima-evm-rootfs"
+    IMAGE_CLASSES += "ima-evm-rootfs"
     IMA_EVM_KEY_DIR = "${INTEGRITY_BASE}/data/debug-keys"
+    IMA_EVM_PRIVKEY = "${IMA_EVM_KEY_DIR}/privkey_ima.pem"
+    IMA_EVM_X509 = "${IMA_EVM_KEY_DIR}/x509_ima.der"
 
 This uses the default keys provided in the "data" directory of the layer.
 Because everyone has access to these private keys, such an image

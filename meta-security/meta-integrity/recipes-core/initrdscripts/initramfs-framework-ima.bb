@@ -27,5 +27,5 @@ do_install () {
 
 FILES_${PN} = "/init.d ${sysconfdir}"
 
-RDEPENDS_${PN} = "keyutils ${IMA_POLICY}"
+RDEPENDS_${PN} = "keyutils ima-evm-keys ${IMA_POLICY}"
 RDEPENDS_${PN} += "initramfs-framework-base"

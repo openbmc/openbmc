@@ -1,7 +1,7 @@
 SUMARRY = "The ethernet monitor program; for keeping track of ethernet/ip address pairings"
 LICENSE = "BSD-4-Clause"
 HOME_PAGE = "http://ee.lbl.gov/"
-LIC_FILES_CHKSUM = "file://configure;md5=212742e55562cf47527d31c2a492411a"
+LIC_FILES_CHKSUM = "file://configure;md5=74ca964ed34fda7b46c6fe3e50bded9d"
 
 DEPENDS += "libpcap postfix"
 
@@ -12,7 +12,7 @@ SRC_URI = "https://ee.lbl.gov/downloads/arpwatch/${BP}.tar.gz \
            file://postfix_workaround.patch \
            file://host_contam_fix.patch "
 
-SRC_URI[sha256sum] = "82e137e104aca8b1280f5cca0ebe61b978f10eadcbb4c4802c181522ad02b25b"
+SRC_URI[sha256sum] = "ee1d15d9a07952c0c017908b9dbfd5ac988fed0058c3cc4fa6c13e0be36f3a9f"
 
 inherit  autotools-brokensep update-rc.d useradd
 

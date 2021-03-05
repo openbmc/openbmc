@@ -6,12 +6,11 @@ LIC_FILES_CHKSUM = "file://LICENSE;beginline=0;endline=1;md5=8eac08d22113880357c
 
 DEPENDS += "gperf-native"
 
-SRCREV = "f13f58efc690493fe7aa69f54cb52a118f3769c1"
+SRCREV = "4bf70431a339a2886ab8c82e9a45378f30c6e6c7"
 
 SRC_URI = "git://github.com/seccomp/libseccomp.git;branch=release-2.5 \
            file://run-ptest \
-           file://fix-mips-build-failure.patch \
-"
+           "
 
 COMPATIBLE_HOST_riscv32 = "null"
 

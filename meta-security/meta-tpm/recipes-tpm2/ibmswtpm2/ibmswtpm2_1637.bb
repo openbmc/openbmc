@@ -27,7 +27,7 @@ SRC_URI[sha512sum] = "007aa415cccf19a2bcf789c426727dc4032dcb04cc9d11eedc231d2add
 
 S = "${WORKDIR}/src"
 
-CFLAGS += "-Wno-error=maybe-uninitialized"
+CFLAGS += "-Wno-error=maybe-uninitialized -DALG_CAMELLIA=ALG_NO"
 
 do_compile () {
    make CC='${CC}'

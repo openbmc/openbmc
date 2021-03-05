@@ -11,7 +11,7 @@ DEPENDS_class-native = "pkgconfig-native swig-native curl-native libxml2-native 
 
 S = "${WORKDIR}/git"
 
-inherit cmake pkgconfig python3native perlnative
+inherit cmake pkgconfig python3native python3targetconfig perlnative
 
 PACKAGECONFIG ?= "python3 rpm perl gcrypt ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)}"
 PACKAGECONFIG[python3] = "-DENABLE_PYTHON3=ON, ,python3, python3"

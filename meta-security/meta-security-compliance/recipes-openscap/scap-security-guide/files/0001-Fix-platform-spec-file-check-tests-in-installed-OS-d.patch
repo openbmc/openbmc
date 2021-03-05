@@ -1,0 +1,46 @@
+From 2beb4bc83a157b21edb1a3fef295cd4cced467df Mon Sep 17 00:00:00 2001
+From: Jate Sujjavanich <jatedev@gmail.com>
+Date: Thu, 7 Jan 2021 18:10:01 -0500
+Subject: [PATCH 1/3] Fix platform spec, file check, tests in installed OS
+ detect for openembedded
+
+Change platform to multi in openembedded installed check matching others
+and allowing compile of xml into oval
+---
+ shared/checks/oval/installed_OS_is_openembedded.xml | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/shared/checks/oval/installed_OS_is_openembedded.xml b/shared/checks/oval/installed_OS_is_openembedded.xml
+index 763d17bcb..01df16b43 100644
+--- a/shared/checks/oval/installed_OS_is_openembedded.xml
++++ b/shared/checks/oval/installed_OS_is_openembedded.xml
+@@ -1,11 +1,9 @@
+-</def-group>
+-
+ <def-group>
+   <definition class="inventory" id="installed_OS_is_openembedded" version="2">
+     <metadata>
+       <title>OpenEmbedded</title>
+       <affected family="unix">
+-        <platform>OPENEMBEDDED</platform>
++        <platform>multi_platform_all</platform>
+       </affected>
+       <reference ref_id="cpe:/o:openembedded:openembedded:0"
+       source="CPE" />
+@@ -20,8 +18,11 @@
+     </criteria>
+   </definition>
+ 
+-  <ind:textfilecontent54_object id="test_openembedded" version="1" comment="Check OPenEmbedded version">
+-    <ind:filepath>/etc/os-release/ind:filepath>
++  <ind:textfilecontent54_test check="all" check_existence="at_least_one_exists" comment="Check OpenEmbedded version" id="test_openembedded" version="1">
++    <ind:object object_ref="obj_openembedded" />
++  </ind:textfilecontent54_test>
++  <ind:textfilecontent54_object id="obj_openembedded" version="1" comment="Check OpenEmbedded version">
++    <ind:filepath>/etc/os-release</ind:filepath>
+     <ind:pattern operation="pattern match">^VERSION_ID=\"nodistro\.[0-9].$</ind:pattern>
+     <ind:instance datatype="int">1</ind:instance>
+   </ind:textfilecontent54_object>
+-- 
+2.24.3 (Apple Git-128)
+

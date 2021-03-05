@@ -34,12 +34,19 @@ local_conf_header:
     CONF_VERSION = "1"
     SOURCE_MIRROR_URL = "http://downloads.yoctoproject.org/mirror/sources/"
     SSTATE_MIRRORS = "file://.* http://sstate.yoctoproject.org/dev/PATH;downloadfilename=PATH \n"
-    DL_DIR = "/home/srv/downloads/master"
     BB_HASHSERVE = "auto"
     BB_SIGNATURE_HANDLER = "OEEquivHash"
     INHERIT += "buildstats buildstats-summary buildhistory"
     INHERIT += "report-error"
     INHERIT += "testimage"
+    INHERIT += "rm_work"
+    BB_NUMBER_THREADS="24"
+    BB_NUMBER_PARSE_THREADS="12"
+    PARALLEL_MAKE="-j 8"
+    BB_TASK_NICE_LEVEL = '5'
+    BB_TASK_NICE_LEVEL_task-testimage = '0'
+    BB_TASK_IONICE_LEVEL = '2.7'
+    BB_TASK_IONICE_LEVEL_task-testimage = '2.1'
     TEST_QEMUBOOT_TIMEOUT = "1500"
     EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
     PACKAGE_CLASSES = "package_ipk"
