@@ -11,7 +11,7 @@
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
-                "targetTempOffset": -13000,
+                "targetTempOffset": -15000,
                 "scalar": 1.0
             }
         },
@@ -22,11 +22,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme0",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp00,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -37,11 +37,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme1",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp01,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -52,11 +52,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme2",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp02,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -67,11 +67,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme3",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp03,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -82,11 +82,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme4",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp04,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -97,11 +97,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme5",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp05,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -112,11 +112,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme6",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp06,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -127,11 +127,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme7",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp07,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -142,11 +142,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme8",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp08,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -157,11 +157,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme9",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp09,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -172,11 +172,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme10",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp10,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -187,11 +187,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme11",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp11,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -202,11 +202,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme12",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp12,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -217,11 +217,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme13",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp13,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -232,11 +232,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme14",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp14,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
@@ -247,11 +247,11 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme15",
             "parameters": {
                 "type": "",
-                "maxTemp": 77000,
+                "maxTemp": WCTemp15,
                 "path": "",
                 "sysLabel": "",
-                "targetTemp": 67000,
-                "targetTempOffset": 0,
+                "targetTemp": -1,
+                "targetTempOffset": -7000,
                 "scalar": 1.0
             }
         },
