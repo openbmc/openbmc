@@ -8,7 +8,11 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit systemd
 
-SRC_URI += "file://nftables.service"
+SRC_URI += " \
+  file://nft-configure.sh \
+  file://nftables.service \
+  "
+
 SYSTEMD_SERVICE_${PN} += "nftables.service"
 
 RDEPENDS_${PN} += " \
@@ -17,6 +21,9 @@ RDEPENDS_${PN} += " \
   "
 
 do_install() {
-    install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/nftables.service ${D}${systemd_system_unitdir}
+  install -d ${D}${libexecdir}
+  install -m0755 ${WORKDIR}/nft-configure.sh ${D}${libexecdir}/
+
+  install -d ${D}${systemd_system_unitdir}
+  install -m0644 ${WORKDIR}/nftables.service ${D}${systemd_system_unitdir}/
 }
