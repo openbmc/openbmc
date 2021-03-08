@@ -11,6 +11,11 @@ inherit systemd
 SRC_URI += "file://nftables.service"
 SYSTEMD_SERVICE_${PN} += "nftables.service"
 
+RDEPENDS_${PN} += " \
+  bash \
+  nftables \
+  "
+
 do_install() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/nftables.service ${D}${systemd_system_unitdir}
