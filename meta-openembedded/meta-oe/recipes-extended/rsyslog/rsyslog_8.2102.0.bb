@@ -151,7 +151,7 @@ do_install_append() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_system_unitdir}
         install -m 644 ${WORKDIR}/rsyslog.service ${D}${systemd_system_unitdir}
-        sed -i -e "s,@sbindir\@,$(sbindir),g" ${D}${systemd_system_unitdir}/rsyslog.service
+        sed -i -e "s,@sbindir@,${sbindir},g" ${D}${systemd_system_unitdir}/rsyslog.service
     fi
 }
 
