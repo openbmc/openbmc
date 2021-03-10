@@ -13,10 +13,8 @@ mapper wait /xyz/openbmc_project/sensors/fan_tach/fb_fan0
 mapper wait /xyz/openbmc_project/sensors/fan_tach/fb_fan1
 mapper wait /xyz/openbmc_project/sensors/fan_tach/fb_fan2
 
-/usr/bin/fan-default-speed.sh
-
 # generate fan table writePath
-Fan_0_To_4_Hwmon="$(ls -la /sys/class/hwmon |grep pwm |  head -n 1| tail -n +1|cut -d '/' -f 9)"
+Fan_0_To_4_Hwmon="$(ls /sys/devices/platform/ahb/ahb\:apb/f0103000.pwm-fan-controller/hwmon/)"
 
 if [[ "$Fan_0_To_4_Hwmon" != "" ]]; then
      sed -i "s/Fan_0_To_4_Hwmon/$Fan_0_To_4_Hwmon/g" $FAN_TABLE_FILE

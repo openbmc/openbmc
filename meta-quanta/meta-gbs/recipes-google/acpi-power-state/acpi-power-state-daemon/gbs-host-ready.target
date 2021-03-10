@@ -1,0 +1,8 @@
+[Unit]
+Description=Host is ready to be powered on
+Wants=phosphor-ipmi-host.service
+After=phosphor-ipmi-host.service
+Wants=obmc-console@ttyS1.service
+After=obmc-console@ttyS1.service
+After=postcode-7seg@seven_seg_disp_val.service
+RefuseManualStop=yes
