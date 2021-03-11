@@ -1,0 +1,107 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[ -z "${gbmc_ncsi_br_pub_addr_lib-}" ] || return
+
+gbmc_ncsi_br_pub_addr_init=
+gbmc_ncsi_br_pub_addr_lastip=
+
+gbmc_ncsi_br_pub_addr_update() {
+  [ -n "$gbmc_ncsi_br_pub_addr_init" ] || return
+
+  printf 'gBMC Bridge Pub Addr from NCSI: %s\n' \
+    "${gbmc_ncsi_br_pub_addr_lastip:-(deleted)}" >&2
+
+  local pfx=
+  if [ -n "$gbmc_ncsi_br_pub_addr_lastip" ]; then
+    # Pad the address out to a /64 and ensure that it doesn't have extra bits
+    pfx="${gbmc_ncsi_br_pub_addr_lastip%::}"
+    while true; do
+      # Count `:` in `pfx` by removing them and diffing their lengths
+      local nos="${pfx//:/}"
+      (( ${#pfx} - ${#nos} >= 3 )) && break
+      pfx+=":0"
+    done
+    # Addresses that have more than 64bits of prefix (more than 3 separators)
+    # do not work with this scheme. Ignore them.
+    (( ${#pfx} - ${#nos} == 3 )) || pfx=
+  fi
+
+  local contents='[Network]'$'\n'
+  if [ -n "$pfx" ]; then
+    local here=
+    read -r -d '' here <<EOF
+Address=${pfx}:fd01::/128
+IPv6PrefixDelegation=yes
+[IPv6PrefixDelegation]
+RouterLifetimeSec=60
+[IPv6Prefix]
+Prefix=${pfx}:fd00::/80
+PreferredLifetimeSec=60
+ValidLifetimeSec=60
+[IPv6RoutePrefix]
+Route=${pfx}:fd01::/80
+LifetimeSec=60
+EOF
+    contents+="$here"$'\n'
+  fi
+
+  local file
+  for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-public.conf; do
+    mkdir -p -m 755 "$(dirname "$file")"
+    printf '%s' "$contents" >"$file"
+  done
+
+  # We only restart networkd if we know we have a management network available
+  # on the machine and networkd is already running.
+  if [ -e /lib/systemd/network/-bmc-gbmcbrdummy.network ] && \
+     ! systemctl status systemd-networkd | grep -q inactive; then
+    echo "Restarting networkd" >&2
+    # HACK: We can't restart systemd-networkd without coordinating with
+    # phosphor-networkd, otherwise it will sometimes detect interfaces as
+    # unmanaged because it reads administrative state to determine enabled
+    # status. Adding an IP to phosphor-networkd is guaranteed to trigger the
+    # restart we want, and systemd-network will never actually accept the
+    # new value.
+    local start=$SECONDS
+    while (( SECONDS - start < 30 )); do
+      busctl call xyz.openbmc_project.Network \
+        /xyz/openbmc_project/network/gbmcbrdummy \
+        xyz.openbmc_project.Network.IP.Create IP ssys \
+        xyz.openbmc_project.Network.IP.Protocol.IPv6 ff02::1 128 '' && break
+      sleep 1
+    done
+  fi
+}
+
+gbmc_ncsi_br_pub_addr_hook() {
+  if [ "$change" = 'init' ]; then
+    gbmc_ncsi_br_pub_addr_init=1
+    gbmc_ncsi_br_pub_addr_update
+  elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' ] &&
+     [ "$scope" = 'global' -a "$fam" = 'inet6' ]; then
+    if [ "$action" = 'add' -a "$ip" != "$gbmc_ncsi_br_pub_addr_lastip" ]; then
+      gbmc_ncsi_br_pub_addr_lastip="$ip"
+      gbmc_ncsi_br_pub_addr_update
+    fi
+    if [ "$action" = 'del' -a "$ip" = "$gbmc_ncsi_br_pub_addr_lastip" ]; then
+      gbmc_ncsi_br_pub_addr_lastip=
+      gbmc_ncsi_br_pub_addr_update
+    fi
+  fi
+}
+
+GBMC_IP_MONITOR_HOOKS+=(gbmc_ncsi_br_pub_addr_hook)
+
+gbmc_ncsi_br_pub_addr_lib=1

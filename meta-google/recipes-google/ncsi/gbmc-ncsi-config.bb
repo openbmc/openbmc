@@ -10,6 +10,7 @@ SRC_URI += " \
   file://gbmc-ncsi-sslh.socket.in \
   file://gbmc-ncsi-sslh.service \
   file://gbmc-ncsi-nft.sh.in \
+  file://gbmc-ncsi-br-pub-addr.sh.in \
   "
 
 S = "${WORKDIR}"
@@ -71,4 +72,7 @@ do_install_append() {
   sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-nft.sh.in \
     >${WORKDIR}/gbmc-ncsi-nft.sh
   install -m644 ${WORKDIR}/gbmc-ncsi-nft.sh $mondir
+  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-br-pub-addr.sh.in \
+    >${WORKDIR}/gbmc-ncsi-br-pub-addr.sh
+  install -m644 ${WORKDIR}/gbmc-ncsi-br-pub-addr.sh $mondir
 }
