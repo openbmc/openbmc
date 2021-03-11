@@ -24,4 +24,11 @@ table inet filter {
         icmpv6 type nd-neighbor-solicit accept
         icmpv6 type nd-router-advert accept
     }
+    chain ncsi_forward {
+        type filter hook forward priority 0; policy accept;
+        iifname != @NCSI_IF@ accept
+        oifname != gbmcbr drop
+        ip6 daddr fdb5:0481:10ce::/64 drop
+        ip6 saddr fdb5:0481:10ce::/64 drop
+    }
 }
