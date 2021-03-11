@@ -1,0 +1,38 @@
+From 966cbeb309f867ff4ac8e7f4462be4780e421700 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Mon, 25 Jan 2021 19:01:06 -0800
+Subject: [PATCH] stacktrace-t.c: make the test conditional
+
+Fixes:
+/prj/tmp/work/cortexa57-poky-linux-musl/mariadb/10.5.8-r0/recipe-sysroot-native/usr/bin/aarch64-poky-linux-musl/../../libexec/aarch64-poky-linux-musl/gcc/aarch64-poky-linux-musl/10.2.0/ld.bfd: /usr/src/debug/mariadb/10.5.8-r0/mariadb-10.5.8/unittest/mysys/stacktrace-t.c:36: undefined reference to `my_safe_print_str'
+
+Upstream-Status: Submitted [https://jira.mariadb.org/browse/MDEV-24131]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ unittest/mysys/stacktrace-t.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/unittest/mysys/stacktrace-t.c b/unittest/mysys/stacktrace-t.c
+index 8fa0db15b36..d8408f80d76 100644
+--- a/unittest/mysys/stacktrace-t.c
++++ b/unittest/mysys/stacktrace-t.c
+@@ -29,6 +29,7 @@ void test_my_safe_print_str()
+   memcpy(b_stack, "LEGAL", 6);
+   memcpy(b_bss, "LEGAL", 6);
+ 
++#ifdef HAVE_STACKTRACE
+ #ifndef __SANITIZE_ADDRESS__
+   fprintf(stderr, "\n===== stack =====\n");
+   my_safe_print_str(b_stack, 65535);
+@@ -48,6 +49,7 @@ void test_my_safe_print_str()
+   fprintf(stderr, "\n===== (const char*) 1 =====\n");
+   my_safe_print_str((const char*)1, 5);
+ #endif /*__SANITIZE_ADDRESS__*/
++#endif /*HAVE_STACKTRACE*/
+ 
+   free(b_heap);
+ 
+-- 
+2.17.1
+

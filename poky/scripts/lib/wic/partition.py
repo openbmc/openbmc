@@ -298,6 +298,8 @@ class Partition():
         mkfs_cmd = "fsck.%s -pvfD %s" % (self.fstype, rootfs)
         exec_native_cmd(mkfs_cmd, native_sysroot, pseudo=pseudo)
 
+        self.check_for_Y2038_problem(rootfs, native_sysroot)
+
     def prepare_rootfs_btrfs(self, rootfs, cr_workdir, oe_builddir, rootfs_dir,
                              native_sysroot, pseudo):
         """
@@ -388,6 +390,8 @@ class Partition():
             (self.fstype, extraopts, label_str, self.fsuuid, rootfs)
         exec_native_cmd(mkfs_cmd, native_sysroot)
 
+        self.check_for_Y2038_problem(rootfs, native_sysroot)
+
     def prepare_empty_partition_btrfs(self, rootfs, oe_builddir,
                                       native_sysroot):
         """
@@ -449,3 +453,37 @@ class Partition():
 
         mkswap_cmd = "mkswap %s -U %s %s" % (label_str, self.fsuuid, path)
         exec_native_cmd(mkswap_cmd, native_sysroot)
+
+    def check_for_Y2038_problem(self, rootfs, native_sysroot):
+        """
+        Check if the filesystem is affected by the Y2038 problem
+        (Y2038 problem = 32 bit time_t overflow in January 2038)
+        """
+        def get_err_str(part):
+            err = "The {} filesystem {} has no Y2038 support."
+            if part.mountpoint:
+                args = [part.fstype, "mounted at %s" % part.mountpoint]
+            elif part.label:
+                args = [part.fstype, "labeled '%s'" % part.label]
+            elif part.part_name:
+                args = [part.fstype, "in partition '%s'" % part.part_name]
+            else:
+                args = [part.fstype, "in partition %s" % part.num]
+            return err.format(*args)
+
+        # ext2 and ext3 are always affected by the Y2038 problem
+        if self.fstype in ["ext2", "ext3"]:
+            logger.warn(get_err_str(self))
+            return
+
+        ret, out = exec_native_cmd("dumpe2fs %s" % rootfs, native_sysroot)
+
+        # if ext4 is affected by the Y2038 problem depends on the inode size
+        for line in out.splitlines():
+            if line.startswith("Inode size:"):
+                size = int(line.split(":")[1].strip())
+                if size < 256:
+                    logger.warn("%s Inodes (of size %d) are too small." %
+                                (get_err_str(self), size))
+                break
+

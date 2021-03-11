@@ -1,0 +1,28 @@
+From 0f90440ca70abab947acbd77795e9f130967956c Mon Sep 17 00:00:00 2001
+From: Darren Tucker <dtucker@dtucker.net>
+Date: Fri, 20 Nov 2020 13:37:54 +1100
+Subject: [PATCH] Add new pselect6_time64 syscall on ARM.
+
+This is apparently needed on armhfp/armv7hl.  bz#3232, patch from
+jjelen at redhat.com.
+---
+ sandbox-seccomp-filter.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+Upstream-Status: Backport
+[fixes issues on 32bit IA and probably other 32 bit platforms too with glibc 2.33]
+
+diff --git a/sandbox-seccomp-filter.c b/sandbox-seccomp-filter.c
+index e0768c063..5065ae7ef 100644
+--- a/sandbox-seccomp-filter.c
++++ b/sandbox-seccomp-filter.c
+@@ -267,6 +267,9 @@ static const struct sock_filter preauth_insns[] = {
+ #ifdef __NR_pselect6
+ 	SC_ALLOW(__NR_pselect6),
+ #endif
++#ifdef __NR_pselect6_time64
++	SC_ALLOW(__NR_pselect6_time64),
++#endif
+ #ifdef __NR_read
+ 	SC_ALLOW(__NR_read),
+ #endif

@@ -2,7 +2,7 @@ DESCRIPTION = "Google gRPC tools"
 HOMEPAGE = "http://www.grpc.io/"
 SECTION = "devel/python"
 
-DEPENDS_append = "${PYTHON_PN}-grpcio"
+DEPENDS_append = " ${PYTHON_PN}-grpcio"
 RDEPENDS_${PN} = "${PYTHON_PN}-grpcio"
 
 LICENSE = "Apache-2.0"

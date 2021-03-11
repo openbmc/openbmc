@@ -3,6 +3,13 @@ require sudo.inc
 SRC_URI = "https://www.sudo.ws/dist/sudo-${PV}.tar.gz \
            ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_SRC_URI}', '', d)} \
            file://0001-sudo.conf.in-fix-conflict-with-multilib.patch \
+           file://CVE-2021-23239.patch \
+           file://CVE-2021-23240.patch \
+           file://CVE-2021-3156-1.patch \
+           file://CVE-2021-3156-2.patch \
+           file://CVE-2021-3156-3.patch \
+           file://CVE-2021-3156-4.patch \
+           file://CVE-2021-3156-5.patch \
            "
 
 PAM_SRC_URI = "file://sudo.pam"

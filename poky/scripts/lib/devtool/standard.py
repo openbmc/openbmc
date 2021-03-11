@@ -474,7 +474,11 @@ def symlink_oelocal_files_srctree(rd,srctree):
                 destpth = os.path.join(srctree, relpth, fn)
                 if os.path.exists(destpth):
                     os.unlink(destpth)
-                os.symlink('oe-local-files/%s' % fn, destpth)
+                if relpth != '.':
+                    back_relpth = os.path.relpath(local_files_dir, root)
+                    os.symlink('%s/oe-local-files/%s/%s' % (back_relpth, relpth, fn), destpth)
+                else:
+                    os.symlink('oe-local-files/%s' % fn, destpth)
                 addfiles.append(os.path.join(relpth, fn))
         if addfiles:
             bb.process.run('git add %s' % ' '.join(addfiles), cwd=srctree)

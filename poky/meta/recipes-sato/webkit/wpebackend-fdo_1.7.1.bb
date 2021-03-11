@@ -15,3 +15,6 @@ REQUIRED_DISTRO_FEATURES = "opengl"
 SRC_URI = "https://wpewebkit.org/releases/${BPN}-${PV}.tar.xz"
 SRC_URI[sha256sum] = "9b980a73ea4e3762266c48f81ded56d9dcad4acf32bad9bd05d0dffdd454c6f5"
 
+FILES_${PN} += "${libdir}/libWPEBackend-fdo-1.0.so"
+FILES_SOLIBSDEV = ""
+INSANE_SKIP_${PN} += "dev-so"

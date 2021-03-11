@@ -39,7 +39,7 @@ PARALLEL_MAKE = ""
 
 COMPATIBLE_MACHINE_mips64 = "(!.*mips64).*"
 
-inherit pkgconfig autotools-brokensep update-rc.d python3native perlnative cpan systemd features_check bash-completion
+inherit pkgconfig autotools-brokensep update-rc.d python3native python3targetconfig perlnative cpan systemd features_check bash-completion
 
 REQUIRED_DISTRO_FEATURES = "apparmor"
 

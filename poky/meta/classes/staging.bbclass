@@ -27,11 +27,15 @@ SYSROOT_DIRS_BLACKLIST = " \
     ${mandir} \
     ${docdir} \
     ${infodir} \
+    ${datadir}/X11/locale \
     ${datadir}/applications \
+    ${datadir}/bash-completion \
     ${datadir}/fonts \
     ${datadir}/gtk-doc/html \
+    ${datadir}/installed-tests \
     ${datadir}/locale \
     ${datadir}/pixmaps \
+    ${datadir}/terminfo \
     ${libdir}/${BPN}/ptest \
 "
 

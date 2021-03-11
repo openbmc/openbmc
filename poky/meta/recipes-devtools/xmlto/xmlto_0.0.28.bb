@@ -29,7 +29,7 @@ RDEPENDS_${PN}_append_class-target = " \
                   libxslt-bin \
                   coreutils \
 "
-CACHED_CONFIGUREVARS += "ac_cv_path_TAIL=tail"
+CACHED_CONFIGUREVARS += "ac_cv_path_TAIL=tail ac_cv_path_GREP=grep"
 
 BBCLASSEXTEND = "native"
 

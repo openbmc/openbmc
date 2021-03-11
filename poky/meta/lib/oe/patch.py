@@ -38,15 +38,19 @@ def runcmd(args, dir = None):
         args = [ pipes.quote(str(arg)) for arg in args ]
         cmd = " ".join(args)
         # print("cmd: %s" % cmd)
-        (exitstatus, output) = subprocess.getstatusoutput(cmd)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = proc.communicate()
+        stdout = stdout.decode('utf-8')
+        stderr = stderr.decode('utf-8')
+        exitstatus = proc.returncode
         if exitstatus != 0:
-            raise CmdError(cmd, exitstatus >> 8, output)
-        if " fuzz " in output and "Hunk " in output:
+            raise CmdError(cmd, exitstatus >> 8, "stdout: %s\nstderr: %s" % (stdout, stderr))
+        if " fuzz " in stdout and "Hunk " in stdout:
             # Drop patch fuzz info with header and footer to log file so
             # insane.bbclass can handle to throw error/warning
-            bb.note("--- Patch fuzz start ---\n%s\n--- Patch fuzz end ---" % format(output))
+            bb.note("--- Patch fuzz start ---\n%s\n--- Patch fuzz end ---" % format(stdout))
 
-        return output
+        return stdout
 
     finally:
         if dir:

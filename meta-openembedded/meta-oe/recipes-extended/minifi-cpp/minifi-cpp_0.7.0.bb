@@ -75,6 +75,7 @@ TARGET_CFLAGS_append_riscv64 += "-fpic"
 TARGET_CXXFLAGS_append_riscv64 += "-fpic"
 
 do_install[cleandirs] += "${WORKDIR}/minifi-install"
+PSEUDO_CONSIDER_PATHS .= ",${WORKDIR}/minifi-install"
 
 do_install() {
     DESTDIR='${WORKDIR}/minifi-install' cmake_runcmake_build --target ${OECMAKE_TARGET_INSTALL}

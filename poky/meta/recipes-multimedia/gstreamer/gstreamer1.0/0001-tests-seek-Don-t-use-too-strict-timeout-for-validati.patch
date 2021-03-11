@@ -1,0 +1,32 @@
+From 1db36347d05d88835519368442e9aa89c64091ad Mon Sep 17 00:00:00 2001
+From: Seungha Yang <seungha@centricular.com>
+Date: Tue, 15 Sep 2020 00:54:58 +0900
+Subject: [PATCH] tests: seek: Don't use too strict timeout for validation
+
+Expected segment-done message might not be seen within expected
+time if system is not powerful enough.
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/625>
+
+Upstream-Status: Backport [https://cgit.freedesktop.org/gstreamer/gstreamer/commit?id=f44312ae5d831438fcf8041162079c65321c588c]
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ tests/check/pipelines/seek.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/check/pipelines/seek.c b/tests/check/pipelines/seek.c
+index 28bb8846d..5f7447bc5 100644
+--- a/tests/check/pipelines/seek.c
++++ b/tests/check/pipelines/seek.c
+@@ -521,7 +521,7 @@ GST_START_TEST (test_loopback_2)
+ 
+   GST_INFO ("wait for segment done message");
+ 
+-  msg = gst_bus_timed_pop_filtered (bus, (GstClockTime) 2 * GST_SECOND,
++  msg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE,
+       GST_MESSAGE_SEGMENT_DONE | GST_MESSAGE_ERROR);
+   fail_unless (msg, "no message within the timed window");
+   fail_unless_equals_string (GST_MESSAGE_TYPE_NAME (msg), "segment-done");
+-- 
+2.29.2
+

@@ -20,6 +20,7 @@ SRC_URI = "http://www.libsdl.org/release/SDL2-${PV}.tar.gz \
            file://more-gen-depends.patch \
            file://directfb-spurious-curly-brace-missing-e.patch \
            file://directfb-renderfillrect-fix.patch \
+           file://CVE-2020-14409-14410.patch \
 "
 
 S = "${WORKDIR}/SDL2-${PV}"

@@ -703,6 +703,23 @@ def check_sanity_version_change(status, d):
     if (tmpdirmode & stat.S_ISUID):
         status.addresult("TMPDIR is setuid, please don't build in a setuid directory")
 
+    # Check that a user isn't building in a path in PSEUDO_IGNORE_PATHS
+    pseudoignorepaths = d.getVar('PSEUDO_IGNORE_PATHS', expand=True).split(",")
+    workdir = d.getVar('WORKDIR', expand=True)
+    for i in pseudoignorepaths:
+        if i and workdir.startswith(i):
+            status.addresult("You are building in a path included in PSEUDO_IGNORE_PATHS " + str(i) + " please locate the build outside this path.\n")
+
+    # Check if PSEUDO_IGNORE_PATHS and and paths under pseudo control overlap
+    pseudoignorepaths = d.getVar('PSEUDO_IGNORE_PATHS', expand=True).split(",")
+    pseudo_control_dir = "${D},${PKGD},${PKGDEST},${IMAGEROOTFS},${SDK_OUTPUT}"
+    pseudocontroldir = d.expand(pseudo_control_dir).split(",")
+    for i in pseudoignorepaths:
+        for j in pseudocontroldir:
+            if i and j:
+                if j.startswith(i):
+                    status.addresult("A path included in PSEUDO_IGNORE_PATHS " + str(i) + " and the path " + str(j) + " overlap and this will break pseudo permission and ownership tracking. Please set the path " + str(j) + " to a different directory which does not overlap with pseudo controlled directories. \n")
+
     # Some third-party software apparently relies on chmod etc. being suid root (!!)
     import stat
     suid_check_bins = "chown chmod mknod".split()
@@ -786,6 +803,11 @@ def check_sanity_everybuild(status, d):
     paths = d.getVar('PATH').split(":")
     if "." in paths or "./" in paths or "" in paths:
         status.addresult("PATH contains '.', './' or '' (empty element), which will break the build, please remove this.\nParsed PATH is " + str(paths) + "\n")
+
+    #Check if bitbake is present in PATH environment variable
+    bb_check = bb.utils.which(d.getVar('PATH'), 'bitbake')
+    if not bb_check:
+        bb.warn("bitbake binary is not found in PATH, did you source the script?")
 
     # Check whether 'inherit' directive is found (used for a class to inherit)
     # in conf file it's supposed to be uppercase INHERIT

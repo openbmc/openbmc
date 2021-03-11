@@ -19,7 +19,6 @@ stages:
     - done
     - cd $CI_PROJECT_DIR
     - rm -rf build
-    - $CI_PROJECT_DIR/scripts/ci-cleanup.sh
   cache:
     paths:
       - layers

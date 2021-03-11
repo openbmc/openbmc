@@ -318,6 +318,7 @@ class Wic(WicTestCase):
                                    "--image-name=core-image-minimal "
                                    "-D -o %s" % self.resultdir)
         self.assertEqual(1, len(glob(self.resultdir + "wictestdisk-*.direct")))
+        self.assertEqual(1, len(glob(self.resultdir + "tmp.wic*")))
 
     def test_debug_long(self):
         """Test --debug option"""
@@ -325,6 +326,7 @@ class Wic(WicTestCase):
                                    "--image-name=core-image-minimal "
                                    "--debug -o %s" % self.resultdir)
         self.assertEqual(1, len(glob(self.resultdir + "wictestdisk-*.direct")))
+        self.assertEqual(1, len(glob(self.resultdir + "tmp.wic*")))
 
     def test_skip_build_check_short(self):
         """Test -s option"""
@@ -588,6 +590,9 @@ part / --source rootfs  --fstype=ext4 --include-path %s --include-path core-imag
     def test_permissions(self):
         """Test permissions are respected"""
 
+        # prepare wicenv and rootfs
+        bitbake('core-image-minimal core-image-minimal-mtdutils -c do_rootfs_wicenv')
+
         oldpath = os.environ['PATH']
         os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
 
@@ -621,6 +626,19 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
                     res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part))
                     self.assertEqual(True, files_own_by_root(res.output))
 
+                config = 'IMAGE_FSTYPES += "wic"\nWKS_FILE = "%s"\n' % wks_file
+                self.append_config(config)
+                bitbake('core-image-minimal')
+                tmpdir = os.path.join(get_bb_var('WORKDIR', 'core-image-minimal'),'build-wic')
+
+                # check each partition for permission
+                for part in glob(os.path.join(tmpdir, 'temp-*.direct.p*')):
+                    res = runCmd("debugfs -R 'ls -p' %s 2>/dev/null" % (part))
+                    self.assertTrue(files_own_by_root(res.output)
+                        ,msg='Files permission incorrect using wks set "%s"' % test)
+
+                # clean config and result directory for next cases
+                self.remove_config(config)
                 rmtree(self.resultdir, ignore_errors=True)
 
         finally:

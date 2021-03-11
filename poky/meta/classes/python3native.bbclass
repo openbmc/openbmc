@@ -17,8 +17,6 @@ export STAGING_LIBDIR
 export PYTHON_LIBRARY="${STAGING_LIBDIR}/lib${PYTHON_DIR}${PYTHON_ABI}.so"
 export PYTHON_INCLUDE_DIR="${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}"
 
-export _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata"
-
 # suppress host user's site-packages dirs.
 export PYTHONNOUSERSITE = "1"
 

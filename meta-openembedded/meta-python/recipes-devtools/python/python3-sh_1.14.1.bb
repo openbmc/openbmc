@@ -18,7 +18,6 @@ RDEPENDS_${PN} += " \
     ${PYTHON_PN}-resource \
     ${PYTHON_PN}-shell \
     ${PYTHON_PN}-terminal \
-    ${PYTHON_PN}-tests \
     ${PYTHON_PN}-threading \
     ${PYTHON_PN}-unixadmin \
 "

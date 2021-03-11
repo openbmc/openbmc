@@ -1,0 +1,17 @@
+Don't encode the distro from /etc/os-release into the binaries.
+
+Upstream-Status: Pending
+RP 2021/2/26
+
+Index: epiphany-3.38.2/meson.build
+===================================================================
+--- epiphany-3.38.2.orig/meson.build
++++ epiphany-3.38.2/meson.build
+@@ -15,6 +15,7 @@ if r.returncode() == 0
+ else
+   distributor_name = 'GNOME Web'
+ endif
++distributor_name = 'OpenEmbedded'
+ 
+ prefix = get_option('prefix')
+ datadir = join_paths(prefix, get_option('datadir'))

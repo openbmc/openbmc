@@ -10,6 +10,6 @@ SRC_URI = "git://github.com/OISF/suricata-update;branch='master-1.1.x'"
 
 S = "${WORKDIR}/git"
 
-inherit python3native setuptools3
+inherit python3native python3targetconfig setuptools3
 
 RDEPENDS_${PN} = "python3-pyyaml"

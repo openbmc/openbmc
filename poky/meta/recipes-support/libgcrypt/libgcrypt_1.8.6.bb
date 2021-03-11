@@ -28,6 +28,9 @@ SRC_URI = "${GNUPG_MIRROR}/libgcrypt/libgcrypt-${PV}.tar.bz2 \
 "
 SRC_URI[sha256sum] = "0cba2700617b99fc33864a0c16b1fa7fdf9781d9ed3509f5d767178e5fd7b975"
 
+# Below whitelisted CVEs are disputed and not affecting crypto libraries for any distro.
+CVE_CHECK_WHITELIST += "CVE-2018-12433 CVE-2018-12438"
+
 BINCONFIG = "${bindir}/libgcrypt-config"
 
 inherit autotools texinfo binconfig-disabled pkgconfig

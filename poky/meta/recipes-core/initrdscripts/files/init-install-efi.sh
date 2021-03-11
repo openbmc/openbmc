@@ -279,6 +279,11 @@ fi
 
 umount /tgt_root
 
+# copy any extra files needed for ESP
+if [ -d /run/media/$1/esp ]; then
+    cp -r /run/media/$1/esp/* /boot
+fi
+
 # Copy kernel artifacts. To add more artifacts just add to types
 # For now just support kernel types already being used by something in OE-core
 for types in bzImage zImage vmlinux vmlinuz fitImage; do
