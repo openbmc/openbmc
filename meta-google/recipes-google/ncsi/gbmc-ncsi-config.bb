@@ -9,17 +9,22 @@ SRC_URI += " \
   file://50-gbmc-ncsi.rules.in \
   file://gbmc-ncsi-sslh.socket.in \
   file://gbmc-ncsi-sslh.service \
+  file://gbmc-ncsi-nft.sh.in \
   "
 
 S = "${WORKDIR}"
 
 RDEPENDS_${PN} += " \
+  gbmc-ip-monitor \
   ncsid \
   nftables-systemd \
   sslh \
   "
 
-FILES_${PN} += "${systemd_unitdir}"
+FILES_${PN} += " \
+  ${datadir}/gbmc-ip-monitor \
+  ${systemd_unitdir} \
+  "
 
 SYSTEMD_SERVICE_${PN} += " \
   gbmc-ncsi-sslh.service \
@@ -50,7 +55,7 @@ do_install_append() {
 
   nftdir=${D}${sysconfdir}/nftables
   install -d -m0755 "$nftdir"
-  sed "s,@NCSI_IF@,$if_name," ${WORKDIR}/50-gbmc-ncsi.rules.in \
+  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/50-gbmc-ncsi.rules.in \
     >"$nftdir"/50-gbmc-ncsi.rules
 
   wantdir=${D}${systemd_system_unitdir}/multi-user.target.wants
@@ -58,6 +63,12 @@ do_install_append() {
   ln -sv ../ncsid@.service "$wantdir"/ncsid@$if_name.service
 
   install -m 0644 ${WORKDIR}/gbmc-ncsi-sslh.service ${D}${systemd_system_unitdir}
-  sed "s,@NCSI_IF@,$if_name," ${WORKDIR}/gbmc-ncsi-sslh.socket.in \
+  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-sslh.socket.in \
     >${D}${systemd_system_unitdir}/gbmc-ncsi-sslh.socket
+
+  mondir=${D}${datadir}/gbmc-ip-monitor/
+  install -d -m0755 $mondir
+  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-nft.sh.in \
+    >${WORKDIR}/gbmc-ncsi-nft.sh
+  install -m644 ${WORKDIR}/gbmc-ncsi-nft.sh $mondir
 }
