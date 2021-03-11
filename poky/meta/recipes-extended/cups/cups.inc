@@ -52,6 +52,8 @@ EXTRA_OECONF = " \
                --enable-debug \
                --disable-relro \
                --enable-libusb \
+               --with-system-groups=lpadmin \
+               --with-cups-group=lp \
                DSOFLAGS='${LDFLAGS}' \
                "
 

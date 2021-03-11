@@ -1,0 +1,29 @@
+From f4e9e4337f8844d199515ff2b762c914dd254cbd Mon Sep 17 00:00:00 2001
+From: Dan Robertson <dan@dlrobertson.com>
+Date: Sat, 16 May 2020 00:12:44 +0000
+Subject: [PATCH] Fix includes when building with musl
+
+Include sys/types.h for mode_t and id_t in sudo_debug.h
+
+Upstream-Status: Backport [https://github.com/sudo-project/sudo/commit/f4e9e4337f8844d199515ff2b762c914dd254cbd]
+Signed-off-by: Chee Yang Lee <chee.yang.lee@intel.com>
+
+---
+ include/sudo_debug.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/sudo_debug.h b/include/sudo_debug.h
+index 180f2096f..0124b0b19 100644
+--- a/include/sudo_debug.h
++++ b/include/sudo_debug.h
+@@ -25,6 +25,7 @@
+ #else
+ # include "compat/stdbool.h"
+ #endif
++#include <sys/types.h>
+ #include "sudo_queue.h"
+ 
+ /*
+-- 
+2.25.1
+

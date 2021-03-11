@@ -1,0 +1,26 @@
+From 6ce86cb5cf06541cd5aad70fe8494b07b22c247e Mon Sep 17 00:00:00 2001
+From: Matthias Schiffer <matthias.schiffer@tq-group.com>
+Date: Wed, 27 Jan 2021 16:10:32 +0100
+Subject: [PATCH] rngd_jitter: fix O_NONBLOCK setting for entropy pipe
+
+A pointer was passed to fcntl instead of the flags variable, setting
+random flags.
+
+Signed-off-by: Matthias Schiffer <matthias.schiffer@tq-group.com>
+---
+ rngd_jitter.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rngd_jitter.c b/rngd_jitter.c
+index 32bac53..25b3543 100644
+--- a/rngd_jitter.c
++++ b/rngd_jitter.c
+@@ -465,7 +465,7 @@ int init_jitter_entropy_source(struct rng *ent_src)
+ 
+ 	flags = fcntl(pipefds[0], F_GETFL, 0);
+ 	flags |= O_NONBLOCK;
+-	fcntl(pipefds[0], F_SETFL, &flags);
++	fcntl(pipefds[0], F_SETFL, flags);
+ 
+ 	if (ent_src->rng_options[JITTER_OPT_USE_AES].int_val) {
+ #ifdef HAVE_LIBGCRYPT

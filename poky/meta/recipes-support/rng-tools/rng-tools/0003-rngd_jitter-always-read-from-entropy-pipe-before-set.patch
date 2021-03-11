@@ -1,0 +1,38 @@
+From 36bc92ef2789b13183c8895d83665f48b13c2b9e Mon Sep 17 00:00:00 2001
+From: Matthias Schiffer <matthias.schiffer@tq-group.com>
+Date: Wed, 27 Jan 2021 16:22:39 +0100
+Subject: [PATCH] rngd_jitter: always read from entropy pipe before setting
+ O_NONBLOCK
+
+Even with AES disabled, we want to make sure that jent_read_entropy() has
+already generated some entropy before we consider the the source
+initialized. Otherwise "Entropy Generation is slow" log spam will be
+emitteded until this has happened, which can take several seconds.
+
+Signed-off-by: Matthias Schiffer <matthias.schiffer@tq-group.com>
+---
+ rngd_jitter.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/rngd_jitter.c b/rngd_jitter.c
+index 48f344c..b736cdd 100644
+--- a/rngd_jitter.c
++++ b/rngd_jitter.c
+@@ -492,6 +492,17 @@ int init_jitter_entropy_source(struct rng *ent_src)
+ 		message_entsrc(ent_src,LOG_CONS|LOG_INFO, "libgcrypt not available. Disabling AES in JITTER source\n");
+ 		ent_src->rng_options[JITTER_OPT_USE_AES].int_val = 0;
+ #endif
++	} else {
++		/*
++		 * Make sure that an entropy gathering thread has generated
++		 * at least some entropy before setting O_NONBLOCK and finishing
++		 * the entropy source initialization.
++		 *
++		 * This avoids "Entropy Generation is slow" log spamming that
++		 * would otherwise happen until jent_read_entropy() has run
++		 * for the first time.
++		 */
++		xread_jitter(&i, 1, ent_src);
+ 	}
+ 	message_entsrc(ent_src,LOG_DAEMON|LOG_INFO, "Enabling JITTER rng support\n");
+ 	return 0;

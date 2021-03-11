@@ -1,5 +1,6 @@
 SUMMARY = "File synchronization tool"
 HOMEPAGE = "http://rsync.samba.org/"
+DESCRIPTION = "rsync is an open source utility that provides fast incremental file transfer."
 BUGTRACKER = "http://rsync.samba.org/bugzilla.html"
 SECTION = "console/network"
 # GPLv2+ (<< 3.0.0), GPLv3+ (>= 3.0.0)

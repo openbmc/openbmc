@@ -1,6 +1,7 @@
 SUMMARY = "A parallel build system"
 DESCRIPTION = "distcc is a parallel build system that distributes \
 compilation of C/C++/ObjC code across machines on a network."
+HOMEPAGE = "https://github.com/distcc/distcc"
 SECTION = "devel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"

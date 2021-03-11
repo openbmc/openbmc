@@ -13,7 +13,7 @@ do_configure() {
 }
 
 do_install() {
-	oe_runmake CWAUTOMACROSPREFIX=${D}${prefix} install
+	oe_runmake LABEL=`date -d @${SOURCE_DATE_EPOCH} +%Y%m%d` CWAUTOMACROSPREFIX=${D}${prefix} install
 
 	# cleanup buildpaths in autogen.sh
 	sed -i -e 's,${D},,g' ${D}${prefix}/share/cwautomacros/scripts/autogen.sh

@@ -1,5 +1,6 @@
 SUMMARY = "Program for creating simple man pages"
-SECTION = "devel"
+HOMEPAGE = "https://www.gnu.org/software/help2man/"
+DESCRIPTION = "help2man is a tool for automatically generating simple manual pages from program output."SECTION = "devel"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 DEPENDS = "autoconf-native automake-native"

@@ -1,4 +1,5 @@
 SUMMARY  = "Embedded Linux Library"
+HOMEPAGE = "https://01.org/ell"
 DESCRIPTION = "The Embedded Linux Library (ELL) provides core, \
 low-level functionality for system daemons. It typically has no \
 dependencies other than the Linux kernel, C standard library, and \

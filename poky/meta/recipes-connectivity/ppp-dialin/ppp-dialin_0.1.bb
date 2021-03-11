@@ -1,5 +1,6 @@
 SUMMARY = "Enables PPP dial-in through a serial connection"
 SECTION = "console/network"
+DESCRIPTION = "PPP dail-in provides a point to point protocol (PPP), so that other computers can dial up to it and access connected networks."
 DEPENDS = "ppp"
 RDEPENDS_${PN} = "ppp"
 PR = "r8"

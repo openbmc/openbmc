@@ -2,6 +2,7 @@ SUMMARY = "Advanced front-end for dpkg"
 DESCRIPTION = "Provides command-line tools for searching and managing as well \
 as querying information about packages as a low-level access to all features \
 of the libapt-pkg library."
+HOMEPAGE = "https://packages.debian.org/jessie/apt"
 LICENSE = "GPLv2.0+"
 SECTION = "base"
 

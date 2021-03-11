@@ -1,0 +1,24 @@
+From f2bc064e0d70ac068de4539d069bfab6cdccc48d Mon Sep 17 00:00:00 2001
+From: "Shane F. Carr" <shane@unicode.org>
+Date: Fri, 10 Jul 2020 14:28:22 -0500
+Subject: [PATCH] ICU-21175 Add cnvalias as a dependency of misc_res
+
+Upstream-Status: Backport [https://github.com/unicode-org/icu/commit/ee2d8b01034c3101de2bd58f9328daa076995e9e]
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ data/BUILDRULES.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/data/BUILDRULES.py b/data/BUILDRULES.py
+index 2338afd1f7..63b6e09273 100644
+--- a/data/BUILDRULES.py
++++ b/data/BUILDRULES.py
+@@ -361,7 +361,7 @@ def generate_misc(config, io, common_vars):
+         RepeatedExecutionRequest(
+             name = "misc_res",
+             category = "misc",
+-            dep_targets = [],
++            dep_targets = [DepTarget("cnvalias")], # ICU-21175
+             input_files = input_files,
+             output_files = output_files,
+             tool = IcuTool("genrb"),

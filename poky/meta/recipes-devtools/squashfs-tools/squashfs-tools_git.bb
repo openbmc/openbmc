@@ -1,6 +1,8 @@
 # Note, we can probably remove the lzma option as it has be replaced with xz,
 # and I don't think the kernel supports it any more.
 SUMMARY = "Tools for manipulating SquashFS filesystems"
+HOMEPAGE = "https://github.com/plougher/squashfs-tools"
+DESCRIPTION = "Tools to create and extract Squashfs filesystems."
 SECTION = "base"
 LICENSE = "GPL-2"
 LIC_FILES_CHKSUM = "file://../COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"

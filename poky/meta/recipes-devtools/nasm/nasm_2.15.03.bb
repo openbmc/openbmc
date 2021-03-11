@@ -1,5 +1,7 @@
 SUMMARY = "General-purpose x86 assembler"
 SECTION = "devel"
+HOMEPAGE = "http://www.nasm.us/"
+DESCRIPTION = "The Netwide Assembler (NASM) is an assembler and disassembler for the Intel x86 architecture."
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=90904486f8fbf1861cf42752e1a39efe"
 

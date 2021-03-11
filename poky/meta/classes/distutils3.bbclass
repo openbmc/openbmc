@@ -12,28 +12,30 @@ DISTUTILS_INSTALL_ARGS ?= "--root=${D} \
 DISTUTILS_PYTHON = "python3"
 DISTUTILS_PYTHON_class-native = "nativepython3"
 
+DISTUTILS_SETUP_PATH ?= "${S}"
+
 distutils3_do_configure() {
     :
 }
 
 distutils3_do_compile() {
-        cd ${S}
+        cd ${DISTUTILS_SETUP_PATH}
         NO_FETCH_BUILD=1 \
         STAGING_INCDIR=${STAGING_INCDIR} \
         STAGING_LIBDIR=${STAGING_LIBDIR} \
-        ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} ${S}/setup.py \
+        ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py \
         build --build-base=${B} ${DISTUTILS_BUILD_ARGS} || \
         bbfatal_log "'${PYTHON_PN} setup.py build ${DISTUTILS_BUILD_ARGS}' execution failed."
 }
 distutils3_do_compile[vardepsexclude] = "MACHINE"
 
 distutils3_do_install() {
-        cd ${S}
+        cd ${DISTUTILS_SETUP_PATH}
         install -d ${D}${PYTHON_SITEPACKAGES_DIR}
         STAGING_INCDIR=${STAGING_INCDIR} \
         STAGING_LIBDIR=${STAGING_LIBDIR} \
         PYTHONPATH=${D}${PYTHON_SITEPACKAGES_DIR} \
-        ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} ${S}/setup.py \
+        ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py \
         build --build-base=${B} install --skip-build ${DISTUTILS_INSTALL_ARGS} || \
         bbfatal_log "'${PYTHON_PN} setup.py install ${DISTUTILS_INSTALL_ARGS}' execution failed."
 

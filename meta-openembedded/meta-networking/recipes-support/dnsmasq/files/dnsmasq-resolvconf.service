@@ -8,7 +8,7 @@ PIDFile=/run/dnsmasq.pid
 ExecStartPre=/usr/bin/dnsmasq --test
 ExecStart=/usr/bin/dnsmasq -x /run/dnsmasq.pid -7 /etc/dnsmasq.d --local-service
 ExecStartPost=/usr/bin/dnsmasq-resolvconf-helper start
-ExecStopPre=/usr/bin/dnsmasq-resolvconf-helper stop
+ExecStop=/usr/bin/dnsmasq-resolvconf-helper stop
 ExecStop=/bin/kill $MAINPID
 ExecReload=/bin/kill -HUP $MAINPID
 

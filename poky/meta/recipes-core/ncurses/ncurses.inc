@@ -319,3 +319,8 @@ FILES_${PN}-terminfo-base = "\
 
 RSUGGESTS_${PN}-libtinfo = "${PN}-terminfo"
 RRECOMMENDS_${PN}-libtinfo = "${PN}-terminfo-base"
+
+# Putting terminfo into the sysroot adds around 2800 files to
+# each recipe specific sysroot. We can live without this, particularly
+# as many recipes may have native and target copies.
+SYSROOT_DIRS_remove = "${datadir}"

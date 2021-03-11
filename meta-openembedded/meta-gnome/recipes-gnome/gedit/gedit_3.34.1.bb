@@ -19,7 +19,7 @@ DEPENDS = " \
     gtksourceview4 \
 "
 
-inherit gnomebase gsettings itstool gnome-help gobject-introspection gtk-doc vala gettext features_check upstream-version-is-even mime-xdg
+inherit gnomebase gsettings itstool gnome-help gobject-introspection gtk-doc vala gettext features_check upstream-version-is-even mime-xdg python3targetconfig
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

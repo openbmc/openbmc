@@ -17,8 +17,10 @@
 #  NPM_INSTALL_DEV:
 #       Set to 1 to also install devDependencies.
 
+inherit python3native
+
 DEPENDS_prepend = "nodejs-native "
-RDEPENDS_${PN}_prepend = "nodejs "
+RDEPENDS_${PN}_append_class-target = " nodejs"
 
 NPM_INSTALL_DEV ?= "0"
 
@@ -237,9 +239,7 @@ python npm_do_compile() {
         sysroot = d.getVar("RECIPE_SYSROOT_NATIVE")
         nodedir = os.path.join(sysroot, d.getVar("prefix_native").strip("/"))
         configs.append(("nodedir", nodedir))
-        bindir = os.path.join(sysroot, d.getVar("bindir_native").strip("/"))
-        pythondir = os.path.join(bindir, "python-native", "python")
-        configs.append(("python", pythondir))
+        configs.append(("python", d.getVar("PYTHON")))
 
         # Add node-pre-gyp configuration
         args.append(("target_arch", d.getVar("NPM_ARCH")))

@@ -20,7 +20,7 @@ from oe.path import copyhardlinktree
 
 from wic import WicError
 from wic.pluginbase import SourcePlugin
-from wic.misc import get_bitbake_var
+from wic.misc import get_bitbake_var, exec_native_cmd
 
 logger = logging.getLogger('wic')
 
@@ -43,6 +43,15 @@ class RootfsPlugin(SourcePlugin):
                            (rootfs_dir, image_rootfs_dir))
 
         return os.path.realpath(image_rootfs_dir)
+
+    @staticmethod
+    def __get_pseudo(native_sysroot, rootfs, pseudo_dir):
+        pseudo = "export PSEUDO_PREFIX=%s/usr;" % native_sysroot
+        pseudo += "export PSEUDO_LOCALSTATEDIR=%s;" % pseudo_dir
+        pseudo += "export PSEUDO_PASSWD=%s;" % rootfs
+        pseudo += "export PSEUDO_NOSYMLINKEXP=1;"
+        pseudo += "%s " % get_bitbake_var("FAKEROOTCMD")
+        return pseudo
 
     @classmethod
     def do_prepare_partition(cls, part, source_params, cr, cr_workdir,
@@ -68,18 +77,55 @@ class RootfsPlugin(SourcePlugin):
                                "it is not a valid path, exiting" % part.rootfs_dir)
 
         part.rootfs_dir = cls.__get_rootfs_dir(rootfs_dir)
+        part.has_fstab = os.path.exists(os.path.join(part.rootfs_dir, "etc/fstab"))
+        pseudo_dir = os.path.join(part.rootfs_dir, "../pseudo")
+        if not os.path.lexists(pseudo_dir):
+            logger.warn("%s folder does not exist. "
+                        "Usernames and permissions will be invalid " % pseudo_dir)
+            pseudo_dir = None
 
         new_rootfs = None
+        new_pseudo = None
         # Handle excluded paths.
-        if part.exclude_path or part.include_path:
-            # We need a new rootfs directory we can delete files from. Copy to
-            # workdir.
+        if part.exclude_path or part.include_path or part.change_directory or part.update_fstab_in_rootfs:
+            # We need a new rootfs directory we can safely modify without
+            # interfering with other tasks. Copy to workdir.
             new_rootfs = os.path.realpath(os.path.join(cr_workdir, "rootfs%d" % part.lineno))
 
             if os.path.lexists(new_rootfs):
                 shutil.rmtree(os.path.join(new_rootfs))
 
-            copyhardlinktree(part.rootfs_dir, new_rootfs)
+            if part.change_directory:
+                cd = part.change_directory
+                if cd[-1] == '/':
+                    cd = cd[:-1]
+                if os.path.isabs(cd):
+                    logger.error("Must be relative: --change-directory=%s" % cd)
+                    sys.exit(1)
+                orig_dir = os.path.realpath(os.path.join(part.rootfs_dir, cd))
+                if not orig_dir.startswith(part.rootfs_dir):
+                    logger.error("'%s' points to a path outside the rootfs" % orig_dir)
+                    sys.exit(1)
+
+            else:
+                orig_dir = part.rootfs_dir
+            copyhardlinktree(orig_dir, new_rootfs)
+
+            # Convert the pseudo directory to its new location
+            if (pseudo_dir):
+                new_pseudo = os.path.realpath(
+                             os.path.join(cr_workdir, "pseudo%d" % part.lineno))
+                if os.path.lexists(new_pseudo):
+                    shutil.rmtree(new_pseudo)
+                os.mkdir(new_pseudo)
+                shutil.copy(os.path.join(pseudo_dir, "files.db"),
+                            os.path.join(new_pseudo, "files.db"))
+
+                pseudo_cmd = "%s -B -m %s -M %s" % (cls.__get_pseudo(native_sysroot,
+                                                                     new_rootfs,
+                                                                     new_pseudo),
+                                                    orig_dir, new_rootfs)
+                exec_native_cmd(pseudo_cmd, native_sysroot)
 
             for path in part.include_path or []:
                 copyhardlinktree(path, new_rootfs)
@@ -99,17 +145,34 @@ class RootfsPlugin(SourcePlugin):
                     logger.error("'%s' points to a path outside the rootfs" % orig_path)
                     sys.exit(1)
 
+                if new_pseudo:
+                    pseudo = cls.__get_pseudo(native_sysroot, new_rootfs, new_pseudo)
+                else:
+                    pseudo = None
                 if path.endswith(os.sep):
                     # Delete content only.
                     for entry in os.listdir(full_path):
                         full_entry = os.path.join(full_path, entry)
-                        if os.path.isdir(full_entry) and not os.path.islink(full_entry):
-                            shutil.rmtree(full_entry)
-                        else:
-                            os.remove(full_entry)
+                        rm_cmd = "rm -rf %s" % (full_entry)
+                        exec_native_cmd(rm_cmd, native_sysroot, pseudo)
                 else:
                     # Delete whole directory.
-                    shutil.rmtree(full_path)
+                    rm_cmd = "rm -rf %s" % (full_path)
+                    exec_native_cmd(rm_cmd, native_sysroot, pseudo)
+
+            # Update part.has_fstab here as fstab may have been added or
+            # removed by the above modifications.
+            part.has_fstab = os.path.exists(os.path.join(new_rootfs, "etc/fstab"))
+            if part.update_fstab_in_rootfs and part.has_fstab:
+                fstab_path = os.path.join(new_rootfs, "etc/fstab")
+                # Assume that fstab should always be owned by root with fixed permissions
+                install_cmd = "install -m 0644 %s %s" % (part.updated_fstab_path, fstab_path)
+                if new_pseudo:
+                    pseudo = cls.__get_pseudo(native_sysroot, new_rootfs, new_pseudo)
+                else:
+                    pseudo = None
+                exec_native_cmd(install_cmd, native_sysroot, pseudo)
 
         part.prepare_rootfs(cr_workdir, oe_builddir,
-                            new_rootfs or part.rootfs_dir, native_sysroot)
+                            new_rootfs or part.rootfs_dir, native_sysroot,
+                            pseudo_dir = new_pseudo or pseudo_dir)

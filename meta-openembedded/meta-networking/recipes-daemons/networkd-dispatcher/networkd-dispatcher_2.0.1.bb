@@ -12,9 +12,10 @@ inherit features_check systemd
 RDEPENDS_${PN} = "python3-pygobject python3-dbus"
 REQUIRED_DISTRO_FEATURES = "systemd"
 
-SRC_URI = "https://gitlab.com/craftyguy/networkd-dispatcher/-/archive/${PV}/networkd-dispatcher-${PV}.tar.bz2"
-SRC_URI[md5sum] = "304d7dcc21331ea295e207f8493cb8d8"
-SRC_URI[sha256sum] = "21f84c3646a043329dc64787e4e58dfce592b2559b0e3069af82c469805660c2"
+SRCREV = "333ef1ed1d7c7c17264fcf7629e5c2f78ab4112c"
+SRC_URI = "git://gitlab.com/craftyguy/networkd-dispatcher;protocol=https"
+
+S = "${WORKDIR}/git"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "networkd-dispatcher.service"

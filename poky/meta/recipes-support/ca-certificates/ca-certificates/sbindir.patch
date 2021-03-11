@@ -1,6 +1,12 @@
-Upstream-Status: Pending
+sbin/Makefile: Allow the sbin path to be configurable
 
-Let us alter the install destination of the script via SBINDIR
+Some project sharing ca-certificates from Debian allow configuration
+of the installation location. Make the sbin location configurable.
+
+Also ensure the target directory exists
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Upstream-Status: Submitted [https://salsa.debian.org/debian/ca-certificates/-/merge_requests/5]
 
 --- ca-certificates-20130119.orig/sbin/Makefile
 +++ ca-certificates-20130119/sbin/Makefile

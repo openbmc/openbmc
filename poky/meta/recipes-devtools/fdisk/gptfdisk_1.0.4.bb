@@ -1,5 +1,6 @@
 SUMMARY = "Utility for modifying GPT disk partitioning"
 DESCRIPTION = "GPT fdisk is a disk partitioning tool loosely modeled on Linux fdisk, but used for modifying GUID Partition Table (GPT) disks. The related FixParts utility fixes some common problems on Master Boot Record (MBR) disks."
+HOMEPAGE = "https://sourceforge.net/projects/gptfdisk/"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"

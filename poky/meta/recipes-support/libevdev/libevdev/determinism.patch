@@ -4,7 +4,8 @@ Sort to remove this inconsistency.
 RP 2020/2/7
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
-Upstream-Status: Pending
+Submitted: https://lists.freedesktop.org/archives/input-tools/2021-February/001560.html
+Upstream-Status: Backport [https://gitlab.freedesktop.org/libevdev/libevdev/-/commit/8d70f449892c6f7659e07bb0f06b8347677bb7d8]
 
 Index: a/libevdev/make-event-names.py
 ===================================================================

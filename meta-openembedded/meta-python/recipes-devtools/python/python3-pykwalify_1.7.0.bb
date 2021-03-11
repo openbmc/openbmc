@@ -10,8 +10,8 @@ SRC_URI[sha256sum] = "7e8b39c5a3a10bc176682b3bd9a7422c39ca247482df198b402e8015de
 SRC_URI += "file://0001-rule.py-fix-missing-comma.patch"
 
 PYPI_PACKAGE = "pykwalify"
+
 inherit setuptools3 pypi
-unset _PYTHON_SYSCONFIGDATA_NAME
 
 RDEPENDS_${PN} = "\
     ${PYTHON_PN}-dateutil \

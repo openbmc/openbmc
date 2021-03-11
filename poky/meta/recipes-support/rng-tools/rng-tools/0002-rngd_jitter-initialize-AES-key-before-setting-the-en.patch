@@ -1,0 +1,38 @@
+From 330c2ba14510c8103b30d5021adb18f1534031a1 Mon Sep 17 00:00:00 2001
+From: Matthias Schiffer <matthias.schiffer@tq-group.com>
+Date: Wed, 27 Jan 2021 16:18:09 +0100
+Subject: [PATCH] rngd_jitter: initialize AES key before setting the entropy
+ pipe to O_NONBLOCK
+
+Signed-off-by: Matthias Schiffer <matthias.schiffer@tq-group.com>
+---
+ rngd_jitter.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/rngd_jitter.c b/rngd_jitter.c
+index 25b3543..48f344c 100644
+--- a/rngd_jitter.c
++++ b/rngd_jitter.c
+@@ -463,10 +463,6 @@ int init_jitter_entropy_source(struct rng *ent_src)
+ 		pthread_mutex_unlock(&tdata[i].statemtx);
+ 	}
+ 
+-	flags = fcntl(pipefds[0], F_GETFL, 0);
+-	flags |= O_NONBLOCK;
+-	fcntl(pipefds[0], F_SETFL, flags);
+-
+ 	if (ent_src->rng_options[JITTER_OPT_USE_AES].int_val) {
+ #ifdef HAVE_LIBGCRYPT
+ 		/*
+@@ -487,6 +483,11 @@ int init_jitter_entropy_source(struct rng *ent_src)
+ 			ent_src->rng_options[JITTER_OPT_USE_AES].int_val = 1;
+ 		}
+ 		xread_jitter(aes_buf, tdata[0].buf_sz, ent_src);
++
++		flags = fcntl(pipefds[0], F_GETFL, 0);
++		flags |= O_NONBLOCK;
++		fcntl(pipefds[0], F_SETFL, flags);
++
+ #else
+ 		message_entsrc(ent_src,LOG_CONS|LOG_INFO, "libgcrypt not available. Disabling AES in JITTER source\n");
+ 		ent_src->rng_options[JITTER_OPT_USE_AES].int_val = 0;

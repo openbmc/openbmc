@@ -1,5 +1,5 @@
 #!/bin/sh
-export TIMEOUT_DURATION=120
+export TIMEOUT_DURATION=240
 chown nobody tests
 chown nobody tests/*
 chown nobody ../ptest

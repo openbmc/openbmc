@@ -1,5 +1,6 @@
 SUMMARY = "Perl scripting language"
 HOMEPAGE = "http://www.perl.org/"
+DESCRIPTION = "Perl is a highly capable, feature-rich programming language"
 SECTION = "devel"
 LICENSE = "Artistic-1.0 | GPL-1.0+"
 LIC_FILES_CHKSUM = "file://Copying;md5=5b122a36d0f6dc55279a0ebc69f3c60b \

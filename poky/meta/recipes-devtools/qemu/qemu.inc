@@ -28,6 +28,7 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0009-Fix-webkitgtk-builds.patch \
            file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
            file://0011-hw-i386-pc-fix-regression-in-parsing-vga-cmdline-par.patch \
+           file://0012-util-cacheinfo-fix-crash-when-compiling-with-uClibc.patch \
            file://CVE-2019-15890.patch \
            file://CVE-2020-1711.patch \
            file://CVE-2020-7039-1.patch \

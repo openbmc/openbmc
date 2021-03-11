@@ -1,5 +1,6 @@
 SUMMARY = "Name Service Switch module for Multicast DNS (zeroconf) name resolution"
 HOMEPAGE = "https://github.com/lathiat/nss-mdns"
+DESCRIPTION = "nss-mdns is a plugin for the GNU Name Service Switch (NSS) functionality of the GNU C Library (glibc) providing host name resolution via Multicast DNS (aka Zeroconf, aka Apple Rendezvous, aka Apple Bonjour), effectively allowing name resolution by common Unix/Linux programs in the ad-hoc mDNS domain .local."
 SECTION = "libs"
 
 LICENSE = "LGPLv2.1+"

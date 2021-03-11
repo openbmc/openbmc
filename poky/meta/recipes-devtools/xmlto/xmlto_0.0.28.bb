@@ -1,5 +1,6 @@
 SUMMARY = "A shell-script tool for converting XML files to various formats"
-HOMEPAGE = "https://releases.pagure.org/xmlto/"
+HOMEPAGE = "https://pagure.io/xmlto"
+DESCRIPTION = "Utility xmlto is a simple shell-script tool for converting XML files to various formats. It serves as easy to use command line frontend to make fine output without remembering many long options and searching for the syntax of the backends."
 SECTION = "docs/xmlto"
 LICENSE = "GPLv2"
 
@@ -29,7 +30,7 @@ RDEPENDS_${PN}_append_class-target = " \
                   libxslt-bin \
                   coreutils \
 "
-CACHED_CONFIGUREVARS += "ac_cv_path_TAIL=tail"
+CACHED_CONFIGUREVARS += "ac_cv_path_TAIL=tail ac_cv_path_GREP=grep"
 
 BBCLASSEXTEND = "native"
 

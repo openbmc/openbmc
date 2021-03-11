@@ -1,4 +1,5 @@
 SUMMARY = "ifupdown: basic ifup and ifdown used by initscripts"
+HOMEPAGE = "https://salsa.debian.org/debian/ifupdown"
 DESCRIPTION = "High level tools to configure network interfaces \
 This package provides the tools ifup and ifdown which may be used to \
 configure (or, respectively, deconfigure) network interfaces, based on \

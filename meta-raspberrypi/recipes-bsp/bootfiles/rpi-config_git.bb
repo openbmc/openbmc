@@ -194,6 +194,12 @@ do_deploy() {
         echo "dtoverlay=dwc2,dr_mode=peripheral" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
     fi
 
+    # DWC2 USB host mode support
+    if [ "${ENABLE_DWC2_HOST}" = "1" ]; then
+        echo "# Enable USB host mode" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+        echo "dtoverlay=dwc2,dr_mode=host" >> ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
+    fi
+
     # AT86RF23X support
     if [ "${ENABLE_AT86RF}" = "1" ]; then
         echo "# Enable AT86RF23X" >>${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt
