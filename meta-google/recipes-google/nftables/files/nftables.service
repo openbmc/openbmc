@@ -5,7 +5,7 @@ Before=network-pre.target
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/libexec/nft-configure.sh
-ExecStop=/bin/bash -c 'nft flush ruleset'
+ExecStop=/usr/sbin/nft flush ruleset
 
 [Install]
 WantedBy=multi-user.target

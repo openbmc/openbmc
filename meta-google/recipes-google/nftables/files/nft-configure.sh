@@ -9,6 +9,7 @@ for dir in /run/nftables /etc/nftables /usr/share/nftables; do
   let i+=1
 done
 rc=0
+nft flush ruleset || rc=$?
 for key in $(printf "%s\n" "${!basemap[@]}" | sort -r); do
   echo "Executing ${basemap[$key]}" >&2
   nft -f "${basemap[$key]}" || rc=$?
