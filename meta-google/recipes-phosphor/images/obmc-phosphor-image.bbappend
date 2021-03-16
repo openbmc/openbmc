@@ -29,5 +29,5 @@ OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " dummy-gbmc-update"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " virtual/bmc-update"
 
 # Jettison the cracklib package to save space.
-PACKAGE_INSTALL:remove:gbmc = "cracklib pam-plugin-cracklib"
-PACKAGE_EXCLUDE:gbmc = "cracklib pam-plugin-cracklib"
+PACKAGE_INSTALL:remove:gbmc = "cracklib libpwquality"
+PACKAGE_EXCLUDE:gbmc = "cracklib libpwquality"

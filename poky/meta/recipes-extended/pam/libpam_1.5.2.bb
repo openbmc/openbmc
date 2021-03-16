@@ -21,21 +21,23 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/Linux-PAM-${PV}.tar.xz \
            file://pam.d/common-session-noninteractive \
            file://pam.d/other \
            file://libpam-xtests.patch \
-           file://pam-security-abstract-securetty-handling.patch \
-           file://pam-unix-nullok-secure.patch \
-           file://crypt_configure.patch \
+           file://0001-run-xtests.sh-check-whether-files-exist.patch \
+           file://run-ptest \
            file://pam-volatiles.conf \
+           file://CVE-2022-28321-0002.patch \
+           file://0001-pam_motd-do-not-rely-on-all-filesystems-providing-a-.patch \
            "
 
-SRC_URI[md5sum] = "558ff53b0fc0563ca97f79e911822165"
-SRC_URI[sha256sum] = "eff47a4ecd833fbf18de9686632a70ee8d0794b79aecb217ebd0ce11db4cd0db"
+SRC_URI[sha256sum] = "e4ec7131a91da44512574268f493c6d8ca105c87091691b8e9b56ca685d4f94d"
 
 DEPENDS = "bison-native flex-native cracklib libxml2-native virtual/crypt"
 
 EXTRA_OECONF = "--includedir=${includedir}/security \
                 --libdir=${base_libdir} \
+                --with-systemdunitdir=${systemd_system_unitdir} \
                 --disable-nis \
                 --disable-regenerate-docu \
+                --disable-doc \
 		--disable-prelude"
 
 CFLAGS:append = " -fPIC "
@@ -51,7 +53,7 @@ PACKAGECONFIG[userdb] = "--enable-db=db,--enable-db=no,db,"
 PACKAGES += "${PN}-runtime ${PN}-xtests"
 FILES:${PN} = "${base_libdir}/lib*${SOLIBS}"
 FILES:${PN}-dev += "${base_libdir}/security/*.la ${base_libdir}/*.la ${base_libdir}/lib*${SOLIBSDEV}"
-FILES:${PN}-runtime = "${sysconfdir}"
+FILES:${PN}-runtime = "${sysconfdir} ${sbindir} ${systemd_system_unitdir}"
 FILES:${PN}-xtests = "${datadir}/Linux-PAM/xtests"
 
 PACKAGES_DYNAMIC += "^${MLPREFIX}pam-plugin-.*"
@@ -74,24 +76,16 @@ RDEPENDS:${PN}-runtime = "${PN}-${libpam_suffix} \
 RDEPENDS:${PN}-xtests = "${PN}-${libpam_suffix} \
     ${MLPREFIX}pam-plugin-access-${libpam_suffix} \
     ${MLPREFIX}pam-plugin-debug-${libpam_suffix} \
-    ${MLPREFIX}pam-plugin-cracklib-${libpam_suffix} \
     ${MLPREFIX}pam-plugin-pwhistory-${libpam_suffix} \
     ${MLPREFIX}pam-plugin-succeed-if-${libpam_suffix} \
     ${MLPREFIX}pam-plugin-time-${libpam_suffix} \
-    coreutils"
+    bash coreutils"
 
 # FIXME: Native suffix breaks here, disable it for now
 RRECOMMENDS:${PN} = "${PN}-runtime-${libpam_suffix}"
-RRECOMMENDS:${PN}_class-native = ""
+RRECOMMENDS:${PN}:class-native = ""
 
 python populate_packages:prepend () {
-    def pam_plugin_append_file(pn, dir, file):
-        nf = os.path.join(dir, file)
-        of = d.getVar('FILES:' + pn)
-        if of:
-            nf = of + " " + nf
-        d.setVar('FILES:' + pn, nf)
-
     def pam_plugin_hook(file, pkg, pattern, format, basename):
         pn = d.getVar('PN')
         libpam_suffix = d.getVar('libpam_suffix')
@@ -119,13 +113,6 @@ python populate_packages:prepend () {
 
     do_split_packages(d, pam_libdir, r'^pam(.*)\.so$', pam_pkgname,
                       'PAM plugin for %s', hook=pam_plugin_hook, extra_depends='')
-    pam_plugin_append_file('%spam-plugin-unix' % mlprefix, pam_sbindir, 'unix_chkpwd')
-    pam_plugin_append_file('%spam-plugin-unix' % mlprefix, pam_sbindir, 'unix_update')
-    pam_plugin_append_file('%spam-plugin-tally' % mlprefix, pam_sbindir, 'pam_tally')
-    pam_plugin_append_file('%spam-plugin-tally2' % mlprefix, pam_sbindir, 'pam_tally2')
-    pam_plugin_append_file('%spam-plugin-timestamp' % mlprefix, pam_sbindir, 'pam_timestamp_check')
-    pam_plugin_append_file('%spam-plugin-mkhomedir' % mlprefix, pam_sbindir, 'mkhomedir_helper')
-    pam_plugin_append_file('%spam-plugin-console' % mlprefix, pam_sbindir, 'pam_console_apply')
     do_split_packages(d, pam_filterdir, r'^(.*)$', 'pam-filter-%s', 'PAM filter for %s', extra_depends='')
 }
 
@@ -163,6 +150,10 @@ do_install() {
 	if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
 		echo "session optional pam_systemd.so" >> ${D}${sysconfdir}/pam.d/common-session
 	fi
+	if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','false','true',d)}; then
+		install -d ${D}/${libdir}/
+		mv ${D}/${base_libdir}/pkgconfig ${D}/${libdir}/
+	fi
 }
 
 do_install_ptest() {
@@ -173,7 +164,7 @@ do_install_ptest() {
     fi
 }
 
-pkg_postinst_${PN}() {
+pkg_postinst:${PN}() {
          if [ -z "$D" ] && [ -e /etc/init.d/populate-volatile.sh ] ; then
                  /etc/init.d/populate-volatile.sh update
          fi

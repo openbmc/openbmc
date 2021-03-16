@@ -8,14 +8,19 @@
 # traditional Unix authentication mechanisms.
 
 # here are the per-package modules (the "Primary" block)
-auth	[success=ok user_unknown=ignore default=2]	pam_tally2.so deny=0 unlock_time=0
 # Try for local user first, and then try for ldap
 auth	[success=2 default=ignore]	pam_unix.so quiet
 -auth    [success=1 default=ignore]  	pam_ldap.so ignore_unknown_user ignore_authinfo_unavail
-# here's the fallback if no module succeeds
-auth	requisite			pam_deny.so
+# Control gets here when no authentication module succeeds.  Increment the
+# failure tally and return failure status to PAM.
+auth    [default=die]                   pam_faillock.so authfail
+# Control gets here when authentication succeeds.  Check if the user is locked
+# out due to consecutive authentication failures and return status accordingly.
+auth    sufficient                      pam_faillock.so authsucc
+# If authsucc failed, deny access
+auth    requisite                       pam_deny.so
 # prime the stack with a positive return value if there isn't one already;
 # this avoids us returning an error just because nothing sets a success code
 # since the modules above will each just jump around
-auth	required			pam_permit.so
+auth    required                        pam_permit.so
 # and here are more per-package modules (the "Additional" block)
