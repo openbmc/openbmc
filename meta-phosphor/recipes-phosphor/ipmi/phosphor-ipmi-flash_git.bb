@@ -36,6 +36,8 @@ PACKAGECONFIG[host-bios] = "--enable-host-bios, --disable-host-bios"
 PACKAGECONFIG[aspeed-p2a] = "--enable-aspeed-p2a, --disable-aspeed-p2a"
 PACKAGECONFIG[aspeed-lpc] = "--enable-aspeed-lpc, --disable-aspeed-lpc"
 PACKAGECONFIG[nuvoton-lpc] = "--enable-nuvoton-lpc, --disable-nuvoton-lpc"
+PACKAGECONFIG[nuvoton-p2a-vga] = "--enable-nuvoton-p2a-vga, --disable-nuvoton-p2a-vga"
+PACKAGECONFIG[nuvoton-p2a-mbox] = "--enable-nuvoton-p2a-mbox, --disable-nuvoton-p2a-mbox"
 PACKAGECONFIG[net-bridge] = "--enable-net-bridge, --disable-net-bridge"
 
 EXTRA_OECONF = "--disable-tests --disable-build-host-tool"
