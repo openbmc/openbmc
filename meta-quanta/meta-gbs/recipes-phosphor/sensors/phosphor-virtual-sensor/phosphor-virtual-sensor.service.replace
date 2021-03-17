@@ -8,6 +8,7 @@ ExecStartPre=mapper wait /xyz/openbmc_project/sensors/temperature/inlet
 ExecStartPre=mapper wait /xyz/openbmc_project/sensors/temperature/outlet_0
 ExecStartPre=mapper wait /xyz/openbmc_project/sensors/temperature/outlet_1
 ExecStart=/usr/bin/virtual-sensor
+ExecStartPost=/usr/bin/setMaxMinValue.sh
 Type=dbus
 BusName=xyz.openbmc_project.VirtualSensor
 SyslogIdentifier=phosphor-virtual-sensor
