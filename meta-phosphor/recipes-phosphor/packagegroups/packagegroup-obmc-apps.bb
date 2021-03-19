@@ -43,7 +43,7 @@ RDEPENDS:${PN}-bmc-state-mgmt = " \
 SUMMARY:${PN}-bmcweb = "bmcweb support"
 RDEPENDS:${PN}-bmcweb = " \
         bmcweb \
-        phosphor-bmcweb-cert-config \
+        phosphor-certificate-manager \
         "
 
 SUMMARY:${PN}-chassis-state-mgmt = "Chassis state management"
@@ -196,5 +196,4 @@ RDEPENDS:${PN}-user-mgmt-ldap = " \
         nss-pam-ldapd \
         phosphor-ldap \
         phosphor-nslcd-cert-config \
-        phosphor-nslcd-authority-cert-config \
         "

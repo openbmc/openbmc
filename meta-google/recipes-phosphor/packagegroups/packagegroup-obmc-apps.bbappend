@@ -8,4 +8,4 @@ RDEPENDS:${PN}-extras:remove:gbmc = "phosphor-nslcd-authority-cert-config"
 RDEPENDS:${PN}-extrasdev:remove:gbmc = "rest-dbus"
 
 # Disable bmcweb for gbmc machines without redfish.
-RDEPENDS:${PN}-extras:remove:gbmc = '${@bb.utils.contains:any("MACHINE_FEATURES", ['redfish'], "", "bmcweb phosphor-bmcweb-cert-config", d)}'
+RDEPENDS:${PN}-extras:remove:gbmc = '${@bb.utils.contains:any("MACHINE_FEATURES", ['redfish'], "", "bmcweb", d)}'
