@@ -24,6 +24,7 @@
     ],
     "cooling_unit": [
         {"instance": 0, "name": "/ZONE0"},
-        {"instance": 1, "name": "/ZONE1"}
+        {"instance": 1, "name": "/ZONE1"},
+        {"instance": 2, "name": "/ZONE2"}
     ]
 }
