@@ -739,3 +739,24 @@
     sensorReadingType: 111
     sensorType: 31
     serviceInterface: org.freedesktop.DBus.Properties
+
+254:
+    sensorType: 2
+    path: /xyz/openbmc_project/sensors/voltage/vbat
+    sensorReadingType: 1
+    # This gives the measurement 1.800..3.585 volts with a step 0.007
+    multiplierM: 7
+    offsetB: 18
+    bExp: 2
+    rExp: -3
+    scale: 0
+    unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+    mutability: Mutability::Read
+    readingType: readingData
+    serviceInterface: org.freedesktop.DBus.Properties
+    interfaces:
+        xyz.openbmc_project.Sensor.Value:
+            Value:
+                Offsets:
+                    255:
+                        type: double
