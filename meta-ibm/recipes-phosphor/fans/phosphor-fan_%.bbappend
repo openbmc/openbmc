@@ -73,6 +73,7 @@ SRC_URI_append_rainier = " \
     file://rainier-1s4u/fans.json \
     file://rainier-2u/zones.json \
     file://rainier-4u/zones.json \
+    file://rainier-1s4u/zones.json \
     file://everest/fans.json \
     file://everest/zones.json"
 do_install_append_rainier() {
@@ -88,8 +89,10 @@ do_install_append_rainier() {
 
     install -d ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier-2u/
     install -d ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier-4u/
+    install -d ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier-1s4u/
     install -m 0644 ${WORKDIR}/rainier-2u/zones.json ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier-2u/
     install -m 0644 ${WORKDIR}/rainier-4u/zones.json ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier-4u/
+    install -m 0644 ${WORKDIR}/rainier-1s4u/zones.json ${D}/${datadir}/phosphor-fan-presence/control/ibm,rainier-1s4u/
 
     # Install Everest fan config files
     install -d ${D}/${datadir}/phosphor-fan-presence/control/ibm,everest
@@ -102,6 +105,7 @@ FILES_${PN}-control_append_rainier = " \
     ${datadir}/phosphor-fan-presence/control/ibm,rainier-1s4u/fans.json \
     ${datadir}/phosphor-fan-presence/control/ibm,rainier-2u/zones.json \
     ${datadir}/phosphor-fan-presence/control/ibm,rainier-4u/zones.json \
+    ${datadir}/phosphor-fan-presence/control/ibm,rainier-1s4u/zones.json \
     ${datadir}/phosphor-fan-presence/control/ibm,everest/fans.json \
     ${datadir}/phosphor-fan-presence/control/ibm,everest/zones.json"
 
