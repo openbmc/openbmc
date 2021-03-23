@@ -1,0 +1,90 @@
+{
+   "fans": [
+      {
+         "inventory": "/system/chassis/motherboard/fan0",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 30,
+         "fan_missing_error_delay": 20,
+         "nonfunc_rotor_error_delay": 0,
+         "sensors": [
+            {
+               "name": "fan0_0",
+               "has_target": true
+            }
+         ]
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan1",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 30,
+         "fan_missing_error_delay": 20,
+         "nonfunc_rotor_error_delay": 0,
+         "sensors": [
+            {
+               "name": "fan1_0",
+               "has_target": true
+            }
+         ]
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan2",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 30,
+         "fan_missing_error_delay": 20,
+         "nonfunc_rotor_error_delay": 0,
+         "sensors": [
+            {
+               "name": "fan2_0",
+               "has_target": true
+            }
+         ]
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan3",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 30,
+         "fan_missing_error_delay": 20,
+         "nonfunc_rotor_error_delay": 0,
+         "sensors": [
+            {
+               "name": "fan3_0",
+               "has_target": true
+            }
+         ]
+      }
+   ],
+   "fault_handling":
+   {
+       "num_nonfunc_rotors_before_error": 1,
+
+       "power_off_config":
+       [
+           {
+                "type": "hard",
+                "cause": "missing_fan_frus",
+                "count": 1,
+                "delay": 25,
+                "state": "at_pgood"
+            },
+            {
+                "type": "epow",
+                "cause": "nonfunc_fan_rotors",
+                "count": 2,
+                "service_mode_delay": 300,
+                "meltdown_delay": 300
+            }
+       ]
+   }
+}
