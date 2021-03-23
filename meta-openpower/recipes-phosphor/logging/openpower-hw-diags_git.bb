@@ -25,3 +25,8 @@ DEPENDS = "boost libgpiod pdbg phosphor-logging sdbusplus openpower-libhei \
 
 # This is required so that libhei is installed with the chip data files.
 RDEPENDS_${PN} += "openpower-libhei"
+
+# Conditionally pull in PHAL APIs, if available.
+PACKAGECONFIG ??= "${@bb.utils.filter('OBMC_MACHINE_FEATURES', 'phal', d)}"
+PACKAGECONFIG[phal] = "-Dphal=enabled, -Dphal=disabled, pdata"
+
