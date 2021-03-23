@@ -5,6 +5,9 @@ SYSTEMD_SERVICE_${PN}-ledmanager_append_rainier += "obmc-led-set-all-groups-asse
 # Copies config file having arguments for led-set-all-groups-asserted.sh
 SYSTEMD_ENVIRONMENT_FILE_${PN}-ledmanager_append_rainier +="obmc/led/set-all/groups/config"
 
+# Use the JSON configuration file at runtime than the static led.yaml
+PACKAGECONFIG_append_rainier = " use-json"
+
 pkg_postinst_${PN}-ledmanager_rainier () {
 
     # Needed this to run as part of BMC boot
