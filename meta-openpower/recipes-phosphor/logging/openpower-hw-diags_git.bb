@@ -19,7 +19,6 @@ SRC_URI = "git://github.com/openbmc/openpower-hw-diags"
 SRCREV = "0b8368cb0aa251032eb18b5c938d009e27f0b152"
 
 SYSTEMD_SERVICE_${PN} = "attn_handler.service"
-FILES_${PN} += "${UNITDIR}/attn_handler.service"
 
 DEPENDS = "boost libgpiod pdbg phosphor-logging sdbusplus openpower-libhei \
            nlohmann-json"
