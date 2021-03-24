@@ -6,7 +6,8 @@ SYSTEMD_SERVICE_${PN}-ledmanager_append_rainier += "obmc-led-set-all-groups-asse
 SYSTEMD_ENVIRONMENT_FILE_${PN}-ledmanager_append_rainier +="obmc/led/set-all/groups/config"
 
 # Use the JSON configuration file at runtime than the static led.yaml
-PACKAGECONFIG_append_rainier = " use-json"
+# Also, enable Lamp Test feature for rainier systems
+PACKAGECONFIG_append_rainier = " use-json use-lamp-test"
 
 pkg_postinst_${PN}-ledmanager_rainier () {
 
