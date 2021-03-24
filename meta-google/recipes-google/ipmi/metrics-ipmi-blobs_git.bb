@@ -13,7 +13,7 @@ DEPENDS += "protobuf-native"
 DEPENDS += "protobuf"
 
 SRC_URI = "git://github.com/openbmc/google-misc"
-SRCREV = "3f43b7eebe17c96c13643018c927f38c0a071868"
+SRCREV = "b056df698ca4405b7adfa5bbf931f4b8a9431e55"
 S = "${WORKDIR}/git/metrics-ipmi-blobs"
 
 FILES_${PN} += "${libdir}/ipmid-providers/libmetricsblob.so*"
