@@ -11,3 +11,5 @@ OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = \
   '${@"" if not d.getVar("GBMC_NCSI_IF_NAME") else " gbmc-ncsi-config"}'
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = \
   '${@"" if not d.getVar("GBMC_MAC_EEPROM_OF_NAME") else " gbmc-mac-config"}'
+OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = \
+  '${@"" if not d.getVar("GBMC_KCS_DEV") else " gbmc-kcs-config"}'
