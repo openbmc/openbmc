@@ -8,7 +8,7 @@ PACKAGECONFIG_remove = "\
 
 inherit systemd
 
-FILES_${PN} += "${systemd_unitdir}/system/rngd.service.d"
+FILES_${PN} += "${systemd_system_unitdir}/rngd.service.d"
 
 do_install_append() {
 
@@ -18,9 +18,9 @@ do_install_append() {
     # go slower.
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         if ${@bb.utils.contains('PACKAGECONFIG', 'libjitterentropy', 'true', 'false', d)}; then
-            install -d ${D}${systemd_unitdir}/system/rngd.service.d
+            install -d ${D}${systemd_system_unitdir}/rngd.service.d
             install -m 644 ${WORKDIR}/10-nice.conf \
-                ${D}${systemd_unitdir}/system/rngd.service.d
+                ${D}${systemd_system_unitdir}/rngd.service.d
         fi
     fi
 }

@@ -36,7 +36,7 @@ SYSTEMD_SERVICE_${PN} += "obmc-console-ssh@.service \
                 obmc-console@.service \
                 "
 
-FILES_${PN} += "/lib/systemd/system/obmc-console-ssh@.service.d/use-socket.conf"
+FILES_${PN} += "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
 
 do_install_append() {
         # Install the server configuration
