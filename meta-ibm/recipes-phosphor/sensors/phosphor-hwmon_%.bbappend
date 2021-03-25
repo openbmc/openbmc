@@ -74,7 +74,7 @@ CHIPS_witherspoon-tacoma = " \
                bus@1e78a000/i2c-bus@500/tmp275@4a \
                "
 
-CHIPS_rainier = " \
+CHIPS_p10bmc = " \
                bus@1e78a000/i2c-bus@400/max31785@52 \
                bus@1e78a000/i2c-bus@780/i2c-switch@70/i2c@3/max31785@52 \
                "
@@ -110,7 +110,7 @@ SYSTEMD_ENVIRONMENT_FILE_${PN}_append_ibm-ac-server = " ${@compose_list(d, 'ENVS
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_ibm-ac-server = " ${@compose_list(d, 'ENVS', 'OCCITEMS')}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_mihawk = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_mihawk = " ${@compose_list(d, 'ENVS', 'OCCITEMS')}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_rainier = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_p10bmc = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
 
 # Enable and install the max31785-msl package
 PACKAGECONFIG_append_ibm-ac-server = " max31785-msl"
