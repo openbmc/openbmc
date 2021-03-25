@@ -12,8 +12,8 @@ PV = "1.0+git${SRCPV}"
 
 KCS_DEVICE ?= "ipmi-kcs3"
 
-SYSTEMD_SERVICE_${PN} = " ${PN}@${KCS_DEVICE}.service "
-FILES_${PN} += " ${systemd_system_unitdir}/${PN}@.service "
+SYSTEMD_SERVICE_${PN} = "${PN}@${KCS_DEVICE}.service"
+FILES_${PN} += "${systemd_system_unitdir}/${PN}@.service"
 
 PROVIDES += "virtual/obmc-host-ipmi-hw"
 RPROVIDES_${PN} += "virtual-obmc-host-ipmi-hw"
