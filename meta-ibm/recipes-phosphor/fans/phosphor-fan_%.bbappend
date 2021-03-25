@@ -34,16 +34,16 @@ SYSTEMD_OVERRIDE_phosphor-fan-control_witherspoon += "fan-watchdog-monitor.conf:
 SYSTEMD_OVERRIDE_phosphor-fan-control_witherspoon += "fan-watchdog-monitor.conf:phosphor-fan-control@0.service.d/fan-watchdog-monitor.conf"
 SYSTEMD_OVERRIDE_phosphor-fan-monitor_witherspoon += "fan-watchdog-monitor.conf:phosphor-fan-monitor-init@0.service.d/fan-watchdog-monitor.conf"
 SYSTEMD_OVERRIDE_phosphor-fan-monitor_witherspoon += "fan-watchdog-monitor.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-monitor.conf"
-SYSTEMD_OVERRIDE_phosphor-fan-control_rainier += "fan-watchdog-monitor.conf:phosphor-fan-control-init@0.service.d/fan-watchdog-monitor.conf"
-SYSTEMD_OVERRIDE_phosphor-fan-control_rainier += "fan-watchdog-monitor.conf:phosphor-fan-control@0.service.d/fan-watchdog-monitor.conf"
-SYSTEMD_OVERRIDE_phosphor-fan-monitor_rainier += "fan-watchdog-monitor.conf:phosphor-fan-monitor-init@0.service.d/fan-watchdog-monitor.conf"
-SYSTEMD_OVERRIDE_phosphor-fan-monitor_rainier += "fan-watchdog-monitor.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-monitor.conf"
+SYSTEMD_OVERRIDE_phosphor-fan-control_p10bmc += "fan-watchdog-monitor.conf:phosphor-fan-control-init@0.service.d/fan-watchdog-monitor.conf"
+SYSTEMD_OVERRIDE_phosphor-fan-control_p10bmc += "fan-watchdog-monitor.conf:phosphor-fan-control@0.service.d/fan-watchdog-monitor.conf"
+SYSTEMD_OVERRIDE_phosphor-fan-monitor_p10bmc += "fan-watchdog-monitor.conf:phosphor-fan-monitor-init@0.service.d/fan-watchdog-monitor.conf"
+SYSTEMD_OVERRIDE_phosphor-fan-monitor_p10bmc += "fan-watchdog-monitor.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-monitor.conf"
 
 #These services need to be stopped when watchdog expires
 SYSTEMD_OVERRIDE_phosphor-fan-control_witherspoon += "fan-watchdog-conflicts.conf:phosphor-fan-control@0.service.d/fan-watchdog-conflicts.conf"
 SYSTEMD_OVERRIDE_phosphor-fan-monitor_witherspoon += "fan-watchdog-conflicts.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-conflicts.conf"
-SYSTEMD_OVERRIDE_phosphor-fan-control_rainier += "fan-watchdog-conflicts.conf:phosphor-fan-control@0.service.d/fan-watchdog-conflicts.conf"
-SYSTEMD_OVERRIDE_phosphor-fan-monitor_rainier += "fan-watchdog-conflicts.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-conflicts.conf"
+SYSTEMD_OVERRIDE_phosphor-fan-control_p10bmc += "fan-watchdog-conflicts.conf:phosphor-fan-control@0.service.d/fan-watchdog-conflicts.conf"
+SYSTEMD_OVERRIDE_phosphor-fan-monitor_p10bmc += "fan-watchdog-conflicts.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-conflicts.conf"
 
 # Witherspoon fan control service linking
 # Link fan control init service
@@ -61,13 +61,13 @@ EXTRA_OECONF_append_witherspoon = " --disable-json-control"
 RDEPENDS_${PN}-presence-tach_append_witherspoon = " phosphor-fan-presence-config"
 RDEPENDS_${PN}-monitor_append_witherspoon = " phosphor-fan-monitor-config"
 
-PACKAGECONFIG_append_rainier = " json sensor-monitor"
-FAN_PACKAGES_append_rainier = " sensor-monitor"
-RDEPENDS_${PN}-presence-tach_append_rainier = " phosphor-fan-presence-config"
-RDEPENDS_${PN}-monitor_append_rainier = " phosphor-fan-monitor-config"
+PACKAGECONFIG_append_p10bmc = " json sensor-monitor"
+FAN_PACKAGES_append_p10bmc = " sensor-monitor"
+RDEPENDS_${PN}-presence-tach_append_p10bmc = " phosphor-fan-presence-config"
+RDEPENDS_${PN}-monitor_append_p10bmc = " phosphor-fan-monitor-config"
 
 # Install fan control JSON config files
-SRC_URI_append_rainier = " \
+SRC_URI_append_p10bmc = " \
     file://manager.json \
     file://rainier/fans.json \
     file://rainier-1s4u/fans.json \
@@ -76,7 +76,7 @@ SRC_URI_append_rainier = " \
     file://rainier-1s4u/zones.json \
     file://everest/fans.json \
     file://everest/zones.json"
-do_install_append_rainier() {
+do_install_append_p10bmc() {
     # Install fan control manager config file
     install -d ${D}/${datadir}/phosphor-fan-presence/control/
     install -m 0644 ${WORKDIR}/manager.json ${D}/${datadir}/phosphor-fan-presence/control/
@@ -99,7 +99,7 @@ do_install_append_rainier() {
     install -m 0644 ${WORKDIR}/everest/fans.json ${D}/${datadir}/phosphor-fan-presence/control/ibm,everest/
     install -m 0644 ${WORKDIR}/everest/zones.json ${D}/${datadir}/phosphor-fan-presence/control/ibm,everest/
 }
-FILES_${PN}-control_append_rainier = " \
+FILES_${PN}-control_append_p10bmc = " \
     ${datadir}/phosphor-fan-presence/control/manager.json \
     ${datadir}/phosphor-fan-presence/control/ibm,rainier/fans.json \
     ${datadir}/phosphor-fan-presence/control/ibm,rainier-1s4u/fans.json \
