@@ -1,9 +1,9 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
-PACKAGECONFIG_append_rainier = " host-dump-transport-pldm"
+PACKAGECONFIG_append_p10bmc = " host-dump-transport-pldm"
 PACKAGECONFIG_append_witherspoon-tacoma = " host-dump-transport-pldm"
 
-PACKAGECONFIG_append_rainier = " openpower-dumps-extension"
+PACKAGECONFIG_append_p10bmc = " openpower-dumps-extension"
 PACKAGECONFIG_append_witherspoon-tacoma = " openpower-dumps-extension"
 
 SRC_URI += "file://plugins.d/ibm_elogall"
@@ -34,6 +34,6 @@ install_dreport_header() {
 }
 
 IBM_INSTALL_POSTFUNCS = "install_ibm_plugins link_ibm_plugins"
-IBM_INSTALL_POSTFUNCS_rainier += "install_dreport_header"
+IBM_INSTALL_POSTFUNCS_p10bmc += "install_dreport_header"
 
 do_install[postfuncs] += "${IBM_INSTALL_POSTFUNCS}"
