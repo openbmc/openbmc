@@ -13,8 +13,8 @@ install_network_configuration(){
     install -m 0644 ${WORKDIR}/inventory-object-map.json ${D}${datadir}/network/config.json
 }
 
-SRC_URI_append_rainier = " file://inventory-object-map.json"
-do_install_append_rainier(){
+SRC_URI_append_p10bmc = " file://inventory-object-map.json"
+do_install_append_p10bmc(){
     install_network_configuration
 }
 
