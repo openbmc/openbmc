@@ -1,18 +1,18 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SYSTEMD_SERVICE_${PN}_append_rainier += "obmc-led-set-all-groups-asserted@.service obmc-led-create-virtual-leds@.service"
+SYSTEMD_SERVICE_${PN}_append_p10bmc += "obmc-led-set-all-groups-asserted@.service obmc-led-create-virtual-leds@.service"
 
 # Copies config file having arguments for led-set-all-groups-asserted.sh
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_rainier +="obmc/led/set-all/groups/config"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_p10bmc +="obmc/led/set-all/groups/config"
 
 # Use the JSON configuration file at runtime than the static led.yaml
-# Also, enable Lamp Test feature for rainier systems
-PACKAGECONFIG_append_rainier = " use-json use-lamp-test"
+# Also, enable Lamp Test feature for p10bmc systems
+PACKAGECONFIG_append_p10bmc = " use-json use-lamp-test"
 
-# Install the lamp test override file for rainier
-SRC_URI_append_rainier = " file://lamp-test-led-overrides.json"
+# Install the lamp test override file for p10bmc
+SRC_URI_append_p10bmc = " file://lamp-test-led-overrides.json"
 
-pkg_postinst_${PN}_rainier () {
+pkg_postinst_${PN}_p10bmc () {
 
     # Needed this to run as part of BMC boot
     mkdir -p $D$systemd_system_unitdir/multi-user.target.wants
@@ -39,7 +39,7 @@ pkg_postinst_${PN}_rainier () {
     ln -s $TARGET_ID $LINK_ID
 }
 
-pkg_prerm_${PN}_rainier () {
+pkg_prerm_${PN}_p10bmc () {
 
     LINK="$D$systemd_system_unitdir/multi-user.target.wants/obmc-led-set-all-groups-asserted@false.service"
     rm $LINK
@@ -55,7 +55,7 @@ pkg_prerm_${PN}_rainier () {
 }
 
 # Install lamp test override json
-do_install_append_rainier() {
+do_install_append_p10bmc() {
     install -d ${D}${datadir}/${BPN}/
     install -m 0644 ${WORKDIR}/lamp-test-led-overrides.json ${D}${datadir}/${BPN}/
 }
