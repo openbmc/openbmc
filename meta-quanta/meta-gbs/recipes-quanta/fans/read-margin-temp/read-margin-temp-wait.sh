@@ -1,22 +1,15 @@
 #!/bin/bash
 
-MARGIN_TABLE_FILE="/usr/share/read-margin-temp/config-margin.json"
+MARGIN_TABLE_FILE_IN="/usr/share/read-margin-temp/config-margin.json.in"
+TEMP_FILE="$(mktemp)"
+cp "$MARGIN_TABLE_FILE_IN" "$TEMP_FILE"
 
-target_num="$(cat $MARGIN_TABLE_FILE | grep '"target"' | wc -l)"
-
-cpu_hwmon="$(ls -la /sys/class/hwmon | grep f0082000 |  head -n 1 | tail -n +1 | cut -d '/' -f 11)"
-
-# replace by the real cpu temperature hwmon path in runtime
-if [[ "$cpu_hwmon" != "" ]]
-then
-     sed -i "s/cpu_hwmon/$cpu_hwmon/g" $MARGIN_TABLE_FILE
-fi
+target_num="$(cat $TEMP_FILE | grep '"target"' | wc -l)"
 
 # wait target dbus
-for ((i=0; i<$target_num; i++))
-do
+for ((i = 0; i < ${target_num}; i++)); do
     line_num=$((i+1))
-    path="$(cat $MARGIN_TABLE_FILE | grep '"target"' | head -n ${line_num} | tail -n +${line_num} | cut -d '"' -f 4)"
+    path="$(cat $TEMP_FILE | grep '"target"' | head -n ${line_num} | tail -n +${line_num} | cut -d '"' -f 4)"
     mapper wait $path
 done
 
@@ -24,7 +17,7 @@ nvmePath="/xyz/openbmc_project/sensors/temperature/nvme"
 nvmeInventoryPath="/xyz/openbmc_project/inventory/system/chassis/motherboard/nvme"
 # Get and Set WCTEMP
 for ((i = 0; i < 16; i++)); do
-    name=WCTemp$(printf "%02d" $i)
+    name="@WCTemp$(printf "%02d" $i)@"
     wcTemp=72000
     presentState=$(busctl get-property \
         xyz.openbmc_project.Inventory.Manager \
@@ -42,8 +35,11 @@ for ((i = 0; i < 16; i++)); do
         wcTemp=$((wcTemp * 1000))
     fi
 
-    sed -i "s/$name/${wcTemp}/g" $MARGIN_TABLE_FILE
+    sed -i "s/$name/${wcTemp}/g" $TEMP_FILE
 done
+
+# Use shell parameter expansion to trim the ".in" suffix
+mv "$TEMP_FILE" "${MARGIN_TABLE_FILE_IN%".in"}"
 
 # start read margin temp
 /usr/bin/read-margin-temp &

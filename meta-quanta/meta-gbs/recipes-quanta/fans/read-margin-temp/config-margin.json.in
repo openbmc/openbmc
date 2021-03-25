@@ -22,7 +22,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme0",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp00,
+                "maxTemp": @WCTemp00@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -37,7 +37,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme1",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp01,
+                "maxTemp": @WCTemp01@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -52,7 +52,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme2",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp02,
+                "maxTemp": @WCTemp02@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -67,7 +67,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme3",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp03,
+                "maxTemp": @WCTemp03@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -82,7 +82,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme4",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp04,
+                "maxTemp": @WCTemp04@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -97,7 +97,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme5",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp05,
+                "maxTemp": @WCTemp05@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -112,7 +112,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme6",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp06,
+                "maxTemp": @WCTemp06@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -127,7 +127,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme7",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp07,
+                "maxTemp": @WCTemp07@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -142,7 +142,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme8",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp08,
+                "maxTemp": @WCTemp08@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -157,7 +157,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme9",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp09,
+                "maxTemp": @WCTemp09@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -172,7 +172,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme10",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp10,
+                "maxTemp": @WCTemp10@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -187,7 +187,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme11",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp11,
+                "maxTemp": @WCTemp11@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -202,7 +202,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme12",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp12,
+                "maxTemp": @WCTemp12@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -217,7 +217,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme13",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp13,
+                "maxTemp": @WCTemp13@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -232,7 +232,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme14",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp14,
+                "maxTemp": @WCTemp14@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
@@ -247,7 +247,7 @@
             "path": "/xyz/openbmc_project/sensors/temperature/nvme15",
             "parameters": {
                 "type": "",
-                "maxTemp": WCTemp15,
+                "maxTemp": @WCTemp15@,
                 "path": "",
                 "sysLabel": "",
                 "targetTemp": -1,
