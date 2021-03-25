@@ -2,7 +2,7 @@
     "sensors" : [
         {
             "name": "cputemp",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/cputemp",
             "parameters": {
@@ -17,7 +17,7 @@
         },
         {
             "name": "nvme0",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme0",
             "parameters": {
@@ -32,7 +32,7 @@
         },
         {
             "name": "nvme1",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme1",
             "parameters": {
@@ -47,7 +47,7 @@
         },
         {
             "name": "nvme2",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme2",
             "parameters": {
@@ -62,7 +62,7 @@
         },
         {
             "name": "nvme3",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme3",
             "parameters": {
@@ -77,7 +77,7 @@
         },
         {
             "name": "nvme4",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme4",
             "parameters": {
@@ -92,7 +92,7 @@
         },
         {
             "name": "nvme5",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme5",
             "parameters": {
@@ -107,7 +107,7 @@
         },
         {
             "name": "nvme6",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme6",
             "parameters": {
@@ -122,7 +122,7 @@
         },
         {
             "name": "nvme7",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme7",
             "parameters": {
@@ -137,7 +137,7 @@
         },
         {
             "name": "nvme8",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme8",
             "parameters": {
@@ -152,7 +152,7 @@
         },
         {
             "name": "nvme9",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme9",
             "parameters": {
@@ -167,7 +167,7 @@
         },
         {
             "name": "nvme10",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme10",
             "parameters": {
@@ -182,7 +182,7 @@
         },
         {
             "name": "nvme11",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme11",
             "parameters": {
@@ -197,7 +197,7 @@
         },
         {
             "name": "nvme12",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme12",
             "parameters": {
@@ -212,7 +212,7 @@
         },
         {
             "name": "nvme13",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme13",
             "parameters": {
@@ -227,7 +227,7 @@
         },
         {
             "name": "nvme14",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme14",
             "parameters": {
@@ -242,7 +242,7 @@
         },
         {
             "name": "nvme15",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/nvme15",
             "parameters": {
@@ -257,7 +257,7 @@
         },
         {
             "name": "vddcr_cpu",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/vddcr_cpu",
             "parameters": {
@@ -272,7 +272,7 @@
         },
         {
             "name": "vddcr_soc",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/vddcr_soc",
             "parameters": {
@@ -287,7 +287,7 @@
         },
         {
             "name": "vddio_abcd",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/vddio_abcd",
             "parameters": {
@@ -302,7 +302,7 @@
         },
         {
             "name": "vddio_efgh",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/vddio_efgh",
             "parameters": {
@@ -317,7 +317,7 @@
         },
         {
             "name": "p12v_mobo",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/p12v_mobo",
             "parameters": {
@@ -332,7 +332,7 @@
         },
         {
             "name": "powerseq_temp",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/powerseq_temp",
             "parameters": {
@@ -347,7 +347,7 @@
         },
         {
             "name": "p12v_fan",
-            "unit": "millidegree",
+            "unit": "degree",
             "type": "dbus",
             "path": "/xyz/openbmc_project/sensors/temperature/p12v_fan",
             "parameters": {
