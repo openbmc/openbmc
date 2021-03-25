@@ -37,7 +37,7 @@ SYSTEMD_SERVICE_${PN}_append_p10bmc = " obmc-console-ssh@2200.service \
                 "
 SYSTEMD_SERVICE_${PN}_remove_p10bmc = "obmc-console-ssh.socket"
 
-FILES_${PN}_remove_p10bmc = "/lib/systemd/system/obmc-console-ssh@.service.d/use-socket.conf"
+FILES_${PN}_remove_p10bmc = "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
 
 EXTRA_OECONF_append_p10bmc = " --enable-concurrent-servers"
 
@@ -55,7 +55,7 @@ SYSTEMD_SERVICE_${PN}_append_witherspoon-tacoma = " obmc-console-ssh@2200.servic
                 "
 SYSTEMD_SERVICE_${PN}_remove_witherspoon-tacoma = "obmc-console-ssh.socket"
 
-FILES_${PN}_remove_witherspoon-tacoma = "/lib/systemd/system/obmc-console-ssh@.service.d/use-socket.conf"
+FILES_${PN}_remove_witherspoon-tacoma = "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
 
 EXTRA_OECONF_append_witherspoon-tacoma = " --enable-concurrent-servers"
 
