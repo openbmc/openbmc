@@ -27,21 +27,21 @@ install_concurrent_console_config() {
         install -m 0644 ${WORKDIR}/server.ttyVUART1.conf ${D}${sysconfdir}/${BPN}/
 }
 
-SRC_URI_append_rainier = " file://client.2201.conf"
-SRC_URI_append_rainier = " file://server.ttyVUART1.conf"
+SRC_URI_append_p10bmc = " file://client.2201.conf"
+SRC_URI_append_p10bmc = " file://server.ttyVUART1.conf"
 
-REGISTERED_SERVICES_${PN}_append_rainier = " obmc_console_guests:tcp:2201:"
+REGISTERED_SERVICES_${PN}_append_p10bmc = " obmc_console_guests:tcp:2201:"
 
-SYSTEMD_SERVICE_${PN}_append_rainier = " obmc-console-ssh@2200.service \
+SYSTEMD_SERVICE_${PN}_append_p10bmc = " obmc-console-ssh@2200.service \
 		obmc-console-ssh@2201.service \
                 "
-SYSTEMD_SERVICE_${PN}_remove_rainier = "obmc-console-ssh.socket"
+SYSTEMD_SERVICE_${PN}_remove_p10bmc = "obmc-console-ssh.socket"
 
-FILES_${PN}_remove_rainier = "/lib/systemd/system/obmc-console-ssh@.service.d/use-socket.conf"
+FILES_${PN}_remove_p10bmc = "/lib/systemd/system/obmc-console-ssh@.service.d/use-socket.conf"
 
-EXTRA_OECONF_append_rainier = " --enable-concurrent-servers"
+EXTRA_OECONF_append_p10bmc = " --enable-concurrent-servers"
 
-do_install_append_rainier() {
+do_install_append_p10bmc() {
         install_concurrent_console_config
 }
 
