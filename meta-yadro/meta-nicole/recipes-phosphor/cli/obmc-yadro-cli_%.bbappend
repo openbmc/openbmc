@@ -4,7 +4,7 @@ RDEPENDS_${PN}_append = " \
     op-proc-control \
     openpower-esel-parser \
     phosphor-debug-collector \
-    phosphor-led-manager-ledmanager \
+    phosphor-led-manager \
     phosphor-mapper \
     phosphor-state-manager \
 "
