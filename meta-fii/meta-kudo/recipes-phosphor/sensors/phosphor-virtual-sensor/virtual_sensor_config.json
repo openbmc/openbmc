@@ -1,0 +1,64 @@
+[
+    {
+        "Desc":
+        {
+            "Name": "Mobo_NBM1_T",
+            "SensorType": "temperature",
+            "minValue": 0,
+            "maxValue": 160
+        },
+        "Threshold" :
+        {
+            "CriticalHigh": 110,
+            "CriticalLow": 0,
+            "WarningHigh": 108,
+            "WarningLow": 0
+        },
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "V1",
+                    "Desc":
+                    {
+                        "Name": "Mobo_NBM1_RAW",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "(V1 - 2.73) * 100"
+    },
+    {
+        "Desc":
+        {
+            "Name": "Mobo_NBM2_T",
+            "SensorType": "temperature",
+            "minValue": 0,
+            "maxValue": 160
+        },
+        "Threshold" :
+        {
+            "CriticalHigh": 110,
+            "CriticalLow": 0,
+            "WarningHigh": 108,
+            "WarningLow": 0
+        },
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "V2",
+                    "Desc":
+                    {
+                        "Name": "Mobo_NBM2_RAW",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "(V2 - 2.73) * 100"
+    }
+]
