@@ -12,4 +12,5 @@ do_install_append_p10bmc() {
     install -d ${D}/${datadir}/phosphor-logging/pels
     install -m 0644 ${WORKDIR}/ibm,rainier-2u_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/ibm,rainier-2u_dev_callouts.json
     install -m 0644 ${WORKDIR}/ibm,rainier-4u_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/ibm,rainier-4u_dev_callouts.json
+    ln -s ./ibm,rainier-4u_dev_callouts.json ${D}/${datadir}/phosphor-logging/pels/ibm,rainier-1s4u_dev_callouts.json
 }
