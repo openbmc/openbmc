@@ -4,7 +4,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 SRC_URI = "git://github.com/quanta-bmc/read-margin-temp.git"
-SRCREV = "898f158b56f8cc16474dfc46e032a0d754b437c6"
+SRCREV = "cadbe4801db76799e21b7bc9c405e5df9988dee0"
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
