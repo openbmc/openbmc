@@ -25,10 +25,14 @@ LOG_DEASSERT_FLAG="false"
 LOG_GENID_FLAG="0x0020"
 present_state=("true" "true" "true" "true" "true" "true" "true" "true" "true" "true")
 
+for i in ${!PRESENT_OBJPATH[@]}
+do
+    mapper wait ${PRESENT_OBJPATH[$i]}
+done
+
 while true; do
     for i in ${!PRESENT_OBJPATH[@]}
     do
-        mapper wait ${PRESENT_OBJPATH[$i]}
         boot_status="$(busctl get-property $SERVICE_NAME ${PRESENT_OBJPATH[$i]} $INTERFACE_NAME Present | awk '{print $2}')"
 
         if [ $boot_status == "false" ] && [ ${present_state[$i]} == "true" ];then
