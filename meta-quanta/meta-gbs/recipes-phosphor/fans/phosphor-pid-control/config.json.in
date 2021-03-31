@@ -1,11 +1,11 @@
 {
-    "version": "R04",
+    "version": "R05",
     "sensors": [
         {
             "name": "fan0",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan0",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/Fan_0_To_4_Hwmon/pwm1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/@Fan_0_To_4_Hwmon@/pwm1",
             "min": 0,
             "max": 255
         },
@@ -13,7 +13,7 @@
             "name": "fan1",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan1",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/Fan_0_To_4_Hwmon/pwm2",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/@Fan_0_To_4_Hwmon@/pwm2",
             "min": 0,
             "max": 255
         },
@@ -21,7 +21,7 @@
             "name": "fb_fan0",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/fb_fan0",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/Fan_0_To_4_Hwmon/pwm3",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/@Fan_0_To_4_Hwmon@/pwm3",
             "min": 0,
             "max": 255
         },
@@ -29,7 +29,7 @@
             "name": "fb_fan1",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/fb_fan1",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/Fan_0_To_4_Hwmon/pwm4",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/@Fan_0_To_4_Hwmon@/pwm4",
             "min": 0,
             "max": 255
         },
@@ -37,7 +37,7 @@
             "name": "fb_fan2",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/fb_fan2",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/Fan_0_To_4_Hwmon/pwm5",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/@Fan_0_To_4_Hwmon@/pwm5",
             "min": 0,
             "max": 255
         },
