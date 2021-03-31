@@ -14,3 +14,4 @@ do_install () {
         lnr ${D}${sysconfdir}/keys/x509_evm.der ${D}${sysconfdir}/keys/x509_ima.der
     fi
 }
+do_install[file-checksums] += "${@'${IMA_EVM_X509}:%s' % os.path.exists('${IMA_EVM_X509}')}"

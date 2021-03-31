@@ -15,7 +15,7 @@ SRC_URI = "git://github.com/google/fscryptctl.git"
 S = "${WORKDIR}/git"
 
 do_install() {
-    oe_runmake DESTDIR=${D}${bindir} install
+    oe_runmake DESTDIR=${D} PREFIX=/usr install
 }
 
 RRECOMMENDS_${PN} += "\

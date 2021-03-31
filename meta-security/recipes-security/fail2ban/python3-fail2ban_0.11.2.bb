@@ -35,8 +35,9 @@ do_install_append () {
 
 do_install_ptest_append () {
     install -d ${D}${PTEST_PATH}
+    install -d ${D}${PTEST_PATH}/bin
     sed -i -e 's/##PYTHON##/${PYTHON_PN}/g' ${D}${PTEST_PATH}/run-ptest
-    install -D ${S}/fail2ban-testcases-all-python3 ${D}${PTEST_PATH}
+    install -D ${S}/bin/* ${D}${PTEST_PATH}/bin
 }
 
 FILES_${PN} += "/run"

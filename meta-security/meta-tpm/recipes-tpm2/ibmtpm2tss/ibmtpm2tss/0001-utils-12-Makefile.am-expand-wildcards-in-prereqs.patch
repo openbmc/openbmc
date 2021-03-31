@@ -15,17 +15,15 @@ Signed-off-by: Jens Rehsack <sno@netbsd.org>
  utils12/Makefile.am |  8 ++++-
  2 files changed, 79 insertions(+), 4 deletions(-)
 
-diff --git a/utils/Makefile.am b/utils/Makefile.am
-index 1e51fe3..170a26e 100644
---- a/utils/Makefile.am
-+++ b/utils/Makefile.am
-@@ -81,9 +81,78 @@ libibmtssutils_la_LIBADD = libibmtss.la $(LIBCRYPTO_LIBS)
+Index: git/utils/Makefile.am
+===================================================================
+--- git.orig/utils/Makefile.am
++++ git/utils/Makefile.am
+@@ -85,9 +85,78 @@ libibmtssutils_la_LIBADD = libibmtss.la
  
- noinst_HEADERS = CommandAttributes.h imalib.h tssdev.h ntc2lib.h tssntc.h Commands_fp.h objecttemplates.h tssproperties.h cryptoutils.h Platform.h tssauth.h tsssocket.h ekutils.h eventlib.h tssccattributes.h
+ noinst_HEADERS = CommandAttributes.h imalib.h tssdev.h ntc2lib.h tssntc.h Commands_fp.h objecttemplates.h tssproperties.h cryptoutils.h Platform.h tssauth.h tsssocket.h ekutils.h eventlib.h efilib.h tssccattributes.h
  # install every header in ibmtss
 -nobase_include_HEADERS = ibmtss/*.h
--
--notrans_man_MANS = man/man1/*.1
 +nobase_include_HEADERS = ibmtss/ActivateCredential_fp.h ibmtss/ActivateIdentity_fp.h ibmtss/BaseTypes.h \
 +	ibmtss/CertifyCreation_fp.h ibmtss/Certify_fp.h ibmtss/CertifyX509_fp.h ibmtss/ChangeEPS_fp.h \
 +	ibmtss/ChangePPS_fp.h ibmtss/ClearControl_fp.h ibmtss/Clear_fp.h ibmtss/ClockRateAdjust_fp.h \
@@ -65,7 +63,8 @@ index 1e51fe3..170a26e 100644
 +	ibmtss/tssmarshal.h ibmtss/tssprintcmd.h ibmtss/tssprint.h ibmtss/tssresponsecode.h ibmtss/tsstransmit.h \
 +	ibmtss/tssutils.h ibmtss/Unmarshal12_fp.h ibmtss/Unmarshal_fp.h ibmtss/Unseal_fp.h ibmtss/VerifySignature_fp.h \
 +	ibmtss/ZGen_2Phase_fp.h
-+
+ 
+-notrans_man_MANS = man/man1/*.1
 +notrans_man_MANS = man/man1/tssactivatecredential.1 man/man1/tsscertify.1 man/man1/tsscertifycreation.1 \
 +	man/man1/tsscertifyx509.1 man/man1/tsschangeeps.1 man/man1/tsschangepps.1 man/man1/tssclear.1 \
 +	man/man1/tssclearcontrol.1 man/man1/tssclockrateadjust.1 man/man1/tssclockset.1 man/man1/tsscommit.1 \
@@ -101,11 +100,11 @@ index 1e51fe3..170a26e 100644
  
  if CONFIG_TPM20
  noinst_HEADERS += tss20.h tssauth20.h ibmtss/tssprintcmd.h
-diff --git a/utils12/Makefile.am b/utils12/Makefile.am
-index a01f47c..e9fe61e 100644
---- a/utils12/Makefile.am
-+++ b/utils12/Makefile.am
-@@ -9,7 +9,13 @@ libibmtssutils12_la_CFLAGS = -I$(top_srcdir)/utils
+Index: git/utils12/Makefile.am
+===================================================================
+--- git.orig/utils12/Makefile.am
++++ git/utils12/Makefile.am
+@@ -9,7 +9,13 @@ libibmtssutils12_la_CFLAGS = -I$(top_src
  # result: [current-age].age.revision
  libibmtssutils12_la_LDFLAGS = -version-info @TSSLIB_VERSION_INFO@ ../utils/libibmtss.la
  
@@ -120,6 +119,3 @@ index a01f47c..e9fe61e 100644
  noinst_HEADERS = ekutils12.h
  
  bin_PROGRAMS = activateidentity createendorsementkeypair createwrapkey extend flushspecific getcapability loadkey2 makeidentity nvdefinespace nvreadvalueauth nvreadvalue nvwritevalueauth nvwritevalue oiap osap ownerreadinternalpub ownersetdisable pcrread quote2 sign startup takeownership tpminit createekcert makeekblob eventextend imaextend
--- 
-2.17.1
-

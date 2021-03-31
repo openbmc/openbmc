@@ -6,8 +6,10 @@ SECTION = "tpm"
 
 DEPENDS = "autoconf-archive-native libgcrypt openssl"
 
-SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/${PV}/${BPN}-${PV}.tar.gz"
-SRC_URI[sha256sum] = "e294677f8993234d0adfa191a5cbf9c5b83cc60c724c233e3d631c26712abea0"
+SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/${PV}/${BPN}-${PV}.tar.gz \
+           file://0001-configure.ac-fix-compatibility-with-autoconf-2.70.patch \
+          "
+SRC_URI[sha256sum] = "78392be7309baf47f51b122f566ac915fd4d1760ea78571cba2e1484f9b5be17"
 
 inherit autotools pkgconfig systemd extrausers
 

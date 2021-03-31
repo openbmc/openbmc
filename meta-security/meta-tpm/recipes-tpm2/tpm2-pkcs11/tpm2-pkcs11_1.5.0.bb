@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/tpm2-software/tpm2-pkcs11.git;branch=1.X \
            file://bootstrap_fixup.patch \
            file://0001-remove-local-binary-checkes.patch"
 
-SRCREV = "78bbf6a0237351830d0c3923b25ba0b57ae0b7e9"
+SRCREV = "5d583351028eebd470f50ec35db5dcf00533df31"
 
 S = "${WORKDIR}/git"
 

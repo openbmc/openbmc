@@ -6,8 +6,8 @@ SECTION = "security/tpm"
 
 DEPENDS = "openssl"
 
-SRCREV = "e74dd1d96753b0538192143adf58d04fcd3b242b"
-PV = "0.3.14+git${SRCPV}"
+SRCREV = "94144b0a1dcef6e31845d6c319e9bd7357208eb9"
+PV = "0.3.15+git${SRCPV}"
 
 SRC_URI = " \
 	git://git.code.sf.net/p/trousers/trousers \

@@ -8,6 +8,6 @@ DEPENDS = "tpm2-abrmd tpm2-tss openssl curl autoconf-archive"
 
 SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/${PV}/${BPN}-${PV}.tar.gz"
 
-SRC_URI[sha256sum] = "ae009b3495b44a16faa3d94d41ac9c9d99c71723482efad53c5eea17eeed80fc"
+SRC_URI[sha256sum] = "e1b907fe29877628052e08ad84eebc6c3f7646d29505ed4862e96162a8c91ba1"
 
 inherit autotools pkgconfig bash-completion

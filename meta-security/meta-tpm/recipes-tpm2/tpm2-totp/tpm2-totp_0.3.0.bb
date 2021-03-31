@@ -9,8 +9,8 @@ DEPENDS = "autoconf-archive libtss2-dev qrencode"
 
 PE = "1"
 
-SRCREV = "bfd581986353edc1058604e77cac804bd8b0d30a"
-SRC_URI = "git://github.com/tpm2-software/tpm2-totp.git;branch=v0.2.x"
+SRCREV = "96a1448753a48974149003bc90ea3990ae8e8d0b"
+SRC_URI = "git://github.com/tpm2-software/tpm2-totp.git"
 
 inherit autotools-brokensep pkgconfig
 
