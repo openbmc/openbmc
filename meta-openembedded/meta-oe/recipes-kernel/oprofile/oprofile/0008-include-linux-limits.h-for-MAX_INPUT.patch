@@ -1,0 +1,30 @@
+From 33e945f31fee2d74a392eb79025c9477e12b590d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 18 Mar 2021 00:49:48 -0700
+Subject: [PATCH 08/10] include linux/limits.h for MAX_INPUT
+
+Fixes
+op_pe_utils.cpp:533:19: error: 'MAX_INPUT' was not declared in this scope
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libpe_utils/op_pe_utils.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libpe_utils/op_pe_utils.cpp b/libpe_utils/op_pe_utils.cpp
+index 1ca4ce3a..c5d16a56 100644
+--- a/libpe_utils/op_pe_utils.cpp
++++ b/libpe_utils/op_pe_utils.cpp
+@@ -11,6 +11,7 @@
+  *
+  */
+ 
++#include <linux/limits.h>
+ #include <linux/perf_event.h>
+ #include <dirent.h>
+ #include <stdio.h>
+-- 
+2.31.0
+

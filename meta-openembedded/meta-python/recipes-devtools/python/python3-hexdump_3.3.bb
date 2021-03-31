@@ -19,9 +19,7 @@ S = "${WORKDIR}"
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_cleanup_hexfile() {
+do_install_append() {
     rm ${D}${datadir}/data/hexfile.bin
     rmdir ${D}${datadir}/data ${D}${datadir}
 }
-
-addtask cleanup_hexfile before do_package after do_install

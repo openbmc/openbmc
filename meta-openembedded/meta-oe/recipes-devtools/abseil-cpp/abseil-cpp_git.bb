@@ -13,6 +13,7 @@ BRANCH = "lts_2020_09_23"
 SRC_URI = "git://github.com/abseil/abseil-cpp;branch=${BRANCH}         \
            file://0001-absl-always-use-asm-sgidefs.h.patch             \
            file://0002-Remove-maes-option-from-cross-compilation.patch \
+           file://abseil-ppc-fixes.patch \
           "
 
 S = "${WORKDIR}/git"
@@ -28,7 +29,6 @@ EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON \
                 "
 
 BBCLASSEXTEND = "native nativesdk"
-ALLOW_EMPTY_${PN} = "1"
 
-FILES_${PN} = "${libdir}/libabsl_*.so ${libdir}/cmake"
-FILES_${PN}-dev = "${includedir}"
+FILES_${PN} = "${libdir}/libabsl_*.so"
+FILES_${PN}-dev = "${includedir} ${libdir}/cmake"

@@ -1,0 +1,30 @@
+From 864e02eab12cdc523b2dcd3f7b87a27abc16eefc Mon Sep 17 00:00:00 2001
+From: Viktor Kleinik <vkleinik@cisco.com>
+Date: Sun, 7 Mar 2021 17:07:44 +0000
+Subject: [PATCH 03/10] Define the C preprocessor variable to improve reproducibility
+
+Define the C preprocessor variable BUILD_DATE, which can be used
+as source for reproducible build date in case when
+SOURCE_DATE_EPOCH environment variable is set.
+
+Upstream-Status: Backport [https://sourceforge.net/p/oprofile/oprofile/ci/864e02eab12cdc523b2dcd3f7b87a27abc16eefc/]
+Signed-off-by: Viktor Kleinik <vkleinik@cisco.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index f5fcd17d..dc447f89 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -31,6 +31,7 @@ if test -n "$SOURCE_DATE_EPOCH" ; then
+ fi
+ dnl for the man page
+ DATE="`date $dateopt '+%a %d %B %Y'`"
++AC_DEFINE_UNQUOTED([BUILD_DATE], ["$DATE"], [Use reproducible build date])
+ AC_SUBST(DATE)
+ 
+ # Since we should not permanently alter user environment variables, we'll
+-- 
+2.31.0
+

@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e4f3ea6e9b28af88dc0321190a1f8250"
 
 S = "${WORKDIR}/git"
 SRCREV = "4cdfdc38eca237c19c22a8b90490446ce6d970fa"
-SRC_URI = "git://github.com/maxmind/geoip-api-perl.git;protocol=https; \
+SRC_URI = "git://github.com/maxmind/geoip-api-perl.git;branch=main \
     file://run-ptest \
 "
 

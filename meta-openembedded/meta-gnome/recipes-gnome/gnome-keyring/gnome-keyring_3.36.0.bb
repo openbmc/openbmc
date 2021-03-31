@@ -43,10 +43,8 @@ FILES_${PN} += " \
     ${base_libdir}/security/*${SOLIBSDEV} \
     ${libdir}/pkcs11/gnome-keyring-pkcs11.so \
 "
-
 # fix | gnome-keyring-daemon: insufficient process capabilities, unsecure memory might get used
-# This does not make it through pseudo so perform on-target - sigh
-pkg_postinst_ontarget_${PN} () {
-    setcap cap_ipc_lock+ep `which gnome-keyring-daemon`
+pkg_postinst_${PN} () {
+    setcap cap_ipc_lock+ep $D/${bindir}/gnome-keyring-daemon
 }
-RDEPENDS_${PN} += "libcap-bin"
+PACKAGE_WRITE_DEPS += "libcap-native"

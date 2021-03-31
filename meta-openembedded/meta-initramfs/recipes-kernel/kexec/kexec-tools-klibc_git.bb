@@ -10,7 +10,7 @@ PV = "2.0.18+git${SRCPV}"
 
 DEPENDS = "zlib xz"
 
-inherit klibc autotools
+inherit klibc autotools siteinfo
 
 SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kexec/kexec-tools.git"
 SRCREV = "5750980cdbbc33ef75bfba6660295b932376ce15"
@@ -66,17 +66,8 @@ EXTRA_OECONF += "--without-zlib --without-lzma --without-xen"
 
 # fix purgatory/printf.c:2:10: fatal error: limits.h: No such file or directory
 # fix include/limits.h:42:10: fatal error: bitsize/limits.h: No such file or directory
-COMMON_CFLAGS += "-O2 -I${STAGING_DIR_HOST}${libdir}/klibc/include -I${S}/purgatory/include"
-CFLAGS_x86_append = " ${COMMON_CFLAGS} -I${STAGING_DIR_HOST}${libdir}/klibc/include/bits32"
-CFLAGS_x86-64_append = " ${COMMON_CFLAGS} -I${STAGING_DIR_HOST}${libdir}/klibc/include/bits64"
-CFLAGS_arm_append = " ${COMMON_CFLAGS} -I${STAGING_DIR_HOST}${libdir}/klibc/include/bits32"
-CFLAGS_aarch64_append = " ${COMMON_CFLAGS} -I${STAGING_DIR_HOST}${libdir}/klibc/include/bits64"
-CFLAGS_mips_append = " ${COMMON_CFLAGS} -I${STAGING_DIR_HOST}${libdir}/klibc/include/bits32"
-CFLAGS_mipsel_append = " ${COMMON_CFLAGS} -I${STAGING_DIR_HOST}${libdir}/klibc/include/bits32"
-CFLAGS_mips64_append = " ${COMMON_CFLAGS} -I${STAGING_DIR_HOST}${libdir}/klibc/include/bits64"
-CFLAGS_mips64el_append = " ${COMMON_CFLAGS} -I${STAGING_DIR_HOST}${libdir}/klibc/include/bits64"
-CFLAGS_powerpc_append = " ${COMMON_CFLAGS} -I${STAGING_DIR_HOST}${libdir}/klibc/include/bits32"
-
+CFLAGS += "-O2 -I${STAGING_DIR_HOST}${libdir}/klibc/include -I${S}/purgatory/include \
+           -I${STAGING_DIR_HOST}${libdir}/klibc/include/bits${SITEINFO_BITS}"
 
 do_compile_prepend() {
     # Remove the prepackaged config.h from the source tree as it overrides

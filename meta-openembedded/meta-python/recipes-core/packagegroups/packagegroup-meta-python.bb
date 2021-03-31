@@ -21,6 +21,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-aiofiles \
     python3-aiohttp \
     python3-aiohttp-jinja2 \
+    python3-aiohue \
     python3-alembic \
     python3-ansi2html \
     python3-ansicolors \
@@ -103,6 +104,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-djangorestframework \
     python3-dnspython \
     python3-docopt \
+    python3-docutils \
     python3-dominate \
     python3-dt-schema \
     python3-dynamic-dispatch \
@@ -143,6 +145,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-gmqtt \
     python3-gnupg \
     python3-google-api-python-client \
+    python3-gpsd-py3 \
     python3-graphviz \
     python3-greenlet \
     python3-greenstalk \
@@ -150,6 +153,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-grpcio-tools \
     python3-gsocketpool \
     python3-gunicorn \
+    python3-h11 \
     python3-h2 \
     python3-h5py \
     python3-haversine \
@@ -167,6 +171,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-idna \
     python3-idna \
     python3-idna-ssl \
+    python3-ifaddr \
     python3-imageio \
     python3-incremental \
     python3-inflection \
@@ -185,6 +190,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-jdatetime \
     python3-jdcal \
     python3-jedi \
+    python3-jmespath \
     python3-jsmin \
     python3-jsonpatch \
     python3-jsonpath-rw \
@@ -248,6 +254,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-parse-type \
     python3-parso \
     python3-passlib \
+    python3-pastedeploy \
     python3-pathtools3 \
     python3-pep8 \
     python3-periphery \
@@ -320,6 +327,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-pyscaffold \
     python3-pyserial \
     python3-pysocks \
+    python3-pysonos \
     python3-pystache \
     python3-pystemd \
     python3-pytest-asyncio \
@@ -329,6 +337,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-pytest-runner \
     python3-pytest-tempdir \
     python3-pytest-timeout \
+    python3-pythonping \
     python3-python-vlc \
     python3-pytoml \
     python3-pytun \
@@ -361,6 +370,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-scrypt \
     python3-sdnotify \
     python3-semver \
+    python3-semantic-version \
     python3-send2trash \
     python3-sentry-sdk \
     python3-serpent \
@@ -405,6 +415,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-twitter \
     python3-twofish \
     python3-txaio \
+    python3-txdbus \
     python3-txws \
     python3-typed-ast \
     python3-typeguard \
@@ -444,6 +455,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-zopeinterface \
     telepathy-python3 \
 "
+RDEPENDS_packagegroup-meta-python3_remove_libc-musl_powerpc64le = "python3-grpcio python3-grpcio-tools"
 
 RDEPENDS_packagegroup-meta-python3-ptest = "\
     python3-cryptography-ptest \
@@ -507,6 +519,7 @@ RDEPENDS_packagegroup-meta-python3-ptest = "\
     python3-uritemplate-ptest \
     python3-webcolors-ptest \
     python3-whoosh-ptest \
+    python3-wpa-supplicant \
     python3-xlrd-ptest \
     python3-xmltodict-ptest \
     python3-xxhash-ptest \

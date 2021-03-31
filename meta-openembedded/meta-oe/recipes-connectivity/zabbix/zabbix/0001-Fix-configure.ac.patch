@@ -1,5 +1,7 @@
 uname can not get version of kernel correctly while cross compile
 
+Upstream-Status: Inappropriate [configuration]
+
 Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
 ---
  configure.ac | 2 +-

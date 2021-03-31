@@ -10,8 +10,6 @@ Upstream-Status: Pending
  src/base/linux_syscall_support.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/base/linux_syscall_support.h b/src/base/linux_syscall_support.h
-index 70431ca..b23ca59 100644
 --- a/src/base/linux_syscall_support.h
 +++ b/src/base/linux_syscall_support.h
 @@ -164,7 +164,7 @@ extern "C" {

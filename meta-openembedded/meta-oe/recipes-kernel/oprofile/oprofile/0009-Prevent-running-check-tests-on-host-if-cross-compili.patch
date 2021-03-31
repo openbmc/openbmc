@@ -1,0 +1,113 @@
+From 3a942cfd7d2e92667313e189930f7d1733cf40d4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 18 Mar 2021 00:59:20 -0700
+Subject: [PATCH 09/10] Prevent running check tests on host if cross compiling
+
+This patch enables running the 'make check' tests on the target
+in a cross-compiled environment. If not cross-compiling, then 'make
+ check' builds and executes the tests; no change from this patch.
+In a cross-compiling environment, the make variable CROSS_COMPILE is
+set which bypasses assiging tests to the makekfile variable TESTS.
+Since TESTS is empty, the 'make check' process never tries to run the
+tests on the hosts.  On the target, the tests must be run manually.
+
+Also, in the libutil++ tests, a makefile variable SRCDIR is passed into
+the compilation phase, pointing to the runtime location of the test
+'file-manip-tests'.  The mechanism used for a host test, based on
+'topdir' doesn't work.  Instead, if CROSS_COMPILE is set, the
+makefile takes the path of SRCDIR from the build environment and not
+from an expression based on the host path 'topdir'.
+
+Upstream-Status: Pending
+
+Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac                | 1 +
+ libdb/tests/Makefile.am     | 2 ++
+ libop/tests/Makefile.am     | 2 ++
+ libregex/tests/Makefile.am  | 2 ++
+ libutil++/tests/Makefile.am | 4 ++++
+ libutil/tests/Makefile.am   | 2 ++
+ 6 files changed, 13 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 520b18ed..108a84e4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -386,6 +386,7 @@ AC_ARG_ENABLE(account-check,
+ 	enable_account_check=$enableval, enable_account_check=yes)
+ 
+ AM_CONDITIONAL(CHECK_ACCOUNT, test "x$enable_account_check" = "xyes")
++AM_CONDITIONAL(CROSS_COMPILE, test "x$cross_compiling" = "xyes")
+ 
+ AC_SUBST(OP_CFLAGS)
+ AC_SUBST(OP_CXXFLAGS)
+diff --git a/libdb/tests/Makefile.am b/libdb/tests/Makefile.am
+index 8a69003f..c933baf6 100644
+--- a/libdb/tests/Makefile.am
++++ b/libdb/tests/Makefile.am
+@@ -13,4 +13,6 @@ check_PROGRAMS = db_test
+ db_test_SOURCES = db_test.c
+ db_test_LDADD = ../libodb.a ../../libutil/libutil.a
+ 
++if ! CROSS_COMPILE
+ TESTS = ${check_PROGRAMS}
++endif
+diff --git a/libop/tests/Makefile.am b/libop/tests/Makefile.am
+index 8a79eb5d..6b90e997 100644
+--- a/libop/tests/Makefile.am
++++ b/libop/tests/Makefile.am
+@@ -33,4 +33,6 @@ load_events_files_tests_LDADD = ${COMMON_LIBS}
+ mangle_tests_SOURCES = mangle_tests.c
+ mangle_tests_LDADD = ${COMMON_LIBS}
+ 
++if ! CROSS_COMPILE
+ TESTS = ${check_PROGRAMS} utf8_checker.sh
++endif
+diff --git a/libregex/tests/Makefile.am b/libregex/tests/Makefile.am
+index 6f19838f..43e84946 100644
+--- a/libregex/tests/Makefile.am
++++ b/libregex/tests/Makefile.am
+@@ -18,4 +18,6 @@ java_test_LDADD = \
+ 
+ EXTRA_DIST = mangled-name.in
+ 
++if ! CROSS_COMPILE
+ TESTS = ${check_PROGRAMS}
++endif
+diff --git a/libutil++/tests/Makefile.am b/libutil++/tests/Makefile.am
+index 51af0313..dd63fbe2 100644
+--- a/libutil++/tests/Makefile.am
++++ b/libutil++/tests/Makefile.am
+@@ -1,7 +1,9 @@
+ 
+ REALPATH= readlink -f
+ 
++if ! CROSS_COMPILE
+ SRCDIR := $(shell $(REALPATH) $(topdir)/libutil++/tests/ )
++endif
+ 
+ AM_CPPFLAGS = \
+ 	-I ${top_srcdir}/libutil++ -D SRCDIR="\"$(SRCDIR)/\"" @OP_CPPFLAGS@
+@@ -46,4 +48,6 @@ cached_value_tests_LDADD = ${COMMON_LIBS}
+ utility_tests_SOURCES = utility_tests.cpp
+ utility_tests_LDADD = ${COMMON_LIBS}
+ 
++if ! CROSS_COMPILE
+ TESTS = ${check_PROGRAMS}
++endif
+diff --git a/libutil/tests/Makefile.am b/libutil/tests/Makefile.am
+index dfcd6eca..d8b51892 100644
+--- a/libutil/tests/Makefile.am
++++ b/libutil/tests/Makefile.am
+@@ -12,4 +12,6 @@ file_tests_LDADD = ../libutil.a
+ string_tests_SOURCES = string_tests.c
+ string_tests_LDADD = ../libutil.a
+ 
++if ! CROSS_COMPILE
+ TESTS = ${check_PROGRAMS}
++endif
+-- 
+2.31.0
+

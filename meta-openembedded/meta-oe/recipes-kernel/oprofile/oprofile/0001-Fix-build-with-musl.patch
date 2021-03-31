@@ -1,0 +1,55 @@
+From 5ed9bda8baf7465172a99ff86ed7f46397b06c7f Mon Sep 17 00:00:00 2001
+From: Andrew Savchenko <bircoph@gmail.com>
+Date: Sat, 5 Sep 2020 14:41:30 +0300
+Subject: [PATCH 01/10] Fix build with musl
+
+--Signature=_Sat__5_Sep_2020_14_41_30_+0300_B.qpPPwu83bbA.32
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+When musl is used instead of glibc, oprofile build fails because it
+uses glibc-specific FTW extension: FTW_ACTIONRETVAL for custom
+__delete_old_previous_sample_data return codes and FTW_STOP,
+FTW_CONTINUE for such return codes. Musl supports only POSIX ftw, so
+build fails.
+
+However, this extension is not really needed by oprofile, because
+FTW_SKIP_* are not used and {FTW_STOP,FTW_CONTINUE} can be handled
+by standard return codes {1,0} (more precisely standard defines
+{!0,0}, but in glibc FTW_STOP = 1, so I keep this value).
+
+Upstream-Status: Backport [https://sourceforge.net/p/oprofile/oprofile/ci/5ed9bda8baf7465172a99ff86ed7f46397b06c7f/]
+Signed-off-by: Andrew Savchenko <bircoph@gmail.com>
+---
+ pe_profiling/operf.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pe_profiling/operf.cpp b/pe_profiling/operf.cpp
+index 06a0ea3c..00834409 100644
+--- a/pe_profiling/operf.cpp
++++ b/pe_profiling/operf.cpp
+@@ -860,9 +860,9 @@ static int __delete_old_previous_sample_data(const char *fpath,
+ {
+ 	if (remove(fpath)) {
+ 		perror("sample data removal error");
+-		return FTW_STOP;
++		return 1;
+ 	} else {
+-		return FTW_CONTINUE;
++		return 0;
+ 	}
+ }
+ 
+@@ -897,7 +897,7 @@ static void convert_sample_data(void)
+ 		return;
+ 
+ 	if (!operf_options::append) {
+-                int flags = FTW_DEPTH | FTW_ACTIONRETVAL;
++		int flags = FTW_DEPTH;
+ 		errno = 0;
+ 		if (nftw(previous_sampledir.c_str(), __delete_old_previous_sample_data, 32, flags) !=0 &&
+ 				errno != ENOENT) {
+-- 
+2.31.0
+

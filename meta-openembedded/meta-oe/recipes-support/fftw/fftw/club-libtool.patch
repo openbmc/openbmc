@@ -1,0 +1,9 @@
+--- ./tests/Makefile.am.orig	2021-03-23 11:45:12.756371739 -0400
++++ ./tests/Makefile.am	2021-03-23 11:46:43.224132851 -0400
+@@ -1,5 +1,5 @@
+ AM_CPPFLAGS = -I $(top_srcdir)
+-noinst_PROGRAMS = bench
++bin_PROGRAMS = bench@PREC_SUFFIX@
+ EXTRA_DIST = check.pl README
+ 
+ if THREADS

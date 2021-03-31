@@ -29,15 +29,6 @@ SRC_URI[archive.sha256sum] = "3e33dbd319b562a5ab602dcab6de3ca81b85f8346672e90ec6
 
 UNKNOWN_CONFIGURE_WHITELIST = "introspection"
 
-# allow cross build mixed with build of native tools
-do_write_config_append() {
-    cat >${WORKDIR}/meson.native <<EOF
-[binaries]
-pkgconfig = 'pkg-config-native'
-EOF
-}
-EXTRA_OEMESON = "--native-file ${WORKDIR}/meson.native"
-
 PACKAGECONFIG ??= " \
     cups nm \
     alsa gudev \

@@ -1,0 +1,25 @@
+From ea3f11a7846ad27926c6eacc0534914f4873504f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 5 Mar 2021 19:30:09 -0800
+Subject: [PATCH] respect environment variables
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1d70f17..c7e726e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,5 @@
+-CFLAGS = -g -O2 -Wall -fPIC -Ilibwuya
+-LDFLAGS = -Llibwuya
++CFLAGS += -g -O2 -Wall -fPIC -Ilibwuya
++LDFLAGS += -Llibwuya
+ 
+ libleak.so: libleak.o
+ 	CFLAGS='-fPIC' make -C libwuya
+-- 
+2.30.1
+

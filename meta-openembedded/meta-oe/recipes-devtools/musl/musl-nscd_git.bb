@@ -15,6 +15,7 @@ SRCREV = "af581482a3e1059458f3c8b20a56f82807ca3bd4"
 SRC_URI = "git://github.com/pikhq/musl-nscd \
            file://0001-Fix-build-under-GCC-fno-common.patch \
            file://0001-configure-Check-for-flex-if-lex-is-not-found.patch \
+           file://0001-nsswitch.y-Replace-empty-bison-extension.patch \
           "
 
 UPSTREAM_CHECK_COMMITS = "1"

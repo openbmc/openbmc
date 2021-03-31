@@ -19,3 +19,5 @@ inherit cmake
 EXTRA_OECMAKE += "-DOPENJPEG_INSTALL_LIB_DIR=${@d.getVar('baselib').replace('/', '')}"
 
 FILES_${PN} += "${libdir}/openjpeg*"
+
+BBCLASSEXTEND = "native nativesdk"

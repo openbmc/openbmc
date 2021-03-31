@@ -13,6 +13,7 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "libcap libpng cairo dbus udev"
+DEPENDS_append_libc-musl = " musl-rpmatch"
 PROVIDES = "virtual/psplash"
 RPROVIDES_${PN} = "virtual-psplash virtual-psplash-support"
 
@@ -41,6 +42,8 @@ PACKAGECONFIG[initrd] = ",,,"
 LOGO ??= "${datadir}/plymouth/bizcom.png"
 
 inherit autotools pkgconfig systemd gettext
+
+LDFLAGS_append_libc-musl = " -lrpmatch"
 
 do_install_append() {
     # Remove /var/run from package as plymouth will populate it on startup

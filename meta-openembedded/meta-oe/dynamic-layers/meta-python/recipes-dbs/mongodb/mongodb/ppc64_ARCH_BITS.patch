@@ -1,0 +1,18 @@
+Subject: [PATCH] stacktrace: Define ARCH_BITS for ppc64
+
+src/mongo/util/stacktrace_somap.cpp:89:2: error: #error Unknown target architecture.
+stacktrace_somap.cpp:92:33: error: 'ELFCLASSARCH_BITS' was not declared in this scope
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/src/mongo/util/stacktrace_somap.cpp
++++ b/src/mongo/util/stacktrace_somap.cpp
+@@ -81,7 +81,7 @@ void addUnameToSoMap(BSONObjBuilder* soM
+ 
+ #if defined(__ELF_NATIVE_CLASS)  // determine ARCH_BITS
+ #define ARCH_BITS __ELF_NATIVE_CLASS
+-#elif defined(__x86_64__) || defined(__aarch64__)
++#elif defined(__x86_64__) || defined(__aarch64__)  || defined(__powerpc64__)
+ #define ARCH_BITS 64
+ #elif defined(__i386__) || defined(__arm__)
+ #define ARCH_BITS 32

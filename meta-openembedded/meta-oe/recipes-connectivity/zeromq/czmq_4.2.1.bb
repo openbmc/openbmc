@@ -30,3 +30,7 @@ PACKAGECONFIG[systemd] = ",-DCMAKE_DISABLE_FIND_PACKAGE_systemd=TRUE,systemd"
 
 BBCLASSEXTEND = "nativesdk"
 
+do_install_append() {
+        mkdir -p ${D}/${includedir}/${BPN}
+        mv ${D}/${includedir}/sha1.h ${D}/${includedir}/${BPN}/.
+}

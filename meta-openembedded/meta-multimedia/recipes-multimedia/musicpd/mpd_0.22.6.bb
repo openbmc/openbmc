@@ -2,8 +2,6 @@ SUMMARY = "Music Player Daemon"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-LICENSE_FLAGS = "${@bb.utils.contains_any('PACKAGECONFIG', ['ffmpeg', 'aac'], 'commercial', '', d)}"
-
 HOMEPAGE ="http://www.musicpd.org"
 
 inherit meson useradd systemd pkgconfig
@@ -28,7 +26,14 @@ S = "${WORKDIR}/git"
 
 EXTRA_OEMESON += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '-Dsystemd=enabled -Dsystemd_system_unit_dir=${systemd_system_unitdir} -Dsystemd_user_unit_dir=${systemd_system_unitdir}', '-Dsystemd=disabled', d)}"
 
-PACKAGECONFIG ??= "aac alsa ao bzip2 daemon ffmpeg fifo flac fluidsynth iso9660 jack libsamplerate httpd mms mpg123 modplug sndfile upnp openal opus oss recorder vorbis wavpack zlib"
+PACKAGECONFIG ??= "${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "aac", "", d)} \
+                   alsa ao bzip2 daemon \
+                   ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "ffmpeg aac", "", d)} \
+                   fifo flac fluidsynth iso9660 \
+                   jack libsamplerate httpd \
+                   mms mpg123 modplug sndfile \
+                   upnp openal opus oss recorder \
+                   vorbis wavpack zlib"
 
 PACKAGECONFIG[aac] = "-Dfaad=enabled,-Dfaad=disabled,faad2"
 PACKAGECONFIG[alsa] = "-Dalsa=enabled,-Dalsa=disabled,alsa-lib"

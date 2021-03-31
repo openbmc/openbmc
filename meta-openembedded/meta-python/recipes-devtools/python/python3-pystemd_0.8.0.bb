@@ -6,6 +6,7 @@ SRC_URI[md5sum] = "f993739eca645749f18d4ccfd4a0fbf3"
 SRC_URI[sha256sum] = "cac2e42043ab28d43adf33dab493c6a3cf8a99794f824ae8af6d9cd6458b9972"
 
 DEPENDS = "systemd"
+RDEPENDS_${PN} += "python3-xml python3-pprint"
 REQUIRED_DISTRO_FEATURES = "systemd"
 
 inherit pypi setuptools3 features_check

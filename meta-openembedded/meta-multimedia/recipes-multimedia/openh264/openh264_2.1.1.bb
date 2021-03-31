@@ -23,6 +23,7 @@ COMPATIBLE_MACHINE_x86 = "(.*)"
 COMPATIBLE_MACHINE_x86-64 = "(.*)"
 COMPATIBLE_MACHINE_mips = "(.*)"
 COMPATIBLE_MACHINE_mips64 = "(.*)"
+COMPATIBLE_MACHINE_powerpc64le = "null"
 
 EXTRA_OEMAKE_armv7a = "ARCH=arm"
 EXTRA_OEMAKE_armv7ve = "ARCH=arm"

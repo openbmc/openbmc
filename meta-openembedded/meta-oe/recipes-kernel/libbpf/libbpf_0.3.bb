@@ -10,6 +10,8 @@ LIC_FILES_CHKSUM = "file://../LICENSE.LPGL-2.1;md5=b370887980db5dd40659b50909238
 
 DEPENDS = "zlib elfutils"
 
+do_compile[depends] += "virtual/kernel:do_shared_workdir"
+
 SRC_URI = "git://github.com/libbpf/libbpf.git;protocol=https"
 SRCREV = "051a4009f94d5633a8f734ca4235f0a78ee90469"
 
@@ -22,6 +24,8 @@ COMPATIBLE_HOST = "(x86_64.*|i.86.*|aarch64).*-linux"
 S = "${WORKDIR}/git/src"
 
 EXTRA_OEMAKE += "DESTDIR=${D} LIBDIR=${libdir}"
+
+inherit pkgconfig
 
 do_compile() {
 	if grep -q "CONFIG_BPF_SYSCALL=y" ${STAGING_KERNEL_BUILDDIR}/.config
@@ -40,5 +44,3 @@ do_install() {
 		bbnote "no files to install"
 	fi
 }
-
-BBCLASSEXTEND = "native"

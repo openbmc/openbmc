@@ -9,12 +9,22 @@ inherit bash-completion kernelsrc kernel-arch
 
 do_populate_lic[depends] += "virtual/kernel:do_patch"
 
-EXTRA_OEMAKE = "V=1 -C ${S}/tools/bpf/bpftool O=${B} CROSS=${TARGET_PREFIX} CC="${CC}" LD="${LD}" AR=${AR} ARCH=${ARCH}"
+EXTRA_OEMAKE = "\
+    V=1 \
+    -C ${S}/tools/bpf/bpftool \
+    O=${B} \
+    CROSS=${TARGET_PREFIX} \
+    CC="${CC} ${DEBUG_PREFIX_MAP} -fdebug-prefix-map=${STAGING_KERNEL_DIR}=${KERNEL_SRC_PATH}" \
+    LD="${LD}" \
+    AR=${AR} \
+    ARCH=${ARCH} \
+"
 
 SECURITY_CFLAGS = ""
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
+COMPATIBLE_HOST = "(x86_64).*-linux"
 COMPATIBLE_HOST_libc-musl = 'null'
 
 do_compile() {
@@ -32,4 +42,3 @@ python do_package_prepend() {
 }
 
 B = "${WORKDIR}/${BPN}-${PV}"
-PNBLACKLIST[bpftool] ?= "Needs forward porting to kernel 5.2+"

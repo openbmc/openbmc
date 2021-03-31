@@ -9,5 +9,7 @@ DEPENDS = " \
 
 inherit gnomebase gettext gobject-introspection vala
 
+SRC_URI += "file://0001-Set-vapidir.patch"
+
 SRC_URI[archive.md5sum] = "c26fd21c21b9ef6533a202a73fab21db"
 SRC_URI[archive.sha256sum] = "bba8ff30eea815037e53bee727bbd5f0b6a2e74d452a7711b819a7c444e78e53"

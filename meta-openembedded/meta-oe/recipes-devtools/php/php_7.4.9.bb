@@ -214,6 +214,8 @@ RDEPENDS_${PN}-cli = "${PN}"
 RDEPENDS_${PN}-modphp = "${PN} apache2"
 RDEPENDS_${PN}-opcache = "${PN}"
 
+ALLOW_EMPTY_${PN} = "1"
+
 INITSCRIPT_PACKAGES = "${PN}-fpm"
 inherit update-rc.d
 

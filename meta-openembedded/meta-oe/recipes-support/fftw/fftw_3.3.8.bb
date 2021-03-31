@@ -6,11 +6,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 SRC_URI = " \
     http://www.fftw.org/fftw-${PV}.tar.gz \
     file://0001-NEON-autodetection-segfaults-assume-neon-present.patch \
+    file://install-bench.patch \
+    file://run-ptest \
 "
 SRC_URI[md5sum] = "8aac833c943d8e90d51b697b27d4384d"
 SRC_URI[sha256sum] = "6113262f6e92c5bd474f2875fa1b01054c4ad5040f6b0da7c03c98821d9ae303"
 
-inherit autotools pkgconfig
+inherit autotools pkgconfig ptest
 
 # we had multiple recipes in the past
 PROVIDES = "fftwl fftwf"
@@ -65,6 +67,22 @@ do_install() {
     done
 }
 
+do_install_ptest() {
+    for lib in fftw fftwl fftwf; do
+        install -d ${D}${PTEST_PATH}/$lib
+        install -m 0755 ${S}/tests/check.pl ${D}${PTEST_PATH}/$lib
+        cd ${WORKDIR}/build-$lib
+        if [ $lib = "fftw" ]; then
+            mv ${D}${bindir}/bench ${D}${PTEST_PATH}/$lib
+        fi
+        if [ $lib = "fftwl" ]; then
+            mv ${D}${bindir}/benchl ${D}${PTEST_PATH}/$lib
+        fi
+        if [ $lib = "fftwf" ]; then
+            mv ${D}${bindir}/benchf ${D}${PTEST_PATH}/$lib
+        fi
+    done
+}
 
 PACKAGES =+ "libfftw libfftwl libfftwf"
 FILES_libfftw = "${libdir}/libfftw3.so.* ${libdir}/libfftw3_*.so.*"
@@ -79,5 +97,7 @@ FILES_fftw-wisdom-to-conf = "${bindir}/fftw-wisdom-to-conf"
 
 FILES_${PN}-dev += "${libdir}/cmake"
 RDEPENDS_${PN}-dev = "libfftw libfftwl libfftwf"
+RDEPENDS_${PN}-ptest += "perl"
+RDEPENDS_${PN}-ptest_remove = "fftw"
 
 BBCLASSEXTEND = "native"

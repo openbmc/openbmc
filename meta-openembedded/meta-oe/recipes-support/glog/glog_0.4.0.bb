@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=dc9db360e0bbd4e46672f3fd91dd6c4b"
 SRC_URI = " \
     git://github.com/google/glog.git;nobranch=1 \
     file://0001-Find-Libunwind-during-configure.patch \
+    file://libexecinfo.patch \
 "
 
 SRCREV = "96a2f23dca4cc7180821ca5f32e526314395d26a"
@@ -20,8 +21,11 @@ inherit cmake
 PACKAGECONFIG ?= "shared unwind"
 PACKAGECONFIG_remove_riscv64 = "unwind"
 PACKAGECONFIG_remove_riscv32 = "unwind"
+PACKAGECONFIG_append_libc-musl_riscv64 = " execinfo"
+PACKAGECONFIG_append_libc-musl_riscv32 = " execinfo"
 
 PACKAGECONFIG[unwind] = "-DWITH_UNWIND=ON,-DWITH_UNWIND=OFF,libunwind,libunwind"
+PACKAGECONFIG[execinfo] = ",,libexecinfo"
 PACKAGECONFIG[shared] = "-DBUILD_SHARED_LIBS=ON,-DBUILD_SHARED_LIBS=OFF,,"
 
 do_configure_append() {

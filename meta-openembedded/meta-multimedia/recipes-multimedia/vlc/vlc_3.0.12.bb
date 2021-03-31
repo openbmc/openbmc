@@ -16,9 +16,6 @@ DEPENDS = "coreutils-native fribidi libtool libgcrypt libgcrypt-native \
 LDFLAGS_append_riscv64 = " -latomic"
 LDFLAGS_append_riscv32 = " -latomic"
 
-# While this item does not require it, it depends on ffmpeg which does
-LICENSE_FLAGS = "commercial"
-
 SRC_URI = "http://download.videolan.org/pub/videolan/${BPN}/${PV}/${BP}.tar.xz \
            file://0001-make-opencv-configurable.patch \
            file://0002-use-vorbisidec.patch \
@@ -134,3 +131,4 @@ FILES_${PN}-staticdev += "\
 
 INSANE_SKIP_${PN} = "dev-so"
 
+EXCLUDE_FROM_WORLD = "${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "0", "1", d)}"

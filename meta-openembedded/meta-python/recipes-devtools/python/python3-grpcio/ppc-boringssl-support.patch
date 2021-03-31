@@ -12,6 +12,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +#elif (defined(__PPC__) || defined(__powerpc__))
 +#define OPENSSL_32_BIT
 +#define OPENSSL_PPC
- #elif defined(__mips__) && !defined(__LP64__)
+ #elif defined(__MIPSEL__) && !defined(__LP64__)
  #define OPENSSL_32_BIT
  #define OPENSSL_MIPS

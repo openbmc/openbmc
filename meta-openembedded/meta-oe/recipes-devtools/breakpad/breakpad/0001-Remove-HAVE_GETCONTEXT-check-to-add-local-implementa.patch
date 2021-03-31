@@ -1,0 +1,54 @@
+From 70441611d4e8200d9d16dfed493873b8c1bb57c5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 15 Mar 2021 11:33:38 -0700
+Subject: [PATCH] Remove HAVE_GETCONTEXT check to add local implementation
+
+On musl getcontext/setcontext APIs are implemented in libucontext which
+can be used
+
+Upstream-Status: Inappropriate [Musl Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index ee7454e4..69700192 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -187,10 +187,6 @@ src_client_linux_libbreakpad_client_a_SOURCES = \
+ 	src/common/linux/linux_libc_support.cc \
+ 	src/common/linux/memory_mapped_file.cc \
+ 	src/common/linux/safe_readlink.cc
+-if !HAVE_GETCONTEXT
+-src_client_linux_libbreakpad_client_a_SOURCES += \
+-	src/common/linux/breakpad_getcontext.S
+-endif
+ endif LINUX_HOST
+ 
+ if !DISABLE_PROCESSOR
+@@ -508,10 +504,6 @@ src_client_linux_linux_client_unittest_shlib_SOURCES = \
+ 	src/processor/minidump.cc \
+ 	src/processor/pathname_stripper.cc \
+ 	src/processor/proc_maps_linux.cc
+-if !HAVE_GETCONTEXT
+-src_client_linux_linux_client_unittest_shlib_SOURCES += \
+-	src/common/linux/breakpad_getcontext.S
+-endif
+ 
+ src_client_linux_linux_client_unittest_shlib_CPPFLAGS = \
+ 	$(AM_CPPFLAGS) $(TEST_CFLAGS)
+@@ -541,10 +533,6 @@ src_client_linux_linux_client_unittest_shlib_LDADD = \
+ 	src/common/string_conversion.o \
+ 	$(TEST_LIBS) \
+ 	$(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
+-if !HAVE_GETCONTEXT
+-src_client_linux_linux_client_unittest_shlib_SOURCES += \
+-	src/common/linux/breakpad_getcontext_unittest.cc
+-endif
+ if ANDROID_HOST
+ src_client_linux_linux_client_unittest_shlib_LDFLAGS += \
+ 	-llog -lm
+-- 
+2.30.2
+

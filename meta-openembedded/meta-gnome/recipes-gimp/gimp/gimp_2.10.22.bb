@@ -54,6 +54,7 @@ EXTRA_OECONF = "--disable-python \
                 --without-wmf"
 
 EXTRA_OECONF_append_libc-musl_mipsarch = " --disable-vector-icons"
+EXTRA_OECONF_append_libc-musl_riscv32 = " --disable-vector-icons"
 EXTRA_OECONF_append_arm = " --disable-vector-icons"
 
 do_configure_append() {

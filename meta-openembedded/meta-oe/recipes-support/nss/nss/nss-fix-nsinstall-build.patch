@@ -15,7 +15,7 @@ on host to install built files, it doesn't need any cross-compling or
 multilib build options. Just clean the ARCHFLAG and LDFLAGS to fix this
 error.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
 ===================================================
