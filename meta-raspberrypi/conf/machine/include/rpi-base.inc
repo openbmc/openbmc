@@ -15,6 +15,7 @@ XSERVER = " \
     "
 
 RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
+    overlays/overlay_map.dtb \
     overlays/at86rf233.dtbo \
     overlays/disable-bt.dtbo \
     overlays/dwc2.dtbo \
@@ -44,6 +45,7 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/rpi-poe.dtbo \
     overlays/vc4-fkms-v3d.dtbo \
     overlays/vc4-kms-v3d.dtbo \
+    overlays/vc4-kms-v3d-pi4.dtbo \
     overlays/vc4-kms-dsi-7inch.dtbo \
     overlays/w1-gpio.dtbo \
     overlays/w1-gpio-pullup.dtbo \
@@ -110,17 +112,17 @@ def make_dtb_boot_files(d):
 
     def transform(dtb):
         base = os.path.basename(dtb)
-        if dtb.endswith('dtb'):
-            # eg: whatever/bcm2708-rpi-b.dtb has:
-            #     DEPLOYDIR file: bcm2708-rpi-b.dtb
-            #     destination: bcm2708-rpi-b.dtb
-            return base
-        elif dtb.endswith('dtbo'):
+        if dtb.endswith('dtbo') or base == 'overlay_map.dtb':
             # overlay dtb:
             # eg: overlays/hifiberry-amp.dtbo has:
             #     DEPLOYDIR file: hifiberry-amp.dtbo
             #     destination: overlays/hifiberry-amp.dtbo
             return '{};{}'.format(base, dtb)
+        elif dtb.endswith('dtb'):
+            # eg: whatever/bcm2708-rpi-b.dtb has:
+            #     DEPLOYDIR file: bcm2708-rpi-b.dtb
+            #     destination: bcm2708-rpi-b.dtb
+            return base
 
     return ' '.join([transform(dtb) for dtb in alldtbs.split(' ') if dtb])
 
