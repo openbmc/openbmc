@@ -8,6 +8,7 @@ OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " iproute2 iproute2-ss"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " gbmc-systemd-config"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " gbmc-iperf3"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " authorized-keys-comp"
+OBMC_IMAGE_EXTRA_INSTALL_append_gbmc_dev = " gbmc-dev-ssh-key"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = \
   '${@"" if not d.getVar("GBMC_NCSI_IF_NAME") else " gbmc-ncsi-config"}'
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = \
