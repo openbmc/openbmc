@@ -25,6 +25,11 @@
             "name": "SYS_PWROK_BUFF",
             "pin": "R2",
             "direction": "in"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "pin": "P3",
+            "direction": "both"
         }
     ]
 }
