@@ -1,0 +1,3899 @@
+[
+   {
+      "Exposes":[
+         {
+            "Address":"$address",
+            "Bus":"$bus",
+            "Name":"BMC FRU",
+            "Type":"EEPROM"
+         },
+         {
+            "Address":"0x59",
+            "Bus":14,
+            "Name":"BMC_MAX34440",
+            "EntityID" : "0x13",
+            "Labels":[
+               "vout2",
+               "vout3",
+               "vout4",
+               "vout5",
+               "vout6"
+            ],
+            "vout2_Name":"DC_P2V5",
+            "vout3_Name":"DC_P1V2",
+            "vout4_Name":"DC_P3V3_PU",
+            "vout5_Name":"DC_3V3_STBY",
+            "vout6_Name":"DC_P1V175",
+            "vout2_Max":3,
+            "vout3_Max":2.2,
+            "vout4_Max":5.8,
+            "vout5_Max":5.8,
+            "vout6_Max":3,
+            "Thresholds":[
+                 {
+                     "Direction":"greater than",
+                     "Name":"upper critical",
+                     "Label":"vout2",
+                     "Severity":1,
+                     "Value":2.75
+                 },
+                 {
+                     "Direction":"greater than",
+                     "Name":"upper non critical",
+                     "Label":"vout2",
+                     "Severity":0,
+                     "Value":2.5
+                 },
+                 {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout2",
+                    "Severity":1,
+                    "Value":2.375
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout2",
+                    "Severity":0,
+                    "Value":2.4
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout3",
+                    "Severity":1,
+                    "Value":1.32
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout3",
+                    "Severity":0,
+                    "Value":1.22
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout3",
+                    "Severity":1,
+                    "Value":1.14
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout3",
+                    "Severity":0,
+                    "Value":1.17
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout4",
+                    "Severity":1,
+                    "Value":3.63
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout4",
+                    "Severity":0,
+                    "Value":3.4
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout4",
+                    "Severity":1,
+                    "Value":3.135
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout4",
+                    "Severity":0,
+                    "Value":3.2
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout5",
+                    "Severity":1,
+                    "Value":3.63
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout5",
+                    "Severity":0,
+                    "Value":3.4
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout5",
+                    "Severity":1,
+                    "Value":3.135
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout5",
+                    "Severity":0,
+                    "Value":3.2
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout6",
+                    "Severity":1,
+                    "Value":1.292
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout6",
+                    "Severity":0,
+                    "Value":1.23
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout6",
+                    "Severity":1,
+                    "Value":1.117
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout6",
+                    "Severity":0,
+                    "Value":1.117
+                }
+            ],
+            "Type":"MAX34440"
+         },
+         {
+            "Name":"DC_P2V5",
+            "Type":"MAX34440",
+            "EntityId":"0x13",
+            "EntityInstance":0
+         },
+         {
+            "Name":"DC_P1V2",
+            "Type":"MAX34440",
+            "EntityId":"0x13",
+            "EntityInstance":1
+         },
+         {
+            "Name":"DC_P3V3_PU",
+            "Type":"MAX34440",
+            "EntityId":"0x13",
+            "EntityInstance":2
+         },
+         {
+            "Name":"DC_3V3_STBY",
+            "Type":"MAX34440",
+            "EntityId":"0x13",
+            "EntityInstance":3
+         },
+         {
+            "Name":"DC_P1V175",
+            "Type":"MAX34440",
+            "EntityId":"0x13",
+            "EntityInstance":4
+         }
+      ],
+      "Name":"Kudo_BMC",
+      "Probe":"xyz.openbmc_project.FruDevice({'BOARD_SERIAL_NUMBER': 'ACN*'})",
+      "Type":"Board",
+      "xyz.openbmc_project.Inventory.Decorator.Asset":{
+         "Manufacturer":"$BOARD_MANUFACTURER",
+         "Model":"$BOARD_PRODUCT_NAME",
+         "PartNumber":"$BOARD_PART_NUMBER",
+         "SerialNumber":"$BOARD_SERIAL_NUMBER"
+      },
+      "xyz.openbmc_project.Inventory.Decorator.FruDevice":{
+         "Bus":"$bus",
+         "Address":"$address"
+      },
+      "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
+        "EntityId": "0x07",
+        "EntityInstance": 0
+      }
+   },
+   {
+      "Exposes":[
+         {
+            "Address":"$address",
+            "Bus":"$bus",
+            "Name":"MB FRU",
+            "Type":"EEPROM"
+         },
+         {
+            "Address":"0x48",
+            "Bus":42,
+            "Name":"Mobo_M2_ZONE_T",
+            "Thresholds":[
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Severity":1,
+                  "Value":105
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Severity":0,
+                  "Value":100
+               }
+            ],
+            "Type":"TMP75",
+            "EntityId": "0x03",
+            "EntityInstance": 1
+         },
+         {
+            "Address":"0x49",
+            "Bus":43,
+            "Name":"Mobo_BATT_ZONE_T",
+            "Thresholds":[
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Severity":1,
+                  "Value":105
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Severity":0,
+                  "Value":100
+               }
+            ],
+            "Type":"TMP75",
+            "EntityId": "0x03",
+            "EntityInstance": 2
+         },
+         {
+            "Address":"0x48",
+            "Bus":44,
+            "Name":"Mobo_NBM1_ZONE_T",
+            "Thresholds":[
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Severity":1,
+                  "Value":110
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Severity":0,
+                  "Value":108
+               }
+            ],
+            "Type":"TMP75",
+            "EntityId": "0x03",
+            "EntityInstance": 3
+         },
+         {
+            "Address":"0x49",
+            "Bus":45,
+            "Name":"Mobo_NBM2_ZONE_T",
+            "Thresholds":[
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Severity":1,
+                  "Value":110
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Severity":0,
+                  "Value":108
+               }
+            ],
+            "Type":"TMP75",
+            "EntityId": "0x03",
+            "EntityInstance": 4
+         },
+         {
+            "Address":"0x5c",
+            "Bus":20,
+            "Name":"Mobo_INLET1_T",
+            "Thresholds":[
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Severity":1,
+                  "Value":46
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Severity":0,
+                  "Value":42
+               }
+            ],
+            "Type":"TMP75",
+            "EntityId": "0x03",
+            "EntityInstance": 5
+         },
+         {
+            "Address":"0x5c",
+            "Bus":21,
+            "Name":"Mobo_OUTLET1_T",
+            "Thresholds":[
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Severity":1,
+                  "Value":90
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Severity":0,
+                  "Value":85
+               }
+            ],
+            "Type":"TMP75",
+            "EntityId": "0x03",
+            "EntityInstance": 6
+         },
+         {
+            "Address":"0x5c",
+            "Bus":22,
+            "Name":"Mobo_OUTLET2_T",
+            "Thresholds":[
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Severity":1,
+                  "Value":90
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Severity":0,
+                  "Value":85
+               }
+            ],
+            "Type":"TMP75",
+            "EntityId": "0x03",
+            "EntityInstance": 7
+         },
+         {
+            "Address":"0x5c",
+            "Bus":23,
+            "Name":"Mobo_OUTLET3_T",
+            "Thresholds":[
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Severity":1,
+                  "Value":90
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Severity":0,
+                  "Value":85
+               }
+            ],
+            "Type":"TMP75",
+            "EntityId": "0x03",
+            "EntityInstance": 8
+         },
+         {
+                  "Address":"0x74",
+                  "Bus":26,
+                  "Name":"Mobo_STB_T",
+                  "Labels":[
+                     "temp1"
+                   ],
+                   "temp1_Name":"Mobo_STB_T",
+                   "temp1_Max":255,
+                  "Thresholds":[
+                     {
+                        "Direction":"greater than",
+                        "Name":"upper critical",
+                        "Label":"temp1",
+                        "Severity":1,
+                        "Value":220
+                     },
+                     {
+                        "Direction":"greater than",
+                        "Name":"upper non critical",
+                        "Label":"temp1",
+                        "Severity":0,
+                        "Value":125
+                     }
+                  ],
+                  "Type":"pmbus",
+                  "EntityId": "0x03",
+                  "EntityInstance": 9
+         },
+         {
+            "Address":"0x40",
+            "Bus":32,
+            "Name":"MB_ADM1266_0",
+            "Labels":[
+               "vout1",
+               "vout2",
+               "vout3",
+               "vout4",
+               "vout5",
+               "vout6",
+               "vout7",
+               "vout8",
+               "vout9",
+               "vout10",
+               "vout11",
+               "vout12",
+               "vout13",
+               "vout14",
+               "vout15",
+               "vout16",
+               "vout17"
+            ],
+            "vout1_Name":"Mobo_12V_PSTB",
+            "vout2_Name":"Mobo_5V",
+            "vout3_Name":"Mobo_3V3",
+            "vout4_Name":"Mobo_3V3_STB",
+            "vout5_Name":"Mobo_48V",
+            "vout6_Name":"CPU0_13V5_NBM",
+            "vout7_Name":"CPU0_3V3_SOC",
+            "vout8_Name":"CPU0_1V2_DQ0123",
+            "vout9_Name":"CPU0_1V2_DQ4567",
+            "vout10_Name":"Mobo_8V5_PSTB",
+            "vout11_Name":"Mobo_5V_PSTB",
+            "vout12_Name":"CPU0_1V8_VDDH",
+            "vout13_Name":"CPU0_1V5_VDDH",
+            "vout14_Name":"Mobo_1V8_SATA",
+            "vout15_Name":"CPU0_1V8_SOC",
+            "vout16_Name":"CPU0_0V8_DC_SOC",
+            "vout17_Name":"Mobo_VBAT_RTC",
+            "vout1_Max":14.5,
+            "vout2_Max":8.5,
+            "vout3_Max":6,
+            "vout4_Max":6,
+            "vout5_Max":70,
+            "vout6_Max":19.5,
+            "vout7_Max":5,
+            "vout8_Max":3,
+            "vout9_Max":3,
+            "vout10_Max":11.5,
+            "vout11_Max":7.5,
+            "vout12_Max":4,
+            "vout13_Max":3,
+            "vout14_Max":4.5,
+            "vout15_Max":5,
+            "vout16_Max":3,
+            "vout17_Max":6,
+            "Thresholds":[
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout1",
+                  "Severity":1,
+                  "Value":12.6
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout1",
+                  "Severity":1,
+                  "Value":11.4
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout1",
+                  "Severity":0,
+                  "Value":12.4
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout1",
+                  "Severity":0,
+                  "Value":11.9
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout2",
+                  "Severity":1,
+                  "Value":6.06
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout2",
+                  "Severity":1,
+                  "Value":3.4
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout2",
+                  "Severity":0,
+                  "Value":5.25
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout2",
+                  "Severity":0,
+                  "Value":4.75
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout3",
+                  "Severity":1,
+                  "Value":3.98
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout3",
+                  "Severity":1,
+                  "Value":2.83
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout3",
+                  "Severity":0,
+                  "Value":3.465
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout3",
+                  "Severity":0,
+                  "Value":3.132
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout4",
+                  "Severity":1,
+                  "Value":5.508
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout4",
+                  "Severity":1,
+                  "Value":1.922
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout4",
+                  "Severity":0,
+                  "Value":2.938
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout4",
+                  "Severity":0,
+                  "Value":2.657
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout5",
+                  "Severity":1,
+                  "Value":64.9
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout5",
+                  "Severity":1,
+                  "Value":36.58
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout5",
+                  "Severity":0,
+                  "Value":59.95
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout5",
+                  "Severity":0,
+                  "Value":39.875
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout6",
+                  "Severity":1,
+                  "Value":16.685
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout6",
+                  "Severity":1,
+                  "Value":8.59
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout6",
+                  "Severity":0,
+                  "Value":14.91
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout6",
+                  "Severity":0,
+                  "Value":10.011
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout7",
+                  "Severity":1,
+                  "Value":3.98
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout7",
+                  "Severity":1,
+                  "Value":2.268
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout7",
+                  "Severity":0,
+                  "Value":3.456
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout7",
+                  "Severity":0,
+                  "Value":3.132
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout8",
+                  "Severity":1,
+                  "Value":1.805
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout8",
+                  "Severity":1,
+                  "Value":0.802
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout8",
+                  "Severity":0,
+                  "Value":1.263
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout8",
+                  "Severity":0,
+                  "Value":1.145
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout9",
+                  "Severity":1,
+                  "Value":1.805
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout9",
+                  "Severity":1,
+                  "Value":0.802
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout9",
+                  "Severity":0,
+                  "Value":1.263
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout9",
+                  "Severity":0,
+                  "Value":1.145
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout10",
+                  "Severity":1,
+                  "Value":8.898
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout10",
+                  "Severity":1,
+                  "Value":8.036
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout10",
+                  "Severity":0,
+                  "Value":8.938
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout10",
+                  "Severity":0,
+                  "Value":8.075
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout11",
+                  "Severity":1,
+                  "Value":5.253
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout11",
+                  "Severity":1,
+                  "Value":4.758
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout11",
+                  "Severity":0,
+                  "Value":5.143
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout11",
+                  "Severity":0,
+                  "Value":4.84
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout12",
+                  "Severity":1,
+                  "Value":2.167
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout12",
+                  "Severity":1,
+                  "Value":1.225
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout12",
+                  "Severity":0,
+                  "Value":1.884
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout12",
+                  "Severity":0,
+                  "Value":1.711
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout13",
+                  "Severity":1,
+                  "Value":1.804
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout13",
+                  "Severity":1,
+                  "Value":1.021
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout13",
+                  "Severity":0,
+                  "Value":1.575
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout13",
+                  "Severity":0,
+                  "Value":1.426
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout14",
+                  "Severity":1,
+                  "Value":2.072
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout14",
+                  "Severity":1,
+                  "Value":1.444
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout14",
+                  "Severity":0,
+                  "Value":1.884
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout14",
+                  "Severity":0,
+                  "Value":1.711
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout15",
+                  "Severity":1,
+                  "Value":2.165
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout15",
+                  "Severity":1,
+                  "Value":1.214
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout15",
+                  "Severity":0,
+                  "Value":1.883
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout15",
+                  "Severity":0,
+                  "Value":1.795
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout16",
+                  "Severity":1,
+                  "Value":1.196
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout16",
+                  "Severity":1,
+                  "Value":0.598
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout16",
+                  "Severity":0,
+                  "Value":0.823
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout16",
+                  "Severity":0,
+                  "Value":0.676
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout17",
+                  "Severity":1,
+                  "Value":3.972
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout17",
+                  "Severity":1,
+                  "Value":2.327
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout17",
+                  "Severity":0,
+                  "Value":3.455
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout17",
+                  "Severity":0,
+                  "Value":3.126
+               }
+            ],
+            "Type":"ADM1266"
+         },
+         {
+            "Name":"Mobo_12V_PSTB",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":5
+         },
+         {
+            "Name":"Mobo_5V",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":6
+         },
+         {
+            "Name":"Mobo_3V3",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":7
+         },
+         {
+            "Name":"Mobo_3V3_STB",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":8
+         },
+         {
+            "Name":"Mobo_48V",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":9
+         },
+         {
+            "Name":"CPU0_13V5_NBM",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":10
+         },
+         {
+            "Name":"CPU0_3V3_SOC",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":11
+         },
+         {
+            "Name":"CPU0_1V2_DQ0123",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":12
+         },
+         {
+            "Name":"CPU0_1V2_DQ4567",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":13
+         },
+         {
+            "Name":"Mobo_8V5_PSTB",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":14
+         },
+         {
+            "Name":"Mobo_5V_PSTB",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":15
+         },
+         {
+            "Name":"CPU0_1V8_VDDH",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":16
+         },
+         {
+            "Name":"CPU0_1V5_VDDH",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":17
+         },
+         {
+            "Name":"Mobo_1V8_SATA",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":18
+         },
+         {
+            "Name":"CPU0_1V8_SOC",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":19
+         },
+         {
+            "Name":"CPU0_0V8_DC_SOC",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":20
+         },
+         {
+            "Name":"Mobo_VBAT_RTC",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":21
+         },
+         {
+            "Address":"0x41",
+            "Bus":32,
+            "Name":"MB_ADM1266_1",
+            "Labels":[
+               "vout2",
+               "vout3",
+               "vout4",
+               "vout5",
+               "vout6",
+               "vout7",
+               "vout8",
+               "vout9",
+               "vout10",
+               "vout11",
+               "vout12",
+               "vout13",
+               "vout14",
+               "vout15",
+               "vout16",
+               "vout17"
+            ],
+            "vout2_Name":"Mobo_5V_SATA",
+            "vout3_Name":"Mobo_1V_SATA",
+            "vout4_Name":"CPU0_0V85_DC_RCA",
+            "vout5_Name":"CPU0_1V8_PCP",
+            "vout6_Name":"CPU1_13V5_NBM",
+            "vout7_Name":"CPU1_3V3_SOC",
+            "vout8_Name":"CPU1_1V2_DQ0123",
+            "vout9_Name":"CPU1_1V2_DQ4567",
+            "vout10_Name":"CPU0_0V75_PCP",
+            "vout11_Name":"CPU1_0V75_PCP",
+            "vout12_Name":"CPU1_1V8_VDDH",
+            "vout13_Name":"CPU1_1V5_VDDH",
+            "vout14_Name":"CPU1_0V85_DC_RCA",
+            "vout15_Name":"CPU1_1V8_SOC",
+            "vout16_Name":"CPU1_0V8_DC_SOC",
+            "vout17_Name":"CPU1_1V8_PCP",
+            "vout2_Max":9,
+            "vout3_Max":4.5,
+            "vout4_Max":3,
+            "vout5_Max":4,
+            "vout6_Max":20,
+            "vout7_Max":5.5,
+            "vout8_Max":3.5,
+            "vout9_Max":3.5,
+            "vout10_Max":3,
+            "vout11_Max":3,
+            "vout12_Max":4,
+            "vout13_Max":3.4,
+            "vout14_Max":3,
+            "vout15_Max":4,
+            "vout16_Max":3.2,
+            "vout17_Max":4,
+            "Thresholds":[
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout2",
+                  "Severity":1,
+                  "Value":6.06
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout2",
+                  "Severity":1,
+                  "Value":3.391
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout2",
+                  "Severity":0,
+                  "Value":5.244
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout2",
+                  "Severity":0,
+                  "Value":4.741
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout3",
+                  "Severity":1,
+                  "Value":3.009
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout3",
+                  "Severity":1,
+                  "Value":0.484
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout3",
+                  "Severity":0,
+                  "Value":0.637
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout3",
+                  "Severity":0,
+                  "Value":0.566
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout4",
+                  "Severity":1,
+                  "Value":1.901
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout4",
+                  "Severity":1,
+                  "Value":0.198
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout4",
+                  "Severity":0,
+                  "Value":1.496
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout4",
+                  "Severity":0,
+                  "Value":0.404
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout5",
+                  "Severity":1,
+                  "Value":2.165
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout5",
+                  "Severity":1,
+                  "Value":1.219
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout5",
+                  "Severity":0,
+                  "Value":1.891
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout5",
+                  "Severity":0,
+                  "Value":1.713
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout6",
+                  "Severity":1,
+                  "Value":16.685
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout6",
+                  "Severity":1,
+                  "Value":8.591
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout6",
+                  "Severity":0,
+                  "Value":14.91
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout6",
+                  "Severity":0,
+                  "Value":10.011
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout7",
+                  "Severity":1,
+                  "Value":3.974
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout7",
+                  "Severity":1,
+                  "Value":2.268
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout7",
+                  "Severity":0,
+                  "Value":3.465
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout7",
+                  "Severity":0,
+                  "Value":3.132
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout8",
+                  "Severity":1,
+                  "Value":1.805
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout8",
+                  "Severity":1,
+                  "Value":0.802
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout8",
+                  "Severity":0,
+                  "Value":1.263
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout8",
+                  "Severity":0,
+                  "Value":1.145
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout9",
+                  "Severity":1,
+                  "Value":1.805
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout9",
+                  "Severity":1,
+                  "Value":0.802
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout9",
+                  "Severity":0,
+                  "Value":1.263
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout9",
+                  "Severity":0,
+                  "Value":1.145
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout10",
+                  "Severity":1,
+                  "Value":1.196
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout10",
+                  "Severity":1,
+                  "Value":0.598
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout10",
+                  "Severity":0,
+                  "Value":1.098
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout10",
+                  "Severity":0,
+                  "Value":0.755
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout11",
+                  "Severity":1,
+                  "Value":1.196
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout11",
+                  "Severity":1,
+                  "Value":0.598
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout11",
+                  "Severity":0,
+                  "Value":1.098
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout11",
+                  "Severity":0,
+                  "Value":0.755
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout12",
+                  "Severity":1,
+                  "Value":2.167
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout12",
+                  "Severity":1,
+                  "Value":1.225
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout12",
+                  "Severity":0,
+                  "Value":1.884
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout12",
+                  "Severity":0,
+                  "Value":1.711
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout13",
+                  "Severity":1,
+                  "Value":1.804
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout13",
+                  "Severity":1,
+                  "Value":1.021
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout13",
+                  "Severity":0,
+                  "Value":1.575
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout13",
+                  "Severity":0,
+                  "Value":1.426
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout14",
+                  "Severity":1,
+                  "Value":1.901
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout14",
+                  "Severity":1,
+                  "Value":0.198
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout14",
+                  "Severity":0,
+                  "Value":1.496
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout14",
+                  "Severity":0,
+                  "Value":0.404
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout15",
+                  "Severity":1,
+                  "Value":2.165
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout15",
+                  "Severity":1,
+                  "Value":1.214
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout15",
+                  "Severity":0,
+                  "Value":1.883
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout15",
+                  "Severity":0,
+                  "Value":1.795
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout16",
+                  "Severity":1,
+                  "Value":1.196
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout16",
+                  "Severity":1,
+                  "Value":0.598
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout16",
+                  "Severity":0,
+                  "Value":0.823
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout16",
+                  "Severity":0,
+                  "Value":0.676
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper critical",
+                  "Label":"vout17",
+                  "Severity":1,
+                  "Value":2.165
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Label":"vout17",
+                  "Severity":1,
+                  "Value":1.219
+               },
+               {
+                  "Direction":"greater than",
+                  "Name":"upper non critical",
+                  "Label":"vout17",
+                  "Severity":0,
+                  "Value":1.891
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Label":"vout17",
+                  "Severity":0,
+                  "Value":1.713
+               }
+            ],
+            "Type":"ADM1266"
+         },
+         {
+            "Name":"Mobo_5V_SATA",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":22
+         },
+         {
+            "Name":"Mobo_1V_SATA",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":23
+         },
+         {
+            "Name":"CPU0_0V85_DC_RCA",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":24
+         },
+         {
+            "Name":"CPU0_1V8_PCP",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":25
+         },
+         {
+            "Name":"CPU1_13V5_NBM",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":26
+         },
+         {
+            "Name":"CPU1_3V3_SOC",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":27
+         },
+         {
+            "Name":"CPU1_1V2_DQ0123",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":28
+         },
+         {
+            "Name":"CPU1_1V2_DQ4567",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":29
+         },
+         {
+            "Name":"CPU0_0V75_PCP",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":30
+         },
+         {
+            "Name":"CPU1_0V75_PCP",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":31
+         },
+         {
+            "Name":"CPU1_1V8_VDDH",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":32
+         },
+         {
+            "Name":"CPU1_1V5_VDDH",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":33
+         },
+         {
+            "Name":"CPU1_0V85_DC_RCA",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":34
+         },
+         {
+            "Name":"CPU1_1V8_SOC",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":35
+         },
+         {
+            "Name":"CPU1_0V8_DC_SOC",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":36
+         },
+         {
+            "Name":"CPU1_1V8_PCP",
+            "Type":"ADM1266",
+            "EntityId":"0x13",
+            "EntityInstance":37
+         },
+         {
+            "Address":"0x4e",
+            "Bus":2,
+            "Name":"MB_smpro_CPU1",
+            "Labels":[
+               "temp1",
+               "temp2",
+               "temp3",
+               "temp4",
+               "temp5",
+               "temp6",
+               "temp7",
+               "temp8",
+               "temp9",
+               "temp10",
+               "temp11",
+               "temp12",
+               "temp13",
+               "temp14",
+               "pout5",
+               "pout3",
+               "pout4",
+               "pout6",
+               "pout7",
+               "pout8",
+               "vout1",
+               "vout2",
+               "vout3",
+               "vout4",
+               "vout5",
+               "vout6",
+               "temp17",
+               "curr1",
+               "curr2",
+               "curr3",
+               "curr4",
+               "curr5"
+            ],
+            "Type":"AC01_SMPRO",
+            "temp1_Name":"CPU1_SOC_T",
+            "temp2_Name":"CPU1_SOC_VRD_T",
+            "temp3_Name":"CPU1_DIMM_VRD_T",
+            "temp4_Name":"CPU1_CORE_VRD_T",
+            "temp5_Name":"CPU1_DIMMG0_T",
+            "temp6_Name":"CPU1_CH0DIMM_T",
+            "temp7_Name":"CPU1_CH1DIMM_T",
+            "temp8_Name":"CPU1_CH2DIMM_T",
+            "temp9_Name":"CPU1_CH3DIMM_T",
+            "temp10_Name":"CPU1_DIMMG1_T",
+            "temp11_Name":"CPU1_CH4DIMM_T",
+            "temp12_Name":"CPU1_CH5DIMM_T",
+            "temp13_Name":"CPU1_CH6DIMM_T",
+            "temp14_Name":"CPU1_CH7DIMM_T",
+            "pout5_Name":"CPU1_CPU_PW",
+            "pout3_Name":"CPU1_DIMM_VR1_PW",
+            "pout4_Name":"CPU1_DIMM_VR2_PW",
+            "pout6_Name":"CPU1_MEM_PW",
+            "pout7_Name":"CPU1_RCA_VR_PW",
+            "pout8_Name":"CPU1_SOC_TDP_PW",
+            "vout1_Name":"CPU1_CPU_VCORE",
+            "vout2_Name":"CPU1_SOC_V",
+            "vout3_Name":"CPU1_DIMM_VR1_V",
+            "vout4_Name":"CPU1_DIMM_VR2_V",
+            "vout5_Name":"CPU1_DIMM_DDR_V",
+            "vout6_Name":"CPU1_RCA_VR_V",
+            "temp17_Name":"CPU1_RCA_VR_T",
+            "curr1_Name":"CPU1_CORE_VRD_CU",
+            "curr2_Name":"CPU1_SOC_VRD_CU",
+            "curr3_Name":"CPU1_DIMM_VR1_CU",
+            "curr4_Name":"CPU1_DIMM_VR2_CU",
+            "curr5_Name":"CPU1_RCA_VRD_CU",
+            "temp1_Max":255,
+            "temp2_Max":255,
+            "temp3_Max":255,
+            "temp4_Max":255,
+            "temp5_Max":255,
+            "temp6_Max":255,
+            "temp7_Max":255,
+            "temp8_Max":255,
+            "temp9_Max":255,
+            "temp10_Max":255,
+            "temp11_Max":255,
+            "temp12_Max":255,
+            "temp13_Max":255,
+            "temp14_Max":255,
+            "pout5_Max":255,
+            "pout3_Max":40,
+            "pout4_Max":40,
+            "pout6_Max":70,
+            "pout7_Max":30,
+            "pout8_Max":255,
+            "vout1_Max":3.2,
+            "vout2_Max":3.3,
+            "vout3_Max":3,
+            "vout4_Max":3,
+            "vout5_Max":5,
+            "vout6_Max":6,
+            "temp17_Max":255,
+            "curr1_Max":13,
+            "curr2_Max":5,
+            "curr3_Max":13,
+            "curr4_Max":13,
+            "curr5_Max":10,
+            "Thresholds":[
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp1",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp1",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp2",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp2",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp3",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp3",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp4",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp4",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp5",
+                    "Severity":1,
+                    "Value":90
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp5",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp6",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp6",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp7",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp7",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp8",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp8",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp9",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp9",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp10",
+                    "Severity":1,
+                    "Value":90
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp10",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp11",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp11",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp12",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp12",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp13",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp13",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp14",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp14",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"pout5",
+                    "Severity":1,
+                    "Value":53.815
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"pout5",
+                    "Severity":0,
+                    "Value":47.94
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"pout3",
+                    "Severity":1,
+                    "Value":7.801
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"pout4",
+                    "Severity":1,
+                    "Value":7.801
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"pout6",
+                    "Severity":1,
+                    "Value":29.987
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout1",
+                    "Severity":1,
+                    "Value":1.05
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout1",
+                    "Severity":1,
+                    "Value":0.697
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout1",
+                    "Severity":0,
+                    "Value":1.05
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout1",
+                    "Severity":0,
+                    "Value":0.697
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout2",
+                    "Severity":1,
+                    "Value":0.951
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout2",
+                    "Severity":1,
+                    "Value":0.549
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout2",
+                    "Severity":0,
+                    "Value":0.804
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout2",
+                    "Severity":0,
+                    "Value":0.598
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout3",
+                    "Severity":1,
+                    "Value":1.254
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout3",
+                    "Severity":1,
+                    "Value":1.098
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout3",
+                    "Severity":0,
+                    "Value":1.215
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout3",
+                    "Severity":0,
+                    "Value":1.147
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout4",
+                    "Severity":1,
+                    "Value":1.254
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout4",
+                    "Severity":1,
+                    "Value":1.098
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout4",
+                    "Severity":0,
+                    "Value":1.215
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout4",
+                    "Severity":0,
+                    "Value":1.147
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout5",
+                    "Severity":1,
+                    "Value":2.999
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp17",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp17",
+                    "Severity":0,
+                    "Value":100
+                }
+            ]
+         },
+         {
+            "Name":"CPU1_SOC_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":12
+         },
+         {
+            "Name":"CPU1_SOC_VRD_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":13
+         },
+         {
+            "Name":"CPU1_DIMM_VRD_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":14
+         },
+         {
+            "Name":"CPU1_CORE_VRD_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":15
+         },
+         {
+            "Name":"CPU1_DIMMG0_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":16
+         },
+         {
+            "Name":"CPU1_CH0DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":17
+         },
+         {
+            "Name":"CPU1_CH1DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":18
+         },
+         {
+            "Name":"CPU1_CH2DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":19
+         },
+         {
+            "Name":"CPU1_CH3DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":20
+         },
+         {
+            "Name":"CPU1_DIMMG1_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":21
+         },
+         {
+            "Name":"CPU1_CH4DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":22
+         },
+         {
+            "Name":"CPU1_CH5DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":23
+         },
+         {
+            "Name":"CPU1_CH6DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":24
+         },
+         {
+            "Name":"CPU1_CH7DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":25
+         },
+         {
+            "Name":"CPU1_CPU_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":38
+         },
+         {
+            "Name":"CPU1_DIMM_VR1_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":39
+         },
+         {
+            "Name":"CPU1_DIMM_VR2_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":40
+         },
+         {
+            "Name":"CPU1_MEM_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":41
+         },
+         {
+            "Name":"CPU1_RCA_VR_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":42
+         },
+         {
+            "Name":"CPU1_SOC_TDP_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":43
+         },
+         {
+            "Name":"CPU1_CPU_VCORE",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":44
+         },
+         {
+            "Name":"CPU1_SOC_V",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":45
+         },
+         {
+            "Name":"CPU1_DIMM_VR1_V",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":46
+         },
+         {
+            "Name":"CPU1_DIMM_VR2_V",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":47
+         },
+         {
+            "Name":"CPU1_DIMM_DDR_V",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":48
+         },
+         {
+            "Name":"CPU1_RCA_VR_V",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":49
+         },
+         {
+            "Name":"CPU1_RCA_VR_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":26
+         },
+         {
+            "Name":"CPU1_CORE_VRD_CU",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":50
+         },
+         {
+            "Name":"CPU1_SOC_VRD_CU",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":51
+         },
+         {
+            "Name":"CPU1_DIMM_VR1_CU",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":52
+         },
+         {
+            "Name":"CPU1_DIMM_VR2_CU",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":53
+         },
+         {
+            "Name":"CPU1_RCA_VRD_CU",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":54
+         },
+         {
+            "Address":"0x4f",
+            "Bus":2,
+            "Name":"MB_smpro_CPU0",
+            "Labels":[
+               "temp1",
+               "temp2",
+               "temp3",
+               "temp4",
+               "temp5",
+               "temp6",
+               "temp7",
+               "temp8",
+               "temp9",
+               "temp10",
+               "temp11",
+               "temp12",
+               "temp13",
+               "temp14",
+               "pout5",
+               "pout3",
+               "pout4",
+               "pout6",
+               "pout7",
+               "pout8",
+               "vout1",
+               "vout2",
+               "vout3",
+               "vout4",
+               "vout5",
+               "vout6",
+               "temp17",
+               "curr1",
+               "curr2",
+               "curr3",
+               "curr4",
+               "curr5"
+            ],
+            "Type":"AC01_SMPRO",
+            "temp1_Name":"CPU0_SOC_T",
+            "temp2_Name":"CPU0_SOC_VRD_T",
+            "temp3_Name":"CPU0_DIMM_VRD_T",
+            "temp4_Name":"CPU0_CORE_VRD_T",
+            "temp5_Name":"CPU0_DIMMG0_T",
+            "temp6_Name":"CPU0_CH0DIMM_T",
+            "temp7_Name":"CPU0_CH1DIMM_T",
+            "temp8_Name":"CPU0_CH2DIMM_T",
+            "temp9_Name":"CPU0_CH3DIMM_T",
+            "temp10_Name":"CPU0_DIMMG1_T",
+            "temp11_Name":"CPU0_CH4DIMM_T",
+            "temp12_Name":"CPU0_CH5DIMM_T",
+            "temp13_Name":"CPU0_CH6DIMM_T",
+            "temp14_Name":"CPU0_CH7DIMM_T",
+            "pout5_Name":"CPU0_CPU_PW",
+            "pout3_Name":"CPU0_DIMM_VR1_PW",
+            "pout4_Name":"CPU0_DIMM_VR2_PW",
+            "pout6_Name":"CPU0_MEM_PW",
+            "pout7_Name":"CPU0_RCA_VR_PW",
+            "pout8_Name":"CPU0_SOC_TDP_PW",
+            "vout1_Name":"CPU0_CPU_VCORE",
+            "vout2_Name":"CPU0_SOC_V",
+            "vout3_Name":"CPU0_DIMM_VR1_V",
+            "vout4_Name":"CPU0_DIMM_VR2_V",
+            "vout5_Name":"CPU0_DIMM_DDR_V",
+            "vout6_Name":"CPU0_RCA_VR_V",
+            "temp17_Name":"CPU0_RCA_VR_T",
+            "curr1_Name":"CPU0_CORE_VRD_CU",
+            "curr2_Name":"CPU0_SOC_VRD_CU",
+            "curr3_Name":"CPU0_DIMM_VR1_CU",
+            "curr4_Name":"CPU0_DIMM_VR2_CU",
+            "curr5_Name":"CPU0_RCA_VRD_CU",
+            "temp1_Max":255,
+            "temp2_Max":255,
+            "temp3_Max":255,
+            "temp4_Max":255,
+            "temp5_Max":255,
+            "temp6_Max":255,
+            "temp7_Max":255,
+            "temp8_Max":255,
+            "temp9_Max":255,
+            "temp10_Max":255,
+            "temp11_Max":255,
+            "temp12_Max":255,
+            "temp13_Max":255,
+            "temp14_Max":255,
+            "pout5_Max":350,
+            "pout3_Max":40,
+            "pout4_Max":40,
+            "pout6_Max":80,
+            "pout7_Max":30,
+            "pout8_Max":255,
+            "vout1_Max":3,
+            "vout2_Max":3.5,
+            "vout3_Max":3.5,
+            "vout4_Max":3.5,
+            "vout5_Max":5,
+            "vout6_Max":5,
+            "temp17_Max":255,
+            "curr1_Max":13,
+            "curr2_Max":5,
+            "curr3_Max":12,
+            "curr4_Max":12,
+            "curr5_Max":10,
+            "Thresholds":[
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp1",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp1",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp2",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp2",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp3",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp3",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp4",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp4",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp5",
+                    "Severity":1,
+                    "Value":90
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp5",
+                    "Severity":0,
+                    "Value":80
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp6",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp6",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp7",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp7",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp8",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp8",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp9",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp9",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp10",
+                    "Severity":1,
+                    "Value":90
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp10",
+                    "Severity":0,
+                    "Value":80
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp11",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp11",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp12",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp12",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp13",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp13",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp14",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp14",
+                    "Severity":0,
+                    "Value":100
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"pout5",
+                    "Severity":1,
+                    "Value":299.98
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"pout5",
+                    "Severity":0,
+                    "Value":299.98
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"pout3",
+                    "Severity":1,
+                    "Value":7.801
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"pout4",
+                    "Severity":1,
+                    "Value":7.801
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"pout6",
+                    "Severity":1,
+                    "Value":29.987
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout1",
+                    "Severity":1,
+                    "Value":1.05
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout1",
+                    "Severity":1,
+                    "Value":0.697
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout1",
+                    "Severity":0,
+                    "Value":1.05
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout1",
+                    "Severity":0,
+                    "Value":0.697
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout2",
+                    "Severity":1,
+                    "Value":0.951
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout2",
+                    "Severity":1,
+                    "Value":0.549
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout2",
+                    "Severity":0,
+                    "Value":0.804
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout2",
+                    "Severity":0,
+                    "Value":0.598
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout3",
+                    "Severity":1,
+                    "Value":1.254
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout3",
+                    "Severity":1,
+                    "Value":1.098
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout3",
+                    "Severity":0,
+                    "Value":1.215
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout3",
+                    "Severity":0,
+                    "Value":1.147
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout4",
+                    "Severity":1,
+                    "Value":1.254
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower critical",
+                    "Label":"vout4",
+                    "Severity":1,
+                    "Value":1.098
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"vout4",
+                    "Severity":0,
+                    "Value":1.215
+                },
+                {
+                    "Direction":"less than",
+                    "Name":"lower non critical",
+                    "Label":"vout4",
+                    "Severity":0,
+                    "Value":1.147
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"vout5",
+                    "Severity":1,
+                    "Value":2.999
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper critical",
+                    "Label":"temp17",
+                    "Severity":1,
+                    "Value":105
+                },
+                {
+                    "Direction":"greater than",
+                    "Name":"upper non critical",
+                    "Label":"temp17",
+                    "Severity":0,
+                    "Value":100
+                }
+            ]
+         },
+         {
+            "Name":"CPU0_SOC_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":27
+         },
+         {
+            "Name":"CPU0_SOC_VRD_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":28
+         },
+         {
+            "Name":"CPU0_DIMM_VRD_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":29
+         },
+         {
+            "Name":"CPU0_CORE_VRD_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":30
+         },
+         {
+            "Name":"CPU0_DIMMG0_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":31
+         },
+         {
+            "Name":"CPU0_CH0DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":32
+         },
+         {
+            "Name":"CPU0_CH1DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":33
+         },
+         {
+            "Name":"CPU0_CH2DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":34
+         },
+         {
+            "Name":"CPU0_CH3DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":35
+         },
+         {
+            "Name":"CPU0_DIMMG1_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":36
+         },
+         {
+            "Name":"CPU0_CH4DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":37
+         },
+         {
+            "Name":"CPU0_CH5DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":38
+         },
+         {
+            "Name":"CPU0_CH6DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":39
+         },
+         {
+            "Name":"CPU0_CH7DIMM_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":40
+         },
+         {
+            "Name":"CPU0_CPU_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":55
+         },
+         {
+            "Name":"CPU0_DIMM_VR1_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":56
+         },
+         {
+            "Name":"CPU0_DIMM_VR2_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":57
+         },
+         {
+            "Name":"CPU0_MEM_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":58
+         },
+         {
+            "Name":"CPU0_RCA_VR_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":59
+         },
+         {
+            "Name":"CPU0_SOC_TDP_PW",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":60
+         },
+         {
+            "Name":"CPU0_CPU_VCORE",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":61
+         },
+         {
+            "Name":"CPU0_SOC_V",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":62
+         },
+         {
+            "Name":"CPU0_DIMM_VR1_V",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":63
+         },
+         {
+            "Name":"CPU0_DIMM_VR2_V",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":64
+         },
+         {
+            "Name":"CPU0_DIMM_DDR_V",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":65
+         },
+         {
+            "Name":"CPU0_RCA_VR_V",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":66
+         },
+         {
+            "Name":"CPU0_RCA_VR_T",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x03",
+            "EntityInstance":41
+         },
+         {
+            "Name":"CPU0_CORE_VRD_CU",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":67
+         },
+         {
+            "Name":"CPU0_SOC_VRD_CU",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":68
+         },
+         {
+            "Name":"CPU0_DIMM_VR1_CU",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":69
+         },
+         {
+            "Name":"CPU0_DIMM_VR2_CU",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":70
+         },
+         {
+            "Name":"CPU0_RCA_VRD_CU",
+            "Type":"AC01_SMPRO",
+            "EntityId":"0x13",
+            "EntityInstance":71
+         },
+         {
+            "Index" : 8,
+            "Name" : "Mobo_NBM1_RAW",
+            "Type" : "ADC",
+            "EntityId" : "0x13",
+            "EntityInstance" : 72
+         },
+         {
+            "Index" : 9,
+            "Name" : "Mobo_NBM2_RAW",
+            "Type" : "ADC",
+            "EntityId" : "0x13",
+            "EntityInstance" : 73
+         },
+         {
+            "Name" : "Mobo_NBM1_T"
+         },
+         {
+            "Name" : "Mobo_NBM2_T"
+         },
+         {
+            "AllowedFailures":1,
+            "Name":"FanRedundancy",
+            "Type":"FanRedundancy"
+         },
+         {
+            "Address":"0x2c",
+            "Bus":"18",
+            "Connector":{
+               "Name":"REAR_FAN0_SPEED",
+               "Pwm":0,
+               "PwmName":"REAR_FAN0_PWM",
+               "Tachs":[
+                  0
+               ]
+            },
+            "Index":0,
+            "MaxReading":20000,
+            "Name":"REAR_FAN0_SPEED",
+            "PowerState":"Always",
+            "Thresholds":[
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Severity":1,
+                  "Value":2000
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Severity":0,
+                  "Value":1000
+               }
+            ],
+            "Type":"I2CFan",
+            "EntityId":"0x1D",
+            "EntityInstance":0,
+            "Mutable":true
+         },
+         {
+            "EntityId":"0x1D",
+            "EntityInstance":0,
+            "Mutable":true,
+            "Name":"REAR_FAN0_PWM",
+            "Type":"I2CFan"
+         },
+         {
+            "Address":"0x2c",
+            "Bus":"18",
+            "Connector":{
+               "Name":"REAR_FAN1_SPEED",
+               "Pwm":1,
+               "PwmName":"REAR_FAN1_PWM",
+               "Tachs":[
+                  0
+               ]
+            },
+            "Index":1,
+            "MaxReading":20000,
+            "Name":"REAR_FAN1_SPEED",
+            "PowerState":"Always",
+            "Thresholds":[
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Severity":1,
+                  "Value":2000
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Severity":0,
+                  "Value":1000
+               }
+            ],
+            "Type":"I2CFan",
+            "EntityId":"0x1D",
+            "EntityInstance":1
+         },
+         {
+            "EntityId":"0x1D",
+            "EntityInstance":1,
+            "Mutable":true,
+            "Name":"REAR_FAN1_PWM",
+            "Type":"I2CFan"
+         },
+         {
+            "Address":"0x2c",
+            "Bus":"18",
+            "Connector":{
+               "Name":"REAR_FAN2_SPEED",
+               "Pwm":2,
+               "PwmName":"REAR_FAN2_PWM",
+               "Tachs":[
+                  0
+               ],
+               "EntityId":"0x1D",
+               "EntityInstance":2,
+               "Mutable":true
+            },
+            "Index":2,
+            "MaxReading":20000,
+            "Name":"REAR_FAN2_SPEED",
+            "PowerState":"Always",
+            "Thresholds":[
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Severity":1,
+                  "Value":2000
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Severity":0,
+                  "Value":1000
+               }
+            ],
+            "Type":"I2CFan",
+            "EntityId":"0x1D",
+            "EntityInstance":2
+         },
+         {
+            "EntityId":"0x1D",
+            "EntityInstance":2,
+            "Mutable":true,
+            "Name":"REAR_FAN2_PWM",
+            "Type":"I2CFan"
+         },
+         {
+            "Address":"0x2c",
+            "Bus":"18",
+            "Connector":{
+               "Name":"REAR_FAN3_SPEED",
+               "Pwm":3,
+               "PwmName":"REAR_FAN3_PWM",
+               "Tachs":[
+                  0
+               ],
+               "EntityId":"0x1D",
+               "EntityInstance":3,
+               "Mutable":true
+            },
+            "Index":3,
+            "MaxReading":20000,
+            "Name":"REAR_FAN3_SPEED",
+            "PowerState":"Always",
+            "Thresholds":[
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Severity":1,
+                  "Value":2000
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Severity":0,
+                  "Value":1000
+               }
+            ],
+            "Type":"I2CFan",
+            "EntityId":"0x1D",
+            "EntityInstance":3
+         },
+         {
+            "EntityId":"0x1D",
+            "EntityInstance":3,
+            "Mutable":true,
+            "Name":"REAR_FAN3_PWM",
+            "Type":"I2CFan"
+         },
+         {
+            "Address":"0x2c",
+            "Bus":"18",
+            "Connector":{
+               "Name":"REAR_FAN4_SPEED",
+               "Pwm":4,
+               "PwmName":"REAR_FAN4_PWM",
+               "Tachs":[
+                  0
+               ],
+               "EntityId":"0x1D",
+               "EntityInstance":4,
+               "Mutable":true
+            },
+            "Index":4,
+            "MaxReading":20000,
+            "Name":"REAR_FAN4_SPEED",
+            "PowerState":"Always",
+            "Thresholds":[
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Severity":1,
+                  "Value":2000
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Severity":0,
+                  "Value":1000
+               }
+            ],
+            "Type":"I2CFan",
+            "EntityId":"0x1D",
+            "EntityInstance":4
+         },
+         {
+            "EntityId":"0x1D",
+            "EntityInstance":4,
+            "Mutable":true,
+            "Name":"REAR_FAN4_PWM",
+            "Type":"I2CFan"
+         },
+         {
+            "Address":"0x2c",
+            "Bus":"18",
+            "Connector":{
+               "Name":"REAR_FAN5_SPEED",
+               "Pwm":5,
+               "PwmName":"REAR_FAN5_PWM",
+               "Tachs":[
+                  0
+               ],
+               "EntityId":"0x1D",
+               "EntityInstance":5,
+               "Mutable":true
+            },
+            "Index":5,
+            "MaxReading":20000,
+            "Name":"REAR_FAN5_SPEED",
+            "PowerState":"Always",
+            "Thresholds":[
+               {
+                  "Direction":"less than",
+                  "Name":"lower critical",
+                  "Severity":1,
+                  "Value":2000
+               },
+               {
+                  "Direction":"less than",
+                  "Name":"lower non critical",
+                  "Severity":0,
+                  "Value":1000
+               }
+            ],
+            "Type":"I2CFan",
+            "EntityId":"0x1D",
+            "EntityInstance":5
+         },
+         {
+            "EntityId":"0x1D",
+            "EntityInstance":5,
+            "Mutable":true,
+            "Name":"REAR_FAN5_PWM",
+            "Type":"I2CFan"
+         },
+    {
+            "Name": "Fan1Zone",
+            "Type": "Pid.Zone",
+            "MinThermalOutput": 25,
+            "FailSafePercent": 100
+         },
+     {
+            "Name": "Fan2Zone",
+            "Type": "Pid.Zone",
+            "MinThermalOutput": 25,
+            "FailSafePercent": 100
+         },
+         {
+            "Name": "REAR_FAN0_1",
+            "Type": "Pid",
+            "Class": "fan",
+            "SetPoint": 65.0,
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "REAR_FAN0_SPEED",
+                "REAR_FAN1_SPEED"
+            ],
+            "Outputs": [
+                "REAR_FAN0_PWM",
+                "REAR_FAN1_PWM"
+            ],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "REAR_FAN2",
+            "Type": "Pid",
+            "Class": "fan",
+            "SetPoint": 65.0,
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "REAR_FAN2_SPEED"
+            ],
+            "Outputs": [
+                "REAR_FAN2_PWM"
+            ],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "REAR_FAN3",
+            "Type": "Pid",
+            "Class": "fan",
+            "SetPoint": 65.0,
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "REAR_FAN3_SPEED"
+            ],
+            "Outputs": [
+                "REAR_FAN3_PWM"
+            ],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "REAR_FAN4_5",
+            "Type": "Pid",
+            "Class": "fan",
+            "SetPoint": 65.0,
+            "FFGainCoefficient": 1.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": 0.0,
+            "ICoefficient": 0.0,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "REAR_FAN4_SPEED",
+                "REAR_FAN5_SPEED"
+            ],
+            "Outputs": [
+                "REAR_FAN4_PWM",
+                "REAR_FAN5_PWM"
+            ],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "CPU0_SOC_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 90.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -4.5,
+            "ICoefficient": -0.3,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU0_SOC_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "CPU0_SOC_VRD_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 85.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU0_SOC_VRD_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "CPU0_DIMM_VRD_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 85.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU0_DIMM_VRD_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "CPU0_CORE_VRD_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 85.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU0_CORE_VRD_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "CPU0_DIMMG0_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 60.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU0_DIMMG0_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "CPU0_DIMMG1_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 60.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU0_DIMMG0_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "CPU1_SOC_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 90.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -4.5,
+            "ICoefficient": -0.3,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU1_SOC_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "CPU1_SOC_VRD_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 85.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU1_SOC_VRD_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "CPU1_DIMM_VRD_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 85.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU1_DIMM_VRD_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "CPU1_CORE_VRD_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 85.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU1_CORE_VRD_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "CPU1_DIMMG0_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 60.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU1_DIMMG0_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "CPU1_DIMMG1_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 60.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "CPU1_DIMMG0_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "Mobo_STB_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 85.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "Mobo_STB_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "Mobo_NBM1_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 75.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "Mobo_NBM1_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "Mobo_NBM2_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 75.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "Mobo_NBM2_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "Mobo_NBM1_ZONE_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 60.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "Mobo_NBM1_ZONE_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "Mobo_NBM2_ZONE_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 60.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "Mobo_NBM2_ZONE_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         },
+         {
+            "Name": "Mobo_M2_ZONE_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 50.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -2.0,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "Mobo_M2_ZONE_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan1Zone"
+            ]
+         },
+         {
+            "Name": "Mobo_BATT_ZONE_TEMP",
+            "Type": "Pid",
+            "Class": "temp",
+            "SetPoint": 50.0,
+            "FFGainCoefficient": 0.0,
+            "FFOffCoefficient": 0.0,
+            "PCoefficient": -3.5,
+            "ICoefficient": -0.1,
+            "ILimitMin": 0.0,
+            "ILimitMax": 0.0,
+            "PositiveHysteresis": 0.0,
+            "NegativeHysteresis": 0.0,
+            "SlewPos": 0.0,
+            "SlewNeg": 0.0,
+            "OutLimitMin": 25.0,
+            "OutLimitMax": 100.0,
+            "Inputs": [
+                "Mobo_BATT_ZONE_T"
+            ],
+            "Outputs": [],
+            "Zones": [
+                "Fan2Zone"
+            ]
+         }
+      ],
+      "Name":"Kudo_MB",
+      "Probe":"xyz.openbmc_project.FruDevice({'BOARD_SERIAL_NUMBER': 'MCN*'})",
+      "Type":"Board",
+      "xyz.openbmc_project.Inventory.Decorator.Asset":{
+         "Manufacturer":"$BOARD_MANUFACTURER",
+         "Model":"$BOARD_PRODUCT_NAME",
+         "PartNumber":"$BOARD_PART_NUMBER",
+         "SerialNumber":"$BOARD_SERIAL_NUMBER"
+      },
+      "xyz.openbmc_project.Inventory.Decorator.FruDevice":{
+         "Bus":"$bus",
+         "Address":"$address"
+      },
+      "xyz.openbmc_project.Inventory.Decorator.Ipmi": {
+        "EntityId": "0x07",
+        "EntityInstance": 1
+      }
+   }
+]
