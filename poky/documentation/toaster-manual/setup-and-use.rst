@@ -155,7 +155,7 @@ superuser by following these steps:
    is the :term:`Build Directory`,
    invoke the ``createsuperuser`` command from ``manage.py``::
 
-      $ cd ~/poky/build
+      $ cd poky/build
       $ ../bitbake/lib/toaster/manage.py createsuperuser
 
 #. Django prompts you for the username, which you need to provide.
@@ -417,13 +417,13 @@ Perform the following steps to install Toaster:
 
       [Unit]
       Description=Toaster runbuilds
-      
+
       [Service]
       Type=forking User=toaster
       ExecStart=/usr/bin/screen -d -m -S runbuilds /var/www/toaster/poky/bitbake/lib/toaster/runbuilds-service.sh start
       ExecStop=/usr/bin/screen -S runbuilds -X quit
       WorkingDirectory=/var/www/toaster/poky
-      
+
       [Install]
       WantedBy=multi-user.target
 
@@ -433,11 +433,11 @@ Perform the following steps to install Toaster:
     up executable permissions::
 
       #!/bin/bash
-      
+
       #export http_proxy=http://proxy.host.com:8080
       #export https_proxy=http://proxy.host.com:8080
       #export GIT_PROXY_COMMAND=$HOME/bin/gitproxy
-      cd ~/poky/
+      cd poky/
       source ./oe-init-build-env build
       source ../bitbake/bin/toaster $1 noweb
       [ "$1" == 'start' ] && /bin/bash

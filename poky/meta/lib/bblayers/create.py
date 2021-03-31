@@ -35,6 +35,7 @@ class CreatePlugin(LayerPlugin):
         bb.utils.mkdirhier(conf)
 
         layername = os.path.basename(os.path.normpath(args.layerdir))
+        layerid = args.layerid if args.layerid is not None else layername
 
         # Create the README from templates/README
         readme_template =  read_template('README').format(layername=layername)
@@ -54,7 +55,7 @@ class CreatePlugin(LayerPlugin):
 
         # Create the layer.conf from templates/layer.conf
         layerconf_template = read_template('layer.conf').format(
-                layername=layername, priority=args.priority, compat=compat)
+                layerid=layerid, priority=args.priority, compat=compat)
         layerconf = os.path.join(conf, 'layer.conf')
         with open(layerconf, 'w') as fd:
             fd.write(layerconf_template)
@@ -71,7 +72,8 @@ class CreatePlugin(LayerPlugin):
     def register_commands(self, sp):
         parser_create_layer = self.add_command(sp, 'create-layer', self.do_create_layer, parserecipes=False)
         parser_create_layer.add_argument('layerdir', help='Layer directory to create')
-        parser_create_layer.add_argument('--priority', '-p', default=6, help='Layer directory to create')
+        parser_create_layer.add_argument('--layerid', '-i', help='Layer id to use if different from layername')
+        parser_create_layer.add_argument('--priority', '-p', default=6, help='Priority of recipes in layer')
         parser_create_layer.add_argument('--example-recipe-name', '-e', dest='examplerecipe', default='example', help='Filename of the example recipe')
         parser_create_layer.add_argument('--example-recipe-version', '-v', dest='version', default='0.1', help='Version number for the example recipe')
 

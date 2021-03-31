@@ -1,4 +1,5 @@
 SUMMARY = "A small and simple INI-file parser module"
+HOMEPAGE = "https://pypi.org/project/iniconfig/"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a6bb0320b04a0a503f12f69fea479de9"

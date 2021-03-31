@@ -31,7 +31,7 @@ class ColorCodeTests(unittest.TestCase):
     def setUp(self):
         self.d = bb.data.init()
         self._progress_watcher = ProgressWatcher()
-        bb.event.register("bb.build.TaskProgress", self._progress_watcher.handle_event)
+        bb.event.register("bb.build.TaskProgress", self._progress_watcher.handle_event, data=self.d)
 
     def tearDown(self):
         bb.event.remove("bb.build.TaskProgress", None)

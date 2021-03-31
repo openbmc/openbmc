@@ -1,0 +1,95 @@
+From 7c7623c4a31fb0f2a7176c43acc728093818b58c Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 11 Nov 2020 18:26:19 +0000
+Subject: [PATCH 08/29] gdbuserror: Drop unnecessary volatile qualifiers from
+ variables
+
+This should introduce no API changes. The
+`g_dbus_error_register_error_domain()` function still (incorrectly) has
+a `volatile` argument, but dropping that qualifier would be an API
+break.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Helps: #600
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719]
+---
+ gio/gdbuserror.c | 28 +++++++++++++++++-----------
+ 1 file changed, 17 insertions(+), 11 deletions(-)
+
+diff --git a/gio/gdbuserror.c b/gio/gdbuserror.c
+index 682677354..b03a33f27 100644
+--- a/gio/gdbuserror.c
++++ b/gio/gdbuserror.c
+@@ -84,12 +84,12 @@
+  * GQuark
+  * foo_bar_error_quark (void)
+  * {
+- *   static volatile gsize quark_volatile = 0;
++ *   static gsize quark = 0;
+  *   g_dbus_error_register_error_domain ("foo-bar-error-quark",
+- *                                       &quark_volatile,
++ *                                       &quark,
+  *                                       foo_bar_error_entries,
+  *                                       G_N_ELEMENTS (foo_bar_error_entries));
+- *   return (GQuark) quark_volatile;
++ *   return (GQuark) quark;
+  * }
+  * ]|
+  * With this setup, a D-Bus peer can transparently pass e.g. %FOO_BAR_ERROR_ANOTHER_ERROR and
+@@ -160,12 +160,12 @@ GQuark
+ g_dbus_error_quark (void)
+ {
+   G_STATIC_ASSERT (G_N_ELEMENTS (g_dbus_error_entries) - 1 == G_DBUS_ERROR_PROPERTY_READ_ONLY);
+-  static volatile gsize quark_volatile = 0;
++  static gsize quark = 0;
+   g_dbus_error_register_error_domain ("g-dbus-error-quark",
+-                                      &quark_volatile,
++                                      &quark,
+                                       g_dbus_error_entries,
+                                       G_N_ELEMENTS (g_dbus_error_entries));
+-  return (GQuark) quark_volatile;
++  return (GQuark) quark;
+ }
+ 
+ /**
+@@ -185,25 +185,31 @@ g_dbus_error_register_error_domain (const gchar           *error_domain_quark_na
+                                     const GDBusErrorEntry *entries,
+                                     guint                  num_entries)
+ {
++  gsize *quark;
++
+   g_return_if_fail (error_domain_quark_name != NULL);
+   g_return_if_fail (quark_volatile != NULL);
+   g_return_if_fail (entries != NULL);
+   g_return_if_fail (num_entries > 0);
+ 
+-  if (g_once_init_enter (quark_volatile))
++  /* Drop the volatile qualifier, which should never have been on the argument
++   * in the first place. */
++  quark = (gsize *) quark_volatile;
++
++  if (g_once_init_enter (quark))
+     {
+       guint n;
+-      GQuark quark;
++      GQuark new_quark;
+ 
+-      quark = g_quark_from_static_string (error_domain_quark_name);
++      new_quark = g_quark_from_static_string (error_domain_quark_name);
+ 
+       for (n = 0; n < num_entries; n++)
+         {
+-          g_warn_if_fail (g_dbus_error_register_error (quark,
++          g_warn_if_fail (g_dbus_error_register_error (new_quark,
+                                                        entries[n].error_code,
+                                                        entries[n].dbus_error_name));
+         }
+-      g_once_init_leave (quark_volatile, quark);
++      g_once_init_leave (quark, new_quark);
+     }
+ }
+ 
+-- 
+2.30.1
+

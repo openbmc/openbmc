@@ -26,7 +26,8 @@ MESONOPTS = " --prefix ${prefix} \
               --sysconfdir ${sysconfdir} \
               --localstatedir ${localstatedir} \
               --sharedstatedir ${sharedstatedir} \
-              --wrap-mode nodownload"
+              --wrap-mode nodownload \
+              --native-file ${WORKDIR}/meson.native"
 
 EXTRA_OEMESON_append = " ${PACKAGECONFIG_CONFARGS}"
 
@@ -102,12 +103,14 @@ cups-config = 'cups-config'
 g-ir-scanner = '${STAGING_BINDIR}/g-ir-scanner-wrapper'
 g-ir-compiler = '${STAGING_BINDIR}/g-ir-compiler-wrapper'
 
-[properties]
-needs_exe_wrapper = true
+[built-in options]
 c_args = ${@meson_array('CFLAGS', d)}
 c_link_args = ${@meson_array('LDFLAGS', d)}
 cpp_args = ${@meson_array('CXXFLAGS', d)}
 cpp_link_args = ${@meson_array('LDFLAGS', d)}
+
+[properties]
+needs_exe_wrapper = true
 gtkdoc_exe_wrapper = '${B}/gtkdoc-qemuwrapper'
 
 [host_machine]
@@ -122,8 +125,26 @@ cpu_family = '${@meson_cpu_family('TARGET_ARCH', d)}'
 cpu = '${TARGET_ARCH}'
 endian = '${@meson_endian('TARGET', d)}'
 EOF
+
+    cat >${WORKDIR}/meson.native <<EOF
+[binaries]
+c = ${@meson_array('BUILD_CC', d)}
+cpp = ${@meson_array('BUILD_CXX', d)}
+ar = ${@meson_array('BUILD_AR', d)}
+nm = ${@meson_array('BUILD_NM', d)}
+strip = ${@meson_array('BUILD_STRIP', d)}
+readelf = ${@meson_array('BUILD_READELF', d)}
+pkgconfig = 'pkg-config-native'
+
+[built-in options]
+c_args = ${@meson_array('BUILD_CFLAGS', d)}
+c_link_args = ${@meson_array('BUILD_LDFLAGS', d)}
+cpp_args = ${@meson_array('BUILD_CXXFLAGS', d)}
+cpp_link_args = ${@meson_array('BUILD_LDFLAGS', d)}
+EOF
 }
 
+# Tell externalsrc that changes to this file require a reconfigure
 CONFIGURE_FILES = "meson.build"
 
 meson_do_configure() {
@@ -138,33 +159,6 @@ meson_do_configure() {
     if ! meson ${MESONOPTS} "${MESON_SOURCEPATH}" "${B}" ${MESON_CROSS_FILE} ${EXTRA_OEMESON}; then
         bbfatal_log meson failed
     fi
-}
-
-override_native_tools() {
-    # Set these so that meson uses the native tools for its build sanity tests,
-    # which require executables to be runnable. The cross file will still
-    # override these for the target build.
-    export CC="${BUILD_CC}"
-    export CXX="${BUILD_CXX}"
-    export LD="${BUILD_LD}"
-    export AR="${BUILD_AR}"
-    export STRIP="${BUILD_STRIP}"
-    # These contain *target* flags but will be used as *native* flags.  The
-    # correct native flags will be passed via -Dc_args and so on, unset them so
-    # they don't interfere with tools invoked by Meson (such as g-ir-scanner)
-    unset CPPFLAGS CFLAGS CXXFLAGS LDFLAGS
-}
-
-meson_do_configure_prepend_class-target() {
-    override_native_tools
-}
-
-meson_do_configure_prepend_class-nativesdk() {
-    override_native_tools
-}
-
-meson_do_configure_prepend_class-native() {
-    export PKG_CONFIG="pkg-config-native"
 }
 
 python meson_do_qa_configure() {

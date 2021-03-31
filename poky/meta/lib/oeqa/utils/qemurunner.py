@@ -176,7 +176,7 @@ class QemuRunner:
             self.logger.error("Failed to create listening socket: %s" % msg[1])
             return False
 
-        bootparams = 'console=tty1 console=ttyS0,115200n8 printk.time=1'
+        bootparams = ' printk.time=1'
         if extra_bootparams:
             bootparams = bootparams + ' ' + extra_bootparams
 

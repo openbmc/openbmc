@@ -768,7 +768,7 @@ Follow these steps to create a local version of the upstream
    exists on your system and by default, it is checked out:
    ::
 
-      $ cd ~/poky
+      $ cd poky
       $ git status
       On branch master
       Your branch is up-to-date with 'origin/master'.

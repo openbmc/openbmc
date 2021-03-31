@@ -1,0 +1,41 @@
+From 92cc3e7f76a545a2cd4828576971f1eea83f4e68 Mon Sep 17 00:00:00 2001
+From: Francis Deslauriers <francis.deslauriers@efficios.com>
+Date: Wed, 17 Mar 2021 10:40:56 -0400
+Subject: [PATCH 4/4] Fix: kretprobe: null ptr deref on session destroy
+
+The `filter_bytecode_runtime_head` list is currently not initialized for
+the return event of the kretprobe. This caused a kernel null ptr
+dereference when destroying a session. It can reproduced with the
+following commands:
+
+  lttng create
+  lttng enable-event -k --function=lttng_test_filter_event_write my_event
+  lttng start
+  lttng stop
+  lttng destroy
+
+Upstream-status: backport 
+
+Signed-off-by: Francis Deslauriers <francis.deslauriers@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: I1162ce8b10dd7237a26331531f048346b984eee7
+---
+ lttng-events.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lttng-events.c b/lttng-events.c
+index 984bd341..3450fa40 100644
+--- a/lttng-events.c
++++ b/lttng-events.c
+@@ -704,6 +704,8 @@ struct lttng_event *_lttng_event_create(struct lttng_channel *chan,
+ 		event_return->enabled = 0;
+ 		event_return->registered = 1;
+ 		event_return->instrumentation = itype;
++		INIT_LIST_HEAD(&event_return->bytecode_runtime_head);
++		INIT_LIST_HEAD(&event_return->enablers_ref_head);
+ 		/*
+ 		 * Populate lttng_event structure before kretprobe registration.
+ 		 */
+-- 
+2.19.1
+

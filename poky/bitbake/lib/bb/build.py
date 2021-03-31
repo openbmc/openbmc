@@ -854,6 +854,23 @@ def make_stamp(task, d, file_name = None):
         file_name = d.getVar('BB_FILENAME')
         bb.parse.siggen.dump_sigtask(file_name, task, stampbase, True)
 
+def find_stale_stamps(task, d, file_name=None):
+    current = stamp_internal(task, d, file_name)
+    current2 = stamp_internal(task + "_setscene", d, file_name)
+    cleanmask = stamp_cleanmask_internal(task, d, file_name)
+    found = []
+    for mask in cleanmask:
+        for name in glob.glob(mask):
+            if "sigdata" in name or "sigbasedata" in name:
+                continue
+            if name.endswith('.taint'):
+                continue
+            if name == current or name == current2:
+                continue
+            logger.debug2("Stampfile %s does not match %s or %s" % (name, current, current2))
+            found.append(name)
+    return found
+
 def del_stamp(task, d, file_name = None):
     """
     Removes a stamp for a given task

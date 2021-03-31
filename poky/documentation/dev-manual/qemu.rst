@@ -58,7 +58,7 @@ available. Follow these general steps to run QEMU:
       environment script (i.e. :ref:`structure-core-script`):
       ::
 
-         $ cd ~/poky
+         $ cd poky
          $ source oe-init-build-env
 
    -  If you installed a cross-toolchain, you can run the script that
@@ -66,7 +66,7 @@ available. Follow these general steps to run QEMU:
       the initialization script from the default ``poky_sdk`` directory:
       ::
 
-         . ~/poky_sdk/environment-setup-core2-64-poky-linux
+         . poky_sdk/environment-setup-core2-64-poky-linux
 
 3. *Ensure the Artifacts are in Place:* You need to be sure you have a
    pre-built kernel that will boot in QEMU. You also need the target

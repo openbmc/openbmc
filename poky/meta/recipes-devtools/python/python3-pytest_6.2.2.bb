@@ -1,4 +1,6 @@
 SUMMARY = "Simple powerful testing with python"
+HOMEPAGE = "https://pypi.org/project/pytest/"
+DESCRIPTION = "The pytest framework makes it easy to write small tests, yet scales to support complex functional testing for applications and libraries."
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=81eb9f71d006c6b268cf4388e3c98f7b"

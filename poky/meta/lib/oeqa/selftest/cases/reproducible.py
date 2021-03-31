@@ -29,14 +29,10 @@ import datetime
 #https://autobuilder.yocto.io/pub/repro-fail/oe-reproducible-20210215-0_td9la2/packages/diff-html/
 exclude_packages = [
 	'glide',
-	'go-dep',
 	'go-helloworld',
 	'go-runtime',
 	'go_',
 	'go-',
-	'meson',
-	'ovmf-shell-efi',
-	'perf',
 	'ruby-ri-docs'
 	]
 

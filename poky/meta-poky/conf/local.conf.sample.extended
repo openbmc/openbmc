@@ -390,3 +390,8 @@ DISTRO_FEATURES_remove = "x11"
 #
 #require conf/distro/include/lto.inc
 #DISTRO_FEATURES_append = " lto"
+
+#
+# Set PS1 for SDK
+#
+#SDK_PS1 ?= "${SDK_NAME}${SDK_VENDOR}:\$ "

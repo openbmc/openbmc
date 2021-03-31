@@ -212,9 +212,9 @@ class PythonParser():
             funcstr = codegen.to_source(func)
             argstr = codegen.to_source(arg)
         except TypeError:
-            self.log.debug(2, 'Failed to convert function and argument to source form')
+            self.log.debug2('Failed to convert function and argument to source form')
         else:
-            self.log.debug(1, self.unhandled_message % (funcstr, argstr))
+            self.log.debug(self.unhandled_message % (funcstr, argstr))
 
     def visit_Call(self, node):
         name = self.called_node_name(node.func)
@@ -450,7 +450,7 @@ class ShellParser():
 
                 cmd = word[1]
                 if cmd.startswith("$"):
-                    self.log.debug(1, self.unhandled_template % cmd)
+                    self.log.debug(self.unhandled_template % cmd)
                 elif cmd == "eval":
                     command = " ".join(word for _, word in words[1:])
                     self._parse_shell(command)

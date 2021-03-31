@@ -1296,6 +1296,17 @@ For more information on task dependencies, see the
 See the ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:variable flags`" section for information
 on variable flags you can use with tasks.
 
+.. note::
+
+   While it's infrequent, it's possible to define multiple tasks as
+   dependencies when calling ``addtask``. For example, here's a snippet
+   from the OpenEmbedded class file ``package_tar.bbclass``::
+
+     addtask package_write_tar before do_build after do_packagedata do_package
+
+   Note how the ``package_write_tar`` task has to wait until both of
+   ``do_packagedata`` and ``do_package`` complete.
+
 Deleting a Task
 ---------------
 
@@ -1569,7 +1580,7 @@ might have an interest in viewing:
    events when each of the workers parse the base configuration or if
    the server changes configuration and reparses. Any given datastore
    only has one such event executed against it, however. If
-   ```BB_INVALIDCONF`` <#>`__ is set in the datastore by the event
+   :term:`BB_INVALIDCONF` is set in the datastore by the event
    handler, the configuration is reparsed and a new event triggered,
    allowing the metadata to update configuration.
 

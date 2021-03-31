@@ -440,7 +440,7 @@ class Tinfoil:
         to initialise Tinfoil and use it with config_only=True first and
         then conditionally call this function to parse recipes later.
         """
-        config_params = TinfoilConfigParameters(config_only=False)
+        config_params = TinfoilConfigParameters(config_only=False, quiet=self.quiet)
         self.run_actions(config_params)
         self.recipes_parsed = True
 

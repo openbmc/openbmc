@@ -1,4 +1,6 @@
 SUMMARY = "Boost.Build"
+DESCRIPTION = "B2 makes it easy to build C++ projects, everywhere."
+HOMEPAGE = "https://github.com/boostorg/build"
 SECTION = "devel"
 
 LICENSE = "BSL-1.0"

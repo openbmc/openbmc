@@ -1,5 +1,6 @@
 SUMMARY = "Baremetal examples to work with the several QEMU architectures supported on OpenEmbedded"
 HOMEPAGE = "https://github.com/aehs29/baremetal-helloqemu"
+DESCRIPTION = "These are introductory examples to showcase the use of QEMU to run baremetal applications."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=39346640a23c701e4f459e05f56f4449"
 

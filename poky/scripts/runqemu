@@ -139,6 +139,7 @@ class BaseConfig(object):
                         'OE_TMPDIR',
                         'OECORE_NATIVE_SYSROOT',
                         'MULTICONFIG',
+                        'SERIAL_CONSOLES',
                         )
 
         self.qemu_opt = ''
@@ -173,6 +174,13 @@ class BaseConfig(object):
         self.nfs_running = False
         self.serialconsole = False
         self.serialstdio = False
+        self.nographic = False
+        self.sdl = False
+        self.gtk = False
+        self.gl = False
+        self.gl_es = False
+        self.egl_headless = False
+        self.novga = False
         self.cleantap = False
         self.saved_stty = ''
         self.audio_enabled = False
@@ -459,44 +467,22 @@ class BaseConfig(object):
             if arg in self.fstypes + self.vmtypes + self.wictypes:
                 self.check_arg_fstype(arg)
             elif arg == 'nographic':
-                if ('sdl' in sys.argv):
-                    raise RunQemuError('Option nographic makes no sense alongside the sdl option.' % (arg))
-                if ('gtk' in sys.argv):
-                    raise RunQemuError('Option nographic makes no sense alongside the gtk option.' % (arg))
-                self.qemu_opt_script += ' -nographic'
-                self.kernel_cmdline_script += ' console=ttyS0'
+                self.nographic = True
             elif arg == 'sdl':
-                if 'gl' in sys.argv[1:]:
-                    self.set_dri_path()
-                    self.qemu_opt_script += ' -vga virtio -display sdl,gl=on,show-cursor=on'
-                elif 'gl-es' in sys.argv[1:]:
-                    self.set_dri_path()
-                    self.qemu_opt_script += ' -vga virtio -display sdl,gl=es,show-cursor=on'
-                else:
-                    self.qemu_opt_script += ' -display sdl,show-cursor=on'
+                self.sdl = True
             elif arg == 'gtk':
-                if 'gl' in sys.argv[1:]:
-                    self.set_dri_path()
-                    self.qemu_opt_script += ' -vga virtio -display gtk,gl=on,show-cursor=on'
-                elif 'gl-es' in sys.argv[1:]:
-                    self.set_dri_path()
-                    self.qemu_opt_script += ' -vga virtio -display gtk,gl=es,show-cursor=on'
-                else:
-                    self.qemu_opt_script += ' -display gtk,show-cursor=on'
-            elif arg == 'gl' or arg == 'gl-es':
-                # These args are handled inside sdl or gtk blocks above
-                if ('gtk' not in sys.argv) and ('sdl' not in sys.argv):
-                    raise RunQemuError('Option %s also needs gtk or sdl option.' % (arg))
+                self.gtk = True
+            elif arg == 'gl':
+                self.gl = True
+            elif 'gl-es' in sys.argv[1:]:
+                self.gl_es = True
             elif arg == 'egl-headless':
-                self.set_dri_path()
-                self.qemu_opt_script += ' -vga virtio -display egl-headless,show-cursor=on'
+                self.egl_headless = True
             elif arg == 'novga':
-                self.qemu_opt_script += ' -vga none'
+                self.novga = True
             elif arg == 'serial':
-                self.kernel_cmdline_script += ' console=ttyS0'
                 self.serialconsole = True
             elif arg == "serialstdio":
-                self.kernel_cmdline_script += ' console=ttyS0'
                 self.serialstdio = True
             elif arg == 'audio':
                 logger.info("Enabling audio in qemu")
@@ -1321,6 +1307,66 @@ class BaseConfig(object):
             raise RunQemuError("Failed to boot, QB_SYSTEM_NAME is NULL!")
         self.qemu_system = qemu_system
 
+    def setup_vga(self):
+        if self.nographic == True:
+            if self.sdl == True:
+                raise RunQemuError('Option nographic makes no sense alongside the sdl option.')
+            if self.gtk == True:
+                raise RunQemuError('Option nographic makes no sense alongside the gtk option.')
+            self.qemu_opt += ' -nographic'
+            return
+
+        if self.novga == True:
+            self.qemu_opt += ' -vga none'
+            return
+
+        if (self.gl_es == True or self.gl == True) and (self.sdl == False and self.gtk == False):
+            raise RunQemuError('Option gl/gl-es needs gtk or sdl option.')
+
+        if self.sdl == True or self.gtk == True or self.egl_headless == True:
+            self.set_dri_path()
+            self.qemu_opt += ' -vga virtio -display '
+            if self.egl_headless == True:
+                self.qemu_opt += 'egl-headless,'
+            else:
+                if self.sdl == True:
+                    self.qemu_opt += 'sdl,'
+                elif self.gtk == True:
+                    self.qemu_opt += 'gtk,'
+
+                if self.gl == True:
+                    self.qemu_opt += 'gl=on,'
+                elif self.gl_es == True:
+                    self.qemu_opt += 'gl=es,'
+            self.qemu_opt += 'show-cursor=on'
+
+        self.qemu_opt += ' %s' %self.get('QB_GRAPHICS')
+
+    def setup_serial(self):
+        # Setup correct kernel command line for serial
+        if self.serialstdio == True or self.serialconsole == True or self.nographic == True or self.tcpserial_portnum:
+            for entry in self.get('SERIAL_CONSOLES').split(' '):
+                self.kernel_cmdline_script += ' console=%s' %entry.split(';')[1]
+
+        if self.serialstdio == True or self.nographic == True:
+            self.qemu_opt += " -serial mon:stdio"
+        else:
+            self.qemu_opt += " -serial mon:vc"
+            if self.serialconsole:
+                if sys.stdin.isatty():
+                    subprocess.check_call(("stty", "intr", "^]"))
+                    logger.info("Interrupt character is '^]'")
+
+                self.qemu_opt += " %s" % self.get("QB_SERIAL_OPT")
+
+        # We always wants ttyS0 and ttyS1 in qemu machines (see SERIAL_CONSOLES).
+        # If no serial or serialtcp options were specified, only ttyS0 is created
+        # and sysvinit shows an error trying to enable ttyS1:
+        #     INIT: Id "S1" respawning too fast: disabled for 5 minutes
+        serial_num = len(re.findall("-serial", self.qemu_opt))
+        if serial_num < 2:
+            self.qemu_opt += " -serial null"
+
     def setup_final(self):
         qemu_bin = os.path.join(self.bindir_native, self.qemu_system)
 
@@ -1345,6 +1391,8 @@ class BaseConfig(object):
 
         for ovmf in self.ovmf_bios:
             format = ovmf.rsplit('.', 1)[-1]
+            if format == "bin":
+                format = "raw"
             self.qemu_opt += ' -drive if=pflash,format=%s,file=%s' % (format, ovmf)
 
         self.qemu_opt += ' ' + self.qemu_opt_script
@@ -1363,37 +1411,8 @@ class BaseConfig(object):
         if self.snapshot:
             self.qemu_opt += " -snapshot"
 
-        if self.serialconsole:
-            if sys.stdin.isatty():
-                subprocess.check_call(("stty", "intr", "^]"))
-                logger.info("Interrupt character is '^]'")
-
-            first_serial = ""
-            if not re.search("-nographic", self.qemu_opt):
-                first_serial = "-serial mon:vc"
-            # We always want a ttyS1. Since qemu by default adds a serial
-            # port when nodefaults is not specified, it seems that all that
-            # would be needed is to make sure a "-serial" is there. However,
-            # it appears that when "-serial" is specified, it ignores the
-            # default serial port that is normally added.  So here we make
-            # sure to add two -serial if there are none. And only one if
-            # there is one -serial already.
-            serial_num = len(re.findall("-serial", self.qemu_opt))
-            if serial_num == 0:
-                self.qemu_opt += " %s %s" % (first_serial, self.get("QB_SERIAL_OPT"))
-            elif serial_num == 1:
-                self.qemu_opt += " %s" % self.get("QB_SERIAL_OPT")
-
-        # We always wants ttyS0 and ttyS1 in qemu machines (see SERIAL_CONSOLES),
-        # if not serial or serialtcp options was specified only ttyS0 is created
-        # and sysvinit shows an error trying to enable ttyS1:
-        #     INIT: Id "S1" respawning too fast: disabled for 5 minutes
-        serial_num = len(re.findall("-serial", self.qemu_opt))
-        if serial_num == 0:
-            if re.search("-nographic", self.qemu_opt) or self.serialstdio:
-                self.qemu_opt += " -serial mon:stdio -serial null"
-            else:
-                self.qemu_opt += " -serial mon:vc -serial null"
+        self.setup_serial()
+        self.setup_vga()
 
     def start_qemu(self):
         import shlex

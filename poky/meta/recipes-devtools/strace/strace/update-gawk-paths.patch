@@ -1,4 +1,4 @@
-From 12a726b280eca94883edcb4da1eaaf8e93d41739 Mon Sep 17 00:00:00 2001
+From 4cd26cfaec255ec87f22abe886e0be89312a9671 Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Mon, 18 Jan 2016 11:01:00 -0800
 Subject: [PATCH] update gawk paths, /bin/gawk -> /usr/bin/gawk
@@ -13,7 +13,7 @@ Upstream-Status: Inappropriate [configuration]
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
 
 ---
- mpers.awk                   | 2 +-
+ src/mpers.awk               | 2 +-
  tests-m32/caps.awk          | 2 +-
  tests-m32/match.awk         | 2 +-
  tests-m32/rt_sigaction.awk  | 2 +-
@@ -25,18 +25,18 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
  tests/rt_sigaction.awk      | 2 +-
  10 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/mpers.awk b/mpers.awk
-index 17f8f2b..d69dcd5 100644
---- a/mpers.awk
-+++ b/mpers.awk
+diff --git a/src/mpers.awk b/src/mpers.awk
+index 25a212f..b2ff53f 100644
+--- a/src/mpers.awk
++++ b/src/mpers.awk
 @@ -1,4 +1,4 @@
 -#!/bin/gawk
 +#!/usr/bin/gawk
  #
  # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
- # Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ # Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
 diff --git a/tests-m32/caps.awk b/tests-m32/caps.awk
-index 941564a..0bcc3ff 100644
+index 69500ec..e5dfd87 100644
 --- a/tests-m32/caps.awk
 +++ b/tests-m32/caps.awk
 @@ -1,4 +1,4 @@
@@ -46,27 +46,27 @@ index 941564a..0bcc3ff 100644
  # This file is part of caps strace test.
  #
 diff --git a/tests-m32/match.awk b/tests-m32/match.awk
-index d91c518..ee5d908 100644
+index 1cde87c..df63f78 100644
 --- a/tests-m32/match.awk
 +++ b/tests-m32/match.awk
 @@ -1,4 +1,4 @@
 -#!/bin/gawk
 +#!/usr/bin/gawk
  #
- # Copyright (c) 2014-2018 Dmitry V. Levin <ldv@altlinux.org>
+ # Copyright (c) 2014-2021 Dmitry V. Levin <ldv@strace.io>
  # All rights reserved.
 diff --git a/tests-m32/rt_sigaction.awk b/tests-m32/rt_sigaction.awk
-index 81dd813..9cd9549 100644
+index dce78f5..573d9ea 100644
 --- a/tests-m32/rt_sigaction.awk
 +++ b/tests-m32/rt_sigaction.awk
 @@ -1,4 +1,4 @@
 -#!/bin/gawk
 +#!/usr/bin/gawk
  #
- # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
  # Copyright (c) 2016 Elvira Khabirova <lineprinter0@gmail.com>
 diff --git a/tests-mx32/caps.awk b/tests-mx32/caps.awk
-index 941564a..0bcc3ff 100644
+index 69500ec..e5dfd87 100644
 --- a/tests-mx32/caps.awk
 +++ b/tests-mx32/caps.awk
 @@ -1,4 +1,4 @@
@@ -76,27 +76,27 @@ index 941564a..0bcc3ff 100644
  # This file is part of caps strace test.
  #
 diff --git a/tests-mx32/match.awk b/tests-mx32/match.awk
-index d91c518..ee5d908 100644
+index 1cde87c..df63f78 100644
 --- a/tests-mx32/match.awk
 +++ b/tests-mx32/match.awk
 @@ -1,4 +1,4 @@
 -#!/bin/gawk
 +#!/usr/bin/gawk
  #
- # Copyright (c) 2014-2018 Dmitry V. Levin <ldv@altlinux.org>
+ # Copyright (c) 2014-2021 Dmitry V. Levin <ldv@strace.io>
  # All rights reserved.
 diff --git a/tests-mx32/rt_sigaction.awk b/tests-mx32/rt_sigaction.awk
-index 81dd813..9cd9549 100644
+index dce78f5..573d9ea 100644
 --- a/tests-mx32/rt_sigaction.awk
 +++ b/tests-mx32/rt_sigaction.awk
 @@ -1,4 +1,4 @@
 -#!/bin/gawk
 +#!/usr/bin/gawk
  #
- # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
  # Copyright (c) 2016 Elvira Khabirova <lineprinter0@gmail.com>
 diff --git a/tests/caps.awk b/tests/caps.awk
-index 941564a..0bcc3ff 100644
+index 69500ec..e5dfd87 100644
 --- a/tests/caps.awk
 +++ b/tests/caps.awk
 @@ -1,4 +1,4 @@
@@ -106,22 +106,22 @@ index 941564a..0bcc3ff 100644
  # This file is part of caps strace test.
  #
 diff --git a/tests/match.awk b/tests/match.awk
-index d91c518..ee5d908 100644
+index 1cde87c..df63f78 100644
 --- a/tests/match.awk
 +++ b/tests/match.awk
 @@ -1,4 +1,4 @@
 -#!/bin/gawk
 +#!/usr/bin/gawk
  #
- # Copyright (c) 2014-2018 Dmitry V. Levin <ldv@altlinux.org>
+ # Copyright (c) 2014-2021 Dmitry V. Levin <ldv@strace.io>
  # All rights reserved.
 diff --git a/tests/rt_sigaction.awk b/tests/rt_sigaction.awk
-index 81dd813..9cd9549 100644
+index dce78f5..573d9ea 100644
 --- a/tests/rt_sigaction.awk
 +++ b/tests/rt_sigaction.awk
 @@ -1,4 +1,4 @@
 -#!/bin/gawk
 +#!/usr/bin/gawk
  #
- # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
  # Copyright (c) 2016 Elvira Khabirova <lineprinter0@gmail.com>

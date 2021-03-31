@@ -554,7 +554,7 @@ example that assumes default repository and build directory names:
 
 .. code-block:: shell
 
-   $ cd ~/poky/build
+   $ cd poky/build
    $ python ../bitbake/lib/toaster/manage.py buildslist
 
 If your Toaster database had only one build, the above

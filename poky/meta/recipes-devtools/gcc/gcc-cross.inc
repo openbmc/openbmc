@@ -21,7 +21,7 @@ require gcc-configure-common.inc
 # gnu) will hit a QA failure.
 LINKER_HASH_STYLE ?= "sysv"
 
-EXTRA_OECONF += "--enable-poison-system-directories"
+EXTRA_OECONF += "--enable-poison-system-directories=error"
 EXTRA_OECONF_append_sh4 = " \
     --with-multilib-list= \
     --enable-incomplete-targets \

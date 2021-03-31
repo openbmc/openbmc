@@ -1,0 +1,35 @@
+From f4607def1695efb50eb49e0586eed0f5557935f2 Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 11 Nov 2020 18:20:37 +0000
+Subject: [PATCH 06/29] tests: Drop unnecessary volatile qualifiers from tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+These variables were already (correctly) accessed atomically. The
+`volatile` qualifier doesn’t help with that.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Helps: #600
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719]
+---
+ gio/tests/g-file-info.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gio/tests/g-file-info.c b/gio/tests/g-file-info.c
+index 809b0ec79..1a02b5e0e 100644
+--- a/gio/tests/g-file-info.c
++++ b/gio/tests/g-file-info.c
+@@ -221,7 +221,7 @@ test_internal_enhanced_stdio (void)
+   guint64 size_p0, alsize_p0, size_ps, alsize_ps;
+   const gchar *id_p0;
+   const gchar *id_p1;
+-  volatile guint64 time_p0;
++  guint64 time_p0;
+   gchar *tmp_dir;
+   wchar_t *programdata_dir_w;
+   wchar_t *users_dir_w;
+-- 
+2.30.1
+

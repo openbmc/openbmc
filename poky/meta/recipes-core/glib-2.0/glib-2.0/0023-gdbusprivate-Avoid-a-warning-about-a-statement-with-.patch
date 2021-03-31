@@ -1,0 +1,33 @@
+From 0604f5858259c32744e6fc912ed4feb308651a3a Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Mon, 16 Nov 2020 14:47:23 +0000
+Subject: [PATCH 23/29] gdbusprivate: Avoid a warning about a statement with no
+ effect
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719]
+---
+ gio/gdbusprivate.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/gio/gdbusprivate.c b/gio/gdbusprivate.c
+index 99b37f3eb..4e42c1a4d 100644
+--- a/gio/gdbusprivate.c
++++ b/gio/gdbusprivate.c
+@@ -1945,11 +1945,10 @@ _g_dbus_initialize (void)
+ 
+   if (g_once_init_enter (&initialized))
+     {
+-      GQuark g_dbus_error_domain;
+       const gchar *debug;
+ 
+-      g_dbus_error_domain = G_DBUS_ERROR;
+-      (g_dbus_error_domain); /* To avoid -Wunused-but-set-variable */
++      /* Ensure the domain is registered. */
++      g_dbus_error_quark ();
+ 
+       debug = g_getenv ("G_DBUS_DEBUG");
+       if (debug != NULL)
+-- 
+2.30.1
+

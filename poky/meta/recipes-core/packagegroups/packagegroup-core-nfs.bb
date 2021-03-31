@@ -7,7 +7,6 @@ PR = "r2"
 
 inherit packagegroup
 
-PROVIDES = "${PACKAGES}"
 PACKAGES = "${PN}-server ${PN}-client"
 
 SUMMARY_${PN}-client = "NFS client"

@@ -270,6 +270,18 @@ system and gives an overview of their function and contents.
       ":ref:`Basic Syntax <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:basic syntax>`" section in the BitBake
       User Manual for more information.
 
+   :term:`AZ_SAS`
+      Azure Storage Shared Access Signature, when using the
+      :ref:`Azure Storage fetcher (az://) <bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`
+      This variable can be defined to be used by the fetcher to authenticate
+      and gain access to non-public artifacts.
+      ::
+
+         AZ_SAS = ""se=2021-01-01&sp=r&sv=2018-11-09&sr=c&skoid=<skoid>&sig=<signature>""
+
+      For more information see Microsoft's Azure Storage documentation at
+      https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview
+
    :term:`B`
       The directory within the :term:`Build Directory` in
       which the OpenEmbedded build system places generated objects during a
@@ -1553,6 +1565,12 @@ system and gives an overview of their function and contents.
 
          DEBIANNAME_${PN} = "dbus-1"
 
+   :term:`DEBUGINFOD_URLS`
+      Points to the URL of the "debuginfod" server. Such that for every
+      debugging information lookup, the debuginfod client will query the
+      server and return the requested information. You set this variable
+      in your ``local.conf`` file.
+
    :term:`DEBUG_BUILD`
       Specifies to build packages with debugging information. This
       influences the value of the ``SELECTED_OPTIMIZATION`` variable.
@@ -2218,7 +2236,7 @@ system and gives an overview of their function and contents.
       .. note::
 
          To add packages to the root filesystem, see the various
-         \*:term:`RDEPENDS` and \*:term:`RRECOMMENDS` variables.
+         :term:`RDEPENDS` and :term:`RRECOMMENDS` variables.
 
    :term:`EXTRANATIVEPATH`
       A list of subdirectories of
@@ -7103,6 +7121,8 @@ system and gives an overview of their function and contents.
 
       -  ``npm://`` - Fetches JavaScript modules from a registry.
 
+      -  ``az://`` - Fetches files from an Azure Storage account.
+
       Standard and recipe-specific options for ``SRC_URI`` exist. Here are
       standard options:
 
@@ -8787,7 +8807,7 @@ system and gives an overview of their function and contents.
       The ``WKS_FILE_DEPENDS`` variable is similar to the
       :term:`DEPENDS` variable. When you use the variable in
       your recipe that builds the Wic image, dependencies you list in the
-      ``WIC_FILE_DEPENDS`` variable are added to the ``DEPENDS`` variable.
+      ``WKS_FILE_DEPENDS`` variable are added to the ``DEPENDS`` variable.
 
       With the ``WKS_FILE_DEPENDS`` variable, you have the possibility to
       specify a list of additional dependencies (e.g. native tools,

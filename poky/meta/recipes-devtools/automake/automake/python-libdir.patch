@@ -1,4 +1,4 @@
-From a80dacd5124d0713cf2c986b28d736e78dc6b0ca Mon Sep 17 00:00:00 2001
+From 61bd143910001aaf610416d7ca56c52c0b081318 Mon Sep 17 00:00:00 2001
 From: Kumar Gala <galak@kernel.crashing.org>
 Date: Thu, 11 Aug 2011 01:26:33 -0500
 Subject: [PATCH] automake: Update for python.m4 to respect libdir
@@ -17,11 +17,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 7 insertions(+), 20 deletions(-)
 
 diff --git a/m4/python.m4 b/m4/python.m4
-index 63c0a0e..7bbd2d2 100644
+index b2302ba..dbc6954 100644
 --- a/m4/python.m4
 +++ b/m4/python.m4
-@@ -94,12 +94,13 @@ AC_DEFUN([AM_PATH_PYTHON],
-     [am_cv_python_version=`$PYTHON -c "import sys; sys.stdout.write(sys.version[[:3]])"`])
+@@ -96,12 +96,13 @@ AC_DEFUN([AM_PATH_PYTHON],
+     [am_cv_python_version=`$PYTHON -c "import sys; print('%u.%u' % sys.version_info[[:2]])"`])
    AC_SUBST([PYTHON_VERSION], [$am_cv_python_version])
  
 -  dnl Use the values of $prefix and $exec_prefix for the corresponding
@@ -36,7 +36,7 @@ index 63c0a0e..7bbd2d2 100644
    AC_SUBST([PYTHON_EXEC_PREFIX], ['${exec_prefix}'])
  
    dnl At times (like when building shared libraries) you may want
-@@ -144,14 +145,7 @@ except ImportError:
+@@ -146,14 +147,7 @@ except ImportError:
       else
         am_py_prefix=$prefix
       fi
@@ -52,7 +52,7 @@ index 63c0a0e..7bbd2d2 100644
       case $am_cv_python_pythondir in
       $am_py_prefix*)
         am__strip_prefix=`echo "$am_py_prefix" | sed 's|.|.|g'`
-@@ -161,7 +155,7 @@ sys.stdout.write(sitedir)"`
+@@ -163,7 +157,7 @@ sys.stdout.write(sitedir)"`
         case $am_py_prefix in
           /usr|/System*) ;;
           *)
@@ -61,7 +61,7 @@ index 63c0a0e..7bbd2d2 100644
  	  ;;
         esac
         ;;
-@@ -186,14 +180,7 @@ sys.stdout.write(sitedir)"`
+@@ -188,14 +182,7 @@ sys.stdout.write(sitedir)"`
       else
         am_py_exec_prefix=$exec_prefix
       fi
@@ -77,7 +77,7 @@ index 63c0a0e..7bbd2d2 100644
       case $am_cv_python_pyexecdir in
       $am_py_exec_prefix*)
         am__strip_prefix=`echo "$am_py_exec_prefix" | sed 's|.|.|g'`
-@@ -203,7 +190,7 @@ sys.stdout.write(sitedir)"`
+@@ -205,7 +192,7 @@ sys.stdout.write(sitedir)"`
         case $am_py_exec_prefix in
           /usr|/System*) ;;
           *)

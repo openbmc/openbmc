@@ -624,6 +624,34 @@ Here are some example URLs: ::
    SRC_URI = "repo://REPOROOT;protocol=git;branch=some_branch;manifest=my_manifest.xml"
    SRC_URI = "repo://REPOROOT;protocol=file;branch=some_branch;manifest=my_manifest.xml"
 
+.. _az-fetcher:
+
+Az Fetcher (``az://``)
+--------------------------
+
+This submodule fetches data from an
+`Azure Storage account <https://docs.microsoft.com/en-us/azure/storage/>`__ ,
+it inherits its functionality from the HTTP wget fetcher, but modifies its
+behavior to accomodate the usage of a
+`Shared Access Signature (SAS) <https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview>`__
+for non-public data.
+
+Such functionality is set by the variable:
+
+-  :term:`AZ_SAS`: The Azure Storage Shared Access Signature provides secure
+   delegate access to resources, if this variable is set, the Az Fetcher will
+   use it when fetching artifacts from the cloud.
+
+You can specify the AZ_SAS variable as shown below: ::
+
+   AZ_SAS = "se=2021-01-01&sp=r&sv=2018-11-09&sr=c&skoid=<skoid>&sig=<signature>"
+
+Here is an example URL: ::
+
+   SRC_URI = "az://<azure-storage-account>.blob.core.windows.net/<foo_container>/<bar_file>"
+
+It can also be used when setting mirrors definitions using the :term:`PREMIRRORS` variable.
+
 Other Fetchers
 --------------
 

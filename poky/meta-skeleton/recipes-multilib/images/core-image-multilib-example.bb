@@ -1,5 +1,4 @@
-#
-# An example of a multilib image
+SUMMARY = "An example of a multilib image"
 #
 # This example includes a lib32 version of bash into an otherwise standard
 # sato image. It assumes a "lib32" multilib has been enabled in the user's

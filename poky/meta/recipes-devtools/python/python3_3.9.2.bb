@@ -371,6 +371,7 @@ RDEPENDS_${PN}-ptest_append_libc-glibc = " locale-base-tr-tr.iso-8859-9"
 RDEPENDS_${PN}-tkinter += "${@bb.utils.contains('PACKAGECONFIG', 'tk', 'tk tk-lib', '', d)}"
 RDEPENDS_${PN}-idle += "${@bb.utils.contains('PACKAGECONFIG', 'tk', '${PN}-tkinter tcl', '', d)}"
 RDEPENDS_${PN}-dev = ""
+RDEPENDS_${PN}-pydoc += "${PN}-io"
 
 RDEPENDS_${PN}-tests_append_class-target = " ${MLPREFIX}bash"
 RDEPENDS_${PN}-tests_append_class-nativesdk = " ${MLPREFIX}bash"

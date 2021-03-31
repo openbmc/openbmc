@@ -33,7 +33,7 @@ import bb.tinfoil
 def get_fnlist(bbhandler, pkg_pn, preferred):
     ''' Get all recipe file names '''
     if preferred:
-        (latest_versions, preferred_versions) = bb.providers.findProviders(bbhandler.config_data, bbhandler.cooker.recipecaches[''], pkg_pn)
+        (latest_versions, preferred_versions, required_versions) = bb.providers.findProviders(bbhandler.config_data, bbhandler.cooker.recipecaches[''], pkg_pn)
 
     fn_list = []
     for pn in sorted(pkg_pn):

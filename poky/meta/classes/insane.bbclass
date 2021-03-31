@@ -1014,26 +1014,6 @@ python do_package_qa () {
     logdir = d.getVar('T')
     pn = d.getVar('PN')
 
-    # Check the compile log for host contamination
-    compilelog = os.path.join(logdir,"log.do_compile")
-
-    if os.path.exists(compilelog):
-        statement = "grep -e 'CROSS COMPILE Badness:' -e 'is unsafe for cross-compilation' %s > /dev/null" % compilelog
-        if subprocess.call(statement, shell=True) == 0:
-            msg = "%s: The compile log indicates that host include and/or library paths were used.\n \
-        Please check the log '%s' for more information." % (pn, compilelog)
-            package_qa_handle_error("compile-host-path", msg, d)
-
-    # Check the install log for host contamination
-    installlog = os.path.join(logdir,"log.do_install")
-
-    if os.path.exists(installlog):
-        statement = "grep -e 'CROSS COMPILE Badness:' -e 'is unsafe for cross-compilation' %s > /dev/null" % installlog
-        if subprocess.call(statement, shell=True) == 0:
-            msg = "%s: The install log indicates that host include and/or library paths were used.\n \
-        Please check the log '%s' for more information." % (pn, installlog)
-            package_qa_handle_error("install-host-path", msg, d)
-
     # Scan the packages...
     pkgdest = d.getVar('PKGDEST')
     packages = set((d.getVar('PACKAGES') or '').split())
@@ -1212,7 +1192,7 @@ python do_qa_configure() {
     if bb.data.inherits_class('autotools', d) and not skip_configure_unsafe:
         bb.note("Checking autotools environment for common misconfiguration")
         for root, dirs, files in os.walk(workdir):
-            statement = "grep -q -F -e 'CROSS COMPILE Badness:' -e 'is unsafe for cross-compilation' %s" % \
+            statement = "grep -q -F -e 'is unsafe for cross-compilation' %s" % \
                         os.path.join(root,"config.log")
             if "config.log" in files:
                 if subprocess.call(statement, shell=True) == 0:

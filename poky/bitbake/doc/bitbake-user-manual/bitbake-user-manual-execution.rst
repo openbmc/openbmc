@@ -244,7 +244,8 @@ want upstream. Here is an example: ::
   BBFILE_COLLECTIONS = "upstream local"
   BBFILE_PATTERN_upstream = "^/stuff/openembedded/"
   BBFILE_PATTERN_local = "^/stuff/openembedded.modified/"
-  BBFILE_PRIORITY_upstream = "5" BBFILE_PRIORITY_local = "10"
+  BBFILE_PRIORITY_upstream = "5"
+  BBFILE_PRIORITY_local = "10"
 
 .. note::
 

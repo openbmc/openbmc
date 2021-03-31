@@ -1,0 +1,51 @@
+From e4e88688a0722237effc56cc21438d0c8e82de88 Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 11 Nov 2020 18:29:26 +0000
+Subject: [PATCH 10/29] kqueue: Fix unlocked access to shared variable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+And drop the `volatile` qualifier because it doesn’t help.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Helps: #600
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719]
+---
+ gio/kqueue/kqueue-missing.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/gio/kqueue/kqueue-missing.c b/gio/kqueue/kqueue-missing.c
+index 37af82e5b..d1ffdf4bd 100644
+--- a/gio/kqueue/kqueue-missing.c
++++ b/gio/kqueue/kqueue-missing.c
+@@ -34,7 +34,7 @@ static gboolean km_debug_enabled = FALSE;
+ static GSList *missing_subs_list = NULL;
+ G_LOCK_DEFINE_STATIC (missing_lock);
+ 
+-static volatile gboolean scan_missing_running = FALSE;
++static gboolean scan_missing_running = FALSE;  /* must be accessed under @missing_lock */
+ 
+ 
+ static gboolean
+@@ -62,7 +62,6 @@ _km_add_missing (kqueue_sub *sub)
+ 
+   KM_W ("adding %s to missing list\n", sub->filename);
+   missing_subs_list = g_slist_prepend (missing_subs_list, sub);
+-  G_UNLOCK (missing_lock);
+ 
+   if (!scan_missing_running)
+     {
+@@ -73,6 +72,8 @@ _km_add_missing (kqueue_sub *sub)
+       g_source_attach (source, GLIB_PRIVATE_CALL (g_get_worker_context) ());
+       g_source_unref (source);
+     }
++
++  G_UNLOCK (missing_lock);
+ }
+ 
+ /**
+-- 
+2.30.1
+

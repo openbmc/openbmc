@@ -128,7 +128,7 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
                     sys.exit(1)
 
         pkg_pn = self.tinfoil.cooker.recipecaches[mc].pkg_pn
-        (latest_versions, preferred_versions) = self.tinfoil.find_providers(mc)
+        (latest_versions, preferred_versions, required_versions) = self.tinfoil.find_providers(mc)
         allproviders = self.tinfoil.get_all_providers(mc)
 
         # Ensure we list skipped recipes

@@ -65,6 +65,7 @@ PACKAGECONFIG[wayland]    = "--enable-video-wayland,--disable-video-wayland,wayl
 PACKAGECONFIG[x11]        = "--enable-video-x11,--disable-video-x11,virtual/libx11 libxext libxrandr libxrender"
 
 EXTRA_AUTORECONF += "--include=acinclude --exclude=autoheader"
+CFLAGS_append_class-native = " -DNO_SHARED_MEMORY"
 
 do_configure_prepend() {
         # Remove old libtool macros.

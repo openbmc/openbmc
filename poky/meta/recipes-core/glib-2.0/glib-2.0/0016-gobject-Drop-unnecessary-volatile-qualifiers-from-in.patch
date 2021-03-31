@@ -1,0 +1,126 @@
+From 08d04d0428cc26935a2d42083f1710432465c98a Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 11 Nov 2020 18:42:43 +0000
+Subject: [PATCH 16/29] gobject: Drop unnecessary volatile qualifiers from
+ internal variables
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+These variables were already (correctly) accessed atomically. The
+`volatile` qualifier doesn’t help with that.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Helps: #600
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719]
+---
+ gobject/gclosure.c |  2 +-
+ gobject/gclosure.h | 20 ++++++++++----------
+ gobject/gobject.c  |  4 ++--
+ gobject/gtype.c    | 10 +++++-----
+ 4 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/gobject/gclosure.c b/gobject/gclosure.c
+index 1d1f2f48a..6d41e6d8a 100644
+--- a/gobject/gclosure.c
++++ b/gobject/gclosure.c
+@@ -98,7 +98,7 @@
+ 
+ typedef union {
+   GClosure closure;
+-  volatile gint vint;
++  gint vint;
+ } ClosureInt;
+ 
+ #define CHANGE_FIELD(_closure, _field, _OP, _value, _must_set, _SET_OLD, _SET_NEW)      \
+diff --git a/gobject/gclosure.h b/gobject/gclosure.h
+index a0f91f538..884e403a8 100644
+--- a/gobject/gclosure.h
++++ b/gobject/gclosure.h
+@@ -175,20 +175,20 @@ struct _GClosureNotifyData
+ struct _GClosure
+ {
+   /*< private >*/
+-  volatile      	guint	 ref_count : 15;
++  guint ref_count : 15;  /* (atomic) */
+   /* meta_marshal is not used anymore but must be zero for historical reasons
+      as it was exposed in the G_CLOSURE_N_NOTIFIERS macro */
+-  volatile       	guint	 meta_marshal_nouse : 1;
+-  volatile       	guint	 n_guards : 1;
+-  volatile       	guint	 n_fnotifiers : 2;	/* finalization notifiers */
+-  volatile       	guint	 n_inotifiers : 8;	/* invalidation notifiers */
+-  volatile       	guint	 in_inotify : 1;
+-  volatile       	guint	 floating : 1;
++  guint meta_marshal_nouse : 1;  /* (atomic) */
++  guint n_guards : 1;  /* (atomic) */
++  guint n_fnotifiers : 2;  /* finalization notifiers (atomic) */
++  guint n_inotifiers : 8;  /* invalidation notifiers (atomic) */
++  guint in_inotify : 1;  /* (atomic) */
++  guint floating : 1;  /* (atomic) */
+   /*< protected >*/
+-  volatile         	guint	 derivative_flag : 1;
++  guint derivative_flag : 1;  /* (atomic) */
+   /*< public >*/
+-  volatile       	guint	 in_marshal : 1;
+-  volatile       	guint	 is_invalid : 1;
++  guint in_marshal : 1;  /* (atomic) */
++  guint is_invalid : 1;  /* (atomic) */
+ 
+   /*< private >*/	void   (*marshal)  (GClosure       *closure,
+ 					    GValue /*out*/ *return_value,
+diff --git a/gobject/gobject.c b/gobject/gobject.c
+index 6e9c44a1e..a3a32be9f 100644
+--- a/gobject/gobject.c
++++ b/gobject/gobject.c
+@@ -174,9 +174,9 @@ typedef struct
+   GTypeInstance  g_type_instance;
+ 
+   /*< private >*/
+-  volatile guint ref_count;
++  guint          ref_count;  /* (atomic) */
+ #ifdef HAVE_OPTIONAL_FLAGS
+-  volatile guint optional_flags;
++  guint          optional_flags;  /* (atomic) */
+ #endif
+   GData         *qdata;
+ } GObjectReal;
+diff --git a/gobject/gtype.c b/gobject/gtype.c
+index 51dad7690..be5989a3e 100644
+--- a/gobject/gtype.c
++++ b/gobject/gtype.c
+@@ -221,9 +221,9 @@ typedef enum
+ /* --- structures --- */
+ struct _TypeNode
+ {
+-  guint volatile ref_count;
++  guint        ref_count;  /* (atomic) */
+ #ifdef G_ENABLE_DEBUG
+-  guint volatile instance_count;
++  guint        instance_count;  /* (atomic) */
+ #endif
+   GTypePlugin *plugin;
+   guint        n_children; /* writable with lock */
+@@ -233,7 +233,7 @@ struct _TypeNode
+   guint        is_instantiatable : 1;
+   guint        mutatable_check_cache : 1;	/* combines some common path checks */
+   GType       *children; /* writable with lock */
+-  TypeData * volatile data;
++  TypeData    *data;
+   GQuark       qname;
+   GData       *global_gdata;
+   union {
+@@ -569,8 +569,8 @@ type_node_new_W (TypeNode    *pnode,
+ }
+ 
+ static inline IFaceEntry*
+-lookup_iface_entry_I (volatile IFaceEntries *entries,
+-		      TypeNode *iface_node)
++lookup_iface_entry_I (IFaceEntries *entries,
++                      TypeNode     *iface_node)
+ {
+   guint8 *offsets;
+   guint offset_index;
+-- 
+2.30.1
+

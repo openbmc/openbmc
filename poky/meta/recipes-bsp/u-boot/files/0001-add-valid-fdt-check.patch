@@ -1,0 +1,36 @@
+From ea1a9ec5f430359720d9a0621ed1acfbba6a142a Mon Sep 17 00:00:00 2001
+From: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Date: Wed, 13 Jan 2021 02:09:12 +0100
+Subject: [PATCH] image-fit: fit_check_format check for valid FDT
+
+fit_check_format() must check that the buffer contains a flattened device
+tree before calling any device tree library functions.
+
+Failure to do may cause segmentation faults.
+
+Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+
+Upstream-Status: Backport[https://github.com/u-boot/u-boot/commit/ea1a9ec5f430359720d9a0621ed1acfbba6a142a]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+
+---
+ common/image-fit.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/common/image-fit.c b/common/image-fit.c
+index 6a8787ca0a..21c44bdf69 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -1553,6 +1553,12 @@ int fit_image_check_comp(const void *fit, int noffset, uint8_t comp)
+  */
+ int fit_check_format(const void *fit)
+ {
++	/* A FIT image must be a valid FDT */
++	if (fdt_check_header(fit)) {
++		debug("Wrong FIT format: not a flattened device tree\n");
++		return 0;
++	}
++
+ 	/* mandatory / node 'description' property */
+ 	if (fdt_getprop(fit, 0, FIT_DESC_PROP, NULL) == NULL) {
+ 		debug("Wrong FIT format: no description\n");

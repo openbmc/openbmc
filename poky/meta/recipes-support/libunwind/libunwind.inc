@@ -4,6 +4,7 @@ HOMEPAGE = "http://www.nongnu.org/libunwind"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d80c8ed4062b8339b715f90fa68cc9f"
 DEPENDS += "libatomic-ops"
+DEPENDS_append_libc-musl = " libucontext"
 
 inherit autotools multilib_header
 

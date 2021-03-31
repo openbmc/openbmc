@@ -9,6 +9,7 @@
 #
 # Available IMAGE_FEATURES:
 #
+# - weston              - Weston Wayland compositor
 # - x11                 - X server
 # - x11-base            - X server with minimal environment
 # - x11-sato            - OpenedHand Sato environment
@@ -37,6 +38,7 @@
 # - stateless-rootfs    - systemctl-native not run, image populated by systemd at runtime
 # - splash              - bootup splash screen
 #
+FEATURE_PACKAGES_weston = "packagegroup-core-weston"
 FEATURE_PACKAGES_x11 = "packagegroup-core-x11"
 FEATURE_PACKAGES_x11-base = "packagegroup-core-x11-base"
 FEATURE_PACKAGES_x11-sato = "packagegroup-core-x11-sato"

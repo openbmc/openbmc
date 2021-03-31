@@ -1,4 +1,5 @@
 SUMMARY = "Library for solving packages and reading repositories"
+DESCRIPTION = "This is libsolv, a free package dependency solver using a satisfiability algorithm for solving packages and reading repositories"
 HOMEPAGE = "https://github.com/openSUSE/libsolv"
 BUGTRACKER = "https://github.com/openSUSE/libsolv/issues"
 SECTION = "devel"

@@ -1,0 +1,39 @@
+From e4c41db74b8972285cbdfe614c95c1ffd97d70e1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 Mar 2021 11:59:43 -0700
+Subject: [PATCH] RISC-V: Restore the typcast to 64bit type
+
+this makes the type promotions clear and explicit
+It was already typecasted to long but was accidentally dropped in [1]
+which stated to cause failures on riscv32 as reported in [2]
+
+[1] https://git.savannah.gnu.org/cgit/grub.git/commit/?id=2bf40e9e5be9808b17852e688eead87acff14420
+[2] https://savannah.gnu.org/bugs/index.php?60283
+
+Upstream-Status: Submitted
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Cc: Andreas Schwab <schwab@suse.de>
+Cc: Daniel Kiper <daniel.kiper@oracle.com>
+Cc: Chester Lin <clin@suse.com>
+Cc: Nikita Ermakov <arei@altlinux.org>
+Cc: Alistair Francis <alistair.francis@wdc.com>
+---
+ util/grub-mkimagexx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/grub-mkimagexx.c b/util/grub-mkimagexx.c
+index 00f49ccaa..ac677d03d 100644
+--- a/util/grub-mkimagexx.c
++++ b/util/grub-mkimagexx.c
+@@ -1242,7 +1242,7 @@ SUFFIX (relocate_addrs) (Elf_Ehdr *e, struct section_metadata *smd,
+ 		  */
+ 
+ 		 sym_addr += addend;
+-		 off = sym_addr - target_section_addr - offset - image_target->vaddr_offset;
++		 off = (grub_int64_t)sym_addr - target_section_addr - offset - image_target->vaddr_offset;
+ 
+ 		 switch (ELF_R_TYPE (info))
+ 		   {
+-- 
+2.31.1
+

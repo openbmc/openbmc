@@ -1,0 +1,84 @@
+Pass --zero to GenFw in release builds so that the sections that link back to
+the intermediate binaries (containing build paths) are removed.
+
+Upstream-Status: Pending (discussion at https://bugzilla.tianocore.org/show_bug.cgi?id=3256)
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From 6303b065802c9427c718fda129360189b79316e7 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Tue, 16 Mar 2021 16:49:49 +0000
+Subject: [PATCH] Strip build paths
+
+---
+ OvmfPkg/AmdSev/AmdSevX64.dsc | 1 +
+ OvmfPkg/Bhyve/BhyveX64.dsc   | 1 +
+ OvmfPkg/OvmfPkgIa32.dsc      | 2 ++
+ OvmfPkg/OvmfPkgIa32X64.dsc   | 1 +
+ OvmfPkg/OvmfPkgX64.dsc       | 1 +
+ OvmfPkg/OvmfXen.dsc          | 1 +
+ 6 files changed, 7 insertions(+)
+
+diff --git a/OvmfPkg/Bhyve/BhyveX64.dsc b/OvmfPkg/Bhyve/BhyveX64.dsc
+index 4a1cdf5aca..132f55cf69 100644
+--- a/OvmfPkg/Bhyve/BhyveX64.dsc
++++ b/OvmfPkg/Bhyve/BhyveX64.dsc
+@@ -76,6 +76,7 @@
+   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
+   INTEL:*_*_X64_GENFW_FLAGS = --keepexceptiontable
+ !endif
++  RELEASE_*_*_GENFW_FLAGS = --zero
+ 
+   #
+   # Disable deprecated APIs.
+diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
+index 1eaf3e99c6..ce20f09df8 100644
+--- a/OvmfPkg/OvmfPkgIa32.dsc
++++ b/OvmfPkg/OvmfPkgIa32.dsc
+@@ -90,6 +90,8 @@
+ 
+ !include NetworkPkg/NetworkBuildOptions.dsc.inc
+ 
++  RELEASE_*_*_GENFW_FLAGS = --zero
++
+ [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
+   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
+   XCODE:*_*_*_DLINK_FLAGS = -seg1addr 0x1000 -segalign 0x1000
+diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
+index 4a5a430147..97cc438250 100644
+--- a/OvmfPkg/OvmfPkgIa32X64.dsc
++++ b/OvmfPkg/OvmfPkgIa32X64.dsc
+@@ -84,6 +84,7 @@
+   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
+   INTEL:*_*_X64_GENFW_FLAGS = --keepexceptiontable
+ !endif
++  RELEASE_*_*_GENFW_FLAGS = --zero
+ 
+   #
+   # Disable deprecated APIs.
+diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+index d4d601b444..f544fb04bf 100644
+--- a/OvmfPkg/OvmfPkgX64.dsc
++++ b/OvmfPkg/OvmfPkgX64.dsc
+@@ -84,6 +84,7 @@
+   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
+   INTEL:*_*_X64_GENFW_FLAGS = --keepexceptiontable
+ !endif
++  RELEASE_*_*_GENFW_FLAGS = --zero
+ 
+   #
+   # Disable deprecated APIs.
+diff --git a/OvmfPkg/OvmfXen.dsc b/OvmfPkg/OvmfXen.dsc
+index 507029404f..fcaa35acf1 100644
+--- a/OvmfPkg/OvmfXen.dsc
++++ b/OvmfPkg/OvmfXen.dsc
+@@ -74,6 +74,7 @@
+   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
+   INTEL:*_*_X64_GENFW_FLAGS = --keepexceptiontable
+ !endif
++  RELEASE_*_*_GENFW_FLAGS = --zero
+ 
+   #
+   # Disable deprecated APIs.
+-- 
+2.25.1
+

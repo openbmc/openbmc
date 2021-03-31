@@ -282,16 +282,15 @@ def expand_wildcard_licenses(d, wildcard_licenses):
     """
     import fnmatch
 
-    # Assume if we're passed "GPLv3" or "*GPLv3" it means -or-later as well
-    for lic in wildcard_licenses[:]:
-        if not lic.endswith(("-or-later", "-only", "*")):
-            wildcard_licenses.append(lic + "+")
-
     licenses = wildcard_licenses[:]
     spdxmapkeys = d.getVarFlags('SPDXLICENSEMAP').keys()
     for wld_lic in wildcard_licenses:
         spdxflags = fnmatch.filter(spdxmapkeys, wld_lic)
         licenses += [d.getVarFlag('SPDXLICENSEMAP', flag) for flag in spdxflags]
+        # Assume if we're passed "GPLv3" or "*GPLv3" it means -or-later as well
+        if not wld_lic.endswith(("-or-later", "-only", "*", "+")):
+            spdxflags = fnmatch.filter(spdxmapkeys, wld_lic + "+")
+            licenses += [d.getVarFlag('SPDXLICENSEMAP', flag) for flag in spdxflags]
 
     spdx_lics = d.getVar('AVAILABLE_LICENSES').split()
     for wld_lic in wildcard_licenses:

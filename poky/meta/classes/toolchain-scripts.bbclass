@@ -8,6 +8,8 @@ TARGET_CC_ARCH_append_libc-musl = " -mmusl"
 # default debug prefix map isn't valid in the SDK
 DEBUG_PREFIX_MAP = ""
 
+EXPORT_SDK_PS1 = "${@ 'export PS1=\'%s\'' % d.getVar('SDK_PS1') if d.getVar('SDK_PS1') else ''}"
+
 # This function creates an environment-setup-script for use in a deployable SDK
 toolchain_create_sdk_env_script () {
 	# Create environment setup script.  Remember that $SDKTARGETSYSROOT should
@@ -39,6 +41,7 @@ toolchain_create_sdk_env_script () {
 	echo '    return 1' >> $script
 	echo 'fi' >> $script
 
+	echo "${EXPORT_SDK_PS1}" >> $script
 	echo 'export SDKTARGETSYSROOT='"$sysroot" >> $script
 	EXTRAPATH=""
 	for i in ${CANADIANEXTRAOS}; do

@@ -1,0 +1,58 @@
+From b3fdf78b15beb940918da1e41eb68e24ba31bb87 Mon Sep 17 00:00:00 2001
+From: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Date: Wed, 3 Mar 2021 10:10:16 -0500
+Subject: [PATCH 1/4] Fix: memory leaks on event destroy
+
+Both filter runtime and event enabler ref objects are owned by the
+event, but are not freed upon destruction of the event object, thus
+leaking memory.
+
+Upstream-status: backport
+
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: Ice9b1c18b47584838aea2b965494d3c8391f4c84
+---
+ lttng-events.c | 7 +++++++
+ lttng-events.h | 1 +
+ 2 files changed, 8 insertions(+)
+
+diff --git a/lttng-events.c b/lttng-events.c
+index f3398adc..984bd341 100644
+--- a/lttng-events.c
++++ b/lttng-events.c
+@@ -919,6 +919,8 @@ int _lttng_event_unregister(struct lttng_event *event)
+ static
+ void _lttng_event_destroy(struct lttng_event *event)
+ {
++	struct lttng_enabler_ref *enabler_ref, *tmp_enabler_ref;
++
+ 	switch (event->instrumentation) {
+ 	case LTTNG_KERNEL_TRACEPOINT:
+ 		lttng_event_put(event->desc);
+@@ -944,6 +946,11 @@ void _lttng_event_destroy(struct lttng_event *event)
+ 	}
+ 	list_del(&event->list);
+ 	lttng_destroy_context(event->ctx);
++	lttng_free_event_filter_runtime(event);
++	/* Free event enabler refs */
++	list_for_each_entry_safe(enabler_ref, tmp_enabler_ref,
++				 &event->enablers_ref_head, node)
++		kfree(enabler_ref);
+ 	kmem_cache_free(event_cache, event);
+ }
+ 
+diff --git a/lttng-events.h b/lttng-events.h
+index 1b9ab167..13b6abf5 100644
+--- a/lttng-events.h
++++ b/lttng-events.h
+@@ -716,6 +716,7 @@ int lttng_enabler_attach_bytecode(struct lttng_enabler *enabler,
+ 		struct lttng_kernel_filter_bytecode __user *bytecode);
+ void lttng_enabler_event_link_bytecode(struct lttng_event *event,
+ 		struct lttng_enabler *enabler);
++void lttng_free_event_filter_runtime(struct lttng_event *event);
+ 
+ int lttng_probes_init(void);
+ 
+-- 
+2.19.1
+

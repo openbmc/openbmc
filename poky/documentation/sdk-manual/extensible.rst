@@ -118,7 +118,7 @@ architecture. The example assumes the SDK installer is located in
    $ ./Downloads/poky-glibc-x86_64-core-image-minimal-core2-64-toolchain-ext-2.5.sh
    Poky (Yocto Project Reference Distro) Extensible SDK installer version 2.5
    ==========================================================================
-   Enter target directory for SDK (default: ~/poky_sdk):
+   Enter target directory for SDK (default: poky_sdk):
    You are about to install the SDK to "/home/scottrif/poky_sdk". Proceed [Y/n]? Y
    Extracting SDK..............done
    Setting it up...

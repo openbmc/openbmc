@@ -1,0 +1,77 @@
+From 6bd0a4b29753570a2c20b61b5ad2c0068567b7b6 Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Mon, 16 Nov 2020 16:44:29 +0000
+Subject: [PATCH 25/29] gthread: Use g_atomic() primitives correctly in
+ destructor list
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In the Windows destructor list, consistently access
+`g_private_destructors` using atomic primitives.
+
+`g_atomic_pointer_compare_and_exchange()` should be equivalent to
+`InterlockedCompareExchangePointer()`, but is a bit more understandable
+in a general GLib context, and pairs with `g_atomic_pointer_get()`. (I
+can’t find a Windows API equivalent for that.)
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Helps: #600
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719]
+---
+ glib/gthread-win32.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/glib/gthread-win32.c b/glib/gthread-win32.c
+index 0c37dc6c1..20aca6fa1 100644
+--- a/glib/gthread-win32.c
++++ b/glib/gthread-win32.c
+@@ -301,7 +301,7 @@ struct _GPrivateDestructor
+   GPrivateDestructor *next;
+ };
+ 
+-static GPrivateDestructor * volatile g_private_destructors;
++static GPrivateDestructor *g_private_destructors;  /* (atomic) prepend-only */
+ static CRITICAL_SECTION g_private_lock;
+ 
+ static DWORD
+@@ -329,7 +329,7 @@ g_private_get_impl (GPrivate *key)
+                 g_thread_abort (errno, "malloc");
+               destructor->index = impl;
+               destructor->notify = key->notify;
+-              destructor->next = g_private_destructors;
++              destructor->next = g_atomic_pointer_get (&g_private_destructors);
+ 
+               /* We need to do an atomic store due to the unlocked
+                * access to the destructor list from the thread exit
+@@ -337,13 +337,14 @@ g_private_get_impl (GPrivate *key)
+                *
+                * It can double as a sanity check...
+                */
+-              if (InterlockedCompareExchangePointer (&g_private_destructors, destructor,
+-                                                     destructor->next) != destructor->next)
++              if (!g_atomic_pointer_compare_and_exchange (&g_private_destructors,
++                                                          destructor->next,
++                                                          destructor))
+                 g_thread_abort (0, "g_private_get_impl(1)");
+             }
+ 
+           /* Ditto, due to the unlocked access on the fast path */
+-          if (InterlockedCompareExchangePointer (&key->p, impl, NULL) != NULL)
++          if (!g_atomic_pointer_compare_and_exchange (&key->p, NULL, impl))
+             g_thread_abort (0, "g_private_get_impl(2)");
+         }
+       LeaveCriticalSection (&g_private_lock);
+@@ -635,7 +636,7 @@ g_thread_win32_thread_detach (void)
+        */
+       dtors_called = FALSE;
+ 
+-      for (dtor = g_private_destructors; dtor; dtor = dtor->next)
++      for (dtor = g_atomic_pointer_get (&g_private_destructors); dtor; dtor = dtor->next)
+         {
+           gpointer value;
+ 
+-- 
+2.30.1
+

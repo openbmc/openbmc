@@ -1,0 +1,159 @@
+From 23a2f61ffc6a656f136fa2044c0c3b8f79766779 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=A9r=C3=A9mie=20Galarneau?=
+ <jeremie.galarneau@efficios.com>
+Date: Wed, 3 Mar 2021 18:52:19 -0500
+Subject: [PATCH 2/4] Fix: filter interpreter early-exits on uninitialized
+ value
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+I observed that syscall filtering on string arguments wouldn't work on
+my development machines, both running 5.11.2-arch1-1 (Arch Linux).
+
+For instance, enabling the tracing of the `openat()` syscall with the
+'filename == "/proc/cpuinfo"' filter would not produce events even
+though matching events were present in another session that had no
+filtering active. The same problem occurred with `execve()`.
+
+I tried a couple of kernel versions before (5.11.1 and 5.10.13, if
+memory serves me well) and I had the same problem. Meanwhile, I couldn't
+reproduce the problem on various Debian machines (the LTTng CI) nor on a
+fresh Ubuntu 20.04 with both the stock kernel and with an updated 5.11.2
+kernel.
+
+I built the lttng-modules with the interpreter debugging printout and
+saw the following warning:
+  LTTng: [debug bytecode in /home/jgalar/EfficiOS/src/lttng-modules/src/lttng-bytecode-interpreter.c:bytecode_interpret@1508] Bytecode warning: loading a NULL string.
+
+After a shedload (yes, a _shed_load) of digging, I figured that the
+problem was hidden in plain sight near that logging statement.
+
+In the `BYTECODE_OP_LOAD_FIELD_REF_USER_STRING` operation, the 'ax'
+register's 'user_str' is initialized with the stack value (the user
+space string's address in our case). However, a NULL check is performed
+against the register's 'str' member.
+
+I initialy suspected that both members would be part of the same union
+and alias each-other, but they are actually contiguous in a structure.
+
+On the unaffected machines, I could confirm that the `str` member was
+uninitialized to a non-zero value causing the condition to evaluate to
+false.
+
+Francis Deslauriers reproduced the problem by initializing the
+interpreter stack to zero.
+
+I am unsure of the exact kernel configuration option that reveals this
+issue on Arch Linux, but my kernel has the following option enabled:
+
+CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL:
+   Zero-initialize any stack variables that may be passed by reference
+   and had not already been explicitly initialized. This is intended to
+   eliminate all classes of uninitialized stack variable exploits and
+   information exposures.
+
+I have not tried to build without this enabled as, anyhow, this seems
+to be a legitimate issue.
+
+I have spotted what appears to be an identical problem in
+`BYTECODE_OP_LOAD_FIELD_REF_USER_SEQUENCE` and corrected it. However,
+I have not exercised that code path.
+
+The commit that introduced this problem is 5b4ad89.
+
+The debug print-out of the `BYTECODE_OP_LOAD_FIELD_REF_USER_STRING`
+operation is modified to print the user string (truncated to 31 chars).
+
+Upstream-status: backport
+
+Signed-off-by: Jérémie Galarneau <jeremie.galarneau@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: I2da3c31b9e3ce0e1b164cf3d2711c0893cbec273
+---
+ lttng-filter-interpreter.c | 41 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 37 insertions(+), 4 deletions(-)
+
+diff --git a/lttng-filter-interpreter.c b/lttng-filter-interpreter.c
+index 5d572437..6e5a5139 100644
+--- a/lttng-filter-interpreter.c
++++ b/lttng-filter-interpreter.c
+@@ -22,7 +22,7 @@ LTTNG_STACK_FRAME_NON_STANDARD(lttng_filter_interpret_bytecode);
+  * to handle user-space read.
+  */
+ static
+-char get_char(struct estack_entry *reg, size_t offset)
++char get_char(const struct estack_entry *reg, size_t offset)
+ {
+ 	if (unlikely(offset >= reg->u.s.seq_len))
+ 		return '\0';
+@@ -593,6 +593,39 @@ end:
+ 	return ret;
+ }
+ 
++#ifdef DEBUG
++
++#define DBG_USER_STR_CUTOFF 32
++
++/*
++ * In debug mode, print user string (truncated, if necessary).
++ */
++static inline
++void dbg_load_ref_user_str_printk(const struct estack_entry *user_str_reg)
++{
++	size_t pos = 0;
++	char last_char;
++	char user_str[DBG_USER_STR_CUTOFF];
++
++	pagefault_disable();
++	do {
++		last_char = get_char(user_str_reg, pos);
++		user_str[pos] = last_char;
++		pos++;
++	} while (last_char != '\0' && pos < sizeof(user_str));
++	pagefault_enable();
++
++	user_str[sizeof(user_str) - 1] = '\0';
++	dbg_printk("load field ref user string: '%s%s'\n", user_str,
++		last_char != '\0' ? "[...]" : "");
++}
++#else
++static inline
++void dbg_load_ref_user_str_printk(const struct estack_entry *user_str_reg)
++{
++}
++#endif
++
+ /*
+  * Return 0 (discard), or raise the 0x1 flag (log event).
+  * Currently, other flags are kept for future extensions and have no
+@@ -1313,7 +1346,7 @@ uint64_t lttng_filter_interpret_bytecode(void *filter_data,
+ 			estack_push(stack, top, ax, bx);
+ 			estack_ax(stack, top)->u.s.user_str =
+ 				*(const char * const *) &filter_stack_data[ref->offset];
+-			if (unlikely(!estack_ax(stack, top)->u.s.str)) {
++			if (unlikely(!estack_ax(stack, top)->u.s.user_str)) {
+ 				dbg_printk("Filter warning: loading a NULL string.\n");
+ 				ret = -EINVAL;
+ 				goto end;
+@@ -1322,7 +1355,7 @@ uint64_t lttng_filter_interpret_bytecode(void *filter_data,
+ 			estack_ax(stack, top)->u.s.literal_type =
+ 				ESTACK_STRING_LITERAL_TYPE_NONE;
+ 			estack_ax(stack, top)->u.s.user = 1;
+-			dbg_printk("ref load string %s\n", estack_ax(stack, top)->u.s.str);
++			dbg_load_ref_user_str_printk(estack_ax(stack, top));
+ 			next_pc += sizeof(struct load_op) + sizeof(struct field_ref);
+ 			PO;
+ 		}
+@@ -1340,7 +1373,7 @@ uint64_t lttng_filter_interpret_bytecode(void *filter_data,
+ 			estack_ax(stack, top)->u.s.user_str =
+ 				*(const char **) (&filter_stack_data[ref->offset
+ 								+ sizeof(unsigned long)]);
+-			if (unlikely(!estack_ax(stack, top)->u.s.str)) {
++			if (unlikely(!estack_ax(stack, top)->u.s.user_str)) {
+ 				dbg_printk("Filter warning: loading a NULL sequence.\n");
+ 				ret = -EINVAL;
+ 				goto end;
+-- 
+2.19.1
+

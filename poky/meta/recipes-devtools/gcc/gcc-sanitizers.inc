@@ -83,10 +83,11 @@ COMPATIBLE_HOST = '(x86_64|i.86|powerpc|sparc|s390|arm|aarch64).*-linux'
 # musl is currently broken entirely
 COMPATIBLE_HOST_libc-musl = 'null'
 
-FILES_libasan += "${libdir}/libasan.so.*"
+FILES_libasan += "${libdir}/libasan.so.* ${libdir}/libhwasan.so.*"
 FILES_libasan-dev += "\
     ${libdir}/libasan_preinit.o \
     ${libdir}/libasan.so \
+    ${libdir}/libhwasan.so \
     ${libdir}/libasan.la \
 "
 FILES_libasan-staticdev += "${libdir}/libasan.a"

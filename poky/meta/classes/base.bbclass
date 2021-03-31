@@ -593,6 +593,8 @@ python () {
     srcuri = d.getVar('SRC_URI')
     for uri_string in srcuri.split():
         uri = bb.fetch.URI(uri_string)
+        # Also check downloadfilename as the URL path might not be useful for sniffing
+        path = uri.params.get("downloadfilename", uri.path)
 
         # HTTP/FTP use the wget fetcher
         if uri.scheme in ("http", "https", "ftp"):
@@ -626,27 +628,27 @@ python () {
             d.appendVarFlag('do_fetch', 'depends', ' nodejs-native:do_populate_sysroot')
 
         # *.lz4 should DEPEND on lz4-native for unpacking
-        if uri.path.endswith('.lz4'):
+        if path.endswith('.lz4'):
             d.appendVarFlag('do_unpack', 'depends', ' lz4-native:do_populate_sysroot')
 
         # *.lz should DEPEND on lzip-native for unpacking
-        elif uri.path.endswith('.lz'):
+        elif path.endswith('.lz'):
             d.appendVarFlag('do_unpack', 'depends', ' lzip-native:do_populate_sysroot')
 
         # *.xz should DEPEND on xz-native for unpacking
-        elif uri.path.endswith('.xz') or uri.path.endswith('.txz'):
+        elif path.endswith('.xz') or path.endswith('.txz'):
             d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
 
         # .zip should DEPEND on unzip-native for unpacking
-        elif uri.path.endswith('.zip') or uri.path.endswith('.jar'):
+        elif path.endswith('.zip') or path.endswith('.jar'):
             d.appendVarFlag('do_unpack', 'depends', ' unzip-native:do_populate_sysroot')
 
         # Some rpm files may be compressed internally using xz (for example, rpms from Fedora)
-        elif uri.path.endswith('.rpm'):
+        elif path.endswith('.rpm'):
             d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
 
         # *.deb should DEPEND on xz-native for unpacking
-        elif uri.path.endswith('.deb'):
+        elif path.endswith('.deb'):
             d.appendVarFlag('do_unpack', 'depends', ' xz-native:do_populate_sysroot')
 
     if needsrcrev:

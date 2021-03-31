@@ -38,16 +38,17 @@ def findProviders(cfgData, dataCache, pkg_pn = None):
     localdata = data.createCopy(cfgData)
     bb.data.expandKeys(localdata)
 
+    required = {}
     preferred_versions = {}
     latest_versions = {}
 
     for pn in pkg_pn:
-        (last_ver, last_file, pref_ver, pref_file) = findBestProvider(pn, localdata, dataCache, pkg_pn)
+        (last_ver, last_file, pref_ver, pref_file, req) = findBestProvider(pn, localdata, dataCache, pkg_pn)
         preferred_versions[pn] = (pref_ver, pref_file)
         latest_versions[pn] = (last_ver, last_file)
+        required[pn] = req
 
-    return (latest_versions, preferred_versions)
-
+    return (latest_versions, preferred_versions, required)
 
 def allProviders(dataCache):
     """
@@ -58,7 +59,6 @@ def allProviders(dataCache):
         ver = dataCache.pkg_pepvpr[fn]
         all_providers[pn].append((ver, fn))
     return all_providers
-
 
 def sortPriorities(pn, dataCache, pkg_pn = None):
     """
@@ -87,6 +87,21 @@ def sortPriorities(pn, dataCache, pkg_pn = None):
 
     return tmp_pn
 
+def versionVariableMatch(cfgData, keyword, pn):
+    """
+    Return the value of the <keyword>_VERSION variable if set.
+    """
+
+    # pn can contain '_', e.g. gcc-cross-x86_64 and an override cannot
+    # hence we do this manually rather than use OVERRIDES
+    ver = cfgData.getVar("%s_VERSION_pn-%s" % (keyword, pn))
+    if not ver:
+        ver = cfgData.getVar("%s_VERSION_%s" % (keyword, pn))
+    if not ver:
+        ver = cfgData.getVar("%s_VERSION" % keyword)
+
+    return ver
+
 def preferredVersionMatch(pe, pv, pr, preferred_e, preferred_v, preferred_r):
     """
     Check if the version pe,pv,pr is the preferred one.
@@ -102,19 +117,28 @@ def preferredVersionMatch(pe, pv, pr, preferred_e, preferred_v, preferred_r):
 
 def findPreferredProvider(pn, cfgData, dataCache, pkg_pn = None, item = None):
     """
-    Find the first provider in pkg_pn with a PREFERRED_VERSION set.
+    Find the first provider in pkg_pn with REQUIRED_VERSION or PREFERRED_VERSION set.
     """
 
     preferred_file = None
     preferred_ver = None
+    required = False
 
-    # pn can contain '_', e.g. gcc-cross-x86_64 and an override cannot
-    # hence we do this manually rather than use OVERRIDES
-    preferred_v = cfgData.getVar("PREFERRED_VERSION_pn-%s" % pn)
-    if not preferred_v:
-        preferred_v = cfgData.getVar("PREFERRED_VERSION_%s" % pn)
-    if not preferred_v:
-        preferred_v = cfgData.getVar("PREFERRED_VERSION")
+    required_v = versionVariableMatch(cfgData, "REQUIRED", pn)
+    preferred_v = versionVariableMatch(cfgData, "PREFERRED", pn)
+
+    itemstr = ""
+    if item:
+        itemstr = " (for item %s)" % item
+
+    if required_v is not None:
+        if preferred_v is not None:
+            logger.warn("REQUIRED_VERSION and PREFERRED_VERSION for package %s%s are both set using REQUIRED_VERSION %s", pn, itemstr, required_v)
+        else:
+            logger.debug("REQUIRED_VERSION is set for package %s%s", pn, itemstr)
+        # REQUIRED_VERSION always takes precedence over PREFERRED_VERSION
+        preferred_v = required_v
+        required = True
 
     if preferred_v:
         m = re.match(r'(\d+:)*(.*)(_.*)*', preferred_v)
@@ -147,11 +171,9 @@ def findPreferredProvider(pn, cfgData, dataCache, pkg_pn = None, item = None):
             pv_str = preferred_v
         if not (preferred_e is None):
             pv_str = '%s:%s' % (preferred_e, pv_str)
-        itemstr = ""
-        if item:
-            itemstr = " (for item %s)" % item
         if preferred_file is None:
-            logger.warn("preferred version %s of %s not available%s", pv_str, pn, itemstr)
+            if not required:
+                logger.warn("preferred version %s of %s not available%s", pv_str, pn, itemstr)
             available_vers = []
             for file_set in pkg_pn:
                 for f in file_set:
@@ -164,11 +186,15 @@ def findPreferredProvider(pn, cfgData, dataCache, pkg_pn = None, item = None):
             if available_vers:
                 available_vers.sort()
                 logger.warn("versions of %s available: %s", pn, ' '.join(available_vers))
+            if required:
+                logger.error("required version %s of %s not available%s", pv_str, pn, itemstr)
         else:
-            logger.debug("selecting %s as PREFERRED_VERSION %s of package %s%s", preferred_file, pv_str, pn, itemstr)
+            if required:
+                logger.debug("selecting %s as REQUIRED_VERSION %s of package %s%s", preferred_file, pv_str, pn, itemstr)
+            else:
+                logger.debug("selecting %s as PREFERRED_VERSION %s of package %s%s", preferred_file, pv_str, pn, itemstr)
 
-    return (preferred_ver, preferred_file)
-
+    return (preferred_ver, preferred_file, required)
 
 def findLatestProvider(pn, cfgData, dataCache, file_set):
     """
@@ -189,7 +215,6 @@ def findLatestProvider(pn, cfgData, dataCache, file_set):
 
     return (latest, latest_f)
 
-
 def findBestProvider(pn, cfgData, dataCache, pkg_pn = None, item = None):
     """
     If there is a PREFERRED_VERSION, find the highest-priority bbfile
@@ -198,17 +223,16 @@ def findBestProvider(pn, cfgData, dataCache, pkg_pn = None, item = None):
     """
 
     sortpkg_pn = sortPriorities(pn, dataCache, pkg_pn)
-    # Find the highest priority provider with a PREFERRED_VERSION set
-    (preferred_ver, preferred_file) = findPreferredProvider(pn, cfgData, dataCache, sortpkg_pn, item)
+    # Find the highest priority provider with a REQUIRED_VERSION or PREFERRED_VERSION set
+    (preferred_ver, preferred_file, required) = findPreferredProvider(pn, cfgData, dataCache, sortpkg_pn, item)
     # Find the latest version of the highest priority provider
     (latest, latest_f) = findLatestProvider(pn, cfgData, dataCache, sortpkg_pn[0])
 
-    if preferred_file is None:
+    if not required and preferred_file is None:
         preferred_file = latest_f
         preferred_ver = latest
 
-    return (latest, latest_f, preferred_ver, preferred_file)
-
+    return (latest, latest_f, preferred_ver, preferred_file, required)
 
 def _filterProviders(providers, item, cfgData, dataCache):
     """
@@ -234,10 +258,13 @@ def _filterProviders(providers, item, cfgData, dataCache):
 
     logger.debug("providers for %s are: %s", item, list(sorted(pkg_pn.keys())))
 
-    # First add PREFERRED_VERSIONS
+    # First add REQUIRED_VERSIONS or PREFERRED_VERSIONS
     for pn in sorted(pkg_pn):
         sortpkg_pn[pn] = sortPriorities(pn, dataCache, pkg_pn)
-        preferred_versions[pn] = findPreferredProvider(pn, cfgData, dataCache, sortpkg_pn[pn], item)
+        preferred_ver, preferred_file, required = findPreferredProvider(pn, cfgData, dataCache, sortpkg_pn[pn], item)
+        if required and preferred_file is None:
+            return eligible
+        preferred_versions[pn] = (preferred_ver, preferred_file)
         if preferred_versions[pn][1]:
             eligible.append(preferred_versions[pn][1])
 
@@ -249,7 +276,6 @@ def _filterProviders(providers, item, cfgData, dataCache):
         eligible.append(preferred_versions[pn][1])
 
     if not eligible:
-        logger.error("no eligible providers for %s", item)
         return eligible
 
     # If pn == item, give it a slight default preference
@@ -265,7 +291,6 @@ def _filterProviders(providers, item, cfgData, dataCache):
         eligible = [fn] + eligible
 
     return eligible
-
 
 def filterProviders(providers, item, cfgData, dataCache):
     """
@@ -387,7 +412,6 @@ def getRuntimeProviders(dataCache, rdepend):
             logger.debug("Assuming %s is a dynamic package, but it may not exist" % rdepend)
 
     return rproviders
-
 
 def buildWorldTargetList(dataCache, task=None):
     """

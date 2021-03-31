@@ -1,0 +1,169 @@
+From 1314ff93fc4d3379483c33da6a7deff27f71ed95 Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 11 Nov 2020 18:40:56 +0000
+Subject: [PATCH 15/29] glib: Drop unnecessary volatile qualifiers from
+ internal variables
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+These variables were already (correctly) accessed atomically. The
+`volatile` qualifier doesn’t help with that.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Helps: #600
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719]
+---
+ glib/gdatetime.c | 2 +-
+ glib/gkeyfile.c  | 2 +-
+ glib/gmain.c     | 8 ++++----
+ glib/gmarkup.c   | 2 +-
+ glib/gregex.c    | 6 +++---
+ glib/gthread.c   | 6 +++---
+ 6 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/glib/gdatetime.c b/glib/gdatetime.c
+index 1755257be..453077f6d 100644
+--- a/glib/gdatetime.c
++++ b/glib/gdatetime.c
+@@ -126,7 +126,7 @@ struct _GDateTime
+   /* 1 is 0001-01-01 in Proleptic Gregorian */
+   gint32 days;
+ 
+-  volatile gint ref_count;
++  gint ref_count;  /* (atomic) */
+ };
+ 
+ /* Time conversion {{{1 */
+diff --git a/glib/gkeyfile.c b/glib/gkeyfile.c
+index 9d0215331..bbe638b74 100644
+--- a/glib/gkeyfile.c
++++ b/glib/gkeyfile.c
+@@ -512,7 +512,7 @@ struct _GKeyFile
+ 
+   gchar **locales;
+ 
+-  volatile gint ref_count;
++  gint ref_count;  /* (atomic) */
+ };
+ 
+ typedef struct _GKeyFileKeyValuePair GKeyFileKeyValuePair;
+diff --git a/glib/gmain.c b/glib/gmain.c
+index 772b8ecfc..9c5f0ef1e 100644
+--- a/glib/gmain.c
++++ b/glib/gmain.c
+@@ -272,7 +272,7 @@ struct _GMainContext
+   guint owner_count;
+   GSList *waiters;
+ 
+-  volatile gint ref_count;
++  gint ref_count;  /* (atomic) */
+ 
+   GHashTable *sources;              /* guint -> GSource */
+ 
+@@ -303,7 +303,7 @@ struct _GMainContext
+ 
+ struct _GSourceCallback
+ {
+-  volatile gint ref_count;
++  gint ref_count;  /* (atomic) */
+   GSourceFunc func;
+   gpointer    data;
+   GDestroyNotify notify;
+@@ -313,7 +313,7 @@ struct _GMainLoop
+ {
+   GMainContext *context;
+   gboolean is_running; /* (atomic) */
+-  volatile gint ref_count;
++  gint ref_count;  /* (atomic) */
+ };
+ 
+ struct _GTimeoutSource
+@@ -4749,7 +4749,7 @@ g_main_context_get_poll_func (GMainContext *context)
+  *
+  * |[<!-- language="C" --> 
+  *   #define NUM_TASKS 10
+- *   static volatile gint tasks_remaining = NUM_TASKS;
++ *   static gint tasks_remaining = NUM_TASKS;  // (atomic)
+  *   ...
+  *  
+  *   while (g_atomic_int_get (&tasks_remaining) != 0)
+diff --git a/glib/gmarkup.c b/glib/gmarkup.c
+index ba4dfd2e4..b8327fb6d 100644
+--- a/glib/gmarkup.c
++++ b/glib/gmarkup.c
+@@ -119,7 +119,7 @@ struct _GMarkupParseContext
+ {
+   const GMarkupParser *parser;
+ 
+-  volatile gint ref_count;
++  gint ref_count;  /* (atomic) */
+ 
+   GMarkupParseFlags flags;
+ 
+diff --git a/glib/gregex.c b/glib/gregex.c
+index 52416bbb9..5e6ddfb46 100644
+--- a/glib/gregex.c
++++ b/glib/gregex.c
+@@ -203,7 +203,7 @@ G_STATIC_ASSERT (G_REGEX_RAW               == PCRE_UTF8);
+ 
+ struct _GMatchInfo
+ {
+-  volatile gint ref_count;      /* the ref count */
++  gint ref_count;               /* the ref count (atomic) */
+   GRegex *regex;                /* the regex */
+   GRegexMatchFlags match_opts;  /* options used at match time on the regex */
+   gint matches;                 /* number of matching sub patterns */
+@@ -218,7 +218,7 @@ struct _GMatchInfo
+ 
+ struct _GRegex
+ {
+-  volatile gint ref_count;      /* the ref count for the immutable part */
++  gint ref_count;               /* the ref count for the immutable part (atomic) */
+   gchar *pattern;               /* the pattern */
+   pcre *pcre_re;                /* compiled form of the pattern */
+   GRegexCompileFlags compile_opts;      /* options used at compile time on the pattern */
+@@ -1300,7 +1300,7 @@ g_regex_new (const gchar         *pattern,
+   pcre *re;
+   const gchar *errmsg;
+   gboolean optimize = FALSE;
+-  static volatile gsize initialised = 0;
++  static gsize initialised = 0;
+ 
+   g_return_val_if_fail (pattern != NULL, NULL);
+   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+diff --git a/glib/gthread.c b/glib/gthread.c
+index 53f3a0848..612a9739f 100644
+--- a/glib/gthread.c
++++ b/glib/gthread.c
+@@ -513,7 +513,7 @@ static GMutex    g_once_mutex;
+ static GCond     g_once_cond;
+ static GSList   *g_once_init_list = NULL;
+ 
+-static volatile guint g_thread_n_created_counter = 0;
++static guint g_thread_n_created_counter = 0;  /* (atomic) */
+ 
+ static void g_thread_cleanup (gpointer data);
+ static GPrivate     g_thread_specific_private = G_PRIVATE_INIT (g_thread_cleanup);
+@@ -694,7 +694,7 @@ g_once_impl (GOnce       *once,
+ gboolean
+ (g_once_init_enter) (volatile void *location)
+ {
+-  volatile gsize *value_location = location;
++  gsize *value_location = (gsize *) location;
+   gboolean need_init = FALSE;
+   g_mutex_lock (&g_once_mutex);
+   if (g_atomic_pointer_get (value_location) == 0)
+@@ -731,7 +731,7 @@ void
+ (g_once_init_leave) (volatile void *location,
+                      gsize          result)
+ {
+-  volatile gsize *value_location = location;
++  gsize *value_location = (gsize *) location;
+ 
+   g_return_if_fail (g_atomic_pointer_get (value_location) == 0);
+   g_return_if_fail (result != 0);
+-- 
+2.30.1
+

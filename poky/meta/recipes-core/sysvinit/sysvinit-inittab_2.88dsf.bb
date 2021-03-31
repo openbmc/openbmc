@@ -53,6 +53,10 @@ EOF
     fi
 }
 
+do_install_append_qemuppc64 () {
+            echo "9:12345:respawn:${base_sbindir}/getty 38400 hvc0" >> ${D}${sysconfdir}/inittab
+}
+
 pkg_postinst_${PN} () {
 # run this on host and on target
 if [ "${SERIAL_CONSOLES_CHECK}" = "" ]; then

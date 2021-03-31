@@ -127,6 +127,8 @@ for M in ${machines}; do
   fi
 done
 
+COMPARE_TASKS="do_configure.sigdata do_populate_sysroot.sigdata do_package_write_ipk.sigdata do_package_write_rpm.sigdata do_package_write_deb.sigdata do_package_write_tar.sigdata"
+
 function compareSignatures() {
   MACHINE1=$1
   MACHINE2=$2
@@ -134,7 +136,7 @@ function compareSignatures() {
   PRE_PATTERN=""
   [ -n "${PATTERN}" ] || PRE_PATTERN="-v"
   [ -n "${PATTERN}" ] || PATTERN="MACHINE"
-  for TASK in do_configure.sigdata do_populate_sysroot.sigdata do_package_write_ipk.sigdata; do
+  for TASK in $COMPARE_TASKS; do
     printf "\n\n === Comparing signatures for task ${TASK} between ${MACHINE1} and ${MACHINE2} ===\n" | tee -a ${OUTPUT}/signatures.${MACHINE2}.${TASK}.log
     diff ${OUTPUT}/${MACHINE1}/list.M ${OUTPUT}/${MACHINE2}/list.M | grep ${PRE_PATTERN} "${PATTERN}" | grep ${TASK} > ${OUTPUT}/signatures.${MACHINE2}.${TASK}
     for i in `cat ${OUTPUT}/signatures.${MACHINE2}.${TASK} | sed 's#[^/]*/\([^/]*\)/.*#\1#g' | sort -u | xargs`; do

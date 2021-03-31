@@ -145,15 +145,46 @@ FILES_${PN}_append_class-nativesdk = " ${SDKPATHNATIVE}/environment-setup.d/rpm.
 
 FILES_${PN}-dev += "${libdir}/rpm-plugins/*.la \
                     "
+PACKAGE_BEFORE_PN += "${PN}-build ${PN}-sign ${PN}-archive"
+
+RRECOMMENDS_${PN} += "rpm-build rpm-sign rpm-archive"
+
+FILES_${PN}-build = "\
+    ${bindir}/rpmbuild \
+    ${bindir}/gendiff \
+    ${bindir}/rpmspec \
+    ${libdir}/librpmbuild.so.* \
+    ${libdir}/rpm/brp-* \
+    ${libdir}/rpm/check-* \
+    ${libdir}/rpm/debugedit \
+    ${libdir}/rpm/sepdebugcrcfix \
+    ${libdir}/rpm/find-debuginfo.sh \
+    ${libdir}/rpm/find-lang.sh \
+    ${libdir}/rpm/*provides* \
+    ${libdir}/rpm/*requires* \
+    ${libdir}/rpm/*deps* \
+    ${libdir}/rpm/*.prov \
+    ${libdir}/rpm/*.req \
+    ${libdir}/rpm/config.* \
+    ${libdir}/rpm/mkinstalldirs \
+    ${libdir}/rpm/macros.p* \
+    ${libdir}/rpm/fileattrs/* \
+"
+
+FILES_${PN}-sign = "\
+    ${bindir}/rpmsign \
+    ${libdir}/librpmsign.so.* \
+"
+
+FILES_${PN}-archive = "\
+    ${bindir}/rpm2archive \
+"
 
 PACKAGES += "python3-rpm"
 PROVIDES += "python3-rpm"
 FILES_python3-rpm = "${PYTHON_SITEPACKAGES_DIR}/rpm/*"
 
-# rpm 5.x was packaging the rpm build tools separately
-RPROVIDES_${PN} += "rpm-build"
-
-RDEPENDS_${PN} = "bash perl python3-core"
+RDEPENDS_${PN}-build = "bash perl python3-core"
 
 PACKAGE_PREPROCESS_FUNCS += "rpm_package_preprocess"
 

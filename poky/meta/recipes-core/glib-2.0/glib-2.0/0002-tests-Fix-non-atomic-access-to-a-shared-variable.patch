@@ -1,0 +1,44 @@
+From a6ce0e742a5c75c53a7c702ebb1af1084065160a Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 11 Nov 2020 18:14:29 +0000
+Subject: [PATCH 02/29] tests: Fix non-atomic access to a shared variable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+And drop the `volatile` qualifier from the variable, as that doesn’t
+help with thread safety.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Helps: #600
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719]
+---
+ glib/tests/642026.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/glib/tests/642026.c b/glib/tests/642026.c
+index ef54f14bb..26ab2ed06 100644
+--- a/glib/tests/642026.c
++++ b/glib/tests/642026.c
+@@ -25,7 +25,7 @@ static GMutex *mutex;
+ static GCond *cond;
+ static guint i;
+ 
+-static volatile gint freed = 0;
++static gint freed = 0;  /* (atomic) */
+ 
+ static void
+ notify (gpointer p)
+@@ -63,7 +63,7 @@ testcase (void)
+       GThread *t1;
+ 
+       g_static_private_init (&sp);
+-      freed = 0;
++      g_atomic_int_set (&freed, 0);
+ 
+       t1 = g_thread_create (thread_func, NULL, TRUE, NULL);
+       g_assert (t1 != NULL);
+-- 
+2.30.1
+

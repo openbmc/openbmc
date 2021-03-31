@@ -32,6 +32,7 @@ PACKAGECONFIG[coresight] = "CORESIGHT=1,,opencsd"
 # libunwind is not yet ported for some architectures
 PACKAGECONFIG_remove_arc = "libunwind"
 PACKAGECONFIG_remove_riscv64 = "libunwind"
+PACKAGECONFIG_remove_riscv32 = "libunwind"
 
 DEPENDS = " \
     virtual/${MLPREFIX}libc \
@@ -81,6 +82,7 @@ EXTRA_OEMAKE = '\
     AR="${AR}" \
     LD="${LD}" \
     EXTRA_CFLAGS="-ldw" \
+    YFLAGS='-y --file-prefix-map=${WORKDIR}=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}' \
     EXTRA_LDFLAGS="${PERF_EXTRA_LDFLAGS}" \
     perfexecdir=${libexecdir} \
     NO_GTK2=1 \
@@ -214,6 +216,51 @@ do_configure_prepend () {
             ${S}/tools/build/Makefile.build
     fi
 
+    # start reproducibility substitutions
+    if [ -e "${S}/tools/perf/Makefile.config" ]; then
+        # The following line in the Makefle:
+        #     override PYTHON := $(call get-executable-or-default,PYTHON,$(PYTHON_AUTO))
+        # "PYTHON" / "PYTHON_AUTO" have the full path as part of the variable. We've
+        # ensure that the environment is setup and we do not need the full path to be
+        # captured, since the symbol gets built into the executable, making it not
+        # reproducible.
+        sed -i -e 's,$(call get-executable-or-default\,PYTHON\,$(PYTHON_AUTO)),$(notdir $(call get-executable-or-default\,PYTHON\,$(PYTHON_AUTO))),g' \
+            ${S}/tools/perf/Makefile.config
+
+        # The following line:
+        #     srcdir_SQ = $(patsubst %tools/perf,tools/perf,$(subst ','\'',$(srcdir))),
+        # Captures the full src path of perf, which of course makes it not
+        # reproducible. We really only need the relative location 'tools/perf', so we
+        # change the Makefile line to remove everything before 'tools/perf'
+        sed -i -e "s%srcdir_SQ = \$(subst ','\\\'',\$(srcdir))%srcdir_SQ = \$(patsubst \%tools/perf,tools/perf,\$(subst ','\\\'',\$(srcdir)))%g" \
+            ${S}/tools/perf/Makefile.config
+    fi
+    if [ -e "${S}/tools/perf/tests/Build" ]; then
+        # OUTPUT is the full path, we have python on the path so we remove it from the
+        # definition. This is captured in the perf binary, so breaks reproducibility
+        sed -i -e 's,PYTHONPATH="BUILD_STR($(OUTPUT)python)",PYTHONPATH="BUILD_STR(python)",g' \
+            ${S}/tools/perf/tests/Build
+    fi
+    if [ -e "${S}/tools/perf/util/Build" ]; then
+        # To avoid bison generating #ifdefs that have captured paths, we make sure
+        # all the calls have YFLAGS, which contains prefix mapping information.
+        sed -i -e 's,$(BISON),$(BISON) $(YFLAGS),g' ${S}/tools/perf/util/Build
+    fi
+    if [ -e "${S}/scripts/Makefile.host" ]; then
+        # To avoid yacc (bison) generating #ifdefs that have captured paths, we make sure
+        # all the calls have YFLAGS, which contains prefix mapping information.
+        sed -i -e 's,$(YACC),$(YACC) $(YFLAGS),g' ${S}/scripts/Makefile.host
+    fi
+    if [ -e "${S}/tools/perf/pmu-events/Build" ]; then
+        target='$(OUTPUT)pmu-events/pmu-events.c $(V)'
+        replacement1='$(OUTPUT)pmu-events/pmu-events.c $(V)\n'
+        replacement2='\t$(srctree)/sort-pmuevents.py $(OUTPUT)pmu-events/pmu-events.c $(OUTPUT)pmu-events/pmu-events.c.new\n'
+        replacement3='\tcp $(OUTPUT)pmu-events/pmu-events.c.new $(OUTPUT)pmu-events/pmu-events.c'
+        sed -i -e "s,$target,$replacement1$replacement2$replacement3,g" \
+                       "${S}/tools/perf/pmu-events/Build"
+    fi
+    # end reproducibility substitutions
+
     # We need to ensure the --sysroot option in CC is preserved
     if [ -e "${S}/tools/perf/Makefile.perf" ]; then
         sed -i 's,CC = $(CROSS_COMPILE)gcc,#CC,' ${S}/tools/perf/Makefile.perf
@@ -254,6 +301,14 @@ do_configure_prepend () {
     # so we copy it from the sysroot unistd.h to the perf unistd.h
     install -D -m0644 ${STAGING_INCDIR}/asm-generic/unistd.h ${S}/tools/include/uapi/asm-generic/unistd.h
     install -D -m0644 ${STAGING_INCDIR}/asm-generic/unistd.h ${S}/include/uapi/asm-generic/unistd.h
+
+    # the fetcher is inhibited by the 'inherit kernelsrc', so we do a quick check and
+    # copy for a helper script we need
+    for p in $(echo ${FILESPATH} | tr ':' '\n'); do
+	if [ -e $p/sort-pmuevents.py ]; then
+	    cp $p/sort-pmuevents.py ${S}
+	fi
+    done
 }
 
 python do_package_prepend() {

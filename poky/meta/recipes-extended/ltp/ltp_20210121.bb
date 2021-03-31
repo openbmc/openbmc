@@ -30,8 +30,8 @@ CFLAGS_append_mipsarchn64 = " -D__SANE_USERSPACE_TYPES__"
 SRCREV = "4d005621edd109d119627eb9210b224a63bf22cb"
 
 # remove at next version upgrade or when output changes
-PR = "r1"
-HASHEQUIV_HASH_VERSION .= ".1"
+PR = "r4"
+HASHEQUIV_HASH_VERSION .= ".4"
 
 SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0001-build-Add-option-to-select-libc-implementation.patch \
@@ -39,6 +39,9 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0001-Add-more-musl-exclusions.patch \
            file://0001-Remove-OOM-tests-from-runtest-mm.patch \
            file://determinism.patch \
+           file://0001-open_posix_testsuite-generate-makefiles.sh-Avoid-inc.patch \
+           file://0002-Makefile-Avoid-wildcard-determinism-issues.patch \
+           file://0003-syscalls-swapon-swapoff-Move-common-library-to-libs.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -55,14 +58,6 @@ EXTRA_AUTORECONF += "-I ${S}/testcases/realtime/m4"
 EXTRA_OECONF = " --with-realtime-testsuite --with-open-posix-testsuite "
 # ltp network/rpc test cases ftbfs when libtirpc is found
 EXTRA_OECONF += " --without-tirpc "
-
-do_compile_prepend() {
-	# Reported at http://lists.linux.it/pipermail/ltp/2021-March/021274.html
-	# Avoid a race over construction of libswapon.o which is built by swapon and swapoff
-	# but the object differs depending upon which one built it
-	# ("../swapon/libswapon.c" vs "libswapon.c" references)
-	make -C ${B}/testcases/kernel/syscalls/swapon/
-}
 
 do_install(){
     install -d ${D}${prefix}/

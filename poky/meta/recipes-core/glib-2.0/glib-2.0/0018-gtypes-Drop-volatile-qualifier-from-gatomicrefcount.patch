@@ -1,0 +1,35 @@
+From 8a87069ff42a0631dce153701cb2ec5e343a958c Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 11 Nov 2020 19:16:30 +0000
+Subject: [PATCH 18/29] gtypes: Drop volatile qualifier from gatomicrefcount
+
+This is technically an API break, but since the type is meant to be
+opaque (third party code is not meant to treat it like an integer) it
+should not cause problems.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Helps: #600
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719]
+---
+ glib/gtypes.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/glib/gtypes.h b/glib/gtypes.h
+index 23c5a1295..2c4825582 100644
+--- a/glib/gtypes.h
++++ b/glib/gtypes.h
+@@ -550,8 +550,8 @@ struct _GTimeVal
+   glong tv_usec;
+ } GLIB_DEPRECATED_TYPE_IN_2_62_FOR(GDateTime);
+ 
+-typedef gint            grefcount;
+-typedef volatile gint   gatomicrefcount;
++typedef gint grefcount;
++typedef gint gatomicrefcount;  /* should be accessed only using atomics */
+ 
+ G_END_DECLS
+ 
+-- 
+2.30.1
+

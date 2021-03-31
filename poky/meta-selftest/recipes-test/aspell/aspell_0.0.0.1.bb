@@ -4,6 +4,7 @@
 
 SUMMARY = "GNU Aspell spell-checker"
 SECTION = "console/utils"
+HOMEPAGE = "https://ftp.gnu.org/gnu/aspell/"
 
 LICENSE = "LGPLv2 | LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"

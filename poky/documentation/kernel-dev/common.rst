@@ -57,7 +57,7 @@ section:
    the build environment script (i.e. :ref:`structure-core-script`):
    ::
 
-      $ cd ~/poky
+      $ cd poky
       $ source oe-init-build-env
 
    .. note::
@@ -74,7 +74,7 @@ section:
    ``MACHINE`` variable appropriately in your ``conf/local.conf`` file
    found in the
    :term:`Build Directory` (i.e.
-   ``~/poky/build`` in this example).
+   ``poky/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
    to set the
@@ -94,7 +94,7 @@ section:
    ``bitbake-layers create-layer`` command as follows:
    ::
 
-      $ cd ~/poky/build
+      $ cd poky/build
       $ bitbake-layers create-layer ../../meta-mylayer
       NOTE: Starting bitbake server...
       Add your new layer with 'bitbake-layers add-layer ../../meta-mylayer'
@@ -119,7 +119,7 @@ section:
    ``bblayers.conf`` file as follows:
    ::
 
-      $ cd ~/poky/build
+      $ cd poky/build
       $ bitbake-layers add-layer ../../meta-mylayer
       NOTE: Starting bitbake server...
       $
@@ -128,7 +128,7 @@ section:
    specifically for use with images to be run using QEMU:
    ::
 
-      $ cd ~/poky/build
+      $ cd poky/build
       $ bitbake core-image-minimal -c populate_sdk_ext
 
    Once
@@ -136,21 +136,21 @@ section:
    ``*.sh`` file) in the following directory:
    ::
 
-      ~/poky/build/tmp/deploy/sdk
+      poky/build/tmp/deploy/sdk
 
    For this example, the installer file is named
    ``poky-glibc-x86_64-core-image-minimal-i586-toolchain-ext-&DISTRO;.sh``.
 
 6. *Install the Extensible SDK:* Use the following command to install
    the SDK. For this example, install the SDK in the default
-   ``~/poky_sdk`` directory:
+   ``poky_sdk`` directory:
    ::
 
-      $ cd ~/poky/build/tmp/deploy/sdk
+      $ cd poky/build/tmp/deploy/sdk
       $ ./poky-glibc-x86_64-core-image-minimal-i586-toolchain-ext-&DISTRO;.sh
       Poky (Yocto Project Reference Distro) Extensible SDK installer version &DISTRO;
       ============================================================================
-      Enter target directory for SDK (default: ~/poky_sdk):
+      Enter target directory for SDK (default: poky_sdk):
       You are about to install the SDK to "/home/scottrif/poky_sdk". Proceed [Y/n]? Y
       Extracting SDK......................................done
       Setting it up...
@@ -175,7 +175,7 @@ section:
    directed by the output from installing the SDK:
    ::
 
-      $ source ~/poky_sdk/environment-setup-i586-poky-linux
+      $ source poky_sdk/environment-setup-i586-poky-linux
       "SDK environment now set up; additionally you may now run devtool to perform development tasks.
       Run devtool --help for further details.
 
@@ -240,7 +240,7 @@ section:
    section in the Yocto Project Development Tasks Manual.
    ::
 
-      $ cd ~/poky
+      $ cd poky
       $ git branch
       master
       * &DISTRO_NAME_NO_CAP;
@@ -260,7 +260,7 @@ section:
    ``MACHINE`` variable appropriately in your ``conf/local.conf`` file
    found in the
    :term:`Build Directory` (i.e.
-   ``~/poky/build`` in this example).
+   ``poky/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
    to set the
@@ -280,7 +280,7 @@ section:
    ``bitbake-layers create-layer`` command as follows:
    ::
 
-      $ cd ~/poky/build
+      $ cd poky/build
       $ bitbake-layers create-layer ../../meta-mylayer
       NOTE: Starting bitbake server...
       Add your new layer with 'bitbake-layers add-layer ../../meta-mylayer'
@@ -304,7 +304,7 @@ section:
    ``bblayers.conf`` file as follows:
    ::
 
-      $ cd ~/poky/build
+      $ cd poky/build
       $ bitbake-layers add-layer ../../meta-mylayer
       NOTE: Starting bitbake server ...
       $
@@ -398,7 +398,6 @@ home directory:
 1. *Create Structure*: Create the layer's structure:
    ::
 
-      $ cd $HOME
       $ mkdir meta-mylayer
       $ mkdir meta-mylayer/conf
       $ mkdir meta-mylayer/recipes-kernel
@@ -819,12 +818,12 @@ the ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``" Se
 
    1. *Change the working directory*: In the previous step, the output
       noted where you can find the source files (e.g.
-      ``~/poky_sdk/workspace/sources/linux-yocto``). Change to where the
+      ``poky_sdk/workspace/sources/linux-yocto``). Change to where the
       kernel source code is before making your edits to the
       ``calibrate.c`` file:
       ::
 
-         $ cd ~/poky_sdk/workspace/sources/linux-yocto
+         $ cd poky_sdk/workspace/sources/linux-yocto
 
    2. *Edit the source file*: Edit the ``init/calibrate.c`` file to have
       the following changes:
@@ -896,7 +895,7 @@ the ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``" Se
    and use these Git commands to stage and commit your changes:
    ::
 
-      $ cd ~/poky_sdk/workspace/sources/linux-yocto
+      $ cd poky_sdk/workspace/sources/linux-yocto
       $ git status
       $ git add init/calibrate.c
       $ git commit -m "calibrate: Add printk example"
@@ -926,7 +925,7 @@ the ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``" Se
    set up to run BitBake:
    ::
 
-      $ cd ~/poky/build
+      $ cd poky/build
       $ bitbake core-image-minimal
 
 Using Traditional Kernel Development to Patch the Kernel
@@ -1015,7 +1014,7 @@ Section.
    to the following to your ``local.conf``:
    ::
 
-      $ cd ~/poky/build/conf
+      $ cd poky/build/conf
 
    Add the following to the ``local.conf``:
    ::
@@ -1037,7 +1036,7 @@ Section.
    you can now use BitBake to build the image:
    ::
 
-      $ cd ~/poky/build
+      $ cd poky/build
       $ bitbake core-image-minimal
 
 5. *Boot the image*: Boot the modified image in the QEMU emulator using
@@ -1045,7 +1044,7 @@ Section.
    with no password:
    ::
 
-      $ cd ~/poky/build
+      $ cd poky/build
       $ runqemu qemux86
 
 6. *Look for Your Changes:* As QEMU booted, you might have seen your
@@ -1119,7 +1118,7 @@ Section.
       the following sequence of commands:
       ::
 
-              $ cd ~/poky/build
+              $ cd poky/build
               $ bitbake -c cleanall yocto-linux
               $ bitbake core-image-minimal -c cleanall
               $ bitbake core-image-minimal
@@ -1172,7 +1171,7 @@ environment, you must do the following:
 The following commands initialize the BitBake environment, run the
 :ref:`ref-tasks-kernel_configme`
 task, and launch ``menuconfig``. These commands assume the Source
-Directory's top-level folder is ``~/poky``:
+Directory's top-level folder is ``poky``:
 ::
 
    $ cd poky

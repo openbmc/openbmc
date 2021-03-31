@@ -12,10 +12,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/core/systemd.pc.in | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/src/core/systemd.pc.in b/src/core/systemd.pc.in
+index b5cc8f9..21dbf30 100644
 --- a/src/core/systemd.pc.in
 +++ b/src/core/systemd.pc.in
 @@ -65,16 +65,16 @@ systemdshutdowndir=${systemd_shutdown_dir}
- tmpfiles_dir=/usr/lib/tmpfiles.d
+ tmpfiles_dir=${prefix}/lib/tmpfiles.d
  tmpfilesdir=${tmpfiles_dir}
  
 -sysusers_dir=${rootprefix}/lib/sysusers.d
@@ -34,4 +36,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +modules_load_dir=${prefix}/lib/modules-load.d
  modulesloaddir=${modules_load_dir}
  
- catalog_dir=/usr/lib/systemd/catalog
+ catalog_dir=${prefix}/lib/systemd/catalog
+-- 
+2.25.1
+

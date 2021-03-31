@@ -173,7 +173,7 @@ build the SDK installer. Follow these steps:
    ``tmp/deploy/sdk`` in the Build Directory. Following is an example:
    ::
 
-      $ cd ~/poky/build/tmp/deploy/sdk
+      $ cd poky/build/tmp/deploy/sdk
       $ ./poky-glibc-x86_64-core-image-sato-core2-64-toolchain-ext-&DISTRO;.sh
 
    During execution of the script, you choose the root location for the
@@ -249,7 +249,7 @@ Follow these steps to extract the root filesystem:
    ":ref:`sdk-manual/appendix-obtain:locating pre-built sdk installers`" section:
    ::
 
-      $ source ~/poky_sdk/environment-setup-core2-64-poky-linux
+      $ source poky_sdk/environment-setup-core2-64-poky-linux
 
 3. *Extract the Root Filesystem:* Use the ``runqemu-extract-sdk``
    command and provide the root filesystem image.

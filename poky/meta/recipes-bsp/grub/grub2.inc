@@ -13,25 +13,24 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 CVE_PRODUCT = "grub2"
 
-SRC_URI = "${GNU_MIRROR}/grub/grub-${PV}.tar.gz \
+SRC_URI = "https://alpha.gnu.org/gnu/grub/grub-${REALPV}.tar.xz \
            file://0001-Disable-mfpmath-sse-as-well-when-SSE-is-disabled.patch \
            file://autogen.sh-exclude-pc.patch \
            file://grub-module-explicitly-keeps-symbole-.module_license.patch \
            file://0001-grub.d-10_linux.in-add-oe-s-kernel-name.patch \
-           file://CVE-2020-10713.patch \
-           file://calloc-Make-sure-we-always-have-an-overflow-checking.patch \
-           file://lvm-Add-LVM-cache-logical-volume-handling.patch \
-           file://CVE-2020-14308-calloc-Use-calloc-at-most-places.patch \
-           file://safemath-Add-some-arithmetic-primitives-that-check-f.patch \
-           file://CVE-2020-14309-CVE-2020-14310-CVE-2020-14311-malloc-Use-overflow-checking-primitives-where-we-do-.patch \
-           file://script-Remove-unused-fields-from-grub_script_functio.patch \
-           file://CVE-2020-15706-script-Avoid-a-use-after-free-when-redefining-a-func.patch \
-           file://CVE-2020-15707-linux-Fix-integer-overflows-in-initrd-size-handling.patch \
-           file://6643507ce30f775008e093580f0c9499dfb2c485.patch \
            file://determinism.patch \
+           file://0001-RISC-V-Restore-the-typcast-to-long.patch \
 "
-SRC_URI[md5sum] = "5ce674ca6b2612d8939b9e6abed32934"
-SRC_URI[sha256sum] = "f10c85ae3e204dbaec39ae22fa3c5e99f0665417e91c2cb49b7e5031658ba6ea"
+
+SRC_URI[sha256sum] = "2c87f1f21e2ab50043e6cd9163c08f1b6c3a6171556bf23ff9ed65b074145484"
+
+REALPV = "2.06~rc1"
+PV = "2.04+${REALPV}"
+
+S = "${WORKDIR}/grub-${REALPV}"
+
+UPSTREAM_CHECK_URI = "${GNU_MIRROR}/grub"
+UPSTREAM_CHECK_REGEX = "grub-(?P<pver>\d+(\.\d+)+)\.tar\.(gz|xz)"
 
 DEPENDS = "flex-native bison-native gettext-native"
 

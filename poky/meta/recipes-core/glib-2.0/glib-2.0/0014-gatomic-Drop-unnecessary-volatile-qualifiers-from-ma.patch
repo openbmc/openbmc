@@ -1,0 +1,56 @@
+From 9474655eb21d64519b293e780bb686976cbdb790 Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 11 Nov 2020 18:38:36 +0000
+Subject: [PATCH 14/29] gatomic: Drop unnecessary volatile qualifiers from
+ macro variables
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It’s not necessary and provides no thread safety guarantees.
+
+The `volatile` qualifiers on the function arguments have to be kept, as
+they are (unfortunately) part of the API.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+Helps: #600
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1719]
+---
+ glib/gatomic.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/glib/gatomic.h b/glib/gatomic.h
+index bb1435c70..e6eccfada 100644
+--- a/glib/gatomic.h
++++ b/glib/gatomic.h
+@@ -211,7 +211,7 @@ G_END_DECLS
+   }))
+ #define g_atomic_pointer_and(atomic, val) \
+   (G_GNUC_EXTENSION ({                                                       \
+-    volatile gsize *gapa_atomic = (volatile gsize *) (atomic);               \
++    gsize *gapa_atomic = (gsize *) (atomic);                                 \
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gpointer));                 \
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gsize));                    \
+     (void) (0 ? (gpointer) *(atomic) : NULL);                                \
+@@ -220,7 +220,7 @@ G_END_DECLS
+   }))
+ #define g_atomic_pointer_or(atomic, val) \
+   (G_GNUC_EXTENSION ({                                                       \
+-    volatile gsize *gapo_atomic = (volatile gsize *) (atomic);               \
++    gsize *gapo_atomic = (gsize *) (atomic);                                 \
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gpointer));                 \
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gsize));                    \
+     (void) (0 ? (gpointer) *(atomic) : NULL);                                \
+@@ -229,7 +229,7 @@ G_END_DECLS
+   }))
+ #define g_atomic_pointer_xor(atomic, val) \
+   (G_GNUC_EXTENSION ({                                                       \
+-    volatile gsize *gapx_atomic = (volatile gsize *) (atomic);               \
++    gsize *gapx_atomic = (gsize *) (atomic);                                 \
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gpointer));                 \
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gsize));                    \
+     (void) (0 ? (gpointer) *(atomic) : NULL);                                \
+-- 
+2.30.1
+

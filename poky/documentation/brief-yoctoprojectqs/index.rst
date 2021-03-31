@@ -176,7 +176,7 @@ an entire Linux distribution, including the toolchain, from source.
 
    .. code-block:: shell
 
-      $ cd ~/poky
+      $ cd poky
       $ source oe-init-build-env
       You had no conf/local.conf file. This configuration file has therefore been
       created for you with some default values. You may wish to edit it to, for
@@ -189,7 +189,7 @@ an entire Linux distribution, including the toolchain, from source.
 
       The Yocto Project has extensive documentation about OE including a reference
       manual which can be found at:
-          http://yoctoproject.org/documentation
+          https://docs.yoctoproject.org
 
       For more information about OpenEmbedded see their website:
           http://www.openembedded.org/
@@ -293,7 +293,7 @@ Follow these steps to add a hardware layer:
 
    .. code-block:: shell
 
-      $ cd ~/poky
+      $ cd poky
       $ git clone https://github.com/kraj/meta-altera.git
       Cloning into 'meta-altera'...
       remote: Counting objects: 25170, done.
@@ -337,7 +337,7 @@ Follow these steps to add a hardware layer:
 
    .. code-block:: shell
 
-      $ cd ~/poky/build
+      $ cd poky/build
       $ bitbake-layers add-layer ../meta-altera
       NOTE: Starting bitbake server...
       Parsing recipes: 100% |##################################################################| Time: 0:00:32
@@ -374,7 +374,7 @@ The following commands run the tool to create a layer named
 
 .. code-block:: shell
 
-   $ cd ~/poky
+   $ cd poky
    $ bitbake-layers create-layer meta-mylayer
    NOTE: Starting bitbake server...
    Add your new layer with 'bitbake-layers add-layer meta-mylayer'

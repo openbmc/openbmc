@@ -11,11 +11,9 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  Source/WTF/wtf/PlatformHave.h                  |  2 +-
  2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/Source/JavaScriptCore/runtime/MachineContext.h b/Source/JavaScriptCore/runtime/MachineContext.h
-index c5052527..95ef98b5 100644
 --- a/Source/JavaScriptCore/runtime/MachineContext.h
 +++ b/Source/JavaScriptCore/runtime/MachineContext.h
-@@ -196,7 +196,7 @@ static inline void*& stackPointerImpl(mcontext_t& machineContext)
+@@ -196,7 +196,7 @@ static inline void*& stackPointerImpl(mc
  #error Unknown Architecture
  #endif
  
@@ -24,7 +22,7 @@ index c5052527..95ef98b5 100644
  
  #if CPU(X86)
      return reinterpret_cast<void*&>((uintptr_t&) machineContext.gregs[REG_ESP]);
-@@ -347,7 +347,7 @@ static inline void*& framePointerImpl(mcontext_t& machineContext)
+@@ -347,7 +347,7 @@ static inline void*& framePointerImpl(mc
  #error Unknown Architecture
  #endif
  
@@ -33,7 +31,7 @@ index c5052527..95ef98b5 100644
  
  // The following sequence depends on glibc's sys/ucontext.h.
  #if CPU(X86)
-@@ -498,7 +498,7 @@ static inline void*& instructionPointerImpl(mcontext_t& machineContext)
+@@ -498,7 +498,7 @@ static inline void*& instructionPointerI
  #error Unknown Architecture
  #endif
  
@@ -42,7 +40,7 @@ index c5052527..95ef98b5 100644
  
  // The following sequence depends on glibc's sys/ucontext.h.
  #if CPU(X86)
-@@ -656,7 +656,7 @@ inline void*& argumentPointer<1>(mcontext_t& machineContext)
+@@ -656,7 +656,7 @@ inline void*& argumentPointer<1>(mcontex
  #error Unknown Architecture
  #endif
  
@@ -51,7 +49,7 @@ index c5052527..95ef98b5 100644
  
  // The following sequence depends on glibc's sys/ucontext.h.
  #if CPU(X86)
-@@ -773,7 +773,7 @@ inline void*& llintInstructionPointer(mcontext_t& machineContext)
+@@ -773,7 +773,7 @@ inline void*& llintInstructionPointer(mc
  #error Unknown Architecture
  #endif
  
@@ -60,11 +58,9 @@ index c5052527..95ef98b5 100644
  
  // The following sequence depends on glibc's sys/ucontext.h.
  #if CPU(X86)
-diff --git a/Source/WTF/wtf/PlatformHave.h b/Source/WTF/wtf/PlatformHave.h
-index daca20fe..53eae6ba 100644
 --- a/Source/WTF/wtf/PlatformHave.h
 +++ b/Source/WTF/wtf/PlatformHave.h
-@@ -222,7 +222,7 @@
+@@ -202,7 +202,7 @@
  #define HAVE_HOSTED_CORE_ANIMATION 1
  #endif
  
@@ -73,3 +69,23 @@ index daca20fe..53eae6ba 100644
  #define HAVE_MACHINE_CONTEXT 1
  #endif
  
+--- a/Source/WebCore/xml/XPathGrammar.cpp
++++ b/Source/WebCore/xml/XPathGrammar.cpp
+@@ -966,7 +966,7 @@ int yydebug;
+ #if YYERROR_VERBOSE
+ 
+ # ifndef yystrlen
+-#  if defined __GLIBC__ && defined _STRING_H
++#  if defined __linux__ && defined _STRING_H
+ #   define yystrlen strlen
+ #  else
+ /* Return the length of YYSTR.  */
+@@ -989,7 +989,7 @@ yystrlen (yystr)
+ # endif
+ 
+ # ifndef yystpcpy
+-#  if defined __GLIBC__ && defined _STRING_H && defined _GNU_SOURCE
++#  if defined __linux__ && defined _STRING_H && defined _GNU_SOURCE
+ #   define yystpcpy stpcpy
+ #  else
+ /* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in

@@ -1,0 +1,31 @@
+From 8aa5402393fabaf4fff51be3af4868e8dfab6da7 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 9 Mar 2021 19:30:42 +0000
+Subject: [PATCH] libdnf/config.h: avoid the use of non-portable __WORDSIZE
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/1159]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ libdnf/config.h | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/libdnf/config.h b/libdnf/config.h
+index 16121f6f..2925923e 100644
+--- a/libdnf/config.h
++++ b/libdnf/config.h
+@@ -18,12 +18,10 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+  */
+ 
+-#include <bits/wordsize.h>
++#include <limits.h>
+ 
+-#if __WORDSIZE == 32
+-#include "config-32.h"
+-#elif __WORDSIZE == 64
++#if (ULONG_MAX == 0xffffffffffffffff)
+ #include "config-64.h"
+ #else
+-#error "Unknown word size"
++#include "config-32.h"
+ #endif

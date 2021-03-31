@@ -100,7 +100,7 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     if shutil.which("checkbashisms.pl") is None:
-        print("Cannot find checkbashisms.pl on $PATH, get it from https://anonscm.debian.org/cgit/collab-maint/devscripts.git/plain/scripts/checkbashisms.pl")
+        print("Cannot find checkbashisms.pl on $PATH, get it from https://salsa.debian.org/debian/devscripts/raw/master/scripts/checkbashisms.pl")
         sys.exit(1)
 
     # The order of defining the worker function,

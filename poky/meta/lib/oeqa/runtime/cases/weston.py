@@ -53,7 +53,11 @@ class WestonTest(OERuntimeTestCase):
 
     @OEHasPackage(['wayland-utils'])
     def test_wayland_info(self):
-        status, output = self.target.run(self.get_weston_command('wayland-info'))
+        if 'systemd' in self.tc.td['VIRTUAL-RUNTIME_init_manager']:
+            command = 'XDG_RUNTIME_DIR=/run wayland-info'
+        else:
+            command = self.get_weston_command('wayland-info')
+        status, output = self.target.run(command)
         self.assertEqual(status, 0, msg='wayland-info error: %s' % output)
 
     @OEHasPackage(['weston'])

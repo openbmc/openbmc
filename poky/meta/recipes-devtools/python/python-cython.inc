@@ -1,3 +1,5 @@
+SUMMARY = "The Cython language"
+HOMEPAGE = "https://pypi.org/project/Cython/"
 DESCRIPTION = "Cython is a language specially designed for writing Python extension modules. \
 It's designed to bridge the gap between the nice, high-level, easy-to-use world of Python \
 and the messy, low-level world of C."

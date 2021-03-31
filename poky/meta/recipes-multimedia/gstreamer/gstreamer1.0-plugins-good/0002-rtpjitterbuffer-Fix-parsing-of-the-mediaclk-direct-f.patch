@@ -1,0 +1,33 @@
+From ec1949dffd931d0ec7e4f67108a08ab1e2af0cfe Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Tue, 16 Mar 2021 19:25:36 +0200
+Subject: [PATCH] rtpjitterbuffer: Fix parsing of the mediaclk:direct= field
+
+Due to an off-by-one when parsing the string, the most significant digit
+or the clock offset was skipped when parsing the offset.
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gst-plugins-good/-/merge_requests/910>
+
+Upstream-Status: Backport [b5bb4ede3a42273fafc1054f9cf106ca527e3c26]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ gst/rtpmanager/gstrtpjitterbuffer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gst/rtpmanager/gstrtpjitterbuffer.c b/gst/rtpmanager/gstrtpjitterbuffer.c
+index 60d8ad875..02fe15adc 100644
+--- a/gst/rtpmanager/gstrtpjitterbuffer.c
++++ b/gst/rtpmanager/gstrtpjitterbuffer.c
+@@ -1534,7 +1534,7 @@ gst_jitter_buffer_sink_parse_caps (GstRtpJitterBuffer * jitterbuffer,
+       GST_DEBUG_OBJECT (jitterbuffer, "Got media clock %s", mediaclk);
+ 
+       if (!g_str_has_prefix (mediaclk, "direct=") ||
+-          !g_ascii_string_to_unsigned (&mediaclk[8], 10, 0, G_MAXUINT64,
++          !g_ascii_string_to_unsigned (&mediaclk[7], 10, 0, G_MAXUINT64,
+               &clock_offset, NULL))
+         GST_FIXME_OBJECT (jitterbuffer, "Unsupported media clock");
+       if (strstr (mediaclk, "rate=") != NULL) {
+-- 
+2.31.0
+

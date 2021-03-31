@@ -41,20 +41,22 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  src/network/netdev/netdev-gperf.gperf     | 1 +
  src/network/netdev/netdev.c               | 1 +
  src/network/networkd-brvlan.c             | 1 +
- src/network/networkd-dhcp-common.c        | 1 +
+ src/network/networkd-dhcp-common.c        | 4 +++-
+ src/network/networkd-dhcp-server.c        | 4 ++--
  src/network/networkd-dhcp4.c              | 2 +-
  src/network/networkd-dhcp6.c              | 2 +-
  src/network/networkd-link.c               | 2 +-
  src/network/networkd-network.c            | 1 +
+ src/network/networkd-route.c              | 5 ++++-
  src/network/test-network-tables.c         | 1 +
  src/shared/ethtool-util.c                 | 1 +
  src/shared/ethtool-util.h                 | 1 +
  src/udev/net/link-config.c                | 1 +
  src/udev/udev-builtin-net_setup_link.c    | 1 +
- 19 files changed, 18 insertions(+), 4 deletions(-)
+ 21 files changed, 26 insertions(+), 8 deletions(-)
 
 diff --git a/src/libsystemd-network/sd-dhcp6-client.c b/src/libsystemd-network/sd-dhcp6-client.c
-index 30ac526fc9..126077e13c 100644
+index 66f87c4b95..de1264ae46 100644
 --- a/src/libsystemd-network/sd-dhcp6-client.c
 +++ b/src/libsystemd-network/sd-dhcp6-client.c
 @@ -5,7 +5,6 @@
@@ -158,7 +160,7 @@ index e53c73c30c..9bf0771b84 100644
  #include <stdbool.h>
  
 diff --git a/src/network/networkd-dhcp-common.c b/src/network/networkd-dhcp-common.c
-index c338c775a7..ab35d65c53 100644
+index 9f58121350..554d006cb8 100644
 --- a/src/network/networkd-dhcp-common.c
 +++ b/src/network/networkd-dhcp-common.c
 @@ -1,7 +1,8 @@
@@ -171,7 +173,7 @@ index c338c775a7..ab35d65c53 100644
  
  #include "dhcp-internal.h"
  #include "dhcp6-internal.h"
-@@ -10,6 +10,7 @@
+@@ -10,6 +11,7 @@
  #include "networkd-dhcp-common.h"
  #include "networkd-link.h"
  #include "networkd-manager.h"
@@ -195,7 +197,7 @@ index cf279c640d..bae541029b 100644
  #include "sd-dhcp-server.h"
  
 diff --git a/src/network/networkd-dhcp4.c b/src/network/networkd-dhcp4.c
-index 02d33841b6..a30d8dd82c 100644
+index f3c1e5f609..e4ef6eca63 100644
 --- a/src/network/networkd-dhcp4.c
 +++ b/src/network/networkd-dhcp4.c
 @@ -1,9 +1,9 @@
@@ -210,7 +212,7 @@ index 02d33841b6..a30d8dd82c 100644
  #include "escape.h"
  #include "alloc-util.h"
 diff --git a/src/network/networkd-dhcp6.c b/src/network/networkd-dhcp6.c
-index d4d4182ee5..635d08f7d5 100644
+index 5c077c1ec8..fa98042aa5 100644
 --- a/src/network/networkd-dhcp6.c
 +++ b/src/network/networkd-dhcp6.c
 @@ -3,9 +3,9 @@
@@ -225,7 +227,7 @@ index d4d4182ee5..635d08f7d5 100644
  #include "sd-dhcp6-client.h"
  
 diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
-index ced18de425..07b43770de 100644
+index 3bfe636691..e0c68c8ad3 100644
 --- a/src/network/networkd-link.c
 +++ b/src/network/networkd-link.c
 @@ -1,8 +1,8 @@
@@ -250,7 +252,7 @@ index 3254641461..f0ada419fd 100644
  #include <netinet/in.h>
  #include <linux/netdevice.h>
 diff --git a/src/network/networkd-route.c b/src/network/networkd-route.c
-index 10f30c1a7e..579885726c 100644
+index 0ed89584ef..e7e157c201 100644
 --- a/src/network/networkd-route.c
 +++ b/src/network/networkd-route.c
 @@ -1,7 +1,10 @@
@@ -311,16 +313,16 @@ index d12fd0e299..636806dc23 100644
  #include <netinet/ether.h>
  #include <unistd.h>
 diff --git a/src/udev/udev-builtin-net_setup_link.c b/src/udev/udev-builtin-net_setup_link.c
-index cb12b943fe..5a28c8b563 100644
+index 87e1fb133e..13876029d0 100644
 --- a/src/udev/udev-builtin-net_setup_link.c
 +++ b/src/udev/udev-builtin-net_setup_link.c
 @@ -1,5 +1,6 @@
  /* SPDX-License-Identifier: LGPL-2.1-or-later */
  
 +#include <netinet/if_ether.h>
- #include "device-util.h"
  #include "alloc-util.h"
- #include "link-config.h"
+ #include "device-util.h"
+ #include "errno-util.h"
 -- 
-2.27.0
+2.25.1
 

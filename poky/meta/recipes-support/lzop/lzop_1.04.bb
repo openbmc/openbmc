@@ -5,6 +5,7 @@ gzip are much higher compression and decompression speed at the cost of some \n\
 compression ratio. The lzop compression utility was designed with the goals \n\
 of reliability, speed, portability and with reasonable drop-in compatibility \n\
 to gzip."
+HOMEPAGE = "http://www.lzop.org/"
 DEPENDS += "lzo"
 
 LICENSE = "GPLv2+"

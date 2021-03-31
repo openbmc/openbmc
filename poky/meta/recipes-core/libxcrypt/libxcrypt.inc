@@ -9,7 +9,9 @@ LIC_FILES_CHKSUM = "file://LICENSING;md5=bd5d9777dfe7076c4f2928f12fed226a \
 
 inherit autotools pkgconfig
 
-SRC_URI = "git://github.com/besser82/libxcrypt.git;branch=${SRCBRANCH}"
+SRC_URI = "git://github.com/besser82/libxcrypt.git;branch=${SRCBRANCH} \
+           file://0001-configure.ac-do-not-use-compute-symver-floor.patch \
+           "
 SRCREV = "94d84f92ca123d851586016c4678eb1f21c19029"
 SRCBRANCH ?= "develop"
 

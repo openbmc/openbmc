@@ -3007,7 +3007,7 @@ The following steps describe how to set up the AUH utility:
    running the AUH utility:
    ::
 
-      $ cd ~/poky
+      $ cd poky
       $ source oe-init-build-env your_AUH_build_directory
 
    Re-using an existing build directory and its configurations is not
@@ -5908,7 +5908,7 @@ the existing kernel, and then inserts a new kernel:
               $ wic help ls
 
 
-   The following command shows what is in Partition one:
+   The following command shows what is in partition one:
    ::
 
         $ wic ls tmp/deploy/images/qemux86/core-image-minimal-qemux86.wic:1
@@ -5956,8 +5956,8 @@ the existing kernel, and then inserts a new kernel:
    kernel:
    ::
 
-      cp ~/poky_sdk/tmp/work/qemux86-poky-linux/linux-yocto/4.12.12+git999-r0/linux-yocto-4.12.12+git999/arch/x86/boot/bzImage \
-         ~/poky/build/tmp/deploy/images/qemux86/core-image-minimal-qemux86.wic:1/vmlinuz
+      $ wic cp poky_sdk/tmp/work/qemux86-poky-linux/linux-yocto/4.12.12+git999-r0/linux-yocto-4.12.12+git999/arch/x86/boot/bzImage \
+               poky/build/tmp/deploy/images/qemux86/core-image-minimal-qemux86.wic:1/vmlinuz
 
    Once the new kernel is added back into the image, you can use the
    ``dd`` command or :ref:`bmaptool
@@ -6956,7 +6956,7 @@ variable to specify the format:
 
 1. Open the ``local.conf`` file inside your
    :term:`Build Directory` (e.g.
-   ``~/poky/build/conf/local.conf``).
+   ``poky/build/conf/local.conf``).
 
 2. Select the desired package format as follows:
    ::
@@ -7048,11 +7048,11 @@ From within the build directory where you have built an image based on
 your packaging choice (i.e. the
 :term:`PACKAGE_CLASSES`
 setting), simply start the server. The following example assumes a build
-directory of ``~/poky/build/tmp/deploy/rpm`` and a ``PACKAGE_CLASSES``
+directory of ``poky/build/tmp/deploy/rpm`` and a ``PACKAGE_CLASSES``
 setting of "package_rpm":
 ::
 
-   $ cd ~/poky/build/tmp/deploy/rpm
+   $ cd poky/build/tmp/deploy/rpm
    $ python3 -m http.server
 
 Target Setup
@@ -8409,7 +8409,7 @@ that queries the Git repository and prints just the differences that
 might be significant in human-readable form. Here is an example:
 ::
 
-   $ ~/poky/poky/scripts/buildhistory-diff . HEAD^
+   $ poky/poky/scripts/buildhistory-diff . HEAD^
    Changes to images/qemux86_64/glibc/core-image-minimal (files-in-image.txt):
       /etc/anotherpkg.conf was added
       /sbin/anotherpkg was added
@@ -10023,7 +10023,52 @@ before starting the debugging process. These extra computations place
 more load on the target system and can alter the characteristics of the
 program being debugged.
 
-To help get past the previously mentioned constraints, you can use
+To help get past the previously mentioned constraints, there are two
+methods you can use: running a debuginfod server and using gdbserver.
+
+Using the debuginfod server method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"debuginfod" from "elfutils" is a way to distribute "debuginfo" files.
+Running a "debuginfod" server makes debug symbols readily available,
+which means you don't need to download debugging information
+and the binaries of the process being debugged. You can just fetch
+debug symbols from the server.
+
+To run a debuginfod server, you need to do the following:
+
+-  Ensure that this variable is set in your ``local.conf`` file:
+   ::
+
+      PACKAGECONFIG_pn-elfutils-native = "debuginfod libdebuginfod"
+
+   This :term:`PACKAGECONFIG` option enables debuginfod and libdebuginfod for
+   "elfutils-native".
+
+-  Run the following commands to set up the "debuginfod" server:
+   ::
+
+      $ oe-debuginfod
+
+
+To use debuginfod on the target, you need the following:
+
+-  Ensure that this variable is set in your ``local.conf`` file:
+   ::
+
+      DEBUGINFOD_URLS = "http://localhost:8002/"
+
+   This :term:`DEBUGINFOD_URLS` option does the client configuration.
+
+   ::
+
+        PACKAGECONFIG_pn-gdb = "debuginfod"
+
+   This :term:`PACKAGECONFIG` option enables "debuginfod" for "gdb".
+
+Using the gdbserver method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 gdbserver, which runs on the remote target and does not load any
 debugging information from the debugged process. Instead, a GDB instance
 processes the debugging information that is run on a remote computer -
@@ -10738,7 +10783,7 @@ been followed:
    are ``create-pull-request`` and ``send-pull-request``. You can find
    these scripts in the ``scripts`` directory within the
    :term:`Source Directory` (e.g.
-   ``~/poky/scripts``).
+   ``poky/scripts``).
 
    Using these scripts correctly formats the requests without
    introducing any whitespace or HTML formatting. The maintainer that
@@ -10752,7 +10797,7 @@ been followed:
    line in the created patch files:
    ::
 
-      $ ~/poky/scripts/create-pull-request -u meta-intel-contrib -s "Updated Manual Section Reference in README"
+      $ poky/scripts/create-pull-request -u meta-intel-contrib -s "Updated Manual Section Reference in README"
 
    Running this script forms ``*.patch`` files in a folder named
    ``pull-``\ `PID` in the current directory. One of the patch files is a
@@ -10766,7 +10811,7 @@ been followed:
    list:
    ::
 
-      $ ~/poky/scripts/send-pull-request -p ~/meta-intel/pull-10565 -t meta-intel@yoctoproject.org
+      $ poky/scripts/send-pull-request -p ~/meta-intel/pull-10565 -t meta-intel@yoctoproject.org
 
    You need to follow the prompts as the script is interactive.
 

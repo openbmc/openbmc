@@ -28,7 +28,7 @@ universal, the list includes them just in case:
       to allow for matching recipe names. For example, suppose you have an
       append file named as follows:
       ::
-      
+
          busybox_1.21.%.bbappend
 
       That append file
@@ -76,7 +76,7 @@ universal, the list includes them just in case:
 
             .. code-block:: shell
 
-               $ cd $HOME/poky
+               $ cd poky
                $ source oe-init-build-env
 
          -  Create the Build Directory inside your home directory and
@@ -84,19 +84,16 @@ universal, the list includes them just in case:
 
             .. code-block:: shell
 
-               $ cd $HOME
                $ source poky/oe-init-build-env test-builds
 
          -  Provide a directory path and specifically name the Build
             Directory. Any intermediate folders in the pathname must exist.
             This next example creates a Build Directory named
-            ``YP-&POKYVERSION;`` in your home directory within the existing
-            directory ``mybuilds``:
+            ``YP-&POKYVERSION;`` within the existing directory ``mybuilds``:
 
             .. code-block:: shell
 
-               $ cd $HOME
-               $ source $HOME/poky/oe-init-build-env $HOME/mybuilds/YP-&POKYVERSION;
+               $ source poky/oe-init-build-env mybuilds/YP-&POKYVERSION;
 
       .. note::
 

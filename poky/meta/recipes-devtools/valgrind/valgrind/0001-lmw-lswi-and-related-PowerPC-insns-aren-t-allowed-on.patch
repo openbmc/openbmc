@@ -1,0 +1,62 @@
+From 0748ed5403a75c12ad9137b3fabf9d8397206ed8 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Tue, 1 Dec 2020 13:57:39 +0100
+Subject: [PATCH] lmw, lswi and related PowerPC insns aren't allowed on ppc64le
+
+lmw, lswi and related PowerPC insns aren't allowed on ppc64le
+
+Newer binutils produce an error when the assembly contains lmw, stmw,
+lswi, lswx, stswi, or stswx instructions in little-endian mode.
+
+Only build and run the lsw and ldst_multiple testcases on ppc64[be].
+
+https://bugs.kde.org/show_bug.cgi?id=427870
+Upstream-Status: Backport [https://sourceware.org/git/?p=valgrind.git;a=commit;h=74b74174d572fee4015b8f4e326db3cd949bcdc3]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ none/tests/ppc64/Makefile.am          | 9 ++++++---
+ none/tests/ppc64/ldst_multiple.vgtest | 1 +
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/none/tests/ppc64/Makefile.am b/none/tests/ppc64/Makefile.am
+index 9bc0d0a..9d1e8b7 100644
+--- a/none/tests/ppc64/Makefile.am
++++ b/none/tests/ppc64/Makefile.am
+@@ -54,16 +54,20 @@ EXTRA_DIST = \
+ 
+ check_PROGRAMS = \
+ 	allexec \
+-	lsw jm-insns round \
++	jm-insns round \
+ 	test_isa_2_06_part1 test_isa_2_06_part2 test_isa_2_06_part3 \
+ 	test_dfp1 test_dfp2 test_dfp3 test_dfp4 test_dfp5 \
+ 	test_isa_2_07_part1 test_isa_2_07_part2 \
+ 	test_isa_3_0 \
+ 	subnormal_test \
+-	test_tm test_touch_tm ldst_multiple data-cache-instructions \
++	test_tm test_touch_tm data-cache-instructions \
+ 	power6_mf_gpr std_reg_imm \
+ 	twi_tdi tw_td power6_bcmp
+ 
++# lmw, stmw, lswi, lswx, stswi, stswx compile (and run) only on big endian.
++if VGCONF_PLATFORMS_INCLUDE_PPC64BE_LINUX
++check_PROGRAMS += lsw ldst_multiple
++endif
+ 
+ AM_CFLAGS    += @FLAG_M64@
+ AM_CXXFLAGS  += @FLAG_M64@
+@@ -175,4 +179,3 @@ test_isa_2_07_part2_LDADD = -lm
+ test_tm_LDADD = -lm
+ test_touch_tm_LDADD = -lm
+ test_isa_3_0_LDADD = -lm
+-
+diff --git a/none/tests/ppc64/ldst_multiple.vgtest b/none/tests/ppc64/ldst_multiple.vgtest
+index 87e668e..22dd46c 100644
+--- a/none/tests/ppc64/ldst_multiple.vgtest
++++ b/none/tests/ppc64/ldst_multiple.vgtest
+@@ -1 +1,2 @@
++prereq: ../../../tests/is_ppc64_BE
+ prog: ldst_multiple
+-- 
+2.31.0
+

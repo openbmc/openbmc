@@ -3,6 +3,7 @@ DESCRIPTION = "The Apache Serf library is a C-based HTTP client library built up
 Portable Runtime (APR) library. It multiplexes connections, running the \
 read/write communication asynchronously. Memory copies and transformations are \
 kept to a minimum to provide high performance operation."
+HOMEPAGE = "http://serf.apache.org/"
 SRC_URI = "${APACHE_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://norpath.patch \
            file://env.patch \
