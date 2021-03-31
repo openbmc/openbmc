@@ -38,8 +38,11 @@ ALLOW_EMPTY_${PN} = "1"
 PACKAGE_BEFORE_PN += "${LOGGING_PACKAGES}"
 SYSTEMD_PACKAGES = "${LOGGING_PACKAGES}"
 DBUS_PACKAGES = "${LOGGING_PACKAGES}"
+USERADD_PACKAGES = "${PN}-base"
+GROUPADD_PARAM_${PN}-base = "-r phosphor-logging"
 
 FILES_${PN}-base += " \
+        ${sysconfdir}/dbus-1 \
         ${bindir}/phosphor-log-manager \
         ${libdir}/libphosphor_logging.so.* \
 "
