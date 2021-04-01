@@ -44,7 +44,7 @@ RDEPENDS_${PN} += " \
 
 do_install_ptest() {
         install -d ${D}${PTEST_PATH}/test
-        cp -rf ${B}*_test ${D}${PTEST_PATH}/test/
+        cp -rf ${B}/*_test ${D}${PTEST_PATH}/test/
 }
 
 FILES_${PN} += "${datadir}/** "
