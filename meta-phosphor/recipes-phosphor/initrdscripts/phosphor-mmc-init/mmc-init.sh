@@ -31,8 +31,7 @@ done
 
 # Move the secondary GPT to the end of the device if needed. Look for the GPT
 # header signature "EFI PART" located 512 bytes from the end of the device.
-magic=$(tail -c 512 "${mmcdev}" | hexdump -C -n 8 | grep "EFI PART")
-if test -z "${magic}"; then
+if ! tail -c 512 "${mmcdev}" | hexdump -C -n 8 | grep -q "EFI PART"; then
     sgdisk -e "${mmcdev}"
     partprobe
 fi
