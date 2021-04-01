@@ -63,4 +63,4 @@ for f in $fslist; do
     mount --move $f $rodir/$f
 done
 
-exec chroot $rodir /sbin/init
+exec switch_root $rodir /sbin/init
