@@ -1,12 +1,12 @@
 Example build invocations:
 
 mihawk:
-DISTRO=openbmc-witherspoon MACHINE=mihawk bitbake obmc-phosphor-image
+MACHINE=mihawk bitbake obmc-phosphor-image
 p10bmc:
-DISTRO=openbmc-openpower MACHINE=p10bmc bitbake obmc-phosphor-image
+MACHINE=p10bmc bitbake obmc-phosphor-image
 swift:
-DISTRO=openbmc-witherspoon MACHINE=swift bitbake obmc-phosphor-image
+MACHINE=swift bitbake obmc-phosphor-image
 witherspoon:
-DISTRO=openbmc-witherspoon MACHINE=witherspoon bitbake obmc-phosphor-image
+MACHINE=witherspoon bitbake obmc-phosphor-image
 witherspoon-tacoma:
-DISTRO=openbmc-openpower MACHINE=witherspoon-tacoma bitbake obmc-phosphor-image
+MACHINE=witherspoon-tacoma bitbake obmc-phosphor-image

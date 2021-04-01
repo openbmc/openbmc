@@ -2,7 +2,7 @@
 #MACHINE ?= "p10bmc"
 #MACHINE ?= "swift"
 MACHINE ??= "witherspoon"
-DISTRO ?= "openbmc-witherspoon"
+DISTRO ?= "openbmc-openpower"
 PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"
 EXTRA_IMAGE_FEATURES = "debug-tweaks"
