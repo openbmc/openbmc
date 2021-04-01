@@ -9,7 +9,7 @@ EXTRA_OEMESON += "-Doptional-images='image-hostfw'"
 RDEPENDS_phosphor-software-manager-updater-mmc += " \
     gptfdisk \
     parted \
-    zstd-bin \
+    zstd \
 "
 
 SYSTEMD_SERVICE_phosphor-software-manager-updater-mmc += " \
