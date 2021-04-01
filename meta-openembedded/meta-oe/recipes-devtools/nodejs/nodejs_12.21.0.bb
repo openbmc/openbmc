@@ -39,7 +39,7 @@ def map_nodejs_arch(a, d):
     if   re.match('i.86$', a): return 'ia32'
     elif re.match('x86_64$', a): return 'x64'
     elif re.match('aarch64$', a): return 'arm64'
-    elif re.match('(powerpc64|powerpc64le)$', a): return 'ppc64'
+    elif re.match('(powerpc64|powerpc64le|ppc64le)$', a): return 'ppc64'
     elif re.match('powerpc$', a): return 'ppc'
     return a
 
