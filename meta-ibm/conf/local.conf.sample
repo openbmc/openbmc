@@ -1,6 +1,6 @@
 #MACHINE ?= "mihawk"
+#MACHINE ?= "p10bmc"
 #MACHINE ?= "swift"
-#MACHINE ?= "rainier"
 MACHINE ??= "witherspoon"
 DISTRO ?= "openbmc-witherspoon"
 PACKAGE_CLASSES ?= "package_rpm"

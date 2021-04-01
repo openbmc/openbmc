@@ -55,7 +55,7 @@ gsj                     on5263m5                   vesnin
 hr630                   palmetto                   witherspoon
 hr855xg2                qemuarm                    witherspoon-128
 lanyang                 quanta-q71l                witherspoon-tacoma
-mihawk                  rainier                    yosemitev2
+mihawk                  p10bmc                     yosemitev2
 msn                     romulus                    zaius
 neptune                 s2600wf
 ```
