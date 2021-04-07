@@ -391,22 +391,7 @@
                     "zoneSetpoint": 10000,
                     "target": "/xyz/openbmc_project/extsensors/margin/nvme",
                     "components": [
-                        "nvme0",
-                        "nvme1",
-                        "nvme2",
-                        "nvme3",
-                        "nvme4",
-                        "nvme5",
-                        "nvme6",
-                        "nvme7",
-                        "nvme8",
-                        "nvme9",
-                        "nvme10",
-                        "nvme11",
-                        "nvme12",
-                        "nvme13",
-                        "nvme14",
-                        "nvme15"
+                        @nvmeList@
                     ]
                 },
                 {
