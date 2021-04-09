@@ -28,9 +28,9 @@ RDEPENDS_${PN}-inventory_append_mihawk = " openpower-fru-vpd openpower-occ-contr
 RDEPENDS_${PN}-fan-control_append_ibm-ac-server = " fan-watchdog"
 RDEPENDS_${PN}-fan-control_append_p10bmc = " fan-watchdog sensor-monitor"
 RDEPENDS_${PN}-extras_append_ibm-ac-server = " ${POWER_SERVICE_PACKAGES_AC_SERVER} witherspoon-power-supply-sync phosphor-webui"
-RDEPENDS_${PN}-extras_append_p10bmc = " ${POWER_SERVICE_PACKAGES_P10} webui-vue dbus-sensors phosphor-virtual-sensor kexec-tools"
+RDEPENDS_${PN}-extras_append_p10bmc = " ${POWER_SERVICE_PACKAGES_P10} webui-vue dbus-sensors phosphor-virtual-sensor kexec-tools makedumpfile kdump vmcore-dmesg"
 RDEPENDS_${PN}-extras_append_mihawk = " phosphor-webui phosphor-image-signing wistron-ipmi-oem ${POWER_SERVICE_PACKAGES_AC_SERVER}"
-RDEPENDS_${PN}-extras_append_witherspoon-tacoma = " pldm srvcfg-manager webui-vue biosconfig-manager phosphor-post-code-manager phosphor-host-postd kexec-tools"
+RDEPENDS_${PN}-extras_append_witherspoon-tacoma = " pldm srvcfg-manager webui-vue biosconfig-manager phosphor-post-code-manager phosphor-host-postd kexec-tools makedumpfile kdump vmcore-dmesg"
 
 RDEPENDS_${PN}-extras_remove_p10bmc = "obmc-ikvm liberation-fonts uart-render-controller"
 RDEPENDS_${PN}-extras_remove_swift = "obmc-ikvm"
