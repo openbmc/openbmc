@@ -11,6 +11,8 @@ inherit obmc-phosphor-dbus-service obmc-phosphor-systemd
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[use-json] = "--enable-use-json, --disable-use-json"
 PACKAGECONFIG[use-lamp-test] = "--enable-use-lamp-test, --disable-use-lamp-test"
+PACKAGECONFIG[monitor-operational-status] = "--enable-monitor-operational-status, \
+                                             --disable-monitor-operational-status"
 
 SYSTEMD_PACKAGES = "${PN} ${PN}-faultmonitor"
 PACKAGE_BEFORE_PN += "${PN}-faultmonitor"

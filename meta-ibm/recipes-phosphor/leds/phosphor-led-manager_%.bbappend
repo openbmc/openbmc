@@ -6,8 +6,9 @@ SYSTEMD_SERVICE_${PN}_append_p10bmc += "obmc-led-set-all-groups-asserted@.servic
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_p10bmc +="obmc/led/set-all/groups/config"
 
 # Use the JSON configuration file at runtime than the static led.yaml
-# Also, enable Lamp Test feature for p10bmc systems
-PACKAGECONFIG_append_p10bmc = " use-json use-lamp-test"
+# Also, enable Lamp Test and OperationalStatus monitor feature for
+# p10bmc systems
+PACKAGECONFIG_append_p10bmc = " use-json use-lamp-test monitor-operational-status"
 
 # Install the lamp test override file for p10bmc
 SRC_URI_append_p10bmc = " file://lamp-test-led-overrides.json"
