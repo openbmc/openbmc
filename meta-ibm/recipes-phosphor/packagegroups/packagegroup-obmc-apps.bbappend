@@ -37,7 +37,6 @@ RDEPENDS_${PN}-extras_remove_swift = "obmc-ikvm"
 RDEPENDS_${PN}-extras_remove_witherspoon-tacoma = "obmc-ikvm liberation-fonts uart-render-controller phosphor-webui"
 RDEPENDS_${PN}-logging_append = " ${EXTRA_IBM_LOGGING_PKGS}"
 RDEPENDS_${PN}-extras_append_p10bmc = " pldm openpower-hw-diags srvcfg-manager biosconfig-manager phosphor-post-code-manager phosphor-host-postd"
-RDEPENDS_${PN}-leds_remove_p10bmc = "phosphor-led-manager-faultmonitor"
 RDEPENDS_${PN}-leds_remove_witherspoon-tacoma = "phosphor-led-manager-faultmonitor"
 
 ${PN}-software-extras_append_ibm-ac-server = " phosphor-software-manager-sync"
