@@ -49,7 +49,7 @@
          ]
       },
       {
-         "inventory": "/system/chassis/motherboard/fan3",
+         "inventory": "/system/chassis/motherboard/fan4",
          "functional_delay": 5,
          "allowed_out_of_range_time": 30,
          "deviation": 15,
@@ -59,7 +59,7 @@
          "nonfunc_rotor_error_delay": 0,
          "sensors": [
             {
-               "name": "fan3_0",
+               "name": "fan4_0",
                "has_target": true
             }
          ]

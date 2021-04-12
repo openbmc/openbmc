@@ -63,19 +63,19 @@
       }
    },
    {
-      "name": "fan3",
-      "path": "/system/chassis/motherboard/fan3",
+      "name": "fan4",
+      "path": "/system/chassis/motherboard/fan4",
       "methods": [
          {
             "type": "gpio",
-            "key": 9,
+            "key": 10,
             "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a400.i2c-bus/i2c-7/7-0061",
             "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
          },
          {
             "type": "tach",
             "sensors": [
-               "fan3_0"
+               "fan4_0"
             ]
          }
       ],

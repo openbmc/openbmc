@@ -18,9 +18,9 @@
         "target_interface": "xyz.openbmc_project.Control.FanSpeed"
     },
     {
-        "name": "fan3",
+        "name": "fan4",
         "zone": "0",
-        "sensors": ["fan3_0"],
+        "sensors": ["fan4_0"],
         "target_interface": "xyz.openbmc_project.Control.FanSpeed"
     }
 ]
