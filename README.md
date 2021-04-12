@@ -48,16 +48,16 @@ of supported hardware targets, see the following example:
 $ . setup <machine> [build_dir]
 Target machine must be specified. Use one of:
 
-centriq2400-rep         nicole                     stardragon4800-rep2
-f0b                     olympus                    swift
-fp5280g2                olympus-nuvoton            tiogapass
-gsj                     on5263m5                   vesnin
-hr630                   palmetto                   witherspoon
-hr855xg2                qemuarm                    witherspoon-128
-lanyang                 quanta-q71l                witherspoon-tacoma
-mihawk                  p10bmc                     yosemitev2
-msn                     romulus                    zaius
-neptune                 s2600wf
+centriq2400-rep         f0b                     fp5280g2
+gsj                     hr630                   hr855xg2
+lanyang                 mihawk                  msn
+neptune                 nicole                  olympus
+olympus-nuvoton         on5263m5                p10bmc
+palmetto                qemuarm                 quanta-q71l
+romulus                 s2600wf                 stardragon4800-rep2
+swift                   tiogapass               vesnin
+witherspoon             witherspoon-tacoma      yosemitev2
+zaius
 ```
 
 Once you know the target (e.g. romulus), source the `setup` script as follows:
