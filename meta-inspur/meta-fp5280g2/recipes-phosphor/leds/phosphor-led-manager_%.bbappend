@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://led-group-config.json"
 
-PACKAGECONFIG_append = " use-json"
+PACKAGECONFIG_append = " use-json use-lamp-test"
 
 DEPENDS += "phosphor-dbus-interfaces"
 
