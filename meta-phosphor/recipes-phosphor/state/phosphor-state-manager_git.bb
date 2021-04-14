@@ -55,6 +55,8 @@ DEPENDS += "libcereal"
 DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
 
+RDEPENDS_${PN}-chassis += "bash"
+
 FILES_${PN}-host = "${bindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
 DBUS_SERVICE_${PN}-host += "phosphor-reboot-host@.service"
@@ -180,6 +182,6 @@ SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'FAN_LINK_FMT', 'OBMC_CHA
 SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERROR_TARGETS', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "4a4c1a69432dd88a4204e7a15a838aae75ae1d12"
+SRCREV = "525478053c362bf57f89ac032eed74cc7d3de744"
 
 S = "${WORKDIR}/git"
