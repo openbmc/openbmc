@@ -1,5 +1,5 @@
 FILESEXTRAPATHS_prepend_ethanolx := "${THISDIR}/${PN}:"
-EXTRA_OECONF_append_ethanolx = " --enable-negative-errno-on-fail"
+EXTRA_OEMESON_append_ethanolx = " -Dnegative-errno-on-fail=true"
 
 
 CHIPS = " \

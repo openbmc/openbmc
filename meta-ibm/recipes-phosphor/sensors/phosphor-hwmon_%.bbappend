@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-EXTRA_OECONF_append_mihawk = " --enable-negative-errno-on-fail"
+EXTRA_OEMESON_append_mihawk = "-Dnegative-errno-on-fail=true"
 
 SRC_URI_append_ibm-ac-server = " \
            file://70-hwmon.rules \

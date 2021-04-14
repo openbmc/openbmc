@@ -23,4 +23,4 @@ Q71L_ITEMS += "${@compose_list(d, 'Q71L_PSUBASE', 'Q71L_PSUS')}"
 ENVS = "obmc/hwmon/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_quanta-q71l := " ${@compose_list(d, 'ENVS', 'Q71L_ITEMS')}"
 
-EXTRA_OECONF_append_quanta-q71l = " --enable-negative-errno-on-fail"
+EXTRA_OEMESON_append_quanta-q71l = " -Dnegative-errno-on-fail=true"
