@@ -39,14 +39,14 @@ RDEPENDS_${PN} += "\
 RRECOMMENDS_${PN} += "${VIRTUAL-RUNTIME_phosphor-hwmon-config}"
 
 FILES_max31785-msl = "${bindir}/max31785-msl"
-RDEPENDS_max31785-msl = "${VIRTUAL-RUNTIME_base-utils} i2c-tools"
+RDEPENDS_max31785-msl = "${VIRTUAL-RUNTIME_base-utils} i2c-tools bash"
 
 SRC_URI += "git://github.com/openbmc/phosphor-hwmon"
 SRC_URI += "file://70-hwmon.rules"
 SRC_URI += "file://70-iio.rules"
 SRC_URI += "file://start_hwmon.sh"
 
-SRCREV = "82921ae8e84b250e6436c8c005245bccd5c4706c"
+SRCREV = "f4414cba09577e906b7b022a96b41e6a859da149"
 
 S = "${WORKDIR}/git"
 
