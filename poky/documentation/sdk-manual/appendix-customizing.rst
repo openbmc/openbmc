@@ -101,17 +101,15 @@ adjustments:
 
 -  Generally, you want to have a shared state mirror set up so users of
    the SDK can add additional items to the SDK after installation
-   without needing to build the items from source. See the "`Providing
-   Additional Installable Extensible SDK
-   Content <#sdk-providing-additional-installable-extensible-sdk-content>`__"
+   without needing to build the items from source. See the
+   ":ref:`sdk-manual/appendix-customizing:providing additional installable extensible sdk content`"
    section for information.
 
 -  If you want users of the SDK to be able to easily update the SDK, you
    need to set the
    :term:`SDK_UPDATE_URL`
-   variable. For more information, see the "`Providing Updates to the
-   Extensible SDK After
-   Installation <#sdk-providing-updates-to-the-extensible-sdk-after-installation>`__"
+   variable. For more information, see the
+   ":ref:`sdk-manual/appendix-customizing:providing updates to the extensible sdk after installation`"
    section.
 
 -  If you have adjusted the list of files and directories that appear in
@@ -139,9 +137,9 @@ Changing the Extensible SDK Installer Title
 
 You can change the displayed title for the SDK installer by setting the
 :term:`SDK_TITLE` variable and then
-rebuilding the the SDK installer. For information on how to build an SDK
-installer, see the "`Building an SDK
-Installer <#sdk-building-an-sdk-installer>`__" section.
+rebuilding the SDK installer. For information on how to build an SDK
+installer, see the ":ref:`sdk-manual/appendix-obtain:building an sdk installer`"
+section.
 
 By default, this title is derived from
 :term:`DISTRO_NAME` when it is
@@ -189,9 +187,8 @@ the installed SDKs to update the installed SDKs by using the
    variable to point to the corresponding HTTP or HTTPS URL. Setting
    this variable causes any SDK built to default to that URL and thus,
    the user does not have to pass the URL to the ``devtool sdk-update``
-   command as described in the "`Applying Updates to an Installed
-   Extensible
-   SDK <#sdk-applying-updates-to-an-installed-extensible-sdk>`__"
+   command as described in the
+   ":ref:`sdk-manual/extensible:applying updates to an installed extensible sdk`"
    section.
 
 3. Build the extensible SDK normally (i.e., use the
@@ -208,9 +205,9 @@ the installed SDKs to update the installed SDKs by using the
 
 Completing the above steps allows users of the existing installed SDKs
 to simply run ``devtool sdk-update`` to retrieve and apply the latest
-updates. See the "`Applying Updates to an Installed Extensible
-SDK <#sdk-applying-updates-to-an-installed-extensible-sdk>`__" section
-for further information.
+updates. See the
+":ref:`sdk-manual/extensible:applying updates to an installed extensible sdk`"
+section for further information.
 
 Changing the Default SDK Installation Directory
 ===============================================

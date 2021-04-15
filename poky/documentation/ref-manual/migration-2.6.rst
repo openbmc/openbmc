@@ -1,8 +1,8 @@
-Moving to the Yocto Project 2.6 Release
-=======================================
+Moving to the Yocto Project 2.6 Release (thud)
+==============================================
 
 This section provides migration information for moving to the Yocto
-Project 2.6 Release from the prior release.
+Project 2.6 Release (codename "thud") from the prior release.
 
 .. _migration-2.6-gcc-changes:
 
@@ -110,7 +110,7 @@ upon the older ``*proto`` recipes need to be changed to depend on the
 newer ``xorgproto`` recipe instead.
 
 For names of recipes removed because of this repository change, see the
-`Removed Recipes <#removed-recipes>`__ section.
+:ref:`ref-manual/migration-2.6:removed recipes` section.
 
 .. _migration-2.6-distutils-distutils3-fetching-dependencies:
 
@@ -118,7 +118,7 @@ For names of recipes removed because of this repository change, see the
 ---------------------------------------------------------------------------------------------------
 
 Previously, it was possible for Python recipes that inherited the
-:ref:`distutils <ref-classes-distutils>` and
+``distutils`` and
 :ref:`distutils3 <ref-classes-distutils3>` classes to fetch code
 during the :ref:`ref-tasks-configure` task to satisfy
 dependencies mentioned in ``setup.py`` if those dependencies were not

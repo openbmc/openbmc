@@ -1,8 +1,8 @@
-Moving to the Yocto Project 2.3 Release
-=======================================
+Moving to the Yocto Project 2.3 Release (pyro)
+==============================================
 
 This section provides migration information for moving to the Yocto
-Project 2.3 Release from the prior release.
+Project 2.3 Release (codename "pyro") from the prior release.
 
 .. _migration-2.3-recipe-specific-sysroots:
 

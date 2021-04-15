@@ -9,14 +9,14 @@ Execution Flow within the Autobuilder
 
 The "a-full" and "a-quick" targets are the usual entry points into the
 Autobuilder and it makes sense to follow the process through the system
-starting there. This is best visualised from the Autobuilder Console
+starting there. This is best visualized from the Autobuilder Console
 view (:yocto_ab:`/typhoon/#/console`).
 
 Each item along the top of that view represents some "target build" and
 these targets are all run in parallel. The 'full' build will trigger the
 majority of them, the "quick" build will trigger some subset of them.
 The Autobuilder effectively runs whichever configuration is defined for
-each of those targets on a seperate buildbot worker. To understand the
+each of those targets on a separate buildbot worker. To understand the
 configuration, you need to look at the entry on ``config.json`` file
 within the ``yocto-autobuilder-helper`` repository. The targets are
 defined in the ‘overrides' section, a quick example could be qemux86-64
@@ -64,10 +64,10 @@ While not every detail of this is covered here, you can see how the
 template mechanism allows quite complex configurations to be built up
 yet allows duplication and repetition to be kept to a minimum.
 
-The different build targets are designed to allow for parallelisation,
+The different build targets are designed to allow for parallelization,
 so different machines are usually built in parallel, operations using
 the same machine and metadata are built sequentially, with the aim of
-trying to optimise build efficiency as much as possible.
+trying to optimize build efficiency as much as possible.
 
 The ``config.json`` file is processed by the scripts in the Helper
 repository in the ``scripts`` directory. The following section details
@@ -111,7 +111,7 @@ roughly consist of:
    :ref:`test-manual/understand-autobuilder:Autobuilder Clone Cache`.
 
    This step has two possible modes of operation. If the build is part
-   of a parent build, its possible that all the repositories needed may
+   of a parent build, it's possible that all the repositories needed may
    already be available, ready in a pre-prepared directory. An "a-quick"
    or "a-full" build would prepare this before starting the other
    sub-target builds. This is done for two reasons:
@@ -130,7 +130,7 @@ roughly consist of:
 
 #. *Call scripts/run-config*
 
-   This is another call into the Helper scripts where its expected that
+   This is another call into the Helper scripts where it's expected that
    the main functionality of this target will be executed.
 
 Autobuilder Technology
@@ -164,7 +164,7 @@ Autobuilder Worker Janitor
 
 This is a process running on each Worker that performs two basic
 operations, including background file deletion at IO idle (see :ref:`test-manual/understand-autobuilder:Autobuilder Target Execution Overview`: Run clobberdir) and
-maintainenance of a cache of cloned repositories to improve the speed
+maintenance of a cache of cloned repositories to improve the speed
 the system can checkout repositories.
 
 Shared DL_DIR
@@ -250,7 +250,7 @@ Deploying Yocto Autobuilder
 ===========================
 
 The most up to date information about how to setup and deploy your own
-Autbuilder can be found in README.md in the ``yocto-autobuilder2``
+Autobuilder can be found in README.md in the ``yocto-autobuilder2``
 repository.
 
 We hope that people can use the ``yocto-autobuilder2`` code directly but

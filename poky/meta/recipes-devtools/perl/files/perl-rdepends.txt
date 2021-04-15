@@ -1,3 +1,11 @@
+
+# Some additional dependencies that the above doesn't manage to figure out
+RDEPENDS_perl-module-file-spec += "perl-module-file-spec-unix"
+RDEPENDS_perl-module-math-bigint += "perl-module-math-bigint-calc"
+RDEPENDS_perl-module-thread-queue += "perl-module-attributes"
+RDEPENDS_perl-module-overload += "perl-module-overloading"
+
+# Generated depends list beyond this line
 RDEPENDS_perl-module-anydbm-file += "perl-module-strict"
 RDEPENDS_perl-module-anydbm-file += "perl-module-warnings"
 RDEPENDS_perl-module-app-cpan += "perl-module-config"

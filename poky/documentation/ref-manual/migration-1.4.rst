@@ -1,8 +1,8 @@
-Moving to the Yocto Project 1.4 Release
-=======================================
+Moving to the Yocto Project 1.4 Release (dylan)
+===============================================
 
 This section provides migration information for moving to the Yocto
-Project 1.4 Release from the prior release.
+Project 1.4 Release (codename "dylan") from the prior release.
 
 .. _migration-1.4-bitbake:
 

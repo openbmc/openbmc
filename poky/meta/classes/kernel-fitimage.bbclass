@@ -53,43 +53,12 @@ python __anonymous () {
                 d.appendVarFlag('do_assemble_fitimage_initramfs', 'depends', ' %s:do_populate_sysroot' % uboot_pn)
 }
 
-# Options for the device tree compiler passed to mkimage '-D' feature:
-UBOOT_MKIMAGE_DTCOPTS ??= ""
-
-# fitImage Hash Algo
-FIT_HASH_ALG ?= "sha256"
-
-# fitImage Signature Algo
-FIT_SIGN_ALG ?= "rsa2048"
-
-# Generate keys for signing fitImage
-FIT_GENERATE_KEYS ?= "0"
-
-# Size of private key in number of bits
-FIT_SIGN_NUMBITS ?= "2048"
-
-# args to openssl genrsa (Default is just the public exponent)
-FIT_KEY_GENRSA_ARGS ?= "-F4"
-
-# args to openssl req (Default is -batch for non interactive mode and
-# -new for new certificate)
-FIT_KEY_REQ_ARGS ?= "-batch -new"
-
-# Standard format for public key certificate
-FIT_KEY_SIGN_PKCS ?= "-x509"
 
 # Description string
-FIT_DESC ?= "U-Boot fitImage for ${DISTRO_NAME}/${PV}/${MACHINE}"
+FIT_DESC ?= "Kernel fitImage for ${DISTRO_NAME}/${PV}/${MACHINE}"
 
 # Sign individual images as well
 FIT_SIGN_INDIVIDUAL ?= "0"
-
-# mkimage command
-UBOOT_MKIMAGE ?= "uboot-mkimage"
-UBOOT_MKIMAGE_SIGN ?= "${UBOOT_MKIMAGE}"
-
-# Arguments passed to mkimage for signing
-UBOOT_MKIMAGE_SIGN_ARGS ?= ""
 
 #
 # Emit the fitImage ITS header
@@ -698,33 +667,6 @@ do_assemble_fitimage_initramfs() {
 
 addtask assemble_fitimage_initramfs before do_deploy after do_bundle_initramfs
 
-do_generate_rsa_keys() {
-	if [ "${UBOOT_SIGN_ENABLE}" = "0" ] && [ "${FIT_GENERATE_KEYS}" = "1" ]; then
-		bbwarn "FIT_GENERATE_KEYS is set to 1 eventhough UBOOT_SIGN_ENABLE is set to 0. The keys will not be generated as they won't be used."
-	fi
-
-	if [ "${UBOOT_SIGN_ENABLE}" = "1" ] && [ "${FIT_GENERATE_KEYS}" = "1" ]; then
-
-		# Generate keys only if they don't already exist
-		if [ ! -f "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".key ] || \
-			[ ! -f "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".crt]; then
-
-			# make directory if it does not already exist
-			mkdir -p "${UBOOT_SIGN_KEYDIR}"
-
-			echo "Generating RSA private key for signing fitImage"
-			openssl genrsa ${FIT_KEY_GENRSA_ARGS} -out \
-				"${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".key \
-				"${FIT_SIGN_NUMBITS}"
-
-			echo "Generating certificate for signing fitImage"
-			openssl req ${FIT_KEY_REQ_ARGS} "${FIT_KEY_SIGN_PKCS}" \
-				-key "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".key \
-				-out "${UBOOT_SIGN_KEYDIR}/${UBOOT_SIGN_KEYNAME}".crt
-		fi
-	fi
-}
-
 addtask generate_rsa_keys before do_assemble_fitimage after do_compile
 
 kernel_do_deploy[vardepsexclude] = "DATETIME"
@@ -753,12 +695,22 @@ kernel_do_deploy_append() {
 				ln -snf fitImage-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_NAME}.bin "$deployDir/fitImage-${INITRAMFS_IMAGE_NAME}-${KERNEL_FIT_LINK_NAME}"
 			fi
 		fi
-		if [ "${UBOOT_SIGN_ENABLE}" = "1" -a -n "${UBOOT_DTB_BINARY}" ] ; then
-			# UBOOT_DTB_IMAGE is a realfile, but we can't use
-			# ${UBOOT_DTB_IMAGE} since it contains ${PV} which is aimed
-			# for u-boot, but we are in kernel env now.
-			install -m 0644 ${B}/u-boot-${MACHINE}*.dtb "$deployDir/"
-		fi
+	fi
+	if [ "${UBOOT_SIGN_ENABLE}" = "1" -o "${UBOOT_FITIMAGE_ENABLE}" = "1" ] && \
+	   [ -n "${UBOOT_DTB_BINARY}" ] ; then
+		# UBOOT_DTB_IMAGE is a realfile, but we can't use
+		# ${UBOOT_DTB_IMAGE} since it contains ${PV} which is aimed
+		# for u-boot, but we are in kernel env now.
+		install -m 0644 ${B}/u-boot-${MACHINE}*.dtb "$deployDir/"
+	fi
+	if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" -a -n "${UBOOT_BINARY}" -a -n "${SPL_DTB_BINARY}" ] ; then
+		# If we're also creating and/or signing the uboot fit, now we need to
+		# deploy it, it's its file, as well as u-boot-spl.dtb
+		install -m 0644 ${B}/u-boot-spl-${MACHINE}*.dtb "$deployDir/"
+		echo "Copying u-boot-fitImage file..."
+		install -m 0644 ${B}/u-boot-fitImage-* "$deployDir/"
+		echo "Copying u-boot-its file..."
+		install -m 0644 ${B}/u-boot-its-* "$deployDir/"
 	fi
 }
 

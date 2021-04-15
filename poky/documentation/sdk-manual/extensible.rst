@@ -21,8 +21,9 @@ hardware, and ease integration into the rest of the
 
 In addition to the functionality available through ``devtool``, you can
 alternatively make use of the toolchain directly, for example from
-Makefile and Autotools. See the "`Using the SDK Toolchain
-Directly <#sdk-working-projects>`__" chapter for more information.
+Makefile and Autotools. See the
+":ref:`sdk-manual/working-projects:using the sdk toolchain directly`" chapter
+for more information.
 
 Why use the Extensible SDK and What is in It?
 =============================================
@@ -1087,12 +1088,12 @@ links created within the source tree:
 
    -  ``sysroot-destdir/``: Contains a subset of files installed within
       ``do_install`` that have been put into the shared sysroot. For
-      more information, see the "`Sharing Files Between
-      Recipes <#sdk-sharing-files-between-recipes>`__" section.
+      more information, see the
+      ":ref:`dev-manual/common-tasks:sharing files between recipes`" section.
 
    -  ``packages-split/``: Contains subdirectories for each package
       produced by the recipe. For more information, see the
-      "`Packaging <#sdk-packaging>`__" section.
+      ":ref:`sdk-manual/extensible:packaging`" section.
 
 You can use these links to get more information on what is happening at
 each build step.
@@ -1271,11 +1272,9 @@ To update your installed SDK, use ``devtool`` as follows:
    $ devtool sdk-update
 
 The previous command assumes your SDK provider has set the
-default update URL for you through the
-:term:`SDK_UPDATE_URL`
-variable as described in the "`Providing Updates to the Extensible SDK
-After
-Installation <#sdk-providing-updates-to-the-extensible-sdk-after-installation>`__"
+default update URL for you through the :term:`SDK_UPDATE_URL`
+variable as described in the
+":ref:`sdk-manual/appendix-customizing:Providing Updates to the Extensible SDK After Installation`"
 section. If the SDK provider has not set that default URL, you need to
 specify it yourself in the command as follows: $ devtool sdk-update
 path_to_update_directory

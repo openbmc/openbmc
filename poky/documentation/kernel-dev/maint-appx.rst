@@ -64,7 +64,7 @@ the "yocto-4.12" branch of the ``yocto-kernel-cache`` repository:
    kernel versions (e.g. "yocto-4.12", "yocto-4.10", "yocto-4.9", and so forth).
 
 Once you have checked out and switched to appropriate branches, you can
-see a snapshot of all the kernel source files used to used to build that
+see a snapshot of all the kernel source files used to build that
 particular Yocto Linux kernel for a particular board.
 
 To see the features and configurations for a particular Yocto Linux

@@ -1,8 +1,8 @@
-Moving to the Yocto Project 3.1 Release
-=======================================
+Moving to the Yocto Project 3.1 Release (dunfell)
+=================================================
 
 This section provides migration information for moving to the Yocto
-Project 3.1 Release from the prior release.
+Project 3.1 Release (codename "dunfell") from the prior release.
 
 .. _migration-3.1-minimum-system-requirements:
 

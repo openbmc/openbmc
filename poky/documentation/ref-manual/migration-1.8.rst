@@ -1,8 +1,8 @@
-Moving to the Yocto Project 1.8 Release
-=======================================
+Moving to the Yocto Project 1.8 Release (fido)
+==============================================
 
 This section provides migration information for moving to the Yocto
-Project 1.8 Release from the prior release.
+Project 1.8 Release (codename "fido") from the prior release.
 
 .. _migration-1.8-removed-recipes:
 

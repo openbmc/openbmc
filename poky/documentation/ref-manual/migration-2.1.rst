@@ -1,8 +1,8 @@
-Moving to the Yocto Project 2.1 Release
-=======================================
+Moving to the Yocto Project 2.1 Release (krogoth)
+=================================================
 
 This section provides migration information for moving to the Yocto
-Project 2.1 Release from the prior release.
+Project 2.1 Release (codename "krogoth") from the prior release.
 
 .. _migration-2.1-variable-expansion-in-python-functions:
 
@@ -134,7 +134,7 @@ or that mention ``do_rootfs``, you might need to update those changes.
 In particular, if you had added any tasks after ``do_rootfs``, you
 should make edits so that those tasks are after the
 :ref:`ref-tasks-image-complete` task rather than
-after ``do_rootfs`` so that the your added tasks run at the correct
+after ``do_rootfs`` so that your added tasks run at the correct
 time.
 
 A minor part of this restructuring is that the post-processing
@@ -179,9 +179,8 @@ The following recipes have been removed in the 2.1 release:
 
 -  ``python-pygtk``: Recipe became obsolete.
 
--  ``adt-installer``: Recipe became obsolete. See the "`ADT
-   Removed <#adt-removed>`__" section for more
-   information.
+-  ``adt-installer``: Recipe became obsolete. See the
+   ":ref:`ref-manual/migration-2.1:adt removed`" section for more information.
 
 .. _migration-2.1-class-changes:
 

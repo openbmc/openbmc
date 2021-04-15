@@ -1,8 +1,8 @@
-Moving to the Yocto Project 2.7 Release
-=======================================
+Moving to the Yocto Project 2.7 Release (warrior)
+=================================================
 
 This section provides migration information for moving to the Yocto
-Project 2.7 Release from the prior release.
+Project 2.7 Release (codename "warrior") from the prior release.
 
 .. _migration-2.7-bitbake-changes:
 

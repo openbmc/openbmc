@@ -90,8 +90,7 @@ understand the following documentation:
 -  The ":ref:`dev-manual/common-tasks:understanding and creating layers`"
    section in the Yocto Project Development Tasks Manual.
 
--  The "`Kernel Modification
-   Workflow <#kernel-modification-workflow>`__" section.
+-  The ":ref:`kernel-dev/intro:kernel modification workflow`" section.
 
 Kernel Modification Workflow
 ============================

@@ -59,7 +59,7 @@ distributions:
 
 -  Debian GNU/Linux 10.x (Buster)
 
--  OpenSUSE Leap 15.1
+-  openSUSE Leap 15.1
 
 
 .. note::
@@ -256,11 +256,11 @@ Required Git, tar, Python and gcc Versions
 In order to use the build system, your host development system must meet
 the following version requirements for Git, tar, and Python:
 
--  Git 1.8.3.1 or greater
+-  Git &MIN_GIT_VERSION; or greater
 
--  tar 1.28 or greater
+-  tar &MIN_TAR_VERSION; or greater
 
--  Python 3.5.0 or greater
+-  Python &MIN_PYTHON_VERSION; or greater
 
 If your host development system does not meet all these requirements,
 you can resolve this by installing a ``buildtools`` tarball that
@@ -270,11 +270,15 @@ a pre-built tarball or use BitBake to build the tarball.
 In addition, your host development system must meet the following
 version requirement for gcc:
 
--  gcc 5.0 or greater
+-  gcc &MIN_GCC_VERSION; or greater
 
 If your host development system does not meet this requirement, you can
 resolve this by installing a ``buildtools-extended`` tarball that
-contains additional tools, the equivalent of ``buildtools-essential``.
+contains additional tools, the equivalent of the Debian/Ubuntu ``build-essential``
+package.
+
+In the sections that follow, three different methods will be described for
+installing the ``buildtools`` or ``buildtools-extended`` toolset.
 
 Installing a Pre-Built ``buildtools`` Tarball with ``install-buildtools`` script
 --------------------------------------------------------------------------------
@@ -294,7 +298,7 @@ installer and automatically installs the tools for you:
 
    During execution, the buildtools tarball will be downloaded, the
    checksum of the download will be verified, the installer will be run
-   for you, and some basic checks will be run to to make sure the
+   for you, and some basic checks will be run to make sure the
    installation is functional.
 
    To avoid the need of ``sudo`` privileges, the ``install-buildtools``
@@ -331,8 +335,9 @@ installer and automatically installs the tools for you:
 Downloading a Pre-Built ``buildtools`` Tarball
 ----------------------------------------------
 
-Downloading and running a pre-built buildtools installer is the easiest
-of the two methods by which you can get these tools:
+If you would prefer not to use the ``install-buildtools`` script, you can instead
+download and run a pre-built buildtools installer yourself with the following
+steps:
 
 1. Locate and download the ``*.sh`` at &YOCTO_RELEASE_DL_URL;/buildtools/
 

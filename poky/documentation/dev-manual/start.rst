@@ -230,8 +230,8 @@ particular working environment and set of practices.
     -  Separate the project's Metadata and code by using separate Git
        repositories. See the ":ref:`overview-manual/development-environment:yocto project source repositories`"
        section in the Yocto Project Overview and Concepts Manual for
-       information on these repositories. See the "`Locating Yocto
-       Project Source Files <#locating-yocto-project-source-files>`__"
+       information on these repositories. See the
+       ":ref:`dev-manual/start:locating yocto project source files`"
        section for information on how to set up local Git repositories
        for related upstream Yocto Project Git repositories.
 
@@ -314,13 +314,13 @@ Project Build Host:
    should be able to run on any modern distribution that has the
    following versions for Git, tar, Python and gcc.
 
-   -  Git 1.8.3.1 or greater
+   -  Git &MIN_GIT_VERSION; or greater
 
-   -  tar 1.28 or greater
+   -  tar &MIN_TAR_VERSION; or greater
 
-   -  Python 3.5.0 or greater.
+   -  Python &MIN_PYTHON_VERSION; or greater.
 
-   -  gcc 5.0 or greater.
+   -  gcc &MIN_GCC_VERSION; or greater.
 
    If your build host does not meet any of these three listed version
    requirements, you can take steps to prepare the system so that you
@@ -655,8 +655,7 @@ The :yocto_home:`Yocto Project Website <>` uses a "DOWNLOADS" page
 from which you can locate and download tarballs of any Yocto Project
 release. Rather than Git repositories, these files represent snapshot
 tarballs similar to the tarballs located in the Index of Releases
-described in the "`Accessing Index of
-Releases <#accessing-index-of-releases>`__" section.
+described in the ":ref:`dev-manual/start:accessing index of releases`" section.
 
 .. note::
 
@@ -759,9 +758,9 @@ Follow these steps to create a local version of the upstream
    "master" branch, which results in a snapshot of the latest
    development changes for "master". For information on how to check out
    a specific development branch or on how to check out a local branch
-   based on a tag name, see the "`Checking Out By Branch in
-   Poky <#checking-out-by-branch-in-poky>`__" and `Checking Out By Tag
-   in Poky <#checkout-out-by-tag-in-poky>`__" sections, respectively.
+   based on a tag name, see the
+   ":ref:`dev-manual/start:checking out by branch in poky`" and
+   ":ref:`dev-manual/start:checking out by tag in poky`" sections, respectively.
 
    Once the local repository is created, you can change to that
    directory and check its status. Here, the single "master" branch

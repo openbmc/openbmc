@@ -1,8 +1,8 @@
-Moving to the Yocto Project 2.4 Release
-=======================================
+Moving to the Yocto Project 2.4 Release (rocko)
+===============================================
 
 This section provides migration information for moving to the Yocto
-Project 2.4 Release from the prior release.
+Project 2.4 Release (codename "rocko") from the prior release.
 
 .. _migration-2.4-memory-resident-mode:
 

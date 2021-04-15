@@ -178,8 +178,8 @@ resides in ``/home/user/sources/jackson``:
    $ devtool add jackson /home/user/sources/jackson
 
 If you add a recipe and the workspace layer does not exist, the command
-creates the layer and populates it as described in "`The Workspace Layer
-Structure <#devtool-the-workspace-layer-structure>`__" section.
+creates the layer and populates it as described in
+":ref:`devtool-the-workspace-layer-structure`" section.
 
 Running ``devtool add`` when the workspace layer exists causes the tool
 to add the recipe, append files, and source files into the existing

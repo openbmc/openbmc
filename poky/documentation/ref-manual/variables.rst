@@ -768,9 +768,7 @@ system and gives an overview of their function and contents.
       .. note::
 
          If you run BitBake from a directory outside of the
-         Build Directory
-         , you must be sure to set
-         BBPATH
+         :term:`Build Directory`, you must be sure to set ``BBPATH``
          to point to the Build Directory. Set the variable as you would any
          environment variable and then run BitBake:
          ::
@@ -1980,6 +1978,19 @@ system and gives an overview of their function and contents.
       is included in the default value of
       :term:`OVERRIDES`.
 
+   :term:`DISTUTILS_SETUP_PATH`
+      When used by recipes that inherit the
+      :ref:`distutils3 <ref-classes-distutils3>` or
+      :ref:`setuptools3 <ref-classes-setuptools3>` class, this variable should
+      be used to specify the directory in which the ``setup.py`` file is
+      located if it is not at the root of the source tree (as specified by
+      :term:`S`). For example, in a recipe where the sources are fetched from
+      a Git repository and ``setup.py`` is in a ``python/pythonmodule``
+      subdirectory, you would have this::
+
+         S = "${WORKDIR}/git"
+         DISTUTILS_SETUP_PATH = "${S}/python/pythonmodule"
+
    :term:`DL_DIR`
       The central download directory used by the build process to store
       downloads. By default, ``DL_DIR`` gets files suitable for mirroring
@@ -2295,6 +2306,17 @@ system and gives an overview of their function and contents.
          # usermod -s /bin/sh tester; \
          # "
 
+      Additionally there is a special ``passwd-expire`` command that will
+      cause the password for a user to be expired and thus force changing it
+      on first login, for example::
+
+         EXTRA_USERS_PARAMS += " useradd myuser; passwd-expire myuser;"
+
+      .. note::
+
+         At present, ``passwd-expire`` may only work for remote logins when
+         using OpenSSH and not dropbear as an SSH server.
+
    :term:`FEATURE_PACKAGES`
       Defines one or more packages to include in an image when a specific
       item is included in :term:`IMAGE_FEATURES`.
@@ -2571,6 +2593,16 @@ system and gives an overview of their function and contents.
    :term:`FIT_HASH_ALG`
       Specifies the hash algorithm used in creating the FIT Image. For e.g. sha256.
 
+   :term:`FIT_KERNEL_COMP_ALG`
+      Compression algorithm to use for the kernel image inside the FIT Image.
+      At present, the only supported values are "gzip" (default) or "none"
+      If you set this variable to anything other than "none" you may also need
+      to set :term:`FIT_KERNEL_COMP_ALG_EXTENSION`.
+
+   :term:`FIT_KERNEL_COMP_ALG_EXTENSION`
+      File extension corresponding to :term:`FIT_KERNEL_COMP_ALG`. The default
+      value is ".gz".
+
    :term:`FIT_KEY_GENRSA_ARGS`
       Arguments to openssl genrsa for generating RSA private key for signing
       fitImage. The default value is "-F4". i.e. the public exponent 65537 to
@@ -2582,7 +2614,7 @@ system and gives an overview of their function and contents.
       and new for generating new keys.
 
    :term:`FIT_KEY_SIGN_PKCS`
-      Format for public key ceritifcate used in signing fitImage.
+      Format for public key certificate used in signing fitImage.
       The default value is "x509".
 
    :term:`FIT_SIGN_ALG`
@@ -2991,7 +3023,7 @@ system and gives an overview of their function and contents.
 
    :term:`IMAGE_CMD`
       Specifies the command to create the image file for a specific image
-      type, which corresponds to the value set set in
+      type, which corresponds to the value set in
       :term:`IMAGE_FSTYPES`, (e.g. ``ext3``,
       ``btrfs``, and so forth). When setting this variable, you should use
       an override for the associated type. Here is an example:
@@ -3449,7 +3481,7 @@ system and gives an overview of their function and contents.
 
          It is possible to define a list of licenses that are allowed to be
          used instead of the licenses that are excluded. To do this, define
-         a variable ``COMPATIBLE_LICENSES`` with the names of the licences
+         a variable ``COMPATIBLE_LICENSES`` with the names of the licenses
          that are allowed. Then define ``INCOMPATIBLE_LICENSE`` as:
          ::
 
@@ -3457,8 +3489,8 @@ system and gives an overview of their function and contents.
 
 
          This will result in ``INCOMPATIBLE_LICENSE`` containing the names of
-         all licences from :term:`AVAILABLE_LICENSES` except the ones specified
-         in ``COMPATIBLE_LICENSES`` , thus only allowing the latter licences to
+         all licenses from :term:`AVAILABLE_LICENSES` except the ones specified
+         in ``COMPATIBLE_LICENSES``, thus only allowing the latter licenses to
          be used.
 
    :term:`INHERIT`
@@ -4661,6 +4693,14 @@ system and gives an overview of their function and contents.
    :term:`MAINTAINER`
       The email address of the distribution maintainer.
 
+   :term:`METADATA_BRANCH`
+      The branch currently checked out for the OpenEmbedded-Core layer (path
+      determined by :term:`COREBASE`).
+
+   :term:`METADATA_REVISION`
+      The revision currently checked out for the OpenEmbedded-Core layer (path
+      determined by :term:`COREBASE`).
+
    :term:`MIRRORS`
       Specifies additional paths from which the OpenEmbedded build system
       gets source code. When the build system searches for source code, it
@@ -5011,7 +5051,7 @@ system and gives an overview of their function and contents.
          ${PN}-${PV}
 
    :term:`PACKAGE_ADD_METADATA`
-      This variable defines additional metdata to add to packages.
+      This variable defines additional metadata to add to packages.
 
       You may find you need to inject additional metadata into packages.
       This variable allows you to do that by setting the injected data as
@@ -5792,10 +5832,11 @@ system and gives an overview of their function and contents.
          exclusive alternative providers.
 
    :term:`PREFERRED_VERSION`
-      If multiple versions of recipes exist, this variable determines which
-      version is given preference. You must always suffix the variable with
-      the :term:`PN` you want to select, and you should set the
-      :term:`PV` accordingly for precedence.
+      If there are multiple versions of a recipe available, this variable
+      determines which version should be given preference. You must always
+      suffix the variable with the :term:`PN` you want to select (`python` in
+      the first example below), and you should specify the :term:`PV`
+      accordingly (`3.4.0` in the example).
 
       The ``PREFERRED_VERSION`` variable supports limited wildcard use
       through the "``%``" character. You can use the character to match any
@@ -5852,6 +5893,10 @@ system and gives an overview of their function and contents.
 
          The ``\_forcevariable`` override is not handled specially. This override
          only works because the default value of ``OVERRIDES`` includes "forcevariable".
+
+      If a recipe with the specified version is not available, a warning
+      message will be shown. See :term:`REQUIRED_VERSION` if you want this
+      to be an error instead.
 
    :term:`PREMIRRORS`
       Specifies additional paths from which the OpenEmbedded build system
@@ -6019,9 +6064,7 @@ system and gives an overview of their function and contents.
    :term:`PYTHON_ABI`
       When used by recipes that inherit the
       :ref:`distutils3 <ref-classes-distutils3>`,
-      :ref:`setuptools3 <ref-classes-setuptools3>`,
-      :ref:`distutils <ref-classes-distutils>`, or
-      :ref:`setuptools <ref-classes-setuptools>` classes, denotes the
+      :ref:`setuptools3 <ref-classes-setuptools3>` classes, denotes the
       Application Binary Interface (ABI) currently in use for Python. By
       default, the ABI is "m". You do not have to set this variable as the
       OpenEmbedded build system sets it for you.
@@ -6030,16 +6073,14 @@ system and gives an overview of their function and contents.
       names used when installing the Python headers and libraries in
       sysroot (e.g. ``.../python3.3m/...``).
 
-      Recipes that inherit the ``distutils`` class during cross-builds also
+      Recipes that inherit the ``distutils3`` class during cross-builds also
       use this variable to locate the headers and libraries of the
       appropriate Python that the extension is targeting.
 
    :term:`PYTHON_PN`
       When used by recipes that inherit the
       `distutils3 <ref-classes-distutils3>`,
-      :ref:`setuptools3 <ref-classes-setuptools3>`,
-      :ref:`distutils <ref-classes-distutils>`, or
-      :ref:`setuptools <ref-classes-setuptools>` classes, specifies the
+      :ref:`setuptools3 <ref-classes-setuptools3>` classes, specifies the
       major Python version being built. For Python 3.x, ``PYTHON_PN`` would
       be "python3". You do not have to set this variable as the
       OpenEmbedded build system automatically sets it for you.
@@ -6209,6 +6250,17 @@ system and gives an overview of their function and contents.
       appear in ``DISTRO_FEATURES`` within the current configuration, then
       the recipe will be skipped, and if the build system attempts to build
       the recipe then an error will be triggered.
+
+   :term:`REQUIRED_VERSION`
+      If there are multiple versions of a recipe available, this variable
+      determines which version should be given preference.
+      :term:`REQUIRED_VERSION` works in exactly the same manner as
+      :term:`PREFERRED_VERSION`, except that if the specified version is not
+      available then an error message is shown and the build fails
+      immediately.
+
+      If both :term:`REQUIRED_VERSION` and :term:`PREFERRED_VERSION` are set
+      for the same recipe, the :term:`REQUIRED_VERSION` value applies.
 
    :term:`RM_WORK_EXCLUDE`
       With ``rm_work`` enabled, this variable specifies a list of recipes
@@ -6482,6 +6534,11 @@ system and gives an overview of their function and contents.
    :term:`SDK_ARCH`
       The target architecture for the SDK. Typically, you do not directly
       set this variable. Instead, use :term:`SDKMACHINE`.
+
+   :term:`SDK_CUSTOM_TEMPLATECONF`
+      When building the extensible SDK, if ``SDK_CUSTOM_TEMPLATECONF`` is set to
+      "1" and a ``conf/templateconf.conf`` file exists in the build directory
+      (:term:`TOPDIR`) then this will be copied into the SDK.
 
    :term:`SDK_DEPLOY`
       The directory set up and used by the
@@ -6758,16 +6815,16 @@ system and gives an overview of their function and contents.
       Specifies the name of the SDK vendor.
 
    :term:`SDK_VERSION`
-      Specifies the version of the SDK. The distribution configuration file
-      (e.g. ``/meta-poky/conf/distro/poky.conf``) defines the
+      Specifies the version of the SDK. The Poky distribution configuration file
+      (``/meta-poky/conf/distro/poky.conf``) sets the default
       ``SDK_VERSION`` as follows:
       ::
 
-         SDK_VERSION = "${@d.getVar('DISTRO_VERSION').replace('snapshot-${DATE}','snapshot')}"
+         SDK_VERSION = "${@d.getVar('DISTRO_VERSION').replace('snapshot-${METADATA_REVISION}', 'snapshot')}"
 
       For additional information, see the
       :term:`DISTRO_VERSION` and
-      :term:`DATE` variables.
+      :term:`METADATA_REVISION` variables.
 
    :term:`SDKEXTPATH`
       The default installation directory for the Extensible SDK. By
@@ -7092,7 +7149,7 @@ system and gives an overview of their function and contents.
       -  ``git://`` - Fetches files from a Git revision control
          repository.
 
-      -  ``osc://`` - Fetches files from an OSC (OpenSUSE Build service)
+      -  ``osc://`` - Fetches files from an OSC (openSUSE Build service)
          revision control repository.
 
       -  ``repo://`` - Fetches files from a repo (Git) repository.

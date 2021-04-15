@@ -1,8 +1,8 @@
-Moving to the Yocto Project 1.7 Release
-=======================================
+Moving to the Yocto Project 1.7 Release (dizzy)
+===============================================
 
 This section provides migration information for moving to the Yocto
-Project 1.7 Release from the prior release.
+Project 1.7 Release (codename "dizzy") from the prior release.
 
 .. _migration-1.7-changes-to-setting-qemu-packageconfig-options:
 
@@ -12,7 +12,7 @@ Changes to Setting QEMU ``PACKAGECONFIG`` Options in ``local.conf``
 The QEMU recipe now uses a number of
 :term:`PACKAGECONFIG` options to enable various
 optional features. The method used to set defaults for these options
-means that existing ``local.conf`` files will need to be be modified to
+means that existing ``local.conf`` files will need to be modified to
 append to ``PACKAGECONFIG`` for ``qemu-native`` and ``nativesdk-qemu``
 instead of setting it. In other words, to enable graphical output for
 QEMU, you should now have these lines in ``local.conf``:

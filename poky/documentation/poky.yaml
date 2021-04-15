@@ -1,17 +1,17 @@
-DISTRO : "3.2.2"
+DISTRO : "3.2.3"
 DISTRO_NAME_NO_CAP : "gatesgarth"
 DISTRO_NAME : "Gatesgarth"
 DISTRO_NAME_NO_CAP_MINUS_ONE : "dunfell"
 DISTRO_NAME_NO_CAP_LTS : "dunfell"
-YOCTO_DOC_VERSION : "3.2.2"
+YOCTO_DOC_VERSION : "3.2.3"
 YOCTO_DOC_VERSION_MINUS_ONE : "3.1.6"
-DISTRO_REL_TAG : "yocto-3.2.2"
-POKYVERSION : "24.0.2"
+DISTRO_REL_TAG : "yocto-3.2.3"
+POKYVERSION : "24.0.3"
 YOCTO_POKY : "poky-&DISTRO_NAME_NO_CAP;-&POKYVERSION;"
 YOCTO_DL_URL : "https://downloads.yoctoproject.org"
 YOCTO_AB_URL : "https://autobuilder.yoctoproject.org"
 YOCTO_RELEASE_DL_URL : "&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;"
-UBUNTU_HOST_PACKAGES_ESSENTIAL : "gawk wget git-core diffstat unzip texinfo gcc-multilib \
+UBUNTU_HOST_PACKAGES_ESSENTIAL : "gawk wget git diffstat unzip texinfo gcc \
      build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
      xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
      pylint3 xterm python3-subunit mesa-common-dev"
@@ -40,3 +40,7 @@ CENTOS8_HOST_PACKAGES_ESSENTIAL : "-y epel-release
      python3-GitPython python3-jinja2 python3-pexpect xz which SDL-devel xterm \
      rpcgen mesa-libGL-devel"
 PIP3_HOST_PACKAGES_DOC : "$ sudo pip3 install sphinx sphinx_rtd_theme pyyaml"
+MIN_PYTHON_VERSION : "3.6.0"
+MIN_TAR_VERSION : "1.28"
+MIN_GIT_VERSION : "1.8.3.1"
+MIN_GCC_VERSION : "5.0"

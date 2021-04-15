@@ -1,8 +1,8 @@
-Moving to the Yocto Project 2.5 Release
-=======================================
+Moving to the Yocto Project 2.5 Release (sumo)
+==============================================
 
 This section provides migration information for moving to the Yocto
-Project 2.5 Release from the prior release.
+Project 2.5 Release (codename "sumo") from the prior release.
 
 .. _migration-2.5-packaging-changes:
 

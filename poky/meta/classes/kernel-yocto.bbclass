@@ -403,11 +403,11 @@ do_kernel_configme() {
 		*alldefconfig)
 			config_flags=""
 			;;
-	    *)
-		if [ -f ${WORKDIR}/defconfig ]; then
-			config_flags="-n"
-		fi
-	    ;;
+		*)
+			if [ -f ${WORKDIR}/defconfig ]; then
+				config_flags="-n"
+			fi
+			;;
 	esac
 
 	cd ${S}

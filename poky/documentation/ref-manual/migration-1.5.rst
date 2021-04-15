@@ -1,8 +1,8 @@
-Moving to the Yocto Project 1.5 Release
-=======================================
+Moving to the Yocto Project 1.5 Release (dora)
+==============================================
 
 This section provides migration information for moving to the Yocto
-Project 1.5 Release from the prior release.
+Project 1.5 Release (codename "dora") from the prior release.
 
 .. _migration-1.5-host-dependency-changes:
 
@@ -298,7 +298,7 @@ Removed and Renamed Recipes
 -  ``libtool-nativesdk`` has been renamed to ``nativesdk-libtool``.
 
 -  ``tinylogin`` has been removed. It has been replaced by a suid
-   portion of Busybox. See the "`BusyBox <#busybox>`__"
+   portion of Busybox. See the ":ref:`migration-1.5-busybox`"
    section for more information.
 
 -  ``external-python-tarball`` has been renamed to

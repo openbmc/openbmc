@@ -306,8 +306,8 @@ present, the toolchain is also automatically used.
       tarball by using the ``runqemu-extract-sdk`` command. After
       running the command, you must then point the ``runqemu`` script to
       the extracted directory instead of a root filesystem image file.
-      See the "`Running Under a Network File System (NFS)
-      Server <#qemu-running-under-a-network-file-system-nfs-server>`__"
+      See the
+      ":ref:`dev-manual/qemu:running under a network file system (nfs) server`"
       section for more information.
 
 QEMU Command-Line Syntax
@@ -452,7 +452,7 @@ command line:
    or "qemux86-64" QEMU architectures. For KVM with VHOST to work, the
    following conditions must be met:
 
-   -  `kvm <#kvm-cond>`__ option conditions must be met.
+   -  ``kvm`` option conditions defined above must be met.
 
    -  Your build host has to have virtio net device, which are
       ``/dev/vhost-net``.

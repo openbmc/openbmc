@@ -131,6 +131,7 @@ class QemuTarget(BaseTarget):
                             logfile = self.qemulog,
                             kernel = self.kernel,
                             boottime = int(d.getVar("TEST_QEMUBOOT_TIMEOUT")),
+                            tmpfsdir = d.getVar("RUNQEMU_TMPFS_DIR"),
                             logger = logger)
         else:
             self.runner = QemuRunner(machine=d.getVar("MACHINE"),
@@ -144,6 +145,7 @@ class QemuTarget(BaseTarget):
                             dump_dir = dump_dir,
                             dump_host_cmds = d.getVar("testimage_dump_host"),
                             logger = logger,
+                            tmpfsdir = d.getVar("RUNQEMU_TMPFS_DIR"),
                             serial_ports = len(d.getVar("SERIAL_CONSOLES").split()))
 
         self.target_dumper = TargetDumper(dump_target_cmds, dump_dir, self.runner)

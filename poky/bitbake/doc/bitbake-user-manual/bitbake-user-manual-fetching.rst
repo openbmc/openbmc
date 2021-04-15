@@ -441,6 +441,15 @@ Here are some example URLs: ::
    SRC_URI = "git://git.oe.handhelds.org/git/vip.git;tag=version-1"
    SRC_URI = "git://git.oe.handhelds.org/git/vip.git;protocol=http"
 
+.. note::
+
+   Specifying passwords directly in ``git://`` urls is not supported.
+   There are several reasons: ``SRC_URI`` is often written out to logs and
+   other places, and that could easily leak passwords; it is also all too
+   easy to share metadata without removing passwords. SSH keys, ``~/.netrc``
+   and ``~/.ssh/config`` files can be used as alternatives.
+
+
 .. _gitsm-fetcher:
 
 Git Submodule Fetcher (``gitsm://``)

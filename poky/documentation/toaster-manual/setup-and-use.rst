@@ -362,7 +362,7 @@ Perform the following steps to install Toaster:
 
       /etc/httpd/conf.d/toaster.conf
 
-    If you are using OpenSUSE, put it here::
+    If you are using openSUSE, put it here::
 
       /etc/apache2/conf.d/toaster.conf
 
@@ -380,13 +380,13 @@ Perform the following steps to install Toaster:
             Require all granted
          </IfModule>
       </Directory>
-    
+
       <Directory /var/www/toaster/poky/bitbake/lib/toaster/toastermain>
          <Files "wsgi.py">
             Require all granted
          </Files>
       </Directory>
-    
+
       WSGIDaemonProcess toaster_wsgi python-path=/var/www/toaster/poky/bitbake/lib/toaster:/var/www/toaster/.local/lib/python3.4/site-packages
       WSGIScriptAlias / "/var/www/toaster/poky/bitbake/lib/toaster/toastermain/wsgi.py"
       <Location />
@@ -402,7 +402,7 @@ Perform the following steps to install Toaster:
       $ chmod +x bitbake/lib/toaster/toastermain/wsgi.py
 
     Finally, restart Apache to make sure all new configuration is loaded. For Ubuntu,
-    Debian, and OpenSUSE use::
+    Debian, and openSUSE use::
 
       $ sudo service apache2 restart
 

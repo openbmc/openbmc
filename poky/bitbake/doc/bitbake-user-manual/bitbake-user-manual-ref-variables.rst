@@ -1096,8 +1096,8 @@ overview of their function and contents.
          PREFERRED_PROVIDER_aaa = "bbb"
 
    :term:`PREFERRED_VERSION`
-      If there are multiple versions of recipes available, this variable
-      determines which recipe should be given preference. You must always
+      If there are multiple versions of a recipe available, this variable
+      determines which version should be given preference. You must always
       suffix the variable with the :term:`PN` you want to
       select, and you should set :term:`PV` accordingly for
       precedence.
@@ -1116,6 +1116,10 @@ overview of their function and contents.
          The use of the " % " character is limited in that it only works at the
          end of the string. You cannot use the wildcard character in any other
          location of the string.
+
+      If a recipe with the specified version is not available, a warning
+      message will be shown. See :term:`REQUIRED_VERSION` if you want this
+      to be an error instead.
 
    :term:`PREMIRRORS`
       Specifies additional paths from which BitBake gets source code. When
@@ -1226,6 +1230,16 @@ overview of their function and contents.
    :term:`REPODIR`
       The directory in which a local copy of a ``google-repo`` directory is
       stored when it is synced.
+
+   :term:`REQUIRED_VERSION`
+      If there are multiple versions of a recipe available, this variable
+      determines which version should be given preference. ``REQUIRED_VERSION``
+      works in exactly the same manner as :term:`PREFERRED_VERSION`, except
+      that if the specified version is not available then an error message
+      is shown and the build fails immediately.
+
+      If both ``REQUIRED_VERSION`` and ``PREFERRED_VERSION`` are set for
+      the same recipe, the ``REQUIRED_VERSION`` value applies.
 
    :term:`RPROVIDES`
       A list of package name aliases that a package also provides. These

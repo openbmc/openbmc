@@ -176,8 +176,8 @@ image.
 You just need to follow these general steps:
 
 1. *Install the SDK for your target hardware:* For information on how to
-   install the SDK, see the "`Installing the
-   SDK <#sdk-installing-the-sdk>`__" section.
+   install the SDK, see the ":ref:`sdk-manual/using:installing the sdk`"
+   section.
 
 2. *Download or Build the Target Image:* The Yocto Project supports
    several target architectures and has many pre-built kernel images and

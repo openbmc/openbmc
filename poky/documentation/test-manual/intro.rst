@@ -26,7 +26,7 @@ engineers:
 
 -  *yocto-autobuilder2:* This
    :yocto_git:`README.md </yocto-autobuilder2/tree/README.md>`
-   is the main README which detials how to set up the Yocto Project
+   is the main README which details how to set up the Yocto Project
    Autobuilder. The ``yocto-autobuilder2`` repository represents the
    Yocto Project's console UI plugin to Buildbot and the configuration
    necessary to configure Buildbot to perform the testing the project
@@ -88,7 +88,7 @@ Yocto Project Tests - Types of Testing Overview
 ===============================================
 
 The Autobuilder tests different elements of the project by using
-thefollowing types of tests:
+the following types of tests:
 
 -  *Build Testing:* Tests whether specific configurations build by
    varying :term:`MACHINE`,
@@ -124,7 +124,7 @@ thefollowing types of tests:
    The tests utilize the ``testsdkext`` class and the ``do_testsdkext`` task.
 
 -  *Feature Testing:* Various scenario-based tests are run through the
-   :ref:`OpenEmbedded Self test (oe-selftest) <ref-manual/release-process:Testing and Quality Assurance>`. We test oe-selftest on each of the main distrubutions
+   :ref:`OpenEmbedded Self test (oe-selftest) <ref-manual/release-process:Testing and Quality Assurance>`. We test oe-selftest on each of the main distributions
    we support.
 
 -  *Image Testing:* Image tests initiated through the following command::
@@ -474,7 +474,7 @@ correctly. The test would only run if python3 is installed in the SDK.
 ----------------------
 
 The performance tests usually measure how long operations take and the
-resource utilisation as that happens. An example from
+resource utilization as that happens. An example from
 ``meta/lib/oeqa/buildperf/test_basic.py`` contains the following::
 
    class Test3(BuildPerfTestCase):
@@ -524,5 +524,5 @@ This is particularly true for oe-selftests since these can run in
 parallel and changing metadata leads to changing checksums, which
 confuses BitBake while running in parallel. If this is necessary, copy
 layers to a temporary location and modify them. Some tests need to
-change metadata, such as the devtool tests. To prevent the metadate from
+change metadata, such as the devtool tests. To protect the metadata from
 changes, set up temporary copies of that data first.

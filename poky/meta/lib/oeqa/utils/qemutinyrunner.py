@@ -19,7 +19,7 @@ from .qemurunner import QemuRunner
 
 class QemuTinyRunner(QemuRunner):
 
-    def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, kernel, boottime, logger):
+    def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, kernel, boottime, logger, tmpfsdir=None):
 
         # Popen object for runqemu
         self.runqemu = None
@@ -37,6 +37,7 @@ class QemuTinyRunner(QemuRunner):
         self.deploy_dir_image = deploy_dir_image
         self.logfile = logfile
         self.boottime = boottime
+        self.tmpfsdir = tmpfsdir
 
         self.runqemutime = 60
         self.socketfile = "console.sock"
@@ -83,6 +84,9 @@ class QemuTinyRunner(QemuRunner):
             return False
         else:
             os.environ["DEPLOY_DIR_IMAGE"] = self.deploy_dir_image
+        if self.tmpfsdir:
+            env["RUNQEMU_TMPFS_DIR"] = self.tmpfsdir
+
 
         # Set this flag so that Qemu doesn't do any grabs as SDL grabs interact
         # badly with screensavers.

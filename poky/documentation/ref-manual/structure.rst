@@ -168,7 +168,7 @@ possible targets to build. Here is an example:
        meta-toolchain
        meta-ide-support
 
-   You can also run generated qemu images with a command like 'runqemu qemux86-64'
+   You can also run generated QEMU images with a command like 'runqemu qemux86-64'
 
 The default output of the ``oe-init-build-env`` script is from the
 ``conf-notes.txt`` file, which is found in the ``meta-poky`` directory

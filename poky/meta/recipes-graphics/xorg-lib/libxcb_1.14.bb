@@ -19,7 +19,7 @@ BBCLASSEXTEND = "native nativesdk"
 
 DEPENDS = "xcb-proto xorgproto libxau libpthread-stubs libxdmcp"
 
-PACKAGES_DYNAMIC = "^libxcb-.*"
+PACKAGES_DYNAMIC = "^${PN}-.*"
 
 FILES_${PN} = "${libdir}/libxcb.so.*"
 
@@ -35,5 +35,5 @@ do_install_append () {
 }
 
 python populate_packages_prepend () {
-    do_split_packages(d, '${libdir}', r'^libxcb-(.*)\.so\..*$', 'libxcb-%s', 'XCB library module for %s', allow_links=True)
+    do_split_packages(d, '${libdir}', r'^libxcb-(.*)\.so\..*$', '${PN}-%s', 'XCB library module for %s', allow_links=True)
 }

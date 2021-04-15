@@ -155,8 +155,8 @@ Follow these general steps to create your layer without using tools:
 5. *Optionally Test for Compatibility:* If you want permission to use
    the Yocto Project Compatibility logo with your layer or application
    that uses your layer, perform the steps to apply for compatibility.
-   See the "`Making Sure Your Layer is Compatible With Yocto
-   Project <#making-sure-your-layer-is-compatible-with-yocto-project>`__"
+   See the
+   ":ref:`dev-manual/common-tasks:making sure your layer is compatible with yocto project`"
    section for more information.
 
 Following Best Practices When Creating Layers
@@ -282,9 +282,8 @@ following list:
 -  *Perform Steps to Apply for Yocto Project Compatibility:* If you want
    permission to use the Yocto Project Compatibility logo with your
    layer or application that uses your layer, perform the steps to apply
-   for compatibility. See the "`Making Sure Your Layer is Compatible
-   With Yocto
-   Project <#making-sure-your-layer-is-compatible-with-yocto-project>`__"
+   for compatibility. See the
+   ":ref:`dev-manual/common-tasks:making sure your layer is compatible with yocto project`"
    section for more information.
 
 -  *Follow the Layer Naming Convention:* Store custom layers in a Git
@@ -1247,8 +1246,7 @@ the recipe.
    your layer such that it can be found.
 
    You can find more information on how layers are structured in the
-   "`Understanding and Creating
-   Layers <#understanding-and-creating-layers>`__" section.
+   ":ref:`dev-manual/common-tasks:understanding and creating layers`" section.
 
 -  *Naming Your Recipe:* When you name your recipe, you need to follow
    this naming convention:
@@ -1364,7 +1362,7 @@ extension (e.g. ``.tar``, ``.tar.gz``, ``.tar.bz2``, ``.zip``, and so
 forth), are automatically extracted during the
 :ref:`ref-tasks-unpack` task. For
 another example that specifies these types of files, see the
-"`Autotooled Package <#new-recipe-autotooled-package>`__" section.
+":ref:`dev-manual/common-tasks:autotooled package`" section.
 
 Another way of specifying source is from an SCM. For Git repositories,
 you must specify :term:`SRCREV` and
@@ -1445,15 +1443,14 @@ and searches specific directories in a certain order:
 ``${``\ :term:`BPN`\ ``}``, and
 ``files``. The directories are assumed to be subdirectories of the
 directory in which the recipe or append file resides. For another
-example that specifies these types of files, see the "`Single .c File
-Package (Hello
-World!) <#new-recipe-single-c-file-package-hello-world>`__" section.
+example that specifies these types of files, see the
+":ref:`dev-manual/common-tasks:single .c file package (hello world!)`" section.
 
 The previous example also specifies a patch file. Patch files are files
 whose names usually end in ``.patch`` or ``.diff`` but can end with
 compressed suffixes such as ``diff.gz`` and ``patch.bz2``, for example.
 The build system automatically applies patches as described in the
-"`Patching Code <#new-recipe-patching-code>`__" section.
+":ref:`dev-manual/common-tasks:patching code`" section.
 
 Unpacking Code
 --------------
@@ -1543,7 +1540,7 @@ variables:
    appropriate files in the ``LIC_FILES_CHKSUM`` variable with incorrect
    md5 strings, attempt to build the software, and then note the
    resulting error messages that will report the correct md5 strings.
-   See the "`Fetching Code <#new-recipe-fetching-code>`__" section for
+   See the ":ref:`dev-manual/common-tasks:fetching code`" section for
    additional information.
 
    Here is an example that assumes the software has a ``COPYING`` file:
@@ -1787,8 +1784,8 @@ Here are some common issues that cause failures.
 
       PARALLEL_MAKE = ""
 
-   For information on parallel Makefile issues, see the "`Debugging
-   Parallel Make Races <#debugging-parallel-make-races>`__" section.
+   For information on parallel Makefile issues, see the
+   ":ref:`dev-manual/common-tasks:debugging parallel make races`" section.
 
 -  *Improper host path usage:* This failure applies to recipes building
    for the target or ``nativesdk`` only. The failure occurs when the
@@ -1854,8 +1851,7 @@ the software being built:
    ``PREFIX=${D}``, ``INSTALLROOT=${D}``, and so forth).
 
    For an example recipe using ``make install``, see the
-   "`Makefile-Based Package <#new-recipe-makefile-based-package>`__"
-   section.
+   ":ref:`dev-manual/common-tasks:makefile-based package`" section.
 
 -  *Manual:* You need to define a ``do_install`` function in your
    recipe. The function must first use ``install -d`` to create the
@@ -1990,14 +1986,13 @@ take. The following list describes the process:
    ``do_install(_append)``, and so forth as needed.
 
 -  *Splitting an Application into Multiple Packages*: If you need to
-   split an application into several packages, see the "`Splitting an
-   Application into Multiple
-   Packages <#splitting-an-application-into-multiple-packages>`__"
+   split an application into several packages, see the
+   ":ref:`dev-manual/common-tasks:splitting an application into multiple packages`"
    section for an example.
 
 -  *Installing a Post-Installation Script*: For an example showing how
-   to install a post-installation script, see the "`Post-Installation
-   Scripts <#new-recipe-post-installation-scripts>`__" section.
+   to install a post-installation script, see the
+   ":ref:`dev-manual/common-tasks:post-installation scripts`" section.
 
 -  *Marking Package Architecture*: Depending on what your recipe is
    building and how it is configured, it might be important to mark the
@@ -2061,16 +2056,12 @@ sysroot are cataloged in manifests in order to ensure the files can be
 removed later when a recipe is either modified or removed. Thus, the
 sysroot is able to remain free from stale files.
 
-A subset of the files installed by the
-:ref:`ref-tasks-install` task are
-used by the
-:ref:`ref-tasks-populate_sysroot`
-task as defined by the the
-:term:`SYSROOT_DIRS` variable to
-automatically populate the sysroot. It is possible to modify the list of
-directories that populate the sysroot. The following example shows how
-you could add the ``/opt`` directory to the list of directories within a
-recipe:
+A subset of the files installed by the :ref:`ref-tasks-install` task are
+used by the :ref:`ref-tasks-populate_sysroot` task as defined by the the
+:term:`SYSROOT_DIRS` variable to automatically populate the sysroot. It
+is possible to modify the list of directories that populate the sysroot.
+The following example shows how you could add the ``/opt`` directory to
+the list of directories within a recipe:
 ::
 
    SYSROOT_DIRS += "/opt"
@@ -2081,8 +2072,7 @@ recipe:
    that are not included in the target filesystem, allowing them to share
    these artifacts without needing to use the ``DEPLOY_DIR``.
 
-For a more complete description of the
-:ref:`ref-tasks-populate_sysroot`
+For a more complete description of the :ref:`ref-tasks-populate_sysroot`
 task and its associated functions, see the
 :ref:`staging <ref-classes-staging>` class.
 
@@ -2177,9 +2167,8 @@ Properly Versioning Pre-Release Recipes
 Sometimes the name of a recipe can lead to versioning problems when the
 recipe is upgraded to a final release. For example, consider the
 ``irssi_0.8.16-rc1.bb`` recipe file in the list of example recipes in
-the "`Storing and Naming the
-Recipe <#new-recipe-storing-and-naming-the-recipe>`__" section. This
-recipe is at a release candidate stage (i.e. "rc1"). When the recipe is
+the ":ref:`dev-manual/common-tasks:storing and naming the recipe`" section.
+This recipe is at a release candidate stage (i.e. "rc1"). When the recipe is
 released, the recipe filename becomes ``irssi_0.8.16.bb``. The version
 change from ``0.8.16-rc1`` to ``0.8.16`` is seen as a decrease by the
 build system and package managers, so the resulting packages will not
@@ -2263,8 +2252,7 @@ software you built runs correctly. To accomplish runtime testing, add
 the build's output packages to your image and test them on the target.
 
 For information on how to customize your image by adding specific
-packages, see the "`Customizing
-Images <#usingpoky-extend-customimage>`__" section.
+packages, see ":ref:`dev-manual/common-tasks:customizing images`" section.
 
 Examples
 --------
@@ -2314,8 +2302,8 @@ directory BitBake uses for the build.
 
 By default, the ``helloworld``, ``helloworld-dbg``, and
 ``helloworld-dev`` packages are built. For information on how to
-customize the packaging process, see the "`Splitting an Application into
-Multiple Packages <#splitting-an-application-into-multiple-packages>`__"
+customize the packaging process, see the
+":ref:`dev-manual/common-tasks:splitting an application into multiple packages`"
 section.
 
 Autotooled Package
@@ -3428,9 +3416,8 @@ Follow these general steps:
 1. *Find the Source Code:* Temporary source code used by the
    OpenEmbedded build system is kept in the
    :term:`Build Directory`. See the
-   "`Finding Temporary Source
-   Code <#finding-the-temporary-source-code>`__" section to learn how to
-   locate the directory that has the temporary source code for a
+   ":ref:`dev-manual/common-tasks:finding temporary source code`" section to
+   learn how to locate the directory that has the temporary source code for a
    particular package.
 
 2. *Change Your Working Directory:* You need to be in the directory that
@@ -3999,24 +3986,21 @@ perform to create distributions with smaller root filesystems, achieve
 faster boot times, maintain your critical functionality, and avoid
 initial RAM disks:
 
--  `Determine your goals and guiding
-   principles. <#goals-and-guiding-principles>`__
+-  :ref:`Determine your goals and guiding principles
+   <dev-manual/common-tasks:goals and guiding principles>`
 
--  `Understand what contributes to your image
-   size. <#understand-what-gives-your-image-size>`__
+-  :ref:`dev-manual/common-tasks:understand what contributes to your image size`
 
--  `Reduce the size of the root
-   filesystem. <#trim-the-root-filesystem>`__
+-  :ref:`Reduce the size of the root filesystem
+   <dev-manual/common-tasks:trim the root filesystem>`
 
--  `Reduce the size of the kernel. <#trim-the-kernel>`__
+-  :ref:`Reduce the size of the kernel <dev-manual/common-tasks:trim the kernel>`
 
--  `Eliminate packaging
-   requirements. <#remove-package-management-requirements>`__
+-  :ref:`dev-manual/common-tasks:remove package management requirements`
 
--  `Look for other ways to minimize
-   size. <#look-for-other-ways-to-minimize-size>`__
+-  :ref:`dev-manual/common-tasks:look for other ways to minimize size`
 
--  `Iterate on the process. <#iterate-on-the-process>`__
+-  :ref:`dev-manual/common-tasks:iterate on the process`
 
 Goals and Guiding Principles
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4036,8 +4020,8 @@ very small distributions:
 -  Leverage the device-specific options.
 
 -  Work in a separate layer so that you keep changes isolated. For
-   information on how to create layers, see the "`Understanding and
-   Creating Layers <#understanding-and-creating-layers>`__" section.
+   information on how to create layers, see the
+   ":ref:`dev-manual/common-tasks:understanding and creating layers`" section.
 
 Understand What Contributes to Your Image Size
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4581,17 +4565,17 @@ directory:
       If you do have recipes that use ``AUTOREV``, you can take steps to
       still use the recipes in an offline build. Do the following:
 
-      1. Use a configuration generated by enabling `build
-         history <#maintaining-build-output-quality>`__.
+      1. Use a configuration generated by enabling :ref:`build
+         history <dev-manual/common-tasks:maintaining build output quality>`.
 
       2. Use the ``buildhistory-collect-srcrevs`` command to collect the
          stored ``SRCREV`` values from the build's history. For more
-         information on collecting these values, see the "`Build History
-         Package Information <#build-history-package-information>`__"
+         information on collecting these values, see the
+         ":ref:`dev-manual/common-tasks:build history package information`"
          section.
 
       3. Once you have the correct source revisions, you can modify
-         those recipes to to set ``SRCREV`` to specific versions of the
+         those recipes to set ``SRCREV`` to specific versions of the
          software.
 
 Speeding Up a Build
@@ -4711,16 +4695,16 @@ Libraries are an integral part of your system. This section describes
 some common practices you might find helpful when working with libraries
 to build your system:
 
--  `How to include static library
-   files <#including-static-library-files>`__
+-  :ref:`How to include static library files
+   <dev-manual/common-tasks:including static library files>`
 
--  `How to use the Multilib feature to combine multiple versions of
-   library files into a single
-   image <#combining-multiple-versions-library-files-into-one-image>`__
+-  :ref:`How to use the Multilib feature to combine multiple versions of
+   library files into a single image
+   <dev-manual/common-tasks:combining multiple versions of library files into one image>`
 
--  `How to install multiple versions of the same library in parallel on
-   the same
-   system <#installing-multiple-versions-of-the-same-library>`__
+-  :ref:`How to install multiple versions of the same library in parallel on
+   the same system
+   <dev-manual/common-tasks:installing multiple versions of the same library>`
 
 Including Static Library Files
 ------------------------------
@@ -5058,7 +5042,7 @@ because the library is produced for the target architecture, but its
 code needs to be executed on the build host. This problem is solved with
 the OpenEmbedded build system by running the code through QEMU, which
 allows precisely that. Unfortunately, QEMU does not always work
-perfectly as mentioned in the "`Known Issues <#known-issues>`__"
+perfectly as mentioned in the ":ref:`dev-manual/common-tasks:known issues`"
 section.
 
 Enabling the Generation of Introspection Data
@@ -5230,11 +5214,11 @@ OpenEmbedded build artifacts. Image generation is driven by partitioning
 commands contained in an Openembedded kickstart file (``.wks``)
 specified either directly on the command line or as one of a selection
 of canned kickstart files as shown with the ``wic list images`` command
-in the "`Using an Existing Kickstart
-File <#using-a-provided-kickstart-file>`__" section. When you apply the
-command to a given set of build artifacts, the result is an image or set
-of images that can be directly written onto media and used on a
-particular system.
+in the
+":ref:`dev-manual/common-tasks:generate an image using an existing kickstart file`"
+section. When you apply the command to a given set of build artifacts, the
+result is an image or set of images that can be directly written onto media and
+used on a particular system.
 
 .. note::
 
@@ -5245,8 +5229,8 @@ particular system.
 The ``wic`` command and the infrastructure it is based on is by
 definition incomplete. The purpose of the command is to allow the
 generation of customized images, and as such, was designed to be
-completely extensible through a plugin interface. See the "`Using the
-Wic PlugIn Interface <#wic-using-the-wic-plugin-interface>`__" section
+completely extensible through a plugin interface. See the
+":ref:`dev-manual/common-tasks:using the wic plugin interface`" section
 for information on these plugins.
 
 This section provides some background information on Wic, describes what
@@ -5362,7 +5346,7 @@ command to return the available Wic images as follows:
      genericx86                    		Create an EFI disk image for genericx86*
      beaglebone-yocto              		Create SD card image for Beaglebone
      edgerouter                    		Create SD card image for Edgerouter
-     qemux86-directdisk            		Create a qemu machine 'pcbios' direct disk image
+     qemux86-directdisk            		Create a QEMU machine 'pcbios' direct disk image
      directdisk-gpt                		Create a 'pcbios' direct disk image
      mkefidisk                     		Create an EFI disk image
      directdisk                    		Create a 'pcbios' direct disk image
@@ -5509,7 +5493,7 @@ Use the following command to list the available kickstart files:
      genericx86                    		Create an EFI disk image for genericx86*
      beaglebone-yocto              		Create SD card image for Beaglebone
      edgerouter                    		Create SD card image for Edgerouter
-     qemux86-directdisk            		Create a qemu machine 'pcbios' direct disk image
+     qemux86-directdisk            		Create a QEMU machine 'pcbios' direct disk image
      directdisk-gpt                		Create a 'pcbios' direct disk image
      mkefidisk                     		Create an EFI disk image
      directdisk                    		Create a 'pcbios' direct disk image
@@ -5683,7 +5667,7 @@ Wic Examples
 
 This section provides several examples that show how to use the Wic
 utility. All the examples assume the list of requirements in the
-"`Requirements <#wic-requirements>`__" section have been met. The
+":ref:`dev-manual/common-tasks:requirements`" section have been met. The
 examples assume the previously generated image is
 ``core-image-minimal``.
 
@@ -6098,8 +6082,7 @@ more secure:
 
 -  Ensure you remove or disable debugging functionality before producing
    the final image. For information on how to do this, see the
-   "`Considerations Specific to the OpenEmbedded Build
-   System <#considerations-specific-to-the-openembedded-build-system>`__"
+   ":ref:`dev-manual/common-tasks:considerations specific to the openembedded build system`"
    section.
 
 -  Ensure you have no network services listening that are not needed.
@@ -6280,17 +6263,17 @@ layer. The following steps provide some more detail:
       distro-specific configuration files that are included by an
       existing recipe, you should add an append file (``.bbappend``) for
       those. For general information and recommendations on how to add
-      recipes to your layer, see the "`Creating Your Own
-      Layer <#creating-your-own-layer>`__" and "`Following Best
-      Practices When Creating
-      Layers <#best-practices-to-follow-when-creating-layers>`__"
+      recipes to your layer, see the
+      ":ref:`dev-manual/common-tasks:creating your own layer`" and
+      ":ref:`dev-manual/common-tasks:following best practices when creating layers`"
       sections.
 
    -  Add any image recipes that are specific to your distribution.
 
    -  Add a ``psplash`` append file for a branded splash screen. For
-      information on append files, see the "`Using .bbappend Files in
-      Your Layer <#using-bbappend-files>`__" section.
+      information on append files, see the
+      ":ref:`dev-manual/common-tasks:using .bbappend files in your layer`"
+      section.
 
    -  Add any other append files to make custom changes that are
       specific to individual recipes.
@@ -6388,29 +6371,22 @@ Working with Packages
 
 This section describes a few tasks that involve packages:
 
--  `Excluding packages from an
-   image <#excluding-packages-from-an-image>`__
+-  :ref:`dev-manual/common-tasks:excluding packages from an image`
 
--  `Incrementing a binary package
-   version <#incrementing-a-binary-package-version>`__
+-  :ref:`dev-manual/common-tasks:incrementing a package version`
 
--  `Handling optional module
-   packaging <#handling-optional-module-packaging>`__
+-  :ref:`dev-manual/common-tasks:handling optional module packaging`
 
--  `Using runtime package
-   management <#using-runtime-package-management>`__
+-  :ref:`dev-manual/common-tasks:using runtime package management`
 
--  `Generating and using signed
-   packages <#generating-and-using-signed-packages>`__
+-  :ref:`dev-manual/common-tasks:generating and using signed packages`
 
--  `Setting up and running package test
-   (ptest) <#testing-packages-with-ptest>`__
+-  :ref:`Setting up and running package test
+   (ptest) <dev-manual/common-tasks:testing packages with ptest>`
 
--  `Creating node package manager (NPM)
-   packages <#creating-node-package-manager-npm-packages>`__
+-  :ref:`dev-manual/common-tasks:creating node package manager (npm) packages`
 
--  `Adding custom metadata to
-   packages <#adding-custom-metadata-to-packages>`__
+-  :ref:`dev-manual/common-tasks:adding custom metadata to packages`
 
 Excluding Packages from an Image
 --------------------------------
@@ -6499,9 +6475,8 @@ much preferred over a manual system. In either system, the main
 requirement is that binary package version numbering increases in a
 linear fashion and that a number of version components exist that
 support that linear progression. For information on how to ensure
-package revisioning remains linear, see the "`Automatically Incrementing
-a Binary Package Revision
-Number <#automatically-incrementing-a-binary-package-revision-number>`__"
+package revisioning remains linear, see the
+":ref:`dev-manual/common-tasks:automatically incrementing a package version number`"
 section.
 
 The following three sections provide related information on the PR
@@ -6592,14 +6567,14 @@ each building system's ``local.conf`` file:
    BUILDHISTORY_COMMIT = "1"
 
 For information on build
-history, see the "`Maintaining Build Output
-Quality <#maintaining-build-output-quality>`__" section.
+history, see the
+":ref:`dev-manual/common-tasks:maintaining build output quality`" section.
 
 .. note::
 
    The OpenEmbedded build system does not maintain ``PR`` information as
    part of the shared state (sstate) packages. If you maintain an sstate
-   feed, its expected that either all your building systems that
+   feed, it's expected that either all your building systems that
    contribute to the sstate feed use a shared PR Service, or you do not
    run a PR Service on any of your building systems. Having some systems
    use a PR Service while others do not leads to obvious problems.
@@ -7070,7 +7045,7 @@ runtime package management of RPM packages. In order to use DNF for
 runtime package management, you must perform an initial setup on the
 target machine for cases where the ``PACKAGE_FEED_*`` variables were not
 set as part of the image that is running on the target. This means if
-you built your image and did not not use these variables as part of the
+you built your image and did not use these variables as part of the
 build and your image is now running on the target, you need to perform
 the steps in this section if you want to use runtime package management.
 
@@ -8522,7 +8497,7 @@ In order to run tests, you need to do the following:
 
    -  Ubuntu and Debian: ``sysstat`` and ``iproute2``
 
-   -  OpenSUSE: ``sysstat`` and ``iproute2``
+   -  openSUSE: ``sysstat`` and ``iproute2``
 
    -  Fedora: ``sysstat`` and ``iproute``
 
@@ -8596,8 +8571,8 @@ options exist:
    it the same IP address for each reboot.
 
    If you choose "SystemdbootTarget", there are additional requirements
-   and considerations. See the "`Selecting
-   SystemdbootTarget <#selecting-systemdboottarget>`__" section, which
+   and considerations. See the
+   ":ref:`dev-manual/common-tasks:selecting systemdboottarget`" section, which
    follows, for more information.
 
 -  *"BeagleBoneTarget":* Choose "BeagleBoneTarget" if you are deploying
@@ -8629,7 +8604,7 @@ Selecting SystemdbootTarget
 
 If you did not set ``TEST_TARGET`` to "SystemdbootTarget", then you do
 not need any information in this section. You can skip down to the
-"`Running Tests <#qemu-image-running-tests>`__" section.
+":ref:`dev-manual/common-tasks:running tests`" section.
 
 If you did set ``TEST_TARGET`` to "SystemdbootTarget", you also need to
 perform a one-time setup of your master image by doing the following:
@@ -8648,7 +8623,7 @@ perform a one-time setup of your master image by doing the following:
 
    -  Inherits ``core-image`` so that kernel modules are installed.
 
-   -  Installs normal linux utilities not busybox ones (e.g. ``bash``,
+   -  Installs normal linux utilities not BusyBox ones (e.g. ``bash``,
       ``coreutils``, ``tar``, ``gzip``, and ``kmod``).
 
    -  Uses a custom Initial RAM Disk (initramfs) image with a custom
@@ -9095,13 +9070,11 @@ situations.
 The following list shows the debugging topics in the remainder of this
 section:
 
--  "`Viewing Logs from Failed
-   Tasks <#dev-debugging-viewing-logs-from-failed-tasks>`__" describes
+-  ":ref:`dev-manual/common-tasks:viewing logs from failed tasks`" describes
    how to find and view logs from tasks that failed during the build
    process.
 
--  "`Viewing Variable
-   Values <#dev-debugging-viewing-variable-values>`__" describes how to
+-  ":ref:`dev-manual/common-tasks:viewing variable values`" describes how to
    use the BitBake ``-e`` option to examine variable values after a
    recipe has been parsed.
 
@@ -9110,51 +9083,47 @@ section:
    :term:`PKGDATA_DIR` and
    display package-related information for built packages.
 
--  "`Viewing Dependencies Between Recipes and
-   Tasks <#dev-viewing-dependencies-between-recipes-and-tasks>`__"
+-  ":ref:`dev-manual/common-tasks:viewing dependencies between recipes and tasks`"
    describes how to use the BitBake ``-g`` option to display recipe
    dependency information used during the build.
 
--  "`Viewing Task Variable
-   Dependencies <#dev-viewing-task-variable-dependencies>`__" describes
+-  ":ref:`dev-manual/common-tasks:viewing task variable dependencies`" describes
    how to use the ``bitbake-dumpsig`` command in conjunction with key
    subdirectories in the
    :term:`Build Directory` to determine
    variable dependencies.
 
--  "`Running Specific Tasks <#dev-debugging-taskrunning>`__" describes
+-  ":ref:`dev-manual/common-tasks:running specific tasks`" describes
    how to use several BitBake options (e.g. ``-c``, ``-C``, and ``-f``)
    to run specific tasks in the build chain. It can be useful to run
    tasks "out-of-order" when trying isolate build issues.
 
--  "`General BitBake Problems <#dev-debugging-bitbake>`__" describes how
+-  ":ref:`dev-manual/common-tasks:general bitbake problems`" describes how
    to use BitBake's ``-D`` debug output option to reveal more about what
    BitBake is doing during the build.
 
--  "`Building with No Dependencies <#dev-debugging-buildfile>`__"
+-  ":ref:`dev-manual/common-tasks:building with no dependencies`"
    describes how to use the BitBake ``-b`` option to build a recipe
    while ignoring dependencies.
 
--  "`Recipe Logging Mechanisms <#recipe-logging-mechanisms>`__"
+-  ":ref:`dev-manual/common-tasks:recipe logging mechanisms`"
    describes how to use the many recipe logging functions to produce
    debugging output and report errors and warnings.
 
--  "`Debugging Parallel Make Races <#debugging-parallel-make-races>`__"
+-  ":ref:`dev-manual/common-tasks:debugging parallel make races`"
    describes how to debug situations where the build consists of several
    parts that are run simultaneously and when the output or result of
    one part is not ready for use with a different part of the build that
    depends on that output.
 
--  "`Debugging With the GNU Project Debugger (GDB)
-   Remotely <#platdev-gdb-remotedebug>`__" describes how to use GDB to
-   allow you to examine running programs, which can help you fix
-   problems.
+-  ":ref:`dev-manual/common-tasks:debugging with the gnu project debugger (gdb) remotely`"
+   describes how to use GDB to allow you to examine running programs, which can
+   help you fix problems.
 
--  "`Debugging with the GNU Project Debugger (GDB) on the
-   Target <#debugging-with-the-gnu-project-debugger-gdb-on-the-target>`__"
+-  ":ref:`dev-manual/common-tasks:debugging with the gnu project debugger (gdb) on the target`"
    describes how to use GDB directly on target hardware for debugging.
 
--  "`Other Debugging Tips <#dev-other-debugging-others>`__" describes
+-  ":ref:`dev-manual/common-tasks:other debugging tips`" describes
    miscellaneous debugging tips that can be useful.
 
 Viewing Logs from Failed Tasks
@@ -9462,8 +9431,8 @@ state (sstate) task can be a useful debugging aid. This information is
 available in signature information (``siginfo``) files in
 :term:`SSTATE_DIR`. For
 information on how to view and interpret information in ``siginfo``
-files, see the "`Viewing Task Variable
-Dependencies <#dev-viewing-task-variable-dependencies>`__" section.
+files, see the
+":ref:`dev-manual/common-tasks:viewing task variable dependencies`" section.
 
 For conceptual information on shared state, see the
 ":ref:`overview-manual/concepts:shared state`"
@@ -9882,9 +9851,8 @@ Once the local build for "neard" completes, start a ``devshell`` build:
 
    $ bitbake neard -c devshell
 
-For information on how to use a
-``devshell``, see the "`Using a Development
-Shell <#platdev-appdev-devshell>`__" section.
+For information on how to use a ``devshell``, see the
+":ref:`dev-manual/common-tasks:using a development shell`" section.
 
 In the ``devshell``, do the following:
 ::
@@ -9926,7 +9894,7 @@ to patch the ``Makefile.am`` file, which is generated from
    File Makefile.am added to patch patches/parallelmake.patch
 
 For more information on using Quilt, see the
-"`Using Quilt in Your Workflow <#using-a-quilt-workflow>`__" section.
+":ref:`dev-manual/common-tasks:using quilt in your workflow`" section.
 
 At this point you need to make the edits to ``Makefile.am`` to add the
 missing dependency. For our example, you have to add the following line
@@ -9992,9 +9960,9 @@ The build should work without issue.
 
 As with all solved problems, if they originated upstream, you need to
 submit the fix for the recipe in OE-Core and upstream so that the
-problem is taken care of at its source. See the "`Submitting a Change to
-the Yocto Project <#how-to-submit-a-change>`__" section for more
-information.
+problem is taken care of at its source. See the
+":ref:`dev-manual/common-tasks:submitting a change to the yocto project`"
+section for more information.
 
 Debugging With the GNU Project Debugger (GDB) Remotely
 ------------------------------------------------------
@@ -10368,8 +10336,9 @@ Here are some other tips that you might find useful:
    :yocto_bugs:`Bugzilla <>`. For information on
    how to submit a bug against the Yocto Project, see the Yocto Project
    Bugzilla :yocto_wiki:`wiki page </Bugzilla_Configuration_and_Bug_Tracking>`
-   and the "`Submitting a Defect Against the Yocto
-   Project <#submitting-a-defect-against-the-yocto-project>`__" section.
+   and the
+   ":ref:`dev-manual/common-tasks:submitting a defect against the yocto project`"
+   section.
 
    .. note::
 
@@ -10624,8 +10593,9 @@ Using Email to Submit a Patch
 
 Depending on the components changed, you need to submit the email to a
 specific mailing list. For some guidance on which mailing list to use,
-see the `list <#figuring-out-the-mailing-list-to-use>`__ at the
-beginning of this section. For a description of all the available
+see the
+:ref:`list <dev-manual/common-tasks:submitting a change to the yocto project>`
+at the beginning of this section. For a description of all the available
 mailing lists, see the ":ref:`Mailing Lists <resources-mailinglist>`" section in the
 Yocto Project Reference Manual.
 
@@ -11039,7 +11009,7 @@ file. For example, to enable the
 ``poky/meta/recipes-multimedia/gstreamer/gst-plugins-ugly`` package, you
 could add either the string "commercial_gst-plugins-ugly" or the more
 general string "commercial" to ``LICENSE_FLAGS_WHITELIST``. See the
-"`License Flag Matching <#license-flag-matching>`__" section for a full
+":ref:`dev-manual/common-tasks:license flag matching`" section for a full
 explanation of how ``LICENSE_FLAGS`` matching works. Here is the
 example:
 ::

@@ -1,8 +1,8 @@
-Moving to the Yocto Project 1.6 Release
-=======================================
+Moving to the Yocto Project 1.6 Release (daisy)
+===============================================
 
 This section provides migration information for moving to the Yocto
-Project 1.6 Release from the prior release.
+Project 1.6 Release (codename "daisy") from the prior release.
 
 .. _migration-1.6-archiver-class:
 

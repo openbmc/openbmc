@@ -2457,6 +2457,9 @@ class RunQueueExecute:
                 if dep in self.scenequeue_covered or dep in self.scenequeue_notcovered:
                     # dependency could be already processed, e.g. noexec setscene task
                     continue
+                noexec, stamppresent = check_setscene_stamps(dep, self.rqdata, self.rq, self.stampcache)
+                if noexec or stamppresent:
+                    continue
                 logger.debug2("%s was unavailable and is a hard dependency of %s so skipping" % (task, dep))
                 self.sq_task_failoutright(dep)
                 continue
@@ -2795,6 +2798,26 @@ def build_scenequeue_data(sqdata, rqdata, rq, cooker, stampcache, sqrq):
         event = bb.event.StaleSetSceneTasks(found[mc])
         bb.event.fire(event, cooker.databuilder.mcdata[mc])
 
+def check_setscene_stamps(tid, rqdata, rq, stampcache, noexecstamp=False):
+
+    (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
+
+    taskdep = rqdata.dataCaches[mc].task_deps[taskfn]
+
+    if 'noexec' in taskdep and taskname in taskdep['noexec']:
+        bb.build.make_stamp(taskname + "_setscene", rqdata.dataCaches[mc], taskfn)
+        return True, False
+
+    if rq.check_stamp_task(tid, taskname + "_setscene", cache=stampcache):
+        logger.debug2('Setscene stamp current for task %s', tid)
+        return False, True
+
+    if rq.check_stamp_task(tid, taskname, recurse = True, cache=stampcache):
+        logger.debug2('Normal stamp current for task %s', tid)
+        return False, True
+
+    return False, False
+
 def update_scenequeue_data(tids, sqdata, rqdata, rq, cooker, stampcache, sqrq, summary=True):
 
     tocheck = set()
@@ -2805,24 +2828,14 @@ def update_scenequeue_data(tids, sqdata, rqdata, rq, cooker, stampcache, sqrq, s
         if tid in sqdata.valid:
             sqdata.valid.remove(tid)
 
-        (mc, fn, taskname, taskfn) = split_tid_mcfn(tid)
+        noexec, stamppresent = check_setscene_stamps(tid, rqdata, rq, stampcache, noexecstamp=True)
 
-        taskdep = rqdata.dataCaches[mc].task_deps[taskfn]
-
-        if 'noexec' in taskdep and taskname in taskdep['noexec']:
+        if noexec:
             sqdata.noexec.add(tid)
             sqrq.sq_task_skip(tid)
-            bb.build.make_stamp(taskname + "_setscene", rqdata.dataCaches[mc], taskfn)
             continue
 
-        if rq.check_stamp_task(tid, taskname + "_setscene", cache=stampcache):
-            logger.debug2('Setscene stamp current for task %s', tid)
-            sqdata.stamppresent.add(tid)
-            sqrq.sq_task_skip(tid)
-            continue
-
-        if rq.check_stamp_task(tid, taskname, recurse = True, cache=stampcache):
-            logger.debug2('Normal stamp current for task %s', tid)
+        if stamppresent:
             sqdata.stamppresent.add(tid)
             sqrq.sq_task_skip(tid)
             continue

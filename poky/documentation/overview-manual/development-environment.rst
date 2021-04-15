@@ -157,7 +157,8 @@ these tarballs gives you a snapshot of the released files.
 
    -  The recommended method for setting up the Yocto Project
       :term:`Source Directory` and the files
-      for supported BSPs (e.g., ``meta-intel``) is to use `Git <#git>`__
+      for supported BSPs (e.g., ``meta-intel``) is to use
+      :ref:`overview-manual/development-environment:git`
       to create a local copy of the upstream repositories.
 
    -  Be sure to always work in matching branches for both the selected
@@ -214,7 +215,8 @@ Git Workflows and the Yocto Project
 ===================================
 
 Developing using the Yocto Project likely requires the use of
-`Git <#git>`__. Git is a free, open source distributed version control
+:ref:`overview-manual/development-environment:git`.
+Git is a free, open source distributed version control
 system used as part of many collaborative design environments. This
 section provides workflow concepts using the Yocto Project and Git. In
 particular, the information covers basic practices that describe roles
@@ -382,11 +384,10 @@ commands.
 Repositories, Tags, and Branches
 --------------------------------
 
-As mentioned briefly in the previous section and also in the "`Git
-Workflows and the Yocto
-Project <#gs-git-workflows-and-the-yocto-project>`__" section, the Yocto
-Project maintains source repositories at :yocto_git:`/`. If you
-look at this web-interface of the repositories, each item is a separate
+As mentioned briefly in the previous section and also in the
+":ref:`overview-manual/development-environment:git workflows and the yocto project`"
+section, the Yocto Project maintains source repositories at :yocto_git:`/`.
+If you look at this web-interface of the repositories, each item is a separate
 Git repository.
 
 Git repositories use branching techniques that track content change (not
@@ -541,7 +542,7 @@ descriptions and strategies on how to use these commands:
    in this form assumes the local branch already exists. This command is
    analogous to "cd".
 
--  *git checkout –b working-branch upstream-branch:* Creates and
+-  *git checkout -b working-branch upstream-branch:* Creates and
    checks out a working branch on your local machine. The local branch
    tracks the upstream branch. You can use your local branch to isolate
    your work. It is a good idea to use local branches when adding

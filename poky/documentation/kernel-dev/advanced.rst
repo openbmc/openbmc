@@ -56,8 +56,8 @@ using the same BSP description. Multiple Corei7-based BSPs could share
 the same "intel-corei7-64" value for ``KMACHINE``. It is important to
 realize that ``KMACHINE`` is just for kernel mapping, while ``MACHINE``
 is the machine type within a BSP Layer. Even with this distinction,
-however, these two variables can hold the same value. See the `BSP
-Descriptions <#bsp-descriptions>`__ section for more information.
+however, these two variables can hold the same value. See the
+":ref:`kernel-dev/advanced:bsp descriptions`" section for more information.
 
 Every linux-yocto style recipe must also indicate the Linux kernel
 source repository branch used to build the Linux kernel. The
@@ -87,7 +87,7 @@ Together with ``KMACHINE``, ``LINUX_KERNEL_TYPE`` defines the search
 arguments used by the kernel tools to find the appropriate description
 within the kernel Metadata with which to build out the sources and
 configuration. The linux-yocto recipes define "standard", "tiny", and
-"preempt-rt" kernel types. See the "`Kernel Types <#kernel-types>`__"
+"preempt-rt" kernel types. See the ":ref:`kernel-dev/advanced:kernel types`"
 section for more information on kernel types.
 
 During the build, the kern-tools search for the BSP description file
@@ -123,8 +123,8 @@ the entries in ``KERNEL_FEATURES`` are dependent on their location
 within the kernel Metadata itself. The examples here are taken from the
 ``yocto-kernel-cache`` repository. Each branch of this repository
 contains "features" and "cfg" subdirectories at the top-level. For more
-information, see the "`Kernel Metadata
-Syntax <#kernel-metadata-syntax>`__" section.
+information, see the ":ref:`kernel-dev/advanced:kernel metadata syntax`"
+section.
 
 Kernel Metadata Syntax
 ======================
@@ -148,7 +148,7 @@ Features aggregate sources in the form of patches and configuration
 fragments into a modular reusable unit. You can use features to
 implement conceptually separate kernel Metadata descriptions such as
 pure configuration fragments, simple patches, complex features, and
-kernel types. `Kernel types <#kernel-types>`__ define general kernel
+kernel types. :ref:`kernel-dev/advanced:kernel types` define general kernel
 features and policy to be reused in the BSPs.
 
 BSPs define hardware-specific features and aggregate them with kernel
@@ -167,10 +167,9 @@ following Metadata file hierarchy is recommended:
       ktypes/
       patches/
 
-The ``bsp`` directory contains the `BSP
-descriptions <#bsp-descriptions>`__. The remaining directories all
-contain "features". Separating ``bsp`` from the rest of the structure
-aids conceptualizing intended usage.
+The ``bsp`` directory contains the :ref:`kernel-dev/advanced:bsp descriptions`.
+The remaining directories all contain "features". Separating ``bsp`` from the
+rest of the structure aids conceptualizing intended usage.
 
 Use these guidelines to help place your ``scc`` description files within
 the structure:
@@ -198,11 +197,12 @@ contain "features" as far as the kernel tools are concerned.
 Paths used in kernel Metadata files are relative to base, which is
 either
 :term:`FILESEXTRAPATHS` if
-you are creating Metadata in `recipe-space <#recipe-space-metadata>`__,
+you are creating Metadata in
+:ref:`recipe-space <kernel-dev/advanced:recipe-space metadata>`,
 or the top level of
 :yocto_git:`yocto-kernel-cache </yocto-kernel-cache/tree/>`
-if you are creating `Metadata outside of the
-recipe-space <#metadata-outside-the-recipe-space>`__.
+if you are creating
+:ref:`kernel-dev/advanced:metadata outside the recipe-space`.
 
 .. [1]
    ``scc`` stands for Series Configuration Control, but the naming has
@@ -353,9 +353,9 @@ as how an additional feature description file is included with the
 Typically, features are less granular than configuration fragments and
 are more likely than configuration fragments and patches to be the types
 of things you want to specify in the ``KERNEL_FEATURES`` variable of the
-Linux kernel recipe. See the "`Using Kernel Metadata in a
-Recipe <#using-kernel-metadata-in-a-recipe>`__" section earlier in the
-manual.
+Linux kernel recipe. See the
+":ref:`kernel-dev/advanced:using kernel metadata in a recipe`" section earlier
+in the manual.
 
 Kernel Types
 ------------
@@ -364,7 +364,7 @@ A kernel type defines a high-level kernel policy by aggregating
 non-hardware configuration fragments with patches you want to use when
 building a Linux kernel of a specific type (e.g. a real-time kernel).
 Syntactically, kernel types are no different than features as described
-in the "`Features <#features>`__" section. The
+in the ":ref:`kernel-dev/advanced:features`" section. The
 :term:`LINUX_KERNEL_TYPE`
 variable in the kernel recipe selects the kernel type. For example, in
 the ``linux-yocto_4.12.bb`` kernel recipe found in
@@ -540,7 +540,7 @@ example, this is done using the following:
 
 This file aggregates all the configuration
 fragments, patches, and features that make up your standard kernel
-policy. See the "`Kernel Types <#kernel-types>`__" section for more
+policy. See the ":ref:`kernel-dev/advanced:kernel types`" section for more
 information.
 
 To aggregate common configurations and features specific to the kernel
@@ -825,11 +825,11 @@ Given this scenario, you do not need to create any branches in the
 source repository. Rather, you just take the static patches you need and
 encapsulate them within a feature description. Once you have the feature
 description, you simply include that into the BSP description as
-described in the "`BSP Descriptions <#bsp-descriptions>`__" section.
+described in the ":ref:`kernel-dev/advanced:bsp descriptions`" section.
 
 You can find information on how to create patches and BSP descriptions
-in the "`Patches <#patches>`__" and "`BSP
-Descriptions <#bsp-descriptions>`__" sections.
+in the ":ref:`kernel-dev/advanced:patches`" and
+":ref:`kernel-dev/advanced:bsp descriptions`" sections.
 
 Machine Branches
 ----------------

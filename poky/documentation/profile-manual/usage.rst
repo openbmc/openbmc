@@ -100,8 +100,8 @@ Using perf to do Basic Profiling
 As a simple test case, we'll profile the 'wget' of a fairly large file,
 which is a minimally interesting case because it has both file and
 network I/O aspects, and at least in the case of standard Yocto images,
-it's implemented as part of busybox, so the methods we use to analyze it
-can be used in a very similar way to the whole host of supported busybox
+it's implemented as part of BusyBox, so the methods we use to analyze it
+can be used in a very similar way to the whole host of supported BusyBox
 applets in Yocto. ::
 
    root@crownbay:~# rm linux-2.6.19.2.tar.bz2; \
@@ -251,12 +251,12 @@ As a bit of background explanation for these callchains, think about
 what happens at a high level when you run wget to get a file out on the
 network. Basically what happens is that the data comes into the kernel
 via the network connection (socket) and is passed to the userspace
-program 'wget' (which is actually a part of busybox, but that's not
+program 'wget' (which is actually a part of BusyBox, but that's not
 important for now), which takes the buffers the kernel passes to it and
 writes it to a disk file to save it.
 
 The part of this process that we're looking at in the above call stacks
-is the part where the kernel passes the data it's read from the socket
+is the part where the kernel passes the data it has read from the socket
 down to wget i.e. a copy-to-user.
 
 Notice also that here there's also a case where the hex value is
@@ -277,16 +277,16 @@ Now that we've seen the basic layout of the profile data and the basics
 of how to extract useful information out of it, let's get back to the
 task at hand and see if we can get some basic idea about where the time
 is spent in the program we're profiling, wget. Remember that wget is
-actually implemented as an applet in busybox, so while the process name
-is 'wget', the executable we're actually interested in is busybox. So
-let's expand the first entry containing busybox:
+actually implemented as an applet in BusyBox, so while the process name
+is 'wget', the executable we're actually interested in is BusyBox. So
+let's expand the first entry containing BusyBox:
 
 .. image:: figures/perf-wget-busybox-expanded-stripped.png
    :align: center
 
 Again, before we expanded we saw that the function was labeled with a
 hex value instead of a symbol as with most of the kernel entries.
-Expanding the busybox entry doesn't make it any better.
+Expanding the BusyBox entry doesn't make it any better.
 
 The problem is that perf can't find the symbol information for the
 busybox binary, which is actually stripped out by the Yocto build
@@ -299,7 +299,7 @@ when you build the image: ::
 
 However, we already have an image with the binaries stripped, so
 what can we do to get perf to resolve the symbols? Basically we need to
-install the debuginfo for the busybox package.
+install the debuginfo for the BusyBox package.
 
 To generate the debug info for the packages in the image, we can add
 ``dbg-pkgs`` to :term:`EXTRA_IMAGE_FEATURES` in ``local.conf``. For example: ::
@@ -314,7 +314,7 @@ in the ``local.conf`` file: ::
    PACKAGE_DEBUG_SPLIT_STYLE = 'debug-file-directory'
 
 Once we've done that, we can install the
-debuginfo for busybox. The debug packages once built can be found in
+debuginfo for BusyBox. The debug packages once built can be found in
 ``build/tmp/deploy/rpm/*`` on the host system. Find the busybox-dbg-...rpm
 file and copy it to the target. For example: ::
 
@@ -325,7 +325,7 @@ Now install the debug rpm on the target: ::
 
    root@crownbay:~# rpm -i busybox-dbg-1.20.2-r2.core2_32.rpm
 
-Now that the debuginfo is installed, we see that the busybox entries now display
+Now that the debuginfo is installed, we see that the BusyBox entries now display
 their functions symbolically:
 
 .. image:: figures/perf-wget-busybox-debuginfo.png
@@ -345,11 +345,11 @@ expanded all the nodes using the 'E' key):
 .. image:: figures/perf-wget-busybox-dso-zoom.png
    :align: center
 
-Finally, we can see that now that the busybox debuginfo is installed,
+Finally, we can see that now that the BusyBox debuginfo is installed,
 the previously unresolved symbol in the ``sys_clock_gettime()`` entry
 mentioned previously is now resolved, and shows that the
 sys_clock_gettime system call that was the source of 6.75% of the
-copy-to-user overhead was initiated by the ``handle_input()`` busybox
+copy-to-user overhead was initiated by the ``handle_input()`` BusyBox
 function:
 
 .. image:: figures/perf-wget-g-copy-to-user-expanded-debuginfo.png
@@ -1580,7 +1580,7 @@ events in the output buffer: ::
    root@sugarbay:/sys/kernel/debug/tracing# echo nop > current_tracer
    root@sugarbay:/sys/kernel/debug/tracing# echo 1 > tracing_on
 
-Now, if we look at the the 'trace' file, we see nothing
+Now, if we look at the 'trace' file, we see nothing
 but the kmalloc events we just turned on: ::
 
    root@sugarbay:/sys/kernel/debug/tracing# cat trace | less
@@ -1900,7 +1900,7 @@ the target: ::
             meta-toolchain
             meta-ide-support
 
-   You can also run generated qemu images with a command like 'runqemu qemux86-64'
+   You can also run generated QEMU images with a command like 'runqemu qemux86-64'
 
 Once you've done that, you can cd to whatever
 directory contains your scripts and use 'crosstap' to run the script: ::

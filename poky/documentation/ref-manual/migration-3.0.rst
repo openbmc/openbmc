@@ -1,8 +1,8 @@
-Moving to the Yocto Project 3.0 Release
-=======================================
+Moving to the Yocto Project 3.0 Release (zeus)
+==============================================
 
 This section provides migration information for moving to the Yocto
-Project 3.0 Release from the prior release.
+Project 3.0 Release (codename "zeus") from the prior release.
 
 .. _migration-3.0-init-system-selection:
 

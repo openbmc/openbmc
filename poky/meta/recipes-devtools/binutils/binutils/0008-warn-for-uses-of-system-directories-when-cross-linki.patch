@@ -1,4 +1,4 @@
-From a1d0ca24d3bbdf4cb37537cd84d04a17bf0f813b Mon Sep 17 00:00:00 2001
+From bb48edf1a87bbc711e8978dd1e9112fe953dc1bf Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Jan 2016 06:31:09 +0000
 Subject: [PATCH] warn for uses of system directories when cross linking
@@ -59,8 +59,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  ld/ldfile.c     | 17 +++++++++++++++++
  ld/ldlex.h      |  2 ++
  ld/ldmain.c     |  2 ++
- ld/lexsup.c     | 15 +++++++++++++++
- 9 files changed, 85 insertions(+)
+ ld/lexsup.c     | 16 ++++++++++++++++
+ 9 files changed, 86 insertions(+)
 
 diff --git a/ld/config.in b/ld/config.in
 index 7b60d778587..37b8e9b6f6c 100644
@@ -77,7 +77,7 @@ index 7b60d778587..37b8e9b6f6c 100644
  #undef EXTRA_SHLIB_EXTENSION
  
 diff --git a/ld/configure b/ld/configure
-index d399d08d0c4..8355c433c76 100755
+index b0969791959..50bb04ce6a8 100755
 --- a/ld/configure
 +++ b/ld/configure
 @@ -828,6 +828,7 @@ with_lib_path
@@ -235,7 +235,7 @@ index 080b1c4c6c2..78d8a2df278 100644
    /* We initialize DEMANGLING based on the environment variable
       COLLECT_NO_DEMANGLE.  The gcc collect2 program will demangle the
 diff --git a/ld/lexsup.c b/ld/lexsup.c
-index f005a58a045..c83292a9427 100644
+index f005a58a045..5eb8439fef7 100644
 --- a/ld/lexsup.c
 +++ b/ld/lexsup.c
 @@ -591,6 +591,14 @@ static const struct ld_option ld_options[] =
@@ -253,17 +253,18 @@ index f005a58a045..c83292a9427 100644
  };
  
  #define OPTION_COUNT ARRAY_SIZE (ld_options)
-@@ -1674,6 +1682,13 @@ parse_args (unsigned argc, char **argv)
- 
- 	case OPTION_PRINT_MAP_DISCARDED:
+@@ -1676,6 +1684,14 @@ parse_args (unsigned argc, char **argv)
  	  config.print_map_discarded = TRUE;
-+
+ 	  break;
+ 
 +	case OPTION_NO_POISON_SYSTEM_DIRECTORIES:
 +	  command_line.poison_system_directories = FALSE;
 +	  break;
 +
 +	case OPTION_ERROR_POISON_SYSTEM_DIRECTORIES:
 +	  command_line.error_poison_system_directories = TRUE;
- 	  break;
- 
++	  break;
++
  	case OPTION_DEPENDENCY_FILE:
+ 	  config.dependency_file = optarg;
+ 	  break;

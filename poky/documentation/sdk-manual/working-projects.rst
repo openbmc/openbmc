@@ -104,10 +104,7 @@ project:
 
    .. note::
 
-      If you get errors from
-      configure.ac
-      , which
-      autoreconf
+      If you get errors from ``configure.ac``, which ``autoreconf``
       runs, that indicate missing files, you can use the "-i" option,
       which ensures missing auxiliary files are copied to the build
       host.
@@ -206,9 +203,7 @@ regarding variable behavior:
 .. note::
 
    Regardless of how you set your variables, if you use the "-e" option
-   with
-   make
-   , the variables from the SDK setup script take precedence:
+   with ``make``, the variables from the SDK setup script take precedence:
    ::
 
       $ make -e target

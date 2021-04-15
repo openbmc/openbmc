@@ -1196,6 +1196,15 @@ class BaseConfig(object):
             self.fstype = self.fstype[4:]
         rootfs_format = self.fstype if self.fstype in ('vmdk', 'vhd', 'vhdx', 'qcow2', 'vdi') else 'raw'
 
+        tmpfsdir = os.environ.get("RUNQEMU_TMPFS_DIR", None)
+        if self.snapshot and tmpfsdir:
+            newrootfs = os.path.join(tmpfsdir, os.path.basename(self.rootfs)) + "." + str(os.getpid())
+            shutil.copyfile(self.rootfs, newrootfs)
+            #print("Copying rootfs to tmpfs: %s" % newrootfs)
+            self.rootfs = newrootfs
+            # Don't need a second copy now!
+            self.snapshot = False
+
         qb_rootfs_opt = self.get('QB_ROOTFS_OPT')
         if qb_rootfs_opt:
             self.rootfs_options = qb_rootfs_opt.replace('@ROOTFS@', self.rootfs)
@@ -1314,7 +1323,6 @@ class BaseConfig(object):
             if self.gtk == True:
                 raise RunQemuError('Option nographic makes no sense alongside the gtk option.')
             self.qemu_opt += ' -nographic'
-            return
 
         if self.novga == True:
             self.qemu_opt += ' -vga none'

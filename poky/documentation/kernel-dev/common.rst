@@ -365,8 +365,7 @@ section:
 
 At this point, you are ready to start making modifications to the kernel
 using traditional kernel development steps. For a continued example, see
-the "`Using Traditional Kernel Development to Patch the
-Kernel <#using-traditional-kernel-development-to-patch-the-kernel>`__"
+the ":ref:`kernel-dev/common:using traditional kernel development to patch the kernel`"
 section.
 
 Creating and Preparing a Layer
@@ -463,8 +462,8 @@ Modifying an existing recipe can consist of the following:
 - :ref:`kernel-dev/common:changing the configuration`
 
 Before modifying an existing recipe, be sure that you have created a
-minimal, custom layer from which you can work. See the "`Creating and
-Preparing a Layer <#creating-and-preparing-a-layer>`__" section for
+minimal, custom layer from which you can work. See the
+":ref:`kernel-dev/common:creating and preparing a layer`" section for
 information.
 
 Creating the Append File
@@ -710,7 +709,7 @@ Linux kernel, BitBake detects the change in the recipe and fetches and
 applies the new configuration before building the kernel.
 
 For a detailed example showing how to configure the kernel, see the
-"`Configuring the Kernel <#configuring-the-kernel>`__" section.
+":ref:`kernel-dev/common:configuring the kernel`" section.
 
 Using an "In-Tree"  ``defconfig`` File
 --------------------------------------
@@ -954,15 +953,14 @@ emulator console output at boot time through ``printk`` statements in
 the kernel's ``calibrate.c`` source code file. Applying the patch and
 booting the modified image causes the added messages to appear on the
 emulator's console. The example is a continuation of the setup procedure
-found in the "`Getting Ready for Traditional Kernel
-Development <#getting-ready-for-traditional-kernel-development>`__"
+found in the
+":ref:`kernel-dev/common:getting ready for traditional kernel development`"
 Section.
 
 1. *Edit the Source Files* Prior to this step, you should have used Git
    to create a local copy of the repository for your kernel. Assuming
-   you created the repository as directed in the "`Getting Ready for
-   Traditional Kernel
-   Development <#getting-ready-for-traditional-kernel-development>`__"
+   you created the repository as directed in the
+   ":ref:`kernel-dev/common:getting ready for traditional kernel development`"
    section, use the following commands to edit the ``calibrate.c`` file:
 
    1. *Change the working directory*: You need to locate the source
@@ -1104,9 +1102,9 @@ Section.
    The :term:`FILESEXTRAPATHS` and :term:`SRC_URI` statements
    enable the OpenEmbedded build system to find the patch file.
 
-   For more information on append files and patches, see the "`Creating
-   the Append File <#creating-the-append-file>`__" and "`Applying
-   Patches <#applying-patches>`__" sections. You can also see the
+   For more information on append files and patches, see the
+   ":ref:`kernel-dev/common:creating the append file`" and
+   ":ref:`kernel-dev/common:applying patches`" sections. You can also see the
    ":ref:`dev-manual/common-tasks:using .bbappend files in your layer`"
    section in the Yocto Project Development Tasks Manual.
 
@@ -1140,8 +1138,8 @@ configuration fragments, and how to interactively modify your
 ``.config`` file to create the leanest kernel configuration file
 possible.
 
-For more information on kernel configuration, see the "`Changing the
-Configuration <#changing-the-configuration>`__" section.
+For more information on kernel configuration, see the
+":ref:`kernel-dev/common:changing the configuration`" section.
 
 Using  ``menuconfig``
 ---------------------
@@ -1297,8 +1295,8 @@ created to hold the configuration changes.
    applies these on top of and after applying the existing ``defconfig`` file
    configurations.
 
-For more information on configuring the kernel, see the "`Changing the
-Configuration <#changing-the-configuration>`__" section.
+For more information on configuring the kernel, see the
+":ref:`kernel-dev/common:changing the configuration`" section.
 
 Creating Configuration Fragments
 --------------------------------
@@ -1369,8 +1367,8 @@ steps:
       $ bitbake linux-yocto -c diffconfig
 
 The ``diffconfig`` command creates a file that is a list of Linux kernel
-``CONFIG_`` assignments. See the "`Changing the
-Configuration <#changing-the-configuration>`__" section for additional
+``CONFIG_`` assignments. See the
+":ref:`kernel-dev/common:changing the configuration`" section for additional
 information on how to use the output as a configuration fragment.
 
 .. note::
@@ -1614,8 +1612,7 @@ source directory. Follow these steps to clean up the version string:
    ":ref:`kernel-dev/common:using \`\`devtool\`\` to patch the kernel`"
    section. For
    information on building the kernel image when using Bitbake, see the
-   "`Using Traditional Kernel Development to Patch the
-   Kernel <#using-traditional-kernel-development-to-patch-the-kernel>`__"
+   ":ref:`kernel-dev/common:using traditional kernel development to patch the kernel`"
    section.
 
 Working With Your Own Sources
@@ -1733,8 +1730,9 @@ Here are some basic steps you can use to work with your own sources:
 
 5. *Customize Your Recipe as Needed:* Provide further customizations to
    your recipe as needed just as you would customize an existing
-   linux-yocto recipe. See the "`Modifying an Existing
-   Recipe <#modifying-an-existing-recipe>`__" section for information.
+   linux-yocto recipe. See the
+   ":ref:`ref-manual/devtool-reference:modifying an existing recipe`" section
+   for information.
 
 Working with Out-of-Tree Modules
 ================================
@@ -1914,7 +1912,7 @@ differences:
    $ git show origin/standard/base..origin/standard/emenlow
 
 Use this command to create individual patches for each change. Here is
-an example that that creates patch files for each commit and places them
+an example that creates patch files for each commit and places them
 in your ``Documents`` directory:
 ::
 

@@ -32,7 +32,7 @@ re_control_char = re.compile('[%s]' % re.escape("".join(control_chars)))
 class QemuRunner:
 
     def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, boottime, dump_dir, dump_host_cmds,
-                 use_kvm, logger, use_slirp=False, serial_ports=2, boot_patterns = defaultdict(str), use_ovmf=False, workdir=None):
+                 use_kvm, logger, use_slirp=False, serial_ports=2, boot_patterns = defaultdict(str), use_ovmf=False, workdir=None, tmpfsdir=None):
 
         # Popen object for runqemu
         self.runqemu = None
@@ -61,6 +61,7 @@ class QemuRunner:
         self.serial_ports = serial_ports
         self.msg = ''
         self.boot_patterns = boot_patterns
+        self.tmpfsdir = tmpfsdir
 
         self.runqemutime = 120
         if not workdir:
@@ -149,6 +150,9 @@ class QemuRunner:
             return False
         else:
             env["DEPLOY_DIR_IMAGE"] = self.deploy_dir_image
+
+        if self.tmpfsdir:
+            env["RUNQEMU_TMPFS_DIR"] = self.tmpfsdir
 
         if not launch_cmd:
             launch_cmd = 'runqemu %s' % ('snapshot' if discard_writes else '')

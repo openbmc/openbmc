@@ -55,6 +55,16 @@ for i in `cat remove-for-all`; do
    mv $i.IGNORE $i.vgtest;
 done
 
+echo "Failed test details..."
+failed_tests=`grep FAIL: ${LOG} | awk '{print $2}'`
+for test in $failed_tests; do
+    for diff_results in `ls $test*.diff`; do
+        echo $diff_results
+        echo '************'
+        cat  $diff_results
+    done
+done
+
 passed=`grep PASS: ${LOG}|wc -l`
 failed=`grep FAIL: ${LOG}|wc -l`
 skipped=`grep SKIP: ${LOG}|wc -l`

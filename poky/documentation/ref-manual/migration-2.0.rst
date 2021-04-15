@@ -1,8 +1,8 @@
-Moving to the Yocto Project 2.0 Release
-=======================================
+Moving to the Yocto Project 2.0 Release (jethro)
+================================================
 
 This section provides migration information for moving to the Yocto
-Project 2.0 Release from the prior release.
+Project 2.0 Release (codename "jethro") from the prior release.
 
 .. _migration-2.0-gcc-5:
 

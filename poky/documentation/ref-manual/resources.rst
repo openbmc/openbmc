@@ -91,7 +91,7 @@ For more Yocto Project-related mailing lists, see the
 Internet Relay Chat (IRC)
 =========================
 
-Two IRC channels on freenode are available for the Yocto Project and
+Two IRC channels on Freenode are available for the Yocto Project and
 Poky discussions:
 
 -  ``#yocto``
@@ -189,7 +189,7 @@ Here is a list of resources you might find helpful:
    implementation of Bugzilla for logging and tracking Yocto Project
    defects.
 
--  *Internet Relay Chat (IRC):* Two IRC channels on freenode are
+-  *Internet Relay Chat (IRC):* Two IRC channels on Freenode are
    available for Yocto Project and Poky discussions: ``#yocto`` and
    ``#poky``, respectively.
 

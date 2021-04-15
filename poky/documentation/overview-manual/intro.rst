@@ -14,17 +14,16 @@ information suitable for a new Yocto Project user.
 
 The following list describes what you can get from this manual:
 
--  `Introducing the Yocto Project <#overview-yp>`__\ *:* This chapter
-   provides an introduction to the Yocto Project. You will learn about
-   features and challenges of the Yocto Project, the layer model,
+-  :ref:`overview-manual/yp-intro:introducing the yocto project`\ *:*
+   This chapter provides an introduction to the Yocto Project. You will learn
+   about features and challenges of the Yocto Project, the layer model,
    components and tools, development methods, the
    :term:`Poky` reference distribution, the
    OpenEmbedded build system workflow, and some basic Yocto terms.
 
--  `The Yocto Project Development
-   Environment <#overview-development-environment>`__\ *:* This chapter
-   helps you get started understanding the Yocto Project development
-   environment. You will learn about open source, development hosts,
+-  :ref:`overview-manual/development-environment:the yocto project development environment`\ *:*
+   This chapter helps you get started understanding the Yocto Project
+   development environment. You will learn about open source, development hosts,
    Yocto Project source repositories, workflows using Git and the Yocto
    Project, a Git primer, and information about licensing.
 
