@@ -1,4 +1,4 @@
-From f8861d2129b9e18bba137705bfa38c6bd9be1790 Mon Sep 17 00:00:00 2001
+From 1fa047162983d4a7e0576f0837a73a6027a783bd Mon Sep 17 00:00:00 2001
 From: Venture Research <tech@ventureresearch.com>
 Date: Wed, 6 Feb 2013 20:51:02 -0600
 Subject: [PATCH] hack to force use of libc malloc
@@ -6,7 +6,7 @@ Subject: [PATCH] hack to force use of libc malloc
 Hack to force libc usage as it seems the option to pass it in has been
 removed in favor of magic.
 
-Note that this of course doesn't allow tcmalloc and jemalloc, however 
+Note that this of course doesn't allow tcmalloc and jemalloc, however
 jemalloc wasn't building correctly.
 
 Signed-off-by: Venture Research <tech@ventureresearch.com>
@@ -15,11 +15,11 @@ Update to work with 4.0.8
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 
 ---
- src/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/Makefile b/src/Makefile
-index 86e0b3fe..a810180b 100644
+index ecd6929..c7f43c5 100644
 --- a/src/Makefile
 +++ b/src/Makefile
 @@ -13,7 +13,8 @@
@@ -31,4 +31,4 @@ index 86e0b3fe..a810180b 100644
 +uname_S := "USE_LIBC_MALLOC"
  uname_M := $(shell sh -c 'uname -m 2>/dev/null || echo not')
  OPTIMIZATION?=-O2
- DEPENDENCY_TARGETS=hiredis linenoise lua
+ DEPENDENCY_TARGETS=hiredis linenoise lua hdr_histogram

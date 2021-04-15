@@ -5,8 +5,8 @@ SECTION = "System/Base"
 LICENSE = "GPL-2.0+"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1556547711e8246992b999edd9445a57"
 
-PV = "0.345"
-SRCREV = "5d7d97bae533401f60ce9a5a036ff7152c8aca8c"
+PV = "0.346"
+SRCREV = "a2bff16032a68b089eeb169f09dea08094891c9c"
 SRC_URI = "git://github.com/vcrhonek/${BPN}.git"
 
 S = "${WORKDIR}/git"

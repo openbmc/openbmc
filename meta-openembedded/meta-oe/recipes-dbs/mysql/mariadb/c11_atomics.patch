@@ -17,10 +17,10 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  3 files changed, 27 insertions(+), 1 deletion(-)
 
 diff --git a/configure.cmake b/configure.cmake
-index bb3ad43..2ff4f19 100644
+index 4fc324a9..23a2ea91 100644
 --- a/configure.cmake
 +++ b/configure.cmake
-@@ -861,7 +861,25 @@ int main()
+@@ -862,7 +862,25 @@ int main()
    long long int *ptr= &var;
    return (int)__atomic_load_n(ptr, __ATOMIC_SEQ_CST);
  }"
@@ -48,10 +48,10 @@ index bb3ad43..2ff4f19 100644
  IF(WITH_VALGRIND)
    SET(HAVE_valgrind 1)
 diff --git a/mysys/CMakeLists.txt b/mysys/CMakeLists.txt
-index 6a3a1ef..e306ae7 100644
+index 6aab788f..91b9c393 100644
 --- a/mysys/CMakeLists.txt
 +++ b/mysys/CMakeLists.txt
-@@ -140,6 +140,10 @@ TARGET_LINK_LIBRARIES(mysys dbug strings ${ZLIB_LIBRARY}
+@@ -154,6 +154,10 @@ TARGET_LINK_LIBRARIES(mysys dbug strings ${ZLIB_LIBRARY}
   ${LIBNSL} ${LIBM} ${LIBRT} ${CMAKE_DL_LIBS} ${LIBSOCKET} ${LIBEXECINFO})
  DTRACE_INSTRUMENT(mysys)
  
@@ -63,10 +63,10 @@ index 6a3a1ef..e306ae7 100644
    TARGET_LINK_LIBRARIES(mysys bfd)  
  ENDIF(HAVE_BFD_H)
 diff --git a/sql/CMakeLists.txt b/sql/CMakeLists.txt
-index 4978d01..883a930 100644
+index b9cd418f..d42e5017 100644
 --- a/sql/CMakeLists.txt
 +++ b/sql/CMakeLists.txt
-@@ -220,6 +220,10 @@ ELSE()
+@@ -222,6 +222,10 @@ ELSE()
    SET(MYSQLD_SOURCE main.cc ${DTRACE_PROBES_ALL})
  ENDIF()
  
@@ -74,9 +74,9 @@ index 4978d01..883a930 100644
 +  TARGET_LINK_LIBRARIES(sql atomic)
 +ENDIF()
 +
- IF(MSVC)
+ IF(MSVC OR CMAKE_SYSTEM_NAME MATCHES AIX)
    SET(libs_to_export_symbols sql mysys dbug strings)
    # Create shared library of already compiled object
 -- 
-2.17.1
+2.25.1
 

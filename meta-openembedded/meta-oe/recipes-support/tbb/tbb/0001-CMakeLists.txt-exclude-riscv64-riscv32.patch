@@ -1,0 +1,42 @@
+From cb9e9b5b1ad05dd9de07a65ee7147cdb3433746a Mon Sep 17 00:00:00 2001
+From: Naveen Saini <naveen.kumar.saini@intel.com>
+Date: Fri, 9 Apr 2021 15:41:35 +0800
+Subject: [PATCH] CMakeLists.txt: exclude riscv64 & riscv32
+
+Upstream-Status: Pending
+
+Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
+---
+ src/tbb/CMakeLists.txt       | 2 +-
+ src/tbbmalloc/CMakeLists.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/tbb/CMakeLists.txt b/src/tbb/CMakeLists.txt
+index a6edb6ad..4f261813 100644
+--- a/src/tbb/CMakeLists.txt
++++ b/src/tbb/CMakeLists.txt
+@@ -55,7 +55,7 @@ target_compile_definitions(tbb
+                            PRIVATE
+                            __TBB_BUILD)
+ 
+-if (NOT ("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "(armv7-a|aarch64|mips|arm64)" OR
++if (NOT ("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "(armv7-a|aarch64|mips|arm64|riscv64|riscv32)" OR
+          "${CMAKE_OSX_ARCHITECTURES}" MATCHES "arm64" OR
+          WINDOWS_STORE OR
+          TBB_WINDOWS_DRIVER))
+diff --git a/src/tbbmalloc/CMakeLists.txt b/src/tbbmalloc/CMakeLists.txt
+index de7ca7ea..31e854fe 100644
+--- a/src/tbbmalloc/CMakeLists.txt
++++ b/src/tbbmalloc/CMakeLists.txt
+@@ -28,7 +28,7 @@ target_compile_definitions(tbbmalloc
+                            PRIVATE
+                            __TBBMALLOC_BUILD)
+ 
+-if (NOT ("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "(armv7-a|aarch64|mips|arm64)" OR
++if (NOT ("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "(armv7-a|aarch64|mips|arm64|riscv64|riscv32)" OR
+          "${CMAKE_OSX_ARCHITECTURES}" MATCHES "arm64" OR
+          WINDOWS_STORE OR
+          TBB_WINDOWS_DRIVER))
+-- 
+2.17.1
+

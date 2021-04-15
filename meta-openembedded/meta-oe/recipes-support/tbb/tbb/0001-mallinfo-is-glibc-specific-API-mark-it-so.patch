@@ -1,22 +1,23 @@
-From 6b2b136caa68912d77ffe26143cd3da768b9ef80 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Sat, 3 Jun 2017 08:39:37 -0700
+From 52c1586bff0ecb418ac21d6678f8963d70959f04 Mon Sep 17 00:00:00 2001
+From: Naveen Saini <naveen.kumar.saini@intel.com>
+Date: Wed, 7 Apr 2021 11:14:13 +0800
 Subject: [PATCH] mallinfo() is glibc specific API mark it so
 
 Helps compiling with musl
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Pending
 
- src/tbbmalloc/proxy.cpp | 2 ++
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
+---
+ src/tbbmalloc_proxy/proxy.cpp | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/src/tbbmalloc/proxy.cpp b/src/tbbmalloc/proxy.cpp
-index 5ef279d..06c4872 100644
---- a/src/tbbmalloc/proxy.cpp
-+++ b/src/tbbmalloc/proxy.cpp
-@@ -185,6 +185,7 @@ int mallopt(int /*param*/, int /*value*/) __THROW
+diff --git a/src/tbbmalloc_proxy/proxy.cpp b/src/tbbmalloc_proxy/proxy.cpp
+index f9942bf1..fe0dad89 100644
+--- a/src/tbbmalloc_proxy/proxy.cpp
++++ b/src/tbbmalloc_proxy/proxy.cpp
+@@ -253,6 +253,7 @@ int mallopt(int /*param*/, int /*value*/) __THROW
      return 1;
  }
  
@@ -24,7 +25,7 @@ index 5ef279d..06c4872 100644
  struct mallinfo mallinfo() __THROW
  {
      struct mallinfo m;
-@@ -192,6 +193,7 @@ struct mallinfo mallinfo() __THROW
+@@ -260,6 +261,7 @@ struct mallinfo mallinfo() __THROW
  
      return m;
  }
@@ -33,5 +34,5 @@ index 5ef279d..06c4872 100644
  #if __ANDROID__
  // Android doesn't have malloc_usable_size, provide it to be compatible
 -- 
-2.13.0
+2.17.1
 

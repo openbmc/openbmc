@@ -146,7 +146,6 @@ RDEPENDS_packagegroup-meta-oe-connectivity ="\
     obexftp \
     packagegroup-tools-bluetooth \
     paho-mqtt-c \
-    phonet-utils \
     rabbitmq-c \
     rfkill \
     rtorrent \
@@ -192,7 +191,7 @@ RDEPENDS_packagegroup-meta-oe-core = "\
     usleep \
     dbus-cxx \
 "
-RDEPENDS_packagegroup-meta-oe-core_append_libc-glibc = " glfw"
+RDEPENDS_packagegroup-meta-oe-core_append_libc-glibc = " ${@bb.utils.contains("DISTRO_FEATURES", "x11 opengl", "glfw", "", d)}"
 RDEPENDS_packagegroup-meta-oe-core_remove_riscv64 = "safec"
 RDEPENDS_packagegroup-meta-oe-core_remove_riscv32 = "safec"
 
@@ -322,109 +321,109 @@ RDEPENDS_packagegroup-meta-oe-devtools_remove_aarch64 = "concurrencykit"
 RDEPENDS_packagegroup-meta-oe-devtools_remove_x86 = "ply"
 
 RDEPENDS_packagegroup-meta-oe-extended ="\
-     bitwise \
+    bitwise \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 wayland opengl", "boinc-client", "", d)} \
-     brotli \
-     byacc \
-     cmpi-bindings \
-     collectd \
-     cfengine-masterfiles \
-     cfengine \
-     ddrescue \
-     dialog \
-     enscript \
-     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "gnuplot", "", d)} \
-     dlt-daemon \
-     docopt.cpp \
-     iotop \
-     dumb-init \
-     konkretcmpi \
-     figlet \
-     libcec \
-     libdivecomputer \
-     fluentbit \
-     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "libgxim", "", d)} \
-     liblognorm \
-     libmodbus \
-     haveged \
-     hexedit \
-     hiredis \
-     hplip \
-     hwloc \
-     libleak \
-     libuio \
-     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "libwmf", "", d)} \
-     lprng \
-     icewm \
-     md5deep \
-     indent \
-     jansson \
-     nana \
-     nicstat \
-     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "openwsman", "", d)} \
-     p7zip \
-     isomd5sum \
-     jpnevulator \
-     ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "polkit-group-rule-datetime polkit-group-rule-network polkit", "", d)} \
-     rarpd \
-     redis \
-     libfastjson \
-     librelp \
-     sblim-cmpi-devel \
-     sblim-sfc-common \
-     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "sblim-sfcb ", "", d)} \
-     sblim-sfcc \
-     libblockdev \
-     sgpio \
-     smartmontools \
-     can-utils \
-     canutils \
-     libsocketcan \
-     libconfig \
-     linuxconsole \
-     uml-utilities \
-     libidn \
-     libqb \
-     wipe \
-     libzip \
-     zram \
-     libplist \
-     libusbmuxd \
-     liblockfile \
-     liblogging \
-     libnss-nisplus \
-     libpwquality \
-     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "libreport", "", d)} \
-     libserialport \
-     libstatgrab \
-     lockfile-progs \
-     logwatch \
-     mailx \
-     mraa \
-     ostree \
-     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pam-plugin-ccreds pam-plugin-ldapdb pam-ssh-agent-auth", "", d)} \
-     pegtl \
-     libfile-fnmatch-perl \
-     rrdtool \
-     sanlock \
-     scsirastools \
-     sedutil \
-     libsigrok \
-     libsigrokdecode \
-     sigrok-cli \
-     snappy \
-     tipcutils \
-     tiptop \
-     tmate \
-     tmux \
-     triggerhappy \
-     upm \
-     vlock \
-     volume-key \
-     wxwidgets \
-     zlog \
-     zstd \
-     redis-plus-plus \
+    brotli \
+    byacc \
+    cmpi-bindings \
+    collectd \
+    cfengine-masterfiles \
+    cfengine \
+    ddrescue \
+    dialog \
+    enscript \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "gnuplot", "", d)} \
+    dlt-daemon \
+    docopt.cpp \
+    iotop \
+    dumb-init \
+    konkretcmpi \
+    figlet \
+    libcec \
+    libdivecomputer \
+    fluentbit \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "libgxim", "", d)} \
+    liblognorm \
+    libmodbus \
+    haveged \
+    hexedit \
+    hiredis \
+    hplip \
+    hwloc \
+    libleak \
+    libuio \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "libwmf", "", d)} \
+    lprng \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "icewm", "", d)} \
+    md5deep \
+    indent \
+    jansson \
+    nana \
+    nicstat \
+    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "openwsman", "", d)} \
+    p7zip \
+    isomd5sum \
+    jpnevulator \
+    ${@bb.utils.contains("DISTRO_FEATURES", "polkit", "polkit-group-rule-datetime polkit-group-rule-network polkit", "", d)} \
+    rarpd \
+    redis \
+    libfastjson \
+    librelp \
+    sblim-cmpi-devel \
+    sblim-sfc-common \
+    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "sblim-sfcb ", "", d)} \
+    sblim-sfcc \
+    libblockdev \
+    sgpio \
+    smartmontools \
+    can-utils \
+    canutils \
+    libsocketcan \
+    libconfig \
+    linuxconsole \
+    uml-utilities \
+    libidn \
+    libqb \
+    wipe \
+    libzip \
+    zram \
+    libplist \
+    libusbmuxd \
+    liblockfile \
+    liblogging \
+    libnss-nisplus \
+    libpwquality \
+    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "libreport", "", d)} \
+    libserialport \
+    libstatgrab \
+    lockfile-progs \
+    logwatch \
+    mailx \
+    mraa \
+    ostree \
+    ${@bb.utils.contains("DISTRO_FEATURES", "pam", "pam-plugin-ccreds pam-plugin-ldapdb pam-ssh-agent-auth", "", d)} \
+    pegtl \
+    libfile-fnmatch-perl \
+    rrdtool \
+    sanlock \
+    scsirastools \
+    sedutil \
+    libsigrok \
+    libsigrokdecode \
+    sigrok-cli \
+    snappy \
+    tipcutils \
+    tiptop \
+    tmate \
+    tmux \
+    triggerhappy \
+    upm \
+    vlock \
+    volume-key \
+    wxwidgets \
+    zlog \
+    zstd \
+    redis-plus-plus \
 "
 RDEPENDS_packagegroup-meta-oe-extended_append_libc-musl = " libexecinfo"
 RDEPENDS_packagegroup-meta-oe-extended_append_x86-64 = " pmdk libx86-1"
@@ -712,7 +711,6 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     ace-cloud-editor \
     frame \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "geis", "", d)} \
-    geis \
     grail \
     asio \
     augeas \
@@ -762,7 +760,7 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     ccid \
     zchunk \
     libgpiod \
-    libgpiod \
+    libmanette \
     ckermit \
     libcereal \
     daemontools \

@@ -11,4 +11,4 @@ SRC_URI[sha256sum] = "1f6facee57a659af560f06024ca6f98aa4d638bf57a8bcfb613b4dc70f
 
 FILES_${PN} += "${datadir}/metainfo"
 
-RDEPENDS_${PN} += "python3-pygobject"
+RDEPENDS_${PN} += "python3-pygobject python3-dbus"

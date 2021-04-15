@@ -24,6 +24,7 @@ SRC_URI = "http://www.rsyslog.com/download/files/download/rsyslog/${BPN}-${PV}.t
            file://rsyslog.service \
            file://use-pkgconfig-to-check-libgcrypt.patch \
            file://run-ptest \
+           file://0001-tests-disable-the-check-for-inotify.patch \
 "
 
 SRC_URI_append_libc-musl = " \
@@ -80,11 +81,6 @@ PACKAGECONFIG[mail] = "--enable-mail,--disable-mail,,"
 PACKAGECONFIG[valgrind] = ",--without-valgrind-testbench,valgrind,"
 PACKAGECONFIG[imhttp] = "--enable-imhttp,--disable-imhttp,civetweb,"
 
-do_configure_prepend() {
-    sed -i -e 's|python |python3 |g' ${S}/tests/*.sh
-    sed -i -e 's|/usr/bin/env python|/usr/bin/env python3|g' ${S}/tests/*.py
-    sed -i -e 's|/usr/bin/env python|/usr/bin/env python3|g' ${S}/tests/testsuites/*.py
-}
 
 TESTDIR = "tests"
 do_compile_ptest() {
@@ -96,6 +92,10 @@ do_install_ptest() {
     # install the tests
     cp -rf ${S}/${TESTDIR} ${D}${PTEST_PATH}
     cp -rf ${B}/${TESTDIR} ${D}${PTEST_PATH}
+
+    # give permissions to all users
+    # some tests need to write to this directory as user 'daemon'
+    chmod 777 -R ${D}${PTEST_PATH}/tests
 
     # do NOT need to rebuild Makefile itself
     sed -i 's/^Makefile:.*$/Makefile:/' ${D}${PTEST_PATH}/${TESTDIR}/Makefile
@@ -195,8 +195,11 @@ VALGRIND_libc-musl_powerpc64le = ''
 VALGRIND_riscv64 = ""
 VALGRIND_riscv32 = ""
 
+# util-linux: logger needs the -d option
 RDEPENDS_${PN}-ptest += "\
   make diffutils gzip bash gawk coreutils procps \
-  libgcc python3-core python3-io \
+  libgcc python3-core python3-io python3-json \
+  curl util-linux shadow \
   "
+
 RRECOMMENDS_${PN}-ptest += "${TCLIBC}-dbg ${VALGRIND}"

@@ -1,0 +1,59 @@
+From 6134b471c35df826ccb41aab9a47e5c89e15a0c4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 26 Oct 2020 21:32:22 -0700
+Subject: [PATCH] Define correct gregs for RISCV32
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Updated patch for 6.2.1
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
+---
+ src/debug.c | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/src/debug.c b/src/debug.c
+index e7fec29..5abb404 100644
+--- a/src/debug.c
++++ b/src/debug.c
+@@ -1039,7 +1039,9 @@ static void *getMcontextEip(ucontext_t *uc) {
+     #endif
+ #elif defined(__linux__)
+     /* Linux */
+-    #if defined(__i386__) || ((defined(__X86_64__) || defined(__x86_64__)) && defined(__ILP32__))
++    #if defined(__riscv) && __riscv_xlen == 32
++    return (void*) uc->uc_mcontext.__gregs[REG_PC];
++    #elif defined(__i386__) || ((defined(__X86_64__) || defined(__x86_64__)) && defined(__ILP32__))
+     return (void*) uc->uc_mcontext.gregs[14]; /* Linux 32 */
+     #elif defined(__X86_64__) || defined(__x86_64__)
+     return (void*) uc->uc_mcontext.gregs[16]; /* Linux 64 */
+@@ -1206,8 +1208,28 @@ void logRegisters(ucontext_t *uc) {
+     #endif
+ /* Linux */
+ #elif defined(__linux__)
++    /* Linux RISCV32 */
++    #if defined(__riscv) && __riscv_xlen == 32
++    serverLog(LL_WARNING,
++    "\n"
++    "RA:%08lx S0:%08lx S1:%08lx S2:%08lx\n"
++    "SP:%08lx PC:%08lx A0:%08lx A1:%08lx\n"
++    "A2 :%08lx A3:%08lx A4:%08lx",
++        (unsigned long) uc->uc_mcontext.__gregs[REG_RA],
++        (unsigned long) uc->uc_mcontext.__gregs[REG_S0],
++        (unsigned long) uc->uc_mcontext.__gregs[REG_S1],
++        (unsigned long) uc->uc_mcontext.__gregs[REG_S2],
++        (unsigned long) uc->uc_mcontext.__gregs[REG_SP],
++        (unsigned long) uc->uc_mcontext.__gregs[REG_PC],
++        (unsigned long) uc->uc_mcontext.__gregs[REG_A0 + 0],
++        (unsigned long) uc->uc_mcontext.__gregs[REG_A0 + 1],
++        (unsigned long) uc->uc_mcontext.__gregs[REG_A0 + 2],
++        (unsigned long) uc->uc_mcontext.__gregs[REG_A0 + 3],
++        (unsigned long) uc->uc_mcontext.__gregs[REG_A0 + 4]
++    );
++    logStackContent((void**)uc->uc_mcontext.__gregs[REG_SP]);
+     /* Linux x86 */
+-    #if defined(__i386__) || ((defined(__X86_64__) || defined(__x86_64__)) && defined(__ILP32__))
++    #elif defined(__i386__) || ((defined(__X86_64__) || defined(__x86_64__)) && defined(__ILP32__))
+     serverLog(LL_WARNING,
+     "\n"
+     "EAX:%08lx EBX:%08lx ECX:%08lx EDX:%08lx\n"

@@ -1,4 +1,4 @@
-From 1a46082d0889a784037952c4da0cde3822849032 Mon Sep 17 00:00:00 2001
+From 6f8cee826ef9309c174aa97cb6af2ba532ed9dba Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Thu, 28 Jan 2021 18:44:10 -0800
 Subject: [PATCH] setup_build.py: avoid absolute path
@@ -15,7 +15,7 @@ Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/setup_build.py b/setup_build.py
-index 3c7c7ad..d824bdd 100644
+index 78c6677..64db7f7 100644
 --- a/setup_build.py
 +++ b/setup_build.py
 @@ -21,7 +21,7 @@ from setup_configure import BuildConfig

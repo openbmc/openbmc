@@ -1,0 +1,26 @@
+From 7d9a11a17da425d106791ada7100d7a6559e6065 Mon Sep 17 00:00:00 2001
+From: Adrian Freihofer <adrian.freihofer@siemens.com>
+Date: Sat, 7 Mar 2020 14:24:01 +0100
+Subject: [PATCH 2/2] Fix build with musl - systemd specific
+
+---
+ src/core/systemd/src/libsystemd-network/sd-dhcp6-client.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/core/systemd/src/libsystemd-network/sd-dhcp6-client.c b/src/core/systemd/src/libsystemd-network/sd-dhcp6-client.c
+index 3fafd3c0e..79d6096c2 100644
+--- a/src/core/systemd/src/libsystemd-network/sd-dhcp6-client.c
++++ b/src/core/systemd/src/libsystemd-network/sd-dhcp6-client.c
+@@ -8,7 +8,9 @@
+ #include <errno.h>
+ #include <sys/ioctl.h>
+ #if 0 /* NM_IGNORED */
++#ifdef __GLIBC__  /* musl supplies full set of userspace headers */
+ #include <linux/if_arp.h>
++#endif
+ #else /* NM_IGNORED */
+ #include <net/if_arp.h>
+ #endif /* NM_IGNORED */
+-- 
+2.20.1
+

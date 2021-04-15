@@ -18,7 +18,7 @@ diff --git a/configure b/configure
 index 0aafefc..03e8df0 100755
 --- a/configure
 +++ b/configure
-@@ -5411,6 +5411,7 @@ for ac_func in \
+@@ -5605,6 +5605,7 @@ for ac_func in \
  	unsetenv \
  	sched_yield \
  	setpgid \
@@ -42,7 +42,7 @@ diff --git a/main.c b/main.c
 index 5e60589..b81d2be 100644
 --- a/main.c
 +++ b/main.c
-@@ -2868,7 +2868,7 @@ main(int argc, char *argv[]ENVP_ARG)
+@@ -2903,7 +2903,7 @@ main(int argc, char *argv[]ENVP_ARG)
      }
  }
  
@@ -51,7 +51,7 @@ index 5e60589..b81d2be 100644
  #define USE_OPENPTY 1
  static int opened_tty = -1;
  #endif
-@@ -4040,7 +4040,7 @@ spawnXTerm(XtermWidget xw, unsigned line_speed)
+@@ -4074,7 +4074,7 @@ spawnXTerm(XtermWidget xw, unsigned line_speed)
  	    /*
  	     * now in child process
  	     */
@@ -64,14 +64,14 @@ diff --git a/xtermcfg.hin b/xtermcfg.hin
 index 1dbc3b8..4f3ff5b 100644
 --- a/xtermcfg.hin
 +++ b/xtermcfg.hin
-@@ -96,6 +96,7 @@
+@@ -95,6 +95,7 @@
  #undef HAVE_PUTENV		/* AC_CHECK_FUNCS(putenv) */
  #undef HAVE_SCHED_YIELD		/* AC_CHECK_FUNCS(sched_yield) */
  #undef HAVE_SETPGID		/* AC_CHECK_FUNCS(setpgid) */
 +#undef HAVE_SETSID		/* AC_CHECK_FUNCS(setsid) */
  #undef HAVE_STDINT_H		/* AC_PROG_CC_STDC */
  #undef HAVE_STDLIB_H		/* AC_CHECK_HEADERS(stdlib.h) */
- #undef HAVE_STRFTIME		/* AC_CHECK_FUNCS(strftime) */
+ #undef HAVE_STDNORETURN_H	/* CF_C11_NORETURN */
 -- 
 2.24.1
 

@@ -160,8 +160,8 @@ do_install() {
 
 PACKAGES =+ "${PN}-fstools ${PN}-adbd"
 
-RDEPENDS_${BPN}-adbd = "${BPN}-conf"
-RDEPENDS_${BPN}-fstools = "bash"
+RDEPENDS_${PN}-adbd = "${PN}-conf"
+RDEPENDS_${PN}-fstools = "bash"
 
 FILES_${PN}-adbd = "\
     ${bindir}/adbd \

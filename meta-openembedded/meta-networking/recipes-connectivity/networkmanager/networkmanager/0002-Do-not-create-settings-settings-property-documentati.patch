@@ -1,34 +1,29 @@
-From 9eab96351a726e9ce6a15d158f743e35d73a8900 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
-Date: Sat, 16 Jan 2021 14:27:38 +0100
+From d0dead0478a070b96f37bd3b310443eaa8c93a25 Mon Sep 17 00:00:00 2001
+From: Vinicius Aquino <voa.aquino@gmail.com>
+Date: Thu, 1 Apr 2021 14:13:07 -0300
 Subject: [PATCH] Do not create settings settings/property documentation
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
 It was tried to get this work by adding python3-pygobject-native to DEPENDS but
-compile could not find (configure passed) python module gi. 
+compile could not find (configure passed) python module gi.
 Anyway it is not necessary for us to have the settings/property docs.
 
 Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
-
+Signed-off-by: Vinicius Aquino <voa.aquino@gmail.com>
 ---
- Makefile.am  | 13 -------------
- configure.ac |  5 -----
- 2 files changed, 18 deletions(-)
+ Makefile.am  | 4 ----
+ configure.ac | 5 -----
+ 2 files changed, 9 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 110957a..b4cfbcc 100644
+index 9279672c1..2e52acbb2 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -1587,14 +1587,10 @@ libnm/libnm.typelib: libnm/libnm.gir
+@@ -1686,14 +1686,10 @@ libnm/libnm.typelib: libnm/libnm.gir
  INTROSPECTION_GIRS += libnm/NM-1.0.gir
  
  libnm_noinst_data = \
@@ -43,30 +38,11 @@ index 110957a..b4cfbcc 100644
  	$(NULL)
  
  noinst_DATA += $(libnm_noinst_data)
-@@ -4448,18 +4444,9 @@ $(clients_common_libnmc_base_la_OBJECTS): $(libnm_lib_h_pub_mkenums)
- $(clients_common_libnmc_base_la_OBJECTS): clients/common/.dirstamp
- 
- clients_common_settings_doc_h = clients/common/settings-docs.h
--if HAVE_INTROSPECTION
--$(clients_common_settings_doc_h): clients/common/settings-docs.xsl libnm/nm-settings-docs-gir.xml clients/common/.dirstamp
--	$(AM_V_GEN) $(XSLTPROC) --output $@ $< $(word 2,$^)
--DISTCLEANFILES += $(clients_common_settings_doc_h)
--check-local-settings-docs: $(clients_common_settings_doc_h)
--	$(srcdir)/tools/check-settings-docs.sh "$(srcdir)" "$(builddir)" "$(clients_common_settings_doc_h)"
--check_local += check-local-settings-docs
--else
- $(clients_common_settings_doc_h): $(clients_common_settings_doc_h).in clients/common/.dirstamp
- 	$(AM_V_GEN) cp "$(srcdir)/$(clients_common_settings_doc_h).in" "$(builddir)/$(clients_common_settings_doc_h)"
- check-local-settings-docs:
--endif
- EXTRA_DIST += \
- 	$(clients_common_settings_doc_h) \
- 	$(clients_common_settings_doc_h).in
 diff --git a/configure.ac b/configure.ac
-index 704b1c1..18bba87 100644
+index 784ac4695..681e6cb32 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1228,11 +1228,6 @@ GTK_DOC_CHECK(1.0)
+@@ -1241,11 +1241,6 @@ GTK_DOC_CHECK(1.0)
  # check if we can build setting property documentation
  build_docs=no
  if test -n "$INTROSPECTION_MAKEFILE"; then
@@ -79,5 +55,5 @@ index 704b1c1..18bba87 100644
  	if test -z "$PERL"; then
  		AC_MSG_ERROR([--enable-introspection requires perl])
 -- 
-2.26.2
+2.20.1
 

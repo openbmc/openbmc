@@ -11,6 +11,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/sipe/pidgin-sipe-${PV}.tar.xz \
            file://0001-sipe-consider-64bit-time_t-when-printing.patch \
            file://0001-Align-structs-casts-with-time_t-elements-to-8byte-bo.patch \
            file://0001-configure-Do-not-add-native-paths-to-pkgconfig-searc.patch \
+           file://0001-Migrate-to-use-g_memdup2.patch \
 "
 
 SRC_URI[md5sum] = "0e742f021dc8c3f17435aea05c3e0314"

@@ -17,4 +17,6 @@ do_install_append() {
     install -Dm644 ${S}/examples/systemd/vnstat.service "${D}${systemd_system_unitdir}/vnstat.service"
 }
 
+PARALLEL_MAKEINST = ""
+
 SYSTEMD_SERVICE_${PN} = "vnstat.service"

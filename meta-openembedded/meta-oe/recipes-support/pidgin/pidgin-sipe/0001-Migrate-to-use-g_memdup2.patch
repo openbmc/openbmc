@@ -1,0 +1,192 @@
+From 51c95a23bff3a024dc19e3127ca751e1458be0f0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 5 Apr 2021 11:36:50 -0700
+Subject: [PATCH] Migrate to use g_memdup2
+
+g_memdup has been deprecated for long and latest glib-2.0 2.68+ has
+turned it int an error to use old function.
+
+The fall-back to g_memdup isn't needed because pidgin provides g_memdup2
+in pidgin-sipe/1.25.0-r0/recipe-sysroot/usr/include/libpurple/glibcompat.h
+based on glib-2.0 version:
+  /* Backport the static inline version of g_memdup2 if we don't have g_memdup2.
+   * see https://mail.gnome.org/archives/desktop-devel-list/2021-February/msg00000.html
+   * for more information.
+   */
+  #if !GLIB_CHECK_VERSION(2, 67, 3)
+  static inline gpointer
+  g_memdup2(gconstpointer mem, gsize byte_size) {
+          gpointer new_mem = NULL;
+
+          if(mem && byte_size != 0) {
+                  new_mem = g_malloc (byte_size);
+                  memcpy (new_mem, mem, byte_size);
+          }
+
+          return new_mem;
+  }
+  #endif /* !GLIB_CHECK_VERSION(2, 67, 3) */
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/api/sipe-common.h              |  3 +++
+ src/core/sip-sec-gssapi.c          |  4 ++--
+ src/core/sip-sec-ntlm.c            | 12 ++++++------
+ src/core/sip-sec-tls-dsk.c         |  4 ++--
+ src/core/sipe-media.c              |  2 +-
+ src/core/sipe-tls-tester.c         |  2 +-
+ src/core/sipe-tls.c                |  4 ++--
+ src/telepathy/telepathy-protocol.c |  2 +-
+ 8 files changed, 18 insertions(+), 15 deletions(-)
+
+diff --git a/src/api/sipe-common.h b/src/api/sipe-common.h
+index c964f15..cab81e0 100644
+--- a/src/api/sipe-common.h
++++ b/src/api/sipe-common.h
+@@ -51,3 +51,6 @@
+ #ifdef _MSC_VER
+ typedef long ssize_t;
+ #endif
++
++// for g_memdup2
++#include <libpurple/glibcompat.h>
+diff --git a/src/core/sip-sec-gssapi.c b/src/core/sip-sec-gssapi.c
+index 873080f..4c63868 100644
+--- a/src/core/sip-sec-gssapi.c
++++ b/src/core/sip-sec-gssapi.c
+@@ -602,7 +602,7 @@ sip_sec_init_sec_context__gssapi(SipSecContext context,
+ 
+ 	out_buff->length = output_token.length;
+ 	if (out_buff->length)
+-		out_buff->value = g_memdup(output_token.value, output_token.length);
++		out_buff->value = g_memdup2(output_token.value, output_token.length);
+ 	else
+ 		/* Special case: empty token */
+ 		out_buff->value = (guint8 *) g_strdup("");
+@@ -653,7 +653,7 @@ sip_sec_make_signature__gssapi(SipSecContext context,
+ 		return FALSE;
+ 	} else {
+ 		signature->length = output_token.length;
+-		signature->value  = g_memdup(output_token.value,
++		signature->value  = g_memdup2(output_token.value,
+ 					     output_token.length);
+ 		gss_release_buffer(&minor, &output_token);
+ 		return TRUE;
+diff --git a/src/core/sip-sec-ntlm.c b/src/core/sip-sec-ntlm.c
+index 2e2354f..1fa4daa 100644
+--- a/src/core/sip-sec-ntlm.c
++++ b/src/core/sip-sec-ntlm.c
+@@ -951,7 +951,7 @@ sip_sec_ntlm_parse_challenge(SipSecBuffer in_buff,
+ 
+ 	/* server challenge (nonce) */
+ 	if (server_challenge) {
+-		*server_challenge = g_memdup(cmsg->nonce, 8);
++		*server_challenge = g_memdup2(cmsg->nonce, 8);
+ 	}
+ 
+ 	/* flags */
+@@ -984,7 +984,7 @@ sip_sec_ntlm_parse_challenge(SipSecBuffer in_buff,
+ 			*target_info_len = len;
+ 		}
+ 		if (target_info) {
+-			*target_info = g_memdup(content, len);
++			*target_info = g_memdup2(content, len);
+ 		}
+ 	}
+ }
+@@ -1117,13 +1117,13 @@ sip_sec_ntlm_gen_authenticate(guchar **client_sign_key,
+ 		   Set ServerSigningKey to SIGNKEY(ExportedSessionKey, "Server")
+ 		*/
+ 		SIGNKEY(exported_session_key, TRUE, key);
+-		*client_sign_key = g_memdup(key, 16);
++		*client_sign_key = g_memdup2(key, 16);
+ 		SIGNKEY(exported_session_key, FALSE, key);
+-		*server_sign_key = g_memdup(key, 16);
++		*server_sign_key = g_memdup2(key, 16);
+ 		SEALKEY(neg_flags, exported_session_key, TRUE, key);
+-		*client_seal_key = g_memdup(key, 16);
++		*client_seal_key = g_memdup2(key, 16);
+ 		SEALKEY(neg_flags, exported_session_key, FALSE, key);
+-		*server_seal_key = g_memdup(key, 16);
++		*server_seal_key = g_memdup2(key, 16);
+ 	}
+ 
+ 	/* @TODO: */
+diff --git a/src/core/sip-sec-tls-dsk.c b/src/core/sip-sec-tls-dsk.c
+index 70433ea..2d3f2db 100644
+--- a/src/core/sip-sec-tls-dsk.c
++++ b/src/core/sip-sec-tls-dsk.c
+@@ -88,9 +88,9 @@ sip_sec_init_sec_context__tls_dsk(SipSecContext context,
+ 			/* copy key pair */
+ 			ctx->algorithm  = state->algorithm;
+ 			ctx->key_length = state->key_length;
+-			ctx->client_key = g_memdup(state->client_key,
++			ctx->client_key = g_memdup2(state->client_key,
+ 						   state->key_length);
+-			ctx->server_key = g_memdup(state->server_key,
++			ctx->server_key = g_memdup2(state->server_key,
+ 						   state->key_length);
+ 
+ 			/* extract certicate expiration time */
+diff --git a/src/core/sipe-media.c b/src/core/sipe-media.c
+index e9c4b8a..936e31c 100644
+--- a/src/core/sipe-media.c
++++ b/src/core/sipe-media.c
+@@ -578,7 +578,7 @@ media_stream_to_sdpmedia(struct sipe_media_call_private *call_private,
+ 	// Set our key if encryption is enabled.
+ 	if (stream_private->encryption_key &&
+ 	    encryption_policy != SIPE_ENCRYPTION_POLICY_REJECTED) {
+-		sdpmedia->encryption_key = g_memdup(stream_private->encryption_key,
++		sdpmedia->encryption_key = g_memdup2(stream_private->encryption_key,
+ 						    SIPE_SRTP_KEY_LEN);
+ 		sdpmedia->encryption_key_id = stream_private->encryption_key_id;
+ 	}
+diff --git a/src/core/sipe-tls-tester.c b/src/core/sipe-tls-tester.c
+index e80d715..5fbb5f8 100644
+--- a/src/core/sipe-tls-tester.c
++++ b/src/core/sipe-tls-tester.c
+@@ -155,7 +155,7 @@ static guchar *read_tls_record(int fd,
+ 		printf("received %d bytes from server\n", result);
+ 		record = g_new0(struct record, 1);
+ 		record->length  = result;
+-		record->msg     = g_memdup(buffer, result);
++		record->msg     = g_memdup2(buffer, result);
+ 		length         += result;
+ 		fragments = g_slist_append(fragments, record);
+ 	}
+diff --git a/src/core/sipe-tls.c b/src/core/sipe-tls.c
+index b0235d5..020aedb 100644
+--- a/src/core/sipe-tls.c
++++ b/src/core/sipe-tls.c
+@@ -427,7 +427,7 @@ static guchar *sipe_tls_prf(SIPE_UNUSED_PARAMETER struct tls_internal_state *sta
+ 	gsize half           = (secret_length + 1) / 2;
+ 	gsize newseed_length = label_length + seed_length;
+ 	/* secret: used as S1; secret2: last half of original secret (S2) */
+-	guchar *secret2 = g_memdup(secret + secret_length - half, half);
++	guchar *secret2 = g_memdup2(secret + secret_length - half, half);
+ 	guchar *newseed = g_malloc(newseed_length);
+ 	guchar *md5, *dest;
+ 	guchar *sha1, *src;
+@@ -1525,7 +1525,7 @@ static struct tls_compiled_message *tls_client_key_exchange(struct tls_internal_
+ 
+ 	/* found all the required fields */
+ 	state->server_random.length = server_random->length;
+-	state->server_random.buffer = g_memdup(server_random->data,
++	state->server_random.buffer = g_memdup2(server_random->data,
+ 					       server_random->length);
+ 	tls_calculate_secrets(state);
+ 
+diff --git a/src/telepathy/telepathy-protocol.c b/src/telepathy/telepathy-protocol.c
+index f6e5337..1dde579 100644
+--- a/src/telepathy/telepathy-protocol.c
++++ b/src/telepathy/telepathy-protocol.c
+@@ -237,7 +237,7 @@ static void get_connection_details(SIPE_UNUSED_PARAMETER TpBaseProtocol *self,
+ 			SIPE_TYPE_SEARCH_MANAGER,
+ 			G_TYPE_INVALID
+ 		};
+-		*channel_managers = g_memdup(types, sizeof(types));
++		*channel_managers = g_memdup2(types, sizeof(types));
+ 	}
+ 	if (icon_name)
+ 		*icon_name    = g_strdup("im-" SIPE_TELEPATHY_DOMAIN);

@@ -6,6 +6,7 @@ import tempfile
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
 
+
 class MetaOESourceMirroring(OESelftestTestCase):
     # Can we download everything from the OpenEmbedded Sources Mirror over http only
     def test_oe_source_mirror(self):

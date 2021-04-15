@@ -2,12 +2,12 @@
 
 """\
 Sanitize a bitbake file following the OpenEmbedded style guidelines,
-see http://openembedded.org/wiki/StyleGuide 
+see http://openembedded.org/wiki/StyleGuide
 
 (C) 2006 Cyril Romain <cyril.romain@gmail.com>
 MIT license
 
-TODO: 
+TODO:
  - add the others OpenEmbedded variables commonly used:
  - parse command arguments and print usage on misuse
     . prevent giving more than one .bb file in arguments
@@ -19,7 +19,7 @@ TODO:
  - count rule breaks and displays them in the order frequence
 """
 
-from __future__ import print_function 
+from __future__ import print_function
 import fileinput
 import string
 import re
@@ -65,7 +65,7 @@ OE_vars = [
     'RSUGGESTS',
     'RPROVIDES',
     'RCONFLICTS',
-    'FILES',    
+    'FILES',
     'do_package',
     'do_stage',
     'addhandler',
@@ -215,80 +215,113 @@ routineRegexp = r'^([a-zA-Z0-9_ ${}-]+?)\('
 
 # Variables seen in the processed .bb
 seen_vars = {}
-for v in OE_vars: 
+for v in OE_vars:
     seen_vars[v] = []
 
-# _Format guideline #0_: 
-#   No spaces are allowed at the beginning of lines that define a variable or 
+# _Format guideline #0_:
+#   No spaces are allowed at the beginning of lines that define a variable or
 #   a do_ routine
-def respect_rule0(line): 
-    return line.lstrip()==line
-def conformTo_rule0(line): 
+
+
+def respect_rule0(line):
+    return line.lstrip() == line
+
+
+def conformTo_rule0(line):
     return line.lstrip()
 
-# _Format guideline #1_: 
+# _Format guideline #1_:
 #   No spaces are allowed behind the line continuation symbol '\'
+
+
 def respect_rule1(line):
     if line.rstrip().endswith('\\'):
         return line.endswith('\\')
-    else: 
+    else:
         return True
+
+
 def conformTo_rule1(line):
     return line.rstrip()
 
-# _Format guideline #2_: 
+# _Format guideline #2_:
 #   Tabs should not be used (use spaces instead).
+
+
 def respect_rule2(line):
-    return line.count('\t')==0
+    return line.count('\t') == 0
+
+
 def conformTo_rule2(line):
     return line.expandtabs()
 
 # _Format guideline #3_:
-#   Comments inside bb files are allowed using the '#' character at the 
+#   Comments inside bb files are allowed using the '#' character at the
 #   beginning of a line.
+
+
 def respect_rule3(line):
     if line.lstrip().startswith('#'):
         return line.startswith('#')
-    else: 
+    else:
         return True
+
+
 def conformTo_rule3(line):
     return line.lstrip()
 
 # _Format guideline #4_:
 #   Use quotes on the right hand side of assignments FOO = "BAR"
+
+
 def respect_rule4(line):
     r = re.search(varRegexp, line)
     if r is not None:
         r2 = re.search(r'("?)([^"\\]*)(["\\]?)', r.group(5))
         # do not test for None it because always match
-        return r2.group(1)=='"' and r2.group(3)!=''
+        return r2.group(1) == '"' and r2.group(3) != ''
     return False
+
+
 def conformTo_rule4(line):
     r = re.search(varRegexp, line)
     return ''.join([r.group(1), ' ', r.group(3), ' "', r.group(5), r.group(5).endswith('"') and '' or '"'])
 
 # _Format guideline #5_:
 #   The correct spacing for a variable is FOO = "BAR".
+
+
 def respect_rule5(line):
     r = re.search(varRegexp, line)
-    return r is not None and r.group(2)==" " and r.group(4)==" "
+    return r is not None and r.group(2) == " " and r.group(4) == " "
+
+
 def conformTo_rule5(line):
     r = re.search(varRegexp, line)
     return ''.join([r.group(1), ' ', r.group(3), ' ', r.group(5)])
 
 # _Format guideline #6_:
 #   Don't use spaces or tabs on empty lines
+
+
 def respect_rule6(line):
-    return not line.isspace() or line=="\n"
+    return not line.isspace() or line == "\n"
+
+
 def conformTo_rule6(line):
     return ""
 
 # _Format guideline #7_:
 #   Indentation of multiline variables such as SRC_URI is desireable.
+
+
 def respect_rule7(line):
     return True
+
+
 def conformTo_rule7(line):
     return line
+
 
 rules = (
     (respect_rule0, conformTo_rule0, "No spaces are allowed at the beginning of lines that define a variable or a do_ routine"),
@@ -303,6 +336,8 @@ rules = (
 
 # Function to check that a line respects a rule. If not, it tries to conform
 # the line to the rule. Reminder or Disgression message are dump accordingly.
+
+
 def follow_rule(i, line):
     oldline = line
     # if the line does not respect the rule
@@ -312,10 +347,10 @@ def follow_rule(i, line):
         # if the line still does not respect the rule
         if not rules[i][0](line):
             # this is a rule disgression
-            print ("## Disgression: ", rules[i][2], " in: '", oldline, "'")
+            print("## Disgression: ", rules[i][2], " in: '", oldline, "'")
         else:
             # just remind user about his/her errors
-            print ("## Reminder: ", rules[i][2], " in : '", oldline, "'")
+            print("## Reminder: ", rules[i][2], " in : '", oldline, "'")
     return line
 
 
@@ -329,8 +364,8 @@ if __name__ == "__main__":
         if True:
             lines.append(line)
         else:
-            # expandtabs on each line so that rule2 is always respected 
-            # rstrip each line so that rule1 is always respected 
+            # expandtabs on each line so that rule2 is always respected
+            # rstrip each line so that rule1 is always respected
             line = line.expandtabs().rstrip()
             # ignore empty lines (or line filled with spaces or tabs only)
             # so that rule6 is always respected
@@ -342,7 +377,7 @@ if __name__ == "__main__":
     in_routine = False
     commentBloc = []
     olines = []
-    for line in lines: 
+    for line in lines:
         originalLine = line
         # rstrip line to remove line breaks characters
         line = line.rstrip()
@@ -353,12 +388,13 @@ if __name__ == "__main__":
         # ignore empty lines
         if line.isspace() or line is '':
             # flush comments into the olines
-            for c in commentBloc: olines.append(c)
+            for c in commentBloc:
+                olines.append(c)
             commentBloc = []
             continue
 
-        if line.startswith('}'): 
-            in_routine=False
+        if line.startswith('}'):
+            in_routine = False
         keep = line.endswith('\\') or in_routine
 
         # handles commented lines
@@ -370,7 +406,8 @@ if __name__ == "__main__":
             continue
 
         if var in seen_vars:
-            for c in commentBloc: seen_vars[var].append(c)
+            for c in commentBloc:
+                seen_vars[var].append(c)
             commentBloc = []
             seen_vars[var].append(line)
         else:
@@ -378,8 +415,8 @@ if __name__ == "__main__":
                 if line.startswith(k):
                     var = k
                     break
-            if re.match(routineRegexp, line) is not None: 
-                in_routine=True
+            if re.match(routineRegexp, line) is not None:
+                in_routine = True
                 line = follow_rule(0, line)
             elif re.match(varRegexp, line) is not None:
                 line = follow_rule(0, line)
@@ -387,26 +424,30 @@ if __name__ == "__main__":
                 line = follow_rule(5, line)
             if var == "":
                 if not in_routine:
-                    print ("## Warning: unknown variable/routine \"%s\"" % originalLine.rstrip('\n'))
+                    print("## Warning: unknown variable/routine \"%s\"" % originalLine.rstrip('\n'))
                 var = 'others'
-            for c in commentBloc: seen_vars[var].append(c)
+            for c in commentBloc:
+                seen_vars[var].append(c)
             commentBloc = []
             seen_vars[var].append(line)
-        if not keep and not in_routine: var = ""
+        if not keep and not in_routine:
+            var = ""
 
     # -- dump the sanitized .bb file --
     addEmptyLine = False
     # write comments that are not related to variables nor routines
-    for l in commentBloc: olines.append(l)
+    for l in commentBloc:
+        olines.append(l)
     # write variables and routines
     previourVarPrefix = "unknown"
     for k in OE_vars:
-        if k=='SRC_URI': addEmptyLine = True
-        if seen_vars[k] != []: 
+        if k == 'SRC_URI':
+            addEmptyLine = True
+        if seen_vars[k] != []:
             if addEmptyLine and not k.startswith(previourVarPrefix):
                 olines.append("")
-            for l in seen_vars[k]: 
+            for l in seen_vars[k]:
                 olines.append(l)
-            previourVarPrefix = k.split('_')[0]=='' and "unknown" or k.split('_')[0]
-    for line in olines: print(line)
-
+            previourVarPrefix = k.split('_')[0] == '' and "unknown" or k.split('_')[0]
+    for line in olines:
+        print(line)

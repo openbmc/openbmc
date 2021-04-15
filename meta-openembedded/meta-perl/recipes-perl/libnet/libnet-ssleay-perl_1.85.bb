@@ -19,6 +19,7 @@ RDEPENDS_${PN} += "\
     perl-module-extutils-makemaker \
     perl-module-mime-base64 \
     perl-module-socket \
+    perl-module-autoloader \
     zlib \
 "
 
