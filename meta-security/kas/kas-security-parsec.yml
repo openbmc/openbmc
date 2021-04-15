@@ -1,0 +1,21 @@
+header:
+    version: 9
+    includes:
+        - kas-security-base.yml
+
+repos:
+  meta-security:
+    layers:
+      meta-parsec:
+
+  meta-rust:
+    url: https://github.com/meta-rust/meta-rust.git
+    refspec: master
+
+  meta-clang:
+    url: https://github.com/kraj/meta-clang.git
+    refspec: master
+
+local_conf_header:
+  meta-parsec: |
+    IMAGE_INSTALL_append = " parsec-service parsec-tool"

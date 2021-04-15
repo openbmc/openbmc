@@ -1,0 +1,18 @@
+
+Use cryptoki v0.1.1 which supports the "generate-bindings" feature
+required for building Parsec service 0.7.0 in Yocto.
+
+Signed-off-by: Anton Antonov <Anton.Antonov@arm.com>
+Upstream-Status: Submitted
+
+--- a/Cargo.toml	2021-04-01 10:29:50.333687763 +0100
++++ b/Cargo.toml	2021-04-01 10:27:13.051860002 +0100
+@@ -37,7 +37,7 @@
+ version = "1.3.1"
+ 
+ [dependencies.cryptoki]
+-version = "0.1.0"
++version = "0.1.1"
+ features = ["psa-crypto-conversions"]
+ optional = true
+ 

@@ -7,18 +7,19 @@ DEPENDS = "libtasn1 coreutils-native expect socat glib-2.0 net-tools-native libt
 
 # configure checks for the tools already during compilation and
 # then swtpm_setup needs them at runtime
-DEPENDS += "tpm-tools-native expect-native socat-native"
+DEPENDS_append = " tpm-tools-native expect-native socat-native python3-pip-native python3-cryptography-native"
 
 SRCREV = "e59c0c1a7b4c8d652dbb280fd6126895a7057464"
 SRC_URI = "git://github.com/stefanberger/swtpm.git;branch=stable-0.5 \
            file://ioctl_h.patch \
+           file://oe_configure.patch \
            "
 PE = "1"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig python3-dir
 PARALLEL_MAKE = ""
+inherit autotools pkgconfig python3native
 
 TSS_USER="tss"
 TSS_GROUP="tss"
@@ -41,7 +42,7 @@ USERADD_PARAM_${PN} = "--system -g ${TSS_GROUP} --home-dir  \
 
 
 PACKAGES =+ "${PN}-python"
-FILES_${PN}-python = "${nonarch_libdir}/${PYTHON_PN}/dist-packages/* "
+FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
 
 PACKAGE_BEFORE_PN = "${PN}-cuse"
 FILES_${PN}-cuse = "${bindir}/swtpm_cuse"

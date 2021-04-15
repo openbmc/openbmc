@@ -1,0 +1,58 @@
+Fixes checks not needed do to glibc 2.33
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/CMakeLists.txt
+===================================================================
+--- git.orig/CMakeLists.txt
++++ git/CMakeLists.txt
+@@ -374,8 +373,6 @@ check_include_file("stdlib.h"
+ check_include_file("string.h"           HAVE_STRING_H)
+ check_include_file("strings.h"          HAVE_STRINGS_H)
+ check_include_file("sys/cdefs.h"        HAVE_SYS_CDEFS_H)
+-check_include_file("sys/dl.h"           HAVE_SYS_DL_H)
+-check_include_file("sys/fileio.h"       HAVE_SYS_FILIO_H)
+ check_include_file("sys/mman.h"         HAVE_SYS_MMAN_H)
+ check_include_file("sys/param.h"        HAVE_SYS_PARAM_H)
+ check_include_file("sys/queue.h"        HAVE_SYS_QUEUE_H)
+@@ -410,8 +407,6 @@ endif()
+ 
+ # int-types variants
+ check_include_file("inttypes.h"         HAVE_INTTYPES_H)
+-check_include_file("sys/inttypes.h"     HAVE_SYS_INTTYPES_H)
+-check_include_file("sys/int_types.h"    HAVE_SYS_INT_TYPES_H)
+ check_include_file("stdint.h"           HAVE_STDINT_H)
+ 
+ # this hack required to silence warnings on systems with inttypes.h
+@@ -539,17 +528,11 @@ check_type_size("time_t"  SIZEOF_TIME_T)
+ # Checks for library functions.
+ include(CheckSymbolExists)
+ check_symbol_exists(_Exit           "stdlib.h"      HAVE__EXIT)
+-check_symbol_exists(accept4         "sys/types.h"   HAVE_ACCEPT4)
+ check_symbol_exists(snprintf        "stdio.h"       HAVE_SNPRINTF)
+-check_symbol_exists(stat64          "sys/stat.h"    HAVE_STAT64)
+-check_symbol_exists(strcasestr      "string.h"      HAVE_STRCASESTR)
+ check_symbol_exists(strerror_r      "string.h"      HAVE_STRERROR_R)
+-check_symbol_exists(strlcat         "string.h"      HAVE_STRLCAT)
+-check_symbol_exists(strlcpy         "string.h"      HAVE_STRLCPY)
+ check_symbol_exists(strndup         "string.h"      HAVE_STRNDUP)
+ check_symbol_exists(strnlen         "string.h"      HAVE_STRNLEN)
+-check_symbol_exists(strnstr         "string.h"      HAVE_STRNSTR)
+-check_symbol_exists(sysctlbyname    "sysctl.h"      HAVE_SYSCTLBYNAME)
++check_symbol_exists(strcasecmp      "string.h"      HAVE_STRNCMP)
+ check_symbol_exists(timegm          "time.h"        HAVE_TIMEGM)
+ check_symbol_exists(vsnprintf       "stdio.h"       HAVE_VSNPRINTF)
+ 
+@@ -563,10 +546,9 @@ else()
+     check_symbol_exists(fseeko          "stdio.h"       HAVE_FSEEKO)
+     check_symbol_exists(getaddrinfo     "netdb.h"       HAVE_GETADDRINFO)
+     check_symbol_exists(getpagesize     "unistd.h"      HAVE_GETPAGESIZE)
+-    check_symbol_exists(mkstemp         "unistd.h"      HAVE_MKSTEMP)
+     check_symbol_exists(poll            "poll.h"        HAVE_POLL)
+-    check_symbol_exists(setgroups       "unistd.h"      HAVE_SETGROUPS)
+     check_symbol_exists(setsid          "unistd.h"      HAVE_SETSID)
++    set(HAVE_SYSCONF_SC_PAGESIZE 1)
+ endif()
+ 
+ include(CheckSymbolExists)

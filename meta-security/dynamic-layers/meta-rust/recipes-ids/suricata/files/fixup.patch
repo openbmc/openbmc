@@ -1,0 +1,32 @@
+Skip pkg Makefile from using its own rust steps
+
+Upstream-Status: OE Specific
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: suricata-6.0.2/Makefile.am
+===================================================================
+--- suricata-6.0.2.orig/Makefile.am
++++ suricata-6.0.2/Makefile.am
+@@ -7,7 +7,7 @@ EXTRA_DIST = ChangeLog COPYING LICENSE s
+              $(SURICATA_UPDATE_DIR) \
+ 	     lua \
+ 	     acsite.m4
+-SUBDIRS = $(HTP_DIR) rust src qa rules doc contrib etc python ebpf \
++SUBDIRS = $(HTP_DIR) src qa rules doc contrib etc python ebpf \
+           $(SURICATA_UPDATE_DIR)
+ 
+ CLEANFILES = stamp-h[0-9]*
+Index: suricata-6.0.2/Makefile.in
+===================================================================
+--- suricata-6.0.2.orig/Makefile.in
++++ suricata-6.0.2/Makefile.in
+@@ -426,7 +426,7 @@ EXTRA_DIST = ChangeLog COPYING LICENSE s
+ 	     lua \
+ 	     acsite.m4
+ 
+-SUBDIRS = $(HTP_DIR) rust src qa rules doc contrib etc python ebpf \
++SUBDIRS = $(HTP_DIR) src qa rules doc contrib etc python ebpf \
+           $(SURICATA_UPDATE_DIR)
+ 
+ CLEANFILES = stamp-h[0-9]*

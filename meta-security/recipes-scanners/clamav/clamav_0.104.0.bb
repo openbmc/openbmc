@@ -4,94 +4,68 @@ HOMEPAGE = "http://www.clamav.net/index.html"
 SECTION = "security"
 LICENSE = "LGPL-2.1"
 
-DEPENDS = "libtool db libxml2 openssl zlib curl llvm clamav-native libmspack bison-native"
-DEPENDS_class-native = "db-native openssl-native zlib-native llvm-native curl-native bison-native"
+DEPENDS = "glibc llvm libtool db openssl zlib curl libxml2 bison pcre2 json-c libcheck"
  
-LIC_FILES_CHKSUM = "file://COPYING.LGPL;beginline=2;endline=3;md5=4b89c05acc71195e9a06edfa2fa7d092"
+LIC_FILES_CHKSUM = "file://COPYING.txt;beginline=2;endline=3;md5=f7029fbbc5898b273d5902896f7bbe17"
 
-SRCREV = "482fcd413b07e9fd3ef9850e6d01a45f4e187108"
+SRCREV = "5553a5e206ceae5d920368baee7d403f823bcb6f"
 
-SRC_URI = "git://github.com/vrtadmin/clamav-devel;branch=rel/0.101 \
+SRC_URI = "git://github.com/vrtadmin/clamav-devel;branch=dev/0.104 \
     file://clamd.conf \
     file://freshclam.conf \
     file://volatiles.03_clamav \
     file://tmpfiles.clamav \
     file://${BPN}.service \
-    file://freshclam-native.conf \
-    "
-
+    file://headers_fixup.patch \
+    file://oe_cmake_fixup.patch \
+"
 S = "${WORKDIR}/git"
 
 LEAD_SONAME = "libclamav.so"
-SO_VER = "9.0.4"
+SO_VER = "9.6.0"
 
-inherit autotools pkgconfig useradd systemd multilib_header multilib_script
+BINCONFIG = "${bindir}/clamav-config"
+
+inherit cmake chrpath pkgconfig useradd systemd multilib_header multilib_script
 
 CLAMAV_UID ?= "clamav"
 CLAMAV_GID ?= "clamav"
-INSTALL_CLAMAV_CVD ?= "1"
 
-CLAMAV_USR_DIR = "${STAGING_DIR_NATIVE}/usr"
-CLAMAV_USR_DIR_class-target = "${STAGING_DIR_HOST}/usr"
+MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/clamav-config"
 
-PACKAGECONFIG_class-target ?= "ncurses bz2"
-PACKAGECONFIG_class-target += " ${@bb.utils.contains("DISTRO_FEATURES", "ipv6", "ipv6", "", d)}"
-PACKAGECONFIG_class-target += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
+EXTRA_OECMAKE = " -DCMAKE_BUILD_TYPE=Release -DOPTIMIZE=ON -DENABLE_JSON_SHARED=OFF \
+                  -DCLAMAV_GROUP=${CLAMAV_GID} -DCLAMAV_USER=${CLAMAV_UID} \ 
+                  -DENABLE_TESTS=OFF -DBUILD_SHARED_LIBS=ON \
+                  -DDISABLE_MPOOL=ON -DENABLE_FRESHCLAM_DNS_FIX=ON \
+                   "
 
-PACKAGECONFIG[pcre] = "--with-pcre=${STAGING_LIBDIR},  --without-pcre, libpcre"
-PACKAGECONFIG[json] = "--with-libjson=${STAGING_LIBDIR}, --without-libjson, json-c,"
-PACKAGECONFIG[ipv6] = "--enable-ipv6, --disable-ipv6"
-PACKAGECONFIG[bz2] = "--with-libbz2-prefix=${CLAMAV_USR_DIR}, --disable-bzip2, bzip2"
-PACKAGECONFIG[ncurses] = "--with-libncurses-prefix=${CLAMAV_USR_DIR}, --without-libncurses-prefix, ncurses, "
-PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_unitdir}/system/, --without-systemdsystemunitdir, "
+PACKAGECONFIG ?= "  clamonacc \
+                 ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "systemd", "", d)}"
 
-MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/clamav-config ${PN}-cvd:${localstatedir}/lib/clamav/mirrors.dat"
+PACKAGECONFIG[milter] = "-DENABLE_MILTER=ON ,-DENABLE_MILTER=OFF, curl, curl"
+PACKAGECONFIG[clamonacc] = "-DENABLE_CLAMONACC=ON ,-DENABLE_CLAMONACC=OFF,"
+PACKAGECONFIG[unrar] = "-DENABLE_UNRAR=ON ,-DENABLE_UNRAR=OFF,"
+PACKAGECONFIG[systemd] = "-DENABLE_SYSTEMD=ON -DSYSTEMD_UNIT_DIR=${systemd_system_unitdir}, -DENABLE_SYSTEMD=OFF, systemd"
 
-EXTRA_OECONF_CLAMAV = "--without-libcheck-prefix --disable-unrar \
-            --disable-mempool \
-            --program-prefix="" \
-            --disable-zlib-vcheck \
-            --with-xml=${CLAMAV_USR_DIR} \
-            --with-zlib=${CLAMAV_USR_DIR} \
-            --with-openssl=${CLAMAV_USR_DIR} \
-            --with-libcurl=${CLAMAV_USR_DIR} \
-            --with-system-libmspack=${CLAMAV_USR_DIR} \
-            --with-iconv=no \
-            --enable-check=no \
-            "
+export OECMAKE_C_FLAGS += " -I${STAGING_INCDIR} -L ${RECIPE_SYSROOT}${nonarch_libdir} -L${STAGING_LIBDIR} -lpthread" 
 
-EXTRA_OECONF_class-native += "${EXTRA_OECONF_CLAMAV}"
-EXTRA_OECONF_class-target += "--with-user=${CLAMAV_UID}  --with-group=${CLAMAV_GID} ${EXTRA_OECONF_CLAMAV}"
-
-do_configure () {
-    ${S}/configure ${CONFIGUREOPTS} ${EXTRA_OECONF} 
-}
-
-do_configure_class-native () {
-    ${S}/configure ${CONFIGUREOPTS} ${EXTRA_OECONF} 
-}
-
-do_compile_append_class-target() {
-    if [ "${INSTALL_CLAMAV_CVD}" = "1" ]; then
-        bbnote "CLAMAV creating cvd"
-        install -d ${S}/clamav_db
-        ${STAGING_BINDIR_NATIVE}/freshclam --datadir=${S}/clamav_db --config=${WORKDIR}/freshclam-native.conf
-    fi
-}
-
-do_install_append_class-target () {
+do_install_append () {
     install -d ${D}/${sysconfdir}
     install -d ${D}/${localstatedir}/lib/clamav
     install -d ${D}${sysconfdir}/clamav ${D}${sysconfdir}/default/volatiles
 
-    install -m 644 ${WORKDIR}/clamd.conf ${D}/${sysconfdir}
-    install -m 644 ${WORKDIR}/freshclam.conf ${D}/${sysconfdir}
+    install -m 644 ${WORKDIR}/clamd.conf ${D}/${prefix}/${sysconfdir}
+    install -m 644 ${WORKDIR}/freshclam.conf ${D}/${prefix}/${sysconfdir}
     install -m 0644 ${WORKDIR}/volatiles.03_clamav  ${D}${sysconfdir}/default/volatiles/03_clamav
     sed -i -e 's#${STAGING_DIR_HOST}##g' ${D}${libdir}/pkgconfig/libclamav.pc
     rm ${D}/${libdir}/libclamav.so
     if [ "${INSTALL_CLAMAV_CVD}" = "1" ]; then
         install -m 666 ${S}/clamav_db/* ${D}/${localstatedir}/lib/clamav/.
     fi
+
+    rm ${D}/${libdir}/libfreshclam.so
+    rm ${D}/${libdir}/libmspack.so
+
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)};then
         install -D -m 0644 ${WORKDIR}/clamav.service ${D}${systemd_unitdir}/system/clamav.service
         install -d ${D}${sysconfdir}/tmpfiles.d
@@ -111,13 +85,13 @@ pkg_postinst_ontarget_${PN} () {
 }
 
 
-PACKAGES = "${PN} ${PN}-dev ${PN}-dbg ${PN}-daemon ${PN}-doc ${PN}-cvd \
+PACKAGES = "${PN} ${PN}-dev ${PN}-dbg ${PN}-daemon ${PN}-doc \
             ${PN}-clamdscan ${PN}-freshclam ${PN}-libclamav ${PN}-staticdev"
 
-FILES_${PN} = "${bindir}/clambc ${bindir}/clamscan ${bindir}/clamsubmit \
+FILES_${PN} = "${bindir}/clambc ${bindir}/clamscan ${bindir}/clamsubmit ${sbindir}/clamonacc \
                 ${bindir}/*sigtool ${mandir}/man1/clambc* ${mandir}/man1/clamscan* \
                 ${mandir}/man1/sigtool* ${mandir}/man1/clambsubmit*  \
-                ${docdir}/clamav/* "
+                ${docdir}/clamav/* ${libdir}/libmspack* "
 
 FILES_${PN}-clamdscan = " ${bindir}/clamdscan \
                         ${docdir}/clamdscan/* \
@@ -128,12 +102,17 @@ FILES_${PN}-daemon = "${bindir}/clamconf ${bindir}/clamdtop ${sbindir}/clamd \
                         ${mandir}/man1/clamconf* ${mandir}/man1/clamdtop* \
                         ${mandir}/man5/clamd*  ${mandir}/man8/clamd* \
                         ${sysconfdir}/clamd.conf* \
+                        /usr/etc/clamd.conf* \
                         ${systemd_unitdir}/system/clamav-daemon/* \
                         ${docdir}/clamav-daemon/*  ${sysconfdir}/clamav-daemon \
-                        ${sysconfdir}/logcheck/ignore.d.server/clamav-daemon "
+                        ${sysconfdir}/logcheck/ignore.d.server/clamav-daemon \
+                        ${systemd_unitdir}/system/clamav-daemon.service \
+                        ${systemd_unitdir}/system/clamav-clamonacc.service \
+                        "
 
 FILES_${PN}-freshclam = "${bindir}/freshclam \
                         ${sysconfdir}/freshclam.conf*  \
+                        /usr/etc/freshclam.conf*  \
                         ${sysconfdir}/clamav ${sysconfdir}/default/volatiles \
                         ${sysconfdir}/tmpfiles.d/*.conf \
                         ${localstatedir}/lib/clamav \
@@ -148,14 +127,12 @@ FILES_${PN}-dev = " ${bindir}/clamav-config ${libdir}/*.la \
 
 FILES_${PN}-staticdev = "${libdir}/*.a"
 
-FILES_${PN}-libclamav = "${libdir}/libclamav.so* ${libdir}/libclammspack.so*\
-                          ${docdir}/libclamav/* "
+FILES_${PN}-libclamav = "${libdir}/libclamav.so* ${libdir}/libclammspack.so* \
+                         ${libdir}/libfreshclam.so* ${docdir}/libclamav/* "
 
 FILES_${PN}-doc = "${mandir}/man/* \
                    ${datadir}/man/* \
                    ${docdir}/* "
-
-FILES_${PN}-cvd =  "${localstatedir}/lib/clamav/*.cvd ${localstatedir}/lib/clamav/*.dat"
 
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM_${PN} = "--system ${CLAMAV_UID}"
@@ -169,6 +146,3 @@ RCONFLICTS_${PN} += "${PN}-systemd"
 SYSTEMD_SERVICE_${PN} = "${BPN}.service"
 
 RDEPENDS_${PN} = "openssl ncurses-libncurses libxml2 libbz2 ncurses-libtinfo curl libpcre2 clamav-freshclam clamav-libclamav"
-RDEPENDS_${PN}_class-native = ""
-
-BBCLASSEXTEND = "native"

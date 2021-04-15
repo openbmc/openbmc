@@ -2,11 +2,16 @@
 #
 # Loads IMA policy into the kernel.
 
+force_ima=@@FORCE_IMA@@
+
 ima_enabled() {
-    if [ "$bootparam_no_ima" = "true" ]; then
+    if [ "$force_ima" = "true" ]; then
+        return 0
+    elif [ "$bootparam_no_ima" = "true" ]; then
         return 1
+    else
+        return 0
     fi
-    return 0
 }
 
 ima_run() {
