@@ -18,7 +18,8 @@ SYSTEMD_ENVIRONMENT_FILE_${PN}_append_gbs +="obmc/gpio/gpios-6.conf"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_gbs +="obmc/gpio/gpios-7.conf"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_gbs +="obmc/gpio/gpios-8.conf"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_gbs +="obmc/gpio/gpios-9.conf"
-GBS_OBMC_PRESENT_INSTANCES = "0 1 2 3 4 5 6 7 8 9"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_gbs +="obmc/gpio/gpios-10.conf"
+GBS_OBMC_PRESENT_INSTANCES = "0 1 2 3 4 5 6 7 8 9 10"
 
 SYSTEMD_LINK_${PN}-presence_append_gbs = " ${@compose_list(d, 'FMT_PRESENT', 'GBS_OBMC_PRESENT_INSTANCES')}"
 

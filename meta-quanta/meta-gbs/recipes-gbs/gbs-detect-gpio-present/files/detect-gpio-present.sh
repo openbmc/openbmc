@@ -10,7 +10,8 @@ PRESENT_OBJPATH=("/xyz/openbmc_project/inventory/system/chassis/cable/ss_cab0_pr
 "/xyz/openbmc_project/inventory/system/chassis/cable/bp12v_cab_prsnt"
 "/xyz/openbmc_project/inventory/system/chassis/entity/sata0_prsnt"
 "/xyz/openbmc_project/inventory/system/chassis/entity/pe_slot0_prsnt"
-"/xyz/openbmc_project/inventory/system/chassis/entity/pe_slot1_prsnt")
+"/xyz/openbmc_project/inventory/system/chassis/entity/pe_slot1_prsnt"
+"/xyz/openbmc_project/inventory/system/chassis/entity/fans_efuse_pg")
 INTERFACE_NAME="xyz.openbmc_project.Inventory.Item"
 
 IPMI_LOG_SERVICE="xyz.openbmc_project.Logging.IPMI"
@@ -23,7 +24,7 @@ LOG_EVENT_DATA="3 0x01 0xff 0xfe"
 LOG_ASSERT_FLAG="true"
 LOG_DEASSERT_FLAG="false"
 LOG_GENID_FLAG="0x0020"
-present_state=("true" "true" "true" "true" "true" "true" "true" "true" "true" "true")
+present_state=("true" "true" "true" "true" "true" "true" "true" "true" "true" "true" "true")
 
 for i in ${!PRESENT_OBJPATH[@]}
 do
