@@ -1,0 +1,8 @@
+{
+  "PostComplete": "POST_COMPLETE",
+  "PwrButton": "POWER_BUTTON",
+  "PwrOK": "PS_PWROK",
+  "PwrOut": "POWER_OUT",
+  "RstButton": "RESET_BUTTON",
+  "RstOut": "RESET_OUT"
+}
