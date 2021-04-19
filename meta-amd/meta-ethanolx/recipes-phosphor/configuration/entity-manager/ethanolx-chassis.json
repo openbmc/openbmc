@@ -1,0 +1,77 @@
+{
+    "Exposes": [
+        {
+            "Index": 0,
+            "BindConnector": "P0 Fan connector",
+            "MaxReading": 6000,
+            "Name": "P0_Fan",
+            "Type": "AspeedFan",
+            "Pwm": 1,
+            "Tachs": [1],
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        },
+        {
+            "Index": 1,
+            "BindConnector": "P1 Fan connector",
+            "MaxReading": 6000,
+            "Name": "P1_Fan",
+            "Type": "AspeedFan",
+            "Pwm": 2,
+            "Tachs": [2],
+            "Thresholds": [
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 10
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 10000
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 8000
+                }
+            ]
+        }
+    ],
+    "Name": "AMD EthanolX Chassis",
+    "Probe": "FOUND('AMD EthanolX Baseboard')",
+    "Type": "Chassis"
+}
