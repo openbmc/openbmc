@@ -27,13 +27,28 @@ for ((i = 0; i < 16; i++)); do
         Present | awk '{print $2}')"
 
     if [[ "$presentState" == "true" ]]; then
-        wcTemp="$(
-            busctl get-property xyz.openbmc_project.nvme.manager \
-                ${nvmePath}${i} \
-                xyz.openbmc_project.Sensor.Threshold.Critical \
-                CriticalHigh | awk '{print $2}'
-        )"
-        wcTemp="$((wcTemp * 1000))"
+        actualWCTemp=0
+        for ((j = 0; j < 3; j++)); do
+            actualWCTemp="$(
+                busctl get-property xyz.openbmc_project.nvme.manager \
+                    ${nvmePath}${i} \
+                    xyz.openbmc_project.Sensor.Threshold.Critical \
+                    CriticalHigh | awk '{print $2}'
+            )"
+            if [[ "${actualWCTemp}" -ne 0 ]]; then
+                break
+            fi
+
+            echo "${nvmePath}${i} WCTemp was read to be 0, retrying after 1 sec sleep"
+            sleep 1
+        done
+
+        if [[ "${actualWCTemp}" -eq 0 ]]; then
+            echo "${nvmePath}${i} WCTemp was read to be 0, setting to default WCTemp: ${wcTemp}"
+            actualWCTemp="${wcTemp}"
+        fi
+
+        wcTemp="$((actualWCTemp * 1000))"
         if [[ -z "$nvmeList" ]]; then
             nvmeList="\"nvme"${i}"\""
         else
