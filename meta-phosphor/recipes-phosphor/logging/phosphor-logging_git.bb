@@ -66,7 +66,7 @@ PACKAGECONFIG[metadata-processing] = " \
 PACKAGECONFIG[openpower-pels] = " \
         --enable-openpower-pel-extension, \
         --disable-openpower-pel-extension, \
-        nlohmann-json nlohmann-fifo cli11 pldm, \
+        nlohmann-json cli11 pldm, \
         python3, \
         "
 
