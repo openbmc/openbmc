@@ -43,12 +43,12 @@ for ((i = 0; i < 16; i++)); do
             sleep 1
         done
 
-        if [[ "${actualWCTemp}" -eq 0 ]]; then
-            echo "${nvmePath}${i} WCTemp was read to be 0, setting to default WCTemp: ${wcTemp}"
-            actualWCTemp="${wcTemp}"
+        if [[ "${actualWCTemp}" -ne 0 ]]; then
+            wcTemp="$((actualWCTemp * 1000))"
+        else
+            echo "${nvmePath}${i} WCTemp was read to be 0, using default WCTemp: ${wcTemp}"
         fi
 
-        wcTemp="$((actualWCTemp * 1000))"
         if [[ -z "$nvmeList" ]]; then
             nvmeList="\"nvme"${i}"\""
         else
