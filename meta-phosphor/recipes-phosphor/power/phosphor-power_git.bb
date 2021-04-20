@@ -39,6 +39,7 @@ DEPENDS += " \
          ${PYTHON_PN}-setuptools-native \
          ${PYTHON_PN}-mako-native \
          boost \
+         libgpiod \
          "
 
 # The monitor package uses an org.open_power D-Bus interface and so
