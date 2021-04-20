@@ -10,7 +10,7 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"
 do_install() {
         install -d ${D}${bindir}
         install -m 0755 ${S}/fp5280g2-psu-update ${D}${bindir}/fp5280g2-psu-update
