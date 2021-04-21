@@ -1,6 +1,6 @@
 KBRANCH ?= "dev-5.10-kdump"
 LINUX_VERSION ?= "5.10.30"
 
-SRCREV="d538d632fb2046278ff3457994d64d43ee2901c7"
+SRCREV="e047f17492eb61abb8ed272768f571ccc37d26e8"
 
 require linux-aspeed.inc
