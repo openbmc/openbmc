@@ -8,6 +8,6 @@ inherit cmake
 SRC_URI = "git://github.com/openbmc/libpeci"
 
 PV = "0.1+git${SRCPV}"
-SRCREV = "8fc53d7cef0dd7ac405b5d7d91a368f376cdb508"
+SRCREV = "ff44e549c44c7658ec11e0c19c13c4c45900cfe4"
 
 S = "${WORKDIR}/git"

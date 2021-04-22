@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-EXTRA_OECONF_append = " --enable-negative-errno-on-fail"
+EXTRA_OEMESON_append = " -Dnegative-errno-on-fail=true"
 
 ITEMS = "iio-hwmon-battery.conf"
 

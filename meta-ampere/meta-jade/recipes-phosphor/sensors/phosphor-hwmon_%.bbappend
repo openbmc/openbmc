@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_append_mtjade := "${THISDIR}/${PN}:"
 
-EXTRA_OECONF_append_mtjade = " --enable-negative-errno-on-fail"
+EXTRA_OEMESON_append_mtjade = " -Dnegative-errno-on-fail=true"
 
 CHIPS_mtjade = " \
         bus@1e78a000/i2c-bus@100/tmp175@28 \

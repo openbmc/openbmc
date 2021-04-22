@@ -71,5 +71,5 @@ Patch checklist.  Please ensure patches adhere to the following guidelines:
    message](https://chris.beams.io/posts/git-commit/#seven-rules)
 
 For questions or help please come join us on the [mailing
-list](https://lists.ozlabs.org/listinfo/openbmc) or in
-[IRC](irc://freenode.net/openbmc).
+list](https://lists.ozlabs.org/listinfo/openbmc) or on
+[Discord](https://discord.gg/69Km47zH98).

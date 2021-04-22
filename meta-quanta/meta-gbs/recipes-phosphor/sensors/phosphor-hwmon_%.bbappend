@@ -32,4 +32,4 @@ FENVS = "obmc/hwmon/ahb/apb/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_gbs = " ${@compose_list(d, 'FENVS', 'FITEMS')}"
 
 
-EXTRA_OECONF_append_gbs = " --enable-update-functional-on-fail"
+EXTRA_OEMESON_append_gbs = " -Dupdate-functional-on-fail=true"

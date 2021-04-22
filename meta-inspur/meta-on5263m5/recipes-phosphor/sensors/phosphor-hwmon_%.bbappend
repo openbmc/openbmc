@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-EXTRA_OECONF_append_on5263m5= " --enable-negative-errno-on-fail"
+EXTRA_OEMESON_append_on5263m5= " -Dnegative-errno-on-fail=true"
 
 CHIPS = " \
         bus@1e78a000/i2c-bus@1c0/tmp112@48 \
