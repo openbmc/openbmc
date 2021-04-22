@@ -1,4 +1,4 @@
-Unit]
+[Unit]
 Description=System unit to hard reset or system reset chassis for yosemitev2
 
 [Service]
