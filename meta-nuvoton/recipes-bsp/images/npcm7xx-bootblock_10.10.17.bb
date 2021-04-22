@@ -15,7 +15,7 @@ SRC_URI = " \
 "
 
 SRC_URI[lic.md5sum] = "b234ee4d69f5fce4486a80fdaf4a4263"
-SRC_URI[bin.sha256sum] = "b2df56cc8667227fa625f11c628bfc10c831d36d076bf28ff376902d06b63a54"
+SRC_URI[bin.sha256sum] = "3e92e3f6c4624139d000f91541792a54f52205637bb88abd14310c854694cb39"
 
 inherit deploy
 
