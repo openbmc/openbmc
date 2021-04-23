@@ -17,13 +17,13 @@ do_install() {
   install -m 0644 ${WORKDIR}/iperf3.service ${D}${systemd_system_unitdir}
 }
 
-# Allow IPERF3 to the mgmt node on DEV builds
+# Allow IPERF3 to run on the gbmcbr node on DEV builds
 do_install_append_dev() {
   nftables_dir=${D}${sysconfdir}/nftables
   rules=$nftables_dir/50-gbmc-iperf3-dev.rules
   install -d -m0755 $nftables_dir
   echo 'table inet filter {' >"$rules"
-  echo '    chain mgmt_pub_input {' >>"$rules"
+  echo '    chain gbmc_br_pub_input {' >>"$rules"
   echo '        tcp dport 5201 accept' >>"$rules"
   echo '    }' >>"$rules"
   echo '}' >>"$rules"

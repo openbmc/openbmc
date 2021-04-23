@@ -1,0 +1,8 @@
+[Match]
+Name=gbmcbr
+[Network]
+DHCP=false
+IPv6AcceptRA=false
+LLMNR=true
+MulticastDNS=true
+LinkLocalAddressing=ipv6
