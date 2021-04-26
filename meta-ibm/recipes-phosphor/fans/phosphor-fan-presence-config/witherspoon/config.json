@@ -6,7 +6,7 @@
          {
             "type": "gpio",
             "key": 4,
-            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060",
+            "physpath": "/sys/bus/i2c/devices/3-0060",
             "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
          },
          {
@@ -28,7 +28,7 @@
          {
             "type": "gpio",
             "key": 5,
-            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060",
+            "physpath": "/sys/bus/i2c/devices/3-0060",
             "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
          },
          {
@@ -50,7 +50,7 @@
          {
             "type": "gpio",
             "key": 6,
-            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060",
+            "physpath": "/sys/bus/i2c/devices/3-0060",
             "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
          },
          {
@@ -72,7 +72,7 @@
          {
             "type": "gpio",
             "key": 7,
-            "physpath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c-bus/i2c-3/3-0060",
+            "physpath": "/sys/bus/i2c/devices/3-0060",
             "devpath": "/dev/input/by-path/platform-gpio-keys-polled-event"
          },
          {
