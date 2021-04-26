@@ -14,4 +14,4 @@ S = "${WORKDIR}/git"
 
 inherit perlnative
 
-DEPENDS += "libxml2-native libxml-simple-perl-native"
+DEPENDS += "libxml2-native libxml-simple-perl-native libjson-perl-native"
