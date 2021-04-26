@@ -2,7 +2,7 @@
 Name=gbmcbr
 [Network]
 DHCP=false
-IPv6AcceptRA=false
+IPv6AcceptRA=true
 LLMNR=true
 MulticastDNS=true
 LinkLocalAddressing=ipv6

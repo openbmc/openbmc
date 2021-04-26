@@ -15,6 +15,9 @@ SRC_URI += " \
   file://ipmi.service.in \
   file://50-gbmc-br.rules \
   file://gbmc-br-ula.sh \
+  file://gbmc-br-from-ra.sh \
+  file://gbmc-br-ensure-ra.sh \
+  file://gbmc-br-ensure-ra.service \
   "
 
 FILES_${PN}_append = " \
@@ -25,10 +28,14 @@ FILES_${PN}_append = " \
   "
 
 RDEPENDS_${PN}_append = " \
+  bash \
   gbmc-ip-monitor \
   mstpd-mstpd \
   network-sh \
+  ndisc6-rdisc6 \
   "
+
+SYSTEMD_SERVICE_${PN} += "gbmc-br-ensure-ra.service"
 
 GBMC_BR_MAC_ADDR ?= ""
 
@@ -81,4 +88,10 @@ do_install() {
   mondir=${D}${datadir}/gbmc-ip-monitor
   install -d -m0755 "$mondir"
   install -m0644 ${WORKDIR}/gbmc-br-ula.sh "$mondir"/
+  install -m0644 ${WORKDIR}/gbmc-br-from-ra.sh "$mondir"/
+
+  install -d -m0755 ${D}${libexecdir}
+  install -m0755 ${WORKDIR}/gbmc-br-ensure-ra.sh ${D}${libexecdir}/
+  install -d -m0755 ${D}${systemd_system_unitdir}
+  install -m0755 ${WORKDIR}/gbmc-br-ensure-ra.service ${D}${systemd_system_unitdir}/
 }
