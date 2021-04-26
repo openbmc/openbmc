@@ -14,16 +14,20 @@ SRC_URI += " \
   file://+-bmc-gbmcbrusb.network \
   file://ipmi.service.in \
   file://50-gbmc-br.rules \
+  file://gbmc-br-ula.sh \
   "
 
 FILES_${PN}_append = " \
+  ${datadir}/gbmc-ip-monitor \
   ${systemd_unitdir}/network \
   ${sysconfdir}/nftables \
   ${sysconfdir}/avahi/services \
   "
 
 RDEPENDS_${PN}_append = " \
+  gbmc-ip-monitor \
   mstpd-mstpd \
+  network-sh \
   "
 
 GBMC_BR_MAC_ADDR ?= ""
@@ -72,4 +76,8 @@ do_install() {
   sed -i 's,@EXTRA_ATTRS@,,g' ${WORKDIR}/ipmi.service.in
   sed 's,@NAME@,bmc,g' ${WORKDIR}/ipmi.service.in >${avahi_dir}/bmc.ipmi.service
   sed 's,@NAME@,${MACHINE}-bmc,g' ${WORKDIR}/ipmi.service.in >${avahi_dir}/${MACHINE}-bmc.ipmi.service
+
+  mondir=${D}${datadir}/gbmc-ip-monitor
+  install -d -m0755 "$mondir"
+  install -m0644 ${WORKDIR}/gbmc-br-ula.sh "$mondir"/
 }
