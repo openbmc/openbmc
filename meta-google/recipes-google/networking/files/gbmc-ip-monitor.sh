@@ -114,7 +114,7 @@ trap cleanup HUP INT QUIT ABRT TERM EXIT
 return 0 2>/dev/null
 
 while read line; do
-  gbmc_ip_monitor_parse_line || continue
+  gbmc_ip_monitor_parse_line "$line" || continue
   gbmc_ip_monitor_run_hooks || continue
   if [ "$change" = 'init' ]; then
     systemd-notify --ready
