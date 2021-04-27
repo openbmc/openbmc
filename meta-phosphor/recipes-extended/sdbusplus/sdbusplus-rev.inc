@@ -3,4 +3,4 @@ PR = "r1"
 PV = "1.0+git${SRCPV}"
 
 SRC_URI += "git://github.com/openbmc/sdbusplus"
-SRCREV = "533218b426ce2b393248591c234e2bb734fd0c43"
+SRCREV = "f8860128c9f16afd287ba5e83e2395e10f09fae1"
