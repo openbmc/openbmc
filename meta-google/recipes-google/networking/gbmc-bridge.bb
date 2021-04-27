@@ -18,6 +18,7 @@ SRC_URI += " \
   file://gbmc-br-from-ra.sh \
   file://gbmc-br-ensure-ra.sh \
   file://gbmc-br-ensure-ra.service \
+  file://gbmc-br-nft.sh \
   "
 
 FILES_${PN}_append = " \
@@ -89,6 +90,7 @@ do_install() {
   install -d -m0755 "$mondir"
   install -m0644 ${WORKDIR}/gbmc-br-ula.sh "$mondir"/
   install -m0644 ${WORKDIR}/gbmc-br-from-ra.sh "$mondir"/
+  install -m0644 ${WORKDIR}/gbmc-br-nft.sh "$mondir"/
 
   install -d -m0755 ${D}${libexecdir}
   install -m0755 ${WORKDIR}/gbmc-br-ensure-ra.sh ${D}${libexecdir}/
