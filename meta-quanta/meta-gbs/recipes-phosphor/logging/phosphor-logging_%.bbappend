@@ -1,0 +1,1 @@
+EXTRA_OECONF_append_gbs = " ERROR_INFO_CAP=256"
