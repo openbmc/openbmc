@@ -2,11 +2,11 @@
 Description=Virtual sensors
 Wants=obmc-mapper.target
 After=obmc-mapper.target
+After=mapper-wait@-xyz-openbmc_project-sensors-temperature-inlet.service
+After=mapper-wait@-xyz-openbmc_project-sensors-temperature-outlet_0.service
+After=mapper-wait@-xyz-openbmc_project-sensors-temperature-outlet_1.service
 
 [Service]
-ExecStartPre=mapper wait /xyz/openbmc_project/sensors/temperature/inlet
-ExecStartPre=mapper wait /xyz/openbmc_project/sensors/temperature/outlet_0
-ExecStartPre=mapper wait /xyz/openbmc_project/sensors/temperature/outlet_1
 ExecStart=/usr/bin/virtual-sensor
 ExecStartPost=/usr/bin/setMaxMinValue.sh
 Type=dbus
