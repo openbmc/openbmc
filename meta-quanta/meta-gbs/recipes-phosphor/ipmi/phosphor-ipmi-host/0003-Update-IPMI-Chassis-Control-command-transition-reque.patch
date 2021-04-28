@@ -1,0 +1,180 @@
+From 291629d5c3e5bea31925c9d025688897c90eb783 Mon Sep 17 00:00:00 2001
+From: "Jason M. Bills" <jason.m.bills@linux.intel.com>
+Date: Thu, 30 Jan 2020 16:22:24 -0800
+Subject: [PATCH 3/3] Update IPMI Chassis Control command transition requests
+
+This change updates the IPMI Chassis Control command to use the new
+host state transitions and chassis off transition based on the
+mapping in the design document below.  This allows each chassis
+control action to more closely follow the behavior defined in the
+IPMI spec.
+
+ref: https://gerrit.openbmc-project.xyz/c/openbmc/docs/+/22358
+
+Tested:
+Ran each IPMI chassis control command to confirm the expected
+behavior:
+ipmitool power on: system is powered-on using Host.On
+ipmitool power off: system is forced off using Chassis.Off
+ipmitool power cycle: system is forced off then powered-on using
+                      Host.Reboot
+ipmitool power reset: system is hard reset using Host.ForceWarmReboot
+ipmitool power soft: soft power-off requested from system software
+                     using Host.Off
+
+Change-Id: Ieb42722102fde0e51a49dc4aaa3ff227a3394066
+Signed-off-by: Jason M. Bills <jason.m.bills@linux.intel.com>
+---
+ chassishandler.cpp | 121 ++-------------------------------------------
+ 1 file changed, 5 insertions(+), 116 deletions(-)
+
+diff --git a/chassishandler.cpp b/chassishandler.cpp
+index af9cba72..663081de 100644
+--- a/chassishandler.cpp
++++ b/chassishandler.cpp
+@@ -1301,76 +1301,6 @@ ipmi::RspType<uint4_t, // Restart Cause
+     return ipmi::responseSuccess(cause.value(), reserved, channel);
+ }
+ 
+-//-------------------------------------------------------------
+-// Send a command to SoftPowerOff application to stop any timer
+-//-------------------------------------------------------------
+-int stop_soft_off_timer()
+-{
+-    constexpr auto iface = "org.freedesktop.DBus.Properties";
+-    constexpr auto soft_off_iface = "xyz.openbmc_project.Ipmi.Internal."
+-                                    "SoftPowerOff";
+-
+-    constexpr auto property = "ResponseReceived";
+-    constexpr auto value = "xyz.openbmc_project.Ipmi.Internal."
+-                           "SoftPowerOff.HostResponse.HostShutdown";
+-
+-    // Get the system bus where most system services are provided.
+-    auto bus = ipmid_get_sd_bus_connection();
+-
+-    // Get the service name
+-    // TODO openbmc/openbmc#1661 - Mapper refactor
+-    //
+-    // See openbmc/openbmc#1743 for some details but high level summary is that
+-    // for now the code will directly call the soft off interface due to a
+-    // race condition with mapper usage
+-    //
+-    // char *busname = nullptr;
+-    // auto r = mapper_get_service(bus, SOFTOFF_OBJPATH, &busname);
+-    // if (r < 0)
+-    //{
+-    //    fprintf(stderr, "Failed to get %s bus name: %s\n",
+-    //            SOFTOFF_OBJPATH, -r);
+-    //    return r;
+-    //}
+-
+-    // No error object or reply expected.
+-    int rc = sd_bus_call_method(bus, SOFTOFF_BUSNAME, SOFTOFF_OBJPATH, iface,
+-                                "Set", nullptr, nullptr, "ssv", soft_off_iface,
+-                                property, "s", value);
+-    if (rc < 0)
+-    {
+-        log<level::ERR>("Failed to set property in SoftPowerOff object",
+-                        entry("ERRNO=0x%X", -rc));
+-    }
+-
+-    // TODO openbmc/openbmc#1661 - Mapper refactor
+-    // free(busname);
+-    return rc;
+-}
+-
+-//----------------------------------------------------------------------
+-// Create file to indicate there is no need for softoff notification to host
+-//----------------------------------------------------------------------
+-void indicate_no_softoff_needed()
+-{
+-    fs::path path{HOST_INBAND_REQUEST_DIR};
+-    if (!fs::is_directory(path))
+-    {
+-        fs::create_directory(path);
+-    }
+-
+-    // Add the host instance (default 0 for now) to the file name
+-    std::string file{HOST_INBAND_REQUEST_FILE};
+-    auto size = std::snprintf(nullptr, 0, file.c_str(), 0);
+-    size++; // null
+-    std::unique_ptr<char[]> buf(new char[size]);
+-    std::snprintf(buf.get(), size, file.c_str(), 0);
+-
+-    // Append file name to directory and create it
+-    path /= buf.get();
+-    std::ofstream(path.c_str());
+-}
+-
+ /** @brief Implementation of chassis control command
+  *
+  *  @param - chassisControl command byte
+@@ -1386,60 +1316,19 @@ ipmi::RspType<> ipmiChassisControl(uint8_t chassisControl)
+             rc = initiateHostStateTransition(State::Host::Transition::On);
+             break;
+         case CMD_POWER_OFF:
+-            // This path would be hit in 2 conditions.
+-            // 1: When user asks for power off using ipmi chassis command 0x04
+-            // 2: Host asking for power off post shutting down.
+-
+-            // If it's a host requested power off, then need to nudge Softoff
+-            // application that it needs to stop the watchdog timer if running.
+-            // If it is a user requested power off, then this is not really
+-            // needed. But then we need to differentiate between user and host
+-            // calling this same command
+-
+-            // For now, we are going ahead with trying to nudge the soft off and
+-            // interpret the failure to do so as a non softoff case
+-            rc = stop_soft_off_timer();
+-
+-            // Only request the Off transition if the soft power off
+-            // application is not running
+-            if (rc < 0)
+-            {
+-                // First create a file to indicate to the soft off application
+-                // that it should not run. Not doing this will result in State
+-                // manager doing a default soft power off when asked for power
+-                // off.
+-                indicate_no_softoff_needed();
+-
+-                // Now request the shutdown
+-                rc = initiateHostStateTransition(State::Host::Transition::Off);
+-            }
+-            else
+-            {
+-                log<level::INFO>("Soft off is running, so let shutdown target "
+-                                 "stop the host");
+-            }
++            rc =
++                initiateChassisStateTransition(State::Chassis::Transition::Off);
+             break;
+-
+         case CMD_HARD_RESET:
++            rc = initiateHostStateTransition(
++                State::Host::Transition::ForceWarmReboot);
++            break;
+         case CMD_POWER_CYCLE:
+-            // SPEC has a section that says certain implementations can trigger
+-            // PowerOn if power is Off when a command to power cycle is
+-            // requested
+-
+-            // First create a file to indicate to the soft off application
+-            // that it should not run since this is a direct user initiated
+-            // power reboot request (i.e. a reboot request that is not
+-            // originating via a soft power off SMS request)
+-            indicate_no_softoff_needed();
+-
+             rc = initiateHostStateTransition(State::Host::Transition::Reboot);
+             break;
+-
+         case CMD_SOFT_OFF_VIA_OVER_TEMP:
+-            // Request Host State Manager to do a soft power off
+             rc = initiateHostStateTransition(State::Host::Transition::Off);
+             break;
+-
+         case CMD_PULSE_DIAGNOSTIC_INTR:
+             rc = setNmiProperty(true);
+             break;
+-- 
+2.21.0
+
