@@ -1,18 +1,56 @@
-From 8eafa1b0513dd2f5898182487b4524a485bf1e21 Mon Sep 17 00:00:00 2001
-From: Eddielu <Eddie.Lu@quantatw.com>
-Date: Mon, 27 Jul 2020 20:54:28 +0800
-Subject: [PATCH] Update add sensors slow readings patch.
+From c1b3d32430df12ab01f9cacf132aedff8324d55b Mon Sep 17 00:00:00 2001
+From: Brandon Kim <brandonkim@google.com>
+Date: Fri, 9 Aug 2019 15:38:53 -0700
+Subject: [PATCH] sensor: Implement sensor "ASYNC_READ_TIMEOUT"
 
+This change will prevent sensors from blocking all other sensor reads
+and D-Bus if they do not report failures quickly enough.
+
+If "ASYNC_READ_TIMEOUT" environment variable is defined in the
+sensor's config file for a key_type, the sensor read will be
+asynchronous with timeout set in milliseconds.
+
+For example for "sensor1":
+ASYNC_READ_TIMEOUT_sensor1="1000"  // Timeout will be set to 1 sec
+
+If the read times out, the sensor read will be skipped and the
+sensor's functional property will be set to 'false'. Timed out futures
+will be placed in a map to prevent their destructor from running and
+blocking until the read completes (limiation of std::async).
+
+Change-Id: I3d9ed4d5c9cc87d3196fc281451834f3001d0b48
+Signed-off-by: Brandon Kim <brandonkim@google.com>
 ---
- mainloop.cpp | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ Makefile.am  |  2 ++
+ mainloop.cpp | 73 +++++++++++++++++++++++++++++++++++++++++++++++---
  mainloop.hpp |  3 +++
  meson.build  |  1 +
- sensor.cpp   | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++-------
- sensor.hpp   | 20 ++++++++++++++--
- 5 files changed, 158 insertions(+), 14 deletions(-)
+ sensor.cpp   | 75 ++++++++++++++++++++++++++++++++++++++++++++++------
+ sensor.hpp   | 20 ++++++++++++--
+ 6 files changed, 160 insertions(+), 14 deletions(-)
 
+diff --git a/Makefile.am b/Makefile.am
+index 706a6cc..c620fa4 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -46,6 +46,7 @@ libhwmon_la_LIBADD = \
+ 	$(SDEVENTPLUS_LIBS) \
+ 	$(PHOSPHOR_DBUS_INTERFACES_LIBS) \
+ 	$(PHOSPHOR_LOGGING_LIBS) \
++	$(PTHREAD_LIBS) \
+ 	$(GPIOPLUS_LIBS) \
+ 	$(STDPLUS_LIBS) \
+ 	$(CODE_COVERAGE_LIBS) \
+@@ -55,6 +56,7 @@ libhwmon_la_CXXFLAGS = \
+ 	$(SDEVENTPLUS_CFLAGS) \
+ 	$(PHOSPHOR_DBUS_INTERFACES_CFLAGS) \
+ 	$(PHOSPHOR_LOGGING_CFLAGS) \
++	$(PTHREAD_CFLAGS) \
+ 	$(STDPLUS_CFLAGS) \
+ 	$(CODE_COVERAGE_CXXFLAGS)
+ 
 diff --git a/mainloop.cpp b/mainloop.cpp
-index 4789a80..98d0658 100644
+index ecceee5..29dc26a 100644
 --- a/mainloop.cpp
 +++ b/mainloop.cpp
 @@ -34,6 +34,7 @@
@@ -23,7 +61,7 @@ index 4789a80..98d0658 100644
  #include <iostream>
  #include <memory>
  #include <phosphor-logging/elog-errors.hpp>
-@@ -299,7 +300,7 @@ std::optional<ObjectStateData>
+@@ -242,7 +243,7 @@ std::optional<ObjectStateData>
      {
          // Add status interface based on _fault file being present
          sensorObj->addStatus(info);
@@ -32,7 +70,7 @@ index 4789a80..98d0658 100644
      }
      catch (const std::system_error& e)
      {
-@@ -542,10 +543,74 @@ void MainLoop::read()
+@@ -478,10 +479,74 @@ void MainLoop::read()
                  // RAII object for GPIO unlock / lock
                  auto locker = sensor::gpioUnlock(sensor->getGpio());
  
@@ -144,7 +182,7 @@ index 66e6801..d6a92f8 100644
      link_with: [
          libaverage,
 diff --git a/sensor.cpp b/sensor.cpp
-index b1cb470..72b45f8 100644
+index 09aeca6..ac2f896 100644
 --- a/sensor.cpp
 +++ b/sensor.cpp
 @@ -15,6 +15,7 @@
@@ -155,7 +193,7 @@ index b1cb470..72b45f8 100644
  #include <phosphor-logging/elog-errors.hpp>
  #include <thread>
  #include <xyz/openbmc_project/Common/error.hpp>
-@@ -125,8 +126,9 @@ SensorValueType Sensor::adjustValue(SensorValueType value)
+@@ -116,8 +117,9 @@ SensorValueType Sensor::adjustValue(SensorValueType value)
      return value;
  }
  
@@ -167,7 +205,7 @@ index b1cb470..72b45f8 100644
  {
      static constexpr bool deferSignals = true;
  
-@@ -153,12 +155,69 @@ std::shared_ptr<ValueObject> Sensor::addValue(const RetryIO& retryIO,
+@@ -144,12 +146,69 @@ std::shared_ptr<ValueObject> Sensor::addValue(const RetryIO& retryIO,
              // RAII object for GPIO unlock / lock
              auto locker = gpioUnlock(getGpio());
  
@@ -244,7 +282,7 @@ index b1cb470..72b45f8 100644
  #ifdef UPDATE_FUNCTIONAL_ON_FAIL
          catch (const std::system_error& e)
 diff --git a/sensor.hpp b/sensor.hpp
-index 369a252..41c0fe7 100644
+index 4b2d281..64d6e48 100644
 --- a/sensor.hpp
 +++ b/sensor.hpp
 @@ -4,6 +4,8 @@
@@ -291,5 +329,5 @@ index 369a252..41c0fe7 100644
      /**
       * @brief Add status interface and functional property for sensor
 -- 
-2.7.4
+2.21.0
 
