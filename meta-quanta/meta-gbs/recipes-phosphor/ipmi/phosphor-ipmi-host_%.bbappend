@@ -15,3 +15,5 @@ EXTRA_OECONF_append_gbs = " \
      FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/gbs-yaml-config/ipmi-fru-read.yaml \
      INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/gbs-yaml-config/ipmi-inventory-sensors.yaml \
      "
+
+RDEPENDS_${PN}_remove_gbs = "clear-once"
