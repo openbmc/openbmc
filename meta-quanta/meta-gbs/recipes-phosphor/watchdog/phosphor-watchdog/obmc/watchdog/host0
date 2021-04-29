@@ -1,0 +1,5 @@
+DEVPATH=/xyz/openbmc_project/watchdog/host0
+SERVICE=xyz.openbmc_project.Watchdog
+UNIT_HARD_RESET=phosphor-host-watchdog-reset.service
+UNIT_POWER_OFF=phosphor-host-watchdog-poweroff.service
+UNIT_POWER_CYCLE=phosphor-host-watchdog-powercycle.service
