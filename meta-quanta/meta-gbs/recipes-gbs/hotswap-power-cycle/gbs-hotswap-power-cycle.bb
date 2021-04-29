@@ -8,6 +8,7 @@ inherit systemd
 
 DEPENDS += "systemd"
 RDEPENDS_${PN} += "bash"
+RDEPENDS_${PN} += "libgpiod-tools"
 
 SRC_URI = " file://hotswap-power-cycle.service \
             file://tray_powercycle.sh \

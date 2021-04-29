@@ -8,8 +8,9 @@ inherit systemd
 
 DEPENDS += "systemd"
 RDEPENDS_${PN} += "bash"
-RDEPENDS_${PN} += "libsystemd"
+RDEPENDS_${PN} += "i2c-tools"
 RDEPENDS_${PN} += "jq"
+RDEPENDS_${PN} += "libsystemd"
 
 SRC_URI = "file://gbs-sysinit.sh \
            file://gbs-gpio-common.sh \
