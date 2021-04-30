@@ -7,13 +7,12 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-inherit autotools pkgconfig
+inherit meson
 inherit python3native
 inherit obmc-phosphor-dbus-service
 inherit phosphor-logging
 inherit phosphor-dbus-yaml
 
-DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
 DEPENDS += "${PYTHON_PN}-mako-native"
 DEPENDS += "${PYTHON_PN}-pyyaml-native"
@@ -56,21 +55,16 @@ SRCREV = "60356ad409fd51703ba2ac7ea13df3d7f0426d0c"
 
 S = "${WORKDIR}/git"
 
-PACKAGECONFIG ??= "metadata-processing"
-
-PACKAGECONFIG[metadata-processing] = " \
-        --enable-metadata-processing, \
-        --disable-metadata-processing, , \
-        "
+PACKAGECONFIG ??= ""
 
 PACKAGECONFIG[openpower-pels] = " \
-        --enable-openpower-pel-extension, \
-        --disable-openpower-pel-extension, \
+        -Dopenpower-pel-extension=enabled, \
+        -Dopenpower-pel-extension=disabled, \
         nlohmann-json cli11 pldm, \
         python3, \
         "
 
-EXTRA_OECONF = " \
-        YAML_DIR=${STAGING_DIR_TARGET}${yaml_dir} \
-        CALLOUTS_YAML=${STAGING_DIR_NATIVE}${callouts_datadir}/callouts.yaml \
+EXTRA_OEMESON = " \
+        -Dyamldir=${STAGING_DIR_TARGET}${yaml_dir} \
+        -Dcallout_yaml=${STAGING_DIR_NATIVE}${callouts_datadir}/callouts.yaml \
         "
