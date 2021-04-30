@@ -11,6 +11,10 @@ EXTRA_OEMESON_append_mihawk = " -Dpower_sequencer=mihawk-cpld"
 DEPENDS_append_ibm-ac-server = " power-sequencer"
 DEPENDS_append_p10bmc = " power-sequencer"
 
+PACKAGECONFIG_append_ibm-ac-server = " monitor"
+PACKAGECONFIG_append_swift = " monitor"
+PACKAGECONFIG_append_mihawk = " monitor"
+
 do_install_append(){
     install -D ${WORKDIR}/psu.json ${D}${datadir}/phosphor-power/psu.json
 }
