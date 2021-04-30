@@ -12,7 +12,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 SRC_URI += "git://github.com/openbmc/phosphor-snmp"
-SRCREV = "0d5094bf65f5102af6fc896e60a6fc6fbb1770b5"
+SRCREV = "33a34f04ba608276442cdaba2c02d203d09ac75b"
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.Network.SNMP.service"
 
