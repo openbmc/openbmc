@@ -11,6 +11,36 @@
             "Type": "FanConnector"
         },
         {
+            "Name": "SYS FAN1 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN2 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN3 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN4 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN5 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN6 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
             "Address": "0x48",
             "Bus": 7,
             "Name": "BMC",

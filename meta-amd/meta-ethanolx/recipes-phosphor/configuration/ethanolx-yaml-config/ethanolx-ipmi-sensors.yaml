@@ -200,3 +200,129 @@
         Offsets:
           0x0:
             type: double
+
+11:
+  entityID: 0x1D
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/SYS_FAN1
+  sensorReadingType: 0x01
+  multiplierM: 40
+  offsetB: 0
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  scale: 0
+  rExp: 0
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0x0:
+            type: double
+
+12:
+  entityID: 0x1D
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/SYS_FAN2
+  sensorReadingType: 0x01
+  multiplierM: 40
+  offsetB: 0
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  scale: 0
+  rExp: 0
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0x0:
+            type: double
+
+13:
+  entityID: 0x1D
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/SYS_FAN3
+  sensorReadingType: 0x01
+  multiplierM: 40
+  offsetB: 0
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  scale: 0
+  rExp: 0
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0x0:
+            type: double
+
+14:
+  entityID: 0x1D
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/SYS_FAN4
+  sensorReadingType: 0x01
+  multiplierM: 40
+  offsetB: 0
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  scale: 0
+  rExp: 0
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0x0:
+            type: double
+
+15:
+  entityID: 0x1D
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/SYS_FAN5
+  sensorReadingType: 0x01
+  multiplierM: 40
+  offsetB: 0
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  scale: 0
+  rExp: 0
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0x0:
+            type: double
+
+16:
+  entityID: 0x1D
+  sensorType: 0x04
+  path: /xyz/openbmc_project/sensors/fan_tach/SYS_FAN6
+  sensorReadingType: 0x01
+  multiplierM: 40
+  offsetB: 0
+  bExp: 0
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+  scale: 0
+  rExp: 0
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0x0:
+            type: double
