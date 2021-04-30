@@ -43,5 +43,5 @@ RDEPENDS_${PN}-system = " \
         entity-manager \
         ipmitool \
         phosphor-hostlogger \
-        phosphor-webui \
+        webui-vue \
         "
