@@ -161,6 +161,7 @@ def install_dreport_user_script(script_path, d):
             linkname = "E" + priority + script
             destlink = os.path.join(destdir, linkname)
             os.symlink(srclink, destlink)
+    file.close()
 
 #Make the links for all the plugins
 python install_dreport_user_scripts() {
