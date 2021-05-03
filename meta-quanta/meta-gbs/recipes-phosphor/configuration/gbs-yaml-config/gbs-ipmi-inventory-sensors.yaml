@@ -398,17 +398,17 @@
   sensorID: 0xF5
   sensorType: 0x25
   offset: 0x01
-/xyz/openbmc_project/inventory/system/chassis/cable/hsbp_cab_prsnt:
+/xyz/openbmc_project/inventory/system/chassis/entity/hsbp_cab_prsnt:
   eventReadingType: 0x6f
   sensorID: 0xF6
   sensorType: 0x25
   offset: 0x01
-/xyz/openbmc_project/inventory/system/chassis/cable/fanbd_cab_prsnt:
+/xyz/openbmc_project/inventory/system/chassis/entity/fanbd_cab_prsnt:
   eventReadingType: 0x6f
   sensorID: 0xF7
   sensorType: 0x25
   offset: 0x01
-/xyz/openbmc_project/inventory/system/chassis/cable/bp12v_cab_prsnt:
+/xyz/openbmc_project/inventory/system/chassis/entity/bp12v_cab_prsnt:
   eventReadingType: 0x6f
   sensorID: 0xF8
   sensorType: 0x25
