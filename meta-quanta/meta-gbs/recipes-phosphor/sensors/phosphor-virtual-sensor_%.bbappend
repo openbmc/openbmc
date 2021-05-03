@@ -2,15 +2,11 @@ FILESEXTRAPATHS_prepend_gbs := "${THISDIR}/${PN}:"
 
 SRC_URI_append_gbs = " file://config-virtual-sensor.json \
                        file://phosphor-virtual-sensor.service.replace \
-                       file://setMaxMinValue.sh \
                      "
 
 RDEPENDS_${PN}_append_gbs = "bash"
 
 do_install_append_gbs() {
-    install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/setMaxMinValue.sh ${D}${bindir}/
-
     install -d ${D}${datadir}/${PN}
     install -m 0644 -D ${WORKDIR}/config-virtual-sensor.json \
         ${D}${datadir}/${PN}/virtual_sensor_config.json

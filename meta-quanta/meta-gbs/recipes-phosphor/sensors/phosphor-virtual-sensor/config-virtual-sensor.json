@@ -2,7 +2,9 @@
     {
         "Desc": {
             "Name": "i2cool_0",
-            "SensorType": "temperature"
+            "SensorType": "temperature",
+            "MaxValue": 127.0,
+            "MinValue": -128.0
         },
         "Threshold": {
             "CriticalHigh": 35,
@@ -40,7 +42,9 @@
     {
         "Desc": {
             "Name": "i2cool_1",
-            "SensorType": "temperature"
+            "SensorType": "temperature",
+            "MaxValue": 127.0,
+            "MinValue": -128.0
         },
         "Threshold": {
             "CriticalHigh": 70,
@@ -78,7 +82,9 @@
     {
         "Desc": {
             "Name": "i2cool_2",
-            "SensorType": "temperature"
+            "SensorType": "temperature",
+            "MaxValue": 127.0,
+            "MinValue": -128.0
         },
         "Threshold": {
             "CriticalHigh": 70,
