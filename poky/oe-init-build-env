@@ -8,7 +8,11 @@
 #
 
 #
-# Normally this is called as '. ./oe-init-build-env <builddir>'
+# Normally this is called as '. ./oe-init-build-env <builddir>'.
+# If $1 is set, then its value is used for BUILDDIR.
+# Otherwise, if BUILDDIR is set, its value is used.
+# Otherwise BUILDDIR will be set to $OEROOT/build (see OEROOT below) by
+# oe-buildenv-internal.
 #
 # This works in most shells (not dash), but not all of them pass the arguments
 # when being sourced.  To workaround the shell limitation use "set <builddir>"
@@ -41,8 +45,17 @@ if [ -z "$OEROOT" ]; then
 fi
 unset THIS_SCRIPT
 
+if [ -n "$1" ]; then
+    # When $1 is passed in, its value is used for BUILDDIR.
+    BUILDDIR=$1
+    export BUILDDIR
+fi
+
+# If BUILDDIR is set (immediately above or otherwise), its value is used.
+# Otherwise BUILDDIR's value will be set to $OEROOT/build by
+# oe-buildenv-internal.
 export OEROOT
-. $OEROOT/scripts/oe-buildenv-internal &&
+. $OEROOT/scripts/oe-buildenv-internal $BUILDDIR &&
     TEMPLATECONF="$TEMPLATECONF" $OEROOT/scripts/oe-setup-builddir || {
     unset OEROOT
     return 1
