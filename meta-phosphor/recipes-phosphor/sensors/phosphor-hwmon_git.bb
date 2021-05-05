@@ -43,6 +43,54 @@ RDEPENDS_max31785-msl = "${VIRTUAL-RUNTIME_base-utils} i2c-tools bash"
 
 SRC_URI += "git://github.com/openbmc/phosphor-hwmon"
 
-SRCREV = "5b520cf494ad65be2d336f60ee622efc456c2e3f"
+SRCREV = "d46d081895ada3ab411996dc3a681f796f4a0926"
 
 S = "${WORKDIR}/git"
+
+# The following postinstall script iterate over hwmon env files:
+# 1. It adds HW_SENSOR_ID value if not set. The value being calculated
+#    as sha256sum.
+# 2. For each hwmon the script generates busconfig ACLs.
+pkg_postinst_${PN}() {
+    [ -n "$D" ] || return 0
+
+    hwmon_dir="$D/etc/default/obmc/hwmon"
+    dbus_dir="$D/etc/dbus-1/system.d"
+
+    [ -d "${hwmon_dir}" ] || return 0
+
+    # Remove existing links and replace with actual copy of the file to prevent
+    # HW_SENSOR_ID variable override for different sensors' instances.
+    find "${hwmon_dir}" -type l -name \*.conf | while read f; do
+        path="$(readlink -f $f)"
+        rm -f "${f}"
+        cp "${path}" "${f}"
+    done
+
+    find "${hwmon_dir}" -type f -name \*.conf | while read f; do
+        path="/${f##${hwmon_dir}/}"
+        path="${path%.conf}"
+        sensor_id="$(printf "%s" "${path}" | sha256sum | cut -d\  -f1)"
+        acl_file="${dbus_dir}/xyz.openbmc_project.Hwmon-${sensor_id}.conf"
+
+        egrep -q '^HW_SENSOR_ID\s*=' "${f}" ||
+            printf "\n# Sensor id for %s\nHW_SENSOR_ID = \"%s\"\n" "${path}" "${sensor_id}" >> "${f}"
+
+        # Extract HW_SENSOR_ID that could be either quoted or unquoted string.
+        sensor_id="$(sed -n 's,^HW_SENSOR_ID\s*=\s*"\?\(.[^" ]\+\)\s*"\?,\1,p' "${f}")"
+
+        [ ! -f "${acl_file}" ] || continue
+        path_s="$(echo "${path}" | sed 's,\-\-,\\-\\-,g')"
+        cat <<EOF>"${acl_file}"
+<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+<busconfig>
+  <policy user="root">
+    <!-- ${path_s} -->
+    <allow own="xyz.openbmc_project.Hwmon-${sensor_id}.Hwmon1"/>
+    <allow send_destination="xyz.openbmc_project.Hwmon-${sensor_id}.Hwmon1"/>
+  </policy>
+</busconfig>
+EOF
+    done
+}
