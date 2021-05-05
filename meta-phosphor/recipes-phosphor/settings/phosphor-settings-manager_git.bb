@@ -15,6 +15,7 @@ DBUS_SERVICE_${PN} = "xyz.openbmc_project.Settings.service"
 
 DEPENDS += "${PYTHON_PN}-pyyaml-native"
 DEPENDS += "${PYTHON_PN}-mako-native"
+DEPENDS += "${PYTHON_PN}-sdbus++-native"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "virtual/phosphor-settings-defaults"
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'obmc-mrw', 'phosphor-settings-read-settings-mrw-native', '', d)}"
