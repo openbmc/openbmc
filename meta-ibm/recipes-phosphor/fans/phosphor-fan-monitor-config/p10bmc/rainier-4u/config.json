@@ -2,8 +2,8 @@
    "fans": [
       {
          "inventory": "/system/chassis/motherboard/fan0",
-         "functional_delay": 5,
-         "allowed_out_of_range_time": 30,
+         "method": "count",
+         "count_interval": 1,
          "deviation": 15,
          "num_sensors_nonfunc_for_fan_nonfunc": 1,
          "monitor_start_delay": 30,
@@ -12,14 +12,15 @@
          "sensors": [
             {
                "name": "fan0_0",
+               "threshold": 30,
                "has_target": true
             }
          ]
       },
       {
          "inventory": "/system/chassis/motherboard/fan1",
-         "functional_delay": 5,
-         "allowed_out_of_range_time": 30,
+         "method": "count",
+         "count_interval": 1,
          "deviation": 15,
          "num_sensors_nonfunc_for_fan_nonfunc": 1,
          "monitor_start_delay": 30,
@@ -28,14 +29,15 @@
          "sensors": [
             {
                "name": "fan1_0",
+               "threshold": 30,
                "has_target": true
             }
          ]
       },
       {
          "inventory": "/system/chassis/motherboard/fan2",
-         "functional_delay": 5,
-         "allowed_out_of_range_time": 30,
+         "method": "count",
+         "count_interval": 1,
          "deviation": 15,
          "num_sensors_nonfunc_for_fan_nonfunc": 1,
          "monitor_start_delay": 30,
@@ -44,14 +46,15 @@
          "sensors": [
             {
                "name": "fan2_0",
+               "threshold": 30,
                "has_target": true
             }
          ]
       },
       {
          "inventory": "/system/chassis/motherboard/fan3",
-         "functional_delay": 5,
-         "allowed_out_of_range_time": 30,
+         "method": "count",
+         "count_interval": 1,
          "deviation": 15,
          "num_sensors_nonfunc_for_fan_nonfunc": 1,
          "monitor_start_delay": 30,
@@ -60,14 +63,15 @@
          "sensors": [
             {
                "name": "fan3_0",
+               "threshold": 30,
                "has_target": true
             }
          ]
       },
       {
          "inventory": "/system/chassis/motherboard/fan4",
-         "functional_delay": 5,
-         "allowed_out_of_range_time": 30,
+         "method": "count",
+         "count_interval": 1,
          "deviation": 15,
          "num_sensors_nonfunc_for_fan_nonfunc": 1,
          "monitor_start_delay": 30,
@@ -76,14 +80,15 @@
          "sensors": [
             {
                "name": "fan4_0",
+               "threshold": 30,
                "has_target": true
             }
          ]
       },
       {
          "inventory": "/system/chassis/motherboard/fan5",
-         "functional_delay": 5,
-         "allowed_out_of_range_time": 30,
+         "method": "count",
+         "count_interval": 1,
          "deviation": 15,
          "num_sensors_nonfunc_for_fan_nonfunc": 1,
          "monitor_start_delay": 30,
@@ -92,6 +97,7 @@
          "sensors": [
             {
                "name": "fan5_0",
+               "threshold": 30,
                "has_target": true
             }
          ]
