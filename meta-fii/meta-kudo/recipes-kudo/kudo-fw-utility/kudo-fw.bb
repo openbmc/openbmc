@@ -14,14 +14,15 @@ RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "bash"
 
 
-SRC_URI_append_kudo = " \
+SRC_URI = " \
     file://kudo-fw.sh \
     file://kudo-fw-ver.service \
     file://kudo-fw-ver.sh \
+    file://kudo-lib.sh \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN}_append_kudo = " \
+SYSTEMD_SERVICE_${PN} = " \
     kudo-fw-ver.service \
     "
 
@@ -29,6 +30,7 @@ do_install () {
     install -d ${D}/${sbindir}
     install -m 0755 ${WORKDIR}/kudo-fw.sh ${D}/${sbindir}/kudo-fw.sh
     install -m 0755 ${WORKDIR}/kudo-fw-ver.sh ${D}/${sbindir}/kudo-fw-ver.sh
+    install -m 0755 ${WORKDIR}/kudo-lib.sh ${D}/${sbindir}/kudo-lib.sh
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/kudo-fw-ver.service ${D}${systemd_system_unitdir}
 }

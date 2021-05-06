@@ -12,7 +12,7 @@ DEPENDS += "systemd"
 RDEPENDS_${PN} += "libsystemd"
 RDEPENDS_${PN} += "bash"
 
-SRC_URI += " \
+SRC_URI = " \
     file://init_once.sh \
     file://host-powerctrl.service \
     "
@@ -23,9 +23,8 @@ SYSTEMD_SERVICE_${PN} = " \
     "
 
 do_install () {
-    install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/init_once.sh ${D}${bindir}/
-
+    install -d ${D}${sbindir}
+    install -m 0755 ${WORKDIR}/init_once.sh ${D}${sbindir}/
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${WORKDIR}/host-powerctrl.service ${D}${systemd_unitdir}/system
 }

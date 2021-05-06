@@ -13,8 +13,8 @@ set_gpio_ctrl 85 out 1
 set_gpio_ctrl 86 out 1
 
 # LED control
-# LED_BMC_LIVE #0
-set_gpio_ctrl 0 out 1
+# LED_BMC_LIVE #7
+set_gpio_ctrl 7 out 1
 
 # SPI control
 # Send command to CPLD to switch the bios spi interface to host
