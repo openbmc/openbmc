@@ -323,6 +323,62 @@
             ]
         },
         {
+            "path": "system/chassis/motherboard/powersupply2",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "fault_inventory_object",
+                        "fType": "fault_led_group"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/led/groups/powersupply2_fault"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "identify_inventory_object",
+                        "fType": "identify_led_group"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/led/groups/powersupply2_identify"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/powersupply3",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "fault_inventory_object",
+                        "fType": "fault_led_group"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/led/groups/powersupply3_fault"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "identify_inventory_object",
+                        "fType": "identify_led_group"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/led/groups/powersupply3_identify"
+                    ]
+                }
+            ]
+        },
+        {
             "path": "system/chassis/motherboard",
             "endpoints":
             [
