@@ -16,7 +16,7 @@ inherit meson systemd
 S = "${WORKDIR}/git"
 
 SRC_URI = "git://github.com/openbmc/openpower-hw-diags"
-SRCREV = "eea45427d3c5976f1922711cf01a0e25ca193993"
+SRCREV = "832526df90ead77f5dcb501406cb07fbbfa7046b"
 
 SYSTEMD_SERVICE_${PN} = "attn_handler.service"
 
