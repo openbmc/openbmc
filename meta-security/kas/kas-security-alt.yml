@@ -5,4 +5,4 @@ header:
 
 local_conf_header:
   alt: |
-      DISTRO_FEATURES_append = " apparmor pam smack systemd"
+      DISTRO_FEATURES_append = " systemd"

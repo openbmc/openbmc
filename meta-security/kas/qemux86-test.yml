@@ -3,9 +3,4 @@ header:
   includes:
     - kas-security-base.yml
 
-
-local_conf_header:
-  meta-security: |
-      DISTRO_FEATURES_append = " apparmor smack pam"
-
 machine: qemux86

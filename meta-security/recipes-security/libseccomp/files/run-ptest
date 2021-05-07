@@ -1,4 +1,0 @@
-#!/bin/sh
-
-cd tests
-./regression -a
