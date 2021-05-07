@@ -1,44 +1,34 @@
-From 9563b69640227da2220ee0c39077afb736cc96d1 Mon Sep 17 00:00:00 2001
-From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Thu, 20 Jul 2017 17:12:17 +0800
-Subject: [PATCH 4/4] tigervnc: add fPIC option to COMPILE_FLAGS
+From 7f8acd59bb2e54f9be25a98dd71534700a9e355a Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 19 Apr 2021 23:14:28 -0700
+Subject: [PATCH] tigervnc: add fPIC option to COMPILE_FLAGS
 
-The static libraries in Xregion/network/rdr/rfb were linked by shared
+The static libraries in network/rdr/rfb were linked by shared
 library libvnc.so, so we should add fPIC option to COMPILE_FLAGS to fix
 relocation issue.
 
 Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 ---
- common/Xregion/CMakeLists.txt | 1 +
  common/network/CMakeLists.txt | 1 +
  common/rdr/CMakeLists.txt     | 1 +
  common/rfb/CMakeLists.txt     | 1 +
- 4 files changed, 4 insertions(+)
+ 3 files changed, 3 insertions(+)
 
-diff --git a/common/Xregion/CMakeLists.txt b/common/Xregion/CMakeLists.txt
-index 40ca97e..9411328 100644
---- a/common/Xregion/CMakeLists.txt
-+++ b/common/Xregion/CMakeLists.txt
-@@ -3,4 +3,5 @@ add_library(Xregion STATIC
- 
- if(UNIX)
-   libtool_create_control_file(Xregion)
-+  set_target_properties(Xregion PROPERTIES COMPILE_FLAGS -fPIC)
- endif()
 diff --git a/common/network/CMakeLists.txt b/common/network/CMakeLists.txt
-index b624c8e..6c06ec9 100644
+index d00ca452..e84e0290 100644
 --- a/common/network/CMakeLists.txt
 +++ b/common/network/CMakeLists.txt
-@@ -9,4 +9,5 @@ endif()
+@@ -16,4 +16,5 @@ endif()
  
  if(UNIX)
    libtool_create_control_file(network)
 +  set_target_properties(network PROPERTIES COMPILE_FLAGS -fPIC)
  endif()
 diff --git a/common/rdr/CMakeLists.txt b/common/rdr/CMakeLists.txt
-index 989ba2f..20f6489 100644
+index 989ba2f4..20f6489d 100644
 --- a/common/rdr/CMakeLists.txt
 +++ b/common/rdr/CMakeLists.txt
 @@ -27,4 +27,5 @@ target_link_libraries(rdr ${RDR_LIBRARIES})
@@ -48,15 +38,15 @@ index 989ba2f..20f6489 100644
 +  set_target_properties(rdr PROPERTIES COMPILE_FLAGS -fPIC)
  endif()
 diff --git a/common/rfb/CMakeLists.txt b/common/rfb/CMakeLists.txt
-index 5047e5e..88838ab 100644
+index fc5a37bf..7f5ce131 100644
 --- a/common/rfb/CMakeLists.txt
 +++ b/common/rfb/CMakeLists.txt
-@@ -98,4 +98,5 @@ target_link_libraries(rfb ${RFB_LIBRARIES})
+@@ -99,4 +99,5 @@ target_link_libraries(rfb ${RFB_LIBRARIES})
  
  if(UNIX)
    libtool_create_control_file(rfb)
 +  set_target_properties(rfb PROPERTIES COMPILE_FLAGS -fPIC)
  endif()
 -- 
-2.7.4
+2.30.2
 

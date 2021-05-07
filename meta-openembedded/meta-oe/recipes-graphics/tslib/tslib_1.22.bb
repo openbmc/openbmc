@@ -23,9 +23,10 @@ UPSTREAM_CHECK_URI = "https://github.com/kergoth/tslib/releases"
 
 inherit autotools pkgconfig
 
-PACKAGECONFIG ??= "debounce dejitter iir linear median pthres skip lowpass invert variance input touchkit waveshare"
+PACKAGECONFIG ??= "debounce dejitter evthres iir linear median pthres skip lowpass invert variance input touchkit waveshare"
 PACKAGECONFIG[debounce] = "--enable-debounce,--disable-debounce"
 PACKAGECONFIG[dejitter] = "--enable-dejitter,--disable-dejitter"
+PACKAGECONFIG[evthres] = "--enable-evthres,--disable-evthres"
 PACKAGECONFIG[iir] = "--enable-iir,--disable-iir"
 PACKAGECONFIG[linear] = "--enable-linear,--disable-linear"
 PACKAGECONFIG[median] = "--enable-median,--disable-median"
@@ -49,6 +50,7 @@ PACKAGECONFIG[arctic2] = "--enable-arctic2,--disable-arctic2"
 PACKAGECONFIG[dmc_dus3000] = "--enable-dmc_dus3000,--disable-dmc_dus3000"
 PACKAGECONFIG[cy8mrln-palmpre] = "--enable-cy8mrln-palmpre,--disable-cy8mrln-palmpre"
 PACKAGECONFIG[galax] = "--enable-galax,--disable-galax"
+PACKAGECONFIG[one-wire-ts-input] = "--enable-one-wire-ts-input,--disable-one-wire-ts-input"
 PACKAGECONFIG[debug] = "--enable-debug,--disable-debug"
 
 do_install_prepend() {

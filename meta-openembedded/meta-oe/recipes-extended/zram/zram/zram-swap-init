@@ -24,3 +24,8 @@ modprobe -q zram || true
 
 zramctl -a ${ZRAM_ALGORITHM} -s ${memzram}KB $device
 mkswap -L "zram-swap" $device
+
+devname="${device##*/}"
+if [ ! -z ${ZRAM_SIZE_LIMIT+x} ]; then
+	echo ${ZRAM_SIZE_LIMIT} > /sys/block/$devname/mem_limit
+fi

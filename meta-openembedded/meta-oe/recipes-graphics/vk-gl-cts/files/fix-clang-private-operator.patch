@@ -1,7 +1,5 @@
-Index: git/external/glslang/src/glslang/Include/PoolAlloc.h
-===================================================================
---- git.orig/external/glslang/src/glslang/Include/PoolAlloc.h
-+++ git/external/glslang/src/glslang/Include/PoolAlloc.h
+--- a/external/glslang/src/glslang/Include/PoolAlloc.h
++++ b/external/glslang/src/glslang/Include/PoolAlloc.h
 @@ -240,8 +240,9 @@ protected:
  
      int numCalls;           // just an interesting statistic

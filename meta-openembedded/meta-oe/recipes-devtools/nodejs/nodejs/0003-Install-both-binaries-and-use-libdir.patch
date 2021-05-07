@@ -1,28 +1,31 @@
-From 5bfeffdf4b5de1c60a2ff0d1ddf65db2bb9a1533 Mon Sep 17 00:00:00 2001
+From 5b22fac923d1ca3e9fefb97f5a171124a88f5e22 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
-Subject: [PATCH 3/3] Install both binaries and use libdir.
+Subject: [PATCH] Install both binaries and use libdir.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 This allows us to build with a shared library for other users while
 still providing the normal executable.
 
-Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
-
-Stolen from [1]
-
-[1] https://src.fedoraproject.org/rpms/nodejs/raw/master/f/0003-Install-both-binaries-and-use-libdir.patch
+Taken from - https://src.fedoraproject.org/rpms/nodejs/raw/rawhide/f/0002-Install-both-binaries-and-use-libdir.patch
 
 Upstream-Status: Pending
 
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  configure.py     |  7 +++++++
- tools/install.py | 31 ++++++++++++++-----------------
- 2 files changed, 21 insertions(+), 17 deletions(-)
+ tools/install.py | 21 +++++++++------------
+ 2 files changed, 16 insertions(+), 12 deletions(-)
 
+diff --git a/configure.py b/configure.py
+index e6f7e4db..6cf5c45d 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -602,6 +602,12 @@ parser.add_option('--shared',
+@@ -626,6 +626,12 @@ parser.add_option('--shared',
      help='compile shared library for embedding node in another project. ' +
           '(This mode is not officially supported for regular applications)')
  
@@ -35,7 +38,7 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  parser.add_option('--without-v8-platform',
      action='store_true',
      dest='without_v8_platform',
-@@ -1168,6 +1174,7 @@ def configure_node(o):
+@@ -1202,6 +1208,7 @@ def configure_node(o):
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
  
    o['variables']['node_shared'] = b(options.shared)
@@ -43,9 +46,11 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
    node_module_version = getmoduleversion.get_version()
  
    if options.dest_os == 'android':
+diff --git a/tools/install.py b/tools/install.py
+index 729b416f..9bfc6234 100755
 --- a/tools/install.py
 +++ b/tools/install.py
-@@ -121,26 +121,23 @@ def subdir_files(path, dest, action):
+@@ -121,22 +121,19 @@ def subdir_files(path, dest, action):
  
  def files(action):
    is_windows = sys.platform == 'win32'
@@ -64,16 +69,8 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
 -      output_file += '.dll'
 -    else:
 -      output_file = 'lib' + output_file + '.' + variables.get('shlib_suffix')
--      # GYP will output to lib.target except on OS X, this is hardcoded
--      # in its source - see the _InstallableTargetInstallPath function.
--      if sys.platform != 'darwin':
--        output_prefix += 'lib.target/'
 +    output_bin = 'node'
 +    output_lib = 'libnode.' + variables.get('shlib_suffix')
-+    # GYP will output to lib.target except on OS X, this is hardcoded
-+    # in its source - see the _InstallableTargetInstallPath function.
-+    if sys.platform != 'darwin':
-+      output_libprefix += 'lib.target/'
  
 -  if 'false' == variables.get('node_shared'):
 -    action([output_prefix + output_file], 'bin/' + output_file)

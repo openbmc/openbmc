@@ -23,8 +23,9 @@ inherit lib_package
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=1fc37e1037ae673975fbcb96a98f7191"
 
-SRCREV = "8ef7680081c61b486622f2d983c0d3d21e83caad"
-SRC_URI = "git://www.bearssl.org/git/BearSSL;protocol=https;nobranch=1 \
+PV .= "+git${SRCPV}"
+SRCREV = "79b1a9996c094ff593ae50bc4edc1f349f39dd6d"
+SRC_URI = "git://www.bearssl.org/git/BearSSL;protocol=https \
 	   file://0001-conf-Unix.mk-remove-fixed-command-definitions.patch \
 	   file://0002-test-test_x509.c-fix-potential-overflow-issue.patch \
            file://0001-make-Pass-LDFLAGS-when-building-shared-objects.patch \

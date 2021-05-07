@@ -120,6 +120,7 @@ do_install_append() {
     sed    -e "s@^NSC_SRCDIR=.*@NSC_SRCDIR=.@g" \
         -i ${D}${bindir}/net-snmp-create-v3-user
     sed -e 's@^NSC_SRCDIR=.*@NSC_SRCDIR=.@g' \
+        -e 's@[^ ]*-ffile-prefix-map=[^ "]*@@g' \
         -e 's@[^ ]*-fdebug-prefix-map=[^ "]*@@g' \
         -e 's@[^ ]*-fmacro-prefix-map=[^ "]*@@g' \
         -e 's@[^ ]*--sysroot=[^ "]*@@g' \
@@ -172,6 +173,7 @@ net_snmp_sysroot_preprocess () {
             -e "s@^includedir=.*@includedir=${STAGING_INCDIR}@g" \
             -e "s@^libdir=.*@libdir=${STAGING_LIBDIR}@g" \
             -e "s@^NSC_SRCDIR=.*@NSC_SRCDIR=${S}@g" \
+            -e "s@-ffile-prefix-map=${SNMP_DBGDIR}@-ffile-prefix-map=${WORKDIR}=${SNMP_DBGDIR}@g" \
             -e "s@-fdebug-prefix-map=${SNMP_DBGDIR}@-fdebug-prefix-map=${WORKDIR}=${SNMP_DBGDIR}@g" \
             -e "s@-fdebug-prefix-map= -fdebug-prefix-map=@-fdebug-prefix-map=${STAGING_DIR_NATIVE}= \
                   -fdebug-prefix-map=${STAGING_DIR_HOST}=@g" \

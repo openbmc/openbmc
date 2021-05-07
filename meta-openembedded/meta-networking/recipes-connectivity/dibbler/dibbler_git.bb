@@ -29,6 +29,8 @@ inherit autotools
 
 DEPENDS += "flex-native"
 
+LDFLAGS += "-pthread"
+
 PACKAGES =+ "${PN}-requestor ${PN}-client ${PN}-relay ${PN}-server"
 
 FILES_${PN}-client = "${sbindir}/${PN}-client"

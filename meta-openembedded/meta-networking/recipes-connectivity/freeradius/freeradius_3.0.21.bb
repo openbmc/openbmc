@@ -31,6 +31,7 @@ SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.0.x;lfs=0
     file://0001-workaround-error-with-autoconf-2.7.patch \
     file://radiusd.service \
     file://radiusd-volatiles.conf \
+    file://check-openssl-cmds-in-script-bootstrap.patch \
 "
 
 SRCREV = "af428abda249b2279ba0582180985a9f6f4a144a"

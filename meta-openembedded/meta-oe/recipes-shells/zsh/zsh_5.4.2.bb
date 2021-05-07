@@ -38,7 +38,7 @@ EXTRA_OEMAKE = "-e MAKEFLAGS="
 ALTERNATIVE_${PN} = "sh"
 ALTERNATIVE_LINK_NAME[sh] = "${base_bindir}/sh"
 ALTERNATIVE_TARGET[sh] = "${base_bindir}/${BPN}"
-ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_PRIORITY = "90"
 
 export AUTOHEADER = "true"
 

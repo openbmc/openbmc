@@ -8,64 +8,55 @@ Subject: [PATCH] Using native binaries
  tools/v8_gypfiles/v8.gyp | 11 ++++-------
  2 files changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/node.gyp b/node.gyp
-index 8f4dc518..d9389190 100644
 --- a/node.gyp
 +++ b/node.gyp
-@@ -446,7 +446,7 @@
-                 '<(SHARED_INTERMEDIATE_DIR)/node_code_cache.cc',
+@@ -487,6 +487,7 @@
+               'action_name': 'run_mkcodecache',
+               'process_outputs_as_sources': 1,
+               'inputs': [
++                '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+                 '<(mkcodecache_exec)',
                ],
-               'action': [
--                '<@(_inputs)',
-+                'mkcodecache',
-                 '<@(_outputs)',
+               'outputs': [
+@@ -512,6 +513,7 @@
+               'action_name': 'node_mksnapshot',
+               'process_outputs_as_sources': 1,
+               'inputs': [
++                '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+                 '<(node_mksnapshot_exec)',
                ],
-             },
-@@ -471,7 +471,7 @@
-                 '<(SHARED_INTERMEDIATE_DIR)/node_snapshot.cc',
-               ],
-               'action': [
--                '<@(_inputs)',
-+                'node_mksnapshot',
-                 '<@(_outputs)',
-               ],
-             },
-diff --git a/tools/v8_gypfiles/v8.gyp b/tools/v8_gypfiles/v8.gyp
-index a506a67d..c91f7dde 100644
+               'outputs': [
 --- a/tools/v8_gypfiles/v8.gyp
 +++ b/tools/v8_gypfiles/v8.gyp
-@@ -140,7 +140,8 @@
-             '<@(torque_outputs)',
+@@ -220,6 +220,7 @@
+         {
+           'action_name': 'run_torque_action',
+           'inputs': [  # Order matters.
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)torque<(EXECUTABLE_SUFFIX)',
+             '<@(torque_files)',
            ],
-           'action': [
--            '<@(_inputs)',
-+            'torque',
-+            '<@(torque_files)',
-             '-o', '<(torque_output_root)/torque-generated',
-             '-v8-root', '<(V8_ROOT)'
+@@ -351,6 +352,7 @@
+         {
+           'action_name': 'generate_bytecode_builtins_list_action',
+           'inputs': [
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)bytecode_builtins_list_generator<(EXECUTABLE_SUFFIX)',
            ],
-@@ -247,9 +248,7 @@
-             '<(generate_bytecode_builtins_list_output)',
+           'outputs': [
+@@ -533,6 +535,7 @@
+             ],
+           },
+           'inputs': [
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(mksnapshot_exec)',
            ],
-           'action': [
--            'python',
--            '<(V8_ROOT)/tools/run.py',
--            '<@(_inputs)',
-+            'bytecode_builtins_list_generator',
-             '<@(_outputs)',
+           'outputs': [
+@@ -1448,6 +1451,7 @@
+         {
+           'action_name': 'run_gen-regexp-special-case_action',
+           'inputs': [
++            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)gen-regexp-special-case<(EXECUTABLE_SUFFIX)',
            ],
-         },
-@@ -1396,9 +1395,7 @@
-             '<(SHARED_INTERMEDIATE_DIR)/src/regexp/special-case.cc',
-           ],
-           'action': [
--            'python',
--            '<(V8_ROOT)/tools/run.py',
--            '<@(_inputs)',
-+            'gen-regexp-special-case',
-             '<@(_outputs)',
-           ],
-         },
--- 
-2.20.1
-
+           'outputs': [

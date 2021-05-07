@@ -22,6 +22,10 @@ REQUIRED_DISTRO_FEATURES += "opengl"
 
 DEPENDS += "libpng zlib virtual/libgles2 virtual/egl"
 
+SRC_URI += "file://0001-Workaround-for-GCC-11-uninit-variable-warnings-946.patch;patchdir=external/amber/src \
+            file://0001-Include-limits-header-for-numeric_limits.patch;patchdir=external/vulkancts \
+"
+
 SRC_URI_append_libc-musl = "\
 	file://fix-musl.patch \
 "

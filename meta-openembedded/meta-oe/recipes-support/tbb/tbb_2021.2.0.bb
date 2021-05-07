@@ -9,6 +9,8 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=86d3f3a95c324c9479bd8986968f4327"
 
 DEPENDS_append_libc-musl = " libucontext"
 
+PE = "1"
+
 BRANCH = "onetbb_2021"
 SRCREV = "2dba2072869a189b9fdab3ffa431d3ea49059a19"
 SRC_URI = "git://github.com/oneapi-src/oneTBB.git;protocol=https;branch=${BRANCH} \
@@ -43,3 +45,6 @@ LDFLAGS_append_mips = " -latomic"
 LDFLAGS_append_mipsel = " -latomic"
 
 LDFLAGS_append_libc-musl = " -lucontext"
+
+# The latest version of oneTBB does not support PPC
+COMPATIBLE_MACHINE_powerpc = "(!.*ppc).*"

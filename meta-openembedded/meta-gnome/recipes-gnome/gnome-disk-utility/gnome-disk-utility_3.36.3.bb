@@ -18,7 +18,7 @@ GNOMEBASEBUILDCLASS = "meson"
 
 inherit gnomebase gsettings gtk-icon-cache gettext features_check upstream-version-is-even mime-xdg
 
-REQUIRED_DISTRO_FEATURES = "x11"
+REQUIRED_DISTRO_FEATURES = "x11 polkit"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
@@ -31,4 +31,3 @@ FILES_${PN} += " \
     ${datadir}/metainfo \
     ${datadir}/dbus-1 \
 "
-

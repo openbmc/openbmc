@@ -1,0 +1,108 @@
+From 808577f8464f542076840d0d93fe168a5f79442c Mon Sep 17 00:00:00 2001
+From: Silcet <camorga1@gmail.com>
+Date: Tue, 27 Apr 2021 05:40:03 +0000
+Subject: [PATCH] setup: add an option to specify iptables location
+
+When cross-compiling it isn't certain that the location of iptables on the
+target will be the same as on the host.  It also doesn't make sense the
+test the version of the host during setup.  We provide an option to
+specify an alternate iptables directory.  This is assumed to be a
+cross-compile environment and therefore no attempt is made to verify the
+version of iptables to be used.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+
+The patch was imported from the OpenEmbedded git server
+(git://git.openembedded.org/openembedded) as of commit id
+2cc1bd9dd060f5002c2fde7aacba86fe230c12af.
+
+Signed-off-by: Silcet <camorga1@gmail.com>
+---
+ setup.py | 65 ++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 37 insertions(+), 28 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 09204d3..2343bc9 100644
+--- a/setup.py
++++ b/setup.py
+@@ -246,41 +246,50 @@ shutil.copytree('src', 'staging')
+ os.unlink(os.path.join('staging', 'ufw-init'))
+ os.unlink(os.path.join('staging', 'ufw-init-functions'))
+ 
++iptables_set = 0
+ iptables_exe = ''
+ iptables_dir = ''
+ 
+-for e in ['iptables']:
+-    for dir in ['/sbin', '/bin', '/usr/sbin', '/usr/bin', '/usr/local/sbin', \
+-                '/usr/local/bin']:
+-        if e == "iptables":
+-            if os.path.exists(os.path.join(dir, e)):
+-                iptables_dir = dir
+-                iptables_exe = os.path.join(iptables_dir, "iptables")
+-                print("Found '%s'" % iptables_exe)
+-            else:
+-                continue
+-
+-        if iptables_exe != "":
+-            break
+-
++if "--iptables-dir" in sys.argv:
++    iptables_dir = sys.argv[sys.argv.index("--iptables-dir") + 1]
++    iptables_exe = os.path.join(iptables_dir, "iptables")
++    iptables_set = 1
++    print("INFO: iptables manually set: '%s'" % (iptables_exe))
++    sys.argv.remove(iptables_dir)
++    sys.argv.remove("--iptables-dir")
++
++if not iptables_set:
++    for e in ['iptables']:
++        for dir in ['/sbin', '/bin', '/usr/sbin', '/usr/bin', '/usr/local/sbin', \
++                    '/usr/local/bin']:
++            if e == "iptables":
++                if os.path.exists(os.path.join(dir, e)):
++                    iptables_dir = dir
++                    iptables_exe = os.path.join(iptables_dir, "iptables")
++                    print("Found '%s'" % iptables_exe)
++                else:
++                    continue
+ 
+-if iptables_exe == '':
+-    print("ERROR: could not find required binary 'iptables'", file=sys.stderr)
+-    sys.exit(1)
++            if iptables_exe != "":
++                break
+ 
+-for e in ['ip6tables', 'iptables-restore', 'ip6tables-restore']:
+-    if not os.path.exists(os.path.join(iptables_dir, e)):
+-        print("ERROR: could not find required binary '%s'" % (e), file=sys.stderr)
++    if iptables_exe == '':
++        print("ERROR: could not find required binary 'iptables'", file=sys.stderr)
+         sys.exit(1)
+ 
+-(rc, out) = cmd([iptables_exe, '-V'])
+-if rc != 0:
+-    raise OSError(errno.ENOENT, "Could not find version for '%s'" % \
+-                  (iptables_exe))
+-version = re.sub('^v', '', re.split('\s', str(out))[1])
+-print("Found '%s' version '%s'" % (iptables_exe, version))
+-if version < "1.4":
+-    print("WARN: version '%s' has limited IPv6 support. See README for details." % (version), file=sys.stderr)
++    for e in ['ip6tables', 'iptables-restore', 'ip6tables-restore']:
++        if not os.path.exists(os.path.join(iptables_dir, e)):
++            print("ERROR: could not find required binary '%s'" % (e), file=sys.stderr)
++            sys.exit(1)
++
++    (rc, out) = cmd([iptables_exe, '-V'])
++    if rc != 0:
++        raise OSError(errno.ENOENT, "Could not find version for '%s'" % \
++                      (iptables_exe))
++    version = re.sub('^v', '', re.split('\s', str(out))[1])
++    print("Found '%s' version '%s'" % (iptables_exe, version))
++    if version < "1.4":
++        print("WARN: version '%s' has limited IPv6 support. See README for details." % (version), file=sys.stderr)
+ 
+ setup (name='ufw',
+       version=ufw_version,
