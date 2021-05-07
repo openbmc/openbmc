@@ -57,6 +57,102 @@ mac_to_eui64() {
   printf '%02x%02x:%02x%02x:%02x%02x:%02x%02x\n' "${suffix_bytes[@]}"
 }
 
+ip_to_bytes() {
+  local -n bytes_out="$1"
+  local str="$2"
+
+  local bytes=()
+  local oldifs="$IFS"
+  # Heuristic for V4 / V6, validity will be checked as it is parsed
+  if [[ "$str" == *.* ]]; then
+    # Ensure we don't start or end with IFS
+    [ "${str:0:1}" != '.' ] || return 1
+    [ "${str: -1}" != '.' ] || return 1
+
+    local v
+    # Split IPv4 address into octets
+    IFS=.
+    for v in $str; do
+      # IPv4 digits are always decimal numbers
+      if ! [[ "$v" =~ ^[0-9]+$ ]]; then
+        IFS="$oldifs"
+        return 1
+      fi
+      # Each octet is a single byte, make sure the number isn't larger
+      if (( v > 0xff )); then
+        IFS="$oldifs"
+        return 1
+      fi
+      bytes+=($v)
+    done
+    # IPv4 addresses must have all 4 bytes present
+    if (( "${#bytes[@]}" != 4 )); then
+      IFS="$oldifs"
+      return 1
+    fi
+  else
+    # Ensure we bound the padding in an outer byte for
+    # IFS splitting to work correctly
+    [ "${str:0:2}" = '::' ] && str="0$str"
+    [ "${str: -2}" = '::' ] && str="${str}0"
+
+    # Ensure we don't start or end with IFS
+    [ "${str:0:1}" != ':' ] || return 1
+    [ "${str: -1}" != ':' ] || return 1
+
+    # Stores the bytes that come before ::, if it exists
+    local bytesBeforePad=()
+    local v
+    # Split the Address into hextets
+    IFS=:
+    for v in $str; do
+      # Handle ::, which translates to an empty string
+      if [ -z "$v" ]; then
+        # Only allow a single :: sequence in an address
+        if (( "${#bytesBeforePad[@]}" > 0 )); then
+          IFS="$oldifs"
+          return 1
+        fi
+        # Store the already parsed upper bytes separately
+        # This allows us to calculate and insert padding
+        bytesBeforePad=("${bytes[@]}")
+        bytes=()
+        continue
+      fi
+      # IPv6 digits are always hex
+      if ! [[ "$v" =~ ^[[:xdigit:]]+$ ]]; then
+        IFS="$oldifs"
+        return 1
+      fi
+      # Ensure the number is no larger than a hextet
+      v="0x$v"
+      if (( v > 0xffff )); then
+        IFS="$oldifs"
+        return 1
+      fi
+      # Split the hextet into 2 bytes
+      bytes+=($(( v >> 8 )))
+      bytes+=($(( v & 0xff )))
+    done
+    # If we have ::, add padding
+    if (( "${#bytesBeforePad[@]}" > 0 )); then
+      # Fill the middle bytes with padding and store in `bytes`
+      while (( "${#bytes[@]}" + "${#bytesBeforePad[@]}" < 16 )); do
+        bytesBeforePad+=(0)
+      done
+      bytes=("${bytesBeforePad[@]}" "${bytes[@]}")
+    fi
+    # IPv6 addresses must have all 16 bytes present
+    if (( "${#bytes[@]}" != 16 )); then
+      IFS="$oldifs"
+      return 1
+    fi
+  fi
+
+  IFS="$oldifs"
+  bytes_out=("${bytes[@]}")
+}
+
 ipv6_pfx_concat() {
   local pfx="$1"
   local sfx="$2"
