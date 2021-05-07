@@ -71,7 +71,8 @@ def _rename_recipe_dirs(oldpv, newpv, path):
                 if oldfile.find(oldpv) != -1:
                     newfile = oldfile.replace(oldpv, newpv)
                     if oldfile != newfile:
-                        os.rename(os.path.join(path, oldfile), os.path.join(path, newfile))
+                        bb.utils.rename(os.path.join(path, oldfile),
+                              os.path.join(path, newfile))
 
 def _rename_recipe_file(oldrecipe, bpn, oldpv, newpv, path):
     oldrecipe = os.path.basename(oldrecipe)

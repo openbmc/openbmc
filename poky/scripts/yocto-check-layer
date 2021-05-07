@@ -112,7 +112,7 @@ def main():
                      % layer['name'])
             layers.remove(layer)
         elif layer['type'] == LayerType.ERROR_NO_LAYER_CONF:
-            logger.error("%s: Don't have conf/layer.conf file."\
+            logger.info("%s: Doesn't have conf/layer.conf file, so ignoring"\
                      % layer['name'])
             layers.remove(layer)
         else:
@@ -137,6 +137,9 @@ def main():
         if layer['type'] == LayerType.ERROR_NO_LAYER_CONF or \
                 layer['type'] == LayerType.ERROR_BSP_DISTRO:
             continue
+
+        # Reset to a clean backup copy for each run
+        shutil.copyfile(bblayersconf + '.backup', bblayersconf)
 
         if check_bblayers(bblayersconf, layer['path'], logger):
             logger.info("%s already in %s. To capture initial signatures, layer under test should not present "

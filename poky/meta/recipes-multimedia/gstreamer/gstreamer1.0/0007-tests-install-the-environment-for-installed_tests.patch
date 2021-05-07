@@ -1,0 +1,58 @@
+From 57d2965e979f886e03eecd7e351bf01812053971 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sun, 2 May 2021 01:58:01 +0100
+Subject: [PATCH 4/4] tests: install the environment for installed_tests
+
+- adapt the test environment for installed_tests
+- install the test environment for installed_tests
+- run the tests using the installed environment
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/789]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ template.test.in        |  2 +-
+ tests/check/meson.build | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/template.test.in b/template.test.in
+index f701627f8..9a3fbdd09 100644
+--- a/template.test.in
++++ b/template.test.in
+@@ -1,3 +1,3 @@
+ [Test]
+ Type=session
+-Exec=@installed_tests_dir@/@program@
++Exec=sh -c 'set -aex && source @installed_tests_dir@/@program@.env && exec @installed_tests_dir@/@program@'
+diff --git a/tests/check/meson.build b/tests/check/meson.build
+index f64524904..a67e0f8dd 100644
+--- a/tests/check/meson.build
++++ b/tests/check/meson.build
+@@ -183,6 +183,24 @@ foreach t : core_tests
+         install_dir: installed_tests_metadir,
+         configuration: test_conf
+       )
++
++      env += {'GST_REGISTRY': '~/.cache/gstreamer-1.0/@0@.registry'.format(test_name)}
++      configure_file(
++        output: test_name + '.env',
++        install_dir: installed_tests_execdir,
++        configuration : env,
++      )
++      # helper to convert a meson environment dictionay object exported with configure_file
++      # this also remove not needed variables for the installed tests
++      meson.add_postconf_script('sed', '-i',
++        '-e', '/^#define/!d',
++        '-e', 's/^#define //g',
++        '-e', '/^GST_PLUGIN_PATH_1_0/d',
++        '-e', '/^GST_PLUGIN_SYSTEM_PATH_1_0/d',
++        '-e', '/^GST_PLUGIN_SCANNER_1_0/d',
++        '-e', 's/ /=/',
++        join_paths(meson.current_build_dir(), test_name + '.env')
++      )
+     endif
+ 
+     test(test_name, exe, env: env, timeout : 3 * 60)
+-- 
+2.31.1
+

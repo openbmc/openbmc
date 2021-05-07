@@ -71,8 +71,7 @@ when building a simple image such as core-image-minimal. If you do not
 need runtime tests enabled for core components, then it is recommended
 that you remove "ptest" from
 :term:`DISTRO_FEATURES` to save a significant
-amount of build time e.g. by adding the following in your configuration:
-::
+amount of build time e.g. by adding the following in your configuration::
 
    DISTRO_FEATURES_remove = "ptest"
 
@@ -179,12 +178,12 @@ parameter instead of the earlier ``name`` which overlapped with the
 generic ``name`` parameter. All recipes using the npm fetcher will need
 to be changed as a result.
 
-An example of the new scheme: ::
+An example of the new scheme::
 
    SRC_URI = "npm://registry.npmjs.org;package=array-flatten;version=1.1.1 \
               npmsw://${THISDIR}/npm-shrinkwrap.json"
 
-Another example where the sources are fetched from git rather than an npm repository: ::
+Another example where the sources are fetched from git rather than an npm repository::
 
    SRC_URI = "git://github.com/foo/bar.git;protocol=https \
               npmsw://${THISDIR}/npm-shrinkwrap.json"

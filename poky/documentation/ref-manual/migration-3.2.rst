@@ -90,12 +90,12 @@ If you have anonymous python or in-line python conditionally adding
 dependencies in your custom recipes, and you intend for those recipes to
 work with multilib, then you will need to ensure that ``${MLPREFIX}``
 is prefixed on the package names in the dependencies, for example
-(from the ``glibc`` recipe): ::
+(from the ``glibc`` recipe)::
 
     RRECOMMENDS_${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'ldconfig', '${MLPREFIX}ldconfig', '', d)}"
 
 This also applies when conditionally adding packages to :term:`PACKAGES` where
-those packages have dependencies, for example (from the ``alsa-plugins`` recipe): ::
+those packages have dependencies, for example (from the ``alsa-plugins`` recipe)::
 
     PACKAGES += "${@bb.utils.contains('PACKAGECONFIG', 'pulseaudio', 'alsa-plugins-pulseaudio-conf', '', d)}"
     ...
@@ -229,7 +229,7 @@ needs ``/etc/ld.so.conf`` to be present at image build time:
 
 When some recipe installs libraries to a non-standard location, and
 therefore installs in a file in ``/etc/ld.so.conf.d/foo.conf``, we
-need ``/etc/ld.so.conf`` containing: ::
+need ``/etc/ld.so.conf`` containing::
 
   include /etc/ld.so.conf.d/*.conf
 

@@ -20,7 +20,7 @@ Obtaining BitBake
 
 See the :ref:`bitbake-user-manual/bitbake-user-manual-hello:obtaining bitbake` section for
 information on how to obtain BitBake. Once you have the source code on
-your machine, the BitBake directory appears as follows: ::
+your machine, the BitBake directory appears as follows::
 
    $ ls -al
    total 100
@@ -49,7 +49,7 @@ Setting Up the BitBake Environment
 
 First, you need to be sure that you can run BitBake. Set your working
 directory to where your local BitBake files are and run the following
-command: ::
+command::
 
   $ ./bin/bitbake --version
   BitBake Build Tool Core version 1.23.0, bitbake version 1.23.0
@@ -61,14 +61,14 @@ The recommended method to run BitBake is from a directory of your
 choice. To be able to run BitBake from any directory, you need to add
 the executable binary to your binary to your shell's environment
 ``PATH`` variable. First, look at your current ``PATH`` variable by
-entering the following: ::
+entering the following::
 
   $ echo $PATH
 
 Next, add the directory location
 for the BitBake binary to the ``PATH``. Here is an example that adds the
 ``/home/scott-lenovo/bitbake/bin`` directory to the front of the
-``PATH`` variable: ::
+``PATH`` variable::
 
   $ export PATH=/home/scott-lenovo/bitbake/bin:$PATH
 
@@ -116,7 +116,7 @@ Following is the complete "Hello World" example.
 
 #.  **Create a Project Directory:** First, set up a directory for the
     "Hello World" project. Here is how you can do so in your home
-    directory: ::
+    directory::
 
       $ mkdir ~/hello
       $ cd ~/hello
@@ -127,7 +127,7 @@ Following is the complete "Hello World" example.
     directory is a good way to isolate your project.
 
 #.  **Run BitBake:** At this point, you have nothing but a project
-    directory. Run the ``bitbake`` command and see what it does: ::
+    directory. Run the ``bitbake`` command and see what it does::
 
        $ bitbake
        The BBPATH variable is not set and bitbake did not
@@ -161,7 +161,7 @@ Following is the complete "Hello World" example.
     ``BBPATH`` variable up in a configuration file for each project.
 
     From your shell, enter the following commands to set and export the
-    ``BBPATH`` variable: ::
+    ``BBPATH`` variable::
 
       $ BBPATH="projectdirectory"
       $ export BBPATH
@@ -176,7 +176,7 @@ Following is the complete "Hello World" example.
        shell would.
 
 #.  **Run BitBake:** Now that you have ``BBPATH`` defined, run the
-    ``bitbake`` command again: ::
+    ``bitbake`` command again::
 
        $ bitbake
        ERROR: Traceback (most recent call last):
@@ -208,13 +208,13 @@ Following is the complete "Hello World" example.
     http://git.openembedded.org/bitbake/tree/conf/bitbake.conf.
 
     Use the following commands to create the ``conf`` directory in the
-    project directory: ::
+    project directory::
 
       $ mkdir conf
 
     From within the ``conf`` directory,
     use some editor to create the ``bitbake.conf`` so that it contains
-    the following: ::
+    the following::
 
        PN  = "${@bb.parse.BBHandler.vars_from_file(d.getVar('FILE', False),d)[0] or 'defaultpkgname'}"
 
@@ -251,7 +251,7 @@ Following is the complete "Hello World" example.
     glossary.
 
 #.  **Run BitBake:** After making sure that the ``conf/bitbake.conf`` file
-    exists, you can run the ``bitbake`` command again: ::
+    exists, you can run the ``bitbake`` command again::
 
        $ bitbake
        ERROR: Traceback (most recent call last):
@@ -278,7 +278,7 @@ Following is the complete "Hello World" example.
     in the ``classes`` directory of the project (i.e ``hello/classes``
     in this example).
 
-    Create the ``classes`` directory as follows: ::
+    Create the ``classes`` directory as follows::
 
       $ cd $HOME/hello
       $ mkdir classes
@@ -291,7 +291,7 @@ Following is the complete "Hello World" example.
     environments BitBake is supporting.
 
 #.  **Run BitBake:** After making sure that the ``classes/base.bbclass``
-    file exists, you can run the ``bitbake`` command again: ::
+    file exists, you can run the ``bitbake`` command again::
 
        $ bitbake
        Nothing to do. Use 'bitbake world' to build everything, or run 'bitbake --help' for usage information.
@@ -314,7 +314,7 @@ Following is the complete "Hello World" example.
     Minimally, you need a recipe file and a layer configuration file in
     your layer. The configuration file needs to be in the ``conf``
     directory inside the layer. Use these commands to set up the layer
-    and the ``conf`` directory: ::
+    and the ``conf`` directory::
 
        $ cd $HOME
        $ mkdir mylayer
@@ -322,12 +322,12 @@ Following is the complete "Hello World" example.
        $ mkdir conf
 
     Move to the ``conf`` directory and create a ``layer.conf`` file that has the
-    following: ::
+    following::
 
       BBPATH .= ":${LAYERDIR}"
-      BBFILES += "${LAYERDIR}/\*.bb"
+      BBFILES += "${LAYERDIR}/*.bb"
       BBFILE_COLLECTIONS += "mylayer"
-     `BBFILE_PATTERN_mylayer := "^${LAYERDIR_RE}/"
+      BBFILE_PATTERN_mylayer := "^${LAYERDIR_RE}/"
 
     For information on these variables, click on :term:`BBFILES`,
     :term:`LAYERDIR`, :term:`BBFILE_COLLECTIONS` or :term:`BBFILE_PATTERN_mylayer <BBFILE_PATTERN>`
@@ -335,7 +335,7 @@ Following is the complete "Hello World" example.
 
     You need to create the recipe file next. Inside your layer at the
     top-level, use an editor and create a recipe file named
-    ``printhello.bb`` that has the following: ::
+    ``printhello.bb`` that has the following::
 
        DESCRIPTION = "Prints Hello World"
        PN = 'printhello'
@@ -356,7 +356,7 @@ Following is the complete "Hello World" example.
     follow the links to the glossary.
 
 #. **Run BitBake With a Target:** Now that a BitBake target exists, run
-    the command and provide that target: ::
+    the command and provide that target::
 
       $ cd $HOME/hello
       $ bitbake printhello
@@ -376,7 +376,7 @@ Following is the complete "Hello World" example.
     ``hello/conf`` for this example).
 
     Set your working directory to the ``hello/conf`` directory and then
-    create the ``bblayers.conf`` file so that it contains the following: ::
+    create the ``bblayers.conf`` file so that it contains the following::
 
        BBLAYERS ?= " \
            /home/<you>/mylayer \
@@ -386,7 +386,7 @@ Following is the complete "Hello World" example.
 
 #. **Run BitBake With a Target:** Now that you have supplied the
     ``bblayers.conf`` file, run the ``bitbake`` command and provide the
-    target: ::
+    target::
 
        $ bitbake printhello
        Parsing recipes: 100% |##################################################################################|

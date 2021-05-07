@@ -33,7 +33,7 @@ class TestData(TestBase):
 
     def test_data_fail_wrong_variable(self):
         expectedError = 'AssertionError'
-        d = {'IMAGE' : 'core-image-sato', 'ARCH' : 'arm'}
+        d = {'IMAGE' : 'core-image-weston', 'ARCH' : 'arm'}
 
         tc = self._testLoader(d=d, modules=self.modules)
         results = tc.runTests()

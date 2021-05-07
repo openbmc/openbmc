@@ -24,6 +24,7 @@ SRC_URI = "https://github.com/linux-pam/linux-pam/releases/download/v${PV}/Linux
            file://pam-security-abstract-securetty-handling.patch \
            file://pam-unix-nullok-secure.patch \
            file://crypt_configure.patch \
+           file://pam-volatiles.conf \
           "
 
 SRC_URI[md5sum] = "558ff53b0fc0563ca97f79e911822165"
@@ -140,8 +141,18 @@ do_install() {
 
 	# don't install /var/run when populating rootfs. Do it through volatile
 	rm -rf ${D}${localstatedir}
-	install -d ${D}${sysconfdir}/default/volatiles
-	install -m 0644 ${WORKDIR}/99_pam ${D}${sysconfdir}/default/volatiles
+
+        if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','false','true',d)}; then
+            rm -rf ${D}${sysconfdir}/init.d/
+            rm -rf ${D}${sysconfdir}/rc*
+            install -d ${D}${sysconfdir}/tmpfiles.d
+            install -m 0644 ${WORKDIR}/pam-volatiles.conf \
+                    ${D}${sysconfdir}/tmpfiles.d/pam.conf
+        else
+            install -d ${D}${sysconfdir}/default/volatiles
+            install -m 0644 ${WORKDIR}/99_pam \
+                    ${D}${sysconfdir}/default/volatiles/
+        fi
 
 	install -d ${D}${sysconfdir}/pam.d/
 	install -m 0644 ${WORKDIR}/pam.d/* ${D}${sysconfdir}/pam.d/
@@ -158,7 +169,14 @@ do_install_ptest() {
     if [ ${PTEST_ENABLED} = "1" ]; then
         mkdir -p ${D}${PTEST_PATH}/tests
         install -m 0755 ${B}/tests/.libs/* ${D}${PTEST_PATH}/tests
+        install -m 0644 ${S}/tests/confdir ${D}${PTEST_PATH}/tests
     fi
+}
+
+pkg_postinst_${PN}() {
+         if [ -z "$D" ] && [ -e /etc/init.d/populate-volatile.sh ] ; then
+                 /etc/init.d/populate-volatile.sh update
+         fi
 }
 
 inherit features_check

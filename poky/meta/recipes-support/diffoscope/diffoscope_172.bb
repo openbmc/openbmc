@@ -23,6 +23,7 @@ do_install_append_class-native() {
 	create_wrapper ${D}${bindir}/diffoscope \
 		MAGIC=${STAGING_DIR_NATIVE}${datadir_native}/misc/magic.mgc \
 		RPM_CONFIGDIR=${STAGING_LIBDIR_NATIVE}/rpm \
+		LD_LIBRARY_PATH=${STAGING_LIBDIR_NATIVE} \
 		RPM_ETCCONFIGDIR=${STAGING_DIR_NATIVE}
 }
 

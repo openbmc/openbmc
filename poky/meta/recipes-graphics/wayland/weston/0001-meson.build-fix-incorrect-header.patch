@@ -1,0 +1,32 @@
+From a2ba4714a6872e547621d29d9ddcb0f374b88cf6 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 20 Apr 2021 20:42:18 -0700
+Subject: [PATCH] meson.build: fix incorrect header
+
+The wayland.c actually include 'xdg-shell-client-protocol.h' instead of
+the server one, so fix it. Otherwise, it's possible to get build failure
+due to race condition.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ libweston/backend-wayland/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libweston/backend-wayland/meson.build b/libweston/backend-wayland/meson.build
+index 7e82513..29270b5 100644
+--- a/libweston/backend-wayland/meson.build
++++ b/libweston/backend-wayland/meson.build
+@@ -10,7 +10,7 @@ srcs_wlwl = [
+ 	fullscreen_shell_unstable_v1_protocol_c,
+ 	presentation_time_protocol_c,
+ 	presentation_time_server_protocol_h,
+-	xdg_shell_server_protocol_h,
++	xdg_shell_client_protocol_h,
+ 	xdg_shell_protocol_c,
+ ]
+ 
+-- 
+2.30.2
+

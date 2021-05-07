@@ -104,7 +104,7 @@ def write_task_data(status, logfile, e, d):
             f.write("Status: FAILED \n")
         f.write("Ended: %0.2f \n" % e.time)
 
-def write_host_data(logfile, e, d):
+def write_host_data(logfile, e, d, type):
     import subprocess, os, datetime
     # minimum time allowed for each command to run, in seconds
     time_threshold = 0.5
@@ -112,15 +112,22 @@ def write_host_data(logfile, e, d):
     num_cmds = 0
     # interval at which data will be logged
     interval = int(d.getVar("BB_HEARTBEAT_EVENT", False))
-    # the commands to be run at each interval
-    cmds = d.getVar('BB_LOG_HOST_STAT_CMDS')
-    # if no commands are passed, issue a warning and return
-    if cmds is None:
-        d.setVar("BB_LOG_HOST_STAT_ON_INTERVAL", "0")
-        d.setVar("BB_LOG_HOST_STAT_ON_FAILURE", "0")
-        bb.warn("buildstats: Collecting host data failed. Set BB_LOG_HOST_STAT_CMDS=\"command1 ; command2 ; ... \" in conf/local.conf\n")
-        return
-    # find the total commands
+    msg = ""
+    if type == "interval":
+        cmds = d.getVar('BB_LOG_HOST_STAT_CMDS_INTERVAL')
+        msg = "Host Stats: Collecting data at interval.\n"
+        if cmds is None:
+            d.setVar("BB_LOG_HOST_STAT_ON_INTERVAL", "0")
+            bb.warn("buildstats: Collecting host data at intervals failed. Set BB_LOG_HOST_STAT_CMDS_INTERVAL=\"command1 ; command2 ; ... \" in conf/local.conf\n")
+            return
+    if type == "failure":
+        cmds = d.getVar('BB_LOG_HOST_STAT_CMDS_FAILURE')
+        msg = "Host Stats: Collecting data on failure.\n"
+        msg += "Failed at task " + e.task + "\n"
+        if cmds is None:
+            d.setVar("BB_LOG_HOST_STAT_ON_FAILURE", "0")
+            bb.warn("buildstats: Collecting host data on failure failed. Set BB_LOG_HOST_STAT_CMDS_FAILURE=\"command1 ; command2 ; ... \" in conf/local.conf\n")
+            return
     c_san = []
     for cmd in cmds.split(";"):
         if len(cmd) == 0:
@@ -147,6 +154,7 @@ def write_host_data(logfile, e, d):
     os.environ['PATH'] = path + ":" + opath + ":" + ospath
     with open(logfile, "a") as f:
         f.write("Event Time: %f\nDate: %s\n" % (e.time, datetime.datetime.now()))
+        f.write("%s" % msg)
         for c in c_san:
             try:
                 output = subprocess.check_output(c.split(), stderr=subprocess.STDOUT, timeout=limit).decode('utf-8')
@@ -171,7 +179,7 @@ python run_buildstats () {
         taskdir = os.path.join(bsdir, d.getVar('PF'))
         if isinstance(e, bb.event.HeartbeatEvent) and bb.utils.to_boolean(d.getVar("BB_LOG_HOST_STAT_ON_INTERVAL")):
             bb.utils.mkdirhier(bsdir)
-            write_host_data(os.path.join(bsdir, "host_stats"), e, d)
+            write_host_data(os.path.join(bsdir, "host_stats"), e, d, "interval")
 
     if isinstance(e, bb.event.BuildStarted):
         ########################################################################
@@ -247,7 +255,7 @@ python run_buildstats () {
         with open(build_status, "a") as f:
             f.write(d.expand("Failed at: ${PF} at task: %s \n" % e.task))
             if bb.utils.to_boolean(d.getVar("BB_LOG_HOST_STAT_ON_FAILURE")):
-                write_host_data(build_status, e, d)
+                write_host_data(os.path.join(bsdir, "host_stats"), e, d, "failure")
 }
 
 addhandler run_buildstats

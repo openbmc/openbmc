@@ -15,6 +15,7 @@ SRC_URI = "https://github.com/libevent/libevent/releases/download/release-${PV}-
            file://Makefile-missing-test-dir.patch \
            file://run-ptest \
            file://0001-test-regress_dns.c-patch-out-tests-that-require-a-wo.patch \
+           file://0002-test-regress.h-Increase-default-timeval-tolerance-50.patch \
            "
 
 SRC_URI[sha256sum] = "92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb"

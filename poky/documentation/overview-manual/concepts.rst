@@ -55,8 +55,7 @@ This section briefly introduces BitBake. If you want more information on
 BitBake, see the :doc:`BitBake User Manual <bitbake:index>`.
 
 To see a list of the options BitBake supports, use either of the
-following commands:
-::
+following commands::
 
    $ bitbake -h
    $ bitbake --help
@@ -66,8 +65,7 @@ The most common usage for BitBake is ``bitbake recipename``, where
 to as the "target"). The target often equates to the first part of a
 recipe's filename (e.g. "foo" for a recipe named ``foo_1.3.0-r0.bb``).
 So, to process the ``matchbox-desktop_1.2.3.bb`` recipe file, you might
-type the following:
-::
+type the following::
 
    $ bitbake matchbox-desktop
 
@@ -1068,15 +1066,13 @@ the image. The formats used for the root filesystem depend on the
 support compression.
 
 As an example, a dynamically created task when creating a particular
-image type would take the following form:
-::
+image type would take the following form::
 
    do_image_type
 
 So, if the type
 as specified by the ``IMAGE_FSTYPES`` were ``ext4``, the dynamically
-generated task would be as follows:
-::
+generated task would be as follows::
 
    do_image_ext4
 
@@ -1478,8 +1474,7 @@ cross-compiler that is used internally within BitBake only.
    gcc-cross
    .
 
-The chain of events that occurs when the standard toolchain is bootstrapped:
-::
+The chain of events that occurs when the standard toolchain is bootstrapped::
 
    binutils-cross -> linux-libc-headers -> gcc-cross -> libgcc-initial -> glibc -> libgcc -> gcc-runtime
 
@@ -1528,8 +1523,7 @@ might not be the same machine as the Build Host.
    can take advantage of pre-built images that ship with the Yocto
    Project and already contain cross-development toolchain installers.
 
-Here is the bootstrap process for the relocatable toolchain:
-::
+Here is the bootstrap process for the relocatable toolchain::
 
    gcc -> binutils-crosssdk -> gcc-crosssdk-initial -> linux-libc-headers -> glibc-initial -> nativesdk-glibc -> gcc-crosssdk -> gcc-cross-canadian
 
@@ -1703,8 +1697,7 @@ to the task.
 
 Like the ``WORKDIR`` case, situations exist where dependencies should be
 ignored. For these situations, you can instruct the build process to
-ignore a dependency by using a line like the following:
-::
+ignore a dependency by using a line like the following::
 
    PACKAGE_ARCHS[vardepsexclude] = "MACHINE"
 
@@ -1714,8 +1707,7 @@ reference it.
 
 Equally, there are cases where you need to add dependencies BitBake is
 not able to find. You can accomplish this by using a line like the
-following:
-::
+following::
 
    PACKAGE_ARCHS[vardeps] = "MACHINE"
 
@@ -1745,8 +1737,7 @@ and the dependent task hashes can be influenced. Within the BitBake
 configuration file, you can give BitBake some extra information to help
 it construct the basehash. The following statement effectively results
 in a list of global variable dependency excludes (i.e. variables never
-included in any checksum):
-::
+included in any checksum)::
 
    BB_HASHBASE_WHITELIST ?= "TMPDIR FILE PATH PWD BB_TASKHASH BBPATH DL_DIR \\
        SSTATE_DIR THISDIR FILESEXTRAPATHS FILE_DIRNAME HOME LOGNAME SHELL TERM \\
@@ -1771,8 +1762,7 @@ desired. This file defines the two basic signature generators
 "OEBasicHash". By default, a dummy "noop" signature handler is enabled
 in BitBake. This means that behavior is unchanged from previous
 versions. OE-Core uses the "OEBasicHash" signature handler by default
-through this setting in the ``bitbake.conf`` file:
-::
+through this setting in the ``bitbake.conf`` file::
 
    BB_SIGNATURE_HANDLER ?= "OEBasicHash"
 
@@ -1826,8 +1816,7 @@ The Yocto Project team has tried to keep the details of the
 implementation hidden in ``sstate`` class. From a user's perspective,
 adding shared state wrapping to a task is as simple as this
 :ref:`ref-tasks-deploy` example taken
-from the :ref:`deploy <ref-classes-deploy>` class:
-::
+from the :ref:`deploy <ref-classes-deploy>` class::
 
    DEPLOYDIR = "${WORKDIR}/deploy-${PN}"
    SSTATETASKS += "do_deploy"
@@ -1871,8 +1860,7 @@ The following list explains the previous example:
       instead, skipping the ``do_deploy`` task.
 
 -  The following task definition is glue logic needed to make the
-   previous settings effective:
-   ::
+   previous settings effective::
 
       python do_deploy_setscene () {
           sstate_setscene(d)
@@ -1898,8 +1886,7 @@ The following list explains the previous example:
       In cases where ``sstate-inputdirs`` and ``sstate-outputdirs`` would be
       the same, you can use ``sstate-plaindirs``. For example, to preserve the
       ${:term:`PKGD`} and ${:term:`PKGDEST`} output from the ``do_package``
-      task, use the following:
-      ::
+      task, use the following::
 
               do_package[sstate-plaindirs] = "${PKGD} ${PKGDEST}"
 
@@ -1917,24 +1904,21 @@ The following list explains the previous example:
    multiple directories. For example, the following declares
    ``PKGDESTWORK`` and ``SHLIBWORK`` as shared state input directories,
    which populates the shared state cache, and ``PKGDATA_DIR`` and
-   ``SHLIBSDIR`` as the corresponding shared state output directories:
-   ::
+   ``SHLIBSDIR`` as the corresponding shared state output directories::
 
       do_package[sstate-inputdirs] = "${PKGDESTWORK} ${SHLIBSWORKDIR}"
       do_package[sstate-outputdirs] = "${PKGDATA_DIR} ${SHLIBSDIR}"
 
 -  These methods also include the ability to take a lockfile when
    manipulating shared state directory structures, for cases where file
-   additions or removals are sensitive:
-   ::
+   additions or removals are sensitive::
 
       do_package[sstate-lockfile] = "${PACKAGELOCK}"
 
 Behind the scenes, the shared state code works by looking in
 :term:`SSTATE_DIR` and
 :term:`SSTATE_MIRRORS` for
-shared state files. Here is an example:
-::
+shared state files. Here is an example::
 
    SSTATE_MIRRORS ?= "\
        file://.\* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \n \
@@ -2116,8 +2100,7 @@ accomplished using fakeroot.
    under fakeroot. Otherwise, the task cannot run root-only operations,
    and cannot see the fake file ownership and permissions set by the
    other task. You need to also add a dependency on
-   ``virtual/fakeroot-native:do_populate_sysroot``, giving the following:
-   ::
+   ``virtual/fakeroot-native:do_populate_sysroot``, giving the following::
 
       fakeroot do_mytask () {
           ...

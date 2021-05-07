@@ -214,7 +214,7 @@ class DpkgPM(OpkgDpkgPM):
 
                     tmp_sf.write(status)
 
-        os.rename(status_file + ".tmp", status_file)
+        bb.utils.rename(status_file + ".tmp", status_file)
 
     def run_pre_post_installs(self, package_name=None):
         """
@@ -299,13 +299,13 @@ class DpkgPM(OpkgDpkgPM):
             for dir in dirs:
                 new_dir = re.sub(r"\.dpkg-new", "", dir)
                 if dir != new_dir:
-                    os.rename(os.path.join(root, dir),
+                    bb.utils.rename(os.path.join(root, dir),
                               os.path.join(root, new_dir))
 
             for file in files:
                 new_file = re.sub(r"\.dpkg-new", "", file)
                 if file != new_file:
-                    os.rename(os.path.join(root, file),
+                    bb.utils.rename(os.path.join(root, file),
                               os.path.join(root, new_file))
 
 

@@ -430,8 +430,7 @@ local working area (also called a branch) that tracks a specific
 development branch from the upstream source Git repository. in other
 words, you can define your local Git environment to work on any
 development branch in the repository. To help illustrate, consider the
-following example Git commands:
-::
+following example Git commands::
 
    $ cd ~
    $ git clone git://git.yoctoproject.org/poky
@@ -476,8 +475,7 @@ create and checkout a local working Git branch based on a tag name. When
 you do this, you get a snapshot of the Git repository that reflects the
 state of the files when the change was made associated with that tag.
 The most common use is to checkout a working branch that matches a
-specific Yocto Project release. Here is an example:
-::
+specific Yocto Project release. Here is an example::
 
    $ cd ~
    $ git clone git://git.yoctoproject.org/poky

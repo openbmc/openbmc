@@ -2,9 +2,10 @@
 
 cd tests
 
+export srcdir=.
+
 failed=0
 all=0
-
 for f in tst-*; do
     "./$f" > /dev/null 2>&1
     case "$?" in
@@ -28,4 +29,4 @@ if [ "$failed" -eq 0 ] ; then
 else
   echo "$failed of $all tests failed"
 fi
-
+unset srcdir

@@ -61,70 +61,6 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-hw.boot_from_runlevel_3",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "Boot into system and edit /etc/inittab to make sure that system enter at the run level 3 by default, this is done by changing the line   \n\n\nid:5:initdefault  \n\nto  \n\nid:3:initdefault  \n\n",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "Reboot system, and press \"Tab\" to enter \"grub\"",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "Get into the \"kernel\" line with the edit option  \"e\" and add \"psplash=false text\" at the end line.",
-                    "expected_results": ""
-                },
-                "4": {
-                    "action": "Press \"F10\" or \"ctrl+x\" to boot system",
-                    "expected_results": ""
-                },
-                "5": {
-                    "action": "If system ask you for a login type \"root\"",
-                    "expected_results": "System should boot to run level 3, showing the command prompt."
-                }
-            },
-            "summary": "boot_from_runlevel_3"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-hw.boot_from_runlevel_5",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "Boot into system and edit /etc/inittab to make sure that system enter at the run level 5 by default, this is done by changing the line   \n\nid:3:initdefault  \n\nto  \n\nid:5:initdefault  \n\n",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "Reboot system, and press \"Tab\" to enter \"grub\"",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "Get into the \"kernel\" line with the edit option  \"e\" and add \"psplash=false text\" at the end line.",
-                    "expected_results": ""
-                },
-                "4": {
-                    "action": "Press \"F10\" or \"ctrl+x\" to boot system \nNote: The test is only for sato image.",
-                    "expected_results": "System should boot to runlevel 5 ."
-                }
-            },
-            "summary": "boot_from_runlevel_5"
-        }
-    },
-    {
-        "test": {
             "@alias": "bsps-hw.bsps-hw.switch_among_multi_applications_and_desktop",
             "author": [
                 {
@@ -155,70 +91,6 @@
     },
     {
         "test": {
-            "@alias": "bsps-hw.bsps-hw.ethernet_static_ip_set_in_connman",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "Boot the system and check internet connection is on . ",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "Launch connmand-properties (up-right corner on desktop)",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "Choose  Ethernet device and set a valid static ip address for it. \nFor example, in our internal network, we can set as following: \nip address: 10.239.48.xxx \nMask: 255.255.255.0 \nGateway (Broadcast): 10.239.48.255",
-                    "expected_results": ""
-                },
-                "4": {
-                    "action": "Check the Network configuration with \"ifconfig\"",
-                    "expected_results": "Static IP was set successfully  \n"
-                },
-                "5": {
-                    "action": "ping to another IP adress",
-                    "expected_results": "Ping works correclty\n"
-                }
-            },
-            "summary": "ethernet_static_ip_set_in_connman"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-hw.ethernet_get_IP_in_connman_via_DHCP",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "Launch connmand-properties (up-right corner on your desktop). ",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "Check if Ethernet device can work properly with static IP, doing \"ping XXX.XXX.XXX.XXX\", once this is set.",
-                    "expected_results": "Ping executed successfully .  \n\n"
-                },
-                "3": {
-                    "action": "Then choose DHCP method for Ethernet device in connmand-properties.",
-                    "expected_results": ""
-                },
-                "4": {
-                    "action": "Check with 'ifconfig\" and \"ping\" if Ethernet device get IP address via DHCP.",
-                    "expected_results": "Ethernet device can get dynamic IP address via DHCP in connmand ."
-                }
-            },
-            "summary": "ethernet_get_IP_in_connman_via_DHCP"
-        }
-    },
-    {
-        "test": {
             "@alias": "bsps-hw.bsps-hw.connman_offline_mode_in_connman-gnome",
             "author": [
                 {
@@ -237,40 +109,6 @@
                 }
             },
             "summary": "connman_offline_mode_in_connman-gnome"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-hw.standby",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "boot system and launch terminal; check output of \"date\" and launch script \"continue.sh\"",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "echo \"mem\" > /sys/power/state",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "After system go into S3 mode, move mouse or press any key to make it resume (on NUC press power button)",
-                    "expected_results": ""
-                },
-                "4": {
-                    "action": "Check \"date\" and script \"continue.sh\"",
-                    "expected_results": ""
-                },
-                "5": {
-                    "action": "Check if application can work as normal \ncontinue.sh as below: \n \n#!/bin/sh \n \ni=1 \nwhile [ 0 ] \ndo \n echo $i \n sleep 1 \n i=$((i+1)) \ndone ",
-                    "expected_results": "Screen should resume back and script can run continuously incrementing the i's value from where it was before going to standby state. Date should be the same with the corresponding time increment."
-                }
-            },
-            "summary": "standby"
         }
     },
     {
@@ -301,88 +139,6 @@
                 }
             },
             "summary": "check_CPU_utilization_after_standby"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-hw.Test_if_LAN_device_works_well_after_resume_from_suspend_state",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "boot system and launch terminal",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "echo \"mem\" > /sys/power/state",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "After system go into S3 mode, move mouse or press any key to make it resume",
-                    "expected_results": ""
-                },
-                "4": {
-                    "action": "check ping status  \n\nNote: This TC apply only for core-image-full-cmd.",
-                    "expected_results": "ping should always work before/after standby"
-                }
-            },
-            "summary": "Test_if_LAN_device_works_well_after_resume_from_suspend_state"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-hw.Test_if_usb_hid_device_works_well_after_resume_from_suspend_state",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "boot system and launch terminal",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "echo \"mem\" > /sys/power/state",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "After system go into S3 mode, resume the device by pressing the power button or using HID devices",
-                    "expected_results": "Devices resumes "
-                },
-                "4": {
-                    "action": "check usb mouse and keyboard",
-                    "expected_results": "Usb mouse and keyboard should work"
-                }
-            },
-            "summary": "Test_if_usb_hid_device_works_well_after_resume_from_suspend_state"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-hw.click_terminal_icon_on_X_desktop",
-            "author": [
-                {
-                    "email": "alexandru.c.georgescu@intel.com",
-                    "name": "alexandru.c.georgescu@intel.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "After system launch and X start up, click terminal icon on desktop",
-                    "expected_results": ""
-                },
-                "2": {
-                    "action": "Check if only one terminal window launched and no other problem met",
-                    "expected_results": "There should be no problem after launching terminal . "
-                }
-            },
-            "summary": "click_terminal_icon_on_X_desktop"
         }
     },
     {
@@ -835,40 +591,6 @@
                 }
             },
             "summary": "Check_if_watchdog_can_reset_the_target_system"
-        }
-    },
-    {
-        "test": {
-            "@alias": "bsps-hw.bsps-hw.Check_if_RTC_(Real_Time_Clock)_can_work_correctly",
-            "author": [
-                {
-                    "email": "yi.zhao@windriver.com",
-                    "name": "yi.zhao@windriver.com"
-                }
-            ],
-            "execution": {
-                "1": {
-                    "action": "Read time from RTC registers.  root@localhost:/root> hwclock -r  Sun Mar 22 04:05:47 1970 -0.001948 seconds ",
-                    "expected_results": "Can read and set the time from RTC.\n"
-                },
-                "2": {
-                    "action": "Set system current time  root@localhost:/root> date 062309452008 ",
-                    "expected_results": ""
-                },
-                "3": {
-                    "action": "Synchronize the system current time to RTC registers  root@localhost:/root> hwclock -w ",
-                    "expected_results": ""
-                },
-                "4": {
-                    "action": "Read time from RTC registers  root@localhost:/root> hwclock -r ",
-                    "expected_results": ""
-                },
-                "5": {
-                    "action": "Reboot target and read time from RTC again\n",
-                    "expected_results": ""
-                }
-            },
-            "summary": "Check_if_RTC_(Real_Time_Clock)_can_work_correctly"
         }
     },
     {

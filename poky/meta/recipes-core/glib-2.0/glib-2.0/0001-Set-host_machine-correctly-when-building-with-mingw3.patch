@@ -17,16 +17,16 @@ diff --git a/gio/tests/meson.build b/gio/tests/meson.build
 index 3a19c82..b762835 100644
 --- a/gio/tests/meson.build
 +++ b/gio/tests/meson.build
-@@ -12,7 +12,7 @@ test_c_args = [
-   '-UG_DISABLE_ASSERT',
- ]
+@@ -27,7 +27,7 @@ test_c_args = [
+   endif # libutil.length() > 0
+ endif # build_machine.system() == 'linux'
  
 -if host_machine.system() == 'windows'
 +if host_system == 'windows'
    common_gio_tests_deps += [iphlpapi_dep, winsock2, cc.find_library ('secur32')]
  endif
  
-@@ -133,7 +133,7 @@ else
+@@ -148,7 +148,7 @@ else
  endif
  
  #  Test programs buildable on UNIX only
@@ -35,7 +35,7 @@ index 3a19c82..b762835 100644
    gio_tests += {
      'file' : {},
      'gdbus-peer' : {
-@@ -385,7 +385,7 @@ if host_machine.system() != 'windows'
+@@ -402,7 +402,7 @@ if host_machine.system() != 'windows'
  endif # unix
  
  #  Test programs buildable on Windows only
@@ -44,7 +44,7 @@ index 3a19c82..b762835 100644
    gio_tests += {'win32-streams' : {}}
  endif
  
-@@ -455,7 +455,7 @@ if cc.get_id() != 'msvc' and cc.get_id() != 'clang-cl'
+@@ -472,7 +472,7 @@ if cc.get_id() != 'msvc' and cc.get_id() != 'clang-cl'
    }
  endif
  
@@ -57,7 +57,7 @@ diff --git a/glib/tests/meson.build b/glib/tests/meson.build
 index 6eb23e8..36eb919 100644
 --- a/glib/tests/meson.build
 +++ b/glib/tests/meson.build
-@@ -137,7 +137,7 @@ if glib_conf.has('HAVE_EVENTFD')
+@@ -142,7 +142,7 @@ if glib_conf.has('HAVE_EVENTFD')
    }
  endif
  

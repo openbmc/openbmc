@@ -114,8 +114,7 @@ Changes to Scripts
 The following changes to scripts took place:
 
 -  ``oe-find-native-sysroot``: The usage for the
-   ``oe-find-native-sysroot`` script has changed to the following:
-   ::
+   ``oe-find-native-sysroot`` script has changed to the following::
 
       $ . oe-find-native-sysroot recipe
 
@@ -124,8 +123,7 @@ The following changes to scripts took place:
    was not necessary to provide the script with the command.
 
 -  ``oe-run-native``: The usage for the ``oe-run-native`` script has
-   changed to the following:
-   ::
+   changed to the following::
 
       $ oe-run-native native_recipe tool
 
@@ -453,14 +451,11 @@ The following miscellaneous changes have occurred:
    tools.
 
 -  The ``USE_LDCONFIG`` variable has been replaced with the "ldconfig"
-   ``DISTRO_FEATURES`` feature. Distributions that previously set:
-   ::
+   ``DISTRO_FEATURES`` feature. Distributions that previously set::
 
       USE_LDCONFIG = "0"
 
-   should now instead use the following:
-
-   ::
+   should now instead use the following::
 
       DISTRO_FEATURES_BACKFILL_CONSIDERED_append = " ldconfig"
 
@@ -478,8 +473,7 @@ The following miscellaneous changes have occurred:
    order to allow module packages from multiple kernel versions to
    co-exist on a target system. If you wish to return to the previous
    naming scheme that does not include the version suffix, use the
-   following:
-   ::
+   following::
 
       KERNEL_MODULE_PACKAGE_SUFFIX = ""
 

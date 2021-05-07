@@ -240,8 +240,8 @@ USERADD_GID_TABLES += "files/static-group"
 
     def test_no_busybox_base_utils(self):
         config = """
-# Enable x11
-DISTRO_FEATURES_append += "x11"
+# Enable wayland
+DISTRO_FEATURES_append += "pam opengl wayland"
 
 # Switch to systemd
 DISTRO_FEATURES += "systemd"
@@ -262,7 +262,7 @@ PNBLACKLIST[busybox] = "Don't build this"
 """
         self.write_config(config)
 
-        bitbake("--graphviz core-image-sato")
+        bitbake("--graphviz core-image-weston")
 
     def test_image_gen_debugfs(self):
         """

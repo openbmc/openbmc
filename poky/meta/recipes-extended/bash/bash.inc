@@ -91,6 +91,9 @@ do_install_append_class-target () {
 do_install_ptest () {
 	make INSTALL_TEST_DIR=${D}${PTEST_PATH}/tests install-test
 	cp ${B}/Makefile ${D}${PTEST_PATH}
+	cp ${B}/config.h ${D}${PTEST_PATH}
+	cp ${B}/version.h ${D}${PTEST_PATH}
+	cp ${S}/y.tab.[ch] ${D}${PTEST_PATH}
 	install -D ${WORKDIR}/run-bash-ptests ${D}${PTEST_PATH}/run-bash-ptests
         sed -i -e 's/^Makefile/_Makefile/' -e "s,--sysroot=${STAGING_DIR_TARGET},,g" \
 	    -e 's|${DEBUG_PREFIX_MAP}||g' \

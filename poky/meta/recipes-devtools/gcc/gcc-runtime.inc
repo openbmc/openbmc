@@ -49,16 +49,18 @@ RUNTIMETARGET_libc-newlib = "libstdc++-v3"
 # libiberty
 # libgfortran needs separate recipe due to libquadmath dependency
 
-SLIB = "${TMPDIR}/work-shared/gcc-${PV}-${PR}/gcc-${PV}"
-SLIB_NEW = "/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}"
+# Relative path to be repaced into debug info
+REL_S = "/usr/src/debug/${PN}/${EXTENDPE}${PV}-${PR}"
 
 DEBUG_PREFIX_MAP_class-target = " \
    -fdebug-prefix-map=${WORKDIR}/recipe-sysroot= \
    -fdebug-prefix-map=${WORKDIR}/recipe-sysroot-native= \
-   -fdebug-prefix-map=${SLIB}=${SLIB_NEW} \
-   -fdebug-prefix-map=${SLIB}/include=${SLIB_NEW}/libstdc++-v3/../include \
-   -fdebug-prefix-map=${SLIB}/libiberty=${SLIB_NEW}/libstdc++-v3/../libiberty \
-   -fdebug-prefix-map=${B}=${SLIB_NEW} \
+   -fdebug-prefix-map=${S}=${REL_S} \
+   -fdebug-prefix-map=${S}/include=${REL_S}/libstdc++-v3/../include \
+   -fdebug-prefix-map=${S}/libiberty=${REL_S}/libstdc++-v3/../libiberty \
+   -fdebug-prefix-map=${S}/libgcc=${REL_S}/libstdc++-v3/../libgcc \
+   -fdebug-prefix-map=${B}=${REL_S} \
+   -ffile-prefix-map=${B}/${HOST_SYS}/libstdc++-v3/include=${includedir}/c++/${BINV} \
    "
 
 do_configure () {

@@ -5,6 +5,12 @@
 =========================
 
 *******************************
+3.3 'hardknott' Release Series
+*******************************
+
+- :yocto_docs:`3.3 Documentation </3.3>`
+
+*******************************
 3.2 'gatesgarth' Release Series
 *******************************
 
@@ -24,6 +30,7 @@
 - :yocto_docs:`3.1.4 Documentation </3.1.4>`
 - :yocto_docs:`3.1.5 Documentation </3.1.5>`
 - :yocto_docs:`3.1.6 Documentation </3.1.6>`
+- :yocto_docs:`3.1.7 Documentation </3.1.7>`
 
 ==========================
  Previous Release Manuals

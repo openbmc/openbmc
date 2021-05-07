@@ -7,7 +7,7 @@ def prserv_make_conn(d, check = False):
     host_params = list([_f for _f in (d.getVar("PRSERV_HOST") or '').split(':') if _f])
     try:
         conn = None
-        conn = prserv.serv.PRServerConnection(host_params[0], int(host_params[1]))
+        conn = prserv.serv.connect(host_params[0], int(host_params[1]))
         if check:
             if not conn.ping():
                 raise Exception('service not available')

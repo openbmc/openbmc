@@ -16,6 +16,7 @@ KEXECTOOLS_e5500-64b ?= ""
 KEXECTOOLS_microblaze ?= ""
 KEXECTOOLS_nios2 ?= ""
 KEXECTOOLS_riscv64 ?= ""
+KEXECTOOLS_riscv32 ?= ""
 
 GSTEXAMPLES ?= "gst-examples"
 GSTEXAMPLES_riscv64 = ""

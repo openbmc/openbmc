@@ -26,8 +26,7 @@ One method you can use to determine which recipes are checking to see if
 a particular feature is contained or not is to ``grep`` through the
 :term:`Metadata` for the feature. Here is an example that
 discovers the recipes whose build is potentially changed based on a
-given feature:
-::
+given feature::
 
    $ cd poky
    $ git grep 'contains.*MACHINE_FEATURES.*feature'

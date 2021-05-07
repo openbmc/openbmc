@@ -1,4 +1,4 @@
-From 3a003af8804dda90fdf4862eca5f66cb12faaf02 Mon Sep 17 00:00:00 2001
+From cd5db101e3c4e72248f988a67ce28be8e24f66d4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 7 Dec 2015 23:42:45 +0000
 Subject: [PATCH] Fix various _FOR_BUILD and related variables
@@ -26,7 +26,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  5 files changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index c717903bb13..5abc649868d 100644
+index af19589fa95..d0116a23e1a 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -152,6 +152,7 @@ BUILD_EXPORTS = \
@@ -64,7 +64,7 @@ index c717903bb13..5abc649868d 100644
  	"FLEX=$(FLEX)" \
  	"INSTALL=$(INSTALL)" \
 diff --git a/Makefile.tpl b/Makefile.tpl
-index efed1511750..778beb705b4 100644
+index 6e0337fb48f..4fcac93d3d8 100644
 --- a/Makefile.tpl
 +++ b/Makefile.tpl
 @@ -154,6 +154,7 @@ BUILD_EXPORTS = \
@@ -94,10 +94,10 @@ index efed1511750..778beb705b4 100644
  	CFLAGS="$(CFLAGS)"; export CFLAGS; \
  	CONFIG_SHELL="$(SHELL)"; export CONFIG_SHELL; \
 diff --git a/gcc/Makefile.in b/gcc/Makefile.in
-index 011c7ac2db6..2f1165f7b5e 100644
+index 9b17d120aa1..3053d05903c 100644
 --- a/gcc/Makefile.in
 +++ b/gcc/Makefile.in
-@@ -805,7 +805,7 @@ BUILD_LDFLAGS=@BUILD_LDFLAGS@
+@@ -820,7 +820,7 @@ BUILD_LDFLAGS=@BUILD_LDFLAGS@
  BUILD_NO_PIE_FLAG = @BUILD_NO_PIE_FLAG@
  BUILD_LDFLAGS += $(BUILD_NO_PIE_FLAG)
  BUILD_CPPFLAGS= -I. -I$(@D) -I$(srcdir) -I$(srcdir)/$(@D) \
@@ -107,10 +107,10 @@ index 011c7ac2db6..2f1165f7b5e 100644
  # Actual name to use when installing a native compiler.
  GCC_INSTALL_NAME := $(shell echo gcc|sed '$(program_transform_name)')
 diff --git a/gcc/configure b/gcc/configure
-index 825a9652329..ff46cf58960 100755
+index e663052cad2..b0906aa3e96 100755
 --- a/gcc/configure
 +++ b/gcc/configure
-@@ -12314,7 +12314,7 @@ else
+@@ -12699,7 +12699,7 @@ else
  	CC="${CC_FOR_BUILD}" CFLAGS="${CFLAGS_FOR_BUILD}" \
  	CXX="${CXX_FOR_BUILD}" CXXFLAGS="${CXXFLAGS_FOR_BUILD}" \
  	LD="${LD_FOR_BUILD}" LDFLAGS="${LDFLAGS_FOR_BUILD}" \
@@ -120,10 +120,10 @@ index 825a9652329..ff46cf58960 100755
  		--enable-languages=${enable_languages-all} \
  		${enable_obsolete+--enable-obsolete="$enable_obsolete"} \
 diff --git a/gcc/configure.ac b/gcc/configure.ac
-index 6099eb3251f..b3c345b61dc 100644
+index 2b84875b028..bfbd8946e8a 100644
 --- a/gcc/configure.ac
 +++ b/gcc/configure.ac
-@@ -1898,7 +1898,7 @@ else
+@@ -2023,7 +2023,7 @@ else
  	CC="${CC_FOR_BUILD}" CFLAGS="${CFLAGS_FOR_BUILD}" \
  	CXX="${CXX_FOR_BUILD}" CXXFLAGS="${CXXFLAGS_FOR_BUILD}" \
  	LD="${LD_FOR_BUILD}" LDFLAGS="${LDFLAGS_FOR_BUILD}" \

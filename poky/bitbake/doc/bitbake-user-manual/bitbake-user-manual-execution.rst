@@ -16,7 +16,7 @@ data, or simply return information about the execution environment.
 
 This chapter describes BitBake's execution process from start to finish
 when you use it to create an image. The execution process is launched
-using the following command form: ::
+using the following command form::
 
   $ bitbake target
 
@@ -32,7 +32,7 @@ the BitBake command and its options, see ":ref:`The BitBake Command
    your project's ``local.conf`` configuration file.
 
    A common method to determine this value for your build host is to run
-   the following: ::
+   the following::
 
      $ grep processor /proc/cpuinfo
 
@@ -139,7 +139,7 @@ in ``BBPATH`` in the same way as configuration files.
 
 A good way to get an idea of the configuration files and the class files
 used in your execution environment is to run the following BitBake
-command: ::
+command::
 
   $ bitbake -e > mybb.log
 
@@ -155,7 +155,7 @@ execution environment.
    pair of curly braces in a shell function, the closing curly brace
    must not be located at the start of the line without leading spaces.
 
-   Here is an example that causes BitBake to produce a parsing error: ::
+   Here is an example that causes BitBake to produce a parsing error::
 
       fakeroot create_shar() {
          cat << "EOF" > ${SDK_DEPLOY}/${TOOLCHAIN_OUTPUTNAME}.sh
@@ -185,7 +185,7 @@ During the configuration phase, BitBake will have set
 :term:`BBFILES`. BitBake now uses it to construct a
 list of recipes to parse, along with any append files (``.bbappend``) to
 apply. ``BBFILES`` is a space-separated list of available files and
-supports wildcards. An example would be: ::
+supports wildcards. An example would be::
 
   BBFILES = "/path/to/bbfiles/*.bb /path/to/appends/*.bbappend"
 
@@ -206,7 +206,7 @@ parses in order any append files found in ``BBFILES``.
 One common convention is to use the recipe filename to define pieces of
 metadata. For example, in ``bitbake.conf`` the recipe name and version
 are used to set the variables :term:`PN` and
-:term:`PV`: ::
+:term:`PV`::
 
    PN = "${@bb.parse.BBHandler.vars_from_file(d.getVar('FILE', False),d)[0] or 'defaultpkgname'}"
    PV = "${@bb.parse.BBHandler.vars_from_file(d.getVar('FILE', False),d)[1] or '1.0'}"
@@ -238,7 +238,7 @@ Recipe file collections exist to allow the user to have multiple
 repositories of ``.bb`` files that contain the same exact package. For
 example, one could easily use them to make one's own local copy of an
 upstream repository, but with custom modifications that one does not
-want upstream. Here is an example: ::
+want upstream. Here is an example::
 
   BBFILES = "/stuff/openembedded/*/*.bb /stuff/openembedded.modified/*/*.bb"
   BBFILE_COLLECTIONS = "upstream local"
@@ -270,7 +270,7 @@ variable, which is optional.
 When a recipe uses ``PROVIDES``, that recipe's functionality can be
 found under an alternative name or names other than the implicit ``PN``
 name. As an example, suppose a recipe named ``keyboard_1.0.bb``
-contained the following: ::
+contained the following::
 
   PROVIDES += "fullkeyboard"
 
@@ -291,7 +291,7 @@ needs to prioritize providers by determining provider preferences.
 A common example in which a target has multiple providers is
 "virtual/kernel", which is on the ``PROVIDES`` list for each kernel
 recipe. Each machine often selects the best kernel provider by using a
-line similar to the following in the machine configuration file: ::
+line similar to the following in the machine configuration file::
 
   PREFERRED_PROVIDER_virtual/kernel = "linux-yocto"
 
@@ -331,7 +331,7 @@ If the first recipe is named ``a_1.1.bb``, then the
 
 Thus, if a recipe named ``a_1.2.bb`` exists, BitBake will choose 1.2 by
 default. However, if you define the following variable in a ``.conf``
-file that BitBake parses, you can change that preference: ::
+file that BitBake parses, you can change that preference::
 
   PREFERRED_VERSION_a = "1.1"
 
@@ -498,7 +498,7 @@ to the task.
 
 Like the working directory case, situations exist where dependencies
 should be ignored. For these cases, you can instruct the build process
-to ignore a dependency by using a line like the following: ::
+to ignore a dependency by using a line like the following::
 
   PACKAGE_ARCHS[vardepsexclude] = "MACHINE"
 
@@ -508,7 +508,7 @@ even if it does reference it.
 
 Equally, there are cases where we need to add dependencies BitBake is
 not able to find. You can accomplish this by using a line like the
-following: ::
+following::
 
   PACKAGE_ARCHS[vardeps] = "MACHINE"
 
@@ -536,7 +536,7 @@ configuration file, we can give BitBake some extra information to help
 it construct the basehash. The following statement effectively results
 in a list of global variable dependency excludes - variables never
 included in any checksum. This example uses variables from OpenEmbedded
-to help illustrate the concept: ::
+to help illustrate the concept::
 
    BB_HASHBASE_WHITELIST ?= "TMPDIR FILE PATH PWD BB_TASKHASH BBPATH DL_DIR \
        SSTATE_DIR THISDIR FILESEXTRAPATHS FILE_DIRNAME HOME LOGNAME SHELL \
@@ -557,7 +557,7 @@ OpenEmbedded-Core uses: "OEBasic" and "OEBasicHash". By default, there
 is a dummy "noop" signature handler enabled in BitBake. This means that
 behavior is unchanged from previous versions. ``OE-Core`` uses the
 "OEBasicHash" signature handler by default through this setting in the
-``bitbake.conf`` file: ::
+``bitbake.conf`` file::
 
   BB_SIGNATURE_HANDLER ?= "OEBasicHash"
 

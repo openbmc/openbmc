@@ -12,6 +12,11 @@ from oeqa.selftest.case import OESelftestTestCase
 
 class BitbakeLayers(OESelftestTestCase):
 
+    def test_bitbakelayers_layerindexshowdepends(self):
+        result = runCmd('bitbake-layers layerindex-show-depends meta-poky')
+        find_in_contents = re.search("openembedded-core", result.output)
+        self.assertTrue(find_in_contents, msg = "openembedded-core should have been listed at this step. bitbake-layers layerindex-show-depends meta-poky output: %s" % result.output)
+
     def test_bitbakelayers_showcrossdepends(self):
         result = runCmd('bitbake-layers show-cross-depends')
         self.assertIn('aspell', result.output)

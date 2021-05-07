@@ -221,8 +221,7 @@ Errors and Warnings
    Typically, the way to solve this performance issue is to add "-fPIC"
    or "-fpic" to the compiler command-line options. For example, given
    software that reads :term:`CFLAGS` when you build it,
-   you could add the following to your recipe:
-   ::
+   you could add the following to your recipe::
 
       CFLAGS_append = " -fPIC "
 
@@ -240,8 +239,7 @@ Errors and Warnings
    variable is being passed to the linker command. A common workaround
    for this situation is to pass in ``LDFLAGS`` using
    :term:`TARGET_CC_ARCH` within the recipe as
-   follows:
-   ::
+   follows::
 
       TARGET_CC_ARCH += "${LDFLAGS}"
 
@@ -265,8 +263,7 @@ Errors and Warnings
 
    The ``/usr/share/info/dir`` should not be packaged. Add the following
    line to your :ref:`ref-tasks-install` task or to your
-   ``do_install_append`` within the recipe as follows:
-   ::
+   ``do_install_append`` within the recipe as follows::
 
       rm ${D}${infodir}/dir
    
@@ -675,7 +672,7 @@ Errors and Warnings
     task. Patch fuzz is a situation when the ``patch`` tool ignores some of the context
     lines in order to apply the patch. Consider this example:
 
-    Patch to be applied: ::
+    Patch to be applied::
 
         --- filename
         +++ filename
@@ -687,7 +684,7 @@ Errors and Warnings
          context line 5
          context line 6
 
-    Original source code: ::
+    Original source code::
 
         different context line 1
         different context line 2
@@ -696,7 +693,7 @@ Errors and Warnings
         different context line 5
         different context line 6
 
-    Outcome (after applying patch with fuzz): ::
+    Outcome (after applying patch with fuzz)::
 
         different context line 1
         different context line 2
@@ -716,14 +713,14 @@ Errors and Warnings
     *How to eliminate patch fuzz warnings*
 
     Use the ``devtool`` command as explained by the warning. First, unpack the
-    source into devtool workspace: ::
+    source into devtool workspace::
 
             devtool modify <recipe>
 
     This will apply all of the patches, and create new commits out of them in
     the workspace - with the patch context updated.
 
-    Then, replace the patches in the recipe layer: ::
+    Then, replace the patches in the recipe layer::
 
             devtool finish --force-patch-refresh <recipe> <layer_path>
 

@@ -114,7 +114,7 @@ class Rootfs(object, metaclass=ABCMeta):
             shutil.rmtree(self.image_rootfs + '-orig')
         except:
             pass
-        os.rename(self.image_rootfs, self.image_rootfs + '-orig')
+        bb.utils.rename(self.image_rootfs, self.image_rootfs + '-orig')
 
         bb.note("  Creating debug rootfs...")
         bb.utils.mkdirhier(self.image_rootfs)
@@ -165,10 +165,10 @@ class Rootfs(object, metaclass=ABCMeta):
             shutil.rmtree(self.image_rootfs + '-dbg')
         except:
             pass
-        os.rename(self.image_rootfs, self.image_rootfs + '-dbg')
+        bb.utils.rename(self.image_rootfs, self.image_rootfs + '-dbg')
 
         bb.note("  Restoreing original rootfs...")
-        os.rename(self.image_rootfs + '-orig', self.image_rootfs)
+        bb.utils.rename(self.image_rootfs + '-orig', self.image_rootfs)
 
     def _exec_shell_cmd(self, cmd):
         fakerootcmd = self.d.getVar('FAKEROOT')
@@ -305,7 +305,7 @@ class Rootfs(object, metaclass=ABCMeta):
     def _check_for_kernel_modules(self, modules_dir):
         for root, dirs, files in os.walk(modules_dir, topdown=True):
             for name in files:
-                found_ko = name.endswith(".ko")
+                found_ko = name.endswith((".ko", ".ko.gz", ".ko.xz"))
                 if found_ko:
                     return found_ko
         return False

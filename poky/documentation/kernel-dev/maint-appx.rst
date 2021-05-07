@@ -28,8 +28,7 @@ in the Yocto Project Linux kernel in any clone of the Yocto Project
 Linux kernel source repository and ``yocto-kernel-cache`` Git trees. For
 example, the following commands clone the Yocto Project baseline Linux
 kernel that branches off ``linux.org`` version 4.12 and the
-``yocto-kernel-cache``, which contains stores of kernel Metadata:
-::
+``yocto-kernel-cache``, which contains stores of kernel Metadata::
 
    $ git clone git://git.yoctoproject.org/linux-yocto-4.12
    $ git clone git://git.yoctoproject.org/linux-kernel-cache
@@ -42,16 +41,14 @@ section.
 
 Once you have cloned the kernel Git repository and the cache of Metadata
 on your local machine, you can discover the branches that are available
-in the repository using the following Git command:
-::
+in the repository using the following Git command::
 
    $ git branch -a
 
 Checking out a branch allows you to work with a particular Yocto Linux
 kernel. For example, the following commands check out the
 "standard/beagleboard" branch of the Yocto Linux kernel repository and
-the "yocto-4.12" branch of the ``yocto-kernel-cache`` repository:
-::
+the "yocto-4.12" branch of the ``yocto-kernel-cache`` repository::
 
    $ cd ~/linux-yocto-4.12
    $ git checkout -b my-kernel-4.12 remotes/origin/standard/beagleboard
@@ -111,8 +108,7 @@ patch, or BSP:
 
    For a typical build, the target of the search is a feature
    description in an ``.scc`` file whose name follows this format (e.g.
-   ``beaglebone-standard.scc`` and ``beaglebone-preempt-rt.scc``):
-   ::
+   ``beaglebone-standard.scc`` and ``beaglebone-preempt-rt.scc``)::
 
       bsp_root_name-kernel_type.scc
 
@@ -222,8 +218,7 @@ build process generates a build tree that is separate from your kernel's
 local Git source repository tree. This build tree has a name that uses
 the following form, where ``${MACHINE}`` is the metadata name of the
 machine (BSP) and "kernel_type" is one of the Yocto Project supported
-kernel types (e.g. "standard"):
-::
+kernel types (e.g. "standard")::
 
    linux-${MACHINE}-kernel_type-build
 

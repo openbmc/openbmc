@@ -54,6 +54,7 @@ FILES_${PN} = "\
     ${gcclibdir}/${TARGET_SYS}/${BINV}/lib*${SOLIBS} \
     ${gcclibdir}/${TARGET_SYS}/${BINV}/include \
     ${gcclibdir}/${TARGET_SYS}/${BINV}/include-fixed \
+    ${libdir}/bfd-plugins/*.so \
 "
 INSANE_SKIP_${PN} += "dev-so"
 RRECOMMENDS_${PN} += "\
@@ -215,7 +216,8 @@ do_install () {
 	ln -sf ${bindir}/${TARGET_PREFIX}cpp ${D}${base_libdir}/cpp
 	ln -sf g++ c++
 	ln -sf gcc cc
-
+	install -d ${D}${libdir}/bfd-plugins
+	ln -sf ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/liblto_plugin.so ${D}${libdir}/bfd-plugins/liblto_plugin.so
 	chown -R root:root ${D}
 }
 

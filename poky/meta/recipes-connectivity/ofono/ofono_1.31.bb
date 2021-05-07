@@ -11,6 +11,7 @@ SRC_URI = "\
     ${KERNELORG_MIRROR}/linux/network/${BPN}/${BP}.tar.xz \
     file://ofono \
     file://0001-mbim-add-an-optional-TEMP_FAILURE_RETRY-macro-copy.patch \
+    file://0002-mbim-Fix-build-with-ell-0.39-by-restoring-unlikely-m.patch \
 "
 SRC_URI[md5sum] = "1c26340e3c6ed132cc812595081bb3dc"
 SRC_URI[sha256sum] = "a15c5d28096c10eb30e47a68b6dc2e7c4a5a99d7f4cfedf0b69624f33d859e9b"
@@ -30,9 +31,14 @@ PACKAGECONFIG[bluez] = "--enable-bluetooth, --disable-bluetooth, bluez5"
 
 EXTRA_OECONF += "--enable-test --enable-external-ell"
 
+do_configure_prepend() {
+    bbnote "Removing bundled ell from ${S}/ell to prevent including it"
+    rm -rf ${S}/ell
+}
+
 do_install_append() {
-  install -d ${D}${sysconfdir}/init.d/
-  install -m 0755 ${WORKDIR}/ofono ${D}${sysconfdir}/init.d/ofono
+    install -d ${D}${sysconfdir}/init.d/
+    install -m 0755 ${WORKDIR}/ofono ${D}${sysconfdir}/init.d/ofono
 }
 
 PACKAGES =+ "${PN}-tests"

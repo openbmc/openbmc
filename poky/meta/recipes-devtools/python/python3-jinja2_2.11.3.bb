@@ -13,8 +13,7 @@ CVE_PRODUCT = "jinja2 jinja"
 CLEANBROKEN = "1"
 
 inherit pypi setuptools3
-# ptest disabled in OE-Core for now due to missing dependencies
-
+inherit ${@bb.utils.filter('DISTRO_FEATURES', 'ptest', d)}
 
 SRC_URI += " \
 	file://run-ptest \
@@ -27,6 +26,7 @@ do_install_ptest() {
 
 RDEPENDS_${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
+        ${PYTHON_PN}-toml \
 	${PYTHON_PN}-unixadmin \
 "
 

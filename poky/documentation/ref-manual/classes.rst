@@ -168,8 +168,7 @@ example use for this class.
    the "subpath" parameter limits the checkout to a specific subpath
    of the tree. Here is an example where ``${BP}`` is used so that the files
    are extracted into the subdirectory expected by the default value of
-   ``S``:
-   ::
+   ``S``::
 
            SRC_URI = "git://example.com/downloads/somepackage.rpm;subpath=${BP}"
 
@@ -221,8 +220,7 @@ each recipe you wish to blacklist. Specify the :term:`PN`
 value as a variable flag (varflag) and provide a reason, which is
 reported, if the package is requested to be built as the value. For
 example, if you want to blacklist a recipe called "exoticware", you add
-the following to your ``local.conf`` or distribution configuration:
-::
+the following to your ``local.conf`` or distribution configuration::
 
    INHERIT += "blacklist"
    PNBLACKLIST[exoticware] = "Not supported by our organization."
@@ -470,8 +468,7 @@ information about using ``devshell``.
 The ``devupstream`` class uses
 :term:`BBCLASSEXTEND` to add a variant of the
 recipe that fetches from an alternative URI (e.g. Git) instead of a
-tarball. Following is an example:
-::
+tarball. Following is an example::
 
    BBCLASSEXTEND = "devupstream:target"
    SRC_URI_class-devupstream = "git://git.example.com/example"
@@ -481,8 +478,7 @@ Adding the above statements to your recipe creates a variant that has
 :term:`DEFAULT_PREFERENCE` set to "-1".
 Consequently, you need to select the variant of the recipe to use it.
 Any development-specific adjustments can be done by using the
-``class-devupstream`` override. Here is an example:
-::
+``class-devupstream`` override. Here is an example::
 
    DEPENDS_append_class-devupstream = " gperf-native"
    do_configure_prepend_class-devupstream() {
@@ -544,8 +540,7 @@ By default, this class expects the source code to support recipe builds
 that use the :term:`B` variable to point to the directory in
 which the OpenEmbedded build system places the generated objects built
 from the recipes. By default, the ``B`` directory is set to the
-following, which is separate from the source directory (``S``):
-::
+following, which is separate from the source directory (``S``)::
 
    ${WORKDIR}/${BPN}/{PV}/
 
@@ -581,8 +576,7 @@ be performed using the
    useradd
    class to add user and group configuration to a specific recipe.
 
-Here is an example that uses this class in an image recipe:
-::
+Here is an example that uses this class in an image recipe::
 
    inherit extrausers
    EXTRA_USERS_PARAMS = "\
@@ -595,8 +589,7 @@ Here is an example that uses this class in an image recipe:
        "
 
 Here is an example that adds two users named "tester-jim" and "tester-sue" and assigns
-passwords:
-::
+passwords::
 
    inherit extrausers
    EXTRA_USERS_PARAMS = "\
@@ -604,8 +597,7 @@ passwords:
        useradd -P tester01 tester-sue; \
        "
 
-Finally, here is an example that sets the root password to "1876*18":
-::
+Finally, here is an example that sets the root password to "1876*18"::
 
    inherit extrausers
    EXTRA_USERS_PARAMS = "\
@@ -867,8 +859,7 @@ system need to either inherit the ``icecc`` class or nobody should.
 At the distribution level, you can inherit the ``icecc`` class to be
 sure that all builders start with the same sstate signatures. After
 inheriting the class, you can then disable the feature by setting the
-:term:`ICECC_DISABLED` variable to "1" as follows:
-::
+:term:`ICECC_DISABLED` variable to "1" as follows::
 
    INHERIT_DISTRO_append = " icecc"
    ICECC_DISABLED ??= "1"
@@ -876,8 +867,7 @@ inheriting the class, you can then disable the feature by setting the
 This practice
 makes sure everyone is using the same signatures but also requires
 individuals that do want to use Icecream to enable the feature
-individually as follows in your ``local.conf`` file:
-::
+individually as follows in your ``local.conf`` file::
 
    ICECC_DISABLED = ""
 
@@ -925,8 +915,7 @@ types.
 
 By default, the :ref:`image <ref-classes-image>` class automatically
 enables the ``image_types`` class. The ``image`` class uses the
-``IMGCLASSES`` variable as follows:
-::
+``IMGCLASSES`` variable as follows::
 
    IMGCLASSES = "rootfs_${IMAGE_PKGTYPE} image_types ${IMAGE_CLASSES}"
    IMGCLASSES += "${@['populate_sdk_base', 'populate_sdk_ext']['linux' in d.getVar("SDK_OS")]}"
@@ -968,8 +957,7 @@ during the :ref:`ref-tasks-rootfs` task, which optimizes
 the size of libraries contained in the image.
 
 By default, the class is enabled in the ``local.conf.template`` using
-the :term:`USER_CLASSES` variable as follows:
-::
+the :term:`USER_CLASSES` variable as follows::
 
    USER_CLASSES ?= "buildstats image-mklibs image-prelink"
 
@@ -984,8 +972,7 @@ the dynamic linking of shared libraries to reduce executable startup
 time.
 
 By default, the class is enabled in the ``local.conf.template`` using
-the :term:`USER_CLASSES` variable as follows:
-::
+the :term:`USER_CLASSES` variable as follows::
 
    USER_CLASSES ?= "buildstats image-mklibs image-prelink"
 
@@ -1014,8 +1001,7 @@ configuration). However, to skip one or more checks in recipes, you
 should use :term:`INSANE_SKIP`. For example, to skip
 the check for symbolic link ``.so`` files in the main package of a
 recipe, add the following to the recipe. You need to realize that the
-package name override, in this example ``${PN}``, must be used:
-::
+package name override, in this example ``${PN}``, must be used::
 
    INSANE_SKIP_${PN} += "dev-so"
 
@@ -1152,8 +1138,7 @@ The following list shows the tests you can list with the ``WARN_QA`` and
 
 -  ``invalid-packageconfig:`` Checks that no undefined features are
    being added to :term:`PACKAGECONFIG`. For
-   example, any name "foo" for which the following form does not exist:
-   ::
+   example, any name "foo" for which the following form does not exist::
 
       PACKAGECONFIG[foo] = "..."
 
@@ -1636,8 +1621,7 @@ a couple different ways:
    .. note::
 
       When creating a recipe this way, the recipe name must follow this
-      naming convention:
-      ::
+      naming convention::
 
          myrecipe-native.bb
 
@@ -1645,8 +1629,7 @@ a couple different ways:
       Not using this naming convention can lead to subtle problems
       caused by existing code that depends on that naming convention.
 
--  Create or modify a target recipe that contains the following:
-   ::
+-  Create or modify a target recipe that contains the following::
 
       BBCLASSEXTEND = "native"
 
@@ -1677,8 +1660,7 @@ couple different ways:
    inherit statement in the recipe after all other inherit statements so
    that the ``nativesdk`` class is inherited last.
 
--  Create a ``nativesdk`` variant of any recipe by adding the following:
-   ::
+-  Create a ``nativesdk`` variant of any recipe by adding the following::
 
        BBCLASSEXTEND = "nativesdk"
 
@@ -1689,8 +1671,7 @@ couple different ways:
 
 .. note::
 
-   When creating a recipe, you must follow this naming convention:
-   ::
+   When creating a recipe, you must follow this naming convention::
 
            nativesdk-myrecipe.bb
 
@@ -1753,8 +1734,7 @@ before attempting to fetch it from the upstream specified in
 :term:`SRC_URI` within each recipe.
 
 To use this class, inherit it globally and specify
-:term:`SOURCE_MIRROR_URL`. Here is an example:
-::
+:term:`SOURCE_MIRROR_URL`. Here is an example::
 
    INHERIT += "own-mirrors"
    SOURCE_MIRROR_URL = "http://example.com/my-source-mirror"
@@ -2017,8 +1997,7 @@ established and then populates the SDK. After populating the SDK, the
 contains the cross-compiler and associated tooling, and the target,
 which contains a target root filesystem that is configured for the SDK
 usage. These two images reside in :term:`SDK_OUTPUT`,
-which consists of the following:
-::
+which consists of the following::
 
    ${SDK_OUTPUT}/${SDK_ARCH}-nativesdk-pkgs
    ${SDK_OUTPUT}/${SDKTARGETSYSROOT}/target-pkgs
@@ -2180,8 +2159,7 @@ installed by ``libtool``. Removing these files results in them being
 absent from both the sysroot and target packages.
 
 If a recipe needs the ``.la`` files to be installed, then the recipe can
-override the removal by setting ``REMOVE_LIBTOOL_LA`` to "0" as follows:
-::
+override the removal by setting ``REMOVE_LIBTOOL_LA`` to "0" as follows::
 
    REMOVE_LIBTOOL_LA = "0"
 
@@ -2231,8 +2209,7 @@ recipe, enabling ``rm_work`` will potentially result in your changes to
 the source being lost. To exclude some recipes from having their work
 directories deleted by ``rm_work``, you can add the names of the recipe
 or recipes you are working on to the ``RM_WORK_EXCLUDE`` variable, which
-can also be set in your ``local.conf`` file. Here is an example:
-::
+can also be set in your ``local.conf`` file. Here is an example::
 
    RM_WORK_EXCLUDE += "busybox glibc"
 
@@ -2531,8 +2508,7 @@ You should set :term:`SYSTEMD_SERVICE` to the
 name of the service file. You should also use a package name override to
 indicate the package to which the value applies. If the value applies to
 the recipe's main package, use ``${``\ :term:`PN`\ ``}``. Here
-is an example from the connman recipe:
-::
+is an example from the connman recipe::
 
    SYSTEMD_SERVICE_${PN} = "connman.service"
 
@@ -2608,8 +2584,7 @@ The tests are commands that run on the target system over ``ssh``. Each
 test is written in Python and makes use of the ``unittest`` module.
 
 The ``testimage.bbclass`` runs tests on an image when called using the
-following:
-::
+following::
 
    $ bitbake -c testimage image
 
@@ -2628,8 +2603,7 @@ section in the Yocto Project Development Tasks Manual.
 
 This class supports running automated tests against software development
 kits (SDKs). The ``testsdk`` class runs tests on an SDK when called
-using the following:
-::
+using the following::
 
    $ bitbake -c testsdk image
 
@@ -2684,8 +2658,7 @@ the environment for installed SDKs.
 The ``typecheck`` class provides support for validating the values of
 variables set at the configuration level against their defined types.
 The OpenEmbedded build system allows you to define the type of a
-variable using the "type" varflag. Here is an example:
-::
+variable using the "type" varflag. Here is an example::
 
    IMAGE_FEATURES[type] = "list"
 
@@ -2695,14 +2668,12 @@ variable using the "type" varflag. Here is an example:
 ========================
 
 The ``uboot-config`` class provides support for U-Boot configuration for
-a machine. Specify the machine in your recipe as follows:
-::
+a machine. Specify the machine in your recipe as follows::
 
    UBOOT_CONFIG ??= <default>
    UBOOT_CONFIG[foo] = "config,images"
 
-You can also specify the machine using this method:
-::
+You can also specify the machine using this method::
 
    UBOOT_MACHINE = "config"
 

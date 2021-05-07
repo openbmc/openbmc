@@ -1049,7 +1049,7 @@ python fixup_perms () {
         # Create path to move directory to, move it, and then setup the symlink
         bb.utils.mkdirhier(os.path.dirname(target))
         #bb.note("Fixup Perms: Rename %s -> %s" % (dir, ptarget))
-        os.rename(origin, target)
+        bb.utils.rename(origin, target)
         #bb.note("Fixup Perms: Link %s -> %s" % (dir, link))
         os.symlink(link, origin)
 
@@ -1967,7 +1967,7 @@ python package_do_shlibs() {
 
         for (old, new) in renames:
             bb.note("Renaming %s to %s" % (old, new))
-            os.rename(old, new)
+            bb.utils.rename(old, new)
             pkgfiles[pkg].remove(old)
 
         shlibs_file = os.path.join(shlibswork_dir, pkg + ".list")

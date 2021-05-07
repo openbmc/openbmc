@@ -149,8 +149,7 @@ from the :term:`DISTRO` variable.
 The
 :ref:`populate_sdk_base <ref-classes-populate-sdk-*>`
 class defines the default value of the ``SDK_TITLE`` variable as
-follows:
-::
+follows::
 
    SDK_TITLE ??= "${@d.getVar('DISTRO_NAME') or d.getVar('DISTRO')} SDK"
 
@@ -162,8 +161,7 @@ an example, assume you have your own layer for your distribution named
 does the default "poky" distribution. If so, you could update the
 ``SDK_TITLE`` variable in the
 ``~/meta-mydistro/conf/distro/mydistro.conf`` file using the following
-form:
-::
+form::
 
    SDK_TITLE = "your_title"
 
@@ -194,8 +192,7 @@ the installed SDKs to update the installed SDKs by using the
 3. Build the extensible SDK normally (i.e., use the
    ``bitbake -c populate_sdk_ext`` imagename command).
 
-4. Publish the SDK using the following command:
-   ::
+4. Publish the SDK using the following command::
 
       $ oe-publish-sdk some_path/sdk-installer.sh path_to_shared_http_directory
 
@@ -218,8 +215,7 @@ installation directory for the SDK is based on the
 :term:`SDKEXTPATH` variables from
 within the
 :ref:`populate_sdk_base <ref-classes-populate-sdk-*>`
-class as follows:
-::
+class as follows::
 
    SDKEXTPATH ??= "~/${@d.getVar('DISTRO')}_sdk"
 
@@ -236,8 +232,7 @@ assume you have your own layer for your distribution named
 does the default "poky" distribution. If so, you could update the
 ``SDKEXTPATH`` variable in the
 ``~/meta-mydistro/conf/distro/mydistro.conf`` file using the following
-form:
-::
+form::
 
    SDKEXTPATH = "some_path_for_your_installed_sdk"
 
@@ -272,8 +267,7 @@ source, you need to do a number of things:
 
 3. Set the appropriate configuration so that the produced SDK knows how
    to find the configuration. The variable you need to set is
-   :term:`SSTATE_MIRRORS`:
-   ::
+   :term:`SSTATE_MIRRORS`::
 
       SSTATE_MIRRORS = "file://.* http://example.com/some_path/sstate-cache/PATH"
 
@@ -287,8 +281,7 @@ source, you need to do a number of things:
       side, and its contents will not interfere with the build), then
       you can set the variable in your ``local.conf`` or custom distro
       configuration file. You can then "whitelist" the variable through
-      to the SDK by adding the following:
-      ::
+      to the SDK by adding the following::
 
          SDK_LOCAL_CONF_WHITELIST = "SSTATE_MIRRORS"
 
@@ -313,8 +306,7 @@ everything needed to reconstruct the image for which the SDK was built.
 This bundling can lead to an SDK installer file that is a Gigabyte or
 more in size. If the size of this file causes a problem, you can build
 an SDK that has just enough in it to install and provide access to the
-``devtool command`` by setting the following in your configuration:
-::
+``devtool command`` by setting the following in your configuration::
 
    SDK_EXT_TYPE = "minimal"
 
@@ -336,8 +328,7 @@ information enables the ``devtool search`` command to return useful
 results.
 
 To facilitate this wider range of information, you would need to set the
-following:
-::
+following::
 
    SDK_INCLUDE_PKGDATA = "1"
 

@@ -6,6 +6,7 @@ require diffutils.inc
 SRC_URI = "${GNU_MIRROR}/diffutils/diffutils-${PV}.tar.xz \
            file://run-ptest \
            file://0001-Skip-strip-trailing-cr-test-case.patch \
+           file://0001-c-stack-stop-using-SIGSTKSZ.patch \
 "
 
 SRC_URI[md5sum] = "4824adc0e95dbbf11dfbdfaad6a1e461"

@@ -21,6 +21,7 @@ import fcntl
 import struct
 import copy
 import atexit
+from itertools import groupby
 
 from bb.ui import uihelper
 
@@ -538,6 +539,13 @@ def main(server, eventHandler, params, tf = TerminalFilter):
            os.symlink(os.path.basename(consolelogfile), loglink)
         except OSError:
            pass
+
+    # Add the logging domains specified by the user on the command line
+    for (domainarg, iterator) in groupby(params.debug_domains):
+        dlevel = len(tuple(iterator))
+        l = logconfig["loggers"].setdefault("BitBake.%s" % domainarg, {})
+        l["level"] = logging.DEBUG - dlevel + 1
+        l.setdefault("handlers", []).extend(["BitBake.verbconsole"])
 
     conf = bb.msg.setLoggingConfig(logconfig, logconfigfile)
 

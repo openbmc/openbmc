@@ -1,4 +1,4 @@
-From 9c0c73ee48dbee2aad57f4dcdad1b7b74e77b944 Mon Sep 17 00:00:00 2001
+From c55e24459370ad96577496ecd87475e3a9de7dad Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 7 Dec 2015 23:41:45 +0000
 Subject: [PATCH] Search target sysroot gcc version specific dirs with
@@ -51,10 +51,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 28 insertions(+), 1 deletion(-)
 
 diff --git a/gcc/gcc.c b/gcc/gcc.c
-index 535d5c3bb65..04647ae812d 100644
+index aa6fbe43965..f8a71a13826 100644
 --- a/gcc/gcc.c
 +++ b/gcc/gcc.c
-@@ -2616,7 +2616,7 @@ for_each_path (const struct path_prefix *paths,
+@@ -2811,7 +2811,7 @@ for_each_path (const struct path_prefix *paths,
        if (path == NULL)
  	{
  	  len = paths->max_len + extra_space + 1;
@@ -63,7 +63,7 @@ index 535d5c3bb65..04647ae812d 100644
  	  path = XNEWVEC (char, len);
  	}
  
-@@ -2628,6 +2628,33 @@ for_each_path (const struct path_prefix *paths,
+@@ -2823,6 +2823,33 @@ for_each_path (const struct path_prefix *paths,
  	  /* Look first in MACHINE/VERSION subdirectory.  */
  	  if (!skip_multi_dir)
  	    {

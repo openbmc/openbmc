@@ -359,8 +359,7 @@ To determine whether or not a given option is "hardware" or
 "non-hardware", the kernel Metadata in ``yocto-kernel-cache`` contains
 files that classify individual or groups of options as either hardware
 or non-hardware. To better show this, consider a situation where the
-``yocto-kernel-cache`` contains the following files:
-::
+``yocto-kernel-cache`` contains the following files::
 
    yocto-kernel-cache/features/drm-psb/hardware.cfg
    yocto-kernel-cache/features/kgdb/hardware.cfg
@@ -400,8 +399,7 @@ provides explanations for the various files:
    (i.e. ``hardware.kcf`` or ``non-hardware.kcf``).
 
 Here is a specific example using the
-``kernel-cache/bsp/mti-malta32/hardware.cfg``:
-::
+``kernel-cache/bsp/mti-malta32/hardware.cfg``::
 
    CONFIG_SERIAL_8250
    CONFIG_SERIAL_8250_CONSOLE

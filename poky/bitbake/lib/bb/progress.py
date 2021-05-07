@@ -94,12 +94,15 @@ class LineFilterProgressHandler(ProgressHandler):
         while True:
             breakpos = self._linebuffer.find('\n') + 1
             if breakpos == 0:
-                break
+                # for the case when the line with progress ends with only '\r'
+                breakpos = self._linebuffer.find('\r') + 1
+                if breakpos == 0:
+                    break
             line = self._linebuffer[:breakpos]
             self._linebuffer = self._linebuffer[breakpos:]
             # Drop any line feeds and anything that precedes them
             lbreakpos = line.rfind('\r') + 1
-            if lbreakpos:
+            if lbreakpos and lbreakpos != breakpos:
                 line = line[lbreakpos:]
             if self.writeline(filter_color(line)):
                 super().write(line)

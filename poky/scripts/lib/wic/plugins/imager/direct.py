@@ -616,5 +616,5 @@ class PartitionedImage():
                              part.start + part.size_sec - 1, part.size_sec)
 
                 partimage = self.path + '.p%d' % part.num
-                os.rename(source, partimage)
+                bb.utils.rename(source, partimage)
                 self.partimages.append(partimage)

@@ -2030,8 +2030,6 @@ class RunQueueExecute:
                             logger.debug("%s didn't become valid, skipping setscene" % nexttask)
                             self.sq_task_failoutright(nexttask)
                             return True
-                        else:
-                            self.sqdata.outrightfail.remove(nexttask)
                     if nexttask in self.sqdata.outrightfail:
                         logger.debug2('No package found, so skipping setscene task %s', nexttask)
                         self.sq_task_failoutright(nexttask)
@@ -2296,10 +2294,16 @@ class RunQueueExecute:
             self.updated_taskhash_queue.remove((tid, unihash))
 
             if unihash != self.rqdata.runtaskentries[tid].unihash:
-                hashequiv_logger.verbose("Task %s unihash changed to %s" % (tid, unihash))
-                self.rqdata.runtaskentries[tid].unihash = unihash
-                bb.parse.siggen.set_unihash(tid, unihash)
-                toprocess.add(tid)
+                # Make sure we rehash any other tasks with the same task hash that we're deferred against.
+                torehash = [tid]
+                for deftid in self.sq_deferred:
+                    if self.sq_deferred[deftid] == tid:
+                        torehash.append(deftid)
+                for hashtid in torehash:
+                    hashequiv_logger.verbose("Task %s unihash changed to %s" % (hashtid, unihash))
+                    self.rqdata.runtaskentries[hashtid].unihash = unihash
+                    bb.parse.siggen.set_unihash(hashtid, unihash)
+                    toprocess.add(hashtid)
 
         # Work out all tasks which depend upon these
         total = set()
@@ -2827,6 +2831,8 @@ def update_scenequeue_data(tids, sqdata, rqdata, rq, cooker, stampcache, sqrq, s
             sqdata.stamppresent.remove(tid)
         if tid in sqdata.valid:
             sqdata.valid.remove(tid)
+        if tid in sqdata.outrightfail:
+            sqdata.outrightfail.remove(tid)
 
         noexec, stamppresent = check_setscene_stamps(tid, rqdata, rq, stampcache, noexecstamp=True)
 
@@ -2845,6 +2851,7 @@ def update_scenequeue_data(tids, sqdata, rqdata, rq, cooker, stampcache, sqrq, s
     sqdata.valid |= rq.validate_hashes(tocheck, cooker.data, len(sqdata.stamppresent), False, summary=summary)
 
     sqdata.hashes = {}
+    sqrq.sq_deferred = {}
     for mc in sorted(sqdata.multiconfigs):
         for tid in sorted(sqdata.sq_revdeps):
             if mc_from_tid(tid) != mc:
@@ -2857,10 +2864,13 @@ def update_scenequeue_data(tids, sqdata, rqdata, rq, cooker, stampcache, sqrq, s
                 continue
             if tid in sqrq.scenequeue_notcovered:
                 continue
-            sqdata.outrightfail.add(tid)
+            if tid in sqrq.scenequeue_covered:
+                continue
 
             h = pending_hash_index(tid, rqdata)
             if h not in sqdata.hashes:
+                if tid in tids:
+                    sqdata.outrightfail.add(tid)
                 sqdata.hashes[h] = tid
             else:
                 sqrq.sq_deferred[tid] = sqdata.hashes[h]

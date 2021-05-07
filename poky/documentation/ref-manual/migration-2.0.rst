@@ -25,8 +25,7 @@ and the porting guide at
 https://gcc.gnu.org/gcc-5/porting_to.html.
 
 Alternatively, you can switch back to GCC 4.9 or 4.8 by setting
-``GCCVERSION`` in your configuration, as follows:
-::
+``GCCVERSION`` in your configuration, as follows::
 
    GCCVERSION = "4.9%"
 
@@ -91,8 +90,7 @@ unlikely to require any changes to Metadata. However, these minor
 changes in behavior exist:
 
 -  All potential overrides are now visible in the variable history as
-   seen when you run the following:
-   ::
+   seen when you run the following::
 
       $ bitbake -e
 
@@ -200,8 +198,7 @@ changes.
 
 Additionally, work directories for old versions of recipes are now
 pruned. If you wish to disable pruning old work directories, you can set
-the following variable in your configuration:
-::
+the following variable in your configuration::
 
    SSTATE_PRUNE_OBSOLETEWORKDIR = "0"
 

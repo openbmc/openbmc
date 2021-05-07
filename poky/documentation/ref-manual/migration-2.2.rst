@@ -144,8 +144,7 @@ The new ``runqemu`` is a Python script. Machine knowledge is no longer
 hardcoded into ``runqemu``. You can choose to use the ``qemuboot``
 configuration file to define the BSP's own arguments and to make it
 bootable with ``runqemu``. If you use a configuration file, use the
-following form:
-::
+following form::
 
    image-name-machine.qemuboot.conf
 
@@ -160,8 +159,7 @@ rootfs). QEMU boot arguments can be set in BSP's configuration file and
 the ``qemuboot`` class will save them to ``qemuboot.conf``.
 
 If you want to use ``runqemu`` without a configuration file, use the
-following command form:
-::
+following command form::
 
    $ runqemu machine rootfs kernel [options]
 
@@ -179,7 +177,7 @@ Supported machines are as follows:
 
 Consider the
 following example, which uses the ``qemux86-64`` machine, provides a
-root filesystem, provides an image, and uses the ``nographic`` option: ::
+root filesystem, provides an image, and uses the ``nographic`` option::
 
    $ runqemu qemux86-64 tmp/deploy/images/qemux86-64/core-image-minimal-qemux86-64.ext4 tmp/deploy/images/qemux86-64/bzImage nographic
 
@@ -244,8 +242,7 @@ recipes. You need to fix these recipes so that they use the expected
 ``LDFLAGS``. Depending on how the software is built, the build system
 used by the software (e.g. a Makefile) might need to be patched.
 However, sometimes making this fix is as simple as adding the following
-to the recipe:
-::
+to the recipe::
 
    TARGET_CC_ARCH += "${LDFLAGS}"
 
@@ -258,8 +255,7 @@ The ``KERNEL_IMAGE_BASE_NAME`` variable no longer uses the
 :term:`KERNEL_IMAGETYPE` variable to create the
 image's base name. Because the OpenEmbedded build system can now build
 multiple kernel image types, this part of the kernel image base name as
-been removed leaving only the following:
-::
+been removed leaving only the following::
 
    KERNEL_IMAGE_BASE_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
 

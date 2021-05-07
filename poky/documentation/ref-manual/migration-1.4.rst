@@ -40,8 +40,7 @@ Differences include the following:
 
 -  *Shared State Code:* The shared state code has been optimized to
    avoid running unnecessary tasks. For example, the following no longer
-   populates the target sysroot since that is not necessary:
-   ::
+   populates the target sysroot since that is not necessary::
 
       $ bitbake -c rootfs some-image
 
@@ -136,8 +135,7 @@ Target Package Management with RPM
 If runtime package management is enabled and the RPM backend is
 selected, Smart is now installed for package download, dependency
 resolution, and upgrades instead of Zypper. For more information on how
-to use Smart, run the following command on the target:
-::
+to use Smart, run the following command on the target::
 
    smart --help
 

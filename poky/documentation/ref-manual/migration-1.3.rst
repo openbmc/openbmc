@@ -29,7 +29,7 @@ location (either local or remote) and then point to it in
 :term:`SSTATE_MIRRORS`, you need to append "PATH"
 to the end of the mirror URL so that the path used by BitBake before the
 mirror substitution is appended to the path used to access the mirror.
-Here is an example: ::
+Here is an example::
 
    SSTATE_MIRRORS = "file://.* http://someserver.tld/share/sstate/PATH"
 
@@ -181,14 +181,13 @@ Linux Kernel Naming
 -------------------
 
 The naming scheme for kernel output binaries has been changed to now
-include :term:`PE` as part of the filename:
-::
+include :term:`PE` as part of the filename::
 
    KERNEL_IMAGE_BASE_NAME ?= "${KERNEL_IMAGETYPE}-${PE}-${PV}-${PR}-${MACHINE}-${DATETIME}"
 
 Because the ``PE`` variable is not set by default, these binary files
 could result with names that include two dash characters. Here is an
-example: ::
+example::
 
    bzImage--3.10.9+git0+cd502a8814_7144bcc4b8-r0-qemux86-64-20130830085431.bin
 

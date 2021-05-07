@@ -8,7 +8,7 @@ it can reflect broader range which is now checked
 
 Rename ATOMIC_INT64_IS_BUILTIN to ATOMICS_ARE_BUILTIN
 
-Upstream-Status: Submitted [https://bugs.webkit.org/attachment.cgi?bugid=222959]
+Upstream-Status: Accepted [https://bugs.webkit.org/attachment.cgi?bugid=222959]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  Source/JavaScriptCore/CMakeLists.txt   |  2 +-

@@ -1,0 +1,112 @@
+From 1f76151c92e1b52e9c24ebf06adc77fbd6c062bc Mon Sep 17 00:00:00 2001
+From: Will Cosgrove <will@panic.com>
+Date: Tue, 26 Jan 2021 11:41:21 -0800
+Subject: [PATCH] kex.c: move EC macro outside of if check #549 (#550)
+
+File: kex.c
+
+Notes:
+Moved the macro LIBSSH2_KEX_METHOD_EC_SHA_HASH_CREATE_VERIFY outside of the LIBSSH2_ECDSA since it's also now used by the ED25519 code.
+
+Sha 256, 384 and 512 need to be defined for all backends now even if they aren't used directly. I believe this is already the case, but just a heads up.
+
+Credit:
+Stefan-Ghinea
+
+Upstream-Status: Backport
+
+Reference to upstream patch:
+https://github.com/libssh2/libssh2/commit/1f76151c92e1b52e9c24ebf06adc77fbd6c062bc
+
+Signed-off-by: Stefan Ghinea <stefan.ghinea@windriver.com>
+---
+ src/kex.c | 66 +++++++++++++++++++++++++++----------------------------
+ 1 file changed, 33 insertions(+), 33 deletions(-)
+
+diff --git a/src/kex.c b/src/kex.c
+index cb16639..19ab6ec 100644
+--- a/src/kex.c
++++ b/src/kex.c
+@@ -1885,39 +1885,6 @@ kex_method_diffie_hellman_group_exchange_sha256_key_exchange
+ }
+ 
+ 
+-#if LIBSSH2_ECDSA
+-
+-/* kex_session_ecdh_curve_type
+- * returns the EC curve type by name used in key exchange
+- */
+-
+-static int
+-kex_session_ecdh_curve_type(const char *name, libssh2_curve_type *out_type)
+-{
+-    int ret = 0;
+-    libssh2_curve_type type;
+-
+-    if(name == NULL)
+-        return -1;
+-
+-    if(strcmp(name, "ecdh-sha2-nistp256") == 0)
+-        type = LIBSSH2_EC_CURVE_NISTP256;
+-    else if(strcmp(name, "ecdh-sha2-nistp384") == 0)
+-        type = LIBSSH2_EC_CURVE_NISTP384;
+-    else if(strcmp(name, "ecdh-sha2-nistp521") == 0)
+-        type = LIBSSH2_EC_CURVE_NISTP521;
+-    else {
+-        ret = -1;
+-    }
+-
+-    if(ret == 0 && out_type) {
+-        *out_type = type;
+-    }
+-
+-    return ret;
+-}
+-
+-
+ /* LIBSSH2_KEX_METHOD_EC_SHA_HASH_CREATE_VERIFY
+  *
+  * Macro that create and verifies EC SHA hash with a given digest bytes
+@@ -2027,6 +1994,39 @@ kex_session_ecdh_curve_type(const char *name, libssh2_curve_type *out_type)
+ }                                                                       \
+ 
+ 
++#if LIBSSH2_ECDSA
++
++/* kex_session_ecdh_curve_type
++ * returns the EC curve type by name used in key exchange
++ */
++
++static int
++kex_session_ecdh_curve_type(const char *name, libssh2_curve_type *out_type)
++{
++    int ret = 0;
++    libssh2_curve_type type;
++
++    if(name == NULL)
++        return -1;
++
++    if(strcmp(name, "ecdh-sha2-nistp256") == 0)
++        type = LIBSSH2_EC_CURVE_NISTP256;
++    else if(strcmp(name, "ecdh-sha2-nistp384") == 0)
++        type = LIBSSH2_EC_CURVE_NISTP384;
++    else if(strcmp(name, "ecdh-sha2-nistp521") == 0)
++        type = LIBSSH2_EC_CURVE_NISTP521;
++    else {
++        ret = -1;
++    }
++
++    if(ret == 0 && out_type) {
++        *out_type = type;
++    }
++
++    return ret;
++}
++
++
+ /* ecdh_sha2_nistp
+  * Elliptic Curve Diffie Hellman Key Exchange
+  */
+-- 
+2.17.1
+

@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 6 Oct 2017 17:00:08 +0300
 Subject: [PATCH] Fix build with musl
 
-Upstream-Status: Pending
+Upstream-Status: Accepted
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---

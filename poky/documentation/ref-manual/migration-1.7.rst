@@ -15,8 +15,7 @@ optional features. The method used to set defaults for these options
 means that existing ``local.conf`` files will need to be modified to
 append to ``PACKAGECONFIG`` for ``qemu-native`` and ``nativesdk-qemu``
 instead of setting it. In other words, to enable graphical output for
-QEMU, you should now have these lines in ``local.conf``:
-::
+QEMU, you should now have these lines in ``local.conf``::
 
    PACKAGECONFIG_append_pn-qemu-native = " sdl"
    PACKAGECONFIG_append_pn-nativesdk-qemu = " sdl"
@@ -80,8 +79,7 @@ disable the scripts due to the scripts previously requiring error-prone
 path substitution. Software that links against these libraries using
 these scripts should use the much more robust ``pkg-config`` instead.
 The list of recipes changed in this version (and their configuration
-scripts) is as follows:
-::
+scripts) is as follows::
 
    directfb (directfb-config)
    freetype (freetype-config)

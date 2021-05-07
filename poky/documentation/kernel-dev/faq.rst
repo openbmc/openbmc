@@ -57,8 +57,7 @@ These other variables are useful for installing specific modules:
 
 For example, set the following in the ``qemux86.conf`` file to include
 the ``ab123`` kernel modules with images built for the ``qemux86``
-machine:
-::
+machine::
 
    MACHINE_EXTRA_RRECOMMENDS += "kernel-module-ab123"
 
@@ -71,8 +70,7 @@ How do I change the Linux kernel command line?
 The Linux kernel command line is
 typically specified in the machine config using the ``APPEND`` variable.
 For example, you can add some helpful debug information doing the
-following:
-::
+following::
 
    APPEND += "printk.time=y initcall_debug debug"
 

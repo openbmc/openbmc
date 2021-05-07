@@ -1,4 +1,4 @@
-From d63820a78d92f302410358293546f01c7ad17bd8 Mon Sep 17 00:00:00 2001
+From 96aa24a874331a318693e4fccc4bc4e7d3fbad2b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 28 Apr 2015 23:18:39 -0700
 Subject: [PATCH] aarch64: Add support for musl ldso
@@ -11,7 +11,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gcc/config/aarch64/aarch64-linux.h b/gcc/config/aarch64/aarch64-linux.h
-index ddc62895693..b301825313a 100644
+index 5303b39186f..4bcae7f3110 100644
 --- a/gcc/config/aarch64/aarch64-linux.h
 +++ b/gcc/config/aarch64/aarch64-linux.h
 @@ -24,7 +24,7 @@

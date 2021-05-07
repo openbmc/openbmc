@@ -90,7 +90,7 @@ class RebuildFromSState(SStateBase):
         self.assertFalse(failed_cleansstate, msg="The following recipes have failed cleansstate(all others have passed both cleansstate and rebuild from sstate tests): %s" % ' '.join(map(str, failed_cleansstate)))
 
     def test_sstate_relocation(self):
-        self.run_test_sstate_rebuild(['core-image-sato-sdk'], relocate=True, rebuild_dependencies=True)
+        self.run_test_sstate_rebuild(['core-image-weston-sdk'], relocate=True, rebuild_dependencies=True)
 
     def test_sstate_rebuild(self):
-        self.run_test_sstate_rebuild(['core-image-sato-sdk'], relocate=False, rebuild_dependencies=True)
+        self.run_test_sstate_rebuild(['core-image-weston-sdk'], relocate=False, rebuild_dependencies=True)

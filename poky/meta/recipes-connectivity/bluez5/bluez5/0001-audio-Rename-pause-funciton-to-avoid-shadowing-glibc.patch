@@ -1,0 +1,48 @@
+From 8adab7f1e04948e78854953f9373cac741445a0f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 30 Apr 2021 21:09:33 -0700
+Subject: [PATCH] audio: Rename pause funciton to avoid shadowing glibc
+ defintions
+
+Fixes
+profiles/audio/media.c:1284:13: error: static declaration of 'pause' follows non-static declaration
+static bool pause(void *user_data)
+            ^
+/mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux/bluez5/5.56-r0/recipe-sysroot/usr/include/unistd.h:478:12: note: previous declaration is here
+extern int pause (void);
+           ^
+../bluez-5.56/profiles/audio/media.c:1334:11: warning: incompatible function pointer types initializing 'bool (*)(void *)' with an expression of type 'int (void)' [-Wincompatible-function-pointer-types]
+        .pause = pause,
+                 ^~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ profiles/audio/media.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index c84bbe2..7110089 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -1281,7 +1281,7 @@ static bool stop(void *user_data)
+ 	return media_player_send(mp, "Stop");
+ }
+ 
+-static bool pause(void *user_data)
++static bool apause(void *user_data)
+ {
+ 	struct media_player *mp = user_data;
+ 
+@@ -1331,7 +1331,7 @@ static struct avrcp_player_cb player_cb = {
+ 	.set_volume = set_volume,
+ 	.play = play,
+ 	.stop = stop,
+-	.pause = pause,
++	.pause = apause,
+ 	.next = next,
+ 	.previous = previous,
+ };
+-- 
+2.31.1
+

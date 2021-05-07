@@ -22,8 +22,7 @@ Getting Help
 
 The ``devtool`` command line is organized similarly to Git in that it
 has a number of sub-commands for each function. You can run
-``devtool --help`` to see all the commands:
-::
+``devtool --help`` to see all the commands::
 
    $ devtool -h
    NOTE: Starting bitbake server...
@@ -79,8 +78,7 @@ has a number of sub-commands for each function. You can run
 
 As directed in the general help output, you can
 get more syntax on a specific command by providing the command name and
-using "--help":
-::
+using "--help"::
 
    $ devtool add --help
    NOTE: Starting bitbake server...
@@ -172,8 +170,7 @@ you. The source files the recipe uses should exist in an external area.
 
 The following example creates and adds a new recipe named ``jackson`` to
 a workspace layer the tool creates. The source code built by the recipes
-resides in ``/home/user/sources/jackson``:
-::
+resides in ``/home/user/sources/jackson``::
 
    $ devtool add jackson /home/user/sources/jackson
 
@@ -201,8 +198,7 @@ unpacking files from a remote URI. In some cases, you might want to
 specify a source revision by branch, tag, or commit hash. You can
 specify these options when using the ``devtool add`` command:
 
--  To specify a source branch, use the ``--srcbranch`` option:
-   ::
+-  To specify a source branch, use the ``--srcbranch`` option::
 
       $ devtool add --srcbranch &DISTRO_NAME_NO_CAP; jackson /home/user/sources/jackson
 
@@ -210,8 +206,7 @@ specify these options when using the ``devtool add`` command:
    branch.
 
 -  To specify a specific tag or commit hash, use the ``--srcrev``
-   option:
-   ::
+   option::
 
       $ devtool add --srcrev &DISTRO_REL_TAG; jackson /home/user/sources/jackson
       $ devtool add --srcrev some_commit_hash /home/user/sources/jackson
@@ -269,8 +264,7 @@ The ``devtool modify`` command extracts the source for a recipe, sets it
 up as a Git repository if the source had not already been fetched from
 Git, checks out a branch for development, and applies any patches from
 the recipe as commits on top. You can use the following command to
-checkout the source files:
-::
+checkout the source files::
 
    $ devtool modify recipe
 
@@ -309,8 +303,7 @@ compile, and test the code.
 
 When you are satisfied with the results and you have committed your
 changes to the Git repository, you can then run the
-``devtool update-recipe`` to create the patches and update the recipe:
-::
+``devtool update-recipe`` to create the patches and update the recipe::
 
    $ devtool update-recipe recipe
 
@@ -321,8 +314,7 @@ Often, you might want to apply customizations made to your software in
 your own layer rather than apply them to the original recipe. If so, you
 can use the ``-a`` or ``--append`` option with the
 ``devtool update-recipe`` command. These options allow you to specify
-the layer into which to write an append file:
-::
+the layer into which to write an append file::
 
    $ devtool update-recipe recipe -a base-layer-directory
 
@@ -358,8 +350,7 @@ particular recipe.
       recipe's latest version tag.
 
 As with all ``devtool`` commands, you can get help on the individual
-command:
-::
+command::
 
    $ devtool check-upgrade-status -h
    NOTE: Starting bitbake server...
@@ -462,8 +453,7 @@ files have been modified, the command preserves the modified files in a
 separate "attic" subdirectory under the workspace layer.
 
 Here is an example that resets the workspace directory that contains the
-``mtr`` recipe:
-::
+``mtr`` recipe::
 
    $ devtool reset mtr
    NOTE: Cleaning sysroot for recipe mtr...
@@ -482,8 +472,7 @@ Use the ``devtool build`` command to build your recipe. The
 When you use the ``devtool build`` command, you must supply the root
 name of the recipe (i.e. do not provide versions, paths, or extensions).
 You can use either the "-s" or the "--disable-parallel-make" options to
-disable parallel makes during the build. Here is an example:
-::
+disable parallel makes during the build. Here is an example::
 
    $ devtool build recipe
 
@@ -499,8 +488,7 @@ device for testing. For proper integration into a final image, you need
 to edit your custom image recipe appropriately.
 
 When you use the ``devtool build-image`` command, you must supply the
-name of the image. This command has no command line options:
-::
+name of the image. This command has no command line options::
 
    $ devtool build-image image
 
@@ -510,8 +498,7 @@ Deploying Your Software on the Target Machine
 =============================================
 
 Use the ``devtool deploy-target`` command to deploy the recipe's build
-output to the live target machine:
-::
+output to the live target machine::
 
    $ devtool deploy-target recipe target
 
@@ -582,15 +569,13 @@ new workspace layer, it is populated with the ``README`` file and the
 ``conf`` directory only.
 
 The following example creates a new workspace layer in your current
-working and by default names the workspace layer "workspace":
-::
+working and by default names the workspace layer "workspace"::
 
    $ devtool create-workspace
 
 You can create a workspace layer anywhere by supplying a pathname with
 the command. The following command creates a new workspace layer named
-"new-workspace":
-::
+"new-workspace"::
 
    $ devtool create-workspace /home/scottrif/new-workspace
 
@@ -603,15 +588,13 @@ Use the ``devtool status`` command to list the recipes currently in your
 workspace. Information includes the paths to their respective external
 source trees.
 
-The ``devtool status`` command has no command-line options:
-::
+The ``devtool status`` command has no command-line options::
 
    $ devtool status
 
 Following is sample output after using
 :ref:`devtool add <ref-manual/devtool-reference:adding a new recipe to the workspace layer>`
-to create and add the ``mtr_0.86.bb`` recipe to the ``workspace`` directory:
-::
+to create and add the ``mtr_0.86.bb`` recipe to the ``workspace`` directory::
 
    $ devtool status
    mtr:/home/scottrif/poky/build/workspace/sources/mtr (/home/scottrif/poky/build/workspace/recipes/mtr/mtr_0.86.bb)

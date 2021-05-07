@@ -26,12 +26,10 @@ readypipeinfd = int(sys.argv[3])
 logfile = sys.argv[4]
 lockname = sys.argv[5]
 sockname = sys.argv[6]
-timeout = sys.argv[7]
+timeout = float(sys.argv[7])
 xmlrpcinterface = (sys.argv[8], int(sys.argv[9]))
 if xmlrpcinterface[0] == "None":
     xmlrpcinterface = (None, xmlrpcinterface[1])
-if timeout == "None":
-    timeout = None
 
 # Replace standard fds with our own
 with open('/dev/null', 'r') as si:

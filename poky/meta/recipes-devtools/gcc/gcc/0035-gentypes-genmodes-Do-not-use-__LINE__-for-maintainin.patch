@@ -1,4 +1,4 @@
-From 0395060a7dcf98c5f5a65103f6aaa71d6b862259 Mon Sep 17 00:00:00 2001
+From 520411cf364ee4b0b5a8f0857498aaabd790afb3 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 10 Mar 2020 08:26:53 -0700
 Subject: [PATCH] gentypes/genmodes: Do not use __LINE__ for maintaining
@@ -17,7 +17,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 19 insertions(+), 19 deletions(-)
 
 diff --git a/gcc/gengtype.c b/gcc/gengtype.c
-index 981577481af..d5700fff401 100644
+index 5f50242e857..cbaca9b8cd0 100644
 --- a/gcc/gengtype.c
 +++ b/gcc/gengtype.c
 @@ -991,7 +991,7 @@ create_field_at (pair_p next, type_p type, const char *name, options_p opt,
@@ -38,7 +38,7 @@ index 981577481af..d5700fff401 100644
  
  /* Reverse a linked list of 'struct pair's in place.  */
  pair_p
-@@ -5187,7 +5187,7 @@ main (int argc, char **argv)
+@@ -5189,7 +5189,7 @@ main (int argc, char **argv)
        /* These types are set up with #define or else outside of where
           we can see them.  We should initialize them before calling
           read_input_list.  */
@@ -48,10 +48,10 @@ index 981577481af..d5700fff401 100644
        POS_HERE (do_scalar_typedef ("CUMULATIVE_ARGS", &pos));
        POS_HERE (do_scalar_typedef ("REAL_VALUE_TYPE", &pos));
 diff --git a/gcc/genmodes.c b/gcc/genmodes.c
-index bd78310ea24..dbd02c51a4c 100644
+index c268ebc4c6e..4361f3f1563 100644
 --- a/gcc/genmodes.c
 +++ b/gcc/genmodes.c
-@@ -430,7 +430,7 @@ complete_all_modes (void)
+@@ -438,7 +438,7 @@ complete_all_modes (void)
  }
  
  /* For each mode in class CLASS, construct a corresponding complex mode.  */
@@ -60,7 +60,7 @@ index bd78310ea24..dbd02c51a4c 100644
  static void
  make_complex_modes (enum mode_class cl,
  		    const char *file, unsigned int line)
-@@ -489,7 +489,7 @@ make_complex_modes (enum mode_class cl,
+@@ -497,7 +497,7 @@ make_complex_modes (enum mode_class cl,
     having as many components as necessary.  ORDER is the sorting order
     of the mode, with smaller numbers indicating a higher priority.  */
  #define VECTOR_MODES_WITH_PREFIX(PREFIX, C, W, ORDER) \
@@ -69,7 +69,7 @@ index bd78310ea24..dbd02c51a4c 100644
  #define VECTOR_MODES(C, W) VECTOR_MODES_WITH_PREFIX (V, C, W, 0)
  static void ATTRIBUTE_UNUSED
  make_vector_modes (enum mode_class cl, const char *prefix, unsigned int width,
-@@ -541,7 +541,7 @@ make_vector_modes (enum mode_class cl, const char *prefix, unsigned int width,
+@@ -549,7 +549,7 @@ make_vector_modes (enum mode_class cl, const char *prefix, unsigned int width,
  /* Create a vector of booleans called NAME with COUNT elements and
     BYTESIZE bytes in total.  */
  #define VECTOR_BOOL_MODE(NAME, COUNT, BYTESIZE) \
@@ -78,7 +78,7 @@ index bd78310ea24..dbd02c51a4c 100644
  static void ATTRIBUTE_UNUSED
  make_vector_bool_mode (const char *name, unsigned int count,
  		       unsigned int bytesize, const char *file,
-@@ -563,7 +563,7 @@ make_vector_bool_mode (const char *name, unsigned int count,
+@@ -571,7 +571,7 @@ make_vector_bool_mode (const char *name, unsigned int count,
  /* Input.  */
  
  #define _SPECIAL_MODE(C, N) \
@@ -87,7 +87,7 @@ index bd78310ea24..dbd02c51a4c 100644
  #define RANDOM_MODE(N) _SPECIAL_MODE (RANDOM, N)
  #define CC_MODE(N) _SPECIAL_MODE (CC, N)
  
-@@ -576,7 +576,7 @@ make_special_mode (enum mode_class cl, const char *name,
+@@ -584,7 +584,7 @@ make_special_mode (enum mode_class cl, const char *name,
  
  #define INT_MODE(N, Y) FRACTIONAL_INT_MODE (N, -1U, Y)
  #define FRACTIONAL_INT_MODE(N, B, Y) \
@@ -96,7 +96,7 @@ index bd78310ea24..dbd02c51a4c 100644
  
  static void
  make_int_mode (const char *name,
-@@ -589,16 +589,16 @@ make_int_mode (const char *name,
+@@ -611,16 +611,16 @@ make_opaque_mode (const char *name,
  }
  
  #define FRACT_MODE(N, Y, F) \
@@ -117,7 +117,7 @@ index bd78310ea24..dbd02c51a4c 100644
  
  /* Create a fixed-point mode by setting CL, NAME, BYTESIZE, IBIT, FBIT,
     FILE, and LINE.  */
-@@ -619,7 +619,7 @@ make_fixed_point_mode (enum mode_class cl,
+@@ -641,7 +641,7 @@ make_fixed_point_mode (enum mode_class cl,
  
  #define FLOAT_MODE(N, Y, F)             FRACTIONAL_FLOAT_MODE (N, -1U, Y, F)
  #define FRACTIONAL_FLOAT_MODE(N, B, Y, F) \
@@ -126,7 +126,7 @@ index bd78310ea24..dbd02c51a4c 100644
  
  static void
  make_float_mode (const char *name,
-@@ -636,7 +636,7 @@ make_float_mode (const char *name,
+@@ -658,7 +658,7 @@ make_float_mode (const char *name,
  #define DECIMAL_FLOAT_MODE(N, Y, F)	\
  	FRACTIONAL_DECIMAL_FLOAT_MODE (N, -1U, Y, F)
  #define FRACTIONAL_DECIMAL_FLOAT_MODE(N, B, Y, F)	\
@@ -135,7 +135,7 @@ index bd78310ea24..dbd02c51a4c 100644
  
  static void
  make_decimal_float_mode (const char *name,
-@@ -651,7 +651,7 @@ make_decimal_float_mode (const char *name,
+@@ -673,7 +673,7 @@ make_decimal_float_mode (const char *name,
  }
  
  #define RESET_FLOAT_FORMAT(N, F) \
@@ -144,7 +144,7 @@ index bd78310ea24..dbd02c51a4c 100644
  static void ATTRIBUTE_UNUSED
  reset_float_format (const char *name, const char *format,
  		    const char *file, unsigned int line)
-@@ -672,7 +672,7 @@ reset_float_format (const char *name, const char *format,
+@@ -694,7 +694,7 @@ reset_float_format (const char *name, const char *format,
  
  /* __intN support.  */
  #define INT_N(M,PREC)				\
@@ -153,7 +153,7 @@ index bd78310ea24..dbd02c51a4c 100644
  static void ATTRIBUTE_UNUSED
  make_int_n (const char *m, int bitsize,
              const char *file, unsigned int line)
-@@ -701,7 +701,7 @@ make_int_n (const char *m, int bitsize,
+@@ -723,7 +723,7 @@ make_int_n (const char *m, int bitsize,
  /* Partial integer modes are specified by relation to a full integer
     mode.  */
  #define PARTIAL_INT_MODE(M,PREC,NAME)				\
@@ -162,7 +162,7 @@ index bd78310ea24..dbd02c51a4c 100644
  static void ATTRIBUTE_UNUSED
  make_partial_integer_mode (const char *base, const char *name,
  			   unsigned int precision,
-@@ -728,7 +728,7 @@ make_partial_integer_mode (const char *base, const char *name,
+@@ -750,7 +750,7 @@ make_partial_integer_mode (const char *base, const char *name,
  /* A single vector mode can be specified by naming its component
     mode and the number of components.  */
  #define VECTOR_MODE(C, M, N) \
@@ -171,7 +171,7 @@ index bd78310ea24..dbd02c51a4c 100644
  static void ATTRIBUTE_UNUSED
  make_vector_mode (enum mode_class bclass,
  		  const char *base,
-@@ -771,7 +771,7 @@ make_vector_mode (enum mode_class bclass,
+@@ -793,7 +793,7 @@ make_vector_mode (enum mode_class bclass,
  
  /* Adjustability.  */
  #define _ADD_ADJUST(A, M, X, C1, C2) \

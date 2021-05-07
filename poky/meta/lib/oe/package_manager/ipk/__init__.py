@@ -213,7 +213,7 @@ class OpkgPM(OpkgDpkgPM):
 
                     tmp_sf.write(status)
 
-        os.rename(status_file + ".tmp", status_file)
+        bb.utils.rename(status_file + ".tmp", status_file)
 
     def _create_custom_config(self):
         bb.note("Building from feeds activated!")

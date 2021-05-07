@@ -30,8 +30,7 @@ Command: part or partition
 ==========================
 
 Either of these commands creates a partition on the system and uses the
-following syntax:
-::
+following syntax::
 
    part [mntpoint]
    partition [mntpoint]
@@ -59,8 +58,7 @@ must also provide one of the ``--ondrive``, ``--ondisk``, or
    versions of these application are currently excluded.
 
 Here is an example that uses "/" as the mountpoint. The command uses
-``--ondisk`` to force the partition onto the ``sdb`` disk:
-::
+``--ondisk`` to force the partition onto the ``sdb`` disk::
 
       part / --source rootfs --ondisk sdb --fstype=ext3 --label platform --align 1024
 

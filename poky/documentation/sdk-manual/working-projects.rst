@@ -45,16 +45,14 @@ project:
    respectively.
 
    Use the following command to create an empty README file, which is
-   required by GNU Coding Standards:
-   ::
+   required by GNU Coding Standards::
 
       $ touch README
 
    Create the remaining
    three files as follows:
 
-   -  ``hello.c``:
-      ::
+   -  ``hello.c``::
 
          #include <stdio.h>
 
@@ -63,8 +61,7 @@ project:
                  printf("Hello World!\n");
              }
 
-   -  ``configure.ac``:
-      ::
+   -  ``configure.ac``::
 
          AC_INIT(hello,0.1)
          AM_INIT_AUTOMAKE([foreign])
@@ -72,8 +69,7 @@ project:
          AC_CONFIG_FILES(Makefile)
          AC_OUTPUT
 
-   -  ``Makefile.am``:
-      ::
+   -  ``Makefile.am``::
 
          bin_PROGRAMS = hello
          hello_SOURCES = hello.c
@@ -87,8 +83,7 @@ project:
    which is followed by the string "poky-linux". For this example, the
    command sources a script from the default SDK installation directory
    that uses the 32-bit Intel x86 Architecture and the &DISTRO; Yocto
-   Project release:
-   ::
+   Project release::
 
       $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
 
@@ -113,8 +108,7 @@ project:
    the cross-compiler. The
    :term:`CONFIGURE_FLAGS`
    environment variable provides the minimal arguments for GNU
-   configure:
-   ::
+   configure::
 
       $ ./configure ${CONFIGURE_FLAGS}
 
@@ -127,14 +121,12 @@ project:
    ``armv5te-poky-linux-gnueabi``. You will notice that the name of the
    script is ``environment-setup-armv5te-poky-linux-gnueabi``. Thus, the
    following command works to update your project and rebuild it using
-   the appropriate cross-toolchain tools:
-   ::
+   the appropriate cross-toolchain tools::
 
      $ ./configure --host=armv5te-poky-linux-gnueabi --with-libtool-sysroot=sysroot_dir
 
 5. *Make and Install the Project:* These two commands generate and
-   install the project into the destination directory:
-   ::
+   install the project into the destination directory::
 
       $ make
       $ make install DESTDIR=./tmp
@@ -157,8 +149,7 @@ project:
 
 6. *Execute Your Project:* To execute the project, you would need to run
    it on your target hardware. If your target hardware happens to be
-   your build host, you could run the project as follows:
-   ::
+   your build host, you could run the project as follows::
 
       $ ./tmp/usr/local/bin/hello
 
@@ -203,8 +194,7 @@ regarding variable behavior:
 .. note::
 
    Regardless of how you set your variables, if you use the "-e" option
-   with ``make``, the variables from the SDK setup script take precedence:
-   ::
+   with ``make``, the variables from the SDK setup script take precedence::
 
       $ make -e target
 
@@ -226,8 +216,7 @@ Running the
 SDK setup script for a 64-bit build host and an i586-tuned target
 architecture for a ``core-image-sato`` image using the current &DISTRO;
 Yocto Project release and then echoing that variable shows the value
-established through the script:
-::
+established through the script::
 
    $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
    $ echo ${CC}
@@ -252,8 +241,7 @@ example:
 
    Create the three files as follows:
 
-   -  ``main.c``:
-      ::
+   -  ``main.c``::
 
          #include "module.h"
          void sample_func();
@@ -263,14 +251,12 @@ example:
              return 0;
          }
 
-   -  ``module.h``:
-      ::
+   -  ``module.h``::
 
          #include <stdio.h>
          void sample_func();
 
-   -  ``module.c``:
-      ::
+   -  ``module.c``::
 
          #include "module.h"
          void sample_func()
@@ -288,8 +274,7 @@ example:
    which is followed by the string "poky-linux". For this example, the
    command sources a script from the default SDK installation directory
    that uses the 32-bit Intel x86 Architecture and the &DISTRO_NAME; Yocto
-   Project release:
-   ::
+   Project release::
 
       $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
 
@@ -297,8 +282,7 @@ example:
    two lines that can be used to set the ``CC`` variable. One line is
    identical to the value that is set when you run the SDK environment
    setup script, and the other line sets ``CC`` to "gcc", the default
-   GNU compiler on the build host:
-   ::
+   GNU compiler on the build host::
 
       # CC=i586-poky-linux-gcc -m32 -march=i586 --sysroot=/opt/poky/2.5/sysroots/i586-poky-linux
       # CC="gcc"
@@ -315,8 +299,7 @@ example:
 4. *Make the Project:* Use the ``make`` command to create the binary
    output file. Because variables are commented out in the Makefile, the
    value used for ``CC`` is the value set when the SDK environment setup
-   file was run:
-   ::
+   file was run::
 
       $ make
       i586-poky-linux-gcc -m32 -march=i586 --sysroot=/opt/poky/2.5/sysroots/i586-poky-linux -I . -c main.c
@@ -351,8 +334,7 @@ example:
    variable as part of the command line. Go into the Makefile and
    re-insert the comment character so that running ``make`` uses the
    established SDK compiler. However, when you run ``make``, use a
-   command-line argument to set ``CC`` to "gcc":
-   ::
+   command-line argument to set ``CC`` to "gcc"::
 
       $ make clean
       rm -rf *.o
@@ -376,8 +358,7 @@ example:
    environment variable.
 
    In this last case, edit Makefile again to use the "gcc" compiler but
-   then use the "-e" option on the ``make`` command line:
-   ::
+   then use the "-e" option on the ``make`` command line::
 
       $ make clean
       rm -rf *.o
@@ -402,8 +383,7 @@ example:
    Makefile.
 
 5. *Execute Your Project:* To execute the project (i.e. ``target_bin``),
-   use the following command:
-   ::
+   use the following command::
 
       $ ./target_bin
       Hello World!

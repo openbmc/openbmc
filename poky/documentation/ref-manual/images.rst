@@ -18,8 +18,7 @@ image you want.
    are going to build an image using non-GPLv3 and similarly licensed
    components, you must make the following changes in the ``local.conf``
    file before using the BitBake command to build the minimal or base
-   image:
-   ::
+   image::
 
            1. Comment out the EXTRA_IMAGE_FEATURES line
            2. Set INCOMPATIBLE_LICENSE = "GPL-3.0 LGPL-3.0 AGPL-3.0"
@@ -27,7 +26,7 @@ image you want.
 
 From within the ``poky`` Git repository, you can use the following
 command to display the list of directories within the :term:`Source Directory`
-that contain image recipe files: ::
+that contain image recipe files::
 
    $ ls meta*/recipes*/images/*.bb
 

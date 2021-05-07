@@ -1,4 +1,4 @@
-From 6ddfb0bfcd1eea71acd37ab06f7a4510b9f1d12b Mon Sep 17 00:00:00 2001
+From 57e2c5e35732988c0b287289eb0997b4e9769371 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:12:56 +0400
 Subject: [PATCH] optional libstdc
@@ -25,10 +25,10 @@ Upstream-Status: Inappropriate [embedded specific]
  4 files changed, 37 insertions(+), 1 deletion(-)
 
 diff --git a/gcc/c-family/c.opt b/gcc/c-family/c.opt
-index c49da99d395..35f712e2c84 100644
+index 64e46e7573e..1824380f27a 100644
 --- a/gcc/c-family/c.opt
 +++ b/gcc/c-family/c.opt
-@@ -2025,6 +2025,10 @@ nostdinc++
+@@ -2166,6 +2166,10 @@ nostdinc++
  C++ ObjC++
  Do not search standard system include directories for C++.
  
@@ -40,10 +40,10 @@ index c49da99d395..35f712e2c84 100644
  C ObjC C++ ObjC++ Joined Separate
  ; Documented in common.opt
 diff --git a/gcc/cp/g++spec.c b/gcc/cp/g++spec.c
-index 0ab63bcd211..7b081e9e4f0 100644
+index 3c9bd1490b4..818beb61cee 100644
 --- a/gcc/cp/g++spec.c
 +++ b/gcc/cp/g++spec.c
-@@ -137,6 +137,7 @@ lang_specific_driver (struct cl_decoded_option **in_decoded_options,
+@@ -159,6 +159,7 @@ lang_specific_driver (struct cl_decoded_option **in_decoded_options,
        switch (decoded_options[i].opt_index)
  	{
  	case OPT_nostdlib:
@@ -52,10 +52,10 @@ index 0ab63bcd211..7b081e9e4f0 100644
  	  library = -1;
  	  break;
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index f12d8d12150..cf6cb428e7d 100644
+index 6659a903bf0..9ee63dbe52f 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
-@@ -230,6 +230,9 @@ in the following sections.
+@@ -239,6 +239,9 @@ in the following sections.
  -fno-weak  -nostdinc++ @gol
  -fvisibility-inlines-hidden @gol
  -fvisibility-ms-compat @gol
@@ -63,9 +63,9 @@ index f12d8d12150..cf6cb428e7d 100644
 +-fvtv-counts -fvtv-debug @gol
 +-nostdlib++ @gol
  -fext-numeric-literals @gol
- -Wabi-tag  -Wcatch-value  -Wcatch-value=@var{n} @gol
- -Wno-class-conversion  -Wclass-memaccess @gol
-@@ -599,7 +602,7 @@ Objective-C and Objective-C++ Dialects}.
+ -flang-info-include-translate@r{[}=@var{header}@r{]} @gol
+ -flang-info-include-translate-not @gol
+@@ -632,7 +635,7 @@ Objective-C and Objective-C++ Dialects}.
  -pie  -pthread  -r  -rdynamic @gol
  -s  -static  -static-pie  -static-libgcc  -static-libstdc++ @gol
  -static-libasan  -static-libtsan  -static-liblsan  -static-libubsan @gol
@@ -74,7 +74,7 @@ index f12d8d12150..cf6cb428e7d 100644
  -T @var{script}  -Wl,@var{option}  -Xlinker @var{option} @gol
  -u @var{symbol}  -z @var{keyword}}
  
-@@ -14407,6 +14410,33 @@ Specify that the program entry point is @var{entry}.  The argument is
+@@ -15708,6 +15711,33 @@ Specify that the program entry point is @var{entry}.  The argument is
  interpreted by the linker; the GNU linker accepts either a symbol name
  or an address.
  
@@ -109,10 +109,10 @@ index f12d8d12150..cf6cb428e7d 100644
  @opindex pie
  Produce a dynamically linked position independent executable on targets
 diff --git a/gcc/gcc.c b/gcc/gcc.c
-index b2200c5185a..f8be58ce0a6 100644
+index 19c75b6e20d..be7630ffd8c 100644
 --- a/gcc/gcc.c
 +++ b/gcc/gcc.c
-@@ -1051,6 +1051,7 @@ proper position among the other output files.  */
+@@ -1162,6 +1162,7 @@ proper position among the other output files.  */
      %(mflib) " STACK_SPLIT_SPEC "\
      %{fprofile-arcs|fprofile-generate*|coverage:-lgcov} " SANITIZER_SPEC " \
      %{!nostdlib:%{!r:%{!nodefaultlibs:%(link_ssp) %(link_gcc_c_sequence)}}}\

@@ -1306,8 +1306,8 @@ class Wic2(WicTestCase):
             result = runCmd("%s/usr/sbin/sfdisk -F %s" % (sysroot, new_image_path))
             self.assertTrue("0 B, 0 bytes, 0 sectors" in result.output)
 
-            os.rename(image_path, image_path + '.bak')
-            os.rename(new_image_path, image_path)
+            bb.utils.rename(image_path, image_path + '.bak')
+            bb.utils.rename(new_image_path, image_path)
 
             # Check if it boots in qemu
             with runqemu('core-image-minimal', ssh=False) as qemu:
@@ -1318,7 +1318,7 @@ class Wic2(WicTestCase):
             if os.path.exists(new_image_path):
                 os.unlink(new_image_path)
             if os.path.exists(image_path + '.bak'):
-                os.rename(image_path + '.bak', image_path)
+                bb.utils.rename(image_path + '.bak', image_path)
 
     def test_wic_ls_ext(self):
         """Test listing content of the ext partition using 'wic ls'"""

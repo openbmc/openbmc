@@ -26,8 +26,7 @@ universal, the list includes them just in case:
 
       When you name an append file, you can use the "``%``" wildcard character
       to allow for matching recipe names. For example, suppose you have an
-      append file named as follows:
-      ::
+      append file named as follows::
 
          busybox_1.21.%.bbappend
 

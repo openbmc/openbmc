@@ -16,6 +16,8 @@ SRC_URI = "git://anongit.freedesktop.org/pkg-config \
            file://pkg-config-native.in \
            file://fix-glib-configure-libtool-usage.patch \
            file://0001-glib-gettext.m4-Update-AM_GLIB_GNU_GETTEXT-to-match-.patch \
+           file://0001-autotools-remove-support-for-the-__int64-type.-See-1.patch \
+           file://0001-autotools-use-C99-printf-format-specifiers-on-Window.patch \
            "
 
 S = "${WORKDIR}/git"

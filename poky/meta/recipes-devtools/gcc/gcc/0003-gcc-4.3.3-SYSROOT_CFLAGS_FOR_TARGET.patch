@@ -1,4 +1,4 @@
-From 6e3395c0bc933bdc3242d1dead4896d0aa4e11a8 Mon Sep 17 00:00:00 2001
+From 274a27da6fe355c4c49953b3b69c8949d2412c62 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:08:31 +0400
 Subject: [PATCH] gcc-4.3.3: SYSROOT_CFLAGS_FOR_TARGET
@@ -26,10 +26,10 @@ Upstream-Status: Pending
  1 file changed, 32 insertions(+)
 
 diff --git a/configure b/configure
-index 226a64939d1..b31dc137fc9 100755
+index bcebad264ec..86e4ee7c383 100755
 --- a/configure
 +++ b/configure
-@@ -6971,6 +6971,38 @@ fi
+@@ -8977,6 +8977,38 @@ fi
  
  
  

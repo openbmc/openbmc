@@ -4,6 +4,7 @@
 
 import os
 import sys
+import json
 import errno
 import datetime
 import itertools
@@ -51,6 +52,8 @@ class BaseDumper(object):
             prefix = "host"
         elif isinstance(self, TargetDumper):
             prefix = "target"
+        elif isinstance(self, MonitorDumper):
+            prefix = "qmp"
         else:
             prefix = "unknown"
         for i in itertools.count():
@@ -58,9 +61,12 @@ class BaseDumper(object):
             fullname = os.path.join(self.dump_dir, filename)
             if not os.path.exists(fullname):
                 break
-        with open(fullname, 'w') as dump_file:
-            dump_file.write(output)
-
+        if isinstance(self, MonitorDumper):
+            with open(fullname, 'w') as json_file:
+                json.dump(output, json_file, indent=4)
+        else:
+            with open(fullname, 'w') as dump_file:
+                dump_file.write(output)
 
 class HostDumper(BaseDumper):
     """ Class to get dumps from the host running the tests """
@@ -96,3 +102,23 @@ class TargetDumper(BaseDumper):
             except:
                 print("Tried to dump info from target but "
                         "serial console failed")
+                print("Failed CMD: %s" % (cmd))
+
+class MonitorDumper(BaseDumper):
+    """ Class to get dumps via the Qemu Monitor, it only works with QemuRunner """
+
+    def __init__(self, cmds, parent_dir, runner):
+        super(MonitorDumper, self).__init__(cmds, parent_dir)
+        self.runner = runner
+
+    def dump_monitor(self, dump_dir=""):
+        if self.runner is None:
+            return
+        if dump_dir:
+            self.dump_dir = dump_dir
+        for cmd in self.cmds:
+            try:
+                output = self.runner.run_monitor(cmd)
+                self._write_dump(cmd, output)
+            except:
+                print("Failed to dump QMP CMD: %s" % (cmd))

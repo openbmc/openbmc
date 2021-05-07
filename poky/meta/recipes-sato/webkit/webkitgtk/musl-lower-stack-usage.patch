@@ -13,7 +13,7 @@ setting DEFAULT_THREAD_STACK_SIZE_IN_KB alone is not enough either
 This patch only changes behavior when using musl, the defaults for
 glibc in OE remains same
 
-Upstream-Status: Pending
+Upstream-Status: Accepted
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/Source/JavaScriptCore/runtime/OptionsList.h

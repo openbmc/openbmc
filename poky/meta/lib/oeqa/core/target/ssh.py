@@ -43,12 +43,22 @@ class OESSHTarget(OETarget):
         if port:
             self.ssh = self.ssh + [ '-p', port ]
             self.scp = self.scp + [ '-P', port ]
+        self._monitor_dumper = None
 
     def start(self, **kwargs):
         pass
 
     def stop(self, **kwargs):
         pass
+
+    @property
+    def monitor_dumper(self):
+        return self._monitor_dumper
+
+    @monitor_dumper.setter
+    def monitor_dumper(self, dumper):
+        self._monitor_dumper = dumper
+        self.monitor_dumper.dump_monitor()
 
     def _run(self, command, timeout=None, ignore_status=True):
         """
@@ -87,9 +97,14 @@ class OESSHTarget(OETarget):
             processTimeout = self.timeout
 
         status, output = self._run(sshCmd, processTimeout, True)
-        self.logger.debug('Command: %s\nOutput:  %s\n' % (command, output))
+        self.logger.debug('Command: %s\nStatus: %d Output:  %s\n' % (command, status, output))
         if (status == 255) and (('No route to host') in output):
+            if self.monitor_dumper:
+                self.monitor_dumper.dump_monitor()
+        if status == 255:
             self.target_dumper.dump_target()
+            if self.monitor_dumper:
+                self.monitor_dumper.dump_monitor()
         return (status, output)
 
     def copyTo(self, localSrc, remoteDst):

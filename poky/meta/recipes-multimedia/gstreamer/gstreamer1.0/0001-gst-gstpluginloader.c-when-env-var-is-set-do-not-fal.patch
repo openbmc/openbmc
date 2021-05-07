@@ -12,7 +12,10 @@ environemnts, regardless of whether one pointed to by the env var succeeded or f
 taken from:
 http://cgit.openembedded.org/openembedded-core/commit/meta/recipes-multimedia/gstreamer/gstreamer1.0/0001-gst-gstpluginloader.c-when-env-var-is-set-do-not-fal.patch?id=0db7ba34ca41b107042306d13a6f0162885c123b
 
-Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/669]
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/669>
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/9f958058697e6fbf5bde325228034572331d1a3a]
+
 Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
 ---
  gst/gstpluginloader.c | 15 +++++++--------

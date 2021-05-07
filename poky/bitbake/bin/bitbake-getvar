@@ -1,0 +1,48 @@
+#! /usr/bin/env python3
+#
+# Copyright (C) 2021 Richard Purdie
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+import argparse
+import io
+import os
+import sys
+
+bindir = os.path.dirname(__file__)
+topdir = os.path.dirname(bindir)
+sys.path[0:0] = [os.path.join(topdir, 'lib')]
+
+import bb.tinfoil
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Bitbake Query Variable")
+    parser.add_argument("variable", help="variable name to query")
+    parser.add_argument("-r", "--recipe", help="Recipe name to query", default=None, required=False)
+    parser.add_argument('-u', '--unexpand', help='Do not expand the value (with --value)', action="store_true")
+    parser.add_argument('-f', '--flag', help='Specify a variable flag to query (with --value)', default=None)
+    parser.add_argument('--value', help='Only report the value, no history and no variable name', action="store_true")
+    args = parser.parse_args()
+
+    if args.unexpand and not args.value:
+        print("--unexpand only makes sense with --value")
+        sys.exit(1)
+
+    if args.flag and not args.value:
+        print("--flag only makes sense with --value")
+        sys.exit(1)
+
+    with bb.tinfoil.Tinfoil(tracking=True) as tinfoil:
+        if args.recipe:
+            tinfoil.prepare(quiet=2)
+            d = tinfoil.parse_recipe(args.recipe)
+        else:
+            tinfoil.prepare(quiet=2, config_only=True)
+            d = tinfoil.config_data
+        if args.flag:
+            print(str(d.getVarFlag(args.variable, args.flag, expand=(not args.unexpand))))
+        elif args.value:
+            print(str(d.getVar(args.variable, expand=(not args.unexpand))))
+        else:
+            bb.data.emit_var(args.variable, d=d, all=True)

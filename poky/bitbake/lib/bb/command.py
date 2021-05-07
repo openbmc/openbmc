@@ -20,6 +20,7 @@ Commands are queued in a CommandQueue
 
 from collections import OrderedDict, defaultdict
 
+import io
 import bb.event
 import bb.cooker
 import bb.remotedata
@@ -499,6 +500,17 @@ class CommandsSync:
 
         d = command.remotedatastores[dsindex].varhistory
         return getattr(d, method)(*args, **kwargs)
+
+    def dataStoreConnectorVarHistCmdEmit(self, command, params):
+        dsindex = params[0]
+        var = params[1]
+        oval = params[2]
+        val = params[3]
+        d = command.remotedatastores[params[4]]
+
+        o = io.StringIO()
+        command.remotedatastores[dsindex].varhistory.emit(var, oval, val, o, d)
+        return o.getvalue()
 
     def dataStoreConnectorIncHistCmd(self, command, params):
         dsindex = params[0]

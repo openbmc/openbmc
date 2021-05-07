@@ -153,8 +153,7 @@ When you run this script, your Yocto Project environment is set up, a
 :term:`Build Directory` is created, your working
 directory becomes the Build Directory, and you are presented with some
 simple suggestions as to what to do next, including a list of some
-possible targets to build. Here is an example:
-::
+possible targets to build. Here is an example::
 
    $ source oe-init-build-env
 
@@ -185,8 +184,7 @@ creates the ``build/`` directory in your current working directory. If
 you provide a Build Directory argument when you ``source`` the script,
 you direct the OpenEmbedded build system to create a Build Directory of
 your choice. For example, the following command creates a Build
-Directory named ``mybuilds/`` that is outside of the :term:`Source Directory`:
-::
+Directory named ``mybuilds/`` that is outside of the :term:`Source Directory`::
 
    $ source oe-init-build-env ~/mybuilds
 
@@ -269,8 +267,7 @@ and to ``meta/conf/`` when you are building from the OpenEmbedded-Core
 environment. Because the script variable points to the source of the
 ``local.conf.sample`` file, this implies that you can configure your
 build environment from any layer by setting the variable in the
-top-level build environment setup script as follows:
-::
+top-level build environment setup script as follows::
 
    TEMPLATECONF=your_layer/conf
 
@@ -309,8 +306,7 @@ Project development environment, and to ``meta/conf/`` when you are
 building from the OpenEmbedded-Core environment. Because the script
 variable points to the source of the ``bblayers.conf.sample`` file, this
 implies that you can base your build from any layer by setting the
-variable in the top-level build environment setup script as follows:
-::
+variable in the top-level build environment setup script as follows::
 
    TEMPLATECONF=your_layer/conf
 
@@ -463,8 +459,7 @@ image again.
 If you do accidentally delete files here, you will need to force them to
 be re-created. In order to do that, you will need to know the target
 that produced them. For example, these commands rebuild and re-create
-the kernel files:
-::
+the kernel files::
 
    $ bitbake -c clean virtual/kernel
    $ bitbake virtual/kernel
@@ -535,8 +530,7 @@ recipe-specific :term:`WORKDIR` directories. Thus, the
 This directory holds information that BitBake uses for accounting
 purposes to track what tasks have run and when they have run. The
 directory is sub-divided by architecture, package name, and version.
-Following is an example:
-::
+Following is an example::
 
       stamps/all-poky-linux/distcc-config/1.0-r0.do_build-2fdd....2do
 

@@ -130,7 +130,7 @@ overview of their function and contents.
       you to control the build based on these parameters.
 
       Disk space monitoring is disabled by default. When setting this
-      variable, use the following form: ::
+      variable, use the following form::
 
          BB_DISKMON_DIRS = "<action>,<dir>,<threshold> [...]"
 
@@ -166,7 +166,7 @@ overview of their function and contents.
                not specify G, M, or K, Kbytes is assumed by
                default.  Do not use GB, MB, or KB.
 
-      Here are some examples: ::
+      Here are some examples::
 
          BB_DISKMON_DIRS = "ABORT,${TMPDIR},1G,100K WARN,${SSTATE_DIR},1G,100K"
          BB_DISKMON_DIRS = "STOPTASKS,${TMPDIR},1G"
@@ -207,7 +207,7 @@ overview of their function and contents.
       BB_DISKMON_WARNINTERVAL = "50M,5K"
 
       When specifying the variable in your configuration file, use the
-      following form: ::
+      following form::
 
          BB_DISKMON_WARNINTERVAL = "<disk_space_interval>,<disk_inode_interval>"
 
@@ -223,7 +223,7 @@ overview of their function and contents.
                G, M, or K for Gbytes, Mbytes, or Kbytes,
                respectively. You cannot use GB, MB, or KB.
 
-      Here is an example: ::
+      Here is an example::
 
          BB_DISKMON_DIRS = "WARN,${SSTATE_DIR},1G,100K"
          BB_DISKMON_WARNINTERVAL = "50M,5K"
@@ -329,7 +329,7 @@ overview of their function and contents.
       Specifies the name of the log files saved into
       ``${``\ :term:`T`\ ``}``. By default, the ``BB_LOGFMT``
       variable is undefined and the log file names get created using the
-      following form: ::
+      following form::
 
          log.{task}.{pid}
 
@@ -383,7 +383,7 @@ overview of their function and contents.
       Specifies the name of the executable script files (i.e. run files)
       saved into ``${``\ :term:`T`\ ``}``. By default, the
       ``BB_RUNFMT`` variable is undefined and the run file names get
-      created using the following form: ::
+      created using the following form::
 
          run.{task}.{pid}
 
@@ -511,7 +511,7 @@ overview of their function and contents.
          This variable works similarly to the :term:`BB_TASK_NICE_LEVEL`
          variable except with a task's I/O priorities.
 
-      Set the variable as follows: ::
+      Set the variable as follows::
 
          BB_TASK_IONICE_LEVEL = "class.prio"
 
@@ -529,7 +529,7 @@ overview of their function and contents.
          In order for your I/O priority settings to take effect, you need the
          Completely Fair Queuing (CFQ) Scheduler selected for the backing block
          device. To select the scheduler, use the following command form where
-         device is the device (e.g. sda, sdb, and so forth): ::
+         device is the device (e.g. sda, sdb, and so forth)::
 
             $ sudo sh -c "echo cfq > /sys/block/device/queu/scheduler"
 
@@ -570,7 +570,7 @@ overview of their function and contents.
       To build a different variant of the recipe with a minimal amount of
       code, it usually is as simple as adding the variable to your recipe.
       Here are two examples. The "native" variants are from the
-      OpenEmbedded-Core metadata: ::
+      OpenEmbedded-Core metadata::
 
          BBCLASSEXTEND =+ "native nativesdk"
          BBCLASSEXTEND =+ "multilib:multilib_name"
@@ -658,12 +658,12 @@ overview of their function and contents.
       ``.bb`` files in case a layer is not present.  Use this avoid hard
       dependency on those other layers.
 
-      Use the following form for ``BBFILES_DYNAMIC``: ::
+      Use the following form for ``BBFILES_DYNAMIC``::
 
          collection_name:filename_pattern
 
       The following example identifies two collection names and two filename
-      patterns: ::
+      patterns::
 
          BBFILES_DYNAMIC += "\
              clang-layer:${LAYERDIR}/bbappends/meta-clang/*/*/*.bbappend \
@@ -671,14 +671,14 @@ overview of their function and contents.
          "
 
       When the collection name is prefixed with "!" it will add the file pattern in case
-      the layer is absent: ::
+      the layer is absent::
 
          BBFILES_DYNAMIC += "\
              !clang-layer:${LAYERDIR}/backfill/meta-clang/*/*/*.bb \
          "
 
       This next example shows an error message that occurs because invalid
-      entries are found, which cause parsing to abort: ::
+      entries are found, which cause parsing to abort::
 
          ERROR: BBFILES_DYNAMIC entries must be of the form {!}<collection name>:<filename pattern>, not:
          /work/my-layer/bbappends/meta-security-isafw/*/*/*.bbappend
@@ -701,7 +701,7 @@ overview of their function and contents.
    :term:`BBLAYERS`
       Lists the layers to enable during the build. This variable is defined
       in the ``bblayers.conf`` configuration file in the build directory.
-      Here is an example: ::
+      Here is an example::
 
          BBLAYERS = " \
              /home/scottrif/poky/meta \
@@ -735,13 +735,13 @@ overview of their function and contents.
 
       The following example uses a complete regular expression to tell
       BitBake to ignore all recipe and recipe append files in the
-      ``meta-ti/recipes-misc/`` directory: ::
+      ``meta-ti/recipes-misc/`` directory::
 
          BBMASK = "meta-ti/recipes-misc/"
 
       If you want to mask out multiple directories or recipes, you can
       specify multiple regular expression fragments. This next example
-      masks out multiple directories and individual recipes: ::
+      masks out multiple directories and individual recipes::
 
          BBMASK += "/meta-ti/recipes-misc/ meta-ti/recipes-ti/packagegroup/"
          BBMASK += "/meta-oe/recipes-support/"
@@ -762,7 +762,7 @@ overview of their function and contents.
       ``conf/local.conf`` configuration file.
 
       As an example, the following line specifies three multiconfigs, each
-      having a separate configuration file: ::
+      having a separate configuration file::
 
          BBMULTIFONFIG = "configA configB configC"
 
@@ -783,7 +783,7 @@ overview of their function and contents.
       If you run BitBake from a directory outside of the build directory,
       you must be sure to set ``BBPATH`` to point to the build directory.
       Set the variable as you would any environment variable and then run
-      BitBake: ::
+      BitBake::
 
          $ BBPATH="build_directory"
          $ export BBPATH
@@ -852,7 +852,7 @@ overview of their function and contents.
 
       Consider this simple example for two recipes named "a" and "b" that
       produce similarly named packages. In this example, the ``DEPENDS``
-      statement appears in the "a" recipe: ::
+      statement appears in the "a" recipe::
 
          DEPENDS = "b"
 
@@ -1074,7 +1074,7 @@ overview of their function and contents.
       recipes provide the same item. You should always suffix the variable
       with the name of the provided item, and you should set it to the
       :term:`PN` of the recipe to which you want to give
-      precedence. Some examples: ::
+      precedence. Some examples::
 
          PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
          PREFERRED_PROVIDER_virtual/xserver = "xserver-xf86"
@@ -1086,11 +1086,11 @@ overview of their function and contents.
       ``PREFERRED_PROVIDERS`` is identical to
       :term:`PREFERRED_PROVIDER`. However, the ``PREFERRED_PROVIDERS`` variable
       lets you define preferences for multiple situations using the following
-      form: ::
+      form::
 
          PREFERRED_PROVIDERS = "xxx:yyy aaa:bbb ..."
 
-      This form is a convenient replacement for the following: ::
+      This form is a convenient replacement for the following::
 
          PREFERRED_PROVIDER_xxx = "yyy"
          PREFERRED_PROVIDER_aaa = "bbb"
@@ -1106,7 +1106,7 @@ overview of their function and contents.
       through the "``%``" character. You can use the character to match any
       number of characters, which can be useful when specifying versions
       that contain long revision numbers that potentially change. Here are
-      two examples: ::
+      two examples::
 
          PREFERRED_VERSION_python = "2.7.3"
          PREFERRED_VERSION_linux-yocto = "4.12%"
@@ -1130,7 +1130,7 @@ overview of their function and contents.
 
       Typically, you would add a specific server for the build system to
       attempt before any others by adding something like the following to
-      your configuration: ::
+      your configuration::
 
          PREMIRRORS_prepend = "\
          git://.*/.* http://www.yoctoproject.org/sources/ \n \
@@ -1152,7 +1152,7 @@ overview of their function and contents.
       ``DEPENDS``.
 
       Consider the following example ``PROVIDES`` statement from a recipe
-      file ``libav_0.8.11.bb``: ::
+      file ``libav_0.8.11.bb``::
 
          PROVIDES += "libpostproc"
 
@@ -1175,7 +1175,7 @@ overview of their function and contents.
    :term:`PRSERV_HOST`
       The network based :term:`PR` service host and port.
 
-      Following is an example of how the ``PRSERV_HOST`` variable is set: ::
+      Following is an example of how the ``PRSERV_HOST`` variable is set::
 
          PRSERV_HOST = "localhost:0"
 
@@ -1196,7 +1196,7 @@ overview of their function and contents.
       you should always use the variable in a form with an attached package
       name. For example, suppose you are building a development package
       that depends on the ``perl`` package. In this case, you would use the
-      following ``RDEPENDS`` statement: ::
+      following ``RDEPENDS`` statement::
 
          RDEPENDS_${PN}-dev += "perl"
 
@@ -1207,11 +1207,11 @@ overview of their function and contents.
       BitBake supports specifying versioned dependencies. Although the
       syntax varies depending on the packaging format, BitBake hides these
       differences from you. Here is the general syntax to specify versions
-      with the ``RDEPENDS`` variable: ::
+      with the ``RDEPENDS`` variable::
 
          RDEPENDS_${PN} = "package (operator version)"
 
-      For ``operator``, you can specify the following: ::
+      For ``operator``, you can specify the following::
 
          =
          <
@@ -1220,7 +1220,7 @@ overview of their function and contents.
          >=
 
       For example, the following sets up a dependency on version 1.2 or
-      greater of the package ``foo``: ::
+      greater of the package ``foo``::
 
          RDEPENDS_${PN} = "foo (>= 1.2)"
 
@@ -1249,7 +1249,7 @@ overview of their function and contents.
 
       As with all package-controlling variables, you must always use the
       variable in conjunction with a package name override. Here is an
-      example: ::
+      example::
 
          RPROVIDES_${PN} = "widget-abi-2"
 
@@ -1263,11 +1263,11 @@ overview of their function and contents.
       BitBake supports specifying versioned recommends. Although the syntax
       varies depending on the packaging format, BitBake hides these
       differences from you. Here is the general syntax to specify versions
-      with the ``RRECOMMENDS`` variable: ::
+      with the ``RRECOMMENDS`` variable::
 
          RRECOMMENDS_${PN} = "package (operator version)"
 
-      For ``operator``, you can specify the following: ::
+      For ``operator``, you can specify the following::
 
          =
          <
@@ -1276,7 +1276,7 @@ overview of their function and contents.
          >=
 
       For example, the following sets up a recommend on version
-      1.2 or greater of the package ``foo``: ::
+      1.2 or greater of the package ``foo``::
 
          RRECOMMENDS_${PN} = "foo (>= 1.2)"
 

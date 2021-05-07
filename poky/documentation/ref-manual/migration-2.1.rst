@@ -42,8 +42,7 @@ defaulted to False if not specified. Now, however, no default exists so
 one must be specified. You must change any ``getVar()`` calls that do
 not specify the final expand parameter to calls that do specify the
 parameter. You can run the following ``sed`` command at the base of a
-layer to make this change:
-::
+layer to make this change::
 
    sed -e 's:\(\.getVar([^,()]*\)):\1, False):g' -i `grep -ril getVar *`
    sed -e 's:\(\.getVarFlag([^,()]*,[^,()]*\)):\1, False):g' -i `grep -ril getVarFlag *`
@@ -285,8 +284,7 @@ The following changes have been made for the Poky distribution:
    Any recipe that needs to opt-out of having the "--disable-static"
    option specified on the configure command line either because it is
    not a supported option for the configure script or because static
-   libraries are needed should set the following variable:
-   ::
+   libraries are needed should set the following variable::
 
       DISABLE_STATIC = ""
 
@@ -369,8 +367,7 @@ These additional changes exist:
 -  Previously, the following list of packages were removed if
    package-management was not in
    :term:`IMAGE_FEATURES`, regardless of any
-   dependencies:
-   ::
+   dependencies::
 
       update-rc.d
       base-passwd

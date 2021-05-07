@@ -56,7 +56,7 @@ you can now remove them.
 Additionally, a ``bluetooth`` class has been added to make selection of
 the appropriate bluetooth support within a recipe a little easier. If
 you wish to make use of this class in a recipe, add something such as
-the following: ::
+the following::
 
    inherit bluetooth
    PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', '${BLUEZ}', '', d)}"
@@ -84,7 +84,7 @@ where the ``linux.inc`` file in ``meta-oe`` was updated.
 
 Recipes that rely on the kernel source code and do not inherit the
 module classes might need to add explicit dependencies on the
-``do_shared_workdir`` kernel task, for example: ::
+``do_shared_workdir`` kernel task, for example::
 
    do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
@@ -131,7 +131,7 @@ One of the improvements is to attempt to run "make clean" during the
 ``do_configure`` task if a ``Makefile`` exists. Some software packages
 do not provide a working clean target within their make files. If you
 have such recipes, you need to set
-:term:`CLEANBROKEN` to "1" within the recipe, for example: ::
+:term:`CLEANBROKEN` to "1" within the recipe, for example::
 
    CLEANBROKEN = "1"
 

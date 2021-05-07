@@ -184,7 +184,7 @@ python apply_update_alternative_renames () {
                         link_rename.append((alt_target, alt_target_rename))
                     else:
                         bb.note('%s: Rename %s -> %s' % (pn, alt_target, alt_target_rename))
-                        os.rename(src, dest)
+                        bb.utils.rename(src, dest)
                         update_files(alt_target, alt_target_rename, pkg, d)
                 else:
                     bb.warn("%s: alternative target (%s or %s) does not exist, skipping..." % (pn, alt_target, alt_target_rename))
@@ -201,7 +201,7 @@ python apply_update_alternative_renames () {
             if os.path.lexists(link_target):
                 # Ok, the link_target exists, we can rename
                 bb.note('%s: Rename (link) %s -> %s' % (pn, alt_target, alt_target_rename))
-                os.rename(src, dest)
+                bb.utils.rename(src, dest)
             else:
                 # Try to resolve the broken link to link.${BPN}
                 link_maybe = '%s.%s' % (os.readlink(src), pn)

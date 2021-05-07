@@ -49,15 +49,13 @@ Follow these general steps to create your layer without using tools:
    (e.g. the cloned ``poky`` repository).
 
    While not strictly required, prepend the name of the directory with
-   the string "meta-". For example:
-   ::
+   the string "meta-". For example::
 
       meta-mylayer
       meta-GUI_xyz
       meta-mymachine
 
-   With rare exceptions, a layer's name follows this form:
-   ::
+   With rare exceptions, a layer's name follows this form::
 
       meta-root_name
 
@@ -77,8 +75,7 @@ Follow these general steps to create your layer without using tools:
    :yocto_git:`Source Repositories </poky/tree/meta-yocto-bsp/conf>`
    demonstrates the required syntax. For your layer, you need to replace
    "yoctobsp" with a unique identifier for your layer (e.g. "machinexyz"
-   for a layer named "meta-machinexyz"):
-   ::
+   for a layer named "meta-machinexyz")::
 
       # We have a conf and classes directory, add to BBPATH
       BBPATH .= ":${LAYERDIR}"
@@ -195,8 +192,7 @@ following list:
       machine "one". To do so, you use an append file named
       ``base-files.bbappend`` and create a dependency on "foo" by
       altering the :term:`DEPENDS`
-      variable:
-      ::
+      variable::
 
          DEPENDS = "foo"
 
@@ -209,14 +205,12 @@ following list:
       ``foo``.
 
       To make sure your changes apply only when building machine "one",
-      use a machine override with the ``DEPENDS`` statement:
-      ::
+      use a machine override with the ``DEPENDS`` statement::
 
          DEPENDS_one = "foo"
 
       You should follow the same strategy when using ``_append``
-      and ``_prepend`` operations:
-      ::
+      and ``_prepend`` operations::
 
          DEPENDS_append_one = " foo"
          DEPENDS_prepend_one = "foo "
@@ -224,8 +218,7 @@ following list:
       As an actual example, here's a
       snippet from the generic kernel include file ``linux-yocto.inc``,
       wherein the kernel compile and link options are adjusted in the
-      case of a subset of the supported architectures:
-      ::
+      case of a subset of the supported architectures::
 
          DEPENDS_append_aarch64 = " libgcc"
          KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
@@ -252,8 +245,7 @@ following list:
       file, you can use an append file to cause the build to use your
       own version of the file. For example, an append file in your layer
       at ``meta-one/recipes-core/base-files/base-files.bbappend`` could
-      extend :term:`FILESPATH` using :term:`FILESEXTRAPATHS` as follows:
-      ::
+      extend :term:`FILESPATH` using :term:`FILESEXTRAPATHS` as follows::
 
          FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
 
@@ -375,8 +367,7 @@ the COMMON and DISTRO related tests. Furthermore, if your layer is a BSP
 layer, the layer must pass the COMMON and BSP set of tests.
 
 To execute the script, enter the following commands from your build
-directory:
-::
+directory::
 
    $ source oe-init-build-env
    $ yocto-check-layer your_layer_directory
@@ -432,8 +423,7 @@ enable it. To enable your layer, simply add your layer's path to the
 ``BBLAYERS`` variable in your ``conf/bblayers.conf`` file, which is
 found in the :term:`Build Directory`.
 The following example shows how to enable a layer named
-``meta-mylayer``:
-::
+``meta-mylayer``::
 
    # POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
    # changes incompatibly
@@ -488,8 +478,7 @@ As an example, consider the main formfactor recipe and a corresponding
 formfactor append file both from the :term:`Source Directory`.
 Here is the main
 formfactor recipe, which is named ``formfactor_0.0.bb`` and located in
-the "meta" layer at ``meta/recipes-bsp/formfactor``:
-::
+the "meta" layer at ``meta/recipes-bsp/formfactor``::
 
    SUMMARY = "Device formfactor information"
    DESCRIPTION = "A formfactor configuration file provides information about the \
@@ -521,8 +510,7 @@ during the build.
 
 Following is the append file, which is named ``formfactor_0.0.bbappend``
 and is from the Raspberry Pi BSP Layer named ``meta-raspberrypi``. The
-file is in the layer at ``recipes-bsp/formfactor``:
-::
+file is in the layer at ``recipes-bsp/formfactor``::
 
    FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
@@ -570,8 +558,7 @@ build system to calculate it based on the layer's dependencies.
 
 To specify the layer's priority manually, use the
 :term:`BBFILE_PRIORITY`
-variable and append the layer's root name:
-::
+variable and append the layer's root name::
 
    BBFILE_PRIORITY_mylayer = "1"
 
@@ -595,8 +582,7 @@ with their paths and priorities and on ``.bbappend`` files and their
 applicable recipes can help to reveal potential problems.
 
 For help on the BitBake layer management tool, use the following
-command:
-::
+command::
 
    $ bitbake-layers --help
    NOTE: Starting bitbake server...
@@ -676,8 +662,7 @@ The following list describes the available commands:
       variable values, you need to tidy these up yourself. Consider the
       following example. Here, the ``bitbake-layers`` command adds the
       line ``#### bbappended ...`` so that you know where the following
-      lines originate:
-      ::
+      lines originate::
 
          ...
          DESCRIPTION = "A useful utility"
@@ -691,8 +676,7 @@ The following list describes the available commands:
          EXTRA_OECONF += "--enable-somethingelse"
 
 
-      Ideally, you would tidy up these utilities as follows:
-      ::
+      Ideally, you would tidy up these utilities as follows::
 
          ...
          DESCRIPTION = "Customized utility"
@@ -746,14 +730,12 @@ create a layer with the following:
 
 In its simplest form, you can use the following command form to create a
 layer. The command creates a layer whose name corresponds to
-"your_layer_name" in the current directory:
-::
+"your_layer_name" in the current directory::
 
    $ bitbake-layers create-layer your_layer_name
 
 As an example, the following command creates a layer named ``meta-scottrif``
-in your home directory:
-::
+in your home directory::
 
    $ cd /usr/home
    $ bitbake-layers create-layer meta-scottrif
@@ -770,8 +752,7 @@ default, you can use the ``--example-recipe-name`` option.
 
 The easiest way to see how the ``bitbake-layers create-layer`` command
 works is to experiment with the script. You can also read the usage
-information by entering the following:
-::
+information by entering the following::
 
    $ bitbake-layers create-layer --help
    NOTE: Starting bitbake server...
@@ -799,16 +780,14 @@ Once you create your general layer, you must add it to your
 makes the OpenEmbedded build system aware of your layer so that it can
 search it for metadata.
 
-Add your layer by using the ``bitbake-layers add-layer`` command:
-::
+Add your layer by using the ``bitbake-layers add-layer`` command::
 
    $ bitbake-layers add-layer your_layer_name
 
 Here is an example that adds a
 layer named ``meta-scottrif`` to the configuration file. Following the
 command that adds the layer is another ``bitbake-layers`` command that
-shows the layers that are in your ``bblayers.conf`` file:
-::
+shows the layers that are in your ``bblayers.conf`` file::
 
    $ bitbake-layers add-layer meta-scottrif
    NOTE: Starting bitbake server...
@@ -851,8 +830,7 @@ variable changes are in effect for every build and consequently affect
 all images, which might not be what you require.
 
 To add a package to your image using the local configuration file, use
-the ``IMAGE_INSTALL`` variable with the ``_append`` operator:
-::
+the ``IMAGE_INSTALL`` variable with the ``_append`` operator::
 
    IMAGE_INSTALL_append = " strace"
 
@@ -870,8 +848,7 @@ takes effect.
 
 As shown in its simplest use, ``IMAGE_INSTALL_append`` affects all
 images. It is possible to extend the syntax so that the variable applies
-to a specific image only. Here is an example:
-::
+to a specific image only. Here is an example::
 
    IMAGE_INSTALL_append_pn-core-image-minimal = " strace"
 
@@ -942,8 +919,7 @@ Customizing Images Using Custom .bb Files
 
 You can also customize an image by creating a custom recipe that defines
 additional software as part of the image. The following example shows
-the form for the two lines you need:
-::
+the form for the two lines you need::
 
    IMAGE_INSTALL = "packagegroup-core-x11-base package1 package2"
    inherit core-image
@@ -958,8 +934,7 @@ The other method for creating a custom image is to base it on an
 existing image. For example, if you want to create an image based on
 ``core-image-sato`` but add the additional package ``strace`` to the
 image, copy the ``meta/recipes-sato/images/core-image-sato.bb`` to a new
-``.bb`` and add the following line to the end of the copy:
-::
+``.bb`` and add the following line to the end of the copy::
 
    IMAGE_INSTALL += "strace"
 
@@ -990,8 +965,7 @@ in the ``packagegroup-base.bb`` recipe.
 Here is a short, fabricated example showing the same basic pieces for a
 hypothetical packagegroup defined in ``packagegroup-custom.bb``, where
 the variable ``PN`` is the standard way to abbreviate the reference to
-the full packagegroup name ``packagegroup-custom``:
-::
+the full packagegroup name ``packagegroup-custom``::
 
    DESCRIPTION = "My Custom Package Groups"
 
@@ -1033,13 +1007,11 @@ configured hostname written to ``/etc/hostname`` is "qemux86".
 
 You can customize this name by altering the value of the "hostname"
 variable in the ``base-files`` recipe using either an append file or a
-configuration file. Use the following in an append file:
-::
+configuration file. Use the following in an append file::
 
    hostname = "myhostname"
 
-Use the following in a configuration file:
-::
+Use the following in a configuration file::
 
    hostname_pn-base-files = "myhostname"
 
@@ -1054,8 +1026,7 @@ you can easily reset the default hostname.
 
 Another point of interest is that if you unset the variable, the image
 will have no default hostname in the filesystem. Here is an example that
-unsets the variable in a configuration file:
-::
+unsets the variable in a configuration file::
 
   hostname_pn-base-files = ""
 
@@ -1136,8 +1107,7 @@ To run the tool, you just need to be in your
 :term:`Build Directory` and have sourced the
 build environment setup script (i.e.
 :ref:`structure-core-script`).
-To get help on the tool, use the following command:
-::
+To get help on the tool, use the following command::
 
    $ recipetool -h
    NOTE: Starting bitbake server...
@@ -1166,8 +1136,7 @@ locates it properly in the layer that contains your source files.
 Following are some syntax examples:
 
  - Use this syntax to generate a recipe based on source. Once generated,
-   the recipe resides in the existing source code layer:
-   ::
+   the recipe resides in the existing source code layer::
 
       recipetool create -o OUTFILE source
 
@@ -1180,8 +1149,7 @@ Following are some syntax examples:
 
  - Use this syntax to generate a recipe based on source. The options
    direct ``recipetool`` to generate debugging information. Once generated,
-   the recipe resides in the existing source code layer:
-   ::
+   the recipe resides in the existing source code layer::
 
       recipetool create -d -o OUTFILE source
 
@@ -1236,8 +1204,7 @@ the recipe.
    recipe through the layer's ``conf/layer.conf`` file and the
    :term:`BBFILES` variable. This
    variable sets up a path from which the build system can locate
-   recipes. Here is the typical use:
-   ::
+   recipes. Here is the typical use::
 
       BBFILES += "${LAYERDIR}/recipes-*/*/*.bb \
                   ${LAYERDIR}/recipes-*/*/*.bbappend"
@@ -1249,8 +1216,7 @@ the recipe.
    ":ref:`dev-manual/common-tasks:understanding and creating layers`" section.
 
 -  *Naming Your Recipe:* When you name your recipe, you need to follow
-   this naming convention:
-   ::
+   this naming convention::
 
       basename_version.bb
 
@@ -1276,8 +1242,7 @@ Assuming you have sourced the build environment setup script (i.e.
 :ref:`structure-core-script`) and you are in
 the :term:`Build Directory`, use
 BitBake to process your recipe. All you need to provide is the
-``basename`` of the recipe as described in the previous section:
-::
+``basename`` of the recipe as described in the previous section::
 
    $ bitbake basename
 
@@ -1289,8 +1254,7 @@ compilation and packaging files, and so forth.
 
 The path to the per-recipe temporary work directory depends on the
 context in which it is being built. The quickest way to find this path
-is to have BitBake return it by running the following:
-::
+is to have BitBake return it by running the following::
 
    $ bitbake -e basename | grep ^WORKDIR=
 
@@ -1299,8 +1263,7 @@ top-level folder named ``poky``, a default Build Directory at
 ``poky/build``, and a ``qemux86-poky-linux`` machine target system.
 Furthermore, suppose your recipe is named ``foo_1.3.0.bb``. In this
 case, the work directory the build system uses to build the package
-would be as follows:
-::
+would be as follows::
 
    poky/build/tmp/work/qemux86-poky-linux/foo/1.3.0-r0
 
@@ -1352,8 +1315,7 @@ recipe to match the new version.
 Here is a simple example from the
 ``meta/recipes-devtools/strace/strace_5.5.bb`` recipe where the source
 comes from a single tarball. Notice the use of the
-:term:`PV` variable:
-::
+:term:`PV` variable::
 
    SRC_URI = "https://strace.io/files/${PV}/strace-${PV}.tar.xz \
 
@@ -1369,8 +1331,7 @@ you must specify :term:`SRCREV` and
 you should specify :term:`PV` to include
 the revision with :term:`SRCPV`. Here
 is an example from the recipe
-``meta/recipes-kernel/blktrace/blktrace_git.bb``:
-::
+``meta/recipes-kernel/blktrace/blktrace_git.bb``::
 
    SRCREV = "d6918c8832793b4205ed3bfede78c2f915c23385"
 
@@ -1392,8 +1353,7 @@ SCM URLs), you need to provide the ``md5`` and ``sha256`` checksums for
 each URL. For these cases, you provide a name for each URL as part of
 the ``SRC_URI`` and then reference that name in the subsequent checksum
 statements. Here is an example combining lines from the files
-``git.inc`` and ``git_2.24.1.bb``:
-::
+``git.inc`` and ``git_2.24.1.bb``::
 
    SRC_URI = "${KERNELORG_MIRROR}/software/scm/git/git-${PV}.tar.gz;name=tarball \
               ${KERNELORG_MIRROR}/software/scm/git/git-manpages-${PV}.tar.gz;name=manpages"
@@ -1512,8 +1472,7 @@ variables:
    include ``COPYING``, ``LICENSE``, and ``README`` files. You could
    also find the information near the top of a source file. For example,
    given a piece of software licensed under the GNU General Public
-   License version 2, you would set ``LICENSE`` as follows:
-   ::
+   License version 2, you would set ``LICENSE`` as follows::
 
       LICENSE = "GPLv2"
 
@@ -1543,8 +1502,7 @@ variables:
    See the ":ref:`dev-manual/common-tasks:fetching code`" section for
    additional information.
 
-   Here is an example that assumes the software has a ``COPYING`` file:
-   ::
+   Here is an example that assumes the software has a ``COPYING`` file::
 
       LIC_FILES_CHKSUM = "file://COPYING;md5=xxx"
 
@@ -1747,8 +1705,7 @@ standard mainline kernel, not your own custom one.
 When you use custom kernel headers you need to get them from
 :term:`STAGING_KERNEL_DIR`,
 which is the directory with kernel headers that are required to build
-out-of-tree modules. Your recipe will also need the following:
-::
+out-of-tree modules. Your recipe will also need the following::
 
    do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
@@ -1779,8 +1736,7 @@ Here are some common issues that cause failures.
 
    To fix the problem, you need to either satisfy the missing dependency
    in the Makefile or whatever script produced the Makefile, or (as a
-   workaround) set :term:`PARALLEL_MAKE` to an empty string:
-   ::
+   workaround) set :term:`PARALLEL_MAKE` to an empty string::
 
       PARALLEL_MAKE = ""
 
@@ -1889,8 +1845,7 @@ installed correctly.
       missing dependencies between targets that can result in race
       conditions. If you experience intermittent failures during
       ``do_install``, you might be able to work around them by disabling
-      parallel Makefile installs by adding the following to the recipe:
-      ::
+      parallel Makefile installs by adding the following to the recipe::
 
          PARALLEL_MAKEINST = ""
 
@@ -2006,8 +1961,7 @@ take. The following list describes the process:
    :term:`MACHINE` value is passed
    into the configure script or a patch is applied only for a particular
    machine), you should mark them as such by adding the following to the
-   recipe:
-   ::
+   recipe::
 
       PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -2016,8 +1970,7 @@ take. The following list describes the process:
    all (e.g. recipes that simply package script files or configuration
    files), you should use the
    :ref:`allarch <ref-classes-allarch>` class to
-   do this for you by adding this to your recipe:
-   ::
+   do this for you by adding this to your recipe::
 
       inherit allarch
 
@@ -2061,8 +2014,7 @@ used by the :ref:`ref-tasks-populate_sysroot` task as defined by the the
 :term:`SYSROOT_DIRS` variable to automatically populate the sysroot. It
 is possible to modify the list of directories that populate the sysroot.
 The following example shows how you could add the ``/opt`` directory to
-the list of directories within a recipe:
-::
+the list of directories within a recipe::
 
    SYSROOT_DIRS += "/opt"
 
@@ -2091,8 +2043,7 @@ kernel recipe. Suppose you have three kernel recipes whose
 in some way uses a :term:`PROVIDES`
 statement that essentially identifies itself as being able to provide
 ``virtual/kernel``. Here is one way through the
-:ref:`kernel <ref-classes-kernel>` class:
-::
+:ref:`kernel <ref-classes-kernel>` class::
 
    PROVIDES += "${@ "virtual/kernel" if (d.getVar("KERNEL_PACKAGE_NAME") == "kernel") else "" }"
 
@@ -2107,8 +2058,7 @@ an example, consider the :yocto_git:`x86-base.inc
 </poky/tree/meta/conf/machine/include/x86-base.inc>` include file, which is a
 machine (i.e. :term:`MACHINE`) configuration file. This include file is the
 reason all x86-based machines use the ``linux-yocto`` kernel. Here are the
-relevant lines from the include file:
-::
+relevant lines from the include file::
 
    PREFERRED_PROVIDER_virtual/kernel ??= "linux-yocto"
    PREFERRED_VERSION_linux-yocto ??= "4.15%"
@@ -2116,8 +2066,7 @@ relevant lines from the include file:
 When you use a virtual provider, you do not have to "hard code" a recipe
 name as a build dependency. You can use the
 :term:`DEPENDS` variable to state the
-build is dependent on ``virtual/kernel`` for example:
-::
+build is dependent on ``virtual/kernel`` for example::
 
    DEPENDS = "virtual/kernel"
 
@@ -2125,8 +2074,7 @@ During the build, the OpenEmbedded build system picks
 the correct recipe needed for the ``virtual/kernel`` dependency based on
 the ``PREFERRED_PROVIDER`` variable. If you want to use the small kernel
 mentioned at the beginning of this section, configure your build as
-follows:
-::
+follows::
 
    PREFERRED_PROVIDER_virtual/kernel ??= "kernel-small"
 
@@ -2178,8 +2126,7 @@ In order to ensure the versions compare properly, the recommended
 convention is to set :term:`PV` within the
 recipe to "previous_version+current_version". You can use an additional
 variable so that you can use the current version elsewhere. Here is an
-example:
-::
+example::
 
    REALPV = "0.8.16-rc1"
    PV = "0.8.15+${REALPV}"
@@ -2198,8 +2145,7 @@ required, specify
 ``${``\ :term:`PN`\ ``}`` in place of
 PACKAGENAME.
 
-A post-installation function has the following structure:
-::
+A post-installation function has the following structure::
 
    pkg_postinst_PACKAGENAME() {
        # Commands to carry out
@@ -2352,13 +2298,11 @@ Otherwise, BitBake runs an empty ``do_install`` task by default.
 Some applications might require extra parameters to be passed to the
 compiler. For example, the application might need an additional header
 path. You can accomplish this by adding to the ``CFLAGS`` variable. The
-following example shows this:
-::
+following example shows this::
 
    CFLAGS_prepend = "-I ${S}/include "
 
-In the following example, ``mtd-utils`` is a makefile-based package:
-::
+In the following example, ``mtd-utils`` is a makefile-based package::
 
    SUMMARY = "Tools for managing memory technology devices"
    SECTION = "base"
@@ -2403,8 +2347,7 @@ application into multiple packages.
 Following is an example that uses the ``libxpm`` recipe. By default,
 this recipe generates a single package that contains the library along
 with a few binaries. You can modify the recipe to split the binaries
-into separate packages:
-::
+into separate packages::
 
    require xorg-lib-common.inc
 
@@ -2498,8 +2441,7 @@ doing the following:
    that replaces ``do_configure`` and ``do_compile`` with custom
    versions, then you can use the
    ``[``\ :ref:`noexec <bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ``]``
-   flag to turn the tasks into no-ops, as follows:
-   ::
+   flag to turn the tasks into no-ops, as follows::
 
       do_configure[noexec] = "1"
       do_compile[noexec] = "1"
@@ -2558,8 +2500,7 @@ chapter of the BitBake User Manual.
    supported.
 
    The following example shows some of the ways you can use variables in
-   recipes:
-   ::
+   recipes::
 
       S = "${WORKDIR}/postfix-${PV}"
       CFLAGS += "-DNO_ASM"
@@ -2572,8 +2513,7 @@ chapter of the BitBake User Manual.
    syntax, although access to OpenEmbedded variables and internal
    methods are also available.
 
-   The following is an example function from the ``sed`` recipe:
-   ::
+   The following is an example function from the ``sed`` recipe::
 
       do_install () {
           autotools_do_install
@@ -2594,16 +2534,14 @@ chapter of the BitBake User Manual.
    from other files (``include`` and ``require``) and export variables
    to the environment (``export``).
 
-   The following example shows the use of some of these keywords:
-   ::
+   The following example shows the use of some of these keywords::
 
       export POSTCONF = "${STAGING_BINDIR}/postconf"
       inherit autoconf
       require otherfile.inc
 
 -  *Comments (#):* Any lines that begin with the hash character (``#``)
-   are treated as comment lines and are ignored:
-   ::
+   are treated as comment lines and are ignored::
 
       # This is a comment
 
@@ -2615,8 +2553,7 @@ in the BitBake User Manual.
 
 -  *Line Continuation (\\):* Use the backward slash (``\``) character to
    split a statement over multiple lines. Place the slash character at
-   the end of the line that is to be continued on the next line:
-   ::
+   the end of the line that is to be continued on the next line::
 
        VAR = "A really long \
               line"
@@ -2627,8 +2564,7 @@ in the BitBake User Manual.
       slash character.
 
 -  *Using Variables (${VARNAME}):* Use the ``${VARNAME}`` syntax to
-   access the contents of a variable:
-   ::
+   access the contents of a variable::
 
       SRC_URI = "${SOURCEFORGE_MIRROR}/libpng/zlib-${PV}.tar.gz"
 
@@ -2648,8 +2584,7 @@ in the BitBake User Manual.
       when you make the assignment, but this is not generally needed.
 
 -  *Quote All Assignments ("value"):* Use double quotes around values in
-   all variable assignments (e.g. ``"value"``). Following is an example:
-   ::
+   all variable assignments (e.g. ``"value"``). Following is an example::
 
       VAR1 = "${OTHERVAR}"
       VAR2 = "The version is ${PV}"
@@ -2663,13 +2598,11 @@ in the BitBake User Manual.
 
    Here is an example where ``VAR1`` is set to "New value" if it is
    currently empty. However, if ``VAR1`` has already been set, it
-   remains unchanged:
-   ::
+   remains unchanged::
 
       VAR1 ?= "New value"
 
-   In this next example, ``VAR1`` is left with the value "Original value":
-   ::
+   In this next example, ``VAR1`` is left with the value "Original value"::
 
       VAR1 = "Original value"
       VAR1 ?= "New value"
@@ -2682,8 +2615,7 @@ in the BitBake User Manual.
       This operator adds a space between the existing content of the
       variable and the new content.
 
-   Here is an example:
-   ::
+   Here is an example::
 
       SRC_URI += "file://fix-makefile.patch"
 
@@ -2695,8 +2627,7 @@ in the BitBake User Manual.
       This operator adds a space between the new content and the
       existing content of the variable.
 
-   Here is an example:
-   ::
+   Here is an example::
 
       VAR =+ "Starts"
 
@@ -2708,15 +2639,13 @@ in the BitBake User Manual.
 
    The following example shows the space being explicitly added to the
    start to ensure the appended value is not merged with the existing
-   value:
-   ::
+   value::
 
       SRC_URI_append = " file://fix-makefile.patch"
 
    You can also use
    the ``_append`` operator with overrides, which results in the actions
-   only being performed for the specified target or machine:
-   ::
+   only being performed for the specified target or machine::
 
       SRC_URI_append_sh4 = " file://fix-makefile.patch"
 
@@ -2728,15 +2657,13 @@ in the BitBake User Manual.
 
    The following example shows the space being explicitly added to the
    end to ensure the prepended value is not merged with the existing
-   value:
-   ::
+   value::
 
       CFLAGS_prepend = "-I${S}/myincludes "
 
    You can also use the
    ``_prepend`` operator with overrides, which results in the actions
-   only being performed for the specified target or machine:
-   ::
+   only being performed for the specified target or machine::
 
       CFLAGS_prepend_sh4 = "-I${S}/myincludes "
 
@@ -2746,8 +2673,7 @@ in the BitBake User Manual.
    value to "standard/base" for any target
    :term:`MACHINE`, except for
    qemuarm where it should be set to "standard/arm-versatile-926ejs",
-   you would do the following:
-   ::
+   you would do the following::
 
       KBRANCH = "standard/base"
       KBRANCH_qemuarm = "standard/arm-versatile-926ejs"
@@ -2770,8 +2696,7 @@ in the BitBake User Manual.
    search and replacement on a variable).
 
    You indicate Python code using the ``${@python_code}`` syntax for the
-   variable assignment:
-   ::
+   variable assignment::
 
       SRC_URI = "ftp://ftp.info-zip.org/pub/infozip/src/zip${@d.getVar('PV',1).replace('.', '')}.tgz
 
@@ -2861,8 +2786,7 @@ of adding a suitable ``defconfig`` file. The file needs to be added into
 a location similar to ``defconfig`` files used for other machines in a
 given kernel recipe. A possible way to do this is by listing the file in
 the ``SRC_URI`` and adding the machine to the expression in
-``COMPATIBLE_MACHINE``:
-::
+``COMPATIBLE_MACHINE``::
 
    COMPATIBLE_MACHINE = '(qemux86|qemumips)'
 
@@ -2889,8 +2813,7 @@ contains directories for specific machines such as ``qemuarm`` and
 defaults, see the ``meta/recipes-bsp/formfactor/files/config`` file
 found in the same area.
 
-Following is an example for "qemuarm" machine:
-::
+Following is an example for "qemuarm" machine::
 
    HAVE_TOUCHSCREEN=1
    HAVE_KEYBOARD=1
@@ -2961,22 +2884,19 @@ The following steps describe how to set up the AUH utility:
 2. *Make Sure Git is Configured:* The AUH utility requires Git to be
    configured because AUH uses Git to save upgrades. Thus, you must have
    Git user and email configured. The following command shows your
-   configurations:
-   ::
+   configurations::
 
       $ git config --list
 
    If you do not have the user and
-   email configured, you can use the following commands to do so:
-   ::
+   email configured, you can use the following commands to do so::
 
       $ git config --global user.name some_name
       $ git config --global user.email username@domain.com
 
 3. *Clone the AUH Repository:* To use AUH, you must clone the repository
    onto your development host. The following command uses Git to create
-   a local copy of the repository on your system:
-   ::
+   a local copy of the repository on your system::
 
       $ git clone  git://git.yoctoproject.org/auto-upgrade-helper
       Cloning into 'auto-upgrade-helper'... remote: Counting objects: 768, done.
@@ -2992,8 +2912,7 @@ The following steps describe how to set up the AUH utility:
 4. *Create a Dedicated Build Directory:* Run the
    :ref:`structure-core-script`
    script to create a fresh build directory that you use exclusively for
-   running the AUH utility:
-   ::
+   running the AUH utility::
 
       $ cd poky
       $ source oe-init-build-env your_AUH_build_directory
@@ -3010,8 +2929,7 @@ The following steps describe how to set up the AUH utility:
    -  If you want to enable :ref:`Build
       History <dev-manual/common-tasks:maintaining build output quality>`,
       which is optional, you need the following lines in the
-      ``conf/local.conf`` file:
-      ::
+      ``conf/local.conf`` file::
 
          INHERIT =+ "buildhistory"
          BUILDHISTORY_COMMIT = "1"
@@ -3024,23 +2942,20 @@ The following steps describe how to set up the AUH utility:
    -  If you want to enable testing through the
       :ref:`testimage <ref-classes-testimage*>`
       class, which is optional, you need to have the following set in
-      your ``conf/local.conf`` file:
-      ::
+      your ``conf/local.conf`` file::
 
          INHERIT += "testimage"
 
       .. note::
 
          If your distro does not enable by default ptest, which Poky
-         does, you need the following in your ``local.conf`` file:
-         ::
+         does, you need the following in your ``local.conf`` file::
 
                  DISTRO_FEATURES_append = " ptest"
 
 
 6. *Optionally Start a vncserver:* If you are running in a server
-   without an X11 session, you need to start a vncserver:
-   ::
+   without an X11 session, you need to start a vncserver::
 
       $ vncserver :1
       $ export DISPLAY=:1
@@ -3064,45 +2979,38 @@ The following steps describe how to set up the AUH utility:
 This next set of examples describes how to use the AUH:
 
 -  *Upgrading a Specific Recipe:* To upgrade a specific recipe, use the
-   following form:
-   ::
+   following form::
 
       $ upgrade-helper.py recipe_name
 
-   For example, this command upgrades the ``xmodmap`` recipe:
-   ::
+   For example, this command upgrades the ``xmodmap`` recipe::
 
       $ upgrade-helper.py xmodmap
 
 -  *Upgrading a Specific Recipe to a Particular Version:* To upgrade a
-   specific recipe to a particular version, use the following form:
-   ::
+   specific recipe to a particular version, use the following form::
 
       $ upgrade-helper.py recipe_name -t version
 
-   For example, this command upgrades the ``xmodmap`` recipe to version 1.2.3:
-   ::
+   For example, this command upgrades the ``xmodmap`` recipe to version 1.2.3::
 
       $ upgrade-helper.py xmodmap -t 1.2.3
 
 -  *Upgrading all Recipes to the Latest Versions and Suppressing Email
    Notifications:* To upgrade all recipes to their most recent versions
-   and suppress the email notifications, use the following command:
-   ::
+   and suppress the email notifications, use the following command::
 
       $ upgrade-helper.py all
 
 -  *Upgrading all Recipes to the Latest Versions and Send Email
    Notifications:* To upgrade all recipes to their most recent versions
    and send email messages to maintainers for each attempted recipe as
-   well as a status email, use the following command:
-   ::
+   well as a status email, use the following command::
 
       $ upgrade-helper.py -e all
 
 Once you have run the AUH utility, you can find the results in the AUH
-build directory:
-::
+build directory::
 
    ${BUILDDIR}/upgrade-helper/timestamp
 
@@ -3127,15 +3035,13 @@ section in the Yocto Project Application Development and the Extensible
 Software Development Kit (eSDK) Manual.
 
 To see all the command-line options available with ``devtool upgrade``,
-use the following help command:
-::
+use the following help command::
 
    $ devtool upgrade -h
 
 If you want to find out what version a recipe is currently at upstream
 without any attempt to upgrade your local version of the recipe, you can
-use the following command:
-::
+use the following command::
 
    $ devtool latest-version recipe_name
 
@@ -3161,15 +3067,13 @@ could add it easily using the
 ":ref:`bitbake-layers <bsp-guide/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script>`"
 script. For example, suppose you use the ``nano.bb`` recipe from the
 ``meta-oe`` layer in the ``meta-openembedded`` repository. For this
-example, assume that the layer has been cloned into following area:
-::
+example, assume that the layer has been cloned into following area::
 
    /home/scottrif/meta-openembedded
 
 The following command from your
 :term:`Build Directory` adds the layer to
-your build configuration (i.e. ``${BUILDDIR}/conf/bblayers.conf``):
-::
+your build configuration (i.e. ``${BUILDDIR}/conf/bblayers.conf``)::
 
    $ bitbake-layers add-layer /home/scottrif/meta-openembedded/meta-oe
    NOTE: Starting bitbake server...
@@ -3210,8 +3114,7 @@ directory automatically upgrades the recipe for you:
    NOTE: New recipe is /home/scottrif/poky/build/workspace/recipes/nano/nano_2.9.3.bb
 
 Continuing with this example, you can use ``devtool build`` to build the
-newly upgraded recipe:
-::
+newly upgraded recipe::
 
    $ devtool build nano
    NOTE: Starting bitbake server...
@@ -3236,8 +3139,7 @@ and submit commits for the changes generated by the upgrade process.
 
 Once the tree is clean, you can clean things up in this example with the
 following command from the ``${BUILDDIR}/workspace/sources/nano``
-directory:
-::
+directory::
 
    $ devtool finish nano meta-oe
    NOTE: Starting bitbake server...
@@ -3341,8 +3243,7 @@ build packages is available in the Build Directory as defined by the
 :term:`S` variable. Below is the default
 value for the ``S`` variable as defined in the
 ``meta/conf/bitbake.conf`` configuration file in the
-:term:`Source Directory`:
-::
+:term:`Source Directory`::
 
    S = "${WORKDIR}/${BP}"
 
@@ -3353,16 +3254,14 @@ usually set ``S`` to ``${WORKDIR}/git``.
 .. note::
 
    The :term:`BP` represents the base recipe name, which consists of the name
-   and version:
-   ::
+   and version::
 
            BP = "${BPN}-${PV}"
 
 
 The path to the work directory for the recipe
 (:term:`WORKDIR`) is defined as
-follows:
-::
+follows::
 
    ${TMPDIR}/work/${MULTIMACH_TARGET_SYS}/${PN}/${EXTENDPE}${PV}-${PR}
 
@@ -3388,8 +3287,7 @@ As an example, assume a Source Directory top-level folder named
 ``poky``, a default Build Directory at ``poky/build``, and a
 ``qemux86-poky-linux`` machine target system. Furthermore, suppose your
 recipe is named ``foo_1.3.0.bb``. In this case, the work directory the
-build system uses to build the package would be as follows:
-::
+build system uses to build the package would be as follows::
 
    poky/build/tmp/work/qemux86-poky-linux/foo/1.3.0-r0
 
@@ -3426,15 +3324,13 @@ Follow these general steps:
 
 3. *Create a New Patch:* Before modifying source code, you need to
    create a new patch. To create a new patch file, use ``quilt new`` as
-   below:
-   ::
+   below::
 
       $ quilt new my_changes.patch
 
 4. *Notify Quilt and Add Files:* After creating the patch, you need to
    notify Quilt about the files you plan to edit. You notify Quilt by
-   adding the files to the patch you just created:
-   ::
+   adding the files to the patch you just created::
 
       $ quilt add file1.c file2.c file3.c
 
@@ -3443,8 +3339,7 @@ Follow these general steps:
 
 6. *Test Your Changes:* Once you have modified the source code, the
    easiest way to test your changes is by calling the ``do_compile``
-   task as shown in the following example:
-   ::
+   task as shown in the following example::
 
       $ bitbake -c compile -f package
 
@@ -3481,8 +3376,7 @@ Follow these general steps:
    that holds the recipe (``.bb``) file or the append (``.bbappend``)
    file. Placing the patch here guarantees that the OpenEmbedded build
    system will find the patch. Next, add the patch into the ``SRC_URI``
-   of the recipe. Here is an example:
-   ::
+   of the recipe. Here is an example::
 
       SRC_URI += "file://my_changes.patch"
 
@@ -3503,8 +3397,7 @@ this way can be helpful when debugging a build or preparing software to
 be used with the OpenEmbedded build system.
 
 Following is an example that uses ``devshell`` on a target named
-``matchbox-desktop``:
-::
+``matchbox-desktop``::
 
   $ bitbake matchbox-desktop -c devshell
 
@@ -3533,8 +3426,7 @@ corresponding ``run.*`` script in the
 directory (e.g., ``run.do_configure.``\ `pid`). If a task's script does
 not exist, which would be the case if the task was skipped by way of the
 sstate cache, you can create the task by first running it outside of the
-``devshell``:
-::
+``devshell``::
 
    $ bitbake -c task
 
@@ -3581,8 +3473,7 @@ specified target. Then a new terminal is opened. Additionally, key
 Python objects and code are available in the same way they are to
 BitBake tasks, in particular, the data store 'd'. So, commands such as
 the following are useful when exploring the data store and running
-functions:
-::
+functions::
 
    pydevshell> d.getVar("STAGING_DIR")
    '/media/build1/poky/build/tmp/sysroots'
@@ -3602,8 +3493,7 @@ helpful when debugging a build or preparing software to be used with the
 OpenEmbedded build system.
 
 Following is an example that uses ``devpyshell`` on a target named
-``matchbox-desktop``:
-::
+``matchbox-desktop``::
 
    $ bitbake matchbox-desktop -c devpyshell
 
@@ -3664,8 +3554,7 @@ The following figure and list overviews the build process:
 
 2. *Initialize the Build Environment:* Initialize the build environment
    by sourcing the build environment script (i.e.
-   :ref:`structure-core-script`):
-   ::
+   :ref:`structure-core-script`)::
 
       $ source oe-init-build-env [build_dir]
 
@@ -3690,8 +3579,7 @@ The following figure and list overviews the build process:
    and a centralized tarball download directory through the
    :term:`DL_DIR` variable.
 
-4. *Build the Image:* Build the image using the ``bitbake`` command:
-   ::
+4. *Build the Image:* Build the image using the ``bitbake`` command::
 
       $ bitbake target
 
@@ -3710,8 +3598,7 @@ The following figure and list overviews the build process:
    Project Reference Manual.
 
    As an example, the following command builds the
-   ``core-image-minimal`` image:
-   ::
+   ``core-image-minimal`` image::
 
       $ bitbake core-image-minimal
 
@@ -3763,8 +3650,7 @@ Follow these steps to set up and execute multiple configuration builds:
 
    Here is an example showing the minimal statements needed in a
    configuration file for a "qemux86" target whose temporary build
-   directory is ``tmpmultix86``:
-   ::
+   directory is ``tmpmultix86``::
 
       MACHINE = "qemux86"
       TMPDIR = "${TOPDIR}/tmpmultix86"
@@ -3789,8 +3675,7 @@ Follow these steps to set up and execute multiple configuration builds:
    variable in your ``conf/local.conf`` configuration file to specify
    each multiconfig. Continuing with the example from the previous
    figure, the ``BBMULTICONFIG`` variable needs to enable two
-   multiconfigs: "x86" and "arm" by specifying each configuration file:
-   ::
+   multiconfigs: "x86" and "arm" by specifying each configuration file::
 
       BBMULTICONFIG = "x86 arm"
 
@@ -3804,13 +3689,11 @@ Follow these steps to set up and execute multiple configuration builds:
       with "".
 
 -  *Launch BitBake*: Use the following BitBake command form to launch
-   the multiple configuration build:
-   ::
+   the multiple configuration build::
 
       $ bitbake [mc:multiconfigname:]target [[[mc:multiconfigname:]target] ... ]
 
-   For the example in this section, the following command applies:
-   ::
+   For the example in this section, the following command applies::
 
       $ bitbake mc:x86:core-image-minimal mc:arm:core-image-sato mc::core-image-base
 
@@ -3844,15 +3727,13 @@ essentially that the
 
 To enable dependencies in a multiple configuration build, you must
 declare the dependencies in the recipe using the following statement
-form:
-::
+form::
 
    task_or_package[mcdepends] = "mc:from_multiconfig:to_multiconfig:recipe_name:task_on_which_to_depend"
 
 To better show how to use this statement, consider the example scenario
 from the first paragraph of this section. The following statement needs
-to be added to the recipe that builds the ``core-image-sato`` image:
-::
+to be added to the recipe that builds the ``core-image-sato`` image::
 
    do_image[mcdepends] = "mc:x86:arm:core-image-minimal:do_rootfs"
 
@@ -3862,8 +3743,7 @@ task on which the ``do_image`` task in the recipe depends is the
 with the "arm" multiconfig.
 
 Once you set up this dependency, you can build the "x86" multiconfig
-using a BitBake command as follows:
-::
+using a BitBake command as follows::
 
    $ bitbake mc:x86:core-image-sato
 
@@ -3874,8 +3754,7 @@ dependency, BitBake also executes through the ``do_rootfs`` task for the
 
 Having a recipe depend on the root filesystem of another build might not
 seem that useful. Consider this change to the statement in the
-``core-image-sato`` recipe:
-::
+``core-image-sato`` recipe::
 
    do_image[mcdepends] = "mc:x86:arm:core-image-minimal:do_image"
 
@@ -4091,8 +3970,7 @@ happens, which changes the way you build them. You can also modify the
 filesystem itself or select a different filesystem.
 
 First, find out what is hogging your root filesystem by running the
-``dirsize.py`` script from your root directory:
-::
+``dirsize.py`` script from your root directory::
 
    $ cd root-directory-of-image
    $ dirsize.py 100000 > dirsize-100k.log
@@ -4107,8 +3985,7 @@ the root filesystem that take up large amounts of memory.
 
 You need to be sure that what you eliminate does not cripple the
 functionality you need. One way to see how packages relate to each other
-is by using the Dependency Explorer UI with the BitBake command:
-::
+is by using the Dependency Explorer UI with the BitBake command::
 
    $ cd image-directory
    $ bitbake -u taskexp -g image
@@ -4124,8 +4001,7 @@ instead of ``udev``.
 
 Use your ``local.conf`` file to make changes. For example, to eliminate
 ``udev`` and ``glib``, set the following in the local configuration
-file:
-::
+file::
 
    VIRTUAL-RUNTIME_dev_manager = ""
 
@@ -4153,8 +4029,7 @@ building? Which drivers do you build by default?
    You can modify the kernel source if you want to help with boot time.
 
 Run the ``ksize.py`` script from the top-level Linux build directory to
-get an idea of what is making up the kernel:
-::
+get an idea of what is making up the kernel::
 
    $ cd top-level-linux-build-directory
    $ ksize.py > ksize.log
@@ -4168,8 +4043,7 @@ in a compressed kernel image. Look to reduce the areas that are large
 and taking up around the "90% rule."
 
 To examine, or drill down, into any particular area, use the ``-d``
-option with the script:
-::
+option with the script::
 
    $ ksize.py -d > ksize.log
 
@@ -4316,8 +4190,7 @@ your tunings to best consider build times and package feed maintenance.
    machine-architecture dependent, make sure your recipe enables the
    "machine" package architecture through the
    :term:`MACHINE_ARCH`
-   variable:
-   ::
+   variable::
 
       PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -4325,8 +4198,7 @@ your tunings to best consider build times and package feed maintenance.
    specifically enable a package architecture through the
    :term:`PACKAGE_ARCH`, The
    OpenEmbedded build system defaults to the
-   :term:`TUNE_PKGARCH` setting:
-   ::
+   :term:`TUNE_PKGARCH` setting::
 
       PACKAGE_ARCH = "${TUNE_PKGARCH}"
 
@@ -4426,15 +4298,13 @@ to do is inherit the
 and then set the
 :term:`EXTERNALSRC` variable to
 point to your external source code. Here are the statements to put in
-your ``local.conf`` file:
-::
+your ``local.conf`` file::
 
    INHERIT += "externalsrc"
    EXTERNALSRC_pn-myrecipe = "path-to-your-source-tree"
 
 This next example shows how to accomplish the same thing by setting
-``EXTERNALSRC`` in the recipe itself or in the recipe's append file:
-::
+``EXTERNALSRC`` in the recipe itself or in the recipe's append file::
 
    EXTERNALSRC = "path"
    EXTERNALSRC_BUILD = "path"
@@ -4451,8 +4321,7 @@ directory separate from the external source directory as specified by
 to have the source built in the same directory in which it resides, or
 some other nominated directory, you can set
 :term:`EXTERNALSRC_BUILD`
-to point to that directory:
-::
+to point to that directory::
 
    EXTERNALSRC_BUILD_pn-myrecipe = "path-to-your-source-tree"
 
@@ -4475,8 +4344,7 @@ Follow these steps to populate your Downloads directory:
    an empty location or one that does not yet exist.
 
 2. *Generate Tarballs of the Source Git Repositories:* Edit your
-   ``local.conf`` configuration file as follows:
-   ::
+   ``local.conf`` configuration file as follows::
 
       DL_DIR = "/home/your-download-dir/"
       BB_GENERATE_MIRROR_TARBALLS = "1"
@@ -4489,8 +4357,7 @@ Follow these steps to populate your Downloads directory:
    variable for more information.
 
 3. *Populate Your Downloads Directory Without Building:* Use BitBake to
-   fetch your sources but inhibit the build:
-   ::
+   fetch your sources but inhibit the build::
 
       $ bitbake target --runonly=fetch
 
@@ -4536,8 +4403,7 @@ directory:
    ``${``\ :term:`TMPDIR`\ ``}``
    directory or using a new :term:`Build Directory`.
 
-3. *Build Your Target:* Use BitBake to build your target:
-   ::
+3. *Build Your Target:* Use BitBake to build your target::
 
       $ bitbake target
 
@@ -4550,8 +4416,7 @@ directory:
       The offline build does not work if recipes attempt to find the
       latest version of software by setting
       :term:`SRCREV` to
-      ``${``\ :term:`AUTOREV`\ ``}``:
-      ::
+      ``${``\ :term:`AUTOREV`\ ``}``::
 
          SRCREV = "${AUTOREV}"
 
@@ -4670,8 +4535,7 @@ that can help you speed up the build:
 -  Disable static library generation for recipes derived from
    ``autoconf`` or ``libtool``: Following is an example showing how to
    disable static libraries and still provide an override to handle
-   exceptions:
-   ::
+   exceptions::
 
       STATICLIBCONF = "--disable-static"
       STATICLIBCONF_sqlite3-native = ""
@@ -4726,8 +4590,7 @@ library files.
    static library files through ``${PN}-dev``.
 
 Following is part of the BitBake configuration file, where you can see
-how the static library files are defined:
-::
+how the static library files are defined::
 
    PACKAGE_BEFORE_PN ?= ""
    PACKAGES = "${PN}-dbg ${PN}-staticdev ${PN}-dev ${PN}-doc ${PN}-locale ${PACKAGE_BEFORE_PN} ${PN}"
@@ -4833,8 +4696,7 @@ After you have set up the recipes, you need to define the actual
 combination of multiple libraries you want to build. You accomplish this
 through your ``local.conf`` configuration file in the
 :term:`Build Directory`. An example
-configuration would be as follows:
-::
+configuration would be as follows::
 
    MACHINE = "qemux86-64"
    require conf/multilib.conf
@@ -4850,14 +4712,12 @@ on this particular tuning, see
 
 The example then includes ``lib32-glib-2.0`` in all the images, which
 illustrates one method of including a multiple library dependency. You
-can use a normal image build to include this dependency, for example:
-::
+can use a normal image build to include this dependency, for example::
 
    $ bitbake core-image-sato
 
 You can also build Multilib packages
-specifically with a command like this:
-::
+specifically with a command like this::
 
    $ bitbake lib32-glib-2.0
 
@@ -4952,8 +4812,7 @@ you have other recipes that depend on a given library, you need to use
 the :term:`DEPENDS` variable to
 create the dependency. Continuing with the same example, if you want to
 have a recipe depend on the 1.8 version of the ``clutter`` library, use
-the following in your recipe:
-::
+the following in your recipe::
 
    DEPENDS = "clutter-1.8"
 
@@ -4996,8 +4855,7 @@ follows:
 -  Support for large images exists.
 
 To use the x32 psABI, you need to edit your ``conf/local.conf``
-configuration file as follows:
-::
+configuration file as follows::
 
    MACHINE = "qemux86-64"
    DEFAULTTUNE = "x86-64-x32"
@@ -5006,8 +4864,7 @@ configuration file as follows:
 
 Once you have set
 up your configuration file, use BitBake to build an image that supports
-the x32 psABI. Here is an example:
-::
+the x32 psABI. Here is an example::
 
    $ bitbake core-image-sato
 
@@ -5066,8 +4923,7 @@ library package involves the following:
 3. Try to build the recipe. If you encounter build errors that look like
    something is unable to find ``.so`` libraries, check where these
    libraries are located in the source tree and add the following to the
-   recipe:
-   ::
+   recipe::
 
       GIR_EXTRA_LIBS_PATH = "${B}/something/.libs"
 
@@ -5097,8 +4953,7 @@ perhaps QEMU does not work on your build host and target architecture
 combination. If so, you can use either of the following methods to
 disable GIR file generations:
 
--  Add the following to your distro configuration:
-   ::
+-  Add the following to your distro configuration::
 
       DISTRO_FEATURES_BACKFILL_CONSIDERED = "gobject-introspection-data"
 
@@ -5106,8 +4961,7 @@ disable GIR file generations:
    QEMU but will still enable building introspection tools and libraries
    (i.e. building them does not require the use of QEMU).
 
--  Add the following to your machine configuration:
-   ::
+-  Add the following to your machine configuration::
 
       MACHINE_FEATURES_BACKFILL_CONSIDERED = "qemu-usermode"
 
@@ -5140,8 +4994,7 @@ working in an image:
 
 3. Launch a Terminal and then start Python in the terminal.
 
-4. Enter the following in the terminal:
-   ::
+4. Enter the following in the terminal::
 
       >>> from gi.repository import GLib
       >>> GLib.get_host_name()
@@ -5289,8 +5142,7 @@ system needs to meet the following requirements:
    form generated by the OpenEmbedded build system.
 
 -  You must build several native tools, which are built to run on the
-   build system:
-   ::
+   build system::
 
       $ bitbake parted-native dosfstools-native mtools-native
 
@@ -5306,8 +5158,7 @@ Getting Help
 
 You can get general help for the ``wic`` command by entering the ``wic``
 command by itself or by entering the command with a help argument as
-follows:
-::
+follows::
 
    $ wic -h
    $ wic --help
@@ -5315,32 +5166,27 @@ follows:
 
 Currently, Wic supports seven commands: ``cp``, ``create``, ``help``,
 ``list``, ``ls``, ``rm``, and ``write``. You can get help for all these
-commands except "help" by using the following form:
-::
+commands except "help" by using the following form::
 
    $ wic help command
 
 For example, the following command returns help for the ``write``
-command:
-::
+command::
 
    $ wic help write
 
 Wic supports help for three topics: ``overview``, ``plugins``, and
-``kickstart``. You can get help for any topic using the following form:
-::
+``kickstart``. You can get help for any topic using the following form::
 
    $ wic help topic
 
-For example, the following returns overview help for Wic:
-::
+For example, the following returns overview help for Wic::
 
    $ wic help overview
 
 One additional level of help exists for Wic. You can get help on
 individual images through the ``list`` command. You can use the ``list``
-command to return the available Wic images as follows:
-::
+command to return the available Wic images as follows::
 
    $ wic list images
      genericx86                    		Create an EFI disk image for genericx86*
@@ -5359,8 +5205,7 @@ command to return the available Wic images as follows:
 Once you know the list of available
 Wic images, you can use ``help`` with the command to get help on a
 particular image. For example, the following command returns help on the
-"beaglebone-yocto" image:
-::
+"beaglebone-yocto" image::
 
    $ wic list beaglebone-yocto help
 
@@ -5397,8 +5242,7 @@ can point to arbitrary kernel, root filesystem locations, and so forth.
 Contrast this behavior with cooked mode where Wic looks in the Build
 Directory (e.g. ``tmp/deploy/images/``\ machine).
 
-The general form of the ``wic`` command in raw mode is:
-::
+The general form of the ``wic`` command in raw mode is::
 
    $ wic create wks_file options ...
 
@@ -5456,8 +5300,7 @@ a kickstart file and the name of the image from which to use artifacts
 by using the "-e" option. Wic looks in the Build Directory (e.g.
 ``tmp/deploy/images/``\ machine) for artifacts.
 
-The general form of the ``wic`` command using Cooked Mode is as follows:
-::
+The general form of the ``wic`` command using Cooked Mode is as follows::
 
    $ wic create wks_file -e IMAGE_NAME
 
@@ -5480,14 +5323,12 @@ Using an Existing Kickstart File
 If you do not want to create your own kickstart file, you can use an
 existing file provided by the Wic installation. As shipped, kickstart
 files can be found in the :ref:`overview-manual/development-environment:yocto project source repositories` in the
-following two locations:
-::
+following two locations::
 
    poky/meta-yocto-bsp/wic
    poky/scripts/lib/wic/canned-wks
 
-Use the following command to list the available kickstart files:
-::
+Use the following command to list the available kickstart files::
 
    $ wic list images
      genericx86                    		Create an EFI disk image for genericx86*
@@ -5505,15 +5346,13 @@ Use the following command to list the available kickstart files:
 
 When you use an existing file, you
 do not have to use the ``.wks`` extension. Here is an example in Raw
-Mode that uses the ``directdisk`` file:
-::
+Mode that uses the ``directdisk`` file::
 
    $ wic create directdisk -r rootfs_dir -b bootimg_dir \
          -k kernel_dir -n native_sysroot
 
 Here are the actual partition language commands used in the
-``genericx86.wks`` file to generate an image:
-::
+``genericx86.wks`` file to generate an image::
 
    # short-description: Create an EFI disk image for genericx86*
    # long-description: Creates a partitioned EFI disk image for genericx86* machines
@@ -5571,8 +5410,7 @@ When the Wic implementation needs to invoke a partition-specific
 implementation, it looks for the plugin with the same name as the
 ``--source`` parameter used in the kickstart file given to that
 partition. For example, if the partition is set up using the following
-command in a kickstart file:
-::
+command in a kickstart file::
 
    part /boot --source bootimg-pcbios --ondisk sda --label boot --active --align 1024
 
@@ -5583,8 +5421,7 @@ members of the matching source plugin (i.e. ``bootimg-pcbios``) in the
 To be more concrete, here is the corresponding plugin definition from
 the ``bootimg-pcbios.py`` file for the previous command along with an
 example method called by the Wic implementation when it needs to prepare
-a partition using an implementation-specific function:
-::
+a partition using an implementation-specific function::
 
                 .
                 .
@@ -5675,8 +5512,7 @@ Generate an Image using an Existing Kickstart File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This example runs in Cooked Mode and uses the ``mkefidisk`` kickstart
-file:
-::
+file::
 
    $ wic create mkefidisk -e core-image-minimal
    INFO: Building wic-tools...
@@ -5712,8 +5548,7 @@ and kickstart file information.
 Continuing with the example, you can now write the image from the Build
 Directory onto a USB stick, or whatever media for which you built your
 image, and boot from the media. You can write the image by using
-``bmaptool`` or ``dd``:
-::
+``bmaptool`` or ``dd``::
 
    $ oe-run-native bmaptool copy mkefidisk-201804191017-sda.direct /dev/sdX
 
@@ -5761,8 +5596,7 @@ the lines that specify the target disk from which to boot.
 Next, the example modifies the ``directdisksdb-gpt.wks`` file and
 changes all instances of "``--ondisk sda``" to "``--ondisk sdb``". The
 example changes the following two lines and leaves the remaining lines
-untouched:
-::
+untouched::
 
    part /boot --source bootimg-pcbios --ondisk sdb --label boot --active --align 1024
    part / --source rootfs --ondisk sdb --fstype=ext4 --label platform --align 1024 --use-uuid
@@ -5799,8 +5633,7 @@ Computing (nuc) :term:`MACHINE` the
 
 Continuing with the example, you can now directly ``dd`` the image to a
 USB stick, or whatever media for which you built your image, and boot
-the resulting media:
-::
+the resulting media::
 
    $ sudo dd if=directdisksdb-gpt-201710090938-sdb.direct of=/dev/sdb
    140966+0 records in
@@ -5814,8 +5647,7 @@ Using a Modified Kickstart File and Running in Raw Mode
 This next example manually specifies each build artifact (runs in Raw
 Mode) and uses a modified kickstart file. The example also uses the
 ``-o`` option to cause Wic to create the output somewhere other than the
-default output directory, which is the current directory:
-::
+default output directory, which is the current directory::
 
    $ wic create /home/stephano/my_yocto/test.wks -o /home/stephano/testwic \
         --rootfs-dir /home/stephano/build/master/build/tmp/work/qemux86-poky-linux/core-image-minimal/1.0-r0/rootfs \
@@ -5860,8 +5692,7 @@ The following example examines the contents of the Wic image, deletes
 the existing kernel, and then inserts a new kernel:
 
 1. *List the Partitions:* Use the ``wic ls`` command to list all the
-   partitions in the Wic image:
-   ::
+   partitions in the Wic image::
 
       $ wic ls tmp/deploy/images/qemux86/core-image-minimal-qemux86.wic
       Num     Start        End          Size      Fstype
@@ -5877,8 +5708,7 @@ the existing kernel, and then inserts a new kernel:
    .. note::
 
       You can get command usage on any Wic command using the following
-      form:
-      ::
+      form::
 
               $ wic help command
 
@@ -5886,14 +5716,12 @@ the existing kernel, and then inserts a new kernel:
       For example, the following command shows you the various ways to
       use the
       wic ls
-      command:
-      ::
+      command::
 
               $ wic help ls
 
 
-   The following command shows what is in partition one:
-   ::
+   The following command shows what is in partition one::
 
         $ wic ls tmp/deploy/images/qemux86/core-image-minimal-qemux86.wic:1
         Volume in drive : is boot
@@ -5915,8 +5743,7 @@ the existing kernel, and then inserts a new kernel:
 
       If you see the following error, you need to update or create a
       ``~/.mtoolsrc`` file and be sure to have the line "mtools_skip_check=1"
-      in the file. Then, run the Wic command again:
-      ::
+      in the file. Then, run the Wic command again::
 
               ERROR: _exec_cmd: /usr/bin/mdir -i /tmp/wic-parttfokuwra ::/ returned '1' instead of 0
                output: Total number of sectors (47824) not a multiple of sectors per track (32)!
@@ -5924,8 +5751,7 @@ the existing kernel, and then inserts a new kernel:
 
 
 3. *Remove the Old Kernel:* Use the ``wic rm`` command to remove the
-   ``vmlinuz`` file (kernel):
-   ::
+   ``vmlinuz`` file (kernel)::
 
       $ wic rm tmp/deploy/images/qemux86/core-image-minimal-qemux86.wic:1/vmlinuz
 
@@ -5937,8 +5763,7 @@ the existing kernel, and then inserts a new kernel:
    kernel will be in the ``workspace/sources`` area.
 
    The following example assumes ``devtool`` was used to build the
-   kernel:
-   ::
+   kernel::
 
       $ wic cp poky_sdk/tmp/work/qemux86-poky-linux/linux-yocto/4.12.12+git999-r0/linux-yocto-4.12.12+git999/arch/x86/boot/bzImage \
                poky/build/tmp/deploy/images/qemux86/core-image-minimal-qemux86.wic:1/vmlinuz
@@ -5968,14 +5793,12 @@ system image files much faster.
    -  If you are using Ubuntu or Debian distributions, you can install
       the ``bmap-tools`` package using the following command and then
       use the tool without specifying ``PATH`` even from the root
-      account:
-      ::
+      account::
 
          $ sudo apt-get install bmap-tools
 
    -  If you are unable to install the ``bmap-tools`` package, you will
-      need to build Bmaptool before using it. Use the following command:
-      ::
+      need to build Bmaptool before using it. Use the following command::
 
          $ bitbake bmap-tools-native
 
@@ -5984,15 +5807,13 @@ that while this example uses a Wic image, you can use Bmaptool to flash
 any type of image. Use these steps to flash an image using Bmaptool:
 
 1. *Update your local.conf File:* You need to have the following set
-   in your ``local.conf`` file before building your image:
-   ::
+   in your ``local.conf`` file before building your image::
 
       IMAGE_FSTYPES += "wic wic.bmap"
 
 2. *Get Your Image:* Either have your image ready (pre-built with the
    :term:`IMAGE_FSTYPES`
-   setting previously mentioned) or take the step to build the image:
-   ::
+   setting previously mentioned) or take the step to build the image::
 
       $ bitbake image
 
@@ -6000,20 +5821,17 @@ any type of image. Use these steps to flash an image using Bmaptool:
    depending on your particular setup. The following commands assume the
    image resides in the Build Directory's ``deploy/images/`` area:
 
-   -  If you have write access to the media, use this command form:
-      ::
+   -  If you have write access to the media, use this command form::
 
          $ oe-run-native bmap-tools-native bmaptool copy build-directory/tmp/deploy/images/machine/image.wic /dev/sdX
 
    -  If you do not have write access to the media, set your permissions
-      first and then use the same command form:
-      ::
+      first and then use the same command form::
 
          $ sudo chmod 666 /dev/sdX
          $ oe-run-native bmap-tools-native bmaptool copy build-directory/tmp/deploy/images/machine/image.wic /dev/sdX
 
-For help on the ``bmaptool`` command, use the following command:
-::
+For help on the ``bmaptool`` command, use the following command::
 
    $ bmaptool --help
 
@@ -6107,8 +5925,7 @@ your build output more secure. The security flags are in the
 
 Use the following line in your ``local.conf`` file or in your custom
 distribution configuration file to enable the security compiler and
-linker flags for your build:
-::
+linker flags for your build::
 
    require conf/distro/include/security_flags.inc
 
@@ -6123,8 +5940,7 @@ system to make your images more secure:
    When creating a new project, the default is to provide you with an
    initial ``local.conf`` file that enables this feature using the
    :term:`EXTRA_IMAGE_FEATURES`
-   variable with the line:
-   ::
+   variable with the line::
 
       EXTRA_IMAGE_FEATURES = "debug-tweaks"
 
@@ -6250,8 +6066,7 @@ layer. The following steps provide some more detail:
    :term:`DISTRO` variable to point to
    your distribution's configuration file. For example, if your
    distribution's configuration file is named ``mydistro.conf``, then
-   you point to it as follows:
-   ::
+   you point to it as follows::
 
       DISTRO = "mydistro"
 
@@ -6292,8 +6107,7 @@ The OpenEmbedded build system uses the environment variable
 configuration information that ultimately ends up in the
 :term:`Build Directory` ``conf`` directory.
 By default, ``TEMPLATECONF`` is set as follows in the ``poky``
-repository:
-::
+repository::
 
    TEMPLATECONF=${TEMPLATECONF:-meta-poky/conf}
 
@@ -6335,8 +6149,7 @@ display BitBake targets as part of the script output. Customizing this
 targets appears as part of the script's output.
 
 Here is the default list of targets displayed as a result of running
-either of the setup scripts:
-::
+either of the setup scripts::
 
    You can now run 'bitbake <target>'
 
@@ -6355,8 +6168,7 @@ Conserving Disk Space During Builds
 
 To help conserve disk space during builds, you can add the following
 statement to your project's ``local.conf`` configuration file found in
-the :term:`Build Directory`:
-::
+the :term:`Build Directory`::
 
    INHERIT += "rm_work"
 
@@ -6534,8 +6346,7 @@ The simplest form for a PR Service is for it to exist for a single host
 development system that builds the package feed (building system). For
 this scenario, you can enable a local PR Service by setting
 :term:`PRSERV_HOST` in your
-``local.conf`` file in the :term:`Build Directory`:
-::
+``local.conf`` file in the :term:`Build Directory`::
 
    PRSERV_HOST = "localhost:0"
 
@@ -6546,8 +6357,7 @@ stopping the server.
 If you have a more complex setup where multiple host development systems
 work against a common, shared package feed, you have a single PR Service
 running and it is connected to each building system. For this scenario,
-you need to start the PR Service using the ``bitbake-prserv`` command:
-::
+you need to start the PR Service using the ``bitbake-prserv`` command::
 
    bitbake-prserv --host ip --port port --start
 
@@ -6559,8 +6369,7 @@ server and port.
 It is also recommended you use build history, which adds some sanity
 checks to binary package versions, in conjunction with the server that
 is running the PR Service. To enable build history, add the following to
-each building system's ``local.conf`` file:
-::
+each building system's ``local.conf`` file::
 
    # It is recommended to activate "buildhistory" for testing the PR service
    INHERIT += "buildhistory"
@@ -6629,15 +6438,13 @@ the specific source code revision from which to build. You set the
 ``SRCREV`` variable to
 :term:`AUTOREV` to cause the
 OpenEmbedded build system to automatically use the latest revision of
-the software:
-::
+the software::
 
    SRCREV = "${AUTOREV}"
 
 Furthermore, you need to reference ``SRCPV`` in ``PV`` in order to
 automatically update the version whenever the revision of the source
-code changes. Here is an example:
-::
+code changes. Here is an example::
 
    PV = "1.0+git${SRCPV}"
 
@@ -6707,8 +6514,7 @@ package for each one it finds by appending to the
 :term:`PACKAGES` variable and
 setting the appropriate values for ``FILES_packagename``,
 ``RDEPENDS_packagename``, ``DESCRIPTION_packagename``, and so forth.
-Here is an example from the ``lighttpd`` recipe:
-::
+Here is an example from the ``lighttpd`` recipe::
 
    python populate_packages_prepend () {
        lighttpd_libdir = d.expand('${libdir}')
@@ -6751,8 +6557,7 @@ directory of the ``poky`` :ref:`source repository <overview-manual/development-e
 also find examples in ``meta/classes/kernel.bbclass``.
 
 Following is a reference that shows ``do_split_packages`` mandatory and
-optional arguments:
-::
+optional arguments::
 
    Mandatory arguments
 
@@ -6840,8 +6645,7 @@ any dependencies on optional modules from other recipes are satisfied by
 your recipe. You can be sure these dependencies are satisfied by using
 the :term:`PACKAGES_DYNAMIC`
 variable. Here is an example that continues with the ``lighttpd`` recipe
-shown earlier:
-::
+shown earlier::
 
    PACKAGES_DYNAMIC = "lighttpd-module-.*"
 
@@ -6933,8 +6737,7 @@ variable to specify the format:
    :term:`Build Directory` (e.g.
    ``poky/build/conf/local.conf``).
 
-2. Select the desired package format as follows:
-   ::
+2. Select the desired package format as follows::
 
       PACKAGE_CLASSES ?= "package_packageformat"
 
@@ -6968,15 +6771,13 @@ target's package database(s) later once your image is up and running.
 Whenever you perform any sort of build step that can potentially
 generate a package or modify existing package, it is always a good idea
 to re-generate the package index after the build by using the following
-command:
-::
+command::
 
    $ bitbake package-index
 
 It might be tempting to build the
 package and the package index at the same time with a command such as
-the following:
-::
+the following::
 
    $ bitbake some-package package-index
 
@@ -7024,8 +6825,7 @@ your packaging choice (i.e. the
 :term:`PACKAGE_CLASSES`
 setting), simply start the server. The following example assumes a build
 directory of ``poky/build/tmp/deploy/rpm`` and a ``PACKAGE_CLASSES``
-setting of "package_rpm":
-::
+setting of "package_rpm"::
 
    $ cd poky/build/tmp/deploy/rpm
    $ python3 -m http.server
@@ -7091,8 +6891,7 @@ for all architectures. You cannot do both:
    architectures.
 
 -  *Create a Single (Full) Package Index:* Define a single base URL that
-   identifies where a full package database is located:
-   ::
+   identifies where a full package database is located::
 
       [oe-packages]
       baseurl=http://my.server/rpm
@@ -7210,8 +7009,7 @@ Signing RPM Packages
 
 To enable signing RPM packages, you must set up the following
 configurations in either your ``local.config`` or ``distro.config``
-file:
-::
+file::
 
    # Inherit sign_rpm.bbclass to enable signing functionality
    INHERIT += " sign_rpm"
@@ -7242,8 +7040,7 @@ signed package feeds for IPK and RPM packages.
 
 The steps you need to take to enable signed package feed use are similar
 to the steps used to sign RPM packages. You must define the following in
-your ``local.config`` or ``distro.config`` file:
-::
+your ``local.config`` or ``distro.config`` file::
 
    INHERIT += "sign_package_feed"
    PACKAGE_FEED_GPG_NAME = "key_name"
@@ -7282,8 +7079,7 @@ hand, the test can be anything from a simple shell script that runs a
 binary and checks the output to an elaborate system of test binaries and
 data files.
 
-The test generates output in the format used by Automake:
-::
+The test generates output in the format used by Automake::
 
    result: testname
 
@@ -7305,8 +7101,7 @@ To add package testing to your build, add the
 :term:`DISTRO_FEATURES` and
 :term:`EXTRA_IMAGE_FEATURES`
 variables to your ``local.conf`` file, which is found in the
-:term:`Build Directory`:
-::
+:term:`Build Directory`::
 
    DISTRO_FEATURES_append = " ptest"
    EXTRA_IMAGE_FEATURES += "ptest-pkgs"
@@ -7331,16 +7126,14 @@ test. Here is what you have to do for each recipe:
 
 -  *Be sure the recipe inherits
    the* :ref:`ptest <ref-classes-ptest>` *class:*
-   Include the following line in each recipe:
-   ::
+   Include the following line in each recipe::
 
       inherit ptest
 
 -  *Create run-ptest:* This script starts your test. Locate the
    script where you will refer to it using
    :term:`SRC_URI`. Here is an
-   example that starts a test for ``dbus``:
-   ::
+   example that starts a test for ``dbus``::
 
       #!/bin/sh
       cd test
@@ -7352,8 +7145,7 @@ test. Here is what you have to do for each recipe:
    :term:`DEPENDS` and
    :term:`RDEPENDS` variables in
    your recipe in order for the package to meet the dependencies. Here
-   is an example where the package has a runtime dependency on "make":
-   ::
+   is an example where the package has a runtime dependency on "make"::
 
       RDEPENDS_${PN}-ptest += "make"
 
@@ -7374,8 +7166,7 @@ test. Here is what you have to do for each recipe:
 
    Regardless, you still must add a ``do_compile_ptest`` function to
    build the test suite. Add a function similar to the following to your
-   recipe:
-   ::
+   recipe::
 
       do_compile_ptest() {
           oe_runmake buildtest-TESTS
@@ -7457,8 +7248,7 @@ which is a file browser web application.
    You must know the ``cute-files`` module version.
 
 The first thing you need to do is use ``devtool`` and the NPM fetcher to
-create the recipe:
-::
+create the recipe::
 
    $ devtool add "npm://registry.npmjs.org;package=cute-files;version=1.0.2"
 
@@ -7486,8 +7276,7 @@ runs.
    practical way to have the licenses for all of the dependencies
    represented in the license manifest of the image.
 
-The ``devtool edit-recipe`` command lets you take a look at the recipe:
-::
+The ``devtool edit-recipe`` command lets you take a look at the recipe::
 
    $ devtool edit-recipe cute-files
    SUMMARY = "Turn any folder on your computer into a cute file browser, available on the local network."
@@ -7520,8 +7309,7 @@ Three key points exist in the previous example:
    :ref:`npm <ref-classes-npm>` class to package
    up all the modules.
 
-You can run the following command to build the ``cute-files`` package:
-::
+You can run the following command to build the ``cute-files`` package::
 
    $ devtool build cute-files
 
@@ -7529,8 +7317,7 @@ Remember that ``nodejs`` must be installed on
 the target before your package.
 
 Assuming 192.168.7.2 for the target's IP address, use the following
-command to deploy your package:
-::
+command to deploy your package::
 
    $ devtool deploy-target -s cute-files root@192.168.7.2
 
@@ -7569,15 +7356,13 @@ projects method, you provide ``devtool`` with an URL that points to the
 source files.
 
 Replicating the same example, (i.e. ``cute-files``) use the following
-command:
-::
+command::
 
    $ devtool add https://github.com/martinaglv/cute-files.git
 
 The
 recipe this command generates is very similar to the recipe created in
-the previous section. However, the ``SRC_URI`` looks like the following:
-::
+the previous section. However, the ``SRC_URI`` looks like the following::
 
    SRC_URI = " \
        git://github.com/martinaglv/cute-files.git;protocol=https \
@@ -7629,8 +7414,7 @@ by the literal sequence '\\n'. The separator can be redefined using the
 variable flag ``separator``.
 
 The following is an example that adds two custom fields for ipk
-packages:
-::
+packages::
 
    PACKAGE_ADD_METADATA_IPK = "Vendor: CustomIpk\nGroup:Applications/Spreadsheets"
 
@@ -7660,8 +7444,7 @@ adding statements to your configuration file so that the build process
 checks local directories first for existing tarballs before checking the
 Internet.
 
-Here is an efficient way to set it up in your ``local.conf`` file:
-::
+Here is an efficient way to set it up in your ``local.conf`` file::
 
    SOURCE_MIRROR_URL ?= "file:///home/you/your-download-dir/"
    INHERIT += "own-mirrors"
@@ -7692,8 +7475,7 @@ download directory :ref:`structure-build-downloads`,
 which is located with :term:`DL_DIR`.
 
 Use the following BitBake command form to fetch all the necessary
-sources without starting the build:
-::
+sources without starting the build::
 
    $ bitbake target --runall=fetch
 
@@ -7740,15 +7522,13 @@ following sections.
 Using systemd Exclusively
 -------------------------
 
-Set these variables in your distribution configuration file as follows:
-::
+Set these variables in your distribution configuration file as follows::
 
    DISTRO_FEATURES_append = " systemd"
    VIRTUAL-RUNTIME_init_manager = "systemd"
 
 You can also prevent the SysVinit distribution feature from
-being automatically enabled as follows:
-::
+being automatically enabled as follows::
 
    DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit"
 
@@ -7756,8 +7536,7 @@ Doing so removes any
 redundant SysVinit scripts.
 
 To remove initscripts from your image altogether, set this variable
-also:
-::
+also::
 
    VIRTUAL-RUNTIME_initscripts = ""
 
@@ -7767,8 +7546,7 @@ For information on the backfill variable, see
 Using systemd for the Main Image and Using SysVinit for the Rescue Image
 ------------------------------------------------------------------------
 
-Set these variables in your distribution configuration file as follows:
-::
+Set these variables in your distribution configuration file as follows::
 
    DISTRO_FEATURES_append = " systemd"
    VIRTUAL-RUNTIME_init_manager = "systemd"
@@ -7800,8 +7578,7 @@ Using Persistent and Pre-Populated\ ``/dev``
 
 To use the static method for device population, you need to set the
 :term:`USE_DEVFS` variable to "0"
-as follows:
-::
+as follows::
 
    USE_DEVFS = "0"
 
@@ -7813,8 +7590,7 @@ machine or distro configuration file. Alternatively, you can set this
 variable in your ``local.conf`` configuration file.
 
 If you do not define the ``IMAGE_DEVICE_TABLES`` variable, the default
-``device_table-minimal.txt`` is used:
-::
+``device_table-minimal.txt`` is used::
 
    IMAGE_DEVICE_TABLES = "device_table-mymachine.txt"
 
@@ -7826,8 +7602,7 @@ Using ``devtmpfs`` and a Device Manager
 
 To use the dynamic method for device population, you need to use (or be
 sure to set) the :term:`USE_DEVFS`
-variable to "1", which is the default:
-::
+variable to "1", which is the default::
 
    USE_DEVFS = "1"
 
@@ -7844,8 +7619,7 @@ To have more control over the device nodes, you can use a device manager
 like ``udev`` or ``busybox-mdev``. You choose the device manager by
 defining the ``VIRTUAL-RUNTIME_dev_manager`` variable in your machine or
 distro configuration file. Alternatively, you can set this variable in
-your ``local.conf`` configuration file:
-::
+your ``local.conf`` configuration file::
 
    VIRTUAL-RUNTIME_dev_manager = "udev"
 
@@ -7866,14 +7640,12 @@ Subversion (SVN), Git, and Bazaar (BZR) repositories.
 
 To enable this behavior, the :term:`PV` of
 the recipe needs to reference
-:term:`SRCPV`. Here is an example:
-::
+:term:`SRCPV`. Here is an example::
 
    PV = "1.2.3+git${SRCPV}"
 
 Then, you can add the following to your
-``local.conf``:
-::
+``local.conf``::
 
    SRCREV_pn-PN = "${AUTOREV}"
 
@@ -7881,20 +7653,17 @@ Then, you can add the following to your
 which you want to enable automatic source revision updating.
 
 If you do not want to update your local configuration file, you can add
-the following directly to the recipe to finish enabling the feature:
-::
+the following directly to the recipe to finish enabling the feature::
 
    SRCREV = "${AUTOREV}"
 
 The Yocto Project provides a distribution named ``poky-bleeding``, whose
-configuration file contains the line:
-::
+configuration file contains the line::
 
    require conf/distro/include/poky-floating-revisions.inc
 
 This line pulls in the
-listed include file that contains numerous lines of exactly that form:
-::
+listed include file that contains numerous lines of exactly that form::
 
    #SRCREV_pn-opkg-native ?= "${AUTOREV}"
    #SRCREV_pn-opkg-sdk ?= "${AUTOREV}"
@@ -7946,15 +7715,13 @@ Creating the Root Filesystem
 To create the read-only root filesystem, simply add the
 "read-only-rootfs" feature to your image, normally in one of two ways.
 The first way is to add the "read-only-rootfs" image feature in the
-image's recipe file via the ``IMAGE_FEATURES`` variable:
-::
+image's recipe file via the ``IMAGE_FEATURES`` variable::
 
    IMAGE_FEATURES += "read-only-rootfs"
 
 As an alternative, you can add the same feature
 from within your build directory's ``local.conf`` file with the
-associated ``EXTRA_IMAGE_FEATURES`` variable, as in:
-::
+associated ``EXTRA_IMAGE_FEATURES`` variable, as in::
 
    EXTRA_IMAGE_FEATURES = "read-only-rootfs"
 
@@ -8051,8 +7818,7 @@ Build history is disabled by default. To enable it, add the following
 ``INHERIT`` statement and set the
 :term:`BUILDHISTORY_COMMIT`
 variable to "1" at the end of your ``conf/local.conf`` file found in the
-:term:`Build Directory`:
-::
+:term:`Build Directory`::
 
    INHERIT += "buildhistory"
    BUILDHISTORY_COMMIT = "1"
@@ -8140,8 +7906,7 @@ and actual revisions might differ when
 :term:`SRCREV` is set to
 ${:term:`AUTOREV`}. Here is an
 example assuming
-``buildhistory/packages/qemux86-poky-linux/linux-yocto/latest_srcrev``):
-::
+``buildhistory/packages/qemux86-poky-linux/linux-yocto/latest_srcrev``)::
 
    # SRCREV_machine = "38cd560d5022ed2dbd1ab0dca9642e47c98a0aa1"
    SRCREV_machine = "38cd560d5022ed2dbd1ab0dca9642e47c98a0aa1"
@@ -8154,8 +7919,7 @@ collect the stored ``SRCREV`` values from build history and report them
 in a format suitable for use in global configuration (e.g.,
 ``local.conf`` or a distro include file) to override floating
 ``AUTOREV`` values to a fixed set of revisions. Here is some example
-output from this command:
-::
+output from this command::
 
    $ buildhistory-collect-srcrevs -a
    # i586-poky-linux
@@ -8270,8 +8034,7 @@ image. If you are just interested in this information and not interested
 in collecting specific package or SDK information, you can enable
 writing only image information without any history by adding the
 following to your ``conf/local.conf`` file found in the
-:term:`Build Directory`:
-::
+:term:`Build Directory`::
 
    INHERIT += "buildhistory"
    BUILDHISTORY_COMMIT = "0"
@@ -8370,8 +8133,7 @@ interface.
 To see any changes that have occurred (assuming you have
 :term:`BUILDHISTORY_COMMIT` = "1"),
 you can simply use any Git command that allows you to view the history
-of a repository. Here is one method:
-::
+of a repository. Here is one method::
 
    $ git log -p
 
@@ -8381,8 +8143,7 @@ however, that this method does show changes that are not significant
 
 A command-line tool called ``buildhistory-diff`` does exist, though,
 that queries the Git repository and prints just the differences that
-might be significant in human-readable form. Here is an example:
-::
+might be significant in human-readable form. Here is an example::
 
    $ poky/poky/scripts/buildhistory-diff . HEAD^
    Changes to images/qemux86_64/glibc/core-image-minimal (files-in-image.txt):
@@ -8402,8 +8163,7 @@ might be significant in human-readable form. Here is an example:
 .. note::
 
    The ``buildhistory-diff`` tool requires the ``GitPython``
-   package. Be sure to install it using Pip3 as follows:
-   ::
+   package. Be sure to install it using Pip3 as follows::
 
          $ pip3 install GitPython --user
 
@@ -8473,8 +8233,7 @@ In order to run tests, you need to do the following:
             with sudo.
 
          -  The package recipe ``qemu-helper-native`` is required to run
-            this script. Build the package using the following command:
-            ::
+            this script. Build the package using the following command::
 
                $ bitbake qemu-helper-native
 
@@ -8609,8 +8368,7 @@ not need any information in this section. You can skip down to the
 If you did set ``TEST_TARGET`` to "SystemdbootTarget", you also need to
 perform a one-time setup of your master image by doing the following:
 
-1. *Set EFI_PROVIDER:* Be sure that ``EFI_PROVIDER`` is as follows:
-   ::
+1. *Set EFI_PROVIDER:* Be sure that ``EFI_PROVIDER`` is as follows::
 
       EFI_PROVIDER = "systemd-boot"
 
@@ -8648,16 +8406,14 @@ The final thing you need to do when setting ``TEST_TARGET`` to
 "SystemdbootTarget" is to set up the test image:
 
 1. *Set up your local.conf file:* Make sure you have the following
-   statements in your ``local.conf`` file:
-   ::
+   statements in your ``local.conf`` file::
 
       IMAGE_FSTYPES += "tar.gz"
       INHERIT += "testimage"
       TEST_TARGET = "SystemdbootTarget"
       TEST_TARGET_IP = "192.168.2.3"
 
-2. *Build your test image:* Use BitBake to build the image:
-   ::
+2. *Build your test image:* Use BitBake to build the image::
 
       $ bitbake core-image-sato
 
@@ -8671,8 +8427,7 @@ power:
    ``TEST_POWERCONTROL_EXTRA_ARGS`` as a command that runs on the host
    and does power cycling. The test code passes one argument to that
    command: off, on or cycle (off then on). Here is an example that
-   could appear in your ``local.conf`` file:
-   ::
+   could appear in your ``local.conf`` file::
 
       TEST_POWERCONTROL_CMD = "powercontrol.exp test 10.11.12.1 nuc1"
 
@@ -8705,8 +8460,7 @@ wish to experiment with automated hardware testing, you can use the
 the required power action. This script requires either KDialog or Zenity
 to be installed. To use this script, set the
 :term:`TEST_POWERCONTROL_CMD`
-variable as follows:
-::
+variable as follows::
 
    TEST_POWERCONTROL_CMD = "${COREBASE}/scripts/contrib/dialog-power-control"
 
@@ -8728,8 +8482,7 @@ connecting to a remote console server. Regardless of the case, the
 command simply needs to connect to the serial console and forward that
 connection to standard input and output as any normal terminal program
 does. For example, to use the picocom terminal program on serial device
-``/dev/ttyUSB0`` at 115200bps, you would set the variable as follows:
-::
+``/dev/ttyUSB0`` at 115200bps, you would set the variable as follows::
 
    TEST_SERIALCONTROL_CMD = "picocom /dev/ttyUSB0 -b 115200"
 
@@ -8737,8 +8490,7 @@ For local
 devices where the serial port device disappears when the device reboots,
 an additional "serdevtry" wrapper script is provided. To use this
 wrapper, simply prefix the terminal command with
-``${COREBASE}/scripts/contrib/serdevtry``:
-::
+``${COREBASE}/scripts/contrib/serdevtry``::
 
    TEST_SERIALCONTROL_CMD = "${COREBASE}/scripts/contrib/serdevtry picocom -b 115200 /dev/ttyUSB0"
 
@@ -8752,27 +8504,23 @@ You can start the tests automatically or manually:
    set the
    :term:`TESTIMAGE_AUTO`
    variable to "1" in your ``local.conf`` file in the
-   :term:`Build Directory`:
-   ::
+   :term:`Build Directory`::
 
       TESTIMAGE_AUTO = "1"
 
    Next, build your image. If the image successfully builds, the
-   tests run:
-   ::
+   tests run::
 
       bitbake core-image-sato
 
 -  *Manually running tests:* To manually run the tests, first globally
    inherit the
    :ref:`testimage <ref-classes-testimage*>` class
-   by editing your ``local.conf`` file:
-   ::
+   by editing your ``local.conf`` file::
 
       INHERIT += "testimage"
 
-   Next, use BitBake to run the tests:
-   ::
+   Next, use BitBake to run the tests::
 
       bitbake -c testimage image
 
@@ -8815,18 +8563,15 @@ handling.
 
 Here are some things to keep in mind when running tests:
 
--  The default tests for the image are defined as:
-   ::
+-  The default tests for the image are defined as::
 
       DEFAULT_TEST_SUITES_pn-image = "ping ssh df connman syslog xorg scp vnc date rpm dnf dmesg"
 
--  Add your own test to the list of the by using the following:
-   ::
+-  Add your own test to the list of the by using the following::
 
       TEST_SUITES_append = " mytest"
 
--  Run a specific list of tests as follows:
-   ::
+-  Run a specific list of tests as follows::
 
      TEST_SUITES = "test1 test2 test3"
 
@@ -8842,16 +8587,14 @@ test execution off to a scheduler. You can only export tests that are
 defined in :term:`TEST_SUITES`.
 
 If your image is already built, make sure the following are set in your
-``local.conf`` file:
-::
+``local.conf`` file::
 
    INHERIT += "testexport"
    TEST_TARGET_IP = "IP-address-for-the-test-target"
    TEST_SERVER_IP = "IP-address-for-the-test-server"
 
 You can then export the tests with the
-following BitBake command form:
-::
+following BitBake command form::
 
    $ bitbake image -c testexport
 
@@ -8860,28 +8603,24 @@ Exporting the tests places them in the
 ``tmp/testexport/``\ image, which is controlled by the
 ``TEST_EXPORT_DIR`` variable.
 
-You can now run the tests outside of the build environment:
-::
+You can now run the tests outside of the build environment::
 
    $ cd tmp/testexport/image
    $ ./runexported.py testdata.json
 
 Here is a complete example that shows IP addresses and uses the
-``core-image-sato`` image:
-::
+``core-image-sato`` image::
 
    INHERIT += "testexport"
    TEST_TARGET_IP = "192.168.7.2"
    TEST_SERVER_IP = "192.168.7.1"
 
-Use BitBake to export the tests:
-::
+Use BitBake to export the tests::
 
    $ bitbake core-image-sato -c testexport
 
 Run the tests outside of
-the build environment using the following:
-::
+the build environment using the following::
 
    $ cd tmp/testexport/core-image-sato
    $ ./runexported.py testdata.json
@@ -9157,14 +8896,12 @@ variables>` did not work out as expected.
 BitBake's ``-e`` option is used to display variable values after
 parsing. The following command displays the variable values after the
 configuration files (i.e. ``local.conf``, ``bblayers.conf``,
-``bitbake.conf`` and so forth) have been parsed:
-::
+``bitbake.conf`` and so forth) have been parsed::
 
    $ bitbake -e
 
 The following command displays variable values after a specific recipe has
-been parsed. The variables include those from the configuration as well:
-::
+been parsed. The variables include those from the configuration as well::
 
    $ bitbake -e recipename
 
@@ -9187,8 +8924,7 @@ variable flags (varflags) set on the variable. The output can be very
 helpful during debugging.
 
 Variables that are exported to the environment are preceded by
-``export`` in the output of ``bitbake -e``. See the following example:
-::
+``export`` in the output of ``bitbake -e``. See the following example::
 
    export CC="i586-poky-linux-gcc -m32 -march=i586 --sysroot=/home/ulf/poky/build/tmp/sysroots/qemux86"
 
@@ -9250,8 +8986,7 @@ Following are a few of the available ``oe-pkgdata-util`` subcommands.
 -  ``oe-pkgdata-util find-path path ...``: Lists the names of
    the packages that contain the given paths. For example, the following
    tells us that ``/usr/share/man/man1/make.1`` is contained in the
-   ``make-doc`` package:
-   ::
+   ``make-doc`` package::
 
       $ oe-pkgdata-util find-path /usr/share/man/man1/make.1
       make-doc: /usr/share/man/man1/make.1
@@ -9260,8 +8995,7 @@ Following are a few of the available ``oe-pkgdata-util`` subcommands.
    of the recipes that produce the given packages.
 
 For more information on the ``oe-pkgdata-util`` command, use the help
-facility:
-::
+facility::
 
    $ oe-pkgdata-util --help
    $ oe-pkgdata-util subcommand --help
@@ -9274,8 +9008,7 @@ before the one you have specified. Dependency information can help you
 understand why a recipe is built.
 
 To generate dependency information for a recipe, run the following
-command:
-::
+command::
 
    $ bitbake -g recipename
 
@@ -9305,8 +9038,7 @@ format and can be converted to images (e.g. using the ``dot`` tool from
       provide useful information.
 
       As an example, the ``task-depends.dot`` file contains lines such
-      as the following:
-      ::
+      as the following::
 
          "libxslt.do_configure" -> "libxml2.do_populate_sysroot"
 
@@ -9323,8 +9055,7 @@ format and can be converted to images (e.g. using the ``dot`` tool from
       displays paths between graph nodes.
 
 You can use a different method to view dependency information by using
-the following command:
-::
+the following command::
 
    $ bitbake -g -u taskexp recipename
 
@@ -9350,8 +9081,7 @@ If you are unsure whether a variable dependency is being picked up
 automatically for a given task, you can list the variable dependencies
 BitBake has determined by doing the following:
 
-1. Build the recipe containing the task:
-::
+1. Build the recipe containing the task::
 
    $ bitbake recipename
 
@@ -9362,8 +9092,7 @@ BitBake has determined by doing the following:
    checksum for the task. As an example, for the
    :ref:`ref-tasks-fetch` task of the
    ``db`` recipe, the ``sigdata`` file might be found in the following
-   location:
-   ::
+   location::
 
       ${BUILDDIR}/tmp/stamps/i586-poky-linux/db/6.0.30-r1.do_fetch.sigdata.7c048c18222b16ff0bcee2000ef648b1
 
@@ -9375,8 +9104,7 @@ BitBake has determined by doing the following:
    same information as ``sigdata`` files.
 
 3. Run ``bitbake-dumpsig`` on the ``sigdata`` or ``siginfo`` file. Here
-   is an example:
-   ::
+   is an example::
 
       $ bitbake-dumpsig ${BUILDDIR}/tmp/stamps/i586-poky-linux/db/6.0.30-r1.do_fetch.sigdata.7c048c18222b16ff0bcee2000ef648b1
 
@@ -9406,8 +9134,7 @@ call ``bitbake-diffsigs`` with just one file, the command behaves like
 
 You can also use BitBake to dump out the signature construction
 information without executing tasks by using either of the following
-BitBake command-line options:
-::
+BitBake command-line options::
 
    ‐‐dump-signatures=SIGNATURE_HANDLER
    -S SIGNATURE_HANDLER
@@ -9494,8 +9221,7 @@ behavior in most cases is: ``do_fetch``, ``do_unpack``, ``do_patch``,
 ``do_build`` and any tasks on which it depends build first. Some tasks,
 such as ``do_devshell``, are not part of the default build chain. If you
 wish to run a task that is not part of the default build chain, you can
-use the ``-c`` option in BitBake. Here is an example:
-::
+use the ``-c`` option in BitBake. Here is an example::
 
    $ bitbake matchbox-desktop -c devshell
 
@@ -9520,8 +9246,7 @@ out), then you can use the ``-f`` option.
    [\ :ref:`nostamp <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:variable flags>`\ ]
    variable flag is already set for the task.
 
-The following example shows one way you can use the ``-f`` option:
-::
+The following example shows one way you can use the ``-f`` option::
 
    $ bitbake matchbox-desktop
              .
@@ -9550,8 +9275,7 @@ Using this option invalidates the given task and then runs the
 :ref:`ref-tasks-build` task, which is
 the default task if no task is given, and the tasks on which it depends.
 You could replace the final two commands in the previous example with
-the following single command:
-::
+the following single command::
 
    $ bitbake matchbox-desktop -C compile
 
@@ -9575,16 +9299,14 @@ task dependency mechanisms.
    and build output might not be in the clean state they would be in for
    a "normal" build, depending on what actions you took. To get rid of
    such warnings, you can remove the work directory and rebuild the
-   recipe, as follows:
-   ::
+   recipe, as follows::
 
       $ bitbake matchbox-desktop -c clean
       $ bitbake matchbox-desktop
 
 
 You can view a list of tasks in a given package by running the
-``do_listtasks`` task as follows:
-::
+``do_listtasks`` task as follows::
 
    $ bitbake matchbox-desktop -c listtasks
 
@@ -9608,8 +9330,7 @@ Building with No Dependencies
 -----------------------------
 
 To build a specific recipe (``.bb`` file), you can use the following
-command form:
-::
+command form::
 
    $ bitbake -b somepath/somerecipe.bb
 
@@ -9678,8 +9399,7 @@ in the log, use the "debug" loglevel.
 Following is an example written in Python. The code handles logging for
 a function that determines the number of tasks needed to be run. See the
 ":ref:`ref-tasks-listtasks`"
-section for additional information:
-::
+section for additional information::
 
    python do_listtasks() {
        bb.debug(2, "Starting to figure out the task list")
@@ -9841,21 +9561,18 @@ build, set the
 :term:`PARALLEL_MAKE` variable
 in your ``local.conf`` file to a high number (e.g. "-j 20"). Using a
 high value for ``PARALLEL_MAKE`` increases the chances of the race
-condition showing up:
-::
+condition showing up::
 
    $ bitbake neard
 
-Once the local build for "neard" completes, start a ``devshell`` build:
-::
+Once the local build for "neard" completes, start a ``devshell`` build::
 
    $ bitbake neard -c devshell
 
 For information on how to use a ``devshell``, see the
 ":ref:`dev-manual/common-tasks:using a development shell`" section.
 
-In the ``devshell``, do the following:
-::
+In the ``devshell``, do the following::
 
    $ make clean
    $ make tools/snep-send.o
@@ -9863,8 +9580,7 @@ In the ``devshell``, do the following:
 The ``devshell`` commands cause the failure to clearly
 be visible. In this case, a missing dependency exists for the "neard"
 Makefile target. Here is some abbreviated, sample output with the
-missing dependency clearly visible at the end:
-::
+missing dependency clearly visible at the end::
 
    i586-poky-linux-gcc  -m32 -march=i586 --sysroot=/home/scott-lenovo/......
       .
@@ -9885,8 +9601,7 @@ Creating a Patch for the Fix
 
 Because there is a missing dependency for the Makefile target, you need
 to patch the ``Makefile.am`` file, which is generated from
-``Makefile.in``. You can use Quilt to create the patch:
-::
+``Makefile.in``. You can use Quilt to create the patch::
 
    $ quilt new parallelmake.patch
    Patch patches/parallelmake.patch is now on top
@@ -9898,14 +9613,12 @@ For more information on using Quilt, see the
 
 At this point you need to make the edits to ``Makefile.am`` to add the
 missing dependency. For our example, you have to add the following line
-to the file:
-::
+to the file::
 
    tools/snep-send.$(OBJEXT): include/near/dbus.h
 
 Once you have edited the file, use the ``refresh`` command to create the
-patch:
-::
+patch::
 
    $ quilt refresh
    Refreshed patch patches/parallelmake.patch
@@ -9913,8 +9626,7 @@ patch:
 Once
 the patch file exists, you need to add it back to the originating recipe
 folder. Here is an example assuming a top-level
-:term:`Source Directory` named ``poky``:
-::
+:term:`Source Directory` named ``poky``::
 
    $ cp patches/parallelmake.patch poky/meta/recipes-connectivity/neard/neard
 
@@ -9922,8 +9634,7 @@ The final thing you need to do to implement the fix in the build is to
 update the "neard" recipe (i.e. ``neard-0.14.bb``) so that the
 :term:`SRC_URI` statement includes
 the patch file. The recipe file is in the folder above the patch. Here
-is what the edited ``SRC_URI`` statement would look like:
-::
+is what the edited ``SRC_URI`` statement would look like::
 
    SRC_URI = "${KERNELORG_MIRROR}/linux/network/nfc/${BPN}-${PV}.tar.xz \
               file://neard.in \
@@ -9932,8 +9643,7 @@ is what the edited ``SRC_URI`` statement would look like:
              "
 
 With the patch complete and moved to the correct folder and the
-``SRC_URI`` statement updated, you can exit the ``devshell``:
-::
+``SRC_URI`` statement updated, you can exit the ``devshell``::
 
    $ exit
 
@@ -9941,16 +9651,14 @@ Testing the Build
 ~~~~~~~~~~~~~~~~~
 
 With everything in place, you can get back to trying the build again
-locally:
-::
+locally::
 
    $ bitbake neard
 
 This build should succeed.
 
 Now you can open up a ``devshell`` again and repeat the clean and make
-operations as follows:
-::
+operations as follows::
 
    $ bitbake neard -c devshell
    $ make clean
@@ -9997,42 +9705,47 @@ methods you can use: running a debuginfod server and using gdbserver.
 Using the debuginfod server method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-"debuginfod" from "elfutils" is a way to distribute "debuginfo" files.
-Running a "debuginfod" server makes debug symbols readily available,
+``debuginfod`` from ``elfutils`` is a way to distribute ``debuginfo`` files.
+Running a ``debuginfod`` server makes debug symbols readily available,
 which means you don't need to download debugging information
 and the binaries of the process being debugged. You can just fetch
 debug symbols from the server.
 
-To run a debuginfod server, you need to do the following:
+To run a ``debuginfod`` server, you need to do the following:
 
--  Ensure that this variable is set in your ``local.conf`` file:
-   ::
+-  Ensure that ``debuginfod`` is present in :term:`DISTRO_FEATURES`
+   (it already is in ``OpenEmbedded-core`` defaults and ``poky`` reference distribution).
+   If not, set in your distro config file or in ``local.conf``::
 
-      PACKAGECONFIG_pn-elfutils-native = "debuginfod libdebuginfod"
+      DISTRO_FEATURES_append = " debuginfod"
 
-   This :term:`PACKAGECONFIG` option enables debuginfod and libdebuginfod for
-   "elfutils-native".
+   This distro feature enables the server and client library in ``elfutils``,
+   and enables ``debuginfod`` support in clients (at the moment, ``gdb`` and ``binutils``).
 
--  Run the following commands to set up the "debuginfod" server:
-   ::
+-  Run the following commands to launch the ``debuginfod`` server on the host::
 
       $ oe-debuginfod
 
+-  To use ``debuginfod`` on the target, you need to know the ip:port where
+   ``debuginfod`` is listening on the host (port defaults to 8002), and export
+   that into the shell environment, for example in ``qemu``::
 
-To use debuginfod on the target, you need the following:
+      root@qemux86-64:~# export DEBUGINFOD_URLS="http://192.168.7.1:8002/"
 
--  Ensure that this variable is set in your ``local.conf`` file:
-   ::
+-  Then debug info fetching should simply work when running the target ``gdb``,
+   ``readelf`` or ``objdump``, for example::
 
-      DEBUGINFOD_URLS = "http://localhost:8002/"
+      root@qemux86-64:~# gdb /bin/cat
+      ...
+      Reading symbols from /bin/cat...
+      Downloading separate debug info for /bin/cat...
+      Reading symbols from /home/root/.cache/debuginfod_client/923dc4780cfbc545850c616bffa884b6b5eaf322/debuginfo...
 
-   This :term:`DEBUGINFOD_URLS` option does the client configuration.
+-  It's also possible to use ``debuginfod-find`` to just query the server::
 
-   ::
+      root@qemux86-64:~# debuginfod-find debuginfo /bin/ls
+      /home/root/.cache/debuginfod_client/356edc585f7f82d46f94fcb87a86a3fe2d2e60bd/debuginfo
 
-        PACKAGECONFIG_pn-gdb = "debuginfod"
-
-   This :term:`PACKAGECONFIG` option enables "debuginfod" for "gdb".
 
 Using the gdbserver method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -10069,8 +9782,7 @@ debugger.
 1. *Configure your build system to construct the companion debug
    filesystem:*
 
-   In your ``local.conf`` file, set the following:
-   ::
+   In your ``local.conf`` file, set the following::
 
       IMAGE_GEN_DEBUGFS = "1"
       IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
@@ -10090,8 +9802,7 @@ debugger.
 2. *Configure the system to include gdbserver in the target filesystem:*
 
    Make the following addition in either your ``local.conf`` file or in
-   an image recipe:
-   ::
+   an image recipe::
 
       IMAGE_INSTALL_append = " gdbserver"
 
@@ -10101,29 +9812,25 @@ debugger.
 3. *Build the environment:*
 
    Use the following command to construct the image and the companion
-   Debug Filesystem:
-   ::
+   Debug Filesystem::
 
       $ bitbake image
 
    Build the cross GDB component and
    make it available for debugging. Build the SDK that matches the
    image. Building the SDK is best for a production build that can be
-   used later for debugging, especially during long term maintenance:
-   ::
+   used later for debugging, especially during long term maintenance::
 
       $ bitbake -c populate_sdk image
 
    Alternatively, you can build the minimal toolchain components that
    match the target. Doing so creates a smaller than typical SDK and
    only contains a minimal set of components with which to build simple
-   test applications, as well as run the debugger:
-   ::
+   test applications, as well as run the debugger::
 
       $ bitbake meta-toolchain
 
-   A final method is to build Gdb itself within the build system:
-   ::
+   A final method is to build Gdb itself within the build system::
 
       $ bitbake gdb-cross-<architecture>
 
@@ -10140,8 +9847,7 @@ debugger.
 
 4. *Set up the* ``debugfs``\ *:*
 
-   Run the following commands to set up the ``debugfs``:
-   ::
+   Run the following commands to set up the ``debugfs``::
 
       $ mkdir debugfs
       $ cd debugfs
@@ -10180,8 +9886,7 @@ debugger.
    Documentation <https://www.gnu.org/software/gdb/documentation/>`__.
 
    After running gdbserver on the target, you need to run Gdb on the
-   host and configure it and connect to the target. Use these commands:
-   ::
+   host and configure it and connect to the target. Use these commands::
 
       $ cd directory-holding-the-debugfs-directory
       $ arch-gdb
@@ -10212,8 +9917,7 @@ debugger.
    If the binary is processed through the debug splitting in
    OpenEmbedded, you should also copy the debug items (i.e. ``.debug``
    contents and corresponding ``/usr/src/debug`` files) from the work
-   directory. Here is an example:
-   ::
+   directory. Here is an example::
 
       $ bitbake bash
       $ bitbake -c devshell bash
@@ -10234,25 +9938,21 @@ debug on the target hardware.
 To support this kind of debugging, you need do the following:
 
 -  Ensure that GDB is on the target. You can do this by adding "gdb" to
-   :term:`IMAGE_INSTALL`:
-   ::
+   :term:`IMAGE_INSTALL`::
 
       IMAGE_INSTALL_append = " gdb"
 
-   Alternatively, you can add "tools-debug" to :term:`IMAGE_FEATURES`:
-   ::
+   Alternatively, you can add "tools-debug" to :term:`IMAGE_FEATURES`::
 
       IMAGE_FEATURES_append = " tools-debug"
 
 -  Ensure that debug symbols are present. You can make sure these
-   symbols are present by installing ``-dbg``:
-   ::
+   symbols are present by installing ``-dbg``::
 
       IMAGE_INSTALL_append = "packagename-dbg"
 
    Alternatively, you can do the following to include
-   all the debug symbols:
-   ::
+   all the debug symbols::
 
       IMAGE_FEATURES_append = " dbg-pkgs"
 
@@ -10262,8 +9962,7 @@ To support this kind of debugging, you need do the following:
    of optimization used by the compiler. For example, when adding the
    following line to your ``local.conf`` file, you will reduce optimization
    from :term:`FULL_OPTIMIZATION` of "-O2" to :term:`DEBUG_OPTIMIZATION`
-   of "-O -fno-omit-frame-pointer":
-   ::
+   of "-O -fno-omit-frame-pointer"::
 
            DEBUG_BUILD = "1"
 
@@ -10307,8 +10006,7 @@ Here are some other tips that you might find useful:
    Using GNU Grep, you can use the following shell function to
    recursively search through common recipe-related files, skipping
    binary files, ``.git`` directories, and the Build Directory (assuming
-   its name starts with "build"):
-   ::
+   its name starts with "build")::
 
       g() {
           grep -Ir \
@@ -10321,8 +10019,7 @@ Here are some other tips that you might find useful:
                "$@"
       }
 
-   Following are some usage examples:
-   ::
+   Following are some usage examples::
 
       $ g FOO # Search recursively for "FOO"
       $ g -i foo # Search recursively for "foo", ignoring case
@@ -10581,8 +10278,7 @@ Preparing Changes for Submission
       specific convention for bug references - any commit that addresses
       a specific bug should use the following form for the detailed
       description. Be sure to use the actual bug-tracking ID from
-      Bugzilla for bug-id:
-      ::
+      Bugzilla for bug-id::
 
          Fixes [YOCTO #bug-id]
 
@@ -10608,8 +10304,7 @@ without using the scripts once the steps in
    provide the command, you must include a revision list or a number of
    patches as part of the command. For example, either of these two
    commands takes your most recent single commit and formats it as an
-   email message in the current directory:
-   ::
+   email message in the current directory::
 
       $ git format-patch -1
 
@@ -10701,8 +10396,7 @@ been followed:
 
 1. *Push Your Commits to a "Contrib" Upstream:* If you have arranged for
    permissions to push to an upstream contrib repository, push the
-   change to that repository:
-   ::
+   change to that repository::
 
       $ git push upstream_remote_repo local_branch_name
 
@@ -10711,8 +10405,7 @@ been followed:
    working in a local branch named `your_name`\ ``/README``. The following
    command pushes your local commits to the ``meta-intel-contrib``
    upstream repository and puts the commit in a branch named
-   `your_name`\ ``/README``:
-   ::
+   `your_name`\ ``/README``::
 
       $ git push meta-intel-contrib your_name/README
 
@@ -10729,8 +10422,7 @@ been followed:
 
    -  *Search by File:* Using :ref:`overview-manual/development-environment:git`, you can
       enter the following command to bring up a short list of all
-      commits against a specific file:
-      ::
+      commits against a specific file::
 
          git shortlog -- filename
 
@@ -10764,8 +10456,7 @@ been followed:
    First, create the pull request. For example, the following command
    runs the script, specifies the upstream repository in the contrib
    directory into which you pushed the change, and provides a subject
-   line in the created patch files:
-   ::
+   line in the created patch files::
 
       $ poky/scripts/create-pull-request -u meta-intel-contrib -s "Updated Manual Section Reference in README"
 
@@ -10778,8 +10469,7 @@ been followed:
    editing the cover letter, send the pull request. For example, the
    following command runs the script and specifies the patch directory
    and email address. In this example, the email address is a mailing
-   list:
-   ::
+   list::
 
       $ poky/scripts/send-pull-request -p ~/meta-intel/pull-10565 -t meta-intel@yoctoproject.org
 
@@ -10788,8 +10478,7 @@ been followed:
    .. note::
 
       For help on using these scripts, simply provide the ``-h``
-      argument as follows:
-      ::
+      argument as follows::
 
               $ poky/scripts/create-pull-request -h
               $ poky/scripts/send-pull-request -h
@@ -10901,8 +10590,7 @@ Specifying the ``LIC_FILES_CHKSUM`` Variable
 
 The ``LIC_FILES_CHKSUM`` variable contains checksums of the license text
 in the source code for the recipe. Following is an example of how to
-specify ``LIC_FILES_CHKSUM``:
-::
+specify ``LIC_FILES_CHKSUM``::
 
    LIC_FILES_CHKSUM = "file://COPYING;md5=xxxx \
                        file://licfile1.txt;beginline=5;endline=29;md5=yyyy \
@@ -10925,8 +10613,7 @@ variable as the default directory when searching files listed in
 ``LIC_FILES_CHKSUM``. The previous example employs the default
 directory.
 
-Consider this next example:
-::
+Consider this next example::
 
    LIC_FILES_CHKSUM = "file://src/ls.c;beginline=5;endline=16;\
                                        md5=bb14ed3c4cda583abc85401304b5cd4e"
@@ -10988,15 +10675,13 @@ are defined on a recipe-by-recipe basis through the
 :term:`LICENSE_FLAGS` variable
 definition in the affected recipe. For instance, the
 ``poky/meta/recipes-multimedia/gstreamer/gst-plugins-ugly`` recipe
-contains the following statement:
-::
+contains the following statement::
 
    LICENSE_FLAGS = "commercial"
 
 Here is a
 slightly more complicated example that contains both an explicit recipe
-name and version (after variable expansion):
-::
+name and version (after variable expansion)::
 
    LICENSE_FLAGS = "license_${PN}_${PV}"
 
@@ -11011,8 +10696,7 @@ could add either the string "commercial_gst-plugins-ugly" or the more
 general string "commercial" to ``LICENSE_FLAGS_WHITELIST``. See the
 ":ref:`dev-manual/common-tasks:license flag matching`" section for a full
 explanation of how ``LICENSE_FLAGS`` matching works. Here is the
-example:
-::
+example::
 
    LICENSE_FLAGS_WHITELIST = "commercial_gst-plugins-ugly"
 
@@ -11020,8 +10704,7 @@ Likewise, to additionally enable the package built from the recipe
 containing ``LICENSE_FLAGS = "license_${PN}_${PV}"``, and assuming that
 the actual recipe name was ``emgd_1.10.bb``, the following string would
 enable that package as well as the original ``gst-plugins-ugly``
-package:
-::
+package::
 
    LICENSE_FLAGS_WHITELIST = "commercial_gst-plugins-ugly license_emgd_1.10"
 
@@ -11077,8 +10760,7 @@ matches any expanded ``LICENSE_FLAGS`` definition that starts with the
 string "commercial" such as "commercial_foo" and "commercial_bar", which
 are the strings the build system automatically generates for
 hypothetical recipes named "foo" and "bar" assuming those recipes simply
-specify the following:
-::
+specify the following::
 
    LICENSE_FLAGS = "commercial"
 
@@ -11116,8 +10798,7 @@ Other Variables Related to Commercial Licenses
 
 Other helpful variables related to commercial license handling exist and
 are defined in the
-``poky/meta/conf/distro/include/default-distrovars.inc`` file:
-::
+``poky/meta/conf/distro/include/default-distrovars.inc`` file::
 
    COMMERCIAL_AUDIO_PLUGINS ?= ""
    COMMERCIAL_VIDEO_PLUGINS ?= ""
@@ -11125,8 +10806,7 @@ are defined in the
 If you
 want to enable these components, you can do so by making sure you have
 statements similar to the following in your ``local.conf`` configuration
-file:
-::
+file::
 
    COMMERCIAL_AUDIO_PLUGINS = "gst-plugins-ugly-mad \
        gst-plugins-ugly-mpegaudioparse"
@@ -11138,8 +10818,7 @@ file:
 Of course, you could also create a matching whitelist for those
 components using the more general "commercial" in the whitelist, but
 that would also enable all the other packages with ``LICENSE_FLAGS``
-containing "commercial", which you may or may not want:
-::
+containing "commercial", which you may or may not want::
 
    LICENSE_FLAGS_WHITELIST = "commercial"
 
@@ -11219,8 +10898,7 @@ of compliance in mind.
 One way of doing this (but certainly not the only way) is to release
 just the source as a tarball. You can do this by adding the following to
 the ``local.conf`` file found in the
-:term:`Build Directory`:
-::
+:term:`Build Directory`::
 
    INHERIT += "archiver"
    ARCHIVER_MODE[src] = "original"
@@ -11276,8 +10954,7 @@ One requirement that is often overlooked is inclusion of license text.
 This requirement also needs to be dealt with prior to generating the
 final image. Some licenses require the license text to accompany the
 binary. You can achieve this by adding the following to your
-``local.conf`` file:
-::
+``local.conf`` file::
 
    COPY_LIC_MANIFEST = "1"
    COPY_LIC_DIRS = "1"
@@ -11344,8 +11021,7 @@ thing a development organization might want to consider for end-user
 convenience is to modify ``meta-poky/conf/bblayers.conf.sample`` to
 ensure that when the end user utilizes the released build system to
 build an image, the development organization's layers are included in
-the ``bblayers.conf`` file automatically:
-::
+the ``bblayers.conf`` file automatically::
 
    # POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
    # changes incompatibly
@@ -11413,8 +11089,7 @@ variable. Using this variable also avoids QA errors when you use a
 non-common, non-CLOSED license in a recipe.
 
 The following is an example that uses the ``LICENSE.Abilis.txt`` file as
-the license from the fetched source:
-::
+the license from the fetched source::
 
    NO_GENERIC_LICENSE[Firmware-Abilis] = "LICENSE.Abilis.txt"
 
@@ -11457,8 +11132,7 @@ class by adding the following statement to the end of your
 By default, the error reporting feature stores information in
 ``${``\ :term:`LOG_DIR`\ ``}/error-report``.
 However, you can specify a directory to use by adding the following to
-your ``local.conf`` file:
-::
+your ``local.conf`` file::
 
    ERR_REPORT_DIR = "path"
 
@@ -11467,8 +11141,7 @@ reporting causes the build process to collect the errors and store them
 in a file as previously described. When the build system encounters an
 error, it includes a command as part of the console output. You can run
 the command to send the error file to the server. For example, the
-following command sends the errors to an upstream server:
-::
+following command sends the errors to an upstream server::
 
    $ send-error-report /home/brandusa/project/poky/build/tmp/log/error-report/error_report_201403141617.txt
 
@@ -11476,8 +11149,7 @@ In the previous example, the errors are sent to a public database
 available at https://errors.yoctoproject.org, which is used by the
 entire community. If you specify a particular server, you can send the
 errors to a different database. Use the following command for more
-information on available options:
-::
+information on available options::
 
    $ send-error-report --help
 
@@ -11557,8 +11229,7 @@ Wayland with Kernel Mode Setting
 (`KMS <https://wiki.archlinux.org/index.php/Kernel_Mode_Setting>`__)
 support, include the "wayland" flag in the
 :term:`DISTRO_FEATURES`
-statement in your ``local.conf`` file:
-::
+statement in your ``local.conf`` file::
 
    DISTRO_FEATURES_append = " wayland"
 
@@ -11573,8 +11244,7 @@ Installing Wayland and Weston
 To install the Wayland feature into an image, you must include the
 following
 :term:`CORE_IMAGE_EXTRA_INSTALL`
-statement in your ``local.conf`` file:
-::
+statement in your ``local.conf`` file::
 
    CORE_IMAGE_EXTRA_INSTALL += "wayland weston"
 
@@ -11589,14 +11259,12 @@ Alternatively, you can run Weston through the command-line interpretor
 (CLI), which is better suited for development work. To run Weston under
 the CLI, you need to do the following after your image is built:
 
-1. Run these commands to export ``XDG_RUNTIME_DIR``:
-   ::
+1. Run these commands to export ``XDG_RUNTIME_DIR``::
 
       mkdir -p /tmp/$USER-weston
       chmod 0700 /tmp/$USER-weston
       export XDG_RUNTIME_DIR=/tmp/$USER-weston
 
-2. Launch Weston in the shell:
-   ::
+2. Launch Weston in the shell::
 
       weston

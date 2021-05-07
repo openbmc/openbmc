@@ -11,6 +11,7 @@ SRC_URI = "http://www.libssh2.org/download/${BP}.tar.gz \
            file://CVE-2019-17498.patch \
            file://0001-configure-Conditionally-undefine-backend-m4-macro.patch \
            file://run-ptest \
+           file://0001-kex.c-move-EC-macro-outside-of-if-check-549-550.patch \
 "
 
 SRC_URI_append_ptest = " file://0001-Don-t-let-host-enviroment-to-decide-if-a-test-is-bui.patch"

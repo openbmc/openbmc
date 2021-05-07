@@ -1,0 +1,24 @@
+If you pass CFLAGS with a leading space, " " gets passed to popen and convinces
+gcc to try and open a file called " ". This results in a confusing error message
+like:
+
+x86_64-pokysdk-linux-gcc: error: : No such file or directory
+
+Avoid this by stripping empty elements out of CFLAGS.
+
+Upstream-Status: Submitted [https://github.com/besser82/libxcrypt/pull/126]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: a/build-aux/compute-symver-floor
+===================================================================
+--- a/build-aux/compute-symver-floor
++++ b/build-aux/compute-symver-floor
+@@ -36,6 +36,8 @@ sub preprocessor_check {
+         die "C compiler not available\n" unless @CC;
+ 
+         @CFLAGS = sh_split($ENV{CFLAGS} // q{});
++        # Remove empty elements, particularly leading ones which cause issues with popen below
++        @CFLAGS = grep {$_} @CFLAGS;
+ 
+         # We call ensure_C_locale here, not from the main section,
+         # because this sub might not get called at all, in which

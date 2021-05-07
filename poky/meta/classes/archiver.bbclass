@@ -118,7 +118,7 @@ python () {
         d.appendVarFlag('do_deploy_archives', 'depends', ' %s:do_ar_patched' % pn)
     elif ar_src == "configured":
         # We can't use "addtask do_ar_configured after do_configure" since it
-        # will cause the deptask of do_populate_sysroot to run not matter what
+        # will cause the deptask of do_populate_sysroot to run no matter what
         # archives we need, so we add the depends here.
 
         # There is a corner case with "gcc-source-${PV}" recipes, they don't have
@@ -163,7 +163,7 @@ python () {
                 d.appendVarFlag('do_package_write_rpm', 'depends', ' %s:do_ar_configured' % pn)
 }
 
-# Take all the sources for a recipe and puts them in WORKDIR/archiver-work/.
+# Take all the sources for a recipe and put them in WORKDIR/archiver-work/.
 # Files in SRC_URI are copied directly, anything that's a directory
 # (e.g. git repositories) is "unpacked" and then put into a tarball.
 python do_ar_original() {
@@ -463,7 +463,7 @@ python do_unpack_and_patch() {
     ar_sysroot_native = d.getVar('STAGING_DIR_NATIVE')
     pn = d.getVar('PN')
 
-    # The kernel class functions require it to be on work-shared, so we dont change WORKDIR
+    # The kernel class functions require it to be on work-shared, so we don't change WORKDIR
     if not is_work_shared(d):
         # Change the WORKDIR to make do_unpack do_patch run in another dir.
         d.setVar('WORKDIR', ar_workdir)
@@ -505,7 +505,7 @@ python do_unpack_and_patch() {
 # of the output file ensures that we create it each time the recipe
 # gets rebuilt, at least as long as a PR server is used. We also rely
 # on that mechanism to catch changes in the file content, because the
-# file content is not part of of the task signature either.
+# file content is not part of the task signature either.
 do_ar_recipe[vardepsexclude] += "BBINCLUDED"
 python do_ar_recipe () {
     """

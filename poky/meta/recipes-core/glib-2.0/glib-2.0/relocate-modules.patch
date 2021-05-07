@@ -1,4 +1,4 @@
-From 011c9f024b6475d31e7d5432a38d00fb67eaea40 Mon Sep 17 00:00:00 2001
+From ff790dd7086e28896f8e7630135f756cc6f06c80 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Fri, 11 Mar 2016 15:35:55 +0000
 Subject: [PATCH] glib-2.0: relocate the GIO module directory for native builds
@@ -19,19 +19,19 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/gio/giomodule.c b/gio/giomodule.c
-index dc4d6d3..da46906 100644
+index ca1daf2..954a250 100644
 --- a/gio/giomodule.c
 +++ b/gio/giomodule.c
-@@ -49,6 +49,8 @@
- #include "gmemorymonitordbus.h"
+@@ -51,6 +51,8 @@
  #ifdef G_OS_WIN32
  #include "gregistrysettingsbackend.h"
+ #include "giowin32-priv.h"
 +#else
 +#include <dlfcn.h>
  #endif
  #include <glib/gstdio.h>
  
-@@ -1163,7 +1165,15 @@ get_gio_module_dir (void)
+@@ -1212,7 +1214,15 @@ get_gio_module_dir (void)
                                       NULL);
        g_free (install_dir);
  #else

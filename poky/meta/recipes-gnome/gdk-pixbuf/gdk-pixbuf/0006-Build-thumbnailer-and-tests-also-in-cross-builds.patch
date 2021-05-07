@@ -1,19 +1,20 @@
-From 1a532e090c558a830de9503f56e23414e880bb95 Mon Sep 17 00:00:00 2001
+From d02a8e202d2fe5caf3449683e0ccdf84a482a325 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 5 Jun 2019 14:17:55 +0200
 Subject: [PATCH] Build thumbnailer and tests also in cross builds.
 
 Upstream-Status: Inappropriate [relies on oe-core specific hacks]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  meson.build | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index d104cea..7acb88a 100644
+index 73034d1..d114016 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -397,10 +397,8 @@ endif
+@@ -378,10 +378,8 @@ subdir('gdk-pixbuf')
  # i18n
  subdir('po')
  
@@ -25,4 +26,4 @@ index d104cea..7acb88a 100644
 +subdir('thumbnailer')
  
  # Documentation
- subdir('docs')
+ build_docs = get_option('gtk_doc') or get_option('docs')

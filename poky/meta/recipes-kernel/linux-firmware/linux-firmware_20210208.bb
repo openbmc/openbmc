@@ -229,6 +229,7 @@ PACKAGES =+ "${PN}-ralink-license ${PN}-ralink \
              ${PN}-sd8887 ${PN}-sd8897 ${PN}-sd8997 ${PN}-usb8997 \
              ${PN}-ti-connectivity-license ${PN}-wlcommon ${PN}-wl12xx ${PN}-wl18xx \
              ${PN}-vt6656-license ${PN}-vt6656 \
+             ${PN}-rs9113 ${PN}-rs9116 \
              ${PN}-rtl-license ${PN}-rtl8188 ${PN}-rtl8192cu ${PN}-rtl8192ce ${PN}-rtl8192su ${PN}-rtl8723 ${PN}-rtl8821 \
              ${PN}-rtl8168 \
              ${PN}-cypress-license \
@@ -528,6 +529,16 @@ FILES_${PN}-nvidia-license = "${nonarch_base_libdir}/firmware/LICENCE.nvidia"
 RDEPENDS_${PN}-nvidia-gpu += "${PN}-nvidia-license"
 RDEPENDS_${PN}-nvidia-tegra += "${PN}-nvidia-license"
 RDEPENDS_${PN}-nvidia-tegra-k1 += "${PN}-nvidia-license"
+
+# For RSI RS911x WiFi
+LICENSE_${PN}-rs9113 = "WHENCE"
+LICENSE_${PN}-rs9116 = "WHENCE"
+
+FILES_${PN}-rs9113 = " ${nonarch_base_libdir}/firmware/rsi/rs9113*.rps "
+FILES_${PN}-rs9116 = " ${nonarch_base_libdir}/firmware/rsi/rs9116*.rps "
+
+RDEPENDS_${PN}-rs9113 += "${PN}-whence-license"
+RDEPENDS_${PN}-rs9116 += "${PN}-whence-license"
 
 # For rtl
 LICENSE_${PN}-rtl8188 = "Firmware-rtlwifi_firmware"

@@ -77,8 +77,7 @@ immediately followed by a string representing the target architecture.
 
 For example, the following SDK installer is for a 64-bit
 development host system and a i586-tuned target architecture based off
-the SDK for ``core-image-sato`` and using the current DISTRO snapshot:
-::
+the SDK for ``core-image-sato`` and using the current DISTRO snapshot::
 
    poky-glibc-x86_64-core-image-sato-i586-toolchain-DISTRO.sh
 
@@ -141,8 +140,7 @@ begin with the string "``environment-setup``" and include as part of
 their name the tuned target architecture. As an example, the following
 commands set the working directory to where the SDK was installed and
 then source the environment setup script. In this example, the setup
-script is for an IA-based target machine using i586 tuning:
-::
+script is for an IA-based target machine using i586 tuning::
 
    $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
 

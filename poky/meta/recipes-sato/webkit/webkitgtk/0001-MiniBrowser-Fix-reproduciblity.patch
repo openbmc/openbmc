@@ -1,0 +1,31 @@
+From dcf9ae0dc0b4510eddbeeea09e11edfb123f95af Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 2 May 2021 13:10:49 -0700
+Subject: [PATCH] MiniBrowser: Fix reproduciblity
+
+Do not emit references to source dir in generated sourcecode
+
+Upstream-Status: Submitted [https://bugs.webkit.org/show_bug.cgi?id=225283]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Tools/MiniBrowser/gtk/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Tools/MiniBrowser/gtk/CMakeLists.txt b/Tools/MiniBrowser/gtk/CMakeLists.txt
+index 93b62521..482d3b00 100644
+--- a/Tools/MiniBrowser/gtk/CMakeLists.txt
++++ b/Tools/MiniBrowser/gtk/CMakeLists.txt
+@@ -51,8 +51,8 @@ add_custom_command(
+     OUTPUT ${MiniBrowser_DERIVED_SOURCES_DIR}/BrowserMarshal.c
+            ${MiniBrowser_DERIVED_SOURCES_DIR}/BrowserMarshal.h
+     MAIN_DEPENDENCY ${MiniBrowser_DIR}/browser-marshal.list
+-    COMMAND glib-genmarshal --prefix=browser_marshal ${MiniBrowser_DIR}/browser-marshal.list --body > ${MiniBrowser_DERIVED_SOURCES_DIR}/BrowserMarshal.c
+-    COMMAND glib-genmarshal --prefix=browser_marshal ${MiniBrowser_DIR}/browser-marshal.list --header > ${MiniBrowser_DERIVED_SOURCES_DIR}/BrowserMarshal.h
++    COMMAND glib-genmarshal --prefix=browser_marshal ${MiniBrowser_DIR}/browser-marshal.list --body --skip-source > ${MiniBrowser_DERIVED_SOURCES_DIR}/BrowserMarshal.c
++    COMMAND glib-genmarshal --prefix=browser_marshal ${MiniBrowser_DIR}/browser-marshal.list --header --skip-source > ${MiniBrowser_DERIVED_SOURCES_DIR}/BrowserMarshal.h
+     VERBATIM)
+ 
+ if (USE_GTK4)
+-- 
+2.31.1
+
