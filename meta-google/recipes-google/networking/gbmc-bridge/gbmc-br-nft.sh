@@ -14,6 +14,8 @@
 
 [ -z "${gbmc_br_nft_lib-}" ] || return
 
+source /usr/share/network/lib.sh || exit
+
 gbmc_br_nft_init=
 gbmc_br_nft_pfx=
 
@@ -48,9 +50,16 @@ gbmc_br_nft_hook() {
   # (<mpfx>:fdxx:). So 2002:af4:3480:2248:fd02:6345:3069:9186 would become
   # a 2002:af4:3480:2248:fd00/72 rule.
   elif [ "$change" = 'addr' -a "$intf" = 'gbmcbr' -a "$scope" = 'global' ] &&
-       [[ "$fam" == 'inet6' && "$ip" =~ ^(([^:]+:){4}fd)[^:]{2}:.*$ ]] &&
-       [[ "$flags" != *tentative* ]]; then
-    pfx="${BASH_REMATCH[1]}00::/72"
+       [[ "$fam" == 'inet6' && "$flags" != *tentative* ]]; then
+    local ip_bytes=()
+    if ! ip_to_bytes ip_bytes "$ip"; then
+      echo "gBMC Bridge NFT Invalid IP: $ip" >&2
+      return 1
+    fi
+    if (( ip_bytes[9] != 0xfd )); then
+      return 0
+    fi
+    pfx="$(printf '%02x%02x:%02x%02x:%02x%02x:%02x%02x:fd00::/72' "${ip_bytes[@]}")"
     if [ "$action" = "add" -a "$pfx" != "$gbmc_br_nft_pfx" ]; then
       gbmc_br_nft_pfx="$pfx"
       gbmc_br_nft_update

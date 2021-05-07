@@ -14,6 +14,8 @@
 
 [ -z "${gbmc_br_gw_src_lib-}" ] || return
 
+source /usr/share/network/lib.sh || exit
+
 gbmc_br_gw_src_ip=
 declare -A gbmc_br_gw_src_routes=()
 
@@ -48,8 +50,15 @@ gbmc_br_gw_src_hook() {
   # prefix (<mpfx>:fd00:). So 2002:af4:3480:2248:fd00:6345:3069:9186 would be
   # matched as the preferred source IP for outoging traffic.
   elif [ "$change" = 'addr' -a "$intf" = 'gbmcbr' -a "$scope" = 'global' ] &&
-       [[ "$fam" == 'inet6' && "$ip" =~ ^([^:]+:){4}fd00:.*$ ]] &&
-       [[ "$flags" != *tentative* ]]; then
+       [[ "$fam" == 'inet6' && "$flags" != *tentative* ]]; then
+    local ip_bytes=()
+    if ! ip_to_bytes ip_bytes "$ip"; then
+      echo "gBMC Bridge Ensure RA Invalid IP: $ip" >&2
+      return 1
+    fi
+    if (( ip_bytes[9] != 0xfd || ip_bytes[10] != 0 )); then
+      return 0
+    fi
     if [ "$action" = 'add' -a "$ip" != "$gbmc_br_gw_src_ip" ]; then
       gbmc_br_gw_src_ip="$ip"
       gbmc_br_gw_src_update
