@@ -40,10 +40,13 @@ gbmc_br_ula_update() {
     printf '%s' "$contents" >"$netfile"
   done
 
-  # We have to add the address after writing the systemd config to ensure we
-  # don't race with reconfiguration and drop the address.
-  if [ -n "$addr" ]; then
-    ip addr replace "$addr" dev gbmcbr
+  # Ensure that systemd-networkd performs a reconfiguration as it doesn't
+  # currently check the mtime of drop-in files.
+  touch -c /lib/systemd/network/*-bmc-gbmcbr.network
+
+  if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
+    networkctl reload
+    networkctl reconfigure gbmcbr
   fi
 }
 

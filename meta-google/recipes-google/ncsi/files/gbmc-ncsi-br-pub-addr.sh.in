@@ -63,25 +63,13 @@ EOF
     printf '%s' "$contents" >"$file"
   done
 
-  # We only restart networkd if we know we have a management network available
-  # on the machine and networkd is already running.
-  if [ -e /lib/systemd/network/-bmc-gbmcbrdummy.network ] && \
-     ! systemctl status systemd-networkd | grep -q inactive; then
-    echo "Restarting networkd" >&2
-    # HACK: We can't restart systemd-networkd without coordinating with
-    # phosphor-networkd, otherwise it will sometimes detect interfaces as
-    # unmanaged because it reads administrative state to determine enabled
-    # status. Adding an IP to phosphor-networkd is guaranteed to trigger the
-    # restart we want, and systemd-network will never actually accept the
-    # new value.
-    local start=$SECONDS
-    while (( SECONDS - start < 30 )); do
-      busctl call xyz.openbmc_project.Network \
-        /xyz/openbmc_project/network/gbmcbrdummy \
-        xyz.openbmc_project.Network.IP.Create IP ssys \
-        xyz.openbmc_project.Network.IP.Protocol.IPv6 ff02::1 128 '' && break
-      sleep 1
-    done
+  # Ensure that systemd-networkd performs a reconfiguration as it doesn't
+  # currently check the mtime of drop-in files.
+  touch -c /lib/systemd/network/*-bmc-gbmcbr.network
+
+  if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
+    networkctl reload
+    networkctl reconfigure gbmcbr
   fi
 }
 
