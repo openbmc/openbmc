@@ -1,7 +1,6 @@
 FILESEXTRAPATHS_prepend_gbs := "${THISDIR}/${PN}:"
 
-SRC_URI_append_gbs = " file://0001-sensor-Implement-sensor-ASYNC_READ_TIMEOUT.patch \
-                       file://0002-Add-power-on-monitor-mechanism.patch \
+SRC_URI_append_gbs = " file://0002-Add-power-on-monitor-mechanism.patch \
                      "
 
 GBS_NAMES = " \
