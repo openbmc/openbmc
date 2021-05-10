@@ -13,14 +13,14 @@
             {
                "name": "fan0_0",
                "threshold": 30,
-               "has_target": true
+               "has_target": true,
+               "factor": 0.627,
+               "offset": 750
             },
             {
                "name": "fan0_1",
                "threshold": 30,
-               "has_target": false,
-               "factor": 1.45,
-               "offset": -909
+               "has_target": false
             }
          ]
       },
@@ -37,14 +37,14 @@
             {
                "name": "fan1_0",
                "threshold": 30,
-               "has_target": true
+               "has_target": true,
+               "factor": 0.627,
+               "offset": 750
             },
             {
                "name": "fan1_1",
                "threshold": 30,
-               "has_target": false,
-               "factor": 1.45,
-               "offset": -909
+               "has_target": false
             }
          ]
       },
@@ -61,14 +61,14 @@
             {
                "name": "fan2_0",
                "threshold": 30,
-               "has_target": true
+               "has_target": true,
+               "factor": 0.627,
+               "offset": 750
             },
             {
                "name": "fan2_1",
                "threshold": 30,
-               "has_target": false,
-               "factor": 1.45,
-               "offset": -909
+               "has_target": false
             }
          ]
       },
@@ -85,14 +85,14 @@
             {
                "name": "fan3_0",
                "threshold": 30,
-               "has_target": true
+               "has_target": true,
+               "factor": 0.627,
+               "offset": 750
             },
             {
                "name": "fan3_1",
                "threshold": 30,
-               "has_target": false,
-               "factor": 1.45,
-               "offset": -909
+               "has_target": false
             }
          ]
       },
@@ -109,14 +109,14 @@
             {
                "name": "fan4_0",
                "threshold": 30,
-               "has_target": true
+               "has_target": true,
+               "factor": 0.627,
+               "offset": 750
             },
             {
                "name": "fan4_1",
                "threshold": 30,
-               "has_target": false,
-               "factor": 1.45,
-               "offset": -909
+               "has_target": false
             }
          ]
       },
@@ -133,14 +133,14 @@
             {
                "name": "fan5_0",
                "threshold": 30,
-               "has_target": true
+               "has_target": true,
+               "factor": 0.627,
+               "offset": 750
             },
             {
                "name": "fan5_1",
                "threshold": 30,
-               "has_target": false,
-               "factor": 1.45,
-               "offset": -909
+               "has_target": false
             }
          ]
       }
