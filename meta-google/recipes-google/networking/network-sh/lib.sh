@@ -153,6 +153,60 @@ ip_to_bytes() {
   bytes_out=("${bytes[@]}")
 }
 
+ip_bytes_to_str() {
+  local -n bytes="$1"
+
+  if (( "${#bytes[@]}" == 4 )); then
+    printf '%d.%d.%d.%d\n' "${bytes[@]}"
+  elif (( "${#bytes[@]}" == 16 )); then
+    # Track the starting position of the longest run of 0 hextets (2 bytes)
+    local longest_i=0
+    # Track the size of the longest run of 0 hextets
+    local longest_s=0
+    # The index of the first 0 byte in the current run of zeros
+    local first_zero=0
+    local i
+    # Find the location of the longest run of zero hextets, preferring same
+    # size runs later in the address.
+    for (( i=0; i<=16; i+=2 )); do
+      # Terminate the run of zeros if we are at the end of the array or
+      # have a non-zero hextet
+      if (( i == 16 || bytes[$i] != 0 || bytes[$((i+1))] != 0 )); then
+        local s=$((i - first_zero))
+        if (( s >= longest_s )); then
+          longest_i=$first_zero
+          longest_s=$s
+        fi
+        first_zero=$((i+2))
+      fi
+    done
+    # Build the address string by each hextet
+    for (( i=0; i<16; i+=2 )); do
+      # If we encountered a run of zeros, add the necessary :: at the end
+      # of the string. If not at the end, a single : is added since : is
+      # printed to subsequent hextets already.
+      if (( i == longest_i )); then
+        (( i += longest_s-2 ))
+        printf ':'
+        # End of string needs to be ::
+        if (( i == 14 )); then
+          printf ':'
+        fi
+      else
+        # Prepend : to all hextets except the first for separation
+        if (( i != 0 )); then
+          printf ':'
+        fi
+        printf '%x' $(( (bytes[$i]<<8) | bytes[$(($i+1))]))
+      fi
+    done
+    printf '\n'
+  else
+    echo "Invalid IP Bytes: ${bytes[*]}" >&2
+    return 1
+  fi
+}
+
 ipv6_pfx_concat() {
   local pfx="$1"
   local sfx="$2"

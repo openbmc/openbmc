@@ -114,6 +114,36 @@ test_ip6_to_bytes() {
   out=()
 }
 
+test_ip4_bytes_str() {
+  in=(10 0 255 1)
+  str="$(ip_bytes_to_str in)" || fail
+  expect_streq "$str" '10.0.255.1'
+}
+
+test_ip6_bytes_str() {
+  in=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+  str="$(ip_bytes_to_str in)" || fail
+  expect_streq "$str" '::'
+  in=(0xfd 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+  str="$(ip_bytes_to_str in)" || fail
+  expect_streq "$str" 'fd00::'
+  in=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0xfd)
+  str="$(ip_bytes_to_str in)" || fail
+  expect_streq "$str" '::fd'
+  in=(0xfd 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1)
+  str="$(ip_bytes_to_str in)" || fail
+  expect_streq "$str" 'fd01::1'
+  in=(0xfd 1 0 0 0 0 0 0 0 1 0 0 0 0 0 1)
+  str="$(ip_bytes_to_str in)" || fail
+  expect_streq "$str" 'fd01::1:0:0:1'
+  in=(0xfd 1 0 0 0 0 0 1 0 1 0 0 0 0 0 1)
+  str="$(ip_bytes_to_str in)" || fail
+  expect_streq "$str" 'fd01:0:0:1:1::1'
+  in=(0 1 0 1 0xdd 0xdd 0 1 0 1 0 1 0 1 0 1)
+  str="$(ip_bytes_to_str in)" || fail
+  expect_streq "$str" '1:1:dddd:1:1:1:1:1'
+}
+
 test_ipv6_pfx_concat() {
   # Invalid inputs
   expect_err 1 ipv6_pfx_concat 'fd/64' '1234:5678:90af'
