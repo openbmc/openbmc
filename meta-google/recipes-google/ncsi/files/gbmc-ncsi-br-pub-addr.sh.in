@@ -23,35 +23,37 @@ gbmc_ncsi_br_pub_addr_update() {
   printf 'gBMC Bridge Pub Addr from NCSI: %s\n' \
     "${gbmc_ncsi_br_pub_addr_lastip:-(deleted)}" >&2
 
-  local pfx=
+  local pfx_bytes=()
   if [ -n "$gbmc_ncsi_br_pub_addr_lastip" ]; then
-    # Pad the address out to a /64 and ensure that it doesn't have extra bits
-    pfx="${gbmc_ncsi_br_pub_addr_lastip%::}"
-    while true; do
-      # Count `:` in `pfx` by removing them and diffing their lengths
-      local nos="${pfx//:/}"
-      (( ${#pfx} - ${#nos} >= 3 )) && break
-      pfx+=":0"
+    ip_to_bytes pfx_bytes "$gbmc_ncsi_br_pub_addr_lastip"
+    # Ensure we don't have more than a /64 address
+    local i
+    for (( i = 8; i < 16; ++i )); do
+      if (( pfx_bytes[$i] != 0 )); then
+        pfx_bytes=()
+        break
+      fi
     done
-    # Addresses that have more than 64bits of prefix (more than 3 separators)
-    # do not work with this scheme. Ignore them.
-    (( ${#pfx} - ${#nos} == 3 )) || pfx=
   fi
 
   local contents='[Network]'$'\n'
-  if [ -n "$pfx" ]; then
+  if (( ${#pfx_bytes[@]} != 0 )); then
+    pfx_bytes[8]=0xfd
+    local stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
+    pfx_bytes[9]=0x01
+    local ncsi_pfx="$(ip_bytes_to_str pfx_bytes)"
     local here=
     read -r -d '' here <<EOF
-Address=${pfx}:fd01::/128
+Address=$ncsi_pfx/128
 IPv6PrefixDelegation=yes
 [IPv6PrefixDelegation]
 RouterLifetimeSec=60
 [IPv6Prefix]
-Prefix=${pfx}:fd00::/80
+Prefix=$stateless_pfx/80
 PreferredLifetimeSec=60
 ValidLifetimeSec=60
 [IPv6RoutePrefix]
-Route=${pfx}:fd01::/80
+Route=$ncsi_pfx/80
 LifetimeSec=60
 EOF
     contents+="$here"$'\n'

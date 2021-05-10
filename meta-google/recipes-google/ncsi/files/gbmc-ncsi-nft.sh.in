@@ -38,22 +38,23 @@ gbmc_ncsi_nft_update() {
   if [ -n "$ip6" ]; then
     contents+="        ip6 daddr $ip6/128 goto ncsi_legacy_input"$'\n'
 
-    # Pad out to 4 hextets with no trailing semicolons
-    local pfx=
-    pfx="${ip6%::}"
-    while true; do
-      # Count `:` in `pfx` by removing them and diffing their lengths
-      local nos="${pfx//:/}"
-      (( ${#pfx} - ${#nos} >= 3 )) && break
-      pfx+=":0"
-    done
-
+    local ip_bytes=()
+    ip_to_bytes ip_bytes "$ip6"
     # If our address has enough spare bits for appending the BMC suffix
     # then we add a rule that allows the BMC subnet. That is, we need a /64
     # as input.
-    if (( ${#pfx} - ${#nos} == 3 )); then
-      contents+="        ip6 saddr != ${pfx}:fd00::/72 ip6 daddr"
-      contents+=" ${pfx}:fd00::/72 goto ncsi_gbmc_br_pub_input"$'\n'
+    local i
+    for (( i = 8; i < 16; i++ )); do
+      if (( ip_bytes[$i] != 0 )); then
+        ip_bytes=()
+        break
+      fi
+    done
+    if (( ${#ip_bytes[@]} != 0 )); then
+      ip_bytes[8]=0xfd
+      local pfx="$(ip_bytes_to_str ip_bytes)"
+      contents+="        ip6 saddr != $pfx/72 ip6 daddr"
+      contents+=" $pfx/72 goto ncsi_gbmc_br_pub_input"$'\n'
     fi
   fi
 
