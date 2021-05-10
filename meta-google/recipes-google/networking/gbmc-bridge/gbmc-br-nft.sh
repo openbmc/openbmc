@@ -56,10 +56,14 @@ gbmc_br_nft_hook() {
       echo "gBMC Bridge NFT Invalid IP: $ip" >&2
       return 1
     fi
-    if (( ip_bytes[9] != 0xfd )); then
+    if (( ip_bytes[8] != 0xfd )); then
       return 0
     fi
-    pfx="$(printf '%02x%02x:%02x%02x:%02x%02x:%02x%02x:fd00::/72' "${ip_bytes[@]}")"
+    local i
+    for (( i=9; i<16; i++ )); do
+      ip_bytes[$i]=0
+    done
+    pfx="$(ip_bytes_to_str ip_bytes)/72"
     if [ "$action" = "add" -a "$pfx" != "$gbmc_br_nft_pfx" ]; then
       gbmc_br_nft_pfx="$pfx"
       gbmc_br_nft_update

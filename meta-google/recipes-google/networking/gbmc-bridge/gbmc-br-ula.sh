@@ -27,10 +27,11 @@ gbmc_br_ula_update() {
   local addr=
   contents='[Network]'$'\n'
   if [ -n "$gbmc_br_ula_mac" ]; then
-    local eui64
-    eui64="$(mac_to_eui64 "$mac")" || return
-    addr="fdb5:0481:10ce:0:$eui64/64"
-    contents+="Address=$addr"$'\n'
+    local sfx
+    if sfx="$(mac_to_eui64 "$gbmc_br_ula_mac")" &&
+       addr="$(ip_pfx_concat "fdb5:0481:10ce::/64" "$sfx")"; then
+      contents+="Address=$addr"$'\n'
+    fi
   fi
 
   local netfile

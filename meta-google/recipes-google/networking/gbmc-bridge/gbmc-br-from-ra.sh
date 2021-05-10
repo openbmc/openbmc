@@ -27,7 +27,7 @@ gbmc_br_from_ra_update() {
   local pfx
   for pfx in "${!gbmc_br_from_ra_pfxs[@]}"; do
     local cidr
-    if ! cidr="$(ipv6_pfx_to_cidr "$pfx")"; then
+    if ! cidr="$(ip_pfx_to_cidr "$pfx")"; then
       unset 'gbmc_br_from_ra_pfxs[$pfx]'
       continue
     fi
@@ -38,8 +38,12 @@ gbmc_br_from_ra_update() {
         continue
       fi
       local addr
-      addr="$(ipv6_pfx_concat "$pfx" "$sfx")"
+      if ! addr="$(ip_pfx_concat "$pfx" "$sfx")"; then
+        unset 'gbmc_br_from_ra_pfxs[$pfx]'
+        continue
+      fi
     else
+      unset 'gbmc_br_from_ra_pfxs[$pfx]'
       continue
     fi
     local valid="${gbmc_br_from_ra_pfxs["$pfx"]}"

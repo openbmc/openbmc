@@ -33,11 +33,11 @@ mac_to_bytes() {
 }
 
 mac_to_eui48() {
-  local mac_bytes=()
+  local mac_bytes=(0 0 0 0 0 0 0 0 0 0)
   mac_to_bytes mac_bytes "$1" || return
 
   # Return the EUI-64 bytes in the IPv6 format
-  printf '%02x%02x:%02x%02x:%02x%02x\n' "${mac_bytes[@]}"
+  ip_bytes_to_str mac_bytes
 }
 
 mac_to_eui64() {
@@ -47,6 +47,7 @@ mac_to_eui64() {
   # Using EUI-64 conversion rules, create the suffix bytes from MAC bytes
   # Invert bit-0 of the first byte, and insert 0xfffe in the middle.
   local suffix_bytes=(
+    0 0 0 0 0 0 0 0
     $((mac_bytes[0] ^ 1))
     ${mac_bytes[@]:1:2}
     $((0xff)) $((0xfe))
@@ -54,7 +55,7 @@ mac_to_eui64() {
   )
 
   # Return the EUI-64 bytes in the IPv6 format
-  printf '%02x%02x:%02x%02x:%02x%02x:%02x%02x\n' "${suffix_bytes[@]}"
+  ip_bytes_to_str suffix_bytes
 }
 
 ip_to_bytes() {
@@ -207,47 +208,84 @@ ip_bytes_to_str() {
   fi
 }
 
-ipv6_pfx_concat() {
+ip_pfx_concat() {
   local pfx="$1"
   local sfx="$2"
 
-  # Validate the prefix
-  if ! [[ "$pfx" =~ ^(([0-9a-fA-F]{1,4}:)+):/([0-9]+)$ ]]; then
-    echo "Invalid IPv6 prefix: $pfx" >&2
+  # Parse the prefix
+  if ! [[ "$pfx" =~ ^([0-9a-fA-F:.]+)/([0-9]+)$ ]]; then
+    echo "Invalid IP prefix: $pfx" >&2
     return 1
   fi
   local addr="${BASH_REMATCH[1]}"
-  local cidr="${BASH_REMATCH[3]}"
+  local cidr="${BASH_REMATCH[2]}"
+
   # Ensure prefix doesn't have too many bytes
-  local nos="${addr//:/}"
-  if (( ${#addr} - ${#nos} > (cidr+7)/16 )); then
-    echo "Too many prefix bytes: $pfx" >&2
+  local pfx_bytes=()
+  if ! ip_to_bytes pfx_bytes "$addr"; then
+    echo "Invalid IP prefix: $pfx" >&2
     return 1
   fi
+  if (( ${#pfx_bytes[@]}*8 < cidr )); then
+    echo "Prefix CIDR too large" >&2
+    return 1
+  fi
+  # CIDR values might partially divide a byte so we need to mask out
+  # only the part of the byte we want to check for emptiness
+  if (( (pfx_bytes[cidr/8] & ~(~0 << (8-cidr%8))) != 0 )); then
+    echo "Invalid byte $((cidr/8)): $pfx" >&2
+    return 1
+  fi
+  local i
+  # Check the rest of the whole bytes to make sure they are empty
+  for (( i=cidr/8+1; i<${#pfx_bytes[@]}; i++ )); do
+    if (( pfx_bytes[$i] != 0 )); then
+      echo "Byte $i not 0: $pfx" >&2
+      return 1
+    fi
+  done
 
   # Validate the suffix
-  if ! [[ "$sfx" =~ ^[0-9a-fA-F]{1,4}(:[0-9a-fA-F]{1,4})*$ ]]; then
+  local sfx_bytes=()
+  if ! ip_to_bytes sfx_bytes "$sfx"; then
     echo "Invalid IPv6 suffix: $sfx" >&2
     return 1
   fi
-  # Ensure suffix doesn't have too many bytes
-  local nos="${sfx//:/}"
-  if (( ${#sfx} - ${#nos} >= (128-cidr)/16 )); then
-    echo "Too many suffix bytes: $sfx" >&2
+  if (( "${#sfx_bytes[@]}" != "${#pfx_bytes[@]}" )); then
+    echo "Suffix not the same family as prefix: $pfx $sfx" >&2
     return 1
   fi
-
-  local comb="$addr:$sfx"
-  local nos="${comb//:/}"
-  if (( ${#comb} - ${#nos} == 8 )); then
-    comb="$addr$sfx"
+  # Check potential partially divided bytes for emptiness in the upper part
+  # based on the division specified in CIDR.
+  if (( (sfx_bytes[cidr/8] & (~0 << (8-cidr%8))) != 0 )); then
+    echo "Invalid byte $((cidr/8)): $sfx" >&2
+    return 1
   fi
-  echo "$comb/$cidr"
+  local i
+  # Check the bytes before the CIDR for emptiness to ensure they don't overlap
+  for (( i=0; i<cidr/8; i++ )); do
+    if (( sfx_bytes[$i] != 0 )); then
+      echo "Byte $i not 0: $sfx" >&2
+      return 1
+    fi
+  done
+
+  out_bytes=()
+  for (( i=0; i<${#pfx_bytes[@]}; i++ )); do
+    out_bytes+=($(( pfx_bytes[$i] | sfx_bytes[$i] )))
+  done
+  echo "$(ip_bytes_to_str out_bytes)/$cidr"
 }
 
-ipv6_pfx_to_cidr() {
-  [[ "$1" =~ ^[0-9a-fA-F:]+/([0-9]+)$ ]] || return
+ip_pfx_to_cidr() {
+  [[ "$1" =~ ^[0-9a-fA-F:.]+/([0-9]+)$ ]] || return
   echo "${BASH_REMATCH[1]}"
+}
+
+normalize_ip() {
+  local ip_bytes=()
+  ip_to_bytes ip_bytes "$1" || return
+  ip_bytes_to_str ip_bytes
 }
 
 network_init=1

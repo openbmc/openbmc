@@ -50,14 +50,14 @@ test_mac_to_bytes() {
   expect_array_numeq out expected
 }
 
-test_mac_to_eui_48() {
+test_mac_to_eui48() {
   str="$(mac_to_eui48 '12:34:56:78:90:af')" || fail
-  expect_streq "$str" '1234:5678:90af'
+  expect_streq "$str" '::1234:5678:90af'
 }
 
-test_eui_64() {
+test_mac_to_eui64() {
   str="$(mac_to_eui64 '12:34:56:78:90:af')" || fail
-  expect_streq "$str" '1334:56ff:fe78:90af'
+  expect_streq "$str" '::1334:56ff:fe78:90af'
 }
 
 test_ip4_to_bytes() {
@@ -144,37 +144,57 @@ test_ip6_bytes_str() {
   expect_streq "$str" '1:1:dddd:1:1:1:1:1'
 }
 
-test_ipv6_pfx_concat() {
+test_ip_pfx_concat() {
   # Invalid inputs
-  expect_err 1 ipv6_pfx_concat 'fd/64' '1234:5678:90af'
-  expect_err 1 ipv6_pfx_concat 'fd01::' '1234:5678:90af'
-  expect_err 1 ipv6_pfx_concat 'fd01:' '1234:5678:90af'
-  expect_err 1 ipv6_pfx_concat 'fd01::/a0' '1234:5678:90af'
-  expect_err 1 ipv6_pfx_concat 'fd01::/64' ':1234:5678:90af'
-  expect_err 1 ipv6_pfx_concat 'fd01::/64' '::'
+  expect_err 1 ip_pfx_concat 'fd/64' '::1234:5678:90af'
+  expect_err 1 ip_pfx_concat 'fd01::' '::1234:5678:90af'
+  expect_err 1 ip_pfx_concat 'fd01:' '::1234:5678:90af'
+  expect_err 1 ip_pfx_concat 'fd01::/a0' '::1234:5678:90af'
+  expect_err 1 ip_pfx_concat 'fd01::/64' ':1234:5678:90af'
+  expect_err 1 ip_pfx_concat 'fd01::/64' ''
+  expect_err 1 ip_pfx_concat 'fd01::/129' '::1'
 
   # Too many address bits
-  expect_err 1 ipv6_pfx_concat 'fd01:1:1:1:1::/64' '1234:5678:90af'
-  expect_err 1 ipv6_pfx_concat 'fd01::/64' '1:0:1234:5678:90af'
-  expect_err 1 ipv6_pfx_concat 'fd01::/65' '1:1234:5678:90af'
-  expect_err 1 ipv6_pfx_concat 'fd01::/72' '1:1234:5678:90af'
+  expect_err 1 ip_pfx_concat 'fd01:1:1:1:1::/64' '::1234:5678:90af'
+  expect_err 1 ip_pfx_concat 'fd01::/64' '::1:0:1234:5678:90af'
+  expect_err 1 ip_pfx_concat 'fd01::/79' '::3:1234:5678:90af'
+  expect_err 1 ip_pfx_concat 'fd01::/15' '::3:1234:5678:90af'
+  expect_err 1 ip_pfx_concat '10.0.0.1/31' '0.0.0.0'
 
-  str="$(ipv6_pfx_concat 'fd01::/64' '1')" || fail
+  str="$(ip_pfx_concat '::1/128' '::0')" || fail
+  expect_streq "$str" '::1/128'
+  str="$(ip_pfx_concat 'fd01::/64' '::1')" || fail
   expect_streq "$str" 'fd01::1/64'
-  str="$(ipv6_pfx_concat 'fd01::/72' '1234:5678:90af')" || fail
+  str="$(ip_pfx_concat 'fd01::/127' '::1')" || fail
+  expect_streq "$str" 'fd01::1/127'
+  str="$(ip_pfx_concat 'fd02::/15' '::1')" || fail
+  expect_streq "$str" 'fd02::1/15'
+  str="$(ip_pfx_concat 'fd01::/72' '::1234:5678:90af')" || fail
   expect_streq "$str" 'fd01::1234:5678:90af/72'
-  str="$(ipv6_pfx_concat 'fd01:eeee:aaaa:cccc::/64' 'a:1234:5678:90af')" || fail
+  str="$(ip_pfx_concat 'fd01:eeee:aaaa:cccc::/64' '::a:1234:5678:90af')" || fail
   expect_streq "$str" 'fd01:eeee:aaaa:cccc:a:1234:5678:90af/64'
+  str="$(ip_pfx_concat 'fd01::fd00:0:0:0/80' '::1')" || fail
+  expect_streq "$str" 'fd01::fd00:0:0:1/80'
+
+  str="$(ip_pfx_concat '10.0.0.0/24' '0.0.0.1')" || fail
+  expect_streq "$str" '10.0.0.1/24'
 }
 
-test_ipv6_pfx_to_cidr() {
-  expect_err 1 ipv6_pfx_to_cidr 'z/64'
-  expect_err 1 ipv6_pfx_to_cidr '64'
+test_ip_pfx_to_cidr() {
+  expect_err 1 ip_pfx_to_cidr 'z/64'
+  expect_err 1 ip_pfx_to_cidr '64'
 
-  cidr="$(ipv6_pfx_to_cidr 'fd01::/64')" || fail
+  cidr="$(ip_pfx_to_cidr 'fd01::/64')" || fail
   expect_numeq "$cidr" 64
-  cidr="$(ipv6_pfx_to_cidr 'fd01:eeee:aaaa:cccc:a:1234:5678:90af/128')" || fail
+  cidr="$(ip_pfx_to_cidr 'fd01:eeee:aaaa:cccc:a:1234:5678:90af/128')" || fail
   expect_numeq "$cidr" 128
+  cidr="$(ip_pfx_to_cidr '10.0.0.1/24')" || fail
+  expect_numeq "$cidr" 24
+}
+
+test_normalize_ip() {
+  ip="$(normalize_ip 'fd01:1::0:0:1')" || fail
+  expect_streq "$ip" 'fd01:1::1'
 }
 
 return 0 2>/dev/null
