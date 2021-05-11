@@ -4,7 +4,7 @@ LICENSE= "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/NOTICE;md5=fee220301a2af3faf8f211524b4248ea"
 
 SRC_URI = "git://github.com/open-power/eCMD.git"
-SRCREV = "d35b5c025a3f629401ea1352f6e53aa7429950ca"
+SRCREV = "57b40102a54dac8b4b9cdc91beefd709d222867e"
 DEPENDS += "zlib"
 
 SRC_URI += "file://croserver.service"
