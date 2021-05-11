@@ -272,7 +272,9 @@
                         "/xyz/openbmc_project/sensors/fan_tach/fan3_0",
                         "/xyz/openbmc_project/sensors/fan_tach/fan3_1",
                         "/xyz/openbmc_project/sensors/fan_tach/fan4_0",
-                        "/xyz/openbmc_project/sensors/fan_tach/fan4_1"
+                        "/xyz/openbmc_project/sensors/fan_tach/fan4_1",
+                        "/xyz/openbmc_project/sensors/fan_tach/fan5_0",
+                        "/xyz/openbmc_project/sensors/fan_tach/fan5_1"
                     ]
                 }
             ]
@@ -302,6 +304,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/powersupply0_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -329,6 +342,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/powersupply1_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -1590,6 +1614,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot0_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -1617,6 +1652,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot1_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -1646,6 +1692,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot2_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -1673,6 +1730,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot3_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -1702,6 +1770,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot4_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -1729,6 +1808,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot6_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -1758,6 +1848,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot7_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -1785,6 +1886,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot8_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -1814,6 +1926,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot9_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -1842,6 +1965,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot10_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -1869,6 +2003,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/pcieslot11_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2206,6 +2351,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme0_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2233,6 +2389,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme1_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2262,6 +2429,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme2_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2289,6 +2467,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme3_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2318,6 +2507,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme4_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2345,6 +2545,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme5_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2374,6 +2585,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme6_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2401,6 +2623,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme7_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2430,6 +2663,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme8_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2457,6 +2701,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme9_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2486,6 +2741,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme10_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2513,6 +2779,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme11_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2542,6 +2819,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme12_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2569,6 +2857,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme13_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2598,6 +2897,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme14_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2625,6 +2935,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme15_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2654,6 +2975,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme16_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2681,6 +3013,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme17_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2710,6 +3053,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme18_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2737,6 +3091,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme19_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2766,6 +3131,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme20_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2793,6 +3169,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme21_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
@@ -2822,6 +3209,17 @@
                     [
                         "/xyz/openbmc_project/led/groups/nvme22_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
+                    ]
                 }
             ]
         },
@@ -2849,6 +3247,17 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/nvme23_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "chassis"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis"
                     ]
                 }
             ]
