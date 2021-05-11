@@ -1,6 +1,7 @@
 [Match]
 Name=gbmcbr
 [Network]
+@ADDR@
 DHCP=false
 IPv6AcceptRA=true
 LLMNR=true

@@ -1,7 +1,5 @@
 [NetDev]
 Name=gbmcbr
 Kind=bridge
-@MAC@
-@ADDR@
 [Bridge]
 STP=true
