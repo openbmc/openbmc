@@ -23,6 +23,8 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}, \
                           --without-systemdsystemunitdir,systemd"
 
+PACKAGECONFIG[astlpc-raw-kcs] = "--enable-astlpc-raw-kcs,--disable-astlpc-raw-kcs,udev,udev"
+
 CONFFILES_${PN} = "${sysconfdir}/default/mctp"
 
 do_install_append() {
