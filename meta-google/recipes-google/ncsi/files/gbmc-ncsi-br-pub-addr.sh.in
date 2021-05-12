@@ -55,6 +55,10 @@ ValidLifetimeSec=60
 [IPv6RoutePrefix]
 Route=$ncsi_pfx/80
 LifetimeSec=60
+[Route]
+Destination=$stateless_pfx/72
+Type=unreachable
+Metric=1024
 EOF
     contents+="$here"$'\n'
   fi
