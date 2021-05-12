@@ -7,12 +7,15 @@ PROVIDES = "${PACKAGES}"
 PACKAGES = " \
     ${PN}-kudo-system \
     ${PN}-kudo-fw \
+    ${PN}-fan-mgmt \
     "
 
 PROVIDES += "virtual/obmc-system-mgmt"
+PROVIDES += "virtual/obmc-fan-mgmt"
 
 RPROVIDES_${PN}-kudo-system += "virtual-obmc-system-mgmt"
 RPROVIDES_${PN}-kudo-fw += "virtual-obmc-system-mgmt"
+RPROVIDES_${PN}-fan-mgmt += "virtual-obmc-fan-mgmt"
 
 SUMMARY_${PN}-kudo-system = "KUDO System"
 RDEPENDS_${PN}-kudo-system = " \
@@ -38,4 +41,10 @@ RDEPENDS_${PN}-kudo-fw = " \
     kudo-bmc-update \
     kudo-cpld-update \
     kudo-scp-update \
+    "
+
+SUMMARY_${PN}-fan-mgmt = "kudo fan mgmt"
+RDEPENDS_${PN}-fan-mgmt = " \
+    pwm-init \
+    phosphor-pid-control \
     "
