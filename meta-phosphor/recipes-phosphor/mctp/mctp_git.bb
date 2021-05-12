@@ -12,13 +12,18 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0d30807bb7a4f16d36e96b78f9ed8fae"
 SRC_URI = "git://github.com/openbmc/libmctp \
 	   file://default"
 SRCREV = "34d4c96fcf9691e060d8a7f56633bf196c82a52f"
-CONFFILES_${PN} = "${sysconfdir}/default/mctp"
 
 DEPENDS += "autoconf-archive-native \
             systemd \
             "
 
 SYSTEMD_SERVICE_${PN} = "mctp-demux.service"
+
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}, \
+                          --without-systemdsystemunitdir,systemd"
+
+CONFFILES_${PN} = "${sysconfdir}/default/mctp"
 
 do_install_append() {
 	install -d ${D}${sysconfdir}/default
