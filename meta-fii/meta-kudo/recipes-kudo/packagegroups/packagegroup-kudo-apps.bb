@@ -14,7 +14,7 @@ PROVIDES += "virtual/obmc-system-mgmt"
 PROVIDES += "virtual/obmc-fan-mgmt"
 
 RPROVIDES_${PN}-kudo-system += "virtual-obmc-system-mgmt"
-RPROVIDES_${PN}-kudo-fw += "virtual-obmc-system-mgmt"
+RPROVIDES_${PN}-kudo-fw += "virtual-obmc-flash-mgmt"
 RPROVIDES_${PN}-fan-mgmt += "virtual-obmc-fan-mgmt"
 
 SUMMARY_${PN}-kudo-system = "KUDO System"
