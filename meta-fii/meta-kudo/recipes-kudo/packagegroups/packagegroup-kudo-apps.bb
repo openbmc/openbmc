@@ -28,6 +28,7 @@ RDEPENDS_${PN}-kudo-system = " \
     ncsid \
     gbmc-mac-config \
     kudo-boot \
+    kudo-cmd \
     "
 
 SUMMARY_${PN}-kudo-fw = "KUDO Firmware"
