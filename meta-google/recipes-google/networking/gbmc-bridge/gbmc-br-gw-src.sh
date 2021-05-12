@@ -56,7 +56,7 @@ gbmc_br_gw_src_hook() {
       echo "gBMC Bridge Ensure RA Invalid IP: $ip" >&2
       return 1
     fi
-    if (( ip_bytes[9] != 0xfd || ip_bytes[10] != 0 )); then
+    if (( ip_bytes[8] != 0xfd || ip_bytes[9] != 0 )); then
       return 0
     fi
     if [ "$action" = 'add' -a "$ip" != "$gbmc_br_gw_src_ip" ]; then
