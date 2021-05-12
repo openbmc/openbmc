@@ -59,6 +59,11 @@ gbmc_ncsi_nft_update() {
   fi
 
   contents+='    }'$'\n'
+  contents+='    chain ncsi_forward {'$'\n'
+  if [ -n "$pfx" ]; then
+    contents+="        ip6 saddr != $pfx/72 ip6 daddr $pfx/72 accept"$'\n'
+  fi
+  contents+='    }'$'\n'
   contents+='}'$'\n'
 
   local rfile=/run/nftables/40-gbmc-ncsi-in.rules
