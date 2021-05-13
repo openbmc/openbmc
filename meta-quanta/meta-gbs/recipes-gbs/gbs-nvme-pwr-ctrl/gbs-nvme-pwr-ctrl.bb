@@ -12,7 +12,7 @@ DEPENDS += "boost"
 DEPENDS += "libgpiod"
 
 SRC_URI = "git://github.com/quanta-bmc/nvme-power-control;protocol=git"
-SRCREV = "f7d2dbd6b48f3992d4a2fb1c0fe2afd746b8428a"
+SRCREV = "3b39e92a8340d8ba1bd40a03af3f5a9049da3bc7"
 
 S = "${WORKDIR}/git"
 
