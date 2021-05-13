@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/bin/sh
 
 # Contributors Listed Below - COPYRIGHT 2015
 # [+] International Business Machines Corp.
@@ -16,14 +16,9 @@
 # implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
-import time
-import sys
-import dbus
-import dbus.service
-import dbus.mainloop.glib
+echo "obmc-phosphor-sysd starting..."
 
-if __name__ == '__main__':
-	print "obmc-phosphor-watchdogd starting..."
-
-	while 1:
-		time.sleep(5)
+while true
+do
+	sleep 60
+done
