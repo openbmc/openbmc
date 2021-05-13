@@ -97,3 +97,10 @@ do_install() {
   install -d -m0755 ${D}${systemd_system_unitdir}
   install -m0755 ${WORKDIR}/gbmc-br-ensure-ra.service ${D}${systemd_system_unitdir}/
 }
+
+do_rm_work_prepend() {
+  # HACK: Work around broken do_rm_work not properly calling rm with `--`
+  # It doesn't like filenames that start with `-`
+  mkdir -p ${WORKDIR}/done
+  mv -- ${WORKDIR}/-* ${WORKDIR}/done
+}
