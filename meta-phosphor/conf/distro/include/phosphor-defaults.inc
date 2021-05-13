@@ -239,6 +239,9 @@ SECURITY_CFLAGS_pn-obmc-libobmc-intf = ""
 # is merged and rev bumped
 SECURITY_CFLAGS_pn-pldm = ""
 
+# We generally want to enable LTO with meson
+EXTRA_OEMESON_append_class-target = " -Db_lto=true"
+
 # Set the root password to '0penBmc'
 inherit extrausers
 
