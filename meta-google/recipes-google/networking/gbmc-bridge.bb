@@ -61,9 +61,8 @@ do_install() {
   install -d -m0755 $netdir
 
   if [ ! -z "${GBMC_BR_MAC_ADDR}" ]; then
-    local addr=
-    addr+='Address=fe80::${@mac_to_eui64(GBMC_BR_MAC_ADDR)}/64\n'
-    addr+='Address=${GBMC_ULA_PREFIX}:${@mac_to_eui64(GBMC_BR_MAC_ADDR)}/64'
+    sfx='${@mac_to_eui64(GBMC_BR_MAC_ADDR)}'
+    addr="Address=${GBMC_ULA_PREFIX}:$sfx/64\nAddress=fe80::$sfx/64"
     sed -i "s,@ADDR@,$addr," ${WORKDIR}/-bmc-gbmcbr.network.in
   else
     sed -i '/@ADDR@/d' ${WORKDIR}/-bmc-gbmcbr.network.in
