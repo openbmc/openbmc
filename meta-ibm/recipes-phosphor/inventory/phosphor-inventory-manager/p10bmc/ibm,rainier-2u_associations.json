@@ -276,6 +276,25 @@
                         "/xyz/openbmc_project/sensors/fan_tach/fan5_0",
                         "/xyz/openbmc_project/sensors/fan_tach/fan5_1"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "assembly"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/vdd_vrm0",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/vdd_vrm1",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/tpm_wilson",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/tod_battery",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/base_op_panel_blyth",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/lcd_op_panel_hill",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1",
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane2"
+                    ]
                 }
             ]
         },
