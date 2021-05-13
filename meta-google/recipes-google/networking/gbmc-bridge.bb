@@ -101,6 +101,5 @@ do_install() {
 do_rm_work_prepend() {
   # HACK: Work around broken do_rm_work not properly calling rm with `--`
   # It doesn't like filenames that start with `-`
-  mkdir -p ${WORKDIR}/done
-  mv -- ${WORKDIR}/-* ${WORKDIR}/done
+  rm -rf -- ${WORKDIR}/-*
 }
