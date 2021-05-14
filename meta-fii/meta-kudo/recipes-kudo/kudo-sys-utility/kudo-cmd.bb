@@ -1,6 +1,5 @@
 SUMMARY = "Phosphor OpenBMC Kudo System Command"
 DESCRIPTION = "Phosphor OpenBMC Kudo System Command Daemon"
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:
 
 PR = "r1"
 LICENSE = "Apache-2.0"
