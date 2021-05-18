@@ -21,7 +21,6 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libnl"
 DEPENDS += "stdplus"
-DEPENDS += "nlohmann-json"
 
 PACKAGECONFIG ??= "uboot-env default-link-local-autoconf default-ipv6-accept-ra"
 
@@ -30,7 +29,7 @@ PACKAGECONFIG[uboot-env] = "--with-uboot-env,--without-uboot-env,,${UBOOT_ENV_RD
 PACKAGECONFIG[default-link-local-autoconf] = "--enable-link-local-autoconfiguration,--disable-link-local-autoconfiguration,,"
 PACKAGECONFIG[default-ipv6-accept-ra] = "--enable-ipv6-accept-ra,--disable-ipv6-accept-ra,,"
 PACKAGECONFIG[nic-ethtool] = "--enable-nic-ethtool,--disable-nic-ethtool,,"
-PACKAGECONFIG[sync-mac] = "--enable-sync-mac,--disable-sync-mac,,"
+PACKAGECONFIG[sync-mac] = "--enable-sync-mac,--disable-sync-mac,nlohmann-json,"
 
 S = "${WORKDIR}/git"
 
