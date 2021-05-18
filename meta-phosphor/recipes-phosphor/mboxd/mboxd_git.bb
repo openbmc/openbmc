@@ -18,7 +18,7 @@ SRC_URI += "git://github.com/openbmc/mboxbridge.git"
 
 SRC_URI += "file://99-aspeed-lpc-ctrl.rules"
 
-SRCREV="5ff50e3cbd7702aefc185264e4adfb9952040575"
+SRCREV="5c9264daedf1aff690e1957c4578d8395b549cff"
 
 PROVIDES += "mboxctl"
 
