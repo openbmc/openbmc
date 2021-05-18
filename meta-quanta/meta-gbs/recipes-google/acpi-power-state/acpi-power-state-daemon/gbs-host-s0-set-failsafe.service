@@ -8,8 +8,8 @@ After=mapper-wait@-xyz-openbmc_project-settings-fanctrl.service
 
 [Service]
 Type=oneshot
-# 230: 90% duty cycle
-ExecStart=/usr/bin/gbs-set-failsafe.sh 230
+# 255: 100% duty cycle
+ExecStart=/usr/bin/gbs-set-failsafe.sh 255
 
 [Install]
 WantedBy=host-s0-state.target
