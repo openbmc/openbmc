@@ -88,6 +88,10 @@ if [ ! -d "$BITBAKEDIR" ]; then
     return 1
 fi
 
+# Add BitBake's library to PYTHONPATH
+PYTHONPATH=$BITBAKEDIR/lib:$PYTHONPATH
+export PYTHONPATH
+
 # Make sure our paths are at the beginning of $PATH
 for newpath in "$BITBAKEDIR/bin" "$OEROOT/scripts"; do
     # Remove any existences of $newpath from $PATH

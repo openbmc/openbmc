@@ -27,6 +27,8 @@ SRC_URI = "http://cairographics.org/releases/cairo-${PV}.tar.xz \
            file://CVE-2018-19876.patch \
            file://CVE-2019-6461.patch \
            file://CVE-2019-6462.patch \
+           file://CVE-2020-35492.patch \
+           file://bug-image-compositor.ref.png \
           "
 
 SRC_URI[md5sum] = "f19e0353828269c22bd72e271243a552"
@@ -63,6 +65,15 @@ EXTRA_OECONF += " \
 export ac_cv_lib_bfd_bfd_openr="no"
 # Ensure we don't depend on LZO
 export ac_cv_lib_lzo2_lzo2a_decompress="no"
+
+#for CVE-2020-35492.patch
+do_patch_append() {
+    bb.build.exec_func('do_cp_binary_source', d)
+}
+
+do_cp_binary_source () {
+	cp ${WORKDIR}/bug-image-compositor.ref.png ${S}/test/reference/
+}
 
 do_install_append () {
 	rm -rf ${D}${bindir}/cairo-sphinx

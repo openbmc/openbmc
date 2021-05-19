@@ -1,0 +1,305 @@
+From 17cd2dc91cb82ed342b0da699f2b1a70c1bf6a03 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 15 Mar 2021 14:54:02 -0400
+Subject: [PATCH 2/4] fix: block: add a disk_uevent helper (v5.12)
+
+See upstream commit:
+
+  commit bc359d03c7ec1bf3b86d03bafaf6bbb21e6414fd
+  Author: Christoph Hellwig <hch@lst.de>
+  Date:   Sun Jan 24 11:02:39 2021 +0100
+
+    block: add a disk_uevent helper
+
+    Add a helper to call kobject_uevent for the disk and all partitions, and
+    unexport the disk_part_iter_* helpers that are now only used in the core
+    block code.
+
+Upstream-status: Backport [2.12.6]
+
+Change-Id: If6e8797049642ab382d5699660ee1dd734e92c90
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ Makefile               |   1 +
+ lttng-statedump-impl.c |  34 +++++++++----
+ src/wrapper/genhd.c    | 111 +++++++++++++++++++++++++++++++++++++++++
+ wrapper/genhd.h        |  62 +++++++++++++++++++++++
+ 4 files changed, 198 insertions(+), 10 deletions(-)
+ create mode 100644 src/wrapper/genhd.c
+
+diff --git a/Makefile b/Makefile
+index a9aff3f1..34043cfb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -80,6 +80,7 @@ ifneq ($(KERNELRELEASE),)
+                         wrapper/kallsyms.o \
+                         wrapper/irqdesc.o \
+                         wrapper/fdtable.o \
++                        wrapper/genhd.o \
+                         lttng-wrapper-impl.o
+ 
+   ifneq ($(CONFIG_HAVE_SYSCALL_TRACEPOINTS),)
+diff --git a/lttng-statedump-impl.c b/lttng-statedump-impl.c
+index 60b937c9..5511c7e8 100644
+--- a/lttng-statedump-impl.c
++++ b/lttng-statedump-impl.c
+@@ -250,13 +250,17 @@ int lttng_enumerate_block_devices(struct lttng_session *session)
+ 	struct device_type *ptr_disk_type;
+ 	struct class_dev_iter iter;
+ 	struct device *dev;
++	int ret = 0;
+ 
+ 	ptr_block_class = wrapper_get_block_class();
+-	if (!ptr_block_class)
+-		return -ENOSYS;
++	if (!ptr_block_class) {
++		ret = -ENOSYS;
++		goto end;
++	}
+ 	ptr_disk_type = wrapper_get_disk_type();
+ 	if (!ptr_disk_type) {
+-		return -ENOSYS;
++		ret = -ENOSYS;
++		goto end;
+ 	}
+ 	class_dev_iter_init(&iter, ptr_block_class, NULL, ptr_disk_type);
+ 	while ((dev = class_dev_iter_next(&iter))) {
+@@ -272,22 +276,32 @@ int lttng_enumerate_block_devices(struct lttng_session *session)
+ 		    (disk->flags & GENHD_FL_SUPPRESS_PARTITION_INFO))
+ 			continue;
+ 
+-		disk_part_iter_init(&piter, disk, DISK_PITER_INCL_PART0);
+-		while ((part = disk_part_iter_next(&piter))) {
++		/*
++		 * The original 'disk_part_iter_init' returns void, but our
++		 * wrapper can fail to lookup the original symbol.
++		 */
++		if (wrapper_disk_part_iter_init(&piter, disk, DISK_PITER_INCL_PART0) < 0) {
++			ret = -ENOSYS;
++			goto iter_exit;
++		}
++
++		while ((part = wrapper_disk_part_iter_next(&piter))) {
+ 			char name_buf[BDEVNAME_SIZE];
+ 
+ 			if (lttng_get_part_name(disk, part, name_buf) == -ENOSYS) {
+-				disk_part_iter_exit(&piter);
+-				class_dev_iter_exit(&iter);
+-				return -ENOSYS;
++				wrapper_disk_part_iter_exit(&piter);
++				ret = -ENOSYS;
++				goto iter_exit;
+ 			}
+ 			trace_lttng_statedump_block_device(session,
+ 					lttng_get_part_devt(part), name_buf);
+ 		}
+-		disk_part_iter_exit(&piter);
++		wrapper_disk_part_iter_exit(&piter);
+ 	}
++iter_exit:
+ 	class_dev_iter_exit(&iter);
+-	return 0;
++end:
++	return ret;
+ }
+ 
+ #ifdef CONFIG_INET
+diff --git a/src/wrapper/genhd.c b/src/wrapper/genhd.c
+new file mode 100644
+index 00000000..a5a6c410
+--- /dev/null
++++ b/src/wrapper/genhd.c
+@@ -0,0 +1,111 @@
++/* SPDX-License-Identifier: (GPL-2.0-only OR LGPL-2.1-only)
++ *
++ * wrapper/genhd.c
++ *
++ * Wrapper around disk_part_iter_(init|next|exit). Using KALLSYMS to get the
++ * addresses when available, else we need to have a kernel that exports this
++ * function to GPL modules. This export was removed in 5.12.
++ *
++ * Copyright (C) 2021 Michael Jeanson <mjeanson@efficios.com>
++ */
++
++#include <lttng/kernel-version.h>
++#include <linux/module.h>
++#include <wrapper/genhd.h>
++
++#if (defined(CONFIG_KALLSYMS) && \
++	(LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,12,0)))
++
++#include <wrapper/kallsyms.h>
++
++static
++void (*disk_part_iter_init_sym)(struct disk_part_iter *piter, struct gendisk *disk,
++			unsigned int flags);
++
++static
++LTTNG_DISK_PART_TYPE *(*disk_part_iter_next_sym)(struct disk_part_iter *piter);
++
++static
++void (*disk_part_iter_exit_sym)(struct disk_part_iter *piter);
++
++/*
++ * This wrapper has an 'int' return type instead of the original 'void', to be
++ * able to report the symbol lookup failure to the caller.
++ *
++ * Return 0 on success, -1 on error.
++ */
++int wrapper_disk_part_iter_init(struct disk_part_iter *piter, struct gendisk *disk,
++                          unsigned int flags)
++{
++	if (!disk_part_iter_init_sym)
++		disk_part_iter_init_sym = (void *) kallsyms_lookup_funcptr("disk_part_iter_init");
++
++	if (disk_part_iter_init_sym) {
++		disk_part_iter_init_sym(piter, disk, flags);
++	} else {
++		printk_once(KERN_WARNING "LTTng: disk_part_iter_init symbol lookup failed.\n");
++		return -1;
++	}
++	return 0;
++}
++EXPORT_SYMBOL_GPL(wrapper_disk_part_iter_init);
++
++LTTNG_DISK_PART_TYPE *wrapper_disk_part_iter_next(struct disk_part_iter *piter)
++{
++	if (!disk_part_iter_next_sym)
++		disk_part_iter_next_sym = (void *) kallsyms_lookup_funcptr("disk_part_iter_next");
++
++	if (disk_part_iter_next_sym) {
++		return disk_part_iter_next_sym(piter);
++	} else {
++		printk_once(KERN_WARNING "LTTng: disk_part_iter_next symbol lookup failed.\n");
++		return NULL;
++	}
++}
++EXPORT_SYMBOL_GPL(wrapper_disk_part_iter_next);
++
++/*
++ * We don't return an error on symbol lookup failure here because there is
++ * nothing the caller can do to cleanup the iterator.
++ */
++void wrapper_disk_part_iter_exit(struct disk_part_iter *piter)
++{
++	if (!disk_part_iter_exit_sym)
++		disk_part_iter_exit_sym = (void *) kallsyms_lookup_funcptr("disk_part_iter_exit");
++
++	if (disk_part_iter_exit_sym) {
++		disk_part_iter_exit_sym(piter);
++	} else {
++		printk_once(KERN_WARNING "LTTng: disk_part_iter_exit symbol lookup failed.\n");
++	}
++}
++EXPORT_SYMBOL_GPL(wrapper_disk_part_iter_exit);
++
++#else
++
++/*
++ * This wrapper has an 'int' return type instead of the original 'void', so the
++ * kallsyms variant can report the symbol lookup failure to the caller.
++ *
++ * This variant always succeeds and returns 0.
++ */
++int wrapper_disk_part_iter_init(struct disk_part_iter *piter, struct gendisk *disk,
++                          unsigned int flags)
++{
++	disk_part_iter_init(piter, disk, flags);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(wrapper_disk_part_iter_init);
++
++LTTNG_DISK_PART_TYPE *wrapper_disk_part_iter_next(struct disk_part_iter *piter)
++{
++	return disk_part_iter_next(piter);
++}
++EXPORT_SYMBOL_GPL(wrapper_disk_part_iter_next);
++
++void wrapper_disk_part_iter_exit(struct disk_part_iter *piter)
++{
++	disk_part_iter_exit(piter);
++}
++EXPORT_SYMBOL_GPL(wrapper_disk_part_iter_exit);
++#endif
+diff --git a/wrapper/genhd.h b/wrapper/genhd.h
+index 98feb57b..6bae239d 100644
+--- a/wrapper/genhd.h
++++ b/wrapper/genhd.h
+@@ -13,6 +13,13 @@
+ #define _LTTNG_WRAPPER_GENHD_H
+ 
+ #include <linux/genhd.h>
++#include <lttng/kernel-version.h>
++
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
++#define LTTNG_DISK_PART_TYPE struct block_device
++#else
++#define LTTNG_DISK_PART_TYPE struct hd_struct
++#endif
+ 
+ #ifdef CONFIG_KALLSYMS_ALL
+ 
+@@ -94,4 +101,59 @@ struct device_type *wrapper_get_disk_type(void)
+ 
+ #endif
+ 
++/*
++ * This wrapper has an 'int' return type instead of the original 'void', to be
++ * able to report the symbol lookup failure to the caller.
++ *
++ * Return 0 on success, -1 on error.
++ */
++int wrapper_disk_part_iter_init(struct disk_part_iter *piter, struct gendisk *disk,
++                          unsigned int flags);
++LTTNG_DISK_PART_TYPE *wrapper_disk_part_iter_next(struct disk_part_iter *piter);
++void wrapper_disk_part_iter_exit(struct disk_part_iter *piter);
++
++/*
++ * Canary function to check for 'disk_part_iter_init()' at compile time.
++ *
++ * From 'include/linux/genhd.h':
++ *
++ *   extern void disk_part_iter_init(struct disk_part_iter *piter,
++ *                                   struct gendisk *disk, unsigned int flags);
++ *
++ */
++static inline
++void __canary__disk_part_iter_init(struct disk_part_iter *piter, struct gendisk *disk,
++		unsigned int flags)
++{
++	disk_part_iter_init(piter, disk, flags);
++}
++
++/*
++ * Canary function to check for 'disk_part_iter_next()' at compile time.
++ *
++ * From 'include/linux/genhd.h':
++ *
++ *   struct block_device *disk_part_iter_next(struct disk_part_iter *piter);
++ *
++ */
++static inline
++LTTNG_DISK_PART_TYPE *__canary__disk_part_iter_next(struct disk_part_iter *piter)
++{
++	return disk_part_iter_next(piter);
++}
++
++/*
++ * Canary function to check for 'disk_part_iter_exit()' at compile time.
++ *
++ * From 'include/linux/genhd.h':
++ *
++ *   extern void disk_part_iter_exit(struct disk_part_iter *piter);
++ *
++ */
++static inline
++void __canary__disk_part_iter_exit(struct disk_part_iter *piter)
++{
++	return disk_part_iter_exit(piter);
++}
++
+ #endif /* _LTTNG_WRAPPER_GENHD_H */
+-- 
+2.25.1
+

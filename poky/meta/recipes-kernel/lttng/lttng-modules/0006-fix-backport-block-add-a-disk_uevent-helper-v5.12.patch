@@ -1,0 +1,48 @@
+From 127135b6a45d5fca828815c62308f72de97e5739 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Thu, 15 Apr 2021 13:56:24 -0400
+Subject: [PATCH 3/4] fix backport: block: add a disk_uevent helper (v5.12)
+
+Upstream-Status: Backport [2.12.6]
+
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: I717162069990577abe78e5e7fed28816f32b2c84
+---
+ {src/wrapper => wrapper}/genhd.c | 2 +-
+ wrapper/genhd.h                  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+ rename {src/wrapper => wrapper}/genhd.c (98%)
+
+diff --git a/src/wrapper/genhd.c b/wrapper/genhd.c
+similarity index 98%
+rename from src/wrapper/genhd.c
+rename to wrapper/genhd.c
+index a5a6c410..cbec06f7 100644
+--- a/src/wrapper/genhd.c
++++ b/wrapper/genhd.c
+@@ -9,7 +9,7 @@
+  * Copyright (C) 2021 Michael Jeanson <mjeanson@efficios.com>
+  */
+ 
+-#include <lttng/kernel-version.h>
++#include <lttng-kernel-version.h>
+ #include <linux/module.h>
+ #include <wrapper/genhd.h>
+ 
+diff --git a/wrapper/genhd.h b/wrapper/genhd.h
+index 6bae239d..1b4a4201 100644
+--- a/wrapper/genhd.h
++++ b/wrapper/genhd.h
+@@ -13,7 +13,7 @@
+ #define _LTTNG_WRAPPER_GENHD_H
+ 
+ #include <linux/genhd.h>
+-#include <lttng/kernel-version.h>
++#include <lttng-kernel-version.h>
+ 
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,11,0))
+ #define LTTNG_DISK_PART_TYPE struct block_device
+-- 
+2.25.1
+

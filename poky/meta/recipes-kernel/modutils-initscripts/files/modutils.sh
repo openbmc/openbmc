@@ -13,6 +13,7 @@
 
 LOAD_MODULE=modprobe
 [ -f /proc/modules ] || exit 0
+[ -d /lib/modules/`uname -r` ] || exit 0
 
 # Test if modules.dep exists and has a size greater than zero
 if [ ! -s /lib/modules/`uname -r`/modules.dep ]; then

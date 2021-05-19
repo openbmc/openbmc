@@ -50,6 +50,16 @@ SRC_URI += "\
            file://0028-gresource-Fix-a-pointer-mismatch-with-an-atomic-load.patch \
            file://0029-docs-Document-not-to-use-volatile-qualifiers.patch \
 "
+
+# Fix CVE-2021-28153
+SRC_URI += "\
+           file://0001-glocalfileoutputstream-Fix-a-typo-in-a-comment.patch \
+           file://0002-tests-Stop-using-g_test_bug_base-in-file-tests.patch \
+           file://0003-glocalfileoutputstream-Factor-out-a-flag-check.patch \
+           file://0004-glocalfileoutputstream-Fix-CREATE_REPLACE_DESTINATIO.patch \
+           file://0005-glocalfileoutputstream-Add-a-missing-O_CLOEXEC-flag-.patch \
+"
+
 SRC_URI_append_class-native = " file://relocate-modules.patch"
 
 SRC_URI[sha256sum] = "09f158769f6f26b31074e15b1ac80ec39b13b53102dfae66cfe826fb2cc65502"

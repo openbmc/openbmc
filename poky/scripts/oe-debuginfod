@@ -20,12 +20,7 @@ if __name__ == "__main__":
         package_classes_var = "DEPLOY_DIR_" + tinfoil.config_data.getVar("PACKAGE_CLASSES").split()[0].replace("package_", "").upper()
         feed_dir = tinfoil.config_data.getVar(package_classes_var, expand=True)
 
-    try:
-        if package_classes_var == "DEPLOY_DIR_RPM":
-            subprocess.check_output(subprocess.run(['oe-run-native', 'elfutils-native', 'debuginfod', '--verbose', '-R', feed_dir]))
-        else:
-            subprocess.check_output(subprocess.run(['oe-run-native', 'elfutils-native', 'debuginfod', '--verbose', '-U', feed_dir]))
-    except subprocess.CalledProcessError:
-        print("\nTo use the debuginfod server Please ensure that this variable PACKAGECONFIG_pn-elfutils-native = \"debuginfod libdebuginfod\" is set in the local.conf")
-    except KeyboardInterrupt:
-            sys.exit(1)
+    subprocess.call(['bitbake', '-c', 'addto_recipe_sysroot', 'elfutils-native'])
+
+    subprocess.call(['oe-run-native', 'elfutils-native', 'debuginfod', '--verbose', '-R', '-U', feed_dir])
+    print("\nTo use the debuginfod server please ensure that this variable PACKAGECONFIG_pn-elfutils-native = \"debuginfod libdebuginfod\" is set in the local.conf")

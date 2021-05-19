@@ -1,0 +1,60 @@
+From 8cc84a2f8c668541aaba584cb9b73c98afeb8e2d Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 10 Mar 2021 16:05:55 +0000
+Subject: [PATCH 3/5] glocalfileoutputstream: Factor out a flag check
+
+This clarifies the code a little. It introduces no functional changes.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+CVE: CVE-2021-28153
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/issues/2325]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ gio/glocalfileoutputstream.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/gio/glocalfileoutputstream.c b/gio/glocalfileoutputstream.c
+index e3d31d6..392d0b0 100644
+--- a/gio/glocalfileoutputstream.c
++++ b/gio/glocalfileoutputstream.c
+@@ -850,6 +850,7 @@ handle_overwrite_open (const char    *filename,
+   int res;
+   int mode;
+   int errsv;
++  gboolean replace_destination_set = (flags & G_FILE_CREATE_REPLACE_DESTINATION);
+ 
+   mode = mode_from_flags_or_info (flags, reference_info);
+ 
+@@ -960,7 +961,7 @@ handle_overwrite_open (const char    *filename,
+    * to a backup file and rewrite the contents of the file.
+    */
+   
+-  if ((flags & G_FILE_CREATE_REPLACE_DESTINATION) ||
++  if (replace_destination_set ||
+       (!(_g_stat_nlink (&original_stat) > 1) && !is_symlink))
+     {
+       char *dirname, *tmp_filename;
+@@ -979,7 +980,7 @@ handle_overwrite_open (const char    *filename,
+       
+       /* try to keep permissions (unless replacing) */
+ 
+-      if ( ! (flags & G_FILE_CREATE_REPLACE_DESTINATION) &&
++      if (!replace_destination_set &&
+ 	   (
+ #ifdef HAVE_FCHOWN
+ 	    fchown (tmpfd, _g_stat_uid (&original_stat), _g_stat_gid (&original_stat)) == -1 ||
+@@ -1120,7 +1121,7 @@ handle_overwrite_open (const char    *filename,
+ 	}
+     }
+ 
+-  if (flags & G_FILE_CREATE_REPLACE_DESTINATION)
++  if (replace_destination_set)
+     {
+       g_close (fd, NULL);
+       
+-- 
+2.17.1
+

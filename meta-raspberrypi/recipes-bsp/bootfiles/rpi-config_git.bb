@@ -118,10 +118,15 @@ do_deploy() {
 
     # Video camera support
     if [ "${VIDEO_CAMERA}" = "1" ]; then
-        # TODO: It has been observed that Raspberry Pi 4B 4GB may fail to enable the camera if "start_x=1" is at the end
-        #       of the file. The underlying cause is unknown, but it can be related with a file size limitation affecting
-        #       this variable. Therefore, "start_x=1" has been set to replace the original occurrence in config.txt,
-        #       which is at the middle of the file.
+        #   It has been observed that Raspberry Pi 4B 4GB may fail to enable the
+        # camera if "start_x=1" is at the end of the file. Therefore,
+        # "start_x=1" has been set to replace the original occurrence in
+        # config.txt, which is at the middle of the file.
+        #   The exact underlying cause is unknown. There are similar issues
+        # reported in the raspberrypi/firware repo and the conclusion reached
+        # was that there could be a file size limitation affecting certain
+        # variables. It was commented that this limitation could be 4k but
+        # not proved.
         sed -i '/#start_x=/ c\start_x=1' $CONFIG
     fi
 

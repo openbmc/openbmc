@@ -1,0 +1,39 @@
+From 5827f6389a227157958d14a687fb29223cb3a03a Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 7 Apr 2021 07:48:42 +0000
+Subject: [PATCH] xshmfence_futex.h: Define SYS_futex if it does not exist
+
+_NR_futex is not defines by newer architectures e.g. riscv32 as
+they only have 64bit variant of time_t. Glibc defines SYS_futex
+interface based on __NR_futex, since this is used in applications,
+such applications start to fail to build for these newer architectures.
+This patch defines a fallback to alias __NR_futex to __NR_futex_time64
+to make SYS_futex keep working.
+
+Reference: https://git.openembedded.org/openembedded-core/commit/?id=7a218adf9990f5e18d0b6a33eb34091969f979c7
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/xshmfence_futex.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/xshmfence_futex.h b/src/xshmfence_futex.h
+index 673ac0e..a71efa5 100644
+--- a/src/xshmfence_futex.h
++++ b/src/xshmfence_futex.h
+@@ -53,6 +53,10 @@ static inline int futex_wait(int32_t *addr, int32_t value) {
+ #include <sys/time.h>
+ #include <sys/syscall.h>
+ 
++#if !defined(SYS_futex) && defined(SYS_futex_time64)
++#define SYS_futex SYS_futex_time64
++#endif
++
+ static inline long sys_futex(void *addr1, int op, int val1, struct timespec *timeout, void *addr2, int val3)
+ {
+ 	return syscall(SYS_futex, addr1, op, val1, timeout, addr2, val3);
+-- 
+2.29.2
+

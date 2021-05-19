@@ -80,6 +80,8 @@ RDEPENDS_packagegroup-security-mac = " \
     ${@bb.utils.contains("DISTRO_FEATURES", "smack", "smack", "",d)} \
     "
 
+RDEPENDS_packagegroup-security-mac_remove_mipsarch = "apparmor"
+
 RDEPENDS_packagegroup-meta-security-ptest-packages = "\
     ptest-runner \
     samhain-standalone-ptest \

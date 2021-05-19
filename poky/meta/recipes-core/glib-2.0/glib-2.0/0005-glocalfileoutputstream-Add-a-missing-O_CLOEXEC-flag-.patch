@@ -1,0 +1,60 @@
+From ab4ee65fb5778964fa3cca9b3d6749711ef9ba19 Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 24 Feb 2021 17:42:24 +0000
+Subject: [PATCH 5/5] glocalfileoutputstream: Add a missing O_CLOEXEC flag to
+ replace()
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+CVE: CVE-2021-28153
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/issues/2325]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ gio/glocalfileoutputstream.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/gio/glocalfileoutputstream.c b/gio/glocalfileoutputstream.c
+index a2c7e3c..4c512ea 100644
+--- a/gio/glocalfileoutputstream.c
++++ b/gio/glocalfileoutputstream.c
+@@ -63,6 +63,12 @@
+ #define O_BINARY 0
+ #endif
+ 
++#ifndef O_CLOEXEC
++#define O_CLOEXEC 0
++#else
++#define HAVE_O_CLOEXEC 1
++#endif
++
+ struct _GLocalFileOutputStreamPrivate {
+   char *tmp_filename;
+   char *original_filename;
+@@ -1239,7 +1245,7 @@ _g_local_file_output_stream_replace (const char        *filename,
+   sync_on_close = FALSE;
+ 
+   /* If the file doesn't exist, create it */
+-  open_flags = O_CREAT | O_EXCL | O_BINARY;
++  open_flags = O_CREAT | O_EXCL | O_BINARY | O_CLOEXEC;
+   if (readable)
+     open_flags |= O_RDWR;
+   else
+@@ -1269,8 +1275,11 @@ _g_local_file_output_stream_replace (const char        *filename,
+       set_error_from_open_errno (filename, error);
+       return NULL;
+     }
+-  
+- 
++#if !defined(HAVE_O_CLOEXEC) && defined(F_SETFD)
++  else
++    fcntl (fd, F_SETFD, FD_CLOEXEC);
++#endif
++
+   stream = g_object_new (G_TYPE_LOCAL_FILE_OUTPUT_STREAM, NULL);
+   stream->priv->fd = fd;
+   stream->priv->sync_on_close = sync_on_close;
+-- 
+2.17.1
+

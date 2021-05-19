@@ -61,7 +61,7 @@ EXTRA_OECONF += " --without-tirpc "
 
 do_install(){
     install -d ${D}${prefix}/
-    oe_runmake DESTDIR=${D} SKIP_IDCHECK=1 install
+    oe_runmake DESTDIR=${D} SKIP_IDCHECK=1 install include-install
 
     # fixup not deploy STPfailure_report.pl to avoid confusing about it fails to run
     # as it lacks dependency on some perl moudle such as LWP::Simple

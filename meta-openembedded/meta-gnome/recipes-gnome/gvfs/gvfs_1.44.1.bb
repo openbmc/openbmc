@@ -8,6 +8,8 @@ inherit gnomebase gsettings bash-completion gettext upstream-version-is-even fea
 DEPENDS += "libsecret glib-2.0 glib-2.0-native libgudev shadow-native \
             gsettings-desktop-schemas dbus"
 
+RDEPENDS_${PN} += "gsettings-desktop-schemas"
+
 SRC_URI = "https://download.gnome.org/sources/${BPN}/${@gnome_verdir("${PV}")}/${BPN}-${PV}.tar.xz;name=archive"
 SRC_URI[archive.md5sum] = "72383474f52d05c21ef2be96d0b91974"
 SRC_URI[archive.sha256sum] = "50ef3245d1b03666a40455109169a2a1bd51419fd2d51f9fa6cfd4f89f04fb46"

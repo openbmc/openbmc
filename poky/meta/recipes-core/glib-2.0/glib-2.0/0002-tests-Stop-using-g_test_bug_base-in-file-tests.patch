@@ -1,0 +1,47 @@
+From 3d7f54ae4cfdddaf1a807879d9263e16cd12ffd3 Mon Sep 17 00:00:00 2001
+From: Philip Withnall <pwithnall@endlessos.org>
+Date: Wed, 24 Feb 2021 17:34:32 +0000
+Subject: [PATCH 2/5] tests: Stop using g_test_bug_base() in file tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Since a following commit is going to add a new test which references
+Gitlab, so it’s best to move the URI bases inside the test cases.
+
+Signed-off-by: Philip Withnall <pwithnall@endlessos.org>
+
+CVE: CVE-2021-28153
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/issues/2325]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ gio/tests/file.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/gio/tests/file.c b/gio/tests/file.c
+index d876965..39d51da 100644
+--- a/gio/tests/file.c
++++ b/gio/tests/file.c
+@@ -686,7 +686,7 @@ test_replace_cancel (void)
+   guint count;
+   GError *error = NULL;
+ 
+-  g_test_bug ("629301");
++  g_test_bug ("https://bugzilla.gnome.org/629301");
+ 
+   path = g_dir_make_tmp ("g_file_replace_cancel_XXXXXX", &error);
+   g_assert_no_error (error);
+@@ -1785,8 +1785,6 @@ main (int argc, char *argv[])
+ {
+   g_test_init (&argc, &argv, NULL);
+ 
+-  g_test_bug_base ("http://bugzilla.gnome.org/");
+-
+   g_test_add_func ("/file/basic", test_basic);
+   g_test_add_func ("/file/build-filename", test_build_filename);
+   g_test_add_func ("/file/parent", test_parent);
+-- 
+2.17.1
+

@@ -163,12 +163,11 @@ class QemuTest(OESelftestTestCase):
         bitbake(cls.recipe)
 
     def _start_qemu_shutdown_check_if_shutdown_succeeded(self, qemu, timeout):
+        # Allow the runner's LoggingThread instance to exit without errors
+        # (such as the exception "Console connection closed unexpectedly")
+        # as qemu will disappear when we shut it down
+        qemu.runner.allowexit()
         qemu.run_serial("shutdown -h now")
-        # Stop thread will stop the LoggingThread instance used for logging
-        # qemu through serial console, stop thread will prevent this code
-        # from facing exception (Console connection closed unexpectedly)
-        # when qemu was shutdown by the above shutdown command
-        qemu.runner.stop_thread()
         time_track = 0
         try:
             while True:

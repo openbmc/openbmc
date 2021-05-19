@@ -26,3 +26,5 @@ do_compile () {
 do_install () {
 	install -D -m 0755 ${S}/ptest-runner ${D}${bindir}/ptest-runner
 }
+
+RDEPENDS_${PN}_append_libc-glibc = " libgcc"

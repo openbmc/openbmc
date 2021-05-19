@@ -1,0 +1,27 @@
+lsb-release maintains it's own copy of help2man. Include the support
+for specifying SOURCE_DATE_EPOCH from upstream.
+
+Upstream-Status: Pending
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+
+diff --git a/help2man b/help2man
+index 13015c2..63439db 100755
+--- a/help2man
++++ b/help2man
+@@ -173,7 +173,14 @@ my ($help_text, $version_text) = map {
+ 	or die "$this_program: can't get `--$_' info from $ARGV[0]\n"
+ } qw(help), $opt_version_key;
+ 
+-my $date = strftime "%B %Y", localtime;
++my $epoch_secs = time;
++if (exists $ENV{SOURCE_DATE_EPOCH} and $ENV{SOURCE_DATE_EPOCH} =~ /^(\d+)$/)
++{
++    $epoch_secs = $1;
++    $ENV{TZ} = 'UTC0';
++}
++
++my $date = strftime "%B %Y", localtime $epoch_secs;
+ (my $program = $ARGV[0]) =~ s!.*/!!;
+ my $package = $program;
+ my $version;

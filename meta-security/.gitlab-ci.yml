@@ -1,33 +1,76 @@
-stages:
-  - build
-
-.build:
-  stage: build
-  image: crops/poky
-  before_script:
+.before-my-script: &before-my-script
     - echo "$ERR_REPORT_USERNAME" > ~/.oe-send-error
     - echo "$ERR_REPORT_EMAIL" >> ~/.oe-send-error
     - export PATH=~/.local/bin:$PATH
     - wget https://bootstrap.pypa.io/get-pip.py
     - python3 get-pip.py
     - python3 -m pip install kas
-  after_script:
+
+.after-my-script: &after-my-script
     - cd $CI_PROJECT_DIR/poky
     - . ./oe-init-build-env $CI_PROJECT_DIR/build
     - for x in `ls $CI_PROJECT_DIR/build/tmp/log/error-report/ | grep error_report_`; do
     - send-error-report -y tmp/log/error-report/$x
     - done
-    - cd $CI_PROJECT_DIR
-    - rm -rf build
-  cache:
-    paths:
-      - layers
+    - rm -fr $CI_PROJECT_DIR/build
+
+
+stages:
+  - build
+  - parsec
+  - multi
+  - alt 
+  - musl
+  - test
+
+.build:
+  before_script:
+    - *before-my-script
+  stage: build
+  after_script:
+    - *after-my-script
+
+.parsec:
+  before_script:
+    - *before-my-script
+  stage: parsec 
+  after_script:
+    - *after-my-script
+
+
+.multi:
+  before_script:
+    - *before-my-script
+  stage: multi
+  after_script:
+    - *after-my-script
+
+.alt:
+  before_script:
+    - *before-my-script
+  stage: alt
+  after_script:
+    - *after-my-script
+
+.musl:
+  before_script:
+    - *before-my-script
+  stage: musl
+  after_script:
+    - *after-my-script
+
+.test:
+  before_script:
+    - *before-my-script
+  stage: test 
+  after_script:
+    - *after-my-script
+
 
 qemux86:
   extends: .build
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
-  - kas build --target security-build-image kas/$CI_JOB_NAME-parsec.yml
   - kas build --target security-build-image kas/$CI_JOB_NAME-comp.yml
   - kas build --target harden-image-minimal kas/$CI_JOB_NAME-harden.yml
   - kas build --target integrity-image-minimal kas/$CI_JOB_NAME-ima.yml
@@ -35,8 +78,7 @@ qemux86:
 qemux86-64:
   extends: .build
   script:
-  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
-  - kas build --target security-build-image kas/$CI_JOB_NAME-parsec.yml
+  - kas shell kas/$CI_JOB_NAME.yml  -c "bitbake -k security-build-image security-tpm-image security-tpm2-image"
   - kas build --target dm-verity-image-initramfs kas/$CI_JOB_NAME-dm-verify.yml
   - kas build --target integrity-image-minimal kas/$CI_JOB_NAME-ima.yml
 
@@ -44,20 +86,17 @@ qemuarm:
   extends: .build
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
-  - kas build --target security-build-image kas/$CI_JOB_NAME-parsec.yml
 
 qemuarm64:
   extends: .build
   script:
-  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
-  - kas build --target security-build-image kas/$CI_JOB_NAME-parsec.yml
+  - kas shell kas/$CI_JOB_NAME.yml  -c "bitbake -k security-build-image security-tpm2-image"
   - kas build --target integrity-image-minimal kas/$CI_JOB_NAME-ima.yml
 
 qemuppc:
   extends: .build
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
-  - kas build --target security-build-image kas/$CI_JOB_NAME-parsec.yml
 
 qemumips64:
   extends: .build
@@ -69,61 +108,58 @@ qemuriscv64:
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
-qemux86-64-tpm:
-  extends: .build
-  script:
-  - kas build --target security-tpm-image kas/$CI_JOB_NAME.yml
-  - kas build --target security-tpm2-image kas/$CI_JOB_NAME2.yml
-
-qemuarm64-tpm2:
-  extends: .build
-  script:
-  - kas build --target security-tpm2-image kas/$CI_JOB_NAME.yml
-
 qemuarm64-alt:
-  extends: .build
+  extends: .alt
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
 qemuarm64-multi:
-  extends: .build
+  extends: .multi
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
 qemumips64-alt:
-  extends: .build
+  extends: .alt
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
 qemumips64-multi:
-  extends: .build
+  extends: .multi
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
 qemux86-64-alt:
-  extends: .build
+  extends: .alt
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
 qemux86-64-multi:
-  extends: .build
+  extends: .multi
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
 qemux86-musl:
-  extends: .build
+  extends: .musl
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
 qemuarm64-musl:
-  extends: .build
+  extends: .musl
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
 qemux86-test:
-  extends: .build
+  extends: .test
   allow_failure: true
   script:
   - kas build --target security-test-image kas/$CI_JOB_NAME.yml
   - kas build -c testimage --target security-test-image kas/$CI_JOB_NAME.yml
 
+parsec:
+  extends: .parsec
+  script:
+  - kas build --target security-build-image kas/qemuarm-$CI_JOB_NAME.yml
+  - kas build --target security-build-image kas/qemuarm64-$CI_JOB_NAME.yml
+  - kas build --target security-build-image kas/qemux86-$CI_JOB_NAME.yml
+  - kas build --target security-build-image kas/qemux86-64-$CI_JOB_NAME.yml
+  - kas build --target security-build-image kas/qemuppc-$CI_JOB_NAME.yml

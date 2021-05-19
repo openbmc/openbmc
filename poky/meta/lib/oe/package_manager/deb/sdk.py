@@ -65,6 +65,8 @@ class PkgSdk(Sdk):
 
         self.target_pm.install_complementary(self.d.getVar('SDKIMAGE_INSTALL_COMPLEMENTARY'))
 
+        self.target_pm.run_pre_post_installs()
+
         self.target_pm.run_intercepts(populate_sdk='target')
 
         execute_pre_post_process(self.d, self.d.getVar("POPULATE_SDK_POST_TARGET_COMMAND"))
@@ -77,6 +79,8 @@ class PkgSdk(Sdk):
         bb.note("Installing NATIVESDK packages")
         self._populate_sysroot(self.host_pm, self.host_manifest)
         self.install_locales(self.host_pm)
+
+        self.host_pm.run_pre_post_installs()
 
         self.host_pm.run_intercepts(populate_sdk='host')
 

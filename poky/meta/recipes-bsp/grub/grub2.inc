@@ -49,6 +49,8 @@ GRUBPLATFORM ??= "pc"
 
 inherit autotools gettext texinfo pkgconfig
 
+CFLAGS_remove = "-O2"
+
 EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
                 --disable-grub-mkfont \
                 --program-prefix="" \

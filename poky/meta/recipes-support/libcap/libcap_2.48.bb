@@ -20,15 +20,6 @@ UPSTREAM_CHECK_URI = "https://www.kernel.org/pub/linux/libs/security/linux-privs
 
 inherit lib_package
 
-# do NOT pass target cflags to host compilations
-#
-do_configure() {
-	# libcap uses := for compilers, fortunately, it gives us a hint
-	# on what should be replaced with ?=
-	sed -e 's,:=,?=,g' -i Make.Rules
-	sed -e 's,^BUILD_CFLAGS ?= ,BUILD_CFLAGS := $(BUILD_CFLAGS) ,' -i Make.Rules
-}
-
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG_class-native ??= ""
 
@@ -44,11 +35,15 @@ EXTRA_OEMAKE = " \
 
 EXTRA_OEMAKE_append_class-target = " SYSTEM_HEADERS=${STAGING_INCDIR}"
 
-# these are present in the libcap defaults, so include in our CFLAGS too
-CFLAGS += "-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
-
 do_compile() {
-	oe_runmake ${PACKAGECONFIG_CONFARGS}
+	unset CFLAGS BUILD_CFLAGS
+	oe_runmake \
+		${PACKAGECONFIG_CONFARGS} \
+		AR="${AR}" \
+		CC="${CC}" \
+		RANLIB="${RANLIB}" \
+		COPTS="${CFLAGS}" \
+		BUILD_COPTS="${BUILD_CFLAGS}"
 }
 
 do_install() {

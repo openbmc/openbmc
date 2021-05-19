@@ -5,7 +5,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=48da9957849056017dc568bbc43d8975 \
 PROVIDES = "libv4l media-ctl"
 
 DEPENDS = "jpeg \
-           ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'virtual/libx11', '', d)}"
+           ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'virtual/libx11', '', d)} \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 DEPENDS_append_libc-musl = " argp-standalone"
 DEPENDS_append_class-target = " udev"
 LDFLAGS_append = " -pthread"
@@ -21,13 +22,14 @@ SRC_URI = "http://linuxtv.org/downloads/v4l-utils/v4l-utils-${PV}.tar.bz2 \
            file://export-mediactl-headers.patch \
            file://0002-contrib-test-Link-mc_nextgen_test-with-libargp-if-ne.patch \
            file://0007-Do-not-use-getsubopt.patch \
+           file://0008-configure.ac-autodetect-availability-of-systemd.patch \
+           file://0009-keytable-restrict-installation-of-50-rc_keymap.conf.patch \
            "
 SRC_URI[md5sum] = "46f9e2c0b2fdccd009da2f7e1aa87894"
 SRC_URI[sha256sum] = "956118713f7ccb405c55c7088a6a2490c32d54300dd9a30d8d5008c28d3726f7"
 
 EXTRA_OECONF = "--disable-qv4l2 --enable-shared --with-udevdir=${base_libdir}/udev \
-                --disable-v4l2-compliance-32 --disable-v4l2-ctl-32 \
-                --with-systemdsystemunitdir=${systemd_system_unitdir}"
+                --disable-v4l2-compliance-32 --disable-v4l2-ctl-32"
 
 VIRTUAL-RUNTIME_ir-keytable-keymaps ?= "rc-keymaps"
 
@@ -37,8 +39,7 @@ RPROVIDES_${PN}-dbg += "libv4l-dbg"
 
 FILES_media-ctl = "${bindir}/media-ctl ${libdir}/libmediactl.so.*"
 
-FILES_ir-keytable = "${bindir}/ir-keytable ${base_libdir}/udev/rules.d/*-infrared.rules \
-                     ${systemd_system_unitdir}/systemd-udevd.service.d/50-rc_keymap.conf"
+FILES_ir-keytable = "${bindir}/ir-keytable ${base_libdir}/udev/rules.d/*-infrared.rules"
 RDEPENDS_ir-keytable += "${VIRTUAL-RUNTIME_ir-keytable-keymaps}"
 
 FILES_rc-keymaps = "${sysconfdir}/rc* ${base_libdir}/udev/rc*"

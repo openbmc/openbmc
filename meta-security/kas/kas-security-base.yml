@@ -14,7 +14,7 @@ repos:
 
   poky:
     url: https://git.yoctoproject.org/git/poky
-    refspec: master
+    refspec: hardknott
     layers:
       meta:
       meta-poky:
@@ -22,7 +22,7 @@ repos:
 
   meta-openembedded:
     url: http://git.openembedded.org/meta-openembedded
-    refspec: master
+    refspec: hardknott
     layers:
       meta-oe:
       meta-perl:
@@ -35,14 +35,14 @@ local_conf_header:
     CONF_VERSION = "1"
     SOURCE_MIRROR_URL = "http://downloads.yoctoproject.org/mirror/sources/"
     SSTATE_MIRRORS = "file://.* http://sstate.yoctoproject.org/dev/PATH;downloadfilename=PATH \n"
+    SSTATE_DIR = "/home/build/sstate-cache/hardknott"
+    DL_DIR = "/home/build/downloads/hardknott"
     BB_HASHSERVE = "auto"
     BB_SIGNATURE_HANDLER = "OEEquivHash"
     INHERIT += "buildstats buildstats-summary buildhistory"
     INHERIT += "report-error"
     INHERIT += "testimage"
     INHERIT += "rm_work"
-    BB_NUMBER_THREADS="24"
-    BB_NUMBER_PARSE_THREADS="12"
     BB_TASK_NICE_LEVEL = '5'
     BB_TASK_NICE_LEVEL_task-testimage = '0'
     BB_TASK_IONICE_LEVEL = '2.7'
@@ -51,6 +51,8 @@ local_conf_header:
     EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
     PACKAGE_CLASSES = "package_ipk"
 
+    DISTRO_FEATURES_append = " pam apparmor smack"
+    MACHINE_FEATURES_append = " tpm tpm2"
 
   diskmon: |
     BB_DISKMON_DIRS = "\

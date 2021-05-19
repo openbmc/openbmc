@@ -1,0 +1,71 @@
+From 853d5903a200d8a15b3f38780ddaea5c92fa1a03 Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Mon, 19 Apr 2021 09:09:28 +0000
+Subject: [PATCH 4/4] fix: mm, tracing: kfree event name mismatching with
+ provider kmem (v5.12)
+
+a8bc8ae5c932 ("fix: mm, tracing: record slab name for kmem_cache_free() (v5.12)")
+introduces the following call trace for kfree. This is caused by mismatch
+between kfree event and its provider kmem.
+
+This patch maps kfree to kmem_kfree.
+
+WARNING: CPU: 2 PID: 42294 at src/lttng-probes.c:81 fixup_lazy_probes+0xb0/0x1b0 [lttng_tracer]
+CPU: 2 PID: 42294 Comm: modprobe Tainted: G           O      5.12.0-rc6-yoctodev-standard #1
+Hardware name: Intel Corporation JACOBSVILLE/JACOBSVILLE, BIOS JBVLCRB2.86B.0014.P20.2004020248 04/02/2020
+RIP: 0010:fixup_lazy_probes+0xb0/0x1b0 [lttng_tracer]
+Code: 75 28 83 c3 01 3b 5d c4 74 22 48 8b 4d d0 48 63
+      c3 4c 89 e2 4c 89 f6 48 8b 04 c1 4c 8b 38 4c 89
+      ff e8 64 9f 4b de 85 c0 74 c3 <0f> 0b 48 8b 05 bf
+      f2 1e 00 48 8d 50 e8 48 3d f0 a0 98 c0 75 18 eb
+RSP: 0018:ffffb976807bfbe0 EFLAGS: 00010286
+RAX: 00000000ffffffff RBX: 0000000000000004 RCX: 0000000000000004
+RDX: 0000000000000066 RSI: ffffffffc03c10a7 RDI: ffffffffc03c11a1
+RBP: ffffb976807bfc28 R08: 0000000000000000 R09: 0000000000000001
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000004
+R13: ffffffffc03c2000 R14: ffffffffc03c10a7 R15: ffffffffc03c11a1
+FS:  00007f0ef9533740(0000) GS:ffffa100faa00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000561e8f0aa000 CR3: 000000015b318000 CR4: 0000000000350ee0
+Call Trace:
+ lttng_probe_register+0x38/0xe0 [lttng_tracer]
+ ? __event_probe__module_load+0x520/0x520 [lttng_probe_module]
+ __lttng_events_init__module+0x15/0x20 [lttng_probe_module]
+ do_one_initcall+0x68/0x310
+ ? kmem_cache_alloc_trace+0x2ad/0x4c0
+ ? do_init_module+0x28/0x280
+ do_init_module+0x62/0x280
+ load_module+0x26e4/0x2920
+ ? kernel_read_file+0x22e/0x290
+ __do_sys_finit_module+0xb1/0xf0
+ __x64_sys_finit_module+0x1a/0x20
+ do_syscall_64+0x38/0x50
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Upstream-Status: Backport [2.12.6]
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Change-Id: I00e8ee2b8c35f6f8602c88295f5113fbbd139709
+---
+ instrumentation/events/lttng-module/kmem.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/instrumentation/events/lttng-module/kmem.h b/instrumentation/events/lttng-module/kmem.h
+index d787ea54..c9edee61 100644
+--- a/instrumentation/events/lttng-module/kmem.h
++++ b/instrumentation/events/lttng-module/kmem.h
+@@ -88,7 +88,9 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(kmem_alloc_node, kmem_cache_alloc_node,
+ )
+ 
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,12,0))
+-LTTNG_TRACEPOINT_EVENT(kfree,
++LTTNG_TRACEPOINT_EVENT_MAP(kfree,
++
++	kmem_kfree,
+ 
+ 	TP_PROTO(unsigned long call_site, const void *ptr),
+ 
+-- 
+2.25.1
+

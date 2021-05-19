@@ -102,7 +102,7 @@ SERIAL_CONSOLES_CHECK ??= "${SERIAL_CONSOLES}"
 BOOTFILES_DIR_NAME ?= "bootfiles"
 
 # Set Raspberrypi splash image
-SPLASH = "psplash-raspberrypi"
+SPLASH ?= "psplash-raspberrypi"
 
 def make_dtb_boot_files(d):
     # Generate IMAGE_BOOT_FILES entries for device tree files listed in

@@ -10,7 +10,7 @@ ideal for firewalled environments. \
 HOMEPAGE = "http://www.balabit.com/network-security/syslog-ng/opensource-logging-system"
 
 LICENSE = "GPLv2 & LGPLv2.1"
-LIC_FILES_CHKSUM = "file://COPYING;md5=24c0c5cb2c83d9f2ab725481e4df5240"
+LIC_FILES_CHKSUM = "file://COPYING;md5=189c3826d32deaf83ad8d0d538a10023"
 
 # util-linux added to get libuuid
 DEPENDS = "libpcre flex glib-2.0 openssl util-linux bison-native"
@@ -22,7 +22,6 @@ SRC_URI = "https://github.com/balabit/syslog-ng/releases/download/${BP}/${BP}.ta
            file://syslog-ng.conf.sysvinit \
            file://initscript \
            file://volatiles.03_syslog-ng \
-           file://configure.ac-add-option-enable-thread-tls-to-manage-.patch \
 "
 
 UPSTREAM_CHECK_URI = "https://github.com/balabit/syslog-ng/releases"
@@ -42,11 +41,7 @@ EXTRA_OECONF = " \
     --disable-python \
     --disable-java --disable-java-modules \
     --with-pidfile-dir=${localstatedir}/run/${BPN} \
-    ${CONFIG_TLS} \
 "
-
-CONFIG_TLS = "--enable-thread-tls"
-CONFIG_TLS_arm = "${@oe.utils.conditional( "DEBUG_BUILD", "1", " --disable-thread-tls", " --enable-thread-tls", d )}"
 
 PACKAGECONFIG ??= " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6 systemd', d)} \
@@ -55,7 +50,7 @@ PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,,"
 PACKAGECONFIG[systemd] = "--enable-systemd --with-systemdsystemunitdir=${systemd_unitdir}/system/,--disable-systemd --without-systemdsystemunitdir,systemd,"
 PACKAGECONFIG[linux-caps] = "--enable-linux-caps,--disable-linux-caps,libcap,"
 PACKAGECONFIG[dbi] = "--enable-sql,--disable-sql,libdbi,"
-PACKAGECONFIG[libnet] = "--enable-libnet --with-libnet=${STAGING_BINDIR_CROSS},--disable-libnet,libnet,"
+PACKAGECONFIG[spoof-source] = "--enable-spoof-source --with-libnet=${STAGING_BINDIR_CROSS},--disable-spoof-source,libnet,"
 PACKAGECONFIG[http] = "--enable-http,--disable-http,curl,"
 PACKAGECONFIG[smtp] = "--enable-smtp --with-libesmtp=${STAGING_LIBDIR},--disable-smtp,libesmtp,"
 PACKAGECONFIG[json] = "--enable-json,--disable-json,json-c,"

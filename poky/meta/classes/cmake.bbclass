@@ -149,16 +149,14 @@ addtask generate_toolchain_file after do_patch before do_configure
 
 CONFIGURE_FILES = "CMakeLists.txt"
 
+do_configure[cleandirs] = "${@d.getVar('B') if d.getVar('S') != d.getVar('B') else ''}"
+
 cmake_do_configure() {
 	if [ "${OECMAKE_BUILDPATH}" ]; then
 		bbnote "cmake.bbclass no longer uses OECMAKE_BUILDPATH.  The default behaviour is now out-of-tree builds with B=WORKDIR/build."
 	fi
 
-	if [ "${S}" != "${B}" ]; then
-		rm -rf ${B}
-		mkdir -p ${B}
-		cd ${B}
-	else
+	if [ "${S}" = "${B}" ]; then
 		find ${B} -name CMakeFiles -or -name Makefile -or -name cmake_install.cmake -or -name CMakeCache.txt -delete
 	fi
 

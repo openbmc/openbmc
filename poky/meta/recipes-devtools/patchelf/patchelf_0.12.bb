@@ -6,6 +6,8 @@ LICENSE = "GPLv3"
 
 SRC_URI = "git://github.com/NixOS/patchelf;protocol=https \
            file://handle-read-only-files.patch \
+           file://6edec83653ce1b5fc201ff6db93b966394766814.patch \
+           file://alignmentfix.patch \
            "
 SRCREV = "8d3a16e97294e3c5521c61b4c8835499c9918264"
 

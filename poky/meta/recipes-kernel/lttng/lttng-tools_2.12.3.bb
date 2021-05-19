@@ -69,7 +69,7 @@ do_install_append () {
 }
 
 do_install_ptest () {
-    for f in Makefile tests/Makefile tests/utils/utils.sh tests/regression/tools/save-load/load-42*.lttng tests/regression/tools/save-load/configuration/load-42*.lttng tests/regression/tools/health/test_health.sh tests/regression/tools/metadata/utils.sh tests/regression/tools/rotation/rotate_utils.sh; do
+    for f in Makefile tests/Makefile tests/utils/utils.sh tests/regression/tools/save-load/*.lttng tests/regression/tools/save-load/configuration/load-42*.lttng tests/regression/tools/health/test_health.sh tests/regression/tools/metadata/utils.sh tests/regression/tools/rotation/rotate_utils.sh; do
         install -D "${B}/$f" "${D}${PTEST_PATH}/$f"
     done
 
@@ -155,7 +155,7 @@ do_install_ptest () {
         -i ${D}${PTEST_PATH}/tests/unit/Makefile
 
     # Fix hardcoded build path
-    sed -e 's#TESTAPP_PATH=.*/tests/regression/#TESTAPP_PATH=${PTEST_PATH}/tests/regression/#' \
+    sed -e 's#TESTAPP_PATH=.*/tests/regression/#TESTAPP_PATH="${PTEST_PATH}/tests/regression/#' \
         -i ${D}${PTEST_PATH}/tests/regression/ust/python-logging/test_python_logging
 
     # Substitute links to installed binaries.

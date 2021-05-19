@@ -45,14 +45,14 @@ class OEHasPackage(OETestDecorator):
             msg = 'Checking if %s is not installed' % ', '.join(unneed_pkgs)
             self.logger.debug(msg)
             if not self.case.tc.image_packages.isdisjoint(unneed_pkgs):
-                msg = "Test can't run with %s installed" % ', or'.join(unneed_pkgs)
+                msg = "Test can't run with %s installed" % ', or '.join(unneed_pkgs)
                 self._decorator_fail(msg)
 
         if need_pkgs:
             msg = 'Checking if at least one of %s is installed' % ', '.join(need_pkgs)
             self.logger.debug(msg)
             if self.case.tc.image_packages.isdisjoint(need_pkgs):
-                msg = "Test requires %s to be installed" % ', or'.join(need_pkgs)
+                msg = "Test requires %s to be installed" % ', or '.join(need_pkgs)
                 self._decorator_fail(msg)
 
     def _decorator_fail(self, msg):

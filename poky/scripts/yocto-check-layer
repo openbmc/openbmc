@@ -138,6 +138,9 @@ def main():
                 layer['type'] == LayerType.ERROR_BSP_DISTRO:
             continue
 
+        # Reset to a clean backup copy for each run
+        shutil.copyfile(bblayersconf + '.backup', bblayersconf)
+
         if check_bblayers(bblayersconf, layer['path'], logger):
             logger.info("%s already in %s. To capture initial signatures, layer under test should not present "
                "in BBLAYERS. Please remove %s from BBLAYERS." % (layer['name'], bblayersconf, layer['name']))
