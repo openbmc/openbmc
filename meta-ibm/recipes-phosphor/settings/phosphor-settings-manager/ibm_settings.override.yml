@@ -9,3 +9,9 @@
       Properties:
           Enabled:
               Default: 'true'
+
+/xyz/openbmc_project/control/host0/power_mode:
+    - Interface: xyz.openbmc_project.Control.Power.Mode
+      Properties:
+          PowerMode:
+              Default: Mode::PowerMode::MaximumPerformance
