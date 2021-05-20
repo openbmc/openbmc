@@ -32,5 +32,5 @@ SUMMARY_${PN}-flash = "GBS Flash"
 RDEPENDS_${PN}-flash = " \
         phosphor-ipmi-flash \
         gbs-bmc-update \
-        gbs-bios-update \
+        virtual/bios-update \
         "
