@@ -479,7 +479,11 @@
                     "/xyz/openbmc_project/sensors/fan_tach/fan1",
                     "/xyz/openbmc_project/sensors/fan_tach/fb_fan0",
                     "/xyz/openbmc_project/sensors/fan_tach/fb_fan1",
-                    "/xyz/openbmc_project/sensors/fan_tach/fb_fan2"
+                    "/xyz/openbmc_project/sensors/fan_tach/fb_fan2",
+
+                    "/xyz/openbmc_project/sensors/utilization/CPU",
+                    "/xyz/openbmc_project/sensors/utilization/Memory",
+                    "/xyz/openbmc_project/sensors/utilization/Storage_RW"
                 ]
             }
         ]
