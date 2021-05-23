@@ -61,7 +61,7 @@ zaius
 Once you know the target (e.g. romulus), source the `setup` script as follows:
 
 ```
-. setup romulus build
+. setup romulus
 ```
 
 For evb-ast2500, please use the below command to specify the machine config,
