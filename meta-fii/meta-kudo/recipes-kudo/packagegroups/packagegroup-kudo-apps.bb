@@ -1,4 +1,4 @@
-SUMMARY = "OpenBMC for KUDO system - Applications"
+SUMMARY = "OpenBMC for kudo system - Applications"
 PR = "r1"
 
 inherit packagegroup
@@ -17,7 +17,7 @@ RPROVIDES_${PN}-kudo-system += "virtual-obmc-system-mgmt"
 RPROVIDES_${PN}-kudo-fw += "virtual-obmc-flash-mgmt"
 RPROVIDES_${PN}-fan-mgmt += "virtual-obmc-fan-mgmt"
 
-SUMMARY_${PN}-kudo-system = "KUDO System"
+SUMMARY_${PN}-kudo-system = "kudo System"
 RDEPENDS_${PN}-kudo-system = " \
     ipmitool \
     ethtool \
@@ -34,7 +34,7 @@ RDEPENDS_${PN}-kudo-system = " \
     kudo-cmd \
     "
 
-SUMMARY_${PN}-kudo-fw = "KUDO Firmware"
+SUMMARY_${PN}-kudo-fw = "kudo Firmware"
 RDEPENDS_${PN}-kudo-fw = " \
     kudo-fw \
     kudo-bios-update \

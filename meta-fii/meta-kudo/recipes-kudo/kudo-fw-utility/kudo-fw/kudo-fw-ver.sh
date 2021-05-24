@@ -1,5 +1,5 @@
-
 #!/bin/bash
+
 BMC_CPLD_VER_FILE="/run/cpld0.version"
 MB_CPLD_VER_FILE="/run/cpld1.version"
 ver=''

@@ -1,6 +1,5 @@
 SUMMARY = "Phosphor OpenBMC Kudo SCP Firmware Upgrade Command"
 DESCRIPTION = "Phosphor OpenBMC Kudo SCP Firmware Upgrade Comman Daemon"
-FILESEXTRAPATHS_prepend := "${THISDIR}/kudo-scp-update:"
 
 PR = "r1"
 LICENSE = "Apache-2.0"
