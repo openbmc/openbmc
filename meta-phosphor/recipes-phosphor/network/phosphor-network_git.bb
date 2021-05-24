@@ -11,7 +11,7 @@ inherit python3native
 inherit systemd
 
 SRC_URI += "git://github.com/openbmc/phosphor-networkd"
-SRCREV = "de433b74ec5bce22043ea44c55e83d9be3dc5372"
+SRCREV = "1e710d04a61092b45ff4ccd58656cb5cee3cba5b"
 
 DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"
