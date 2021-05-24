@@ -1,0 +1,4 @@
+DEVPATH=/xyz/openbmc_project/watchdog/host0
+SERVICE=xyz.openbmc_project.Watchdog
+TARGET=obmc-host-timeout@0.target
+TIMEOUT_IN_MSEC=600000
