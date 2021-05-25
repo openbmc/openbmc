@@ -13,7 +13,6 @@ function usage_rst() {
 }
 
 function usage_led() {
-
   echo " kudo led 'att'/'boot' [parameter]"
   echo "        on --> change to CPU console"
   echo "        off --> change to CPU 0 SCP console"
@@ -22,11 +21,13 @@ function usage_led() {
 
 function usage_uart() {
   echo " kudo uart [parameter]"
-  echo "        host --> change to CPU console"
-  echo "        scp1 --> change to CPU 0 SCP console"
-  echo "        scp2 --> change to CPU 1 SCP console"
-  echo "        hosthr --> change CPU console to header"
-  echo "        scphr --> change SCP console to header"
+  echo "        host --> show CPU console"
+  echo "        scp --> show SCP0 console"
+  echo "        swhost --> change to CPU console to ttyS1"
+  echo "        swscp1 --> change to CPU 0 SCP console to ttyS3"
+  echo "        swscp2 --> change to CPU 1 SCP console"
+  echo "        swhosthr --> change CPU console to header"
+  echo "        swscphr --> change SCP console to header"
   echo "        display  --> "
 }
 
@@ -114,22 +115,38 @@ function fw_rev() {
 function uartmux() {
   case $1 in
     host)
+      if [ `tty` ==  "/dev/ttyS0" ]; then
+        echo "Couldn't redirect to the host console within BMC local console"
+      else
+        echo "Entering Console use 'shift ~~..' to quit"
+        obmc-console-client -c /etc/obmc-console/server.ttyS1.conf
+      fi
+      ;;
+    scp)
+      if [ `tty` ==  "/dev/ttyS0" ]; then
+        echo "Couldn't redirect to the scp console within BMC local console"
+      else
+        echo "Entering Console use 'shift ~~..' to quit"
+        obmc-console-client -c /etc/obmc-console/server.ttyS3.conf
+      fi
+      ;;
+    swhost)
       set_gpio_ctrl 167 out 1
       ;;
-    scp1)
+    swscp1)
       set_gpio_ctrl 161 out 1
       set_gpio_ctrl 177 out 1
       set_gpio_ctrl 198 out 0
       ;;
-    scp2)
+    swscp2)
       set_gpio_ctrl 161 out 1
       set_gpio_ctrl 177 out 1
       set_gpio_ctrl 198 out 1
       ;;
-    hosthr)
+    swhosthr)
       set_gpio_ctrl 167 out 0
       ;;
-    scphr)
+    swscphr)
       set_gpio_ctrl 161 out 0
       set_gpio_ctrl 177 out 0
       ;;
