@@ -5,11 +5,14 @@ inherit packagegroup
 
 PROVIDES = "${PACKAGES}"
 PACKAGES = " \
-        ${PN}-chassis \
         ${PN}-extras \
         ${PN}-fans \
         ${PN}-flash \
         ${PN}-system \
+        "
+PACKAGES_append_fb-withhost = " \
+        ${PN}-chassis \
+        ${PN}-hostmgmt \
         "
 
 PROVIDES += "virtual/obmc-chassis-mgmt"
@@ -40,10 +43,8 @@ RDEPENDS_${PN}-flash = " \
         phosphor-software-manager \
         "
 
-SUMMARY_${PN}-system = "Facebook System"
-RDEPENDS_${PN}-system = " \
-        entity-manager \
-        dbus-sensors \
+RDEPENDS_PN_SYSTEM_EXTRAS = ""
+RDEPENDS_PN_SYSTEM_EXTRAS_fb-withhost = " \
         fb-powerctrl \
         phosphor-ipmi-ipmb \
         fb-ipmi-oem \
@@ -52,5 +53,12 @@ RDEPENDS_${PN}-system = " \
         ipmitool \
         phosphor-post-code-manager \
         phosphor-host-postd \
+        "
+
+SUMMARY_${PN}-system = "Facebook System"
+RDEPENDS_${PN}-system = " \
+        entity-manager \
+        dbus-sensors \
         phosphor-virtual-sensor \
+        ${RDEPENDS_PN_SYSTEM_EXTRAS} \
         "
