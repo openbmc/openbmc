@@ -16,6 +16,7 @@ SRC_URI = " \
            file://0003-fix-typeerror-on-error.patch \
            file://0004-lp1039729.patch \
            file://0005-lp1191197.patch \
+           file://fix-dynamic-update-of-python-shebang.patch \
 "
 
 UPSTREAM_CHECK_URI = "https://launchpad.net/ufw"

@@ -15,6 +15,10 @@ SRC_URI[sha256sum] = "eb0484e568ead8fa23b513e9b0041df7e327f4ee2d22db5a533929dfc1
 # exclude betas
 UPSTREAM_CHECK_REGEX = "tiff-(?P<pver>\d+(\.\d+)+).tar"
 
+# Tested with check from https://security-tracker.debian.org/tracker/CVE-2015-7313
+# and 4.3.0 doesn't have the issue
+CVE_CHECK_WHITELIST += "CVE-2015-7313"
+
 inherit autotools multilib_header
 
 CACHED_CONFIGUREVARS = "ax_cv_check_gl_libgl=no"

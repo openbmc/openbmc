@@ -1,0 +1,36 @@
+From 857d74f2c5fff79589e9b35cd405bf8ffffafb54 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20=C5=A0tetiar?= <ynezz@true.cz>
+Date: Mon, 3 May 2021 18:44:53 +0200
+Subject: [PATCH] CMake: make build of documentation optional (#842)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+So we don't need to support corner cases as for example one fixed in
+commit f6202db308e3 ("doc/MANUAL.adoc: Don't use non-ASCII quotes
+(#761)") when the documentation is actually not needed at all as ccache
+is used as a build tool only.
+
+Signed-off-by: Petr Štetiar <ynezz@true.cz>
+Upstream-Status: Backport [b96ca763c453a602b5516b4b9ca5e2829528e318]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ CMakeLists.txt | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 40e21a57..151cc5f7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -131,7 +131,10 @@ target_link_libraries(ccache PRIVATE standard_settings standard_warnings ccache_
+ #
+ # Documentation
+ #
+-add_subdirectory(doc)
++option(ENABLE_DOCUMENTATION "Enable documentation" ON)
++if(ENABLE_DOCUMENTATION)
++  add_subdirectory(doc)
++endif()
+ 
+ #
+ # Installation

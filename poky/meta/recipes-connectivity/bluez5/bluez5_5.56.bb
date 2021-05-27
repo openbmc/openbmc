@@ -3,6 +3,9 @@ require bluez5.inc
 SRC_URI[md5sum] = "e6c51b2aefa7c56ff072819a78611fa5"
 SRC_URI[sha256sum] = "59c4dba9fc8aae2a6a5f8f12f19bc1b0c2dc27355c7ca3123eed3fe6bd7d0b9d"
 
+# These issues have kernel fixes rather than bluez fixes so exclude here
+CVE_CHECK_WHITELIST += "CVE-2020-12352 CVE-2020-24490"
+
 # noinst programs in Makefile.tools that are conditional on READLINE
 # support
 NOINST_TOOLS_READLINE ?= " \

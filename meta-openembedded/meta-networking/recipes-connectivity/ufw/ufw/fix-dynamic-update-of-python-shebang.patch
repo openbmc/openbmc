@@ -1,0 +1,57 @@
+From b961a7fceb5654c283c3f987bee593d52abaf1f5 Mon Sep 17 00:00:00 2001
+From: Silcet <camorga1@gmail.com>
+Date: Mon, 26 Apr 2021 07:47:02 +0000
+Subject: [PATCH] ufw: Fix dynamic update of python shebang
+
+[meta-openembedded ticket #327] -- https://github.com/openembedded/meta-openembedded/issues/327
+
+The python version in the shebang at the begining of the ufw script
+should be the same one as the version the setup.py script was called
+with.
+
+The fix in patch "setup-only-make-one-reference-to-env.patch"
+depends on sys.executable returning "/usr/bin/env pythonX". However,
+it returns "/usr/bin/pythonX". Using sys.version_info we can get the
+major version of the python used to called the script and append
+that to the shebang line so it works as intended.
+
+Upstream-status: Pending
+
+Signed-off-by: Silcet <camorga1@gmail.com>
+---
+ setup.py | 21 ++++++---------------
+ 1 file changed, 6 insertions(+), 15 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index ca730b7..941bbf6 100644
+--- a/setup.py
++++ b/setup.py
+@@ -112,22 +112,13 @@ class Install(_install, object):
+         for f in [ script, manpage, manpage_f ]:
+             self.mkpath(os.path.dirname(f))
+ 
+-        # if sys.executable == /usr/bin/env python* the result will be the top
+-        # of ufw getting:
+-        #
+-        #  #! /usr/bin/env /usr/bin/env python
+-        #
+-        # which is not ideal
+-        #
+         # update the interpreter to that of the one the user specified for setup
+-        print("Updating staging/ufw to use (%s)" % (sys.executable))
+-
+-        if re.search("(/usr/bin/env)", sys.executable):
+-            print("found 'env' in sys.executable (%s)" % (sys.executable))
+-            subprocess.call(["sed",
+-                             "-i.jjm",
+-                             "1s%^#.*python.*%#! " + sys.executable + "%g",
+-                             'staging/ufw'])
++        python_major = sys.version_info.major
++        print("Updating staging/ufw to use (python%s)" % (python_major))
++        subprocess.call(["sed",
++                         "-i.jjm",
++                         "1s%^#.*python.*%#! " + sys.executable + "%g",
++                         'staging/ufw'])
+ 
+         self.copy_file('staging/ufw', script)
+         self.copy_file('doc/ufw.8', manpage)

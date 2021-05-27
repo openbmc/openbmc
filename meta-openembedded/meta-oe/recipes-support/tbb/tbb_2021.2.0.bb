@@ -45,3 +45,6 @@ LDFLAGS_append_mips = " -latomic"
 LDFLAGS_append_mipsel = " -latomic"
 
 LDFLAGS_append_libc-musl = " -lucontext"
+
+# The latest version of oneTBB does not support PPC
+COMPATIBLE_MACHINE_powerpc = "(!.*ppc).*"

@@ -30,3 +30,6 @@ PROVIDES += "libnotify3"
 RPROVIDES_${PN} += "libnotify3"
 RCONFLICTS_${PN} += "libnotify3"
 RREPLACES_${PN} += "libnotify3"
+
+# -7381 is specific to the NodeJS bindings
+CVE_CHECK_WHITELIST += "CVE-2013-7381"

@@ -12,9 +12,13 @@ LIC_FILES_CHKSUM = "file://LICENSE.adoc;md5=28afb89f649f309e7ac1aab554564637"
 DEPENDS = "zstd"
 
 SRC_URI = "https://github.com/ccache/ccache/releases/download/v${PV}/${BP}.tar.gz"
+SRC_URI += "file://0001-CMake-make-build-of-documentation-optional-842.patch"
+
 SRC_URI[sha256sum] = "dbf139ff32031b54cb47f2d7983269f328df14b5a427882f89f7721e5c411b7e"
 
 UPSTREAM_CHECK_URI = "https://github.com/ccache/ccache/releases/"
+
+PACKAGECONFIG[docs] = "-DENABLE_DOCUMENTATION=ON,-DENABLE_DOCUMENTATION=OFF,asciidoc"
 
 inherit cmake
 

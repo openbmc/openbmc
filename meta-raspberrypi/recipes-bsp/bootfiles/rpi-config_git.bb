@@ -189,9 +189,15 @@ do_deploy() {
 
     # Choose Camera Sensor to be used, default imx219 sensor
     if [ "${RASPBERRYPI_CAMERA_V2}" = "1" ]; then
-        echo "# Enable Sony RaspberryPi Camera" >> $CONFIG
+        echo "# Enable Sony RaspberryPi Camera(imx219)" >> $CONFIG
         echo "dtoverlay=imx219" >> $CONFIG
     fi
+
+    # Choose Camera Sensor to be used, default imx477 sensor
+    #if [ "${RASPBERRYPI_HD_CAMERA}" = "1" ]; then
+    #    echo "# Enable Sony RaspberryPi Camera(imx477)" >> $CONFIG
+    #    echo "dtoverlay=imx477" >> $CONFIG
+    #fi
 
     # Waveshare "C" 1024x600 7" Rev2.1 IPS capacitive touch (http://www.waveshare.com/7inch-HDMI-LCD-C.htm)
     if [ "${WAVESHARE_1024X600_C_2_1}" = "1" ]; then

@@ -921,7 +921,7 @@ RDEPENDS_packagegroup-meta-oe-support_remove_arm ="numactl"
 RDEPENDS_packagegroup-meta-oe-support_remove_mipsarch = "gperftools"
 RDEPENDS_packagegroup-meta-oe-support_remove_riscv64 = "gperftools uim"
 RDEPENDS_packagegroup-meta-oe-support_remove_riscv32 = "gperftools uim"
-RDEPENDS_packagegroup-meta-oe-support_remove_powerpc = "ssiapi"
+RDEPENDS_packagegroup-meta-oe-support_remove_powerpc = "ssiapi tbb"
 RDEPENDS_packagegroup-meta-oe-support_remove_powerpc64le = "ssiapi"
 
 RDEPENDS_packagegroup-meta-oe-test ="\
