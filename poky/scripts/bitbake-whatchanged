@@ -217,7 +217,7 @@ print what will be done between the current and last builds, for example:
     # Edit the recipes
     $ bitbake-whatchanged core-image-sato
 
-The changes will be printed"
+The changes will be printed.
 
 Note:
     The amount of tasks is not accurate when the task is "do_build" since

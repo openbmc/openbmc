@@ -1,0 +1,19 @@
+Remove the compiler commandline/platform from the compiled binary as this
+breaks reproducibilty.
+
+Upstream-Status: Inappropriate [OE reproducibiity fix upstream unlikely to take]
+RP 2021/3/1
+
+
+Index: swig-3.0.12/Source/Modules/main.cxx
+===================================================================
+--- swig-3.0.12.orig/Source/Modules/main.cxx
++++ swig-3.0.12/Source/Modules/main.cxx
+@@ -636,7 +636,6 @@ void SWIG_getoptions(int argc, char *arg
+ 	}
+       } else if (strcmp(argv[i], "-version") == 0) {
+ 	fprintf(stdout, "\nSWIG Version %s\n", Swig_package_version());
+-	fprintf(stdout, "\nCompiled with %s [%s]\n", SWIG_CXX, SWIG_PLATFORM);
+ 	fprintf(stdout, "\nConfigured options: %cpcre\n",
+ #ifdef HAVE_PCRE
+ 		'+'

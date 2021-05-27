@@ -1,4 +1,7 @@
 SUMMARY = "Advanced tools for certain ALSA sound card drivers"
+DESCRIPTION = "Package containing a number of tools ranging from envy24control \
+which provides complete control over all devices with an envy24 chip, to \
+firmware loaders for pcmcia, USB and the hdsp devices."
 HOMEPAGE = "http://www.alsa-project.org"
 BUGTRACKER = "http://alsa-project.org/main/index.php/Bug_Tracking"
 SECTION = "console/utils"

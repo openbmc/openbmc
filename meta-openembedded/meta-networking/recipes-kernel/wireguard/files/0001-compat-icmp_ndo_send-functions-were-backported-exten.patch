@@ -1,0 +1,32 @@
+From 122f06bfd8fc7b06a0899fa9adc4ce8e06900d98 Mon Sep 17 00:00:00 2001
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Sun, 7 Mar 2021 08:14:33 -0700
+Subject: [PATCH] compat: icmp_ndo_send functions were backported extensively
+
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+
+Upstream-Status: Backport
+
+Fixes build with 5.4.103 update.
+/include/linux/icmpv6.h:56:6: note: previous declaration of 'icmpv6_ndo_send' was here
+|    56 | void icmpv6_ndo_send(struct sk_buff *skb_in, u8 type, u8 code, __u32 info);
+
+Signed-of-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ src/compat/compat.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: src/compat/compat.h
+===================================================================
+--- src.orig/compat/compat.h
++++ src/compat/compat.h
+@@ -946,7 +946,7 @@ static inline int skb_ensure_writable(st
+ }
+ #endif
+ 
+-#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0)
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 5, 0)) || (LINUX_VERSION_CODE < KERNEL_VERSION(5, 4, 102) && LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)) || (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 178) && LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)) || (LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 223) && LINUX_VERSION_CODE > KERNEL_VERSION(4, 10, 0)) || LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 259) || defined(ISRHEL8) || defined(ISUBUNTU1804)
+ #if IS_ENABLED(CONFIG_NF_NAT)
+ #include <linux/ip.h>
+ #include <linux/icmpv6.h>

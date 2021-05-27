@@ -1,4 +1,6 @@
 SUMMARY = "Library for file management"
+DESCRIPTION = "LibFM provides file management functions built on top of Glib/GIO \
+giving a convenient higher-level API."
 HOMEPAGE = "http://pcmanfm.sourceforge.net/"
 
 LICENSE = "GPLv2+ & LGPLv2+"

@@ -1,4 +1,5 @@
 SUMMARY = "Vulkan Utilities and Tools"
+DESCRIPTION = "Assist development by enabling developers to verify their applications correct use of the Vulkan API."
 HOMEPAGE = "https://www.khronos.org/vulkan/"
 BUGTRACKER = "https://github.com/KhronosGroup/Vulkan-Tools"
 SECTION = "libs"

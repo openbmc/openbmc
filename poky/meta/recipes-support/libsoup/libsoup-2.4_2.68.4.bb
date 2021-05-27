@@ -1,4 +1,6 @@
 SUMMARY = "An HTTP library implementation in C"
+DESCRIPTION = "libsoup is an HTTP client/server library for GNOME. It uses GObjects \
+and the glib main loop, to integrate well with GNOME applications."
 HOMEPAGE = "https://wiki.gnome.org/Projects/libsoup"
 BUGTRACKER = "https://bugzilla.gnome.org/"
 SECTION = "x11/gnome/libs"

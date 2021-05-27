@@ -1,4 +1,8 @@
 SUMMARY = "Command line tool and library for client-side URL transfers"
+DESCRIPTION = "It uses URL syntax to transfer data to and from servers. \
+curl is a widely used because of its ability to be flexible and complete \
+complex tasks. For example, you can use curl for things like user authentication, \
+HTTP post, SSL connections, proxy support, FTP uploads, and more!"
 HOMEPAGE = "http://curl.haxx.se/"
 BUGTRACKER = "http://curl.haxx.se/mail/list.cgi?list=curl-tracker"
 SECTION = "console/network"
@@ -13,6 +17,8 @@ SRC_URI = "https://curl.haxx.se/download/curl-${PV}.tar.bz2 \
            file://CVE-2020-8284.patch \
            file://CVE-2020-8285.patch \
            file://CVE-2020-8286.patch \
+           file://CVE-2021-22876.patch \
+           file://CVE-2021-22890.patch \
 "
 
 SRC_URI[md5sum] = "ec5fc263f898a3dfef08e805f1ecca42"

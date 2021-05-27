@@ -1,0 +1,37 @@
+From ec821e572a640bd79aecc3922cb9001f4b6b26f2 Mon Sep 17 00:00:00 2001
+From: Petr Vorel <petr.vorel@gmail.com>
+Date: Sat, 7 Sep 2019 06:07:19 +0200
+Subject: [PATCH] arping: Fix comparison of different signedness warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+../arping.c:768:45: warning: comparison of integer expressions of different signedness: ‘int’ and ‘uint64_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+  768 |         (ctl->quit_on_reply && ctl->timeout < total_expires)) {
+
+Fixes: 1df5350 ("arping: fix -f quit on first reply regression")
+Reference: https://github.com/iputils/iputils/pull/212
+Acked-by: Sami Kerola <kerolasa@iki.fi>
+Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
+Upstream-Status: Backport [https://github.com/iputils/iputils/commit/ec821e572a640bd79aecc3922cb9001f4b6b26f2]
+Signed-off-by: Diego Santa Cruz <Diego.SantaCruz@spinetix.com>
+---
+ arping.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arping.c b/arping.c
+index 2d05728..88319cd 100644
+--- a/arping.c
++++ b/arping.c
+@@ -765,7 +765,7 @@ static int event_loop(struct run_state *ctl)
+ 				}
+ 				total_expires += exp;
+ 				if ((0 < ctl->count && (uint64_t)ctl->count < total_expires) ||
+-				    (ctl->quit_on_reply && ctl->timeout < total_expires)) {
++				    (ctl->quit_on_reply && ctl->timeout < (long)total_expires)) {
+ 					exit_loop = 1;
+ 					continue;
+ 				}
+-- 
+2.18.4
+

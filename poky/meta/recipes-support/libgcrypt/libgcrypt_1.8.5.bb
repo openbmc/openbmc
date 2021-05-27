@@ -1,4 +1,7 @@
 SUMMARY = "General purpose cryptographic library based on the code from GnuPG"
+DESCRIPTION = "A cryptography library developed as a separated module of GnuPG. \
+It can also be used independently of GnuPG, but depends on its error-reporting \
+library Libgpg-error."
 HOMEPAGE = "http://directory.fsf.org/project/libgcrypt/"
 BUGTRACKER = "https://bugs.g10code.com/gnupg/index"
 SECTION = "libs"

@@ -1,7 +1,7 @@
-From a8bceaec1b16fffbf6810df05503d8ae9092b735 Mon Sep 17 00:00:00 2001
+From 667c0cf97dadc4f5994d26ec3984f559a05ec406 Mon Sep 17 00:00:00 2001
 From: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
 Date: Fri, 26 Jul 2019 17:34:26 -0400
-Subject: [PATCH 2/5] BaseTools: makefile: adjust to build in under bitbake
+Subject: [PATCH 2/4] BaseTools: makefile: adjust to build in under bitbake
 
 Prepend the build flags with those of bitbake. This is to build
 using the bitbake native sysroot include and library directories.
@@ -10,14 +10,14 @@ Signed-off-by: Ricardo Neri <ricardo.neri@linux.intel.com>
 Upstream-Status: Pending
 
 ---
- BaseTools/Source/C/Makefiles/header.makefile | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ BaseTools/Source/C/Makefiles/header.makefile | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/BaseTools/Source/C/Makefiles/header.makefile b/BaseTools/Source/C/Makefiles/header.makefile
-index 4e9b36d98b..eb03ee33fa 100644
+index 1c105ee7d4..d5eea3864e 100644
 --- a/BaseTools/Source/C/Makefiles/header.makefile
 +++ b/BaseTools/Source/C/Makefiles/header.makefile
-@@ -62,23 +62,23 @@ $(error Bad HOST_ARCH)
+@@ -69,35 +69,36 @@ $(error Bad HOST_ARCH)
  endif
  
  INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE)
@@ -33,19 +33,35 @@ index 4e9b36d98b..eb03ee33fa 100644
 +BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror \
  -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -g
  else
+ ifeq ($(CXX), llvm)
+-BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
++BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
+ -fno-delete-null-pointer-checks -Wall -Werror \
+ -Wno-deprecated-declarations -Wno-self-assign \
+ -Wno-unused-result -nostdlib -g
+ else
 -BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
 +BUILD_CFLAGS += -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
  -fno-delete-null-pointer-checks -Wall -Werror \
  -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict \
  -Wno-unused-result -nostdlib -g
  endif
+ endif
+ ifeq ($(CXX), llvm)
+-BUILD_LFLAGS =
+-BUILD_CXXFLAGS = -Wno-deprecated-register -Wno-unused-result
++BUILD_LFLAGS = $(LDFLAGS)
++BUILD_CXXFLAGS += -Wno-deprecated-register -Wno-unused-result
+ else
 -BUILD_LFLAGS =
 -BUILD_CXXFLAGS = -Wno-unused-result
 +BUILD_LFLAGS = $(LDFLAGS)
 +BUILD_CXXFLAGS += -Wno-unused-result
- 
+ endif
++
  ifeq ($(HOST_ARCH), IA32)
  #
+ # Snow Leopard  is a 32-bit and 64-bit environment. uname -m returns i386, but gcc defaults
 -- 
-2.17.1
+2.28.0
 

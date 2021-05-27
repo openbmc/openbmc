@@ -1,4 +1,9 @@
 SUMMARY = "A library for applications dealing with netlink sockets"
+DESCRIPTION = "The libnl suite is a collection of libraries providing \
+APIs to netlink protocol based Linux kernel interfaces. libnl is the core \
+library implementing the fundamentals required to use the netlink protocol \
+such as socket handling, message construction and parsing, and sending \
+and receiving of data."
 HOMEPAGE = "http://www.infradead.org/~tgr/libnl/"
 SECTION = "libs/network"
 

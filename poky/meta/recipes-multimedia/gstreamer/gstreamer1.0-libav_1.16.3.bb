@@ -1,4 +1,6 @@
 SUMMARY = "Libav-based GStreamer 1.x plugin"
+DESCRIPTION = "Contains a GStreamer plugin for using the encoders, decoders, \
+muxers, and demuxers provided by FFmpeg."
 HOMEPAGE = "http://gstreamer.freedesktop.org/"
 SECTION = "multimedia"
 

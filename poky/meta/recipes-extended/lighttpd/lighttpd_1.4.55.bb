@@ -1,5 +1,6 @@
 SUMMARY = "Lightweight high-performance web server"
 HOMEPAGE = "http://www.lighttpd.net/"
+DESCRIPTION = "Lightweight high-performance web server is designed and optimized for high performance environments. With a small memory footprint compared to other web-servers, effective management of the cpu-load, and advanced feature set (FastCGI, SCGI, Auth, Output-Compression, URL-Rewriting and many more)"
 BUGTRACKER = "http://redmine.lighttpd.net/projects/lighttpd/issues"
 
 LICENSE = "BSD-3-Clause"

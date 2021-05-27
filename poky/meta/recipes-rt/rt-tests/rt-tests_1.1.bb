@@ -1,5 +1,6 @@
 SUMMARY = "Real-Time preemption testcases"
-HOMEPAGE = "https://rt.wiki.kernel.org/index.php/Cyclictest"
+HOMEPAGE = "https://wiki.linuxfoundation.org/realtime/documentation/start"
+DESCRIPTION = "The main aim of the PREEMPT_RT patch is to minimize the amount of kernel code that is non-preemptible Therefore several substitution mechanisms and new mechanisms are implemented."
 SECTION = "tests"
 DEPENDS = "linux-libc-headers virtual/libc"
 LICENSE = "GPLv2 & GPLv2+"

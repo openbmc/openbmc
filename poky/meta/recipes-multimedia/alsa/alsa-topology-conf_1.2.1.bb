@@ -1,4 +1,7 @@
 SUMMARY = "ALSA topology configuration files"
+DESCRIPTION = "Provides a method for audio drivers to load their mixers, \
+routing, PCMs and capabilities from user space at runtime without changing \
+any driver source code."
 HOMEPAGE = "https://alsa-project.org"
 BUGTRACKER = "https://alsa-project.org/wiki/Bug_Tracking"
 LICENSE = "BSD-3-Clause"

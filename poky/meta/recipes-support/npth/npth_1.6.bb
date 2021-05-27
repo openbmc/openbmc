@@ -1,4 +1,5 @@
 SUMMARY = "New GNU Portable Threads library"
+DESCRIPTION = "nPth is a library to provide the GNU Pth API and thus a non-preemptive threads implementation. "
 HOMEPAGE = "https://www.gnu.org/software/pth/"
 SECTION = "libs"
 LICENSE = "LGPLv2+"

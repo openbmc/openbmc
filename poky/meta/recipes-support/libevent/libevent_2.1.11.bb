@@ -1,4 +1,9 @@
 SUMMARY = "An asynchronous event notification library"
+DESCRIPTION = "A software library that provides asynchronous event \
+notification. The libevent API provides a mechanism to execute a callback \
+function when a specific event occurs on a file descriptor or after a \
+timeout has been reached. libevent also supports callbacks triggered \
+by signals and regular timeouts"
 HOMEPAGE = "http://libevent.org/"
 BUGTRACKER = "https://github.com/libevent/libevent/issues"
 SECTION = "libs"
@@ -10,6 +15,7 @@ SRC_URI = "https://github.com/libevent/libevent/releases/download/release-${PV}-
            file://Makefile-missing-test-dir.patch \
            file://run-ptest \
            file://0001-test-regress_dns.c-patch-out-tests-that-require-a-wo.patch \
+           file://0002-test-regress.h-Increase-default-timeval-tolerance-50.patch \
            "
 
 SRC_URI[md5sum] = "7f35cfe69b82d879111ec0d7b7b1c531"

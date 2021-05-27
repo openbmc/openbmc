@@ -1,4 +1,5 @@
 SUMMARY = "Very simple session manager for X"
+DESCRIPTION = "Simple session manager for X, that provides just the right boilerplate to create a session and launch the browser "
 HOMEPAGE = "http://www.yoctoproject.org"
 BUGTRACKER = "http://bugzilla.pokylinux.org"
 

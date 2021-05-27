@@ -19,6 +19,11 @@ Upstream-Status: Pending
 Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
 Signed-off-by: Tudor Florea <tudor.florea@enea.com>
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+Increase time limit to 90 s.
+(double of the expected time of drd/tests/std_list on qemuarm64)
+
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
 ---
  tests/vg_regtest.in | 75 +++++++++++++++++++++++++++++++++++++++--------------
  1 file changed, 55 insertions(+), 20 deletions(-)
@@ -66,7 +71,7 @@ index a441f42..cb05b52 100755
  # Since most of the program time is spent in system() calls, need this to
  # propagate a Ctrl-C enabling us to quit.
 -sub mysystem($) 
-+# Enforce 30 seconds limit for the test.
++# Enforce 90 seconds limit for the test.
 +# This resume execution of the remaining tests if valgrind hangs.
 +sub mysystem($)
  {
@@ -76,7 +81,7 @@ index a441f42..cb05b52 100755
 +    my $exit_code=0;
 +    eval {
 +        local $SIG{'ALRM'} = sub { die "timed out\n" };
-+        alarm(30);
++        alarm(90);
 +        $exit_code = system($_[0]);
 +        alarm (0);
 +        ($exit_code == 2) and die "SIGINT\n";   # 2 is SIGINT

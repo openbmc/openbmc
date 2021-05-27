@@ -1,5 +1,10 @@
 SUMMARY = "Library for embedding a Clutter canvas in a GTK+ application"
+DESCRIPTION = "Clutter-GTK is a library providing facilities to integrate Clutter into GTK+ \
+applications and vice versa. It provides a GTK+ widget, GtkClutterEmbed, for embedding the \
+a Clutter stage into any GtkContainer; and GtkClutterActor, a Clutter \
+actor for embedding any GtkWidget inside a Clutter stage."
 HOMEPAGE = "http://www.clutter-project.org/"
+BUGTRACKER = "https://gitlab.gnome.org/GNOME/clutter/-/issues"
 LICENSE = "LGPLv2+"
 
 CLUTTERBASEBUILDCLASS = "meson"

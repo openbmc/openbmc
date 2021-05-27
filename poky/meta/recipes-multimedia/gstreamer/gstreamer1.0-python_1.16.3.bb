@@ -1,4 +1,6 @@
 SUMMARY = "Python bindings for GStreamer 1.0"
+DESCRIPTION = "GStreamer Python binding overrides (complementing the bindings \
+provided by python-gi) "
 HOMEPAGE = "http://cgit.freedesktop.org/gstreamer/gst-python/"
 SECTION = "multimedia"
 

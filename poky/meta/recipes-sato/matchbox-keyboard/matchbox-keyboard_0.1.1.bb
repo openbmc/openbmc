@@ -1,4 +1,5 @@
 SUMMARY = "Matchbox virtual keyboard for X11"
+DESCRIPTION = "An on screen 'virtual' or 'software' keyboard."
 HOMEPAGE = "http://matchbox-project.org"
 BUGTRACKER = "http://bugzilla.yoctoproject.org/"
 SECTION = "x11"

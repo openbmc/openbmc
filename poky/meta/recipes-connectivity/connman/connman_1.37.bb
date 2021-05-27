@@ -6,6 +6,9 @@ SRC_URI  = "${KERNELORG_MIRROR}/linux/network/${BPN}/${BP}.tar.xz \
             file://0001-gweb-fix-segfault-with-musl-v1.1.21.patch \
             file://connman \
             file://no-version-scripts.patch \
+            file://CVE-2021-26675.patch \
+            file://CVE-2021-26676-0001.patch \
+            file://CVE-2021-26676-0002.patch \
 "
 
 SRC_URI_append_libc-musl = " file://0002-resolve-musl-does-not-implement-res_ninit.patch"

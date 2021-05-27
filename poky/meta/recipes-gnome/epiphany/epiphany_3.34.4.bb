@@ -1,4 +1,7 @@
 SUMMARY = "WebKit based web browser for GNOME"
+DESCRIPTION = "Epiphany is an open source web browser for the Linux desktop environment. \
+It provides a simple and easy-to-use internet browsing experience."
+HOMEPAGE = "https://wiki.gnome.org/Apps/Web"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/epiphany"
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"

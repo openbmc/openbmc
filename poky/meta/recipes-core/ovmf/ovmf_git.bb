@@ -12,15 +12,15 @@ LIC_FILES_CHKSUM = "file://OvmfPkg/License.txt;md5=06357ddc23f46577c2aeaeaf7b776
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[secureboot] = ",,,"
 
-SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=git \
+SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https \
            file://0001-ovmf-update-path-to-native-BaseTools.patch \
            file://0002-BaseTools-makefile-adjust-to-build-in-under-bitbake.patch \
            file://0003-ovmf-enable-long-path-file.patch \
            file://0004-ovmf-Update-to-latest.patch \
         "
 
-PV = "edk2-stable201911"
-SRCREV = "bd85bf54c268204c7a698a96f3ccd96cd77952cd"
+PV = "edk2-stable202008"
+SRCREV = "06dc822d045c2bb42e497487935485302486e151"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>edk2-stable.*)"
 
 inherit deploy

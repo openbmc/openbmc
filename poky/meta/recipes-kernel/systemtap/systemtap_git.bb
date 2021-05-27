@@ -1,4 +1,7 @@
 SUMMARY = "Script-directed dynamic tracing and performance analysis tool for Linux"
+DESCRIPTION = "It provides free software infrastructure to simplify the \
+gathering of information about the running Linux system. This assists \
+diagnosis of a performance or functional problem."
 HOMEPAGE = "https://sourceware.org/systemtap/"
 
 require systemtap_git.inc

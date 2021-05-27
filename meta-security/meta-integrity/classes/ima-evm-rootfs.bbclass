@@ -28,6 +28,9 @@ IMA_EVM_ROOTFS_HASHED ?= ". -depth 0 -false"
 # the iversion flags (needed by IMA when allowing writing).
 IMA_EVM_ROOTFS_IVERSION ?= ""
 
+# Avoid re-generating fstab when ima is enabled.
+WIC_CREATE_EXTRA_ARGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'ima', ' --no-fstab-update', '', d)}"
+
 ima_evm_sign_rootfs () {
     cd ${IMAGE_ROOTFS}
 
@@ -36,15 +39,6 @@ ima_evm_sign_rootfs () {
     # rootfs. That's because do_image might again run for various
     # reasons (including a change of the signing keys) without also
     # re-running do_rootfs.
-
-    # Copy file(s) which must be on the device. Note that
-    # evmctl uses x509_evm.der also for "ima_verify", which is probably
-    # a bug (should default to x509_ima.der). Does not matter for us
-    # because we use the same key for both.
-    install -d ./${sysconfdir}/keys
-    rm -f ./${sysconfdir}/keys/x509_evm.der
-    install "${IMA_EVM_X509}" ./${sysconfdir}/keys/x509_evm.der
-    ln -sf x509_evm.der ./${sysconfdir}/keys/x509_ima.der
 
     # Fix /etc/fstab: it must include the "i_version" mount option for
     # those file systems where writing files is allowed, otherwise
@@ -80,13 +74,16 @@ ima_evm_sign_rootfs () {
 }
 
 # Signing must run as late as possible in the do_rootfs task.
-# IMAGE_PREPROCESS_COMMAND runs after ROOTFS_POSTPROCESS_COMMAND, so
-# append (not prepend!) to IMAGE_PREPROCESS_COMMAND, and do it with
-# _append instead of += because _append gets evaluated later. In
-# particular, we must run after prelink_image in
-# IMAGE_PREPROCESS_COMMAND, because prelinking changes executables.
+# To guarantee that, we append it to IMAGE_PREPROCESS_COMMAND in
+# RecipePreFinalise event handler, this ensures it's the last
+# function in IMAGE_PREPROCESS_COMMAND.
+python ima_evm_sign_handler () {
+    if not e.data or 'ima' not in e.data.getVar('DISTRO_FEATURES').split():
+        return
 
-IMAGE_PREPROCESS_COMMAND_append = " ima_evm_sign_rootfs ; "
-
-# evmctl must have been installed first.
-do_rootfs[depends] += "ima-evm-utils-native:do_populate_sysroot"
+    e.data.appendVar('IMAGE_PREPROCESS_COMMAND', ' ima_evm_sign_rootfs; ')
+    e.data.appendVar('IMAGE_INSTALL', ' ima-evm-keys')
+    e.data.appendVarFlag('do_rootfs', 'depends', ' ima-evm-utils-native:do_populate_sysroot')
+}
+addhandler ima_evm_sign_handler
+ima_evm_sign_handler[eventmask] = "bb.event.RecipePreFinalise"

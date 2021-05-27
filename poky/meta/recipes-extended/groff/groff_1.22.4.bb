@@ -62,6 +62,10 @@ do_install_append() {
 	rm -rf ${D}${bindir}/glilypond
 	rm -rf ${D}${libdir}/groff/glilypond
 	rm -rf ${D}${mandir}/man1/glilypond*
+
+	# not ship /usr/bin/grap2graph and its releated man files
+	rm -rf ${D}${bindir}/grap2graph
+	rm -rf ${D}${mandir}/man1/grap2graph*
 }
 
 do_install_append_class-native() {

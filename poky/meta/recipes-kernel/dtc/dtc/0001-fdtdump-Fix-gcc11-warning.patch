@@ -1,0 +1,35 @@
+From 4827e0db6c4f7dea7f4094f49d3bb48ef6dfdc2d Mon Sep 17 00:00:00 2001
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 6 Jan 2021 14:52:26 +1100
+Subject: [PATCH] fdtdump: Fix gcc11 warning
+
+In one place, fdtdump abuses fdt_set_magic(), passing it just a small char
+array instead of the full fdt header it expects.  That's relying on the
+fact that in fact fdt_set_magic() will only actually access the first 4
+bytes of the buffer.
+
+This trips a new warning in GCC 11 - and it's entirely possible it was
+always UB.  So, don't do that.
+
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/utils/dtc/dtc.git/patch/?id=ca16a723fa9dde9c5da80dba567f48715000e77c]
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ fdtdump.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fdtdump.c b/fdtdump.c
+index 9613bef..d9fb374 100644
+--- a/fdtdump.c
++++ b/fdtdump.c
+@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
+ 		char *p = buf;
+ 		char *endp = buf + len;
+ 
+-		fdt_set_magic(smagic, FDT_MAGIC);
++		fdt32_st(smagic, FDT_MAGIC);
+ 
+ 		/* poor man's memmem */
+ 		while ((endp - p) >= FDT_MAGIC_SIZE) {
+-- 
+2.30.1
+

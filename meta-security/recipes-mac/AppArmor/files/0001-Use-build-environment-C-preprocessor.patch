@@ -1,0 +1,39 @@
+From b19d65886263cee40c7283d329ff05f43cbb2047 Mon Sep 17 00:00:00 2001
+From: Omer Akram <omer@thing.com>
+Date: Mon, 12 Apr 2021 22:24:13 +0500
+Subject: [PATCH] Use build environment C preprocessor
+
+---
+ common/list_af_names.sh     | 2 +-
+ common/list_capabilities.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/common/list_af_names.sh b/common/list_af_names.sh
+index d7987537..23d9ba7f 100755
+--- a/common/list_af_names.sh
++++ b/common/list_af_names.sh
+@@ -11,7 +11,7 @@
+ # rewrite as "AF_".
+ 
+ echo "#include <sys/socket.h>" | \
+-  cpp -dM | \
++  ${CPP} -dM - | \
+   LC_ALL=C sed -n \
+     -e '/PF_UNIX/d' \
+     -e 's/PF_LOCAL/PF_UNIX/' \
+diff --git a/common/list_capabilities.sh b/common/list_capabilities.sh
+index 4e37cda7..d07111de 100755
+--- a/common/list_capabilities.sh
++++ b/common/list_capabilities.sh
+@@ -7,7 +7,7 @@
+ # =====================
+ 
+ echo "#include <linux/capability.h>" | \
+-  cpp -dM | \
++  ${CPP} -dM - | \
+   LC_ALL=C sed -n \
+     -e '/CAP_EMPTY_SET/d' \
+     -e 's/^\#define[ \t]\+CAP_\([A-Z0-9_]\+\)[ \t]\+\([0-9xa-f]\+\)\(.*\)$/CAP_\1/p' | \
+-- 
+2.25.1
+

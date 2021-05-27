@@ -1,4 +1,5 @@
 SUMMARY = "The Bitstream Vera fonts - TTF Edition"
+HOMEPAGE = "https://www.gnome.org/fonts/"
 DESCRIPTION = "The Bitstream Vera fonts include four monospace and sans \
 faces (normal, oblique, bold, bold oblique) and two serif faces (normal \
 and bold).  In addition Fontconfig/Xft2 can artificially oblique the \

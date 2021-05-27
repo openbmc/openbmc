@@ -1,0 +1,45 @@
+From 68f12fc4a0dbef4ae4c404da24040d22c5a14339 Mon Sep 17 00:00:00 2001
+From: Sami Kerola <kerolasa@iki.fi>
+Date: Sat, 8 Feb 2020 14:12:18 +0000
+Subject: [PATCH] arping: return success when unsolicited ARP mode destination
+ does not answer
+
+Manual page is making promise answers are not expected when -U (or -A)
+option is in use.  Either I am looking wrong or this has been broken since
+at the beginning of git history.
+
+Addresses: https://github.com/iputils/iputils/issues/247
+Signed-off-by: Sami Kerola <kerolasa@iki.fi>
+Upstream-Status: Backport [https://github.com/iputils/iputils/commit/68f12fc4a0dbef4ae4c404da24040d22c5a14339]
+Signed-off-by: Diego Santa Cruz <Diego.SantaCruz@spinetix.com>
+---
+ arping.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arping.c b/arping.c
+index 996cf2b..5180ae0 100644
+--- a/arping.c
++++ b/arping.c
+@@ -794,7 +794,9 @@ static int event_loop(struct run_state *ctl)
+ 	close(tfd);
+ 	freeifaddrs(ctl->ifa0);
+ 	rc |= finish(ctl);
+-	if (ctl->dad && ctl->quit_on_reply)
++	if (ctl->unsolicited)
++		/* nothing */;
++	else if (ctl->dad && ctl->quit_on_reply)
+ 		/* Duplicate address detection mode return value */
+ 		rc |= !(ctl->brd_sent != ctl->received);
+ 	else
+@@ -943,7 +945,7 @@ int main(int argc, char **argv)
+ 		}
+ 		memset(&saddr, 0, sizeof(saddr));
+ 		saddr.sin_family = AF_INET;
+-		if (ctl.source || ctl.gsrc.s_addr) {
++		if (!ctl.unsolicited && (ctl.source || ctl.gsrc.s_addr)) {
+ 			saddr.sin_addr = ctl.gsrc;
+ 			if (bind(probe_fd, (struct sockaddr *)&saddr, sizeof(saddr)) == -1)
+ 				error(2, errno, "bind");
+-- 
+2.18.4
+

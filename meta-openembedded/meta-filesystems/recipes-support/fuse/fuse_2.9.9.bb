@@ -19,6 +19,11 @@ SRC_URI = "https://github.com/libfuse/libfuse/releases/download/${BP}/${BP}.tar.
 SRC_URI[md5sum] = "8000410aadc9231fd48495f7642f3312"
 SRC_URI[sha256sum] = "d0e69d5d608cc22ff4843791ad097f554dd32540ddc9bed7638cc6fea7c1b4b5"
 
+# CVE-2019-14860 is a REDHAT specific issue and was addressed for REDHAT Fuse products on Red Hat Fuse 7.4.1 and Red Hat Fuse 7.5.0.
+# REDHAT has also released the fix and updated their security advisories after significant releases.
+CVE_PRODUCT = "fuse"
+CVE_CHECK_WHITELIST += "CVE-2019-14860"
+
 UPSTREAM_CHECK_URI = "https://github.com/libfuse/libfuse/releases"
 UPSTREAM_CHECK_REGEX = "fuse\-(?P<pver>2(\.\d+)+).tar.gz"
 

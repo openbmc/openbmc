@@ -1,0 +1,94 @@
+From 60a27c76174c0ae23bdafde2bad4fdd18a44a7ea Mon Sep 17 00:00:00 2001
+From: Sami Kerola <kerolasa@iki.fi>
+Date: Sat, 7 Mar 2020 22:03:21 +0000
+Subject: [PATCH] arping: use additional timerfd to control when timeout
+ happens
+
+Trying to determine timeout by adding up interval values is pointlessly
+complicating.  With separate timer everything just works.
+
+Addresses: https://github.com/iputils/iputils/issues/259
+Fixes: 1df5350bdc952b14901fde356b17b78c2bcd4cff
+Signed-off-by: Sami Kerola <kerolasa@iki.fi>
+Upstream-Status: Backport [https://github.com/iputils/iputils/commit/e594ca52afde89746b7d79c875fe9d6aea1850ac]
+Signed-off-by: Diego Santa Cruz <Diego.SantaCruz@spinetix.com>
+---
+ arping.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/arping.c b/arping.c
+index 61db3a6..7284351 100644
+--- a/arping.c
++++ b/arping.c
+@@ -670,6 +670,7 @@ static int event_loop(struct run_state *ctl)
+ 	enum {
+ 		POLLFD_SIGNAL = 0,
+ 		POLLFD_TIMER,
++		POLLFD_TIMEOUT,
+ 		POLLFD_SOCKET,
+ 		POLLFD_COUNT
+ 	};
+@@ -686,6 +687,13 @@ static int event_loop(struct run_state *ctl)
+ 		.it_value.tv_sec = ctl->interval,
+ 		.it_value.tv_nsec = 0
+ 	};
++	int timeoutfd;
++	struct itimerspec timeoutfd_vals = {
++		.it_interval.tv_sec = ctl->timeout,
++		.it_interval.tv_nsec = 0,
++		.it_value.tv_sec = ctl->timeout,
++		.it_value.tv_nsec = 0
++	};
+ 	uint64_t exp, total_expires = 1;
+ 
+ 	unsigned char packet[4096];
+@@ -709,7 +717,7 @@ static int event_loop(struct run_state *ctl)
+ 	pfds[POLLFD_SIGNAL].fd = sfd;
+ 	pfds[POLLFD_SIGNAL].events = POLLIN | POLLERR | POLLHUP;
+ 
+-	/* timerfd */
++	/* interval timerfd */
+ 	tfd = timerfd_create(CLOCK_MONOTONIC, 0);
+ 	if (tfd == -1) {
+ 		error(0, errno, "timerfd_create failed");
+@@ -722,6 +730,19 @@ static int event_loop(struct run_state *ctl)
+ 	pfds[POLLFD_TIMER].fd = tfd;
+ 	pfds[POLLFD_TIMER].events = POLLIN | POLLERR | POLLHUP;
+ 
++	/* timeout timerfd */
++	timeoutfd = timerfd_create(CLOCK_MONOTONIC, 0);
++	if (tfd == -1) {
++		error(0, errno, "timerfd_create failed");
++		return 1;
++	}
++	if (timerfd_settime(timeoutfd, 0, &timeoutfd_vals, NULL)) {
++		error(0, errno, "timerfd_settime failed");
++		return 1;
++	}
++	pfds[POLLFD_TIMEOUT].fd = timeoutfd;
++	pfds[POLLFD_TIMEOUT].events = POLLIN | POLLERR | POLLHUP;
++
+ 	/* socket */
+ 	pfds[POLLFD_SOCKET].fd = ctl->socketfd;
+ 	pfds[POLLFD_SOCKET].events = POLLIN | POLLERR | POLLHUP;
+@@ -764,13 +785,15 @@ static int event_loop(struct run_state *ctl)
+ 					continue;
+ 				}
+ 				total_expires += exp;
+-				if ((0 < ctl->count && (uint64_t)ctl->count < total_expires) ||
+-				    (ctl->quit_on_reply && ctl->timeout < (long)total_expires)) {
++				if (0 < ctl->count && (uint64_t)ctl->count < total_expires) {
+ 					exit_loop = 1;
+ 					continue;
+ 				}
+ 				send_pack(ctl);
+ 				break;
++			case POLLFD_TIMEOUT:
++				exit_loop = 1;
++				break;
+ 			case POLLFD_SOCKET:
+ 				if ((s =
+ 				     recvfrom(ctl->socketfd, packet, sizeof(packet), 0,
+-- 
+2.18.4
+

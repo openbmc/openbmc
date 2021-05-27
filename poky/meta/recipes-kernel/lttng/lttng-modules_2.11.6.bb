@@ -1,6 +1,7 @@
 SECTION = "devel"
 SUMMARY = "Linux Trace Toolkit KERNEL MODULE"
 DESCRIPTION = "The lttng-modules 2.0 package contains the kernel tracer modules"
+HOMEPAGE = "https://lttng.org/"
 LICENSE = "LGPLv2.1 & GPLv2 & MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3f882d431dc0f32f1f44c0707aa41128"
 

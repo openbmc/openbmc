@@ -1,5 +1,6 @@
 SUMMARY = "Password strength checker library"
-HOMEPAGE = "http://sourceforge.net/projects/cracklib"
+HOMEPAGE = "https://github.com/cracklib/cracklib"
+DESCRIPTION = "${SUMMARY}"
 
 LICENSE = "LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=e3eda01d9815f8d24aae2dbd89b68b06"

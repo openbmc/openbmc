@@ -1,4 +1,6 @@
 SUMMARY = "GTK+ icon theme"
+DESCRIPTION = "The Adwaita icon theme is the default icon theme of the GNOME desktop \
+This package package contains an icon theme for Gtk+ 3 applications."
 HOMEPAGE = "https://gitlab.gnome.org/GNOME/adwaita-icon-theme"
 BUGTRACKER = "https://gitlab.gnome.org/GNOME/adwaita-icon-theme/issues"
 SECTION = "x11/gnome"

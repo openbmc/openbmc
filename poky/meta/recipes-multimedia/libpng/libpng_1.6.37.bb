@@ -1,4 +1,7 @@
 SUMMARY = "PNG image format decoding library"
+DESCRIPTION = "An open source project to develop and maintain the reference \
+library for use in applications that read, create, and manipulate PNG \
+(Portable Network Graphics) raster image files. "
 HOMEPAGE = "http://www.libpng.org/"
 SECTION = "libs"
 LICENSE = "Libpng"

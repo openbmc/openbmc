@@ -1,5 +1,6 @@
 SUMMARY = "GNU grep utility"
 HOMEPAGE = "http://savannah.gnu.org/projects/grep/"
+DESCRIPTION = "Grep searches one or more input files for lines containing a match to a specified pattern. By default, grep prints the matching lines."
 BUGTRACKER = "http://savannah.gnu.org/bugs/?group=grep"
 SECTION = "console/utils"
 LICENSE = "GPLv3"

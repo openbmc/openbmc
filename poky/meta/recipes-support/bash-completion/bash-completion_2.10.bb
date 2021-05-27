@@ -1,6 +1,9 @@
 SUMMARY = "Programmable Completion for Bash 4"
-DESCRIPTION = "bash completion extends bash's standard completion behavior to \
-achieve complex command lines with just a few keystrokes."
+DESCRIPTION = "Collection of command line command completions for the Bash shell, \
+collection of helper functions to assist in creating new completions, \
+and set of facilities for loading completions automatically on demand, as well \
+as installing them."
+
 HOMEPAGE = "https://github.com/scop/bash-completion"
 BUGTRACKER = "https://github.com/scop/bash-completion/issues"
 

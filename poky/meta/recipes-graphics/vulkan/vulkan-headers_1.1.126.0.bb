@@ -1,4 +1,8 @@
 SUMMARY = "Vulkan Header files and API registry"
+DESCRIPTION = "Vulkan is a 3D graphics and compute API providing cross-platform access \
+to modern GPUs with low overhead and targeting realtime graphics applications such as \
+games and interactive media. This package contains the development headers \
+for packages wanting to make use of Vulkan."
 HOMEPAGE = "https://www.khronos.org/vulkan/"
 BUGTRACKER = "https://github.com/KhronosGroup/Vulkan-Headers"
 SECTION = "libs"

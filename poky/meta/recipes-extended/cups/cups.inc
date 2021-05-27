@@ -54,6 +54,7 @@ EXTRA_OECONF = " \
                --enable-libusb \
                --with-system-groups=lpadmin \
                --with-cups-group=lp \
+               --with-domainsocket=/run/cups/cups.sock \
                DSOFLAGS='${LDFLAGS}' \
                "
 

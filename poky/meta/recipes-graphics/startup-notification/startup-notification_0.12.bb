@@ -1,6 +1,9 @@
 SUMMARY = "Enables monitoring and display of application startup"
+DESCRIPTION = "Contains a reference implementation of the startup notification protocol. \
+The reference implementation is mostly under an X Window System style license, and has \
+no special dependencies. "
 HOMEPAGE = "http://www.freedesktop.org/wiki/Software/startup-notification/"
-BUGTRACKER = "https://bugs.freedesktop.org/enter_bug.cgi?product=Specifications"
+BUGTRACKER = "https://gitlab.freedesktop.org/xdg/startup-notification/-/issues"
 
 # most files are under MIT, but libsn/sn-util.c is under LGPL, the
 # effective license is LGPL

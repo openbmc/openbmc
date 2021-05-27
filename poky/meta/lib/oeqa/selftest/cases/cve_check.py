@@ -34,3 +34,11 @@ class CVECheck(OESelftestTestCase):
         self.assertTrue( result ,msg="Failed to compare version with suffix '1.0b' < '1.0r'")
         result = Version("1.0b","alphabetical") > Version("1.0","alphabetical")
         self.assertTrue( result ,msg="Failed to compare version with suffix '1.0b' > '1.0'")
+
+        # consider the trailing "p" and "patch" as patched released when comparing
+        result = Version("1.0","patch") < Version("1.0p1","patch")
+        self.assertTrue( result ,msg="Failed to compare version with suffix '1.0' < '1.0p1'")
+        result = Version("1.0p2","patch") > Version("1.0p1","patch")
+        self.assertTrue( result ,msg="Failed to compare version with suffix '1.0p2' > '1.0p1'")
+        result = Version("1.0_patch2","patch") < Version("1.0_patch3","patch")
+        self.assertTrue( result ,msg="Failed to compare version with suffix '1.0_patch2' < '1.0_patch3'")

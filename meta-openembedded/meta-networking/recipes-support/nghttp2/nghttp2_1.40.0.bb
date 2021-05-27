@@ -10,6 +10,8 @@ UPSTREAM_CHECK_URI = "https://github.com/nghttp2/nghttp2/releases"
 SRC_URI = "\
     https://github.com/nghttp2/nghttp2/releases/download/v${PV}/nghttp2-${PV}.tar.xz \
     file://0001-fetch-ocsp-response-use-python3.patch \
+    file://CVE-2020-11080-1.patch \
+    file://CVE-2020-11080-2.patch \
 "
 SRC_URI[md5sum] = "8d1a6b96760254e4dd142d7176e8fb7c"
 SRC_URI[sha256sum] = "09fc43d428ff237138733c737b29fb1a7e49d49de06d2edbed3bc4cdcee69073"

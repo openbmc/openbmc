@@ -1,6 +1,9 @@
 SUMMARY = "Enchant Spell checker API Library"
+DESCRIPTION = "A library (and command-line program) that wraps a number of \
+different spelling libraries and programs with a consistent interface."
 SECTION = "libs"
 HOMEPAGE = "https://abiword.github.io/enchant/"
+BUGTRACKER = "https://github.com/AbiWord/enchant/issues/"
 LICENSE = "LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=a916467b91076e631dd8edb7424769c7"
 

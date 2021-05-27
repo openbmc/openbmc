@@ -1,4 +1,4 @@
-From fe27d0e2341683606704115949d16250e4cacbfa Mon Sep 17 00:00:00 2001
+From 23425e45f6e26f2b1e387b88e104872b3a1ea5d1 Mon Sep 17 00:00:00 2001
 From: Jason Wessel <jason.wessel@windriver.com>
 Date: Wed, 9 May 2018 13:33:59 -0700
 Subject: [PATCH] Temporarliy work around deprecated ffmpeg RAW function
@@ -11,7 +11,7 @@ Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
  1 file changed, 8 insertions(+)
 
 diff --git a/modules/videoio/src/cap_ffmpeg_impl.hpp b/modules/videoio/src/cap_ffmpeg_impl.hpp
-index 0d360ad..566df66 100644
+index 0d360ad5d9..566df6664b 100644
 --- a/modules/videoio/src/cap_ffmpeg_impl.hpp
 +++ b/modules/videoio/src/cap_ffmpeg_impl.hpp
 @@ -736,6 +736,14 @@ struct ImplMutex::Impl

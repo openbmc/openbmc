@@ -49,3 +49,5 @@ do_compile_prepend () {
 do_install_prepend (){
 	mkdir -p ${D}/${localstatedir}/lib
 }
+
+CVE_VERSION_SUFFIX = "patch"

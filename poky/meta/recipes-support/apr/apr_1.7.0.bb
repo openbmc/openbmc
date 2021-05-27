@@ -1,8 +1,8 @@
 SUMMARY = "Apache Portable Runtime (APR) library"
-DESCRIPTION = "The Apache Portable Runtime (APR) is a supporting library for the \
-Apache web server. It provides a set of APIs that map to the underlying \
-operating system (OS). Where the OS does not support a particular function, \
-APR will provide an emulation."
+
+DESCRIPTION = "Create and maintain software libraries that provide a predictable \
+and consistent interface to underlying platform-specific implementations."
+
 HOMEPAGE = "http://apr.apache.org/"
 SECTION = "libs"
 DEPENDS = "util-linux"

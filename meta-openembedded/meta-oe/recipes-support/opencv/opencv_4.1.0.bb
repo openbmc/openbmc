@@ -50,6 +50,10 @@ SRC_URI = "git://github.com/opencv/opencv.git;name=opencv \
            file://0001-Dont-use-isystem.patch \
            file://0001-carotene-Replace-ipcp-unit-growth-with-ipa-cp-unit-g.patch \
            file://download.patch \
+           file://CVE-2019-14491.patch \
+           file://CVE-2019-14493.patch \
+           file://CVE-2019-15939.patch \
+           file://CVE-2019-19624.patch \
            "
 PV = "4.1.0"
 

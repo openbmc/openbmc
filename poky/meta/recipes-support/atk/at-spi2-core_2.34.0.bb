@@ -1,7 +1,9 @@
 SUMMARY = "Assistive Technology Service Provider Interface (dbus core)"
-DESCRIPTION = "At-Spi2 is a protocol over DBus, toolkit widgets use it to \
-provide their content to screen readers such as Orca."
+
+DESCRIPTION = "It provides a Service Provider Interface for the Assistive Technologies available on the GNOME platform and a library against which applications can be linked."
+
 HOMEPAGE = "https://wiki.linuxfoundation.org/accessibility/d-bus"
+BUGTRACKER = "http://bugzilla.gnome.org/"
 LICENSE = "LGPL-2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 

@@ -1,16 +1,27 @@
 SUMMARY = "Provides support for the Tag Image File Format (TIFF)"
+DESCRIPTION = "Library provides support for the Tag Image File Format \
+(TIFF), a widely used format for storing image data.  This library \
+provide means to easily access and create TIFF image files."
+HOMEPAGE = "http://www.libtiff.org/"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=34da3db46fab7501992f9615d7e158cf"
 
 CVE_PRODUCT = "libtiff"
 
 SRC_URI = "http://download.osgeo.org/libtiff/tiff-${PV}.tar.gz \
+           file://CVE-2020-35523.patch  \
+           file://CVE-2020-35524-1.patch \
+           file://CVE-2020-35524-2.patch \
           "
 SRC_URI[md5sum] = "2165e7aba557463acc0664e71a3ed424"
 SRC_URI[sha256sum] = "5d29f32517dadb6dbcd1255ea5bbc93a2b54b94fbf83653b4d65c7d6775b8634"
 
 # exclude betas
 UPSTREAM_CHECK_REGEX = "tiff-(?P<pver>\d+(\.\d+)+).tar"
+
+# Tested with check from https://security-tracker.debian.org/tracker/CVE-2015-7313
+# and 4.1.0 doesn't have the issue
+CVE_CHECK_WHITELIST += "CVE-2015-7313"
 
 inherit autotools multilib_header
 

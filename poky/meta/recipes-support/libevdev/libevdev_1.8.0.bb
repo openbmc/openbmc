@@ -1,4 +1,7 @@
 SUMMARY = "Wrapper library for evdev devices"
+DESCRIPTION = "A library for handling evdev kernel devices. It abstracts \
+the evdev ioctls through type-safe interfaces and provides functions \
+to change the appearance of the device."
 HOMEPAGE = "http://www.freedesktop.org/wiki/Software/libevdev/"
 SECTION = "libs"
 

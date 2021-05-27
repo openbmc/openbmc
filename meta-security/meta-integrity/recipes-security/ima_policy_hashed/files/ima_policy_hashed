@@ -53,6 +53,9 @@ dont_measure fsmagic=0x43415d53
 # CGROUP_SUPER_MAGIC
 dont_appraise fsmagic=0x27e0eb
 dont_measure fsmagic=0x27e0eb
+# CGROUP2_SUPER_MAGIC
+dont_appraise fsmagic=0x63677270
+dont_measure fsmagic=0x63677270
 # EFIVARFS_MAGIC
 dont_appraise fsmagic=0xde5e81e4
 dont_measure fsmagic=0xde5e81e4

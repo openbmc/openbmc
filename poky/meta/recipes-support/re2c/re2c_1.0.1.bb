@@ -1,5 +1,7 @@
 SUMMARY = "Tool for writing very fast and very flexible scanners"
-HOMEPAGE = "http://re2c.sourceforge.net/"
+DESCRIPTION = "A free and open-source lexer generator for C, C++ and Go. It compiles regular expressions to determinisitic finite automata and encodes the automata in the form of a program in the target language. Unlike any other such tool, re2c focuses on generating high efficient code for regular expression matching. As a result this allows a much broader range of use than any traditional lexer."
+HOMEPAGE = "http://re2c.org/"
+BUGTRACKER = "https://github.com/skvadrik/re2c/issues"
 AUTHOR = "Marcus Börger <helly@users.sourceforge.net>"
 SECTION = "devel"
 LICENSE = "PD"

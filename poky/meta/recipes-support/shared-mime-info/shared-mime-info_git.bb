@@ -1,4 +1,5 @@
 SUMMARY = "Shared MIME type database and specification"
+DESCRIPTION = "The shared-mime-info package contains the core database of common types and the update-mime-database command used to extend it. It requires glib2 to be installed for building the update command. Additionally, it uses intltool for translations, though this is only a dependency for the maintainers."
 HOMEPAGE = "http://freedesktop.org/wiki/Software/shared-mime-info"
 SECTION = "base"
 

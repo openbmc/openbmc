@@ -1,5 +1,9 @@
 SUMMARY = "GStreamer integration library for Clutter"
+DESCRIPTION = "Clutter-Gst is an integration library for using GStreamer with Clutter. \
+It provides a GStreamer sink to upload frames to GL and an actor that \
+implements the ClutterGstPlayer interface using playbin."
 HOMEPAGE = "http://www.clutter-project.org/"
+BUGTRACKER = "https://gitlab.gnome.org/GNOME/clutter-gst/-/issues"
 LICENSE = "LGPLv2+"
 
 inherit clutter features_check upstream-version-is-even gobject-introspection

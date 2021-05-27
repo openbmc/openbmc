@@ -1,4 +1,6 @@
 SUMMARY = "ALSA sound library"
+DESCRIPTION = "(Occasionally a.k.a. libasound) is a userspace library that \
+provides a level of abstraction over the /dev interfaces provided by the kernel modules."
 HOMEPAGE = "http://www.alsa-project.org"
 BUGTRACKER = "http://alsa-project.org/main/index.php/Bug_Tracking"
 SECTION = "libs/multimedia"

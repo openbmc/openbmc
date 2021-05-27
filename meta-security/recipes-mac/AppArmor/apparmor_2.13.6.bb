@@ -22,19 +22,19 @@ SRC_URI = " \
     file://apparmor \
     file://apparmor.service \
     file://0001-Makefile.am-suppress-perllocal.pod.patch \
+    file://0001-Use-build-environment-C-preprocessor.patch \
+    file://0002-Correctly-escape-in-Makefile.patch \
     file://run-ptest \
-    file://0001-regression-tests-Don-t-build-syscall_sysctl-if-missi.patch \
-    file://0001-tests-regression-fix-failure-on-older-versions-of-Ma.patch \
     "
 
-SRCREV = "df0ac742f7a1146181d8734d03334494f2015134"
+SRCREV = "c16fff8cb487cf150e3e5ad536b7ff2d4cb4f784"
 S = "${WORKDIR}/git"
 
 PARALLEL_MAKE = ""
 
 COMPATIBLE_MACHINE_mips64 = "(!.*mips64).*"
 
-inherit pkgconfig autotools-brokensep update-rc.d python3native perlnative ptest cpan manpages systemd features_check
+inherit pkgconfig autotools-brokensep update-rc.d python3native python3targetconfig perlnative ptest cpan manpages systemd features_check
 REQUIRED_DISTRO_FEATURES = "apparmor"
 
 PACKAGECONFIG ??= "python perl aa-decode"

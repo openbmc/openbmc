@@ -1,0 +1,39 @@
+From 1df5350bdc952b14901fde356b17b78c2bcd4cff Mon Sep 17 00:00:00 2001
+From: Sami Kerola <kerolasa@iki.fi>
+Date: Wed, 28 Aug 2019 20:05:22 +0100
+Subject: [PATCH] arping: fix -f quit on first reply regression
+
+When arping runs together with -f 'quit on first reply' and -w <timeout>
+'how long to wait for a reply' the command needs to exit if replies are not
+received after wait period.  Notice that the exit in case of lost packages
+will be 1 signifying failure.  Getting a reply results to 0 exit value.
+
+Addresses: https://bugs.debian.org/935946
+Reported-by: Lucas Nussbaum <lucas@debian.org>
+Addresses: https://github.com/iputils/iputils/issues/211
+Reported-by: Noah Meyerhans <noahm@debian.org>
+Broken-since: 67e070d08dcbec990e1178360f82b3e2ca4f6d5f
+Signed-off-by: Sami Kerola <kerolasa@iki.fi>
+Upstream-Status: Backport [https://github.com/iputils/iputils/commit/1df5350bdc952b14901fde356b17b78c2bcd4cff]
+Signed-off-by: Diego Santa Cruz <Diego.SantaCruz@spinetix.com>
+---
+ arping.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arping.c b/arping.c
+index 2c87c15..30884f6 100644
+--- a/arping.c
++++ b/arping.c
+@@ -764,7 +764,8 @@ static int event_loop(struct run_state *ctl)
+ 					continue;
+ 				}
+ 				total_expires += exp;
+-				if (0 < ctl->count && (uint64_t)ctl->count < total_expires) {
++				if ((0 < ctl->count && (uint64_t)ctl->count < total_expires) ||
++				    (ctl->quit_on_reply && ctl->timeout < total_expires)) {
+ 					exit_loop = 1;
+ 					continue;
+ 				}
+-- 
+2.18.4
+

@@ -1,0 +1,25 @@
+From 4ffd666a2cedeabc8eef42371c03be52fc2a3d66 Mon Sep 17 00:00:00 2001
+From: Omer Akram <omer@thing.com>
+Date: Mon, 12 Apr 2021 22:54:52 +0500
+Subject: [PATCH] Correctly escape # in Makefile
+
+---
+ tests/regression/apparmor/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/regression/apparmor/Makefile b/tests/regression/apparmor/Makefile
+index c3d0cfb7..b41dbe47 100644
+--- a/tests/regression/apparmor/Makefile
++++ b/tests/regression/apparmor/Makefile
+@@ -69,7 +69,7 @@ endif # USE_SYSTEM
+ 
+ CFLAGS += -g -O0 -Wall -Wstrict-prototypes
+ 
+-USE_SYSCTL:=$(shell echo "#include <sys/sysctl.h>" | cpp -dM >/dev/null 2>/dev/null && echo true)
++USE_SYSCTL:=$(shell echo "\#include <sys/sysctl.h>" | cpp -dM >/dev/null 2>/dev/null && echo true)
+ 
+ 
+ SRC=access.c \
+-- 
+2.25.1
+

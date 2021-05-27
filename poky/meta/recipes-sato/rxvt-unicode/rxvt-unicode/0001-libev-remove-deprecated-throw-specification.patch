@@ -1,0 +1,30 @@
+From 9a8f1d73e7b7e183768a8379ef32429a84f0e5c2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 Feb 2021 18:11:56 -0800
+Subject: [PATCH] libev: remove deprecated throw specification
+
+removes the throw specifications that are deprecated since C++11:
+warning: dynamic exception specifications are deprecated in C++11 [-Wdeprecated]
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libev/ev++.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libev/ev++.h b/libev/ev++.h
+index 4f0a36a..85ddf44 100644
+--- a/libev/ev++.h
++++ b/libev/ev++.h
+@@ -376,7 +376,7 @@ namespace ev {
+ 
+   struct default_loop : loop_ref
+   {
+-    default_loop (unsigned int flags = AUTO) throw (bad_loop)
++    default_loop (unsigned int flags = AUTO)
+ #if EV_MULTIPLICITY
+     : loop_ref (ev_default_loop (flags))
+ #endif
+-- 
+2.30.1
+

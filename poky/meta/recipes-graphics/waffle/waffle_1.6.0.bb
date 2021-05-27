@@ -1,4 +1,10 @@
-SUMMARY = "cross-platform C library to defer selection of GL API and of window system"
+SUMMARY = "A C library for selecting an OpenGL API and window system at runtime"
+DESCRIPTION = "A cross-platform C library that allows one to defer selection \
+of an OpenGL API and window system until runtime. For example, on Linux, Waffle \
+enables an application to select X11/EGL with an OpenGL 3.3 core profile, \
+Wayland with OpenGL ES2, and other window system / API combinations."
+HOMEPAGE = "http://www.waffle-gl.org/"
+BUGTRACKER = "https://gitlab.freedesktop.org/mesa/waffle"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=4c5154407c2490750dd461c50ad94797 \
                     file://include/waffle/waffle.h;endline=24;md5=61dbf8697f61c78645e75a93c585b1bf"

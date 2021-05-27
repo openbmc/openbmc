@@ -26,6 +26,10 @@ SRC_URI_append_libc-musl = "file://strtod_fix_clash_with_strtold.patch"
 SRC_URI[md5sum] = "0009a224d8e288e8ec406ef0161f9293"
 SRC_URI[sha256sum] = "ff7a9c918edce6b4f4b2725e3f9b37b0c4d193531cac49a48b56c4d0d3a9e9fd"
 
+# http://git.savannah.gnu.org/cgit/coreutils.git/commit/?id=v8.27-101-gf5d7c0842
+# runcon is not really a sandbox command, use `runcon ... setsid ...` to avoid this particular issue.
+CVE_CHECK_WHITELIST += "CVE-2016-2781"
+
 EXTRA_OECONF_class-native = "--without-gmp"
 EXTRA_OECONF_class-target = "--enable-install-program=arch,hostname --libexecdir=${libdir}"
 EXTRA_OECONF_class-nativesdk = "--enable-install-program=arch,hostname"

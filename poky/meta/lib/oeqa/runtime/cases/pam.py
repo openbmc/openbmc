@@ -8,11 +8,14 @@
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.core.decorator.data import skipIfNotFeature
+from oeqa.runtime.decorator.package import OEHasPackage
 
 class PamBasicTest(OERuntimeTestCase):
 
     @skipIfNotFeature('pam', 'Test requires pam to be in DISTRO_FEATURES')
     @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @OEHasPackage(['shadow'])
+    @OEHasPackage(['shadow-base'])
     def test_pam(self):
         status, output = self.target.run('login --help')
         msg = ('login command does not work as expected. '

@@ -62,7 +62,6 @@ do_configure_prepend_libc-musl () {
 do_compile_prepend_class-native() {
     export NSPR_INCLUDE_DIR=${STAGING_INCDIR_NATIVE}/nspr
     export NSPR_LIB_DIR=${STAGING_LIBDIR_NATIVE}
-    export NSS_ENABLE_WERROR=0
 }
 
 do_compile_prepend_class-nativesdk() {
@@ -81,6 +80,11 @@ do_compile() {
     export NATIVE_CC="${BUILD_CC}"
     # Additional defines needed on Centos 7
     export NATIVE_FLAGS="${BUILD_CFLAGS} -DLINUX -Dlinux"
+
+    # POSIX.1-2001 states that the behaviour of getcwd() when passing a null
+    # pointer as the buf argument, is unspecified.
+    export NATIVE_FLAGS="${NATIVE_FLAGS} -DGETCWD_CANT_MALLOC"
+
     export BUILD_OPT=1
 
     export FREEBL_NO_DEPEND=1

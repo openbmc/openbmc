@@ -1,4 +1,7 @@
 SUMMARY = "Key/value database library with extensible hashing"
+DESCRIPTION = "Library of database functions that use extensible hashing \
+and work similar to the standard UNIX dbm. These routines are provided \
+to a programmer needing to create and manipulate a hashed database."
 HOMEPAGE = "http://www.gnu.org/software/gdbm/"
 SECTION = "libs"
 LICENSE = "GPLv3"

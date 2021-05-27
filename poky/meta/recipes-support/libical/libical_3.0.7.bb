@@ -1,4 +1,8 @@
 SUMMARY = "iCal and scheduling (RFC 2445, 2446, 2447) library"
+DESCRIPTION = "An Open Source implementation of the iCalendar protocols \
+and protocol data units. The iCalendar specification describes how \
+calendar clients can communicate with calendar servers so users can store \
+their calendar data and arrange meetings with other users. "
 HOMEPAGE = "https://github.com/libical/libical"
 BUGTRACKER = "https://github.com/libical/libical/issues"
 LICENSE = "LGPLv2.1 | MPL-2.0"

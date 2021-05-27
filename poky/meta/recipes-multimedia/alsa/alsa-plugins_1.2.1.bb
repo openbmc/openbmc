@@ -1,4 +1,7 @@
 SUMMARY = "ALSA Plugins"
+DESCRIPTION = "Used to create virtual devices that can be used like normal \
+hardware devices but cause extra processing of the sound stream to take place. \
+They are used while configuring ALSA in the .asoundrc file."
 HOMEPAGE = "http://alsa-project.org"
 BUGTRACKER = "http://alsa-project.org/main/index.php/Bug_Tracking"
 SECTION = "multimedia"

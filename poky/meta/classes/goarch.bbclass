@@ -114,6 +114,8 @@ def go_map_mips(a, f, d):
 def go_map_os(o, d):
     if o.startswith('linux'):
         return 'linux'
+    elif o.startswith('mingw'):
+        return 'windows'
     return o
 
 

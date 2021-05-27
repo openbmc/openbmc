@@ -1,4 +1,8 @@
 SUMMARY = "Test runner for GNOME-style installed tests"
+DESCRIPTION = "Runner provides an execution harness for GNOME installed tests. \
+These tests are useful for verifying the functionality of software as \
+installed and packaged, and complement rather than replace build-time \
+('make check') tests."
 HOMEPAGE = "https://wiki.gnome.org/GnomeGoals/InstalledTests"
 LICENSE = "LGPLv2+"
 

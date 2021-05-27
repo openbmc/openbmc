@@ -3,7 +3,8 @@ require wireguard.inc
 SRCREV = "43f57dac7b8305024f83addc533c9eede6509129"
 
 SRC_URI = "git://git.zx2c4.com/wireguard-linux-compat \
-           file://0001-compat-SYM_FUNC_-START-END-were-backported-to-5.4.patch"
+           file://0001-compat-SYM_FUNC_-START-END-were-backported-to-5.4.patch \
+           file://0001-compat-icmp_ndo_send-functions-were-backported-exten.patch "
 
 inherit module kernel-module-split
 

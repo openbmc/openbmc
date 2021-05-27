@@ -1,4 +1,5 @@
 SUMMARY = "OpenMAX IL plugins for GStreamer"
+DESCRIPTION = "Wraps available OpenMAX IL components and makes them available as standard GStreamer elements."
 HOMEPAGE = "http://gstreamer.freedesktop.org/"
 SECTION = "multimedia"
 

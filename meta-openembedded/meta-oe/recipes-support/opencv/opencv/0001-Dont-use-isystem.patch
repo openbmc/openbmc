@@ -1,4 +1,4 @@
-From 9659f5a1e75fc29c9879c301767bba72ecf9042a Mon Sep 17 00:00:00 2001
+From b34a6e8d4582aa13ad4cd58547d8e0f0a0f1c6a6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 11 Sep 2018 00:21:18 -0700
 Subject: [PATCH] Dont use isystem
@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/cmake/OpenCVPCHSupport.cmake b/cmake/OpenCVPCHSupport.cmake
-index 59bc826..055dfce 100644
+index 59bc826ed0..055dfce251 100644
 --- a/cmake/OpenCVPCHSupport.cmake
 +++ b/cmake/OpenCVPCHSupport.cmake
 @@ -18,6 +18,8 @@ IF(CV_GCC)

@@ -1,4 +1,9 @@
 SUMMARY = "GNOME XSLT library"
+DESCRIPTION = "libxslt is the XSLT C parser and toolkit developed for the Gnome project. \
+XSLT itself is a an XML language to define transformation for XML. Libxslt is based on \
+libxml2 the XML C library developed for the GNOME project. It also implements most of \
+the EXSLT set of processor-portable extensions functions and some of Saxon's evaluate \
+and expressions extensions."
 HOMEPAGE = "http://xmlsoft.org/XSLT/"
 BUGTRACKER = "https://bugzilla.gnome.org/"
 

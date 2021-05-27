@@ -16,6 +16,9 @@ SRC_URI[sha256sum] = "e87470d9c984317f658567c03bfefb6b0c829ff17dbf6b0de48d71a4c8
 
 inherit autotools gettext texinfo
 
+# Issue applies to use of cpio in SUSE/OBS, doesn't apply to us
+CVE_CHECK_WHITELIST += "CVE-2010-4226"
+
 EXTRA_OECONF += "DEFAULT_RMT_DIR=${sbindir}"
 
 do_install () {

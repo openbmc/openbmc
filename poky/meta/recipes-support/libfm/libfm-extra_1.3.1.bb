@@ -1,4 +1,5 @@
 SUMMARY = "Library for file management"
+DESCRIPTION = "Contains a library and other files required by menu-cache-gen libexec of menu-cache-1.1.0. "
 HOMEPAGE = "http://pcmanfm.sourceforge.net/"
 
 LICENSE = "LGPLv2+"

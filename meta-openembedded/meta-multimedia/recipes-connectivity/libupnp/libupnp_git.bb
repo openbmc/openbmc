@@ -12,7 +12,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=394a0f17b97f33426275571e15920434"
 PV = "1.8.4+git${SRCPV}"
 # release-1.8.4
 SRCREV = "d5a01fc9895daae98a0c5a8c7d3afce46add529d"
-SRC_URI = "git://github.com/mrjimenez/pupnp.git;protocol=https"
+SRC_URI = "git://github.com/mrjimenez/pupnp.git;protocol=https \
+           file://CVE-2020-13848.patch"
 
 S="${WORKDIR}/git"
 

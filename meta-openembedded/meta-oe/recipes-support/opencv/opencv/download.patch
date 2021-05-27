@@ -1,3 +1,8 @@
+From 3b1a69503dea2075d51655a0cea5369c88a67632 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Thu, 9 Jan 2020 16:24:24 +0000
+Subject: [PATCH] opencv: abort configure if we need to download
+
 This CMake module will download files during do_configure.  This is bad as it
 means we can't do offline builds.
 
@@ -5,6 +10,10 @@ Add an option to disallow downloads by emitting a fatal error.
 
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+---
+ cmake/OpenCVDownload.cmake | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/cmake/OpenCVDownload.cmake b/cmake/OpenCVDownload.cmake
 index cdc47ad2cb..74573f45a2 100644

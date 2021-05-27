@@ -1,0 +1,39 @@
+From 18f14be80466ddc8fb17a400be82764a779c8dcd Mon Sep 17 00:00:00 2001
+From: Sami Kerola <kerolasa@iki.fi>
+Date: Wed, 31 Jul 2019 21:28:12 +0100
+Subject: [PATCH] arping: revert partially - fix sent vs received packages
+ return value
+
+Commit 84ca65ca980315c73f929fed8b6f16bbd698c3a0 caused regression.  The
+arping -D needs return value evaluation that was the earlier default, in
+other cases the new return value should be correct.
+
+Addresses: https://github.com/iputils/iputils/issues/209
+See-also: https://github.com/void-linux/void-packages/issues/13304
+Signed-off-by: Sami Kerola <kerolasa@iki.fi>
+Upstream-Status: Backport [https://github.com/iputils/iputils/commit/18f14be80466ddc8fb17a400be82764a779c8dcd]
+Signed-off-by: Diego Santa Cruz <Diego.SantaCruz@spinetix.com>
+---
+ arping.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arping.c b/arping.c
+index 77c9c56..2c87c15 100644
+--- a/arping.c
++++ b/arping.c
+@@ -792,7 +792,11 @@ static int event_loop(struct run_state *ctl)
+ 	close(tfd);
+ 	freeifaddrs(ctl->ifa0);
+ 	rc |= finish(ctl);
+-	rc |= (ctl->sent != ctl->received);
++	if (ctl->dad && ctl->quit_on_reply)
++		/* Duplicate address detection mode return value */
++		rc |= !(ctl->brd_sent != ctl->received);
++	else
++		rc |= (ctl->sent != ctl->received);
+ 	return rc;
+ }
+ 
+-- 
+2.18.4
+

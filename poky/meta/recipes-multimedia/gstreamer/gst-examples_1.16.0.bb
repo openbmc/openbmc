@@ -1,4 +1,7 @@
 SUMMARY = "GStreamer examples (including gtk-play, gst-play)"
+DESCRIPTION = "GStreamer example applications"
+HOMEPAGE = "https://gitlab.freedesktop.org/gstreamer/gst-examples"
+BUGTRACKER = "https://gitlab.freedesktop.org/gstreamer/gst-examples/-/issues"
 LICENSE = "LGPL-2.0+"
 LIC_FILES_CHKSUM = "file://playback/player/gtk/gtk-play.c;beginline=1;endline=20;md5=f8c72dae3d36823ec716a9ebcae593b9"
 

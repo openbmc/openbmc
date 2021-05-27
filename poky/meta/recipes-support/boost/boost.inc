@@ -1,4 +1,8 @@
 SUMMARY = "Free peer-reviewed portable C++ source libraries"
+DESCRIPTION = "Provides free peer-reviewed portable C++ source libraries.  The emphasis is on libraries which work well with the C++ \
+Standard Library.  One goal is to establish 'existing practice' and \
+provide reference implementations so that the Boost libraries are suitable for eventual standardization.  Some of the libraries have already been proposed for inclusion in the C++ Standards Committee's \
+upcoming C++ Standard Library Technical Report."
 SECTION = "libs"
 DEPENDS = "bjam-native zlib bzip2"
 

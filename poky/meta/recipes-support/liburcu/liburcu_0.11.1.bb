@@ -1,4 +1,7 @@
 SUMMARY = "Userspace RCU (read-copy-update) library"
+DESCRIPTION = "A userspace RCU (read-copy-update) library. This data \
+synchronization library provides read-side access which scales linearly \
+with the number of cores. "
 HOMEPAGE = "http://lttng.org/urcu"
 BUGTRACKER = "http://lttng.org/project/issues"
 

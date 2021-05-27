@@ -8,6 +8,9 @@ SRC_URI += "file://00avahi-autoipd \
 
 inherit update-rc.d systemd useradd
 
+# Issue only affects Debian/SUSE, not us
+CVE_CHECK_WHITELIST += "CVE-2021-26720"
+
 PACKAGES =+ "libavahi-gobject avahi-daemon libavahi-common libavahi-core libavahi-client avahi-dnsconfd libavahi-glib avahi-autoipd avahi-utils"
 
 LICENSE_libavahi-gobject = "LGPLv2.1+"
