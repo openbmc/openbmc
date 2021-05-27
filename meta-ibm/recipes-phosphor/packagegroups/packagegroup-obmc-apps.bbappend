@@ -33,6 +33,7 @@ RDEPENDS_${PN}-extras_append_mihawk = " phosphor-webui phosphor-image-signing wi
 RDEPENDS_${PN}-extras_append_witherspoon-tacoma = " pldm srvcfg-manager webui-vue biosconfig-manager phosphor-post-code-manager phosphor-host-postd kexec-tools makedumpfile kdump vmcore-dmesg"
 
 RDEPENDS_${PN}-extras_remove_p10bmc = "obmc-ikvm liberation-fonts uart-render-controller"
+RDEPENDS_${PN}-host-state-mgmt_remove_p10bmc = "checkstop-monitor"
 RDEPENDS_${PN}-extras_remove_swift = "obmc-ikvm"
 RDEPENDS_${PN}-extras_remove_witherspoon-tacoma = "obmc-ikvm liberation-fonts uart-render-controller phosphor-webui"
 RDEPENDS_${PN}-logging_append = " ${EXTRA_IBM_LOGGING_PKGS}"
