@@ -1,7 +1,7 @@
-From 82cf4bc5623c5220dfa1c096ea192f2509837782 Mon Sep 17 00:00:00 2001
+From 214f1895db14e3a88d5b2b3b6c844af3890e2eba Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 15 Jul 2018 00:48:38 -0700
-Subject: [PATCH 18/21] Add EGL_IMG_context_priority related defines
+Subject: [PATCH] Add EGL_IMG_context_priority related defines
 
 These defines are needed for compiling weston 4.x
 taken from Khronos headers
@@ -30,6 +30,3 @@ index dcc90ce..6842bf9 100755
  #ifndef EGL_KHR_vg_parent_image
  #define EGL_KHR_vg_parent_image 1
  #define EGL_VG_PARENT_IMAGE_KHR			0x30BA	/* eglCreateImageKHR target */
--- 
-2.27.0
-

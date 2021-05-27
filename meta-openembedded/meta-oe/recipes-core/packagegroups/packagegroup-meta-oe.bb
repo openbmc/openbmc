@@ -8,12 +8,15 @@ PACKAGES = "\
     packagegroup-meta-oe \
     packagegroup-meta-oe-benchmarks \
     packagegroup-meta-oe-connectivity \
+    packagegroup-meta-oe-connectivity-python2 \
     packagegroup-meta-oe-core \
     packagegroup-meta-oe-crypto \
     packagegroup-meta-oe-bsp \
     packagegroup-meta-oe-dbs \
+    packagegroup-meta-oe-dbs-python2 \
     packagegroup-meta-oe-devtools \
     packagegroup-meta-oe-extended \
+    packagegroup-meta-oe-extended-python2 \
     packagegroup-meta-oe-kernel \
     packagegroup-meta-oe-multimedia \
     packagegroup-meta-oe-navigation \
@@ -21,6 +24,7 @@ PACKAGES = "\
     packagegroup-meta-oe-shells \
     packagegroup-meta-oe-security \
     packagegroup-meta-oe-support \
+    packagegroup-meta-oe-support-python2 \
     packagegroup-meta-oe-test \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "packagegroup-meta-oe-gnome", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "packagegroup-meta-oe-graphics", "", d)} \
@@ -32,11 +36,14 @@ RDEPENDS_packagegroup-meta-oe = "\
     packagegroup-meta-oe-benchmarks \
     packagegroup-meta-oe-bsp \
     packagegroup-meta-oe-connectivity \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "packagegroup-meta-oe-connectivity-python2", "", d)} \
     packagegroup-meta-oe-core \
     packagegroup-meta-oe-crypto \
     packagegroup-meta-oe-dbs \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "packagegroup-meta-oe-dbs-python2", "", d)} \
     packagegroup-meta-oe-devtools \
     packagegroup-meta-oe-extended \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "packagegroup-meta-oe-extended-python2", "", d)} \
     packagegroup-meta-oe-kernel \
     packagegroup-meta-oe-multimedia \
     packagegroup-meta-oe-navigation \
@@ -44,6 +51,7 @@ RDEPENDS_packagegroup-meta-oe = "\
     packagegroup-meta-oe-security \
     packagegroup-meta-oe-shells \
     packagegroup-meta-oe-support \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "packagegroup-meta-oe-support-python2", "", d)} \
     packagegroup-meta-oe-test \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "packagegroup-meta-oe-gnome", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "packagegroup-meta-oe-graphics", "", d)} \
@@ -144,7 +152,6 @@ RDEPENDS_packagegroup-meta-oe-connectivity ="\
     ser2net \
     smstools3 \
     telepathy-glib \
-    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "telepathy-idle", "", d)} \
     thrift \
     usbmuxd \
     wifi-test-suite \
@@ -154,6 +161,10 @@ RDEPENDS_packagegroup-meta-oe-connectivity ="\
 "
 
 RDEPENDS_packagegroup-meta-oe-connectivity_append_libc-glibc = " wvstreams wvdial"
+
+RDEPENDS_packagegroup-meta-oe-connectivity-python2 = "\
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "telepathy-idle", "", d)} \
+"
 
 # dracut needs dracut
 RDEPENDS_packagegroup-meta-oe-core = "\
@@ -179,7 +190,7 @@ RDEPENDS_packagegroup-meta-oe-core = "\
     toybox \
     usleep \
 "
-RDEPENDS_packagegroup-meta-oe-core_append_libc-glibc = " glfw"
+RDEPENDS_packagegroup-meta-oe-core_append_libc-glibc = " ${@bb.utils.contains("DISTRO_FEATURES", "x11 opengl", "glfw", "", d)}"
 RDEPENDS_packagegroup-meta-oe-core_remove_riscv64 = "safec"
 RDEPENDS_packagegroup-meta-oe-core_remove_riscv32 = "safec"
 
@@ -197,12 +208,15 @@ RDEPENDS_packagegroup-meta-oe-dbs ="\
     leveldb \
     libdbi \
     mariadb \
-    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "mysql-python", "", d)} \
     postgresql \
     psqlodbc \
     rocksdb \
     soci \
     sqlite \
+"
+
+RDEPENDS_packagegroup-meta-oe-dbs-python2 ="\
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "mysql-python", "", d)} \
 "
 
 RDEPENDS_packagegroup-meta-oe-devtools ="\
@@ -258,7 +272,7 @@ RDEPENDS_packagegroup-meta-oe-devtools ="\
     mpich \
     msgpack-c \
     mercurial \
-    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "nodejs", "", d)} \
+    nodejs \
     openocd \
     pax-utils \
     ipc-run \
@@ -335,13 +349,12 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
      libuio \
      ${@bb.utils.contains("DISTRO_FEATURES", "x11", "libwmf", "", d)} \
      lprng \
-     icewm \
+     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "icewm", "", d)} \
      md5deep \
      indent \
      jansson \
      nana \
      nicstat \
-     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "openlmi-tools", "", d)} \
      ${@bb.utils.contains("DISTRO_FEATURES", "pam", "openwsman", "", d)} \
      p7zip \
      isomd5sum \
@@ -417,6 +430,10 @@ RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc64 = "upm mraa minifi-cpp"
 RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc64le = "upm mraa"
 RDEPENDS_packagegroup-meta-oe-extended_remove_riscv64 = "upm mraa sysdig tiptop"
 RDEPENDS_packagegroup-meta-oe-extended_remove_riscv32 = "upm mraa sysdig tiptop"
+
+RDEPENDS_packagegroup-meta-oe-extended-python2 ="\
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "openlmi-tools", "", d)} \
+"
 
 RDEPENDS_packagegroup-meta-oe-gnome ="\
     atkmm \
@@ -681,7 +698,6 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     ace-cloud-editor \
     frame \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "geis", "", d)} \
-    geis \
     grail \
     asio \
     augeas \
@@ -789,7 +805,6 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     libusbg \
     libutempter \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "links-x11", "links", d)} \
-    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "lio-utils", "", d)} \
     log4c \
     log4cpp \
     nspr \
@@ -883,6 +898,11 @@ RDEPENDS_packagegroup-meta-oe-support_append_armv7ve = " ne10"
 RDEPENDS_packagegroup-meta-oe-support_append_aarch64 = " ne10"
 RDEPENDS_packagegroup-meta-oe-support_append_x86 = " mcelog mce-inject mce-test open-vm-tools vboxguestdrivers"
 RDEPENDS_packagegroup-meta-oe-support_append_x86-64 = " mcelog mce-inject mce-test open-vm-tools vboxguestdrivers"
+
+RDEPENDS_packagegroup-meta-oe-support-python2 ="\
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "lio-utils", "", d)} \
+"
+
 RDEPENDS_packagegroup-meta-oe-support_remove_arm ="numactl"
 RDEPENDS_packagegroup-meta-oe-support_remove_mipsarch = "gperftools"
 RDEPENDS_packagegroup-meta-oe-support_remove_riscv64 = "gperftools uim"

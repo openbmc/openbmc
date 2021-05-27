@@ -1,0 +1,214 @@
+From 3b60fa1598385fb36fef1c47f59cb08d3a6fba35 Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Fri, 4 Dec 2020 01:54:37 -0500
+Subject: [PATCH] add "install" targets to Makefiles
+
+Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ Makefile                   | 3 +++
+ game/Makefile              | 4 ++++
+ lib/Makefile               | 1 +
+ life/Makefile              | 4 ++++
+ mandelbrot/Makefile        | 4 ++++
+ offscreen/Makefile         | 4 ++++
+ pngview/Makefile           | 4 ++++
+ radar_sweep/Makefile       | 4 ++++
+ radar_sweep_alpha/Makefile | 4 ++++
+ rgb_triangle/Makefile      | 4 ++++
+ spriteview/Makefile        | 4 ++++
+ test_pattern/Makefile      | 4 ++++
+ worms/Makefile             | 4 ++++
+ 13 files changed, 48 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 4e14e18..4a06de9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -16,6 +16,9 @@ default :all
+ all:
+ 	for target in $(TARGETS); do ($(MAKE) -C $$target); done
+ 
++install:
++	for target in $(TARGETS); do ($(MAKE) -C $$target install); done
++
+ clean:
+ 	for target in $(TARGETS); do ($(MAKE) -C $$target clean); done
+ 
+diff --git a/game/Makefile b/game/Makefile
+index ced9cce..6da6a6d 100644
+--- a/game/Makefile
++++ b/game/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)
+diff --git a/lib/Makefile b/lib/Makefile
+index 15d7c37..2765c91 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -29,6 +29,7 @@ $(LIB): $(OBJS)
+ $(LIBPNG): $(OBJSPNG)
+ 	$(AR) rcs lib$(LIBPNG).a $(OBJSPNG)
+ 
++install:
+ 
+ clean:
+ 	@rm -f $(OBJS)
+diff --git a/life/Makefile b/life/Makefile
+index 2fcb034..44f1edb 100644
+--- a/life/Makefile
++++ b/life/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -pthread -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)
+diff --git a/mandelbrot/Makefile b/mandelbrot/Makefile
+index e61beb3..a6e6735 100644
+--- a/mandelbrot/Makefile
++++ b/mandelbrot/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -pthread -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)
+diff --git a/offscreen/Makefile b/offscreen/Makefile
+index 2bc81b9..8d23354 100644
+--- a/offscreen/Makefile
++++ b/offscreen/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)
+diff --git a/pngview/Makefile b/pngview/Makefile
+index f947320..8c037ec 100644
+--- a/pngview/Makefile
++++ b/pngview/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)
+diff --git a/radar_sweep/Makefile b/radar_sweep/Makefile
+index 3a46150..5f814b7 100644
+--- a/radar_sweep/Makefile
++++ b/radar_sweep/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)
+diff --git a/radar_sweep_alpha/Makefile b/radar_sweep_alpha/Makefile
+index 5680b9b..f66c338 100644
+--- a/radar_sweep_alpha/Makefile
++++ b/radar_sweep_alpha/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)
+diff --git a/rgb_triangle/Makefile b/rgb_triangle/Makefile
+index 2017956..2ce779d 100644
+--- a/rgb_triangle/Makefile
++++ b/rgb_triangle/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)
+diff --git a/spriteview/Makefile b/spriteview/Makefile
+index 2713936..ada9277 100644
+--- a/spriteview/Makefile
++++ b/spriteview/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)
+diff --git a/test_pattern/Makefile b/test_pattern/Makefile
+index be434d9..1e02b0a 100644
+--- a/test_pattern/Makefile
++++ b/test_pattern/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)
+diff --git a/worms/Makefile b/worms/Makefile
+index 2a21a4b..c249c8c 100644
+--- a/worms/Makefile
++++ b/worms/Makefile
+@@ -15,6 +15,10 @@ all: $(BIN)
+ $(BIN): $(OBJS)
+ 	$(CC) -o $@ -Wl,--whole-archive $(OBJS) $(LDFLAGS) -Wl,--no-whole-archive -rdynamic
+ 
++install: $(BIN)
++	install -d $(DESTDIR)/usr/bin
++	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++
+ clean:
+ 	@rm -f $(OBJS)
+ 	@rm -f $(BIN)

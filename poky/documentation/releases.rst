@@ -9,6 +9,10 @@
 *******************************
 
 - :yocto_docs:`3.2 Documentation </3.2>`
+- :yocto_docs:`3.2.1 Documentation </3.2.1>`
+- :yocto_docs:`3.2.2 Documentation </3.2.2>`
+- :yocto_docs:`3.2.3 Documentation </3.2.3>`
+- :yocto_docs:`3.2.4 Documentation </3.2.4>`
 
 ****************************
 3.1 'dunfell' Release Series
@@ -18,6 +22,10 @@
 - :yocto_docs:`3.1.1 Documentation </3.1.1>`
 - :yocto_docs:`3.1.2 Documentation </3.1.2>`
 - :yocto_docs:`3.1.3 Documentation </3.1.3>`
+- :yocto_docs:`3.1.4 Documentation </3.1.4>`
+- :yocto_docs:`3.1.5 Documentation </3.1.5>`
+- :yocto_docs:`3.1.6 Documentation </3.1.6>`
+- :yocto_docs:`3.1.7 Documentation </3.1.7>`
 
 ==========================
  Previous Release Manuals
@@ -31,6 +39,7 @@
 - :yocto_docs:`3.0.1 Documentation </3.0.1>`
 - :yocto_docs:`3.0.2 Documentation </3.0.2>`
 - :yocto_docs:`3.0.3 Documentation </3.0.3>`
+- :yocto_docs:`3.0.4 Documentation </3.0.4>`
 
 ****************************
 2.7 'warrior' Release Series

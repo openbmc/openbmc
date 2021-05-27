@@ -18,6 +18,7 @@ SRC_URI = "${GNOME_MIRROR}/glib/${SHRT_VER}/glib-${PV}.tar.xz \
            file://0001-gio-tests-resources.c-comment-out-a-build-host-only-.patch \
            file://tzdata-update.patch \
            file://CVE-2020-35457.patch \
+           file://CVE-2021-27219.patch \
            "
 
 SRC_URI_append_class-native = " file://relocate-modules.patch"

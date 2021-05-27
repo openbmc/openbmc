@@ -26,7 +26,6 @@ RDEPENDS_packagegroup-meta-webserver-http = "\
     monkey \
     nginx \
     nginx \
-    nostromo \
     sthttpd \
 "
 

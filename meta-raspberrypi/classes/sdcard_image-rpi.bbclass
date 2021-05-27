@@ -13,20 +13,17 @@ inherit image_types
 #                                                     Default Free space = 1.3x
 #                                                     Use IMAGE_OVERHEAD_FACTOR to add more space
 #                                                     <--------->
-#            4MiB              40MiB           SDIMG_ROOTFS
+#            4MiB              48MiB           SDIMG_ROOTFS
 # <-----------------------> <----------> <---------------------->
 #  ------------------------ ------------ ------------------------
 # | IMAGE_ROOTFS_ALIGNMENT | BOOT_SPACE | ROOTFS_SIZE            |
 #  ------------------------ ------------ ------------------------
 # ^                        ^            ^                        ^
 # |                        |            |                        |
-# 0                      4MiB     4MiB + 40MiB       4MiB + 40Mib + SDIMG_ROOTFS
+# 0                      4MiB     4MiB + 48MiB       4MiB + 48Mib + SDIMG_ROOTFS
 
 # This image depends on the rootfs image
 IMAGE_TYPEDEP_rpi-sdimg = "${SDIMG_ROOTFS_TYPE}"
-
-# Set kernel and boot loader
-IMAGE_BOOTLOADER ?= "bootfiles"
 
 # Kernel image name
 SDIMG_KERNELIMAGE_raspberrypi  ?= "kernel.img"
@@ -34,10 +31,12 @@ SDIMG_KERNELIMAGE_raspberrypi2 ?= "kernel7.img"
 SDIMG_KERNELIMAGE_raspberrypi3-64 ?= "kernel8.img"
 
 # Boot partition volume id
-BOOTDD_VOLUME_ID ?= "${MACHINE}"
+# Shorten raspberrypi to just rpi to keep it under 11 characters
+# now enforced by mkfs.vfat from dosfstools-4.2
+BOOTDD_VOLUME_ID ?= "${@d.getVar('MACHINE').replace('raspberrypi', 'rpi')}"
 
 # Boot partition size [in KiB] (will be rounded up to IMAGE_ROOTFS_ALIGNMENT)
-BOOT_SPACE ?= "40960"
+BOOT_SPACE ?= "49152"
 
 # Set alignment to 4MB [in KiB]
 IMAGE_ROOTFS_ALIGNMENT = "4096"
@@ -56,8 +55,7 @@ do_image_rpi_sdimg[depends] = " \
     mtools-native:do_populate_sysroot \
     dosfstools-native:do_populate_sysroot \
     virtual/kernel:do_deploy \
-    ${IMAGE_BOOTLOADER}:do_deploy \
-    rpi-config:do_deploy \
+    rpi-bootfiles:do_deploy \
     ${@bb.utils.contains('MACHINE_FEATURES', 'armstub', 'armstubs:do_deploy', '' ,d)} \
     ${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'u-boot:do_deploy', '',d)} \
     ${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'u-boot-default-script:do_deploy', '',d)} \

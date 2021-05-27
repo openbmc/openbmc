@@ -251,7 +251,9 @@ python copy_buildsystem () {
 
     # Create a layer for new recipes / appends
     bbpath = d.getVar('BBPATH')
-    bb.process.run(['devtool', '--bbpath', bbpath, '--basepath', baseoutpath, 'create-workspace', '--create-only', os.path.join(baseoutpath, 'workspace')])
+    env = os.environ.copy()
+    env['PYTHONDONTWRITEBYTECODE'] = '1'
+    bb.process.run(['devtool', '--bbpath', bbpath, '--basepath', baseoutpath, 'create-workspace', '--create-only', os.path.join(baseoutpath, 'workspace')], env=env)
 
     # Create bblayers.conf
     bb.utils.mkdirhier(baseoutpath + '/conf')
@@ -363,6 +365,9 @@ python copy_buildsystem () {
 
             # Hide the config information from bitbake output (since it's fixed within the SDK)
             f.write('BUILDCFG_HEADER = ""\n\n')
+
+            # Write METADATA_REVISION
+            f.write('METADATA_REVISION = "%s"\n\n' % d.getVar('METADATA_REVISION'))
 
             f.write('# Provide a flag to indicate we are in the EXT_SDK Context\n')
             f.write('WITHIN_EXT_SDK = "1"\n\n')

@@ -13,7 +13,8 @@ inherit gnomebase gtk-doc vala gobject-introspection manpages
 
 DEPENDS += "glib-2.0 libgcrypt gettext-native"
 
-SRC_URI += "file://0001-meson-add-option-introspection.patch"
+SRC_URI += "file://0001-meson-add-option-introspection.patch \
+            file://determinism.patch"
 
 SRC_URI[archive.md5sum] = "47c3fdfeb111a87b509ad271e4a6f496"
 SRC_URI[archive.sha256sum] = "4fcb3c56f8ac4ab9c75b66901fb0104ec7f22aa9a012315a14c0d6dffa5290e4"

@@ -8,6 +8,7 @@ PROVIDES = "virtual/gpsd"
 SRC_URI = "${SAVANNAH_GNU_MIRROR}/${BPN}/${BP}.tar.gz \
     file://0001-SConstruct-prefix-includepy-with-sysroot-and-drop-sy.patch \
     file://0001-Revert-SConstruct-Add-test-for-sizeof-time_t-result-.patch \
+    file://0001-gpsd-dbusexport.c-Fix-broken-d-bus-message-time.patch \
     file://gpsd.init \
 "
 SRC_URI[md5sum] = "cf7fdec7ce7221d20bee1a7246362b05"

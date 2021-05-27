@@ -2,7 +2,7 @@ require glibc.inc
 require glibc-version.inc
 
 # whitelist CVE's with fixes in latest release/2.32/master branch
-CVE_CHECK_WHITELIST += "CVE-2019-25013 CVE-2020-10029 CVE-2020-27618"
+CVE_CHECK_WHITELIST += "CVE-2019-25013 CVE-2020-10029 CVE-2020-27618 CVE-2021-27645 CVE-2021-3326"
 
 DEPENDS += "gperf-native bison-native make-native"
 

@@ -1,0 +1,41 @@
+From de24fc96bf24fca470a9ca13176ad9ad9cc4d5a9 Mon Sep 17 00:00:00 2001
+From: Nick Gasson <nick.gasson@arm.com>
+Date: Mon, 2 Nov 2020 12:02:05 +0800
+Subject: [PATCH] gold: ensure file_counts_lock is initialized before using
+
+Since upgrading to binutils 2.35 I've been experiencing random memory
+corruption related crashes with ld.gold --threads. It's caused by
+multiple threads concurrently pushing elements onto the shared
+std::vector in File_read::record_file_read(). This vector is supposed to
+be protected by file_counts_lock, but that is initialized lazily and
+might be NULL when File_read::open() is called, in which case
+Hold_optional_lock silently skips locking it.
+
+Fix by calling the initialize() method before attempting to acquire the
+lock, the same as other places that use file_counts_lock.
+
+	PR 26827
+	* fileread.cc (File_read::open): Ensure file_counts_lock is
+	initialized.
+	* testsuite/Makefile.am (check_PROGRAMS): Add a test that passes
+	-Wl,--threads.
+	* testsuite/Makefile.in: Regenerate.
+
+Upstream-Status: Backport [af61e84fd2d from 2.36.0]
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ gold/fileread.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gold/fileread.cc b/gold/fileread.cc
+index f5ca719360d..0b5228e2afd 100644
+--- a/gold/fileread.cc
++++ b/gold/fileread.cc
+@@ -212,6 +212,7 @@ File_read::open(const Task* task, const std::string& name)
+       gold_debug(DEBUG_FILES, "Attempt to open %s succeeded",
+ 		 this->name_.c_str());
+       this->token_.add_writer(task);
++      file_counts_initialize_lock.initialize();
+       Hold_optional_lock hl(file_counts_lock);
+       record_file_read(this->name_);
+     }

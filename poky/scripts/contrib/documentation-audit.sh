@@ -27,7 +27,7 @@ fi
 
 echo "REMINDER: you need to build for MACHINE=qemux86 or you won't get useful results"
 echo "REMINDER: you need to set LICENSE_FLAGS_WHITELIST appropriately in local.conf or "
-echo " you'll get false positives.  For example, LICENSE_FLAGS_WHITELIST = \"Commercial\""
+echo " you'll get false positives.  For example, LICENSE_FLAGS_WHITELIST = \"commercial\""
 
 for pkg in `bitbake -s | awk '{ print \$1 }'`; do
 	if [[ "$pkg" == "Loading" || "$pkg" == "Loaded" ||

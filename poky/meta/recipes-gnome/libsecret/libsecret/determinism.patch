@@ -1,0 +1,37 @@
+secret-enum-types.c/h.template: Fix reproducibility issue 
+
+When full filenames are used in generated sources it makes the resulting
+debug packages non-reproducible. Best practise is to use basename in
+comments instead.
+
+Signed-off-by: Richard Purdie richard.purdie@linuxfoundation.org
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/libsecret/-/merge_requests/68]
+
+Index: libsecret-0.20.4/libsecret/secret-enum-types.c.template
+===================================================================
+--- libsecret-0.20.4.orig/libsecret/secret-enum-types.c.template
++++ libsecret-0.20.4/libsecret/secret-enum-types.c.template
+@@ -23,8 +23,8 @@
+ /*** END file-header ***/
+ 
+ /*** BEGIN file-production ***/
+-#include "@filename@"
+-/* enumerations from "@filename@" */
++#include "@basename@"
++/* enumerations from "@basename@" */
+ /*** END file-production ***/
+ 
+ /*** BEGIN value-header ***/
+Index: libsecret-0.20.4/libsecret/secret-enum-types.h.template
+===================================================================
+--- libsecret-0.20.4.orig/libsecret/secret-enum-types.h.template
++++ libsecret-0.20.4/libsecret/secret-enum-types.h.template
+@@ -27,7 +27,7 @@ G_BEGIN_DECLS
+ 
+ /*** BEGIN file-production ***/
+ 
+-/* enumerations from "@filename@" */
++/* enumerations from "@basename@" */
+ /*** END file-production ***/
+ 
+ /*** BEGIN value-header ***/

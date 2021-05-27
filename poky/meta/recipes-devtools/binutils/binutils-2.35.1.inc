@@ -44,5 +44,6 @@ SRC_URI = "\
      file://0017-gas-improve-reproducibility-for-stabs-debugging-data.patch \
      file://0001-aarch64-Return-an-error-on-conditional-branch-to-an-.patch \
      file://CVE-2020-35448.patch \
+     file://0001-gold-ensure-file_counts_lock-is-initialized-before-u.patch \
 "
 S  = "${WORKDIR}/git"

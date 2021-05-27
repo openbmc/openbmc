@@ -882,13 +882,18 @@ def check_sanity_everybuild(status, d):
         except:
             pass
 
-    oeroot = d.getVar('COREBASE')
-    if oeroot.find('+') != -1:
-        status.addresult("Error, you have an invalid character (+) in your COREBASE directory path. Please move the installation to a directory which doesn't include any + characters.")
-    if oeroot.find('@') != -1:
-        status.addresult("Error, you have an invalid character (@) in your COREBASE directory path. Please move the installation to a directory which doesn't include any @ characters.")
-    if oeroot.find(' ') != -1:
-        status.addresult("Error, you have a space in your COREBASE directory path. Please move the installation to a directory which doesn't include a space since autotools doesn't support this.")
+    for checkdir in ['COREBASE', 'TMPDIR']:
+        val = d.getVar(checkdir)
+        if val.find('..') != -1:
+            status.addresult("Error, you have '..' in your %s directory path. Please ensure the variable contains an absolute path as this can break some recipe builds in obtuse ways." % checkdir)
+        if val.find('+') != -1:
+            status.addresult("Error, you have an invalid character (+) in your %s directory path. Please move the installation to a directory which doesn't include any + characters." % checkdir)
+        if val.find('@') != -1:
+            status.addresult("Error, you have an invalid character (@) in your %s directory path. Please move the installation to a directory which doesn't include any @ characters." % checkdir)
+        if val.find(' ') != -1:
+            status.addresult("Error, you have a space in your %s directory path. Please move the installation to a directory which doesn't include a space since autotools doesn't support this." % checkdir)
+        if val.find('%') != -1:
+            status.addresult("Error, you have an invalid character (%) in your %s directory path which causes problems with python string formatting. Please move the installation to a directory which doesn't include any % characters." % checkdir)
 
     # Check the format of MIRRORS, PREMIRRORS and SSTATE_MIRRORS
     import re

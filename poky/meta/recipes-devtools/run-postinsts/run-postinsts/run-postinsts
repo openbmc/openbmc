@@ -72,12 +72,12 @@ exec_postinst_scriptlets() {
 		else
 			echo "ERROR: postinst $i failed."
 			[ "$POSTINST_LOGGING" = "1" ] && eval echo "ERROR: postinst $i failed." $append_log
-			remove_pi_dir=0
+			remove_rcsd_link=0
 		fi
 	done
 }
 
-remove_pi_dir=1
+remove_rcsd_link=1
 if $pm_installed; then
 	case $pm in
 		"ipk")
@@ -92,9 +92,7 @@ else
 	exec_postinst_scriptlets
 fi
 
-# since all postinstalls executed successfully, remove the postinstalls directory
-# and the rcS.d link
-if [ $remove_pi_dir = 1 ]; then
-	rm -rf $pi_dir
+# since all postinstalls executed successfully, remove the rcS.d link
+if [ $remove_rcsd_link = 1 ]; then
 	remove_rcsd_link
 fi

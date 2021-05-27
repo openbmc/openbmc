@@ -62,3 +62,6 @@ pkg_postinst_${PN} () {
         fi
     fi
 }
+
+PNBLACKLIST[nostromo] ?= "Host site for URI is dead"
+EXCLUDE_FROM_WORLD = "1"

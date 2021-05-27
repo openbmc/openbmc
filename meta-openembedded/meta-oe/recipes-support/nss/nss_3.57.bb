@@ -68,13 +68,16 @@ do_compile_prepend_class-native() {
 
 do_compile() {
     export NSPR_INCLUDE_DIR=${STAGING_INCDIR}/nspr
-    export NSS_ENABLE_WERROR=0
 
     export CROSS_COMPILE=1
     export NATIVE_CC="${BUILD_CC}"
     # Additional defines needed on Centos 7
     export NATIVE_FLAGS="${BUILD_CFLAGS} -DLINUX -Dlinux"
     export BUILD_OPT=1
+
+    # POSIX.1-2001 states that the behaviour of getcwd() when passing a null
+    # pointer as the buf argument, is unspecified.
+    export NATIVE_FLAGS="${NATIVE_FLAGS} -DGETCWD_CANT_MALLOC"
 
     export FREEBL_NO_DEPEND=1
     export FREEBL_LOWHASH=1

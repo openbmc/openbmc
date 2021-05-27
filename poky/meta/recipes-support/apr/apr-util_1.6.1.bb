@@ -35,6 +35,7 @@ OE_BINCONFIG_EXTRA_MANGLE = " -e 's:location=source:location=installed:'"
 do_configure_append() {
 	if [ "${CLASSOVERRIDE}" = "class-target" ]; then
 		cp ${STAGING_DATADIR}/apr/apr_rules.mk ${B}/build/rules.mk
+		sed -i -e 's#^CFLAGS=.*#CFLAGS=${TARGET_CFLAGS}#g' ${B}/build/rules.mk
 	fi
 }
 do_configure_prepend_class-native() {
@@ -49,6 +50,7 @@ do_configure_append_class-native() {
 
 do_configure_prepend_class-nativesdk() {
 	cp ${STAGING_DATADIR}/apr/apr_rules.mk ${S}/build/rules.mk
+	sed -i -e 's#^CFLAGS=.*#CFLAGS=${TARGET_CFLAGS}#g' ${S}/build/rules.mk
 }
 
 do_configure_append_class-nativesdk() {

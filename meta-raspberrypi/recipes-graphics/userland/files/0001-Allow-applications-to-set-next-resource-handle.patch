@@ -1,7 +1,7 @@
-From d0956d198ceaf611314d61a0835fb5924b8a3577 Mon Sep 17 00:00:00 2001
+From 8a734f44beea9b10548ba696eaea1f5a76148fd5 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <dc4@broadcom.com>
 Date: Tue, 9 Jul 2013 09:26:26 -0400
-Subject: [PATCH 01/21] Allow applications to set next resource handle
+Subject: [PATCH] Allow applications to set next resource handle
 
 This patch adds provisions in userland to
 let apps callers set the next rendereing dispmanx resource.
@@ -203,6 +203,3 @@ index 8a5734c..51b3580 100644
  FN(void, eglIntSelectMipmap_impl, (EGL_SURFACE_ID_T s, int level))
  
  FN(void, eglIntGetColorData_impl, (EGL_SURFACE_ID_T s, KHRN_IMAGE_FORMAT_T format, uint32_t width, uint32_t height, int32_t stride, uint32_t y_offset, void *data))
--- 
-2.27.0
-

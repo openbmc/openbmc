@@ -1,13 +1,22 @@
-LINUX_VERSION ?= "5.4.72"
+LINUX_VERSION ?= "5.4.83"
 LINUX_RPI_BRANCH ?= "rpi-5.4.y"
 
-SRCREV_machine = "154de7bbd5844a824a635d4f9e3f773c15c6ce11"
-SRCREV_meta = "5d52d9eea95fa09d404053360c2351b2b91b323b"
+SRCREV_machine = "08ae2dd9e7dc89c20bff823a3ef045de09bfd090"
+SRCREV_meta = "d676bf5ff7b7071e14f44498d2482c0a596f14cd"
 
-require linux-raspberrypi_5.4.inc
+KMETA = "kernel-meta"
 
-SRC_URI += "file://0001-Revert-selftests-bpf-Skip-perf-hw-events-test-if-the.patch \
-            file://0002-Revert-selftests-bpf-Fix-perf_buffer-test-on-systems.patch \
-            file://powersave.cfg \
-            file://android-drivers.cfg \
-           "
+SRC_URI = " \
+    git://github.com/raspberrypi/linux.git;name=machine;branch=${LINUX_RPI_BRANCH} \
+    git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.4;destsuffix=${KMETA} \
+    file://0001-Revert-selftests-bpf-Skip-perf-hw-events-test-if-the.patch \
+    file://0002-Revert-selftests-bpf-Fix-perf_buffer-test-on-systems.patch \
+    file://powersave.cfg \
+    file://android-drivers.cfg \
+    "
+
+require linux-raspberrypi.inc
+
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
+
+KERNEL_EXTRA_ARGS += "DTC_FLAGS='-@ -H epapr'"

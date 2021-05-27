@@ -60,6 +60,7 @@ PTESTS_FAST_remove_mips64 = "qemu-ptest"
 #    bash-ptest \ # Test outcomes are non-deterministic by design
 #    ifupdown-ptest \ # Tested separately in lib/oeqa/selftest/cases/imagefeatures.py
 #    mdadm-ptest \ # Tests rely on non-deterministic sleep() amounts
+#    libinput-ptest \ # Tests need an unloaded system to be reliable
 #"
 
 PTESTS_SLOW = "\
@@ -72,7 +73,6 @@ PTESTS_SLOW = "\
     glib-2.0-ptest \
     gstreamer1.0-ptest \
     libevent-ptest \
-    libinput-ptest \
     lttng-tools-ptest \
     openssh-ptest \
     openssl-ptest \

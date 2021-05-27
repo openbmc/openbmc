@@ -1,7 +1,7 @@
-From ce90048cb25a0c2c49c585ce3a4cd8c73a8ff55b Mon Sep 17 00:00:00 2001
+From 22652fec1206eb6e5b3c05e2c4933feffce922e8 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 6 Feb 2016 11:10:47 -0800
-Subject: [PATCH 06/21] zero-out wl buffers in egl_surface_free
+Subject: [PATCH] zero-out wl buffers in egl_surface_free
 
 origins from buildroot
 
@@ -28,6 +28,3 @@ index 42350bf..1f923d9 100644
        }
  #endif
     }
--- 
-2.27.0
-

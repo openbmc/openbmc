@@ -269,6 +269,15 @@ local.conf:
 
     ENABLE_DWC2_PERIPHERAL = "1"
 
+## Enable USB host support
+
+By default in case of the Compute Module 4 IO Board the standard USB driver
+that usually supports host mode operations is disabled for power saving reasons.
+Users who want to use the 2 USB built-in ports or the other ports provided via
+the header extension should set the following in local.conf:
+
+    ENABLE_DWC2_HOST = "1"
+
 ## Enable Openlabs 802.15.4 radio module
 
 When using device tree kernels, set this variable to enable the 802.15.4 hat:
@@ -326,3 +335,17 @@ option:
         # Raspberry Pi 7\" display/touch screen \n \
         lcd_rotate=2 \n \
         '
+## Enable Raspberrypi Camera V2
+
+RaspberryPi does not have the unicam device ( RaspberryPi Camera ) enabled by default.
+Because this unicam device ( bcm2835-unicam ) as of now is used by libcamera opensource.
+So we have to explicitly set in local.conf.
+
+    RASPBERRYPI_CAMERA_V2 = "1"
+
+This will add the device tree overlays imx219 ( RaspberryPi Camera sensor V2 driver ) to config.txt.
+Also, this will enable adding Contiguous Memory Allocation value in the cmdline.txt.
+
+Ref.:
+* <https://github.com/raspberrypi/documentation/blob/master/linux/software/libcamera/README.md>
+* <https://www.raspberrypi.org/blog/an-open-source-camera-stack-for-raspberry-pi-using-libcamera/>
