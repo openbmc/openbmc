@@ -20,11 +20,11 @@ RPROVIDES_${PN} += "virtual-obmc-host-ipmi-hw"
 RRECOMMENDS_${PN} += "phosphor-ipmi-host"
 
 DEPENDS += " \
-        systemd \
+        fmt \
         sdbusplus \
-        boost \
-        phosphor-logging \
-        cli11 \
+        sdeventplus \
+        stdplus \
+        systemd \
         "
 
 S = "${WORKDIR}/git"
