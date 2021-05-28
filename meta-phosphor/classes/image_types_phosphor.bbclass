@@ -338,7 +338,6 @@ make_signatures() {
 		cat $sort_signature_files > image-full
 		openssl dgst -sha256 -sign ${SIGNING_KEY} -out image-full.sig image-full
 		signature_files="${signature_files} image-full.sig"
-		rm -rf image-full
 	fi
 }
 
