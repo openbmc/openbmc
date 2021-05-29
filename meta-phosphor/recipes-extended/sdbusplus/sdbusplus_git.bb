@@ -15,7 +15,6 @@ DEPENDS += " \
         ${PYTHON_PN}-mako-native \
         ${PYTHON_PN}-pyyaml-native \
         boost \
-        googletest \
         systemd \
         "
 
