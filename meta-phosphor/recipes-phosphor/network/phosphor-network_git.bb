@@ -36,3 +36,5 @@ FILES_${PN} += "${datadir}/dbus-1/system.d"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Network.service"
+
+EXTRA_OEMESON += "-Dtests=disabled"
