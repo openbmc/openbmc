@@ -28,6 +28,8 @@ DEPENDS += " \
         cli11 \
         "
 
+EXTRA_OEMESON += "-Dtests=disabled"
+
 FILES_${PN} += "${base_libdir}/systemd/system/xyz.openbmc_project.Hwmon@.service"
 RDEPENDS_${PN} += "\
         bash \
