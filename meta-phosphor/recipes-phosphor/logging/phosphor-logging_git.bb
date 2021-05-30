@@ -63,7 +63,7 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[openpower-pels] = " \
         -Dopenpower-pel-extension=enabled, \
         -Dopenpower-pel-extension=disabled, \
-        nlohmann-json cli11 pldm, \
+        nlohmann-json cli11 pldm python3, \
         python3, \
         "
 
