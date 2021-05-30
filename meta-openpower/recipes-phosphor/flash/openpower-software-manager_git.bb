@@ -37,6 +37,7 @@ PACKAGECONFIG[mmc_layout] = "-Ddevice-type=mmc"
 PACKAGECONFIG[virtual_pnor] = "-Dvpnor=enabled, -Dvpnor=disabled"
 
 EXTRA_OEMESON += " \
+    -Dtests=disabled \
     -Dmsl="v2.0.10 v2.2" \
     "
 
