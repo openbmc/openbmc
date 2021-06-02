@@ -32,7 +32,7 @@ these instances.
 Manual Organization
 ===================
 
-Folders exist for individual manuals as follows:
+Here the folders corresponding to individual manuals:
 
 * sdk-manual           - The Yocto Project Software Development Kit (SDK) Developer's Guide.
 * bsp-guide            - The Yocto Project Board Support Package (BSP) Developer's Guide
@@ -167,7 +167,7 @@ The layout of the Yocto Project manuals is organized as follows
           Section
             Section
 
-The following headings styles are defined in Sphinx:
+Here are the heading styles defined in Sphinx:
 
     Book              => overline ===
       Chapter         => overline ***

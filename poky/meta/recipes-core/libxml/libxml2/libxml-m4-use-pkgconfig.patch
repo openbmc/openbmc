@@ -1,7 +1,8 @@
-From 43edc9a445ed66cceb7533eadeef242940b4592c Mon Sep 17 00:00:00 2001
-From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Sat, 11 May 2019 20:37:12 +0800
+From f57da62218cf72c1342da82abafdac6b0a2e4997 Mon Sep 17 00:00:00 2001
+From: Tony Tascioglu <tony.tascioglu@windriver.com>
+Date: Fri, 14 May 2021 11:50:35 -0400
 Subject: [PATCH] AM_PATH_XML2 uses xml-config which we disable through
+
 binconfig-disabled.bbclass, so port it to use pkg-config instead.
 
 Upstream-Status: Pending
@@ -9,16 +10,22 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 Rebase to 2.9.9
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Updated to apply cleanly to v2.9.12
+
+Signed-off-by: Tony Tascioglu <tony.tascioglu@windriver.com>
 ---
- libxml.m4 | 186 ++------------------------------------------------------------
- 1 file changed, 5 insertions(+), 181 deletions(-)
+ libxml.m4 | 190 ++----------------------------------------------------
+ 1 file changed, 5 insertions(+), 185 deletions(-)
 
 diff --git a/libxml.m4 b/libxml.m4
-index 2d7a6f5..1c53585 100644
+index 09de9fe2..1c535853 100644
 --- a/libxml.m4
 +++ b/libxml.m4
-@@ -1,188 +1,12 @@
+@@ -1,192 +1,12 @@
 -# Configure paths for LIBXML2
+-# Simon Josefsson 2020-02-12
+-# Fix autoconf 2.70+ warnings
 -# Mike Hommey 2004-06-19
 -# use CPPFLAGS instead of CFLAGS
 -# Toshio Kuratomi 2001-04-21
@@ -78,7 +85,8 @@ index 2d7a6f5..1c53585 100644
 -dnl (Also sanity checks the results of xml2-config to some extent)
 -dnl
 -      rm -f conf.xmltest
--      AC_TRY_RUN([
+-      AC_RUN_IFELSE(
+-            [AC_LANG_SOURCE([[
 -#include <stdlib.h>
 -#include <stdio.h>
 -#include <string.h>
@@ -148,12 +156,12 @@ index 2d7a6f5..1c53585 100644
 -        printf("*** being found. The easiest way to fix this is to remove the old version\n");
 -        printf("*** of LIBXML, but you can also set the XML2_CONFIG environment to point to the\n");
 -        printf("*** correct copy of xml2-config. (In this case, you will have to\n");
--        printf("*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n");
+-        printf("*** modify your LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf\n");
 -        printf("*** so that the correct libraries are found at run-time))\n");
 -    }
 -  return 1;
 -}
--],, no_xml=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
+-]])],, no_xml=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
 -       CPPFLAGS="$ac_save_CPPFLAGS"
 -       LIBS="$ac_save_LIBS"
 -     fi
@@ -178,10 +186,11 @@ index 2d7a6f5..1c53585 100644
 -          echo "*** Could not run libxml test program, checking why..."
 -          CPPFLAGS="$CPPFLAGS $XML_CPPFLAGS"
 -          LIBS="$LIBS $XML_LIBS"
--          AC_TRY_LINK([
+-	  AC_LINK_IFELSE(
+-            [AC_LANG_PROGRAM([[
 -#include <libxml/xmlversion.h>
 -#include <stdio.h>
--],      [ LIBXML_TEST_VERSION; return 0;],
+-]],    [[ LIBXML_TEST_VERSION; return 0;]])],
 -        [ echo "*** The test program compiled, but did not run. This usually means"
 -          echo "*** that the run-time linker is not finding LIBXML or finding the wrong"
 -          echo "*** version of LIBXML. If it is not finding LIBXML, you'll need to set your"

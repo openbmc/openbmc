@@ -10,7 +10,7 @@ Introduction
 ============
 
 The Yocto Project team is happy for people to experiment with the Yocto
-Project. A number of places exist to find help if you run into
+Project. There is a number of places where you can find help if you run into
 difficulties or find bugs. This presents information about contributing
 and participating in the Yocto Project.
 
@@ -43,8 +43,7 @@ the Yocto Project itself (e.g. when discovering an issue with some
 component of the build system that acts contrary to the documentation or
 your expectations).
 
-A general procedure and guidelines exist for when you use Bugzilla to
-submit a bug. For information on how to use Bugzilla to submit a bug
+For a general procedure and guidelines on how to use Bugzilla to submit a bug
 against the Yocto Project, see the following:
 
 -  The ":ref:`dev-manual/common-tasks:submitting a defect against the yocto project`"
@@ -59,7 +58,7 @@ For information on Bugzilla in general, see https://www.bugzilla.org/about/.
 Mailing lists
 =============
 
-A number of mailing lists maintained by the Yocto Project exist as well
+There are multiple mailing lists maintained by the Yocto Project as well
 as related OpenEmbedded mailing lists for discussion, patch submission
 and announcements. To subscribe to one of the following mailing lists,
 click on the appropriate URL in the following list and follow the
@@ -156,9 +155,8 @@ Here is a list of resources you might find helpful:
 
 -  :yocto_docs:`Yocto Project Mega-Manual </singleindex.html>`\ *:* This manual
    is simply a single HTML file comprised of the bulk of the Yocto
-   Project manuals. The Mega-Manual primarily exists as a vehicle by
-   which you can easily search for phrases and terms used in the Yocto
-   Project documentation set.
+   Project manuals. It makes it easy to search for phrases and terms used
+   in the Yocto Project documentation set.
 
 -  :doc:`/profile-manual/index` *:* This manual presents a set of
    common and generally useful tracing and profiling schemes along with

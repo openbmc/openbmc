@@ -6,19 +6,19 @@ Upstream-Status: Inappropriate [may be rewritten in a way upstream may accept?]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
 
-Index: qemu-5.2.0/configure
+Index: qemu-6.0.0/configure
 ===================================================================
---- qemu-5.2.0.orig/configure
-+++ qemu-5.2.0/configure
-@@ -6973,7 +6973,6 @@ if has $sdl2_config; then
+--- qemu-6.0.0.orig/configure
++++ qemu-6.0.0/configure
+@@ -6371,7 +6371,6 @@ if has $sdl2_config; then
  fi
  echo "strip = [$(meson_quote $strip)]" >> $cross
  echo "windres = [$(meson_quote $windres)]" >> $cross
--if test -n "$cross_prefix"; then
+-if test "$cross_compile" = "yes"; then
      cross_arg="--cross-file config-meson.cross"
      echo "[host_machine]" >> $cross
      if test "$mingw32" = "yes" ; then
-@@ -6999,9 +6998,6 @@ if test -n "$cross_prefix"; then
+@@ -6403,9 +6402,6 @@ if test "$cross_compile" = "yes"; then
      else
          echo "endian = 'little'" >> $cross
      fi

@@ -7,7 +7,7 @@ Kernel Development FAQ
 Common Questions and Solutions
 ==============================
 
-The following lists some solutions for common questions.
+Here are some solutions for common questions.
 
 How do I use my own Linux kernel ``.config`` file?
 --------------------------------------------------

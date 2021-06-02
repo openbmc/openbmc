@@ -27,6 +27,16 @@ SRC_URI[sha256sum] = "2c87f1f21e2ab50043e6cd9163c08f1b6c3a6171556bf23ff9ed65b074
 REALPV = "2.06~rc1"
 PV = "2.04+${REALPV}"
 
+# Fixed in 2.06~rc1, can be removed for 2.06 final
+CVE_CHECK_WHITELIST += "\
+    CVE-2020-14308 CVE-2020-14309 CVE-2020-14310 CVE-2020-14311 CVE-2020-10713 \
+    CVE-2020-14372 CVE-2020-15705 CVE-2020-15706 CVE-2020-15707 \
+    CVE-2020-25632 CVE-2020-25647 CVE-2020-27749 CVE-2020-27779 \
+    CVE-2021-3418 CVE-2021-20225 CVE-2021-20233"
+
+# Applies only to RHEL
+CVE_CHECK_WHITELIST += "CVE-2019-14865"
+
 S = "${WORKDIR}/grub-${REALPV}"
 
 UPSTREAM_CHECK_URI = "${GNU_MIRROR}/grub"
@@ -48,6 +58,8 @@ GRUBPLATFORM_riscv64 = "efi"
 GRUBPLATFORM ??= "pc"
 
 inherit autotools gettext texinfo pkgconfig
+
+CFLAGS_remove = "-O2"
 
 EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
                 --disable-grub-mkfont \

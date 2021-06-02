@@ -57,8 +57,7 @@ Adjusting the Extensible SDK to Suit Your Build Host's Setup
 ============================================================
 
 In most cases, the extensible SDK defaults should work with your :term:`Build
-Host`'s setup.
-However, some cases exist for which you might consider making
+Host`'s setup. However, there are cases when you might consider making
 adjustments:
 
 -  If your SDK configuration inherits additional classes using the
@@ -153,7 +152,7 @@ follows::
 
    SDK_TITLE ??= "${@d.getVar('DISTRO_NAME') or d.getVar('DISTRO')} SDK"
 
-While several ways exist to change this variable, an efficient method is
+While there are several ways of changing this variable, an efficient method is
 to set the variable in your distribution's configuration file. Doing so
 creates an SDK installer title that applies across your distribution. As
 an example, assume you have your own layer for your distribution named
@@ -223,7 +222,7 @@ You can
 change this default installation directory by specifically setting the
 ``SDKEXTPATH`` variable.
 
-While a number of ways exist through which you can set this variable,
+While there are several ways of setting this variable,
 the method that makes the most sense is to set the variable in your
 distribution's configuration file. Doing so creates an SDK installer
 default directory that applies across your distribution. As an example,

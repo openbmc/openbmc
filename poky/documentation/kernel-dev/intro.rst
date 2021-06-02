@@ -66,9 +66,9 @@ from the continual kernel integration and testing performed during
 development of the Yocto Project.
 
 If, instead, you have a very specific Linux kernel source tree and are
-unable to align with one of the official Yocto Linux kernel recipes, an
-alternative exists by which you can use the Yocto Project Linux kernel
-tools with your own kernel sources.
+unable to align with one of the official Yocto Linux kernel recipes,
+you have a way to use the Yocto Project Linux kernel tools with your
+own kernel sources.
 
 The remainder of this manual provides instructions for completing
 specific Linux kernel development tasks. These instructions assume you

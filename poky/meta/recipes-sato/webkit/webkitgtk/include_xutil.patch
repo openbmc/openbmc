@@ -1,3 +1,8 @@
+From d95f46e149226f634830e76cc1f4f8e3ee04ff5a Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Fri, 6 Nov 2020 04:38:13 +0100
+Subject: [PATCH] webkitgtk: fix build with x11 enabled
+
 Since
 https://github.com/WebKit/webkit/commit/acd3f32cd43c363be032f93ede3aa10c4ee97fa4
 it uses XVisualInfo which is defined in Xutil.h
@@ -11,9 +16,14 @@ webkitgtk-2.30.2/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp:132
 Upstream-Status: Pending
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 
-diff -uNr webkitgtk-2.30.2.orig/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp webkitgtk-2.30.2/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
---- webkitgtk-2.30.2.orig/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp	2020-08-12 09:17:55.000000000 +0000
-+++ webkitgtk-2.30.2/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp	2020-11-06 03:11:40.379913528 +0000
+---
+ Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp b/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
+index 2d66b9cd..424fb5a1 100644
+--- a/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
++++ b/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
 @@ -30,6 +30,7 @@
  
  #if PLATFORM(X11)
@@ -21,4 +31,4 @@ diff -uNr webkitgtk-2.30.2.orig/Source/WebCore/platform/graphics/x11/PlatformDis
 +#include <X11/Xutil.h>
  #include <X11/extensions/Xcomposite.h>
  #if PLATFORM(GTK)
- #include <X11/extensions/Xdamage.h>
+ #include <X11/Xutil.h>

@@ -3,11 +3,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-import asyncio
-import json
 import logging
 import socket
-import os
 import bb.asyncrpc
 from . import create_async_client
 

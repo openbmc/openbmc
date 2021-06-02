@@ -210,5 +210,5 @@ supports the following options:
 
 -  ``--configfile``: Specifies a user-defined configuration file for
    the bootloader. You can provide a full pathname for the file or a
-   file that exists in the ``canned-wks`` folder. This option overrides
+   file located in the ``canned-wks`` folder. This option overrides
    all other bootloader options.

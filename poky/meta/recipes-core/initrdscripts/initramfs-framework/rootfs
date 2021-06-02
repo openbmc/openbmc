@@ -56,8 +56,8 @@ rootfs_run() {
 					# It is unlikely to change, but keep trying anyway.
 					# Perhaps we pick a different device next time.
 					umount $ROOTFS_DIR
-					fi
 				fi
+			fi
 		fi
 		debug "Sleeping for $delay second(s) to wait root to settle..."
 		sleep $delay

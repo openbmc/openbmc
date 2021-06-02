@@ -367,7 +367,12 @@ class ProcessServer():
                 self.next_heartbeat = now + self.heartbeat_seconds
             if hasattr(self.cooker, "data"):
                 heartbeat = bb.event.HeartbeatEvent(now)
-                bb.event.fire(heartbeat, self.cooker.data)
+                try:
+                    bb.event.fire(heartbeat, self.cooker.data)
+                except Exception as exc:
+                    if not isinstance(exc, bb.BBHandledException):
+                        logger.exception('Running heartbeat function')
+                    self.quit = True
         if nextsleep and now + nextsleep > self.next_heartbeat:
             # Shorten timeout so that we we wake up in time for
             # the heartbeat.

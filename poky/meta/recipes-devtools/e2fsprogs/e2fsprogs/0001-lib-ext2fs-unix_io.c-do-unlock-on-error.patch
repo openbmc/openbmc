@@ -1,0 +1,24 @@
+From 42ba67f9a51ef959e7fd8dac29b5398c121c6976 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 30 Apr 2021 23:45:56 +0200
+Subject: [PATCH] lib/ext2fs/unix_io.c: do unlock on error
+
+Upstream-Status: Submitted [https://github.com/tytso/e2fsprogs/pull/68]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ lib/ext2fs/unix_io.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/ext2fs/unix_io.c b/lib/ext2fs/unix_io.c
+index 64eee342..528c2fbc 100644
+--- a/lib/ext2fs/unix_io.c
++++ b/lib/ext2fs/unix_io.c
+@@ -398,7 +398,7 @@ static errcode_t raw_write_blk(io_channel channel,
+ 		mutex_lock(data, BOUNCE_MTX);
+ 		if (ext2fs_llseek(data->dev, location, SEEK_SET) < 0) {
+ 			retval = errno ? errno : EXT2_ET_LLSEEK_FAILED;
+-			goto error_out;
++			goto error_unlock;
+ 		}
+ 		actual = write(data->dev, buf, size);
+ 		mutex_unlock(data, BOUNCE_MTX);

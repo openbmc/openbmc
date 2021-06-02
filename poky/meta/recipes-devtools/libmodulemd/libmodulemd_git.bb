@@ -8,8 +8,8 @@ SRC_URI = "git://github.com/fedora-modularity/libmodulemd;protocol=https;branch=
            file://0001-modulemd-generate-the-manpage-only-if-the-feature-is.patch \
            "
 
-PV = "2.12.0"
-SRCREV = "aaed38c899a958a88a6a368a70510e350ebe336c"
+PV = "2.12.1"
+SRCREV = "c0897fa0e9d7d1305fd4813b1010c1d4cca42346"
 
 S = "${WORKDIR}/git"
 

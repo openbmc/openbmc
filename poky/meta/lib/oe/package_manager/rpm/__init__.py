@@ -199,6 +199,9 @@ class RpmPM(PackageManager):
 
         failed_scriptlets_pkgnames = collections.OrderedDict()
         for line in output.splitlines():
+            if line.startswith("Error: Systemctl"):
+                bb.error(line)
+
             if line.startswith("Error in POSTIN scriptlet in rpm package"):
                 failed_scriptlets_pkgnames[line.split()[-1]] = True
 

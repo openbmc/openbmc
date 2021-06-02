@@ -27,6 +27,7 @@ SRC_URI = "http://cairographics.org/releases/cairo-${PV}.tar.xz \
            file://CVE-2018-19876.patch \
            file://CVE-2019-6461.patch \
            file://CVE-2019-6462.patch \
+           file://CVE-2020-35492.patch \
           "
 
 SRC_URI[md5sum] = "f19e0353828269c22bd72e271243a552"

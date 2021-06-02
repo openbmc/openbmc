@@ -9,12 +9,10 @@ LICENSE = "MIT"
 
 inherit meson
 
-SRCREV = "d16ad07e7f2a028e14d61f570931c87fa5ce404c"
-PV = "1.25+git${SRCPV}"
+SRCREV = "203def046b466fb2da67f9f15552d84e1c0b41f2"
+PV = "1.26"
 
-SRC_URI = "git://gitlab.freedesktop.org/drm/igt-gpu-tools.git;protocol=https \
-           file://0001-lib-igt_edid-Allocate-raw-8-bytes-for-VSDB.patch \
-           file://reproducibility.patch"
+SRC_URI = "git://gitlab.freedesktop.org/drm/igt-gpu-tools.git;protocol=https"
 
 S = "${WORKDIR}/git"
 

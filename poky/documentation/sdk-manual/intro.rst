@@ -8,8 +8,8 @@ eSDK Introduction
 =================
 
 Welcome to the Yocto Project Application Development and the Extensible
-Software Development Kit (eSDK) manual. This manual provides information
-that explains how to use both the Yocto Project extensible and standard
+Software Development Kit (eSDK) manual. This manual
+explains how to use both the Yocto Project extensible and standard
 SDKs to develop applications and images.
 
 .. note::
@@ -25,12 +25,13 @@ SDKs to develop applications and images.
 All SDKs consist of the following:
 
 -  *Cross-Development Toolchain*: This toolchain contains a compiler,
-   debugger, and various miscellaneous tools.
+   debugger, and various associated tools.
 
 -  *Libraries, Headers, and Symbols*: The libraries, headers, and
-   symbols are specific to the image (i.e. they match the image).
+   symbols are specific to the image (i.e. they match the image
+   against which the SDK was built).
 
--  *Environment Setup Script*: This ``*.sh`` file, once run, sets up the
+-  *Environment Setup Script*: This ``*.sh`` file, once sourced, sets up the
    cross-development environment by defining variables and preparing for
    SDK use.
 
@@ -48,14 +49,14 @@ time since that path cannot be dynamically altered. This is the reason
 for a wrapper around the ``populate_sdk`` and ``populate_sdk_ext``
 archives.
 
-Another feature for the SDKs is that only one set of cross-compiler
+Another feature of the SDKs is that only one set of cross-compiler
 toolchain binaries are produced for any given architecture. This feature
 takes advantage of the fact that the target hardware can be passed to
 ``gcc`` as a set of compiler options. Those options are set up by the
 environment script and contained in variables such as
 :term:`CC` and
 :term:`LD`. This reduces the space needed
-for the tools. Understand, however, that every target still needs a
+for the tools. Understand, however, that every target still needs its own
 sysroot because those binaries are target-specific.
 
 The SDK development environment consists of the following:
@@ -118,8 +119,8 @@ The Cross-Development Toolchain
 
 The :term:`Cross-Development Toolchain` consists
 of a cross-compiler, cross-linker, and cross-debugger that are used to
-develop user-space applications for targeted hardware. Additionally, for
-an extensible SDK, the toolchain also has built-in ``devtool``
+develop user-space applications for targeted hardware; in addition,
+the extensible SDK comes with built-in ``devtool``
 functionality. This toolchain is created by running a SDK installer
 script or through a :term:`Build Directory` that is based on
 your metadata configuration or extension for your targeted device. The
@@ -138,21 +139,19 @@ The QEMU Emulator
 -----------------
 
 The QEMU emulator allows you to simulate your hardware while running
-your application or image. QEMU is not part of the SDK but is made
-available a number of different ways:
+your application or image. QEMU is not part of the SDK but is
+automatically installed and available if you have done any one of
+the following:
 
--  If you have cloned the ``poky`` Git repository to create a
-   :term:`Source Directory` and you have
-   sourced the environment setup script, QEMU is installed and
-   automatically available.
+-  cloned the ``poky`` Git repository to create a
+   :term:`Source Directory` and sourced the environment setup script.
 
--  If you have downloaded a Yocto Project release and unpacked it to
-   create a Source Directory and you have sourced the environment setup
-   script, QEMU is installed and automatically available.
+-  downloaded a Yocto Project release and unpacked it to
+   create a Source Directory and sourced the environment setup
+   script.
 
--  If you have installed the cross-toolchain tarball and you have
-   sourced the toolchain's setup environment script, QEMU is also
-   installed and automatically available.
+-  installed the cross-toolchain tarball and
+   sourced the toolchain's setup environment script.
 
 SDK Development Model
 =====================
@@ -202,10 +201,9 @@ You just need to follow these general steps:
 
    .. note::
 
-      To use the root filesystem in QEMU, you need to extract it. See
-      the "
-      Extracting the Root Filesystem
-      " section for information on how to extract the root filesystem.
+      To use the root filesystem in QEMU, you need to extract it. See the
+      ":ref:`sdk-manual/appendix-obtain:extracting the root filesystem`"
+      section for information on how to do this extraction.
 
 3. *Develop and Test your Application:* At this point, you have the
    tools to develop your application. If you need to separately install
@@ -216,5 +214,5 @@ You just need to follow these general steps:
    within the Yocto Project.
 
 The remainder of this manual describes how to use the extensible and
-standard SDKs. Information also exists in appendix form that describes
+standard SDKs. There is also information in appendix form describing
 how you can build, install, and modify an SDK.

@@ -1,7 +1,7 @@
-From 55af446156da863b5b36a1109845858956a4c274 Mon Sep 17 00:00:00 2001
+From 0f4b60e34a806055c678eb97a7ec7e21291bcf48 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Wed, 4 Jul 2018 15:00:44 +0800
-Subject: [PATCH 14/26] Do not disable buffering when writing to oom_score_adj
+Subject: [PATCH] Do not disable buffering when writing to oom_score_adj
 
 On musl, disabling buffering when writing to oom_score_adj will
 cause the following error.
@@ -19,15 +19,16 @@ Upstream-Status: Inappropriate [musl specific]
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 [rebased for systemd 243]
 Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+
 ---
  src/basic/process-util.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/basic/process-util.c b/src/basic/process-util.c
-index 4417101569..556dab8ebf 100644
+index caa9dfe3a3..6101f43db5 100644
 --- a/src/basic/process-util.c
 +++ b/src/basic/process-util.c
-@@ -1536,7 +1536,7 @@ int set_oom_score_adjust(int value) {
+@@ -1523,7 +1523,7 @@ int set_oom_score_adjust(int value) {
          sprintf(t, "%i", value);
  
          return write_string_file("/proc/self/oom_score_adj", t,
@@ -36,6 +37,3 @@ index 4417101569..556dab8ebf 100644
  }
  
  int pidfd_get_pid(int fd, pid_t *ret) {
--- 
-2.27.0
-

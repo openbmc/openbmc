@@ -82,14 +82,14 @@ stable release.
    bug fixes and security fixes only. Policy dictates that features are
    not backported to a stable release. This policy means generic recipe
    version upgrades are unlikely to be accepted for backporting. The
-   exception to this policy occurs when a strong reason exists such as
+   exception to this policy occurs when there is a strong reason such as
    the fix happens to also be the preferred upstream approach.
 
 Stable release branches have strong maintenance for about a year after
 their initial release. Should significant issues be found for any
 release regardless of its age, fixes could be backported to older
 releases. For issues that are not backported given an older release,
-Community LTS trees and branches exist where community members share
+Community LTS trees and branches allow community members to share
 patches for older releases. However, these types of patches do not go
 through the same release process as do point releases. You can find more
 information about stable branch maintenance at

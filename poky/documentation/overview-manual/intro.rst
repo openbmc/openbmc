@@ -12,7 +12,7 @@ introduces the Yocto Project by providing concepts, software overviews,
 best-known-methods (BKMs), and any other high-level introductory
 information suitable for a new Yocto Project user.
 
-The following list describes what you can get from this manual:
+Here is what you can get from this manual:
 
 -  :ref:`overview-manual/yp-intro:introducing the yocto project`\ *:*
    This chapter provides an introduction to the Yocto Project. You will learn

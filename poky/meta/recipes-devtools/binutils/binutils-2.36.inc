@@ -36,6 +36,7 @@ SRC_URI = "\
      file://0015-sync-with-OE-libtool-changes.patch \
      file://0016-Check-for-clang-before-checking-gcc-version.patch \
      file://0017-Add-support-for-the-DW_FORM_strx-forms-to-the-BFD-li.patch \
+     file://0018-Add-DWARF-5-support-in-gold.patch \
      file://CVE-2021-20197.patch \
 "
 S  = "${WORKDIR}/git"

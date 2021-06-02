@@ -1,4 +1,4 @@
-From 35c084a051bcd6587ebc73e4acb045cb2bdf7e99 Mon Sep 17 00:00:00 2001
+From 354682ad8f71f62643dcd83f64b51b5979615a0c Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 7 Dec 2015 23:39:54 +0000
 Subject: [PATCH] handle sysroot support for nativesdk-gcc
@@ -23,6 +23,9 @@ b) Add other paths which need relocation into a .gccrelocprefix section
 Upstream-Status: Inappropriate
 RP 2015/7/28
 
+Extend the gccrelocprefix support to musl config too, this ensures
+that gcc will get right bits in SDK installations
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Added PREFIXVAR and EXEC_PREFIXVAR to support runtime relocation.  Without
@@ -32,16 +35,18 @@ implementation.)
 
 Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
- gcc/c-family/c-opts.c |  4 +--
- gcc/cppdefault.c      | 63 ++++++++++++++++++++++++++-----------------
- gcc/cppdefault.h      | 13 ++++-----
- gcc/gcc.c             | 20 +++++++++-----
- gcc/incpath.c         | 12 ++++-----
- gcc/prefix.c          |  6 +++--
- 6 files changed, 70 insertions(+), 48 deletions(-)
+ gcc/c-family/c-opts.c     |  4 +--
+ gcc/config/linux.h        | 24 +++++++--------
+ gcc/config/rs6000/sysv4.h | 24 +++++++--------
+ gcc/cppdefault.c          | 63 ++++++++++++++++++++++++---------------
+ gcc/cppdefault.h          | 13 ++++----
+ gcc/gcc.c                 | 20 +++++++++----
+ gcc/incpath.c             | 12 ++++----
+ gcc/prefix.c              |  6 ++--
+ 8 files changed, 94 insertions(+), 72 deletions(-)
 
 diff --git a/gcc/c-family/c-opts.c b/gcc/c-family/c-opts.c
-index bd15b9cd902..2bd667e3f58 100644
+index 89e05a4c551..5577383665d 100644
 --- a/gcc/c-family/c-opts.c
 +++ b/gcc/c-family/c-opts.c
 @@ -1436,8 +1436,8 @@ add_prefixed_path (const char *suffix, incpath_kind chain)
@@ -55,6 +60,162 @@ index bd15b9cd902..2bd667e3f58 100644
  
    path = (char *) xmalloc (prefix_len + suffix_len + 1);
    memcpy (path, prefix, prefix_len);
+diff --git a/gcc/config/linux.h b/gcc/config/linux.h
+index b525bcd56b3..ba02c013e30 100644
+--- a/gcc/config/linux.h
++++ b/gcc/config/linux.h
+@@ -129,53 +129,53 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+  * Unfortunately, this is mostly duplicated from cppdefault.c */
+ #if DEFAULT_LIBC == LIBC_MUSL
+ #define INCLUDE_DEFAULTS_MUSL_GPP			\
+-    { GPLUSPLUS_INCLUDE_DIR, "G++", 1, 1,		\
++    { GPLUSPLUS_INCLUDE_DIRVAR, "G++", 1, 1,		\
+       GPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT, 0 },		\
+-    { GPLUSPLUS_TOOL_INCLUDE_DIR, "G++", 1, 1,		\
++    { GPLUSPLUS_TOOL_INCLUDE_DIRVAR, "G++", 1, 1,	\
+       GPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT, 1 },		\
+-    { GPLUSPLUS_BACKWARD_INCLUDE_DIR, "G++", 1, 1,	\
++    { GPLUSPLUS_BACKWARD_INCLUDE_DIRVAR, "G++", 1, 1,	\
+       GPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT, 0 },
+ 
+ #ifdef LOCAL_INCLUDE_DIR
+ #define INCLUDE_DEFAULTS_MUSL_LOCAL			\
+-    { LOCAL_INCLUDE_DIR, 0, 0, 1, 1, 2 },		\
+-    { LOCAL_INCLUDE_DIR, 0, 0, 1, 1, 0 },
++    { LOCAL_INCLUDE_DIRVAR, 0, 0, 1, 1, 2 },		\
++    { LOCAL_INCLUDE_DIRVAR, 0, 0, 1, 1, 0 },
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_LOCAL
+ #endif
+ 
+ #ifdef PREFIX_INCLUDE_DIR
+ #define INCLUDE_DEFAULTS_MUSL_PREFIX			\
+-    { PREFIX_INCLUDE_DIR, 0, 0, 1, 0, 0},
++    { PREFIX_INCLUDE_DIRVAR, 0, 0, 1, 0, 0},
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_PREFIX
+ #endif
+ 
+ #ifdef CROSS_INCLUDE_DIR
+ #define INCLUDE_DEFAULTS_MUSL_CROSS			\
+-    { CROSS_INCLUDE_DIR, "GCC", 0, 0, 0, 0},
++    { CROSS_INCLUDE_DIRVAR, "GCC", 0, 0, 0, 0},
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_CROSS
+ #endif
+ 
+ #ifdef TOOL_INCLUDE_DIR
+ #define INCLUDE_DEFAULTS_MUSL_TOOL			\
+-    { TOOL_INCLUDE_DIR, "BINUTILS", 0, 1, 0, 0},
++    { TOOL_INCLUDE_DIRVAR, "BINUTILS", 0, 1, 0, 0},
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_TOOL
+ #endif
+ 
+ #ifdef GCC_INCLUDE_SUBDIR_TARGET
+ #define INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET		\
+-    { STANDARD_STARTFILE_PREFIX_2 GCC_INCLUDE_SUBDIR_TARGET, "GCC", 0, 0, 1, 0},
++    { STANDARD_STARTFILE_PREFIX_2VAR, "GCC", 0, 0, 1, 0},
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET
+ #endif
+ 
+ #ifdef NATIVE_SYSTEM_HEADER_DIR
+ #define INCLUDE_DEFAULTS_MUSL_NATIVE			\
+-    { NATIVE_SYSTEM_HEADER_DIR, 0, 0, 0, 1, 2 },	\
+-    { NATIVE_SYSTEM_HEADER_DIR, 0, 0, 0, 1, 0 },
++    { NATIVE_SYSTEM_HEADER_DIRVAR, 0, 0, 0, 1, 2 },	\
++    { NATIVE_SYSTEM_HEADER_DIRVAR, 0, 0, 0, 1, 0 },
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_NATIVE
+ #endif
+@@ -200,7 +200,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+     INCLUDE_DEFAULTS_MUSL_TOOL				\
+     INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET			\
+     INCLUDE_DEFAULTS_MUSL_NATIVE			\
+-    { GCC_INCLUDE_DIR, "GCC", 0, 1, 0, 0 },		\
++    { GCC_INCLUDE_DIRVAR, "GCC", 0, 1, 0, 0 },		\
+     { 0, 0, 0, 0, 0, 0 }				\
+   }
+ #endif
+diff --git a/gcc/config/rs6000/sysv4.h b/gcc/config/rs6000/sysv4.h
+index 0c2bba5ea32..313a8de4417 100644
+--- a/gcc/config/rs6000/sysv4.h
++++ b/gcc/config/rs6000/sysv4.h
+@@ -959,53 +959,53 @@ ncrtn.o%s"
+ /* Include order changes for musl, same as in generic linux.h.  */
+ #if DEFAULT_LIBC == LIBC_MUSL
+ #define INCLUDE_DEFAULTS_MUSL_GPP			\
+-    { GPLUSPLUS_INCLUDE_DIR, "G++", 1, 1,		\
++    { GPLUSPLUS_INCLUDE_DIRVAR, "G++", 1, 1,		\
+       GPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT, 0 },		\
+-    { GPLUSPLUS_TOOL_INCLUDE_DIR, "G++", 1, 1,		\
++    { GPLUSPLUS_TOOL_INCLUDE_DIRVAR, "G++", 1, 1,	\
+       GPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT, 1 },		\
+-    { GPLUSPLUS_BACKWARD_INCLUDE_DIR, "G++", 1, 1,	\
++    { GPLUSPLUS_BACKWARD_INCLUDE_DIRVAR, "G++", 1, 1,	\
+       GPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT, 0 },
+ 
+ #ifdef LOCAL_INCLUDE_DIR
+ #define INCLUDE_DEFAULTS_MUSL_LOCAL			\
+-    { LOCAL_INCLUDE_DIR, 0, 0, 1, 1, 2 },		\
+-    { LOCAL_INCLUDE_DIR, 0, 0, 1, 1, 0 },
++    { LOCAL_INCLUDE_DIRVAR, 0, 0, 1, 1, 2 },		\
++    { LOCAL_INCLUDE_DIRVAR, 0, 0, 1, 1, 0 },
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_LOCAL
+ #endif
+ 
+ #ifdef PREFIX_INCLUDE_DIR
+ #define INCLUDE_DEFAULTS_MUSL_PREFIX			\
+-    { PREFIX_INCLUDE_DIR, 0, 0, 1, 0, 0},
++    { PREFIX_INCLUDE_DIRVAR, 0, 0, 1, 0, 0},
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_PREFIX
+ #endif
+ 
+ #ifdef CROSS_INCLUDE_DIR
+ #define INCLUDE_DEFAULTS_MUSL_CROSS			\
+-    { CROSS_INCLUDE_DIR, "GCC", 0, 0, 0, 0},
++    { CROSS_INCLUDE_DIRVAR, "GCC", 0, 0, 0, 0},
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_CROSS
+ #endif
+ 
+ #ifdef TOOL_INCLUDE_DIR
+ #define INCLUDE_DEFAULTS_MUSL_TOOL			\
+-    { TOOL_INCLUDE_DIR, "BINUTILS", 0, 1, 0, 0},
++    { TOOL_INCLUDE_DIRVAR, "BINUTILS", 0, 1, 0, 0},
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_TOOL
+ #endif
+ 
+ #ifdef GCC_INCLUDE_SUBDIR_TARGET
+ #define INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET            \
+-    { STANDARD_STARTFILE_PREFIX_2 GCC_INCLUDE_SUBDIR_TARGET, "GCC", 0, 0, 1, 0},
++    { STANDARD_STARTFILE_PREFIX_2VAR, "GCC", 0, 0, 1, 0},
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET
+ #endif
+ 
+ #ifdef NATIVE_SYSTEM_HEADER_DIR
+ #define INCLUDE_DEFAULTS_MUSL_NATIVE			\
+-    { NATIVE_SYSTEM_HEADER_DIR, 0, 0, 0, 1, 2 },	\
+-    { NATIVE_SYSTEM_HEADER_DIR, 0, 0, 0, 1, 0 },
++    { NATIVE_SYSTEM_HEADER_DIRVAR, 0, 0, 0, 1, 2 },	\
++    { NATIVE_SYSTEM_HEADER_DIRVAR, 0, 0, 0, 1, 0 },
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_NATIVE
+ #endif
+@@ -1030,7 +1030,7 @@ ncrtn.o%s"
+     INCLUDE_DEFAULTS_MUSL_TOOL				\
+     INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET			\
+     INCLUDE_DEFAULTS_MUSL_NATIVE			\
+-    { GCC_INCLUDE_DIR, "GCC", 0, 1, 0, 0 },		\
++    { GCC_INCLUDE_DIRVAR, "GCC", 0, 1, 0, 0 },		\
+     { 0, 0, 0, 0, 0, 0 }				\
+   }
+ #endif
 diff --git a/gcc/cppdefault.c b/gcc/cppdefault.c
 index d54d6ce0076..784a92a0c24 100644
 --- a/gcc/cppdefault.c

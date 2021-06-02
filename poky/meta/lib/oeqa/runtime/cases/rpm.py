@@ -141,13 +141,4 @@ class RpmInstallRemoveTest(OERuntimeTestCase):
 
         self.tc.target.run('rm -f %s' % self.dst)
 
-        # if using systemd this should ensure all entries are flushed to /var
-        status, output = self.target.run("journalctl --sync")
-        # Get the amount of entries in the log file
-        status, output = self.target.run(check_log_cmd)
-        msg = 'Failed to get the final size of the log file.'
-        self.assertEqual(0, status, msg=msg)
 
-        # Check that there's enough of them
-        self.assertGreaterEqual(int(output), 80,
-                                   'Cound not find sufficient amount of rpm entries in /var/log/messages, found {} entries'.format(output))

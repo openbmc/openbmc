@@ -1,7 +1,7 @@
-From bfc3416edeb69082ac9b9c9e844f12d7b45bb006 Mon Sep 17 00:00:00 2001
+From 45bae28d3da6607d33d54f4b30a500f5249aadde Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:44:54 +0800
-Subject: [PATCH 18/26] avoid redefinition of prctl_mm_map structure
+Subject: [PATCH] avoid redefinition of prctl_mm_map structure
 
 Fix the following compile failure:
 error: redefinition of 'struct prctl_mm_map'
@@ -9,6 +9,7 @@ error: redefinition of 'struct prctl_mm_map'
 Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
 ---
  src/basic/missing_prctl.h | 2 ++
  1 file changed, 2 insertions(+)
@@ -27,6 +28,3 @@ index ab851306ba..5547cad875 100644
  
  /* 58319057b7847667f0c9585b9de0e8932b0fdb08 (4.3) */
  #ifndef PR_CAP_AMBIENT
--- 
-2.27.0
-

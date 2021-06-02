@@ -14,11 +14,11 @@ Signed-off-by: He Zhe <zhe.he@windriver.com>
  configure | 48 ++++++++++++++++++++++++++++++++++++++++--------
  1 file changed, 40 insertions(+), 8 deletions(-)
 
-Index: qemu-5.2.0/configure
+Index: qemu-6.0.0/configure
 ===================================================================
---- qemu-5.2.0.orig/configure
-+++ qemu-5.2.0/configure
-@@ -2956,6 +2956,30 @@ has_libgcrypt() {
+--- qemu-6.0.0.orig/configure
++++ qemu-6.0.0/configure
+@@ -2847,6 +2847,30 @@ has_libgcrypt() {
      return 0
  }
  
@@ -49,7 +49,7 @@ Index: qemu-5.2.0/configure
  
  if test "$nettle" != "no"; then
      pass="no"
-@@ -2994,7 +3018,14 @@ fi
+@@ -2885,7 +2909,14 @@ fi
  
  if test "$gcrypt" != "no"; then
      pass="no"
@@ -65,7 +65,7 @@ Index: qemu-5.2.0/configure
          gcrypt_cflags=$(libgcrypt-config --cflags)
          gcrypt_libs=$(libgcrypt-config --libs)
          # Debian has removed -lgpg-error from libgcrypt-config
-@@ -3004,12 +3035,12 @@ if test "$gcrypt" != "no"; then
+@@ -2895,12 +2926,12 @@ if test "$gcrypt" != "no"; then
          then
              gcrypt_libs="$gcrypt_libs -lgpg-error"
          fi

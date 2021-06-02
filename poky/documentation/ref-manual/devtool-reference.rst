@@ -403,8 +403,8 @@ Upgrading a Recipe
 
 As software matures, upstream recipes are upgraded to newer versions. As
 a developer, you need to keep your local recipes up-to-date with the
-upstream version releases. Several methods exist by which you can
-upgrade recipes. You can read about them in the ":ref:`dev-manual/common-tasks:upgrading recipes`"
+upstream version releases. There are several ways of upgrading recipes.
+You can read about them in the ":ref:`dev-manual/common-tasks:upgrading recipes`"
 section of the Yocto Project Development Tasks Manual. This section
 overviews the ``devtool upgrade`` command.
 
@@ -516,8 +516,8 @@ you do, the package manager is bypassed.
    should never use it to update an image that will be used in
    production.
 
-Some conditions exist that could prevent a deployed application from
-behaving as expected. When both of the following conditions exist, your
+Some conditions could prevent a deployed application from
+behaving as expected. When both of the following conditions are met, your
 application has the potential to not behave correctly when run on the
 target:
 
@@ -528,7 +528,7 @@ target:
 -  The target does not physically have the packages on which the
    application depends installed.
 
-If both of these conditions exist, your application will not behave as
+If both of these conditions are met, your application will not behave as
 expected. The reason for this misbehavior is because the
 ``devtool deploy-target`` command does not deploy the packages (e.g.
 libraries) on which your new application depends. The assumption is that

@@ -196,7 +196,7 @@ you can add several different predefined packages such as development
 utilities or packages with debug information needed to investigate
 application problems or profile applications.
 
-The following image features are available for all images:
+Here are the image features available for all images:
 
 -  *allow-empty-password:* Allows Dropbear and OpenSSH to accept root
    logins and logins from accounts having an empty password string.

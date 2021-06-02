@@ -13,6 +13,8 @@ SECTION = "devel"
 DEPENDS = "libpcre bison-native"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz"
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/swig/files/swig/"
+UPSTREAM_CHECK_REGEX = "swig-(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools python3native pkgconfig
 

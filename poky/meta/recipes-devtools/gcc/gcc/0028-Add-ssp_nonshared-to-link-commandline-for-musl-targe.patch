@@ -22,12 +22,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  gcc/config/rs6000/linux64.h | 10 ++++++++++
  3 files changed, 27 insertions(+)
 
-diff --git a/gcc/config/linux.h b/gcc/config/linux.h
-index 87efc5f69fe..3c7b7c538b9 100644
 --- a/gcc/config/linux.h
 +++ b/gcc/config/linux.h
-@@ -195,6 +195,13 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
-     { GCC_INCLUDE_DIR, "GCC", 0, 1, 0, 0 },		\
+@@ -203,6 +203,13 @@ see the files COPYING3 and COPYING.RUNTI
+     { GCC_INCLUDE_DIRVAR, "GCC", 0, 1, 0, 0 },		\
      { 0, 0, 0, 0, 0, 0 }				\
    }
 +#ifdef TARGET_LIBC_PROVIDES_SSP
@@ -40,8 +38,6 @@ index 87efc5f69fe..3c7b7c538b9 100644
  #endif
  
  #if (DEFAULT_LIBC == LIBC_UCLIBC) && defined (SINGLE_LIBC) /* uClinux */
-diff --git a/gcc/config/rs6000/linux.h b/gcc/config/rs6000/linux.h
-index 47c9d9ac0b6..d065f88b377 100644
 --- a/gcc/config/rs6000/linux.h
 +++ b/gcc/config/rs6000/linux.h
 @@ -94,6 +94,16 @@
@@ -61,8 +57,6 @@ index 47c9d9ac0b6..d065f88b377 100644
  #undef LINK_OS_LINUX_SPEC
  #define LINK_OS_LINUX_SPEC LINK_OS_LINUX_EMUL " %{!shared: %{!static: \
    %{!static-pie: \
-diff --git a/gcc/config/rs6000/linux64.h b/gcc/config/rs6000/linux64.h
-index a11e01faa3d..ce464f3626b 100644
 --- a/gcc/config/rs6000/linux64.h
 +++ b/gcc/config/rs6000/linux64.h
 @@ -369,6 +369,16 @@ extern int dot_symbols;

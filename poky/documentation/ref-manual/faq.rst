@@ -312,7 +312,7 @@ HTTPS requests and direct them to the ``http://`` sources mirror. You
 can use ``file://`` URLs to point to local directories or network shares
 as well.
 
-Aside from the previous technique, these options also exist::
+Here are other options::
 
    BB_NO_NETWORK = "1"
 

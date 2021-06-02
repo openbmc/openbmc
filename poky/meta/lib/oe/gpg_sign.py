@@ -111,7 +111,7 @@ class LocalSigner(object):
 
     def verify(self, sig_file):
         """Verify signature"""
-        cmd = self.gpg_cmd + [" --verify", "--no-permission-warning"]
+        cmd = self.gpg_cmd + ["--verify", "--no-permission-warning"]
         if self.gpg_path:
             cmd += ["--homedir", self.gpg_path]
 

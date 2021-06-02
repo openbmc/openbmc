@@ -25,45 +25,28 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
            file://0001-Add-enable-disable-udev.patch \
            file://0001-qemu-Do-not-include-file-if-not-exists.patch \
-           file://mingwfix.patch \
-           file://mmap.patch \
            file://mmap2.patch \
            file://determinism.patch \
            file://0001-tests-meson.build-use-relative-path-to-refer-to-file.patch \
-           file://CVE-2021-20203.patch \
-           file://CVE-2020-35517_1.patch \
-           file://CVE-2020-35517_2.patch \
-           file://CVE-2020-35517_3.patch \
-           file://CVE-2021-20181.patch \
-           file://CVE-2020-29443.patch \
-           file://CVE-2021-20221.patch \
-           file://CVE-2021-3409_1.patch \
-           file://CVE-2021-3409_2.patch \
-           file://CVE-2021-3409_3.patch \
-           file://CVE-2021-3409_4.patch \
-           file://CVE-2021-3409_5.patch \
-           file://CVE-2021-3409_6.patch \
-           file://CVE-2021-3416_1.patch \
-           file://CVE-2021-3416_2.patch \
-           file://CVE-2021-3416_3.patch \
-           file://CVE-2021-3416_4.patch \
-           file://CVE-2021-3416_5.patch \
-           file://CVE-2021-3416_6.patch \
-           file://CVE-2021-3416_7.patch \
-           file://CVE-2021-3416_8.patch \
-           file://CVE-2021-3416_9.patch \
-           file://CVE-2021-3416_10.patch \
-           file://CVE-2021-20257.patch \
-           file://CVE-2020-27821.patch \
-           file://CVE-2021-20263.patch \
-           file://CVE-2021-3392.patch \
+           file://0001-configure-fix-detection-of-gdbus-codegen.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 
-SRC_URI[sha256sum] = "cb18d889b628fbe637672b0326789d9b0e3b8027e0445b936537c78549df17bc"
+SRC_URI[sha256sum] = "87bc1a471ca24b97e7005711066007d443423d19aacda3d442558ae032fa30b9"
 
 SRC_URI_append_class-target = " file://cross.patch"
 SRC_URI_append_class-nativesdk = " file://cross.patch"
+
+# Applies against virglrender < 0.6.0 and not qemu itself
+CVE_CHECK_WHITELIST += "CVE-2017-5957"
+
+# The VNC server can expose host files uder some circumstances. We don't
+# enable it by default.
+CVE_CHECK_WHITELIST += "CVE-2007-0998"
+
+# 'The issues identified by this CVE were determined to not constitute a vulnerability.'
+# https://bugzilla.redhat.com/show_bug.cgi?id=1609015#c11
+CVE_CHECK_WHITELIST += "CVE-2018-18438"
 
 COMPATIBLE_HOST_mipsarchn32 = "null"
 COMPATIBLE_HOST_mipsarchn64 = "null"
@@ -82,8 +65,6 @@ do_install_ptest() {
 	find ${D}${PTEST_PATH}/tests -type f -name "*.[Sshcodp]" | xargs -i rm -rf {}
 
 	# Don't check the file genreated by configure
-        sed -i -e 's,${HOSTTOOLS_DIR}/python3,${bindir}/python3,' \
-            ${D}/${PTEST_PATH}/tests/qemu-iotests/common.env 
 	sed -i -e "1s,#!/usr/bin/bash,#!${base_bindir}/bash," ${D}${PTEST_PATH}/tests/data/acpi/disassemle-aml.sh
 
 	# Strip the paths from the QEMU variable, we can use PATH
@@ -110,7 +91,7 @@ EXTRA_OECONF = " \
     --extra-cflags='${CFLAGS}' \
     --extra-ldflags='${LDFLAGS}' \
     --with-git=/bin/false \
-    --disable-git-update \
+    --with-git-submodules=ignore \
     --meson=meson \
     ${PACKAGECONFIG_CONFARGS} \
     "

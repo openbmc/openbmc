@@ -34,7 +34,7 @@ PACKAGECONFIG[gcrypt] = "--with-crypto=libgcrypt --with-libgcrypt-prefix=${STAGI
 BBCLASSEXTEND = "native nativesdk"
 
 # required for ptest on documentation
-RDEPENDS_${PN}-ptest = "man-db openssh"
+RDEPENDS_${PN}-ptest = "man-db openssh util-linux-col"
 RDEPENDS_${PN}-ptest_append_libc-glibc = " locale-base-en-us"
 
 do_compile_ptest() {

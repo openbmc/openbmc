@@ -9,11 +9,9 @@ Upstream-Status: pending
  configure.ac | 38 +++++++-------------------------------
  1 file changed, 7 insertions(+), 31 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index 0c984b7..6edcec1 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -70,38 +70,14 @@ AC_MSG_RESULT([$with_pcre])
+@@ -52,38 +52,14 @@ AC_MSG_RESULT([$with_pcre])
  
  dnl To make configuring easier, check for a locally built PCRE using the Tools/pcre-build.sh script
  if test x"${with_pcre}" = xyes ; then
@@ -59,6 +57,3 @@ index 0c984b7..6edcec1 100644
  
  
  dnl CCache
--- 
-1.9.3
-

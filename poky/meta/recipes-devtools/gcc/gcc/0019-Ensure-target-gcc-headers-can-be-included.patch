@@ -1,4 +1,4 @@
-From 9b4eb0e18a953d79d20c78d3ba741af6d71ab9ca Mon Sep 17 00:00:00 2001
+From 6f410ed8fb7eee11ba7a25634c2257666b98ef52 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 20 Feb 2015 10:25:11 +0000
 Subject: [PATCH] Ensure target gcc headers can be included
@@ -11,14 +11,18 @@ found by gcc with the existing search paths. Add support for
 picking up these headers under the sysroot supplied on the gcc
 command line in order to resolve this.
 
+Extend target gcc headers search to musl too
+
 Upstream-Status: Pending
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- gcc/Makefile.in  | 2 ++
- gcc/cppdefault.c | 4 ++++
- 2 files changed, 6 insertions(+)
+ gcc/Makefile.in           | 2 ++
+ gcc/config/linux.h        | 8 ++++++++
+ gcc/config/rs6000/sysv4.h | 8 ++++++++
+ gcc/cppdefault.c          | 4 ++++
+ 4 files changed, 22 insertions(+)
 
 diff --git a/gcc/Makefile.in b/gcc/Makefile.in
 index 59c45c81393..9b17d120aa1 100644
@@ -40,6 +44,58 @@ index 59c45c81393..9b17d120aa1 100644
    -DFIXED_INCLUDE_DIR=\"$(libsubdir)/include-fixed\" \
    -DGPLUSPLUS_INCLUDE_DIR=\"$(gcc_gxx_include_dir)\" \
    -DGPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT=$(gcc_gxx_include_dir_add_sysroot) \
+diff --git a/gcc/config/linux.h b/gcc/config/linux.h
+index 87efc5f69fe..b525bcd56b3 100644
+--- a/gcc/config/linux.h
++++ b/gcc/config/linux.h
+@@ -165,6 +165,13 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ #define INCLUDE_DEFAULTS_MUSL_TOOL
+ #endif
+ 
++#ifdef GCC_INCLUDE_SUBDIR_TARGET
++#define INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET		\
++    { STANDARD_STARTFILE_PREFIX_2 GCC_INCLUDE_SUBDIR_TARGET, "GCC", 0, 0, 1, 0},
++#else
++#define INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET
++#endif
++
+ #ifdef NATIVE_SYSTEM_HEADER_DIR
+ #define INCLUDE_DEFAULTS_MUSL_NATIVE			\
+     { NATIVE_SYSTEM_HEADER_DIR, 0, 0, 0, 1, 2 },	\
+@@ -191,6 +198,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+     INCLUDE_DEFAULTS_MUSL_PREFIX			\
+     INCLUDE_DEFAULTS_MUSL_CROSS				\
+     INCLUDE_DEFAULTS_MUSL_TOOL				\
++    INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET			\
+     INCLUDE_DEFAULTS_MUSL_NATIVE			\
+     { GCC_INCLUDE_DIR, "GCC", 0, 1, 0, 0 },		\
+     { 0, 0, 0, 0, 0, 0 }				\
+diff --git a/gcc/config/rs6000/sysv4.h b/gcc/config/rs6000/sysv4.h
+index 510abe169c5..0c2bba5ea32 100644
+--- a/gcc/config/rs6000/sysv4.h
++++ b/gcc/config/rs6000/sysv4.h
+@@ -995,6 +995,13 @@ ncrtn.o%s"
+ #define INCLUDE_DEFAULTS_MUSL_TOOL
+ #endif
+ 
++#ifdef GCC_INCLUDE_SUBDIR_TARGET
++#define INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET            \
++    { STANDARD_STARTFILE_PREFIX_2 GCC_INCLUDE_SUBDIR_TARGET, "GCC", 0, 0, 1, 0},
++#else
++#define INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET
++#endif
++
+ #ifdef NATIVE_SYSTEM_HEADER_DIR
+ #define INCLUDE_DEFAULTS_MUSL_NATIVE			\
+     { NATIVE_SYSTEM_HEADER_DIR, 0, 0, 0, 1, 2 },	\
+@@ -1021,6 +1028,7 @@ ncrtn.o%s"
+     INCLUDE_DEFAULTS_MUSL_PREFIX			\
+     INCLUDE_DEFAULTS_MUSL_CROSS				\
+     INCLUDE_DEFAULTS_MUSL_TOOL				\
++    INCLUDE_DEFAULTS_MUSL_SUBDIR_TARGET			\
+     INCLUDE_DEFAULTS_MUSL_NATIVE			\
+     { GCC_INCLUDE_DIR, "GCC", 0, 1, 0, 0 },		\
+     { 0, 0, 0, 0, 0, 0 }				\
 diff --git a/gcc/cppdefault.c b/gcc/cppdefault.c
 index c503d14fc3f..d54d6ce0076 100644
 --- a/gcc/cppdefault.c

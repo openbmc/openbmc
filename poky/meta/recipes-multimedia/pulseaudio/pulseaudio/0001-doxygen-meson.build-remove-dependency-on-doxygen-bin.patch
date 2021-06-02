@@ -1,0 +1,26 @@
+From 4ee244d0824e772ab35abb0f9df5e8088e16fc5d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 26 Apr 2021 19:30:40 +0200
+Subject: [PATCH] doxygen/meson.build: remove dependency on doxygen binary
+
+New meson refuses to complete confuguration if doxygen is absent
+even if this target is never actually run. As we never run it,
+let's remove it, until upstream and/or meson figure out that it's
+optional and should be treated as such.
+
+Upstream-Status: Inappropriate [needs proper upstream fix]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ doxygen/meson.build | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/doxygen/meson.build b/doxygen/meson.build
+index afc0e49..df55c83 100644
+--- a/doxygen/meson.build
++++ b/doxygen/meson.build
+@@ -6,5 +6,3 @@ doxygen_conf = configure_file(
+   configuration : cdata,
+ )
+ 
+-run_target('doxygen',
+-  command : ['doxygen', doxygen_conf])

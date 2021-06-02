@@ -1,0 +1,39 @@
+From 2729c00f0060beab8537a9bebc796b170949093d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 4 May 2021 22:03:30 +0200
+Subject: [PATCH 1/2] dnf/rpm/miscutils.py: fix usage of _()
+
+Specifically:
+- an import of _ was missing
+- _ was reused for a different purpose
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/dnf/pull/1762]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ dnf/rpm/miscutils.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/dnf/rpm/miscutils.py b/dnf/rpm/miscutils.py
+index 235aaf28f..7e33d4c42 100644
+--- a/dnf/rpm/miscutils.py
++++ b/dnf/rpm/miscutils.py
+@@ -22,6 +22,7 @@ import subprocess
+ import logging
+ 
+ from dnf.i18n import ucd
++from dnf.i18n import _
+ from shutil import which
+ 
+ 
+@@ -46,7 +47,7 @@ def _verifyPkgUsingRpmkeys(package, installroot):
+             env={'LC_ALL': 'C'},
+             stdout=subprocess.PIPE,
+             cwd='/') as p:
+-        data, _ = p.communicate()
++        data, err = p.communicate()
+     if p.returncode != 0 or data != (package.encode('ascii', 'strict') + b': digests signatures OK\n'):
+         return 0
+     else:
+-- 
+2.31.1
+

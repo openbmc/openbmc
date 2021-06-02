@@ -6,13 +6,8 @@
 from contextlib import closing, contextmanager
 from datetime import datetime
 import asyncio
-import json
 import logging
 import math
-import os
-import signal
-import socket
-import sys
 import time
 from . import create_async_client, TABLE_COLUMNS
 import bb.asyncrpc
@@ -124,7 +119,6 @@ async def copy_from_upstream(client, db, method, taskhash):
     if d is not None:
         # Filter out unknown columns
         d = {k: v for k, v in d.items() if k in TABLE_COLUMNS}
-        keys = sorted(d.keys())
 
         with closing(db.cursor()) as cursor:
             insert_task(cursor, d)
@@ -137,7 +131,6 @@ async def copy_outhash_from_upstream(client, db, method, outhash, taskhash):
     if d is not None:
         # Filter out unknown columns
         d = {k: v for k, v in d.items() if k in TABLE_COLUMNS}
-        keys = sorted(d.keys())
 
         with closing(db.cursor()) as cursor:
             insert_task(cursor, d)

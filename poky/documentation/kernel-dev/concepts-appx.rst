@@ -213,7 +213,7 @@ BSP-specific commits. In other words, the divisions of the kernel are
 transparent and are not relevant to the developer on a day-to-day basis.
 From the developer's perspective, this path is the "master" branch in
 Git terms. The developer does not need to be aware of the existence of
-any other branches at all. Of course, value exists in the having these
+any other branches at all. Of course, it can make sense to have these
 branches in the tree, should a person decide to explore them. For
 example, a comparison between two BSPs at either the commit level or at
 the line-by-line code ``diff`` level is now a trivial operation.
@@ -379,8 +379,7 @@ or non-hardware. To better show this, consider a situation where the
    yocto-kernel-cache/ktypes/base/hardware.kcf
    yocto-kernel-cache/bsp/qemu-ppc32/hardware.kcf
 
-The following list
-provides explanations for the various files:
+Here are explanations for the various files:
 
 -  ``hardware.kcf``: Specifies a list of kernel Kconfig files that
    contain hardware options only.

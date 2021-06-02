@@ -21,7 +21,7 @@ is the ``yocto-kernel-cache`` Git repository. You can find this repository
 grouped under the "Yocto Linux Kernel" heading in the
 :yocto_git:`Yocto Project Source Repositories <>`.
 
-Kernel development tools ("kern-tools") exist also in the Yocto Project
+Kernel development tools ("kern-tools") are also available in the Yocto Project
 Source Repositories under the "Yocto Linux Kernel" heading in the
 ``yocto-kernel-tools`` Git repository. The recipe that builds these
 tools is ``meta/recipes-kernel/kern-tools/kern-tools-native_git.bb`` in
@@ -313,7 +313,7 @@ The following listings show the ``build.scc`` file and part of the
 
 The description file can
 include multiple patch statements where each statement handles a single
-patch. In the example ``build.scc`` file, five patch statements exist
+patch. In the example ``build.scc`` file, there are five patch statements
 for the five patches in the directory.
 
 You can create a typical ``.patch`` file using ``diff -Nurp`` or
@@ -509,8 +509,8 @@ description as meeting the criteria set by the recipe being built. This
 example supports the "beaglebone" machine for the "standard" kernel and
 the "arm" architecture.
 
-Be aware that a hard link between the ``KTYPE`` variable and a kernel
-type description file does not exist. Thus, if you do not have the
+Be aware that there is no hard link between the ``KTYPE`` variable and a kernel
+type description file. Thus, if you do not have the
 kernel type defined in your kernel Metadata as it is here, you only need
 to ensure that the
 :term:`LINUX_KERNEL_TYPE`
@@ -776,8 +776,8 @@ patches in every kernel you build (i.e. have the patches as part of the
 lone "master" branch). It is situations like these that give rise to
 multiple branches used within a Linux kernel sources Git repository.
 
-Repository organization strategies exist that maximize source reuse,
-remove redundancy, and logically order your changes. This section
+Here are repository organization strategies maximizing source reuse,
+removing redundancy, and logically ordering your changes. This section
 presents strategies for the following cases:
 
 -  Encapsulating patches in a feature description and only including the

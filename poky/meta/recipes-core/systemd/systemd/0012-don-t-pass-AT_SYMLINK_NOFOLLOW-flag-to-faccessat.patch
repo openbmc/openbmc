@@ -1,7 +1,7 @@
-From 03e89da266edf70121a19ffc32a78cc3b97585ef Mon Sep 17 00:00:00 2001
+From 06915b70735caa66987af758ebdc4207757ae758 Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Tue, 10 Oct 2017 14:33:30 -0700
-Subject: [PATCH 12/26] don't pass AT_SYMLINK_NOFOLLOW flag to faccessat()
+Subject: [PATCH] don't pass AT_SYMLINK_NOFOLLOW flag to faccessat()
 
 Avoid using AT_SYMLINK_NOFOLLOW flag. It doesn't seem like the right
 thing to do and it's not portable (not supported by musl). See:
@@ -25,20 +25,22 @@ just historical and not actually necessary or desired behaviour?
 Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
+
 ---
- src/basic/fs-util.h          | 22 +++++++++++++++++++++-
+ src/basic/fs-util.h          | 23 +++++++++++++++++++++--
  src/shared/base-filesystem.c |  6 +++---
- 2 files changed, 24 insertions(+), 4 deletions(-)
+ 2 files changed, 24 insertions(+), 5 deletions(-)
 
 diff --git a/src/basic/fs-util.h b/src/basic/fs-util.h
-index 5dc8853eac..0491b3dae2 100644
+index 027037f7a7..16eb379caf 100644
 --- a/src/basic/fs-util.h
 +++ b/src/basic/fs-util.h
-@@ -43,7 +43,27 @@ int futimens_opath(int fd, const struct timespec ts[2]);
+@@ -44,8 +44,27 @@ int futimens_opath(int fd, const struct timespec ts[2]);
  int fd_warn_permissions(const char *path, int fd);
  int stat_warn_permissions(const char *path, const struct stat *st);
  
--#define laccess(path, mode) faccessat(AT_FDCWD, (path), (mode), AT_SYMLINK_NOFOLLOW)
+-#define laccess(path, mode)                                             \
+-        (faccessat(AT_FDCWD, (path), (mode), AT_SYMLINK_NOFOLLOW) < 0 ? -errno : 0)
 +/*
 +   Avoid using AT_SYMLINK_NOFOLLOW flag. It doesn't seem like the right thing to
 +   do and it's not portable (not supported by musl). See:
@@ -94,6 +96,3 @@ index 1d05409086..1ed06c31ab 100644
                                                  continue;
                                  }
  
--- 
-2.27.0
-

@@ -422,7 +422,7 @@ The following miscellaneous changes have occurred:
    :term:`SRCREV` by default when fetching from a Git
    repository. You can override this in either case to use
    ``${``\ :term:`AUTOREV`\ ``}`` instead by using the
-   ``-a`` or ``DASHDASHautorev`` command-line option
+   ``-a`` or ``--autorev`` command-line option
 
 -  ``distcc``: GTK+ UI is now disabled by default.
 

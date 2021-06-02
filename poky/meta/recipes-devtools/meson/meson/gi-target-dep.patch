@@ -3,7 +3,7 @@ to be executed) but *host* gobject-introspection libraries, as otherwise the
 native pkg-config can be used and the build will try to link native and host
 binaries together.
 
-Upstream-Status: Pending
+Upstream-Status: Backport [589236226856f591c9e8daf0cb7aa1aef8862388]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
 diff --git a/mesonbuild/modules/gnome.py b/mesonbuild/modules/gnome.py

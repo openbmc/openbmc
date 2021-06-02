@@ -11,6 +11,7 @@ PR = "r2"
 
 DEPENDS = ""
 INHIBIT_DEFAULT_DEPS = "1"
+ICECC_DISABLED = "1"
 
 # This is needed, because otherwise there is dependency loop from quilt-native
 # Dependency loop #1 found:

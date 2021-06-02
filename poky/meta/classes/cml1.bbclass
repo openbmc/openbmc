@@ -6,7 +6,7 @@ def find_cfgs(d):
         if s.endswith('.cfg'):
             sources_list.append(s)
 
-    return sorted(sources_list)
+    return sources_list
 
 cml1_do_configure() {
 	set -e

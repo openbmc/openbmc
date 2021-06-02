@@ -71,7 +71,7 @@ section in
 the Yocto Project Development Tasks Manual.
 
 If your development host is going to be a system that runs a Linux
-distribution, steps still exist that you must take to prepare the system
+distribution, you must still take steps to prepare the system
 for use with the Yocto Project. You need to be sure that the Linux
 distribution on the system is one that supports the Yocto Project. You
 also need to be sure that the correct set of host packages are installed
@@ -80,8 +80,8 @@ set up a development host that runs Linux, see the
 ":ref:`dev-manual/start:setting up a native linux host`"
 section in the Yocto Project Development Tasks Manual.
 
-Once your development host is set up to use the Yocto Project, several
-methods exist for you to do work in the Yocto Project environment:
+Once your development host is set up to use the Yocto Project, there
+are several ways of working in the Yocto Project environment:
 
 -  *Command Lines, BitBake, and Shells:* Traditional development in the
    Yocto Project involves using the :term:`OpenEmbedded Build System`,
@@ -271,7 +271,7 @@ files that are being worked on simultaneously by more than one person.
 All this work is done locally on the development host before anything is
 pushed to a "contrib" area and examined at the maintainer's level.
 
-A somewhat formal method exists by which developers commit changes and
+There is a somewhat formal method by which developers commit changes and
 push them into the "contrib" area and subsequently request that the
 maintainer include them into an upstream branch. This process is called
 "submitting a patch" or "submitting a change." For information on
@@ -279,9 +279,9 @@ submitting patches and changes, see the
 ":ref:`dev-manual/common-tasks:submitting a change to the yocto project`"
 section in the Yocto Project Development Tasks Manual.
 
-In summary, a single point of entry exists for changes into a "master"
+In summary, there is a single point of entry for changes into a "master"
 or development branch of the Git repository, which is controlled by the
-project's maintainer. And, a set of developers exist who independently
+project's maintainer. A set of developers independently
 develop, test, and submit changes to "contrib" areas for the maintainer
 to examine. The maintainer then chooses which changes are going to
 become a permanent part of the project.

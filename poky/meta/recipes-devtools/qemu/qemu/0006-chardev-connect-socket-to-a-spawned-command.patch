@@ -51,11 +51,11 @@ Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
  qapi/char.json        |   5 +++
  3 files changed, 109 insertions(+)
 
-Index: qemu-5.2.0/chardev/char-socket.c
+Index: qemu-6.0.0/chardev/char-socket.c
 ===================================================================
---- qemu-5.2.0.orig/chardev/char-socket.c
-+++ qemu-5.2.0/chardev/char-socket.c
-@@ -1308,6 +1308,67 @@ static bool qmp_chardev_validate_socket(
+--- qemu-6.0.0.orig/chardev/char-socket.c
++++ qemu-6.0.0/chardev/char-socket.c
+@@ -1362,6 +1362,67 @@ static bool qmp_chardev_validate_socket(
      return true;
  }
  
@@ -123,7 +123,7 @@ Index: qemu-5.2.0/chardev/char-socket.c
  
  static void qmp_chardev_open_socket(Chardev *chr,
                                      ChardevBackend *backend,
-@@ -1316,6 +1377,9 @@ static void qmp_chardev_open_socket(Char
+@@ -1370,6 +1431,9 @@ static void qmp_chardev_open_socket(Char
  {
      SocketChardev *s = SOCKET_CHARDEV(chr);
      ChardevSocket *sock = backend->u.socket.data;
@@ -133,7 +133,7 @@ Index: qemu-5.2.0/chardev/char-socket.c
      bool do_nodelay     = sock->has_nodelay ? sock->nodelay : false;
      bool is_listen      = sock->has_server  ? sock->server  : true;
      bool is_telnet      = sock->has_telnet  ? sock->telnet  : false;
-@@ -1381,6 +1445,14 @@ static void qmp_chardev_open_socket(Char
+@@ -1446,6 +1510,14 @@ static void qmp_chardev_open_socket(Char
  
      update_disconnected_filename(s);
  
@@ -148,7 +148,7 @@ Index: qemu-5.2.0/chardev/char-socket.c
      if (s->is_listen) {
          if (qmp_chardev_open_socket_server(chr, is_telnet || is_tn3270,
                                             is_waitconnect, errp) < 0) {
-@@ -1400,6 +1472,9 @@ static void qemu_chr_parse_socket(QemuOp
+@@ -1465,6 +1537,9 @@ static void qemu_chr_parse_socket(QemuOp
      const char *host = qemu_opt_get(opts, "host");
      const char *port = qemu_opt_get(opts, "port");
      const char *fd = qemu_opt_get(opts, "fd");
@@ -158,7 +158,7 @@ Index: qemu-5.2.0/chardev/char-socket.c
  #ifdef CONFIG_LINUX
      bool tight = qemu_opt_get_bool(opts, "tight", true);
      bool abstract = qemu_opt_get_bool(opts, "abstract", false);
-@@ -1407,6 +1482,20 @@ static void qemu_chr_parse_socket(QemuOp
+@@ -1472,6 +1547,20 @@ static void qemu_chr_parse_socket(QemuOp
      SocketAddressLegacy *addr;
      ChardevSocket *sock;
  
@@ -179,7 +179,7 @@ Index: qemu-5.2.0/chardev/char-socket.c
      if ((!!path + !!fd + !!host) != 1) {
          error_setg(errp,
                     "Exactly one of 'path', 'fd' or 'host' required");
-@@ -1448,13 +1537,24 @@ static void qemu_chr_parse_socket(QemuOp
+@@ -1522,13 +1611,24 @@ static void qemu_chr_parse_socket(QemuOp
      sock->tls_creds = g_strdup(qemu_opt_get(opts, "tls-creds"));
      sock->has_tls_authz = qemu_opt_get(opts, "tls-authz");
      sock->tls_authz = g_strdup(qemu_opt_get(opts, "tls-authz"));
@@ -204,11 +204,11 @@ Index: qemu-5.2.0/chardev/char-socket.c
  #ifdef CONFIG_LINUX
          q_unix->has_tight = true;
          q_unix->tight = tight;
-Index: qemu-5.2.0/chardev/char.c
+Index: qemu-6.0.0/chardev/char.c
 ===================================================================
---- qemu-5.2.0.orig/chardev/char.c
-+++ qemu-5.2.0/chardev/char.c
-@@ -839,6 +839,9 @@ QemuOptsList qemu_chardev_opts = {
+--- qemu-6.0.0.orig/chardev/char.c
++++ qemu-6.0.0/chardev/char.c
+@@ -840,6 +840,9 @@ QemuOptsList qemu_chardev_opts = {
              .name = "path",
              .type = QEMU_OPT_STRING,
          },{
@@ -218,10 +218,10 @@ Index: qemu-5.2.0/chardev/char.c
              .name = "host",
              .type = QEMU_OPT_STRING,
          },{
-Index: qemu-5.2.0/qapi/char.json
+Index: qemu-6.0.0/qapi/char.json
 ===================================================================
---- qemu-5.2.0.orig/qapi/char.json
-+++ qemu-5.2.0/qapi/char.json
+--- qemu-6.0.0.orig/qapi/char.json
++++ qemu-6.0.0/qapi/char.json
 @@ -250,6 +250,10 @@
  #
  # @addr: socket address to listen on (server=true)

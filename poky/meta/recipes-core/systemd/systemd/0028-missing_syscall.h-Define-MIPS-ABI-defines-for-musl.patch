@@ -1,4 +1,4 @@
-From 7b32582c066549fea0f7180a6c575e7fa37a867f Mon Sep 17 00:00:00 2001
+From 366cd28f5f93ba7c861cd32a718251770d74830e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 12 Apr 2021 23:44:53 -0700
 Subject: [PATCH] missing_syscall.h: Define MIPS ABI defines for musl
@@ -10,15 +10,16 @@ them here in case they are undefined
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/basic/missing_syscall.h | 6 ++++++
  1 file changed, 6 insertions(+)
 
 diff --git a/src/basic/missing_syscall.h b/src/basic/missing_syscall.h
-index 0594a1b930..495d161334 100644
+index 1384324804..0202d00372 100644
 --- a/src/basic/missing_syscall.h
 +++ b/src/basic/missing_syscall.h
-@@ -15,6 +15,12 @@
+@@ -20,6 +20,12 @@
  #include <asm/sgidefs.h>
  #endif
  
@@ -28,9 +29,6 @@ index 0594a1b930..495d161334 100644
 +#define _MIPS_SIM_ABI64		3
 +#endif
 +
- #if defined(__x86_64__) && defined(__ILP32__)
- #  define systemd_SC_arch_bias(x) ((x) | /* __X32_SYSCALL_BIT */ 0x40000000)
- #elif defined(__ia64__)
--- 
-2.31.1
-
+ #include "missing_keyctl.h"
+ #include "missing_stat.h"
+ #include "missing_syscall_def.h"

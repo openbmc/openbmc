@@ -1,7 +1,7 @@
-From 32dd7a47b87793cd836ab4bb776d1524f24c2d58 Mon Sep 17 00:00:00 2001
+From 11e730694706fa354a0e43c588ef66677a777d9a Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:27:54 +0800
-Subject: [PATCH 17/26] missing_type.h: add __compar_d_fn_t definition
+Subject: [PATCH] missing_type.h: add __compar_d_fn_t definition
 
 Fix the following compile failure:
 src/basic/util.h:71:18: error: unknown type name '__compar_d_fn_t'; did you mean '__compar_fn_t'?
@@ -9,6 +9,7 @@ src/basic/util.h:71:18: error: unknown type name '__compar_d_fn_t'; did you mean
 Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
 ---
  src/basic/missing_type.h | 1 +
  1 file changed, 1 insertion(+)
@@ -25,6 +26,3 @@ index 3df1084ef2..697aa7f58a 100644
  #endif
  
  #ifndef __COMPAR_FN_T
--- 
-2.27.0
-

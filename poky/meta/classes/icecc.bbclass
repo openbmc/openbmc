@@ -138,10 +138,6 @@ def use_icecc(bb,d):
     if icecc_is_cross_canadian(bb, d):
         return "no"
 
-    if d.getVar('INHIBIT_DEFAULT_DEPS', False):
-        # We don't have a compiler, so no icecc
-        return "no"
-
     pn = d.getVar('PN')
     bpn = d.getVar('BPN')
 
@@ -362,7 +358,7 @@ set_icecc_env() {
     ICECC_WHICH_AS="${@bb.utils.which(os.getenv('PATH'), 'as')}"
     if [ ! -x "${ICECC_CC}" -o ! -x "${ICECC_CXX}" ]
     then
-        bbwarn "Cannot use icecc: could not get ICECC_CC or ICECC_CXX"
+        bbnote "Cannot use icecc: could not get ICECC_CC or ICECC_CXX"
         return
     fi
 

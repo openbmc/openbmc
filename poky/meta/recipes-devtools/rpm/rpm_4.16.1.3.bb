@@ -47,7 +47,7 @@ SRCREV = "3659b8a04f5b8bacf6535e0124e7fe23f15286bd"
 
 S = "${WORKDIR}/git"
 
-DEPENDS = "libgcrypt db file popt xz bzip2 elfutils python3"
+DEPENDS = "libgcrypt file popt xz bzip2 elfutils python3"
 DEPENDS_append_class-native = " file-replacement-native bzip2-replacement-native"
 
 inherit autotools gettext pkgconfig python3native
@@ -70,11 +70,12 @@ EXTRA_OECONF_append_class-nativesdk = " --sysconfdir=/etc --disable-plugins"
 
 BBCLASSEXTEND = "native nativesdk"
 
-PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'inhibit', '', d)}"
+PACKAGECONFIG ??= "bdb ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'inhibit', '', d)}"
 # The inhibit plugin serves no purpose outside of the target
 PACKAGECONFIG_remove_class-native = "inhibit"
 PACKAGECONFIG_remove_class-nativesdk = "inhibit"
 
+PACKAGECONFIG[bdb] = "--enable-bdb,--disable-bdb,db"
 PACKAGECONFIG[imaevm] = "--with-imaevm,,ima-evm-utils"
 PACKAGECONFIG[inhibit] = "--enable-inhibit-plugin,--disable-inhibit-plugin,dbus"
 PACKAGECONFIG[rpm2archive] = "--with-archive,--without-archive,libarchive"

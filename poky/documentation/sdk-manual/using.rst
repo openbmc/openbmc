@@ -11,9 +11,8 @@ standard SDK.
 .. note::
 
    For a side-by-side comparison of main features supported for a
-   standard SDK as compared to an extensible SDK, see the "
-   Introduction
-   " section.
+   standard SDK as compared to an extensible SDK, see the
+   ":ref:`sdk-manual/intro:introduction`" section.
 
 You can use a standard SDK to work on Makefile and Autotools-based
 projects. See the
@@ -49,7 +48,7 @@ the Index of Releases. Toolchains are available for several 32-bit and
 64-bit architectures with the ``x86_64`` directories, respectively. The
 toolchains the Yocto Project provides are based off the
 ``core-image-sato`` and ``core-image-minimal`` images and contain
-libraries appropriate for developing against that image.
+libraries appropriate for developing against the corresponding image.
 
 The names of the tarball installer scripts are such that a string
 representing the host system appears first in the filename and then is
@@ -84,9 +83,9 @@ the SDK for ``core-image-sato`` and using the current DISTRO snapshot::
 .. note::
 
    As an alternative to downloading an SDK, you can build the SDK
-   installer. For information on building the installer, see the "
-   Building an SDK Installer
-   " section.
+   installer. For information on building the installer, see the
+   ":ref:`sdk-manual/appendix-obtain:building an sdk installer`"
+   section.
 
 The SDK and toolchains are self-contained and by default are installed
 into the ``poky_sdk`` folder in your home directory. You can choose to

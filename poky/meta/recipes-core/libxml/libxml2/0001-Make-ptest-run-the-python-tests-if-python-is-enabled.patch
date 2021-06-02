@@ -1,4 +1,4 @@
-From 2b5fb416aa275fd2a17a0139a2f783998bcb42cc Mon Sep 17 00:00:00 2001
+From ea1993d1d9a18c5e61b9cb271892b0a48f508d32 Mon Sep 17 00:00:00 2001
 From: Peter Kjellerstedt <pkj@axis.com>
 Date: Fri, 9 Jun 2017 17:50:46 +0200
 Subject: [PATCH] Make ptest run the python tests if python is enabled
@@ -8,16 +8,14 @@ be due to the fact that the tests are forced to run with Python 3.
 
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
-
 ---
- Makefile.am                  |  2 +-
- python/Makefile.am           |  9 +++++++++
- python/tests/Makefile.am     | 10 ++++++++++
- python/tests/tstLastError.py |  2 +-
- 4 files changed, 21 insertions(+), 2 deletions(-)
+ Makefile.am              |  2 +-
+ python/Makefile.am       |  9 +++++++++
+ python/tests/Makefile.am | 10 ++++++++++
+ 3 files changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index ae62274..bd1e425 100644
+index b428452b..dc18d6dd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -203,9 +203,9 @@ install-ptest:
@@ -32,7 +30,7 @@ index ae62274..bd1e425 100644
  runtests: runtest$(EXEEXT) testrecurse$(EXEEXT) testapi$(EXEEXT) \
            testchar$(EXEEXT) testdict$(EXEEXT) runxmlconf$(EXEEXT)
 diff --git a/python/Makefile.am b/python/Makefile.am
-index 34aed96..ba3ec6a 100644
+index 34aed96c..ba3ec6a4 100644
 --- a/python/Makefile.am
 +++ b/python/Makefile.am
 @@ -48,7 +48,16 @@ GENERATED = libxml2class.py libxml2class.txt $(BUILT_SOURCES)
@@ -53,7 +51,7 @@ index 34aed96..ba3ec6a 100644
  tests test: all
  	cd tests && $(MAKE) tests
 diff --git a/python/tests/Makefile.am b/python/tests/Makefile.am
-index 227e24d..021bb29 100644
+index 227e24df..3568c2d2 100644
 --- a/python/tests/Makefile.am
 +++ b/python/tests/Makefile.am
 @@ -59,6 +59,11 @@ XMLS=		\
@@ -83,16 +81,6 @@ index 227e24d..021bb29 100644
 +
  tests:
  endif
-diff --git a/python/tests/tstLastError.py b/python/tests/tstLastError.py
-index 81d0acc..162c8db 100755
---- a/python/tests/tstLastError.py
-+++ b/python/tests/tstLastError.py
-@@ -25,7 +25,7 @@ class TestCase(unittest.TestCase):
-         when the exception is raised, check the libxml2.lastError for
-         expected values."""
-         # disable the default error handler
--        libxml2.registerErrorHandler(None,None)
-+        libxml2.registerErrorHandler(lambda ctx,str: None,None)
-         try:
-             f(*args)
-         except exc:
+--
+2.25.1
+

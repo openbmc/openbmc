@@ -930,6 +930,7 @@ DESCRIPTION
              ext4
              btrfs
              squashfs
+             erofs
              swap
 
          --fsoptions: Specifies a free-form string of options to be

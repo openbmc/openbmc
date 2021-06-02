@@ -1,13 +1,13 @@
-From d1db531ddd3bbf94d5e764b7917bcc8684ff6357 Mon Sep 17 00:00:00 2001
+From f8be7b283309e4332eedc088774daac637afef7b Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Wed, 28 Feb 2018 21:25:22 -0800
-Subject: [PATCH 11/26] test-sizeof.c: Disable tests for missing typedefs in
- musl
+Subject: [PATCH] test-sizeof.c: Disable tests for missing typedefs in musl
 
 Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
 ---
  src/test/test-sizeof.c | 4 ++++
  1 file changed, 4 insertions(+)
@@ -37,6 +37,3 @@ index 3c9dc180fa..e1a59d408c 100644
          info(pid_t);
          info(uid_t);
          info(gid_t);
--- 
-2.27.0
-

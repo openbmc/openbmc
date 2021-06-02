@@ -1,41 +1,43 @@
-From 76934bcbf2cfa7304e8864e28c51f58adda0392f Mon Sep 17 00:00:00 2001
+From b64032a2eb1fb760f4ffd5b4b666e2433cf80d39 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 3 Jul 2018 13:59:09 +0100
-Subject: [PATCH] Make CPU family warnings fatal
+Subject: [PATCH 1/2] Make CPU family warnings fatal
 
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
-
 ---
  mesonbuild/envconfig.py   | 2 +-
  mesonbuild/environment.py | 4 +---
  2 files changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/mesonbuild/envconfig.py b/mesonbuild/envconfig.py
-index ba35d16..2d3c34c 100644
+index c6a4df3..4d58c91 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
-@@ -254,7 +254,7 @@ class MachineInfo:
-
+@@ -266,7 +266,7 @@ class MachineInfo:
+ 
          cpu_family = literal['cpu_family']
          if cpu_family not in known_cpu_families:
--            mlog.warning('Unknown CPU family {}, please report this at https://github.com/mesonbuild/meson/issues/new'.format(cpu_family))
+-            mlog.warning(f'Unknown CPU family {cpu_family}, please report this at https://github.com/mesonbuild/meson/issues/new')
 +            raise EnvironmentException('Unknown CPU family {}, see https://wiki.yoctoproject.org/wiki/Meson/UnknownCPU for directions.'.format(cpu_family))
-
+ 
          endian = literal['endian']
          if endian not in ('little', 'big'):
 diff --git a/mesonbuild/environment.py b/mesonbuild/environment.py
-index 756dd81..4d2c2b6 100644
+index fc9b703..eea8345 100644
 --- a/mesonbuild/environment.py
 +++ b/mesonbuild/environment.py
-@@ -434,9 +434,7 @@ def detect_cpu_family(compilers: CompilersDict) -> str:
+@@ -436,9 +436,7 @@ def detect_cpu_family(compilers: CompilersDict) -> str:
              trial = 'ppc64'
-
+ 
      if trial not in known_cpu_families:
 -        mlog.warning('Unknown CPU family {!r}, please report this at '
 -                     'https://github.com/mesonbuild/meson/issues/new with the '
 -                     'output of `uname -a` and `cat /proc/cpuinfo`'.format(trial))
 +        raise EnvironmentException('Unknown CPU family %s, see https://wiki.yoctoproject.org/wiki/Meson/UnknownCPU for directions.' % trial)
-
+ 
      return trial
+ 
+-- 
+2.24.0
 

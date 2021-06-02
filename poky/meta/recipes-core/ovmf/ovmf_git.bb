@@ -17,6 +17,9 @@ SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https \
            file://0002-BaseTools-makefile-adjust-to-build-in-under-bitbake.patch \
            file://0004-ovmf-Update-to-latest.patch \
            file://zero.patch \
+           file://debug_prefix_map.patch \
+           file://reproducible.patch \
+           file://0001-Fix-VLA-parameter-warning.patch \
            "
 
 PV = "edk2-stable202102"
@@ -101,8 +104,22 @@ fix_toolchain_append_class-native() {
     # to make ovmf-native reusable across distros.
     sed -i \
         -e 's#^\(DEFINE GCC.*DLINK.*FLAGS  *=\)#\1 -fuse-ld=bfd#' \
+        -e 's#-flto#-fno-lto#g' \
+        -e 's#-DUSING_LTO##g' \
         ${S}/BaseTools/Conf/tools_def.template
 }
+
+# We disable lto above since the results are not reproducible and make it hard to compare
+# binary build aretfacts to debug reproducibility problems.
+# Surprisingly, if you disable lto, you see compiler warnings which are fatal. We therefore
+# have to hack warnings overrides into GCC_PREFIX_MAP to allow it to build.
+
+# We want to pass ${DEBUG_PREFIX_MAP} to gcc commands and also pass in
+# --debug-prefix-map to nasm (we carry a patch to nasm for this). The
+# tools definitions are built by ovmf-native so we need to pass this in
+# at target build time when we know the right values.
+export NASM_PREFIX_MAP = "--debug-prefix-map=${WORKDIR}=/usr/src/debug/ovmf/${EXTENDPE}${PV}-${PR}"
+export GCC_PREFIX_MAP = "${DEBUG_PREFIX_MAP} -Wno-stringop-overflow -Wno-maybe-uninitialized"
 
 GCC_VER="$(${CC} -v 2>&1 | tail -n1 | awk '{print $3}')"
 

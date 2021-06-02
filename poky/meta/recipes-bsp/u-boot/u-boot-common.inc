@@ -12,16 +12,9 @@ PE = "1"
 
 # We use the revision in order to avoid having to fetch it from the
 # repo during parse
-SRCREV = "c4fddedc48f336eabc4ce3f74940e6aa372de18c"
+SRCREV = "b46dd116ce03e235f2a7d4843c6278e1da44b5e1"
 
 SRC_URI = "git://git.denx.de/u-boot.git \
-           file://0001-add-valid-fdt-check.patch \
-           file://CVE-2021-27097-1.patch \
-           file://CVE-2021-27097-2.patch \
-           file://CVE-2021-27097-3.patch \
-           file://CVE-2021-27097-4.patch \
-           file://CVE-2021-27138-1.patch \
-           file://CVE-2021-27138-2.patch \
           "
 
 S = "${WORKDIR}/git"

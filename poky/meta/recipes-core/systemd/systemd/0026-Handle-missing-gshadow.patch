@@ -1,7 +1,7 @@
-From 47bf88f74717b417e4adbcc04256334b2335c873 Mon Sep 17 00:00:00 2001
+From 04e94f9a15101daa8f65a9af269d26cda2a24056 Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Tue, 10 Mar 2020 11:05:20 +0000
-Subject: [PATCH 26/26] Handle missing gshadow
+Subject: [PATCH] Handle missing gshadow
 
 gshadow usage is now present in the userdb code. Mask all uses of it to
 allow compilation on musl
@@ -10,6 +10,7 @@ Upstream-Status: Inappropriate [musl specific]
 Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
 [Rebased for v247]
 Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
+
 ---
  src/shared/user-record-nss.c | 20 ++++++++++++++++++++
  src/shared/user-record-nss.h |  4 ++++
@@ -138,10 +139,10 @@ index 22ab04d6ee..4e52e7a911 100644
  #include <shadow.h>
  
 diff --git a/src/shared/userdb.c b/src/shared/userdb.c
-index 2d480283d1..0d19764f2e 100644
+index 613350bd46..5c821d28cd 100644
 --- a/src/shared/userdb.c
 +++ b/src/shared/userdb.c
-@@ -929,13 +929,16 @@ int groupdb_iterator_get(UserDBIterator *iterator, GroupRecord **ret) {
+@@ -938,13 +938,16 @@ int groupdb_iterator_get(UserDBIterator *iterator, GroupRecord **ret) {
                  if (gr) {
                          _cleanup_free_ char *buffer = NULL;
                          bool incomplete = false;
@@ -155,10 +156,10 @@ index 2d480283d1..0d19764f2e 100644
                                  iterator->synthesize_nobody = false;
  
 +#if ENABLE_GSHADOW
-                         r = nss_sgrp_for_group(gr, &sgrp, &buffer);
-                         if (r < 0) {
-                                 log_debug_errno(r, "Failed to acquire shadow entry for group %s, ignoring: %m", gr->gr_name);
-@@ -943,6 +946,9 @@ int groupdb_iterator_get(UserDBIterator *iterator, GroupRecord **ret) {
+                         if (!FLAGS_SET(iterator->flags, USERDB_AVOID_SHADOW)) {
+                                 r = nss_sgrp_for_group(gr, &sgrp, &buffer);
+                                 if (r < 0) {
+@@ -957,6 +960,9 @@ int groupdb_iterator_get(UserDBIterator *iterator, GroupRecord **ret) {
                          }
  
                          r = nss_group_to_group_record(gr, r >= 0 ? &sgrp : NULL, ret);
@@ -168,6 +169,3 @@ index 2d480283d1..0d19764f2e 100644
                          if (r < 0)
                                  return r;
  
--- 
-2.27.0
-

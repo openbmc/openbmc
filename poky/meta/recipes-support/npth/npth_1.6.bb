@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "\
 UPSTREAM_CHECK_URI = "https://gnupg.org/download/index.html"
 SRC_URI = "${GNUPG_MIRROR}/npth/npth-${PV}.tar.bz2 \
            file://pkgconfig.patch \
+           file://0001-Revert-Fix-problem-with-regression-tests-on-recent-g.patch \
           "
 
 SRC_URI[md5sum] = "375d1a15ad969f32d25f1a7630929854"

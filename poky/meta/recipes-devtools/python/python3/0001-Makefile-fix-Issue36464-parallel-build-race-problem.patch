@@ -9,8 +9,7 @@ installs python-config there) to race, resulting in a failure due to
 attempting to install python-config into a nonexistent BINDIR. Ensure it also
 exists in the libainstall target.
 
-Upstream-Status: Submitted [https://github.com/python/cpython/pull/13186]
-
+Upstream-Status: Backport [https://github.com/python/cpython/commit/a25c46bd7dd47a2f95b32d17ee2f66de214892c6]
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  Makefile.pre.in | 2 +-

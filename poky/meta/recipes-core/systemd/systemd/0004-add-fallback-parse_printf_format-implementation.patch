@@ -1,7 +1,7 @@
-From f3dbe29f7620a063af4d8eb3ea7c48ecd410200d Mon Sep 17 00:00:00 2001
-From: Chen Qi <Qi.Chen@windriver.com>
-Date: Mon, 25 Feb 2019 14:04:21 +0800
-Subject: [PATCH 04/26] add fallback parse_printf_format implementation
+From 6c18e5f9373da3e3b38f2c5727e2aefe07fcbbd9 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sat, 22 May 2021 20:26:24 +0200
+Subject: [PATCH] [PATCH] add fallback parse_printf_format implementation
 
 Upstream-Status: Inappropriate [musl specific]
 
@@ -11,21 +11,21 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 [rebased for systemd 243]
 Signed-off-by: Scott Murray <scott.murray@konsulko.com>
 ---
- meson.build                     |   1 +
- src/basic/meson.build           |   5 +
- src/basic/parse-printf-format.c | 273 ++++++++++++++++++++++++++++++++
- src/basic/parse-printf-format.h |  57 +++++++
- src/basic/stdio-util.h          |   2 +-
- src/journal/journal-send.c      |   2 +-
+ meson.build                              |   1 +
+ src/basic/meson.build                    |   5 +
+ src/basic/parse-printf-format.c          | 273 +++++++++++++++++++++++
+ src/basic/parse-printf-format.h          |  57 +++++
+ src/basic/stdio-util.h                   |   2 +-
+ src/libsystemd/sd-journal/journal-send.c |   2 +-
  6 files changed, 338 insertions(+), 2 deletions(-)
  create mode 100644 src/basic/parse-printf-format.c
  create mode 100644 src/basic/parse-printf-format.h
 
 diff --git a/meson.build b/meson.build
-index f406d595e6..6aa47fc755 100644
+index 27186d63a3..2abb7b3188 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -646,6 +646,7 @@ endif
+@@ -675,6 +675,7 @@ endif
  foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
@@ -34,21 +34,21 @@ index f406d595e6..6aa47fc755 100644
                    'valgrind/memcheck.h',
                    'valgrind/valgrind.h',
 diff --git a/src/basic/meson.build b/src/basic/meson.build
-index 1183ea83ad..aa5c958850 100644
+index 60ef801a25..aba2172edd 100644
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
-@@ -322,6 +322,11 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
- endforeach
+@@ -341,6 +341,11 @@ endforeach
  
  basic_sources += generated_gperf_headers
-+
+ 
 +if conf.get('HAVE_PRINTF_H') != 1
 +        basic_sources += [files('parse-printf-format.c')]
 +endif
 +
- basic_gcrypt_sources = files(
-         'gcrypt-util.c',
-         'gcrypt-util.h')
++
+ ############################################################
+ 
+ arch_list = [
 diff --git a/src/basic/parse-printf-format.c b/src/basic/parse-printf-format.c
 new file mode 100644
 index 0000000000..49437e5445
@@ -410,10 +410,10 @@ index 6dc1e72312..cea76b36cf 100644
  
  #define snprintf_ok(buf, len, fmt, ...) \
          ((size_t) snprintf(buf, len, fmt, __VA_ARGS__) < (len))
-diff --git a/src/journal/journal-send.c b/src/journal/journal-send.c
+diff --git a/src/libsystemd/sd-journal/journal-send.c b/src/libsystemd/sd-journal/journal-send.c
 index fd3fd7ef9c..e8e6ad555b 100644
---- a/src/journal/journal-send.c
-+++ b/src/journal/journal-send.c
+--- a/src/libsystemd/sd-journal/journal-send.c
++++ b/src/libsystemd/sd-journal/journal-send.c
 @@ -2,7 +2,6 @@
  
  #include <errno.h>
@@ -431,5 +431,5 @@ index fd3fd7ef9c..e8e6ad555b 100644
  #define SNDBUF_SIZE (8*1024*1024)
  
 -- 
-2.27.0
+2.24.0
 

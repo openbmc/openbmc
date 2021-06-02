@@ -823,6 +823,5 @@ sections from a size-sensitive configuration.
 After the kernel is unpacked but before it is patched, this task makes
 sure that the machine and metadata branches as specified by the
 :term:`SRCREV` variables actually exist on the specified
-branches. If these branches do not exist and
-:term:`AUTOREV` is not being used, the
+branches. Otherwise, if :term:`AUTOREV` is not being used, the
 ``do_validate_branches`` task fails during the build.

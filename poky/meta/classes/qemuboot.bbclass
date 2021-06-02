@@ -19,6 +19,9 @@
 # QB_CPU_KVM: the similar to QB_CPU, but used when kvm, e.g., '-cpu kvm64',
 #             set it when support kvm.
 #
+# QB_SMP: amount of CPU cores inside qemu guest, each mapped to a thread on the host,
+#             e.g. "-smp 8".
+#
 # QB_KERNEL_CMDLINE_APPEND: options to append to kernel's -append
 #                           option, e.g., "console=ttyS0 console=tty"
 #
@@ -80,6 +83,7 @@
 # See "runqemu help" for more info
 
 QB_MEM ?= "-m 256"
+QB_SMP ?= ""
 QB_SERIAL_OPT ?= "-serial mon:stdio -serial null"
 QB_DEFAULT_KERNEL ?= "${KERNEL_IMAGETYPE}"
 QB_DEFAULT_FSTYPE ?= "ext4"

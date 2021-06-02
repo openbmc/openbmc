@@ -36,7 +36,7 @@ particular working environment and set of practices.
     equipment together and set up your development environment's
     hardware topology.
 
-    The following roles exist:
+    Here are possible roles:
 
     -  *Application Developer:* This type of developer does application
        level work on top of an existing software stack.
@@ -99,8 +99,7 @@ particular working environment and set of practices.
     .. note::
 
        The setup of these services is beyond the scope of this manual.
-       However, sites such as the following exist that describe how to
-       perform setup:
+       However, here are sites describing how to perform setup:
 
        -  `Gitolite <https://gitolite.com>`__: Information for
           ``gitolite``.
@@ -190,7 +189,7 @@ particular working environment and set of practices.
     develop locally using their primary development system.
 
 9.  *Document Policies and Change Flow:* The Yocto Project uses a
-    hierarchical structure and a pull model. Scripts exist to create and
+    hierarchical structure and a pull model. There are scripts to create and
     send pull requests (i.e. ``create-pull-request`` and
     ``send-pull-request``). This model is in line with other open source
     projects where maintainers are responsible for specific areas of the
@@ -215,8 +214,8 @@ particular working environment and set of practices.
     someone else in the community needs them also.
 
 10. *Development Environment Summary:* Aside from the previous steps,
-    some best practices exist within the Yocto Project development
-    environment. Consider the following:
+    here are best practices within the Yocto Project development
+    environment:
 
     -  Use :ref:`overview-manual/development-environment:git` as the source control
        system.
@@ -607,8 +606,8 @@ of a given component.
 
    The recommended method for accessing Yocto Project components is to
    use Git to clone the upstream repository and work from within that
-   locally cloned repository. The procedure in this section exists
-   should you desire a tarball snapshot of any given component.
+   locally cloned repository. However, this section documents how to
+   use a tarball snapshot of any given component.
 
 Follow these steps to locate and download a particular tarball:
 
@@ -644,13 +643,6 @@ from which you can locate and download tarballs of any Yocto Project
 release. Rather than Git repositories, these files represent snapshot
 tarballs similar to the tarballs located in the Index of Releases
 described in the ":ref:`dev-manual/start:accessing index of releases`" section.
-
-.. note::
-
-   The recommended method for accessing Yocto Project components is to
-   use Git to clone a repository and work from within that local
-   repository. The procedure in this section exists should you desire a
-   tarball snapshot of any given component.
 
 1. *Go to the Yocto Project Website:* Open The
    :yocto_home:`Yocto Project Website <>` in your browser.
@@ -750,8 +742,8 @@ Follow these steps to create a local version of the upstream
    ":ref:`dev-manual/start:checking out by tag in poky`" sections, respectively.
 
    Once the local repository is created, you can change to that
-   directory and check its status. Here, the single "master" branch
-   exists on your system and by default, it is checked out::
+   directory and check its status. The ``master`` branch is checked out
+   by default::
 
       $ cd poky
       $ git status

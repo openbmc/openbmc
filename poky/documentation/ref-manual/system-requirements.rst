@@ -41,7 +41,7 @@ distributions:
 
 -  Ubuntu 18.04 (LTS)
 
--  Ubuntu 20.04
+-  Ubuntu 20.04 (LTS)
 
 -  Fedora 30
 
@@ -66,9 +66,8 @@ distributions:
 
    -  While the Yocto Project Team attempts to ensure all Yocto Project
       releases are one hundred percent compatible with each officially
-      supported Linux distribution, instances might exist where you
-      encounter a problem while using the Yocto Project on a specific
-      distribution.
+      supported Linux distribution, you may still encounter problems
+      that happen only with a specific distribution.
 
    -  Yocto Project releases are tested against the stable Linux
       distributions in the above list. The Yocto Project should work
@@ -111,7 +110,7 @@ function.
 Ubuntu and Debian
 -----------------
 
-The following list shows the required packages by function given a
+Here are the required packages by function given a
 supported Ubuntu or Debian Linux distribution:
 
 .. note::
@@ -119,8 +118,7 @@ supported Ubuntu or Debian Linux distribution:
    -  If your build system has the ``oss4-dev`` package installed, you
       might experience QEMU build failures due to the package installing
       its own custom ``/usr/include/linux/soundcard.h`` on the Debian
-      system. If you run into this situation, either of the following
-      solutions exist::
+      system. If you run into this situation, try either of these solutions::
 
          $ sudo apt-get build-dep qemu
          $ sudo apt-get remove oss4-dev
@@ -150,7 +148,7 @@ supported Ubuntu or Debian Linux distribution:
 Fedora Packages
 ---------------
 
-The following list shows the required packages by function given a
+Here are the required packages by function given a
 supported Fedora Linux distribution:
 
 -  *Essentials:* Packages needed to build an image for a headless
@@ -167,7 +165,7 @@ supported Fedora Linux distribution:
 openSUSE Packages
 -----------------
 
-The following list shows the required packages by function given a
+Here are the required packages by function given a
 supported openSUSE Linux distribution:
 
 -  *Essentials:* Packages needed to build an image for a headless
@@ -185,7 +183,7 @@ supported openSUSE Linux distribution:
 CentOS-7 Packages
 -----------------
 
-The following list shows the required packages by function given a
+Here are the required packages by function given a
 supported CentOS-7 Linux distribution:
 
 -  *Essentials:* Packages needed to build an image for a headless
@@ -212,7 +210,7 @@ supported CentOS-7 Linux distribution:
 CentOS-8 Packages
 -----------------
 
-The following list shows the required packages by function given a
+Here are the required packages by function given a
 supported CentOS-8 Linux distribution:
 
 -  *Essentials:* Packages needed to build an image for a headless

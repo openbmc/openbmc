@@ -113,6 +113,8 @@ do_kernel_metadata() {
 	cd ${S}
 	export KMETA=${KMETA}
 
+	bbnote "do_kernel_metadata: for summary/debug, set KCONF_AUDIT_LEVEL > 0"
+
 	# if kernel tools are available in-tree, they are preferred
 	# and are placed on the path before any external tools. Unless
 	# the external tools flag is set, in that case we do nothing.
@@ -289,6 +291,21 @@ do_kernel_metadata() {
 				bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
 			fi
 		fi
+	fi
+
+	if [ ${KCONF_AUDIT_LEVEL} -gt 0 ]; then
+		bbnote "kernel meta data summary for ${KMACHINE} (${LINUX_KERNEL_TYPE}):"
+		bbnote "======================================================================"
+		if [ -n "${KMETA_EXTERNAL_BSPS}" ]; then
+			bbnote "Non kernel-cache (external) bsp"
+		fi
+		bbnote "BSP entry point / definition: $bsp_definition"
+		if [ -n "$in_tree_defconfig" ]; then
+			bbnote "KBUILD_DEFCONFIG: ${KBUILD_DEFCONFIG}"
+		fi
+		bbnote "Fragments from SRC_URI: $sccs_from_src_uri"
+		bbnote "KERNEL_FEATURES: $KERNEL_FEATURES_FINAL"
+		bbnote "Final scc/cfg list: $sccs_defconfig $bsp_definition $sccs $KERNEL_FEATURES_FINAL"
 	fi
 }
 

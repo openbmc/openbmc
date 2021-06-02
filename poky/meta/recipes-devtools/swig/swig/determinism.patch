@@ -5,11 +5,9 @@ Upstream-Status: Inappropriate [OE reproducibiity fix upstream unlikely to take]
 RP 2021/3/1
 
 
-Index: swig-3.0.12/Source/Modules/main.cxx
-===================================================================
---- swig-3.0.12.orig/Source/Modules/main.cxx
-+++ swig-3.0.12/Source/Modules/main.cxx
-@@ -636,7 +636,6 @@ void SWIG_getoptions(int argc, char *arg
+--- a/Source/Modules/main.cxx
++++ b/Source/Modules/main.cxx
+@@ -642,7 +642,6 @@ static void getoptions(int argc, char *a
  	}
        } else if (strcmp(argv[i], "-version") == 0) {
  	fprintf(stdout, "\nSWIG Version %s\n", Swig_package_version());

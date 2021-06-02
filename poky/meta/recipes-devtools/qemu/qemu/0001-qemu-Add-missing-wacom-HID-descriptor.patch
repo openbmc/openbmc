@@ -20,10 +20,10 @@ Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
  hw/usb/dev-wacom.c | 94 +++++++++++++++++++++++++++++++++++++++++++++-
  1 file changed, 93 insertions(+), 1 deletion(-)
 
-Index: qemu-5.2.0/hw/usb/dev-wacom.c
+Index: qemu-6.0.0/hw/usb/dev-wacom.c
 ===================================================================
---- qemu-5.2.0.orig/hw/usb/dev-wacom.c
-+++ qemu-5.2.0/hw/usb/dev-wacom.c
+--- qemu-6.0.0.orig/hw/usb/dev-wacom.c
++++ qemu-6.0.0/hw/usb/dev-wacom.c
 @@ -69,6 +69,89 @@ static const USBDescStrings desc_strings
      [STR_SERIALNUMBER]     = "1",
  };

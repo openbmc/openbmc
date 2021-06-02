@@ -18,6 +18,6 @@ TIME=$(which time)
 
 echo "Architecture: $(uname -m)" > ${output}
 echo "Image: $(uname -sr)" >> ${output}
-${TIME} -f 'Execution time: %e s' bash -c "testCheck runtests -vv" |& tee -a ${output}
-${TIME} -f 'Execution time: %e s' bash -c "testCheck runtestspp -vv" |& tee -a ${output}
+${TIME} -f 'Execution time: %e s' bash -c "testCheck runtests -v" |& tee -a ${output}
+${TIME} -f 'Execution time: %e s' bash -c "testCheck runtestspp -v" |& tee -a ${output}
 echo

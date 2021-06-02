@@ -49,10 +49,9 @@ system and gives an overview of their function and contents.
       alternatives system to create a different binary naming scheme so the
       commands can co-exist.
 
-      To use the variable, list out the package's commands that also exist
-      as part of another package. For example, if the ``busybox`` package
-      has four commands that also exist as part of another package, you
-      identify them as follows::
+      To use the variable, list out the package's commands that are also
+      provided by another package. For example, if the ``busybox`` package
+      has four such commands, you identify them as follows::
 
          ALTERNATIVE_busybox = "sh sed test bracket"
 
@@ -306,8 +305,8 @@ system and gives an overview of their function and contents.
       variable), the OpenEmbedded build system ignores your request and
       will install the packages to avoid dependency errors.
 
-      Support for this variable exists only when using the IPK and RPM
-      packaging backend. Support does not exist for DEB.
+      This variable is supported only when using the IPK and RPM
+      packaging backends. DEB is not supported.
 
       See the :term:`NO_RECOMMENDATIONS` and the
       :term:`PACKAGE_EXCLUDE` variables for related
@@ -336,8 +335,8 @@ system and gives an overview of their function and contents.
       -  This host list is only used if ``BB_NO_NETWORK`` is either not set
          or set to "0".
 
-      -  Limited support for wildcard matching against the beginning of
-         host names exists. For example, the following setting matches
+      -  There is limited support for wildcard matching against the beginning of
+         host names. For example, the following setting matches
          ``git.gnu.org``, ``ftp.gnu.org``, and ``foo.git.gnu.org``.
          ::
 
@@ -558,7 +557,7 @@ system and gives an overview of their function and contents.
 
    :term:`BBCLASSEXTEND`
       Allows you to extend a recipe so that it builds variants of the
-      software. Common variants for recipes exist such as "natives" like
+      software. There are common variants for recipes as "natives" like
       ``quilt-native``, which is a copy of Quilt built to run on the build
       system; "crosses" such as ``gcc-cross``, which is a compiler built to
       run on the build machine but produces binaries that run on the target
@@ -1237,7 +1236,7 @@ system and gives an overview of their function and contents.
          CONFFILES_${PN} += "${sysconfdir}/file1 \
              ${sysconfdir}/file2 ${sysconfdir}/file3"
 
-      A relationship exists between the ``CONFFILES`` and ``FILES``
+      There is a relationship between the ``CONFFILES`` and ``FILES``
       variables. The files listed within ``CONFFILES`` must be a subset of
       the files listed within ``FILES``. Because the configuration files
       you provide with ``CONFFILES`` are simply being identified so that
@@ -1417,8 +1416,8 @@ system and gives an overview of their function and contents.
    :term:`COREBASE_FILES`
       Lists files from the :term:`COREBASE` directory that
       should be copied other than the layers listed in the
-      ``bblayers.conf`` file. The ``COREBASE_FILES`` variable exists for
-      the purpose of copying metadata from the OpenEmbedded build system
+      ``bblayers.conf`` file. The ``COREBASE_FILES`` variable allows
+      to copy metadata from the OpenEmbedded build system
       into the extensible SDK.
 
       Explicitly listing files in ``COREBASE`` is needed because it
@@ -1525,10 +1524,10 @@ system and gives an overview of their function and contents.
 
    :term:`DEBUG_BUILD`
       Specifies to build packages with debugging information. This
-      influences the value of the ``SELECTED_OPTIMIZATION`` variable.
+      influences the value of the :term:`SELECTED_OPTIMIZATION` variable.
 
    :term:`DEBUG_OPTIMIZATION`
-      The options to pass in ``TARGET_CFLAGS`` and ``CFLAGS`` when
+      The options to pass in :term:`TARGET_CFLAGS` and :term:`CFLAGS` when
       compiling a system for debugging. This variable defaults to "-O
       -fno-omit-frame-pointer ${DEBUG_FLAGS} -pipe".
 
@@ -1538,7 +1537,7 @@ system and gives an overview of their function and contents.
       The most common usage of this is variable is to set it to "-1" within
       a recipe for a development version of a piece of software. Using the
       variable in this way causes the stable version of the recipe to build
-      by default in the absence of ``PREFERRED_VERSION`` being used to
+      by default in the absence of :term:`PREFERRED_VERSION` being used to
       build the development version.
 
       .. note::
@@ -2460,8 +2459,8 @@ system and gives an overview of their function and contents.
             ``FILESEXTRAPATHS`` variable.
 
       You can take advantage of this searching behavior in useful ways. For
-      example, consider a case where the following directory structure
-      exists for general and machine-specific configurations::
+      example, consider a case where there is the following directory structure
+      for general and machine-specific configurations::
 
          files/defconfig
          files/MACHINEA/defconfig
@@ -2579,7 +2578,7 @@ system and gives an overview of their function and contents.
       Set the variable to "1" to force the removal of these packages.
 
    :term:`FULL_OPTIMIZATION`
-      The options to pass in ``TARGET_CFLAGS`` and ``CFLAGS`` when
+      The options to pass in :term:`TARGET_CFLAGS` and :term:`CFLAGS` when
       compiling an optimized system. This variable defaults to "-O2 -pipe
       ${DEBUG_FLAGS}".
 
@@ -3013,8 +3012,8 @@ system and gives an overview of their function and contents.
 
       Image recipes set ``IMAGE_INSTALL`` to specify the packages to
       install into an image through ``image.bbclass``. Additionally,
-      "helper" classes such as the
-      :ref:`core-image <ref-classes-core-image>` class exist that can
+      there are "helper" classes such as the
+      :ref:`core-image <ref-classes-core-image>` class which can
       take lists used with ``IMAGE_FEATURES`` and turn them into
       auto-generated entries in ``IMAGE_INSTALL`` in addition to its
       default contents.
@@ -3465,8 +3464,8 @@ system and gives an overview of their function and contents.
          Use of the ``INHIBIT_SYSROOT_STRIP`` variable occurs in rare and
          special circumstances. For example, suppose you are building
          bare-metal firmware by using an external GCC toolchain. Furthermore,
-         even if the toolchain's binaries are strippable, other files exist
-         that are needed for the build that are not strippable.
+         even if the toolchain's binaries are strippable, there are other files
+         needed for the build that are not strippable.
 
    :term:`INITRAMFS_FSTYPES`
       Defines the format for the output image of an initial RAM filesystem
@@ -3745,6 +3744,44 @@ system and gives an overview of their function and contents.
       ":ref:`kernel-dev/common:using an "in-tree" \`\`defconfig\`\` file`"
       section in the Yocto Project Linux Kernel Development Manual.
 
+   :term:`KCONFIG_MODE`
+      When used with the :ref:`kernel-yocto <ref-classes-kernel-yocto>`
+      class, specifies the kernel configuration values to use for options
+      not specified in the provided ``defconfig`` file. Valid options are::
+
+         KCONFIG_MODE = "alldefconfig"
+         KCONFIG_MODE = "allnoconfig"
+
+      In ``alldefconfig`` mode the options not explicitly specified will be
+      assigned their Kconfig default value. In ``allnoconfig`` mode the
+      options not explicitly specified will be disabled in the kernel
+      config.
+
+      In case ``KCONFIG_MODE`` is not set the behaviour will depend on where
+      the ``defconfig`` file is coming from. An "in-tree" ``defconfig`` file
+      will be handled in ``alldefconfig`` mode, a ``defconfig`` file placed
+      in ``${WORKDIR}`` through a meta-layer will be handled in
+      ``allnoconfig`` mode.
+
+      An "in-tree" ``defconfig`` file can be selected via the
+      :term:`KBUILD_DEFCONFIG` variable. ``KCONFIG_MODE`` does not need to
+      be explicitly set.
+
+      A ``defconfig`` file compatible with ``allnoconfig`` mode can be
+      generated by copying the ``.config`` file from a working Linux kernel
+      build, renaming it to ``defconfig`` and placing it into the Linux
+      kernel ``${WORKDIR}`` through your meta-layer. ``KCONFIG_MODE`` does
+      not need to be explicitly set.
+
+      A ``defconfig`` file compatible with ``alldefconfig`` mode can be
+      generated using the
+      :ref:`ref-tasks-savedefconfig`
+      task and placed into the Linux kernel ``${WORKDIR}`` through your
+      meta-layer. Explicitely set ``KCONFIG_MODE``::
+
+         KCONFIG_MODE = "alldefconfig"
+
+
    :term:`KERNEL_ALT_IMAGETYPE`
       Specifies an alternate kernel image type for creation in addition to
       the kernel image type specified using the
@@ -3779,7 +3816,7 @@ system and gives an overview of their function and contents.
 
       .. note::
 
-         Legacy support exists for specifying the full path to the device
+         There is legacy support for specifying the full path to the device
          tree. However, providing just the ``.dtb`` file is preferred.
 
       In order to use this variable, the
@@ -4004,7 +4041,7 @@ system and gives an overview of their function and contents.
 
    :term:`KERNELDEPMODDEPEND`
       Specifies whether the data referenced through
-      :term:`PKGDATA_DIR` is needed or not. The
+      :term:`PKGDATA_DIR` is needed or not.
       ``KERNELDEPMODDEPEND`` does not control whether or not that data
       exists, but simply whether or not it is used. If you do not need to
       use the data, set the ``KERNELDEPMODDEPEND`` variable in your
@@ -4189,8 +4226,8 @@ system and gives an overview of their function and contents.
       -  Separate license names using \| (pipe) when there is a choice
          between licenses.
 
-      -  Separate license names using & (ampersand) when multiple licenses
-         exist that cover different parts of the source.
+      -  Separate license names using & (ampersand) when there are
+         multiple licenses for different parts of the source.
 
       -  You can use spaces between license names.
 
@@ -4338,8 +4375,8 @@ system and gives an overview of their function and contents.
 
       The variable corresponds to a machine configuration file of the same
       name, through which machine-specific configurations are set. Thus,
-      when ``MACHINE`` is set to "qemux86" there exists the corresponding
-      ``qemux86.conf`` machine configuration file, which can be found in
+      when ``MACHINE`` is set to "qemux86", the corresponding
+      ``qemux86.conf`` machine configuration file can be found in
       the :term:`Source Directory` in
       ``meta/conf/machine``.
 
@@ -4704,7 +4741,7 @@ system and gives an overview of their function and contents.
 
    :term:`NO_GENERIC_LICENSE`
       Avoids QA errors when you use a non-common, non-CLOSED license in a
-      recipe. Packages exist, such as the linux-firmware package, with many
+      recipe. There are packages, such as the linux-firmware package, with many
       licenses that are not in any way common. Also, new licenses are added
       occasionally to avoid introducing a lot of common license files,
       which are only applicable to a specific package.
@@ -4716,7 +4753,7 @@ system and gives an overview of their function and contents.
 
          NO_GENERIC_LICENSE[license_name] = "license_file_in_fetched_source"
 
-      The following is an example that
+      Here is an example that
       uses the ``LICENSE.Abilis.txt`` file as the license from the fetched
       source::
 
@@ -4748,8 +4785,8 @@ system and gives an overview of their function and contents.
          functionality, such as kernel modules. It is up to you to add
          packages with the :term:`IMAGE_INSTALL` variable.
 
-      Support for this variable exists only when using the IPK and RPM
-      packaging backend. Support does not exist for DEB.
+      This variable is only supported when using the IPK and RPM
+      packaging backends. DEB is not supported.
 
       See the :term:`BAD_RECOMMENDATIONS` and
       the :term:`PACKAGE_EXCLUDE` variables for
@@ -5026,8 +5063,8 @@ system and gives an overview of their function and contents.
       an iterative development process to remove specific components from a
       system.
 
-      Support for this variable exists only when using the IPK and RPM
-      packaging backend. Support does not exist for DEB.
+      This variable is supported only when using the IPK and RPM
+      packaging backends. DEB is not supported.
 
       See the :term:`NO_RECOMMENDATIONS` and the
       :term:`BAD_RECOMMENDATIONS` variables for
@@ -6173,7 +6210,7 @@ system and gives an overview of their function and contents.
       :term:`PACKAGE_EXCLUDE` variables.
 
       Packages specified in ``RRECOMMENDS`` need not actually be produced.
-      However, a recipe must exist that provides each package, either
+      However, there must be a recipe providing each package, either
       through the :term:`PACKAGES` or
       :term:`PACKAGES_DYNAMIC` variables or the
       :term:`RPROVIDES` variable, or an error will occur
@@ -6653,8 +6690,8 @@ system and gives an overview of their function and contents.
       value of the :term:`TARGET_CFLAGS` variable.
 
       The ``SELECTED_OPTIMIZATION`` variable takes the value of
-      ``FULL_OPTIMIZATION`` unless ``DEBUG_BUILD`` = "1". If that is the
-      case, the value of ``DEBUG_OPTIMIZATION`` is used.
+      :term:`FULL_OPTIMIZATION` unless :term:`DEBUG_BUILD` = "1", in which
+      case the value of :term:`DEBUG_OPTIMIZATION` is used.
 
    :term:`SERIAL_CONSOLE`
       Defines a serial console (TTY) to enable using
@@ -6941,8 +6978,8 @@ system and gives an overview of their function and contents.
 
       -  ``az://`` - Fetches files from an Azure Storage account.
 
-      Standard and recipe-specific options for ``SRC_URI`` exist. Here are
-      standard options:
+      There are standard and recipe-specific options for ``SRC_URI``. Here are
+      standard ones:
 
       -  ``apply`` - Whether to apply the patch or not. The default
          action is to apply the patch.
@@ -7629,8 +7666,8 @@ system and gives an overview of their function and contents.
    :term:`TARGET_OS`
       Specifies the target's operating system. The variable can be set to
       "linux" for glibc-based systems (GNU C Library) and to "linux-musl"
-      for musl libc. For ARM/EABI targets, "linux-gnueabi" and
-      "linux-musleabi" possible values exist.
+      for musl libc. For ARM/EABI targets, the possible values are
+      "linux-gnueabi" and "linux-musleabi".
 
    :term:`TARGET_PREFIX`
       Specifies the prefix used for the toolchain binary target tools.
@@ -8331,11 +8368,10 @@ system and gives an overview of their function and contents.
       configure options are simply not passed to the configure script (e.g.
       should be removed from :term:`EXTRA_OECONF` or
       :term:`PACKAGECONFIG_CONFARGS`).
-      However, common options, for example, exist that are passed to all
-      configure scripts at a class level that might not be valid for some
-      configure scripts. It follows that no benefit exists in seeing a
-      warning about these options. For these cases, the options are added
-      to ``UNKNOWN_CONFIGURE_WHITELIST``.
+      However, there are common options that are passed to all
+      configure scripts at a class level, but might not be valid for some
+      configure scripts. Therefore warnings about these options are useless.
+      For these cases, the options are added to ``UNKNOWN_CONFIGURE_WHITELIST``.
 
       The configure arguments check that uses
       ``UNKNOWN_CONFIGURE_WHITELIST`` is part of the

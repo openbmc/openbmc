@@ -97,7 +97,7 @@ Errors and Warnings
 
 -  ``<packagename1> rdepends on <packagename2>, but it isn't a build dependency? [build-deps]``
 
-   A runtime dependency exists between the two specified packages, but
+   There is a runtime dependency between the two specified packages, but
    there is nothing explicit within the recipe to enable the
    OpenEmbedded build system to ensure that dependency is satisfied.
    This condition is usually triggered by an
@@ -303,7 +303,7 @@ Errors and Warnings
 
 -  ``<packagename> rdepends on <debug_packagename> [debug-deps]``
 
-   A dependency exists between the specified non-dbg package (i.e. a
+   There is a dependency between the specified non-dbg package (i.e. a
    package whose name does not end in ``-dbg``) and a package that is a
    ``dbg`` package. The ``dbg`` packages contain debug symbols and are
    brought in using several different methods:
@@ -326,7 +326,7 @@ Errors and Warnings
 
 -  ``<packagename> rdepends on <dev_packagename> [dev-deps]``
 
-   A dependency exists between the specified non-dev package (a package
+   There is a dependency between the specified non-dev package (a package
    whose name does not end in ``-dev``) and a package that is a ``dev``
    package. The ``dev`` packages contain development headers and are
    usually brought in using several different methods:
@@ -753,6 +753,6 @@ how to work with the QA checks, see the
 
 .. note::
 
-   Please keep in mind that the QA checks exist in order to detect real
+   Please keep in mind that the QA checks are meant to detect real
    or potential problems in the packaged output. So exercise caution
    when disabling these checks.

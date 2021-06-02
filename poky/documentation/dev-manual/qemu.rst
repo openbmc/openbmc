@@ -219,15 +219,15 @@ using an NFS server.
    Should you need to start, stop, or restart the NFS share, you can use
    the following commands:
 
-   -  The following command starts the NFS share::
+   -  To start the NFS share::
 
          runqemu-export-rootfs start file-system-location
 
-   -  The following command stops the NFS share::
+   -  To stop the NFS share::
 
          runqemu-export-rootfs stop file-system-location
 
-   -  The following command restarts the NFS share::
+   -  To restart the NFS share::
 
          runqemu-export-rootfs restart file-system-location
 
@@ -275,7 +275,7 @@ present, the toolchain is also automatically used.
 
 .. note::
 
-   Several mechanisms exist that let you connect to the system running
+   There are several mechanisms to connect to the system running
    on the QEMU emulator:
 
    -  QEMU provides a framebuffer interface that makes standard consoles
@@ -286,7 +286,7 @@ present, the toolchain is also automatically used.
       that port to run a console. The connection uses standard IP
       networking.
 
-   -  SSH servers exist in some QEMU images. The ``core-image-sato``
+   -  SSH servers are available in some QEMU images. The ``core-image-sato``
       QEMU image has a Dropbear secure shell (SSH) server that runs with
       the root password disabled. The ``core-image-full-cmdline`` and
       ``core-image-lsb`` QEMU images have OpenSSH instead of Dropbear.

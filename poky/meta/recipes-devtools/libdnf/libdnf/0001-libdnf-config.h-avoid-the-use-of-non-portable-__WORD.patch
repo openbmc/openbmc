@@ -1,23 +1,26 @@
-From 8aa5402393fabaf4fff51be3af4868e8dfab6da7 Mon Sep 17 00:00:00 2001
+From fc0b81bb717db3f41513f09f6661676a7aea6dd4 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 9 Mar 2021 19:30:42 +0000
 Subject: [PATCH] libdnf/config.h: avoid the use of non-portable __WORDSIZE
 
 Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/1159]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
- libdnf/config.h | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ libdnf/config.h | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/libdnf/config.h b/libdnf/config.h
-index 16121f6f..2925923e 100644
+index 01b330b4..dbd53f5e 100644
 --- a/libdnf/config.h
 +++ b/libdnf/config.h
-@@ -18,12 +18,10 @@
-  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-  */
+@@ -20,14 +20,11 @@
  
+ #ifdef __APPLE__
+ #include <stdint.h>
+-#else
 -#include <bits/wordsize.h>
+ #endif
 +#include <limits.h>
  
 -#if __WORDSIZE == 32

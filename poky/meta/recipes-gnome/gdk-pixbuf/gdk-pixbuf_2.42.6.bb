@@ -20,15 +20,12 @@ MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 SRC_URI = "${GNOME_MIRROR}/${BPN}/${MAJ_VER}/${BPN}-${PV}.tar.xz \
            file://run-ptest \
            file://fatal-loader.patch \
-           file://0001-Work-around-thumbnailer-cross-compile-failure.patch \
-           file://0001-Fix-a-couple-of-decisions-around-cross-compilation.patch \
-           file://0006-Build-thumbnailer-and-tests-also-in-cross-builds.patch \
-           file://0001-Work-around-thumbnailer-and-pixdata-cross-compile-fa.patch \
+           file://0001-Add-use_prebuilt_tools-option.patch \
            "
 
 SRC_URI[sha256sum] = "c4a6b75b7ed8f58ca48da830b9fa00ed96d668d3ab4b1f723dcf902f78bde77f"
 
-inherit meson pkgconfig gettext pixbufcache ptest-gnome upstream-version-is-even gobject-introspection gtk-doc lib_package
+inherit meson pkgconfig gettext pixbufcache ptest-gnome upstream-version-is-even gobject-introspection gi-docgen lib_package
 
 GIR_MESON_OPTION = 'introspection'
 GIR_MESON_ENABLE_FLAG = "enabled"
@@ -46,6 +43,14 @@ PACKAGECONFIG[png] = "-Dpng=true,-Dpng=false,libpng"
 PACKAGECONFIG[jpeg] = "-Djpeg=true,-Djpeg=false,jpeg"
 PACKAGECONFIG[tiff] = "-Dtiff=true,-Dtiff=false,tiff"
 PACKAGECONFIG[tests] = "-Dinstalled_tests=true,-Dinstalled_tests=false"
+
+EXTRA_OEMESON_class-target = " \
+    -Duse_prebuilt_tools=true \
+"
+
+EXTRA_OEMESON_class-nativesdk = " \
+    -Duse_prebuilt_tools=true \
+"
 
 PACKAGES =+ "${PN}-xlib"
 

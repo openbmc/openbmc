@@ -167,7 +167,7 @@ class Rootfs(object, metaclass=ABCMeta):
             pass
         bb.utils.rename(self.image_rootfs, self.image_rootfs + '-dbg')
 
-        bb.note("  Restoreing original rootfs...")
+        bb.note("  Restoring original rootfs...")
         bb.utils.rename(self.image_rootfs + '-orig', self.image_rootfs)
 
     def _exec_shell_cmd(self, cmd):
