@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Copyright 2020 Google LLC
 # Copyright 2020 Quanta Computer Inc.
 #
@@ -20,10 +20,22 @@
 SPI_SW_SELECT=169
 
 # Kernel control string for bind/unbind
-KERNEL_FIU_ID="c0000000.fiu"
+KERNEL_FIU_ID="c0000000.spi"
 
 # Kernel sysfs path for bind/unbind
 KERNEL_SYSFS_FIU="/sys/bus/platform/drivers/NPCM-FIU"
+
+# the node of FIU is spi for kernel 5.10, but
+# for less than or equal kernel 5.4, the node
+# is fiu
+for fname in $(find ${KERNEL_SYSFS_FIU} -type l)
+do
+    if [ "${fname##*\.}" == "fiu" ]
+    then
+        KERNEL_FIU_ID="c0000000.fiu"
+        break
+    fi
+done
 
 IMAGE_FILE="/tmp/image-bios"
 
