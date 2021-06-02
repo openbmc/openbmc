@@ -12,6 +12,8 @@ SRC_URI += " \
     file://run-ptest \
     "
 
+UPSTREAM_CHECK_URI = "www.openinfosecfoundation.org/download"
+
 inherit autotools-brokensep pkgconfig python3-dir systemd ptest
 
 CFLAGS += "-D_DEFAULT_SOURCE -fcommon"

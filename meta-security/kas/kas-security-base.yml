@@ -51,7 +51,7 @@ local_conf_header:
     EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
     PACKAGE_CLASSES = "package_ipk"
 
-    DISTRO_FEATURES_append = " pam apparmor smack"
+    DISTRO_FEATURES_append = " pam apparmor smack ima"
     MACHINE_FEATURES_append = " tpm tpm2"
 
   diskmon: |

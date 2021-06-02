@@ -73,3 +73,5 @@ FILES_${PN}-ptest += "${PTEST_PATH}/tests "
 
 RDEPENDS_${PN} += " perl nano msmtp cronie"
 RDEPENDS_${PN}-ptest = " perl lib-perl perl-modules "
+
+PNBLACKLIST[tripwire] ?= "Upsteram project appears to be abondoned, fails to build with gcc11"

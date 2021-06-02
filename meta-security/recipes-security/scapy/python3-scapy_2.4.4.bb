@@ -13,6 +13,8 @@ SRC_URI = "git://github.com/secdev/scapy.git \
 
 S = "${WORKDIR}/git"
 
+UPSTREAM_CHECK_COMMITS = "1"
+
 inherit setuptools3 ptest
 
 do_install_append() {

@@ -8,16 +8,17 @@ DEPENDS = "glibc llvm libtool db openssl zlib curl libxml2 bison pcre2 json-c li
  
 LIC_FILES_CHKSUM = "file://COPYING.txt;beginline=2;endline=3;md5=f7029fbbc5898b273d5902896f7bbe17"
 
-SRCREV = "5553a5e206ceae5d920368baee7d403f823bcb6f"
+# May 2nd
+SRCREV = "de0086aa918b79cd22570d0c05977a288b197e23"
 
 SRC_URI = "git://github.com/vrtadmin/clamav-devel;branch=dev/0.104 \
     file://clamd.conf \
     file://freshclam.conf \
     file://volatiles.03_clamav \
     file://tmpfiles.clamav \
-    file://${BPN}.service \
     file://headers_fixup.patch \
     file://oe_cmake_fixup.patch \
+    file://fix_systemd_socket.patch \
 "
 S = "${WORKDIR}/git"
 
@@ -27,6 +28,8 @@ SO_VER = "9.6.0"
 BINCONFIG = "${bindir}/clamav-config"
 
 inherit cmake chrpath pkgconfig useradd systemd multilib_header multilib_script
+
+UPSTREAM_CHECK_COMMITS = "1"
 
 CLAMAV_UID ?= "clamav"
 CLAMAV_GID ?= "clamav"
@@ -67,31 +70,29 @@ do_install_append () {
     rm ${D}/${libdir}/libmspack.so
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)};then
-        install -D -m 0644 ${WORKDIR}/clamav.service ${D}${systemd_unitdir}/system/clamav.service
         install -d ${D}${sysconfdir}/tmpfiles.d
         install -m 0644 ${WORKDIR}/tmpfiles.clamav ${D}${sysconfdir}/tmpfiles.d/clamav.conf
     fi
     oe_multilib_header clamav-types.h
 }
 
-pkg_postinst_ontarget_${PN} () {
-    if command -v systemd-tmpfiles >/dev/null; then
-        systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/clamav.conf
-    elif [ -e ${sysconfdir}/init.d/populate-volatile.sh ]; then
-        ${sysconfdir}/init.d/populate-volatile.sh update
+pkg_postinst_${PN} () {
+    if [ -z "$D" ]; then
+        if command -v systemd-tmpfiles >/dev/null; then
+            systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/clamav.conf
+        elif [ -e ${sysconfdir}/init.d/populate-volatile.sh ]; then
+            ${sysconfdir}/init.d/populate-volatile.sh update
+        fi
+        chown -R ${CLAMAV_UID}:${CLAMAV_GID} ${localstatedir}/lib/clamav
     fi
-    mkdir -p ${localstatedir}/lib/clamav
-    chown -R ${CLAMAV_UID}:${CLAMAV_GID} ${localstatedir}/lib/clamav
 }
 
-
-PACKAGES = "${PN} ${PN}-dev ${PN}-dbg ${PN}-daemon ${PN}-doc \
-            ${PN}-clamdscan ${PN}-freshclam ${PN}-libclamav ${PN}-staticdev"
+PACKAGES += "${PN}-daemon ${PN}-clamdscan ${PN}-freshclam ${PN}-libclamav"
 
 FILES_${PN} = "${bindir}/clambc ${bindir}/clamscan ${bindir}/clamsubmit ${sbindir}/clamonacc \
                 ${bindir}/*sigtool ${mandir}/man1/clambc* ${mandir}/man1/clamscan* \
                 ${mandir}/man1/sigtool* ${mandir}/man1/clambsubmit*  \
-                ${docdir}/clamav/* ${libdir}/libmspack* "
+                ${docdir}/clamav/*"
 
 FILES_${PN}-clamdscan = " ${bindir}/clamdscan \
                         ${docdir}/clamdscan/* \
@@ -103,11 +104,11 @@ FILES_${PN}-daemon = "${bindir}/clamconf ${bindir}/clamdtop ${sbindir}/clamd \
                         ${mandir}/man5/clamd*  ${mandir}/man8/clamd* \
                         ${sysconfdir}/clamd.conf* \
                         /usr/etc/clamd.conf* \
-                        ${systemd_unitdir}/system/clamav-daemon/* \
+                        ${systemd_system_unitdir}/clamav-daemon/* \
                         ${docdir}/clamav-daemon/*  ${sysconfdir}/clamav-daemon \
                         ${sysconfdir}/logcheck/ignore.d.server/clamav-daemon \
-                        ${systemd_unitdir}/system/clamav-daemon.service \
-                        ${systemd_unitdir}/system/clamav-clamonacc.service \
+                        ${systemd_system_unitdir}/clamav-daemon.service \
+                        ${systemd_system_unitdir}/clamav-clamonacc.service \
                         "
 
 FILES_${PN}-freshclam = "${bindir}/freshclam \
@@ -118,7 +119,7 @@ FILES_${PN}-freshclam = "${bindir}/freshclam \
                         ${localstatedir}/lib/clamav \
                         ${docdir}/${PN}-freshclam ${mandir}/man1/freshclam.* \
                         ${mandir}/man5/freshclam.conf.* \
-                        ${systemd_unitdir}/system/clamav-freshclam.service"
+                        ${systemd_system_unitdir}/clamav-freshclam.service"
 
 FILES_${PN}-dev = " ${bindir}/clamav-config ${libdir}/*.la \
                     ${libdir}/pkgconfig/*.pc \
@@ -128,7 +129,8 @@ FILES_${PN}-dev = " ${bindir}/clamav-config ${libdir}/*.la \
 FILES_${PN}-staticdev = "${libdir}/*.a"
 
 FILES_${PN}-libclamav = "${libdir}/libclamav.so* ${libdir}/libclammspack.so* \
-                         ${libdir}/libfreshclam.so* ${docdir}/libclamav/* "
+                         ${libdir}/libfreshclam.so* ${docdir}/libclamav/* \
+                         ${libdir}/libmspack* "
 
 FILES_${PN}-doc = "${mandir}/man/* \
                    ${datadir}/man/* \
@@ -137,12 +139,15 @@ FILES_${PN}-doc = "${mandir}/man/* \
 USERADD_PACKAGES = "${PN}"
 GROUPADD_PARAM_${PN} = "--system ${CLAMAV_UID}"
 USERADD_PARAM_${PN} = "--system -g ${CLAMAV_GID} --home-dir  \
-    ${localstatedir}/spool/${BPN} \
-    --no-create-home  --shell /bin/false ${BPN}"
+    ${localstatedir}/lib/${BPN} \
+    --no-create-home  --shell /sbin/nologin ${BPN}"
 
 RPROVIDES_${PN} += "${PN}-systemd"
 RREPLACES_${PN} += "${PN}-systemd"
 RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_PACKAGES  = "${PN}-daemon ${PN}-freshclam"
+SYSTEMD_SERVICE_${PN}-daemon = "clamav-daemon.service"
+SYSTEMD_SERVICE_${PN}-freshclam = "clamav-freshclam.service"
 
 RDEPENDS_${PN} = "openssl ncurses-libncurses libxml2 libbz2 ncurses-libtinfo curl libpcre2 clamav-freshclam clamav-libclamav"
+RDEPENDS_${PN}-daemon = "clamav"

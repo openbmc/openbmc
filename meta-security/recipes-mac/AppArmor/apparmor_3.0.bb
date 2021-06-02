@@ -177,8 +177,9 @@ SYSTEMD_AUTO_ENABLE ?= "enable"
 
 PACKAGES += "mod-${PN}"
 
-FILES_${PN} += "/lib/apparmor/ /lib/security/ ${sysconfdir}/apparmor ${PYTHON_SITEPACKAGES_DIR}"
+FILES_${PN} += "/lib/apparmor/ /lib/security/ ${sysconfdir}/apparmor ${nonarch_libdir}/${PYTHON_DIR}/site-packages"
 FILES_mod-${PN} = "${libdir}/apache2/modules/*"
+FILES_${PN}-dbg += "/lib/security/"
 
 DEPENDS_append_libc-musl = " fts "
 RDEPENDS_${PN}_libc-musl +=  "musl-utils"

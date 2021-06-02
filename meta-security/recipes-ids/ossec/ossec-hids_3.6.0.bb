@@ -11,6 +11,8 @@ SRC_URI = "git://github.com/ossec/ossec-hids;branch=master \
 
 SRCREV = "1303c78e2c67d7acee0508cb00c3bc63baaa27c2"
 
+UPSTREAM_CHECK_COMMITS = "1"
+
 inherit autotools-brokensep  useradd
 
 S = "${WORKDIR}/git"

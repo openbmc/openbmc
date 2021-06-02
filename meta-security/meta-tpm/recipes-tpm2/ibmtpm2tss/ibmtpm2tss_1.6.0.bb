@@ -17,10 +17,12 @@ DEPENDS = "openssl ibmswtpm2"
 
 inherit autotools pkgconfig
 
-SRCREV = "3e736f712ba53c8f06e66751f60fae428fd2e20f"
+SRCREV = "c4e131e34ec0ed09411aa3bc76f76129ef881573"
 SRC_URI = " git://git.code.sf.net/p/ibmtpm20tss/tss;nobranch=1 \
            file://0001-utils-12-Makefile.am-expand-wildcards-in-prereqs.patch \
            "
+
+UPSTREAM_CHECK_COMMITS = "1"
 
 EXTRA_OECONF = "--disable-tpm-1.2"
 
