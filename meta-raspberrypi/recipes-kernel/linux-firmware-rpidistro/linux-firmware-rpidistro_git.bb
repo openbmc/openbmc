@@ -36,8 +36,8 @@ NO_GENERIC_LICENSE[WHENCE] = "WHENCE"
 
 SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree"
 
-SRCREV = "b66ab26cebff689d0d3257f56912b9bb03c20567"
-PV = "20190114-1+rpt10"
+SRCREV = "83938f78ca2d5a0ffe0c223bb96d72ccc7b71ca5"
+PV = "20190114-1+rpt11"
 
 S = "${WORKDIR}/git"
 

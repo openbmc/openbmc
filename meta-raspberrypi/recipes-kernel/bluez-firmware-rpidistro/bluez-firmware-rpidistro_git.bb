@@ -16,7 +16,7 @@ SECTION = "kernel"
 # [^1]: https://github.com/RPi-Distro/bluez-firmware/issues/1
 LICENSE = "Firmware-cypress-rpidistro"
 LIC_FILES_CHKSUM = "\
-    file://LICENCE.cypress-rpidistro;md5=852f9d10cbedba1f6c439729bd0617b4 \
+    file://LICENCE.cypress-rpidistro;md5=c5d12ae0b24ef7177902a8e288751a4e \
 "
 
 # These are not common licenses, set NO_GENERIC_LICENSE for them
@@ -24,8 +24,8 @@ LIC_FILES_CHKSUM = "\
 NO_GENERIC_LICENSE[Firmware-cypress-rpidistro] = "LICENCE.cypress-rpidistro"
 
 SRC_URI = "git://github.com/RPi-Distro/bluez-firmware"
-SRCREV = "96eefffcccc725425fd83be5e0704a5c32b79e54"
-PV = "0.0+git${SRCPV}"
+SRCREV = "e7fd166981ab4bb9a36c2d1500205a078a35714d"
+PV = "1.2-4+rpt8"
 
 S = "${WORKDIR}/git"
 
@@ -55,11 +55,15 @@ do_install() {
 PACKAGES = "\
     ${PN}-cypress-license \
     ${PN}-bcm43430a1-hcd \
+    ${PN}-bcm43430b0-hcd \
     ${PN}-bcm4345c0-hcd \
+    ${PN}-bcm4345c5-hcd \
 "
 
 LICENSE_${PN}-bcm43430a1-hcd = "Firmware-cypress-rpidistro"
+LICENSE_${PN}-bcm43430b0-hcd = "Firmware-cypress-rpidistro"
 LICENSE_${PN}-bcm4345c0-hcd = "Firmware-cypress-rpidistro"
+LICENSE_${PN}-bcm4345c5-hcd = "Firmware-cypress-rpidistro"
 LICENSE_${PN}-cypress-license = "Firmware-cypress-rpidistro"
 
 FILES_${PN}-cypress-license = "\
@@ -68,16 +72,28 @@ FILES_${PN}-cypress-license = "\
 FILES_${PN}-bcm43430a1-hcd = "\
     ${nonarch_base_libdir}/firmware/brcm/BCM43430A1.hcd \
 "
+FILES_${PN}-bcm43430b0-hcd = "\
+    ${nonarch_base_libdir}/firmware/brcm/BCM43430B0.hcd \
+"
 FILES_${PN}-bcm4345c0-hcd = "\
     ${nonarch_base_libdir}/firmware/brcm/BCM4345C0.hcd \
 "
+FILES_${PN}-bcm4345c5-hcd = "\
+    ${nonarch_base_libdir}/firmware/brcm/BCM4345C5.hcd \
+"
 
 RDEPENDS_${PN}-bcm43430a1-hcd += "${PN}-cypress-license"
+RDEPENDS_${PN}-bcm43430b0-hcd += "${PN}-cypress-license"
 RDEPENDS_${PN}-bcm4345c0-hcd += "${PN}-cypress-license"
+RDEPENDS_${PN}-bcm4345c5-hcd += "${PN}-cypress-license"
 RCONFLICTS_${PN}-bcm43430a1-hcd = "linux-firmware-bcm43430a1-hcd"
 RREPLACES_${PN}-bcm43430a1-hcd = "linux-firmware-bcm43430a1-hcd"
+RCONFLICTS_${PN}-bcm43430b0-hcd = "linux-firmware-bcm43430b0-hcd"
+RREPLACES_${PN}-bcm43430b0-hcd = "linux-firmware-bcm43430b0-hcd"
 RCONFLICTS_${PN}-bcm43435c0-hcd = "linux-firmware-bcm4345c0-hcd"
 RREPLACES_${PN}-bcm43435c0-hcd = "linux-firmware-bcm4345c0-hcd"
+RCONFLICTS_${PN}-bcm43435c5-hcd = "linux-firmware-bcm4345c5-hcd"
+RREPLACES_${PN}-bcm43435c5-hcd = "linux-firmware-bcm4345c5-hcd"
 
 # Firmware files are generally not run on the CPU, so they can be
 # allarch despite being architecture specific

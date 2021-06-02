@@ -118,10 +118,15 @@ do_deploy() {
 
     # Video camera support
     if [ "${VIDEO_CAMERA}" = "1" ]; then
-        # TODO: It has been observed that Raspberry Pi 4B 4GB may fail to enable the camera if "start_x=1" is at the end
-        #       of the file. The underlying cause is unknown, but it can be related with a file size limitation affecting
-        #       this variable. Therefore, "start_x=1" has been set to replace the original occurrence in config.txt,
-        #       which is at the middle of the file.
+        #   It has been observed that Raspberry Pi 4B 4GB may fail to enable the
+        # camera if "start_x=1" is at the end of the file. Therefore,
+        # "start_x=1" has been set to replace the original occurrence in
+        # config.txt, which is at the middle of the file.
+        #   The exact underlying cause is unknown. There are similar issues
+        # reported in the raspberrypi/firware repo and the conclusion reached
+        # was that there could be a file size limitation affecting certain
+        # variables. It was commented that this limitation could be 4k but
+        # not proved.
         sed -i '/#start_x=/ c\start_x=1' $CONFIG
     fi
 
@@ -184,9 +189,15 @@ do_deploy() {
 
     # Choose Camera Sensor to be used, default imx219 sensor
     if [ "${RASPBERRYPI_CAMERA_V2}" = "1" ]; then
-        echo "# Enable Sony RaspberryPi Camera" >> $CONFIG
+        echo "# Enable Sony RaspberryPi Camera(imx219)" >> $CONFIG
         echo "dtoverlay=imx219" >> $CONFIG
     fi
+
+    # Choose Camera Sensor to be used, default imx477 sensor
+    #if [ "${RASPBERRYPI_HD_CAMERA}" = "1" ]; then
+    #    echo "# Enable Sony RaspberryPi Camera(imx477)" >> $CONFIG
+    #    echo "dtoverlay=imx477" >> $CONFIG
+    #fi
 
     # Waveshare "C" 1024x600 7" Rev2.1 IPS capacitive touch (http://www.waveshare.com/7inch-HDMI-LCD-C.htm)
     if [ "${WAVESHARE_1024X600_C_2_1}" = "1" ]; then
