@@ -1,0 +1,41 @@
+From bcfc4c8d7dc70bd81367c183a68cc9ee02ab4744 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 28 May 2021 17:52:57 -0700
+Subject: [PATCH] track: Check for unw_set_caching_policy before using
+
+llvm libunwind does not implement unw_cache_* functions yet
+Include inttypes.h got PRI* macros
+
+Upstream-Status: Submitted [https://github.com/KDE/heaptrack/pull/33]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/track/trace_libunwind.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/track/trace_libunwind.cpp b/src/track/trace_libunwind.cpp
+index c76337c..96b2176 100644
+--- a/src/track/trace_libunwind.cpp
++++ b/src/track/trace_libunwind.cpp
+@@ -26,6 +26,7 @@
+ 
+ #define UNW_LOCAL_ONLY
+ #include <libunwind.h>
++#include <inttypes.h>
+ 
+ #include <stdio.h>
+ 
+@@ -60,9 +61,11 @@ void Trace::print()
+ void Trace::setup()
+ {
+     // configure libunwind for better speed
++#if UNW_CACHE_PER_THREAD
+     if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
+         fprintf(stderr, "WARNING: Failed to enable per-thread libunwind caching.\n");
+     }
++#endif
+ #if LIBUNWIND_HAS_UNW_SET_CACHE_SIZE
+     if (unw_set_cache_size(unw_local_addr_space, 1024, 0)) {
+         fprintf(stderr, "WARNING: Failed to set libunwind cache size.\n");
+-- 
+2.31.1
+

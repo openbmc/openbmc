@@ -20,6 +20,8 @@ RDEPENDS_${PN} += "\
 "
 
 RDEPENDS_${PN}-ptest += " \
+    ${PYTHON_PN}-json \
+    ${PYTHON_PN}-pytest \
     ${PYTHON_PN}-pytz \
 "
 

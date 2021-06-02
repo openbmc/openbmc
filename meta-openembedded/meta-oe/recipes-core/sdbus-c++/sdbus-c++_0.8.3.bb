@@ -17,7 +17,13 @@ PACKAGECONFIG[with-tests] = "-DBUILD_TESTS=ON -DTESTS_INSTALL_PATH=${libdir}/${B
 DEPENDS += "expat"
 
 SRCREV = "6e8e5aadb674cccea5bdd55141db5dad887fbacd"
-SRC_URI = "git://github.com/Kistler-Group/sdbus-cpp.git;protocol=https;branch=master"
+SRCREV_gtest = "a3460d1aeeaa43fdf137a6adefef10ba0b59fe4b"
+SRCREV_FORMAT = "default_gtest"
+
+SRC_URI = "git://github.com/Kistler-Group/sdbus-cpp.git;protocol=https;branch=master \
+           git://github.com/google/googletest.git;protocol=https;branch=master;name=gtest;destsuffix=git/tests/googletest-src \
+           file://0001-Do-not-download-gtest-automatically.patch \
+"
 SRC_URI += "file://run-ptest"
 
 EXTRA_OECMAKE = "-DBUILD_CODE_GEN=ON \

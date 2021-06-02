@@ -1,0 +1,37 @@
+From 7233883c6bd4e80c0e91b29b5c76fe798023e9fe Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 11 Feb 2019 16:41:13 +0100
+Subject: [PATCH] Add a config variable for enabling/disabling introspection
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ clutter-gtk/meson.build | 2 +-
+ meson_options.txt       | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/clutter-gtk/meson.build b/clutter-gtk/meson.build
+index 5d6847d..5d934b6 100644
+--- a/clutter-gtk/meson.build
++++ b/clutter-gtk/meson.build
+@@ -49,7 +49,7 @@ clutter_gtk_dep = declare_dependency(link_with: clutter_gtk,
+                                      dependencies: [ mathlib_dep, clutter_dep, gtk_dep ],
+                                      include_directories: include_directories('.'))
+ 
+-if not meson.is_cross_build()
++if get_option('enable_gi')
+   gnome.generate_gir(clutter_gtk,
+                      sources: clutter_gtk_headers + clutter_gtk_sources,
+                      namespace: 'GtkClutter',
+diff --git a/meson_options.txt b/meson_options.txt
+index aaf59f1..b7e51c3 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -2,3 +2,7 @@ option('enable_docs',
+        type: 'boolean',
+        value: false,
+        description: 'Enable generating the API reference (depends on GTK-Doc)')
++option('enable_gi',
++       type: 'boolean',
++       value: false,
++       description: 'Enable gobject introspection')

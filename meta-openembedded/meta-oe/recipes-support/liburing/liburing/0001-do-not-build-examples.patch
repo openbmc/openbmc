@@ -1,4 +1,4 @@
-From 3ee2f1e231bde18a99f86da747a9b8feca3c179d Mon Sep 17 00:00:00 2001
+From 653c39b0b30b2a329db5041e558cfc97c03d6bfb Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 17 Feb 2021 19:18:16 -0800
 Subject: [PATCH] do not build examples
@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 948e004..8b63024 100644
+index 5d9c4dc..53e1615 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -11,7 +11,6 @@ default: all
@@ -23,8 +23,8 @@ index 948e004..8b63024 100644
  	@$(MAKE) -C test
 -	@$(MAKE) -C examples
  
- partcheck: all
- 	@echo "make partcheck => TODO add tests with out kernel support"
+ .PHONY: all install default clean test
+ .PHONY: FORCE cscope
 -- 
-2.30.1
+2.31.1
 

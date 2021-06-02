@@ -41,9 +41,9 @@ Subject: [PATCH] chrony: fix build failure for arma9
      SCMP_SYS(getpid),
 -    SCMP_SYS(getrlimit),
      SCMP_SYS(getuid),
+     SCMP_SYS(getuid32),
      SCMP_SYS(rt_sigaction),
-     SCMP_SYS(rt_sigreturn),
-@@ -519,7 +517,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
+@@ -520,7 +518,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
      /* Memory */
      SCMP_SYS(brk),
      SCMP_SYS(madvise),
@@ -51,7 +51,7 @@ Subject: [PATCH] chrony: fix build failure for arma9
      SCMP_SYS(mmap2),
      SCMP_SYS(mprotect),
      SCMP_SYS(mremap),
-@@ -573,8 +570,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
+@@ -580,8 +577,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
      SCMP_SYS(sendmsg),
      SCMP_SYS(sendto),
      SCMP_SYS(shutdown),
@@ -60,7 +60,7 @@ Subject: [PATCH] chrony: fix build failure for arma9
 
      /* General I/O */
      SCMP_SYS(_newselect),
-@@ -597,7 +592,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
+@@ -604,7 +599,6 @@ SYS_Linux_EnableSystemCallFilter(int lev
  #ifdef __NR_futex_time64
      SCMP_SYS(futex_time64),
  #endif
@@ -68,7 +68,7 @@ Subject: [PATCH] chrony: fix build failure for arma9
      SCMP_SYS(set_robust_list),
      SCMP_SYS(write),
 
-@@ -605,6 +599,15 @@ SYS_Linux_EnableSystemCallFilter(int lev
+@@ -612,6 +606,15 @@ SYS_Linux_EnableSystemCallFilter(int lev
      SCMP_SYS(getrandom),
      SCMP_SYS(sysinfo),
      SCMP_SYS(uname),
@@ -83,4 +83,4 @@ Subject: [PATCH] chrony: fix build failure for arma9
 +#endif
    };
 
-   const int socket_domains[] = {
+   const int denied_any[] = {

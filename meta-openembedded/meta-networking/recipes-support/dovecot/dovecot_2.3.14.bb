@@ -10,6 +10,7 @@ SRC_URI = "http://dovecot.org/releases/2.3/dovecot-${PV}.tar.gz \
            file://dovecot.service \
            file://dovecot.socket \
            file://0001-not-check-pandoc.patch \
+           file://0001-m4-Check-for-libunwind-instead-of-libunwind-generic.patch \
            "
 
 SRC_URI[md5sum] = "2f03532cec3280ae45a101a7a55ccef5"

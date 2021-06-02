@@ -106,6 +106,12 @@ PACKAGECONFIG ??= "gapi python3 eigen jpeg png tiff v4l libv4l gstreamer samples
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "gtk", "", d)} \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "libav", "", d)}"
 
+# TBB does not build for powerpc so disable that package config
+PACKAGECONFIG_remove_powerpc = "tbb"
+# tbb now needs getcontect/setcontext which is not there for all arches on musl
+PACKAGECONFIG_remove_libc-musl_riscv64 = "tbb"
+PACKAGECONFIG_remove_libc-musl_riscv32 = "tbb"
+
 PACKAGECONFIG[gapi] = "-DWITH_ADE=ON -Dade_DIR=${STAGING_LIBDIR},-DWITH_ADE=OFF,ade"
 PACKAGECONFIG[amdblas] = "-DWITH_OPENCLAMDBLAS=ON,-DWITH_OPENCLAMDBLAS=OFF,libclamdblas,"
 PACKAGECONFIG[amdfft] = "-DWITH_OPENCLAMDFFT=ON,-DWITH_OPENCLAMDFFT=OFF,libclamdfft,"
@@ -224,5 +230,3 @@ do_install_append() {
             -i ${D}${libdir}/cmake/opencv4/OpenCVModules.cmake
     fi
 }
-
-TOOLCHAIN = "gcc"

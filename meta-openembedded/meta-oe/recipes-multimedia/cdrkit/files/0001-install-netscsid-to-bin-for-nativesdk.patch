@@ -1,0 +1,28 @@
+From 6b698b7c1045d279fe24818d45c67d9884d5fd81 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 7 May 2021 15:10:04 +0800
+Subject: [PATCH] install netscsid to bin for nativesdk
+
+For Yocto, the nativesdk does not have sbin dir, use bin to relpace
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ netscsid/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/netscsid/CMakeLists.txt b/netscsid/CMakeLists.txt
+index f6bddf1..cf23312 100644
+--- a/netscsid/CMakeLists.txt
++++ b/netscsid/CMakeLists.txt
+@@ -9,5 +9,5 @@ ADD_EXECUTABLE (netscsid netscsid.c)
+ #SET_SOURCE_FILES_PROPERTIES(netscsid.c )
+ TARGET_LINK_LIBRARIES(netscsid ${EXTRA_LIBS} )
+ #SET_TARGET_PROPERTIES(netscsid PROPERTIES  SKIP_BUILD_RPATH TRUE)
+-INSTALL(TARGETS netscsid DESTINATION sbin)
++INSTALL(TARGETS netscsid DESTINATION bin)
+ 
+-- 
+2.27.0
+

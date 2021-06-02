@@ -74,6 +74,7 @@ RDEPENDS_packagegroup-meta-oe-benchmarks = "\
     memtester \
     nbench-byte \
     phoronix-test-suite \
+    qperf \
     s-suite \
     stressapptest \
     sysbench \
@@ -300,6 +301,7 @@ RDEPENDS_packagegroup-meta-oe-devtools ="\
     xmlrpc-c \
     yasm \
     json-schema-validator \
+    poke \
 "
 RDEPENDS_packagegroup-meta-oe-devtools_append_x86 = " cpuid msr-tools pmtools"
 RDEPENDS_packagegroup-meta-oe-devtools_append_x86-64 = " cpuid msr-tools pcimem pmtools"
@@ -481,6 +483,7 @@ RDEPENDS_packagegroup-meta-oe-graphics ="\
     libforms \
     lxdm \
     numlockx \
+    nyancat \
     obconf \
     openbox \
     packagegroup-fonts-truetype \
@@ -696,6 +699,7 @@ RDEPENDS_packagegroup-meta-oe-security ="\
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "passwdqc", "", d)} \
     softhsm \
     tomoyo-tools \
+    auditd \
 "
 
 RDEPENDS_packagegroup-meta-oe-shells ="\
@@ -727,6 +731,7 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     digitemp \
     dstat \
     espeak \
+    evemu-tools \
     exiv2 \
     libnice \
     c-periphery \

@@ -10,15 +10,16 @@ e.g. -latomic is needed on clang/x86 to provide for 64bit atomics
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  src/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/Makefile b/src/Makefile
-index 7f7c625..c71dd3b 100644
+index 5564351..83ccd76 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -75,7 +75,7 @@ endif
+@@ -91,7 +91,7 @@ endif
  
  FINAL_CFLAGS=$(STD) $(WARN) $(OPT) $(DEBUG) $(CFLAGS) $(REDIS_CFLAGS)
  FINAL_LDFLAGS=$(LDFLAGS) $(REDIS_LDFLAGS) $(DEBUG)
@@ -26,7 +27,4 @@ index 7f7c625..c71dd3b 100644
 +FINAL_LIBS+=-lm
  DEBUG=-g -ggdb
  
- # Linux ARM needs -latomic at linking time
--- 
-2.23.0
-
+ # Linux ARM32 needs -latomic at linking time

@@ -28,10 +28,8 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  arch/ppc64.c | 38 ++------------------------------------
  1 file changed, 2 insertions(+), 36 deletions(-)
 
-Index: git/arch/ppc64.c
-===================================================================
---- git.orig/arch/ppc64.c
-+++ git/arch/ppc64.c
+--- a/arch/ppc64.c
++++ b/arch/ppc64.c
 @@ -462,44 +462,6 @@ ppc64_vtop_level4(unsigned long vaddr)
  	return paddr;
  }

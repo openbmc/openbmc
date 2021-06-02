@@ -1,41 +1,28 @@
-From e97bb73851f5bbd94260da553a222526485cdfb1 Mon Sep 17 00:00:00 2001
+From 9de4f5fa81891e14e205fe61e1408f1218369e55 Mon Sep 17 00:00:00 2001
 From: Leon Anavi <leon.anavi@konsulko.com>
-Date: Fri, 15 Nov 2019 18:24:42 +0000
+Date: Tue, 18 May 2021 15:03:22 +0000
 Subject: [PATCH] config.mk: Fix compiler and linker
 
-Do not set explicitly compiler and linker.
+Fix LIBS
 
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
- config.mk | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ config.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/config.mk b/config.mk
-index df6e812..5deb991 100644
+index 2eb9fb0..032bf9f 100644
 --- a/config.mk
 +++ b/config.mk
-@@ -15,17 +15,17 @@ GTKINC = `pkg-config --cflags gtk+-3.0 webkit2gtk-4.0`
- GTKLIB = `pkg-config --libs gtk+-3.0 webkit2gtk-4.0`
+@@ -19,7 +19,7 @@ WEBEXTLIBS = `pkg-config --libs webkit2gtk-4.0 webkit2gtk-web-extension-4.0 gio-
  
  # includes and libs
--INCS = -I. -I/usr/include -I${X11INC} ${GTKINC}
--LIBS = -L/usr/lib -lc -L${X11LIB} -lX11 ${GTKLIB} -lgthread-2.0
-+INCS = ${GTKINC}
+ INCS = $(X11INC) $(GTKINC)
+-LIBS = $(X11LIB) $(GTKLIB) -lgthread-2.0
 +LIBS = -lc -lX11 ${GTKLIB} -lgthread-2.0
  
  # flags
- CPPFLAGS = -DVERSION=\"${VERSION}\" -DWEBEXTDIR=\"${LIBPREFIX}\" -D_DEFAULT_SOURCE
- CFLAGS = -std=c99 -pedantic -Wall -Os ${INCS} ${CPPFLAGS}
--LDFLAGS = -s ${LIBS}
-+LDFLAGS = ${LIBS}
- 
- # Solaris
- #CFLAGS = -fast ${INCS} -DVERSION=\"${VERSION}\"
- #LDFLAGS = ${LIBS}
- 
- # compiler and linker
--CC = cc
-+CC ?= cc
+ CPPFLAGS = -DVERSION=\"$(VERSION)\" -DGCR_API_SUBJECT_TO_CHANGE \
 -- 
-2.7.4
+2.17.1
 

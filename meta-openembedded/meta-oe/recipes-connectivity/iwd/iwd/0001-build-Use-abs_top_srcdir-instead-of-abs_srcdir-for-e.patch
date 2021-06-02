@@ -1,6 +1,6 @@
-From 0532cddcec9c3abff1f3bc22d2fa50df03d55d17 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Mon, 5 Apr 2021 14:11:40 -0700
+From b0b51d762f45ff9d320b96bd0acb89313148a446 Mon Sep 17 00:00:00 2001
+From: Zang Ruochen <zangrc.fnst@fujitsu.com>
+Date: Wed, 12 May 2021 14:28:24 +0900
 Subject: [PATCH] build: Use abs_top_srcdir instead of abs_srcdir for ell sources
 
 this makes it build when build dir is outside of sources dir
@@ -10,13 +10,12 @@ Upstream-Status: Submitted [https://lists.01.org/hyperkitty/list/iwd@lists.01.or
  Makefile.am | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/Makefile.am b/Makefile.am
+index 68035e4..e3f7990 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -625,9 +625,10 @@ unit/tls-settings.8021x: unit/cert-ca.pe
- BUILT_SOURCES = $(ell_built_sources) src/builtin.h
- 
- ell/shared: Makefile
-+	$(AM_V_at)$(MKDIR_P) ell
+@@ -628,7 +628,7 @@ ell/shared: Makefile
+ 	$(AM_V_at)$(MKDIR_P) ell
  	$(AM_V_GEN)for f in $(ell_shared) ; do \
  		if [ ! -f $$f ] ; then \
 -			$(LN_S) -t ell -f $(abs_srcdir)/../ell/$$f ; \
@@ -24,7 +23,7 @@ Upstream-Status: Submitted [https://lists.01.org/hyperkitty/list/iwd@lists.01.or
  		fi \
  	done > $@
  
-@@ -635,7 +636,7 @@ ell/internal: Makefile
+@@ -636,7 +636,7 @@ ell/internal: Makefile
  	$(AM_V_at)$(MKDIR_P) ell
  	$(AM_V_GEN)for f in $(ell_headers) $(ell_sources) ; do \
  		if [ ! -f $$f ] ; then \
@@ -33,3 +32,6 @@ Upstream-Status: Submitted [https://lists.01.org/hyperkitty/list/iwd@lists.01.or
  		fi \
  	done > $@
  
+-- 
+2.25.1
+

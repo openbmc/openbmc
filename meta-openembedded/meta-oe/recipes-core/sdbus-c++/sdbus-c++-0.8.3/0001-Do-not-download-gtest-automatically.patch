@@ -1,0 +1,44 @@
+From af91a20ee201f13e56f225df536a56e5d8d259e8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 27 May 2021 09:56:49 -0700
+Subject: [PATCH] Do not download gtest automatically
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/CMakeLists.txt                        | 9 +--------
+ tests/googletest-download/CMakeLists.txt.in | 3 ---
+ 2 files changed, 1 insertion(+), 11 deletions(-)
+
+--- a/tests/googletest-download/CMakeLists.txt.in
++++ b/tests/googletest-download/CMakeLists.txt.in
+@@ -7,10 +7,7 @@ project(googletest-download NONE)
+ include(ExternalProject)
+ 
+ ExternalProject_Add(googletest
+-    GIT_REPOSITORY    https://github.com/google/googletest.git
+-    GIT_TAG           master
+-    GIT_SHALLOW       1
+-    SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/googletest-src"
++    SOURCE_DIR        "${CMAKE_CURRENT_SOURCE_DIR}/googletest-src"
+     BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/googletest-build"
+     UPDATE_COMMAND    ""
+     CONFIGURE_COMMAND ""
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -6,9 +6,7 @@ include(FetchContent)
+ 
+ message("Fetching googletest...")
+ FetchContent_Declare(googletest
+-                     GIT_REPOSITORY https://github.com/google/googletest.git
+-                     GIT_TAG        master
+-                     GIT_SHALLOW    1
++                     SOURCE_DIR    ${CMAKE_CURRENT_SOURCE_DIR}/googletest-src
+                      UPDATE_COMMAND "")
+ 
+ #FetchContent_MakeAvailable(googletest) # Not available in CMake 3.13 :-( Let's do it manually:
+@@ -144,4 +142,4 @@ endif()
+ if(NOT CMAKE_CROSSCOMPILING)
+     add_test(NAME sdbus-c++-unit-tests COMMAND sdbus-c++-unit-tests)
+     add_test(NAME sdbus-c++-integration-tests COMMAND sdbus-c++-integration-tests)
+-endif() 
++endif()

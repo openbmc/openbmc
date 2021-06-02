@@ -10,12 +10,11 @@ LIC_FILES_CHKSUM = "\
 
 SRC_URI = " \
         git://linuxtv.org/libcamera.git;protocol=git \
-        file://0001-uvcvideo-Use-auto-variable-to-avoid-range-loop-warni.patch \
 "
 
-SRCREV = "f490a87fd339fc7443f5d8467ba56a35c750a5f7"
+SRCREV = "193ca8c353a42334f65ddfc988a105a47bca3547"
 
-PV = "202102+git${SRCPV}"
+PV = "202105+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
@@ -30,6 +29,10 @@ PACKAGECONFIG[gst] = "-Dgstreamer=enabled,-Dgstreamer=disabled,gstreamer1.0 gstr
 RDEPENDS_${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland qt', 'qtwayland', '', d)}"
 
 inherit meson pkgconfig python3native
+
+do_configure_prepend() {
+    sed -i -e 's|py_compile=True,||' ${S}/utils/ipc/mojo/public/tools/mojom/mojom/generate/template_expander.py
+}
 
 do_install_append() {
     chrpath -d ${D}${libdir}/libcamera.so

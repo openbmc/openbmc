@@ -10,11 +10,9 @@ Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
  configure.ac | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index c5e3ca03..4b89396a 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -140,7 +140,7 @@ AC_CHECK_FUNC([getloadavg],[AC_DEFINE([HAVE_GETLOADAVG2], 1, [getloadavg() is av
+@@ -160,7 +160,7 @@ AC_CHECK_FUNCS([backtrace_symbols_fd mem
  AC_FUNC_SELECT_ARGTYPES
  
  AC_MSG_CHECKING([for strlcpy])
@@ -23,7 +21,7 @@ index c5e3ca03..4b89396a 100644
                 char a[2];
                 if (strlcpy(a, "yes", 2) != 3)
                     return 1;]])],
-@@ -156,7 +156,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
+@@ -176,7 +176,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[#includ
                ])
  
  AC_MSG_CHECKING([for strlcat])
@@ -32,6 +30,25 @@ index c5e3ca03..4b89396a 100644
                 char a[4] = "no";
                 if (strlcat(a, "yes", 4) != 5)
                     return 1;]])],
--- 
-2.17.1
-
+@@ -191,21 +191,6 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[#includ
+                            [Define to 1 if you have the strlcat function.])
+               ])
+ 
+-AC_MSG_CHECKING([for C++11 by default])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <regex>]],[[
+-               if (__cplusplus < 201103L) return 1;]])],
+-              [AC_MSG_RESULT([yes])],
+-              [AC_MSG_RESULT([no])
+-               AC_MSG_CHECKING([for C++11 when forced])
+-               CXXFLAGS="$CXXFLAGS -std=c++11"
+-               AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <regex>]],[[
+-                              if (__cplusplus < 201103L) return 1;]])],
+-                             [AC_MSG_RESULT([yes])],
+-                             [AC_MSG_RESULT([no])
+-                              AC_MSG_ERROR([Need C++11. Please set CXXFLAGS.])
+-                             ])
+-              ])
+-
+ PKG_CHECK_MODULES([CORE],[fontconfig xrender xcomposite xdamage xfixes xext x11])
+ AC_SUBST([CORE_CFLAGS])
+ AC_SUBST([CORE_LIBS])

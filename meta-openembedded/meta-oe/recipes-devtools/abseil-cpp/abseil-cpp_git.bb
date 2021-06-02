@@ -7,13 +7,14 @@ SECTION = "libs"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=df52c6edb7adc22e533b2bacc3bd3915"
 
-PV = "20200923+git${SRCPV}"
-SRCREV = "6f9d96a1f41439ac172ee2ef7ccd8edf0e5d068c"
-BRANCH = "lts_2020_09_23"
+PV = "20210324+git${SRCPV}"
+SRCREV = "e1d388e7e74803050423d035e4374131b9b57919"
+BRANCH = "lts_2021_03_24"
 SRC_URI = "git://github.com/abseil/abseil-cpp;branch=${BRANCH}         \
            file://0001-absl-always-use-asm-sgidefs.h.patch             \
            file://0002-Remove-maes-option-from-cross-compilation.patch \
            file://abseil-ppc-fixes.patch \
+           file://0001-Export-of-internal-Abseil-changes.patch \
           "
 
 S = "${WORKDIR}/git"
@@ -30,5 +31,4 @@ EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON \
 
 BBCLASSEXTEND = "native nativesdk"
 
-FILES_${PN} = "${libdir}/libabsl_*.so"
-FILES_${PN}-dev = "${includedir} ${libdir}/cmake"
+FILES_${PN}-dev += "${includedir} ${libdir}/cmake ${libdir}/pkgconfig"

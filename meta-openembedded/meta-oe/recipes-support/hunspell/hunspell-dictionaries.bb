@@ -141,7 +141,7 @@ S = "${WORKDIR}/git"
 
 do_install() {
     for LANGUAGE in `ls -d1 ${S}/dictionaries/*` ; do
-        LANGUAGE_DIR=`basename $LANGUAGE`
+        LANGUAGE_DIR=`basename $LANGUAGE | sed 's:-:_:'`
         install -D -m0644 $LANGUAGE/index.dic ${D}${datadir}/hunspell/$LANGUAGE_DIR.dic
         install -D -m0644 $LANGUAGE/index.aff ${D}${datadir}/hunspell/$LANGUAGE_DIR.aff
         install -D -m0644 $LANGUAGE/LICENSE   ${D}${datadir}/hunspell/LICENSE-$LANGUAGE_DIR 2>/dev/null || echo "No LICENSE for language $LANGUAGE"

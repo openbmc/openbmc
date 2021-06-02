@@ -11,9 +11,8 @@ SRC_URI = " \
     file://0002-always-build-fluid-and-export-pointers.patch \
 "
 
-PV = "1.3.5"
-SRC_URI[md5sum] = "0de2b45a1896be2b4a8cafae89b84248"
-SRC_URI[sha256sum] = "2933c72400f9e7c0f4c3a81a1ce98bc9582b2a3edc44b8597ccd26e240e32c3c"
+PV = "1.3.6"
+SRC_URI[sha256sum] = "20d2627c97b4485ee3eab5522303985bc22b798a878ba80239e6d43dcfed067e"
 
 inherit cmake pkgconfig
 

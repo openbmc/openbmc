@@ -1,0 +1,30 @@
+From 6c0ff65f782ad38130b18e4ecb1538d9a8633684 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 29 May 2021 14:32:17 -0700
+Subject: [PATCH] m4: Check for libunwind instead of libunwind-generic
+
+libunwind-generic is specific to nongnu libunwind, when using llvm
+libunwind this fails, so poking for libunwind make it generic
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ m4/want_unwind.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/m4/want_unwind.m4 b/m4/want_unwind.m4
+index cadb62b..5517314 100644
+--- a/m4/want_unwind.m4
++++ b/m4/want_unwind.m4
+@@ -2,7 +2,7 @@ AC_DEFUN([DOVECOT_WANT_UNWIND], [
+   have_libunwind=no
+   AS_IF([test "$want_libunwind" != "no"], [
+     PKG_CHECK_EXISTS([libunwind], [
+-      PKG_CHECK_MODULES([LIBUNWIND], [libunwind-generic],[
++      PKG_CHECK_MODULES([LIBUNWIND], [libunwind],[
+         have_libunwind=yes
+ 	AC_DEFINE([HAVE_LIBUNWIND],,[Define this if you have libunwind])
+       ])
+-- 
+2.31.1
+

@@ -12,4 +12,4 @@
 +#elif defined(__mips__) && defined(__LP64__)
  #define OPENSSL_64_BIT
  #define OPENSSL_MIPS64
- #elif defined(__riscv)
+ #elif defined(__riscv) && __SIZEOF_POINTER__ == 8

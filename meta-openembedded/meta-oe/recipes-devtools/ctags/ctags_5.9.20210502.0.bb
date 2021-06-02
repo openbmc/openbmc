@@ -14,12 +14,21 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
 inherit autotools-brokensep pkgconfig manpages
 
-DEPENDS += "libxml2 jansson libyaml python3-docutils-native"
 SRCREV = "6df08b82d4845d1b9420d9268f24d5db16ee4480"
 SRC_URI = "git://github.com/universal-ctags/ctags"
 
 S = "${WORKDIR}/git"
 
-#do_install() {
-#    install -Dm 755 ${B}/ctags ${D}${bindir}/ctags
-#}
+PACKAGECONFIG ??= " \
+    readcmd \
+    xml \
+    json \
+    yaml \
+"
+PACKAGECONFIG[readcmd] = "--enable-readcmd,--disable-readcmd"
+PACKAGECONFIG[etags] = "--enable-etags,--disable-etags"
+PACKAGECONFIG[xml] = "--enable-xml,--disable-xml,libxml2"
+PACKAGECONFIG[json] = "--enable-json,--disable-json,jansson"
+PACKAGECONFIG[seccomp] = "--enable-seccomp,--disable-seccomp,libseccomp"
+PACKAGECONFIG[yaml] = "--enable-yaml,--disable-yaml,libyaml"
+PACKAGECONFIG[manpages] = ",,python3-docutils-native"

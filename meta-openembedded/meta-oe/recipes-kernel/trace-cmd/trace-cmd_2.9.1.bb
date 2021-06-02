@@ -12,6 +12,8 @@ S = "${WORKDIR}/git"
 
 do_install() {
        oe_runmake etcdir=${sysconfdir} DESTDIR=${D} install
+       mkdir -p ${D}${libdir}/traceevent/plugins/${BPN}
+       mv ${D}/${libdir}/traceevent/plugins/*.so ${D}${libdir}/traceevent/plugins/${BPN}/
 }
 
 FILES_${PN} += "${libdir}/traceevent/plugins"

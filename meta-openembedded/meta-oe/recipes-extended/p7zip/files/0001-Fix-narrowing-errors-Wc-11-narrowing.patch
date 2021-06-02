@@ -1,4 +1,4 @@
-From b6b1782af4aa7f9084d32e4144738dc2535c8d6f Mon Sep 17 00:00:00 2001
+From 653674e11872465dd5edf1c1e8413ea813d7e086 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 23 Apr 2018 23:07:21 -0700
 Subject: [PATCH] Fix narrowing errors -Wc++11-narrowing
@@ -17,6 +17,7 @@ also reported here https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=224930
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  CPP/Windows/ErrorMsg.cpp | 14 +++++++-------
  1 file changed, 7 insertions(+), 7 deletions(-)

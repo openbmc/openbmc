@@ -12,6 +12,9 @@ SRC_URI = "${DEBIAN_MIRROR}/main/c/${BPN}/${BPN}_${PV}.orig.tar.gz \
            file://0002-Do-not-use-rcmd-on-build-with-musl.patch \
            file://0001-genisoimage-Add-missing-extern-definition.patch \
            "
+SRC_URI_append_class-nativesdk = " \
+           file://0001-install-netscsid-to-bin-for-nativesdk.patch \
+"
 SRC_URI[md5sum] = "efe08e2f3ca478486037b053acd512e9"
 SRC_URI[sha256sum] = "d1c030756ecc182defee9fe885638c1785d35a2c2a297b4604c0e0dcc78e47da"
 
@@ -51,7 +54,7 @@ FILES_wodim = " \
 "
 
 do_install_append() {
-    ln -sf ${bindir}/genisoimage ${D}${bindir}/mkisofs
+    ln -sf --relative ${D}${bindir}/genisoimage ${D}${bindir}/mkisofs
 }
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

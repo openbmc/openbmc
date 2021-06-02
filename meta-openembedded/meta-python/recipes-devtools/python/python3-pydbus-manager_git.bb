@@ -11,3 +11,5 @@ SRCREV = "6b576b969cbda50521dca62a7df929167207f9fc"
 PV = "git${SRCPV}"
 
 S = "${WORKDIR}/git"
+
+RDEPENDS_${PN} += "python3-pydbus"

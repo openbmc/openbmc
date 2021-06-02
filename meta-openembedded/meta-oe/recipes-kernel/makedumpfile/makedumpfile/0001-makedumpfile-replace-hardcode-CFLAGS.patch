@@ -17,10 +17,8 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  Makefile | 45 +++++++++++++++++++++++----------------------
  1 file changed, 23 insertions(+), 22 deletions(-)
 
-Index: git/Makefile
-===================================================================
---- git.orig/Makefile
-+++ git/Makefile
+--- a/Makefile
++++ b/Makefile
 @@ -8,12 +8,6 @@ ifeq ($(strip $CC),)
  CC	= gcc
  endif
@@ -79,7 +77,7 @@ Index: git/Makefile
 +              -DRELEASE_DATE='"$(DATE)"'
 +
  SRC_BASE = makedumpfile.c makedumpfile.h diskdump_mod.h sadump_mod.h sadump_info.h
- SRC_PART = print_info.c dwarf_info.c elf_info.c erase_info.c sadump_info.c cache.c tools.c
+ SRC_PART = print_info.c dwarf_info.c elf_info.c erase_info.c sadump_info.c cache.c tools.c printk.c
  OBJ_PART=$(patsubst %.c,%.o,$(SRC_PART))
 @@ -52,12 +53,12 @@ OBJ_ARCH=$(patsubst %.c,%.o,$(SRC_ARCH))
  
@@ -104,7 +102,7 @@ Index: git/Makefile
 +CFLAGS_COMMON += -DUSESNAPPY
  endif
  
- LIBS := -lpthread $(LIBS)
+ LIBS := $(LIBS) -lpthread
 @@ -90,14 +91,14 @@ LIBS := $(LIBS) $(call try-run,\
  all: makedumpfile
  

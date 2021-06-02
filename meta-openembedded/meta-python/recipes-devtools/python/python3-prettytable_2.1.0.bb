@@ -31,7 +31,8 @@ RDEPENDS_${PN} += " \
 "
 
 RDEPENDS_${PN}-ptest += " \
-	${PYTHON_PN}-pytest \
+    ${PYTHON_PN}-pytest \
+    ${PYTHON_PN}-sqlite3 \
 "
 
 do_install_ptest() {

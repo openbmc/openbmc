@@ -1,18 +1,17 @@
 SUMMARY = "Snowball compiler and stemming algorithms"
 HOMEPAGE = "https://snowballstem.org/"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://COPYING;md5=2750797da77c1d784e7626b3f7d7ff3e"
+LIC_FILES_CHKSUM = "file://COPYING;md5=19139aaf3c8c8fa1ca6edd59c072fb9f"
 
 DEPENDS_class-target = "${BPN}-native"
 
 SRC_URI = "\
     git://github.com/snowballstem/snowball.git \
     file://0001-Build-so-lib.patch \
-    file://0002-snowball-stemwords-do-link-with-LDFLAGS-set-by-build.patch \
 "
-SRCREV = "c70ed64f9d41c1032fba4e962b054f8e9d489a74"
+SRCREV = "4764395431c8f2a0b4fe18b816ab1fc966a45837"
 S = "${WORKDIR}/git"
-PV = "2.0.0"
+PV = "2.1.0"
 LIBVER = "0.0.0"
 
 inherit lib_package

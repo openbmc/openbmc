@@ -38,6 +38,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-astroid \
     python3-asttokens \
     python3-async-timeout \
+    python3-asyncio-glib \
     python3-attr \
     python3-autobahn \
     python3-automat \
@@ -215,7 +216,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-lxml \
     python3-lz4 \
     python3-m2crypto \
-    python3-markdown \
     python3-markupsafe \
     python3-matplotlib \
     python3-mccabe \
@@ -290,6 +290,7 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-pybind11-json \
     python3-pybluez \
     python3-pychromecast \
+    python3-pycocotools \
     python3-pycodestyle \
     python3-pyconnman \
     python3-pycparser \
@@ -366,7 +367,6 @@ RDEPENDS_packagegroup-meta-python3 = "\
     python3-robotframework-seriallibrary \
     python3-rsa \
     python3-ruamel-yaml \
-    python3-scapy \
     python3-scrypt \
     python3-sdnotify \
     python3-semver \

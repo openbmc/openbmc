@@ -12,9 +12,10 @@ DEPENDS += "gperf-native gettext-native util-linux libcap"
 
 SRCREV = "efb536d0cbe2e58f80e501d19999928c75e08f6a"
 SRCBRANCH = "v243-stable"
-SRC_URI = "git://github.com/systemd/systemd-stable.git;protocol=git;branch=${SRCBRANCH}"
-
-SRC_URI += "file://static-libsystemd-pkgconfig.patch"
+SRC_URI = "git://github.com/systemd/systemd-stable.git;protocol=git;branch=${SRCBRANCH} \
+           file://static-libsystemd-pkgconfig.patch \
+           file://7c5fd25119a495009ea62f79e5daec34cc464628.patch \
+           "
 
 # patches needed by musl
 SRC_URI_append_libc-musl = " ${SRC_URI_MUSL}"

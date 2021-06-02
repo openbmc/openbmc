@@ -89,11 +89,11 @@ index a5e2328..dec509a 100644
 +}
 +
 diff --git a/lib/colord/cd-icc.c b/lib/colord/cd-icc.c
-index f231814..2c8fe77 100644
+index 8beec43..398ff7a 100644
 --- a/lib/colord/cd-icc.c
 +++ b/lib/colord/cd-icc.c
-@@ -3094,68 +3094,6 @@ out:
- 	return ret;
+@@ -3114,68 +3114,6 @@ cd_icc_create_default (CdIcc *icc, GError **error)
+ 	return cd_icc_create_default_full (icc, CD_ICC_LOAD_FLAGS_NONE, error);
  }
  
 -/**

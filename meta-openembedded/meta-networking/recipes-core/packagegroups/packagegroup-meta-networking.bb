@@ -100,6 +100,7 @@ RDEPENDS_packagegroup-meta-networking-daemons_remove_libc-musl = "opensaf"
 
 RDEPENDS_packagegroup-meta-networking-devtools = "\
     python3-ldap \
+    python3-scapy \
 "
 
 RDEPENDS_packagegroup-meta-networking-extended = "\
@@ -192,6 +193,7 @@ RDEPENDS_packagegroup-meta-networking-support = "\
     geoipupdate \
     fwknop \
     htpdate \
+    http-parser \
     iftop \
     ifmetric \
     ipvsadm \

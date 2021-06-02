@@ -33,31 +33,12 @@ DISTUTILS_INSTALL_ARGS += "build_ext --openssl=${STAGING_EXECPREFIXDIR}"
 
 SWIG_FEATURES_x86 = "-D__i386__"
 SWIG_FEATURES_x32 = "-D__ILP32__"
-SWIG_FEATURES ?= "-D__${HOST_ARCH}__"
+
+SWIG_FEATURES ?= "-D__${HOST_ARCH}__ ${@['-D__ILP32__','-D__LP64__'][d.getVar('SITEINFO_BITS') != '32']}"
+
+SWIG_FEATURES_append_riscv64 = " -D__SIZEOF_POINTER__=${SITEINFO_BITS}/8 -D__riscv_xlen=${SITEINFO_BITS}"
+SWIG_FEATURES_append_riscv32 = " -D__SIZEOF_POINTER__=${SITEINFO_BITS}/8 -D__riscv_xlen=${SITEINFO_BITS}"
+SWIG_FEATURES_append_mipsarch = " -D_MIPS_SZPTR=${SITEINFO_BITS}"
 export SWIG_FEATURES
-
-# Get around a problem with swig, but only if the
-# multilib header file exists.
-#
-do_configure_prepend() {
-    ${CPP} -dM - < /dev/null | grep -v '__\(STDC\|REGISTER_PREFIX\|GNUC\|STDC_HOSTED\)__' \
-    | sed 's/^\(#define \([^ ]*\) .*\)$/#undef \2\n\1/' > ${S}/SWIG/gcc_macros.h
-
-    if [ "${SITEINFO_BITS}" = "64" ];then
-        bit="64"
-    else
-        bit="32"
-    fi
-
-    if [ -e ${STAGING_INCDIR}/openssl/opensslconf-${bit}.h ] ;then
-        for i in SWIG/_ec.i SWIG/_evp.i; do
-            sed -i -e "s/opensslconf.*\./opensslconf-${bit}\./" "${S}/$i"
-        done
-    elif [ -e ${STAGING_INCDIR}/openssl/opensslconf-n${bit}.h ] ;then
-        for i in SWIG/_ec.i SWIG/_evp.i; do
-            sed -i -e "s/opensslconf.*\./opensslconf-n${bit}\./" "${S}/$i"
-        done
-    fi
-}
 
 BBCLASSEXTEND = "native"

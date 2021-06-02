@@ -23,7 +23,7 @@ diff --git a/GNUmakefile b/GNUmakefile
 index cbd6ff7..a85230b 100644
 --- a/GNUmakefile
 +++ b/GNUmakefile
-@@ -142,10 +142,10 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
+@@ -162,10 +162,10 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.o)
  JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
  JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
  
@@ -36,7 +36,7 @@ index cbd6ff7..a85230b 100644
  
  clean:
  	rm -f $(COMPILER_OBJECTS) $(RUNTIME_OBJECTS) \
-@@ -192,6 +192,9 @@ libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
+@@ -212,6 +212,9 @@ libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
  libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
  	$(AR) -cru $@ $^
  
@@ -44,7 +44,7 @@ index cbd6ff7..a85230b 100644
 +	$(CC) $(CFLAGS) -shared $(LDFLAGS) -Wl,-soname,libstemmer.so.0,-version-script,libstemmer/symbol.map -o $@.0.0.0 $^
 +
  stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
- 	$(CC) $(CFLAGS) -o $@ $^
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
  
 diff --git a/libstemmer/symbol.map b/libstemmer/symbol.map
 new file mode 100644

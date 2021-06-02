@@ -1,0 +1,4 @@
+#!/bin/sh
+UTscapy3 -t regression.uts -f text -l -C \
+    -o @PTEST_PATH@/scapy_ptest_$(date +%Y%m%d-%H%M%S).log \
+    2>&1 | sed -e 's/^passed None/PASS:/' -e 's/^failed None/FAIL:/'

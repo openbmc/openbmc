@@ -4,7 +4,7 @@ JUCE supported platforms, including Linux and Embedded Linux."
 SECTION = "utils"
 HOMEPAGE = "http://juce.com/"
 LICENSE = "GPLv3"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=a20f91622a47d4e4af9340d5d3f1a2d8"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=12e9c2db7897c0349a4cc1c6d2a8c5d5"
 
 inherit pkgconfig features_check
 
@@ -13,14 +13,13 @@ REQUIRED_DISTRO_FEATURES = "x11"
 DEPENDS = "libx11 libxext libxinerama libxrandr libxcursor freetype alsa-lib curl bzip2 libpng harfbuzz glib-2.0 libpcre"
 DEPENDS_append_libc-musl = " libexecinfo"
 
-SRCREV = "724ae27c71ef809b836df06713cf9e50bc14162b"
+SRCREV = "90e8da0cfb54ac593cdbed74c3d0c9b09bad3a9f"
 BRANCH = "master"
 SRC_URI = "git://github.com/WeAreROLI/JUCE.git;protocol=https;branch=${BRANCH} \
-           file://0001-Disable-webkit-component.patch \
 "
 
 S = "${WORKDIR}/git"
-PV = "5.4.5"
+PV = "6.0.8"
 
 JUCE_PROJUCER_BUILD_PATH = "${B}/extras/Projucer/Builds"
 JUCE_PROJUCER_MAKEFILE_PATH = "${JUCE_PROJUCER_BUILD_PATH}/LinuxMakefile"
