@@ -2,7 +2,6 @@ FILESEXTRAPATHS_prepend_gbs := "${THISDIR}/${PN}:"
 SRC_URI_append_gbs = " file://config.json.in \
                        file://fan-table-init.sh \
                        file://phosphor-pid-control.service \
-                       file://0001-Advertise-failSafePercent-on-dbus.patch \
                      "
 
 FILES_${PN}_append_gbs = " ${datadir}/swampd/config.json.in"
