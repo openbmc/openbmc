@@ -4,4 +4,4 @@ Description=Phosphor %I watchdog
 [Service]
 Restart=no
 EnvironmentFile={envfiledir}/obmc/watchdog/%I
-ExecStart=/usr/bin/phosphor-watchdog --continue --service=${{SERVICE}} --path=${{DEVPATH}} --target=${{TARGET}} --min_interval=${{TIMEOUT_IN_MSEC}}
+ExecStart=/usr/bin/phosphor-watchdog --continue --service=${{SERVICE}} --path=${{DEVPATH}} --target=${{TARGET}} --default_interval=${{TIMEOUT_IN_MSEC}}
