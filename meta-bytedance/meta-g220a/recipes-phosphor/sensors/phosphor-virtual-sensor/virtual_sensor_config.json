@@ -5,6 +5,14 @@
             "Name": "total_power",
             "SensorType": "power"
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -35,6 +43,14 @@
             "Name": "P0_DIMM_VR_Pwr",
             "SensorType": "power"
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -65,6 +81,14 @@
             "Name": "P1_DIMM_VR_Pwr",
             "SensorType": "power"
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -95,6 +119,14 @@
             "Name": "CPU0_VR_Pwr",
             "SensorType": "power"
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -133,6 +165,14 @@
             "Name": "CPU1_VR_Pwr",
             "SensorType": "power"
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -176,6 +216,14 @@
 			"CriticalHigh": 125,
 			"WarningHigh": 105
 		},
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -211,6 +259,14 @@
 			"CriticalHigh": 125,
 			"WarningHigh": 105
 		},
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -246,6 +302,14 @@
 			"CriticalHigh": 125,
 			"WarningHigh": 105
 		},
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -289,6 +353,14 @@
 			"CriticalHigh": 125,
 			"WarningHigh": 105
 		},
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
