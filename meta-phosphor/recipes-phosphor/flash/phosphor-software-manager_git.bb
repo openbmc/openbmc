@@ -84,6 +84,8 @@ SYSTEMD_SERVICE_${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_b
 
 S = "${WORKDIR}/git"
 
+EXTRA_OEMESON = "-Dtests=disabled"
+
 do_install_append() {
     install -d ${D}/usr/local
 }
