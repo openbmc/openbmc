@@ -57,6 +57,8 @@ DEPENDS += "cli11"
 
 RDEPENDS_${PN}-chassis += "bash"
 
+EXTRA_OEMESON += "-Dtests=disabled"
+
 FILES_${PN}-host = "${bindir}/phosphor-host-state-manager"
 DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
 DBUS_SERVICE_${PN}-host += "phosphor-reboot-host@.service"
