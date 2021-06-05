@@ -30,6 +30,8 @@ HOSTIPMI_PROVIDER_LIBRARY += "libsyscmds.so"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "gbmc-psu-hardreset.target"
 
+EXTRA_OECONF += "--disable-tests"
+
 CXXFLAGS_append_gbmc = '${@"" if not d.getVar("GBMC_NCSI_IF_NAME") else \
   " -DNCSI_IPMI_CHANNEL=1 -DNCSI_IF_NAME=" + d.getVar("GBMC_NCSI_IF_NAME")}'
 
