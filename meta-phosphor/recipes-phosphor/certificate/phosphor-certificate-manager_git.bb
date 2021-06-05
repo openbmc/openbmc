@@ -26,6 +26,8 @@ DEPENDS = " \
 
 S = "${WORKDIR}/git"
 
+EXTRA_OECONF += "--disable-tests"
+
 CERT_TMPL = "phosphor-certificate-manager@.service"
 SYSTEMD_SERVICE_${PN} = "${CERT_TMPL}"
 
