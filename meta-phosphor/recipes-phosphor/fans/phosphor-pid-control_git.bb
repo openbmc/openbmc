@@ -38,6 +38,7 @@ SYSTEMD_SERVICE_${PN} = "${SERVICE_FILE}"
 
 EXTRA_OECONF = " \
   SYSTEMD_TARGET="multi-user.target" \
+  --disable-tests \
        "
 
 FILES_${PN} = "${bindir}/swampd ${bindir}/setsensor"
