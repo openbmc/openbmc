@@ -21,6 +21,8 @@ BLOBIPMI_PROVIDER_LIBRARY += "libmetricsblob.so"
 
 INSANE_SKIP_${PN} += "dev-so"
 
+EXTRA_OEMESON += "-Dtests=disabled"
+
 do_install_append() {
   install -d ${D}/${libdir}/blob-ipmid
   ln -s ../ipmid-providers/libmetricsblob.so ${D}/${libdir}/blob-ipmid/libmetricsblob.so.0
