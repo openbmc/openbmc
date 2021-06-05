@@ -30,6 +30,8 @@ SRCREV = "2b7789c0180e9678909407df2c195dd3191dfc68"
 
 S = "${WORKDIR}/git"
 
+EXTRA_OECONF += "--disable-tests"
+
 python populate_packages_prepend () {
     mapperlibdir = d.getVar("libdir", True)
     do_split_packages(d, mapperlibdir, '^lib(.*)\.so\.*', 'lib%s', 'Phosphor mapper %s library', extra_depends='', allow_links=True)
