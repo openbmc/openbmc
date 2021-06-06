@@ -11,6 +11,7 @@ S = "${WORKDIR}"
 
 SRC_URI = " \
           file://ampere-host-force-reset@.service \
+          file://ampere-host-on-host-check@.service \
           "
 
 SYSTEMD_PACKAGES = "${PN}"
@@ -24,4 +25,11 @@ HOST_WARM_REBOOT_FORCE_INSTMPL = "ampere-host-force-reset@{0}.service"
 HOST_WARM_REBOOT_FORCE_TGTFMT = "obmc-host-force-warm-reboot@{0}.target"
 HOST_WARM_REBOOT_FORCE_TARGET_FMT = "../${HOST_WARM_REBOOT_FORCE_TGT}:${HOST_WARM_REBOOT_FORCE_TGTFMT}.requires/${HOST_WARM_REBOOT_FORCE_INSTMPL}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_WARM_REBOOT_FORCE_TARGET_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_SERVICE_${PN} += "${HOST_WARM_REBOOT_FORCE_TGT}"
 
+HOST_ON_RESET_HOSTTMPL = "ampere-host-on-host-check@.service"
+HOST_ON_RESET_HOSTINSTMPL = "ampere-host-on-host-check@{0}.service"
+HOST_ON_RESET_HOSTTGTFMT = "obmc-host-startmin@{0}.target"
+HOST_ON_RESET_HOSTFMT = "../${HOST_ON_RESET_HOSTTMPL}:${HOST_ON_RESET_HOSTTGTFMT}.requires/${HOST_ON_RESET_HOSTINSTMPL}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_ON_RESET_HOSTFMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_SERVICE_${PN} += "${HOST_ON_RESET_HOSTTMPL}"
