@@ -24,7 +24,7 @@ sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath d
 
 ```
 sudo dnf install -y git patch diffstat texinfo chrpath SDL-devel bitbake \
-    rpcgen perl-Thread-Queue perl-bignum perl-Crypt-OpenSSL-Bignum
+    rpcgen perl-Thread-Queue perl-bignum perl-Crypt-OpenSSL-Bignum perl-FindBin
 sudo dnf groupinstall "C Development Tools and Libraries"
 ```
 ### 2) Download the source
