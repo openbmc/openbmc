@@ -52,3 +52,13 @@ SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'STATES')}"
 SYSTEMD_OVERRIDE_${PN} += "bmc_booted.conf:obmc-led-group-start@bmc_booted.service.d/bmc_booted.conf"
 
 EXTRA_OEMESON += "-Dtests=disabled"
+
+do_compile_prepend() {
+    if [ -f "${LED_YAML_PATH}/led.yaml" ]; then
+        cp "${LED_YAML_PATH}/led.yaml" "${S}/led.yaml"
+    elif [ -f "${STAGING_DATADIR_NATIVE}/${PN}/led.yaml" ]; then
+        cp "${STAGING_DATADIR_NATIVE}/${PN}/led.yaml" "${S}/led.yaml"
+    elif [ -f "${WORKDIR}/led.yaml" ]; then
+        cp "${WORKDIR}/led.yaml" "${S}/led.yaml"
+    fi
+}
