@@ -1,4 +1,4 @@
-EXTRA_OEMESON_witherspoon += "-Dwarm-reboot=disabled"
+EXTRA_OEMESON_append_witherspoon = " -Dwarm-reboot=disabled"
 
 # The scheduled-host-transition package provides support to
 # schedule power on and off operations for the host at some
