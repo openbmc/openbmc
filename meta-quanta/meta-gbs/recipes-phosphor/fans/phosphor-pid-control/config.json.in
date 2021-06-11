@@ -73,8 +73,8 @@
         },
         {
             "name": "cputemp",
-            "type": "margin",
-            "readPath": "/xyz/openbmc_project/extsensors/margin/cputemp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/cputemp",
             "writePath": "",
             "min": 0,
             "max": 0,
@@ -82,9 +82,9 @@
             "timeout": 0
         },
         {
-            "name": "zone0_vr",
-            "type": "margin",
-            "readPath": "/xyz/openbmc_project/extsensors/margin/zone0_vr",
+            "name": "vddcr_cpu",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/vddcr_cpu",
             "writePath": "",
             "min": 0,
             "max": 0,
@@ -92,9 +92,49 @@
             "timeout": 0
         },
         {
-            "name": "nvme",
-            "type": "margin",
-            "readPath": "/xyz/openbmc_project/extsensors/margin/nvme",
+            "name": "vddcr_soc",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/vddcr_soc",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "vddio_abcd",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/vddio_abcd",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "vddio_efgh",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/vddio_efgh",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "p12v_mobo",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/p12v_mobo",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "powerseq_temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/powerseq_temp",
             "writePath": "",
             "min": 0,
             "max": 0,
@@ -103,8 +143,168 @@
         },
         {
             "name": "p12v_fan",
-            "type": "margin",
-            "readPath": "/xyz/openbmc_project/extsensors/margin/p12v_fan",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/p12v_fan",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme0",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme0",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme1",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme1",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme2",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme2",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme3",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme3",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme4",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme4",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme5",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme5",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme6",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme6",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme7",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme7",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme8",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme8",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme9",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme9",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme10",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme10",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme11",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme11",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme12",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme12",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme13",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme13",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme14",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme14",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme15",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme15",
             "writePath": "",
             "min": 0,
             "max": 0,
@@ -162,15 +362,15 @@
                 },
                 {
                     "name": "cputemp",
-                    "type": "margin",
+                    "type": "temp",
                     "inputs": [
                         "cputemp"
                     ],
-                    "setpoint": 10.0,
+                    "setpoint": 80.0,
                     "pid": {
                         "samplePeriod": 1.0,
-                        "proportionalCoeff": 714.0,
-                        "integralCoeff": 9.0,
+                        "proportionalCoeff": -714.0,
+                        "integralCoeff": -9.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
                         "integralLimit_min": 2679.0,
@@ -185,15 +385,20 @@
                 },
                 {
                     "name": "zone0_vr",
-                    "type": "margin",
+                    "type": "temp",
                     "inputs": [
-                        "zone0_vr"
+                        "vddcr_cpu",
+                        "vddcr_soc",
+                        "vddio_abcd",
+                        "vddio_efgh",
+                        "p12v_mobo",
+                        "powerseq_temp"
                     ],
-                    "setpoint": 10.0,
+                    "setpoint": 90.0,
                     "pid": {
                         "samplePeriod": 1.0,
-                        "proportionalCoeff": 536.0,
-                        "integralCoeff": 9.0,
+                        "proportionalCoeff": -536.0,
+                        "integralCoeff": -9.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
                         "integralLimit_min": 2679.0,
@@ -346,16 +551,16 @@
                     }
                 },
                 {
-                    "name": "nvme",
-                    "type": "margin",
+                    "name": "p12v_fan",
+                    "type": "temp",
                     "inputs": [
-                        "nvme"
+                        "p12v_fan"
                     ],
-                    "setpoint": 10.0,
+                    "setpoint": 90.0,
                     "pid": {
                         "samplePeriod": 1.0,
-                        "proportionalCoeff": 1250.0,
-                        "integralCoeff": 12.0,
+                        "proportionalCoeff": -268.0,
+                        "integralCoeff": -4.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
                         "integralLimit_min": 2679.0,
@@ -369,16 +574,361 @@
                     }
                 },
                 {
-                    "name": "p12v_fan",
-                    "type": "margin",
+                    "name": "nvme0",
+                    "type": "temp",
                     "inputs": [
-                        "p12v_fan"
+                        "nvme0"
                     ],
-                    "setpoint": 10.0,
+                    "setpoint": @WCTemp00@,
                     "pid": {
                         "samplePeriod": 1.0,
-                        "proportionalCoeff": 268.0,
-                        "integralCoeff": 4.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme1",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme1"
+                    ],
+                    "setpoint": @WCTemp01@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme2",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme2"
+                    ],
+                    "setpoint": @WCTemp02@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme3",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme3"
+                    ],
+                    "setpoint": @WCTemp03@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme4",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme4"
+                    ],
+                    "setpoint": @WCTemp04@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme5",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme5"
+                    ],
+                    "setpoint": @WCTemp05@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme6",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme6"
+                    ],
+                    "setpoint": @WCTemp06@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme7",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme7"
+                    ],
+                    "setpoint": @WCTemp07@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme8",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme8"
+                    ],
+                    "setpoint": @WCTemp08@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme9",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme9"
+                    ],
+                    "setpoint": @WCTemp09@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme10",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme10"
+                    ],
+                    "setpoint": @WCTemp10@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme11",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme11"
+                    ],
+                    "setpoint": @WCTemp11@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme12",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme12"
+                    ],
+                    "setpoint": @WCTemp12@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme13",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme13"
+                    ],
+                    "setpoint": @WCTemp13@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme14",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme14"
+                    ],
+                    "setpoint": @WCTemp14@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "nvme15",
+                    "type": "temp",
+                    "inputs": [
+                        "nvme15"
+                    ],
+                    "setpoint": @WCTemp15@,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": -1250.0,
+                        "integralCoeff": -12.0,
                         "feedFwdOffsetCoeff": 0.0,
                         "feedFwdGainCoeff": 0.0,
                         "integralLimit_min": 2679.0,
