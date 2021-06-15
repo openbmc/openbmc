@@ -8,6 +8,7 @@ inherit systemd
 
 require pldm.inc
 
+DEPENDS += "function2"
 DEPENDS += "systemd"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-dbus-interfaces"
