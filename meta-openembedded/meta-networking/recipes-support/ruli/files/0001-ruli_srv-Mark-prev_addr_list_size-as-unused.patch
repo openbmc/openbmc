@@ -1,0 +1,35 @@
+From 895ae26e36c4498677ad0b2695a6e5af05548a29 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Nov 2019 22:02:43 -0800
+Subject: [PATCH] ruli_srv: Mark prev_addr_list_size as unused
+
+This ensures that compiler does not trip on building it
+
+ruli_srv.c:157:20: error: variable 'prev_addr_list_size' set but not used [-Werror=unused-but-set-variable]
+|   int              prev_addr_list_size;
+|                    ^~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+
+Upstream-Status: Inappropriate [Workaround]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/ruli_srv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ruli_srv.c b/src/ruli_srv.c
+index 45c70c7..ff82349 100644
+--- a/src/ruli_srv.c
++++ b/src/ruli_srv.c
+@@ -154,7 +154,7 @@ static void *on_walk_answer(ruli_host_t *host_qry, void *qry_arg)
+   walk_t           *walk_qry = (walk_t *) qry_arg;
+   ruli_srv_t       *srv_qry = walk_qry->srv_query;
+   ruli_srv_entry_t *srv_entry;
+-  int              prev_addr_list_size;
++  __attribute__((unused)) int              prev_addr_list_size;
+ 
+   assert(ruli_host_answer_code(host_qry) != RULI_SRV_CODE_VOID);
+ 
+-- 
+2.24.0
+

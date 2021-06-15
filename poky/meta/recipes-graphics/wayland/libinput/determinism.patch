@@ -1,0 +1,21 @@
+This finds our outer git tree and that version information breaks
+determinism of this recipe. Disable it.
+
+RP 2020/2/6
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: libinput-1.14.3/meson.build
+===================================================================
+--- libinput-1.14.3.orig/meson.build
++++ libinput-1.14.3/meson.build
+@@ -387,7 +387,7 @@ pkgconfig.generate(
+ 	libraries : lib_libinput
+ )
+ 
+-git_version_h = vcs_tag(command : ['git', 'describe'],
++git_version_h = vcs_tag(command : ['false'],
+ 			fallback : 'unknown',
+ 			input : 'src/libinput-git-version.h.in',
+ 			output :'libinput-git-version.h')

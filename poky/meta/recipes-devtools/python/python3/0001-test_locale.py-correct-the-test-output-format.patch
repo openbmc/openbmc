@@ -1,0 +1,46 @@
+From b94995e0c694ec9561efec0d1a59b323340e6105 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Mon, 5 Aug 2019 15:57:39 +0800
+Subject: [PATCH] test_locale.py: correct the test output format
+
+Before this patch:
+ # python3 -m test -v test_locale
+ [snip]
+ test_getsetlocale_issue1813 (test.test_locale.TestMiscellaneous) ... testing with ('tr_TR', 'ISO8859-9') ok
+ [snip]
+
+ After this patch:
+ # python3 -m test -v test_locale
+ [snip]
+ test_getsetlocale_issue1813 (test.test_locale.TestMiscellaneous) ... testing with ('tr_TR', 'ISO8859-9')... ok
+ [snip]
+
+ Make the test ended with "... ok" is common in python
+ unittest world, we should make it keep consistent
+ with other test cases in case it may be ignored to
+ record in the report if we use the common filter
+ "... ok".
+
+Upstream-Status: Submitted [https://github.com/python/cpython/pull/15132]
+
+
+Rebased for 3.9.4, still not accepted upstream Signed-off-by: Alejandro Hernandez <alejandro@enedino.org>
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ Lib/test/test_locale.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: Python-3.9.4/Lib/test/test_locale.py
+===================================================================
+--- Python-3.9.4.orig/Lib/test/test_locale.py
++++ Python-3.9.4/Lib/test/test_locale.py
+@@ -562,7 +562,7 @@ class TestMiscellaneous(unittest.TestCas
+             self.skipTest('test needs Turkish locale')
+         loc = locale.getlocale(locale.LC_CTYPE)
+         if verbose:
+-            print('testing with %a' % (loc,), end=' ', flush=True)
++            print('testing with %a...' % (loc,), end=' ', flush=True)
+         try:
+             locale.setlocale(locale.LC_CTYPE, loc)
+         except locale.Error as exc:

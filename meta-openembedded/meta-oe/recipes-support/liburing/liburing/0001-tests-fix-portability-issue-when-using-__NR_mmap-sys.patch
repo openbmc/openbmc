@@ -1,0 +1,53 @@
+From 2d3940163e14d183fddc4d8b24cc1d3865bba0b3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 5 May 2021 09:36:36 -0700
+Subject: [PATCH] tests: fix portability issue when using __NR_mmap syscall
+
+On some architectures e.g. ARM and RISCV32, __NR_mmap does not exist and
+libc will then use NR_mmap2 to implement mmap() API, therefore use
+system C library mmap() API instead of calling the syscall directly
+
+Upstream-Status: Partial Backport [https://github.com/axboe/liburing/commit/808b6c72ab753bda0c300b5683cfd31750d1d49b]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/double-poll-crash.c   | 6 +++---
+ test/sqpoll-disable-exit.c | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/test/double-poll-crash.c b/test/double-poll-crash.c
+index 1a219c7..6e08285 100644
+--- a/test/double-poll-crash.c
++++ b/test/double-poll-crash.c
+@@ -150,9 +150,9 @@ int main(int argc, char *argv[])
+   if (argc > 1)
+     return 0;
+ 
+-  syscall(__NR_mmap, 0x1ffff000ul, 0x1000ul, 0ul, 0x32ul, -1, 0ul);
+-  syscall(__NR_mmap, 0x20000000ul, 0x1000000ul, 7ul, 0x32ul, -1, 0ul);
+-  syscall(__NR_mmap, 0x21000000ul, 0x1000ul, 0ul, 0x32ul, -1, 0ul);
++  mmap((void *) 0x1ffff000, (size_t) 0x1000, PROT_NONE, MAP_FIXED | MAP_ANONYMOUS, -1, 0);
++  mmap((void *) 0x20000000, (size_t) 0x1000000,  PROT_READ | PROT_WRITE | PROT_EXEC, MAP_FIXED | MAP_ANONYMOUS, -1, 0);
++  mmap((void *) 0x21000000, (size_t) 0x1000, PROT_NONE, MAP_FIXED | MAP_ANONYMOUS, -1, 0);
+   intptr_t res = 0;
+   *(uint32_t*)0x20000484 = 0;
+   *(uint32_t*)0x20000488 = 0;
+diff --git a/test/sqpoll-disable-exit.c b/test/sqpoll-disable-exit.c
+index d4e17f8..a0d00cc 100644
+--- a/test/sqpoll-disable-exit.c
++++ b/test/sqpoll-disable-exit.c
+@@ -223,9 +223,9 @@ void execute_one(void)
+ }
+ int main(void)
+ {
+-  syscall(__NR_mmap, 0x1ffff000ul, 0x1000ul, 0ul, 0x32ul, -1, 0ul);
+-  syscall(__NR_mmap, 0x20000000ul, 0x1000000ul, 7ul, 0x32ul, -1, 0ul);
+-  syscall(__NR_mmap, 0x21000000ul, 0x1000ul, 0ul, 0x32ul, -1, 0ul);
++  mmap((void *) 0x1ffff000, (size_t) 0x1000, PROT_NONE, MAP_FIXED | MAP_ANONYMOUS, -1, 0);
++  mmap((void *) 0x20000000, (size_t) 0x1000000,  PROT_READ | PROT_WRITE | PROT_EXEC, MAP_FIXED | MAP_ANONYMOUS, -1, 0);
++  mmap((void *) 0x21000000, (size_t) 0x1000, PROT_NONE, MAP_FIXED | MAP_ANONYMOUS, -1, 0);
+   loop();
+   return 0;
+ }
+-- 
+2.31.1
+

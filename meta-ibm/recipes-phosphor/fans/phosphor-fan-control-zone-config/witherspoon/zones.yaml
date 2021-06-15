@@ -1,0 +1,100 @@
+manager_configuration:
+  power_on_delay: 20
+
+zone_configuration:
+
+#Air cooled zones
+- zone_conditions:
+  - name: air_cooled_chassis
+
+  zones:
+    - zone: 0
+      cooling_profiles:
+      - air
+      - all
+      full_speed: 10500
+      default_floor: 8000
+      increase_delay: 5
+      decrease_interval: 30
+      interfaces:
+          - name: xyz.openbmc_project.Control.ThermalMode
+            properties:
+                - name: Supported
+                  type: array[string]
+                  values:
+                      - value: DEFAULT
+                        description: >
+                            Default thermal control mode
+                      - value: CUSTOM
+                        description: >
+                            Custom thermal control mode for handling the use of
+                            PCI cards located behind the GPU exhaust that
+                            could overtemp where the default mode is not
+                            sufficient enough.
+                      - value: HEAVY_IO
+                        description: >
+                            Heavy IO thermal control mode for handling the use
+                            of PCI cards that produce heavy IO utilization and
+                            could overtemp.
+                      - value: MAX_BASE_FAN_FLOOR
+                        description: >
+                            Maximum base fan floor mode is for handling the
+                            use of any hardware that requires the highest
+                            amount of cooling even when the system may be idle.
+                - name: Current
+                  type: string
+                  persist: true
+                  values:
+                      - value: DEFAULT
+                        description: >
+                            Set current thermal control mode to the
+                            default which will be replaced on startup if
+                            another selected mode was persisted.
+
+#Water cooled zones
+- zone_conditions:
+  - name: water_and_air_cooled_chassis
+
+  zones:
+    - zone: 0
+      cooling_profiles:
+      - water
+      - all
+      full_speed: 10500
+      default_floor: 8000
+      increase_delay: 5
+      decrease_interval: 30
+      interfaces:
+          - name: xyz.openbmc_project.Control.ThermalMode
+            properties:
+                - name: Supported
+                  type: array[string]
+                  values:
+                      - value: DEFAULT
+                        description: >
+                            Default thermal control mode
+                      - value: CUSTOM
+                        description: >
+                            Custom thermal control mode for handling the use of
+                            PCI cards located behind the GPU exhaust that
+                            could overtemp where the default mode is not
+                            sufficient enough.
+                      - value: HEAVY_IO
+                        description: >
+                            Heavy IO thermal control mode for handling the use
+                            of PCI cards that produce heavy IO utilization and
+                            could overtemp.
+                      - value: MAX_BASE_FAN_FLOOR
+                        description: >
+                            Maximum base fan floor mode is for handling the
+                            use of any hardware that requires the highest
+                            amount of cooling even when the system may be idle.
+                - name: Current
+                  type: string
+                  persist: true
+                  values:
+                     - value: DEFAULT
+                       description: >
+                           Set current thermal control mode to the
+                           default which will be replaced on startup if
+                           another selected mode was persisted.

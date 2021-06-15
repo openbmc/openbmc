@@ -13,18 +13,18 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/daemon/main.c b/src/daemon/main.c
-index c80fa94..75496be 100644
+index 30ef499..5c3abf0 100644
 --- a/src/daemon/main.c
 +++ b/src/daemon/main.c
-@@ -908,7 +908,7 @@ int main(int argc, char *argv[]) {
+@@ -916,7 +916,7 @@ int main(int argc, char *argv[]) {
+     pa_set_env_and_record("PULSE_SYSTEM", conf->system_instance ? "1" : "0");
  
      pa_log_info("This is PulseAudio %s", PACKAGE_VERSION);
-     pa_log_debug("Compilation host: %s", CANONICAL_HOST);
 -    pa_log_debug("Compilation CFLAGS: %s", PA_CFLAGS);
 +    pa_log_debug("Compilation CFLAGS: ***");
  
  #ifdef HAVE_LIBSAMPLERATE
      pa_log_warn("Compiled with DEPRECATED libsamplerate support!");
 -- 
-2.7.4
+2.25.1
 

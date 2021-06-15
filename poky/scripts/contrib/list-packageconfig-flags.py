@@ -1,20 +1,9 @@
 #!/usr/bin/env python3
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software Foundation.
-#
 # Copyright (C) 2013 Wind River Systems, Inc.
 # Copyright (C) 2014 Intel Corporation
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 #
 # - list available recipes which have PACKAGECONFIG flags
 # - list available PACKAGECONFIG flags and all affected recipes
@@ -44,7 +33,7 @@ import bb.tinfoil
 def get_fnlist(bbhandler, pkg_pn, preferred):
     ''' Get all recipe file names '''
     if preferred:
-        (latest_versions, preferred_versions) = bb.providers.findProviders(bbhandler.config_data, bbhandler.cooker.recipecaches[''], pkg_pn)
+        (latest_versions, preferred_versions, required_versions) = bb.providers.findProviders(bbhandler.config_data, bbhandler.cooker.recipecaches[''], pkg_pn)
 
     fn_list = []
     for pn in sorted(pkg_pn):
@@ -76,7 +65,7 @@ def collect_pkgs(data_dict):
     for fn in data_dict:
         pkgconfigflags = data_dict[fn].getVarFlags("PACKAGECONFIG")
         pkgconfigflags.pop('doc', None)
-        pkgname = data_dict[fn].getVar("P")
+        pkgname = data_dict[fn].getVar("PN")
         pkg_dict[pkgname] = sorted(pkgconfigflags.keys())
 
     return pkg_dict

@@ -1,0 +1,36 @@
+From 1a3f130008b4ebcd9a6e45cdac7188bde88f2f28 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 21 Feb 2018 12:32:02 +0530
+Subject: [PATCH 13/52] [Patch,Microblaze]: Compiler will give error messages
+ in more detail for mxl-gp-opt flag..
+
+---
+ ld/ldmain.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/ld/ldmain.c b/ld/ldmain.c
+index 08be9030cb..613d748fef 100644
+--- a/ld/ldmain.c
++++ b/ld/ldmain.c
+@@ -1515,6 +1515,18 @@ reloc_overflow (struct bfd_link_info *info,
+ 	  break;
+ 	case bfd_link_hash_defined:
+ 	case bfd_link_hash_defweak:
++
++         if((strcmp(reloc_name,"R_MICROBLAZE_SRW32") == 0) &&  entry->type == bfd_link_hash_defined)
++	  {
++	  einfo (_(" relocation truncated to fit: don't enable small data pointer optimizations[mxl-gp-opt] if extern or multiple declarations used: "
++		 "%s against symbol `%T' defined in %A section in %B"),
++                 reloc_name, entry->root.string,
++                 entry->u.def.section,
++                 entry->u.def.section == bfd_abs_section_ptr
++                  ? info->output_bfd : entry->u.def.section->owner);
++	      break;
++	  }
++
+ 	  einfo (_(" relocation truncated to fit: "
+ 		   "%s against symbol `%pT' defined in %pA section in %pB"),
+ 		 reloc_name, entry->root.string,
+-- 
+2.17.1
+

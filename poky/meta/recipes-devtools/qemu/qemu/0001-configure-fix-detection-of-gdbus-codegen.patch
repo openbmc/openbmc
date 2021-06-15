@@ -1,0 +1,50 @@
+From 464cfc64201b21386030b8f353fe9724a3413a85 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 5 May 2021 10:15:34 -0400
+Subject: [PATCH] configure: fix detection of gdbus-codegen
+
+"pkg-config --variable=gdbus_codegen gio-2.0" returns "gdbus-codegen",
+and it does not pass test -x (which does not walk the path).
+
+Meson 0.58.0 notices that something is iffy, as the dbus_vmstate1
+assignment in tests/qtest/meson.build uses an empty string as the
+command, and fails very eloquently:
+
+../tests/qtest/meson.build:92:2: ERROR: No program name specified.
+
+Use the "has" function instead of test -x, and fix the generation
+of config-host.mak since meson.build expects that GDBUS_CODEGEN
+is absent, rather than empty, if the tool is unavailable.
+
+Reported-by: Sebastian Mitterle <smitterl@redhat.com>
+Fixes: #178
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Upstream-Status: Backport [https://git.qemu.org/?p=qemu.git;a=commitdiff;h=5ecfb76ccc056eb6127e44268e475827ae73b9e0]
+(not in 6.0.0, should be kept when upgrading)
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+Index: qemu-6.0.0/configure
+===================================================================
+--- qemu-6.0.0.orig/configure
++++ qemu-6.0.0/configure
+@@ -3366,7 +3366,7 @@ if ! test "$gio" = "no"; then
+         gio_cflags=$($pkg_config --cflags gio-2.0)
+         gio_libs=$($pkg_config --libs gio-2.0)
+         gdbus_codegen=$($pkg_config --variable=gdbus_codegen gio-2.0)
+-        if [ ! -x "$gdbus_codegen" ]; then
++        if ! has "$gdbus_codegen"; then
+             gdbus_codegen=
+         fi
+         # Check that the libraries actually work -- Ubuntu 18.04 ships
+@@ -5704,6 +5704,8 @@ if test "$gio" = "yes" ; then
+     echo "CONFIG_GIO=y" >> $config_host_mak
+     echo "GIO_CFLAGS=$gio_cflags" >> $config_host_mak
+     echo "GIO_LIBS=$gio_libs" >> $config_host_mak
++fi
++if test "$gdbus_codegen" != "" ; then
+     echo "GDBUS_CODEGEN=$gdbus_codegen" >> $config_host_mak
+ fi
+ echo "CONFIG_TLS_PRIORITY=\"$tls_priority\"" >> $config_host_mak

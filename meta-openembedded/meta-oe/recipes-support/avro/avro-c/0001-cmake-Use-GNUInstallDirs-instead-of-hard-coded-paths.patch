@@ -1,0 +1,70 @@
+From f24f863f3a8ca86f44123a58613f62c3b511da1e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 19 Dec 2019 18:23:41 -0800
+Subject: [PATCH] cmake: Use GNUInstallDirs instead of hard-coded paths
+
+This ensures that it can be built on platforms where libdir is not
+/usr/lib e.g. ppc64
+
+Upstream-Status: Submitted [https://github.com/apache/avro/pull/749]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lang/c/CMakeLists.txt     |  2 +-
+ lang/c/src/CMakeLists.txt | 16 +++++++++-------
+ 2 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/lang/c/CMakeLists.txt b/lang/c/CMakeLists.txt
+index 11cbf018e..6c8d7aaf3 100644
+--- a/lang/c/CMakeLists.txt
++++ b/lang/c/CMakeLists.txt
+@@ -16,7 +16,7 @@
+ # specific language governing permissions and limitations
+ # under the License.
+ #
+-cmake_minimum_required(VERSION 2.4)
++cmake_minimum_required(VERSION 3.1)
+ project(AvroC)
+ enable_testing()
+ 
+diff --git a/lang/c/src/CMakeLists.txt b/lang/c/src/CMakeLists.txt
+index 6f5659750..c1761c8de 100644
+--- a/lang/c/src/CMakeLists.txt
++++ b/lang/c/src/CMakeLists.txt
+@@ -106,17 +106,19 @@ install(DIRECTORY
+         DESTINATION include
+         FILES_MATCHING PATTERN "*.h")
+ 
++include(GNUInstallDirs)
++
+ if (WIN32)
+ install(TARGETS avro-static
+-        RUNTIME DESTINATION bin
+-        LIBRARY DESTINATION lib
+-        ARCHIVE DESTINATION lib
++	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
+ else(WIN32)
+ install(TARGETS avro-static avro-shared
+-        RUNTIME DESTINATION bin
+-        LIBRARY DESTINATION lib
+-        ARCHIVE DESTINATION lib
++	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
+ endif(WIN32)
+ 
+@@ -126,7 +128,7 @@ set(prefix ${CMAKE_INSTALL_PREFIX})
+ set(VERSION ${AVRO_VERSION})
+ configure_file(avro-c.pc.in avro-c.pc)
+ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/avro-c.pc
+-        DESTINATION lib/pkgconfig)
++        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+ 
+ add_executable(avrocat avrocat.c)
+ target_link_libraries(avrocat avro-static)
+-- 
+2.24.1
+

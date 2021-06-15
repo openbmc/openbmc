@@ -1,0 +1,95 @@
+From a983bc6cd48fb0da939e3329cac18d7a3b29ecf8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 22 Feb 2021 17:54:01 -0800
+Subject: [PATCH] Revert "cmd/go: make sure CC and CXX are absolute"
+
+OE uses CC/CXX values which consists of cmpiler and options together,
+secondly, the environment is canned so this check add little value to OE
+based builds
+
+Fixes go-runtime build issues
+
+go install: CXX environment variable is relative; must be absolute path: powerpc64le-yoe-linux-musl-g++ -mlittle-endian -mhard-float -m64 -mabi=elfv2 -mcpu=power9 -fstack-protector-strong -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/mnt/b/yoe/master/build/tmp/work/ppc64p9le-yoe-linux-musl/go/1.16-r0/recipe-sysroot
+
+This reverts commit aa161e799df7e1eba99d2be10271e76b6f758142.
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/cmd/go/internal/envcmd/env.go        |  5 -----
+ src/cmd/go/internal/work/init.go         |  7 -------
+ src/cmd/go/testdata/script/env_write.txt | 24 ------------------------
+ 3 files changed, 36 deletions(-)
+
+diff --git a/src/cmd/go/internal/envcmd/env.go b/src/cmd/go/internal/envcmd/env.go
+index 6937187522..29f9057c3f 100644
+--- a/src/cmd/go/internal/envcmd/env.go
++++ b/src/cmd/go/internal/envcmd/env.go
+@@ -427,11 +427,6 @@ func checkEnvWrite(key, val string) error {
+ 		if !filepath.IsAbs(val) && val != "" {
+ 			return fmt.Errorf("GOPATH entry is relative; must be absolute path: %q", val)
+ 		}
+-	// Make sure CC and CXX are absolute paths
+-	case "CC", "CXX":
+-		if !filepath.IsAbs(val) && val != "" && val != filepath.Base(val) {
+-			return fmt.Errorf("%s entry is relative; must be absolute path: %q", key, val)
+-		}
+ 	}
+ 
+ 	if !utf8.ValidString(val) {
+diff --git a/src/cmd/go/internal/work/init.go b/src/cmd/go/internal/work/init.go
+index ba7c7c2fbb..3a6df5f758 100644
+--- a/src/cmd/go/internal/work/init.go
++++ b/src/cmd/go/internal/work/init.go
+@@ -41,13 +41,6 @@ func BuildInit() {
+ 		cfg.BuildPkgdir = p
+ 	}
+ 
+-	// Make sure CC and CXX are absolute paths
+-	for _, key := range []string{"CC", "CXX"} {
+-		if path := cfg.Getenv(key); !filepath.IsAbs(path) && path != "" && path != filepath.Base(path) {
+-			base.Fatalf("go %s: %s environment variable is relative; must be absolute path: %s\n", flag.Args()[0], key, path)
+-		}
+-	}
+-
+ 	// For each experiment that has been enabled in the toolchain, define a
+ 	// build tag with the same name but prefixed by "goexperiment." which can be
+ 	// used for compiling alternative files for the experiment. This allows
+diff --git a/src/cmd/go/testdata/script/env_write.txt b/src/cmd/go/testdata/script/env_write.txt
+index bda1e57826..c99aadb7f2 100644
+--- a/src/cmd/go/testdata/script/env_write.txt
++++ b/src/cmd/go/testdata/script/env_write.txt
+@@ -129,30 +129,6 @@ go env -w GOTMPDIR=
+ go env GOTMPDIR
+ stdout ^$
+ 
+-# go env -w rejects relative CC values
+-[!windows] go env -w CC=/usr/bin/clang
+-go env -w CC=clang
+-[!windows] ! go env -w CC=./clang
+-[!windows] ! go env -w CC=bin/clang
+-[!windows] stderr 'go env -w: CC entry is relative; must be absolute path'
+-
+-[windows] go env -w CC=$WORK\bin\clang
+-[windows] ! go env -w CC=.\clang
+-[windows] ! go env -w CC=bin\clang
+-[windows] stderr 'go env -w: CC entry is relative; must be absolute path'
+-
+-# go env -w rejects relative CXX values
+-[!windows] go env -w CC=/usr/bin/cpp
+-go env -w CXX=cpp
+-[!windows] ! go env -w CXX=./cpp
+-[!windows] ! go env -w CXX=bin/cpp
+-[!windows] stderr 'go env -w: CXX entry is relative; must be absolute path'
+-
+-[windows] go env -w CXX=$WORK\bin\cpp
+-[windows] ! go env -w CXX=.\cpp
+-[windows] ! go env -w CXX=bin\cpp
+-[windows] stderr 'go env -w: CXX entry is relative; must be absolute path'
+-
+ # go env -w/-u checks validity of GOOS/ARCH combinations
+ env GOOS=
+ env GOARCH=
+-- 
+2.30.1
+

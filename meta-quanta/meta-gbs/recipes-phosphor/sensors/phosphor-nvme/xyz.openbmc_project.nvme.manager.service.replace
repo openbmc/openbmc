@@ -1,0 +1,19 @@
+[Unit]
+Description=NVMe management
+Wants=xyz.openbmc_project.LED.GroupManager.service xyz.openbmc_project.Inventory.Manager.service
+After=xyz.openbmc_project.LED.GroupManager.service xyz.openbmc_project.Inventory.Manager.service
+Wants=mapper-wait@-xyz-openbmc_project-control-nvme.service
+After=mapper-wait@-xyz-openbmc_project-control-nvme.service
+
+[Service]
+ExecStartPre=/usr/bin/nvme_json_rewrite.sh
+ExecStart=/usr/bin/nvme_main
+Type=dbus
+BusName=xyz.openbmc_project.nvme.manager
+SyslogIdentifier=phosphor-nvme
+Restart=always
+RestartSec=3
+StartLimitInterval=0
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,42 @@
+From 66dfe0fa886f6289add06d1af8642ce2b5302852 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 9 Feb 2021 16:40:12 -0800
+Subject: [PATCH] riscv32: Use double-float ABI for rv32
+
+So it can use libgcc built with OE toolchain
+Fixes
+error: "can't link hard-float modules with soft-float modules"
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate [embedded specific]
+---
+ arch/riscv/Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+index 0b80eb8d86..7324946f48 100644
+--- a/arch/riscv/Makefile
++++ b/arch/riscv/Makefile
+@@ -9,7 +9,9 @@ ifeq ($(CONFIG_ARCH_RV64I),y)
+ endif
+ ifeq ($(CONFIG_ARCH_RV32I),y)
+ 	ARCH_BASE = rv32im
+-	ABI = ilp32
++	ABI = ilp32d
++	ARCH_D = d
++	ARCH_F = f
+ endif
+ ifeq ($(CONFIG_RISCV_ISA_A),y)
+ 	ARCH_A = a
+@@ -24,7 +26,7 @@ ifeq ($(CONFIG_CMODEL_MEDANY),y)
+ 	CMODEL = medany
+ endif
+ 
+-ARCH_FLAGS = -march=$(ARCH_BASE)$(ARCH_A)$(ARCH_C) -mabi=$(ABI) \
++ARCH_FLAGS = -march=$(ARCH_BASE)$(ARCH_A)$(ARCH_F)$(ARCH_D)$(ARCH_C) -mabi=$(ABI) \
+ 	     -mcmodel=$(CMODEL)
+ 
+ PLATFORM_CPPFLAGS	+= $(ARCH_FLAGS)
+-- 
+2.30.0
+

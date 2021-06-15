@@ -1,0 +1,6 @@
+- Instance: 0
+  SensorID: 0x03
+  SensorName: occ0
+- Instance: 1
+  SensorID: 0x04
+  SensorName: occ1

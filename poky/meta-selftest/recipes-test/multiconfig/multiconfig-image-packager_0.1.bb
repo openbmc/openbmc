@@ -8,7 +8,7 @@ MCIMGTYPE_virtclass-mcextend-tiny = "cpio.gz"
 
 MC_DEPLOY_DIR_IMAGE = "${TOPDIR}/tmp-mc-${MCNAME}/deploy/images/${MCMACHINE}"
 
-do_install[mcdepends] += "multiconfig::${MCNAME}:core-image-minimal:do_image_complete multiconfig::${MCNAME}:virtual/kernel:do_deploy"
+do_install[mcdepends] += "mc::${MCNAME}:core-image-minimal:do_image_complete mc::${MCNAME}:virtual/kernel:do_deploy"
 
 do_install () {
     install -d ${D}/var/lib/machines/${MCNAME}

@@ -1,0 +1,47 @@
+From ff714d6461569d69b253089110ec659e4ebec248 Mon Sep 17 00:00:00 2001
+From: Oleksandr Kravchuk <open.source@oleksandr-kravchuk.com>
+Date: Tue, 2 Jul 2019 20:10:42 +0200
+Subject: [PATCH] Define FNM_EXTMATCH for musl
+
+Fixes the following compilation errors with musl that does not have
+FNM_EXTMATCH defined:
+
+| main.c: In function 'expand_matches':
+| main.c:700:40: error: 'FNM_EXTMATCH' undeclared (first use in this
+function); did you mean 'FNM_NOMATCH'?
+|   700 |     if(fnmatch(pattern, ifa->ifa_name, FNM_EXTMATCH))
+|       |                                        ^~~~~~~~~~~~
+|       |                                        FNM_NOMATCH
+
+and
+
+| archlinux.c:40:28: error: 'FNM_EXTMATCH' undeclared (first use in this
+function); did you mean 'FNM_NOMATCH'?
+|    40 |   if(fnmatch(pattern, buf, FNM_EXTMATCH) == 0) {
+|       |                            ^~~~~~~~~~~~
+|       |                            FNM_NOMATCH
+
+Upstream-Status: Submitted [https://salsa.debian.org/debian/ifupdown/merge_requests/5]
+
+Signed-off-by: Oleksandr Kravchuk <open.source@oleksandr-kravchuk.com>
+---
+ archcommon.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/archcommon.h b/archcommon.h
+index fe99950..f257f9d 100644
+--- a/archcommon.h
++++ b/archcommon.h
+@@ -1,5 +1,9 @@
+ #include "header.h"
+ 
++#if !defined(FNM_EXTMATCH)
++#define FNM_EXTMATCH 0
++#endif
++
+ bool execable(const char *);
+ 
+ #define iface_is_link() (!_iface_has(ifd->real_iface, ":."))
+-- 
+2.17.1
+

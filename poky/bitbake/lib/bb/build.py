@@ -1,5 +1,3 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # BitBake 'Build' implementation
 #
@@ -10,27 +8,17 @@
 #
 # Based on Gentoo's portage.py.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # Based on functions from the base bb module, Copyright 2003 Holger Schurig
 
 import os
 import sys
 import logging
-import shlex
 import glob
+import itertools
 import time
+import re
 import stat
 import bb
 import bb.msg
@@ -40,6 +28,9 @@ from bb import data, event, utils
 
 bblogger = logging.getLogger('BitBake')
 logger = logging.getLogger('BitBake.Build')
+
+verboseShellLogging = False
+verboseStdoutLogging = False
 
 __mtime_cache = {}
 
@@ -67,34 +58,20 @@ else:
 builtins['bb'] = bb
 builtins['os'] = os
 
-class FuncFailed(Exception):
-    def __init__(self, name = None, logfile = None):
-        self.logfile = logfile
-        self.name = name
-        if name:
-            self.msg = 'Function failed: %s' % name
-        else:
-            self.msg = "Function failed"
-
-    def __str__(self):
-        if self.logfile and os.path.exists(self.logfile):
-            msg = ("%s (log file is located at %s)" %
-                   (self.msg, self.logfile))
-        else:
-            msg = self.msg
-        return msg
-
 class TaskBase(event.Event):
     """Base class for task events"""
 
-    def __init__(self, t, logfile, d):
+    def __init__(self, t, fn, logfile, d):
         self._task = t
+        self._fn = fn
         self._package = d.getVar("PF")
         self._mc = d.getVar("BB_CURRENT_MC")
         self.taskfile = d.getVar("FILE")
         self.taskname = self._task
         self.logfile = logfile
         self.time = time.time()
+        self.pn = d.getVar("PN")
+        self.pv = d.getVar("PV")
         event.Event.__init__(self)
         self._message = "recipe %s: task %s: %s" % (d.getVar("PF"), t, self.getDisplayName())
 
@@ -111,8 +88,8 @@ class TaskBase(event.Event):
 
 class TaskStarted(TaskBase):
     """Task execution started"""
-    def __init__(self, t, logfile, taskflags, d):
-        super(TaskStarted, self).__init__(t, logfile, d)
+    def __init__(self, t, fn, logfile, taskflags, d):
+        super(TaskStarted, self).__init__(t, fn, logfile, d)
         self.taskflags = taskflags
 
 class TaskSucceeded(TaskBase):
@@ -121,9 +98,9 @@ class TaskSucceeded(TaskBase):
 class TaskFailed(TaskBase):
     """Task execution failed"""
 
-    def __init__(self, task, logfile, metadata, errprinted = False):
+    def __init__(self, task, fn, logfile, metadata, errprinted = False):
         self.errprinted = errprinted
-        super(TaskFailed, self).__init__(task, logfile, metadata)
+        super(TaskFailed, self).__init__(task, fn, logfile, metadata)
 
 class TaskFailedSilent(TaskBase):
     """Task execution failed (silently)"""
@@ -133,8 +110,8 @@ class TaskFailedSilent(TaskBase):
 
 class TaskInvalid(TaskBase):
 
-    def __init__(self, task, metadata):
-        super(TaskInvalid, self).__init__(task, None, metadata)
+    def __init__(self, task, fn, metadata):
+        super(TaskInvalid, self).__init__(task, fn, None, metadata)
         self._message = "No such task '%s'" % task
 
 class TaskProgress(event.Event):
@@ -176,15 +153,33 @@ class LogTee(object):
 
     def __repr__(self):
         return '<LogTee {0}>'.format(self.name)
+
     def flush(self):
         self.outfile.flush()
 
-#
-# pythonexception allows the python exceptions generated to be raised
-# as the real exceptions (not FuncFailed) and without a backtrace at the 
-# origin of the failure.
-#
-def exec_func(func, d, dirs = None, pythonexception=False):
+
+class StdoutNoopContextManager:
+    """
+    This class acts like sys.stdout, but adds noop __enter__ and __exit__ methods.
+    """
+    def __enter__(self):
+        return sys.stdout
+
+    def __exit__(self, *exc_info):
+        pass
+
+    def write(self, string):
+        return sys.stdout.write(string)
+
+    def flush(self):
+        sys.stdout.flush()
+
+    @property
+    def name(self):
+        return sys.stdout.name
+
+
+def exec_func(func, d, dirs = None):
     """Execute a BB 'function'"""
 
     try:
@@ -256,7 +251,7 @@ def exec_func(func, d, dirs = None, pythonexception=False):
 
     with bb.utils.fileslocked(lockfiles):
         if ispython:
-            exec_func_python(func, d, runfile, cwd=adir, pythonexception=pythonexception)
+            exec_func_python(func, d, runfile, cwd=adir)
         else:
             exec_func_shell(func, d, runfile, cwd=adir)
 
@@ -276,7 +271,7 @@ _functionfmt = """
 {function}(d)
 """
 logformatter = bb.msg.BBLogFormatter("%(levelname)s: %(message)s")
-def exec_func_python(func, d, runfile, cwd=None, pythonexception=False):
+def exec_func_python(func, d, runfile, cwd=None):
     """Execute a python BB 'function'"""
 
     code = _functionfmt.format(function=func)
@@ -301,14 +296,7 @@ def exec_func_python(func, d, runfile, cwd=None, pythonexception=False):
         bb.methodpool.insert_method(func, text, fn, lineno - 1)
 
         comp = utils.better_compile(code, func, "exec_python_func() autogenerated")
-        utils.better_exec(comp, {"d": d}, code, "exec_python_func() autogenerated", pythonexception=pythonexception)
-    except (bb.parse.SkipRecipe, bb.build.FuncFailed):
-        raise
-    except Exception as e:
-        if pythonexception:
-            raise
-        logger.error(str(e))
-        raise FuncFailed(func, None)
+        utils.better_exec(comp, {"d": d}, code, "exec_python_func() autogenerated")
     finally:
         bb.debug(2, "Python function %s finished" % func)
 
@@ -320,21 +308,97 @@ def exec_func_python(func, d, runfile, cwd=None, pythonexception=False):
 
 def shell_trap_code():
     return '''#!/bin/sh\n
+__BITBAKE_LAST_LINE=0
+
 # Emit a useful diagnostic if something fails:
-bb_exit_handler() {
+bb_sh_exit_handler() {
     ret=$?
-    case $ret in
-    0)  ;;
-    *)  case $BASH_VERSION in
-        "") echo "WARNING: exit code $ret from a shell command.";;
-        *)  echo "WARNING: ${BASH_SOURCE[0]}:${BASH_LINENO[0]} exit $ret from '$BASH_COMMAND'";;
-        esac
-        exit $ret
-    esac
+    if [ "$ret" != 0 ]; then
+        echo "WARNING: exit code $ret from a shell command."
+    fi
+    exit $ret
 }
-trap 'bb_exit_handler' 0
-set -e
+
+bb_bash_exit_handler() {
+    ret=$?
+    { set +x; } > /dev/null
+    trap "" DEBUG
+    if [ "$ret" != 0 ]; then
+        echo "WARNING: ${BASH_SOURCE[0]}:${__BITBAKE_LAST_LINE} exit $ret from '$1'"
+
+        echo "WARNING: Backtrace (BB generated script): "
+        for i in $(seq 1 $((${#FUNCNAME[@]} - 1))); do
+            if [ "$i" -eq 1 ]; then
+                echo -e "\t#$((i)): ${FUNCNAME[$i]}, ${BASH_SOURCE[$((i-1))]}, line ${__BITBAKE_LAST_LINE}"
+            else
+                echo -e "\t#$((i)): ${FUNCNAME[$i]}, ${BASH_SOURCE[$((i-1))]}, line ${BASH_LINENO[$((i-1))]}"
+            fi
+        done
+    fi
+    exit $ret
+}
+
+bb_bash_debug_handler() {
+    local line=${BASH_LINENO[0]}
+    # For some reason the DEBUG trap trips with lineno=1 when scripts exit; ignore it
+    if [ "$line" -eq 1 ]; then
+        return
+    fi
+
+    # Track the line number of commands as they execute. This is so we can have access to the failing line number
+    # in the EXIT trap. See http://gnu-bash.2382.n7.nabble.com/trap-echo-quot-trap-exit-on-LINENO-quot-EXIT-gt-wrong-linenumber-td3666.html
+    if [ "${FUNCNAME[1]}" != "bb_bash_exit_handler" ]; then
+        __BITBAKE_LAST_LINE=$line
+    fi
+}
+
+case $BASH_VERSION in
+"") trap 'bb_sh_exit_handler' 0
+    set -e
+    ;;
+*)  trap 'bb_bash_exit_handler "$BASH_COMMAND"' 0
+    trap '{ bb_bash_debug_handler; } 2>/dev/null' DEBUG
+    set -e
+    shopt -s extdebug
+    ;;
+esac
 '''
+
+def create_progress_handler(func, progress, logfile, d):
+    if progress == 'percent':
+        # Use default regex
+        return bb.progress.BasicProgressHandler(d, outfile=logfile)
+    elif progress.startswith('percent:'):
+        # Use specified regex
+        return bb.progress.BasicProgressHandler(d, regex=progress.split(':', 1)[1], outfile=logfile)
+    elif progress.startswith('outof:'):
+        # Use specified regex
+        return bb.progress.OutOfProgressHandler(d, regex=progress.split(':', 1)[1], outfile=logfile)
+    elif progress.startswith("custom:"):
+        # Use a custom progress handler that was injected via OE_EXTRA_IMPORTS or __builtins__
+        import functools
+        from types import ModuleType
+
+        parts = progress.split(":", 2)
+        _, cls, otherargs = parts[0], parts[1], (parts[2] or None) if parts[2:] else None
+        if cls:
+            def resolve(x, y):
+                if not x:
+                    return None
+                if isinstance(x, ModuleType):
+                    return getattr(x, y, None)
+                return x.get(y)
+            cls_obj = functools.reduce(resolve, cls.split("."), bb.utils._context)
+            if not cls_obj:
+                # Fall-back on __builtins__
+                cls_obj = functools.reduce(resolve, cls.split("."), __builtins__)
+            if cls_obj:
+                return cls_obj(d, outfile=logfile, otherargs=otherargs)
+            bb.warn('%s: unknown custom progress handler in task progress varflag value "%s", ignoring' % (func, cls))
+    else:
+        bb.warn('%s: invalid task progress varflag value "%s", ignoring' % (func, progress))
+
+    return logfile
 
 def exec_func_shell(func, d, runfile, cwd=None):
     """Execute a shell function from the metadata
@@ -352,7 +416,7 @@ def exec_func_shell(func, d, runfile, cwd=None):
 
         bb.data.emit_func(func, script, d)
 
-        if bb.msg.loggerVerboseLogs:
+        if verboseShellLogging or bb.utils.to_boolean(d.getVar("BB_VERBOSE_LOGS", False)):
             script.write("set -x\n")
         if cwd:
             script.write("cd '%s'\n" % cwd)
@@ -372,24 +436,20 @@ exit $ret
         if fakerootcmd:
             cmd = [fakerootcmd, runfile]
 
-    if bb.msg.loggerDefaultVerbose:
-        logfile = LogTee(logger, sys.stdout)
+    if verboseStdoutLogging:
+        logfile = LogTee(logger, StdoutNoopContextManager())
     else:
-        logfile = sys.stdout
+        logfile = StdoutNoopContextManager()
 
     progress = d.getVarFlag(func, 'progress')
     if progress:
-        if progress == 'percent':
-            # Use default regex
-            logfile = bb.progress.BasicProgressHandler(d, outfile=logfile)
-        elif progress.startswith('percent:'):
-            # Use specified regex
-            logfile = bb.progress.BasicProgressHandler(d, regex=progress.split(':', 1)[1], outfile=logfile)
-        elif progress.startswith('outof:'):
-            # Use specified regex
-            logfile = bb.progress.OutOfProgressHandler(d, regex=progress.split(':', 1)[1], outfile=logfile)
-        else:
-            bb.warn('%s: invalid task progress varflag value "%s", ignoring' % (func, progress))
+        try:
+            logfile = create_progress_handler(func, progress, logfile, d)
+        except:
+            from traceback import format_exc
+            logger.error("Failed to create progress handler")
+            logger.error(format_exc())
+            raise
 
     fifobuffer = bytearray()
     def readfifo(data):
@@ -408,6 +468,8 @@ exit $ret
                     bb.plain(value)
                 elif cmd == 'bbnote':
                     bb.note(value)
+                elif cmd == 'bbverbnote':
+                    bb.verbnote(value)
                 elif cmd == 'bbwarn':
                     bb.warn(value)
                 elif cmd == 'bberror':
@@ -437,13 +499,64 @@ exit $ret
     with open(fifopath, 'r+b', buffering=0) as fifo:
         try:
             bb.debug(2, "Executing shell function %s" % func)
+            with open(os.devnull, 'r+') as stdin, logfile:
+                bb.process.run(cmd, shell=False, stdin=stdin, log=logfile, extrafiles=[(fifo,readfifo)])
+        except bb.process.ExecutionError as exe:
+            # Find the backtrace that the shell trap generated
+            backtrace_marker_regex = re.compile(r"WARNING: Backtrace \(BB generated script\)")
+            stdout_lines = (exe.stdout or "").split("\n")
+            backtrace_start_line = None
+            for i, line in enumerate(reversed(stdout_lines)):
+                if backtrace_marker_regex.search(line):
+                    backtrace_start_line = len(stdout_lines) - i
+                    break
 
-            try:
-                with open(os.devnull, 'r+') as stdin:
-                    bb.process.run(cmd, shell=False, stdin=stdin, log=logfile, extrafiles=[(fifo,readfifo)])
-            except bb.process.CmdError:
-                logfn = d.getVar('BB_LOGFILE')
-                raise FuncFailed(func, logfn)
+            # Read the backtrace frames, starting at the location we just found
+            backtrace_entry_regex = re.compile(r"#(?P<frameno>\d+): (?P<funcname>[^\s]+), (?P<file>.+?), line ("
+                                               r"?P<lineno>\d+)")
+            backtrace_frames = []
+            if backtrace_start_line:
+                for line in itertools.islice(stdout_lines, backtrace_start_line, None):
+                    match = backtrace_entry_regex.search(line)
+                    if match:
+                        backtrace_frames.append(match.groupdict())
+
+            with open(runfile, "r") as script:
+                script_lines = [line.rstrip() for line in script.readlines()]
+
+            # For each backtrace frame, search backwards in the script (from the line number called out by the frame),
+            # to find the comment that emit_vars injected when it wrote the script. This will give us the metadata
+            # filename (e.g. .bb or .bbclass) and line number where the shell function was originally defined.
+            script_metadata_comment_regex = re.compile(r"# line: (?P<lineno>\d+), file: (?P<file>.+)")
+            better_frames = []
+            # Skip the very last frame since it's just the call to the shell task in the body of the script
+            for frame in backtrace_frames[:-1]:
+                # Check whether the frame corresponds to a function defined in the script vs external script.
+                if os.path.samefile(frame["file"], runfile):
+                    # Search backwards from the frame lineno to locate the comment that BB injected
+                    i = int(frame["lineno"]) - 1
+                    while i >= 0:
+                        match = script_metadata_comment_regex.match(script_lines[i])
+                        if match:
+                            # Calculate the relative line in the function itself
+                            relative_line_in_function = int(frame["lineno"]) - i - 2
+                            # Calculate line in the function as declared in the metadata
+                            metadata_function_line = relative_line_in_function + int(match["lineno"])
+                            better_frames.append("#{frameno}: {funcname}, {file}, line {lineno}".format(
+                                frameno=frame["frameno"],
+                                funcname=frame["funcname"],
+                                file=match["file"],
+                                lineno=metadata_function_line
+                            ))
+                            break
+                        i -= 1
+                else:
+                    better_frames.append("#{frameno}: {funcname}, {file}, line {lineno}".format(**frame))
+
+            if better_frames:
+                better_frames = ("\t{0}".format(frame) for frame in better_frames)
+                exe.extra_message = "\nBacktrace (metadata-relative locations):\n{0}".format("\n".join(better_frames))
+            raise
         finally:
             os.unlink(fifopath)
 
@@ -470,7 +583,7 @@ def _exec_task(fn, task, d, quieterr):
         logger.error("No such task: %s" % task)
         return 1
 
-    logger.debug(1, "Executing task %s", task)
+    logger.debug("Executing task %s", task)
 
     localdata = _task_data(fn, task, d)
     tempdir = localdata.getVar('T')
@@ -483,7 +596,7 @@ def _exec_task(fn, task, d, quieterr):
         curnice = os.nice(0)
         nice = int(nice) - curnice
         newnice = os.nice(nice)
-        logger.debug(1, "Renice to %s " % newnice)
+        logger.debug("Renice to %s " % newnice)
     ionice = localdata.getVar("BB_TASK_IONICE_LEVEL")
     if ionice:
         try:
@@ -568,11 +681,8 @@ def _exec_task(fn, task, d, quieterr):
 
     try:
         try:
-            event.fire(TaskStarted(task, logfn, flags, localdata), localdata)
+            event.fire(TaskStarted(task, fn, logfn, flags, localdata), localdata)
         except (bb.BBHandledException, SystemExit):
-            return 1
-        except FuncFailed as exc:
-            logger.error(str(exc))
             return 1
 
         try:
@@ -581,16 +691,16 @@ def _exec_task(fn, task, d, quieterr):
             exec_func(task, localdata)
             for func in (postfuncs or '').split():
                 exec_func(func, localdata)
-        except FuncFailed as exc:
+        except bb.BBHandledException:
+            event.fire(TaskFailed(task, fn, logfn, localdata, True), localdata)
+            return 1
+        except Exception as exc:
             if quieterr:
-                event.fire(TaskFailedSilent(task, logfn, localdata), localdata)
+                event.fire(TaskFailedSilent(task, fn, logfn, localdata), localdata)
             else:
                 errprinted = errchk.triggered
                 logger.error(str(exc))
-                event.fire(TaskFailed(task, logfn, localdata, errprinted), localdata)
-            return 1
-        except bb.BBHandledException:
-            event.fire(TaskFailed(task, logfn, localdata, True), localdata)
+                event.fire(TaskFailed(task, fn, logfn, localdata, errprinted), localdata)
             return 1
     finally:
         sys.stdout.flush()
@@ -610,10 +720,10 @@ def _exec_task(fn, task, d, quieterr):
 
         logfile.close()
         if os.path.exists(logfn) and os.path.getsize(logfn) == 0:
-            logger.debug(2, "Zero size logfn %s, removing", logfn)
+            logger.debug2("Zero size logfn %s, removing", logfn)
             bb.utils.remove(logfn)
             bb.utils.remove(loglink)
-    event.fire(TaskSucceeded(task, logfn, localdata), localdata)
+    event.fire(TaskSucceeded(task, fn, logfn, localdata), localdata)
 
     if not localdata.getVarFlag(task, 'nostamp', False) and not localdata.getVarFlag(task, 'selfstamp', False):
         make_stamp(task, localdata)
@@ -744,6 +854,23 @@ def make_stamp(task, d, file_name = None):
         file_name = d.getVar('BB_FILENAME')
         bb.parse.siggen.dump_sigtask(file_name, task, stampbase, True)
 
+def find_stale_stamps(task, d, file_name=None):
+    current = stamp_internal(task, d, file_name)
+    current2 = stamp_internal(task + "_setscene", d, file_name)
+    cleanmask = stamp_cleanmask_internal(task, d, file_name)
+    found = []
+    for mask in cleanmask:
+        for name in glob.glob(mask):
+            if "sigdata" in name or "sigbasedata" in name:
+                continue
+            if name.endswith('.taint'):
+                continue
+            if name == current or name == current2:
+                continue
+            logger.debug2("Stampfile %s does not match %s or %s" % (name, current, current2))
+            found.append(name)
+    return found
+
 def del_stamp(task, d, file_name = None):
     """
     Removes a stamp for a given task
@@ -815,6 +942,9 @@ def add_tasks(tasklist, d):
         task_deps['parents'][task] = []
         if 'deps' in flags:
             for dep in flags['deps']:
+                # Check and warn for "addtask task after foo" while foo does not exist
+                #if not dep in tasklist:
+                #    bb.warn('%s: dependent task %s for %s does not exist' % (d.getVar('PN'), dep, task))
                 dep = d.expand(dep)
                 task_deps['parents'][task].append(dep)
 

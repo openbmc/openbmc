@@ -1,0 +1,42 @@
+From a12325a0cbf3bf1d66a0b0f8d85e08083bae6066 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20=C5=A0tetiar?= <ynezz@true.cz>
+Date: Wed, 25 Dec 2019 10:27:59 +0100
+Subject: [PATCH] blobmsg: fix array out of bounds GCC 10 warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes following warning reported by GCC 10.0.0 20191203:
+
+ blobmsg.c:234:2: error: 'strcpy' offset 6 from the object at 'attr' is out of the bounds of referenced subobject 'name' with type 'uint8_t[0]' {aka 'unsigned char[0]'} at offset 6 [-Werror=array-bounds]
+   234 |  strcpy((char *) hdr->name, (const char *)name);
+       |  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ In file included from blobmsg.c:16:
+ blobmsg.h:42:10: note: subobject 'name' declared here
+    42 |  uint8_t name[];
+       |          ^~~~
+
+Upstream-Status: Submitted [https://gitlab.com/ynezz/openwrt-libubox/commit/3775b3aa28de8c20d96b6f02786a327423b0748a]
+Reported-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Petr Štetiar <ynezz@true.cz>
+---
+ blobmsg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blobmsg.c b/blobmsg.c
+index a860483..b6b7535 100644
+--- a/blobmsg.c
++++ b/blobmsg.c
+@@ -195,7 +195,7 @@ blobmsg_new(struct blob_buf *buf, int type, const char *name, int payload_len, v
+ 	attr->id_len |= be32_to_cpu(BLOB_ATTR_EXTENDED);
+ 	hdr = blob_data(attr);
+ 	hdr->namelen = cpu_to_be16(namelen);
+-	strcpy((char *) hdr->name, (const char *)name);
++	memcpy(hdr->name, name, namelen);
+ 	pad_end = *data = blobmsg_data(attr);
+ 	pad_start = (char *) &hdr->name[namelen];
+ 	if (pad_start < pad_end)
+-- 
+2.24.1
+

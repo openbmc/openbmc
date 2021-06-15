@@ -1,0 +1,512 @@
+From 9bb68d8820480519e8b331f7a8b866b8718ad7fd Mon Sep 17 00:00:00 2001
+From: Alexander Filippov <a.filippov@yadro.com>
+Date: Tue, 19 May 2020 18:55:41 +0300
+Subject: [PATCH] aspeed: add gpio support
+
+This is an initial support for the parallel GPIO pins directly connected
+to the AHB on the Aspeed 2400/2500.
+
+This brings the functions and a shell command to manipulate the GPIO
+state. The GPIO value reading and writing work in non interrupt mode
+only.
+
+Signed-off-by: Alexander Filippov <a.filippov@yadro.com>
+---
+ arch/arm/include/asm/arch-aspeed/gpio.h     |  65 ++++
+ arch/arm/include/asm/arch-aspeed/platform.h |   1 +
+ drivers/gpio/Makefile                       |   2 +
+ drivers/gpio/aspeed_gpio.c                  | 386 ++++++++++++++++++++
+ 4 files changed, 454 insertions(+)
+ create mode 100644 arch/arm/include/asm/arch-aspeed/gpio.h
+ create mode 100644 drivers/gpio/aspeed_gpio.c
+
+diff --git a/arch/arm/include/asm/arch-aspeed/gpio.h b/arch/arm/include/asm/arch-aspeed/gpio.h
+new file mode 100644
+index 0000000000..c63987e917
+--- /dev/null
++++ b/arch/arm/include/asm/arch-aspeed/gpio.h
+@@ -0,0 +1,65 @@
++/*
++ * SPDX-License-Identifier: GPL-2.0+
++ * Copyright (C) 2020 YADRO.
++ */
++#ifndef _ASPEED_GPIO_H
++#define _ASPEED_GPIO_H
++
++#define ASPEED_GPIO_PORT_A 0
++#define ASPEED_GPIO_PORT_B 1
++#define ASPEED_GPIO_PORT_C 2
++#define ASPEED_GPIO_PORT_D 3
++#define ASPEED_GPIO_PORT_E 4
++#define ASPEED_GPIO_PORT_F 5
++#define ASPEED_GPIO_PORT_G 6
++#define ASPEED_GPIO_PORT_H 7
++#define ASPEED_GPIO_PORT_I 8
++#define ASPEED_GPIO_PORT_J 9
++#define ASPEED_GPIO_PORT_K 10
++#define ASPEED_GPIO_PORT_L 11
++#define ASPEED_GPIO_PORT_M 12
++#define ASPEED_GPIO_PORT_N 13
++#define ASPEED_GPIO_PORT_O 14
++#define ASPEED_GPIO_PORT_P 15
++#define ASPEED_GPIO_PORT_Q 16
++#define ASPEED_GPIO_PORT_R 17
++#define ASPEED_GPIO_PORT_S 18
++#define ASPEED_GPIO_PORT_T 19
++#define ASPEED_GPIO_PORT_U 20
++#define ASPEED_GPIO_PORT_V 21
++#define ASPEED_GPIO_PORT_W 22
++#define ASPEED_GPIO_PORT_X 23
++#define ASPEED_GPIO_PORT_Y 24
++#define ASPEED_GPIO_PORT_Z 25
++#define ASPEED_GPIO_PORT_AA 26
++#define ASPEED_GPIO_PORT_AB 27
++#define ASPEED_GPIO_PORT_AC 28
++
++#define ASPEED_GPIO_PORT_SHIFT 3
++#define ASPEED_GPIO_PIN_MASK 0x7
++#define ASPEED_GPIO(port, pin)                                                 \
++    ((ASPEED_GPIO_PORT_##port << ASPEED_GPIO_PORT_SHIFT) |                     \
++     (pin & ASPEED_GPIO_PIN_MASK))
++
++/* Direction values */
++#define ASPEED_GPIO_INPUT 0
++#define ASPEED_GPIO_OUTPUT 1
++
++/* Trigger values */
++#define ASPEED_GPIO_FALLING_EDGE 0
++#define ASPEED_GPIO_RISING_EDGE 1
++#define ASPEED_GPIO_LOW_LEVEL 2
++#define ASPEED_GPIO_HIGH_LEVEL 3
++#define ASPEED_GPIO_DUAL_EDGE 4
++
++/* Debounce values */
++#define ASPEED_GPIO_DEBOUNCE_NONE 0
++#define ASPEED_GPIO_DEBOUNCE_1 1
++#define ASPEED_GPIO_DEBOUNCE_2 2
++#define ASPEED_GPIO_DEBOUNCE_3 3
++
++#define gpio_status() gpio_info()
++
++extern void gpio_info(void);
++
++#endif /* #ifndef _ASPEED_GPIO_H */
+diff --git a/arch/arm/include/asm/arch-aspeed/platform.h b/arch/arm/include/asm/arch-aspeed/platform.h
+index b9207c492f..0a05a7a7a0 100644
+--- a/arch/arm/include/asm/arch-aspeed/platform.h
++++ b/arch/arm/include/asm/arch-aspeed/platform.h
+@@ -32,5 +32,6 @@
+ #endif
+ 
+ #define CONFIG_BOARD_LATE_INIT 1 /* Call board_late_init */
++#define CONFIG_CMD_GPIO 1        /* Enable gpio command in shell */
+ 
+ #endif
+diff --git a/drivers/gpio/Makefile b/drivers/gpio/Makefile
+index 792d19186a..5f043e07ce 100644
+--- a/drivers/gpio/Makefile
++++ b/drivers/gpio/Makefile
+@@ -14,6 +14,8 @@ obj-$(CONFIG_DM_GPIO)		+= gpio-uclass.o
+ obj-$(CONFIG_DM_PCA953X)	+= pca953x_gpio.o
+ obj-$(CONFIG_DM_74X164)		+= 74x164_gpio.o
+ 
++obj-$(CONFIG_ARCH_AST2400)	+= aspeed_gpio.o
++obj-$(CONFIG_ARCH_AST2500)	+= aspeed_gpio.o
+ obj-$(CONFIG_AT91_GPIO)	+= at91_gpio.o
+ obj-$(CONFIG_ATMEL_PIO4)	+= atmel_pio4.o
+ obj-$(CONFIG_INTEL_ICH6_GPIO)	+= intel_ich6_gpio.o
+diff --git a/drivers/gpio/aspeed_gpio.c b/drivers/gpio/aspeed_gpio.c
+new file mode 100644
+index 0000000000..dc07f5a520
+--- /dev/null
++++ b/drivers/gpio/aspeed_gpio.c
+@@ -0,0 +1,386 @@
++/*
++ * SPDX-License-Identifier: GPL-2.0+
++ * Copyright (C) 2020 YADRO.
++ */
++
++#include <common.h>
++
++#include <asm/arch/gpio.h>
++#include <asm/arch/platform.h>
++#include <asm/io.h>
++#include <linux/ctype.h>
++
++typedef struct _ast_gpio_regs
++{
++    uint32_t base;     /* data and direction registers */
++    uint32_t intcfg;   /* interrupt config */
++    uint32_t debounce; /* debounce config */
++    uint32_t cmdsrc;   /* command source config */
++    uint32_t data;     /* data read register */
++} ast_gpio_regs_t;
++
++static ast_gpio_regs_t ast_gpio_regs[] = {
++    /* A/B/C/D */
++    {AST_GPIO_BASE + 0x0000, AST_GPIO_BASE + 0x0008, AST_GPIO_BASE + 0x0040,
++     AST_GPIO_BASE + 0x0060, AST_GPIO_BASE + 0x00C0},
++    /* E/F/G/H */
++    {AST_GPIO_BASE + 0x0020, AST_GPIO_BASE + 0x0028, AST_GPIO_BASE + 0x0048,
++     AST_GPIO_BASE + 0x0068, AST_GPIO_BASE + 0x00C4},
++    /* I/J/K/L */
++    {AST_GPIO_BASE + 0x0070, AST_GPIO_BASE + 0x0098, AST_GPIO_BASE + 0x00B0,
++     AST_GPIO_BASE + 0x0090, AST_GPIO_BASE + 0x00C8},
++    /* M/N/O/P */
++    {AST_GPIO_BASE + 0x0078, AST_GPIO_BASE + 0x00E8, AST_GPIO_BASE + 0x0100,
++     AST_GPIO_BASE + 0x00E0, AST_GPIO_BASE + 0x00CC},
++    /* Q/R/S/T */
++    {AST_GPIO_BASE + 0x0080, AST_GPIO_BASE + 0x0118, AST_GPIO_BASE + 0x0130,
++     AST_GPIO_BASE + 0x0110, AST_GPIO_BASE + 0x00D0},
++    /* U/V/W/X */
++    {AST_GPIO_BASE + 0x0088, AST_GPIO_BASE + 0x0148, AST_GPIO_BASE + 0x0160,
++     AST_GPIO_BASE + 0x0140, AST_GPIO_BASE + 0x00D4},
++    /* Y/Z/AA/AB */
++    {AST_GPIO_BASE + 0x01E0, AST_GPIO_BASE + 0x0178, AST_GPIO_BASE + 0x0190,
++     AST_GPIO_BASE + 0x0170, AST_GPIO_BASE + 0x00D8},
++    /* AC */
++    {AST_GPIO_BASE + 0x01E8, AST_GPIO_BASE + 0x01A8, AST_GPIO_BASE + 0x01C0,
++     AST_GPIO_BASE + 0x01A0, AST_GPIO_BASE + 0x00DC},
++};
++
++#define AST_GPIO_PINS_PER_PORT 8
++#define AST_GPIO_PORTS_PER_REGISTER 4
++
++#define AST_GPIO_PORT(gpio) (gpio >> ASPEED_GPIO_PORT_SHIFT)
++#define AST_GPIO_PIN(gpio) (gpio & ASPEED_GPIO_PIN_MASK)
++#define AST_GPIO_SHIFT(gpio)                                                   \
++    ((AST_GPIO_PORT(gpio) % AST_GPIO_PORTS_PER_REGISTER) *                     \
++         AST_GPIO_PINS_PER_PORT +                                              \
++     AST_GPIO_PIN(gpio))
++
++#define AST_GPIO_REG_INDEX(gpio)                                               \
++    (AST_GPIO_PORT(gpio) / AST_GPIO_PORTS_PER_REGISTER)
++
++/**
++ * @return Pointer to corresponding item from ast_gpio_regs table.
++ */
++#define AST_GPIO_REGS(gpio)                                                    \
++    ((AST_GPIO_REG_INDEX(gpio) < ARRAY_SIZE(ast_gpio_regs))                    \
++         ? (ast_gpio_regs + AST_GPIO_REG_INDEX(gpio))                          \
++         : NULL)
++
++/**
++ * @brief Set a corresponding bit in specified register.
++ *
++ * @param val - Required bit value
++ * @param base - Register address
++ * @param shift - Bit index.
++ */
++#define AST_GPIO_WRITE(val, base, shift)                                       \
++    writel(((val) ? readl(base) | (1 << (shift))                               \
++                  : readl(base) & ~(1 << (shift))),                            \
++           base)
++
++/**
++ * @brief Get value of corresponging bit from specified register.
++ *
++ * @param base - Register address
++ * @param shift - Bit index
++ *
++ * @return Bit value
++ */
++#define AST_GPIO_READ(base, shift) ((readl(base) >> (shift)) & 1)
++
++#define IS_VALID_GPIO(gpio)                                                    \
++    ((gpio) >= ASPEED_GPIO(A, 0) && (gpio) <= ASPEED_GPIO(AC, 7))
++
++#define AST_GPIO_DIRECTION 0x04
++#define AST_GPIO_INT_SENS0 0x04
++#define AST_GPIO_INT_SENS1 0x08
++#define AST_GPIO_INT_SENS2 0x0C
++#define AST_GPIO_INT_STATUS 0x10
++#define AST_GPIO_DEBOUNCE0 0x00
++#define AST_GPIO_DEBOUNCE1 0x04
++#define AST_GPIO_CMD_SRC0 0x00
++#define AST_GPIO_CMD_SRC1 0x04
++
++/**
++ * @brief Set a GPIO direction
++ *
++ * @param gpio      GPIO line
++ * @param direction GPIO direction (0 for input or 1 for output)
++ *
++ * @return 0 if ok, -1 on error
++ */
++static int ast_gpio_set_direction(unsigned gpio, unsigned direction)
++{
++    ast_gpio_regs_t *regs = AST_GPIO_REGS(gpio);
++    if (!regs)
++    {
++        printf("%s: Invalid GPIO!\n", __func__);
++        return -1;
++    }
++
++    AST_GPIO_WRITE(direction, regs->base + AST_GPIO_DIRECTION,
++                   AST_GPIO_SHIFT(gpio));
++    return 0;
++}
++
++/**
++ * The 6 following functions are generic u-boot gpio implementation.
++ * They are declared in `include/asm-generic/gpio.h`
++ */
++
++int gpio_request(unsigned gpio, const char *label)
++{
++    return (IS_VALID_GPIO(gpio) ? 0 : -1);
++}
++
++int gpio_free(unsigned gpio)
++{
++    return (IS_VALID_GPIO(gpio) ? 0 : -1);
++}
++
++int gpio_get_value(unsigned gpio)
++{
++    ast_gpio_regs_t *regs = AST_GPIO_REGS(gpio);
++    if (!regs)
++    {
++        printf("%s: Invalid GPIO!\n", __func__);
++        return -1;
++    }
++
++    return AST_GPIO_READ(regs->base, AST_GPIO_SHIFT(gpio));
++}
++
++int gpio_set_value(unsigned gpio, int value)
++{
++    ast_gpio_regs_t *regs = AST_GPIO_REGS(gpio);
++    if (!regs)
++    {
++        printf("%s: Invalid GPIO!\n", __func__);
++        return -1;
++    }
++
++    AST_GPIO_WRITE(value, regs->base, AST_GPIO_SHIFT(gpio));
++    return 0;
++}
++
++int gpio_direction_input(unsigned gpio)
++{
++    return ast_gpio_set_direction(gpio, ASPEED_GPIO_INPUT);
++}
++
++int gpio_direction_output(unsigned gpio, int value)
++{
++    int rc = ast_gpio_set_direction(gpio, ASPEED_GPIO_OUTPUT);
++    return (rc == 0 ? gpio_set_value(gpio, value) : rc);
++}
++
++/**
++ * @brief Convert a string to GPIO line. Used by `do_gpio()` from `cmd/gpio.c`
++ *
++ * @param str a GPIO name or line number
++ *
++ * @return GPIO line if ok, -1 on error
++ */
++int name_to_gpio(const char *str)
++{
++    int gpio = -1;
++
++    if (str)
++    {
++        if (isalpha(*str))
++        {
++            gpio = (toupper(*str) - 'A') << ASPEED_GPIO_PORT_SHIFT;
++
++            if (toupper(*str) == 'A' && toupper(*(str + 1)) >= 'A' &&
++                toupper(*(str + 1)) <= 'C')
++            {
++                str++;
++                gpio = (ASPEED_GPIO_PORT_AA + toupper(*str) - 'A')
++                       << ASPEED_GPIO_PORT_SHIFT;
++            }
++
++            str++;
++            if (*str >= '0' && *str <= '7' && !*(str + 1))
++            {
++                gpio += *str - '0';
++            }
++            else
++            {
++                gpio = -1;
++            }
++        }
++        else if (isdigit(*str))
++        {
++            gpio = simple_strtoul(str, NULL, 0);
++        }
++    }
++
++    return gpio;
++}
++
++/**
++ * @return A GPIO direction in human readable format.
++ */
++static const char *ast_gpio_direction(unsigned gpio)
++{
++    ast_gpio_regs_t *regs = AST_GPIO_REGS(gpio);
++    if (regs)
++    {
++        int direction = AST_GPIO_READ(regs->base + AST_GPIO_DIRECTION,
++                                      AST_GPIO_SHIFT(gpio));
++        switch (direction)
++        {
++            case ASPEED_GPIO_INPUT:
++                return "input";
++            case ASPEED_GPIO_OUTPUT:
++                return "output";
++            default:
++                break;
++        }
++    }
++    return "error";
++}
++
++/**
++ * @return An interrupt trigger settings in human readable format.
++ */
++static const char *ast_gpio_trigger(unsigned gpio)
++{
++    ast_gpio_regs_t *regs = AST_GPIO_REGS(gpio);
++    if (regs)
++    {
++        unsigned shift = AST_GPIO_SHIFT(gpio);
++        unsigned trigger =
++            (AST_GPIO_READ(regs->intcfg + AST_GPIO_INT_SENS0, shift) << 0) |
++            (AST_GPIO_READ(regs->intcfg + AST_GPIO_INT_SENS1, shift) << 1) |
++            (AST_GPIO_READ(regs->intcfg + AST_GPIO_INT_SENS2, shift) << 2);
++
++        switch (trigger)
++        {
++            case ASPEED_GPIO_FALLING_EDGE:
++                return "fall";
++            case ASPEED_GPIO_RISING_EDGE:
++                return "rise";
++            case ASPEED_GPIO_LOW_LEVEL:
++                return "low ";
++            case ASPEED_GPIO_HIGH_LEVEL:
++                return "high";
++            default:
++                return "both";
++        }
++    }
++    return "error";
++}
++
++/**
++ * @return An interrupt status in human readable format.
++ */
++static const char *ast_gpio_int_status(unsigned gpio)
++{
++    ast_gpio_regs_t *regs = AST_GPIO_REGS(gpio);
++    if (regs)
++    {
++        unsigned shift = AST_GPIO_SHIFT(gpio);
++        if (AST_GPIO_READ(regs->intcfg, shift))
++        {
++            return AST_GPIO_READ(regs->intcfg + AST_GPIO_INT_STATUS, shift)
++                       ? "pending"
++                       : "cleaned";
++        }
++        return "disabled";
++    }
++
++    return "error";
++}
++
++/**
++ * @return A debounce value in human readable format.
++ */
++static const char *ast_gpio_debounce(unsigned gpio)
++{
++    ast_gpio_regs_t *regs = AST_GPIO_REGS(gpio);
++    if (regs)
++    {
++        unsigned shift = AST_GPIO_SHIFT(gpio);
++        unsigned debounce =
++            (AST_GPIO_READ(regs->debounce + AST_GPIO_DEBOUNCE0, shift) << 0) |
++            (AST_GPIO_READ(regs->debounce + AST_GPIO_DEBOUNCE1, shift) << 1);
++        switch (debounce)
++        {
++            case ASPEED_GPIO_DEBOUNCE_NONE:
++                return "none";
++            case ASPEED_GPIO_DEBOUNCE_1:
++                return "timer1";
++            case ASPEED_GPIO_DEBOUNCE_2:
++                return "timer2";
++            case ASPEED_GPIO_DEBOUNCE_3:
++                return "timer3";
++            default:
++                break;
++        }
++    }
++
++    return "error";
++}
++
++/**
++ * @return A command source value in human readable format.
++ */
++static const char *ast_gpio_command_source(unsigned gpio)
++{
++    ast_gpio_regs_t *regs = AST_GPIO_REGS(gpio);
++    if (regs)
++    {
++        /* Used one bit per gpio port */
++        unsigned shift = AST_GPIO_SHIFT(gpio) - AST_GPIO_PIN(gpio);
++        unsigned cmdsrc =
++            (AST_GPIO_READ(regs->cmdsrc + AST_GPIO_CMD_SRC0, shift) << 0) |
++            (AST_GPIO_READ(regs->cmdsrc + AST_GPIO_CMD_SRC1, shift) << 1);
++
++        switch (cmdsrc)
++        {
++            /* The single place where these values are used is here. */
++            case 0x0:
++                return "ARM";
++            case 0x1:
++                return "LPC";
++            case 0x2:
++                return "CoCPU";
++            default:
++                return "Unknown";
++        }
++    }
++
++    return "error";
++}
++
++/**
++ * @brief Show all GPIO pins statuses. Used by `do_gpio()` in `cmd/gpio.c`
++ */
++void gpio_info(void)
++{
++    unsigned first = ASPEED_GPIO(A, 0);
++    unsigned last = ASPEED_GPIO(AC, 7);
++    for (unsigned gpio = first; gpio <= last; gpio++)
++    {
++        unsigned port = AST_GPIO_PORT(gpio);
++        unsigned pin = AST_GPIO_PIN(gpio);
++        unsigned shift = AST_GPIO_SHIFT(gpio);
++        ast_gpio_regs_t *regs = AST_GPIO_REGS(gpio);
++        if (!regs)
++        {
++            printf("gpio %u is invalid!\n", gpio);
++            continue;
++        }
++
++        printf("gpio %c%c%c line %3d: %s, int: %s, %s, deb: %s, src: %s, "
++               "val: %d/%d\n",
++               (port >= ASPEED_GPIO_PORT_AA ? 'A' : ' '),
++               ('A' + port % ASPEED_GPIO_PORT_AA), ('0' + pin), gpio,
++               ast_gpio_direction(gpio), ast_gpio_trigger(gpio),
++               ast_gpio_int_status(gpio), ast_gpio_debounce(gpio),
++               ast_gpio_command_source(gpio), gpio_get_value(gpio),
++               AST_GPIO_READ(regs->data, shift));
++    }
++}
+-- 
+2.25.4
+

@@ -1,0 +1,83 @@
+From dd06894a786edf4bea11dace50d7380b89dfaba5 Mon Sep 17 00:00:00 2001
+From: hasan.men <hasan.men@bosphorusiss.com>
+Date: Sun, 4 Apr 2021 17:20:32 +0200
+Subject: [PATCH] fix absolute path problem
+
+---
+ src/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index c6c05e06..e6c47374 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -176,7 +176,7 @@ if(MINGW)
+ endif(MINGW)
+ 
+ # Support '#include <rdkafka.h>'
+-target_include_directories(rdkafka PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>")
++target_include_directories(rdkafka PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}> $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+ target_compile_definitions(rdkafka PUBLIC ${rdkafka_compile_definitions})
+ if(RDKAFKA_BUILD_STATIC)
+   target_compile_definitions(rdkafka PUBLIC LIBRDKAFKA_STATICLIB)
+@@ -188,7 +188,7 @@ if(MINGW)
+   target_link_libraries(rdkafka PUBLIC crypt32 ws2_32 secur32)
+ endif(MINGW)
+ 
+-if(WIN32)  
++if(WIN32)
+   if(RDKAFKA_BUILD_STATIC)
+     target_link_libraries(rdkafka PUBLIC crypt32)
+   else()
+@@ -207,13 +207,13 @@ endif()
+ 
+ if(WITH_ZLIB)
+   find_package(ZLIB REQUIRED)
+-  target_include_directories(rdkafka PUBLIC ${ZLIB_INCLUDE_DIRS})
++  target_include_directories(rdkafka PRIVATE ${ZLIB_INCLUDE_DIRS})
+   target_link_libraries(rdkafka PUBLIC ZLIB::ZLIB)
+ endif()
+ 
+ if(WITH_ZSTD)
+-  target_link_libraries(rdkafka PUBLIC ${ZSTD_LIBRARY})
+-  target_include_directories(rdkafka PUBLIC ${ZSTD_INCLUDE_DIR})
++  target_link_libraries(rdkafka PRIVATE ${ZSTD_LIBRARY})
++  target_include_directories(rdkafka PRIVATE ${ZSTD_INCLUDE_DIR})
+   message(STATUS "Found ZSTD: ${ZSTD_LIBRARY}")
+ endif()
+ 
+@@ -222,12 +222,12 @@ if(WITH_SSL)
+     if(NOT TARGET bundled-ssl)
+       message(FATAL_ERROR "bundled-ssl target not exist")
+     endif()
+-    target_include_directories(rdkafka BEFORE PUBLIC ${BUNDLED_SSL_INCLUDE_DIR})
++    target_include_directories(rdkafka BEFORE PRIVATE ${BUNDLED_SSL_INCLUDE_DIR})
+     target_link_libraries(rdkafka PUBLIC ${BUNDLED_SSL_LIBRARIES})
+     add_dependencies(rdkafka bundled-ssl)
+   else()
+     find_package(OpenSSL REQUIRED)
+-    target_include_directories(rdkafka PUBLIC ${OPENSSL_INCLUDE_DIR})
++    target_include_directories(rdkafka PRIVATE ${OPENSSL_INCLUDE_DIR})
+     target_link_libraries(rdkafka PUBLIC OpenSSL::SSL OpenSSL::Crypto)
+     get_target_property(OPENSSL_TARGET_TYPE OpenSSL::SSL TYPE)
+     if(OPENSSL_CRYPTO_LIBRARY MATCHES "\\.a$")
+@@ -244,7 +244,7 @@ find_package(Threads REQUIRED)
+ target_link_libraries(rdkafka PUBLIC Threads::Threads)
+ 
+ if(WITH_SASL_CYRUS)
+-  target_include_directories(rdkafka PUBLIC ${SASL_INCLUDE_DIRS})
++  target_include_directories(rdkafka PRIVATE ${SASL_INCLUDE_DIRS})
+   target_link_libraries(rdkafka PUBLIC ${SASL_LIBRARIES})
+ endif()
+ 
+@@ -253,7 +253,7 @@ if(WITH_LIBDL)
+ endif()
+ 
+ if(WITH_LZ4_EXT)
+-  target_include_directories(rdkafka PUBLIC ${LZ4_INCLUDE_DIRS})
++  target_include_directories(rdkafka PRIVATE ${LZ4_INCLUDE_DIRS})
+   target_link_libraries(rdkafka PUBLIC LZ4::LZ4)
+ endif()
+ 
+-- 
+2.17.1

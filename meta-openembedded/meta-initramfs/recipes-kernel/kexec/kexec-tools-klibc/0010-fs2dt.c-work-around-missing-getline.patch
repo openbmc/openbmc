@@ -1,4 +1,4 @@
-From edefda702d906d472ee7a675f6b506d5cfca7ac8 Mon Sep 17 00:00:00 2001
+From 14d4dbd293c75bc81a0dde6e678f9bbefb40b6f1 Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Tue, 17 Apr 2018 13:48:25 +0200
 Subject: [PATCH] fs2dt.c: work around missing getline()

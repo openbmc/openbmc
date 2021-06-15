@@ -1,0 +1,256 @@
+From 10d59c50195cff30c4e74959ef4cebc9065808a4 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Sat, 13 Oct 2018 21:12:43 +0530
+Subject: [PATCH 38/54] Fixed the load store issue with the 32bit arith
+ libraries
+
+---
+ libgcc/config/microblaze/divsi3.S  | 25 ++++++++++++++++++++++++-
+ libgcc/config/microblaze/modsi3.S  | 26 +++++++++++++++++++++++++-
+ libgcc/config/microblaze/mulsi3.S  |  3 +++
+ libgcc/config/microblaze/udivsi3.S | 24 +++++++++++++++++++++++-
+ libgcc/config/microblaze/umodsi3.S | 24 +++++++++++++++++++++++-
+ 5 files changed, 98 insertions(+), 4 deletions(-)
+
+diff --git a/libgcc/config/microblaze/divsi3.S b/libgcc/config/microblaze/divsi3.S
+index bb047094e2f..104243e35fe 100644
+--- a/libgcc/config/microblaze/divsi3.S
++++ b/libgcc/config/microblaze/divsi3.S
+@@ -41,6 +41,17 @@
+ 	.globl	__divsi3
+ 	.ent	__divsi3
+ 	.type	__divsi3,@function
++#ifdef __arch64__
++        .align 3
++__divsi3:
++	.frame	r1,0,r15	
++
++	ADDIK   r1,r1,-32
++	SLI     r28,r1,0
++	SLI     r29,r1,8
++	SLI     r30,r1,16
++	SLI     r31,r1,24
++#else
+ __divsi3:
+ 	.frame	r1,0,r15	
+ 
+@@ -49,7 +60,7 @@ __divsi3:
+ 	SWI     r29,r1,4
+ 	SWI     r30,r1,8
+ 	SWI     r31,r1,12
+-
++#endif
+ 	BEQI    r6,$LaDiv_By_Zero       # Div_by_Zero   # Division Error
+ 	BEQI    r5,$LaResult_Is_Zero    # Result is Zero 
+ 	BGEID   r5,$LaR5_Pos 
+@@ -89,6 +100,17 @@ $LaLOOP_END:
+ $LaDiv_By_Zero:
+ $LaResult_Is_Zero:
+ 	OR      r3,r0,r0 # set result to 0
++#ifdef __arch64__
++$LaRETURN_HERE:
++# Restore values of CSRs and that of r3 and the divisor and the dividend
++	LLI     r28,r1,0
++	LLI     r29,r1,8
++	LLI     r30,r1,16
++	LLI     r31,r1,24
++	ADDLIK  r1,r1,32
++	RTSD    r15,8
++	NOP
++#else
+ $LaRETURN_HERE:
+ # Restore values of CSRs and that of r3 and the divisor and the dividend
+ 	LWI     r28,r1,0
+@@ -97,6 +119,7 @@ $LaRETURN_HERE:
+ 	LWI     r31,r1,12
+ 	RTSD    r15,8
+ 	ADDIK   r1,r1,16
++#endif
+ .end __divsi3
+ 	.size	__divsi3, . - __divsi3
+ 
+diff --git a/libgcc/config/microblaze/modsi3.S b/libgcc/config/microblaze/modsi3.S
+index 9692ff310ff..9500d64bdc0 100644
+--- a/libgcc/config/microblaze/modsi3.S
++++ b/libgcc/config/microblaze/modsi3.S
+@@ -41,6 +41,17 @@
+ 	.globl	__modsi3
+ 	.ent	__modsi3
+ 	.type	__modsi3,@function
++#ifdef __arch64__
++        .align 3
++__modsi3:
++	.frame	r1,0,r15	
++
++	addlik	r1,r1,-32
++	sli	r28,r1,0
++	sli	r29,r1,8
++	sli	r30,r1,16
++	sli	r31,r1,24
++#else
+ __modsi3:
+ 	.frame	r1,0,r15	
+ 
+@@ -49,6 +60,7 @@ __modsi3:
+ 	swi	r29,r1,4
+ 	swi	r30,r1,8
+ 	swi	r31,r1,12
++#endif
+ 
+ 	BEQI	r6,$LaDiv_By_Zero       # Div_by_Zero   # Division Error
+ 	BEQI	r5,$LaResult_Is_Zero    # Result is Zero 
+@@ -88,6 +100,18 @@ $LaLOOP_END:
+ $LaDiv_By_Zero:
+ $LaResult_Is_Zero:
+ 	or	r3,r0,r0        # set result to 0 [Both mod as well as div are 0]
++
++#ifdef __arch64__
++$LaRETURN_HERE:
++# Restore values of CSRs and that of r3 and the divisor and the dividend
++	lli	r28,r1,0
++	lli	r29,r1,8
++	lli	r30,r1,16
++	lli	r31,r1,24
++	addik	r1,r1,32
++	rtsd	r15,8
++	nop
++#else
+ $LaRETURN_HERE:
+ # Restore values of CSRs and that of r3 and the divisor and the dividend
+ 	lwi	r28,r1,0
+@@ -95,7 +119,7 @@ $LaRETURN_HERE:
+ 	lwi	r30,r1,8
+ 	lwi	r31,r1,12
+ 	rtsd	r15,8
+-	addik	r1,r1,16
++#endif
+         .end __modsi3
+ 	.size	__modsi3, . - __modsi3
+ 
+diff --git a/libgcc/config/microblaze/mulsi3.S b/libgcc/config/microblaze/mulsi3.S
+index cb3b6b8321f..2044399db4a 100644
+--- a/libgcc/config/microblaze/mulsi3.S
++++ b/libgcc/config/microblaze/mulsi3.S
+@@ -41,6 +41,9 @@
+ 	.globl	__mulsi3
+ 	.ent	__mulsi3
+ 	.type	__mulsi3,@function
++#ifdef __arch64__
++        .align 3
++#endif
+ __mulsi3:
+ 	.frame	r1,0,r15
+ 	add	r3,r0,r0
+diff --git a/libgcc/config/microblaze/udivsi3.S b/libgcc/config/microblaze/udivsi3.S
+index ee2bdd0950d..d2332bcfe62 100644
+--- a/libgcc/config/microblaze/udivsi3.S
++++ b/libgcc/config/microblaze/udivsi3.S
+@@ -41,6 +41,16 @@
+ 	.globl	__udivsi3
+ 	.ent	__udivsi3
+ 	.type	__udivsi3,@function
++#ifdef __arch64__
++        .align 3
++__udivsi3:
++	.frame	r1,0,r15	
++
++	ADDLIK   r1,r1,-24
++    	SLI     r29,r1,0
++	SLI     r30,r1,8
++	SLI     r31,r1,16
++#else
+ __udivsi3:
+ 	.frame	r1,0,r15	
+ 
+@@ -48,7 +58,7 @@ __udivsi3:
+     	SWI     r29,r1,0
+ 	SWI     r30,r1,4
+ 	SWI     r31,r1,8
+-
++#endif
+ 	BEQI    r6,$LaDiv_By_Zero           # Div_by_Zero   # Division Error
+ 	BEQID   r5,$LaResult_Is_Zero        # Result is Zero 
+ 	ADDIK   r30,r0,0                    # Clear mod
+@@ -98,6 +108,17 @@ $LaLOOP_END:
+ $LaDiv_By_Zero:
+ $LaResult_Is_Zero:
+ 	OR      r3,r0,r0 # set result to 0
++
++#ifdef __arch64__
++$LaRETURN_HERE:
++        # Restore values of CSRs and that of r3 and the divisor and the dividend
++	LLI     r29,r1,0
++	LLI     r30,r1,8
++	LLI     r31,r1,16
++	ADDIK   r1,r1,24
++	RTSD    r15,8
++	NOP
++#else
+ $LaRETURN_HERE:
+         # Restore values of CSRs and that of r3 and the divisor and the dividend
+ 	LWI     r29,r1,0
+@@ -105,5 +126,6 @@ $LaRETURN_HERE:
+ 	LWI     r31,r1,8
+ 	RTSD    r15,8
+ 	ADDIK   r1,r1,12
++#endif
+         .end __udivsi3
+ 	.size	__udivsi3, . - __udivsi3
+diff --git a/libgcc/config/microblaze/umodsi3.S b/libgcc/config/microblaze/umodsi3.S
+index 12c082f6417..30bd8c20b58 100644
+--- a/libgcc/config/microblaze/umodsi3.S
++++ b/libgcc/config/microblaze/umodsi3.S
+@@ -41,6 +41,16 @@
+ 	.globl	__umodsi3
+ 	.ent	__umodsi3
+ 	.type	__umodsi3,@function
++#ifdef __arch64__
++        .align 3
++__umodsi3:
++	.frame	r1,0,r15	
++
++	addik	r1,r1,-24
++	swi	r29,r1,0
++	swi	r30,r1,8
++	swi	r31,r1,16
++#else
+ __umodsi3:
+ 	.frame	r1,0,r15	
+ 
+@@ -48,7 +58,7 @@ __umodsi3:
+ 	swi	r29,r1,0
+ 	swi	r30,r1,4
+ 	swi	r31,r1,8
+-
++#endif
+ 	BEQI	r6,$LaDiv_By_Zero         # Div_by_Zero   # Division Error
+ 	BEQId	r5,$LaResult_Is_Zero     # Result is Zero 
+ 	ADDIK 	r3,r0,0                  # Clear div
+@@ -101,6 +111,17 @@ $LaLOOP_END:
+ $LaDiv_By_Zero:
+ $LaResult_Is_Zero:
+ 	or 	r3,r0,r0   # set result to 0
++
++#ifdef __arch64__
++$LaRETURN_HERE:
++# Restore values of CSRs and that of r3 and the divisor and the dividend
++	lli 	r29,r1,0
++	lli 	r30,r1,8
++	lli 	r31,r1,16
++	addlik 	r1,r1,24
++	rtsd 	r15,8
++	nop
++#else
+ $LaRETURN_HERE:
+ # Restore values of CSRs and that of r3 and the divisor and the dividend
+ 	lwi 	r29,r1,0
+@@ -108,5 +129,6 @@ $LaRETURN_HERE:
+ 	lwi 	r31,r1,8
+ 	rtsd 	r15,8
+ 	addik 	r1,r1,12
++#endif
+ .end __umodsi3
+ 	.size	__umodsi3, . - __umodsi3
+-- 
+2.17.1
+

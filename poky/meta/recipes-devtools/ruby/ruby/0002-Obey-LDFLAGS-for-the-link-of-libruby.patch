@@ -1,23 +1,23 @@
-Upstream-Status: Pending
-
-From 306e95a9818d39d3349075aac9609e062b0f19ce Mon Sep 17 00:00:00 2001
+From 07fd1ada322eda6c05ac45c08fc814976f31b596 Mon Sep 17 00:00:00 2001
 From: Christopher Larson <chris_larson@mentor.com>
 Date: Thu, 5 May 2016 10:59:07 -0700
-Subject: [PATCH 2/2] Obey LDFLAGS for the link of libruby
+Subject: [PATCH] Obey LDFLAGS for the link of libruby
 
 Signed-off-by: Christopher Larson <chris_larson@mentor.com>
+Upstream-Status: Pending
+
 ---
- Makefile.in | 2 +-
+ template/Makefile.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: ruby-2.5.0/Makefile.in
-===================================================================
---- ruby-2.5.0.orig/Makefile.in
-+++ ruby-2.5.0/Makefile.in
-@@ -77,7 +77,7 @@ LIBS = @LIBS@ $(EXTLIBS)
- MISSING = @LIBOBJS@ @ALLOCA@
- ENABLE_SHARED = @ENABLE_SHARED@
+diff --git a/template/Makefile.in b/template/Makefile.in
+index f5a3149..5cc75ae 100644
+--- a/template/Makefile.in
++++ b/template/Makefile.in
+@@ -114,7 +114,7 @@ ENABLE_SHARED = @ENABLE_SHARED@
  LDSHARED = @LIBRUBY_LDSHARED@
+ DLDSHARED = @DLDSHARED@
+ XDLDFLAGS = @DLDFLAGS@
 -DLDFLAGS = @LIBRUBY_DLDFLAGS@ $(XLDFLAGS) $(ARCH_FLAG)
 +DLDFLAGS = @LIBRUBY_DLDFLAGS@ @LDFLAGS@ $(XLDFLAGS) $(ARCH_FLAG)
  SOLIBS = @SOLIBS@

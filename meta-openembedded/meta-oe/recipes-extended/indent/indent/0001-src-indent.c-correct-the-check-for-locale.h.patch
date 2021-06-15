@@ -1,0 +1,40 @@
+From 75369ce004ec0f5e46a432fa1dac8cfc7ae1ef8d Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Sun, 24 Feb 2019 22:35:08 -0800
+Subject: [PATCH] src/indent.c: correct the check for locale.h
+
+Adjust to check HAVE_LC_MESSAGES or HAVE_LOCALE_H
+to determine whether include locale.h or not to
+fix below issue:
+
+| ../../indent-2.2.12/src/indent.c: In function 'main':
+| ../../indent-2.2.12/src/indent.c:1062:5: error: implicit declaration of function 'setlocale'; did you mean 'setstate'? [-Werror=implicit-function-declaration]
+|      setlocale(LC_ALL, "");
+|      ^~~~~~~~~
+|      setstate
+| ../../indent-2.2.12/src/indent.c:1062:5: error: nested extern declaration of 'setlocale' [-Werror=nested-externs]
+| ../../indent-2.2.12/src/indent.c:1062:15: error: 'LC_ALL' undeclared (first use in this function)
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/indent.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/indent.c b/src/indent.c
+index 4d666e2..0c2780b 100644
+--- a/src/indent.c
++++ b/src/indent.c
+@@ -71,7 +71,7 @@
+ #include <string.h>
+ #include <ctype.h>
+ #include <stdlib.h>
+-#ifdef HAVE_LOCALE_H
++#if defined(HAVE_LC_MESSAGES) || defined(HAVE_LOCALE_H)
+ #include <locale.h>
+ #endif
+ #include "indent.h"
+-- 
+2.17.1
+

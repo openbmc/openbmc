@@ -1,6 +1,6 @@
-From 70de3fecbc551907c4fd504cfff385c73be8db75 Mon Sep 17 00:00:00 2001
-From: Ruslan Bilovol <rbilovol@cisco.com>
-Date: Tue, 19 Dec 2017 15:59:04 +0200
+From 21909e3f9096fa8e4825df8c65114ee92ab3d532 Mon Sep 17 00:00:00 2001
+From: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+Date: Wed, 7 Aug 2019 02:57:35 +0900
 Subject: [PATCH] kpatch-build: add cross-compilation support
 
 This patch introduces new option for kpatch-build
@@ -17,44 +17,45 @@ possible to pass multy-component strings like
 Upstream-Status: Pending
 
 Signed-off-by: Ruslan Bilovol <rbilovol@cisco.com>
-
 ---
  kpatch-build/kpatch-build | 13 +++++++++++--
  kpatch-build/kpatch-gcc   |  4 ++--
  2 files changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/kpatch-build/kpatch-build b/kpatch-build/kpatch-build
-index a76913f..4a011aa 100755
+index 9ef3809..463dab1 100755
 --- a/kpatch-build/kpatch-build
 +++ b/kpatch-build/kpatch-build
-@@ -197,7 +197,7 @@ gcc_version_check() {
+@@ -198,7 +198,7 @@ gcc_version_check() {
  	# gcc --version varies between distributions therefore extract version
  	# by compiling a test file and compare it to vmlinux's version.
  	echo 'void main(void) {}' > "$c"
 -	out="$(gcc -c -pg -ffunction-sections -o "$o" "$c" 2>&1)"
 +	out="$(${KPATCH_CROSS_COMPILE}gcc -c -pg -ffunction-sections -o "$o" "$c" 2>&1)"
  	gccver="$(gcc_version_from_file "$o")"
- 	kgccver="$(gcc_version_from_file "$VMLINUX")"
- 	rm -f "$c" "$o"
-@@ -392,12 +392,14 @@ usage() {
- 	echo "		-d, --debug        Enable 'xtrace' and keep scratch files" >&2
- 	echo "		                   in <CACHEDIR>/tmp" >&2
+ 	if [[ -n "$OOT_MODULE" ]]; then
+ 		kgccver="$(gcc_version_from_file "$OOT_MODULE")"
+@@ -411,6 +411,8 @@ usage() {
  	echo "		                   (can be specified multiple times)" >&2
+ 	echo "		-e, --oot-module   Enable patching out-of-tree module," >&2
+ 	echo "		                   specify current version of module" >&2
 +	echo "		--cross-compile    Specify the prefix used for all executables" >&2
 +	echo "		                   used during compilation" >&2
  	echo "		--skip-cleanup     Skip post-build cleanup" >&2
- 	echo "		--skip-gcc-check   Skip gcc version matching check" >&2
+	echo "		--skip-gcc-check   Skip gcc version matching check" >&2
+	echo "		                   (not recommended)" >&2
+@@ -416,7 +418,7 @@ usage() {
  	echo "		                   (not recommended)" >&2
  }
  
--options="$(getopt -o ha:r:s:c:v:j:t:n:o:d -l "help,archversion:,sourcerpm:,sourcedir:,config:,vmlinux:,jobs:,target:,name:,output:,debug,skip-gcc-check,skip-cleanup" -- "$@")" || die "getopt failed"
-+options="$(getopt -o ha:r:s:c:v:j:t:n:o:d -l "help,archversion:,sourcerpm:,sourcedir:,config:,vmlinux:,jobs:,target:,name:,output:,debug,cross-compile:,skip-gcc-check,skip-cleanup" -- "$@")" || die "getopt failed"
+-options="$(getopt -o ha:r:s:c:v:j:t:n:o:de: -l "help,archversion:,sourcerpm:,sourcedir:,config:,vmlinux:,jobs:,target:,name:,output:,oot-module:,debug,skip-gcc-check,skip-cleanup" -- "$@")" || die "getopt failed"
++options="$(getopt -o ha:r:s:c:v:j:t:n:o:de: -l "help,archversion:,sourcerpm:,sourcedir:,config:,vmlinux:,jobs:,target:,name:,output:,oot-module:,debug,cross-compile:,skip-gcc-check,skip-cleanup" -- "$@")" || die "getopt failed"
  
  eval set -- "$options"
  
-@@ -455,6 +457,10 @@ while [[ $# -gt 0 ]]; do
- 			echo "DEBUG mode enabled"
- 		fi
+@@ -479,6 +481,10 @@ while [[ $# -gt 0 ]]; do
+ 		OOT_MODULE="$(readlink -f "$2")"
+ 		shift
  		;;
 +	--cross-compile)
 +		KPATCH_CROSS_COMPILE="$2"
@@ -63,17 +64,17 @@ index a76913f..4a011aa 100755
  	--skip-cleanup)
  		echo "Skipping cleanup"
  		SKIPCLEANUP=1
-@@ -710,6 +716,8 @@ if [[ $DEBUG -ge 4 ]]; then
+@@ -757,6 +763,8 @@ if [[ $DEBUG -ge 4 ]]; then
  	export KPATCH_GCC_DEBUG=1
  fi
  
 +export KPATCH_CROSS_COMPILE
 +
- echo "Building original kernel"
- ./scripts/setlocalversion --save-scmversion || die
+ echo "Building original source"
+ [[ -n "$OOT_MODULE" ]] || ./scripts/setlocalversion --save-scmversion || die
  unset KPATCH_GCC_TEMPDIR
-@@ -874,6 +882,7 @@ cd "$TEMPDIR/patch" || die
- KPATCH_BUILD="$SRCDIR" KPATCH_NAME="$MODNAME" \
+@@ -940,6 +948,7 @@ fi
+ KPATCH_BUILD="$KPATCH_BUILD" KPATCH_NAME="$MODNAME" \
  KBUILD_EXTRA_SYMBOLS="$KBUILD_EXTRA_SYMBOLS" \
  KPATCH_LDFLAGS="$KPATCH_LDFLAGS" \
 +CROSS_COMPILE="$KPATCH_CROSS_COMPILE" \
@@ -81,7 +82,7 @@ index a76913f..4a011aa 100755
  
  if ! "$KPATCH_MODULE"; then
 diff --git a/kpatch-build/kpatch-gcc b/kpatch-build/kpatch-gcc
-index 2d56da1..59a4255 100755
+index 9663290..56e6c8f 100755
 --- a/kpatch-build/kpatch-gcc
 +++ b/kpatch-build/kpatch-gcc
 @@ -8,7 +8,7 @@ TOOLCHAINCMD="$1"
@@ -93,9 +94,12 @@ index 2d56da1..59a4255 100755
  fi
  
  declare -a args=("$@")
-@@ -82,4 +82,4 @@ elif [[ "$TOOLCHAINCMD" = "ld" ]] ; then
+@@ -84,4 +84,4 @@ elif [[ "$TOOLCHAINCMD" = "ld" ]] ; then
  	done
  fi
  
 -exec "$TOOLCHAINCMD" "${args[@]}"
 +exec ${KPATCH_CROSS_COMPILE}${TOOLCHAINCMD} "${args[@]}"
+-- 
+2.7.4
+

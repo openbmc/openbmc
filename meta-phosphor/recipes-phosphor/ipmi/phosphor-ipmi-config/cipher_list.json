@@ -1,10 +1,4 @@
 {
-    "a":{
-        "cipher":3,
-        "authentication":1,
-        "integrity":1,
-        "confidentiality":1
-    },
     "b":{
         "cipher":17,
         "authentication":3,

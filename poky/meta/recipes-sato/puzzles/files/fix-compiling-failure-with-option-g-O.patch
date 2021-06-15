@@ -1,4 +1,7 @@
-gtk.c: fix compiling failure with option -g -O
+From 876c6ff1e20f51b0921acda99861f476b6423f26 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 11 Aug 2014 12:39:53 +0800
+Subject: [PATCH] gtk.c: fix compiling failure with option -g -O
 
 There were compiling failure with option -g -O
 ...
@@ -21,23 +24,21 @@ Initialized pointer 'cr' and 'error' with NULL
 Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
- gtk.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ gtk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gtk.c b/gtk.c
-index a2eba2c..c54bf63 100644
+index 4565836..5e83b48 100644
 --- a/gtk.c
 +++ b/gtk.c
-@@ -2481,7 +2481,7 @@ char *fgetline(FILE *fp)
+@@ -2944,7 +2944,7 @@ static void list_presets_from_menu(struct preset_menu *menu)
  int main(int argc, char **argv)
  {
      char *pname = argv[0];
 -    char *error;
 +    char *error = NULL;
-     int ngenerate = 0, print = FALSE, px = 1, py = 1;
-     int time_generation = FALSE, test_solve = FALSE, list_presets = FALSE;
-     int soln = FALSE, colour = FALSE;
--- 
-1.9.1
-
+     int ngenerate = 0, px = 1, py = 1;
+     bool print = false;
+     bool time_generation = false, test_solve = false, list_presets = false;

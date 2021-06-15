@@ -1,0 +1,87 @@
+fans:
+  - inventory: /system/chassis/motherboard/fan0
+    functional_delay: 5
+    allowed_out_of_range_time: 30
+    deviation: 35
+    num_sensors_nonfunc_for_fan_nonfunc: 1
+    sensors:
+      - name: fan0_0
+        has_target: true
+        target_interface: xyz.openbmc_project.Control.FanPwm
+        factor: 60
+        offset: 0
+      - name: fan0_1
+        has_target: false
+        target_interface: xyz.openbmc_project.Control.FanPwm
+        factor: 55
+        offset: 0
+
+  - inventory: /system/chassis/motherboard/fan1
+    functional_delay: 5
+    allowed_out_of_range_time: 30
+    deviation: 15
+    num_sensors_nonfunc_for_fan_nonfunc: 1
+    sensors:
+      - name: fan1_0
+        has_target: true
+        target_interface: xyz.openbmc_project.Control.FanPwm
+        factor: 60
+        offset: 0
+      - name: fan1_1
+        has_target: false
+        target_interface: xyz.openbmc_project.Control.FanPwm
+        factor: 55
+        offset: 0
+
+  - inventory: /system/chassis/motherboard/fan2
+    functional_delay: 5
+    allowed_out_of_range_time: 30
+    deviation: 15
+    num_sensors_nonfunc_for_fan_nonfunc: 1
+    sensors:
+      - name: fan2_0
+        has_target: true
+        target_interface: xyz.openbmc_project.Control.FanPwm
+        factor: 60
+        offset: 0
+      - name: fan2_1
+        has_target: false
+        target_interface: xyz.openbmc_project.Control.FanPwm
+        factor: 55
+        offset: 0
+
+  - inventory: /system/chassis/motherboard/fan3
+    functional_delay: 5
+    allowed_out_of_range_time: 30
+    deviation: 15
+    num_sensors_nonfunc_for_fan_nonfunc: 1
+    sensors:
+      - name: fan3_0
+        has_target: true
+        target_interface: xyz.openbmc_project.Control.FanPwm
+        factor: 60
+        offset: 0
+      - name: fan3_1
+        has_target: false
+        target_interface: xyz.openbmc_project.Control.FanPwm
+        factor: 55
+        offset: 0
+
+sensor_trust_groups:
+  - class: NonzeroSpeed
+    group:
+        # Include all _1 fans to determine trust
+      - name: fan0_1
+      - name: fan1_1
+      - name: fan2_1
+      - name: fan3_1
+        # Add all _0 fans to be included in trust result effects,
+        # but not in determining trust
+      - name: fan0_0
+        in_trust: false
+      - name: fan1_0
+        in_trust: false
+      - name: fan2_0
+        in_trust: false
+      - name: fan3_0
+        in_trust: false

@@ -1,0 +1,28 @@
+From 6bc6e867c5b3a774c0d7819ee5a3d2885e97caa9 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 30 Mar 2020 17:11:19 +0200
+Subject: [PATCH] gptcurses: correctly include curses.h
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ gptcurses.cc | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/gptcurses.cc b/gptcurses.cc
+index 71aa734..4ebfde1 100644
+--- a/gptcurses.cc
++++ b/gptcurses.cc
+@@ -23,11 +23,7 @@
+ #include <iostream>
+ #include <string>
+ #include <sstream>
+-#if defined (__APPLE__) || (__FreeBSD__)
+ #include <ncurses.h>
+-#else
+-#include <ncursesw/ncurses.h>
+-#endif
+ #include "gptcurses.h"
+ #include "support.h"
+ 

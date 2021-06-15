@@ -2,6 +2,9 @@ SYSTEMD_BOOT_CFG ?= "${S}/loader.conf"
 SYSTEMD_BOOT_ENTRIES ?= ""
 SYSTEMD_BOOT_TIMEOUT ?= "10"
 
+# Uses MACHINE specific KERNEL_IMAGETYPE
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 # Need UUID utility code.
 inherit fs-uuid
 

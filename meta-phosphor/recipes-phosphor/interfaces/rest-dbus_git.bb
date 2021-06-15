@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 inherit allarch
 inherit obmc-phosphor-systemd
-inherit setuptools
+inherit setuptools3
 
 RDEPENDS_${PN} += " \
         python-netserver \

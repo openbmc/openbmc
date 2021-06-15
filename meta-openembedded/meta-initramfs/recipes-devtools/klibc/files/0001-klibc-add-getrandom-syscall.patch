@@ -10,11 +10,9 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  usr/klibc/SYSCALLS.def | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/usr/klibc/SYSCALLS.def b/usr/klibc/SYSCALLS.def
-index 6b3bf4c..d4184ba 100644
 --- a/usr/klibc/SYSCALLS.def
 +++ b/usr/klibc/SYSCALLS.def
-@@ -274,6 +274,7 @@ int syslog::klogctl(int, char *, int);
+@@ -275,6 +275,7 @@ int syslog::klogctl(int, char *, int);
  int sysinfo(struct sysinfo *);
  long kexec_load(void *, unsigned long, struct kexec_segment *, unsigned long);
  <x86_64,ppc64,s390x> long kexec_file_load(int, int, unsigned long, const char *, unsigned long);
@@ -22,6 +20,3 @@ index 6b3bf4c..d4184ba 100644
  
  /*
   * Low-level I/O (generally architecture-specific);
--- 
-2.7.4
-

@@ -1,4 +1,4 @@
-From 9bcec221a2bb438d8a9ed59aed846ffe3be9cffa Mon Sep 17 00:00:00 2001
+From 3d881c112bba765731d581194aae95651819b715 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Tue, 19 Jul 2016 01:56:23 -0400
 Subject: [PATCH] squid: use serial-tests config needed by ptest
@@ -15,15 +15,15 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 3827222..504a844 100644
+index c7ae568..5e1454e 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -10,7 +10,7 @@ AC_PREREQ(2.61)
  AC_CONFIG_HEADERS([include/autoconf.h])
  AC_CONFIG_AUX_DIR(cfgaux)
  AC_CONFIG_SRCDIR([src/main.cc])
--AM_INIT_AUTOMAKE([tar-ustar nostdinc subdir-objects])
-+AM_INIT_AUTOMAKE([tar-ustar nostdinc subdir-objects serial-tests])
+-AM_INIT_AUTOMAKE([tar-ustar nostdinc subdir-objects dist-xz])
++AM_INIT_AUTOMAKE([tar-ustar nostdinc subdir-objects dist-xz serial-tests])
  AC_REVISION($Revision$)dnl
  AC_PREFIX_DEFAULT(/usr/local/squid)
  AM_MAINTAINER_MODE

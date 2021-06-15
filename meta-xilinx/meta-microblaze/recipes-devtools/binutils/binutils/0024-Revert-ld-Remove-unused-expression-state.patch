@@ -1,0 +1,76 @@
+From 70fcc4fe0635bdc871bc2ec1087173e3f93cab86 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 27 Feb 2019 15:12:32 +0530
+Subject: [PATCH 24/52] Revert "ld: Remove unused expression state"
+
+This reverts commit 65f14869fd3fbee8ed4c4ca49de8aaa86dbc66cb.
+
+Conflicts:
+	ld/ChangeLog
+---
+ ld/ldexp.c | 8 +++++---
+ ld/ldexp.h | 1 +
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/ld/ldexp.c b/ld/ldexp.c
+index b4e7c41209..dd3b058110 100644
+--- a/ld/ldexp.c
++++ b/ld/ldexp.c
+@@ -1360,6 +1360,7 @@ static etree_type *
+ exp_assop (const char *dst,
+ 	   etree_type *src,
+ 	   enum node_tree_enum class,
++	   bfd_boolean defsym,
+ 	   bfd_boolean hidden)
+ {
+   etree_type *n;
+@@ -1371,6 +1372,7 @@ exp_assop (const char *dst,
+   n->assign.type.node_class = class;
+   n->assign.src = src;
+   n->assign.dst = dst;
++  n->assign.defsym = defsym;
+   n->assign.hidden = hidden;
+   return n;
+ }
+@@ -1380,7 +1382,7 @@ exp_assop (const char *dst,
+ etree_type *
+ exp_assign (const char *dst, etree_type *src, bfd_boolean hidden)
+ {
+-  return exp_assop (dst, src, etree_assign, hidden);
++  return exp_assop (dst, src, etree_assign, FALSE, hidden);
+ }
+ 
+ /* Handle --defsym command-line option.  */
+@@ -1388,7 +1390,7 @@ exp_assign (const char *dst, etree_type *src, bfd_boolean hidden)
+ etree_type *
+ exp_defsym (const char *dst, etree_type *src)
+ {
+-  return exp_assop (dst, src, etree_assign, FALSE);
++  return exp_assop (dst, src, etree_assign, TRUE, FALSE);
+ }
+ 
+ /* Handle PROVIDE.  */
+@@ -1396,7 +1398,7 @@ exp_defsym (const char *dst, etree_type *src)
+ etree_type *
+ exp_provide (const char *dst, etree_type *src, bfd_boolean hidden)
+ {
+-  return exp_assop (dst, src, etree_provide, hidden);
++  return exp_assop (dst, src, etree_provide, FALSE, hidden);
+ }
+ 
+ /* Handle ASSERT.  */
+diff --git a/ld/ldexp.h b/ld/ldexp.h
+index 717e839bd4..852ac6c588 100644
+--- a/ld/ldexp.h
++++ b/ld/ldexp.h
+@@ -66,6 +66,7 @@ typedef union etree_union {
+     node_type type;
+     const char *dst;
+     union etree_union *src;
++    bfd_boolean defsym;
+     bfd_boolean hidden;
+   } assign;
+   struct {
+-- 
+2.17.1
+

@@ -19,11 +19,9 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  configure.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure.in b/configure.in
-index b98b9bb..8584677 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -2211,7 +2211,7 @@ Use --without-tcl to disable building PL/Tcl.])
+@@ -2206,7 +2206,7 @@ Use --without-tcl to disable building PL
  fi
  
  # check for <perl.h>
@@ -32,6 +30,3 @@ index b98b9bb..8584677 100644
    ac_save_CPPFLAGS=$CPPFLAGS
    CPPFLAGS="$CPPFLAGS $perl_includespec"
    AC_CHECK_HEADER(perl.h, [], [AC_MSG_ERROR([header file <perl.h> is required for Perl])],
--- 
-2.7.4
-

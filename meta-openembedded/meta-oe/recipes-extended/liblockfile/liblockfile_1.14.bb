@@ -8,7 +8,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/libl/liblockfile/liblockfile_1.14.orig.tar.gz \
     ${DEBIAN_MIRROR}/main/libl/liblockfile/liblockfile_1.14-1.debian.tar.bz2;name=1.14-1 \
     file://configure.patch \
     file://0001-Makefile.in-add-DESTDIR.patch \
-    file://0001-Makefile.in-install-nfslock.so-and-nfslock.so.0.patch \
+    file://0001-Makefile.in-install-nfslock-libs.patch \
     file://liblockfile-fix-install-so-to-man-dir.patch \
 "
 

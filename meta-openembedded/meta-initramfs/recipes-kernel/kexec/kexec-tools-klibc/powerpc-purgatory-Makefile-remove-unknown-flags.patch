@@ -1,8 +1,7 @@
-From 709dfe457c07aa0275f3da14634cbce5cf1029dc Mon Sep 17 00:00:00 2001
+From 3683b3f3e318fa711f6018f154d950c51d5b597a Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Thu, 19 Apr 2018 19:26:53 +0200
-Subject: [PATCH 3/3] powerpc/purgatory: Makefile: remove unknown flags for
- powerpc
+Subject: [PATCH] powerpc/purgatory: Makefile: remove unknown flags for powerpc
 
 Fix
 
@@ -12,6 +11,7 @@ Fix
 
 Upstream-Status: Inappropriate [klibc specific]
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
 ---
  purgatory/arch/ppc/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -29,6 +29,3 @@ index c85c58a..cd44a16 100644
  
  dist += purgatory/arch/ppc/Makefile $(ppc_PURGATORY_SRCS)		\
  	purgatory/arch/ppc/purgatory-ppc.h purgatory/arch/ppc/ppc_asm.h
--- 
-2.7.4
-

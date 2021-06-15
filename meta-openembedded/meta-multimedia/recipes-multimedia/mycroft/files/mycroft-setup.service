@@ -5,7 +5,8 @@ After=systemd-user-sessions.service
 
 [Service]
 Type=oneshot
-ExecStart=@LIBDIR@/mycroft/dev_setup.sh --allow-root
+ExecStart=cp -rf @LIBDIR@/mycroft /var/
+ExecStart=/var/mycroft/dev_setup.sh --allow-root
 
 [Install]
 WantedBy=multi-user.target

@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
 BitBake 'TaskData' implementation
 
@@ -10,18 +7,8 @@ Task data collection and handling
 
 # Copyright (C) 2006  Richard Purdie
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import logging
 import re
@@ -34,8 +21,13 @@ def re_match_strings(target, strings):
     Whether or not the string 'target' matches
     any one string of the strings which can be regular expression string
     """
-    return any(name == target or re.match(name, target)
-               for name in strings)
+    for name in strings:
+        if name.startswith("^") or name.endswith("$"):
+            if re.match(name, target):
+                return True
+        elif name == target:
+            return True
+    return False
 
 class TaskEntry:
     def __init__(self):
@@ -93,7 +85,7 @@ class TaskData:
         def add_mcdepends(task):
             for dep in task_deps['mcdepends'][task].split():
                 if len(dep.split(':')) != 5:
-                    bb.msg.fatal("TaskData", "Error for %s:%s[%s], multiconfig dependency %s does not contain exactly four  ':' characters.\n Task '%s' should be specified in the form 'multiconfig:fromMC:toMC:packagename:task'" % (fn, task, 'mcdepends', dep, 'mcdepends'))
+                    bb.msg.fatal("TaskData", "Error for %s:%s[%s], multiconfig dependency %s does not contain exactly four  ':' characters.\n Task '%s' should be specified in the form 'mc:fromMC:toMC:packagename:task'" % (fn, task, 'mcdepends', dep, 'mcdepends'))
                 if dep not in self.mcdepends:
                     self.mcdepends.append(dep)
 
@@ -139,7 +131,7 @@ class TaskData:
             for depend in dataCache.deps[fn]:
                 dependids.add(depend)
             self.depids[fn] = list(dependids)
-            logger.debug(2, "Added dependencies %s for %s", str(dataCache.deps[fn]), fn)
+            logger.debug2("Added dependencies %s for %s", str(dataCache.deps[fn]), fn)
 
         # Work out runtime dependencies
         if not fn in self.rdepids:
@@ -157,9 +149,9 @@ class TaskData:
                     rreclist.append(rdepend)
                     rdependids.add(rdepend)
             if rdependlist:
-                logger.debug(2, "Added runtime dependencies %s for %s", str(rdependlist), fn)
+                logger.debug2("Added runtime dependencies %s for %s", str(rdependlist), fn)
             if rreclist:
-                logger.debug(2, "Added runtime recommendations %s for %s", str(rreclist), fn)
+                logger.debug2("Added runtime recommendations %s for %s", str(rreclist), fn)
             self.rdepids[fn] = list(rdependids)
 
         for dep in self.depids[fn]:
@@ -375,7 +367,7 @@ class TaskData:
             bb.event.fire(bb.event.NoProvider(item, dependees=self.get_dependees(item), reasons=["No eligible PROVIDERs exist for '%s'" % item]), cfgData)
             raise bb.providers.NoProvider(item)
 
-        if len(eligible) > 1 and foundUnique == False:
+        if len(eligible) > 1 and not foundUnique:
             if item not in self.consider_msgs_cache:
                 providers_list = []
                 for fn in eligible:
@@ -386,7 +378,7 @@ class TaskData:
         for fn in eligible:
             if fn in self.failed_fns:
                 continue
-            logger.debug(2, "adding %s to satisfy %s", fn, item)
+            logger.debug2("adding %s to satisfy %s", fn, item)
             self.add_build_target(fn, item)
             self.add_tasks(fn, dataCache)
 
@@ -439,7 +431,7 @@ class TaskData:
         for fn in eligible:
             if fn in self.failed_fns:
                 continue
-            logger.debug(2, "adding '%s' to satisfy runtime '%s'", fn, item)
+            logger.debug2("adding '%s' to satisfy runtime '%s'", fn, item)
             self.add_runtime_target(fn, item)
             self.add_tasks(fn, dataCache)
 
@@ -454,7 +446,7 @@ class TaskData:
             return
         if not missing_list:
             missing_list = []
-        logger.debug(1, "File '%s' is unbuildable, removing...", fn)
+        logger.debug("File '%s' is unbuildable, removing...", fn)
         self.failed_fns.append(fn)
         for target in self.build_targets:
             if fn in self.build_targets[target]:
@@ -534,7 +526,7 @@ class TaskData:
                     added = added + 1
                 except (bb.providers.NoRProvider, bb.providers.MultipleRProvider):
                     self.remove_runtarget(target)
-            logger.debug(1, "Resolved " + str(added) + " extra dependencies")
+            logger.debug("Resolved " + str(added) + " extra dependencies")
             if added == 0:
                 break
         # self.dump_data()
@@ -557,38 +549,38 @@ class TaskData:
         """
         Dump some debug information on the internal data structures
         """
-        logger.debug(3, "build_names:")
-        logger.debug(3, ", ".join(self.build_targets))
+        logger.debug3("build_names:")
+        logger.debug3(", ".join(self.build_targets))
 
-        logger.debug(3, "run_names:")
-        logger.debug(3, ", ".join(self.run_targets))
+        logger.debug3("run_names:")
+        logger.debug3(", ".join(self.run_targets))
 
-        logger.debug(3, "build_targets:")
+        logger.debug3("build_targets:")
         for target in self.build_targets:
             targets = "None"
             if target in self.build_targets:
                 targets = self.build_targets[target]
-            logger.debug(3, " %s: %s", target, targets)
+            logger.debug3(" %s: %s", target, targets)
 
-        logger.debug(3, "run_targets:")
+        logger.debug3("run_targets:")
         for target in self.run_targets:
             targets = "None"
             if target in self.run_targets:
                 targets = self.run_targets[target]
-            logger.debug(3, " %s: %s", target, targets)
+            logger.debug3(" %s: %s", target, targets)
 
-        logger.debug(3, "tasks:")
+        logger.debug3("tasks:")
         for tid in self.taskentries:
-            logger.debug(3, " %s: %s %s %s",
+            logger.debug3(" %s: %s %s %s",
                        tid,
                        self.taskentries[tid].idepends,
                        self.taskentries[tid].irdepends,
                        self.taskentries[tid].tdepends)
 
-        logger.debug(3, "dependency ids (per fn):")
+        logger.debug3("dependency ids (per fn):")
         for fn in self.depids:
-            logger.debug(3, " %s: %s", fn, self.depids[fn])
+            logger.debug3(" %s: %s", fn, self.depids[fn])
 
-        logger.debug(3, "runtime dependency ids (per fn):")
+        logger.debug3("runtime dependency ids (per fn):")
         for fn in self.rdepids:
-            logger.debug(3, " %s: %s", fn, self.rdepids[fn])
+            logger.debug3(" %s: %s", fn, self.rdepids[fn])

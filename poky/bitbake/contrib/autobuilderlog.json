@@ -1,0 +1,13 @@
+{
+    "version": 1,
+    "loggers": {
+        "BitBake.SigGen.HashEquiv": {
+            "level": "VERBOSE",
+            "handlers": ["BitBake.verbconsole"]
+        },
+        "BitBake.RunQueue.HashEquiv": {
+            "level": "VERBOSE",
+            "handlers": ["BitBake.verbconsole"]
+        }
+    }
+}

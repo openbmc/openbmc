@@ -1,3 +1,6 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 class ClassRegistryMeta(type):
     """Give each ClassRegistry their own registry"""

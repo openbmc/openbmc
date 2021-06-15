@@ -1,16 +1,17 @@
-From 0be9c08dd3f825e92fa02d4a08d8aff743109e61 Mon Sep 17 00:00:00 2001
-From: Li xin <lixin.fnst@cn.fujitsu.com>
-Date: Wed, 17 Jun 2015 14:46:30 +0900
-Subject: [PATCH] syslog-ng.service: the syslog-ng service can not start
+Subject: [PATCH] syslog-ng.service: the syslog-ng service can not start 
  successfully,so modify it.
 
 Upstream-Status: pending
 
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
 Updated-by: Andrej Valek <andrej.valek@siemens.com>
+
+Update for 3.24.1
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 ---
- contrib/systemd/syslog-ng.service | 5 ++---
- 1 file changed, 2 insertion(+), 3 deletions(-)
+ contrib/systemd/syslog-ng@.service | 4 ++--
+ contrib/systemd/syslog-ng@default  | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/contrib/systemd/syslog-ng@.service b/contrib/systemd/syslog-ng@.service
 index a28640e..93aec94 100644
@@ -28,19 +29,18 @@ index a28640e..93aec94 100644
  StandardError=journal
  Restart=on-failure
 diff --git a/contrib/systemd/syslog-ng@default b/contrib/systemd/syslog-ng@default
-index 02da288..3a8215d 100644
+index 0ccc2b9..7f08c0e 100644
 --- a/contrib/systemd/syslog-ng@default
 +++ b/contrib/systemd/syslog-ng@default
 @@ -1,5 +1,5 @@
--CONFIG_FILE=/etc/syslog-ng.conf
+ CONFIG_FILE=/etc/syslog-ng/syslog-ng.conf
 -PERSIST_FILE=/var/lib/syslog-ng/syslog-ng.persist
--CONTROL_FILE=/var/lib/syslog-ng/syslog-ng.ctl
+-CONTROL_FILE=/var/run/syslog-ng.ctl
 -PID_FILE=/var/run/syslog-ng.pid
-+CONFIG_FILE=/etc/syslog-ng/syslog-ng.conf
 +PERSIST_FILE=@LOCALSTATEDIR@/lib/syslog-ng/syslog-ng.persist
 +CONTROL_FILE=@LOCALSTATEDIR@/lib/syslog-ng/syslog-ng.ctl
 +PID_FILE=@LOCALSTATEDIR@/run/syslog-ng.pid
  OTHER_OPTIONS="--enable-core"
-
 -- 
-1.8.4.2
+2.7.4
+

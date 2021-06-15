@@ -1,5 +1,3 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
 BitBake "Fetch" repo (git) implementation
 
@@ -8,20 +6,10 @@ BitBake "Fetch" repo (git) implementation
 # Copyright (C) 2009 Tom Rini <trini@embeddedalley.com>
 #
 # Based on git.py which is:
-#Copyright (C) 2005 Richard Purdie
+# Copyright (C) 2005 Richard Purdie
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import os
 import bb
@@ -59,7 +47,7 @@ class Repo(FetchMethod):
         """Fetch url"""
 
         if os.access(os.path.join(d.getVar("DL_DIR"), ud.localfile), os.R_OK):
-            logger.debug(1, "%s already exists (or was stashed). Skipping repo init / sync.", ud.localpath)
+            logger.debug("%s already exists (or was stashed). Skipping repo init / sync.", ud.localpath)
             return
 
         repodir = d.getVar("REPODIR") or (d.getVar("DL_DIR") + "/repo")

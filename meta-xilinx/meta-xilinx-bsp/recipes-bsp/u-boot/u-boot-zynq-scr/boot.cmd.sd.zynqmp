@@ -1,0 +1,9 @@
+setenv sdbootdev @@SDBOOTDEV@@
+setenv bootargs $bootargs root=/dev/mmcblk${sdbootdev}p2 rw rootwait earlycon clk_ignore_unused
+setenv bootargs $bootargs root=/dev/mmcblk0p2 rw rootwait earlycon clk_ignore_unused
+if test -n "@@BITSTREAM@@"; then
+   fatload mmc $sdbootdev @@BITSTREAM_LOAD_ADDRESS@@ @@BITSTREAM_IMAGE@@ && fpga @@BITSTREAM_LOAD_TYPE@@ 0 @@BITSTREAM_LOAD_ADDRESS@@ ${filesize}
+fi
+fatload mmc $sdbootdev @@DEVICETREE_ADDRESS@@ @@DEVICE_TREE_NAME@@
+fatload mmc $sdbootdev:$partid @@KERNEL_LOAD_ADDRESS@@ @@KERNEL_IMAGETYPE@@
+@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ - @@DEVICETREE_ADDRESS@@

@@ -1,0 +1,61 @@
+From 5c63eb5d56abd4e5232add4727247965a863d851 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Dec 2019 14:02:45 -0800
+Subject: [PATCH] Do not add stack pointer to clobber list
+
+It was being ignored until now when gcc 9.0 became capable
+of flagging these silent ignore via [1].
+
+We weren't actually clobbering the stack pointers here
+so it should not cause change in behavior.
+
+[1] https://gcc.gnu.org/PR52813
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ linux_syscall_support.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/linux_syscall_support.h b/linux_syscall_support.h
+index 9276f56..6e73309 100644
+--- a/linux_syscall_support.h
++++ b/linux_syscall_support.h
+@@ -1955,7 +1955,7 @@ struct kernel_statfs {
+                            LSS_ENTRYPOINT                                     \
+                            "pop %%ebx"                                        \
+                            args                                               \
+-                           : "esp", "memory");                                \
++                           : "memory");                                       \
+       LSS_RETURN(type,__res)
+     #undef  _syscall0
+     #define _syscall0(type,name)                                              \
+@@ -2012,7 +2012,7 @@ struct kernel_statfs {
+                              : "i" (__NR_##name), "ri" ((long)(arg1)),        \
+                                "c" ((long)(arg2)), "d" ((long)(arg3)),        \
+                                "S" ((long)(arg4)), "D" ((long)(arg5))         \
+-                             : "esp", "memory");                              \
++                             : "memory");                                     \
+         LSS_RETURN(type,__res);                                               \
+       }
+     #undef  _syscall6
+@@ -2034,7 +2034,7 @@ struct kernel_statfs {
+                              : "i" (__NR_##name),  "0" ((long)(&__s)),        \
+                                "c" ((long)(arg2)), "d" ((long)(arg3)),        \
+                                "S" ((long)(arg4)), "D" ((long)(arg5))         \
+-                             : "esp", "memory");                              \
++                             : "memory");                                     \
+         LSS_RETURN(type,__res);                                               \
+       }
+     LSS_INLINE int LSS_NAME(clone)(int (*fn)(void *), void *child_stack,
+@@ -2120,7 +2120,7 @@ struct kernel_statfs {
+                            : "0"(-EINVAL), "i"(__NR_clone),
+                              "m"(fn), "m"(child_stack), "m"(flags), "m"(arg),
+                              "m"(parent_tidptr), "m"(newtls), "m"(child_tidptr)
+-                           : "esp", "memory", "ecx", "edx", "esi", "edi");
++                           : "memory", "ecx", "edx", "esi", "edi");
+       LSS_RETURN(int, __res);
+     }
+ 
+-- 
+2.24.1
+

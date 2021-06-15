@@ -11,14 +11,17 @@ would lead to program abort.
 Upstream-Status: Submitted [http://bugzilla.mindrot.org/show_bug.cgi?id=2608]
 
 Signed-off-by: Yuanjie Huang <yuanjie.huang@windriver.com>
+
+Complete the fix
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- openbsd-compat/strlcat.c | 8 ++++++--
- openbsd-compat/strlcpy.c | 8 ++++++--
- openbsd-compat/strnlen.c | 8 ++++++--
- 3 files changed, 18 insertions(+), 6 deletions(-)
+ openbsd-compat/strlcat.c | 10 +++++++---
+ openbsd-compat/strlcpy.c |  8 ++++++--
+ openbsd-compat/strnlen.c |  8 ++++++--
+ 3 files changed, 19 insertions(+), 7 deletions(-)
 
 diff --git a/openbsd-compat/strlcat.c b/openbsd-compat/strlcat.c
-index bcc1b61..e758ebf 100644
+index bcc1b61..124e1e3 100644
 --- a/openbsd-compat/strlcat.c
 +++ b/openbsd-compat/strlcat.c
 @@ -23,6 +23,7 @@
@@ -29,6 +32,15 @@ index bcc1b61..e758ebf 100644
  
  /*
   * Appends src to string dst of size siz (unlike strncat, siz is the
+@@ -42,7 +43,7 @@ strlcat(char *dst, const char *src, size_t siz)
+ 	/* Find the end of dst and adjust bytes left but don't go past end */
+ 	while (n-- != 0 && *d != '\0')
+ 		d++;
+-	dlen = d - dst;
++	dlen = (uintptr_t)d - (uintptr_t)dst;
+ 	n = siz - dlen;
+ 
+ 	if (n == 0)
 @@ -55,8 +56,11 @@ strlcat(char *dst, const char *src, size_t siz)
  		s++;
  	}
@@ -70,7 +82,7 @@ index b4b1b60..b06f374 100644
  
  #endif /* !HAVE_STRLCPY */
 diff --git a/openbsd-compat/strnlen.c b/openbsd-compat/strnlen.c
-index 93d5155..9b8de5d 100644
+index 7ad3573..7040f1f 100644
 --- a/openbsd-compat/strnlen.c
 +++ b/openbsd-compat/strnlen.c
 @@ -23,6 +23,7 @@
@@ -95,5 +107,5 @@ index 93d5155..9b8de5d 100644
  }
  #endif
 -- 
-1.9.1
+2.17.1
 

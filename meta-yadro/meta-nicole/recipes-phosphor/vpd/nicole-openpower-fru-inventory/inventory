@@ -1,0 +1,3 @@
+FRUS=BMC,ETHERNET
+PATHS=/system/chassis/bmc,/system/chassis/ethernet
+EEPROM=/sys/bus/i2c/devices/0-0050/eeprom

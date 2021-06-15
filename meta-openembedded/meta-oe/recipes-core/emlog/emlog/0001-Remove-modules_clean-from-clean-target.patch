@@ -1,0 +1,33 @@
+From fd0a4ee201b5c7b24da79dcd346ac121978951a0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 29 Mar 2020 19:58:36 -0700
+Subject: [PATCH] Remove modules_clean from clean target
+
+This is needed when building applications (w/o module)
+Since OE will run 'make clean' before reconfiguring, this
+will try to run module_clean and will wrongly try to look for removing
+modules from /lib/modules
+
+Upstream-Status: Inappropriate [ OE-Specific ]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index c60863f..fc897d5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -23,7 +23,7 @@ all: modules nbcat mkemlog
+ 
+ install: modules_install nbcat_install mkemlog_install
+ 
+-clean: modules_clean nbcat_clean mkemlog_clean
++clean: nbcat_clean mkemlog_clean
+ 
+ modules:
+ 	$(MAKE) -C $(KDIR) M=$(CURDIR) modules
+-- 
+2.26.0
+

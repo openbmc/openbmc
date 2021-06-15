@@ -1,4 +1,4 @@
-inherit setuptools
+inherit setuptools3
 
 do_compile_class-native() {
     :

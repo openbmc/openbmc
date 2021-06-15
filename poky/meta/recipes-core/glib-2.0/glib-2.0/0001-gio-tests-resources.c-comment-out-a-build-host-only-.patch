@@ -1,0 +1,28 @@
+From 92de6c7eb30b961b24a2dce812d5276487b7d23d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 8 Jan 2020 18:22:46 +0100
+Subject: [PATCH] gio/tests/resources.c: comment out a build host-only test
+
+This test requires building resources in a way that is
+not cross-compatible (hardcodes ld and objcopy).
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ gio/tests/resources.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gio/tests/resources.c b/gio/tests/resources.c
+index c44d214..e289a01 100644
+--- a/gio/tests/resources.c
++++ b/gio/tests/resources.c
+@@ -993,7 +993,7 @@ main (int   argc,
+   g_test_add_func ("/resource/automatic", test_resource_automatic);
+   /* This only uses automatic resources too, so it tests the constructors and destructors */
+   g_test_add_func ("/resource/module", test_resource_module);
+-  g_test_add_func ("/resource/binary-linked", test_resource_binary_linked);
++  /* g_test_add_func ("/resource/binary-linked", test_resource_binary_linked); */
+ #endif
+   g_test_add_func ("/resource/uri/query-info", test_uri_query_info);
+   g_test_add_func ("/resource/uri/file", test_uri_file);

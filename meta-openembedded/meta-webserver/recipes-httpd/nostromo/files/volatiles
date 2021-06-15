@@ -1,2 +1,0 @@
-d www-data www-data 0775 /var/run/nostromo none
-d www-data www-data 0775 /var/log/nostromo none

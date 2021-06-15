@@ -3,6 +3,8 @@
 # Released under the MIT license (see COPYING.MIT)
 
 inherit metadata_scm
+inherit image-artifact-names
+
 # testimage.bbclass enables testing of qemu images using python unittests.
 # Most of the tests are commands run on target image over ssh.
 # To use it add testimage to global inherit and call your target image with -c testimage
@@ -31,8 +33,20 @@ TESTIMAGE_AUTO ??= "0"
 # TEST_LOG_DIR contains a command ssh log and may contain infromation about what command is running, output and return codes and for qemu a boot log till login.
 # Booting is handled by this class, and it's not a test in itself.
 # TEST_QEMUBOOT_TIMEOUT can be used to set the maximum time in seconds the launch code will wait for the login prompt.
+# TEST_OVERALL_TIMEOUT can be used to set the maximum time in seconds the tests will be allowed to run (defaults to no limit).
 # TEST_QEMUPARAMS can be used to pass extra parameters to qemu, e.g. "-m 1024" for setting the amount of ram to 1 GB.
 # TEST_RUNQEMUPARAMS can be used to pass extra parameters to runqemu, e.g. "gl" to enable OpenGL acceleration.
+
+# TESTIMAGE_BOOT_PATTERNS can be used to override certain patterns used to communicate with the target when booting,
+# if a pattern is not specifically present on this variable a default will be used when booting the target.
+# TESTIMAGE_BOOT_PATTERNS[<flag>] overrides the pattern used for that specific flag, where flag comes from a list of accepted flags
+# e.g. normally the system boots and waits for a login prompt (login:), after that it sends the command: "root\n" to log as the root user
+# if we wanted to log in as the hypothetical "webserver" user for example we could set the following:
+# TESTIMAGE_BOOT_PATTERNS = "send_login_user search_login_succeeded"
+# TESTIMAGE_BOOT_PATTERNS[send_login_user] = "webserver\n"
+# TESTIMAGE_BOOT_PATTERNS[search_login_succeeded] = "webserver@[a-zA-Z0-9\-]+:~#"
+# The accepted flags are the following: search_reached_prompt, send_login_user, search_login_succeeded, search_cmd_finished.
+# They are prefixed with either search/send, to differentiate if the pattern is meant to be sent or searched to/from the target terminal
 
 TEST_LOG_DIR ?= "${WORKDIR}/testimage"
 
@@ -46,7 +60,7 @@ BASICTESTSUITE = "\
     ping date df ssh scp python perl gi ptest parselogs \
     logrotate connman systemd oe_syslog pam stap ldd xorg \
     kernelmodule gcc buildcpio buildlzip buildgalculator \
-    dnf rpm opkg apt"
+    dnf rpm opkg apt weston"
 
 DEFAULT_TEST_SUITES = "${BASICTESTSUITE}"
 
@@ -64,9 +78,12 @@ DEFAULT_TEST_SUITES_remove_qemumips64 = "${MIPSREMOVE}"
 TEST_SUITES ?= "${DEFAULT_TEST_SUITES}"
 
 TEST_QEMUBOOT_TIMEOUT ?= "1000"
+TEST_OVERALL_TIMEOUT ?= ""
 TEST_TARGET ?= "qemu"
 TEST_QEMUPARAMS ?= ""
 TEST_RUNQEMUPARAMS ?= ""
+
+TESTIMAGE_BOOT_PATTERNS ?= ""
 
 TESTIMAGEDEPENDS = ""
 TESTIMAGEDEPENDS_append_qemuall = " qemu-native:do_populate_sysroot qemu-helper-native:do_populate_sysroot qemu-helper-native:do_addto_recipe_sysroot"
@@ -110,6 +127,11 @@ testimage_dump_host () {
     netstat -an
 }
 
+testimage_dump_monitor () {
+    query-status
+    query-block
+}
+
 python do_testimage() {
     testimage_main(d)
 }
@@ -150,6 +172,29 @@ def get_testimage_json_result_dir(d):
 def get_testimage_result_id(configuration):
     return '%s_%s_%s_%s' % (configuration['TEST_TYPE'], configuration['IMAGE_BASENAME'], configuration['MACHINE'], configuration['STARTTIME'])
 
+def get_testimage_boot_patterns(d):
+    from collections import defaultdict
+    boot_patterns = defaultdict(str)
+    # Only accept certain values
+    accepted_patterns = ['search_reached_prompt', 'send_login_user', 'search_login_succeeded', 'search_cmd_finished']
+    # Not all patterns need to be overriden, e.g. perhaps we only want to change the user
+    boot_patterns_flags = d.getVarFlags('TESTIMAGE_BOOT_PATTERNS') or {}
+    if boot_patterns_flags:
+        patterns_set = [p for p in boot_patterns_flags.items() if p[0] in d.getVar('TESTIMAGE_BOOT_PATTERNS').split()]
+        for flag, flagval in patterns_set:
+                if flag not in accepted_patterns:
+                    bb.fatal('Testimage: The only accepted boot patterns are: search_reached_prompt,send_login_user, \
+                    search_login_succeeded,search_cmd_finished\n Make sure your TESTIMAGE_BOOT_PATTERNS=%s \
+                    contains an accepted flag.' % d.getVar('TESTIMAGE_BOOT_PATTERNS'))
+                    return
+                # We know boot prompt is searched through in binary format, others might be expressions
+                if flag == 'search_reached_prompt':
+                    boot_patterns[flag] = flagval.encode()
+                else:
+                    boot_patterns[flag] = flagval.encode().decode('unicode-escape')
+    return boot_patterns
+
+
 def testimage_main(d):
     import os
     import json
@@ -168,7 +213,11 @@ def testimage_main(d):
         """
         Catch SIGTERM from worker in order to stop qemu.
         """
-        raise RuntimeError
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def handle_test_timeout(timeout):
+        bb.warn("Global test timeout reached (%s seconds), stopping the tests." %(timeout))
+        os.kill(os.getpid(), signal.SIGINT)
 
     testimage_sanity(d)
 
@@ -207,10 +256,14 @@ def testimage_main(d):
     if d.getVar("TEST_TARGET") == "qemu":
         fstypes = [fs for fs in fstypes if fs in supported_fstypes]
         if not fstypes:
-            bb.fatal('Unsupported image type built. Add a comptible image to '
+            bb.fatal('Unsupported image type built. Add a compatible image to '
                      'IMAGE_FSTYPES. Supported types: %s' %
                      ', '.join(supported_fstypes))
-    rootfs = '%s.%s' % (image_name, fstypes[0])
+    qfstype = fstypes[0]
+    qdeffstype = d.getVar("QB_DEFAULT_FSTYPE")
+    if qdeffstype:
+        qfstype = qdeffstype
+    rootfs = '%s.%s' % (image_name, qfstype)
 
     # Get tmpdir (not really used, just for compatibility)
     tmpdir = d.getVar("TMPDIR")
@@ -235,11 +288,14 @@ def testimage_main(d):
     # Get use_kvm
     kvm = oe.types.qemu_use_kvm(d.getVar('QEMU_USE_KVM'), d.getVar('TARGET_ARCH'))
 
+    # Get OVMF
+    ovmf = d.getVar("QEMU_USE_OVMF")
+
     slirp = False
     if d.getVar("QEMU_USE_SLIRP"):
         slirp = True
 
-    # TODO: We use the current implementatin of qemu runner because of
+    # TODO: We use the current implementation of qemu runner because of
     # time constrains, qemu runner really needs a refactor too.
     target_kwargs = { 'machine'     : machine,
                       'rootfs'      : rootfs,
@@ -252,11 +308,37 @@ def testimage_main(d):
                       'kvm'         : kvm,
                       'slirp'       : slirp,
                       'dump_dir'    : d.getVar("TESTIMAGE_DUMP_DIR"),
+                      'serial_ports': len(d.getVar("SERIAL_CONSOLES").split()),
+                      'ovmf'        : ovmf,
+                      'tmpfsdir'    : d.getVar("RUNQEMU_TMPFS_DIR"),
                     }
+
+    if d.getVar("TESTIMAGE_BOOT_PATTERNS"):
+        target_kwargs['boot_patterns'] = get_testimage_boot_patterns(d)
 
     # TODO: Currently BBPATH is needed for custom loading of targets.
     # It would be better to find these modules using instrospection.
     target_kwargs['target_modules_path'] = d.getVar('BBPATH')
+
+    # hardware controlled targets might need further access
+    target_kwargs['powercontrol_cmd'] = d.getVar("TEST_POWERCONTROL_CMD") or None
+    target_kwargs['powercontrol_extra_args'] = d.getVar("TEST_POWERCONTROL_EXTRA_ARGS") or ""
+    target_kwargs['serialcontrol_cmd'] = d.getVar("TEST_SERIALCONTROL_CMD") or None
+    target_kwargs['serialcontrol_extra_args'] = d.getVar("TEST_SERIALCONTROL_EXTRA_ARGS") or ""
+    target_kwargs['testimage_dump_monitor'] = d.getVar("testimage_dump_monitor") or ""
+    target_kwargs['testimage_dump_target'] = d.getVar("testimage_dump_target") or ""
+
+    def export_ssh_agent(d):
+        import os
+
+        variables = ['SSH_AGENT_PID', 'SSH_AUTH_SOCK']
+        for v in variables:
+            if v not in os.environ.keys():
+                val = d.getVar(v)
+                if val is not None:
+                    os.environ[v] = val
+
+    export_ssh_agent(d)
 
     # runtime use network for download projects for build
     export_proxies(d)
@@ -292,32 +374,41 @@ def testimage_main(d):
     package_extraction(d, tc.suites)
 
     results = None
+    complete = False
     orig_sigterm_handler = signal.signal(signal.SIGTERM, sigterm_exception)
     try:
         # We need to check if runqemu ends unexpectedly
         # or if the worker send us a SIGTERM
         tc.target.start(params=d.getVar("TEST_QEMUPARAMS"), runqemuparams=d.getVar("TEST_RUNQEMUPARAMS"))
+        import threading
+        try:
+            threading.Timer(int(d.getVar("TEST_OVERALL_TIMEOUT")), handle_test_timeout, (int(d.getVar("TEST_OVERALL_TIMEOUT")),)).start()
+        except ValueError:
+            pass
         results = tc.runTests()
-    except (RuntimeError, BlockingIOError) as err:
-        if isinstance(err, RuntimeError):
-            bb.error('testimage received SIGTERM, shutting down...')
+        complete = True
+    except (KeyboardInterrupt, BlockingIOError) as err:
+        if isinstance(err, KeyboardInterrupt):
+            bb.error('testimage interrupted, shutting down...')
         else:
             bb.error('runqemu failed, shutting down...')
         if results:
             results.stop()
-            results = None
+        results = tc.results
     finally:
         signal.signal(signal.SIGTERM, orig_sigterm_handler)
         tc.target.stop()
 
     # Show results (if we have them)
-    if not results:
+    if results:
+        configuration = get_testimage_configuration(d, 'runtime', machine)
+        results.logDetails(get_testimage_json_result_dir(d),
+                        configuration,
+                        get_testimage_result_id(configuration),
+                        dump_streams=d.getVar('TESTREPORT_FULLLOGS'))
+        results.logSummary(pn)
+    if not results or not complete:
         bb.fatal('%s - FAILED - tests were interrupted during execution' % pn, forcelog=True)
-    configuration = get_testimage_configuration(d, 'runtime', machine)
-    results.logDetails(get_testimage_json_result_dir(d),
-                       configuration,
-                       get_testimage_result_id(configuration))
-    results.logSummary(pn)
     if not results.wasSuccessful():
         bb.fatal('%s - FAILED - check the task log and the ssh log' % pn, forcelog=True)
 

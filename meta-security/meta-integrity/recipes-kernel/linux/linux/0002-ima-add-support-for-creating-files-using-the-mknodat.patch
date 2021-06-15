@@ -1,0 +1,138 @@
+From baaec960e9e7be0b526eaf831b079ddfe5c15124 Mon Sep 17 00:00:00 2001
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Date: Thu, 10 Mar 2016 18:19:20 +0200
+Subject: [PATCH] ima: add support for creating files using the mknodat
+ syscall
+
+Commit 3034a14 "ima: pass 'opened' flag to identify newly created files"
+stopped identifying empty files as new files.  However new empty files
+can be created using the mknodat syscall.  On systems with IMA-appraisal
+enabled, these empty files are not labeled with security.ima extended
+attributes properly, preventing them from subsequently being opened in
+order to write the file data contents.  This patch marks these empty
+files, created using mknodat, as new in order to allow the file data
+contents to be written.
+
+Files with security.ima xattrs containing a file signature are considered
+"immutable" and can not be modified.  The file contents need to be
+written, before signing the file.  This patch relaxes this requirement
+for new files, allowing the file signature to be written before the file
+contents.
+
+Upstream-Status: Accepted [https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/security/integrity/ima/ima_appraise.c?id=05d1a717ec0430c916a749b94eb90ab74bbfa356]
+
+Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+---
+ fs/namei.c                            |  2 ++
+ include/linux/ima.h                   |  7 ++++++-
+ security/integrity/ima/ima_appraise.c |  3 +++
+ security/integrity/ima/ima_main.c     | 32 +++++++++++++++++++++++++++++++-
+ 4 files changed, 42 insertions(+), 2 deletions(-)
+
+diff --git a/fs/namei.c b/fs/namei.c
+index ccd7f98..19502da 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -3526,6 +3526,8 @@ retry:
+ 	switch (mode & S_IFMT) {
+ 		case 0: case S_IFREG:
+ 			error = vfs_create(path.dentry->d_inode,dentry,mode,true);
++			if (!error)
++				ima_post_path_mknod(dentry);
+ 			break;
+ 		case S_IFCHR: case S_IFBLK:
+ 			error = vfs_mknod(path.dentry->d_inode,dentry,mode,
+diff --git a/include/linux/ima.h b/include/linux/ima.h
+index 120ccc5..7f51971 100644
+--- a/include/linux/ima.h
++++ b/include/linux/ima.h
+@@ -20,7 +20,7 @@ extern void ima_file_free(struct file *file);
+ extern int ima_file_mmap(struct file *file, unsigned long prot);
+ extern int ima_module_check(struct file *file);
+ extern int ima_fw_from_file(struct file *file, char *buf, size_t size);
+-
++extern void ima_post_path_mknod(struct dentry *dentry);
+ #else
+ static inline int ima_bprm_check(struct linux_binprm *bprm)
+ {
+@@ -52,6 +52,11 @@ static inline int ima_fw_from_file(struct file *file, char *buf, size_t size)
+ 	return 0;
+ }
+ 
++static inline void ima_post_path_mknod(struct dentry *dentry)
++{
++	return;
++}
++
+ #endif /* CONFIG_IMA */
+ 
+ #ifdef CONFIG_IMA_APPRAISE
+diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
+index 4df493e..20806ea 100644
+--- a/security/integrity/ima/ima_appraise.c
++++ b/security/integrity/ima/ima_appraise.c
+@@ -274,6 +274,11 @@ out:
+ 		     xattr_value->type != EVM_IMA_XATTR_DIGSIG)) {
+ 			if (!ima_fix_xattr(dentry, iint))
+ 				status = INTEGRITY_PASS;
++		} else if ((inode->i_size == 0) &&
++			   (iint->flags & IMA_NEW_FILE) &&
++			   (xattr_value &&
++			    xattr_value->type == EVM_IMA_XATTR_DIGSIG)) {
++			status = INTEGRITY_PASS;
+ 		}
+ 		integrity_audit_msg(AUDIT_INTEGRITY_DATA, inode, filename,
+ 				    op, cause, rc, 0);
+diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+index eeee00dc..705bf78 100644
+--- a/security/integrity/ima/ima_main.c
++++ b/security/integrity/ima/ima_main.c
+@@ -242,7 +242,8 @@ static int process_measurement(struct file *file, int mask, int function,
+ 		ima_audit_measurement(iint, pathname);
+ 
+ out_digsig:
+-	if ((mask & MAY_WRITE) && (iint->flags & IMA_DIGSIG))
++	if ((mask & MAY_WRITE) && (iint->flags & IMA_DIGSIG) &&
++	     !(iint->flags & IMA_NEW_FILE))
+ 		rc = -EACCES;
+ 	kfree(xattr_value);
+ out_free:
+@@ -310,6 +311,35 @@ int ima_file_check(struct file *file, int mask, int opened)
+ EXPORT_SYMBOL_GPL(ima_file_check);
+ 
+ /**
++ * ima_post_path_mknod - mark as a new inode
++ * @dentry: newly created dentry
++ *
++ * Mark files created via the mknodat syscall as new, so that the
++ * file data can be written later.
++ */
++void ima_post_path_mknod(struct dentry *dentry)
++{
++	struct integrity_iint_cache *iint;
++	struct inode *inode;
++	int must_appraise;
++
++	if (!dentry || !dentry->d_inode)
++		return;
++
++	inode = dentry->d_inode;
++	if (inode->i_size != 0)
++		return;
++
++	must_appraise = ima_must_appraise(inode, MAY_ACCESS, FILE_CHECK);
++	if (!must_appraise)
++		return;
++
++	iint = integrity_inode_get(inode);
++	if (iint)
++		iint->flags |= IMA_NEW_FILE;
++}
++
++/**
+  * ima_module_check - based on policy, collect/store/appraise measurement.
+  * @file: pointer to the file to be measured/appraised
+  *
+-- 
+2.5.0
+

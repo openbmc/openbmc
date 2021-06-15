@@ -1,0 +1,35 @@
+LCONF_VERSION = "7"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \
+    ##OEROOT##/meta \
+    ##OEROOT##/meta-poky \
+    ##OEROOT##/../meta-openembedded/meta-perl \
+    ##OEROOT##/../meta-openembedded/meta-python \
+    ##OEROOT##/../meta-openembedded/meta-filesystems \
+    ##OEROOT##/../meta-openembedded/meta-gnome \
+    ##OEROOT##/../meta-openembedded/meta-multimedia \
+    ##OEROOT##/../meta-openembedded/meta-networking \
+    ##OEROOT##/../meta-openembedded/meta-webserver \
+    ##OEROOT##/../meta-openembedded/meta-xfce \
+    ##OEROOT##/../meta-openembedded/meta-initramfs \
+    ##OEROOT##/../meta-openembedded/meta-oe \
+    ##OEROOT##/../meta-browser \
+    ##OEROOT##/../meta-qt5 \
+    ##OEROOT##/../meta-xilinx/meta-xilinx-bsp \
+    ##OEROOT##/../meta-xilinx/meta-xilinx-pynq \
+    ##OEROOT##/../meta-xilinx/meta-xilinx-standalone \
+    ##OEROOT##/../meta-xilinx/meta-xilinx-contrib \
+    ##OEROOT##/../meta-xilinx-tools \
+    ##OEROOT##/../meta-petalinux \
+    ##OEROOT##/../meta-virtualization \
+    ##OEROOT##/../meta-openamp \
+    ##OEROOT##/../meta-jupyter \
+    ##OEROOT##/../meta-python2 \
+"
+
+BBLAYERS_NON_REMOVABLE ?= " \
+    ##OEROOT##/meta \
+"

@@ -1,0 +1,5 @@
+#MACHINE ?= "evb-ast2500"
+MACHINE ??= "evb-ast2600"
+
+# Allow logging in if the user does not set the root password.
+EXTRA_IMAGE_FEATURES ?= "debug-tweaks"

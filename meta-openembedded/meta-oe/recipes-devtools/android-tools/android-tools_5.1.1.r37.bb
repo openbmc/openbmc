@@ -3,8 +3,8 @@ SECTION = "console/utils"
 LICENSE = "Apache-2.0 & GPL-2.0 & BSD-2-Clause & BSD-3-Clause"
 LIC_FILES_CHKSUM = " \
     file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10 \
-    file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6 \
-    file://${COMMON_LICENSE_DIR}/BSD-2-Clause;md5=8bef8e6712b1be5aa76af1ebde9d6378 \
+    file://${COMMON_LICENSE_DIR}/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6 \
+    file://${COMMON_LICENSE_DIR}/BSD-2-Clause;md5=cb641bc04cda31daea161b1bc15da69f \
     file://${COMMON_LICENSE_DIR}/BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \
 "
 DEPENDS = "libbsd libpcre zlib libcap"
@@ -38,10 +38,13 @@ SRC_URI = " \
     file://core/0011-Remove-bionic-specific-calls.patch;patchdir=system/core \
     file://core/0012-Fix-implicit-declaration-of-stlcat-strlcopy-function.patch;patchdir=system/core \
     file://core/adb_libssl_11.diff;patchdir=system/core \
+    file://core/0013-adb-Support-riscv64.patch;patchdir=system/core \
     file://extras/0001-ext4_utils-remove-selinux-extensions.patch;patchdir=system/extras \
     file://extras/0002-ext4_utils-add-o-argument-to-preserve-ownership.patch;patchdir=system/extras \
     file://libselinux/0001-Remove-bionic-specific-calls.patch;patchdir=external/libselinux \
+    file://libselinux/0001-libselinux-Do-not-define-gettid-if-glibc-2.30-is-use.patch;patchdir=external/libselinux \
     file://android-tools-adbd.service \
+    file://build/0001-Riscv-Add-risc-v-Android-config-header.patch;patchdir=build \
     file://gitignore \
     file://adb.mk;subdir=${BPN} \
     file://adbd.mk;subdir=${BPN} \
@@ -60,10 +63,12 @@ ARM_INSTRUCTION_SET_armv5 = "arm"
 
 COMPATIBLE_HOST_powerpc = "(null)"
 COMPATIBLE_HOST_powerpc64 = "(null)"
+COMPATIBLE_HOST_powerpc64le = "(null)"
 
 inherit systemd
 
-SYSTEMD_SERVICE_${PN} = "android-tools-adbd.service"
+SYSTEMD_PACKAGES = "${PN}-adbd"
+SYSTEMD_SERVICE_${PN}-adbd = "android-tools-adbd.service"
 
 # Find libbsd headers during native builds
 CC_append_class-native = " -I${STAGING_INCDIR}"
@@ -92,6 +97,9 @@ do_compile() {
       aarch64)
         export android_arch=linux-arm64
       ;;
+      riscv64)
+        export android_arch=linux-riscv64
+      ;;
       mips|mipsel)
         export android_arch=linux-mips
       ;;
@@ -101,7 +109,7 @@ do_compile() {
       powerpc|powerpc64)
         export android_arch=linux-ppc
       ;;
-      i586|x86_64)
+      i586|i686|x86_64)
         export android_arch=linux-x86
       ;;
     esac
@@ -150,9 +158,15 @@ do_install() {
     fi
 }
 
-PACKAGES += "${PN}-fstools"
+PACKAGES =+ "${PN}-fstools ${PN}-adbd"
 
-RDEPENDS_${BPN} = "${BPN}-conf bash"
+RDEPENDS_${PN}-adbd = "${PN}-conf"
+RDEPENDS_${PN}-fstools = "bash"
+
+FILES_${PN}-adbd = "\
+    ${bindir}/adbd \
+    ${systemd_unitdir}/system/android-tools-adbd.service \
+"
 
 FILES_${PN}-fstools = "\
     ${bindir}/ext2simg \

@@ -1,0 +1,22 @@
+From 51e145b43e66134aa4b33c9af0319331ec8a5bce Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 5 Feb 2021 23:15:45 -0800
+Subject: [PATCH] configure: Use AC_PROG_INTLTOOL
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -8,7 +8,7 @@ AC_CONFIG_AUX_DIR([build-aux])
+ AC_CONFIG_MACRO_DIR([m4])
+ AM_INIT_AUTOMAKE([1.11 -Wall parallel-tests subdir-objects])
+ AC_CONFIG_HEADERS([config.h])
+-
++AC_PROG_INTLTOOL
+ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+ 
+ GEANY_PREFIX

@@ -14,10 +14,11 @@ Upstream-Status: Inappropriate [configuration]
 
 Signed-off-by: Song.Li <Song.Li@windriver.com>
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
-
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- configure |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ configure    | 2 +-
+ configure.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 Index: unix/configure
 ===================================================================
@@ -27,8 +28,8 @@ Index: unix/configure
  
  eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
  
--TCL_LIBRARY='$(prefix)/lib/tcl$(VERSION)'
-+TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
+-test -z "$TCL_LIBRARY" && TCL_LIBRARY='$(prefix)/lib/tcl$(VERSION)'
++test -z "$TCL_LIBRARY" && TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
  PRIVATE_INCLUDE_DIR='$(includedir)'
  HTML_DIR='$(DISTDIR)/html'
  
@@ -40,8 +41,8 @@ Index: unix/configure.in
  
  eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
  
--TCL_LIBRARY='$(prefix)/lib/tcl$(VERSION)'
-+TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
+-test -z "$TCL_LIBRARY" && TCL_LIBRARY='$(prefix)/lib/tcl$(VERSION)'
++test -z "$TCL_LIBRARY" && TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
  PRIVATE_INCLUDE_DIR='$(includedir)'
  HTML_DIR='$(DISTDIR)/html'
  

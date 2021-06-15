@@ -11,25 +11,40 @@ SECTION = "bootloaders"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-SRC_URI = "https://ftp.gnu.org/gnu/grub/grub-${PV}.tar.gz \
+CVE_PRODUCT = "grub2"
+
+SRC_URI = "https://alpha.gnu.org/gnu/grub/grub-${REALPV}.tar.xz \
            file://0001-Disable-mfpmath-sse-as-well-when-SSE-is-disabled.patch \
-           file://0001-Unset-need_charset_alias-when-building-for-musl.patch \
            file://autogen.sh-exclude-pc.patch \
            file://grub-module-explicitly-keeps-symbole-.module_license.patch \
            file://0001-grub.d-10_linux.in-add-oe-s-kernel-name.patch \
-           file://fix.build.with.gcc-7.patch \
-           file://gcc8.patch \
-           file://0001-x86-64-Treat-R_X86_64_PLT32-as-R_X86_64_PC32.patch \
-           file://0001-grub-setup-Debug-message-cleanup.patch \
-           file://disable-address-of-packed-member.patch \
-           file://fix.build.with.squashfs.patch \
+           file://determinism.patch \
+           file://0001-RISC-V-Restore-the-typcast-to-long.patch \
 "
-SRC_URI[md5sum] = "1116d1f60c840e6dbd67abbc99acb45d"
-SRC_URI[sha256sum] = "660ee136fbcee08858516ed4de2ad87068bfe1b6b8b37896ce3529ff054a726d"
 
-DEPENDS = "flex-native bison-native"
+SRC_URI[sha256sum] = "2c87f1f21e2ab50043e6cd9163c08f1b6c3a6171556bf23ff9ed65b074145484"
 
-COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*)-(linux.*|freebsd.*)'
+REALPV = "2.06~rc1"
+PV = "2.04+${REALPV}"
+
+# Fixed in 2.06~rc1, can be removed for 2.06 final
+CVE_CHECK_WHITELIST += "\
+    CVE-2020-14308 CVE-2020-14309 CVE-2020-14310 CVE-2020-14311 CVE-2020-10713 \
+    CVE-2020-14372 CVE-2020-15705 CVE-2020-15706 CVE-2020-15707 \
+    CVE-2020-25632 CVE-2020-25647 CVE-2020-27749 CVE-2020-27779 \
+    CVE-2021-3418 CVE-2021-20225 CVE-2021-20233"
+
+# Applies only to RHEL
+CVE_CHECK_WHITELIST += "CVE-2019-14865"
+
+S = "${WORKDIR}/grub-${REALPV}"
+
+UPSTREAM_CHECK_URI = "${GNU_MIRROR}/grub"
+UPSTREAM_CHECK_REGEX = "grub-(?P<pver>\d+(\.\d+)+)\.tar\.(gz|xz)"
+
+DEPENDS = "flex-native bison-native gettext-native"
+
+COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*|riscv.*)-(linux.*|freebsd.*)'
 COMPATIBLE_HOST_armv7a = 'null'
 COMPATIBLE_HOST_armv7ve = 'null'
 
@@ -38,9 +53,13 @@ COMPATIBLE_HOST_armv7ve = 'null'
 
 GRUBPLATFORM_arm = "efi"
 GRUBPLATFORM_aarch64 = "efi"
+GRUBPLATFORM_riscv32 = "efi"
+GRUBPLATFORM_riscv64 = "efi"
 GRUBPLATFORM ??= "pc"
 
-inherit autotools gettext texinfo
+inherit autotools gettext texinfo pkgconfig
+
+CFLAGS_remove = "-O2"
 
 EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
                 --disable-grub-mkfont \
@@ -48,6 +67,7 @@ EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
                 --enable-liblzma=no \
                 --enable-libzfs=no \
                 --enable-largefile \
+                --disable-werror \
 "
 
 PACKAGECONFIG ??= ""
@@ -63,13 +83,10 @@ BUILD_CFLAGS = ""
 BUILD_CXXFLAGS = ""
 BUILD_LDFLAGS = ""
 
-do_configure_prepend() {
-	# The grub2 configure script uses variables such as TARGET_CFLAGS etc
-	# for its own purposes. Remove the OE versions from the environment to
-	# avoid conflicts.
-	unset TARGET_CPPFLAGS TARGET_CFLAGS TARGET_CXXFLAGS TARGET_LDFLAGS
-	( cd ${S}
-	${S}/autogen.sh )
-}
+export PYTHON = "python3"
 
-RDEPENDS_${PN}_class-native = ""
+do_configure_prepend() {
+	cd ${S}
+	FROM_BOOTSTRAP=1 ${S}/autogen.sh
+	cd ${B}
+}

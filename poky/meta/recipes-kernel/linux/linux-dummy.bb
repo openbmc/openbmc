@@ -5,9 +5,11 @@ where you wish to build the kernel externally from the build system."
 SECTION = "kernel"
 
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://${WORKDIR}/COPYING.GPL;md5=751419260aa954499f7abaabaa882bbe"
+LIC_FILES_CHKSUM = "file://COPYING.GPL;md5=751419260aa954499f7abaabaa882bbe"
 
 PROVIDES += "virtual/kernel"
+
+inherit deploy linux-dummy
 
 PACKAGES_DYNAMIC += "^kernel-module-.*"
 PACKAGES_DYNAMIC += "^kernel-image-.*"
@@ -24,7 +26,7 @@ DESCRIPTION_kernel-vmlinux = "Kernel vmlinux meta package"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-#COMPATIBLE_MACHINE = "your_machine"
+COMPATIBLE_HOST = ".*-linux"
 
 PR = "r1"
 
@@ -37,6 +39,10 @@ do_configure() {
 
 do_compile () {
 	:
+}
+
+do_compile_kernelmodules() {
+    :
 }
 
 do_shared_workdir () {
@@ -58,3 +64,4 @@ do_deploy() {
 addtask bundle_initramfs after do_install before do_deploy
 addtask deploy after do_install
 addtask shared_workdir after do_compile before do_install
+addtask compile_kernelmodules

@@ -9,6 +9,7 @@ SRC_URI = "${SAVANNAH_NONGNU_MIRROR}/hddtemp/hddtemp-0.3-beta15.tar.bz2 \
            file://hddtemp_0.3-beta15-52.diff \
            file://hddtemp-0.3-beta15-autodetect-717479.patch \
            file://0001-backtrace-Replace-struct-ucontext-with-ucontext_t.patch \
+           file://0001-configure.ac-Rename-to-configure.ac-and-use-external.patch \
            file://hddtemp.db \
            file://init \
 "

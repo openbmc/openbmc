@@ -1,0 +1,36 @@
+Fix build with gettext 0.20.x
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -3,7 +3,7 @@
+ ## If you don't want it to overwrite it,
+ ## 	Please disable it in the Anjuta project configuration
+ 
+-SUBDIRS = intl po src pixmaps
++SUBDIRS = po src pixmaps
+ 
+ gtkperfdocdir = ${prefix}/doc/gtkperf
+ gtkperfdoc_DATA = \
+--- a/configure.in
++++ b/configure.in
+@@ -31,8 +31,7 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GE
+ 
+ dnl Languages which your application supports
+ ALL_LINGUAS=""
+-AM_GNU_GETTEXT
+-AM_GNU_GETTEXT_VERSION(0.10.40)
++AM_GNU_GETTEXT([external])
+ 
+ dnl Set PACKAGE_LOCALE_DIR in config.h.
+ if test "x${prefix}" = "xNONE"; then
+@@ -100,7 +99,6 @@ AC_DEFINE_UNQUOTED(PACKAGE_SOURCE_DIR, "
+ 
+ AC_OUTPUT([
+ Makefile
+-intl/Makefile
+ po/Makefile.in
+ src/Makefile
+ pixmaps/Makefile

@@ -1,0 +1,63 @@
+From bfbf393e7d5b1b41df85ce1c37e887776c45d529 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Wed, 1 May 2019 16:37:48 +0100
+Subject: [PATCH] Changes to allow ptest to run standalone on target:
+
+a) Run the tests serially
+b) Use the standalone test mode which allows the tests to be run in their
+  'installled' locations on target (but not any of the standalone build pieces)
+c) We want to use the binaries from their installed locations so the run-subr
+   script needs tweaking to run them like that. The rpath conditional isn't
+   enough since we want the second entry in the case statement.
+d) Add an oecheck make target which we can use to build the test binaries we need
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Inappropriate [oe specific]
+
+---
+ configure.ac       | 2 +-
+ tests/Makefile.am  | 2 ++
+ tests/test-subr.sh | 6 ------
+ 3 files changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index d345495..67933d1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -48,7 +48,7 @@ AC_COPYRIGHT([Copyright (C) 1996-2021 The elfutils developers.])
+ AC_PREREQ(2.63)			dnl Minimum Autoconf version required.
+ 
+ dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
+-AM_INIT_AUTOMAKE([gnits 1.11 -Wno-portability dist-bzip2 no-dist-gzip parallel-tests])
++AM_INIT_AUTOMAKE([gnits 1.11 -Wno-portability dist-bzip2 no-dist-gzip serial-tests])
+ AM_MAINTAINER_MODE
+ 
+ AM_SILENT_RULES([yes])
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 72afd0e..a2dfd43 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -698,3 +698,5 @@ check: check-am coverage
+ coverage:
+ 	-$(srcdir)/coverage.sh
+ endif
++oecheck:
++	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
+diff --git a/tests/test-subr.sh b/tests/test-subr.sh
+index 411e5f2..a638ff9 100644
+--- a/tests/test-subr.sh
++++ b/tests/test-subr.sh
+@@ -91,12 +91,6 @@ installed_testrun()
+   program="$1"
+   shift
+   case "$program" in
+-  ${abs_builddir}/*)
+-    if [ "x$elfutils_tests_rpath" != xno ]; then
+-      echo >&2 installcheck not possible with --enable-tests-rpath
+-      exit 77
+-    fi
+-    ;;
+   ${abs_top_builddir}/src/*)
+     program=${bindir}/`program_transform ${program##*/}`
+     ;;

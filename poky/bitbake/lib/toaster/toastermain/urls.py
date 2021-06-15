@@ -1,23 +1,10 @@
 #
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
-#
 # BitBake Toaster Implementation
 #
 # Copyright (C) 2013        Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from django.conf.urls import include, url
 from django.views.generic import RedirectView, TemplateView
@@ -64,7 +51,7 @@ if toastermain.settings.DEBUG_PANEL_ENABLED:
 
 urlpatterns = [
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ] + urlpatterns
 
 # Automatically discover urls.py in various apps, beside our own
@@ -82,7 +69,7 @@ for t in os.walk(os.path.dirname(currentdir)):
         # make sure we don't have this module name in
         conflict = False
         for p in urlpatterns:
-            if p.regex.pattern == '^' + modulename + '/':
+            if p.pattern.regex.pattern == '^' + modulename + '/':
                 conflict = True
         if not conflict:
             urlpatterns.insert(0, url(r'^' + modulename + '/', include ( modulename + '.urls')))

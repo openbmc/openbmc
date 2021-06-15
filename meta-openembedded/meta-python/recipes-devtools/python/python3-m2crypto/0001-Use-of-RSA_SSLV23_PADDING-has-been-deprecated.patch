@@ -1,0 +1,29 @@
+From d06eaa88a5f491827733f32027c46de3557fbd05 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mat=C4=9Bj=20Cepl?= <mcepl@cepl.eu>
+Date: Fri, 19 Feb 2021 15:53:02 +0100
+Subject: [PATCH] Use of RSA_SSLV23_PADDING has been deprecated.
+
+Fixes #293.
+---
+ tests/test_rsa.py | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/tests/test_rsa.py b/tests/test_rsa.py
+index 3de5016..7299785 100644
+--- a/tests/test_rsa.py
++++ b/tests/test_rsa.py
+@@ -124,11 +124,6 @@ class RSATestCase(unittest.TestCase):
+             ptxt = priv.private_decrypt(ctxt, p)
+             self.assertEqual(ptxt, self.data)
+ 
+-        # sslv23_padding
+-        ctxt = priv.public_encrypt(self.data, RSA.sslv23_padding)
+-        res = priv.private_decrypt(ctxt, RSA.sslv23_padding)
+-        self.assertEqual(res, self.data)
+-
+         # no_padding
+         with six.assertRaisesRegex(self, RSA.RSAError, 'data too small'):
+             priv.public_encrypt(self.data, RSA.no_padding)
+-- 
+2.29.2
+

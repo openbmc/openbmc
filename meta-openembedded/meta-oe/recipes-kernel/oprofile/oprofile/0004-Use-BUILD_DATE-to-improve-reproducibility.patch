@@ -1,0 +1,63 @@
+From 7bef5b905abe36adfd4e4cc16bc830376f50e8f6 Mon Sep 17 00:00:00 2001
+From: Viktor Kleinik <vkleinik@cisco.com>
+Date: Sun, 7 Mar 2021 17:22:26 +0000
+Subject: [PATCH 04/10] Use BUILD_DATE to improve reproducibility
+
+The C preprocessor variable BUILD_DATE contains the actual
+build date or some reproducible value. It depends on whether
+SOURCE_DATE_EPOCH environment variable was set previously or not.
+In this way, reproducibility can be improved when needed.
+
+Upstream-Status: Backport [https://sourceforge.net/p/oprofile/oprofile/ci/864e02eab12cdc523b2dcd3f7b87a27abc16eefc/]
+Signed-off-by: Viktor Kleinik <vkleinik@cisco.com>
+---
+ libutil/op_version.c   | 2 +-
+ pe_counting/ocount.cpp | 4 ++--
+ pe_profiling/operf.cpp | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/libutil/op_version.c b/libutil/op_version.c
+index 99a844e4..a257e9c4 100644
+--- a/libutil/op_version.c
++++ b/libutil/op_version.c
+@@ -19,6 +19,6 @@ void show_version(char const * app_name)
+ {
+ 	/* Do not change the version format: it is documented in html doc */
+ 	printf("%s: " PACKAGE " " VERSION " compiled on "
+-	       __DATE__ " " __TIME__ "\n", app_name);
++	       BUILD_DATE "\n", app_name);
+ 	exit(EXIT_SUCCESS);
+ }
+diff --git a/pe_counting/ocount.cpp b/pe_counting/ocount.cpp
+index 2470745d..ae89fe61 100644
+--- a/pe_counting/ocount.cpp
++++ b/pe_counting/ocount.cpp
+@@ -660,8 +660,8 @@ static int _process_ocount_and_app_args(int argc, char * const argv[])
+ 			__print_usage_and_exit(NULL);
+ 			break;
+ 		case 'v':
+-			cout << argv[0] << ": " << PACKAGE << " " << VERSION << " compiled on " << __DATE__
+-			     << " " << __TIME__ << endl;
++			cout << argv[0] << ": " << PACKAGE << " " << VERSION << " compiled on "
++			     << BUILD_DATE << endl;
+ 			exit(EXIT_SUCCESS);
+ 			break;
+ 		default:
+diff --git a/pe_profiling/operf.cpp b/pe_profiling/operf.cpp
+index 00834409..f0f9c209 100644
+--- a/pe_profiling/operf.cpp
++++ b/pe_profiling/operf.cpp
+@@ -1342,8 +1342,8 @@ static int _process_operf_and_app_args(int argc, char * const argv[])
+ 			__print_usage_and_exit(NULL);
+ 			break;
+ 		case 'v':
+-			cout << argv[0] << ": " << PACKAGE << " " << VERSION << " compiled on " << __DATE__
+-			     << " " << __TIME__ << endl;
++			cout << argv[0] << ": " << PACKAGE << " " << VERSION << " compiled on "
++			     << BUILD_DATE << endl;
+ 			exit(EXIT_SUCCESS);
+ 			break;
+ 		default:
+-- 
+2.31.0
+

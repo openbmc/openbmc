@@ -1,19 +1,3 @@
-# Helper functions for checking feature variables.
-
-def df_enabled(d, feature, truevalue, falsevalue=""):
-    return bb.utils.contains("DISTRO_FEATURES", feature, truevalue, falsevalue, d)
-
-
-def mf_enabled(d, feature, truevalue, falsevalue=""):
-    return bb.utils.contains("MACHINE_FEATURES", feature, truevalue, falsevalue, d)
-
-
-def cf_enabled(d, feature, truevalue, falsevalue=""):
-    return truevalue if df_enabled(d, feature, truevalue) \
-        and mf_enabled(d, feature, truevalue) \
-            else falsevalue
-
-
 def set_append(d, var, val, sep=' '):
     values = (d.getVar(var, True) or '').split(sep)
     if filter(bool, values):
@@ -39,11 +23,3 @@ def compose_list_zip(d, fmtvar, *listvars, **kw):
     lists = [listvar_to_list(d, x) for x in listvars]
     lst = [fmt.format(*x) for x in zip(*lists)]
     return (kw.get('sep') or ' ').join(lst)
-
-
-def append_suffix(val, suffix):
-    words = val.split(' ')
-    newval = []
-    for w in words:
-        newval.append(w + suffix)
-    return ' '.join(newval)

@@ -1,0 +1,5 @@
+[NetDev]
+Name=eth0.4004
+Kind=vlan
+[VLAN]
+Id=4004

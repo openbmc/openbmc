@@ -1,0 +1,24 @@
+From 070b114fd54b6ad38b4eff04279fe89ccaaef61b Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Fri, 4 Dec 2020 01:39:30 -0500
+Subject: [PATCH] gitignore: add archives from lib directory
+
+The build creates two *.a files in the lib directory, add these to .gitignore.
+
+Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ .gitignore | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/.gitignore b/.gitignore
+index 633f325..4a1ca0c 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -21,5 +21,6 @@ test_pattern/test_pattern
+ worms/worms
+ 
+ # other directories
++lib/*.a
+ 
+ *_/

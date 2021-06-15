@@ -14,8 +14,6 @@ UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/docbook/files/docbook-xsl/
 # Reject versions ending in .0 as those are release candidates
 UPSTREAM_CHECK_REGEX = "/docbook-xsl/(?P<pver>(\d+[\.\-_]*)+(?!\.0)\.\d+)/"
 
-DEPENDS = "libxml2-native"
-
 S = "${WORKDIR}/docbook-xsl-${PV}"
 
 inherit allarch xmlcatalog

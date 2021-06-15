@@ -4,11 +4,10 @@
 
 SUMMARY = "GNU Aspell spell-checker"
 SECTION = "console/utils"
+HOMEPAGE = "https://ftp.gnu.org/gnu/aspell/"
 
 LICENSE = "LGPLv2 | LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
-
-PR = "r1"
 
 SRC_URI = "${GNU_MIRROR}/aspell/aspell-${PV}.tar.gz"
 SRC_URI[md5sum] = "e66a9c9af6a60dc46134fdacf6ce97d7"

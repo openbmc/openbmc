@@ -1,0 +1,228 @@
+From 3ec4eaf1688e413e8b5cb433148a3bc6e7987606 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Aug 2019 15:10:03 -0700
+Subject: [PATCH] enable out of source tree builds
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/efi/Makefile.am      |  2 +-
+ lib/engine/Makefile.am   |  2 +-
+ lib/orom/Makefile.am     |  2 +-
+ lib/safeclib/Makefile.am |  2 +-
+ src/Makefile.am          | 16 ++++++++--------
+ tools/Makefile.am        | 10 +++++-----
+ ut/Makefile.am           | 36 ++++++++++++++++++------------------
+ 7 files changed, 35 insertions(+), 35 deletions(-)
+
+--- a/lib/efi/Makefile.am
++++ b/lib/efi/Makefile.am
+@@ -7,6 +7,6 @@ libefi_la_SOURCES =             \
+     efi.h
+ 
+ libefi_la_CPPFLAGS =            \
+-        -I$(top_srcdir)         \
++        -I$(top_builddir)       \
+         -I$(top_srcdir)/include \
+         -I$(top_srcdir)/lib
+--- a/lib/engine/Makefile.am
++++ b/lib/engine/Makefile.am
+@@ -123,6 +123,7 @@ libengine_la_SOURCES =          \
+         volume.h
+ 
+ libengine_la_CPPFLAGS =         \
++        -I$(top_builddir)       \
+         -I$(top_srcdir)         \
+         -I$(top_srcdir)/include \
+         -I$(top_srcdir)/lib
+--- a/lib/orom/Makefile.am
++++ b/lib/orom/Makefile.am
+@@ -7,6 +7,6 @@ liborom_la_SOURCES =            \
+     orom.h
+ 
+ liborom_la_CPPFLAGS =           \
+-        -I$(top_srcdir)         \
++        -I$(top_builddir)       \
+         -I$(top_srcdir)/include \
+         -I$(top_srcdir)/lib
+--- a/lib/safeclib/Makefile.am
++++ b/lib/safeclib/Makefile.am
+@@ -37,7 +37,7 @@ libsafec_la_SOURCES =		\
+ 	strtok_s.c
+ 
+ libsafec_la_CPPFLAGS =		\
+-        -I$(top_srcdir)			\
++        -I$(top_builddir)		\
+         -I$(top_srcdir)/include		\
+         -I$(top_srcdir)/lib		\
+ 	-Wno-unused-variable
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -5,7 +5,7 @@ AUTOMAKE_OPTIONS = nostdinc
+ lib_LTLIBRARIES = libssi.la
+ 
+ libssi_la_CPPFLAGS =                    \
+-        -I$(top_srcdir)                 \
++        -I$(top_builddir)               \
+         -I$(top_srcdir)/include         \
+         -I$(top_srcdir)/lib             \
+         -DBOOST_NO_USER_CONFIG
+@@ -46,10 +46,10 @@ libssi_la_SOURCES =
+         templates.h                     \
+         volume.cpp
+ 
+-libssi_la_LIBADD =                      \
+-        ../lib/efi/libefi.la            \
+-        ../lib/log/liblog.la            \
+-        ../lib/orom/liborom.la          \
+-        ../lib/mpb/libmpb.la            \
+-        ../lib/engine/libengine.la      \
+-        ../lib/safeclib/libsafec.la
++libssi_la_LIBADD =                                   \
++        $(top_builddir)/lib/efi/libefi.la            \
++        $(top_builddir)/lib/log/liblog.la            \
++        $(top_builddir)/lib/orom/liborom.la          \
++        $(top_builddir)/lib/mpb/libmpb.la            \
++        $(top_builddir)/lib/engine/libengine.la      \
++        $(top_builddir)/lib/safeclib/libsafec.la
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -6,17 +6,18 @@ ssimsg_SOURCES =
+         ssimsg.cpp
+ 
+ ssimsg_CPPFLAGS =                       \
+-        -I$(top_srcdir)                 \
++        -I$(top_builddir)               \
+         -I$(top_srcdir)/include         \
+         -I$(top_srcdir)/lib
+ 
+-ssieventmonitor_SOURCES =                 \
++ssieventmonitor_SOURCES =               \
+         ssieventmonitor.cpp
+ 
+-ssieventmonitor_CPPFLAGS =                \
++ssieventmonitor_CPPFLAGS =              \
++        -I$(top_builddir)               \
+         -I$(top_srcdir)                 \
+         -I$(top_srcdir)/include         \
+         -I$(top_srcdir)/lib
+ 
+ ssieventmonitor_LDADD =			\
+-	$(top_srcdir)/lib/safeclib/libsafec.la
++	$(top_builddir)/lib/safeclib/libsafec.la
+--- a/ut/Makefile.am
++++ b/ut/Makefile.am
+@@ -8,81 +8,81 @@ ut_events_SOURCES = \
+ 	ut_events.cpp
+ 
+ ut_events_CPPFLAGS = \
+-	-I$(top_srcdir) \
++	-I$(top_builddir) \
+ 	-I$(top_srcdir)/include
+ 
+ ut_events_LDADD = \
+-	../src/libssi.la
++	$(top_builddir)/src/libssi.la
+ 
+ ut_volume_SOURCES = \
+ 	ut_volume.cpp
+ 
+ ut_volume_CPPFLAGS = \
+-	-I$(top_srcdir) \
++	-I$(top_builddir) \
+ 	-I$(top_srcdir)/include
+ 
+ ut_volume_LDADD = \
+-	../src/libssi.la
++	$(top_builddir)/src/libssi.la
+ 
+ ut_session_SOURCES = \
+ 	ut_session.cpp
+ 
+ ut_session_CPPFLAGS = \
+-	-g3 -I$(top_srcdir) \
++	-g3 -I$(top_builddir) \
+ 	-I$(top_srcdir)/include
+ 
+ ut_session_LDADD = \
+-	../src/libssi.la
++	$(top_builddir)/src/libssi.la
+ 
+ ut_info_SOURCES = \
+ 	ut_info.cpp
+ 
+ ut_info_CPPFLAGS = \
+-	-g3 -I$(top_srcdir) \
++	-g3 -I$(top_builddir) \
+ 	-I$(top_srcdir)/include
+ 
+ ut_info_LDADD = \
+-	../src/libssi.la
++	$(top_builddir)/src/libssi.la
+ 
+ ut_markasspare_SOURCES = \
+ 	ut_markasspare.cpp
+ 
+ ut_markasspare_CPPFLAGS = \
+-	-g3 -I$(top_srcdir) \
++	-g3 -I$(top_builddir) \
+ 	-I$(top_srcdir)/include
+ 
+ ut_markasspare_LDADD = \
+-	../src/libssi.la
++	$(top_builddir)/src/libssi.la
+ 
+ ut_migration_SOURCES = \
+ 	ut_migration.cpp
+ 
+ ut_migration_CPPFLAGS = \
+-	-g3 -I$(top_srcdir) \
++	-g3 -I$(top_builddir) \
+ 	-I$(top_srcdir)/include
+ 
+ ut_migration_LDADD = \
+-	../src/libssi.la
++	$(top_builddir)/src/libssi.la
+ 
+ ut_phy_SOURCES = \
+ 	ut_phy.cpp
+ 
+ ut_phy_CPPFLAGS = \
+-	-g3 -I$(top_srcdir) \
++	-g3 -I$(top_builddir) \
+ 	-I$(top_srcdir)/include
+ 
+ ut_phy_LDADD = \
+-	../src/libssi.la
++	$(top_builddir)/src/libssi.la
+ 
+ ut_initialize_volume_SOURCES = \
+ 	ut_initialize_volume.cpp
+ 
+ ut_initialize_volume_CPPFLAGS = \
+-	-g3 -I$(top_srcdir) \
++	-g3 -I$(top_builddir) \
+ 	-I$(top_srcdir)/include
+ 
+ ut_initialize_volume_LDADD = \
+-	../src/libssi.la
++	$(top_builddir)/src/libssi.la
+ 
+ ut_filesystem_SOURCES = \
+ 	ut_filesystem.cpp \
+@@ -92,7 +92,7 @@ ut_filesystem_SOURCES = \
+ 
+ ut_filesystem_CPPFLAGS = \
+ 	-iquote $(top_srcdir)/lib/engine \
+-	-I$(top_srcdir) \
++	-I$(top_builddir) \
+ 	-I$(top_srcdir)/include
+ 
+ ut_string_SOURCES = \
+@@ -103,6 +103,6 @@ ut_string_SOURCES = \
+ 
+ ut_string_CPPFLAGS = \
+ 	-iquote $(top_srcdir)/lib/engine \
+-	-I$(top_srcdir) \
++	-I$(top_builddir) \
+ 	-I$(top_srcdir)/include
+ 

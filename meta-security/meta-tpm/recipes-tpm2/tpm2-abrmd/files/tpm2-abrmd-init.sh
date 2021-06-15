@@ -27,7 +27,7 @@ case "${1}" in
 	start)
 		echo -n "Starting $DESC: "
 
-		if [ ! -e /dev/tpm* ]
+		if [ ! -e /dev/tpm? ]
 		then
 			echo "device driver not loaded, skipping."
 			exit 0

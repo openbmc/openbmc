@@ -14,11 +14,13 @@ SRC_URI = "git://pagure.io/netcf.git;protocol=https \
 
 UPSTREAM_CHECK_GITTAGREGEX = "release-(?P<pver>(\d+(\.\d+)+))"
 
-DEPENDS += "augeas libnl libxslt libxml2 gnulib"
+DEPENDS += "augeas libnl libxslt libxml2"
+
+do_configure[depends] += "${MLPREFIX}gnulib:do_populate_sysroot"
 
 S = "${WORKDIR}/git"
 
-inherit gettext autotools pkgconfig systemd
+inherit gettext autotools perlnative pkgconfig systemd
 
 EXTRA_OECONF_append_class-target = " --with-driver=redhat"
 

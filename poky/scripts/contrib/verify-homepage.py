@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # This script can be used to verify HOMEPAGE values for all recipes in
 # the current configuration.
 # The result is influenced by network environment, since the timeout of connect url is 5 seconds as default.

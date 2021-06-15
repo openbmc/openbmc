@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # Perform an audit of which packages provide documentation and which
 # are missing -doc packages.
 #
@@ -7,7 +9,6 @@
 # this script after source'ing the build environment script, so you're
 # running it from build/ directory.
 #
-# Maintainer: Scott Garman <scott.a.garman@intel.com>
 
 REPORT_DOC_SIMPLE="documentation_exists.txt"
 REPORT_DOC_DETAIL="documentation_exists_detail.txt"
@@ -26,7 +27,7 @@ fi
 
 echo "REMINDER: you need to build for MACHINE=qemux86 or you won't get useful results"
 echo "REMINDER: you need to set LICENSE_FLAGS_WHITELIST appropriately in local.conf or "
-echo " you'll get false positives.  For example, LICENSE_FLAGS_WHITELIST = \"Commercial\""
+echo " you'll get false positives.  For example, LICENSE_FLAGS_WHITELIST = \"commercial\""
 
 for pkg in `bitbake -s | awk '{ print \$1 }'`; do
 	if [[ "$pkg" == "Loading" || "$pkg" == "Loaded" ||

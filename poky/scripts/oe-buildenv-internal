@@ -4,19 +4,8 @@
 #
 # Copyright (C) 2006-2011 Linux Foundation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# SPDX-License-Identifier: GPL-2.0-or-later
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 if ! $(return >/dev/null 2>&1) ; then
     echo 'oe-buildenv-internal: error: this script must be sourced'
@@ -40,22 +29,15 @@ if [ -z "$OE_SKIP_SDK_CHECK" ] && [ -n "$OECORE_SDK_VERSION" ]; then
     return 1
 fi
 
-py_v27_check=$(python2 -c 'import sys; print sys.version_info >= (2,7,3)')
-if [ "$py_v27_check" != "True" ]; then
-    echo >&2 "OpenEmbedded requires 'python' to be python v2 (>= 2.7.3), not python v3."
-    echo >&2 "Please upgrade your python v2."
-fi
-unset py_v27_check
-
 # We potentially have code that doesn't parse correctly with older versions 
 # of Python, and rather than fixing that and being eternally vigilant for 
 # any other new feature use, just check the version here.
-py_v34_check=$(python3 -c 'import sys; print(sys.version_info >= (3,4,0))')
-if [ "$py_v34_check" != "True" ]; then
-    echo >&2 "BitBake requires Python 3.4.0 or later as 'python3'"
+py_v35_check=$(python3 -c 'import sys; print(sys.version_info >= (3,5,0))')
+if [ "$py_v35_check" != "True" ]; then
+    echo >&2 "BitBake requires Python 3.5.0 or later as 'python3 (scripts/install-buildtools can be used if needed)'"
     return 1
 fi
-unset py_v34_check
+unset py_v35_check
 
 if [ -z "$BDIR" ]; then
     if [ -z "$1" ]; then
@@ -106,6 +88,10 @@ if [ ! -d "$BITBAKEDIR" ]; then
     return 1
 fi
 
+# Add BitBake's library to PYTHONPATH
+PYTHONPATH=$BITBAKEDIR/lib:$PYTHONPATH
+export PYTHONPATH
+
 # Make sure our paths are at the beginning of $PATH
 for newpath in "$BITBAKEDIR/bin" "$OEROOT/scripts"; do
     # Remove any existences of $newpath from $PATH
@@ -124,7 +110,8 @@ BB_ENV_EXTRAWHITE_OE="MACHINE DISTRO TCMODE TCLIBC HTTP_PROXY http_proxy \
 HTTPS_PROXY https_proxy FTP_PROXY ftp_proxy FTPS_PROXY ftps_proxy ALL_PROXY \
 all_proxy NO_PROXY no_proxy SSH_AGENT_PID SSH_AUTH_SOCK BB_SRCREV_POLICY \
 SDKMACHINE BB_NUMBER_THREADS BB_NO_NETWORK PARALLEL_MAKE GIT_PROXY_COMMAND \
-SOCKS5_PASSWD SOCKS5_USER SCREENDIR STAMPS_DIR BBPATH_EXTRA BB_SETSCENE_ENFORCE"
+SOCKS5_PASSWD SOCKS5_USER SCREENDIR STAMPS_DIR BBPATH_EXTRA BB_SETSCENE_ENFORCE \
+BB_LOGCONFIG"
 
 BB_ENV_EXTRAWHITE="$(echo $BB_ENV_EXTRAWHITE $BB_ENV_EXTRAWHITE_OE | tr ' ' '\n' | LC_ALL=C sort --unique | tr '\n' ' ')"
 

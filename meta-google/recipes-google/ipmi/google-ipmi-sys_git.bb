@@ -18,7 +18,7 @@ DEPENDS += "nlohmann-json"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/google-ipmi-sys"
-SRCREV = "ba32fe4e25329f90bc8ab3d2e554dfe8615998d2"
+SRCREV = "3b1b427c1fa4bcddcab1fc003410e5fa5d7a8334"
 
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
@@ -29,6 +29,11 @@ HOSTIPMI_PROVIDER_LIBRARY += "libsyscmds.so"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "gbmc-psu-hardreset.target"
+
+EXTRA_OECONF += "--disable-tests"
+
+CXXFLAGS_append_gbmc = '${@"" if not d.getVar("GBMC_NCSI_IF_NAME") else \
+  " -DNCSI_IPMI_CHANNEL=1 -DNCSI_IF_NAME=" + d.getVar("GBMC_NCSI_IF_NAME")}'
 
 do_install_append() {
 	install -d ${D}${systemd_system_unitdir}

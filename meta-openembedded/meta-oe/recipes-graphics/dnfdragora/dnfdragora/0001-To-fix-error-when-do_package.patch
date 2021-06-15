@@ -3,7 +3,8 @@ From: Lei Maohui <leimaohui@cn.fujitsu.com>
 Date: Tue, 19 Dec 2017 11:15:29 +0900
 Subject: [PATCH] To fix error when do_package
 
-QA Issue: nativesdk-dnfdragora: Files/directories were installed but not shipped in any package:
+QA Issue: nativesdk-dnfdragora: Files/directories were installed but not
+shipped in any package:
   /etc
   /etc/dnfdragora
   /etc/dnfdragora/dnfdragora.yaml
@@ -14,18 +15,18 @@ Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7c66b39..a5659f7 100644
+index 230c87b..1b8d800 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -52,7 +52,7 @@ endif(ENABLE_COMPS)
+@@ -68,7 +68,7 @@ endif(ENABLE_COMPS)
  set(CMAKE_INSTALL_BINDIR "${CMAKE_INSTALL_PREFIX}/bin")
  set(CMAKE_INSTALL_DATAROOTDIR "${CMAKE_INSTALL_PREFIX}/share")
  set(CMAKE_INSTALL_LOCALEDIR "${CMAKE_INSTALL_DATAROOTDIR}/locale")
--set(CMAKE_INSTALL_FULL_SYSCONFDIR "/etc")
-+set(CMAKE_INSTALL_FULL_SYSCONFDIR "${CMAKE_INSTALL_PREFIX}/../etc")
+-set(CMAKE_INSTALL_FULL_SYSCONFDIR "/etc" CACHE PATH "sysconfig directory (default /etc)")
++set(CMAKE_INSTALL_FULL_SYSCONFDIR "${CMAKE_INSTALL_PREFIX}/../etc" CACHE PATH "sysconfig directory (default /etc)")
  
  # Configure files
  configure_file(${CMAKE_SOURCE_DIR}/etc/dnfdragora.yaml.in ${CMAKE_BINARY_DIR}/etc/dnfdragora.yaml @ONLY)
 -- 
-2.7.4
+2.17.1
 

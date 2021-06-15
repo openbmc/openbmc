@@ -13,13 +13,14 @@ SRC_URI = "git://github.com/HewlettPackard/netperf.git \
            file://vfork.patch \
            file://init \
            file://0001-netlib.c-Move-including-sched.h-out-og-function.patch \
+           file://0001-nettest_omni-Remove-duplicate-variable-definitions.patch \
            "
 
 SRCREV = "f482bab49fcedee46fc5b755da127f608325cd13"
 
 S = "${WORKDIR}/git"
 
-inherit update-rc.d autotools
+inherit update-rc.d autotools texinfo
 
 # cpu_set.patch plus _GNU_SOURCE makes src/netlib.c compile with CPU_ macros
 CFLAGS_append = " -DDO_UNIX -DDO_IPV6 -D_GNU_SOURCE"
@@ -31,6 +32,8 @@ CFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'largefile', \
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[sctp] = "--enable-sctp,--disable-sctp,lksctp-tools,"
+PACKAGECONFIG[intervals] = "--enable-intervals,--disable-intervals,,"
+PACKAGECONFIG[histogram] = "--enable-histogram,--disable-histogram,,"
 
 # autotools.bbclass attends to include m4 files with path depth <= 2 by
 # "find ${S} -maxdepth 2 -name \*.m4", so move m4 files from m4/m4.

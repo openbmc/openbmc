@@ -1,0 +1,27 @@
+From 14e2e74682db3bfcf057688f738fdd842a02ff2d Mon Sep 17 00:00:00 2001
+From: Carl Hurd <carl@Carls-MacBook-Pro.local>
+Date: Wed, 18 Jul 2018 09:04:32 -0400
+Subject: [PATCH] Fixed missed #ifndef for __mips_soft_float
+
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+Upstream-Status: Submitted [https://github.com/libffi/libffi/pull/442]
+---
+ src/mips/o32.S | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/mips/o32.S b/src/mips/o32.S
+index 44e74cb..799139b 100644
+--- a/src/mips/o32.S
++++ b/src/mips/o32.S
+@@ -282,9 +282,11 @@ $LCFI12:
+ 	li	$13, 1		# FFI_O32
+ 	bne	$16, $13, 1f	# Skip fp save if FFI_O32_SOFT_FLOAT
+ 	
++#ifndef __mips_soft_float
+ 	# Store all possible float/double registers.
+ 	s.d	$f12, FA_0_0_OFF2($fp)
+ 	s.d	$f14, FA_1_0_OFF2($fp)
++#endif
+ 1:
+ 	# prepare arguments for ffi_closure_mips_inner_O32
+ 	REG_L	a0, 4($15)	 # cif 

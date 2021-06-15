@@ -1,7 +1,7 @@
-From cb454ad44fcb35fc28b823f05f3538c1f997e89e Mon Sep 17 00:00:00 2001
+From f324e2724973aa76d054c3662d5d0903fd405390 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 6 Feb 2016 13:12:47 -0800
-Subject: [PATCH 09/18] fix cmake dependency race
+Subject: [PATCH] fix cmake dependency race
 
 Fixes errors like
 
@@ -42,10 +42,10 @@ index 1d81ca3..d6cd415 100644
     add_library (vcos SHARED ${SOURCES})
     target_link_libraries (vcos pthread dl rt)
 diff --git a/interface/vmcs_host/CMakeLists.txt b/interface/vmcs_host/CMakeLists.txt
-index 6718215..c415176 100755
+index 552312a..775742d 100755
 --- a/interface/vmcs_host/CMakeLists.txt
 +++ b/interface/vmcs_host/CMakeLists.txt
-@@ -17,14 +17,6 @@ set(VCHOSTIF_SOURCE
+@@ -15,14 +15,6 @@ set(VCHOSTIF_SOURCE
  #            ${VMCS_TARGET}/vmcs_main.c
  #  vc_vchi_haud.c
  
@@ -73,6 +73,3 @@ index f0bae30..8c44c58 100644
  struct wl_dispmanx_server_buffer {
  	struct wl_resource *resource;
  	struct wl_dispmanx *dispmanx;
--- 
-2.20.1
-

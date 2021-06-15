@@ -1,0 +1,37 @@
+Description: musl lacks on_exit
+Author: Adrian Bunk <bunk@stusta.de>
+
+Only prints a trace on nonzero exit(),
+so can safely be disabled in musl builds.
+
+Signed-off-by: Adrian Bunk <bunk@stusta.de>
+Upstream-Status: Inappropriate [musl specific]
+
+--- linux-atm-2.5.1.orig/src/sigd/atmsigd.c
++++ linux-atm-2.5.1/src/sigd/atmsigd.c
+@@ -283,6 +283,7 @@ static void setup_signals(void)
+ /* ------------------------------- main ...  ------------------------------- */
+ 
+ 
++#if 0
+ static void trace_on_exit(int status,void *dummy)
+ {
+     char path[PATH_MAX+1];
+@@ -300,6 +301,7 @@ static void trace_on_exit(int status,voi
+     dump_trace(file,"Message trace (after error exit)");
+     if (file != stderr) (void) fclose(file);
+ }
++#endif
+ 
+ 
+ static void manual_override(void)
+@@ -517,7 +519,9 @@ int main(int argc,char **argv)
+ 	    exit(0);
+ 	}
+     }
++#if 0
+     (void) on_exit(trace_on_exit,NULL);
++#endif
+     poll_loop();
+     close_all();
+     for (sig = entities; sig; sig = sig->next) stop_saal(&sig->saal);

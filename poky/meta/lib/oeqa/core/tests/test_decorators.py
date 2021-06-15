@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import signal
 import unittest
@@ -12,58 +14,58 @@ setup_sys_path()
 from oeqa.core.exception import OEQADependency
 from oeqa.core.utils.test import getCaseMethod, getSuiteCasesNames, getSuiteCasesIDs
 
-class TestFilterDecorator(TestBase):
-
-    def _runFilterTest(self, modules, filters, expect, msg):
-        tc = self._testLoader(modules=modules, filters=filters)
-        test_loaded = set(getSuiteCasesNames(tc.suites))
-        self.assertEqual(expect, test_loaded, msg=msg)
+class TestTagDecorator(TestBase):
+    def _runTest(self, modules, filterfn, expect):
+        tc = self._testLoader(modules = modules, tags_filter = filterfn)
+        test_loaded = set(getSuiteCasesIDs(tc.suites))
+        self.assertEqual(expect, test_loaded)
 
     def test_oetag(self):
-        # Get all cases without filtering.
-        filter_all = {}
-        test_all = {'testTagGood', 'testTagOther', 'testTagNone'}
-        msg_all = 'Failed to get all oetag cases without filtering.'
+        # get all cases without any filtering
+        self._runTest(['oetag'], None, {
+                'oetag.TagTest.testTagGood',
+                'oetag.TagTest.testTagOther',
+                'oetag.TagTest.testTagOtherMulti',
+                'oetag.TagTest.testTagNone',
+                'oetag.TagClassTest.testTagOther',
+                'oetag.TagClassTest.testTagOtherMulti',
+                'oetag.TagClassTest.testTagNone',
+                })
 
-        # Get cases with 'goodTag'.
-        filter_good = {'oetag':'goodTag'}
-        test_good = {'testTagGood'}
-        msg_good = 'Failed to get just one test filtering with "goodTag" oetag.'
+        # exclude any case with tags
+        self._runTest(['oetag'], lambda tags: tags, {
+                'oetag.TagTest.testTagNone',
+                })
 
-        # Get cases with an invalid tag.
-        filter_invalid = {'oetag':'invalidTag'}
-        test_invalid = set()
-        msg_invalid = 'Failed to filter all test using an invalid oetag.'
+        # exclude any case with otherTag
+        self._runTest(['oetag'], lambda tags: "otherTag" in tags, {
+                'oetag.TagTest.testTagGood',
+                'oetag.TagTest.testTagNone',
+                'oetag.TagClassTest.testTagNone',
+                })
 
-        tests = ((filter_all, test_all, msg_all),
-                 (filter_good, test_good, msg_good),
-                 (filter_invalid, test_invalid, msg_invalid))
+        # exclude any case with classTag
+        self._runTest(['oetag'], lambda tags: "classTag" in tags, {
+                'oetag.TagTest.testTagGood',
+                'oetag.TagTest.testTagOther',
+                'oetag.TagTest.testTagOtherMulti',
+                'oetag.TagTest.testTagNone',
+                })
 
-        for test in tests:
-            self._runFilterTest(['oetag'], test[0], test[1], test[2])
+        # include any case with classTag
+        self._runTest(['oetag'], lambda tags: "classTag" not in tags, {
+                'oetag.TagClassTest.testTagOther',
+                'oetag.TagClassTest.testTagOtherMulti',
+                'oetag.TagClassTest.testTagNone',
+                })
 
-    def test_oeid(self):
-        # Get all cases without filtering.
-        filter_all = {}
-        test_all = {'testIdGood', 'testIdOther', 'testIdNone'}
-        msg_all = 'Failed to get all oeid cases without filtering.'
-
-        # Get cases with '101' oeid.
-        filter_good = {'oeid': 101}
-        test_good = {'testIdGood'}
-        msg_good = 'Failed to get just one tes filtering with "101" oeid.'
-
-        # Get cases with an invalid id.
-        filter_invalid = {'oeid':999}
-        test_invalid = set()
-        msg_invalid = 'Failed to filter all test using an invalid oeid.'
-
-        tests = ((filter_all, test_all, msg_all),
-                 (filter_good, test_good, msg_good),
-                 (filter_invalid, test_invalid, msg_invalid))
-
-        for test in tests:
-            self._runFilterTest(['oeid'], test[0], test[1], test[2])
+        # include any case with classTag or no tags
+        self._runTest(['oetag'], lambda tags: tags and "classTag" not in tags, {
+                'oetag.TagTest.testTagNone',
+                'oetag.TagClassTest.testTagOther',
+                'oetag.TagClassTest.testTagOtherMulti',
+                'oetag.TagClassTest.testTagNone',
+                })
 
 class TestDependsDecorator(TestBase):
     modules = ['depends']
@@ -130,6 +132,12 @@ class TestTimeoutDecorator(TestBase):
         self.assertFalse(tc.runTests().wasSuccessful(), msg=msg)
         msg = "OETestTimeout didn't restore SIGALRM"
         self.assertIs(alarm_signal, signal.getsignal(signal.SIGALRM), msg=msg)
+
+    def test_timeout_cancel(self):
+        tests = ['timeout.TimeoutTest.testTimeoutSkip', 'timeout.TimeoutTest.testTimeoutDepends', 'timeout.TimeoutTest.testTimeoutUnrelated']
+        msg = 'Unrelated test failed to complete'
+        tc = self._testLoader(modules=self.modules, tests=tests)
+        self.assertTrue(tc.runTests().wasSuccessful(), msg=msg)
 
 if __name__ == '__main__':
     unittest.main()

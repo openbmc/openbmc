@@ -1,4 +1,4 @@
-From 06562244ac4a1a61e1a2c6b219a517658f7349bf Mon Sep 17 00:00:00 2001
+From db7eb5f0a4e78c6bd3c4f9cbd8332d909eb82ad6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 10 Apr 2017 12:09:41 -0700
 Subject: [PATCH] Declare the define visivility attribute together
@@ -9,16 +9,17 @@ symbols become hidden and consumers of this library
 fail to link due to these missing symbols
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  doxygen.cfg.in           |   2 +-
- src/extra/ipv4.c         |  15 +++----
+ src/extra/ipv4.c         |  15 ++----
  src/extra/ipv6.c         |   9 ++--
- src/extra/pktbuff.c      |  42 ++++++------------
- src/extra/tcp.c          |  21 +++------
- src/extra/udp.c          |  21 +++------
- src/internal.h           |   5 +--
- src/libnetfilter_queue.c | 108 ++++++++++++++++-------------------------------
- src/nlmsg.c              |  21 +++------
+ src/extra/pktbuff.c      |  42 +++++----------
+ src/extra/tcp.c          |  21 +++-----
+ src/extra/udp.c          |  21 +++-----
+ src/internal.h           |   5 +-
+ src/libnetfilter_queue.c | 108 +++++++++++++--------------------------
+ src/nlmsg.c              |  21 +++-----
  9 files changed, 82 insertions(+), 162 deletions(-)
 
 diff --git a/doxygen.cfg.in b/doxygen.cfg.in
@@ -592,7 +593,7 @@ index 558d267..79b0752 100644
  
  struct iphdr;
 diff --git a/src/libnetfilter_queue.c b/src/libnetfilter_queue.c
-index 065d618..ab0b66b 100644
+index 673e3b0..c12f068 100644
 --- a/src/libnetfilter_queue.c
 +++ b/src/libnetfilter_queue.c
 @@ -133,8 +133,7 @@ struct nfq_data {
@@ -772,7 +773,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_set_queue_flags - set flags (options) for the kernel queue
-@@ -690,7 +678,7 @@ EXPORT_SYMBOL(nfq_set_mode);
+@@ -708,7 +696,7 @@ EXPORT_SYMBOL(nfq_set_mode);
   *
   * \return -1 on error with errno set appropriately; =0 otherwise.
   */
@@ -781,7 +782,7 @@ index 065d618..ab0b66b 100644
  			uint32_t mask, uint32_t flags)
  {
  	union {
-@@ -711,7 +699,6 @@ int nfq_set_queue_flags(struct nfq_q_handle *qh,
+@@ -729,7 +717,6 @@ int nfq_set_queue_flags(struct nfq_q_handle *qh,
  
  	return nfnl_query(qh->h->nfnlh, &u.nmh);
  }
@@ -789,7 +790,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_set_queue_maxlen - Set kernel queue maximum length parameter
-@@ -724,7 +711,7 @@ EXPORT_SYMBOL(nfq_set_queue_flags);
+@@ -742,7 +729,7 @@ EXPORT_SYMBOL(nfq_set_queue_flags);
   *
   * \return -1 on error; >=0 otherwise.
   */
@@ -798,7 +799,7 @@ index 065d618..ab0b66b 100644
  				uint32_t queuelen)
  {
  	union {
-@@ -742,7 +729,6 @@ int nfq_set_queue_maxlen(struct nfq_q_handle *qh,
+@@ -760,7 +747,6 @@ int nfq_set_queue_maxlen(struct nfq_q_handle *qh,
  
  	return nfnl_query(qh->h->nfnlh, &u.nmh);
  }
@@ -806,7 +807,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * @}
-@@ -829,14 +815,13 @@ static int __set_verdict(struct nfq_q_handle *qh, uint32_t id,
+@@ -847,14 +833,13 @@ static int __set_verdict(struct nfq_q_handle *qh, uint32_t id,
   *
   * \return -1 on error; >= 0 otherwise.
   */
@@ -822,7 +823,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_set_verdict2 - like nfq_set_verdict, but you can set the mark.
-@@ -847,14 +832,13 @@ EXPORT_SYMBOL(nfq_set_verdict);
+@@ -865,14 +850,13 @@ EXPORT_SYMBOL(nfq_set_verdict);
   * \param data_len number of bytes of data pointed to by #buf
   * \param buf the buffer that contains the packet data
   */
@@ -838,7 +839,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_set_verdict_batch - issue verdicts on several packets at once
-@@ -868,13 +852,12 @@ EXPORT_SYMBOL(nfq_set_verdict2);
+@@ -886,13 +870,12 @@ EXPORT_SYMBOL(nfq_set_verdict2);
   * batch support was added in Linux 3.1.
   * These functions will fail silently on older kernels.
   */
@@ -853,7 +854,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_set_verdict_batch2 - like nfq_set_verdict_batch, but you can set a mark.
-@@ -883,13 +866,12 @@ EXPORT_SYMBOL(nfq_set_verdict_batch);
+@@ -901,13 +884,12 @@ EXPORT_SYMBOL(nfq_set_verdict_batch);
   * \param verdict verdict to return to netfilter (NF_ACCEPT, NF_DROP)
   * \param mark mark to put on packet
   */
@@ -868,7 +869,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_set_verdict_mark - like nfq_set_verdict, but you can set the mark.
-@@ -905,14 +887,13 @@ EXPORT_SYMBOL(nfq_set_verdict_batch2);
+@@ -923,14 +905,13 @@ EXPORT_SYMBOL(nfq_set_verdict_batch2);
   * This function is deprecated since it is broken, its use is highly
   * discouraged. Please, use nfq_set_verdict2 instead.
   */
@@ -884,7 +885,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * @}
-@@ -947,12 +928,11 @@ EXPORT_SYMBOL(nfq_set_verdict_mark);
+@@ -965,12 +946,11 @@ EXPORT_SYMBOL(nfq_set_verdict_mark);
  	} __attribute__ ((packed));
  \endverbatim
   */
@@ -898,7 +899,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_nfmark - get the packet mark
-@@ -960,11 +940,10 @@ EXPORT_SYMBOL(nfq_get_msg_packet_hdr);
+@@ -978,11 +958,10 @@ EXPORT_SYMBOL(nfq_get_msg_packet_hdr);
   *
   * \return the netfilter mark currently assigned to the given queued packet.
   */
@@ -911,7 +912,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_timestamp - get the packet timestamp
-@@ -975,7 +954,7 @@ EXPORT_SYMBOL(nfq_get_nfmark);
+@@ -993,7 +972,7 @@ EXPORT_SYMBOL(nfq_get_nfmark);
   *
   * \return 0 on success, non-zero on failure.
   */
@@ -920,7 +921,7 @@ index 065d618..ab0b66b 100644
  {
  	struct nfqnl_msg_packet_timestamp *qpt;
  	qpt = nfnl_get_pointer_to_data(nfad->data, NFQA_TIMESTAMP,
-@@ -988,7 +967,6 @@ int nfq_get_timestamp(struct nfq_data *nfad, struct timeval *tv)
+@@ -1006,7 +985,6 @@ int nfq_get_timestamp(struct nfq_data *nfad, struct timeval *tv)
  
  	return 0;
  }
@@ -928,7 +929,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_indev - get the interface that the packet was received through
-@@ -1001,11 +979,10 @@ EXPORT_SYMBOL(nfq_get_timestamp);
+@@ -1019,11 +997,10 @@ EXPORT_SYMBOL(nfq_get_timestamp);
   * \warning all nfq_get_dev() functions return 0 if not set, since linux
   * only allows ifindex >= 1, see net/core/dev.c:2600  (in 2.6.13.1)
   */
@@ -941,7 +942,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_physindev - get the physical interface that the packet was received
-@@ -1015,11 +992,10 @@ EXPORT_SYMBOL(nfq_get_indev);
+@@ -1033,11 +1010,10 @@ EXPORT_SYMBOL(nfq_get_indev);
   * If the returned index is 0, the packet was locally generated or the
   * physical input interface is no longer known (ie. POSTROUTING?).
   */
@@ -954,7 +955,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_outdev - gets the interface that the packet will be routed out
-@@ -1029,11 +1005,10 @@ EXPORT_SYMBOL(nfq_get_physindev);
+@@ -1047,11 +1023,10 @@ EXPORT_SYMBOL(nfq_get_physindev);
   * returned index is 0, the packet is destined for localhost or the output
   * interface is not yet known (ie. PREROUTING?).
   */
@@ -967,7 +968,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_physoutdev - get the physical interface that the packet output
-@@ -1045,11 +1020,10 @@ EXPORT_SYMBOL(nfq_get_outdev);
+@@ -1063,11 +1038,10 @@ EXPORT_SYMBOL(nfq_get_outdev);
   * 
   * \return The index of physical interface that the packet output will be routed out.
   */
@@ -980,7 +981,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_indev_name - get the name of the interface the packet
-@@ -1089,13 +1063,12 @@ EXPORT_SYMBOL(nfq_get_physoutdev);
+@@ -1107,13 +1081,12 @@ EXPORT_SYMBOL(nfq_get_physoutdev);
  \endverbatim
   *
   */
@@ -995,7 +996,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_physindev_name - get the name of the physical interface the
-@@ -1109,13 +1082,12 @@ EXPORT_SYMBOL(nfq_get_indev_name);
+@@ -1127,13 +1100,12 @@ EXPORT_SYMBOL(nfq_get_indev_name);
   *
   * \return  -1 in case of error, > 0 if it succeed. 
   */
@@ -1010,7 +1011,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_outdev_name - get the name of the physical interface the
-@@ -1129,13 +1101,12 @@ EXPORT_SYMBOL(nfq_get_physindev_name);
+@@ -1147,13 +1119,12 @@ EXPORT_SYMBOL(nfq_get_physindev_name);
   *
   * \return  -1 in case of error, > 0 if it succeed. 
   */
@@ -1025,7 +1026,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_physoutdev_name - get the name of the interface the
-@@ -1150,13 +1121,12 @@ EXPORT_SYMBOL(nfq_get_outdev_name);
+@@ -1168,13 +1139,12 @@ EXPORT_SYMBOL(nfq_get_outdev_name);
   * \return  -1 in case of error, > 0 if it succeed. 
   */
  
@@ -1040,7 +1041,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_packet_hw
-@@ -1180,12 +1150,11 @@ EXPORT_SYMBOL(nfq_get_physoutdev_name);
+@@ -1198,12 +1168,11 @@ EXPORT_SYMBOL(nfq_get_physoutdev_name);
  	} __attribute__ ((packed));
  \endverbatim
   */
@@ -1054,7 +1055,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_uid - get the UID of the user the packet belongs to
-@@ -1193,7 +1162,7 @@ EXPORT_SYMBOL(nfq_get_packet_hw);
+@@ -1215,7 +1184,7 @@ EXPORT_SYMBOL(nfq_get_packet_hw);
   *
   * \return 1 if there is a UID available, 0 otherwise.
   */
@@ -1063,7 +1064,7 @@ index 065d618..ab0b66b 100644
  {
  	if (!nfnl_attr_present(nfad->data, NFQA_UID))
  		return 0;
-@@ -1201,7 +1170,6 @@ int nfq_get_uid(struct nfq_data *nfad, uint32_t *uid)
+@@ -1223,7 +1192,6 @@ int nfq_get_uid(struct nfq_data *nfad, uint32_t *uid)
  	*uid = ntohl(nfnl_get_data(nfad->data, NFQA_UID, uint32_t));
  	return 1;
  }
@@ -1071,7 +1072,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_gid - get the GID of the user the packet belongs to
-@@ -1209,7 +1177,7 @@ EXPORT_SYMBOL(nfq_get_uid);
+@@ -1235,7 +1203,7 @@ EXPORT_SYMBOL(nfq_get_uid);
   *
   * \return 1 if there is a GID available, 0 otherwise.
   */
@@ -1080,15 +1081,15 @@ index 065d618..ab0b66b 100644
  {
  	if (!nfnl_attr_present(nfad->data, NFQA_GID))
  		return 0;
-@@ -1217,7 +1185,6 @@ int nfq_get_gid(struct nfq_data *nfad, uint32_t *gid)
+@@ -1243,7 +1211,6 @@ int nfq_get_gid(struct nfq_data *nfad, uint32_t *gid)
  	*gid = ntohl(nfnl_get_data(nfad->data, NFQA_GID, uint32_t));
  	return 1;
  }
 -EXPORT_SYMBOL(nfq_get_gid);
  
- 
  /**
-@@ -1227,7 +1194,7 @@ EXPORT_SYMBOL(nfq_get_gid);
+  * nfq_get_secctx - get the security context for this packet
+@@ -1256,7 +1223,7 @@ EXPORT_SYMBOL(nfq_get_gid);
   *
   * \return -1 on error, otherwise > 0
   */
@@ -1097,7 +1098,7 @@ index 065d618..ab0b66b 100644
  {
  	if (!nfnl_attr_present(nfad->data, NFQA_SECCTX))
  		return -1;
-@@ -1240,7 +1207,6 @@ int nfq_get_secctx(struct nfq_data *nfad, unsigned char **secdata)
+@@ -1269,7 +1236,6 @@ int nfq_get_secctx(struct nfq_data *nfad, unsigned char **secdata)
  
  	return 0;
  }
@@ -1105,7 +1106,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * nfq_get_payload - get payload 
-@@ -1253,7 +1219,7 @@ EXPORT_SYMBOL(nfq_get_secctx);
+@@ -1282,7 +1248,7 @@ EXPORT_SYMBOL(nfq_get_secctx);
   *
   * \return -1 on error, otherwise > 0.
   */
@@ -1114,7 +1115,7 @@ index 065d618..ab0b66b 100644
  {
  	*data = (unsigned char *)
  		nfnl_get_pointer_to_data(nfad->data, NFQA_PAYLOAD, char);
-@@ -1262,7 +1228,6 @@ int nfq_get_payload(struct nfq_data *nfad, unsigned char **data)
+@@ -1291,7 +1257,6 @@ int nfq_get_payload(struct nfq_data *nfad, unsigned char **data)
  
  	return -1;
  }
@@ -1122,7 +1123,7 @@ index 065d618..ab0b66b 100644
  
  /**
   * @}
-@@ -1307,7 +1272,7 @@ do {								\
+@@ -1336,7 +1301,7 @@ do {								\
   * would have been printed into the buffer (in case that there is enough
   * room in it). See snprintf() return value for more information.
   */
@@ -1131,7 +1132,7 @@ index 065d618..ab0b66b 100644
  {
  	struct nfqnl_msg_packet_hdr *ph;
  	struct nfqnl_msg_packet_hw *hwph;
-@@ -1460,7 +1425,6 @@ int nfq_snprintf_xml(char *buf, size_t rem, struct nfq_data *tb, int flags)
+@@ -1489,7 +1454,6 @@ int nfq_snprintf_xml(char *buf, size_t rem, struct nfq_data *tb, int flags)
  
  	return len;
  }
@@ -1224,6 +1225,3 @@ index ba28c77..5582407 100644
  
  /**
   * @}
--- 
-2.12.2
-

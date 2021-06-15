@@ -1,0 +1,28 @@
+From e5126c7167e26f865990dc5f86344602603aa8c6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 2 Mar 2015 02:27:55 +0000
+Subject: [PATCH 01/11] make man install relative to DESTDIR
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sim/common/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sim/common/Makefile.in b/sim/common/Makefile.in
+index f713fcaa35b..7c553709d3f 100644
+--- a/sim/common/Makefile.in
++++ b/sim/common/Makefile.in
+@@ -35,7 +35,7 @@ tooldir = $(libdir)/$(target_alias)
+ datarootdir = @datarootdir@
+ datadir = @datadir@
+ mandir = @mandir@
+-man1dir = $(mandir)/man1
++man1dir = $(DESTDIR)$(mandir)/man1
+ infodir = @infodir@
+ includedir = @includedir@
+ 
+-- 
+2.29.2
+

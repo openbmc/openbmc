@@ -1,76 +1,57 @@
 inherit distutils3-base
 
+B = "${WORKDIR}/build"
+distutils_do_configure[cleandirs] = "${B}"
+
 DISTUTILS_BUILD_ARGS ?= ""
-DISTUTILS_BUILD_EXT_ARGS ?= ""
-DISTUTILS_STAGE_HEADERS_ARGS ?= "--install-dir=${STAGING_INCDIR}/${PYTHON_DIR}"
-DISTUTILS_STAGE_ALL_ARGS ?= "--prefix=${STAGING_DIR_HOST}${prefix} \
-    --install-data=${STAGING_DATADIR}"
 DISTUTILS_INSTALL_ARGS ?= "--root=${D} \
     --prefix=${prefix} \
     --install-lib=${PYTHON_SITEPACKAGES_DIR} \
     --install-data=${datadir}"
 
+DISTUTILS_PYTHON = "python3"
+DISTUTILS_PYTHON_class-native = "nativepython3"
+
+DISTUTILS_SETUP_PATH ?= "${S}"
+
 distutils3_do_configure() {
-	if [ "${CLEANBROKEN}" != "1" ] ; then
-		NO_FETCH_BUILD=1 \
-		${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py clean ${DISTUTILS_BUILD_ARGS}
-	fi
+    :
 }
 
 distutils3_do_compile() {
+        cd ${DISTUTILS_SETUP_PATH}
         NO_FETCH_BUILD=1 \
         STAGING_INCDIR=${STAGING_INCDIR} \
         STAGING_LIBDIR=${STAGING_LIBDIR} \
         ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py \
-        build ${DISTUTILS_BUILD_ARGS} || \
+        build --build-base=${B} ${DISTUTILS_BUILD_ARGS} || \
         bbfatal_log "'${PYTHON_PN} setup.py build ${DISTUTILS_BUILD_ARGS}' execution failed."
 }
 distutils3_do_compile[vardepsexclude] = "MACHINE"
 
-distutils3_stage_headers() {
-        install -d ${STAGING_DIR_HOST}${PYTHON_SITEPACKAGES_DIR}
-        ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py install_headers ${DISTUTILS_STAGE_HEADERS_ARGS} || \
-        bbfatal_log "'${PYTHON_PN} setup.py install_headers ${DISTUTILS_STAGE_HEADERS_ARGS}' execution for stage_headers failed."
-}
-distutils3_stage_headers[vardepsexclude] = "MACHINE"
-
-distutils3_stage_all() {
-        STAGING_INCDIR=${STAGING_INCDIR} \
-        STAGING_LIBDIR=${STAGING_LIBDIR} \
-        install -d ${STAGING_DIR_HOST}${PYTHON_SITEPACKAGES_DIR}
-        PYTHONPATH=${STAGING_DIR_HOST}${PYTHON_SITEPACKAGES_DIR} \
-        ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py install ${DISTUTILS_STAGE_ALL_ARGS} || \
-        bbfatal_log "'${PYTHON_PN} setup.py install ${DISTUTILS_STAGE_ALL_ARGS}' execution for stage_all failed."
-}
-distutils3_stage_all[vardepsexclude] = "MACHINE"
-
 distutils3_do_install() {
+        cd ${DISTUTILS_SETUP_PATH}
         install -d ${D}${PYTHON_SITEPACKAGES_DIR}
         STAGING_INCDIR=${STAGING_INCDIR} \
         STAGING_LIBDIR=${STAGING_LIBDIR} \
         PYTHONPATH=${D}${PYTHON_SITEPACKAGES_DIR} \
-        ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py install ${DISTUTILS_INSTALL_ARGS} || \
+        ${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN} setup.py \
+        build --build-base=${B} install --skip-build ${DISTUTILS_INSTALL_ARGS} || \
         bbfatal_log "'${PYTHON_PN} setup.py install ${DISTUTILS_INSTALL_ARGS}' execution failed."
 
         # support filenames with *spaces*
-        find ${D} -name "*.py" -exec grep -q ${D} {} \; -exec sed -i -e s:${D}::g {} \;
+        find ${D} -name "*.py" -exec grep -q ${D} {} \; \
+                               -exec sed -i -e s:${D}::g {} \;
 
-        if test -e ${D}${bindir} ; then	
-            for i in ${D}${bindir}/* ; do \
-                sed -i -e s:${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN}:${USRBINPATH}/env\ ${PYTHON_PN}:g $i
+        for i in ${D}${bindir}/* ${D}${sbindir}/*; do
+            if [ -f "$i" ]; then
+                sed -i -e s:${PYTHON}:${USRBINPATH}/env\ ${DISTUTILS_PYTHON}:g $i
                 sed -i -e s:${STAGING_BINDIR_NATIVE}:${bindir}:g $i
-            done
-        fi
-
-        if test -e ${D}${sbindir}; then
-            for i in ${D}${sbindir}/* ; do \
-                sed -i -e s:${STAGING_BINDIR_NATIVE}/python-${PYTHON_PN}/${PYTHON_PN}:${USRBINPATH}/env\ ${PYTHON_PN}:g $i
-                sed -i -e s:${STAGING_BINDIR_NATIVE}:${bindir}:g $i
-            done
-        fi
+            fi
+        done
 
         rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/easy-install.pth
-        
+
         #
         # FIXME: Bandaid against wrong datadir computation
         #

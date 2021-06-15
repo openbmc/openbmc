@@ -1,0 +1,31 @@
+From 528a64d17488295299dad9fbfe3d7140bc1cfdfa Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 6 Feb 2021 11:06:48 -0800
+Subject: [PATCH] make: Add compiler includes in cflags
+
+Fixes
+| In file included from /mnt/b/yoe/master/build/tmp/work/raspberrypi4_64-yoe-linux/kexecboot-klibc/0.6+gitAUTOINC+5a5e04be20-r0/recipe-sysroot/usr/lib/klibc/include/stdio.h:11:
+| /mnt/b/yoe/master/build/tmp/work/raspberrypi4_64-yoe-linux/kexecboot-klibc/0.6+gitAUTOINC+5a5e04be20-r0/recipe-sysroot/usr/lib/klibc/include/stdarg.h:9:15: fatal error: 'stdarg.h' file not found
+| #include_next <stdarg.h>
+|               ^~~~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index c75df23..d2adf38 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,6 +1,6 @@
+ bin_PROGRAMS=kexecboot
+ 
+-kexecboot_CFLAGS = -I$(top_srcdir) $(AM_CFLAGS)
++kexecboot_CFLAGS = -I$(top_srcdir) $(AM_CFLAGS) -I$(shell $(CC) -print-file-name=include)
+ 
+ kexecboot_SOURCES = \
+ 	util.c \
+-- 
+2.30.0
+

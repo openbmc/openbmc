@@ -1,3 +1,4 @@
 #!/bin/sh
 
-make -C tests check-TESTS
+abs_ptestdir=`echo "$(cd "$(dirname "$0")"; pwd)"`
+make -C $abs_ptestdir/tests check-TESTS abs_top_srcdir="$abs_ptestdir"

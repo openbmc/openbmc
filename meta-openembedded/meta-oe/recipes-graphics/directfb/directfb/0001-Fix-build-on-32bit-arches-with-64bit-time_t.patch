@@ -1,0 +1,139 @@
+From 0b66557f2e924023b12006b58d8e86149c745aed Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Nov 2019 20:34:33 -0800
+Subject: [PATCH] Fix build on 32bit arches with 64bit time_t
+
+time element is deprecated on new input_event structure in kernel's
+input.h [1]
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=152194fe9c3f
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ inputdrivers/linux_input/linux_input.c | 36 ++++++++++++++++++--------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
+
+diff --git a/inputdrivers/linux_input/linux_input.c b/inputdrivers/linux_input/linux_input.c
+index 7e9a6ad..03deebc 100644
+--- a/inputdrivers/linux_input/linux_input.c
++++ b/inputdrivers/linux_input/linux_input.c
+@@ -42,6 +42,11 @@ typedef unsigned long kernel_ulong_t;
+ 
+ #include <linux/input.h>
+ 
++#ifndef input_event_sec
++#define input_event_sec time.tv_sec
++#define input_event_usec time.tv_usec
++#endif
++
+ #ifndef KEY_OK
+ /* Linux kernel 2.5.42+ defines additional keys in linux/input.h */
+ #include "input_fake.h"
+@@ -754,7 +759,8 @@ translate_event( const LinuxInputData     *data,
+                  DFBInputEvent            *devt )
+ {
+      devt->flags     = DIEF_TIMESTAMP;
+-     devt->timestamp = levt->time;
++     devt->timestamp.tv_sec = levt->input_event_sec;
++     devt->timestamp.tv_usec = levt->input_event_usec;
+ 
+      switch (levt->type) {
+           case EV_KEY:
+@@ -2139,7 +2145,8 @@ touchpad_translate( struct touchpad_fsm_state *state,
+      int abs, rel;
+ 
+      devt->flags     = DIEF_TIMESTAMP | (dfb_config->linux_input_touch_abs ? DIEF_AXISABS : DIEF_AXISREL);
+-     devt->timestamp = levt->time;
++     devt->timestamp.tv_sec = levt->input_event_sec;
++     devt->timestamp.tv_usec = levt->input_event_usec;
+      devt->type      = DIET_AXISMOTION;
+ 
+      switch (levt->code) {
+@@ -2204,7 +2211,7 @@ touchpad_fsm( struct touchpad_fsm_state *state,
+               DFBInputEvent             *devt )
+ {
+      struct timeval timeout = { 0, 125000 };
+-
++     struct timeval tval;
+      /* select() timeout? */
+      if (!levt) {
+           /* Check if button release is due. */
+@@ -2223,6 +2230,8 @@ touchpad_fsm( struct touchpad_fsm_state *state,
+           return 0;
+      }
+ 
++     tval.tv_sec = levt->input_event_sec;
++     tval.tv_usec = levt->input_event_usec;
+      /* More or less ignore these events for now */
+      if ((levt->type == EV_SYN && levt->code == SYN_REPORT) ||
+          (levt->type == EV_ABS && levt->code == ABS_PRESSURE) ||
+@@ -2233,7 +2242,7 @@ touchpad_fsm( struct touchpad_fsm_state *state,
+ 
+           /* Check if button release is due. */
+           if (state->fsm_state == TOUCHPAD_FSM_DRAG_START &&
+-              timeout_passed( &state->timeout, &levt->time )) {
++              timeout_passed( &state->timeout, &tval )) {
+                devt->flags     = DIEF_TIMESTAMP;
+                devt->timestamp = state->timeout; /* timeout of levt->time? */
+                devt->type      = DIET_BUTTONRELEASE;
+@@ -2255,7 +2264,8 @@ touchpad_fsm( struct touchpad_fsm_state *state,
+      case TOUCHPAD_FSM_START:
+           if (touchpad_finger_landing( levt )) {
+                state->fsm_state = TOUCHPAD_FSM_MAIN;
+-               state->timeout = levt->time;
++               state->timeout.tv_sec = levt->input_event_sec;
++               state->timeout.tv_usec = levt->input_event_usec;
+                timeout_add( &state->timeout, &timeout );
+           }
+           return 0;
+@@ -2268,15 +2278,17 @@ touchpad_fsm( struct touchpad_fsm_state *state,
+                }
+           }
+           else if (touchpad_finger_leaving( levt )) {
+-               if (!timeout_passed( &state->timeout, &levt->time )) {
++               if (!timeout_passed( &state->timeout, &tval )) {
+                     devt->flags     = DIEF_TIMESTAMP;
+-                    devt->timestamp = levt->time;
++                    devt->timestamp.tv_sec = levt->input_event_sec;
++                    devt->timestamp.tv_usec = levt->input_event_usec;
+                     devt->type      = DIET_BUTTONPRESS;
+                     devt->button    = DIBI_FIRST;
+ 
+                     touchpad_fsm_init( state );
+                     state->fsm_state = TOUCHPAD_FSM_DRAG_START;
+-                    state->timeout = levt->time;
++                    state->timeout.tv_sec = levt->input_event_sec;
++                    state->timeout.tv_usec = levt->input_event_usec;
+                     timeout_add( &state->timeout, &timeout );
+                     return 1;
+                }
+@@ -2287,7 +2299,7 @@ touchpad_fsm( struct touchpad_fsm_state *state,
+           return 0;
+ 
+      case TOUCHPAD_FSM_DRAG_START:
+-          if (timeout_passed( &state->timeout, &levt->time )){
++          if (timeout_passed( &state->timeout, &tval )){
+                devt->flags     = DIEF_TIMESTAMP;
+                devt->timestamp = state->timeout; /* timeout of levt->time? */
+                devt->type      = DIET_BUTTONRELEASE;
+@@ -2299,7 +2311,8 @@ touchpad_fsm( struct touchpad_fsm_state *state,
+           else {
+                if (touchpad_finger_landing( levt )) {
+                     state->fsm_state = TOUCHPAD_FSM_DRAG_MAIN;
+-                    state->timeout = levt->time;
++                    state->timeout.tv_sec = levt->input_event_sec;
++                    state->timeout.tv_usec = levt->input_event_usec;
+                     timeout_add( &state->timeout, &timeout );
+                }
+           }
+@@ -2314,7 +2327,8 @@ touchpad_fsm( struct touchpad_fsm_state *state,
+           }
+           else if (touchpad_finger_leaving( levt )) {
+                devt->flags     = DIEF_TIMESTAMP;
+-               devt->timestamp = levt->time;
++               devt->timestamp.tv_sec = levt->input_event_sec;
++               devt->timestamp.tv_usec = levt->input_event_usec;
+                devt->type      = DIET_BUTTONRELEASE;
+                devt->button    = DIBI_FIRST;
+ 

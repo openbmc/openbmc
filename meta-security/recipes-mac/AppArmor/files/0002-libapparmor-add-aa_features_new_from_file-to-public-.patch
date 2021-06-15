@@ -1,0 +1,37 @@
+From c9255a03436e6a91bd4e410601da8d43a341ffc2 Mon Sep 17 00:00:00 2001
+From: Patrick Steinhardt <ps@pks.im>
+Date: Sat, 3 Oct 2020 20:58:45 +0200
+Subject: [PATCH] libapparmor: add `aa_features_new_from_file` to public
+ symbols
+
+With AppArmor release 3.0, a new function `aa_features_new_from_file`
+was added, but not added to the list of public symbols. As a result,
+it's not possible to make use of this function when linking against
+libapparmor.so.
+
+Fix the issue by adding it to the symbol map.
+
+Signed-off-by: Patrick Steinhardt <ps@pks.im>
+
+Upstream-Status: Backport
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ libraries/libapparmor/src/libapparmor.map | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libraries/libapparmor/src/libapparmor.map b/libraries/libapparmor/src/libapparmor.map
+index bbff51f5..1579509a 100644
+--- a/libraries/libapparmor/src/libapparmor.map
++++ b/libraries/libapparmor/src/libapparmor.map
+@@ -117,6 +117,7 @@ APPARMOR_2.13.1 {
+ 
+ APPARMOR_3.0 {
+   global:
++	aa_features_new_from_file;
+ 	aa_features_write_to_fd;
+ 	aa_features_value;
+   local:
+-- 
+2.17.1
+

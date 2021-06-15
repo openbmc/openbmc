@@ -6,9 +6,7 @@ LICENSE = "LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbb461211a33b134d42ed5ee802b37ff"
 
 SRC_URI = "http://download.augeas.net/${BP}.tar.gz \
-           file://add-missing-argz-conditional.patch \
            file://sepbuildfix.patch \
-           file://0001-Unset-need_charset_alias-when-building-for-musl.patch \
           "
 
 DEPENDS = "readline libxml2"

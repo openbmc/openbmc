@@ -47,7 +47,6 @@ log_end_msg () {
 }
 
 . /lib/apparmor/functions
-. /lib/lsb/init-functions
 
 usage() {
     echo "Usage: $0 {start|stop|restart|reload|force-reload|status|recache}"

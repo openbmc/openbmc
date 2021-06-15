@@ -1,0 +1,39 @@
+Issue with rpath including /usr/lib and crosscompile checkes causing oe configure to fail
+
+Use oe's cmake rpath framework and exclude some of the cmake checks that fail in our env
+
+Upstream-Status: Inappropriate [configuration]
+Singed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/CMakeLists.txt
+===================================================================
+--- git.orig/CMakeLists.txt
++++ git/CMakeLists.txt
+@@ -162,12 +162,6 @@ endif()
+ 
+ include(GNUInstallDirs)
+ 
+-if(CMAKE_INSTALL_FULL_LIBDIR)
+-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_FULL_LIBDIR}")
+-else()
+-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+-endif()
+-
+ if(C_LINUX)
+     if(CMAKE_COMPILER_IS_GNUCXX)
+         # Set _GNU_SOURCE for O_LARGEFILE, O_CLOEXEC, O_DIRECTORY, O_NOFOLLOW, etc flags on older systems
+@@ -512,14 +506,8 @@ include(TestInline)
+ include(CheckFileOffsetBits)
+ # Determine how to pack structs on this platform.
+ include(CheckStructPacking)
+-# Check for signed right shift implementation.
+-include(CheckSignedRightShift)
+ # Check if systtem fts implementation available
+ include(CheckFTS)
+-# Check if uname(2) follows POSIX standard.
+-include(CheckUnamePosix)
+-# Check support for file descriptor passing
+-include(CheckFDPassing)
+ 
+ # Check if big-endian
+ include(TestBigEndian)

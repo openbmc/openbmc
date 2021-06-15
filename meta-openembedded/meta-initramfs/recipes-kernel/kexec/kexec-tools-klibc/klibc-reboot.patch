@@ -1,3 +1,13 @@
+From 9c99b0748dd0ea1aaf3836378ee75fa5af099a19 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 15 Mar 2019 00:22:40 -0700
+
+---
+ kexec/kexec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kexec/kexec.c b/kexec/kexec.c
+index 157c577..5da0d67 100644
 --- a/kexec/kexec.c
 +++ b/kexec/kexec.c
 @@ -901,7 +901,7 @@ static int my_exec(void)

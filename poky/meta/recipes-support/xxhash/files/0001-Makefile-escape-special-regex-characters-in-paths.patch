@@ -1,0 +1,55 @@
+From 9ab56f841b1986cd5cdff66cb5ef222794b9ed39 Mon Sep 17 00:00:00 2001
+From: Dmitry Kalinkin <dmitry.kalinkin@gmail.com>
+Date: Mon, 22 Feb 2021 14:07:58 -0500
+Subject: [PATCH] Makefile: escape special regex characters in paths
+
+Fixes a problem with certain valid install paths:
+
+make prefix=/tmp/a+b/
+Makefile:434: *** configured libdir (/tmp/a+b//lib) is outside of exec_prefix (/tmp/a+b/), can't generate pkg-config file.  Stop.
+
+Upstream-Status: Backport [f79cd22a806993b4a62d8a4f1ba529a29a9d9ff5]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ Makefile | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index ef24e94..baa1533 100644
+--- a/Makefile
++++ b/Makefile
+@@ -411,14 +411,18 @@ INSTALL_PROGRAM ?= $(INSTALL)
+ INSTALL_DATA    ?= $(INSTALL) -m 644
+ 
+ 
+-PCLIBDIR ?= $(shell echo "$(LIBDIR)"     | $(SED) -n $(SED_ERE_OPT) -e "s@^$(EXEC_PREFIX)(/|$$)@@p")
+-PCINCDIR ?= $(shell echo "$(INCLUDEDIR)" | $(SED) -n $(SED_ERE_OPT) -e "s@^$(PREFIX)(/|$$)@@p")
++# Escape special symbols by putting each character into its separate class
++EXEC_PREFIX_REGEX ?= $(shell echo "$(EXEC_PREFIX)" | $(SED) $(SED_ERE_OPT) -e "s/([^^])/[\1]/g" -e "s/\\^/\\\\^/g")
++PREFIX_REGEX ?= $(shell echo "$(PREFIX)" | $(SED) $(SED_ERE_OPT) -e "s/([^^])/[\1]/g" -e "s/\\^/\\\\^/g")
++
++PCLIBDIR ?= $(shell echo "$(LIBDIR)"     | $(SED) -n $(SED_ERE_OPT) -e "s@^$(EXEC_PREFIX_REGEX)(/|$$)@@p")
++PCINCDIR ?= $(shell echo "$(INCLUDEDIR)" | $(SED) -n $(SED_ERE_OPT) -e "s@^$(PREFIX_REGEX)(/|$$)@@p")
+ PCEXECDIR?= $(if $(filter $(PREFIX),$(EXEC_PREFIX)),$$\{prefix\},$(EXEC_PREFIX))
+ 
+ ifeq (,$(PCLIBDIR))
+ # Additional prefix check is required, since the empty string is technically a
+ # valid PCLIBDIR
+-ifeq (,$(shell echo "$(LIBDIR)" | $(SED) -n $(SED_ERE_OPT) -e "\\@^$(EXEC_PREFIX)(/|$$)@ p"))
++ifeq (,$(shell echo "$(LIBDIR)" | $(SED) -n $(SED_ERE_OPT) -e "\\@^$(EXEC_PREFIX_REGEX)(/|$$)@ p"))
+ $(error configured libdir ($(LIBDIR)) is outside of exec_prefix ($(EXEC_PREFIX)), can't generate pkg-config file)
+ endif
+ endif
+@@ -426,7 +430,7 @@ endif
+ ifeq (,$(PCINCDIR))
+ # Additional prefix check is required, since the empty string is technically a
+ # valid PCINCDIR
+-ifeq (,$(shell echo "$(INCLUDEDIR)" | $(SED) -n $(SED_ERE_OPT) -e "\\@^$(PREFIX)(/|$$)@ p"))
++ifeq (,$(shell echo "$(INCLUDEDIR)" | $(SED) -n $(SED_ERE_OPT) -e "\\@^$(PREFIX_REGEX)(/|$$)@ p"))
+ $(error configured includedir ($(INCLUDEDIR)) is outside of prefix ($(PREFIX)), can't generate pkg-config file)
+ endif
+ endif
+-- 
+2.17.1
+

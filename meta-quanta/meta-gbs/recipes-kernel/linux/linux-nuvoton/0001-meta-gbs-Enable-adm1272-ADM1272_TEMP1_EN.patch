@@ -1,0 +1,45 @@
+From 8e211c8bc64521d772c4389219889a240b40307b Mon Sep 17 00:00:00 2001
+From: Charles <Charles.Hsu@quantatw.com>
+Date: Fri, 14 Aug 2020 18:06:22 +0800
+Subject: [PATCH] meta-gis: Enable adm1272 ADM1272_TEMP1_EN
+
+---
+ drivers/hwmon/pmbus/adm1275.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/hwmon/pmbus/adm1275.c b/drivers/hwmon/pmbus/adm1275.c
+index 5caa37fbfc18..550b9a8388f6 100644
+--- a/drivers/hwmon/pmbus/adm1275.c
++++ b/drivers/hwmon/pmbus/adm1275.c
+@@ -595,11 +595,13 @@ static int adm1275_probe(struct i2c_client *client,
+ 		tindex = 8;
+ 
+ 		info->func[0] |= PMBUS_HAVE_PIN | PMBUS_HAVE_STATUS_INPUT |
+-			PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT;
++			PMBUS_HAVE_VOUT | PMBUS_HAVE_STATUS_VOUT |
++			PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP;
+ 
+-		/* Enable VOUT if not enabled (it is disabled by default) */
+-		if (!(config & ADM1278_VOUT_EN)) {
+-			config |= ADM1278_VOUT_EN;
++		
++		/* Enable VOUT & TEMP1 if not enabled (it is disabled by default) */
++		if ((config & (ADM1278_VOUT_EN | ADM1278_TEMP1_EN)) != (ADM1278_VOUT_EN | ADM1278_TEMP1_EN)) {
++			config |= ADM1278_VOUT_EN | ADM1278_TEMP1_EN;
+ 			ret = i2c_smbus_write_byte_data(client,
+ 							ADM1275_PMON_CONFIG,
+ 							config);
+@@ -610,9 +612,7 @@ static int adm1275_probe(struct i2c_client *client,
+ 			}
+ 		}
+ 
+-		if (config & ADM1278_TEMP1_EN)
+-			info->func[0] |=
+-				PMBUS_HAVE_TEMP | PMBUS_HAVE_STATUS_TEMP;
++
+ 		if (config & ADM1278_VIN_EN)
+ 			info->func[0] |= PMBUS_HAVE_VIN;
+ 		break;
+-- 
+2.25.1
+

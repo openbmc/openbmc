@@ -6,7 +6,7 @@ IMAGE_INSTALL = "packagegroup-core-boot \
     kernel-modules \
 "
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 IMAGE_LINGUAS ?= " "
@@ -16,3 +16,5 @@ LICENSE = "MIT"
 export IMAGE_BASENAME = "core-image-minimal-xfce"
 
 inherit core-image
+
+SYSTEMD_DEFAULT_TARGET = "graphical.target"

@@ -12,7 +12,7 @@ DEPENDS = "freetype libpng jpeg expat gtk+"
 
 BBCLASSEXTEND = "native"
 
-inherit distro_features_check autotools pkgconfig
+inherit features_check autotools pkgconfig
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

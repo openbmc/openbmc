@@ -1,4 +1,4 @@
-From 423c3f6f41fe04f4512e2a97a130f072d53dd4cf Mon Sep 17 00:00:00 2001
+From c6934455ec2337e6da7ea9fbc3486ce9beeb5d82 Mon Sep 17 00:00:00 2001
 From: OpenEmbedded <oe.patch@oe>
 Date: Wed, 11 Apr 2018 22:51:05 +0200
 Subject: [PATCH] x86-linux-setup.c: replace vfscanf() with vsscanf()
@@ -13,7 +13,7 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/kexec/arch/i386/x86-linux-setup.c b/kexec/arch/i386/x86-linux-setup.c
-index 7850083..e190356 100644
+index 5514c1c..bdb28c6 100644
 --- a/kexec/arch/i386/x86-linux-setup.c
 +++ b/kexec/arch/i386/x86-linux-setup.c
 @@ -200,6 +200,8 @@ static int file_scanf(const char *dir, const char *file, const char *scanf_line,

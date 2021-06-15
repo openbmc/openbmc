@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import re
 import subprocess
@@ -5,8 +9,7 @@ from oeqa.utils.httpserver import HTTPService
 
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
-from oeqa.core.decorator.data import skipIfNotDataVar, skipIfNotFeature
+from oeqa.core.decorator.data import skipIfNotDataVar, skipIfNotFeature, skipIfInDataVar, skipIfNotInDataVar
 from oeqa.runtime.decorator.package import OEHasPackage
 
 class DnfTest(OERuntimeTestCase):
@@ -26,27 +29,22 @@ class DnfBasicTest(DnfTest):
                       'RPM is not the primary package manager')
     @OEHasPackage(['dnf'])
     @OETestDepends(['ssh.SSHTest.test_ssh'])
-    @OETestID(1735)
     def test_dnf_help(self):
         self.dnf('--help')
 
     @OETestDepends(['dnf.DnfBasicTest.test_dnf_help'])
-    @OETestID(1739)
     def test_dnf_version(self):
         self.dnf('--version')
 
     @OETestDepends(['dnf.DnfBasicTest.test_dnf_help'])
-    @OETestID(1737)
     def test_dnf_info(self):
         self.dnf('info dnf')
 
     @OETestDepends(['dnf.DnfBasicTest.test_dnf_help'])
-    @OETestID(1738)
     def test_dnf_search(self):
         self.dnf('search dnf')
 
     @OETestDepends(['dnf.DnfBasicTest.test_dnf_help'])
-    @OETestID(1736)
     def test_dnf_history(self):
         self.dnf('history')
 
@@ -55,7 +53,8 @@ class DnfRepoTest(DnfTest):
     @classmethod
     def setUpClass(cls):
         cls.repo_server = HTTPService(os.path.join(cls.tc.td['WORKDIR'], 'oe-testimage-repo'),
-                                      cls.tc.target.server_ip, logger=cls.tc.logger)
+                                      '0.0.0.0', port=cls.tc.target.server_port,
+                                      logger=cls.tc.logger)
         cls.repo_server.start()
 
     @classmethod
@@ -71,7 +70,6 @@ class DnfRepoTest(DnfTest):
         return output
 
     @OETestDepends(['dnf.DnfBasicTest.test_dnf_help'])
-    @OETestID(1744)
     def test_dnf_makecache(self):
         self.dnf_with_repo('makecache')
 
@@ -82,12 +80,10 @@ class DnfRepoTest(DnfTest):
 #        self.dnf_with_repo('repolist')
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_makecache'])
-    @OETestID(1746)
     def test_dnf_repoinfo(self):
         self.dnf_with_repo('repoinfo')
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_makecache'])
-    @OETestID(1740)
     def test_dnf_install(self):
         output = self.dnf_with_repo('list run-postinsts-dev')
         if 'Installed Packages' in output:
@@ -95,13 +91,11 @@ class DnfRepoTest(DnfTest):
         self.dnf_with_repo('install -y run-postinsts-dev')
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_install'])
-    @OETestID(1741)
     def test_dnf_install_dependency(self):
         self.dnf_with_repo('remove -y run-postinsts')
         self.dnf_with_repo('install -y run-postinsts-dev')
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_install_dependency'])
-    @OETestID(1742)
     def test_dnf_install_from_disk(self):
         self.dnf_with_repo('remove -y run-postinsts-dev')
         self.dnf_with_repo('install -y --downloadonly run-postinsts-dev')
@@ -110,7 +104,6 @@ class DnfRepoTest(DnfTest):
         self.dnf_with_repo('install -y %s' % output)
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_install_from_disk'])
-    @OETestID(1743)
     def test_dnf_install_from_http(self):
         output = subprocess.check_output('%s %s -name run-postinsts-dev*' % (bb.utils.which(os.getenv('PATH'), "find"),
                                                                            os.path.join(self.tc.td['WORKDIR'], 'oe-testimage-repo')), shell=True).decode("utf-8")
@@ -120,12 +113,12 @@ class DnfRepoTest(DnfTest):
         self.dnf_with_repo('install -y %s' % url)
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_install'])
-    @OETestID(1745)
     def test_dnf_reinstall(self):
         self.dnf_with_repo('reinstall -y run-postinsts-dev')
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_makecache'])
-    @OETestID(1771)
+    @skipIfInDataVar('DISTRO_FEATURES', 'usrmerge', 'Test run when not enable usrmerge')
+    @OEHasPackage('busybox')
     def test_dnf_installroot(self):
         rootpath = '/home/root/chroot/test'
         #Copy necessary files to avoid errors with not yet installed tools on
@@ -151,7 +144,38 @@ class DnfRepoTest(DnfTest):
         self.assertEqual(0, status, output)
 
     @OETestDepends(['dnf.DnfRepoTest.test_dnf_makecache'])
-    @OETestID(1772)
+    @skipIfNotInDataVar('DISTRO_FEATURES', 'usrmerge', 'Test run when enable usrmege')
+    @OEHasPackage('busybox')
+    def test_dnf_installroot_usrmerge(self):
+        rootpath = '/home/root/chroot/test'
+        #Copy necessary files to avoid errors with not yet installed tools on
+        #installroot directory.
+        self.target.run('mkdir -p %s/etc' % rootpath, 1500)
+        self.target.run('mkdir -p %s/usr/bin %s/usr/sbin' % (rootpath, rootpath), 1500)
+        self.target.run('ln -sf -r %s/usr/bin %s/bin'  % (rootpath, rootpath), 1500)
+        self.target.run('ln -sf -r %s/usr/sbin %s/sbin'  % (rootpath, rootpath), 1500)
+        self.target.run('mkdir -p %s/dev' % rootpath, 1500)
+        #Handle different architectures lib dirs
+        self.target.run('mkdir -p %s/usr/lib' % rootpath, 1500)
+        self.target.run('mkdir -p %s/usr/libx32' % rootpath, 1500)
+        self.target.run('mkdir -p %s/usr/lib64' % rootpath, 1500)
+        self.target.run('cp /lib/libtinfo.so.5 %s/usr/lib' % rootpath, 1500)
+        self.target.run('cp /libx32/libtinfo.so.5 %s/usr/libx32' % rootpath, 1500)
+        self.target.run('cp /lib64/libtinfo.so.5 %s/usr/lib64' % rootpath, 1500)
+        self.target.run('ln -sf -r %s/lib %s/usr/lib' % (rootpath,rootpath), 1500)
+        self.target.run('ln -sf -r %s/libx32 %s/usr/libx32' % (rootpath,rootpath), 1500)
+        self.target.run('ln -sf -r %s/lib64 %s/usr/lib64' % (rootpath,rootpath), 1500)
+        self.target.run('cp -r /etc/rpm %s/etc' % rootpath, 1500)
+        self.target.run('cp -r /etc/dnf %s/etc' % rootpath, 1500)
+        self.target.run('cp /bin/sh %s/bin' % rootpath, 1500)
+        self.target.run('mount -o bind /dev %s/dev/' % rootpath, 1500)
+        self.dnf_with_repo('install --installroot=%s -v -y --rpmverbosity=debug busybox run-postinsts' % rootpath)
+        status, output = self.target.run('test -e %s/var/cache/dnf' % rootpath, 1500)
+        self.assertEqual(0, status, output)
+        status, output = self.target.run('test -e %s/bin/busybox' % rootpath, 1500)
+        self.assertEqual(0, status, output)
+
+    @OETestDepends(['dnf.DnfRepoTest.test_dnf_makecache'])
     def test_dnf_exclude(self):
         excludepkg = 'curl-dev'
         self.dnf_with_repo('install -y curl*')

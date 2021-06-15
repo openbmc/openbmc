@@ -1,0 +1,84 @@
+From c848ddceb98359db1efb3ed0d1e7b5a90053dddf Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@xilinx.com>
+Date: Thu, 3 Dec 2020 11:02:11 -0800
+Subject: [PATCH 47/52] bfd/elf64-microblaze.c: Fix build failures
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ bfd/elf64-microblaze.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+Index: gdb-9.2/bfd/elf64-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf64-microblaze.c
++++ gdb-9.2/bfd/elf64-microblaze.c
+@@ -1572,7 +1572,7 @@ microblaze_elf_relocate_section (bfd *ou
+ 			  {
+ 			    BFD_FAIL ();
+ 			    (*_bfd_error_handler)
+-			      (_("%B: probably compiled without -fPIC?"),
++			      (_("%pB: probably compiled without -fPIC?"),
+ 			       input_bfd);
+ 			    bfd_set_error (bfd_error_bad_value);
+ 			    return FALSE;
+@@ -2691,7 +2691,7 @@ microblaze_elf_check_relocs (bfd * abfd,
+ 		/* If this is a global symbol, we count the number of
+ 		   relocations we need for this symbol.  */
+ 		if (h != NULL)
+-		  head = &h->dyn_relocs;
++		  head = &((struct elf64_mb_link_hash_entry *) h)->dyn_relocs;
+ 		else
+ 		  {
+ 		    /* Track dynamic relocs needed for local syms too.
+@@ -2911,7 +2911,7 @@ microblaze_elf_adjust_dynamic_symbol (st
+ 
+   /* If we didn't find any dynamic relocs in read-only sections, then
+      we'll be keeping the dynamic relocs and avoiding the copy reloc.  */
+-  if (!_bfd_elf_readonly_dynrelocs (h))
++  if (p == NULL)
+     {
+       h->non_got_ref = 0;
+       return TRUE;
+@@ -3096,7 +3096,7 @@ allocate_dynrelocs (struct elf_link_hash
+   else
+     h->got.offset = (bfd_vma) -1;
+ 
+-  if (h->dyn_relocs == NULL)
++  if (eh->dyn_relocs == NULL)
+     return TRUE;
+ 
+   /* In the shared -Bsymbolic case, discard space allocated for
+@@ -3113,7 +3113,7 @@ allocate_dynrelocs (struct elf_link_hash
+ 	{
+ 	  struct elf64_mb_dyn_relocs **pp;
+ 
+-	  for (pp = &h->dyn_relocs; (p = *pp) != NULL; )
++	  for (pp = &eh->dyn_relocs; (p = *pp) != NULL; )
+ 	    {
+ 	      p->count -= p->pc_count;
+ 	      p->pc_count = 0;
+@@ -3124,7 +3124,7 @@ allocate_dynrelocs (struct elf_link_hash
+ 	    }
+ 	}
+       else if (UNDEFWEAK_NO_DYNAMIC_RELOC (info, h))
+-	h->dyn_relocs = NULL;
++	eh->dyn_relocs = NULL;
+     }
+   else
+     {
+@@ -3154,13 +3154,13 @@ allocate_dynrelocs (struct elf_link_hash
+ 	    goto keep;
+ 	}
+ 
+-      h->dyn_relocs = NULL;
++      eh->dyn_relocs = NULL;
+ 
+     keep: ;
+     }
+ 
+   /* Finally, allocate space.  */
+-  for (p = h->dyn_relocs; p != NULL; p = p->next)
++  for (p = eh->dyn_relocs; p != NULL; p = p->next)
+     {
+       asection *sreloc = elf_section_data (p->sec)->sreloc;
+       sreloc->size += p->count * sizeof (Elf64_External_Rela);

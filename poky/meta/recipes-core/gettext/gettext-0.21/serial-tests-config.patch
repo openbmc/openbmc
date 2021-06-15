@@ -1,0 +1,56 @@
+From ed64a5724ef7d6eb4e9a876f817ea266a536e195 Mon Sep 17 00:00:00 2001
+From: "Hongjun.Yang" <hongjun.yang@windriver.com>
+Date: Thu, 28 Jul 2016 12:36:15 +0800
+Subject: [PATCH] fix for ptest
+
+Add serial-tests support, ptest need it
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+---
+ configure.ac                 | 2 +-
+ gettext-runtime/configure.ac | 2 +-
+ gettext-tools/configure.ac   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 38db6fd..f019ae0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -22,7 +22,7 @@ AC_INIT([gettext],
+ 	[bug-gettext@gnu.org])
+ AC_CONFIG_SRCDIR([gettext-tools/src/msgfmt.c])
+ AC_CONFIG_AUX_DIR([build-aux])
+-AM_INIT_AUTOMAKE([1.13 silent-rules parallel-tests tar-ustar])
++AM_INIT_AUTOMAKE([1.13 silent-rules serial-tests tar-ustar])
+ 
+ dnl Override automake's tar command used for creating distributions.
+ am__tar='${AMTAR} chf - --format=ustar --owner=root --group=root "$$tardir"'
+diff --git a/gettext-runtime/configure.ac b/gettext-runtime/configure.ac
+index de203e7..138a07f 100644
+--- a/gettext-runtime/configure.ac
++++ b/gettext-runtime/configure.ac
+@@ -22,7 +22,7 @@ AC_INIT([gettext-runtime],
+ 	[bug-gettext@gnu.org])
+ AC_CONFIG_SRCDIR([intl/dcigettext.c])
+ AC_CONFIG_AUX_DIR([../build-aux])
+-AM_INIT_AUTOMAKE([1.11.1 silent-rules parallel-tests])
++AM_INIT_AUTOMAKE([1.11.1 silent-rules serial-tests])
+ AC_CONFIG_HEADERS([config.h])
+ 
+ dnl Installation directories.
+diff --git a/gettext-tools/configure.ac b/gettext-tools/configure.ac
+index cf1dd73..b544d6d 100644
+--- a/gettext-tools/configure.ac
++++ b/gettext-tools/configure.ac
+@@ -22,7 +22,7 @@ AC_INIT([gettext-tools],
+ 	[bug-gettext@gnu.org])
+ AC_CONFIG_SRCDIR([src/msgfmt.c])
+ AC_CONFIG_AUX_DIR([../build-aux])
+-AM_INIT_AUTOMAKE([1.11.1 silent-rules parallel-tests])
++AM_INIT_AUTOMAKE([1.11.1 silent-rules serial-tests])
+ AC_CONFIG_HEADERS([config.h])
+ 
+ dnl Installation directories.

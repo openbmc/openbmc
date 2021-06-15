@@ -28,5 +28,4 @@ do_patch_append() {
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
 
-KERNEL_FEATURES_remove = "phosphor-gpio-keys"
 INSANE_SKIP_kernel-vmlinux = "ldflags"

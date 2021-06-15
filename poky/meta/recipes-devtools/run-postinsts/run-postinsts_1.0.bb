@@ -1,4 +1,5 @@
 SUMMARY = "Runs postinstall scripts on first boot of the target device"
+DESCRIPTION = "${SUMMARY}"
 SECTION = "devel"
 PR = "r10"
 LICENSE = "MIT"

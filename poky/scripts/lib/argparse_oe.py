@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 import sys
 import argparse
 from collections import defaultdict, OrderedDict

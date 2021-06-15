@@ -1,0 +1,4 @@
+# Very simple policy demonstrating the systemd policy loading bug
+# (policy with one line works, two lines don't).
+dont_appraise fsmagic=0x9fa0
+dont_appraise fsmagic=0x62656572

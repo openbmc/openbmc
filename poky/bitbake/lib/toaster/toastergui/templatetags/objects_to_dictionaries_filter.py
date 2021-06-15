@@ -1,5 +1,8 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 from django import template
-import json
 
 register = template.Library()
 

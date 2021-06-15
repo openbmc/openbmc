@@ -1,0 +1,14 @@
+Include endian.h for missing definitions of htobe16
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/systemd/util.c
++++ b/systemd/util.c
+@@ -28,6 +28,7 @@
+ #include <stdbool.h>
+ #include <assert.h>
+ #include <errno.h>
++#include <endian.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <net/if.h>

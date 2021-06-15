@@ -34,6 +34,11 @@ Link: gcc -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions
 Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+sed use of DEBUG_PREFIX_MAP must treat whitespace the same as the
+echo command building version.c or the expression match will fail.
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
 ---
  src/Makefile.am | 4 ++++
  1 file changed, 4 insertions(+)
@@ -47,12 +52,12 @@ index 28c0be2..44084a3 100644
  	echo 'const char *version_string = "@VERSION@";' >> $@
  	echo 'const char *compilation_string = "'$(COMPILE)'";' \
 +	    | sed -e "s,$(TOOLCHAIN_OPTIONS),,g" \
-+	          -e "s,$(DEBUG_PREFIX_MAP),,g" \
++	          -e "s,$$(echo $(DEBUG_PREFIX_MAP)),,g" \
  	    | $(ESCAPEQUOTE) >> $@
  	echo 'const char *link_string = "'$(CCLD) $(AM_CFLAGS) $(CFLAGS) \
  	$(AM_LDFLAGS) $(LDFLAGS) $(LIBS) $(wget_LDADD)'";' \
 +	    | sed -e "s,$(TOOLCHAIN_OPTIONS),,g" \
-+	          -e "s,$(DEBUG_PREFIX_MAP),,g" \
++	          -e "s,$$(echo $(DEBUG_PREFIX_MAP)),,g" \
  	    | $(ESCAPEQUOTE) >> $@
  
  css.c: $(srcdir)/css.l

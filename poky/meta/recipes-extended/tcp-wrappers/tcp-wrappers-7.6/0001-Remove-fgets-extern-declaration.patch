@@ -1,0 +1,43 @@
+From 24d10919b4bc5e37a2d80b274d2cd2ee77b03549 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 13 Jan 2020 14:25:47 -0800
+Subject: [PATCH] Remove fgets() extern declaration
+
+These sources already include <stdio.h> which should bring the correct
+declaration
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ hosts_access.c | 1 -
+ misc.c         | 2 --
+ 2 files changed, 3 deletions(-)
+
+diff --git a/hosts_access.c b/hosts_access.c
+index 329b35e..0133e5e 100644
+--- a/hosts_access.c
++++ b/hosts_access.c
+@@ -44,7 +44,6 @@ static char sccsid[] = "@(#) hosts_access.c 1.21 97/02/12 02:13:22";
+ #include <netdb.h>
+ #endif
+ 
+-extern char *fgets();
+ extern int errno;
+ 
+ #ifndef	INADDR_NONE
+diff --git a/misc.c b/misc.c
+index 74ca319..9a5e73a 100644
+--- a/misc.c
++++ b/misc.c
+@@ -18,8 +18,6 @@ static char sccsic[] = "@(#) misc.c 1.2 96/02/11 17:01:29";
+ 
+ #include "tcpd.h"
+ 
+-extern char *fgets();
+-
+ #ifndef	INADDR_NONE
+ #define	INADDR_NONE	(-1)		/* XXX should be 0xffffffff */
+ #endif
+-- 
+2.24.1
+

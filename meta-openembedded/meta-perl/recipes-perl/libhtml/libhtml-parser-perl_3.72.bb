@@ -16,10 +16,30 @@ S = "${WORKDIR}/HTML-Parser-${PV}"
 
 EXTRA_CPANFLAGS = "EXPATLIBPATH=${STAGING_LIBDIR} EXPATINCPATH=${STAGING_INCDIR}"
 
-inherit cpan
+inherit cpan ptest-perl
 
 do_compile() {
     export LIBC="$(find ${STAGING_DIR_TARGET}/${base_libdir}/ -name 'libc-*.so')"
     cpan_do_compile
 }
+
+RDEPENDS_${PN} += "\
+    perl-module-exporter \
+    perl-module-strict \
+    perl-module-vars \
+    perl-module-xsloader \
+    libhtml-tagset-perl \
+"
+
+RDEPENDS_${PN}-ptest += "\
+    liburi-perl \
+    perl-module-config \
+    perl-module-file-spec \
+    perl-module-filehandle \
+    perl-module-io-file \
+    perl-module-selectsaver \
+    perl-module-test \
+    perl-module-test-more \
+"
+
 BBCLASSEXTEND = "native"

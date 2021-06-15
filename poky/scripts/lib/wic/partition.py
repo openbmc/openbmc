@@ -1,21 +1,7 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # Copyright (c) 2013-2016 Intel Corporation.
-# All rights reserved.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # DESCRIPTION
 # This module provides the OpenEmbedded partition object definitions.
@@ -44,6 +30,8 @@ class Partition():
         self.device = None
         self.extra_space = args.extra_space
         self.exclude_path = args.exclude_path
+        self.include_path = args.include_path
+        self.change_directory = args.change_directory
         self.fsopts = args.fsopts
         self.fstype = args.fstype
         self.label = args.label
@@ -52,6 +40,7 @@ class Partition():
         self.mountpoint = args.mountpoint
         self.no_table = args.no_table
         self.num = None
+        self.offset = args.offset
         self.overhead_factor = args.overhead_factor
         self.part_name = args.part_name
         self.part_type = args.part_type
@@ -64,6 +53,10 @@ class Partition():
         self.use_uuid = args.use_uuid
         self.uuid = args.uuid
         self.fsuuid = args.fsuuid
+        self.type = args.type
+        self.updated_fstab_path = None
+        self.has_fstab = False
+        self.update_fstab_in_rootfs = False
 
         self.lineno = lineno
         self.source_file = ""
@@ -128,11 +121,15 @@ class Partition():
         return self.fixed_size if self.fixed_size else self.size
 
     def prepare(self, creator, cr_workdir, oe_builddir, rootfs_dir,
-                bootimg_dir, kernel_dir, native_sysroot):
+                bootimg_dir, kernel_dir, native_sysroot, updated_fstab_path):
         """
         Prepare content for individual partitions, depending on
         partition command parameters.
         """
+        self.updated_fstab_path = updated_fstab_path
+        if self.updated_fstab_path and not (self.fstype.startswith("ext") or self.fstype == "msdos"):
+            self.update_fstab_in_rootfs = True
+
         if not self.source:
             if not self.size and not self.fixed_size:
                 raise WicError("The %s partition has a size of zero. Please "
@@ -144,9 +141,9 @@ class Partition():
                                             native_sysroot)
                 self.source_file = "%s/fs.%s" % (cr_workdir, self.fstype)
             else:
-                if self.fstype == 'squashfs':
-                    raise WicError("It's not possible to create empty squashfs "
-                                   "partition '%s'" % (self.mountpoint))
+                if self.fstype in ('squashfs', 'erofs'):
+                    raise WicError("It's not possible to create empty %s "
+                                   "partition '%s'" % (self.fstype, self.mountpoint))
 
                 rootfs = "%s/fs_%s.%s.%s" % (cr_workdir, self.label,
                                              self.lineno, self.fstype)
@@ -202,46 +199,62 @@ class Partition():
                            (self.mountpoint, self.size, self.fixed_size))
 
     def prepare_rootfs(self, cr_workdir, oe_builddir, rootfs_dir,
-                       native_sysroot, real_rootfs = True):
+                       native_sysroot, real_rootfs = True, pseudo_dir = None):
         """
         Prepare content for a rootfs partition i.e. create a partition
         and fill it from a /rootfs dir.
 
         Currently handles ext2/3/4, btrfs, vfat and squashfs.
         """
-        p_prefix = os.environ.get("PSEUDO_PREFIX", "%s/usr" % native_sysroot)
-        p_localstatedir = os.environ.get("PSEUDO_LOCALSTATEDIR",
-                                         "%s/../pseudo" %  rootfs_dir)
-        p_passwd = os.environ.get("PSEUDO_PASSWD", rootfs_dir)
-        p_nosymlinkexp = os.environ.get("PSEUDO_NOSYMLINKEXP", "1")
-        pseudo = "export PSEUDO_PREFIX=%s;" % p_prefix
-        pseudo += "export PSEUDO_LOCALSTATEDIR=%s;" % p_localstatedir
-        pseudo += "export PSEUDO_PASSWD=%s;" % p_passwd
-        pseudo += "export PSEUDO_NOSYMLINKEXP=%s;" % p_nosymlinkexp
-        pseudo += "%s " % get_bitbake_var("FAKEROOTCMD")
 
         rootfs = "%s/rootfs_%s.%s.%s" % (cr_workdir, self.label,
                                          self.lineno, self.fstype)
         if os.path.isfile(rootfs):
             os.remove(rootfs)
 
-        # Get rootfs size from bitbake variable if it's not set in .ks file
+        p_prefix = os.environ.get("PSEUDO_PREFIX", "%s/usr" % native_sysroot)
+        if (pseudo_dir):
+            # Canonicalize the ignore paths. This corresponds to
+            # calling oe.path.canonicalize(), which is used in bitbake.conf.
+            ignore_paths = [rootfs] + (get_bitbake_var("PSEUDO_IGNORE_PATHS") or "").split(",")
+            canonical_paths = []
+            for path in ignore_paths:
+                if "$" not in path:
+                    trailing_slash = path.endswith("/") and "/" or ""
+                    canonical_paths.append(os.path.realpath(path) + trailing_slash)
+            ignore_paths = ",".join(canonical_paths)
+
+            pseudo = "export PSEUDO_PREFIX=%s;" % p_prefix
+            pseudo += "export PSEUDO_LOCALSTATEDIR=%s;" % pseudo_dir
+            pseudo += "export PSEUDO_PASSWD=%s;" % rootfs_dir
+            pseudo += "export PSEUDO_NOSYMLINKEXP=1;"
+            pseudo += "export PSEUDO_IGNORE_PATHS=%s;" % ignore_paths
+            pseudo += "%s " % get_bitbake_var("FAKEROOTCMD")
+        else:
+            pseudo = None
+
         if not self.size and real_rootfs:
-            # Bitbake variable ROOTFS_SIZE is calculated in
-            # Image._get_rootfs_size method from meta/lib/oe/image.py
-            # using IMAGE_ROOTFS_SIZE, IMAGE_ROOTFS_ALIGNMENT,
-            # IMAGE_OVERHEAD_FACTOR and IMAGE_ROOTFS_EXTRA_SPACE
+            # The rootfs size is not set in .ks file so try to get it
+            # from bitbake variable
             rsize_bb = get_bitbake_var('ROOTFS_SIZE')
-            if rsize_bb:
-                logger.warning('overhead-factor was specified, but size was not,'
-                               ' so bitbake variables will be used for the size.'
-                               ' In this case both IMAGE_OVERHEAD_FACTOR and '
-                               '--overhead-factor will be applied')
+            rdir = get_bitbake_var('IMAGE_ROOTFS')
+            if rsize_bb and rdir == rootfs_dir:
+                # Bitbake variable ROOTFS_SIZE is calculated in
+                # Image._get_rootfs_size method from meta/lib/oe/image.py
+                # using IMAGE_ROOTFS_SIZE, IMAGE_ROOTFS_ALIGNMENT,
+                # IMAGE_OVERHEAD_FACTOR and IMAGE_ROOTFS_EXTRA_SPACE
                 self.size = int(round(float(rsize_bb)))
+            else:
+                # Bitbake variable ROOTFS_SIZE is not defined so compute it
+                # from the rootfs_dir size using the same logic found in
+                # get_rootfs_size() from meta/classes/image.bbclass
+                du_cmd = "du -ks %s" % rootfs_dir
+                out = exec_cmd(du_cmd)
+                self.size = int(out.split()[0])
 
         prefix = "ext" if self.fstype.startswith("ext") else self.fstype
         method = getattr(self, "prepare_rootfs_" + prefix)
-        method(rootfs, oe_builddir, rootfs_dir, native_sysroot, pseudo)
+        method(rootfs, cr_workdir, oe_builddir, rootfs_dir, native_sysroot, pseudo)
         self.source_file = rootfs
 
         # get the rootfs size in the right units for kickstart (kB)
@@ -249,7 +262,7 @@ class Partition():
         out = exec_cmd(du_cmd)
         self.size = int(out.split()[0])
 
-    def prepare_rootfs_ext(self, rootfs, oe_builddir, rootfs_dir,
+    def prepare_rootfs_ext(self, rootfs, cr_workdir, oe_builddir, rootfs_dir,
                            native_sysroot, pseudo):
         """
         Prepare content for an ext2/3/4 rootfs partition.
@@ -273,10 +286,21 @@ class Partition():
             (self.fstype, extraopts, rootfs, label_str, self.fsuuid, rootfs_dir)
         exec_native_cmd(mkfs_cmd, native_sysroot, pseudo=pseudo)
 
+        if self.updated_fstab_path and self.has_fstab:
+            debugfs_script_path = os.path.join(cr_workdir, "debugfs_script")
+            with open(debugfs_script_path, "w") as f:
+                f.write("cd etc\n")
+                f.write("rm fstab\n")
+                f.write("write %s fstab\n" % (self.updated_fstab_path))
+            debugfs_cmd = "debugfs -w -f %s %s" % (debugfs_script_path, rootfs)
+            exec_native_cmd(debugfs_cmd, native_sysroot)
+
         mkfs_cmd = "fsck.%s -pvfD %s" % (self.fstype, rootfs)
         exec_native_cmd(mkfs_cmd, native_sysroot, pseudo=pseudo)
 
-    def prepare_rootfs_btrfs(self, rootfs, oe_builddir, rootfs_dir,
+        self.check_for_Y2038_problem(rootfs, native_sysroot)
+
+    def prepare_rootfs_btrfs(self, rootfs, cr_workdir, oe_builddir, rootfs_dir,
                              native_sysroot, pseudo):
         """
         Prepare content for a btrfs rootfs partition.
@@ -299,7 +323,7 @@ class Partition():
              self.mkfs_extraopts, self.fsuuid, rootfs)
         exec_native_cmd(mkfs_cmd, native_sysroot, pseudo=pseudo)
 
-    def prepare_rootfs_msdos(self, rootfs, oe_builddir, rootfs_dir,
+    def prepare_rootfs_msdos(self, rootfs, cr_workdir, oe_builddir, rootfs_dir,
                              native_sysroot, pseudo):
         """
         Prepare content for a msdos/vfat rootfs partition.
@@ -315,25 +339,27 @@ class Partition():
             label_str = "-n %s" % self.label
 
         size_str = ""
-        if self.fstype == 'msdos':
-            size_str = "-F 16" # FAT 16
 
         extraopts = self.mkfs_extraopts or '-S 512'
 
         dosfs_cmd = "mkdosfs %s -i %s %s %s -C %s %d" % \
                     (label_str, self.fsuuid, size_str, extraopts, rootfs,
-                     max(8250, rootfs_size))
+                     rootfs_size)
         exec_native_cmd(dosfs_cmd, native_sysroot)
 
         mcopy_cmd = "mcopy -i %s -s %s/* ::/" % (rootfs, rootfs_dir)
         exec_native_cmd(mcopy_cmd, native_sysroot)
+
+        if self.updated_fstab_path and self.has_fstab:
+            mcopy_cmd = "mcopy -i %s %s ::/etc/fstab" % (rootfs, self.updated_fstab_path)
+            exec_native_cmd(mcopy_cmd, native_sysroot)
 
         chmod_cmd = "chmod 644 %s" % rootfs
         exec_cmd(chmod_cmd)
 
     prepare_rootfs_vfat = prepare_rootfs_msdos
 
-    def prepare_rootfs_squashfs(self, rootfs, oe_builddir, rootfs_dir,
+    def prepare_rootfs_squashfs(self, rootfs, cr_workdir, oe_builddir, rootfs_dir,
                                 native_sysroot, pseudo):
         """
         Prepare content for a squashfs rootfs partition.
@@ -342,6 +368,16 @@ class Partition():
         squashfs_cmd = "mksquashfs %s %s %s" % \
                        (rootfs_dir, rootfs, extraopts)
         exec_native_cmd(squashfs_cmd, native_sysroot, pseudo=pseudo)
+
+    def prepare_rootfs_erofs(self, rootfs, cr_workdir, oe_builddir, rootfs_dir,
+                             native_sysroot, pseudo):
+        """
+        Prepare content for a erofs rootfs partition.
+        """
+        extraopts = self.mkfs_extraopts or ''
+        erofs_cmd = "mkfs.erofs %s -U %s %s %s" % \
+                       (extraopts, self.fsuuid, rootfs, rootfs_dir)
+        exec_native_cmd(erofs_cmd, native_sysroot, pseudo=pseudo)
 
     def prepare_empty_partition_ext(self, rootfs, oe_builddir,
                                     native_sysroot):
@@ -361,6 +397,8 @@ class Partition():
         mkfs_cmd = "mkfs.%s -F %s %s -U %s %s" % \
             (self.fstype, extraopts, label_str, self.fsuuid, rootfs)
         exec_native_cmd(mkfs_cmd, native_sysroot)
+
+        self.check_for_Y2038_problem(rootfs, native_sysroot)
 
     def prepare_empty_partition_btrfs(self, rootfs, oe_builddir,
                                       native_sysroot):
@@ -392,8 +430,6 @@ class Partition():
             label_str = "-n %s" % self.label
 
         size_str = ""
-        if self.fstype == 'msdos':
-            size_str = "-F 16" # FAT 16
 
         extraopts = self.mkfs_extraopts or '-S 512'
 
@@ -423,3 +459,37 @@ class Partition():
 
         mkswap_cmd = "mkswap %s -U %s %s" % (label_str, self.fsuuid, path)
         exec_native_cmd(mkswap_cmd, native_sysroot)
+
+    def check_for_Y2038_problem(self, rootfs, native_sysroot):
+        """
+        Check if the filesystem is affected by the Y2038 problem
+        (Y2038 problem = 32 bit time_t overflow in January 2038)
+        """
+        def get_err_str(part):
+            err = "The {} filesystem {} has no Y2038 support."
+            if part.mountpoint:
+                args = [part.fstype, "mounted at %s" % part.mountpoint]
+            elif part.label:
+                args = [part.fstype, "labeled '%s'" % part.label]
+            elif part.part_name:
+                args = [part.fstype, "in partition '%s'" % part.part_name]
+            else:
+                args = [part.fstype, "in partition %s" % part.num]
+            return err.format(*args)
+
+        # ext2 and ext3 are always affected by the Y2038 problem
+        if self.fstype in ["ext2", "ext3"]:
+            logger.warn(get_err_str(self))
+            return
+
+        ret, out = exec_native_cmd("dumpe2fs %s" % rootfs, native_sysroot)
+
+        # if ext4 is affected by the Y2038 problem depends on the inode size
+        for line in out.splitlines():
+            if line.startswith("Inode size:"):
+                size = int(line.split(":")[1].strip())
+                if size < 256:
+                    logger.warn("%s Inodes (of size %d) are too small." %
+                                (get_err_str(self), size))
+                break
+

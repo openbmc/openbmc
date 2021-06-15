@@ -1,4 +1,4 @@
-From c139a6c929cff93dbb9b8279e97263fc9e055727 Mon Sep 17 00:00:00 2001
+From 9294cd19e5e3121fb8d37b44ee82dd7c4b3ab2c7 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 7 Feb 2017 12:16:03 +0200
 Subject: [PATCH] Get parameters for both libsolv and libsolvext (libdnf is
@@ -13,15 +13,15 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index cd91f08..6422534 100644
+index b722d4fb..ce88b9e3 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -46,7 +46,7 @@ endif(APPLE)
- PKG_CHECK_MODULES(GLIB gio-unix-2.0>=2.46.0 REQUIRED)
- pkg_check_modules(SMARTCOLS REQUIRED smartcols)
- FIND_LIBRARY (RPMDB_LIBRARY NAMES rpmdb)
+@@ -45,7 +45,7 @@ endif()
+ 
+ # build dependencies
+ find_package(Gpgme REQUIRED)
 -PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
 +PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv libsolvext)
  set(LIBSOLV_LIBRARY ${LIBSOLV_LIBRARIES})
- if (ENABLE_RHSM_SUPPORT)
-     pkg_check_modules (RHSM REQUIRED librhsm>=0.0.3)
+ find_package(OpenSSL REQUIRED)
+ 

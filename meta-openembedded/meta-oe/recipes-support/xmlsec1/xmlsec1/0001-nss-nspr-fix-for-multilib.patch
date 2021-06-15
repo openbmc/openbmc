@@ -1,0 +1,52 @@
+From 9ed3b4e628f9254d5c86006fe63c33a1eb02aee5 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Tue, 4 Feb 2020 23:39:49 -0800
+Subject: [PATCH] nss/nspr: fix for multilib
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ configure.ac | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b46d97d..39f4318 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -920,24 +920,24 @@ fi
+ dnl Priority 1: User specifies the path to installation
+ if test "z$NSPR_FOUND" = "zno" -a "z$with_nspr" != "z" -a "z$with_nspr" != "zyes" ; then
+     AC_MSG_CHECKING(for nspr library installation in "$with_nspr" folder)
+-    if test -f "$with_nspr/include/$NSPR_INCLUDE_MARKER" -a -f "$with_nspr/lib/$NSPR_LIB_MARKER" ; then
+-        NSPR_INCLUDE_PATH="$with_nspr/include"
+-        NSPR_LIB_PATH="$with_nspr/lib"
++    if test -f "$with_nspr/${includedir}/$NSPR_INCLUDE_MARKER" -a -f "$with_nspr/${libdir}/$NSPR_LIB_MARKER" ; then
++        NSPR_INCLUDE_PATH="$with_nspr/${includedir}"
++        NSPR_LIB_PATH="$with_nspr/${libdir}"
+         NSPR_FOUND="yes"
+         AC_MSG_RESULT([yes])
+     else
+-        AC_MSG_ERROR([not found: "$with_nspr/include/$NSPR_INCLUDE_MARKER" and/or "$with_nspr/lib/$NSPR_LIB_MARKER" files don't exist), typo?])
++        AC_MSG_ERROR([not found: "$with_nspr/${includedir}/$NSPR_INCLUDE_MARKER" and/or "$with_nspr/${libdir}/$NSPR_LIB_MARKER" files don't exist), typo?])
+     fi
+ fi
+ if test "z$NSS_FOUND" = "zno" -a "z$with_nss" != "z" -a "z$with_nss" != "zyes" ; then
+     AC_MSG_CHECKING(for nss library installation in "$with_nss" folder)
+-    if test -f "$with_nss/include/$NSS_INCLUDE_MARKER" -a -f "$with_nss/lib/$NSS_LIB_MARKER" ; then
+-        NSS_INCLUDE_PATH="$with_nss/include"
+-        NSS_LIB_PATH="$with_nss/lib"
++    if test -f "$with_nss/${includedir}/$NSS_INCLUDE_MARKER" -a -f "$with_nss/${libdir}/$NSS_LIB_MARKER" ; then
++        NSS_INCLUDE_PATH="$with_nss/${includedir}"
++        NSS_LIB_PATH="$with_nss/${libdir}"
+         NSS_FOUND="yes"
+         AC_MSG_RESULT([yes])
+     else
+-        AC_MSG_ERROR([not found: "$with_nss/include/$NSS_INCLUDE_MARKER" and/or "$with_nss/lib/$NSS_LIB_MARKER" files don't exist), typo?])
++        AC_MSG_ERROR([not found: "$with_nss/${includedir}/$NSS_INCLUDE_MARKER" and/or "$with_nss/${libdir}/$NSS_LIB_MARKER" files don't exist), typo?])
+     fi
+ fi
+ 
+-- 
+2.21.0
+

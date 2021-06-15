@@ -1,0 +1,19 @@
+Add explicit static cast to fix narrowing warning
+
+Fixes
+deps/v8/src/codegen/mips/assembler-mips.cc:3556:44: error: non-constant-expression cannot be narrowed from type 'int' to 'size_t' (aka 'unsigned int') in initializer list [-Wc++11-narrowing]
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/deps/v8/src/codegen/mips/assembler-mips.cc
++++ b/deps/v8/src/codegen/mips/assembler-mips.cc
+@@ -3553,7 +3553,7 @@ void Assembler::GrowBuffer() {
+                                reloc_info_writer.last_pc() + pc_delta);
+ 
+   // Relocate runtime entries.
+-  Vector<byte> instructions{buffer_start_, pc_offset()};
++  Vector<byte> instructions{buffer_start_, static_cast<size_t>(pc_offset())};
+   Vector<const byte> reloc_info{reloc_info_writer.pos(), reloc_size};
+   for (RelocIterator it(instructions, reloc_info, 0); !it.done(); it.next()) {
+     RelocInfo::Mode rmode = it.rinfo()->rmode();

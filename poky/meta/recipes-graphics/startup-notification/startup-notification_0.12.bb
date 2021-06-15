@@ -1,6 +1,9 @@
 SUMMARY = "Enables monitoring and display of application startup"
+DESCRIPTION = "Contains a reference implementation of the startup notification protocol. \
+The reference implementation is mostly under an X Window System style license, and has \
+no special dependencies. "
 HOMEPAGE = "http://www.freedesktop.org/wiki/Software/startup-notification/"
-BUGTRACKER = "https://bugs.freedesktop.org/enter_bug.cgi?product=Specifications"
+BUGTRACKER = "https://gitlab.freedesktop.org/xdg/startup-notification/-/issues"
 
 # most files are under MIT, but libsn/sn-util.c is under LGPL, the
 # effective license is LGPL
@@ -17,12 +20,13 @@ SECTION = "libs"
 
 DEPENDS = "virtual/libx11 libsm xcb-util"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = "http://www.freedesktop.org/software/startup-notification/releases/${BPN}-${PV}.tar.gz \
            file://obsolete_automake_macros.patch \
+           file://time_t.patch \
 "
 
 SRC_URI[md5sum] = "2cd77326d4dcaed9a5a23a1232fb38e9"

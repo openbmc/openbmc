@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.GPL;md5=f27defe1e96c2e1ecd4e0c9be8967949 \
 "
 
-inherit autotools pkgconfig python3native lib_package distro_features_check
+inherit autotools pkgconfig python3native lib_package features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
@@ -23,6 +23,9 @@ SRC_URI = "https://launchpad.net/${BPN}/trunk/${PV}/+download/${BPN}-${PV}.tar.x
            file://fix-indentation-for-gcc6.patch \
            file://0001-libgeis-Compare-the-first-character-of-string-to-nul.patch \
            "
+
+UPSTREAM_CHECK_URI = "https://launchpad.net/geis/trunk"
+
 SRC_URI[md5sum] = "2ff9d76a3ea5794516bb02c9d1924faf"
 SRC_URI[sha256sum] = "8a60f5683852094038904e690d23cc5a90a980fc52da67f0f28890baa25c70eb"
 

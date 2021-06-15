@@ -1,7 +1,7 @@
-From 6d8326275802a2e6e61d3e99460af6891ae8362f Mon Sep 17 00:00:00 2001
+From 453587d714473b806473b309727f865b673cbc06 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 13 Jan 2016 23:10:19 -0800
-Subject: [puzzles][PATCH] palisade: Fix warnings with clang on arm
+Subject: [PATCH] palisade: Fix warnings with clang on arm
 
 ARM treats 'char' as unsigned char when 'char' is not qualified with
 'signed' or 'unsigned' explicitly.
@@ -16,17 +16,16 @@ type 'clue' (aka 'char') is always false
 Therefore, typcast the contant to char in such places to be explicit
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
 Upstream-Status: Submitted
-
+---
  palisade.c | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/palisade.c b/palisade.c
-index 984e616..2b9c25c 100644
+index 6ffbf2d..8b54d42 100644
 --- a/palisade.c
 +++ b/palisade.c
-@@ -295,11 +295,11 @@ static void solver_connected_clues_versus_region_size(solver_ctx *ctx)
+@@ -304,11 +304,11 @@ static void solver_connected_clues_versus_region_size(solver_ctx *ctx)
       * If p = q = 3 then the region has size exactly 2. */
  
      for (i = 0; i < wh; ++i) {
@@ -40,8 +39,8 @@ index 984e616..2b9c25c 100644
              if ((8 - ctx->clues[i] - ctx->clues[j] > ctx->params->k) ||
                  (ctx->clues[i] == 3 && ctx->clues[j] == 3 &&
                   ctx->params->k != 2))
-@@ -317,7 +317,7 @@ static int solver_number_exhausted(solver_ctx *ctx)
-     int changed = FALSE;
+@@ -326,7 +326,7 @@ static bool solver_number_exhausted(solver_ctx *ctx)
+     bool changed = false;
  
      for (i = 0; i < wh; ++i) {
 -        if (ctx->clues[i] == EMPTY) continue;
@@ -49,16 +48,16 @@ index 984e616..2b9c25c 100644
  
          if (bitcount[(ctx->borders[i] & BORDER_MASK)] == ctx->clues[i]) {
              for (dir = 0; dir < 4; ++dir) {
-@@ -528,7 +528,7 @@ static int is_solved(const game_params *params, clue *clues,
+@@ -538,7 +538,7 @@ static bool is_solved(const game_params *params, clue *clues,
      for (i = 0; i < wh; ++i) {
-         if (dsf[i] == UNVISITED) dfs_dsf(i, params->w, border, dsf, TRUE);
+         if (dsf[i] == UNVISITED) dfs_dsf(i, params->w, border, dsf, true);
          if (dsf_size(dsf, i) != k) goto error;
 -        if (clues[i] == EMPTY) continue;
 +        if (clues[i] == (char)EMPTY) continue;
          if (clues[i] != bitcount[border[i] & BORDER_MASK]) goto error;
      }
  
-@@ -674,7 +674,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
+@@ -685,7 +685,7 @@ static char *new_game_desc(const game_params *params, random_state *rs,
      p = numbers;
      r = 0;
      for (i = 0; i < wh; ++i) {
@@ -67,6 +66,3 @@ index 984e616..2b9c25c 100644
              while (r) {
                  while (r > 26) {
                      *p++ = 'z';
--- 
-2.7.0
-

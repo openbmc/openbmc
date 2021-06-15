@@ -1,0 +1,28 @@
+From 321709837f412e2f590e36e3fe33571bb40036a7 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 27 Jun 2019 13:27:18 +0000
+Subject: [PATCH] Makefile.am: include descriptor.pb.cc when building libprotoc.so
+
+* otherwise plugin.pb.o has undefined symbol scc_info_FileDescriptorProto_google_2fprotobuf_2fdescriptor_2eproto
+  and build with gold fails with:
+  core2-32-oe-linux/protobuf/3.8.0-r0/recipe-sysroot-native/usr/bin/i686-oe-linux/../../libexec/i686-oe-linux/gcc/i686-oe-linux/9.1.0/ld.bfd: ./.libs/libprotoc.so: undefined reference to `descriptor_table_google_2fprotobuf_2fdescriptor_2eproto'
+  core2-32-oe-linux/protobuf/3.8.0-r0/recipe-sysroot-native/usr/bin/i686-oe-linux/../../libexec/i686-oe-linux/gcc/i686-oe-linux/9.1.0/ld.bfd: ./.libs/libprotoc.so: undefined reference to `scc_info_FileDescriptorProto_google_2fprotobuf_2fdescriptor_2eproto'
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ src/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index be18ba761..57e3daec1 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -313,6 +313,7 @@ libprotoc_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libprotoc.map
+ EXTRA_libprotoc_la_DEPENDENCIES = libprotoc.map
+ endif
+ libprotoc_la_SOURCES =                                         \
++  google/protobuf/descriptor.pb.cc                             \
+   google/protobuf/compiler/code_generator.cc                   \
+   google/protobuf/compiler/command_line_interface.cc           \
+   google/protobuf/compiler/plugin.cc                           \

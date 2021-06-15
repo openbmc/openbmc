@@ -1,0 +1,56 @@
+From bf8b2fa0f6870589d036f0f33c140a3f85b530a0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 31 Mar 2020 21:23:28 -0700
+Subject: [PATCH] qt: include ext/qt/gstqtgl.h instead of gst/gl/gstglfuncs.h
+
+gst/gl/gstglfuncs.h is included via ext/qt/gstqtgl.h which has logic to
+prefer qt headers definitions for GLsync
+
+This helps in fixing build errors like below
+
+/mnt/b/yoe/build/tmp/work/cortexa7t2hf-neon-vfpv4-yoe-linux-gnueabi/gstreamer1.0-plugins-good/1.16.2-r0/recipe-sysroot/usr/include/QtGui/qopengles2ext.h:24:26: error: conflicting declaration 'typedef struct __GLsync* GLsync'
+   24 | typedef struct __GLsync *GLsync;
+      |                          ^~~~~~
+In file included from /mnt/b/yoe/build/tmp/work/cortexa7t2hf-neon-vfpv4-yoe-linux-gnueabi/gstreamer1.0-plugins-good/1.16.2-r0/recipe-sysroot/usr/include/gstreamer-1.0/gst/gl/gstglfuncs.h:84,
+                 from ../gst-plugins-good-1.16.2/ext/qt/gstqsgtexture.cc:30:
+/mnt/b/yoe/build/tmp/work/cortexa7t2hf-neon-vfpv4-yoe-linux-gnueabi/gstreamer1.0-plugins-good/1.16.2-r0/recipe-sysroot/usr/include/gstreamer-1.0/gst/gl/glprototypes/gstgl_compat.h:40:18: note: previous declaration as 'typedef void* GLsync
+'
+   40 | typedef gpointer GLsync;
+      |                  ^~~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ext/qt/gstqsgtexture.cc | 2 +-
+ ext/qt/qtwindow.cc      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ext/qt/gstqsgtexture.cc b/ext/qt/gstqsgtexture.cc
+index a05d26e..4cc9fc6 100644
+--- a/ext/qt/gstqsgtexture.cc
++++ b/ext/qt/gstqsgtexture.cc
+@@ -27,7 +27,7 @@
+ 
+ #include <gst/video/video.h>
+ #include <gst/gl/gl.h>
+-#include <gst/gl/gstglfuncs.h>
++#include <ext/qt/gstqtgl.h>
+ #include "gstqsgtexture.h"
+ 
+ #define GST_CAT_DEFAULT gst_qsg_texture_debug
+diff --git a/ext/qt/qtwindow.cc b/ext/qt/qtwindow.cc
+index 9360c33..0dfd3f1 100644
+--- a/ext/qt/qtwindow.cc
++++ b/ext/qt/qtwindow.cc
+@@ -25,7 +25,7 @@
+ #include <stdio.h>
+ 
+ #include <gst/video/video.h>
+-#include <gst/gl/gstglfuncs.h>
++#include <ext/qt/gstqtgl.h>
+ #include "qtwindow.h"
+ #include "gstqsgtexture.h"
+ #include "gstqtglutility.h"
+-- 
+2.28.0
+

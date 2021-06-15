@@ -1,5 +1,8 @@
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import sys
 import os
@@ -27,9 +30,9 @@ class TestBase(unittest.TestCase):
         directory = os.path.dirname(os.path.abspath(__file__))
         self.cases_path = os.path.join(directory, 'cases')
 
-    def _testLoader(self, d={}, modules=[], tests=[], filters={}):
+    def _testLoader(self, d={}, modules=[], tests=[], **kwargs):
         from oeqa.core.context import OETestContext
         tc = OETestContext(d, self.logger)
         tc.loadTests(self.cases_path, modules=modules, tests=tests,
-                     filters=filters)
+                     **kwargs)
         return tc

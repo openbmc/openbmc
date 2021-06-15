@@ -2,18 +2,8 @@
 #
 # Copyright (C) 2014-2017 Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import sys
 import os
@@ -70,11 +60,13 @@ class RecipeHandler(object):
         if RecipeHandler.recipelibmap:
             return
         # First build up library->package mapping
-        shlib_providers = oe.package.read_shlib_providers(d)
+        d2 = bb.data.createCopy(d)
+        d2.setVar("WORKDIR_PKGDATA", "${PKGDATA_DIR}")
+        shlib_providers = oe.package.read_shlib_providers(d2)
         libdir = d.getVar('libdir')
         base_libdir = d.getVar('base_libdir')
         libpaths = list(set([base_libdir, libdir]))
-        libname_re = re.compile('^lib(.+)\.so.*$')
+        libname_re = re.compile(r'^lib(.+)\.so.*$')
         pkglibmap = {}
         for lib, item in shlib_providers.items():
             for path, pkg in item.items():
@@ -436,7 +428,7 @@ def create_recipe(args):
 
     if scriptutils.is_src_url(source):
         # Warn about github archive URLs
-        if re.match('https?://github.com/[^/]+/[^/]+/archive/.+(\.tar\..*|\.zip)$', source):
+        if re.match(r'https?://github.com/[^/]+/[^/]+/archive/.+(\.tar\..*|\.zip)$', source):
             logger.warning('github archive files are not guaranteed to be stable and may be re-generated over time. If the latter occurs, the checksums will likely change and the recipe will fail at do_fetch. It is recommended that you point to an actual commit or tag in the repository instead (using the repository URL in conjunction with the -S/--srcrev option).')
         # Fetch a URL
         fetchuri = reformat_git_uri(urldefrag(source)[0])
@@ -468,6 +460,7 @@ def create_recipe(args):
                 logger.error('branch= parameter and -B/--srcbranch option cannot both be specified - use one or the other')
                 sys.exit(1)
             srcbranch = args.srcbranch
+            params['branch'] = srcbranch
         nobranch = params.get('nobranch')
         if nobranch and srcbranch:
             logger.error('nobranch= cannot be used if you specify a branch')
@@ -485,8 +478,6 @@ def create_recipe(args):
             storeTagName = params['tag']
             params['nobranch'] = '1'
             del params['tag']
-        if scheme == 'npm':
-            params['noverify'] = '1'
         fetchuri = bb.fetch2.encodeurl((scheme, network, path, user, passwd, params))
 
         tmpparent = tinfoil.config_data.getVar('BASE_WORKDIR')
@@ -503,9 +494,7 @@ def create_recipe(args):
         if ftmpdir and args.keep_temp:
             logger.info('Fetch temp directory is %s' % ftmpdir)
 
-        dirlist = os.listdir(srctree)
-        filterout = ['git.indirectionsymlink']
-        dirlist = [x for x in dirlist if x not in filterout]
+        dirlist = scriptutils.filter_src_subdirs(srctree)
         logger.debug('Directory listing (excluding filtered out):\n  %s' % '\n  '.join(dirlist))
         if len(dirlist) == 1:
             singleitem = os.path.join(srctree, dirlist[0])
@@ -704,7 +693,7 @@ def create_recipe(args):
         if not args.autorev and srcrev == '${AUTOREV}':
             if os.path.exists(os.path.join(srctree, '.git')):
                 (stdout, _) = bb.process.run('git rev-parse HEAD', cwd=srctree)
-            srcrev = stdout.rstrip()
+                srcrev = stdout.rstrip()
         lines_before.append('SRCREV = "%s"' % srcrev)
     if args.provides:
         lines_before.append('PROVIDES = "%s"' % args.provides)
@@ -724,10 +713,8 @@ def create_recipe(args):
         lines_after.append('INSANE_SKIP_${PN} += "already-stripped"')
         lines_after.append('')
 
-    if args.fetch_dev:
-        extravalues['fetchdev'] = True
-    else:
-        extravalues['fetchdev'] = None
+    if args.npm_dev:
+        extravalues['NPM_INSTALL_DEV'] = 1
 
     # Find all plugins that want to register handlers
     logger.debug('Loading recipe handlers')
@@ -843,7 +830,7 @@ def create_recipe(args):
         elif line.startswith('PV = '):
             if realpv:
                 # Replace the first part of the PV value
-                line = re.sub('"[^+]*\+', '"%s+' % realpv, line)
+                line = re.sub(r'"[^+]*\+', '"%s+' % realpv, line)
         lines_before.append(line)
 
     if args.also_native:
@@ -1063,6 +1050,7 @@ def get_license_md5sums(d, static_only=False):
     md5sums['3b83ef96387f14655fc854ddc3c6bd57'] = 'Apache-2.0'
     md5sums['385c55653886acac3821999a3ccd17b3'] = 'Artistic-1.0 | GPL-2.0' # some perl modules
     md5sums['54c7042be62e169199200bc6477f04d1'] = 'BSD-3-Clause'
+    md5sums['bfe1f75d606912a4111c90743d6c7325'] = 'MPL-1.1'
     return md5sums
 
 def crunch_license(licfile):
@@ -1078,8 +1066,8 @@ def crunch_license(licfile):
     import oe.utils
 
     # Note: these are carefully constructed!
-    license_title_re = re.compile('^\(?(#+ *)?(The )?.{1,10} [Ll]icen[sc]e( \(.{1,10}\))?\)?:?$')
-    license_statement_re = re.compile('^(This (project|software) is( free software)? (released|licen[sc]ed)|(Released|Licen[cs]ed)) under the .{1,10} [Ll]icen[sc]e:?$')
+    license_title_re = re.compile(r'^\(?(#+ *)?(The )?.{1,10} [Ll]icen[sc]e( \(.{1,10}\))?\)?:?$')
+    license_statement_re = re.compile(r'^(This (project|software) is( free software)? (released|licen[sc]ed)|(Released|Licen[cs]ed)) under the .{1,10} [Ll]icen[sc]e:?$')
     copyright_re = re.compile('^(#+)? *Copyright .*$')
 
     crunched_md5sums = {}
@@ -1322,7 +1310,7 @@ def register_commands(subparsers):
     group.add_argument('-S', '--srcrev', help='Source revision to fetch if fetching from an SCM such as git (default latest)')
     parser_create.add_argument('-B', '--srcbranch', help='Branch in source repository if fetching from an SCM such as git (default master)')
     parser_create.add_argument('--keep-temp', action="store_true", help='Keep temporary directory (for debugging)')
-    parser_create.add_argument('--fetch-dev', action="store_true", help='For npm, also fetch devDependencies')
+    parser_create.add_argument('--npm-dev', action="store_true", help='For npm, also fetch devDependencies')
     parser_create.add_argument('--devtool', action="store_true", help=argparse.SUPPRESS)
     parser_create.add_argument('--mirrors', action="store_true", help='Enable PREMIRRORS and MIRRORS for source tree fetching (disabled by default).')
     parser_create.set_defaults(func=create_recipe)

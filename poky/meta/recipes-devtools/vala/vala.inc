@@ -1,4 +1,5 @@
 SUMMARY = "C#-like programming language for easing GObject programming"
+HOMEPAGE = "http://vala-project.org"
 DESCRIPTION = "Vala is a C#-like language dedicated to ease GObject programming. \
 Vala compiles to plain C and has no runtime environment nor penalities whatsoever."
 SECTION = "devel"
@@ -12,7 +13,6 @@ DEPENDS_append_class-target = " ${@bb.utils.contains('DISTRO_FEATURES', 'api-doc
 # vala-native contains a native version of vapigen, which we use instead of the target one
 DEPENDS_append_class-target = " vala-native"
 BBCLASSEXTEND = "native"
-HOMEPAGE = "http://vala-project.org"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 
@@ -37,7 +37,7 @@ EOF
         chmod +x ${B}/vapigen-wrapper
 }
 
-EXTRA_OECONF += " --disable-graphviz"
+EXTRA_OECONF += " --disable-valadoc"
 
 # Vapigen wrapper needs to be available system-wide, because it will be used
 # to build vapi files from all other packages with vala support

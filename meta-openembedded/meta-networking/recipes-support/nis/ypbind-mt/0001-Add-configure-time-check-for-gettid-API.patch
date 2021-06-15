@@ -1,0 +1,45 @@
+From 25d5daf30aa2dc451ba528712f668036d8506054 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 Jul 2019 07:50:26 -0700
+Subject: [PATCH] Add configure time check for gettid API
+
+glibc 2.30 has added this syscalls wrapper
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac  | 1 +
+ src/log_msg.c | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 9e32a4a..6d1067b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -33,6 +33,7 @@ if test -n "$TIRPC_LIBS"; then
+   AC_DEFINE(HAVE_TIRPC, 1, [Define to 1 if TIRPC is available])
+ fi
+ 
++AC_CHECK_FUNCS(gettid)
+ dnl The difficult part: could we reconfigure NSS or must we use DNS ?
+ AC_CHECK_FUNCS(__nss_configure_lookup)
+ if eval "test \"`echo '$ac_cv_func___nss_configure_lookup'`\" != yes"; then
+diff --git a/src/log_msg.c b/src/log_msg.c
+index 49f0905..37da311 100644
+--- a/src/log_msg.c
++++ b/src/log_msg.c
+@@ -26,6 +26,7 @@
+ #include "log_msg.h"
+ 
+ #include <sys/syscall.h>
++#if !HAVE_GETTID
+ #ifdef __NR_gettid
+ static pid_t
+ gettid (void)
+@@ -39,6 +40,7 @@ gettid (void)
+     return getpid ();
+ }
+ #endif
++#endif
+ 
+ int debug_flag = 0;
+ int logfile_flag = 0;

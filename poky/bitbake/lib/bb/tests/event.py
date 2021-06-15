@@ -1,35 +1,23 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # BitBake Tests for the Event implementation (event.py)
 #
 # Copyright (C) 2017 Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 
-import unittest
-import bb
-import logging
-import bb.compat
-import bb.event
+import collections
 import importlib
+import logging
+import pickle
 import threading
 import time
-import pickle
+import unittest
 from unittest.mock import Mock
 from unittest.mock import call
+
+import bb
+import bb.event
 from bb.msg import BBLogFormatter
 
 
@@ -88,7 +76,7 @@ class EventHandlingTest(unittest.TestCase):
 
     def _create_test_handlers(self):
         """ Method used to create a test handler ordered dictionary """
-        test_handlers = bb.compat.OrderedDict()
+        test_handlers = collections.OrderedDict()
         test_handlers["handler1"] = self._test_process.handler1
         test_handlers["handler2"] = self._test_process.handler2
         return test_handlers
@@ -109,7 +97,7 @@ class EventHandlingTest(unittest.TestCase):
 
     def test_clean_class_handlers(self):
         """ Test clean_class_handlers method """
-        cleanDict = bb.compat.OrderedDict()
+        cleanDict = collections.OrderedDict()
         self.assertEqual(cleanDict,
                          bb.event.clean_class_handlers())
 
@@ -572,14 +560,6 @@ class EventClassesTest(unittest.TestCase):
         callback = lambda a: 2 * a
         event = bb.event.RecipeParsed(callback)
         self.assertEqual(event.fn(1), callback(1))
-        self.assertEqual(event.pid, EventClassesTest._worker_pid)
-
-    def test_StampUpdate(self):
-        targets = ["foo", "bar"]
-        stampfns = [lambda:"foobar"]
-        event = bb.event.StampUpdate(targets, stampfns)
-        self.assertEqual(event.targets, targets)
-        self.assertEqual(event.stampPrefix, stampfns)
         self.assertEqual(event.pid, EventClassesTest._worker_pid)
 
     def test_BuildBase(self):

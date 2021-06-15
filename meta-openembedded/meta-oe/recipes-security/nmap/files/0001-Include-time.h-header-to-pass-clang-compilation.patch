@@ -1,0 +1,73 @@
+From a068952a20880fc864e8cb8b49f8a6b143a5ac30 Mon Sep 17 00:00:00 2001
+From: Peiran Hong <peiran.hong@windriver.com>
+Date: Fri, 20 Sep 2019 15:02:45 -0400
+Subject: [PATCH] Include time.h header to pass clang compilation
+
+---
+ nmap_error.cc       | 11 +----------
+ nping/EchoServer.cc |  1 +
+ osscan2.cc          |  1 +
+ service_scan.cc     |  1 +
+ 4 files changed, 4 insertions(+), 10 deletions(-)
+
+diff --git a/nmap_error.cc b/nmap_error.cc
+index 588b13c33..254107ff5 100644
+--- a/nmap_error.cc
++++ b/nmap_error.cc
+@@ -135,16 +135,7 @@
+ #include "xml.h"
+ 
+ #include <errno.h>
+-#if TIME_WITH_SYS_TIME
+-# include <sys/time.h>
+-# include <time.h>
+-#else
+-# if HAVE_SYS_TIME_H
+-#  include <sys/time.h>
+-# else
+-#  include <time.h>
+-# endif
+-#endif
++#include <time.h>
+ 
+ extern NmapOps o;
+ 
+diff --git a/nping/EchoServer.cc b/nping/EchoServer.cc
+index ccdcf9c2d..c403aeda5 100644
+--- a/nping/EchoServer.cc
++++ b/nping/EchoServer.cc
+@@ -137,6 +137,7 @@
+ #include "NpingOps.h"
+ #include "ProbeMode.h"
+ #include <signal.h>
++#include <time.h>
+ 
+ extern NpingOps o;
+ extern EchoServer es;
+diff --git a/osscan2.cc b/osscan2.cc
+index aa31feb12..89673e108 100644
+--- a/osscan2.cc
++++ b/osscan2.cc
+@@ -147,6 +147,7 @@
+ 
+ #include <list>
+ #include <math.h>
++#include <time.h>
+ 
+ extern NmapOps o;
+ #ifdef WIN32
+diff --git a/service_scan.cc b/service_scan.cc
+index 57a92ed28..ef277bb1f 100644
+--- a/service_scan.cc
++++ b/service_scan.cc
+@@ -145,6 +145,7 @@
+ #include "nmap_tty.h"
+ 
+ #include <errno.h>
++#include <time.h>
+ 
+ #if HAVE_OPENSSL
+ /* OpenSSL 1.0.0 needs _WINSOCKAPI_ to be defined, otherwise it loads
+-- 
+2.21.0
+

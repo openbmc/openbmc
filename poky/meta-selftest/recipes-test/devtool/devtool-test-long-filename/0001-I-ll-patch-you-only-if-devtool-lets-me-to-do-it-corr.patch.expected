@@ -1,0 +1,16 @@
+From 45ba3d107ea60777a6b6e134fd00fe5009749177 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 28 May 2020 02:03:39 +0200
+Subject: [PATCH] meta-selftest: add test for .patch file with long filename
+
+---
+ patch-me | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/patch-me b/patch-me
+index a20b29a..5e35d1b 100644
+--- a/patch-me
++++ b/patch-me
+@@ -1 +1 @@
+-please
++NO

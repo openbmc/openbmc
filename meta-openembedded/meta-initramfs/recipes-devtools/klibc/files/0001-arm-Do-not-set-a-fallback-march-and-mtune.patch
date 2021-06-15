@@ -14,8 +14,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  usr/klibc/arch/arm/MCONFIG | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/usr/klibc/arch/arm/MCONFIG b/usr/klibc/arch/arm/MCONFIG
-index 303c6ac..48d2685 100644
 --- a/usr/klibc/arch/arm/MCONFIG
 +++ b/usr/klibc/arch/arm/MCONFIG
 @@ -10,7 +10,7 @@

@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 
 DEPENDS = "libconfig"
 
-inherit autotools pkgconfig systemd update-rc.d
+inherit autotools pkgconfig systemd update-rc.d update-alternatives
 
 PV = "0.2.0+git${SRCPV}"
 SRCREV = "45c14ef4d5d7ced0fbf984208de44ced6d5ed898"
@@ -38,3 +38,8 @@ do_install_append() {
 }
 
 RDEPENDS_${PN} += "libusbgx-config"
+
+ALTERNATIVE_PRIORITY = "90"
+ALTERNATIVE_${PN} = "gadget-acm-ecm show-gadgets"
+ALTERNATIVE_LINK_NAME[gadget-acm-ecm] = "${bindir}/gadget-acm-ecm"
+ALTERNATIVE_LINK_NAME[show-gadgets] = "${bindir}/show-gadgets"

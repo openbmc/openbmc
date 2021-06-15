@@ -8,17 +8,20 @@ Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
 
 forward ported to 2.4.4
 Signed-off-by: Armin Kuster <akuster@mvista.com>
+---
+ src/libassuan.m4 | 81 ++----------------------------------------------
+ 1 file changed, 3 insertions(+), 78 deletions(-)
 
-Index: libassuan-2.5.2/src/libassuan.m4
-===================================================================
---- libassuan-2.5.2.orig/src/libassuan.m4
-+++ libassuan-2.5.2/src/libassuan.m4
-@@ -16,27 +16,6 @@ dnl Returns ok set to yes or no.
+diff --git a/src/libassuan.m4 b/src/libassuan.m4
+index df50484..380a48a 100644
+--- a/src/libassuan.m4
++++ b/src/libassuan.m4
+@@ -17,27 +17,6 @@ dnl Returns ok set to yes or no.
  dnl
  AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
  [ AC_REQUIRE([AC_CANONICAL_HOST])
 -  AC_ARG_WITH(libassuan-prefix,
--              AC_HELP_STRING([--with-libassuan-prefix=PFX],
+-              AS_HELP_STRING([--with-libassuan-prefix=PFX],
 -                             [prefix where LIBASSUAN is installed (optional)]),
 -     libassuan_config_prefix="$withval", libassuan_config_prefix="")
 -  if test x$libassuan_config_prefix != x ; then
@@ -41,10 +44,11 @@ Index: libassuan-2.5.2/src/libassuan.m4
  
    tmp=ifelse([$1], ,1:0.9.2,$1)
    if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
-@@ -47,58 +26,11 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+@@ -47,59 +26,11 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+     req_libassuan_api=0
      min_libassuan_version="$tmp"
    fi
- 
+-
 -  AC_MSG_CHECKING(for LIBASSUAN - version >= $min_libassuan_version)
 -  ok=no
 -  if test "$LIBASSUAN_CONFIG" != "no"; then
@@ -102,7 +106,7 @@ Index: libassuan-2.5.2/src/libassuan.m4
        if test "$tmp" -gt 0 ; then
          AC_MSG_CHECKING([LIBASSUAN API version])
          if test "$req_libassuan_api" -eq "$tmp" ; then
-@@ -114,9 +46,7 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
+@@ -115,9 +46,7 @@ AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
    if test $ok = yes; then
      if test x"$host" != x ; then
        if test -z "$use_gpgrt_config"; then
@@ -113,7 +117,7 @@ Index: libassuan-2.5.2/src/libassuan.m4
        fi
        if test x"$libassuan_config_host" != xnone ; then
          if test x"$libassuan_config_host" != x"$host" ; then
-@@ -158,12 +88,8 @@ dnl
+@@ -159,12 +88,8 @@ dnl
  AC_DEFUN([AM_PATH_LIBASSUAN],
  [ _AM_PATH_LIBASSUAN_COMMON($1)
    if test $ok = yes; then
@@ -126,3 +130,6 @@ Index: libassuan-2.5.2/src/libassuan.m4
      ifelse([$3], , :, [$3])
    fi
    AC_SUBST(LIBASSUAN_CFLAGS)
+-- 
+2.25.1
+

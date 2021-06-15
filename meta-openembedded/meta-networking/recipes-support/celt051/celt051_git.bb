@@ -9,14 +9,14 @@ with high quality. Unlike these formats CELT imposes very little delay \
 on the signal, even less than is typical for speech centric formats \
 like Speex, GSM, or G.729."
 
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=375f60ab360d17f0172737036ff155b2"
 
 PV = "0.5.1.3+git${SRCPV}"
 
 SRCREV = "5555aae843f57241d005e330b9cb65602d56db0f"
 
-SRC_URI = "git://git.xiph.org/celt.git;branch=compat-v0.5.1;protocol=https \
+SRC_URI = "git://gitlab.xiph.org/xiph/celt.git;branch=compat-v0.5.1;protocol=https \
            file://0001-configure.ac-make-tools-support-optional.patch \
            file://0001-tests-Include-entcode.c-into-test-sources-to-provide.patch \
            "

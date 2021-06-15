@@ -1,0 +1,79 @@
+From 5464d9e1bfd1a1c54338ec7c4148cad1b222ef93 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Tue, 24 Apr 2012 18:45:14 +0200
+Subject: [PATCH] SConstruct: prefix includepy with sysroot and drop sysroot
+ from python_lib_dir
+
+* without PYTHONPATH, distutil's sysconfig returns INCLUDEPY without sysroot prefix
+  and with PYTHONPATH from OE it's pointing to native python dir
+
+    $ export PYTHONPATH=/OE/shr-core/tmp-eglibc/sysroots/om-gta02/usr/lib/python2.7/
+    $ python
+    Python 2.7.2 (default, Apr 18 2012, 09:19:59)
+    [GCC 4.6.2] on linux2
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> from distutils import sysconfig
+    >>> sysconfig.get_config_vars('INCLUDEPY')
+    ['/OE/shr-core/tmp-eglibc/sysroots/x86_64-linux/usr/include/python2.7']
+    >>>
+    $ unset PYTHONPATH
+    $ python
+    Python 2.7.2 (default, Apr 18 2012, 09:19:59)
+    [GCC 4.6.2] on linux2
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> from distutils import sysconfig
+    >>> sysconfig.get_config_vars('INCLUDEPY')
+    ['/python2.7']
+    >>> import sysconfig
+    >>> sysconfig.get_config_vars('INCLUDEPY')
+    ['/OE/shr-core/tmp-eglibc/sysroots/x86_64-linux/usr/include/python2.7']
+* python_lib_dir = python_lib_dir.replace(env['sysroot'], '')
+  returns path to target sysroot
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Signed-off-by: Peter A. Bigot <pab@pabigot.com>
+
+---
+ SConstruct | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/SConstruct b/SConstruct
+index b8f3fb1..883e06d 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -980,7 +980,7 @@ else:
+ 
+ # Set up configuration for target Python
+ 
+-PYTHON_LIBDIR_CALL = 'sysconfig.get_python_lib()'
++PYTHON_LIBDIR_CALL = 'sysconfig.get_python_lib(plat_specific=1)'
+ 
+ PYTHON_CONFIG_NAMES = ['CC', 'CXX', 'OPT', 'BASECFLAGS',
+                        'CCSHARED', 'LDSHARED', 'SO', 'INCLUDEPY', 'LDFLAGS']
+@@ -1506,7 +1506,7 @@ else:
+                        LINK=ldshared,
+                        SHLIBPREFIX="",
+                        SHLIBSUFFIX=python_config['SO'],
+-                       CPPPATH=[python_config['INCLUDEPY']],
++                       CPPPATH=[os.path.normpath("%s/%s/%s/%s" % (env['sysroot'], env['prefix'], env['includedir'], python_config['INCLUDEPY']))] if env['sysroot'] else [python_config['INCLUDEPY']],
+                        CPPFLAGS=python_config['OPT'],
+                        CFLAGS=python_config['BASECFLAGS'],
+                        CXXFLAGS=python_config['BASECFLAGS'])
+@@ -1808,12 +1808,14 @@ if ((not env['debug'] and not env['profiling'] and not env['nostrip'] and
+     env.AddPostAction(binaryinstall, '$STRIP $TARGET')
+ 
+ if env['python']:
+-    python_module_dir = str(python_libdir) + os.sep + 'gps'
++    python_module_dir = python_libdir.replace(env['sysroot'], '') + os.sep + 'gps'
+     python_extensions_install = python_env.Install(DESTDIR + python_module_dir,
+                                                    python_built_extensions)
+     if ((not env['debug'] and not env['profiling'] and
+          not env['nostrip'] and not sys.platform.startswith('darwin'))):
+         python_env.AddPostAction(python_extensions_install, '$STRIP $TARGET')
++    env.AddPostAction(python_extensions_install, '$CHRPATH -r "%s" "$TARGET"' \
++                     % (python_libdir, ))
+ 
+     python_modules_install = python_env.Install(DESTDIR + python_module_dir,
+                                                 python_modules)

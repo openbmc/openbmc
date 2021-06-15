@@ -1,0 +1,21 @@
+[Unit]
+Description=SSL/SSH multiplexer
+Requires=gbmc-ncsi-sslh.socket
+After=gbmc-ncsi-sslh.socket
+
+[Service]
+ExecStart=/usr/sbin/sslh -n -f --ssh [::1]:22 --http [::1]:80 --tls [::1]:443
+KillMode=process
+#Hardening
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+MountFlags=private
+NoNewPrivileges=true
+PrivateDevices=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryDenyWriteExecute=true
+DynamicUser=true

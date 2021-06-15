@@ -1,6 +1,7 @@
 # Copyright (c) 2018 Joshua Watt, Garmin International,Inc.
 # Released under the MIT license (see COPYING.MIT for the terms)
 SUMMARY = "Generates Icecream toolchain for SDK"
+DESCRIPTION = "${SUMMARY}"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/icecc-env.sh;beginline=2;endline=20;md5=dd6b68c1efed8a9fb04e409b3b287d47"
 

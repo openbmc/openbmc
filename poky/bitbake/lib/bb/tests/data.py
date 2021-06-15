@@ -1,23 +1,10 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # BitBake Tests for the Data Store (data.py/data_smart.py)
 #
 # Copyright (C) 2010 Chris Larson
 # Copyright (C) 2012 Richard Purdie
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 
 import unittest
@@ -25,6 +12,7 @@ import bb
 import bb.data
 import bb.parse
 import logging
+import os
 
 class LogRecord():
     def __enter__(self):
@@ -394,6 +382,19 @@ class TestOverrides(unittest.TestCase):
         self.d.setVar("OVERRIDES", "foo:bar:some_val")
         self.assertEqual(self.d.getVar("TEST"), " testvalue5")
 
+    def test_append_and_override_1(self):
+        self.d.setVar("TEST_append", "testvalue2")
+        self.d.setVar("TEST_bar", "testvalue3")
+        self.assertEqual(self.d.getVar("TEST"), "testvalue3testvalue2")
+
+    def test_append_and_override_2(self):
+        self.d.setVar("TEST_append_bar", "testvalue2")
+        self.assertEqual(self.d.getVar("TEST"), "testvaluetestvalue2")
+
+    def test_append_and_override_3(self):
+        self.d.setVar("TEST_bar_append", "testvalue2")
+        self.assertEqual(self.d.getVar("TEST"), "testvalue2")
+
     # Test an override with _<numeric> in it based on a real world OE issue
     def test_underscore_override(self):
         self.d.setVar("TARGET_ARCH", "x86_64")
@@ -476,10 +477,10 @@ class Contains(unittest.TestCase):
 class TaskHash(unittest.TestCase):
     def test_taskhashes(self):
         def gettask_bashhash(taskname, d):
-            tasklist, gendeps, lookupcache = bb.data.generate_dependencies(d)
+            tasklist, gendeps, lookupcache = bb.data.generate_dependencies(d, set())
             taskdeps, basehash = bb.data.generate_dependency_hash(tasklist, gendeps, lookupcache, set(), "somefile")
             bb.warn(str(lookupcache))
-            return basehash["somefile." + taskname]
+            return basehash["somefile:" + taskname]
 
         d = bb.data.init()
         d.setVar("__BBTASKS", ["mytask"])
@@ -544,142 +545,3 @@ class Serialize(unittest.TestCase):
         self.assertEqual(newd.getVarFlag('HELLO', 'other'), 'planet')
 
 
-# Remote datastore tests
-# These really only test the interface, since in actual usage we have a
-# tinfoil connector that does everything over RPC, and this doesn't test
-# that.
-
-class TestConnector:
-    d = None
-    def __init__(self, d):
-        self.d = d
-    def getVar(self, name):
-        return self.d._findVar(name)
-    def getKeys(self):
-        return set(self.d.keys())
-    def getVarHistory(self, name):
-        return self.d.varhistory.variable(name)
-    def expandPythonRef(self, varname, expr, d):
-        localdata = self.d.createCopy()
-        for key in d.localkeys():
-            localdata.setVar(d.getVar(key))
-        varparse = bb.data_smart.VariableParse(varname, localdata)
-        return varparse.python_sub(expr)
-    def setVar(self, name, value):
-        self.d.setVar(name, value)
-    def setVarFlag(self, name, flag, value):
-        self.d.setVarFlag(name, flag, value)
-    def delVar(self, name):
-        self.d.delVar(name)
-        return False
-    def delVarFlag(self, name, flag):
-        self.d.delVarFlag(name, flag)
-        return False
-    def renameVar(self, name, newname):
-        self.d.renameVar(name, newname)
-        return False
-
-class Remote(unittest.TestCase):
-    def test_remote(self):
-
-        d1 = bb.data.init()
-        d1.enableTracking()
-        d2 = bb.data.init()
-        d2.enableTracking()
-        connector = TestConnector(d1)
-
-        d2.setVar('_remote_data', connector)
-
-        d1.setVar('HELLO', 'world')
-        d1.setVarFlag('OTHER', 'flagname', 'flagvalue')
-        self.assertEqual(d2.getVar('HELLO'), 'world')
-        self.assertEqual(d2.expand('${HELLO}'), 'world')
-        self.assertEqual(d2.expand('${@d.getVar("HELLO")}'), 'world')
-        self.assertIn('flagname', d2.getVarFlags('OTHER'))
-        self.assertEqual(d2.getVarFlag('OTHER', 'flagname'), 'flagvalue')
-        self.assertEqual(d1.varhistory.variable('HELLO'), d2.varhistory.variable('HELLO'))
-        # Test setVar on client side affects server
-        d2.setVar('HELLO', 'other-world')
-        self.assertEqual(d1.getVar('HELLO'), 'other-world')
-        # Test setVarFlag on client side affects server
-        d2.setVarFlag('HELLO', 'flagname', 'flagvalue')
-        self.assertEqual(d1.getVarFlag('HELLO', 'flagname'), 'flagvalue')
-        # Test client side data is incorporated in python expansion (which is done on server)
-        d2.setVar('FOO', 'bar')
-        self.assertEqual(d2.expand('${@d.getVar("FOO")}'), 'bar')
-        # Test overrides work
-        d1.setVar('FOO_test', 'baz')
-        d1.appendVar('OVERRIDES', ':test')
-        self.assertEqual(d2.getVar('FOO'), 'baz')
-
-
-# Remote equivalents of local test classes
-# Note that these aren't perfect since we only test in one direction
-
-class RemoteDataExpansions(DataExpansions):
-    def setUp(self):
-        self.d1 = bb.data.init()
-        self.d = bb.data.init()
-        self.d1["foo"] = "value_of_foo"
-        self.d1["bar"] = "value_of_bar"
-        self.d1["value_of_foo"] = "value_of_'value_of_foo'"
-        connector = TestConnector(self.d1)
-        self.d.setVar('_remote_data', connector)
-
-class TestRemoteNestedExpansions(TestNestedExpansions):
-    def setUp(self):
-        self.d1 = bb.data.init()
-        self.d = bb.data.init()
-        self.d1["foo"] = "foo"
-        self.d1["bar"] = "bar"
-        self.d1["value_of_foobar"] = "187"
-        connector = TestConnector(self.d1)
-        self.d.setVar('_remote_data', connector)
-
-class TestRemoteConcat(TestConcat):
-    def setUp(self):
-        self.d1 = bb.data.init()
-        self.d = bb.data.init()
-        self.d1.setVar("FOO", "foo")
-        self.d1.setVar("VAL", "val")
-        self.d1.setVar("BAR", "bar")
-        connector = TestConnector(self.d1)
-        self.d.setVar('_remote_data', connector)
-
-class TestRemoteConcatOverride(TestConcatOverride):
-    def setUp(self):
-        self.d1 = bb.data.init()
-        self.d = bb.data.init()
-        self.d1.setVar("FOO", "foo")
-        self.d1.setVar("VAL", "val")
-        self.d1.setVar("BAR", "bar")
-        connector = TestConnector(self.d1)
-        self.d.setVar('_remote_data', connector)
-
-class TestRemoteOverrides(TestOverrides):
-    def setUp(self):
-        self.d1 = bb.data.init()
-        self.d = bb.data.init()
-        self.d1.setVar("OVERRIDES", "foo:bar:local")
-        self.d1.setVar("TEST", "testvalue")
-        connector = TestConnector(self.d1)
-        self.d.setVar('_remote_data', connector)
-
-class TestRemoteKeyExpansion(TestKeyExpansion):
-    def setUp(self):
-        self.d1 = bb.data.init()
-        self.d = bb.data.init()
-        self.d1.setVar("FOO", "foo")
-        self.d1.setVar("BAR", "foo")
-        connector = TestConnector(self.d1)
-        self.d.setVar('_remote_data', connector)
-
-class TestRemoteFlags(TestFlags):
-    def setUp(self):
-        self.d1 = bb.data.init()
-        self.d = bb.data.init()
-        self.d1.setVar("foo", "value of foo")
-        self.d1.setVarFlag("foo", "flag1", "value of flag1")
-        self.d1.setVarFlag("foo", "flag2", "value of flag2")
-        connector = TestConnector(self.d1)
-        self.d.setVar('_remote_data', connector)

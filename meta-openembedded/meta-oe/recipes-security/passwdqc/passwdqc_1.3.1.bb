@@ -21,10 +21,10 @@ SECTION = "System Environment/Base"
 
 DEPENDS += "libpam"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
-LICENSE = "BSD"
+LICENSE = "BSD-1-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1b4af6f3d4ee079a38107366e93b334d"
 
 SRC_URI = "http://www.openwall.com/${BPN}/${BP}.tar.gz \
@@ -35,7 +35,7 @@ SRC_URI[sha256sum] = "d1fedeaf759e8a0f32d28b5811ef11b5a5365154849190f4b7fab670a7
 
 # explicitly define LINUX_PAM in case DISTRO_FEATURES no pam
 # this package's pam_passwdqc.so needs pam
-CFLAGS_append += "-Wall -fPIC -DHAVE_SHADOW -DLINUX_PAM"
+CFLAGS_append = " -Wall -fPIC -DHAVE_SHADOW -DLINUX_PAM"
 
 # -e is no longer default setting in bitbake.conf
 EXTRA_OEMAKE = "-e"

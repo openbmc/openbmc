@@ -1,0 +1,30 @@
+From 1ba007583b83468494c4146bcb7267d863de6a7b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 Feb 2021 23:54:10 -0800
+Subject: [PATCH] fix strncpy bound error
+
+This patch fixes the following error while using gcc 11
+error: 'char* __builtin_strncpy(char*, const char*, long unsigned int)' specified bound depends on the length of the source argument [-Werror=stringop-overflow=]
+
+Upstream-Status: Submitted [https://github.com/KhronosGroup/SPIRV-Tools/pull/4151]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ source/diagnostic.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/diagnostic.cpp b/source/diagnostic.cpp
+index edc27c8fd..77c29d70c 100644
+--- a/source/diagnostic.cpp
++++ b/source/diagnostic.cpp
+@@ -37,7 +37,7 @@ spv_diagnostic spvDiagnosticCreate(const spv_position position,
+   diagnostic->position = *position;
+   diagnostic->isTextSource = false;
+   memset(diagnostic->error, 0, length);
+-  strncpy(diagnostic->error, message, length);
++  memcpy(diagnostic->error, message, length);
+   return diagnostic;
+ }
+ 
+-- 
+2.30.1
+

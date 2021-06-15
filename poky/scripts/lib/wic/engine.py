@@ -1,21 +1,7 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # Copyright (c) 2013, Intel Corporation.
-# All rights reserved.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # DESCRIPTION
 
@@ -33,6 +19,7 @@ import os
 import tempfile
 import json
 import subprocess
+import re
 
 from collections import namedtuple, OrderedDict
 from distutils.spawn import find_executable
@@ -89,7 +76,8 @@ def find_canned_image(scripts_path, wks_file):
             for fname in files:
                 if fname.endswith("~") or fname.endswith("#"):
                     continue
-                if fname.endswith(".wks") and wks_file + ".wks" == fname:
+                if ((fname.endswith(".wks") and wks_file + ".wks" == fname) or \
+                   (fname.endswith(".wks.in") and wks_file + ".wks.in" == fname)):
                     fullpath = os.path.join(canned_wks_dir, fname)
                     return fullpath
     return None
@@ -106,7 +94,7 @@ def list_canned_images(scripts_path):
             for fname in files:
                 if fname.endswith("~") or fname.endswith("#"):
                     continue
-                if fname.endswith(".wks"):
+                if fname.endswith(".wks") or fname.endswith(".wks.in"):
                     fullpath = os.path.join(canned_wks_dir, fname)
                     with open(fullpath) as wks:
                         for line in wks:
@@ -115,7 +103,7 @@ def list_canned_images(scripts_path):
                             if idx != -1:
                                 desc = line[idx + len("short-description:"):].strip()
                                 break
-                    basename = os.path.splitext(fname)[0]
+                    basename = fname.split('.')[0]
                     print("  %s\t\t%s" % (basename.ljust(30), desc))
 
 
@@ -292,7 +280,7 @@ class Disk:
     def __getattr__(self, name):
         """Get path to the executable in a lazy way."""
         if name in ("mdir", "mcopy", "mdel", "mdeltree", "sfdisk", "e2fsck",
-                    "resize2fs", "mkswap", "mkdosfs", "debugfs"):
+                    "resize2fs", "mkswap", "mkdosfs", "debugfs","blkid"):
             aname = "_%s" % name
             if aname not in self.__dict__:
                 setattr(self, aname, find_executable(name, self.paths))
@@ -303,7 +291,7 @@ class Disk:
 
     def _get_part_image(self, pnum):
         if pnum not in self.partitions:
-            raise WicError("Partition %s is not in the image")
+            raise WicError("Partition %s is not in the image" % pnum)
         part = self.partitions[pnum]
         # check if fstype is supported
         for fstype in self.fstypes:
@@ -326,6 +314,9 @@ class Disk:
                     seek=self.partitions[pnum].start)
 
     def dir(self, pnum, path):
+        if pnum not in self.partitions:
+            raise WicError("Partition %s is not in the image" % pnum)
+
         if self.partitions[pnum].fstype.startswith('ext'):
             return exec_cmd("{} {} -R 'ls -l {}'".format(self.debugfs,
                                                          self._get_part_image(pnum),
@@ -335,38 +326,80 @@ class Disk:
                                                    self._get_part_image(pnum),
                                                    path))
 
-    def copy(self, src, pnum, path):
+    def copy(self, src, dest):
         """Copy partition image into wic image."""
+        pnum =  dest.part if isinstance(src, str) else src.part
+
         if self.partitions[pnum].fstype.startswith('ext'):
-            cmd = "printf 'cd {}\nwrite {} {}\n' | {} -w {}".\
-                      format(path, src, os.path.basename(src),
+            if isinstance(src, str):
+                cmd = "printf 'cd {}\nwrite {} {}\n' | {} -w {}".\
+                      format(os.path.dirname(dest.path), src, os.path.basename(src),
                              self.debugfs, self._get_part_image(pnum))
+            else: # copy from wic
+                # run both dump and rdump to support both files and directory
+                cmd = "printf 'cd {}\ndump /{} {}\nrdump /{} {}\n' | {} {}".\
+                      format(os.path.dirname(src.path), src.path,
+                             dest, src.path, dest, self.debugfs,
+                             self._get_part_image(pnum))
         else: # fat
-            cmd = "{} -i {} -snop {} ::{}".format(self.mcopy,
+            if isinstance(src, str):
+                cmd = "{} -i {} -snop {} ::{}".format(self.mcopy,
                                                   self._get_part_image(pnum),
-                                                  src, path)
+                                                  src, dest.path)
+            else:
+                cmd = "{} -i {} -snop ::{} {}".format(self.mcopy,
+                                                  self._get_part_image(pnum),
+                                                  src.path, dest)
+
         exec_cmd(cmd, as_shell=True)
         self._put_part_image(pnum)
 
-    def remove(self, pnum, path):
+    def remove_ext(self, pnum, path, recursive):
+        """
+        Remove files/dirs and their contents from the partition.
+        This only applies to ext* partition.
+        """
+        abs_path = re.sub('\/\/+', '/', path)
+        cmd = "{} {} -wR 'rm \"{}\"'".format(self.debugfs,
+                                            self._get_part_image(pnum),
+                                            abs_path)
+        out = exec_cmd(cmd , as_shell=True)
+        for line in out.splitlines():
+            if line.startswith("rm:"):
+                if "file is a directory" in line:
+                    if recursive:
+                        # loop through content and delete them one by one if
+                        # flaged with -r
+                        subdirs = iter(self.dir(pnum, abs_path).splitlines())
+                        next(subdirs)
+                        for subdir in subdirs:
+                            dir = subdir.split(':')[1].split(" ", 1)[1]
+                            if not dir == "." and not dir == "..":
+                                self.remove_ext(pnum, "%s/%s" % (abs_path, dir), recursive)
+
+                    rmdir_out = exec_cmd("{} {} -wR 'rmdir \"{}\"'".format(self.debugfs,
+                                                    self._get_part_image(pnum),
+                                                    abs_path.rstrip('/'))
+                                                    , as_shell=True)
+
+                    for rmdir_line in rmdir_out.splitlines():
+                        if "directory not empty" in rmdir_line:
+                            raise WicError("Could not complete operation: \n%s \n"
+                                            "use -r to remove non-empty directory" % rmdir_line)
+                        if rmdir_line.startswith("rmdir:"):
+                            raise WicError("Could not complete operation: \n%s "
+                                            "\n%s" % (str(line), rmdir_line))
+
+                else:
+                    raise WicError("Could not complete operation: \n%s "
+                                    "\nUnable to remove %s" % (str(line), abs_path))
+
+    def remove(self, pnum, path, recursive):
         """Remove files/dirs from the partition."""
         partimg = self._get_part_image(pnum)
         if self.partitions[pnum].fstype.startswith('ext'):
-            cmd = "{} {} -wR 'rm {}'".format(self.debugfs,
-                                                self._get_part_image(pnum),
-                                                path)
-            out = exec_cmd(cmd , as_shell=True)
-            for line in out.splitlines():
-                if line.startswith("rm:"):
-                    if "file is a directory" in line:
-                        # Try rmdir to see if this is an empty directory. This won't delete
-                        # any non empty directory so let user know about any error that this might
-                        # generate.
-                        print(exec_cmd("{} {} -wR 'rmdir {}'".format(self.debugfs,
-                                                    self._get_part_image(pnum),
-                                                    path), as_shell=True))
-                    else:
-                        raise WicError("Could not complete operation: wic %s" % str(line))
+            self.remove_ext(pnum, path, recursive)
+
         else: # fat
             cmd = "{} -i {} ::{}".format(self.mdel, partimg, path)
             try:
@@ -409,7 +442,7 @@ class Disk:
             outf.flush()
 
         def read_ptable(path):
-            out = exec_cmd("{} -dJ {}".format(self.sfdisk, path))
+            out = exec_cmd("{} -J {}".format(self.sfdisk, path))
             return json.loads(out)
 
         def write_ptable(parts, target):
@@ -510,7 +543,8 @@ class Disk:
                         logger.info("creating swap partition {}".format(pnum))
                         label = part.get("name")
                         label_str = "-L {}".format(label) if label else ''
-                        uuid = part.get("uuid")
+                        out = exec_cmd("{} --probe {}".format(self.blkid, self._get_part_image(pnum)))
+                        uuid = out[out.index("UUID=\"")+6:out.index("UUID=\"")+42]
                         uuid_str = "-U {}".format(uuid) if uuid else ''
                         with open(partfname, 'w') as sparse:
                             os.ftruncate(sparse.fileno(), part['size'] * self._lsector_size)
@@ -536,11 +570,15 @@ def wic_ls(args, native_sysroot):
 
 def wic_cp(args, native_sysroot):
     """
-    Copy local file or directory to the vfat partition of
+    Copy file or directory to/from the vfat/ext partition of
     partitioned image.
     """
-    disk = Disk(args.dest.image, native_sysroot)
-    disk.copy(args.src, args.dest.part, args.dest.path)
+    if isinstance(args.dest, str):
+        disk = Disk(args.src.image, native_sysroot)
+    else:
+        disk = Disk(args.dest.image, native_sysroot)
+    disk.copy(args.src, args.dest)
+
 
 def wic_rm(args, native_sysroot):
     """
@@ -548,13 +586,13 @@ def wic_rm(args, native_sysroot):
     partitioned image.
     """
     disk = Disk(args.path.image, native_sysroot)
-    disk.remove(args.path.part, args.path.path)
+    disk.remove(args.path.part, args.path.path, args.recursive_delete)
 
 def wic_write(args, native_sysroot):
     """
     Write image to a target device.
     """
-    disk = Disk(args.image, native_sysroot, ('fat', 'ext', 'swap'))
+    disk = Disk(args.image, native_sysroot, ('fat', 'ext', 'linux-swap'))
     disk.write(args.target, args.expand)
 
 def find_canned(scripts_path, file_name):

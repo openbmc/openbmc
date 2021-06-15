@@ -1,12 +1,25 @@
+From 4f41e090e33a00117a27f0c77b6338fb8b495f37 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 2 Jun 2017 21:58:32 -0700
+Subject: [PATCH] openipmi: Fix build with musl
+
 include sys/types.h for u_int32_t
 
 ui.c:340:5: error: unknown type name 'u_int32_t'; did you mean 'uint32_t'?
      u_int32_t     addr;
      ^~~~~~~~~
-Index: OpenIPMI-2.0.24/ui/ui.c
-===================================================================
---- OpenIPMI-2.0.24.orig/ui/ui.c
-+++ OpenIPMI-2.0.24/ui/ui.c
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ui/ui.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ui/ui.c b/ui/ui.c
+index 529ff22..066d118 100644
+--- a/ui/ui.c
++++ b/ui/ui.c
 @@ -42,6 +42,7 @@
  #include <fcntl.h>
  #include <time.h>

@@ -1,0 +1,30 @@
+kernel headers have restructured mips syscall generation in kernel
+in recent versions, however, ltrace still has logic to define the
+syscall numbers based on old logic, this patch includes the legacy
+UAPI headers to get these defines
+
+Fixes errors e.g.
+../../../../git/sysdeps/linux-gnu/mips/trace.c:138:29: error: '__NR_O32_Linux' undeclared (first use in this function)
+  const int syscallbase[] = {__NR_O32_Linux, __NR_N32_Linux,
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/sysdeps/linux-gnu/mips/trace.c
++++ b/sysdeps/linux-gnu/mips/trace.c
+@@ -34,6 +34,16 @@
+ #include <assert.h>
+ #include <asm/unistd.h>
+ 
++#ifndef __NR_O32_Linux
++#include <asm/unistd_nr_o32.h>
++#endif
++#ifndef __NR_N32_Linux
++#include <asm/unistd_nr_n64.h>
++#endif
++#ifndef __NR_N64_Linux
++#include <asm/unistd_nr_n32.h>
++#endif
++
+ #include "backend.h"
+ #include "common.h"
+ #include "debug.h"

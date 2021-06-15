@@ -68,14 +68,14 @@ python () {
             url_data = fetch.ud[url]
             parm = url_data.parm
             if (url_data.type == 'file' or
+                    url_data.type == 'npmsw' or
                     'type' in parm and parm['type'] == 'kmeta'):
                 local_srcuri.append(url)
 
         d.setVar('SRC_URI', ' '.join(local_srcuri))
 
-        if '{SRCPV}' in d.getVar('PV', False):
-            # Dummy value because the default function can't be called with blank SRC_URI
-            d.setVar('SRCPV', '999')
+        # Dummy value because the default function can't be called with blank SRC_URI
+        d.setVar('SRCPV', '999')
 
         if d.getVar('CONFIGUREOPT_DEPTRACK') == '--disable-dependency-tracking':
             d.setVar('CONFIGUREOPT_DEPTRACK', '')
@@ -86,7 +86,7 @@ python () {
             if task.endswith("_setscene"):
                 # sstate is never going to work for external source trees, disable it
                 bb.build.deltask(task, d)
-            else:
+            elif os.path.realpath(d.getVar('S')) == os.path.realpath(d.getVar('B')):
                 # Since configure will likely touch ${S}, ensure only we lock so one task has access at a time
                 d.appendVarFlag(task, "lockfiles", " ${S}/singletask.lock")
 
@@ -191,6 +191,7 @@ def srctree_hash_files(d, srcdir=None):
     import shutil
     import subprocess
     import tempfile
+    import hashlib
 
     s_dir = srcdir or d.getVar('EXTERNALSRC')
     git_dir = None
@@ -198,12 +199,16 @@ def srctree_hash_files(d, srcdir=None):
     try:
         git_dir = os.path.join(s_dir,
             subprocess.check_output(['git', '-C', s_dir, 'rev-parse', '--git-dir'], stderr=subprocess.DEVNULL).decode("utf-8").rstrip())
+        top_git_dir = os.path.join(s_dir, subprocess.check_output(['git', '-C', d.getVar("TOPDIR"), 'rev-parse', '--git-dir'],
+            stderr=subprocess.DEVNULL).decode("utf-8").rstrip())
+        if git_dir == top_git_dir:
+            git_dir = None
     except subprocess.CalledProcessError:
         pass
 
     ret = " "
     if git_dir is not None:
-        oe_hash_file = os.path.join(git_dir, 'oe-devtool-tree-sha1')
+        oe_hash_file = os.path.join(git_dir, 'oe-devtool-tree-sha1-%s' % d.getVar('PN'))
         with tempfile.NamedTemporaryFile(prefix='oe-devtool-index') as tmp_index:
             # Clone index
             shutil.copyfile(os.path.join(git_dir, 'index'), tmp_index.name)
@@ -211,7 +216,17 @@ def srctree_hash_files(d, srcdir=None):
             env = os.environ.copy()
             env['GIT_INDEX_FILE'] = tmp_index.name
             subprocess.check_output(['git', 'add', '-A', '.'], cwd=s_dir, env=env)
-            sha1 = subprocess.check_output(['git', 'write-tree'], cwd=s_dir, env=env).decode("utf-8")
+            git_sha1 = subprocess.check_output(['git', 'write-tree'], cwd=s_dir, env=env).decode("utf-8")
+            submodule_helper = subprocess.check_output(['git', 'submodule--helper', 'list'], cwd=s_dir, env=env).decode("utf-8")
+            for line in submodule_helper.splitlines():
+                module_dir = os.path.join(s_dir, line.rsplit(maxsplit=1)[1])
+                if os.path.isdir(module_dir):
+                    proc = subprocess.Popen(['git', 'add', '-A', '.'], cwd=module_dir, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    proc.communicate()
+                    proc = subprocess.Popen(['git', 'write-tree'], cwd=module_dir, env=env, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                    stdout, _ = proc.communicate()
+                    git_sha1 += stdout.decode("utf-8")
+            sha1 = hashlib.sha1(git_sha1.encode("utf-8")).hexdigest()
         with open(oe_hash_file, 'w') as fobj:
             fobj.write(sha1)
         ret = oe_hash_file + ':True'

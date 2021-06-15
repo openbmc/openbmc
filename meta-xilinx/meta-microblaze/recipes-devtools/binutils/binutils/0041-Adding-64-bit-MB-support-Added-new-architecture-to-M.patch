@@ -1,0 +1,1008 @@
+From 90412eba37c683e0526470c39926318ae7f5bd27 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Thu, 31 Jan 2019 14:36:00 +0530
+Subject: [PATCH 41/52] Adding 64 bit MB support Added new architecture to
+ Microblaze 64-bit support to GDB Signed-off-by :Nagaraju Mekala
+ <nmekala@xilix.com>
+
+Conflicts:
+	gdb/Makefile.in
+---
+ bfd/archures.c                                |   2 +
+ bfd/bfd-in2.h                                 |   2 +
+ bfd/cpu-microblaze.c                          |   8 +-
+ gas/config/tc-microblaze.c                    |  13 ++
+ gas/config/tc-microblaze.h                    |   4 +
+ gdb/features/Makefile                         |   3 +
+ gdb/features/microblaze-core.xml              |   6 +-
+ gdb/features/microblaze-stack-protect.xml     |   4 +-
+ gdb/features/microblaze-with-stack-protect.c  |   8 +-
+ gdb/features/microblaze.c                     |   6 +-
+ gdb/features/microblaze64-core.xml            |  69 ++++++
+ gdb/features/microblaze64-stack-protect.xml   |  12 +
+ .../microblaze64-with-stack-protect.c         |  79 +++++++
+ .../microblaze64-with-stack-protect.xml       |  12 +
+ gdb/features/microblaze64.c                   |  77 +++++++
+ gdb/features/microblaze64.xml                 |  11 +
+ gdb/microblaze-tdep.c                         | 207 ++++++++++++++++--
+ gdb/microblaze-tdep.h                         |   8 +-
+ .../microblaze-with-stack-protect.dat         |   4 +-
+ 19 files changed, 491 insertions(+), 44 deletions(-)
+ create mode 100644 gdb/features/microblaze64-core.xml
+ create mode 100644 gdb/features/microblaze64-stack-protect.xml
+ create mode 100644 gdb/features/microblaze64-with-stack-protect.c
+ create mode 100644 gdb/features/microblaze64-with-stack-protect.xml
+ create mode 100644 gdb/features/microblaze64.c
+ create mode 100644 gdb/features/microblaze64.xml
+
+diff --git a/bfd/archures.c b/bfd/archures.c
+index 551ec8732f..627d81261d 100644
+--- a/bfd/archures.c
++++ b/bfd/archures.c
+@@ -522,6 +522,8 @@ DESCRIPTION
+ .  bfd_arch_lm32,      {* Lattice Mico32.  *}
+ .#define bfd_mach_lm32		1
+ .  bfd_arch_microblaze,{* Xilinx MicroBlaze.  *}
++.#define bfd_mach_microblaze	1
++.#define bfd_mach_microblaze64	2
+ .  bfd_arch_tilepro,   {* Tilera TILEPro.  *}
+ .  bfd_arch_tilegx,    {* Tilera TILE-Gx.  *}
+ .#define bfd_mach_tilepro	1
+diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
+index 05fbeb9b3a..788fb2b48b 100644
+--- a/bfd/bfd-in2.h
++++ b/bfd/bfd-in2.h
+@@ -1922,6 +1922,8 @@ enum bfd_architecture
+   bfd_arch_lm32,      /* Lattice Mico32.  */
+ #define bfd_mach_lm32          1
+   bfd_arch_microblaze,/* Xilinx MicroBlaze.  */
++#define bfd_mach_microblaze    1
++#define bfd_mach_microblaze64  2
+   bfd_arch_tilepro,   /* Tilera TILEPro.  */
+   bfd_arch_tilegx,    /* Tilera TILE-Gx.  */
+ #define bfd_mach_tilepro       1
+diff --git a/bfd/cpu-microblaze.c b/bfd/cpu-microblaze.c
+index 194920b20b..f3e8bbda75 100644
+--- a/bfd/cpu-microblaze.c
++++ b/bfd/cpu-microblaze.c
+@@ -31,7 +31,7 @@ const bfd_arch_info_type bfd_microblaze_arch[] =
+   64,		  		/* 32 bits in an address.  */
+   8,		  		/* 8 bits in a byte.  */
+   bfd_arch_microblaze, 		/* Architecture.  */
+-  0,		  		/* Machine number - 0 for now.  */
++  bfd_mach_microblaze64, 	/* 64 bit Machine  */
+   "microblaze",	  		/* Architecture name.  */
+   "MicroBlaze",	  		/* Printable name.  */
+   3,		  		/* Section align power.  */
+@@ -46,7 +46,7 @@ const bfd_arch_info_type bfd_microblaze_arch[] =
+   32,				/* Bits in an address.  */
+   8,				/* Bits in a byte.  */
+   bfd_arch_microblaze,		/* Architecture number.  */
+-  0,				/* Machine number - 0 for now.  */
++  bfd_mach_microblaze,		/* 32 bit Machine  */
+   "microblaze",			/* Architecture name.  */
+   "MicroBlaze",			/* Printable name.  */
+   3,				/* Section align power.  */
+@@ -63,7 +63,7 @@ const bfd_arch_info_type bfd_microblaze_arch[] =
+   32,		  		/* 32 bits in an address.  */
+   8,		  		/* 8 bits in a byte.  */
+   bfd_arch_microblaze, 		/* Architecture.  */
+-  0,		  		/* Machine number - 0 for now.  */
++  bfd_mach_microblaze,		/* 32 bit Machine */
+   "microblaze",	  		/* Architecture name.  */
+   "MicroBlaze",	  		/* Printable name.  */
+   3,		  		/* Section align power.  */
+@@ -78,7 +78,7 @@ const bfd_arch_info_type bfd_microblaze_arch[] =
+   64,		  		/* 32 bits in an address.  */
+   8,		  		/* 8 bits in a byte.  */
+   bfd_arch_microblaze, 		/* Architecture.  */
+-  0,		  		/* Machine number - 0 for now.  */
++  bfd_mach_microblaze64,	/* 64 bit Machine */
+   "microblaze",	  		/* Architecture name.  */
+   "MicroBlaze",	  		/* Printable name.  */
+   3,		  		/* Section align power.  */
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index c6ca913f8b..df7088d6c3 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -438,6 +438,11 @@ md_begin (void)
+ 
+   opcode_hash_control = hash_new ();
+ 
++  if (microblaze_arch_size == 64)
++    bfd_set_arch_mach (stdoutput, bfd_arch_microblaze, bfd_mach_microblaze64);
++  else
++    bfd_set_arch_mach (stdoutput, bfd_arch_microblaze, bfd_mach_microblaze);
++
+   /* Insert unique names into hash table.  */
+   for (opcode = (struct opcodes *)opcodes; opcode->name; opcode ++)
+     {
+@@ -3478,6 +3483,14 @@ md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
+   fprintf (stream, "  -%-23s%s\n", "m64", N_("generate 64-bit elf"));
+ }
+ 
++unsigned long
++microblaze_mach (void)
++{
++  if (microblaze_arch_size == 64)
++    return bfd_mach_microblaze64;
++  else
++    return bfd_mach_microblaze;
++}
+ 
+ /* Create a fixup for a cons expression.  If parse_cons_expression_microblaze
+    found a machine specific op in an expression,
+diff --git a/gas/config/tc-microblaze.h b/gas/config/tc-microblaze.h
+index 7435a70ef5..90c2a4a555 100644
+--- a/gas/config/tc-microblaze.h
++++ b/gas/config/tc-microblaze.h
+@@ -23,6 +23,10 @@
+ #define TC_MICROBLAZE 1
+ 
+ #define TARGET_ARCH	bfd_arch_microblaze
++#define TARGET_MACH (microblaze_mach ())
++#define DEFAULT_MACHINE bfd_mach_microblaze64
++extern unsigned long microblaze_mach (void);
++
+ #ifndef TARGET_BYTES_BIG_ENDIAN
+ /* Used to initialise target_big_endian.  */
+ #define TARGET_BYTES_BIG_ENDIAN 1
+diff --git a/gdb/features/Makefile b/gdb/features/Makefile
+index d0af9a47b4..2c3cf91b69 100644
+--- a/gdb/features/Makefile
++++ b/gdb/features/Makefile
+@@ -46,6 +46,7 @@
+ # List of .dat files to create in ../regformats/
+ WHICH = mips-linux mips-dsp-linux \
+ 	microblaze-with-stack-protect \
++	microblaze64-with-stack-protect \
+ 	mips64-linux mips64-dsp-linux \
+ 	nios2-linux \
+ 	rs6000/powerpc-32 \
+@@ -107,7 +108,9 @@ OUTPUTS = $(patsubst %,$(outdir)/%.dat,$(WHICH))
+ # to make on the command line.
+ XMLTOC = \
+ 	microblaze-with-stack-protect.xml \
++	microblaze64-with-stack-protect.xml \
+ 	microblaze.xml \
++	microblaze64.xml \
+ 	mips-dsp-linux.xml \
+ 	mips-linux.xml \
+ 	mips64-dsp-linux.xml \
+diff --git a/gdb/features/microblaze-core.xml b/gdb/features/microblaze-core.xml
+index f272650a41..a87f0f2319 100644
+--- a/gdb/features/microblaze-core.xml
++++ b/gdb/features/microblaze-core.xml
+@@ -8,7 +8,7 @@
+ <!DOCTYPE feature SYSTEM "gdb-target.dtd">
+ <feature name="org.gnu.gdb.microblaze.core">
+   <reg name="r0" bitsize="32" regnum="0"/>
+-  <reg name="r1" bitsize="32" type="data_ptr"/>
++  <reg name="r1" bitsize="32"/>
+   <reg name="r2" bitsize="32"/>
+   <reg name="r3" bitsize="32"/>
+   <reg name="r4" bitsize="32"/>
+@@ -39,7 +39,7 @@
+   <reg name="r29" bitsize="32"/>
+   <reg name="r30" bitsize="32"/>
+   <reg name="r31" bitsize="32"/>
+-  <reg name="rpc" bitsize="32" type="code_ptr"/>
++  <reg name="rpc" bitsize="32"/>
+   <reg name="rmsr" bitsize="32"/>
+   <reg name="rear" bitsize="32"/>
+   <reg name="resr" bitsize="32"/>
+@@ -64,4 +64,6 @@
+   <reg name="rtlbsx" bitsize="32"/>
+   <reg name="rtlblo" bitsize="32"/>
+   <reg name="rtlbhi" bitsize="32"/>
++  <reg name="slr" bitsize="32"/>
++  <reg name="shr" bitsize="32"/>
+ </feature>
+diff --git a/gdb/features/microblaze-stack-protect.xml b/gdb/features/microblaze-stack-protect.xml
+index 1b16223406..1a67f88c18 100644
+--- a/gdb/features/microblaze-stack-protect.xml
++++ b/gdb/features/microblaze-stack-protect.xml
+@@ -7,6 +7,6 @@
+ 
+ <!DOCTYPE feature SYSTEM "gdb-target.dtd">
+ <feature name="org.gnu.gdb.microblaze.stack-protect">
+-  <reg name="rslr" bitsize="32"/>
+-  <reg name="rshr" bitsize="32"/>
++  <reg name="slr" bitsize="32"/>
++  <reg name="shr" bitsize="32"/>
+ </feature>
+diff --git a/gdb/features/microblaze-with-stack-protect.c b/gdb/features/microblaze-with-stack-protect.c
+index b39aa19887..609934e2b4 100644
+--- a/gdb/features/microblaze-with-stack-protect.c
++++ b/gdb/features/microblaze-with-stack-protect.c
+@@ -14,7 +14,7 @@ initialize_tdesc_microblaze_with_stack_protect (void)
+ 
+   feature = tdesc_create_feature (result, "org.gnu.gdb.microblaze.core");
+   tdesc_create_reg (feature, "r0", 0, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "data_ptr");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r2", 2, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r3", 3, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r4", 4, 1, NULL, 32, "int");
+@@ -45,7 +45,7 @@ initialize_tdesc_microblaze_with_stack_protect (void)
+   tdesc_create_reg (feature, "r29", 29, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r30", 30, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r31", 31, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "code_ptr");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rear", 34, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
+@@ -72,8 +72,8 @@ initialize_tdesc_microblaze_with_stack_protect (void)
+   tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
+ 
+   feature = tdesc_create_feature (result, "org.gnu.gdb.microblaze.stack-protect");
+-  tdesc_create_reg (feature, "rslr", 57, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "rshr", 58, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "slr", 57, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "shr", 58, 1, NULL, 32, "int");
+ 
+   tdesc_microblaze_with_stack_protect = result;
+ }
+diff --git a/gdb/features/microblaze.c b/gdb/features/microblaze.c
+index 6c86fc0770..ceb98ca8b8 100644
+--- a/gdb/features/microblaze.c
++++ b/gdb/features/microblaze.c
+@@ -14,7 +14,7 @@ initialize_tdesc_microblaze (void)
+ 
+   feature = tdesc_create_feature (result, "org.gnu.gdb.microblaze.core");
+   tdesc_create_reg (feature, "r0", 0, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "data_ptr");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r2", 2, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r3", 3, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r4", 4, 1, NULL, 32, "int");
+@@ -45,7 +45,7 @@ initialize_tdesc_microblaze (void)
+   tdesc_create_reg (feature, "r29", 29, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r30", 30, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r31", 31, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "code_ptr");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rear", 34, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
+@@ -70,6 +70,8 @@ initialize_tdesc_microblaze (void)
+   tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
+ 
+   tdesc_microblaze = result;
+ }
+diff --git a/gdb/features/microblaze64-core.xml b/gdb/features/microblaze64-core.xml
+new file mode 100644
+index 0000000000..96e99e2fb2
+--- /dev/null
++++ b/gdb/features/microblaze64-core.xml
+@@ -0,0 +1,69 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2014-2018 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE feature SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.microblaze64.core">
++  <reg name="r0" bitsize="64" regnum="0"/>
++  <reg name="r1" bitsize="64"/>
++  <reg name="r2" bitsize="64"/>
++  <reg name="r3" bitsize="64"/>
++  <reg name="r4" bitsize="64"/>
++  <reg name="r5" bitsize="64"/>
++  <reg name="r6" bitsize="64"/>
++  <reg name="r7" bitsize="64"/>
++  <reg name="r8" bitsize="64"/>
++  <reg name="r9" bitsize="64"/>
++  <reg name="r10" bitsize="64"/>
++  <reg name="r11" bitsize="64"/>
++  <reg name="r12" bitsize="64"/>
++  <reg name="r13" bitsize="64"/>
++  <reg name="r14" bitsize="64"/>
++  <reg name="r15" bitsize="64"/>
++  <reg name="r16" bitsize="64"/>
++  <reg name="r17" bitsize="64"/>
++  <reg name="r18" bitsize="64"/>
++  <reg name="r19" bitsize="64"/>
++  <reg name="r20" bitsize="64"/>
++  <reg name="r21" bitsize="64"/>
++  <reg name="r22" bitsize="64"/>
++  <reg name="r23" bitsize="64"/>
++  <reg name="r24" bitsize="64"/>
++  <reg name="r25" bitsize="64"/>
++  <reg name="r26" bitsize="64"/>
++  <reg name="r27" bitsize="64"/>
++  <reg name="r28" bitsize="64"/>
++  <reg name="r29" bitsize="64"/>
++  <reg name="r30" bitsize="64"/>
++  <reg name="r31" bitsize="64"/>
++  <reg name="rpc" bitsize="64"/>
++  <reg name="rmsr" bitsize="32"/>
++  <reg name="rear" bitsize="64"/>
++  <reg name="resr" bitsize="32"/>
++  <reg name="rfsr" bitsize="32"/>
++  <reg name="rbtr" bitsize="64"/>
++  <reg name="rpvr0" bitsize="32"/>
++  <reg name="rpvr1" bitsize="32"/>
++  <reg name="rpvr2" bitsize="32"/>
++  <reg name="rpvr3" bitsize="32"/>
++  <reg name="rpvr4" bitsize="32"/>
++  <reg name="rpvr5" bitsize="32"/>
++  <reg name="rpvr6" bitsize="32"/>
++  <reg name="rpvr7" bitsize="32"/>
++  <reg name="rpvr8" bitsize="64"/>
++  <reg name="rpvr9" bitsize="64"/>
++  <reg name="rpvr10" bitsize="32"/>
++  <reg name="rpvr11" bitsize="32"/>
++  <reg name="redr" bitsize="32"/>
++  <reg name="rpid" bitsize="32"/>
++  <reg name="rzpr" bitsize="32"/>
++  <reg name="rtlbx" bitsize="32"/>
++  <reg name="rtlbsx" bitsize="32"/>
++  <reg name="rtlblo" bitsize="32"/>
++  <reg name="rtlbhi" bitsize="32"/>
++  <reg name="slr" bitsize="64"/>
++  <reg name="shr" bitsize="64"/>
++</feature>
+diff --git a/gdb/features/microblaze64-stack-protect.xml b/gdb/features/microblaze64-stack-protect.xml
+new file mode 100644
+index 0000000000..1bbf5fc3ce
+--- /dev/null
++++ b/gdb/features/microblaze64-stack-protect.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2014-2018 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE feature SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.microblaze64.stack-protect">
++  <reg name="slr" bitsize="64"/>
++  <reg name="shr" bitsize="64"/>
++</feature>
+diff --git a/gdb/features/microblaze64-with-stack-protect.c b/gdb/features/microblaze64-with-stack-protect.c
+new file mode 100644
+index 0000000000..f448c9a749
+--- /dev/null
++++ b/gdb/features/microblaze64-with-stack-protect.c
+@@ -0,0 +1,79 @@
++/* THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi:set ro:
++  Original: microblaze-with-stack-protect.xml */
++
++#include "defs.h"
++#include "osabi.h"
++#include "target-descriptions.h"
++
++struct target_desc *tdesc_microblaze64_with_stack_protect;
++static void
++initialize_tdesc_microblaze64_with_stack_protect (void)
++{
++  struct target_desc *result = allocate_target_description ();
++  struct tdesc_feature *feature;
++
++  feature = tdesc_create_feature (result, "org.gnu.gdb.microblaze64.core");
++  tdesc_create_reg (feature, "r0", 0, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r2", 2, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r3", 3, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r4", 4, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r5", 5, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r6", 6, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r7", 7, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r8", 8, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r9", 9, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r10", 10, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r11", 11, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r12", 12, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r13", 13, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r14", 14, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r15", 15, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r16", 16, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r17", 17, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r18", 18, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r19", 19, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r20", 20, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r21", 21, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r22", 22, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r23", 23, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r24", 24, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r25", 25, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r26", 26, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r27", 27, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r28", 28, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r29", 29, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r30", 30, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r31", 31, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rear", 34, 1, NULL, 64, "int");
++  tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rfsr", 36, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rbtr", 37, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr0", 38, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr1", 39, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr2", 40, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr3", 41, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr4", 42, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr5", 43, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr6", 44, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr7", 45, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr8", 46, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr9", 47, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr10", 48, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr11", 49, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "redr", 50, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpid", 51, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rzpr", 52, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbx", 53, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
++
++  feature = tdesc_create_feature (result, "org.gnu.gdb.microblaze64.stack-protect");
++  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
++
++  tdesc_microblaze64_with_stack_protect = result;
++}
+diff --git a/gdb/features/microblaze64-with-stack-protect.xml b/gdb/features/microblaze64-with-stack-protect.xml
+new file mode 100644
+index 0000000000..0e9f01611f
+--- /dev/null
++++ b/gdb/features/microblaze64-with-stack-protect.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2014-2018 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE target SYSTEM "gdb-target.dtd">
++<target>
++  <xi:include href="microblaze64-core.xml"/>
++  <xi:include href="microblaze64-stack-protect.xml"/>
++</target>
+diff --git a/gdb/features/microblaze64.c b/gdb/features/microblaze64.c
+new file mode 100644
+index 0000000000..1aa37c4512
+--- /dev/null
++++ b/gdb/features/microblaze64.c
+@@ -0,0 +1,77 @@
++/* THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi:set ro:
++  Original: microblaze.xml */
++
++#include "defs.h"
++#include "osabi.h"
++#include "target-descriptions.h"
++
++struct target_desc *tdesc_microblaze64;
++static void
++initialize_tdesc_microblaze64 (void)
++{
++  struct target_desc *result = allocate_target_description ();
++  struct tdesc_feature *feature;
++
++  feature = tdesc_create_feature (result, "org.gnu.gdb.microblaze64.core");
++  tdesc_create_reg (feature, "r0", 0, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r2", 2, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r3", 3, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r4", 4, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r5", 5, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r6", 6, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r7", 7, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r8", 8, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r9", 9, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r10", 10, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r11", 11, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r12", 12, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r13", 13, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r14", 14, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r15", 15, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r16", 16, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r17", 17, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r18", 18, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r19", 19, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r20", 20, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r21", 21, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r22", 22, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r23", 23, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r24", 24, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r25", 25, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r26", 26, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r27", 27, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r28", 28, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r29", 29, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r30", 30, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r31", 31, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rear", 34, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rfsr", 36, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rbtr", 37, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr0", 38, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr1", 39, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr2", 40, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr3", 41, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr4", 42, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr5", 43, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr6", 44, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr7", 45, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr8", 46, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr9", 47, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr10", 48, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr11", 49, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "redr", 50, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpid", 51, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rzpr", 52, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbx", 53, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
++
++  tdesc_microblaze64 = result;
++}
+diff --git a/gdb/features/microblaze64.xml b/gdb/features/microblaze64.xml
+new file mode 100644
+index 0000000000..515d18e65c
+--- /dev/null
++++ b/gdb/features/microblaze64.xml
+@@ -0,0 +1,11 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2014-2018 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE target SYSTEM "gdb-target.dtd">
++<target>
++  <xi:include href="microblaze64-core.xml"/>
++</target>
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 1b5cf38e45..f4ea3cc342 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -40,7 +40,9 @@
+ #include "remote.h"
+ 
+ #include "features/microblaze-with-stack-protect.c"
++#include "features/microblaze64-with-stack-protect.c"
+ #include "features/microblaze.c"
++#include "features/microblaze64.c"
+ 
+ /* Instruction macros used for analyzing the prologue.  */
+ /* This set of instruction macros need to be changed whenever the
+@@ -75,12 +77,13 @@ static const char *microblaze_register_names[] =
+   "rpvr0", "rpvr1", "rpvr2", "rpvr3", "rpvr4", "rpvr5", "rpvr6",
+   "rpvr7", "rpvr8", "rpvr9", "rpvr10", "rpvr11",
+   "redr", "rpid", "rzpr", "rtlbx", "rtlbsx", "rtlblo", "rtlbhi",
+-  "rslr", "rshr"
++  "slr", "shr"
+ };
+ 
+ #define MICROBLAZE_NUM_REGS ARRAY_SIZE (microblaze_register_names)
+ 
+ static unsigned int microblaze_debug_flag = 0;
++int reg_size = 4;
+ 
+ static void ATTRIBUTE_PRINTF (1, 2)
+ microblaze_debug (const char *fmt, ...)
+@@ -145,6 +148,7 @@ microblaze_store_arguments (struct regcache *regcache, int nargs,
+   error (_("store_arguments not implemented"));
+   return sp;
+ }
++#if 0
+ static int
+ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+ 				    struct bp_target_info *bp_tgt)
+@@ -154,7 +158,7 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+   int val;
+   int bplen;
+   gdb_byte old_contents[BREAKPOINT_MAX];
+-  struct cleanup *cleanup;
++  //struct cleanup *cleanup;
+ 
+   /* Determine appropriate breakpoint contents and size for this address.  */
+   bp = gdbarch_breakpoint_from_pc (gdbarch, &addr, &bplen);
+@@ -162,7 +166,8 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+     error (_("Software breakpoints not implemented for this target."));
+ 
+   /* Make sure we see the memory breakpoints.  */
+-  cleanup = make_show_memory_breakpoints_cleanup (1);
++  scoped_restore 
++    cleanup = make_scoped_restore_show_memory_breakpoints (1);
+   val = target_read_memory (addr, old_contents, bplen);
+ 
+   /* If our breakpoint is no longer at the address, this means that the
+@@ -178,6 +183,7 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+   return val;
+ }
+ 
++#endif
+ /* Allocate and initialize a frame cache.  */
+ 
+ static struct microblaze_frame_cache *
+@@ -570,17 +576,16 @@ microblaze_extract_return_value (struct type *type, struct regcache *regcache,
+ 				 gdb_byte *valbuf)
+ {
+   gdb_byte buf[8];
+-
+   /* Copy the return value (starting) in RETVAL_REGNUM to VALBUF.  */
+   switch (TYPE_LENGTH (type))
+     {
+       case 1:	/* return last byte in the register.  */
+ 	regcache->cooked_read (MICROBLAZE_RETVAL_REGNUM, buf);
+-	memcpy(valbuf, buf + MICROBLAZE_REGISTER_SIZE - 1, 1);
++	memcpy(valbuf, buf + reg_size - 1, 1);
+ 	return;
+       case 2:	/* return last 2 bytes in register.  */
+ 	regcache->cooked_read (MICROBLAZE_RETVAL_REGNUM, buf);
+-	memcpy(valbuf, buf + MICROBLAZE_REGISTER_SIZE - 2, 2);
++	memcpy(valbuf, buf + reg_size - 2, 2);
+ 	return;
+       case 4:	/* for sizes 4 or 8, copy the required length.  */
+       case 8:
+@@ -647,7 +652,119 @@ microblaze_stabs_argument_has_addr (struct gdbarch *gdbarch, struct type *type)
+   return (TYPE_LENGTH (type) == 16);
+ }
+ 
+-
++#if 0
++static std::vector<CORE_ADDR>
++microblaze_software_single_step (struct regcache *regcache)
++{
++//  struct gdbarch *arch = get_frame_arch(frame);
++  struct gdbarch *arch = get_regcache_arch (regcache);
++  struct address_space *aspace = get_regcache_aspace (regcache);
++//  struct address_space *aspace = get_frame_address_space (frame);
++  struct gdbarch_tdep *tdep = gdbarch_tdep (arch);
++  static char le_breakp[] = MICROBLAZE_BREAKPOINT_LE;
++  static char be_breakp[] = MICROBLAZE_BREAKPOINT;
++  enum bfd_endian byte_order = gdbarch_byte_order (arch);
++  char *breakp = byte_order == BFD_ENDIAN_BIG ? be_breakp : le_breakp;
++  std::vector<CORE_ADDR> ret = 0;
++
++ /* Save the address and the values of the next_pc and the target */
++  static struct sstep_breaks
++  {
++    CORE_ADDR address;
++    bfd_boolean valid;
++    /* Shadow contents.  */
++    char data[INST_WORD_SIZE];
++  } stepbreaks[2];
++ int ii;
++
++  if (1)
++    {
++      CORE_ADDR pc;
++      std::vector<CORE_ADDR> *next_pcs = NULL;
++      long insn;
++      enum microblaze_instr minstr;
++      bfd_boolean isunsignednum;
++      enum microblaze_instr_type insn_type;
++      short delay_slots;
++      int imm;
++      bfd_boolean immfound = FALSE;
++
++     /* Set a breakpoint at the next instruction */
++      /* If the current instruction is an imm, set it at the inst after */
++      /* If the instruction has a delay slot, skip the delay slot */
++      pc = regcache_read_pc (regcache);
++      insn = microblaze_fetch_instruction (pc);
++      minstr = get_insn_microblaze (insn, &isunsignednum, &insn_type, &delay_slots);
++      if (insn_type == immediate_inst)
++	{
++	  int rd, ra, rb;
++	  immfound = TRUE;
++	  minstr = microblaze_decode_insn (insn, &rd, &ra, &rb, &imm);
++	  pc = pc + INST_WORD_SIZE;
++	  insn = microblaze_fetch_instruction (pc);
++	  minstr = get_insn_microblaze (insn, &isunsignednum, &insn_type, &delay_slots);
++	}
++      stepbreaks[0].address = pc + (delay_slots * INST_WORD_SIZE) + INST_WORD_SIZE;
++      if (insn_type != return_inst) {
++	stepbreaks[0].valid = TRUE;
++      } else {
++	stepbreaks[0].valid = FALSE;
++      }
++
++      microblaze_debug ("single-step insn_type=%x insn=%x\n", insn_type, insn);
++      /* Now check for branch or return instructions */
++      if (insn_type == branch_inst || insn_type == return_inst) {
++	int limm;
++	int lrd, lra, lrb;
++	int ra, rb;
++	bfd_boolean targetvalid;
++	bfd_boolean unconditionalbranch;
++	microblaze_decode_insn(insn, &lrd, &lra, &lrb, &limm);
++	if (lra >= 0 && lra < MICROBLAZE_NUM_REGS)
++	  ra = regcache_raw_get_unsigned(regcache, lra);
++	else
++	  ra = 0;
++	if (lrb >= 0 && lrb < MICROBLAZE_NUM_REGS)
++	  rb = regcache_raw_get_unsigned(regcache, lrb);
++	else
++	  rb = 0;
++	stepbreaks[1].address = microblaze_get_target_address (insn, immfound, imm, pc, ra, rb, &targetvalid, &unconditionalbranch);
++        microblaze_debug ("single-step uncondbr=%d targetvalid=%d target=%x\n", unconditionalbranch, targetvalid, stepbreaks[1].address);
++	if (unconditionalbranch)
++	  stepbreaks[0].valid = FALSE; /* This is a unconditional branch: will not come to the next address */
++	if (targetvalid && (stepbreaks[0].valid == FALSE ||
++			    (stepbreaks[0].address != stepbreaks[1].address))
++	                && (stepbreaks[1].address != pc)) {
++	  stepbreaks[1].valid = TRUE;
++	} else {
++	  stepbreaks[1].valid = FALSE;
++	}
++      } else {
++	stepbreaks[1].valid = FALSE;
++      }
++
++      /* Insert the breakpoints */
++      for (ii = 0; ii < 2; ++ii)
++        {
++
++          /* ignore invalid breakpoint. */
++          if (stepbreaks[ii].valid) {
++            VEC_safe_push (CORE_ADDR, next_pcs, stepbreaks[ii].address);;
++//            insert_single_step_breakpoint (arch, aspace, stepbreaks[ii].address);
++            ret = next_pcs;
++	  }
++	}
++    }
++    return ret;
++}
++#endif
++
++static void
++microblaze_write_pc (struct regcache *regcache, CORE_ADDR pc)
++{
++  regcache_cooked_write_unsigned (regcache, MICROBLAZE_PC_REGNUM, pc);
++}
++
+ static int dwarf2_to_reg_map[78] =
+ { 0  /* r0  */,   1  /* r1  */,   2  /* r2  */,   3  /* r3  */,  /*  0- 3 */
+   4  /* r4  */,   5  /* r5  */,   6  /* r6  */,   7  /* r7  */,  /*  4- 7 */
+@@ -682,13 +799,14 @@ microblaze_dwarf2_reg_to_regnum (struct gdbarch *gdbarch, int reg)
+ static void
+ microblaze_register_g_packet_guesses (struct gdbarch *gdbarch)
+ {
++
+   register_remote_g_packet_guess (gdbarch,
+-                                  4 * MICROBLAZE_NUM_CORE_REGS,
+-                                  tdesc_microblaze);
++                                  4 * MICROBLAZE_NUM_REGS,
++                                  tdesc_microblaze64);
+ 
+   register_remote_g_packet_guess (gdbarch,
+                                   4 * MICROBLAZE_NUM_REGS,
+-                                  tdesc_microblaze_with_stack_protect);
++                                  tdesc_microblaze64_with_stack_protect);
+ }
+ 
+ void
+@@ -696,15 +814,15 @@ microblaze_supply_gregset (const struct microblaze_gregset *gregset,
+                         struct regcache *regcache,
+                         int regnum, const void *gregs)
+ {
+-  unsigned int *regs = gregs;
++  const gdb_byte *regs = (const gdb_byte *) gregs;
+   if (regnum >= 0)
+-    regcache_raw_supply (regcache, regnum, regs + regnum);
++    regcache->raw_supply (regnum, regs + regnum);
+ 
+   if (regnum == -1) {
+     int i;
+ 
+     for (i = 0; i < 50; i++) {
+-      regcache_raw_supply (regcache, i, regs + i);
++      regcache->raw_supply (regnum, regs + i);
+     }
+   }
+ }
+@@ -755,6 +873,17 @@ microblaze_regset_from_core_section (struct gdbarch *gdbarch,
+ }
+ 
+ 
++static void
++make_regs (struct gdbarch *arch)
++{
++  struct gdbarch_tdep *tdep = gdbarch_tdep (arch);
++  int mach = gdbarch_bfd_arch_info (arch)->mach;
++  
++  if (mach == bfd_mach_microblaze64)
++    {
++      set_gdbarch_ptr_bit (arch, 64);
++    }
++}
+ 
+ static struct gdbarch *
+ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -769,8 +898,15 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   if (arches != NULL)
+     return arches->gdbarch;
+   if (tdesc == NULL)
+-    tdesc = tdesc_microblaze;
+-
++    {
++      if (info.bfd_arch_info->mach == bfd_mach_microblaze64) 
++        {
++    	  tdesc = tdesc_microblaze64;
++          reg_size = 8;
++   	}
++      else
++    	tdesc = tdesc_microblaze;
++    }
+   /* Check any target description for validity.  */
+   if (tdesc_has_registers (tdesc))
+     {
+@@ -778,27 +914,35 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+       int valid_p;
+       int i;
+ 
+-      feature = tdesc_find_feature (tdesc,
++      if (info.bfd_arch_info->mach == bfd_mach_microblaze64)
++        feature = tdesc_find_feature (tdesc,
++                                    "org.gnu.gdb.microblaze64.core");
++      else
++        feature = tdesc_find_feature (tdesc,
+                                     "org.gnu.gdb.microblaze.core");
+       if (feature == NULL)
+         return NULL;
+       tdesc_data = tdesc_data_alloc ();
+ 
+       valid_p = 1;
+-      for (i = 0; i < MICROBLAZE_NUM_CORE_REGS; i++)
++      for (i = 0; i < MICROBLAZE_NUM_REGS; i++)
+         valid_p &= tdesc_numbered_register (feature, tdesc_data, i,
+                                             microblaze_register_names[i]);
+-      feature = tdesc_find_feature (tdesc,
++      if (info.bfd_arch_info->mach == bfd_mach_microblaze64)
++        feature = tdesc_find_feature (tdesc,
++                                    "org.gnu.gdb.microblaze64.stack-protect");
++      else
++        feature = tdesc_find_feature (tdesc,
+                                     "org.gnu.gdb.microblaze.stack-protect");
+       if (feature != NULL)
+         {
+           valid_p = 1;
+           valid_p &= tdesc_numbered_register (feature, tdesc_data,
+                                               MICROBLAZE_SLR_REGNUM,
+-                                              "rslr");
++                                              "slr");
+           valid_p &= tdesc_numbered_register (feature, tdesc_data,
+                                               MICROBLAZE_SHR_REGNUM,
+-                                              "rshr");
++                                              "shr");
+         }
+ 
+       if (!valid_p)
+@@ -806,6 +950,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+           tdesc_data_cleanup (tdesc_data);
+           return NULL;
+         }
++      
+     }
+ 
+   /* Allocate space for the new architecture.  */
+@@ -825,7 +970,17 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   /* Register numbers of various important registers.  */
+   set_gdbarch_sp_regnum (gdbarch, MICROBLAZE_SP_REGNUM); 
+   set_gdbarch_pc_regnum (gdbarch, MICROBLAZE_PC_REGNUM); 
++  
++  /* Register set.  
++  make_regs (gdbarch); */
++  switch (info.bfd_arch_info->mach)
++    {
++    case bfd_mach_microblaze64:
++      set_gdbarch_ptr_bit (gdbarch, 64);
++    break;
++    }
+ 
++  
+   /* Map Dwarf2 registers to GDB registers.  */
+   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, microblaze_dwarf2_reg_to_regnum);
+ 
+@@ -845,13 +1000,15 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ 				       microblaze_breakpoint::kind_from_pc);
+   set_gdbarch_sw_breakpoint_from_kind (gdbarch,
+ 				       microblaze_breakpoint::bp_from_kind);
+-  set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
++//  set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
++
++//  set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
+ 
+   set_gdbarch_frame_args_skip (gdbarch, 8);
+ 
+   set_gdbarch_unwind_pc (gdbarch, microblaze_unwind_pc);
+ 
+-  microblaze_register_g_packet_guesses (gdbarch);
++  //microblaze_register_g_packet_guesses (gdbarch);
+ 
+   frame_base_set_default (gdbarch, &microblaze_frame_base);
+ 
+@@ -866,11 +1023,11 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+     tdesc_use_registers (gdbarch, tdesc, tdesc_data);
+   //frame_base_append_sniffer (gdbarch, microblaze_frame_sniffer);
+ 
+-  /* If we have register sets, enable the generic core file support.  */
++  /* If we have register sets, enable the generic core file support.  
+   if (tdep->gregset) {
+       set_gdbarch_regset_from_core_section (gdbarch,
+                                           microblaze_regset_from_core_section);
+-  }
++  }*/
+ 
+   return gdbarch;
+ }
+@@ -883,6 +1040,8 @@ _initialize_microblaze_tdep ()
+ 
+   initialize_tdesc_microblaze_with_stack_protect ();
+   initialize_tdesc_microblaze ();
++  initialize_tdesc_microblaze64_with_stack_protect ();
++  initialize_tdesc_microblaze64 ();
+   /* Debug this files internals.  */
+   add_setshow_zuinteger_cmd ("microblaze", class_maintenance,
+ 			     &microblaze_debug_flag, _("\
+diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
+index 1234f8a36f..c0fc900733 100644
+--- a/gdb/microblaze-tdep.h
++++ b/gdb/microblaze-tdep.h
+@@ -27,7 +27,7 @@ struct microblaze_gregset
+    microblaze_gregset() {}
+    unsigned int gregs[32];
+    unsigned int fpregs[32];
+-   unsigned int pregs[16];
++   unsigned int pregs[18];
+ };
+ 
+ struct gdbarch_tdep
+@@ -101,9 +101,9 @@ enum microblaze_regnum
+   MICROBLAZE_RTLBSX_REGNUM,
+   MICROBLAZE_RTLBLO_REGNUM,
+   MICROBLAZE_RTLBHI_REGNUM,
+-  MICROBLAZE_SLR_REGNUM, MICROBLAZE_NUM_CORE_REGS = MICROBLAZE_SLR_REGNUM,
++  MICROBLAZE_SLR_REGNUM,
+   MICROBLAZE_SHR_REGNUM,
+-  MICROBLAZE_NUM_REGS
++  MICROBLAZE_NUM_REGS, MICROBLAZE_NUM_CORE_REGS = MICROBLAZE_NUM_REGS
+ };
+ 
+ struct microblaze_frame_cache
+@@ -128,7 +128,7 @@ struct microblaze_frame_cache
+   struct trad_frame_saved_reg *saved_regs;
+ };
+ /* All registers are 32 bits.  */
+-#define MICROBLAZE_REGISTER_SIZE 4
++//#define MICROBLAZE_REGISTER_SIZE 8
+ 
+ /* MICROBLAZE_BREAKPOINT defines the breakpoint that should be used.
+    Only used for native debugging.  */
+diff --git a/gdb/regformats/microblaze-with-stack-protect.dat b/gdb/regformats/microblaze-with-stack-protect.dat
+index 8040a7b3fd..450e321d49 100644
+--- a/gdb/regformats/microblaze-with-stack-protect.dat
++++ b/gdb/regformats/microblaze-with-stack-protect.dat
+@@ -60,5 +60,5 @@ expedite:r1,rpc
+ 32:rtlbsx
+ 32:rtlblo
+ 32:rtlbhi
+-32:rslr
+-32:rshr
++32:slr
++32:shr
+-- 
+2.17.1
+

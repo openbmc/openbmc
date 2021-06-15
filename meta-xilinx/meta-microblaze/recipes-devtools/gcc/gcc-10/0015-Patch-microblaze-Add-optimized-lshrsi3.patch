@@ -1,0 +1,81 @@
+From f448485f5e0507a7ab8be7f83c08f807200a3501 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 17 Jan 2017 15:23:57 +0530
+Subject: [PATCH 15/54] [Patch, microblaze]: Add optimized lshrsi3 When barrel
+ shifter is not present, the immediate value is greater than #5 and
+ optimization is -OS, the compiler will generate shift operation using loop.
+
+Changelog
+
+2013-11-26  David Holsgrove <david.holsgrove@xilinx.com>
+
+ * gcc/config/microblaze/microblaze.md: Add size optimized lshrsi3 insn
+
+ChangeLog/testsuite
+
+2014-02-12  David Holsgrove <david.holsgrove@xilinx.com>
+
+ * gcc/testsuite/gcc.target/microblaze/others/lshrsi_Os_1.c: New test.
+
+Signed-off-by:Nagaraju <nmekala@xilix.com>
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+---
+ gcc/config/microblaze/microblaze.md           | 21 +++++++++++++++++++
+ .../microblaze/others/lshrsi_Os_1.c           | 13 ++++++++++++
+ 2 files changed, 34 insertions(+)
+ create mode 100644 gcc/testsuite/gcc.target/microblaze/others/lshrsi_Os_1.c
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 187ad522dcc..8f9baec826b 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -1618,6 +1618,27 @@
+   (set_attr "length"	"4,4")]
+ )
+ 
++(define_insn "*lshrsi3_with_size_opt"
++  [(set (match_operand:SI 0 "register_operand" "=&d")
++       (lshiftrt:SI (match_operand:SI 1 "register_operand"  "d")
++                   (match_operand:SI 2 "immediate_operand" "I")))]
++  "(INTVAL (operands[2]) > 5 && optimize_size)"
++  {
++    operands[3] = gen_rtx_REG (SImode, MB_ABI_ASM_TEMP_REGNUM);
++
++    output_asm_insn ("ori\t%3,r0,%2", operands);
++    if (REGNO (operands[0]) != REGNO (operands[1]))
++        output_asm_insn ("addk\t%0,%1,r0", operands);
++
++    output_asm_insn ("addik\t%3,%3,-1", operands);
++    output_asm_insn ("bneid\t%3,.-4", operands);
++    return "srl\t%0,%0";
++  }
++  [(set_attr "type"    "multi")
++  (set_attr "mode"    "SI")
++  (set_attr "length"  "20")]
++)
++
+ (define_insn "*lshrsi_inline"
+   [(set (match_operand:SI 0 "register_operand" "=&d")
+        (lshiftrt:SI (match_operand:SI 1 "register_operand"  "d")
+diff --git a/gcc/testsuite/gcc.target/microblaze/others/lshrsi_Os_1.c b/gcc/testsuite/gcc.target/microblaze/others/lshrsi_Os_1.c
+new file mode 100644
+index 00000000000..32a3be7c76a
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/microblaze/others/lshrsi_Os_1.c
+@@ -0,0 +1,13 @@
++/* { dg-options "-Os -mno-xl-barrel-shift" } */
++
++void testfunc(void)
++{
++    unsigned volatile int z = 8192;
++    z >>= 8;
++}
++/* { dg-final { scan-assembler-not "\bsrli" } } */
++/* { dg-final { scan-assembler "\ori\tr18,r0" } } */
++/* { dg-final { scan-assembler "addk\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r0" } } */
++/* { dg-final { scan-assembler "addik\tr18,r18,-1" } } */
++/* { dg-final { scan-assembler "bneid\tr18,.-4" } } */
++/* { dg-final { scan-assembler "\srl\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1])" } } */
+-- 
+2.17.1
+

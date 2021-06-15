@@ -3,8 +3,9 @@ update for glibc libio.h removal in 2.28+
 see
 https://src.fedoraproject.org/rpms/m4/c/814d592134fad36df757f9a61422d164ea2c6c9b?branch=master
 
-Upstream-Status: Pending
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/gnulib.git/commit/?id=4af4a4a718]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 Index: m4-1.4.18/lib/fflush.c
 ===================================================================
 --- m4-1.4.18.orig/lib/fflush.c

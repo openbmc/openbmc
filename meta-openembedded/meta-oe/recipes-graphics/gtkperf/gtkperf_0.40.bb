@@ -7,6 +7,7 @@ SRC_URI = "http://prdownloads.sourceforge.net/${BPN}/${BPN}_${PV}.tar.gz \
            file://Makevars \
            file://0001-Include-stdlib.h-for-exit-API.patch \
            file://0002-timing.c-Fix-format-security-errors.patch \
+           file://gettext.patch \
            "
 
 SRC_URI[md5sum] = "4331dde4bb83865e15482885fcb0cc53"
@@ -16,7 +17,7 @@ DEPENDS = "gtk+"
 
 S = "${WORKDIR}/${BPN}"
 
-inherit distro_features_check autotools binconfig pkgconfig gettext
+inherit features_check autotools binconfig pkgconfig gettext
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

@@ -1,18 +1,5 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 
 import logging
@@ -42,9 +29,9 @@ class RawCopyPlugin(SourcePlugin):
             cmd = 'btrfs filesystem label %s %s' % (dst, label)
         elif fstype == 'swap':
             cmd = 'mkswap -L %s %s' % (label, dst)
-        elif fstype == 'squashfs':
-            raise WicError("It's not possible to update a squashfs "
-                           "filesystem label '%s'" % (label))
+        elif fstype in ('squashfs', 'erofs'):
+            raise WicError("It's not possible to update a %s "
+                           "filesystem label '%s'" % (fstype, label))
         else:
             raise WicError("Cannot update filesystem label: "
                            "Unknown fstype: '%s'" % (fstype))
@@ -70,7 +57,10 @@ class RawCopyPlugin(SourcePlugin):
             raise WicError("No file specified")
 
         src = os.path.join(kernel_dir, source_params['file'])
-        dst = os.path.join(cr_workdir, "%s.%s" % (source_params['file'], part.lineno))
+        dst = os.path.join(cr_workdir, "%s.%s" % (os.path.basename(source_params['file']), part.lineno))
+
+        if not os.path.exists(os.path.dirname(dst)):
+            os.makedirs(os.path.dirname(dst))
 
         if 'skip' in source_params:
             sparse_copy(src, dst, skip=int(source_params['skip']))

@@ -1,5 +1,9 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 from django import template
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 register = template.Library()
 

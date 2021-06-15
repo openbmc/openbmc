@@ -1,4 +1,4 @@
-From b19b68eab567aa534cf8dec79fe18e3dc0e14043 Mon Sep 17 00:00:00 2001
+From 6fec72bd7264478c214169b0f30f649304bd39ea Mon Sep 17 00:00:00 2001
 From: Quanyang Wang <quanyang.wang@windriver.com>
 Date: Tue, 16 Jun 2015 12:59:57 +0800
 Subject: [PATCH] powerpc: change the memory size limit
@@ -16,15 +16,16 @@ locate_hole failed
 Upstream-Status: Pending
 
 Signed-off-by: Quanyang Wang <quanyang.wang@windriver.com>
+
 ---
  kexec/arch/ppc/kexec-ppc.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: kexec-tools-2.0.10/kexec/arch/ppc/kexec-ppc.h
-===================================================================
---- kexec-tools-2.0.10.orig/kexec/arch/ppc/kexec-ppc.h
-+++ kexec-tools-2.0.10/kexec/arch/ppc/kexec-ppc.h
-@@ -42,7 +42,7 @@ void dol_ppc_usage(void);
+diff --git a/kexec/arch/ppc/kexec-ppc.h b/kexec/arch/ppc/kexec-ppc.h
+index 04e728e..6bae9ec 100644
+--- a/kexec/arch/ppc/kexec-ppc.h
++++ b/kexec/arch/ppc/kexec-ppc.h
+@@ -44,7 +44,7 @@ void dol_ppc_usage(void);
   * During inital setup the kernel does not map the whole memory but a part of
   * it. On Book-E that is 64MiB, 601 24MiB or 256MiB (if possible).
   */

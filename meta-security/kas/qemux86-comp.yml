@@ -1,0 +1,11 @@
+header:
+  version: 8
+  includes:
+    - kas-security-base.yml
+
+local_conf_header:
+  meta-compliance: |
+    IMAGE_INSTALL_append = " lynis"
+    IMAGE_INSTALL_append = " openscap openscap-daemon scap-security-guide"
+
+machine: qemux86

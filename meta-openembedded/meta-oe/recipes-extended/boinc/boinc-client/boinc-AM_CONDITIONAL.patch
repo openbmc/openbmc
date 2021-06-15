@@ -1,21 +1,28 @@
-Add configure check for gtk2+ and objc++
+From 7957756a3dd16498cf7a75e1fb6675a33bc7f3dc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 3 Nov 2016 01:20:33 -0700
+Subject: [PATCH] Add configure check for gtk2+ and objc++
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
 
-Index: boinc-client_release-7.6-7.6.33/configure.ac
-===================================================================
---- boinc-client_release-7.6-7.6.33.orig/configure.ac
-+++ boinc-client_release-7.6-7.6.33/configure.ac
-@@ -64,6 +64,7 @@ m4_ifdef([AC_PROG_OBJCXX],[AC_PROG_OBJCX
+---
+ configure.ac | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index d81d795de4..7beeb34ae2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -63,6 +63,7 @@ m4_pattern_allow([AC_PROG_OBJCXX])
+ m4_ifdef([AC_PROG_OBJCXX],[AC_PROG_OBJCXX],)
  dnl ------
- AC_PROG_F77
  AC_PROG_CPP
 +AC_PROG_OBJCXX
  AC_PROG_MAKE_SET
  SAH_LINKS
  AC_LANG_PUSH(C)
-@@ -1081,6 +1082,8 @@ AM_CONDITIONAL(ENABLE_BOINCCRYPT, [test
+@@ -1068,6 +1069,8 @@ AM_CONDITIONAL(ENABLE_BOINCCRYPT, [test "x${enable_server}" = xyes  || test "x${
  AM_CONDITIONAL(INSTALL_HEADERS, [test "${enable_install_headers}" = yes])
  AM_CONDITIONAL(HAVE_CUDA_LIB, [test "${enable_client}" = yes -a -f ./coprocs/CUDA/posix/${boinc_platform}/libcudart.so])
  

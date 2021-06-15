@@ -1,0 +1,67 @@
+From 27bda5ee884e79d6d0e76955124d2b0c5798d6cf Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Mon, 25 Feb 2019 00:34:17 -0800
+Subject: [PATCH] Makefile.am: remove regression dir
+
+Remove regression dir to fix below do_compile
+error:
+| Making all in regression
+| /bin/sh: line 20: cd: regression: No such file or directory
+| Makefile:451: recipe for target 'all-recursive' failed
+
+BTW, it should be safe not to cover regression dir
+as there is no Makefile.in under ${S}/regression
+and the content of ${S}/regression/Makefile as below.
+-------------------------------------
+all:
+
+install:
+
+check:
+        ./TEST
+
+distclean: clean
+
+maintainer-clean: clean
+
+distdir:
+
+clean:
+        @rm -rf output
+
+.PHONY: all install
+-------------------------------------
+
+Upstream-Status: Pending
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ Makefile.am | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index ba37a42..548fea7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,7 +1,7 @@
+ ## Process this file with automake to produce Makefile.in
+ AUTOMAKE_OPTIONS = no-texinfo.tex
+ 
+-SUBDIRS = intl src doc po man regression
++SUBDIRS = intl src doc po man
+ 
+ BUILT_SOURCES = 
+ 
+@@ -13,8 +13,7 @@ EXTRA_DIST = 	README.md \
+ 		aclocal/UTIMBUF.m4 \
+ 		miscel/Makefile.mingw32 \
+ 		miscel/README.vc++ \
+-		bootstrap \
+-		regression
++		bootstrap
+ 
+ DISTCLEANFILES=config/config.cache config/config.log config.h
+ 
+-- 
+2.17.1
+

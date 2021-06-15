@@ -1,9 +1,12 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var
 import oeqa.utils.ftools as ftools
-from oeqa.core.decorator.oeid import OETestID
 
 class LayerAppendTests(OESelftestTestCase):
     layerconf = """
@@ -49,7 +52,6 @@ SRC_URI_append = " file://appendtest.txt"
             ftools.remove_from_file(self.builddir + "/conf/bblayers.conf", self.layerappend)
         super(LayerAppendTests, self).tearDownLocal()
 
-    @OETestID(1196)
     def test_layer_appends(self):
         corebase = get_bb_var("COREBASE")
 

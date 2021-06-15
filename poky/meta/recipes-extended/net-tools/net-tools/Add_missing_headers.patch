@@ -1,0 +1,15 @@
+Description: Add missing headers
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+--- a/netstat.c
++++ b/netstat.c
+@@ -88,6 +88,7 @@
+ #include <sys/stat.h>
+ #include <net/if.h>
+ #include <dirent.h>
++#include <sys/types.h>
+ 
+ #include "net-support.h"
+ #include "pathnames.h"

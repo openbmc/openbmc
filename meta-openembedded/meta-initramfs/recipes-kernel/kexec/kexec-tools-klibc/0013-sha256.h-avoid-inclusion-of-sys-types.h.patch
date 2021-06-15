@@ -1,4 +1,4 @@
-From ec6000b9f287e62cb0746e26cfa4372c7ea528f4 Mon Sep 17 00:00:00 2001
+From 60098810e1c04be677794bff6a3935011af98934 Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Thu, 19 Apr 2018 23:26:43 +0200
 Subject: [PATCH] sha256.h: avoid inclusion of sys/types.h
@@ -31,6 +31,3 @@ index 467fb22..40fd3ed 100644
  #include <stdint.h>
  
  typedef struct
--- 
-2.7.4
-

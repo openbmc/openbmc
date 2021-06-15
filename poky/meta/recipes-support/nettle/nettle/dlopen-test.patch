@@ -1,0 +1,29 @@
+Remove the relative path for libnettle.so so the test
+program can find it.
+Relative paths are not suitable, as the folder strucure for ptest
+is different from the one expected by the nettle testsuite.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ testsuite/dlopen-test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/testsuite/dlopen-test.c b/testsuite/dlopen-test.c
+index 4265bf7..1a25d17 100644
+--- a/testsuite/dlopen-test.c
++++ b/testsuite/dlopen-test.c
+@@ -15,7 +15,7 @@ int
+ main (int argc UNUSED, char **argv UNUSED)
+ {
+ #if HAVE_LIBDL
+-  void *handle = dlopen ("../libnettle." SO_EXT, RTLD_NOW);
++  void *handle = dlopen ("libnettle.so", RTLD_NOW);
+   int (*get_version)(void);
+   if (!handle)
+     {
+-- 
+2.17.1
+

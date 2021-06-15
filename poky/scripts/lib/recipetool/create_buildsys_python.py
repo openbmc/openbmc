@@ -2,18 +2,8 @@
 #
 # Copyright (C) 2015 Mentor Graphics Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import ast
 import codecs
@@ -41,11 +31,11 @@ def tinfoil_init(instance):
 
 
 class PythonRecipeHandler(RecipeHandler):
-    base_pkgdeps = ['python-core']
-    excluded_pkgdeps = ['python-dbg']
-    # os.path is provided by python-core
+    base_pkgdeps = ['python3-core']
+    excluded_pkgdeps = ['python3-dbg']
+    # os.path is provided by python3-core
     assume_provided = ['builtins', 'os.path']
-    # Assumes that the host python builtin_module_names is sane for target too
+    # Assumes that the host python3 builtin_module_names is sane for target too
     assume_provided = assume_provided + list(sys.builtin_module_names)
 
     bbvar_map = {
@@ -164,8 +154,13 @@ class PythonRecipeHandler(RecipeHandler):
         if 'buildsystem' in handled:
             return False
 
-        if not RecipeHandler.checkfiles(srctree, ['setup.py']):
-            return
+        # Check for non-zero size setup.py files
+        setupfiles = RecipeHandler.checkfiles(srctree, ['setup.py'])
+        for fn in setupfiles:
+            if os.path.getsize(fn):
+                break
+        else:
+            return False
 
         # setup.py is always parsed to get at certain required information, such as
         # distutils vs setuptools
@@ -225,9 +220,9 @@ class PythonRecipeHandler(RecipeHandler):
         self.apply_info_replacements(info)
 
         if uses_setuptools:
-            classes.append('setuptools')
+            classes.append('setuptools3')
         else:
-            classes.append('distutils')
+            classes.append('distutils3')
 
         if license_str:
             for i, line in enumerate(lines_before):
@@ -292,7 +287,7 @@ class PythonRecipeHandler(RecipeHandler):
                 for feature, feature_reqs in extras_req.items():
                     unmapped_deps.difference_update(feature_reqs)
 
-                    feature_req_deps = ('python-' + r.replace('.', '-').lower() for r in sorted(feature_reqs))
+                    feature_req_deps = ('python3-' + r.replace('.', '-').lower() for r in sorted(feature_reqs))
                     lines_after.append('PACKAGECONFIG[{}] = ",,,{}"'.format(feature.lower(), ' '.join(feature_req_deps)))
 
         inst_reqs = set()
@@ -303,7 +298,7 @@ class PythonRecipeHandler(RecipeHandler):
             if inst_reqs:
                 unmapped_deps.difference_update(inst_reqs)
 
-                inst_req_deps = ('python-' + r.replace('.', '-').lower() for r in sorted(inst_reqs))
+                inst_req_deps = ('python3-' + r.replace('.', '-').lower() for r in sorted(inst_reqs))
                 lines_after.append('# WARNING: the following rdepends are from setuptools install_requires. These')
                 lines_after.append('# upstream names may not correspond exactly to bitbake package names.')
                 lines_after.append('RDEPENDS_${{PN}} += "{}"'.format(' '.join(inst_req_deps)))
@@ -366,7 +361,7 @@ class PythonRecipeHandler(RecipeHandler):
         return info, 'setuptools' in imported_modules, non_literals, extensions
 
     def get_setup_args_info(self, setupscript='./setup.py'):
-        cmd = ['python', setupscript]
+        cmd = ['python3', setupscript]
         info = {}
         keys = set(self.bbvar_map.keys())
         keys |= set(self.setuparg_list_fields)
@@ -400,7 +395,7 @@ class PythonRecipeHandler(RecipeHandler):
     def get_setup_byline(self, fields, setupscript='./setup.py'):
         info = {}
 
-        cmd = ['python', setupscript]
+        cmd = ['python3', setupscript]
         cmd.extend('--' + self.setuparg_map.get(f, f.lower()) for f in fields)
         try:
             info_lines = self.run_command(cmd, cwd=os.path.dirname(setupscript)).splitlines()
@@ -537,7 +532,7 @@ class PythonRecipeHandler(RecipeHandler):
         pkgdata_dir = tinfoil.config_data.getVar('PKGDATA_DIR')
 
         ldata = tinfoil.config_data.createCopy()
-        bb.parse.handle('classes/python-dir.bbclass', ldata, True)
+        bb.parse.handle('classes/python3-dir.bbclass', ldata, True)
         python_sitedir = ldata.getVar('PYTHON_SITEPACKAGES_DIR')
 
         dynload_dir = os.path.join(os.path.dirname(python_sitedir), 'lib-dynload')

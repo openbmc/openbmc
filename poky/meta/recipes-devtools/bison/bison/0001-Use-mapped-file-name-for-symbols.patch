@@ -1,0 +1,62 @@
+From 2a3db4e3b8d33bad5577c2fcfe124ee7a202ef4f Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Mon, 15 Feb 2021 20:39:57 -0600
+Subject: [PATCH] Use mapped file name for symbols
+
+Applies the file name mapping before exporting it as a symbol. This
+allows the symbols to correctly respect the --file-prefix-map command
+line option.
+
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/bison-patches/2021-02/msg00014.html]
+---
+ src/muscle-tab.c | 4 +++-
+ src/output.c     | 8 ++++++--
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/src/muscle-tab.c b/src/muscle-tab.c
+index b610d0b8..3e7657ca 100644
+--- a/src/muscle-tab.c
++++ b/src/muscle-tab.c
+@@ -204,8 +204,10 @@ static void
+ muscle_syncline_grow (char const *key, location loc)
+ {
+   obstack_printf (&muscle_obstack, "]b4_syncline(%d, ", loc.start.line);
++  char *f = map_file_name (loc.start.file);
+   obstack_quote (&muscle_obstack,
+-                 quotearg_style (c_quoting_style, loc.start.file));
++                 quotearg_style (c_quoting_style, f));
++  free (f);
+   obstack_sgrow (&muscle_obstack, ")dnl\n[");
+   char const *extension = obstack_finish0 (&muscle_obstack);
+   muscle_grow (key, extension, "", "");
+diff --git a/src/output.c b/src/output.c
+index 391d8e65..34dbc671 100644
+--- a/src/output.c
++++ b/src/output.c
+@@ -531,7 +531,9 @@ user_actions_output (FILE *out)
+           {
+             fprintf (out, "b4_syncline(%d, ",
+                      rules[r].action_loc.start.line);
+-            string_output (out, rules[r].action_loc.start.file);
++            char *f = map_file_name (rules[r].action_loc.start.file);
++            string_output (out, f);
++            free(f);
+             fprintf (out, ")dnl\n");
+           }
+         fprintf (out, "[%*s%s]],\n[[",
+@@ -629,8 +631,10 @@ prepare_symbol_definitions (void)
+ 
+           if (p->code)
+             {
++              char *f = map_file_name (p->location.start.file);
+               SET_KEY2 (pname, "file");
+-              MUSCLE_INSERT_C_STRING (key, p->location.start.file);
++              MUSCLE_INSERT_C_STRING (key, f);
++              free (f);
+ 
+               SET_KEY2 (pname, "line");
+               MUSCLE_INSERT_INT (key, p->location.start.line);
+-- 
+2.30.0
+

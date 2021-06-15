@@ -1,0 +1,22 @@
+From 7a2fe915dded27630a345762628cdd542ea5d58a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 20 Dec 2019 13:56:16 +0100
+Subject: [PATCH] Fix build with recent gettext
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 03d1131..65609e7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -17,5 +17,5 @@
+ ## Process this file with automake to produce Makefile.in.
+ 
+ EXTRA_DIST      = config.rpath m4 $(DIST_ALPHA)
+-SUBDIRS         = intl lib libopts src doc po tests
++SUBDIRS         = lib libopts src doc po tests
+ ACLOCAL_AMFLAGS = -I m4

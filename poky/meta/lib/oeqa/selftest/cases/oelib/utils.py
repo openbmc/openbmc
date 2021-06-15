@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import sys
 from unittest.case import TestCase
 from contextlib import contextmanager

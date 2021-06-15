@@ -16,6 +16,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/n/netkit-rsh/netkit-rsh_${PV}.orig.tar.gz;name=
             file://netkit-rsh-0.17-rexec-ipv6.patch \
             file://fix-host-variable.patch \
             file://fixup_wait3_api_change.patch \
+            file://CVE-2019-7282-and-CVE-2019-7283.patch \
 "
 
 SRC_URI[archive.md5sum] = "65f5f28e2fe22d9ad8b17bb9a10df096"
@@ -30,13 +31,13 @@ PAM_SRC_URI = "file://rexec.pam \
 "
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_SRC_URI}', '', d)}"
 
-inherit pkgconfig
+inherit pkgconfig update-alternatives
 
 CFLAGS += " -D_GNU_SOURCE -Wno-deprecated-declarations"
 LDFLAGS += " -L${STAGING_LIBDIR} -lutil -lcrypt"
 
 PACKAGECONFIG ??= ""
-PACKAGECONFIG += "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
+PACKAGECONFIG_append = " ${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG[pam] = " , --without-pam, libpam, libpam"
 
 COMPATIBLE_HOST_libc-musl = 'null'
@@ -102,6 +103,3 @@ RPROVIDES_${PN}-server = "rshd"
 
 RDEPENDS_${PN}-server = "xinetd"
 RDEPENDS_${PN}-server += "tcp-wrappers"
-
-# http://errors.yoctoproject.org/Errors/Details/186963/
-EXCLUDE_FROM_WORLD_libc-musl = "1"

@@ -17,7 +17,7 @@ PV = "1.10.1+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-inherit cmake distro_features_check
+inherit cmake features_check
 
 EXTRA_OECMAKE += "-DSYNERGY_BUILD_LEGACY_GUI=OFF"
 

@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 def create_socket(url, d):
     import urllib
     from bb.utils import export_proxies

@@ -1,0 +1,14 @@
+[Unit]
+Description=Init BMC Hostname
+ConditionPathExists=!/var/lib/first-boot-set-hostname
+Wants=op-vpd-parser.service
+After=op-vpd-parser.service
+
+[Service]
+ExecStart=/usr/bin/first-boot-set-hostname.sh
+Type=oneshot
+RemainAfterExit=Yes
+
+[Install]
+WantedBy=multi-user.target
+

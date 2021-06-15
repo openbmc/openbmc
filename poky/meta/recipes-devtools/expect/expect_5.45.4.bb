@@ -25,6 +25,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/expect/Expect/${PV}/${BPN}${PV}.tar.gz \
            file://0001-expect-install-scripts-without-using-the-fixline1-tc.patch \
            file://0001-Resolve-string-formatting-issues.patch \
            file://0001-expect-Fix-segfaults-if-Tcl-is-built-with-stubs-and-.patch \
+           file://0001-exp_main_sub.c-Use-PATH_MAX-for-path.patch \
           "
 SRC_URI[md5sum] = "00fce8de158422f5ccd2666512329bd2"
 SRC_URI[sha256sum] = "49a7da83b0bdd9f46d04a04deec19c7767bb9a323e40c4781f89caf760b92c34"
@@ -44,9 +45,9 @@ do_install_append() {
 }
 
 # Apparently the public Tcl headers are only in /usr/include/tcl8.6
-# when building for the target.
-TCL_INCLUDE_PATH = ""
-TCL_INCLUDE_PATH_class-target = "--with-tclinclude=${STAGING_INCDIR}/tcl8.6"
+# when building for the target and nativesdk.
+TCL_INCLUDE_PATH = "--with-tclinclude=${STAGING_INCDIR}/tcl8.6"
+TCL_INCLUDE_PATH_class-native = ""
 
 EXTRA_OECONF += "--with-tcl=${STAGING_LIBDIR} \
                  --enable-shared \

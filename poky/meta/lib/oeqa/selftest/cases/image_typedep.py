@@ -1,14 +1,16 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake
-from oeqa.core.decorator.oeid import OETestID
 
 class ImageTypeDepTests(OESelftestTestCase):
 
     # Verify that when specifying a IMAGE_TYPEDEP_ of the form "foo.bar" that
     # the conversion type bar gets added as a dep as well
-    @OETestID(1633)
     def test_conversion_typedep_added(self):
 
         self.write_recipeinc('emptytest', """

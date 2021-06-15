@@ -1,4 +1,4 @@
-From 20c184a7ab3fb7be67fb7626c411e756ea61d2f5 Mon Sep 17 00:00:00 2001
+From 794648d84672bbda30a920a05540b56cd155ed9d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 7 Aug 2016 23:47:57 -0700
 Subject: [PATCH] strace: Fix build with mips/mips64 on musl

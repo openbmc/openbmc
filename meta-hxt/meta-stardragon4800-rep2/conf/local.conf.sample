@@ -3,7 +3,7 @@ DISTRO ?= "openbmc-phosphor"
 PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"
 EXTRA_IMAGE_FEATURES = "debug-tweaks"
-USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+USER_CLASSES ?= "buildstats image-prelink"
 PATCHRESOLVE = "noop"
 BB_DISKMON_DIRS = "\
     STOPTASKS,${TMPDIR},1G,100K \

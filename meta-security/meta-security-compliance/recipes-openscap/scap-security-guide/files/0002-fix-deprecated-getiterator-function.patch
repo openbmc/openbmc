@@ -1,0 +1,58 @@
+From b0adc1d53780def4a95e310b6d26bb91ee97177e Mon Sep 17 00:00:00 2001
+From: Vojtech Polasek <vpolasek@redhat.com>
+Date: Mon, 8 Jun 2020 13:27:41 +0200
+Subject: [PATCH] fix deprecated getiterator function
+
+Upstream-Status: Backport
+[https://github.com/ComplianceAsCode/content/commit/b0adc1d53780def4a95e310b6d26bb91ee97177e]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ ssg/build_cpe.py    | 6 +++---
+ ssg/id_translate.py | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/ssg/build_cpe.py b/ssg/build_cpe.py
+index 2e5d24a5d..8c046777a 100644
+--- a/ssg/build_cpe.py
++++ b/ssg/build_cpe.py
+@@ -17,7 +17,7 @@ def extract_subelement(objects, sub_elem_type):
+     """
+ 
+     for obj in objects:
+-        for subelement in obj.getiterator():
++        for subelement in obj.iter():
+             if subelement.get(sub_elem_type):
+                 sub_element = subelement.get(sub_elem_type)
+                 return sub_element
+@@ -44,12 +44,12 @@ def extract_referred_nodes(tree_with_refs, tree_with_ids, attrname):
+     reflist = []
+     elementlist = []
+ 
+-    for element in tree_with_refs.getiterator():
++    for element in tree_with_refs.iter():
+         value = element.get(attrname)
+         if value is not None:
+             reflist.append(value)
+ 
+-    for element in tree_with_ids.getiterator():
++    for element in tree_with_ids.iter():
+         if element.get("id") in reflist:
+             elementlist.append(element)
+ 
+diff --git a/ssg/id_translate.py b/ssg/id_translate.py
+index 72b07be18..ba9225904 100644
+--- a/ssg/id_translate.py
++++ b/ssg/id_translate.py
+@@ -64,7 +64,7 @@ class IDTranslator(object):
+         )
+ 
+     def translate(self, tree, store_defname=False):
+-        for element in tree.getiterator():
++        for element in tree.iter():
+             idname = element.get("id")
+             if idname:
+                 # store the old name if requested (for OVAL definitions)
+-- 
+2.17.1
+

@@ -1,4 +1,4 @@
-From 419181e242892ded050f5a375a709b9588fb581d Mon Sep 17 00:00:00 2001
+From d2cedfa3394365689a3f7c8cfe8e0dd56b29bed9 Mon Sep 17 00:00:00 2001
 From: Koen Kooi <koen.kooi@linaro.org>
 Date: Tue, 17 Jun 2014 09:10:57 +0200
 Subject: [PATCH] configure: use pkg-config for PCRE detection
@@ -6,13 +6,12 @@ Subject: [PATCH] configure: use pkg-config for PCRE detection
 Upstream-Status: Pending
 
 Signed-off-by: Koen Kooi <koen.kooi@linaro.org>
-
 ---
  configure.in | 27 +++++----------------------
  1 file changed, 5 insertions(+), 22 deletions(-)
 
 diff --git a/configure.in b/configure.in
-index be7bd25..54dfd0d 100644
+index 9feaceb..dc6ea15 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -215,28 +215,11 @@ fi
@@ -49,3 +48,6 @@ index be7bd25..54dfd0d 100644
  APACHE_SUBST(PCRE_LIBS)
  
  AC_MSG_NOTICE([])
+-- 
+2.7.4
+

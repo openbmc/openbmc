@@ -1,0 +1,102 @@
+From 000cfdc6f16009e62c236267ce7123a9ef2380e9 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Fri, 28 Sep 2018 12:07:43 +0530
+Subject: [PATCH 08/11] fixing the bug in crt files, added addlik instead of
+ lli insn
+
+---
+ libgloss/microblaze/crt0.S | 6 +++---
+ libgloss/microblaze/crt1.S | 6 +++---
+ libgloss/microblaze/crt2.S | 6 +++---
+ libgloss/microblaze/crt3.S | 6 +++---
+ libgloss/microblaze/crt4.S | 6 +++---
+ 5 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/libgloss/microblaze/crt0.S b/libgloss/microblaze/crt0.S
+index e4df73b66..25e7c4af3 100644
+--- a/libgloss/microblaze/crt0.S
++++ b/libgloss/microblaze/crt0.S
+@@ -106,9 +106,9 @@ _vector_hw_exception:
+         .type _start1, @function   
+ _start1:
+ #ifdef  __arch64__
+-        lli     r13, r0, _SDA_BASE_
+-        lli     r2, r0, _SDA2_BASE_
+-        lli     r1,  r0, _stack-32
++        addlik     r13, r0, _SDA_BASE_
++        addlik     r2, r0, _SDA2_BASE_
++        addlik     r1,  r0, _stack-32
+         brealid	r15, _crtinit
+         nop
+         addlik   r5, r3, 0
+diff --git a/libgloss/microblaze/crt1.S b/libgloss/microblaze/crt1.S
+index b24eeb531..38440c957 100644
+--- a/libgloss/microblaze/crt1.S
++++ b/libgloss/microblaze/crt1.S
+@@ -94,9 +94,9 @@ _vector_hw_exception:
+         .type _start, @function    
+ _start:
+ #ifdef	__arch64__
+-	lli	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+-        lli      r2, r0, _SDA2_BASE_
+-        lli      r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++	addlik	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
++        addlik      r2, r0, _SDA2_BASE_
++        addlik     r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+ 
+         brealid   r15, _crtinit               /* Initialize BSS and run program */
+ 	nop
+diff --git a/libgloss/microblaze/crt2.S b/libgloss/microblaze/crt2.S
+index ae4c89ee0..352927dab 100644
+--- a/libgloss/microblaze/crt2.S
++++ b/libgloss/microblaze/crt2.S
+@@ -92,9 +92,9 @@ _vector_hw_exception:
+         .type _start, @function    
+ _start:
+ #ifdef	__arch64__
+-        lli	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+-        lli	r2, r0, _SDA2_BASE_
+-        lli	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++        addlik	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
++        addlik	r2, r0, _SDA2_BASE_
++        addlik	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+         brealid	r15, _crtinit               /* Initialize BSS and run program */
+         nop
+ 	addlik	r5, r3, 0
+diff --git a/libgloss/microblaze/crt3.S b/libgloss/microblaze/crt3.S
+index a8bc7839b..bc32cda86 100644
+--- a/libgloss/microblaze/crt3.S
++++ b/libgloss/microblaze/crt3.S
+@@ -62,9 +62,9 @@
+         .type _start, @function    
+ _start:
+ #ifdef	__arch64__
+-        lli	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+-        lli	r2, r0, _SDA2_BASE_
+-        lli	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++        addlik	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
++        addlik	r2, r0, _SDA2_BASE_
++        addlik	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+ 
+         brealid	r15, _crtinit               /* Initialize BSS and run program */
+         nop
+diff --git a/libgloss/microblaze/crt4.S b/libgloss/microblaze/crt4.S
+index 54ba473ea..a25c84734 100644
+--- a/libgloss/microblaze/crt4.S
++++ b/libgloss/microblaze/crt4.S
+@@ -63,9 +63,9 @@
+         .type _start, @function    
+ _start:
+ #ifdef	__arch64__
+-        lli	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+-        lli	r2, r0, _SDA2_BASE_
+-        lli	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++        addlik	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
++        addlik	r2, r0, _SDA2_BASE_
++        addlik	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+ 
+         brealid	r15, _crtinit               /* Initialize BSS and run program */
+ 	nop
+-- 
+2.17.1
+

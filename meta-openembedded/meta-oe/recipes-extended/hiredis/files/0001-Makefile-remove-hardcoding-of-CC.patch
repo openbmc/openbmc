@@ -11,22 +11,18 @@ Signed-off-by: Andrea Galbusera <gizero@gmail.com>
  Makefile | 5 -----
  1 file changed, 5 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 8b0f0c2..66a4317 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -34,11 +34,6 @@ define REDIS_TEST_CONFIG
+@@ -35,12 +35,6 @@ define REDIS_TEST_CONFIG
  endef
  export REDIS_TEST_CONFIG
  
 -# Fallback to gcc when $CC is not in $PATH.
--CC:=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
+-CC:=$(shell sh -c 'type $${CC%% *} >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
+-CXX:=$(shell sh -c 'type $${CXX%% *} >/dev/null 2>/dev/null && echo $(CXX) || echo g++')
 -OPTIMIZATION?=-O3
 -WARNINGS=-Wall -W -Wstrict-prototypes -Wwrite-strings
--DEBUG?= -g -ggdb
- REAL_CFLAGS=$(OPTIMIZATION) -fPIC $(CFLAGS) $(WARNINGS) $(DEBUG) $(ARCH)
- REAL_LDFLAGS=$(LDFLAGS) $(ARCH)
+-DEBUG_FLAGS?= -g -ggdb
+ REAL_CFLAGS=$(OPTIMIZATION) -fPIC $(CFLAGS) $(WARNINGS) $(DEBUG_FLAGS)
+ REAL_LDFLAGS=$(LDFLAGS)
  
--- 
-1.9.1
-

@@ -1,0 +1,238 @@
+From 2a5cf5021b56bc92c9953d2c82e8c90502d22c97 Mon Sep 17 00:00:00 2001
+From: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Date: Fri, 13 Sep 2019 10:20:53 +0200
+Subject: [PATCH] build: use autotools
+
+This removes the hand-crafted Makefile in favor of standardized autotools
+build configuration. This is done to allow for easy cross-compilation of
+this project.
+
+Upstream-Status: Submitted
+
+Signed-off-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
+---
+ .gitignore          | 17 ++++++++++++
+ Makefile            | 66 ---------------------------------------------
+ Makefile.am         | 10 +++++++
+ configure.ac        | 36 +++++++++++++++++++++++++
+ include/Makefile.am |  9 +++++++
+ man/Makefile.am     |  7 +++++
+ obj/.gitkeep        |  0
+ src/Makefile.am     | 13 +++++++++
+ 8 files changed, 92 insertions(+), 66 deletions(-)
+ delete mode 100644 Makefile
+ create mode 100644 Makefile.am
+ create mode 100644 configure.ac
+ create mode 100644 include/Makefile.am
+ create mode 100644 man/Makefile.am
+ delete mode 100644 obj/.gitkeep
+ create mode 100644 src/Makefile.am
+
+diff --git a/.gitignore b/.gitignore
+index af88e94..4e7355a 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -3,3 +3,20 @@ obj/*.o
+ man/*.1
+ man/*.xml
+ test/GLOB*
++*.o
++
++# autotools stuff
++.deps/
++Makefile
++Makefile.in
++aclocal.m4
++autom4te.cache/
++autostuff/
++config.h
++config.h.in
++config.h.in~
++config.log
++config.status
++configure
++m4/
++stamp-h1
+diff --git a/Makefile b/Makefile
+deleted file mode 100644
+index 6264da0..0000000
+--- a/Makefile
++++ /dev/null
+@@ -1,66 +0,0 @@
+-TARGET = unclutter
+-VERSION = 1.5
+-SDIR = src
+-IDIR = include
+-ODIR = obj
+-
+-INSTALL = install
+-PREFIX = /usr
+-
+-BINDIR = $(PREFIX)/bin
+-MANDIR = $(PREFIX)/share/man/man1
+-LICENSEDIR = $(PREFIX)/share/licenses/$(TARGET)
+-
+-CC = gcc
+-LD = $(CC)
+-PKG_CONFIG = pkg-config
+-
+-CPPFLAGS += -D'__VERSION="${VERSION}"' "-I$(IDIR)"
+-
+-CFLAGS += -std=gnu99
+-CFLAGS += -Wall -Wundef -Wshadow -Wformat-security
+-
+-LDFLAGS += $(shell $(PKG_CONFIG) --libs x11 xi xfixes)
+-# libev has no pkg-config support
+-LDFLAGS += -lev
+-
+-INCS = $(wildcard $(IDIR)/*.h)
+-SRCS = $(wildcard $(SDIR)/*.c)
+-OBJS = $(patsubst %,$(ODIR)/%,$(notdir $(SRCS:.c=.o)))
+-
+-MANS = man/unclutter-xfixes.1
+-
+-.NOTPARALLEL:
+-
+-.PHONY: all
+-all: clean $(TARGET) mans
+-
+-.PHONY: $(TARGET)
+-$(TARGET): $(OBJS)
+-	$(LD) $(OBJS) $(LDFLAGS) -o "$(TARGET)"
+-
+-$(ODIR)/%.o: $(SDIR)/%.c $(INCS)
+-	$(CC) $(CPPFLAGS) $(CFLAGS) -o "$@" -c "$<"
+-
+-.PHONY: install
+-install: $(TARGET) mans
+-	$(INSTALL) -Dm 0755 "$(TARGET)" "$(DESTDIR)$(BINDIR)/$(TARGET)"
+-	$(INSTALL) -Dm 0644 man/unclutter-xfixes.1 "$(DESTDIR)$(MANDIR)/unclutter.1"
+-	$(INSTALL) -Dm 0644 -t "$(DESTDIR)$(LICENSEDIR)/" LICENSE
+-
+-.PHONY: uninstall
+-uninstall:
+-	$(RM) "$(DESTDIR)$(BINDIR)/$(TARGET)"
+-	$(RM) "$(DESTDIR)$(MANDIR)/unclutter.1"
+-	$(RM) "$(DESTDIR)$(LICENSEDIR)/LICENSE"
+-
+-.PHONY: mans
+-mans: $(MANS)
+-
+-$(MANS): %.1: %.man
+-	a2x --no-xmllint -f manpage "$<"
+-
+-.PHONY: clean
+-clean:
+-	$(RM) $(TARGET) $(OBJS)
+-	$(RM) man/*.1 man/*.xml
+diff --git a/Makefile.am b/Makefile.am
+new file mode 100644
+index 0000000..38ecaa1
+--- /dev/null
++++ b/Makefile.am
+@@ -0,0 +1,10 @@
++ACLOCAL_AMFLAGS = -I m4
++AUTOMAKE_OPTIONS = foreign
++SUBDIRS = include src
++
++if HAS_A2X
++SUBDIRS += man
++endif
++
++licensedir = $(datadir)/licenses/unclutter
++license_DATA = LICENSE
+diff --git a/configure.ac b/configure.ac
+new file mode 100644
+index 0000000..1d59197
+--- /dev/null
++++ b/configure.ac
+@@ -0,0 +1,36 @@
++AC_PREREQ(2.61)
++
++AC_INIT([unclutter-xfixes], 1.6)
++AC_DEFINE_UNQUOTED([VERSION], ["$PACKAGE_VERSION"])
++
++AC_CONFIG_AUX_DIR([autostuff])
++AC_CONFIG_MACRO_DIRS([m4])
++AM_INIT_AUTOMAKE([foreign subdir-objects])
++
++m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
++
++AC_CONFIG_SRCDIR([src])
++AC_CONFIG_HEADER([config.h])
++
++AM_PROG_AR
++AC_PROG_CC
++AC_PROG_INSTALL
++
++# libev has no pkg-config support
++AC_CHECK_HEADERS([ev.h], [], [AC_MSG_ERROR([ev.h not found - please install libev])])
++
++PKG_CHECK_MODULES([X11], [x11 xi xfixes])
++
++AC_CHECK_PROG([has_a2x], [a2x], [true], [false])
++AM_CONDITIONAL([HAS_A2X], [test "x$has_a2x" = xtrue])
++if test "x$has_a2x" = xfalse
++then
++	AC_MSG_NOTICE([a2x not found - needed to generate man pages])
++fi
++
++AC_CONFIG_FILES([Makefile
++		 include/Makefile
++		 src/Makefile
++		 man/Makefile])
++
++AC_OUTPUT
+diff --git a/include/Makefile.am b/include/Makefile.am
+new file mode 100644
+index 0000000..90d8bbc
+--- /dev/null
++++ b/include/Makefile.am
+@@ -0,0 +1,9 @@
++noinst_HEADERS = \
++	all.h \
++	cursor.h \
++	event.h \
++	extensions.h \
++	externals.h \
++	globals.h \
++	types.h \
++	util.h
+diff --git a/man/Makefile.am b/man/Makefile.am
+new file mode 100644
+index 0000000..7856e6a
+--- /dev/null
++++ b/man/Makefile.am
+@@ -0,0 +1,7 @@
++unclutter-xfixes.1:
++	a2x --no-xmllint -f manpage unclutter-xfixes.man
++
++dist_man1_MANS = unclutter-xfixes.1
++
++clean-local:
++	rm -f unclutter-xfixes.1
+diff --git a/obj/.gitkeep b/obj/.gitkeep
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/src/Makefile.am b/src/Makefile.am
+new file mode 100644
+index 0000000..c7f0729
+--- /dev/null
++++ b/src/Makefile.am
+@@ -0,0 +1,13 @@
++AM_CFLAGS = -D'__VERSION="${VERSION}"' "-I$(top_srcdir)/include"
++AM_CFLAGS += -std=gnu99 -Wall -Wundef -Wshadow -Wformat-security
++AM_CFLAGS += $(X11_CFLAGS)
++AM_LDFLAGS = -lev $(X11_LIBS)
++
++bin_PROGRAMS = unclutter
++
++unclutter_SOURCES = \
++	cursor.c \
++	event.c \
++	extensions.c \
++	unclutter.c \
++	util.c
+-- 
+2.21.0
+

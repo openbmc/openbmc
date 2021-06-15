@@ -1,0 +1,132 @@
+From b63f13d2df91ede45288653b21e0d30a6b45f2ac Mon Sep 17 00:00:00 2001
+From: Beniamin Sandu <beniaminsandu@gmail.com>
+Date: Mon, 30 Nov 2020 18:24:48 +0200
+Subject: [PATCH] trace-cmd: make it build with musl
+
+Signed-off-by: Beniamin Sandu <beniaminsandu@gmail.com>
+---
+ include/trace-cmd/trace-cmd.h |  1 +
+ lib/trace-cmd/trace-msg.c     |  1 +
+ lib/trace-cmd/trace-plugin.c  |  2 ++
+ lib/tracefs/tracefs-events.c  |  1 +
+ tracecmd/trace-agent.c        |  1 +
+ tracecmd/trace-setup-guest.c  |  1 +
+ tracecmd/trace-tsync.c        | 15 ++++++++++-----
+ 7 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/include/trace-cmd/trace-cmd.h b/include/trace-cmd/trace-cmd.h
+index f3c95f3..a697905 100644
+--- a/include/trace-cmd/trace-cmd.h
++++ b/include/trace-cmd/trace-cmd.h
+@@ -6,6 +6,7 @@
+ #ifndef _TRACE_CMD_H
+ #define _TRACE_CMD_H
+ 
++#include <sys/types.h>
+ #include "traceevent/event-parse.h"
+ 
+ #define TRACECMD_MAGIC { 23, 8, 68 }
+diff --git a/lib/trace-cmd/trace-msg.c b/lib/trace-cmd/trace-msg.c
+index 4a0bfa9..fc1f2c7 100644
+--- a/lib/trace-cmd/trace-msg.c
++++ b/lib/trace-cmd/trace-msg.c
+@@ -21,6 +21,7 @@
+ #include <arpa/inet.h>
+ #include <sys/types.h>
+ #include <linux/types.h>
++#include <byteswap.h>
+ 
+ #include "trace-write-local.h"
+ #include "trace-cmd-local.h"
+diff --git a/lib/trace-cmd/trace-plugin.c b/lib/trace-cmd/trace-plugin.c
+index 92f9edf..c2ef3dc 100644
+--- a/lib/trace-cmd/trace-plugin.c
++++ b/lib/trace-cmd/trace-plugin.c
+@@ -8,6 +8,8 @@
+ #include <dlfcn.h>
+ #include <sys/stat.h>
+ #include <libgen.h>
++#include <limits.h>
++
+ #include "trace-cmd.h"
+ #include "trace-local.h"
+ 
+diff --git a/lib/tracefs/tracefs-events.c b/lib/tracefs/tracefs-events.c
+index 8e825f5..a8d8560 100644
+--- a/lib/tracefs/tracefs-events.c
++++ b/lib/tracefs/tracefs-events.c
+@@ -13,6 +13,7 @@
+ #include <errno.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
++#include <limits.h>
+ 
+ #include "kbuffer.h"
+ #include "tracefs.h"
+diff --git a/tracecmd/trace-agent.c b/tracecmd/trace-agent.c
+index b581696..abfefac 100644
+--- a/tracecmd/trace-agent.c
++++ b/tracecmd/trace-agent.c
+@@ -20,6 +20,7 @@
+ #include <unistd.h>
+ #include <linux/vm_sockets.h>
+ #include <pthread.h>
++#include <limits.h>
+ 
+ #include "trace-local.h"
+ #include "trace-msg.h"
+diff --git a/tracecmd/trace-setup-guest.c b/tracecmd/trace-setup-guest.c
+index 899848c..99595a1 100644
+--- a/tracecmd/trace-setup-guest.c
++++ b/tracecmd/trace-setup-guest.c
+@@ -13,6 +13,7 @@
+ #include <string.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
++#include <limits.h>
+ 
+ #include "trace-local.h"
+ #include "trace-msg.h"
+diff --git a/tracecmd/trace-tsync.c b/tracecmd/trace-tsync.c
+index e639788..b8b5ac3 100644
+--- a/tracecmd/trace-tsync.c
++++ b/tracecmd/trace-tsync.c
+@@ -104,13 +104,15 @@ int tracecmd_host_tsync(struct buffer_instance *instance,
+ 
+ 	pthread_attr_init(&attrib);
+ 	pthread_attr_setdetachstate(&attrib, PTHREAD_CREATE_JOINABLE);
+-	if (!get_first_cpu(&pin_mask, &mask_size))
+-		pthread_attr_setaffinity_np(&attrib, mask_size, pin_mask);
+ 
+ 	ret = pthread_create(&instance->tsync_thread, &attrib,
+ 			     tsync_host_thread, &instance->tsync);
+-	if (!ret)
++	if (!ret) {
++		if (!get_first_cpu(&pin_mask, &mask_size))
++			pthread_setaffinity_np(instance->tsync_thread, mask_size, pin_mask);
+ 		instance->tsync_thread_running = true;
++	}
++
+ 	if (pin_mask)
+ 		CPU_FREE(pin_mask);
+ 	pthread_attr_destroy(&attrib);
+@@ -243,11 +245,14 @@ unsigned int tracecmd_guest_tsync(char *tsync_protos,
+ 	pthread_attr_init(&attrib);
+ 	tsync->sync_proto = proto;
+ 	pthread_attr_setdetachstate(&attrib, PTHREAD_CREATE_JOINABLE);
+-	if (!get_first_cpu(&pin_mask, &mask_size))
+-		pthread_attr_setaffinity_np(&attrib, mask_size, pin_mask);
+ 
+ 	ret = pthread_create(thr_id, &attrib, tsync_agent_thread, tsync);
+ 
++	if (!ret) {
++		if (!get_first_cpu(&pin_mask, &mask_size))
++			pthread_setaffinity_np(*thr_id, mask_size, pin_mask);
++	}
++
+ 	if (pin_mask)
+ 		CPU_FREE(pin_mask);
+ 	pthread_attr_destroy(&attrib);
+-- 
+2.25.1
+

@@ -1,0 +1,125 @@
+{
+   "fans": [
+      {
+         "inventory": "/system/chassis/motherboard/fan0",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 20,
+         "sensors": [
+            {
+               "name": "fan0_0",
+               "has_target": true
+            },
+            {
+               "name": "fan0_1",
+               "has_target": false
+            }
+         ]
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan1",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 20,
+         "sensors": [
+            {
+               "name": "fan1_0",
+               "has_target": true
+            },
+            {
+               "name": "fan1_1",
+               "has_target": false
+            }
+         ],
+         "condition": {
+            "name": "propertiesMatch",
+            "properties": [
+               {
+                  "object": "/xyz/openbmc_project/inventory/system/chassis",
+                  "interface": "xyz.openbmc_project.Inventory.Decorator.CoolingType",
+                  "property": {
+                     "name": "WaterCooled",
+                     "type": "bool",
+                     "value": false
+                  }
+               }
+            ]
+         }
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan2",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 20,
+         "sensors": [
+            {
+               "name": "fan2_0",
+               "has_target": true
+            },
+            {
+               "name": "fan2_1",
+               "has_target": false
+            }
+         ]
+      },
+      {
+         "inventory": "/system/chassis/motherboard/fan3",
+         "functional_delay": 5,
+         "allowed_out_of_range_time": 30,
+         "deviation": 15,
+         "num_sensors_nonfunc_for_fan_nonfunc": 1,
+         "monitor_start_delay": 20,
+         "sensors": [
+            {
+               "name": "fan3_0",
+               "has_target": true
+            },
+            {
+               "name": "fan3_1",
+               "has_target": false
+            }
+         ]
+      }
+   ],
+   "sensor_trust_groups": [
+      {
+         "class": "NonzeroSpeed",
+         "group": [
+            {
+               "name": "fan0_1"
+            },
+            {
+               "name": "fan1_1"
+            },
+            {
+               "name": "fan2_1"
+            },
+            {
+               "name": "fan3_1"
+            },
+            {
+               "name": "fan0_0",
+               "in_trust": false
+            },
+            {
+               "name": "fan1_0",
+               "in_trust": false
+            },
+            {
+               "name": "fan2_0",
+               "in_trust": false
+            },
+            {
+               "name": "fan3_0",
+               "in_trust": false
+            }
+         ]
+      }
+   ]
+}

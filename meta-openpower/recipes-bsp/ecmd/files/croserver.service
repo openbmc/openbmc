@@ -1,0 +1,12 @@
+[Unit]
+Description=Cronus Server
+Documentation=https://github.com/open-power/eCMD/
+After=network.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/croserver
+Restart=on-failure
+ProtectHome=yes
+ProtectSystem=full
+RestrictAddressFamilies=AF_INET AF_INET6

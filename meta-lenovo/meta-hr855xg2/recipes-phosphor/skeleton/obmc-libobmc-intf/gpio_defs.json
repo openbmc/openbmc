@@ -1,0 +1,35 @@
+{
+    "gpio_configs": {
+
+        "power_config": {
+            "power_good_in": "PGOOD",
+            "power_up_outs": [
+            ],
+            "reset_outs": [
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "PGOOD",
+            "pin": "H7",
+            "direction": "in"
+        },
+        {
+             "name": "POWER_BUTTON",
+             "pin": "I1",
+             "direction": "both"
+        },
+        {
+             "name": "RESET_BUTTON",
+             "pin": "R0",
+             "direction": "both"
+        },
+        {
+            "name": "ID_BTN",
+            "pin": "Y2",
+            "direction": "both"
+        }
+    ]
+}

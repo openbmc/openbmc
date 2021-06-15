@@ -1,0 +1,116 @@
+From dd6ad8ca447457c812809791ab8622da8646104c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 30 Aug 2019 13:07:33 -0700
+Subject: [PATCH] Don't use __GNUC_PREREQ
+
+These are not official GCC predefined macros; they are macros defined
+by GNU libc and some versions of BSD libc for internal use by their
+own headers, and we shouldn't be using them without checking for their
+availability first
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/efi/efi.h           | 4 ++--
+ lib/engine/pragma.h     | 4 ++--
+ lib/log/log.h           | 4 ++--
+ lib/mpb/machine_bytes.h | 4 ++--
+ lib/mpb/mpb.h           | 4 ++--
+ lib/orom/orom.h         | 4 ++--
+ 6 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/lib/efi/efi.h b/lib/efi/efi.h
+index 0620d9c..c8358db 100644
+--- a/lib/efi/efi.h
++++ b/lib/efi/efi.h
+@@ -33,9 +33,9 @@
+ #include <features.h>
+ #include <ssi.h>
+ 
+-#if __GNUC_PREREQ(3, 4)
++#if ((defined __GNUC__ && __GNUC__ >= 3 && __GNUC_MINOR__ >= 4) || defined __clang__)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
++#endif
+ 
+ #if defined(__cplusplus)
+ extern "C" {
+diff --git a/lib/engine/pragma.h b/lib/engine/pragma.h
+index 8205ed3..fa0b268 100644
+--- a/lib/engine/pragma.h
++++ b/lib/engine/pragma.h
+@@ -32,9 +32,9 @@
+ 
+ #include <features.h>
+ 
+-#if __GNUC_PREREQ(3, 4)
++#if ((defined __GNUC__ && __GNUC__ >= 3 && __GNUC_MINOR__ >= 4) || defined __clang__)
+ #define SSI_HAS_PRAGMA_ONCE
+-#endif /* __GNUC_PREREQ */
++#endif
+ 
+ #ifdef SSI_HAS_PRAGMA_ONCE
+ #pragma once
+diff --git a/lib/log/log.h b/lib/log/log.h
+index 66a707b..ca5000a 100644
+--- a/lib/log/log.h
++++ b/lib/log/log.h
+@@ -32,9 +32,9 @@
+ 
+ #include <features.h>
+ 
+-#if __GNUC_PREREQ(3, 4)
++#if ((defined __GNUC__ && __GNUC__ >= 3 && __GNUC_MINOR__ >= 4) || defined __clang__)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
++#endif
+ 
+ #if defined(__cplusplus)
+ extern "C" {
+diff --git a/lib/mpb/machine_bytes.h b/lib/mpb/machine_bytes.h
+index 6cb81c9..807461f 100644
+--- a/lib/mpb/machine_bytes.h
++++ b/lib/mpb/machine_bytes.h
+@@ -27,9 +27,9 @@
+  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
+-#if __GNUC_PREREQ(3, 4)
++#if ((defined __GNUC__ && __GNUC__ >= 3 && __GNUC_MINOR__ >= 4) || defined __clang__)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
++#endif
+ 
+ #ifndef __ENDIAN_H__INCLUDED__
+ #define __ENDIAN_H__INCLUDED__
+diff --git a/lib/mpb/mpb.h b/lib/mpb/mpb.h
+index 32beb21..98f82fe 100644
+--- a/lib/mpb/mpb.h
++++ b/lib/mpb/mpb.h
+@@ -27,9 +27,9 @@
+  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
+-#if __GNUC_PREREQ(3, 4)
++#if ((defined __GNUC__ && __GNUC__ >= 3 && __GNUC_MINOR__ >= 4) || defined __clang__)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
++#endif
+ 
+ #ifndef __MPB_H__INCLUDED__
+ #define __MPB_H__INCLUDED__
+diff --git a/lib/orom/orom.h b/lib/orom/orom.h
+index 4492066..16b03a6 100644
+--- a/lib/orom/orom.h
++++ b/lib/orom/orom.h
+@@ -32,9 +32,9 @@
+ 
+ #include <features.h>
+ 
+-#if __GNUC_PREREQ(3, 4)
++#if ((defined __GNUC__ && __GNUC__ >= 3 && __GNUC_MINOR__ >= 4) || defined __clang__)
+ #pragma once
+-#endif /* __GNUC_PREREQ */
++#endif
+ 
+ #if defined(__cplusplus)
+ extern "C" {

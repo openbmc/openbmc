@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 import codecs
 import os
 
@@ -13,9 +17,8 @@ def read_pkgdatafile(fn):
 
     if os.access(fn, os.R_OK):
         import re
-        f = open(fn, 'r')
-        lines = f.readlines()
-        f.close()
+        with open(fn, 'r') as f:
+            lines = f.readlines()
         r = re.compile("([^:]+):\s*(.*)")
         for l in lines:
             m = r.match(l)

@@ -25,12 +25,11 @@ LIBC_DEPENDENCIES = "\
     libgloss-dbg \
     libgcc-dev \
     libgcc-dbg \
+    libstdc++-dev \
+    libstdc++-staticdev \
     "
 
-# compilerlibs defaults to gcc-runtime, but we get runtime from libgloss
-# we set ASSUME_PROVIDED because we cant set PREFERRED_PROVIDER
-# for compilerlibs since its overridden by tcmode-default
-ASSUME_PROVIDED += "virtual/${TARGET_PREFIX}compilerlibs virtual/crypt"
+ASSUME_PROVIDED += "virtual/crypt"
 
 # Its useful to be able to extend newlib, but we dont provide a native variant of libgloss
 NEWLIB_EXTENDED ?=  "libgloss libgcc"
@@ -39,7 +38,7 @@ BASE_DEFAULT_DEPS_append_class-target = " ${NEWLIB_EXTENDED}"
 TARGET_OS = "elf"
 TARGET_OS_arm = "eabi"
 
-TOOLCHAIN_HOST_TASK ?= "packagegroup-cross-canadian-${MACHINE}"
+TOOLCHAIN_HOST_TASK ?= "packagegroup-cross-canadian-${MACHINE} nativesdk-qemu"
 TOOLCHAIN_TARGET_TASK ?= "${LIBC_DEPENDENCIES}"
 TOOLCHAIN_NEED_CONFIGSITE_CACHE_remove = "zlib ncurses"
 

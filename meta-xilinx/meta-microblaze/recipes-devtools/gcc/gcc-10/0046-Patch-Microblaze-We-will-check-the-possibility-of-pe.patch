@@ -1,0 +1,87 @@
+From 444a09859149f8d21777a1c859ef2305ff86b211 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Fri, 29 Mar 2019 12:08:39 +0530
+Subject: [PATCH 46/54] [Patch,Microblaze] : We will check the possibility of
+ peephole2 optimization,if we can then we will fix the compiler issue.
+
+---
+ gcc/config/microblaze/microblaze.md | 63 +++++++++++++++++------------
+ 1 file changed, 38 insertions(+), 25 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 207d2bf1b55..9b88666c0a6 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -882,31 +882,44 @@
+   (set_attr "mode"	"SI")
+   (set_attr "length"	"4")])
+ 
+-(define_peephole2
+-  [(set (match_operand:SI 0 "register_operand")
+-        (fix:SI (match_operand:SF 1 "register_operand")))
+-   (set (pc)
+-        (if_then_else (match_operator 2 "ordered_comparison_operator"
+-                       [(match_operand:SI 3 "register_operand")
+-                        (match_operand:SI 4 "arith_operand")])
+-                      (label_ref (match_operand 5))
+-                      (pc)))]
+-   "TARGET_HARD_FLOAT && !TARGET_MB_64"
+-   [(set (match_dup 1) (match_dup 3))]
+-
+-  {
+-    rtx condition;
+-    rtx cmp_op0 = operands[3];
+-    rtx cmp_op1 = operands[4];
+-    rtx comp_reg =  gen_rtx_REG (SImode, MB_ABI_ASM_TEMP_REGNUM);
+-
+-    emit_insn (gen_cstoresf4 (comp_reg, operands[2],
+-                              gen_rtx_REG (SFmode, REGNO (cmp_op0)),
+-                              gen_rtx_REG (SFmode, REGNO (cmp_op1))));
+-    condition = gen_rtx_NE (SImode, comp_reg, const0_rtx);
+-    emit_jump_insn (gen_condjump (condition, operands[5]));
+-  }
+-)
++;; peephole2 optimization will be done only if fint and if-then-else
++;; are dependent.added condition for the same.
++;; if they are dependent then gcc is giving "flow control insn inside a basic block" 
++;; testcase:
++;;        volatile float vec = 1.0;
++;;        volatile int ci = 2;
++;;        register int cj = (int)(vec);
++;;//        ci=cj;
++;;//      if (ci <0) {
++;;        if (cj < 0) {
++;;                ci = 0;
++;;        }
++;; commenting for now.we will check the possibility of this optimization later
++
++;;(define_peephole2
++;;  [(set (match_operand:SI 0 "register_operand")
++;;        (fix:SI (match_operand:SF 1 "register_operand")))
++;;   (set (pc)
++;;        (if_then_else (match_operator 2 "ordered_comparison_operator"
++;;                       [(match_operand:SI 3 "register_operand")
++;;                        (match_operand:SI 4 "arith_operand")])
++;;                      (label_ref (match_operand 5))
++;;                      (pc)))]
++;;   "TARGET_HARD_FLOAT && !TARGET_MB_64 && ((REGNO (operands[0])) == (REGNO (operands[3])))"
++;;  [(set (match_dup 1) (match_dup 3))]
++;;  {
++;;    rtx condition;
++;;    rtx cmp_op0 = operands[3];
++;;    rtx cmp_op1 = operands[4];
++;;    rtx comp_reg =  gen_rtx_REG (SImode, MB_ABI_ASM_TEMP_REGNUM);
++;;
++;;    emit_insn (gen_cstoresf4 (comp_reg, operands[2],
++;;                              gen_rtx_REG (SFmode, REGNO (cmp_op0)),
++;;                              gen_rtx_REG (SFmode, REGNO (cmp_op1))));
++;;    condition = gen_rtx_NE (SImode, comp_reg, const0_rtx);
++;;    emit_jump_insn (gen_condjump (condition, operands[5]));
++;;  }
++;;)
+ 
+ ;;----------------------------------------------------------------
+ ;; Negation and one's complement
+-- 
+2.17.1
+

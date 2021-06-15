@@ -1,0 +1,127 @@
+Description: Debian forbids calls to external websites.
+
+Author: Gianfranco Costamagna <locutus@debian.org>
+Origin: Debian
+Forwarded: not-needed
+Reviewed-By: Gianfranco Costamagna <locutusofborg@debian.org>
+Last-Update: 2015-11-25
+
+Index: cpprest/Release/tests/functional/http/client/CMakeLists.txt
+===================================================================
+--- cpprest.orig/Release/tests/functional/http/client/CMakeLists.txt
++++ cpprest/Release/tests/functional/http/client/CMakeLists.txt
+@@ -12,7 +12,6 @@
+   multiple_requests.cpp
+   oauth1_tests.cpp
+   oauth2_tests.cpp
+-  outside_tests.cpp
+   pipeline_stage_tests.cpp
+   progress_handler_tests.cpp
+   proxy_tests.cpp
+Index: cpprest/Release/tests/functional/http/client/authentication_tests.cpp
+===================================================================
+--- cpprest.orig/Release/tests/functional/http/client/authentication_tests.cpp
++++ cpprest/Release/tests/functional/http/client/authentication_tests.cpp
+@@ -675,9 +675,9 @@
+         VERIFY_ARE_EQUAL(return_code, response.status_code());
+     }
+ 
+-    TEST(auth_no_data) { auth_test_impl(false); }
++    //TEST(auth_no_data) { auth_test_impl(false); }
+ 
+-    TEST(unsuccessful_auth_with_basic_cred) { auth_test_impl(true); }
++    //TEST(unsuccessful_auth_with_basic_cred) { auth_test_impl(true); }
+ 
+     TEST_FIXTURE(uri_address, set_user_options_asio_http)
+     {
+@@ -695,6 +695,7 @@
+         VERIFY_ARE_EQUAL(200, response.status_code());
+     }
+ 
++    /*
+     TEST_FIXTURE(uri_address, set_user_options_asio_https)
+     {
+         handle_timeout([] {
+@@ -714,6 +715,7 @@
+             VERIFY_IS_FALSE(v.empty());
+         });
+     }
++    */
+ 
+ #endif
+ 
+Index: cpprest/Release/tests/functional/websockets/client/authentication_tests.cpp
+===================================================================
+--- cpprest.orig/Release/tests/functional/websockets/client/authentication_tests.cpp
++++ cpprest/Release/tests/functional/websockets/client/authentication_tests.cpp
+@@ -93,6 +93,7 @@ SUITE(authentication_tests)
+         return false;
+     }
+ 
++    /*
+     TEST(ssl_test)
+     {
+         websocket_client client;
+@@ -127,6 +128,7 @@ SUITE(authentication_tests)
+             throw;
+         }
+     }
++    */
+ 
+     void handshake_error_test_impl(const ::utility::string_t& host)
+     {
+@@ -148,11 +150,11 @@ SUITE(authentication_tests)
+         }
+     }
+ 
+-    TEST(self_signed_cert) { handshake_error_test_impl(U("wss://self-signed.badssl.com/")); }
++    //TEST(self_signed_cert) { handshake_error_test_impl(U("wss://self-signed.badssl.com/")); }
+ 
+-    TEST(hostname_mismatch) { handshake_error_test_impl(U("wss://wrong.host.badssl.com/")); }
++    //TEST(hostname_mismatch) { handshake_error_test_impl(U("wss://wrong.host.badssl.com/")); }
+ 
+-    TEST(cert_expired) { handshake_error_test_impl(U("wss://expired.badssl.com/")); }
++    //TEST(cert_expired) { handshake_error_test_impl(U("wss://expired.badssl.com/")); }
+ 
+ } // SUITE(authentication_tests)
+ 
+Index: cpprest/Release/tests/functional/http/client/connections_and_errors.cpp
+===================================================================
+--- cpprest.orig/Release/tests/functional/http/client/connections_and_errors.cpp
++++ cpprest/Release/tests/functional/http/client/connections_and_errors.cpp
+@@ -408,6 +408,7 @@
+     }
+ #endif
+ 
++    /*
+     // Try to connect to a server on a closed port and cancel the operation.
+     TEST_FIXTURE(uri_address, cancel_bad_port)
+     {
+@@ -439,6 +440,7 @@
+ 
+         VERIFY_THROWS_HTTP_ERROR_CODE(t.get(), std::errc::operation_canceled);
+     }
++    */
+ 
+ } // SUITE(connections_and_errors)
+ 
+--- cpprest-2.10.16.orig/Release/tests/functional/http/client/redirect_tests.cpp
++++ cpprest-2.10.16/Release/tests/functional/http/client/redirect_tests.cpp
+@@ -159,7 +159,7 @@ SUITE(redirect_tests)
+             VERIFY_NO_THROWS(reply.get());
+         }
+     }
+-
++/*
+     TEST(does_not_follow_https_to_http_by_default)
+     {
+         handle_timeout([] {
+@@ -182,7 +182,7 @@ SUITE(redirect_tests)
+             );
+         });
+     }
+-
++*/
+     TEST_FIXTURE(uri_address, follows_permanent_redirect)
+     {
+ #if USING_WINHTTP

@@ -1,4 +1,10 @@
-x86_64: Add support to build kexec-tools with x32 ABI
+From fd40eee42273220fb0050fe10744b10067adc0a7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
+Date: Fri, 31 Aug 2018 17:31:50 +0200
+Subject: [PATCH] x86_64: Add support to build kexec-tools with x32 ABI
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 Summary of changes,
 
@@ -21,11 +27,11 @@ Signed-off-by: Mariano Lopez <mariano.lopez@linux.intel.com>
  purgatory/arch/x86_64/Makefile           | 4 +++-
  4 files changed, 20 insertions(+), 1 deletion(-)
 
-Index: kexec-tools-2.0.10/configure.ac
-===================================================================
---- kexec-tools-2.0.10.orig/configure.ac
-+++ kexec-tools-2.0.10/configure.ac
-@@ -56,6 +56,15 @@ case $target_cpu in
+diff --git a/configure.ac b/configure.ac
+index e05d601..c428146 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -54,6 +54,15 @@ case $target_cpu in
  		;;
  	ia64|x86_64|alpha|m68k )
  		ARCH="$target_cpu"
@@ -41,11 +47,11 @@ Index: kexec-tools-2.0.10/configure.ac
  		;;
  	* )
  		AC_MSG_ERROR([unsupported architecture $target_cpu])
-Index: kexec-tools-2.0.10/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
-===================================================================
---- kexec-tools-2.0.10.orig/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
-+++ kexec-tools-2.0.10/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
-@@ -8,7 +8,11 @@ int machine_verify_elf_rel(struct mem_eh
+diff --git a/kexec/arch/x86_64/kexec-elf-rel-x86_64.c b/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
+index 761a4ed..1c0e3f8 100644
+--- a/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
++++ b/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
+@@ -8,7 +8,11 @@ int machine_verify_elf_rel(struct mem_ehdr *ehdr)
  	if (ehdr->ei_data != ELFDATA2LSB) {
  		return 0;
  	}
@@ -57,10 +63,10 @@ Index: kexec-tools-2.0.10/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
  		return 0;
  	}
  	if (ehdr->e_machine != EM_X86_64) {
-Index: kexec-tools-2.0.10/kexec/kexec-syscall.h
-===================================================================
---- kexec-tools-2.0.10.orig/kexec/kexec-syscall.h
-+++ kexec-tools-2.0.10/kexec/kexec-syscall.h
+diff --git a/kexec/kexec-syscall.h b/kexec/kexec-syscall.h
+index 2a3794d..3e67078 100644
+--- a/kexec/kexec-syscall.h
++++ b/kexec/kexec-syscall.h
 @@ -31,8 +31,12 @@
  #define __NR_kexec_load		268
  #endif
@@ -74,11 +80,11 @@ Index: kexec-tools-2.0.10/kexec/kexec-syscall.h
  #ifdef __s390x__
  #define __NR_kexec_load		277
  #endif
-Index: kexec-tools-2.0.10/purgatory/arch/x86_64/Makefile
-===================================================================
---- kexec-tools-2.0.10.orig/purgatory/arch/x86_64/Makefile
-+++ kexec-tools-2.0.10/purgatory/arch/x86_64/Makefile
-@@ -23,4 +23,6 @@ x86_64_PURGATORY_SRCS += purgatory/arch/
+diff --git a/purgatory/arch/x86_64/Makefile b/purgatory/arch/x86_64/Makefile
+index 7300937..4af11e4 100644
+--- a/purgatory/arch/x86_64/Makefile
++++ b/purgatory/arch/x86_64/Makefile
+@@ -23,4 +23,6 @@ x86_64_PURGATORY_SRCS += purgatory/arch/i386/console-x86.c
  x86_64_PURGATORY_SRCS += purgatory/arch/i386/vga.c
  x86_64_PURGATORY_SRCS += purgatory/arch/i386/pic.c
  

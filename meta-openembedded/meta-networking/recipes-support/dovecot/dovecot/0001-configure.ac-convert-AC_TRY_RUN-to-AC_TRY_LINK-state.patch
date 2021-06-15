@@ -9,58 +9,65 @@ Upstream-Status: pending
 
 Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
 Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
----
- configure.ac | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index 3b32614..94ec002 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -519,13 +519,10 @@ have_ioloop=no
- 
- if test "$ioloop" = "best" || test "$ioloop" = "epoll"; then
-   AC_CACHE_CHECK([whether we can use epoll],i_cv_epoll_works,[
+Signed-off-by: Wang Mingyu <wangmy@cn.fujitsu.com>
+---
+ m4/glibc.m4  | 6 ++----
+ m4/ioloop.m4 | 9 +++------
+ 2 files changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/m4/glibc.m4 b/m4/glibc.m4
+index 5d722aa..ce088d3 100644
+--- a/m4/glibc.m4
++++ b/m4/glibc.m4
+@@ -17,7 +17,7 @@ AC_DEFUN([DOVECOT_GLIBC], [
+   dnl * Old glibcs have broken posix_fallocate(). Make sure not to use it.
+   dnl * It may also be broken in AIX.
+   AC_CACHE_CHECK([whether posix_fallocate() works],i_cv_posix_fallocate_works,[
 -    AC_TRY_RUN([
 +    AC_TRY_LINK([
-       #include <sys/epoll.h>
--  
--      int main()
--      {
--	return epoll_create(5) < 1;
+       #define _XOPEN_SOURCE 600
+       #include <stdio.h>
+       #include <stdlib.h>
+@@ -26,7 +26,7 @@ AC_DEFUN([DOVECOT_GLIBC], [
+       #if defined(__GLIBC__) && (__GLIBC__ < 2 || __GLIBC_MINOR__ < 7)
+         possibly broken posix_fallocate
+       #endif
+-      int main() {
++      ], [
+         int fd = creat("conftest.temp", 0600);
+         int ret;
+         if (fd == -1) {
+@@ -35,8 +35,6 @@ AC_DEFUN([DOVECOT_GLIBC], [
+         }
+         ret = posix_fallocate(fd, 1024, 1024) < 0 ? 1 : 0;
+         unlink("conftest.temp");
+-        return ret;
 -      }
-+    ], [
+     ], [
+       i_cv_posix_fallocate_works=yes
+     ], [
+diff --git a/m4/ioloop.m4 b/m4/ioloop.m4
+index 0f7dde0..f40fd62 100644
+--- a/m4/ioloop.m4
++++ b/m4/ioloop.m4
+@@ -4,13 +4,10 @@ AC_DEFUN([DOVECOT_IOLOOP], [
+   
+   if test "$ioloop" = "best" || test "$ioloop" = "epoll"; then
+     AC_CACHE_CHECK([whether we can use epoll],i_cv_epoll_works,[
+-      AC_TRY_RUN([
++      AC_TRY_LINK([
+         #include <sys/epoll.h>
+-    
+-        int main()
+-        {
+-  	return epoll_create(5) < 1;
+-        }
++      ], [
 +      epoll_create(5) < 1;
-     ], [
-       i_cv_epoll_works=yes
-     ], [
-@@ -653,7 +650,7 @@ fi
- dnl * Old glibcs have broken posix_fallocate(). Make sure not to use it.
- dnl * It may also be broken in AIX.
- AC_CACHE_CHECK([whether posix_fallocate() works],i_cv_posix_fallocate_works,[
--  AC_TRY_RUN([
-+  AC_TRY_LINK([
-     #define _XOPEN_SOURCE 600
-     #include <stdio.h>
-     #include <stdlib.h>
-@@ -662,7 +659,7 @@ AC_CACHE_CHECK([whether posix_fallocate() works],i_cv_posix_fallocate_works,[
-     #if defined(__GLIBC__) && (__GLIBC__ < 2 || __GLIBC_MINOR__ < 7)
-       possibly broken posix_fallocate
-     #endif
--    int main() {
-+    ], [
-       int fd = creat("conftest.temp", 0600);
-       int ret;
-       if (fd == -1) {
-@@ -671,8 +668,6 @@ AC_CACHE_CHECK([whether posix_fallocate() works],i_cv_posix_fallocate_works,[
-       }
-       ret = posix_fallocate(fd, 1024, 1024) < 0 ? 1 : 0;
-       unlink("conftest.temp");
--      return ret;
--    }
-   ], [
-     i_cv_posix_fallocate_works=yes
-   ], [
+       ], [
+         i_cv_epoll_works=yes
+       ], [
 -- 
-1.8.4.2
+2.25.1
 

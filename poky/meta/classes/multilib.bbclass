@@ -33,6 +33,8 @@ python multilib_virtclass_handler () {
         e.data.setVar("MLPREFIX", variant + "-")
         e.data.setVar("PN", variant + "-" + e.data.getVar("PN", False))
         e.data.setVar('SDKTARGETSYSROOT', e.data.getVar('SDKTARGETSYSROOT'))
+        override = ":virtclass-multilib-" + variant
+        e.data.setVar("OVERRIDES", e.data.getVar("OVERRIDES", False) + override)
         target_vendor = e.data.getVar("TARGET_VENDOR_" + "virtclass-multilib-" + variant, False)
         if target_vendor:
             e.data.setVar("TARGET_VENDOR", target_vendor)
@@ -89,13 +91,12 @@ addhandler multilib_virtclass_handler
 multilib_virtclass_handler[eventmask] = "bb.event.RecipePreFinalise"
 
 python __anonymous () {
-    variant = d.getVar("BBEXTENDVARIANT")
-
-    import oe.classextend
-
-    clsextend = oe.classextend.ClassExtender(variant, d)
-
     if bb.data.inherits_class('image', d):
+        variant = d.getVar("BBEXTENDVARIANT")
+        import oe.classextend
+
+        clsextend = oe.classextend.ClassExtender(variant, d)
+
         clsextend.map_depends_variable("PACKAGE_INSTALL")
         clsextend.map_depends_variable("LINGUAS_INSTALL")
         clsextend.map_depends_variable("RDEPENDS")
@@ -106,6 +107,22 @@ python __anonymous () {
         d.setVar("PACKAGE_INSTALL_ATTEMPTONLY", "")
         bb.build.deltask('do_populate_sdk', d)
         bb.build.deltask('do_populate_sdk_ext', d)
+        return
+}
+
+python multilib_virtclass_handler_postkeyexp () {
+    cls = d.getVar("BBEXTENDCURR")
+    variant = d.getVar("BBEXTENDVARIANT")
+    if cls != "multilib" or not variant:
+        return
+
+    variant = d.getVar("BBEXTENDVARIANT")
+
+    import oe.classextend
+
+    clsextend = oe.classextend.ClassExtender(variant, d)
+
+    if bb.data.inherits_class('image', d):
         return
 
     clsextend.map_depends_variable("DEPENDS")
@@ -123,7 +140,57 @@ python __anonymous () {
     clsextend.map_variable("USERADD_PACKAGES")
     clsextend.map_variable("SYSTEMD_PACKAGES")
     clsextend.map_variable("UPDATERCPN")
+
+    reset_alternative_priority(d)
 }
+
+addhandler multilib_virtclass_handler_postkeyexp
+multilib_virtclass_handler_postkeyexp[eventmask] = "bb.event.RecipePostKeyExpansion"
+
+def reset_alternative_priority(d):
+    if not bb.data.inherits_class('update-alternatives', d):
+        return
+
+    # There might be multiple multilibs at the same time, e.g., lib32 and
+    # lib64, each of them should have a different priority.
+    multilib_variants = d.getVar('MULTILIB_VARIANTS')
+    bbextendvariant = d.getVar('BBEXTENDVARIANT')
+    reset_gap = multilib_variants.split().index(bbextendvariant) + 1
+
+    # ALTERNATIVE_PRIORITY = priority
+    alt_priority_recipe = d.getVar('ALTERNATIVE_PRIORITY')
+    # Reset ALTERNATIVE_PRIORITY when found
+    if alt_priority_recipe:
+        reset_priority = int(alt_priority_recipe) - reset_gap
+        bb.debug(1, '%s: Setting ALTERNATIVE_PRIORITY to %s' % (d.getVar('PN'), reset_priority))
+        d.setVar('ALTERNATIVE_PRIORITY', reset_priority)
+
+    handled_pkgs = []
+    for pkg in (d.getVar('PACKAGES') or "").split():
+        # ALTERNATIVE_PRIORITY_pkg = priority
+        alt_priority_pkg = d.getVar('ALTERNATIVE_PRIORITY_%s' % pkg)
+        # Reset ALTERNATIVE_PRIORITY_pkg when found
+        if alt_priority_pkg:
+            reset_priority = int(alt_priority_pkg) - reset_gap
+            if not pkg in handled_pkgs:
+                handled_pkgs.append(pkg)
+                bb.debug(1, '%s: Setting ALTERNATIVE_PRIORITY_%s to %s' % (pkg, pkg, reset_priority))
+                d.setVar('ALTERNATIVE_PRIORITY_%s' % pkg, reset_priority)
+
+        for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg) or "").split():
+            # ALTERNATIVE_PRIORITY_pkg[tool]  = priority
+            alt_priority_pkg_name = d.getVarFlag('ALTERNATIVE_PRIORITY_%s' % pkg, alt_name)
+            # ALTERNATIVE_PRIORITY[tool] = priority
+            alt_priority_name = d.getVarFlag('ALTERNATIVE_PRIORITY', alt_name)
+
+            if alt_priority_pkg_name:
+                reset_priority = int(alt_priority_pkg_name) - reset_gap
+                bb.debug(1, '%s: Setting ALTERNATIVE_PRIORITY_%s[%s] to %s' % (pkg, pkg, alt_name, reset_priority))
+                d.setVarFlag('ALTERNATIVE_PRIORITY_%s' % pkg, alt_name, reset_priority)
+            elif alt_priority_name:
+                reset_priority = int(alt_priority_name) - reset_gap
+                bb.debug(1, '%s: Setting ALTERNATIVE_PRIORITY[%s] to %s' % (pkg, alt_name, reset_priority))
+                d.setVarFlag('ALTERNATIVE_PRIORITY', alt_name, reset_priority)
 
 PACKAGEFUNCS_append = " do_package_qa_multilib"
 
@@ -135,11 +202,12 @@ python do_package_qa_multilib() {
         for i in values:
             if i.startswith('virtual/'):
                 i = i[len('virtual/'):]
-            if (not i.startswith('kernel-module')) and (not i.startswith(mlprefix)) and \
-                (not 'cross-canadian' in i) and (not i.startswith("nativesdk-")) and \
-                (not i.startswith("rtld")) and (not i.startswith('kernel-vmlinux')) \
-                and (not i.startswith("kernel-image")):
+
+            if (not (i.startswith(mlprefix) or i.startswith("kernel-") \
+                    or ('cross-canadian' in i) or i.startswith("nativesdk-") \
+                    or i.startswith("rtld") or i.startswith("/"))):
                 candidates.append(i)
+
         if len(candidates) > 0:
             msg = "%s package %s - suspicious values '%s' in %s" \
                    % (d.getVar('PN'), pkg, ' '.join(candidates), var)

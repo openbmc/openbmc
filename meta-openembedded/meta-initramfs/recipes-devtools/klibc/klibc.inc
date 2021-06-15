@@ -5,9 +5,8 @@ SECTION = "libs"
 LICENSE = "BSD-3-Clause & GPL-2.0 & MIT & Zlib"
 LIC_FILES_CHKSUM = "file://usr/klibc/LICENSE;md5=d75181f10e998c21eb147f6d2e43ce8b"
 DEPENDS = "linux-libc-headers perl-native"
-SRCREV = "22b36d1ae34416bc48869619cbb0cccb2070f48f"
 
-SRC_URI = "git://git.kernel.org/pub/scm/libs/klibc/klibc.git \
+SRC_URI = "${KERNELORG_MIRROR}/linux/libs/klibc/2.0/klibc-${PV}.tar.xz \
            ${ARMPATCHES} \
            file://klcc-consider-sysroot.patch \
            file://klcc-cross-accept-clang-options.patch \
@@ -16,22 +15,26 @@ SRC_URI = "git://git.kernel.org/pub/scm/libs/klibc/klibc.git \
            file://0001-include-linux-sysinfo.h-directly.patch \
            file://0001-mkfifo-Implement-mkfifo.patch \
            file://0001-always-use-bfd-linker.patch \
-           file://0001-Kbuild.klibc-Use-print-libgcc-file-name-instead-of-p.patch \
-           file://0001-Kbuild.klibc-Add-path-to-compiler-headers-via-isyste.patch \
            file://0001-arm-Do-not-set-a-fallback-march-and-mtune.patch \
            file://0001-klibc_2.0.4-add-kexec_file_load-syscall.patch \
            file://0001-klibc-add-getrandom-syscall.patch \
            file://0001-klibc-Kbuild-Accept-EXTRA_KLIBCAFLAGS.patch \
-           file://0001-Define-ulocked_-fgets-fread-fwrite-aliases.patch \
+           file://cross-clang.patch \
+           file://0001-workaround-for-overlapping-sections-in-binary.patch \
            "
 
 ARMPATCHES ?= ""
 
-ARMPATCHES_arm = "file://klibc-config-eabi.patch \
+ARMPATCHES_arm = " \
                   file://armv4-fix-v4bx.patch \
                  "
+SRC_URI[sha256sum] = "4e48f1398cfe3ce0b6df55ce6e70acf54fc8488e3aea3fb3610ee1622d9cb436"
 
-S = "${WORKDIR}/git"
+S = "${WORKDIR}/klibc-${PV}"
+
+OPTFLAGS = "${TUNE_CCARGS} -Os -fcommon"
+OPTFLAGS_append_toolchain-clang = " -fno-builtin-bcmp"
+OPTFLAGS_append_toolchain-clang_mipsarch = " -no-integrated-as"
 
 PARALLEL_MAKE = ""
 EXTRA_OEMAKE = "'KLIBCARCH=${KLIBC_ARCH}' \
@@ -43,7 +46,7 @@ EXTRA_OEMAKE = "'KLIBCARCH=${KLIBC_ARCH}' \
                 'INSTALLDIR=${libdir}/klibc' \
                 'SHLIBDIR=${libdir}' \
                 '${KLIBCTHUMB}' \
-                'KLIBCOPTFLAGS=${TUNE_CCARGS} -Os' \
+                'KLIBCOPTFLAGS=${OPTFLAGS}' \
                  V=1 \
                 "
 
@@ -71,4 +74,5 @@ KLIBC_ARCH_x86 = "i386"
 KLIBC_ARCH_x86-64 = "x86_64"
 KLIBC_ARCH_powerpc = "ppc"
 KLIBC_ARCH_powerpc64 = "ppc64"
+KLIBC_ARCH_powerpc64le = "ppc64"
 THIS_LIBKLIBC = "libklibc (= ${PV}-${PR})"

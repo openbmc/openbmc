@@ -23,7 +23,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  	if (sysconfdir != NULL && *sysconfdir != '\0') {
  		/* No +1, we skip the initial period.  */
 -		syspath = malloc(strlen(sysconfdir) + sizeof FN);
-+		syspath = malloc(strlen(sysconfdir) + sizeof FN + 1);
++		syspath = malloc(strlen(sysconfdir) + sizeof FN + 2);
 +		syspath[strlen(sysconfdir) + sizeof FN + 1] = '\0';
  		if (syspath == NULL
 -		    || sprintf(syspath, "%s/%s", sysconfdir, FN + 1) < 0)

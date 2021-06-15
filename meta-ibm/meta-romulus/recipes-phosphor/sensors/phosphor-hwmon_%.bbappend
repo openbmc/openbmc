@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend_romulus := "${THISDIR}/${PN}:"
 
-EXTRA_OECONF_append_romulus = " --enable-negative-errno-on-fail"
+EXTRA_OEMESON_append_romulus = " -Dnegative-errno-on-fail=true"
 
 CHIPS = " \
         bus@1e78a000/i2c-bus@440/w83773g@4c \

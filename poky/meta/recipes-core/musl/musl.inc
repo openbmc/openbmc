@@ -9,7 +9,7 @@ standards-conformance and safety."
 HOMEPAGE = "http://www.musl-libc.org/"
 LICENSE = "MIT"
 SECTION = "libs"
-LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=8a4bb28f771c817fe57d3a7c4240e3aa"
+LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=b03f1cc25363d094011f8f4fd8bcfb68"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -25,3 +25,7 @@ MIPS_INSTRUCTION_SET = "mips"
 ARM_INSTRUCTION_SET_armv5 = "arm"
 ARM_INSTRUCTION_SET_armv4 = "arm"
 
+# Enable out of tree build
+B = "${WORKDIR}/build"
+
+do_configure[cleandirs] = "${B}"

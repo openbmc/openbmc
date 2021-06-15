@@ -1,5 +1,7 @@
-# Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+## Copyright (C) 2016 Intel Corporation
+#
+# SPDX-License-Identifier: MIT
+#
 
 import os
 import sys
@@ -7,6 +9,7 @@ import json
 import time
 import logging
 import collections
+import unittest
 
 from oeqa.core.loader import OETestLoader
 from oeqa.core.runner import OETestRunner
@@ -28,6 +31,9 @@ class OETestContext(object):
         self._registry = {}
         self._registry['cases'] = collections.OrderedDict()
 
+        self.results = unittest.TestResult()
+        unittest.registerResult(self.results)
+
     def _read_modules_from_manifest(self, manifest):
         if not os.path.exists(manifest):
             raise OEQAMissingManifest("Manifest does not exist on %s" % manifest)
@@ -43,19 +49,34 @@ class OETestContext(object):
     def skipTests(self, skips):
         if not skips:
             return
+        def skipfuncgen(skipmsg):
+            def func():
+                raise unittest.SkipTest(skipmsg)
+            return func
+        class_ids = {}
         for test in self.suites:
+            if test.__class__ not in class_ids:
+                class_ids[test.__class__] = '.'.join(test.id().split('.')[:-1])
             for skip in skips:
-                if test.id().startswith(skip):
-                    setattr(test, 'setUp', lambda: test.skipTest('Skip by the command line argument "%s"' % skip))
+                if (test.id()+'.').startswith(skip+'.'):
+                    setattr(test, 'setUp', skipfuncgen('Skip by the command line argument "%s"' % skip))
+        for tclass in class_ids:
+            cid = class_ids[tclass]
+            for skip in skips:
+                if (cid + '.').startswith(skip + '.'):
+                    setattr(tclass, 'setUpHooker', skipfuncgen('Skip by the command line argument "%s"' % skip))
 
     def loadTests(self, module_paths, modules=[], tests=[],
-            modules_manifest="", modules_required=[], filters={}):
+            modules_manifest="", modules_required=[], **kwargs):
         if modules_manifest:
             modules = self._read_modules_from_manifest(modules_manifest)
 
         self.loader = self.loaderClass(self, module_paths, modules, tests,
-                modules_required, filters)
+                modules_required, **kwargs)
         self.suites = self.loader.discover()
+
+    def prepareSuite(self, suites, processes):
+        return suites
 
     def runTests(self, processes=None, skips=[]):
         self.runner = self.runnerClass(self, descriptions=False, verbosity=2)
@@ -64,14 +85,10 @@ class OETestContext(object):
         self.skipTests(skips)
 
         self._run_start_time = time.time()
-        if processes:
-            from oeqa.core.utils.concurrencytest import ConcurrentTestSuite
-
-            concurrent_suite = ConcurrentTestSuite(self.suites, processes)
-            result = self.runner.run(concurrent_suite)
-        else:
+        self._run_end_time = self._run_start_time
+        if not processes:
             self.runner.buffer = True
-            result = self.runner.run(self.suites)
+        result = self.runner.run(self.prepareSuite(self.suites, processes))
         self._run_end_time = time.time()
 
         return result
@@ -87,21 +104,26 @@ class OETestContextExecutor(object):
     name = 'core'
     help = 'core test component example'
     description = 'executes core test suite example'
+    datetime = time.strftime("%Y%m%d%H%M%S")
 
     default_cases = [os.path.join(os.path.abspath(os.path.dirname(__file__)),
             'cases/example')]
     default_test_data = os.path.join(default_cases[0], 'data.json')
     default_tests = None
+    default_json_result_dir = None
 
     def register_commands(self, logger, subparsers):
         self.parser = subparsers.add_parser(self.name, help=self.help,
                 description=self.description, group='components')
 
-        self.default_output_log = '%s-results-%s.log' % (self.name,
-                time.strftime("%Y%m%d%H%M%S"))
+        self.default_output_log = '%s-results-%s.log' % (self.name, self.datetime)
         self.parser.add_argument('--output-log', action='store',
                 default=self.default_output_log,
                 help="results output log, default: %s" % self.default_output_log)
+
+        self.parser.add_argument('--json-result-dir', action='store',
+                default=self.default_json_result_dir,
+                help="json result output dir, default: %s" % self.default_json_result_dir)
 
         group = self.parser.add_mutually_exclusive_group()
         group.add_argument('--run-tests', action='store', nargs='+',
@@ -138,6 +160,8 @@ class OETestContextExecutor(object):
         fh = logging.FileHandler(args.output_log)
         fh.setFormatter(formatter)
         logger.addHandler(fh)
+        if getattr(args, 'verbose', False):
+            logger.setLevel('DEBUG')
 
         return logger
 
@@ -165,6 +189,22 @@ class OETestContextExecutor(object):
 
         self.module_paths = args.CASES_PATHS
 
+    def _get_json_result_dir(self, args):
+        return args.json_result_dir
+
+    def _get_configuration(self):
+        td = self.tc_kwargs['init']['td']
+        configuration = {'TEST_TYPE': self.name,
+                        'MACHINE': td.get("MACHINE"),
+                        'DISTRO': td.get("DISTRO"),
+                        'IMAGE_BASENAME': td.get("IMAGE_BASENAME"),
+                        'DATETIME': td.get("DATETIME")}
+        return configuration
+
+    def _get_result_id(self, configuration):
+        return '%s_%s_%s_%s' % (configuration['TEST_TYPE'], configuration['IMAGE_BASENAME'],
+                                configuration['MACHINE'], self.datetime)
+
     def _pre_run(self):
         pass
 
@@ -183,7 +223,16 @@ class OETestContextExecutor(object):
         else:
             self._pre_run()
             rc = self.tc.runTests(**self.tc_kwargs['run'])
-            rc.logDetails()
+
+            json_result_dir = self._get_json_result_dir(args)
+            if json_result_dir:
+                configuration = self._get_configuration()
+                rc.logDetails(json_result_dir,
+                              configuration,
+                              self._get_result_id(configuration))
+            else:
+                rc.logDetails()
+
             rc.logSummary(self.name)
 
         output_link = os.path.join(os.path.dirname(args.output_log),

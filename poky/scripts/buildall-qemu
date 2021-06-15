@@ -1,0 +1,120 @@
+#!/bin/sh
+#  Copyright (c) 2020 Wind River Systems, Inc.
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# buildall-qemu: a tool for automating build testing of recipes
+# TODO: Add support for selecting which qemu architectures to build
+# TODO: Add support for queueing up multiple recipe builds
+# TODO: Add more logging options (e.g. local.conf info, bitbake env info)
+
+usage ()
+{
+    base=$(basename "$0")
+    echo "Usage: $base [options] [recipename/target]"
+    echo "Executes a build of a given target for selected LIBCs. With no options, default to both libc and musl."
+    echo "Options:"
+    echo "-l, --libc            Specify one of \"glibc\" or \"musl\""
+}
+
+
+buildall ()
+{
+    # Get path to oe-core directory. Since oe-init-build-env prepends $PATH with
+    # the path to the scripts directory, get it from there
+    SCRIPTS_PATH="$(echo "$PATH" | cut -d ":" -f 1)"
+    OE_CORE_PATH=$(echo "$SCRIPTS_PATH" | sed 's|\(.*\)/.*|\1|') 
+
+    # Get target list and host machine information
+    TARGET_LIST=$(find "$OE_CORE_PATH"/meta/conf/machine -maxdepth 1 -type f | grep qemu | sed 's|.*/||' | sed -e 's/\.conf//')
+
+    # Set LIBC value to use for the builds based on options provided by the user
+    if [ -n "$2" ]
+    then
+	LIBC_LIST="$2"
+	echo "$LIBC_LIST"
+    else
+	LIBC_LIST="glibc musl"
+	echo "$LIBC_LIST"
+    fi
+
+    START_TIME=$(date "+%Y-%m-%d_%H:%M:%S")
+    LOG_FILE="$1-buildall.log"
+    OS_INFO=$(grep "PRETTY_NAME=" /etc/os-release | awk -F "=" '{print $2}' | sed -e 's/^"//' -e 's/"$//')
+
+    # Append an existing log file for this build with .old if one exists
+    if [ -f "${LOG_FILE}" ] 
+    then
+       mv "${LOG_FILE}" "${LOG_FILE}.old"
+    else
+	   touch "${LOG_FILE}"
+    fi
+
+    # Fill the log file with build and host info
+    echo "BUILDALL-QEMU LOG FOR $1" >> "${LOG_FILE}"
+    echo "START TIME: ${START_TIME}" >> "${LOG_FILE}"
+    echo "HOSTNAME: $(uname -n)" >> "${LOG_FILE}"
+    echo "HOST OS: ${OS_INFO}" >> "${LOG_FILE}"
+    echo "HOST KERNEL: $(uname -r)" >> "${LOG_FILE}"
+    echo "===============" >> "${LOG_FILE}"
+    echo "BUILD RESULTS:" >> "${LOG_FILE}"
+
+    # start the builds for each MACHINE and TCLIBC
+    for j in ${LIBC_LIST} 
+    do
+	echo "[$j]" >> "${LOG_FILE}"
+	for i in ${TARGET_LIST} 
+	do
+	    echo "$i" "$j"; \
+	    TCLIBC=$j MACHINE=$i bitbake "$1" && echo "PASS: $i" >> "${LOG_FILE}" || echo "FAIL: $i" >> "${LOG_FILE}"
+	done
+    done
+
+    # Get pass/fail totals and add them to the end of the log
+    PASSED=$(grep "PASS:" "${LOG_FILE}" | wc -l)
+    FAILED=$(grep "FAIL:" "${LOG_FILE}" | wc -l)
+
+    echo "===============" >> "${LOG_FILE}"
+    echo "PASSED: ${PASSED}" >> "${LOG_FILE}"
+    echo "FAILED: ${FAILED}" >> "${LOG_FILE}"
+}
+
+
+# fail entire script if any command fails
+set -e
+
+# print usage and exit if not enough args given
+[ $# -eq 0 ] && usage && exit 1
+
+# handle arguments
+RECIPE=
+while [ $# -gt 0 ]
+do
+    arg=$1
+    case $arg in
+	-l|--libc)
+	if [ "$2" = "glibc" ] || [ "$2" = "musl" ]
+	then
+	    LIBC_LIST="$2"
+	else
+	    echo "Unrecognized libc option."
+	    usage && exit 1
+	fi
+	shift
+	shift
+	;;
+	*)
+        RECIPE="$1"
+	shift
+	;;
+    esac
+done
+
+set -- "$RECIPE"
+
+# run buildall for the given recipe and LIBC
+if [ -n "$1" ]
+then
+	buildall "$1" "$LIBC_LIST"
+fi
+

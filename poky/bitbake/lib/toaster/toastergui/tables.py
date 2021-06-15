@@ -1,34 +1,16 @@
 #
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
-#
 # BitBake Toaster Implementation
 #
 # Copyright (C) 2015        Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from toastergui.widgets import ToasterTable
-from orm.models import Recipe, ProjectLayer, Layer_Version, Machine, Project
+from orm.models import Recipe, ProjectLayer, Layer_Version, Project
 from orm.models import CustomImageRecipe, Package, Target, Build, LogMessage, Task
 from orm.models import CustomImagePackage, Package_DependencyManager
-from orm.models import Distro
-from django.db.models import Q, Max, Sum, Count, When, Case, Value, IntegerField
-from django.conf.urls import url
-from django.core.urlresolvers import reverse, resolve
-from django.http import HttpResponse
-from django.views.generic import TemplateView
+from django.db.models import Q, Sum, Count, When, Case, Value, IntegerField
 
 from toastergui.tablefilter import TableFilter
 from toastergui.tablefilter import TableFilterActionToggle

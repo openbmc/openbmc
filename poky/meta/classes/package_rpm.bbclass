@@ -36,7 +36,7 @@ def write_rpm_perfiledata(srcname, d):
     pkgd = d.getVar('PKGD')
 
     def dump_filerdeps(varname, outfile, d):
-        outfile.write("#!/usr/bin/env python\n\n")
+        outfile.write("#!/usr/bin/env python3\n\n")
         outfile.write("# Dependency table\n")
         outfile.write('deps = {\n')
         for pkg in packages.split():
@@ -286,25 +286,27 @@ python write_specfile () {
 
     # Construct the SPEC file...
     srcname    = d.getVar('PN')
-    srcsummary = (d.getVar('SUMMARY') or d.getVar('DESCRIPTION') or ".")
-    srcversion = d.getVar('PKGV').replace('-', '+')
-    srcrelease = d.getVar('PKGR')
-    srcepoch   = (d.getVar('PKGE') or "")
-    srclicense = d.getVar('LICENSE')
-    srcsection = d.getVar('SECTION')
-    srcmaintainer  = d.getVar('MAINTAINER')
-    srchomepage    = d.getVar('HOMEPAGE')
-    srcdescription = d.getVar('DESCRIPTION') or "."
-    srccustomtagschunk = get_package_additional_metadata("rpm", d)
+    localdata = bb.data.createCopy(d)
+    localdata.setVar('OVERRIDES', d.getVar("OVERRIDES", False) + ":" + srcname)
+    srcsummary = (localdata.getVar('SUMMARY') or localdata.getVar('DESCRIPTION') or ".")
+    srcversion = localdata.getVar('PKGV').replace('-', '+')
+    srcrelease = localdata.getVar('PKGR')
+    srcepoch   = (localdata.getVar('PKGE') or "")
+    srclicense = localdata.getVar('LICENSE')
+    srcsection = localdata.getVar('SECTION')
+    srcmaintainer  = localdata.getVar('MAINTAINER')
+    srchomepage    = localdata.getVar('HOMEPAGE')
+    srcdescription = localdata.getVar('DESCRIPTION') or "."
+    srccustomtagschunk = get_package_additional_metadata("rpm", localdata)
 
     srcdepends     = d.getVar('DEPENDS')
-    srcrdepends    = []
-    srcrrecommends = []
-    srcrsuggests   = []
-    srcrprovides   = []
-    srcrreplaces   = []
-    srcrconflicts  = []
-    srcrobsoletes  = []
+    srcrdepends    = ""
+    srcrrecommends = ""
+    srcrsuggests   = ""
+    srcrprovides   = ""
+    srcrreplaces   = ""
+    srcrconflicts  = ""
+    srcrobsoletes  = ""
 
     srcrpreinst  = []
     srcrpostinst = []
@@ -363,13 +365,13 @@ python write_specfile () {
         # Map the dependencies into their final form
         mapping_rename_hook(localdata)
 
-        splitrdepends    = localdata.getVar('RDEPENDS')
-        splitrrecommends = localdata.getVar('RRECOMMENDS')
-        splitrsuggests   = localdata.getVar('RSUGGESTS')
-        splitrprovides   = localdata.getVar('RPROVIDES')
-        splitrreplaces   = localdata.getVar('RREPLACES')
-        splitrconflicts  = localdata.getVar('RCONFLICTS')
-        splitrobsoletes  = []
+        splitrdepends    = localdata.getVar('RDEPENDS') or ""
+        splitrrecommends = localdata.getVar('RRECOMMENDS') or ""
+        splitrsuggests   = localdata.getVar('RSUGGESTS') or ""
+        splitrprovides   = localdata.getVar('RPROVIDES') or ""
+        splitrreplaces   = localdata.getVar('RREPLACES') or ""
+        splitrconflicts  = localdata.getVar('RCONFLICTS') or ""
+        splitrobsoletes  = ""
 
         splitrpreinst  = localdata.getVar('pkg_preinst')
         splitrpostinst = localdata.getVar('pkg_postinst')
@@ -409,7 +411,6 @@ python write_specfile () {
             if not file_list and localdata.getVar('ALLOW_EMPTY', False) != "1":
                 bb.note("Not creating empty RPM package for %s" % splitname)
             else:
-                bb.note("Creating RPM package for %s" % splitname)
                 spec_files_top.append('%files')
                 if extra_pkgdata:
                     package_rpm_extra_pkgdata(splitname, spec_files_top, localdata)
@@ -418,7 +419,7 @@ python write_specfile () {
                     bb.note("Creating RPM package for %s" % splitname)
                     spec_files_top.extend(file_list)
                 else:
-                    bb.note("Creating EMPTY RPM Package for %s" % splitname)
+                    bb.note("Creating empty RPM package for %s" % splitname)
                 spec_files_top.append('')
             continue
 
@@ -438,9 +439,9 @@ python write_specfile () {
             spec_preamble_bottom.append(splitcustomtagschunk)
 
         # Replaces == Obsoletes && Provides
-        robsoletes = bb.utils.explode_dep_versions2(splitrobsoletes or "")
-        rprovides = bb.utils.explode_dep_versions2(splitrprovides or "")
-        rreplaces = bb.utils.explode_dep_versions2(splitrreplaces or "")
+        robsoletes = bb.utils.explode_dep_versions2(splitrobsoletes)
+        rprovides = bb.utils.explode_dep_versions2(splitrprovides)
+        rreplaces = bb.utils.explode_dep_versions2(splitrreplaces)
         for dep in rreplaces:
             if not dep in robsoletes:
                 robsoletes[dep] = rreplaces[dep]
@@ -510,7 +511,7 @@ python write_specfile () {
                 bb.note("Creating RPM package for %s" % splitname)
                 spec_files_bottom.extend(file_list)
             else:
-                bb.note("Creating EMPTY RPM Package for %s" % splitname)
+                bb.note("Creating empty RPM package for %s" % splitname)
             spec_files_bottom.append('')
 
         del localdata
@@ -532,9 +533,9 @@ python write_specfile () {
     tail_source(d)
 
     # Replaces == Obsoletes && Provides
-    robsoletes = bb.utils.explode_dep_versions2(srcrobsoletes or "")
-    rprovides = bb.utils.explode_dep_versions2(srcrprovides or "")
-    rreplaces = bb.utils.explode_dep_versions2(srcrreplaces or "")
+    robsoletes = bb.utils.explode_dep_versions2(srcrobsoletes)
+    rprovides = bb.utils.explode_dep_versions2(srcrprovides)
+    rreplaces = bb.utils.explode_dep_versions2(srcrreplaces)
     for dep in rreplaces:
         if not dep in robsoletes:
             robsoletes[dep] = rreplaces[dep]
@@ -556,7 +557,7 @@ python write_specfile () {
 
     print_deps(srcrrecommends, "Recommends", spec_preamble_top, d)
     print_deps(srcrsuggests, "Suggests", spec_preamble_top, d)
-    print_deps(srcrprovides + (" /bin/sh" if srcname.startswith("nativesdk-") else ""), "Provides", spec_preamble_top, d)
+    print_deps(srcrprovides, "Provides", spec_preamble_top, d)
     print_deps(srcrobsoletes, "Obsoletes", spec_preamble_top, d)
     print_deps(srcrconflicts, "Conflicts", spec_preamble_top, d)
 
@@ -622,6 +623,10 @@ python write_specfile () {
 # Otherwise allarch packages may change depending on override configuration
 write_specfile[vardepsexclude] = "OVERRIDES"
 
+# Have to list any variables referenced as X_<pkg> that aren't in pkgdata here
+RPMEXTRAVARS = "PACKAGE_ADD_METADATA_RPM"
+write_specfile[vardeps] += "${@gen_packagevar(d, 'RPMEXTRAVARS')}"
+
 python do_package_rpm () {
     workdir = d.getVar('WORKDIR')
     tmpdir = d.getVar('TMPDIR')
@@ -679,10 +684,12 @@ python do_package_rpm () {
     cmd = cmd + " --define '_use_internal_dependency_generator 0'"
     cmd = cmd + " --define '_binaries_in_noarch_packages_terminate_build 0'"
     cmd = cmd + " --define '_build_id_links none'"
-    cmd = cmd + " --define '_binary_payload w6T.xzdio'"
-    cmd = cmd + " --define '_source_payload w6T.xzdio'"
+    cmd = cmd + " --define '_binary_payload w6T%d.xzdio'" % int(d.getVar("XZ_THREADS"))
+    cmd = cmd + " --define '_source_payload w6T%d.xzdio'" % int(d.getVar("XZ_THREADS"))
     cmd = cmd + " --define 'clamp_mtime_to_source_date_epoch 1'"
+    cmd = cmd + " --define 'use_source_date_epoch_as_buildtime 1'"
     cmd = cmd + " --define '_buildhost reproducible'"
+    cmd = cmd + " --define '__font_provides %{nil}'"
     if perfiledeps:
         cmd = cmd + " --define '__find_requires " + outdepends + "'"
         cmd = cmd + " --define '__find_provides " + outprovides + "'"
@@ -740,7 +747,6 @@ python do_package_write_rpm () {
 
 do_package_write_rpm[dirs] = "${PKGWRITEDIRRPM}"
 do_package_write_rpm[cleandirs] = "${PKGWRITEDIRRPM}"
-do_package_write_rpm[umask] = "022"
 do_package_write_rpm[depends] += "${@oe.utils.build_depends_string(d.getVar('PACKAGE_WRITE_DEPS'), 'do_populate_sysroot')}"
 addtask package_write_rpm after do_packagedata do_package
 

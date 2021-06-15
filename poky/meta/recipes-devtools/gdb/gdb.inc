@@ -8,3 +8,4 @@ inherit gettext
 # cross-canadian must not see this
 PACKAGES =+ "gdbserver"
 FILES_gdbserver = "${bindir}/gdbserver"
+

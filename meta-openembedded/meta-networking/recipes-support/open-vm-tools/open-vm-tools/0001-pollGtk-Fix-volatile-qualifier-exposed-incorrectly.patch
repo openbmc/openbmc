@@ -1,0 +1,29 @@
+From 524fd4db646b4ac2155074b4cedf8436a8ff726d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 15 Apr 2021 06:58:31 -0700
+Subject: [PATCH] pollGtk: Fix volatile qualifier exposed incorrectly
+
+GCC11 flags it
+
+Fixes
+glib-2.0/glib/gatomic.h:117:5: error: argument 2 of '__atomic_load' discards 'volatile' qualifier [-Werror=incompatible-pointer-types]
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/lib/pollGtk/pollGtk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/open-vm-tools/lib/pollGtk/pollGtk.c b/open-vm-tools/lib/pollGtk/pollGtk.c
+index 4ccaeda6..336a8bf1 100644
+--- a/open-vm-tools/lib/pollGtk/pollGtk.c
++++ b/open-vm-tools/lib/pollGtk/pollGtk.c
+@@ -127,7 +127,7 @@ typedef struct Poll {
+ } Poll;
+ 
+ static Poll *pollState;
+-static volatile gsize inited = 0;
++static gsize inited = 0;
+ 
+ static VMwareStatus
+ PollGtkCallback(PollClassSet classSet,   // IN

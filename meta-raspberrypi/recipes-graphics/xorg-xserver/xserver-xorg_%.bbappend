@@ -1,9 +1,5 @@
-OPENGL_PKGCFG = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', 'dri3 xshmfence glamor', '', d)}"
+OPENGL_PKGCONFIGS_rpi = "dri glx ${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', 'dri3 xshmfence glamor', '', d)}"
 
-# slightly modified to oe-core's default: add ${OPENGL_PKGCFG}
-PACKAGECONFIG_rpi ?= " \
-    dri2 udev ${XORG_CRYPTO} \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'dri glx ${OPENGL_PKGCFG}', '', d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "wayland", "xwayland", "", d)} \
-    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "systemd", "", d)} \
-"
+# when using userland graphic KHR/khrplatform.h is provided by userland but virtual/libgl is provided by mesa-gl where
+# we explicitly delete KHR/khrplatform.h since its already coming from userland package
+DEPENDS_append_rpi = " ${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '', 'userland', d)}"

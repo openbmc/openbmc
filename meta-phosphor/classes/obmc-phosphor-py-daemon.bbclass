@@ -3,7 +3,7 @@
 inherit allarch
 inherit obmc-phosphor-systemd
 
-RDEPENDS_${PN} += "python-dbus python-pygobject"
+RDEPENDS_${PN} += "python3-dbus python3-pygobject"
 INSTALL_NAME ?= "${PN}"
 SCRIPT_NAME ?= "${INSTALL_NAME}.py"
 

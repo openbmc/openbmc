@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/meduketto/iksemel.git;protocol=https \
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig lib_package
+inherit autotools pkgconfig lib_package texinfo
 
 # TLS support requires either openssl or gnutls (if both are enabled openssl will be used).
 PACKAGECONFIG ?= "gnutls"

@@ -1,0 +1,11 @@
+[Unit]
+Description=Ampere Computing LLC Power OFF Chassis
+Requires=op-wait-power-off@%i.service
+Before=op-wait-power-off@%i.service
+Conflicts=obmc-chassis-poweron@0.target
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/usr/bin/env ampere_power_util.sh mb off
+SyslogIdentifier=ampere_power_util.sh

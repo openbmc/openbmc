@@ -1,4 +1,4 @@
 #
-# Things we exlude fromw world testing within the reference distro
+# Things we exlude from world testing within the reference distro
 #
 

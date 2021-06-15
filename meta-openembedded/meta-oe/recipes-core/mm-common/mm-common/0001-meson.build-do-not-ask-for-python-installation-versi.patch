@@ -1,0 +1,41 @@
+From af4069263487399be82ee53d48b1edda7f8e594e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Mon, 4 Nov 2019 19:19:47 +0100
+Subject: [PATCH] meson.build: do not ask for python installation / version
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Even by adding python3-setuptools-native the following error is not fixed so
+just ask for python3 executable.
+
+| meson.build:9:0: ERROR: <ExternalProgram 'python3' -> ['<...>/recipe-sysroot-native/usr/bin/python3-native/python3']> is not a valid python or it is missing setuptools
+
+Upstream-Status:  Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ meson.build | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 3255328..7a6094c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -6,12 +6,7 @@ project('mm-common',
+   license: 'GPLv2+'
+ )
+ 
+-python3 = import('python').find_installation('python3')
+-python_version = python3.language_version()
+-python_version_req = '>= 3.5'
+-if not python_version.version_compare(python_version_req)
+-  error('Requires Python @0@, found @1@.'.format(python_version_req, python_version))
+-endif
++python3 = import('python3').find_python()
+ 
+ # Use these instead of meson.source_root() and meson.build_root().
+ # source_root() and build_root() are not useful, if this is a subproject.
+-- 
+2.21.0
+

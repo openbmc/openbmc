@@ -6,26 +6,35 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fa818a259cbed7ce8bc2a22d35a464fc"
 
-inherit autotools pkgconfig
-inherit pythonnative
-inherit phosphor-networkd-rev
+inherit meson pkgconfig
+inherit python3native
 inherit systemd
 
+SRC_URI += "git://github.com/openbmc/phosphor-networkd"
+SRCREV = "3bf1c74e11cef14b7658a0653e5a1571a9ef7620"
 
 DEPENDS += "systemd"
-DEPENDS += "autoconf-archive-native"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus ${PYTHON_PN}-sdbus++-native"
 DEPENDS += "sdeventplus"
-DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
+DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "phosphor-logging"
 DEPENDS += "libnl"
+DEPENDS += "stdplus"
+
+PACKAGECONFIG ??= "uboot-env default-link-local-autoconf default-ipv6-accept-ra"
+
+UBOOT_ENV_RDEPENDS = "${@d.getVar('PREFERRED_PROVIDER_u-boot-fw-utils', True) or 'u-boot-fw-utils'}"
+PACKAGECONFIG[uboot-env] = "-Duboot-env=true,-Duboot-env=false,,${UBOOT_ENV_RDEPENDS}"
+PACKAGECONFIG[default-link-local-autoconf] = "-Ddefault-link-local-autoconf=true,-Ddefault-link-local-autoconf=false,,"
+PACKAGECONFIG[default-ipv6-accept-ra] = "-Ddefault-ipv6-accept-ra=true,-Ddefault-ipv6-accept-ra=false,,"
+PACKAGECONFIG[nic-ethtool] = "-Dnic-ethtool=true,-Dnic-ethtool=false,,"
+PACKAGECONFIG[sync-mac] = "-Dsync-mac=true,-Dsync-mac=false,nlohmann-json,"
 
 S = "${WORKDIR}/git"
 
-SERVICE_FILE = "xyz.openbmc_project.Network.service"
-SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} += "${SERVICE_FILE}"
+FILES_${PN} += "${datadir}/dbus-1/system.d"
 
-EXTRA_OECONF = " \
-  SYSTEMD_TARGET="multi-user.target" \
-"
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Network.service"
+
+EXTRA_OEMESON += "-Dtests=disabled"

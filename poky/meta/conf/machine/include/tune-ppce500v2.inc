@@ -15,6 +15,6 @@ SPEABIEXTENSION = "${@bb.utils.filter('TUNE_FEATURES', 'spe', d)}"
 ABIEXTENSION .= "${SPEABIEXTENSION}"
 
 AVAILTUNES += "ppce500v2"
-TUNE_FEATURES_tune-ppce500v2 = "m32 ppce500v2"
+TUNE_FEATURES_tune-ppce500v2 = "m32 ppce500v2 bigendian"
 TUNE_PKGARCH_tune-ppce500v2 = "ppce500v2"
 PACKAGE_EXTRA_ARCHS_tune-ppce500v2 = "ppce500v2"

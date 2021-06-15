@@ -1,4 +1,4 @@
-From 5f47c30759684cea9a7a409646686c1a358b78ac Mon Sep 17 00:00:00 2001
+From 7823956149c78e1996c567d1965803456df090f8 Mon Sep 17 00:00:00 2001
 From: OpenEmbedded <oe.patch@oe>
 Date: Wed, 11 Apr 2018 22:51:05 +0200
 Subject: [PATCH] replace basename() with sscanf()
@@ -13,7 +13,7 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/kexec/arch/i386/x86-linux-setup.c b/kexec/arch/i386/x86-linux-setup.c
-index 6c7d260..7850083 100644
+index 6cda12c..5514c1c 100644
 --- a/kexec/arch/i386/x86-linux-setup.c
 +++ b/kexec/arch/i386/x86-linux-setup.c
 @@ -304,9 +304,9 @@ static int add_edd_entry(struct x86_linux_param_header *real_mode,

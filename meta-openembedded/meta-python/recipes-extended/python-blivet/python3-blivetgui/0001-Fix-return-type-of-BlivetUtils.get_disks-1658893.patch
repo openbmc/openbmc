@@ -1,0 +1,32 @@
+From 4d0f9f961704bc1dd83fdf6808fb6ab91dc6a768 Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Thu, 13 Dec 2018 13:39:03 +0100
+Subject: [PATCH] Fix return type of BlivetUtils.get_disks (#1658893)
+
+This must be a list, not a generator, because we are iterating
+over it multiple times in some cases.
+
+Upstream-Status: Backport[git://github.com/rhinstaller/blivet-gui]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+---
+ blivetgui/blivet_utils.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/blivetgui/blivet_utils.py b/blivetgui/blivet_utils.py
+index e2bd802..ddb04fc 100644
+--- a/blivetgui/blivet_utils.py
++++ b/blivetgui/blivet_utils.py
+@@ -204,7 +204,7 @@ class BlivetUtils(object):
+ 
+         """
+ 
+-        return (device for device in self.storage.disks if device.type != "mdarray")
++        return [device for device in self.storage.disks if device.type != "mdarray"]
+ 
+     def get_group_devices(self):
+         """ Return list of LVM2 Volume Group devices
+-- 
+2.7.4
+

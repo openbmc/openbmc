@@ -1,5 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://busybox.cfg"
 SRC_URI += "file://flash.cfg"
+SRC_URI += "file://less.cfg"
 SRC_URI += "file://mountpoint.cfg"
 SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'obmc-ubi-fs', '', 'file://reboot.cfg', d)}"

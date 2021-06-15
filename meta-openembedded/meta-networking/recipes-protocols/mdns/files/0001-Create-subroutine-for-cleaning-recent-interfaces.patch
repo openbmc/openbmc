@@ -1,0 +1,59 @@
+From 6d90f9fdaf008f5c3b8fd8d91594fa1461437888 Mon Sep 17 00:00:00 2001
+From: Nate Karstens <nate.karstens@garmin.com>
+Date: Wed, 28 Jun 2017 17:30:00 -0500
+Subject: [PATCH] Create subroutine for cleaning recent interfaces
+
+Moves functionality for cleaning the list of recent
+interfaces into its own subroutine.
+
+Upstream-Status: Submitted [dts@apple.com]
+
+Signed-off-by: Nate Karstens <nate.karstens@garmin.com>
+---
+ mDNSPosix/mDNSPosix.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/mDNSPosix/mDNSPosix.c b/mDNSPosix/mDNSPosix.c
+index a63cd19..7aeee7b 100755
+--- a/mDNSPosix/mDNSPosix.c
++++ b/mDNSPosix/mDNSPosix.c
+@@ -1199,6 +1199,19 @@ mDNSlocal int SetupSocket(struct sockaddr *intfAddr, mDNSIPPort port, int interf
+     return err;
+ }
+ 
++// Clean up any interfaces that have been hanging around on the RecentInterfaces list for more than a minute
++mDNSlocal void CleanRecentInterfaces(void)
++{
++    PosixNetworkInterface **ri = &gRecentInterfaces;
++    const mDNSs32 utc = mDNSPlatformUTC();
++    while (*ri)
++    {
++        PosixNetworkInterface *pi = *ri;
++        if (utc - pi->LastSeen < 60) ri = (PosixNetworkInterface **)&pi->coreIntf.next;
++        else { *ri = (PosixNetworkInterface *)pi->coreIntf.next; free(pi); }
++    }
++}
++
+ // Creates a PosixNetworkInterface for the interface whose IP address is
+ // intfAddr and whose name is intfName and registers it with mDNS core.
+ mDNSlocal int SetupOneInterface(mDNS *const m, struct sockaddr *intfAddr, struct sockaddr *intfMask, const char *intfName, int intfIndex)
+@@ -1388,15 +1401,7 @@ mDNSlocal int SetupInterfaceList(mDNS *const m)
+     // Clean up.
+     if (intfList != NULL) freeifaddrs(intfList);
+ 
+-    // Clean up any interfaces that have been hanging around on the RecentInterfaces list for more than a minute
+-    PosixNetworkInterface **ri = &gRecentInterfaces;
+-    const mDNSs32 utc = mDNSPlatformUTC();
+-    while (*ri)
+-    {
+-        PosixNetworkInterface *pi = *ri;
+-        if (utc - pi->LastSeen < 60) ri = (PosixNetworkInterface **)&pi->coreIntf.next;
+-        else { *ri = (PosixNetworkInterface *)pi->coreIntf.next; free(pi); }
+-    }
++    CleanRecentInterfaces();
+ 
+     return err;
+ }
+-- 
+2.20.1
+

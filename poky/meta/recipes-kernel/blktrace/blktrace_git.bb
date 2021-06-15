@@ -1,4 +1,9 @@
 SUMMARY = "Generates traces of I/O traffic on block devices"
+DESCRIPTION = "blktrace is a block layer IO tracing mechanism which provides \
+detailed information about request queue operations up to user space. There \
+are three major components: a kernel component, a utility to record the i/o \
+trace information for the kernel to user space, and utilities to analyse and \
+view the trace information."
 HOMEPAGE = "http://brick.kernel.dk/snaps/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
@@ -12,6 +17,7 @@ PV = "1.2.0+git${SRCPV}"
 SRC_URI = "git://git.kernel.dk/blktrace.git \
            file://ldflags.patch \
            file://CVE-2018-10689.patch \
+           file://make-btt-scripts-python3-ready.patch \
 "
 
 S = "${WORKDIR}/git"

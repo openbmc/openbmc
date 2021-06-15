@@ -1,0 +1,48 @@
+From 863c09f640a5dfd33ff22915b0d5fee7bc5df70a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 16 Feb 2020 17:50:25 +0100
+Subject: [PATCH] configure.ac, setup.py: do not add a curses include path from
+ the host
+
+This leads to host contamination, and particularly can cause
+curses modules to fail at runtime if the host curses is configured
+differently to native curses (observed on current OpenSuse Tumbleweed
+as dnf failures).
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ configure.ac | 6 ------
+ setup.py     | 2 --
+ 2 files changed, 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 915f475..c911011 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4828,12 +4828,6 @@ then
+   [Define if you have struct stat.st_mtimensec])
+ fi
+ 
+-# first curses header check
+-ac_save_cppflags="$CPPFLAGS"
+-if test "$cross_compiling" = no; then
+-  CPPFLAGS="$CPPFLAGS -I/usr/include/ncursesw"
+-fi
+-
+ AC_CHECK_HEADERS(curses.h ncurses.h)
+ 
+ # On Solaris, term.h requires curses.h
+diff --git a/setup.py b/setup.py
+index b0f1541..7208cd0 100644
+--- a/setup.py
++++ b/setup.py
+@@ -973,8 +973,6 @@ class PyBuildExt(build_ext):
+         panel_library = 'panel'
+         if curses_library == 'ncursesw':
+             curses_defines.append(('HAVE_NCURSESW', '1'))
+-            if not CROSS_COMPILING:
+-                curses_includes.append('/usr/include/ncursesw')
+             # Bug 1464056: If _curses.so links with ncursesw,
+             # _curses_panel.so must link with panelw.
+             panel_library = 'panelw'

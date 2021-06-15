@@ -1,6 +1,11 @@
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
+import base64
+import zlib
 import unittest
 
 from oeqa.core.exception import OEQAMissingVariable
@@ -29,6 +34,8 @@ class OETestCase(unittest.TestCase):
     @classmethod
     def _oeSetUpClass(clss):
         _validate_td_vars(clss.td, clss.td_vars, "class")
+        if hasattr(clss, 'setUpHooker') and callable(getattr(clss, 'setUpHooker')):
+            clss.setUpHooker()
         clss.setUpClassMethod()
 
     @classmethod
@@ -36,11 +43,63 @@ class OETestCase(unittest.TestCase):
         clss.tearDownClassMethod()
 
     def _oeSetUp(self):
-        for d in self.decorators:
-            d.setUpDecorator()
+        try:
+            for d in self.decorators:
+                d.setUpDecorator()
+        except:
+            for d in self.decorators:
+                d.tearDownDecorator()
+            raise
         self.setUpMethod()
 
     def _oeTearDown(self):
         for d in self.decorators:
             d.tearDownDecorator()
         self.tearDownMethod()
+
+class OEPTestResultTestCase:
+    """
+    Mix-in class to provide functions to make interacting with extraresults for
+    the purposes of storing ptestresult data.
+    """
+    @staticmethod
+    def _compress_log(log):
+        logdata = log.encode("utf-8") if isinstance(log, str) else log
+        logdata = zlib.compress(logdata)
+        logdata = base64.b64encode(logdata).decode("utf-8")
+        return {"compressed" : logdata}
+
+    def ptest_rawlog(self, log):
+        if not hasattr(self, "extraresults"):
+            self.extraresults = {"ptestresult.sections" : {}}
+        self.extraresults["ptestresult.rawlogs"] = {"log" : self._compress_log(log)}
+
+    def ptest_section(self, section, duration = None, log = None, logfile = None, exitcode = None):
+        if not hasattr(self, "extraresults"):
+            self.extraresults = {"ptestresult.sections" : {}}
+
+        sections = self.extraresults.get("ptestresult.sections")
+        if section not in sections:
+            sections[section] = {}
+
+        if log is not None:
+            sections[section]["log"] = self._compress_log(log)
+        elif logfile is not None:
+            with open(logfile, "rb") as f:
+                sections[section]["log"] = self._compress_log(f.read())
+
+        if duration is not None:
+            sections[section]["duration"] = duration
+        if exitcode is not None:
+            sections[section]["exitcode"] = exitcode
+
+    def ptest_result(self, section, test, result):
+        if not hasattr(self, "extraresults"):
+            self.extraresults = {"ptestresult.sections" : {}}
+
+        sections = self.extraresults.get("ptestresult.sections")
+        if section not in sections:
+            sections[section] = {}
+        resultname = "ptestresult.{}.{}".format(section, test)
+        self.extraresults[resultname] = {"status" : result}
+

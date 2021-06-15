@@ -1,0 +1,54 @@
+From c2a67c1f62175ab061bc03d10dd766f968c6a097 Mon Sep 17 00:00:00 2001
+From: Naveen Saini <naveen.kumar.saini@intel.com>
+Date: Fri, 2 Aug 2019 10:41:26 +0800
+Subject: [PATCH] configure.ac: skip running test program when cross-compiling
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -160,7 +160,7 @@ AC_CHECK_FUNCS([backtrace_symbols_fd mem
+ AC_FUNC_SELECT_ARGTYPES
+ 
+ AC_MSG_CHECKING([for strlcpy])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
+                char a[2];
+                if (strlcpy(a, "yes", 2) != 3)
+                    return 1;]])],
+@@ -176,7 +176,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[#includ
+               ])
+ 
+ AC_MSG_CHECKING([for strlcat])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <string.h>]],[[
+                char a[4] = "no";
+                if (strlcat(a, "yes", 4) != 5)
+                    return 1;]])],
+@@ -191,21 +191,6 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([[#includ
+                            [Define to 1 if you have the strlcat function.])
+               ])
+ 
+-AC_MSG_CHECKING([for C++11 by default])
+-AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <regex>]],[[
+-               if (__cplusplus < 201103L) return 1;]])],
+-              [AC_MSG_RESULT([yes])],
+-              [AC_MSG_RESULT([no])
+-               AC_MSG_CHECKING([for C++11 when forced])
+-               CXXFLAGS="$CXXFLAGS -std=c++11"
+-               AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <regex>]],[[
+-                              if (__cplusplus < 201103L) return 1;]])],
+-                             [AC_MSG_RESULT([yes])],
+-                             [AC_MSG_RESULT([no])
+-                              AC_MSG_ERROR([Need C++11. Please set CXXFLAGS.])
+-                             ])
+-              ])
+-
+ PKG_CHECK_MODULES([CORE],[fontconfig xrender xcomposite xdamage xfixes xext x11])
+ AC_SUBST([CORE_CFLAGS])
+ AC_SUBST([CORE_LIBS])

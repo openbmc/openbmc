@@ -1,8 +1,11 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake, get_bb_vars, runCmd
-from oeqa.core.decorator.oeid import OETestID
 
 # This test builds an image with using the "container" IMAGE_FSTYPE, and
 # ensures that then files in the image are only the ones expected.
@@ -21,7 +24,6 @@ class ContainerImageTests(OESelftestTestCase):
 
     # Verify that when specifying a IMAGE_TYPEDEP_ of the form "foo.bar" that
     # the conversion type bar gets added as a dep as well
-    @OETestID(1619)
     def test_expected_files(self):
 
         def get_each_path_part(path):
@@ -40,6 +42,9 @@ IMAGE_FSTYPES = "container"
 PACKAGE_CLASSES = "package_ipk"
 IMAGE_FEATURES = ""
 IMAGE_BUILDINFO_FILE = ""
+INIT_MANAGER = "sysvinit"
+IMAGE_INSTALL_remove = "ssh-pregen-hostkeys"
+
 """)
 
         bbvars = get_bb_vars(['bindir', 'sysconfdir', 'localstatedir',
@@ -55,11 +60,7 @@ IMAGE_BUILDINFO_FILE = ""
                     '.{sysconfdir}/version',
                     './run/',
                     '.{localstatedir}/cache/',
-                    '.{localstatedir}/cache/ldconfig/',
-                    '.{localstatedir}/cache/ldconfig/aux-cache',
-                    '.{localstatedir}/cache/opkg/',
-                    '.{localstatedir}/lib/',
-                    '.{localstatedir}/lib/opkg/'
+                    '.{localstatedir}/lib/'
                 ]
 
         expected_files = [ x.format(bindir=bbvars['bindir'],

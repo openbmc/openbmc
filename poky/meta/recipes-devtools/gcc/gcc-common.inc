@@ -1,5 +1,6 @@
 SUMMARY = "GNU cc and gcc C compilers"
 HOMEPAGE = "http://www.gnu.org/software/gcc/"
+DESCRIPTION = "The GNU Compiler Collection includes front ends for C, C++, Objective-C, Fortran, Ada, Go, and D, as well as libraries for these languages (libstdc++,...). GCC was originally written as the compiler for the GNU operating system."
 SECTION = "devel"
 LICENSE = "GPL"
 
@@ -17,7 +18,7 @@ python extract_stashed_builddir () {
     src = d.expand("${COMPONENTS_DIR}/${BUILD_ARCH}/gcc-stashed-builddir-${TARGET_SYS}")
     dest = d.getVar("B")
     oe.path.copyhardlinktree(src, dest)
-    staging_processfixme([src + "/fixmepath"], dest, dest, dest, d)
+    staging_processfixme([src + "/fixmepath"], dest, d.getVar("RECIPE_SYSROOT"), d.getVar("RECIPE_SYSROOT_NATIVE"), d)
 }
 
 def get_gcc_float_setting(bb, d):
@@ -41,19 +42,13 @@ def get_gcc_ppc_plt_settings(bb, d):
         return "--enable-secureplt"
     return ""
 
-def get_long_double_setting(bb, d):
-    if d.getVar('TRANSLATED_TARGET_ARCH') in [ 'powerpc', 'powerpc64' ] and d.getVar('TCLIBC') in [ 'glibc' ]:
-        return "--with-long-double-128"
-    else:
-        return "--without-long-double-128 libgcc_cv_powerpc_float128=no"
-    return ""
-
 def get_gcc_multiarch_setting(bb, d):
     target_arch = d.getVar('TRANSLATED_TARGET_ARCH')
     multiarch_options = {
         "i586":    "--enable-targets=all",
         "i686":    "--enable-targets=all",
         "powerpc": "--enable-targets=powerpc64",
+        "powerpc64le": "--enable-targets=powerpcle",
         "mips":    "--enable-targets=all",
         "sparc":   "--enable-targets=all",
     }

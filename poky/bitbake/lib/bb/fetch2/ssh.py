@@ -1,5 +1,3 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 '''
 BitBake 'Fetch' implementations
 
@@ -29,24 +27,11 @@ IETF secsh internet draft:
 #            Copyright 2003 Holger Schurig
 #
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import re, os
-from   bb.fetch2 import FetchMethod
-from   bb.fetch2 import FetchError
-from   bb.fetch2 import logger
-from   bb.fetch2 import runfetchcmd
+from bb.fetch2 import check_network_access, FetchMethod, ParameterError, runfetchcmd
 
 
 __pattern__ = re.compile(r'''
@@ -72,14 +57,14 @@ class SSH(FetchMethod):
     '''Class to fetch a module or modules via Secure Shell'''
 
     def supports(self, urldata, d):
-        return __pattern__.match(urldata.url) != None
+        return __pattern__.match(urldata.url) is not None
 
     def supports_checksum(self, urldata):
         return False
 
     def urldata_init(self, urldata, d):
         if 'protocol' in urldata.parm and urldata.parm['protocol'] == 'git':
-            raise bb.fetch2.ParameterError(
+            raise ParameterError(
                 "Invalid protocol - if you wish to fetch from a git " +
                 "repository using ssh, you need to use " +
                 "git:// prefix with protocol=ssh", urldata.url)
@@ -119,7 +104,7 @@ class SSH(FetchMethod):
             dldir
         )
 
-        bb.fetch2.check_network_access(d, cmd, urldata.url)
+        check_network_access(d, cmd, urldata.url)
 
         runfetchcmd(cmd, d)
 

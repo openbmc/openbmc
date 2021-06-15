@@ -1,7 +1,11 @@
 #!/bin/sh -eu
 
 show_error() {
-    logger -p user.error -t bmc-first-init $@
+    if [ -n "${JOURNAL_STREAM-}" ]; then
+        echo "$@" | systemd-cat -t first-boot-set-mac -p emerg
+    else
+        echo "$@" >&2
+    fi
 }
 
 sync_mac() {
@@ -11,13 +15,34 @@ sync_mac() {
     INVENTORY_PATH='/xyz/openbmc_project/inventory'
     NETWORK_ITEM_IFACE='xyz.openbmc_project.Inventory.Item.NetworkInterface'
 
-    NETWORK_ITEM_PATH=$(busctl --no-pager --verbose call \
+    # Get the NETWORK ITEM count
+    NETWORK_ITEM_PATH_COUNT=$(busctl --no-pager --verbose call \
+                            ${MAPPER_IFACE} \
+                            ${MAPPER_PATH} \
+                            ${MAPPER_IFACE} \
+                            GetSubTree sias \
+                            ${INVENTORY_PATH} 0 1 ${NETWORK_ITEM_IFACE} \
+                        2>/dev/null | grep ${INVENTORY_PATH} | wc -l || true)
+
+    if [ $NETWORK_ITEM_PATH_COUNT -gt 1 ]; then
+        # If there are more than 2 NETOWRK ITEM and path must contain $1
+        # for finding the right NETWORK ITEM
+        NETWORK_ITEM_PATH=$(busctl --no-pager --verbose call \
+                            ${MAPPER_IFACE} \
+                            ${MAPPER_PATH} \
+                            ${MAPPER_IFACE} \
+                            GetSubTree sias \
+                            ${INVENTORY_PATH} 0 1 ${NETWORK_ITEM_IFACE} \
+                        2>/dev/null | grep ${INVENTORY_PATH} | grep $1 || true)
+    else
+        NETWORK_ITEM_PATH=$(busctl --no-pager --verbose call \
                             ${MAPPER_IFACE} \
                             ${MAPPER_PATH} \
                             ${MAPPER_IFACE} \
                             GetSubTree sias \
                             ${INVENTORY_PATH} 0 1 ${NETWORK_ITEM_IFACE} \
                         2>/dev/null | grep ${INVENTORY_PATH} || true)
+    fi
 
     # '     STRING "/xyz/openbmc_project/inventory/system/chassis/ethernet";'
     NETWORK_ITEM_PATH=${NETWORK_ITEM_PATH#*\"}
@@ -47,11 +72,13 @@ sync_mac() {
     fi
 }
 
-if [ $# -eq 0 ]
-    then echo 'No Ethernet interface name is given'
+if [ $# -eq 0 ]; then
+    show_error 'No Ethernet interface name is given'
     exit 1
 fi
 
 sync_mac $1
 
-systemctl disable first-boot-set-mac@${1}.service
+# Prevent start at next boot time
+mkdir -p "/var/lib/first-boot-set-mac"
+touch "/var/lib/first-boot-set-mac/${1}"

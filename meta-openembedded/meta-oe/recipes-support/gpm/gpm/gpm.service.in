@@ -4,6 +4,7 @@ Description=Virtual console mouse server
 [Service]
 Type=forking
 ExecStart=@bindir@/gpm -m /dev/input/mice -t imps2
+PIDFile=/run/gpm.pid
 
 [Install]
 WantedBy=multi-user.target

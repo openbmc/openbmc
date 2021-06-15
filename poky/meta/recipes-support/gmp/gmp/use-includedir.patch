@@ -1,0 +1,18 @@
+exec includedir should be pointing to general yocto includdir
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: gmp-6.1.2/Makefile.am
+===================================================================
+--- gmp-6.1.2.orig/Makefile.am
++++ gmp-6.1.2/Makefile.am
+@@ -130,7 +130,7 @@ EXTRA_DIST += gmpxx.h
+ # but anyone knowledgeable enough to be playing with exec_prefix will be able
+ # to address that.
+ #
+-includeexecdir = $(exec_prefix)/include
++includeexecdir = $(includedir)
+ include_HEADERS = $(GMPXX_HEADERS_OPTION)
+ nodist_includeexec_HEADERS = gmp.h
+ lib_LTLIBRARIES = libgmp.la $(GMPXX_LTLIBRARIES_OPTION)

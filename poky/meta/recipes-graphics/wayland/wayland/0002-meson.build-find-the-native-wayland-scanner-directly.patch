@@ -1,0 +1,28 @@
+From 98e7902a4ddcd80b61cce6f35f97907e841a5eda Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 16 Feb 2020 16:29:53 +0100
+Subject: [PATCH] meson.build: find the native wayland-scanner directly in PATH
+
+Otherwise, meson attempts to use the target pkg-config and fails.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ src/meson.build | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index d91c503..15730a3 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -59,8 +59,7 @@ if get_option('scanner')
+ endif
+ 
+ if meson.is_cross_build() or not get_option('scanner')
+-	scanner_dep = dependency('wayland-scanner', native: true, version: meson.project_version())
+-	wayland_scanner_for_build = find_program(scanner_dep.get_pkgconfig_variable('wayland_scanner'))
++	wayland_scanner_for_build = find_program('wayland-scanner')
+ else
+ 	wayland_scanner_for_build = wayland_scanner
+ endif

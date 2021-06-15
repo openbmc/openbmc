@@ -1,0 +1,46 @@
+From 6e51d529988cfc0bb357751fd767e9f1478e2b81 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Thu, 13 Feb 2020 06:08:45 +0000
+Subject: [PATCH] rarpd: rdisc: Drop PrivateUsers
+
+Neither rarpd nor rdisc can gain the necessary capabilities with
+PrivateUsers enabled.
+
+Upstream-Status: Pending
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ systemd/rarpd.service.in | 1 -
+ systemd/rdisc.service.in | 3 ++-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/systemd/rarpd.service.in b/systemd/rarpd.service.in
+index e600c10c93e6..f5d7621a7ce8 100644
+--- a/systemd/rarpd.service.in
++++ b/systemd/rarpd.service.in
+@@ -12,7 +12,6 @@ AmbientCapabilities=CAP_NET_RAW
+ DynamicUser=yes
+ PrivateTmp=yes
+ PrivateDevices=yes
+-PrivateUsers=yes
+ ProtectSystem=strict
+ ProtectHome=yes
+ ProtectControlGroups=yes
+diff --git a/systemd/rdisc.service.in b/systemd/rdisc.service.in
+index 4e2a1ec9d0e5..a71b87d36b37 100644
+--- a/systemd/rdisc.service.in
++++ b/systemd/rdisc.service.in
+@@ -8,9 +8,10 @@ After=network.target
+ EnvironmentFile=-/etc/sysconfig/rdisc
+ ExecStart=@sbindir@/rdisc -f -t $OPTIONS $SEND_ADDRESS $RECEIVE_ADDRESS
+ 
++CapabilityBoundingSet=CAP_NET_RAW
+ AmbientCapabilities=CAP_NET_RAW
+ PrivateTmp=yes
+-PrivateUsers=yes
++DynamicUser=yes
+ ProtectSystem=strict
+ ProtectHome=yes
+ ProtectControlGroups=yes
+-- 
+2.17.1
+

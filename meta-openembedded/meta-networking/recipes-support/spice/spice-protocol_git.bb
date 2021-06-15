@@ -10,12 +10,12 @@ environment - not only on its computer-server machine, but also from \
 anywhere on the Internet and using a wide variety of machine \
 architectures."
 
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b37311cb5604f3e5cc2fb0fd23527e95"
 
-PV = "0.12.13+git${SRCPV}"
+PV = "0.14.1+git${SRCPV}"
 
-SRCREV = "87441524f4e7b79658e42bd8f1f6c3e3c8649aa5"
+SRCREV = "e0ec178a72aa33e307ee5ac02b63bf336da921a5"
 
 SRC_URI = " \
     git://anongit.freedesktop.org/spice/spice-protocol \

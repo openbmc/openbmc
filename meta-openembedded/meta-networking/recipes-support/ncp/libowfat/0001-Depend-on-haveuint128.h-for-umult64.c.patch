@@ -1,0 +1,44 @@
+From 7f6a104a682d59f28f7df889129f4467cc45e912 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 6 Nov 2019 19:55:42 -0800
+Subject: [PATCH] Depend on haveuint128.h for umult64.c
+
+This fixes parallel build issue e.g.
+mult/umult64.c:9:10: fatal error: 'haveuint128.h' file not found
+         ^~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ GNUmakefile | 1 +
+ Makefile    | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/GNUmakefile b/GNUmakefile
+index 3f3193d..751ca60 100644
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -126,6 +126,7 @@ $(CDB_OBJS): cdb.h uint32.h
+ $(CRITBIT_OBJS): critbit.h
+ 
+ mult64.o: haveuint128.h
++umult64.o: haveuint128.h
+ 
+ 
+ iob_addbuf.o iob_addfile.o iob_new.o iob_reset.o iob_send.o: iob_internal.h iob.h
+diff --git a/Makefile b/Makefile
+index 0d08da4..02df6c6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -430,7 +430,7 @@ range_str4inbuf.o: mult/range_str4inbuf.c rangecheck.h
+ range_strinbuf.o: mult/range_strinbuf.c rangecheck.h
+ umult16.o: mult/umult16.c uint16.h
+ umult32.o: mult/umult32.c uint32.h
+-umult64.o: mult/umult64.c uint64.h
++umult64.o: mult/umult64.c uint64.h haveuint128.h
+ open_append.o: open/open_append.c open.h
+ open_excl.o: open/open_excl.c open.h
+ open_read.o: open/open_read.c open.h
+-- 
+2.24.0
+

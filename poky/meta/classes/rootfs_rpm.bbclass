@@ -9,7 +9,7 @@ export STAGING_INCDIR
 export STAGING_LIBDIR
 
 # Add 100Meg of extra space for dnf
-IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("PACKAGE_INSTALL", "dnf", " + 102400", "" ,d)}"
+IMAGE_ROOTFS_EXTRA_SPACE_append = "${@bb.utils.contains("PACKAGE_INSTALL", "dnf", " + 102400", "", d)}"
 
 # Dnf is python based, so be sure python3-native is available to us.
 EXTRANATIVEPATH += "python3-native"
@@ -24,7 +24,7 @@ do_rootfs[depends] += "${RPMROOTFSDEPENDS}"
 do_populate_sdk[depends] += "${RPMROOTFSDEPENDS}"
 
 do_rootfs[recrdeptask] += "do_package_write_rpm do_package_qa"
-do_rootfs[vardeps] += "PACKAGE_FEED_URIS"
+do_rootfs[vardeps] += "PACKAGE_FEED_URIS PACKAGE_FEED_BASE_PATHS PACKAGE_FEED_ARCHS"
 
 python () {
     if d.getVar('BUILD_IMAGES_FROM_FEEDS'):

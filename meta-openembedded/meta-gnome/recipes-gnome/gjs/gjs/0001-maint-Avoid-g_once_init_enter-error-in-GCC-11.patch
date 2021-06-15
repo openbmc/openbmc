@@ -1,0 +1,77 @@
+From dae0055be61937fe70252f3f4ee09b355aba2b8f Mon Sep 17 00:00:00 2001
+From: Philip Chimento <philip.chimento@gmail.com>
+Date: Sun, 14 Feb 2021 12:20:09 -0800
+Subject: [PATCH] maint: Avoid g_once_init_enter error in GCC 11
+
+On platforms where g_once_init_enter() is defined to use C11 atomic
+builtins, passing a pointer to a volatile value is an error in GCC 11 and
+later, in C++.
+
+More info about the GCC change:
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95378
+https://gcc.gnu.org/pipermail/gcc-patches/2020-June/548283.html
+
+However, it's my understanding that in modern C++ there is no longer a
+need to guard the initialization of these variables. Since C++11, static
+local variables in a function are guaranteed to be initialized only once,
+the first time control passes through that function. So we can just remove
+the g_once_init_enter guard.
+
+More info:
+https://en.cppreference.com/w/cpp/language/storage_duration#Static_local_variables
+
+Stack Overflow answers with quotations from the C++ standard:
+https://stackoverflow.com/a/58804/172999
+https://stackoverflow.com/a/8102145/172999
+
+Closes: #376
+---
+ gjs/error-types.cpp | 32 +++++++++++++-------------------
+ 1 file changed, 13 insertions(+), 19 deletions(-)
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gjs/-/commit/f02eaf3a9d3465915eb849428c2d9615e2184a4c]
+diff --git a/gjs/error-types.cpp b/gjs/error-types.cpp
+index 86cb878..5eba61b 100644
+--- a/gjs/error-types.cpp
++++ b/gjs/error-types.cpp
+@@ -31,24 +31,18 @@ G_DEFINE_QUARK(gjs-js-error-quark, gjs_js_error)
+ // clang-format on
+ 
+ GType gjs_js_error_get_type(void) {
+-    static volatile GType g_type_id;
+-
+-    if (g_once_init_enter(&g_type_id)) {
+-        static GEnumValue errors[] = {
+-            { GJS_JS_ERROR_ERROR, "Error", "error" },
+-            { GJS_JS_ERROR_EVAL_ERROR, "EvalError", "eval-error" },
+-            { GJS_JS_ERROR_INTERNAL_ERROR, "InternalError", "internal-error" },
+-            { GJS_JS_ERROR_RANGE_ERROR, "RangeError", "range-error" },
+-            { GJS_JS_ERROR_REFERENCE_ERROR, "ReferenceError", "reference-error" },
+-            { GJS_JS_ERROR_STOP_ITERATION, "StopIteration", "stop-iteration" },
+-            { GJS_JS_ERROR_SYNTAX_ERROR, "SyntaxError", "syntax-error" },
+-            { GJS_JS_ERROR_TYPE_ERROR, "TypeError", "type-error" },
+-            { GJS_JS_ERROR_URI_ERROR, "URIError", "uri-error" },
+-            { 0, nullptr, nullptr }
+-        };
+-
+-        g_type_id = g_enum_register_static("GjsJSError", errors);
+-    }
+-
++    static const GEnumValue errors[] = {
++        {GJS_JS_ERROR_ERROR, "Error", "error"},
++        {GJS_JS_ERROR_EVAL_ERROR, "EvalError", "eval-error"},
++        {GJS_JS_ERROR_INTERNAL_ERROR, "InternalError", "internal-error"},
++        {GJS_JS_ERROR_RANGE_ERROR, "RangeError", "range-error"},
++        {GJS_JS_ERROR_REFERENCE_ERROR, "ReferenceError", "reference-error"},
++        {GJS_JS_ERROR_STOP_ITERATION, "StopIteration", "stop-iteration"},
++        {GJS_JS_ERROR_SYNTAX_ERROR, "SyntaxError", "syntax-error"},
++        {GJS_JS_ERROR_TYPE_ERROR, "TypeError", "type-error"},
++        {GJS_JS_ERROR_URI_ERROR, "URIError", "uri-error"},
++        {0, nullptr, nullptr}};
++    // Initialization of static local variable guaranteed only once in C++11
++    static GType g_type_id = g_enum_register_static("GjsJSError", errors);
+     return g_type_id;
+ }
+-- 
+2.31.1
+

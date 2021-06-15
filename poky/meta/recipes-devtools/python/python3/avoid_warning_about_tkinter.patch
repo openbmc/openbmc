@@ -1,4 +1,4 @@
-From fead48c8b501a8d7c3db21df2e599f90f38f11d3 Mon Sep 17 00:00:00 2001
+From ba7202700578d435b07cfdfb7b57e83185752800 Mon Sep 17 00:00:00 2001
 From: Andrei Gherzan <andrei@gherzan.ro>
 Date: Mon, 28 Jan 2019 15:57:54 +0000
 Subject: [PATCH] _tkinter module needs tk module along with tcl. tk is not yet
@@ -11,26 +11,21 @@ Also simply disable the tk module since its not in DEPENDS.
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 
 ---
- setup.py | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ setup.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index fbec00d..b7a36a6 100644
+index ab18ff0..7691258 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -1623,10 +1623,12 @@ class PyBuildExt(build_ext):
-         self.extensions.extend(exts)
+@@ -1706,8 +1706,8 @@ class PyBuildExt(build_ext):
+         self.detect_decimal()
+         self.detect_ctypes()
+         self.detect_multiprocessing()
+-        if not self.detect_tkinter():
+-            self.missing.append('_tkinter')
++#        if not self.detect_tkinter():
++#            self.missing.append('_tkinter')
+         self.detect_uuid()
  
-         # Call the method for detecting whether _tkinter can be compiled
--        self.detect_tkinter(inc_dirs, lib_dirs)
-+        # self.detect_tkinter(inc_dirs, lib_dirs)
- 
--        if '_tkinter' not in [e.name for e in self.extensions]:
--            missing.append('_tkinter')
-+        # tkinter module will not be avalaible as yocto
-+        # doesn't have tk integrated (yet)
-+        #if '_tkinter' not in [e.name for e in self.extensions]:
-+        #    missing.append('_tkinter')
- 
-         # Build the _uuid module if possible
-         uuid_incs = find_file("uuid.h", inc_dirs, ["/usr/include/uuid"])
+ ##         # Uncomment these lines if you want to play with xxmodule.c

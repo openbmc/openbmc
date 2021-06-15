@@ -1,0 +1,60 @@
+From a34d61850b680c152e1dcc958ee83c3ab3261c3d Mon Sep 17 00:00:00 2001
+From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Tue, 15 Nov 2016 10:10:23 +0100
+Subject: [PATCH] Revert "ima: limit file hash setting by user to fix and log
+ modes"
+
+This reverts commit c68ed80c97d9720f51ef31fe91560fdd1e121533.
+
+The original motivation was security hardening ("File hashes are
+automatically set and updated and should not be manually set.")
+
+However, that hardening ignores and breaks some valid use cases:
+- File hashes might not be set because the file is currently
+  outside of the policy and therefore have to be set by the
+  creator. Examples:
+  - Booting into an initramfs with an IMA-enabled kernel but
+    without setting an IMA policy, then installing
+    the OS onto the target partition by unpacking a rootfs archive
+    which has the file hashes pre-computed.
+  - Unpacking a file into a staging area with meta data (like owner)
+    that leaves the file outside of the current policy, then changing
+    the meta data such that it becomes part of the current policy.
+- "should not be set manually" implies that the creator is aware
+  of IMA semantic, the current system's configuration, and then
+  skips setting file hashes in security.ima if (and only if) the
+  kernel would prevent it. That's not the case for standard, unmodified
+  tools. Example: unpacking an archive with security.ima xattrs with
+  bsdtar or GNU tar.
+
+Upstream-Status: Submitted [https://sourceforge.net/p/linux-ima/mailman/message/35492824/]
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+---
+ security/integrity/ima/ima_appraise.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
+index 4b9b4a4..b8b2dd9 100644
+--- a/security/integrity/ima/ima_appraise.c
++++ b/security/integrity/ima/ima_appraise.c
+@@ -385,14 +385,10 @@ int ima_inode_setxattr(struct dentry *dentry, const char *xattr_name,
+ 	result = ima_protect_xattr(dentry, xattr_name, xattr_value,
+ 				   xattr_value_len);
+ 	if (result == 1) {
+-		bool digsig;
+-
+ 		if (!xattr_value_len || (xvalue->type >= IMA_XATTR_LAST))
+ 			return -EINVAL;
+-		digsig = (xvalue->type == EVM_IMA_XATTR_DIGSIG);
+-		if (!digsig && (ima_appraise & IMA_APPRAISE_ENFORCE))
+-			return -EPERM;
+-		ima_reset_appraise_flags(d_backing_inode(dentry), digsig);
++		ima_reset_appraise_flags(d_backing_inode(dentry),
++			 (xvalue->type == EVM_IMA_XATTR_DIGSIG) ? 1 : 0);
+ 		result = 0;
+ 	}
+ 	return result;
+-- 
+2.1.4
+

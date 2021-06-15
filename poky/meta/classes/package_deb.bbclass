@@ -6,6 +6,8 @@ inherit package
 
 IMAGE_PKGTYPE ?= "deb"
 
+DPKG_BUILDCMD ??= "dpkg-deb"
+
 DPKG_ARCH ?= "${@debian_arch_map(d.getVar('TARGET_ARCH'), d.getVar('TUNE_FEATURES'))}"
 DPKG_ARCH[vardepvalue] = "${DPKG_ARCH}"
 
@@ -269,7 +271,8 @@ def deb_write_pkg(pkg, d):
             conffiles.close()
 
         os.chdir(basedir)
-        subprocess.check_output("PATH=\"%s\" dpkg-deb -b %s %s" % (localdata.getVar("PATH"), root, pkgoutdir),
+        subprocess.check_output("PATH=\"%s\" %s -b %s %s" % (localdata.getVar("PATH"), localdata.getVar("DPKG_BUILDCMD"),
+                                                             root, pkgoutdir),
                                 stderr=subprocess.STDOUT,
                                 shell=True)
 
@@ -280,8 +283,9 @@ def deb_write_pkg(pkg, d):
 # Otherwise allarch packages may change depending on override configuration
 deb_write_pkg[vardepsexclude] = "OVERRIDES"
 
-# Indirect references to these vars
-do_package_write_deb[vardeps] += "PKGV PKGR PKGV DESCRIPTION SECTION PRIORITY MAINTAINER DPKG_ARCH PN HOMEPAGE"
+# Have to list any variables referenced as X_<pkg> that aren't in pkgdata here
+DEBEXTRAVARS = "PKGV PKGR PKGV DESCRIPTION SECTION PRIORITY MAINTAINER DPKG_ARCH PN HOMEPAGE PACKAGE_ADD_METADATA_DEB"
+do_package_write_deb[vardeps] += "${@gen_packagevar(d, 'DEBEXTRAVARS')}"
 
 SSTATETASKS += "do_package_write_deb"
 do_package_write_deb[sstate-inputdirs] = "${PKGWRITEDIRDEB}"
@@ -310,7 +314,6 @@ python do_package_write_deb () {
 }
 do_package_write_deb[dirs] = "${PKGWRITEDIRDEB}"
 do_package_write_deb[cleandirs] = "${PKGWRITEDIRDEB}"
-do_package_write_deb[umask] = "022"
 do_package_write_deb[depends] += "${@oe.utils.build_depends_string(d.getVar('PACKAGE_WRITE_DEPS'), 'do_populate_sysroot')}"
 addtask package_write_deb after do_packagedata do_package
 

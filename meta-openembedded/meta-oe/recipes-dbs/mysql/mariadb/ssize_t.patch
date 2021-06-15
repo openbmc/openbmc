@@ -1,0 +1,15 @@
+ssize_t comes from sys/types.h therefore include it
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/wsrep-lib/include/wsrep/gtid.hpp
++++ b/wsrep-lib/include/wsrep/gtid.hpp
+@@ -25,7 +25,7 @@
+ #include "compiler.hpp"
+ 
+ #include <iosfwd>
+-
++#include <sys/types.h>
+ /**
+  * Minimum number of bytes guaratneed to store GTID string representation,
+  * terminating '\0' not included (36 + 1 + 20).

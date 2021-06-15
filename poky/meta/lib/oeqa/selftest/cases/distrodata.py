@@ -1,14 +1,16 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
 from oeqa.utils.decorators import testcase
 from oeqa.utils.ftools import write_file
-from oeqa.core.decorator.oeid import OETestID
 
 import oe.recipeutils
 
 class Distrodata(OESelftestTestCase):
 
-    @OETestID(1902)
     def test_checkpkg(self):
         """
         Summary:     Test that upstream version checks do not regress
@@ -38,10 +40,47 @@ but their recipes claim otherwise by setting UPSTREAM_VERSION_UNKNOWN. Please re
 """ + "\n".join(regressed_successes)
         self.assertTrue(len(regressed_failures) == 0 and len(regressed_successes) == 0, msg)
 
+    def test_missing_homepg(self):
+        """
+        Summary:     Test for oe-core recipes that don't have a HOMEPAGE or DESCRIPTION
+        Expected:    All oe-core recipes should have a DESCRIPTION entry
+        Expected:    All oe-core recipes should have a HOMEPAGE entry except for recipes that are not fetched from external sources.
+        Product:     oe-core
+        """
+        with bb.tinfoil.Tinfoil() as tinfoil:
+            tinfoil.prepare(config_only=False)
+            no_description = []
+            no_homepage = []
+            for fn in tinfoil.all_recipe_files(variants=False):
+                if not '/meta/recipes-' in fn:
+                    # We are only interested in OE-Core
+                    continue
+                rd = tinfoil.parse_recipe_file(fn, appends=False)
+                pn = rd.getVar('BPN')
+                srcfile = rd.getVar('SRC_URI').split()
+                #Since DESCRIPTION defaults to SUMMARY if not set, we are only interested in recipes without DESCRIPTION or SUMMARY
+                if not (rd.getVar('SUMMARY') or rd.getVar('DESCRIPTION')):
+                    no_description.append((pn, fn))
+                if not rd.getVar('HOMEPAGE'):
+                    if srcfile and srcfile[0].startswith('file') or not rd.getVar('SRC_URI'):
+                        # We are only interested in recipes SRC_URI fetched from external sources
+                        continue
+                    no_homepage.append((pn, fn))
+        if no_homepage:
+            self.fail("""
+The following recipes do not have a HOMEPAGE. Please add an entry for HOMEPAGE in the recipe.
+""" + "\n".join(['%s (%s)' % i for i in no_homepage]))
+
+        if no_description:
+            self.fail("""
+The following recipes do not have a DESCRIPTION. Please add an entry for DESCRIPTION in the recipe.
+""" + "\n".join(['%s (%s)' % i for i in no_description]))
+
     def test_maintainers(self):
         """
-        Summary:     Test that oe-core recipes have a maintainer
+        Summary:     Test that oe-core recipes have a maintainer and entries in maintainers list have a recipe
         Expected:    All oe-core recipes (except a few special static/testing ones) should have a maintainer listed in maintainers.inc file.
+        Expected:    All entries in maintainers list should have a recipe file that matches them
         Product:     oe-core
         Author:      Alexander Kanavin <alex.kanavin@gmail.com>
         """
@@ -52,7 +91,15 @@ but their recipes claim otherwise by setting UPSTREAM_VERSION_UNKNOWN. Please re
                      return True
             return False
 
-        feature = 'require conf/distro/include/maintainers.inc\n'
+        def is_maintainer_exception(entry):
+            exceptions = ["musl", "newlib", "linux-yocto", "linux-dummy", "mesa-gl", "libgfortran",
+                          "cve-update-db-native"]
+            for i in exceptions:
+                 if i in entry:
+                     return True
+            return False
+
+        feature = 'require conf/distro/include/maintainers.inc\nLICENSE_FLAGS_WHITELIST += " commercial"\nPARSE_ALL_RECIPES = "1"\nPACKAGE_CLASSES = "package_ipk package_deb package_rpm"\n'
         self.write_config(feature)
 
         with bb.tinfoil.Tinfoil() as tinfoil:
@@ -60,6 +107,11 @@ but their recipes claim otherwise by setting UPSTREAM_VERSION_UNKNOWN. Please re
 
             with_maintainer_list = []
             no_maintainer_list = []
+
+            missing_recipes = []
+            recipes = []
+            prefix = "RECIPE_MAINTAINER_pn-"
+
             # We could have used all_recipes() here, but this method will find
             # every recipe if we ever move to setting RECIPE_MAINTAINER in recipe files
             # instead of maintainers.inc
@@ -69,12 +121,22 @@ but their recipes claim otherwise by setting UPSTREAM_VERSION_UNKNOWN. Please re
                     continue
                 rd = tinfoil.parse_recipe_file(fn, appends=False)
                 pn = rd.getVar('PN')
+                recipes.append(pn)
                 if is_exception(pn):
                     continue
                 if rd.getVar('RECIPE_MAINTAINER'):
                     with_maintainer_list.append((pn, fn))
                 else:
                     no_maintainer_list.append((pn, fn))
+
+            maintainers = tinfoil.config_data.keys()
+            for key in maintainers:
+                 if key.startswith(prefix):
+                     recipe = tinfoil.config_data.expand(key[len(prefix):])
+                     if is_maintainer_exception(recipe):
+                         continue
+                     if recipe not in recipes:
+                         missing_recipes.append(recipe)
 
         if no_maintainer_list:
             self.fail("""
@@ -85,3 +147,8 @@ The following recipes do not have a maintainer assigned to them. Please add an e
             self.fail("""
 The list of oe-core recipes with maintainers is empty. This may indicate that the test has regressed and needs fixing.
 """)
+
+        if missing_recipes:
+                self.fail("""
+Unable to find recipes for the following entries in maintainers.inc:
+""" + "\n".join(['%s' % i for i in missing_recipes]))

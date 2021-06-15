@@ -1,3 +1,6 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 """OpenEmbedded variable typing support
 
 Types are defined in the metadata by name, using the 'type' flag on a

@@ -5,6 +5,13 @@ Subject: [PATCH] Fix perl install directory to /usr/bin
 
 Upstream-Status: Inappropriate [configuration]
 
+Add back this patch. Without this patch, apxs's shebang will use
+perl under hosttools, which can be too long for shebang, and cause
+error:
+bad interpreter: No such file or directory
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
 ---
  configure.in | 5 +----
  1 file changed, 1 insertion(+), 4 deletions(-)

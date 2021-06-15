@@ -1,0 +1,39 @@
+From 174293162e5840684d967e36840fc1f9f57c90be Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mat=C4=9Bj=20T=C3=BD=C4=8D?= <matyc@redhat.com>
+Date: Thu, 5 Dec 2019 15:02:05 +0100
+Subject: [PATCH] Fix XML "parsing" of the remediation functions file.
+
+A proper fix is not worth the effort, as we aim to kill shared Bash remediation
+with Jinja2 macros.
+
+Upstream-Status: Backport
+[https://github.com/ComplianceAsCode/content/commit/174293162e5840684d967e36840fc1f9f57c90be]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ ssg/build_remediations.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/ssg/build_remediations.py b/ssg/build_remediations.py
+index 7da807bd6..13e90f732 100644
+--- a/ssg/build_remediations.py
++++ b/ssg/build_remediations.py
+@@ -56,11 +56,11 @@ def get_available_functions(build_dir):
+     remediation_functions = []
+     with codecs.open(xmlfilepath, "r", encoding="utf-8") as xmlfile:
+         filestring = xmlfile.read()
+-        # This regex looks implementation dependent but we can rely on
+-        # ElementTree sorting XML attrs alphabetically. Hidden is guaranteed
+-        # to be the first attr and ID is guaranteed to be second.
++        # This regex looks implementation dependent but we can rely on the element attributes
++        # being present on one line.
++        # We can't rely on ElementTree sorting XML attrs in any way since Python 3.7.
+         remediation_functions = re.findall(
+-            r'<Value hidden=\"true\" id=\"function_(\S+)\"',
++            r'<Value.*id=\"function_(\S+)\"',
+             filestring, re.DOTALL
+         )
+ 
+-- 
+2.17.1
+

@@ -1,4 +1,4 @@
-From 7ae2ce8dbf1c54d4e2db4a5f49397a239baadc49 Mon Sep 17 00:00:00 2001
+From 69d4c517c07f55c505090e48d96ace8cd599fb26 Mon Sep 17 00:00:00 2001
 From: Li xin <lixin.fnst@cn.fujitsu.com>
 Date: Fri, 21 Aug 2015 18:23:13 +0900
 Subject: [PATCH] config_os_headers: Error Fix
@@ -19,10 +19,10 @@ Signed-off-by: Li Xin <lixin.fnst@cn.fujitsu.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure.d/config_os_headers b/configure.d/config_os_headers
-index af99746..83b2e31 100644
+index f07d512..2363b42 100644
 --- a/configure.d/config_os_headers
 +++ b/configure.d/config_os_headers
-@@ -489,8 +489,8 @@ then
+@@ -395,8 +395,8 @@ then
      unset ac_cv_header_pkg_h
      netsnmp_save_CPPFLAGS="$CPPFLAGS"
      netsnmp_save_LDFLAGS="$LDFLAGS"

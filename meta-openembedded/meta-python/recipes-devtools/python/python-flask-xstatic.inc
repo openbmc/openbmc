@@ -1,5 +1,5 @@
 DESCRIPTION = "XStatic support for flask"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=659968f6ebd4b70b6c3190d20b4a924c"
 
 SRC_URI[md5sum] = "2f56023e1444c8bd1fec41afe93de743"

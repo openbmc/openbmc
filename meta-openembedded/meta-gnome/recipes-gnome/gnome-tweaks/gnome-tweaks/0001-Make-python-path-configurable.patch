@@ -1,0 +1,41 @@
+From db94983c93f38bd8494b47d9fa1b3e5368dc9abe Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Wed, 11 Dec 2019 01:34:01 +0100
+Subject: [PATCH] Make python path configurable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [Configuration]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ meson.build       | 2 +-
+ meson_options.txt | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+ create mode 100644 meson_options.txt
+
+diff --git a/meson.build b/meson.build
+index b7da518..d58fb5b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -13,7 +13,7 @@ bindir = join_paths(prefix, get_option('bindir'))
+ datadir = join_paths(prefix, get_option('datadir'))
+ libexecdir = join_paths(prefix, get_option('libexecdir'))
+ localedir = join_paths(prefix, get_option('localedir'))
+-pythondir = join_paths(prefix, python3.sysconfig_path('purelib'))
++pythondir = get_option('python_site_dir')
+ 
+ pkgdatadir = join_paths(datadir, meson.project_name())
+ 
+diff --git a/meson_options.txt b/meson_options.txt
+new file mode 100644
+index 0000000..03455ca
+--- /dev/null
++++ b/meson_options.txt
+@@ -0,0 +1,2 @@
++option('python_site_dir', type: 'string', value: '')
++
+-- 
+2.21.0
+

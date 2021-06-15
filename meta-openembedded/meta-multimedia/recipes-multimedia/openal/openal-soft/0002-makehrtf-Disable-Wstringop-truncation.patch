@@ -6,14 +6,12 @@ Subject: [PATCH] makehrtf: Disable Wstringop-truncation
 Upstream-Status: Inappropriate [Should be fixed in code]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- utils/makehrtf.c | 2 ++
+ utils/makemhr/makemhr.cpp | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/utils/makehrtf.c b/utils/makehrtf.c
-index 0bd36849..0abe4252 100644
---- a/utils/makehrtf.c
-+++ b/utils/makehrtf.c
-@@ -862,6 +862,7 @@ static int TrReadOperator(TokenReaderT *tr, const char *op)
+--- a/utils/makemhr/makemhr.cpp
++++ b/utils/makemhr/makemhr.cpp
+@@ -161,6 +161,7 @@ enum ChannelIndex : uint {
   * pattern string are replaced with the replacement string.  The result is
   * truncated if necessary.
   */
@@ -21,7 +19,7 @@ index 0bd36849..0abe4252 100644
  static int StrSubst(const char *in, const char *pat, const char *rep, const size_t maxLen, char *out)
  {
      size_t inLen, patLen, repLen;
-@@ -900,6 +901,7 @@ static int StrSubst(const char *in, const char *pat, const char *rep, const size
+@@ -199,6 +200,7 @@ static int StrSubst(const char *in, cons
      return !truncated;
  }
  

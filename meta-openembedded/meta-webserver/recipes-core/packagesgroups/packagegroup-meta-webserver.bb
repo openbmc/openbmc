@@ -19,19 +19,31 @@ RDEPENDS_packagegroup-meta-webserver = "\
 "
 
 RDEPENDS_packagegroup-meta-webserver-http = "\
-    nginx monkey cherokee hiawatha nostromo apache-websocket \
-    apache2 sthttpd \
-    "
+    apache-websocket \
+    apache2 \
+    ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "cherokee", "", d)} \
+    hiawatha \
+    monkey \
+    nginx \
+    nginx \
+    sthttpd \
+"
 
 RDEPENDS_packagegroup-meta-webserver-php = "\
-    phpmyadmin xdebug \
-    "
+    phpmyadmin \
+    xdebug \
+"
 
 RDEPENDS_packagegroup-meta-webserver-support = "\
-    spawn-fcgi fcgi \
-    "
+    spawn-fcgi \
+    fcgi \
+    fcgiwrap \
+"
 
 RDEPENDS_packagegroup-meta-webserver-webadmin = "\
-    netdata webmin \
-    "
+    cockpit \
+    webmin \
+    netdata \
+"
+
 EXCLUDE_FROM_WORLD = "1"

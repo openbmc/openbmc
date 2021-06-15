@@ -1,0 +1,38 @@
+From 4a3e515d3ea7ff0fc4063b9677b056af4ee7a3f6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 2 Dec 2020 14:28:01 -0800
+Subject: [PATCH] userland: Sync needed defines for weston build
+
+eglext.h from userland is not sufficient to compile latest weston,
+therefore import needed defines and typedefs from latest mesa
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ interface/khronos/include/EGL/eglext.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/interface/khronos/include/EGL/eglext.h b/interface/khronos/include/EGL/eglext.h
+index 6842bf9..7118e92 100755
+--- a/interface/khronos/include/EGL/eglext.h
++++ b/interface/khronos/include/EGL/eglext.h
+@@ -225,6 +225,20 @@ typedef EGLBoolean (EGLAPIENTRYP PFNEGLQUERYWAYLANDBUFFERWL) (EGLDisplay dpy, st
+ 
+ #endif
+ 
++typedef void* EGLSyncKHR;
++typedef EGLBoolean (EGLAPIENTRYP PFNEGLSETDAMAGEREGIONKHRPROC) (EGLDisplay dpy, EGLSurface surface, EGLint *rects, EGLint n_rects);
++typedef EGLint (EGLAPIENTRYP PFNEGLWAITSYNCKHRPROC) (EGLDisplay dpy, EGLSyncKHR sync, EGLint flags);
++#ifndef EGL_ANDROID_native_fence_sync
++#define EGL_ANDROID_native_fence_sync 1
++#define EGL_SYNC_NATIVE_FENCE_ANDROID     0x3144
++#define EGL_SYNC_NATIVE_FENCE_FD_ANDROID  0x3145
++#define EGL_SYNC_NATIVE_FENCE_SIGNALED_ANDROID 0x3146
++#define EGL_NO_NATIVE_FENCE_FD_ANDROID    -1
++typedef EGLint (EGLAPIENTRYP PFNEGLDUPNATIVEFENCEFDANDROIDPROC) (EGLDisplay dpy, EGLSyncKHR sync);
++#ifdef EGL_EGLEXT_PROTOTYPES
++EGLAPI EGLint EGLAPIENTRY eglDupNativeFenceFDANDROID (EGLDisplay dpy, EGLSyncKHR sync);
++#endif
++#endif /* EGL_ANDROID_native_fence_sync */
+ 
+ #ifdef __cplusplus
+ }

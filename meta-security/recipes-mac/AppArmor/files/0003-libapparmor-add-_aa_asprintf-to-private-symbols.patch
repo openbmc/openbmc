@@ -1,0 +1,34 @@
+From 9a8fee6bf1c79c261374d928b838b5eb9244ee9b Mon Sep 17 00:00:00 2001
+From: Patrick Steinhardt <ps@pks.im>
+Date: Sat, 3 Oct 2020 21:04:57 +0200
+Subject: [PATCH] libapparmor: add _aa_asprintf to private symbols
+
+While `_aa_asprintf` is supposed to be of private visibility, it's used
+by apparmor_parser and thus required to be visible when linking. This
+commit thus adds it to the list of private symbols to make it available
+for linking in apparmor_parser.
+
+Signed-off-by: Patrick Steinhardt <ps@pks.im>
+
+Upstream-Status: Backport
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+---
+ libraries/libapparmor/src/libapparmor.map | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libraries/libapparmor/src/libapparmor.map b/libraries/libapparmor/src/libapparmor.map
+index 1579509a..41e541ac 100644
+--- a/libraries/libapparmor/src/libapparmor.map
++++ b/libraries/libapparmor/src/libapparmor.map
+@@ -127,6 +127,7 @@ APPARMOR_3.0 {
+ PRIVATE {
+ 	global:
+ 		_aa_is_blacklisted;
++		_aa_asprintf;
+ 		_aa_autofree;
+ 		_aa_autoclose;
+ 		_aa_autofclose;
+-- 
+2.17.1
+

@@ -20,22 +20,24 @@ DBUS_PACKAGES = "${PN}-manager"
 
 SYSTEMD_PACKAGES = "${PN}-monitor"
 
-inherit autotools \
-        pkgconfig \
+inherit meson \
         obmc-phosphor-dbus-service \
-        pythonnative \
+        python3native \
         phosphor-debug-collector
 
 require phosphor-debug-collector.inc
 
 DEPENDS += " \
         phosphor-dbus-interfaces \
-        phosphor-dbus-interfaces-native \
         phosphor-logging \
         sdbusplus \
-        sdbusplus-native \
+        ${PYTHON_PN}-sdbus++-native \
         autoconf-archive-native \
         virtual/phosphor-debug-errors \
+        ${PYTHON_PN}-native \
+        ${PYTHON_PN}-pyyaml-native \
+        ${PYTHON_PN}-setuptools-native \
+        ${PYTHON_PN}-mako-native \
 "
 
 RDEPENDS_${PN}-manager += " \
@@ -56,20 +58,20 @@ MGR_SVC ?= "xyz.openbmc_project.Dump.Manager.service"
 SYSTEMD_SUBSTITUTIONS += "BMC_DUMP_PATH:${bmc_dump_path}:${MGR_SVC}"
 
 FILES_${PN}-manager +=  " \
-    ${sbindir}/phosphor-dump-manager \
+    ${bindir}/phosphor-dump-manager \
     ${exec_prefix}/lib/tmpfiles.d/coretemp.conf \
     ${datadir}/dump/ \
     "
-FILES_${PN}-monitor += "${sbindir}/phosphor-dump-monitor"
+FILES_${PN}-monitor += "${bindir}/phosphor-dump-monitor"
 FILES_${PN}-dreport += "${bindir}/dreport"
 FILES_${PN}-scripts += "${dreport_dir}"
 
 DBUS_SERVICE_${PN}-manager += "${MGR_SVC}"
 SYSTEMD_SERVICE_${PN}-monitor += "obmc-dump-monitor.service"
 
-EXTRA_OECONF = " \
-    BMC_DUMP_PATH=${bmc_dump_path} \
-    ERROR_MAP_YAML=${STAGING_DIR_NATIVE}/${datadir}/dump/errors_watch.yaml \
+EXTRA_OEMESON = " \
+    -DBMC_DUMP_PATH=${bmc_dump_path} \
+    -DERROR_MAP_YAML=${STAGING_DIR_NATIVE}/${datadir}/dump/errors_watch.yaml \
     "
 
 S = "${WORKDIR}/git"
@@ -159,6 +161,7 @@ def install_dreport_user_script(script_path, d):
             linkname = "E" + priority + script
             destlink = os.path.join(destdir, linkname)
             os.symlink(srclink, destlink)
+    file.close()
 
 #Make the links for all the plugins
 python install_dreport_user_scripts() {
@@ -172,11 +175,19 @@ python install_dreport_user_scripts() {
         install_dreport_user_script(srcname, d)
 }
 
-#Enable ubifs-workaround by DISTRO_FEATURE obmc-ubi-fs.
-PACKAGECONFIG_append_df-obmc-ubi-fs = " ubifs-workaround"
-PACKAGECONFIG[ubifs-workaround] = " \
-       --enable-ubifs-workaround, \
-       --disable-ubifs-workaround \
+PACKAGECONFIG ??= "${@bb.utils.contains_any('DISTRO_FEATURES', \
+         'obmc-ubi-fs phosphor-mmc', '', 'jffs-workaround', d)}"
+PACKAGECONFIG[jffs-workaround] = "-Djffs-workaround=enabled, \
+        -Djffs-workaround=disabled"
+
+PACKAGECONFIG[host-dump-transport-pldm] = " \
+        -Dhost-transport=pldm,, \
+        pldm \
+        "
+
+PACKAGECONFIG[openpower-dumps-extension] = " \
+       -Dopenpower-dumps-extension=enabled, \
+       -Dopenpower-dumps-extension=disabled  \
 "
 
 do_install[postfuncs] += "install_dreport"

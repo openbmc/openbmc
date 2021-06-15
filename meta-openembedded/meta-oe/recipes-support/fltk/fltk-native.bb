@@ -9,11 +9,14 @@ EXTRA_OECMAKE += " \
     -DOPTION_USE_THREADS=OFF \
     -DOPTION_USE_XDBE=OFF \
     -DOPTION_USE_XFT=OFF \
-    -DOPTION_BUILD_EXAMPLES=OFF \
+    -DFLTK_BUILD_TEST=OFF \
     -DOPTION_USE_XINERAMA=OFF \
     -DOPTION_USE_XFIXES=OFF \
     -DOPTION_USE_XCURSOR=OFF \
 "
+
+# lib/libfltk.a(Fl_Native_File_Chooser.cxx.o): undefined reference to symbol 'dlsym@@GLIBC_2.2.5'
+LDFLAGS += "-ldl"
 
 do_install_append() {
     # make sure native fltk-config is not used accidentaly

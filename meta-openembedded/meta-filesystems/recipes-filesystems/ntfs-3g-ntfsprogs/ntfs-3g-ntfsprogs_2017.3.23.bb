@@ -34,10 +34,18 @@ FILES_ntfsprogs = "${base_sbindir}/* ${bindir}/* ${sbindir}/*"
 FILES_libntfs-3g = "${libdir}/*${SOLIBS}"
 
 do_install_append() {
-    # Standard mount will execute the program /sbin/mount.TYPE
-    # when called. Add the symbolic to let mount could find ntfs.
-    ln -sf mount.ntfs-3g ${D}/${base_sbindir}/mount.ntfs
+    # Standard mount will execute the program /sbin/mount.TYPE when called.
+    # Add a symbolic link to let mount find ntfs.
+    ln -sf mount.ntfs-3g ${D}${base_sbindir}/mount.ntfs
     rmdir ${D}${libdir}/ntfs-3g
+
+    # Handle when usrmerge is in effect. Some files are installed to /sbin
+    # regardless of the value of ${base_sbindir}.
+    if [ "${base_sbindir}" != /sbin ] && [ -d ${D}/sbin ]; then
+        mkdir -p ${D}${base_sbindir}
+        mv ${D}/sbin/* ${D}${base_sbindir}
+        rmdir ${D}/sbin
+    fi
 }
 
 # Satisfy the -dev runtime dependency

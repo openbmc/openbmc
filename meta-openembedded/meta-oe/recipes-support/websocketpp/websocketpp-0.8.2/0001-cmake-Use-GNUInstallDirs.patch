@@ -1,0 +1,35 @@
+From 771d79eeb0ac5079482a4b3a131bbda744793e7d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 19 Dec 2019 20:07:11 -0800
+Subject: [PATCH] cmake: Use GNUInstallDirs
+
+Helps install cmakefiles in right libdir
+
+Upstream-Status: Submitted [https://github.com/zaphoyd/websocketpp/pull/854]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2786aba..080be3e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -39,11 +39,13 @@ endif()
+ 
+ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+ 
++include(GNUInstallDirs)
++
+ set(INSTALL_INCLUDE_DIR include CACHE PATH "Installation directory for header files")
+ if (WIN32 AND NOT CYGWIN)
+   set (DEF_INSTALL_CMAKE_DIR cmake)
+ else ()
+-  set (DEF_INSTALL_CMAKE_DIR lib/cmake/websocketpp)
++  set (DEF_INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/websocketpp)
+ endif ()
+ set (INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
+ 
+-- 
+2.24.1
+

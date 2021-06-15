@@ -1,152 +1,133 @@
-# Copyright (C) 2018 Garmin Ltd.
+# Copyright (C) 2018-2019 Garmin Ltd.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import contextlib
-import urllib.parse
+import asyncio
+from contextlib import closing
+import re
 import sqlite3
+import itertools
 import json
-import traceback
-import logging
-from datetime import datetime
 
-logger = logging.getLogger('hashserv')
+UNIX_PREFIX = "unix://"
 
-class HashEquivalenceServer(BaseHTTPRequestHandler):
-    def log_message(self, f, *args):
-        logger.debug(f, *args)
+ADDR_TYPE_UNIX = 0
+ADDR_TYPE_TCP = 1
 
-    def do_GET(self):
-        try:
-            p = urllib.parse.urlparse(self.path)
+# The Python async server defaults to a 64K receive buffer, so we hardcode our
+# maximum chunk size. It would be better if the client and server reported to
+# each other what the maximum chunk sizes were, but that will slow down the
+# connection setup with a round trip delay so I'd rather not do that unless it
+# is necessary
+DEFAULT_MAX_CHUNK = 32 * 1024
 
-            if p.path != self.prefix + '/v1/equivalent':
-                self.send_error(404)
-                return
+TABLE_DEFINITION = (
+    ("method", "TEXT NOT NULL"),
+    ("outhash", "TEXT NOT NULL"),
+    ("taskhash", "TEXT NOT NULL"),
+    ("unihash", "TEXT NOT NULL"),
+    ("created", "DATETIME"),
 
-            query = urllib.parse.parse_qs(p.query, strict_parsing=True)
-            method = query['method'][0]
-            taskhash = query['taskhash'][0]
+    # Optional fields
+    ("owner", "TEXT"),
+    ("PN", "TEXT"),
+    ("PV", "TEXT"),
+    ("PR", "TEXT"),
+    ("task", "TEXT"),
+    ("outhash_siginfo", "TEXT"),
+)
 
-            d = None
-            with contextlib.closing(self.db.cursor()) as cursor:
-                cursor.execute('SELECT taskhash, method, unihash FROM tasks_v1 WHERE method=:method AND taskhash=:taskhash ORDER BY created ASC LIMIT 1',
-                        {'method': method, 'taskhash': taskhash})
+TABLE_COLUMNS = tuple(name for name, _ in TABLE_DEFINITION)
 
-                row = cursor.fetchone()
-
-                if row is not None:
-                    logger.debug('Found equivalent task %s', row['taskhash'])
-                    d = {k: row[k] for k in ('taskhash', 'method', 'unihash')}
-
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(json.dumps(d).encode('utf-8'))
-        except:
-            logger.exception('Error in GET')
-            self.send_error(400, explain=traceback.format_exc())
-            return
-
-    def do_POST(self):
-        try:
-            p = urllib.parse.urlparse(self.path)
-
-            if p.path != self.prefix + '/v1/equivalent':
-                self.send_error(404)
-                return
-
-            length = int(self.headers['content-length'])
-            data = json.loads(self.rfile.read(length).decode('utf-8'))
-
-            with contextlib.closing(self.db.cursor()) as cursor:
-                cursor.execute('''
-                    SELECT taskhash, method, unihash FROM tasks_v1 WHERE method=:method AND outhash=:outhash
-                    ORDER BY CASE WHEN taskhash=:taskhash THEN 1 ELSE 2 END,
-                        created ASC
-                    LIMIT 1
-                    ''', {k: data[k] for k in ('method', 'outhash', 'taskhash')})
-
-                row = cursor.fetchone()
-
-                if row is None or row['taskhash'] != data['taskhash']:
-                    unihash = data['unihash']
-                    if row is not None:
-                        unihash = row['unihash']
-
-                    insert_data = {
-                            'method': data['method'],
-                            'outhash': data['outhash'],
-                            'taskhash': data['taskhash'],
-                            'unihash': unihash,
-                            'created': datetime.now()
-                            }
-
-                    for k in ('owner', 'PN', 'PV', 'PR', 'task', 'outhash_siginfo'):
-                        if k in data:
-                            insert_data[k] = data[k]
-
-                    cursor.execute('''INSERT INTO tasks_v1 (%s) VALUES (%s)''' % (
-                            ', '.join(sorted(insert_data.keys())),
-                            ', '.join(':' + k for k in sorted(insert_data.keys()))),
-                        insert_data)
-
-                    logger.info('Adding taskhash %s with unihash %s', data['taskhash'], unihash)
-                    cursor.execute('SELECT taskhash, method, unihash FROM tasks_v1 WHERE id=:id', {'id': cursor.lastrowid})
-                    row = cursor.fetchone()
-
-                    self.db.commit()
-
-                d = {k: row[k] for k in ('taskhash', 'method', 'unihash')}
-
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json; charset=utf-8')
-                self.end_headers()
-                self.wfile.write(json.dumps(d).encode('utf-8'))
-        except:
-            logger.exception('Error in POST')
-            self.send_error(400, explain=traceback.format_exc())
-            return
-
-def create_server(addr, db, prefix=''):
-    class Handler(HashEquivalenceServer):
-        pass
-
-    Handler.prefix = prefix
-    Handler.db = db
+def setup_database(database, sync=True):
+    db = sqlite3.connect(database)
     db.row_factory = sqlite3.Row
 
-    with contextlib.closing(db.cursor()) as cursor:
+    with closing(db.cursor()) as cursor:
         cursor.execute('''
-            CREATE TABLE IF NOT EXISTS tasks_v1 (
+            CREATE TABLE IF NOT EXISTS tasks_v2 (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                method TEXT NOT NULL,
-                outhash TEXT NOT NULL,
-                taskhash TEXT NOT NULL,
-                unihash TEXT NOT NULL,
-                created DATETIME,
-
-                -- Optional fields
-                owner TEXT,
-                PN TEXT,
-                PV TEXT,
-                PR TEXT,
-                task TEXT,
-                outhash_siginfo TEXT
+                %s
+                UNIQUE(method, outhash, taskhash)
                 )
-            ''')
+            ''' % " ".join("%s %s," % (name, typ) for name, typ in TABLE_DEFINITION))
+        cursor.execute('PRAGMA journal_mode = WAL')
+        cursor.execute('PRAGMA synchronous = %s' % ('NORMAL' if sync else 'OFF'))
 
-    logger.info('Starting server on %s', addr)
-    return HTTPServer(addr, Handler)
+        # Drop old indexes
+        cursor.execute('DROP INDEX IF EXISTS taskhash_lookup')
+        cursor.execute('DROP INDEX IF EXISTS outhash_lookup')
+
+        # Create new indexes
+        cursor.execute('CREATE INDEX IF NOT EXISTS taskhash_lookup_v2 ON tasks_v2 (method, taskhash, created)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS outhash_lookup_v2 ON tasks_v2 (method, outhash)')
+
+    return db
+
+
+def parse_address(addr):
+    if addr.startswith(UNIX_PREFIX):
+        return (ADDR_TYPE_UNIX, (addr[len(UNIX_PREFIX):],))
+    else:
+        m = re.match(r'\[(?P<host>[^\]]*)\]:(?P<port>\d+)$', addr)
+        if m is not None:
+            host = m.group('host')
+            port = m.group('port')
+        else:
+            host, port = addr.split(':')
+
+        return (ADDR_TYPE_TCP, (host, int(port)))
+
+
+def chunkify(msg, max_chunk):
+    if len(msg) < max_chunk - 1:
+        yield ''.join((msg, "\n"))
+    else:
+        yield ''.join((json.dumps({
+                'chunk-stream': None
+            }), "\n"))
+
+        args = [iter(msg)] * (max_chunk - 1)
+        for m in map(''.join, itertools.zip_longest(*args, fillvalue='')):
+            yield ''.join(itertools.chain(m, "\n"))
+        yield "\n"
+
+
+def create_server(addr, dbname, *, sync=True, upstream=None, read_only=False):
+    from . import server
+    db = setup_database(dbname, sync=sync)
+    s = server.Server(db, upstream=upstream, read_only=read_only)
+
+    (typ, a) = parse_address(addr)
+    if typ == ADDR_TYPE_UNIX:
+        s.start_unix_server(*a)
+    else:
+        s.start_tcp_server(*a)
+
+    return s
+
+
+def create_client(addr):
+    from . import client
+    c = client.Client()
+
+    (typ, a) = parse_address(addr)
+    if typ == ADDR_TYPE_UNIX:
+        c.connect_unix(*a)
+    else:
+        c.connect_tcp(*a)
+
+    return c
+
+async def create_async_client(addr):
+    from . import client
+    c = client.AsyncClient()
+
+    (typ, a) = parse_address(addr)
+    if typ == ADDR_TYPE_UNIX:
+        await c.connect_unix(*a)
+    else:
+        await c.connect_tcp(*a)
+
+    return c

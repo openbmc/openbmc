@@ -17,12 +17,12 @@ index fc8c6f8..3a59549 100644
 +++ b/m4/libiconv.m4
 @@ -17,7 +17,7 @@ AC_REQUIRE([AC_C_CONST])dnl
  dnl
- 
+
  dnl Use standard iconv test
 -AM_ICONV
 +m4_pattern_allow([AM_ICONV])
- CONVERTOR_LIBS="$CONVERTOR_LIBS $LIBICONV"
- 
+ CONVERTER_LIBS="$CONVERTER_LIBS $LIBICONV"
+
  dnl Compile iconvcap.c and run it to determine what encodings iconv actually
 -- 
 1.9.3

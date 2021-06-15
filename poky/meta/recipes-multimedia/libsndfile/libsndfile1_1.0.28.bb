@@ -1,7 +1,10 @@
 SUMMARY = "Audio format Conversion library"
+DESCRIPTION = "Library for reading and writing files containing sampled \
+sound (such as MS Windows WAV and the Apple/SGI AIFF format) through \
+one standard library interface."
 HOMEPAGE = "http://www.mega-nerd.com/libsndfile"
 AUTHOR = "Erik de Castro Lopo"
-DEPENDS = "flac libogg libvorbis sqlite3"
+DEPENDS = "flac libogg libvorbis"
 SECTION = "libs/multimedia"
 LICENSE = "LGPLv2.1"
 
@@ -30,11 +33,14 @@ S = "${WORKDIR}/libsndfile-${PV}"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'alsa', d)}"
 PACKAGECONFIG[alsa] = "--enable-alsa,--disable-alsa,alsa-lib"
+PACKAGECONFIG[regtest] = "--enable-sqlite,--disable-sqlite,sqlite3"
 
-inherit autotools lib_package pkgconfig
+inherit autotools lib_package pkgconfig multilib_header
 
-do_configure_prepend_arm() {
-	export ac_cv_sys_largefile_source=1
-	export ac_cv_sys_file_offset_bits=64
+do_install_append() {
+    oe_multilib_header sndfile.h
 }
 
+# This can't be replicated and is just a memory leak.
+# https://github.com/erikd/libsndfile/issues/398
+CVE_CHECK_WHITELIST += "CVE-2018-13419"

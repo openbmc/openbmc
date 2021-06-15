@@ -17,7 +17,7 @@ fixup! add comments of shutdown for user
  2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/pykickstart/commands/reboot.py b/pykickstart/commands/reboot.py
-index 2c1b1c0..b3ec717 100644
+index 75a6d916..edfe83ff 100644
 --- a/pykickstart/commands/reboot.py
 +++ b/pykickstart/commands/reboot.py
 @@ -43,6 +43,9 @@ class FC3_Reboot(KickstartCommand):
@@ -31,18 +31,18 @@ index 2c1b1c0..b3ec717 100644
          return retval
  
 diff --git a/pykickstart/parser.py b/pykickstart/parser.py
-index e68174d..efd78a6 100644
+index bc59131b..b2d09d45 100644
 --- a/pykickstart/parser.py
 +++ b/pykickstart/parser.py
-@@ -385,7 +385,7 @@ class Packages(KickstartObject):
+@@ -428,7 +428,7 @@ class Packages(KickstartObject):
  
          if not self.default:
              if self.environment:
 -                pkgs += "@^%s\n" % self.environment
 +                pkgs += "#@^%s\n" % self.environment
  
-             grps = self.groupList
-             grps.sort()
+         grps = self.groupList
+         grps.sort()
 -- 
 2.7.4
 

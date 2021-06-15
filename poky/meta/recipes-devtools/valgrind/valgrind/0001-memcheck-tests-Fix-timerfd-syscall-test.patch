@@ -1,0 +1,98 @@
+From 5d411fd147d652e9d7bb259f4048693c6e4742aa Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 9 Mar 2020 16:30:19 -0700
+Subject: [PATCH] memcheck/tests: Fix timerfd syscall test
+
+modern libc provides these functions, moreover this also ensures that we
+are 64bit time_t safe. Fallback to existing definitions if libc does not
+have the implementation or syscall is not defined
+
+Upstream-Status: Submitted [https://sourceforge.net/p/valgrind/mailman/message/36943897/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ config.h.in                            |  9 +++++++++
+ configure.ac                           |  3 +++
+ memcheck/tests/linux/timerfd-syscall.c | 10 ++++++++--
+ 5 files changed, 32 insertions(+), 2 deletions(-)
+
+--- a/config.h.in
++++ b/config.h.in
+@@ -301,6 +301,9 @@
+ /* Define to 1 if you have the <sys/sysnvl.h> header file. */
+ #undef HAVE_SYS_SYSNVL_H
+ 
++/* Define to 1 if you have the <sys/timerfd.h> header file. */
++#undef HAVE_SYS_TIMERFD_H
++
+ /* Define to 1 if you have the <sys/time.h> header file. */
+ #undef HAVE_SYS_TIME_H
+ 
+--- a/configure.ac
++++ b/configure.ac
+@@ -4098,6 +4098,7 @@ AC_CHECK_HEADERS([       \
+         sys/syscall.h    \
+         sys/sysnvl.h     \
+         sys/time.h       \
++        sys/timerfd.h    \
+         sys/types.h      \
+         ])
+ 
+--- a/memcheck/tests/linux/timerfd-syscall.c
++++ b/memcheck/tests/linux/timerfd-syscall.c
+@@ -45,6 +45,9 @@
+ #if defined(HAVE_SYS_TIME_H)
+ #include <sys/time.h>
+ #endif
++#if defined(HAVE_SYS_TIMERFD_H)
++#include <sys/timerfd.h>
++#endif
+ #if defined(HAVE_SYS_TYPES_H)
+ #include <sys/types.h>
+ #endif
+@@ -54,7 +57,8 @@
+  * timerfd_* system call numbers introduced in 2.6.23. These constants are
+  * not yet in the glibc 2.7 headers, that is why they are defined here.
+  */
+-#ifndef __NR_timerfd_create
++#if !defined(HAVE_SYS_TIMERFD_H)
++#if !defined(__NR_timerfd_create)
+ #if defined(__x86_64__)
+ #define __NR_timerfd_create  283
+ #elif defined(__i386__)
+@@ -67,8 +71,10 @@
+ #error Cannot detect your architecture!
+ #endif
+ #endif
++#endif
+ 
+-#ifndef __NR_timerfd_settime
++#if !defined(HAVE_SYS_TIMERFD_H)
++#if !defined(__NR_timerfd_settime)
+ #if defined(__x86_64__)
+ #define __NR_timerfd_settime 286
+ #define __NR_timerfd_gettime 287
+@@ -85,7 +91,7 @@
+ #error Cannot detect your architecture!
+ #endif
+ #endif
+-
++#endif
+ 
+ 
+ /* Definitions from include/linux/timerfd.h */
+@@ -127,6 +133,7 @@ void set_timespec(struct timespec *tmr,
+   tmr->tv_nsec = (long) (1000ULL * (ustime % 1000000ULL));
+ }
+ 
++#if !defined(HAVE_SYS_TIMERFD_H)
+ int timerfd_create(int clockid, int flags)
+ {
+   return syscall(__NR_timerfd_create, clockid, flags);
+@@ -142,6 +149,7 @@ int timerfd_gettime(int ufc, struct itim
+ {
+   return syscall(__NR_timerfd_gettime, ufc, otmr);
+ }
++#endif
+ 
+ long waittmr(int tfd, int timeo)
+ {

@@ -1,0 +1,863 @@
+0:
+  /system/chassis/bmc:
+    entityID: 6
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+1:
+  /system/chassis/motherboard/cpu0: &CPU_DEFAULTS
+    entityID: 3
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Custom Field 2
+          IPMIFruSection: Board
+          IPMIFruValueDelimiter: 58
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+          Value: False
+2:
+  /system/chassis/motherboard/cpu1:
+    <<: *CPU_DEFAULTS
+    entityInstance: 2
+3:
+  /system/chassis/motherboard/cpu2:
+    <<: *CPU_DEFAULTS
+    entityInstance: 3
+4:
+  /system/chassis/motherboard/cpu3:
+    <<: *CPU_DEFAULTS
+    entityInstance: 4
+5:
+  /system/chassis/motherboard:
+    entityID: 7
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        Model:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Chassis
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+  /system:
+    entityID: 25
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Chassis
+        Model:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Chassis
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+6:
+  /system/chassis/motherboard/membuf1: &MEMBUF_DEFAULTS
+    entityID: 23
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+7:
+  /system/chassis/motherboard/membuf0:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 2
+8:
+  /system/chassis/motherboard/membuf5:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 3
+9:
+  /system/chassis/motherboard/membuf4:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 4
+10:
+ /system/chassis/motherboard/membuf9:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 5
+11:
+  /system/chassis/motherboard/membuf8:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 6
+12:
+  /system/chassis/motherboard/membuf13:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 7
+13:
+  /system/chassis/motherboard/membuf12:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 8
+14:
+  /system/chassis/motherboard/membuf17:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 9
+15:
+  /system/chassis/motherboard/membuf16:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 10
+16:
+  /system/chassis/motherboard/membuf21:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 11
+17:
+  /system/chassis/motherboard/membuf20:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 12
+18:
+  /system/chassis/motherboard/membuf25:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 13
+19:
+  /system/chassis/motherboard/membuf24:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 14
+20:
+  /system/chassis/motherboard/membuf29:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 15
+21:
+  /system/chassis/motherboard/membuf28:
+    <<: *MEMBUF_DEFAULTS
+    entityInstance: 16
+22:
+  /system/chassis/motherboard/dimm8: &DIMM_DEFAULTS
+    entityID: 32
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        Model:
+          IPMIFruProperty: Model Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+23:
+  /system/chassis/motherboard/dimm9:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 2
+24:
+  /system/chassis/motherboard/dimm10:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 3
+25:
+  /system/chassis/motherboard/dimm11:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 4
+26:
+  /system/chassis/motherboard/dimm12:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 5
+27:
+  /system/chassis/motherboard/dimm13:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 6
+28:
+  /system/chassis/motherboard/dimm14:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 7
+29:
+  /system/chassis/motherboard/dimm15:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 8
+30:
+  /system/chassis/motherboard/dimm0:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 9
+31:
+  /system/chassis/motherboard/dimm1:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 10
+32:
+  /system/chassis/motherboard/dimm2:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 11
+33:
+  /system/chassis/motherboard/dimm3:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 12
+34:
+  /system/chassis/motherboard/dimm4:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 13
+35:
+  /system/chassis/motherboard/dimm5:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 14
+36:
+  /system/chassis/motherboard/dimm6:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 15
+37:
+  /system/chassis/motherboard/dimm7:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 16
+38:
+  /system/chassis/motherboard/dimm16:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 17
+39:
+  /system/chassis/motherboard/dimm17:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 18
+40:
+  /system/chassis/motherboard/dimm18:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 19
+41:
+  /system/chassis/motherboard/dimm19:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 20
+42:
+  /system/chassis/motherboard/dimm20:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 21
+43:
+  /system/chassis/motherboard/dimm21:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 22
+44:
+  /system/chassis/motherboard/dimm22:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 23
+45:
+  /system/chassis/motherboard/dimm23:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 24
+46:
+  /system/chassis/motherboard/dimm24:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 25
+47:
+  /system/chassis/motherboard/dimm25:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 26
+48:
+  /system/chassis/motherboard/dimm26:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 27
+49:
+  /system/chassis/motherboard/dimm27:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 28
+50:
+  /system/chassis/motherboard/dimm28:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 29
+51:
+  /system/chassis/motherboard/dimm29:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 30
+52:
+  /system/chassis/motherboard/dimm30:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 31
+53:
+  /system/chassis/motherboard/dimm31:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 32
+54:
+  /system/chassis/motherboard/dimm40:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 33
+55:
+  /system/chassis/motherboard/dimm41:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 34
+56:
+  /system/chassis/motherboard/dimm42:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 35
+57:
+  /system/chassis/motherboard/dimm43:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 36
+58:
+  /system/chassis/motherboard/dimm44:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 37
+59:
+  /system/chassis/motherboard/dimm45:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 38
+60:
+  /system/chassis/motherboard/dimm46:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 39
+61:
+  /system/chassis/motherboard/dimm47:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 40
+62:
+  /system/chassis/motherboard/dimm32:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 41
+63:
+  /system/chassis/motherboard/dimm33:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 42
+64:
+  /system/chassis/motherboard/dimm34:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 43
+65:
+  /system/chassis/motherboard/dimm35:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 44
+66:
+  /system/chassis/motherboard/dimm36:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 45
+67:
+  /system/chassis/motherboard/dimm37:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 46
+68:
+  /system/chassis/motherboard/dimm38:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 47
+69:
+  /system/chassis/motherboard/dimm39:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 48
+70:
+  /system/chassis/motherboard/dimm48:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 49
+71:
+  /system/chassis/motherboard/dimm49:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 50
+72:
+  /system/chassis/motherboard/dimm50:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 51
+73:
+  /system/chassis/motherboard/dimm51:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 52
+74:
+  /system/chassis/motherboard/dimm52:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 53
+75:
+  /system/chassis/motherboard/dimm53:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 54
+76:
+  /system/chassis/motherboard/dimm54:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 55
+77:
+  /system/chassis/motherboard/dimm55:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 56
+78:
+  /system/chassis/motherboard/dimm56:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 57
+79:
+  /system/chassis/motherboard/dimm57:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 58
+80:
+  /system/chassis/motherboard/dimm58:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 59
+81:
+  /system/chassis/motherboard/dimm59:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 60
+82:
+  /system/chassis/motherboard/dimm60:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 61
+83:
+  /system/chassis/motherboard/dimm61:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 62
+84:
+  /system/chassis/motherboard/dimm62:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 63
+85:
+  /system/chassis/motherboard/dimm63:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 64
+86:
+  /system/chassis/motherboard/dimm72:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 65
+87:
+  /system/chassis/motherboard/dimm73:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 66
+88:
+  /system/chassis/motherboard/dimm74:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 67
+89:
+  /system/chassis/motherboard/dimm75:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 68
+90:
+  /system/chassis/motherboard/dimm76:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 69
+91:
+  /system/chassis/motherboard/dimm77:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 70
+92:
+  /system/chassis/motherboard/dimm78:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 71
+93:
+  /system/chassis/motherboard/dimm79:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 72
+94:
+  /system/chassis/motherboard/dimm64:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 73
+95:
+  /system/chassis/motherboard/dimm65:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 74
+96:
+  /system/chassis/motherboard/dimm66:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 75
+97:
+  /system/chassis/motherboard/dimm67:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 76
+98:
+  /system/chassis/motherboard/dimm68:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 77
+99:
+  /system/chassis/motherboard/dimm69:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 78
+100:
+  /system/chassis/motherboard/dimm70:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 79
+101:
+  /system/chassis/motherboard/dimm71:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 80
+102:
+  /system/chassis/motherboard/dimm80:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 81
+103:
+  /system/chassis/motherboard/dimm81:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 82
+104:
+  /system/chassis/motherboard/dimm82:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 83
+105:
+  /system/chassis/motherboard/dimm83:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 84
+106:
+  /system/chassis/motherboard/dimm84:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 85
+107:
+  /system/chassis/motherboard/dimm85:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 86
+108:
+  /system/chassis/motherboard/dimm86:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 87
+109:
+  /system/chassis/motherboard/dimm87:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 88
+110:
+  /system/chassis/motherboard/dimm88:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 89
+111:
+  /system/chassis/motherboard/dimm89:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 90
+112:
+  /system/chassis/motherboard/dimm90:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 91
+113:
+  /system/chassis/motherboard/dimm91:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 92
+114:
+  /system/chassis/motherboard/dimm92:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 93
+115:
+  /system/chassis/motherboard/dimm93:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 94
+116:
+  /system/chassis/motherboard/dimm94:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 95
+117:
+  /system/chassis/motherboard/dimm95:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 96
+118:
+  /system/chassis/motherboard/dimm104:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 97
+119:
+  /system/chassis/motherboard/dimm105:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 98
+120:
+  /system/chassis/motherboard/dimm106:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 99
+121:
+  /system/chassis/motherboard/dimm107:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 100
+122:
+  /system/chassis/motherboard/dimm108:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 101
+123:
+  /system/chassis/motherboard/dimm109:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 102
+124:
+  /system/chassis/motherboard/dimm110:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 103
+125:
+  /system/chassis/motherboard/dimm111:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 104
+126:
+  /system/chassis/motherboard/dimm96:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 105
+127:
+  /system/chassis/motherboard/dimm97:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 106
+128:
+  /system/chassis/motherboard/dimm98:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 107
+129:
+  /system/chassis/motherboard/dimm99:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 108
+130:
+  /system/chassis/motherboard/dimm100:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 109
+131:
+  /system/chassis/motherboard/dimm101:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 110
+132:
+  /system/chassis/motherboard/dimm102:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 111
+133:
+  /system/chassis/motherboard/dimm103:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 112
+134:
+  /system/chassis/motherboard/dimm112:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 113
+135:
+  /system/chassis/motherboard/dimm113:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 114
+136:
+  /system/chassis/motherboard/dimm114:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 115
+137:
+  /system/chassis/motherboard/dimm115:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 116
+138:
+  /system/chassis/motherboard/dimm116:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 117
+139:
+  /system/chassis/motherboard/dimm117:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 118
+140:
+  /system/chassis/motherboard/dimm118:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 119
+141:
+  /system/chassis/motherboard/dimm119:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 120
+142:
+  /system/chassis/motherboard/dimm120:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 121
+143:
+  /system/chassis/motherboard/dimm121:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 122
+144:
+  /system/chassis/motherboard/dimm122:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 123
+145:
+  /system/chassis/motherboard/dimm123:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 124
+146:
+  /system/chassis/motherboard/dimm124:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 125
+147:
+  /system/chassis/motherboard/dimm125:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 126
+148:
+  /system/chassis/motherboard/dimm126:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 127
+149:
+  /system/chassis/motherboard/dimm127:
+    <<: *DIMM_DEFAULTS
+    entityInstance: 128
+
+150:
+  /system/chassis/motherboard/powersupply0:
+    entityID: 19
+    entityInstance: 0
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        Model:
+          IPMIFruProperty: Model Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+  /system/chassis/motherboard/powersupply0/info:
+    entityID: 19
+    entityInstance: 0
+    interfaces:
+      xyz.openbmc_project.Inventory.MultiRecord.PowerSupply:
+        Data:
+          IPMIFruProperty: PowerSupply
+          IPMIFruSection: MultiRecord
+  /system/chassis/motherboard/powersupply0/dc_output:
+    entityID: 19
+    entityInstance: 0
+    interfaces:
+      xyz.openbmc_project.Inventory.MultiRecord.DcOutput:
+        Data:
+          IPMIFruProperty: DcOutput
+          IPMIFruSection: MultiRecord
+
+151:
+  /system/chassis/motherboard/powersupply1:
+    entityID: 19
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Product
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        Model:
+          IPMIFruProperty: Model Number
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+  /system/chassis/motherboard/powersupply1/info:
+    entityID: 19
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.MultiRecord.PowerSupply:
+        Data:
+          IPMIFruProperty: PowerSupply
+          IPMIFruSection: MultiRecord
+  /system/chassis/motherboard/powersupply1/dc_output:
+    entityID: 19
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.MultiRecord.DcOutput:
+        Data:
+          IPMIFruProperty: DcOutput
+          IPMIFruSection: MultiRecord
+
+152:
+  /system/chassis/motherboard/fan0: &FAN_DEFAULTS
+    entityID: 29
+    entityInstance: 0
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        PartNumber:
+          IPMIFruProperty: Model Number
+          IPMIFruSection: Product
+        Model:
+          IPMIFruProperty: Model Number
+          IPMIFruSection: Product
+
+153:
+  /system/chassis/motherboard/fan1:
+    <<: *FAN_DEFAULTS
+    entityInstance: 1
+
+154:
+  /system/chassis/motherboard/fan2:
+    <<: *FAN_DEFAULTS
+    entityInstance: 2
+
+155:
+  /system/chassis/motherboard/fan3:
+    <<: *FAN_DEFAULTS
+    entityInstance: 3
+
+156:
+  /system/chassis/motherboard/fan4:
+    <<: *FAN_DEFAULTS
+    entityInstance: 4
+
+254:
+  /system/chassis/motherboard/opfw:
+    entityID: 34
+    entityInstance: 0
+    interfaces:
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: Version
+          IPMIFruSection: Product

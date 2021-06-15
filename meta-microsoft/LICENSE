@@ -1,0 +1,13 @@
+Full Description:
+Different components of meta-microsoft are under different licenses (a mix
+of MIT and Apache-2.0). Please see:
+
+COPYING.Apache-2.0
+COPYING.MIT (MIT)
+
+All metadata is MIT licensed unless otherwise stated. Source code
+included in tree for individual recipes is under the LICENSE stated in
+the associated recipe (.bb file) unless otherwise stated.
+
+License information for any other files is either explicitly stated
+or defaults to Apache-2.0.

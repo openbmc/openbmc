@@ -1,0 +1,37 @@
+From 066c49158a71ea77598c9e1ae16bba63d6ac6bb5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 19 Dec 2019 23:41:35 -0800
+Subject: [PATCH] cmake: Use GNUInstallDirs instead of hardcoding lib path
+
+Upstream-Status: Submitted [https://github.com/Jacajack/liblightmodbus/pull/12]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ce6cc88..bee83aa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -242,14 +242,14 @@ if ( DEFINED AVR )
+ 	)
+ endif( )
+ 
+-
++include(GNUInstallDirs)
+ #Installation
+ install( 
+ 	TARGETS lightmodbus
+-	ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/"
++	ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/"
+ )
+ 
+ #Install headers
+ install(
+ 	DIRECTORY "${CMAKE_SOURCE_DIR}/include/" DESTINATION "${CMAKE_INSTALL_PREFIX}/include/" FILES_MATCHING PATTERN "*.h"
+-)
+\ No newline at end of file
++)
+-- 
+2.24.1
+

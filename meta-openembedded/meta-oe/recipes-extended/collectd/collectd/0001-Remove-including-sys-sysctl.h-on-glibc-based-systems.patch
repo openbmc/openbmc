@@ -1,0 +1,53 @@
+From 090a17ca338a9311d682ecc5933b32bff67cf07f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 Jul 2019 14:20:14 -0700
+Subject: [PATCH] Remove including sys/sysctl.h on glibc based systems
+
+Glibc 2.30 has added deprecation notice and collectd detects it as
+warning [1]
+
+Fixes
+sys/sysctl.h:21:2: error: "The <sys/sysctl.h> header is deprecated and
+will be removed." [-Werror,-W#warnings]
+
+[1]
+https://sourceware.org/git/?p=glibc.git;a=commit;h=744e829637162bb7d5029632aacf341c64b86990
+
+Upstream-Status: Submitted
+[https://github.com/collectd/collectd/pull/3234]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/processes.c | 2 +-
+ src/uptime.c    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/processes.c b/src/processes.c
+index f83913a..9f71511 100644
+--- a/src/processes.c
++++ b/src/processes.c
+@@ -87,7 +87,7 @@
+ #if HAVE_MACH_VM_PROT_H
+ #include <mach/vm_prot.h>
+ #endif
+-#if HAVE_SYS_SYSCTL_H
++#if defined(HAVE_SYS_SYSCTL_H) && !defined(__GLIBC__)
+ #include <sys/sysctl.h>
+ #endif
+ /* #endif HAVE_THREAD_INFO */
+diff --git a/src/uptime.c b/src/uptime.c
+index 0892bda..4b15150 100644
+--- a/src/uptime.c
++++ b/src/uptime.c
+@@ -33,7 +33,7 @@
+  */
+ /* #endif HAVE_LIBKSTAT */
+ 
+-#elif HAVE_SYS_SYSCTL_H
++#elif defined(HAVE_SYS_SYSCTL_H) && !defined(__GLIBC__)
+ #include <sys/sysctl.h>
+ /* Using sysctl interface to retrieve the boot time on *BSD / Darwin / OS X
+  * systems */
+ 
+-- 
+2.17.1
+

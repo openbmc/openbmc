@@ -1,0 +1,42 @@
+manager_configuration:
+  power_on_delay: 20
+
+zone_configuration:
+
+#Air cooled zones
+- zone_conditions:
+  - name: air_cooled_chassis
+
+  zones:
+    - zone: 0
+      cooling_profiles:
+      - air
+      - all
+      full_speed: 255
+      default_floor: 195
+      increase_delay: 5
+      decrease_interval: 30
+      interfaces:
+          - name: xyz.openbmc_project.Control.ThermalMode
+            properties:
+                - name: Supported
+                  type: array[string]
+                  values:
+                      - value: DEFAULT
+                        description: >
+                            Default thermal control mode
+                      - value: CUSTOM
+                        description: >
+                            Custom thermal control mode for handling the use of
+                            optical cables located behind the GPU exhaust that
+                            could produce overtemp warnings without this mode
+                            enabled.
+                - name: Current
+                  type: string
+                  persist: true
+                  values:
+                      - value: DEFAULT
+                        description: >
+                            Set current thermal control mode to the
+                            default which will be replaced on startup if
+                            another selected mode was persisted.

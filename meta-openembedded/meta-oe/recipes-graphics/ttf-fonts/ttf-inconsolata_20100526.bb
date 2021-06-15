@@ -14,7 +14,7 @@ FILES_${PN} = "${datadir}/fonts/truetype/Inconsolata.ttf \
     ${datadir}/doc/ttf-inconsolata/*"
 
 do_configure() {
-    mv ${WORKDIR}/Inconsolata.otf ${S}/Inconsolata.ttf
+    cp -fr ${WORKDIR}/Inconsolata.otf ${S}/Inconsolata.ttf
 }
 
 do_install_append() {

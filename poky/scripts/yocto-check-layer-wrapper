@@ -6,7 +6,9 @@
 # script to avoid a contaminated environment.
 #
 # Copyright (C) 2017 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 if [ -z "$BUILDDIR" ]; then
 	echo "Please source oe-init-build-env before run this script."

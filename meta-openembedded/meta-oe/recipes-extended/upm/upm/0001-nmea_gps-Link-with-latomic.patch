@@ -1,0 +1,27 @@
+From 996d37fc0b7177ee57788399b9140032d5de2765 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 18 Nov 2019 15:50:02 -0800
+Subject: [PATCH] nmea_gps: Link with latomic
+
+clang/x86 ends up with missing symbols for atomics due to atomic<double>
+with libstdc++, it works ok with libc++
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/nmea_gps/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/nmea_gps/CMakeLists.txt b/src/nmea_gps/CMakeLists.txt
+index b3fb6591..5280bfed 100644
+--- a/src/nmea_gps/CMakeLists.txt
++++ b/src/nmea_gps/CMakeLists.txt
+@@ -6,4 +6,4 @@ upm_mixed_module_init (NAME nmea_gps
+     CPP_SRC nmea_gps.cxx
+     FTI_SRC nmea_gps_fti.c
+     CPP_WRAPS_C
+-    REQUIRES mraa utilities-c ${CMAKE_THREAD_LIBS_INIT})
++    REQUIRES mraa utilities-c atomic ${CMAKE_THREAD_LIBS_INIT})
+-- 
+2.24.0
+

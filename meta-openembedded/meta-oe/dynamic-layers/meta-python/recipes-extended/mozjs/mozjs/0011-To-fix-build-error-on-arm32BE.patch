@@ -1,0 +1,28 @@
+From 9afb0e4d3b9209ea198052cea0401bef7ee25ad8 Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Thu, 9 May 2019 12:23:40 +0900
+Subject: [PATCH] To fix build error on arm32BE.
+
+error: #error Target architecture was not detected as supported by Double-Conversion.
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ mfbt/double-conversion/double-conversion/utils.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mfbt/double-conversion/double-conversion/utils.h b/mfbt/double-conversion/double-conversion/utils.h
+index 4f37218..93575cb 100644
+--- a/mfbt/double-conversion/double-conversion/utils.h
++++ b/mfbt/double-conversion/double-conversion/utils.h
+@@ -53,7 +53,7 @@
+ // disabled.)
+ // On Linux,x86 89255e-22 != Div_double(89255.0/1e22)
+ #if defined(_M_X64) || defined(__x86_64__) || \
+-    defined(__ARMEL__) || defined(__avr32__) || \
++    defined(__arm__) || defined(__avr32__) || \
+     defined(__hppa__) || defined(__ia64__) || \
+     defined(__mips__) || \
+     defined(__powerpc__) || defined(__ppc__) || defined(__ppc64__) || \
+-- 
+2.7.4
+

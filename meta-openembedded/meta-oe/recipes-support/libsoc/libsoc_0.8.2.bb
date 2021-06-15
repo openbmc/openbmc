@@ -7,7 +7,7 @@ HOMEPAGE = "https://github.com/jackmitch/libsoc"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=e0bfebea12a718922225ba987b2126a5"
 
-inherit autotools pkgconfig python-dir
+inherit autotools pkgconfig python3-dir
 
 SRCREV = "fd1ad6e7823fa76d8db0d3c5884faffa8ffddafb"
 SRC_URI = "git://github.com/jackmitch/libsoc.git"
@@ -21,7 +21,7 @@ PACKAGECONFIG ?= ""
 PACKAGECONFIG[disabledebug] = "--disable-debug,,"
 PACKAGECONFIG[allboardconfigs] = "--with-board-configs,,"
 PACKAGECONFIG[enableboardconfig] = "--enable-board=${BOARD},,"
-PACKAGECONFIG[python] = "--enable-python=${PYTHON_PN},,${PYTHON_PN}"
+PACKAGECONFIG[python] = "--enable-python=${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-native/${PYTHON_PN},,${PYTHON_PN} ${PYTHON_PN}-native"
 
 PACKAGES =+ "${@bb.utils.contains('PACKAGECONFIG', 'python', \
     '${PYTHON_PN}-libsoc-staticdev ${PYTHON_PN}-libsoc', '', d)}"

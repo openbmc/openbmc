@@ -1,0 +1,36 @@
+fans:
+  - inventory: /system/chassis/motherboard/fan0
+    functional_delay: 5
+    allowed_out_of_range_time: 30
+    deviation: 15
+    num_sensors_nonfunc_for_fan_nonfunc: 1
+    sensors:
+      - name: fan0_0
+        has_target: true
+
+  - inventory: /system/chassis/motherboard/fan1
+    functional_delay: 5
+    allowed_out_of_range_time: 30
+    deviation: 15
+    num_sensors_nonfunc_for_fan_nonfunc: 1
+    sensors:
+      - name: fan1_0
+        has_target: true
+
+  - inventory: /system/chassis/motherboard/fan2
+    functional_delay: 5
+    allowed_out_of_range_time: 30
+    deviation: 15
+    num_sensors_nonfunc_for_fan_nonfunc: 1
+    sensors:
+      - name: fan2_0
+        has_target: true
+
+  - inventory: /system/chassis/motherboard/fan3
+    functional_delay: 5
+    allowed_out_of_range_time: 30
+    deviation: 15
+    num_sensors_nonfunc_for_fan_nonfunc: 1
+    sensors:
+      - name: fan3_0
+        has_target: true

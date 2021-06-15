@@ -1,32 +1,34 @@
-Upstream-Status: Inappropriate [configuration]
+From 99b62670d01c6081d883303722726beb65699cbb Mon Sep 17 00:00:00 2001
+From: Zong Li <zong.li@sifive.com>
+Date: Wed, 6 May 2020 01:23:22 -0700
+Subject: [PATCH] Makefile for cross compile SoftFloat 3e
 
-From 07f2528d93f44fe1d8080a4225f29f4ada9f4663 Mon Sep 17 00:00:00 2001
-From: Fabio Berton <fabio.berton@ossystems.com.br>
-Date: Thu, 4 Feb 2016 09:15:37 -0200
-Subject: [PATCH 1/2] Makefile for cross compile SoftFloat
+This commit adds a Makefile for cross compile on SoftFloat
+3e version. Almost implementation is based on meta-oe porting
+from Fabio Berton <fabio.berton@ossystems.com.br>.
 
-Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+Signed-off-by: Zong Li <zongbox@gmail.com>
 ---
- SoftFloat-3a/build/Linux-Cross-Compile/Makefile   | 274 ++++++++++++++++++++++
- SoftFloat-3a/build/Linux-Cross-Compile/platform.h |  44 ++++
- 2 files changed, 318 insertions(+)
- create mode 100644 SoftFloat-3a/build/Linux-Cross-Compile/Makefile
- create mode 100644 SoftFloat-3a/build/Linux-Cross-Compile/platform.h
+ SoftFloat-3e/build/Linux-Cross-Compile/Makefile   | 325 ++++++++++++++++++++++
+ SoftFloat-3e/build/Linux-Cross-Compile/platform.h |  52 ++++
+ 2 files changed, 377 insertions(+)
+ create mode 100644 SoftFloat-3e/build/Linux-Cross-Compile/Makefile
+ create mode 100644 SoftFloat-3e/build/Linux-Cross-Compile/platform.h
 
-diff --git a/SoftFloat-3a/build/Linux-Cross-Compile/Makefile b/SoftFloat-3a/build/Linux-Cross-Compile/Makefile
+diff --git a/SoftFloat-3e/build/Linux-Cross-Compile/Makefile b/SoftFloat-3e/build/Linux-Cross-Compile/Makefile
 new file mode 100644
-index 0000000..c4d0a60
+index 0000000..4da4bc9
 --- /dev/null
-+++ b/SoftFloat-3a/build/Linux-Cross-Compile/Makefile
-@@ -0,0 +1,274 @@
++++ b/SoftFloat-3e/build/Linux-Cross-Compile/Makefile
+@@ -0,0 +1,325 @@
 +
 +#=============================================================================
 +#
-+# This Makefile is part of the SoftFloat IEEE Floating-Point Arithmetic
-+# Package, Release 3a, by John R. Hauser.
++# This Makefile template is part of the SoftFloat IEEE Floating-Point
++# Arithmetic Package, Release 3e, by John R. Hauser.
 +#
-+# Copyright 2011, 2012, 2013, 2014 The Regents of the University of
-+# California.  All rights reserved.
++# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 The Regents of the
++# University of California.  All rights reserved.
 +#
 +# Redistribution and use in source and binary forms, with or without
 +# modification, are permitted provided that the following conditions are met:
@@ -55,20 +57,24 @@ index 0000000..c4d0a60
 +#
 +#=============================================================================
 +
-+SOURCE_DIR = ../../source
-+SPECIALIZE_TYPE = 8086
++SOURCE_DIR ?= ../../source
++SPECIALIZE_TYPE ?= 8086
 +
-+SOFTFLOAT_OPTS = -DINLINE_LEVEL=5 -DSOFTFLOAT_FAST_DIV64TO32 -fgnu89-inline
++SOFTFLOAT_OPTS ?= \
++  -DSOFTFLOAT_ROUND_ODD -DINLINE_LEVEL=5 -DSOFTFLOAT_FAST_DIV32TO16 \
++  -DSOFTFLOAT_FAST_DIV64TO32
 +
 +DELETE = rm -f
 +C_INCLUDES = -I. -I$(SOURCE_DIR)/$(SPECIALIZE_TYPE) -I$(SOURCE_DIR)/include
 +COMPILE_C = \
 +  ${CC} -c -Werror-implicit-function-declaration $(SOFTFLOAT_OPTS) \
-+    $(C_INCLUDES) -O2 -o $@
++  $(C_INCLUDES) -O2 -o $@
 +MAKELIB = ${AR} crs $@
 +
 +OBJ = .o
 +LIB = .a
++
++OTHER_HEADERS =
 +
 +.PHONY: all
 +all: softfloat$(LIB)
@@ -87,6 +93,7 @@ index 0000000..c4d0a60
 +  s_shiftRightJamM$(OBJ) \
 +  s_shiftRightM$(OBJ) \
 +  s_countLeadingZeros8$(OBJ) \
++  s_countLeadingZeros16$(OBJ) \
 +  s_countLeadingZeros32$(OBJ) \
 +  s_countLeadingZeros64$(OBJ) \
 +  s_addM$(OBJ) \
@@ -97,12 +104,17 @@ index 0000000..c4d0a60
 +  s_subM$(OBJ) \
 +  s_mul64To128M$(OBJ) \
 +  s_mul128MTo256M$(OBJ) \
++  s_approxRecip_1Ks$(OBJ) \
 +  s_approxRecip32_1$(OBJ) \
++  s_approxRecipSqrt_1Ks$(OBJ) \
 +  s_approxRecipSqrt32_1$(OBJ) \
 +  s_remStepMBy32$(OBJ) \
 +
 +OBJS_SPECIALIZE = \
 +  softfloat_raiseFlags$(OBJ) \
++  s_f16UIToCommonNaN$(OBJ) \
++  s_commonNaNToF16UI$(OBJ) \
++  s_propagateNaNF16UI$(OBJ) \
 +  s_f32UIToCommonNaN$(OBJ) \
 +  s_commonNaNToF32UI$(OBJ) \
 +  s_propagateNaNF32UI$(OBJ) \
@@ -119,10 +131,16 @@ index 0000000..c4d0a60
 +  s_propagateNaNF128M$(OBJ) \
 +
 +OBJS_OTHERS = \
-+  s_roundPackToUI32$(OBJ) \
-+  s_roundPackMToUI64$(OBJ) \
-+  s_roundPackToI32$(OBJ) \
-+  s_roundPackMToI64$(OBJ) \
++  s_roundToUI32$(OBJ) \
++  s_roundMToUI64$(OBJ) \
++  s_roundToI32$(OBJ) \
++  s_roundMToI64$(OBJ) \
++  s_normSubnormalF16Sig$(OBJ) \
++  s_roundPackToF16$(OBJ) \
++  s_normRoundPackToF16$(OBJ) \
++  s_addMagsF16$(OBJ) \
++  s_subMagsF16$(OBJ) \
++  s_mulAddF16$(OBJ) \
 +  s_normSubnormalF32Sig$(OBJ) \
 +  s_roundPackToF32$(OBJ) \
 +  s_normRoundPackToF32$(OBJ) \
@@ -151,22 +169,53 @@ index 0000000..c4d0a60
 +  s_addF128M$(OBJ) \
 +  s_mulAddF128M$(OBJ) \
 +  softfloat_state$(OBJ) \
++  ui32_to_f16$(OBJ) \
 +  ui32_to_f32$(OBJ) \
 +  ui32_to_f64$(OBJ) \
 +  ui32_to_extF80M$(OBJ) \
 +  ui32_to_f128M$(OBJ) \
++  ui64_to_f16$(OBJ) \
 +  ui64_to_f32$(OBJ) \
 +  ui64_to_f64$(OBJ) \
 +  ui64_to_extF80M$(OBJ) \
 +  ui64_to_f128M$(OBJ) \
++  i32_to_f16$(OBJ) \
 +  i32_to_f32$(OBJ) \
 +  i32_to_f64$(OBJ) \
 +  i32_to_extF80M$(OBJ) \
 +  i32_to_f128M$(OBJ) \
++  i64_to_f16$(OBJ) \
 +  i64_to_f32$(OBJ) \
 +  i64_to_f64$(OBJ) \
 +  i64_to_extF80M$(OBJ) \
 +  i64_to_f128M$(OBJ) \
++  f16_to_ui32$(OBJ) \
++  f16_to_ui64$(OBJ) \
++  f16_to_i32$(OBJ) \
++  f16_to_i64$(OBJ) \
++  f16_to_ui32_r_minMag$(OBJ) \
++  f16_to_ui64_r_minMag$(OBJ) \
++  f16_to_i32_r_minMag$(OBJ) \
++  f16_to_i64_r_minMag$(OBJ) \
++  f16_to_f32$(OBJ) \
++  f16_to_f64$(OBJ) \
++  f16_to_extF80M$(OBJ) \
++  f16_to_f128M$(OBJ) \
++  f16_roundToInt$(OBJ) \
++  f16_add$(OBJ) \
++  f16_sub$(OBJ) \
++  f16_mul$(OBJ) \
++  f16_mulAdd$(OBJ) \
++  f16_div$(OBJ) \
++  f16_rem$(OBJ) \
++  f16_sqrt$(OBJ) \
++  f16_eq$(OBJ) \
++  f16_le$(OBJ) \
++  f16_lt$(OBJ) \
++  f16_eq_signaling$(OBJ) \
++  f16_le_quiet$(OBJ) \
++  f16_lt_quiet$(OBJ) \
++  f16_isSignalingNaN$(OBJ) \
 +  f32_to_ui32$(OBJ) \
 +  f32_to_ui64$(OBJ) \
 +  f32_to_i32$(OBJ) \
@@ -175,6 +224,7 @@ index 0000000..c4d0a60
 +  f32_to_ui64_r_minMag$(OBJ) \
 +  f32_to_i32_r_minMag$(OBJ) \
 +  f32_to_i64_r_minMag$(OBJ) \
++  f32_to_f16$(OBJ) \
 +  f32_to_f64$(OBJ) \
 +  f32_to_extF80M$(OBJ) \
 +  f32_to_f128M$(OBJ) \
@@ -201,6 +251,7 @@ index 0000000..c4d0a60
 +  f64_to_ui64_r_minMag$(OBJ) \
 +  f64_to_i32_r_minMag$(OBJ) \
 +  f64_to_i64_r_minMag$(OBJ) \
++  f64_to_f16$(OBJ) \
 +  f64_to_f32$(OBJ) \
 +  f64_to_extF80M$(OBJ) \
 +  f64_to_f128M$(OBJ) \
@@ -227,6 +278,7 @@ index 0000000..c4d0a60
 +  extF80M_to_ui64_r_minMag$(OBJ) \
 +  extF80M_to_i32_r_minMag$(OBJ) \
 +  extF80M_to_i64_r_minMag$(OBJ) \
++  extF80M_to_f16$(OBJ) \
 +  extF80M_to_f32$(OBJ) \
 +  extF80M_to_f64$(OBJ) \
 +  extF80M_to_f128M$(OBJ) \
@@ -251,6 +303,7 @@ index 0000000..c4d0a60
 +  f128M_to_ui64_r_minMag$(OBJ) \
 +  f128M_to_i32_r_minMag$(OBJ) \
 +  f128M_to_i64_r_minMag$(OBJ) \
++  f128M_to_f16$(OBJ) \
 +  f128M_to_f32$(OBJ) \
 +  f128M_to_f64$(OBJ) \
 +  f128M_to_extF80M$(OBJ) \
@@ -272,7 +325,7 @@ index 0000000..c4d0a60
 +OBJS_ALL = $(OBJS_PRIMITIVES) $(OBJS_SPECIALIZE) $(OBJS_OTHERS)
 +
 +$(OBJS_ALL): \
-+  platform.h $(SOURCE_DIR)/include/primitiveTypes.h \
++  $(OTHER_HEADERS) platform.h $(SOURCE_DIR)/include/primitiveTypes.h \
 +  $(SOURCE_DIR)/include/primitives.h
 +$(OBJS_SPECIALIZE) $(OBJS_OTHERS): \
 +  $(SOURCE_DIR)/include/softfloat_types.h $(SOURCE_DIR)/include/internals.h \
@@ -293,20 +346,20 @@ index 0000000..c4d0a60
 +clean:
 +	$(DELETE) $(OBJS_ALL) softfloat$(LIB)
 +
-diff --git a/SoftFloat-3a/build/Linux-Cross-Compile/platform.h b/SoftFloat-3a/build/Linux-Cross-Compile/platform.h
+diff --git a/SoftFloat-3e/build/Linux-Cross-Compile/platform.h b/SoftFloat-3e/build/Linux-Cross-Compile/platform.h
 new file mode 100644
-index 0000000..5e566fc
+index 0000000..1728c15
 --- /dev/null
-+++ b/SoftFloat-3a/build/Linux-Cross-Compile/platform.h
-@@ -0,0 +1,44 @@
++++ b/SoftFloat-3e/build/Linux-Cross-Compile/platform.h
+@@ -0,0 +1,52 @@
 +
 +/*============================================================================
 +
-+This C header file is part of the SoftFloat IEEE Floating-Point Arithmetic
-+Package, Release 3a, by John R. Hauser.
++This C header template is part of the SoftFloat IEEE Floating-Point Arithmetic
++Package, Release 3e, by John R. Hauser.
 +
-+Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
-+All rights reserved.
++Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
++California.  All rights reserved.
 +
 +Redistribution and use in source and binary forms, with or without
 +modification, are permitted provided that the following conditions are met:
@@ -341,8 +394,16 @@ index 0000000..5e566fc
 +
 +/*----------------------------------------------------------------------------
 +*----------------------------------------------------------------------------*/
++#ifdef __GNUC_STDC_INLINE__
++#define INLINE inline
++#else
 +#define INLINE extern inline
++#endif
 +
++/*----------------------------------------------------------------------------
++*----------------------------------------------------------------------------*/
++#define SOFTFLOAT_BUILTIN_CLZ 1
++#include "opts-GCC.h"
 -- 
-2.1.4
+2.7.4
 

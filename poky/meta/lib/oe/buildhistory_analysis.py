@@ -3,6 +3,8 @@
 # Copyright (C) 2012-2013, 2016-2017 Intel Corporation
 # Author: Paul Eggleton <paul.eggleton@linux.intel.com>
 #
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # Note: requires GitPython 0.3.1+
 #
 # You can use this from the command line by running scripts/buildhistory-diff
@@ -127,7 +129,7 @@ class ChangeRecord:
             removed = list(set(aitems) - set(bitems))
             added = list(set(bitems) - set(aitems))
 
-            if not removed and not added:
+            if not removed and not added and self.fieldname in ['RPROVIDES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RREPLACES', 'RCONFLICTS']:
                 depvera = bb.utils.explode_dep_versions2(self.oldvalue, sort=False)
                 depverb = bb.utils.explode_dep_versions2(self.newvalue, sort=False)
                 for i, j in zip(depvera.items(), depverb.items()):
@@ -179,7 +181,7 @@ class ChangeRecord:
             diff = difflib.unified_diff(alines, blines, self.fieldname, self.fieldname, lineterm='')
             out += '\n  '.join(list(diff)[2:])
             out += '\n  --'
-        elif self.fieldname in img_monitor_files or '/image-files/' in self.path:
+        elif self.fieldname in img_monitor_files or '/image-files/' in self.path or self.fieldname == "sysroot":
             if self.filechanges or (self.oldvalue and self.newvalue):
                 fieldname = self.fieldname
                 if '/image-files/' in self.path:
@@ -211,6 +213,7 @@ class FileChange:
     changetype_perms = 'P'
     changetype_ownergroup = 'O'
     changetype_link = 'L'
+    changetype_move = 'M'
 
     def __init__(self, path, changetype, oldvalue = None, newvalue = None):
         self.path = path
@@ -249,9 +252,10 @@ class FileChange:
             return '%s changed owner/group from %s to %s' % (self.path, self.oldvalue, self.newvalue)
         elif self.changetype == self.changetype_link:
             return '%s changed symlink target from %s to %s' % (self.path, self.oldvalue, self.newvalue)
+        elif self.changetype == self.changetype_move:
+            return '%s moved to %s' % (self.path, self.oldvalue)
         else:
             return '%s changed (unknown)' % self.path
-
 
 def blob_to_dict(blob):
     alines = [line for line in blob.data_stream.read().decode('utf-8').splitlines()]
@@ -279,11 +283,14 @@ def file_list_to_dict(lines):
             adict[path] = splitv[0:3]
     return adict
 
+numeric_removal = str.maketrans('0123456789', 'XXXXXXXXXX')
 
-def compare_file_lists(alines, blines):
+def compare_file_lists(alines, blines, compare_ownership=True):
     adict = file_list_to_dict(alines)
     bdict = file_list_to_dict(blines)
     filechanges = []
+    additions = []
+    removals = []
     for path, splitv in adict.items():
         newsplitv = bdict.pop(path, None)
         if newsplitv:
@@ -292,16 +299,20 @@ def compare_file_lists(alines, blines):
             newvalue = newsplitv[0][0]
             if oldvalue != newvalue:
                 filechanges.append(FileChange(path, FileChange.changetype_type, oldvalue, newvalue))
+
             # Check permissions
             oldvalue = splitv[0][1:]
             newvalue = newsplitv[0][1:]
             if oldvalue != newvalue:
                 filechanges.append(FileChange(path, FileChange.changetype_perms, oldvalue, newvalue))
-            # Check owner/group
-            oldvalue = '%s/%s' % (splitv[1], splitv[2])
-            newvalue = '%s/%s' % (newsplitv[1], newsplitv[2])
-            if oldvalue != newvalue:
-                filechanges.append(FileChange(path, FileChange.changetype_ownergroup, oldvalue, newvalue))
+
+            if compare_ownership:
+                # Check owner/group
+                oldvalue = '%s/%s' % (splitv[1], splitv[2])
+                newvalue = '%s/%s' % (newsplitv[1], newsplitv[2])
+                if oldvalue != newvalue:
+                    filechanges.append(FileChange(path, FileChange.changetype_ownergroup, oldvalue, newvalue))
+
             # Check symlink target
             if newsplitv[0][0] == 'l':
                 if len(splitv) > 3:
@@ -312,11 +323,67 @@ def compare_file_lists(alines, blines):
                 if oldvalue != newvalue:
                     filechanges.append(FileChange(path, FileChange.changetype_link, oldvalue, newvalue))
         else:
-            filechanges.append(FileChange(path, FileChange.changetype_remove))
+            removals.append(path)
 
     # Whatever is left over has been added
     for path in bdict:
-        filechanges.append(FileChange(path, FileChange.changetype_add))
+        additions.append(path)
+
+    # Rather than print additions and removals, its nicer to print file 'moves'
+    # where names or paths are similar.
+    revmap_remove = {}
+    for removal in removals:
+        translated = removal.translate(numeric_removal)
+        if translated not in revmap_remove:
+            revmap_remove[translated] = []
+        revmap_remove[translated].append(removal)
+
+    #
+    # We want to detect renames of large trees of files like
+    # /lib/modules/5.4.40-yocto-standard to /lib/modules/5.4.43-yocto-standard
+    #
+    renames = {}
+    for addition in additions.copy():
+        if addition not in additions:
+            continue
+        translated = addition.translate(numeric_removal)
+        if translated in revmap_remove:
+            if len(revmap_remove[translated]) != 1:
+                continue
+            removal = revmap_remove[translated][0]
+            commondir = addition.split("/")
+            commondir2 = removal.split("/")
+            idx = None
+            for i in range(len(commondir)):
+                if commondir[i] != commondir2[i]:
+                    idx = i
+                    break
+            commondir = "/".join(commondir[:i+1])
+            commondir2 = "/".join(commondir2[:i+1])
+            # If the common parent is in one dict and not the other its likely a rename
+            # so iterate through those files and process as such
+            if commondir2 not in bdict and commondir not in adict:
+                if commondir not in renames:
+                    renames[commondir] = commondir2
+                    for addition2 in additions.copy():
+                        if addition2.startswith(commondir):
+                            removal2 = addition2.replace(commondir, commondir2)
+                            if removal2 in removals:
+                                additions.remove(addition2)
+                                removals.remove(removal2)
+                    continue
+            filechanges.append(FileChange(removal, FileChange.changetype_move, addition))
+            if addition in additions:
+                additions.remove(addition)
+            if removal in removals:
+                removals.remove(removal)
+    for rename in renames:
+        filechanges.append(FileChange(renames[rename], FileChange.changetype_move, rename))
+
+    for addition in additions:
+        filechanges.append(FileChange(addition, FileChange.changetype_add))
+    for removal in removals:
+        filechanges.append(FileChange(removal, FileChange.changetype_remove))
 
     return filechanges
 
@@ -407,7 +474,7 @@ def compare_dict_blobs(path, ablob, bblob, report_all, report_ver):
                 if abs(percentchg) < monitor_numeric_threshold:
                     continue
             elif (not report_all) and key in list_fields:
-                if key == "FILELIST" and path.endswith("-dbg") and bstr.strip() != '':
+                if key == "FILELIST" and (path.endswith("-dbg") or path.endswith("-src")) and bstr.strip() != '':
                     continue
                 if key in ['RPROVIDES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RREPLACES', 'RCONFLICTS']:
                     (depvera, depverb) = compare_pkg_lists(astr, bstr)
@@ -569,6 +636,15 @@ def process_changes(repopath, revision1, revision2='HEAD', report_all=False, rep
             elif filename.startswith('latest.'):
                 chg = ChangeRecord(path, filename, d.a_blob.data_stream.read().decode('utf-8'), d.b_blob.data_stream.read().decode('utf-8'), True)
                 changes.append(chg)
+            elif filename == 'sysroot':
+                alines = d.a_blob.data_stream.read().decode('utf-8').splitlines()
+                blines = d.b_blob.data_stream.read().decode('utf-8').splitlines()
+                filechanges = compare_file_lists(alines,blines, compare_ownership=False)
+                if filechanges:
+                    chg = ChangeRecord(path, filename, None, None, True)
+                    chg.filechanges = filechanges
+                    changes.append(chg)
+
         elif path.startswith('images/'):
             filename = os.path.basename(d.a_blob.path)
             if filename in img_monitor_files:

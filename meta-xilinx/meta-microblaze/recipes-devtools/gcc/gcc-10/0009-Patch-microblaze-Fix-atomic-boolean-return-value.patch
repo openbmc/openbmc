@@ -1,0 +1,40 @@
+From d3d065c9645d795e03dab6db827c08231e011a1f Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Thu, 12 Jan 2017 16:45:45 +0530
+Subject: [PATCH 09/54] [Patch, microblaze]: Fix atomic boolean return value.
+ In atomic_compare_and_swapsi, fix boolean return value. Previously, it
+ contained zero if successful and non-zero if unsuccessful.
+
+Signed-off-by: Kirk Meyer <kirk.meyer@sencore.com>
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+---
+ gcc/config/microblaze/sync.md | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/gcc/config/microblaze/sync.md b/gcc/config/microblaze/sync.md
+index 24cd67e1fdb..76c3616c992 100644
+--- a/gcc/config/microblaze/sync.md
++++ b/gcc/config/microblaze/sync.md
+@@ -34,15 +34,16 @@
+    (clobber (match_scratch:SI 8 "=&d"))]
+   ""
+   {
+-    output_asm_insn ("addc \tr0,r0,r0", operands);
++    output_asm_insn ("add  \t%0,r0,r0", operands);
+     output_asm_insn ("lwx  \t%1,%y2,r0", operands);
+     output_asm_insn ("addic\t%8,r0,0", operands);
+     output_asm_insn ("bnei \t%8,.-8", operands);
+-    output_asm_insn ("cmp  \t%0,%1,%3", operands);
+-    output_asm_insn ("bnei \t%0,.+16", operands);
++    output_asm_insn ("cmp  \t%8,%1,%3", operands);
++    output_asm_insn ("bnei \t%8,.+20", operands);
+     output_asm_insn ("swx  \t%4,%y2,r0", operands);
+     output_asm_insn ("addic\t%8,r0,0", operands);
+     output_asm_insn ("bnei \t%8,.-28", operands);
++    output_asm_insn ("addi \t%0,r0,1", operands);
+     return "";
+   }
+ )
+-- 
+2.17.1
+

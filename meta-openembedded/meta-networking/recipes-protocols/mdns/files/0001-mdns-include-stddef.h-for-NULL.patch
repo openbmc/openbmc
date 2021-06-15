@@ -1,0 +1,40 @@
+From d744609c56f9872e5aa71707f1f71feec9867f51 Mon Sep 17 00:00:00 2001
+From: Mikko Rapeli <mikko.rapeli@bmw.de>
+Date: Tue, 14 Jul 2020 16:36:29 +0000
+Subject: [PATCH 1/2] mdns: include <stddef.h> for NULL
+
+Fixes build error with version 1096.40.7:
+
+../mDNSCore/mDNS.c:11385:26: error: 'NULL' undeclared (first use in this function)
+11385 |     const char *reason = NULL;
+      |                          ^~~~
+../mDNSCore/mDNS.c:56:1: note: 'NULL' is defined in header '<stddef.h>'; did you forget to '#include <stddef.h>'?
+   55 | #include "dns_sd_internal.h"
+  +++ |+#include <stddef.h>
+   56 |
+../mDNSCore/mDNS.c:11385:26: note: each undeclared identifier is reported only once for each function it appears in
+11385 |     const char *reason = NULL;
+      |                          ^~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Mikko Rapeli <mikko.rapeli@bmw.de>
+---
+ mDNSCore/mDNS.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mDNSCore/mDNS.c b/mDNSCore/mDNS.c
+index 2fbea04..d4b9af5 100755
+--- a/mDNSCore/mDNS.c
++++ b/mDNSCore/mDNS.c
+@@ -23,6 +23,7 @@
+  * routines, or types (which may or may not be present on any given platform).
+  */
+ 
++#include <stddef.h> /* for NULL */
+ #include "DNSCommon.h"                  // Defines general DNS utility routines
+ #include "uDNS.h"                       // Defines entry points into unicast-specific routines
+
+-- 
+2.20.1
+

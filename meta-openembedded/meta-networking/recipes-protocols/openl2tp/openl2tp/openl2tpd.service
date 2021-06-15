@@ -5,7 +5,7 @@ Requires=rpcbind.service
 
 [Service]
 Type=forking
-PIDFile=@STATEDIR@/run/openl2tpd.pid
+PIDFile=/run/openl2tpd.pid
 EnvironmentFile=@SYSCONFDIR@/default/openl2tpd
 ExecStartPre=@BASE_BINDIR@/sh -c "@BASE_SBINDIR@/modprobe -sq l2tp_ppp || @BASE_SBINDIR@/modprobe -sq pppol2tp"
 ExecStart=@SBINDIR@/openl2tpd $OPENL2TPDARGS

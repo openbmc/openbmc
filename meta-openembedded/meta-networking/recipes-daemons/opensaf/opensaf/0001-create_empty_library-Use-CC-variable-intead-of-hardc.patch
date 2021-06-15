@@ -1,0 +1,23 @@
+From 300fd3e27e71a91fc52d3f985ed4fde548852853 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 27 Sep 2019 12:50:11 -0700
+Subject: [PATCH] create_empty_library: Use CC variable intead of hardcoding
+ gcc
+
+This ensures that cross-compiles can succeed, otherwise we get wrong
+architecture on these stub libraries
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ scripts/create_empty_library | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/scripts/create_empty_library
++++ b/scripts/create_empty_library
+@@ -66,4 +66,4 @@ for s in $symbols; do
+     echo "SaAisErrorT $s() { return SA_AIS_ERR_UNAVAILABLE; }" >> "$tmpdir/lib.c"
+ done
+ rm -f "$1"
+-gcc -O2 -shared -fPIC "$tmpdir/lib.c" -Wl,-version-script="$2" -Wl,-soname="$libbase.so.$version1" -o "$1"
++$CC -O2 -shared -fPIC "$tmpdir/lib.c" -Wl,-version-script="$2" -Wl,-soname="$libbase.so.$version1" -o "$1" $LDFLAGS

@@ -3,27 +3,18 @@
 # toaster - shell script to start Toaster
 
 # Copyright (C) 2013-2015 Intel Corp.
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# SPDX-License-Identifier: GPL-2.0-or-later
 #
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see http://www.gnu.org/licenses/.
 
 HELP="
-Usage: source toaster start|stop [webport=<address:port>] [noweb] [nobuild] [toasterdir]
+Usage 1: source toaster start|stop [webport=<address:port>] [noweb] [nobuild] [toasterdir]
     Optional arguments:
         [nobuild] Setup the environment for capturing builds with toaster but disable managed builds
         [noweb] Setup the environment for capturing builds with toaster but don't start the web server
         [webport] Set the development server (default: localhost:8000)
         [toasterdir] Set absolute path to be used as TOASTER_DIR (default: BUILDDIR/../)
+Usage 2: source toaster manage [createsuperuser|lsupdates|migrate|makemigrations|checksettings|collectstatic|...]
 "
 
 custom_extention()
@@ -218,13 +209,21 @@ for param in $*; do
     toasterdir=*)
             TOASTERDIR="${param#*=}"
     ;;
+    manage )
+            CMD=$param
+            manage_cmd=""
+    ;;
     --help)
             echo "$HELP"
             return 0
     ;;
     *)
-            echo "$HELP"
-            return 1
+            if [ "manage" == "$CMD" ] ; then
+                manage_cmd="$manage_cmd $param"
+            else
+                echo "$HELP"
+                exit 1
+            fi
     ;;
 
     esac
@@ -315,6 +314,10 @@ case $CMD in
     stop )
         stop_system
         echo "Successful ${CMD}."
+    ;;
+    manage )
+        cd $BBBASEDIR/lib/toaster
+        $MANAGE $manage_cmd
     ;;
 esac
 custom_extention toaster_postpend $CMD $ADDR_PORT

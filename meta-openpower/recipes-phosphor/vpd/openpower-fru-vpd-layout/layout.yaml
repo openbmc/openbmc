@@ -11,3 +11,8 @@ ETHERNET:
         VINI,B1: MACAddress
         OPFR,B1: MACAddress
     xyz.openbmc_project.Inventory.Item.Ethernet:
+ETHERNET1:
+    xyz.openbmc_project.Inventory.Item.NetworkInterface:
+        VINI,B1: MACAddress
+        OPFR,B1: MACAddress
+    xyz.openbmc_project.Inventory.Item.Ethernet:

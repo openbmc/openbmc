@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#   Snort Startup Script modified for OpenEmbedded
+# Snort Startup Script modified for OpenEmbedded
 #
 
 # Script variables
@@ -30,16 +30,16 @@ fi
 
 start()
 {
-
     [ -n "$LAN_INTERFACE" ] || return 0
     # Check if log diratory is present. Otherwise, create it.
     if [ ! -d $LOGDIR/$DATE ]; then
-        mkdir -d $LOGDIR/$DATE
+        mkdir -p $LOGDIR/$DATE
         /bin/chown -R $USER:$USER $LOGDIR/$DATE
-    /bin/chmod -R 700 $LOGDIR/$DATE
+        /bin/chmod -R 700 $LOGDIR/$DATE
     fi
 
     /bin/echo "Starting $PROG: "
+
     # Snort parameters
     # -D Run Snort in background (daemon) mode
     # -i <if> Listen on interface <if>
@@ -64,7 +64,7 @@ stop()
         RETURN_VAL=$?
         /bin/echo "$PROG shutdown complete."
         [ -e $DEL_PID ] && rm -f $DEL_PID
-    [ -e $DEL_PID.lck ] && rm -f $DEL_PID.lck
+        [ -e $DEL_PID.lck ] && rm -f $DEL_PID.lck
     else
         /bin/echo "ERROR: PID in $PID file not found."
         RETURN_VAL=1
@@ -72,12 +72,13 @@ stop()
     return $RETURN_VAL
 }
 
-status() {
-        if [ -s $PID ]; then
-                echo "$PROG is running as pid `cat $PID`:"
-        else
-                echo "$PROG is not running."
-        fi
+status()
+{
+    if [ -s $PID ]; then
+        echo "$PROG is running as pid `cat $PID`:"
+    else
+        echo "$PROG is not running."
+    fi
 }
 
 restart()
@@ -89,21 +90,21 @@ restart()
 }
 
 case "$1" in
- start)
-       start
-    ;;
- stop)
-       stop
-    ;;
- status)
-       status
-    ;;
- restart|reload)
-       restart
-    ;;
- *)
-    /bin/echo "Usage: $0 {start|stop|status|restart|reload}"
-    RETURN_VAL=1
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status
+        ;;
+    restart|reload)
+        restart
+        ;;
+    *)
+        /bin/echo "Usage: $0 {start|stop|status|restart|reload}"
+        RETURN_VAL=1
 esac
 
 exit $RETURN_VAL

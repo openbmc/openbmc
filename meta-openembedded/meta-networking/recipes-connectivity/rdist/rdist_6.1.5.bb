@@ -28,6 +28,7 @@ SRC_URI += "file://rdist-6.1.5-linux.patch \
             file://rdist-6.1.5-fix-msgsndnotify-loop.patch \
             file://rdist-6.1.5-bb-build.patch \
             file://rdist-6.1.5-makefile-add-ldflags.patch \
+            file://rdist-6.1.5-fix-parallel-build.patch \
 "
 
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/rdist/files/rdist/"
@@ -40,4 +41,4 @@ inherit autotools-brokensep
 EXTRA_OEMAKE = "BIN_GROUP=root MAN_GROUP=root RDIST_MODE=755 RDISTD_MODE=755 MAN_MODE=644"
 
 # http://errors.yoctoproject.org/Errors/Details/186972/
-EXCLUDE_FROM_WORLD_libc-musl = "1"
+COMPATIBLE_HOST_libc-musl = 'null'

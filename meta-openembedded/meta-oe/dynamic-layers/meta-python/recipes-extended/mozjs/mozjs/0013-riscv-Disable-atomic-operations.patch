@@ -1,0 +1,38 @@
+From 64ad80e6d95871f17be4cd01da15581f41ac0b2b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 27 May 2019 21:10:34 -0700
+Subject: [PATCH] riscv: Disable atomic operations
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ js/src/jit/AtomicOperations.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/js/src/jit/AtomicOperations.h
++++ b/js/src/jit/AtomicOperations.h
+@@ -393,6 +393,8 @@ inline bool AtomicOperations::isLockfree
+ #include "jit/none/AtomicOperations-feeling-lucky.h"
+ #elif defined(__s390__) || defined(__s390x__)
+ #include "jit/none/AtomicOperations-feeling-lucky.h"
++#elif defined(__riscv)
++#include "jit/none/AtomicOperations-feeling-lucky.h"
+ #else
+ #error "No AtomicOperations support provided for this platform"
+ #endif
+--- a/js/src/jit/none/AtomicOperations-feeling-lucky.h
++++ b/js/src/jit/none/AtomicOperations-feeling-lucky.h
+@@ -80,6 +80,14 @@
+ #define GNUC_COMPATIBLE
+ #endif
+ 
++#ifdef __riscv
++#define GNUC_COMPATIBLE
++#ifdef __riscv_xlen == 64
++#define HAS_64BIT_ATOMICS
++#define HAS_64BIT_LOCKFREE
++#endif
++#endif
++
+ // The default implementation tactic for gcc/clang is to use the newer
+ // __atomic intrinsics added for use in C++11 <atomic>.  Where that
+ // isn't available, we use GCC's older __sync functions instead.

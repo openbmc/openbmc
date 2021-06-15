@@ -39,9 +39,9 @@ start() {
     RETVAL=$?
     if [ $RETVAL = 0 ]; then
         touch ${lockfile}
-        echo_success
+        success
     else
-        echo_failure
+        failure
     fi
     echo
     return $RETVAL
@@ -53,9 +53,9 @@ stop() {
     RETVAL=$?
     if [ $RETVAL = 0 ]; then
         rm -f ${lockfile} ${pidfile}
-        echo_success
+        success
     else
-        echo_failure
+        failure
     fi
     echo
     return $RETVAL

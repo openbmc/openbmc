@@ -12,26 +12,22 @@ undefined reference to `__stack_chk_fail_local'
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 ---
- src/Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/Makefile b/src/Makefile
-index eadb336..56ab701 100644
+index 37ae219..22e0c9a 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -3,10 +3,10 @@ includedir=$(prefix)/include
- libdir=$(prefix)/lib
- 
- CFLAGS ?= -g -fomit-frame-pointer -O2
--CFLAGS += -nostdlib -nostartfiles -Wall -I. -fPIC
-+CFLAGS += -Wall -I. -fPIC
+@@ -6,7 +6,7 @@ CFLAGS ?= -g -fomit-frame-pointer -O2
+ CFLAGS += -Wall -I. -fPIC
  SO_CFLAGS=-shared $(CFLAGS)
  L_CFLAGS=$(CFLAGS)
 -LINK_FLAGS=
 +LINK_FLAGS=$(LDFLAGS)
  LINK_FLAGS+=$(LDFLAGS)
+ ENABLE_SHARED ?= 1
  
- soname=libaio.so.1
 -- 
-2.1.4
+2.25.1
 

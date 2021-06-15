@@ -1,4 +1,4 @@
-From e6bd7a1bcfbd3e54efc81fbd7d60d915f9af0632 Mon Sep 17 00:00:00 2001
+From 17e9da8d3c3c69f84e11c0457bd9fb8c4ee4274b Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Tue, 17 Apr 2018 11:35:14 +0200
 Subject: [PATCH] kexec.c: add guard around ENOTSUP
@@ -16,10 +16,10 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/kexec/kexec.c b/kexec/kexec.c
-index 313d9fe..b5a8a1e 100644
+index 32ae56c..0764e85 100644
 --- a/kexec/kexec.c
 +++ b/kexec/kexec.c
-@@ -1501,6 +1501,7 @@ int main(int argc, char *argv[])
+@@ -1517,6 +1517,7 @@ int main(int argc, char *argv[])
  					 */
  				case -EINVAL:
  				case -ENOEXEC:
@@ -27,7 +27,7 @@ index 313d9fe..b5a8a1e 100644
  					 /*
  					  * ENOTSUP can be unsupported image
  					  * type or unsupported PE signature
-@@ -1513,6 +1514,7 @@ int main(int argc, char *argv[])
+@@ -1529,6 +1530,7 @@ int main(int argc, char *argv[])
  					  * kernel bug
  					  */
  				case -ENOTSUP:

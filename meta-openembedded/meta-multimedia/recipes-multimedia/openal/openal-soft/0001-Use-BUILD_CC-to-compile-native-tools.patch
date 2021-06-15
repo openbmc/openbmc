@@ -13,21 +13,19 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  CMakeLists.txt | 5 ++---
  1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 39b80250..d6bdf8ed 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1288,11 +1288,10 @@ FILE(MAKE_DIRECTORY "${NATIVE_BIN_DIR}")
- SET(BIN2H_COMMAND  "${NATIVE_BIN_DIR}bin2h")
- SET(BSINCGEN_COMMAND  "${NATIVE_BIN_DIR}bsincgen")
- ADD_CUSTOM_COMMAND(OUTPUT "${BIN2H_COMMAND}" "${BSINCGEN_COMMAND}"
--    COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" "${NATIVE_SRC_DIR}"
-     COMMAND ${CMAKE_COMMAND} -E remove "${BIN2H_COMMAND}" "${BSINCGEN_COMMAND}"
--    COMMAND ${CMAKE_COMMAND} --build . --config "Release"
-+    COMMAND gcc "${NATIVE_SRC_DIR}bin2h.c" -o "${BIN2H_COMMAND}" -lm
-+    COMMAND gcc "${NATIVE_SRC_DIR}bsincgen.c" -o "${BSINCGEN_COMMAND}" -lm
-     WORKING_DIRECTORY "${NATIVE_BIN_DIR}"
--    DEPENDS "${NATIVE_SRC_DIR}CMakeLists.txt"
-     IMPLICIT_DEPENDS C "${NATIVE_SRC_DIR}bin2h.c"
-                      C "${NATIVE_SRC_DIR}bsincgen.c"
-     VERBATIM
+@@ -1085,11 +1085,10 @@ ELSE()
+     SET(BIN2H_COMMAND  "${NATIVE_BIN_DIR}/bin2h")
+     SET(BSINCGEN_COMMAND  "${NATIVE_BIN_DIR}/bsincgen")
+     ADD_CUSTOM_COMMAND(OUTPUT "${BIN2H_COMMAND}" "${BSINCGEN_COMMAND}"
+-        COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" "${NATIVE_SRC_DIR}"
+         COMMAND ${CMAKE_COMMAND} -E remove "${BIN2H_COMMAND}" "${BSINCGEN_COMMAND}"
+-        COMMAND ${CMAKE_COMMAND} --build . --config "Release"
++        COMMAND gcc "${NATIVE_SRC_DIR}/bin2h.c" -o "${BIN2H_COMMAND}" -lm
++        COMMAND gcc "${NATIVE_SRC_DIR}/bsincgen.c" -o "${BSINCGEN_COMMAND}" -lm
+         WORKING_DIRECTORY "${NATIVE_BIN_DIR}"
+-        DEPENDS "${NATIVE_SRC_DIR}/CMakeLists.txt"
+         IMPLICIT_DEPENDS
+             C "${NATIVE_SRC_DIR}/bin2h.c"
+             C "${NATIVE_SRC_DIR}/bsincgen.c"

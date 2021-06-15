@@ -1,0 +1,27 @@
+From 4694f1ef8bdb40f5aa82597a62f2a8a8a5a38969 Mon Sep 17 00:00:00 2001
+From: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+Date: Thu, 13 Aug 2020 16:56:12 -0700
+Subject: [meta-xilinx-bsp][master-upstream][PATCH] local.conf.sample: PMU_ROM
+ to use pmu-rom.elf from /proj/yocto
+
+Users have to manually copy pmu-rom.elf to DEPLOY_DIR when using runqemu.
+Enable PMU_ROM line within local.conf to use pmu from /proj/yocto/pmu-rom/
+
+Signed-off-by: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+---
+ meta-xilinx-bsp/conf/local.conf.sample | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/meta-xilinx-bsp/conf/local.conf.sample b/meta-xilinx-bsp/conf/local.conf.sample
+index 377a519..5d567af 100644
+--- a/meta-xilinx-bsp/conf/local.conf.sample
++++ b/meta-xilinx-bsp/conf/local.conf.sample
+@@ -231,3 +231,5 @@ PMU_FIRMWARE_IMAGE_NAME = "pmu-firmware-${MACHINE}"
+ # this doesn't mean anything to you.
+ CONF_VERSION = "1"
+ 
++#Enable the below line to use pmu-rom.elf from a specific path
++#PMU_ROM = "/proj/yocto/pmu-rom/pmu-rom.elf"
+-- 
+2.7.4
+

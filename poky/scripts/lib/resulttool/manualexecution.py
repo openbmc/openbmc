@@ -2,27 +2,22 @@
 #
 # Copyright (c) 2018, Intel Corporation.
 #
-# This program is free software; you can redistribute it and/or modify it
-# under the terms and conditions of the GNU General Public License,
-# version 2, as published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
+
 import argparse
 import json
 import os
 import sys
 import datetime
 import re
+import copy
 from oeqa.core.runner import OETestResultJSONHelper
 
 
-def load_json_file(file):
-    with open(file, "r") as f:
-        return json.load(f)
+def load_json_file(f):
+    with open(f, "r") as filedata:
+        return json.load(filedata)
 
 def write_json_file(f, json_data):
     os.makedirs(os.path.dirname(f), exist_ok=True)
@@ -31,9 +26,8 @@ def write_json_file(f, json_data):
 
 class ManualTestRunner(object):
 
-    def _get_testcases(self, file):
-        self.jdata = load_json_file(file)
-        self.test_module = self.jdata[0]['test']['@alias'].split('.', 2)[0]
+    def _get_test_module(self, case_file):
+        return os.path.basename(case_file).split('.')[0]
 
     def _get_input(self, config):
         while True:
@@ -57,23 +51,21 @@ class ManualTestRunner(object):
             print('Only integer index inputs from above available configuration options are allowed. Please try again.')
         return options[output]
 
-    def _create_config(self, config_options):
+    def _get_config(self, config_options, test_module):
         from oeqa.utils.metadata import get_layers
         from oeqa.utils.commands import get_bb_var
         from resulttool.resultutils import store_map
 
         layers = get_layers(get_bb_var('BBLAYERS'))
-        self.configuration = {}
-        self.configuration['LAYERS'] = layers
-        current_datetime = datetime.datetime.now()
-        self.starttime = current_datetime.strftime('%Y%m%d%H%M%S')
-        self.configuration['STARTTIME'] = self.starttime
-        self.configuration['TEST_TYPE'] = 'manual'
-        self.configuration['TEST_MODULE'] = self.test_module
+        configurations = {}
+        configurations['LAYERS'] = layers
+        configurations['STARTTIME'] = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        configurations['TEST_TYPE'] = 'manual'
+        configurations['TEST_MODULE'] = test_module
 
-        extra_config = set(store_map['manual']) - set(self.configuration)
+        extra_config = set(store_map['manual']) - set(configurations)
         for config in sorted(extra_config):
-            avail_config_options = self._get_available_config_options(config_options, self.test_module, config)
+            avail_config_options = self._get_available_config_options(config_options, test_module, config)
             if avail_config_options:
                 print('---------------------------------------------')
                 print('These are available configuration #%s options:' % config)
@@ -89,21 +81,19 @@ class ManualTestRunner(object):
                 print('---------------------------------------------')
                 value_conf = self._get_input('Configuration Value')
                 print('---------------------------------------------\n')
-            self.configuration[config] = value_conf
+            configurations[config] = value_conf
+        return configurations
 
-    def _create_result_id(self):
-        self.result_id = 'manual_%s_%s' % (self.test_module, self.starttime)
-
-    def _execute_test_steps(self, test):
+    def _execute_test_steps(self, case):
         test_result = {}
         print('------------------------------------------------------------------------')
-        print('Executing test case: %s' % test['test']['@alias'])
+        print('Executing test case: %s' % case['test']['@alias'])
         print('------------------------------------------------------------------------')
-        print('You have total %s test steps to be executed.' % len(test['test']['execution']))
+        print('You have total %s test steps to be executed.' % len(case['test']['execution']))
         print('------------------------------------------------------------------------\n')
-        for step, _ in sorted(test['test']['execution'].items(), key=lambda x: int(x[0])):
-            print('Step %s: %s' % (step, test['test']['execution'][step]['action']))
-            expected_output = test['test']['execution'][step]['expected_results']
+        for step, _ in sorted(case['test']['execution'].items(), key=lambda x: int(x[0])):
+            print('Step %s: %s' % (step, case['test']['execution'][step]['action']))
+            expected_output = case['test']['execution'][step]['expected_results']
             if expected_output:
                 print('Expected output: %s' % expected_output)
         while True:
@@ -118,31 +108,37 @@ class ManualTestRunner(object):
                         res = result_types[r]
                         if res == 'FAILED':
                             log_input = input('\nPlease enter the error and the description of the log: (Ex:log:211 Error Bitbake)\n')
-                            test_result.update({test['test']['@alias']: {'status': '%s' % res, 'log': '%s' % log_input}})
+                            test_result.update({case['test']['@alias']: {'status': '%s' % res, 'log': '%s' % log_input}})
                         else:
-                            test_result.update({test['test']['@alias']: {'status': '%s' % res}})
+                            test_result.update({case['test']['@alias']: {'status': '%s' % res}})
                 break
             print('Invalid input!')
         return test_result
 
-    def _create_write_dir(self):
-        basepath = os.environ['BUILDDIR']
-        self.write_dir = basepath + '/tmp/log/manual/'
+    def _get_write_dir(self):
+        return os.environ['BUILDDIR'] + '/tmp/log/manual/'
 
-    def run_test(self, file, config_options_file):
-        self._get_testcases(file)
+    def run_test(self, case_file, config_options_file, testcase_config_file):
+        test_module = self._get_test_module(case_file)
+        cases = load_json_file(case_file)
         config_options = {}
         if config_options_file:
             config_options = load_json_file(config_options_file)
-        self._create_config(config_options)
-        self._create_result_id()
-        self._create_write_dir()
+        configurations = self._get_config(config_options, test_module)
+        result_id = 'manual_%s_%s' % (test_module, configurations['STARTTIME'])
         test_results = {}
-        print('\nTotal number of test cases in this test suite: %s\n' % len(self.jdata))
-        for t in self.jdata:
-            test_result = self._execute_test_steps(t)
+        if testcase_config_file:
+            test_case_config = load_json_file(testcase_config_file)
+            test_case_to_execute = test_case_config['testcases']
+            for case in copy.deepcopy(cases) :
+                if case['test']['@alias'] not in test_case_to_execute:
+                    cases.remove(case)
+
+        print('\nTotal number of test cases in this test suite: %s\n' % len(cases))
+        for c in cases:
+            test_result = self._execute_test_steps(c)
             test_results.update(test_result)
-        return self.configuration, self.result_id, self.write_dir, test_results
+        return configurations, result_id, self._get_write_dir(), test_results
 
     def _get_true_false_input(self, input_message):
         yes_list = ['Y', 'YES']
@@ -156,11 +152,11 @@ class ManualTestRunner(object):
             return False
         return True
 
-    def make_config_option_file(self, logger, manual_case_file, config_options_file):
+    def make_config_option_file(self, logger, case_file, config_options_file):
         config_options = {}
         if config_options_file:
             config_options = load_json_file(config_options_file)
-        new_test_module = os.path.basename(manual_case_file).split('.')[0]
+        new_test_module = self._get_test_module(case_file)
         print('Creating configuration options file for test module: %s' % new_test_module)
         new_config_options = {}
 
@@ -181,19 +177,45 @@ class ManualTestRunner(object):
         if new_config_options:
             config_options[new_test_module] = new_config_options
         if not config_options_file:
-            self._create_write_dir()
-            config_options_file = os.path.join(self.write_dir, 'manual_config_options.json')
+            config_options_file = os.path.join(self._get_write_dir(), 'manual_config_options.json')
         write_json_file(config_options_file, config_options)
         logger.info('Configuration option file created at %s' % config_options_file)
+
+    def make_testcase_config_file(self, logger, case_file, testcase_config_file):
+        if  testcase_config_file:
+            if os.path.exists(testcase_config_file):
+                print('\nTest configuration file with name %s already exists. Please provide a unique file name' % (testcase_config_file))
+                return 0
+
+        if not testcase_config_file:
+            testcase_config_file = os.path.join(self._get_write_dir(), "testconfig_new.json")
+
+        testcase_config = {}
+        cases = load_json_file(case_file)
+        new_test_module = self._get_test_module(case_file)
+        new_testcase_config = {}
+        new_testcase_config['testcases'] = []
+
+        print('\nAdd testcases for this configuration file:')
+        for case in cases:
+            print('\n' + case['test']['@alias'])
+            add_tc_config = self._get_true_false_input('\nDo you want to add this test case to test configuration : (Y)es/(N)o\n')
+            if add_tc_config:
+                new_testcase_config['testcases'].append(case['test']['@alias'])
+        write_json_file(testcase_config_file, new_testcase_config)
+        logger.info('Testcase Configuration file created at %s' % testcase_config_file)
 
 def manualexecution(args, logger):
     testrunner = ManualTestRunner()
     if args.make_config_options_file:
         testrunner.make_config_option_file(logger, args.file, args.config_options_file)
         return 0
-    get_configuration, get_result_id, get_write_dir, get_test_results = testrunner.run_test(args.file, args.config_options_file)
+    if args.make_testcase_config_file:
+        testrunner.make_testcase_config_file(logger, args.file, args.testcase_config_file)
+        return 0
+    configurations, result_id, write_dir, test_results = testrunner.run_test(args.file, args.config_options_file, args.testcase_config_file)
     resultjsonhelper = OETestResultJSONHelper()
-    resultjsonhelper.dump_testresult_file(get_write_dir, get_configuration, get_result_id, get_test_results)
+    resultjsonhelper.dump_testresult_file(write_dir, configurations, result_id, test_results)
     return 0
 
 def register_commands(subparsers):
@@ -207,3 +229,7 @@ def register_commands(subparsers):
                               help='the config options file to import and used as available configuration option selection or make config option file')
     parser_build.add_argument('-m', '--make-config-options-file', action='store_true',
                               help='make the configuration options file based on provided inputs')
+    parser_build.add_argument('-t', '--testcase-config-file', default='',
+                              help='the testcase configuration file to enable user to run a selected set of test case or make a testcase configuration file')
+    parser_build.add_argument('-d', '--make-testcase-config-file', action='store_true',
+                    help='make the testcase configuration file to run a set of test cases based on user selection')

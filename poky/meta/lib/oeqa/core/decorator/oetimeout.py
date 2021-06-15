@@ -1,5 +1,8 @@
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import signal
 from . import OETestDecorator, registerDecorator
@@ -21,5 +24,6 @@ class OETimeout(OETestDecorator):
 
     def tearDownDecorator(self):
         signal.alarm(0)
-        signal.signal(signal.SIGALRM, self.alarmSignal)
-        self.logger.debug("Removed SIGALRM handler")
+        if hasattr(self, 'alarmSignal'):
+            signal.signal(signal.SIGALRM, self.alarmSignal)
+            self.logger.debug("Removed SIGALRM handler")

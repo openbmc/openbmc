@@ -1,5 +1,3 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
 BitBake 'Fetch' implementation for Amazon AWS S3.
 
@@ -13,27 +11,53 @@ The aws tool must be correctly installed and configured prior to use.
 # Based in part on bb.fetch2.wget:
 #    Copyright (C) 2003, 2004  Chris Larson
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # Based on functions from the base bb module, Copyright 2003 Holger Schurig
 
 import os
 import bb
 import urllib.request, urllib.parse, urllib.error
+import re
 from bb.fetch2 import FetchMethod
 from bb.fetch2 import FetchError
 from bb.fetch2 import runfetchcmd
+
+def convertToBytes(value, unit):
+    value = float(value)
+    if (unit == "KiB"):
+        value = value*1024.0;
+    elif (unit == "MiB"):
+        value = value*1024.0*1024.0;
+    elif (unit == "GiB"):
+        value = value*1024.0*1024.0*1024.0;
+    return value
+
+class S3ProgressHandler(bb.progress.LineFilterProgressHandler):
+    """
+    Extract progress information from s3 cp output, e.g.:
+    Completed 5.1 KiB/8.8 GiB (12.0 MiB/s) with 1 file(s) remaining
+    """
+    def __init__(self, d):
+        super(S3ProgressHandler, self).__init__(d)
+        # Send an initial progress event so the bar gets shown
+        self._fire_progress(0)
+
+    def writeline(self, line):
+        percs = re.findall(r'^Completed (\d+.{0,1}\d*) (\w+)\/(\d+.{0,1}\d*) (\w+) (\(.+\)) with\s+', line)
+        if percs:
+            completed = (percs[-1][0])
+            completedUnit = (percs[-1][1])
+            total = (percs[-1][2])
+            totalUnit = (percs[-1][3])
+            completed = convertToBytes(completed, completedUnit)
+            total = convertToBytes(total, totalUnit)
+            progress = (completed/total)*100.0
+            rate = percs[-1][4]
+            self.update(progress, rate)
+            return False
+        return True
+
 
 class S3(FetchMethod):
     """Class to fetch urls via 'aws s3'"""
@@ -65,7 +89,9 @@ class S3(FetchMethod):
 
         cmd = '%s cp s3://%s%s %s' % (ud.basecmd, ud.host, ud.path, ud.localpath)
         bb.fetch2.check_network_access(d, cmd, ud.url)
-        runfetchcmd(cmd, d)
+
+        progresshandler = S3ProgressHandler(d)
+        runfetchcmd(cmd, d, False, log=progresshandler)
 
         # Additional sanity checks copied from the wget class (although there
         # are no known issues which mean these are required, treat the aws cli

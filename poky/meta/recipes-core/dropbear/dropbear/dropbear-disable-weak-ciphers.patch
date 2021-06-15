@@ -1,0 +1,35 @@
+From c347ece05a7fdbf50d76cb136b9ed45caed333f6 Mon Sep 17 00:00:00 2001
+From: Joseph Reynolds <joseph.reynolds1@ibm.com>
+Date: Thu, 20 Jun 2019 16:29:15 -0500
+Subject: [PATCH] dropbear: new feature: disable-weak-ciphers
+
+This feature disables all CBC, SHA1, and diffie-hellman group1 ciphers
+in the dropbear ssh server and client since they're considered weak ciphers
+and we want to support the stong algorithms.
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Joseph Reynolds <joseph.reynolds1@ibm.com>
+
+---
+ default_options.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/default_options.h b/default_options.h
+index 1aa2297..7ff1394 100644
+--- a/default_options.h
++++ b/default_options.h
+@@ -163,12 +163,12 @@ IMPORTANT: Some options will require "make clean" after changes */
+  * Small systems should generally include either curve25519 or ecdh for performance.
+  * curve25519 is less widely supported but is faster
+  */ 
+-#define DROPBEAR_DH_GROUP14_SHA1 1
++#define DROPBEAR_DH_GROUP14_SHA1 0
+ #define DROPBEAR_DH_GROUP14_SHA256 1
+ #define DROPBEAR_DH_GROUP16 0
+ #define DROPBEAR_CURVE25519 1
+ #define DROPBEAR_ECDH 1
+-#define DROPBEAR_DH_GROUP1 1
++#define DROPBEAR_DH_GROUP1 0
+ 
+ /* When group1 is enabled it will only be allowed by Dropbear client
+ not as a server, due to concerns over its strength. Set to 0 to allow

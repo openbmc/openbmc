@@ -1,0 +1,33 @@
+{
+  "name": "Custom serial connector",
+  "devices": [
+    {
+      "name": "CustomSerialDevice1",
+      "type": "default",
+      "port": "/dev/ttyUSB0",
+      "baudrate": 9600,
+      "converter": "CustomSerialUplinkConverter",
+      "telemetry": [
+        {
+          "type": "byte",
+          "key": "humidity",
+          "untilDelimiter": "\r"
+        }
+      ],
+      "attributes":[
+        {
+          "key": "SerialNumber",
+          "type": "string",
+          "fromByte": 4,
+          "toByte": -1
+        }
+      ],
+      "attributeUpdates": [
+        {
+          "attributeOnThingsBoard": "attr1",
+          "stringToDevice": "value = ${attr1}\n"
+        }
+      ]
+    }
+  ]
+}

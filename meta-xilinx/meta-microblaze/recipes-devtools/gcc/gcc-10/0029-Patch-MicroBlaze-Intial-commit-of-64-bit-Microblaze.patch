@@ -1,0 +1,845 @@
+From 1a7fda96cb247bad0a4df61cd8fd3e65c0e6f35d Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 10 Nov 2020 12:52:54 +0530
+Subject: [PATCH 29/54] [Patch,MicroBlaze]: Intial commit of 64-bit Microblaze
+
+---
+ gcc/config/microblaze/constraints.md      |   6 +
+ gcc/config/microblaze/microblaze-protos.h |   1 +
+ gcc/config/microblaze/microblaze.c        | 109 ++++--
+ gcc/config/microblaze/microblaze.h        |   4 +-
+ gcc/config/microblaze/microblaze.md       | 395 +++++++++++++++++++++-
+ gcc/config/microblaze/microblaze.opt      |   7 +-
+ gcc/config/microblaze/t-microblaze        |   7 +-
+ 7 files changed, 492 insertions(+), 37 deletions(-)
+
+diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
+index b9fc6e3fae2..123395717e0 100644
+--- a/gcc/config/microblaze/constraints.md
++++ b/gcc/config/microblaze/constraints.md
+@@ -52,6 +52,12 @@
+   (and (match_code "const_int")
+        (match_test "ival > 0 && ival < 0x10000")))
+ 
++(define_constraint "K"
++  "A constant in the range 0xffffff8000000000L  to 0x0000007fffffffffL (inclusive)."
++  (and (match_code "const_int")
++       (match_test "ival > (long)0xffffff8000000000L && ival < (long)0x0000007fffffffffL")))
++
++
+ ;; Define floating point constraints
+ 
+ (define_constraint "G"
+diff --git a/gcc/config/microblaze/microblaze-protos.h b/gcc/config/microblaze/microblaze-protos.h
+index c2f88813a8d..460feac4ac5 100644
+--- a/gcc/config/microblaze/microblaze-protos.h
++++ b/gcc/config/microblaze/microblaze-protos.h
+@@ -36,6 +36,7 @@ extern void microblaze_expand_divide (rtx *);
+ extern void microblaze_expand_conditional_branch (enum machine_mode, rtx *);
+ extern void microblaze_expand_conditional_branch_reg (machine_mode, rtx *);
+ extern void microblaze_expand_conditional_branch_sf (rtx *); 
++extern void microblaze_expand_conditional_branch_df (rtx *); 
+ extern int microblaze_can_use_return_insn (void);
+ extern void print_operand (FILE *, rtx, int);
+ extern void print_operand_address (FILE *, rtx);
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 451db9c79b0..99a1cd5c0be 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -3432,11 +3432,11 @@ microblaze_expand_move (machine_mode mode, rtx operands[])
+   op0 = operands[0];
+   op1 = operands[1];
+ 
+-  if (!register_operand (op0, SImode)
+-      && !register_operand (op1, SImode)
++  if (!register_operand (op0, mode)
++      && !register_operand (op1, mode)
+       && (GET_CODE (op1) != CONST_INT || INTVAL (op1) != 0))
+     {
+-      rtx temp = force_reg (SImode, op1);
++      rtx temp = force_reg (mode, op1);
+       emit_move_insn (op0, temp);
+       return true;
+     }
+@@ -3501,12 +3501,12 @@ microblaze_expand_move (machine_mode mode, rtx operands[])
+ 	          && (flag_pic == 2 || microblaze_tls_symbol_p (p0)
+ 		      || !SMALL_INT (p1)))))
+ 	{
+-	  rtx temp = force_reg (SImode, p0);
++	  rtx temp = force_reg (mode, p0);
+ 	  rtx temp2 = p1;
+ 
+ 	  if (flag_pic && reload_in_progress)
+ 	    df_set_regs_ever_live (PIC_OFFSET_TABLE_REGNUM, true);
+-	  emit_move_insn (op0, gen_rtx_PLUS (SImode, temp, temp2));
++	  emit_move_insn (op0, gen_rtx_PLUS (mode, temp, temp2));
+ 	  return true;
+ 	}
+     }
+@@ -3637,7 +3637,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
+   rtx cmp_op0 = operands[1];
+   rtx cmp_op1 = operands[2];
+   rtx label1 = operands[3];
+-  rtx comp_reg = gen_reg_rtx (SImode);
++  rtx comp_reg = gen_reg_rtx (mode);
+   rtx condition;
+ 
+   gcc_assert ((GET_CODE (cmp_op0) == REG) || (GET_CODE (cmp_op0) == SUBREG));
+@@ -3646,23 +3646,36 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
+   if (cmp_op1 == const0_rtx)
+     {
+       comp_reg = cmp_op0;
+-      condition = gen_rtx_fmt_ee (signed_condition (code), SImode, comp_reg, const0_rtx);
+-      emit_jump_insn (gen_condjump (condition, label1));
++      condition = gen_rtx_fmt_ee (signed_condition (code), mode, comp_reg, const0_rtx);
++      if (mode == SImode)
++        emit_jump_insn (gen_condjump (condition, label1));
++      else
++        emit_jump_insn (gen_long_condjump (condition, label1));
++
+     }
+ 
+   else if (code == EQ || code == NE)
+     {
+       /* Use xor for equal/not-equal comparison.  */
+-      emit_insn (gen_xorsi3 (comp_reg, cmp_op0, cmp_op1));
+-      condition = gen_rtx_fmt_ee (signed_condition (code), SImode, comp_reg, const0_rtx);
+-      emit_jump_insn (gen_condjump (condition, label1));
++      if (mode == SImode)
++        emit_insn (gen_xorsi3 (comp_reg, cmp_op0, cmp_op1));
++      else
++        emit_insn (gen_xordi3 (comp_reg, cmp_op0, cmp_op1));
++      condition = gen_rtx_fmt_ee (signed_condition (code), mode, comp_reg, const0_rtx);
++      if (mode == SImode)
++        emit_jump_insn (gen_condjump (condition, label1));
++      else
++        emit_jump_insn (gen_long_condjump (condition, label1));
+     }
+   else
+     {
+       /* Generate compare and branch in single instruction. */
+       cmp_op1 = force_reg (mode, cmp_op1);
+       condition = gen_rtx_fmt_ee (code, mode, cmp_op0, cmp_op1);
+-      emit_jump_insn (gen_branch_compare(condition, cmp_op0, cmp_op1, label1));
++      if (mode == SImode)
++        emit_jump_insn (gen_branch_compare(condition, cmp_op0, cmp_op1, label1));
++      else
++        emit_jump_insn (gen_long_branch_compare(condition, cmp_op0, cmp_op1, label1));
+     }
+ }
+ 
+@@ -3673,7 +3686,7 @@ microblaze_expand_conditional_branch_reg (machine_mode mode, rtx operands[])
+   rtx cmp_op0 = operands[1];
+   rtx cmp_op1 = operands[2];
+   rtx label1 = operands[3];
+-  rtx comp_reg = gen_reg_rtx (SImode);
++  rtx comp_reg = gen_reg_rtx (mode);
+   rtx condition;
+ 
+   gcc_assert ((GET_CODE (cmp_op0) == REG)
+@@ -3684,30 +3697,63 @@ microblaze_expand_conditional_branch_reg (machine_mode mode, rtx operands[])
+     {
+       comp_reg = cmp_op0;
+       condition = gen_rtx_fmt_ee (signed_condition (code),
+-                                  SImode, comp_reg, const0_rtx);
+-      emit_jump_insn (gen_condjump (condition, label1));
++                                  mode, comp_reg, const0_rtx);
++      if (mode == SImode)
++        emit_jump_insn (gen_condjump (condition, label1));
++      else
++        emit_jump_insn (gen_long_condjump (condition, label1));
+     }
+   else if (code == EQ)
+     {
+-      emit_insn (gen_seq_internal_pat (comp_reg,
+-                                       cmp_op0, cmp_op1));
+-      condition = gen_rtx_EQ (SImode, comp_reg, const0_rtx);
+-      emit_jump_insn (gen_condjump (condition, label1));
++      if (mode == SImode)
++        {
++          emit_insn (gen_seq_internal_pat (comp_reg, cmp_op0,
++                                           cmp_op1));
++	}
++      else
++        {
++          emit_insn (gen_seq_internal_pat (comp_reg, cmp_op0,
++                                           cmp_op1));
++	}
++      condition = gen_rtx_EQ (mode, comp_reg, const0_rtx);
++      if (mode == SImode)
++        emit_jump_insn (gen_condjump (condition, label1));
++      else
++        emit_jump_insn (gen_long_condjump (condition, label1));
++ 
+     }
+   else if (code == NE)
+     {
+-      emit_insn (gen_sne_internal_pat (comp_reg, cmp_op0,
+-                                       cmp_op1));
+-      condition = gen_rtx_NE (SImode, comp_reg, const0_rtx);
+-      emit_jump_insn (gen_condjump (condition, label1));
++      if (mode == SImode)
++        {
++          emit_insn (gen_sne_internal_pat (comp_reg, cmp_op0,
++                                           cmp_op1));
++	}
++      else
++        {
++          emit_insn (gen_sne_internal_pat (comp_reg, cmp_op0,
++                                           cmp_op1));
++	}
++      condition = gen_rtx_NE (mode, comp_reg, const0_rtx);
++      if (mode == SImode)
++        emit_jump_insn (gen_condjump (condition, label1));
++      else
++        emit_jump_insn (gen_long_condjump (condition, label1));
+     }
+   else
+     {
+       /* Generate compare and branch in single instruction. */
+       cmp_op1 = force_reg (mode, cmp_op1);
+       condition = gen_rtx_fmt_ee (code, mode, cmp_op0, cmp_op1);
+-      emit_jump_insn (gen_branch_compare (condition, cmp_op0,
+-                                         cmp_op1, label1));
++      if (mode == SImode)
++        emit_jump_insn (gen_branch_compare (condition, cmp_op0,
++                                           cmp_op1, label1));
++      else 
++	{
++          emit_jump_insn (gen_long_branch_compare (condition, cmp_op0,
++                                             cmp_op1, label1));
++        }	
++
+     }
+ }
+ 
+@@ -3724,6 +3770,19 @@ microblaze_expand_conditional_branch_sf (rtx operands[])
+   emit_jump_insn (gen_condjump (condition, operands[3]));
+ }
+ 
++void
++microblaze_expand_conditional_branch_df (rtx operands[])
++{
++  rtx condition;
++  rtx cmp_op0 = XEXP (operands[0], 0);
++  rtx cmp_op1 = XEXP (operands[0], 1);
++  rtx comp_reg = gen_reg_rtx (DImode);
++
++  emit_insn (gen_cstoredf4 (comp_reg, operands[0], cmp_op0, cmp_op1));
++  condition = gen_rtx_NE (DImode, comp_reg, const0_rtx);
++  emit_jump_insn (gen_long_condjump (condition, operands[3]));
++}
++
+ /* Implement TARGET_FRAME_POINTER_REQUIRED.  */
+ 
+ static bool
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 857cb1cd9d0..c0358603380 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -102,6 +102,7 @@ extern enum pipeline_type microblaze_pipe;
+ #define ASM_SPEC "\
+ %(target_asm_spec) \
+ %{mbig-endian:-EB} \
++%{m64:-m64} \
+ %{mlittle-endian:-EL}"
+ 
+ /* Extra switches sometimes passed to the linker.  */
+@@ -110,6 +111,7 @@ extern enum pipeline_type microblaze_pipe;
+ #define LINK_SPEC "%{shared:-shared} -N -relax \
+   %{mbig-endian:-EB --oformat=elf32-microblaze} \
+   %{mlittle-endian:-EL --oformat=elf32-microblazeel} \
++  %{m64:-EL --oformat=elf64-microblazeel} \
+   %{Zxl-mode-xmdstub:-defsym _TEXT_START_ADDR=0x800} \
+   %{mxl-mode-xmdstub:-defsym _TEXT_START_ADDR=0x800} \
+   %{mxl-gp-opt:%{G*}} %{!mxl-gp-opt: -G 0} \
+@@ -217,7 +219,7 @@ extern enum pipeline_type microblaze_pipe;
+ #define MIN_UNITS_PER_WORD      4
+ #define INT_TYPE_SIZE           32
+ #define SHORT_TYPE_SIZE         16
+-#define LONG_TYPE_SIZE          32
++#define LONG_TYPE_SIZE          64
+ #define LONG_LONG_TYPE_SIZE     64
+ #define FLOAT_TYPE_SIZE         32
+ #define DOUBLE_TYPE_SIZE        64
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 7695b105baa..4d8429d9a90 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -497,7 +497,6 @@
+   (set_attr "mode"      "SF")
+   (set_attr "length"    "4")])
+ 
+-
+ (define_insn "divsf3"
+   [(set (match_operand:SF 0 "register_operand" "=d")
+         (div:SF (match_operand:SF 1 "register_operand" "d")
+@@ -508,6 +507,7 @@
+   (set_attr "mode"      "SF")
+   (set_attr "length"    "4")])
+ 
++
+ (define_insn "sqrtsf2"
+   [(set (match_operand:SF 0 "register_operand" "=d")
+         (sqrt:SF (match_operand:SF 1 "register_operand" "d")))]
+@@ -562,6 +562,18 @@
+ 
+ ;; Adding 2 DI operands in register or reg/imm
+ 
++(define_insn "adddi3_long"
++  [(set (match_operand:DI 0 "register_operand" "=d,d")
++	(plus:DI (match_operand:DI 1 "reg_or_0_operand" "%dJ,dJ")
++		 (match_operand:DI 2 "arith_plus_operand" "d,K")))]
++  "TARGET_MB_64"
++  "@
++   addlk\t%0,%z1,%2
++   addlik\t%0,%z1,%2"
++  [(set_attr "type"	"arith,arith")
++  (set_attr "mode"	"DI,DI")
++  (set_attr "length"	"4,4")])
++
+ (define_insn "adddi3"
+   [(set (match_operand:DI 0 "register_operand" "=d,d")
+ 	(plus:DI (match_operand:DI 1 "register_operand" "%d,d")
+@@ -606,6 +618,18 @@
+ ;; Double Precision Subtraction
+ ;;----------------------------------------------------------------
+ 
++(define_insn "subdi3_long"
++  [(set (match_operand:DI 0 "register_operand" "=d,d")
++	(minus:DI (match_operand:DI 1 "register_operand" "d,d")
++		  (match_operand:DI 2 "register_operand" "d,n")))]
++  "TARGET_MB_64"
++  "@
++   rsubl\t%0,%2,%1
++   addlik\t%0,%z1,-%2"
++  [(set_attr "type"	"darith")
++  (set_attr "mode"	"DI,DI")
++  (set_attr "length"	"4,4")])
++
+ (define_insn "subdi3"
+   [(set (match_operand:DI 0 "register_operand" "=&d")
+ 	(minus:DI (match_operand:DI 1 "register_operand" "d")
+@@ -795,6 +819,15 @@
+   (set_attr "mode"	"SI")
+   (set_attr "length"	"4")])
+ 
++(define_insn "negdi2_long"
++  [(set (match_operand:DI 0 "register_operand" "=d")
++	(neg:DI (match_operand:DI 1 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "rsubl\t%0,%1,r0"
++  [(set_attr "type"	"darith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"4")])
++
+ (define_insn "negdi2"
+   [(set (match_operand:DI 0 "register_operand" "=d")
+ 	(neg:DI (match_operand:DI 1 "register_operand" "d")))]
+@@ -814,6 +847,15 @@
+   (set_attr "mode"	"SI")
+   (set_attr "length"	"4")])
+ 
++(define_insn "one_cmpldi2_long"
++  [(set (match_operand:DI 0 "register_operand" "=d")
++	(not:DI (match_operand:DI 1 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "xorli\t%0,%1,-1"
++  [(set_attr "type"	"arith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"4")])
++
+ (define_insn "*one_cmpldi2"
+   [(set (match_operand:DI 0 "register_operand" "=d")
+ 	(not:DI (match_operand:DI 1 "register_operand" "d")))]
+@@ -840,6 +882,20 @@
+ ;; Logical
+ ;;----------------------------------------------------------------
+ 
++(define_insn "anddi3"
++  [(set (match_operand:DI 0 "register_operand" "=d,d")
++	(and:DI (match_operand:DI 1 "arith_operand" "d,d")
++		(match_operand:DI 2 "arith_operand" "d,K")))]
++  "TARGET_MB_64"
++  "@
++   andl\t%0,%1,%2
++   andli\t%0,%1,%2 #andl1"
++  ;; andli\t%0,%1,%2 #andl3
++  ;; andli\t%0,%1,%2 #andl2
++  [(set_attr "type"	"arith,arith")
++  (set_attr "mode"	"DI,DI")
++  (set_attr "length"	"4,4")])
++
+ (define_insn "andsi3"
+   [(set (match_operand:SI 0 "register_operand" "=d,d,d,d")
+ 	(and:SI (match_operand:SI 1 "arith_operand" "%d,d,d,d")
+@@ -855,6 +911,18 @@
+   (set_attr "length"	"4,8,8,8")])
+ 
+ 
++(define_insn "iordi3"
++  [(set (match_operand:DI 0 "register_operand" "=d,d")
++	(ior:DI (match_operand:DI 1 "arith_operand" "d,d")
++		(match_operand:DI 2 "arith_operand" "d,K")))]
++  "TARGET_MB_64"
++  "@
++   orl\t%0,%1,%2
++   orli\t%0,%1,%2 #andl1"
++  [(set_attr "type"	"arith,arith")
++  (set_attr "mode"	"DI,DI")
++  (set_attr "length"	"4,4")])
++
+ (define_insn "iorsi3"
+   [(set (match_operand:SI 0 "register_operand" "=d,d,d,d")
+ 	(ior:SI (match_operand:SI 1 "arith_operand" "%d,d,d,d")
+@@ -869,6 +937,19 @@
+   (set_attr "mode"	"SI,SI,SI,SI")
+   (set_attr "length"	"4,8,8,8")])
+ 
++(define_insn "xordi3"
++  [(set (match_operand:DI 0 "register_operand" "=d,d")
++	(xor:DI (match_operand:DI 1 "arith_operand" "%d,d")
++		(match_operand:DI 2 "arith_operand" "d,K")))]
++  "TARGET_MB_64"
++  "@
++   xorl\t%0,%1,%2
++   xorli\t%0,%1,%2 #andl1"
++  [(set_attr "type"	"arith,arith")
++  (set_attr "mode"	"DI,DI")
++  (set_attr "length"	"4,4")])
++
++
+ (define_insn "xorsi3"
+   [(set (match_operand:SI 0 "register_operand" "=d,d,d")
+ 	(xor:SI (match_operand:SI 1 "arith_operand" "%d,d,d")
+@@ -937,6 +1018,26 @@
+   (set_attr "mode"	"SI")
+   (set_attr "length"	"4")])
+ 
++;;(define_expand "extendqidi2"
++;;  [(set (match_operand:DI 0 "register_operand" "=d")
++;;        (sign_extend:DI (match_operand:QI 1 "general_operand" "d")))]
++;;  "TARGET_MB_64"
++;;  {
++;;	if (GET_CODE (operands[1]) != REG)
++;;	FAIL;
++;;   }
++;;)
++    
++
++;;(define_insn "extendqidi2"
++;;  [(set (match_operand:DI 0 "register_operand" "=d")
++;;	(sign_extend:DI (match_operand:QI 1 "register_operand" "d")))]
++;;  "TARGET_MB_64"
++;;  "sextl8\t%0,%1"
++;;  [(set_attr "type"	"arith")
++;;  (set_attr "mode"	"DI")
++;;  (set_attr "length"	"4")])
++
+ (define_insn "extendhisi2"
+   [(set (match_operand:SI 0 "register_operand" "=d")
+ 	(sign_extend:SI (match_operand:HI 1 "register_operand" "d")))]
+@@ -946,6 +1047,16 @@
+   (set_attr "mode"	"SI")
+   (set_attr "length"	"4")])
+ 
++(define_insn "extendhidi2"
++  [(set (match_operand:DI 0 "register_operand" "=d")
++	(sign_extend:DI (match_operand:HI 1 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "sextl16\t%0,%1"
++  [(set_attr "type"	"arith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"4")])
++
++
+ ;; Those for integer source operand are ordered
+ ;; widest source type first.
+ 
+@@ -1011,6 +1122,32 @@
+ )
+ 
+ 
++(define_insn "*movdi_internal_64"
++  [(set (match_operand:DI 0 "nonimmediate_operand" "=d,d,d,d,d,R,o")
++	(match_operand:DI 1 "general_operand"      " d,K,J,R,o,d,d"))]
++  "TARGET_MB_64 && (INTVAL(operands[1]) < 0x7fffffffff) && (INTVAL(operands[1]) > 0xffffff8000000000)"
++  { 
++    switch (which_alternative)
++    {
++      case 0:
++        return "addlk\t%0,%1";
++      case 1:
++	return "addlik\t%0,r0,%1";
++      case 2:
++	  return "addlk\t%0,r0,r0";
++      case 3:
++      case 4:
++	  return "lli\t%0,%1";
++      case 5:
++      case 6:
++        return "sli\t%1,%0";
++    }
++    return "unreachable";
++  }
++  [(set_attr "type"	"no_delay_move,no_delay_arith,no_delay_arith,no_delay_load,no_delay_load,no_delay_store,no_delay_store")
++  (set_attr "mode"	"DI")
++  (set_attr "length"   "8,8,8,8,12,8,12")])
++
+ 
+ (define_insn "*movdi_internal"
+   [(set (match_operand:DI 0 "nonimmediate_operand" "=d,d,d,d,d,R,o")
+@@ -1423,6 +1560,36 @@
+   (set_attr "length"	"4,4")]
+ )
+ 
++;; Barrel shift left
++(define_expand "ashldi3"
++  [(set (match_operand:DI 0 "register_operand" "=&d")
++	(ashift:DI (match_operand:DI 1 "register_operand" "d")
++                   (match_operand:DI 2 "arith_operand"    "")))]
++"TARGET_MB_64"
++{
++;;if (CONST_INT_P (operands[2]) && INTVAL (operands[2]) > 0 && INTVAL (operands[2]) < 65)
++if (INTVAL (operands[2]) > 0 && INTVAL (operands[2]) < 65)
++  {
++    emit_insn(gen_ashldi3_long (operands[0], operands[1],operands[2]));
++    DONE;
++  }
++else
++  FAIL;
++}    
++)
++
++(define_insn "ashldi3_long"
++  [(set (match_operand:DI 0 "register_operand" "=d,d")
++	(ashift:DI (match_operand:DI 1 "register_operand" "d,d")
++                   (match_operand:DI 2 "arith_operand"    "I,d")))]
++  "TARGET_MB_64"
++  "@
++  bsllli\t%0,%1,%2
++  bslll\t%0,%1,%2"
++  [(set_attr "type"	"bshift,bshift")
++  (set_attr "mode"	"DI,DI")
++  (set_attr "length"	"4,4")]
++)
+ ;; The following patterns apply when there is no barrel shifter present
+ 
+ (define_insn "*ashlsi3_with_mul_delay"
+@@ -1548,6 +1715,36 @@
+ ;;----------------------------------------------------------------
+ ;; 32-bit right shifts
+ ;;----------------------------------------------------------------
++;; Barrel shift left
++(define_expand "ashrdi3"
++  [(set (match_operand:DI 0 "register_operand" "=&d")
++	(ashiftrt:DI (match_operand:DI 1 "register_operand" "d")
++                   (match_operand:DI 2 "arith_operand"    "")))]
++"TARGET_MB_64"
++{
++;;if (CONST_INT_P (operands[2]) && INTVAL (operands[2]) > 0 && INTVAL (operands[2]) < 65)
++if (INTVAL (operands[2]) > 0 && INTVAL (operands[2]) < 65)
++  {
++    emit_insn(gen_ashrdi3_long (operands[0], operands[1],operands[2]));
++    DONE;
++  }
++else
++  FAIL;
++}    
++)
++
++(define_insn "ashrdi3_long"
++  [(set (match_operand:DI 0 "register_operand" "=d,d")
++	(ashiftrt:DI (match_operand:DI 1 "register_operand" "d,d")
++                   (match_operand:DI 2 "arith_operand"    "I,d")))]
++  "TARGET_MB_64"
++  "@
++   bslrai\t%0,%1,%2
++   bslra\t%0,%1,%2"
++  [(set_attr "type"	"bshift,bshift")
++  (set_attr "mode"	"DI,DI")
++  (set_attr "length"	"4,4")]
++  )
+ (define_expand "ashrsi3"
+   [(set (match_operand:SI 0 "register_operand" "=&d")
+ 	(ashiftrt:SI (match_operand:SI 1 "register_operand" "d")
+@@ -1657,6 +1854,36 @@
+ ;;----------------------------------------------------------------
+ ;; 32-bit right shifts (logical)
+ ;;----------------------------------------------------------------
++;; Barrel shift left
++(define_expand "lshrdi3"
++  [(set (match_operand:DI 0 "register_operand" "=&d")
++	(lshiftrt:DI (match_operand:DI 1 "register_operand" "d")
++                   (match_operand:DI 2 "arith_operand"    "")))]
++"TARGET_MB_64"
++{
++;;if (CONST_INT_P (operands[2]) && INTVAL (operands[2]) > 0 && INTVAL (operands[2]) < 65)
++if (INTVAL (operands[2]) > 0 && INTVAL (operands[2]) < 65)
++  {
++    emit_insn(gen_lshrdi3_long (operands[0], operands[1],operands[2]));
++    DONE;
++  }
++else
++  FAIL;
++}    
++)
++
++(define_insn "lshrdi3_long"
++  [(set (match_operand:DI 0 "register_operand" "=d,d")
++	(lshiftrt:DI (match_operand:DI 1 "register_operand" "d,d")
++                   (match_operand:DI 2 "arith_operand"    "I,d")))]
++  "TARGET_MB_64"
++  "@
++   bslrli\t%0,%1,%2
++   bslrl\t%0,%1,%2"
++  [(set_attr "type"	"bshift,bshift")
++  (set_attr "mode"	"DI,DI")
++  (set_attr "length"	"4,4")]
++  )
+ 
+ (define_expand "lshrsi3"
+   [(set (match_operand:SI 0 "register_operand" "=&d")
+@@ -1803,6 +2030,8 @@
+   (set_attr "length"	"4")]
+ )              
+ 
++
++
+ ;;----------------------------------------------------------------
+ ;; Setting a register from an floating point comparison. 
+ ;;----------------------------------------------------------------
+@@ -1818,6 +2047,18 @@
+    (set_attr "length"    "4")]
+ )
+ 
++(define_insn "cstoredf4"
++   [(set (match_operand:DI 0 "register_operand" "=r")
++        (match_operator:DI 1 "ordered_comparison_operator"
++	      [(match_operand:DF 2 "register_operand" "r")
++	       (match_operand:DF 3 "register_operand" "r")]))]
++  "TARGET_MB_64"
++  "dcmp.%C1\t%0,%3,%2"
++  [(set_attr "type"     "fcmp")
++   (set_attr "mode"      "DF")
++   (set_attr "length"    "4")]
++)
++
+ ;;----------------------------------------------------------------
+ ;; Conditional branches
+ ;;----------------------------------------------------------------
+@@ -1930,6 +2171,115 @@
+    (set_attr "length"   "12")]
+ )
+ 
++
++(define_expand "cbranchdi4"
++  [(set (pc)
++        (if_then_else (match_operator 0 "ordered_comparison_operator"
++                       [(match_operand:DI 1 "register_operand")
++                        (match_operand:DI 2 "arith_operand" "I,i")])
++                      (label_ref (match_operand 3 ""))
++                      (pc)))]
++  "TARGET_MB_64"
++{
++  microblaze_expand_conditional_branch (DImode, operands);
++  DONE;
++})
++
++(define_expand "cbranchdi4_reg"
++  [(set (pc)
++        (if_then_else (match_operator 0 "ordered_comparison_operator"
++                       [(match_operand:DI 1 "register_operand")
++                        (match_operand:DI 2 "register_operand")])
++                      (label_ref (match_operand 3 ""))
++                      (pc)))]
++  "TARGET_MB_64"
++{
++  microblaze_expand_conditional_branch_reg (DImode, operands);
++  DONE;
++})
++
++(define_expand "cbranchdf4"
++  [(set (pc)
++	(if_then_else (match_operator 0 "ordered_comparison_operator"
++		       [(match_operand:DF 1 "register_operand")
++		        (match_operand:DF 2 "register_operand")])
++		      (label_ref (match_operand 3 ""))
++		      (pc)))]
++  "TARGET_MB_64"
++{
++  microblaze_expand_conditional_branch_df (operands);
++  DONE;
++
++})
++
++;; Used to implement comparison instructions
++(define_expand "long_condjump"
++  [(set (pc)
++	(if_then_else (match_operand 0)
++		      (label_ref (match_operand 1))
++		      (pc)))])
++
++(define_insn "long_branch_zero"
++  [(set (pc)
++	(if_then_else (match_operator:DI 0 "ordered_comparison_operator"
++  				 [(match_operand:DI 1 "register_operand" "d")
++                                  (const_int 0)])
++                      (match_operand:DI 2 "pc_or_label_operand" "")
++                      (match_operand:DI 3 "pc_or_label_operand" "")))
++  ]
++  "TARGET_MB_64"
++  {
++    if (operands[3] == pc_rtx) 
++      return "beal%C0i%?\t%z1,%2";
++    else 
++      return "beal%N0i%?\t%z1,%3";
++  }
++  [(set_attr "type"	"branch")
++   (set_attr "mode"	"none")
++   (set_attr "length"	"4")]
++)
++
++(define_insn "long_branch_compare"
++  [(set (pc)
++        (if_then_else (match_operator:DI 0 "cmp_op"
++                                         [(match_operand:DI 1 "register_operand" "d")
++                                          (match_operand:DI 2 "register_operand" "d")
++                                         ])
++                      (label_ref (match_operand 3))
++                      (pc)))
++  (clobber(reg:DI R_TMP))]
++  "TARGET_MB_64"
++  {
++    operands[4] = gen_rtx_REG (DImode, MB_ABI_ASM_TEMP_REGNUM);
++    enum rtx_code code = GET_CODE (operands[0]);
++
++    if (code == GT || code == LE)
++      {
++        output_asm_insn ("cmpl\tr18,%z1,%z2", operands);
++        code = swap_condition (code);
++      }
++    else if (code == GTU || code == LEU)
++      {
++        output_asm_insn ("cmplu\tr18,%z1,%z2", operands);
++        code = swap_condition (code);
++      }
++    else if (code == GE || code == LT)
++      {
++        output_asm_insn ("cmpl\tr18,%z2,%z1", operands);
++      }
++    else if (code == GEU || code == LTU)
++      {
++        output_asm_insn ("cmplu\tr18,%z2,%z1", operands);
++      }
++
++    operands[0] = gen_rtx_fmt_ee (signed_condition (code), DImode, operands[4], const0_rtx);
++    return "beal%C0i%?\tr18,%3";
++  }
++  [(set_attr "type"     "branch")
++   (set_attr "mode"     "none")
++   (set_attr "length"   "12")]
++)
++
+ ;;----------------------------------------------------------------
+ ;; Unconditional branches
+ ;;----------------------------------------------------------------
+@@ -2478,17 +2828,33 @@
+   DONE;
+ }")
+ 
+-(define_expand "extzvsi"
++(define_expand "extvsi"
+   [(set (match_operand:SI 0 "register_operand" "r")
+ 	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
+ 			 (match_operand:SI 2 "immediate_operand" "I")
+ 			 (match_operand:SI 3 "immediate_operand" "I")))]
+ "TARGET_HAS_BITFIELD"
+-""
+-)
+-
++"
++{
++  unsigned HOST_WIDE_INT len = UINTVAL (operands[2]);
++  unsigned HOST_WIDE_INT pos = UINTVAL (operands[3]);
++
++  if ((len == 0) || (pos + len > 32) )
++    FAIL;
++
++  ;;if (!register_operand (operands[1], VOIDmode))
++  ;;  FAIL;
++  if (operands[0] == operands[1])
++  FAIL;
++  if (GET_CODE (operands[1]) == ASHIFT)
++  FAIL;
++;;  operands[2] = GEN_INT(INTVAL(operands[2])+1 );
++ emit_insn (gen_extv_32 (operands[0], operands[1],
++			  operands[2], operands[3]));
++  DONE;
++}")
+ 
+-(define_insn "extzv_32"
++(define_insn "extv_32"
+   [(set (match_operand:SI 0 "register_operand" "=r")
+ 	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
+ 			 (match_operand:SI 2 "immediate_operand" "I")
+@@ -2505,8 +2871,21 @@
+ 			 (match_operand:SI 2 "immediate_operand" "I"))
+ 	(match_operand:SI 3 "register_operand" "r"))]
+  "TARGET_HAS_BITFIELD"
+-""
+-)
++  "
++{
++  unsigned HOST_WIDE_INT len = UINTVAL (operands[1]);
++  unsigned HOST_WIDE_INT pos = UINTVAL (operands[2]);
++
++  if (len <= 0 || pos + len > 32)
++    FAIL;
++
++  ;;if (!register_operand (operands[0], VOIDmode))
++  ;;  FAIL;
++
++  emit_insn (gen_insv_32 (operands[0], operands[1],
++			  operands[2], operands[3]));
++  DONE;
++}")
+ 
+ (define_insn "insv_32"
+   [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
+diff --git a/gcc/config/microblaze/microblaze.opt b/gcc/config/microblaze/microblaze.opt
+index a29c6f8df90..bbe48b06da6 100644
+--- a/gcc/config/microblaze/microblaze.opt
++++ b/gcc/config/microblaze/microblaze.opt
+@@ -136,4 +136,9 @@ Target
+ 
+ mxl-frequency
+ Target Mask(AREA_OPTIMIZED_2)
+-Use 8 stage pipeline (frequency optimization)
++Use 8 stage pipeline (frequency optimization).
++
++m64
++Target Mask(MB_64)
++MicroBlaze 64-bit mode.
++
+diff --git a/gcc/config/microblaze/t-microblaze b/gcc/config/microblaze/t-microblaze
+index 41fa9a92081..e9a1921ae26 100644
+--- a/gcc/config/microblaze/t-microblaze
++++ b/gcc/config/microblaze/t-microblaze
+@@ -1,8 +1,11 @@
+-MULTILIB_OPTIONS = mxl-barrel-shift mno-xl-soft-mul mxl-multiply-high mlittle-endian
+-MULTILIB_DIRNAMES = bs m mh le
++MULTILIB_OPTIONS = mxl-barrel-shift mno-xl-soft-mul mxl-multiply-high mlittle-endian m64
++MULTILIB_DIRNAMES = bs m mh le m64
+ MULTILIB_EXCEPTIONS = *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
+ MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/mlittle-endian
++MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/m64
+ MULTILIB_EXCEPTIONS += mxl-multiply-high/mlittle-endian
++MULTILIB_EXCEPTIONS += mxl-multiply-high/m64
++MULTILIB_EXCEPTIONS += *mxl-multiply-high/mlittle-endian/m64
+ 
+ # Extra files
+ microblaze-c.o: $(srcdir)/config/microblaze/microblaze-c.c \
+-- 
+2.17.1
+

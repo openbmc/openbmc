@@ -1,0 +1,53 @@
+From 63dc2d0c9384d85482dc4cbb3c179b4b0bb18d4e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 19 Dec 2019 22:32:01 -0800
+Subject: [PATCH] cmake: Use GNUInstallDirs
+
+Helps install cmakefiles in right libdir
+
+Upstream-Status: Submitted [https://github.com/labapart/gattlib/pull/139]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt      |  5 +++--
+ dbus/CMakeLists.txt | 18 ++++++++++--------
+ 2 files changed, 13 insertions(+), 10 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 12d8d71..ded7239 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -152,7 +152,8 @@ endif()
+ #
+ # List of file to install
+ #
+-install(FILES include/gattlib.h DESTINATION include)
+-install(FILES ${PROJECT_BINARY_DIR}/gattlib.pc DESTINATION lib/pkgconfig)
++include(GNUInstallDirs)
++install(FILES include/gattlib.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++install(FILES ${PROJECT_BINARY_DIR}/gattlib.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+ 
+ include(CPack)
+diff --git a/dbus/CMakeLists.txt b/dbus/CMakeLists.txt
+index f5096ce..cef031f 100644
+--- a/dbus/CMakeLists.txt
++++ b/dbus/CMakeLists.txt
+@@ -19,7 +19,7 @@
+ #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ #
+ 
+-cmake_minimum_required(VERSION 2.6)
++cmake_minimum_required(VERSION 3.0)
+ 
+ find_package(PkgConfig REQUIRED)
+ 
+@@ -119,4 +119,6 @@ endif()
+ add_library(gattlib SHARED ${gattlib_SRCS})
+ target_link_libraries(gattlib ${gattlib_LIBS})
+ 
+-install(TARGETS gattlib LIBRARY DESTINATION lib)
++include(GNUInstallDirs)
++
++install(TARGETS gattlib LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+-- 
+2.24.1
+

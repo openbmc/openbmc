@@ -1,4 +1,6 @@
 SUMMARY = "Simple GTK+ based panel for handheld devices"
+DESCRIPTION = "A flexible always present 'window bar' for holding application \
+launchers and small 'applet' style applications"
 HOMEPAGE = "http://matchbox-project.org"
 BUGTRACKER = "http://bugzilla.yoctoproject.org/"
 
@@ -37,4 +39,4 @@ FILES_${PN} += "${libdir}/matchbox-panel/*.so \
                 ${datadir}/icons/"
 FILES_${PN}-dev += "${libdir}/matchbox-panel/*.la"
 
-inherit autotools pkgconfig distro_features_check gettext
+inherit autotools pkgconfig features_check gettext

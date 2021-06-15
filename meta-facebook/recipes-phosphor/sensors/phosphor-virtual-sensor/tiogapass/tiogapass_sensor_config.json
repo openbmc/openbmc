@@ -1,0 +1,46 @@
+[
+	{
+		"Desc" :
+		{
+			"Name" : "Virtual_Inlet_Temp",
+			"SensorType" : "temperature"
+		},
+		"Threshold" :
+		{
+			"CriticalHigh": 90,
+			"CriticalLow": 20,
+			"WarningHigh": 70,
+			"WarningLow": 30
+		},
+		"Params":
+		{
+			"ConstParam" :
+			[
+				{
+					"ParamName" : "P1",
+					"Value" : 1.1
+				}
+			],
+			"DbusParam" :
+			[
+				{
+					"ParamName" : "P2",
+					"Desc" :
+					{
+						"Name" : "MB_INLET_TEMP",
+						"SensorType" : "temperature"
+					}
+				},
+				{
+					"ParamName" : "P3",
+					"Desc" :
+					{
+						"Name" : "MB_FAN0_TACH",
+						"SensorType" : "fan_tach"
+					}
+				}
+			]
+		},
+		"Expression" : "P1 * (P2 + 5 - P3 * 0.01)"
+	}
+]

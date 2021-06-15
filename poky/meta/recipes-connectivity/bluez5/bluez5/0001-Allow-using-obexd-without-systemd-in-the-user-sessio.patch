@@ -1,4 +1,4 @@
-From 99ccdbe155028c4c789803a429072675b87d0c3a Mon Sep 17 00:00:00 2001
+From f74eb97c9fb3c0ee2895742e773ac6a3c41c999c Mon Sep 17 00:00:00 2001
 From: Giovanni Campagna <gcampagna-cNUdlRotFMnNLxjTenLetw@public.gmane.org>
 Date: Sat, 12 Oct 2013 17:45:25 +0200
 Subject: [PATCH] Allow using obexd without systemd in the user session
@@ -17,22 +17,22 @@ http://thread.gmane.org/gmane.linux.bluez.kernel/38725/focus=38843
 Signed-off-by: Javier Viguera <javier.viguera@digi.com>
 
 ---
- Makefile.obexd                                                  | 4 ++--
- obexd/src/{org.bluez.obex.service => org.bluez.obex.service.in} | 2 +-
+ Makefile.obexd                                                | 4 ++--
+ .../src/{org.bluez.obex.service => org.bluez.obex.service.in} | 2 +-
  2 files changed, 3 insertions(+), 3 deletions(-)
  rename obexd/src/{org.bluez.obex.service => org.bluez.obex.service.in} (76%)
 
 diff --git a/Makefile.obexd b/Makefile.obexd
-index c462692..0325f66 100644
+index de59d29..73004a3 100644
 --- a/Makefile.obexd
 +++ b/Makefile.obexd
 @@ -1,12 +1,12 @@
  if SYSTEMD
- systemduserunitdir = @SYSTEMD_USERUNITDIR@
+ systemduserunitdir = $(SYSTEMD_USERUNITDIR)
  systemduserunit_DATA = obexd/src/obex.service
 +endif
  
- dbussessionbusdir = @DBUS_SESSIONBUSDIR@
+ dbussessionbusdir = $(DBUS_SESSIONBUSDIR)
  dbussessionbus_DATA = obexd/src/org.bluez.obex.service
 -endif
  

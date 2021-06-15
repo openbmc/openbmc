@@ -1,10 +1,7 @@
-From a805b601fcf4bb9e269566a8d25e48d9e60915c0 Mon Sep 17 00:00:00 2001
+From c3436ec8a502a40579abf62be0a479fa9d7888ad Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
-Date: Mon, 26 Nov 2018 11:14:24 +0800
-Subject: [PATCH] From 8bdd4481d822b6625d8bf719431ca74ed1b5e021 Mon Sep 17
- 00:00:00 2001 From: Changqing Li <changqing.li@windriver.com> Date: Mon, 16
- Jul 2018 15:56:37 +0800 Subject: [PATCH] multipath-tools: modify Makefile.inc
- for cross-compilation
+Date: Tue, 4 Jun 2019 11:39:39 +0800
+Subject: [PATCH] multipath-tools: modify Makefile.inc for cross-compilation
 
 Do not look for systemd info on the host, and allow us to pass in CFLAGS
 using the OPTFLAGS variable.
@@ -27,23 +24,28 @@ remove change about CFLAGS part, since patch 0024 already have similar function.
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 
-update for version 0.7.9
+update for version 0.8.1
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- Makefile.inc | 6 ------
- 1 file changed, 6 deletions(-)
+ Makefile.inc | 11 -----------
+ 1 file changed, 11 deletions(-)
 
 diff --git a/Makefile.inc b/Makefile.inc
-index 295afb9..7136db3 100644
+index 661f141..3f9fd28 100644
 --- a/Makefile.inc
 +++ b/Makefile.inc
-@@ -38,12 +38,6 @@ ifndef RUN
+@@ -35,17 +35,6 @@ ifndef RUN
  	endif
  endif
  
 -ifndef SYSTEMD
--	ifeq ($(shell systemctl --version > /dev/null 2>&1 && echo 1), 1)
--		SYSTEMD = $(shell systemctl --version 2> /dev/null |  sed -n 's/systemd \([0-9]*\)/\1/p')
+-	ifeq ($(shell pkg-config --modversion libsystemd >/dev/null 2>&1 && echo 1), 1)
+-		SYSTEMD = $(shell pkg-config --modversion libsystemd)
+-	else
+-		ifeq ($(shell systemctl --version >/dev/null 2>&1 && echo 1), 1)
+-			SYSTEMD = $(shell systemctl --version 2> /dev/null | \
+-				sed -n 's/systemd \([0-9]*\).*/\1/p')
+-		endif
 -	endif
 -endif
 -

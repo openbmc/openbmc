@@ -1,2 +1,1 @@
-# Specify rng device
-RNG_DEVICE=/dev/hwrng
+EXTRA_ARGS="-r /dev/hwrng"

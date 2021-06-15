@@ -1,0 +1,22 @@
+Busybox does not support ps -p so use pgrep
+
+Upstream-Status: Inappropriate [embedded specific]
+Based on changes from Diego Sueiro <Diego.Sueiro@arm.com>
+
+Signed-off-by: Armin kuster <akuster808@gmail.com>
+
+Index: kea-1.7.10/src/bin/keactrl/keactrl.in
+===================================================================
+--- kea-1.7.10.orig/src/bin/keactrl/keactrl.in
++++ kea-1.7.10/src/bin/keactrl/keactrl.in
+@@ -137,8 +137,8 @@ check_running() {
+     # Get the PID from the PID file (if it exists)
+     get_pid_from_file "${proc_name}"
+     if [ ${_pid} -gt 0 ]; then
+-        # Use ps to check if PID is alive
+-        ps -p ${_pid} 1>/dev/null
++        # Use pgrep and grep to check if PID is alive
++        pgrep -v 1 | grep ${_pid} 1>/dev/null
+         retcode=$?
+         if [ $retcode -eq 0 ]; then
+             # No error, so PID IS ALIVE

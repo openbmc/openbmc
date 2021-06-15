@@ -1,0 +1,35 @@
+From 4f4d7d6b88b6e440263ebeb22dfb40c52bb30fd8 Mon Sep 17 00:00:00 2001
+From: Zhenhua Luo <zhenhua.luo@freescale.com>
+Date: Fri, 25 Jan 2013 18:10:50 +0800
+Subject: [PATCH] apache2: fix the race issue of parallel installation
+
+Upstream-Status: Pending
+
+fix following race issue when do parallel install
+| mkdir: cannot create directory `/home/mypc/workspace/poky/build_p4080ds_release/tmp/work/ppce500mc-fsl_networking-linux/apache2/2.4.3-r1/image/usr/share/apache2': File exists
+...
+| mkdir: cannot create directory `/home/mypc/workspace/poky/build_p4080ds_release/tmp/work/ppce500mc-fsl_networking-linux/apache2/2.4.3-r1/image/usr/share/apache2': File exists
+| make[1]: *** [install-man] Error 1
+| make[1]: *** Waiting for unfinished jobs....
+
+Signed-off-by: Zhenhua Luo <zhenhua.luo@freescale.com>
+---
+ build/mkdir.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/mkdir.sh b/build/mkdir.sh
+index e2d5bb6..dde5ae0 100755
+--- a/build/mkdir.sh
++++ b/build/mkdir.sh
+@@ -39,7 +39,7 @@ for file in ${1+"$@"} ; do
+         esac
+         if test ! -d "$pathcomp"; then
+             echo "mkdir $pathcomp" 1>&2
+-            mkdir "$pathcomp" || errstatus=$?
++            mkdir -p "$pathcomp" || errstatus=$?
+         fi
+         pathcomp="$pathcomp/"
+     done
+-- 
+2.7.4
+

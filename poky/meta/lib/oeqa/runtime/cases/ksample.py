@@ -1,9 +1,12 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import time
 
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfNotFeature
 
 # need some kernel fragments

@@ -2,8 +2,8 @@ SUMMARY = "Sample hostfw inventory map for phosphor-ipmi-fru"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit native
 inherit phosphor-ipmi-fru
+inherit native
 
 require phosphor-ipmi-fru.inc
 

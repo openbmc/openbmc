@@ -16,31 +16,31 @@ Index: a/unix/configure
 ===================================================================
 --- a/unix/configure.orig
 +++ b/unix/configure
-@@ -1432,6 +1432,7 @@ echo "$as_me: error: ${with_tclconfig} d
+@@ -1431,6 +1431,7 @@ echo "$as_me: error: ${with_tclconfig} d
  			`ls -d /usr/local/lib 2>/dev/null` \
  			`ls -d /usr/contrib/lib 2>/dev/null` \
  			`ls -d /usr/pkg/lib 2>/dev/null` \
 +			`ls -d /usr/share/tcltk/tcl8.6 2>/dev/null` \
+ 			`ls -d /usr/lib/tcl8.6 2>/dev/null` \
  			`ls -d /usr/lib 2>/dev/null` \
  			`ls -d /usr/lib64 2>/dev/null` \
- 			`ls -d /usr/local/lib/tcl8.6 2>/dev/null` \
 Index: a/unix/tcl.m4
 ===================================================================
 --- a/unix/tcl.m4.orig
 +++ b/unix/tcl.m4
-@@ -94,6 +94,7 @@ AC_DEFUN([SC_PATH_TCLCONFIG], [
+@@ -93,6 +93,7 @@ AC_DEFUN([SC_PATH_TCLCONFIG], [
  			`ls -d /usr/local/lib 2>/dev/null` \
  			`ls -d /usr/contrib/lib 2>/dev/null` \
  			`ls -d /usr/pkg/lib 2>/dev/null` \
 +			`ls -d /usr/share/tcltk/tcl8.6 2>/dev/null` \
+ 			`ls -d /usr/lib/tcl8.6 2>/dev/null` \
  			`ls -d /usr/lib 2>/dev/null` \
  			`ls -d /usr/lib64 2>/dev/null` \
- 			`ls -d /usr/local/lib/tcl8.6 2>/dev/null` \
-@@ -227,6 +228,7 @@ AC_DEFUN([SC_PATH_TKCONFIG], [
+@@ -226,6 +227,7 @@ AC_DEFUN([SC_PATH_TKCONFIG], [
  			`ls -d /usr/local/lib 2>/dev/null` \
  			`ls -d /usr/contrib/lib 2>/dev/null` \
  			`ls -d /usr/pkg/lib 2>/dev/null` \
-+			`ls -d /usr/share/tcltk/tk8.6 2>/dev/null` \
++			`ls -d /usr/share/tcltk/tcl8.6 2>/dev/null` \
+ 			`ls -d /usr/lib/tk8.6 2>/dev/null` \
  			`ls -d /usr/lib 2>/dev/null` \
  			`ls -d /usr/lib64 2>/dev/null` \
- 			`ls -d /usr/local/lib/tk8.6 2>/dev/null` \

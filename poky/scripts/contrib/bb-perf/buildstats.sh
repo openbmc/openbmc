@@ -1,21 +1,8 @@
 #!/bin/bash
 #
 # Copyright (c) 2011, Intel Corporation.
-# All rights reserved.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# SPDX-License-Identifier: GPL-2.0-or-later
 #
 # DESCRIPTION
 # Given 'buildstats' data (generate by bitbake when setting
@@ -49,8 +36,10 @@ Child rusage ru_majflt:Child rusage ru_inblock:Child rusage ru_oublock:Child rus
 Child rusage ru_nivcsw"
 
 BS_DIR="tmp/buildstats"
+RECIPE=""
 TASKS="compile:configure:fetch:install:patch:populate_lic:populate_sysroot:unpack"
 STATS="$TIME"
+ACCUMULATE=""
 HEADER="" # No header by default
 
 function usage {
@@ -59,6 +48,7 @@ cat <<EOM
 Usage: $CMD [-b buildstats_dir] [-t do_task]
   -b buildstats The path where the folder resides
                 (default: "$BS_DIR")
+  -r recipe     The recipe to be computed
   -t tasks      The tasks to be computed
                 (default: "$TASKS")
   -s stats      The stats to be matched. Options: TIME, IO, RUSAGE, CHILD_RUSAGE
@@ -69,87 +59,109 @@ Usage: $CMD [-b buildstats_dir] [-t do_task]
                     IO=$IO
                     RUSAGE=$RUSAGE
                     CHILD_RUSAGE=$CHILD_RUSAGE
+  -a            Accumulate all stats values for found recipes
   -h            Display this help message
 EOM
 }
 
 # Parse and validate arguments
-while getopts "b:t:s:Hh" OPT; do
-	case $OPT in
-	b)
-		BS_DIR="$OPTARG"
-		;;
-	t)
-		TASKS="$OPTARG"
-		;;
-	s)
-		STATS="$OPTARG"
-		;;
-	H)
-	        HEADER="y"
-	        ;;
-	h)
-		usage
-		exit 0
-		;;
-	*)
-		usage
-		exit 1
-		;;
-	esac
+while getopts "b:r:t:s:aHh" OPT; do
+    case $OPT in
+    b)
+        BS_DIR="$OPTARG"
+        ;;
+    r)
+        RECIPE="$OPTARG"
+        ;;
+    t)
+        TASKS="$OPTARG"
+        ;;
+    s)
+        STATS="$OPTARG"
+        ;;
+    a)
+        ACCUMULATE="y"
+        ;;
+    H)
+        HEADER="y"
+        ;;
+    h)
+        usage
+        exit 0
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+    esac
 done
 
 # Ensure the buildstats folder exists
 if [ ! -d "$BS_DIR" ]; then
-	echo "ERROR: $BS_DIR does not exist"
-	usage
-	exit 1
+    echo "ERROR: $BS_DIR does not exist"
+    usage
+    exit 1
 fi
 
 stats=""
 IFS=":"
 for stat in ${STATS}; do
-	case $stat in
-	    TIME)
-		stats="${stats}:${TIME}"
-		;;
-	    IO)
-		stats="${stats}:${IO}"
-		;;
-	    RUSAGE)
-		stats="${stats}:${RUSAGE}"
-		;;
-	    CHILD_RUSAGE)
-		stats="${stats}:${CHILD_RUSAGE}"
-		;;
-	    *)
-		stats="${STATS}"
-	esac
+    case $stat in
+        TIME)
+            stats="${stats}:${TIME}"
+            ;;
+        IO)
+            stats="${stats}:${IO}"
+            ;;
+        RUSAGE)
+            stats="${stats}:${RUSAGE}"
+            ;;
+        CHILD_RUSAGE)
+            stats="${stats}:${CHILD_RUSAGE}"
+            ;;
+        *)
+            stats="${STATS}"
+            ;;
+    esac
 done
 
 # remove possible colon at the beginning
 stats="$(echo "$stats" | sed -e 's/^://1')"
 
 # Provide a header if required by the user
-[ -n "$HEADER" ] && { echo "task:recipe:$stats"; }
+if [ -n "$HEADER" ] ; then
+    if [ -n "$ACCUMULATE" ]; then
+        echo "task:recipe:accumulated(${stats//:/;})"
+    else
+        echo "task:recipe:$stats"
+    fi
+fi
 
 for task in ${TASKS}; do
     task="do_${task}"
-    for file in $(find ${BS_DIR} -type f -name ${task} | awk 'BEGIN{ ORS=""; OFS=":" } { print $0,"" }'); do
+    for file in $(find ${BS_DIR} -type f -path *${RECIPE}*/${task} | awk 'BEGIN{ ORS=""; OFS=":" } { print $0,"" }'); do
         recipe="$(basename $(dirname $file))"
-	times=""
-	for stat in ${stats}; do
-	    [ -z "$stat" ] && { echo "empty stats"; }
-	    time=$(sed -n -e "s/^\($stat\): \\(.*\\)/\\2/p" $file)
-	    # in case the stat is not present, set the value as NA
-	    [ -z "$time" ] && { time="NA"; }
-	    # Append it to times
-	    if [ -z "$times" ]; then
-		times="${time}"
-	    else
-		times="${times} ${time}"
-	    fi
-	done
+        times=""
+        for stat in ${stats}; do
+            [ -z "$stat" ] && { echo "empty stats"; }
+            time=$(sed -n -e "s/^\($stat\): \\(.*\\)/\\2/p" $file)
+            # in case the stat is not present, set the value as NA
+            [ -z "$time" ] && { time="NA"; }
+            # Append it to times
+            if [ -z "$times" ]; then
+                times="${time}"
+            else
+                times="${times} ${time}"
+            fi
+        done
+        if [ -n "$ACCUMULATE" ]; then
+            IFS=' '; valuesarray=(${times}); IFS=':'
+            times=0
+            for value in "${valuesarray[@]}"; do
+                [ "$value" == "NA" ] && { echo "ERROR: stat is not present."; usage; exit 1; }
+                times=$(( $times + $value ))
+            done
+        fi
         echo "${task} ${recipe} ${times}"
     done
 done

@@ -1,0 +1,38 @@
+From 5704610f4b3aed5210e9c5b7c05ff8b5b2364c9c Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Mon, 12 Aug 2019 08:18:21 +0000
+Subject: [PATCH] Fix missing return statements in module stubs
+
+* fixes build with -Werror=return-type
+  twofish.c: In function 'init_twofish':
+  twofish.c:45:1: error: control reaches end of non-void function [-Werror=return-type]
+     45 | PyMODINIT_FUNC init_twofish(void) { }
+        | ^~~~~~~~~~~~~~
+  twofish.c: In function 'PyInit__twofish':
+  twofish.c:46:1: error: control reaches end of non-void function [-Werror=return-type]
+     46 | PyMODINIT_FUNC PyInit__twofish(void) { }
+        | ^~~~~~~~~~~~~~
+  cc1: some warnings being treated as errors
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+Upstream-Status: Submitted [https://github.com/keybase/python-twofish/pull/6]
+---
+ twofish.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/twofish.c b/twofish.c
+index e324c34..d4487d8 100644
+--- a/twofish.c
++++ b/twofish.c
+@@ -42,5 +42,5 @@ DL_EXPORT(void) exp_Twofish_decrypt(Twofish_key * xkey, uint8_t c[16], uint8_t p
+ We need a stub init_twofish function so the module will link as a proper module.
+ Do not import _twofish from python; it will not work since _twofish is not a *real* module
+ */
+-PyMODINIT_FUNC init_twofish(void) { }
+-PyMODINIT_FUNC PyInit__twofish(void) { }
++PyMODINIT_FUNC init_twofish(void) { return NULL; }
++PyMODINIT_FUNC PyInit__twofish(void) { return NULL; }
+-- 
+2.17.1
+

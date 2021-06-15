@@ -1,0 +1,43 @@
+From c817db76bb63b872fe2069e3c2449ac18affe8c1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 30 Aug 2019 13:17:38 -0700
+Subject: [PATCH] replace canonicalize_file_name with realpath
+
+Use 'realpath()' (BSD, POSIX) instead of
+'canonicalize_file_name()' (GNU extension).
+
+Fixes
+error: use of undeclared identifier 'canonicalize_file_name'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/engine/filesystem.cpp | 2 +-
+ tools/ssieventmonitor.cpp | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/engine/filesystem.cpp b/lib/engine/filesystem.cpp
+index bf5a776..194ab8a 100644
+--- a/lib/engine/filesystem.cpp
++++ b/lib/engine/filesystem.cpp
+@@ -54,7 +54,7 @@ void CanonicalPath::__canonicalize_path_name(const char *path)
+     if (path == NULL) {
+         throw E_NULL_POINTER;
+     }
+-    char *p = canonicalize_file_name(path);
++    char *p = realpath(path, (char *)0);
+     assign(p);
+     if (p) {
+         free(p);
+diff --git a/tools/ssieventmonitor.cpp b/tools/ssieventmonitor.cpp
+index 80791fd..3eed877 100644
+--- a/tools/ssieventmonitor.cpp
++++ b/tools/ssieventmonitor.cpp
+@@ -120,7 +120,7 @@ static int _exec_ssimsg(void)
+     int status;
+     switch (pid) {
+         case 0: {
+-            cp = canonicalize_file_name("/proc/self/exe");
++            cp = realpath("/proc/self/exe", (char *)0);
+             if (cp) {
+                 strcpy_s(buffer, sizeof(buffer), cp);
+                 free(cp);

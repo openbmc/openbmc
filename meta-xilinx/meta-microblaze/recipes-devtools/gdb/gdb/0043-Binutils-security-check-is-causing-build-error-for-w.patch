@@ -1,0 +1,32 @@
+From 187f46b3a0d31c5b1eac0ce9ddc7c136b2d53d70 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 11 Mar 2019 13:57:42 +0530
+Subject: [PATCH 43/52] Binutils security check is causing build error for
+ windows builds.commenting for now.
+
+---
+ bfd/elf-attrs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+Index: gdb-9.2/bfd/elf-attrs.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf-attrs.c
++++ gdb-9.2/bfd/elf-attrs.c
+@@ -440,7 +440,8 @@ _bfd_elf_parse_attributes (bfd *abfd, El
+   /* PR 17512: file: 2844a11d.  */
+   if (hdr->sh_size == 0)
+     return;
+-  if (hdr->sh_size > bfd_get_file_size (abfd))
++#if 0
++if (hdr->sh_size > bfd_get_file_size (abfd))
+     {
+       /* xgettext:c-format */
+       _bfd_error_handler (_("%pB: error: attribute section '%pA' too big: %#llx"),
+@@ -448,6 +449,7 @@ _bfd_elf_parse_attributes (bfd *abfd, El
+       bfd_set_error (bfd_error_invalid_operation);
+       return;
+     }
++#endif
+ 
+   contents = (bfd_byte *) bfd_malloc (hdr->sh_size + 1);
+   if (!contents)

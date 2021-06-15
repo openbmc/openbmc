@@ -1,0 +1,9 @@
+[Unit]
+Description=Configure GPIOs for Tiogapass
+
+[Service]
+Restart=no
+RemainAfterExit=true
+Type=oneshot
+ExecStart=/usr/sbin/setup_gpio.sh
+SyslogIdentifier=setup_gpio.sh

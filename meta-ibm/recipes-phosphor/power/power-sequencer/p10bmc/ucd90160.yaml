@@ -1,0 +1,201 @@
+- Device:
+  index: 0
+  # Linux sysfs path for this power sequencer (0x22 8-bit address)
+  path:  /sys/bus/i2c/devices/i2c-8/8-0011
+  RailNames:
+      - "12.0V"
+      - "5.0V_USB"
+      - "5.0V_DASD"
+      - "3.3VA"
+      - "3.3VB"
+      - "1.5V"
+      - "1.1V"
+      - "VDDA_DCM0"
+      - "VDDB_DCM0"
+      - "VDDA_DCM1"
+      - "VDDB_DCM1"
+      - "12.0VCS"
+      - "3.3VCS"
+      - "1.1V_Current"
+      - "5.0V_USB_Current"
+      - "5.0V_DASD_Current"
+      - "12.0VN"
+      - "12.0VP"
+      - "12.0VQ"
+      - "12.0VR"
+      - "ThermalDiode1"
+      - "ThermalDiode2"
+      - "ThermalDiode3"
+      - "ThermalDiode4"
+  GPIConfigs:
+      - name:            PCIE_SLOT0
+        gpi:             1
+        pinID:           44
+        poll:            false
+        analysis:        none
+      - name:            PCIE_SLOT1
+        gpi:             2
+        pinID:           45
+        poll:            false
+        analysis:        none
+      - name:            PCIE_SLOT2
+        gpi:             3
+        pinID:           46
+        poll:            false
+        analysis:        none
+      - name:            PCIE_SLOT3
+        gpi:             4
+        pinID:           47
+        poll:            false
+        analysis:        none
+      - name:            PCIE_SLOT4
+        gpi:             5
+        pinID:           48
+        poll:            false
+        analysis:        none
+      - name:            PCIE_SLOT7
+        gpi:             6
+        pinID:           49
+        poll:            false
+        analysis:        none
+      - name:            PCIE_SLOT8
+        gpi:             7
+        pinID:           50
+        poll:            false
+        analysis:        none
+      - name:            PCIE_SLOT9
+        gpi:             8
+        pinID:           51
+        poll:            false
+        analysis:        none
+      - name:            PCIE_SLOT10
+        gpi:             9
+        pinID:           52
+        poll:            false
+        analysis:        none
+      - name:            PCIE_SLOT11
+        gpi:             10
+        pinID:           53
+        poll:            false
+        analysis:        none
+      - name:            SOFTWARE_PGOOD
+        gpi:             11
+        pinID:           55
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12A
+        gpi:             12
+        pinID:           56
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12B
+        gpi:             13
+        pinID:           57
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12C
+        gpi:             14
+        pinID:           58
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12D
+        gpi:             15
+        pinID:           59
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12L
+        gpi:             16
+        pinID:           60
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12M
+        gpi:             17
+        pinID:           61
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12N
+        gpi:             18
+        pinID:           62
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12P
+        gpi:             19
+        pinID:           63
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12PCIE
+        gpi:             20
+        pinID:           64
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12Q
+        gpi:             21
+        pinID:           65
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_12R
+        gpi:             22
+        pinID:           66
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_VDN_DCM0
+        gpi:             23
+        pinID:           72
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_VDN_DCM1
+        gpi:             24
+        pinID:           73
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_VCS_DCM0
+        gpi:             25
+        pinID:           74
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_VCS_DCM1
+        gpi:             26
+        pinID:           75
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_VIO_DCM0
+        gpi:             27
+        pinID:           76
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_VIO_DCM1
+        gpi:             28
+        pinID:           77
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_VPCIE_DCM0
+        gpi:             29
+        pinID:           78
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_VPCIE_DCM1
+        gpi:             30
+        pinID:           79
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_PSU1
+        gpi:             31
+        pinID:           80
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_PSU2
+        gpi:             32
+        pinID:           81
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_PSU3
+        gpi:             33
+        pinID:           82
+        poll:            false
+        analysis:        none
+      - name:            PGOOD_PSU4
+        gpi:             34
+        pinID:           83
+        poll:            false
+        analysis:        none
+

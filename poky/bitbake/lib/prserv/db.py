@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 import logging
 import os.path
 import errno
@@ -67,7 +71,7 @@ class PRTable(object):
         data=self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                            (version, pkgarch, checksum))
         row=data.fetchone()
-        if row != None:
+        if row is not None:
             return row[0]
         else:
             #no value found, try to insert
@@ -83,7 +87,7 @@ class PRTable(object):
             data=self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                                (version, pkgarch, checksum))
             row=data.fetchone()
-            if row != None:
+            if row is not None:
                 return row[0]
             else:
                 raise prserv.NotFoundError
@@ -95,7 +99,7 @@ class PRTable(object):
                             % (self.table, self.table),
                             (version, pkgarch, checksum, version, pkgarch))
         row=data.fetchone()
-        if row != None:
+        if row is not None:
             return row[0]
         else:
             #no value found, try to insert
@@ -112,7 +116,7 @@ class PRTable(object):
             data=self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                                (version, pkgarch, checksum))
             row=data.fetchone()
-            if row != None:
+            if row is not None:
                 return row[0]
             else:
                 raise prserv.NotFoundError
@@ -128,7 +132,7 @@ class PRTable(object):
         data = self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                            (version, pkgarch, checksum))
         row = data.fetchone()
-        if row != None:
+        if row is not None:
             val=row[0]
         else:
             #no value found, try to insert
@@ -143,7 +147,7 @@ class PRTable(object):
             data = self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                            (version, pkgarch, checksum))
             row = data.fetchone()
-            if row != None:
+            if row is not None:
                 val = row[0]
         return val
 
@@ -166,7 +170,7 @@ class PRTable(object):
         data = self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=? AND value>=?;" % self.table,
                             (version,pkgarch,checksum,value))
         row=data.fetchone()
-        if row != None:
+        if row is not None:
             return row[0]
         else:
             return None
@@ -253,7 +257,7 @@ class PRData(object):
         self.connection=sqlite3.connect(self.filename, isolation_level="EXCLUSIVE", check_same_thread = False)
         self.connection.row_factory=sqlite3.Row
         self.connection.execute("pragma synchronous = off;")
-        self.connection.execute("PRAGMA journal_mode = WAL;")
+        self.connection.execute("PRAGMA journal_mode = MEMORY;")
         self._tables={}
 
     def disconnect(self):

@@ -165,7 +165,7 @@
     }
   },
   "15" : {
-    "name" : "SMS",
+    "name" : "ipmi_kcs3",
     "is_valid" : true,
     "active_sessions" : 0,
     "channel_info" : {

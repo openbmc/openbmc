@@ -1,0 +1,29 @@
+From 5fb216d35b6846074196e80421f3162df3b9c8cd Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 1 Nov 2020 23:19:22 +0000
+Subject: [PATCH] CMakeLists.txt: do not hardcode 'lib' as installation target
+
+Upstream-Status: Inappropriate [already fixed in newer versions]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e00f8c77..f9896eed 100644
+--- a/third_party/spirv-cross/CMakeLists.txt
++++ b/third_party/spirv-cross/CMakeLists.txt
+@@ -67,8 +67,8 @@ macro(spirv_cross_add_library name config_name)
+   install(TARGETS ${name}
+       EXPORT ${config_name}Config
+       RUNTIME DESTINATION bin
+-      LIBRARY DESTINATION lib
+-      ARCHIVE DESTINATION lib
++      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+       PUBLIC_HEADER DESTINATION include/spirv_cross)
+   install(FILES ${hdrs} DESTINATION include/spirv_cross)
+   install(EXPORT ${config_name}Config DESTINATION share/${config_name}/cmake)
+-- 
+2.17.1
+

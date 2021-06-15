@@ -1,0 +1,10 @@
+{
+    "forceLEDs":[
+        "virtual_enc_fault",
+        "virtual_enc_id"
+    ],
+    "skipLEDs":[
+        "virtual_enc_fault",
+        "virtual_enc_id"
+    ]
+}

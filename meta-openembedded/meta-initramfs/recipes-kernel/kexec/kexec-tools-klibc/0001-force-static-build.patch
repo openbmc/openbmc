@@ -1,4 +1,4 @@
-From d6af515cfcc8185f423860f80ff28719975b701f Mon Sep 17 00:00:00 2001
+From 2a62d7623e3d4c0eaa44434ab678274fe3a9edb1 Mon Sep 17 00:00:00 2001
 From: OpenEmbedded <oe.patch@oe>
 Date: Wed, 11 Apr 2018 22:51:00 +0200
 Subject: [PATCH] force static build
@@ -11,7 +11,7 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 54c206f..79188d8 100644
+index fb01134..dbf1fb6 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -47,7 +47,7 @@ TARGET_CFLAGS	= @TARGET_CFLAGS@

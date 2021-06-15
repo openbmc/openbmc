@@ -38,6 +38,14 @@ case "$1" in
            if [ -e /dev/hidraw0 ]; then
                chmod o+rw /dev/hidraw*
            fi
+           # Make sure that the Xorg has the cap_sys_admin capability which is
+           # needed for setting the drm master
+           if ! grep -q "^auth.*pam_cap\.so" /etc/pam.d/su; then
+               echo "auth	optional	pam_cap.so" >>/etc/pam.d/su
+           fi
+           if ! /usr/sbin/getcap $XSERVER |  grep -q cap_sys_admin; then
+               /usr/sbin/setcap cap_sys_admin+eip $XSERVER
+           fi
        fi
 
        # Using su rather than sudo as latest 1.8.1 cause failure [YOCTO #1211]

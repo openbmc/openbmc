@@ -1,22 +1,9 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # Copyright (C) 2006 - 2007  Michael 'Mickey' Lauer
 # Copyright (C) 2006 - 2007  Richard Purdie
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
 
 """
 Use this class to fork off a thread to recieve event callbacks from the bitbake
@@ -24,8 +11,12 @@ server and queue them for the UI to process. This process must be used to avoid
 client/server deadlocks.
 """
 
-import socket, threading, pickle, collections
+import collections, logging, pickle, socket, threading
 from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
+
+import bb
+
+logger = logging.getLogger(__name__)
 
 class BBUIEventQueue:
     def __init__(self, BBServer, clientinfo=("localhost, 0")):
@@ -59,7 +50,7 @@ class BBUIEventQueue:
                 self.EventHandle = ret
                 error = ""
 
-            if self.EventHandle != None:
+            if self.EventHandle is not None:
                 break
 
             errmsg = "Could not register UI event handler. Error: %s, host %s, "\

@@ -1,2 +1,0 @@
-addFilter("devel-file-in-non-devel-package .*/lib.*\.so")
-

@@ -1,13 +1,13 @@
 #!/bin/sh
 
-[ -z "$ENVCLEANED" ] && exec /usr/bin/env -i ENVCLEANED=1 HOME="$HOME" \
-	LC_ALL=en_US.UTF-8 \
-	TERM=$TERM \
-	ICECC_PATH="$ICECC_PATH" \
-	http_proxy="$http_proxy" https_proxy="$https_proxy" ftp_proxy="$ftp_proxy" \
-	no_proxy="$no_proxy" all_proxy="$all_proxy" GIT_PROXY_COMMAND="$GIT_PROXY_COMMAND" "$0" "$@"
-[ -f /etc/environment ] && . /etc/environment
-export PATH=`echo "$PATH" | sed -e 's/:\.//' -e 's/::/:/'`
+export LC_ALL=en_US.UTF-8
+#Make sure at least one python is installed
+INIT_PYTHON=$(which python3 2>/dev/null )
+[ -z "$INIT_PYTHON" ] && INIT_PYTHON=$(which python2 2>/dev/null)
+[ -z "$INIT_PYTHON" ] && echo "Error: The SDK needs a python installed" && exit 1
+
+# Remove invalid PATH elements first (maybe from a previously setup toolchain now deleted
+PATH=`$INIT_PYTHON -c 'import os; print(":".join(e for e in os.environ["PATH"].split(":") if os.path.exists(e)))'`
 
 tweakpath () {
     case ":${PATH}:" in
@@ -26,7 +26,7 @@ tweakpath /sbin
 INST_ARCH=$(uname -m | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
 SDK_ARCH=$(echo @SDK_ARCH@ | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
 
-INST_GCC_VER=$(gcc --version | sed -ne 's/.* \([0-9]\+\.[0-9]\+\)\.[0-9]\+.*/\1/p')
+INST_GCC_VER=$(gcc --version 2>/dev/null | sed -ne 's/.* \([0-9]\+\.[0-9]\+\)\.[0-9]\+.*/\1/p')
 SDK_GCC_VER='@SDK_GCC_VER@'
 
 verlte () {
@@ -95,7 +95,7 @@ while getopts ":yd:npDRSl" OPT; do
 		listcontents=1
 		;;
 	*)
-		echo "Usage: $(basename $0) [-y] [-d <dir>]"
+		echo "Usage: $(basename "$0") [-y] [-d <dir>]"
 		echo "  -y         Automatic yes to all prompts"
 		echo "  -d <dir>   Install the SDK to <dir>"
 		echo "======== Extensible SDK only options ============"
@@ -111,9 +111,18 @@ while getopts ":yd:npDRSl" OPT; do
 	esac
 done
 
-payload_offset=$(($(grep -na -m1 "^MARKER:$" $0|cut -d':' -f1) + 1))
+payload_offset=$(($(grep -na -m1 "^MARKER:$" "$0"|cut -d':' -f1) + 1))
 if [ "$listcontents" = "1" ] ; then
-    tail -n +$payload_offset $0| tar tvJ || exit 1
+    if [ @SDK_ARCHIVE_TYPE@ = "zip" ]; then
+        tail -n +$payload_offset "$0" > sdk.zip
+        if unzip -l sdk.zip;then
+            rm sdk.zip
+        else
+            rm sdk.zip && exit 1
+        fi
+    else
+        tail -n +$payload_offset "$0"| tar tvJ || exit 1
+    fi
     exit
 fi
 
@@ -232,7 +241,16 @@ if [ ! -x $target_sdk_dir -o ! -w $target_sdk_dir -o ! -r $target_sdk_dir ]; the
 fi
 
 printf "Extracting SDK..."
-tail -n +$payload_offset $0| $SUDO_EXEC tar xJ -C $target_sdk_dir --checkpoint=.2500 $EXTRA_TAR_OPTIONS || exit 1
+if [ @SDK_ARCHIVE_TYPE@ = "zip" ]; then
+    tail -n +$payload_offset "$0" > sdk.zip
+    if $SUDO_EXEC unzip $EXTRA_TAR_OPTIONS sdk.zip -d $target_sdk_dir;then
+        rm sdk.zip
+    else
+        rm sdk.zip && exit 1
+    fi
+else
+    tail -n +$payload_offset "$0"| $SUDO_EXEC tar mxJ -C $target_sdk_dir --checkpoint=.2500 $EXTRA_TAR_OPTIONS || exit 1
+fi
 echo "done"
 
 printf "Setting it up..."

@@ -1,0 +1,47 @@
+#!/bin/sh -eu
+
+my_cleanup() {
+    [ -n "${workdir:-}" ] && rm -rf "${workdir}"
+}
+
+trap "my_cleanup" EXIT
+for sig in INT TERM ; do
+    # We want sig to expand right here and now, as it's
+    # a loop variable, not when signalled. For $$ it
+    # doesn't matter.
+    # shellcheck disable=SC2064
+    trap "my_cleanup ; trap - EXIT ; trap - ${sig} ; kill -s ${sig} $$" ${sig}
+done
+
+workdir=$(mktemp -d -t onig.ptest.XXXXXX)
+status="${workdir}/failed"
+touch "${status}"
+
+find tests/ -perm -111 -type f -exec sh -c '
+    workdir="${1}"
+    status="${2}"
+    t="${3}"
+    t_log="${workdir}/$(basename ${t}).log"
+
+    res=0
+    ./${t} > "${t_log}" 2>&1 \
+        || res=$?
+    if [ $res -eq 0 ] ; then
+        echo "PASS: ${t}"
+    else
+        echo "FAIL: ${t}"
+        echo "$(basename ${t}): ${t_log}" >> "${status}"
+    fi
+    ' _ "${workdir}" "${status}" {} \;
+
+if [ $(stat -c '%s' "${status}") -ne 0 ] ; then
+    exec >&2
+    while IFS=': ' read -r t t_log ; do
+        printf "\n=========================\n"
+        printf "ERROR: %s:\n" "${t}"
+        printf --  "-------------------------\n"
+        cat "${t_log}"
+    done < "${status}"
+fi
+
+[ $(stat -c '%s' "${status}") -eq 0 ]

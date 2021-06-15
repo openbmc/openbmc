@@ -1,4 +1,7 @@
 SUMMARY = "Tool for working with series of patches"
+DESCRIPTION = "Quilt is a tool to manage large sets of patches by keeping \
+track of the changes each patch makes. Patches can be applied, un-applied,\
+refreshed, etc."
 HOMEPAGE = "http://savannah.nongnu.org/projects/quilt/"
 SECTION = "devel"
 LICENSE = "GPLv2"
@@ -13,8 +16,8 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/quilt/quilt-${PV}.tar.gz \
 
 SRC_URI_append_class-target = " file://gnu_patch_test_fix_target.patch"
 
-SRC_URI[md5sum] = "c67ba0228f5b7b8bbe469474661f92d6"
-SRC_URI[sha256sum] = "f6cbc788e5cbbb381a3c6eab5b9efce67c776a8662a7795c7432fd27aa096819"
+SRC_URI[md5sum] = "6800c2404a2c0598ab2eff92a636ba70"
+SRC_URI[sha256sum] = "314b319a6feb13bf9d0f9ffa7ce6683b06919e734a41275087ea457cc9dc6e07"
 
 inherit autotools-brokensep ptest
 
@@ -27,7 +30,7 @@ EXTRA_OECONF = "--with-perl='${USRBINPATH}/env perl' --with-patch=patch"
 EXTRA_OECONF_append_class-native = " --disable-nls"
 EXTRA_AUTORECONF += "--exclude=aclocal"
 
-CACHED_CONFIGUREVARS += "ac_cv_path_BASH=/bin/bash"
+CACHED_CONFIGUREVARS += "ac_cv_path_BASH=/bin/bash ac_cv_path_COLUMN=column"
 
 # Make sure we don't have "-w" in shebang lines: it breaks using
 # "/usr/bin/env perl" as parser
@@ -78,12 +81,12 @@ FILES_guards = "${bindir}/guards"
 FILES_${PN}-doc = "${mandir}/man1/quilt.1 ${docdir}/${BPN}"
 FILES_guards-doc = "${mandir}/man1/guards.1"
 
-RDEPENDS_${PN} = "bash patch diffstat bzip2 util-linux"
+RDEPENDS_${PN} = "bash patch diffstat bzip2 util-linux less"
 RDEPENDS_${PN}_class-native = "diffstat-native patch-native bzip2-native"
 
 RDEPENDS_${PN}-ptest = "make file sed gawk diffutils findutils ed perl \
                         perl-module-filehandle perl-module-getopt-std \
                         perl-module-posix perl-module-file-temp \
                         perl-module-text-parsewords perl-module-overloading \
-                        bash util-linux-getopt \
+                        bash util-linux-getopt patch \
                        "

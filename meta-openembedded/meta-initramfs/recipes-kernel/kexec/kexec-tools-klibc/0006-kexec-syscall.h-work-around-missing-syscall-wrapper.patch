@@ -1,4 +1,4 @@
-From 45a80fe7d247898d83edfeabe32b9de80a50a6be Mon Sep 17 00:00:00 2001
+From ab24f236cbc0aa8a3eadde5d71d9d7ea1d979a51 Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Fri, 31 Aug 2018 11:33:51 +0200
 Subject: [PATCH] kexec-syscall.h: work around missing syscall() wrapper
@@ -16,10 +16,10 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  1 file changed, 21 insertions(+)
 
 diff --git a/kexec/kexec-syscall.h b/kexec/kexec-syscall.h
-index 33638c2..204007d 100644
+index b96e02a..2a3794d 100644
 --- a/kexec/kexec-syscall.h
 +++ b/kexec/kexec-syscall.h
-@@ -74,11 +74,16 @@
+@@ -77,11 +77,16 @@
  
  struct kexec_segment;
  
@@ -36,7 +36,7 @@ index 33638c2..204007d 100644
  
  static inline int is_kexec_file_load_implemented(void) {
  	if (__NR_kexec_file_load != 0xffffffff)
-@@ -86,6 +91,21 @@ static inline int is_kexec_file_load_implemented(void) {
+@@ -89,6 +94,21 @@ static inline int is_kexec_file_load_implemented(void) {
  	return 0;
  }
  
@@ -58,7 +58,7 @@ index 33638c2..204007d 100644
  static inline long kexec_file_load(int kernel_fd, int initrd_fd,
  			unsigned long cmdline_len, const char *cmdline_ptr,
  			unsigned long flags)
-@@ -93,6 +113,7 @@ static inline long kexec_file_load(int kernel_fd, int initrd_fd,
+@@ -96,6 +116,7 @@ static inline long kexec_file_load(int kernel_fd, int initrd_fd,
  	return (long) syscall(__NR_kexec_file_load, kernel_fd, initrd_fd,
  				cmdline_len, cmdline_ptr, flags);
  }
@@ -66,6 +66,3 @@ index 33638c2..204007d 100644
  
  #define KEXEC_ON_CRASH		0x00000001
  #define KEXEC_PRESERVE_CONTEXT	0x00000002
--- 
-2.7.4
-

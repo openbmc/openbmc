@@ -11,7 +11,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 DEPENDS = "glib-2.0 gssdp gupnp gupnp-av gupnp-dlna libsoup-2.4 dleyna-core"
 RDEPENDS_${PN} = "dleyna-connector-dbus"
 
-SRC_URI = "git://github.com/01org/${BPN}.git"
+SRC_URI = "git://github.com/01org/${BPN}.git \
+           file://0001-add-gupnp-1.2-API-support.patch \
+          "
 SRCREV = "50fd1ec9d51328e7dea98874129dc8d6fe3ea1dd"
 S = "${WORKDIR}/git"
 

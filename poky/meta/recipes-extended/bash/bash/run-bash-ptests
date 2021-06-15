@@ -1,0 +1,4 @@
+#!/bin/sh
+cd "$(dirname "$0")"
+make -k THIS_SH=/bin/bash BUILD_DIR=`pwd` srcdir=`pwd` runtest
+

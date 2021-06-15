@@ -1,24 +1,10 @@
 #!/usr/bin/env python3
 #
 # Copyright (c) 2011, Intel Corporation.
-# All rights reserved.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# SPDX-License-Identifier: GPL-2.0-or-later
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-#
-#
-# Display details of the kernel build size, broken up by built-in.o. Sort
+# Display details of the kernel build size, broken up by built-in.[o,a]. Sort
 # the objects by size. Run from the top level kernel build directory.
 #
 # Author: Darren Hart <dvhart@linux.intel.com>
@@ -41,7 +27,7 @@ def usage():
 class Sizes:
     def __init__(self, glob):
         self.title = glob
-        p = Popen("size -t " + str(glob), shell=True, stdout=PIPE, stderr=PIPE)
+        p = Popen("size -t " + str(glob), shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True)
         output = p.communicate()[0].splitlines()
         if len(output) > 2:
             sizes = output[-1].split()[0:4]
@@ -63,17 +49,17 @@ class Report:
         path = os.path.dirname(filename)
 
         p = Popen("ls " + str(path) + "/*.o | grep -v built-in.o",
-                  shell=True, stdout=PIPE, stderr=PIPE)
+                  shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True)
         glob = ' '.join(p.communicate()[0].splitlines())
         oreport = Report(glob, str(path) + "/*.o")
         oreport.sizes.title = str(path) + "/*.o"
         r.parts.append(oreport)
 
         if subglob:
-            p = Popen("ls " + subglob, shell=True, stdout=PIPE, stderr=PIPE)
+            p = Popen("ls " + subglob, shell=True, stdout=PIPE, stderr=PIPE, universal_newlines=True)
             for f in p.communicate()[0].splitlines():
                 path = os.path.dirname(f)
-                r.parts.append(Report.create(f, path, str(path) + "/*/built-in.o"))
+                r.parts.append(Report.create(f, path, str(path) + "/*/built-in.[o,a]"))
             r.parts.sort(reverse=True)
 
         for b in r.parts:
@@ -153,7 +139,7 @@ def main():
         else:
             assert False, "unhandled option"
 
-    glob = "arch/*/built-in.o */built-in.o"
+    glob = "arch/*/built-in.[o,a] */built-in.[o,a]"
     vmlinux = Report.create("vmlinux",  "Linux Kernel", glob)
 
     vmlinux.show()

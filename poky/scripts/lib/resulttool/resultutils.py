@@ -3,19 +3,17 @@
 # Copyright (c) 2019, Intel Corporation.
 # Copyright (c) 2019, Linux Foundation
 #
-# This program is free software; you can redistribute it and/or modify it
-# under the terms and conditions of the GNU General Public License,
-# version 2, as published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
+
 import os
+import base64
+import zlib
 import json
 import scriptpath
 import copy
+import urllib.request
+import posixpath
 scriptpath.add_oe_lib_path()
 
 flatten_map = {
@@ -40,24 +38,42 @@ store_map = {
     "manual": ['TEST_TYPE', 'TEST_MODULE', 'MACHINE', 'IMAGE_BASENAME']
 }
 
+def is_url(p):
+    """
+    Helper for determining if the given path is a URL
+    """
+    return p.startswith('http://') or p.startswith('https://')
+
+extra_configvars = {'TESTSERIES': ''}
+
 #
 # Load the json file and append the results data into the provided results dict
 #
-def append_resultsdata(results, f, configmap=store_map):
+def append_resultsdata(results, f, configmap=store_map, configvars=extra_configvars):
     if type(f) is str:
-        with open(f, "r") as filedata:
-            data = json.load(filedata)
+        if is_url(f):
+            with urllib.request.urlopen(f) as response:
+                data = json.loads(response.read().decode('utf-8'))
+            url = urllib.parse.urlparse(f)
+            testseries = posixpath.basename(posixpath.dirname(url.path))
+        else:
+            with open(f, "r") as filedata:
+                data = json.load(filedata)
+            testseries = os.path.basename(os.path.dirname(f))
     else:
         data = f
     for res in data:
         if "configuration" not in data[res] or "result" not in data[res]:
             raise ValueError("Test results data without configuration or result section?")
-        if "TESTSERIES" not in data[res]["configuration"]:
-            data[res]["configuration"]["TESTSERIES"] = os.path.basename(os.path.dirname(f))
+        for config in configvars:
+            if config == "TESTSERIES" and "TESTSERIES" not in data[res]["configuration"]:
+                data[res]["configuration"]["TESTSERIES"] = testseries
+                continue
+            if config not in data[res]["configuration"]:
+                data[res]["configuration"][config] = configvars[config]
         testtype = data[res]["configuration"].get("TEST_TYPE")
         if testtype not in configmap:
             raise ValueError("Unknown test type %s" % testtype)
-        configvars = configmap[testtype]
         testpath = "/".join(data[res]["configuration"].get(i) for i in configmap[testtype])
         if testpath not in results:
             results[testpath] = {}
@@ -67,16 +83,16 @@ def append_resultsdata(results, f, configmap=store_map):
 # Walk a directory and find/load results data
 # or load directly from a file
 #
-def load_resultsdata(source, configmap=store_map):
+def load_resultsdata(source, configmap=store_map, configvars=extra_configvars):
     results = {}
-    if os.path.isfile(source):
-        append_resultsdata(results, source, configmap)
+    if is_url(source) or os.path.isfile(source):
+        append_resultsdata(results, source, configmap, configvars)
         return results
     for root, dirs, files in os.walk(source):
         for name in files:
             f = os.path.join(root, name)
             if name == "testresults.json":
-                append_resultsdata(results, f, configmap)
+                append_resultsdata(results, f, configmap, configvars)
     return results
 
 def filter_resultsdata(results, resultid):
@@ -103,6 +119,41 @@ def strip_ptestresults(results):
                     del newresults[res]['result']['ptestresult.sections'][i]['log']
     return newresults
 
+def decode_log(logdata):
+    if isinstance(logdata, str):
+        return logdata
+    elif isinstance(logdata, dict):
+        if "compressed" in logdata:
+            data = logdata.get("compressed")
+            data = base64.b64decode(data.encode("utf-8"))
+            data = zlib.decompress(data)
+            return data.decode("utf-8", errors='ignore')
+    return None
+
+def generic_get_log(sectionname, results, section):
+    if sectionname not in results:
+        return None
+    if section not in results[sectionname]:
+        return None
+
+    ptest = results[sectionname][section]
+    if 'log' not in ptest:
+        return None
+    return decode_log(ptest['log'])
+
+def ptestresult_get_log(results, section):
+    return generic_get_log('ptestresuls.sections', results, section)
+
+def generic_get_rawlogs(sectname, results):
+    if sectname not in results:
+        return None
+    if 'log' not in results[sectname]:
+        return None
+    return decode_log(results[sectname]['log'])
+
+def ptestresult_get_rawlogs(results):
+    return generic_get_rawlogs('ptestresult.rawlogs', results)
+
 def save_resultsdata(results, destdir, fn="testresults.json", ptestjson=False, ptestlogs=False):
     for res in results:
         if res:
@@ -117,16 +168,19 @@ def save_resultsdata(results, destdir, fn="testresults.json", ptestjson=False, p
             f.write(json.dumps(resultsout, sort_keys=True, indent=4))
         for res2 in results[res]:
             if ptestlogs and 'result' in results[res][res2]:
-                if 'ptestresult.rawlogs' in results[res][res2]['result']:
+                seriesresults = results[res][res2]['result']
+                rawlogs = ptestresult_get_rawlogs(seriesresults)
+                if rawlogs is not None:
                     with open(dst.replace(fn, "ptest-raw.log"), "w+") as f:
-                        f.write(results[res][res2]['result']['ptestresult.rawlogs']['log'])
-                if 'ptestresult.sections' in results[res][res2]['result']:
-                    for i in results[res][res2]['result']['ptestresult.sections']:
-                        if 'log' in results[res][res2]['result']['ptestresult.sections'][i]:
+                        f.write(rawlogs)
+                if 'ptestresult.sections' in seriesresults:
+                    for i in seriesresults['ptestresult.sections']:
+                        sectionlog = ptestresult_get_log(seriesresults, i)
+                        if sectionlog is not None:
                             with open(dst.replace(fn, "ptest-%s.log" % i), "w+") as f:
-                                f.write(results[res][res2]['result']['ptestresult.sections'][i]['log'])
+                                f.write(sectionlog)
 
-def git_get_result(repo, tags):
+def git_get_result(repo, tags, configmap=store_map):
     git_objs = []
     for tag in tags:
         files = repo.run_cmd(['ls-tree', "--name-only", "-r", tag]).splitlines()
@@ -149,6 +203,22 @@ def git_get_result(repo, tags):
     # Optimize by reading all data with one git command
     results = {}
     for obj in parse_json_stream(repo.run_cmd(['show'] + git_objs + ['--'])):
-        append_resultsdata(results, obj)
+        append_resultsdata(results, obj, configmap=configmap)
 
     return results
+
+def test_run_results(results):
+    """
+    Convenient generator function that iterates over all test runs that have a
+    result section.
+
+    Generates a tuple of:
+        (result json file path, test run name, test run (dict), test run "results" (dict))
+    for each test run that has a "result" section
+    """
+    for path in results:
+        for run_name, test_run in results[path].items():
+            if not 'result' in test_run:
+                continue
+            yield path, run_name, test_run, test_run['result']
+

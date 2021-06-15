@@ -36,7 +36,7 @@
 # Tha method to handle cached files does not work when a module includes a folder which
 # itself contains the pycache folder, gladly this is almost never the case.
 #
-# Author: Alejandro Enedino Hernandez Samaniego "aehs29" <aehs29 at gmail dot com>
+# Author: Alejandro Enedino Hernandez Samaniego <alejandro at enedino dot org>
 
 
 import sys
@@ -44,6 +44,11 @@ import subprocess
 import json
 import os
 import collections
+
+if '-d' in sys.argv:
+    debugFlag = '-d'
+else:
+    debugFlag = ''
 
 # Get python version from ${PYTHON_MAJMIN}
 pyversion = str(sys.argv[1])
@@ -84,6 +89,12 @@ def prepend_comments(comments, json_manifest):
         manifest.seek(0, 0)
         manifest.write(comments + json_contents)
 
+def print_indent(msg, offset):
+    for l in msg.splitlines():
+        msg = ' ' * offset + l
+        print(msg)
+
+
 # Read existing JSON manifest
 with open('python3-manifest.json') as manifest:
     # The JSON format doesn't allow comments so we hack the call to keep the comments using a marker
@@ -99,7 +110,7 @@ with open('python3-manifest.json') as manifest:
 # Not exactly the same so it should not be a function
 #
 
-print ('Getting dependencies for package: core')
+print_indent('Getting dependencies for package: core', 0)
 
 
 # This special call gets the core dependencies and
@@ -109,7 +120,7 @@ print ('Getting dependencies for package: core')
 # on the new core package, they will still find them
 # even when checking the old_manifest
 
-output = subprocess.check_output([sys.executable, 'get_module_deps3.py', 'python-core-package']).decode('utf8')
+output = subprocess.check_output([sys.executable, 'get_module_deps3.py', 'python-core-package', '%s' % debugFlag]).decode('utf8')
 for coredep in output.split():
     coredep = coredep.replace(pyversion,'${PYTHON_MAJMIN}')
     if isCached(coredep):
@@ -149,17 +160,16 @@ for filedep in old_manifest['core']['files']:
     # Get actual module name , shouldnt be affected by libdir/bindir, etc.
     pymodule = os.path.splitext(os.path.basename(os.path.normpath(filedep)))[0]
 
-
     # We now know that were dealing with a python module, so we can import it
     # and check what its dependencies are.
     # We launch a separate task for each module for deterministic behavior.
     # Each module will only import what is necessary for it to work in specific.
     # The output of each task will contain each module's dependencies
 
-    print ('Getting dependencies for module: %s' % pymodule)
-    output = subprocess.check_output([sys.executable, 'get_module_deps3.py', '%s' % pymodule]).decode('utf8')
-    print ('The following dependencies were found for module %s:\n' % pymodule)
-    print (output)
+    print_indent('Getting dependencies for module: %s' % pymodule, 2)
+    output = subprocess.check_output([sys.executable, 'get_module_deps3.py', '%s' % pymodule, '%s' % debugFlag]).decode('utf8')
+    print_indent('The following dependencies were found for module %s:\n' % pymodule, 4)
+    print_indent(output, 6)
 
 
     for pymodule_dep in output.split():
@@ -178,12 +188,13 @@ for filedep in old_manifest['core']['files']:
 # all others will use this a base.
 
 
+print('\n\nChecking for directories...\n')
 # To improve the script speed, we check which packages contain directories
 # since we will be looping through (only) those later.
 for pypkg in old_manifest:
     for filedep in old_manifest[pypkg]['files']:
         if isFolder(filedep):
-            print ('%s is a folder' % filedep)
+            print_indent('%s is a directory' % filedep, 2)
             if pypkg not in hasfolders:
                 hasfolders.append(pypkg)
             if filedep not in allfolders:
@@ -221,14 +232,14 @@ for pypkg in old_manifest:
 
     print('\n')
     print('--------------------------')
-    print ('Handling package %s' % pypkg)
+    print('Handling package %s' % pypkg)
     print('--------------------------')
 
     # Handle special cases, we assume that when they were manually added 
     # to the manifest we knew what we were doing.
     special_packages = ['misc', 'modules', 'dev', 'tests']
     if pypkg in special_packages or 'staticdev' in pypkg:
-        print('Passing %s package directly' % pypkg)
+        print_indent('Passing %s package directly' % pypkg, 2)
         new_manifest[pypkg] = old_manifest[pypkg]
         continue
 
@@ -259,7 +270,7 @@ for pypkg in old_manifest:
 
         # Get actual module name , shouldnt be affected by libdir/bindir, etc.
         # We need to check if the imported module comes from another (e.g. sqlite3.dump)
-        path,pymodule = os.path.split(filedep)
+        path, pymodule = os.path.split(filedep)
         path = os.path.basename(path)
         pymodule = os.path.splitext(os.path.basename(pymodule))[0]
 
@@ -279,10 +290,10 @@ for pypkg in old_manifest:
         # Each module will only import what is necessary for it to work in specific.
         # The output of each task will contain each module's dependencies
 
-        print ('\nGetting dependencies for module: %s' % pymodule)
-        output = subprocess.check_output([sys.executable, 'get_module_deps3.py', '%s' % pymodule]).decode('utf8')
-        print ('The following dependencies were found for module %s:\n' % pymodule)
-        print (output)
+        print_indent('\nGetting dependencies for module: %s' % pymodule, 2)
+        output = subprocess.check_output([sys.executable, 'get_module_deps3.py', '%s' % pymodule, '%s' % debugFlag]).decode('utf8')
+        print_indent('The following dependencies were found for module %s:\n' % pymodule, 4)
+        print_indent(output, 6)
 
         reportFILES = []
         reportRDEPS = []
@@ -325,7 +336,7 @@ for pypkg in old_manifest:
                             # print('Checking folder %s on package %s' % (pymodule_dep,pypkg_with_folder))
                             for folder_dep in old_manifest[pypkg_with_folder]['files'] or folder_dep in old_manifest[pypkg_with_folder]['cached']:
                                 if folder_dep == folder:
-                                    print ('%s folder found in %s' % (folder, pypkg_with_folder))
+                                    print ('%s directory found in %s' % (folder, pypkg_with_folder))
                                     folderFound = True
                                     if pypkg_with_folder not in new_manifest[pypkg]['rdepends'] and pypkg_with_folder != pypkg:
                                         new_manifest[pypkg]['rdepends'].append(pypkg_with_folder)
@@ -424,7 +435,7 @@ prepend_comments(comments,'python3-manifest.json.new')
 
 if (repeated):
     error_msg = '\n\nERROR:\n'
-    error_msg += 'The following files are repeated (contained in more than one package),\n'
+    error_msg += 'The following files were found in more than one package),\n'
     error_msg += 'this is likely to happen when new files are introduced after an upgrade,\n'
     error_msg += 'please check which package should get it,\n modify the manifest accordingly and re-run the create_manifest task:\n'
     error_msg += '\n'.join(repeated)

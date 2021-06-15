@@ -13,7 +13,6 @@ PROVIDES = "virtual/xserver-xf86"
 PROVIDES += "virtual/xserver"
 
 PE = "2"
-INC_PR = "r8"
 
 XORG_PN = "xorg-server"
 SRC_URI = "${XORG_MIRROR}/individual/xserver/${XORG_PN}-${PV}.tar.bz2"
@@ -24,12 +23,11 @@ S = "${WORKDIR}/${XORG_PN}-${PV}"
 
 inherit autotools pkgconfig
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
-PROTO_DEPS = "xorgproto"
 LIB_DEPS = "pixman libxfont2 xtrans libxau libxext libxdmcp libdrm libxkbfile libpciaccess"
-DEPENDS = "${PROTO_DEPS} ${LIB_DEPS} font-util"
+DEPENDS = "xorgproto ${LIB_DEPS} font-util"
 
 # Split out some modules and extensions from the main package
 # These aren't needed for basic operations and only take up space:
@@ -118,28 +116,29 @@ EXTRA_OECONF += "--with-fop=no \
                  --sysconfdir=/etc/X11 \
                  --localstatedir=/var \
                  --with-xkb-output=/var/lib/xkb \
+                 --with-os-name=Linux \
 "
 
 OPENGL_PKGCONFIGS = "dri glx glamor dri3 xshmfence"
-PACKAGECONFIG ??= "dri2 udev ${XORG_CRYPTO} \
+PACKAGECONFIG ??= "dga dri2 udev ${XORG_CRYPTO} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', '${OPENGL_PKGCONFIGS}', '', d)} \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'opengl wayland', 'xwayland', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd systemd-logind', '', d)} \
 "
 
 PACKAGECONFIG[udev] = "--enable-config-udev,--disable-config-udev,udev"
-PACKAGECONFIG[dri] = "--enable-dri,--disable-dri,xorgproto virtual/mesa"
-PACKAGECONFIG[dri2] = "--enable-dri2,--disable-dri2,xorgproto"
+PACKAGECONFIG[dga] = "--enable-dga,--disable-dga"
+PACKAGECONFIG[dri] = "--enable-dri,--disable-dri,virtual/mesa"
+PACKAGECONFIG[dri2] = "--enable-dri2,--disable-dri2"
 # DRI3 requires xshmfence to also be enabled
-PACKAGECONFIG[dri3] = "--enable-dri3,--disable-dri3,xorgproto"
-PACKAGECONFIG[glx] = "--enable-glx,--disable-glx,xorgproto virtual/libgl virtual/libx11"
+PACKAGECONFIG[dri3] = "--enable-dri3,--disable-dri3"
+PACKAGECONFIG[glx] = "--enable-glx,--disable-glx,virtual/libgl virtual/libx11"
 PACKAGECONFIG[glamor] = "--enable-glamor,--disable-glamor,libepoxy virtual/libgbm,libegl"
 PACKAGECONFIG[unwind] = "--enable-libunwind,--disable-libunwind,libunwind"
 PACKAGECONFIG[xshmfence] = "--enable-xshmfence,--disable-xshmfence,libxshmfence"
 PACKAGECONFIG[xmlto] = "--with-xmlto, --without-xmlto, xmlto-native docbook-xml-dtd4-native docbook-xsl-stylesheets-native"
 PACKAGECONFIG[systemd-logind] = "--enable-systemd-logind=yes,--enable-systemd-logind=no,dbus,"
 PACKAGECONFIG[systemd] = "--with-systemd-daemon,--without-systemd-daemon,systemd"
-PACKAGECONFIG[xinerama] = "--enable-xinerama,--disable-xinerama,xorgproto"
+PACKAGECONFIG[xinerama] = "--enable-xinerama,--disable-xinerama"
 PACKAGECONFIG[xwayland] = "--enable-xwayland,--disable-xwayland,wayland wayland-native wayland-protocols libepoxy"
 
 # Xorg requires a SHA1 implementation, pick one
@@ -151,6 +150,7 @@ PACKAGECONFIG[gcrypt] = "--with-sha1=libgcrypt,,libgcrypt"
 do_install_append () {
 	# Its assumed base-files creates this for us
 	rmdir ${D}${localstatedir}/log/
+        sed -i -e 's,${libdir}/xorg/modules,${prefix}/lib*/xorg/modules,' ${D}${mandir}/man5/xorg.conf.5
 }
 
 # Add runtime provides for the ABI versions of the video and input subsystems,

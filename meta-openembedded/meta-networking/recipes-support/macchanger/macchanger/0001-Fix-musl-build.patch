@@ -1,0 +1,31 @@
+From 12d1cc9da14b0cd0265bca3c4289a335ddf2e357 Mon Sep 17 00:00:00 2001
+From: Oleksandr Kravchuk <open.source@oleksandr-kravchuk.com>
+Date: Mon, 8 Apr 2019 21:00:20 +0200
+Subject: [PATCH] Fix musl build
+
+Fixes compilation error on musl:
+| ../macchanger-1.7.0/src/netinfo.c:116:26: error: expected ';' before 'epa'
+|   req.ifr_data = (caddr_t)epa;
+
+Missing data type is defined in <sys/types.h>.
+
+Signed-off-by: Oleksandr Kravchuk <open.source@oleksandr-kravchuk.com>
+---
+ src/netinfo.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/netinfo.c b/src/netinfo.c
+index 3525123..1aa3293 100644
+--- a/src/netinfo.c
++++ b/src/netinfo.c
+@@ -28,6 +28,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <sys/ioctl.h>
++#include <sys/types.h>
+ 
+ #include <linux/ethtool.h>
+ #include <linux/sockios.h>
+-- 
+2.17.1
+

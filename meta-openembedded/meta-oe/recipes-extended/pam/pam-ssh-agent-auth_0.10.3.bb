@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "3c53d358d6eaed1b211239df017c27c6f9970995d14102ae67bae16d4f
 
 DEPENDS += "libpam openssl"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
 # This gets us ssh-agent, which we are almost certain to want.
@@ -27,7 +27,7 @@ RDEPENDS_${PN} += "openssh-misc"
 #
 S = "${WORKDIR}/pam_ssh_agent_auth-${PV}"
 
-inherit autotools-brokensep
+inherit autotools-brokensep perlnative
 
 # Avoid autoreconf.  Override the --libexec oe_runconf specifies so that
 # the module is put with the other pam modules.  Because it cannot, in general,

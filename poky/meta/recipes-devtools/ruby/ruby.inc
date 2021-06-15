@@ -6,25 +6,24 @@ It is simple, straight-forward, and extensible. \
 "
 HOMEPAGE = "http://www.ruby-lang.org/"
 SECTION = "devel/ruby"
-LICENSE = "Ruby | BSD | GPLv2"
-LIC_FILES_CHKSUM = "\
-    file://COPYING;md5=340948e1882e579731841bf49cdc22c1 \
-    file://BSDL;md5=19aaf65c88a40b508d17ae4be539c4b5\
-    file://GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263\
-    file://LEGAL;md5=23a79bb4c1a40f6cc9bcb6f4e7c39799 \
-"
+LICENSE = "Ruby | BSD-2-Clause | BSD-3-Clause | GPLv2 | ISC | MIT"
+LIC_FILES_CHKSUM = "file://COPYING;md5=5b8c87559868796979806100db3f3805 \
+                    file://BSDL;md5=8b50bc6de8f586dc66790ba11d064d75 \
+                    file://GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
+                    file://LEGAL;md5=cfe5b0bc9f051b58c7e78db882ca5f9b \
+                    "
 
-DEPENDS = "ruby-native zlib openssl tcl libyaml gdbm readline"
-DEPENDS_class-native = "openssl-native libyaml-native readline-native"
+DEPENDS = "ruby-native zlib openssl libyaml gdbm readline libffi"
+DEPENDS_class-native = "openssl-native libyaml-native readline-native zlib-native"
 
 SHRT_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 SRC_URI = "http://cache.ruby-lang.org/pub/ruby/${SHRT_VER}/ruby-${PV}.tar.gz \
-           file://extmk.patch \
+           file://0001-extmk-fix-cross-compilation-of-external-gems.patch \
            file://0002-Obey-LDFLAGS-for-the-link-of-libruby.patch \
            "
 UPSTREAM_CHECK_URI = "https://www.ruby-lang.org/en/downloads/"
 
-inherit autotools
+inherit autotools ptest
 
 
 # This snippet lets compiled extensions which rely on external libraries,
@@ -35,6 +34,6 @@ inherit autotools
 # built.
 
 do_configure_prepend() {
-    sed -i "s#%%TARGET_CFLAGS%%#$TARGET_CFLAGS#; s#%%TARGET_LDFLAGS%%#$TARGET_LDFLAGS#" ${S}/common.mk
+    sed -i "s#%%TARGET_CFLAGS%%#$CFLAGS#; s#%%TARGET_LDFLAGS%%#$LDFLAGS#" ${S}/common.mk
     rm -rf ${S}/ruby/
 }

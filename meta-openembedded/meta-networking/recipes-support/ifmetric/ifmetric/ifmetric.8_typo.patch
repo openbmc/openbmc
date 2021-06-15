@@ -1,0 +1,15 @@
+Description: Correct typo: s/ommited/omitted/
+Author: Michael Shuler <michael@pbandjelly.org>
+Index: ifmetric/man/ifmetric.8
+===================================================================
+--- ifmetric.orig/man/ifmetric.8
++++ ifmetric/man/ifmetric.8
+@@ -9,7 +9,7 @@ ifmetric is a Linux tool for setting the
+ 
+ ifmetric uses the Linux NETLINK interface to manipulate the routes. Because of that it is compatible with routes created with the new iproute2 utility.
+ .SH OPTIONS
+-You should specify the interface name as first parameter. The second parameter should be the new metric. If ommited the metric 0 (highest) is used.
++You should specify the interface name as first parameter. The second parameter should be the new metric. If omitted the metric 0 (highest) is used.
+ .SH RETURN VALUES
+ \fI0\f1 Success
+ 

@@ -7,8 +7,6 @@ LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=4fbd65380cdd255951079008b364516c \
 
 DEPENDS = "glib-2.0 gdk-pixbuf"
 
-GNOME_COMPRESS_TYPE = "xz"
-
 inherit gnomebase gtk-doc gobject-introspection
 
 EXTRA_OECONF = "--disable-qt --enable-gdkpixbuf"

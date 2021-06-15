@@ -1,0 +1,3 @@
+FRUS=BMC,ETHERNET,ETHERNET1
+PATHS=/system/chassis/motherboard/bmc,/system/chassis/motherboard/bmc/eth0,/system/chassis/motherboard/bmc/eth1
+EEPROM=/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a080.i2c-bus/i2c-1/1-0050/eeprom

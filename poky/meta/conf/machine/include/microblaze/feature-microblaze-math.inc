@@ -13,14 +13,14 @@ TUNECONFLICTS[fpu-hard] = "fpu-soft"
 TUNECONFLICTS[fpu-hard-extended] = "fpu-soft"
 
 # Compiler args
-TUNE_CCARGS += "${@bb.utils.contains_any('TUNE_FEATURES', ['multiply-low', 'multiply-high'], '-mno-xl-soft-mul', '-mxl-soft-mul', d)}"
-TUNE_CCARGS += "${@bb.utils.contains('TUNE_FEATURES', 'multiply-high', '-mxl-multiply-high', '', d)}"
+TUNE_CCARGS .= "${@bb.utils.contains_any('TUNE_FEATURES', ['multiply-low', 'multiply-high'], ' -mno-xl-soft-mul', ' -mxl-soft-mul', d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'multiply-high', ' -mxl-multiply-high', '', d)}"
 
-TUNE_CCARGS += "${@bb.utils.contains('TUNE_FEATURES', 'divide-hard', '-mno-xl-soft-div', '-mxl-soft-div', d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'divide-hard', ' -mno-xl-soft-div', ' -mxl-soft-div', d)}"
 
-TUNE_CCARGS += "${@bb.utils.contains('TUNE_FEATURES', 'fpu-soft', '', '', d)}"
-TUNE_CCARGS += "${@bb.utils.contains_any('TUNE_FEATURES', ['fpu-hard', 'fpu-hard-extended'], '-mhard-float', '', d)}"
-TUNE_CCARGS += "${@bb.utils.contains('TUNE_FEATURES', 'fpu-hard-extended', '-mxl-float-convert -mxl-float-sqrt', '', d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'fpu-soft', '', '', d)}"
+TUNE_CCARGS .= "${@bb.utils.contains_any('TUNE_FEATURES', ['fpu-hard', 'fpu-hard-extended'], ' -mhard-float', '', d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'fpu-hard-extended', ' -mxl-float-convert -mxl-float-sqrt', '', d)}"
 
 # Set target fpu (bitbake known target) to soft or hard (basic or extended)
 TARGET_FPU = "${@bb.utils.contains_any('TUNE_FEATURES', 'fpu-hard fpu-hard-extended', 'fpu-hard', 'fpu-soft', d)}"

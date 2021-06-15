@@ -1,4 +1,5 @@
 SUMMARY = "Matchbox Window Manager Desktop"
+DESCRIPTION = "A lightweight windows manager for embedded systems. It uses the desktop background to provide an application launcher and allows modules to be loaded for additional functionality."
 HOMEPAGE = "http://matchbox-project.org/"
 BUGTRACKER = "http://bugzilla.yoctoproject.org/"
 
@@ -13,14 +14,14 @@ SECTION = "x11/wm"
 # SRCREV tagged 2.2
 SRCREV = "6bc67d09da4147e5552fe30011a05a2c59d2f777"
 SRC_URI = "git://git.yoctoproject.org/${BPN}-2 \
-           file://vfolders/* \
+           file://vfolders/ \
            "
 
 EXTRA_OECONF = "--enable-startup-notification --with-dbus"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 # The startup-notification requires x11 in DISTRO_FEATURES
 REQUIRED_DISTRO_FEATURES = "x11"

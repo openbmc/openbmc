@@ -1,5 +1,3 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
 BitBake 'Fetch' implementations
 
@@ -10,26 +8,14 @@ BitBake build tools.
 
 # Copyright (C) 2003, 2004  Chris Larson
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # Based on functions from the base bb module, Copyright 2003 Holger Schurig
 
+import shlex
 import re
 import tempfile
-import subprocess
 import os
-import logging
 import errno
 import bb
 import bb.progress
@@ -40,7 +26,6 @@ from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
 from   bb.fetch2 import logger
 from   bb.fetch2 import runfetchcmd
-from   bb.fetch2 import FetchConnectionCache
 from   bb.utils import export_proxies
 from   bs4 import BeautifulSoup
 from   bs4 import SoupStrainer
@@ -67,6 +52,12 @@ class WgetProgressHandler(bb.progress.LineFilterProgressHandler):
 
 
 class Wget(FetchMethod):
+
+    # CDNs like CloudFlare may do a 'browser integrity test' which can fail
+    # with the standard wget/urllib User-Agent, so pretend to be a modern
+    # browser.
+    user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0"
+
     """Class to fetch urls via 'wget'"""
     def supports(self, ud, d):
         """
@@ -97,7 +88,7 @@ class Wget(FetchMethod):
 
         progresshandler = WgetProgressHandler(d)
 
-        logger.debug(2, "Fetching %s using command '%s'" % (ud.url, command))
+        logger.debug2("Fetching %s using command '%s'" % (ud.url, command))
         bb.fetch2.check_network_access(d, command, ud.url)
         runfetchcmd(command + ' --progress=dot -v', d, quiet, log=progresshandler, workdir=workdir)
 
@@ -107,9 +98,9 @@ class Wget(FetchMethod):
         fetchcmd = self.basecmd
 
         if 'downloadfilename' in ud.parm:
-            dldir = d.getVar("DL_DIR")
-            bb.utils.mkdirhier(os.path.dirname(dldir + os.sep + ud.localfile))
-            fetchcmd += " -O " + dldir + os.sep + ud.localfile
+            localpath = os.path.join(d.getVar("DL_DIR"), ud.localfile)
+            bb.utils.mkdirhier(os.path.dirname(localpath))
+            fetchcmd += " -O %s" % shlex.quote(localpath)
 
         if ud.user and ud.pswd:
             fetchcmd += " --user=%s --password=%s --auth-no-challenge" % (ud.user, ud.pswd)
@@ -223,10 +214,7 @@ class Wget(FetchMethod):
                         fetch.connection_cache.remove_connection(h.host, h.port)
                     raise urllib.error.URLError(err)
                 else:
-                    try:
-                        r = h.getresponse(buffering=True)
-                    except TypeError: # buffering kw not supported
-                        r = h.getresponse()
+                    r = h.getresponse()
 
                 # Pick apart the HTTPResponse object to get the addinfourl
                 # object initialized properly.
@@ -270,13 +258,15 @@ class Wget(FetchMethod):
                 fp.read()
                 fp.close()
 
-                newheaders = dict((k, v) for k, v in list(req.headers.items())
-                                  if k.lower() not in ("content-length", "content-type"))
-                return self.parent.open(urllib.request.Request(req.get_full_url(),
-                                                        headers=newheaders,
-                                                        origin_req_host=req.origin_req_host,
-                                                        unverifiable=True))
+                if req.get_method() != 'GET':
+                    newheaders = dict((k, v) for k, v in list(req.headers.items())
+                                      if k.lower() not in ("content-length", "content-type"))
+                    return self.parent.open(urllib.request.Request(req.get_full_url(),
+                                                            headers=newheaders,
+                                                            origin_req_host=req.origin_req_host,
+                                                            unverifiable=True))
 
+                raise urllib.request.HTTPError(req, code, msg, headers, None)
 
             # Some servers (e.g. GitHub archives, hosted on Amazon S3) return 403
             # Forbidden when they actually mean 405 Method Not Allowed.
@@ -313,6 +303,7 @@ class Wget(FetchMethod):
             # Some servers (FusionForge, as used on Alioth) require that the
             # optional Accept header is set.
             r.add_header("Accept", "*/*")
+            r.add_header("User-Agent", self.user_agent)
             def add_basic_auth(login_str, request):
                 '''Adds Basic auth to http request, pass in login:password as string'''
                 import base64
@@ -335,11 +326,19 @@ class Wget(FetchMethod):
                 pass
         except urllib.error.URLError as e:
             if try_again:
-                logger.debug(2, "checkstatus: trying again")
+                logger.debug2("checkstatus: trying again")
                 return self.checkstatus(fetch, ud, d, False)
             else:
                 # debug for now to avoid spamming the logs in e.g. remote sstate searches
-                logger.debug(2, "checkstatus() urlopen failed: %s" % e)
+                logger.debug2("checkstatus() urlopen failed: %s" % e)
+                return False
+        except ConnectionResetError as e:
+            if try_again:
+                logger.debug2("checkstatus: trying again")
+                return self.checkstatus(fetch, ud, d, False)
+            else:
+                # debug for now to avoid spamming the logs in e.g. remote sstate searches
+                logger.debug2("checkstatus() urlopen failed: %s" % e)
                 return False
         return True
 
@@ -416,9 +415,8 @@ class Wget(FetchMethod):
         """
         f = tempfile.NamedTemporaryFile()
         with tempfile.TemporaryDirectory(prefix="wget-index-") as workdir, tempfile.NamedTemporaryFile(dir=workdir, prefix="wget-listing-") as f:
-            agent = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.12) Gecko/20101027 Ubuntu/9.10 (karmic) Firefox/3.6.12"
             fetchcmd = self.basecmd
-            fetchcmd += " -O " + f.name + " --user-agent='" + agent + "' '" + uri + "'"
+            fetchcmd += " -O " + f.name + " --user-agent='" + self.user_agent + "' '" + uri + "'"
             try:
                 self._runwget(ud, d, fetchcmd, True, workdir=workdir)
                 fetchresult = f.read()
@@ -474,7 +472,7 @@ class Wget(FetchMethod):
         version_dir = ['', '', '']
         version = ['', '', '']
 
-        dirver_regex = re.compile(r"(?P<pfx>\D*)(?P<ver>(\d+[\.\-_])+(\d+))")
+        dirver_regex = re.compile(r"(?P<pfx>\D*)(?P<ver>(\d+[\.\-_])*(\d+))")
         s = dirver_regex.search(dirver)
         if s:
             version_dir[1] = s.group('ver')

@@ -1,14 +1,14 @@
 require pseudo.inc
 
-SRC_URI = "git://git.yoctoproject.org/pseudo \
+SRC_URI = "git://git.yoctoproject.org/pseudo;branch=oe-core \
            file://0001-configure-Prune-PIE-flags.patch \
            file://fallback-passwd \
            file://fallback-group \
-           file://moreretries.patch \
-           file://toomanyfiles.patch \
            "
 
-SRCREV = "6294b344e5140f5467e6860f45a174440015304e"
+SRCREV = "ee24ebec9e5a11dd5208c9be2870f35eab3b9e20"
 S = "${WORKDIR}/git"
 PV = "1.9.0+git${SRCPV}"
 
+# error: use of undeclared identifier '_STAT_VER'
+COMPATIBLE_HOST_libc-musl = 'null'

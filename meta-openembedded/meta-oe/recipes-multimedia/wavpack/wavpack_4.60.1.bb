@@ -1,5 +1,5 @@
 DESCRIPTION = "WavPack is a completely open audio compression format providing lossless, high-quality lossy, and a unique hybrid compression mode."
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://license.txt;md5=f596650807588c61fcab60bec8242df8"
 
 SRC_URI = "http://wavpack.com/wavpack-${PV}.tar.bz2"

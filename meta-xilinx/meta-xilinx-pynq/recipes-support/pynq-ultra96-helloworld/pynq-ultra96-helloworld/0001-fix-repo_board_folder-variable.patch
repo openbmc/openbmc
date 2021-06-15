@@ -1,0 +1,33 @@
+
+m 38230239577f1c53fdd83b44002f8113bdabedd6 Mon Sep 17 00:00:00 2001
+From: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+Date: Fri, 7 Jun 2019 23:51:07 +0000
+Subject: [PATCH] fix repo_board_folder variable
+
+---
+ setup.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 708dc25..21595f1 100644
+--- a/setup.py
++++ b/setup.py
+@@ -34,13 +34,14 @@ import shutil
+ 
+ # global variables
+ board = os.environ['BOARD']
+-repo_board_folder = f'boards/{board}/resizer'
++repo_board_folder = 'boards/'+board+'/resizer'
+ board_notebooks_dir = os.environ['PYNQ_JUPYTER_NOTEBOOKS']
+ hw_data_files = []
+ 
+ 
+ # check whether board is supported
+ def check_env():
++    print("board = %s repo_board_folder = %s" %(board,repo_board_folder))
+     if not os.path.isdir(repo_board_folder):
+         raise ValueError("Board {} is not supported.".format(board))
+     if not os.path.isdir(board_notebooks_dir):
+-- 
+2.7.4
+

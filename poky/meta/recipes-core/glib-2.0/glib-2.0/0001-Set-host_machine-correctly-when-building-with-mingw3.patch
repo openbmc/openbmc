@@ -1,4 +1,4 @@
-From 4169f11beedacfbb8c7934a4c99189d44935a6b9 Mon Sep 17 00:00:00 2001
+From 333809ded70ad4e3470b7134e3fac1a42ff48e61 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 13 Feb 2019 15:32:05 +0100
 Subject: [PATCH] Set host_machine correctly when building with mingw32
@@ -8,78 +8,69 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
  gio/tests/meson.build  | 8 ++++----
- glib/tests/meson.build | 4 ++--
+ glib/tests/meson.build | 2 +-
  meson.build            | 3 +++
  tests/meson.build      | 2 +-
- 4 files changed, 10 insertions(+), 7 deletions(-)
+ 4 files changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/gio/tests/meson.build b/gio/tests/meson.build
-index 181f5c7..11a1f12 100644
+index 3a19c82..b762835 100644
 --- a/gio/tests/meson.build
 +++ b/gio/tests/meson.build
-@@ -12,7 +12,7 @@ test_c_args = [
-   '-DGLIB_COMPILE_SCHEMAS="@0@"'.format(glib_compile_schemas.full_path()),
- ]
+@@ -27,7 +27,7 @@ test_c_args = [
+   endif # libutil.length() > 0
+ endif # build_machine.system() == 'linux'
  
 -if host_machine.system() == 'windows'
 +if host_system == 'windows'
    common_gio_tests_deps += [iphlpapi_dep, winsock2, cc.find_library ('secur32')]
  endif
  
-@@ -122,7 +122,7 @@ if dbus1_dep.found()
+@@ -148,7 +148,7 @@ else
  endif
  
  #  Test programs buildable on UNIX only
 -if host_machine.system() != 'windows'
 +if host_system != 'windows'
-   gio_tests += [{
+   gio_tests += {
      'file' : {},
      'gdbus-peer' : {
-@@ -314,7 +314,7 @@ if host_machine.system() != 'windows'
+@@ -402,7 +402,7 @@ if host_machine.system() != 'windows'
  endif # unix
  
  #  Test programs buildable on Windows only
 -if host_machine.system() == 'windows'
 +if host_system == 'windows'
-   gio_tests += [{'win32-streams' : {}}]
+   gio_tests += {'win32-streams' : {}}
  endif
  
-@@ -379,7 +379,7 @@ if cc.get_id() != 'msvc'
-   }]
+@@ -472,7 +472,7 @@ if cc.get_id() != 'msvc' and cc.get_id() != 'clang-cl'
+   }
  endif
  
 -if host_machine.system() != 'windows'
 +if host_system != 'windows'
-   test_extra_programs += [{
+   test_extra_programs += {
      'gdbus-example-unix-fd-client' : {
        'install' : false,
 diff --git a/glib/tests/meson.build b/glib/tests/meson.build
-index d7b6a7a..6678a08 100644
+index 6eb23e8..36eb919 100644
 --- a/glib/tests/meson.build
 +++ b/glib/tests/meson.build
-@@ -45,7 +45,7 @@ glib_tests = {
-   'hook' : {},
-   'hostutils' : {},
-   'include' : {
--    'skip' : host_machine.system() == 'windows',
-+    'skip' : host_system == 'windows',
-   },
-   'keyfile' : {},
-   'list' : {},
-@@ -112,7 +112,7 @@ glib_tests = {
-   'utils' : {},
-   'unicode' : {},
-   'unix' : {
--    'skip' : host_machine.system() == 'windows',
-+    'skip' : host_system == 'windows',
-   },
-   'uri' : {},
-   '1bit-mutex' : {},
+@@ -142,7 +142,7 @@ if glib_conf.has('HAVE_EVENTFD')
+   }
+ endif
+ 
+-if host_machine.system() == 'windows'
++if host_system == 'windows'
+   if winsock2.found()
+     glib_tests += {
+       'gpoll' : {
 diff --git a/meson.build b/meson.build
-index f7405a2..4348f20 100644
+index 47f3a5c..7ea7ad1 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -31,6 +31,9 @@ else
+@@ -32,6 +32,9 @@ else
  endif
  
  host_system = host_machine.system()
@@ -87,18 +78,18 @@ index f7405a2..4348f20 100644
 +  host_system = 'windows'
 +endif
  
- glib_version = meson.project_version()
- glib_api_version = '2.0'
+ if host_system == 'darwin'
+   ios_test_code = '''#include <TargetConditionals.h>
 diff --git a/tests/meson.build b/tests/meson.build
-index 80e45d7..9f3869f 100644
+index 6741f8f..12fdc90 100644
 --- a/tests/meson.build
 +++ b/tests/meson.build
-@@ -67,7 +67,7 @@ test_extra_programs = {
+@@ -73,7 +73,7 @@ test_extra_programs = {
    'unicode-collate' : {},
  }
  
 -if host_machine.system() != 'windows'
 +if host_system != 'windows'
-   tests += [{
+   tests += {
      'timeloop' : {},
-     'spawn-test' : {},
+     'iochannel-test' : {},

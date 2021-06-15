@@ -1,0 +1,39 @@
+From 4fc5075cebc9c76053b5ff683ab75c9e8b46ca1a Mon Sep 17 00:00:00 2001
+From: David Holsgrove <david.holsgrove@xilinx.com>
+Date: Wed, 27 Feb 2013 13:56:11 +1000
+Subject: [PATCH 05/52] upstream change to garbage collection sweep causes mb
+ regression
+
+Upstream change for PR13177 now clears the def_regular during gc_sweep of a
+section. (All other archs in binutils/bfd/elf32-*.c received an update
+to a warning about unresolvable relocations - this warning is not present
+in binutils/bfd/elf32-microblaze.c, but this warning check would not
+prevent the error being seen)
+
+The visible issue with this change is when running a c++ application
+in Petalinux which links libstdc++.so for exception handling it segfaults
+on execution.
+
+This does not occur if static linking libstdc++.a, so its during the
+relocations for a shared lib with garbage collection this occurs
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+---
+ bfd/elflink.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/bfd/elflink.c b/bfd/elflink.c
+index 998b72f228..2daf8fdf6a 100644
+--- a/bfd/elflink.c
++++ b/bfd/elflink.c
+@@ -6372,7 +6372,6 @@ elf_gc_sweep_symbol (struct elf_link_hash_entry *h, void *data)
+ 
+       inf = (struct elf_gc_sweep_symbol_info *) data;
+       (*inf->hide_symbol) (inf->info, h, TRUE);
+-      h->def_regular = 0;
+       h->ref_regular = 0;
+       h->ref_regular_nonweak = 0;
+     }
+-- 
+2.17.1
+

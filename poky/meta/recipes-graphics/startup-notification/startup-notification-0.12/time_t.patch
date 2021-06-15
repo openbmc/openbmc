@@ -1,0 +1,108 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From a7e49fefde18ea8d5bada8096d32f23bcfb5a6dc Mon Sep 17 00:00:00 2001
+From: "Federico G. Schwindt" <fgsch@openbsd.org>
+Date: Mon, 17 Feb 2014 15:48:12 +0100
+Subject: [PATCH 1/3] Fix crash on 32bit architectures where time_t is 64 bit
+
+This is an ABI change on platforms where sizeof(time_t) doesn't equal
+sizeof(long). For most platforms this change shouldn't make a difference
+at present. OpenBSD recently switched to 64bit time_t on all architectures
+to avoid time_t overflow in 2038 on 32bit machines.
+
+This fix extends to consumers of startup-notification, for instance
+the window manager of XFCE, which is how I got involved in this.
+See http://mail.xfce.org/pipermail/xfce4-dev/2014-February/030611.html
+and follow-ups. The XFCE devs pointed out that my patch to fix a
+crash in XFCE's window manager depends on this startup-notification patch.
+
+Signed-off-by: Julien Danjou <julien@danjou.info>
+---
+ libsn/sn-monitor.c | 8 ++++----
+ libsn/sn-monitor.h | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/libsn/sn-monitor.c b/libsn/sn-monitor.c
+index 2a9ad16..f419bc1 100644
+--- a/libsn/sn-monitor.c
++++ b/libsn/sn-monitor.c
+@@ -364,8 +364,8 @@ sn_startup_sequence_get_screen (SnStartupSequence *sequence)
+  **/
+ void
+ sn_startup_sequence_get_initiated_time (SnStartupSequence *sequence,
+-                                        long              *tv_sec,
+-                                        long              *tv_usec)
++                                        time_t            *tv_sec,
++                                        suseconds_t       *tv_usec)
+ {
+   if (tv_sec)
+     *tv_sec = sequence->initiation_time.tv_sec;
+@@ -386,8 +386,8 @@ sn_startup_sequence_get_initiated_time (SnStartupSequence *sequence,
+  **/
+ void
+ sn_startup_sequence_get_last_active_time (SnStartupSequence *sequence,
+-                                          long              *tv_sec,
+-                                          long              *tv_usec)
++                                          time_t            *tv_sec,
++                                          suseconds_t       *tv_usec)
+ {
+   /* for now the same as get_initiated_time */
+   if (tv_sec)
+diff --git a/libsn/sn-monitor.h b/libsn/sn-monitor.h
+index b58581f..2f639df 100644
+--- a/libsn/sn-monitor.h
++++ b/libsn/sn-monitor.h
+@@ -77,11 +77,11 @@ const char* sn_startup_sequence_get_application_id        (SnStartupSequence *se
+ int         sn_startup_sequence_get_screen                (SnStartupSequence *sequence);
+ 
+ void        sn_startup_sequence_get_initiated_time        (SnStartupSequence *sequence,
+-                                                           long              *tv_sec,
+-                                                           long              *tv_usec);
++                                                           time_t            *tv_sec,
++                                                           suseconds_t       *tv_usec);
+ void        sn_startup_sequence_get_last_active_time      (SnStartupSequence *sequence,
+-                                                           long              *tv_sec,
+-                                                           long              *tv_usec);
++                                                           time_t            *tv_sec,
++                                                           suseconds_t       *tv_usec);
+ 
+ void        sn_startup_sequence_complete                  (SnStartupSequence *sequence);
+ 
+-- 
+2.26.2
+
+From ea9f7e4cc6fd8c08d175ed7774ed2c5bd11c8ef0 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Mon, 17 Feb 2014 14:37:09 -0500
+Subject: [PATCH 2/3] Add include of <sys/select.h> for previous patch
+
+Unfortunately while the standard says that <sys/types.h> is the
+correct header to get suseconds_t, at least with glibc, that requires
+-DXOPEN_SOURCE.  Which is problematic for a public header, because
+then all *users* of startup-notification will be required to define
+that.
+
+Poking around a bit, it looks like at least with glibc, <sys/select.h>
+will give us an unconditional define.
+
+Signed-off-by: Julien Danjou <julien@danjou.info>
+---
+ libsn/sn-monitor.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libsn/sn-monitor.h b/libsn/sn-monitor.h
+index 2f639df..cea4e12 100644
+--- a/libsn/sn-monitor.h
++++ b/libsn/sn-monitor.h
+@@ -28,6 +28,7 @@
+ #define __SN_MONITOR_H__
+ 
+ #include <libsn/sn-common.h>
++#include <sys/select.h>
+ 
+ SN_BEGIN_DECLS
+ 
+-- 
+2.26.2
+

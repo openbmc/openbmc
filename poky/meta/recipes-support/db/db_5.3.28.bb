@@ -10,22 +10,24 @@
 # same system at the same time if really necessary.
 SECTION = "libs"
 SUMMARY = "Berkeley Database v5"
-HOMEPAGE = "http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html"
+DESCRIPTION = "Provides the foundational storage services for your application, no matter how demanding and unique your requirements may seem to be"
+HOMEPAGE = "https://www.oracle.com/database/technologies/related/berkeleydb.html"
 LICENSE = "Sleepycat"
 RCONFLICTS_${PN} = "db3"
 
-CVE_PRODUCT = "oracle_berkeley_db"
+CVE_PRODUCT = "oracle_berkeley_db berkeley_db"
 CVE_VERSION = "11.2.${PV}"
 
 PR = "r1"
 PE = "1"
 
-SRC_URI = "http://download.oracle.com/berkeley-db/db-${PV}.tar.gz"
+SRC_URI = "https://download.oracle.com/berkeley-db/db-${PV}.tar.gz"
 SRC_URI += "file://fix-parallel-build.patch \
             file://0001-atomic-Rename-local-__atomic_compare_exchange-to-avo.patch \
             file://0001-configure-Add-explicit-tag-options-to-libtool-invoca.patch \
             file://sequence-type.patch \
             file://0001-Fix-libc-compatibility-by-renaming-atomic_init-API.patch \
+            file://0001-clock-Do-not-define-own-timespec.patch \
            "
 # We are not interested in official latest 6.x versions;
 # let's track what debian is using.
@@ -56,9 +58,13 @@ FILES_SOLIBSDEV = "${libdir}/libdb.so ${libdir}/libdb_cxx.so"
 
 #configuration - set in local.conf to override
 # All the --disable-* options replace --enable-smallbuild, which breaks a bunch of stuff (eg. postfix)
-DB5_CONFIG ?= "--enable-o_direct --disable-cryptography --disable-queue --disable-replication --disable-verify --disable-compat185 --disable-sql"
+DB5_CONFIG ?= "--enable-o_direct --disable-cryptography --disable-queue --disable-replication --disable-compat185 --disable-sql"
 
 EXTRA_OECONF = "${DB5_CONFIG} --enable-shared --enable-cxx --with-sysroot STRIP=true"
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[verify] = "--enable-verify, --disable-verify"
+PACKAGECONFIG[dbm] = "--enable-dbm,--disable-dbm,"
 
 EXTRA_OEMAKE += "LIBTOOL='./${HOST_SYS}-libtool'"
 
@@ -104,6 +110,9 @@ do_install_append() {
 	fi
 
 	chown -R root:root ${D}
+	if ${@bb.utils.contains('PACKAGECONFIG', 'verify', 'false', 'true', d)}; then
+		rm -f ${D}${bindir}/db_verify
+	fi
 }
 
 INSANE_SKIP_${PN} = "dev-so"

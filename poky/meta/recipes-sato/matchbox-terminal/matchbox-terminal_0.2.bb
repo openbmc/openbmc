@@ -16,6 +16,6 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"

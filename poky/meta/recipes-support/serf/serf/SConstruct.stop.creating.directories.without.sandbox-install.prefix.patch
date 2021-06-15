@@ -1,0 +1,71 @@
+stop scons trying to create directories in hosts rootfs
+
+* since 1522f09a4d serf: cleanup recipe
+  serf.do_install fails in builds with multilib enabled (with
+  libdir=/usr/lib64 on host where /usr/lib64 doesn't exist)
+
+DEBUG: Executing shell function do_install
+scons: Reading SConscript files ...
+PermissionError: [Errno 13] Permission denied: '/usr/lib64':
+  File "TOPDIR/BUILD/work/qemux86-signage-linux/serf/1.3.9-r0/serf-1.3.9/SConstruct", line 158:
+    ENV = os.environ,
+  File "/TOPDIR/BUILD/work/qemux86-signage-linux/serf/1.3.9-r0/recipe-sysroot-native/usr/bin/../../usr/lib/python3.7/site-packages/SCons/Environment.py", line 965:
+    variables.Update(self)
+  File "/TOPDIR/BUILD/work/qemux86-signage-linux/serf/1.3.9-r0/recipe-sysroot-native/usr/bin/../../usr/lib/python3.7/site-packages/SCons/Variables/__init__.py", line 227:
+    option.validator(option.key, env.subst('${%s}'%option.key), env)
+  File "TOPDIR/BUILD/work/qemux86-signage-linux/serf/1.3.9-r0/serf-1.3.9/SConstruct", line 60:
+    return PathVariable.PathIsDirCreate(key, val, env)
+  File "/TOPDIR/BUILD/work/qemux86-signage-linux/serf/1.3.9-r0/recipe-sysroot-native/usr/bin/../../usr/lib/python3.7/site-packages/SCons/Variables/PathVariable.py", line 101:
+    os.makedirs(val)
+  File "TOPDIR/BUILD/work/qemux86-signage-linux/serf/1.3.9-r0/recipe-sysroot-native/usr/lib/python3.7/os.py", line 221:
+    mkdir(name, mode)
+ERROR: scons install execution failed.
+
+* I don't know how exactly --install-sandbox is supposed to work but
+  in this case it's trying to mkdir /usr/lib64 on the host rootfs
+  which is clearly wrong and if I set LIBDIR together with
+  --install-sandbox then the install paths are prefixed with $D twice
+  in some cases (not for includedir and empty libdir at the end).
+  So in the end I think it was an issue caused by the custom path
+  validator in serf's SConstruct, removing that stops touching host
+  and the installed paths (including the paths inside libserf*.pc)
+  look correct
+
+Upstream-Status: Pending
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+--- serf-1.3.9/SConstruct	2019-06-18 15:49:19.968961108 +0000
++++ serf-1.3.9b/SConstruct	2019-06-18 18:53:21.412337151 +0000
+@@ -51,17 +51,6 @@
+     """
+     return (key, '%s' % (help), default, None, lambda val: _converter(val))
+ 
+-# Custom path validator, creates directory when a specified option is set.
+-# To be used to ensure a PREFIX directory is only created when installing.
+-def createPathIsDirCreateWithTarget(target):
+-  def my_validator(key, val, env):
+-    build_targets = (map(str, BUILD_TARGETS))
+-    if target in build_targets:
+-      return PathVariable.PathIsDirCreate(key, val, env)
+-    else:
+-      return PathVariable.PathAccept(key, val, env)
+-  return my_validator
+-
+ # default directories
+ if sys.platform == 'win32':
+   default_incdir='..'
+@@ -77,11 +66,11 @@
+   PathVariable('PREFIX',
+                'Directory to install under',
+                default_prefix,
+-               createPathIsDirCreateWithTarget('install')),
++               PathVariable.PathAccept),
+   PathVariable('LIBDIR',
+                'Directory to install architecture dependent libraries under',
+                default_libdir,
+-               createPathIsDirCreateWithTarget('install')),
++               PathVariable.PathAccept),
+   PathVariable('APR',
+                "Path to apr-1-config, or to APR's install area",
+                default_incdir,

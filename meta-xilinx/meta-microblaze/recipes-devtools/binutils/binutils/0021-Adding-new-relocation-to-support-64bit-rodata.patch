@@ -1,0 +1,166 @@
+From 9880b06269a176c0b5c4f0ecb9e3784f630a76be Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Sat, 13 Oct 2018 21:17:01 +0530
+Subject: [PATCH 21/52] Adding new relocation to support 64bit rodata
+
+---
+ bfd/elf64-microblaze.c     | 11 +++++++--
+ gas/config/tc-microblaze.c | 49 ++++++++++++++++++++++++++++++++++----
+ 2 files changed, 54 insertions(+), 6 deletions(-)
+
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index f42d7f429b..ddcb5baf74 100644
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -1473,6 +1473,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 	    case (int) R_MICROBLAZE_64_PCREL :
+ 	    case (int) R_MICROBLAZE_64:
+ 	    case (int) R_MICROBLAZE_32:
++	    case (int) R_MICROBLAZE_IMML_64:
+ 	      {
+ 		/* r_symndx will be STN_UNDEF (zero) only for relocs against symbols
+ 		   from removed linkonce sections, or sections discarded by
+@@ -1482,6 +1483,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 		    relocation += addend;
+ 		    if (r_type == R_MICROBLAZE_32)// || r_type == R_MICROBLAZE_IMML_64)
+ 		      bfd_put_32 (input_bfd, relocation, contents + offset);
++		    else if (r_type == R_MICROBLAZE_IMML_64)
++		      bfd_put_64 (input_bfd, relocation, contents + offset);
+ 		    else
+ 		      {
+ 			if (r_type == R_MICROBLAZE_64_PCREL)
+@@ -1560,7 +1563,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 		      }
+ 		    else
+ 		      {
+-			if (r_type == R_MICROBLAZE_32)
++			if (r_type == R_MICROBLAZE_32 || r_type == R_MICROBLAZE_IMML_64)
+ 			  {
+ 			    outrel.r_info = ELF64_R_INFO (0, R_MICROBLAZE_REL);
+ 			    outrel.r_addend = relocation + addend;
+@@ -1586,6 +1589,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 		    relocation += addend;
+ 		    if (r_type == R_MICROBLAZE_32)
+ 		      bfd_put_32 (input_bfd, relocation, contents + offset);
++		    else if (r_type == R_MICROBLAZE_IMML_64)
++		      bfd_put_64 (input_bfd, relocation, contents + offset + endian);
+ 		    else
+ 		      {
+ 			if (r_type == R_MICROBLAZE_64_PCREL)
+@@ -2098,7 +2103,8 @@ microblaze_elf_relax_section (bfd *abfd,
+                   microblaze_bfd_write_imm_value_32 (abfd, ocontents + irelscan->r_offset,
+                                                      irelscan->r_addend);
+               }
+-              if (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32)
++              if (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32 
++		   || ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_IMML_64)
+                 {
+ 	          isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
+ 
+@@ -2606,6 +2612,7 @@ microblaze_elf_check_relocs (bfd * abfd,
+         case R_MICROBLAZE_64:
+         case R_MICROBLAZE_64_PCREL:
+         case R_MICROBLAZE_32:
++        case R_MICROBLAZE_IMML_64:
+           {
+             if (h != NULL && !bfd_link_pic (info))
+ 	      {
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index bfb3104720..532a26eaa5 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -1119,6 +1119,13 @@ md_assemble (char * str)
+ 	    as_fatal (_("smi pseudo instruction should not use a label in imm field"));
+           if(streq (name, "lli") || streq (name, "sli"))
+             opc = str_microblaze_64;
++          else if ((microblaze_arch_size == 64) && ((streq (name, "lbui")
++			|| streq (name, "lhui") || streq (name, "lwi") || streq (name, "sbi")
++			|| streq (name, "shi") || streq (name, "swi"))))
++	    {
++              opc = str_microblaze_64;
++	      subtype = opcode->inst_offset_type;
++	    }
+ 	  else if (reg2 == REG_ROSDP)
+ 	    opc = str_microblaze_ro_anchor;
+ 	  else if (reg2 == REG_RWSDP)
+@@ -1182,7 +1189,10 @@ md_assemble (char * str)
+               inst |= (immed << IMM_LOW) & IMM_MASK;
+             }
+ 	}
+-      else if (streq (name, "lli") || streq (name, "sli"))
++      else if (streq (name, "lli") || streq (name, "sli") || ((microblaze_arch_size == 64)
++		&& ((streq (name, "lbui")) || streq (name, "lhui")
++		|| streq (name, "lwi") || streq (name, "sbi")
++                || streq (name, "shi") || streq (name, "swi"))))
+         {
+           temp = immed & 0xFFFFFF8000;
+           if (temp != 0 && temp != 0xFFFFFF8000)
+@@ -1794,6 +1804,11 @@ md_assemble (char * str)
+ 
+ 	  if (exp.X_md != 0)
+ 	    subtype = get_imm_otype(exp.X_md);
++          else if (streq (name, "brealid") || streq (name, "breaid") || streq (name, "breai"))
++            {
++              opc = str_microblaze_64;
++	      subtype = opcode->inst_offset_type;
++	    }
+ 	  else
+ 	    subtype = opcode->inst_offset_type;
+ 
+@@ -1811,6 +1826,31 @@ md_assemble (char * str)
+           output = frag_more (isize);
+           immed = exp.X_add_number;
+         }
++      if (streq (name, "brealid") || streq (name, "breaid") || streq (name, "breai"))
++        {
++          temp = immed & 0xFFFFFF8000;
++          if (temp != 0 && temp != 0xFFFFFF8000)
++            {
++              /* Needs an immediate inst.  */
++              opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imml");
++              if (opcode1 == NULL)
++                {
++                  as_bad (_("unknown opcode \"%s\""), "imml");
++                  return;
++                }
++              inst1 = opcode1->bit_sequence;
++	      inst1 |= ((immed & 0xFFFFFFFFFFFF0000L) >> 16) & IMML_MASK;
++              output[0] = INST_BYTE0 (inst1);
++              output[1] = INST_BYTE1 (inst1);
++              output[2] = INST_BYTE2 (inst1);
++              output[3] = INST_BYTE3 (inst1);
++              output = frag_more (isize);
++            }
++      	  inst |= (reg1 << RD_LOW) & RD_MASK;
++          inst |= (immed << IMM_LOW) & IMM_MASK;
++         }
++       else 
++	 {
+ 
+       temp = immed & 0xFFFF8000;
+       if ((temp != 0) && (temp != 0xFFFF8000))
+@@ -1834,6 +1874,7 @@ md_assemble (char * str)
+ 
+       inst |= (reg1 << RD_LOW) & RD_MASK;
+       inst |= (immed << IMM_LOW) & IMM_MASK;
++        }
+       break;
+ 
+     case INST_TYPE_R2:
+@@ -3081,10 +3122,10 @@ cons_fix_new_microblaze (fragS * frag,
+           r = BFD_RELOC_32;
+           break;
+         case 8:
+-          /*if (microblaze_arch_size == 64)
+-            r = BFD_RELOC_32;
+-          else*/
++          if (microblaze_arch_size == 64)
+             r = BFD_RELOC_MICROBLAZE_EA64;
++          else
++            r = BFD_RELOC_64;
+           break;
+         default:
+           as_bad (_("unsupported BFD relocation size %u"), size);
+-- 
+2.17.1
+

@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import shutil
 import tempfile
@@ -5,7 +9,6 @@ import urllib.parse
 
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var
 from oeqa.utils.commands import get_bb_vars, create_temp_layer
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.selftest.cases import devtool
 
 templayerdir = None
@@ -89,7 +92,6 @@ class RecipetoolTests(RecipetoolBase):
         for errorstr in checkerror:
             self.assertIn(errorstr, result.output)
 
-    @OETestID(1177)
     def test_recipetool_appendfile_basic(self):
         # Basic test
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -97,14 +99,12 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('base-files', '/etc/motd', self.testfile, '', expectedlines, ['motd'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1183)
     def test_recipetool_appendfile_invalid(self):
         # Test some commands that should error
         self._try_recipetool_appendfile_fail('/etc/passwd', self.testfile, ['ERROR: /etc/passwd cannot be handled by this tool', 'useradd', 'extrausers'])
         self._try_recipetool_appendfile_fail('/etc/timestamp', self.testfile, ['ERROR: /etc/timestamp cannot be handled by this tool'])
         self._try_recipetool_appendfile_fail('/dev/console', self.testfile, ['ERROR: /dev/console cannot be handled by this tool'])
 
-    @OETestID(1176)
     def test_recipetool_appendfile_alternatives(self):
         # Now try with a file we know should be an alternative
         # (this is very much a fake example, but one we know is reliably an alternative)
@@ -128,7 +128,6 @@ class RecipetoolTests(RecipetoolBase):
         result = runCmd('diff -q %s %s' % (testfile2, copiedfile), ignore_status=True)
         self.assertNotEqual(result.status, 0, 'New file should have been copied but was not %s' % result.output)
 
-    @OETestID(1178)
     def test_recipetool_appendfile_binary(self):
         # Try appending a binary file
         # /bin/ls can be a symlink to /usr/bin/ls
@@ -137,7 +136,6 @@ class RecipetoolTests(RecipetoolBase):
         self.assertIn('WARNING: ', result.output)
         self.assertIn('is a binary', result.output)
 
-    @OETestID(1173)
     def test_recipetool_appendfile_add(self):
         # Try arbitrary file add to a recipe
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -166,7 +164,6 @@ class RecipetoolTests(RecipetoolBase):
                          '}\n']
         self._try_recipetool_appendfile('netbase', '/usr/share/scriptname', testfile2, '-r netbase', expectedlines, ['testfile', testfile2name])
 
-    @OETestID(1174)
     def test_recipetool_appendfile_add_bindir(self):
         # Try arbitrary file add to a recipe, this time to a location such that should be installed as executable
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -180,7 +177,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('netbase', '/usr/bin/selftest-recipetool-testbin', self.testfile, '-r netbase', expectedlines, ['testfile'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1175)
     def test_recipetool_appendfile_add_machine(self):
         # Try arbitrary file add to a recipe, this time to a location such that should be installed as executable
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -196,7 +192,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('netbase', '/usr/share/something', self.testfile, '-r netbase -m mymachine', expectedlines, ['mymachine/testfile'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1184)
     def test_recipetool_appendfile_orig(self):
         # A file that's in SRC_URI and in do_install with the same name
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -204,7 +199,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-orig', self.testfile, '', expectedlines, ['selftest-replaceme-orig'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1191)
     def test_recipetool_appendfile_todir(self):
         # A file that's in SRC_URI and in do_install with destination directory rather than file
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -212,7 +206,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-todir', self.testfile, '', expectedlines, ['selftest-replaceme-todir'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1187)
     def test_recipetool_appendfile_renamed(self):
         # A file that's in SRC_URI with a different name to the destination file
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -220,7 +213,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-renamed', self.testfile, '', expectedlines, ['file1'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1190)
     def test_recipetool_appendfile_subdir(self):
         # A file that's in SRC_URI in a subdir
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -234,21 +226,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-subdir', self.testfile, '', expectedlines, ['testfile'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1189)
-    def test_recipetool_appendfile_src_glob(self):
-        # A file that's in SRC_URI as a glob
-        expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
-                         '\n',
-                         'SRC_URI += "file://testfile"\n',
-                         '\n',
-                         'do_install_append() {\n',
-                         '    install -d ${D}${datadir}\n',
-                         '    install -m 0644 ${WORKDIR}/testfile ${D}${datadir}/selftest-replaceme-src-globfile\n',
-                         '}\n']
-        _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-src-globfile', self.testfile, '', expectedlines, ['testfile'])
-        self.assertNotIn('WARNING: ', output)
-
-    @OETestID(1181)
     def test_recipetool_appendfile_inst_glob(self):
         # A file that's in do_install as a glob
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -256,7 +233,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-inst-globfile', self.testfile, '', expectedlines, ['selftest-replaceme-inst-globfile'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1182)
     def test_recipetool_appendfile_inst_todir_glob(self):
         # A file that's in do_install as a glob with destination as a directory
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -264,7 +240,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-inst-todir-globfile', self.testfile, '', expectedlines, ['selftest-replaceme-inst-todir-globfile'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1185)
     def test_recipetool_appendfile_patch(self):
         # A file that's added by a patch in SRC_URI
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -283,7 +258,6 @@ class RecipetoolTests(RecipetoolBase):
         else:
             self.fail('Patch warning not found in output:\n%s' % output)
 
-    @OETestID(1188)
     def test_recipetool_appendfile_script(self):
         # Now, a file that's in SRC_URI but installed by a script (so no mention in do_install)
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -297,7 +271,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-scripted', self.testfile, '', expectedlines, ['testfile'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1180)
     def test_recipetool_appendfile_inst_func(self):
         # A file that's installed from a function called by do_install
         expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
@@ -305,7 +278,6 @@ class RecipetoolTests(RecipetoolBase):
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-inst-func', self.testfile, '', expectedlines, ['selftest-replaceme-inst-func'])
         self.assertNotIn('WARNING: ', output)
 
-    @OETestID(1186)
     def test_recipetool_appendfile_postinstall(self):
         # A file that's created by a postinstall script (and explicitly mentioned in it)
         # First try without specifying recipe
@@ -321,7 +293,6 @@ class RecipetoolTests(RecipetoolBase):
                          '}\n']
         _, output = self._try_recipetool_appendfile('selftest-recipetool-appendfile', '/usr/share/selftest-replaceme-postinst', self.testfile, '-r selftest-recipetool-appendfile', expectedlines, ['testfile'])
 
-    @OETestID(1179)
     def test_recipetool_appendfile_extlayer(self):
         # Try creating a bbappend in a layer that's not in bblayers.conf and has a different structure
         exttemplayerdir = os.path.join(self.tempdir, 'extlayer')
@@ -337,7 +308,6 @@ class RecipetoolTests(RecipetoolBase):
                          'metadata/recipes/recipes-test/selftest-recipetool-appendfile/selftest-recipetool-appendfile/selftest-replaceme-orig']
         self.assertEqual(sorted(createdfiles), sorted(expectedfiles))
 
-    @OETestID(1192)
     def test_recipetool_appendfile_wildcard(self):
 
         def try_appendfile_wc(options):
@@ -362,7 +332,6 @@ class RecipetoolTests(RecipetoolBase):
         filename = try_appendfile_wc('-w')
         self.assertEqual(filename, recipefn.split('_')[0] + '_%.bbappend')
 
-    @OETestID(1193)
     def test_recipetool_create(self):
         # Try adding a recipe
         tempsrc = os.path.join(self.tempdir, 'srctree')
@@ -379,7 +348,6 @@ class RecipetoolTests(RecipetoolBase):
         checkvars['SRC_URI[sha256sum]'] = '2e6a401cac9024db2288297e3be1a8ab60e7401ba8e91225218aaf4a27e82a07'
         self._test_recipe_contents(recipefile, checkvars, [])
 
-    @OETestID(1194)
     def test_recipetool_create_git(self):
         if 'x11' not in get_bb_var('DISTRO_FEATURES'):
             self.skipTest('Test requires x11 as distro feature')
@@ -402,7 +370,6 @@ class RecipetoolTests(RecipetoolBase):
         inherits = ['autotools', 'pkgconfig']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
-    @OETestID(1392)
     def test_recipetool_create_simple(self):
         # Try adding a recipe
         temprecipe = os.path.join(self.tempdir, 'recipe')
@@ -425,27 +392,51 @@ class RecipetoolTests(RecipetoolBase):
         inherits = ['autotools']
         self._test_recipe_contents(os.path.join(temprecipe, dirlist[0]), checkvars, inherits)
 
-    @OETestID(1418)
     def test_recipetool_create_cmake(self):
-        bitbake('-c packagedata gtk+')
-
-        # Try adding a recipe
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
-        recipefile = os.path.join(temprecipe, 'navit_0.5.0.bb')
-        srcuri = 'http://downloads.yoctoproject.org/mirror/sources/navit-0.5.0.tar.gz'
+        recipefile = os.path.join(temprecipe, 'taglib_1.11.1.bb')
+        srcuri = 'http://taglib.github.io/releases/taglib-1.11.1.tar.gz'
         result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
-        checkvars['LICENSE'] = set(['Unknown', 'GPLv2', 'LGPLv2'])
-        checkvars['SRC_URI'] = 'http://downloads.yoctoproject.org/mirror/sources/navit-${PV}.tar.gz'
-        checkvars['SRC_URI[md5sum]'] = '242f398e979a6b8c0f3c802b63435b68'
-        checkvars['SRC_URI[sha256sum]'] = '13353481d7fc01a4f64e385dda460b51496366bba0fd2cc85a89a0747910e94d'
-        checkvars['DEPENDS'] = set(['freetype', 'zlib', 'openssl', 'glib-2.0', 'virtual/libgl', 'virtual/egl', 'gtk+', 'libpng', 'libsdl', 'freeglut', 'dbus-glib', 'fribidi'])
-        inherits = ['cmake', 'python-dir', 'gettext', 'pkgconfig']
+        checkvars['LICENSE'] = set(['LGPLv2.1', 'MPL-1.1'])
+        checkvars['SRC_URI'] = 'http://taglib.github.io/releases/taglib-${PV}.tar.gz'
+        checkvars['SRC_URI[md5sum]'] = 'cee7be0ccfc892fa433d6c837df9522a'
+        checkvars['SRC_URI[sha256sum]'] = 'b6d1a5a610aae6ff39d93de5efd0fdc787aa9e9dc1e7026fa4c961b26563526b'
+        checkvars['DEPENDS'] = set(['boost', 'zlib'])
+        inherits = ['cmake']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
-    @OETestID(1638)
+    def test_recipetool_create_npm(self):
+        collections = get_bb_var('BBFILE_COLLECTIONS').split()
+        if "openembedded-layer" not in collections:
+            self.skipTest("Test needs meta-oe for nodejs")
+
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        recipefile = os.path.join(temprecipe, 'savoirfairelinux-node-server-example_1.0.0.bb')
+        shrinkwrap = os.path.join(temprecipe, 'savoirfairelinux-node-server-example', 'npm-shrinkwrap.json')
+        srcuri = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=1.0.0'
+        result = runCmd('recipetool create -o %s \'%s\'' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        self.assertTrue(os.path.isfile(shrinkwrap))
+        checkvars = {}
+        checkvars['SUMMARY'] = 'Node Server Example'
+        checkvars['HOMEPAGE'] = 'https://github.com/savoirfairelinux/node-server-example#readme'
+        checkvars['LICENSE'] = set(['MIT', 'ISC', 'Unknown'])
+        urls = []
+        urls.append('npm://registry.npmjs.org/;package=@savoirfairelinux/node-server-example;version=${PV}')
+        urls.append('npmsw://${THISDIR}/${BPN}/npm-shrinkwrap.json')
+        checkvars['SRC_URI'] = set(urls)
+        checkvars['S'] = '${WORKDIR}/npm'
+        checkvars['LICENSE_${PN}'] = 'MIT'
+        checkvars['LICENSE_${PN}-base64'] = 'Unknown'
+        checkvars['LICENSE_${PN}-accepts'] = 'MIT'
+        checkvars['LICENSE_${PN}-inherits'] = 'ISC'
+        inherits = ['npm']
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
     def test_recipetool_create_github(self):
         # Basic test to see if github URL mangling works
         temprecipe = os.path.join(self.tempdir, 'recipe')
@@ -457,10 +448,47 @@ class RecipetoolTests(RecipetoolBase):
         checkvars = {}
         checkvars['LICENSE'] = set(['Apache-2.0'])
         checkvars['SRC_URI'] = 'git://github.com/mesonbuild/meson;protocol=https'
-        inherits = ['setuptools']
+        inherits = ['setuptools3']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
-    @OETestID(1639)
+    def test_recipetool_create_python3_setuptools(self):
+        # Test creating python3 package from tarball (using setuptools3 class)
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pn = 'python-magic'
+        pv = '0.4.15'
+        recipefile = os.path.join(temprecipe, '%s_%s.bb' % (pn, pv))
+        srcuri = 'https://files.pythonhosted.org/packages/84/30/80932401906eaf787f2e9bd86dc458f1d2e75b064b4c187341f29516945c/python-magic-%s.tar.gz' % pv
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=16a934f165e8c3245f241e77d401bb88'
+        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/84/30/80932401906eaf787f2e9bd86dc458f1d2e75b064b4c187341f29516945c/python-magic-${PV}.tar.gz'
+        checkvars['SRC_URI[md5sum]'] = 'e384c95a47218f66c6501cd6dd45ff59'
+        checkvars['SRC_URI[sha256sum]'] = 'f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5'
+        inherits = ['setuptools3']
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_python3_distutils(self):
+        # Test creating python3 package from tarball (using distutils3 class)
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pn = 'docutils'
+        pv = '0.14'
+        recipefile = os.path.join(temprecipe, '%s_%s.bb' % (pn, pv))
+        srcuri = 'https://files.pythonhosted.org/packages/84/f4/5771e41fdf52aabebbadecc9381d11dea0fa34e4759b4071244fa094804c/docutils-%s.tar.gz' % pv
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['LICENSE'] = set(['PSF', '&', 'BSD', 'GPL'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://COPYING.txt;md5=35a23d42b615470583563132872c97d6'
+        checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/84/f4/5771e41fdf52aabebbadecc9381d11dea0fa34e4759b4071244fa094804c/docutils-${PV}.tar.gz'
+        checkvars['SRC_URI[md5sum]'] = 'c53768d63db3873b7d452833553469de'
+        checkvars['SRC_URI[sha256sum]'] = '51e64ef2ebfb29cae1faa133b3710143496eca21c530f3f71424d77687764274'
+        inherits = ['distutils3']
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
     def test_recipetool_create_github_tarball(self):
         # Basic test to ensure github URL mangling doesn't apply to release tarballs
         temprecipe = os.path.join(self.tempdir, 'recipe')
@@ -473,10 +501,9 @@ class RecipetoolTests(RecipetoolBase):
         checkvars = {}
         checkvars['LICENSE'] = set(['Apache-2.0'])
         checkvars['SRC_URI'] = 'https://github.com/mesonbuild/meson/releases/download/${PV}/meson-${PV}.tar.gz'
-        inherits = ['setuptools']
+        inherits = ['setuptools3']
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
-    @OETestID(1637)
     def test_recipetool_create_git_http(self):
         # Basic test to check http git URL mangling works
         temprecipe = os.path.join(self.tempdir, 'recipe')
@@ -498,13 +525,16 @@ class RecipetoolTests(RecipetoolBase):
             dstdir = os.path.join(dstdir, p)
             if not os.path.exists(dstdir):
                 os.makedirs(dstdir)
-                self.track_for_cleanup(dstdir)
+                if p == "lib":
+                    # Can race with other tests
+                    self.add_command_to_tearDown('rmdir --ignore-fail-on-non-empty %s' % dstdir)
+                else:
+                    self.track_for_cleanup(dstdir)
         dstfile = os.path.join(dstdir, os.path.basename(srcfile))
         if srcfile != dstfile:
             shutil.copy(srcfile, dstfile)
             self.track_for_cleanup(dstfile)
 
-    @OETestID(1640)
     def test_recipetool_load_plugin(self):
         """Test that recipetool loads only the first found plugin in BBPATH."""
 
@@ -626,11 +656,9 @@ class RecipetoolAppendsrcBase(RecipetoolBase):
 
 class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
 
-    @OETestID(1273)
     def test_recipetool_appendsrcfile_basic(self):
         self._test_appendsrcfile('base-files', 'a-file')
 
-    @OETestID(1274)
     def test_recipetool_appendsrcfile_basic_wildcard(self):
         testrecipe = 'base-files'
         self._test_appendsrcfile(testrecipe, 'a-file', options='-w')
@@ -638,15 +666,12 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
         bbappendfile = self._check_bbappend(testrecipe, recipefile, self.templayerdir)
         self.assertEqual(os.path.basename(bbappendfile), '%s_%%.bbappend' % testrecipe)
 
-    @OETestID(1281)
     def test_recipetool_appendsrcfile_subdir_basic(self):
         self._test_appendsrcfile('base-files', 'a-file', 'tmp')
 
-    @OETestID(1282)
     def test_recipetool_appendsrcfile_subdir_basic_dirdest(self):
         self._test_appendsrcfile('base-files', destdir='tmp')
 
-    @OETestID(1280)
     def test_recipetool_appendsrcfile_srcdir_basic(self):
         testrecipe = 'bash'
         bb_vars = get_bb_vars(['S', 'WORKDIR'], testrecipe)
@@ -655,14 +680,12 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
         subdir = os.path.relpath(srcdir, workdir)
         self._test_appendsrcfile(testrecipe, 'a-file', srcdir=subdir)
 
-    @OETestID(1275)
     def test_recipetool_appendsrcfile_existing_in_src_uri(self):
         testrecipe = 'base-files'
         filepath = self._get_first_file_uri(testrecipe)
         self.assertTrue(filepath, 'Unable to test, no file:// uri found in SRC_URI for %s' % testrecipe)
         self._test_appendsrcfile(testrecipe, filepath, has_src_uri=False)
 
-    @OETestID(1276)
     def test_recipetool_appendsrcfile_existing_in_src_uri_diff_params(self):
         testrecipe = 'base-files'
         subdir = 'tmp'
@@ -672,7 +695,6 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
         output = self._test_appendsrcfile(testrecipe, filepath, subdir, has_src_uri=False)
         self.assertTrue(any('with different parameters' in l for l in output))
 
-    @OETestID(1277)
     def test_recipetool_appendsrcfile_replace_file_srcdir(self):
         testrecipe = 'bash'
         filepath = 'Makefile.in'
@@ -683,9 +705,10 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
 
         self._test_appendsrcfile(testrecipe, filepath, srcdir=subdir)
         bitbake('%s:do_unpack' % testrecipe)
-        self.assertEqual(open(self.testfile, 'r').read(), open(os.path.join(srcdir, filepath), 'r').read())
+        with open(self.testfile, 'r') as testfile:
+            with open(os.path.join(srcdir, filepath), 'r') as makefilein:
+                self.assertEqual(testfile.read(), makefilein.read())
 
-    @OETestID(1278)
     def test_recipetool_appendsrcfiles_basic(self, destdir=None):
         newfiles = [self.testfile]
         for i in range(1, 5):
@@ -695,6 +718,5 @@ class RecipetoolAppendsrcTests(RecipetoolAppendsrcBase):
             newfiles.append(testfile)
         self._test_appendsrcfiles('gcc', newfiles, destdir=destdir, options='-W')
 
-    @OETestID(1279)
     def test_recipetool_appendsrcfiles_basic_subdir(self):
         self.test_recipetool_appendsrcfiles_basic(destdir='testdir')

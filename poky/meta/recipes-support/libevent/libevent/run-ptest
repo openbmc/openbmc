@@ -1,18 +1,29 @@
 #!/bin/sh
 
-fail=0
-for test in ./test/*
-do
-	$test
-	if [ $? -ne 0 ]
-	then
-		fail=1
-	fi
-done
+# run-ptest - 'ptest' test infrastructure shell script that
+#   wraps the libevent test scripts 
+#
+# Trevor Gamblin <trevor.gamblin@windriver.com>
+###############################################################
+LIBEVENTLIB=@libdir@/libevent
+LOG="${LIBEVENTLIB}/ptest/libevent_ptest_$(date +%Y%m%d-%H%M%S).log"
 
-if [ $fail -eq 0 ]
-then
-	echo "PASS: libevent"
-else
-	echo "FAIL: libevent"
-fi
+cd ${LIBEVENTLIB}/ptest 
+
+# Run only the libevent "regress" test. All other test scripts in the
+# libevent "test" folder are related to performance, e.g. read/write
+# rates, and/or do not provide a pass/fail output that can be recorded
+# in the ptest log.
+./test/regress 2>&1| sed -e '/TESTS/d' -e '/tests/d' -e '/OK/ s/^/PASS: / ; /FAILED/ s/^/FAIL: / ; /SKIPPED/ s/^/SKIP: / ; /DISABLED/ s/^/SKIP: /' | cut -f1,2 -d ':' | tee -a ${LOG}
+
+passed=`grep PASS ${LOG}|wc -l`
+failed=`grep FAIL ${LOG}|wc -l`
+skipped=`grep -E SKIP ${LOG}|wc -l`
+all=$((passed + failed + skipped))
+
+(   echo "=== Test Summary ==="
+    echo "TOTAL: ${all}"
+    echo "PASSED: ${passed}"
+    echo "FAILED: ${failed}"
+    echo "SKIPPED: ${skipped}"
+) | tee -a ${LOG}

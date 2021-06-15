@@ -8,6 +8,7 @@ SECTION = "kernel"
 # In maintained upstream linux-firmware:
 # * brcmfmac43430-sdio falls under LICENCE.cypress
 # * brcmfmac43455-sdio falls under LICENCE.broadcom_bcm43xx
+# * brcmfmac43456-sdio falls under LICENCE.broadcom_bcm43xx
 #
 # It is likely[^1] that both of these should be under LICENCE.cypress.
 # Further, at this time the text of LICENCE.broadcom_bcm43xx is the same
@@ -25,7 +26,7 @@ LICENSE = "\
 "
 LIC_FILES_CHKSUM = "\
     file://LICENCE.broadcom_bcm43xx;md5=3160c14df7228891b868060e1951dfbc \
-    file://WHENCE;md5=a9c2c217f513c20e1d16b384b3e2c12d \
+    file://WHENCE;md5=7b12b2224438186e4c97c4c7f3a5cc28 \
 "
 
 # These are not common licenses, set NO_GENERIC_LICENSE for them
@@ -34,8 +35,9 @@ NO_GENERIC_LICENSE[Firmware-broadcom_bcm43xx-rpidistro] = "LICENCE.broadcom_bcm4
 NO_GENERIC_LICENSE[WHENCE] = "WHENCE"
 
 SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree"
-SRCREV = "b518de45ced519e8f7a499f4778100173402ae43"
-PV = "0.0+git${SRCPV}"
+
+SRCREV = "83938f78ca2d5a0ffe0c223bb96d72ccc7b71ca5"
+PV = "20190114-1+rpt11"
 
 S = "${WORKDIR}/git"
 
@@ -55,25 +57,35 @@ do_install() {
     # Replace outdated linux-firmware files with updated ones from
     # raspbian firmware-nonfree. Raspbian adds blobs and nvram
     # definitions that are also necessary so copy those too.
-    for fw in brcmfmac43430-sdio brcmfmac43455-sdio ; do
+    for fw in brcmfmac43430-sdio brcmfmac43455-sdio brcmfmac43456-sdio ; do
         install -m 0644 brcm/${fw}.* ${D}${nonarch_base_libdir}/firmware/brcm/
     done
+    # add compat links. Fixes errors like
+    # brcmfmac mmc1:0001:1: Direct firmware load for brcm/brcmfmac43455-sdio.raspberrypi,4-model-b.txt failed with error -2
+    ln -s brcmfmac43455-sdio.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.raspberrypi,4-model-b.txt
+    ln -s brcmfmac43455-sdio.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.raspberrypi,3-model-b-plus.txt
+    ln -s brcmfmac43430-sdio.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43430-sdio.raspberrypi,3-model-b.txt
+    ln -s brcmfmac43430-sdio.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43430-sdio.raspberrypi,model-zero-w.txt
 }
 
 PACKAGES = "\
     ${PN}-broadcom-license \
     ${PN}-bcm43430 \
     ${PN}-bcm43455 \
+    ${PN}-bcm43456 \
 "
 
 LICENSE_${PN}-bcm43430 = "Firmware-broadcom_bcm43xx-rpidistro"
 LICENSE_${PN}-bcm43455 = "Firmware-broadcom_bcm43xx-rpidistro"
+LICENSE_${PN}-bcm43456 = "Firmware-broadcom_bcm43xx-rpidistro"
 LICENSE_${PN}-broadcom-license = "Firmware-broadcom_bcm43xx-rpidistro"
 FILES_${PN}-broadcom-license = "${nonarch_base_libdir}/firmware/LICENCE.broadcom_bcm43xx-rpidistro"
 FILES_${PN}-bcm43430 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43430*"
 FILES_${PN}-bcm43455 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43455*"
+FILES_${PN}-bcm43456 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43456*"
 RDEPENDS_${PN}-bcm43430 += "${PN}-broadcom-license"
 RDEPENDS_${PN}-bcm43455 += "${PN}-broadcom-license"
+RDEPENDS_${PN}-bcm43456 += "${PN}-broadcom-license"
 RCONFLICTS_${PN}-bcm43430 = "\
     linux-firmware-bcm43430 \
     linux-firmware-raspbian-bcm43430 \
@@ -89,6 +101,14 @@ RCONFLICTS_${PN}-bcm43455 = "\
 RREPLACES_${PN}-bcm43455 = "\
     linux-firmware-bcm43455 \
     linux-firmware-raspbian-bcm43455 \
+"
+RCONFLICTS_${PN}-bcm43456 = "\
+    linux-firmware-bcm43456 \
+    linux-firmware-raspbian-bcm43456 \
+"
+RREPLACES_${PN}-bcm43456 = "\
+    linux-firmware-bcm43456 \
+    linux-firmware-raspbian-bcm43456 \
 "
 
 # Firmware files are generally not run on the CPU, so they can be

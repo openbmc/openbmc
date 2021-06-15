@@ -1,0 +1,33 @@
+From 902412c271e0c5d9cb93b10ec0fb5b119b393474 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 25 Feb 2019 16:53:06 +0800
+Subject: [PATCH 24/24] test-json.c: define M_PIl
+
+Fix the following compile failure:
+src/test/test-json.c:305:50: error: 'M_PIl' undeclared (first use in this function); did you mean 'M_PI'?
+
+Upstream-Status: Inappropriate [musl specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/test/test-json.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/test/test-json.c b/src/test/test-json.c
+index 9b8a2a9..efc746c 100644
+--- a/src/test/test-json.c
++++ b/src/test/test-json.c
+@@ -11,6 +11,10 @@
+ #include "tests.h"
+ #include "util.h"
+ 
++#ifndef M_PIl
++#define M_PIl 3.141592653589793238462643383279502884L
++#endif
++
+ static void test_tokenizer(const char *data, ...) {
+         unsigned line = 0, column = 0;
+         void *state = NULL;
+-- 
+2.11.0
+

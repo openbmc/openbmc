@@ -17,15 +17,15 @@ Upstream-Status: Submitted [1]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
 ---
- src/synth/fluid_synth.c | 69 ++++++++++++++++++++++++++++++++++---------------
+ src/synth/fluid_synth.c | 69 ++++++++++++++++++++++++++++-------------
  1 file changed, 48 insertions(+), 21 deletions(-)
 
 diff --git a/src/synth/fluid_synth.c b/src/synth/fluid_synth.c
-index 0df620d3..379f8216 100644
+index 1eb5d737..6c876efa 100644
 --- a/src/synth/fluid_synth.c
 +++ b/src/synth/fluid_synth.c
-@@ -3306,10 +3306,10 @@ fluid_synth_program_reset(fluid_synth_t *synth)
-  * Synthesize a block of floating point audio to separate audio buffers (multichannel rendering). First effect channel used by reverb, second for chorus.
+@@ -3628,10 +3628,10 @@ fluid_synth_program_reset(fluid_synth_t *synth)
+  *
   * @param synth FluidSynth instance
   * @param len Count of audio frames to synthesize
 - * @param left Array of float buffers to store left channel of planar audio (as many as \c synth.audio-channels buffers, each of \c len in size)
@@ -38,8 +38,8 @@ index 0df620d3..379f8216 100644
 + * @param fx_right Since 1.1.7: If not \c NULL, array of float buffers to store right effect channels (size: dito). Since 2.0.3: NULL allowed for array entry
   * @return #FLUID_OK on success, #FLUID_FAILED otherwise
   *
-  * @note Should only be called from synthesis thread.
-@@ -3386,15 +3386,27 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
+  * First effect channel used by reverb, second for chorus.
+@@ -3719,15 +3719,27 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
          for(i = 0; i < synth->audio_channels; i++)
          {
  #ifdef WITH_FLOAT
@@ -71,7 +71,7 @@ index 0df620d3..379f8216 100644
              }
  
  #endif //WITH_FLOAT
-@@ -3404,12 +3416,12 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
+@@ -3737,12 +3749,12 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
          {
  #ifdef WITH_FLOAT
  
@@ -86,7 +86,7 @@ index 0df620d3..379f8216 100644
              {
                  FLUID_MEMCPY(fx_right[i], &fx_right_in[i * FLUID_BUFSIZE * FLUID_MIXER_MAX_BUFFERS_DEFAULT + synth->cur], bytes);
              }
-@@ -3417,7 +3429,7 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
+@@ -3750,7 +3762,7 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
  #else //WITH_FLOAT
              int j;
  
@@ -95,7 +95,7 @@ index 0df620d3..379f8216 100644
              {
                  for(j = 0; j < num; j++)
                  {
-@@ -3425,7 +3437,7 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
+@@ -3758,7 +3770,7 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
                  }
              }
  
@@ -104,7 +104,7 @@ index 0df620d3..379f8216 100644
              {
                  for(j = 0; j < num; j++)
                  {
-@@ -3456,15 +3468,30 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
+@@ -3789,15 +3801,30 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
          for(i = 0; i < synth->audio_channels; i++)
          {
  #ifdef WITH_FLOAT
@@ -140,7 +140,7 @@ index 0df620d3..379f8216 100644
              }
  
  #endif //WITH_FLOAT
-@@ -3474,12 +3501,12 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
+@@ -3807,12 +3834,12 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
          {
  #ifdef WITH_FLOAT
  
@@ -155,7 +155,7 @@ index 0df620d3..379f8216 100644
              {
                  FLUID_MEMCPY(fx_right[i] + count, &fx_right_in[i * FLUID_BUFSIZE * FLUID_MIXER_MAX_BUFFERS_DEFAULT], bytes);
              }
-@@ -3487,7 +3514,7 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
+@@ -3820,7 +3847,7 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
  #else //WITH_FLOAT
              int j;
  
@@ -164,7 +164,7 @@ index 0df620d3..379f8216 100644
              {
                  for(j = 0; j < num; j++)
                  {
-@@ -3495,7 +3522,7 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
+@@ -3828,7 +3855,7 @@ fluid_synth_nwrite_float(fluid_synth_t *synth, int len,
                  }
              }
  

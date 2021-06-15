@@ -20,7 +20,7 @@ SNMP_CONF="${@bb.utils.contains('DISTRO_FEATURES', 'snmp', '--enable-snmp', '', 
 # the "ip" command from busybox is not sufficient (flush by protocol flushes all routes)
 RDEPENDS_${PN} += "iproute2"
 
-SRC_URI = "${SAVANNAH_GNU_MIRROR}/quagga/quagga-${PV}.tar.gz; \
+SRC_URI = "https://github.com/Quagga/quagga/releases/download/quagga-${PV}/quagga-${PV}.tar.gz \
            file://quagga.init \
            file://quagga.default \
            file://watchquagga.init \
@@ -40,7 +40,9 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG[cap] = "--enable-capabilities,--disable-capabilities,libcap"
 PACKAGECONFIG[pam] = "--with-libpam, --without-libpam, libpam"
 
-inherit autotools update-rc.d useradd systemd pkgconfig
+inherit autotools update-rc.d useradd systemd pkgconfig multilib_header update-alternatives
+
+CFLAGS += "-fcommon"
 
 SYSTEMD_PACKAGES = "${PN} ${PN}-bgpd ${PN}-isisd ${PN}-ospf6d ${PN}-ospfd ${PN}-ripd ${PN}-ripngd"
 SYSTEMD_SERVICE_${PN}-bgpd = "bgpd.service"
@@ -79,7 +81,7 @@ do_install () {
     install -m 0644 ${WORKDIR}/watchquagga.default ${D}${sysconfdir}/default/watchquagga
     install -m 0755 ${WORKDIR}/quagga.init ${D}${sysconfdir}/init.d/quagga
     install -m 0755 ${WORKDIR}/watchquagga.init ${D}${sysconfdir}/init.d/watchquagga
-    install -m 0644 ${WORKDIR}/volatiles.03_quagga  ${D}${sysconfdir}/default/volatiles/volatiles.03_quagga
+    install -m 0644 ${WORKDIR}/volatiles.03_quagga  ${D}${sysconfdir}/default/volatiles/03_quagga
 
     # Install sample configurations for the daemons
     for f in bgpd vtysh isisd ospfd ripngd zebra ripd ospf6d; do
@@ -104,8 +106,11 @@ do_install () {
     sed -i 's!/usr/sbin/!${sbindir}/!g' ${D}${sysconfdir}/init.d/*
     sed -i 's!/usr/bin/!${bindir}/!g' ${D}${sysconfdir}/init.d/quagga
     sed -i 's!/etc/!${sysconfdir}/!g' ${D}${sysconfdir}/init.d/* ${D}${sysconfdir}/default/watchquagga
-    sed -i 's!/var/!${localstatedir}/!g' ${D}${sysconfdir}/init.d/* ${D}${sysconfdir}/default/volatiles/volatiles.03_quagga
+    sed -i 's!/var/!${localstatedir}/!g' ${D}${sysconfdir}/init.d/* ${D}${sysconfdir}/default/volatiles/03_quagga
     sed -i 's!^PATH=.*!PATH=${base_sbindir}:${sbindir}:${base_bindir}:${bindir}!' ${D}${sysconfdir}/init.d/*
+    sed -i 's!--with-libtool-sysroot=[^ "]*!!' ${D}${includedir}/quagga/version.h
+
+    oe_multilib_header quagga/version.h
 
     # For PAM
     for feature in ${DISTRO_FEATURES}; do
@@ -116,9 +121,9 @@ do_install () {
     done
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-        install -d ${D}${sysconfdir}/tmpfiles.d
-        echo "d /var/run/quagga 0755 quagga quagga -" \
-        > ${D}${sysconfdir}/tmpfiles.d/${BPN}.conf
+        install -d ${D}${nonarch_libdir}/tmpfiles.d
+        echo "d /run/quagga 0755 quagga quagga -" \
+        > ${D}${nonarch_libdir}/tmpfiles.d/${BPN}.conf
     fi
 
     # Remove sysinit script if sysvinit is not in DISTRO_FEATURES
@@ -165,6 +170,8 @@ FILES_${PN}-isisd       = "${sbindir}/isisd"
 FILES_${PN}-ospfclient  = "${sbindir}/ospfclient ${libdir}/libospfapiclient.so.*"
 FILES_${PN}-watchquagga = "${sbindir}/watchquagga ${sysconfdir}/default/watchquagga \
                            ${sysconfdir}/init.d/watchquagga"
+
+FILES_${PN} += "${nonarch_libdir}/tmpfiles.d/*.conf"
 
 # Indicate that the default files are configuration files
 CONFFILES_${PN} = "${sysconfdir}/default/quagga \
@@ -230,3 +237,7 @@ pkg_prerm_${PN}-ripngd () {
 pkg_prerm_${PN}-isisd () {
     ${sysconfdir}/init.d/quagga stop isisd
 }
+
+ALTERNATIVE_${PN} = "pimd"
+ALTERNATIVE_LINK_NAME[pimd] = "${sbindir}/pimd"
+

@@ -1,0 +1,30 @@
+From 0604e82e69c673c3ce75fa1d856a54ab10611015 Mon Sep 17 00:00:00 2001
+From: Lotus Xu <xuxiaohan@bytrdance.com>
+Date: Wed, 21 Oct 2020 12:42:45 +0800
+Subject: [PATCH] bytedance: g220a:Enable ipmb
+
+Signed-off-by: Lotus Xu <xuxiaohan@bytrdance.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-bytedance-g220a.dts | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-bytedance-g220a.dts b/arch/arm/boot/dts/aspeed-bmc-bytedance-g220a.dts
+index b66854fa9ade..124b885b03ec 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-bytedance-g220a.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-bytedance-g220a.dts
+@@ -453,7 +453,11 @@ channel_3_3: i2c@3 {
+ 
+ &i2c4 {
+ 	status = "okay";
+-
++	ipmb0@10 {
++		compatible = "ipmb-dev";
++		reg = <(0x10 | I2C_OWN_SLAVE_ADDRESS)>;
++		i2c-protocol;
++	};
+ };
+ 
+ &i2c5 {
+-- 
+2.25.1
+

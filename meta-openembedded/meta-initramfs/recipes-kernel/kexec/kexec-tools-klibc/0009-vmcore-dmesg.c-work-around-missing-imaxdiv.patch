@@ -1,4 +1,4 @@
-From ad598a71ffff6f86462211f252ac0c7b5de53869 Mon Sep 17 00:00:00 2001
+From 20e2c61fc04a291250acee649c2523d2546cedea Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Tue, 17 Apr 2018 13:14:12 +0200
 Subject: [PATCH] vmcore-dmesg.c: work around missing imaxdiv()
@@ -18,7 +18,7 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/vmcore-dmesg/vmcore-dmesg.c b/vmcore-dmesg/vmcore-dmesg.c
-index e340ef4..1b27b71 100644
+index 7972788..c63ac4f 100644
 --- a/vmcore-dmesg/vmcore-dmesg.c
 +++ b/vmcore-dmesg/vmcore-dmesg.c
 @@ -575,8 +575,11 @@ static void dump_dmesg_structured(int fd)

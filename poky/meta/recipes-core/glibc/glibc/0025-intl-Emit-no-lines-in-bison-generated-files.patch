@@ -1,0 +1,31 @@
+From 3156464f9a95bf1dafd2e22d19d7bf89c520acc1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 3 Aug 2018 09:44:00 -0700
+Subject: [PATCH] intl: Emit no lines in bison generated files
+
+Improve reproducibility:
+Do not put any #line preprocessor commands in bison generated files.
+These lines contain absolute paths containing file locations on
+the host build machine.
+
+Upstream-Status: Pending
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ intl/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/intl/Makefile b/intl/Makefile
+index 93478d87e8..b27a7935eb 100644
+--- a/intl/Makefile
++++ b/intl/Makefile
+@@ -155,7 +155,7 @@ $(objpfx)tst-gettext6.out: $(objpfx)tst-gettext.out
+ 
+ CPPFLAGS += -D'LOCALEDIR="$(localedir)"' \
+ 	    -D'LOCALE_ALIAS_PATH="$(localedir)"'
+-BISONFLAGS = --yacc --name-prefix=__gettext --output
++BISONFLAGS = --yacc --no-lines --name-prefix=__gettext --output
+ 
+ $(inst_localedir)/locale.alias: locale.alias $(+force)
+ 	$(do-install)

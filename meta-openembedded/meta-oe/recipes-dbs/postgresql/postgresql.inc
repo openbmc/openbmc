@@ -18,7 +18,7 @@ DESCRIPTION = "\
     this package if you're installing the postgresql-server package. \
 "
 HOMEPAGE = "http://www.postgresql.com"
-LICENSE = "BSD"
+LICENSE = "BSD-0-Clause"
 DEPENDS = "libnsl2 zlib readline tzcode-native"
 
 ARM_INSTRUCTION_SET = "arm"
@@ -29,7 +29,6 @@ SRC_URI = "http://ftp.postgresql.org/pub/source/v${PV}/${BP}.tar.bz2 \
     file://postgresql.pam \
     file://postgresql-setup \
     file://postgresql.service \
-    file://0001-Use-pkg-config-for-libxml2-detection.patch \
 "
 
 LEAD_SONAME = "libpq.so"
@@ -37,7 +36,7 @@ LEAD_SONAME = "libpq.so"
 # LDFLAGS for shared libraries
 export LDFLAGS_SL = "${LDFLAGS}"
 
-inherit autotools pkgconfig perlnative pythonnative useradd update-rc.d systemd gettext cpan-base
+inherit autotools pkgconfig perlnative python3native python3targetconfig useradd update-rc.d systemd gettext cpan-base
 
 CFLAGS += "-I${STAGING_INCDIR}/${PYTHON_DIR} -I${STAGING_INCDIR}/tcl8.6"
 
@@ -57,8 +56,8 @@ pkg_postinst_${PN} () {
 enable_pam = "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG ??= "${enable_pam} openssl python uuid libxml tcl nls libxml perl"
 PACKAGECONFIG[pam] = "--with-pam,--without-pam,libpam,"
-PACKAGECONFIG[openssl] = "--with-openssl,--without-openssl,openssl,"
-PACKAGECONFIG[python] = "--with-python,--without-python,python,python"
+PACKAGECONFIG[openssl] = "--with-openssl,--without-openssl ac_cv_file__dev_urandom=yes,openssl,"
+PACKAGECONFIG[python] = "--with-python,--without-python,python3,python3"
 PACKAGECONFIG[uuid] = "--with-uuid=e2fs,--without-uuid,util-linux,"
 PACKAGECONFIG[tcl] = "--with-tcl --with-tclconfig=${STAGING_BINDIR_CROSS},--without-tcl,tcl tcl-native,"
 PACKAGECONFIG[nls] = "--enable-nls,--disable-nls,,"
@@ -71,6 +70,16 @@ EXTRA_OECONF += "--enable-thread-safety --disable-rpath \
 "
 EXTRA_OECONF_sh4 += "--disable-spinlocks"
 EXTRA_OECONF_aarch64 += "--disable-spinlocks"
+
+DEBUG_OPTIMIZATION_remove_mips = " -Og"
+DEBUG_OPTIMIZATION_append_mips = " -O"
+BUILD_OPTIMIZATION_remove_mips = " -Og"
+BUILD_OPTIMIZATION_append_mips = " -O"
+
+DEBUG_OPTIMIZATION_remove_mipsel = " -Og"
+DEBUG_OPTIMIZATION_append_mipsel = " -O"
+BUILD_OPTIMIZATION_remove_mipsel = " -Og"
+BUILD_OPTIMIZATION_append_mipsel = " -O"
 
 PACKAGES_DYNAMIC += "^${PN}-plperl \
     ^${PN}-pltcl \
@@ -238,10 +247,8 @@ FILES_${PN} += "${sysconfdir}/init.d/${BPN}-server \
 
 FILES_${PN}-client = "${bindir}/clusterdb \
     ${bindir}/createdb \
-    ${bindir}/createlang \
     ${bindir}/createuser \
     ${bindir}/dropdb \
-    ${bindir}/droplang \
     ${bindir}/dropuser \
     ${bindir}/pg_dump \
     ${bindir}/pg_dumpall \
@@ -270,7 +277,9 @@ FILES_${PN}-timezone = "${datadir}/${BPN}/timezone \
     ${datadir}/${BPN}/timezonesets \
 "
 RDEPENDS_${PN} += "${PN}-timezone"
-FILES_${PN}-server-dev = "${includedir}/${BPN}/server"
+FILES_${PN}-server-dev = "${includedir}/${BPN}/server \
+                          ${libdir}/${BPN}/pgxs \
+"
 
 FILES_libecpg = "${libdir}/libecpg*${SOLIBS}"
 FILES_libecpg-dev = "${libdir}/libecpg*${SOLIBSDEV} \
@@ -299,7 +308,7 @@ FILES_libpgtypes-staticdev = "${libdir}/libpgtypes*.a"
 FILES_libpgtypes-dev = "${libdir}/libpgtypes*${SOLIBS} ${includedir}/pgtypes*.h"
 
 FILES_${PN}-contrib = " ${bindir}/oid2name ${bindir}/pg_standby \
-    ${bindir}/pgbench ${bindir}/vacuumlo \
+    ${bindir}/pgbench \
     ${S}/contrib/spi/*.example \
     ${libdir}/${BPN}/_int.so ${libdir}/${BPN}/adminpack.so \
     ${libdir}/${BPN}/autoinc.so ${libdir}/${BPN}/auto_explain.so \
@@ -321,7 +330,7 @@ FILES_${PN}-contrib = " ${bindir}/oid2name ${bindir}/pg_standby \
     ${libdir}/${BPN}/sslinfo.so \
     ${libdir}/${BPN}/tablefunc.so \
     ${libdir}/${BPN}/test_parser.so ${libdir}/${BPN}/timetravel.so \
-    ${libdir}/${BPN}/tsearch2.so ${libdir}/${BPN}/uuid-ossp.so \
+    ${libdir}/${BPN}/uuid-ossp.so \
     ${libdir}/${BPN}/pgxml.so ${libdir}/${BPN}/passwordcheck.so \
     ${libdir}/${BPN}/pg_upgrade_support.so ${libdir}/${BPN}/.so \
     ${libdir}/${BPN}/unaccent.so \

@@ -1,0 +1,37 @@
+From 169f62770f63a43b15d4d4c82336fd57c8467cfe Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 4 Apr 2020 21:43:51 -0700
+Subject: [PATCH] cmake: Disable using -Wno-maybe-uninitialized
+
+This warning causes clang builds to fail because this is not a
+recognised warning with clang
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -6,7 +6,6 @@
+ set (SWIG_CXX_DISABLE_WARNINGS -Wno-error
+                                -Wno-delete-non-virtual-dtor
+                                -Wno-unused-function
+-                               -Wno-maybe-uninitialized
+                                -Wno-strict-aliasing)
+ 
+ # If building under android, make sure swig gets an ANDROID flag
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -115,8 +115,7 @@ endif (WERROR)
+ upm_add_compile_flags(C ${C_CXX_WARNING_FLAGS}
+   -Winit-self
+   -Wimplicit
+-  -Wsign-compare
+-  -Wmissing-parameter-type)
++  -Wsign-compare)
+ 
+ # Set CXX compiler warning flags at top-level scope and emit a warning about
+ # unsupported flags

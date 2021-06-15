@@ -1,0 +1,77 @@
+From 17f05a8d02c589e4867906f70381e63e46a67870 Mon Sep 17 00:00:00 2001
+From: Oleksiy Obitotskyy <oobitots@cisco.com>
+Date: Wed, 27 Jan 2021 06:47:13 -0800
+Subject: [PATCH] lemon: Remove #line directives
+
+In case of reproducible build remove #line
+directives with extra option '-l'.
+
+Upstream-Status: Pending
+Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
+---
+ cmake/modules/UseLemon.cmake | 49 +++++++++++++++++++++++++-----------
+ 1 file changed, 34 insertions(+), 15 deletions(-)
+
+diff --git a/cmake/modules/UseLemon.cmake b/cmake/modules/UseLemon.cmake
+index 849ffc1..ca38ab7 100644
+--- a/cmake/modules/UseLemon.cmake
++++ b/cmake/modules/UseLemon.cmake
+@@ -7,21 +7,40 @@ MACRO(ADD_LEMON_FILES _source _generated)
+ 
+       SET(_out ${CMAKE_CURRENT_BINARY_DIR}/${_basename})
+ 
+-      ADD_CUSTOM_COMMAND(
+-         OUTPUT
+-          ${_out}.c
+-          # These files are generated as side-effect
+-          ${_out}.h
+-          ${_out}.out
+-         COMMAND lemon
+-           -T${_lemonpardir}/lempar.c
+-           -d.
+-           ${_in}
+-         DEPENDS
+-           ${_in}
+-           lemon
+-           ${_lemonpardir}/lempar.c
+-      )
++      IF (DEFINED ENV{SOURCE_DATE_EPOCH})
++        ADD_CUSTOM_COMMAND(
++          OUTPUT
++            ${_out}.c
++            # These files are generated as side-effect
++            ${_out}.h
++            ${_out}.out
++          COMMAND lemon
++            -l
++            -T${_lemonpardir}/lempar.c
++            -d.
++            ${_in}
++          DEPENDS
++            ${_in}
++            lemon
++            ${_lemonpardir}/lempar.c
++        )
++      ELSE ()
++        ADD_CUSTOM_COMMAND(
++          OUTPUT
++            ${_out}.c
++            # These files are generated as side-effect
++            ${_out}.h
++            ${_out}.out
++          COMMAND lemon
++            -T${_lemonpardir}/lempar.c
++            -d.
++            ${_in}
++          DEPENDS
++            ${_in}
++            lemon
++            ${_lemonpardir}/lempar.c
++        )
++      ENDIF ()
+ 
+       LIST(APPEND ${_source} ${_in})
+       LIST(APPEND ${_generated} ${_out}.c)
+-- 
+2.26.2.Cisco
+

@@ -10,10 +10,14 @@ LIC_FILES_CHKSUM = "file://../misc/fonts.dir;md5=82a143d94d6a974aafe97132d2d519a
 
 SRC_URI = "file://misc"
 
-PE = "1"
-PR = "r2"
+SOURCE_DATE_EPOCH = "1613559011"
 
-inherit allarch distro_features_check
+PE = "1"
+PR = "r4"
+# remove at next version upgrade or when output changes
+HASHEQUIV_HASH_VERSION .= ".1"
+
+inherit allarch features_check
 
 # The font-alias requires x11 in DISTRO_FEATURES
 REQUIRED_DISTRO_FEATURES = "x11"
@@ -27,6 +31,8 @@ RDEPENDS_${PN} += "font-alias"
 do_install() {
 	install -d ${D}/${datadir}/fonts/X11/misc
 	install -m 0644 ${S}/* ${D}/${datadir}/fonts/X11/misc/
+	# Pick a date/time as otherwise it would be the git checkout/modify time
+	touch -d @1613559011 ${D}/${datadir}/fonts/X11/misc/*
 	install -d ${D}/${libdir}/X11
 	ln -sf ${datadir}/fonts/X11/ ${D}/${libdir}/X11/fonts -s
 }

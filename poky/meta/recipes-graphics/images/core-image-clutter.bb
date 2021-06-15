@@ -11,3 +11,5 @@ IMAGE_INSTALL = "\
     "
 
 inherit core-image
+
+QB_MEM = '${@bb.utils.contains("DISTRO_FEATURES", "opengl", "-m 512", "-m 256", d)}'

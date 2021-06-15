@@ -16,7 +16,6 @@ RDEPENDS_packagegroup-core-sdk = "\
     coreutils \
     ccache \
     diffutils \
-    intltool \
     perl-module-re \
     perl-module-text-wrap \
     findutils \
@@ -32,6 +31,7 @@ SANITIZERS_microblaze = ""
 SANITIZERS_mipsarch = ""
 SANITIZERS_nios2 = ""
 SANITIZERS_riscv64 = ""
+SANITIZERS_riscv32 = ""
 SANITIZERS_libc-musl = ""
 
 RRECOMMENDS_packagegroup-core-sdk = "\

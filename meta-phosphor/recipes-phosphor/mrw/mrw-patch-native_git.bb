@@ -7,10 +7,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 S = "${WORKDIR}/git"
 
-inherit native
 inherit mrw-rev
+inherit native
 
-DEPENDS += "python-native python-lxml-native"
+DEPENDS += "python3-native python3-lxml-native"
 
 SRC_URI += "${MRW_TOOLS_SRC_URI}"
 SRCREV = "${MRW_TOOLS_SRCREV}"

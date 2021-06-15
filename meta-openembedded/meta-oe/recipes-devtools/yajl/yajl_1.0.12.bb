@@ -17,3 +17,5 @@ inherit cmake lib_package
 S = "${WORKDIR}/git"
 
 EXTRA_OECMAKE = "-DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')}"
+
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>1(\.\d+)+)"

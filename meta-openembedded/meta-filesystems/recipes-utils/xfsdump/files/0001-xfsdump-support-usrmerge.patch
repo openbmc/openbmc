@@ -1,0 +1,52 @@
+From fea8c4634469784c16211e2597411c18c72dfa4a Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 5 Mar 2020 14:36:14 +0800
+Subject: [PATCH] xfsdump: support usrmerge
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ dump/Makefile    | 6 +-----
+ restore/Makefile | 6 +-----
+ 2 files changed, 2 insertions(+), 10 deletions(-)
+
+diff --git a/dump/Makefile b/dump/Makefile
+index 66f00d3..cc2d973 100644
+--- a/dump/Makefile
++++ b/dump/Makefile
+@@ -97,12 +97,8 @@ default: depend $(LTCOMMAND)
+ include $(BUILDRULES)
+ 
+ install: default
+-	$(INSTALL) -m 755 -d $(PKG_ROOT_SBIN_DIR)
+-	$(LTINSTALL) -m 755 $(LTCOMMAND) $(PKG_ROOT_SBIN_DIR)
+ 	$(INSTALL) -m 755 -d $(PKG_SBIN_DIR)
+-	# skip symlink when /sbin is alread symlinked to /usr/sbin, like on Fedora
+-	test $(PKG_ROOT_SBIN_DIR) -ef $(PKG_SBIN_DIR) || \
+-		$(INSTALL) -S $(PKG_ROOT_SBIN_DIR)/$(LTCOMMAND) $(PKG_SBIN_DIR)/$(LTCOMMAND)
++	$(LTINSTALL) -m 755 $(LTCOMMAND) $(PKG_SBIN_DIR)
+ install-dev:
+ 
+ .dep: $(COMMINCL) $(COMMON) $(INVINCL) $(INVCOMMON)
+diff --git a/restore/Makefile b/restore/Makefile
+index ac3f8c8..3c46394 100644
+--- a/restore/Makefile
++++ b/restore/Makefile
+@@ -111,12 +111,8 @@ default: depend $(LTCOMMAND)
+ include $(BUILDRULES)
+ 
+ install: default
+-	$(INSTALL) -m 755 -d $(PKG_ROOT_SBIN_DIR)
+-	$(LTINSTALL) -m 755 $(LTCOMMAND) $(PKG_ROOT_SBIN_DIR)
+ 	$(INSTALL) -m 755 -d $(PKG_SBIN_DIR)
+-	# skip symlink when /sbin is alread symlinked to /usr/sbin, like on Fedora
+-	test $(PKG_ROOT_SBIN_DIR) -ef $(PKG_SBIN_DIR) || \
+-		$(INSTALL) -S $(PKG_ROOT_SBIN_DIR)/$(LTCOMMAND) $(PKG_SBIN_DIR)/$(LTCOMMAND)
++	$(LTINSTALL) -m 755 $(LTCOMMAND) $(PKG_SBIN_DIR)
+ install-dev:
+ 
+ .dep: $(COMMINCL) $(COMMON) $(INVINCL) $(INVCOMMON)
+-- 
+2.7.4
+

@@ -1,0 +1,25 @@
+From dfeadd4eb43e829aafb0d10f611fa22ae81bfca4 Mon Sep 17 00:00:00 2001
+From: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+Date: Sun, 20 Oct 2019 17:00:45 +0900
+Subject: [PATCH] Add build rule for README.
+
+fix do_configure error:
+Makefile.am: required file `./README' not found
+
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index e0c4ad6..0449321 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -35,3 +35,4 @@ rpmcvs: preparerpm
+ 	@LN_S@ -f `pwd`/@PACKAGE@-@VERSION@.tar.gz ${RPMDIR}/SOURCES/@PACKAGE@-@VERSION@_cvs_`date +"%Y%m%d"`.tar.gz
+ 	cd ${RPMDIR}/SPECS && @RPMBUILD@ -ba @PACKAGE@.spec --define 'cvs 1'
+ 
++README: README.md
+-- 
+2.7.4
+

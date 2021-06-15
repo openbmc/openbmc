@@ -1,5 +1,7 @@
 #!/bin/bash
-
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # This is an example script to be used in conjunction with test_build_time.sh
 
 if [ "$TEST_BUILDDIR" = "" ] ; then

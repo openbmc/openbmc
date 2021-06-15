@@ -1,23 +1,11 @@
-#! /usr/bin/env python
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
+#! /usr/bin/env python3
 #
 # BitBake Toaster functional tests implementation
 #
 # Copyright (C) 2017 Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import os
 import logging
@@ -87,7 +75,7 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
         try:
             table_element = self.get_table_element(table_id)
             element = table_element.find_element_by_link_text(link_text)
-        except NoSuchElementException as e:
+        except self.NoSuchElementException:
             print('no element found')
             raise
         return element
@@ -98,7 +86,7 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
             element_xpath = "//*[@id='" + table_id + "']"
             try:
                 element = self.driver.find_element_by_xpath(element_xpath)
-            except NoSuchElementException as e:
+            except self.NoSuchElementException:
                 raise
             return element
         row = coordinate[0]
@@ -108,7 +96,7 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
             element_xpath = "//*[@id='" + table_id + "']/tbody/tr[" + str(row) + "]"
             try:
                 element = self.driver.find_element_by_xpath(element_xpath)
-            except NoSuchElementException as e:
+            except self.NoSuchElementException:
                 return False
             return element
 #now we are looking for an element with specified X and Y
@@ -117,6 +105,6 @@ class SeleniumFunctionalTestCase(SeleniumTestCaseBase):
         element_xpath = "//*[@id='" + table_id + "']/tbody/tr[" + str(row) + "]/td[" + str(column) + "]"
         try:
             element = self.driver.find_element_by_xpath(element_xpath)
-        except NoSuchElementException as e:
+        except self.NoSuchElementException:
             return False
         return element

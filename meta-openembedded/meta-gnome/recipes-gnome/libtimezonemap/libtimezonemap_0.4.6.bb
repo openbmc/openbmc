@@ -12,7 +12,7 @@ DEPENDS = "gtk+3 gdk-pixbuf libsoup-2.4 json-glib gnome-common-native"
 
 B = "${S}"
 
-inherit distro_features_check autotools pkgconfig gobject-introspection
+inherit features_check autotools pkgconfig gobject-introspection
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

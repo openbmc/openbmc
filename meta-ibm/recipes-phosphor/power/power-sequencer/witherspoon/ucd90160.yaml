@@ -1,0 +1,103 @@
+- Device:
+  index: 0
+  # Linux sysfs path for this power sequencer (0xC8 8-bit address)
+  path:  /sys/bus/i2c/devices/i2c-11/11-0064
+  RailNames:
+      - "5.0VCS"
+      - "12.0V"
+      - "3.3V"
+      - "1.8V"
+      - "1.1V"
+      - "1.0V"
+      - "0.9V"
+      - "VDN-A"
+      - "VDN-B"
+      - "AVDD"
+      - "VIO-A"
+      - "VIO-B"
+      - "VDD-A"
+      - "VDD-B"
+      - "VCS-A"
+      - "VCS-B"
+  GPIConfigs:
+      - name:            PGOOD_5P0V
+        gpi:             1
+        pinID:           8
+        poll:            false
+        analysis:        none
+      - name:            MEM_GOOD0
+        gpi:             2
+        pinID:           9
+        poll:            false
+        analysis:        none
+      - name:            MEM_GOOD1
+        gpi:             3
+        pinID:           10
+        poll:            false
+        analysis:        none
+      - name:            GPU_PGOOD
+        gpi:             4
+        pinID:           14
+        poll:            false
+        analysis:        gpuPGOOD
+      - name:            GPU_TH_OVERT
+        gpi:             5
+        pinID:           17
+        poll:            true
+        analysis:        gpuOverTemp
+      - name:            SOFTWARE_PGOOD
+        gpi:             6
+        pinID:           11
+        poll:            false
+        analysis:        none
+  GPIOAnalysis:
+      - type:            gpuPGOOD
+        path:            /sys/bus/i2c/devices/i2c-11/11-0060
+        gpio_value:      low
+        error_function:  gpuPGOODError
+        option_flags:    none
+        GPIODefinitions:
+            - GPIODefinition: GPU Card 0
+              gpio:      8
+              callout:   /system/chassis/motherboard/gv100card0
+            - GPIODefinition: GPU Card 1
+              gpio:      9
+              callout:   /system/chassis/motherboard/gv100card1
+            - GPIODefinition: GPU Card 2
+              gpio:      10
+              callout:   /system/chassis/motherboard/gv100card2
+            - GPIODefinition: GPU Card 3
+              gpio:      11
+              callout:   /system/chassis/motherboard/gv100card3
+            - GPIODefinition: GPU Card 4
+              gpio:      12
+              callout:   /system/chassis/motherboard/gv100card4
+            - GPIODefinition: GPU Card 5
+              gpio:      13
+              callout:   /system/chassis/motherboard/gv100card5
+      - type:            gpuOverTemp # Extra analysis function to call for this type
+        # The PCA9xxx chip device path and address (0xC0 8-bit = 0x60 7-bit)
+        path:            /sys/bus/i2c/devices/i2c-11/11-0060
+        gpio_value:      low # What GPIO value indicates a fault/problem?
+        error_function:  gpuOverTempError
+        option_flags:    shutdownOnFault
+        GPIODefinitions:
+            - GPIODefinition: GPU Card 0 Overtemperature
+              gpio:      2 # GPIO pin/register to check for fault
+              # Call out path for fault
+              callout:   /system/chassis/motherboard/gv100card0
+            - GPIODefinition: GPU Card 1 Overtemperature
+              gpio:      3
+              callout:   /system/chassis/motherboard/gv100card1
+            - GPIODefinition: GPU Card 2 Overtemperature
+              gpio:      4
+              callout:   /system/chassis/motherboard/gv100card2
+            - GPIODefinition: GPU Card 3 Overtemperature
+              gpio:      5
+              callout:   /system/chassis/motherboard/gv100card3
+            - GPIODefinition: GPU Card 4 Overtemperature
+              gpio:      6
+              callout:   /system/chassis/motherboard/gv100card4
+            - GPIODefinition: GPU Card 5 Overtemperature
+              gpio:      7
+              callout:   /system/chassis/motherboard/gv100card5

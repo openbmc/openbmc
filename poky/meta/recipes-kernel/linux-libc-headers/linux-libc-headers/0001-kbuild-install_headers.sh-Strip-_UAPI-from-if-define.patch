@@ -24,18 +24,15 @@ Upstream-Status: Submitted [https://www.spinics.net/lists/arm-kernel/msg694800.h
  scripts/headers_install.sh | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/scripts/headers_install.sh b/scripts/headers_install.sh
-index 593f8879c641..fe1d3fc0d33a 100755
---- a/scripts/headers_install.sh
-+++ b/scripts/headers_install.sh
-@@ -38,6 +38,7 @@ do
- 		-e 's/(^|[^a-zA-Z0-9])__packed([^a-zA-Z0-9_]|$)/\1__attribute__((packed))\2/g' \
- 		-e 's/(^|[[:space:](])(inline|asm|volatile)([[:space:](]|$)/\1__\2__\3/g' \
- 		-e 's@#(ifndef|define|endif[[:space:]]*/[*])[[:space:]]*_UAPI@#\1 @' \
-+		-e ':1;s/(#(if|elif)(.*[^A-Za-z0-9_])defined\([[:space:]]*)_UAPI/\1/;t1' \
- 		"$SRCDIR/$i" > "$OUTDIR/$FILE.sed" || exit 1
- 	scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__ "$OUTDIR/$FILE.sed" \
- 		> "$OUTDIR/$FILE"
--- 
-2.5.0
-
+Index: linux-5.4/scripts/headers_install.sh
+===================================================================
+--- linux-5.4.orig/scripts/headers_install.sh
++++ linux-5.4/scripts/headers_install.sh
+@@ -36,6 +36,7 @@
+ 	s/(^|[^a-zA-Z0-9])__packed([^a-zA-Z0-9_]|$)/\1__attribute__((packed))\2/g
+ 	s/(^|[[:space:](])(inline|asm|volatile)([[:space:](]|$)/\1__\2__\3/g
+ 	s@#(ifndef|define|endif[[:space:]]*/[*])[[:space:]]*_UAPI@#\1 @
++        :1;s/(#(if|elif)(.*[^A-Za-z0-9_])defined\([[:space:]]*)_UAPI/\1/;t1
+ ' $INFILE > $TMPFILE || exit 1
+ 
+ scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__ $TMPFILE > $OUTFILE

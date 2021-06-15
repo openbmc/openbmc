@@ -22,33 +22,36 @@ so rename ../support/misc/file.c to ../support/misc/misc.c.
 Upstream-Status: Submitted[https://marc.info/?l=linux-nfs&m=154502780423058&w=2]
 
 Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
+
+Rebase it.
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 ---
  support/misc/Makefile.am |   2 +-
- support/misc/file.c      | 111 -----------------------------------------------
- support/misc/misc.c      | 111 +++++++++++++++++++++++++++++++++++++++++++++++
+ support/misc/file.c      | 115 ---------------------------------------------------------------------------------------------------------------
+ support/misc/misc.c      | 111 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  support/nsm/Makefile.am  |   2 +-
- 4 files changed, 113 insertions(+), 113 deletions(-)
- delete mode 100644 support/misc/file.c
- create mode 100644 support/misc/misc.c
+ 4 files changed, 113 insertions(+), 117 deletions(-)
 
 diff --git a/support/misc/Makefile.am b/support/misc/Makefile.am
-index 8936b0d..d4c1f76 100644
+index f9993e3..8b0e9db 100644
 --- a/support/misc/Makefile.am
 +++ b/support/misc/Makefile.am
-@@ -1,6 +1,6 @@
+@@ -1,7 +1,7 @@
  ## Process this file with automake to produce Makefile.in
  
  noinst_LIBRARIES = libmisc.a
--libmisc_a_SOURCES = tcpwrapper.c from_local.c mountpoint.c file.c
-+libmisc_a_SOURCES = tcpwrapper.c from_local.c mountpoint.c misc.c
+-libmisc_a_SOURCES = tcpwrapper.c from_local.c mountpoint.c file.c \
++libmisc_a_SOURCES = tcpwrapper.c from_local.c mountpoint.c misc.c \
+ 		    nfsd_path.c workqueue.c xstat.c
  
  MAINTAINERCLEANFILES = Makefile.in
 diff --git a/support/misc/file.c b/support/misc/file.c
 deleted file mode 100644
-index e7c3819..0000000
+index 06f6bb2..0000000
 --- a/support/misc/file.c
 +++ /dev/null
-@@ -1,111 +0,0 @@
+@@ -1,115 +0,0 @@
 -/*
 - * Copyright 2009 Oracle.  All rights reserved.
 - * Copyright 2017 Red Hat, Inc.  All rights reserved.
@@ -68,6 +71,10 @@ index e7c3819..0000000
 - * You should have received a copy of the GNU General Public License
 - * along with nfs-utils.  If not, see <http://www.gnu.org/licenses/>.
 - */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
 -
 -#include <sys/stat.h>
 -
@@ -290,6 +297,3 @@ index 8f5874e..68f1a46 100644
  
  BUILT_SOURCES = $(GENFILES)
  
--- 
-2.7.4
-

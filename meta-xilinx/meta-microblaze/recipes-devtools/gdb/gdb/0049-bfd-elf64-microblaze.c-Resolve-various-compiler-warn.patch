@@ -1,0 +1,42 @@
+From bee1ab76011aca029f89f98b9388aeb0390ee90f Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@xilinx.com>
+Date: Thu, 3 Dec 2020 12:02:25 -0800
+Subject: [PATCH 49/52] bfd/elf64-microblaze.c: Resolve various compiler
+ warnings
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ bfd/elf64-microblaze.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Index: gdb-9.2/bfd/elf64-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf64-microblaze.c
++++ gdb-9.2/bfd/elf64-microblaze.c
+@@ -1258,6 +1258,7 @@ microblaze_elf_relocate_section (bfd *ou
+ 	      goto dogot;
+ 	    case (int) R_MICROBLAZE_TLSLD:
+ 	      tls_type = (TLS_TLS | TLS_LD);
++              /* Fall through. */
+ 	    dogot:
+ 	    case (int) R_MICROBLAZE_GOT_64:
+ 	      {
+@@ -2569,6 +2570,7 @@ microblaze_elf_check_relocs (bfd * abfd,
+           tls_type |= (TLS_TLS | TLS_LD);
+         dogottls:
+           sec->has_tls_reloc = 1;
++          /* Fall through. */
+         case R_MICROBLAZE_GOT_64:
+           if (htab->sgot == NULL)
+             {
+@@ -2802,10 +2804,8 @@ microblaze_elf_adjust_dynamic_symbol (st
+   struct elf64_mb_link_hash_table *htab;
+   struct elf64_mb_link_hash_entry * eh;
+   struct elf64_mb_dyn_relocs *p;
+-  asection *sdynbss;
+   asection *s, *srel;
+   unsigned int power_of_two;
+-  bfd *dynobj;
+ 
+   htab = elf64_mb_hash_table (info);
+   if (htab == NULL)

@@ -1,5 +1,8 @@
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import os
 import subprocess
@@ -42,7 +45,8 @@ class SDKBuildProject(BuildProject):
     def _run(self, cmd):
         self.log("Running . %s; " % self.sdkenv + cmd)
         try:
-            output = subprocess.check_output(". %s; " % self.sdkenv + cmd, shell=True, stderr=subprocess.STDOUT)
+            output = subprocess.check_output(". %s; " % self.sdkenv + cmd, shell=True,
+                                             executable='/bin/bash', stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as exc:
             print(exc.output.decode('utf-8'))
             return exc.returncode

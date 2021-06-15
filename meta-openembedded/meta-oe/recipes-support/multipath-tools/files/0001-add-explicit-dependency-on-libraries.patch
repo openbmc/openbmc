@@ -1,0 +1,40 @@
+From 04884263d1de8c427a7a15bd1cf6466ea65d3a0b Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 25 May 2020 23:22:55 -0700
+Subject: [PATCH] add explicit dependency on libraries
+
+[snip]
+gcc/i686-overc-linux/10.1.0/ld: cannot find -lmpathpersist
+collect2: error: ld returned 1 exit status
+Makefile:36: recipe for target 'multipathd' failed
+make[1]: *** [multipathd] Error 1
+make[1]: Leaving directory 'git/multipathd'
+Makefile:29: recipe for target 'multipathd' failed
+make: *** [multipathd] Error 2
+ln -sf libmpathpersist.so.0 libmpathpersist.so
+[snip]
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index bea0a0b2..37a77129 100644
+--- a/Makefile
++++ b/Makefile
+@@ -29,7 +29,8 @@ $(BUILDDIRS):
+ 	$(MAKE) -C $@
+ 
+ multipath multipathd mpathpersist libmpathpersist : libmultipath
+-mpathpersist:  libmpathpersist
++mpathpersist multipathd:  libmpathpersist
++libdmmp libmultipath mpathpersist multipath multipathd: libmpathcmd
+ 
+ DEPS_ON_MULTIPATH := \
+ 	multipath \
+-- 
+2.21.0
+

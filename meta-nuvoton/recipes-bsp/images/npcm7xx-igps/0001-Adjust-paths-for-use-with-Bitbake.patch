@@ -1,0 +1,145 @@
+From 215a2d9660a929beae8bc420239467fc9e135b4f Mon Sep 17 00:00:00 2001
+From: Benjamin Fair <benjaminfair@google.com>
+Date: Wed, 23 Oct 2019 14:23:08 -0700
+Subject: [PATCH] Adjust paths for use with Bitbake
+
+Signed-off-by: Benjamin Fair <benjaminfair@google.com>
+---
+ ImageGeneration/inputs/mergedBootBlockAndUboot.xml     | 10 +++++-----
+ ImageGeneration/references/BootBlockAndHeader_EB.xml   |  6 +++---
+ .../references/BootBlockAndHeader_RunBMC.xml           |  6 +++---
+ ImageGeneration/references/UbootHeader_EB.xml          |  6 +++---
+ ImageGeneration/references/UbootHeader_RunBMC.xml      |  6 +++---
+ 5 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/ImageGeneration/inputs/mergedBootBlockAndUboot.xml b/ImageGeneration/inputs/mergedBootBlockAndUboot.xml
+index d832f96..f4c7756 100644
+--- a/ImageGeneration/inputs/mergedBootBlockAndUboot.xml
++++ b/ImageGeneration/inputs/mergedBootBlockAndUboot.xml
+@@ -18,18 +18,18 @@
+ 		<name>BootBlock</name>         <!-- name of field -->
+ 		<config>
+ 			<offset>0</offset>            <!-- offset in the header -->
+-			<size format='FileSize'>output_binaries/BootBlockAndHeader.bin</size>              <!-- size in the header -->
++			<size format='FileSize'>Poleg_bootblock.bin.full</size>              <!-- size in the header -->
+ 		</config>
+-		<content format='FileContent'>output_binaries/BootBlockAndHeader.bin</content>  <!-- content the user should fill -->
++		<content format='FileContent'>Poleg_bootblock.bin.full</content>  <!-- content the user should fill -->
+ 	</BinField>
+ 		
+ 	<BinField>
+ 		<name>u-boot</name>         <!-- name of field -->
+ 		<config>
+-			<offset format='FileSize' align='0x1000'>output_binaries/BootBlockAndHeader.bin</offset>            <!-- offset in the header -->
+-			<size format='FileSize'>output_binaries/UbootAndHeader.bin</size>              <!-- size in the header -->
++			<offset format='FileSize' align='0x1000'>Poleg_bootblock.bin.full</offset>            <!-- offset in the header -->
++			<size format='FileSize'>u-boot.bin.full</size>              <!-- size in the header -->
+ 		</config>
+-		<content format='FileContent'>output_binaries/UbootAndHeader.bin</content>  <!-- content the user should fill -->
++		<content format='FileContent'>u-boot.bin.full</content>  <!-- content the user should fill -->
+ 	</BinField>
+ 	
+ </Bin_Ecc_Map>
+diff --git a/ImageGeneration/references/BootBlockAndHeader_EB.xml b/ImageGeneration/references/BootBlockAndHeader_EB.xml
+index 775534f..157535d 100644
+--- a/ImageGeneration/references/BootBlockAndHeader_EB.xml
++++ b/ImageGeneration/references/BootBlockAndHeader_EB.xml
+@@ -42,7 +42,7 @@
+ 			<offset>0x144</offset>       
+ 			<size>0x4</size> 
+ 		</config>
+-		<content format='FileSize'>inputs/Poleg_bootblock.bin</content>	<!-- content the user should fill -->
++		<content format='FileSize'>Poleg_bootblock.bin</content>	<!-- content the user should fill -->
+ 	</BinField>
+ 	
+ 	<BinField>
+@@ -50,9 +50,9 @@
+ 		<name>Code</name>             <!-- name of field -->
+ 		<config>
+ 			<offset>0x200</offset>       
+-			<size format='FileSize'>inputs/Poleg_bootblock.bin</size>                 <!-- size in the header calculated by tool-->
++			<size format='FileSize'>Poleg_bootblock.bin</size>                 <!-- size in the header calculated by tool-->
+ 		</config>
+-		<content format='FileContent'>inputs/Poleg_bootblock.bin</content>  <!-- content the user should fill -->
++		<content format='FileContent'>Poleg_bootblock.bin</content>  <!-- content the user should fill -->
+ 	</BinField>	
+ 	
+ 	<!-- BMC optional fields -->
+diff --git a/ImageGeneration/references/BootBlockAndHeader_RunBMC.xml b/ImageGeneration/references/BootBlockAndHeader_RunBMC.xml
+index cc719e9..4d1e972 100644
+--- a/ImageGeneration/references/BootBlockAndHeader_RunBMC.xml
++++ b/ImageGeneration/references/BootBlockAndHeader_RunBMC.xml
+@@ -42,7 +42,7 @@
+ 			<offset>0x144</offset>       
+ 			<size>0x4</size> 
+ 		</config>
+-		<content format='FileSize'>inputs/Poleg_bootblock.bin</content>	<!-- content the user should fill -->
++		<content format='FileSize'>Poleg_bootblock.bin</content>	<!-- content the user should fill -->
+ 	</BinField>
+ 	
+ 	<BinField>
+@@ -50,9 +50,9 @@
+ 		<name>Code</name>             
+ 		<config>
+ 			<offset>0x200</offset>       
+-			<size format='FileSize'>inputs/Poleg_bootblock.bin</size>                 <!-- size in the header calculated by tool-->
++			<size format='FileSize'>Poleg_bootblock.bin</size>                 <!-- size in the header calculated by tool-->
+ 		</config>
+-		<content format='FileContent'>inputs/Poleg_bootblock.bin</content>  <!-- content the user should fill -->
++		<content format='FileContent'>Poleg_bootblock.bin</content>  <!-- content the user should fill -->
+ 	</BinField>	
+ 	
+ 	<!-- BMC optional fields -->
+diff --git a/ImageGeneration/references/UbootHeader_EB.xml b/ImageGeneration/references/UbootHeader_EB.xml
+index 1e72e22..475ec45 100644
+--- a/ImageGeneration/references/UbootHeader_EB.xml
++++ b/ImageGeneration/references/UbootHeader_EB.xml
+@@ -42,7 +42,7 @@
+ 			<offset>0x144</offset>        <!-- offset in the header -->
+ 			<size>0x4</size>              <!-- size in the header -->
+ 		</config>
+-		<content format='FileSize'>inputs/u-boot.bin</content>	<!-- content the user should fill -->
++		<content format='FileSize'>u-boot.bin</content>	<!-- content the user should fill -->
+ 	</BinField>
+ 	
+ 	<BinField>
+@@ -50,9 +50,9 @@
+ 		<name>Code</name>             <!-- name of field -->
+ 		<config>
+ 			<offset>0x200</offset>        <!-- offset in the header -->
+-			<size format='FileSize'>inputs/u-boot.bin</size>                 <!-- size in the header calculated by tool-->
++			<size format='FileSize'>u-boot.bin</size>                 <!-- size in the header calculated by tool-->
+ 		</config>
+-		<content format='FileContent'>inputs/u-boot.bin</content>  <!-- content the user should fill -->
++		<content format='FileContent'>u-boot.bin</content>  <!-- content the user should fill -->
+ 	</BinField>	
+ 	
+ 	<!-- BMC optional fields -->
+diff --git a/ImageGeneration/references/UbootHeader_RunBMC.xml b/ImageGeneration/references/UbootHeader_RunBMC.xml
+index 7eb3076..481ed2f 100644
+--- a/ImageGeneration/references/UbootHeader_RunBMC.xml
++++ b/ImageGeneration/references/UbootHeader_RunBMC.xml
+@@ -42,7 +42,7 @@
+ 			<offset>0x144</offset>        <!-- offset in the header -->
+ 			<size>0x4</size>              <!-- size in the header -->
+ 		</config>
+-		<content format='FileSize'>inputs/u-boot.bin</content>	<!-- content the user should fill -->
++		<content format='FileSize'>u-boot.bin</content>	<!-- content the user should fill -->
+ 	</BinField>
+ 	
+ 	<BinField>
+@@ -50,9 +50,9 @@
+ 		<name>Code</name>             <!-- name of field -->
+ 		<config>
+ 			<offset>0x200</offset>        <!-- offset in the header -->
+-			<size format='FileSize'>inputs/u-boot.bin</size>                 <!-- size in the header calculated by tool-->
++			<size format='FileSize'>u-boot.bin</size>                 <!-- size in the header calculated by tool-->
+ 		</config>
+-		<content format='FileContent'>inputs/u-boot.bin</content>  <!-- content the user should fill -->
++		<content format='FileContent'>u-boot.bin</content>  <!-- content the user should fill -->
+ 	</BinField>	
+ 	
+ 	<!-- BMC optional fields -->
+-- 
+2.24.0.rc0.303.g954a862665-goog
+

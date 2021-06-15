@@ -97,17 +97,15 @@ python devtool_post_unpack() {
     local_files = oe.recipeutils.get_recipe_local_files(d)
 
     if is_kernel_yocto:
-        for key in local_files.copy():
-            if key.endswith('scc'):
-                sccfile = open(local_files[key], 'r')
+        for key in [f for f in local_files if f.endswith('scc')]:
+            with open(local_files[key], 'r') as sccfile:
                 for l in sccfile:
                     line = l.split()
                     if line and line[0] in ('kconf', 'patch'):
                         cfg = os.path.join(os.path.dirname(local_files[key]), line[-1])
-                        if not cfg in local_files.values():
+                        if cfg not in local_files.values():
                             local_files[line[-1]] = cfg
                             shutil.copy2(cfg, workdir)
-                sccfile.close()
 
     # Ignore local files with subdir={BP}
     srcabspath = os.path.abspath(srcsubdir)
@@ -201,6 +199,7 @@ python devtool_post_patch() {
             # Run do_patch function with the override applied
             localdata = bb.data.createCopy(d)
             localdata.setVar('OVERRIDES', ':'.join(no_overrides))
+            localdata.setVar('FILESOVERRIDES', ':'.join(no_overrides))
             bb.build.exec_func('do_patch', localdata)
             rm_patches()
             # Now we need to reconcile the dev branch with the no-overrides one
@@ -218,7 +217,8 @@ python devtool_post_patch() {
                 # Reset back to the initial commit on a new branch
                 bb.process.run('git checkout %s -b devtool-override-%s' % (initial_rev, override), cwd=srcsubdir)
                 # Run do_patch function with the override applied
-                localdata.appendVar('OVERRIDES', ':%s' % override)
+                localdata.setVar('OVERRIDES', ':'.join(no_overrides + [override]))
+                localdata.setVar('FILESOVERRIDES', ':'.join(no_overrides + [override]))
                 bb.build.exec_func('do_patch', localdata)
                 rm_patches()
                 # Now we need to reconcile the new branch with the no-overrides one

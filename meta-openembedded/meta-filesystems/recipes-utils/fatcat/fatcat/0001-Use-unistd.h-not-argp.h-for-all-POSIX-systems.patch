@@ -1,0 +1,37 @@
+From 14ef83291096e019ebc48040cf63530a2574a26d Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Sun, 19 Jan 2020 16:03:21 +0000
+Subject: [PATCH] Use unistd.h not argp.h for all POSIX systems
+
+getopt(3) is found in unistd.h on all POSIX systems and we make no use
+of any of the GNU specific argp extensions. Include unistd.h directly to
+allow building with musl on linux, whilst retaining compatibility with
+glibc and other unices.
+
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+Upstream-status: Pending
+---
+ src/fatcat.cpp | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/src/fatcat.cpp b/src/fatcat.cpp
+index ce23ca07bb99..b4427e465bde 100644
+--- a/src/fatcat.cpp
++++ b/src/fatcat.cpp
+@@ -1,14 +1,10 @@
+ #include <stdlib.h>
+-#include<string.h>
+-#ifdef __APPLE__
+-#include <unistd.h>
+-#else
++#include <string.h>
+ #ifdef __WIN__
+ #include <ctype.h>
+ #include "xgetopt/xgetopt.h"
+ #else
+-#include <argp.h>
+-#endif
++#include <unistd.h>
+ #endif
+ 
+ #include <stdio.h>

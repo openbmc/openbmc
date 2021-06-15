@@ -3,19 +3,41 @@ SSTATE_VERSION = "3"
 SSTATE_MANIFESTS ?= "${TMPDIR}/sstate-control"
 SSTATE_MANFILEPREFIX = "${SSTATE_MANIFESTS}/manifest-${SSTATE_MANMACH}-${PN}"
 
-def generate_sstatefn(spec, hash, d):
+def generate_sstatefn(spec, hash, taskname, siginfo, d):
+    if taskname is None:
+       return ""
+    extension = ".tgz"
+    # 8 chars reserved for siginfo
+    limit = 254 - 8
+    if siginfo:
+        limit = 254
+        extension = ".tgz.siginfo"
     if not hash:
         hash = "INVALID"
-    return hash[:2] + "/" + spec + hash
+    fn = spec + hash + "_" + taskname + extension
+    # If the filename is too long, attempt to reduce it
+    if len(fn) > limit:
+        components = spec.split(":")
+        # Fields 0,5,6 are mandatory, 1 is most useful, 2,3,4 are just for information
+        # 7 is for the separators
+        avail = (254 - len(hash + "_" + taskname + extension) - len(components[0]) - len(components[1]) - len(components[5]) - len(components[6]) - 7) // 3
+        components[2] = components[2][:avail]
+        components[3] = components[3][:avail]
+        components[4] = components[4][:avail]
+        spec = ":".join(components)
+        fn = spec + hash + "_" + taskname + extension
+        if len(fn) > limit:
+            bb.fatal("Unable to reduce sstate name to less than 255 chararacters")
+    return hash[:2] + "/" + hash[2:4] + "/" + fn
 
 SSTATE_PKGARCH    = "${PACKAGE_ARCH}"
 SSTATE_PKGSPEC    = "sstate:${PN}:${PACKAGE_ARCH}${TARGET_VENDOR}-${TARGET_OS}:${PV}:${PR}:${SSTATE_PKGARCH}:${SSTATE_VERSION}:"
 SSTATE_SWSPEC     = "sstate:${PN}::${PV}:${PR}::${SSTATE_VERSION}:"
-SSTATE_PKGNAME    = "${SSTATE_EXTRAPATH}${@generate_sstatefn(d.getVar('SSTATE_PKGSPEC'), d.getVar('BB_UNIHASH'), d)}"
+SSTATE_PKGNAME    = "${SSTATE_EXTRAPATH}${@generate_sstatefn(d.getVar('SSTATE_PKGSPEC'), d.getVar('BB_UNIHASH'), d.getVar('SSTATE_CURRTASK'), False, d)}"
 SSTATE_PKG        = "${SSTATE_DIR}/${SSTATE_PKGNAME}"
 SSTATE_EXTRAPATH   = ""
 SSTATE_EXTRAPATHWILDCARD = ""
-SSTATE_PATHSPEC   = "${SSTATE_DIR}/${SSTATE_EXTRAPATHWILDCARD}*/${SSTATE_PKGSPEC}"
+SSTATE_PATHSPEC   = "${SSTATE_DIR}/${SSTATE_EXTRAPATHWILDCARD}*/*/${SSTATE_PKGSPEC}*_${SSTATE_PATH_CURRTASK}.tgz*"
 
 # explicitly make PV to depend on evaluated value of PV variable
 PV[vardepvalue] = "${PV}"
@@ -50,6 +72,7 @@ BB_HASHFILENAME = "False ${SSTATE_PKGSPEC} ${SSTATE_SWSPEC}"
 
 SSTATE_ARCHS = " \
     ${BUILD_ARCH} \
+    ${BUILD_ARCH}_${ORIGNATIVELSBSTRING} \
     ${BUILD_ARCH}_${SDK_ARCH}_${SDK_OS} \
     ${BUILD_ARCH}_${TARGET_ARCH} \
     ${SDK_ARCH}_${SDK_OS} \
@@ -58,6 +81,7 @@ SSTATE_ARCHS = " \
     ${PACKAGE_ARCH} \
     ${PACKAGE_EXTRA_ARCHS} \
     ${MACHINE_ARCH}"
+SSTATE_ARCHS[vardepsexclude] = "ORIGNATIVELSBSTRING"
 
 SSTATE_MANMACH ?= "${SSTATE_PKGARCH}"
 
@@ -89,11 +113,6 @@ SSTATE_HASHEQUIV_METHOD[doc] = "The fully-qualified function used to calculate \
     the output hash for a task, which in turn is used to determine equivalency. \
     "
 
-SSTATE_HASHEQUIV_SERVER ?= ""
-SSTATE_HASHEQUIV_SERVER[doc] = "The hash equivalence sever. For example, \
-    'http://192.168.0.1:5000'. Do not include a trailing slash \
-    "
-
 SSTATE_HASHEQUIV_REPORT_TASKDATA ?= "0"
 SSTATE_HASHEQUIV_REPORT_TASKDATA[doc] = "Report additional useful data to the \
     hash equivalency server, such as PN, PV, taskname, etc. This information \
@@ -104,6 +123,8 @@ SSTATE_HASHEQUIV_REPORT_TASKDATA[doc] = "Report additional useful data to the \
 python () {
     if bb.data.inherits_class('native', d):
         d.setVar('SSTATE_PKGARCH', d.getVar('BUILD_ARCH', False))
+        if d.getVar("PN") == "pseudo-native":
+            d.appendVar('SSTATE_PKGARCH', '_${ORIGNATIVELSBSTRING}')
     elif bb.data.inherits_class('crosssdk', d):
         d.setVar('SSTATE_PKGARCH', d.expand("${BUILD_ARCH}_${SDK_ARCH}_${SDK_OS}"))
     elif bb.data.inherits_class('cross', d):
@@ -298,6 +319,8 @@ def sstate_install(ss, d):
     if os.path.exists(i):
         with open(i, "r") as f:
             manifests = f.readlines()
+    # We append new entries, we don't remove older entries which may have the same
+    # manifest name but different versions from stamp/workdir. See below.
     if filedata not in manifests:
         with open(i, "a+") as f:
             f.write(filedata)
@@ -322,25 +345,29 @@ def sstate_installpkg(ss, d):
     from oe.gpg_sign import get_signer
 
     sstateinst = d.expand("${WORKDIR}/sstate-install-%s/" % ss['task'])
-    sstatefetch = d.getVar('SSTATE_PKGNAME') + '_' + ss['task'] + ".tgz"
-    sstatepkg = d.getVar('SSTATE_PKG') + '_' + ss['task'] + ".tgz"
+    d.setVar("SSTATE_CURRTASK", ss['task'])
+    sstatefetch = d.getVar('SSTATE_PKGNAME')
+    sstatepkg = d.getVar('SSTATE_PKG')
 
     if not os.path.exists(sstatepkg):
         pstaging_fetch(sstatefetch, d)
 
     if not os.path.isfile(sstatepkg):
-        bb.note("Staging package %s does not exist" % sstatepkg)
+        bb.note("Sstate package %s does not exist" % sstatepkg)
         return False
 
     sstate_clean(ss, d)
 
     d.setVar('SSTATE_INSTDIR', sstateinst)
-    d.setVar('SSTATE_PKG', sstatepkg)
 
     if bb.utils.to_boolean(d.getVar("SSTATE_VERIFY_SIG"), False):
+        if not os.path.isfile(sstatepkg + '.sig'):
+            bb.warn("No signature file for sstate package %s, skipping acceleration..." % sstatepkg)
+            return False
         signer = get_signer(d, 'local')
         if not signer.verify(sstatepkg + '.sig'):
-            bb.warn("Cannot verify signature on sstate package %s" % sstatepkg)
+            bb.warn("Cannot verify signature on sstate package %s, skipping acceleration..." % sstatepkg)
+            return False
 
     # Empty sstateinst directory, ensure its clean
     if os.path.exists(sstateinst):
@@ -376,7 +403,7 @@ def sstate_installpkgdir(ss, d):
 
     for state in ss['dirs']:
         prepdir(state[1])
-        os.rename(sstateinst + state[0], state[1])
+        bb.utils.rename(sstateinst + state[0], state[1])
     sstate_install(ss, d)
 
     for plain in ss['plaindirs']:
@@ -388,7 +415,7 @@ def sstate_installpkgdir(ss, d):
         dest = plain
         bb.utils.mkdirhier(src)
         prepdir(dest)
-        os.rename(src, dest)
+        bb.utils.rename(src, dest)
 
     return True
 
@@ -444,8 +471,9 @@ python sstate_hardcode_path_unpack () {
 def sstate_clean_cachefile(ss, d):
     import oe.path
 
-    sstatepkgfile = d.getVar('SSTATE_PATHSPEC') + "*_" + ss['task'] + ".tgz*"
     if d.getVarFlag('do_%s' % ss['task'], 'task'):
+        d.setVar("SSTATE_PATH_CURRTASK", ss['task'])
+        sstatepkgfile = d.getVar('SSTATE_PATHSPEC')
         bb.note("Removing %s" % sstatepkgfile)
         oe.path.remove(sstatepkgfile)
 
@@ -616,10 +644,9 @@ def sstate_package(ss, d):
     tmpdir = d.getVar('TMPDIR')
 
     sstatebuild = d.expand("${WORKDIR}/sstate-build-%s/" % ss['task'])
-    sstatepkg = d.getVar('SSTATE_PKG') + '_'+ ss['task'] + ".tgz"
+    d.setVar("SSTATE_CURRTASK", ss['task'])
     bb.utils.remove(sstatebuild, recurse=True)
     bb.utils.mkdirhier(sstatebuild)
-    bb.utils.mkdirhier(os.path.dirname(sstatepkg))
     for state in ss['dirs']:
         if not os.path.exists(state[1]):
             continue
@@ -639,7 +666,7 @@ def sstate_package(ss, d):
                     continue
                 bb.error("sstate found an absolute path symlink %s pointing at %s. Please replace this with a relative link." % (srcpath, link))
         bb.debug(2, "Preparing tree %s for packaging at %s" % (state[1], sstatebuild + state[0]))
-        os.rename(state[1], sstatebuild + state[0])
+        bb.utils.rename(state[1], sstatebuild + state[0])
 
     workdir = d.getVar('WORKDIR')
     sharedworkdir = os.path.join(d.getVar('TMPDIR'), "work-shared")
@@ -649,24 +676,37 @@ def sstate_package(ss, d):
             pdir = plain.replace(sharedworkdir, sstatebuild)
         bb.utils.mkdirhier(plain)
         bb.utils.mkdirhier(pdir)
-        os.rename(plain, pdir)
+        bb.utils.rename(plain, pdir)
 
     d.setVar('SSTATE_BUILDDIR', sstatebuild)
-    d.setVar('SSTATE_PKG', sstatepkg)
     d.setVar('SSTATE_INSTDIR', sstatebuild)
 
     if d.getVar('SSTATE_SKIP_CREATION') == '1':
         return
 
+    sstate_create_package = ['sstate_report_unihash', 'sstate_create_package']
+    if d.getVar('SSTATE_SIG_KEY'):
+        sstate_create_package.append('sstate_sign_package')
+
     for f in (d.getVar('SSTATECREATEFUNCS') or '').split() + \
-             ['sstate_report_unihash', 'sstate_create_package', 'sstate_sign_package'] + \
+             sstate_create_package + \
              (d.getVar('SSTATEPOSTCREATEFUNCS') or '').split():
         # All hooks should run in SSTATE_BUILDDIR.
         bb.build.exec_func(f, d, (sstatebuild,))
 
-    bb.siggen.dump_this_task(sstatepkg + ".siginfo", d)
+    # SSTATE_PKG may have been changed by sstate_report_unihash
+    siginfo = d.getVar('SSTATE_PKG') + ".siginfo"
+    if not os.path.exists(siginfo):
+        bb.siggen.dump_this_task(siginfo, d)
+    else:
+        try:
+            os.utime(siginfo, None)
+        except PermissionError:
+            pass
 
     return
+
+sstate_package[vardepsexclude] += "SSTATE_SIG_KEY"
 
 def pstaging_fetch(sstatefetch, d):
     import bb.fetch2
@@ -704,10 +744,11 @@ def pstaging_fetch(sstatefetch, d):
         localdata.setVar('SRC_URI', srcuri)
         try:
             fetcher = bb.fetch2.Fetch([srcuri], localdata, cache=False)
+            fetcher.checkstatus()
             fetcher.download()
 
         except bb.fetch2.BBFetchException:
-            break
+            pass
 
 def sstate_setscene(d):
     shared_state = sstate_state_fromvars(d)
@@ -748,13 +789,20 @@ sstate_task_postfunc[dirs] = "${WORKDIR}"
 # set as SSTATE_BUILDDIR. Will be run from within SSTATE_BUILDDIR.
 #
 sstate_create_package () {
+	# Exit early if it already exists
+	if [ -e ${SSTATE_PKG} ]; then
+		[ ! -w ${SSTATE_PKG} ] || touch ${SSTATE_PKG}
+		return
+	fi
+
+	mkdir --mode=0775 -p `dirname ${SSTATE_PKG}`
 	TFILE=`mktemp ${SSTATE_PKG}.XXXXXXXX`
 
-        # Use pigz if available
-        OPT="-czS"
-        if [ -x "$(command -v pigz)" ]; then
-            OPT="-I pigz -cS"
-        fi
+	# Use pigz if available
+	OPT="-czS"
+	if [ -x "$(command -v pigz)" ]; then
+		OPT="-I pigz -cS"
+	fi
 
 	# Need to handle empty directories
 	if [ "$(ls -A)" ]; then
@@ -769,19 +817,27 @@ sstate_create_package () {
 		tar $OPT --file=$TFILE --files-from=/dev/null
 	fi
 	chmod 0664 $TFILE
-	mv -f $TFILE ${SSTATE_PKG}
+	# Skip if it was already created by some other process
+	if [ ! -e ${SSTATE_PKG} ]; then
+		# Move into place using ln to attempt an atomic op.
+		# Abort if it already exists
+		ln $TFILE ${SSTATE_PKG} && rm $TFILE
+	else
+		rm $TFILE
+	fi
+	[ ! -w ${SSTATE_PKG} ] || touch ${SSTATE_PKG}
 }
 
 python sstate_sign_package () {
     from oe.gpg_sign import get_signer
 
-    if d.getVar('SSTATE_SIG_KEY'):
-        signer = get_signer(d, 'local')
-        sstate_pkg = d.getVar('SSTATE_PKG')
-        if os.path.exists(sstate_pkg + '.sig'):
-            os.unlink(sstate_pkg + '.sig')
-        signer.detach_sign(sstate_pkg, d.getVar('SSTATE_SIG_KEY', False), None,
-                           d.getVar('SSTATE_SIG_PASSPHRASE'), armor=False)
+
+    signer = get_signer(d, 'local')
+    sstate_pkg = d.getVar('SSTATE_PKG')
+    if os.path.exists(sstate_pkg + '.sig'):
+        os.unlink(sstate_pkg + '.sig')
+    signer.detach_sign(sstate_pkg, d.getVar('SSTATE_SIG_KEY', False), None,
+                       d.getVar('SSTATE_SIG_PASSPHRASE'), armor=False)
 }
 
 python sstate_report_unihash() {
@@ -799,7 +855,7 @@ python sstate_report_unihash() {
 sstate_unpack_package () {
 	tar -xvzf ${SSTATE_PKG}
 	# update .siginfo atime on local/NFS mirror
-	[ -w ${SSTATE_PKG}.siginfo ] && [ -h ${SSTATE_PKG}.siginfo ] && touch -a ${SSTATE_PKG}.siginfo
+	[ -O ${SSTATE_PKG}.siginfo ] && [ -w ${SSTATE_PKG}.siginfo ] && [ -h ${SSTATE_PKG}.siginfo ] && touch -a ${SSTATE_PKG}.siginfo
 	# Use "! -w ||" to return true for read only files
 	[ ! -w ${SSTATE_PKG} ] || touch --no-dereference ${SSTATE_PKG}
 	[ ! -w ${SSTATE_PKG}.sig ] || [ ! -e ${SSTATE_PKG}.sig ] || touch --no-dereference ${SSTATE_PKG}.sig
@@ -808,29 +864,25 @@ sstate_unpack_package () {
 
 BB_HASHCHECK_FUNCTION = "sstate_checkhashes"
 
-def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False, *, sq_unihash=None):
-
-    ret = []
-    missed = []
-    extension = ".tgz"
-    if siginfo:
-        extension = extension + ".siginfo"
+def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, **kwargs):
+    found = set()
+    foundLocal = set()
+    foundNet = set()
+    missed = set()
 
     def gethash(task):
-        if sq_unihash is not None:
-            return sq_unihash[task]
-        return sq_hash[task]
+        return sq_data['unihash'][task]
 
     def getpathcomponents(task, d):
         # Magic data from BB_HASHFILENAME
-        splithashfn = sq_hashfn[task].split(" ")
+        splithashfn = sq_data['hashfn'][task].split(" ")
         spec = splithashfn[1]
         if splithashfn[0] == "True":
             extrapath = d.getVar("NATIVELSBSTRING") + "/"
         else:
             extrapath = ""
-
-        tname = sq_task[task][3:]
+        
+        tname = bb.runqueue.taskname_from_tid(task)[3:]
 
         if tname in ["fetch", "unpack", "patch", "populate_lic", "preconfigure"] and splithashfn[2]:
             spec = splithashfn[2]
@@ -839,18 +891,19 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False, *, 
         return spec, extrapath, tname
 
 
-    for task in range(len(sq_fn)):
+    for tid in sq_data['hash']:
 
-        spec, extrapath, tname = getpathcomponents(task, d)
+        spec, extrapath, tname = getpathcomponents(tid, d)
 
-        sstatefile = d.expand("${SSTATE_DIR}/" + extrapath + generate_sstatefn(spec, gethash(task), d) + "_" + tname + extension)
+        sstatefile = d.expand("${SSTATE_DIR}/" + extrapath + generate_sstatefn(spec, gethash(tid), tname, siginfo, d))
 
         if os.path.exists(sstatefile):
             bb.debug(2, "SState: Found valid sstate file %s" % sstatefile)
-            ret.append(task)
+            found.add(tid)
+            foundLocal.add(tid)
             continue
         else:
-            missed.append(task)
+            missed.add(tid)
             bb.debug(2, "SState: Looked for but didn't find file %s" % sstatefile)
 
     mirrors = d.getVar("SSTATE_MIRRORS")
@@ -880,7 +933,7 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False, *, 
             thread_worker.connection_cache.close_connections()
 
         def checkstatus(thread_worker, arg):
-            (task, sstatefile) = arg
+            (tid, sstatefile) = arg
 
             localdata2 = bb.data.createCopy(localdata)
             srcuri = "file://" + sstatefile
@@ -892,26 +945,30 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False, *, 
                             connection_cache=thread_worker.connection_cache)
                 fetcher.checkstatus()
                 bb.debug(2, "SState: Successful fetch test for %s" % srcuri)
-                ret.append(task)
-                if task in missed:
-                    missed.remove(task)
+                found.add(tid)
+                foundNet.add(tid)
+                if tid in missed:
+                    missed.remove(tid)
             except:
-                missed.append(task)
+                missed.add(tid)
                 bb.debug(2, "SState: Unsuccessful fetch test for %s" % srcuri)
                 pass
-            bb.event.fire(bb.event.ProcessProgress(msg, len(tasklist) - thread_worker.tasks.qsize()), d)
+            if len(tasklist) >= min_tasks:
+                bb.event.fire(bb.event.ProcessProgress(msg, len(tasklist) - thread_worker.tasks.qsize()), d)
 
         tasklist = []
-        for task in range(len(sq_fn)):
-            if task in ret:
+        min_tasks = 100
+        for tid in sq_data['hash']:
+            if tid in found:
                 continue
-            spec, extrapath, tname = getpathcomponents(task, d)
-            sstatefile = d.expand(extrapath + generate_sstatefn(spec, gethash(task), d) + "_" + tname + extension)
-            tasklist.append((task, sstatefile))
+            spec, extrapath, tname = getpathcomponents(tid, d)
+            sstatefile = d.expand(extrapath + generate_sstatefn(spec, gethash(tid), tname, siginfo, d))
+            tasklist.append((tid, sstatefile))
 
         if tasklist:
-            msg = "Checking sstate mirror object availability"
-            bb.event.fire(bb.event.ProcessStarted(msg, len(tasklist)), d)
+            if len(tasklist) >= min_tasks:
+                msg = "Checking sstate mirror object availability"
+                bb.event.fire(bb.event.ProcessStarted(msg, len(tasklist)), d)
 
             import multiprocessing
             nproc = min(multiprocessing.cpu_count(), len(tasklist))
@@ -925,37 +982,38 @@ def sstate_checkhashes(sq_fn, sq_task, sq_hash, sq_hashfn, d, siginfo=False, *, 
             pool.wait_completion()
             bb.event.disable_threadlock()
 
-            bb.event.fire(bb.event.ProcessFinished(msg), d)
+            if len(tasklist) >= min_tasks:
+                bb.event.fire(bb.event.ProcessFinished(msg), d)
 
     inheritlist = d.getVar("INHERIT")
     if "toaster" in inheritlist:
         evdata = {'missed': [], 'found': []};
-        for task in missed:
-            spec, extrapath, tname = getpathcomponents(task, d)
-            sstatefile = d.expand(extrapath + generate_sstatefn(spec, gethash(task), d) + "_" + tname + ".tgz")
-            evdata['missed'].append( (sq_fn[task], sq_task[task], gethash(task), sstatefile ) )
-        for task in ret:
-            spec, extrapath, tname = getpathcomponents(task, d)
-            sstatefile = d.expand(extrapath + generate_sstatefn(spec, gethash(task), d) + "_" + tname + ".tgz")
-            evdata['found'].append( (sq_fn[task], sq_task[task], gethash(task), sstatefile ) )
+        for tid in missed:
+            spec, extrapath, tname = getpathcomponents(tid, d)
+            sstatefile = d.expand(extrapath + generate_sstatefn(spec, gethash(tid), tname, False, d))
+            evdata['missed'].append((bb.runqueue.fn_from_tid(tid), bb.runqueue.taskname_from_tid(tid), gethash(tid), sstatefile ) )
+        for tid in found:
+            spec, extrapath, tname = getpathcomponents(tid, d)
+            sstatefile = d.expand(extrapath + generate_sstatefn(spec, gethash(tid), tname, False, d))
+            evdata['found'].append((bb.runqueue.fn_from_tid(tid), bb.runqueue.taskname_from_tid(tid), gethash(tid), sstatefile ) )
         bb.event.fire(bb.event.MetadataEvent("MissedSstate", evdata), d)
 
-    # Print some summary statistics about the current task completion and how much sstate
-    # reuse there was. Avoid divide by zero errors.
-    total = len(sq_fn)
-    currentcount = d.getVar("BB_SETSCENE_STAMPCURRENT_COUNT") or 0
-    complete = 0
-    if currentcount:
-        complete = (len(ret) + currentcount) / (total + currentcount) * 100
-    match = 0
-    if total:
-        match = len(ret) / total * 100
-    bb.plain("Sstate summary: Wanted %d Found %d Missed %d Current %d (%d%% match, %d%% complete)" % (total, len(ret), len(missed), currentcount, match, complete))
+    if summary:
+        # Print some summary statistics about the current task completion and how much sstate
+        # reuse there was. Avoid divide by zero errors.
+        total = len(sq_data['hash'])
+        complete = 0
+        if currentcount:
+            complete = (len(found) + currentcount) / (total + currentcount) * 100
+        match = 0
+        if total:
+            match = len(found) / total * 100
+        bb.plain("Sstate summary: Wanted %d Local %d Network %d Missed %d Current %d (%d%% match, %d%% complete)" % (total, len(foundLocal), len(foundNet),len(missed), currentcount, match, complete))
 
     if hasattr(bb.parse.siggen, "checkhashes"):
-        bb.parse.siggen.checkhashes(missed, ret, sq_fn, sq_task, sq_hash, sq_hashfn, d)
+        bb.parse.siggen.checkhashes(sq_data, missed, found, d)
 
-    return ret
+    return found
 
 BB_SETSCENE_DEPVALID = "setscene_depvalid"
 
@@ -1070,29 +1128,40 @@ addhandler sstate_eventhandler
 sstate_eventhandler[eventmask] = "bb.build.TaskSucceeded"
 python sstate_eventhandler() {
     d = e.data
-    # When we write an sstate package we rewrite the SSTATE_PKG
-    spkg = d.getVar('SSTATE_PKG')
-    if not spkg.endswith(".tgz"):
+    writtensstate = d.getVar('SSTATE_CURRTASK')
+    if not writtensstate:
         taskname = d.getVar("BB_RUNTASK")[3:]
         spec = d.getVar('SSTATE_PKGSPEC')
         swspec = d.getVar('SSTATE_SWSPEC')
         if taskname in ["fetch", "unpack", "patch", "populate_lic", "preconfigure"] and swspec:
             d.setVar("SSTATE_PKGSPEC", "${SSTATE_SWSPEC}")
             d.setVar("SSTATE_EXTRAPATH", "")
-        sstatepkg = d.getVar('SSTATE_PKG')
-        bb.siggen.dump_this_task(sstatepkg + '_' + taskname + ".tgz" ".siginfo", d)
+        d.setVar("SSTATE_CURRTASK", taskname)
+        siginfo = d.getVar('SSTATE_PKG') + ".siginfo"
+        if not os.path.exists(siginfo):
+            bb.siggen.dump_this_task(siginfo, d)
+        else:
+            try:
+                os.utime(siginfo, None)
+            except PermissionError:
+                pass
+
 }
 
 SSTATE_PRUNE_OBSOLETEWORKDIR ?= "1"
 
-# Event handler which removes manifests and stamps file for
-# recipes which are no longer reachable in a build where they
-# once were.
+#
+# Event handler which removes manifests and stamps file for recipes which are no
+# longer 'reachable' in a build where they once were. 'Reachable' refers to
+# whether a recipe is parsed so recipes in a layer which was removed would no
+# longer be reachable. Switching between systemd and sysvinit where recipes
+# became skipped would be another example.
+#
 # Also optionally removes the workdir of those tasks/recipes
 #
-addhandler sstate_eventhandler2
-sstate_eventhandler2[eventmask] = "bb.event.ReachableStamps"
-python sstate_eventhandler2() {
+addhandler sstate_eventhandler_reachablestamps
+sstate_eventhandler_reachablestamps[eventmask] = "bb.event.ReachableStamps"
+python sstate_eventhandler_reachablestamps() {
     import glob
     d = e.data
     stamps = e.stamps.values()
@@ -1118,11 +1187,21 @@ python sstate_eventhandler2() {
         i = d.expand("${SSTATE_MANIFESTS}/index-" + a)
         if not os.path.exists(i):
             continue
+        manseen = set()
+        ignore = []
         with open(i, "r") as f:
             lines = f.readlines()
-            for l in lines:
+            for l in reversed(lines):
                 try:
                     (stamp, manifest, workdir) = l.split()
+                    # The index may have multiple entries for the same manifest as the code above only appends
+                    # new entries and there may be an entry with matching manifest but differing version in stamp/workdir.
+                    # The last entry in the list is the valid one, any earlier entries with matching manifests
+                    # should be ignored.
+                    if manifest in manseen:
+                        ignore.append(l)
+                        continue
+                    manseen.add(manifest)
                     if stamp not in stamps and stamp not in preservestamps and stamp in machineindex:
                         toremove.append(l)
                         if stamp not in seen:
@@ -1153,6 +1232,8 @@ python sstate_eventhandler2() {
 
         with open(i, "w") as f:
             for l in lines:
+                if l in ignore:
+                    continue
                 f.write(l)
     machineindex |= set(stamps)
     with open(mi, "w") as f:
@@ -1161,4 +1242,60 @@ python sstate_eventhandler2() {
 
     if preservestamps:
         os.remove(preservestampfile)
+}
+
+
+#
+# Bitbake can generate an event showing which setscene tasks are 'stale',
+# i.e. which ones will be rerun. These are ones where a stamp file is present but
+# it is stable (e.g. taskhash doesn't match). With that list we can go through
+# the manifests for matching tasks and "uninstall" those manifests now. We do
+# this now rather than mid build since the distribution of files between sstate
+# objects may have changed, new tasks may run first and if those new tasks overlap
+# with the stale tasks, we'd see overlapping files messages and failures. Thankfully
+# removing these files is fast.
+#
+addhandler sstate_eventhandler_stalesstate
+sstate_eventhandler_stalesstate[eventmask] = "bb.event.StaleSetSceneTasks"
+python sstate_eventhandler_stalesstate() {
+    d = e.data
+    tasks = e.tasks
+
+    bb.utils.mkdirhier(d.expand("${SSTATE_MANIFESTS}"))
+
+    for a in list(set(d.getVar("SSTATE_ARCHS").split())):
+        toremove = []
+        i = d.expand("${SSTATE_MANIFESTS}/index-" + a)
+        if not os.path.exists(i):
+            continue
+        with open(i, "r") as f:
+            lines = f.readlines()
+            for l in lines:
+                try:
+                    (stamp, manifest, workdir) = l.split()
+                    for tid in tasks:
+                        for s in tasks[tid]:
+                            if s.startswith(stamp):
+                                taskname = bb.runqueue.taskname_from_tid(tid)[3:]
+                                manname = manifest + "." + taskname
+                                if os.path.exists(manname):
+                                    bb.debug(2, "Sstate for %s is stale, removing related manifest %s" % (tid, manname))
+                                    toremove.append((manname, tid, tasks[tid]))
+                                    break
+                except ValueError:
+                    bb.fatal("Invalid line '%s' in sstate manifest '%s'" % (l, i))
+
+        if toremove:
+            msg = "Removing %d stale sstate objects for arch %s" % (len(toremove), a)
+            bb.event.fire(bb.event.ProcessStarted(msg, len(toremove)), d)
+
+            removed = 0
+            for (manname, tid, stamps) in toremove:
+                sstate_clean_manifest(manname, d)
+                for stamp in stamps:
+                    bb.utils.remove(stamp)
+                removed = removed + 1
+                bb.event.fire(bb.event.ProcessProgress(msg, removed), d)
+
+            bb.event.fire(bb.event.ProcessFinished(msg), d)
 }

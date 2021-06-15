@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import unittest
 import logging
@@ -20,8 +22,9 @@ class TestData(TestBase):
         expectedException = "oeqa.core.exception.OEQAMissingVariable"
 
         tc = self._testLoader(modules=self.modules)
-        self.assertEqual(False, tc.runTests().wasSuccessful())
-        for test, data in tc.errors:
+        results = tc.runTests()
+        self.assertFalse(results.wasSuccessful())
+        for test, data in results.errors:
             expect = False
             if expectedException in data:
                 expect = True
@@ -30,11 +33,12 @@ class TestData(TestBase):
 
     def test_data_fail_wrong_variable(self):
         expectedError = 'AssertionError'
-        d = {'IMAGE' : 'core-image-sato', 'ARCH' : 'arm'}
+        d = {'IMAGE' : 'core-image-weston', 'ARCH' : 'arm'}
 
         tc = self._testLoader(d=d, modules=self.modules)
-        self.assertEqual(False, tc.runTests().wasSuccessful())
-        for test, data in tc.failures:
+        results = tc.runTests()
+        self.assertFalse(results.wasSuccessful())
+        for test, data in results.failures:
             expect = False
             if expectedError in data:
                 expect = True

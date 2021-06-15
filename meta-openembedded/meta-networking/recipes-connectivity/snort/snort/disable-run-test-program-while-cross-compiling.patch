@@ -226,7 +226,7 @@ index 4b3a5db..a6c5498 100644
 -]])],
 -[have_daq_packet_trace="yes"],
 -[have_daq_packet_trace="no"])
-+have_daq_packet_trace="yes"
++have_daq_packet_trace="no"
  AC_MSG_RESULT($have_daq_packet_trace)
  if test "x$have_daq_packet_trace" = "xyes"; then
      AC_DEFINE([HAVE_DAQ_PKT_TRACE],[1],
@@ -245,7 +245,7 @@ index 4b3a5db..a6c5498 100644
 -]])],
 -[have_daq_verdict_reason="yes"],
 -[have_daq_verdict_reason="no"])
-+have_daq_verdict_reason="yes"
++have_daq_verdict_reason="no"
  AC_MSG_RESULT($have_daq_verdict_reason)
  if test "x$have_daq_verdict_reason" = "xyes"; then
      AC_DEFINE([HAVE_DAQ_VERDICT_REASON],[1],

@@ -67,8 +67,6 @@ do_deploy () {
     fi
 }
 do_deploy[sstate-outputdirs] = "${DEPLOY_DIR_RPM}"
-# cleandirs should possibly be in deploy.bbclass but we need it
-do_deploy[cleandirs] = "${DEPLOYDIR}"
 # clear stamp-extra-info since MACHINE_ARCH is normally put there by
 # deploy.bbclass
 do_deploy[stamp-extra-info] = ""

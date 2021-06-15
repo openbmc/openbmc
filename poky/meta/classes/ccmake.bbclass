@@ -81,7 +81,7 @@ python do_ccmake_diffconfig() {
 
                 with open(d.expand("${WORKDIR}/site-file.cmake"), "w") as f:
                     for k, kt, v in added:
-                        f.write("SET({0} \"{1}\" CACHE {2} "")\n".format(k, v, kt))
+                        f.write("SET({0} \"{1}\" CACHE {2} \"\")\n".format(k, v, kt))
                 bb.plain("Configuration cmake fragment written to: {0}".format(d.expand("${WORKDIR}/site-file.cmake")))
 
                 # restore the original config

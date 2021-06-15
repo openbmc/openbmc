@@ -20,3 +20,5 @@ EXTRA_OECONF = "'CC=${CC}' 'CXX=${CXX}' 'CFLAGS=${CFLAGS}' 'CXXFLAGS=${CXXFLAGS}
 CONFIGUREOPTS_remove = "--disable-dependency-tracking"
 CONFIGUREOPTS_remove = "--disable-silent-rules"
 EXTRA_OECONF_remove = "--disable-static"
+
+BBCLASSEXTEND = "native"

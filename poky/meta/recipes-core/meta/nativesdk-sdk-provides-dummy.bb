@@ -1,10 +1,13 @@
 DUMMYARCH = "sdk-provides-dummy-${SDKPKGSUFFIX}"
 
-# Add /bin/sh?
+DUMMYPROVIDES_PACKAGES = "\
+    pkgconfig \
+"
+
 DUMMYPROVIDES = "\
+    /bin/sh \
     /bin/bash \
     /usr/bin/env \
-    pkgconfig \
     libGL.so()(64bit) \
     libGL.so \
 "

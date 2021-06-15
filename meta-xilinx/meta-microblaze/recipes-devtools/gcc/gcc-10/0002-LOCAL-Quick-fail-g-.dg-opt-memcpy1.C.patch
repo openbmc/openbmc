@@ -1,0 +1,31 @@
+From bef1a4116efded9972e693ded5152f1d8670862e Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 11 Jan 2017 14:31:10 +0530
+Subject: [PATCH 02/54] [LOCAL]: Quick fail g++.dg/opt/memcpy1.C This
+ particular testcase fails with a timeout. Instead, fail it at compile-time
+ for microblaze. This speeds up the testsuite without removing it from the
+ FAIL reports.
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+---
+ gcc/testsuite/g++.dg/opt/memcpy1.C | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gcc/testsuite/g++.dg/opt/memcpy1.C b/gcc/testsuite/g++.dg/opt/memcpy1.C
+index 3862756083d..db9f990f781 100644
+--- a/gcc/testsuite/g++.dg/opt/memcpy1.C
++++ b/gcc/testsuite/g++.dg/opt/memcpy1.C
+@@ -4,6 +4,10 @@
+ // { dg-do compile }
+ // { dg-options "-O" }
+ 
++#if defined (__MICROBLAZE__)
++#error "too slow on mb. Investigate."
++#endif
++
+ typedef unsigned char uint8_t;
+ typedef uint8_t uint8;
+ __extension__ typedef __SIZE_TYPE__ size_t;
+-- 
+2.17.1
+

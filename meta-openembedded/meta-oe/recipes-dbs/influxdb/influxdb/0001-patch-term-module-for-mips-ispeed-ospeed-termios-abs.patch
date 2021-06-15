@@ -1,0 +1,31 @@
+From f3713628fac72e45223013dcf8e37ac65d17d886 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 11 Jan 2021 15:16:57 -0800
+Subject: [PATCH] patch term module for mips ispeed/ospeed termios absense
+
+Upstream-Status: OE-Specific [needed on mips]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ go.mod | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/go.mod
++++ b/go.mod
+@@ -54,3 +54,5 @@ require (
+ 	gonum.org/v1/gonum v0.6.0 // indirect
+ 	google.golang.org/grpc v1.26.0
+ )
++
++replace github.com/pkg/term => github.com/kraj/term v0.0.0-20210111231523-7c42fcb0e627
+--- a/go.sum
++++ b/go.sum
+@@ -215,6 +215,8 @@ github.com/kr/pretty v0.1.0/go.mod h1:dA
+ github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
+ github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
+ github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
++github.com/kraj/term v0.0.0-20210111231523-7c42fcb0e627 h1:3/XXm86KqrOZEJvEmFlzl3NTFA99n5Pd/cSXl60LmuA=
++github.com/kraj/term v0.0.0-20210111231523-7c42fcb0e627/go.mod h1:BYR4E+NOQrH+NhXE71KuBNmyR1lQ+yDvP+O3IIHO5bM=
+ github.com/lib/pq v1.0.0 h1:X5PMW56eZitiTeO7tKzZxFCSpbFZJtkMMooicw2us9A=
+ github.com/lib/pq v1.0.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
+ github.com/mattn/go-colorable v0.0.9 h1:UVL0vNpWh04HeJXV0KLcaT7r06gOH2l4OW6ddYRUIY4=

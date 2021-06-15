@@ -15,8 +15,10 @@ DEPENDS += "phosphor-mapper"
 DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-host"
 
+RRECOMMENDS_${PN} = "pam-ipmi"
+
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
-SRCREV = "d92bc324ffa70d7f12f96e44ca6031e3e16224bd"
+SRCREV = "7b645018775b85a0c61148e592d951841809eef9"
 
 S = "${WORKDIR}/git"
 

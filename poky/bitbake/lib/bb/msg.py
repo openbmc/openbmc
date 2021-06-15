@@ -1,5 +1,3 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
 BitBake 'msg' implementation
 
@@ -9,25 +7,15 @@ Message handling infrastructure for bitbake
 
 # Copyright (C) 2006        Richard Purdie
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import sys
 import copy
 import logging
-import collections
+import logging.config
+import os
 from itertools import groupby
-import warnings
 import bb
 import bb.event
 
@@ -112,6 +100,9 @@ class BBLogFormatter(logging.Formatter):
     def enable_color(self):
         self.color_enabled = True
 
+    def __repr__(self):
+        return "%s fmt='%s' color=%s" % (self.__class__.__name__, self._fmt, "True" if self.color_enabled else "False")
+
 class BBLogFilter(object):
     def __init__(self, handler, level, debug_domains):
         self.stdlevel = level
@@ -130,60 +121,53 @@ class BBLogFilter(object):
             return True
         return False
 
-class BBLogFilterStdErr(BBLogFilter):
-    def filter(self, record):
-        if not BBLogFilter.filter(self, record):
-            return False
-        if record.levelno >= logging.ERROR:
-            return True
-        return False
+class LogFilterGEQLevel(logging.Filter):
+    def __init__(self, level):
+        self.strlevel = str(level)
+        self.level = stringToLevel(level)
 
-class BBLogFilterStdOut(BBLogFilter):
+    def __repr__(self):
+        return "%s level >= %s (%d)" % (self.__class__.__name__, self.strlevel, self.level)
+
     def filter(self, record):
-        if not BBLogFilter.filter(self, record):
-            return False
-        if record.levelno < logging.ERROR:
-            return True
-        return False
+        return (record.levelno >= self.level)
+
+class LogFilterLTLevel(logging.Filter):
+    def __init__(self, level):
+        self.strlevel = str(level)
+        self.level = stringToLevel(level)
+
+    def __repr__(self):
+        return "%s level < %s (%d)" % (self.__class__.__name__, self.strlevel, self.level)
+
+    def filter(self, record):
+        return (record.levelno < self.level)
 
 # Message control functions
 #
 
-loggerDefaultDebugLevel = 0
-loggerDefaultVerbose = False
-loggerVerboseLogs = False
-loggerDefaultDomains = []
+loggerDefaultLogLevel = BBLogFormatter.NOTE
+loggerDefaultDomains = {}
 
 def init_msgconfig(verbose, debug, debug_domains=None):
     """
     Set default verbosity and debug levels config the logger
     """
-    bb.msg.loggerDefaultDebugLevel = debug
-    bb.msg.loggerDefaultVerbose = verbose
-    if verbose:
-        bb.msg.loggerVerboseLogs = True
-    if debug_domains:
-        bb.msg.loggerDefaultDomains = debug_domains
+    if debug:
+        bb.msg.loggerDefaultLogLevel = BBLogFormatter.DEBUG - debug + 1
+    elif verbose:
+        bb.msg.loggerDefaultLogLevel = BBLogFormatter.VERBOSE
     else:
-        bb.msg.loggerDefaultDomains = []
+        bb.msg.loggerDefaultLogLevel = BBLogFormatter.NOTE
+
+    bb.msg.loggerDefaultDomains = {}
+    if debug_domains:
+        for (domainarg, iterator) in groupby(debug_domains):
+            dlevel = len(tuple(iterator))
+            bb.msg.loggerDefaultDomains["BitBake.%s" % domainarg] = logging.DEBUG - dlevel + 1
 
 def constructLogOptions():
-    debug = loggerDefaultDebugLevel
-    verbose = loggerDefaultVerbose
-    domains = loggerDefaultDomains
-
-    if debug:
-        level = BBLogFormatter.DEBUG - debug + 1
-    elif verbose:
-        level = BBLogFormatter.VERBOSE
-    else:
-        level = BBLogFormatter.NOTE
-
-    debug_domains = {}
-    for (domainarg, iterator) in groupby(domains):
-        dlevel = len(tuple(iterator))
-        debug_domains["BitBake.%s" % domainarg] = logging.DEBUG - dlevel + 1
-    return level, debug_domains
+    return loggerDefaultLogLevel, loggerDefaultDomains
 
 def addDefaultlogFilter(handler, cls = BBLogFilter, forcelevel=None):
     level, debug_domains = constructLogOptions()
@@ -192,6 +176,19 @@ def addDefaultlogFilter(handler, cls = BBLogFilter, forcelevel=None):
         level = forcelevel
 
     cls(handler, level, debug_domains)
+
+def stringToLevel(level):
+    try:
+        return int(level)
+    except ValueError:
+        pass
+
+    try:
+        return getattr(logging, level)
+    except AttributeError:
+        pass
+
+    return getattr(BBLogFormatter, level)
 
 #
 # Message handling functions
@@ -226,3 +223,105 @@ def has_console_handler(logger):
             if handler.stream in [sys.stderr, sys.stdout]:
                 return True
     return False
+
+def mergeLoggingConfig(logconfig, userconfig):
+    logconfig = copy.deepcopy(logconfig)
+    userconfig = copy.deepcopy(userconfig)
+
+    # Merge config with the default config
+    if userconfig.get('version') != logconfig['version']:
+        raise BaseException("Bad user configuration version. Expected %r, got %r" % (logconfig['version'], userconfig.get('version')))
+
+    # Set some defaults to make merging easier
+    userconfig.setdefault("loggers", {})
+
+    # If a handler, formatter, or filter is defined in the user
+    # config, it will replace an existing one in the default config
+    for k in ("handlers", "formatters", "filters"):
+        logconfig.setdefault(k, {}).update(userconfig.get(k, {}))
+
+    seen_loggers = set()
+    for name, l in logconfig["loggers"].items():
+        # If the merge option is set, merge the handlers and
+        # filters. Otherwise, if it is False, this logger won't get
+        # add to the set of seen loggers and will replace the
+        # existing one
+        if l.get('bitbake_merge', True):
+            ulogger = userconfig["loggers"].setdefault(name, {})
+            ulogger.setdefault("handlers", [])
+            ulogger.setdefault("filters", [])
+
+            # Merge lists
+            l.setdefault("handlers", []).extend(ulogger["handlers"])
+            l.setdefault("filters", []).extend(ulogger["filters"])
+
+            # Replace other properties if present
+            if "level" in ulogger:
+                l["level"] = ulogger["level"]
+
+            if "propagate" in ulogger:
+                l["propagate"] = ulogger["propagate"]
+
+            seen_loggers.add(name)
+
+    # Add all loggers present in the user config, but not any that
+    # have already been processed
+    for name in set(userconfig["loggers"].keys()) - seen_loggers:
+        logconfig["loggers"][name] = userconfig["loggers"][name]
+
+    return logconfig
+
+def setLoggingConfig(defaultconfig, userconfigfile=None):
+    logconfig = copy.deepcopy(defaultconfig)
+
+    if userconfigfile:
+        with open(os.path.normpath(userconfigfile), 'r') as f:
+            if userconfigfile.endswith('.yml') or userconfigfile.endswith('.yaml'):
+                import yaml
+                userconfig = yaml.safe_load(f)
+            elif userconfigfile.endswith('.json') or userconfigfile.endswith('.cfg'):
+                import json
+                userconfig = json.load(f)
+            else:
+                raise BaseException("Unrecognized file format: %s" % userconfigfile)
+
+            if userconfig.get('bitbake_merge', True):
+                logconfig = mergeLoggingConfig(logconfig, userconfig)
+            else:
+                # Replace the entire default config
+                logconfig = userconfig
+
+    # Convert all level parameters to integers in case users want to use the
+    # bitbake defined level names
+    for h in logconfig["handlers"].values():
+        if "level" in h:
+            h["level"] = bb.msg.stringToLevel(h["level"])
+
+    for l in logconfig["loggers"].values():
+        if "level" in l:
+            l["level"] = bb.msg.stringToLevel(l["level"])
+
+    conf = logging.config.dictConfigClass(logconfig)
+    conf.configure()
+
+    # The user may have specified logging domains they want at a higher debug
+    # level than the standard.
+    for name, l in logconfig["loggers"].items():
+        if not name.startswith("BitBake."):
+            continue
+
+        if not "level" in l:
+            continue
+
+        curlevel = bb.msg.loggerDefaultDomains.get(name)
+        # Note: level parameter should already be a int because of conversion
+        # above
+        newlevel = int(l["level"])
+        if curlevel is None or newlevel < curlevel:
+            bb.msg.loggerDefaultDomains[name] = newlevel
+
+        # TODO: I don't think that setting the global log level should be necessary
+        #if newlevel < bb.msg.loggerDefaultLogLevel:
+        #    bb.msg.loggerDefaultLogLevel = newlevel
+
+    return conf

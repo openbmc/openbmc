@@ -1,4 +1,4 @@
-From a992ee014efacdc98d5658be9930dcab0eaadfd7 Mon Sep 17 00:00:00 2001
+From 444160260a11022ecd84cd605fe8c22b316e6546 Mon Sep 17 00:00:00 2001
 From: OpenEmbedded <oe.patch@oe>
 Date: Wed, 11 Apr 2018 22:51:04 +0200
 Subject: [PATCH] i386: replace with our io.h

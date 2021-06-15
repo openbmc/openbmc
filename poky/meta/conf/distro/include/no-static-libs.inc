@@ -15,10 +15,6 @@ DISABLE_STATIC_pn-nativesdk-libcap = ""
 DISABLE_STATIC_pn-libpcap = ""
 # needed by gdb
 DISABLE_STATIC_pn-readline = ""
-# needed by pseudo
-DISABLE_STATIC_pn-sqlite3 = ""
-DISABLE_STATIC_pn-sqlite3-native = ""
-DISABLE_STATIC_pn-nativesdk-sqlite3 = ""
 # openjade/sgml-common have build issues without static libs
 DISABLE_STATIC_pn-sgml-common-native = ""
 DISABLE_STATIC_pn-openjade-native = ""
@@ -26,9 +22,6 @@ DISABLE_STATIC_pn-openjade-native = ""
 DISABLE_STATIC_pn-openssl = ""
 DISABLE_STATIC_pn-openssl-native = ""
 DISABLE_STATIC_pn-nativesdk-openssl = ""
-DISABLE_STATIC_pn-openssl10 = ""
-DISABLE_STATIC_pn-openssl10-native = ""
-DISABLE_STATIC_pn-nativesdk-openssl10 = ""
 # libssp-static-dev included in build-appliance
 DISABLE_STATIC_pn-gcc-runtime = ""
 # libusb1-native is used to build static dfu-util-native

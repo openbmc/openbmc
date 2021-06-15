@@ -1,0 +1,31 @@
+From 123c690f12f560022305b0cf19499e7f81a690ae Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 27 Aug 2018 23:22:21 -0700
+Subject: [PATCH] Use off64_t instead of __off64_t
+
+Fixes
+unknown type name '__off64_t'
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/lib/file/fileIOPosix.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/open-vm-tools/lib/file/fileIOPosix.c b/open-vm-tools/lib/file/fileIOPosix.c
+index 23108279..bcd2ddc5 100644
+--- a/open-vm-tools/lib/file/fileIOPosix.c
++++ b/open-vm-tools/lib/file/fileIOPosix.c
+@@ -206,10 +206,10 @@ static AlignedPool alignedPool;
+        * the symbols (and anyone building XOPEN<700 gets nothing).
+        */
+       extern ssize_t preadv64(int fd, const struct iovec *iov, int iovcnt,
+-                          __off64_t offset) __attribute__ ((weak));
++                          off64_t offset) __attribute__ ((weak));
+ 
+       extern ssize_t pwritev64(int fd, const struct iovec *iov, int iovcnt,
+-                          __off64_t offset) __attribute__ ((weak));
++                          off64_t offset) __attribute__ ((weak));
+    #else
+       #error "Large file support unavailable. Aborting."
+    #endif

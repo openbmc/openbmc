@@ -1,0 +1,33 @@
+From 33798f3e484ebd3470e9da791b73b4b90ba12bc3 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 14 Jan 2020 15:04:03 +0800
+Subject: [PATCH] hgfsmounter/Makefile.am: support usrmerge
+
+There is a do_package error when enable usrmerge feature due to the
+hardcoded sbin directory. Remove this piece of code because we already
+create the symbolic link in do_install.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ open-vm-tools/hgfsmounter/Makefile.am | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/open-vm-tools/hgfsmounter/Makefile.am b/open-vm-tools/hgfsmounter/Makefile.am
+index 7c1ba1a..58bd3f8 100644
+--- a/open-vm-tools/hgfsmounter/Makefile.am
++++ b/open-vm-tools/hgfsmounter/Makefile.am
+@@ -39,9 +39,6 @@ uninstall-hook:
+ 	rm -f $(DESTDIR)$(sbindir)/mount_vmhgfs
+ else
+ install-exec-hook:
+-	-$(MKDIR_P) $(DESTDIR)/sbin
+-	-$(LN_S) $(DESTDIR)$(sbindir)/mount.vmhgfs \
+-		$(DESTDIR)/sbin/mount.vmhgfs &> /dev/null
+ uninstall-hook:
+ 	rm -f $(DESTDIR)/sbin/mount.vmhgfs
+ endif !FREEBSD
+-- 
+2.7.4
+

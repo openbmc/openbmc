@@ -1,0 +1,6 @@
+---
+/org/open_power/control/host0/ClearHostSecurityKeys:
+    - Interface: org.open_power.Control.TPM.SecurityKeys
+      Properties:
+          ClearHostSecurityKeys:
+             Default: 0

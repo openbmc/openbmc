@@ -1,0 +1,10 @@
+[Unit]
+Before=systemd-networkd.service
+
+[Service]
+Restart=on-failure
+Type=oneshot
+ExecStart=/usr/libexec/gbmc-mac-config.sh
+
+[Install]
+WantedBy=multi-user.target

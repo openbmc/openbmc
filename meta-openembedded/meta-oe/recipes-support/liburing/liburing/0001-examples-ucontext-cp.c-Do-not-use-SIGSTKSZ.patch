@@ -1,0 +1,37 @@
+From a30d62dfb9ea30af58ef331fae1e6f727d0558c0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 4 May 2021 10:32:08 -0700
+Subject: [PATCH] examples/ucontext-cp.c: Do not use SIGSTKSZ
+
+glibc 2.34 has removed SIGSTKSZ therefore we replace it
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ examples/ucontext-cp.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+--- a/examples/ucontext-cp.c
++++ b/examples/ucontext-cp.c
+@@ -3,6 +3,7 @@
+  * gcc -Wall -O2 -D_GNU_SOURCE -o ucontext-cp ucontext-cp.c -luring
+  */
+ #define _POSIX_C_SOURCE 199309L
++#include <stddef.h>
+ #include <stdio.h>
+ #include <fcntl.h>
+ #include <string.h>
+@@ -22,13 +23,9 @@
+ #define QD	64
+ #define BS	1024
+ 
+-#ifndef SIGSTKSZ
+-#define SIGSTKSZ 8192
+-#endif
+-
+ typedef struct {
+ 	struct io_uring *ring;
+-	unsigned char stack_buf[SIGSTKSZ];
++	max_align_t stack_buf[(8 * 1024 + sizeof (max_align_t) - 1) / sizeof (max_align_t)];
+ 	ucontext_t ctx_main, ctx_fnew;
+ } async_context;
+ 

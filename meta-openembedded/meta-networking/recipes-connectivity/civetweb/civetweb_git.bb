@@ -2,10 +2,10 @@ SUMMARY = "Civetweb embedded web server"
 HOMEPAGE = "https://github.com/civetweb/civetweb"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=6f28fdcba0dda735eed62bac6a397562"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=50bd1d7f135b50d7e218996ba28d0d88"
 
-SRCREV = "ce8f6d38a60eb16c996afee1e5340f76ef4d0923"
-PV = "1.11+git${SRCPV}"
+SRCREV = "4b440a339979852d5a51fb11a822952712231c23"
+PV = "1.12+git${SRCPV}"
 SRC_URI = "git://github.com/civetweb/civetweb.git \
            file://0001-Unittest-Link-librt-and-libm-using-l-option.patch \
            "

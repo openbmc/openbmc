@@ -8,11 +8,6 @@ OBMC_POWER_INSTANCES ?= "0"
 OBMC_RESET_BUTTON_INSTANCES ?= "0"
 OBMC_WATCHDOG_INSTANCES ?= "0"
 
-PREFERRED_PROVIDER_virtual/obmc-chassis-mgmt ?= "obmc-phosphor-chassisd"
-PREFERRED_PROVIDER_virtual/obmc-fan-mgmt ?= "obmc-phosphor-fand"
-PREFERRED_PROVIDER_virtual/obmc-flash-mgmt ?= "obmc-phosphor-flashd"
-PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw ?= "phosphor-ipmi-hw-example"
-
 # obmc-bmc-state-manager
 #
 # Provides an implementation of the xyz.openbmc_project.State.BMC
@@ -57,7 +52,7 @@ VIRTUAL-RUNTIME_obmc-inventory-manager ?= "phosphor-inventory-manager"
 # obmc-led-manager
 #
 # Provides an implementation of the xyz.openbmc_project.ledmanager interface.
-VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager-ledmanager"
+VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager"
 
 # obmc-led-monitor
 #
@@ -110,11 +105,6 @@ PREFERRED_PROVIDER_virtual/obmc-system-mgmt ??= "obmc-phosphor-sysd"
 # automatically if the MRW feature is enabled.
 VIRTUAL-RUNTIME_phosphor-hwmon-config ?= ""
 
-# obmc-settings-mgmt
-#
-# Provides a manager for user settings.
-VIRTUAL-RUNTIME_obmc-settings-mgmt ?= "phosphor-settings-manager"
-
 # obmc-network-manager
 #
 # Provide support for managing network
@@ -160,13 +150,6 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-sensor-inventory ?= \
     "phosphor-ipmi-sensor-inventory-native"
 
 # The phosphor-host-ipmid application is data-driven and requires an input
-# yaml of entity association record metadata.
-# This virtual is a native recipe that provides that mapping by installing
-# configuration files in the format and native sysroot location expected by
-# the phosphor-host-ipmid build process in the native sysroot.
-PREFERRED_PROVIDER_virtual/phosphor-ipmi-entity-config ?= "phosphor-ipmi-entity-inventory-native"
-
-# The phosphor-host-ipmid application is data-driven and requires an input
 # mapping of inventory object path to the sensor number and sensor metadata.
 # This virtual is a native recipe that provides that mapping by installing
 # configuration files in the format and native sysroot location expected by
@@ -194,21 +177,20 @@ PREFERRED_PROVIDER_virtual/phosphor-led-manager-config-native ?= \
 PREFERRED_PROVIDER_virtual/phosphor-logging-callouts ?= \
     "phosphor-logging-callouts-example-native"
 
-# The phosphor-fan-presence application is data driven and requires an
-# input YAML that maps fans to their tach sensors.
-# This virtual is a native recipe that provides that mapping by installing
-# configuration files in the format and native sysroot location expected by
-# the phosphor-fan-presence build process in the native sysroot.
+# The phosphor-fan-presence application is data driven and requires an input
+# YAML that maps fans to their tach sensors.  This virtual is a recipe that
+# provides that mapping by installing configuration files in the format and
+# sysroot location expected by the phosphor-fan-presence build process in the
+# sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config ?= \
-    "phosphor-fan-presence-config-native"
+    "phosphor-fan-presence-config"
 
-# The phosphor-fan-control application is data driven and requires a YAML
-# file to define the fans in the system.
-# This virtual is a native recipe that provides that definition by installing
-# the YAML file in the format and native sysroot location expected by
-# the phosphor-fan-control build process in the native sysroot.
+# The phosphor-fan-control application is data driven and requires a YAML file
+# to define the fans in the system.  This virtual is a recipe that provides
+# that definition by installing the YAML file in the format and sysroot
+# location expected by the phosphor-fan-control build process in the sysroot.
 PREFERRED_PROVIDER_virtual/phosphor-fan-control-fan-config ?= \
-    "phosphor-fan-control-fan-config-native"
+    "phosphor-fan-control-fan-config"
 
 # The phosphor-gpio-monitor application is data-driven and requires an input.
 # The application then watches the passed in input event entry for the
@@ -243,6 +225,22 @@ OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
 # Will add a build dependency to host-ipmid on the
 # phosphor-ipmi-fru-whitelist-native recipe.
 VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
+
+# Set security headers on builds
+require conf/distro/include/security_flags.inc
+
+# Disable security on croserver.
+# Remove if https://github.com/open-power/eCMD/pull/433 is ever merged
+SECURITY_STRINGFORMAT_pn-croserver = ""
+# obmc-libobmc-intf doesn't compile with security flags enabled
+SECURITY_CFLAGS_pn-obmc-libobmc-intf = ""
+
+# remove when https://gerrit.openbmc-project.xyz/c/openbmc/pldm/+/39984
+# is merged and rev bumped
+SECURITY_CFLAGS_pn-pldm = ""
+
+# We generally want to enable LTO with meson
+EXTRA_OEMESON_append_class-target = " -Db_lto=true"
 
 # Set the root password to '0penBmc'
 inherit extrausers

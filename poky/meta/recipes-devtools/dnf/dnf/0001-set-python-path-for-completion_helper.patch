@@ -1,0 +1,24 @@
+From 7e79b3b67fd5cecd7380e7e365fd88eca63b5bfa Mon Sep 17 00:00:00 2001
+From: Jeremy Puhlman <jpuhlman@mvista.com>
+Date: Wed, 11 Mar 2020 22:10:02 +0000
+Subject: [PATCH] set python path for completion_helper
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
+---
+ dnf/cli/completion_helper.py.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnf/cli/completion_helper.py.in b/dnf/cli/completion_helper.py.in
+index 351226759..2835cd3b6 100644
+--- a/dnf/cli/completion_helper.py.in
++++ b/dnf/cli/completion_helper.py.in
+@@ -1,4 +1,4 @@
+-#!@PYTHON_EXECUTABLE@
++#!/usr/bin/env python3
+ #
+ # This file is part of dnf.
+ #
+-- 
+2.23.0
+

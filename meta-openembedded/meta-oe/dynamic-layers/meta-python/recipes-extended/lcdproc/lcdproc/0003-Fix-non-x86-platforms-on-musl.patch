@@ -1,0 +1,35 @@
+From 7fd144f101fa5c9316d3468ed26f55629afe1305 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 17 Dec 2019 17:55:54 -0800
+Subject: [PATCH 3/3] Fix non x86 platforms on musl
+
+Musl only specifies in/outb for x86/x86. Use the fallback path in case
+musl is used.
+
+This should fail compilation during the linking stage but for some reason
+does not. Will do if -Werror=implicit-function-declaration is specified.
+
+Original here: https://github.com/openwrt/packages/blob/master/utils/lcdproc/patches/110-in-outb.patch
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ server/drivers/port.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/server/drivers/port.h b/server/drivers/port.h
+index c584cd4e..bde235b3 100644
+--- a/server/drivers/port.h
++++ b/server/drivers/port.h
+@@ -94,7 +94,7 @@ static inline int port_deny_multiple(unsigned short port, unsigned short count);
+ /*  ---------------------------- Linux ------------------------------------ */
+ /*  Use ioperm, inb and outb in <sys/io.h> (Linux) */
+ /*  And iopl for higher addresses of PCI LPT cards */
+-#if defined HAVE_IOPERM
++#if defined(__GLIBC__) || (defined(__x86__) || defined(__x86_64__))
+ 
+ /* Glibc2 and Glibc1 */
+ # ifdef HAVE_SYS_IO_H
+-- 
+2.24.1
+

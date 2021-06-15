@@ -1,5 +1,8 @@
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import os
 import subprocess
@@ -9,7 +12,7 @@ from oeqa.core.case import OETestCase
 class OESDKTestCase(OETestCase):
     def _run(self, cmd):
         return subprocess.check_output(". %s > /dev/null; %s;" % \
-                (self.tc.sdk_env, cmd), shell=True,
+                (self.tc.sdk_env, cmd), shell=True, executable="/bin/bash",
                 stderr=subprocess.STDOUT, universal_newlines=True)
 
     def fetch(self, workdir, dl_dir, url, archive=None):
@@ -23,7 +26,7 @@ class OESDKTestCase(OETestCase):
                 return tarball
 
         tarball = os.path.join(workdir, archive)
-        subprocess.check_output(["wget", "-O", tarball, url])
+        subprocess.check_output(["wget", "-O", tarball, url], stderr=subprocess.STDOUT)
         return tarball
 
     def check_elf(self, path, target_os=None, target_arch=None):

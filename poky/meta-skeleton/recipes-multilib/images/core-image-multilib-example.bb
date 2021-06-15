@@ -1,5 +1,4 @@
-#
-# An example of a multilib image
+SUMMARY = "An example of a multilib image"
 #
 # This example includes a lib32 version of bash into an otherwise standard
 # sato image. It assumes a "lib32" multilib has been enabled in the user's
@@ -7,7 +6,7 @@
 #
 
 # First include a base image to base things off
-require recipes-sato/images/core-image-sato.bb
+require recipes-graphics/images/core-image-weston.bb
 
 # Now add the multilib packages we want to install
 IMAGE_INSTALL += "lib32-bash"

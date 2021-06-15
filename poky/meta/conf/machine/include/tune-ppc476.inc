@@ -6,7 +6,7 @@ TUNEVALID[ppc476] = "Enable ppc476 specific processor optimizations"
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'ppc476', ' -mcpu=476', '', d)}"
 
 AVAILTUNES += "ppc476"
-TUNE_FEATURES_tune-ppc476 = "m32 fpu-hard ppc476"
+TUNE_FEATURES_tune-ppc476 = "m32 fpu-hard ppc476 bigendian"
 TUNE_PKGARCH_tune-ppc476 = "ppc476"
 PACKAGE_EXTRA_ARCHS_tune-ppc476 = "${PACKAGE_EXTRA_ARCHS_tune-powerpc} ppc476"
 

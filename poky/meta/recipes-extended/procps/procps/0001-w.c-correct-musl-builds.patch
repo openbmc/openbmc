@@ -1,0 +1,44 @@
+From 22f8d25567b8d64bdbab0fb0b4915b4362561d9b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 24 Feb 2021 21:14:31 +0000
+Subject: [PATCH] w.c: correct musl builds
+
+No need to redefine UT_ stuff to something that does not exist.
+
+UT_ is already provided in musl but via utmp.h header, so include
+it always.
+
+Upstream-Status: Submitted [https://gitlab.com/procps-ng/procps/-/merge_requests/126]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ w.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/w.c b/w.c
+index 9d07ac9..d10639b 100644
+--- a/w.c
++++ b/w.c
+@@ -57,9 +57,8 @@
+ #include <unistd.h>
+ #ifdef HAVE_UTMPX_H
+ #	include <utmpx.h>
+-#else
+-#	include <utmp.h>
+ #endif
++#include <utmp.h>
+ #include <arpa/inet.h>
+ 
+ static int ignoreuser = 0;	/* for '-u' */
+@@ -72,12 +71,6 @@ typedef struct utmpx utmp_t;
+ typedef struct utmp utmp_t;
+ #endif
+ 
+-#if !defined(UT_HOSTSIZE) || defined(__UT_HOSTSIZE)
+-#	define UT_HOSTSIZE __UT_HOSTSIZE
+-#	define UT_LINESIZE __UT_LINESIZE
+-#	define UT_NAMESIZE __UT_NAMESIZE
+-#endif
+-
+ #ifdef W_SHOWFROM
+ # define FROM_STRING "on"
+ #else

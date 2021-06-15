@@ -1,0 +1,57 @@
+From cce8be3966b602cf7e20d559e50fcf493b9b42cc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Dec 2019 18:13:21 -0800
+Subject: [PATCH] initialize local variables before use
+
+fixes
+error: 'ctrl_reg2_data' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+
+Upstream-Status: Submitted [https://github.com/eclipse/upm/pull/693]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/kxtj3/kxtj3.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/kxtj3/kxtj3.c b/src/kxtj3/kxtj3.c
+index a6f3c4f8..050ae585 100755
+--- a/src/kxtj3/kxtj3.c
++++ b/src/kxtj3/kxtj3.c
+@@ -715,7 +715,7 @@ upm_result_t kxtj3_sensor_software_reset(const kxtj3_context dev)
+     if (kxtj3_set_bit_on(dev, KXTJ3_CTRL_REG2, KXTJ3_CTRL_REG2_SRST) != UPM_SUCCESS)
+         return UPM_ERROR_OPERATION_FAILED;
+ 
+-    uint8_t ctrl_reg2_data;
++    uint8_t ctrl_reg2_data = 0;
+     kxtj3_read_register(dev, KXTJ3_CTRL_REG2, &ctrl_reg2_data);
+ 
+     uint8_t srst_counter = 0;
+@@ -824,7 +824,7 @@ upm_result_t kxtj3_enable_interrupt_pin(const kxtj3_context dev, KXTJ3_INTERRUPT
+                                         KXTJ3_INTERRUPT_RESPONSE_T response_type)
+ {
+     assert(dev != NULL);
+-    uint8_t int_reg_value;
++    uint8_t int_reg_value = 0;
+     kxtj3_read_register(dev, KXTJ3_INT_CTRL_REG1, &int_reg_value);
+ 
+     if (polarity)
+@@ -865,7 +865,7 @@ upm_result_t kxtj3_set_interrupt_response(const kxtj3_context dev, KXTJ3_INTERRU
+ bool kxtj3_get_interrupt_status(const kxtj3_context dev)
+ {
+     assert(dev != NULL);
+-    uint8_t status_reg_value;
++    uint8_t status_reg_value = 0;
+     kxtj3_read_register(dev, KXTJ3_STATUS_REG, &status_reg_value);
+     if (!(status_reg_value & KXTJ3_STATUS_REG_INT))
+         return false;
+@@ -955,7 +955,7 @@ kxtj3_wakeup_axes kxtj3_get_wakeup_axis_and_direction(kxtj3_context dev)
+ {
+     assert(dev != NULL);
+ 
+-    uint8_t int_source2_value;
++    uint8_t int_source2_value = 0;
+     kxtj3_read_register(dev, KXTJ3_INT_SOURCE2, &int_source2_value);
+ 
+     kxtj3_wakeup_axes wakeup_axis;
+-- 
+2.24.1
+

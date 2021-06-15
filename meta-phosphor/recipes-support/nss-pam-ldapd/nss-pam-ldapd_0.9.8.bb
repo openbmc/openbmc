@@ -49,8 +49,8 @@ do_install_append() {
 	sed -i -e 's/^gid nslcd/# gid nslcd/;' ${D}${sysconfdir}/nslcd.conf
 	sed -i -e 's/^base dc=example,dc=com/base ${LDAP_DN}/;' ${D}${sysconfdir}/nslcd.conf
 
-	install -d ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/nslcd.service ${D}${systemd_unitdir}/system
+	install -d ${D}${systemd_system_unitdir}
+	install -m 0644 ${WORKDIR}/nslcd.service ${D}${systemd_system_unitdir}
 }
 
 inherit update-rc.d systemd

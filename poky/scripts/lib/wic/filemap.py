@@ -1,13 +1,8 @@
+#
 # Copyright (c) 2012 Intel, Inc.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License, version 2,
-# as published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# General Public License for more details.
 
 """
 This module implements python implements a way to get file block. Two methods
@@ -37,8 +32,13 @@ def get_block_size(file_obj):
     """
     # Get the block size of the host file-system for the image file by calling
     # the FIGETBSZ ioctl (number 2).
-    binary_data = fcntl.ioctl(file_obj, 2, struct.pack('I', 0))
-    bsize = struct.unpack('I', binary_data)[0]
+    try:
+        binary_data = fcntl.ioctl(file_obj, 2, struct.pack('I', 0))
+        bsize = struct.unpack('I', binary_data)[0]
+    except OSError:
+        bsize = None
+
+    # If ioctl causes OSError or give bsize to zero failback to os.fstat
     if not bsize:
         import os
         stat = os.fstat(file_obj.fileno())
@@ -142,15 +142,6 @@ class _FilemapBase(object):
 
         raise Error("the method is not implemented")
 
-    def block_is_unmapped(self, block): # pylint: disable=W0613,R0201
-        """
-        This method has has to be implemented by child classes. It returns
-        'True' if block number 'block' of the image file is not mapped (hole)
-        and 'False' otherwise.
-        """
-
-        raise Error("the method is not implemented")
-
     def get_mapped_ranges(self, start, count): # pylint: disable=W0613,R0201
         """
         This method has has to be implemented by child classes. This is a
@@ -160,15 +151,6 @@ class _FilemapBase(object):
 
         The ranges are yielded for the area of the file of size 'count' blocks,
         starting from block 'start'.
-        """
-
-        raise Error("the method is not implemented")
-
-    def get_unmapped_ranges(self, start, count): # pylint: disable=W0613,R0201
-        """
-        This method has has to be implemented by child classes. Just like
-        'get_mapped_ranges()', but yields unmapped block ranges instead
-        (holes).
         """
 
         raise Error("the method is not implemented")
@@ -265,15 +247,10 @@ class FilemapSeek(_FilemapBase):
                         % (block, result))
         return result
 
-    def block_is_unmapped(self, block):
-        """Refer the '_FilemapBase' class for the documentation."""
-        return not self.block_is_mapped(block)
-
     def _get_ranges(self, start, count, whence1, whence2):
         """
-        This function implements 'get_mapped_ranges()' and
-        'get_unmapped_ranges()' depending on what is passed in the 'whence1'
-        and 'whence2' arguments.
+        This function implements 'get_mapped_ranges()' depending
+        on what is passed in the 'whence1' and 'whence2' arguments.
         """
 
         assert whence1 != whence2
@@ -302,12 +279,6 @@ class FilemapSeek(_FilemapBase):
         self._log.debug("FilemapSeek: get_mapped_ranges(%d,  %d(%d))"
                         % (start, count, start + count - 1))
         return self._get_ranges(start, count, _SEEK_DATA, _SEEK_HOLE)
-
-    def get_unmapped_ranges(self, start, count):
-        """Refer the '_FilemapBase' class for the documentation."""
-        self._log.debug("FilemapSeek: get_unmapped_ranges(%d,  %d(%d))"
-                        % (start, count, start + count - 1))
-        return self._get_ranges(start, count, _SEEK_HOLE, _SEEK_DATA)
 
 
 # Below goes the FIEMAP ioctl implementation, which is not very readable
@@ -422,10 +393,6 @@ class FilemapFiemap(_FilemapBase):
                         % (block, result))
         return result
 
-    def block_is_unmapped(self, block):
-        """Refer the '_FilemapBase' class for the documentation."""
-        return not self.block_is_mapped(block)
-
     def _unpack_fiemap_extent(self, index):
         """
         Unpack a 'struct fiemap_extent' structure object number 'index' from
@@ -502,23 +469,28 @@ class FilemapFiemap(_FilemapBase):
                         % (first_prev, last_prev))
         yield (first_prev, last_prev)
 
-    def get_unmapped_ranges(self, start, count):
+class FilemapNobmap(_FilemapBase):
+    """
+    This class is used when both the 'SEEK_DATA/HOLE' and FIEMAP are not
+    supported by the filesystem or kernel.
+    """
+
+    def __init__(self, image, log=None):
         """Refer the '_FilemapBase' class for the documentation."""
-        self._log.debug("FilemapFiemap: get_unmapped_ranges(%d,  %d(%d))"
+
+        # Call the base class constructor first
+        _FilemapBase.__init__(self, image, log)
+        self._log.debug("FilemapNobmap: initializing")
+
+    def block_is_mapped(self, block):
+        """Refer the '_FilemapBase' class for the documentation."""
+        return True
+
+    def get_mapped_ranges(self, start, count):
+        """Refer the '_FilemapBase' class for the documentation."""
+        self._log.debug("FilemapNobmap: get_mapped_ranges(%d,  %d(%d))"
                         % (start, count, start + count - 1))
-        hole_first = start
-        for first, last in self._do_get_mapped_ranges(start, count):
-            if first > hole_first:
-                self._log.debug("FilemapFiemap: yielding range (%d, %d)"
-                                % (hole_first, first - 1))
-                yield (hole_first, first - 1)
-
-            hole_first = last + 1
-
-        if hole_first < start + count:
-            self._log.debug("FilemapFiemap: yielding range (%d, %d)"
-                            % (hole_first, start + count - 1))
-            yield (hole_first, start + count - 1)
+        yield (start, start + count -1)
 
 def filemap(image, log=None):
     """
@@ -533,7 +505,10 @@ def filemap(image, log=None):
     try:
         return FilemapFiemap(image, log)
     except ErrorNotSupp:
-        return FilemapSeek(image, log)
+        try:
+            return FilemapSeek(image, log)
+        except ErrorNotSupp:
+            return FilemapNobmap(image, log)
 
 def sparse_copy(src_fname, dst_fname, skip=0, seek=0,
                 length=0, api=None):

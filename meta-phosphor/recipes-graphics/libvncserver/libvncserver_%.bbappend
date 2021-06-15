@@ -1,2 +1,1 @@
-PACKAGECONFIG_append = " openssl"
-PACKAGECONFIG_remove = "gcrypt gnutls png sdl"
+PACKAGECONFIG = "jpeg lzo systemd zlib openssl"

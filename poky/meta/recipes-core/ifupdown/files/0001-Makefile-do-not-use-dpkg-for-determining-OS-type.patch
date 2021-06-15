@@ -1,0 +1,23 @@
+From 7ace0656bd325f9e7749f2cde641eddc057bc98a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 9 Jan 2020 15:38:06 +0100
+Subject: [PATCH] Makefile: do not use dpkg for determining OS type
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 0ce2fa3..739aef2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,6 @@
+ VERSION ?= 0.8
+ CFLAGS ?= -Wall -W -Wno-unused-parameter -g -O2
+-ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
++ARCH := linux
+ 
+ BASEDIR ?= $(DESTDIR)
+ 

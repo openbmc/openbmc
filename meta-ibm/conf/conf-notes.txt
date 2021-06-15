@@ -1,0 +1,12 @@
+Example build invocations:
+
+mihawk:
+MACHINE=mihawk bitbake obmc-phosphor-image
+p10bmc:
+MACHINE=p10bmc bitbake obmc-phosphor-image
+swift:
+MACHINE=swift bitbake obmc-phosphor-image
+witherspoon:
+MACHINE=witherspoon bitbake obmc-phosphor-image
+witherspoon-tacoma:
+MACHINE=witherspoon-tacoma bitbake obmc-phosphor-image

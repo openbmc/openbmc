@@ -1,0 +1,42 @@
+#! /bin/sh 
+#
+# This is an init script for openembedded
+# Copy it to /etc/init.d/monit and type
+# > update-rc.d monit defaults 89
+#
+monit=/usr/bin/monit
+pidfile=/var/run/monit.pid
+monit_args="-c /etc/monitrc"
+
+test -x "$monit" || exit 0
+
+case "$1" in
+  start)
+    echo -n "Starting Monit"
+    start-stop-daemon --start --quiet --exec $monit -- $monit_args
+    RETVAL=$?
+    echo "."
+    ;;
+  stop)
+    echo -n "Stopping Monit"
+    start-stop-daemon --stop --quiet --pidfile $pidfile
+    RETVAL=$?
+    echo "."
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    RETVAL=$?
+    ;;
+  status)
+    $monit $monit_args status
+    RETVAL=$?
+    echo "."
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+esac
+
+exit $RETVAL
+

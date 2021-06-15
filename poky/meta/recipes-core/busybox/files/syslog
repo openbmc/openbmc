@@ -51,6 +51,22 @@ else
 	SYSLOG_ARGS="-C"
 fi
 
+waitpid ()
+{
+  pid=$1
+  # Give pid a chance to exit before we restart with a 5s timeout in 1s intervals
+  if [ -z "$pid" ]; then
+    return
+  fi
+  timeout=5;
+  while [ $timeout -gt 0 ]
+  do
+    timeout=$(( $timeout-1 ))
+    kill -0 $pid 2> /dev/null || break
+    sleep 1
+  done
+}
+
 case "$1" in
   start)
 	echo -n "Starting syslogd/klogd: "
@@ -65,7 +81,11 @@ case "$1" in
 	echo "done"
 	;;
   restart)
-  	$0 stop
+	pid1=`pidof syslogd`
+	pid2=`pidof klogd`
+	$0 stop
+	waitpid $pid1
+	waitpid $pid2
 	$0 start
 	;;
   *)

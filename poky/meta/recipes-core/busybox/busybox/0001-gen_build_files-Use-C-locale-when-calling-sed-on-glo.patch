@@ -1,0 +1,28 @@
+From bff7f16f7f41de8df67beb03722f235828ef2249 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 3 May 2021 15:48:19 -0700
+Subject: [PATCH] gen_build_files: Use C locale when calling sed on globbed files
+
+sort order is different based on chosen locale and also default shell
+being bash or dash
+
+This sets the environment variable LC_ALL to the value C, which will
+enforce bytewise sorting, irrespective of the shell
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ scripts/gen_build_files.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/scripts/gen_build_files.sh
++++ b/scripts/gen_build_files.sh
+@@ -4,6 +4,8 @@
+ # but users complain that many sed implementations
+ # are misinterpreting --.
+ 
++export LC_ALL=C
++
+ test $# -ge 2 || { echo "Syntax: $0 SRCTREE OBJTREE"; exit 1; }
+ 
+ # cd to objtree

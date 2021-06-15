@@ -13,13 +13,11 @@ http://sourceforge.net/mailarchive/message.php?msg_id=29179733
  Source/Modules/main.cxx |   24 ++++++++++++++++++++++--
  1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/Source/Modules/main.cxx b/Source/Modules/main.cxx
-index d2f5d3b..cbb0a12 100644
 --- a/Source/Modules/main.cxx
 +++ b/Source/Modules/main.cxx
-@@ -26,6 +26,11 @@ char cvsroot_main_cxx[] = "$Id$";
- #include "cparse.h"
+@@ -25,6 +25,11 @@
  #include <ctype.h>
+ #include <errno.h>
  #include <limits.h>		// for INT_MAX
 +#ifndef _WIN32
 +#include <cstddef>
@@ -29,7 +27,7 @@ index d2f5d3b..cbb0a12 100644
  
  // Global variables
  
-@@ -902,9 +907,9 @@ int SWIG_main(int argc, char *argv[], Language *l) {
+@@ -934,9 +939,9 @@ int SWIG_main(int argc, char *argv[], co
  
    // Check for SWIG_LIB environment variable
    if ((c = getenv("SWIG_LIB")) == (char *) 0) {
@@ -40,7 +38,7 @@ index d2f5d3b..cbb0a12 100644
      if (!(GetModuleFileName(0, buf, MAX_PATH) == 0 || (p = strrchr(buf, '\\')) == 0)) {
        *(p + 1) = '\0';
        SwigLib = NewStringf("%sLib", buf); // Native windows installation path
-@@ -914,7 +919,22 @@ int SWIG_main(int argc, char *argv[], Language *l) {
+@@ -946,7 +951,22 @@ int SWIG_main(int argc, char *argv[], co
      if (Len(SWIG_LIB_WIN_UNIX) > 0)
        SwigLibWinUnix = NewString(SWIG_LIB_WIN_UNIX); // Unix installation path using a drive letter (for msys/mingw)
  #else
@@ -64,6 +62,3 @@ index d2f5d3b..cbb0a12 100644
  #endif
    } else {
      SwigLib = NewString(c);
--- 
-1.7.9.5
-

@@ -1,0 +1,1137 @@
+From 5040f7d8abb79bf4240d0b446e2d33d26680d9fc Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 11 Sep 2018 14:32:20 +0530
+Subject: [PATCH 07/11] [Patch, Microblaze]: newlib port for microblaze m64
+ flag...
+
+Conflicts:
+	libgloss/microblaze/_hw_exception_handler.S
+	libgloss/microblaze/_interrupt_handler.S
+---
+ libgloss/microblaze/_exception_handler.S    |   6 +-
+ libgloss/microblaze/_hw_exception_handler.S |   7 +-
+ libgloss/microblaze/_interrupt_handler.S    |   7 +-
+ libgloss/microblaze/_program_clean.S        |   6 +-
+ libgloss/microblaze/_program_init.S         |   6 +-
+ libgloss/microblaze/crt0.S                  |  53 ++++++++-
+ libgloss/microblaze/crt1.S                  |  54 +++++++--
+ libgloss/microblaze/crt2.S                  |  52 +++++++--
+ libgloss/microblaze/crt3.S                  |  32 +++++-
+ libgloss/microblaze/crt4.S                  |  37 +++++-
+ libgloss/microblaze/crtinit.S               | 120 ++++++++++++++------
+ libgloss/microblaze/linux-crt0.S            |  60 ++++++++--
+ libgloss/microblaze/linux-syscalls.S        |  15 ++-
+ libgloss/microblaze/pgcrtinit.S             |  59 +++++++++-
+ libgloss/microblaze/sim-crtinit.S           |  31 +++++
+ libgloss/microblaze/sim-pgcrtinit.S         |  31 +++++
+ newlib/libc/machine/microblaze/longjmp.S    |  45 ++++++--
+ newlib/libc/machine/microblaze/setjmp.S     |  33 +++++-
+ 18 files changed, 563 insertions(+), 91 deletions(-)
+
+diff --git a/libgloss/microblaze/_exception_handler.S b/libgloss/microblaze/_exception_handler.S
+index 7a91a781e..0fdff3fec 100644
+--- a/libgloss/microblaze/_exception_handler.S
++++ b/libgloss/microblaze/_exception_handler.S
+@@ -30,7 +30,11 @@
+ */
+ 
+ 	.text
+-	.align 2
++#ifdef __arch64__
++	.align 3
++#else
++        .align 2
++#endif
+ 	.weakext _exception_handler
+ 	.ent _exception_handler
+ 	.type _exception_handler, @function
+diff --git a/libgloss/microblaze/_hw_exception_handler.S b/libgloss/microblaze/_hw_exception_handler.S
+index 47df945c4..b951a6325 100644
+--- a/libgloss/microblaze/_hw_exception_handler.S
++++ b/libgloss/microblaze/_hw_exception_handler.S
+@@ -32,8 +32,11 @@
+ 	.text
+ 	.weakext _hw_exception_handler    # HW Exception Handler Label
+ 	.type _hw_exception_handler, %function
+-	.align 2
+-	
++#ifdef  __arch64__
++	.align 3
++#else
++        .align 2
++#endif
+ 	_hw_exception_handler:
+ 	rted    r17, 0
+ 	nop
+diff --git a/libgloss/microblaze/_interrupt_handler.S b/libgloss/microblaze/_interrupt_handler.S
+index 5bb7329cc..a0ef92df0 100644
+--- a/libgloss/microblaze/_interrupt_handler.S
++++ b/libgloss/microblaze/_interrupt_handler.S
+@@ -32,8 +32,11 @@
+ 	.text
+ 	.weakext _interrupt_handler    # Interrupt Handler Label
+ 	.type _interrupt_handler, %function
+-	.align 2
+-
++#ifdef __arch64__
++	.align 3
++#else
++        .align 2
++#endif
+ 	_interrupt_handler:
+ 	rtid    r14, 0
+ 	nop
+diff --git a/libgloss/microblaze/_program_clean.S b/libgloss/microblaze/_program_clean.S
+index c46059434..0d55d8ab8 100644
+--- a/libgloss/microblaze/_program_clean.S
++++ b/libgloss/microblaze/_program_clean.S
+@@ -33,7 +33,11 @@
+ #
+ 	
+ 	.text
+-	.align	2
++#ifdef __arch64__
++	.align 3
++#else
++        .align 2
++#endif
+ 	.globl	_program_clean
+ 	.ent	_program_clean
+ _program_clean:
+diff --git a/libgloss/microblaze/_program_init.S b/libgloss/microblaze/_program_init.S
+index 0daa42e14..862ef786b 100644
+--- a/libgloss/microblaze/_program_init.S
++++ b/libgloss/microblaze/_program_init.S
+@@ -32,7 +32,11 @@
+ # Dummy file to be replaced by LibGen
+ 	
+ 	.text
+-	.align	2
++#ifdef	__arch64__
++	.align	3
++#else
++        .align 2
++#endif
+ 	.globl	_program_init
+ 	.ent	_program_init
+ _program_init:
+diff --git a/libgloss/microblaze/crt0.S b/libgloss/microblaze/crt0.S
+index 865a8c269..e4df73b66 100644
+--- a/libgloss/microblaze/crt0.S
++++ b/libgloss/microblaze/crt0.S
+@@ -54,7 +54,11 @@
+ 
+ 	.globl _start
+         .section .vectors.reset, "ax"
+-	.align 2
++#ifdef __arch64__
++	.align 3
++#else
++        .align 2
++#endif
+         .ent _start
+         .type _start, @function
+ _start:
+@@ -62,36 +66,64 @@ _start:
+         .end _start
+     
+         .section .vectors.sw_exception, "ax"
++#ifdef  __arch64__
++        .align 3
++#else
+         .align 2
++#endif
+ _vector_sw_exception:       
+         brai    _exception_handler
+ 
+         .section .vectors.interrupt, "ax"
++#ifdef  __arch64__
++        .align 3
++#else
+         .align 2
++#endif
++
+ _vector_interrupt:      
+         brai    _interrupt_handler
+ 
+         .section .vectors.hw_exception, "ax"
++#ifdef  __arch64__
++        .align 3
++#else
+         .align 2
++#endif
++
+ _vector_hw_exception:       
+         brai    _hw_exception_handler
+ 
+         .section .text
+         .globl _start1
++#ifdef  __arch64__
++        .align 3
++#else
+         .align 2
++#endif
++
+         .ent _start1
+         .type _start1, @function   
+ _start1:
++#ifdef  __arch64__
++        lli     r13, r0, _SDA_BASE_
++        lli     r2, r0, _SDA2_BASE_
++        lli     r1,  r0, _stack-32
++        brealid	r15, _crtinit
++        nop
++        addlik   r5, r3, 0
++        brealid	r15, exit
++        nop
++#else
+ 	la	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+ 	la	r2, r0, _SDA2_BASE_
+ 	la	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+-
+ 	brlid	r15, _crtinit               /* Initialize BSS and run program */
+ 	nop
+ 
+-        brlid   r15, exit                   /* Call exit with the return value of main */
+-        addik   r5, r3, 0                   
+-
++	brlid   r15, exit                   /* Call exit with the return value of main */
++	addik   r5, r3, 0
++#endif
+         /* Control does not reach here */
+         .end _start1
+     
+@@ -101,9 +133,18 @@ _start1:
+         Our simple _exit      
+ */    
+         .globl _exit
++#ifdef	__arch64__
++        .align 3
++#else
+         .align 2
++#endif
++
+         .ent _exit
+         .type _exit, @function    
+ _exit:
+-        bri     0
++#ifdef	__arch64__
++        breai     0
++#else
++	bri	0
++#endif
+ 	.end _exit        
+diff --git a/libgloss/microblaze/crt1.S b/libgloss/microblaze/crt1.S
+index a8bf74937..b24eeb531 100644
+--- a/libgloss/microblaze/crt1.S
++++ b/libgloss/microblaze/crt1.S
+@@ -53,36 +53,67 @@
+     
+ 
+         .section .vectors.sw_exception, "ax"
+-        .align 2
++#ifdef	__arch64__
++        .align 3
++#else
++	.align 2
++#endif
++
+ _vector_sw_exception:       
+         brai    _exception_handler
+ 
+         .section .vectors.interrupt, "ax"
+-        .align 2
++#ifdef __arch64__
++        .align 3
++#else
++	.align 2
++#endif
++
+ _vector_interrupt:      
+         brai    _interrupt_handler
+ 
+         .section .vectors.hw_exception, "ax"
+-        .align 2
++#ifdef __arch64__
++	.align 3
++#else
++	.align 2
++#endif
++
+ _vector_hw_exception:       
+         brai    _hw_exception_handler
+ 
+         .section .text
+         .globl _start
+-        .align 2
++#ifdef	__arch64__
++        .align 3
++#else
++	.align 2
++#endif
++
+         .ent _start
+         .type _start, @function    
+ _start:
++#ifdef	__arch64__
++	lli	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
++        lli      r2, r0, _SDA2_BASE_
++        lli      r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++
++        brealid   r15, _crtinit               /* Initialize BSS and run program */
++	nop
++	addlik	r5, r3, 0
++	brealid	r15, exit
++	nop
++#else
+ 	la	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+ 	la	r2, r0, _SDA2_BASE_
+-	la	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++	la	r1, r0, _stack-32          /* 16 bytes (4 words are needed by crtinit for args and link reg */
+ 
+ 	brlid	r15, _crtinit               /* Initialize BSS and run program */
+ 	nop
+ 
+         brlid   r15, exit                   /* Call exit with the return value of main */
+         addik   r5, r3, 0                   
+-
++#endif
+         /* Control does not reach here */
+         .end _start    
+ 
+@@ -92,11 +123,18 @@ _start:
+         Our simple _exit      
+ */    
+         .globl _exit
+-        .align 2
++#ifdef	__arch64__
++        .align 3
++#else
++	.align 2
++#endif
+         .ent _exit
+         .type _exit, @function
+ _exit:
++#ifdef	__arch64__
++	addl	r3, r0, r5
++#else
+ 	add	r3, r0, r5
++#endif
+ 	brki    r16, 0x4                    /* Return to hook in XMDSTUB  */    
+ 	.end _exit        
+-
+diff --git a/libgloss/microblaze/crt2.S b/libgloss/microblaze/crt2.S
+index 34d9f951d..ae4c89ee0 100644
+--- a/libgloss/microblaze/crt2.S
++++ b/libgloss/microblaze/crt2.S
+@@ -51,26 +51,56 @@
+ */      
+     
+         .section .vectors.sw_exception, "ax"
+-        .align 2
++#ifdef	__arch64__
++	.align 3
++#else
++	.align 2
++#endif
++
+ _vector_sw_exception:       
+         brai    _exception_handler
+ 
+         .section .vectors.interrupt, "ax"
+-        .align 2
++#ifdef	__arch64__
++        .align 3
++#else
++	.align 2
++#endif
++
+ _vector_interrupt:      
+         brai    _interrupt_handler
+ 
+         .section .vectors.hw_exception, "ax"
+-        .align 2
++#ifdef	__arch64__
++        .align 3
++#else
++	.align 2
++#endif
++
+ _vector_hw_exception:       
+         brai    _hw_exception_handler
+ 
+         .section .text
+         .globl _start
+-        .align 2
++#ifdef	__arch64__
++        .align 3
++#else
++	.align 2
++#endif
++
+         .ent _start
+         .type _start, @function    
+ _start:
++#ifdef	__arch64__
++        lli	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
++        lli	r2, r0, _SDA2_BASE_
++        lli	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++        brealid	r15, _crtinit               /* Initialize BSS and run program */
++        nop
++	addlik	r5, r3, 0
++        brealid	r15, exit
++	nop
++#else
+ 	la	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+ 	la	r2, r0, _SDA2_BASE_
+ 	la	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+@@ -80,7 +110,7 @@ _start:
+ 
+         brlid   r15, exit                   /* Call exit with the return value of main */
+         addik   r5, r3, 0                   
+-       
++#endif
+         /* Control does not reach here */
+     
+         .end _start
+@@ -90,9 +120,17 @@ _start:
+         Our simple _exit      
+ */    
+         .globl _exit
+-        .align 2
++#ifdef	__arch64__
++        .align 3
++#else
++	.align 2
++#endif
+         .ent _exit
+         .type _exit, @function
+ _exit:
+-        bri     0
++#ifdef	__arch64__
++	breai	0
++#else
++	bri     0
++#endif
+ 	.end _exit        
+diff --git a/libgloss/microblaze/crt3.S b/libgloss/microblaze/crt3.S
+index ebcf207f5..a8bc7839b 100644
+--- a/libgloss/microblaze/crt3.S
++++ b/libgloss/microblaze/crt3.S
+@@ -53,10 +53,26 @@
+ 
+         .section .text
+         .globl _start
+-        .align 2
++#ifdef	__arch64__
++	.align 3
++#else
++	.align 2
++#endif
+         .ent _start
+         .type _start, @function    
+ _start:
++#ifdef	__arch64__
++        lli	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
++        lli	r2, r0, _SDA2_BASE_
++        lli	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++
++        brealid	r15, _crtinit               /* Initialize BSS and run program */
++        nop
++
++        addlik	r5, r3, 0
++        brealid	r15, exit                   /* Call exit with the return value of main */
++	nop
++#else
+ 	la	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+ 	la	r2, r0, _SDA2_BASE_
+ 	la	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+@@ -66,7 +82,7 @@ _start:
+ 
+         brlid   r15, exit                   /* Call exit with the return value of main */
+         addik   r5, r3, 0                   
+-
++#endif
+         /* Control does not reach here */
+         .end _start
+     
+@@ -76,9 +92,17 @@ _start:
+         Our simple _exit      
+ */    
+         .globl _exit
+-        .align 2
++#ifdef	__arch64__
++        .align 3
++#else
++	.align 2
++#endif
+         .ent _exit
+         .type _exit, @function
+ _exit:
+-        bri     0
++#ifdef	__arch64__
++	breai	0
++#else
++       bri     0
++#endif
+ 	.end _exit        
+diff --git a/libgloss/microblaze/crt4.S b/libgloss/microblaze/crt4.S
+index 4cf0b01a4..54ba473ea 100644
+--- a/libgloss/microblaze/crt4.S
++++ b/libgloss/microblaze/crt4.S
+@@ -53,10 +53,27 @@
+ 
+         .section .text
+         .globl _start
+-        .align 2
++#ifdef __arch64__
++        .align 3
++#else
++	.align 2
++#endif
++
+         .ent _start
+         .type _start, @function    
+ _start:
++#ifdef	__arch64__
++        lli	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
++        lli	r2, r0, _SDA2_BASE_
++        lli	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++
++        brealid	r15, _crtinit               /* Initialize BSS and run program */
++	nop
++
++        addlik   r5, r3, 0
++        brealid   r15, exit                   /* Call exit with the return value of main */
++	nop
++#else
+ 	la	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+ 	la	r2, r0, _SDA2_BASE_
+ 	la	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+@@ -68,19 +85,27 @@ _start:
+         addik   r5, r3, 0                   
+ 
+         /* Control does not reach here */
+-
++#endif
+         .end _start
+ 
+-
+ /* 
+         _exit 
+         Our simple _exit      
+ */    
+         .globl _exit
+-        .align 2
++#ifdef	__arch64__
++        .align 3
++#else
++	.align	2
++#endif
+         .ent _exit
+         .type _exit, @function
+ _exit:
+-    	brlid	r15,elf_process_exit    
+-        nop 
++#ifdef	__arch64__
++	brealid	r15,elf_process_exit
++	nop
++#else
++	brlid r15,elf_process_exit
++	nop
++#endif
+ 	.end _exit        
+diff --git a/libgloss/microblaze/crtinit.S b/libgloss/microblaze/crtinit.S
+index 86c6dfcb0..854117536 100644
+--- a/libgloss/microblaze/crtinit.S
++++ b/libgloss/microblaze/crtinit.S
+@@ -29,59 +29,115 @@
+  */ 
+ 
+ 	.globl _crtinit
++#ifdef	__arch64__
++	.align 3
++#else
+ 	.align 2
++#endif
+ 	.ent _crtinit
+         .type _crtinit, @function
+ _crtinit:
+-	addi	r1, r1, -40               	/* Save Link register	 */
+-	swi	r15, r1, 0
++#ifdef	__arch64__
++	addli	r1, r1, -40               	/* Save Link register	 */
++	sli	r15, r1, 0
+ 
+-    	addi	r6, r0, __sbss_start          	/* clear SBSS */
+-	addi	r7, r0, __sbss_end	
+-	rsub	r18, r6, r7		
+-	blei	r18, .Lendsbss
++	addli	r6, r0, __sbss_start          	/* clear SBSS */
++	addli	r7, r0, __sbss_end
++	rsubl	r18, r6, r7
++	bealei	r18, .Lendsbss
+ 
+ .Lloopsbss:	
+-	swi	r0, r6, 0
+-	addi	r6, r6, 4
+-	rsub	r18, r6, r7
+-	bgti	r18, .Lloopsbss
++	sli	r0, r6, 0
++	addli	r6, r6, 4
++	rsubl	r18, r6, r7
++	beagti	r18, .Lloopsbss
+ .Lendsbss:
+-
+-	addi	r6, r0, __bss_start             /* clear BSS */
+-	addi	r7, r0, __bss_end		
+-    	rsub	r18, r6, r7		
+-	blei	r18, .Lendbss
++	addli	r6, r0, __bss_start             /* clear BSS */
++	addli	r7, r0, __bss_end
++	rsubl	r18, r6, r7
++	bealei	r18, .Lendbss
+ .Lloopbss:	
+-	swi	r0, r6, 0
+-	addi	r6, r6, 4
+-	rsub	r18, r6, r7
+-	bgti	r18, .Lloopbss
++	sli	r0, r6, 0
++	addli	r6, r6, 4
++	rsubl	r18, r6, r7
++	beagti	r18, .Lloopbss
+ .Lendbss:
+ 
+-	brlid	r15, _program_init              /* Initialize the program  */
++	brealid	r15, _program_init              /* Initialize the program  */
++	nop
++        brealid   r15, __init                     /* Invoke language initialization functions */
++	nop
++
++	addli	r6, r0, 0                       /* Initialize argc = 1 and argv = NULL and envp = NULL  */
++	addli	r7, r0, 0
++	addli	r5, r0, 0
++	brealid	r15, main                       /* Execute the program */
+ 	nop
++	addlik   r19, r3, 0                      /* Save return value */
++
++        brealid   r15, __fini                     /* Invoke language cleanup functions */
++        nop
++
++	brealid	r15, _program_clean             /* Cleanup the program  */
++	nop
++
++	ll	r15, r1, r0                     /* Return back to CRT   */
++
++        addlik   r3, r19, 0                      /* Restore return value */
++	addli	r1, r1, 40
++	rtsd	r15, 8
++	nop
++#else
++        addi    r1, r1, -40                     /* Save Link register    */
++        swi     r15, r1, 0
++
++        addi    r6, r0, __sbss_start            /* clear SBSS */
++        addi    r7, r0, __sbss_end
++        rsub    r18, r6, r7
++        blei    r18, .Lendsbss
++
++.Lloopsbss:
++        swi     r0, r6, 0
++        addi    r6, r6, 4
++        rsub    r18, r6, r7
++        bgti    r18, .Lloopsbss
++.Lendsbss:
++
++        addi    r6, r0, __bss_start             /* clear BSS */
++        addi    r7, r0, __bss_end
++        rsub    r18, r6, r7
++        blei    r18, .Lendbss
++.Lloopbss:
++        swi     r0, r6, 0
++        addi    r6, r6, 4
++        rsub    r18, r6, r7
++        bgti    r18, .Lloopbss
++.Lendbss:
++
++        brlid   r15, _program_init              /* Initialize the program  */
++        nop
+ 
+         brlid   r15, __init                     /* Invoke language initialization functions */
+         nop
+-    
+-	addi	r6, r0, 0                       /* Initialize argc = 1 and argv = NULL and envp = NULL  */
+-	addi	r7, r0, 0			
+-      	brlid	r15, main                       /* Execute the program */
+-    	addi	r5, r0, 0
++
++        addi    r6, r0, 0                       /* Initialize argc = 1 and argv = NULL and envp = NULL  */
++        addi    r7, r0, 0
++        brlid   r15, main                       /* Execute the program */
++        addi    r5, r0, 0
+ 
+         addik   r19, r3, 0                      /* Save return value */
+-    
++
+         brlid   r15, __fini                     /* Invoke language cleanup functions */
+         nop
+-    
+-	brlid	r15, _program_clean             /* Cleanup the program  */
+-	nop
+ 
+-	lw	r15, r1, r0                     /* Return back to CRT   */
++        brlid   r15, _program_clean             /* Cleanup the program  */
++        nop
++
++        lw      r15, r1, r0                     /* Return back to CRT   */
+ 
+         addik   r3, r19, 0                      /* Restore return value */
+-	rtsd	r15, 8
+-    	addi	r1, r1, 40
++        rtsd    r15, 8
++        addi    r1, r1, 40
++#endif
+ 	.end _crtinit
+ 
+diff --git a/libgloss/microblaze/linux-crt0.S b/libgloss/microblaze/linux-crt0.S
+index 8650bb5d2..503439b2e 100644
+--- a/libgloss/microblaze/linux-crt0.S
++++ b/libgloss/microblaze/linux-crt0.S
+@@ -18,26 +18,50 @@
+         .ent _start
+         .type _start, @function
+ _start:
+-	la	r13, r0, _SDA_BASE_
+-	la	r2, r0, _SDA2_BASE_
++#ifdef	__arch64__
++	lli	r13, r0, _SDA_BASE_
++	lli	r2, r0, _SDA2_BASE_
+ 
+-	brlid	r15, __init
++	brealid	r15, __init
+ 	nop
+ 
+-	lwi	r5, r1, 0
+-	addik	r6, r1, 4
++	lli	r5, r1, 0
++	addlik	r6, r1, 4
+ 
+ 	# Add argc * 4.
+-	addk	r7, r5, r5
+-	addk	r7, r7, r7
++	addlk	r7, r5, r5
++	addlk	r7, r7, r7
+ 
+-	brlid	r15, main
+ 	# Now add 4 + r1 (i.e r6) in the delayslot.
+-	addk	r7, r7, r6
++	addlk	r7, r7, r6
++	brealid	r15, main
++	nop
++	addlik   r5, r3, 0
++	brealid   r15, exit
++	nop
++	.size _start, . - _start
++#else
++        la      r13, r0, _SDA_BASE_
++        la      r2, r0, _SDA2_BASE_
++
++        brlid   r15, __init
++        nop
++
++        lwi     r5, r1, 0
++        addik   r6, r1, 4
+ 
+-	brlid   r15, exit
++        # Add argc * 4.
++	addk    r7, r5, r5
++        addk    r7, r7, r7
++
++        brlid   r15, main
++        # Now add 4 + r1 (i.e r6) in the delayslot.
++        addk    r7, r7, r6
++
++        brlid   r15, exit
+         addik   r5, r3, 0
+-	.size _start, . - _start
++        .size _start, . - _start
++#endif
+         .end _start
+ 
+ 	/* Replacement for the GCC provided crti.S. This one avoids the
+@@ -45,14 +69,28 @@ _start:
+ 	   insn exceptions when running in user-space).  */
+         .section .init, "ax"
+ 	.global __init
++#ifdef	__arch64__
++	.align 3
++__init:
++        addlik   r1, r1, -8
++        sl      r15, r0, r1
++#else
+ 	.align 2
+ __init:
+ 	addik   r1, r1, -8
+ 	sw      r15, r0, r1
+ 
++#endif
+ 	.section .fini, "ax"
+ 	.global __fini
++#ifdef	__arch64__
++	.align 3
++__fini:
++        addlik   r1, r1, -8
++        sl      r15, r0, r1
++#else
+ 	.align 2
+ __fini:
+ 	addik   r1, r1, -8
+ 	sw      r15, r0, r1
++#endif
+diff --git a/libgloss/microblaze/linux-syscalls.S b/libgloss/microblaze/linux-syscalls.S
+index 506de78fd..8594f136e 100644
+--- a/libgloss/microblaze/linux-syscalls.S
++++ b/libgloss/microblaze/linux-syscalls.S
+@@ -20,8 +20,9 @@
+ #define GLOBAL(name) .global name; FUNC(name)
+ #define SIZE(name) .size name, .-name
+ 
++#ifdef	__arch64__
+ # define SYSCALL_BODY(name)		\
+-	addik	r12, r0, SYS_ ## name;	\
++	addlik	r12, r0, SYS_ ## name;	\
+ 	brki    r14, 8;			\
+ 	rtsd	r15, 8;			\
+ 	nop;
+@@ -31,6 +32,18 @@
+ 	SYSCALL_BODY(name);		\
+         SIZE(_ ## name)
+ 
++#else
++# define SYSCALL_BODY(name)             \
++        addik   r12, r0, SYS_ ## name;  \
++        brki    r14, 8;                 \
++        rtsd    r15, 8;                 \
++        nop;
++
++# define SYSCALL(name)                  \
++        GLOBAL(_ ## name);              \
++        SYSCALL_BODY(name);             \
++        SIZE(_ ## name)
++#endif
+ SYSCALL(brk)
+ SYSCALL(exit)
+ SYSCALL(read)
+diff --git a/libgloss/microblaze/pgcrtinit.S b/libgloss/microblaze/pgcrtinit.S
+index 25930821c..638dbd383 100644
+--- a/libgloss/microblaze/pgcrtinit.S
++++ b/libgloss/microblaze/pgcrtinit.S
+@@ -29,10 +29,66 @@
+   
+ 
+ 	.globl _crtinit
++#ifdef	__arch64__
++	.align 3
++#else
+ 	.align 2
++#endif
+ 	.ent _crtinit
+ 
+ _crtinit:
++#ifdef	__arch64__
++
++        addli    r1, r1, -40                     /* Save Link register    */
++        sli     r15, r1, 0
++
++        addli    r6, r0, __sbss_start            /* clear SBSS */
++        addli    r7, r0, __sbss_end
++        rsubl    r18, r6, r7
++        bealei    r18, .Lendsbss
++.Lloopsbss:
++        sli     r0, r6, 0
++        addli    r6, r6, 4
++        rsubl    r18, r6, r7
++        beagti    r18, .Lloopsbss
++.Lendsbss:
++
++        addli    r6, r0, __bss_start             /* clear BSS */
++        addli    r7, r0, __bss_end
++        rsubl    r18, r6, r7
++        bealei    r18, .Lendbss
++.Lloopbss:
++        sli     r0, r6, 0
++        addli    r6, r6, 4
++        rsubl    r18, r6, r7
++        beagti    r18, .Lloopbss
++.Lendbss:
++
++        brealid   r15, _program_init              /* Initialize the program */
++	nop
++        brealid   r15, _profile_init              /* Initialize profiling library */
++	nop
++        brealid   r15, __init                     /* Invoke language initialization functions */
++	nop
++        addli    r6, r0, 0                       /* Initialize argc = 1 and argv = NULL and envp = NULL  */
++        addli    r7, r0, 0
++        addli    r5, r0, 0
++        brealid   r15, main                       /* Execute the program */
++	nop
++        addlik   r19, r3, 0                      /* Save return value */
++
++        brealid   r15, __fini                     /* Invoke language cleanup functions */
++	nop
++        brealid   r15, _profile_clean             /* Cleanup profiling library */
++	nop
++        brealid   r15, _program_clean             /* Cleanup the program */
++	nop
++        ll      r15, r1, r0                     /* Return back to CRT */
++        addlik	r3, r19, 0                      /* Restore return value */
++        addli    r1, r1, 40
++        rtsd    r15, 8
++	nop
++#else
+ 	addi	r1, r1, -40               	/* Save Link register	 */
+ 	swi	r15, r1, 0
+ 
+@@ -86,7 +142,8 @@ _crtinit:
+ 
+ 	lw	r15, r1, r0                     /* Return back to CRT */
+         addik   r3, r19, 0                      /* Restore return value */  
+-	rtsd	r15, 8
++        rtsd	r15, 8
+     	addi	r1, r1, 40
++#endif
+ 	.end _crtinit
+ 
+diff --git a/libgloss/microblaze/sim-crtinit.S b/libgloss/microblaze/sim-crtinit.S
+index 74586d9a7..9892cb0bd 100644
+--- a/libgloss/microblaze/sim-crtinit.S
++++ b/libgloss/microblaze/sim-crtinit.S
+@@ -35,10 +35,39 @@
+ #    
+ 
+ 	.globl _crtinit
++#ifdef	__arch64__
++	.align 3
++#else
+ 	.align 2
++#endif
+ 	.ent _crtinit
+ 
+ _crtinit:
++#ifdef	__arch64__
++        addli    r1, r1, -40                     /* Save Link register    */
++        sli     r15, r1, 0
++
++        brealid   r15, _program_init              /* Initialize the program  */
++	nop
++        brealid   r15, __init                     /* Invoke language initialization functions */
++	nop
++        addli    r6, r0, 0                       /* Initialize argc = 1 and argv = NULL and envp = NULL  */
++        addli    r7, r0, 0
++        addli    r5, r0, 0
++        brealid   r15, main                       /* Execute the program */
++	nop
++        addlik   r19, r3, 0                      /* Save return value */
++
++        brealid   r15, __fini                     /* Invoke language cleanup functions */
++	nop
++        brealid   r15, _program_clean             /* Cleanup the program  */
++	nop
++        ll      r15, r1, r0                     /* Return back to CRT   */
++        addlik   r3, r19, 0                      /* Restore return value */
++        addli    r1, r1, 40
++        rtsd    r15, 8
++	nop
++#else
+ 	addi	r1, r1, -40               	/* Save Link register	 */
+ 	swi	r15, r1, 0
+ 
+@@ -63,7 +92,9 @@ _crtinit:
+ 
+ 	lw	r15, r1, r0                     /* Return back to CRT   */
+         addik   r3, r19, 0                      /* Restore return value */
++
+ 	rtsd	r15, 8
+     	addi	r1, r1, 40
++#endif
+ 	.end _crtinit
+ 
+diff --git a/libgloss/microblaze/sim-pgcrtinit.S b/libgloss/microblaze/sim-pgcrtinit.S
+index 82ebccad4..939f5372f 100644
+--- a/libgloss/microblaze/sim-pgcrtinit.S
++++ b/libgloss/microblaze/sim-pgcrtinit.S
+@@ -35,10 +35,40 @@
+ #    
+ 
+ 	.globl _crtinit
++#ifdef	__arch64__
++	.align 3
++#else
+ 	.align 2
++#endif
+ 	.ent _crtinit
+ 
+ _crtinit:
++#ifdef	__arch64__
++        addli    r1, r1, -40                     /* Save Link register    */
++        sli     r15, r1, 0
++
++        brealid   r15, _program_init              /* Initialize the program */
++	nop
++        brealid   r15, _profile_init              /* Initialize profiling library */
++	nop
++        brealid   r15, __init                     /* Invoke language initialization functions */
++	nop
++        addli    r6, r0, 0                       /* Initialize argc = 1 and argv = NULL and envp = NULL  */
++        addli    r7, r0, 0
++        addli    r5, r0, 0
++        brealid   r15, main                       /* Execute the program */
++	nop
++        brealid   r15, __fini                     /* Invoke language cleanup functions */
++	nop
++        brealid   r15, _profile_clean             /* Cleanup profiling library */
++	nop
++        brealid   r15, _program_clean             /* Cleanup the program */
++	nop
++        ll      r15, r1, r0                     /* Return back to CRT */
++        addli    r1, r1, 40
++        rtsd    r15, 8
++	nop
++#else
+ 	addi	r1, r1, -40               	/* Save Link register	 */
+ 	swi	r15, r1, 0
+ 
+@@ -68,5 +98,6 @@ _crtinit:
+ 	lw	r15, r1, r0                     /* Return back to CRT */
+ 	rtsd	r15, 8
+     	addi	r1, r1, 40
++#endif
+ 	.end _crtinit
+ 
+diff --git a/newlib/libc/machine/microblaze/longjmp.S b/newlib/libc/machine/microblaze/longjmp.S
+index f972bbd88..5ed1c2626 100644
+--- a/newlib/libc/machine/microblaze/longjmp.S
++++ b/newlib/libc/machine/microblaze/longjmp.S
+@@ -51,16 +51,46 @@
+     
+ .globl longjmp
+ .section .text
+-.align 2  
++#ifdef	__arch64__
++.align 3
++#else
++.align 2
++#endif
+ .ent longjmp    
+ longjmp:
++#ifdef __arch64__
++    lli     r1, r5, 0
++    lli     r13, r5, 4
++    lli     r14, r5, 8
++    lli     r15, r5, 12
++    lli     r16, r5, 16
++    lli     r17, r5, 20
++    lli     r18, r5, 24
++    lli     r19, r5, 28
++    lli     r20, r5, 32
++    lli     r21, r5, 36
++    lli     r22, r5, 40
++    lli     r23, r5, 44
++    lli     r24, r5, 48
++    lli     r25, r5, 52
++    lli     r26, r5, 56
++    lli     r27, r5, 60
++    lli     r28, r5, 64
++    lli     r29, r5, 68
++    lli     r30, r5, 72
++    lli     r31, r5, 76
++
++    or      r3, r0, r6
++    rtsd    r15, 8
++    nop
++#else
+     lwi     r1, r5, 0
+     lwi     r13, r5, 4
+     lwi     r14, r5, 8
+-    lwi     r15, r5, 12       
++    lwi     r15, r5, 12
+     lwi     r16, r5, 16
+     lwi     r17, r5, 20
+-    lwi     r18, r5, 24       
++    lwi     r18, r5, 24
+     lwi     r19, r5, 28
+     lwi     r20, r5, 32
+     lwi     r21, r5, 36
+@@ -69,12 +99,13 @@ longjmp:
+     lwi     r24, r5, 48
+     lwi     r25, r5, 52
+     lwi     r26, r5, 56
+-    lwi     r27, r5, 60                        
+-    lwi     r28, r5, 64                        
+-    lwi     r29, r5, 68                        
++    lwi     r27, r5, 60
++    lwi     r28, r5, 64
++    lwi     r29, r5, 68
+     lwi     r30, r5, 72
+-    lwi     r31, r5, 76                                            
++    lwi     r31, r5, 76
+ 
+     rtsd    r15, 8
+     or      r3, r0, r6
++#endif
+ .end longjmp    
+diff --git a/newlib/libc/machine/microblaze/setjmp.S b/newlib/libc/machine/microblaze/setjmp.S
+index cdd87c76f..971862bcb 100644
+--- a/newlib/libc/machine/microblaze/setjmp.S
++++ b/newlib/libc/machine/microblaze/setjmp.S
+@@ -50,9 +50,39 @@
+     
+ .globl setjmp
+ .section .text
+-.align 2  
++#ifdef	__arch64__
++.align 3
++#else
++.align 2
++#endif
+ .ent setjmp    
+ setjmp:
++#ifdef	__arch64__
++    sli     r1, r5, 0
++    sli     r13, r5, 4
++    sli     r14, r5, 8
++    sli     r15, r5, 12
++    sli     r16, r5, 16
++    sli     r17, r5, 20
++    sli     r18, r5, 24
++    sli     r19, r5, 28
++    sli     r20, r5, 32
++    sli     r21, r5, 36
++    sli     r22, r5, 40
++    sli     r23, r5, 44
++    sli     r24, r5, 48
++    sli     r25, r5, 52
++    sli     r26, r5, 56
++    sli     r27, r5, 60
++    sli     r28, r5, 64
++    sli     r29, r5, 68
++    sli     r30, r5, 72
++    sli     r31, r5, 76
++
++    or      r3, r0, r0
++    rtsd    r15, 8
++    nop
++#else
+     swi     r1, r5, 0
+     swi     r13, r5, 4
+     swi     r14, r5, 8
+@@ -76,4 +106,5 @@ setjmp:
+ 
+     rtsd    r15, 8
+     or      r3, r0, r0
++#endif
+ .end setjmp    
+-- 
+2.17.1
+

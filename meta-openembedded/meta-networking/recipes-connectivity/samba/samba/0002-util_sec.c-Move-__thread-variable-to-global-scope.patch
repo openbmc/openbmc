@@ -1,0 +1,58 @@
+From c62a6f32ab965de2ec77a614f20f04568116835b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 5 Sep 2019 21:39:05 -0700
+Subject: [PATCH 2/2] util_sec.c: Move __thread variable to global scope
+
+Make clang happy otherwise it complains about variable scope
+
+fixes
+
+source3/./lib/util_sec.c:470:4: error: '__thread' variables must have global storage
+        } __thread cache;
+          ^
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ source3/lib/util_sec.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/source3/lib/util_sec.c b/source3/lib/util_sec.c
+index 9408269..7390318 100644
+--- a/source3/lib/util_sec.c
++++ b/source3/lib/util_sec.c
+@@ -444,6 +444,17 @@ void become_user_permanently(uid_t uid, gid_t gid)
+ 	assert_gid(gid, gid);
+ }
+ 
++#ifdef HAVE___THREAD
++	struct cache_t {
++		bool active;
++		uid_t uid;
++		gid_t gid;
++		size_t setlen;
++		uintptr_t gidset;
++	};
++
++static __thread struct cache_t cache;
++#endif
+ /**********************************************************
+  Function to set thread specific credentials. Leave
+  saved-set uid/gid alone.Must be thread-safe code.
+@@ -461,14 +472,6 @@ int set_thread_credentials(uid_t uid,
+ 	 * available.
+ 	 */
+ #ifdef HAVE___THREAD
+-	static struct {
+-		bool active;
+-		uid_t uid;
+-		gid_t gid;
+-		size_t setlen;
+-		uintptr_t gidset;
+-	} __thread cache;
+-
+ 	if (cache.active &&
+ 	    cache.uid == uid &&
+ 	    cache.gid == gid &&
+-- 
+2.23.0
+

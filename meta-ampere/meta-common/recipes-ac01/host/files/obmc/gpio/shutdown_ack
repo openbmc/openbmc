@@ -1,0 +1,4 @@
+DEVPATH=/dev/input/event0
+KEY=50
+POLARITY=1
+TARGET=ampere-chassis-poweroff.service

@@ -1,0 +1,25 @@
+#! /bin/sh
+# Copyright 2020 Garmin Ltd. or its subsidiaries
+#
+# SPDX-License-Identifier: GPL-2.0
+#
+# Attempts to find and exec the host qemu-bridge-helper program
+
+# If the QEMU_BRIDGE_HELPER variable is set by the user, exec it.
+if [ -n "$QEMU_BRIDGE_HELPER" ]; then
+    exec "$QEMU_BRIDGE_HELPER" "$@"
+fi
+
+# Search common paths for the helper program
+BN="qemu-bridge-helper"
+PATHS="/usr/libexec/ /usr/lib/qemu/"
+
+for p in $PATHS; do
+    if [ -e "$p/$BN" ]; then
+        exec "$p/$BN" "$@"
+    fi
+done
+
+echo "$BN not found!" > /dev/stderr
+exit 1
+

@@ -5,7 +5,7 @@ HOMEPAGE = "http://bitmath.org/code/mtview/"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4c61b8950dc1aab4d2aa7c2ae6b1cfb3"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
@@ -16,4 +16,4 @@ DEPENDS += "mtdev utouch-frame utouch-evemu libx11"
 
 PV = "1.1.7+git${SRCPV}"
 
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"

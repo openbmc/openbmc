@@ -1,0 +1,5 @@
+--- source.orig	2020-10-06 13:26:10.792688630 +0100
++++ source	2020-10-06 13:26:18.853424694 +0100
+@@ -1 +1 @@
+-This is a test for something
++This is a test for qemuarm

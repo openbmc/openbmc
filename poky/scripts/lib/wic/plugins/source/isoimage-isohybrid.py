@@ -1,18 +1,5 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
-
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # DESCRIPTION
 # This implements the 'isoimage-isohybrid' source plugin class for 'wic'
@@ -83,8 +70,13 @@ class IsoImagePlugin(SourcePlugin):
         syslinux_conf += "DEFAULT boot\n"
         syslinux_conf += "LABEL boot\n"
 
-        kernel = "/bzImage"
-        syslinux_conf += "KERNEL " + kernel + "\n"
+        kernel = get_bitbake_var("KERNEL_IMAGETYPE")
+        if get_bitbake_var("INITRAMFS_IMAGE_BUNDLE") == "1":
+            if get_bitbake_var("INITRAMFS_IMAGE"):
+                kernel = "%s-%s.bin" % \
+                    (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
+
+        syslinux_conf += "KERNEL /" + kernel + "\n"
         syslinux_conf += "APPEND initrd=/initrd LABEL=boot %s\n" \
                              % bootloader.append
 
@@ -127,9 +119,13 @@ class IsoImagePlugin(SourcePlugin):
             grubefi_conf += "\n"
             grubefi_conf += "menuentry 'boot'{\n"
 
-            kernel = "/bzImage"
+            kernel = get_bitbake_var("KERNEL_IMAGETYPE")
+            if get_bitbake_var("INITRAMFS_IMAGE_BUNDLE") == "1":
+                if get_bitbake_var("INITRAMFS_IMAGE"):
+                    kernel = "%s-%s.bin" % \
+                        (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
 
-            grubefi_conf += "linux %s rootwait %s\n" \
+            grubefi_conf += "linux /%s rootwait %s\n" \
                             % (kernel, bootloader.append)
             grubefi_conf += "initrd /initrd \n"
             grubefi_conf += "}\n"
@@ -220,6 +216,18 @@ class IsoImagePlugin(SourcePlugin):
             creator.name = source_params['image_name'].strip()
             logger.debug("The name of the image is: %s", creator.name)
 
+    @staticmethod
+    def _install_payload(source_params, iso_dir):
+        """
+        Copies contents of payload directory (as specified in 'payload_dir' param) into iso_dir
+        """
+
+        if source_params.get('payload_dir'):
+            payload_dir = source_params['payload_dir']
+
+            logger.debug("Payload directory: %s", payload_dir)
+            shutil.copytree(payload_dir, iso_dir, symlinks=True, dirs_exist_ok=True)
+
     @classmethod
     def do_prepare_partition(cls, part, source_params, creator, cr_workdir,
                              oe_builddir, bootimg_dir, kernel_dir,
@@ -231,6 +239,8 @@ class IsoImagePlugin(SourcePlugin):
         """
 
         isodir = "%s/ISO" % cr_workdir
+
+        cls._install_payload(source_params, isodir)
 
         if part.rootfs_dir is None:
             if not 'ROOTFS_DIR' in rootfs_dir:
@@ -281,9 +291,14 @@ class IsoImagePlugin(SourcePlugin):
         if os.path.isfile("%s/initrd.cpio.gz" % cr_workdir):
             os.remove("%s/initrd.cpio.gz" % cr_workdir)
 
-        # Install bzImage
-        install_cmd = "install -m 0644 %s/bzImage %s/bzImage" % \
-                      (kernel_dir, isodir)
+        kernel = get_bitbake_var("KERNEL_IMAGETYPE")
+        if get_bitbake_var("INITRAMFS_IMAGE_BUNDLE") == "1":
+            if get_bitbake_var("INITRAMFS_IMAGE"):
+                kernel = "%s-%s.bin" % \
+                    (get_bitbake_var("KERNEL_IMAGETYPE"), get_bitbake_var("INITRAMFS_LINK_NAME"))
+
+        install_cmd = "install -m 0644 %s/%s %s/%s" % \
+                      (kernel_dir, kernel, isodir, kernel)
         exec_cmd(install_cmd)
 
         #Create bootloader for efi boot
@@ -335,19 +350,23 @@ class IsoImagePlugin(SourcePlugin):
                 (img_iso_dir, isodir)
             exec_cmd(install_cmd)
         else:
+            # Default to 100 blocks of extra space for file system overhead
+            esp_extra_blocks = int(source_params.get('esp_extra_blocks', '100'))
+
             du_cmd = "du -bks %s/EFI" % isodir
             out = exec_cmd(du_cmd)
             blocks = int(out.split()[0])
-            # Add some extra space for file system overhead
-            blocks += 100
+            blocks += esp_extra_blocks
             logger.debug("Added 100 extra blocks to %s to get to %d "
                          "total blocks", part.mountpoint, blocks)
 
             # dosfs image for EFI boot
             bootimg = "%s/efi.img" % isodir
 
-            dosfs_cmd = 'mkfs.vfat -n "EFIimg" -S 512 -C %s %d' \
-                        % (bootimg, blocks)
+            esp_label = source_params.get('esp_label', 'EFIimg')
+
+            dosfs_cmd = 'mkfs.vfat -n \'%s\' -S 512 -C %s %d' \
+                        % (esp_label, bootimg, blocks)
             exec_native_cmd(dosfs_cmd, native_sysroot)
 
             mmd_cmd = "mmd -i %s ::/EFI" % bootimg

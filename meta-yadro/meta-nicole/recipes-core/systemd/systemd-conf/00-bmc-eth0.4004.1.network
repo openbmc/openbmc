@@ -1,0 +1,8 @@
+[Match]
+Name=eth0.4004
+KernelCommandLine=bmcposition=1
+[Network]
+LinkLocalAddressing=yes
+IPv6AcceptRA=true
+DHCP=no
+Address=fd59:4144:524f:5441:544c:494e:3:2/122

@@ -1,4 +1,4 @@
-inherit goarch ptest
+inherit goarch
 
 GO_PARALLEL_BUILD ?= "${@oe.utils.parallel_make_argument(d, '-p %d')}"
 
@@ -7,6 +7,7 @@ GOROOT_class-nativesdk = "${STAGING_DIR_TARGET}${libdir}/go"
 GOROOT = "${STAGING_LIBDIR}/go"
 export GOROOT
 export GOROOT_FINAL = "${libdir}/go"
+export GOCACHE = "${B}/.cache"
 
 export GOARCH = "${TARGET_GOARCH}"
 export GOOS = "${TARGET_GOOS}"
@@ -20,8 +21,6 @@ GOARM_arm_class-target[export] = "1"
 GO386[export] = "0"
 GO386_x86_class-target = "${TARGET_GO386}"
 GO386_x86_class-target[export] = "1"
-GO386_i586_class-target = "${TARGET_GO386}"
-GO386_i586_class-target[export] = "1"
 
 GOMIPS[export] = "0"
 GOMIPS_mips_class-target = "${TARGET_GOMIPS}"
@@ -41,8 +40,9 @@ GO_RPATH_LINK_class-native = "${@'-Wl,-rpath-link=${STAGING_LIBDIR_NATIVE}/go/pk
 GO_EXTLDFLAGS ?= "${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS} ${GO_RPATH_LINK} ${LDFLAGS}"
 GO_LINKMODE ?= ""
 GO_LINKMODE_class-nativesdk = "--linkmode=external"
+GO_LINKMODE_class-native = "--linkmode=external"
 GO_LDFLAGS ?= '-ldflags="${GO_RPATH} ${GO_LINKMODE} -extldflags '${GO_EXTLDFLAGS}'"'
-export GOBUILDFLAGS ?= "-v ${GO_LDFLAGS}"
+export GOBUILDFLAGS ?= "-v ${GO_LDFLAGS} -trimpath"
 export GOPATH_OMIT_IN_ACTIONID ?= "1"
 export GOPTESTBUILDFLAGS ?= "${GOBUILDFLAGS} -c"
 export GOPTESTFLAGS ?= ""
@@ -72,17 +72,13 @@ python go_do_unpack() {
     if len(src_uri) == 0:
         return
 
-    try:
-        fetcher = bb.fetch2.Fetch(src_uri, d)
-        for url in fetcher.urls:
-            if fetcher.ud[url].type == 'git':
-                if fetcher.ud[url].parm.get('destsuffix') is None:
-                    s_dirname = os.path.basename(d.getVar('S'))
-                    fetcher.ud[url].parm['destsuffix'] = os.path.join(s_dirname, 'src',
-                                                                      d.getVar('GO_IMPORT')) + '/'
-        fetcher.unpack(d.getVar('WORKDIR'))
-    except bb.fetch2.BBFetchException as e:
-        raise bb.build.FuncFailed(e)
+    fetcher = bb.fetch2.Fetch(src_uri, d)
+    for url in fetcher.urls:
+        if fetcher.ud[url].type == 'git':
+            if fetcher.ud[url].parm.get('destsuffix') is None:
+                s_dirname = os.path.basename(d.getVar('S'))
+                fetcher.ud[url].parm['destsuffix'] = os.path.join(s_dirname, 'src', d.getVar('GO_IMPORT')) + '/'
+    fetcher.unpack(d.getVar('WORKDIR'))
 }
 
 go_list_packages() {
@@ -115,41 +111,17 @@ go_do_compile() {
 do_compile[dirs] =+ "${GOTMPDIR}"
 do_compile[cleandirs] = "${B}/bin ${B}/pkg"
 
-do_compile_ptest_base() {
-	export TMPDIR="${GOTMPDIR}"
-	rm -f ${B}/.go_compiled_tests.list
-	go_list_package_tests | while read pkg; do
-		cd ${B}/src/$pkg
-		${GO} test ${GOPTESTBUILDFLAGS} $pkg
-		find . -mindepth 1 -maxdepth 1 -type f -name '*.test' -exec echo $pkg/{} \; | \
-			sed -e's,/\./,/,'>> ${B}/.go_compiled_tests.list
-	done
-	do_compile_ptest
-}
-do_compile_ptest_base[dirs] =+ "${GOTMPDIR}"
-
 go_do_install() {
 	install -d ${D}${libdir}/go/src/${GO_IMPORT}
 	tar -C ${S}/src/${GO_IMPORT} -cf - --exclude-vcs --exclude '*.test' --exclude 'testdata' . | \
 		tar -C ${D}${libdir}/go/src/${GO_IMPORT} --no-same-owner -xf -
-	tar -C ${B} -cf - pkg | tar -C ${D}${libdir}/go --no-same-owner -xf -
+	tar -C ${B} -cf - --exclude-vcs --exclude '*.test' --exclude 'testdata' pkg | \
+		tar -C ${D}${libdir}/go --no-same-owner -xf -
 
 	if [ -n "`ls ${B}/${GO_BUILD_BINDIR}/`" ]; then
 		install -d ${D}${bindir}
 		install -m 0755 ${B}/${GO_BUILD_BINDIR}/* ${D}${bindir}/
 	fi
-}
-
-go_make_ptest_wrapper() {
-	cat >${D}${PTEST_PATH}/run-ptest <<EOF
-#!/bin/sh
-RC=0
-run_test() (
-    cd "\$1"
-    ((((./\$2 ${GOPTESTFLAGS}; echo \$? >&3) | sed -r -e"s,^(PASS|SKIP|FAIL)\$,\\1: \$1/\$2," >&4) 3>&1) | (read rc; exit \$rc)) 4>&1
-    exit \$?)
-EOF
-
 }
 
 go_stage_testdata() {
@@ -166,43 +138,18 @@ go_stage_testdata() {
 	cd "$oldwd"
 }
 
-do_install_ptest_base() {
-	test -f "${B}/.go_compiled_tests.list" || exit 0
-	install -d ${D}${PTEST_PATH}
-	go_stage_testdata
-	go_make_ptest_wrapper
-	havetests=""
-	while read test; do
-		testdir=`dirname $test`
-		testprog=`basename $test`
-		install -d ${D}${PTEST_PATH}/$testdir
-		install -m 0755 ${B}/src/$test ${D}${PTEST_PATH}/$test
-	echo "run_test $testdir $testprog || RC=1" >> ${D}${PTEST_PATH}/run-ptest
-		havetests="yes"
-	done < ${B}/.go_compiled_tests.list
-	if [ -n "$havetests" ]; then
-		echo "exit \$RC" >> ${D}${PTEST_PATH}/run-ptest
-		chmod +x ${D}${PTEST_PATH}/run-ptest
-	else
-		rm -rf ${D}${PTEST_PATH}
-	fi
-	do_install_ptest
-	chown -R root:root ${D}${PTEST_PATH}
-}
-
 EXPORT_FUNCTIONS do_unpack do_configure do_compile do_install
 
 FILES_${PN}-dev = "${libdir}/go/src"
 FILES_${PN}-staticdev = "${libdir}/go/pkg"
 
 INSANE_SKIP_${PN} += "ldflags"
-INSANE_SKIP_${PN}-ptest += "ldflags"
 
 # Add -buildmode=pie to GOBUILDFLAGS to satisfy "textrel" QA checking, but mips
-# doesn't support -buildmode=pie, so skip the QA checking for mips and its
+# doesn't support -buildmode=pie, so skip the QA checking for mips/rv32 and its
 # variants.
 python() {
-    if 'mips' in d.getVar('TARGET_ARCH'):
+    if 'mips' in d.getVar('TARGET_ARCH') or 'riscv32' in d.getVar('TARGET_ARCH'):
         d.appendVar('INSANE_SKIP_%s' % d.getVar('PN'), " textrel")
     else:
         d.appendVar('GOBUILDFLAGS', ' -buildmode=pie')

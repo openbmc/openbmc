@@ -1,25 +1,30 @@
-From 1eb84534dea05d41afed1d898cba212ad7d310dd Mon Sep 17 00:00:00 2001
+From 159c53612444ec1df492bae528a5a88a275b93bf Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 13:41:41 +0800
-Subject: [PATCH 02/24] don't use glibc-specific qsort_r
+Subject: [PATCH] don't use glibc-specific qsort_r
 
 Upstream-Status: Inappropriate [musl specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 [Rebased for v241]
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+[Rebased for v242]
+Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
+[Rebased for v247]
+Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
+
 ---
- src/basic/util.h                   | 14 --------------
- src/libsystemd/sd-hwdb/hwdb-util.c | 19 ++++++++++++++-----
- src/shared/format-table.c          | 36 ++++++++++++++++++++++++------------
+ src/basic/sort-util.h              | 14 ------------
+ src/libsystemd/sd-hwdb/hwdb-util.c | 19 +++++++++++-----
+ src/shared/format-table.c          | 36 ++++++++++++++++++++----------
  3 files changed, 38 insertions(+), 31 deletions(-)
 
-diff --git a/src/basic/util.h b/src/basic/util.h
-index dc33d66..9f6a6ce 100644
---- a/src/basic/util.h
-+++ b/src/basic/util.h
-@@ -116,20 +116,6 @@ static inline void qsort_safe(void *base, size_t nmemb, size_t size, __compar_fn
-                 qsort_safe((p), (n), sizeof((p)[0]), (__compar_fn_t) _func_); \
+diff --git a/src/basic/sort-util.h b/src/basic/sort-util.h
+index 49586a4a24..d92a5ab0ed 100644
+--- a/src/basic/sort-util.h
++++ b/src/basic/sort-util.h
+@@ -55,18 +55,4 @@ static inline void _qsort_safe(void *base, size_t nmemb, size_t size, __compar_f
+                 _qsort_safe((p), (n), sizeof((p)[0]), (__compar_fn_t) _func_); \
          })
  
 -static inline void qsort_r_safe(void *base, size_t nmemb, size_t size, __compar_d_fn_t compar, void *userdata) {
@@ -36,14 +41,12 @@ index dc33d66..9f6a6ce 100644
 -                qsort_r_safe((p), (n), sizeof((p)[0]), (__compar_d_fn_t) _func_, userdata); \
 -        })
 -
- /* Normal memcpy requires src to be nonnull. We do nothing if n is 0. */
- static inline void memcpy_safe(void *dst, const void *src, size_t n) {
-         if (n == 0)
+ int cmp_int(const int *a, const int *b);
 diff --git a/src/libsystemd/sd-hwdb/hwdb-util.c b/src/libsystemd/sd-hwdb/hwdb-util.c
-index f852967..b570ce1 100644
+index fd45ff0f54..ac4b63c49b 100644
 --- a/src/libsystemd/sd-hwdb/hwdb-util.c
 +++ b/src/libsystemd/sd-hwdb/hwdb-util.c
-@@ -126,9 +126,13 @@ static void trie_free(struct trie *trie) {
+@@ -126,9 +126,13 @@ static struct trie* trie_free(struct trie *trie) {
  
  DEFINE_TRIVIAL_CLEANUP_FUNC(struct trie*, trie_free);
  
@@ -84,10 +87,10 @@ index f852967..b570ce1 100644
  }
  
 diff --git a/src/shared/format-table.c b/src/shared/format-table.c
-index 7d52980..75dbfe1 100644
+index dccb796b26..c3ab8ac296 100644
 --- a/src/shared/format-table.c
 +++ b/src/shared/format-table.c
-@@ -848,31 +848,33 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t
+@@ -1290,30 +1290,32 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t
          return CMP(index_a, index_b);
  }
  
@@ -95,7 +98,6 @@ index 7d52980..75dbfe1 100644
 +static Table *user_table;
 +static int table_data_compare(const void *x, const void *y) {
 +        const size_t *a = x, *b=y;
-         size_t i;
          int r;
  
 -        assert(t);
@@ -115,8 +117,8 @@ index 7d52980..75dbfe1 100644
                  return 1;
  
          /* Order other lines by the sorting map */
--        for (i = 0; i < t->n_sort_map; i++) {
-+        for (i = 0; i < user_table->n_sort_map; i++) {
+-        for (size_t i = 0; i < t->n_sort_map; i++) {
++        for (size_t i = 0; i < user_table->n_sort_map; i++) {
                  TableData *d, *dd;
  
 -                d = t->data[*a + t->sort_map[i]];
@@ -131,8 +133,8 @@ index 7d52980..75dbfe1 100644
          }
  
          /* Order identical lines by the order there were originally added in */
-@@ -1105,7 +1107,12 @@ int table_print(Table *t, FILE *f) {
-                 for (i = 0; i < n_rows; i++)
+@@ -1952,7 +1954,12 @@ int table_print(Table *t, FILE *f) {
+                 for (size_t i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  
 -                typesafe_qsort_r(sorted, n_rows, table_data_compare, t);
@@ -145,8 +147,8 @@ index 7d52980..75dbfe1 100644
          }
  
          if (t->display_map)
-@@ -1532,7 +1539,12 @@ int table_to_json(Table *t, JsonVariant **ret) {
-                 for (i = 0; i < n_rows; i++)
+@@ -2580,7 +2587,12 @@ int table_to_json(Table *t, JsonVariant **ret) {
+                 for (size_t i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  
 -                typesafe_qsort_r(sorted, n_rows, table_data_compare, t);
@@ -159,6 +161,3 @@ index 7d52980..75dbfe1 100644
          }
  
          if (t->display_map)
--- 
-2.7.4
-

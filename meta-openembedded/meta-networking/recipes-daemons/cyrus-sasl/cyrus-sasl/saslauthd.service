@@ -4,7 +4,7 @@ After=syslog.target
 
 [Service]
 Type=forking
-PIDFile=@LOCALSTATEDIR@/run/saslauthd/saslauthd.pid
+PIDFile=/run/saslauthd/saslauthd.pid
 EnvironmentFile=@SYSCONFDIR@/default/saslauthd
 ExecStart=@SBINDIR@/saslauthd -m $SOCKETDIR -a $MECH $FLAGS
 

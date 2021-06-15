@@ -1,0 +1,39 @@
+Replace strncpy with memcpy 
+
+since the length of data to 
+be copied has already been determined with strlen(). Replace strncpy()
+with memcpy() to address the warning and optimize the code a little.
+
+| ippool_config.c:112:2: note: 'snprintf' output between 8 and 55 bytes into a destination of size 48
+|   112 |  snprintf(prompt, sizeof(prompt), "ippool-%s", server_name);
+|       |  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/cli/cli_readline.c
++++ b/cli/cli_readline.c
+@@ -257,10 +257,15 @@ static void cli_rl_display_wrapped_text(
+ 	int pos;
+ 	int in_ws;
+ 	int i;
++	int bufsize = sizeof(text_buf)/sizeof(text_buf[0]);
+ 
+ 	if (left_margin == 0) {
+ 		left_margin = 3;
+ 	}
++	if (left_margin > bufsize) {
++		left_margin = bufsize;
++	}
++
+ 	if (right_margin == 0) {
+ 		right_margin = 78;;
+ 	}
+@@ -271,7 +276,7 @@ static void cli_rl_display_wrapped_text(
+ 	/* First copy the text heading to the buffer and add a "-", accounting for
+ 	 * the specified left margin.
+ 	 */
+-	strncpy(&text_buf[0], text1, left_margin - 3);
++	memcpy(&text_buf[0], text1, left_margin - 3);
+ 	for (pos = strlen(text1); pos < left_margin - 3; pos++) {
+ 		text_buf[pos] = ' ';
+ 	}

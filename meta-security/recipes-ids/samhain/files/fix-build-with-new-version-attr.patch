@@ -1,0 +1,73 @@
+From e67acafa62f71f0015ed548918b98ed0b1ded128 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Sun, 19 Jan 2020 15:53:48 +0800
+Subject: [PATCH] fix build with new version attr
+
+The attr/xattr.h has been removed from attr 2.4.48 with commit:
+http://git.savannah.nongnu.org/cgit/attr.git/commit/include?id=7921157890d07858d092f4003ca4c6bae9fd2c38
+The xattr syscalls are provided by sys/xattr.h from glibc now.
+Remove the checking code to adapt it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ aclocal.m4    | 26 +++++++++++---------------
+ src/sh_unix.c |  2 +-
+ 2 files changed, 12 insertions(+), 16 deletions(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index ee5b204..38cef8e 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -1453,23 +1453,19 @@ AC_DEFUN([sh_CHECK_POSIX_ACL],
+ 
+ AC_DEFUN([sh_CHECK_XATTR],
+ [
+-  AC_CHECK_HEADERS(attr/xattr.h)
+-  if test $ac_cv_header_attr_xattr_h = yes; then
+-
+-  	AC_CHECK_LIB([attr], [getxattr], sh_lattr=yes, sh_lattr=no)
+-  	if test x"$sh_lattr" = xyes; then
+-    		LIBATTR=-lattr
+-  	else
+-    		LIBATTR=
+-  	fi
+-  
+-  	OLDLIBS="$LIBS"
+-  	LIBS="$LIBS $LIBATTR"
+-  	AC_CHECK_FUNCS([getxattr lgetxattr fgetxattr],
+-                       [sh_fattr=yes],[sh_fattr=no])
+-  	LIBS="$OLDLIBS"
++  AC_CHECK_LIB([attr], [getxattr], sh_lattr=yes, sh_lattr=no)
++  if test x"$sh_lattr" = xyes; then
++      LIBATTR=-lattr
++  else
++      LIBATTR=
+   fi
+ 
++  OLDLIBS="$LIBS"
++  LIBS="$LIBS $LIBATTR"
++  AC_CHECK_FUNCS([getxattr lgetxattr fgetxattr],
++	  [sh_fattr=yes],[sh_fattr=no])
++  LIBS="$OLDLIBS"
++
+   if test x"$sh_fattr" = xyes; then
+ 	  AC_DEFINE(USE_XATTR, 1, [Define if you want extended attributes support.])
+ 	  LIBS="$LIBS $LIBATTR"
+diff --git a/src/sh_unix.c b/src/sh_unix.c
+index 3ede57f..ef236e9 100644
+--- a/src/sh_unix.c
++++ b/src/sh_unix.c
+@@ -3681,7 +3681,7 @@ static char * sh_unix_getinfo_acl (char * path, int fd, struct stat * buf)
+ 
+ #ifdef USE_XATTR
+ 
+-#include <attr/xattr.h>
++#include <sys/xattr.h>
+ static char * sh_unix_getinfo_xattr_int (char * path, int fd, char * name)
+ {
+   char *  out   = NULL;
+-- 
+2.7.4
+

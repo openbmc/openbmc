@@ -22,6 +22,7 @@ else
         gtk-query-immodules-2.0 > ${libdir}/gtk-2.0/2.10.0/immodules.cache
     fi
     if [ ! -z `which gtk-query-immodules-3.0` ]; then
+        mkdir -p ${libdir}/gtk-3.0/3.0.0
         gtk-query-immodules-3.0 > ${libdir}/gtk-3.0/3.0.0/immodules.cache
     fi
 fi

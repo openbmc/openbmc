@@ -4,6 +4,7 @@ IMAGE_PKGTYPE ?= "ipk"
 
 IPKGCONF_TARGET = "${WORKDIR}/opkg.conf"
 IPKGCONF_SDK =  "${WORKDIR}/opkg-sdk.conf"
+IPKGCONF_SDK_TARGET = "${WORKDIR}/opkg-sdk-target.conf"
 
 PKGWRITEDIRIPK = "${WORKDIR}/deploy-ipks"
 
@@ -14,7 +15,7 @@ OPKG_ARGS += "--force_postinstall --prefer-arch-to-version"
 OPKG_ARGS += "${@['', '--no-install-recommends'][d.getVar("NO_RECOMMENDATIONS") == "1"]}"
 OPKG_ARGS += "${@['', '--add-exclude ' + ' --add-exclude '.join((d.getVar('PACKAGE_EXCLUDE') or "").split())][(d.getVar("PACKAGE_EXCLUDE") or "").strip() != ""]}"
 
-OPKGLIBDIR = "${localstatedir}/lib"
+OPKGLIBDIR ??= "${localstatedir}/lib"
 
 python do_package_ipk () {
     workdir = d.getVar('WORKDIR')
@@ -45,6 +46,7 @@ def ipk_write_pkg(pkg, d):
     import subprocess
     import textwrap
     import collections
+    import glob
 
     def cleanupcontrol(root):
         for p in ['CONTROL', 'DEBIAN']:
@@ -101,8 +103,7 @@ def ipk_write_pkg(pkg, d):
         bb.utils.mkdirhier(pkgoutdir)
         os.chdir(root)
         cleanupcontrol(root)
-        from glob import glob
-        g = glob('*')
+        g = glob.glob('*')
         if not g and localdata.getVar('ALLOW_EMPTY', False) != "1":
             bb.note("Not creating empty archive for %s-%s-%s" % (pkg, localdata.getVar('PKGV'), localdata.getVar('PKGR')))
             return
@@ -154,7 +155,6 @@ def ipk_write_pkg(pkg, d):
                     ctrlfile.write('%s\n' % textwrap.fill(description, width=74, initial_indent=' ', subsequent_indent=' '))
             else:
                 ctrlfile.write(c % tuple(pullData(fs, localdata)))
-        # more fields
 
         custom_fields_chunk = get_package_additional_metadata("ipk", localdata)
         if custom_fields_chunk is not None:
@@ -238,6 +238,10 @@ def ipk_write_pkg(pkg, d):
         cleanupcontrol(root)
         bb.utils.unlockfile(lf)
 
+# Have to list any variables referenced as X_<pkg> that aren't in pkgdata here
+IPKEXTRAVARS = "PRIORITY MAINTAINER PACKAGE_ARCH HOMEPAGE PACKAGE_ADD_METADATA_IPK"
+ipk_write_pkg[vardeps] += "${@gen_packagevar(d, 'IPKEXTRAVARS')}"
+
 # Otherwise allarch packages may change depending on override configuration
 ipk_write_pkg[vardepsexclude] = "OVERRIDES"
 
@@ -269,7 +273,6 @@ python do_package_write_ipk () {
 }
 do_package_write_ipk[dirs] = "${PKGWRITEDIRIPK}"
 do_package_write_ipk[cleandirs] = "${PKGWRITEDIRIPK}"
-do_package_write_ipk[umask] = "022"
 do_package_write_ipk[depends] += "${@oe.utils.build_depends_string(d.getVar('PACKAGE_WRITE_DEPS'), 'do_populate_sysroot')}"
 addtask package_write_ipk after do_packagedata do_package
 

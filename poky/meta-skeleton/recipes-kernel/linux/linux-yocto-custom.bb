@@ -1,6 +1,6 @@
+SUMMARY = "An example kernel recipe that uses the linux-yocto and oe-core"
 # linux-yocto-custom.bb:
 #
-#   An example kernel recipe that uses the linux-yocto and oe-core
 #   kernel classes to apply a subset of yocto kernel management to git
 #   managed kernel repositories.
 #

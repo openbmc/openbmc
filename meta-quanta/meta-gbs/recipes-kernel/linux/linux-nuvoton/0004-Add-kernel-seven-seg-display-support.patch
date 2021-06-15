@@ -1,0 +1,10 @@
+diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
+index b9e6d4c3e906..aa7ce9d72d2c 100644
+--- a/drivers/misc/Makefile
++++ b/drivers/misc/Makefile
+@@ -59,3 +59,5 @@ obj-$(CONFIG_HABANA_AI)		+= habanalabs/
+ obj-$(CONFIG_XILINX_SDFEC)	+= xilinx_sdfec.o
+ obj-$(CONFIG_NPCM7XX_LPC_BPC)	+= npcm7xx-lpc-bpc.o
+ obj-$(CONFIG_NPCM7XX_PCI_MBOX)	+= npcm7xx-pci-mbox.o
++obj-$(CONFIG_SEVEN_SEGMENT_DISPLAY)    += seven_seg_disp.o
++obj-$(CONFIG_SEVEN_SEGMENT_GPIO) += seven_seg_gpio.o

@@ -1,0 +1,16 @@
+hb_volatile_sensor:
+    interfaces:
+        xyz.openbmc_project.Object.Enable:
+            Enabled:
+                Offsets:
+                    0:
+                        assert: false
+                        type: bool
+                    1:
+                        assert: true
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    path: /org/open_power/control/volatile
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    serviceInterface: org.freedesktop.DBus.Properties

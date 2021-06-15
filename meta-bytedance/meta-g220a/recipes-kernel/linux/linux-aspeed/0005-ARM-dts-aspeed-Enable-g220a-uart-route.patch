@@ -1,0 +1,25 @@
+From 6901c1fb9c8fbf33461811b9f1667bcaf876b747 Mon Sep 17 00:00:00 2001
+From: John Wang <wangzhiqiang.bj@bytedance.com>
+Date: Wed, 30 Sep 2020 13:02:22 +0800
+Subject: [PATCH 5/5] ARM: dts: aspeed: Enable g220a uart route
+
+Signed-off-by: John Wang <wangzhiqiang.bj@bytedance.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-bytedance-g220a.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-bytedance-g220a.dts b/arch/arm/boot/dts/aspeed-bmc-bytedance-g220a.dts
+index 2ae2684c115c..c18ca23f57ac 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-bytedance-g220a.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-bytedance-g220a.dts
+@@ -929,3 +929,7 @@ &video {
+ &vhub {
+ 	status = "okay";
+ };
++
++&uart_routing {
++       status = "okay";
++};
+-- 
+2.25.1
+

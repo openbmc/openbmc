@@ -1,0 +1,10 @@
+[Unit]
+Description=Enable USB Network
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/usb-network.sh
+EnvironmentFile=/usr/share/usb-network/usb-network.conf
+
+[Install]
+WantedBy=multi-user.target

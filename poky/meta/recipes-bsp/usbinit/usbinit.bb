@@ -1,4 +1,8 @@
 SUMMARY = "Initscript for enabling USB gadget Ethernet"
+DESCRIPTION = "This module allows ethernet emulation over USB, allowing for \
+all sorts of nifty things like SSH and NFS in one go plus charging over the \
+same wire, at higher speeds than most Wifi connections."
+HOMEPAGE = "http://linux-sunxi.org/USB_Gadget/Ethernet"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/COPYING.GPL;md5=751419260aa954499f7abaabaa882bbe"

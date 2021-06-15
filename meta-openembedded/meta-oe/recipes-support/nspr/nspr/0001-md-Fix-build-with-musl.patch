@@ -1,0 +1,35 @@
+From 147f3c2acbd96d44025cec11800ded0282327764 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 18 Sep 2017 17:22:43 -0700
+Subject: [PATCH] md: Fix build with musl
+
+The MIPS specific header <sgidefs.h> is not provided by musl
+linux kernel headers provide <asm/sgidefs.h> which has same definitions
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+Upstream-Status: Pending
+
+ pr/include/md/_linux.cfg | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/pr/include/md/_linux.cfg
++++ b/pr/include/md/_linux.cfg
+@@ -499,7 +499,7 @@
+ #elif defined(__mips__)
+ 
+ /* For _ABI64 */
+-#include <sgidefs.h>
++#include <asm/sgidefs.h>
+ 
+ #ifdef __MIPSEB__
+ #define IS_BIG_ENDIAN 1
+@@ -511,7 +511,7 @@
+ #error "Unknown MIPS endianness."
+ #endif
+ 
+-#if _MIPS_SIM == _ABI64
++#if _MIPS_SIM == _MIPS_SIM_ABI64
+ 
+ #define IS_64
+ 

@@ -1,0 +1,112 @@
+From 598d108e2c438d8f2ecd3bf948fa3ebbd3681490 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tim-Philipp=20M=C3=BCller?= <tim@centricular.com>
+Date: Fri, 14 Aug 2020 16:38:26 +0100
+Subject: [PATCH 2/3] Remove unused valgrind detection
+
+Having this just to log a debug message in case we're
+running inside valgrind doesn't seem very useful, and
+the code that used to use this no longer exists it seems.
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/595>
+
+Upstream-Status: Backport [a2cbf75523cdf8a4df1baa7007d86ef455972245]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ gst/gst_private.h |  2 --
+ gst/gstinfo.c     | 39 ---------------------------------------
+ meson.build       |  1 -
+ 3 files changed, 42 deletions(-)
+
+diff --git a/gst/gst_private.h b/gst/gst_private.h
+index eefd044d9..8252ede51 100644
+--- a/gst/gst_private.h
++++ b/gst/gst_private.h
+@@ -116,8 +116,6 @@ G_GNUC_INTERNAL  gboolean _priv_plugin_deps_env_vars_changed (GstPlugin * plugin
+ 
+ G_GNUC_INTERNAL  gboolean _priv_plugin_deps_files_changed (GstPlugin * plugin);
+ 
+-G_GNUC_INTERNAL  gboolean _priv_gst_in_valgrind (void);
+-
+ /* init functions called from gst_init(). */
+ G_GNUC_INTERNAL  void  _priv_gst_quarks_initialize (void);
+ G_GNUC_INTERNAL  void  _priv_gst_mini_object_initialize (void);
+diff --git a/gst/gstinfo.c b/gst/gstinfo.c
+index 5d317877b..097f8b20d 100644
+--- a/gst/gstinfo.c
++++ b/gst/gstinfo.c
+@@ -305,36 +305,6 @@ static gboolean pretty_tags = PRETTY_TAGS_DEFAULT;
+ static volatile gint G_GNUC_MAY_ALIAS __default_level = GST_LEVEL_DEFAULT;
+ static volatile gint G_GNUC_MAY_ALIAS __use_color = GST_DEBUG_COLOR_MODE_ON;
+ 
+-/* FIXME: export this? */
+-gboolean
+-_priv_gst_in_valgrind (void)
+-{
+-  static enum
+-  {
+-    GST_VG_UNCHECKED,
+-    GST_VG_NO_VALGRIND,
+-    GST_VG_INSIDE
+-  }
+-  in_valgrind = GST_VG_UNCHECKED;
+-
+-  if (in_valgrind == GST_VG_UNCHECKED) {
+-#ifdef HAVE_VALGRIND_VALGRIND_H
+-    if (RUNNING_ON_VALGRIND) {
+-      GST_CAT_INFO (GST_CAT_GST_INIT, "we're running inside valgrind");
+-      in_valgrind = GST_VG_INSIDE;
+-    } else {
+-      GST_CAT_LOG (GST_CAT_GST_INIT, "not doing extra valgrind stuff");
+-      in_valgrind = GST_VG_NO_VALGRIND;
+-    }
+-#else
+-    in_valgrind = GST_VG_NO_VALGRIND;
+-#endif
+-    g_assert (in_valgrind == GST_VG_NO_VALGRIND ||
+-        in_valgrind == GST_VG_INSIDE);
+-  }
+-  return (in_valgrind == GST_VG_INSIDE);
+-}
+-
+ static gchar *
+ _replace_pattern_in_gst_debug_file_name (gchar * name, const char *token,
+     guint val)
+@@ -463,9 +433,6 @@ _priv_gst_debug_init (void)
+   _priv_GST_CAT_PROTECTION =
+       _gst_debug_category_new ("GST_PROTECTION", 0, "protection");
+ 
+-  /* print out the valgrind message if we're in valgrind */
+-  _priv_gst_in_valgrind ();
+-
+   env = g_getenv ("GST_DEBUG_OPTIONS");
+   if (env != NULL) {
+     if (strstr (env, "full_tags") || strstr (env, "full-tags"))
+@@ -2503,12 +2470,6 @@ gst_debug_construct_win_color (guint colorinfo)
+   return 0;
+ }
+ 
+-gboolean
+-_priv_gst_in_valgrind (void)
+-{
+-  return FALSE;
+-}
+-
+ void
+ _gst_debug_dump_mem (GstDebugCategory * cat, const gchar * file,
+     const gchar * func, gint line, GObject * obj, const gchar * msg,
+diff --git a/meson.build b/meson.build
+index ce1921aa4..7a84d0981 100644
+--- a/meson.build
++++ b/meson.build
+@@ -200,7 +200,6 @@ check_headers = [
+   'sys/wait.h',
+   'ucontext.h',
+   'unistd.h',
+-  'valgrind/valgrind.h',
+   'sys/resource.h',
+   'sys/uio.h',
+ ]
+-- 
+2.29.2
+

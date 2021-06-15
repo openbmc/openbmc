@@ -1,0 +1,30 @@
+From b5cb6166dbfa57d1d94b19d4a098991a817f68f5 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 15 Oct 2020 10:02:17 +0800
+Subject: [PATCH] wd_keepalive.service: use /run instead of /var/run
+
+/var/run is deprecated by systemd, use /run instead.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ debian/wd_keepalive.service | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/debian/wd_keepalive.service b/debian/wd_keepalive.service
+index 7f8b1dc..0f2a153 100644
+--- a/debian/wd_keepalive.service
++++ b/debian/wd_keepalive.service
+@@ -7,7 +7,7 @@ Type=forking
+ EnvironmentFile=/etc/default/watchdog
+ ExecStartPre=/bin/sh -c '[ -z "${watchdog_module}" ] || [ "${watchdog_module}" = "none" ] || /sbin/modprobe $watchdog_module'
+ ExecStart=/usr/sbin/wd_keepalive $watchdog_options
+-PIDFile=/var/run/wd_keepalive.pid
++PIDFile=/run/wd_keepalive.pid
+ 
+ [Install]
+ WantedBy=multi-user.target
+-- 
+2.17.1
+

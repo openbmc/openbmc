@@ -1,0 +1,31 @@
+Older seccomp-based filters used in container frameworks will block faccessat2
+calls as it's a relatively new syscall.  This isn't a big problem with
+glibc <2.33 but 2.33 will call faccessat2 itself, get EPERM, and thenn be confused
+about what to do as EPERM isn't an expected error code.
+
+This manifests itself as mysterious errors, for example a kernel failing to link.
+
+The root cause of bad seccomp filters is mostly fixed (systemd 247, Docker 20.10.0)
+but we can't expect everyone to upgrade, so add a workaound (originally from 
+Red Hat) to handle EPERM like ENOSYS and fallback to faccessat().
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/sysdeps/unix/sysv/linux/faccessat.c b/sysdeps/unix/sysv/linux/faccessat.c
+index 56cb6dcc8b4d58d3..5de75032bbc93a2c 100644
+--- a/sysdeps/unix/sysv/linux/faccessat.c
++++ b/sysdeps/unix/sysv/linux/faccessat.c
+@@ -34,7 +34,11 @@ faccessat (int fd, const char *file, int mode, int flag)
+ #if __ASSUME_FACCESSAT2
+   return ret;
+ #else
+-  if (ret == 0 || errno != ENOSYS)
++  /* Fedora-specific workaround:
++     As a workround for a broken systemd-nspawn that returns
++     EPERM when a syscall is not allowed instead of ENOSYS
++     we must check for EPERM here and fall back to faccessat.  */
++  if (ret == 0 || !(errno == ENOSYS || errno == EPERM))
+     return ret;
+ 
+   if (flag & ~(AT_SYMLINK_NOFOLLOW | AT_EACCESS))

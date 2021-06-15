@@ -1,0 +1,58 @@
+From b6298861681965533c9b6dac5e26fbd62b52839d Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 17 Jan 2017 17:11:04 +0530
+Subject: [PATCH 17/54] [Patch,microblaze]: Inline Expansion of fsqrt builtin.
+ The changes are made in the patch for the inline expansion of the fsqrt
+ builtin with fqrt instruction. The sqrt math function takes double as
+ argument and return double as argument. The pattern is selected while
+ expanding the unary op through expand_unop which passes DFmode and the DFmode
+ pattern was not there returning zero. Thus the sqrt math function is not
+ inlined and expanded. The pattern with DFmode argument is added. Also the
+ source and destination argument is not same the DF through two different
+ consecutive registers with lower 32 bit is the argument passed to sqrt and
+ the higher 32 bit is zero. If the source and destinations are different the
+ DFmode 64 bits registers is not set properly giving the problem in runtime.
+ Such changes are taken care in the implementation of the pattern for DFmode
+ for inline expansion of the sqrt.
+
+ChangeLog:
+2015-06-16  Ajit Agarwal  <ajitkum@xilinx.com>
+            Nagaraju Mekala <nmekala@xilinx.com>
+
+	* config/microblaze/microblaze.md (sqrtdf2): New
+	pattern.
+
+Signed-off-by:Ajit Agarwal ajitkum@xilinx.com
+              Nagaraju Mekala nmekala@xilinx.com
+---
+ gcc/config/microblaze/microblaze.md | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 8f9baec826b..986d9c3aa25 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -451,6 +451,20 @@
+   (set_attr "mode"      "SF")
+   (set_attr "length"    "4")])
+ 
++(define_insn "sqrtdf2"
++  [(set (match_operand:DF 0 "register_operand" "=d")
++        (sqrt:DF (match_operand:DF 1 "register_operand" "dG")))]
++  "TARGET_HARD_FLOAT && TARGET_FLOAT_SQRT"
++  {
++    if (REGNO (operands[0]) == REGNO (operands[1]))
++      return "fsqrt\t%0,%1";
++    else
++      return "fsqrt\t%0,%1\n\taddk\t%D0,%D1,r0";
++  }
++  [(set_attr "type"     "fsqrt")
++   (set_attr "mode"      "SF")
++   (set_attr "length"    "4")])
++
+ (define_insn "fix_truncsfsi2"
+   [(set (match_operand:SI 0 "register_operand" "=d")
+         (fix:SI (match_operand:SF 1 "register_operand" "d")))]
+-- 
+2.17.1
+

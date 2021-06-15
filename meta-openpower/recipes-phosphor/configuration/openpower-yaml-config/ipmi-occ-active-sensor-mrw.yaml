@@ -1,0 +1,17 @@
+occ_active_sensor:
+    interfaces:
+        org.open_power.OCC.Status:
+            OccActive:
+                Offsets:
+                    0:
+                        assert: 'false'
+                        deassert: 'true'
+                        type: bool
+                    1:
+                        assert: 'true'
+                        deassert: 'false'
+                        type: bool
+    mutability: Mutability::Write|Mutability::Read
+    readingType: assertion
+    sensorNamePattern: nameLeaf
+    serviceInterface: org.freedesktop.DBus.Properties

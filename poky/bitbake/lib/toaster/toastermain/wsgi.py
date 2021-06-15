@@ -1,7 +1,8 @@
-"""
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+"""
 WSGI config for Toaster project.
 
 This module contains the WSGI application used by Django's development server

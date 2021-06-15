@@ -1,0 +1,70 @@
+From 2b2c6e96c3aefc86c880be05d93685a4ce97c9f1 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Tue, 11 Sep 2018 14:58:00 +0530
+Subject: [PATCH 34/54] Fixed issues like: 1 Interrupt alignment issue 2 Sign
+ extension issue
+
+---
+ gcc/config/microblaze/microblaze.c  | 16 ++++++++++------
+ gcc/config/microblaze/microblaze.md |  2 +-
+ 2 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 046bfd05558..498c8ca191f 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -2177,9 +2177,14 @@ compute_frame_size (HOST_WIDE_INT size)
+ 
+   total_size += gp_reg_size;
+ 
+-  /* Add 4 bytes for MSR.  */
++  /* Add 4/8 bytes for MSR.  */
+   if (microblaze_is_interrupt_variant ())
+-    total_size += 4;
++    {
++      if (TARGET_MB_64)
++        total_size += 8;
++      else
++        total_size += 4;
++    }
+ 
+   /* No space to be allocated for link register in leaf functions with no other
+      stack requirements.  */
+@@ -2464,7 +2469,6 @@ print_operand (FILE * file, rtx op, int letter)
+   else if (letter == 'h' || letter == 'j')
+     {
+       long val[2];
+-      int val1[2];
+       long l[2];
+       if (code == CONST_DOUBLE)
+ 	{
+@@ -2479,10 +2483,10 @@ print_operand (FILE * file, rtx op, int letter)
+ 	}
+       else if (code == CONST_INT || code == CONST)// || code == SYMBOL_REF ||code == LABEL_REF)
+         {
+-	  val1[0] = (INTVAL (op) & 0xffffffff00000000LL) >> 32;
+-	  val1[1] = INTVAL (op) & 0x00000000ffffffffLL;
++	  val[0] = (INTVAL (op) & 0xffffffff00000000LL) >> 32;
++	  val[1] = INTVAL (op) & 0x00000000ffffffffLL;
+         }
+-      fprintf (file, "0x%8.8lx", (letter == 'h') ? val1[0] : val1[1]);
++      fprintf (file, "0x%8.8lx", (letter == 'h') ? val[0] : val[1]);
+     }
+   else if (code == CONST_DOUBLE)
+     {
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 592757baf2f..e7c7cf3e8b5 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -1096,7 +1096,7 @@
+       case 1:
+       case 2:
+         {
+-          output_asm_insn ("ll%i1\t%0,%1", operands);
++          output_asm_insn ("lw%i1\t%0,%1", operands);
+           return "sextl32\t%0,%0";
+         }
+     } 
+-- 
+2.17.1
+

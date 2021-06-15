@@ -1,0 +1,27 @@
+From c2d730cf79eb3e4bea41f5ed8a8a21092ced8b03 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hanno=20B=C3=B6ck?= <hanno@gentoo.org>
+Date: Sun, 2 Feb 2020 14:18:39 +0100
+Subject: [PATCH] i810: Avoid duplicate definition of I810PatternROP
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/xorg/driver/xf86-video-intel/-/commit/652d93cbbdc159c0883f1b626ea48e28bac63ae3]
+Signed-off-by: Chris Wilson <chris@chris-wilson.co.uk>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/legacy/i810/i810.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/legacy/i810/i810.h b/src/legacy/i810/i810.h
+index 347188c9..19be049c 100644
+--- a/src/legacy/i810/i810.h
++++ b/src/legacy/i810/i810.h
+@@ -322,6 +322,6 @@ extern void I810InitMC(ScreenPtr pScreen);
+ extern const OptionInfoRec *I810AvailableOptions(int chipid, int busid);
+ 
+ extern const int I810CopyROP[16];
+-const int I810PatternROP[16];
++extern const int I810PatternROP[16];
+ 
+ #endif /* _I810_H_ */
+-- 
+2.28.0
+

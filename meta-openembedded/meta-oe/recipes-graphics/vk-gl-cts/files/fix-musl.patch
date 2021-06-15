@@ -1,0 +1,20 @@
+--- a/framework/delibs/dethread/CMakeLists.txt
++++ b/framework/delibs/dethread/CMakeLists.txt
+@@ -42,6 +42,7 @@ if (DE_OS_IS_UNIX)
+ 		add_definitions(-D__BSD_VISIBLE)
+ 		add_definitions(-D_XOPEN_SOURCE=600)
+ 	endif ()
++	add_definitions(-D_XOPEN_SOURCE=600)
+ 	add_definitions(-D_GNU_SOURCE)
+ 
+ 	set(DETHREAD_LIBS ${DETHREAD_LIBS} pthread)
+--- a/framework/qphelper/CMakeLists.txt
++++ b/framework/qphelper/CMakeLists.txt
+@@ -28,6 +28,7 @@ set(QPHELPER_LIBS
+ if (DE_OS_IS_UNIX OR DE_OS_IS_QNX)
+ 	# For vsnprintf()
+ 	add_definitions(-D_XOPEN_SOURCE=600)
++	set(QPHELPER_LIBS ${QPHELPER_LIBS} execinfo)
+ endif ()
+ 
+ if (DE_OS_IS_WIN32 AND DE_COMPILER_IS_MSC)

@@ -12,4 +12,4 @@ SRC_URI[sha256sum] = "f4b59eef4a94b1d29dbe0c106dd00cdc630e47f18619fc754e5afbf572
 
 FILES_${PN} = "${libdir}/pidgin/*"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check

@@ -1,0 +1,890 @@
+groups:
+    - name: zone0_control_mode
+      description: Thermal control mode for zone 0
+      service: xyz.openbmc_project.Control.Thermal
+      type: /xyz/openbmc_project/control/thermal
+      members:
+          - /0
+    - name: air_cooled_zone0_fans
+      description: Group of fan inventory objects for air cooled zone 0
+      type: /xyz/openbmc_project/inventory
+      members:
+          - /system/chassis/motherboard/fan0
+          - /system/chassis/motherboard/fan1
+          - /system/chassis/motherboard/fan2
+          - /system/chassis/motherboard/fan3
+          - /system/chassis/motherboard/fan4
+          - /system/chassis/motherboard/fan5
+    - name: zone0_ambient
+      description: Group of ambient temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/ambient_temp
+    - name: occ0_object
+      description: Dbus object containing OCC0 properties
+      type: /org/open_power/control
+      members:
+          - /occ0
+    - name: occ1_object
+      description: Dbus object containing OCC1 properties
+      type: /org/open_power/control
+      members:
+          - /occ1
+    - name: zone0_cores
+      description: Group of core temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/p0_core0_temp
+          - /temperature/p0_core1_temp
+          - /temperature/p0_core2_temp
+          - /temperature/p0_core3_temp
+          - /temperature/p0_core4_temp
+          - /temperature/p0_core5_temp
+          - /temperature/p0_core6_temp
+          - /temperature/p0_core7_temp
+          - /temperature/p0_core8_temp
+          - /temperature/p0_core9_temp
+          - /temperature/p0_core10_temp
+          - /temperature/p0_core11_temp
+          - /temperature/p0_core12_temp
+          - /temperature/p0_core13_temp
+          - /temperature/p0_core14_temp
+          - /temperature/p0_core15_temp
+          - /temperature/p0_core16_temp
+          - /temperature/p0_core17_temp
+          - /temperature/p0_core18_temp
+          - /temperature/p0_core19_temp
+          - /temperature/p0_core20_temp
+          - /temperature/p0_core21_temp
+          - /temperature/p0_core22_temp
+          - /temperature/p0_core23_temp
+          - /temperature/p1_core0_temp
+          - /temperature/p1_core1_temp
+          - /temperature/p1_core2_temp
+          - /temperature/p1_core3_temp
+          - /temperature/p1_core4_temp
+          - /temperature/p1_core5_temp
+          - /temperature/p1_core6_temp
+          - /temperature/p1_core7_temp
+          - /temperature/p1_core8_temp
+          - /temperature/p1_core9_temp
+          - /temperature/p1_core10_temp
+          - /temperature/p1_core11_temp
+          - /temperature/p1_core12_temp
+          - /temperature/p1_core13_temp
+          - /temperature/p1_core14_temp
+          - /temperature/p1_core15_temp
+          - /temperature/p1_core16_temp
+          - /temperature/p1_core17_temp
+          - /temperature/p1_core18_temp
+          - /temperature/p1_core19_temp
+          - /temperature/p1_core20_temp
+          - /temperature/p1_core21_temp
+          - /temperature/p1_core22_temp
+          - /temperature/p1_core23_temp
+    - name: zone0_dimms
+      description: Group of dimm temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/dimm0_temp
+          - /temperature/dimm1_temp
+          - /temperature/dimm2_temp
+          - /temperature/dimm3_temp
+          - /temperature/dimm4_temp
+          - /temperature/dimm5_temp
+          - /temperature/dimm6_temp
+          - /temperature/dimm7_temp
+          - /temperature/dimm8_temp
+          - /temperature/dimm9_temp
+          - /temperature/dimm10_temp
+          - /temperature/dimm11_temp
+          - /temperature/dimm12_temp
+          - /temperature/dimm13_temp
+          - /temperature/dimm14_temp
+          - /temperature/dimm15_temp
+          - /temperature/dimm16_temp
+          - /temperature/dimm17_temp
+          - /temperature/dimm18_temp
+          - /temperature/dimm19_temp
+          - /temperature/dimm20_temp
+          - /temperature/dimm21_temp
+          - /temperature/dimm22_temp
+          - /temperature/dimm23_temp
+          - /temperature/dimm24_temp
+          - /temperature/dimm25_temp
+          - /temperature/dimm26_temp
+          - /temperature/dimm27_temp
+          - /temperature/dimm28_temp
+          - /temperature/dimm29_temp
+          - /temperature/dimm30_temp
+          - /temperature/dimm31_temp
+    - name: zone0_onboard
+      description: Group of onboard temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/p0_pcie_temp
+          - /temperature/p1_pcie_temp
+    - name: zone0_vrd
+      description: Group of vrd temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/p0_vcs_temp
+          - /temperature/p0_vdn_temp
+          - /temperature/p1_vcs_temp
+          - /temperature/p1_vdn_temp
+          - /temperature/p0_vdd_temp
+          - /temperature/p1_vdd_temp
+    - name: zone0_gpu
+      description: Group of gpu temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/gpu0
+          - /temperature/gpu1
+          - /temperature/gpu2
+          - /temperature/gpu3
+          - /temperature/gpu4
+          - /temperature/gpu5
+          - /temperature/gpu6
+          - /temperature/gpu7
+    - name: zone0_nvme
+      description: Group of nvme temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/nvme0
+          - /temperature/nvme1
+          - /temperature/nvme2
+          - /temperature/nvme3
+          - /temperature/nvme4
+          - /temperature/nvme5
+          - /temperature/nvme6
+          - /temperature/nvme7
+          - /temperature/nvme8
+          - /temperature/nvme9
+          - /temperature/nvme10
+          - /temperature/nvme11
+          - /temperature/nvme12
+          - /temperature/nvme13
+          - /temperature/nvme14
+          - /temperature/nvme15
+          - /temperature/nvme16
+          - /temperature/nvme17
+          - /temperature/nvme18
+          - /temperature/nvme19
+          - /temperature/nvme20
+          - /temperature/nvme21
+          - /temperature/nvme22
+          - /temperature/nvme23
+    - name: zone0_250soc
+      description: Group of nvme temperature sensors for zone 0
+      type: /xyz/openbmc_project/sensors
+      members:
+          - /temperature/250_soc0
+          - /temperature/250_soc1
+          - /temperature/250_soc2
+          - /temperature/250_soc3
+          - /temperature/250_soc4
+          - /temperature/250_soc5
+          - /temperature/250_soc6
+          - /temperature/250_soc7
+matches:
+    - name: propertiesChanged
+      parameters:
+          - object
+          - interface
+    - name: interfacesAdded
+      parameters:
+          - object
+    - name: interfacesRemoved
+      parameters:
+          - object
+    - name: nameOwnerChanged
+      parameters:
+          - object
+          - interface
+
+signals:
+    - name: propertiesChanged
+      description: >
+          A property changed match
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+      match: propertiesChanged
+    - name: interfacesAdded
+      description: >
+          An interfaces added match
+      parameters:
+          - type
+          - object
+          - interface
+          - property
+      match: interfacesAdded
+    - name: interfacesRemoved
+      description: >
+          An interfaces removed match
+      parameters:
+          - object
+          - interface
+      match: interfacesRemoved
+    - name: nameOwnerChanged
+      description: >
+          A name owner changed match
+      parameters:
+      match: nameOwnerChanged
+
+methods:
+    - name: getProperties
+      description: >
+          Get the property values of the given group members
+          by performing a `GetProperty` method call on each
+      parameters:
+          - type
+    - name: nameHasOwner
+      description: >
+          A NameHasOwner method call to be performed on all event group members
+      parameters:
+
+handlers:
+    - name: setProperty
+      description: >
+          Sets a value for the given object/interface/property
+      parameters:
+          - type
+    - name: setService
+      description: >
+          Sets the service name and ownership status for the given group
+      parameters:
+          - group
+    - name: removeInterface
+      description: >
+          Removes an interface(and all associated properties) on the
+          given object from use within all event actions
+      parameters:
+          - object
+          - interface
+
+preconditions:
+    - name: property_states_match
+      description: >
+          All defined properties must match the values given to
+          enable a set speed event otherwise fan speeds are set to full
+      parameters:
+          - groups
+    - name: services_missing_owner
+      description: >
+          Any services missing an owner enable the events given otherwise
+          the events are removed/disabled
+      parameters:
+
+actions:
+    - name: call_actions_based_on_timer
+      description: >
+          Sets up a list of actions to be invoked when the defined timer
+          expires (or for each expiration of a repeating timer)
+      parameters:
+          - timer
+          - actions
+    - name: default_floor_on_missing_owner
+      description: >
+          Set the fan floor to the default floor
+    - name: set_speed_on_missing_owner
+      description: >
+          Set fans to the given speed when any service within the group
+          no longer exists
+      parameters:
+          - speed
+    - name: set_request_speed_base_with_max
+      description: >
+          Set the base request speed of a zone to the max value of a group for
+          calculating a new target speed
+    - name: count_state_before_speed
+      description: Set the speed when a number of properties at a state
+      parameters:
+          - count
+          - property
+          - speed
+    - name: set_floor_from_average_sensor_value
+      description: Set floor speed from first entry with average less than key
+      parameters:
+          - map
+    - name: set_ceiling_from_average_sensor_value
+      description: Set ceiling speed based on key transition values with average
+      parameters:
+          - map
+    - name: set_net_increase_speed
+      description: >
+          Set the speed increase delta based on a factor applied to
+          the delta increase size times the given value and property's
+          value difference
+      parameters:
+          - property
+          - factor
+          - delta
+    - name: set_net_decrease_speed
+      description: >
+          Set the speed decrease delta based on a factor applied to
+          the delta decrease size times the given value and property's
+          value difference
+      parameters:
+          - property
+          - factor
+          - delta
+    - name: use_alternate_events_on_state
+      description: >
+          Replaces a set of default events with an alternate set of events
+          when all the group properties are at a given state
+      parameters:
+          - property
+          - defevents
+          - altevents
+
+events:
+    - name: default_fan_floor_on_service_fail
+      precondition:
+          name: services_missing_owner
+          groups:
+              - name: zone0_ambient
+                interface: xyz.openbmc_project.Sensor.Value
+                property:
+                    name: Value
+                    type: int64_t
+          triggers:
+              - name: init
+                method: nameHasOwner
+                handler: setService
+              - name: signal
+                signal: nameOwnerChanged
+                handler: setService
+          events:
+              - name: default_fan_floor
+                groups:
+                    - name: zone0_ambient
+                      interface: xyz.openbmc_project.Sensor.Value
+                      property:
+                          name: Value
+                          type: int64_t
+                triggers:
+                    - name: timer
+                      interval: 5000000
+                      type: oneshot
+                actions:
+                    - name: default_floor_on_missing_owner
+    - name: high_speed_on_occ_service_fails
+      groups:
+          - name: occ0_object
+            interface: org.open_power.OCC.Status
+            property:
+                name: OccActive
+                type: bool
+          - name: occ1_object
+            interface: org.open_power.OCC.Status
+            property:
+                name: OccActive
+                type: bool
+      triggers:
+          - name: init
+            method: nameHasOwner
+            handler: setService
+          - name: signal
+            signal: nameOwnerChanged
+            handler: setService
+      actions:
+          - name: call_actions_based_on_timer
+            timer:
+                interval: 5000000
+                type: oneshot
+            actions:
+                - name: set_speed_on_missing_owner
+                  speed:
+                      value: 255
+                      type: uint64_t
+    - name: missing_or_fails_before_high_speed_air
+      groups:
+          - name: air_cooled_zone0_fans
+            zone_conditions:
+                - name: air_cooled_chassis
+                  zones:
+                      - 0
+            interface: xyz.openbmc_project.Inventory.Item
+            property:
+                name: Present
+                type: bool
+          - name: air_cooled_zone0_fans
+            zone_conditions:
+                - name: air_cooled_chassis
+                  zones:
+                      - 0
+            interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+            property:
+                name: Functional
+                type: bool
+      triggers:
+          - name: init
+            method: getProperties
+            handler: setProperty
+          - name: signal
+            signal: propertiesChanged
+            handler: setProperty
+      actions:
+          - name: count_state_before_speed
+            count: 1
+            property:
+                value: false
+                type: bool
+            speed:
+                value: 255
+                type: uint64_t
+    - name: set_air_cooled_speed_boundaries_based_on_ambient
+      groups:
+          - name: zone0_control_mode
+            zone_conditions:
+                - name: air_cooled_chassis
+                  zones:
+                      - 0
+            interface: xyz.openbmc_project.Control.ThermalMode
+            property:
+                name: Current
+                type: std::string
+      triggers:
+          - name: init
+            method: getProperties
+            handler: setProperty
+          - name: signal
+            signal: propertiesChanged
+            handler: setProperty
+      actions:
+          - name: use_alternate_events_on_state
+            property:
+                value: CUSTOM
+                type: std::string
+            defevents:
+                - name: default_floor_boundary
+                  groups:
+                      - name: zone0_ambient
+                        zone_conditions:
+                            - name: air_cooled_chassis
+                              zones:
+                                  - 0
+                        interface: xyz.openbmc_project.Sensor.Value
+                        property:
+                            name: Value
+                            type: int64_t
+                  triggers:
+                      - name: init
+                        method: getProperties
+                        handler: setProperty
+                      - name: signal
+                        signal: propertiesChanged
+                        handler: setProperty
+                  actions:
+                      - name: set_floor_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 85
+                                - 26000: 85
+                                - 28000: 97
+                                - 31000: 116
+                                - 33000: 128
+                                - 36000: 148
+                                - 38000: 160
+                                - 41000: 255
+                            type: std::map<int64_t, uint64_t>
+                      - name: set_ceiling_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 255
+                                - 27000: 255
+                            type: std::map<int64_t, uint64_t>
+            altevents:
+                - name: alternate_floor_boundary
+                  groups:
+                      - name: zone0_ambient
+                        zone_conditions:
+                            - name: air_cooled_chassis
+                              zones:
+                                  - 0
+                        interface: xyz.openbmc_project.Sensor.Value
+                        property:
+                            name: Value
+                            type: int64_t
+                  triggers:
+                      - name: init
+                        method: getProperties
+                        handler: setProperty
+                      - name: signal
+                        signal: propertiesChanged
+                        handler: setProperty
+                  actions:
+                      - name: set_floor_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 255
+                                - 26000: 255
+                                - 28000: 255
+                                - 31000: 255
+                                - 33000: 255
+                                - 36000: 255
+                                - 38000: 255
+                                - 41000: 255
+                            type: std::map<int64_t, uint64_t>
+                      - name: set_ceiling_from_average_sensor_value
+                        map:
+                            value:
+                                - 25000: 255
+                                - 27000: 255
+                            type: std::map<int64_t, uint64_t>
+    - name: occ_active_speed_changes
+      precondition:
+          name: property_states_match
+          groups:
+              - name: occ0_object
+                interface: org.open_power.OCC.Status
+                property:
+                    name: OccActive
+                    type: bool
+                    value: true
+              - name: occ1_object
+                interface: org.open_power.OCC.Status
+                property:
+                    name: OccActive
+                    type: bool
+                    value: true
+          triggers:
+              - name: init
+                method: getProperties
+                handler: setProperty
+              - name: signal
+                signal: interfacesAdded
+                handler: setProperty
+              - name: signal
+                signal: propertiesChanged
+                handler: setProperty
+          events:
+            - name: speed_control_sensors
+              groups:
+                  - name: zone0_onboard
+                    interface: xyz.openbmc_project.Sensor.Value
+                    property:
+                        name: Value
+                        type: int64_t
+                  - name: zone0_vrd
+                    interface: xyz.openbmc_project.Sensor.Value
+                    property:
+                        name: Value
+                        type: int64_t
+                  - name: zone0_cores
+                    interface: xyz.openbmc_project.Sensor.Value
+                    property:
+                        name: Value
+                        type: int64_t
+                  - name: zone0_dimms
+                    interface: xyz.openbmc_project.Sensor.Value
+                    property:
+                        name: Value
+                        type: int64_t
+                  - name: zone0_gpu
+                    interface: xyz.openbmc_project.Sensor.Value
+                    property:
+                        name: Value
+                        type: int64_t
+                  - name: zone0_nvme
+                    interface: xyz.openbmc_project.Sensor.Value
+                    property:
+                        name: Value
+                        type: int64_t
+                  - name: zone0_250soc
+                    interface: xyz.openbmc_project.Sensor.Value
+                    property:
+                        name: Value
+                        type: int64_t
+              triggers:
+                  - name: init
+                    method: getProperties
+                    handler: setProperty
+                  - name: signal
+                    signal: interfacesAdded
+                    handler: setProperty
+                  - name: signal
+                    signal: propertiesChanged
+                    handler: setProperty
+                  - name: signal
+                    signal: interfacesRemoved
+                    handler: removeInterface
+            - name: fails_before_high_speed_air
+              groups:
+                  - name: zone0_cores
+                    interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+                    property:
+                        name: Functional
+                        type: bool
+                  - name: zone0_dimms
+                    interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+                    property:
+                        name: Functional
+                        type: bool
+              triggers:
+                  - name: init
+                    method: getProperties
+                    handler: setProperty
+                  - name: signal
+                    signal: interfacesAdded
+                    handler: setProperty
+                  - name: signal
+                    signal: propertiesChanged
+                    handler: setProperty
+              actions:
+                  - name: count_state_before_speed
+                    count: 1
+                    property:
+                        value: false
+                        type: bool
+                    speed:
+                        value: 255
+                        type: uint64_t
+            - name: 1sec_speed_change_request_sampling
+              triggers:
+                  - name: timer
+                    interval: 1000000
+                    type: repeating
+              actions:
+                  # Speed changes based on onboard temps
+                  - name: set_net_increase_speed
+                    groups:
+                        - name: zone0_onboard
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 55000
+                        type: int64_t
+                    factor:
+                        value: 1000
+                        type: int64_t
+                    delta:
+                        value: 8
+                        type: uint64_t
+                  - name: set_net_decrease_speed
+                    groups:
+                        - name: zone0_onboard
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 52000
+                        type: int64_t
+                    factor:
+                        value: 1000
+                        type: int64_t
+                    delta:
+                        value: 3
+                        type: uint64_t
+                  # Speed changes based on vrd temps
+                  - name: set_net_increase_speed
+                    groups:
+                        - name: zone0_vrd
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 90000
+                        type: int64_t
+                    factor:
+                        value: 1000
+                        type: int64_t
+                    delta:
+                        value: 5
+                        type: uint64_t
+                  - name: set_net_decrease_speed
+                    groups:
+                        - name: zone0_vrd
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 85000
+                        type: int64_t
+                    factor:
+                        value: 3000
+                        type: int64_t
+                    delta:
+                        value: 3
+                        type: uint64_t
+                  # Speed changes based on core temps
+                  - name: set_net_increase_speed
+                    groups:
+                        - name: zone0_cores
+                          zone_conditions:
+                              - name: air_cooled_chassis
+                                zones:
+                                    - 0
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 75000
+                        type: int64_t
+                    factor:
+                        value: 1000
+                        type: int64_t
+                    delta:
+                        value: 13
+                        type: uint64_t
+                  - name: set_net_decrease_speed
+                    groups:
+                        - name: zone0_cores
+                          zone_conditions:
+                              - name: air_cooled_chassis
+                                zones:
+                                    - 0
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 70000
+                        type: int64_t
+                    factor:
+                        value: 4000
+                        type: int64_t
+                    delta:
+                        value: 5
+                        type: uint64_t
+                  # Speed changes based on dimm temps
+                  - name: set_net_increase_speed
+                    groups:
+                        - name: zone0_dimms
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 80000
+                        type: int64_t
+                    factor:
+                        value: 1000
+                        type: int64_t
+                    delta:
+                        value: 8
+                        type: uint64_t
+                  - name: set_net_decrease_speed
+                    groups:
+                        - name: zone0_dimms
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 75000
+                        type: int64_t
+                    factor:
+                        value: 3000
+                        type: int64_t
+                    delta:
+                        value: 3
+                        type: uint64_t
+                  # Speed changes based on gpu temps
+                  - name: set_net_increase_speed
+                    groups:
+                        - name: zone0_gpu
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 80
+                        type: int64_t
+                    factor:
+                        value: 1
+                        type: int64_t
+                    delta:
+                        value: 13
+                        type: uint64_t
+                  - name: set_net_decrease_speed
+                    groups:
+                        - name: zone0_gpu
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 77
+                        type: int64_t
+                    factor:
+                        value: 4
+                        type: int64_t
+                    delta:
+                        value: 5
+                        type: uint64_t
+                  # Speed changes based on nvme temps
+                  - name: set_net_increase_speed
+                    groups:
+                        - name: zone0_nvme
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 55
+                        type: int64_t
+                    factor:
+                        value: 1
+                        type: int64_t
+                    delta:
+                        value: 13
+                        type: uint64_t
+                  - name: set_net_decrease_speed
+                    groups:
+                        - name: zone0_nvme
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 52
+                        type: int64_t
+                    factor:
+                        value: 3
+                        type: int64_t
+                    delta:
+                        value: 5
+                        type: uint64_t
+                  # Speed changes based on 250soc temps
+                  - name: set_net_increase_speed
+                    groups:
+                        - name: zone0_250soc
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 80000
+                        type: int64_t
+                    factor:
+                        value: 1000
+                        type: int64_t
+                    delta:
+                        value: 13
+                        type: uint64_t
+                  - name: set_net_decrease_speed
+                    groups:
+                        - name: zone0_250soc
+                          interface: xyz.openbmc_project.Sensor.Value
+                          property:
+                              name: Value
+                              type: int64_t
+                    property:
+                        value: 77000
+                        type: int64_t
+                    factor:
+                        value: 3000
+                        type: int64_t
+                    delta:
+                        value: 5
+                        type: uint64_t

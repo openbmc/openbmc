@@ -1,0 +1,108 @@
+From 642b5823abeee27a0fdc2d12d0e1235461ace9ed Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 5 Sep 2019 18:57:39 +0800
+Subject: [PATCH] drbd-utils: support usrmerge
+
+Upstream-Status: Inappropriate[oe-specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ configure.ac         |  2 +-
+ scripts/Makefile.in  |  4 ++--
+ user/v83/Makefile.in | 14 +++++++-------
+ user/v84/Makefile.in | 14 +++++++-------
+ 4 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4df1b4d..c4ef1bc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -176,7 +176,7 @@ AC_ARG_WITH(tmpfilesdir,
+ AC_SUBST(tmpfilesdir)
+ 
+ # set default early
+-default_udevdir=/lib/udev
++default_udevdir=${prefix}/lib/udev
+ if test x"$with_udev" = x || \
+    test x"$with_udev" = xyes ; then
+ 	if test x"$PKG_CONFIG" != x; then
+diff --git a/scripts/Makefile.in b/scripts/Makefile.in
+index fbb0beb..da701a1 100644
+--- a/scripts/Makefile.in
++++ b/scripts/Makefile.in
+@@ -75,8 +75,8 @@ endif
+ ifeq ($(subst both,systemd,$(initscripttype)),systemd)
+ 	install -d $(DESTDIR)$(systemdunitdir)
+ 	install -m 644 drbd.service $(DESTDIR)$(systemdunitdir)/
+-	install -d $(DESTDIR)/lib/drbd/
+-	install -m 755 drbd $(DESTDIR)/lib/drbd/
++	install -d $(DESTDIR)/${nonarch_libdir}/drbd
++	install -m 755 drbd $(DESTDIR)/${nonarch_libdir}/drbd
+ 	install -d $(DESTDIR)$(tmpfilesdir)/
+ 	install -m 444 drbd.tmpfiles.conf $(DESTDIR)$(tmpfilesdir)/drbd.conf
+ endif
+diff --git a/user/v83/Makefile.in b/user/v83/Makefile.in
+index 27516de..b301376 100644
+--- a/user/v83/Makefile.in
++++ b/user/v83/Makefile.in
+@@ -96,19 +96,19 @@ install:
+ ifeq ($(WITH_83_SUPPORT),yes)
+ 	install -d $(DESTDIR)$(localstatedir)/lib/drbd
+ 	install -d $(DESTDIR)$(localstatedir)/lock
+-	install -d $(DESTDIR)/lib/drbd/
++	install -d $(DESTDIR)/${nonarch_libdir}/drbd/
+ 	if getent group haclient > /dev/null 2> /dev/null ; then		\
+-		install -g haclient -m 4750 drbdsetup-83 $(DESTDIR)/lib/drbd/ ;	\
+-		install -m 755 drbdadm-83 $(DESTDIR)/lib/drbd/ ;		\
++		install -g haclient -m 4750 drbdsetup-83 $(DESTDIR)/${nonarch_libdir}/drbd/ ;	\
++		install -m 755 drbdadm-83 $(DESTDIR)/${nonarch_libdir}/drbd/ ;		\
+ 	else									\
+-		install -m 755 drbdsetup-83 $(DESTDIR)/lib/drbd/ ;		\
+-		install -m 755 drbdadm-83 $(DESTDIR)/lib/drbd/ ; 		\
++		install -m 755 drbdsetup-83 $(DESTDIR)/${nonarch_libdir}/drbd/ ;		\
++		install -m 755 drbdadm-83 $(DESTDIR)/${nonarch_libdir}/drbd/ ; 		\
+ 	fi
+ endif
+ 
+ uninstall:
+-	rm -f $(DESTDIR)/lib/drbd/drbdsetup-83
+-	rm -f $(DESTDIR)/lib/drbd/drbdadm-83
++	rm -f $(DESTDIR)/${nonarch_libdir}/drbd/drbdsetup-83
++	rm -f $(DESTDIR)/${nonarch_libdir}/drbd/drbdadm-83
+ 
+ .PHONY: install uninstall clean distclean
+ ../../configure:
+diff --git a/user/v84/Makefile.in b/user/v84/Makefile.in
+index 38977c6..05ef060 100644
+--- a/user/v84/Makefile.in
++++ b/user/v84/Makefile.in
+@@ -109,19 +109,19 @@ ifeq ($(WITH_84_SUPPORT),yes)
+ 	install -d $(DESTDIR)$(localstatedir)/lib/drbd
+ 	install -d $(DESTDIR)$(localstatedir)/run/drbd
+ 	install -d $(DESTDIR)$(localstatedir)/lock
+-	install -d $(DESTDIR)/lib/drbd/
++	install -d $(DESTDIR)/${nonarch_libdir}/drbd/
+ 	if getent group haclient > /dev/null 2> /dev/null ; then	\
+-		install -g haclient -m 4750 drbdsetup-84 $(DESTDIR)/lib/drbd/ ;	\
+-		install -m 755 drbdadm-84 $(DESTDIR)/lib/drbd/ ;		\
++		install -g haclient -m 4750 drbdsetup-84 $(DESTDIR)/${nonarch_libdir}/drbd/ ;	\
++		install -m 755 drbdadm-84 $(DESTDIR)/${nonarch_libdir}/drbd/ ;		\
+ 	else								\
+-		install -m 755 drbdsetup-84 $(DESTDIR)/lib/drbd/ ;		\
+-		install -m 755 drbdadm-84 $(DESTDIR)/lib/drbd/ ; 		\
++		install -m 755 drbdsetup-84 $(DESTDIR)/${nonarch_libdir}/drbd/ ;		\
++		install -m 755 drbdadm-84 $(DESTDIR)/${nonarch_libdir}/drbd/ ; 		\
+ 	fi
+ endif
+ 
+ uninstall:
+-	rm -f $(DESTDIR)/lib/drbd/drbdsetup-84
+-	rm -f $(DESTDIR)/lib/drbd/drbdadm-84
++	rm -f $(DESTDIR)/${nonarch_libdir}/drbd/drbdsetup-84
++	rm -f $(DESTDIR)/${nonarch_libdir}/drbd/drbdadm-84
+ 
+ spell:
+ 	for f in drbdadm_adjust.c drbdadm_main.c drbdadm_parser.c drbdadm_usage_cnt.c drbdsetup.c drbdtool_common.c; do \
+-- 
+2.7.4
+

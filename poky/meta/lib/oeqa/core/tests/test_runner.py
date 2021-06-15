@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import unittest
 import logging

@@ -15,11 +15,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/ruli_addr.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/ruli_addr.c b/src/ruli_addr.c
-index 00d5d0d..f1eabae 100644
 --- a/src/ruli_addr.c
 +++ b/src/ruli_addr.c
-@@ -415,7 +415,7 @@ int ruli_in_print(FILE *out, const _ruli_addr *addr, int family)
+@@ -415,7 +415,7 @@ int ruli_in_print(FILE *out, const _ruli
  {
    switch (family) {
    case PF_INET:
@@ -28,6 +26,25 @@ index 00d5d0d..f1eabae 100644
  
    case PF_INET6:
      return ruli_inet6_print(out, &addr->ipv6);
--- 
-2.13.1
-
+--- a/sample/getaddrinfo.c
++++ b/sample/getaddrinfo.c
+@@ -174,7 +174,7 @@ static void solve(const char *fullname)
+ 
+       for (ai = ai_res; ai; ai = ai->ai_next) {
+ 
+-	printf(fullname);
++	printf("%s", fullname);
+ 
+ 	switch (ai->ai_family) {
+ 	case PF_INET:
+--- a/sample/ruli-getaddrinfo.c
++++ b/sample/ruli-getaddrinfo.c
+@@ -176,7 +176,7 @@ static void solve(const char *fullname)
+ 
+       for (ai = ai_res; ai; ai = ai->ai_next) {
+ 
+-	printf(fullname);
++	printf("%s", fullname);
+ 
+ 	switch (ai->ai_family) {
+ 	case PF_INET:

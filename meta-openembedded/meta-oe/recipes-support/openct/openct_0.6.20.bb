@@ -11,7 +11,7 @@ readers to remote machines via TCP/IP."
 DEPENDS += "libtool pcsc-lite libusb-compat"
 
 SRC_URI = " \
-    ${DEBIAN_MIRROR}/main/o/${BPN}/${BPN}_${PV}.orig.tar.gz \
+    https://downloads.sourceforge.net/project/opensc/${BPN}/${BPN}-${PV}.tar.gz \
     file://etc-openct.udev.in-disablePROGRAM.patch \
     file://etc-openct_usb.in-modify-UDEVINFO.patch \
     file://openct.init \
@@ -35,7 +35,7 @@ EXTRA_OECONF=" \
     --enable-pcsc \
     --enable-doc \
     --enable-api-doc \
-    --with-udev=${nonarch_base_libdir}/udev \
+    --with-udev=${nonarch_libdir}/udev \
     --with-bundle=${libdir}/pcsc/drivers \
 "
 
@@ -43,10 +43,9 @@ inherit autotools pkgconfig
 
 FILES_${PN} += " \
     ${libdir}/ctapi \
-    ${nonarch_base_libdir}/udev \
+    ${nonarch_libdir}/udev \
     ${libdir}/openct-ifd.so \
     ${libdir}/pcsc \
-    /run/openct/status \
 "
 
 FILES_${PN}-dbg += " \
@@ -56,14 +55,10 @@ FILES_${PN}-dbg += " \
 
 INSANE_SKIP_${PN} += "dev-deps"
 
-do_install_append() {
-    rm -r ${D}/${localstatedir}/run
-}
+do_install[cleandirs] += "${D}"
 
 do_install () {
-    rm -rf ${D}
-    install -d ${D}/etc
-    install -dm 755 ${D}${nonarch_base_libdir}/udev
+    install -d ${D}${sysconfdir}
     # fix up hardcoded paths
     sed -i -e 's,/etc/,${sysconfdir}/,' -e 's,/usr/sbin/,${sbindir}/,' \
         ${WORKDIR}/openct.service ${WORKDIR}/openct.init
@@ -71,20 +66,18 @@ do_install () {
     oe_runmake install DESTDIR=${D}
     install -dm 755 ${D}${libdir}/ctapi/
     mv ${D}${libdir}/libopenctapi.so ${D}${libdir}/ctapi/
-    install -Dpm 644 etc/openct.udev ${D}/etc/udev/rules.d/60-openct.rules
-    install -pm 644 etc/openct.conf ${D}/etc/openct.conf
+    install -Dpm 644 etc/openct.udev ${D}${nonarch_libdir}/udev/rules.d/60-openct.rules
+    install -pm 644 etc/openct.conf ${D}${sysconfdir}/openct.conf
 
-    install -Dpm 755 ${WORKDIR}/openct.init ${D}/etc/init.d/openct
-    install -Dpm 644 ${WORKDIR}/openct.sysconfig ${D}/etc/sysconfig/openct
+    install -Dpm 755 ${WORKDIR}/openct.init ${D}${sysconfdir}/init.d/openct
+    install -Dpm 644 ${WORKDIR}/openct.sysconfig ${D}${sysconfdir}/sysconfig/openct
 
-    install -d ${D}/${systemd_unitdir}/system
-    install -m 644 ${WORKDIR}/openct.service ${D}/${systemd_unitdir}/system
+    install -d ${D}${systemd_unitdir}/system
+    install -m 644 ${WORKDIR}/openct.service ${D}${systemd_unitdir}/system
 
     so=$(find ${D} -name \*.so | sed "s|^${D}||")
     sed -i -e 's|\\(LIBPATH\\s*\\).*|\\1$so|' etc/reader.conf
-    install -Dpm 644 etc/reader.conf ${D}/etc/reader.conf.d/openct.conf
-
-    install -dm 755 ${D}${localstatedir}/run/openct
-    touch ${D}${localstatedir}/run/openct/status
-    chmod 644 ${D}${localstatedir}/run/openct/status
+    install -Dpm 644 etc/reader.conf ${D}${sysconfdir}/reader.conf.d/openct.conf
 }
+
+BBCLASSEXTEND = "native"

@@ -1,0 +1,41 @@
+From 75bea7c72a919859674f493548653de88f96c798 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 22 Apr 2019 10:36:13 +0800
+Subject: [PATCH] test-getopt-posix fix
+
+fix below problem:
+test-getopt.h:754: assertion 'strcmp (argv[1], "donald") == 0' failed
+
+get this patch from  
+https://github.com/habitat-sh/core-plans/blob/master/m4/fix-test-getopt-posix-with-glibc-2.26.patch
+
+Upstream-Status: Pending
+
+have report this bug to m4-discuss@gnu.org
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ tests/test-getopt-posix.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/tests/test-getopt-posix.c b/tests/test-getopt-posix.c
+index 5532271..2a3d511 100644
+--- a/tests/test-getopt-posix.c
++++ b/tests/test-getopt-posix.c
+@@ -22,6 +22,13 @@
+    ftell link warning if we are not using the gnulib ftell module.  */
+ #define _GL_NO_LARGE_FILES
+ 
++/*
++ * Glibc 2.26 does hard include bits/getopt_posix.h which causes the system
++ * to use glibc's getopt but the tests expect gnulib behavior. Until a better
++ * fix is available this avoids that mis-resolution.
++ */
++#include <getopt.h>
++
+ /* POSIX and glibc provide the getopt() function in <unistd.h>, see
+    http://pubs.opengroup.org/onlinepubs/9699919799/functions/getopt.html
+    https://www.gnu.org/software/libc/manual/html_node/Using-Getopt.html
+-- 
+2.7.4
+

@@ -128,6 +128,7 @@ def devpyshell(d):
                     more = i.runsource(source, "<pyshell>")
                     if not more:
                         buf = []
+                    sys.stderr.flush()
                     prompt(more)
             except KeyboardInterrupt:
                 i.write("\nKeyboardInterrupt\n")

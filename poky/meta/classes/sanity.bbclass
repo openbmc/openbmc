@@ -2,7 +2,7 @@
 # Sanity check the users setup for common misconfigurations
 #
 
-SANITY_REQUIRED_UTILITIES ?= "patch diffstat makeinfo git bzip2 tar \
+SANITY_REQUIRED_UTILITIES ?= "patch diffstat git bzip2 tar \
     gzip gawk chrpath wget cpio perl file which"
 
 def bblayers_conf_file(d):
@@ -392,9 +392,12 @@ def check_connectivity(d):
             msg = data.getVar('CONNECTIVITY_CHECK_MSG') or ""
             if len(msg) == 0:
                 msg = "%s.\n" % err
-                msg += "    Please ensure your host's network is configured correctly,\n"
-                msg += "    or set BB_NO_NETWORK = \"1\" to disable network access if\n"
-                msg += "    all required sources are on local disk.\n"
+                msg += "    Please ensure your host's network is configured correctly.\n"
+                msg += "    If your ISP or network is blocking the above URL,\n"
+                msg += "    try with another domain name, for example by setting:\n"
+                msg += "    CONNECTIVITY_CHECK_URIS = \"https://www.yoctoproject.org/\""
+                msg += "    You could also set BB_NO_NETWORK = \"1\" to disable network\n"
+                msg += "    access if all required sources are on local disk.\n"
             retval = msg
 
     return retval
@@ -511,18 +514,43 @@ def check_make_version(sanity_data):
     return None
 
 
-# Check if we're running on WSL (Windows Subsystem for Linux). Its known not to
-# work but we should tell the user that upfront.
+# Check if we're running on WSL (Windows Subsystem for Linux).
+# WSLv1 is known not to work but WSLv2 should work properly as
+# long as the VHDX file is optimized often, let the user know
+# upfront.
+# More information on installing WSLv2 at:
+# https://docs.microsoft.com/en-us/windows/wsl/wsl2-install
 def check_wsl(d):
     with open("/proc/version", "r") as f:
         verdata = f.readlines()
     for l in verdata:
         if "Microsoft" in l:
-            return "OpenEmbedded doesn't work under WSL at this time, sorry"
+            return "OpenEmbedded doesn't work under WSLv1, please upgrade to WSLv2 if you want to run builds on Windows"
+        elif "microsoft" in l:
+            bb.warn("You are running bitbake under WSLv2, this works properly but you should optimize your VHDX file eventually to avoid running out of storage space")
+    return None
+
+# Require at least gcc version 6.0.
+#
+# This can be fixed on CentOS-7 with devtoolset-6+
+# https://www.softwarecollections.org/en/scls/rhscl/devtoolset-6/
+#
+# A less invasive fix is with scripts/install-buildtools (or with user
+# built buildtools-extended-tarball)
+#
+def check_gcc_version(sanity_data):
+    from distutils.version import LooseVersion
+    import subprocess
+    
+    build_cc, version = oe.utils.get_host_compiler_version(sanity_data)
+    if build_cc.strip() == "gcc":
+        if LooseVersion(version) < LooseVersion("6.0"):
+            return "Your version of gcc is older than 6.0 and will break builds. Please install a newer version of gcc (you could use the project's buildtools-extended-tarball or use scripts/install-buildtools).\n"
     return None
 
 # Tar version 1.24 and onwards handle overwriting symlinks correctly
 # but earlier versions do not; this needs to work properly for sstate
+# Version 1.28 is needed so opkg-build works correctly when reproducibile builds are enabled
 def check_tar_version(sanity_data):
     from distutils.version import LooseVersion
     import subprocess
@@ -531,8 +559,8 @@ def check_tar_version(sanity_data):
     except subprocess.CalledProcessError as e:
         return "Unable to execute tar --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[3]
-    if LooseVersion(version) < LooseVersion("1.24"):
-        return "Your version of tar is older than 1.24 and has bugs which will break builds. Please install a newer version of tar.\n"
+    if LooseVersion(version) < LooseVersion("1.28"):
+        return "Your version of tar is older than 1.28 and does not have the support needed to enable reproducible builds. Please install a newer version of tar (you could use the project's buildtools-tarball from our last release or use scripts/install-buildtools).\n"
     return None
 
 # We use git parameters and functionality only found in 1.7.8 or later
@@ -560,7 +588,7 @@ def check_perl_modules(sanity_data):
         try:
             subprocess.check_output(["perl", "-e", "use %s" % m])
         except subprocess.CalledProcessError as e:
-            errresult += e.output
+            errresult += bytes.decode(e.output)
             ret += "%s " % m
     if ret:
         return "Required perl module(s) not found: %s\n\n%s\n" % (ret, errresult)
@@ -573,7 +601,7 @@ def sanity_check_conffiles(d):
         if check_conf_exists(conffile, d) and d.getVar(current_version) is not None and \
                 d.getVar(current_version) != d.getVar(required_version):
             try:
-                bb.build.exec_func(func, d, pythonexception=True)
+                bb.build.exec_func(func, d)
             except NotImplementedError as e:
                 bb.fatal(str(e))
             d.setVar("BB_INVALIDCONF", True)
@@ -594,6 +622,9 @@ def sanity_handle_abichanges(status, d):
                 f.write(current_abi)
         elif int(abi) <= 11 and current_abi == "12":
             status.addresult("The layout of TMPDIR changed for Recipe Specific Sysroots.\nConversion doesn't make sense and this change will rebuild everything so please delete TMPDIR (%s).\n" % d.getVar("TMPDIR"))
+        elif int(abi) <= 13 and current_abi == "14":
+            status.addresult("TMPDIR changed to include path filtering from the pseudo database.\nIt is recommended to use a clean TMPDIR with the new pseudo path filtering so TMPDIR (%s) would need to be removed to continue.\n" % d.getVar("TMPDIR"))
+
         elif (abi != current_abi):
             # Code to convert from one ABI to another could go here if possible.
             status.addresult("Error, TMPDIR has changed its layout version number (%s to %s) and you need to either rebuild, revert or adjust it at your own risk.\n" % (abi, current_abi))
@@ -622,14 +653,16 @@ def check_sanity_version_change(status, d):
     # In other words, these tests run once in a given build directory and then 
     # never again until the sanity version or host distrubution id/version changes.
 
-    # Check the python install is complete. glib-2.0-natives requries
-    # xml.parsers.expat
+    # Check the python install is complete. Examples that are often removed in
+    # minimal installations: glib-2.0-natives requries # xml.parsers.expat and icu
+    # requires distutils.sysconfig.
     try:
         import xml.parsers.expat
-    except ImportError:
-        status.addresult('Your python is not a full install. Please install the module xml.parsers.expat (python-xml on openSUSE and SUSE Linux).\n')
-    import stat
+        import distutils.sysconfig
+    except ImportError as e:
+        status.addresult('Your Python 3 is not a full install. Please install the module %s (see the Getting Started guide for further information).\n' % e.name)
 
+    status.addresult(check_gcc_version(d))
     status.addresult(check_make_version(d))
     status.addresult(check_patch_version(d))
     status.addresult(check_tar_version(d))
@@ -664,6 +697,7 @@ def check_sanity_version_change(status, d):
         status.addresult('Please use ASSUME_PROVIDED +=, not ASSUME_PROVIDED = in your local.conf\n')
 
     # Check that TMPDIR isn't on a filesystem with limited filename length (eg. eCryptFS)
+    import stat
     tmpdir = d.getVar('TMPDIR')
     status.addresult(check_create_long_filename(tmpdir, "TMPDIR"))
     tmpdirmode = os.stat(tmpdir).st_mode
@@ -671,6 +705,23 @@ def check_sanity_version_change(status, d):
         status.addresult("TMPDIR is setgid, please don't build in a setgid directory")
     if (tmpdirmode & stat.S_ISUID):
         status.addresult("TMPDIR is setuid, please don't build in a setuid directory")
+
+    # Check that a user isn't building in a path in PSEUDO_IGNORE_PATHS
+    pseudoignorepaths = d.getVar('PSEUDO_IGNORE_PATHS', expand=True).split(",")
+    workdir = d.getVar('WORKDIR', expand=True)
+    for i in pseudoignorepaths:
+        if i and workdir.startswith(i):
+            status.addresult("You are building in a path included in PSEUDO_IGNORE_PATHS " + str(i) + " please locate the build outside this path.\n")
+
+    # Check if PSEUDO_IGNORE_PATHS and and paths under pseudo control overlap
+    pseudoignorepaths = d.getVar('PSEUDO_IGNORE_PATHS', expand=True).split(",")
+    pseudo_control_dir = "${D},${PKGD},${PKGDEST},${IMAGEROOTFS},${SDK_OUTPUT}"
+    pseudocontroldir = d.expand(pseudo_control_dir).split(",")
+    for i in pseudoignorepaths:
+        for j in pseudocontroldir:
+            if i and j:
+                if j.startswith(i):
+                    status.addresult("A path included in PSEUDO_IGNORE_PATHS " + str(i) + " and the path " + str(j) + " overlap and this will break pseudo permission and ownership tracking. Please set the path " + str(j) + " to a different directory which does not overlap with pseudo controlled directories. \n")
 
     # Some third-party software apparently relies on chmod etc. being suid root (!!)
     import stat
@@ -739,10 +790,10 @@ def check_sanity_everybuild(status, d):
     if 0 == os.getuid():
         raise_sanity_error("Do not use Bitbake as root.", d)
 
-    # Check the Python version, we now have a minimum of Python 3.4
+    # Check the Python version, we now have a minimum of Python 3.6
     import sys
-    if sys.hexversion < 0x03040000:
-        status.addresult('The system requires at least Python 3.4 to run. Please update your Python interpreter.\n')
+    if sys.hexversion < 0x030600F0:
+        status.addresult('The system requires at least Python 3.6 to run. Please update your Python interpreter.\n')
 
     # Check the bitbake version meets minimum requirements
     from distutils.version import LooseVersion
@@ -755,6 +806,17 @@ def check_sanity_everybuild(status, d):
     paths = d.getVar('PATH').split(":")
     if "." in paths or "./" in paths or "" in paths:
         status.addresult("PATH contains '.', './' or '' (empty element), which will break the build, please remove this.\nParsed PATH is " + str(paths) + "\n")
+
+    #Check if bitbake is present in PATH environment variable
+    bb_check = bb.utils.which(d.getVar('PATH'), 'bitbake')
+    if not bb_check:
+        bb.warn("bitbake binary is not found in PATH, did you source the script?")
+
+    # Check whether 'inherit' directive is found (used for a class to inherit)
+    # in conf file it's supposed to be uppercase INHERIT
+    inherit = d.getVar('inherit')
+    if inherit:
+        status.addresult("Please don't use inherit directive in your local.conf. The directive is supposed to be used in classes and recipes only to inherit of bbclasses. Here INHERIT should be used.\n")
 
     # Check that the DISTRO is valid, if set
     # need to take into account DISTRO renaming DISTRO
@@ -798,6 +860,11 @@ def check_sanity_everybuild(status, d):
         elif d.getVar('SDK_ARCH', False) == "${BUILD_ARCH}":
             status.addresult('SDKMACHINE is set, but SDK_ARCH has not been changed as a result - SDKMACHINE may have been set too late (e.g. in the distro configuration)\n')
 
+    # If SDK_VENDOR looks like "-my-sdk" then the triples are badly formed so fail early
+    sdkvendor = d.getVar("SDK_VENDOR")
+    if not (sdkvendor.startswith("-") and sdkvendor.count("-") == 1):
+        status.addresult("SDK_VENDOR should be of the form '-foosdk' with a single dash; found '%s'\n" % sdkvendor)
+
     check_supported_distro(d)
 
     omask = os.umask(0o022)
@@ -818,20 +885,25 @@ def check_sanity_everybuild(status, d):
         except:
             pass
 
-    oeroot = d.getVar('COREBASE')
-    if oeroot.find('+') != -1:
-        status.addresult("Error, you have an invalid character (+) in your COREBASE directory path. Please move the installation to a directory which doesn't include any + characters.")
-    if oeroot.find('@') != -1:
-        status.addresult("Error, you have an invalid character (@) in your COREBASE directory path. Please move the installation to a directory which doesn't include any @ characters.")
-    if oeroot.find(' ') != -1:
-        status.addresult("Error, you have a space in your COREBASE directory path. Please move the installation to a directory which doesn't include a space since autotools doesn't support this.")
+    for checkdir in ['COREBASE', 'TMPDIR']:
+        val = d.getVar(checkdir)
+        if val.find('..') != -1:
+            status.addresult("Error, you have '..' in your %s directory path. Please ensure the variable contains an absolute path as this can break some recipe builds in obtuse ways." % checkdir)
+        if val.find('+') != -1:
+            status.addresult("Error, you have an invalid character (+) in your %s directory path. Please move the installation to a directory which doesn't include any + characters." % checkdir)
+        if val.find('@') != -1:
+            status.addresult("Error, you have an invalid character (@) in your %s directory path. Please move the installation to a directory which doesn't include any @ characters." % checkdir)
+        if val.find(' ') != -1:
+            status.addresult("Error, you have a space in your %s directory path. Please move the installation to a directory which doesn't include a space since autotools doesn't support this." % checkdir)
+        if val.find('%') != -1:
+            status.addresult("Error, you have an invalid character (%) in your %s directory path which causes problems with python string formatting. Please move the installation to a directory which doesn't include any % characters." % checkdir)
 
     # Check the format of MIRRORS, PREMIRRORS and SSTATE_MIRRORS
     import re
     mirror_vars = ['MIRRORS', 'PREMIRRORS', 'SSTATE_MIRRORS']
     protocols = ['http', 'ftp', 'file', 'https', \
                  'git', 'gitsm', 'hg', 'osc', 'p4', 'svn', \
-                 'bzr', 'cvs', 'npm', 'sftp', 'ssh', 's3' ]
+                 'bzr', 'cvs', 'npm', 'sftp', 'ssh', 's3', 'az' ]
     for mirror_var in mirror_vars:
         mirrors = (d.getVar(mirror_var) or '').replace('\\n', ' ').split()
 
@@ -919,7 +991,7 @@ def check_sanity(sanity_data):
     last_tmpdir = ""
     last_sstate_dir = ""
     last_nativelsbstr = ""
-    sanityverfile = sanity_data.expand("${TOPDIR}/conf/sanity_info")
+    sanityverfile = sanity_data.expand("${TOPDIR}/cache/sanity_info")
     if os.path.exists(sanityverfile):
         with open(sanityverfile, 'r') as f:
             for line in f:

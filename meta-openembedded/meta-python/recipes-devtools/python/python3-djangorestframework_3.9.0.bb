@@ -1,2 +1,0 @@
-require python-djangorestframework.inc
-inherit setuptools3

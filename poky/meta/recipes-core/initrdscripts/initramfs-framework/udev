@@ -41,6 +41,9 @@ udev_run() {
 	mkdir -p /run
 	mkdir -p /var/run
 
+	# Workaround if console=null, systemd-udevd needs valid stdin, stdout and stderr to work
+	sh -c "exec 4< /dev/console" || { exec 0> /dev/null; exec 1> /dev/null; exec 2> /dev/null; }
+
 	$_UDEV_DAEMON --daemon
 	udevadm trigger --action=add
 	udevadm settle

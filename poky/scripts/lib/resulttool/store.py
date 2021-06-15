@@ -3,15 +3,9 @@
 # Copyright (c) 2019, Intel Corporation.
 # Copyright (c) 2019, Linux Foundation
 #
-# This program is free software; you can redistribute it and/or modify it
-# under the terms and conditions of the GNU General Public License,
-# version 2, as published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
+
 import tempfile
 import os
 import subprocess
@@ -27,16 +21,21 @@ import oeqa.utils.gitarchive as gitarchive
 def store(args, logger):
     tempdir = tempfile.mkdtemp(prefix='testresults.')
     try:
+        configvars = resultutils.extra_configvars.copy()
+        if args.executed_by:
+            configvars['EXECUTED_BY'] = args.executed_by
+        if args.extra_test_env:
+            configvars['EXTRA_TEST_ENV'] = args.extra_test_env
         results = {}
         logger.info('Reading files from %s' % args.source)
-        if os.path.isfile(args.source):
-            resultutils.append_resultsdata(results, args.source)
+        if resultutils.is_url(args.source) or os.path.isfile(args.source):
+            resultutils.append_resultsdata(results, args.source, configvars=configvars)
         else:
             for root, dirs,  files in os.walk(args.source):
                 for name in files:
                     f = os.path.join(root, name)
                     if name == "testresults.json":
-                        resultutils.append_resultsdata(results, f)
+                        resultutils.append_resultsdata(results, f, configvars=configvars)
                     elif args.all:
                         dst = f.replace(args.source, tempdir + "/")
                         os.makedirs(os.path.dirname(dst), exist_ok=True)
@@ -92,11 +91,14 @@ def register_commands(subparsers):
                                          group='setup')
     parser_build.set_defaults(func=store)
     parser_build.add_argument('source',
-                              help='source file or directory that contain the test result files to be stored')
+                              help='source file/directory/URL that contain the test result files to be stored')
     parser_build.add_argument('git_dir',
                               help='the location of the git repository to store the results in')
     parser_build.add_argument('-a', '--all', action='store_true',
                               help='include all files, not just testresults.json files')
     parser_build.add_argument('-e', '--allow-empty', action='store_true',
                               help='don\'t error if no results to store are found')
-
+    parser_build.add_argument('-x', '--executed-by', default='',
+                              help='add executed-by configuration to each result file')
+    parser_build.add_argument('-t', '--extra-test-env', default='',
+                              help='add extra test environment data to each result file configuration')

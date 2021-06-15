@@ -1,4 +1,6 @@
 SUMMARY = "Framework for defining and tracking users, login sessions, and seats"
+DESCRIPTION = "It provides a mechanism for software to react to changes \
+of any of these items or of any of the metadata associated with them."
 HOMEPAGE = "http://www.freedesktop.org/wiki/Software/ConsoleKit"
 BUGTRACKER = "https://bugs.freedesktop.org/buglist.cgi?query_format=specific&product=ConsoleKit"
 
@@ -9,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 DEPENDS = "glib-2.0 glib-2.0-native dbus dbus-glib virtual/libx11"
 RDEPENDS_${PN} += "base-files"
 
-inherit autotools pkgconfig distro_features_check
+inherit autotools pkgconfig features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

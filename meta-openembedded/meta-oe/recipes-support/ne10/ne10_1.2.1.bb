@@ -15,22 +15,17 @@ PV .= "gitr+${SRCPV}"
 
 inherit cmake
 
-NE10_TARGET_ARCH = ""
-EXTRA_OECMAKE = '-DGNULINUX_PLATFORM=ON -DNE10_BUILD_SHARED=ON -DNE10_LINUX_TARGET_ARCH="${NE10_TARGET_ARCH}"'
-
+# Incompatible with archs other than armv7, armv7ve and aarch64
+COMPATIBLE_MACHINE = "(^$)"
 COMPATIBLE_MACHINE_aarch64 = "(.*)"
 COMPATIBLE_MACHINE_armv7a = "(.*)"
+COMPATIBLE_MACHINE_armv7ve = "(.*)"
+NE10_TARGET_ARCH = ""
+NE10_TARGET_ARCH_aarch64 = "aarch64"
+NE10_TARGET_ARCH_armv7a = "armv7"
+NE10_TARGET_ARCH_armv7ve = "armv7"
 
-python () {
-    if any(t.startswith('armv7') for t in d.getVar('TUNE_FEATURES').split()):
-        d.setVar('NE10_TARGET_ARCH', 'armv7')
-        bb.debug(2, 'Building Ne10 for armv7')
-    elif any(t.startswith('aarch64') for t in d.getVar('TUNE_FEATURES').split()):
-        d.setVar('NE10_TARGET_ARCH', 'aarch64')
-        bb.debug(2, 'Building Ne10 for aarch64')
-    else:
-        raise bb.parse.SkipRecipe("Incompatible with archs other than armv7 and aarch64")
-}
+EXTRA_OECMAKE = '-DGNULINUX_PLATFORM=ON -DNE10_BUILD_SHARED=ON -DNE10_LINUX_TARGET_ARCH="${NE10_TARGET_ARCH}"'
 
 do_install() {
     install -d ${D}${libdir}

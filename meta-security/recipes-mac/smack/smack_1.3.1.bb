@@ -13,7 +13,12 @@ SRC_URI = " \
 
 PV = "1.3.1"
 
-inherit autotools update-rc.d pkgconfig ptest ${@bb.utils.contains('VIRTUAL-RUNTIME_init_manager','systemd','systemd','', d)}
+inherit autotools update-rc.d pkgconfig ptest
+inherit ${@bb.utils.contains('VIRTUAL-RUNTIME_init_manager','systemd','systemd','', d)}
+inherit features_check
+
+REQUIRED_DISTRO_FEATURES = "smack"
+
 
 S = "${WORKDIR}/git"
 
@@ -48,7 +53,7 @@ INITSCRIPT_PARAMS = "start 16 2 3 4 5 . stop 35 0 1 6 ."
 FILES_${PN} += "${sysconfdir}/init.d/smack"
 FILES_${PN}-ptest += "generator"
 
-RDEPENDS_${PN} += "coreutils"
+RDEPENDS_${PN} += "coreutils python3-core"
 RDEPENDS_${PN}-ptest += "make bash bc"
 
 BBCLASSEXTEND = "native"

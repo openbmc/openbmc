@@ -7,7 +7,7 @@ PACKAGE_WRITE_DEPS += "qemu-native"
 inherit qemu
 
 FONT_PACKAGES ??= "${PN}"
-FONT_EXTRA_RDEPENDS ?= "fontconfig-utils"
+FONT_EXTRA_RDEPENDS ?= "${MLPREFIX}fontconfig-utils"
 FONTCONFIG_CACHE_DIR ?= "${localstatedir}/cache/fontconfig"
 FONTCONFIG_CACHE_PARAMS ?= "-v"
 # You can change this to e.g. FC_DEBUG=16 to debug fc-cache issues,
@@ -20,7 +20,7 @@ if [ -n "$D" ] ; then
 	$INTERCEPT_DIR/postinst_intercept update_font_cache ${PKG} mlprefix=${MLPREFIX} binprefix=${MLPREFIX} \
 		'bindir="${bindir}"' \
 		'libdir="${libdir}"' \
-                'libexecdir="${libexecdir}"' \
+		'libexecdir="${libexecdir}"' \
 		'base_libdir="${base_libdir}"' \
 		'fontconfigcachedir="${FONTCONFIG_CACHE_DIR}"' \
 		'fontconfigcacheparams="${FONTCONFIG_CACHE_PARAMS}"' \

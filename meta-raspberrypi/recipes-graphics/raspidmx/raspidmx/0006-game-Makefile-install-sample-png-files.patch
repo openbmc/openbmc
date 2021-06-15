@@ -1,0 +1,24 @@
+From 1868a111450be0053ab124df501cfcb7542f5e77 Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Fri, 4 Dec 2020 03:47:17 -0500
+Subject: [PATCH] game/Makefile: install sample png files
+
+Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ game/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/game/Makefile b/game/Makefile
+index f33916d..d007972 100644
+--- a/game/Makefile
++++ b/game/Makefile
+@@ -18,6 +18,8 @@ $(BIN): $(OBJS)
+ install: $(BIN)
+ 	install -d $(DESTDIR)/usr/bin
+ 	install -m 0755 $(BIN) $(DESTDIR)/usr/bin
++	install -d $(DESTDIR)/usr/share/raspidmx
++	install -m 444 spotlight.png sprite.png texture.png $(DESTDIR)/usr/share/raspidmx
+ 
+ clean:
+ 	@rm -f $(OBJS)

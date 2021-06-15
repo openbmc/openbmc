@@ -1,7 +1,7 @@
-From 469840d211beb22085e57934bda3caabb71a4695 Mon Sep 17 00:00:00 2001
+From 3c1566e9c3b356cfcd8327fed0e537ed978c8e78 Mon Sep 17 00:00:00 2001
 From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
 Date: Tue, 1 Oct 2013 13:19:20 +0200
-Subject: [PATCH 02/18] wayland: Add support for the Wayland winsys
+Subject: [PATCH] wayland: Add support for the Wayland winsys
 
 * Adds EGL_WL_bind_wayland_display extension
 * Adds wayland-egl library
@@ -43,13 +43,13 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  .../khronos/wayland-egl/wayland-egl-priv.h    |  53 ++++
  interface/khronos/wayland-egl/wayland-egl.c   |  59 +++++
  .../khronos/wayland-egl/wayland-egl.pc.in     |  10 +
- interface/vmcs_host/CMakeLists.txt            |  21 +-
+ interface/vmcs_host/CMakeLists.txt            |  13 +-
  interface/vmcs_host/vc_dispmanx.h             |  10 +
  interface/vmcs_host/vc_vchi_dispmanx.c        |  42 +++
  interface/vmcs_host/vc_vchi_dispmanx.h        |  15 ++
  interface/wayland/dispmanx.xml                | 123 +++++++++
  makefiles/cmake/Wayland.cmake                 |  72 +++++
- 30 files changed, 1257 insertions(+), 99 deletions(-)
+ 30 files changed, 1253 insertions(+), 95 deletions(-)
  create mode 100644 interface/khronos/common/linux/khrn_wayland.c
  copy interface/{vmcs_host/vc_vchi_dispmanx.h => khronos/common/linux/khrn_wayland.h} (56%)
  create mode 100644 interface/khronos/ext/egl_wayland.c
@@ -69,7 +69,7 @@ index 63570f1..1459436 100644
  *.mkv
 +*~
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index cfc8ae5..673a5ad 100644
+index fe67fc8..80337b2 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -24,6 +24,17 @@ include(makefiles/cmake/global_settings.cmake)
@@ -91,11 +91,11 @@ index cfc8ae5..673a5ad 100644
  
  # Global include paths
 diff --git a/README.md b/README.md
-index de5754d..2097036 100644
+index 404e4d4..97a6b8f 100644
 --- a/README.md
 +++ b/README.md
-@@ -6,3 +6,7 @@ Use buildme to build. It requires cmake to be installed and an arm cross compile
- https://github.com/raspberrypi/tools/tree/master/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian
+@@ -8,3 +8,7 @@ https://github.com/raspberrypi/tools/tree/master/arm-bcm2708/gcc-linaro-arm-linu
+ Whilst 64-bit userspace is not officially supported, some of the libraries will work for it. To cross compile, install gcc-aarch64-linux-gnu and g++-aarch64-linux-gnu first. For both native and cross compiles, add the option ```--aarch64``` to the buildme command.
  
  Note that this repository does not contain the source for the edidparser and vcdbg binaries due to licensing restrictions.
 +
@@ -103,10 +103,10 @@ index de5754d..2097036 100644
 +
 +$ BUILD_WAYLAND=1 ./buildme.
 diff --git a/buildme b/buildme
-index b8fd440..a780bb6 100755
+index 9e2d405..7b8c0d6 100755
 --- a/buildme
 +++ b/buildme
-@@ -8,6 +8,10 @@ fi
+@@ -17,6 +17,10 @@ fi
  
  BUILDSUBDIR=`echo $BUILDTYPE | tr '[A-Z]' '[a-z]'`;
  
@@ -114,10 +114,10 @@ index b8fd440..a780bb6 100755
 +       WAYLAND_VARS="-DBUILD_WAYLAND=TRUE"
 +fi
 +
- if [ "armv6l" = `arch` ] || [ "armv7l" = `arch` ]; then
+ if [ $ARCH = "armv6l" ] || [ $ARCH = "armv7l" ] || [ $ARCH = "aarch64" ]; then
  	# Native compile on the Raspberry Pi
  	mkdir -p build/raspberry/$BUILDSUBDIR
-@@ -32,9 +36,13 @@ elif [ "$1" = "--native" ]; then
+@@ -41,9 +45,13 @@ elif [ "$1" = "--native" ]; then
  	make -j `nproc` $*
  else
  	# Cross compile on a more capable machine
@@ -127,24 +127,24 @@ index b8fd440..a780bb6 100755
 +	fi
  	mkdir -p build/arm-linux/$BUILDSUBDIR
  	pushd build/arm-linux/$BUILDSUBDIR
--	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE ../../..
-+	cmake -DCMAKE_TOOLCHAIN_FILE=../../../makefiles/cmake/toolchains/arm-linux-gnueabihf.cmake -DCMAKE_BUILD_TYPE=$BUILDTYPE $WAYLAND_VARS ../../..
+-	cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=$BUILDTYPE -DARM64=$ARM64 ../../..
++	cmake -DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE -DCMAKE_BUILD_TYPE=$BUILDTYPE -DARM64=$ARM64 $WAYLAND_VARS ../../..
  	make -j `nproc`
  
  	if [ "$1" != "" ]; then
 diff --git a/host_applications/linux/apps/raspicam/CMakeLists.txt b/host_applications/linux/apps/raspicam/CMakeLists.txt
-index f7db21e..73997b7 100644
+index eb1ef7c..5aeeb2e 100644
 --- a/host_applications/linux/apps/raspicam/CMakeLists.txt
 +++ b/host_applications/linux/apps/raspicam/CMakeLists.txt
-@@ -54,7 +54,7 @@ add_executable(raspividyuv  ${COMMON_SOURCES} RaspiVidYUV.c)
+@@ -61,7 +61,7 @@ add_executable(raspivid   ${COMMON_SOURCES} RaspiVid.c)
+ add_executable(raspividyuv  ${COMMON_SOURCES} RaspiVidYUV.c)
  
  set (MMAL_LIBS mmal_core mmal_util mmal_vc_client)
- 
--target_link_libraries(raspistill ${MMAL_LIBS} vcos bcm_host brcmGLESv2 brcmEGL m dl)
-+target_link_libraries(raspistill ${MMAL_LIBS} vcos bcm_host brcmGLESv2 brcmEGL m dl ${WAYLAND_SERVER_LIBRARIES} ${WAYLAND_CLIENT_LIBRARIES})
- target_link_libraries(raspiyuv   ${MMAL_LIBS} vcos bcm_host)
- target_link_libraries(raspivid   ${MMAL_LIBS} vcos bcm_host)
- target_link_libraries(raspividyuv   ${MMAL_LIBS} vcos bcm_host)
+-target_link_libraries(raspistill ${MMAL_LIBS} vcos bcm_host ${EGL_LIBS} m dl)
++target_link_libraries(raspistill ${MMAL_LIBS} vcos bcm_host ${EGL_LIBS} m dl ${WAYLAND_SERVER_LIBRARIES} ${WAYLAND_CLIENT_LIBRARIES})
+ target_link_libraries(raspiyuv   ${MMAL_LIBS} vcos bcm_host m)
+ target_link_libraries(raspivid   ${MMAL_LIBS} vcos bcm_host m)
+ target_link_libraries(raspividyuv   ${MMAL_LIBS} vcos bcm_host m)
 diff --git a/interface/khronos/CMakeLists.txt b/interface/khronos/CMakeLists.txt
 index 9ad615b..95c0e11 100644
 --- a/interface/khronos/CMakeLists.txt
@@ -1551,23 +1551,19 @@ index 0000000..8bafc15
 +Libs: -L${libdir} -lwayland-egl
 +Cflags: -I${includedir}
 diff --git a/interface/vmcs_host/CMakeLists.txt b/interface/vmcs_host/CMakeLists.txt
-index fde18da..6718215 100755
+index cbef80c..552312a 100755
 --- a/interface/vmcs_host/CMakeLists.txt
 +++ b/interface/vmcs_host/CMakeLists.txt
-@@ -9,13 +9,24 @@ add_definitions(-fno-strict-aliasing)
- 
- include_directories(${VMCS_TARGET}/vcfiled)
+@@ -7,13 +7,24 @@
+ # vc_vchi_gencmd.c has a type-punning problem in vc_gencmd_read_response
+ add_definitions(-fno-strict-aliasing)
  
 -add_library(vchostif
--            ${VMCS_TARGET}/vcfilesys.c ${VMCS_TARGET}/vcmisc.c
--            vc_vchi_gencmd.c vc_vchi_filesys.c vc_vchi_gpuserv.c
--            vc_vchi_tvservice.c vc_vchi_cecservice.c
--            vc_vchi_dispmanx.c vc_service_common.c)
 +set(VCHOSTIF_SOURCE
-+    ${VMCS_TARGET}/vcfilesys.c ${VMCS_TARGET}/vcmisc.c
-+    vc_vchi_gencmd.c vc_vchi_filesys.c vc_vchi_gpuserv.c
-+    vc_vchi_tvservice.c vc_vchi_cecservice.c
-+    vc_vchi_dispmanx.c vc_service_common.c)
+             ${VMCS_TARGET}/vcmisc.c
+             vc_vchi_gencmd.c vc_vchi_gpuserv.c
+             vc_vchi_tvservice.c vc_vchi_cecservice.c
+             vc_vchi_dispmanx.c vc_service_common.c)
  #            ${VMCS_TARGET}/vmcs_main.c
  #  vc_vchi_haud.c
 +
@@ -1582,8 +1578,8 @@ index fde18da..6718215 100755
 +add_library(vchostif ${VCHOSTIF_SOURCE})
 +
  #add_library(bufman            vc_vchi_bufman.c            )
+ set(INSTALL_TARGETS vchostif)
  
- # OpenMAX/IL component service
 diff --git a/interface/vmcs_host/vc_dispmanx.h b/interface/vmcs_host/vc_dispmanx.h
 index 37fdae1..fe3619a 100755
 --- a/interface/vmcs_host/vc_dispmanx.h
@@ -1893,6 +1889,3 @@ index 0000000..ad90d30
 +    list(APPEND ${_sources} "${_server_header}")
 +    set(${_sources} ${${_sources}} PARENT_SCOPE)
 +endfunction()
--- 
-2.20.1
-

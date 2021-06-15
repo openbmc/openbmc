@@ -30,6 +30,8 @@ silence this warning
     uint32_t peri_base;
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+[Pierre-Jean: update for version 0.7.0]
+Signed-off-by: Pierre-Jean Texier <pjtexier@koncepto.io>
 ---
 Upstream-Status: Submitted
 
@@ -37,37 +39,6 @@ Upstream-Status: Submitted
  source/py_gpio.c | 135 ++++++++++++++++++++++++++++---------------------------
  2 files changed, 71 insertions(+), 70 deletions(-)
 
-diff --git a/source/c_gpio.c b/source/c_gpio.c
-index c96a2b0..b69880f 100644
---- a/source/c_gpio.c
-+++ b/source/c_gpio.c
-@@ -61,7 +61,7 @@ int setup(void)
- {
-     int mem_fd;
-     uint8_t *gpio_mem;
--    uint32_t peri_base;
-+    uint32_t peri_base = 0;
-     uint32_t gpio_base;
-     unsigned char buf[4];
-     FILE *fp;
-@@ -73,7 +73,7 @@ int setup(void)
-     if ((mem_fd = open("/dev/gpiomem", O_RDWR|O_SYNC)) > 0)
-     {
-         gpio_map = (uint32_t *)mmap(NULL, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, mem_fd, 0);
--        if ((uint32_t)gpio_map < 0) {
-+        if (gpio_map == MAP_FAILED) {
-             return SETUP_MMAP_FAIL;
-         } else {
-             return SETUP_OK;
-@@ -127,7 +127,7 @@ int setup(void)
- 
-     gpio_map = (uint32_t *)mmap( (void *)gpio_mem, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, mem_fd, gpio_base);
- 
--    if ((uint32_t)gpio_map < 0)
-+    if (gpio_map == MAP_FAILED)
-         return SETUP_MMAP_FAIL;
- 
-     return SETUP_OK;
 diff --git a/source/py_gpio.c b/source/py_gpio.c
 index d54cc7f..007bad5 100644
 --- a/source/py_gpio.c

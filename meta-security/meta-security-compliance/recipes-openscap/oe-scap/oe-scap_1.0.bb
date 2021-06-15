@@ -30,4 +30,4 @@ do_install () {
 
 FILES_${PN} += "${datadir}/oe-scap"
 
-RDEPENDS_${PN} = "openscap"
+RDEPENDS_${PN} = "openscap bash"

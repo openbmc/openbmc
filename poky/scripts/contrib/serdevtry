@@ -2,7 +2,8 @@
 
 # Copyright (C) 2014 Intel Corporation
 #
-# Released under the MIT license (see COPYING.MIT)
+# SPDX-License-Identifier: MIT
+#
 
 if [ "$1" = "" -o "$1" = "--help" ] ; then
     echo "Usage: $0 <serial terminal command>"

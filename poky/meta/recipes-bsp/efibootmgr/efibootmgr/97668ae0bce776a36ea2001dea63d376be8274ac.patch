@@ -1,0 +1,83 @@
+From 97668ae0bce776a36ea2001dea63d376be8274ac Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 6 Mar 2019 13:08:33 -0500
+Subject: [PATCH] Make sure PKGS= is propogated into the submake for "make
+ deps"
+
+When we're doing make deps with "$(CC) -MF", gcc and clang have different
+behavior, both broken in different ways, which we're hitting because of a
+missing -I argument for libefivar's includes.  On clang, when a header can't
+be found, it emits a rule with the header as a prerequisite without a path,
+such as efivar.h here:
+
+efibootmgr.o: efibootmgr.c fix_coverity.h efivar.h efiboot.h \
+  /home/pjones/devel/github.com/efibootmgr/master/src/include/list.h \
+  /home/pjones/devel/github.com/efibootmgr/master/src/include/efi.h \
+  /home/pjones/devel/github.com/efibootmgr/master/src/include/unparse_path.h \
+  /home/pjones/devel/github.com/efibootmgr/master/src/include/efibootmgr.h \
+  error.h
+
+Then the build that utilizes that rule will fail to find the
+prerequisite and tell you something like:
+
+make[1]: *** No rule to make target 'efivar.h', needed by 'efibootmgr.o'.  Stop.
+make[1]: Leaving directory '/home/pjones/devel/github.com/efibootmgr/master/src'
+
+With gcc, when a header can't be found, it emits a rule without that header
+as a prerequisite, as such (again with efivar.h):
+
+efibootmgr.o: efibootmgr.c fix_coverity.h \
+ /home/pjones/devel/github.com/efibootmgr/master/src/include/list.h \
+ /home/pjones/devel/github.com/efibootmgr/master/src/include/efi.h \
+ /home/pjones/devel/github.com/efibootmgr/master/src/include/unparse_path.h \
+ /home/pjones/devel/github.com/efibootmgr/master/src/include/efi.h \
+ /home/pjones/devel/github.com/efibootmgr/master/src/include/efibootmgr.h \
+ error.h
+
+And then your build will fail if you haven't adjusted CFLAGS to tell it
+where to find the header.
+
+Both of these would be better just erroring, but at least gcc's doesn't
+insert a *wrong* dependency.
+
+This patch adds "PKGS=efivar efibootmgr popt" for all deps under src/.
+Technically that's overkill, as efibootmgr itself doesn't need popt, but it
+doesn't hurt anything to have the extra part there.  The resulting
+.efibootmgr.d file has the prerequisites expressed correctly:
+
+efibootmgr.o: efibootmgr.c fix_coverity.h /usr/include/efivar/efivar.h \
+ /usr/include/efivar/efiboot.h \
+ /home/pjones/devel/github.com/efibootmgr/master/src/include/list.h \
+ /home/pjones/devel/github.com/efibootmgr/master/src/include/efi.h \
+ /home/pjones/devel/github.com/efibootmgr/master/src/include/unparse_path.h \
+ /home/pjones/devel/github.com/efibootmgr/master/src/include/efi.h \
+ /home/pjones/devel/github.com/efibootmgr/master/src/include/efibootmgr.h \
+ error.h
+
+This fixes the issue described in github PR #96
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+Upstream-Status: Backport [https://github.com/rhboot/efibootmgr/commit/97668ae0bce776a36ea2001dea63d376be8274ac]
+---
+ src/Makefile | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 258bac1..32fa188 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -31,8 +31,13 @@ efibootdump : PKGS=efivar efiboot popt
+ efibootnext : $(call objects-of,$(EFIBOOTNEXT_SOURCES))
+ efibootnext : PKGS=efivar efiboot popt
+ 
++deps : PKGS=efivar efiboot popt
+ deps : $(ALL_SOURCES)
+-	$(MAKE) -f $(TOPDIR)/Make.deps deps SOURCES="$(ALL_SOURCES)" SUBDIR_CFLAGS="$(SUBDIR_CFLAGS)"
++	$(MAKE) -f $(TOPDIR)/Make.deps \
++		SOURCES="$(ALL_SOURCES)" \
++		SUBDIR_CFLAGS="$(SUBDIR_CFLAGS)" \
++		PKGS="$(PKGS)" \
++		deps
+ 
+ clean :
+ 	@rm -rfv *.o *.a *.so $(TARGETS)

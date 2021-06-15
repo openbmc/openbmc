@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 def machine_dict(d):
 #           TARGET_OS  TARGET_ARCH   MACHINE, OSABI, ABIVERSION, Little Endian, 32bit?
     machdata = {
@@ -11,13 +15,13 @@ def machine_dict(d):
                         "aarch64" :   (183,    0,    0,          True,          64),
                         "aarch64_be" :(183,    0,    0,          False,         64),
                         "i586" :      (3,      0,    0,          True,          32),
+                        "i686" :      (3,      0,    0,          True,          32),
                         "x86_64":     (62,     0,    0,          True,          64),
                         "epiphany":   (4643,   0,    0,          True,          32),
                         "lm32":       (138,    0,    0,          False,         32),
                         "mips":       ( 8,     0,    0,          False,         32),
                         "mipsel":     ( 8,     0,    0,          True,          32),
                         "microblaze":  (189,   0,    0,          False,         32),
-                        "microblazeeb":(189,   0,    0,          False,         32),
                         "microblazeel":(189,   0,    0,          True,          32),
                         "powerpc":    (20,     0,    0,          False,         32),
                         "riscv32":    (243,    0,    0,          True,          32),
@@ -30,6 +34,7 @@ def machine_dict(d):
                         "armeb":      (40,    97,    0,          False,         32),
                         "powerpc":    (20,     0,    0,          False,         32),
                         "powerpc64":  (21,     0,    0,          False,         64),
+                        "powerpc64le":  (21,     0,    0,          True,         64),
                         "i386":       ( 3,     0,    0,          True,          32),
                         "i486":       ( 3,     0,    0,          True,          32),
                         "i586":       ( 3,     0,    0,          True,          32),
@@ -54,7 +59,6 @@ def machine_dict(d):
                         "sh4":        (42,     0,    0,          True,          32),
                         "sparc":      ( 2,     0,    0,          False,         32),
                         "microblaze":  (189,   0,    0,          False,         32),
-                        "microblazeeb":(189,   0,    0,          False,         32),
                         "microblazeel":(189,   0,    0,          True,          32),
                       },
             "linux-musl" : { 
@@ -64,6 +68,7 @@ def machine_dict(d):
                         "armeb":      (  40,    97,    0,          False,         32),
                         "powerpc":    (  20,     0,    0,          False,         32),
                         "powerpc64":  (  21,     0,    0,          False,         64),
+                        "powerpc64le":  (21,     0,    0,          True,         64),
                         "i386":       (   3,     0,    0,          True,          32),
                         "i486":       (   3,     0,    0,          True,          32),
                         "i586":       (   3,     0,    0,          True,          32),
@@ -74,7 +79,6 @@ def machine_dict(d):
                         "mips64":     (   8,     0,    0,          False,         64),
                         "mips64el":   (   8,     0,    0,          True,          64),
                         "microblaze":  (189,     0,    0,          False,         32),
-                        "microblazeeb":(189,     0,    0,          False,         32),
                         "microblazeel":(189,     0,    0,          True,          32),
                         "riscv32":    (243,      0,    0,          True,          32),
                         "riscv64":    (243,      0,    0,          True,          64),

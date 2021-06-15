@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # Simple script to show a manual power prompt for when you want to use
 # automated hardware testing with testimage.bbclass but you don't have a
 # web-enabled power strip or similar to do the power on/off/cycle.

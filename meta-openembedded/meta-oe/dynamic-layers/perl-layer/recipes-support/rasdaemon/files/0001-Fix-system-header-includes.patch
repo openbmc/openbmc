@@ -1,0 +1,44 @@
+From 18786db1ad03716267927d983c83275469a1478a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 8 May 2020 12:27:19 -0700
+Subject: [PATCH] Fix system header includes
+
+Use poll.h instead of sys/poll.h
+Fixes
+warning: #warning redirecting incorrect #include <sys/poll.h> to <poll.h> [-Wcpp]
+
+Include limits.h for PATH_MAX
+
+Fixes
+ras-events.c:359:16: error: 'PATH_MAX' undeclared (first use in this function)
+  359 |  char pipe_raw[PATH_MAX];
+      |                ^~~~~~~~
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ras-events.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/ras-events.c b/ras-events.c
+index 511c93d..400e740 100644
+--- a/ras-events.c
++++ b/ras-events.c
+@@ -18,13 +18,14 @@
+ #include <dirent.h>
+ #include <errno.h>
+ #include <fcntl.h>
++#include <limits.h>
++#include <poll.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
+-#include <sys/poll.h>
+ #include <signal.h>
+ #include <sys/signalfd.h>
+ #include "libtrace/kbuffer.h"
+-- 
+2.26.2
+

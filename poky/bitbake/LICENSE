@@ -1,4 +1,13 @@
-BitBake is licensed under the GNU General Public License version 2.0. See COPYING for further details.
+BitBake is licensed under the GNU General Public License version 2.0. See 
+LICENSE.GPL-2.0-only for further details.
+
+Individual files contain the following style tags instead of the full license text:
+
+    SPDX-License-Identifier:	GPL-2.0-only
+
+This enables machine processing of license information based on the SPDX
+License Identifiers that are here available: http://spdx.org/licenses/
+
 
 The following external components are distributed with this software:
 
@@ -17,3 +26,4 @@ Foundation and individual contributors.
 * Font Awesome fonts redistributed under the SIL Open Font License 1.1
 
 * simplediff is distributed under the zlib license.
+

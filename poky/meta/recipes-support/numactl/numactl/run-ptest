@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# If there is numa support, run the tests. Otherwise skip all the tests.
+# Ideally the skipping would happen by the upstream tests.
+if ! numactl -s | grep -q "No NUMA support available on this system."; then
+	make regress1
+	make regress2
+	if  numademo -t -e 10M; then
+		echo "PASS: numademo"
+	else
+		echo "FAIL: numademo"
+	fi
+else
+	echo "SKIP: ./../test/bind_range"
+	echo "SKIP: ./../test/checkaffinity"
+	echo "SKIP: ./../test/checktopology"
+	echo "SKIP: ./../test/distance"
+	echo "SKIP: ./../test/nodemap"
+	echo "SKIP: ./../test/tbitmap"
+	echo "SKIP: numactl_regress"
+	echo "SKIP: numademo"
+fi
+

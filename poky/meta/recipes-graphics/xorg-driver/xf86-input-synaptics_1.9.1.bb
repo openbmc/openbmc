@@ -10,6 +10,8 @@ advanced features of the touchpad to become available."
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=55aacd3535a741824955c5eb8f061398"
 
+SRC_URI += "file://64bit_time_t_support.patch"
+
 SRC_URI[md5sum] = "cfb79d3c975151f9bbf30b727c260cb9"
 SRC_URI[sha256sum] = "7af83526eff1c76e8b9e1553b34245c203d029028d8044dd9dcf71eef1001576"
 

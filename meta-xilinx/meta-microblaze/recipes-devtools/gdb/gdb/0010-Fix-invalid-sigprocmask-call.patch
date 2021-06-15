@@ -1,0 +1,46 @@
+From bc1f01ff5e524f7777083024bce348a9b0017a7a Mon Sep 17 00:00:00 2001
+From: Yousong Zhou <yszhou4tech@gmail.com>
+Date: Fri, 24 Mar 2017 10:36:03 +0800
+Subject: [PATCH] Fix invalid sigprocmask call
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The POSIX document says
+
+    The pthread_sigmask() and sigprocmask() functions shall fail if:
+
+    [EINVAL]
+    The value of the how argument is not equal to one of the defined values.
+
+and this is how musl-libc is currently doing.  Fix the call to be safe
+and correct
+
+ [1] http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_sigmask.html
+
+gdb/ChangeLog:
+2017-03-24  Yousong Zhou  <yszhou4tech@gmail.com>
+
+    * common/signals-state-save-restore.c (save_original_signals_state):
+    Fix invalid sigprocmask call.
+
+Upstream-Status: Pending [not author, cherry-picked from LEDE https://bugs.lede-project.org/index.php?do=details&task_id=637&openedfrom=-1%2Bweek]
+Signed-off-by: André Draszik <adraszik@tycoint.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gdb/gdbsupport/signals-state-save-restore.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdb/gdbsupport/signals-state-save-restore.c b/gdb/gdbsupport/signals-state-save-restore.c
+index c292d498da..af9dcaeb08 100644
+--- a/gdb/gdbsupport/signals-state-save-restore.c
++++ b/gdb/gdbsupport/signals-state-save-restore.c
+@@ -38,7 +38,7 @@ save_original_signals_state (bool quiet)
+   int i;
+   int res;
+ 
+-  res = gdb_sigmask (0,  NULL, &original_signal_mask);
++  res = gdb_sigmask (SIG_BLOCK,  NULL, &original_signal_mask);
+   if (res == -1)
+     perror_with_name (("sigprocmask"));
+ 

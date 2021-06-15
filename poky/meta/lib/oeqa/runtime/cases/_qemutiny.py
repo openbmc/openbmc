@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.runtime.case import OERuntimeTestCase
 
 class QemuTinyTest(OERuntimeTestCase):

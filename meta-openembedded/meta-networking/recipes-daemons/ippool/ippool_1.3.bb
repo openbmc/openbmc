@@ -26,6 +26,7 @@ SRC_URI = "https://sourceforge.net/projects/openl2tp/files/${BPN}/${PV}/${BPN}-$
            file://0003-cli-Mark-return-of-strtol-as-long-int.patch \
            file://0002-link-with-libtirpc.patch \
            file://0003-musl-fixes.patch \
+           file://strncpy-truncation.patch \
            "
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4c59283b82fc2b166455e0fc23c71c6f"

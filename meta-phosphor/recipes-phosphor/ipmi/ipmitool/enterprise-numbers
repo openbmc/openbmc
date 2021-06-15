@@ -1,0 +1,113 @@
+PRIVATE ENTERPRISE NUMBERS
+
+(last updated 2020-03-05)
+
+SMI Network Management Private Enterprise Codes:
+
+Prefix: iso.org.dod.internet.private.enterprise (1.3.6.1.4.1)
+
+This file is http://www.iana.org/assignments/enterprise-numbers
+This file has been reduced to entities signing CLAs with OpenBMC
+https://drive.google.com/drive/folders/1Ooi0RdTcaOWF1DWFJUAJDdN7tRKde7Nl
+
+Decimal
+| Organization
+| | Contact
+| | | Email
+| | | |
+0
+  Reserved
+    Internet Assigned Numbers Authority
+      iana&iana.org
+2
+  IBM (https://w3.ibm.com/standards )
+    Glenn Daly
+      gdaly&us.ibm.com
+343
+  Intel Corporation
+    Adam Kaminski
+      adam.kaminski&intel.com
+674
+  Dell Inc.
+    David L. Douglas
+      david_l_douglas&dell.com
+1694
+  HCL Technologies Limited
+    Ms. Bindu Dandapani
+      bindud&hcl.in
+2487
+  Phoenix Technologies Ltd.
+    Ian Anderson
+      ian_anderson&phoenix.com
+4128
+  ARM Ltd.
+    Jon Brawn
+      jbrawn&arm.com
+6569
+  INVENTEC CORPORATION
+    JH CHYAN
+      chyan.jh&inventec.com
+7244
+  Quanta Computer Inc.
+    Strong Chen
+      @strong.chen&quantatw.com
+8554
+  Departement Elektrotechnik, ETH Zuerich
+    Simon Moser
+      smoser&ee.ethz.ch
+11129
+  Google, Inc.
+    Ben Laurie
+      benl&google.com
+11183
+  Mitac International Corp.
+    P.C. Wang
+      p.c.wang&mic.com.tw
+19046
+  Lenovo Enterprise Business Group
+    Joe Bolan
+      jbolan&lenovo.com
+20974
+  American Megatrends, Inc
+    Kenny Chiang
+      kennychiang&ami.com.tw
+33049
+  Mellanox Technologies LTD
+    Sagi Rotem
+      sagir&mellanox.co.il
+40092
+  Wiwynn Corporation
+    Zong Bing, Wu
+      bing_wu&wiwynn.com
+40981
+  Facebook, Inc.
+    Tim Tickel
+      twt&fb.com
+45065
+  Insyde
+    Y.C. Lin 
+      yc.lin&insyde.com
+48482
+  Linaro Ltd
+    Dave Pigott
+      dave.pigott&linaro.org
+48512
+  Inspur Group Co.,Ltd.
+    Chunpeng Mao
+      Maochp&inspur.com
+49150
+  Vertiv Co
+    John Bogdan
+      john.bogdan&vertivco.com
+49769
+  YADRO
+    Support
+      snmp&yadro.com
+51974
+  Raptor Computing Systems, LLC
+    Support Department
+      support&raptorcs.com
+52538
+  Ampere Computing
+    AJ Shah
+      aj&amperecomputing.com

@@ -1,0 +1,35 @@
+From 5de183dc436bb647361ab641d891c113e6a7dadd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 8 Mar 2020 16:30:48 -0700
+Subject: [PATCH] cmake: Use a regular expression to match x86 architectures
+
+in OE we use i686 for qemux86 and this results in
+
+-- INFO - Target arch is i686
+CMake Error at CMakeLists.txt:191 (message):
+  Only x86, arm, mips, PERIPHERALMAN and mock platforms currently supported
+
+So using a wildcard helps in using any x86 arch
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 250d9106..fb642722 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -176,8 +176,7 @@ else ()
+   message (STATUS "INFO - Override arch is ${DETECTED_ARCH}")
+ endif()
+ 
+-if (DETECTED_ARCH STREQUAL "i586" OR DETECTED_ARCH STREQUAL "x86_64"
+-    OR DETECTED_ARCH STREQUAL "i386")
++if (DETECTED_ARCH MATCHES "i?86" OR DETECTED_ARCH STREQUAL "x86_64")
+   set (X86PLAT ON)
+ elseif (DETECTED_ARCH MATCHES "arm.*" OR DETECTED_ARCH MATCHES "aarch64")
+   set (ARMPLAT ON)
+-- 
+2.25.1
+

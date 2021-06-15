@@ -6,18 +6,8 @@
 # Copyright (C) 2006 Michael 'Mickey' Lauer
 # Copyright (C) 2006-2007 Richard Purdie
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 """
     We have the following windows:
@@ -47,7 +37,7 @@
 
 
 import logging
-import os, sys, itertools, time, subprocess
+import os, sys, itertools, time
 
 try:
     import curses
@@ -56,8 +46,9 @@ except ImportError:
 
 import bb
 import xmlrpc.client
-from bb import ui
 from bb.ui import uihelper
+
+logger = logging.getLogger(__name__)
 
 parsespin = itertools.cycle( r'|/-\\' )
 
@@ -249,7 +240,7 @@ class NCursesUI:
             if error:
                 print("Error running command '%s': %s" % (cmdline, error))
                 return
-            elif ret != True:
+            elif not ret:
                 print("Couldn't get default commandlind! %s" % ret)
                 return
         except xmlrpc.client.Fault as x:

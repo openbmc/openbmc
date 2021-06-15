@@ -8,13 +8,13 @@ gently refuses and rightly so.
 Upstream-Status: Inappropriate [OE-Specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
-Index: fontconfig-2.11.93/fontconfig.pc.in
-===================================================================
---- fontconfig-2.11.93.orig/fontconfig.pc.in
-+++ fontconfig-2.11.93/fontconfig.pc.in
+diff --git a/fontconfig.pc.in b/fontconfig.pc.in
+index 61b35fb..5bc9bab 100644
+--- a/fontconfig.pc.in
++++ b/fontconfig.pc.in
 @@ -15,4 +15,4 @@ Requires: @PKGCONFIG_REQUIRES@
  Requires.private: @PKGCONFIG_REQUIRES_PRIVATELY@
  Libs: -L${libdir} -lfontconfig
- Libs.private: @EXPAT_LIBS@ @FREETYPE_LIBS@ @ICONV_LIBS@ @LIBXML2_LIBS@
--Cflags: -I${includedir} @EXPAT_CFLAGS@ @FREETYPE_CFLAGS@ @ICONV_CFLAGS@ @LIBXML2_CFLAGS@
+ Libs.private: @ICONV_LIBS@ @PKG_EXPAT_LIBS@
+-Cflags: -I${includedir} @ICONV_CFLAGS@ @PKG_EXPAT_CFLAGS@
 +Cflags: -I${includedir}

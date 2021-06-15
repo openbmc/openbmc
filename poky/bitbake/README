@@ -11,7 +11,7 @@ For information about Bitbake, see the OpenEmbedded website:
 
 Bitbake plain documentation can be found under the doc directory or its integrated
 html version at the Yocto Project website:
-    http://yoctoproject.org/documentation
+    https://docs.yoctoproject.org
 
 Contributing
 ------------

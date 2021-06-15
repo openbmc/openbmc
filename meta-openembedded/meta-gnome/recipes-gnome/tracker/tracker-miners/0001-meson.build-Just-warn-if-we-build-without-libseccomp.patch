@@ -1,0 +1,37 @@
+From 54ea2cabf85ad1bd5695cdbd1935115c9495e80c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 1 Dec 2019 17:06:59 +0100
+Subject: [PATCH] meson.build: Just warn if we build without libseccomp
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+libseccomp lives in meta-security currently and we cannot make it a mandatory
+dependency. Once somebody moves libseccomp to meta-oe and adjusts all the
+target specific knobs this patch can go. For discussion see [1].
+
+[1] http://lists.openembedded.org/pipermail/openembedded-devel/2019-November/203234.html
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 71a9df4..1eaa1a0 100644
+--- a/meson.build
++++ b/meson.build
+@@ -279,7 +279,7 @@ cpu_supports_seccomp = not unsupported_cpus.contains(host_cpu)
+ seccomp_required = system_supports_seccomp and cpu_supports_seccomp
+ 
+ if not libseccomp.found() and seccomp_required
+-  error('Libseccomp is mandatory for sandboxed metadata extraction')
++  warning('Building without Libseccomp might cause security issues!')
+ endif
+ 
+ ####################################################################
+-- 
+2.21.0
+

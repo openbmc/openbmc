@@ -1,7 +1,7 @@
-From b15e9610b4ab52c381e712241d50dea96d50d873 Mon Sep 17 00:00:00 2001
+From 04eec97b390621f2b3794b0d774b77429eb88cfd Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Wed, 2 May 2018 23:14:19 +0200
-Subject: [PATCH 14/14] add if_nameindex from musl
+Subject: [PATCH] add if_nameindex from musl
 
 Taken from musl, minimal changes.
 klibc lacks struct and func
@@ -20,10 +20,11 @@ to fix :
  #define __bitwise __bitwise__
 
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
 ---
  kexec/Makefile       |  2 +-
- kexec/if_nameindex.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- kexec/if_nameindex.h | 15 ++++++++++++
+ kexec/if_nameindex.c | 64 ++++++++++++++++++++++++++++++++++++++++++++
+ kexec/if_nameindex.h | 15 +++++++++++
  kexec/ifdown.c       |  3 +++
  4 files changed, 83 insertions(+), 1 deletion(-)
  create mode 100644 kexec/if_nameindex.c
@@ -114,7 +115,7 @@ index 0000000..e586e41
 +}
 diff --git a/kexec/if_nameindex.h b/kexec/if_nameindex.h
 new file mode 100644
-index 0000000..1725fbd
+index 0000000..cf1c061
 --- /dev/null
 +++ b/kexec/if_nameindex.h
 @@ -0,0 +1,15 @@
@@ -147,6 +148,3 @@ index 82c6141..cc3ca9f 100644
  
  /*
   *  First, we find all shaper devices and down them. Then we
--- 
-2.7.4
-

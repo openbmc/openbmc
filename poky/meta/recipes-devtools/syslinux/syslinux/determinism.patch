@@ -1,0 +1,22 @@
+In order to build deterministic binaries, we need to sort the wildcard expansion
+so the libraries are linked in the same order each time. This fixes reproducibility
+issues within syslinux builds.
+
+Upstream-Status: Pending
+RP 2021/3/1
+
+Index: syslinux-6.04-pre2/mk/lib.mk
+===================================================================
+--- syslinux-6.04-pre2.orig/mk/lib.mk
++++ syslinux-6.04-pre2/mk/lib.mk
+@@ -130,8 +130,8 @@ LIBENTRY_OBJS = \
+ 	exit.o
+ 
+ LIBGCC_OBJS = \
+-	  $(patsubst $(com32)/lib/%.c,%.o,$(wildcard $(com32)/lib/$(ARCH)/libgcc/*.c)) \
+-	  $(patsubst $(com32)/lib/%.S,%.o,$(wildcard $(com32)/lib/$(ARCH)/libgcc/*.S))
++	  $(sort $(patsubst $(com32)/lib/%.c,%.o,$(wildcard $(com32)/lib/$(ARCH)/libgcc/*.c))) \
++	  $(sort $(patsubst $(com32)/lib/%.S,%.o,$(wildcard $(com32)/lib/$(ARCH)/libgcc/*.S)))
+ 
+ LIBCONSOLE_OBJS = \
+ 	\

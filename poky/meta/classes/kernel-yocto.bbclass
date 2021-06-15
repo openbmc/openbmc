@@ -1,7 +1,24 @@
 # remove tasks that modify the source tree in case externalsrc is inherited
-SRCTREECOVEREDTASKS += "do_kernel_configme do_validate_branches do_kernel_configcheck do_kernel_checkout do_fetch do_unpack do_patch"
+SRCTREECOVEREDTASKS += "do_validate_branches do_kernel_configcheck do_kernel_checkout do_fetch do_unpack do_patch"
 PATCH_GIT_USER_EMAIL ?= "kernel-yocto@oe"
 PATCH_GIT_USER_NAME ?= "OpenEmbedded"
+
+# The distro or local.conf should set this, but if nobody cares...
+LINUX_KERNEL_TYPE ??= "standard"
+
+# KMETA ?= ""
+KBRANCH ?= "master"
+KMACHINE ?= "${MACHINE}"
+SRCREV_FORMAT ?= "meta_machine"
+
+# LEVELS:
+#   0: no reporting
+#   1: report options that are specified, but not in the final config
+#   2: report options that are not hardware related, but set by a BSP
+KCONF_AUDIT_LEVEL ?= "1"
+KCONF_BSP_AUDIT_LEVEL ?= "0"
+KMETA_AUDIT ?= "yes"
+KMETA_AUDIT_WERROR ?= ""
 
 # returns local (absolute) path names for all valid patches in the
 # src_uri
@@ -31,7 +48,7 @@ def find_sccs(d):
         base, ext = os.path.splitext(os.path.basename(s))
         if ext and ext in [".scc", ".cfg"]:
             sources_list.append(s)
-        elif base and base in 'defconfig':
+        elif base and 'defconfig' in base:
             sources_list.append(s)
 
     return sources_list
@@ -69,10 +86,34 @@ def get_machine_branch(d, default):
 	    
     return default
 
+# returns a list of all directories that are on FILESEXTRAPATHS (and
+# hence available to the build) that contain .scc or .cfg files
+def get_dirs_with_fragments(d):
+    extrapaths = []
+    extrafiles = []
+    extrapathsvalue = (d.getVar("FILESEXTRAPATHS") or "")
+    # Remove default flag which was used for checking
+    extrapathsvalue = extrapathsvalue.replace("__default:", "")
+    extrapaths = extrapathsvalue.split(":")
+    for path in extrapaths:
+        if path + ":True" not in extrafiles:
+            extrafiles.append(path + ":" + str(os.path.exists(path)))
+
+    return " ".join(extrafiles)
+
 do_kernel_metadata() {
 	set +e
+
+	if [ -n "$1" ]; then
+		mode="$1"
+	else
+		mode="patch"
+	fi
+
 	cd ${S}
 	export KMETA=${KMETA}
+
+	bbnote "do_kernel_metadata: for summary/debug, set KCONF_AUDIT_LEVEL > 0"
 
 	# if kernel tools are available in-tree, they are preferred
 	# and are placed on the path before any external tools. Unless
@@ -81,13 +122,6 @@ do_kernel_metadata() {
 		if [ -z "${EXTERNAL_KERNEL_TOOLS}" ]; then
 			PATH=${S}/scripts/util:${PATH}
 		fi
-	fi
-
-	machine_branch="${@ get_machine_branch(d, "${KBRANCH}" )}"
-	machine_srcrev="${SRCREV_machine}"
-	if [ -z "${machine_srcrev}" ]; then
-		# fallback to SRCREV if a non machine_meta tree is being built
-		machine_srcrev="${SRCREV}"
 	fi
 
 	# In a similar manner to the kernel itself:
@@ -111,47 +145,59 @@ do_kernel_metadata() {
 	if [ -n "${KBUILD_DEFCONFIG}" ]; then
 		if [ -f "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}" ]; then
 			if [ -f "${WORKDIR}/defconfig" ]; then
-				# If the two defconfig's are different, warn that we didn't overwrite the
-				# one already placed in WORKDIR by the fetcher.
+				# If the two defconfig's are different, warn that we overwrote the
+				# one already placed in WORKDIR
 				cmp "${WORKDIR}/defconfig" "${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG}"
 				if [ $? -ne 0 ]; then
-					bbwarn "defconfig detected in WORKDIR. ${KBUILD_DEFCONFIG} skipped"
-				else
-					cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+					bbdebug 1 "detected SRC_URI or unpatched defconfig in WORKDIR. ${KBUILD_DEFCONFIG} copied over it"
 				fi
+				cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
 			else
 				cp -f ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
 			fi
-			sccs="${WORKDIR}/defconfig"
+			in_tree_defconfig="${WORKDIR}/defconfig"
 		else
-			bbfatal "A KBUILD_DEFCONFIG '${KBUILD_DEFCONFIG}' was specified, but not present in the source tree"
+			bbfatal "A KBUILD_DEFCONFIG '${KBUILD_DEFCONFIG}' was specified, but not present in the source tree (${S}/arch/${ARCH}/configs/)"
 		fi
 	fi
 
-	# was anyone trying to patch the kernel meta data ?, we need to do
-	# this here, since the scc commands migrate the .cfg fragments to the
-	# kernel source tree, where they'll be used later.
-	check_git_config
-	patches="${@" ".join(find_patches(d,'kernel-meta'))}"
-	for p in $patches; do
-	    (
-		cd ${WORKDIR}/kernel-meta
-		git am -s $p
-	    )
-	done
+	if [ "$mode" = "patch" ]; then
+		# was anyone trying to patch the kernel meta data ?, we need to do
+		# this here, since the scc commands migrate the .cfg fragments to the
+		# kernel source tree, where they'll be used later.
+		check_git_config
+		patches="${@" ".join(find_patches(d,'kernel-meta'))}"
+		for p in $patches; do
+		    (
+			cd ${WORKDIR}/kernel-meta
+			git am -s $p
+		    )
+		done
+	fi
 
 	sccs_from_src_uri="${@" ".join(find_sccs(d))}"
 	patches="${@" ".join(find_patches(d,''))}"
 	feat_dirs="${@" ".join(find_kernel_feature_dirs(d))}"
 
-	# a quick check to make sure we don't have duplicate defconfigs
-	# If there's a defconfig in the SRC_URI, did we also have one from
-	# the KBUILD_DEFCONFIG processing above ?
-	if [ -n "$sccs" ]; then
-	    # we did have a defconfig from above. remove any that might be in the src_uri
-	    sccs_from_src_uri=$(echo $sccs_from_src_uri | awk '{ if ($0!="defconfig") { print $0 } }' RS=' ')
+	# a quick check to make sure we don't have duplicate defconfigs If
+	# there's a defconfig in the SRC_URI, did we also have one from the
+	# KBUILD_DEFCONFIG processing above ?
+	src_uri_defconfig=$(echo $sccs_from_src_uri | awk '(match($0, "defconfig") != 0) { print $0 }' RS=' ')
+	# drop and defconfig's from the src_uri variable, we captured it just above here if it existed
+	sccs_from_src_uri=$(echo $sccs_from_src_uri | awk '(match($0, "defconfig") == 0) { print $0 }' RS=' ')
+
+	if [ -n "$in_tree_defconfig" ]; then
+		sccs_defconfig=$in_tree_defconfig
+		if [ -n "$src_uri_defconfig" ]; then
+			bbwarn "[NOTE]: defconfig was supplied both via KBUILD_DEFCONFIG and SRC_URI. Dropping SRC_URI defconfig"
+		fi
+	else
+		# if we didn't have an in-tree one, make our defconfig the one
+		# from the src_uri. Note: there may not have been one from the
+		# src_uri, so this can be an empty variable.
+		sccs_defconfig=$src_uri_defconfig
 	fi
-	sccs="$sccs $sccs_from_src_uri"
+	sccs="$sccs_from_src_uri"
 
 	# check for feature directories/repos/branches that were part of the
 	# SRC_URI. If they were supplied, we convert them into include directives
@@ -178,30 +224,88 @@ do_kernel_metadata() {
 	# expand kernel features into their full path equivalents
 	bsp_definition=$(spp ${includes} --find -DKMACHINE=${KMACHINE} -DKTYPE=${LINUX_KERNEL_TYPE})
 	if [ -z "$bsp_definition" ]; then
-		echo "$sccs" | grep -q defconfig
-		if [ $? -ne 0 ]; then
+		if [ -z "$sccs_defconfig" ]; then
 			bbfatal_log "Could not locate BSP definition for ${KMACHINE}/${LINUX_KERNEL_TYPE} and no defconfig was provided"
+		fi
+	else
+		# if the bsp definition has "define KMETA_EXTERNAL_BSP t",
+		# then we need to set a flag that will instruct the next
+		# steps to use the BSP as both configuration and patches.
+		grep -q KMETA_EXTERNAL_BSP $bsp_definition
+		if [ $? -eq 0 ]; then
+		    KMETA_EXTERNAL_BSPS="t"
 		fi
 	fi
 	meta_dir=$(kgit --meta)
 
-	# run1: pull all the configuration fragments, no matter where they come from
-	elements="`echo -n ${bsp_definition} ${sccs} ${patches} ${KERNEL_FEATURES}`"
-	if [ -n "${elements}" ]; then
-		echo "${bsp_definition}" > ${S}/${meta_dir}/bsp_definition
-		scc --force -o ${S}/${meta_dir}:cfg,merge,meta ${includes} ${bsp_definition} ${sccs} ${patches} ${KERNEL_FEATURES}
-		if [ $? -ne 0 ]; then
-			bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
+	KERNEL_FEATURES_FINAL=""
+	if [ -n "${KERNEL_FEATURES}" ]; then
+		for feature in ${KERNEL_FEATURES}; do
+			feature_found=f
+			for d in $includes; do
+				path_to_check=$(echo $d | sed 's/^-I//')
+				if [ "$feature_found" = "f" ] && [ -e "$path_to_check/$feature" ]; then
+				    feature_found=t
+				fi
+			done
+			if [ "$feature_found" = "f" ]; then
+				if [ -n "${KERNEL_DANGLING_FEATURES_WARN_ONLY}" ]; then
+				    bbwarn "Feature '$feature' not found, but KERNEL_DANGLING_FEATURES_WARN_ONLY is set"
+				    bbwarn "This may cause runtime issues, dropping feature and allowing configuration to continue"
+				else
+				    bberror "Feature '$feature' not found, this will cause configuration failures."
+				    bberror "Check the SRC_URI for meta-data repositories or directories that may be missing"
+				    bbfatal_log "Set KERNEL_DANGLING_FEATURES_WARN_ONLY to ignore this issue"
+				fi
+			else
+				KERNEL_FEATURES_FINAL="$KERNEL_FEATURES_FINAL $feature"
+			fi
+		done
+        fi
+
+	if [ "$mode" = "config" ]; then
+		# run1: pull all the configuration fragments, no matter where they come from
+		elements="`echo -n ${bsp_definition} $sccs_defconfig ${sccs} ${patches} $KERNEL_FEATURES_FINAL`"
+		if [ -n "${elements}" ]; then
+			echo "${bsp_definition}" > ${S}/${meta_dir}/bsp_definition
+			scc --force -o ${S}/${meta_dir}:cfg,merge,meta ${includes} $sccs_defconfig $bsp_definition $sccs $patches $KERNEL_FEATURES_FINAL
+			if [ $? -ne 0 ]; then
+				bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
+			fi
 		fi
 	fi
 
-	# run2: only generate patches for elements that have been passed on the SRC_URI
-	elements="`echo -n ${sccs} ${patches} ${KERNEL_FEATURES}`"
-	if [ -n "${elements}" ]; then
-		scc --force -o ${S}/${meta_dir}:patch --cmds patch ${includes} ${sccs} ${patches} ${KERNEL_FEATURES}
-		if [ $? -ne 0 ]; then
-			bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
+	# if KMETA_EXTERNAL_BSPS has been set, or it has been detected from
+	# the bsp definition, then we inject the bsp_definition into the
+	# patch phase below.  we'll piggy back on the sccs variable.
+	if [ -n "${KMETA_EXTERNAL_BSPS}" ]; then
+		sccs="${bsp_definition} ${sccs}"
+	fi
+
+	if [ "$mode" = "patch" ]; then
+		# run2: only generate patches for elements that have been passed on the SRC_URI
+		elements="`echo -n ${sccs} ${patches} $KERNEL_FEATURES_FINAL`"
+		if [ -n "${elements}" ]; then
+			scc --force -o ${S}/${meta_dir}:patch --cmds patch ${includes} ${sccs} ${patches} $KERNEL_FEATURES_FINAL
+			if [ $? -ne 0 ]; then
+				bbfatal_log "Could not generate configuration queue for ${KMACHINE}."
+			fi
 		fi
+	fi
+
+	if [ ${KCONF_AUDIT_LEVEL} -gt 0 ]; then
+		bbnote "kernel meta data summary for ${KMACHINE} (${LINUX_KERNEL_TYPE}):"
+		bbnote "======================================================================"
+		if [ -n "${KMETA_EXTERNAL_BSPS}" ]; then
+			bbnote "Non kernel-cache (external) bsp"
+		fi
+		bbnote "BSP entry point / definition: $bsp_definition"
+		if [ -n "$in_tree_defconfig" ]; then
+			bbnote "KBUILD_DEFCONFIG: ${KBUILD_DEFCONFIG}"
+		fi
+		bbnote "Fragments from SRC_URI: $sccs_from_src_uri"
+		bbnote "KERNEL_FEATURES: $KERNEL_FEATURES_FINAL"
+		bbnote "Final scc/cfg list: $sccs_defconfig $bsp_definition $sccs $KERNEL_FEATURES_FINAL"
 	fi
 }
 
@@ -291,19 +395,21 @@ do_kernel_checkout() {
 	# checkout and clobber any unimportant files
 	git checkout -f ${machine_branch}
 }
-do_kernel_checkout[dirs] = "${S}"
+do_kernel_checkout[dirs] = "${S} ${WORKDIR}"
 
-addtask kernel_checkout before do_kernel_metadata after do_unpack
+addtask kernel_checkout before do_kernel_metadata after do_symlink_kernsrc
 addtask kernel_metadata after do_validate_branches do_unpack before do_patch
 do_kernel_metadata[depends] = "kern-tools-native:do_populate_sysroot"
+do_kernel_metadata[file-checksums] = " ${@get_dirs_with_fragments(d)}"
 do_validate_branches[depends] = "kern-tools-native:do_populate_sysroot"
 
 do_kernel_configme[depends] += "virtual/${TARGET_PREFIX}binutils:do_populate_sysroot"
 do_kernel_configme[depends] += "virtual/${TARGET_PREFIX}gcc:do_populate_sysroot"
 do_kernel_configme[depends] += "bc-native:do_populate_sysroot bison-native:do_populate_sysroot"
+do_kernel_configme[depends] += "kern-tools-native:do_populate_sysroot"
 do_kernel_configme[dirs] += "${S} ${B}"
 do_kernel_configme() {
-	set +e
+	do_kernel_metadata config
 
 	# translate the kconfig_mode into something that merge_config.sh
 	# understands
@@ -314,11 +420,11 @@ do_kernel_configme() {
 		*alldefconfig)
 			config_flags=""
 			;;
-	    *)
-		if [ -f ${WORKDIR}/defconfig ]; then
-			config_flags="-n"
-		fi
-	    ;;
+		*)
+			if [ -f ${WORKDIR}/defconfig ]; then
+				config_flags="-n"
+			fi
+			;;
 	esac
 
 	cd ${S}
@@ -330,16 +436,84 @@ do_kernel_configme() {
 		bbfatal_log "Could not find configuration queue (${meta_dir}/config.queue)"
 	fi
 
-	CFLAGS="${CFLAGS} ${TOOLCHAIN_OPTIONS}"	HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}" CC="${KERNEL_CC}" ARCH=${ARCH} merge_config.sh -O ${B} ${config_flags} ${configs} > ${meta_dir}/cfg/merge_config_build.log 2>&1
-	if [ $? -ne 0 ]; then
-		bbfatal_log "Could not configure ${KMACHINE}-${LINUX_KERNEL_TYPE}"
+	CFLAGS="${CFLAGS} ${TOOLCHAIN_OPTIONS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}" CC="${KERNEL_CC}" LD="${KERNEL_LD}" ARCH=${ARCH} merge_config.sh -O ${B} ${config_flags} ${configs} > ${meta_dir}/cfg/merge_config_build.log 2>&1
+	if [ $? -ne 0 -o ! -f ${B}/.config ]; then
+		bberror "Could not generate a .config for ${KMACHINE}-${LINUX_KERNEL_TYPE}"
+		if [ ${KCONF_AUDIT_LEVEL} -gt 1 ]; then
+			bbfatal_log "`cat ${meta_dir}/cfg/merge_config_build.log`"
+		else
+			bbfatal_log "Details can be found at: ${S}/${meta_dir}/cfg/merge_config_build.log"
+		fi
 	fi
 
-	echo "# Global settings from linux recipe" >> ${B}/.config
-	echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
+	if [ ! -z "${LINUX_VERSION_EXTENSION}" ]; then
+		echo "# Global settings from linux recipe" >> ${B}/.config
+		echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
+	fi
 }
 
 addtask kernel_configme before do_configure after do_patch
+addtask config_analysis
+
+do_config_analysis[depends] = "virtual/kernel:do_configure"
+do_config_analysis[depends] += "kern-tools-native:do_populate_sysroot"
+
+CONFIG_AUDIT_FILE ?= "${WORKDIR}/config-audit.txt"
+CONFIG_ANALYSIS_FILE ?= "${WORKDIR}/config-analysis.txt"
+
+python do_config_analysis() {
+    import re, string, sys, subprocess
+
+    s = d.getVar('S')
+
+    env = os.environ.copy()
+    env['PATH'] = "%s:%s%s" % (d.getVar('PATH'), s, "/scripts/util/")
+    env['LD'] = d.getVar('KERNEL_LD')
+    env['CC'] = d.getVar('KERNEL_CC')
+    env['ARCH'] = d.getVar('ARCH')
+    env['srctree'] = s
+
+    # read specific symbols from the kernel recipe or from local.conf
+    # i.e.: CONFIG_ANALYSIS_pn-linux-yocto-dev = 'NF_CONNTRACK LOCALVERSION'
+    config = d.getVar( 'CONFIG_ANALYSIS' )
+    if not config:
+       config = [ "" ]
+    else:
+       config = config.split()
+
+    for c in config:
+        for action in ["analysis","audit"]:
+            if action == "analysis":
+                try:
+                    analysis = subprocess.check_output(['symbol_why.py', '--dotconfig',  '{}'.format( d.getVar('B') + '/.config' ), '--blame', c], cwd=s, env=env ).decode('utf-8')
+                except subprocess.CalledProcessError as e:
+                    bb.fatal( "config analysis failed: %s" % e.output.decode('utf-8'))
+
+                outfile = d.getVar( 'CONFIG_ANALYSIS_FILE' )
+
+            if action == "audit":
+                try:
+                    analysis = subprocess.check_output(['symbol_why.py', '--dotconfig',  '{}'.format( d.getVar('B') + '/.config' ), '--summary', '--extended', '--sanity', c], cwd=s, env=env ).decode('utf-8')
+                except subprocess.CalledProcessError as e:
+                    bb.fatal( "config analysis failed: %s" % e.output.decode('utf-8'))
+
+                outfile = d.getVar( 'CONFIG_AUDIT_FILE' )
+
+            if c:
+                outdir = os.path.dirname( outfile )
+                outname = os.path.basename( outfile )
+                outfile = outdir + '/'+ c + '-' + outname
+
+            if config and os.path.isfile(outfile):
+                os.remove(outfile)
+
+            with open(outfile, 'w+') as f:
+                f.write( analysis )
+
+            bb.warn( "Configuration {} executed, see: {} for details".format(action,outfile ))
+            if c:
+                bb.warn( analysis )
+}
 
 python do_kernel_configcheck() {
     import re, string, sys, subprocess
@@ -349,58 +523,99 @@ python do_kernel_configcheck() {
     # meta-series for processing
     kmeta = d.getVar("KMETA") or "meta"
     if not os.path.exists(kmeta):
-        kmeta = "." + kmeta
+        kmeta = subprocess.check_output(['kgit', '--meta'], cwd=d.getVar('S')).decode('utf-8').rstrip()
 
     s = d.getVar('S')
 
     env = os.environ.copy()
     env['PATH'] = "%s:%s%s" % (d.getVar('PATH'), s, "/scripts/util/")
+    env['LD'] = d.getVar('KERNEL_LD')
+    env['CC'] = d.getVar('KERNEL_CC')
+    env['ARCH'] = d.getVar('ARCH')
+    env['srctree'] = s
 
     try:
         configs = subprocess.check_output(['scc', '--configs', '-o', s + '/.kernel-meta'], env=env).decode('utf-8')
     except subprocess.CalledProcessError as e:
         bb.fatal( "Cannot gather config fragments for audit: %s" % e.output.decode("utf-8") )
 
-    try:
-        subprocess.check_call(['kconf_check', '--report', '-o',
-                '%s/%s/cfg' % (s, kmeta), d.getVar('B') + '/.config', s, configs], cwd=s, env=env)
-    except subprocess.CalledProcessError:
-        # The configuration gathering can return different exit codes, but
-        # we interpret them based on the KCONF_AUDIT_LEVEL variable, so we catch
-        # everything here, and let the run continue.
-        pass
-
     config_check_visibility = int(d.getVar("KCONF_AUDIT_LEVEL") or 0)
     bsp_check_visibility = int(d.getVar("KCONF_BSP_AUDIT_LEVEL") or 0)
+    kmeta_audit_werror = d.getVar("KMETA_AUDIT_WERROR") or ""
+    warnings_detected = False
 
-    # if config check visibility is non-zero, report dropped configuration values
-    mismatch_file = d.expand("${S}/%s/cfg/mismatch.txt" % kmeta)
-    if os.path.exists(mismatch_file):
-        if config_check_visibility:
-            with open (mismatch_file, "r") as myfile:
+    # if config check visibility is "1", that's the lowest level of audit. So
+    # we add the --classify option to the run, since classification will
+    # streamline the output to only report options that could be boot issues,
+    # or are otherwise required for proper operation.
+    extra_params = ""
+    if config_check_visibility == 1:
+       extra_params = "--classify"
+
+    # category #1: mismatches
+    try:
+        analysis = subprocess.check_output(['symbol_why.py', '--dotconfig',  '{}'.format( d.getVar('B') + '/.config' ), '--mismatches', extra_params], cwd=s, env=env ).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        bb.fatal( "config analysis failed: %s" % e.output.decode('utf-8'))
+
+    if analysis:
+        outfile = "{}/{}/cfg/mismatch.txt".format( s, kmeta )
+        if os.path.isfile(outfile):
+           os.remove(outfile)
+        with open(outfile, 'w+') as f:
+            f.write( analysis )
+
+        if config_check_visibility and os.stat(outfile).st_size > 0:
+            with open (outfile, "r") as myfile:
                 results = myfile.read()
                 bb.warn( "[kernel config]: specified values did not make it into the kernel's final configuration:\n\n%s" % results)
+                warnings_detected = True
 
-    if bsp_check_visibility:
-        invalid_file = d.expand("${S}/%s/cfg/invalid.cfg" % kmeta)
-        if os.path.exists(invalid_file) and os.stat(invalid_file).st_size > 0:
-            with open (invalid_file, "r") as myfile:
+    # category #2: invalid fragment elements
+    extra_params = ""
+    if bsp_check_visibility > 1:
+        extra_params = "--strict"
+    try:
+        analysis = subprocess.check_output(['symbol_why.py', '--dotconfig',  '{}'.format( d.getVar('B') + '/.config' ), '--invalid', extra_params], cwd=s, env=env ).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        bb.fatal( "config analysis failed: %s" % e.output.decode('utf-8'))
+
+    if analysis:
+        outfile = "{}/{}/cfg/invalid.txt".format(s,kmeta)
+        if os.path.isfile(outfile):
+           os.remove(outfile)
+        with open(outfile, 'w+') as f:
+            f.write( analysis )
+
+        if bsp_check_visibility and os.stat(outfile).st_size > 0:
+            with open (outfile, "r") as myfile:
                 results = myfile.read()
-                bb.warn( "[kernel config]: This BSP sets config options that are not offered anywhere within this kernel:\n\n%s" % results)
-        errors_file = d.expand("${S}/%s/cfg/fragment_errors.txt" % kmeta)
-        if os.path.exists(errors_file) and os.stat(errors_file).st_size > 0:
-            with open (errors_file, "r") as myfile:
-               results = myfile.read()
-               bb.warn( "[kernel config]: This BSP contains fragments with errors:\n\n%s" % results)
+                bb.warn( "[kernel config]: This BSP contains fragments with warnings:\n\n%s" % results)
+                warnings_detected = True
 
-    # if the audit level is greater than two, we report if a fragment has overriden
-    # a value from a base fragment. This is really only used for new kernel introduction
-    if bsp_check_visibility > 2:
-        redefinition_file = d.expand("${S}/%s/cfg/redefinition.txt" % kmeta)
-        if os.path.exists(redefinition_file) and os.stat(redefinition_file).st_size > 0:
-            with open (redefinition_file, "r") as myfile:
+    # category #3: redefined options (this is pretty verbose and is debug only)
+    try:
+        analysis = subprocess.check_output(['symbol_why.py', '--dotconfig',  '{}'.format( d.getVar('B') + '/.config' ), '--sanity'], cwd=s, env=env ).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        bb.fatal( "config analysis failed: %s" % e.output.decode('utf-8'))
+
+    if analysis:
+        outfile = "{}/{}/cfg/redefinition.txt".format(s,kmeta)
+        if os.path.isfile(outfile):
+           os.remove(outfile)
+        with open(outfile, 'w+') as f:
+            f.write( analysis )
+
+        # if the audit level is greater than two, we report if a fragment has overriden
+        # a value from a base fragment. This is really only used for new kernel introduction
+        if bsp_check_visibility > 2 and os.stat(outfile).st_size > 0:
+            with open (outfile, "r") as myfile:
                 results = myfile.read()
                 bb.warn( "[kernel config]: This BSP has configuration options defined in more than one config, with differing values:\n\n%s" % results)
+                warnings_detected = True
+
+    if warnings_detected and kmeta_audit_werror:
+        bb.fatal( "configuration warnings detected, werror is set, promoting to fatal" )
 }
 
 # Ensure that the branches (BSP and meta) are on the locations specified by
@@ -458,4 +673,15 @@ python () {
     # If diffconfig is available, ensure it runs after kernel_configme
     if 'do_diffconfig' in d:
         bb.build.addtask('do_diffconfig', None, 'do_kernel_configme', d)
+
+    externalsrc = d.getVar('EXTERNALSRC')
+    if externalsrc:
+        # If we deltask do_patch, do_kernel_configme is left without
+        # dependencies and runs too early
+        d.setVarFlag('do_kernel_configme', 'deps', (d.getVarFlag('do_kernel_configme', 'deps', False) or []) + ['do_unpack'])
 }
+
+# extra tasks
+addtask kernel_version_sanity_check after do_kernel_metadata do_kernel_checkout before do_compile
+addtask validate_branches before do_patch after do_kernel_checkout
+addtask kernel_configcheck after do_configure before do_compile

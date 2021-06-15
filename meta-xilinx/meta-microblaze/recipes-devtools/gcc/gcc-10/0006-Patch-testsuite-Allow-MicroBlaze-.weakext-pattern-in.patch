@@ -1,0 +1,67 @@
+From 49cf9cd3fedce80a63e9d03d42482dd4596c27a7 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Thu, 12 Jan 2017 16:14:15 +0530
+Subject: [PATCH 06/54] [Patch, testsuite]: Allow MicroBlaze .weakext pattern
+ in regex match Extend regex pattern to include optional ext at the end of
+ .weak to match the MicroBlaze weak label .weakext
+
+ChangeLog/testsuite
+
+2014-02-14  David Holsgrove <david.holsgrove@xilinx.com>
+
+ * gcc/testsuite/g++.dg/abi/rtti3.C: Extend scan-assembler
+   pattern to take optional ext after .weak.
+ * gcc/testsuite/g++.dg/abi/thunk4.C: Likewise.
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+
+Conflicts:
+
+	gcc/testsuite/g++.dg/abi/rtti3.C
+---
+ gcc/testsuite/g++.dg/abi/rtti3.C  | 4 ++--
+ gcc/testsuite/g++.dg/abi/thunk3.C | 2 +-
+ gcc/testsuite/g++.dg/abi/thunk4.C | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gcc/testsuite/g++.dg/abi/rtti3.C b/gcc/testsuite/g++.dg/abi/rtti3.C
+index 0cc7d3e79d0..f284cd9255c 100644
+--- a/gcc/testsuite/g++.dg/abi/rtti3.C
++++ b/gcc/testsuite/g++.dg/abi/rtti3.C
+@@ -3,8 +3,8 @@
+ 
+ // { dg-require-weak "" }
+ // { dg-skip-if "Linkonce not weak" { *-*-mingw* *-*-cygwin } }
+-// { dg-final { scan-assembler ".weak\[ \t\]_?_ZTSPP1A" { target { ! { *-*-darwin* hppa*-*-hpux* } } } } }
+-// { dg-final { scan-assembler-not ".weak\[ \t\]_?_ZTIPP1A" { target { ! { *-*-darwin* } } } } }
++// { dg-final { scan-assembler ".weak(ext)?\[ \t\]_?_ZTSPP1A" { target { ! { *-*-darwin* } } } } }
++// { dg-final { scan-assembler-not ".weak(ext)?\[ \t\]_?_ZTIPP1A" { target { ! { *-*-darwin* } } } } }
+ // { dg-final { scan-assembler ".weak_definition\[ \t\]_?_ZTSPP1A" { target { *-*-darwin* } } } }
+ // { dg-final { scan-assembler-not ".weak_definition\[ \t\]_?_ZTIPP1A" { target { *-*-darwin* } } } }
+ 
+diff --git a/gcc/testsuite/g++.dg/abi/thunk3.C b/gcc/testsuite/g++.dg/abi/thunk3.C
+index f2347f79ecd..dcec8a771a1 100644
+--- a/gcc/testsuite/g++.dg/abi/thunk3.C
++++ b/gcc/testsuite/g++.dg/abi/thunk3.C
+@@ -1,5 +1,5 @@
+ // { dg-require-weak "" }
+-// { dg-final { scan-assembler-not ".weak\[\t \]_?_ZThn._N7Derived3FooEv" { target { ! { *-*-darwin* } } } } }
++// { dg-final { scan-assembler-not ".weak(ext)?\[\t \]_?_ZThn._N7Derived3FooEv" { target { ! { *-*-darwin* } } } } }
+ // { dg-final { scan-assembler-not ".weak_definition\[\t \]_?_ZThn._N7Derived3FooEv" { target { *-*-darwin* } } } }
+ 
+ struct Base 
+diff --git a/gcc/testsuite/g++.dg/abi/thunk4.C b/gcc/testsuite/g++.dg/abi/thunk4.C
+index 6e8f124bc5e..d1d34fe1e4a 100644
+--- a/gcc/testsuite/g++.dg/abi/thunk4.C
++++ b/gcc/testsuite/g++.dg/abi/thunk4.C
+@@ -1,6 +1,6 @@
+ // { dg-require-weak "" }
+ // { dg-skip-if "Linkonce not weak" { *-*-mingw* *-*-cygwin } }
+-// { dg-final { scan-assembler ".weak\[ \t\]_?_ZThn._N7Derived3FooEv" { target { ! { *-*-darwin* } } } } }
++// { dg-final { scan-assembler ".weak(ext)?\[ \t\]_?_ZThn._N7Derived3FooEv" { target { ! { *-*-darwin* } } } } }
+ // { dg-final { scan-assembler ".weak_definition\[ \t\]_?_ZThn._N7Derived3FooEv" { target { *-*-darwin* } } } }
+ 
+ struct Base 
+-- 
+2.17.1
+

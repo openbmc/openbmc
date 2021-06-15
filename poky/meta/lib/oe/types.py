@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 import errno
 import re
 import os
@@ -150,7 +154,8 @@ def path(value, relativeto='', normalize='true', mustexist='false'):
 
     if boolean(mustexist):
         try:
-            open(value, 'r')
+            with open(value, 'r'):
+                pass
         except IOError as exc:
             if exc.errno == errno.ENOENT:
                 raise ValueError("{0}: {1}".format(value, os.strerror(errno.ENOENT)))
@@ -179,4 +184,3 @@ def qemu_use_kvm(kvm, target_arch):
         elif build_arch == target_arch:
             use_kvm = True
     return use_kvm
-

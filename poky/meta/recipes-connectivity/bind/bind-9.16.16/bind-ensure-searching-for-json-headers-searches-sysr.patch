@@ -1,0 +1,47 @@
+From edda20fb5a6e88548f85e39d34d6c074306e15bc Mon Sep 17 00:00:00 2001
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Date: Tue, 9 Jun 2015 11:22:00 -0400
+Subject: [PATCH] bind: ensure searching for json headers searches sysroot
+
+Bind can fail configure by detecting headers w/o libs[1], or
+it can fail the host contamination check as per below:
+
+ERROR: This autoconf log indicates errors, it looked at host include and/or library paths while determining system capabilities.
+Rerun configure task after fixing this. The path was 'build/tmp/work/core2-64-poky-linux/bind/9.10.2-r1/build'
+ERROR: Function failed: do_qa_configure
+ERROR: Logfile of failure stored in: build/tmp/work/core2-64-poky-linux/bind/9.10.2-r1/temp/log.do_configure.5242
+ERROR: Task 5 (meta/recipes-connectivity/bind/bind_9.10.2.bb, do_configure) failed with exit code '1'
+NOTE: Tasks Summary: Attempted 773 tasks of which 768 didn't need to be rerun and 1 failed.
+No currently running tasks (773 of 781)
+
+Summary: 1 task failed:
+  /meta/recipes-connectivity/bind/bind_9.10.2.bb, do_configure
+
+One way to fix it would be to unconditionally disable json in bind
+configure[2] but here we fix it by using the path to where we would
+put the header if we had json in the sysroot, in case someone wants
+to make use of the combination some day.
+
+[1] https://trac.macports.org/ticket/45305
+[2] https://trac.macports.org/changeset/126406
+
+Upstream-Status: Inappropriate [OE Specific]
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: bind-9.16.4/configure.ac
+===================================================================
+--- bind-9.16.4.orig/configure.ac
++++ bind-9.16.4/configure.ac
+@@ -1232,7 +1232,7 @@ case "$use_lmdb" in
+ 		LMDB_LIBS=""
+ 		;;
+ 	auto|yes)
+-		for d in /usr /usr/local /opt/local
++		for d in "${STAGING_INCDIR}"
+ 		do
+ 			if test -f "${d}/include/lmdb.h"
+ 			then

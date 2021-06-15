@@ -1,0 +1,294 @@
+From 81d6519499dcfebe7d21e65e002a8885a4e8d852 Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Tue, 19 Nov 2019 13:12:17 -0600
+Subject: [PATCH] Add --debug-prefix-map option
+
+Adds an option to remap file prefixes in output object files. This is
+analogous to the "-fdebug-prefix-map" option in GCC, and allows files to
+be built in a reproducible manner regardless of the build directory.
+
+Upstream-Status: Submitted [https://bugzilla.nasm.us/show_bug.cgi?id=3392635]
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+
+---
+ asm/nasm.c              | 24 ++++++++++++++++++++++++
+ include/nasmlib.h       |  9 +++++++++
+ nasm.txt                |  4 ++++
+ nasmlib/filename.c      | 20 ++++++++++++++++++++
+ output/outas86.c        |  4 +++-
+ output/outcoff.c        |  4 ++--
+ output/outelf.c         |  2 +-
+ output/outieee.c        |  2 +-
+ output/outobj.c         |  2 +-
+ stdlib/strlcat.c        |  2 +-
+ test/elfdebugprefix.asm |  6 ++++++
+ test/performtest.pl     | 12 ++++++++++--
+ 12 files changed, 82 insertions(+), 9 deletions(-)
+ create mode 100644 test/elfdebugprefix.asm
+
+diff --git a/asm/nasm.c b/asm/nasm.c
+index e5ae89a..7a7f8b4 100644
+--- a/asm/nasm.c
++++ b/asm/nasm.c
+@@ -939,6 +939,7 @@ enum text_options {
+     OPT_KEEP_ALL,
+     OPT_NO_LINE,
+     OPT_DEBUG,
++    OPT_DEBUG_PREFIX_MAP,
+     OPT_REPRODUCIBLE
+ };
+ enum need_arg {
+@@ -971,6 +972,7 @@ static const struct textargs textopts[] = {
+     {"keep-all", OPT_KEEP_ALL, ARG_NO, 0},
+     {"no-line",  OPT_NO_LINE, ARG_NO, 0},
+     {"debug",    OPT_DEBUG, ARG_MAYBE, 0},
++    {"debug-prefix-map", OPT_DEBUG_PREFIX_MAP, true, 0},
+     {"reproducible", OPT_REPRODUCIBLE, ARG_NO, 0},
+     {NULL, OPT_BOGUS, ARG_NO, 0}
+ };
+@@ -1337,6 +1339,26 @@ static bool process_arg(char *p, char *q, int pass)
+                 case OPT_REPRODUCIBLE:
+                     reproducible = true;
+                     break;
++                case OPT_DEBUG_PREFIX_MAP: {
++                    struct debug_prefix_list *d;
++                    char *c;
++                    c = strchr(param, '=');
++
++                    if (!c) {
++                        nasm_error(ERR_NONFATAL | ERR_NOFILE | ERR_USAGE,
++                                   "option `--%s' must be of the form `BASE=DEST'", p);
++                        break;
++                    }
++
++                    *c = '\0';
++                    d = nasm_malloc(sizeof(*d));
++                    d->next = debug_prefixes;
++                    d->base = nasm_strdup(param);
++                    d->dest = nasm_strdup(c + 1);
++                    debug_prefixes = d;
++                    *c = '=';
++                    }
++                    break;
+                 case OPT_HELP:
+                     help(stdout);
+                     exit(0);
+@@ -2304,6 +2326,8 @@ static void help(FILE *out)
+         "    -w-x          disable warning x (also -Wno-x)\n"
+         "    -w[+-]error   promote all warnings to errors (also -Werror)\n"
+         "    -w[+-]error=x promote warning x to errors (also -Werror=x)\n"
++        "   --debug-prefix-map base=dest\n"
++        "                  remap paths starting with 'base' to 'dest' in output files\n"
+         , out);
+ 
+     fprintf(out, "       %-20s %s\n",
+diff --git a/include/nasmlib.h b/include/nasmlib.h
+index 438178d..4c3e90d 100644
+--- a/include/nasmlib.h
++++ b/include/nasmlib.h
+@@ -250,10 +250,19 @@ int64_t readstrnum(char *str, int length, bool *warn);
+  */
+ int32_t seg_alloc(void);
+ 
++struct debug_prefix_list {
++    struct debug_prefix_list *next;
++    char *base;
++    char *dest;
++};
++
++extern struct debug_prefix_list *debug_prefixes;
++
+ /*
+  * Add/replace or remove an extension to the end of a filename
+  */
+ const char *filename_set_extension(const char *inname, const char *extension);
++char *filename_debug_remap(char *dest, char const *inname, size_t len);
+ 
+ /*
+  * Utility macros...
+diff --git a/nasm.txt b/nasm.txt
+index cc7fa27..d3485c9 100644
+--- a/nasm.txt
++++ b/nasm.txt
+@@ -147,6 +147,10 @@ OPTIONS
+ 	Prepend or append (respectively) the given argument to all global or
+ 	extern variables.
+ 
++--debug-prefix-map 'BASE=DEST'::
++    Map file names beginning with 'BASE' to 'DEST' when encoding them in
++    output object files.
++
+ SYNTAX
+ ------
+ This man page does not fully describe the syntax of *nasm*'s assembly language,
+diff --git a/nasmlib/filename.c b/nasmlib/filename.c
+index 172ae0b..fda2be4 100644
+--- a/nasmlib/filename.c
++++ b/nasmlib/filename.c
+@@ -39,6 +39,8 @@
+ #include "nasmlib.h"
+ #include "error.h"
+ 
++struct debug_prefix_list *debug_prefixes = NULL;
++
+ /*
+  * Add/modify a filename extension, assumed to be a period-delimited
+  * field at the very end of the filename.  Returns a newly allocated
+@@ -61,3 +63,21 @@ const char *filename_set_extension(const char *inname, const char *extension)
+ 
+     return p;
+ }
++
++char *filename_debug_remap(char *dest, char const *in, size_t len)
++{
++    struct debug_prefix_list *d;
++    size_t n;
++
++    for (d = debug_prefixes; d != NULL; d = d->next) {
++        n = strlen(d->base);
++        if (strncmp(in, d->base, n) == 0) {
++            strlcpy(dest, d->dest, len);
++            strlcat(dest, &in[n], len);
++            return dest;
++        }
++    }
++
++    strlcpy(dest, in, len);
++    return dest;
++}
+diff --git a/output/outas86.c b/output/outas86.c
+index 54b22f8..c4a412c 100644
+--- a/output/outas86.c
++++ b/output/outas86.c
+@@ -110,6 +110,8 @@ static void as86_sect_write(struct Section *, const uint8_t *,
+ 
+ static void as86_init(void)
+ {
++    char filename[FILENAME_MAX];
++
+     stext.data = saa_init(1L);
+     stext.datalen = 0L;
+     stext.head = stext.last = NULL;
+@@ -131,7 +133,7 @@ static void as86_init(void)
+     strslen = 0;
+ 
+     /* as86 module name = input file minus extension */
+-    as86_add_string(filename_set_extension(inname, ""));
++    as86_add_string(filename_debug_remap(filename, filename_set_extension(inname, ""), sizeof(filename)));
+ }
+ 
+ static void as86_cleanup(void)
+diff --git a/output/outcoff.c b/output/outcoff.c
+index 58fa024..14baf7b 100644
+--- a/output/outcoff.c
++++ b/output/outcoff.c
+@@ -1072,14 +1072,14 @@ static void coff_symbol(char *name, int32_t strpos, int32_t value,
+ 
+ static void coff_write_symbols(void)
+ {
+-    char filename[18];
++    char filename[19];
+     uint32_t i;
+ 
+     /*
+      * The `.file' record, and the file name auxiliary record.
+      */
+     coff_symbol(".file", 0L, 0L, -2, 0, 0x67, 1);
+-    strncpy(filename, inname, 18);
++    filename_debug_remap(filename, inname, 19);
+     nasm_write(filename, 18, ofile);
+ 
+     /*
+diff --git a/output/outelf.c b/output/outelf.c
+index 61af020..1292958 100644
+--- a/output/outelf.c
++++ b/output/outelf.c
+@@ -553,7 +553,7 @@ static void elf_init(void)
+     };
+     const char * const *p;
+ 
+-    strlcpy(elf_module, inname, sizeof(elf_module));
++    filename_debug_remap(elf_module, inname, sizeof(elf_module));
+     sects = NULL;
+     nsects = sectlen = 0;
+     syms = saa_init((int32_t)sizeof(struct elf_symbol));
+diff --git a/output/outieee.c b/output/outieee.c
+index 6d6d4b2..cdb8333 100644
+--- a/output/outieee.c
++++ b/output/outieee.c
+@@ -207,7 +207,7 @@ static void ieee_unqualified_name(char *, char *);
+  */
+ static void ieee_init(void)
+ {
+-    strlcpy(ieee_infile, inname, sizeof(ieee_infile));
++    filename_debug_remap(ieee_infile, inname, sizeof(ieee_infile));
+     any_segs = false;
+     fpubhead = NULL;
+     fpubtail = &fpubhead;
+diff --git a/output/outobj.c b/output/outobj.c
+index 56b43f9..fefea94 100644
+--- a/output/outobj.c
++++ b/output/outobj.c
+@@ -644,7 +644,7 @@ static enum directive_result obj_directive(enum directive, char *);
+ 
+ static void obj_init(void)
+ {
+-    strlcpy(obj_infile, inname, sizeof(obj_infile));
++    filename_debug_remap(obj_infile, inname, sizeof(obj_infile));
+     first_seg = seg_alloc();
+     any_segs = false;
+     fpubhead = NULL;
+diff --git a/stdlib/strlcat.c b/stdlib/strlcat.c
+index 7084d46..ee93dea 100644
+--- a/stdlib/strlcat.c
++++ b/stdlib/strlcat.c
+@@ -29,7 +29,7 @@ size_t strlcat(char *dest, const char *src, size_t size)
+     size_t n;
+ 
+     /* find the NULL terminator in dest */
+-    for (n = 0; i < size && dest[n] != '\0'; n++)
++    for (n = 0; n < size && dest[n] != '\0'; n++)
+         ;
+ 
+     /* destination was not NULL terminated. Return the initial size */
+diff --git a/test/elfdebugprefix.asm b/test/elfdebugprefix.asm
+new file mode 100644
+index 0000000..a67ba29
+--- /dev/null
++++ b/test/elfdebugprefix.asm
+@@ -0,0 +1,6 @@
++;Testname=unoptimized; Arguments=-O0 --debug-prefix-map elf=ELF -felf -oelfdebugprefix.o; Files=stdout stderr elfdebugprefix.o; Validate=readelf --wide --symbols elfdebugprefix.o | grep 'FILE.*ELFdebugprefix.asm'
++
++	  SECTION .text
++test:			; [1]
++	  ret
++
+diff --git a/test/performtest.pl b/test/performtest.pl
+index f7865b3..096f960 100755
+--- a/test/performtest.pl
++++ b/test/performtest.pl
+@@ -42,14 +42,22 @@ sub perform {
+     TEST:
+     while(<TESTFILE>) {
+         #See if there is a test case
+-        last unless /Testname=(.*);\s*Arguments=(.*);\s*Files=(.*)/;
+-        my ($subname, $arguments, $files) = ($1, $2, $3);
++        last unless /Testname=(.*);\s*Arguments=(.*);\s*Files=([^;]*)(?:;\s*Validate=(.*))?/;
++        my ($subname, $arguments, $files, $validate) = ($1, $2, $3, $4);
++        chomp $files;
+         debugprint("$subname | $arguments | $files");
+ 
+         #Call nasm with this test case
+         system("$nasm $arguments $testpath > $stdoutfile 2> $stderrfile");
+         debugprint("$nasm $arguments $testpath > $stdoutfile 2> $stderrfile ----> $?");
+ 
++        if($validate) {
++            if(system("$validate >> $stdoutfile 2>> $stderrfile") != 0) {
++                print "Test $testname/$subname validation failed\n";
++                $globalresult = 1;
++            }
++        }
++
+         #Move the output to the test dir
+         mkpath("$outputdir/$testname/$subname");
+         foreach(split / /,$files) {

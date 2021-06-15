@@ -1,0 +1,30 @@
+From 3a935c638605bfb392ca7780d22c08c1a0a71e71 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 5 Sep 2019 21:37:33 -0700
+Subject: [PATCH 1/2] lib/replace/wscript: Avoid generating nested main
+ function
+
+clang is not happy when it sees another main nested inside the main
+function and fails the test for prctl syscall, therefore avoid adding
+implicit main() here
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/replace/wscript | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/replace/wscript b/lib/replace/wscript
+index a7fd25d..d6767fc 100644
+--- a/lib/replace/wscript
++++ b/lib/replace/wscript
+@@ -137,6 +137,7 @@ def configure(conf):
+                     }
+                     ''',
+                     'HAVE_PRCTL',
++                    addmain=False,
+                     headers='sys/prctl.h',
+                     msg='Checking for prctl syscall')
+ 
+-- 
+2.23.0
+

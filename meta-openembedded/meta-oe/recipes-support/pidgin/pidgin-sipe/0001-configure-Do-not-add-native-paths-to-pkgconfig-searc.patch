@@ -1,0 +1,36 @@
+From fedef3c0b1772cee97d7288bee7d5d50805a5964 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 12 Dec 2020 08:56:04 -0800
+Subject: [PATCH] configure: Do not add native paths to pkgconfig search
+
+This does not work in cross environments, secondly in OE we already
+point pkkconfig into recipe sysroot where it will find all the
+dependencies therefore this setting is not needed
+
+Upstream-Status: Inappropriate [ OE-Specific ]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 0df85b0..2481153 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,12 +70,6 @@ AC_CHECK_HEADERS([])
+ dnl checks for library functions
+ AC_CHECK_FUNCS([])
+ 
+-dnl tell pkgconfig to look in the same prefix where we're installing this to,
+-dnl as that is likely where libpurple will be found if it is not in the default
+-dnl pkgconfig path
+-PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:${libdir}/pkgconfig"
+-export PKG_CONFIG_PATH
+-
+ dnl debug mode
+ AC_ARG_ENABLE(debug,
+ 	[AS_HELP_STRING([--enable-debug],
+-- 
+2.29.2
+

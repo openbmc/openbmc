@@ -4,7 +4,7 @@ DESCRIPTION = "Tools for monitoring and filtering incoming requests for tcp \
                services."
 SECTION = "console/network"
 
-LICENSE = "BSD"
+LICENSE = "BSD-1-Clause"
 LIC_FILES_CHKSUM = "file://DISCLAIMER;md5=071bd69cb78b18888ea5e3da5c3127fa"
 PR ="r10"
 
@@ -18,7 +18,7 @@ FILES_libwrap-staticdev = "${libdir}/lib*.a"
 FILES_${PN} = "${sbindir}"
 FILES_${PN}-doc = "${mandir}/man8"
 
-SRC_URI = "ftp://ftp.porcupine.org/pub/security/tcp_wrappers_${PV}.tar.gz \
+SRC_URI = "http://ftp.porcupine.org/pub/security/tcp_wrappers_${PV}.tar.gz \
            file://00_man_quoting.diff \
            file://01_man_portability.patch \
            file://05_wildcard_matching.patch \
@@ -47,6 +47,9 @@ SRC_URI = "ftp://ftp.porcupine.org/pub/security/tcp_wrappers_${PV}.tar.gz \
            file://makefile-fix-parallel.patch \
            file://musl-decls.patch \
            file://0001-Fix-build-with-clang.patch \
+           file://fix_warnings.patch \
+           file://fix_warnings2.patch \
+           file://0001-Remove-fgets-extern-declaration.patch \
            "
 
 SRC_URI[md5sum] = "e6fa25f71226d090f34de3f6b122fb5a"

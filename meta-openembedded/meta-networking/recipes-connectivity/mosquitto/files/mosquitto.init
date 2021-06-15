@@ -38,7 +38,7 @@ export PATH="${PATH:+$PATH:}@SBINDIR@:@BASE_SBINDIR@"
 case "$1" in
     start)
         echo "Starting Mosquitto message broker" "mosquitto"
-        if start-stop-daemon --start --quiet --oknodo --background  --make-pidfile --pidfile ${PIDFILE} --exec ${DAEMON} ; then
+        if start-stop-daemon --start --quiet --oknodo --background --make-pidfile --pidfile ${PIDFILE} --exec ${DAEMON} -- -c @SYSCONFDIR@/mosquitto/mosquitto.conf ; then
             exit 0
         else
             exit 1

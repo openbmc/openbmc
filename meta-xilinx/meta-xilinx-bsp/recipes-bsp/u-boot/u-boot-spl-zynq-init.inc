@@ -64,9 +64,7 @@ python () {
         d.setVar("SPL_BINARY", "")
 
     if providesbin and d.getVar("SOC_FAMILY") in ["zynqmp"]:
-        # determine the path relative to the source tree
-        relpath = os.path.relpath(d.expand("${PMU_FIRMWARE_DEPLOY_DIR}/${PMU_FIRMWARE_IMAGE_NAME}.bin"), d.getVar("S"))
         # setup PMU Firmware path via MAKEFLAGS
-        d.appendVar("EXTRA_OEMAKE", " CONFIG_PMUFW_INIT_FILE=\"{0}\"".format(relpath))
+        d.appendVar("EXTRA_OEMAKE", " CONFIG_PMUFW_INIT_FILE=\"{0}\"".format("${PMU_FIRMWARE_DEPLOY_DIR}/${PMU_FIRMWARE_IMAGE_NAME}.bin"))
 }
 

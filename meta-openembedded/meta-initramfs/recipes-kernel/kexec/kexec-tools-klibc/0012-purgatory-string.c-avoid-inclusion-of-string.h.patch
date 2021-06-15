@@ -1,4 +1,4 @@
-From 2d2ad16f9328a7cbb3f5b8479ae93eb923a0727f Mon Sep 17 00:00:00 2001
+From 9bb386018257e1e18ffe0e925201946515b31080 Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Thu, 19 Apr 2018 00:28:14 +0200
 Subject: [PATCH] purgatory/string.c: avoid inclusion of string.h
@@ -26,6 +26,3 @@ index f06c460..c5e978a 100644
  
  size_t strnlen(const char *s, size_t max)
  {
--- 
-2.7.4
-

@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync time from ME
+Wants=ipmb.service
+After=ipmb.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/me-time-sync.sh
+
+[Install]
+WantedBy=multi-user.target

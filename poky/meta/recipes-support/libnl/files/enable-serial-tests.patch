@@ -1,0 +1,28 @@
+From b1476d89bf7a0bc6062438731ee4e9026696328b Mon Sep 17 00:00:00 2001
+From: Eric Xu <chi.xu@windriver.com>
+Date: Fri, 9 Mar 2018 03:38:49 +0000
+Subject: [PATCH] Add ptest for libnl
+
+serial-tests is required to generate those targets.
+
+Signed-off-by: Eric Xu <chi.xu@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 files changed, 1 insertion(+), 1 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index dfead98..2cc8257 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -46,7 +46,7 @@ AC_INIT(libnl, [libnl_version], [], [], [http://www.infradead.org/~tgr/libnl/])
+ AC_CONFIG_HEADERS([lib/defs.h])
+ AC_CONFIG_AUX_DIR([build-aux])
+ AC_CONFIG_MACRO_DIR([m4])
+-AM_INIT_AUTOMAKE([-Wall foreign subdir-objects])
++AM_INIT_AUTOMAKE([-Wall foreign subdir-objects serial-tests])
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)], [])
+ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+ 
+-- 
+2.13.3
+

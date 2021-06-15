@@ -1,0 +1,99 @@
+From f1686db8735972637d2bbcc6e2fbf391c1e848d9 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@xilinx.com>
+Date: Thu, 3 Dec 2020 14:51:37 -0800
+Subject: [PATCH 51/52] gdb/microblaze-tdep.c: Remove unused functions
+
+Compiler warns the removed functions are not referenced anywhere.
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ gdb/microblaze-tdep.c | 45 -------------------------------------------
+ 1 file changed, 45 deletions(-)
+
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 041ebf1fca..28f79f9ffc 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -140,14 +140,6 @@ microblaze_fetch_instruction (CORE_ADDR pc)
+ constexpr gdb_byte microblaze_break_insn[] = MICROBLAZE_BREAKPOINT;
+ 
+ typedef BP_MANIPULATION (microblaze_break_insn) microblaze_breakpoint;
+-static CORE_ADDR
+-microblaze_store_arguments (struct regcache *regcache, int nargs,
+-			    struct value **args, CORE_ADDR sp,
+-			    int struct_return, CORE_ADDR struct_addr)
+-{
+-  error (_("store_arguments not implemented"));
+-  return sp;
+-}
+ #if 0
+ static int
+ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+@@ -555,12 +547,6 @@ microblaze_frame_base_address (struct frame_info *next_frame,
+   return cache->base;
+ }
+ 
+-static const struct frame_unwind *
+-microblaze_frame_sniffer (struct frame_info *next_frame)
+-{
+-  return &microblaze_frame_unwind;
+-}
+-
+ static const struct frame_base microblaze_frame_base =
+ {
+   &microblaze_frame_unwind,
+@@ -759,12 +745,6 @@ microblaze_software_single_step (struct regcache *regcache)
+ }
+ #endif
+ 
+-static void
+-microblaze_write_pc (struct regcache *regcache, CORE_ADDR pc)
+-{
+-  regcache_cooked_write_unsigned (regcache, MICROBLAZE_PC_REGNUM, pc);
+-}
+-
+ static int dwarf2_to_reg_map[78] =
+ { 0  /* r0  */,   1  /* r1  */,   2  /* r2  */,   3  /* r3  */,  /*  0- 3 */
+   4  /* r4  */,   5  /* r5  */,   6  /* r6  */,   7  /* r7  */,  /*  4- 7 */
+@@ -796,19 +776,6 @@ microblaze_dwarf2_reg_to_regnum (struct gdbarch *gdbarch, int reg)
+   return -1;
+ }
+ 
+-static void
+-microblaze_register_g_packet_guesses (struct gdbarch *gdbarch)
+-{
+-
+-  register_remote_g_packet_guess (gdbarch,
+-                                  4 * MICROBLAZE_NUM_REGS,
+-                                  tdesc_microblaze64);
+-
+-  register_remote_g_packet_guess (gdbarch,
+-                                  4 * MICROBLAZE_NUM_REGS,
+-                                  tdesc_microblaze64_with_stack_protect);
+-}
+-
+ void
+ microblaze_supply_gregset (const struct microblaze_gregset *gregset,
+                         struct regcache *regcache,
+@@ -873,18 +840,6 @@ microblaze_regset_from_core_section (struct gdbarch *gdbarch,
+ }
+ 
+ 
+-static void
+-make_regs (struct gdbarch *arch)
+-{
+-  struct gdbarch_tdep *tdep = gdbarch_tdep (arch);
+-  int mach = gdbarch_bfd_arch_info (arch)->mach;
+-  
+-  if (mach == bfd_mach_microblaze64)
+-    {
+-      set_gdbarch_ptr_bit (arch, 64);
+-    }
+-}
+-
+ static struct gdbarch *
+ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ {
+-- 
+2.17.1
+

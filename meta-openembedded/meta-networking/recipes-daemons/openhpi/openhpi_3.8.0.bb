@@ -17,7 +17,7 @@ servers, Blade Center, and machines which export data via sysfs. \
 
 HOMEPAGE = "http://openhpi.sourceforge.net/Home"
 SECTION = "net"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e3c772a32386888ccb5ae1c0ba95f1a4"
 
 DEPENDS = "net-snmp libxml2 ncurses openssl glib-2.0 popt e2fsprogs \
@@ -33,7 +33,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \
            file://openhpi-glib-cross-compile.patch \
            file://openhpi-linkfix.patch \
            file://openhpi-fix-host-gcc.patch \
-           file://openhpi-fix-testfail-errors.patch \
+           file://openhpi-fix-function-saHpiSensorThresholds.patch \
            file://openhpi-add-libnetsnmp-when-link.patch \
            file://openhpi-invalide-session.patch \
            file://openhpi-use-serial-tests-config-needed-by-ptest.patch \
@@ -70,10 +70,10 @@ export DISTRO
 
 do_install_append () {
     install -m 0755 -d ${D}${sysconfdir}/${BPN}
-    install -m 0755 ${S}/openhpiclient.conf.example ${D}${sysconfdir}/${BPN}/openhpiclient.conf
-    install -m 0700 ${S}/openhpi.conf.example ${D}${sysconfdir}/${BPN}/openhpi.conf
-    install -m 0755 ${S}/simulation.data.example ${D}${sysconfdir}/${BPN}/simulation.data
-    install -m 0755 ${S}/test_agent.data.example ${D}${sysconfdir}/${BPN}/test_agent.data
+    install -m 0644 ${S}/openhpiclient.conf.example ${D}${sysconfdir}/${BPN}/openhpiclient.conf
+    install -m 0600 ${S}/openhpi.conf.example ${D}${sysconfdir}/${BPN}/openhpi.conf
+    install -m 0644 ${S}/simulation.data.example ${D}${sysconfdir}/${BPN}/simulation.data
+    install -m 0644 ${S}/test_agent.data.example ${D}${sysconfdir}/${BPN}/test_agent.data
     install -m 0755 ${WORKDIR}/openhpi.init ${D}${sysconfdir}/init.d/openhpid
 
     install -d ${D}${systemd_unitdir}/system
@@ -83,6 +83,21 @@ do_install_append () {
 }
 
 do_compile_ptest () {
+    for x in `find ${B} -name Makefile -exec grep -l buildtest-TESTS {} \;`; do
+        dir=`dirname ${x}`
+        case $dir in
+            *cpp/t)      ;;
+            *snmp_bc/t)  if ${@bb.utils.contains('PACKAGECONFIG','snmp-bc','true','false',d)}
+                         then
+                           oe_runmake -C ${dir} buildtest-TESTS
+                         fi
+                         ;;
+            *)           oe_runmake -C ${dir} buildtest-TESTS ;;
+        esac
+    done
+}
+
+ack_do_compile_ptest () {
     for x in `find ${B} -name Makefile -exec grep -l buildtest-TESTS {} \;`; do
         dir=`dirname ${x}`
         upper=`dirname ${dir}`
@@ -104,6 +119,9 @@ do_install_ptest () {
         sed -i "s:${S}:${PTEST_PATH}/:g" ${x};
         sed -i "s/^Makefile:/MM:/g" ${x};
     done;
+
+    install -m 644 ${S}/openhpid/t/ohpi/openhpi.conf ${D}${PTEST_PATH}/openhpid/t/ohpi/
+    sed -i "s:OPENHPI_CONF=[^ ]*:OPENHPI_CONF=./openhpi.conf:g" ${D}${PTEST_PATH}/openhpid/t/ohpi/Makefile
 
     mkdir -p ${D}${PTEST_PATH}/plugins/watchdog/
     cp -L ${D}/${libdir}/${BPN}/libwatchdog.so ${D}${PTEST_PATH}/plugins/watchdog/

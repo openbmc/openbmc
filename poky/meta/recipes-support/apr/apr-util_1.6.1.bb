@@ -1,7 +1,7 @@
 SUMMARY = "Apache Portable Runtime (APR) companion library"
 HOMEPAGE = "http://apr.apache.org/"
 SECTION = "libs"
-DEPENDS = "apr expat gdbm"
+DEPENDS = "apr expat"
 
 BBCLASSEXTEND = "native nativesdk"
 
@@ -19,22 +19,23 @@ SRC_URI = "${APACHE_MIRROR}/apr/${BPN}-${PV}.tar.gz \
 SRC_URI[md5sum] = "bd502b9a8670a8012c4d90c31a84955f"
 SRC_URI[sha256sum] = "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459"
 
-EXTRA_OECONF = "--with-apr=${STAGING_BINDIR_CROSS}/apr-1-config \ 
+EXTRA_OECONF = "--with-apr=${STAGING_BINDIR_CROSS}/apr-1-config \
 		--without-odbc \
 		--without-pgsql \
-		--with-dbm=gdbm \
-		--with-gdbm=${STAGING_DIR_HOST}${prefix} \
 		--without-sqlite2 \
 		--with-expat=${STAGING_DIR_HOST}${prefix}"
 
 
-inherit autotools lib_package binconfig
+inherit autotools lib_package binconfig multilib_script
+
+MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/apu-1-config"
 
 OE_BINCONFIG_EXTRA_MANGLE = " -e 's:location=source:location=installed:'"
 
 do_configure_append() {
 	if [ "${CLASSOVERRIDE}" = "class-target" ]; then
 		cp ${STAGING_DATADIR}/apr/apr_rules.mk ${B}/build/rules.mk
+		sed -i -e 's#^CFLAGS=.*#CFLAGS=${TARGET_CFLAGS}#g' ${B}/build/rules.mk
 	fi
 }
 do_configure_prepend_class-native() {
@@ -49,6 +50,7 @@ do_configure_append_class-native() {
 
 do_configure_prepend_class-nativesdk() {
 	cp ${STAGING_DATADIR}/apr/apr_rules.mk ${S}/build/rules.mk
+	sed -i -e 's#^CFLAGS=.*#CFLAGS=${TARGET_CFLAGS}#g' ${S}/build/rules.mk
 }
 
 do_configure_append_class-nativesdk() {
@@ -64,10 +66,11 @@ do_install_append_class-target() {
 	       -e 's,APU_BUILD_DIR=.*,APR_BUILD_DIR=,g' ${D}${bindir}/apu-1-config
 }
 
-PACKAGECONFIG ??= "crypto"
+PACKAGECONFIG ??= "crypto gdbm"
 PACKAGECONFIG[ldap] = "--with-ldap,--without-ldap,openldap"
 PACKAGECONFIG[crypto] = "--with-openssl=${STAGING_DIR_HOST}${prefix} --with-crypto,--without-crypto,openssl"
 PACKAGECONFIG[sqlite3] = "--with-sqlite3=${STAGING_DIR_HOST}${prefix},--without-sqlite3,sqlite3"
+PACKAGECONFIG[gdbm] = "--with-dbm=gdbm --with-gdbm=${STAGING_DIR_HOST}${prefix},--without-gdbm,gdbm"
 
 #files ${libdir}/apr-util-1/*.so are not symlinks but loadable modules thus they are packaged in ${PN}
 FILES_${PN}     += "${libdir}/apr-util-1/apr*${SOLIBS} ${libdir}/apr-util-1/apr*${SOLIBSDEV}"
@@ -79,6 +82,7 @@ INSANE_SKIP_${PN} += "dev-so"
 inherit ptest
 
 RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-gconv-iso8859-1 glibc-gconv-iso8859-2 glibc-gconv-utf-7"
+RDEPENDS_${PN}-ptest += "libgcc"
 
 do_compile_ptest() {
 	cd ${B}/test

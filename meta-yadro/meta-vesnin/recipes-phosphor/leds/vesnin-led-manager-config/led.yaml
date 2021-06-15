@@ -1,0 +1,43 @@
+BmcBooted:
+    heartbeat:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+    alarm_yel:
+        Action: 'On'
+        Priority: 'Blink'
+PowerOn:
+    power_green:
+        Action: 'On'
+        Priority: 'On'
+PgoodTimeout:
+    power_red:
+        Action: 'On'
+        Priority: 'On'
+HostQuiesced:
+    alarm_red:
+        Action: 'On'
+        Priority: 'Blink'
+Overheat:
+    alarm_red:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'
+PsuSmbalert:
+    alarm_yel:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
+        Priority: 'Blink'
+EnclosureIdentify:
+    id_blue:
+        Action: 'Blink'
+        Priority: 'On'
+FruFault:
+    alarm_yel:
+       Action: 'Blink'
+       DutyOn: 50
+       Period: 200
+       Priority: 'Blink'
+

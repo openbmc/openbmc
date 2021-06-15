@@ -1,1 +1,0 @@
-PACKAGECONFIG_append = " thunar"

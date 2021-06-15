@@ -2,18 +2,8 @@
 #
 # Copyright (C) 2014-2015 Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """Devtool build plugin"""
 
 import os
@@ -21,7 +11,8 @@ import bb
 import logging
 import argparse
 import tempfile
-from devtool import exec_build_env_command, check_workspace_recipe, DevtoolError
+from devtool import exec_build_env_command, setup_tinfoil, check_workspace_recipe, DevtoolError
+from devtool import parse_recipe
 
 logger = logging.getLogger('devtool')
 
@@ -53,12 +44,22 @@ def _get_build_tasks(config):
 def build(args, config, basepath, workspace):
     """Entry point for the devtool 'build' subcommand"""
     workspacepn = check_workspace_recipe(workspace, args.recipename, bbclassextend=True)
+    tinfoil = setup_tinfoil(config_only=False, basepath=basepath)
+    try:
+        rd = parse_recipe(config, tinfoil, args.recipename, appends=True, filter_workspace=False)
+        if not rd:
+            return 1
+        deploytask = 'do_deploy' in rd.getVar('__BBTASKS')
+    finally:
+        tinfoil.shutdown()
 
     if args.clean:
         # use clean instead of cleansstate to avoid messing things up in eSDK
         build_tasks = ['do_clean']
     else:
         build_tasks = _get_build_tasks(config)
+        if deploytask:
+            build_tasks.append('do_deploy')
 
     bbappend = workspace[workspacepn]['bbappend']
     if args.disable_parallel_make:

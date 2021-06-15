@@ -1,0 +1,19 @@
+configure contains CFLAGS filtering code which was removing our prefix-map
+flags. We need those to generate reproducible binaries. Allow them through.
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -99,6 +99,10 @@ do
+ 	-mno-cygwin)
+ 	    shift
+ 	    ;;
++	-fmacro-prefix-map*|-fdebug-prefix-map*|-ffile-prefix-map*)
++	    CFLAGS="$CFLAGS $1"
++	    shift
++	    ;;
+ 	-m*)
+ 	    arch="$arch $1"
+ 	    shift

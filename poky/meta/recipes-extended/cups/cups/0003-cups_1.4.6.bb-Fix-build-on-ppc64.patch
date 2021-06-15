@@ -1,0 +1,51 @@
+From 66c2079ae91389ee0f9d704bf0d2cccd53b2c603 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 22 Jul 2012 16:54:17 -0700
+Subject: [PATCH 3/4] cups_1.4.6.bb: Fix build on ppc64
+
+Make CUPS_SERVERBIN relative to libdir otherwise on 64bit arches
+e.g. ppc64 where base libdir is lib64 this does not go well
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate [OE config specific]
+
+Update on 20190904:
+Redefine CUPS_SERVERBIN to "$libexecdir/cups" which solves file confliction
+when multilib is enabled.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+---
+ config-scripts/cups-directories.m4 | 2 +-
+ configure                          | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/config-scripts/cups-directories.m4 b/config-scripts/cups-directories.m4
+index b74083a..9a5abb2 100644
+--- a/config-scripts/cups-directories.m4
++++ b/config-scripts/cups-directories.m4
+@@ -270,7 +270,7 @@ case "$host_os_name" in
+ 	*)
+ 		# All others
+ 		INSTALL_SYSV="install-sysv"
+-		CUPS_SERVERBIN="$exec_prefix/lib/cups"
++		CUPS_SERVERBIN="$libexecdir/cups"
+ 		;;
+ esac
+ 
+diff --git a/configure b/configure
+index d3df145..bc68a6c 100755
+--- a/configure
++++ b/configure
+@@ -6420,7 +6420,7 @@ case "$host_os_name" in
+ 	*)
+ 		# All others
+ 		INSTALL_SYSV="install-sysv"
+-		CUPS_SERVERBIN="$exec_prefix/lib/cups"
++		CUPS_SERVERBIN="$libexecdir/cups"
+ 		;;
+ esac
+ 
+-- 
+2.17.1
+

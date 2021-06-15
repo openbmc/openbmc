@@ -1,0 +1,8 @@
+[Match]
+Name=usb*
+[Network]
+Bridge=gbmcbr
+[Bridge]
+# USB speeds tend to be better than 100mbit (100 cost) but worse
+# than 1gbit (10 cost). Generally around 200mbit.
+Cost=85

@@ -1,5 +1,8 @@
+#
 # Copyright 2018 by Garmin Ltd. or its subsidiaries
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 from oeqa.sdk.context import OESDKTestContext, OESDKTestContextExecutor
 

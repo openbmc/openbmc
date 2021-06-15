@@ -1,5 +1,8 @@
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import os
 
@@ -44,6 +47,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
     default_data = None
     default_test_data = 'data/testdata.json'
     default_tests = ''
+    default_json_result_dir = '%s-results' % name
 
     default_target_type = 'simpleremote'
     default_manifest = 'data/manifest'
@@ -74,7 +78,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
 
         runtime_group.add_argument('--packages-manifest', action='store',
                 default=self.default_manifest,
-                help="Package manifest of the image under testi, default: %s" \
+                help="Package manifest of the image under test, default: %s" \
                 % self.default_manifest)
 
         runtime_group.add_argument('--extract-dir', action='store',
@@ -94,6 +98,12 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
             if len(target_ip_port) == 2:
                 target_ip = target_ip_port[0]
                 kwargs['port'] = target_ip_port[1]
+
+        if server_ip:
+            server_ip_port = server_ip.split(':')
+            if len(server_ip_port) == 2:
+                server_ip = server_ip_port[0]
+                kwargs['server_port'] = int(server_ip_port[1])
 
         if target_type == 'simpleremote':
             target = OESSHTarget(logger, target_ip, server_ip, **kwargs)
@@ -135,7 +145,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
         def add_controller_list(path):
             if not os.path.exists(os.path.join(path, '__init__.py')):
                 raise OSError('Controllers directory %s exists but is missing __init__.py' % path)
-            files = sorted([f for f in os.listdir(path) if f.endswith('.py') and not f.startswith('_')])
+            files = sorted([f for f in os.listdir(path) if f.endswith('.py') and not f.startswith('_') and not f.startswith('.#')])
             for f in files:
                 module = 'oeqa.controllers.' + f[:-3]
                 if module not in controllerslist:
@@ -175,7 +185,7 @@ class OERuntimeTestContextExecutor(OETestContextExecutor):
         except:
             obj = None
         return obj
-        
+
     @staticmethod
     def readPackagesManifest(manifest):
         if not manifest or not os.path.exists(manifest):

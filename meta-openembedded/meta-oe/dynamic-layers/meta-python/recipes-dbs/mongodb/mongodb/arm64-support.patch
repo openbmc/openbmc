@@ -1,0 +1,54 @@
+From 298d958148f1fb2bb7725fed15c68c09677c14c9 Mon Sep 17 00:00:00 2001
+From: Vincent Prince <vincent.prince.fr@gmail.com>
+Date: Mon, 16 Sep 2019 13:37:10 +0200
+Subject: [PATCH 05/10] Add alises for arm64 which is same as aarch64
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+---
+ SConstruct                                      | 1 +
+ src/third_party/IntelRDFPMathLib20U1/SConscript | 2 +-
+ src/third_party/wiredtiger/SConscript           | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/SConstruct b/SConstruct
+index 448939bdd0..abfd816f3e 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -1228,6 +1228,7 @@ if endian == "auto":
+ processor_macros = {
+     'arm'        : { 'endian': 'little', 'defines': ('__arm__',) },
+     'aarch64'    : { 'endian': 'little', 'defines': ('__arm64__', '__aarch64__')},
++    'arm64'      : { 'endian': 'little', 'defines': ('__arm64__', '__aarch64__')},
+     'i386'       : { 'endian': 'little', 'defines': ('__i386', '_M_IX86')},
+     'ppc64le'    : { 'endian': 'little', 'defines': ('__powerpc64__',)},
+     's390x'      : { 'endian': 'big',    'defines': ('__s390x__',)},
+diff --git a/src/third_party/IntelRDFPMathLib20U1/SConscript b/src/third_party/IntelRDFPMathLib20U1/SConscript
+index 58e1b7ba65..bffe83b462 100644
+--- a/src/third_party/IntelRDFPMathLib20U1/SConscript
++++ b/src/third_party/IntelRDFPMathLib20U1/SConscript
+@@ -309,7 +309,7 @@ if processor == 'i386' or processor == 'emscripten':
+ elif processor == 'arm':
+     cpp_defines['IA32'] = '1'
+     cpp_defines['ia32'] = '1'
+-elif processor == "aarch64":
++elif processor == "aarch64" or processor == 'arm64':
+     cpp_defines['efi2'] = '1'
+     cpp_defines['EFI2'] = '1'
+ # Using 64 bit little endian
+diff --git a/src/third_party/wiredtiger/SConscript b/src/third_party/wiredtiger/SConscript
+index d6bd665e23..2f1e656a19 100644
+--- a/src/third_party/wiredtiger/SConscript
++++ b/src/third_party/wiredtiger/SConscript
+@@ -152,7 +152,7 @@ condition_map = {
+     'POSIX_HOST'   : not env.TargetOSIs('windows'),
+     'WINDOWS_HOST' : env.TargetOSIs('windows'),
+ 
+-    'ARM64_HOST'   : env['TARGET_ARCH'] == 'aarch64',
++    'ARM64_HOST'   : env['TARGET_ARCH'] in ('aarch64', 'arm64'),
+     'POWERPC_HOST' : env['TARGET_ARCH'] == 'ppc64le',
+     'X86_HOST'     : env['TARGET_ARCH'] == 'x86_64',
+     'ZSERIES_HOST' : env['TARGET_ARCH'] == 's390x',
+-- 
+2.24.0
+

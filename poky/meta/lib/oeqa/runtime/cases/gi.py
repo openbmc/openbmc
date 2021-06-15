@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 
 from oeqa.runtime.case import OERuntimeTestCase

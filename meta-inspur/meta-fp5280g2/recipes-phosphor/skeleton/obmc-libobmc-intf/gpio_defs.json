@@ -1,0 +1,42 @@
+{
+    "gpio_configs": {
+
+        "power_config": {
+            "power_good_in": "CPLD_BMC_SYS_PWROK",
+            "power_up_outs": [
+                { "name": "BMC_CPLD_SOFTWARE_PG_N", "polarity": false},
+                { "name": "BMC_CPLD_SYS_PWRON", "polarity": false}
+            ],
+            "reset_outs": [
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "BMC_CPLD_SOFTWARE_PG_N",
+            "pin": "J3",
+            "direction": "out"
+        },
+        {
+            "name": "BMC_CPLD_SYS_PWRON",
+            "pin": "AA7",
+            "direction": "out"
+        },
+        {
+            "name": "CPLD_BMC_SYS_PWROK",
+            "pin": "AA1",
+            "direction": "in"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "pin": "AA6",
+            "direction": "both"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "pin": "AB0",
+            "direction": "both"
+        }
+    ]
+}

@@ -1,0 +1,127 @@
+From 49b133d84e7a1471bf51d8d005b1ba8b78c37724 Mon Sep 17 00:00:00 2001
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Sat, 20 Mar 2021 20:59:54 +0100
+Subject: [PATCH] cli: drop the second argument from @click.argument()
+ decorator
+
+@click.argument no longer takes two positional arguments.
+
+Signed-off-by: Bartosz Golaszewski <brgl@bgdev.pl>
+---
+Upstream-Status: Pending
+
+ wpa_supplicant/cli.py | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/wpa_supplicant/cli.py b/wpa_supplicant/cli.py
+index bad5b5b..1fb322d 100644
+--- a/wpa_supplicant/cli.py
++++ b/wpa_supplicant/cli.py
+@@ -81,7 +81,7 @@ def root(ctx, debug):
+ 
+ 
+ @root.group()
+-@click.argument('ifname', 'e.g. wlan0')
++@click.argument('ifname')
+ @click.pass_context
+ def interface(ctx, ifname):
+     """Access fi.w1.wpa_supplicant1.Interface object"""
+@@ -101,7 +101,7 @@ def interface_p2p_device():
+ 
+ 
+ @root.group()
+-@click.argument('ifname', 'e.g. wlan0')
++@click.argument('ifname')
+ @click.option('--ssid', default=None, help='Look at scan results for BSS examples')
+ @click.option('--bssid', default=None, help='Look at scan results for BSS examples')
+ @click.pass_context
+@@ -149,7 +149,7 @@ def persistent_group():
+ # fi.w1.wpa_supplicant1 API
+ #
+ @root.command()
+-@click.argument('ifname', 'e.g. wlan0')
++@click.argument('ifname')
+ @click.option('--bridge_if_name', default=None, help='Bridge to control, e.g., br0')
+ @click.option('--driver', default=None, help='e.g. nl80211')
+ @click.option('--config_file', default=None, help='Config file path')
+@@ -161,7 +161,7 @@ def create_interface(ifname, bridge_if_name, driver, config_file):
+ 
+ 
+ @root.command()
+-@click.argument('ifname', 'e.g. wlan0')
++@click.argument('ifname')
+ def remove_interface(ifname):
+     """Method: Deregisters a wireless interface from wpa_supplicant"""
+     with supplicant() as supp:
+@@ -170,7 +170,7 @@ def remove_interface(ifname):
+ 
+ 
+ @root.command()
+-@click.argument('ifname', 'e.g. wlan0')
++@click.argument('ifname')
+ def get_interface(ifname):
+     """Method: Returns a D-Bus path to an object related to an interface which wpa_supplicant already controls"""
+     with supplicant() as supp:
+@@ -178,7 +178,7 @@ def get_interface(ifname):
+ 
+ 
+ @root.command(name='get')
+-@click.argument('name', 'Name of property (case sensitive)')
++@click.argument('name')
+ def root_get(name):
+     """Method: Get Property (case sensitive)"""
+     with supplicant() as supp:
+@@ -186,8 +186,8 @@ def root_get(name):
+ 
+ 
+ @root.command(name='set')
+-@click.argument('name', 'Name of property (case sensitive)')
+-@click.argument('value', 'Value to be set')
++@click.argument('name')
++@click.argument('value')
+ def root_set(name, value):
+     """Method: Set Property (case sensitive)"""
+     with supplicant() as supp:
+@@ -217,7 +217,7 @@ def disconnect(ctx):
+ 
+ 
+ @interface.command(name='get')
+-@click.argument('name', 'Name of property (case sensitive)')
++@click.argument('name')
+ @click.pass_context
+ def interface_get(ctx, name):
+     """Method: Get Property (case sensitive)"""
+@@ -227,8 +227,8 @@ def interface_get(ctx, name):
+ 
+ 
+ @interface.command(name='set')
+-@click.argument('name', 'Name of property (case sensitive)')
+-@click.argument('value', 'Value to be set')
++@click.argument('name')
++@click.argument('value')
+ @click.pass_context
+ def interface_set(ctx, name, value):
+     """Method: Set Property (case sensitive)"""
+@@ -241,7 +241,7 @@ def interface_set(ctx, name, value):
+ # fi.w1.wpa_supplicant1.BSS API
+ #
+ @bss.command(name='get')
+-@click.argument('name', 'Name of property (case sensitive)')
++@click.argument('name')
+ @click.pass_context
+ def bss_get(ctx, name):
+     """Method: Get Property (case sensitive)"""
+@@ -261,8 +261,8 @@ def bss_get(ctx, name):
+ 
+ 
+ @bss.command(name='set')
+-@click.argument('name', 'Name of property (case sensitive)')
+-@click.argument('value', 'Value to be set')
++@click.argument('name')
++@click.argument('value')
+ @click.pass_context
+ def bss_set(ctx, name, value):
+     """Method: Set Property (case sensitive)"""
+-- 
+2.25.1
+

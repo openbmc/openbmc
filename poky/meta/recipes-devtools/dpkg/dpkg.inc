@@ -1,5 +1,7 @@
 SUMMARY = "Package maintenance system from Debian"
 LICENSE = "GPLv2.0+"
+HOMEPAGE = "https://salsa.debian.org/dpkg-team/dpkg"
+DESCRIPTION = "The primary interface for the dpkg suite is the dselect program. A more low-level and less user-friendly interface is available in the form of the dpkg command."
 SECTION = "base"
 
 DEPENDS = "zlib bzip2 perl ncurses"
@@ -7,9 +9,9 @@ DEPENDS_class-native = "bzip2-replacement-native zlib-native virtual/update-alte
 RDEPENDS_${PN} = "${VIRTUAL-RUNTIME_update-alternatives} perl"
 RDEPENDS_${PN}_class-native = ""
 
-UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/d/dpkg/"
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
-inherit autotools gettext perlnative pkgconfig perl-version
+inherit autotools gettext perlnative pkgconfig perl-version update-alternatives
 
 PERL_class-native = "${STAGING_BINDIR_NATIVE}/perl-native/perl"
 
@@ -26,22 +28,36 @@ EXTRA_OECONF = "\
 		"
 
 EXTRA_OECONF_append_class-target = " --disable-update-alternatives DEB_HOST_ARCH=${DPKG_ARCH}"
+EXTRA_OECONF_append_class-nativesdk = " --disable-update-alternatives DEB_HOST_ARCH=${DPKG_ARCH}"
 
 PACKAGECONFIG = "liblzma"
 PACKAGECONFIG[liblzma] = "--with-liblzma,--without-liblzma, xz"
+
+
+#autotools.bbclass default AUTOTOOLS_AUXDIR is ${S}, we need to under ${S}/build-aux
+AUTOTOOLS_AUXDIR = "${S}/build-aux"
+
+do_configure_prepend () {
+        mkdir -p ${AUTOTOOLS_AUXDIR}
+        # autotools_do_configure updates po/Makefile.in.in, we also need
+        # update dselect/po and scripts/po
+        cp -f ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/dselect/po/
+        cp -f ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/scripts/po/
+}
 
 do_install_append () {
 	if [ "${PN}" = "dpkg-native" ]; then
 		# update-alternatives doesn't have an offline mode
 		rm ${D}${bindir}/update-alternatives
-		sed -i -e 's|^#!.*${bindir}/perl-native.*/perl|#!/usr/bin/env nativeperl|' ${D}${bindir}/dpkg-*
+		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env nativeperl|' ${D}${bindir}/dpkg-*
 	else
-		sed -i -e 's|^#!.*${bindir}/perl-native.*/perl|#!/usr/bin/env perl|' ${D}${bindir}/dpkg-*
+		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env perl|' ${D}${bindir}/dpkg-*
 	fi
 }
 
 PROV = "virtual/update-alternatives"
 PROV_class-native = ""
+PROV_class-nativesdk = ""
 
 PROVIDES += "${PROV}"
 
@@ -76,9 +92,13 @@ RDEPENDS_${PN}-perl += "perl-module-carp perl-module-constant \
 # the bitbake version.
 #
 PACKAGES =+ "${PN}-start-stop"
-FILES_${PN}-start-stop = "${sbindir}/start-stop-daemon"
+FILES_${PN}-start-stop = "${sbindir}/start-stop-daemon.${BPN}"
+ALTERNATIVE_${PN}-start-stop = "start-stop-daemon"
+ALTERNATIVE_LINK_NAME[start-stop-daemon] = "${sbindir}/start-stop-daemon"
+ALTERNATIVE_PRIORITY = "100"
 
-RDEPENDS_${PN} += "${PN}-start-stop"
+EXTRA_RDPENDS = "ldconfig"
+EXTRA_RDPENDS_libc-musl = ""
+RDEPENDS_${PN} += "${PN}-start-stop ${EXTRA_RDPENDS}"
 
-
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

@@ -1,14 +1,20 @@
 Different components of OpenEmbedded are under different licenses (a mix
-of MIT and GPLv2). Please see:
-
-meta/COPYING.GPLv2 (GPLv2)
-meta/COPYING.MIT (MIT)
-meta-selftest/COPYING.MIT (MIT)
-meta-skeleton/COPYING.MIT (MIT)
+of MIT and GPLv2). See LICENSE.GPL-2.0-only and LICENSE.MIT for further 
+details of the individual licenses.
 
 All metadata is MIT licensed unless otherwise stated. Source code
-included in tree for individual recipes is under the LICENSE stated in
-the associated recipe (.bb file) unless otherwise stated.
+included in tree for individual recipes (e.g. patches) are under 
+the LICENSE stated in the associated recipe (.bb file) unless 
+otherwise stated.
 
 License information for any other files is either explicitly stated 
-or defaults to GPL version 2.
+or defaults to GPL version 2 only.
+
+Individual files contain the following style tags instead of the full license 
+text to identify their license:
+
+    SPDX-License-Identifier: GPL-2.0-only
+    SPDX-License-Identifier: MIT
+
+This enables machine processing of license information based on the SPDX
+License Identifiers that are here available: http://spdx.org/licenses/

@@ -1,0 +1,57 @@
+From 49fdaa5a4f0ed7e20b82ccb8d0db53075777abe9 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Thu, 29 Nov 2018 17:59:25 +0530
+Subject: [PATCH 25/52] fixing the long & long long mingw toolchain issue
+
+---
+ gas/config/tc-microblaze.c | 10 +++++-----
+ opcodes/microblaze-opc.h   |  4 ++--
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 532a26eaa5..b00b759893 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -783,7 +783,7 @@ parse_imm (char * s, expressionS * e, offsetT min, offsetT max)
+ }
+ 
+  static char *
+-parse_imml (char * s, expressionS * e, long min, long max)
++parse_imml (char * s, expressionS * e, long long min, long long max)
+ {
+   char *new_pointer;
+   char *atp;
+@@ -834,11 +834,11 @@ parse_imml (char * s, expressionS * e, long min, long max)
+     ; /* An error message has already been emitted.  */
+   else if ((e->X_op != O_constant && e->X_op != O_symbol) )
+     as_fatal (_("operand must be a constant or a label"));
+-  else if ((e->X_op == O_constant) && ((long) e->X_add_number < min
+-				       || (long) e->X_add_number > max))
++  else if ((e->X_op == O_constant) && ((long long) e->X_add_number < min
++				       || (long long) e->X_add_number > max))
+     {
+-      as_fatal (_("operand must be absolute in range %ld..%ld, not %ld"),
+-                min, max, (long) e->X_add_number);
++      as_fatal (_("operand must be absolute in range %lld..%lld, not %lld"),
++                min, max, (long long) e->X_add_number);
+     }
+ 
+   if (atp)
+diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
+index f970941209..77d74c17f3 100644
+--- a/opcodes/microblaze-opc.h
++++ b/opcodes/microblaze-opc.h
+@@ -585,8 +585,8 @@ char pvr_register_prefix[] = "rpvr";
+ #define MIN_IMM6_WIDTH  ((int) 0x00000001)
+ #define MAX_IMM6_WIDTH  ((int) 0x00000040)
+ 
+-#define MIN_IMML  ((long) 0xffffff8000000000L)
+-#define MAX_IMML  ((long) 0x0000007fffffffffL)
++#define MIN_IMML  ((long long) 0xffffff8000000000L)
++#define MAX_IMML  ((long long) 0x0000007fffffffffL)
+ 
+ #endif /* MICROBLAZE_OPC */
+ 
+-- 
+2.17.1
+

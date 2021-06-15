@@ -1,0 +1,30 @@
+From d0d5ac317dab11610a5fc91ca3e7f5ad72ce2236 Mon Sep 17 00:00:00 2001
+From: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+Date: Tue, 29 Oct 2019 13:19:37 +0800
+Subject: [PATCH] Bug fix for pid_t not found on musl.
+
+When compiling version 5.1.6 on musl, the following error occurs:
+log.h:49:8: error: unknown type name 'pid_t'
+
+Upstream-Status: Pending
+
+Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+---
+ lib/defaults.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/defaults.c b/lib/defaults.c
+index a6ea116..b3ecfa5 100644
+--- a/lib/defaults.c
++++ b/lib/defaults.c
+@@ -21,6 +21,7 @@
+ #include <string.h>
+ #include <sys/utsname.h>
+ #include <sys/stat.h>
++#include <sys/types.h>
+ #include <stdarg.h>
+ 
+ #include "config.h"
+-- 
+2.20.1
+

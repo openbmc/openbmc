@@ -2,25 +2,42 @@
 # -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # This bbclass is used for creating archive for:
-# 1) original (or unpacked) source: ARCHIVER_MODE[src] = "original"
-# 2) patched source: ARCHIVER_MODE[src] = "patched" (default)
-# 3) configured source: ARCHIVER_MODE[src] = "configured"
-# 4) The patches between do_unpack and do_patch:
-#    ARCHIVER_MODE[diff] = "1"
-#    And you can set the one that you'd like to exclude from the diff:
-#    ARCHIVER_MODE[diff-exclude] ?= ".pc autom4te.cache patches"
-# 5) The environment data, similar to 'bitbake -e recipe':
-#    ARCHIVER_MODE[dumpdata] = "1"
-# 6) The recipe (.bb and .inc): ARCHIVER_MODE[recipe] = "1"
-# 7) Whether output the .src.rpm package:
-#    ARCHIVER_MODE[srpm] = "1"
-# 8) Filter the license, the recipe whose license in
-#    COPYLEFT_LICENSE_INCLUDE will be included, and in
-#    COPYLEFT_LICENSE_EXCLUDE will be excluded.
-#    COPYLEFT_LICENSE_INCLUDE = 'GPL* LGPL*'
-#    COPYLEFT_LICENSE_EXCLUDE = 'CLOSED Proprietary'
-# 9) The recipe type that will be archived:
-#    COPYLEFT_RECIPE_TYPES = 'target'
+#  1) original (or unpacked) source: ARCHIVER_MODE[src] = "original"
+#  2) patched source: ARCHIVER_MODE[src] = "patched" (default)
+#  3) configured source: ARCHIVER_MODE[src] = "configured"
+#  4) source mirror: ARCHIVE_MODE[src] = "mirror"
+#  5) The patches between do_unpack and do_patch:
+#     ARCHIVER_MODE[diff] = "1"
+#     And you can set the one that you'd like to exclude from the diff:
+#     ARCHIVER_MODE[diff-exclude] ?= ".pc autom4te.cache patches"
+#  6) The environment data, similar to 'bitbake -e recipe':
+#     ARCHIVER_MODE[dumpdata] = "1"
+#  7) The recipe (.bb and .inc): ARCHIVER_MODE[recipe] = "1"
+#  8) Whether output the .src.rpm package:
+#     ARCHIVER_MODE[srpm] = "1"
+#  9) Filter the license, the recipe whose license in
+#     COPYLEFT_LICENSE_INCLUDE will be included, and in
+#     COPYLEFT_LICENSE_EXCLUDE will be excluded.
+#     COPYLEFT_LICENSE_INCLUDE = 'GPL* LGPL*'
+#     COPYLEFT_LICENSE_EXCLUDE = 'CLOSED Proprietary'
+# 10) The recipe type that will be archived:
+#     COPYLEFT_RECIPE_TYPES = 'target'
+# 11) The source mirror mode:
+#     ARCHIVER_MODE[mirror] = "split" (default): Sources are split into
+#     per-recipe directories in a similar way to other archiver modes.
+#     Post-processing may be required to produce a single mirror directory.
+#     This does however allow inspection of duplicate sources and more
+#     intelligent handling.
+#     ARCHIVER_MODE[mirror] = "combined": All sources are placed into a single
+#     directory suitable for direct use as a mirror. Duplicate sources are
+#     ignored.
+# 12) Source mirror exclusions:
+#     ARCHIVER_MIRROR_EXCLUDE is a list of prefixes to exclude from the mirror.
+#     This may be used for sources which you are already publishing yourself
+#     (e.g. if the URI starts with 'https://mysite.com/' and your mirror is
+#     going to be published to the same site). It may also be used to exclude
+#     local files (with the prefix 'file://') if these will be provided as part
+#     of an archive of the layers themselves.
 #
 
 # Create archive for all the recipe types
@@ -33,14 +50,19 @@ ARCHIVER_MODE[diff] ?= "0"
 ARCHIVER_MODE[diff-exclude] ?= ".pc autom4te.cache patches"
 ARCHIVER_MODE[dumpdata] ?= "0"
 ARCHIVER_MODE[recipe] ?= "0"
+ARCHIVER_MODE[mirror] ?= "split"
 
 DEPLOY_DIR_SRC ?= "${DEPLOY_DIR}/sources"
-ARCHIVER_TOPDIR ?= "${WORKDIR}/deploy-sources"
+ARCHIVER_TOPDIR ?= "${WORKDIR}/archiver-sources"
 ARCHIVER_OUTDIR = "${ARCHIVER_TOPDIR}/${TARGET_SYS}/${PF}/"
 ARCHIVER_RPMTOPDIR ?= "${WORKDIR}/deploy-sources-rpm"
 ARCHIVER_RPMOUTDIR = "${ARCHIVER_RPMTOPDIR}/${TARGET_SYS}/${PF}/"
 ARCHIVER_WORKDIR = "${WORKDIR}/archiver-work/"
 
+# When producing a combined mirror directory, allow duplicates for the case
+# where multiple recipes use the same SRC_URI.
+ARCHIVER_COMBINED_MIRRORDIR = "${ARCHIVER_TOPDIR}/mirror"
+SSTATE_DUPWHITELIST += "${DEPLOY_DIR_SRC}/mirror"
 
 do_dumpdata[dirs] = "${ARCHIVER_OUTDIR}"
 do_ar_recipe[dirs] = "${ARCHIVER_OUTDIR}"
@@ -78,6 +100,9 @@ python () {
         bb.debug(1, 'archiver: %s is excluded, covered by gcc-source' % pn)
         return
 
+    def hasTask(task):
+        return bool(d.getVarFlag(task, "task", False)) and not bool(d.getVarFlag(task, "noexec", False))
+
     ar_src = d.getVarFlag('ARCHIVER_MODE', 'src')
     ar_dumpdata = d.getVarFlag('ARCHIVER_MODE', 'dumpdata')
     ar_recipe = d.getVarFlag('ARCHIVER_MODE', 'recipe')
@@ -93,19 +118,18 @@ python () {
         d.appendVarFlag('do_deploy_archives', 'depends', ' %s:do_ar_patched' % pn)
     elif ar_src == "configured":
         # We can't use "addtask do_ar_configured after do_configure" since it
-        # will cause the deptask of do_populate_sysroot to run not matter what
+        # will cause the deptask of do_populate_sysroot to run no matter what
         # archives we need, so we add the depends here.
 
         # There is a corner case with "gcc-source-${PV}" recipes, they don't have
         # the "do_configure" task, so we need to use "do_preconfigure"
-        def hasTask(task):
-            return bool(d.getVarFlag(task, "task", False)) and not bool(d.getVarFlag(task, "noexec", False))
-
         if hasTask("do_preconfigure"):
             d.appendVarFlag('do_ar_configured', 'depends', ' %s:do_preconfigure' % pn)
         elif hasTask("do_configure"):
             d.appendVarFlag('do_ar_configured', 'depends', ' %s:do_configure' % pn)
         d.appendVarFlag('do_deploy_archives', 'depends', ' %s:do_ar_configured' % pn)
+    elif ar_src == "mirror":
+        d.appendVarFlag('do_deploy_archives', 'depends', '%s:do_ar_mirror' % pn)
 
     elif ar_src:
         bb.fatal("Invalid ARCHIVER_MODE[src]: %s" % ar_src)
@@ -118,7 +142,11 @@ python () {
 
     # Output the SRPM package
     if d.getVarFlag('ARCHIVER_MODE', 'srpm') == "1" and d.getVar('PACKAGES'):
-        if "package_rpm" in d.getVar('PACKAGE_CLASSES'):
+        if "package_rpm" not in d.getVar('PACKAGE_CLASSES'):
+            bb.fatal("ARCHIVER_MODE[srpm] needs package_rpm in PACKAGE_CLASSES")
+
+        # Some recipes do not have any packaging tasks
+        if hasTask("do_package_write_rpm"):
             d.appendVarFlag('do_deploy_archives', 'depends', ' %s:do_package_write_rpm' % pn)
             d.appendVarFlag('do_package_write_rpm', 'dirs', ' ${ARCHIVER_RPMTOPDIR}')
             d.appendVarFlag('do_package_write_rpm', 'sstate-inputdirs', ' ${ARCHIVER_RPMTOPDIR}')
@@ -133,11 +161,9 @@ python () {
                 d.appendVarFlag('do_package_write_rpm', 'depends', ' %s:do_ar_patched' % pn)
             elif ar_src == "configured":
                 d.appendVarFlag('do_package_write_rpm', 'depends', ' %s:do_ar_configured' % pn)
-        else:
-            bb.fatal("ARCHIVER_MODE[srpm] needs package_rpm in PACKAGE_CLASSES")
 }
 
-# Take all the sources for a recipe and puts them in WORKDIR/archiver-work/.
+# Take all the sources for a recipe and put them in WORKDIR/archiver-work/.
 # Files in SRC_URI are copied directly, anything that's a directory
 # (e.g. git repositories) is "unpacked" and then put into a tarball.
 python do_ar_original() {
@@ -167,7 +193,13 @@ python do_ar_original() {
                 del decoded[5][param]
         encoded = bb.fetch2.encodeurl(decoded)
         urls[i] = encoded
-    fetch = bb.fetch2.Fetch(urls, d)
+
+    # Cleanup SRC_URI before call bb.fetch2.Fetch() since now SRC_URI is in the
+    # variable "urls", otherwise there might be errors like:
+    # The SRCREV_FORMAT variable must be set when multiple SCMs are used
+    ld = bb.data.createCopy(d)
+    ld.setVar('SRC_URI', '')
+    fetch = bb.fetch2.Fetch(urls, ld)
     tarball_suffix = {}
     for url in fetch.urls:
         local = fetch.localpath(url).rstrip("/");
@@ -219,9 +251,10 @@ python do_ar_patched() {
 
     # Get the ARCHIVER_OUTDIR before we reset the WORKDIR
     ar_outdir = d.getVar('ARCHIVER_OUTDIR')
-    ar_workdir = d.getVar('ARCHIVER_WORKDIR')
+    if not is_work_shared(d):
+        ar_workdir = d.getVar('ARCHIVER_WORKDIR')
+        d.setVar('WORKDIR', ar_workdir)
     bb.note('Archiving the patched source...')
-    d.setVar('WORKDIR', ar_workdir)
     create_tarball(d, d.getVar('S'), 'patched', ar_outdir)
 }
 
@@ -276,6 +309,78 @@ python do_ar_configured() {
                 oe.path.copytree(builddir, os.path.join(srcdir, \
                     'build.%s.ar_configured' % d.getVar('PF')))
         create_tarball(d, srcdir, 'configured', ar_outdir)
+}
+
+python do_ar_mirror() {
+    import subprocess
+
+    src_uri = (d.getVar('SRC_URI') or '').split()
+    if len(src_uri) == 0:
+        return
+
+    dl_dir = d.getVar('DL_DIR')
+    mirror_exclusions = (d.getVar('ARCHIVER_MIRROR_EXCLUDE') or '').split()
+    mirror_mode = d.getVarFlag('ARCHIVER_MODE', 'mirror')
+    have_mirror_tarballs = d.getVar('BB_GENERATE_MIRROR_TARBALLS')
+
+    if mirror_mode == 'combined':
+        destdir = d.getVar('ARCHIVER_COMBINED_MIRRORDIR')
+    elif mirror_mode == 'split':
+        destdir = d.getVar('ARCHIVER_OUTDIR')
+    else:
+        bb.fatal('Invalid ARCHIVER_MODE[mirror]: %s' % (mirror_mode))
+
+    if not have_mirror_tarballs:
+        bb.fatal('Using `ARCHIVER_MODE[src] = "mirror"` depends on setting `BB_GENERATE_MIRROR_TARBALLS = "1"`')
+
+    def is_excluded(url):
+        for prefix in mirror_exclusions:
+            if url.startswith(prefix):
+                return True
+        return False
+
+    bb.note('Archiving the source as a mirror...')
+
+    bb.utils.mkdirhier(destdir)
+
+    fetcher = bb.fetch2.Fetch(src_uri, d)
+
+    for ud in fetcher.expanded_urldata():
+        if is_excluded(ud.url):
+            bb.note('Skipping excluded url: %s' % (ud.url))
+            continue
+
+        bb.note('Archiving url: %s' % (ud.url))
+        ud.setup_localpath(d)
+        localpath = None
+
+        # Check for mirror tarballs first. We will archive the first mirror
+        # tarball that we find as it's assumed that we just need one.
+        for mirror_fname in ud.mirrortarballs:
+            mirror_path = os.path.join(dl_dir, mirror_fname)
+            if os.path.exists(mirror_path):
+                bb.note('Found mirror tarball: %s' % (mirror_path))
+                localpath = mirror_path
+                break
+
+        if len(ud.mirrortarballs) and not localpath:
+            bb.warn('Mirror tarballs are listed for a source but none are present. ' \
+                    'Falling back to original download.\n' \
+                    'SRC_URI = %s' % (ud.url))
+
+        # Check original download
+        if not localpath:
+            bb.note('Using original download: %s' % (ud.localpath))
+            localpath = ud.localpath
+
+        if not localpath or not os.path.exists(localpath):
+            bb.fatal('Original download is missing for a source.\n' \
+                        'SRC_URI = %s' % (ud.url))
+
+        # We now have an appropriate localpath
+        bb.note('Copying source mirror')
+        cmd = 'cp -fpPRH %s %s' % (localpath, destdir)
+        subprocess.check_call(cmd, shell=True)
 }
 
 def exclude_useless_paths(tarinfo):
@@ -358,7 +463,7 @@ python do_unpack_and_patch() {
     ar_sysroot_native = d.getVar('STAGING_DIR_NATIVE')
     pn = d.getVar('PN')
 
-    # The kernel class functions require it to be on work-shared, so we dont change WORKDIR
+    # The kernel class functions require it to be on work-shared, so we don't change WORKDIR
     if not is_work_shared(d):
         # Change the WORKDIR to make do_unpack do_patch run in another dir.
         d.setVar('WORKDIR', ar_workdir)
@@ -400,7 +505,7 @@ python do_unpack_and_patch() {
 # of the output file ensures that we create it each time the recipe
 # gets rebuilt, at least as long as a PR server is used. We also rely
 # on that mechanism to catch changes in the file content, because the
-# file content is not part of of the task signature either.
+# file content is not part of the task signature either.
 do_ar_recipe[vardepsexclude] += "BBINCLUDED"
 python do_ar_recipe () {
     """
@@ -438,9 +543,10 @@ python do_ar_recipe () {
             incfile = include_re.match(line).group(1)
         if incfile:
             incfile = d.expand(incfile)
+        if incfile:
             incfile = bb.utils.which(bbpath, incfile)
-            if incfile:
-                shutil.copy(incfile, outdir)
+        if incfile:
+            shutil.copy(incfile, outdir)
 
     create_tarball(d, outdir, 'recipe', d.getVar('ARCHIVER_OUTDIR'))
     bb.utils.remove(outdir, recurse=True)
@@ -476,12 +582,16 @@ do_deploy_archives[sstate-outputdirs] = "${DEPLOY_DIR_SRC}"
 addtask do_deploy_archives_setscene
 
 addtask do_ar_original after do_unpack
-addtask do_unpack_and_patch after do_patch
+addtask do_unpack_and_patch after do_patch do_preconfigure
 addtask do_ar_patched after do_unpack_and_patch
 addtask do_ar_configured after do_unpack_and_patch
+addtask do_ar_mirror after do_fetch
 addtask do_dumpdata
 addtask do_ar_recipe
-addtask do_deploy_archives before do_build
+addtask do_deploy_archives
+do_build[recrdeptask] += "do_deploy_archives"
+do_rootfs[recrdeptask] += "do_deploy_archives"
+do_populate_sdk[recrdeptask] += "do_deploy_archives"
 
 python () {
     # Add tasks in the correct order, specifically for linux-yocto to avoid race condition.

@@ -1,5 +1,5 @@
 SUMMARY = "Provides a bridge between gconf and xsettings"
-HOMEPAGE = "http://svn.o-hand.com/view/matchbox/trunk/settings-daemon/"
+HOMEPAGE = "https://git.yoctoproject.org/cgit/cgit.cgi/xsettings-daemon/"
 BUGTRACKER = "http://bugzilla.yoctoproject.org/"
 LICENSE = "MIT-style"
 LIC_FILES_CHKSUM = "file://xsettings-manager.h;endline=22;md5=7cfac9d2d4dc3694cc7eb605cf32a69b \
@@ -17,7 +17,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
 S = "${WORKDIR}/git"
 
-inherit autotools pkgconfig gconf distro_features_check
+inherit autotools pkgconfig gconf features_check
 
 FILES_${PN} = 	"${bindir}/* ${sysconfdir}"
 

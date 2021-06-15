@@ -6,18 +6,7 @@
 #
 # Copyright 2012-2015 Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 
 import sys
@@ -400,21 +389,16 @@ def list_pkgs(args):
                     return False
         return True
 
+    pkglist = []
     if args.recipe:
         packages = get_recipe_pkgs(args.pkgdata_dir, args.recipe, args.unpackaged)
 
         if args.runtime:
-            pkglist = []
             runtime_pkgs = lookup_pkglist(packages, args.pkgdata_dir, False)
             for rtpkgs in runtime_pkgs.values():
                 pkglist.extend(rtpkgs)
         else:
             pkglist = packages
-
-        for pkg in pkglist:
-            if matchpkg(pkg):
-                found = True
-                print("%s" % pkg)
     else:
         if args.runtime:
             searchdir = 'runtime-reverse'
@@ -425,9 +409,13 @@ def list_pkgs(args):
             for fn in files:
                 if fn.endswith('.packaged'):
                     continue
-                if matchpkg(fn):
-                    found = True
-                    print("%s" % fn)
+                pkglist.append(fn)
+
+    for pkg in sorted(pkglist):
+        if matchpkg(pkg):
+            found = True
+            print("%s" % pkg)
+
     if not found:
         if args.pkgspec:
             logger.error("Unable to find any package matching %s" % args.pkgspec)
@@ -610,6 +598,9 @@ def main():
             logger.error("Unable to find bitbake by searching parent directory of this script or PATH")
             sys.exit(1)
         logger.debug('Found bitbake path: %s' % bitbakepath)
+        if not os.environ.get('BUILDDIR', ''):
+            logger.error("This script can only be run after initialising the build environment (e.g. by using oe-init-build-env)")
+            sys.exit(1)
         tinfoil = tinfoil_init()
         try:
             args.pkgdata_dir = tinfoil.config_data.getVar('PKGDATA_DIR')

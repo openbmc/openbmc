@@ -22,10 +22,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  Makefile.in | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/Makefile.in b/Makefile.in
-index 4c11913..18ecc23 100644
---- a/Makefile.in
-+++ b/Makefile.in
+Index: at-3.2.1/Makefile.in
+===================================================================
+--- at-3.2.1.orig/Makefile.in
++++ at-3.2.1/Makefile.in
 @@ -83,6 +83,8 @@ y.tab.c y.tab.h: parsetime.y
  lex.yy.c: parsetime.l
  	$(LEX) -i parsetime.l
@@ -35,6 +35,3 @@ index 4c11913..18ecc23 100644
  atd.service: atd.service.in
  	cat $< | sed -e 's![@]sbindir[@]!$(sbindir)!g' | sed -e 's![@]atjobdir[@]!$(atjobdir)!g' > $@
  
--- 
-2.7.4
-

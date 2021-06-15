@@ -1,7 +1,0 @@
-[Unit]
-Description=Power%i On
-After=obmc-power-start-pre@%i.target
-Wants=multi-user.target
-Conflicts=obmc-chassis-poweroff@%i.target
-RefuseManualStart=yes
-RefuseManualStop=yes

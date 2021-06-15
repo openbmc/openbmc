@@ -8,17 +8,11 @@ POKY_DEFAULT_EXTRA_RRECOMMENDS = "kernel-module-af-packet"
 DISTRO_EXTRA_RDEPENDS += " ${POKY_DEFAULT_EXTRA_RDEPENDS}"
 DISTRO_EXTRA_RRECOMMENDS += " ${POKY_DEFAULT_EXTRA_RRECOMMENDS}"
 
-POKYQEMUDEPS = "${@bb.utils.contains("INCOMPATIBLE_LICENSE", "GPL-3.0", "", "packagegroup-core-device-devel",d)}"
-DISTRO_EXTRA_RDEPENDS_append_qemuarm = " ${POKYQEMUDEPS}"
-DISTRO_EXTRA_RDEPENDS_append_qemuarm64 = " ${POKYQEMUDEPS}"
-DISTRO_EXTRA_RDEPENDS_append_qemumips = " ${POKYQEMUDEPS}"
-DISTRO_EXTRA_RDEPENDS_append_qemuppc = " ${POKYQEMUDEPS}"
-DISTRO_EXTRA_RDEPENDS_append_qemux86 = " ${POKYQEMUDEPS}"
-DISTRO_EXTRA_RDEPENDS_append_qemux86-64 = " ${POKYQEMUDEPS}"
+DISTROOVERRIDES .= ":openbmc-phosphor"
 
 TCLIBCAPPEND = ""
 
-QEMU_TARGETS ?= "arm aarch64 i386 mips mipsel mips64 mips64el nios2 ppc x86_64"
+QEMU_TARGETS ?= "arm aarch64 i386 riscv32 riscv64 x86_64"
 
 PREMIRRORS ??= "\
 bzr://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n \
@@ -72,8 +66,8 @@ WARN_QA_remove = "${WARN_TO_ERROR_QA}"
 ERROR_QA_append = " ${WARN_TO_ERROR_QA}"
 
 require conf/distro/include/no-static-libs.inc
+require conf/distro/include/yocto-uninative.inc
 
-DISTRO = "openbmc-phosphor"
 DISTRO_NAME = "Phosphor OpenBMC (Phosphor OpenBMC Project Reference Distro)"
 DISTRO_VERSION = "0.1.0"
 TARGET_VENDOR="-openbmc"
@@ -95,27 +89,23 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED = " \
 DISTRO_FEATURES_OBMC = " \
         obmc-host-ctl \
         obmc-host-ipmi \
-        obmc-logging-mgmt \
         obmc-phosphor-chassis-mgmt \
         obmc-phosphor-fan-mgmt \
         obmc-phosphor-flash-mgmt \
         obmc-phosphor-system-mgmt \
-        obmc-phosphor-user-mgmt \
-        obmc-settings-mgmt \
         "
 
 DISTRO_FEATURES_DEFAULT = " \
         avahi \
+        ipv4 \
+        ipv6 \
         pam \
         slp \
         systemd \
-        ldap \
-        libc-inet-anl \
         "
 
-DISTRO_FEATURES = " \
+DISTRO_FEATURES += " \
         ${DISTRO_FEATURES_DEFAULT} \
-        ${DISTRO_FEATURES_LIBC} \
         ${DISTRO_FEATURES_OBMC} \
         "
 
@@ -125,26 +115,25 @@ MACHINE_FEATURES += " \
 
 DISTRO_EXTRA_RDEPENDS_remove_qemuarm = "packagegroup-core-device-devel"
 
-# TODO: openbmc/openbmc#12345 - Upgrade to pygobject-3.
-PREFERRED_VERSION_python-pygobject = "2.%"
-
 include conf/distro/include/openbmc-phosphor/${MACHINE}.inc
 
-KERNEL_FEATURES_append = " phosphor-gpio-keys"
-KERNEL_FEATURES_remove_qemuall = " phosphor-gpio-keys"
+IMAGE_CLASSES_append = " image_types_phosphor phosphor-rootfs-postcommands"
+IMAGE_CLASSES_append_npcm7xx = " image_types_phosphor_nuvoton"
 
-IMAGE_CLASSES_append = " image_types_phosphor"
-
-# OpenBMC uses a couple recipes from meta-virtualization
-# but we do not actually want any virtualization support
-# enabled on a BMC distribution.  Silence the emitted
-# warning.
-SKIP_META_VIRT_SANITY_CHECK = "1"
+IMAGE_INSTALL_append = " dbus-broker libnss-systemd"
 
 # Skip the udev database by default.  It adds around 2MB
 # compressed to the root filesystem, and probably doesn't
 # make sense on a BMC anyway.
-BAD_RECOMMENDATIONS_pn-obmc-phosphor-image = "udev-hwdb"
-BAD_RECOMMENDATIONS_pn-obmc-phosphor-image += "shared-mime-info"
+BAD_RECOMMENDATIONS += "udev-hwdb"
+BAD_RECOMMENDATIONS += "shared-mime-info"
 
 LAYER_CONF_VERSION ?= "8"
+
+KERNEL_CLASSES_append = " obmc-phosphor-kernel-version"
+
+# Some packages have directory trees of YAML files arranged based on
+# canonical organization names.  'xyz/openbmc_project' should be used
+# everywhere in phosphor, but some layers may append this with their
+# own organization(s).
+OBMC_ORG_YAML_SUBDIRS += " xyz/openbmc_project"

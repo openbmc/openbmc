@@ -1,0 +1,13 @@
+[Unit]
+Description=IPv6 Packet Filtering Framework
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=@SBINDIR@/ip6tables-restore -w -- @RULESDIR@/ip6tables.rules
+ExecReload=@SBINDIR@/ip6tables-restore -w -- @RULESDIR@/ip6tables.rules
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

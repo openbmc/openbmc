@@ -10,10 +10,9 @@ inherit obmc-phosphor-ipmiprovider-symlink
 
 DEPENDS += "phosphor-ipmi-host"
 DEPENDS += "autoconf-archive-native"
-DEPENDS += "sdbusplus sdbusplus-native"
+DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
-DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
-DEPENDS += "openpower-dbus-interfaces openpower-dbus-interfaces-native"
+DEPENDS += "phosphor-dbus-interfaces"
 
 TARGET_CFLAGS += "-fpic"
 
@@ -22,7 +21,7 @@ HOSTIPMI_PROVIDER_LIBRARY += "libhiomap.so"
 S = "${WORKDIR}/git"
 
 SRC_URI += "git://github.com/openbmc/openpower-host-ipmi-flash"
-SRCREV = "d4b7f5e4819aa6e3ddb165a80149dd1a1c1649d7"
+SRCREV = "61e18614a64866026b5da05b11e51df2b8653bc4"
 
 FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"

@@ -1,0 +1,28 @@
+Fix error when compile for powerpc:
+
+| x_sh_dbIO.c: In function 'swap_short':
+| x_sh_dbIO.c:229:36: error: initializer element is not constant
+|   229 |       static unsigned short ooop = *iptr;
+|       |                                    ^
+
+Upstream-Status: Pending
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ src/sh_dbIO.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/sh_dbIO.c b/src/sh_dbIO.c
+index b547ac5..23a9621 100644
+--- a/src/sh_dbIO.c
++++ b/src/sh_dbIO.c
+@@ -226,7 +226,8 @@ static unsigned short *  swap_short (unsigned short * iptr)
+   else
+     {
+       /* alignment problem */
+-      static unsigned short ooop = *iptr;
++      static unsigned short ooop;
++      ooop = *iptr;
+       unsigned short hi   = (ooop & 0xff00);
+       unsigned short lo   = (ooop & 0xff);
+       ooop = (lo << 8) | (hi >> 8);

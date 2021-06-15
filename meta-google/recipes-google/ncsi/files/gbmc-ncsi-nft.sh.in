@@ -1,0 +1,101 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[ -z "${gbmc_ncsi_nft_lib-}" ] || return
+
+gbmc_ncsi_nft_init=
+gbmc_ncsi_nft_lastip4=
+gbmc_ncsi_nft_lastip6=
+
+gbmc_ncsi_nft_update() {
+  [ -n "$gbmc_ncsi_nft_init" ] || return
+
+  printf 'NCSI firewall for IPv4(%s) IPv6(%s)\n' \
+    "${gbmc_ncsi_nft_lastip4:-(deleted)}" \
+    "${gbmc_ncsi_nft_lastip6:-(deleted)}" >&2
+
+  local contents=
+  contents+='table inet filter {'$'\n'
+  contents+='    chain ncsi_input {'$'\n'
+
+  local ip4="$gbmc_ncsi_nft_lastip4"
+  if [ -n "$ip4" ]; then
+    contents+="        ip daddr $ip4 goto ncsi_legacy_input"$'\n'
+  fi
+
+  local ip6="$gbmc_ncsi_nft_lastip6"
+  if [ -n "$ip6" ]; then
+    contents+="        ip6 daddr $ip6/128 goto ncsi_legacy_input"$'\n'
+
+    local ip_bytes=()
+    ip_to_bytes ip_bytes "$ip6"
+    # If our address has enough spare bits for appending the BMC suffix
+    # then we add a rule that allows the BMC subnet. That is, we need a /64
+    # as input.
+    local i
+    for (( i = 8; i < 16; i++ )); do
+      if (( ip_bytes[$i] != 0 )); then
+        ip_bytes=()
+        break
+      fi
+    done
+    if (( ${#ip_bytes[@]} != 0 )); then
+      ip_bytes[8]=0xfd
+      local pfx="$(ip_bytes_to_str ip_bytes)"
+      contents+="        ip6 saddr != $pfx/72 ip6 daddr"
+      contents+=" $pfx/72 goto ncsi_gbmc_br_pub_input"$'\n'
+    fi
+  fi
+
+  contents+='    }'$'\n'
+  contents+='    chain ncsi_forward {'$'\n'
+  if [ -n "$pfx" ]; then
+    contents+="        ip6 saddr != $pfx/72 ip6 daddr $pfx/72 accept"$'\n'
+  fi
+  contents+='    }'$'\n'
+  contents+='}'$'\n'
+
+  local rfile=/run/nftables/40-gbmc-ncsi-in.rules
+  mkdir -p -m 755 "$(dirname "$rfile")"
+  printf '%s' "$contents" >"$rfile"
+
+  echo 'Restarting nftables' >&2
+  systemctl reset-failed nftables
+  systemctl --no-block restart nftables
+}
+
+gbmc_ncsi_nft_hook() {
+  if [ "$change" = 'init' ]; then
+    gbmc_ncsi_nft_init=1
+    gbmc_ncsi_nft_update
+  elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' -a "$scope" = 'global' ]; then
+    if [ "$fam" = 'inet6' ]; then
+      local -n lastip='gbmc_ncsi_nft_lastip6'
+    else
+      local -n lastip='gbmc_ncsi_nft_lastip4'
+    fi
+    if [ "$action" = 'add' -a "$ip" != "$lastip" ]; then
+      lastip="$ip"
+      gbmc_ncsi_nft_update
+    fi
+    if [ "$action" = 'del' -a "$ip" = "$lastip" ]; then
+      lastip=
+      gbmc_ncsi_nft_update
+    fi
+  fi
+}
+
+GBMC_IP_MONITOR_HOOKS+=(gbmc_ncsi_nft_hook)
+
+gbmc_ncsi_nft_lib=1

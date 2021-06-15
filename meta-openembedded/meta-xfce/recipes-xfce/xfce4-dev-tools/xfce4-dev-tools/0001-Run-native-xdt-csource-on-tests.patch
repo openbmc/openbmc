@@ -1,0 +1,33 @@
+From b2fcd5c09ee6b4ad03f93ee5e1dd32f2f062cf07 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 3 Jan 2021 15:36:07 +0100
+Subject: [PATCH] Run native xdt-csource on tests
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Tests cannot be opted out so let them pass.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ tests/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index fa0832c..7c46bbf 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -26,7 +26,7 @@ DISTCLEANFILES = test-xdt-csource-data.c
+ BUILT_SOURCES = test-xdt-csource-data.c
+ 
+ test-xdt-csource-data.c: Makefile $(srcdir)/data/data.bin $(srcdir)/data/data.txt
+-	$(top_builddir)/xdt-csource/xdt-csource --extern --build-list data_bin $(srcdir)/data/data.bin data_txt $(srcdir)/data/data.txt > test-xdt-csource-data.c
++	xdt-csource --extern --build-list data_bin $(srcdir)/data/data.bin data_txt $(srcdir)/data/data.txt > test-xdt-csource-data.c
+ 
+ clean-local:
+ 	rm -f *.core core core.*
+-- 
+2.26.2
+

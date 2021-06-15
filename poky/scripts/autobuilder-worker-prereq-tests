@@ -3,7 +3,7 @@
 # Script which can be run on new autobuilder workers to check all needed configuration is present.
 # Designed to be run in a repo where bitbake/oe-core are already present.
 #
-
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # Todo
 # Add testtools/subunit import test

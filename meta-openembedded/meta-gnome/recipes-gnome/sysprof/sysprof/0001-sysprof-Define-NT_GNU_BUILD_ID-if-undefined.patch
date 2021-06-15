@@ -1,0 +1,35 @@
+From 3025d80aaacc5f67aa9eb1e6fde30f71d9c5b04b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 18 Jul 2011 16:00:17 -0700
+Subject: [PATCH 1/2] sysprof: Define NT_GNU_BUILD_ID if undefined
+
+On uclibc elf.h does not have GNU extentions but we need this define
+so we define it locally if its not getting it from elf.h
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Upstream-Status: Pending
+
+%% original patch: define-NT_GNU_BUILD_ID.patch
+---
+ src/libsysprof/elfparser.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/libsysprof/elfparser.h b/src/libsysprof/elfparser.h
+index 160e4c9..94fa5c0 100644
+--- a/src/libsysprof/elfparser.h
++++ b/src/libsysprof/elfparser.h
+@@ -18,6 +18,10 @@
+ 
+ #include <glib.h>
+ 
++#ifndef NT_GNU_BUILD_ID
++#define NT_GNU_BUILD_ID 3
++#endif
++
+ typedef struct ElfSym ElfSym;
+ typedef struct ElfParser ElfParser;
+ 
+-- 
+2.17.1
+

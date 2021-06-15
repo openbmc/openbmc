@@ -1,4 +1,4 @@
-From 10afeecd10499fbd64b2c68d3b076c6906df441f Mon Sep 17 00:00:00 2001
+From a99fc685214452aedabf9ac105bb99357006aa26 Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Wed, 5 Sep 2018 17:07:48 +0200
 Subject: [PATCH] kexec-arm64.c: workaround for getrandom() syscall
@@ -15,15 +15,15 @@ and
 | ../git/kexec/arch/arm64/kexec-arm64.c:499:12: warning: implicit declaration of function 'getrandom'; did you mean 'srandom'? [-Wimplicit-function-declaration]
 |    result = getrandom(&fdt_val64,
 
-
 Upstream-Status: Inappropriate [klibc specific]
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
 ---
  kexec/arch/arm64/kexec-arm64.c | 12 +++++++++++-
  1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/kexec/arch/arm64/kexec-arm64.c b/kexec/arch/arm64/kexec-arm64.c
-index 7a12479..8a7f5c5 100644
+index b143e86..88d4168 100644
 --- a/kexec/arch/arm64/kexec-arm64.c
 +++ b/kexec/arch/arm64/kexec-arm64.c
 @@ -16,7 +16,11 @@
@@ -54,8 +54,5 @@ index 7a12479..8a7f5c5 100644
 +				GRND_NONBLOCK);
 +#endif
  		if(result == -1) {
- 			dbgprintf("%s: Reading random bytes failed.\n",
+ 			fprintf(stderr, "%s: Reading random bytes failed.\n",
  					__func__);
--- 
-2.7.4
-

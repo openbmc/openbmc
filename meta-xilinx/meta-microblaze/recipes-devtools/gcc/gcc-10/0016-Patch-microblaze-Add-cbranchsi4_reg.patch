@@ -1,0 +1,147 @@
+From 386b8dcef2d774e9138515814be0fd579ade5af5 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 17 Jan 2017 17:04:37 +0530
+Subject: [PATCH 16/54] [Patch, microblaze]: Add cbranchsi4_reg This patch
+ optimizes the generation of  pcmpne/pcmpeq instruction if the compare
+ instruction has no immediate values.For the immediate values the xor
+ instruction is generated
+
+Signed-off-by: Nagaraju Mekala <nmekala@xilix.com>
+Signed-off-by: Ajit Agarwal  <ajitkum@xilinx.com>
+
+ChangeLog:
+2015-01-13 Nagaraju Mekala <nmekala@xilix.com>
+           Ajit Agarwal  <ajitkum@xilinx.com>
+
+  *microblaze.md (cbranchsi4_reg): New
+  *microblaze.c (microblaze_expand_conditional_branch_reg): New
+
+Conflicts:
+
+	gcc/config/microblaze/microblaze-protos.h
+---
+ gcc/config/microblaze/microblaze-protos.h         |  2 +-
+ gcc/testsuite/gcc.target/microblaze/isa/fcmp1.c   |  2 +-
+ gcc/testsuite/gcc.target/microblaze/isa/fcmp2.c   |  2 +-
+ gcc/testsuite/gcc.target/microblaze/isa/fcmp3.c   |  2 +-
+ gcc/testsuite/gcc.target/microblaze/isa/fcmp4.c   |  2 +-
+ gcc/testsuite/gcc.target/microblaze/isa/nofcmp.c  | 14 +++++++-------
+ gcc/testsuite/gcc.target/microblaze/isa/vanilla.c | 12 ++++++------
+ 7 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze-protos.h b/gcc/config/microblaze/microblaze-protos.h
+index 982b2abd2d4..c2f88813a8d 100644
+--- a/gcc/config/microblaze/microblaze-protos.h
++++ b/gcc/config/microblaze/microblaze-protos.h
+@@ -33,7 +33,7 @@ extern int microblaze_expand_shift (rtx *);
+ extern bool microblaze_expand_move (machine_mode, rtx *);
+ extern bool microblaze_expand_block_move (rtx, rtx, rtx, rtx);
+ extern void microblaze_expand_divide (rtx *);
+-extern void microblaze_expand_conditional_branch (machine_mode, rtx *);
++extern void microblaze_expand_conditional_branch (enum machine_mode, rtx *);
+ extern void microblaze_expand_conditional_branch_reg (machine_mode, rtx *);
+ extern void microblaze_expand_conditional_branch_sf (rtx *); 
+ extern int microblaze_can_use_return_insn (void);
+diff --git a/gcc/testsuite/gcc.target/microblaze/isa/fcmp1.c b/gcc/testsuite/gcc.target/microblaze/isa/fcmp1.c
+index 4041a241391..ccc6a461cd9 100644
+--- a/gcc/testsuite/gcc.target/microblaze/isa/fcmp1.c
++++ b/gcc/testsuite/gcc.target/microblaze/isa/fcmp1.c
+@@ -6,5 +6,5 @@ void float_func ()
+ {
+   /* { dg-final { scan-assembler "fcmp\.(le|gt)\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1])\[^0-9]" } } */
+     if (f2 <= f3) 
+-        print ("le");
++        f2 = f3;
+ }
+diff --git a/gcc/testsuite/gcc.target/microblaze/isa/fcmp2.c b/gcc/testsuite/gcc.target/microblaze/isa/fcmp2.c
+index 3902b839db9..1dd5fe6c539 100644
+--- a/gcc/testsuite/gcc.target/microblaze/isa/fcmp2.c
++++ b/gcc/testsuite/gcc.target/microblaze/isa/fcmp2.c
+@@ -6,5 +6,5 @@ void float_func ()
+ {
+   /* { dg-final { scan-assembler "fcmp\.(lt|ge)\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1])\[^0-9]" } } */
+     if (f2 < f3) 
+-        print ("lt");
++        f2 = f3;
+ }
+diff --git a/gcc/testsuite/gcc.target/microblaze/isa/fcmp3.c b/gcc/testsuite/gcc.target/microblaze/isa/fcmp3.c
+index 8555974dda5..d6f80fb0ec3 100644
+--- a/gcc/testsuite/gcc.target/microblaze/isa/fcmp3.c
++++ b/gcc/testsuite/gcc.target/microblaze/isa/fcmp3.c
+@@ -6,5 +6,5 @@ void float_func ()
+ {
+   /* { dg-final { scan-assembler "fcmp\.(eq|ne)\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1])\[^0-9]" } } */
+     if (f2 == f3) 
+-        print ("eq");
++        f1 = f2 + f3;
+ }
+diff --git a/gcc/testsuite/gcc.target/microblaze/isa/fcmp4.c b/gcc/testsuite/gcc.target/microblaze/isa/fcmp4.c
+index 79cc5f9dd8e..d1177249552 100644
+--- a/gcc/testsuite/gcc.target/microblaze/isa/fcmp4.c
++++ b/gcc/testsuite/gcc.target/microblaze/isa/fcmp4.c
+@@ -5,5 +5,5 @@ void float_func(float f1, float f2, float f3)
+   /* { dg-final { scan-assembler "fcmp\.eq\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1])\[^0-9]" } } */
+   /* { dg-final { scan-assembler "fcmp\.le\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1])\[^0-9]" } } */
+     if(f1==f2 && f1<=f3)
+-        print ("f1 eq f2 && f1 le f3");
++        f2 = f3;
+ }
+diff --git a/gcc/testsuite/gcc.target/microblaze/isa/nofcmp.c b/gcc/testsuite/gcc.target/microblaze/isa/nofcmp.c
+index ebfb170ecee..75822977ef8 100644
+--- a/gcc/testsuite/gcc.target/microblaze/isa/nofcmp.c
++++ b/gcc/testsuite/gcc.target/microblaze/isa/nofcmp.c
+@@ -5,17 +5,17 @@ volatile float f1, f2, f3;
+ void float_func () 
+ {
+     /* { dg-final { scan-assembler-not "fcmp" } } */
+-    if (f2 <= f3) 
+-        print ("le");
++    if (f2 <= f3)
++        f1 = f3;
+     else if (f2 == f3) 
+-        print ("eq");
++        f1 = f3;
+     else if (f2 < f3) 
+-        print ("lt");
++        f1 = f3;
+     else if (f2 > f3) 
+-        print ("gt");
++        f1 = f3;
+     else if (f2 >= f3) 
+-        print ("ge");
++        f1 = f3;
+     else if (f2 != f3) 
+-        print ("ne");
++        f1 = f3;
+     
+ }
+diff --git a/gcc/testsuite/gcc.target/microblaze/isa/vanilla.c b/gcc/testsuite/gcc.target/microblaze/isa/vanilla.c
+index 1d6ba807b12..532c035adfd 100644
+--- a/gcc/testsuite/gcc.target/microblaze/isa/vanilla.c
++++ b/gcc/testsuite/gcc.target/microblaze/isa/vanilla.c
+@@ -74,16 +74,16 @@ void float_cmp_func ()
+ {
+     /* { dg-final { scan-assembler-not "fcmp" } } */
+     if (f2 <= f3) 
+-        print ("le");
++        f1 = f3;
+     else if (f2 == f3) 
+-        print ("eq");
++        f1 = f3;
+     else if (f2 < f3) 
+-        print ("lt");
++        f1 = f3;
+     else if (f2 > f3) 
+-        print ("gt");
++        f1 = f3;
+     else if (f2 >= f3) 
+-        print ("ge");
++        f1 = f3;
+     else if (f2 != f3) 
+-        print ("ne");
++        f1 = f3;
+     
+ }
+-- 
+2.17.1
+

@@ -1,0 +1,74 @@
+{
+    "gpio_configs": {
+
+        "power_config": {
+            "power_good_in": "SYS_PWROK_BUFF",
+            "power_up_outs": [
+                {"name": "SOFTWARE_PGOOD", "polarity": true},
+                {"name": "BMC_POWER_UP", "polarity": true}
+            ],
+            "reset_outs": [
+                {"name": "BMC_CP0_RESET_N", "polarity": false}
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "BMC_POWER_UP",
+            "pin": "D1",
+            "direction": "out"
+        },
+        {
+            "name": "SOFTWARE_PGOOD",
+            "pin": "R1",
+            "direction": "out"
+        },
+        {
+            "name": "SYS_PWROK_BUFF",
+            "pin": "D2",
+            "direction": "in"
+        },
+        {
+            "name": "CHECKSTOP",
+            "pin": "J2",
+            "direction": "falling"
+        },
+        {
+            "name": "BMC_CP0_RESET_N",
+            "pin": "A1",
+            "direction": "out"
+        },
+        {
+            "name": "BMC_VS0_PERST_N",
+            "pin": "B6",
+            "direction": "out"
+        },
+        {
+            "name": "BMC_VS1_PERST_N",
+            "pin": "B7",
+            "direction": "out"
+        },
+        {
+            "name": "BMC_CP0_PERST_ENABLE_R",
+            "pin": "A3",
+            "direction": "out"
+        },
+        {
+            "name": "IDBTN",
+            "pin": "F1",
+            "direction": "both"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "pin": "I3",
+            "direction": "both"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "pin": "J1",
+            "direction": "both"
+        }
+    ]
+}
+

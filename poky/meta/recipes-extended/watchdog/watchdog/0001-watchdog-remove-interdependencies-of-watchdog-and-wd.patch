@@ -34,7 +34,7 @@ index 7a2fc36..f31d1fe 100644
 -ExecStart=/bin/sh -c '[ $run_watchdog != 1 ] || exec /usr/sbin/watchdog $watchdog_options'
 -ExecStopPost=/bin/sh -c '[ $run_wd_keepalive != 1 ] || false'
 +ExecStart=/bin/sh -c '[ x$run_watchdog != x1 ] || exec /usr/sbin/watchdog $watchdog_options'
-+PIDFile=/var/run/watchdog.pid
++PIDFile=/run/watchdog.pid
  
  [Install]
 -WantedBy=default.target

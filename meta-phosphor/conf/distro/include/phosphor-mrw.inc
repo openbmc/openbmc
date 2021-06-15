@@ -13,5 +13,5 @@ PREFERRED_PROVIDER_virtual/phosphor-ipmi-sensor-inventory_df-mrw ?= "phosphor-ip
 PREFERRED_PROVIDER_virtual/phosphor-ipmi-inventory-sel_df-mrw ?= "phosphor-ipmi-inventory-sel-mrw-native"
 PREFERRED_PROVIDER_virtual/phosphor-led-manager-config-native_df-mrw ?= "phosphor-led-manager-config-mrw-native"
 PREFERRED_PROVIDER_virtual/phosphor-logging-callouts_df-mrw ?= "phosphor-logging-callouts-mrw-native"
-PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config_df-mrw ?= "phosphor-fan-presence-mrw-native"
-PREFERRED_PROVIDER_virtual/phosphor-fan-control-fan-config_df-mrw ?= "phosphor-fan-control-fan-config-mrw-native"
+PREFERRED_PROVIDER_virtual/phosphor-fan-presence-config_df-mrw ?= "phosphor-fan-presence-mrw"
+PREFERRED_PROVIDER_virtual/phosphor-fan-control-fan-config_df-mrw ?= "phosphor-fan-control-fan-config-mrw"

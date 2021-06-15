@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 import os
 import sys
@@ -62,7 +65,6 @@ if 0:
     format_str = "%(levelname)s: %(message)s"
     conlogformat = bb.msg.BBLogFormatter(format_str)
     consolelog = logging.FileHandler(logfilename)
-    bb.msg.addDefaultlogFilter(consolelog)
     consolelog.setFormatter(conlogformat)
     logger.addHandler(consolelog)
 
@@ -116,7 +118,9 @@ def worker_child_fire(event, d):
     data = b"<event>" + pickle.dumps(event) + b"</event>"
     try:
         worker_pipe_lock.acquire()
-        worker_pipe.write(data)
+        while(len(data)):
+            written = worker_pipe.write(data)
+            data = data[written:]
         worker_pipe_lock.release()
     except IOError:
         sigterm_handler(None, None)
@@ -146,11 +150,15 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
 
     taskdep = workerdata["taskdeps"][fn]
     if 'umask' in taskdep and taskname in taskdep['umask']:
+        umask = taskdep['umask'][taskname]
+    elif workerdata["umask"]:
+        umask = workerdata["umask"]
+    if umask:
         # umask might come in as a number or text string..
         try:
-             umask = int(taskdep['umask'][taskname],8)
+             umask = int(umask, 8)
         except TypeError:
-             umask = taskdep['umask'][taskname]
+             pass
 
     dry_run = cfg.dry_run or dry_run_exec
 
@@ -165,7 +173,7 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
         fakedirs = (workerdata["fakerootdirs"][fn] or "").split()
         for p in fakedirs:
             bb.utils.mkdirhier(p)
-        logger.debug(2, 'Running %s:%s under fakeroot, fakedirs: %s' %
+        logger.debug2('Running %s:%s under fakeroot, fakedirs: %s' %
                         (fn, taskname, ', '.join(fakedirs)))
     else:
         envvars = (workerdata["fakerootnoenv"][fn] or "").split()
@@ -192,9 +200,6 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
             global worker_pipe_lock
             pipein.close()
 
-            signal.signal(signal.SIGTERM, sigterm_handler)
-            # Let SIGHUP exit as SIGTERM
-            signal.signal(signal.SIGHUP, sigterm_handler)
             bb.utils.signal_on_parent_exit("SIGTERM")
 
             # Save out the PID so that the event can include it the
@@ -209,6 +214,11 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
             # This ensures signals sent to the controlling terminal like Ctrl+C
             # don't stop the child processes.
             os.setsid()
+
+            signal.signal(signal.SIGTERM, sigterm_handler)
+            # Let SIGHUP exit as SIGTERM
+            signal.signal(signal.SIGHUP, sigterm_handler)
+
             # No stdin
             newsi = os.open(os.devnull, os.O_RDWR)
             os.dup2(newsi, sys.stdin.fileno())
@@ -231,6 +241,8 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
                     the_data.setVar(varname, value)
 
                 bb.parse.siggen.set_taskdata(workerdata["sigdata"])
+                if "newhashes" in workerdata:
+                    bb.parse.siggen.set_taskhashes(workerdata["newhashes"])
                 ret = 0
 
                 the_data = bb_cache.loadDataFull(fn, appends)
@@ -315,7 +327,9 @@ class runQueueWorkerPipe():
         end = len(self.queue)
         index = self.queue.find(b"</event>")
         while index != -1:
-            worker_fire_prepickled(self.queue[:index+8])
+            msg = self.queue[:index+8]
+            assert msg.startswith(b"<event>") and msg.count(b"<event>") == 1
+            worker_fire_prepickled(msg)
             self.queue = self.queue[index+8:]
             index = self.queue.find(b"</event>")
         return (end > start)
@@ -374,6 +388,7 @@ class BitbakeWorker(object):
                 self.handle_item(b"cookerconfig", self.handle_cookercfg)
                 self.handle_item(b"extraconfigdata", self.handle_extraconfigdata)
                 self.handle_item(b"workerdata", self.handle_workerdata)
+                self.handle_item(b"newtaskhashes", self.handle_newtaskhashes)
                 self.handle_item(b"runtask", self.handle_runtask)
                 self.handle_item(b"finishnow", self.handle_finishnow)
                 self.handle_item(b"ping", self.handle_ping)
@@ -406,12 +421,16 @@ class BitbakeWorker(object):
 
     def handle_workerdata(self, data):
         self.workerdata = pickle.loads(data)
-        bb.msg.loggerDefaultDebugLevel = self.workerdata["logdefaultdebug"]
-        bb.msg.loggerDefaultVerbose = self.workerdata["logdefaultverbose"]
-        bb.msg.loggerVerboseLogs = self.workerdata["logdefaultverboselogs"]
+        bb.build.verboseShellLogging = self.workerdata["build_verbose_shell"]
+        bb.build.verboseStdoutLogging = self.workerdata["build_verbose_stdout"]
+        bb.msg.loggerDefaultLogLevel = self.workerdata["logdefaultlevel"]
         bb.msg.loggerDefaultDomains = self.workerdata["logdefaultdomain"]
         for mc in self.databuilder.mcdata:
             self.databuilder.mcdata[mc].setVar("PRSERV_HOST", self.workerdata["prhost"])
+            self.databuilder.mcdata[mc].setVar("BB_HASHSERVE", self.workerdata["hashservaddr"])
+
+    def handle_newtaskhashes(self, data):
+        self.workerdata["newhashes"] = pickle.loads(data)
 
     def handle_ping(self, _):
         workerlog_write("Handling ping\n")

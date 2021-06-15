@@ -1,0 +1,79 @@
+From 60987a1df8eb8c9196222375574dcd7bc0ad2daa Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Nov 2019 20:23:27 -0800
+Subject: [PATCH] Fix build on 32bit arches with 64bit time_t
+
+time element is deprecated on new input_event structure in kernel's
+input.h [1]
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=152194fe9c3f
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/evemu-impl.h |  5 +++++
+ src/evemu.c      | 20 ++++++++++++--------
+ 2 files changed, 17 insertions(+), 8 deletions(-)
+
+diff --git a/src/evemu-impl.h b/src/evemu-impl.h
+index acf2976..c08d861 100644
+--- a/src/evemu-impl.h
++++ b/src/evemu-impl.h
+@@ -21,6 +21,11 @@
+ #include <evemu.h>
+ #include <linux/uinput.h>
+ 
++#ifndef input_event_sec
++#define input_event_sec time.tv_sec
++#define input_event_usec time.tv_usec
++#endif
++
+ #define EVPLAY_NBITS	KEY_CNT
+ #define EVPLAY_NBYTES	((EVPLAY_NBITS + 7) / 8)
+ 
+diff --git a/src/evemu.c b/src/evemu.c
+index 21187af..7489449 100644
+--- a/src/evemu.c
++++ b/src/evemu.c
+@@ -363,7 +363,7 @@ int evemu_read(struct evemu_device *dev, FILE *fp)
+ int evemu_write_event(FILE *fp, const struct input_event *ev)
+ {
+ 	return fprintf(fp, "E: %lu.%06u %04x %04x %d\n",
+-		       ev->time.tv_sec, (unsigned)ev->time.tv_usec,
++		       ev->input_event_sec, (unsigned)ev->input_event_usec,
+ 		       ev->type, ev->code, ev->value);
+ }
+ 
+@@ -391,8 +391,8 @@ int evemu_read_event(FILE *fp, struct input_event *ev)
+ 	int value;
+ 	int ret = fscanf(fp, "E: %lu.%06u %04x %04x %d\n",
+ 			 &sec, &usec, &type, &code, &value);
+-	ev->time.tv_sec = sec;
+-	ev->time.tv_usec = usec;
++	ev->input_event_sec = sec;
++	ev->input_event_usec = usec;
+ 	ev->type = type;
+ 	ev->code = code;
+ 	ev->value = value;
+@@ -410,13 +411,16 @@ int evemu_read_event_realtime(FILE *fp, struct input_event *ev,
+ 		return ret;
+ 
+ 	if (evtime) {
+-		if (!evtime->tv_sec)
+-			*evtime = ev->time;
+-		usec = 1000000L * (ev->time.tv_sec - evtime->tv_sec);
+-		usec += ev->time.tv_usec - evtime->tv_usec;
++		if (!evtime->tv_sec) {
++			evtime->tv_sec = ev->input_event_sec;
++			evtime->tv_usec = ev->input_event_usec;
++		}
++		usec = (ev->input_event_sec - evtime->tv_sec) * 1000000L;
++		usec += ev->input_event_usec - evtime->tv_usec;
+ 		if (usec > 500) {
+ 			usleep(usec);
+-			*evtime = ev->time;
++			evtime->tv_sec = ev->input_event_sec;
++			evtime->tv_usec = ev->input_event_usec;
+ 		}
+ 	}
+ 

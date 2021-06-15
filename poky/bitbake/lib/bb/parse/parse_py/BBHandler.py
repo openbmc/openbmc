@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
    class for handling .bb files
 
@@ -12,24 +9,11 @@
 #  Copyright (C) 2003, 2004  Chris Larson
 #  Copyright (C) 2003, 2004  Phil Blundell
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
 
 import re, bb, os
-import logging
-import bb.build, bb.utils
-from bb import data
+import bb.build, bb.utils, bb.data_smart
 
 from . import ConfHandler
 from .. import resolve_file, ast, logger, ParseError
@@ -38,11 +22,11 @@ from .ConfHandler import include, init
 # For compatibility
 bb.deprecate_import(__name__, "bb.parse", ["vars_from_file"])
 
-__func_start_regexp__    = re.compile(r"(((?P<py>python)|(?P<fr>fakeroot))\s*)*(?P<func>[\w\.\-\+\{\}\$]+)?\s*\(\s*\)\s*{$" )
+__func_start_regexp__    = re.compile(r"(((?P<py>python(?=(\s|\()))|(?P<fr>fakeroot(?=\s)))\s*)*(?P<func>[\w\.\-\+\{\}\$]+)?\s*\(\s*\)\s*{$" )
 __inherit_regexp__       = re.compile(r"inherit\s+(.+)" )
 __export_func_regexp__   = re.compile(r"EXPORT_FUNCTIONS\s+(.+)" )
 __addtask_regexp__       = re.compile(r"addtask\s+(?P<func>\w+)\s*((before\s*(?P<before>((.*(?=after))|(.*))))|(after\s*(?P<after>((.*(?=before))|(.*)))))*")
-__deltask_regexp__       = re.compile(r"deltask\s+(?P<func>\w+)")
+__deltask_regexp__       = re.compile(r"deltask\s+(.+)")
 __addhandler_regexp__    = re.compile(r"addhandler\s+(.+)" )
 __def_regexp__           = re.compile(r"def\s+(\w+).*:" )
 __python_func_regexp__   = re.compile(r"(\s+.*)|(^$)|(^#)" )
@@ -76,7 +60,7 @@ def inherit(files, fn, lineno, d):
                 file = abs_fn
 
         if not file in __inherit_cache:
-            logger.debug(1, "Inheriting %s (from %s:%d)" % (file, fn, lineno))
+            logger.debug("Inheriting %s (from %s:%d)" % (file, fn, lineno))
             __inherit_cache.append( file )
             d.setVar('__inherit_cache', __inherit_cache)
             include(fn, file, lineno, d, "inherit")
@@ -236,6 +220,23 @@ def feeder(lineno, s, fn, root, statements, eof=False):
 
     m = __addtask_regexp__.match(s)
     if m:
+        if len(m.group().split()) == 2:
+            # Check and warn for "addtask task1 task2"
+            m2 = re.match(r"addtask\s+(?P<func>\w+)(?P<ignores>.*)", s)
+            if m2 and m2.group('ignores'):
+                logger.warning('addtask ignored: "%s"' % m2.group('ignores'))
+
+        # Check and warn for "addtask task1 before task2 before task3", the
+        # similar to "after"
+        taskexpression = s.split()
+        for word in ('before', 'after'):
+            if taskexpression.count(word) > 1:
+                logger.warning("addtask contained multiple '%s' keywords, only one is supported" % word)
+
+        # Check and warn for having task with exprssion as part of task name
+        for te in taskexpression:
+            if any( ( "%s_" % keyword ) in te for keyword in bb.data_smart.__setvar_keyword__ ):
+                raise ParseError("Task name '%s' contains a keyword which is not recommended/supported.\nPlease rename the task not to include the keyword.\n%s" % (te, ("\n".join(map(str, bb.data_smart.__setvar_keyword__)))), fn)
         ast.handleAddTask(statements, fn, lineno, m)
         return
 

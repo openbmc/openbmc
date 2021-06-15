@@ -1,0 +1,47 @@
+From 682f65fa3a6b37c207b0d727dd22b6f8cc5d8d3d Mon Sep 17 00:00:00 2001
+From: Nagaraju <nmekala@xilinx.com>
+Date: Thu, 14 Mar 2019 18:11:04 +0530
+Subject: [PATCH 45/54] Fix the MB-64 bug of handling QI objects
+
+---
+ gcc/config/microblaze/microblaze.md | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 8f0ae901b77..207d2bf1b55 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -2348,11 +2348,11 @@ else
+ 
+ (define_insn "branch_zero_64"
+   [(set (pc)
+-	(if_then_else (match_operator:SI 0 "ordered_comparison_operator"
++	(if_then_else (match_operator 0 "ordered_comparison_operator"
+   				 [(match_operand:SI 1 "register_operand" "d")
+                                   (const_int 0)])
+-                      (match_operand:SI 2 "pc_or_label_operand" "")
+-                      (match_operand:SI 3 "pc_or_label_operand" "")))
++                      (match_operand 2 "pc_or_label_operand" "")
++                      (match_operand 3 "pc_or_label_operand" "")))
+   ]
+   "TARGET_MB_64"
+   {
+@@ -2368,11 +2368,11 @@ else
+ 
+ (define_insn "long_branch_zero"
+   [(set (pc)
+-	(if_then_else (match_operator 0 "ordered_comparison_operator"
+-  				 [(match_operand 1 "register_operand" "d")
++	(if_then_else (match_operator:DI 0 "ordered_comparison_operator"
++				 [(match_operand:DI 1 "register_operand" "d")
+                                   (const_int 0)])
+-                      (match_operand 2 "pc_or_label_operand" "")
+-                      (match_operand 3 "pc_or_label_operand" "")))
++                      (match_operand:DI 2 "pc_or_label_operand" "")
++                      (match_operand:DI 3 "pc_or_label_operand" "")))
+   ]
+   "TARGET_MB_64"
+   {
+-- 
+2.17.1
+

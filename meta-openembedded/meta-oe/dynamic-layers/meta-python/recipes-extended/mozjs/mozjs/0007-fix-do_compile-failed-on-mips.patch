@@ -1,0 +1,33 @@
+From 55d833dc3c194f1eb7841f308ad3b9ec3800d3b3 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 13 Jul 2018 15:48:32 +0800
+Subject: [PATCH 5/5] fix do_compile failed on mips
+
+Link with var-OS_LDFLAGS to fix the issue.
+Such as on mips:
+...
+|mips-wrsmllib32-linux-g++ -meb -mabi=32 -mhard-float ... -o libmozjs-52.so
+|/usr/include/c++/8.1.0/bits/atomic_base.h:514: error: undefined
+reference to '__atomic_fetch_add_8'
+...
+
+In recipe, set OS_LDFLAGS="-Wl,-latomic" could fix the issue.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ config/config.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/config/config.mk
++++ b/config/config.mk
+@@ -423,7 +423,7 @@ EXPAND_MKSHLIB_ARGS = --uselist
+ ifdef SYMBOL_ORDER
+ EXPAND_MKSHLIB_ARGS += --symbol-order $(SYMBOL_ORDER)
+ endif
+-EXPAND_MKSHLIB = $(EXPAND_LIBS_EXEC) $(EXPAND_MKSHLIB_ARGS) -- $(MKSHLIB)
++EXPAND_MKSHLIB = $(EXPAND_LIBS_EXEC) $(EXPAND_MKSHLIB_ARGS) -- $(MKSHLIB) $(OS_LDFLAGS)
+ 
+ # autoconf.mk sets OBJ_SUFFIX to an error to avoid use before including
+ # this file

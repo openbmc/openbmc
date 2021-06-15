@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 import layerindexlib
 
 import argparse
@@ -20,7 +24,7 @@ class LayerIndexPlugin(ActionPlugin):
     This class inherits ActionPlugin to get do_add_layer.
     """
 
-    def get_fetch_layer(self, fetchdir, url, subdir, fetch_layer):
+    def get_fetch_layer(self, fetchdir, url, subdir, fetch_layer, branch, shallow=False):
         layername = self.get_layer_name(url)
         if os.path.splitext(layername)[1] == '.git':
             layername = os.path.splitext(layername)[0]
@@ -28,9 +32,15 @@ class LayerIndexPlugin(ActionPlugin):
         layerdir = os.path.join(repodir, subdir)
         if not os.path.exists(repodir):
             if fetch_layer:
-                result = subprocess.call(['git', 'clone', url, repodir])
+                cmd = ['git', 'clone']
+                if shallow:
+                    cmd.extend(['--depth', '1'])
+                if branch:
+                    cmd.extend(['-b' , branch])
+                cmd.extend([url, repodir])
+                result = subprocess.call(cmd)
                 if result:
-                    logger.error("Failed to download %s" % url)
+                    logger.error("Failed to download %s (%s)" % (url, branch))
                     return None, None, None
                 else:
                     return subdir, layername, layerdir
@@ -69,7 +79,7 @@ class LayerIndexPlugin(ActionPlugin):
             branches = [args.branch]
         else:
             branches = (self.tinfoil.config_data.getVar('LAYERSERIES_CORENAMES') or 'master').split()
-        logger.debug(1, 'Trying branches: %s' % branches)
+        logger.debug('Trying branches: %s' % branches)
 
         ignore_layers = []
         if args.ignore:
@@ -149,12 +159,17 @@ class LayerIndexPlugin(ActionPlugin):
                 logger.plain('  recommended by: %s' % ' '.join(recommendedby))
 
         if dependencies:
-            fetchdir = self.tinfoil.config_data.getVar('BBLAYERS_FETCH_DIR')
-            if not fetchdir:
-                logger.error("Cannot get BBLAYERS_FETCH_DIR")
-                return 1
+            if args.fetchdir:
+                fetchdir = args.fetchdir
+            else:
+                fetchdir = self.tinfoil.config_data.getVar('BBLAYERS_FETCH_DIR')
+                if not fetchdir:
+                    logger.error("Cannot get BBLAYERS_FETCH_DIR")
+                    return 1
+
             if not os.path.exists(fetchdir):
                 os.makedirs(fetchdir)
+
             addlayers = []
 
             for deplayerbranch in dependencies:
@@ -167,7 +182,9 @@ class LayerIndexPlugin(ActionPlugin):
                 subdir, name, layerdir = self.get_fetch_layer(fetchdir,
                                                       layerBranch.layer.vcs_url,
                                                       layerBranch.vcs_subdir,
-                                                      not args.show_only)
+                                                      not args.show_only,
+                                                      layerBranch.actual_branch,
+                                                      args.shallow)
                 if not name:
                     # Error already shown
                     return 1
@@ -194,13 +211,17 @@ class LayerIndexPlugin(ActionPlugin):
 """
         args.show_only = True
         args.ignore = []
+        args.fetchdir = ""
+        args.shallow = True
         self.do_layerindex_fetch(args)
 
     def register_commands(self, sp):
         parser_layerindex_fetch = self.add_command(sp, 'layerindex-fetch', self.do_layerindex_fetch, parserecipes=False)
         parser_layerindex_fetch.add_argument('-n', '--show-only', help='show dependencies and do nothing else', action='store_true')
         parser_layerindex_fetch.add_argument('-b', '--branch', help='branch name to fetch')
+        parser_layerindex_fetch.add_argument('-s', '--shallow', help='do only shallow clones (--depth=1)', action='store_true')
         parser_layerindex_fetch.add_argument('-i', '--ignore', help='assume the specified layers do not need to be fetched/added (separate multiple layers with commas, no spaces)', metavar='LAYER')
+        parser_layerindex_fetch.add_argument('-f', '--fetchdir', help='directory to fetch the layer(s) into (will be created if it does not exist)')
         parser_layerindex_fetch.add_argument('layername', nargs='+', help='layer to fetch')
 
         parser_layerindex_show_depends = self.add_command(sp, 'layerindex-show-depends', self.do_layerindex_show_depends, parserecipes=False)

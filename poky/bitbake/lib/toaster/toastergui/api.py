@@ -3,19 +3,8 @@
 #
 # Copyright (C) 2016        Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
 # Please run flake8 on this file before sending patches
 
 import os
@@ -24,7 +13,6 @@ import logging
 import json
 import subprocess
 from collections import Counter
-from shutil import copyfile
 
 from orm.models import Project, ProjectTarget, Build, Layer_Version
 from orm.models import LayerVersionDependency, LayerSource, ProjectLayer
@@ -36,12 +24,10 @@ from bldcontrol import bbcontroller
 
 from django.http import HttpResponse, JsonResponse
 from django.views.generic import View
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q, F
 from django.db import Error
 from toastergui.templatetags.projecttags import filtered_filesizeformat
-from django.utils import timezone
-import pytz
 
 # development/debugging support
 verbose = 2

@@ -28,17 +28,13 @@ udev_daemon() {
 _UDEV_DAEMON=`udev_daemon`
 
 early_setup() {
-    mkdir -p /proc
-    mkdir -p /sys
+    mkdir -p /proc /sys /run /var/run
     mount -t proc proc /proc
     mount -t sysfs sysfs /sys
     mount -t devtmpfs none /dev
 
     # support modular kernel
     modprobe isofs 2> /dev/null
-
-    mkdir -p /run
-    mkdir -p /var/run
 
     $_UDEV_DAEMON --daemon
     udevadm trigger --action=add

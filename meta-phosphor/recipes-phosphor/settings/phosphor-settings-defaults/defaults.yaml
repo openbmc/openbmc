@@ -10,6 +10,12 @@
           AutoReboot:
              Default: 'true'
 
+/xyz/openbmc_project/control/host0/auto_reboot/one_time:
+    - Interface: xyz.openbmc_project.Control.Boot.RebootPolicy
+      Properties:
+          AutoReboot:
+             Default: 'true'
+
 /xyz/openbmc_project/control/host0/boot:
     - Interface: xyz.openbmc_project.Control.Boot.Source
       Properties:
@@ -45,18 +51,18 @@
                   Unit: "Watts"
           PowerCapEnable:
                Default: 'false'
-  
+
 /xyz/openbmc_project/control/host0/power_restore_policy:
     - Interface: xyz.openbmc_project.Control.Power.RestorePolicy
       Properties:
           PowerRestorePolicy:
               Default: RestorePolicy::Policy::AlwaysOff
 
-/xyz/openbmc_project/time/owner:
-    - Interface: xyz.openbmc_project.Time.Owner
+/xyz/openbmc_project/control/host0/power_restore_policy/one_time:
+    - Interface: xyz.openbmc_project.Control.Power.RestorePolicy
       Properties:
-          TimeOwner:
-              Default: Owner::Owners::BMC
+          PowerRestorePolicy:
+              Default: RestorePolicy::Policy::None
 
 /xyz/openbmc_project/time/sync_method:
     - Interface: xyz.openbmc_project.Time.Synchronization
@@ -126,6 +132,12 @@
     - Interface: xyz.openbmc_project.Object.Enable
       Properties:
           Enabled:
+             Default: 'false'
+
+/xyz/openbmc_project/logging/settings:
+    - Interface: xyz.openbmc_project.Logging.Settings
+      Properties:
+          QuiesceOnHwError:
              Default: 'false'
 
 /xyz/openbmc_project/software/apply_time:

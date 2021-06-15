@@ -8,8 +8,8 @@
 -	XFT_LIBS=`xft-config --libs 2>/dev/null` || found_xft="no"
 -	if test "$found_xft" = "no" ; then
  	    found_xft=yes
- 	    XFT_CFLAGS=`pkg-config --cflags xft 2>/dev/null` || found_xft="no"
- 	    XFT_LIBS=`pkg-config --libs xft 2>/dev/null` || found_xft="no"
+ 	    XFT_CFLAGS=`pkg-config --cflags xft fontconfig 2>/dev/null` || found_xft="no"
+ 	    XFT_LIBS=`pkg-config --libs xft fontconfig 2>/dev/null` || found_xft="no"
 -	fi
  	AC_MSG_RESULT([$found_xft])
  	dnl make sure that compiling against Xft header file doesn't bomb

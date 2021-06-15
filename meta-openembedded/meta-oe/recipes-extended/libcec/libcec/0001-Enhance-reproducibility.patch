@@ -1,0 +1,33 @@
+From 240727d3142700af779ca6f5c4677419787bca28 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Apr 2020 16:15:20 -0700
+Subject: [PATCH] Enhance reproducibility
+
+SetBuildInfo.cmake groks information from build system and emits that
+into sourcecode ( header file ) which is then compiled into binary, this
+string is build system dependent, therefore can cause reproducibility
+issues, here we set static string for LIB_INFO
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libcec/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libcec/CMakeLists.txt b/src/libcec/CMakeLists.txt
+index 19a070b..4b3c827 100644
+--- a/src/libcec/CMakeLists.txt
++++ b/src/libcec/CMakeLists.txt
+@@ -133,7 +133,7 @@ set(CEC_HEADERS devices/CECRecordingDevice.h
+ source_group("Header Files" FILES ${CEC_HEADERS})
+ 
+ # platform and device specific
+-include(cmake/SetBuildInfo.cmake)
++set(LIB_INFO "compiled on ${CMAKE_SYSTEM} ... ")
+ include(cmake/CheckPlatformSupport.cmake)
+ 
+ ## create project groups
+-- 
+2.26.2
+

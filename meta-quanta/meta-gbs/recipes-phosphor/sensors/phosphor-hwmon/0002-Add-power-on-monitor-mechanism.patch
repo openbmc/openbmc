@@ -1,0 +1,269 @@
+From 5cea18ba476c0cb6ea622be50a09ead00cd47b14 Mon Sep 17 00:00:00 2001
+From: Ivan Li <rli11@lenovo.com>
+Date: Wed, 25 Dec 2019 17:05:00 +0800
+Subject: [PATCH] Add power on monitor mechanism
+
+Summary:
+1. Add "PWRONMON" attribute in sensor configuration file to determine whether it's power-on monitor sensor or not.  (i.e. PWRONMON_temp1 = "ON")
+2. Watching "CurrentHostState" property and then use it to turn on/off threshold alert for power-on monitor sensors.
+
+Test Plan:
+Check if there is any abnormal threshold events occurred in power off state or during power transition
+
+Signed-off-by: Ivan Li <rli11@lenovo.com>
+Change-Id: I76d3a664153141d94636e0011f3a48e4f6dee922
+---
+ mainloop.cpp   | 102 +++++++++++++++++++++++++++++++++++++++++++++++++
+ sensor.cpp     |  11 +++++-
+ sensor.hpp     |  13 +++++++
+ thresholds.hpp |  24 ------------
+ 4 files changed, 125 insertions(+), 25 deletions(-)
+
+diff --git a/mainloop.cpp b/mainloop.cpp
+index 29dc26a..5e27a30 100644
+--- a/mainloop.cpp
++++ b/mainloop.cpp
+@@ -42,6 +42,13 @@
+ #include <string>
+ #include <unordered_set>
+ #include <xyz/openbmc_project/Sensor/Device/error.hpp>
++#include <boost/asio/io_service.hpp>
++#include <boost/container/flat_map.hpp>
++#include <boost/algorithm/string/predicate.hpp>
++#include <sdbusplus/asio/connection.hpp>
++#include <sdbusplus/asio/object_server.hpp>
++#include <sdbusplus/message/types.hpp>
++#include <sdbusplus/timer.hpp>
+ 
+ using namespace phosphor::logging;
+ 
+@@ -110,6 +117,12 @@ decltype(Thresholds<CriticalObject>::deassertHighSignal)
+     Thresholds<CriticalObject>::deassertHighSignal =
+         &CriticalObject::criticalHighAlarmDeasserted;
+ 
++static std::unique_ptr<phosphor::Timer> cacheTimer = nullptr;
++static std::unique_ptr<sdbusplus::bus::match::match> powerMatch = nullptr;
++static bool powerStatusOn = false;
++static boost::asio::io_service io;
++static auto conn = std::make_shared<sdbusplus::asio::connection>(io);
++
+ void updateSensorInterfaces(InterfaceMap& ifaces, SensorValueType value)
+ {
+     for (auto& iface : ifaces)
+@@ -137,6 +150,83 @@ void updateSensorInterfaces(InterfaceMap& ifaces, SensorValueType value)
+     }
+ }
+ 
++void powerStatusSet()
++{
++    powerStatusOn = true;
++    return;
++}
++
++void createTimer()
++{
++    if (cacheTimer == nullptr)
++    {
++        cacheTimer = std::make_unique<phosphor::Timer>(powerStatusSet);
++    }
++}
++
++bool isPowerOn(void)
++{
++    if (!powerMatch)
++    {
++        throw std::runtime_error("Power Match Not Created");
++    }
++    return powerStatusOn;
++}
++
++void setupPowerMatch(sdbusplus::bus::bus& bus)
++{
++    if (powerMatch)
++    {
++        return;
++    }
++
++    powerMatch = std::make_unique<sdbusplus::bus::match::match>(
++        bus,
++        "type='signal',interface='org.freedesktop.DBus.Properties',path='/xyz/"
++        "openbmc_project/state/"
++        "host0',arg0='xyz.openbmc_project.State.Host'",
++       [](sdbusplus::message::message& message) {
++            std::string objectName;
++            boost::container::flat_map<std::string, std::variant<std::string>>
++                values;
++           message.read(objectName, values);
++           auto findState = values.find("CurrentHostState");
++           if (findState != values.end())
++           {
++               bool on = boost::ends_with(
++                    std::get<std::string>(findState->second), "Running");
++               if (!on)
++                {
++                   cacheTimer->stop();
++                    powerStatusOn = false;
++                    return;
++                }
++               cacheTimer->start(std::chrono::duration_cast<std::chrono::microseconds>(
++                    std::chrono::seconds(10)));
++           }
++           else {
++               powerStatusOn = false;
++            }
++       });
++
++    conn->async_method_call(
++        [](boost::system::error_code ec,
++           const std::variant<std::string>& state) {
++            if (ec)
++            {
++                return;
++            }
++            powerStatusOn =
++                boost::ends_with(std::get<std::string>(state), "Running");
++        },
++        "xyz.openbmc_project.State.Host",
++       "/xyz/openbmc_project/state/host0",
++       "org.freedesktop.DBus.Properties", "Get",
++        "xyz.openbmc_project.State.Host", "CurrentHostState");
++
++    createTimer();
++}
++
+ std::string MainLoop::getID(SensorSet::container_t::const_reference sensor)
+ {
+     std::string id;
+@@ -418,6 +508,7 @@ void MainLoop::init()
+             _interval = std::strtoull(interval.c_str(), NULL, 10);
+         }
+     }
++    setupPowerMatch(_bus);
+ }
+ 
+ void MainLoop::read()
+@@ -462,6 +553,12 @@ void MainLoop::read()
+ 
+         try
+         {
++            if(sensor->pwrOnMonitor() && !isPowerOn())
++            {
++                statusIface->functional(false);
++                continue;
++            }
++
+             if (sensor->hasFaultFile())
+             {
+                 auto fault = _ioAccess->read(sensorSysfsType, sensorSysfsNum,
+@@ -588,6 +685,11 @@ void MainLoop::read()
+                 }
+             }
+ 
++            if(sensor->pwrOnMonitor() && !isPowerOn())
++            {
++                statusIface->functional(false);
++                continue;
++            }
+             updateSensorInterfaces(obj, value);
+         }
+         catch (const std::system_error& e)
+diff --git a/sensor.cpp b/sensor.cpp
+index ac2f896..72b45f8 100644
+--- a/sensor.cpp
++++ b/sensor.cpp
+@@ -32,7 +32,7 @@ Sensor::Sensor(const SensorSet::key_type& sensor,
+                const hwmonio::HwmonIOInterface* ioAccess,
+                const std::string& devPath) :
+     _sensor(sensor),
+-    _ioAccess(ioAccess), _devPath(devPath), _scale(0), _hasFaultFile(false)
++    _ioAccess(ioAccess), _devPath(devPath), _scale(0), _hasFaultFile(false), _pwrOnMonitor(false)
+ {
+     auto chip = env::getEnv("GPIOCHIP", sensor);
+     auto access = env::getEnv("GPIO", sensor);
+@@ -61,6 +61,15 @@ Sensor::Sensor(const SensorSet::key_type& sensor,
+     auto senRmRCs = env::getEnv("REMOVERCS", sensor);
+     // Add sensor removal return codes defined per sensor
+     addRemoveRCs(senRmRCs);
++
++    auto pwrOnMon = env::getEnv("PWRONMON", sensor);
++    if (!pwrOnMon.empty())
++    {
++        if (pwrOnMon == "ON")
++        {
++            _pwrOnMonitor = true;
++        }
++    }
+ }
+ 
+ void Sensor::addRemoveRCs(const std::string& rcList)
+diff --git a/sensor.hpp b/sensor.hpp
+index 64d6e48..41c0fe7 100644
+--- a/sensor.hpp
++++ b/sensor.hpp
+@@ -151,6 +151,16 @@ class Sensor
+         return _hasFaultFile;
+     }
+ 
++    /**
++     * @brief Get whether the sensor only need to be monitored in power on state or not.
++     *
++     * @return - Boolean on whether the sensor only need to be monitored in power on state
++     */
++    inline bool pwrOnMonitor(void) const
++    {
++        return _pwrOnMonitor;
++    }
++
+   private:
+     /** @brief Sensor object's identifiers */
+     SensorSet::key_type _sensor;
+@@ -172,6 +182,9 @@ class Sensor
+ 
+     /** @brief Tracks whether the sensor has a fault file or not. */
+     bool _hasFaultFile;
++
++    /** @brief Whether the sensor only need to be monitored in power on state or not. */
++    bool _pwrOnMonitor;
+ };
+ 
+ /**
+diff --git a/thresholds.hpp b/thresholds.hpp
+index 8d557fc..0ffe0ce 100644
+--- a/thresholds.hpp
++++ b/thresholds.hpp
+@@ -137,32 +137,8 @@ auto addThreshold(const std::string& sensorType, const std::string& sensorID,
+         auto hi = stod(tHi) * std::pow(10, scale);
+         (*iface.*Thresholds<T>::setLo)(lo);
+         (*iface.*Thresholds<T>::setHi)(hi);
+-        auto alarmLowState = (*iface.*Thresholds<T>::getAlarmLow)();
+-        auto alarmHighState = (*iface.*Thresholds<T>::getAlarmHigh)();
+         (*iface.*Thresholds<T>::alarmLo)(value <= lo);
+         (*iface.*Thresholds<T>::alarmHi)(value >= hi);
+-        if (alarmLowState != (value <= lo))
+-        {
+-            if (value <= lo)
+-            {
+-                (*iface.*Thresholds<T>::assertLowSignal)(value);
+-            }
+-            else
+-            {
+-                (*iface.*Thresholds<T>::deassertLowSignal)(value);
+-            }
+-        }
+-        if (alarmHighState != (value >= hi))
+-        {
+-            if (value >= hi)
+-            {
+-                (*iface.*Thresholds<T>::assertHighSignal)(value);
+-            }
+-            else
+-            {
+-                (*iface.*Thresholds<T>::deassertHighSignal)(value);
+-            }
+-        }
+         auto type = Thresholds<T>::type;
+         obj[type] = iface;
+     }
+-- 
+2.21.0
+

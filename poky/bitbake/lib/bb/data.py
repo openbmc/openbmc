@@ -1,5 +1,3 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
 BitBake 'Data' implementations
 
@@ -22,18 +20,7 @@ the speed is more critical here.
 # Copyright (C) 2003, 2004  Chris Larson
 # Copyright (C) 2005        Holger Hans Peter Freyther
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # Based on functions from the base bb module, Copyright 2003 Holger Schurig
 
@@ -92,7 +79,7 @@ def expand(s, d, varname = None):
     return d.expand(s, varname)
 
 def expandKeys(alterdata, readdata = None):
-    if readdata == None:
+    if readdata is None:
         readdata = alterdata
 
     todolist = {}
@@ -143,7 +130,7 @@ def emit_var(var, o=sys.__stdout__, d = init(), all=False):
         if all:
             oval = d.getVar(var, False)
         val = d.getVar(var)
-    except (KeyboardInterrupt, bb.build.FuncFailed):
+    except (KeyboardInterrupt):
         raise
     except Exception as exc:
         o.write('# expansion of %s threw %s: %s\n' % (var, exc.__class__.__name__, str(exc)))
@@ -174,6 +161,12 @@ def emit_var(var, o=sys.__stdout__, d = init(), all=False):
         return True
 
     if func:
+        # Write a comment indicating where the shell function came from (line number and filename) to make it easier
+        # for the user to diagnose task failures. This comment is also used by build.py to determine the metadata
+        # location of shell functions.
+        o.write("# line: {0}, file: {1}\n".format(
+            d.getVarFlag(var, "lineno", False),
+            d.getVarFlag(var, "filename", False)))
         # NOTE: should probably check for unbalanced {} within the var
         val = val.rstrip('\n')
         o.write("%s() {\n%s\n}\n" % (varExpanded, val))
@@ -378,7 +371,7 @@ def build_dependencies(key, keys, shelldeps, varflagsexcl, d):
     #bb.note("Variable %s references %s and calls %s" % (key, str(deps), str(execs)))
     #d.setVarFlag(key, "vardeps", deps)
 
-def generate_dependencies(d):
+def generate_dependencies(d, whitelist):
 
     keys = set(key for key in d if not key.startswith("__"))
     shelldeps = set(key for key in d.getVar("__exportlist", False) if d.getVarFlag(key, "export", False) and not d.getVarFlag(key, "unexport", False))
@@ -393,7 +386,7 @@ def generate_dependencies(d):
         newdeps = deps[task]
         seen = set()
         while newdeps:
-            nextdeps = newdeps
+            nextdeps = newdeps - whitelist
             seen |= nextdeps
             newdeps = set()
             for dep in nextdeps:
@@ -435,7 +428,7 @@ def generate_dependency_hash(tasklist, gendeps, lookupcache, whitelist, fn):
             var = lookupcache[dep]
             if var is not None:
                 data = data + str(var)
-        k = fn + "." + task
+        k = fn + ":" + task
         basehash[k] = hashlib.sha256(data.encode("utf-8")).hexdigest()
         taskdeps[task] = alldeps
 

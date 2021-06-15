@@ -1,0 +1,10 @@
+[Unit]
+Description=Ampere Computing LLC triggering reset ACK
+Conflicts=obmc-host-start@0.target
+OnFailure=obmc-chassis-powerreset@0.target
+
+[Service]
+RemainAfterExit=no
+Type=oneshot
+ExecStart=/usr/bin/env ampere_power_util.sh mb force_reset
+SyslogIdentifier=ampere_power_util.sh

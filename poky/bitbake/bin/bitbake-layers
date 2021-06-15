@@ -7,24 +7,13 @@
 # Copyright (C) 2011 Mentor Graphics Corporation
 # Copyright (C) 2011-2015 Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import logging
 import os
 import sys
 import argparse
-import signal
 
 bindir = os.path.dirname(__file__)
 topdir = os.path.dirname(bindir)
@@ -36,7 +25,6 @@ import bb.msg
 logger = bb.msg.logger_create('bitbake-layers', sys.stdout)
 
 def main():
-    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     parser = argparse.ArgumentParser(
         description="BitBake layers utility",
         epilog="Use %(prog)s <subcommand> --help to get help on a specific command",
@@ -62,7 +50,9 @@ def main():
 
     # Need to re-run logger_create with color argument
     # (will be the same logger since it has the same name)
-    bb.msg.logger_create('bitbake-layers', output=sys.stdout, color=global_args.color)
+    bb.msg.logger_create('bitbake-layers', output=sys.stdout,
+                         color=global_args.color,
+                         level=logger.getEffectiveLevel())
 
     plugins = []
     tinfoil = bb.tinfoil.Tinfoil(tracking=True)

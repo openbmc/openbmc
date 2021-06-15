@@ -1,0 +1,28 @@
+From: Helmut Grohne <helmut@subdivi.de>
+Subject: check for libtoolize rather than libtool
+Last-Update: 2014-09-19
+
+libtool is now in package libtool-bin, but apr only needs libtoolize.
+
+Upstream-Status: Pending [ from debian: https://sources.debian.org/data/main/a/apr/1.6.5-1/debian/patches/libtoolize_check.patch ]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+
+--- apr.orig/build/buildcheck.sh
++++ apr/build/buildcheck.sh
+@@ -39,11 +39,11 @@ fi
+ # ltmain.sh (GNU libtool 1.1361 2004/01/02 23:10:52) 1.5a
+ # output is multiline from 1.5 onwards
+ 
+-# Require libtool 1.4 or newer
+-libtool=`build/PrintPath glibtool1 glibtool libtool libtool15 libtool14`
+-lt_pversion=`$libtool --version 2>/dev/null|sed -e 's/([^)]*)//g;s/^[^0-9]*//;s/[- ].*//g;q'`
++# Require libtoolize 1.4 or newer
++libtoolize=`build/PrintPath glibtoolize1 glibtoolize libtoolize libtoolize15 libtoolize14`
++lt_pversion=`$libtoolize --version 2>/dev/null|sed -e 's/([^)]*)//g;s/^[^0-9]*//;s/[- ].*//g;q'`
+ if test -z "$lt_pversion"; then
+-  echo "buildconf: libtool not found."
++  echo "buildconf: libtoolize not found."
+   echo "           You need libtool version 1.4 or newer installed"
+   echo "           to build APR from SVN."
+   res=1

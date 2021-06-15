@@ -4,10 +4,10 @@ DESCRIPTION = "update-rc.d is a utility that allows the management of symlinks t
 SECTION = "base"
 
 LICENSE = "GPLv2+"
-LIC_FILES_CHKSUM = "file://update-rc.d;beginline=5;endline=15;md5=148a48321b10eb37c1fa3ee02b940a75"
+LIC_FILES_CHKSUM = "file://update-rc.d;beginline=5;endline=15;md5=d40a07c27f535425934bb5001f2037d9"
 
 SRC_URI = "git://git.yoctoproject.org/update-rc.d"
-SRCREV = "22e0692898c3e7ceedc8eb5ff4ec8e0b9c340b2d"
+SRCREV = "4b150b25b38de688d25cde2b2d22c268ed65a748"
 
 UPSTREAM_CHECK_COMMITS = "1"
 

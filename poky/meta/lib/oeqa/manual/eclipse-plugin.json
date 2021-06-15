@@ -82,7 +82,7 @@
             ],
             "execution": {
                 "1": {
-                    "action": "Launch a QEMU of target enviroment.(Reference to case \"ADT - Launch qemu by eclipse\") ",
+                    "action": "Launch a QEMU of target environment.(Reference to case \"ADT - Launch qemu by eclipse\") ",
                     "expected_results": ""
                 },
                 "2": {
@@ -164,7 +164,7 @@
             ],
             "execution": {
                 "1": {
-                    "action": "Launch a QEMU of target enviroment.(Reference to case \"ADT - Launch qemu by eclipse\") ",
+                    "action": "Launch a QEMU of target environment.(Reference to case \"ADT - Launch qemu by eclipse\") ",
                     "expected_results": ""
                 },
                 "2": {

@@ -1,32 +1,19 @@
-From c084c8349d1780980e232cb28b60a109e3d89438 Mon Sep 17 00:00:00 2001
-From: Koen Kooi <koen@dominion.thruhere.net>
-Date: Wed, 2 Nov 2011 16:54:57 +0100
-Subject: [PATCH] Upstream-Status: Pending
+Subject: [PATCH] From c084c8349d1780980e232cb28b60a109e3d89438 Mon Sep 17
+ 00:00:00 2001 From: Koen Kooi <koen@dominion.thruhere.net> Date: Wed, 2 Nov
+ 2011 16:54:57 +0100 Subject: [PATCH] Upstream-Status: Pending
 
+update patch to version 7.4.4
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- acinclude.m4       |  2 +-
  ext/imap/config.m4 | 10 ++--------
- 2 files changed, 3 insertions(+), 9 deletions(-)
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index ad5166e..f6a55ec 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -2350,7 +2350,7 @@ AC_DEFUN([PHP_SETUP_OPENSSL],[
-       PHP_OPENSSL_DIR="/usr/local/ssl /usr/local /usr /usr/local/openssl"
-     fi
- 
--    for i in $PHP_OPENSSL_DIR; do
-+    for i in $PHP_OPENSSL_DIR $PHP_OPENSSL_DIR/usr; do
-       if test -r $i/include/openssl/evp.h; then
-         OPENSSL_INCDIR=$i/include
-       fi
 diff --git a/ext/imap/config.m4 b/ext/imap/config.m4
-index badb6e2..8ff803c 100644
+index 5086a31..0e938bd 100644
 --- a/ext/imap/config.m4
 +++ b/ext/imap/config.m4
-@@ -109,7 +109,7 @@ if test "$PHP_IMAP" != "no"; then
-     PHP_NEW_EXTENSION(imap, php_imap.c, $ext_shared)
+@@ -110,7 +110,7 @@ if test "$PHP_IMAP" != "no"; then
+     PHP_NEW_EXTENSION(imap, php_imap.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
      AC_DEFINE(HAVE_IMAP,1,[ ])
  
 -    for i in $PHP_IMAP /usr/local /usr; do
@@ -34,7 +21,7 @@ index badb6e2..8ff803c 100644
        IMAP_INC_CHK()
        el[]IMAP_INC_CHK(/include/c-client)
        el[]IMAP_INC_CHK(/include/imap)
-@@ -198,13 +198,7 @@ if test "$PHP_IMAP" != "no"; then
+@@ -199,13 +199,7 @@ if test "$PHP_IMAP" != "no"; then
        AC_MSG_ERROR(Cannot find rfc822.h. Please check your c-client installation.)
      fi
  
@@ -49,3 +36,6 @@ index badb6e2..8ff803c 100644
        IMAP_LIB=$lib
        IMAP_LIB_CHK($PHP_LIBDIR)
        IMAP_LIB_CHK(c-client)
+-- 
+2.7.4
+

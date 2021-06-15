@@ -1,4 +1,8 @@
 SUMMARY = "Lightweight C library which eases the writing of UNIX daemons"
+DESCRIPTION = "Lightweight daemon framework for OpenBSD. It provides \
+facilities for logging and a signal handler to enable graceful shutdown, \
+as well as file locking to ensure that only a single copy of a given daemon \
+is running at a time."
 SECTION = "libs"
 AUTHOR = "Lennart Poettering <lennart@poettering.net>"
 HOMEPAGE = "http://0pointer.de/lennart/projects/libdaemon/"

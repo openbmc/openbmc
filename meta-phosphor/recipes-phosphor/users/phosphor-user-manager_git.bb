@@ -23,11 +23,8 @@ inherit useradd
 USERADD_PACKAGES = "${PN} phosphor-ldap"
 DBUS_PACKAGES = "${USERADD_PACKAGES}"
 # add groups needed for privilege maintenance
-GROUPADD_PARAM_${PN} = "priv-admin; priv-operator; priv-user; priv-callback "
-GROUPADD_PARAM_phosphor-ldap = "priv-admin; priv-operator; priv-user; priv-callback "
-
-# Add root user to priv-admin group
-GROUPMEMS_PARAM_${PN} = "-g priv-admin -a root"
+GROUPADD_PARAM_${PN} = "priv-admin; priv-operator; priv-user "
+GROUPADD_PARAM_phosphor-ldap = "priv-admin; priv-operator; priv-user "
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.User.Manager.service"
 FILES_phosphor-ldap += " \
@@ -39,5 +36,5 @@ DBUS_SERVICE_phosphor-ldap = " \
         xyz.openbmc_project.LDAP.PrivilegeMapper.service \
 "
 SRC_URI += "git://github.com/openbmc/phosphor-user-manager"
-SRCREV = "fef578960f632abacc5cd615b2bedfb3ab9ebb90"
+SRCREV = "a260f187436837aec493baef0a5e7063fe11ee92"
 S = "${WORKDIR}/git"

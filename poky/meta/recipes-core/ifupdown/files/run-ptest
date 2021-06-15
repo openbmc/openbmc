@@ -1,0 +1,4 @@
+#!/bin/sh
+
+CURDIR=$(dirname `readlink -f $0`)
+cd $CURDIR/tests && ./testbuild-linux

@@ -1,5 +1,5 @@
 DESCRIPTION = "Graphics libraries for BCM2835."
-LICENSE = "Proprietary"
+LICENSE = "Broadcom-RPi"
 
 LIC_FILES_CHKSUM = "file://LICENCE;md5=86e53f5f5909ee66900418028de11780"
 
@@ -8,7 +8,7 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-include recipes-bsp/common/firmware.inc
+include recipes-bsp/common/raspberrypi-firmware.inc
 
 SRC_URI += " \
     file://egl.pc \
@@ -24,9 +24,6 @@ inherit pkgconfig update-rc.d
 do_install () {
   install -d ${D}${bindir}
   cp -R bin/* ${D}${bindir}
-
-  install -d ${D}${sbindir}
-  cp -R sbin/* ${D}${sbindir}
 
   install -d ${D}${libdir}
   # note: -H option to deref symlinked .so
@@ -49,7 +46,6 @@ INITSCRIPT_NAME = "vchiq.sh"
 INITSCRIPT_PARAMS = "start 03 S ."
 
 FILES_${PN} = "${bindir}/* \
-               ${sbindir}/* \
                ${libdir}/lib*.so \
                ${sysconfdir}/init.d \
                ${libdir}/plugins"

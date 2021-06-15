@@ -1,0 +1,12 @@
+#!/bin/sh
+
+testbin="gpiod-test"
+ptestdir=$(dirname "$(readlink -f "$0")")
+cd $ptestdir/tests
+
+./$testbin
+if [ $? -ne 0 ]; then
+	echo "FAIL: $testbin"
+else
+	echo "PASS: $testbin"
+fi

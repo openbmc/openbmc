@@ -1,0 +1,41 @@
+From 6332823f9fdcb571305b716330e67d0b38810868 Mon Sep 17 00:00:00 2001
+From: Vincent Prince <vincent.prince.fr@gmail.com>
+Date: Mon, 16 Sep 2019 13:30:13 +0200
+Subject: [PATCH 03/10] Use __GLIBC__ to control use of gnu_get_libc_version
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+---
+ src/mongo/util/processinfo_linux.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/mongo/util/processinfo_linux.cpp b/src/mongo/util/processinfo_linux.cpp
+index a968c54727..0d8b8874e2 100644
+--- a/src/mongo/util/processinfo_linux.cpp
++++ b/src/mongo/util/processinfo_linux.cpp
+@@ -44,10 +44,10 @@
+ #include <unistd.h>
+ #ifdef __BIONIC__
+ #include <android/api-level.h>
+-#elif __UCLIBC__
+-#include <features.h>
+-#else
++#elif defined(__GLIBC__) && !defined(__UCLIBC__)
+ #include <gnu/libc-version.h>
++#else
++#include <features.h>
+ #endif
+ 
+ #include <boost/filesystem.hpp>
+@@ -617,7 +617,7 @@ void ProcessInfo::SystemInfo::collectSystemInfo() {
+     std::stringstream ss;
+     ss << "uClibc-" << __UCLIBC_MAJOR__ << "." << __UCLIBC_MINOR__ << "." << __UCLIBC_SUBLEVEL__;
+     bExtra.append("libcVersion", ss.str());
+-#else
++#elif defined(__GLIBC__)
+     bExtra.append("libcVersion", gnu_get_libc_version());
+ #endif
+     if (!verSig.empty())
+-- 
+2.24.0
+

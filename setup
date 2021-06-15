@@ -15,33 +15,65 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-if [ "$(basename -- "$0")" = "setup" ]; then
+if [ -z "$ZSH_NAME" ] && [ "$(basename -- "$0")" = "setup" ]; then
 	echo The script must be sourced, not executed
 	exit 1
+fi
+
+# Check if 'column' command is present
+COLUMN=$(which column || true)
+if [ -z "$COLUMN" ]; then
+    # If it is not, use 'cat'
+    COLUMN=$(which cat)
 fi
 
 machine() {
 	local target=$1
 	local build_dir=$2
-	local mfg mach realmach
-	for mfg in meta-*; do
-		for mach in $mfg/meta-*; do
-			if [ -d "$mach" -a -d "$mach/conf/machine" ]; then
-				realmach=${mach##*meta-}
-				# If a target is specified, then check for a match,
-				# otherwise just list what we've discovered
-				if [ -n "$target" ]; then
-					if [ "$realmach" = "$target" ]; then
-						echo Machine $target is $mach
-						TEMPLATECONF="$mach/conf" source oe-init-build-env $build_dir
-						return
-					fi
-				else
-					echo "$realmach"
+	local cfg name tmpl
+	local configs
+
+	# zsh requires wordsplit so that variable expansion behaves like bash
+	if [ -n "$ZSH_NAME" ]; then
+		setopt local_options shwordsplit
+	fi
+	if which find > /dev/null 2>&1; then
+		configs=$(find meta-* -path "*/conf/machine/*.conf")
+	else
+		configs=$(ls -1 meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf)
+	fi
+
+	for cfg in $configs; do
+		name=${cfg##*/}
+		name=${name%.conf}
+		tmpl=${cfg%/machine/*.conf}
+
+        # Skip any machines that don't support meta-phosphor.
+        if [ ! -e $tmpl/bblayers.conf.sample ]; then
+            continue
+        fi
+        if ! grep -q "##OEROOT##/meta-phosphor" $tmpl/bblayers.conf.sample; then
+            continue
+        fi
+
+		# If a target is specified, then check for a match,
+		# otherwise just list what we've discovered
+		if [ -n "$target" ]; then
+			if [ "${name}" = "${target}" ]; then
+				echo "Machine ${target} found in ${tmpl%/conf}"
+				mkdir -p ${build_dir}
+				TEMPLATECONF="${tmpl}" source \
+						oe-init-build-env ${build_dir}
+
+				if [ "$(cat conf/templateconf.cfg)" = "${tmpl}" ]; then
+					sed "s/^\(MACHINE\s*[?:]*\s*=\s*\).*$/\1\"${target}\"/" \
+						-i conf/local.conf
 				fi
+				return
 			fi
-		done
+        else
+			echo "${name}"
+		fi
 	done
 
 	[ -n "$target" ] && echo "No such machine!"
@@ -50,13 +82,13 @@ machine() {
 if [ -z "$1" ]; then
 	echo Target machine must be specified. Use one of:
 	echo
-	(echo qemuarm; machine) | sort
+	(echo qemuarm; machine) | sort | $COLUMN
 elif [ "$1" = "qemuarm" ]; then
 	source openbmc-env
 else
 	bld_dir=$2
 	if [ -z "$2" ]; then
-		bld_dir="build"
+		bld_dir="build/$1"
 	fi
 	machine $1 $bld_dir
 fi

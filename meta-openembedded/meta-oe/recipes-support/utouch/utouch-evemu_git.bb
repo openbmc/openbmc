@@ -7,11 +7,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=f27defe1e96c2e1ecd4e0c9be8967949"
 
 inherit autotools
 
-SRC_URI = "git://bitmath.org/git/evemu.git;protocol=http"
+SRC_URI = "git://bitmath.org/git/evemu.git;protocol=http \
+           file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \
+           "
 SRCREV = "9752b50e922572e4cd214ac45ed95e4ee410fe24"
 
-PV = "1.0.5+git${SRCPV}"
+PV = "1.0.6+git${SRCPV}"
 
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"
 
 PARALLEL_MAKE = ""

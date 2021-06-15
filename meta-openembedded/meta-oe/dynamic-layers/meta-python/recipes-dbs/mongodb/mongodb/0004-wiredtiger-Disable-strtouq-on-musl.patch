@@ -1,0 +1,26 @@
+From cc95a8878fa581b164dee8fb1f07b05b9d919ef0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 2 Sep 2017 13:13:15 -0700
+Subject: [PATCH 09/10] wiredtiger: Disable strtouq on musl
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/third_party/wiredtiger/build_linux/wiredtiger_config.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/third_party/wiredtiger/build_linux/wiredtiger_config.h b/src/third_party/wiredtiger/build_linux/wiredtiger_config.h
+index 82e9994..0399a67 100644
+--- a/src/third_party/wiredtiger/build_linux/wiredtiger_config.h
++++ b/src/third_party/wiredtiger/build_linux/wiredtiger_config.h
+@@ -104,7 +104,7 @@
+ #define HAVE_STRING_H 1
+ 
+ /* Define to 1 if you have the `strtouq' function. */
+-#define HAVE_STRTOUQ 1
++/* #undef HAVE_STRTOUQ 1 */
+ 
+ /* Define to 1 if you have the `sync_file_range' function. */
+ /* #undef HAVE_SYNC_FILE_RANGE */
+-- 
+2.7.4
+

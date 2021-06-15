@@ -1,0 +1,27 @@
+table bridge filter {
+  chain gbmc_br_prerouting {
+    type filter hook prerouting priority 0;
+    iifname != gbmcbr accept
+    # Sometimes our links are over NCSI and we don't want to broadcast
+    # those packets over the entire bridge. They are only relevant P2P.
+    ether type 0x88F8 drop
+  }
+}
+
+table inet filter {
+  chain gbmc_br_input {
+    type filter hook input priority 0; policy drop;
+    iifname != gbmcbr accept
+    jump gbmc_br_int_input
+    jump gbmc_br_pub_input
+    reject
+  }
+  chain gbmc_br_int_input {
+    ip6 daddr ff00::/8 accept
+    ip6 daddr fe80::/64 accept
+    ip6 daddr fdb5:0481:10ce::/64 accept
+  }
+  chain gbmc_br_pub_input {
+    ip6 nexthdr icmpv6 accept
+  }
+}

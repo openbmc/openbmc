@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
    class for handling configuration data files
 
@@ -11,18 +8,8 @@
 # Copyright (C) 2003, 2004  Chris Larson
 # Copyright (C) 2003, 2004  Phil Blundell
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import errno
 import re
@@ -108,7 +95,7 @@ def include_single_file(parentfn, fn, lineno, data, error_out):
         if exc.errno == errno.ENOENT:
             if error_out:
                 raise ParseError("Could not %s file %s" % (error_out, fn), parentfn, lineno)
-            logger.debug(2, "CONF file '%s' not found", fn)
+            logger.debug2("CONF file '%s' not found", fn)
         else:
             if error_out:
                 raise ParseError("Could not %s file %s: %s" % (error_out, fn, exc.strerror), parentfn, lineno)
@@ -132,30 +119,30 @@ def handle(fn, data, include):
         oldfile = data.getVar('FILE', False)
 
     abs_fn = resolve_file(fn, data)
-    f = open(abs_fn, 'r')
+    with open(abs_fn, 'r') as f:
 
-    statements = ast.StatementGroup()
-    lineno = 0
-    while True:
-        lineno = lineno + 1
-        s = f.readline()
-        if not s:
-            break
-        w = s.strip()
-        # skip empty lines
-        if not w:
-            continue
-        s = s.rstrip()
-        while s[-1] == '\\':
-            s2 = f.readline().rstrip()
+        statements = ast.StatementGroup()
+        lineno = 0
+        while True:
             lineno = lineno + 1
-            if (not s2 or s2 and s2[0] != "#") and s[0] == "#" :
-                bb.fatal("There is a confusing multiline, partially commented expression on line %s of file %s (%s).\nPlease clarify whether this is all a comment or should be parsed." % (lineno, fn, s))
-            s = s[:-1] + s2
-        # skip comments
-        if s[0] == '#':
-            continue
-        feeder(lineno, s, abs_fn, statements)
+            s = f.readline()
+            if not s:
+                break
+            w = s.strip()
+            # skip empty lines
+            if not w:
+                continue
+            s = s.rstrip()
+            while s[-1] == '\\':
+                s2 = f.readline().rstrip()
+                lineno = lineno + 1
+                if (not s2 or s2 and s2[0] != "#") and s[0] == "#" :
+                    bb.fatal("There is a confusing multiline, partially commented expression on line %s of file %s (%s).\nPlease clarify whether this is all a comment or should be parsed." % (lineno, fn, s))
+                s = s[:-1] + s2
+            # skip comments
+            if s[0] == '#':
+                continue
+            feeder(lineno, s, abs_fn, statements)
 
     # DONE WITH PARSING... time to evaluate
     data.setVar('FILE', abs_fn)

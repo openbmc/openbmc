@@ -18,7 +18,7 @@ SECTION ?= "bsp"
 # device trees built with them are at least GPLv2 (and in some cases dual
 # licensed). Default to GPLv2 if the recipe does not specify a license.
 LICENSE ?= "GPLv2"
-LIC_FILES_CHKSUM ?= "file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
+LIC_FILES_CHKSUM ?= "file://${COMMON_LICENSE_DIR}/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS += "dtc-native"
@@ -59,7 +59,7 @@ DT_BOOT_CPU ??= "0"
 
 DTC_FLAGS ?= "-R ${DT_RESERVED_MAP} -b ${DT_BOOT_CPU}"
 DTC_PPFLAGS ?= "-nostdinc -undef -D__DTS__ -x assembler-with-cpp"
-DTC_BFLAGS ?= "-p ${DT_PADDING_SIZE}"
+DTC_BFLAGS ?= "-p ${DT_PADDING_SIZE} -@"
 DTC_OFLAGS ?= "-p 0 -@ -H epapr"
 
 python () {
@@ -116,7 +116,7 @@ def devicetree_compile(dtspath, includes, d):
     dtcargs += ["-o", "{0}.{1}".format(dtname, "dtbo" if isoverlay else "dtb")]
     dtcargs += ["-I", "dts", "-O", "dtb", "{0}.pp".format(dts)]
     bb.note("Running {0}".format(" ".join(dtcargs)))
-    subprocess.run(dtcargs, check = True)
+    subprocess.run(dtcargs, check = True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 python devicetree_do_compile() {
     includes = expand_includes("DT_INCLUDE", d)

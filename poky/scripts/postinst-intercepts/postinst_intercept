@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# SPDX-License-Identifier: MIT
+#
 # This script is called from inside postinstall scriptlets at do_rootfs time. It
 # actually adds, at the end, the list of packages for which the intercept script
 # is valid. Also, if one wants to pass any variables to the intercept script from

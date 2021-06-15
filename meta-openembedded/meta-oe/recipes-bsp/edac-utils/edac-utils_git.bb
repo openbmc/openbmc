@@ -30,8 +30,13 @@ RDEPENDS_${PN}_arm = "dmidecode"
 RDEPENDS_${PN}_aarch64 = "dmidecode"
 RDEPENDS_${PN}_powerpc = "dmidecode"
 RDEPENDS_${PN}_powerpc64 = "dmidecode"
+RDEPENDS_${PN}_powerpc64le = "dmidecode"
 RDEPENDS_${PN}_append = " \
-    perl-module-file-basename perl-module-file-find perl-module-getopt-long perl-module-posix \
+    perl \
+    perl-module-file-basename \
+    perl-module-file-find \
+    perl-module-getopt-long \
+    perl-module-posix \
     perl-module-overload \
     perl-module-overloading \
     perl-module-file-glob \

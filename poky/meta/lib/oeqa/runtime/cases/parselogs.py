@@ -1,10 +1,13 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 
 from subprocess import check_output
 from shutil import rmtree
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfDataVar
 from oeqa.runtime.decorator.package import OEHasPackage
 
@@ -52,11 +55,15 @@ common_errors = [
     "Failed to read /var/lib/nfs/statd/state: Success",
     "error retry time-out =",
     "logind: cannot setup systemd-logind helper (-61), using legacy fallback",
-    "Error changing net interface name 'eth0' to "
+    "Failed to rename network interface",
+    "Failed to process device, ignoring: Device or resource busy",
+    "Cannot find a map file",
+    "[rdrand]: Initialization Failed",
+    "[pulseaudio] authkey.c: Failed to open cookie file",
+    "[pulseaudio] authkey.c: Failed to load authentication key",
     ]
 
 video_related = [
-    "uvesafb",
 ]
 
 x86_common = [
@@ -78,8 +85,11 @@ qemux86_common = [
     "fail to add MMCONFIG information, can't access extended PCI configuration space under this bridge.",
     "can't claim BAR ",
     'amd_nb: Cannot enumerate AMD northbridges',
-    'uvesafb: 5000 ms task timeout, infinitely waiting',
     'tsc: HPET/PMTIMER calibration failed',
+    "modeset(0): Failed to initialize the DRI2 extension",
+    "glamor initialization failed",
+    "blk_update_request: I/O error, dev fd0, sector 0 op 0x0:(READ)",
+    "floppy: error",
 ] + common_errors
 
 ignore_errors = {
@@ -106,6 +116,11 @@ ignore_errors = {
         'can\'t handle BAR above 4GB',
         'Cannot reserve Legacy IO',
         ] + common_errors,
+    'qemuppc64' : [
+        'vio vio: uevent: failed to send synthetic uevent',
+        'synth uevent: /devices/vio: failed to send uevent',
+        'PCI 0000:00 Cannot reserve Legacy IO [io  0x10000-0x10fff]',
+        ] + common_errors,
     'qemuarm' : [
         'mmci-pl18x: probe of fpga:05 failed with error -22',
         'mmci-pl18x: probe of fpga:0b failed with error -22',
@@ -126,6 +141,7 @@ ignore_errors = {
         '(EE) Server terminated with error (1). Closing log file.',
         'dmi: Firmware registration failed.',
         'irq: type mismatch, failed to map hwirq-27 for /intc',
+        'logind: failed to get session seat',
         ] + common_errors,
     'intel-core2-32' : [
         'ACPI: No _BQC method, cannot determine initial brightness',
@@ -176,11 +192,6 @@ ignore_errors = {
         'Failed to load module "glx"',
         'Failed to make EGL context current',
         'glamor initialization failed',
-        ] + common_errors,
-    'mpc8315e-rdb' : [
-        'of_irq_parse_pci: failed with',
-        'Fatal server error:',
-        'Server terminated with error',
         ] + common_errors,
 }
 
@@ -289,7 +300,7 @@ class ParseLogsTest(OERuntimeTestCase):
         grepcmd = 'grep '
         grepcmd += '-Ei "'
         for error in errors:
-            grepcmd += error + '|'
+            grepcmd += '\<' + error + '\>' + '|'
         grepcmd = grepcmd[:-1]
         grepcmd += '" ' + str(log) + " | grep -Eiv \'"
 
@@ -351,7 +362,6 @@ class ParseLogsTest(OERuntimeTestCase):
     def write_dmesg(self):
         (status, dmesg) = self.target.run('dmesg > /tmp/dmesg_output.log')
 
-    @OETestID(1059)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_parselogs(self):
         self.write_dmesg()

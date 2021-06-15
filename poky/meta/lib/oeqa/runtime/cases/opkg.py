@@ -1,7 +1,11 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 from oeqa.utils.httpserver import HTTPService
 from oeqa.runtime.case import OERuntimeTestCase
-from oeqa.core.decorator.data import skipIfNotDataVar, skipIfNotFeature
+from oeqa.core.decorator.data import skipIfNotDataVar, skipIfNotFeature, skipIfFeature
 from oeqa.runtime.decorator.package import OEHasPackage
 
 class OpkgTest(OERuntimeTestCase):
@@ -21,7 +25,9 @@ class OpkgRepoTest(OpkgTest):
         if cls.tc.td["MULTILIB_VARIANTS"]:
             allarchfeed = cls.tc.td["TUNE_PKGARCH"]
         service_repo = os.path.join(cls.tc.td['DEPLOY_DIR_IPK'], allarchfeed)
-        cls.repo_server = HTTPService(service_repo, cls.tc.target.server_ip, logger=cls.tc.logger)
+        cls.repo_server = HTTPService(service_repo,
+                                      '0.0.0.0', port=cls.tc.target.server_port,
+                                      logger=cls.tc.logger)
         cls.repo_server.start()
 
     @classmethod
@@ -41,6 +47,8 @@ class OpkgRepoTest(OpkgTest):
                       'Test requires package-management to be in IMAGE_FEATURES')
     @skipIfNotDataVar('IMAGE_PKGTYPE', 'ipk',
                       'IPK is not the primary package manager')
+    @skipIfFeature('read-only-rootfs',
+                   'Test does not work with read-only-rootfs in IMAGE_FEATURES')
     @OEHasPackage(['opkg'])
     def test_opkg_install_from_repo(self):
         self.setup_source_config_for_package_install()

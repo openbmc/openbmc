@@ -1,0 +1,41 @@
+From b8192ff67ed46ea2cc4282fa1856ce2868223737 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 24 Feb 2021 19:43:07 +0000
+Subject: [PATCH] Makefile.am: add a missing space
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ cipher/Makefile.am | 2 +-
+ doc/Makefile.am    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cipher/Makefile.am b/cipher/Makefile.am
+index 1cf5072..b3ca225 100644
+--- a/cipher/Makefile.am
++++ b/cipher/Makefile.am
+@@ -143,7 +143,7 @@ gost-sb.h: gost-s-box
+ 
+ gost-s-box: gost-s-box.c
+ 	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) \
+-	    $(CPPFLAGS_FOR_BUILD)-o $@ $(srcdir)/gost-s-box.c
++	    $(CPPFLAGS_FOR_BUILD) -o $@ $(srcdir)/gost-s-box.c
+ 
+ 
+ if ENABLE_O_FLAG_MUNGING
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index fd7aac2..1703bd9 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -43,7 +43,7 @@ man_MANS = $(myman_pages)
+ 
+ yat2m: yat2m.c
+ 	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) \
+-	    $(CPPFLAGS_FOR_BUILD)-o $@ $(srcdir)/yat2m.c
++	    $(CPPFLAGS_FOR_BUILD) -o $@ $(srcdir)/yat2m.c
+ 
+ .fig.png:
+ 	fig2dev -L png `test -f '$<' || echo '$(srcdir)/'`$< $@
+-- 
+2.17.1
+

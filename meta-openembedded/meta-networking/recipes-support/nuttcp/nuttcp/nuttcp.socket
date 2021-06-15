@@ -1,0 +1,9 @@
+[Unit]
+Description=Network Performance Testing Server Activation Socket
+
+[Socket]
+ListenStream=5000
+Accept=true
+
+[Install]
+WantedBy=sockets.target

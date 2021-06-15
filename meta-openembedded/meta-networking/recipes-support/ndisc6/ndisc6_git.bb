@@ -15,6 +15,8 @@ SRC_URI = "git://git.remlab.net/git/ndisc6.git;protocol=http \
 
 S = "${WORKDIR}/git"
 
+DEPENDS = "coreutils-native"
+
 inherit autotools gettext
 
 EXTRA_OECONF += "PERL=${USRBINPATH}/perl"

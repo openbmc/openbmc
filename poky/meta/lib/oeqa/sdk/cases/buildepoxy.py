@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import subprocess
 import tempfile
@@ -24,11 +28,13 @@ class EpoxyTest(OESDKTestCase):
             dirs["build"] = os.path.join(testdir, "build")
             dirs["install"] = os.path.join(testdir, "install")
 
-            subprocess.check_output(["tar", "xf", tarball, "-C", testdir])
+            subprocess.check_output(["tar", "xf", tarball, "-C", testdir], stderr=subprocess.STDOUT)
             self.assertTrue(os.path.isdir(dirs["source"]))
             os.makedirs(dirs["build"])
 
-            self._run("meson -Degl=no -Dglx=no -Dx11=false {build} {source}".format(**dirs))
+            log = self._run("meson -Degl=no -Dglx=no -Dx11=false {build} {source}".format(**dirs))
+            # Check that Meson thinks we're doing a cross build and not a native
+            self.assertIn("Build type: cross build", log)
             self._run("ninja -C {build} -v".format(**dirs))
             self._run("DESTDIR={install} ninja -C {build} -v install".format(**dirs))
 

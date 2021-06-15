@@ -3,9 +3,12 @@ HOMEPAGE    = "http://www.la-samhna.de/samhain/"
 LICENSE     = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8ca43cbc842c2336e835926c2166c28b"
 
+PV = "4.4.3"
 
-SRC_URI = "http://la-samhna.de/archive/samhain_signed-${PV}.tar.gz \
-           file://samhain-cross-compile.patch \
+SRC_URI = "https://la-samhna.de/archive/samhain_signed-${PV}.tar.gz \
+           file://${INITSCRIPT_NAME}.init \
+           file://${INITSCRIPT_NAME}.default \
+           file://samhain.service \
            file://samhain-mips64-aarch64-dnmalloc-hash-fix.patch \
            file://samhain-samhainrc.patch \
            file://samhain-samhainrc-fix-files-dirs-path.patch \
@@ -14,13 +17,11 @@ SRC_URI = "http://la-samhna.de/archive/samhain_signed-${PV}.tar.gz \
            file://samhain-configure-add-option-for-ps.patch \
            file://samhain-avoid-searching-host-for-postgresql.patch \
            file://samhain-add-LDFLAGS-variable-for-samhain_setpwd.patch \
-           file://${INITSCRIPT_NAME}.init \
-           file://${INITSCRIPT_NAME}.default \
-           file://samhain.service \
+           file://fix-build-with-new-version-attr.patch \
+           file://samhain-fix-initializer-element-is-not-constant.patch \
            "
 
-SRC_URI[md5sum] = "eae4674164d7c78f5bb39c72b7029c8b"
-SRC_URI[sha256sum] = "0582864ef56ab796031e8e611ed66c48adeb3a30ec34e1a8d0088572442035fc"
+SRC_URI[sha256sum] = "3e57574036d5055e9557ec5095818b419ea6c4365370fc2ccce1e9f87f9fad08"
 
 UPSTREAM_CHECK_URI = "https://www.la-samhna.de/samhain/archive.html"
 UPSTREAM_CHECK_REGEX = "samhain_signed-(?P<pver>(\d+(\.\d+)+))\.tar"
@@ -65,6 +66,9 @@ PACKAGECONFIG[selinux] = "--enable-selinux, --disable-selinux, libselinux attr"
 PACKAGECONFIG[acl] = " --enable-posix-acl , --disable-posix-acl, acl"
 PACKAGECONFIG[audit] = "ac_cv_header_auparse_h=yes,ac_cv_header_auparse_h=no,audit"
 PACKAGECONFIG[ps] = "--with-ps-path=${base_bindir}/ps,,,procps"
+
+EXTRA_OEMAKE_append_aarch64 = " CPPFLAGS+=-DCONFIG_ARCH_AARCH64=1"
+EXTRA_OEMAKE_append_mips64 = " CPPFLAGS+=-DCONFIG_ARCH_MIPS64=1"
 
 do_unpack_samhain() {
     cd ${WORKDIR}
@@ -117,7 +121,6 @@ do_configure () {
 	--enable-network=${SAMHAIN_MODE} \
 	--with-pid-file=${localstatedir}/run/samhain.pid \
 	--with-data-file=${localstatedir}/lib/samhain/samhain_file \
-	--disable-dnmalloc \
 	${EXTRA_OECONF}
 }
 
@@ -158,6 +161,8 @@ do_install_append () {
 	if [ -d ${D}${localstatedir}/run ]; then
 		rmdir ${D}${localstatedir}/run
 	fi
+
+	rm -rf ${D}${localstatedir}/log
 }
 
 FILES_${PN} += "${systemd_system_unitdir}"

@@ -1,0 +1,50 @@
+From 9d47d2fd45c455339759dbfe9a0d6fd24b0a0fa1 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 24 Mar 2021 15:39:36 +0800
+Subject: [PATCH] tclap: add pkg-config file
+
+The tclap switched from autotools to CMake in 1.4.0 and drop the
+pkg-config file tclap.pc. Some projects (e.g. ima-inspect) still require
+it. So add it back.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ CMakeLists.txt | 5 +++++
+ tclap.pc.in    | 7 +++++++
+ 2 files changed, 12 insertions(+)
+ create mode 100644 tclap.pc.in
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c2c9a26..b56eac7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -25,6 +25,11 @@ install(FILES "${PROJECT_BINARY_DIR}/tclap/TCLAPConfig.h"
+   DESTINATION include/tclap
+   )
+ 
++configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tclap.pc.in
++  ${CMAKE_CURRENT_BINARY_DIR}/tclap.pc @ONLY)
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/tclap.pc
++  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
++
+ add_subdirectory(docs)
+ add_subdirectory(examples)
+ add_subdirectory(tests)
+diff --git a/tclap.pc.in b/tclap.pc.in
+new file mode 100644
+index 0000000..ef51c94
+--- /dev/null
++++ b/tclap.pc.in
+@@ -0,0 +1,7 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
++
++Name: tclap
++Description: Templatized C++ Command Line Parser
++Version: @PROJECT_VERSION@
++Cflags: -I${includedir}
+-- 
+2.17.1
+

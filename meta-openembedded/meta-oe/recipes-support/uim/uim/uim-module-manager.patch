@@ -6,11 +6,9 @@ Date: Fri, 26 Jun 2015 12:57:48 +0900
  scm/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scm/Makefile.am b/scm/Makefile.am
-index 14d9393..e8a1083 100644
 --- a/scm/Makefile.am
 +++ b/scm/Makefile.am
-@@ -119,7 +119,7 @@ if EXPAT
+@@ -115,7 +115,7 @@ if EXPAT
    module_names += "yahoo-jp"
  endif
  

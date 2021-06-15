@@ -1,3 +1,6 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 import logging
 import oe.classutils
 import shlex
@@ -52,7 +55,7 @@ class XTerminal(Terminal):
             raise UnsupportedTerminal(self.name)
 
 class Gnome(XTerminal):
-    command = 'gnome-terminal -t "{title}" -x {command}'
+    command = 'gnome-terminal -t "{title}" -- {command}'
     priority = 2
 
     def __init__(self, sh_cmd, title=None, env=None, d=None):
@@ -160,7 +163,12 @@ class Tmux(Terminal):
         # devshells, if it's already there, add a new window to it.
         window_name = 'devshell-%i' % os.getpid()
 
-        self.command = 'tmux new -c "{{cwd}}" -d -s {0} -n {0} "{{command}}"'.format(window_name)
+        self.command = 'tmux new -c "{{cwd}}" -d -s {0} -n {0} "{{command}}"'
+        if not check_tmux_version('1.9'):
+            # `tmux new-session -c` was added in 1.9;
+            # older versions fail with that flag
+            self.command = 'tmux new -d -s {0} -n {0} "{{command}}"'
+        self.command = self.command.format(window_name)
         Terminal.__init__(self, sh_cmd, title, env, d)
 
         attach_cmd = 'tmux att -t {0}'.format(window_name)
@@ -182,7 +190,7 @@ class Custom(Terminal):
             Terminal.__init__(self, sh_cmd, title, env, d)
             logger.warning('Custom terminal was started.')
         else:
-            logger.debug(1, 'No custom terminal (OE_TERMINAL_CUSTOMCMD) set')
+            logger.debug('No custom terminal (OE_TERMINAL_CUSTOMCMD) set')
             raise UnsupportedTerminal('OE_TERMINAL_CUSTOMCMD not set')
 
 
@@ -204,13 +212,16 @@ def spawn_preferred(sh_cmd, title=None, env=None, d=None):
             spawn(terminal.name, sh_cmd, title, env, d)
             break
         except UnsupportedTerminal:
-            continue
+            pass
+        except:
+            bb.warn("Terminal %s is supported but did not start" % (terminal.name))
+    # when we've run out of options
     else:
         raise NoSupportedTerminals(get_cmd_list())
 
 def spawn(name, sh_cmd, title=None, env=None, d=None):
     """Spawn the specified terminal, by name"""
-    logger.debug(1, 'Attempting to spawn terminal "%s"', name)
+    logger.debug('Attempting to spawn terminal "%s"', name)
     try:
         terminal = Registry.registry[name]
     except KeyError:
@@ -247,13 +258,18 @@ def spawn(name, sh_cmd, title=None, env=None, d=None):
         except OSError:
            return
 
+def check_tmux_version(desired):
+    vernum = check_terminal_version("tmux")
+    if vernum and LooseVersion(vernum) < desired:
+        return False
+    return vernum
+
 def check_tmux_pane_size(tmux):
     import subprocess as sub
     # On older tmux versions (<1.9), return false. The reason
     # is that there is no easy way to get the height of the active panel
     # on current window without nested formats (available from version 1.9)
-    vernum = check_terminal_version("tmux")
-    if vernum and LooseVersion(vernum) < '1.9':
+    if not check_tmux_version('1.9'):
         return False
     try:
         p = sub.Popen('%s list-panes -F "#{?pane_active,#{pane_height},}"' % tmux,

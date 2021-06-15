@@ -1,0 +1,37 @@
+From a996fd451bbd7be93cff5f466bff7282ae972fe1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 11 May 2021 10:52:51 -0700
+Subject: [PATCH] set_my_tls_end_of_input: Use an arbitrary but valid pointer
+ as value
+
+Pass a valid pointer to pthread_setspecific to avoid GCC 11 warning.
+Fixes
+
+src/tbb/tls.h:44:46: error: 'int pthread_setspecific(pthread_key_t, const void*)' expecting 1 byte in a region of size 0 [-Werror=stringop-overread]
+|    44 |     void set( T value ) { pthread_setspecific(my_key, (void*)value); }
+|       |                           ~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+| compilation terminated due to -Wfatal-errors.
+
+Upstream-Status: Submitted [https://github.com/oneapi-src/oneTBB/pull/394]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/tbb/parallel_pipeline.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/tbb/parallel_pipeline.cpp b/src/tbb/parallel_pipeline.cpp
+index b7655c6b..ca518b5b 100644
+--- a/src/tbb/parallel_pipeline.cpp
++++ b/src/tbb/parallel_pipeline.cpp
+@@ -243,7 +243,8 @@ public:
+         return end_of_input_tls.get() != 0;
+     }
+     void set_my_tls_end_of_input() {
+-        end_of_input_tls.set(1);
++	// Use an arbitrary but valid pointer as value.
++        end_of_input_tls.set(array_size);
+     }
+ };
+ 
+-- 
+2.31.1
+

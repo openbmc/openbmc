@@ -19,7 +19,7 @@
 #define TUNSETGROUP   _IOW('T', 206, int)
 #endif
 
-static void Usage(char *name)
+static void Usage(char *name, int status)
 {
   fprintf(stderr, "Create: %s [-b] [-u owner] [-g group] [-t device-name] "
 	  "[-f tun-clone-device]\n", name);
@@ -28,7 +28,7 @@ static void Usage(char *name)
   fprintf(stderr, "The default tun clone device is /dev/net/tun - some systems"
 	  " use\n/dev/misc/net/tun instead\n\n");
   fprintf(stderr, "-b will result in brief output (just the device name)\n");
-  exit(1);
+  exit(status);
 }
 
 int main(int argc, char **argv)
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
   int tap_fd, opt, delete = 0, brief = 0;
   char *tun = "", *file = "/dev/net/tun", *name = argv[0], *end;
 
-  while((opt = getopt(argc, argv, "bd:f:t:u:g:")) > 0){
+  while((opt = getopt(argc, argv, "bd:f:t:u:g:h")) > 0){
     switch(opt) {
       case 'b':
         brief = 1;
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 	if(*end != '\0'){
 	  fprintf(stderr, "'%s' is neither a username nor a numeric uid.\n",
 		  optarg);
-	  Usage(name);
+	  Usage(name, 1);
 	}
         break;
       case 'g':
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 	if(*end != '\0'){
 	  fprintf(stderr, "'%s' is neither a groupname nor a numeric group.\n",
 		  optarg);
-	  Usage(name);
+	  Usage(name, 1);
 	}
         break;
 
@@ -84,8 +84,10 @@ int main(int argc, char **argv)
         tun = optarg;
         break;
       case 'h':
+        Usage(name, 0);
+        break;
       default:
-        Usage(name);
+        Usage(name, 1);
     }
   }
 
@@ -93,7 +95,7 @@ int main(int argc, char **argv)
   argc -= optind;
 
   if(argc > 0)
-    Usage(name);
+    Usage(name, 1);
 
   if((tap_fd = open(file, O_RDWR)) < 0){
     fprintf(stderr, "Failed to open '%s' : ", file);

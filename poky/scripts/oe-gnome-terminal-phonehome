@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# SPDX-License-Identifier: GPL-2.0-only
+#
 # Gnome terminal won't tell us which PID a given command is run as 
 # or allow a single instance so we can't tell when it completes.
 # This allows us to figure out the PID of the target so we can tell 

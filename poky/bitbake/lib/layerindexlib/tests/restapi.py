@@ -1,27 +1,14 @@
 # Copyright (C) 2017-2018 Wind River Systems, Inc.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 import unittest
-import tempfile
 import os
-import bb
 
 import layerindexlib
 from layerindexlib.tests.common import LayersTest
 
-import logging
 
 def skipIfNoNetwork():
     if os.environ.get("BB_SKIP_NETTESTS") == "yes":
@@ -70,11 +57,11 @@ class LayerIndexWebRestApiTest(LayersTest):
                type in self.layerindex.indexes[0].config['local']:
                 continue
             for id in getattr(self.layerindex.indexes[0], type):
-                self.logger.debug(1, "type %s" % (type))
+                self.logger.debug("type %s" % (type))
 
                 self.assertTrue(id in getattr(reload.indexes[0], type), msg="Id number not in reloaded index")
 
-                self.logger.debug(1, "%s ? %s" % (getattr(self.layerindex.indexes[0], type)[id], getattr(reload.indexes[0], type)[id]))
+                self.logger.debug("%s ? %s" % (getattr(self.layerindex.indexes[0], type)[id], getattr(reload.indexes[0], type)[id]))
 
                 self.assertEqual(getattr(self.layerindex.indexes[0], type)[id], getattr(reload.indexes[0], type)[id], msg="Reloaded contents different")
 
@@ -93,11 +80,11 @@ class LayerIndexWebRestApiTest(LayersTest):
                type in self.layerindex.indexes[0].config['local']:
                 continue
             for id in getattr(self.layerindex.indexes[0] ,type):
-                self.logger.debug(1, "type %s" % (type))
+                self.logger.debug("type %s" % (type))
 
                 self.assertTrue(id in getattr(reload.indexes[0], type), msg="Id number missing from reloaded data")
 
-                self.logger.debug(1, "%s ? %s" % (getattr(self.layerindex.indexes[0] ,type)[id], getattr(reload.indexes[0], type)[id]))
+                self.logger.debug("%s ? %s" % (getattr(self.layerindex.indexes[0] ,type)[id], getattr(reload.indexes[0], type)[id]))
 
                 self.assertEqual(getattr(self.layerindex.indexes[0] ,type)[id], getattr(reload.indexes[0], type)[id], msg="reloaded data does not match original")
 
@@ -124,14 +111,14 @@ class LayerIndexWebRestApiTest(LayersTest):
                 if dep.layer.name == 'meta-python':
                     break
             else:
-                self.logger.debug(1, "meta-python was not found")
-                self.assetTrue(False)
+                self.logger.debug("meta-python was not found")
+                raise self.failureException
 
             # Only check the first element...
             break
         else:
             # Empty list, this is bad.
-            self.logger.debug(1, "Empty list of dependencies")
+            self.logger.debug("Empty list of dependencies")
             self.assertIsNotNone(first, msg="Empty list of dependencies")
 
             # Last dep should be the requested item
@@ -141,7 +128,7 @@ class LayerIndexWebRestApiTest(LayersTest):
     @skipIfNoNetwork()
     def test_find_collection(self):
         def _check(collection, expected):
-            self.logger.debug(1, "Looking for collection %s..." % collection)
+            self.logger.debug("Looking for collection %s..." % collection)
             result = self.layerindex.find_collection(collection)
             if expected:
                 self.assertIsNotNone(result, msg="Did not find %s when it should be there" % collection)
@@ -161,11 +148,11 @@ class LayerIndexWebRestApiTest(LayersTest):
     @skipIfNoNetwork()
     def test_find_layerbranch(self):
         def _check(name, expected):
-            self.logger.debug(1, "Looking for layerbranch %s..." % name)
+            self.logger.debug("Looking for layerbranch %s..." % name)
 
             for index in self.layerindex.indexes:
                 for layerbranchid in index.layerBranches:
-                    self.logger.debug(1, "Present: %s" % index.layerBranches[layerbranchid].layer.name)
+                    self.logger.debug("Present: %s" % index.layerBranches[layerbranchid].layer.name)
             result = self.layerindex.find_layerbranch(name)
             if expected:
                 self.assertIsNotNone(result, msg="Did not find %s when it should be there" % collection)

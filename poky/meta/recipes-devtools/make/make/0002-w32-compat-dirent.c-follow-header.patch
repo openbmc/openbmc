@@ -1,0 +1,36 @@
+From 4dd8b4f43aa0078707ad9a7932f4e137bc4383ed Mon Sep 17 00:00:00 2001
+From: Jens Rehsack <sno@netbsd.org>
+Date: Mon, 24 Feb 2020 11:12:43 +0100
+Subject: [PATCH 2/3] w32: compat: dirent.c: follow header
+
+src/w32/include/dirent.h completely delegates to mingw dirent implementation,
+gnulib detects it as fine and completely usable - trust in that.
+
+Signed-off-by: Jens Rehsack <sno@netbsd.org>
+---
+Upstream-Status: Pending (https://savannah.gnu.org/bugs/?57888)
+
+ src/w32/compat/dirent.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/w32/compat/dirent.c b/src/w32/compat/dirent.c
+index b8ec615..de80f72 100644
+--- a/src/w32/compat/dirent.c
++++ b/src/w32/compat/dirent.c
+@@ -23,7 +23,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ #include <stdlib.h>
+ #include "dirent.h"
+ 
+-
++#ifndef __MINGW32__
+ DIR*
+ opendir(const char* pDirName)
+ {
+@@ -193,3 +193,4 @@ seekdir(DIR* pDir, long nPosition)
+ 
+         return;
+ }
++#endif  /* !__MINGW32__ */
+-- 
+2.17.1
+

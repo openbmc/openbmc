@@ -1,0 +1,13 @@
+[Unit]
+Description=Kea DHCPv4 Server
+Wants=network-online.target
+After=network-online.target
+After=time-sync.target
+
+[Service]
+ExecStartPre=@BASE_BINDIR@/mkdir -p @LOCALSTATEDIR@/run/kea/
+ExecStartPre=@BASE_BINDIR@/mkdir -p @LOCALSTATEDIR@/lib/kea
+ExecStart=@SBINDIR@/kea-dhcp4 -c @SYSCONFDIR@/kea/kea-dhcp4.conf
+
+[Install]
+WantedBy=multi-user.target

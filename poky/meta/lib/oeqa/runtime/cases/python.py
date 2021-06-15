@@ -1,10 +1,12 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.runtime.decorator.package import OEHasPackage
 
 class PythonTest(OERuntimeTestCase):
-    @OETestID(965)
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['python3-core'])
     def test_python3(self):

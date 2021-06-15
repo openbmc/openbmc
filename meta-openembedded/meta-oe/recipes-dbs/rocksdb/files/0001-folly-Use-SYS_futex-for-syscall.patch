@@ -1,0 +1,47 @@
+From ddcc8a9f7e0f0bfee96f2f0a0c10f21f9fa9b05d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Nov 2020 15:02:28 -0800
+Subject: [PATCH] folly: Use SYS_futex for syscall
+
+glibc defines SYS_futex and on newer 32bit CPUs like RISCV-32, arc there
+is no 32bit time_t therefore define SYS_futex in terms of SYS_futex_time64
+
+Upstream-Status: Submitted [https://github.com/facebook/rocksdb/pull/7676]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ third-party/folly/folly/detail/Futex.cpp | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/third-party/folly/folly/detail/Futex.cpp b/third-party/folly/folly/detail/Futex.cpp
+index 62d6ea2b2..a914a8c73 100644
+--- a/third-party/folly/folly/detail/Futex.cpp
++++ b/third-party/folly/folly/detail/Futex.cpp
+@@ -48,9 +48,15 @@ namespace {
+ #define FUTEX_CLOCK_REALTIME 256
+ #endif
+ 
++/// Newer 32bit CPUs eg. RISCV-32 are defaulting to 64bit time_t from get go and
++/// therefore do not define __NR_futex
++#if !defined(SYS_futex) && defined(SYS_futex_time64)
++# define SYS_futex SYS_futex_time64
++#endif
++
+ int nativeFutexWake(const void* addr, int count, uint32_t wakeMask) {
+   long rv = syscall(
+-      __NR_futex,
++      SYS_futex,
+       addr, /* addr1 */
+       FUTEX_WAKE_BITSET | FUTEX_PRIVATE_FLAG, /* op */
+       count, /* val */
+@@ -112,7 +118,7 @@ FutexResult nativeFutexWaitImpl(
+   // Unlike FUTEX_WAIT, FUTEX_WAIT_BITSET requires an absolute timeout
+   // value - http://locklessinc.com/articles/futex_cheat_sheet/
+   long rv = syscall(
+-      __NR_futex,
++      SYS_futex,
+       addr, /* addr1 */
+       op, /* op */
+       expected, /* val */
+-- 
+2.29.2
+

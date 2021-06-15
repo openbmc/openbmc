@@ -5,9 +5,13 @@
 SUMMARY = "Full-featured set of base utils"
 DESCRIPTION = "Package group bringing in packages needed to provide much of the base utils type functionality found in busybox"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 inherit packagegroup
 
 VIRTUAL-RUNTIME_vim ?= "vim-tiny"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 RDEPENDS_${PN} = "\
     base-passwd \
@@ -17,8 +21,8 @@ RDEPENDS_${PN} = "\
     coreutils \
     cpio \
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "", "debianutils-run-parts", d)} \
-    dhcp-client \
-    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "", "dhcp-server", d)} \
+    dhcpcd \
+    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "", "kea", d)} \
     diffutils \
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "", "dpkg-start-stop", d)} \
     e2fsprogs \

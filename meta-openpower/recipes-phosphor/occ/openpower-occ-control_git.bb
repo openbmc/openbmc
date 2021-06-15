@@ -7,10 +7,10 @@ PV = "1.0+git${SRCPV}"
 inherit autotools \
         pkgconfig \
         obmc-phosphor-dbus-service \
-        pythonnative \
+        python3native \
         phosphor-dbus-yaml
 
-require ${PN}.inc
+require ${BPN}.inc
 
 SRC_URI += "file://occ-active.sh"
 do_install_append() {
@@ -26,15 +26,18 @@ SYSTEMD_SERVICE_${PN} += "op-occ-disable@.service"
 DEPENDS += "virtual/${PN}-config-native"
 DEPENDS += " \
         sdbusplus \
-        sdbusplus-native \
+        ${PYTHON_PN}-sdbus++-native \
         phosphor-logging \
-        openpower-dbus-interfaces \
         phosphor-dbus-interfaces \
-        openpower-dbus-interfaces-native \
         autoconf-archive-native \
-        obmc-targets \
         systemd \
+        ${PYTHON_PN}-native \
+        ${PYTHON_PN}-pyyaml-native \
+        ${PYTHON_PN}-setuptools-native \
+        ${PYTHON_PN}-mako-native \
         "
+
+RDEPENDS_${PN} += "phosphor-state-manager-obmc-targets"
 
 EXTRA_OECONF = " \
              YAML_PATH=${STAGING_DATADIR_NATIVE}/${PN} \
@@ -47,11 +50,11 @@ OCC_DISABLE = "disable"
 HOST_START = "startmin"
 HOST_STOP = "stop"
 
-# Ensure host-stop and host-startmin targets require needed occ states
+# Ensure host-stop and host-startmin targets wants needed occ states
 OCC_TMPL = "op-occ-{0}@.service"
 HOST_TGTFMT = "obmc-host-{1}@{2}.target"
 OCC_INSTFMT = "op-occ-{0}@{2}.service"
-HOST_OCC_FMT = "../${OCC_TMPL}:${HOST_TGTFMT}.requires/${OCC_INSTFMT}"
+HOST_OCC_FMT = "../${OCC_TMPL}:${HOST_TGTFMT}.wants/${OCC_INSTFMT}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_OCC_FMT', 'OCC_ENABLE', 'HOST_START', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'HOST_OCC_FMT', 'OCC_DISABLE', 'HOST_STOP', 'OBMC_HOST_INSTANCES')}"
 
@@ -70,17 +73,20 @@ S = "${WORKDIR}/git"
 # Remove packages not required for native build
 DEPENDS_remove_class-native = " \
         phosphor-logging \
-        obmc-targets \
         systemd \
+        sdbusplus \
         virtual/${PN}-config-native \
         "
+RDEPENDS_${PN}_remove_class-native += "phosphor-state-manager-obmc-targets"
+
 # Remove packages not required for native SDK build
 DEPENDS_remove_class-nativesdk = " \
         phosphor-logging \
-        obmc-targets \
         systemd \
+        sdbusplus \
         virtual/${PN}-config-native \
         "
+RDEPENDS_${PN}_remove_class-nativesdk += "phosphor-state-manager-obmc-targets"
 
 # Provide a means to enable/disable install_error_yaml feature
 PACKAGECONFIG ??= "install_error_yaml"
@@ -98,4 +104,3 @@ PACKAGECONFIG_add_class-nativesdk = "install_error_yaml"
 PACKAGECONFIG_remove_class-target = "install_error_yaml"
 
 BBCLASSEXTEND += "native nativesdk"
-

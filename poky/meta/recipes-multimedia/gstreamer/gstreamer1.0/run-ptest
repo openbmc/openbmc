@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+gnome-desktop-testing-runner gstreamer

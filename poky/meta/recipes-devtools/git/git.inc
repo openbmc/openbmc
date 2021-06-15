@@ -1,5 +1,6 @@
 SUMMARY = "Distributed version control system"
 HOMEPAGE = "http://git-scm.com"
+DESCRIPTION = "Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
 SECTION = "console/utils"
 LICENSE = "GPLv2"
 DEPENDS = "openssl curl zlib expat"
@@ -7,11 +8,15 @@ DEPENDS = "openssl curl zlib expat"
 PROVIDES_append_class-native = " git-replacement-native"
 
 SRC_URI = "${KERNELORG_MIRROR}/software/scm/git/git-${PV}.tar.gz;name=tarball \
-           ${KERNELORG_MIRROR}/software/scm/git/git-manpages-${PV}.tar.gz;name=manpages"
+           ${KERNELORG_MIRROR}/software/scm/git/git-manpages-${PV}.tar.gz;name=manpages \
+           file://fixsort.patch \
+"
 
 S = "${WORKDIR}/git-${PV}"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=7c0d7ef03a7eb04ce795b0f60e68e7e1"
+
+CVE_PRODUCT = "git-scm:git"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[cvsserver] = ""
@@ -19,7 +24,9 @@ PACKAGECONFIG[svn] = ""
 
 EXTRA_OECONF = "--with-perl=${STAGING_BINDIR_NATIVE}/perl-native/perl \
 		--without-tcltk \
+		--without-iconv \
 "
+EXTRA_OECONF_append_class-nativesdk = " --with-gitconfig=/etc/gitconfig "
 
 # Needs brokensep as this doesn't use automake
 inherit autotools-brokensep perlnative bash-completion
@@ -37,12 +44,12 @@ do_compile_prepend () {
 do_install () {
 	oe_runmake install DESTDIR="${D}" bindir=${bindir} \
 		template_dir=${datadir}/git-core/templates
-	install -d ${D}/${mandir}/man1
-	install -d ${D}/${mandir}/man5
-	install -d ${D}/${mandir}/man7
-	install -t ${D}/${mandir}/man1 ${WORKDIR}/man1/*
-	install -t ${D}/${mandir}/man5 ${WORKDIR}/man5/*
-	install -t ${D}/${mandir}/man7 ${WORKDIR}/man7/*
+
+	for section in man1 man5 man7; do
+		install -d ${D}/${mandir}/$section
+		install -t ${D}/${mandir}/$section ${WORKDIR}/$section/*
+	done
+
 	install -d ${D}/${datadir}/bash-completion/completions/
 	install -m 644 ${S}/contrib/completion/git-completion.bash ${D}/${datadir}/bash-completion/completions/git
 }
@@ -92,19 +99,15 @@ do_install_append_class-nativesdk() {
 FILES_${PN} += "${datadir}/git-core ${libexecdir}/git-core/"
 
 PERLTOOLS = " \
+    ${bindir}/git-cvsserver \
     ${libexecdir}/git-core/git-add--interactive \
     ${libexecdir}/git-core/git-archimport \
     ${libexecdir}/git-core/git-cvsexportcommit \
     ${libexecdir}/git-core/git-cvsimport \
     ${libexecdir}/git-core/git-cvsserver \
-    ${bindir}/git-cvsserver \
-    ${libexecdir}/git-core/git-difftool \
     ${libexecdir}/git-core/git-send-email \
     ${libexecdir}/git-core/git-svn \
     ${libexecdir}/git-core/git-instaweb \
-    ${libexecdir}/git-core/git-submodule \
-    ${libexecdir}/git-core/git-am \
-    ${libexecdir}/git-core/git-request-pull \
     ${datadir}/gitweb/gitweb.cgi \
     ${datadir}/git-core/templates/hooks/prepare-commit-msg.sample \
     ${datadir}/git-core/templates/hooks/pre-rebase.sample \

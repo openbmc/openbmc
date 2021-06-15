@@ -1,0 +1,305 @@
+From 21cc8144efdaa3cd8dbd7279f87b14fa3432fae4 Mon Sep 17 00:00:00 2001
+From: Jason Wu <jason.wu.misc@gmail.com>
+Date: Sun, 10 Apr 2016 13:14:13 +1000
+Subject: [PATCH 1/3] drm: xilinx: Add encoder for Digilent boards
+
+Add the dglnt_encoder driver that enables DRM support for the VGA and
+HDMI output ports found on many Digilent boards.
+
+Upstream-Status: Pending
+
+Signed-off-by: Sam Bobrowicz <sbobrowicz@digilentinc.com>
+Signed-off-by: Jason Wu <jason.wu.misc@gmail.com>
+---
+ .../bindings/drm/xilinx/dglnt_encoder.txt          |  23 +++
+ drivers/gpu/drm/xilinx/Kconfig                     |   6 +
+ drivers/gpu/drm/xilinx/Makefile                    |   1 +
+ drivers/gpu/drm/xilinx/dglnt_encoder.c             | 217 +++++++++++++++++++++
+ 4 files changed, 247 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/drm/xilinx/dglnt_encoder.txt
+ create mode 100644 drivers/gpu/drm/xilinx/dglnt_encoder.c
+
+diff --git a/Documentation/devicetree/bindings/drm/xilinx/dglnt_encoder.txt b/Documentation/devicetree/bindings/drm/xilinx/dglnt_encoder.txt
+new file mode 100644
+index 0000000..242b24e
+--- /dev/null
++++ b/Documentation/devicetree/bindings/drm/xilinx/dglnt_encoder.txt
+@@ -0,0 +1,23 @@
++Device-Tree bindings for Digilent DRM Encoder Slave
++
++This driver provides support for VGA and HDMI outputs on Digilent FPGA boards.
++The VGA or HDMI port must be connected to a Xilinx display pipeline via an
++axi2vid IP core.
++
++Required properties:
++ - compatible: Should be "digilent,drm-encoder".
++
++Optional properties:
++ - dglnt,edid-i2c: The I2C device connected to the DDC bus on the video
++                   connector. This is used to obtain the supported resolutions
++                   of an attached monitor. If not defined, then a default
++                   set of resolutions is used and the display will initialize
++                   to 720p. Note most VGA connectors on Digilent boards do
++                   not have the DDC bus routed out.
++
++Example:
++
++	encoder_0: digilent_encoder {
++		compatible = "digilent,drm-encoder";
++		dglnt,edid-i2c = <&i2c1>;
++	};
+diff --git a/drivers/gpu/drm/xilinx/Kconfig b/drivers/gpu/drm/xilinx/Kconfig
+index 57e18a9..d9ecff2 100644
+--- a/drivers/gpu/drm/xilinx/Kconfig
++++ b/drivers/gpu/drm/xilinx/Kconfig
+@@ -33,6 +33,12 @@ config DRM_XILINX_DP_SUB
+ 	help
+ 	  DRM driver for Xilinx Display Port Subsystem.
+ 
++config DRM_DIGILENT_ENCODER
++   tristate "Digilent VGA/HDMI DRM Encoder Driver"
++   depends on DRM_XILINX
++   help
++     DRM slave encoder for Video-out on Digilent boards.
++
+ config DRM_XILINX_DP_SUB_DEBUG_FS
+ 	bool "Xilinx DRM DPSUB debugfs"
+ 	depends on DEBUG_FS && DRM_XILINX_DP_SUB
+diff --git a/drivers/gpu/drm/xilinx/Makefile b/drivers/gpu/drm/xilinx/Makefile
+index 19bc154..c2717e40 100644
+--- a/drivers/gpu/drm/xilinx/Makefile
++++ b/drivers/gpu/drm/xilinx/Makefile
+@@ -7,6 +7,7 @@ xilinx_drm-y := xilinx_drm_crtc.o xilinx_drm_connector.o xilinx_drm_drv.o \
+ 		xilinx_drm_plane.o
+ xilinx_drm-y += xilinx_cresample.o xilinx_osd.o xilinx_rgb2yuv.o xilinx_vtc.o
+ 
++obj-$(CONFIG_DRM_DIGILENT_ENCODER) += dglnt_encoder.o
+ obj-$(CONFIG_DRM_XILINX) += xilinx_drm.o
+ obj-$(CONFIG_DRM_XILINX_DP) += xilinx_drm_dp.o
+ obj-$(CONFIG_DRM_XILINX_DP_SUB) += xilinx_drm_dp_sub.o
+diff --git a/drivers/gpu/drm/xilinx/dglnt_encoder.c b/drivers/gpu/drm/xilinx/dglnt_encoder.c
+new file mode 100644
+index 0000000..cb9fc7d
+--- /dev/null
++++ b/drivers/gpu/drm/xilinx/dglnt_encoder.c
+@@ -0,0 +1,217 @@
++/*
++ * dglnt_encoder.c - DRM slave encoder for Video-out on Digilent boards
++ *
++ * Copyright (C) 2015 Digilent
++ * Author: Sam Bobrowicz <sbobrowicz@digilentinc.com>
++ *
++ * Based on udl_encoder.c and udl_connector.c, Copyright (C) 2012 Red Hat.
++ * Also based on xilinx_drm_dp.c, Copyright (C) 2014 Xilinx, Inc.
++ *
++ * This software is licensed under the terms of the GNU General Public
++ * License version 2, as published by the Free Software Foundation, and
++ * may be copied, distributed, and modified under those terms.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#include <drm/drmP.h>
++#include <drm/drm_edid.h>
++#include <drm/drm_encoder_slave.h>
++
++#include <linux/device.h>
++#include <linux/module.h>
++#include <linux/err.h>
++#include <linux/i2c.h>
++#include <linux/of.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
++
++#define DGLNT_ENC_MAX_FREQ 150000
++#define DGLNT_ENC_MAX_H 1920
++#define DGLNT_ENC_MAX_V 1080
++#define DGLNT_ENC_PREF_H 1280
++#define DGLNT_ENC_PREF_V 720
++
++struct dglnt_encoder {
++	struct drm_encoder *encoder;
++	struct i2c_adapter *i2c_bus;
++	bool i2c_present;
++};
++
++static inline struct dglnt_encoder *to_dglnt_encoder(
++					struct drm_encoder *encoder)
++{
++	return to_encoder_slave(encoder)->slave_priv;
++}
++
++static bool dglnt_mode_fixup(struct drm_encoder *encoder,
++				const struct drm_display_mode *mode,
++				struct drm_display_mode *adjusted_mode)
++{
++	return true;
++}
++
++static void dglnt_encoder_mode_set(struct drm_encoder *encoder,
++				struct drm_display_mode *mode,
++				struct drm_display_mode *adjusted_mode)
++{
++}
++
++static void
++dglnt_encoder_dpms(struct drm_encoder *encoder, int mode)
++{
++}
++
++static void dglnt_encoder_save(struct drm_encoder *encoder)
++{
++}
++
++static void dglnt_encoder_restore(struct drm_encoder *encoder)
++{
++}
++
++static int dglnt_encoder_mode_valid(struct drm_encoder *encoder,
++				struct drm_display_mode *mode)
++{
++	if (mode &&
++		!(mode->flags & ((DRM_MODE_FLAG_INTERLACE |
++			DRM_MODE_FLAG_DBLCLK) | DRM_MODE_FLAG_3D_MASK)) &&
++		(mode->clock <= DGLNT_ENC_MAX_FREQ) &&
++		(mode->hdisplay <= DGLNT_ENC_MAX_H) &&
++		(mode->vdisplay <= DGLNT_ENC_MAX_V))
++		return MODE_OK;
++	return MODE_BAD;
++}
++
++static int dglnt_encoder_get_modes(struct drm_encoder *encoder,
++				struct drm_connector *connector)
++{
++	struct dglnt_encoder *dglnt = to_dglnt_encoder(encoder);
++	struct edid *edid;
++	int num_modes = 0;
++
++	if (dglnt->i2c_present) {
++		edid = drm_get_edid(connector, dglnt->i2c_bus);
++		drm_connector_update_edid_property(connector, edid);
++		if (edid) {
++			num_modes = drm_add_edid_modes(connector, edid);
++			kfree(edid);
++		}
++	} else {
++		num_modes = drm_add_modes_noedid(connector, DGLNT_ENC_MAX_H,
++						DGLNT_ENC_MAX_V);
++		drm_set_preferred_mode(connector, DGLNT_ENC_PREF_H,
++					DGLNT_ENC_PREF_V);
++	}
++	return num_modes;
++}
++
++static enum drm_connector_status dglnt_encoder_detect(
++					struct drm_encoder *encoder,
++					struct drm_connector *connector)
++{
++	struct dglnt_encoder *dglnt = to_dglnt_encoder(encoder);
++
++	if (dglnt->i2c_present) {
++		if (drm_probe_ddc(dglnt->i2c_bus))
++			return connector_status_connected;
++		return connector_status_disconnected;
++	} else
++		return connector_status_unknown;
++}
++
++static struct drm_encoder_slave_funcs dglnt_encoder_slave_funcs = {
++	.dpms			= dglnt_encoder_dpms,
++	.save			= dglnt_encoder_save,
++	.restore		= dglnt_encoder_restore,
++	.mode_fixup		= dglnt_mode_fixup,
++	.mode_valid		= dglnt_encoder_mode_valid,
++	.mode_set		= dglnt_encoder_mode_set,
++	.detect			= dglnt_encoder_detect,
++	.get_modes		= dglnt_encoder_get_modes,
++};
++
++static int dglnt_encoder_encoder_init(struct platform_device *pdev,
++				struct drm_device *dev,
++				struct drm_encoder_slave *encoder)
++{
++	struct dglnt_encoder *dglnt = platform_get_drvdata(pdev);
++	struct device_node *sub_node;
++
++	encoder->slave_priv = dglnt;
++	encoder->slave_funcs = &dglnt_encoder_slave_funcs;
++
++	dglnt->encoder = &encoder->base;
++
++	/* get i2c adapter for edid */
++	dglnt->i2c_present = false;
++	sub_node = of_parse_phandle(pdev->dev.of_node, "dglnt,edid-i2c", 0);
++	if (sub_node) {
++		dglnt->i2c_bus = of_find_i2c_adapter_by_node(sub_node);
++		if (!dglnt->i2c_bus)
++			DRM_INFO("failed to get the edid i2c adapter, using default modes\n");
++		else
++			dglnt->i2c_present = true;
++		of_node_put(sub_node);
++	}
++
++	return 0;
++}
++
++static int dglnt_encoder_probe(struct platform_device *pdev)
++{
++	struct dglnt_encoder *dglnt;
++
++	dglnt = devm_kzalloc(&pdev->dev, sizeof(*dglnt), GFP_KERNEL);
++	if (!dglnt)
++		return -ENOMEM;
++
++	platform_set_drvdata(pdev, dglnt);
++
++	return 0;
++}
++
++static int dglnt_encoder_remove(struct platform_device *pdev)
++{
++	return 0;
++}
++
++static const struct of_device_id dglnt_encoder_of_match[] = {
++	{ .compatible = "digilent,drm-encoder", },
++	{ /* end of table */ },
++};
++MODULE_DEVICE_TABLE(of, dglnt_encoder_of_match);
++
++static struct drm_platform_encoder_driver dglnt_encoder_driver = {
++	.platform_driver = {
++		.probe			= dglnt_encoder_probe,
++		.remove			= dglnt_encoder_remove,
++		.driver			= {
++			.owner		= THIS_MODULE,
++			.name		= "dglnt-drm-enc",
++			.of_match_table	= dglnt_encoder_of_match,
++		},
++	},
++
++	.encoder_init = dglnt_encoder_encoder_init,
++};
++
++static int __init dglnt_encoder_init(void)
++{
++	return platform_driver_register(&dglnt_encoder_driver.platform_driver);
++}
++
++static void __exit dglnt_encoder_exit(void)
++{
++	platform_driver_unregister(&dglnt_encoder_driver.platform_driver);
++}
++
++module_init(dglnt_encoder_init);
++module_exit(dglnt_encoder_exit);
++
++MODULE_AUTHOR("Digilent, Inc.");
++MODULE_DESCRIPTION("DRM slave encoder for Video-out on Digilent boards");
++MODULE_LICENSE("GPL v2");
+-- 
+2.7.4
+

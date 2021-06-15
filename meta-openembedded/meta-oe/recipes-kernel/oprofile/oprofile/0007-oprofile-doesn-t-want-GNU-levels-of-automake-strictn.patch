@@ -1,0 +1,23 @@
+From fd35c343e67ca47f76d0769fce2881d5f7a027a9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 18 Mar 2021 00:48:34 -0700
+Subject: [PATCH 07/10] oprofile doesn't want GNU-levels of automake strictness
+ so tell it to be "foreign".
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -13,7 +13,7 @@ AC_PREREQ(2.13)
+ 
+ AC_INIT([OProfile], [1.4.0])
+ AC_CONFIG_SRCDIR([libop/op_config.h])
+-AM_INIT_AUTOMAKE
++AM_INIT_AUTOMAKE([foreign])
+ AC_CONFIG_HEADERS(config.h)
+ 
+ AC_CHECK_DECLS([basename], [], [], [[#include <libgen.h>]])

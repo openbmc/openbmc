@@ -1,13 +1,14 @@
 [Unit]
 Description=Mycroft
-DefaultDependencies=no
-After=mycroft-setup
+RequiresMountsFor=/var
+After=mycroft-setup.service
 
 [Service]
 Type=forking
+WorkingDirectory=/var/mycroft
 ExecStartPre=mkdir -p /var/log/mycroft
-ExecStart=@LIBDIR@/mycroft/start-mycroft.sh all
-ExecStop=@LIBDIR@/mycroft/stop-mycroft.sh all
+ExecStart=/var/mycroft/start-mycroft.sh all
+ExecStop=/var/mycroft/stop-mycroft.sh all
 
 [Install]
 WantedBy=multi-user.target

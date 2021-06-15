@@ -1,0 +1,83 @@
+From c45a69deeb210ebdb80cf055cef9e62bd0bda053 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@kernel.crashing.org>
+Date: Thu, 16 Jul 2020 12:38:11 -0500
+Subject: [PATCH 31/52] gas: revert moving of md_pseudo_table from const
+
+The base system expect md_pseudo_table to be constant, Changing the
+definition will break other architectures when compiled with a
+unified source code.
+
+Patch reverts the change away from const, and implements a newer
+dynamic handler that passes the correct argument value based on word
+size.
+
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+---
+ gas/config/tc-microblaze.c | 16 +++++++++++++---
+ gas/tc.h                   |  2 +-
+ 2 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index e565b2a99d..c6ca913f8b 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -385,6 +385,17 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
+   demand_empty_rest_of_line ();
+ }
+ 
++/* Handle the .gpword pseudo-op, Pass to s_rva */
++
++static void
++microblaze_s_gpword (int ignore ATTRIBUTE_UNUSED)
++{
++  int size = 4;
++  if (microblaze_arch_size == 64)
++    size = 8;
++  s_rva(size);
++}
++
+ /* This table describes all the machine specific pseudo-ops the assembler
+    has to support.  The fields are:
+    Pseudo-op name without dot
+@@ -392,7 +403,7 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
+    Integer arg to pass to the function.  */
+ /* If the pseudo-op is not found in this table, it searches in the obj-elf.c,
+    and then in the read.c table.  */
+-pseudo_typeS md_pseudo_table[] =
++const pseudo_typeS md_pseudo_table[] =
+ {
+   {"lcomm", microblaze_s_lcomm, 1},
+   {"data", microblaze_s_data, 0},
+@@ -401,7 +412,7 @@ pseudo_typeS md_pseudo_table[] =
+   {"data32", cons, 4},     /* Same as word.  */
+   {"ent", s_func, 0}, /* Treat ent as function entry point.  */
+   {"end", microblaze_s_func, 1}, /* Treat end as function end point.  */
+-  {"gpword", s_rva, 4}, /* gpword label => store resolved label address in data section.  */
++  {"gpword", microblaze_s_gpword, 0}, /* gpword label => store resolved label address in data section.  */
+   {"weakext", microblaze_s_weakext, 0},
+   {"rodata", microblaze_s_rdata, 0},
+   {"sdata2", microblaze_s_rdata, 1},
+@@ -3448,7 +3459,6 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
+     case OPTION_M64:
+       //if (arg != NULL && strcmp (arg, "64") == 0)
+       microblaze_arch_size = 64;
+-      md_pseudo_table[7].poc_val = 8;
+       break;
+     default:
+       return 0;
+diff --git a/gas/tc.h b/gas/tc.h
+index 5bdfe5c347..da1738d67a 100644
+--- a/gas/tc.h
++++ b/gas/tc.h
+@@ -22,7 +22,7 @@
+ /* In theory (mine, at least!) the machine dependent part of the assembler
+    should only have to include one file.  This one.  -- JF */
+ 
+-extern pseudo_typeS md_pseudo_table[];
++extern const pseudo_typeS md_pseudo_table[];
+ 
+ const char * md_atof (int, char *, int *);
+ int    md_parse_option (int, const char *);
+-- 
+2.17.1
+

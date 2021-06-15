@@ -1,0 +1,27 @@
+From 7211120d1e2f059d900f3379b9790484dbcf7761 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Fri, 25 Oct 2019 11:09:34 +0000
+Subject: [PATCH] dispatch_common.h: define also EGL_NO_X11
+
+MESA_EGL_NO_X11_HEADERS was renamed to EGL_NO_X11 in:
+https://github.com/mesa3d/mesa/commit/6202a13b71e18dc31ba7e2f4ea915b67eacc1ddb
+
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Upstream-Status: Pending
+
+---
+ src/dispatch_common.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/dispatch_common.h b/src/dispatch_common.h
+index a136943..448c9b1 100644
+--- a/src/dispatch_common.h
++++ b/src/dispatch_common.h
+@@ -55,6 +55,7 @@
+  * as EGL_NO_X11
+  */
+ #  define MESA_EGL_NO_X11_HEADERS 1
++#  define EGL_NO_X11 1
+ # endif
+ #include "epoxy/egl.h"
+ #endif

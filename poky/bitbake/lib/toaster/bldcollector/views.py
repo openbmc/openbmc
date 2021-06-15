@@ -3,29 +3,11 @@
 #
 # Copyright (C) 2014        Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from django.views.decorators.cache import cache_control
-from django.core.urlresolvers import reverse
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.urls import reverse
 from django.http import HttpResponseBadRequest, HttpResponse
-from django.utils import timezone
-from django.utils.html import escape
-from datetime import timedelta
-from django.utils import formats
-from toastergui.templatetags.projecttags import json as jsonfilter
-import json
 import os
 import tempfile
 import subprocess

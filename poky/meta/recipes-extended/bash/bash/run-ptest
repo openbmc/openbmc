@@ -19,4 +19,8 @@ then
         echo "Warning: The de_DE* locales is needed to run the intl.tests, please add it."
 fi
 
-make -k THIS_SH=/bin/bash BUILD_DIR=`pwd` srcdir=`pwd`  runtest
+useradd bashtest
+chown -R bashtest:bashtest tests
+setpriv --reuid bashtest --rgid bashtest --clear-groups --reset-env $(dirname "$0")/run-bash-ptests
+chown -R root:root tests
+userdel -r bashtest

@@ -1,4 +1,7 @@
 SUMMARY = "Device formfactor information"
+DESCRIPTION = "A formfactor configuration file provides information about the \
+target hardware for which the image is being built and information that the \
+build system cannot obtain from other sources such as the kernel."
 SECTION = "base"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"

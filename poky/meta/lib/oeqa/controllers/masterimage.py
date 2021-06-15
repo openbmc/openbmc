@@ -1,7 +1,7 @@
 # Copyright (C) 2014 Intel Corporation
 #
-# Released under the MIT license (see COPYING.MIT)
-
+# SPDX-License-Identifier: MIT
+#
 # This module adds support to testimage.bbclass to deploy images and run
 # tests using a "master image" - this is a "known good" image that is
 # installed onto the device as part of initial setup and will be booted into
@@ -97,7 +97,7 @@ class MasterImageHardwareTarget(oeqa.targetcontrol.BaseTarget, metaclass=ABCMeta
         if self.powercontrol_cmd:
             cmd = "%s %s" % (self.powercontrol_cmd, msg)
             try:
-                commands.runCmd(cmd, assert_error=False, preexec_fn=os.setsid, env=self.origenv)
+                commands.runCmd(cmd, assert_error=False, start_new_session=True, env=self.origenv)
             except CommandError as e:
                 bb.fatal(str(e))
 

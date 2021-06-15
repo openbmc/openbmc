@@ -1,0 +1,50 @@
+Add RISC-V support
+
+Upstream-Status: Submitted [https://bugzilla.mozilla.org/show_bug.cgi?id=1318905]
+
+Signed-off-by: Ricardo Salveti <ricardo@foundries.io>
+
+--- a/build/autoconf/config.guess
++++ b/build/autoconf/config.guess
+@@ -1029,6 +1029,9 @@ EOF
+     ppcle:Linux:*:*)
+ 	echo powerpcle-unknown-linux-${LIBC}
+ 	exit ;;
++    riscv32:Linux:*:* | riscv64:Linux:*:*)
++	echo ${UNAME_MACHINE}-unknown-linux-${LIBC}
++	exit ;;
+     s390:Linux:*:* | s390x:Linux:*:*)
+ 	echo ${UNAME_MACHINE}-ibm-linux-${LIBC}
+ 	exit ;;
+--- a/build/moz.configure/init.configure
++++ b/build/moz.configure/init.configure
+@@ -658,6 +658,9 @@ def split_triplet(triplet, allow_unknown
+     elif cpu == 'sh4':
+         canonical_cpu = 'sh4'
+         endianness = 'little'
++    elif cpu in ('riscv32', 'riscv64'):
++        canonical_cpu = cpu
++        endianness = 'little'
+     elif allow_unknown:
+         canonical_cpu = cpu
+         endianness = 'unknown'
+--- a/python/mozbuild/mozbuild/configure/constants.py
++++ b/python/mozbuild/mozbuild/configure/constants.py
+@@ -50,6 +50,8 @@ CPU_bitness = {
+     'mips64': 64,
+     'ppc': 32,
+     'ppc64': 64,
++    'riscv32': 32,
++    'riscv64': 64,
+     's390': 32,
+     's390x': 64,
+     'sh4': 32,
+@@ -82,6 +84,8 @@ CPU_preprocessor_checks = OrderedDict((
+     ('s390', '__s390__'),
+     ('ppc64', '__powerpc64__'),
+     ('ppc', '__powerpc__'),
++    ('riscv32', '__riscv && __SIZEOF_POINTER__ == 4'),
++    ('riscv64', '__riscv && __SIZEOF_POINTER__ == 8'),
+     ('Alpha', '__alpha__'),
+     ('hppa', '__hppa__'),
+     ('sparc64', '__sparc__ && __arch64__'),

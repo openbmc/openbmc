@@ -1,0 +1,37 @@
+fans:
+  - inventory: /system/chassis/motherboard/fan0
+    cooling_zone: 0
+    sensors:
+      - fan0_0
+      - fan0_1
+    target_interface: xyz.openbmc_project.Control.FanPwm
+  - inventory: /system/chassis/motherboard/fan1
+    cooling_zone: 0
+    sensors:
+      - fan1_0
+      - fan1_1
+    target_interface: xyz.openbmc_project.Control.FanPwm
+  - inventory: /system/chassis/motherboard/fan2
+    cooling_zone: 0
+    sensors:
+      - fan2_0
+      - fan2_1
+    target_interface: xyz.openbmc_project.Control.FanPwm
+  - inventory: /system/chassis/motherboard/fan3
+    cooling_zone: 0
+    sensors:
+      - fan3_0
+      - fan3_1
+    target_interface: xyz.openbmc_project.Control.FanPwm
+  - inventory: /system/chassis/motherboard/fan4
+    cooling_zone: 0
+    sensors:
+      - fan4_0
+      - fan4_1
+    target_interface: xyz.openbmc_project.Control.FanPwm
+  - inventory: /system/chassis/motherboard/fan5
+    cooling_zone: 0
+    sensors:
+      - fan5_0
+      - fan5_1
+    target_interface: xyz.openbmc_project.Control.FanPwm

@@ -1,0 +1,5 @@
+[NetDev]
+Name=gbmcbr
+Kind=bridge
+[Bridge]
+STP=true

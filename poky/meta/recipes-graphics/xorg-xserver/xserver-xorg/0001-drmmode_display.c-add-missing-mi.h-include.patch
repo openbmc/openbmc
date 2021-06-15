@@ -1,0 +1,23 @@
+From 84338444179cab7ede1252a11b66e3b8f657e6a4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 7 Feb 2020 20:36:45 +0100
+Subject: [PATCH] drmmode_display.c: add missing mi.h include
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ hw/xfree86/drivers/modesetting/drmmode_display.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.c b/hw/xfree86/drivers/modesetting/drmmode_display.c
+index e18cc37..3445cce 100644
+--- a/hw/xfree86/drivers/modesetting/drmmode_display.c
++++ b/hw/xfree86/drivers/modesetting/drmmode_display.c
+@@ -46,6 +46,7 @@
+ #include "xf86Crtc.h"
+ #include "drmmode_display.h"
+ #include "present.h"
++#include "mi.h"
+ 
+ #include <cursorstr.h>
+ 

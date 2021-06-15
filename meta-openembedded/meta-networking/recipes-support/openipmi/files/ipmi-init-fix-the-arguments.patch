@@ -1,3 +1,6 @@
+From 6542ebe7a0d37dee8e9afb856feb8f6c3d334632 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Mon, 29 Dec 2014 18:16:04 +0800
 Subject: [PATCH] ipmi-init: fix the arguments
 
 The functions success/failure/warning defined in /etc/init.d/functions
@@ -12,7 +15,7 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/ipmi.init b/ipmi.init
-index 2ebcd94..d8161c5 100644
+index ea10b11..aac9f83 100644
 --- a/ipmi.init
 +++ b/ipmi.init
 @@ -45,17 +45,17 @@ elif [ -r /etc/init.d/functions ]; then
@@ -36,6 +39,4 @@ index 2ebcd94..d8161c5 100644
  		echo
  		;;
  	    *)
--- 
-1.9.1
 

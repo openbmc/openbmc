@@ -1,23 +1,10 @@
-#!/usr/bin/env python
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # Copyright (C) 2012 Robert Yang
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import os, logging, re, sys
+import os, logging, re
 import bb
 logger = logging.getLogger("BitBake.Monitor")
 
@@ -72,7 +59,7 @@ def getMountedDev(path):
         pass
     return None
 
-def getDiskData(BBDirs, configuration):
+def getDiskData(BBDirs):
 
     """Prepare disk data for disk space monitor"""
 
@@ -181,7 +168,7 @@ class diskMonitor:
 
         BBDirs = configuration.getVar("BB_DISKMON_DIRS") or None
         if BBDirs:
-            self.devDict = getDiskData(BBDirs, configuration)
+            self.devDict = getDiskData(BBDirs)
             if self.devDict:
                 self.spaceInterval, self.inodeInterval = getInterval(configuration)
                 if self.spaceInterval and self.inodeInterval:

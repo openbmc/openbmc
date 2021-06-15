@@ -1,0 +1,30 @@
+#!/bin/sh
+
+cd fftw
+/usr/bin/perl -w ./check.pl  -r -c=30 -v `pwd`/bench
+fftw_result=$?
+cd ../fftwf
+/usr/bin/perl -w ./check.pl  -r -c=30 -v `pwd`/benchf
+fftwf_result=$?
+cd ../fftwl
+/usr/bin/perl -w ./check.pl  -r -c=30 -v `pwd`/benchl
+fftwl_result=$?
+
+echo -n "fftw  test result:"
+if [ $fftw_result  = "0" ]; then
+	echo PASSED
+else
+	echo FAILED
+fi
+echo -n "fftwf test result:"
+if [ $fftwf_result = "0" ]; then
+	echo PASSED
+else
+	echo FAILED
+fi
+echo -n "fftwl test result:"
+if [ $fftwl_result = "0" ]; then
+	echo PASSED
+else
+	echo FAILED
+fi

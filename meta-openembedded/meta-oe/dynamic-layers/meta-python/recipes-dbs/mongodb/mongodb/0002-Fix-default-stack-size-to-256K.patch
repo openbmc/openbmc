@@ -1,0 +1,39 @@
+From ffe6045b190b735601cd209d3e7ac121604c5a4e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 24 Aug 2018 13:07:01 -0700
+Subject: [PATCH 08/10] Fix default stack size to 256K
+
+On musl default stack size is ~80K which is too low
+for mongodb
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mongo/platform/stack_locator_pthread_getattr_np.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/mongo/platform/stack_locator_pthread_getattr_np.cpp b/src/mongo/platform/stack_locator_pthread_getattr_np.cpp
+index 4f3044c..68e47e3 100644
+--- a/src/mongo/platform/stack_locator_pthread_getattr_np.cpp
++++ b/src/mongo/platform/stack_locator_pthread_getattr_np.cpp
+@@ -36,6 +36,16 @@
+ #include "mongo/util/assert_util.h"
+ #include "mongo/util/scopeguard.h"
+ 
++__attribute__((constructor))
++static void set_default_stack_size(void)
++{
++    pthread_attr_t attr;
++    invariant(pthread_attr_init(&attr) == 0);
++    invariant(pthread_attr_setstacksize(&attr, 256*1024) == 0);
++    pthread_setattr_default_np(&attr);
++    invariant(pthread_attr_destroy(&attr) == 0);
++}
++
+ namespace mongo {
+ 
+ StackLocator::StackLocator() {
+-- 
+2.7.4
+

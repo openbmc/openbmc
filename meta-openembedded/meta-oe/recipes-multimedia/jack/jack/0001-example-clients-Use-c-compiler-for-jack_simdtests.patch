@@ -1,0 +1,37 @@
+From f8cb818ca96fc2a45a04448a51f25a277ec183db Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 15 Jan 2020 20:21:58 -0800
+Subject: [PATCH] example-clients: Use c++ compiler for jack_simdtests
+
+It uses c++ sources and runtime therefore its best to use c++ compiler
+to build it so it can find the correct runtime, cross compiling with
+clang fails
+
+x86_64-yoe-linux-ld: example-clients/simdtests.cpp.28.o: undefined reference to symbol '__cxa_call_unexpected@@CXXABI_1.3'
+
+Upstream-Status: Submitted [https://github.com/jackaudio/jack2/pull/536]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ example-clients/wscript | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+--- a/example-clients/wscript
++++ b/example-clients/wscript
+@@ -49,10 +49,15 @@ def build(bld):
+         else:
+             use = ['clientlib']
+ 
++        if example_program == 'jack_simdtests':
++            ftrs = 'cxx cxxprogram'
++        else:
++            ftrs = 'c cprogram'
++
+         if bld.env['IS_MACOSX']:
+-            prog = bld(features='c cprogram', framework = ['Foundation'])
++            prog = bld(features = ftrs, framework = ['Foundation'])
+         else:
+-            prog = bld(features='c cprogram')
++            prog = bld(features = ftrs)
+         prog.includes = os_incdir + ['../common/jack', '../common']
+         prog.source = example_program_source
+         prog.use = use

@@ -1,5 +1,5 @@
 SUMMARY = "UProbes kernel module for SystemTap"
-
+HOMEPAGE = "https://sourceware.org/systemtap/"
 require systemtap_git.inc
 
 DEPENDS = "systemtap virtual/kernel"

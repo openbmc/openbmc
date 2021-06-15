@@ -1,0 +1,215 @@
+From 51d66c1c257f7487497f562033ac32ac75f648cb Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Mon, 8 Feb 2021 12:27:51 +0100
+Subject: [PATCH] meson: import changes from 3.0.* version
+
+* we need to use the meson option to disable introspection and docs
+
+Upstream-Status: Backport
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ meson.build       | 139 ++++++++++++++++++++++++++++------------------
+ meson_options.txt |   5 ++
+ 2 files changed, 90 insertions(+), 54 deletions(-)
+ create mode 100644 meson_options.txt
+
+diff --git a/meson.build b/meson.build
+index 1084c82..ed040b4 100644
+--- a/meson.build
++++ b/meson.build
+@@ -53,9 +53,9 @@ compiler = meson.get_compiler('c')
+ pkgconfig = import('pkgconfig')
+ 
+ # #######################################################################
+-# # Check for GLib 2.16
++# # Check for GLib 2.44
+ # #######################################################################
+-glib = dependency('glib-2.0', version : '>= 2.16.0')
++glib = dependency('glib-2.0', version : '>= 2.44.0')
+ gobject = dependency('gobject-2.0')
+ gmodule = dependency('gmodule-2.0')
+ gnome = import('gnome')
+@@ -63,74 +63,88 @@ gnome = import('gnome')
+ #######################################################################
+ # Check for LibXML2
+ #######################################################################
+-libxml = dependency('libxml-2.0', version : '>= 2.6.0', required : false)
+-gnt_config.set('NO_LIBXML', not libxml.found())
++libxml = dependency('libxml-2.0', version : '>= 2.6.0')
+ 
+ #######################################################################
+ # Check for ncurses and other things used by it
+ #######################################################################
+ ncurses_available = true
+-ncurses_inc = []
+-# The order of this list is important to the condition that follows.
+-ncurses_libs = [
+-	compiler.find_library('ncursesw', required : false),
+-	compiler.find_library('panelw', required : false),
+-	compiler.find_library('tinfow', required : false),
+-]
+-if not ncurses_libs[0].found() or not ncurses_libs[1].found()
+-	ncurses_available = false
+-endif
++ncurses_widechar = true
++ncurses_header = 'ncurses.h'
++# Some distros put the headers in ncursesw/, some don't. These are ordered to
++# pick the last available as most-specific version.
++ncursesw_header_paths = ['', 'ncursesw/']
+ 
+-if host_machine.system() == 'windows'
+-	# FIXME: $host ?
+-	ncurses_sys_prefix = '/usr/$host/sys-root/mingw'
++ncurses = [
++	dependency('ncursesw', required : false),
++	dependency('panelw', required : false),
++]
++if ncurses[0].found() and ncurses[1].found()
++	foreach location : ncursesw_header_paths
++		f = location + 'ncurses.h'
++		if compiler.has_header_symbol(f, 'get_wch',
++		    prefix : '#define _XOPEN_SOURCE_EXTENDED')
++			ncurses_header = f
++		endif
++	endforeach
+ else
+-	ncurses_sys_prefix = '/usr'
+-endif
+-
+-ncurses_sys_dirs = [ncurses_sys_prefix + '/include/ncursesw',
+-                    ncurses_sys_prefix + '/include']
+-
+-if ncurses_available
+-	# Some distros put the headers in ncursesw/, some don't
+-	found_ncurses_h = false
+-	foreach location : ncurses_sys_dirs
+-		f = location + '/ncurses.h'
+-		if not found_ncurses_h
++	ncurses_available = false
++	ncurses_inc = []
++	ncurses_libs = [
++		compiler.find_library('ncursesw', required : false),
++		compiler.find_library('panelw', required : false)
++	]
++	if ncurses_libs[0].found() and ncurses_libs[1].found()
++		foreach location : ncursesw_header_paths
++			f = location + 'ncurses.h'
+ 			if compiler.has_header_symbol(f, 'get_wch',
+ 			    prefix : '#define _XOPEN_SOURCE_EXTENDED')
+-				if location != '.'
+-					ncurses_inc += [include_directories(location)]
+-				endif
+-				found_ncurses_h = true
++				ncurses_available = true
++				ncurses_header = f
+ 			endif
+-		endif
+-	endforeach
++		endforeach
+ 
+-	if not found_ncurses_h
+-		ncurses_inc = []
+-		ncurses_libs = []
+-		ncurses_available = false
++		if ncurses_available
++			ncurses = declare_dependency(
++			    include_directories : ncurses_inc,
++			    dependencies : ncurses_libs
++			)
++		endif
+ 	endif
+-else
++endif
++
++if not ncurses_available
+ 	# ncursesw was not found. Look for plain old ncurses
+-	# The order of this list is important to the condition that follows.
+-	ncurses_libs = [
+-		compiler.find_library('ncurses', required : false),
+-		compiler.find_library('panel', required : false),
+-		compiler.find_library('tinfo', required : false),
++	ncurses = [
++		dependency('ncurses', required : false),
++		dependency('panel', required : false),
+ 	]
+-	ncurses_available = ncurses_libs[0].found() and ncurses_libs[1].found()
+-	gnt_config.set('NO_WIDECHAR', true)
++	if ncurses[0].found() and ncurses_libs[1].found()
++		ncurses_available = true
++	else
++		ncurses_libs = [
++			compiler.find_library('ncurses', required : false),
++			compiler.find_library('panel', required : false),
++		]
++		ncurses_available = ncurses_libs[0].found() and ncurses_libs[1].found()
++		ncurses = declare_dependency(dependencies : ncurses_libs)
++	endif
++	ncurses_widechar = false
+ endif
++
++if not ncurses_available and host_machine.system() == 'windows'
++	# Try pdcurses too.
++	ncurses_header = 'curses.h'
++	ncurses_libs = compiler.find_library('pdcurses', required : false)
++	ncurses_available = compiler.has_header(ncurses_header) and ncurses_libs.found()
++	ncurses = declare_dependency(dependencies : ncurses_libs)
++endif
++
+ if not ncurses_available
+ 	error('ncurses could not be found!')
+ endif
+-
+-ncurses = declare_dependency(
+-    include_directories : ncurses_inc,
+-    dependencies : ncurses_libs
+-)
++gnt_config.set('NCURSES_HEADER', ncurses_header)
++gnt_config.set10('NCURSES_WIDECHAR', ncurses_widechar)
+ 
+ libgnt_SOURCES = [
+ 	'gntwidget.c',
+@@ -191,7 +205,10 @@ libgnt_headers = [
+ ]
+ 
+ # Check for Python headers
+-python_dep = dependency('python2', required : false)
++python_dep = dependency('python3-embed', required: false)
++if not python_dep.found()
++	python_dep = dependency('python3', required : false)
++endif
+ gnt_config.set('USE_PYTHON', python_dep.found())
+ 
+ configure_file(output : 'gntconfig.h',
+@@ -233,6 +250,20 @@ pkgconfig.generate(
+     variables : ['plugindir = ${libdir}/gnt'],
+     )
+ 
++if get_option('introspection')
++	libgnt_gir = gnome.generate_gir(libgnt,
++	    sources : libgnt_headers + [gnt_h],
++	    includes : 'GObject-2.0',
++	    namespace : 'Gnt',
++	    symbol_prefix : 'gnt',
++	    identifier_prefix : 'Gnt',
++	    nsversion : '@0@.@1@'.format(gnt_major_version, gnt_minor_version),
++	    install : true,
++	    extra_args : ['-DGNT_COMPILATION', '--quiet'])
++endif
++
+ subdir('wms')
+ subdir('test')
+-subdir('doc')
++if get_option('doc')
++	subdir('doc')
++endif
+diff --git a/meson_options.txt b/meson_options.txt
+new file mode 100644
+index 0000000..f2414e2
+--- /dev/null
++++ b/meson_options.txt
+@@ -0,0 +1,5 @@
++option('doc', type : 'boolean', value : true, yield : true,
++       description : 'build documentation with gtk-doc')
++
++option('introspection', type : 'boolean', value : true, yield : true,
++       description : 'build introspection data')

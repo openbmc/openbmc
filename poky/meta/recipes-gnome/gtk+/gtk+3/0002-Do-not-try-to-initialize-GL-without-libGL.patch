@@ -1,7 +1,7 @@
-From 23a563155406980dfc8cf6f7c2da6cce0ac310f0 Mon Sep 17 00:00:00 2001
+From 6575ab0f0e8c1bba033ad1616511e37a2ec995ff Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Fri, 16 Oct 2015 16:35:16 +0300
-Subject: [PATCH 2/4] Do not try to initialize GL without libGL
+Subject: [PATCH] Do not try to initialize GL without libGL
 
 _gdk_x11_screen_update_visuals_for_gl() will end up calling epoxys
 GLX api which will exit() if libGL.so.1 is not present. We do not
@@ -22,10 +22,10 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  2 files changed, 11 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index 757fd7c..0a48875 100644
+index e9f5583..bd651bb 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -351,6 +351,12 @@ AC_ARG_ENABLE(cloudproviders,
+@@ -346,6 +346,12 @@ AC_ARG_ENABLE(cloudproviders,
                [AS_HELP_STRING([--enable-cloudproviders],
                                [enable libcloudproviders integration])],
                                [cloudproviders_set=yes])
@@ -36,8 +36,8 @@ index 757fd7c..0a48875 100644
 +  AC_DEFINE([HAVE_GLX], [], [GLX will be available at runtime])
 +])
  
- if test -z "$backend_set"; then
-   if test "$platform_win32" = yes; then
+ AC_ARG_ENABLE(profiler,
+               [AS_HELP_STRING([--enable-profiler],
 diff --git a/gdk/x11/gdkvisual-x11.c b/gdk/x11/gdkvisual-x11.c
 index 81479d8..3c8c5c0 100644
 --- a/gdk/x11/gdkvisual-x11.c
@@ -55,6 +55,3 @@ index 81479d8..3c8c5c0 100644
  }
  
  gint
--- 
-2.14.1
-

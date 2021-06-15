@@ -1,0 +1,24 @@
+From 39d332a8801de5d9ef09dacb3dba85c208b7b2ad Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 12 Dec 2019 13:45:52 +0100
+Subject: [PATCH] tests: do not hardcode the build path into a helper library
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ test/Makemodule.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/Makemodule.am b/test/Makemodule.am
+index 17d4927..015de7f 100644
+--- a/test/Makemodule.am
++++ b/test/Makemodule.am
+@@ -30,7 +30,7 @@ EXTRA_DIST += \
+ check_LTLIBRARIES = libtestlookup.la
+ 
+ libtestlookup_la_SOURCES = test/test_passwd.c test/test_group.c
+-libtestlookup_la_CFLAGS = -DBASEDIR=\"$(abs_srcdir)\"
++libtestlookup_la_CFLAGS = -DBASEDIR=\"/tmp/acl-ptest\"
+ libtestlookup_la_LDFLAGS = -rpath $(abs_builddir)
+ 
+ AM_TESTS_ENVIRONMENT = PATH="$(abs_top_builddir):$$PATH";

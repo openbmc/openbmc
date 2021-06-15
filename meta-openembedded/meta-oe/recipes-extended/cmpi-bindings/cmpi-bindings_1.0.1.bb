@@ -1,7 +1,7 @@
 SUMMARY = "Adapter to write and run CMPI-type CIM providers"
 DESCRIPTION = "CMPI-compliant provider interface for various languages via SWIG"
 HOMEPAGE = "http://github.com/kkaempf/cmpi-bindings"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b19ee058d2d5f69af45da98051d91064"
 SECTION = "Development/Libraries"
 DEPENDS = "swig-native python3 sblim-cmpi-devel"
@@ -22,7 +22,9 @@ S = "${WORKDIR}/git"
 inherit cmake python3native
 
 EXTRA_OECMAKE = "-DLIB='${baselib}' \
-                 -DPYTHON_INCLUDE_PATH=${STAGING_INCDIR}/python${PYTHON_BASEVERSION}"
+                 -DPYTHON_INCLUDE_PATH=${STAGING_INCDIR}/python${PYTHON_BASEVERSION} \
+                 -DPYTHON_ABI=${PYTHON_ABI} \
+                 "
 
 # With Ninja it fails with:
 # ninja: error: build.ninja:282: bad $-escape (literal $ must be written as $$)

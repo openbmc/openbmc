@@ -1,0 +1,60 @@
+It adds '-I$includedir' to CPPFLAGS and adds '-L$libdir' to LDFLAGS in
+configure.ac which causes 'configure-unsafe' QA error. Don't add them for cross
+compile to avoid the QA issues.
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+diff --git a/configure.ac b/configure.ac
+index f0ec537..05c393d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -230,9 +230,9 @@ dnl ---------------------------------------------------------------------------
+ #
+ AC_DEFUN([AC_CHECK_X_HEADER], [
+   ac_save_CPPFLAGS="$CPPFLAGS"
+-  if test \! -z "$includedir" ; then
+-    CPPFLAGS="$CPPFLAGS -I$includedir"
+-  fi
++#  if test \! -z "$includedir" ; then
++#    CPPFLAGS="$CPPFLAGS -I$includedir"
++#  fi
+   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+   AC_CHECK_HEADER([$1],[$2],[$3],[$4])
+   CPPFLAGS="$ac_save_CPPFLAGS"])
+@@ -241,9 +241,9 @@ AC_DEFUN([AC_CHECK_X_HEADER], [
+ #
+ AC_DEFUN([AC_TRY_X_COMPILE], [
+   ac_save_CPPFLAGS="$CPPFLAGS"
+-  if test \! -z "$includedir" ; then
+-    CPPFLAGS="$CPPFLAGS -I$includedir"
+-  fi
++#  if test \! -z "$includedir" ; then
++#    CPPFLAGS="$CPPFLAGS -I$includedir"
++#  fi
+   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+   AC_TRY_COMPILE([$1], [$2], [$3], [$4])
+   CPPFLAGS="$ac_save_CPPFLAGS"])
+@@ -257,15 +257,15 @@ AC_DEFUN([AC_CHECK_X_LIB], [
+   ac_save_LDFLAGS="$LDFLAGS"
+ #  ac_save_LIBS="$LIBS"
+ 
+-  if test \! -z "$includedir" ; then
+-    CPPFLAGS="$CPPFLAGS -I$includedir"
+-  fi
++#  if test \! -z "$includedir" ; then
++#    CPPFLAGS="$CPPFLAGS -I$includedir"
++#  fi
+   # note: $X_CFLAGS includes $x_includes
+   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+ 
+-  if test \! -z "$libdir" ; then
+-    LDFLAGS="$LDFLAGS -L$libdir"
+-  fi
++#  if test \! -z "$libdir" ; then
++#    LDFLAGS="$LDFLAGS -L$libdir"
++#  fi
+   # note: $X_LIBS includes $x_libraries
+   LDFLAGS="$LDFLAGS $ALL_X_LIBS"
+ 

@@ -1,0 +1,339 @@
+# Air cooled mihawk fan policy for PDM.
+#
+# An air cooled mihawk requires a minimum of three functional fans
+# enclosures or six functional fan rotors across all enclosures.
+# If the number of functional fan enclosures is below three, soft poweroff
+# the system, whereas if the number of fan rotors drop below six, an
+# immediate hard poweroff of the system occurs.
+
+- name: fan enclosures
+  description: >
+    'An air cooled mihawk has 6 fan enclosures to monitor.'
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan1
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan4
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan5
+
+- name: fan rotors
+  description: >
+    'An air cooled Witherspoon has eight fan rotors to monitor.'
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0/fan0_0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0/fan0_1
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan1/fan1_0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan1/fan1_1
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2/fan2_0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2/fan2_1
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3/fan3_0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3/fan3_1
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan4/fan4_0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan4/fan4_1
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan5/fan5_0
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan5/fan5_1
+
+- name: chassis state
+  description: >
+    'Witherspoon has a single chassis to monitor.'
+  class: group
+  group: path
+  members:
+    - meta: CHASSISSTATE
+      path: /xyz/openbmc_project/state/chassis0
+
+- name: chassis
+  description: >
+    'Witherspoon has a single chassis to monitor.'
+  class: group
+  group: path
+  members:
+    - meta: CHASSIS
+      path: /xyz/openbmc_project/inventory/system/chassis
+
+- name: fan present
+  description: >
+    'Monitor the presence state of each fan.'
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Inventory.Item
+      meta: PRESENT
+      property: Present
+
+- name: fan functional
+  description: >
+    'Monitor the functional state of each fan.'
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+      meta: FUNCTIONAL
+      property: Functional
+
+- name: chassis powered
+  description: >
+    'Monitor the chassis power state.'
+  class: group
+  group: property
+  type: string
+  members:
+    - interface: xyz.openbmc_project.State.Chassis
+      meta: CHASSIS_STATE
+      property: CurrentPowerState
+
+- name: chassis air cooled
+  description: >
+    'Monitor the chassis cooling type.'
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Inventory.Decorator.CoolingType
+      meta: COOLING_TYPE
+      property: WaterCooled
+
+- name: watch fan present
+  description: >
+    'Trigger logic on fan enclosure presence state changes.'
+  class: watch
+  watch: property
+  paths: fan enclosures
+  properties: fan present
+  callback: check cooling type
+
+- name: watch fan functional
+  description: >
+    'Trigger logic on fan enclosure functional state changes.'
+  class: watch
+  watch: property
+  paths: fan enclosures
+  properties: fan functional
+  callback: check cooling type
+
+- name: watch fan rotor functional
+  description: >
+    'Trigger logic on fan rotor functional state changes.'
+  class: watch
+  watch: property
+  paths: fan rotors
+  properties: fan functional
+  callback: check cooling type
+
+- name: watch chassis state
+  description: >
+    'Trigger logic on chassis power state changes.'
+  class: watch
+  watch: property
+  paths: chassis state
+  properties: chassis powered
+  callback: check cooling type
+
+- name: watch cooling type
+  description: >
+    'Maintain a cache of the chassis cooling type.'
+  class: watch
+  watch: property
+  paths: chassis
+  properties: chassis air cooled
+
+- name: check cooling type
+  description: >
+    'If this condition passes the chassis is air cooled.'
+  class: condition
+  condition: count
+  paths: chassis
+  properties: chassis air cooled
+  callback: check power
+  countop: '=='
+  countbound: 0
+  op: '=='
+  bound: true
+
+- name: check power
+  description: >
+    'If the chassis has power, check fans.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fans
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check fans
+  description: >
+    'Verify there are at least three functional fan enclosures and at least
+    six functional fan rotors, power off if not.'
+  class: callback
+  callback: group
+  members:
+    - check group presence
+    - check group functional enclosures
+    - check group functional rotors
+
+- name: check group presence
+  description: >
+    'If this condition passes more than one fan has been unplugged
+    for more than 25 seconds.  Shut the system down.  Count present
+    fans rather than non-present fans since the latter would pass
+    if the fan has not been created for some reason.
+
+    For a more detailed definition of unplugged, consult the documentation
+    of xyz.openbmc_project.Inventory.Item and/or the documentation
+    of the fan inventory object implementation.'
+  class: condition
+  condition: count
+  paths: fan enclosures
+  properties: fan present
+  defer: 25000000us
+  callback: log and shutdown
+  countop: '<'
+  countbound: 6
+  op: '=='
+  bound: true
+
+- name: check group functional enclosures
+  description: >
+    'If this condition passes more than one fan enclosure in the group has been
+    marked as nonfunctional for 25 seconds.  Shut the system down.
+
+    For a more detailed definition of nonfunctional, consult the documentation
+    of xyz.openbmc_project.State.Decorator.OperationalStatus and/or the
+    documentation of the fan inventory object implementation.'
+  class: condition
+  condition: count
+  paths: fan enclosures
+  properties: fan functional
+  defer: 25000000us
+  callback: log and shutdown
+  countop: '>'
+  countbound: 1
+  op: '=='
+  bound: false
+
+- name: check group functional rotors
+  description: >
+    'If this condition passes more than two fan rotors in the group have been
+    marked as nonfunctional for 25 seconds.  Immediately power off.
+    For a more detailed definition of nonfunctional, consult the documentation
+    of xyz.openbmc_project.State.Decorator.OperationalStatus and/or the
+    documentation of the fan inventory object implementation.'
+  class: condition
+  condition: count
+  paths: fan rotors
+  properties: fan functional
+  defer: 25000000us
+  callback: log and poweroff
+  countop: '>'
+  countbound: 1
+  op: '=='
+  bound: false
+
+- name: log and poweroff
+  description: >
+    'Immediately poweroff, log an event in the journal, and create an
+     error log.'
+  class: callback
+  callback: group
+  members:
+    - hard poweroff
+    - log hard poweroff
+    - create shutdown error
+
+- name: log and shutdown
+  description: >
+    'Shut the system down, log an event in the journal, and create an
+     error log.'
+  class: callback
+  callback: group
+  members:
+    - shutdown
+    - log shutdown
+    - create shutdown error
+
+- name: hard poweroff
+  description: >
+    'Immediately power off the system.'
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+    - value: obmc-chassis-hard-poweroff@0.target
+      type: string
+    - value: replace
+      type: string
+
+- name: shutdown
+  description: >
+    'Shut down the system.'
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+    - value: obmc-host-shutdown@0.target
+      type: string
+    - value: replace
+      type: string
+
+- name: log hard poweroff
+  description: >
+    'Log a hard poweroff event to the systemd journal.'
+  class: callback
+  callback: journal
+  paths: chassis state
+  properties: chassis powered
+  severity: ERR
+  message: Immediate poweroff of system. There are not enough functional fans.
+
+- name: log shutdown
+  description: >
+    'Log a shutdown event to the systemd journal.'
+  class: callback
+  callback: journal
+  paths: chassis state
+  properties: chassis powered
+  severity: ERR
+  message: Request shutdown of system. There are not enough functional fans.
+
+- name: create shutdown error
+  description: >
+    'Create a Fan Shutdown Error log.'
+  class: callback
+  callback: elog
+  paths: chassis state
+  properties: chassis powered
+  error: xyz::openbmc_project::State::Shutdown::Inventory::Error::Fan

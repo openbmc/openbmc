@@ -1,0 +1,21 @@
+Link mksnapshot with libatomic on x86
+
+Clang-12 on x86 emits atomic builtins
+
+Fixes
+| module-compiler.cc:(.text._ZN2v88internal4wasm12_GLOBAL__N_123ExecuteCompilationUnitsERKSt10shared_ptrINS2_22BackgroundCompileTokenEEPNS0_8CountersEiNS2_19CompileBaselineOnlyE+0x558): un
+defined reference to `__atomic_load'
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/tools/v8_gypfiles/v8.gyp
++++ b/tools/v8_gypfiles/v8.gyp
+@@ -1336,6 +1336,7 @@
+     {
+       'target_name': 'mksnapshot',
+       'type': 'executable',
++      'libraries': [ '-latomic' ],
+       'dependencies': [
+         'v8_base_without_compiler',
+         'v8_compiler_for_mksnapshot',

@@ -1,0 +1,27 @@
+From fb0b58be938bab5571ac0bdec3725f6d88b07e9f Mon Sep 17 00:00:00 2001
+From: Jeremy Puhlman <jpuhlman@mvista.com>
+Date: Sat, 22 Feb 2020 19:01:28 +0000
+Subject: [PATCH] Remove timestamp from manpage
+
+Upstream-Status: Submitted [lsb-discuss@lists.linux-foundation.org]
+Signed-off-by: Jeremy A. Puhlman <jpuhlman@mvista.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 04fdecd..5be8081 100644
+--- a/Makefile
++++ b/Makefile
+@@ -17,7 +17,7 @@ man: lsb_release.1.gz
+ 
+ lsb_release.1.gz: lsb_release
+ 	@./help2man -N --include ./lsb_release.examples --alt_version_key=program_version ./lsb_release >lsb_release.1
+-	@gzip -9f lsb_release.1
++	@gzip -9fn lsb_release.1
+ 
+ install: all
+ 	install -D -m 644 lsb_release.1.gz ${mandir}/man1/lsb_release.1.gz
+-- 
+2.13.3
+

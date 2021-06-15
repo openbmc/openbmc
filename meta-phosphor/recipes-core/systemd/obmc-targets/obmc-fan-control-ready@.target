@@ -1,4 +1,0 @@
-[Unit]
-Description=Fan Control Ready
-RefuseManualStop=yes
-Conflicts=obmc-chassis-powered-off@%i.target

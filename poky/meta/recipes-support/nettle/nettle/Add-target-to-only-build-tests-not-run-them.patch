@@ -1,0 +1,45 @@
+Add target to only build tests (not run them)
+
+Not sending upstream as this is only a start of a solution to
+installable tests: It's useful for us already as is.
+
+Upstream-Status: Inappropriate [not a complete solution]
+
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Refactored for 3.4
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+---
+ Makefile.in           | 3 +++
+ testsuite/Makefile.in | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/Makefile.in b/Makefile.in
+index e5ccfc7..15c9275 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -52,6 +52,9 @@ clean distclean mostlyclean maintainer-clean tags:
+ 	  echo "Making $@ in $$d" ; (cd $$d && $(MAKE) $@); done
+ 	$(MAKE) $@-here
+ 
++buildtest:
++	echo "Making $@ in testsuite" ; (cd testsuite && $(MAKE) $@)
++
+ check-here:
+ 	true
+ 
+diff --git a/testsuite/Makefile.in b/testsuite/Makefile.in
+index 3f5e5f6..8fd68a3 100644
+--- a/testsuite/Makefile.in
++++ b/testsuite/Makefile.in
+@@ -122,6 +122,8 @@ $(TARGETS) $(EXTRA_TARGETS): testutils.$(OBJEXT) ../nettle-internal.$(OBJEXT) \
+ # data.
+ VALGRIND = valgrind --error-exitcode=1 --leak-check=full --show-reachable=yes @IF_ASM@ --partial-loads-ok=yes
+ 
++buildtest: $(TS_ALL)
++
+ check: $(TS_ALL)
+ 	TEST_SHLIB_DIR="$(TEST_SHLIB_DIR)" \
+ 	  srcdir="$(srcdir)" \
+-- 
+2.17.1
+

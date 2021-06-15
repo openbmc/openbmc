@@ -9,8 +9,6 @@ DEPENDS = "virtual/kernel"
 RDEPENDS_${PN} = "perl bash tcl perl-module-getopt-long perl-module-text-wrap lib-perl perl-module-file-path perl-module-mime-base64 perl-module-file-find perl-module-errno perl-module-file-glob perl-module-tie-hash-namedcapture perl-module-file-copy perl-module-english perl-module-exporter perl-module-cwd libcurses-perl coreutils"
 FILES_${PN} += "/run/lock/subsys/bastille"
 
-inherit module-base
-
 SRC_URI = "http://sourceforge.net/projects/bastille-linux/files/bastille-linux/3.2.1/Bastille-3.2.1.tar.bz2 \
            file://AccountPermission.pm \
            file://FileContent.pm \
@@ -41,8 +39,7 @@ S = "${WORKDIR}/Bastille"
 
 do_install () {
 	install -d ${D}${sbindir}
-	install -d ${D}${libdir}/perl/site_perl/Curses
-	ln -sf perl ${D}/${libdir}/perl5
+	install -d ${D}${libdir}/perl5/site_perl/Curses
 
 	install -d ${D}${libdir}/Bastille
 	install -d ${D}${libdir}/Bastille/API
@@ -51,7 +48,6 @@ do_install () {
 	install -d ${D}${datadir}/Bastille/OSMap/Modules
 	install -d ${D}${datadir}/Bastille/Questions
 	install -d ${D}${datadir}/Bastille/FKL/configs/
-	install -d ${D}${localstatedir}/lock/subsys/bastille
 	install -d ${D}${localstatedir}/log/Bastille
 	install -d ${D}${sysconfdir}/Bastille
 	install -m 0755 AutomatedBastille  ${D}${sbindir}

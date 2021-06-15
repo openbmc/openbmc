@@ -1,0 +1,329 @@
+From 605210dca3d6803839a8bcea4b5b83866c01f2da Mon Sep 17 00:00:00 2001
+From: Alexander Amelkin <alexander@amelkin.msk.ru>
+Date: Wed, 11 Jul 2018 13:16:01 +0300
+Subject: [PATCH] Fix version parsing, update AUX revision info
+
+AUX Revision info was always taken from the dev_id.json
+file if it exists, overriding the value calculated from the
+active firmware version string. Also, when AUX info was
+calculated, it only properly parsed the dirtyness of the
+build.
+
+With this commit the AUX info calculation will properly parse
+the git hash part and will include it as higher 3 bytes of
+the AUX info. For officially released versions the lower byte
+will be zero.
+
+For development versions, bits [7:1] of the fourth byte will
+all be 1 as an indicator of non-release branch. For unofficial
+builds from release branches those bits will contain a number
+from 1 to 126 indicating a patch level since the release tag.
+
+In any case the bit 0 of byte 4 is a dirtyness indicator.
+If the sources used to build the firmware were modified compared
+to the git hash, this bit will be 1.
+
+WARNING: For the AUX decoding from version string to work
+         properly, the dev_id.json file must NOT contain
+         the `aux` property.
+
+Resolves SRV-775
+End-user-impact: Version info is properly represented in the
+                 AUX Revision Info fields in response to the
+                 IPMI Get Device ID command (ipmitool mc info)
+Signed-off-by: Alexander Amelkin <a.filippov@yadro.com>
+
+---
+ apphandler.cpp | 228 +++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 165 insertions(+), 63 deletions(-)
+
+diff --git a/apphandler.cpp b/apphandler.cpp
+index 90818a9..93e3b6c 100644
+--- a/apphandler.cpp
++++ b/apphandler.cpp
+@@ -1,4 +1,5 @@
+ #include <arpa/inet.h>
++#include <endian.h>
+ #include <fcntl.h>
+ #include <limits.h>
+ #include <linux/i2c-dev.h>
+@@ -459,33 +460,112 @@ ipmi::RspType<uint8_t, // acpiSystemPowerState
+     return ipmi::responseSuccess(sysAcpiState, devAcpiState);
+ }
+ 
++static
++std::vector<std::string>
++tokenize(std::string const& str,
++         char const token[])
++{
++    std::vector<std::string> results;
++    std::string::size_type j = 0;
++    while (j < str.length())
++    {
++        std::string::size_type k = str.find_first_of(token, j);
++        if (k == std::string::npos)
++            k = str.length();
++        results.push_back(str.substr(j, k-j));
++        j = k + 1;
++    }
++    return results;
++}
++
+ typedef struct
+ {
+-    char major;
+-    char minor;
+-    uint16_t d[2];
++    uint8_t major;
++    uint8_t minor;
++    union {
++        uint8_t aux[4]; // Individual bytes in IPMI big-endian order
++        uint32_t aux32; // use htobe32() on writes to aux32
++    };
+ } Revision;
+ 
+-/* Currently supports the vx.x-x-[-x] and v1.x.x-x-[-x] format. It will     */
+-/* return -1 if not in those formats, this routine knows how to parse       */
++/* Currently supports the following formats. It will return -1 if not in    */
++/* those formats:                                                           */
++/*                                                                          */
++/* Format 1:                                                                */
+ /* version = v0.6-19-gf363f61-dirty                                         */
+-/*            ^ ^ ^^          ^                                             */
+-/*            | |  |----------|-- additional details                        */
+-/*            | |---------------- Minor                                     */
+-/*            |------------------ Major                                     */
+-/* and version = v1.99.10-113-g65edf7d-r3-0-g9e4f715                        */
+-/*                ^ ^  ^^ ^                                                 */
+-/*                | |  |--|---------- additional details                    */
+-/*                | |---------------- Minor                                 */
+-/*                |------------------ Major                                 */
+-/* Additional details : If the option group exists it will force Auxiliary  */
+-/* Firmware Revision Information 4th byte to 1 indicating the build was     */
+-/* derived with additional edits                                            */
++/*            ^ ^     ^^^^^^  ^^^^^                                         */
++/*            | |     |       |                                             */
++/*            | |     |       `-- AUX dirty flag                            */
++/*            | |     `---------- AUX commit hash                           */
++/*            | `---------------- Minor                                     */
++/*            `------------------ Major                                     */
++/*                                                                          */
++/* Format 2:                                                                */
++/* version = v1.99.10-113-g65edf7d-r3-0-g9e4f715-dirty                      */
++/*            ^ ^^         ^^^^^^                ^^^^^                      */
++/*            | |          |   .-----------------'                          */
++/*            | |          |   `- AUX dirty flag                            */
++/*            | |          `----- AUX commit hash                           */
++/*            | `---------------- Minor                                     */
++/*            `------------------ Major                                     */
++/*                                                                          */
++/* version = v2.09-dev-794-g196400c89-some-branch-name-dirty                */
++/*            ^ ^^          ^^^^^^                     ^^^^^                */
++/*            | |           |  .-----------------------'                    */
++/*            | |           |  `- AUX dirty flag                            */
++/*            | |           `---- AUX commit hash                           */
++/*            | `---------------- Minor                                     */
++/*            `------------------ Major                                     */
++/*                                                                          */
++/* Format 3 (YADRO Releases):                                               */
++/* version = v1.0rcf2817p7-rc2-unofficial-dirty                             */
++/*            ^ ^ ^^^^^^ ^^    .----------^^^^^                             */
++/*            | | |      |     `- AUX dirty flag                            */
++/*            | | |      `------- AUX patch level (1-126), optional         */
++/*            | | `-------------- AUX release number                        */
++/*            | `---------------- Minor                                     */
++/*            `------------------ Major                                     */
++/*                                                                          */
++static
+ int convertVersion(std::string s, Revision& rev)
+ {
+-    std::string token;
+-    uint16_t commits;
++    std::vector<std::string> tokens;
++    bool has_release = false; // version string is of "release" format 3
++    bool dirty = false;
+ 
++    constexpr int TOKEN_MAJOR = 0;
++    constexpr int TOKEN_MINOR = 1;
++    // These are for "release" format 3
++    constexpr int   TOKEN_MINOR_HASH = 1;
++    constexpr int   TOKEN_MINOR_PATCH = 2;
++    // For non-release formats 1 and 2
++    constexpr int TOKEN_HASH = 3; // Search for git hash starting from this
++
++    // Hash info is in the higher 24 bits of AUX F/W Revision Info
++    constexpr int AUX_HASH_SHIFT = 8;
++    constexpr int AUX_HASH_LEN = 6;
++
++    // Non-release indicator is byte 3 (bits 7..1 of AUX F/W Revision Info)
++    constexpr int AUX_NON_REL_BYTE = 3;
++    constexpr int AUX_NON_REL_SHIFT = 1;
++    constexpr uint8_t AUX_NON_REL_VALUE = UINT8_MAX >> AUX_NON_REL_SHIFT;
++
++    // Release patch level occupies the same bits as the non-release indicator
++    constexpr int AUX_PATCH_BYTE = AUX_NON_REL_BYTE;
++    constexpr int AUX_PATCH_SHIFT = AUX_NON_REL_SHIFT;
++    constexpr int AUX_MAX_PATCH = AUX_NON_REL_VALUE - 1;
++
++    // The least significant bit of byte 3 is the dirty flag
++    constexpr int AUX_DIRTY_BYTE = 3;
++    constexpr int AUX_DIRTY_SHIFT = 0;
++
++    // Use base-16 to convert decimals to BCD
++    constexpr int BCD_BASE = 16;
++
++    // First of all clear the revision
++    rev = {0};
++
++    // Cut off the optional 'v' at the beginning
+     auto location = s.find_first_of('v');
+     if (location != std::string::npos)
+     {
+@@ -494,64 +576,77 @@ int convertVersion(std::string s, Revision& rev)
+ 
+     if (!s.empty())
+     {
+-        location = s.find_first_of(".");
+-        if (location != std::string::npos)
++        int hash = 0;
++
++        if (s.find("dirty") != std::string::npos)
+         {
+-            rev.major =
+-                static_cast<char>(std::stoi(s.substr(0, location), 0, 16));
+-            token = s.substr(location + 1);
++            dirty = true;
+         }
+ 
+-        if (!token.empty())
++        tokens = tokenize(s, ".-");
++
++        if (!tokens.empty())
+         {
+-            location = token.find_first_of(".-");
+-            if (location != std::string::npos)
++            rev.major = std::stoi(tokens[TOKEN_MAJOR], 0, BCD_BASE);
++        }
++
++        if (tokens.size() > TOKEN_MINOR)
++        {
++            rev.minor = std::stoi(tokens[TOKEN_MINOR], 0, BCD_BASE);
++
++            // Minor version token may also contain release/patchlevel info
++            std::vector<std::string> minortok;
++
++            minortok = tokenize(tokens[TOKEN_MINOR], "rp");
++
++            if (minortok.size() > TOKEN_MINOR_HASH)
+             {
+-                rev.minor = static_cast<char>(
+-                    std::stoi(token.substr(0, location), 0, 16));
+-                token = token.substr(location + 1);
++                // hash is plain hex
++                hash= std::stoi(minortok[TOKEN_MINOR_HASH], 0, 16);
++                has_release = true;
++            }
++
++            if (minortok.size() > TOKEN_MINOR_PATCH)
++            {
++                // Patch level is encoded as binary, not BCD.
++                // That is to allow for a wider range.
++                int pl = std::stoi(minortok[TOKEN_MINOR_PATCH], 0, 10);
++                uint8_t patchlevel = (pl > AUX_MAX_PATCH)
++                                     ? AUX_MAX_PATCH
++                                     : pl;
++                rev.aux[AUX_PATCH_BYTE] = patchlevel << AUX_PATCH_SHIFT;
+             }
+         }
+ 
+-        // Capture the number of commits on top of the minor tag.
+-        // I'm using BE format like the ipmi spec asked for
+-        location = token.find_first_of(".-");
+-        if (!token.empty())
++        // If it's not a "release" format 3, then search for
++        // letter 'g' indicating the position of a git hash
++        // in the version string
++        if (!has_release && tokens.size() > TOKEN_HASH)
+         {
+-            commits = std::stoi(token.substr(0, location), 0, 16);
+-            rev.d[0] = (commits >> 8) | (commits << 8);
+-
+-            // commit number we skip
+-            location = token.find_first_of(".-");
+-            if (location != std::string::npos)
++            std::string hashstr;
++            for (size_t i = TOKEN_HASH; i < tokens.size(); ++i)
+             {
+-                token = token.substr(location + 1);
++                // Find the first token that looks like a git hash.
++                // We think here that anything starting with a 'g' is a match.
++                if ('g' == tokens[i][0])
++                {
++                    // Cut off the 'g', take only the first AUX_HASH_LEN digits
++                    hashstr = tokens[i].substr(1, AUX_HASH_LEN);
++                    break;
++                }
+             }
+-        }
+-        else
+-        {
+-            rev.d[0] = 0;
+-        }
+ 
+-        if (location != std::string::npos)
+-        {
+-            token = token.substr(location + 1);
++            // Hash is plain hex
++            hash = std::stoi(hashstr, 0, 16);
++            rev.aux[AUX_NON_REL_BYTE] |= AUX_NON_REL_VALUE << AUX_NON_REL_SHIFT;
+         }
++        rev.aux32 |= htobe32(hash << AUX_HASH_SHIFT);
++        rev.aux[AUX_DIRTY_BYTE] |= dirty << AUX_DIRTY_SHIFT;
+ 
+-        // Any value of the optional parameter forces it to 1
+-        location = token.find_first_of(".-");
+-        if (location != std::string::npos)
+-        {
+-            token = token.substr(location + 1);
+-        }
+-        commits = (!token.empty()) ? 1 : 0;
+-
+-        // We do this operation to get this displayed in least significant bytes
+-        // of ipmitool device id command.
+-        rev.d[1] = (commits >> 8) | (commits << 8);
++        return 0;
+     }
+ 
+-    return 0;
++    return -1;
+ }
+ 
+ /* @brief: Implement the Get Device ID IPMI command per the IPMI spec
+@@ -623,7 +718,7 @@ ipmi::RspType<uint8_t,  // Device ID
+ 
+             rev.minor = (rev.minor > 99 ? 99 : rev.minor);
+             devId.fw[1] = rev.minor % 10 + (rev.minor / 10) * 16;
+-            std::memcpy(&devId.aux, rev.d, 4);
++            std::memcpy(&devId.aux, rev.aux, 4);
+         }
+ 
+         // IPMI Spec version 2.0
+@@ -640,7 +735,14 @@ ipmi::RspType<uint8_t,  // Device ID
+                 devId.addnDevSupport = data.value("addn_dev_support", 0);
+                 devId.manufId = data.value("manuf_id", 0);
+                 devId.prodId = data.value("prod_id", 0);
+-                devId.aux = data.value("aux", 0);
++
++                // Use the AUX data from the file only for overriding
++                // the data obtained from version string.
++                if (data.contains("aux"))
++                {
++                    // AUX F/W Revision Info is MSB first (big-endian)
++                    devId.aux = htobe32(data.value("aux", 0));
++                }
+ 
+                 // Set the availablitity of the BMC.
+                 defaultActivationSetting = data.value("availability", true);
+-- 
+2.28.0
+

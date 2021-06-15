@@ -1,0 +1,13 @@
+#!/bin/sh
+
+test_fullname=`find test -name test_*.rb` 
+ 
+for i in ${test_fullname}; do 
+	ruby ./test/runner.rb ${i}  2>&1 > /dev/null
+	ret=$? 
+	if [ $ret != 0 ]; then
+		echo "FAIL: ${i}" 
+	else
+		echo "PASS: ${i}"         
+	fi 
+done 

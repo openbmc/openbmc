@@ -1,7 +1,7 @@
 SUMMARY = "Xorg 100 DPI font set"
-LICENSE = "Custom"
+LICENSE = "MIT"
 
-inherit packagegroup distro_features_check
+inherit packagegroup features_check
 # rdepends on font recipes with this restriction
 REQUIRED_DISTRO_FEATURES = "x11"
 

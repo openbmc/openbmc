@@ -8,11 +8,17 @@
 ::sysinit:/bin/mkdir -p /dev/pts
 ::sysinit:/bin/mount -t devpts devpts /dev/pts
 ::sysinit:/bin/mount -a
-
+::sysinit:/sbin/swapon -a
+null::sysinit:/bin/ln -sf /proc/self/fd /dev/fd
+null::sysinit:/bin/ln -sf /proc/self/fd/0 /dev/stdin
+null::sysinit:/bin/ln -sf /proc/self/fd/1 /dev/stdout
+null::sysinit:/bin/ln -sf /proc/self/fd/2 /dev/stderr
+# set hostname
+null::sysinit:/bin/busybox hostname -F /etc/hostname
 ::sysinit:/etc/init.d/rcS
 
 # Stuff to do before rebooting
-::ctrlaltdel:/sbin/reboot
+#::ctrlaltdel:/sbin/reboot
 ::shutdown:/etc/init.d/rcK
 ::shutdown:/sbin/swapoff -a
 ::shutdown:/bin/umount -a -r
@@ -20,5 +26,3 @@
 # Stuff to do when restarting the init process
 ::restart:/sbin/init
 
-# set hostname
-null::sysinit:/bin/busybox hostname -F /etc/hostname

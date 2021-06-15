@@ -1,10 +1,13 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 
 def prserv_make_conn(d, check = False):
     import prserv.serv
     host_params = list([_f for _f in (d.getVar("PRSERV_HOST") or '').split(':') if _f])
     try:
         conn = None
-        conn = prserv.serv.PRServerConnection(host_params[0], int(host_params[1]))
+        conn = prserv.serv.connect(host_params[0], int(host_params[1]))
         if check:
             if not conn.ping():
                 raise Exception('service not available')
@@ -76,41 +79,40 @@ def prserv_export_tofile(d, metainfo, datainfo, lockdown, nomax=False):
     df = d.getVar('PRSERV_DUMPFILE')
     #write data
     lf = bb.utils.lockfile("%s.lock" % df)
-    f = open(df, "a")
-    if metainfo:
-        #dump column info 
-        f.write("#PR_core_ver = \"%s\"\n\n" % metainfo['core_ver']);
-        f.write("#Table: %s\n" % metainfo['tbl_name'])
-        f.write("#Columns:\n")
-        f.write("#name      \t type    \t notn    \t dflt    \t pk\n")
-        f.write("#----------\t --------\t --------\t --------\t ----\n")
-        for i in range(len(metainfo['col_info'])):
-            f.write("#%10s\t %8s\t %8s\t %8s\t %4s\n" % 
-                    (metainfo['col_info'][i]['name'], 
-                     metainfo['col_info'][i]['type'], 
-                     metainfo['col_info'][i]['notnull'], 
-                     metainfo['col_info'][i]['dflt_value'], 
-                     metainfo['col_info'][i]['pk']))
-        f.write("\n")
+    with open(df, "a") as f:
+        if metainfo:
+            #dump column info
+            f.write("#PR_core_ver = \"%s\"\n\n" % metainfo['core_ver']);
+            f.write("#Table: %s\n" % metainfo['tbl_name'])
+            f.write("#Columns:\n")
+            f.write("#name      \t type    \t notn    \t dflt    \t pk\n")
+            f.write("#----------\t --------\t --------\t --------\t ----\n")
+            for i in range(len(metainfo['col_info'])):
+                f.write("#%10s\t %8s\t %8s\t %8s\t %4s\n" %
+                        (metainfo['col_info'][i]['name'],
+                         metainfo['col_info'][i]['type'],
+                         metainfo['col_info'][i]['notnull'],
+                         metainfo['col_info'][i]['dflt_value'],
+                         metainfo['col_info'][i]['pk']))
+            f.write("\n")
 
-    if lockdown:
-        f.write("PRSERV_LOCKDOWN = \"1\"\n\n")
+        if lockdown:
+            f.write("PRSERV_LOCKDOWN = \"1\"\n\n")
 
-    if datainfo:
-        idx = {}
-        for i in range(len(datainfo)):
-            pkgarch = datainfo[i]['pkgarch']
-            value = datainfo[i]['value']
-            if pkgarch not in idx:
-                idx[pkgarch] = i
-            elif value > datainfo[idx[pkgarch]]['value']:
-                idx[pkgarch] = i
-            f.write("PRAUTO$%s$%s$%s = \"%s\"\n" % 
-                (str(datainfo[i]['version']), pkgarch, str(datainfo[i]['checksum']), str(value)))
-        if not nomax:
-            for i in idx:
-                f.write("PRAUTO_%s_%s = \"%s\"\n" % (str(datainfo[idx[i]]['version']),str(datainfo[idx[i]]['pkgarch']),str(datainfo[idx[i]]['value'])))
-    f.close()
+        if datainfo:
+            idx = {}
+            for i in range(len(datainfo)):
+                pkgarch = datainfo[i]['pkgarch']
+                value = datainfo[i]['value']
+                if pkgarch not in idx:
+                    idx[pkgarch] = i
+                elif value > datainfo[idx[pkgarch]]['value']:
+                    idx[pkgarch] = i
+                f.write("PRAUTO$%s$%s$%s = \"%s\"\n" %
+                    (str(datainfo[i]['version']), pkgarch, str(datainfo[i]['checksum']), str(value)))
+            if not nomax:
+                for i in idx:
+                    f.write("PRAUTO_%s_%s = \"%s\"\n" % (str(datainfo[idx[i]]['version']),str(datainfo[idx[i]]['pkgarch']),str(datainfo[idx[i]]['value'])))
     bb.utils.unlockfile(lf)
 
 def prserv_check_avail(d):

@@ -34,7 +34,7 @@
 	phy-handle = <&ethernet_phy>;
 
 	ethernet_phy: ethernet-phy@0 {
-		compatible = "marvell,88e1512";
+		compatible = "marvell,88e1512", "marvell,88e1510";
 		device_type = "ethernet-phy";
 		reg = <0>;
 	};

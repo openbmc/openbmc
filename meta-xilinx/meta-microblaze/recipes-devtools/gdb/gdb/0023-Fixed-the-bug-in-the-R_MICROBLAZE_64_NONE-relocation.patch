@@ -1,0 +1,41 @@
+From 1466dd2c74e38ae6d1dca5cf6d4cad87c94fbc8f Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Wed, 28 Nov 2018 14:00:29 +0530
+Subject: [PATCH 23/52] Fixed the bug in the R_MICROBLAZE_64_NONE relocation.
+ It was adjusting only lower 16bits.
+
+---
+ bfd/elf32-microblaze.c | 4 ++--
+ bfd/elf64-microblaze.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+Index: gdb-9.2/bfd/elf32-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf32-microblaze.c
++++ gdb-9.2/bfd/elf32-microblaze.c
+@@ -2023,8 +2023,8 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, 0, sec);
+ 		efix = calc_fixup (target_address, 0, sec);
+ 		irel->r_addend -= (efix - sfix);
+-    microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset
+-				       + INST_WORD_SIZE, irel->r_addend);
++    microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
++                                       irel->r_addend);
+ 	      }
+ 	      break;
+ 	    }
+Index: gdb-9.2/bfd/elf64-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf64-microblaze.c
++++ gdb-9.2/bfd/elf64-microblaze.c
+@@ -2030,8 +2030,8 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, 0, sec);
+ 		efix = calc_fixup (target_address, 0, sec);
+ 		irel->r_addend -= (efix - sfix);
+-    microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset
+-                                       + INST_WORD_SIZE, irel->r_addend);
++    microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
++                                       irel->r_addend);
+ 	      }
+ 	      break;
+ 	    }

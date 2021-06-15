@@ -1,0 +1,6 @@
+[properties]
+have_c99_vsnprintf = false
+have_c99_snprintf = false
+have_unix98_printf = false
+va_val_copy = true
+have_proc_self_cmdline = false

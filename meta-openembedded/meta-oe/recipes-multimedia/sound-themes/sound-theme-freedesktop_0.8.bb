@@ -9,7 +9,7 @@ DEPENDS = "glib-2.0 intltool-native"
 
 inherit autotools gettext
 
-DEPENDS += "glib-2.0-native intltool-native"
+DEPENDS += "glib-2.0-native"
 
 SRC_URI = "http://people.freedesktop.org/~mccann/dist/${BPN}-${PV}.tar.bz2"
 SRC_URI[md5sum] = "d7387912cfd275282d1ec94483cb2f62"

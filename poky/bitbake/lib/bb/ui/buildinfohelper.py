@@ -3,18 +3,8 @@
 #
 # Copyright (C) 2013        Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import sys
 import bb
@@ -158,14 +148,14 @@ class ORMWrapper(object):
         buildrequest = None
         if brbe is not None:
             # Toaster-triggered build
-            logger.debug(1, "buildinfohelper: brbe is %s" % brbe)
+            logger.debug("buildinfohelper: brbe is %s" % brbe)
             br, _ = brbe.split(":")
             buildrequest = BuildRequest.objects.get(pk=br)
             prj = buildrequest.project
         else:
             # CLI build
             prj = Project.objects.get_or_create_default_project()
-            logger.debug(1, "buildinfohelper: project is not specified, defaulting to %s" % prj)
+            logger.debug("buildinfohelper: project is not specified, defaulting to %s" % prj)
 
         if buildrequest is not None:
             # reuse existing Build object
@@ -181,7 +171,7 @@ class ORMWrapper(object):
                 completed_on=now,
                 build_name='')
 
-        logger.debug(1, "buildinfohelper: build is created %s" % build)
+        logger.debug("buildinfohelper: build is created %s" % build)
 
         if buildrequest is not None:
             buildrequest.build = build
@@ -656,6 +646,9 @@ class ORMWrapper(object):
                 Target_Installed_Package.objects.create(target = target_obj, package = packagedict[p]['object'])
 
         packagedeps_objs = []
+        pattern_so = re.compile(r'.*\.so(\.\d*)?$')
+        pattern_lib = re.compile(r'.*\-suffix(\d*)?$')
+        pattern_ko = re.compile(r'^kernel-module-.*')
         for p in packagedict:
             for (px,deptype) in packagedict[p]['depends']:
                 if deptype == 'depends':
@@ -664,6 +657,13 @@ class ORMWrapper(object):
                     tdeptype = Package_Dependency.TYPE_TRECOMMENDS
 
                 try:
+                    # Skip known non-package objects like libraries and kernel modules
+                    if pattern_so.match(px) or pattern_lib.match(px):
+                        logger.info("Toaster does not add library file dependencies to packages (%s,%s)", p, px)
+                        continue
+                    if pattern_ko.match(px):
+                        logger.info("Toaster does not add kernel module dependencies to packages (%s,%s)", p, px)
+                        continue
                     packagedeps_objs.append(Package_Dependency(
                         package = packagedict[p]['object'],
                         depends_on = packagedict[px]['object'],
@@ -906,7 +906,7 @@ class BuildInfoHelper(object):
 
         self.project = None
 
-        logger.debug(1, "buildinfohelper: Build info helper inited %s" % vars(self))
+        logger.debug("buildinfohelper: Build info helper inited %s" % vars(self))
 
 
     ###################
@@ -935,7 +935,7 @@ class BuildInfoHelper(object):
 
             # only reset the build name if the one on the server is actually
             # a valid value for the build_name field
-            if build_name != None:
+            if build_name is not None:
                 build_info['build_name'] = build_name
                 changed = True
 
@@ -1194,7 +1194,7 @@ class BuildInfoHelper(object):
         evdata = BuildInfoHelper._get_data_from_event(event)
 
         for t in self.internal_state['targets']:
-            if t.is_image == True:
+            if t.is_image:
                 output_files = list(evdata.keys())
                 for output in output_files:
                     if t.target in output and 'rootfs' in output and not output.endswith(".manifest"):
@@ -1236,7 +1236,7 @@ class BuildInfoHelper(object):
                 task_information['outcome'] = Task.OUTCOME_PREBUILT
         else:
             task_information['task_executed'] = True
-            if 'noexec' in vars(event) and event.noexec == True:
+            if 'noexec' in vars(event) and event.noexec:
                 task_information['task_executed'] = False
                 task_information['outcome'] = Task.OUTCOME_EMPTY
                 task_information['script_type'] = Task.CODING_NA
@@ -1620,7 +1620,7 @@ class BuildInfoHelper(object):
             # if we have a backlog of events, do our best to save them here
             if len(self.internal_state['backlog']):
                 tempevent = self.internal_state['backlog'].pop()
-                logger.debug(1, "buildinfohelper: Saving stored event %s "
+                logger.debug("buildinfohelper: Saving stored event %s "
                              % tempevent)
                 self.store_log_event(tempevent,cli_backlog)
             else:
@@ -1776,7 +1776,7 @@ class BuildInfoHelper(object):
         image_file_extensions_unique = {}
         image_fstypes = self.server.runCommand(
             ['getVariable', 'IMAGE_FSTYPES'])[0]
-        if image_fstypes != None:
+        if image_fstypes is not None:
             image_types_str = image_fstypes.strip()
             image_file_extensions = re.sub(r' {2,}', ' ', image_types_str)
             image_file_extensions_unique = set(image_file_extensions.split(' '))

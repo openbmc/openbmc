@@ -19,25 +19,7 @@ Signed-off-by: Darren Hart <dvhart@linux.intel.com>
 Signed-off-by: California Sullivan <california.l.sullivan@intel.com>
 [Rebased for 3.0.8]
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
----
- gnuefi/Makefile | 3 ++-
- lib/Makefile    | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/gnuefi/Makefile b/gnuefi/Makefile
-index 2a61699..89b560a 100644
---- a/gnuefi/Makefile
-+++ b/gnuefi/Makefile
-@@ -54,7 +54,8 @@ TARGETS	= crt0-efi-$(ARCH).o libgnuefi.a
- 
- all:	$(TARGETS)
- 
--libgnuefi.a: $(patsubst %,libgnuefi.a(%),$(OBJS))
-+libgnuefi.a: $(OBJS)
-+	$(AR) $(ARFLAGS) $@ $(OBJS)
- 
- clean:
- 	rm -f $(TARGETS) *~ *.o $(OBJS)
 diff --git a/lib/Makefile b/lib/Makefile
 index 0e6410d..048751a 100644
 --- a/lib/Makefile

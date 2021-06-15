@@ -4,7 +4,7 @@ After=network.target remote-fs.target
 
 [Service]
 Type=forking
-ExecStart=/usr/bin/monkey --daemon
+ExecStart=/usr/sbin/monkey --daemon
 PIDFile=/var/run/monkey.pid.2001
 TimeoutSec=10
 

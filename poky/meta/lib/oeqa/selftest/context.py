@@ -1,30 +1,132 @@
+#
 # Copyright (C) 2017 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import os
 import time
 import glob
 import sys
 import importlib
-import signal
-from shutil import copyfile
+import subprocess
+import unittest
 from random import choice
 
 import oeqa
 import oe
+import bb.utils
 
 from oeqa.core.context import OETestContext, OETestContextExecutor
 from oeqa.core.exception import OEQAPreRun, OEQATestNotFound
 
 from oeqa.utils.commands import runCmd, get_bb_vars, get_test_layer
 
+class NonConcurrentTestSuite(unittest.TestSuite):
+    def __init__(self, suite, processes, setupfunc, removefunc):
+        super().__init__([suite])
+        self.processes = processes
+        self.suite = suite
+        self.setupfunc = setupfunc
+        self.removefunc = removefunc
+
+    def run(self, result):
+        (builddir, newbuilddir) = self.setupfunc("-st", None, self.suite)
+        ret = super().run(result)
+        os.chdir(builddir)
+        if newbuilddir and ret.wasSuccessful() and self.removefunc:
+            self.removefunc(newbuilddir)
+
+def removebuilddir(d):
+    delay = 5
+    while delay and os.path.exists(d + "/bitbake.lock"):
+        time.sleep(1)
+        delay = delay - 1
+    # Deleting these directories takes a lot of time, use autobuilder
+    # clobberdir if its available
+    clobberdir = os.path.expanduser("~/yocto-autobuilder-helper/janitor/clobberdir")
+    if os.path.exists(clobberdir):
+        try:
+            subprocess.check_call([clobberdir, d])
+            return
+        except subprocess.CalledProcessError:
+            pass
+    bb.utils.prunedir(d, ionice=True)
+
 class OESelftestTestContext(OETestContext):
-    def __init__(self, td=None, logger=None, machines=None, config_paths=None):
+    def __init__(self, td=None, logger=None, machines=None, config_paths=None, newbuilddir=None, keep_builddir=None):
         super(OESelftestTestContext, self).__init__(td, logger)
 
         self.machines = machines
         self.custommachine = None
         self.config_paths = config_paths
+        self.newbuilddir = newbuilddir
+
+        if keep_builddir:
+            self.removebuilddir = None
+        else:
+            self.removebuilddir = removebuilddir
+
+    def setup_builddir(self, suffix, selftestdir, suite):
+        builddir = os.environ['BUILDDIR']
+        if not selftestdir:
+            selftestdir = get_test_layer()
+        if self.newbuilddir:
+            newbuilddir = os.path.join(self.newbuilddir, 'build' + suffix)
+        else:
+            newbuilddir = builddir + suffix
+        newselftestdir = newbuilddir + "/meta-selftest"
+
+        if os.path.exists(newbuilddir):
+            self.logger.error("Build directory %s already exists, aborting" % newbuilddir)
+            sys.exit(1)
+
+        bb.utils.mkdirhier(newbuilddir)
+        oe.path.copytree(builddir + "/conf", newbuilddir + "/conf")
+        oe.path.copytree(builddir + "/cache", newbuilddir + "/cache")
+        oe.path.copytree(selftestdir, newselftestdir)
+
+        for e in os.environ:
+            if builddir + "/" in os.environ[e]:
+                os.environ[e] = os.environ[e].replace(builddir + "/", newbuilddir + "/")
+            if os.environ[e].endswith(builddir):
+                os.environ[e] = os.environ[e].replace(builddir, newbuilddir)
+
+        subprocess.check_output("git init; git add *; git commit -a -m 'initial'", cwd=newselftestdir, shell=True)
+
+        # Tried to used bitbake-layers add/remove but it requires recipe parsing and hence is too slow
+        subprocess.check_output("sed %s/conf/bblayers.conf -i -e 's#%s#%s#g'" % (newbuilddir, selftestdir, newselftestdir), cwd=newbuilddir, shell=True)
+
+        os.chdir(newbuilddir)
+
+        def patch_test(t):
+            if not hasattr(t, "tc"):
+                return
+            cp = t.tc.config_paths
+            for p in cp:
+                if selftestdir in cp[p] and newselftestdir not in cp[p]:
+                    cp[p] = cp[p].replace(selftestdir, newselftestdir)
+                if builddir in cp[p] and newbuilddir not in cp[p]:
+                    cp[p] = cp[p].replace(builddir, newbuilddir)
+
+        def patch_suite(s):
+            for x in s:
+                if isinstance(x, unittest.TestSuite):
+                    patch_suite(x)
+                else:
+                    patch_test(x)
+
+        patch_suite(suite)
+
+        return (builddir, newbuilddir)
+
+    def prepareSuite(self, suites, processes):
+        if processes:
+            from oeqa.core.utils.concurrencytest import ConcurrentTestSuite
+
+            return ConcurrentTestSuite(suites, processes, self.setup_builddir, self.removebuilddir)
+        else:
+            return NonConcurrentTestSuite(suites, processes, self.setup_builddir, self.removebuilddir)
 
     def runTests(self, processes=None, machine=None, skips=[]):
         if machine:
@@ -74,7 +176,19 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
 
         parser.add_argument('--machine', required=False, choices=['random', 'all'],
                             help='Run tests on different machines (random/all).')
-        
+
+        parser.add_argument('-t', '--select-tag', dest="select_tags",
+                action='append', default=None,
+                help='Filter all (unhidden) tests to any that match any of the specified tag(s).')
+        parser.add_argument('-T', '--exclude-tag', dest="exclude_tags",
+                action='append', default=None,
+                help='Exclude all (unhidden) tests that match any of the specified tag(s). (exclude applies before select)')
+
+        parser.add_argument('-K', '--keep-builddir', action='store_true',
+                help='Keep the test build directory even if all tests pass')
+
+        parser.add_argument('-B', '--newbuilddir', help='New build directory to use for tests.')
+        parser.add_argument('-v', '--verbose', action='store_true')
         parser.set_defaults(func=self.run)
 
     def _get_available_machines(self):
@@ -125,26 +239,24 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
 
         builddir = os.environ.get("BUILDDIR")
         self.tc_kwargs['init']['config_paths'] = {}
-        self.tc_kwargs['init']['config_paths']['testlayer_path'] = \
-                get_test_layer()
+        self.tc_kwargs['init']['config_paths']['testlayer_path'] = get_test_layer()
         self.tc_kwargs['init']['config_paths']['builddir'] = builddir
-        self.tc_kwargs['init']['config_paths']['localconf'] = \
-                os.path.join(builddir, "conf/local.conf")
-        self.tc_kwargs['init']['config_paths']['localconf_backup'] = \
-                os.path.join(builddir, "conf/local.conf.orig")
-        self.tc_kwargs['init']['config_paths']['localconf_class_backup'] = \
-                os.path.join(builddir, "conf/local.conf.bk")
-        self.tc_kwargs['init']['config_paths']['bblayers'] = \
-                os.path.join(builddir, "conf/bblayers.conf")
-        self.tc_kwargs['init']['config_paths']['bblayers_backup'] = \
-                os.path.join(builddir, "conf/bblayers.conf.orig")
-        self.tc_kwargs['init']['config_paths']['bblayers_class_backup'] = \
-                os.path.join(builddir, "conf/bblayers.conf.bk")
+        self.tc_kwargs['init']['config_paths']['localconf'] = os.path.join(builddir, "conf/local.conf")
+        self.tc_kwargs['init']['config_paths']['bblayers'] = os.path.join(builddir, "conf/bblayers.conf")
+        self.tc_kwargs['init']['newbuilddir'] = args.newbuilddir
+        self.tc_kwargs['init']['keep_builddir'] = args.keep_builddir
 
-        copyfile(self.tc_kwargs['init']['config_paths']['localconf'],
-                self.tc_kwargs['init']['config_paths']['localconf_backup'])
-        copyfile(self.tc_kwargs['init']['config_paths']['bblayers'], 
-                self.tc_kwargs['init']['config_paths']['bblayers_backup'])
+        def tag_filter(tags):
+            if args.exclude_tags:
+                if any(tag in args.exclude_tags for tag in tags):
+                    return True
+            if args.select_tags:
+                if not tags or not any(tag in args.select_tags for tag in tags):
+                    return True
+            return False
+
+        if args.select_tags or args.exclude_tags:
+            self.tc_kwargs['load']['tags_filter'] = tag_filter
 
         self.tc_kwargs['run']['skips'] = args.skips
         self.tc_kwargs['run']['processes'] = args.processes
@@ -257,13 +369,8 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
 
         return rc
 
-    def _signal_clean_handler(self, signum, frame):
-        sys.exit(1)
-    
     def run(self, logger, args):
         self._process_args(logger, args)
-
-        signal.signal(signal.SIGTERM, self._signal_clean_handler)
 
         rc = None
         try:
@@ -293,20 +400,6 @@ class OESelftestTestContextExecutor(OETestContextExecutor):
                 rc = self._internal_run(logger, args)
         finally:
             config_paths = self.tc_kwargs['init']['config_paths']
-            if os.path.exists(config_paths['localconf_backup']):
-                copyfile(config_paths['localconf_backup'],
-                        config_paths['localconf'])
-                os.remove(config_paths['localconf_backup'])
-
-            if os.path.exists(config_paths['bblayers_backup']):
-                copyfile(config_paths['bblayers_backup'], 
-                        config_paths['bblayers'])
-                os.remove(config_paths['bblayers_backup'])
-
-            if os.path.exists(config_paths['localconf_class_backup']):
-                os.remove(config_paths['localconf_class_backup'])
-            if os.path.exists(config_paths['bblayers_class_backup']):
-                os.remove(config_paths['bblayers_class_backup'])
 
             output_link = os.path.join(os.path.dirname(args.output_log),
                     "%s-results.log" % self.name)

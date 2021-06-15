@@ -1,0 +1,18 @@
+Don't use -Werror because newer compilers introduce newer warnings.
+
+Upstream-Status: Inappropriate [https://github.com/rhboot/efivar/issues/131]
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+diff --git a/gcc.specs b/gcc.specs
+index 45d43d1..1baf11a 100644
+--- a/gcc.specs
++++ b/gcc.specs
+@@ -2,7 +2,7 @@
+ + -D_GNU_SOURCE
+ 
+ *efivar_cpp_options:
+- -Werror -Wall -std=gnu11 -Wextra
++ -Wall -std=gnu11 -Wextra
+ 
+ *cpp_options:
+ + %(efivar_cpp_options)

@@ -1,0 +1,59 @@
+[PATCH] bindings/python: Allow hardcoded path to capability.h to be overridden
+
+Currently the path to capability.h is hardcoded. When cross compiling
+the host capabiity.h may be different to the target copy, leading
+to different options being encoded in the python bindings than
+expected. This causes a reproducibility issue amongst other potential
+problems.
+
+Add a configure option to optionally specify the right path to the
+correct header as its probably safer/more reliable than trying to
+query the compiler to get the header path.
+
+Signed-off-by: Richard Purdie richard.purdie@linuxfoundation.org
+Upstream-Status: Submitted [https://github.com/stevegrubb/libcap-ng/pull/30]
+
+Index: libcap-ng-0.8.2/configure.ac
+===================================================================
+--- libcap-ng-0.8.2.orig/configure.ac
++++ libcap-ng-0.8.2/configure.ac
+@@ -63,6 +63,13 @@ AC_CHECK_HEADERS(sys/vfs.h, [
+ 	AC_CHECK_HEADERS(linux/magic.h, [] [AC_MSG_WARN(linux/magic.h is required in order to verify procfs.)])
+ 	], [AC_MSG_WARN(sys/vfs.h is required in order to verify procfs.)])
+ 
++
++AC_ARG_WITH([capability_header],
++        [AS_HELP_STRING([--with-capability_header=path : path to cpapbility.h])],
++        [CAPABILITY_HEADER=$withval],
++        [CAPABILITY_HEADER=/usr/include/linux/capability.h])
++AC_SUBST(CAPABILITY_HEADER)
++
+ AC_C_CONST
+ AC_C_INLINE
+ AM_PROG_CC_C_O
+Index: libcap-ng-0.8.2/bindings/python3/Makefile.am
+===================================================================
+--- libcap-ng-0.8.2.orig/bindings/python3/Makefile.am
++++ libcap-ng-0.8.2/bindings/python3/Makefile.am
+@@ -41,7 +41,7 @@ nodist__capng_la_SOURCES  = capng_wrap.c
+ capng.py capng_wrap.c: ${srcdir}/../src/capng_swig.i caps.h capng.h
+ 	swig -o capng_wrap.c ${SWIG_FLAGS} ${SWIG_INCLUDES} ${srcdir}/../src/capng_swig.i
+ caps.h:
+-	cat /usr/include/linux/capability.h | grep '^#define CAP'  | grep -v '[()]' > caps.h
++	cat $(CAPABILITY_HEADER) | grep '^#define CAP'  | grep -v '[()]' > caps.h
+ capng.h:
+ 	cat ${top_srcdir}/src/cap-ng.h | grep -v '_state' > capng.h
+ 
+Index: libcap-ng-0.8.2/bindings/python/Makefile.am
+===================================================================
+--- libcap-ng-0.8.2.orig/bindings/python/Makefile.am
++++ libcap-ng-0.8.2/bindings/python/Makefile.am
+@@ -38,7 +38,7 @@ nodist__capng_la_SOURCES  = capng_wrap.c
+ capng.py capng_wrap.c: ${srcdir}/../src/capng_swig.i caps.h capng.h
+ 	swig -o capng_wrap.c ${SWIG_FLAGS} ${SWIG_INCLUDES} ${srcdir}/../src/capng_swig.i 
+ caps.h:
+-	cat /usr/include/linux/capability.h | grep '^#define CAP'  | grep -v '[()]' > caps.h
++	cat $(CAPABILITY_HEADER) | grep '^#define CAP'  | grep -v '[()]' > caps.h
+ capng.h:
+ 	cat ${top_srcdir}/src/cap-ng.h | grep -v '_state' > capng.h
+ 

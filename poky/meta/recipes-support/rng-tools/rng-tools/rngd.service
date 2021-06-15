@@ -2,11 +2,31 @@
 Description=Hardware RNG Entropy Gatherer Daemon
 DefaultDependencies=no
 After=systemd-udev-settle.service
-Before=sysinit.target
+Before=sysinit.target shutdown.target
+Conflicts=shutdown.target
 
 [Service]
-ExecStart=@SBINDIR@/rngd -f -r /dev/hwrng
-SuccessExitStatus=66
+EnvironmentFile=-@SYSCONFDIR@/default/rng-tools
+ExecStart=@SBINDIR@/rngd -f $EXTRA_ARGS
+CapabilityBoundingSet=CAP_SYS_ADMIN
+IPAddressDeny=any
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+SystemCallErrorNumber=EPERM
+SystemCallFilter=@system-service
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=sysinit.target

@@ -1,5 +1,5 @@
 DESCRIPTION = "Scripting support for flask"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e686048adb69341fc8a08caeda528b41"
 
 SRC_URI[md5sum] = "3fbd91fe13cebedfb2431331f6eabb68"

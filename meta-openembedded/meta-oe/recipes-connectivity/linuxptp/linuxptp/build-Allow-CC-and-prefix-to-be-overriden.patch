@@ -22,8 +22,8 @@ index 22e7d0d..809cc8f 100644
 +CC	?= $(CROSS_COMPILE)gcc
  VER     = -DVER=$(version)
  CFLAGS	= -Wall $(VER) $(incdefs) $(DEBUG) $(EXTRA_CFLAGS)
- LDLIBS	= -lm -lrt $(EXTRA_LDFLAGS)
-@@ -35,7 +35,7 @@ incdefs := $(shell $(srcdir)/incdefs.sh)
+ LDLIBS	= -lm -lrt -pthread $(EXTRA_LDFLAGS)
+@@ -43,7 +43,7 @@ incdefs := $(shell $(srcdir)/incdefs.sh)
  version := $(shell $(srcdir)/version.sh $(srcdir))
  VPATH	= $(srcdir)
  

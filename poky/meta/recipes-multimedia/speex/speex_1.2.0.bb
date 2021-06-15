@@ -2,7 +2,7 @@ SUMMARY = "Speech Audio Codec"
 DESCRIPTION = "Speex is an Open Source/Free Software patent-free audio compression format designed for speech."
 HOMEPAGE = "http://www.speex.org"
 SECTION = "libs"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=314649d8ba9dd7045dfb6683f298d0a8 \
                     file://include/speex/speex.h;beginline=1;endline=34;md5=ef8c8ea4f7198d71cf3509c6ed05ea50"
 DEPENDS = "libogg speexdsp"

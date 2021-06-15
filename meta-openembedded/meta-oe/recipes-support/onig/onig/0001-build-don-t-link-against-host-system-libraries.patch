@@ -1,0 +1,42 @@
+From 78103ecd18efcd0966531d8718f6e94dcb7a5abf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
+Date: Mon, 6 Jan 2020 16:56:31 +0000
+Subject: [PATCH] build: don't link against (host) system libraries
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: André Draszik <git@andred.net>
+---
+ sample/Makefile.am | 1 -
+ test/Makefile.am   | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/sample/Makefile.am b/sample/Makefile.am
+index 22a4989..e935bf0 100644
+--- a/sample/Makefile.am
++++ b/sample/Makefile.am
+@@ -3,7 +3,6 @@
+ lib_onig = ../src/libonig.la
+ LDADD  = $(lib_onig)
+ 
+-AM_LDFLAGS  = -L$(prefix)/lib
+ AM_CPPFLAGS = -I$(top_srcdir)/src
+ 
+ if ENABLE_POSIX_API
+diff --git a/test/Makefile.am b/test/Makefile.am
+index 4d62568..b7a2105 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -1,7 +1,6 @@
+ ## Makefile.am for Oniguruma
+ lib_onig = ../src/libonig.la
+ 
+-AM_LDFLAGS  = -L$(prefix)/lib
+ AM_CFLAGS = -Wall -Wno-invalid-source-encoding
+ AM_CPPFLAGS = -I$(top_srcdir)/src
+ 
+-- 
+2.23.0.rc1
+

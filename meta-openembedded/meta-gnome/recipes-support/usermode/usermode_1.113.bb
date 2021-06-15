@@ -22,7 +22,7 @@ SRC_URI[sha256sum] = "99fbfd248b411ed0e7c44d1957b0ecde699b5a968a4db5d37228e82e7b
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
-inherit distro_features_check autotools gettext pkgconfig
+inherit features_check autotools gettext pkgconfig
 
 EXTRA_OEMAKE += "INSTALL='install -p'"
 

@@ -1,0 +1,16 @@
+[Unit]
+Description=Disable the AVS bus on the VRMs
+Wants=ir35221-on-unbind@%i.service
+After=ir35221-on-unbind@%i.service
+Before=avsbus-enable@%i.service
+Conflicts=obmc-chassis-poweroff@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
+
+[Service]
+ExecStart=/usr/bin/env avsbus-disable.sh
+SyslogIdentifier=avsbus-disable.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-poweron@%i.target

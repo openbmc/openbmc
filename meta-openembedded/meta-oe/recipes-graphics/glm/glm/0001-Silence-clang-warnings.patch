@@ -1,0 +1,50 @@
+From 5b83983b246cff440de4421696b6b5dd9072ed2d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 6 Feb 2021 11:36:23 -0800
+Subject: [PATCH] Silence clang warnings
+
+Fixes
+glm/gtc/random.inl:25:17: error: implicit conversion loses integer precision: 'int' to 'unsigned char' [-Werror,-Wimplicit-int-conversion]
+|                                 std::rand() % std::numeric_limits<uint8>::max());
+|                                 ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+glm/gtc/../ext/quaternion_common.inl:76:87: error: unused parameter 'k' [-Werror,-Wunused-parameter]
+    GLM_FUNC_QUALIFIER qua<T, Q> slerp(qua<T, Q> const& x, qua<T, Q> const& y, T a, S k)
+                                                                                      ^
+
+Upstream-Status: Submitted [https://github.com/g-truc/glm/pull/1055]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ glm/ext/quaternion_common.inl | 2 +-
+ glm/gtc/random.inl            | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/glm/ext/quaternion_common.inl b/glm/ext/quaternion_common.inl
+index 0e4a3bb2..8f9dccef 100644
+--- a/glm/ext/quaternion_common.inl
++++ b/glm/ext/quaternion_common.inl
+@@ -104,7 +104,7 @@ namespace glm
+         {
+             // Graphics Gems III, page 96
+             T angle = acos(cosTheta);
+-            T phi = angle + k * glm::pi<T>();
++            T phi = angle + static_cast<float>(k) * glm::pi<T>();
+             return (sin(angle - a * phi)* x + sin(a * phi) * z) / sin(angle);
+         }
+     }
+diff --git a/glm/gtc/random.inl b/glm/gtc/random.inl
+index 70485098..a4af2a06 100644
+--- a/glm/gtc/random.inl
++++ b/glm/gtc/random.inl
+@@ -22,7 +22,7 @@ namespace detail
+ 		GLM_FUNC_QUALIFIER static vec<1, uint8, P> call()
+ 		{
+ 			return vec<1, uint8, P>(
+-				std::rand() % std::numeric_limits<uint8>::max());
++				static_cast<uint8>(std::rand()) % std::numeric_limits<uint8>::max());
+ 		}
+ 	};
+ 
+-- 
+2.30.0
+

@@ -5,13 +5,14 @@ platforms."
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-require ${PN}.inc
+require ${BPN}.inc
 
 SOFTWARE_MGR_PACKAGES = " \
     ${PN}-version \
     ${PN}-download-mgr \
     ${PN}-updater \
     ${PN}-updater-ubi \
+    ${PN}-updater-mmc \
     ${PN}-sync \
 "
 PACKAGE_BEFORE_PN += "${SOFTWARE_MGR_PACKAGES}"
@@ -23,30 +24,32 @@ DBUS_PACKAGES = "${SOFTWARE_MGR_PACKAGES}"
 # handles the rest.
 SYSTEMD_PACKAGES = ""
 
-PACKAGECONFIG[verify_signature] = "--enable-verify_signature,--disable-verify_signature"
-PACKAGECONFIG[sync_bmc_files] = "--enable-sync_bmc_files,--disable-sync_bmc_files"
-PACKAGECONFIG[ubifs_layout] = "--enable-ubifs_layout"
+PACKAGECONFIG[verify_signature] = " \
+    -Dverify-full-signature=enabled, \
+    -Dverify-full-signature=disabled"
+PACKAGECONFIG[sync_bmc_files] = "-Dsync-bmc-files=enabled, -Dsync-bmc-files=disabled"
+PACKAGECONFIG[ubifs_layout] = "-Dbmc-layout=ubi"
+PACKAGECONFIG[mmc_layout] = "-Dbmc-layout=mmc"
+PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled, -Dhost-bios-upgrade=disabled"
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
-inherit pythonnative
+inherit python3native
 inherit ${@bb.utils.contains('DISTRO_FEATURES', 'obmc-ubi-fs', 'phosphor-software-manager-ubi-fs', '', d)}
+inherit ${@bb.utils.contains('DISTRO_FEATURES', 'phosphor-mmc', 'phosphor-software-manager-mmc', '', d)}
 
 DEPENDS += " \
-    autoconf-archive-native \
-    sdbusplus \
+    openssl \
     phosphor-dbus-interfaces \
     phosphor-logging \
-    sdbus++-native \
+    ${PYTHON_PN}-sdbus++-native \
+    sdbusplus \
 "
 
 RDEPENDS_${PN}-updater += " \
     bash \
     virtual-obmc-image-manager \
-"
-EXTRA_OECONF += " \
-    ACTIVE_BMC_MAX_ALLOWED=1 \
-    MEDIA_DIR=/run/media \
+    ${@bb.utils.contains('PACKAGECONFIG', 'verify_signature', 'phosphor-image-signing', '', d)} \
 "
 
 RPROVIDES_${PN}-version += " \
@@ -58,6 +61,7 @@ FILES_${PN}-download-mgr += "${bindir}/phosphor-download-manager"
 FILES_${PN}-updater += " \
     ${bindir}/phosphor-image-updater \
     ${bindir}/obmc-flash-bmc \
+    /usr/local \
     "
 FILES_${PN}-sync += " \
     ${bindir}/phosphor-sync-software-manager \
@@ -69,7 +73,19 @@ DBUS_SERVICE_${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
 DBUS_SERVICE_${PN}-sync += "xyz.openbmc_project.Software.Sync.service"
 
 SYSTEMD_SERVICE_${PN}-updater += " \
+    force-reboot.service \
     obmc-flash-bmc-setenv@.service \
+    reboot-guard-disable.service \
+    reboot-guard-enable.service \
+    usr-local.mount \
 "
 
+SYSTEMD_SERVICE_${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_bios', 'obmc-flash-host-bios@.service', '', d)}"
+
 S = "${WORKDIR}/git"
+
+EXTRA_OEMESON += "-Dtests=disabled"
+
+do_install_append() {
+    install -d ${D}/usr/local
+}

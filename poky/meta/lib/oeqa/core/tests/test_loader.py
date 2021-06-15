@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-
+#
 # Copyright (C) 2016 Intel Corporation
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 import os
 import unittest
@@ -13,36 +15,12 @@ from oeqa.core.exception import OEQADependency
 from oeqa.core.utils.test import getSuiteModules, getSuiteCasesIDs
 
 class TestLoader(TestBase):
-
-    def test_fail_empty_filter(self):
-        filters = {'oetag' : ''}
-        expect = 'Filter oetag specified is empty'
-        msg = 'Expected TypeError exception for having invalid filter'
-        try:
-            # Must throw TypeError because empty filter
-            tc = self._testLoader(filters=filters)
-            self.fail(msg)
-        except TypeError as e:
-            result = True if expect in str(e) else False
-            self.assertTrue(result, msg=msg)
-
-    def test_fail_invalid_filter(self):
-        filters = {'invalid' : 'good'}
-        expect = 'filter but not declared in any of'
-        msg = 'Expected TypeError exception for having invalid filter'
-        try:
-            # Must throw TypeError because invalid filter
-            tc = self._testLoader(filters=filters)
-            self.fail(msg)
-        except TypeError as e:
-            result = True if expect in str(e) else False
-            self.assertTrue(result, msg=msg)
-
+    @unittest.skip("invalid directory is missing oetag.py")
     def test_fail_duplicated_module(self):
         cases_path = self.cases_path
         invalid_path = os.path.join(cases_path, 'loader', 'invalid')
         self.cases_path = [self.cases_path, invalid_path]
-        expect = 'Duplicated oeid module found in'
+        expect = 'Duplicated oetag module found in'
         msg = 'Expected ImportError exception for having duplicated module'
         try:
             # Must throw ImportEror because duplicated module
@@ -55,17 +33,16 @@ class TestLoader(TestBase):
             self.cases_path = cases_path
 
     def test_filter_modules(self):
-        expected_modules = {'oeid', 'oetag'}
+        expected_modules = {'oetag'}
         tc = self._testLoader(modules=expected_modules)
         modules = getSuiteModules(tc.suites)
         msg = 'Expected just %s modules' % ', '.join(expected_modules)
         self.assertEqual(modules, expected_modules, msg=msg)
 
     def test_filter_cases(self):
-        modules = ['oeid', 'oetag', 'data']
+        modules = ['oetag', 'data']
         expected_cases = {'data.DataTest.testDataOk',
-                          'oetag.TagTest.testTagGood',
-                          'oeid.IDTest.testIdGood'}
+                          'oetag.TagTest.testTagGood'}
         tc = self._testLoader(modules=modules, tests=expected_cases)
         cases = set(getSuiteCasesIDs(tc.suites))
         msg = 'Expected just %s cases' % ', '.join(expected_cases)
@@ -74,7 +51,7 @@ class TestLoader(TestBase):
     def test_import_from_paths(self):
         cases_path = self.cases_path
         cases2_path = os.path.join(cases_path, 'loader', 'valid')
-        expected_modules = {'oeid', 'another'}
+        expected_modules = {'another'}
         self.cases_path = [self.cases_path, cases2_path]
         tc = self._testLoader(modules=expected_modules)
         modules = getSuiteModules(tc.suites)

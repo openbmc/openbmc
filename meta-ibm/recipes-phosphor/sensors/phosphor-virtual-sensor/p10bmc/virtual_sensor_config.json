@@ -1,0 +1,31 @@
+[
+    {
+        "Desc":
+        {
+            "Name": "Ambient_Virtual_Temp",
+            "SensorType": "temperature"
+        },
+        "Threshold" :
+        {
+            "CriticalHigh": 100,
+            "CriticalLow": 0,
+            "WarningHigh": 100,
+            "WarningLow": 0
+        },
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "Ambient_0_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "T0"
+    }
+]

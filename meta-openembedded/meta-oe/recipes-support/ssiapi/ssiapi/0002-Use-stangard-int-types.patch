@@ -1,0 +1,54 @@
+From 01a75b23382fd042673d1f00fce708ba6c67d05a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 30 Aug 2019 13:12:54 -0700
+Subject: [PATCH] Use stangard int types
+
+__unitn_* are internal to GNU libc lets use portable types
+
+Fixes
+error: unknown type name '__uint8_t'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/engine/end_device.cpp | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/lib/engine/end_device.cpp b/lib/engine/end_device.cpp
+index 5a66de9..da078bf 100644
+--- a/lib/engine/end_device.cpp
++++ b/lib/engine/end_device.cpp
+@@ -36,6 +36,7 @@
+ #include <sys/ioctl.h>
+ #include <fcntl.h>
+ #include <linux/hdreg.h>
++#include <stdint.h>
+ #include <unistd.h>
+ #include <linux/fs.h>
+ #include <climits>
+@@ -90,20 +91,20 @@ using boost::shared_ptr;
+ 
+ struct AtaCommand
+ {
+-    __uint8_t command;
+-    __uint8_t obsolete1;
+-    __uint8_t obsolete2;
+-    __uint8_t transportDependent;
++    uint8_t command;
++    uint8_t obsolete1;
++    uint8_t obsolete2;
++    uint8_t transportDependent;
+ };
+ 
+ struct AtaIdentifyCall
+ {
+     AtaCommand command;
+-    __uint16_t data[256];
++    uint16_t data[256];
+ };
+ 
+ namespace {
+-    __uint16_t swap(__uint16_t value)
++    uint16_t swap(uint16_t value)
+     {
+         return (value >> 8) | (value << 8);
+     }

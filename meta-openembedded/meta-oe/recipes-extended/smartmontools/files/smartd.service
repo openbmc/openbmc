@@ -6,7 +6,6 @@ After=syslog.target
 EnvironmentFile=-@SYSCONFDIR@/smartmontools
 ExecStart=@SBINDIR@/smartd -n $smart_opts
 ExecReload=@BASE_BINDIR@/kill -HUP $MAINPID
-StandardOutput=syslog
 
 [Install]
 WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+- Instance: 0
+  SensorID: 0x08
+  SensorName: occ0
+- Instance: 1
+  SensorID: 0x09
+  SensorName: occ1
+- Instance: 6
+  SensorID: 0x06
+  SensorName: occ2
+- Instance: 7
+  SensorID: 0x07
+  SensorName: occ3

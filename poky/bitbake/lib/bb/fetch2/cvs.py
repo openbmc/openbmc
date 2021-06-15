@@ -1,5 +1,3 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
 BitBake 'Fetch' implementations
 
@@ -10,24 +8,12 @@ BitBake build tools.
 
 # Copyright (C) 2003, 2004  Chris Larson
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-#Based on functions from the base bb module, Copyright 2003 Holger Schurig
+# Based on functions from the base bb module, Copyright 2003 Holger Schurig
 #
 
 import os
-import logging
 import bb
 from bb.fetch2 import FetchMethod, FetchError, MissingParameterError, logger
 from bb.fetch2 import runfetchcmd
@@ -64,6 +50,10 @@ class Cvs(FetchMethod):
             fullpath = '_fullpath'
 
         ud.localfile = d.expand('%s_%s_%s_%s%s%s.tar.gz' % (ud.module.replace('/', '.'), ud.host, ud.tag, ud.date, norecurse, fullpath))
+
+        pkg = d.getVar('PN')
+        cvsdir = d.getVar("CVSDIR") or (d.getVar("DL_DIR") + "/cvs")
+        ud.pkgdir = os.path.join(cvsdir, pkg)
 
     def need_update(self, ud, d):
         if (ud.date == "now"):
@@ -119,11 +109,8 @@ class Cvs(FetchMethod):
             cvsupdatecmd = "CVS_RSH=\"%s\" %s" % (cvs_rsh, cvsupdatecmd)
 
         # create module directory
-        logger.debug(2, "Fetch: checking for module directory")
-        pkg = d.getVar('PN')
-        cvsdir = d.getVar("CVSDIR") or (d.getVar("DL_DIR") + "/cvs")
-        pkgdir = os.path.join(cvsdir, pkg)
-        moddir = os.path.join(pkgdir, localdir)
+        logger.debug2("Fetch: checking for module directory")
+        moddir = os.path.join(ud.pkgdir, localdir)
         workdir = None
         if os.access(os.path.join(moddir, 'CVS'), os.R_OK):
             logger.info("Update " + ud.url)
@@ -134,9 +121,9 @@ class Cvs(FetchMethod):
         else:
             logger.info("Fetch " + ud.url)
             # check out sources there
-            bb.utils.mkdirhier(pkgdir)
-            workdir = pkgdir
-            logger.debug(1, "Running %s", cvscmd)
+            bb.utils.mkdirhier(ud.pkgdir)
+            workdir = ud.pkgdir
+            logger.debug("Running %s", cvscmd)
             bb.fetch2.check_network_access(d, cvscmd, ud.url)
             cmd = cvscmd
 
@@ -154,7 +141,7 @@ class Cvs(FetchMethod):
         # tar them up to a defined filename
         workdir = None
         if 'fullpath' in ud.parm:
-            workdir = pkgdir
+            workdir = ud.pkgdir
             cmd = "tar %s -czf %s %s" % (tar_flags, ud.localpath, localdir)
         else:
             workdir = os.path.dirname(os.path.realpath(moddir))
@@ -165,9 +152,6 @@ class Cvs(FetchMethod):
     def clean(self, ud, d):
         """ Clean CVS Files and tarballs """
 
-        pkg = d.getVar('PN')
-        pkgdir = os.path.join(d.getVar("CVSDIR"), pkg)
-
-        bb.utils.remove(pkgdir, True)
+        bb.utils.remove(ud.pkgdir, True)
         bb.utils.remove(ud.localpath)
 

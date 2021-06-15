@@ -1,0 +1,215 @@
+# Machine power supply policy for PDM.
+#
+# Create an error if a power supply is removed while the system is powered on
+
+- name: power supply0
+  class: group
+  group: path
+  members:
+    - meta: POWER SUPPLY
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0
+
+- name: power supply1
+  class: group
+  group: path
+  members:
+    - meta: POWER SUPPLY
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1
+
+- name: power supplies
+  description: >
+    'The machine has two power supplies to monitor.'
+  class: group
+  group: path
+  members:
+    - meta: POWER SUPPLY
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0
+    - meta: POWER SUPPLY
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1
+
+- name: chassis state
+  description: >
+    'The machine has a single chassis to monitor.'
+  class: group
+  group: path
+  members:
+    - meta: CHASSISSTATE
+      path: /xyz/openbmc_project/state/chassis0
+
+- name: power supply present
+  description: >
+    'Monitor the presence state of each power supply.'
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Inventory.Item
+      meta: PRESENT
+      property: Present
+
+- name: chassis powered
+  description: >
+    'Monitor the chassis power state.'
+  class: group
+  group: property
+  type: string
+  members:
+    - interface: xyz.openbmc_project.State.Chassis
+      meta: CHASSIS_STATE
+      property: CurrentPowerState
+
+- name: watch power supply present
+  description: >
+    'Trigger logic on power supply presence state changes.'
+  class: watch
+  watch: property
+  paths: power supplies
+  properties: power supply present
+  callback: check power
+
+- name: watch chassis state
+  description: >
+    'Trigger logic on chassis power state changes.'
+  class: watch
+  watch: property
+  paths: chassis state
+  properties: chassis powered
+  callback: check power
+
+- name: check power
+  description: >
+    'If the chassis has power, check for power supplies.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check power supplies
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power supplies
+  description: >
+    'Create an error if a power supply is not present.'
+  class: callback
+  callback: group
+  members:
+    - check power supply0 presence
+    - check power supply1 presence
+
+- name: check power supply0 presence
+  description: >
+    'If this condition passes power supply0 has been unplugged for more than
+     5 seconds. Count present power supplies rather than non-present
+     power supplies since the latter would pass if the power supply has not
+     been created for some reason.
+
+    For a more detailed definition of unplugged, consult the documentation
+    of xyz.openbmc_project.Inventory.Item and/or the documentation
+    of the power supply inventory object implementation.'
+  class: condition
+  condition: count
+  paths: power supply0
+  properties: power supply present
+  defer: 5000000us
+  callback: notpresent power supply0 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check power supply1 presence
+  description: >
+    'If this condition passes power supply1 has been unplugged for more than
+     5 seconds.'
+  class: condition
+  condition: count
+  paths: power supply1
+  properties: power supply present
+  defer: 5000000us
+  callback: notpresent power supply1 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: notpresent power supply0 error
+  class: callback
+  callback: elog
+  paths: power supply0
+  properties: power supply present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0
+      type: string
+
+- name: notpresent power supply1 error
+  class: callback
+  callback: elog
+  paths: power supply1
+  properties: power supply present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1
+      type: string
+
+- name: resolve power supply0 errors if present
+  description: >
+    'If power supply0 is present, call the resolve ps0 errors callback.'
+  class: condition
+  condition: count
+  paths: power supply0
+  properties: power supply present
+  callback: resolve power supply0 errors
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: true
+
+- name: resolve power supply1 errors if present
+  description: >
+    'If power supply1 is present, call the resolve ps1 errors callback.'
+  class: condition
+  condition: count
+  paths: power supply1
+  properties: power supply present
+  callback: resolve power supply1 errors
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: true
+
+- name: resolve power supply0 errors
+  class: callback
+  callback: resolve callout
+  paths: power supply0
+  properties: power supply present
+  callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply0
+
+- name: resolve power supply1 errors
+  class: callback
+  callback: resolve callout
+  paths: power supply1
+  properties: power supply present
+  callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/powersupply1
+
+- name: watch power supply0 present for resolving error logs
+  description: >
+    'On supply present state changes, check if errors need to be resolved.'
+  class: watch
+  watch: property
+  paths: power supply0
+  properties: power supply present
+  callback: resolve power supply0 errors if present
+
+- name: watch power supply1 present for resolving error logs
+  description: >
+    'On supply present state changes, check if errors need to be resolved.'
+  class: watch
+  watch: property
+  paths: power supply1
+  properties: power supply present
+  callback: resolve power supply1 errors if present

@@ -5,8 +5,8 @@ SECTION = "libs"
 LICENSE = "GPLv2+ & LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e \
                     file://COPYING.LIB;md5=fb504b67c50331fc78734fed90fb0e09 \
-                    file://src/main.c;beginline=1;endline=24;md5=9bc54b93cd7e17bf03f52513f39f926e"
-DEPENDS = "udev dbus-glib glib-2.0"
+                    file://src/main.c;beginline=1;endline=24;md5=0ad83ca0dc37ab08af448777c581e7ac"
+DEPENDS = "dbus glib-2.0"
 PROVIDES += "bluez-hcidump"
 RPROVIDES_${PN} += "bluez-hcidump"
 
@@ -22,6 +22,7 @@ PACKAGECONFIG ??= "obex-profiles \
     hog-profiles \
     tools \
     deprecated \
+    udev \
 "
 PACKAGECONFIG[obex-profiles] = "--enable-obex,--disable-obex,libical"
 PACKAGECONFIG[readline] = "--enable-client,--disable-client,readline,"
@@ -41,30 +42,30 @@ PACKAGECONFIG[sixaxis] = "--enable-sixaxis,--disable-sixaxis"
 PACKAGECONFIG[tools] = "--enable-tools,--disable-tools"
 PACKAGECONFIG[threads] = "--enable-threads,--disable-threads"
 PACKAGECONFIG[deprecated] = "--enable-deprecated,--disable-deprecated"
-PACKAGECONFIG[mesh] = "--enable-mesh,--disable-mesh, json-c ell"
-PACKAGECONFIG[btpclient] = "--enable-btpclient,--disable-btpclient, ell"
+PACKAGECONFIG[mesh] = "--enable-mesh --enable-external-ell,--disable-mesh, json-c ell"
+PACKAGECONFIG[btpclient] = "--enable-btpclient --enable-external-ell,--disable-btpclient, ell"
+PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,udev"
 
-SRC_URI = "\
-    ${KERNELORG_MIRROR}/linux/bluetooth/bluez-${PV}.tar.xz \
-    file://out-of-tree.patch \
-    file://init \
-    file://run-ptest \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '', 'file://0001-Allow-using-obexd-without-systemd-in-the-user-sessio.patch', d)} \
-    file://0001-tests-add-a-target-for-building-tests-without-runnin.patch \
-    file://0001-test-gatt-Fix-hung-issue.patch \
-    file://0001-Makefile.am-Fix-a-race-issue-for-tools.patch \
-    file://CVE-2018-10910.patch \
-"
+SRC_URI = "${KERNELORG_MIRROR}/linux/bluetooth/bluez-${PV}.tar.xz \
+           file://init \
+           file://run-ptest \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '', 'file://0001-Allow-using-obexd-without-systemd-in-the-user-sessio.patch', d)} \
+           file://0001-tests-add-a-target-for-building-tests-without-runnin.patch \
+           file://0001-test-gatt-Fix-hung-issue.patch \
+           file://0001-audio-Rename-pause-funciton-to-avoid-shadowing-glibc.patch \
+           file://0001-Makefile.am-add-missing-mkdir-for-ell-shared.patch \
+           "
 S = "${WORKDIR}/bluez-${PV}"
 
 CVE_PRODUCT = "bluez"
 
-inherit autotools pkgconfig systemd update-rc.d distro_features_check ptest gobject-introspection-data
+inherit autotools pkgconfig systemd update-rc.d ptest gobject-introspection-data
 
 EXTRA_OECONF = "\
   --enable-test \
   --enable-datafiles \
   --enable-library \
+  --without-zsh-completion-dir \
 "
 
 # bluez5 builds a large number of useful utilities but does not
@@ -117,7 +118,10 @@ FILES_${PN}-dev += " \
 
 FILES_${PN}-obex = "${libexecdir}/bluetooth/obexd \
                     ${exec_prefix}/lib/systemd/user/obex.service \
+                    ${systemd_system_unitdir}/obex.service \
+                    ${sysconfdir}/systemd/system/multi-user.target.wants/obex.service \
                     ${datadir}/dbus-1/services/org.bluez.obex.service \
+                    ${sysconfdir}/dbus-1/system.d/obexd.conf \
                    "
 SYSTEMD_SERVICE_${PN}-obex = "obex.service"
 
@@ -133,7 +137,7 @@ def get_noinst_tools_paths (d, bb, tools):
 
 FILES_${PN}-noinst-tools = "${@get_noinst_tools_paths(d, bb, d.getVar('NOINST_TOOLS'))}"
 
-RDEPENDS_${PN}-testtools += "python3 python3-dbus"
+RDEPENDS_${PN}-testtools += "python3-core python3-dbus"
 RDEPENDS_${PN}-testtools += "${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'python3-pygobject', '', d)}"
 
 SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('PACKAGECONFIG', 'systemd', 'bluetooth.service', '', d)}"
@@ -148,3 +152,5 @@ do_install_ptest() {
 	cp -r ${B}/unit/ ${D}${PTEST_PATH}
 	rm -f ${D}${PTEST_PATH}/unit/*.o
 }
+
+RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-gconv-utf-16"

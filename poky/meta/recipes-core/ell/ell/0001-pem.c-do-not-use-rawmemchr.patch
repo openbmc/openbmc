@@ -1,0 +1,27 @@
+From 277e1eca67fcc23cb31be7b826d83a19d9b89bd2 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 22 Dec 2020 10:30:54 +0000
+Subject: [PATCH] pem.c: do not use rawmemchr()
+
+This is a glibc-only function, and causes build failures with
+alternative libc implementations such as musl.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ ell/pem.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ell/pem.c b/ell/pem.c
+index 790f2c2..237ae02 100644
+--- a/ell/pem.c
++++ b/ell/pem.c
+@@ -224,7 +224,7 @@ static uint8_t *pem_load_buffer(const void *buf, size_t buf_len,
+ 
+ 		/* Check that each header line has a key and a colon */
+ 		while (start < end) {
+-			const char *lf = rawmemchr(start, '\n');
++			const char *lf = memchr(start, '\n', end - start);
+ 			const char *colon = memchr(start, ':', lf - start);
+ 
+ 			if (!colon)

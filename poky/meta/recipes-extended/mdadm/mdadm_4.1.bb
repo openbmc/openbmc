@@ -1,5 +1,6 @@
 SUMMARY = "Tool for managing software RAID under Linux"
 HOMEPAGE = "http://www.kernel.org/pub/linux/utils/raid/mdadm/"
+DESCRIPTION = "mdadm is a Linux utility used to manage and monitor software RAID devices."
 
 # Some files are GPLv2+ while others are GPLv2.
 LICENSE = "GPLv2 & GPLv2+"
@@ -17,15 +18,20 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/raid/mdadm/${BPN}-${PV}.tar.xz \
            file://0001-Use-CC-to-check-for-implicit-fallthrough-warning-sup.patch \
            file://0001-Compute-abs-diff-in-a-standard-compliant-way.patch \
            file://0001-fix-gcc-8-format-truncation-warning.patch \
-	   file://mdadm.init \
-	   file://mdmonitor.service \
+           file://debian-no-Werror.patch \
+           file://0001-Revert-tests-wait-for-complete-rebuild-in-integrity-.patch \
+           file://mdadm.init \
+           file://0001-mdadm-add-option-y-for-use-syslog-to-recive-event-re.patch \
+           file://include_sysmacros.patch \
+           file://0001-mdadm-skip-test-11spare-migration.patch \
            "
+
 SRC_URI[md5sum] = "51bf3651bd73a06c413a2f964f299598"
 SRC_URI[sha256sum] = "ab7688842908d3583a704d491956f31324c3a5fc9f6a04653cb75d19f1934f4a"
 
 inherit autotools-brokensep ptest systemd
 
-SYSTEMD_SERVICE_${PN} = "mdmonitor.service mdmon@.service"
+SYSTEMD_SERVICE_${PN} = "mdmonitor.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 CFLAGS_append_toolchain-clang = " -Wno-error=address-of-packed-member"
@@ -38,13 +44,12 @@ CFLAGS_append_powerpc64 = ' -D__SANE_USERSPACE_TYPES__'
 CFLAGS_append_mipsarchn64 = ' -D__SANE_USERSPACE_TYPES__'
 CFLAGS_append_mipsarchn32 = ' -D__SANE_USERSPACE_TYPES__'
 
-EXTRA_OEMAKE = 'CHECK_RUN_DIR=0 CXFLAGS="${CFLAGS}"'
+EXTRA_OEMAKE = 'CHECK_RUN_DIR=0 CXFLAGS="${CFLAGS}" SYSTEMD_DIR=${systemd_unitdir}/system \
+                BINDIR="${base_sbindir}" UDEVDIR="${nonarch_base_libdir}/udev"'
 
 DEBUG_OPTIMIZATION_append = " -Wno-error"
 
 do_compile() {
-	# Point to right sbindir
-	sed -i -e "s;BINDIR  = /sbin;BINDIR = $base_sbindir;" -e "s;UDEVDIR = /lib;UDEVDIR = $nonarch_base_libdir;" ${S}/Makefile
 	oe_runmake SYSROOT="${STAGING_DIR_TARGET}"
 }
 
@@ -56,11 +61,12 @@ do_install() {
 do_install_append() {
         install -d ${D}/${sysconfdir}/
         install -m 644 ${S}/mdadm.conf-example ${D}${sysconfdir}/mdadm.conf
-        install -d ${D}/${systemd_unitdir}/system
-        install -m 644 ${WORKDIR}/mdmonitor.service ${D}/${systemd_unitdir}/system
-        install -m 644 ${S}/systemd/mdmon@.service ${D}/${systemd_unitdir}/system
         install -d ${D}/${sysconfdir}/init.d
         install -m 755 ${WORKDIR}/mdadm.init ${D}${sysconfdir}/init.d/mdmonitor
+}
+
+do_install_append() {
+        oe_runmake install-systemd DESTDIR=${D}
 }
 
 do_compile_ptest() {
@@ -70,7 +76,16 @@ do_compile_ptest() {
 do_install_ptest() {
 	cp -R --no-dereference --preserve=mode,links -v ${S}/tests ${D}${PTEST_PATH}/tests
 	cp ${S}/test ${D}${PTEST_PATH}
-	sed -e 's!sleep 0.*!sleep 1!g; s!/var/tmp!/!g' -i ${D}${PTEST_PATH}/test
+	sed -e 's!sleep 0.*!sleep 1!g; s!/var/tmp!/mdadm-testing-dir!g' -i ${D}${PTEST_PATH}/test
+	sed -e 's!/var/tmp!/mdadm-testing-dir!g' -i ${D}${PTEST_PATH}/tests/*
+        sed -i -e '/echo -ne "$_script... "/d' \
+               -e 's/echo "succeeded"/echo -e "PASS: $_script"/g' \
+               -e '/save_log fail/N; /_fail=1/i\\t\t\techo -ne "FAIL: $_script"' \
+               -e '/die "dmesg prints errors when testing $_basename!"/i\\t\t\t\techo -ne "FAIL: $_script" &&' \
+               ${D}${PTEST_PATH}/test
+
+        chmod +x ${D}${PTEST_PATH}/test
+
 	ln -s ${base_sbindir}/mdadm ${D}${PTEST_PATH}/mdadm
 	for prg in test_stripe swap_super raid6check
 	do
@@ -78,7 +93,7 @@ do_install_ptest() {
 	done
 }
 
-RDEPENDS_${PN}-ptest += "bash"
+RDEPENDS_${PN}-ptest += "bash e2fsprogs-mke2fs"
 RRECOMMENDS_${PN}-ptest += " \
     coreutils \
     util-linux \
@@ -89,3 +104,5 @@ RRECOMMENDS_${PN}-ptest += " \
     kernel-module-raid10 \
     kernel-module-raid456 \
 "
+
+FILES_${PN} += "${systemd_unitdir}/*"

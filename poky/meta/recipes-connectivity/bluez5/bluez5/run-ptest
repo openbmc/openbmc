@@ -6,7 +6,7 @@ failed=0
 all=0
 
 for f in test-*; do
-    "./$f"
+    "./$f" -q
     case "$?" in
         0)
             echo "PASS: $f"

@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+device=$1
+if [ "$device" = "" ]; then
+    echo "Usage: zram-swap-init <device>"
+    exit 1
+fi
+
+# Allocate zram to be size of actual system memory
+# Note: zram is only allocated when used. When swapped pages compress with a
+# a 2:1 ratio zram will require 50% of system memory (while allowing to use
+# 150% memory).
+ZRAM_SIZE_PERCENT=100
+ZRAM_ALGORITHM=lz4
+
+[ -f /etc/default/zram ] && . /etc/default/zram || true
+
+memtotal=$(grep MemTotal /proc/meminfo | awk ' { print $2 } ')
+memzram=$(($memtotal*${ZRAM_SIZE_PERCENT}/100))
+
+# Try loading zram module
+modprobe -q zram || true
+
+zramctl -a ${ZRAM_ALGORITHM} -s ${memzram}KB $device
+mkswap -L "zram-swap" $device
+
+devname="${device##*/}"
+if [ ! -z ${ZRAM_SIZE_LIMIT+x} ]; then
+	echo ${ZRAM_SIZE_LIMIT} > /sys/block/$devname/mem_limit
+fi

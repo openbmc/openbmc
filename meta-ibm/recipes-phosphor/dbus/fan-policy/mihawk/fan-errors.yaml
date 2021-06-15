@@ -1,0 +1,905 @@
+# Witherspoon fan error policy for PDM.
+#
+# * Create a NotPresent error if fan 0, 1, 2, 3, 4, or 5 is not present for more
+#   than 20 seconds.
+# * Create a Nonfunctional error if fan 0, 1, 2, 3, 4, or 5 is not
+#   functional for any amount of time.
+#
+# The system must be powered on in both of these cases.
+# Note: An error is created each time the chassis powers on.
+#
+# * Watch for fans to become both present and functional, and then resolve
+#   their errors
+
+- name: fan0
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0
+
+- name: fan1
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan1
+
+- name: fan2
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2
+
+- name: fan3
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
+
+- name: fan4
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan4
+
+- name: fan5
+  class: group
+  group: path
+  members:
+    - meta: FAN
+      path: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan5
+
+
+- name: chassis state
+  description: >
+    'Witherspoon has a single chassis to monitor.'
+  class: group
+  group: path
+  members:
+    - meta: CHASSISSTATE
+      path: /xyz/openbmc_project/state/chassis0
+
+- name: chassis
+  description: >
+    'Witherspoon has a single chassis to monitor.'
+  class: group
+  group: path
+  members:
+    - meta: CHASSIS
+      path: /xyz/openbmc_project/inventory/system/chassis
+
+
+- name: fan present
+  description: >
+    'Monitor the presence state of each fan.'
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Inventory.Item
+      meta: PRESENT
+      property: Present
+
+- name: fan functional
+  description: >
+    'Monitor the functional state of each fan.'
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+      meta: FUNCTIONAL
+      property: Functional
+
+- name: fan present and functional
+  description: >
+    'Monitor the present and functional state of each fan.'
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Inventory.Item
+      meta: PRESENT
+      property: Present
+    - interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+      meta: FUNCTIONAL
+      property: Functional
+
+- name: chassis powered
+  description: >
+    'Monitor the chassis power state.'
+  class: group
+  group: property
+  type: string
+  members:
+    - interface: xyz.openbmc_project.State.Chassis
+      meta: CHASSIS_STATE
+      property: CurrentPowerState
+
+- name: chassis air cooled
+  description: >
+    'The chassis cooling type.'
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Inventory.Decorator.CoolingType
+      meta: COOLING_TYPE
+      property: WaterCooled
+
+- name: watch chassis state
+  description: >
+    'Trigger logic on chassis power state changes.'
+  class: watch
+  watch: property
+  paths: chassis state
+  properties: chassis powered
+  callback: check power
+
+- name: watch fan0 presence
+  description: >
+    'Trigger logic on fan0 presence state changes.'
+  class: watch
+  watch: property
+  paths: fan0
+  properties: fan present
+  callback: check power fan0 presence
+
+- name: watch fan0 functional
+  description: >
+    'Trigger logic on fan0 functional state changes.'
+  class: watch
+  watch: property
+  paths: fan0
+  properties: fan functional
+  callback: check power fan0 functional
+
+- name: watch fan1 presence
+  description: >
+    'Trigger logic on fan1 presence state changes.'
+  class: watch
+  watch: property
+  paths: fan1
+  properties: fan present
+  callback: check power fan1 presence
+
+- name: watch fan1 functional
+  description: >
+    'Trigger logic on fan1 functional state changes.'
+  class: watch
+  watch: property
+  paths: fan1
+  properties: fan functional
+  callback: check power fan1 functional
+
+- name: watch fan2 presence
+  description: >
+    'Trigger logic on fan2 presence state changes.'
+  class: watch
+  watch: property
+  paths: fan2
+  properties: fan present
+  callback: check power fan2 presence
+
+- name: watch fan2 functional
+  description: >
+    'Trigger logic on fan2 functional state changes.'
+  class: watch
+  watch: property
+  paths: fan2
+  properties: fan functional
+  callback: check power fan2 functional
+
+- name: watch fan3 presence
+  description: >
+    'Trigger logic on fan3 presence state changes.'
+  class: watch
+  watch: property
+  paths: fan3
+  properties: fan present
+  callback: check power fan3 presence
+
+- name: watch fan3 functional
+  description: >
+    'Trigger logic on fan3 functional state changes.'
+  class: watch
+  watch: property
+  paths: fan3
+  properties: fan functional
+  callback: check power fan3 functional
+
+- name: watch fan4 presence
+  description: >
+    'Trigger logic on fan4 presence state changes.'
+  class: watch
+  watch: property
+  paths: fan4
+  properties: fan present
+  callback: check power fan4 presence
+
+- name: watch fan4 functional
+  description: >
+    'Trigger logic on fan4 functional state changes.'
+  class: watch
+  watch: property
+  paths: fan4
+  properties: fan functional
+  callback: check power fan4 functional
+
+- name: watch fan5 presence
+  description: >
+    'Trigger logic on fan5 presence state changes.'
+  class: watch
+  watch: property
+  paths: fan5
+  properties: fan present
+  callback: check power fan5 presence
+
+- name: watch fan5 functional
+  description: >
+    'Trigger logic on fan5 functional state changes.'
+  class: watch
+  watch: property
+  paths: fan5
+  properties: fan functional
+  callback: check power fan5 functional
+
+- name: watch fan0 present and functional for resolving error logs
+  description: >
+    'On fan present or functional state changes, check if errors need to be resolved.'
+  class: watch
+  watch: property
+  paths: fan0
+  properties: fan present and functional
+  callback: resolve fan0 errors if present and functional
+
+- name: watch fan1 present and functional for resolving error logs
+  description: >
+    'On fan present or functional state changes, check if errors need to be resolved.'
+  class: watch
+  watch: property
+  paths: fan1
+  properties: fan present and functional
+  callback: resolve fan1 errors if present and functional
+
+- name: watch fan2 present and functional for resolving error logs
+  description: >
+    'On fan present or functional state changes, check if errors need to be resolved.'
+  class: watch
+  watch: property
+  paths: fan2
+  properties: fan present and functional
+  callback: resolve fan2 errors if present and functional
+
+- name: watch fan3 present and functional for resolving error logs
+  description: >
+    'On fan present or functional state changes, check if errors need to be resolved.'
+  class: watch
+  watch: property
+  paths: fan3
+  properties: fan present and functional
+  callback: resolve fan3 errors if present and functional
+
+- name: watch fan4 present and functional for resolving error logs
+  description: >
+    'On fan present or functional state changes, check if errors need to be resolved.'
+  class: watch
+  watch: property
+  paths: fan4
+  properties: fan present and functional
+  callback: resolve fan4 errors if present and functional
+
+- name: watch fan5 present and functional for resolving error logs
+  description: >
+    'On fan present or functional state changes, check if errors need to be resolved.'
+  class: watch
+  watch: property
+  paths: fan5
+  properties: fan present and functional
+  callback: resolve fan5 errors if present and functional
+
+- name: check power
+  description: >
+    'If the chassis has power, check all fans.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fans
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan0 presence
+  description: >
+    'If the chassis has power, check presence of fan0.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan0 presence
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan0 functional
+  description: >
+    'If the chassis has power, check functional of fan0.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan0 functional
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan1 presence
+  description: >
+    'If the chassis has power, check presence of fan1.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan1 presence
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan1 functional
+  description: >
+    'If the chassis has power, check functional of fan1.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan1 functional
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan2 presence
+  description: >
+    'If the chassis has power, check presence of fan2.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan2 presence
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan2 functional
+  description: >
+    'If the chassis has power, check functional of fan2.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan2 functional
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan3 presence
+  description: >
+    'If the chassis has power, check presence of fan3.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan3 presence
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan3 functional
+  description: >
+    'If the chassis has power, check functional of fan3.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan3 functional
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan4 presence
+  description: >
+    'If the chassis has power, check presence of fan4.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan4 presence
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan4 functional
+  description: >
+    'If the chassis has power, check functional of fan4.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan4 functional
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan5 presence
+  description: >
+    'If the chassis has power, check presence of fan5.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan5 presence
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check power fan5 functional
+  description: >
+    'If the chassis has power, check functional of fan5.'
+  class: condition
+  condition: count
+  paths: chassis state
+  properties: chassis powered
+  callback: check fan5 functional
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: xyz.openbmc_project.State.Chassis.PowerState.On
+
+- name: check fans
+  description: >
+    'Verify each of the 12 fans are present.'
+  class: callback
+  callback: group
+  members:
+    - check fan0 presence
+    - check fan1 presence
+    - check fan2 presence
+    - check fan3 presence
+    - check fan4 presence
+    - check fan5 presence
+    - check fan0 functional
+    - check fan1 functional
+    - check fan2 functional
+    - check fan3 functional
+    - check fan4 functional
+    - check fan5 functional
+
+- name: check fan0 presence
+  description: >
+    'If this condition passes fan0 has been unplugged for more than 20 seconds.'
+  class: condition
+  condition: count
+  paths: fan0
+  properties: fan present
+  defer: 20000000us
+  callback: notpresent fan0 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check fan0 functional
+  description: >
+    'If this condition passes fan0 has been marked as nonfunctional.'
+  class: condition
+  condition: count
+  paths: fan0
+  properties: fan functional
+  callback: nonfunctional fan0 error
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: false
+
+- name: check fan1 presence
+  description: >
+    'If this condition passes fan1 has been unplugged for more than 20 seconds.'
+  class: condition
+  condition: count
+  paths: fan1
+  properties: fan present
+  defer: 20000000us
+  callback: notpresent fan1 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check fan1 functional
+  description: >
+    'If this condition passes fan1 has been marked as nonfunctional.'
+  class: condition
+  condition: count
+  paths: fan1
+  properties: fan functional
+  callback: nonfunctional fan1 error
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: false
+
+- name: check fan2 presence
+  description: >
+    'If this condition passes fan2 has been unplugged for more than 20 seconds.'
+  class: condition
+  condition: count
+  paths: fan2
+  properties: fan present
+  defer: 20000000us
+  callback: notpresent fan2 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check fan2 functional
+  description: >
+    'If this condition passes fan2 has been marked as nonfunctional.'
+  class: condition
+  condition: count
+  paths: fan2
+  properties: fan functional
+  callback: nonfunctional fan2 error
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: false
+
+- name: check fan3 presence
+  description: >
+    'If this condition passes fan3 has been unplugged for more than 20 seconds.'
+  class: condition
+  condition: count
+  paths: fan3
+  properties: fan present
+  defer: 20000000us
+  callback: notpresent fan3 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check fan3 functional
+  description: >
+    'If this condition passes fan3 has been marked as nonfunctional.'
+  class: condition
+  condition: count
+  paths: fan3
+  properties: fan functional
+  callback: nonfunctional fan3 error
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: false
+
+- name: check fan4 presence
+  description: >
+    'If this condition passes fan4 has been unplugged for more than 20 seconds.'
+  class: condition
+  condition: count
+  paths: fan4
+  properties: fan present
+  defer: 20000000us
+  callback: notpresent fan4 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check fan4 functional
+  description: >
+    'If this condition passes fan4 has been marked as nonfunctional.'
+  class: condition
+  condition: count
+  paths: fan4
+  properties: fan functional
+  callback: nonfunctional fan4 error
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: false
+
+- name: check fan5 presence
+  description: >
+    'If this condition passes fan5 has been unplugged for more than 20 seconds.'
+  class: condition
+  condition: count
+  paths: fan5
+  properties: fan present
+  defer: 20000000us
+  callback: notpresent fan5 error
+  countop: '<'
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check fan5 functional
+  description: >
+    'If this condition passes fan5 has been marked as nonfunctional.'
+  class: condition
+  condition: count
+  paths: fan5
+  properties: fan functional
+  callback: nonfunctional fan5 error
+  countop: '>'
+  countbound: 0
+  op: '=='
+  bound: false
+
+- name: notpresent fan0 error
+  class: callback
+  callback: elog
+  paths: fan0
+  properties: fan present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0
+      type: string
+
+- name: nonfunctional fan0 error
+  class: callback
+  callback: elog
+  paths: fan0
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::Nonfunctional
+  metadata:
+    - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0
+      type: string
+
+- name: notpresent fan1 error
+  class: callback
+  callback: elog
+  paths: fan1
+  properties: fan present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan1
+      type: string
+
+- name: nonfunctional fan1 error
+  class: callback
+  callback: elog
+  paths: fan1
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::Nonfunctional
+  metadata:
+    - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan1
+      type: string
+
+- name: notpresent fan2 error
+  class: callback
+  callback: elog
+  paths: fan2
+  properties: fan present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2
+      type: string
+
+- name: nonfunctional fan2 error
+  class: callback
+  callback: elog
+  paths: fan2
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::Nonfunctional
+  metadata:
+    - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2
+      type: string
+
+- name: notpresent fan3 error
+  class: callback
+  callback: elog
+  paths: fan3
+  properties: fan present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
+      type: string
+
+- name: nonfunctional fan3 error
+  class: callback
+  callback: elog
+  paths: fan3
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::Nonfunctional
+  metadata:
+    - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
+      type: string
+
+- name: notpresent fan4 error
+  class: callback
+  callback: elog
+  paths: fan4
+  properties: fan present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan4
+      type: string
+
+- name: nonfunctional fan4 error
+  class: callback
+  callback: elog
+  paths: fan4
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::Nonfunctional
+  metadata:
+    - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan4
+      type: string
+
+- name: notpresent fan5 error
+  class: callback
+  callback: elog
+  paths: fan5
+  properties: fan present
+  error: xyz::openbmc_project::Inventory::Error::NotPresent
+  metadata:
+    - name: xyz::openbmc_project::Inventory::NotPresent::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan5
+      type: string
+
+- name: nonfunctional fan5 error
+  class: callback
+  callback: elog
+  paths: fan5
+  properties: fan functional
+  error: xyz::openbmc_project::Inventory::Error::Nonfunctional
+  metadata:
+    - name: xyz::openbmc_project::Inventory::Nonfunctional::CALLOUT_INVENTORY_PATH
+      value: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan5
+      type: string
+
+- name: resolve fan0 errors if present and functional
+  description: >
+    'If fan0 is present and functional, call the resolve fan0 errors callback.'
+  class: condition
+  condition: count
+  paths: fan0
+  properties: fan present and functional
+  callback: resolve fan0 errors
+  countop: '=='
+  countbound: 2
+  op: '=='
+  bound: true
+
+- name: resolve fan1 errors if present and functional
+  description: >
+    'If fan1 is present and functional, call the resolve fan1 errors callback.'
+  class: condition
+  condition: count
+  paths: fan1
+  properties: fan present and functional
+  callback: resolve fan1 errors
+  countop: '=='
+  countbound: 2
+  op: '=='
+  bound: true
+
+- name: resolve fan2 errors if present and functional
+  description: >
+    'If fan2 is present and functional, call the resolve fan2 errors callback.'
+  class: condition
+  condition: count
+  paths: fan2
+  properties: fan present and functional
+  callback: resolve fan2 errors
+  countop: '=='
+  countbound: 2
+  op: '=='
+  bound: true
+
+- name: resolve fan3 errors if present and functional
+  description: >
+    'If fan3 is present and functional, call the resolve fan3 errors callback.'
+  class: condition
+  condition: count
+  paths: fan3
+  properties: fan present and functional
+  callback: resolve fan3 errors
+  countop: '=='
+  countbound: 2
+  op: '=='
+  bound: true
+
+- name: resolve fan4 errors if present and functional
+  description: >
+    'If fan4 is present and functional, call the resolve fan4 errors callback.'
+  class: condition
+  condition: count
+  paths: fan4
+  properties: fan present and functional
+  callback: resolve fan4 errors
+  countop: '=='
+  countbound: 2
+  op: '=='
+  bound: true
+
+- name: resolve fan5 errors if present and functional
+  description: >
+    'If fan5 is present and functional, call the resolve fan5 errors callback.'
+  class: condition
+  condition: count
+  paths: fan5
+  properties: fan present and functional
+  callback: resolve fan5 errors
+  countop: '=='
+  countbound: 2
+  op: '=='
+  bound: true
+
+- name: resolve fan0 errors
+  class: callback
+  callback: resolve callout
+  paths: fan0
+  properties: fan present and functional
+  callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan0
+
+- name: resolve fan1 errors
+  class: callback
+  callback: resolve callout
+  paths: fan1
+  properties: fan present and functional
+  callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan1
+
+- name: resolve fan2 errors
+  class: callback
+  callback: resolve callout
+  paths: fan2
+  properties: fan present and functional
+  callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan2
+
+- name: resolve fan3 errors
+  class: callback
+  callback: resolve callout
+  paths: fan3
+  properties: fan present and functional
+  callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan3
+
+- name: resolve fan4 errors
+  class: callback
+  callback: resolve callout
+  paths: fan4
+  properties: fan present and functional
+  callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan4
+
+- name: resolve fan5 errors
+  class: callback
+  callback: resolve callout
+  paths: fan5
+  properties: fan present and functional
+  callout: /xyz/openbmc_project/inventory/system/chassis/motherboard/fan5

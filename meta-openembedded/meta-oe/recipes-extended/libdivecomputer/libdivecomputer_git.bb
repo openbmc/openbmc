@@ -8,11 +8,10 @@ DEPENDS = "libusb1"
 
 inherit autotools pkgconfig
 
-PV = "0.4.2+gitr${SRCPV}"
+PV = "0.7.0"
 
-SRCREV = "5f765f91430f16932d96b3777404420aa2dd4c7c"
-SRC_URI = "git://git.libdivecomputer.org/libdivecomputer.git \
-           file://fix-ar.patch \
+SRCREV = "47cbed5355ffda7b952193a770a9a9fa9f89b25b"
+SRC_URI = "git://github.com/libdivecomputer/libdivecomputer.git;protocol=https \
           "
 
 S = "${WORKDIR}/git"

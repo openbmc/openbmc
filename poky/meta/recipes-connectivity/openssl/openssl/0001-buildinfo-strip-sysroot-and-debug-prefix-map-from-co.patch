@@ -25,16 +25,19 @@ Signed-off-by: Martin Hundebøll <martin@geanix.com>
 Update to fix buildpaths qa issue for '-fmacro-prefix-map'.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Update to fix buildpaths qa issue for '-ffile-prefix-map'.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  Configurations/unix-Makefile.tmpl | 10 +++++++++-
  crypto/build.info                 |  2 +-
  2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
-index 16af4d2087..54c162784c 100644
 --- a/Configurations/unix-Makefile.tmpl
 +++ b/Configurations/unix-Makefile.tmpl
-@@ -317,13 +317,22 @@ BIN_LDFLAGS={- join(' ', $target{bin_lflags} || (),
+@@ -420,13 +420,23 @@ BIN_LDFLAGS={- join(' ', $target{bin_lfl
                           '$(CNF_LDFLAGS)', '$(LDFLAGS)') -}
  BIN_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
  
@@ -49,6 +52,7 @@ index 16af4d2087..54c162784c 100644
 +CFLAGS_Q={- for (@{$config{CFLAGS}}) {
 +              s|-fdebug-prefix-map=[^ ]+|-fdebug-prefix-map=|g;
 +              s|-fmacro-prefix-map=[^ ]+|-fmacro-prefix-map=|g;
++              s|-ffile-prefix-map=[^ ]+|-ffile-prefix-map=|g;
 +            }
 +            join(' ', @{$config{CFLAGS}}) -}
 +
@@ -58,11 +62,9 @@ index 16af4d2087..54c162784c 100644
  PERLASM_SCHEME= {- $target{perlasm_scheme} -}
  
  # For x86 assembler: Set PROCESSOR to 386 if you want to support
-diff --git a/crypto/build.info b/crypto/build.info
-index b515b7318e..8c9cee2a09 100644
 --- a/crypto/build.info
 +++ b/crypto/build.info
-@@ -10,7 +10,7 @@ EXTRA=  ../ms/uplink-x86.pl ../ms/uplink.c ../ms/applink.c \
+@@ -10,7 +10,7 @@ EXTRA=  ../ms/uplink-x86.pl ../ms/uplink
          ppccpuid.pl pariscid.pl alphacpuid.pl arm64cpuid.pl armv4cpuid.pl
  
  DEPEND[cversion.o]=buildinf.h
@@ -71,6 +73,3 @@ index b515b7318e..8c9cee2a09 100644
  DEPEND[buildinf.h]=../configdata.pm
  
  GENERATE[uplink-x86.s]=../ms/uplink-x86.pl $(PERLASM_SCHEME)
--- 
-2.19.1
-

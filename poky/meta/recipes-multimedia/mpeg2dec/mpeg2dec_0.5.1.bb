@@ -1,5 +1,9 @@
 SUMMARY = "Library and test program for decoding MPEG-2 and MPEG-1 video streams"
-HOMEPAGE = "http://libmpeg2.sourceforge.net/"
+DESCRIPTION = "mpeg2dec is a test program for libmpeg2. It decodes \
+mpeg-1 and mpeg-2 video streams, and also includes a demultiplexer \
+for mpeg-1 and mpeg-2 program streams. The main purpose of mpeg2dec \
+is to have a simple test bed for libmpeg2."
+HOMEPAGE = "https://libmpeg2.sourceforge.io/"
 SECTION = "libs"
 LICENSE = "GPLv2+"
 LICENSE_FLAGS = "commercial"
@@ -11,6 +15,7 @@ SRC_URI = "http://libmpeg2.sourceforge.net/files/libmpeg2-${PV}.tar.gz \
            file://0001-check-for-available-arm-optimizations.patch \
            file://0002-Set-visibility-of-global-symbols-used-in-ARM-specifi.patch \
            file://61_global-symbol-test.patch \
+           file://0001-Import-revision-1206-from-upstream-to-fix-PIE-build.patch \
            "
 
 S = "${WORKDIR}/libmpeg2-${PV}"

@@ -1,0 +1,30 @@
+From bea5156cd7e7122715b26c769c35928141a1da2c Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Mon, 18 Nov 2019 14:46:34 -0600
+Subject: [PATCH] Remove non-reproducible SRCDIR
+
+Removes SRCDIR as the prefix for finding the test font. This wouldn't
+work anyway, since that path is not present on the target.
+
+This patch is specific to OE, since it appears that this entire method
+of testing was removed when upstream was re-written in rust
+
+Upstream-Status: Inappropriate [OE-specific, no longer present upstream]
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+---
+ rsvg-cairo-draw.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rsvg-cairo-draw.c b/rsvg-cairo-draw.c
+index caa9104..cfb7ed2 100644
+--- a/rsvg-cairo-draw.c
++++ b/rsvg-cairo-draw.c
+@@ -398,7 +398,7 @@ set_font_options_for_testing (PangoContext *context)
+ static void
+ create_font_config_for_testing (RsvgCairoRender *render)
+ {
+-    const char *font_path = SRCDIR "/tests/resources/LiberationSans-Regular.ttf";
++    const char *font_path = "/tests/resources/LiberationSans-Regular.ttf";
+ 
+     if (render->font_config_for_testing != NULL)
+         return;

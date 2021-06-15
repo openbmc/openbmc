@@ -1,0 +1,31 @@
+From 9086d42df1f3134bafcfe33ff16db7bbb9d9a0fd Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 30 Nov 2020 23:08:22 +0000
+Subject: [PATCH] framework/profile.py: make test lists reproducible
+
+These are created with os.walk, which yields different
+order depending on where it's run.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ framework/profile.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/framework/profile.py b/framework/profile.py
+index c210e535e..9b5d51d68 100644
+--- a/framework/profile.py
++++ b/framework/profile.py
+@@ -528,7 +528,11 @@ class TestProfile(object):
+                 else:
+                     opts[n] = self.test_list[n]
+         else:
+-            opts = self.test_list  # pylint: disable=redefined-variable-type
++            opts = collections.OrderedDict()
++            test_keys = list(self.test_list.keys())
++            test_keys.sort()
++            for k in test_keys:
++                opts[k] = self.test_list[k]
+ 
+         for k, v in self.filters.run(opts.items()):
+             yield k, v

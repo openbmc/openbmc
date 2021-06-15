@@ -234,16 +234,16 @@
                     "expected_results": "this should output the directory of the devtool script and it should be within the sdk workdir you are working in.   \n\n"
                 },
                 "5": {
-                    "action": "devtool add v4l2loopback-driver  https://github.com/umlaeute/v4l2loopback.git   \n\n",
-                    "expected_results": "This should automatically create the recipe v4l2loopback-driver.bb under <crops-esdk-workdir-workspace>/recipes/v4l2loopback-driver/v4l2loopback-driver.bb "
+                    "action": "devtool add kernel-module-hello-world https://git.yoctoproject.org/git/kernel-module-hello-world \n\n",
+                    "expected_results": "This should automatically create the recipe kernel-module-hello-world.bb under <crops-esdk-workdir-workspace>/recipes/kernel-module-hello-world/kernel-module-hello-world.bb "
                 },
                 "6": {
-                    "action": "devtool build v4l2loopback-driver   \n\n",
+                    "action": "devtool build kernel-module-hello-world   \n\n",
                     "expected_results": "This should compile an image   \n\n"
                 },
                 "7": {
-                    "action": "devtool reset v4l2loopback-driver   ",
-                    "expected_results": "This cleans sysroot of the v4l2loopback-driver recipe, but it leaves the source tree intact. meaning it does not erase."
+                    "action": "devtool reset kernel-module-hello-world   ",
+                    "expected_results": "This cleans sysroot of the kernel-module-hello-world recipe, but it leaves the source tree intact. meaning it does not erase."
                 }
             },
             "summary": "sdkext_devtool_kernelmodule"

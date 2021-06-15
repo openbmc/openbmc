@@ -6,7 +6,9 @@ SUMMARY = "Self-hosting"
 DESCRIPTION = "Packages required to run the build system"
 PR = "r13"
 
-inherit packagegroup  distro_features_check
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
+inherit packagegroup  features_check
 # rdepends on libx11-dev
 REQUIRED_DISTRO_FEATURES = "x11"
 
@@ -37,7 +39,7 @@ RDEPENDS_packagegroup-self-hosted-host-tools = "\
     e2fsprogs-tune2fs \
     hdparm \
     iptables \
-    lsb \
+    lsb-release \
     mc \
     mc-fish \
     mc-helpers \
@@ -73,7 +75,6 @@ RDEPENDS_packagegroup-self-hosted-sdk = "\
     g++-symlinks \
     gcc \
     gcc-symlinks \
-    intltool \
     ldd \
     less \
     libstdc++ \
@@ -107,7 +108,6 @@ RDEPENDS_packagegroup-self-hosted-debug = " \
 
 RDEPENDS_packagegroup-self-hosted-extended = "\
     bzip2 \
-    chkconfig \
     chrpath \
     cpio \
     curl \
@@ -151,8 +151,6 @@ RDEPENDS_packagegroup-self-hosted-extended = "\
     perl-misc \
     perl-modules \
     perl-pod \
-    python \
-    python-modules \
     python3 \
     python3-modules \
     python3-git \
@@ -166,7 +164,6 @@ RDEPENDS_packagegroup-self-hosted-extended = "\
     sysstat \
     tar \
     tcl \
-    texi2html \
     texinfo \
     unzip \
     usbutils \
@@ -189,7 +186,6 @@ RDEPENDS_packagegroup-self-hosted-graphics = "\
     libx11-dev \
     adwaita-icon-theme \
     xdg-utils \
-    epiphany \
     l3afpad \
     pcmanfm \
     vte \

@@ -1,0 +1,43 @@
+From 8c0e4b7907eb577b1e5214f9a7bc75d5c3263b0a Mon Sep 17 00:00:00 2001
+From: Ariadne Conill <ariadne@dereferenced.org>
+Date: Sat, 14 Nov 2020 22:55:30 -0700
+Subject: [PATCH] Fix build under GCC -fno-common.
+
+Upstream-Status: Submitted [https://github.com/pikhq/musl-nscd/pull/11]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/modules.h | 4 ++--
+ src/main.c        | 3 +++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/include/modules.h b/include/modules.h
+index 70c1960..e77ec58 100644
+--- a/include/modules.h
++++ b/include/modules.h
+@@ -28,7 +28,7 @@ struct mod_passwd {
+ 	link_t link;
+ };
+ 
+-list_t passwd_mods;
+-list_t group_mods;
++extern list_t passwd_mods;
++extern list_t group_mods;
+ 
+ #endif
+diff --git a/src/main.c b/src/main.c
+index c1a78bb..808ef74 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -18,6 +18,9 @@
+ #include "parse.h"
+ #include "util.h"
+ 
++list_t passwd_mods;
++list_t group_mods;
++
+ static void *get_dll(const char *service)
+ {
+ 	char *path;
+-- 
+2.29.2
+

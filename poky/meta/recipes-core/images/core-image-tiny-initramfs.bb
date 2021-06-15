@@ -13,6 +13,7 @@ PACKAGE_INSTALL = "initramfs-live-boot-tiny packagegroup-core-boot dropbear ${VI
 IMAGE_FEATURES = ""
 
 export IMAGE_BASENAME = "core-image-tiny-initramfs"
+IMAGE_NAME_SUFFIX ?= ""
 IMAGE_LINGUAS = ""
 
 LICENSE = "MIT"
@@ -26,7 +27,7 @@ IMAGE_ROOTFS_SIZE = "8192"
 IMAGE_ROOTFS_EXTRA_SPACE = "0"
 
 # Use the same restriction as initramfs-live-install
-COMPATIBLE_HOST = "(i.86|x86_64).*-linux"
+COMPATIBLE_HOST = "(i.86|x86_64|aarch64).*-linux"
 
 python tinyinitrd () {
   # Modify our init file so the user knows we drop to shell prompt on purpose

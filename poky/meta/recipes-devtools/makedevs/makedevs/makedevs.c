@@ -230,7 +230,7 @@ static void add_new_directory(char *name, char *path,
 		unsigned long uid, unsigned long gid, unsigned long mode)
 {
 	if (trace)
-		fprintf(stderr, "Directory: %s %s  UID: %ld  GID %ld  MODE: %04lo", path, name, uid, gid, mode);
+		fprintf(stderr, "Directory: %s %s  UID: %lu  GID %lu  MODE: %04lo", path, name, uid, gid, mode);
 
 	if (mkdir(path, mode) < 0) {
 		if (EEXIST == errno) {
@@ -251,7 +251,7 @@ static void add_new_device(char *name, char *path, unsigned long uid,
 	struct stat sb;
 
 	if (trace) {
-		fprintf(stderr, "Device: %s %s  UID: %ld  GID: %ld  MODE: %04lo  MAJOR: %d  MINOR: %d",
+		fprintf(stderr, "Device: %s %s  UID: %lu  GID: %lu  MODE: %04lo  MAJOR: %d  MINOR: %d",
 				path, name, uid, gid, mode, (short)(rdev >> 8), (short)(rdev & 0xff));
 	}
 
@@ -292,7 +292,7 @@ static void add_new_file(char *name, char *path, unsigned long uid,
 				  unsigned long gid, unsigned long mode)
 {
 	if (trace) {
-		fprintf(stderr, "File: %s %s  UID: %ld  GID: %ld  MODE: %04lo\n",
+		fprintf(stderr, "File: %s %s  UID: %lu  GID: %lu  MODE: %04lo\n",
 			path, name, gid, uid, mode);
 	}
 
@@ -311,7 +311,7 @@ static void add_new_fifo(char *name, char *path, unsigned long uid,
 				  unsigned long gid, unsigned long mode)
 {
 	if (trace) {
-		printf("Fifo: %s %s  UID: %ld  GID: %ld  MODE: %04lo\n",
+		printf("Fifo: %s %s  UID: %lu  GID: %lu  MODE: %04lo\n",
 			path, name, gid, uid, mode);
 	}
 
@@ -360,7 +360,7 @@ static int interpret_table_entry(char *line)
 	unsigned long mode = 0755, uid = 0, gid = 0, major = 0, minor = 0;
 	unsigned long start = 0, increment = 1, count = 0;
 
-	if (0 > sscanf(line, "%4095s %c %lo %40s %40s %lu %lu %lu %lu %lu", path,
+	if (0 > sscanf(line, "%4095s %c %lo %39s %39s %lu %lu %lu %lu %lu", path,
 		    &type, &mode, usr_buf, grp_buf, &major, &minor, &start,
 		    &increment, &count))
 	{

@@ -1,0 +1,57 @@
+From 874da836bc857e5942675c59e19f4fd8ad09b13e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Aug 2019 14:08:19 -0700
+Subject: [PATCH 1/4] log: Avoid shadowing functions from std lib
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/log/log.c | 2 +-
+ lib/log/log.h | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/lib/log/log.c b/lib/log/log.c
+index 7d8e17c..18b67a5 100644
+--- a/lib/log/log.c
++++ b/lib/log/log.c
+@@ -82,7 +82,7 @@ enum log_level log_get_level(void) {
+ }
+ 
+ /* */
+-void __log(enum log_level level, const char *message) {
++void _ssiap_log(enum log_level level, const char *message) {
+     struct tm tm;
+     struct timeval tv;
+ 
+diff --git a/lib/log/log.h b/lib/log/log.h
+index d94e482..66a707b 100644
+--- a/lib/log/log.h
++++ b/lib/log/log.h
+@@ -53,13 +53,13 @@ enum log_level {
+ };
+ 
+ /* */
+-#define log(__level, __message)                                 \
++#define ssiap_log(__level, __message)                           \
+     do { if (log_get_level() >= (enum log_level)(__level))      \
+-        __log(__level, __message);                              \
++        _ssiap_log(__level, __message);                              \
+     } while (0)
+ 
+ #define dlog(__message)                                 \
+-         log(LOG_DEBUG, __message);
++         ssiap_log(LOG_DEBUG, __message);
+ 
+ /* */
+ void log_init(enum log_level level, const char *path);
+@@ -68,7 +68,7 @@ void log_init(enum log_level level, const char *path);
+ void log_fini(void);
+ 
+ /* */
+-void __log(enum log_level level, const char *message);
++void _ssiap_log(enum log_level level, const char *message);
+ 
+ /* */
+ enum log_level log_get_level(void);
+-- 
+2.23.0
+

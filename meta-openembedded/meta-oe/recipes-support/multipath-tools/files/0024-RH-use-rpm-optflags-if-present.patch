@@ -1,9 +1,12 @@
 From 436f7594485e35523269e662c4b5dc3a2c10ff9b Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 26 Nov 2018 09:19:17 +0800
-Subject: [PATCH] From 0000000000000000000000000000000000000000 Mon Sep 17
- 00:00:00 2001 From: Benjamin Marzinski <bmarzins@redhat.com> Date: Wed, 19
- Apr 2017 06:10:01 -0500 Subject: [PATCH] RH: use rpm optflags if present
+Subject: [PATCH] From 0000000000000000000000000000000000000000 Mon Sep
+17
+ 00:00:00 2001 From: Benjamin Marzinski <bmarzins@redhat.com> Date: Wed,
+19
+ Apr 2017 06:10:01 -0500 Subject: [PATCH] RH: use rpm optflags if
+present
 
 Use the passed in optflags when compiling as an RPM, and keep the
 default flags as close as possible to the current fedora flags, while
@@ -17,26 +20,20 @@ update this patch to new version
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- Makefile.inc | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+ Makefile.inc | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/Makefile.inc b/Makefile.inc
-index b86cba6..295afb9 100644
+index 42dbb5bf..55a06c60 100644
 --- a/Makefile.inc
 +++ b/Makefile.inc
-@@ -85,15 +85,22 @@ TEST_CC_OPTION = $(shell \
+@@ -89,15 +89,23 @@ TEST_CC_OPTION = $(shell \
  		echo "$(2)"; \
  	fi)
  
 -STACKPROT := $(call TEST_CC_OPTION,-fstack-protector-strong,-fstack-protector)
 -ERROR_DISCARDED_QUALIFIERS := $(call TEST_CC_OPTION,-Werror=discarded-qualifiers,)
--
--OPTFLAGS	= -O2 -g -pipe -Wall -Wextra -Wformat=2 -Werror=implicit-int \
--		  -Werror=implicit-function-declaration -Werror=format-security \
--		  -Wno-sign-compare -Wno-unused-parameter -Wno-clobbered \
--		  -Werror=cast-qual $(ERROR_DISCARDED_QUALIFIERS) \
--		  -Wp,-D_FORTIFY_SOURCE=2 $(STACKPROT) \
--		  --param=ssp-buffer-size=4
+-WNOCLOBBERED := $(call TEST_CC_OPTION,-Wno-clobbered,)
 +ifndef RPM_OPT_FLAGS
 +       STACKPROT := $(call TEST_CC_OPTION,-fstack-protector-strong,-fstack-protector)
 +       OPTFLAGS        = -O2 -g -pipe -Wall -Werror=format-security \
@@ -54,8 +51,14 @@ index b86cba6..295afb9 100644
 +                  -Wno-unused-parameter -Werror=cast-qual \
 +                  -Werror=discarded-qualifiers
  
+-OPTFLAGS	= -O2 -g -pipe -Werror -Wall -Wextra -Wformat=2 -Werror=implicit-int \
+-		  -Werror=implicit-function-declaration -Werror=format-security \
+-		  $(WNOCLOBBERED) \
+-		  -Werror=cast-qual $(ERROR_DISCARDED_QUALIFIERS) \
+-		  $(STACKPROT) --param=ssp-buffer-size=4
+ CPPFLAGS	:= -Wp,-D_FORTIFY_SOURCE=2 
  CFLAGS		:= $(OPTFLAGS) -DBIN_DIR=\"$(bindir)\" -DLIB_STRING=\"${LIB}\" -DRUN_DIR=\"${RUN}\" \
  		   -MMD -MP $(CFLAGS)
 -- 
-2.7.4
+2.17.1
 

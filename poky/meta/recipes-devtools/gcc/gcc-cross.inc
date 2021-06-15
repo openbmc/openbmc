@@ -21,7 +21,7 @@ require gcc-configure-common.inc
 # gnu) will hit a QA failure.
 LINKER_HASH_STYLE ?= "sysv"
 
-EXTRA_OECONF += "--enable-poison-system-directories"
+EXTRA_OECONF += "--enable-poison-system-directories=error"
 EXTRA_OECONF_append_sh4 = " \
     --with-multilib-list= \
     --enable-incomplete-targets \
@@ -61,104 +61,30 @@ do_compile () {
 	export CXXFLAGS_FOR_TARGET="${TARGET_CXXFLAGS}"
 	export LDFLAGS_FOR_TARGET="${TARGET_LDFLAGS}"
 
+	# Prevent native/host sysroot path from being used in configargs.h header,
+	# as it will be rewritten when used by other sysroots preventing support
+	# for gcc plugins
+	oe_runmake configure-gcc
+	sed -i 's@${STAGING_DIR_TARGET}@/host@g' ${B}/gcc/configargs.h
+	sed -i 's@${STAGING_DIR_HOST}@/host@g' ${B}/gcc/configargs.h
+
+	# Prevent sysroot/workdir paths from being used in checksum-options.
+	# checksum-options is used to generate a checksum which is embedded into
+	# the output binary.
+	oe_runmake TARGET-gcc=checksum-options all-gcc
+	sed -i 's@${DEBUG_PREFIX_MAP}@@g' ${B}/gcc/checksum-options
+	sed -i 's@${STAGING_DIR_HOST}@/host@g' ${B}/gcc/checksum-options
+
 	oe_runmake all-host configure-target-libgcc
 	(cd ${B}/${TARGET_SYS}/libgcc; oe_runmake enable-execute-stack.c unwind.h md-unwind-support.h sfp-machine.h gthr-default.h)
-	# now generate script to drive testing
-	echo "#!/usr/bin/env sh" >${B}/${TARGET_PREFIX}testgcc
-	set >> ${B}/${TARGET_PREFIX}testgcc
-	# prune out the unneeded vars
-	sed -i -e "/^BASH/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^USER/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^OPT/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^DIRSTACK/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^EUID/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^FUNCNAME/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^GROUPS/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^HOST/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^HOME/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^IFS/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^LC_ALL/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^LOGNAME/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^MACHTYPE/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^OSTYPE/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^PIPE/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^SHELL/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^'/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^UID/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^TERM/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^PKG_/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^POSIXLY_/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^PPID/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^PS4/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^Q/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^SHLVL/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^STAGING/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^LD_LIBRARY_PATH/d" ${B}/${TARGET_PREFIX}testgcc
-	sed -i -e "/^PSEUDO/d" ${B}/${TARGET_PREFIX}testgcc
-
-	# append execution part of the script
-cat >> ${B}/${TARGET_PREFIX}testgcc << STOP
-target="\$1"
-usage () {
-	echo "Usage:"
-	echo "\$0 user@target 'extra options to dejagnu'"
-	echo "\$0 target 'extra options to dejagnu'"
-	echo "\$0 target"
-	echo "e.g. \$0 192.168.7.2 ' dg.exp=visibility-d.c'"
-	echo "will only run visibility-d.c test case"
-	echo "e.g. \$0 192.168.7.2 '/-mthumb dg.exp=visibility-d.c'"
-	echo "will only run visibility-d.c test case in thumb mode"
-	echo "You need to have dejagnu autogen expect installed"
-	echo "on the build host"
-    }
-if [ "x\$target" = "x" ]
-then
-	echo "Please specify the target machine and remote user in form of user@target\n"
-	usage
-	exit 1;
-fi
-
-shift
-
-echo "\$target" | grep "@" 2>&1 > /dev/null
-if [ "x\$?" = "x0" ]
-then
-   user=\$(echo \$target | cut -d '@' -f 1)
-   target=\$(echo \$target | cut -d '@' -f 2)
-else
-   user=\$USER
-fi
-ssh \$user@\$target date 2>&1 > /dev/null
-if [ "x\$?" != "x0" ]
-then
-	echo "Failed connecting to \$user@\$target it could be because"
-	echo "you don't have passwordless ssh setup to access \$target"
-	echo "or sometimes host key has been changed"
-	echo "in such case do something like below on build host"
-	echo "ssh-keygen -f "~/.ssh/known_hosts" -R \$target"
-	echo "and then try ssh \$user@\$target"
-
-	usage
-	exit 1
-fi
-	echo "lappend boards_dir [pwd]/../../.." > ${B}/site.exp
-	echo "load_generic_config \"unix\"" > ${B}/${PACKAGE_ARCH}.exp
-	echo "set_board_info username \$user" >> ${B}/${PACKAGE_ARCH}.exp
-	echo "set_board_info rsh_prog ssh" >> ${B}/${PACKAGE_ARCH}.exp
-	echo "set_board_info rcp_prog scp" >> ${B}/${PACKAGE_ARCH}.exp
-	echo "set_board_info hostname \$target" >> ${B}/${PACKAGE_ARCH}.exp
-	DEJAGNU=${B}/site.exp make -k check RUNTESTFLAGS="--target_board=${PACKAGE_ARCH}\$@"
-
-STOP
-
-	chmod +x ${B}/${TARGET_PREFIX}testgcc
-
 }
 
 INHIBIT_PACKAGE_STRIP = "1"
 
 # Compute how to get from libexecdir to bindir in python (easier than shell)
 BINRELPATH = "${@os.path.relpath(d.expand("${STAGING_DIR_NATIVE}${prefix_native}/bin/${TARGET_SYS}"), d.expand("${libexecdir}/gcc/${TARGET_SYS}/${BINV}"))}"
+# linker plugin path
+LIBRELPATH = "${@os.path.relpath(d.expand("${libexecdir}/gcc/${TARGET_SYS}/${BINV}"), d.expand("${STAGING_LIBDIR_NATIVE}/${TARGET_SYS}/bfd-plugins"))}"
 
 do_install () {
 	( cd ${B}/${TARGET_SYS}/libgcc; oe_runmake 'DESTDIR=${D}' install-unwind_h-forbuild install-unwind_h )
@@ -168,7 +94,7 @@ do_install () {
 	install -d ${D}${target_libdir}
 
 	# Link gfortran to g77 to satisfy not-so-smart configure or hard coded g77
-	# gfortran is fully backwards compatible. This is a safe and practical solution. 
+	# gfortran is fully backwards compatible. This is a safe and practical solution.
 	if [ -n "${@d.getVar('FORTRAN')}" ]; then
 		ln -sf ${STAGING_DIR_NATIVE}${prefix_native}/bin/${TARGET_PREFIX}gfortran ${STAGING_DIR_NATIVE}${prefix_native}/bin/${TARGET_PREFIX}g77 || true
 		fortsymlinks="g77 gfortran"
@@ -193,9 +119,11 @@ do_install () {
 	cp ${S}/libquadmath/quadmath.h ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include/
 	cp ${S}/libquadmath/quadmath_weak.h ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include/
 
-	# We use libiberty from binutils
-	find ${D}${exec_prefix}/lib -name libiberty.a | xargs rm -f
-	find ${D}${exec_prefix}/lib -name libiberty.h | xargs rm -f
+	find ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include-fixed -type f -not -name "README" -not -name limits.h -not -name syslimits.h | xargs rm -f
+
+	# install LTO linker plugins where binutils tools can find it
+	install -d ${D}${libdir}/bfd-plugins
+	ln -sf ${LIBRELPATH}/liblto_plugin.so ${D}${libdir}/bfd-plugins/liblto_plugin.so
 }
 
 do_package[noexec] = "1"
@@ -204,12 +132,23 @@ do_package_write_ipk[noexec] = "1"
 do_package_write_rpm[noexec] = "1"
 do_package_write_deb[noexec] = "1"
 
-BUILDDIRSTASH = "${WORKDIR}/stashed-builddir"
+inherit chrpath
+
+python gcc_stash_builddir_fixrpaths() {
+    # rewrite rpaths, breaking hardlinks as required
+    process_dir("/", d.getVar("BUILDDIRSTASH"), d, break_hardlinks = True)
+}
+
+BUILDDIRSTASH = "${WORKDIR}/stashed-builddir/build"
 do_gcc_stash_builddir[dirs] = "${B}"
 do_gcc_stash_builddir[cleandirs] = "${BUILDDIRSTASH}"
+do_gcc_stash_builddir[postfuncs] += "gcc_stash_builddir_fixrpaths"
 do_gcc_stash_builddir () {
 	dest=${BUILDDIRSTASH}
 	hardlinkdir . $dest
+	# Makefile does move-if-change which can end up with 'timestamp' as file contents so break links to those files
+	rm $dest/gcc/include/*.h
+	cp gcc/include/*.h $dest/gcc/include/
 }
 addtask do_gcc_stash_builddir after do_compile before do_install
 SSTATETASKS += "do_gcc_stash_builddir"

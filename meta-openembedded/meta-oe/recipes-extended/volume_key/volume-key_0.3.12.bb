@@ -28,11 +28,11 @@ DEPENDS += " \
 "
 
 PACKAGECONFIG ??= "python3"
-PACKAGECONFIG[python] = "--with-python,--without-python,python,python"
 PACKAGECONFIG[python3] = "--with-python3,--without-python3,python3,python3"
 
-RDEPENDS_python3-${PN} += "${PN}"
+EXTRA_OECONF = "--without-python"
 
-PACKAGES += "python3-${PN}"
-FILES_python3-${PN} = "${PYTHON_SITEPACKAGES_DIR}/*"
+RDEPENDS_python3-${BPN} += "${PN}"
 
+PACKAGES += "python3-${BPN}"
+FILES_python3-${BPN} = "${PYTHON_SITEPACKAGES_DIR}/*"

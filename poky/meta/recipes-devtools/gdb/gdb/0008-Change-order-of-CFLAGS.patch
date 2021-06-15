@@ -1,0 +1,30 @@
+From 07175ae348c9d07581e1db94762d5a2d577a75ad Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Apr 2016 15:35:39 -0700
+Subject: [PATCH 08/11] Change order of CFLAGS
+
+Lets us override Werror if need be
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ gdbserver/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdbserver/Makefile.in b/gdbserver/Makefile.in
+index 2b1a77f2de7..cb5ddb12fd5 100644
+--- a/gdbserver/Makefile.in
++++ b/gdbserver/Makefile.in
+@@ -161,7 +161,7 @@ WIN32APILIBS = @WIN32APILIBS@
+ INTERNAL_CFLAGS_BASE = ${CXXFLAGS} ${GLOBAL_CFLAGS} \
+ 	${PROFILE_CFLAGS} ${INCLUDE_CFLAGS} ${CPPFLAGS} $(PTHREAD_CFLAGS)
+ INTERNAL_WARN_CFLAGS = ${INTERNAL_CFLAGS_BASE} $(WARN_CFLAGS)
+-INTERNAL_CFLAGS = ${INTERNAL_WARN_CFLAGS} $(WERROR_CFLAGS) -DGDBSERVER
++INTERNAL_CFLAGS = ${INTERNAL_WARN_CFLAGS} $(WERROR_CFLAGS) ${COMPILER_CFLAGS} -DGDBSERVER
+ 
+ # LDFLAGS is specifically reserved for setting from the command line
+ # when running make.
+-- 
+2.29.2
+

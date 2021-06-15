@@ -1,0 +1,33 @@
+From ce1eceab2350d27960ec254650717085f6a11c9a Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Fri, 28 Mar 2014 17:42:43 +0800
+Subject: [PATCH] qemu: Add addition environment space to boot loader
+ qemu-system-mips
+
+Upstream-Status: Inappropriate - OE uses deep paths
+
+If you create a project with very long directory names like 128 characters
+deep and use NFS, the kernel arguments will be truncated. The kernel will
+accept longer strings such as 1024 bytes, but the qemu boot loader defaulted
+to only 256 bytes. This patch expands the limit.
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
+---
+ hw/mips/malta.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: qemu-6.0.0/hw/mips/malta.c
+===================================================================
+--- qemu-6.0.0.orig/hw/mips/malta.c
++++ qemu-6.0.0/hw/mips/malta.c
+@@ -65,7 +65,7 @@
+ #define ENVP_PADDR          0x2000
+ #define ENVP_VADDR          cpu_mips_phys_to_kseg0(NULL, ENVP_PADDR)
+ #define ENVP_NB_ENTRIES     16
+-#define ENVP_ENTRY_SIZE     256
++#define ENVP_ENTRY_SIZE     1024
+ 
+ /* Hardware addresses */
+ #define FLASH_ADDRESS       0x1e000000ULL

@@ -1,0 +1,110 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          network-manager
+# Required-Start:    $remote_fs dbus udev
+# Required-Stop:     $remote_fs dbus udev
+# Should-Start:      $syslog
+# Should-Stop:       $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: network connection manager
+# Description:       Daemon for automatically switching network
+#            connections to the best available connection.
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DESC="network connection manager"
+NAME="NetworkManager"
+
+DAEMON=/usr/sbin/$NAME
+
+PIDFILE=/run/$NAME/$NAME.pid
+
+SCRIPTNAME=/etc/init.d/network-manager
+
+. /etc/init.d/functions || exit 1
+
+# Exit if the package is not installed
+[ -x "$DAEMON" ] || exit 0
+
+log_daemon_msg() {
+    echo -n $*
+}
+
+log_end_msg() {
+    if [ $1 -eq 0 ]; then
+        success
+    else
+        failure
+    fi
+    echo
+}
+
+log_progress_msg () {
+    if [ -z "${1:-}" ]; then
+        return 1
+    fi
+    echo -n " $@"
+}
+
+#
+#   Function that starts the daemon/service.
+#
+d_start() {
+    start-stop-daemon --start --quiet --pidfile $PIDFILE \
+        --exec $DAEMON -- $DAEMON_OPTS
+}
+
+#
+#   Function that stops the daemon/service.
+#
+d_stop() {
+    start-stop-daemon --stop --retry 5 --quiet --pidfile $PIDFILE \
+        --exec $DAEMON
+}
+
+d_reload() {
+    start-stop-daemon --stop --signal HUP --quiet --pidfile $PIDFILE \
+        --exec $DAEMON
+}
+
+case "$1" in
+  start)
+    log_daemon_msg "Starting $DESC" "$NAME"
+    d_start
+    case "$?" in
+        0) log_end_msg 0 ;;
+        1) log_progress_msg "already started"
+           log_end_msg 0 ;;
+        *) log_end_msg 1 ;;
+    esac
+    ;;
+  stop)
+    log_daemon_msg "Stopping $DESC" "$NAME"
+    d_stop
+    case "$?" in
+        0) log_end_msg 0 ;;
+        1) log_progress_msg "already stopped"
+           log_end_msg 0 ;;
+        *) log_end_msg 1 ;;
+    esac
+    ;;
+  reload|force-reload)
+    log_daemon_msg "Reloading $DESC" "$NAME"
+    d_reload
+    log_end_msg $?
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    ;;
+  status)
+    status_of_proc -p $PIDFILE $DAEMON $NAME && exit 0 || exit $?
+    ;;
+  *)
+    echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload|status}" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

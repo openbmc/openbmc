@@ -4,7 +4,7 @@ command lines as they are typed in. Both Emacs and vi editing modes are availabl
 additional functions to maintain a list of previously-entered command lines, to recall and perhaps reedit those   \
 lines, and perform csh-like history expansion on previous commands."
 SECTION = "libs"
-HOMEPAGE = "https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html"
+HOMEPAGE = "https://tiswww.case.edu/php/chet/readline/rltop.html"
 
 # GPLv2+ (< 6.0), GPLv3+ (>= 6.0)
 LICENSE = "GPLv3+"
@@ -43,3 +43,14 @@ do_install_append () {
 BBCLASSEXTEND = "native nativesdk"
 
 CONFFILES_${PN} += "${sysconfdir}/inputrc"
+
+inherit update-alternatives
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE_${PN}-doc = "history.3"
+ALTERNATIVE_LINK_NAME[history.3] = "${mandir}/man3/history.3"
+
+# OpenSuse injects versions into libreadline leading to conficits between our native one and theirs
+# see their spec file for where this is injected. Extra versioning is harmless so we just do the same.
+SRC_URI_append_class-native = " file://rl-native.map"
+LDFLAGS_append_class-native = " -Wl,--version-script=${WORKDIR}/rl-native.map"

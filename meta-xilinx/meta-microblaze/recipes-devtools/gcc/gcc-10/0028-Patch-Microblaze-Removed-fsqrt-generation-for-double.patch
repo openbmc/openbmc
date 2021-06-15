@@ -1,0 +1,38 @@
+From e4f5435e6e77afe0150bf36ec9d3d055cf25a089 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 4 Jun 2018 10:10:18 +0530
+Subject: [PATCH 28/54] [Patch,Microblaze] : Removed fsqrt generation for
+ double values.
+
+---
+ gcc/config/microblaze/microblaze.md | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 63ad94b972f..7695b105baa 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -526,20 +526,6 @@
+   (set_attr "mode"      "SF")
+   (set_attr "length"    "4")])
+ 
+-(define_insn "sqrtdf2"
+-  [(set (match_operand:DF 0 "register_operand" "=d")
+-        (sqrt:DF (match_operand:DF 1 "register_operand" "dG")))]
+-  "TARGET_HARD_FLOAT && TARGET_FLOAT_SQRT"
+-  {
+-    if (REGNO (operands[0]) == REGNO (operands[1]))
+-      return "fsqrt\t%0,%1";
+-    else
+-      return "fsqrt\t%0,%1\n\taddk\t%D0,%D1,r0";
+-  }
+-  [(set_attr "type"     "fsqrt")
+-   (set_attr "mode"      "SF")
+-   (set_attr "length"    "4")])
+-
+ (define_insn "fix_truncsfsi2"
+   [(set (match_operand:SI 0 "register_operand" "=d")
+         (fix:SI (match_operand:SF 1 "register_operand" "d")))]
+-- 
+2.17.1
+

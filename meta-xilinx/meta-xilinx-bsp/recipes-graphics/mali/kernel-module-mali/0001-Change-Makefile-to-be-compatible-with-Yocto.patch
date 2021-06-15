@@ -21,9 +21,9 @@ index 5a259fe..a6dd94c 100644
  
 -include $(KDIR)/.config
 +ifeq ($(O),)
-+	include $(KDIR)/.config
++	-include $(KDIR)/.config
 +else
-+	include $(O)/.config
++	-include $(O)/.config
 +endif
  
  ifeq ($(ARCH), arm)

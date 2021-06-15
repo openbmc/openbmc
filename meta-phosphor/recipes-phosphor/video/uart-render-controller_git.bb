@@ -16,7 +16,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
 RDEPENDS_${PN} += "fbterm"
 
-SRCREV = "14decab20f621c050760e5f3310f5a960cf21211"
+SRCREV = "26ac7f7bd6af52db63451d3633bcf1b167eea3d1"
 PV = "0.1+git${SRCPV}"
 
 S = "${WORKDIR}/git"

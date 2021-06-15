@@ -1,0 +1,29 @@
+From eb14aa66dc0384071af401cced8c02993b55502e Mon Sep 17 00:00:00 2001
+From: Jonathan Richardson <jonathan.richardson@broadcom.com>
+Date: Wed, 26 Feb 2020 15:54:51 -0800
+Subject: [PATCH] autotools: Add include path to generated version.h
+
+When the build dir isn't the same as source dir it fails to compile
+because the generated version.h from AC_CONFIG_FILES is always in build
+dir. Include the path to it in AM_CPPFLAGS.
+
+Signed-off-by: Jonathan Richardson <jonathan.richardson@broadcom.com>
+
+---
+ Makefile.am | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 0fb9bb0..2952019 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -14,6 +14,9 @@ endif
+ AM_CPPFLAGS = -I${srcdir}/include -DSYSCONFDIR="\"${sysconfdir}\"" \
+ 	-D_FORTIFY_SOURCE=2
+ 
++# Required for the generated version.h when build dir is not the same as srcdir.
++AM_CPPFLAGS += -I${top_builddir}/include
++
+ ACLOCAL_AMFLAGS = -I m4
+ 
+ parse_cli.o: CFLAGS+=-U_FORTIFY_SOURCE -Wno-error

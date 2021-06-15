@@ -1,0 +1,51 @@
+This patch avoids using time field of input_event structure which is not available
+on 32bit arches supporting 64bit time_t structs, Patch makes it compatible with new
+and keeps old input.h implementation functional as well.
+
+See https://sourceware.org/glibc/wiki/Y2038ProofnessDesign
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/src/eventcomm.c
++++ b/src/eventcomm.c
+@@ -575,10 +575,12 @@ SynapticsReadEvent(InputInfoPtr pInfo, s
+         ev->type = EV_SYN;
+         ev->code = SYN_REPORT;
+         ev->value = 0;
+-        ev->time = last_event_time;
+-    } else if (ev->type == EV_SYN)
+-        last_event_time = ev->time;
+-
++	ev->input_event_sec = last_event_time.tv_sec;
++	ev->input_event_usec = last_event_time.tv_usec;
++    } else if (ev->type == EV_SYN) {
++        last_event_time.tv_sec = ev->input_event_sec;
++        last_event_time.tv_usec = ev->input_event_usec;
++    }
+     return TRUE;
+ }
+ 
+@@ -725,7 +727,7 @@ EventReadHwState(InputInfoPtr pInfo,
+             case SYN_REPORT:
+                 hw->numFingers = count_fingers(pInfo, comm);
+                 if (proto_data->have_monotonic_clock)
+-                    hw->millis = 1000 * ev.time.tv_sec + ev.time.tv_usec / 1000;
++                    hw->millis = 1000 * ev.input_event_sec + ev.input_event_usec / 1000;
+                 else
+                     hw->millis = GetTimeInMillis();
+                 SynapticsCopyHwState(hwRet, hw);
+--- a/src/eventcomm.h
++++ b/src/eventcomm.h
+@@ -34,6 +34,11 @@
+ #include <xf86Xinput.h>
+ #include "synproto.h"
+ 
++#ifndef input_event_sec
++#define input_event_sec time.tv_sec
++#define input_event_usec time.tv_usec
++#endif
++
+ /* for auto-dev: */
+ #define DEV_INPUT_EVENT "/dev/input"
+ #define EVENT_DEV_NAME "event"

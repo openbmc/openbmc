@@ -1,0 +1,43 @@
+From c9baef0c70122e1be33b627874772e6e9a5d7744 Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster808@gmail.com>
+Date: Fri, 2 Oct 2020 19:43:44 -0700
+Subject: [PATCH] apparmor: fix manpage order
+
+It trys to create a symlink before the man pages are installed.
+
+ ln -sf aa-status.8 /(path}/apparmor/3.0-r0/image/usr/share/man/man8/apparmor_status.8
+ | ln: failed to create symbolic link '{path}/apparmor/3.0-r0/image/usr/share/man/man8/apparmor_status.8': No such file or directory
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+...
+
+install -d /{path}/apparmor/3.0-r0/image/usr/share/man/man8 ; install -m 644 aa-status.8 /{path}/apparmor/3.0-r0/image/usr/share/man/man8;
+
+Signed-off-by: Armin Kuster <akuster@mvista.com>
+---
+ binutils/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/binutils/Makefile b/binutils/Makefile
+index 99e54875..3f1d0011 100644
+--- a/binutils/Makefile
++++ b/binutils/Makefile
+@@ -156,12 +156,12 @@ install-arch: arch
+ 	install -m 755 -d ${SBINDIR}
+ 	ln -sf aa-status ${SBINDIR}/apparmor_status
+ 	install -m 755 ${SBINTOOLS} ${SBINDIR}
+-	ln -sf aa-status.8 ${DESTDIR}/${MANDIR}/man8/apparmor_status.8
+ 
+ .PHONY: install-indep
+ install-indep: indep
+ 	$(MAKE) -C po install NAME=${NAME} DESTDIR=${DESTDIR}
+ 	$(MAKE) install_manpages DESTDIR=${DESTDIR}
++	ln -sf aa-status.8 ${DESTDIR}/${MANDIR}/man8/apparmor_status.8
+ 
+ ifndef VERBOSE
+ .SILENT: clean
+-- 
+2.17.1
+

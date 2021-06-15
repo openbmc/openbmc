@@ -1,0 +1,33 @@
+From bdd5f0834d95a9598b0d87a18e7e96afade9d418 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 10 May 2021 15:28:05 -0700
+Subject: [PATCH] libbacktrace: include config.h
+
+Fixes
+thirdparty/libbacktrace/backtrace.h:53:10: fatal error: gstdint.h: No such file or directory
+   53 | #include "gstdint.h"
+      |          ^~~~~~~~~~~
+compilation terminated.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ thirdparty/libbacktrace/backtrace.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/thirdparty/libbacktrace/backtrace.h b/thirdparty/libbacktrace/backtrace.h
+index 2814763f..802cf989 100644
+--- a/thirdparty/libbacktrace/backtrace.h
++++ b/thirdparty/libbacktrace/backtrace.h
+@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.  */
+ #ifndef BACKTRACE_H
+ #define BACKTRACE_H
+ 
++#include <config.h>
+ #include <stddef.h>
+ #include <stdio.h>
+ 
+-- 
+2.31.1
+

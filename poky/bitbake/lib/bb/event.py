@@ -1,5 +1,3 @@
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
 BitBake 'Event' implementation
 
@@ -9,31 +7,20 @@ BitBake build tools.
 
 # Copyright (C) 2003, 2004  Chris Larson
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import os, sys
-import warnings
-import pickle
-import logging
-import atexit
-import traceback
 import ast
+import atexit
+import collections
+import logging
+import pickle
+import sys
 import threading
+import traceback
 
-import bb.utils
-import bb.compat
 import bb.exceptions
+import bb.utils
 
 # This is the pid for which we should generate the event. This is set when
 # the runqueue forks off.
@@ -69,7 +56,7 @@ def set_class_handlers(h):
     _handlers = h
 
 def clean_class_handlers():
-    return bb.compat.OrderedDict()
+    return collections.OrderedDict()
 
 # Internal
 _handlers = clean_class_handlers()
@@ -131,11 +118,14 @@ def fire_class_handlers(event, d):
             if _eventfilter:
                 if not _eventfilter(name, handler, event, d):
                     continue
+            if d is not None and not name in (d.getVar("__BBHANDLERS_MC") or set()):
+                continue
             execute_handler(name, handler, event, d)
 
 ui_queue = []
 @atexit.register
 def print_ui_queue():
+    global ui_queue
     """If we're exiting before a UI has been spawned, display any queued
     LogRecords to the console."""
     logger = logging.getLogger("BitBake")
@@ -180,6 +170,7 @@ def print_ui_queue():
             logger.removeHandler(stderr)
         else:
             logger.removeHandler(stdout)
+        ui_queue = []
 
 def fire_ui_handlers(event, d):
     global _thread_lock
@@ -238,11 +229,19 @@ def fire_from_worker(event, d):
     fire_ui_handlers(event, d)
 
 noop = lambda _: None
-def register(name, handler, mask=None, filename=None, lineno=None):
+def register(name, handler, mask=None, filename=None, lineno=None, data=None):
     """Register an Event handler"""
+
+    if data is not None and data.getVar("BB_CURRENT_MC"):
+        mc = data.getVar("BB_CURRENT_MC")
+        name = '%s%s' % (mc.replace('-', '_'), name)
 
     # already registered
     if name in _handlers:
+        if data is not None:
+            bbhands_mc = (data.getVar("__BBHANDLERS_MC") or set())
+            bbhands_mc.add(name)
+            data.setVar("__BBHANDLERS_MC", bbhands_mc)
         return AlreadyRegistered
 
     if handler is not None:
@@ -279,16 +278,32 @@ def register(name, handler, mask=None, filename=None, lineno=None):
                     _event_handler_map[m] = {}
                 _event_handler_map[m][name] = True
 
+        if data is not None:
+            bbhands_mc = (data.getVar("__BBHANDLERS_MC") or set())
+            bbhands_mc.add(name)
+            data.setVar("__BBHANDLERS_MC", bbhands_mc)
+
         return Registered
 
-def remove(name, handler):
+def remove(name, handler, data=None):
     """Remove an Event handler"""
+    if data is not None:
+        if data.getVar("BB_CURRENT_MC"):
+            mc = data.getVar("BB_CURRENT_MC")
+            name = '%s%s' % (mc.replace('-', '_'), name)
+
     _handlers.pop(name)
     if name in _catchall_handlers:
         _catchall_handlers.pop(name)
     for event in _event_handler_map.keys():
         if name in _event_handler_map[event]:
             _event_handler_map[event].pop(name)
+
+    if data is not None:
+        bbhands_mc = (data.getVar("__BBHANDLERS_MC") or set())
+        if name in bbhands_mc:
+            bbhands_mc.remove(name)
+            data.setVar("__BBHANDLERS_MC", bbhands_mc)
 
 def get_handlers():
     return _handlers
@@ -357,7 +372,7 @@ def set_UIHmask(handlerNum, level, debug_domains, mask):
 
 def getName(e):
     """Returns the name of a class or class instance"""
-    if getattr(e, "__name__", None) == None:
+    if getattr(e, "__name__", None) is None:
         return e.__class__.__name__
     else:
         return e.__name__
@@ -400,6 +415,10 @@ class RecipeEvent(Event):
 class RecipePreFinalise(RecipeEvent):
     """ Recipe Parsing Complete but not yet finalised"""
 
+class RecipePostKeyExpansion(RecipeEvent):
+    """ Recipe Parsing Complete but not yet finalised"""
+
+
 class RecipeTaskPreProcess(RecipeEvent):
     """
     Recipe Tasks about to be finalised
@@ -413,23 +432,6 @@ class RecipeTaskPreProcess(RecipeEvent):
 
 class RecipeParsed(RecipeEvent):
     """ Recipe Parsing Complete """
-
-class StampUpdate(Event):
-    """Trigger for any adjustment of the stamp files to happen"""
-
-    def __init__(self, targets, stampfns):
-        self._targets = targets
-        self._stampfns = stampfns
-        Event.__init__(self)
-
-    def getStampPrefix(self):
-        return self._stampfns
-
-    def getTargets(self):
-        return self._targets
-
-    stampPrefix = property(getStampPrefix)
-    targets = property(getTargets)
 
 class BuildBase(Event):
     """Base class for bitbake build events"""
@@ -536,7 +538,7 @@ class NoProvider(Event):
         extra = ''
         if not self._reasons:
             if self._close_matches:
-                extra = ". Close matches:\n  %s" % '\n  '.join(self._close_matches)
+                extra = ". Close matches:\n  %s" % '\n  '.join(sorted(set(self._close_matches)))
 
         if self._dependees:
             msg = "Nothing %sPROVIDES '%s' (but %s %sDEPENDS on or otherwise requires it)%s" % (r, self._item, ", ".join(self._dependees), r, extra)
@@ -667,6 +669,17 @@ class ReachableStamps(Event):
     def __init__(self, stamps):
         Event.__init__(self)
         self.stamps = stamps
+
+class StaleSetSceneTasks(Event):
+    """
+    An event listing setscene tasks which are 'stale' and will
+    be rerun. The metadata may use to clean up stale data.
+    tasks is a mapping of tasks and matching stale stamps.
+    """
+
+    def __init__(self, tasks):
+        Event.__init__(self)
+        self.tasks = tasks
 
 class FilesMatchingFound(Event):
     """

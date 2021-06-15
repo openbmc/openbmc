@@ -1,0 +1,11 @@
+{
+  "channels": [
+    {
+      "type": "me",
+      "master-path": "/dev/i2c-5",
+      "slave-path": "/dev/ipmb-5",
+      "bmc-addr": 32,
+      "remote-addr": 44
+    }
+  ]
+}

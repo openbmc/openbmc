@@ -1,0 +1,156 @@
+From 0cafb99b57f43cf6ac2c6208718e49ad2dbe462d Mon Sep 17 00:00:00 2001
+From: Jan Schmidt <thaytan@noraisin.net>
+Date: Sun, 10 Nov 2013 00:49:52 +1100
+Subject: [PATCH] Import revision 1206 from upstream to fix PIE build.
+
+Functions MC_put_o_16_arm, MC_put_o_8_arm, MC_put_x_16_arm, MC_put_x_8_arm
+in libmpeg2/motion_comp_arm_s.S have addresses in .text, which is bad
+for shared libraries.  Some environments demand that .text actually be
+read-only all the time, yet MC_put_o_16_arm etc require that the addresses
+be modified by the dynamic linking mechanism (dlopen, LoadLibrary, etc.)
+Even in those environments which permit the dynamic linker to modify the
+.text segment, the runtime cost of doing the relocation can be noticeable.
+
+This commit rewrites the linkage, discarding the tables of addresses
+in favor of tables of offsets.  All transfers are local within each individual
+function, so there can be no interference by processing that occurs
+after assembly, such as link-time re-ordering (even of individual functions.)
+
+Patch by John Reiser <jreiser@bitwagon.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [https://code.videolan.org/videolan/libmpeg2/commit/946bf4b518aacc224f845e73708f99e394744499]
+---
+ libmpeg2/motion_comp_arm_s.S | 70 +++++++++++++++++-------------------
+ 1 file changed, 33 insertions(+), 37 deletions(-)
+
+diff --git a/libmpeg2/motion_comp_arm_s.S b/libmpeg2/motion_comp_arm_s.S
+index c921f7c..82143f8 100644
+--- a/libmpeg2/motion_comp_arm_s.S
++++ b/libmpeg2/motion_comp_arm_s.S
+@@ -30,9 +30,13 @@ MC_put_o_16_arm:
+ 	pld [r1]
+         stmfd sp!, {r4-r11, lr} @ R14 is also called LR
+ 	and r4, r1, #3
+-	adr r5, MC_put_o_16_arm_align_jt
+-	add r5, r5, r4, lsl #2
+-	ldr pc, [r5]
++	ldrb r4, [pc, r4]
++	add pc, pc, r4, lsl #2
++	.byte (MC_put_o_16_arm_align0 - 0f)>>2
++	.byte (MC_put_o_16_arm_align1 - 0f)>>2
++	.byte (MC_put_o_16_arm_align2 - 0f)>>2
++	.byte (MC_put_o_16_arm_align3 - 0f)>>2
++0:
+ 
+ MC_put_o_16_arm_align0:
+ 	ldmia r1, {r4-r7}
+@@ -76,11 +80,6 @@ MC_put_o_16_arm_align3:
+ 1:	PROC(24)
+ 	bne 1b
+         ldmfd sp!, {r4-r11, pc} @@ update PC with LR content.
+-MC_put_o_16_arm_align_jt:
+-	.word MC_put_o_16_arm_align0
+-	.word MC_put_o_16_arm_align1
+-	.word MC_put_o_16_arm_align2
+-	.word MC_put_o_16_arm_align3
+ 
+ @ ----------------------------------------------------------------
+ 	.align
+@@ -91,9 +90,14 @@ MC_put_o_8_arm:
+ 	pld [r1]
+         stmfd sp!, {r4-r10, lr} @ R14 is also called LR
+ 	and r4, r1, #3
+-	adr r5, MC_put_o_8_arm_align_jt
+-	add r5, r5, r4, lsl #2
+-	ldr pc, [r5]
++	ldrb r4, [pc, r4]
++	add pc, pc, r4, lsl #2
++	.byte (MC_put_o_8_arm_align0 - 0f)>>2
++	.byte (MC_put_o_8_arm_align1 - 0f)>>2
++	.byte (MC_put_o_8_arm_align2 - 0f)>>2
++	.byte (MC_put_o_8_arm_align3 - 0f)>>2
++0:
++
+ MC_put_o_8_arm_align0:
+ 	ldmia r1, {r4-r5}
+ 	add r1, r1, r2
+@@ -135,12 +139,6 @@ MC_put_o_8_arm_align3:
+ 	bne 1b
+         ldmfd sp!, {r4-r10, pc} @@ update PC with LR content.
+ 
+-MC_put_o_8_arm_align_jt:
+-	.word MC_put_o_8_arm_align0
+-	.word MC_put_o_8_arm_align1
+-	.word MC_put_o_8_arm_align2
+-	.word MC_put_o_8_arm_align3
+-
+ @ ----------------------------------------------------------------
+ .macro	AVG_PW rW1, rW2
+ 	mov \rW2, \rW2, lsl #24
+@@ -160,12 +158,17 @@ MC_put_x_16_arm:
+ 	@@ void func(uint8_t * dest, const uint8_t * ref, int stride, int height)
+ 	pld [r1]
+         stmfd sp!, {r4-r11,lr} @ R14 is also called LR
++	ldr r11, 0f
+ 	and r4, r1, #3
+-	adr r5, MC_put_x_16_arm_align_jt
+-	ldr r11, [r5]
+ 	mvn r12, r11
+-	add r5, r5, r4, lsl #2
+-	ldr pc, [r5, #4]
++	ldrb r4, [pc, r4]
++	add pc, pc, r4, lsl #2
++	.byte (MC_put_x_16_arm_align0 - 0f)>>2
++	.byte (MC_put_x_16_arm_align1 - 0f)>>2
++	.byte (MC_put_x_16_arm_align2 - 0f)>>2
++	.byte (MC_put_x_16_arm_align3 - 0f)>>2
++0:
++	  .word 0x01010101
+ 
+ .macro	ADJ_ALIGN_QW shift, R0, R1, R2, R3, R4
+ 	mov \R0, \R0, lsr #(\shift)
+@@ -238,12 +241,6 @@ MC_put_x_16_arm_align3:
+ 	add r0, r0, r2
+ 	bne 1b
+         ldmfd sp!, {r4-r11,pc} @@ update PC with LR content.
+-MC_put_x_16_arm_align_jt:
+-	.word 0x01010101
+-	.word MC_put_x_16_arm_align0
+-	.word MC_put_x_16_arm_align1
+-	.word MC_put_x_16_arm_align2
+-	.word MC_put_x_16_arm_align3
+ 
+ @ ----------------------------------------------------------------
+ 	.align
+@@ -253,12 +250,17 @@ MC_put_x_8_arm:
+ 	@@ void func(uint8_t * dest, const uint8_t * ref, int stride, int height)
+ 	pld [r1]
+         stmfd sp!, {r4-r11,lr} @ R14 is also called LR
++	ldr r11, 0f
+ 	and r4, r1, #3
+-	adr r5, MC_put_x_8_arm_align_jt
+-	ldr r11, [r5]
+ 	mvn r12, r11
+-	add r5, r5, r4, lsl #2
+-	ldr pc, [r5, #4]
++	ldrb r4, [pc, r4]
++	add pc, pc, r4, lsl #2
++	.byte (MC_put_x_8_arm_align0 - 0f)>>2
++	.byte (MC_put_x_8_arm_align1 - 0f)>>2
++	.byte (MC_put_x_8_arm_align2 - 0f)>>2
++	.byte (MC_put_x_8_arm_align3 - 0f)>>2
++0:
++	  .word 0x01010101
+ 
+ .macro	ADJ_ALIGN_DW shift, R0, R1, R2
+ 	mov \R0, \R0, lsr #(\shift)
+@@ -319,9 +321,3 @@ MC_put_x_8_arm_align3:
+ 	add r0, r0, r2
+ 	bne 1b
+         ldmfd sp!, {r4-r11,pc} @@ update PC with LR content.
+-MC_put_x_8_arm_align_jt:
+-	.word 0x01010101
+-	.word MC_put_x_8_arm_align0
+-	.word MC_put_x_8_arm_align1
+-	.word MC_put_x_8_arm_align2
+-	.word MC_put_x_8_arm_align3

@@ -42,14 +42,14 @@ if [ -d "$mountpoint" ]; then
     if ! mount -t overlay overlay -olowerdir="$mountpoint",upperdir="$spec",workdir="$overlay_workdir" "$mountpoint" > /dev/null 2>&1; then
 
         if [ "$specdir_existed" != "yes" ]; then
-            cp -pPR "$mountpoint"/. "$spec/"
+            cp -aPR "$mountpoint"/. "$spec/"
         fi
 
         mount -o "bind$options" "$spec" "$mountpoint"
     fi
 elif [ -f "$mountpoint" ]; then
     if [ ! -f "$spec" ]; then
-        cp -pP "$mountpoint" "$spec"
+        cp -aP "$mountpoint" "$spec"
     fi
 
     mount -o "bind$options" "$spec" "$mountpoint"

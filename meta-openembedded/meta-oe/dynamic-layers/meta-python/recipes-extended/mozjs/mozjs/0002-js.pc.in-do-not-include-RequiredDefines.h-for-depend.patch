@@ -1,0 +1,33 @@
+From 0a61b0b98c152f10404ccbdeeac583a486638a7a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@googlemail.com>
+Date: Thu, 6 Jun 2013 18:36:01 +0200
+Subject: [PATCH] js.pc.in: do not include RequiredDefines.h for depending
+ packages
+
+in our cross environment the would fail with:
+
+| cc1: fatal error: /usr/include/js-17.0/js/RequiredDefines.h: No such file or directory
+
+and currently it only defines __STDC_LIMIT_MACROS
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+
+Rebase to 52.8.1
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ js/src/build/js.pc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/js/src/build/js.pc.in b/js/src/build/js.pc.in
+index 2eae393..c2dea62 100644
+--- a/js/src/build/js.pc.in
++++ b/js/src/build/js.pc.in
+@@ -8,4 +8,4 @@ Description: The Mozilla library for JavaScript
+ Version: @MOZILLA_VERSION@
+ @PKGCONF_REQUIRES_PRIVATE@
+ Libs: -L${libdir} -l@JS_LIBRARY_NAME@
+-Cflags: -include ${includedir}/@JS_LIBRARY_NAME@/js/RequiredDefines.h -I${includedir}/@JS_LIBRARY_NAME@
++Cflags: -I${includedir}/@JS_LIBRARY_NAME@
+-- 
+2.7.4
+

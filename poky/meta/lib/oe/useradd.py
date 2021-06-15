@@ -1,3 +1,6 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
 import argparse
 import re
 
@@ -11,7 +14,7 @@ class myArgumentParser(argparse.ArgumentParser):
         error(message)
 
     def error(self, message):
-        raise bb.build.FuncFailed(message)
+        bb.fatal(message)
 
 def split_commands(params):
     params = re.split('''[ \t]*;[ \t]*(?=(?:[^'"]|'[^']*'|"[^"]*")*$)''', params.strip())

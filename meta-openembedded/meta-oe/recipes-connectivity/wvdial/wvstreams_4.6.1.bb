@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=55ca817ccb7d5b5b66355690e9abc605"
 DEPENDS = "zlib openssl (>= 0.9.8) dbus readline"
 DEPENDS_append_libc-musl = " argp-standalone libexecinfo"
 
-SRC_URI = "http://${BPN}.googlecode.com/files/${BP}.tar.gz \
+SRC_URI = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${BPN}/${BP}.tar.gz \
            file://04_signed_request.diff \
            file://05_gcc.diff \
            file://06_gcc-4.7.diff \
@@ -15,7 +15,6 @@ SRC_URI = "http://${BPN}.googlecode.com/files/${BP}.tar.gz \
            file://gcc-6.patch \
            file://argp.patch \
            file://0001-Check-for-limits.h-during-configure.patch \
-           file://0002-wvtask-Dont-use-ucontext-on-non-glibc-systems.patch \
            file://0003-wvtask-Check-for-HAVE_LIBC_STACK_END-only-on-glibc-s.patch \
            file://0004-wvcrash-Replace-use-of-basename-API.patch \
            file://0005-check-for-libexecinfo-during-configure.patch \
@@ -23,10 +22,13 @@ SRC_URI = "http://${BPN}.googlecode.com/files/${BP}.tar.gz \
            file://0002-wvrules.mk-Use-_DEFAULT_SOURCE.patch \
            file://openssl-buildfix.patch \
            file://0001-Forward-port-to-OpenSSL-1.1.x.patch \
+           file://0001-Fix-narrowing-conversion-error.patch \
            "
 
 SRC_URI[md5sum] = "2760dac31a43d452a19a3147bfde571c"
 SRC_URI[sha256sum] = "8403f5fbf83aa9ac0c6ce15d97fd85607488152aa84e007b7d0621b8ebc07633"
+
+COMPATIBLE_HOST_libc-musl = "null"
 
 inherit autotools-brokensep pkgconfig
 

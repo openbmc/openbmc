@@ -1,0 +1,31 @@
+This fixes
+../screen-4.6.2/pty.c: In function 'OpenPTY':
+../screen-4.6.2/pty.c:328:7: warning: implicit declaration of function 'openpty'; did you mean 'openat'? [-Wimplicit-function-declaration]
+   if (openpty(&f, &s, TtyName, NULL, NULL) != 0)
+       ^~~~~~~
+
+Signed-off-by: Amadeusz Sławiński <amade@asmblr.net>
+Signed-off-by: Adrian Bunk <bunk@stusta.de>
+Upstream-Status: Backport
+
+---
+ pty.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/pty.c b/pty.c
+index 1c0660e..502338f 100644
+--- a/pty.c
++++ b/pty.c
+@@ -47,11 +47,7 @@
+ # include <sys/ttold.h>
+ #endif
+ 
+-#ifdef ISC
+-# include <sys/tty.h>
+-# include <sys/sioctl.h>
+-# include <sys/pty.h>
+-#endif
++#include <pty.h>
+ 
+ #ifdef sgi
+ # include <sys/sysmacros.h>

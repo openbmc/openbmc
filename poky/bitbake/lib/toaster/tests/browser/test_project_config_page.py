@@ -1,28 +1,13 @@
-#! /usr/bin/env python
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
+#! /usr/bin/env python3
 #
 # BitBake Toaster Implementation
 #
 # Copyright (C) 2013-2016 Intel Corporation
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import re
-
-from django.core.urlresolvers import reverse
-from django.utils import timezone
+from django.urls import reverse
 from tests.browser.selenium_helpers import SeleniumTestCase
 
 from orm.models import BitbakeVersion, Release, Project, ProjectVariable
@@ -229,3 +214,4 @@ class TestProjectConfigsPage(SeleniumTestCase):
         hidden_element = self.driver.find_element_by_id('hintError-sstate_dir')
         self.assertEqual(hidden_element.is_displayed(), False,
             'sstate directory path valid but treated as invalid')
+

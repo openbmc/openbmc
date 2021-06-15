@@ -1,0 +1,47 @@
+From f0420b201f2fb5286ccf5657faa6b38cd2680e10 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 8 Apr 2021 14:08:06 +0800
+Subject: [PATCH 2/2] support to override /usr/bin/arch-test
+
+Upstream-Status: Submitted [https://salsa.debian.org/installer-team/debootstrap/-/merge_requests/55]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ debootstrap | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/debootstrap b/debootstrap
+index 9b9e58d..a3cf3af 100755
+--- a/debootstrap
++++ b/debootstrap
+@@ -51,6 +51,10 @@ INRELEASE_PATH=""
+ DEF_MIRROR="http://deb.debian.org/debian"
+ DEF_HTTPS_MIRROR="https://deb.debian.org/debian"
+ 
++if [ -z "$ARCH_TEST" ]; then
++	ARCH_TEST="/usr/bin/arch-test"
++fi
++
+ # set $CONTAINER
+ detect_container
+ 
+@@ -645,12 +649,12 @@ fi
+ 
+ ###########################################################################
+ 
+-if [ -x /usr/bin/arch-test ] && am_doing_phase second_stage; then
++if [ -x ${ARCH_TEST} ] && am_doing_phase second_stage; then
+ 	if doing_variant fakechroot; then
+-		ret=0; arch-test "$ARCH" || ret=$?
++		ret=0; ${ARCH_TEST} "$ARCH" || ret=$?
+ 	# Avoid failure with old arch-test package
+-	elif arch-test --version > /dev/null 2>&1; then
+-		ret=0; arch-test -c "$TARGET" "$ARCH" || ret=$?
++	elif ${ARCH_TEST} --version > /dev/null 2>&1; then
++		ret=0; ${ARCH_TEST} -c "$TARGET" "$ARCH" || ret=$?
+ 	else
+ 		ret=3
+ 	fi
+-- 
+2.17.1
+

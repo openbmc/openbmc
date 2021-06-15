@@ -1,0 +1,9 @@
+#!/bin/sh
+
+/usr/libexec/libinput/libinput-test-suite -j1
+if [ $? -eq 0 ]; then
+  echo 'PASS: libinput-test-suite'
+else
+  echo 'FAIL: libinput-test-suite'
+fi
+

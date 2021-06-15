@@ -1,6 +1,8 @@
+#
 # Copyright (C) 2015 Intel Corporation
 #
-# Released under the MIT license (see COPYING.MIT)
+# SPDX-License-Identifier: MIT
+#
 
 # This module provides a class for starting qemu images of poky tiny.
 # It's used by testimage.bbclass.
@@ -17,7 +19,7 @@ from .qemurunner import QemuRunner
 
 class QemuTinyRunner(QemuRunner):
 
-    def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, kernel, boottime, logger):
+    def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, kernel, boottime, logger, tmpfsdir=None):
 
         # Popen object for runqemu
         self.runqemu = None
@@ -35,6 +37,7 @@ class QemuTinyRunner(QemuRunner):
         self.deploy_dir_image = deploy_dir_image
         self.logfile = logfile
         self.boottime = boottime
+        self.tmpfsdir = tmpfsdir
 
         self.runqemutime = 60
         self.socketfile = "console.sock"
@@ -81,6 +84,9 @@ class QemuTinyRunner(QemuRunner):
             return False
         else:
             os.environ["DEPLOY_DIR_IMAGE"] = self.deploy_dir_image
+        if self.tmpfsdir:
+            env["RUNQEMU_TMPFS_DIR"] = self.tmpfsdir
+
 
         # Set this flag so that Qemu doesn't do any grabs as SDL grabs interact
         # badly with screensavers.
@@ -136,7 +142,7 @@ class QemuTinyRunner(QemuRunner):
         #
         # Walk the process tree from the process specified looking for a qemu-system. Return its [pid'cmd]
         #
-        ps = subprocess.Popen(['ps', 'axww', '-o', 'pid,ppid,command'], stdout=subprocess.PIPE).communicate()[0]
+        ps = subprocess.Popen(['ps', 'axww', '-o', 'pid,ppid,pri,ni,command'], stdout=subprocess.PIPE).communicate()[0]
         processes = ps.decode("utf-8").split('\n')
         nfields = len(processes[0].split()) - 1
         pids = {}

@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenBMC Fan Control Daemon
+After=xyz.openbmc_project.nvme.manager.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/fan-control.sh
+Restart=always
+RestartSec=5
+StartLimitInterval=0
+ExecStopPost=/usr/bin/fan-default-speed.sh
+
+[Install]
+WantedBy=basic.target

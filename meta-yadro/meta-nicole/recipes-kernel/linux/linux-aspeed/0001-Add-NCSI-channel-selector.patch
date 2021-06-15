@@ -1,0 +1,131 @@
+From b19111bb23044c9312d13e64dd1df2a9565f6b38 Mon Sep 17 00:00:00 2001
+From: Artem Senichev <a.senichev@yadro.com>
+Date: Wed, 12 Feb 2020 14:05:15 +0300
+Subject: [PATCH] Add NCSI channel selector
+
+NCSI channel number is selected depending on GPIO state of a pin
+described in the device tree (gpio/nsci_cfg node).
+Currently, this pin is controlled via MCU, and its state represents
+Nicole's physical position inside a fabric.
+
+Channel selector scheme:
+* GPIO pin value is 0: channel 0;
+* GPIO pin value is 1: channel 1;
+* invalid configuration or error: channel 0.
+
+After changing pin's state it is necessary to reboot the BMC to apply
+new channel number.
+
+Signed-off-by: Artem Senichev <a.senichev@yadro.com>
+---
+ net/ncsi/ncsi-rsp.c | 80 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 79 insertions(+), 1 deletion(-)
+
+diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
+index d876bd55f356..d211a7e64b14 100644
+--- a/net/ncsi/ncsi-rsp.c
++++ b/net/ncsi/ncsi-rsp.c
+@@ -9,6 +9,9 @@
+ #include <linux/netdevice.h>
+ #include <linux/etherdevice.h>
+ #include <linux/skbuff.h>
++#include <linux/of.h>
++#include <linux/gpio.h>
++#include <linux/gpio/consumer.h>
+ 
+ #include <net/ncsi.h>
+ #include <net/net_namespace.h>
+@@ -19,6 +22,81 @@
+ #include "ncsi-pkt.h"
+ #include "ncsi-netlink.h"
+ 
++/* NSCI channel number, used as default in case of errors. */
++#define NCSI_DEFAULT_CHANNEL 0
++
++/* Predicate for gpiochip_find() call. */
++static int device_match(struct gpio_chip* chip, void* data)
++{
++	const struct device_node *node = data;
++	return chip->of_node == node;
++}
++
++/**
++ * ncsi_select_channel() - Get channel number for NCSI.
++ * @dev: Network device.
++ *
++ * NCSI channel number is selected depending on GPIO state of a pin
++ * described in the device tree (gpio/nsci_cfg node).
++ *
++ * Return: channel number.
++ */
++static int ncsi_select_channel(const struct net_device* dev)
++{
++	static int channel_id = -1;
++	struct device_node* node = NULL;
++
++	while (channel_id < 0) {
++		struct gpio_chip* chip;
++		const struct gpio_desc* desc;
++		u32 pin;
++		int rc;
++
++		/* Read NCSI configuration node from device tree */
++		node = of_find_node_by_name(NULL, "ncsi_cfg");
++		if (!node) {
++			netdev_err(dev, "NCSI: Configuration node not found\n");
++			break;
++		}
++
++		/* Read GPIO pin configuration */
++		rc = of_property_read_u32_index(node, "gpios", 0, &pin);
++		if (rc) {
++			netdev_err(dev, "NCSI: GPIO configuration not found\n");
++			break;
++		}
++
++		/* Find GPIO chip */
++		chip = gpiochip_find(node->parent, device_match);
++		if (!chip) {
++			netdev_err(dev, "NCSI: GPIO chip not found\n");
++			break;
++		}
++
++		/* Read GPIO state */
++		desc = gpio_to_desc(chip->base + pin);
++		if (!desc) {
++			netdev_err(dev, "NCSI: Cannot get GPIO descriptor\n");
++			break;
++		}
++		channel_id = gpiod_get_value(desc);
++		if (channel_id < 0) {
++			netdev_err(dev, "NCSI: GPIO read error %d\n", channel_id);
++		}
++		break;
++	}
++
++	if (node) {
++		of_node_put(node);
++	}
++	if (channel_id < 0) {
++		channel_id = NCSI_DEFAULT_CHANNEL;
++	}
++	netdev_info(dev, "NCSI: Set channel %d\n", channel_id);
++
++	return channel_id;
++}
++
+ static int ncsi_validate_rsp_pkt(struct ncsi_request *nr,
+ 				 unsigned short payload)
+ {
+@@ -87,7 +165,7 @@ static int ncsi_rsp_handler_cis(struct ncsi_request *nr)
+ 		if (ndp->flags & NCSI_DEV_PROBED)
+ 			return -ENXIO;
+ 
+-		id = NCSI_CHANNEL_INDEX(rsp->rsp.common.channel);
++		id = ncsi_select_channel(ndp->ndev.dev);
+ 		nc = ncsi_add_channel(np, id);
+ 	}
+ 
+-- 
+2.25.0
+

@@ -1,0 +1,109 @@
+From 071a9d71bea91bbefcf15e061fc87e53568f3188 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sat, 13 Feb 2021 00:45:56 +0000
+Subject: [PATCH 1/3] cmake: disable building external dependencies
+
+- add cmake option to disable the build of the third_party dependencies
+- change the update_build_version.py to use pkg-config when third_party dependencies not found
+
+Upstream-Status: Inappropriate [OE-core specific]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ CMakeLists.txt                | 13 ++++++++++---
+ utils/update_build_version.py | 22 +++++++++++++++-------
+ 2 files changed, 25 insertions(+), 10 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5c74cd8..b358f6b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,6 +41,7 @@ else()
+ endif()
+ 
+ option(SHADERC_ENABLE_WERROR_COMPILE "Enable passing -Werror to compiler, if available" ON)
++option(BUILD_EXTERNAL "Build external dependencies in /third_party" ON)
+ 
+ set (CMAKE_CXX_STANDARD 11)
+ 
+@@ -101,8 +102,14 @@ endif(MSVC)
+ 
+ 
+ # Configure subdirectories.
+-# We depend on these for later projects, so they should come first.
+-add_subdirectory(third_party)
++if(BUILD_EXTERNAL)
++    # We depend on these for later projects, so they should come first.
++    add_subdirectory(third_party)
++else()
++    find_package(PkgConfig REQUIRED)
++    pkg_check_modules (PKG_CHECK REQUIRED SPIRV-Tools)
++    pkg_check_modules (PKG_CHECK REQUIRED glslang)
++endif()
+ 
+ add_subdirectory(libshaderc_util)
+ add_subdirectory(libshaderc)
+@@ -112,7 +119,7 @@ add_subdirectory(examples)
+ add_custom_target(build-version
+   ${PYTHON_EXECUTABLE}
+   ${CMAKE_CURRENT_SOURCE_DIR}/utils/update_build_version.py
+-  ${shaderc_SOURCE_DIR} ${spirv-tools_SOURCE_DIR} ${glslang_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/build-version.inc
++  ${CMAKE_CURRENT_BINARY_DIR}/build-version.inc ${shaderc_SOURCE_DIR} ${spirv-tools_SOURCE_DIR} ${glslang_SOURCE_DIR}
+   COMMENT "Update build-version.inc in the Shaderc build directory (if necessary).")
+ 
+ function(define_pkg_config_file NAME LIBS)
+diff --git a/utils/update_build_version.py b/utils/update_build_version.py
+index 5785390..f72b762 100755
+--- a/utils/update_build_version.py
++++ b/utils/update_build_version.py
+@@ -30,6 +30,7 @@ import re
+ import subprocess
+ import sys
+ import time
++import itertools
+ 
+ def mkdir_p(directory):
+     """Make the directory, and all its ancestors as required.  Any of the
+@@ -121,25 +122,32 @@ def get_version_string(project, directory):
+     directory, which consists of software version string and git description
+     string."""
+     detailed_version_string_lst = [project]
+-    if project != 'glslang':
+-        detailed_version_string_lst.append(deduce_software_version(directory))
+-    detailed_version_string_lst.append(describe(directory).replace('"', '\\"'))
++    if isinstance(directory, str) and os.path.isdir(directory):
++        if project != 'glslang':
++            detailed_version_string_lst.append(deduce_software_version(directory))
++        detailed_version_string_lst.append(describe(directory).replace('"', '\\"'))
++    else:
++        if project == 'spirv-tools':
++            project = 'SPIRV-Tools'
++        pkgconfig = ['pkg-config', '--modversion', project]
++        version = subprocess.run(pkgconfig, capture_output=True, text=True).stdout.rstrip()
++        detailed_version_string_lst.append(version)
+     return ' '.join(detailed_version_string_lst)
+ 
+ 
+ def main():
+-    if len(sys.argv) != 5:
+-        print(('usage: {} <shaderc-dir> <spirv-tools-dir> <glslang-dir> <output-file>'.format(
++    if len(sys.argv) < 3:
++        print(('usage: {} <output-file> <shaderc-dir> [spirv-tools-dir] [glslang-dir]'.format(
+             sys.argv[0])))
+         sys.exit(1)
+ 
+     projects = ['shaderc', 'spirv-tools', 'glslang']
+     new_content = ''.join([
+         '"{}\\n"\n'.format(get_version_string(p, d))
+-        for (p, d) in zip(projects, sys.argv[1:])
++        for (p, d) in itertools.zip_longest(projects, sys.argv[2:])
+     ])
+ 
+-    output_file = sys.argv[4]
++    output_file = sys.argv[1]
+     mkdir_p(os.path.dirname(output_file))
+ 
+     if os.path.isfile(output_file):
+-- 
+2.30.1
+

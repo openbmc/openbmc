@@ -14,7 +14,6 @@ PV = "7.91+git${SRCPV}"
 SRCREV = "c22d359433b333937ee3d803450dc41998115685"
 
 DEPENDS = "elfutils"
-RDEPENDS_${PN} = "elfutils"
 SRC_URI = "git://github.com/sparkleholic/ltrace.git;branch=master;protocol=http \
            file://configure-allow-to-disable-selinux-support.patch \
            file://0001-replace-readdir_r-with-readdir.patch \
@@ -27,7 +26,12 @@ SRC_URI = "git://github.com/sparkleholic/ltrace.git;branch=master;protocol=http 
            file://0001-mips-plt.c-Delete-include-error.h.patch \
            file://0001-move-fprintf-into-same-block-where-modname-and-symna.patch \
            file://0001-hook-Do-not-append-int-to-std-string.patch \
+           file://include_unistd_nr.patch \
+           file://0001-Bug-fix-for-data-type-length-judgment.patch \
+           file://0001-ensure-the-struct-pointers-are-null-initilized.patch \
            "
+SRC_URI_append_libc-musl = " file://add_ppc64le.patch"
+
 S = "${WORKDIR}/git"
 
 inherit autotools
@@ -35,6 +39,9 @@ inherit autotools
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
 PACKAGECONFIG[unwind] = "--with-libunwind,--without-libunwind,libunwind"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux,libselinux"
+
+COMPATIBLE_HOST_riscv64 = "null"
+COMPATIBLE_HOST_riscv32 = "null"
 
 do_configure_prepend () {
     ( cd ${S}; ./autogen.sh )

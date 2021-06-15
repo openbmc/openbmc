@@ -1,0 +1,131 @@
+From b126134f68f4a5bd826141be68337ac15a7c2c04 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 12 Feb 2019 11:58:34 -0800
+Subject: [PATCH 06/10] replace (sym_iterator)0 with sym_iterator()
+
+clang/libc++ find this error
+
+libpp/xml_utils.cpp:409:43: error: calling a private constructor of class 'std::__1::__wrap_iter<const sym
+bol_entry *const *>'
+|                 { lo = hi = 0; name = ""; begin = end = (sym_iterator)0;}
+|                                                         ^
+|
+
+default constructed iterator isn't supposed to be used for anything
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libpp/xml_utils.cpp | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/libpp/xml_utils.cpp b/libpp/xml_utils.cpp
+index 3de41e58..f45d3ae2 100644
+--- a/libpp/xml_utils.cpp
++++ b/libpp/xml_utils.cpp
+@@ -73,7 +73,7 @@ void dump_symbol(string const & prefix, sym_iterator it, bool want_nl = true)
+ 
+ void dump_symbols(string const & prefix, sym_iterator b, sym_iterator e)
+ {
+-	if (b == (sym_iterator)0)
++	if (b == sym_iterator())
+ 		return;
+ 
+ 	for (sym_iterator it = b; it != e; ++it)
+@@ -167,7 +167,7 @@ string xml_utils::get_profile_header(string cpu_name, double const speed)
+ 	}
+ 
+ 	str << init_attr(CPU_NAME, cpu_type) << endl;
+-	if (processor.size() > 0) 
++	if (processor.size() > 0)
+ 		str << init_attr(PROCESSOR, string(processor)) << endl;
+ 	if (nr_cpus > 1) str << init_attr(SEPARATED_CPUS, nr_cpus) << endl;
+ 	str << init_attr(MHZ, speed) << endl;
+@@ -320,11 +320,11 @@ void xml_utils::build_subclasses(ostream & out)
+ 			(*sc_ptr)[new_index].subclass_name = subclass_name;
+ 			out << open_element(CLASS, true);
+ 			out << init_attr(NAME, subclass_name);
+-			if (nr_cpus > 1) 
++			if (nr_cpus > 1)
+ 				out << init_attr(CPU_NUM, pclass.ptemplate.cpu);
+-			if (nr_events > 1) 
++			if (nr_events > 1)
+ 				out << init_attr(EVENT_NUM, event);
+-			if (has_nonzero_masks) 
++			if (has_nonzero_masks)
+ 				out << init_attr(EVENT_MASK, pclass.ptemplate.unitmask);
+ 			out << close_element();
+ 		}
+@@ -406,7 +406,7 @@ xml_utils::output_summary_data(ostream & out, count_array_t const & summary, siz
+ class module_info {
+ public:
+ 	module_info()
+-		{ lo = hi = 0; name = ""; begin = end = (sym_iterator)0;}
++		{ lo = hi = 0; name = ""; begin = end = sym_iterator();}
+ 	void dump();
+ 	void build_module(string const & n, sym_iterator it,
+ 	                  size_t l, size_t h);
+@@ -540,21 +540,21 @@ void module_info::add_to_summary(count_array_t const & counts)
+ 
+ void module_info::set_begin(sym_iterator b)
+ {
+-	if (begin == (sym_iterator)0)
++	if (begin == sym_iterator())
+ 		begin = b;
+ }
+ 
+ 
+ void module_info::set_end(sym_iterator e)
+ {
+-	if (end == (sym_iterator)0)
++	if (end == sym_iterator())
+ 		end = e;
+ }
+ 
+ 
+ bool module_info::is_closed(string const & n)
+ {
+-	return (name == n) && end != (sym_iterator)0;
++	return (name == n) && end != sym_iterator();
+ }
+ 
+ 
+@@ -585,7 +585,7 @@ void module_info::output_summary(ostream & out)
+ 
+ void module_info::output_symbols(ostream & out, bool is_module)
+ {
+-	if (begin == (sym_iterator)0)
++	if (begin == sym_iterator())
+ 		return;
+ 
+ 	for (sym_iterator it = begin; it != end; ++it)
+@@ -606,7 +606,7 @@ void binary_info::close_binary(sym_iterator it)
+ void binary_info::dump()
+ {
+ 	cverb << vxml << "app_name=" << name << endl;
+-	if (begin != (sym_iterator)0)
++	if (begin != sym_iterator())
+ 		dump_symbols("	", begin, end);
+ 
+ 	for (size_t i = 0; i < nr_modules; ++i)
+@@ -648,7 +648,7 @@ add_module_symbol(string const & module, string const & app,
+ 		// mark end of enclosing binary symbols if there have been any
+ 		// NOTE: it is possible for the binary's symbols to follow its
+ 		// module symbols
+-		if (begin != (sym_iterator)0 && end == (sym_iterator)0)
++		if (begin != sym_iterator() && end == sym_iterator())
+ 			set_end(it);
+ 
+ 		// build the new module
+@@ -718,7 +718,7 @@ summarize_processes(extra_images const & extra_found_images)
+ {
+ 	// add modules to the appropriate threads in the process hierarchy
+ 	for (sym_iterator it = symbols_begin ; it != symbols_end; ++it) {
+-		string binary = get_image_name((*it)->app_name, 
++		string binary = get_image_name((*it)->app_name,
+ 			image_name_storage::int_filename, extra_found_images);
+ 		string module = get_image_name((*it)->image_name,
+ 			image_name_storage::int_filename, extra_found_images);
+-- 
+2.31.0
+

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# remove any stale lock files so that the calls to groupadd/useradd don't stop
+# the ptest if re-using the same image
+rm -rf /etc/passwd.lock /etc/group.lock /etc/gshadow.lock
+
+COREUTILSLIB=@libdir@/coreutils
+LOG="${COREUTILSLIB}/ptest/coreutils_ptest_$(date +%Y%m%d-%H%M%S).log"
+USERNAME="tester"
+groupadd ugroup1
+groupadd ugroup2
+useradd -G ugroup1,ugroup2 $USERNAME || echo "user $USERNAME already exists"
+
+su tester -c "cd ${COREUTILSLIB}/ptest && make check-TESTS top_srcdir=. srcdir=." 2>&1 | tee -a ${LOG}
+userdel $USERNAME 
+groupdel ugroup1
+groupdel ugroup2

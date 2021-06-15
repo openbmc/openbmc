@@ -2,25 +2,31 @@ SUMMARY = "A robust, scalable, and reliable SQL server"
 HOMEPAGE = "http://mariadb.org"
 SECTION = "libs"
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
+LIC_FILES_CHKSUM = "file://COPYING;md5=b1becf0cfa3366e0f4d854d1d264f311"
 
-SRC_URI = "https://downloads.mariadb.org/interstitial/${BPN}-${PV}/source/${BPN}-${PV}.tar.gz \
+SRC_URI = "https://downloads.mariadb.org/interstitial/${BP}/source/${BP}.tar.gz \
            file://my.cnf \
            file://mysqld.service \
            file://install_db.service \
            file://install_db \
            file://mysql-systemd-start \
            file://configure.cmake-fix-valgrind.patch \
-           file://fix-a-building-failure.patch \
            file://support-files-CMakeLists.txt-fix-do_populate_sysroot.patch \
            file://sql-CMakeLists.txt-fix-gen_lex_hash-not-found.patch \
            file://0001-disable-ucontext-on-musl.patch \
            file://c11_atomics.patch \
            file://clang_version_header_conflict.patch \
            file://fix-arm-atomic.patch \
+           file://0001-Fix-library-LZ4-lookup.patch \
+           file://0001-innobase-Define-__NR_futex-if-it-does-not-exist.patch \
+           file://0001-aio_linux-Check-if-syscall-exists-before-using-it.patch \
+           file://sys_futex.patch \
+           file://cross-compiling.patch \
+           file://ssize_t.patch \
           "
-SRC_URI[md5sum] = "603ce42e35b9a688f2cca05275acb5cb"
-SRC_URI[sha256sum] = "b2aa857ef5b84f85a7ea60a1eac7b34c0ca5151c71a0d44ce2d7fb028d71459a"
+SRC_URI_append_libc-musl = " file://ppc-remove-glibc-dep.patch"
+
+SRC_URI[sha256sum] = "a5ff32f9fcaaf26bf5cba94accc7b246d2d5eb75710d027e40122df6bac0babb"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 
@@ -28,7 +34,10 @@ S = "${WORKDIR}/mariadb-${PV}"
 
 BINCONFIG_GLOB = "mysql_config"
 
-inherit cmake gettext binconfig update-rc.d useradd systemd
+inherit cmake gettext binconfig update-rc.d useradd systemd multilib_script
+
+MULTILIB_SCRIPTS = "${PN}-server:${bindir}/mariadbd-safe \
+                    ${PN}-server:${bindir}/mariadb-install-db"
 
 INITSCRIPT_PACKAGES = "${PN}-server ${PN}-setupdb"
 INITSCRIPT_NAME_${PN}-server = "mysqld"
@@ -56,9 +65,9 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)} setupdb"
 PACKAGECONFIG_class-native = ""
 PACKAGECONFIG[pam] = ",-DWITHOUT_AUTH_PAM=TRUE,libpam"
 PACKAGECONFIG[valgrind] = "-DWITH_VALGRIND=TRUE,-DWITH_VALGRIND=FALSE,valgrind"
-PACKAGECONFIG[libedit] = "-DLIBEDIT_INTERFACE=TRUE,-DLIBEDIT_INTERFACE=FALSE,libedit"
 PACKAGECONFIG[krb5] = ", ,krb5"
 PACKAGECONFIG[setupdb] = ", ,,${PN}-setupdb"
+PACKAGECONFIG[zstd] = "-DWITH_ROCKSDB_ZSTD=ON,-DWITH_ROCKSDB_ZSTD=OFF,zstd"
 
 # MariaDB doesn't link properly with gold
 # https://mariadb.atlassian.net/browse/MDEV-5982
@@ -75,6 +84,7 @@ EXTRA_OECMAKE = "-DWITH_EMBEDDED_SERVER=ON \
                  -DNROFF=FALSE \
                  -DENABLE_DTRACE=FALSE \
                  -DWITH_PIC=ON \
+                 -DWITH_PCRE=system \
                  -DINSTALL_LAYOUT=RPM \
                  -DINSTALL_DOCDIR:PATH=${datadir}/doc/${BPN} \
                  -DINSTALL_LIBDIR:PATH=${baselib} \
@@ -165,6 +175,14 @@ do_install() {
     if [ -f ${D}${datadir}/doc/README ]; then
         mv ${D}${datadir}/doc/README ${D}${datadir}/doc/${PN}/
     fi
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
+        pam_so=$(find ${D} -name pam_user_map.so)
+        if [ x"${pam_so}" != x ]; then
+            pam_dir=$(dirname ${pam_so})
+            mv ${pam_dir} ${D}/${libdir}
+            rmdir --ignore-fail-on-non-empty ${pam_dir%security}
+        fi
+    fi
 }
 
 PACKAGES = "${PN}-dbg ${PN} \
@@ -232,75 +250,87 @@ FILES_libmysqld-dev = "\
 FILES_${PN}-client = "\
     ${bindir}/myisam_ftdump \
     ${bindir}/mysql \
+    ${bindir}/mariadb \
     ${bindir}/mysql_client_test \
+    ${bindir}/mariadb-client-test \
     ${bindir}/mysql_client_test_embedded \
+    ${bindir}/mariadb-client-test-embedded \
     ${bindir}/mysql_find_rows \
+    ${bindir}/mariadb-find-rows \
     ${bindir}/mysql_fix_extensions \
+    ${bindir}/mariadb-fix-extensions \
     ${bindir}/mysql_waitpid \
+    ${bindir}/mariadb-waitpid \
     ${bindir}/mysqlaccess \
+    ${bindir}/mariadb-access \
     ${bindir}/mysqladmin \
-    ${bindir}/mysqlbug \
+    ${bindir}/mariadb-admin \
     ${bindir}/mysqlcheck \
+    ${bindir}/mariadb-check \
     ${bindir}/mysqldump \
+    ${bindir}/mariadb-dump \
     ${bindir}/mysqldumpslow \
+    ${bindir}/mariadb-dumpslow \
     ${bindir}/mysqlimport \
+    ${bindir}/mariadb-import \
     ${bindir}/mysqlshow \
+    ${bindir}/mariadb-show \
     ${bindir}/mysqlslap \
+    ${bindir}/mariadb-slap \
     ${bindir}/mysqltest_embedded \
+    ${bindir}/mariadb-test-embedded \
     ${libexecdir}/mysqlmanager \
     ${sysconfdir}/my.cnf.d/mysql-clients.cnf"
 
 FILES_${PN}-server = "\
-    ${bindir}/comp_err \
-    ${bindir}/isamchk \
-    ${bindir}/isamlog \
     ${bindir}/msql2mysql \
     ${bindir}/my_print_defaults \
     ${bindir}/myisamchk \
     ${bindir}/myisamlog \
     ${bindir}/myisampack \
     ${bindir}/mysql_convert_table_format \
-    ${bindir}/mysql_fix_privilege_tables \
+    ${bindir}/mariadb-convert-table-format \
     ${bindir}/mysql_install_db \
+    ${bindir}/mariadb-install-db \
     ${bindir}/mysql_secure_installation \
+    ${bindir}/mariadb-secure-installation \
     ${bindir}/mysql_setpermission \
+    ${bindir}/mariadb-setpermission \
     ${bindir}/mysql-systemd-start \
     ${bindir}/mysql_tzinfo_to_sql \
+    ${bindir}/mariadb-tzinfo-to-sql \
     ${bindir}/mysql_upgrade \
+    ${bindir}/mariadb-upgrade \
     ${bindir}/mysql_plugin \
-    ${bindir}/mysql_zap \
+    ${bindir}/mariadb-plugin \
     ${bindir}/mysqlbinlog \
+    ${bindir}/mariadb-binlog \
     ${bindir}/mysqld_multi \
+    ${bindir}/mariadbd-multi \
+    ${bindir}/mariadbd-safe \
     ${bindir}/mysqld_safe \
     ${bindir}/mysqld_safe_helper \
+    ${bindir}/mariadbd-safe-helper \
     ${bindir}/mysqlhotcopy \
+    ${bindir}/mariadb-hotcopy \
     ${bindir}/mysqltest \
-    ${bindir}/ndb_delete_all \
-    ${bindir}/ndb_desc \
-    ${bindir}/ndb_drop_index \
-    ${bindir}/ndb_drop_table \
-    ${bindir}/ndb_mgm \
-    ${bindir}/ndb_restore \
-    ${bindir}/ndb_select_all \
-    ${bindir}/ndb_select_count \
-    ${bindir}/ndb_show_tables \
-    ${bindir}/ndb_waiter \
-    ${bindir}/pack_isam \
+    ${bindir}/mariadb-test \
     ${bindir}/perror \
     ${bindir}/replace \
     ${bindir}/resolve_stack_dump \
     ${bindir}/resolveip \
     ${libexecdir}/mysqld \
     ${sbindir}/mysqld \
-    ${sbindir}/ndb_cpcd \
-    ${sbindir}/ndbd \
-    ${sbindir}/ndb_mgmd \
+    ${sbindir}/mariadbd \
     ${libdir}/plugin/*.so \
+    ${libdir}/security/*.so \
+    ${libdir}/plugin/auth_pam_tool_dir/auth_pam_tool \
     ${datadir}/mysql/ \
     ${localstatedir}/mysql/ \
     ${sysconfdir}/init.d/mysqld \
     ${sysconfdir}/my.cnf \
     ${sysconfdir}/my.cnf.d/server.cnf \
+    ${sysconfdir}/security/user_map.conf \
     ${sysconfdir}/tmpfiles.d"
 
 DESCRIPTION_${PN}-leftovers = "unpackaged and probably unneeded files for ${PN}"

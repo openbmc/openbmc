@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-EXTRA_OECONF_append_f0b = " --enable-negative-errno-on-fail"
+EXTRA_OEMESON_append_f0b = " -Dnegative-errno-on-fail=true"
 
 NAME = " \
         bus@1e78a000/i2c-bus@80/tmp421@4c \

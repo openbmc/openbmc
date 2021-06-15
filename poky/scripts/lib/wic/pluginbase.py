@@ -1,19 +1,9 @@
-#!/usr/bin/env python -tt
+#!/usr/bin/env python3
 #
 # Copyright (c) 2011 Intel, Inc.
 #
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; version 2 of the License
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-# for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc., 59
-# Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 __all__ = ['ImagerPlugin', 'SourcePlugin']
 
@@ -28,7 +18,7 @@ from wic.misc import get_bitbake_var
 
 PLUGIN_TYPES = ["imager", "source"]
 
-SCRIPTS_PLUGIN_DIR = "scripts/lib/wic/plugins"
+SCRIPTS_PLUGIN_DIR = ["scripts/lib/wic/plugins", "lib/wic/plugins"]
 
 logger = logging.getLogger('wic')
 
@@ -48,10 +38,11 @@ class PluginMgr:
             cls._plugin_dirs = [os.path.join(os.path.dirname(__file__), 'plugins')]
             layers = get_bitbake_var("BBLAYERS") or ''
             for layer_path in layers.split():
-                path = os.path.join(layer_path, SCRIPTS_PLUGIN_DIR)
-                path = os.path.abspath(os.path.expanduser(path))
-                if path not in cls._plugin_dirs and os.path.isdir(path):
-                    cls._plugin_dirs.insert(0, path)
+                for script_plugin_dir in SCRIPTS_PLUGIN_DIR:
+                    path = os.path.join(layer_path, script_plugin_dir)
+                    path = os.path.abspath(os.path.expanduser(path))
+                    if path not in cls._plugin_dirs and os.path.isdir(path):
+                        cls._plugin_dirs.insert(0, path)
 
         if ptype not in PLUGINS:
             # load all ptype plugins

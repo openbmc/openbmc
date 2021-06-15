@@ -1,0 +1,42 @@
+From de9639baac792327c701e509258b8a13f6959e82 Mon Sep 17 00:00:00 2001
+From: Danilo Spinella <danyspin97@protonmail.com>
+Date: Thu, 21 Mar 2019 14:19:26 +0100
+Subject: [PATCH] Add W_EXITCODE macro for non-glibc systems
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Submitted [1]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
+[1] https://gitlab.gnome.org/GNOME/vte/issues/72
+
+---
+ src/missing.hh | 4 ++++
+ src/widget.cc  | 1 +
+ 2 files changed, 5 insertions(+)
+
+--- a/src/missing.hh
++++ b/src/missing.hh
+@@ -24,6 +24,10 @@
+ #define NSIG (8 * sizeof(sigset_t))
+ #endif
+ 
++#ifndef W_EXITCODE
++#define W_EXITCODE(ret, sig) ((ret) << 8 | (sig))
++#endif
++
+ #ifndef HAVE_FDWALK
+ int fdwalk(int (*cb)(void* data, int fd),
+            void* data);
+--- a/src/widget.cc
++++ b/src/widget.cc
+@@ -21,6 +21,7 @@
+ #include "widget.hh"
+ 
+ #include <sys/wait.h> // for W_EXITCODE
++#include "missing.hh" // for W_EXITCODE on non-glibc systems
+ 
+ #include <exception>
+ #include <new>

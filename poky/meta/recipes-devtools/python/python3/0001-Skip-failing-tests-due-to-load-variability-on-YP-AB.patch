@@ -1,0 +1,53 @@
+From 0b25b66d4f54bd74615c9ff10f3fae8f0d1c548d Mon Sep 17 00:00:00 2001
+From: Yi Fan Yu <yifan.yu@windriver.com>
+Date: Thu, 1 Apr 2021 13:08:37 -0700
+Subject: [PATCH] Skip failing tests due to load variability on YP AB
+
+
+Skip these tests until AB-INT is solved.
+
+[YOCTO #14296]
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
+---
+ Lib/test/_test_multiprocessing.py | 2 ++
+ Lib/test/test_time.py             | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/Lib/test/_test_multiprocessing.py b/Lib/test/_test_multiprocessing.py
+index fd3b430..cda29f6 100644
+--- a/Lib/test/_test_multiprocessing.py
++++ b/Lib/test/_test_multiprocessing.py
+@@ -568,6 +568,7 @@ def test_close(self):
+ 
+         close_queue(q)
+ 
++    @unittest.skip('timing related test, dependent on load')
+     def test_many_processes(self):
+         if self.TYPE == 'threads':
+             self.skipTest('test not appropriate for {}'.format(self.TYPE))
+@@ -4715,6 +4716,7 @@ def signal_and_sleep(cls, sem, period):
+         sem.release()
+         time.sleep(period)
+ 
++    @unittest.skip('timing related test, dependent on load')
+     def test_wait_integer(self):
+         from multiprocessing.connection import wait
+ 
+diff --git a/Lib/test/test_time.py b/Lib/test/test_time.py
+index 3258298..adcf407 100644
+--- a/Lib/test/test_time.py
++++ b/Lib/test/test_time.py
+@@ -474,6 +474,7 @@ def test_monotonic(self):
+     def test_perf_counter(self):
+         time.perf_counter()
+ 
++    @unittest.skip('timing related test, dependent on load')
+     def test_process_time(self):
+         # process_time() should not include time spend during a sleep
+         start = time.process_time()
+-- 
+2.17.1
+

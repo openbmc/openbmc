@@ -3,7 +3,7 @@ SUMMARY = "Phosphor certificate manager configuration for an nslcd authority ser
 PR = "r1"
 
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${PHOSPHORBASE}/LICENSE;md5=19407077e42b1ba3d653da313f1f5b4e"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 RDEPENDS_${PN} = "phosphor-certificate-manager"
 
@@ -11,8 +11,10 @@ inherit allarch
 
 SRC_URI = "file://env"
 
+FILES_${PN} = "${datadir}"
+
 do_install() {
-	install -D ${WORKDIR}/env ${D}/${sysconfdir}/default/obmc/cert/authority
+	install -D ${WORKDIR}/env ${D}/${datadir}/phosphor-certificate-manager/authority
 }
 
 pkg_postinst_${PN}() {

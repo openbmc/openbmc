@@ -1,0 +1,43 @@
+#! /bin/sh
+# /etc/init.d/rasdaemon: start rasdaemon service
+
+. /etc/init.d/functions
+
+# Defaults
+PIDFILE=/var/run/rasdaemon.pid
+BINFILE=/usr/sbin/rasdaemon
+SCRIPTNAME=/etc/init.d/rasdaemon
+
+[ -x $BINFILE ] || exit 0
+
+case "$1" in
+	start)
+		echo -n "Starting RASdaemon services: "
+		if [ ! -f "$PIDFILE" ]; then
+			start-stop-daemon --start --quiet --exec $BINFILE -- --enable &> /dev/null
+			start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $BINFILE -- --record
+			pidof $BINFILE > $PIDFILE
+		fi
+		[ -f $PIDFILE ] && echo "done." || echo "fail."
+		;;
+    	stop)
+		echo -n "Stopping RASdaemon services: "
+		if [ -f  "$PIDFILE" ] ; then
+			start-stop-daemon --stop --quiet --pidfile $PIDFILE --exec $BINFILE -- --disable &> /dev/null
+			killproc $BINFILE
+			rm $PIDFILE
+		fi
+		[ ! -f $PIDFILE ] && echo "done." || echo "fail."
+		;;
+	restart)
+		$0 stop
+		sleep 1
+		$0 start
+		;;
+	status)
+		status $BINFILE
+		;;
+	*)
+		echo "Usage: $SCRIPTNAME {start|stop|restart|status}"
+		exit 1
+esac

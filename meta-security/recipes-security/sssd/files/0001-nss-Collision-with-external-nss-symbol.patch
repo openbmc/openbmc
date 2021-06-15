@@ -1,0 +1,78 @@
+From 05c315100a70d3372e891e9a0ea981a875b2ec90 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Michal=20=C5=BDidek?= <mzidek@redhat.com>
+Date: Thu, 27 Feb 2020 06:50:40 +0100
+Subject: [PATCH] nss: Collision with external nss symbol
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+One of our internal static function names started
+to collide with external nss symbol. Additional
+sss_ suffix was added to avoid the collision.
+
+This is needed to unblock Fedora Rawhide's
+SSSD build.
+
+Reviewed-by: Pavel Březina <pbrezina@redhat.com>
+
+Upstream-Status: Backport [https://github.com/SSSD/sssd.git]
+Signed-off-by: Hongxu.jia@windriver.com
+Signed-off-by: Qi.Chen@windriver.com
+---
+ src/responder/nss/nss_cmd.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/src/responder/nss/nss_cmd.c b/src/responder/nss/nss_cmd.c
+index 25e663ed5..a4d4cfc0b 100644
+--- a/src/responder/nss/nss_cmd.c
++++ b/src/responder/nss/nss_cmd.c
+@@ -728,11 +728,13 @@ done:
+     talloc_free(cmd_ctx);
+ }
+ 
+-static void nss_setnetgrent_done(struct tevent_req *subreq);
++static void sss_nss_setnetgrent_done(struct tevent_req *subreq);
+ 
+-static errno_t nss_setnetgrent(struct cli_ctx *cli_ctx,
+-                               enum cache_req_type type,
+-                               nss_protocol_fill_packet_fn fill_fn)
++/* This function's name started to collide with external nss symbol,
++ * so it has additional sss_* prefix unlike other functions here. */
++static errno_t sss_nss_setnetgrent(struct cli_ctx *cli_ctx,
++                                   enum cache_req_type type,
++                                   nss_protocol_fill_packet_fn fill_fn)
+ {
+     struct nss_ctx *nss_ctx;
+     struct nss_state_ctx *state_ctx;
+@@ -774,7 +776,7 @@ static errno_t nss_setnetgrent(struct cli_ctx *cli_ctx,
+         goto done;
+     }
+ 
+-    tevent_req_set_callback(subreq, nss_setnetgrent_done, cmd_ctx);
++    tevent_req_set_callback(subreq, sss_nss_setnetgrent_done, cmd_ctx);
+ 
+     ret = EOK;
+ 
+@@ -787,7 +789,7 @@ done:
+     return EOK;
+ }
+ 
+-static void nss_setnetgrent_done(struct tevent_req *subreq)
++static void sss_nss_setnetgrent_done(struct tevent_req *subreq)
+ {
+     struct nss_cmd_ctx *cmd_ctx;
+     errno_t ret;
+@@ -1037,8 +1039,8 @@ static errno_t nss_cmd_initgroups_ex(struct cli_ctx *cli_ctx)
+ 
+ static errno_t nss_cmd_setnetgrent(struct cli_ctx *cli_ctx)
+ {
+-    return nss_setnetgrent(cli_ctx, CACHE_REQ_NETGROUP_BY_NAME,
+-                           nss_protocol_fill_setnetgrent);
++    return sss_nss_setnetgrent(cli_ctx, CACHE_REQ_NETGROUP_BY_NAME,
++                               nss_protocol_fill_setnetgrent);
+ }
+ 
+ static errno_t nss_cmd_getnetgrent(struct cli_ctx *cli_ctx)
+-- 
+2.21.0
+

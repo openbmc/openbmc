@@ -1,0 +1,17 @@
+[Unit]
+Description=Perform power workarounds on VRMs
+Wants=ir35221-on-unbind@%i.service
+After=ir35221-on-unbind@%i.service
+Before=avsbus-disable@%i.service
+Before=obmc-power-on@%i.target
+Conflicts=obmc-chassis-poweroff@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
+
+[Service]
+ExecStart=/usr/bin/env power-workarounds.sh
+SyslogIdentifier=power-workarounds.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-poweron@%i.target

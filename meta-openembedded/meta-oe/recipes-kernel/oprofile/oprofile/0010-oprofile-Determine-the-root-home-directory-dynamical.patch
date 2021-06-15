@@ -1,0 +1,46 @@
+From 60fb7579bac738809b1776dbcd95ccacf7413c57 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 18 Mar 2021 01:02:49 -0700
+Subject: [PATCH 10/10] oprofile: Determine the root home directory dynamically
+
+This commit detects the root home directory dynamically with changes to
+the oprofile gui app source.
+
+The commit replaces an earlier fix that detected and adjusted a
+'non-standard' root home directory at build time.  The advantage of this
+patch is that the oprofile tools are adjusted to the current run-time
+path to ~root, not the build time path.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Dave Lerner <dave.lerner@windriver.com>
+---
+ doc/oprofile.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/doc/oprofile.xml
++++ b/doc/oprofile.xml
+@@ -647,8 +647,8 @@ Following is a description of the <comma
+ 		<emphasis>must</emphasis> stop it in a controlled manner in order to process
+ 		the profile data it has collected.  Use <code>kill -SIGINT &lt;operf-PID&gt;</code>
+ 		for this purpose. It is recommended that when running <command>operf</command>
+-		with this option, your current working directory should be <filename>/root</filename> or a subdirectory
+-		of <filename>/root</filename> to avoid storing sample data files in locations accessible by regular users.
++		with this option, your current working directory should be <filename>~root</filename> or a subdirectory
++		of <filename>~root</filename> to avoid storing sample data files in locations accessible by regular users.
+ 		</para></listitem>
+ 	</varlistentry>
+ 	<varlistentry>
+--- a/doc/oprofile.html
++++ b/doc/oprofile.html
+@@ -1552,8 +1552,8 @@ Following is a description of the <span
+ 		<span class="emphasis"><em>must</em></span> stop it in a controlled manner in order to process
+ 		the profile data it has collected.  Use <code class="code">kill -SIGINT &lt;operf-PID&gt;</code>
+ 		for this purpose. It is recommended that when running <span class="command"><strong>operf</strong></span>
+-		with this option, your current working directory should be <code class="filename">/root</code> or a subdirectory
+-		of <code class="filename">/root</code> to avoid storing sample data files in locations accessible by regular users.
++		with this option, your current working directory should be <code class="filename">~root</code> or a subdirectory
++		of <code class="filename">~root</code> to avoid storing sample data files in locations accessible by regular users.
+ 		</p>
+               </dd>
+               <dt>

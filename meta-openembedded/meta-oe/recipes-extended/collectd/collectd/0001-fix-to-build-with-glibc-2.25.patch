@@ -11,8 +11,8 @@ diff --git a/src/md.c b/src/md.c
 index 3725f9a..202225b 100644
 --- a/src/md.c
 +++ b/src/md.c
-@@ -25,6 +25,7 @@
- #include "utils_ignorelist.h"
+@@ -26,6 +26,7 @@
+ #include "utils/ignorelist/ignorelist.h"
  
  #include <sys/ioctl.h>
 +#include <sys/sysmacros.h>

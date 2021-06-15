@@ -6,7 +6,7 @@ TUNEVALID[ppce500mc] = "Enable ppce500mc specific processor optimizations"
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'ppce500mc', ' -mcpu=e500mc', '', d)}"
 
 AVAILTUNES += "ppce500mc"
-TUNE_FEATURES_tune-ppce500mc = "m32 fpu-hard ppce500mc"
+TUNE_FEATURES_tune-ppce500mc = "m32 fpu-hard ppce500mc bigendian"
 TUNE_PKGARCH_tune-ppce500mc = "ppce500mc"
 PACKAGE_EXTRA_ARCHS_tune-ppce500mc = "${PACKAGE_EXTRA_ARCHS_tune-powerpc} ppce500mc"
 

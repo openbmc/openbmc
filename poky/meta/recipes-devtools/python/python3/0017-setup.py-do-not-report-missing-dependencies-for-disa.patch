@@ -1,0 +1,38 @@
+From a2dd127b4163aff6cc35af0d0251321964232ad4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 7 Oct 2019 13:22:14 +0200
+Subject: [PATCH] setup.py: do not report missing dependencies for disabled
+ modules
+
+Reporting those missing dependencies is misleading as the modules would not
+have been built anyway. This particularly matters in oe-core's automated
+build completeness checker which relies on the report.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+Signed-off-by: Alejandro Hernandez Samaniego <alejandro@enedino.org>
+
+---
+ setup.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/setup.py b/setup.py
+index 7691258..ec3f2a4 100644
+--- a/setup.py
++++ b/setup.py
+@@ -408,6 +408,14 @@ class PyBuildExt(build_ext):
+                 print("%-*s   %-*s   %-*s" % (longest, e, longest, f,
+                                               longest, g))
+ 
++        # There is no need to report missing module dependencies,
++        # if the modules have been disabled in the first place.
++        # cannot use mods_disabled here, because remove_configured_extensions adds
++        # only disabled extensions into it (doesn't cover _dbm, _gdbm, readline
++        # we support disabling through PACKAGECONFIG)
++        sysconf_dis = sysconfig.get_config_var('MODDISABLED_NAMES').split()
++        self.missing = list(set(self.missing) - set(sysconf_dis))
++
+         if self.missing:
+             print()
+             print("Python build finished successfully!")

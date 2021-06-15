@@ -16,13 +16,13 @@ _PREFIX variants.
 Upstream-Status: Submitted [https://github.com/libyui/libyui/pull/140]
 Signed-off-by: Pascal Bach <pascal.bach@siemens.com>
 ---
- buildtools/LibyuiCommon.cmake | 35 ++++++++++++++---------------------
+ legacy-buildtools/LibyuiCommon.cmake | 35 ++++++++++++++---------------------
  1 file changed, 14 insertions(+), 21 deletions(-)
 
-diff --git a/buildtools/LibyuiCommon.cmake b/buildtools/LibyuiCommon.cmake
+diff --git a/legacy-buildtools/LibyuiCommon.cmake b/legacy-buildtools/LibyuiCommon.cmake
 index e6fbefd..5e2fc0d 100644
---- a/buildtools/LibyuiCommon.cmake
-+++ b/buildtools/LibyuiCommon.cmake
+--- a/legacy-buildtools/LibyuiCommon.cmake
++++ b/legacy-buildtools/LibyuiCommon.cmake
 @@ -258,13 +258,6 @@ MACRO( SET_ENVIRONMENT )	# setup the environment vars
  
    SET( INSTALL_DOC_DIR "${DOC_DIR}" )

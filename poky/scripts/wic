@@ -1,22 +1,8 @@
 #!/usr/bin/env python3
-# ex:ts=4:sw=4:sts=4:et
-# -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #
 # Copyright (c) 2013, Intel Corporation.
-# All rights reserved.
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# SPDX-License-Identifier: GPL-2.0-only
 #
 # DESCRIPTION 'wic' is the OpenEmbedded Image Creator that users can
 # use to generate bootable images.  Invoking it without any arguments
@@ -326,6 +312,8 @@ def wic_init_parser_create(subparser):
 
     subparser.add_argument("-o", "--outdir", dest="outdir", default='.',
                       help="name of directory to create image in")
+    subparser.add_argument("-w", "--workdir",
+                      help="temporary workdir to use for intermediate files")
     subparser.add_argument("-e", "--image-name", dest="image_name",
                       help="name of the image to use the artifacts from "
                            "e.g. core-image-sato")
@@ -406,9 +394,9 @@ def imgpathtype(arg):
 
 def wic_init_parser_cp(subparser):
     subparser.add_argument("src",
-                        help="source spec")
-    subparser.add_argument("dest", type=imgpathtype,
-                        help="image spec: <image>:<vfat partition>[<path>]")
+                        help="image spec: <image>:<vfat partition>[<path>] or <file>")
+    subparser.add_argument("dest",
+                        help="image spec: <image>:<vfat partition>[<path>] or <file>")
     subparser.add_argument("-n", "--native-sysroot",
                         help="path to the native sysroot containing the tools")
 
@@ -417,6 +405,9 @@ def wic_init_parser_rm(subparser):
                         help="path: <image>:<vfat partition><path>")
     subparser.add_argument("-n", "--native-sysroot",
                         help="path to the native sysroot containing the tools")
+    subparser.add_argument("-r", dest="recursive_delete", action="store_true", default=False,
+                        help="remove directories and their contents recursively, "
+                        " this only applies to ext* partition")
 
 def expandtype(rules):
     """
@@ -426,7 +417,7 @@ def expandtype(rules):
     if rules == 'auto':
         return {}
     result = {}
-    for rule in rules.split('-'):
+    for rule in rules.split(','):
         try:
             part, size = rule.split(':')
         except ValueError:
@@ -501,30 +492,47 @@ subcommands = {
 def init_parser(parser):
     parser.add_argument("--version", action="version",
         version="%(prog)s {version}".format(version=__version__))
+    parser.add_argument("-D", "--debug", dest="debug", action="store_true",
+        default=False, help="output debug information")
+
     subparsers = parser.add_subparsers(dest='command', help=hlp.wic_usage)
     for subcmd in subcommands:
         subparser = subparsers.add_parser(subcmd, help=subcommands[subcmd][2])
         subcommands[subcmd][3](subparser)
 
+class WicArgumentParser(argparse.ArgumentParser):
+     def format_help(self):
+         return hlp.wic_help
 
 def main(argv):
-    parser = argparse.ArgumentParser(
+    parser = WicArgumentParser(
         description="wic version %s" % __version__)
 
     init_parser(parser)
 
     args = parser.parse_args(argv)
 
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+
     if "command" in vars(args):
         if args.command == "help":
             if args.help_topic is None:
                 parser.print_help()
-                print()
-                print("Please specify a help topic")
             elif args.help_topic in helptopics:
                 hlpt = helptopics[args.help_topic]
                 hlpt[0](hlpt[1], hlpt[2])
             return 0
+
+    # validate wic cp src and dest parameter to identify which one of it is
+    # image and cast it into imgtype
+    if args.command == "cp":
+        if ":" in args.dest:
+            args.dest = imgtype(args.dest)
+        elif ":" in args.src:
+            args.src = imgtype(args.src)
+        else:
+            raise argparse.ArgumentTypeError("no image or partition number specified.")
 
     return hlp.invoke_subcommand(args, parser, hlp.wic_help_usage, subcommands)
 

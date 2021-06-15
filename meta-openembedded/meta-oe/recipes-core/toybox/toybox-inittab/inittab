@@ -1,0 +1,26 @@
+# STARTUP
+::sysinit:/bin/mount -t proc proc /proc
+::sysinit:/bin/mount -t sysfs sysfs /sys
+::sysinit:/bin/mount -t devtmpfs devtmpfs /dev
+::sysinit:/bin/mount -o remount,rw /
+::sysinit:/bin/mkdir -p /dev/pts
+::sysinit:/bin/mount -t devpts devpts /dev/pts
+::sysinit:/bin/mount -a
+
+::sysinit:/bin/ln -sf /proc/self/fd /dev/fd
+::sysinit:/bin/ln -sf /proc/self/fd/0 /dev/stdin
+::sysinit:/bin/ln -sf /proc/self/fd/1 /dev/stdout
+::sysinit:/bin/ln -sf /proc/self/fd/2 /dev/stderr
+
+::sysinit:/bin/hostname -F /etc/hostname
+
+::sysinit:/etc/init.d/rcS
+
+# REBOOT
+::ctrlaltdel:/sbin/reboot
+::shutdown:/etc/init.d/rcK
+::shutdown:/bin/umount -a -r
+
+# RESTART INIT
+::restart:/sbin/init
+

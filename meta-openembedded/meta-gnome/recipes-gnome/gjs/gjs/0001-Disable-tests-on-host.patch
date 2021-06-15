@@ -1,0 +1,33 @@
+From 95379de2132786f855e8caec1fd5869225774d02 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sat, 18 May 2019 01:14:07 +0200
+Subject: [PATCH] Disable tests on host
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ configure.ac | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index fa4e136..056e96e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -335,9 +335,7 @@ AS_IF([test "x$with_dbus_tests" != "xno"], [
+ ])
+ AM_CONDITIONAL([DBUS_TESTS], [test "x$with_dbus_tests" != "xno"])
+ 
+-AC_MSG_CHECKING([for a suitable UTF-8 locale to run the tests in])
+-TESTS_LOCALE=$($srcdir/build/choose-tests-locale.sh)
+-AC_MSG_RESULT([$TESTS_LOCALE])
++TESTS_LOCALE=C
+ AC_SUBST([TESTS_LOCALE])
+ 
+ AC_SUBST([gjsjsdir], [\${datadir}/gjs-1.0])
+-- 
+2.20.1
+

@@ -1,0 +1,108 @@
+Subject: [PATCH] Revert "SConstruct: Add test for sizeof(time_t), result in
+ SIZEOF_TIME_T."
+
+This reverts commit b32ff1a86c44fa738dabaf63de1b5462e0071ad3.
+
+Upstream-Status: Inappropriate [cross-compile specific]
+
+---
+ SConstruct             | 54 ++++--------------------------------------
+ android/gpsd_config.in |  1 -
+ 2 files changed, 5 insertions(+), 50 deletions(-)
+
+diff --git a/SConstruct b/SConstruct
+index 33e0ff326..e3c62fa3c 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -597,42 +597,6 @@ def CheckHeaderDefines(context, file, define):
+     return ret
+ 
+ 
+-def CheckSizeOf(context, type):
+-    """Check sizeof 'type'"""
+-    context.Message('Checking size of ' + type + '... ')
+-
+-    program = """
+-#include <stdlib.h>
+-#include <stdio.h>
+-
+-/*
+- * The CheckSizeOf function does not have a way for the caller to
+- * specify header files to be included to provide the type being
+- * checked.  As a workaround until that is remedied, include the
+- * header required for time_t, which is the sole current use of this
+- * function.
+- */
+-#include <time.h>
+-
+-int main() {
+-    printf("%d", (int)sizeof(""" + type + """));
+-    return 0;
+-}
+-"""
+-
+-    # compile it
+-    ret = context.TryCompile(program, '.c')
+-    if 0 == ret:
+-        announce('ERROR: TryCompile failed\n')
+-        # fall back to sizeof(time_t) is 8
+-        return '8'
+-
+-    # run it
+-    ret = context.TryRun(program, '.c')
+-    context.Result(ret[0])
+-    return ret[1]
+-
+-
+ def CheckCompilerDefines(context, define):
+     context.Message('Checking if compiler supplies %s... ' % (define,))
+     ret = context.TryLink("""
+@@ -703,15 +667,13 @@ env.Prepend(LIBPATH=[os.path.realpath(os.curdir)])
+ 
+ # CheckXsltproc works, but result is incorrectly saved as "no"
+ config = Configure(env, custom_tests={
+-    'CheckC11': CheckC11,
+-    'CheckCompilerDefines': CheckCompilerDefines,
+-    'CheckCompilerOption': CheckCompilerOption,
+-    'CheckHeaderDefines': CheckHeaderDefines,
+     'CheckPKG': CheckPKG,
+-    'CheckSizeOf': CheckSizeOf,
+     'CheckXsltproc': CheckXsltproc,
+-    'GetPythonValue': GetPythonValue,
+-    })
++    'CheckCompilerOption': CheckCompilerOption,
++    'CheckCompilerDefines': CheckCompilerDefines,
++    'CheckC11': CheckC11,
++    'CheckHeaderDefines': CheckHeaderDefines,
++    'GetPythonValue': GetPythonValue})
+ 
+ # Use print, rather than announce, so we see it in -s mode.
+ print("This system is: %s" % sys.platform)
+@@ -1043,12 +1005,6 @@ else:
+             confdefs.append("/* #undef HAVE_%s_H */\n"
+                             % hdr.replace("/", "_").upper())
+ 
+-    sizeof_time_t = config.CheckSizeOf("time_t")
+-    confdefs.append("#define SIZEOF_TIME_T %s\n" % sizeof_time_t)
+-    announce("sizeof(time_t) is %s" % sizeof_time_t)
+-    if 4 >= int(sizeof_time_t):
+-        announce("WARNING: time_t is too small.  It will fail in 2038")
+-
+     # check function after libraries, because some function require libraries
+     # for example clock_gettime() require librt on Linux glibc < 2.17
+     for f in ("cfmakeraw", "clock_gettime", "daemon", "fcntl", "fork",
+diff --git a/android/gpsd_config.in b/android/gpsd_config.in
+index 758251986..d240f6d34 100644
+--- a/android/gpsd_config.in
++++ b/android/gpsd_config.in
+@@ -19,7 +19,6 @@
+ #define HAVE_ARPA_INET_H 1
+ #define HAVE_SYSLOG_H 1
+ #define HAVE_DAEMON 1
+-#define SIZEOF_TIME_T 8
+ #define HAVE_CLOCK_GETTIME 1
+ #define HAVE_STRPTIME 1
+ #define HAVE_GMTIME_R 1
+-- 
+2.26.2
+

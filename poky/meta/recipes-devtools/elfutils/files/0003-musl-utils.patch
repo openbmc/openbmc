@@ -1,0 +1,96 @@
+From 2dab1a02a3cfd80629f3e0f380805a5e58dd0ac3 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 23 Aug 2019 10:19:48 +0800
+Subject: [PATCH] musl-utils
+
+Provide missing defines which otherwise are available on glibc system headers
+
+Alter the error API to match posix version
+use qsort instead of qsort_r which is glibc specific API
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate [workaround for musl]
+
+Rebase to 0.177
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+---
+ src/arlib.h       | 6 ++++++
+ src/elfcompress.c | 7 +++++++
+ src/strip.c       | 7 +++++++
+ src/unstrip.c     | 9 +++++++++
+ 4 files changed, 29 insertions(+)
+
+diff --git a/src/arlib.h b/src/arlib.h
+index e117166..8326f6c 100644
+--- a/src/arlib.h
++++ b/src/arlib.h
+@@ -29,6 +29,12 @@
+ #include <stdint.h>
+ #include <sys/types.h>
+ 
++#if !defined(ALLPERMS)
++# define ALLPERMS (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO) /* 07777 */
++#endif
++#if !defined(DEFFILEMODE)
++# define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)/* 0666*/
++#endif
+ 
+ /* State of -D/-U flags.  */
+ extern bool arlib_deterministic_output;
+diff --git a/src/elfcompress.c b/src/elfcompress.c
+index 1b5b1e3..21c9024 100644
+--- a/src/elfcompress.c
++++ b/src/elfcompress.c
+@@ -37,6 +37,13 @@
+ #include "libeu.h"
+ #include "printversion.h"
+ 
++#if !defined(ALLPERMS)
++# define ALLPERMS (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO) /* 07777 */
++#endif
++#if !defined(FNM_EXTMATCH)
++# define FNM_EXTMATCH (0)
++#endif
++
+ /* Name and version of program.  */
+ ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
+ 
+diff --git a/src/strip.c b/src/strip.c
+index 7a5d4e4..81a0d57 100644
+--- a/src/strip.c
++++ b/src/strip.c
+@@ -46,6 +46,13 @@
+ #include <system.h>
+ #include <printversion.h>
+ 
++#if !defined(ACCESSPERMS)
++# define ACCESSPERMS (S_IRWXU|S_IRWXG|S_IRWXO) /* 0777 */
++#endif
++#if !defined(FNM_EXTMATCH)
++# define FNM_EXTMATCH (0)
++#endif
++
+ typedef uint8_t GElf_Byte;
+ 
+ /* Name and version of program.  */
+diff --git a/src/unstrip.c b/src/unstrip.c
+index 8580329..d547487 100644
+--- a/src/unstrip.c
++++ b/src/unstrip.c
+@@ -52,6 +52,15 @@
+ #include "libeu.h"
+ #include "printversion.h"
+ 
++#ifndef strndupa
++#define strndupa(s, n) \
++       ({const char *__in = (s); \
++         size_t __len = strnlen (__in, (n)) + 1; \
++         char *__out = (char *) alloca (__len); \
++         __out[__len-1] = '\0'; \
++         (char *) memcpy (__out, __in, __len-1);})
++#endif
++
+ /* Name and version of program.  */
+ ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
+ 

@@ -1,0 +1,43 @@
+From 131b88a81aba3d72d566bc8a9d968941a98e0007 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 31 Mar 2019 18:11:55 +0200
+Subject: [PATCH] CMakeLists.txt: Remove TRY_RUN for iconv
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+| CMake Error: TRY_RUN() invoked in cross-compiling mode, please set the following cache variables appropriately:
+|    _correct_iconv_EXITCODE (advanced)
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ CMakeLists.txt | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1672daf..0b3e4e0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -524,17 +524,6 @@ if(NOT HAVE_ICONV)
+ 	message(FATAL_ERROR "You need to install a working iconv implementation, such as ftp://ftp.gnu.org/pub/gnu/libiconv")
+ endif(NOT HAVE_ICONV)
+ 
+-set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBS})
+-file(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/" _binary_dir_with_separator)
+-CHECK_C_SOURCE_RUNS("#define ICONV_DETECT_BUILD_DIR \"${_binary_dir_with_separator}\"
+-		     #include \"${CMAKE_SOURCE_DIR}/iconv-detect.c\"" _correct_iconv)
+-unset(_binary_dir_with_separator)
+-unset(CMAKE_REQUIRED_LIBRARIES)
+-
+-if(NOT _correct_iconv)
+-	message(FATAL_ERROR "You need to install a working iconv implementation, such as ftp://ftp.gnu.org/pub/gnu/libiconv")
+-endif(NOT _correct_iconv)
+-
+ # ******************************
+ # Backtraces for debugging
+ # ******************************
+-- 
+2.20.1
+

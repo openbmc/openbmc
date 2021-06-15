@@ -1,0 +1,15 @@
+[Unit]
+Description=Enable the AVS bus on VRMs
+Wants=op-power-start@%i.service
+After=op-power-start@%i.service
+Conflicts=obmc-chassis-poweroff@%i.target
+ConditionPathExists=!/run/openbmc/chassis@%i-on
+
+[Service]
+ExecStart=/usr/bin/env avsbus-enable.sh
+SyslogIdentifier=avsbus-enable.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-poweron@%i.target

@@ -26,9 +26,11 @@ SYSTEMD_SERVICE_${PN} += " \
         "
 SRC_URI += "git://github.com/openbmc/phosphor-objmgr"
 
-SRCREV = "5eddf44006cf9ad5b9a5c103adc1682fc835f932"
+SRCREV = "2b7789c0180e9678909407df2c195dd3191dfc68"
 
 S = "${WORKDIR}/git"
+
+EXTRA_OECONF += "--disable-tests"
 
 python populate_packages_prepend () {
     mapperlibdir = d.getVar("libdir", True)

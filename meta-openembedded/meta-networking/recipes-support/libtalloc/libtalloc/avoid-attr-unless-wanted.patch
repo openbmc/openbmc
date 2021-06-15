@@ -1,6 +1,6 @@
---- a/lib/replace/wscript	2015-11-13 16:04:04.000000000 +0100
-+++ b/lib/replace/wscript	2015-11-13 16:23:20.000000000 +0100
-@@ -837,8 +837,6 @@ def build(bld):
+--- a/lib/replace/wscript
++++ b/lib/replace/wscript
+@@ -947,8 +947,6 @@ def build(bld):
      if not bld.CONFIG_SET('HAVE_INET_ATON'):     REPLACE_SOURCE += ' inet_aton.c'
      if not bld.CONFIG_SET('HAVE_INET_NTOP'):     REPLACE_SOURCE += ' inet_ntop.c'
      if not bld.CONFIG_SET('HAVE_INET_PTON'):     REPLACE_SOURCE += ' inet_pton.c'
@@ -9,12 +9,13 @@
  
      if not bld.CONFIG_SET('HAVE_CLOSEFROM'):
          REPLACE_SOURCE += ' closefrom.c'
-@@ -852,7 +850,7 @@ def build(bld):
+@@ -962,7 +960,7 @@ def build(bld):
                        # at the moment:
                        # hide_symbols=bld.BUILTIN_LIBRARY('replace'),
                        private_library=True,
--                      deps='crypt dl nsl socket rt attr' + extra_libs)
-+                      deps='crypt dl nsl socket rt ' + extra_libs)
+-                      deps='dl attr' + extra_libs)
++                      deps='dl' + extra_libs)
  
-     replace_test_cflags="-Wno-format-zero-length"
+     replace_test_cflags = ''
      if bld.CONFIG_SET('HAVE_WNO_FORMAT_TRUNCATION'):
+

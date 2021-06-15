@@ -15,15 +15,15 @@ SRC_URI[debianpatch.md5sum] = "5ef6267c42fca9145e0af006ccb6aff7"
 SRC_URI[debianpatch.sha256sum] = "a5405c6ee5e97e45eeb1c81330a7e9f444a58bda5e6771fa30007516c115007e"
 
 inherit lib_package perlnative
-export basedir="${D}${prefix}"
 
 CFLAGS += " -D__GNU_LIBRARY__"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
+EXTRA_OEMAKE = "basedir=${D}${prefix} baselib=${baselib} LD='${CC}' LD='${CC}'"
 do_compile() {
-        oe_runmake basedir=${D}${prefix} LD="${CC}" LD="${CC}" shared static
+        oe_runmake shared static
 }
 do_install() {
-        oe_runmake DESTDIR=${D} basedir=${D}${prefix} install
+        oe_runmake DESTDIR=${D} install
 }

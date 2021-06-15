@@ -1,0 +1,16 @@
+/dts-v1/;
+/plugin/;
+
+&{/amba} {
+        xlnk {
+                compatible = "xlnx,xlnk-1.0";
+        };
+        fabric@40000000 {
+                compatible = "generic-uio";
+                reg = <0x40001000 0x1000>;
+                status = "okay";
+                interrupt-parent = <&intc>;
+                interrupts = <0 0x1d 4>;
+        };
+
+};

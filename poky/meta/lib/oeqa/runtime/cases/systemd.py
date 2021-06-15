@@ -1,12 +1,15 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import re
 import time
 
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfDataVar, skipIfNotDataVar
 from oeqa.runtime.decorator.package import OEHasPackage
-from oeqa.core.decorator.data import skipIfNotFeature
+from oeqa.core.decorator.data import skipIfNotFeature, skipIfFeature
 
 class SystemdTest(OERuntimeTestCase):
 
@@ -78,12 +81,10 @@ class SystemdBasicTests(SystemdTest):
     def test_systemd_basic(self):
         self.systemctl('--version')
 
-    @OETestID(551)
     @OETestDepends(['systemd.SystemdBasicTests.test_systemd_basic'])
     def test_systemd_list(self):
         self.systemctl('list-unit-files')
 
-    @OETestID(550)
     @OETestDepends(['systemd.SystemdBasicTests.test_systemd_basic'])
     def test_systemd_failed(self):
         settled, output = self.settle()
@@ -104,7 +105,6 @@ class SystemdServiceTests(SystemdTest):
     def test_systemd_status(self):
         self.systemctl('status --full', 'avahi-daemon.service')
 
-    @OETestID(695)
     @OETestDepends(['systemd.SystemdServiceTests.test_systemd_status'])
     def test_systemd_stop_start(self):
         self.systemctl('stop', 'avahi-daemon.service')
@@ -113,13 +113,26 @@ class SystemdServiceTests(SystemdTest):
         self.systemctl('start','avahi-daemon.service')
         self.systemctl('is-active', 'avahi-daemon.service', verbose=True)
 
-    @OETestID(696)
     @OETestDepends(['systemd.SystemdServiceTests.test_systemd_status'])
+    @skipIfFeature('read-only-rootfs',
+                   'Test is only meant to run without read-only-rootfs in IMAGE_FEATURES')
     def test_systemd_disable_enable(self):
         self.systemctl('disable', 'avahi-daemon.service')
         self.systemctl('is-enabled', 'avahi-daemon.service', expected=1)
         self.systemctl('enable', 'avahi-daemon.service')
         self.systemctl('is-enabled', 'avahi-daemon.service')
+
+    @OETestDepends(['systemd.SystemdServiceTests.test_systemd_status'])
+    @skipIfNotFeature('read-only-rootfs',
+                      'Test is only meant to run with read-only-rootfs in IMAGE_FEATURES')
+    def test_systemd_disable_enable_ro(self):
+        status = self.target.run('mount -orw,remount /')[0]
+        self.assertTrue(status == 0, msg='Remounting / as r/w failed')
+        try:
+            self.test_systemd_disable_enable()
+        finally:
+            status = self.target.run('mount -oro,remount /')[0]
+            self.assertTrue(status == 0, msg='Remounting / as r/o failed')
 
 class SystemdJournalTests(SystemdTest):
 

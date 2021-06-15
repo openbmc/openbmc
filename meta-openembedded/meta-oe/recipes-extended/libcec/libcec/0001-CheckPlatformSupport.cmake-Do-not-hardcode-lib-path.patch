@@ -1,0 +1,42 @@
+From 95d4df3b713925e2c4894a2e4d50b06df861d9ef Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 18 Dec 2019 23:37:40 -0800
+Subject: [PATCH] CheckPlatformSupport.cmake: Do not hardcode lib path
+
+Using CMAKE_INSTALL_LIBDIR ensures that we can build for multilib env
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libcec/cmake/CheckPlatformSupport.cmake | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/libcec/cmake/CheckPlatformSupport.cmake b/src/libcec/cmake/CheckPlatformSupport.cmake
+index 2d7102f..55e78f8 100644
+--- a/src/libcec/cmake/CheckPlatformSupport.cmake
++++ b/src/libcec/cmake/CheckPlatformSupport.cmake
+@@ -224,16 +224,16 @@ else()
+ 
+       if (${PYTHON_MAJOR_VERSION} EQUAL 2)
+         install(TARGETS     ${SWIG_MODULE_cec_REAL_NAME}
+-                DESTINATION lib/python${PYTHON_VERSION}/${PYTHON_PKG_DIR}/${PYTHON_LIB_INSTALL_PATH}/cec)
++                DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION}/${PYTHON_PKG_DIR}/${PYTHON_LIB_INSTALL_PATH}/cec)
+         install(FILES       ${CMAKE_BINARY_DIR}/src/libcec/cec.py
+-                DESTINATION lib/python${PYTHON_VERSION}/${PYTHON_PKG_DIR})
++                DESTINATION l${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION}/${PYTHON_PKG_DIR})
+         install(FILES ${CMAKE_SOURCE_DIR}/src/libcec/cmake/__init__.py
+-                DESTINATION lib/python${PYTHON_VERSION}/${PYTHON_PKG_DIR}/cec)
++                DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION}/${PYTHON_PKG_DIR}/cec)
+       else()
+         install(TARGETS     ${SWIG_MODULE_cec_REAL_NAME}
+-                DESTINATION lib/python${PYTHON_VERSION}/${PYTHON_PKG_DIR}/${PYTHON_LIB_INSTALL_PATH})
++                DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION}/${PYTHON_PKG_DIR}/${PYTHON_LIB_INSTALL_PATH})
+         install(FILES       ${CMAKE_BINARY_DIR}/src/libcec/cec.py
+-                DESTINATION lib/python${PYTHON_VERSION}/${PYTHON_PKG_DIR})
++                DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION}/${PYTHON_PKG_DIR})
+       endif()
+     endif()
+   endif()
+-- 
+2.24.1
+

@@ -3,7 +3,7 @@ HOMEPAGE = "http://trac.osgeo.org/geos/"
 SECTION = "libs"
 
 LICENSE = "LGPLv2.1+"
-LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
+LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 SRC_URI = "http://download.osgeo.org/geos/geos-${PV}.tar.bz2"
 

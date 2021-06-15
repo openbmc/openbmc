@@ -35,6 +35,11 @@ do_compile () {
 do_install () {
     cd ${B}/${TARGET_SYS}/libsanitizer/
     oe_runmake 'DESTDIR=${D}' MULTIBUILDTOP=${B}/${TARGET_SYS}/libsanitizer/ install
+    if [ -d ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include ]; then
+	install -d ${D}${libdir}/${TARGET_SYS}/${BINV}/include
+	mv ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include/* ${D}${libdir}/${TARGET_SYS}/${BINV}/include
+	rmdir --ignore-fail-on-non-empty -p ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include
+    fi
     if [ -d ${D}${infodir} ]; then
         rmdir --ignore-fail-on-non-empty -p ${D}${infodir}
     fi
@@ -43,7 +48,10 @@ do_install () {
 
 INHIBIT_DEFAULT_DEPS = "1"
 ALLOW_EMPTY_${PN} = "1"
-DEPENDS = "gcc-runtime virtual/${TARGET_PREFIX}gcc"
+DEPENDS = "virtual/crypt gcc-runtime virtual/${TARGET_PREFIX}gcc"
+
+# used to fix ../../../../../../../../../work-shared/gcc-8.3.0-r0/gcc-8.3.0/libsanitizer/libbacktrace/../../libbacktrace/elf.c:772:21: error: 'st.st_mode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+DEBUG_OPTIMIZATION_append = " -Wno-error"
 
 BBCLASSEXTEND = "nativesdk"
 
@@ -75,13 +83,16 @@ COMPATIBLE_HOST = '(x86_64|i.86|powerpc|sparc|s390|arm|aarch64).*-linux'
 # musl is currently broken entirely
 COMPATIBLE_HOST_libc-musl = 'null'
 
-FILES_libasan += "${libdir}/libasan.so.*"
+FILES_libasan += "${libdir}/libasan.so.* ${libdir}/libhwasan.so.*"
 FILES_libasan-dev += "\
     ${libdir}/libasan_preinit.o \
     ${libdir}/libasan.so \
+    ${libdir}/libhwasan.so \
     ${libdir}/libasan.la \
 "
-FILES_libasan-staticdev += "${libdir}/libasan.a"
+FILES_libasan-staticdev += "${libdir}/libasan.a \
+    ${libdir}/libhwasan.a \
+"
 
 FILES_libubsan += "${libdir}/libubsan.so.*"
 FILES_libubsan-dev += "\
@@ -106,4 +117,4 @@ FILES_libtsan-dev += "\
 "
 FILES_libtsan-staticdev += "${libdir}/libtsan.a"
 
-FILES_${PN} = "${libdir}/*.spec ${libdir}/gcc/${TARGET_SYS}/${BINV}/include/sanitizer/*.h"
+FILES_${PN} = "${libdir}/*.spec ${libdir}/${TARGET_SYS}/${BINV}/include/sanitizer/*.h"

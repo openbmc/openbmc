@@ -1,0 +1,33 @@
+From f6b8e141e00c4837239f5b69af4e7bee1204abba Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Thu, 17 Dec 2020 10:18:58 +0800
+Subject: [PATCH 1/8] greeter: set visible when switch to input user
+
+It switches back to input user entry if press Esc key when input the
+password. At this time, the user name input is shown as '*' rather than
+plain text. Set the visibility to fix this issue. And clean the text as
+well.
+
+Upstream-Status: Submitted [https://sourceforge.net/p/lxdm/code/merge-requests/1/]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ src/greeter.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/greeter.c b/src/greeter.c
+index 2c6e5be..f100c72 100644
+--- a/src/greeter.c
++++ b/src/greeter.c
+@@ -139,6 +139,8 @@ static void switch_to_input_user(void)
+ 		pass=NULL;
+ 	}
+ 	gtk_label_set_text( GTK_LABEL(prompt), _("User:"));
++	gtk_entry_set_text(GTK_ENTRY(login_entry), "");
++	gtk_entry_set_visibility(GTK_ENTRY(login_entry), TRUE);
+ 	gtk_widget_show(prompt);
+ 	if(user_list)
+ 	{
+-- 
+2.25.1
+

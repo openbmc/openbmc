@@ -1,0 +1,113 @@
+From 41de28a92297f4cb0c5a8d7356cde9190176947b Mon Sep 17 00:00:00 2001
+From: Fabio Berton <fabio.berton@ossystems.com.br>
+Date: Thu, 14 Mar 2019 19:54:27 -0300
+Subject: [PATCH] Drop use of error.h
+Organization: O.S. Systems Software LTDA.
+
+The error.h does not work with musl and this project being embedded
+friendly it makes sense to avoid glibc-specific code.
+
+Signed-off-by: Otavio Salvador <otavio@ossystems.com.br>
+Signed-off-by: Fabio Berton <fabio.berton@ossystems.com.br>
+---
+ mkemlog.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
+
+diff --git a/mkemlog.c b/mkemlog.c
+index e3354ed..7bcdfce 100644
+--- a/mkemlog.c
++++ b/mkemlog.c
+@@ -21,7 +21,6 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <stdlib.h>
+-#include <error.h>
+ #include <errno.h>
+
+ #define EMLOG_DEVICE "/dev/emlog"
+@@ -40,16 +39,16 @@ int main(int argc, char** argv) {
+     FILE *max_size_file = NULL;
+     uid_t uid = -1;
+     if (argc < 2 || argc > 5) {
+-        error(1 ,0, USAGE);
++        fprintf(stderr, USAGE);
+     }
+     file = argv[1];
+
+     max_size_file = fopen("/sys/module/emlog/parameters/emlog_max_size", "r");
+     if (max_size_file == NULL)
+-        error(1, errno, "Emlog module not loaded\n");
++        fprintf(stderr, "Emlog module not loaded\n");
+     rc = fscanf(max_size_file, "%d", &emlog_max_size);
+     if (rc != 1)
+-        error(1, errno, "Unable to get emlog max size\n");
++        fprintf(stderr, "Unable to get emlog max size\n");
+     fclose(max_size_file);
+     max_size_file = NULL;
+     if (argc > 2 ) {
+@@ -57,13 +56,13 @@ int main(int argc, char** argv) {
+         number = argv[2];
+         size_of_buffer = strtol(number, &end_of_number, 10);
+         if (errno) {
+-            error(1, errno, "Invalid size provided\n" USAGE);
++            fprintf(stderr, "Invalid size provided\n" USAGE);
+         }
+         if (end_of_number == number) {
+-            error(1, 0, "Invalid size provided\n" USAGE);
++            fprintf(stderr, "Invalid size provided\n" USAGE);
+         }
+         if (size_of_buffer < 1 || size_of_buffer > emlog_max_size) {
+-            error(1, 0, "Invalid size provided must be a value between 1 and %d\n" USAGE, emlog_max_size);
++            fprintf(stderr, "Invalid size provided must be a value between 1 and %d\n" USAGE, emlog_max_size);
+         }
+     }
+     if (argc > 3 ) {
+@@ -71,10 +70,10 @@ int main(int argc, char** argv) {
+         number = argv[3];
+         mode = strtol(number, &end_of_number, 8);
+         if (errno) {
+-            error(1, errno, "Invalid mode provided\n" USAGE);
++            fprintf(stderr, "Invalid mode provided\n" USAGE);
+         }
+         if (end_of_number == number || S_IFMT & mode) {
+-            error(1, 0, "Invalid mode provided\n" USAGE);
++            fprintf(stderr, "Invalid mode provided\n" USAGE);
+         }
+     }
+     if (argc > 4 ) {
+@@ -82,27 +81,27 @@ int main(int argc, char** argv) {
+         number = argv[4];
+         uid = strtol(number, &end_of_number, 10);
+         if (errno) {
+-            error(1, errno, "Invalid uid provided\n" USAGE);
++            fprintf(stderr, "Invalid uid provided\n" USAGE);
+         }
+         if (end_of_number == number) {
+-            error(1, 0, "Invalid uid provided\n" USAGE);
++            fprintf(stderr, "Invalid uid provided\n" USAGE);
+         }
+     }
+     rc = stat(EMLOG_DEVICE, &emlog_stat);
+     if (rc == -1) {
+-        error(1, errno, "stat: " EMLOG_DEVICE);
++        fprintf(stderr, "stat: " EMLOG_DEVICE);
+     }
+     if (!S_ISCHR(emlog_stat.st_mode)) {
+-        error(1, 0, EMLOG_DEVICE " is not a valid emlog device\n");
++        fprintf(stderr, EMLOG_DEVICE " is not a valid emlog device\n");
+     }
+     rc = mknod(file, mode | S_IFCHR, makedev(major(emlog_stat.st_rdev),size_of_buffer));
+     if (rc == -1) {
+-        error(1, errno, "mknod: %s", file);
++        fprintf(stderr, "mknod: %s", file);
+     }
+     if (uid != -1) {
+         rc = chown(file, uid, -1);
+         if (rc == -1) {
+-            error(1, errno, "chown: %s", file);
++            fprintf(stderr, "chown: %s", file);
+         }
+     }
+     printf("Log device %s created with buffer size of %d KiB\n", file, size_of_buffer);
+--
+2.20.1

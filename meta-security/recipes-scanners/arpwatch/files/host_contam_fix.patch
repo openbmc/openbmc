@@ -1,0 +1,21 @@
+This removes the host contamination
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: arpwatch-3.0/configure
+===================================================================
+--- arpwatch-3.0.orig/configure
++++ arpwatch-3.0/configure
+@@ -4349,8 +4349,8 @@ fi
+ 	    CC=cc
+ 	    export CC
+     fi
+-    V_INCLS="$V_INCLS -I/usr/local/include"
+-    LDFLAGS="$LDFLAGS -L/usr/local/lib"
++    V_INCLS="$V_INCLS "
++    LDFLAGS="$LDFLAGS "
+     if test "$GCC" != yes ; then
+ 	    { $as_echo "$as_me:${as_lineno-$LINENO}: checking that $CC handles ansi prototypes" >&5
+ $as_echo_n "checking that $CC handles ansi prototypes... " >&6; }

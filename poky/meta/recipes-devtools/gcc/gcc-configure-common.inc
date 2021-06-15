@@ -5,15 +5,9 @@ require gcc-shared-source.inc
 #
 # These can be overridden by the version specific .inc file.
 
-# Java (gcj doesn't work on all architectures)
-JAVA ?= ",java"
-JAVA_arm ?= ""
-JAVA_armeb ?= ""
-JAVA_mipsel ?= ""
-JAVA_sh3 ?= ""
 # gcc 3.x expects 'f77', 4.0 expects 'f95', 4.1 and 4.2 expect 'fortran'
 FORTRAN ?= ",f77"
-LANGUAGES ?= "c,c++${FORTRAN}${JAVA}"
+LANGUAGES ?= "c,c++${FORTRAN}"
 
 EXTRA_OECONF_BASE ?= ""
 EXTRA_OECONF_PATHS ?= ""
@@ -22,6 +16,8 @@ GCCMULTILIB ?= "--disable-multilib"
 GCCTHREADS ?= "posix"
 
 GCCPIE ??= ""
+
+SYMVERS_CONF ?= "--enable-symvers=gnu"
 
 EXTRA_OECONF = "\
     ${@['--enable-clocale=generic', ''][d.getVar('USE_NLS') != 'no']} \
@@ -33,16 +29,16 @@ EXTRA_OECONF = "\
     ${GCCPIE} \
     --enable-c99 \
     --enable-long-long \
-    --enable-symvers=gnu \
+    ${SYMVERS_CONF} \
     --enable-libstdcxx-pch \
     --program-prefix=${TARGET_PREFIX} \
     --without-local-prefix \
+    --disable-install-libiberty \
     ${EXTRA_OECONF_BASE} \
     ${EXTRA_OECONF_GCC_FLOAT} \
     ${EXTRA_OECONF_PATHS} \
     ${@get_gcc_mips_plt_setting(bb, d)} \
     ${@get_gcc_ppc_plt_settings(bb, d)} \
-    ${@get_long_double_setting(bb, d)} \
     ${@get_gcc_multiarch_setting(bb, d)} \
 "
 

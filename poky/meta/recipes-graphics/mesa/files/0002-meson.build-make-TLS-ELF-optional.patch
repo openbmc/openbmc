@@ -1,0 +1,61 @@
+From d434b9e5d29d614b57c09e164e1d084094bf2150 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair@alistair23.me>
+Date: Thu, 14 Nov 2019 13:08:31 -0800
+Subject: [PATCH] meson.build: make TLS ELF optional
+
+USE_ELF_TLS has replaced GLX_USE_TLS so this patch is the original "make
+TLS GLX optional again" patch updated to the latest mesa.
+
+For details, see:
+https://gitlab.freedesktop.org/mesa/mesa/-/issues/966
+
+This prevents runtime segfault on musl:
+
+Traceback (most recent call last):
+  File "/home/pokybuild/yocto-worker/musl-qemux86/build/meta/lib/oeqa/core/decorator/__init__.py", line 36, in wrapped_f
+    return func(*args, **kwargs)
+  File "/home/pokybuild/yocto-worker/musl-qemux86/build/meta/lib/oeqa/runtime/cases/parselogs.py", line 378, in test_parselogs
+    self.assertEqual(errcount, 0, msg=self.msg)
+AssertionError: 1 != 0 : Log: /home/pokybuild/yocto-worker/musl-qemux86/build/build/tmp/work/qemux86-poky-linux-musl/core-image-sato-sdk/1.0-r0/target_logs/Xorg.0.log
+-----------------------
+Central error: [    10.477] (EE) Failed to load /usr/lib/xorg/modules/extensions/libglx.so: Error relocating /usr/lib/libGL.so.1: alphasort: initial-exec TLS resolves to dynamic definition in /usr/lib/libGL.so.1
+***********************
+
+Upstream-Status: Inappropriate [configuration]
+Signed-off-by: Alistair Francis <alistair@alistair23.me>
+
+---
+ meson.build       | 2 +-
+ meson_options.txt | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 42f448e..02f6e33 100644
+--- a/meson.build
++++ b/meson.build
+@@ -449,7 +449,7 @@ endif
+ use_elf_tls = false
+ if (not ['freebsd', 'openbsd', 'haiku'].contains(host_machine.system()) and
+     (not with_platform_android or get_option('platform-sdk-version') >= 29) and
+-    (not with_platform_windows or not with_shared_glapi))
++    (not with_platform_windows or not with_shared_glapi) and get_option('elf-tls'))
+   pre_args += '-DUSE_ELF_TLS'
+   use_elf_tls = true
+ endif
+diff --git a/meson_options.txt b/meson_options.txt
+index a7030ab..635ec20 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -421,6 +421,12 @@ option(
+   value : true,
+   description : 'Enable direct rendering in GLX and EGL for DRI',
+ )
++option(
++  'elf-tls',
++  type : 'boolean',
++  value : true,
++  description : 'Enable TLS support in ELF',
++)
+ option(
+   'prefer-iris',
+   type : 'boolean',

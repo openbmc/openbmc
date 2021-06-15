@@ -1,8 +1,6 @@
 
 TUNEVALID[thumb] = "Support Thumb instructions"
 
-ARM_THUMB_SUFFIX = "${@bb.utils.contains_any('TUNE_FEATURES', 'armv4 armv5 armv6', 't', 't2', d)}"
-
 # If the device supports ARM, then respect ARM_THUMB_OPT (which can be "arm" or "thumb")
 # If the device doesn't support ARM, then always set "thumb" even when
 # some recipe explicitly sets ARM_INSTRUCTION_SET to "arm"
@@ -22,6 +20,11 @@ python () {
 }
 
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'thumb', ' -m${ARM_M_OPT}', '', d)}"
+
+ARM_THUMB_SUFFIX = "t2"
+ARM_THUMB_SUFFIX_armv4 = "t"
+ARM_THUMB_SUFFIX_armv5 = "t"
+ARM_THUMB_SUFFIX_armv6 = "t"
 
 # Add suffix from ARM_THUMB_SUFFIX only if after all this we still set ARM_M_OPT to thumb
 ARMPKGSFX_THUMB .= "${@bb.utils.contains('TUNE_FEATURES', 'thumb', '${ARM_THUMB_SUFFIX}', '', d) if d.getVar('ARM_M_OPT') == 'thumb' else ''}"

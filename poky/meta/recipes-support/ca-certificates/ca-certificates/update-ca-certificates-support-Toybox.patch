@@ -1,14 +1,13 @@
-From 30378026d136efa779732e3f6664e2ecf461e458 Mon Sep 17 00:00:00 2001
-From: Patrick Ohly <patrick.ohly@intel.com>
-Date: Thu, 17 Mar 2016 12:38:09 +0100
-Subject: [PATCH] update-ca-certificates: support Toybox
+update-ca-certificates: Replace deprecated mktemp -t with mktemp --tmpdir
 
-"mktemp -t" is deprecated and does not work when using Toybox. Replace
-with something that works also with Toybox.
+According to coreutils docs, mktemp -t is deprecated, switch to the
+--tmpdir option instead.
 
-Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Upstream-Status: Submitted [https://salsa.debian.org/debian/ca-certificates/-/merge_requests/5]
 
-Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+[This was originally for compatibility with toybox but toybox now
+supports -t]
 ---
  sbin/update-ca-certificates | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
@@ -24,9 +23,9 @@ index 79c41bb..ae9e3f1 100755
 -TEMPBUNDLE="$(mktemp -t "${CERTBUNDLE}.tmp.XXXXXX")"
 -ADDED="$(mktemp -t "ca-certificates.tmp.XXXXXX")"
 -REMOVED="$(mktemp -t "ca-certificates.tmp.XXXXXX")"
-+TEMPBUNDLE="$(mktemp -p${TMPDIR:-/tmp} "${CERTBUNDLE}.tmp.XXXXXX")"
-+ADDED="$(mktemp -p${TMPDIR:-/tmp} "ca-certificates.tmp.XXXXXX")"
-+REMOVED="$(mktemp -p${TMPDIR:-/tmp} "ca-certificates.tmp.XXXXXX")"
++TEMPBUNDLE="$(mktemp --tmpdir "${CERTBUNDLE}.tmp.XXXXXX")"
++ADDED="$(mktemp --tmpdir "ca-certificates.tmp.XXXXXX")"
++REMOVED="$(mktemp --tmpdir "ca-certificates.tmp.XXXXXX")"
  
  # Adds a certificate to the list of trusted ones.  This includes a symlink
  # in /etc/ssl/certs to the certificate file and its inclusion into the

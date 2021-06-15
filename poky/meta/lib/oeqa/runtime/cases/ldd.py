@@ -1,12 +1,14 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.core.decorator.data import skipIfNotFeature
 from oeqa.runtime.decorator.package import OEHasPackage
 
 class LddTest(OERuntimeTestCase):
 
-    @OETestID(962)
     @OEHasPackage(["ldd"])
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_ldd(self):

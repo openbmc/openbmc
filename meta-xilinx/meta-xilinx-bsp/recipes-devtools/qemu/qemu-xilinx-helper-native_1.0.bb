@@ -20,9 +20,11 @@ FILESEXTRAPATHS_prepend := "${@get_filespath_extra(d, 'recipes-devtools/qemu/qem
 PROVIDES += "qemu-helper-native"
 
 # replace qemu with qemu-xilinx
-DEPENDS_remove = "qemu-native"
+DEPENDS_remove = "qemu-system-native"
 DEPENDS_append = " \
-		qemu-xilinx-native \
+		qemu-xilinx-system-native \
 		qemu-xilinx-multiarch-helper-native \
 		"
 
+RDEPENDS_${PN}_remove = "qemu-system-native"
+RDEPENDS_${PN}_append = " qemu-xilinx-system-native"

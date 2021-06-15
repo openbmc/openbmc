@@ -1,0 +1,27 @@
+vim: do not adjust script pathnames
+
+When cross-compiling, we do not want to reference the host versions of
+things like perl and awk.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -2507,11 +2507,14 @@ installtools: $(TOOLS) $(DESTDIR)$(exec_
+ 		 rm -rf $$cvs; \
+ 	      fi
+ 	-chmod $(FILEMOD) $(DEST_TOOLS)/*
+-# replace the path in some tools
++
++# replace the path in some tools, but not when cross-compiling
++ifneq ($(CROSS_COMPILING),1)
+ 	perlpath=`./which.sh perl` && sed -e "s+/usr/bin/perl+$$perlpath+" $(TOOLSSOURCE)/efm_perl.pl >$(DEST_TOOLS)/efm_perl.pl
+ 	awkpath=`./which.sh nawk` && sed -e "s+/usr/bin/nawk+$$awkpath+" $(TOOLSSOURCE)/mve.awk >$(DEST_TOOLS)/mve.awk; if test -z "$$awkpath"; then \
+ 		awkpath=`./which.sh gawk` && sed -e "s+/usr/bin/nawk+$$awkpath+" $(TOOLSSOURCE)/mve.awk >$(DEST_TOOLS)/mve.awk; if test -z "$$awkpath"; then \
+ 		awkpath=`./which.sh awk` && sed -e "s+/usr/bin/nawk+$$awkpath+" $(TOOLSSOURCE)/mve.awk >$(DEST_TOOLS)/mve.awk; fi; fi
++endif
+ 	-chmod $(SCRIPTMOD) `grep -l "^#!" $(DEST_TOOLS)/*`
+ 
+ # install the language specific files for tools, if they were unpacked

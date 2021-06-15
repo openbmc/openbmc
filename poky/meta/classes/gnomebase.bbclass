@@ -1,5 +1,6 @@
 def gnome_verdir(v):
-    return oe.utils.trim_version(v, 2)
+    return ".".join(v.split(".")[:-1])
+
 
 GNOME_COMPRESS_TYPE ?= "xz"
 SECTION ?= "x11/gnome"

@@ -1,0 +1,162 @@
+From 50f5f8341ba39f2e12eef4a149e59f71f032f7d3 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 10 Nov 2020 09:51:24 +0530
+Subject: [PATCH 24/54] [Patch, microblaze]: Add new bit-field instructions
+
+This patches adds new bsefi and bsifi instructions.
+BSEFI- The instruction shall extract a bit field from a
+register and place it right-adjusted in the destination register.
+The other bits in the destination register shall be set to zero
+BSIFI- The instruction shall insert a right-adjusted bit field
+from a register at another position in the destination register.
+The rest of the bits in the destination register shall be unchanged
+
+Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+---
+ gcc/config/microblaze/microblaze.c  |  5 ++
+ gcc/config/microblaze/microblaze.h  |  2 +
+ gcc/config/microblaze/microblaze.md | 73 +++++++++++++++++++++++++++++
+ 3 files changed, 80 insertions(+)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 4710def18cf..14c652325a8 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -164,6 +164,9 @@ int microblaze_no_unsafe_delay;
+ /* Set to one if the targeted core has the CLZ insn.  */
+ int microblaze_has_clz = 0;
+ 
++/* Set to one if the targeted core has barrel-shift and cpu > 10.0 */
++int microblaze_has_bitfield = 0;
++
+ /* Which CPU pipeline do we use. We haven't really standardized on a CPU 
+    version having only a particular type of pipeline. There can still be 
+    options on the CPU to scale pipeline features up or down. :( 
+@@ -1850,6 +1853,8 @@ microblaze_option_override (void)
+     {
+         if (TARGET_AREA_OPTIMIZED_2)
+           microblaze_pipe = MICROBLAZE_PIPE_8;
++        if (TARGET_BARREL_SHIFT)
++          microblaze_has_bitfield = 1;
+     }
+ 
+   if (TARGET_MULTIPLY_HIGH && TARGET_SOFT_MUL)
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 8a668278337..857cb1cd9d0 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -44,6 +44,7 @@ extern int microblaze_dbx_regno[];
+ 
+ extern int microblaze_no_unsafe_delay;
+ extern int microblaze_has_clz;
++extern int microblaze_has_bitfield;
+ extern enum pipeline_type microblaze_pipe;
+ 
+ #define OBJECT_FORMAT_ELF
+@@ -63,6 +64,7 @@ extern enum pipeline_type microblaze_pipe;
+ /* Do we have CLZ?  */
+ #define TARGET_HAS_CLZ      (TARGET_PATTERN_COMPARE && microblaze_has_clz)
+ 
++#define TARGET_HAS_BITFIELD      (TARGET_BARREL_SHIFT && microblaze_has_bitfield)
+ /* The default is to support PIC.  */
+ #define TARGET_SUPPORTS_PIC 1
+ 
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index c407a81c51e..3e6e2b9276d 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -982,6 +982,8 @@
+   (set_attr "mode"	"DI")
+   (set_attr "length"	"20,20,20")])
+ 
++
++
+ ;;----------------------------------------------------------------
+ ;; Data movement
+ ;;----------------------------------------------------------------
+@@ -1776,6 +1778,7 @@
+   (set_attr "length"   "28")]
+ )
+ 
++
+ ;;----------------------------------------------------------------
+ ;; Setting a register from an integer comparison. 
+ ;;----------------------------------------------------------------
+@@ -2489,4 +2492,74 @@
+   DONE;
+ }")
+ 
++(define_expand "extvsi"
++  [(set (match_operand:SI 0 "register_operand" "r")
++	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
++			 (match_operand:SI 2 "immediate_operand" "I")
++			 (match_operand:SI 3 "immediate_operand" "I")))]
++""
++"
++{
++  unsigned HOST_WIDE_INT len = UINTVAL (operands[2]);
++  unsigned HOST_WIDE_INT pos = UINTVAL (operands[3]);
++
++  if ((len == 0) || (pos + len > 32) )
++    FAIL;
++
++  ;;if (!register_operand (operands[1], VOIDmode))
++  ;;  FAIL;
++  if (operands[0] == operands[1])
++  FAIL;
++  if (GET_CODE (operands[1]) == ASHIFT)
++  FAIL;
++;;  operands[2] = GEN_INT(INTVAL(operands[2])+1 );
++ emit_insn (gen_extv_32 (operands[0], operands[1],
++			  operands[2], operands[3]));
++  DONE;
++}")
++
++(define_insn "extv_32"
++  [(set (match_operand:SI 0 "register_operand" "=r")
++	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
++			 (match_operand:SI 2 "immediate_operand" "I")
++			 (match_operand:SI 3 "immediate_operand" "I")))]
++ "TARGET_BARREL_SHIFT && (UINTVAL (operands[2]) > 0)
++   && ((UINTVAL (operands[2]) + UINTVAL (operands[3])) <= 32)"
++  "bsefi %0,%1,%2,%3"
++  [(set_attr "type" "bshift")
++   (set_attr "length" "4")])
++
++(define_expand "insvsi"
++  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
++			 (match_operand:SI 1 "immediate_operand" "I")
++			 (match_operand:SI 2 "immediate_operand" "I"))
++	(match_operand:SI 3 "register_operand" "r"))]
++ ""
++  "
++{
++  unsigned HOST_WIDE_INT len = UINTVAL (operands[1]);
++  unsigned HOST_WIDE_INT pos = UINTVAL (operands[2]);
++
++  if (len <= 0 || pos + len > 32)
++    FAIL;
++
++  ;;if (!register_operand (operands[0], VOIDmode))
++  ;;  FAIL;
++
++  emit_insn (gen_insv_32 (operands[0], operands[1],
++			  operands[2], operands[3]));
++  DONE;
++}")
++
++(define_insn "insv_32"
++  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
++			 (match_operand:SI 1 "immediate_operand" "I")
++			 (match_operand:SI 2 "immediate_operand" "I"))
++	(match_operand:SI 3 "register_operand" "r"))]
++ "TARGET_BARREL_SHIFT && UINTVAL (operands[1]) > 0
++   && UINTVAL (operands[1]) + UINTVAL (operands[2]) <= 32"
++  "bsifi %0, %3, %1, %2"
++  [(set_attr "type" "bshift")
++   (set_attr "length" "4")])
++
+ (include "sync.md")
+-- 
+2.17.1
+

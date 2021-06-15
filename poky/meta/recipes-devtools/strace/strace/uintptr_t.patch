@@ -1,0 +1,27 @@
+From a6c9366bfbcef6f3f4bb068b1f1a5623935b5013 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 5 Nov 2019 20:05:08 -0800
+Subject: [PATCH] include stdint.h for getting uintptr_t definition
+
+fixes do_compile_ptest_base
+tests/fanotify_mark.c:191:23: error: 'uintptr_t' undeclared (first use in this function); did you mean 'intptr_t'?
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ tests/fanotify_mark.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/fanotify_mark.c b/tests/fanotify_mark.c
+index aade643..de579f3 100644
+--- a/tests/fanotify_mark.c
++++ b/tests/fanotify_mark.c
+@@ -18,6 +18,7 @@
+ 
+ # include <limits.h>
+ # include <stdio.h>
++# include <stdint.h>
+ # include <unistd.h>
+ # include <sys/fanotify.h>
+ 

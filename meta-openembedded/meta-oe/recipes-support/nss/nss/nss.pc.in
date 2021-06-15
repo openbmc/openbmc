@@ -1,0 +1,11 @@
+prefix=OEPREFIX
+exec_prefix=OEEXECPREFIX
+libdir=OELIBDIR
+includedir=OEINCDIR
+
+Name: NSS
+Description: Network Security Services
+Version: %NSS_VERSION%
+Requires: nspr >= %NSPR_VERSION%
+Libs: -L${libdir} -lssl3 -lsmime3 -lnss3 -lsoftokn3 -lnssutil3
+Cflags: -IOEINCDIR

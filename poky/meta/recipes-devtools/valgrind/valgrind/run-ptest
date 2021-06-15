@@ -4,13 +4,67 @@
 #   wraps the valgrind regression script vg_regtest. 
 #
 # Dave Lerner <dave.lerner@windriver.com>
+# Randy MacLeod <Randy.MacLeod@windriver.com>
 ###############################################################
-VALGRINDLIB=@libdir@/valgrind
-LOG="${VALGRINDLIB}/ptest/valgrind_ptest_$(date +%Y%m%d-%H%M%S).log"
+VALGRIND_LIB=@libdir@/valgrind
+VALGRIND_LIBEXECDIR=@libexecdir@/valgrind
+VALGRIND_BIN=@bindir@/valgrind
 
-cd ${VALGRINDLIB}/ptest && ./tests/vg_regtest --all \
-    --valgrind=/usr/bin/valgrind --valgrind-lib=$VALGRINDLIB \
-    --yocto-ptest 2>&1|tee ${LOG}
+LOG="${VALGRIND_LIB}/ptest/valgrind_ptest_$(date +%Y%m%d-%H%M%S).log"
+
+TOOLS="memcheck cachegrind callgrind helgrind drd massif dhat lackey none"
+EXP_TOOLS="exp-bbv"
+
+GDB_BIN=@bindir@/gdb
+cd ${VALGRIND_LIB}/ptest && ./gdbserver_tests/make_local_links ${GDB_BIN}
+
+echo "Hide valgrind tests that are non-deterministic"
+echo "Reported at https://bugs.kde.org/show_bug.cgi?id=430321"
+for i in `cat remove-for-all`; do
+   mv $i.vgtest $i.IGNORE;
+done
+
+arch=`arch`
+if [ "$arch" = "aarch64" ]; then
+   echo "Aarch64: Hide valgrind tests that result in defunct process and then out of memory"
+   for i in `cat remove-for-aarch64`; do
+      mv $i.vgtest $i.IGNORE;
+   done
+fi
+
+cd ${VALGRIND_LIB}/ptest && ./tests/vg_regtest \
+    --valgrind=${VALGRIND_BIN} \
+    --valgrind-lib=${VALGRIND_LIBEXECDIR} \
+    --yocto-ptest \
+    gdbserver_tests ${TOOLS} ${EXP_TOOLS} \
+    2>&1|tee ${LOG}  
+
+cd ${VALGRIND_LIB}/ptest && \
+    ./tests/post_regtest_checks $(pwd) \
+    gdbserver_tests ${TOOLS} ${EXP_TOOLS} \
+    2>&1|tee -a ${LOG}
+
+if [ "$arch" = "aarch64" ]; then
+   echo "Aarch64: Restore valgrind tests that result in defunct process and then out of memory"
+   for i in `cat remove-for-aarch64`; do
+      mv $i.IGNORE $i.vgtest;
+   done
+fi
+
+echo "Restore valgrind tests that are non-deterministc"
+for i in `cat remove-for-all`; do
+   mv $i.IGNORE $i.vgtest;
+done
+
+echo "Failed test details..."
+failed_tests=`grep FAIL: ${LOG} | awk '{print $2}'`
+for test in $failed_tests; do
+    for diff_results in `ls $test*.diff`; do
+        echo $diff_results
+        echo '************'
+        cat  $diff_results
+    done
+done
 
 passed=`grep PASS: ${LOG}|wc -l`
 failed=`grep FAIL: ${LOG}|wc -l`

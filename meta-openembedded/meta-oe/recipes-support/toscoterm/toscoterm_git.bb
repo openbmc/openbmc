@@ -11,7 +11,7 @@ SRC_URI = "git://github.com/OSSystems/toscoterm.git"
 
 S = "${WORKDIR}/git"
 
-inherit distro_features_check gitpkgv pkgconfig
+inherit features_check gitpkgv pkgconfig
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

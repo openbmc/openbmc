@@ -1,0 +1,80 @@
+# With this policy, all files on regular partitions are
+# appraised. Files with signed IMA hash and normal hash are
+# accepted. Signed files cannot be modified while hashed files can be
+# (which will also update the hash). However, signed files can
+# be deleted, so in practice it is still possible to replace them
+# with a modified version.
+#
+# Without EVM, this is obviously not very secure, so this policy is
+# just an example and/or basis for further improvements. For that
+# purpose, some comments show what could be added to make the policy
+# more secure.
+#
+# With EVM the situation might be different because access
+# to the EVM key can be restricted.
+#
+# Files which are appraised are also measured. This allows
+# debugging whether a file is in policy by looking at
+# /sys/kernel/security/ima/ascii_runtime_measurements
+
+# PROC_SUPER_MAGIC
+dont_appraise fsmagic=0x9fa0
+dont_measure fsmagic=0x9fa0
+# SYSFS_MAGIC
+dont_appraise fsmagic=0x62656572
+dont_measure fsmagic=0x62656572
+# DEBUGFS_MAGIC
+dont_appraise fsmagic=0x64626720
+dont_measure fsmagic=0x64626720
+# TMPFS_MAGIC
+dont_appraise fsmagic=0x01021994
+dont_measure fsmagic=0x01021994
+# RAMFS_MAGIC
+dont_appraise fsmagic=0x858458f6
+dont_measure fsmagic=0x858458f6
+# DEVPTS_SUPER_MAGIC
+dont_appraise fsmagic=0x1cd1
+dont_measure fsmagic=0x1cd1
+# BIFMT
+dont_appraise fsmagic=0x42494e4d
+dont_measure fsmagic=0x42494e4d
+# SECURITYFS_MAGIC
+dont_appraise fsmagic=0x73636673
+dont_measure fsmagic=0x73636673
+# SELINUXFS_MAGIC
+dont_appraise fsmagic=0xf97cff8c
+dont_measure fsmagic=0xf97cff8c
+# NSFS_MAGIC (introduced in 3.19, see cd025f7 and e149ed2 in the upstream Linux kernel)
+dont_appraise fsmagic=0x6e736673
+dont_measure fsmagic=0x6e736673
+# SMACK_MAGIC
+dont_appraise fsmagic=0x43415d53
+dont_measure fsmagic=0x43415d53
+# CGROUP_SUPER_MAGIC
+dont_appraise fsmagic=0x27e0eb
+dont_measure fsmagic=0x27e0eb
+# CGROUP2_SUPER_MAGIC
+dont_appraise fsmagic=0x63677270
+dont_measure fsmagic=0x63677270
+# EFIVARFS_MAGIC
+dont_appraise fsmagic=0xde5e81e4
+dont_measure fsmagic=0xde5e81e4
+
+# Special partition, no checking done.
+# dont_measure  fsuuid=a11234...
+# dont_appraise fsuuid=a11243...
+
+# Special immutable group.
+# appraise appraise_type=imasig func=FILE_CHECK mask=MAY_READ fgroup=200
+
+# All executables must be signed - too strict, we need to
+# allow installing executables on the device.
+# appraise appraise_type=imasig func=FILE_MMAP mask=MAY_EXEC
+# appraise appraise_type=imasig func=BPRM_CHECK mask=MAY_EXEC
+
+# Default rule. Would be needed also when other rules were added that
+# determine what to do in case of reading (mask=MAY_READ or
+# mask=MAY_EXEC) because otherwise writing does not update the file
+# hash.
+appraise
+measure

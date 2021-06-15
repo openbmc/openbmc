@@ -1,0 +1,68 @@
+From 3d7cde654c4c6f3bdad32f5521f28f5802a7c377 Mon Sep 17 00:00:00 2001
+From: Christoph Reiter <reiter.christoph@gmail.com>
+Date: Fri, 24 Aug 2018 21:46:47 +0200
+Subject: [PATCH] autotools: use C99 printf format specifiers on Windows. Fixes
+ #1497
+
+Since we now require a C99 compatible printf and use gnulib on Windows,
+we also mark our printf functions as gnu_printf. GCC complains about the
+Windows specific I64 specifiers we still write to glibconfig.h with the
+autotools build.
+
+To fix this switch all I64(x) to ll(x).
+
+This also makes the glibconfig.h output for those macros match the ones
+we get when using meson.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [https://github.com/GNOME/glib/commit/3d7cde654c]
+---
+ configure.ac | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+--- a/glib/configure.ac
++++ b/glib/configure.ac
+@@ -576,7 +576,7 @@ AS_IF([test x$ac_cv_sizeof_long_long = x
+ 	# long long is a 64 bit integer.
+ 	AC_MSG_CHECKING(for format to printf and scanf a guint64)
+ 	AC_CACHE_VAL(glib_cv_long_long_format,[
+-		for format in ll q I64; do
++		for format in ll q; do
+ 		  AC_TRY_RUN([#include <stdio.h>  
+ 			int main()
+ 			{
+@@ -2995,8 +2995,8 @@ long)
+   glib_msize_type='LONG'
+   ;;
+ "long long")
+-  gsize_modifier='"I64"'
+-  gsize_format='"I64u"'
++  gsize_modifier='"ll"'
++  gsize_format='"llu"'
+   glib_msize_type='INT64'
+   ;;
+ esac
+@@ -3018,8 +3018,8 @@ long)
+   glib_mssize_type='LONG'
+   ;;
+ "long long")
+-  gssize_modifier='"I64"'
+-  gssize_format='"I64i"'
++  gssize_modifier='"ll"'
++  gssize_format='"lli"'
+   glib_mssize_type='INT64'
+   ;;
+ esac
+@@ -3048,9 +3048,9 @@ $ac_cv_sizeof_long)
+   ;;
+ $ac_cv_sizeof_long_long)
+   glib_intptr_type_define='long long'
+-  gintptr_modifier='"I64"'
+-  gintptr_format='"I64i"'
+-  guintptr_format='"I64u"'
++  gintptr_modifier='"ll"'
++  gintptr_format='"lli"'
++  guintptr_format='"llu"'
+   glib_gpi_cast='(gint64)'
+   glib_gpui_cast='(guint64)'
+   ;;

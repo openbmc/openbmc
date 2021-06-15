@@ -1,0 +1,138 @@
+From b7de9cff2a9578dd92d191241c28437cd6bbb595 Mon Sep 17 00:00:00 2001
+From: Max Krummenacher <max.krummenacher@toradex.com>
+Date: Sun, 2 Feb 2020 14:39:21 +0000
+Subject: [PATCH] openbox-xdg-autostart: convert to python3
+
+Upstream-Status: Pending
+
+Signed-off-by: Max Krummenacher <max.krummenacher@toradex.com>
+---
+ data/autostart/openbox-xdg-autostart | 72 ++++++++++++++--------------
+ 1 file changed, 36 insertions(+), 36 deletions(-)
+
+diff --git a/data/autostart/openbox-xdg-autostart b/data/autostart/openbox-xdg-autostart
+index 04a17a1..52d763f 100755
+--- a/data/autostart/openbox-xdg-autostart
++++ b/data/autostart/openbox-xdg-autostart
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # openbox-xdg-autostart runs things based on the XDG autostart specification
+ # Copyright (C) 2008       Dana Jansens
+@@ -28,9 +28,9 @@ try:
+     from xdg.DesktopEntry import DesktopEntry
+     from xdg.Exceptions import ParsingError
+ except ImportError:
+-    print
+-    print >>sys.stderr, "ERROR:", ME, "requires PyXDG to be installed"
+-    print
++    print()
++    print("ERROR:", ME, "requires PyXDG to be installed", file=sys.stderr)
++    print()
+     sys.exit(1)
+ 
+ def main(argv=sys.argv):
+@@ -51,7 +51,7 @@ def main(argv=sys.argv):
+             try:
+                 autofile = AutostartFile(path)
+             except ParsingError:
+-                print "Invalid .desktop file: " + path
++                print("Invalid .desktop file: " + path)
+             else:
+                 if not autofile in files:
+                     files.append(autofile)
+@@ -99,9 +99,9 @@ class AutostartFile:
+ 
+     def _alert(self, str, info=False):
+         if info:
+-            print "\t ", str
++            print("\t ", str)
+         else:
+-            print "\t*", str
++            print("\t*", str)
+ 
+     def _showInEnvironment(self, envs, verbose=False):
+         default = not self.de.getOnlyShowIn()
+@@ -146,14 +146,14 @@ class AutostartFile:
+ 
+     def display(self, envs):
+         if self._shouldRun(envs):
+-            print "[*] " + self.de.getName()
++            print("[*] " + self.de.getName())
+         else:
+-            print "[ ] " + self.de.getName()
++            print("[ ] " + self.de.getName())
+         self._alert("File: " + self.path, info=True)
+         if self.de.getExec():
+             self._alert("Executes: " + self.de.getExec(), info=True)
+         self._shouldRun(envs, True)
+-        print
++        print()
+ 
+     def run(self, envs):
+         here = os.getcwd()
+@@ -165,34 +165,34 @@ class AutostartFile:
+         os.chdir(here)
+ 
+ def show_help():
+-    print "Usage:", ME, "[OPTION]... [ENVIRONMENT]..."
+-    print
+-    print "This tool will run xdg autostart .desktop files"
+-    print
+-    print "OPTIONS"
+-    print "  --list        Show a list of the files which would be run"
+-    print "                Files which would be run are marked with an asterix"
+-    print "                symbol [*].  For files which would not be run,"
+-    print "                information is given for why they are excluded"
+-    print "  --help        Show this help and exit"
+-    print "  --version     Show version and copyright information"
+-    print
+-    print "ENVIRONMENT specifies a list of environments for which to run autostart"
+-    print "applications.  If none are specified, only applications which do not "
+-    print "limit themselves to certain environments will be run."
+-    print
+-    print "ENVIRONMENT can be one or more of:"
+-    print "  GNOME         Gnome Desktop"
+-    print "  KDE           KDE Desktop"
+-    print "  ROX           ROX Desktop"
+-    print "  XFCE          XFCE Desktop"
+-    print "  Old           Legacy systems"
+-    print
++    print("Usage:", ME, "[OPTION]... [ENVIRONMENT]...")
++    print()
++    print("This tool will run xdg autostart .desktop files")
++    print()
++    print("OPTIONS")
++    print("  --list        Show a list of the files which would be run")
++    print("                Files which would be run are marked with an asterix")
++    print("                symbol [*].  For files which would not be run,")
++    print("                information is given for why they are excluded")
++    print("  --help        Show this help and exit")
++    print("  --version     Show version and copyright information")
++    print()
++    print("ENVIRONMENT specifies a list of environments for which to run autostart")
++    print("applications.  If none are specified, only applications which do not ")
++    print("limit themselves to certain environments will be run.")
++    print()
++    print("ENVIRONMENT can be one or more of:")
++    print("  GNOME         Gnome Desktop")
++    print("  KDE           KDE Desktop")
++    print("  ROX           ROX Desktop")
++    print("  XFCE          XFCE Desktop")
++    print("  Old           Legacy systems")
++    print()
+ 
+ def show_version():
+-    print ME, VERSION
+-    print "Copyright (c) 2008        Dana Jansens"
+-    print
++    print(ME, VERSION)
++    print("Copyright (c) 2008        Dana Jansens")
++    print()
+ 
+ if __name__ == "__main__":
+         sys.exit(main())
+-- 
+2.20.1
+

@@ -1,8 +1,11 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import get_bb_var, get_bb_vars, bitbake
-from oeqa.core.decorator.oeid import OETestID
 
 class ManifestEntry:
     '''A manifest item of a collection able to list missing packages'''
@@ -59,7 +62,6 @@ class VerifyManifest(OESelftestTestCase):
             self.skipTest("{}: Cannot setup testing scenario"\
                     .format(self.classname))
 
-    @OETestID(1380)
     def test_SDK_manifest_entries(self):
         '''Verifying the SDK manifest entries exist, this may take a build'''
 
@@ -84,11 +86,8 @@ class VerifyManifest(OESelftestTestCase):
         try:
             mdir = self.get_dir_from_bb_var('SDK_DEPLOY', self.buildtarget)
             for k in d_target.keys():
-                bb_vars = get_bb_vars(['SDK_NAME', 'SDK_VERSION'], self.buildtarget)
-                mfilename[k] = "{}-toolchain-{}.{}.manifest".format(
-                        bb_vars['SDK_NAME'],
-                        bb_vars['SDK_VERSION'],
-                        k)
+                toolchain_outputname = get_bb_var('TOOLCHAIN_OUTPUTNAME', self.buildtarget)
+                mfilename[k] = "{}.{}.manifest".format(toolchain_outputname, k)
                 mpath[k] = os.path.join(mdir, mfilename[k])
                 if not os.path.isfile(mpath[k]):
                     self.logger.debug("{}: {} does not exist".format(
@@ -126,7 +125,6 @@ class VerifyManifest(OESelftestTestCase):
                 self.logger.info(msg)
                 self.fail(logmsg)
 
-    @OETestID(1381)
     def test_image_manifest_entries(self):
         '''Verifying the image manifest entries exist'''
 

@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from unittest.case import TestCase
 import oe.license
 

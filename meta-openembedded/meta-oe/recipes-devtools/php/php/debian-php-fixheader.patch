@@ -1,0 +1,32 @@
+From 1234a8ef7c5ab88e24bc5908f0ccfd55af21aa39 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 31 Aug 2020 16:03:27 +0300
+Subject: [PATCH] php: remove host specific info from header file
+
+Based on:
+https://sources.debian.org/data/main/p/php7.3/7.3.6-1/debian/patches/
+        0036-php-5.4.9-fixheader.patch
+
+Upstream-Status: Inappropriate [not author]
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 2a474ba36d..6d22a21630 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1323,7 +1323,7 @@ PHP_BUILD_DATE=`date -u +%Y-%m-%d`
+ fi
+ AC_DEFINE_UNQUOTED(PHP_BUILD_DATE,"$PHP_BUILD_DATE",[PHP build date])
+ 
+-UNAME=`uname -a | xargs`
++UNAME=`uname | xargs`
+ PHP_UNAME=${PHP_UNAME:-$UNAME}
+ AC_DEFINE_UNQUOTED(PHP_UNAME,"$PHP_UNAME",[uname -a output])
+ PHP_OS=`uname | xargs`
+-- 
+2.17.1
+

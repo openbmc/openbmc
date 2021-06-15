@@ -23,23 +23,18 @@
 #
 # For a quad-core machine, BB_NUMBER_THREADS = "4", PARALLEL_MAKE = "-j 4" would
 # be appropriate for example.
+#
+# Some users are behind firewalls or use servers where the number of parallel connections
+# is limited. In such cases you can limit the number of fetch tasks which run in parallel by
+# setting the option below, in this case limiting to a maximum of 4 fetch tasks in parallel:
+#
+#do_fetch[number_threads] = "4"
+#
 
-
-# glibc configurability is used to reduce minimal image's size.
-# the all supported glibc options are listed in DISTRO_FEATURES_LIBC
-# and disabled by default. Uncomment and copy the DISTRO_FEATURES_LIBC
-# and DISTRO_FEATURES definitions to local.conf to enable the options.
-#DISTRO_FEATURES_LIBC = "ipv6 libc-backtrace libc-big-macros libc-bsd libc-cxx-tests libc-catgets libc-charsets libc-crypt \
-#               libc-crypt-ufc libc-db-aliases libc-envz libc-fcvt libc-fmtmsg libc-fstab libc-ftraverse \
-#               libc-getlogin libc-idn libc-inet libc-inet-anl libc-libm libc-locales libc-locale-code \
-#               libc-memusage libc-nsswitch libc-rcmd libc-rtld-debug libc-spawn libc-streams \
-#               libc-utmp libc-utmpx libc-wordexp libc-posix-clang-wchar libc-posix-regexp libc-posix-regexp-glibc \
-#               libc-posix-wchar-io"
-
-#DISTRO_FEATURES = "alsa bluetooth ext2 irda pcmcia usbgadget usbhost wifi nfs zeroconf pci ${DISTRO_FEATURES_LIBC}"
-
-# If you want to get an image based on directfb without x11, Please copy this variable to build/conf/local.conf
-#DISTRO_FEATURES = "alsa argp bluetooth ext2 irda largefile pcmcia usbgadget usbhost wifi xattr nfs zeroconf pci 3g directfb ${DISTRO_FEATURES_LIBC}"
+# If you want to get an image based on directfb without x11 alter
+# DISTRO_FEATURES:
+DISTRO_FEATURES_append = " directfb"
+DISTRO_FEATURES_remove = "x11"
 
 # ENABLE_BINARY_LOCALE_GENERATION controls the generation of binary locale
 # packages at build time using qemu-native. Disabling it (by setting it to 0)
@@ -99,10 +94,7 @@
 # PACKAGE_DEBUG_SPLIT_STYLE = 'debug-file-directory'
 
 # Uncomment these to build a package such that you can use gprof to profile it.
-# NOTE: This will only work with 'linux' targets, not
-# 'linux-uclibc', as uClibc doesn't provide the necessary
-# object files.  Also, don't build glibc itself with these
-# flags, or it'll fail to build.
+# NOTE: Don't build glibc itself with these flags, or it'll fail to build.
 #
 # PROFILE_OPTIMIZATION = "-pg"
 # SELECTED_OPTIMIZATION = "${PROFILE_OPTIMIZATION}"
@@ -126,18 +118,6 @@
 # you would set it as follows:
 #
 # TCMODE ?= "external-sourcery"
-
-# mklibs library size optimization is more useful to smaller images,
-# and less useful for bigger images. Also mklibs library optimization
-# can break the ABI compatibility, so should not be applied to the
-# images which are to be extended or upgraded later.
-#This enabled mklibs library size optimization just for the specified image.
-#MKLIBS_OPTIMIZED_IMAGES ?= "core-image-minimal"
-#This enable mklibs library size optimization will be for all the images.
-#MKLIBS_OPTIMIZED_IMAGES ?= "all"
-
-# Uncomment this if your host distribution provides the help2man tool.
-#ASSUME_PROVIDED += "help2man-native"
 
 # This value is currently used by pseudo to determine if the recipe should
 # build both the 32-bit and 64-bit wrapper libraries on a 64-bit build system.
@@ -203,7 +183,8 @@
 #                           commercial_lame \
 #                           commercial_libmad \
 #                           commercial_libomxil \
-#                           commercial_mpeg2dec"
+#                           commercial_mpeg2dec \
+#                           commercial_qmmp"
 
 
 #
@@ -282,7 +263,7 @@
 #
 # By including the security_flags include file you enable flags
 # to the compiler and linker that cause them to generate more secure
-# code, this is enabled by default in the poky-lsb distro.
+# code.
 # This does affect compile speed slightly.
 #
 # Use the following line to enable the security compiler and linker flags to your build
@@ -316,7 +297,7 @@
 # will correct this condition.
 #
 # By default the system looks in the BBPATH for files/passwd and files/group
-# the default can be overriden by spefying USERADD_UID/GID_TABLES.
+# the default can be overridden by specifying USERADD_UID/GID_TABLES.
 #
 #USERADDEXTENSION = "useradd-staticids"
 #USERADD_UID_TABLES = "files/passwd"
@@ -333,7 +314,6 @@
 # show an example of how it can be done
 # You'll also need your fortran recipe to depend on libgfortran
 #FORTRAN_forcevariable = ",fortran"
-#RUNTIMETARGET_append_pn-gcc-runtime = " libquadmath"
 
 #
 # Kernel image features
@@ -341,7 +321,7 @@
 # The INITRAMFS_IMAGE image variable will cause an additional recipe to
 # be built as a dependency to the what ever rootfs recipe you might be
 # using such as core-image-sato.  The initramfs might be needed for
-# the initial boot of of the target system such as to load kernel
+# the initial boot of the target system such as to load kernel
 # modules prior to mounting the root file system.
 #
 # INITRAMFS_IMAGE_BUNDLE variable controls if the image recipe
@@ -381,20 +361,28 @@
 #
 
 #
-# Use busybox/mdev for system initialization
+# System initialization
 #
-#VIRTUAL-RUNTIME_dev_manager = "busybox-mdev"
-#VIRTUAL-RUNTIME_login_manager = "busybox"
-#VIRTUAL-RUNTIME_init_manager = "busybox"
-#VIRTUAL-RUNTIME_initscripts = "initscripts"
-#VIRTUAL-RUNTIME_keymaps = "keymaps"
-#DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
+#INIT_MANAGER = "none"
+#INIT_MANAGER = "sysvinit"
+#INIT_MANAGER = "systemd"
+#INIT_MANAGER = "mdev-busybox"
 
 #
-# Use systemd for system initialization
+# Use a full set of packages instead of busybox for base utils
 #
-#DISTRO_FEATURES_append = " systemd"
-#DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
-#VIRTUAL-RUNTIME_login_manager = "shadow-base"
-#VIRTUAL-RUNTIME_init_manager = "systemd"
-#VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
+#PREFERRED_PROVIDER_base-utils = "packagegroup-core-base-utils"
+#VIRTUAL-RUNTIME_base-utils = "packagegroup-core-base-utils"
+#VIRTUAL-RUNTIME_base-utils-hwclock = "util-linux-hwclock"
+#VIRTUAL-RUNTIME_base-utils-syslog = "syslog"
+
+#
+# Enable LTO system-wide
+#
+#require conf/distro/include/lto.inc
+#DISTRO_FEATURES_append = " lto"
+
+#
+# Set PS1 for SDK
+#
+#SDK_PS1 ?= "${SDK_NAME}${SDK_VENDOR}:\$ "

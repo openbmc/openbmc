@@ -6,17 +6,18 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=0448d6488ef8cc380632b1569ee6d196"
 
 PROVIDES += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "", "virtual/libgles2 virtual/egl", d)}"
+PROVIDES += "virtual/libomxil"
 
 RPROVIDES_${PN} += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "", "libgles2 egl libegl libegl1 libglesv2-2", d)}"
 COMPATIBLE_MACHINE = "^rpi$"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"
-SRCREV = "e5803f2c986cbf8c919c60278b3231dcdf4271a6"
+SRCREV = "3fd8527eefd8790b4e8393458efc5f94eb21a615"
 
 # Use the date of the above commit as the package version. Update this when
 # SRCREV is changed.
-PV = "20190114"
+PV = "20210319"
 
 SRC_URI = "\
     git://github.com/${SRCFORK}/userland.git;protocol=git;branch=${SRCBRANCH} \
@@ -38,7 +39,16 @@ SRC_URI = "\
     file://0016-Allow-multiple-wayland-compositor-state-data-per-pro.patch \
     file://0017-khronos-backport-typedef-for-EGL_EXT_image_dma_buf_i.patch \
     file://0018-Add-EGL_IMG_context_priority-related-defines.patch \
+    file://0019-libfdt-Undefine-__wordsize-if-already-defined.patch \
+    file://0020-openmaxil-add-pkg-config-file.patch \
+    file://0021-cmake-Disable-format-overflow-warning-as-error.patch \
+    file://0022-all-host_applications-remove-non-existent-projects.patch \
+    file://0023-hello_pi-optionally-build-wayland-specific-app.patch \
+    file://0024-userland-Sync-needed-defines-for-weston-build.patch \
 "
+
+SRC_URI_remove_toolchain-clang = "file://0021-cmake-Disable-format-overflow-warning-as-error.patch"
+
 S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig
@@ -55,6 +65,7 @@ EXTRA_OECMAKE_append_aarch64 = " -DARM64=ON "
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)}"
 
 PACKAGECONFIG[wayland] = "-DBUILD_WAYLAND=TRUE -DWAYLAND_SCANNER_EXECUTABLE:FILEPATH=${STAGING_BINDIR_NATIVE}/wayland-scanner,,wayland-native wayland"
+PACKAGECONFIG[allapps] = "-DALL_APPS=true,,,"
 
 CFLAGS_append = " -fPIC"
 
@@ -64,7 +75,6 @@ do_install_append () {
 		sed -i 's/include "vcos_futex_mutex.h"/include "pthreads\/vcos_futex_mutex.h"/g' ${f}
 		sed -i 's/include "vcos_platform_types.h"/include "pthreads\/vcos_platform_types.h"/g' ${f}
 	done
-        install -D -m 0755 ${D}${prefix}${sysconfdir}/init.d/vcfiled ${D}${sysconfdir}/init.d/vcfiled
         rm -rf ${D}${prefix}${sysconfdir}
 	if [ "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "1", "0", d)}" = "1" ]; then
 		rm -rf ${D}${libdir}/libEGL*
@@ -73,6 +83,10 @@ do_install_append () {
 		rm -rf ${D}${libdir}/pkgconfig/egl.pc ${D}${libdir}/pkgconfig/glesv2.pc \
 			${D}${libdir}/pkgconfig/wayland-egl.pc
 		rm -rf ${D}${includedir}/EGL ${D}${includedir}/GLES* ${D}${includedir}/KHR
+        else
+                ln -sf brcmglesv2.pc ${D}${libdir}/pkgconfig/glesv2.pc
+                ln -sf brcmegl.pc ${D}${libdir}/pkgconfig/egl.pc
+                ln -sf brcmvg.pc ${D}${libdir}/pkgconfig/vg.pc
 	fi
 }
 
@@ -89,8 +103,6 @@ FILES_${PN}-dev += "${includedir} \
                    ${prefix}/src"
 FILES_${PN}-doc += "${datadir}/install"
 FILES_${PN}-dbg += "${libdir}/plugins/.debug"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 RDEPENDS_${PN} += "bash"
 RDEPENDS_${PN} += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "libegl-mesa", "", d)}"

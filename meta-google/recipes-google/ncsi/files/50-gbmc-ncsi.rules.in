@@ -1,0 +1,34 @@
+table inet filter {
+    chain ncsi_input {
+        type filter hook input priority 0; policy drop;
+        iifname != @NCSI_IF@ accept
+        ct state established accept
+        ip6 daddr ff00::/8 goto ncsi_brd_input
+        ip6 daddr fe80::/64 goto ncsi_legacy_input
+    }
+    chain ncsi_gbmc_br_pub_input {
+        jump gbmc_br_pub_input
+        reject
+    }
+    chain gbmc_br_pub_input {
+    }
+    chain ncsi_legacy_input {
+        jump ncsi_brd_input
+        tcp dport 3959 accept
+        udp dport 3959 accept
+        tcp dport 3967 accept
+        udp dport 3967 accept
+    }
+    chain ncsi_brd_input {
+        icmpv6 type nd-neighbor-advert accept
+        icmpv6 type nd-neighbor-solicit accept
+        icmpv6 type nd-router-advert accept
+    }
+    chain ncsi_forward {
+        type filter hook forward priority 0; policy drop;
+        iifname != @NCSI_IF@ accept
+        oifname != gbmcbr drop
+        ip6 daddr fdb5:0481:10ce::/64 drop
+        ip6 saddr fdb5:0481:10ce::/64 drop
+    }
+}

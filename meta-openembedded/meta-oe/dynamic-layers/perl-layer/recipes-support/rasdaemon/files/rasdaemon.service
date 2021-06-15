@@ -1,0 +1,12 @@
+[Unit]
+Description=RAS daemon to log the RAS events
+After=syslog.target
+
+[Service]
+ExecStart=/usr/sbin/rasdaemon -f -r
+ExecStartPost=/usr/sbin/rasdaemon --enable
+ExecStop=/usr/sbin/rasdaemon --disable
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

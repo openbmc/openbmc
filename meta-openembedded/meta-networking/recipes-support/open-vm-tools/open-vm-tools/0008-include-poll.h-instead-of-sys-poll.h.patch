@@ -1,0 +1,26 @@
+From e4f0b99d90e26b15106f634caad1c3dea9e09cb8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 13 Jun 2018 23:02:50 -0700
+Subject: [PATCH] include poll.h instead of sys/poll.h
+
+including sys/poll.h is deprecated
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ open-vm-tools/lib/asyncsocket/asyncsocket.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/open-vm-tools/lib/asyncsocket/asyncsocket.c b/open-vm-tools/lib/asyncsocket/asyncsocket.c
+index 65b07109..b41aa29d 100644
+--- a/open-vm-tools/lib/asyncsocket/asyncsocket.c
++++ b/open-vm-tools/lib/asyncsocket/asyncsocket.c
+@@ -69,8 +69,8 @@
+ #else
+ #include <stddef.h>
+ #include <ctype.h>
++#include <poll.h>
+ #include <sys/types.h>
+-#include <sys/poll.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ #include <netdb.h>

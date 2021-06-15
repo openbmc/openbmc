@@ -1,0 +1,52 @@
+From: =?utf-8?b?IlNaIExpbiAo5p6X5LiK5pm6KSI=?= <szlin@debian.org>
+Date: Thu, 27 Sep 2018 14:51:32 +0800
+Subject: Fix typo
+
+---
+ doc/modbus_mapping_new_start_address.txt | 4 ++--
+ doc/modbus_reply.txt                     | 2 +-
+ doc/modbus_reply_exception.txt           | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/doc/modbus_mapping_new_start_address.txt b/doc/modbus_mapping_new_start_address.txt
+index 4fa196a..94a81fb 100644
+--- a/doc/modbus_mapping_new_start_address.txt
++++ b/doc/modbus_mapping_new_start_address.txt
+@@ -21,9 +21,9 @@ The _modbus_mapping_new_start_address()_ function shall allocate four arrays to
+ store bits, input bits, registers and inputs registers. The pointers are stored
+ in modbus_mapping_t structure. All values of the arrays are initialized to zero.
+ 
+-The different starting adresses make it possible to place the mapping at any
++The different starting addresses make it possible to place the mapping at any
+ address in each address space. This way, you can give access to values stored
+-at high adresses without allocating memory from the address zero, for eg. to
++at high addresses without allocating memory from the address zero, for eg. to
+ make available registers from 10000 to 10009, you can use:
+ 
+ [source,c]
+diff --git a/doc/modbus_reply.txt b/doc/modbus_reply.txt
+index 0b29d6f..6b71d11 100644
+--- a/doc/modbus_reply.txt
++++ b/doc/modbus_reply.txt
+@@ -3,7 +3,7 @@ modbus_reply(3)
+ 
+ NAME
+ ----
+-modbus_reply - send a reponse to the received request
++modbus_reply - send a response to the received request
+ 
+ 
+ SYNOPSIS
+diff --git a/doc/modbus_reply_exception.txt b/doc/modbus_reply_exception.txt
+index 7e6324f..b2170be 100644
+--- a/doc/modbus_reply_exception.txt
++++ b/doc/modbus_reply_exception.txt
+@@ -3,7 +3,7 @@ modbus_reply_exception(3)
+ 
+ NAME
+ ----
+-modbus_reply_exception - send an exception reponse
++modbus_reply_exception - send an exception response
+ 
+ 
+ SYNOPSIS

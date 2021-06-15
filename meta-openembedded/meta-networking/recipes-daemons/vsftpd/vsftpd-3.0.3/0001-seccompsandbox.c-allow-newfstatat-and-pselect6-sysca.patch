@@ -1,0 +1,51 @@
+From 7bc261076ec94efa3197beaca39eba095d162b5e Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 26 Feb 2021 16:32:27 +0800
+Subject: [PATCH] seccompsandbox.c: allow newfstatat and pselect6 syscalls in
+ the seccomp sandbox
+
+Allow newfstatat and pselect6 in the seccomp sanbox for glibc 2.33.
+
+Fixes the following OOPS error:
+root@qemux86-64:~# tnftp 192.168.1.1
+Connected to 192.168.1.1.
+220 (vsFTPd 3.0.3)
+Name (192.168.1.1:root): anonymous
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+OOPS: priv_sock_get_cmd
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ seccompsandbox.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/seccompsandbox.c b/seccompsandbox.c
+index 377c50e..f601241 100644
+--- a/seccompsandbox.c
++++ b/seccompsandbox.c
+@@ -267,6 +267,7 @@ seccomp_sandbox_setup_data_connections()
+                        3, IPPROTO_TCP);
+   allow_nr(__NR_bind);
+   allow_nr(__NR_select);
++  allow_nr(__NR_pselect6);
+   if (tunable_port_enable)
+   {
+     allow_nr(__NR_connect);
+@@ -411,6 +412,7 @@ seccomp_sandbox_setup_postlogin(const struct vsf_session* p_sess)
+   allow_nr(__NR_getdents);
+   allow_nr(__NR_getdents64);
+   allow_nr(__NR_sysinfo);
++  allow_nr(__NR_newfstatat);
+   /* Misc */
+   allow_nr(__NR_umask);
+ 
+-- 
+2.17.1
+

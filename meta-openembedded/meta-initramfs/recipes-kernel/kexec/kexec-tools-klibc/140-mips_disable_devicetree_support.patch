@@ -1,4 +1,4 @@
-From 5ea7cd78cd252ffd3a9f3fbc8dc795d6e1596084 Mon Sep 17 00:00:00 2001
+From 7bd94a64cd5424e74ad49dbda65a15e83670268f Mon Sep 17 00:00:00 2001
 From: Andrea Adami <andrea.adami@gmail.com>
 Date: Mon, 17 Dec 2018 11:25:20 +0100
 Subject: [PATCH] kexec-tools: fix non-device tree devices on mips
@@ -14,6 +14,7 @@ Removed ppc change (unwanted ?)
 
 Signed-off-by: Konstantin Kuzov <master.nosferatu@gmail.com>
 Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
+
 ---
  kexec/arch/mips/include/arch/options.h |  4 +-
  kexec/arch/mips/kexec-elf-mips.c       | 58 ++++++++++++++------------
@@ -158,6 +159,3 @@ index 222c815..90b21c3 100644
  };
  
  extern struct memory_ranges usablemem_rgns;
--- 
-2.17.1
-

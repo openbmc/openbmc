@@ -1,0 +1,35 @@
+From b99891e31eb6ce550e7e1cb2ca592095b3050a93 Mon Sep 17 00:00:00 2001
+From: Brion Vibber <brion@pobox.com>
+Date: Sun, 25 Feb 2018 18:42:36 -0800
+Subject: Auto-detect -Bsymbolic, fixes configure on macOS
+
+The -Bsymbolic linker option is ELF-specific, and was breaking
+configure on macOS unless --disable-Bsymbolic was explicitly passed.
+
+Switching the behavior from requiring -Bsymbolic to be available
+by default to just warning and continuing on without.
+
+Fixes https://gitlab.gnome.org/GNOME/librsvg/issues/211
+
+Upstream-Status: Backport
+Signed-off-by: Adrian Bunk <bunk@stusta.de>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 15b26b2d..9f8dce29 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -216,7 +216,7 @@ AM_CONDITIONAL([ENABLE_PIXBUF_LOADER],[test "$enable_pixbuf_loader" = "yes"])
+ AC_ARG_ENABLE([Bsymbolic],
+   [AS_HELP_STRING([--disable-Bsymbolic],
+                   [disable linking with -Bsymbolic])],
+-  [],[enable_Bsymbolic=yes])
++  [enable_Bsymbolic=no],[enable_Bsymbolic=auto])
+ 
+ BSYMBOLIC_LDFLAG=
+ if test "$enable_Bsymbolic" != "no"; then
+-- 
+2.20.1
+

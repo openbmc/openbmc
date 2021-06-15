@@ -1,0 +1,35 @@
+From 97914aeab52b4d0ea0ab9e5ff985a1c5cddb0fa1 Mon Sep 17 00:00:00 2001
+From: Vincent Prince <vincent.prince.fr@gmail.com>
+Date: Mon, 16 Sep 2019 13:41:39 +0200
+Subject: [PATCH 06/10] IntelRDFPMathLib20U1: Check for __DEFINED_wchar_t
+
+This is defined by musl if wchar_t is already defined
+
+avoids errors like
+
+src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h:46:15: error: typedef redefinition with different types
+      ('int' vs 'unsigned int')
+typedef int   wchar_t;
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+---
+ src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h b/src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h
+index 56775bc..be96a85 100755
+--- a/src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h
++++ b/src/third_party/IntelRDFPMathLib20U1/LIBRARY/src/bid_functions.h
+@@ -43,7 +43,7 @@
+ 
+ #if 0 // MongoDB Modification -- just `#include <stddef.h>`
+ // Fix system header issue on Sun solaris and define required type by ourselves
+-#if !defined(_WCHAR_T) && !defined(_WCHAR_T_DEFINED) && !defined(__QNX__)
++#if !defined(_WCHAR_T) && !defined(_WCHAR_T_DEFINED) && !defined(__QNX__) && !defined(__DEFINED_wchar_t)
+ typedef int   wchar_t;
+ #endif
+ #else
+-- 
+2.7.4
+

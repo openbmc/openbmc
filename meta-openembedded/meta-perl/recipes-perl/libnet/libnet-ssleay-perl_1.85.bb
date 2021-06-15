@@ -19,6 +19,7 @@ RDEPENDS_${PN} += "\
     perl-module-extutils-makemaker \
     perl-module-mime-base64 \
     perl-module-socket \
+    perl-module-autoloader \
     zlib \
 "
 
@@ -41,8 +42,6 @@ do_configure() {
 do_install_ptest() {
     cp -r ${B}/t ${D}${PTEST_PATH}
 }
-
-BBCLASSEXTEND = "native"
 
 FILES_${PN}-dbg =+ "${libdir}/perl/vendor_perl/*/auto/Net/SSLeay/.debug/"
 

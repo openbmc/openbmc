@@ -1,0 +1,12 @@
+READLINE_6.3 {
+    rl_change_environment;
+    rl_clear_history;
+    rl_executing_key;
+    rl_executing_keyseq;
+    rl_filename_stat_hook;
+    rl_history_substr_search_backward;
+    rl_history_substr_search_forward;
+    rl_input_available_hook;
+    rl_print_last_kbd_macro;
+    rl_signal_event_hook;
+};

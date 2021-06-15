@@ -1,0 +1,86 @@
+From e1f9b0b531c6ddb11a85c0664051e2e4efc589fb Mon Sep 17 00:00:00 2001
+From: Ming Liu <ming.liu@toradex.com>
+Date: Sun, 5 May 2019 11:55:14 +0200
+Subject: [PATCH] Drop x11 dependencies
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Ming Liu <ming.liu@toradex.com>
+---
+ configure.ac | 44 --------------------------------------------
+ 1 file changed, 44 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index a5fd706..b42488c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -76,27 +76,8 @@ fi
+ AC_SUBST([EXEEXT_FOR_BUILD])
+ 
+ # Checks for pkg-config packages
+-
+-# Always required
+-X11_REQUIRES='xproto >= 7.0.17 xextproto xtrans xcb >= 1.11.1'
+-X11_EXTRA_DEPS="xcb >= 1.11.1"
+-
+ PKG_PROG_PKG_CONFIG()
+ 
+-AC_SUBST(X11_EXTRA_DEPS)
+-
+-# Issue an error if xtrans.m4 was not found and XTRANS_CONNECTION_FLAGS macro
+-# was not expanded, since libX11 with no transport types is rather useless.
+-#
+-# If you're seeing an error here, be sure you installed the lib/xtrans module
+-# first and if it's not in the default location, that you set the ACLOCAL
+-# environment variable to find it, such as:
+-#	ACLOCAL="aclocal -I ${PREFIX}/share/aclocal"
+-m4_pattern_forbid([^XTRANS_CONNECTION_FLAGS$])
+-
+-# Transport selection macro from xtrans.m4
+-XTRANS_CONNECTION_FLAGS
+-
+ # Check for dlopen
+ AC_MSG_CHECKING([if run-time linking is supported])
+ AC_SEARCH_LIBS(dlopen,[dl svld])
+@@ -237,30 +218,6 @@ AC_SUBST(XTHREAD_CFLAGS)
+ 
+ AC_CHECK_FUNC(poll, [AC_DEFINE(USE_POLL, 1, [poll() function is available])], )
+ 
+-#
+-# Find keysymdef.h
+-#
+-AC_MSG_CHECKING([keysym definitions])
+-AC_ARG_WITH([keysymdefdir],
+-        [AC_HELP_STRING([--with-keysymdefdir=DIR], [The location of keysymdef.h (defaults to xproto include dir)])],
+-        [KEYSYMDEFDIR=$withval],
+-        [KEYSYMDEFDIR=`$PKG_CONFIG --variable=includedir xproto`/X11])
+-
+-if test ! -d "$KEYSYMDEFDIR"; then
+-	AC_MSG_ERROR([$KEYSYMDEFDIR doesn't exist or isn't a directory])
+-fi
+-
+-FILES="keysymdef.h XF86keysym.h Sunkeysym.h DECkeysym.h HPkeysym.h"
+-for i in $FILES; do
+-    if test -f "$KEYSYMDEFDIR/$i"; then
+-            KEYSYMDEFS="$KEYSYMDEFS $KEYSYMDEFDIR/$i"
+-    elif test "x$i" = "xkeysymdef.h"; then
+-	    AC_MSG_ERROR([Cannot find keysymdef.h])
+-    fi
+-done
+-AC_MSG_RESULT([$KEYSYMDEFS])
+-AC_SUBST(KEYSYMDEFS)
+-
+ AC_ARG_ENABLE(xcms,
+               AS_HELP_STRING([--disable-xcms],
+                 [Disable Xlib support for CMS *EXPERIMENTAL*]),
+@@ -340,7 +297,6 @@ X11_LIBDIR="${libdir}/X11"
+ AX_DEFINE_DIR(X11_LIBDIR, X11_LIBDIR, [Location of libX11 library data])
+ AC_SUBST(X11_LIBDIR)
+ 
+-PKG_CHECK_MODULES(X11, [$X11_REQUIRES])
+ X11_CFLAGS="$X11_CFLAGS $XTHREAD_CFLAGS"
+ 
+ #
+-- 
+2.7.4
+

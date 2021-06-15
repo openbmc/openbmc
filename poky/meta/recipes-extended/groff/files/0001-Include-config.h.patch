@@ -1,0 +1,208 @@
+From 6cfa9f8126c1d6ec26f120d273e714fb19108873 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 4 Aug 2019 16:32:41 -0700
+Subject: [PATCH] Include config.h
+
+This helps avoid the include conflicts where <stdlib.h> is including
+<math.h> and since -I./lib is used and a local math.h wrapper is
+residing in there, the build breaks since stdlib.h really wants the
+standard system math.h to be included, this ensures that right macros
+are predefined and included before stdlib.h is included
+
+fixes
+In file included from src/libs/libgroff/assert.cpp:20:
+In file included from TOPDIR/build/tmp/work/aarch64-yoe-linux-musl/groff/1.22.4-r0/recipe-sysroot/usr/include/c++/v1/stdlib.h:100:
+./lib/math.h:38:3: error: "Please include config.h first."
+ #error "Please include config.h first."
+  ^
+./lib/math.h:40:1: error: unknown type name '_GL_INLINE_HEADER_BEGIN'
+
+We delete eqn.cpp and qen.hpp in do_configure
+to ensure they're regenerated and deterministic.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libs/libgroff/assert.cpp  |   4 +
+ src/libs/libgroff/curtime.cpp |   4 +
+ src/libs/libgroff/device.cpp  |   4 +
+ src/libs/libgroff/error.cpp   |   4 +
+ src/libs/libgroff/fatal.cpp   |   4 +
+ src/libs/libgroff/string.cpp  |   4 +
+ src/libs/libgroff/strsave.cpp |   4 +
+ src/preproc/eqn/eqn.cpp       | 450 ++++++++++++++++++----------------
+ src/preproc/eqn/eqn.hpp       |  12 +-
+ src/preproc/eqn/eqn.ypp       |   4 +
+ src/preproc/eqn/other.cpp     |   4 +
+ src/preproc/eqn/text.cpp      |   4 +
+ src/preproc/pic/object.cpp    |   4 +
+ 13 files changed, 285 insertions(+), 221 deletions(-)
+
+diff --git a/src/libs/libgroff/assert.cpp b/src/libs/libgroff/assert.cpp
+index aceed05..97780d6 100644
+--- a/src/libs/libgroff/assert.cpp
++++ b/src/libs/libgroff/assert.cpp
+@@ -16,6 +16,10 @@ for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ 
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include "assert.h"
+diff --git a/src/libs/libgroff/curtime.cpp b/src/libs/libgroff/curtime.cpp
+index 72fe067..9ddba08 100644
+--- a/src/libs/libgroff/curtime.cpp
++++ b/src/libs/libgroff/curtime.cpp
+@@ -15,6 +15,10 @@ for more details.
+ The GNU General Public License version 2 (GPL2) is available in the
+ internet at <http://www.gnu.org/licenses/gpl-2.0.txt>. */
+ 
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <errno.h>
+ #include <limits.h>
+ #include <stdlib.h>
+diff --git a/src/libs/libgroff/device.cpp b/src/libs/libgroff/device.cpp
+index 0d28b85..c211f85 100644
+--- a/src/libs/libgroff/device.cpp
++++ b/src/libs/libgroff/device.cpp
+@@ -17,6 +17,10 @@ for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ 
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <stdlib.h>
+ #include "device.h"
+ #include "defs.h"
+diff --git a/src/libs/libgroff/error.cpp b/src/libs/libgroff/error.cpp
+index 9a18803..7b63d3d 100644
+--- a/src/libs/libgroff/error.cpp
++++ b/src/libs/libgroff/error.cpp
+@@ -17,6 +17,10 @@ for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ 
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff --git a/src/libs/libgroff/fatal.cpp b/src/libs/libgroff/fatal.cpp
+index c0dcb35..fd6003e 100644
+--- a/src/libs/libgroff/fatal.cpp
++++ b/src/libs/libgroff/fatal.cpp
+@@ -16,6 +16,10 @@ for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ 
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <stdlib.h>
+ 
+ #define FATAL_ERROR_EXIT_CODE 3
+diff --git a/src/libs/libgroff/string.cpp b/src/libs/libgroff/string.cpp
+index 46c015c..449f3a6 100644
+--- a/src/libs/libgroff/string.cpp
++++ b/src/libs/libgroff/string.cpp
+@@ -17,6 +17,10 @@ for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ 
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <stdlib.h>
+ 
+ #include "lib.h"
+diff --git a/src/libs/libgroff/strsave.cpp b/src/libs/libgroff/strsave.cpp
+index f95c05e..d875045 100644
+--- a/src/libs/libgroff/strsave.cpp
++++ b/src/libs/libgroff/strsave.cpp
+@@ -17,6 +17,10 @@ for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ 
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <string.h>
+ #include <stdlib.h>
+ 
+diff --git a/src/preproc/eqn/eqn.ypp b/src/preproc/eqn/eqn.ypp
+index fb318c3..b7b647e 100644
+--- a/src/preproc/eqn/eqn.ypp
++++ b/src/preproc/eqn/eqn.ypp
+@@ -16,6 +16,10 @@ for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ %{
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <stdio.h>
+ #include <string.h>
+ #include <stdlib.h>
+diff --git a/src/preproc/eqn/other.cpp b/src/preproc/eqn/other.cpp
+index 8db993f..38db396 100644
+--- a/src/preproc/eqn/other.cpp
++++ b/src/preproc/eqn/other.cpp
+@@ -17,6 +17,10 @@ for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ 
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <stdlib.h>
+ 
+ #include "eqn.h"
+diff --git a/src/preproc/eqn/text.cpp b/src/preproc/eqn/text.cpp
+index f3d06f9..3b244d5 100644
+--- a/src/preproc/eqn/text.cpp
++++ b/src/preproc/eqn/text.cpp
+@@ -17,6 +17,10 @@ for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ 
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <ctype.h>
+ #include <stdlib.h>
+ #include "eqn.h"
+diff --git a/src/preproc/pic/object.cpp b/src/preproc/pic/object.cpp
+index d8ba610..f26a831 100644
+--- a/src/preproc/pic/object.cpp
++++ b/src/preproc/pic/object.cpp
+@@ -17,6 +17,10 @@ for more details.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ 
++#if HAVE_CONFIG_H
++# include <config.h>
++#endif
++
+ #include <stdlib.h>
+ 
+ #include "pic.h"
+-- 
+2.22.0
+

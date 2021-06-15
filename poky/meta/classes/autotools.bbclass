@@ -5,7 +5,7 @@ def autotools_dep_prepend(d):
     pn = d.getVar('PN')
     deps = ''
 
-    if pn in ['autoconf-native', 'automake-native', 'help2man-native']:
+    if pn in ['autoconf-native', 'automake-native']:
         return deps
     deps += 'autoconf-native automake-native '
 
@@ -17,7 +17,7 @@ def autotools_dep_prepend(d):
                         and not d.getVar('INHIBIT_DEFAULT_DEPS'):
             deps += 'libtool-cross '
 
-    return deps + 'gnu-config-native '
+    return deps
 
 DEPENDS_prepend = "${@autotools_dep_prepend(d)} "
 
@@ -25,10 +25,12 @@ inherit siteinfo
 
 # Space separated list of shell scripts with variables defined to supply test
 # results for autoconf tests we cannot run at build time.
-export CONFIG_SITE = "${@siteinfo_get_files(d)}"
+# The value of this variable is filled in in a prefunc because it depends on
+# the contents of the sysroot.
+export CONFIG_SITE
 
 acpaths ?= "default"
-EXTRA_AUTORECONF = "--exclude=autopoint"
+EXTRA_AUTORECONF = "--exclude=autopoint --exclude=gtkdocize"
 
 export lt_cv_sys_lib_dlsearch_path_spec = "${libdir} ${base_libdir}"
 
@@ -88,7 +90,7 @@ oe_runconf () {
 	cfgscript=`python3 -c "import os; print(os.path.relpath(os.path.dirname('${CONFIGURE_SCRIPT}'), '.'))"`/$cfgscript_name
 	if [ -x "$cfgscript" ] ; then
 		bbnote "Running $cfgscript ${CONFIGUREOPTS} ${EXTRA_OECONF} $@"
-		if ! ${CACHED_CONFIGUREVARS} $cfgscript ${CONFIGUREOPTS} ${EXTRA_OECONF} "$@"; then
+		if ! CONFIG_SHELL=${CONFIG_SHELL-/bin/bash} ${CACHED_CONFIGUREVARS} $cfgscript ${CONFIGUREOPTS} ${EXTRA_OECONF} "$@"; then
 			bbnote "The following config.log files may provide further information."
 			bbnote `find ${B} -ignore_readdir_race -type f -name config.log`
 			bbfatal_log "configure failed"
@@ -132,6 +134,8 @@ EXTRACONFFUNCS ??= ""
 EXTRA_OECONF_append = " ${PACKAGECONFIG_CONFARGS}"
 
 do_configure[prefuncs] += "autotools_preconfigure autotools_aclocals ${EXTRACONFFUNCS}"
+do_compile[prefuncs] += "autotools_aclocals"
+do_install[prefuncs] += "autotools_aclocals"
 do_configure[postfuncs] += "autotools_postconfigure"
 
 ACLOCALDIR = "${STAGING_DATADIR}/aclocal"
@@ -140,7 +144,6 @@ ACLOCALEXTRAPATH_class-target = " -I ${STAGING_DATADIR_NATIVE}/aclocal/"
 ACLOCALEXTRAPATH_class-nativesdk = " -I ${STAGING_DATADIR_NATIVE}/aclocal/"
 
 python autotools_aclocals () {
-    # Refresh variable with cache files
     d.setVar("CONFIG_SITE", siteinfo_get_files(d, sysrootcache=True))
 }
 
@@ -212,21 +215,13 @@ autotools_do_configure() {
 			PRUNE_M4="$PRUNE_M4 gettext.m4 iconv.m4 lib-ld.m4 lib-link.m4 lib-prefix.m4 nls.m4 po.m4 progtest.m4"
 		fi
 		mkdir -p m4
-		if grep -q "^[[:space:]]*[AI][CT]_PROG_INTLTOOL" $CONFIGURE_AC; then
-			if ! echo "${DEPENDS}" | grep -q intltool-native; then
-				bbwarn "Missing DEPENDS on intltool-native"
-			fi
-			PRUNE_M4="$PRUNE_M4 intltool.m4"
-			bbnote Executing intltoolize --copy --force --automake
-			intltoolize --copy --force --automake
-		fi
 
 		for i in $PRUNE_M4; do
 			find ${S} -ignore_readdir_race -name $i -delete
 		done
 
 		bbnote Executing ACLOCAL=\"$ACLOCAL\" autoreconf -Wcross --verbose --install --force ${EXTRA_AUTORECONF} $acpaths
-		ACLOCAL="$ACLOCAL" autoreconf -Wcross --verbose --install --force ${EXTRA_AUTORECONF} $acpaths || die "autoreconf execution failed."
+		ACLOCAL="$ACLOCAL" autoreconf -Wcross -Wno-obsolete --verbose --install --force ${EXTRA_AUTORECONF} $acpaths || die "autoreconf execution failed."
 		cd $olddir
 	fi
 	if [ -e ${CONFIGURE_SCRIPT} ]; then

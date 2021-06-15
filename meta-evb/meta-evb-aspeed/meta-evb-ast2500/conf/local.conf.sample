@@ -3,7 +3,7 @@ DISTRO ?= "openbmc-phosphor"
 PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"
 EXTRA_IMAGE_FEATURES = "debug-tweaks"
-USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+USER_CLASSES ?= "buildstats image-prelink"
 PATCHRESOLVE = "noop"
 BB_DISKMON_DIRS = "\
     STOPTASKS,${TMPDIR},1G,100K \
@@ -19,3 +19,5 @@ INHERIT += "extrausers"
 EXTRA_USERS_PARAMS = " \
   usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
   "
+
+require conf/machine/include/obmc-bsp-common.inc

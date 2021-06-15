@@ -1,0 +1,29 @@
+From 1c6028f5f8bbfd3fd7327a43e1bb762c2c166167 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Aug 2020 18:10:54 -0700
+Subject: [PATCH] Mark setjmp_buffer extern declaration
+
+Fixes build with -fno-common
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ metadata.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/metadata.c b/metadata.c
+index 8a10c77..c114091 100644
+--- a/metadata.c
++++ b/metadata.c
+@@ -484,7 +484,7 @@ GetAudioMetadata(const char *path, const char *name)
+ }
+ 
+ /* For libjpeg error handling */
+-jmp_buf setjmp_buffer;
++extern jmp_buf setjmp_buffer;
+ static void
+ libjpeg_error_handler(j_common_ptr cinfo)
+ {
+-- 
+2.28.0
+

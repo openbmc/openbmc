@@ -1,0 +1,25 @@
+Compile warning fixes from Debian
+
+Signed-off-by: Adrian Bunk <bunk@stusta.de>
+Upstream-Status: Inappropriate [upstream is dead]
+
+--- a/options.c
++++ b/options.c
+@@ -41,6 +41,7 @@ static char sccsid[] = "@(#) options.c 1
+ #include <netinet/in.h>
+ #include <netdb.h>
+ #include <stdio.h>
++#include <unistd.h>
+ #include <syslog.h>
+ #include <pwd.h>
+ #include <grp.h>
+--- a/scaffold.c
++++ b/scaffold.c
+@@ -17,6 +17,7 @@ static char sccs_id[] = "@(#) scaffold.c
+ #include <arpa/inet.h>
+ #include <netdb.h>
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <syslog.h>
+ #include <setjmp.h>
+ #include <string.h>

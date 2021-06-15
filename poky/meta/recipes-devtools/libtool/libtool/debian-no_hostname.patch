@@ -1,0 +1,21 @@
+libtool: remove host specific info from header file
+
+https://sources.debian.org/data/main/libt/libtool/2.4.6-10/debian/patches/
+        no_hostname.patch
+
+Upstream-Status: Inappropriate [not author]
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+---
+Index: libtool-2.4.6/m4/libtool.m4
+===================================================================
+--- libtool-2.4.6.orig/m4/libtool.m4
++++ libtool-2.4.6/m4/libtool.m4
+@@ -728,7 +728,6 @@ _LT_CONFIG_SAVE_COMMANDS([
+     cat <<_LT_EOF >> "$cfgfile"
+ #! $SHELL
+ # Generated automatically by $as_me ($PACKAGE) $VERSION
+-# Libtool was configured on host `(hostname || uname -n) 2>/dev/null | sed 1q`:
+ # NOTE: Changes made to this file will be lost: look at ltmain.sh.
+ 
+ # Provide generalized library-building support services.

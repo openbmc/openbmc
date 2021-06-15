@@ -1,0 +1,23 @@
+traceback2 adds traceback for python2. Rather than depend on traceback2, we're
+python3 only so just use traceback.
+This caused breakage in oe-selftest -j which uses testtools on the autobuilder
+using buildtools-tarball.
+
+Upstream-Status: Inappropriate [Our recipe is python3 specific]
+(Once py2 is EOL upstream probably could/should take this)
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: testtools-2.3.0/testtools/content.py
+===================================================================
+--- testtools-2.3.0.orig/testtools/content.py
++++ testtools-2.3.0/testtools/content.py
+@@ -19,8 +19,7 @@ import os
+ import sys
+ 
+ from extras import try_import
+-# To let setup.py work, make this a conditional import.
+-traceback = try_import('traceback2')
++import traceback
+ 
+ from testtools.compat import (
+     _b,

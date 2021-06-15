@@ -1,20 +1,8 @@
 #!/bin/bash
 #
 # Copyright (c) 2016,  Intel Corporation.
-# All Rights Reserved
 #
-# This program is free software;  you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY;  without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-# the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program;  if not, see <http://www.gnu.org/licenses/>
+# SPDX-License-Identifier: GPL-2.0-or-later
 #
 
 #
@@ -28,7 +16,7 @@ if [ $# -lt 1 -o "$1" = '--help' -o "$1" = '-h' ] ; then
     echo 'OpenEmbedded run-native - runs native tools'
     echo ''
     echo 'arguments:'
-    echo '  native-recipe       The recipe which provoides tool'
+    echo '  native-recipe       The recipe which provides tool'
     echo '  tool                Native tool to run'
     echo ''
     exit 2
@@ -55,7 +43,7 @@ fi
 OLD_PATH=$PATH
 
 # look for a tool only in native sysroot
-PATH=$OECORE_NATIVE_SYSROOT/usr/bin:$OECORE_NATIVE_SYSROOT/bin:$OECORE_NATIVE_SYSROOT/usr/sbin:$OECORE_NATIVE_SYSROOT/sbin$(find $OECORE_NATIVE_SYSROOT/usr/bin/*-native -maxdepth 1 -type d -printf ":%p")
+PATH=$OECORE_NATIVE_SYSROOT/usr/bin:$OECORE_NATIVE_SYSROOT/bin:$OECORE_NATIVE_SYSROOT/usr/sbin:$OECORE_NATIVE_SYSROOT/sbin$(find $OECORE_NATIVE_SYSROOT/usr/bin -maxdepth 1 -name "*-native" -type d -printf ":%p")
 tool_find=`/usr/bin/which $tool 2>/dev/null`
 
 if [ -n "$tool_find" ] ; then

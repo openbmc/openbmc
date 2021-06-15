@@ -1,5 +1,8 @@
+#
 # Copyright 2018 by Garmin Ltd. or its subsidiaries
-# Released under the MIT license (see COPYING.MIT)
+#
+# SPDX-License-Identifier: MIT
+#
 
 from oeqa.sdk.testsdk import TestSDKBase
 
@@ -22,11 +25,8 @@ class TestSDKExt(TestSDKBase):
 
         subprocesstweak.errors_have_output()
 
-        # extensible sdk can be contaminated if native programs are
-        # in PATH, i.e. use perl-native instead of eSDK one.
-        paths_to_avoid = [d.getVar('STAGING_DIR'),
-                        d.getVar('BASE_WORKDIR')]
-        os.environ['PATH'] = avoid_paths_in_environ(paths_to_avoid)
+        # We need the original PATH for testing the eSDK, not with our manipulations
+        os.environ['PATH'] = d.getVar("BB_ORIGENV", False).getVar("PATH")
 
         tcname = d.expand("${SDK_DEPLOY}/${TOOLCHAINEXT_OUTPUTNAME}.sh")
         if not os.path.exists(tcname):
@@ -98,6 +98,9 @@ class TestSDKExt(TestSDKBase):
 
             if not result.wasSuccessful():
                 fail = True
+
+            # Clean the workspace/sources to avoid `devtool add' failure because of non-empty source directory
+            bb.utils.remove(sdk_dir+'workspace/sources', True)
 
         if fail:
             bb.fatal("%s - FAILED - check the task log and the commands log" % pn)

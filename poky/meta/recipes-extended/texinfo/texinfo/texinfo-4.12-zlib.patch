@@ -1,4 +1,4 @@
-From fe4f00459601efe0cfa75d92749a32237800a530 Mon Sep 17 00:00:00 2001
+From 3d3b66cf398853c666e724c3dbcc37d53a2240d5 Mon Sep 17 00:00:00 2001
 From: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
 Date: Tue, 29 Nov 2016 12:27:17 -0600
 Subject: [PATCH] texinfo-4.12-zlib
@@ -7,16 +7,17 @@ Upstream-Status: Pending
 
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Signed-off-by: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
+
 ---
- install-info/Makefile.in    | 12 ++-----
- install-info/install-info.c | 79 +++++++++++++++++++++++++++------------------
- 2 files changed, 49 insertions(+), 42 deletions(-)
+ install-info/Makefile.in    |  2 +-
+ install-info/install-info.c | 79 ++++++++++++++++++++++---------------
+ 2 files changed, 48 insertions(+), 33 deletions(-)
 
 diff --git a/install-info/Makefile.in b/install-info/Makefile.in
-index 837d020..ba96579 100644
+index c924509..746df05 100644
 --- a/install-info/Makefile.in
 +++ b/install-info/Makefile.in
-@@ -216,7 +208,7 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
+@@ -218,7 +218,7 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
  PROGRAMS = $(bin_PROGRAMS)
  am_ginstall_info_OBJECTS = install-info.$(OBJEXT)
  ginstall_info_OBJECTS = $(am_ginstall_info_OBJECTS)
@@ -24,12 +25,12 @@ index 837d020..ba96579 100644
 +ginstall_info_LDADD = $(LDADD) -lz
  am__DEPENDENCIES_1 =
  ginstall_info_DEPENDENCIES = $(top_builddir)/gnulib/lib/libgnu.a \
- 	$(am__DEPENDENCIES_1)
+ 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 diff --git a/install-info/install-info.c b/install-info/install-info.c
-index e58189c..8617787 100644
+index 21f4fe3..a7aba82 100644
 --- a/install-info/install-info.c
 +++ b/install-info/install-info.c
-@@ -22,6 +22,7 @@
+@@ -19,6 +19,7 @@
  #include <getopt.h>
  #include <regex.h>
  #include <argz.h>
@@ -37,7 +38,7 @@ index e58189c..8617787 100644
  
  #define TAB_WIDTH 8
  
-@@ -684,15 +685,15 @@ The first time you invoke Info you start off looking at this node.\n\
+@@ -681,15 +682,15 @@ The first time you invoke Info you start off looking at this node.\n\
     
     Return either stdin reading the file, or a non-stdin pipe reading
     the output of the compression program.  */
@@ -56,7 +57,7 @@ index e58189c..8617787 100644
  
    /* We let them pass NULL if they don't want this info, but it's easier
       to always determine it.  */
-@@ -700,48 +701,48 @@ open_possibly_compressed_file (char *filename,
+@@ -697,48 +698,48 @@ open_possibly_compressed_file (char *filename,
      opened_filename = &local_opened_filename;
  
    *opened_filename = filename;
@@ -113,7 +114,7 @@ index e58189c..8617787 100644
      }
  #endif /* __MSDOS__ */
    if (!f)
-@@ -757,7 +758,7 @@ open_possibly_compressed_file (char *filename,
+@@ -754,7 +755,7 @@ open_possibly_compressed_file (char *filename,
            (*create_callback) (filename);
  
            /* And try opening it again.  */
@@ -122,7 +123,7 @@ index e58189c..8617787 100644
            if (!f)
              return 0;
          }
-@@ -767,26 +768,26 @@ open_possibly_compressed_file (char *filename,
+@@ -764,26 +765,26 @@ open_possibly_compressed_file (char *filename,
  
    /* Read first few bytes of file rather than relying on the filename.
       If the file is shorter than this it can't be usable anyway.  */
@@ -158,7 +159,7 @@ index e58189c..8617787 100644
                  return 0;
                goto determine_file_type; /* success */
              }
-@@ -857,35 +858,40 @@ determine_file_type:
+@@ -854,35 +855,40 @@ determine_file_type:
      *compression_program = NULL;
  
    /* Seek back over the magic bytes.  */
@@ -206,7 +207,7 @@ index e58189c..8617787 100644
      }
  
    return f;
-@@ -904,7 +910,8 @@ readfile (char *filename, int *sizep,
+@@ -901,7 +907,8 @@ readfile (char *filename, int *sizep,
      void (*create_callback) (char *), char **opened_filename,
      char **compression_program)
  {
@@ -216,7 +217,7 @@ index e58189c..8617787 100644
    int filled = 0;
    int data_size = 8192;
    char *data = xmalloc (data_size);
-@@ -912,14 +919,20 @@ readfile (char *filename, int *sizep,
+@@ -909,14 +916,20 @@ readfile (char *filename, int *sizep,
    /* If they passed the space for the file name to return, use it.  */
    f = open_possibly_compressed_file (filename, create_callback,
                                       opened_filename,
@@ -239,7 +240,7 @@ index e58189c..8617787 100644
        if (nread < 0)
          return 0;
        if (nread == 0)
-@@ -938,8 +951,10 @@ readfile (char *filename, int *sizep,
+@@ -935,8 +948,10 @@ readfile (char *filename, int *sizep,
    /* We need to close the stream, since on some systems the pipe created
       by popen is simulated by a temporary file which only gets removed
       inside pclose.  */
@@ -251,6 +252,3 @@ index e58189c..8617787 100644
  
    *sizep = filled;
    return data;
--- 
-2.9.3
-

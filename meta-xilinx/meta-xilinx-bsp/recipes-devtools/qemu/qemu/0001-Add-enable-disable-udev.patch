@@ -1,0 +1,29 @@
+From b921e5204030845dc7c9d16d5f66d965e8d05367 Mon Sep 17 00:00:00 2001
+From: Jeremy Puhlman <jpuhlman@mvista.com>
+Date: Thu, 19 Mar 2020 11:54:26 -0700
+Subject: [PATCH] Add enable/disable libudev
+
+Upstream-Status: Pending
+Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
+
+[update patch context]
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
+---
+ configure | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+Index: qemu-5.1.0/configure
+===================================================================
+--- qemu-5.1.0.orig/configure
++++ qemu-5.1.0/configure
+@@ -1640,6 +1640,10 @@ for opt do
+   ;;
+   --disable-libdaxctl) libdaxctl=no
+   ;;
++  --enable-libudev) libudev="yes"
++  ;;
++  --disable-libudev) libudev="no"
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"

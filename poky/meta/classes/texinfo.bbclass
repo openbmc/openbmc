@@ -6,13 +6,13 @@
 # Texinfo recipe, you can remove texinfo-native from ASSUME_PROVIDED and
 # makeinfo from SANITY_REQUIRED_UTILITIES.
 
-TEXDEP = "texinfo-native"
+TEXDEP = "${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', 'texinfo-replacement-native', 'texinfo-dummy-native', d)}"
 TEXDEP_class-native = "texinfo-dummy-native"
 TEXDEP_class-cross = "texinfo-dummy-native"
+TEXDEP_class-crosssdk = "texinfo-dummy-native"
+TEXDEP_class-cross-canadian = "texinfo-dummy-native"
 DEPENDS_append = " ${TEXDEP}"
-PATH_prepend_class-native = "${STAGING_BINDIR_NATIVE}/texinfo-dummy-native:"
-PATH_prepend_class-cross = "${STAGING_BINDIR_NATIVE}/texinfo-dummy-native:"
 
 # libtool-cross doesn't inherit cross
 TEXDEP_pn-libtool-cross = "texinfo-dummy-native"
-PATH_prepend_pn-libtool-cross = "${STAGING_BINDIR_NATIVE}/texinfo-dummy-native:"
+

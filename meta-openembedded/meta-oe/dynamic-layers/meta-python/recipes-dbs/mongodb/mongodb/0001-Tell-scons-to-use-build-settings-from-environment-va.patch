@@ -1,0 +1,55 @@
+From 8295bb6a60896fed54d6450bca091aea4eea4fb2 Mon Sep 17 00:00:00 2001
+From: Vincent Prince <vincent.prince.fr@gmail.com>
+Date: Mon, 16 Sep 2019 13:21:44 +0200
+Subject: [PATCH 01/10] Tell scons to use build settings from environment
+ variables
+
+Signed-off-by: Sven Ebenfeld <sven.ebenfeld@gmail.com>
+Signed-off-by: Vincent Prince <vincent.prince.fr@gmail.com>
+---
+ SConstruct | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/SConstruct b/SConstruct
+index 89c044ab78..2044c0ddb8 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -593,6 +593,7 @@ def variable_arch_converter(val):
+         'amd64':  'x86_64',
+         'emt64':   'x86_64',
+         'x86':    'i386',
++        'aarch64': 'arm64',
+     }
+     val = val.lower()
+ 
+@@ -723,7 +724,8 @@ env_vars.Add(
+ )
+ 
+ env_vars.Add('CC',
+-    help='Select the C compiler to use')
++    help='Select the C compiler to use',
++    default=os.getenv('CC'))
+ 
+ env_vars.Add('CCFLAGS',
+     help='Sets flags for the C and C++ compiler',
+@@ -743,7 +745,8 @@ env_vars.Add('CPPPATH',
+     converter=variable_shlex_converter)
+ 
+ env_vars.Add('CXX',
+-    help='Select the C++ compiler to use')
++    help='Select the C++ compiler to use',
++    default=os.getenv('CXX'))
+ 
+ env_vars.Add('CXXFLAGS',
+     help='Sets flags for the C++ compiler',
+@@ -1127,6 +1130,7 @@ if get_option('build-tools') == 'next' or get_option('ninja') == 'next':
+     SCons.Tool.DefaultToolpath.insert(0, os.path.abspath('site_scons/site_tools/next'))
+ 
+ env = Environment(variables=env_vars, **envDict)
++env.PrependENVPath('PATH', os.getenv('PATH'))
+ 
+ # Only print the spinner if stdout is a tty
+ if sys.stdout.isatty():
+-- 
+2.24.0
+

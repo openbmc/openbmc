@@ -5,9 +5,7 @@ called the makefile, which lists each of the non-source files and how to compute
 HOMEPAGE = "http://www.gnu.org/software/make/"
 SECTION = "devel"
 
-SRC_URI = "${GNU_MIRROR}/make/make-${PV}.tar.bz2 \
-           file://0001-glob-Do-not-assume-glibc-glob-internals.patch \
-           file://0002-glob-Do-not-assume-glibc-glob-internals.patch \
+SRC_URI = "${GNU_MIRROR}/make/make-${PV}.tar.gz \
            "
 
 inherit autotools gettext pkgconfig texinfo

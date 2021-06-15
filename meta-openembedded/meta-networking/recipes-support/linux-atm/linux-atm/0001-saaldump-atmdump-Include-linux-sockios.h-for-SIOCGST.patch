@@ -1,0 +1,59 @@
+From 4456e13880803a300e4b6f263ad22a37481b5df5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Aug 2019 09:33:43 -0700
+Subject: [PATCH] saaldump,atmdump: Include linux/sockios.h for SIOCGSTAMP
+
+In linux kernel commit 0768e17073dc527ccd18ed5f96ce85f9985e9115
+the asm-generic/sockios.h header no longer defines SIOCGSTAMP.
+Instead it provides only SIOCGSTAMP_OLD.
+
+The linux/sockios.h header now defines SIOCGSTAMP using either
+SIOCGSTAMP_OLD or SIOCGSTAMP_NEW as appropriate. This linux only
+header file is not pulled so we get a build failure.
+
+Fixes
+../../../linux-atm-2.5.2/src/maint/atmdump.c:142:18: error: use of undeclared identifier 'SIOCGSTAMP'
+            if (ioctl(s,SIOCGSTAMP,&stamp) < 0) {
+                        ^
+1 error generated.
+make[3]: *** [Makefile:623: atmdump.o] Error 1
+make[3]: *** Waiting for unfinished jobs....
+../../../linux-atm-2.5.2/src/maint/saaldump.c:169:14: error: use of undeclared identifier 'SIOCGSTAMP'
+        if (ioctl(s,SIOCGSTAMP,&stamp) < 0) {
+                    ^
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/maint/atmdump.c  | 2 +-
+ src/maint/saaldump.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/maint/atmdump.c b/src/maint/atmdump.c
+index 8b17826..9e4853b 100644
+--- a/src/maint/atmdump.c
++++ b/src/maint/atmdump.c
+@@ -5,7 +5,7 @@
+ #if HAVE_CONFIG_H
+ #include <config.h>
+ #endif
+-
++#include <linux/sockios.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <unistd.h>
+diff --git a/src/maint/saaldump.c b/src/maint/saaldump.c
+index 83bdde9..69429a8 100644
+--- a/src/maint/saaldump.c
++++ b/src/maint/saaldump.c
+@@ -5,7 +5,7 @@
+ #if HAVE_CONFIG_H
+ #include <config.h>
+ #endif
+-
++#include <linux/sockios.h>
+ #include <stdlib.h>
+ #include <stdarg.h>
+ #include <stdio.h>
+-- 
+2.23.0
+

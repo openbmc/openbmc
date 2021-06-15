@@ -1,0 +1,6 @@
+[properties]
+have_c99_vsnprintf = true
+have_c99_snprintf = true
+have_unix98_printf = true
+va_val_copy = true
+have_strlcpy = true

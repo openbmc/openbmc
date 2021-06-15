@@ -1,0 +1,27 @@
+From efc627f4a288ea2e7969407f50fc403bb0264df1 Mon Sep 17 00:00:00 2001
+From: Alexander Filippov <a.filippov@yadro.com>
+Date: Wed, 23 Oct 2019 15:51:25 +0300
+Subject: [PATCH] config/ast-common: set fieldmode to true
+
+Force enables field mode. Our system always in production.
+
+Signed-off-by: Alexander Filippov <a.filippov@yadro.com>
+---
+ include/configs/ast-common.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/configs/ast-common.h b/include/configs/ast-common.h
+index a0243083bd..6285fa4037 100644
+--- a/include/configs/ast-common.h
++++ b/include/configs/ast-common.h
+@@ -117,6 +117,7 @@
+ #define ASPEED_ENV_SETTINGS \
+ 	"verify=yes\0"	\
+ 	"spi_dma=yes\0" \
++	"fieldmode=true\0" \
+ 	""
+ 
+ #endif	/* __AST_COMMON_CONFIG_H */
+-- 
+2.21.0
+

@@ -20,11 +20,9 @@ Signed-off-by: Serhey Popovych <serhe.popovych@gmail.com>
  ldso/dynlink.c | 4 +++-
  2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index b46f8ca4..c07e4ae8 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -46,7 +46,8 @@ CFLAGS_AUTO = -Os -pipe
+@@ -47,7 +47,8 @@ CFLAGS_AUTO = -Os -pipe
  CFLAGS_C99FSE = -std=c99 -ffreestanding -nostdinc 
  
  CFLAGS_ALL = $(CFLAGS_C99FSE)
@@ -34,20 +32,18 @@ index b46f8ca4..c07e4ae8 100644
  CFLAGS_ALL += $(CPPFLAGS) $(CFLAGS_AUTO) $(CFLAGS)
  
  LDFLAGS_ALL = $(LDFLAGS_AUTO) $(LDFLAGS)
-diff --git a/ldso/dynlink.c b/ldso/dynlink.c
-index ec921dfd..7c119c55 100644
 --- a/ldso/dynlink.c
 +++ b/ldso/dynlink.c
-@@ -22,6 +22,8 @@
- #include "dynlink.h"
- #include "malloc_impl.h"
+@@ -29,6 +29,8 @@
+ #define realloc __libc_realloc
+ #define free __libc_free
  
 +#define SYS_PATH_DFLT SYSLIBDIR ":" LIBDIR
 +
  static void error(const char *, ...);
  
  #define MAXP2(a,b) (-(-(a)&-(b)))
-@@ -1038,7 +1040,7 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
+@@ -1094,7 +1096,7 @@ static struct dso *load_library(const ch
  					sys_path = "";
  				}
  			}
@@ -56,6 +52,3 @@ index ec921dfd..7c119c55 100644
  			fd = path_open(name, sys_path, buf, sizeof buf);
  		}
  		pathname = buf;
--- 
-2.7.4
-

@@ -1,0 +1,42 @@
+From 59402e3a61d14eb7ce8c2019ea1a87ad4bd28605 Mon Sep 17 00:00:00 2001
+From: Anuj Mittal <anuj.mittal@intel.com>
+Date: Thu, 14 Nov 2019 10:13:53 +0800
+Subject: [PATCH] dont setup compiler flags -m32/-m64
+
+We don't want these to be setup by boost as we pass our own flags.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ tools/build/src/tools/gcc.jam | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
+index c7e3cf3..24486e0 100644
+--- a/tools/build/src/tools/gcc.jam
++++ b/tools/build/src/tools/gcc.jam
+@@ -430,20 +430,6 @@ local rule compile-link-flags ( * )
+ }
+ 
+ {
+-    # Handle address-model
+-    compile-link-flags <target-os>aix/<address-model>32 : -maix32 ;
+-    compile-link-flags <target-os>aix/<address-model>64 : -maix64 ;
+-
+-    compile-link-flags <target-os>hpux/<address-model>32 : -milp32 ;
+-    compile-link-flags <target-os>hpux/<address-model>64 : -mlp64 ;
+-
+-    local generic-os = [ set.difference $(all-os) : aix hpux ] ;
+-    local arch = power sparc x86 ;
+-    compile-link-flags <target-os>$(generic-os)/<architecture>$(arch)/<address-model>32 : -m32 ;
+-    compile-link-flags <target-os>$(generic-os)/<architecture>$(arch)/<address-model>64 : -m64 ;
+-}
+-
+-{
+     # Handle threading
+     local rule threading-flags ( * )
+     {
+-- 
+2.7.4
+

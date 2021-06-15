@@ -427,7 +427,7 @@ class BeautifulSoup(Tag):
         if self.is_xml:
             # Print the XML declaration
             encoding_part = ''
-            if eventual_encoding != None:
+            if eventual_encoding is not None:
                 encoding_part = ' encoding="%s"' % eventual_encoding
             prefix = '<?xml version="1.0"%s?>\n' % encoding_part
         else:

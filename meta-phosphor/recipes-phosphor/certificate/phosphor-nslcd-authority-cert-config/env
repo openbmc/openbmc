@@ -3,7 +3,10 @@
 ENDPOINT=ldap
 
 #Path for the certificate file
-CERTPATH=/etc/ssl/certs/Root-CA.pem
+CERTPATH=/etc/ssl/certs/authority
+
+#Units to restart
+UNIT=bmcweb.service
 
 #Type of service
 TYPE=authority

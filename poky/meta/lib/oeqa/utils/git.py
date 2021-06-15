@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2016 Intel Corporation
 #
-# Released under the MIT license (see COPYING.MIT)
+# SPDX-License-Identifier: MIT
 #
 """Git repository interactions"""
 import os

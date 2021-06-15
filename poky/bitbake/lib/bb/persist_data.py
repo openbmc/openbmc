@@ -8,28 +8,18 @@ currently, providing a key/value store accessed by 'domain'.
 # Copyright (C) 2007        Richard Purdie
 # Copyright (C) 2010        Chris Larson <chris_larson@mentor.com>
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 2 as
-# published by the Free Software Foundation.
+# SPDX-License-Identifier: GPL-2.0-only
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import collections
+import contextlib
+import functools
 import logging
 import os.path
+import sqlite3
 import sys
 import warnings
-from bb.compat import total_ordering
 from collections import Mapping
-import sqlite3
-import contextlib
 
 sqlversion = sqlite3.sqlite_version_info
 if sqlversion[0] < 3 or (sqlversion[0] == 3 and sqlversion[1] < 3):
@@ -38,7 +28,7 @@ if sqlversion[0] < 3 or (sqlversion[0] == 3 and sqlversion[1] < 3):
 
 logger = logging.getLogger("BitBake.PersistData")
 
-@total_ordering
+@functools.total_ordering
 class SQLTable(collections.MutableMapping):
     class _Decorators(object):
         @staticmethod
@@ -189,6 +179,9 @@ class SQLTable(collections.MutableMapping):
         elif not isinstance(value, str):
             raise TypeError('Only string values are supported')
 
+        # Ensure the entire transaction (including SELECT) executes under write lock
+        cursor.execute("BEGIN EXCLUSIVE")
+
         cursor.execute("SELECT * from %s where key=?;" % self.table, [key])
         row = cursor.fetchone()
         if row is not None:
@@ -255,7 +248,7 @@ class PersistData(object):
                       stacklevel=2)
 
         self.data = persist(d)
-        logger.debug(1, "Using '%s' as the persistent data cache",
+        logger.debug("Using '%s' as the persistent data cache",
                      self.data.filename)
 
     def addDomain(self, domain):

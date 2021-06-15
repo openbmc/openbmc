@@ -1,0 +1,28 @@
+From fe3436d65518099d35c643848cba50253abc249c Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Thu, 9 May 2019 14:44:51 +0900
+Subject: [PATCH] To fix build error of xrange.
+
+NameError: name 'xrange' is not defined
+
+Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
+---
+ fail2ban/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fail2ban/__init__.py b/fail2ban/__init__.py
+index fa6dcf7..61789a4 100644
+--- a/fail2ban/__init__.py
++++ b/fail2ban/__init__.py
+@@ -82,7 +82,7 @@ strptime("2012", "%Y")
+ 
+ # short names for pure numeric log-level ("Level 25" could be truncated by short formats):
+ def _init():
+-	for i in xrange(50):
++	for i in range(50):
+ 		if logging.getLevelName(i).startswith('Level'):
+ 			logging.addLevelName(i, '#%02d-Lev.' % i)
+ _init()
+-- 
+2.7.4
+

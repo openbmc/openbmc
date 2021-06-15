@@ -1,0 +1,32 @@
+From f999aeb5ceb77b81c36e6a55300a521aaa2da882 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 26 May 2021 22:12:46 -0700
+Subject: [PATCH] aptwebserver.cc: Include <array>
+
+This helps getting std::array definition
+
+Fixes
+test/interactive-helper/aptwebserver.cc:36:55: error: constexpr variable cannot have non-literal type 'const std::array<std::array<const char *, 2>, 6>'
+   constexpr std::array<std::array<char const *,2>,6> htmlencode = {{
+
+Upstream-Status: Submitted [https://github.com/Debian/apt/pull/133]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/interactive-helper/aptwebserver.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/test/interactive-helper/aptwebserver.cc b/test/interactive-helper/aptwebserver.cc
+index 58ba54f84..0e030c7e9 100644
+--- a/test/interactive-helper/aptwebserver.cc
++++ b/test/interactive-helper/aptwebserver.cc
+@@ -22,6 +22,7 @@
+ #include <unistd.h>
+ 
+ #include <algorithm>
++#include <array>
+ #include <fstream>
+ #include <iostream>
+ #include <list>
+-- 
+2.31.1
+

@@ -1,0 +1,32 @@
+From 3349812de0598ca7722e0b7c7b7e5d48bd79bea9 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 20 Dec 2019 14:01:18 +0100
+Subject: [PATCH] Fix builds with recent gettext
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,7 +1,7 @@
+ ## Process this file with automake to produce Makefile.in
+ AUTOMAKE_OPTIONS = no-texinfo.tex
+ 
+-SUBDIRS = intl src doc po man
++SUBDIRS = src po man
+ 
+ BUILT_SOURCES = 
+ 
+--- a/configure.ac
++++ b/configure.ac
+@@ -58,7 +58,6 @@ fi
+ AC_HEADER_DIRENT
+ 
+ AC_OUTPUT([ 
+-   intl/Makefile
+    po/Makefile.in
+    Makefile
+    src/Makefile

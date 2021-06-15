@@ -1,0 +1,91 @@
+Sendmail exists after the system boots. We are using postfix
+so no need to check if it exists. 
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: arpwatch-3.0/configure
+===================================================================
+--- arpwatch-3.0.orig/configure
++++ arpwatch-3.0/configure
+@@ -636,7 +636,6 @@ LBL_LIBS
+ HAVE_FREEBSD_TRUE
+ HAVE_FREEBSD_FALSE
+ PYTHON
+-V_SENDMAIL
+ LIBOBJS
+ INSTALL_DATA
+ INSTALL_SCRIPT
+@@ -5573,53 +5572,6 @@ fi
+ done
+ 
+ 
+-# Extract the first word of "sendmail", so it can be a program name with args.
+-set dummy sendmail; ac_word=$2
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+-$as_echo_n "checking for $ac_word... " >&6; }
+-if ${ac_cv_path_V_SENDMAIL+:} false; then :
+-  $as_echo_n "(cached) " >&6
+-else
+-  case $V_SENDMAIL in
+-  [\\/]* | ?:[\\/]*)
+-  ac_cv_path_V_SENDMAIL="$V_SENDMAIL" # Let the user override the test with a path.
+-  ;;
+-  *)
+-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+-as_dummy="$PATH:/usr/sbin:/usr/lib:/usr/bin:/usr/ucblib:/usr/local/etc"
+-for as_dir in $as_dummy
+-do
+-  IFS=$as_save_IFS
+-  test -z "$as_dir" && as_dir=.
+-    for ac_exec_ext in '' $ac_executable_extensions; do
+-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+-    ac_cv_path_V_SENDMAIL="$as_dir/$ac_word$ac_exec_ext"
+-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+-    break 2
+-  fi
+-done
+-  done
+-IFS=$as_save_IFS
+-
+-  ;;
+-esac
+-fi
+-V_SENDMAIL=$ac_cv_path_V_SENDMAIL
+-if test -n "$V_SENDMAIL"; then
+-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $V_SENDMAIL" >&5
+-$as_echo "$V_SENDMAIL" >&6; }
+-else
+-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+-$as_echo "no" >&6; }
+-fi
+-
+-
+-
+-if test -z "${V_SENDMAIL}" ; then
+-	as_fn_error $? "Can't find sendmail" "$LINENO" 5
+-fi
+-
+-
+ python=${PYTHON:-python}
+ # Extract the first word of "${python}", so it can be a program name with args.
+ set dummy ${python}; ac_word=$2
+Index: arpwatch-3.0/configure.in
+===================================================================
+--- arpwatch-3.0.orig/configure.in
++++ arpwatch-3.0/configure.in
+@@ -76,13 +76,6 @@ AC_LBL_UNION_WAIT
+ AC_CHECK_LIB(resolv, res_query)
+ AC_LBL_LIBPCAP(V_PCAPDEP, V_INCLS)
+ 
+-AC_PATH_PROG(V_SENDMAIL, sendmail,,
+-    $PATH:/usr/sbin:/usr/lib:/usr/bin:/usr/ucblib:/usr/local/etc)
+-
+-if test -z "${V_SENDMAIL}" ; then
+-	AC_MSG_ERROR([Can't find sendmail])
+-fi
+-
+ dnl AC_LBL_CHECK_TYPE(int32_t, int)
+ dnl AC_LBL_CHECK_TYPE(u_int32_t, u_int)
+ 

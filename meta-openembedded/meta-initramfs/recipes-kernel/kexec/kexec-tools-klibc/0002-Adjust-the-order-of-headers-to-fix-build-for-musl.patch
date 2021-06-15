@@ -1,4 +1,4 @@
-From 0976d2d5be1ed44c2324b609c7d16c1e93181c4b Mon Sep 17 00:00:00 2001
+From 6843cefb1d1d0017a714a2752bb008efd844f3e4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 13 Jul 2017 16:20:08 -0700
 Subject: [PATCH] Adjust the order of headers to fix build for musl

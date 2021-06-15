@@ -18,7 +18,8 @@ SRC_URI = "http://v6web.litech.org/radvd/dist/radvd-${PV}.tar.gz \
            file://radvd.init \
            file://radvd.service \
            file://volatiles.03_radvd \
-           file://radvd.default"
+           file://radvd.default \
+           file://radvd.conf"
 
 inherit autotools useradd pkgconfig systemd
 
@@ -52,6 +53,8 @@ do_install_append () {
     for i in radvd.conf.example README; do \
         install -m 0644 ${S}/$i ${D}${docdir}/radvd; \
     done
+
+    install -m 0644 ${WORKDIR}/radvd.conf ${D}${sysconfdir}/radvd.conf
 }
 
 USERADD_PACKAGES = "${PN}"

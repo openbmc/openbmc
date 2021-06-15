@@ -1,0 +1,37 @@
+From d611f78198dee64bb6a05933d200b544e2510b76 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 14 Nov 2020 14:37:13 -0800
+Subject: [PATCH] innobase: Define __NR_futex if it does not exist
+
+__NR_futex is not defines by newer architectures e.g. arc, riscv32 as
+they only have 64bit variant of time_t. Glibc defines SYS_futex interface based
+on
+__NR_futex, since this is used in applications, such applications start
+to fail to build for these newer architectures. This patch defines a
+fallback to alias __NR_futex to __NR_futex_tim64 so SYS_futex keeps
+working
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ storage/innobase/log/log0sync.cc | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/storage/innobase/log/log0sync.cc b/storage/innobase/log/log0sync.cc
+index 7799e605..4fab8f74 100644
+--- a/storage/innobase/log/log0sync.cc
++++ b/storage/innobase/log/log0sync.cc
+@@ -66,6 +66,9 @@ Note that if write operation is very fast, a) or b) can be fine as alternative.
+ #ifdef __linux__
+ #include <linux/futex.h>
+ #include <sys/syscall.h>
++#if !defined(SYS_futex) && defined(SYS_futex_time64)
++# define SYS_futex SYS_futex_time64
++#endif
+ #endif
+ 
+ #include <atomic>
+-- 
+2.29.2
+

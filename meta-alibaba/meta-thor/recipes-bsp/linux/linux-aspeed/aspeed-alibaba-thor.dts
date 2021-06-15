@@ -1,0 +1,292 @@
+// SPDX-License-Identifier: GPL-2.0+
+/dts-v1/;
+#include "aspeed-g5.dtsi"
+#include <dt-bindings/gpio/aspeed-gpio.h>
+/ {
+	model = "Alibaba AST2500 BMC";
+	compatible = "alibaba,thor", "aspeed,ast2500";
+	aliases {
+		serial4 = &uart5;
+		spi2 = &spi2;
+	};
+	chosen {
+		stdout-path = &uart5;
+		bootargs = "console=tty0 console=ttyS4,115200 earlyprintk";
+	};
+	memory@80000000 {
+		device_type = "memory";
+		reg = <0x80000000 0x20000000>;
+	};
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		vga_memory: framebuffer@9f000000 {
+			no-map;
+			reg = <0x9f000000 0x01000000>; /* 16M */
+		};
+		lpc_memory: region@98000000 {
+			no-map;
+			reg = <0x98000000 0x02000000>; /* 32M */
+		};
+		pci_memory: region@9A000000 {
+			no-map;
+			reg = <0x9A000000 0x00010000>; /* 64K */
+		};
+		video_engine_memory: jpegbuffer {
+			size = <0x02800000>;	/* 40M */
+			alignment = <0x01000000>;
+			compatible = "shared-dma-pool";
+			reusable;
+		};
+		gfx_memory: framebuffer {
+			size = <0x01000000>;
+			alignment = <0x01000000>;
+			compatible = "shared-dma-pool";
+			reusable;
+		};
+	};
+};
+&fmc {
+	status = "okay";
+	flash@0 {
+		status = "okay";
+		m25p,fast-read;
+		label = "bmc";
+		spi-max-frequency = <50000000>;
+	};
+};
+&spi1 {
+	status = "disabled";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_spi1_default>;
+	flash@0 {
+		status = "okay";
+		m25p,fast-read;
+		label = "pnor";
+		spi-max-frequency = <100000000>;
+	};
+};
+&spi2 {
+	compatible = "aspeed,spi-dev";
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_spi2ck_default
+		     &pinctrl_spi2cs0_default
+		     &pinctrl_spi2cs1_default
+		     &pinctrl_spi2miso_default
+		     &pinctrl_spi2mosi_default>;
+	flash@0 {
+		compatible = "rohm,dh2228fv";
+		status = "okay";
+		spi-max-frequency = <25000000>;
+	};
+};
+&espi {
+	status = "okay";
+};
+&kcs3 {
+	kcs_addr = <0xca2>;
+	status = "okay";
+};
+&lpc_ctrl {
+	status = "okay";
+	memory-region = <&lpc_memory>;
+	flash = <&spi1>;
+};
+&p2a {
+	status = "okay";
+	memory-region = <&pci_memory>;
+};
+&mbox {
+       status = "okay";
+};
+&uart1 {
+	/* Rear RS-232 connector */
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_txd1_default
+			&pinctrl_rxd1_default
+			&pinctrl_nrts1_default
+			&pinctrl_ndtr1_default
+			&pinctrl_ndsr1_default
+			&pinctrl_ncts1_default
+			&pinctrl_ndcd1_default
+			&pinctrl_nri1_default>;
+};
+&uart2 {
+	/* Rear RS-232 connector */
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_txd2_default
+			&pinctrl_rxd2_default
+			&pinctrl_nrts2_default
+			&pinctrl_ndtr2_default
+			&pinctrl_ndsr2_default
+			&pinctrl_ncts2_default
+			&pinctrl_ndcd2_default
+			&pinctrl_nri2_default>;
+};
+&uart4 {
+	status = "okay";
+};
+&uart5 {
+	status = "okay";
+};
+&mac0 {
+	status = "okay";
+	use-ncsi;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_rmii1_default>;
+};
+&mac1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_rgmii2_default &pinctrl_mdio2_default>;
+};
+&adc {
+	status = "okay";
+};
+&i2c0 {
+	status = "okay";
+};
+&i2c1 {
+	status = "okay";
+};
+&i2c2 {
+	status = "okay";
+};
+&i2c3 {
+	status = "okay";
+};
+&i2c4 {
+	status = "okay";
+};
+&i2c5 {
+	status = "okay";
+};
+&i2c6 {
+	status = "okay";
+};
+&i2c7 {
+	status = "okay";
+};
+&i2c8 {
+	status = "okay";
+};
+&i2c9 {
+	status = "okay";
+};
+&i2c10 {
+	status = "okay";
+};
+&i2c11 {
+	status = "okay";
+};
+&i2c12 {
+	status = "okay";
+};
+&i2c13 {
+	status = "okay";
+};
+&vuart {
+	status = "disabled";
+};
+&gfx {
+	status = "okay";
+};
+&pinctrl {
+	aspeed,external-nodes = <&gfx &lhc>;
+};
+&pwm_tacho {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm0_default 
+			&pinctrl_pwm1_default
+			&pinctrl_pwm2_default
+			&pinctrl_pwm3_default
+			&pinctrl_pwm4_default
+			&pinctrl_pwm5_default
+			&pinctrl_pwm6_default
+			&pinctrl_pwm7_default>;
+	fan@0 {
+		reg = <0x00>;
+		aspeed,fan-tach-ch = /bits/ 8 <0x00 0x01>;
+	};
+	fan@1 {
+		reg = <0x01>;
+		aspeed,fan-tach-ch = /bits/ 8 <0x02 0x03>;
+	};
+	fan@2 {
+		reg = <0x02>;
+		aspeed,fan-tach-ch = /bits/ 8 <0x04 0x05>;
+	};
+	fan@3 {
+		reg = <0x03>;
+		aspeed,fan-tach-ch = /bits/ 8 <0x06 0x07>;
+	};
+	fan@4 {
+		reg = <0x04>;
+		aspeed,fan-tach-ch = /bits/ 8 <0x08 0x09>;
+	};
+	fan@5 {
+		reg = <0x05>;
+		aspeed,fan-tach-ch = /bits/ 8 <0x0a 0x0b>;
+	};
+	fan@6 {
+		reg = <0x06>;
+		aspeed,fan-tach-ch = /bits/ 8 <0x0c 0x0d>;
+	};
+	fan@7 {
+		reg = <0x07>;
+		aspeed,fan-tach-ch = /bits/ 8 <0x0e 0x0f>;
+	};
+};
+&lpc_uart {
+	status = "okay";
+};
+&ibt {
+	status = "disabled";
+};
+&lpc_snoop {
+	status = "okay";
+	snoop-ports = <0x80>;
+};
+&sdmmc {
+	status = "okay";
+};
+&sdhci1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sd2_default>;
+};
+/*
+ * Enable port A as device (via the virtual hub) and port B as
+ * host by default on the eval board. This can be easily changed
+ * by replacing the override below with &ehci0 { ... } to enable
+ * host on both ports.
+ */
+&vhub {
+	status = "okay";
+};
+&ehci1 {
+	status = "okay";
+};
+&uhci {
+	status = "okay";
+};
+&video {
+	status = "okay";
+	memory-region = <&video_engine_memory>;
+};
+&gfx {
+     status = "okay";
+     memory-region = <&gfx_memory>;
+};
+&peci0 {
+	status = "okay";
+};
+&rtc {
+	status = "okay";
+};
+

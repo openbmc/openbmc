@@ -1,0 +1,110 @@
+From c9e93c7a3e4d2773abef4f5e1464af24f36700b3 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sun, 11 Apr 2021 19:48:13 +0100
+Subject: [PATCH 2/4] tests: add support for install the tests
+
+This will provide to run the tests using the gnome-desktop-testing [1]
+
+[1] https://wiki.gnome.org/Initiatives/GnomeGoals/InstalledTests
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/789]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ meson.build             |  5 +++++
+ meson_options.txt       |  1 +
+ template.test.in        |  3 +++
+ tests/check/meson.build | 22 +++++++++++++++++++++-
+ 4 files changed, 30 insertions(+), 1 deletion(-)
+ create mode 100644 template.test.in
+
+diff --git a/meson.build b/meson.build
+index c4e8774f5..1abf4eb26 100644
+--- a/meson.build
++++ b/meson.build
+@@ -562,6 +562,11 @@ if bashcomp_dep.found()
+   endif
+ endif
+ 
++installed_tests_metadir = join_paths(datadir, 'installed-tests', meson.project_name())
++installed_tests_execdir = join_paths(libexecdir, 'installed-tests', meson.project_name())
++installed_tests_enabled = get_option('installed-tests')
++installed_tests_template = files('template.test.in')
++
+ plugins_install_dir = join_paths(get_option('libdir'), 'gstreamer-1.0')
+ 
+ pkgconfig = import('pkgconfig')
+diff --git a/meson_options.txt b/meson_options.txt
+index c8cee3762..b5da40eaa 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -15,6 +15,7 @@ option('poisoning', type : 'boolean', value : false, description : 'Enable poiso
+ option('memory-alignment', type: 'combo',
+        choices : ['1', '2', '4', '8', '16', '32', '64', '128', '256', '512', '1024', '2048', '4096', '8192', 'malloc', 'pagesize'],
+        value: 'malloc')
++option('installed-tests', type : 'boolean', value : false, description : 'Enable installed tests')
+ 
+ # Feature options
+ option('check', type : 'feature', value : 'auto', description : 'Build unit test libraries')
+diff --git a/template.test.in b/template.test.in
+new file mode 100644
+index 000000000..f701627f8
+--- /dev/null
++++ b/template.test.in
+@@ -0,0 +1,3 @@
++[Test]
++Type=session
++Exec=@installed_tests_dir@/@program@
+diff --git a/tests/check/meson.build b/tests/check/meson.build
+index b2636714b..a697a7b06 100644
+--- a/tests/check/meson.build
++++ b/tests/check/meson.build
+@@ -124,10 +124,16 @@ test_defines = [
+   '-UG_DISABLE_ASSERT',
+   '-UG_DISABLE_CAST_CHECKS',
+   '-DGST_CHECK_TEST_ENVIRONMENT_BEACON="GST_STATE_IGNORE_ELEMENTS"',
+-  '-DTESTFILE="' + meson.current_source_dir() + '/meson.build"',
+   '-DGST_DISABLE_DEPRECATED',
+ ]
+ 
++testfile = meson.current_source_dir() + '/meson.build'
++if installed_tests_enabled
++  install_data(testfile, install_dir : installed_tests_metadir, rename : 'testfile')
++  testfile = installed_tests_metadir + '/testfile'
++endif
++test_defines += '-DTESTFILE="@0@"'.format(testfile)
++
+ # sanity checking
+ if get_option('check').disabled()
+   if get_option('tests').enabled()
+@@ -151,6 +157,8 @@ foreach t : core_tests
+       include_directories : [configinc],
+       link_with : link_with_libs,
+       dependencies : test_deps + glib_deps + gst_deps,
++      install_dir: installed_tests_execdir,
++      install: installed_tests_enabled,
+     )
+ 
+     env = environment()
+@@ -162,6 +170,18 @@ foreach t : core_tests
+     env.set('GST_PLUGIN_SCANNER_1_0', gst_scanner_dir + '/gst-plugin-scanner')
+     env.set('GST_PLUGIN_LOADING_WHITELIST', 'gstreamer')
+ 
++    if installed_tests_enabled
++      test_conf = configuration_data()
++      test_conf.set('installed_tests_dir', join_paths(prefix, installed_tests_execdir))
++      test_conf.set('program', test_name)
++      configure_file(
++        input: installed_tests_template,
++        output: test_name + '.test',
++        install_dir: installed_tests_metadir,
++        configuration: test_conf
++      )
++    endif
++
+     test(test_name, exe, env: env, timeout : 3 * 60)
+   endif
+ endforeach
+-- 
+2.31.1
+

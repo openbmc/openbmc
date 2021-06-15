@@ -6,7 +6,7 @@ TUNEVALID[ppc7400] = "Enable ppc7400 specific processor optimizations"
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'ppc7400', ' -mcpu=7400 -mno-spe', '', d)}"
 
 AVAILTUNES += "ppc7400"
-TUNE_FEATURES_tune-ppc7400 = "m32 fpu-hard ppc7400 altivec"
+TUNE_FEATURES_tune-ppc7400 = "m32 fpu-hard ppc7400 altivec bigendian"
 TUNE_PKGARCH_tune-ppc7400 = "ppc7400"
 PACKAGE_EXTRA_ARCHS_tune-ppc7400 = "${PACKAGE_EXTRA_ARCHS_tune-powerpc} ppc7400"
 

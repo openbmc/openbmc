@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 """
 Python Daemonizing helper
 
@@ -9,6 +13,8 @@ import os
 import sys
 import io
 import traceback
+
+import bb
 
 def createDaemon(function, logfile):
     """

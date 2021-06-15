@@ -1,0 +1,47 @@
+From 2dec9199f8a8a2c84b25a3d3e7e2f41b71e07834 Mon Sep 17 00:00:00 2001
+From: Patrick Ohly <patrick.ohly@intel.com>
+Date: Wed, 17 Jun 2015 14:28:18 +0200
+Subject: [PATCH 20/20] evmctl.c: do not depend on xattr.h with IMA defines
+
+Compilation on older Linux distros (like Ubuntu 12.04) fails
+because linux/xattr.h does not yet have the IMA defines. Compiling
+there makes sense when only the tools are needed, for example when
+signing an image in cross-compile mode.
+
+To support this, add fallbacks for the two defines which are needed.
+Their value is part of the Linux ABI and thus fixed.
+
+Upstream-status: Submitted [linux-ima-devel@lists.sourceforge.net]
+
+Signed-off-by: Patrick Ohly <patrick.ohly@intel.com>
+
+---
+ src/evmctl.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/src/evmctl.c b/src/evmctl.c
+index c54efbb..23cf54c 100644
+--- a/src/evmctl.c
++++ b/src/evmctl.c
+@@ -57,6 +57,18 @@
+ #include <termios.h>
+ #include <assert.h>
+ 
++/*
++ * linux/xattr.h might be old to have this. Allow compilation on older
++ * Linux distros (like Ubuntu 12.04) by falling back to our own
++ * definition.
++ */
++#ifndef XATTR_IMA_SUFFIX
++# define XATTR_IMA_SUFFIX "ima"
++#endif
++#ifndef XATTR_NAME_IMA
++# define XATTR_NAME_IMA XATTR_SECURITY_PREFIX XATTR_IMA_SUFFIX
++#endif
++
+ #include <openssl/sha.h>
+ #include <openssl/pem.h>
+ #include <openssl/hmac.h>
+-- 
+2.1.4
+

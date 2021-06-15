@@ -1,0 +1,37 @@
+From b6d1a1ff2de363b1b76c8c70f77ae56a4e4d4b56 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 5 Sep 2019 18:37:31 +0800
+Subject: [PATCH] bootchart2: support usrmerge
+
+Upstream-Status: Inappropriate[oe-specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 1cc2974..f988904 100644
+--- a/Makefile
++++ b/Makefile
+@@ -36,7 +36,7 @@ endif
+ PY_SITEDIR ?= $(PY_LIBDIR)/site-packages
+ LIBC_A_PATH = /usr$(LIBDIR)
+ # Always lib, even on systems that otherwise use lib64
+-SYSTEMD_UNIT_DIR = $(EARLY_PREFIX)/lib/systemd/system
++SYSTEMD_UNIT_DIR ?= $(EARLY_PREFIX)/lib/systemd/system
+ COLLECTOR = \
+ 	collector/collector.o \
+ 	collector/output.o \
+@@ -99,7 +99,7 @@ install-chroot:
+ 	install -d $(DESTDIR)$(PKGLIBDIR)/tmpfs
+ 
+ install-collector: all install-chroot
+-	install -m 755 -D bootchartd $(DESTDIR)$(EARLY_PREFIX)/sbin/$(PROGRAM_PREFIX)bootchartd$(PROGRAM_SUFFIX)
++	install -m 755 -D bootchartd $(DESTDIR)${BASE_SBINDIR}/$(PROGRAM_PREFIX)bootchartd$(PROGRAM_SUFFIX)
+ 	install -m 644 -D bootchartd.conf $(DESTDIR)/etc/$(PROGRAM_PREFIX)bootchartd$(PROGRAM_SUFFIX).conf
+ 	install -m 755 -D bootchart-collector $(DESTDIR)$(PKGLIBDIR)/$(PROGRAM_PREFIX)bootchart$(PROGRAM_SUFFIX)-collector
+ 
+-- 
+2.7.4
+

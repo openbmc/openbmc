@@ -3,4 +3,4 @@
 # test plan to raise ERRORs; this is just noise.
 makeargs="LOG_DRIVER_FLAGS=--ignore-exit top_srcdir=$PWD top_builddir=$PWD"
 make -k -t all >/dev/null 2>&1
-exec make -k -s $makeargs check 2>/dev/null
+exec make -k -s $makeargs check 2>/dev/null | sed -e 's#/tmp/tmp\...........#/tmp/tmp.XXXXXXXXXX#g'

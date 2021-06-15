@@ -1,0 +1,28 @@
+It fails to compile xfce4-datetime-setter occasionally when system load is high:
+
+| ../git/xfce/main.c:42:10: fatal error: cc-datetime-resources.h: No such file or directory
+|    42 | #include "cc-datetime-resources.h"
+|       |          ^~~~~~~~~~~~~~~~~~~~~~~~~
+| compilation terminated.
+
+Update datetime_panel_dep to make sure cc-datetime-resources.h be generated
+before including.
+
+Upstream-Status: Submitted [https://github.com/schnitzeltony/xfce4-datetime-setter/pull/2]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+diff --git a/panels/datetime/meson.build b/panels/datetime/meson.build
+index c5bf39c..241e177 100644
+--- a/panels/datetime/meson.build
++++ b/panels/datetime/meson.build
+@@ -175,7 +175,8 @@ datetime_panel_lib = static_library(
+ 
+ datetime_panel_dep = declare_dependency(
+   include_directories: [ common_inc, include_directories('.') ],
+-  link_with: datetime_panel_lib
++  link_with: datetime_panel_lib,
++  sources: resources
+ )
+ 
+ subdir('po-timezones')

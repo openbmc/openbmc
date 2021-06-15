@@ -1,0 +1,57 @@
+From 5120acaa2be5787d9657f6b91bc8ee3c2d664fbe Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 27 May 2007 21:04:11 +0000
+Subject: [PATCH] perl: 5.8.7 -> 5.8.8 (from OE)
+
+This patch is used for perl-native only. It enables the switching of
+configuration files between Config_heavy.pl and
+Config_heavy-target.pl by setting the environment variables
+PERLCONFIGTARGET - the later containing settings for the target while
+the former contains those for the host. This will allow cpan.bbclass
+to use the settings appropriate for the native and/or target builds
+as required. This also disables the use of the cache since the cached
+values would be valid for the host only.
+
+Upstream-Status: Inappropriate [native]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ configpm | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/configpm b/configpm
+index c8de8bf..204613c 100755
+--- a/configpm
++++ b/configpm
+@@ -687,7 +687,7 @@ sub FETCH {
+     my($self, $key) = @_;
+ 
+     # check for cached value (which may be undef so we use exists not defined)
+-    return exists $self->{$key} ? $self->{$key} : $self->fetch_string($key);
++    return $self->fetch_string($key);
+ }
+ 
+ ENDOFEND
+@@ -845,7 +845,21 @@ $config_txt .= sprintf <<'ENDOFTIE', $fast_config;
+ sub DESTROY { }
+ 
+ sub AUTOLOAD {
+-    require 'Config_heavy.pl';
++    my $cfgfile = 'Config_heavy.pl';
++    if (defined $ENV{PERLCONFIGTARGET} and $ENV{PERLCONFIGTARGET} eq "yes")
++    {
++        $cfgfile = 'Config_heavy-target.pl';
++    }
++    if (defined $ENV{PERL_ARCHLIB})
++    {
++        push @INC, $ENV{PERL_ARCHLIB};
++        require $cfgfile;
++        pop @INC;
++    }
++    else
++    {
++        require $cfgfile;
++    }
+     goto \&launcher unless $Config::AUTOLOAD =~ /launcher$/;
+     die "&Config::AUTOLOAD failed on $Config::AUTOLOAD";
+ }

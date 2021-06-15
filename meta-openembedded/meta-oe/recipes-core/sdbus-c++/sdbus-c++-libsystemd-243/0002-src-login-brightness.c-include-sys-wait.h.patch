@@ -1,0 +1,25 @@
+Include sys/wait.h
+
+Fixes:
+src/login/logind-brightness.c:158:85: error: 'WEXITED' undeclared (first use in this function); did you mean 'WIFEXITED'?
+  158 |         r = sd_event_add_child(w->manager->event, &w->child_event_source, w->child, WEXITED, on_brightness_writer_exit, w);
+      |                                                                                     ^~~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+---
+ src/login/logind-brightness.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/login/logind-brightness.c b/src/login/logind-brightness.c
+index 8dfa97d7ae..bddd4a2727 100644
+--- a/src/login/logind-brightness.c
++++ b/src/login/logind-brightness.c
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: LGPL-2.1+ */
+ 
++#include <sys/wait.h>
+ #include "bus-util.h"
+ #include "device-util.h"
+ #include "hash-funcs.h"

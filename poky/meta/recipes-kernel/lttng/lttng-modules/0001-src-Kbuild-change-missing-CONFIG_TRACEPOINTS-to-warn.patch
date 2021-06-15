@@ -1,0 +1,37 @@
+From 0287f5c32b9fd99078e71c22ca679343d18f1513 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@gmail.com>
+Date: Sat, 15 May 2021 10:26:38 -0400
+Subject: [PATCH] src/Kbuild: change missing CONFIG_TRACEPOINTS to warning
+
+Taken from a previous patch to the main lttng-modules Makefile, by
+Otavio Salvador:
+
+  The lttng-modules are being pulled by the tools-profile image feature,
+  however, not every kernel has the CONFIG_TRACEPOINTS feature enabled.
+
+  This change makes the build do not fail when CONFIG_TRACEPOINTS is not
+  available, allowing it to be kept being pulled by default.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ src/Kbuild | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Kbuild b/src/Kbuild
+index 7137874f..18a43b50 100644
+--- a/src/Kbuild
++++ b/src/Kbuild
+@@ -2,7 +2,7 @@
+ 
+ ifdef CONFIG_LOCALVERSION	# Check if dot-config is included.
+   ifeq ($(CONFIG_TRACEPOINTS),)
+-    $(error The option CONFIG_TRACEPOINTS needs to be enabled in your kernel configuration)
++    $(warning The option CONFIG_TRACEPOINTS needs to be enabled in your kernel configuration)
+   endif # CONFIG_TRACEPOINTS
+ endif # ifdef CONFIG_LOCALVERSION
+ 
+-- 
+2.19.1
+

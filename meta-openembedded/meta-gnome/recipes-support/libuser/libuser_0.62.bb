@@ -12,7 +12,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2 \
 SECTION = "base"
 
 SRC_URI = "https://releases.pagure.org/libuser/libuser-${PV}.tar.xz \
-           file://0001-Check-for-issetugid.patch \
            file://0002-remove-unused-execinfo.h.patch \
            file://0001-modules-files.c-parse_field-fix-string-formating-in-.patch \
            "
@@ -22,7 +21,7 @@ SRC_URI[sha256sum] = "a58ff4fabb01a25043b142185a33eeea961109dd60d4b40b6a9df4fa3c
 
 DEPENDS = "popt libpam glib-2.0 python3"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
 inherit autotools gettext python3native python3-dir pkgconfig gtk-doc

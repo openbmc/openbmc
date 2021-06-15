@@ -1,18 +1,31 @@
-Author: Jamie Strandboge <jamie@canonical.com>
-Description: to improve boot speed when disabled, don't source all of
- ufw-init-functions (which also sources in other files).
+From 92fcdbc1a57086e4decc1597217c0739dc16342a Mon Sep 17 00:00:00 2001
+From: Silcet <camorga1@gmail.com>
+Date: Tue, 27 Apr 2021 05:34:59 +0000
+Subject: [PATCH] Author: Jamie Strandboge <jamie@canonical.com>
+Description:
+to improve boot speed when disabled, don't source all of  ufw-init-functions
+(which also sources in other files).
 
 Upstream-Status: Inappropriate [ not author ]
 
 Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
 
-Index: ufw-0.31/src/ufw-init
-===================================================================
---- ufw-0.31.orig/src/ufw-init	2012-03-09 17:07:11.000000000 -0600
-+++ ufw-0.31/src/ufw-init	2012-03-17 09:37:51.000000000 -0500
-@@ -18,6 +18,12 @@
- #
- set -e
+The patch was imported from the OpenEmbedded git server
+(git://git.openembedded.org/openembedded) as of commit id
+2cc1bd9dd060f5002c2fde7aacba86fe230c12af.
+
+Signed-off-by: Silcet <camorga1@gmail.com>
+---
+ src/ufw-init | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/ufw-init b/src/ufw-init
+index 3505a02..dde37f0 100755
+--- a/src/ufw-init
++++ b/src/ufw-init
+@@ -31,6 +31,12 @@ if [ "$1" = "--datadir" ] && [ -s "$2" ]; then
+ fi
+ export DATA_DIR="$datadir"
  
 +# Debian/Ubuntu: small boot speed improvement
 +. "#CONFIG_PREFIX#/ufw/ufw.conf"
@@ -20,6 +33,6 @@ Index: ufw-0.31/src/ufw-init
 +    exit 0
 +fi
 +
- if [ -s "#STATE_PREFIX#/ufw-init-functions" ]; then
-     . "#STATE_PREFIX#/ufw-init-functions"
+ if [ -s "${rootdir}#STATE_PREFIX#/ufw-init-functions" ]; then
+     . "${rootdir}#STATE_PREFIX#/ufw-init-functions"
  else

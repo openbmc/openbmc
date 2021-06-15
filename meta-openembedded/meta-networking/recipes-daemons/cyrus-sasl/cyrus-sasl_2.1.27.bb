@@ -2,7 +2,7 @@ SUMMARY = "Generic client/server library for SASL authentication"
 SECTION = "libs"
 HOMEPAGE = "http://asg.web.cmu.edu/sasl/"
 DEPENDS = "openssl db groff-native"
-LICENSE = "BSD"
+LICENSE = "BSD-4-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3f55e0974e3d6db00ca6f57f2d206396"
 
 SRCREV = "e41cfb986c1b1935770de554872247453fdbb079"
@@ -16,6 +16,7 @@ SRC_URI = "git://github.com/cyrusimap/cyrus-sasl;protocol=https \
            file://0004-configure.ac-fix-condition-for-suppliment-snprintf-i.patch \
            file://0001-Allow-saslauthd-to-be-built-outside-of-source-tree-w.patch \
            file://0001-makeinit.sh-fix-parallel-build-issue.patch \
+           file://CVE-2019-19906.patch \
            "
 
 UPSTREAM_CHECK_URI = "https://github.com/cyrusimap/cyrus-sasl/archives"
@@ -28,7 +29,7 @@ EXTRA_OECONF += "--with-dblib=berkeley \
                  --with-plugindir='${libdir}/sasl2' \
                  andrew_cv_runpath_switch=none"
 
-PACKAGECONFIG ??= "ntlm \
+PACKAGECONFIG ??= "\
     ${@bb.utils.filter('DISTRO_FEATURES', 'ldap pam', d)} \
 "
 PACKAGECONFIG[gssapi] = "--enable-gssapi=yes,--enable-gssapi=no,krb5,"

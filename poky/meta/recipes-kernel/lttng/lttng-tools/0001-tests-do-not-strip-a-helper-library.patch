@@ -1,0 +1,27 @@
+From ab238c213fac190972f55e73cf3e0bb1c7846eb8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 12 Dec 2019 16:52:07 +0100
+Subject: [PATCH] tests: do not strip a helper library
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/utils/testapp/userspace-probe-elf-binary/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am b/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am
+index 03f5d5a..d12c343 100644
+--- a/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am
++++ b/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am
+@@ -12,7 +12,7 @@ userspace_probe_elf_binary_LDADD = libfoo.la
+ libfoo.strip: libfoo.la
+ 	$(OBJCOPY) --strip-all .libs/libfoo.so
+ 
+-all-local: libfoo.strip
++all-local:
+ 	@if [ x"$(srcdir)" != x"$(builddir)" ]; then \
+ 		for script in $(EXTRA_DIST); do \
+ 			cp -f $(srcdir)/$$script $(builddir); \
+-- 
+2.17.1
+

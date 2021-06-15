@@ -11,7 +11,12 @@ SRC_URI = "http://telepathy.freedesktop.org/releases/${BPN}/${BPN}-${PV}.tar.gz 
 SRC_URI[md5sum] = "92a2de5198284cbd3c430b0d1a971a86"
 SRC_URI[sha256sum] = "3013ad4b38d14ee630b8cc8ada5e95ccaa849b9a6fe15d2eaf6d0717d76f2fab"
 
-inherit autotools pkgconfig pythonnative
+inherit autotools pkgconfig ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "pythonnative", "", d)}
 
 FILES_${PN} += "${datadir}/telepathy \
                 ${datadir}/dbus-1"
+
+python() {
+    if 'meta-python2' not in d.getVar('BBFILE_COLLECTIONS').split():
+        raise bb.parse.SkipRecipe('Requires meta-python2 to be present.')
+}

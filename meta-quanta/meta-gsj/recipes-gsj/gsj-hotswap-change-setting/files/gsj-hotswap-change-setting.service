@@ -1,0 +1,13 @@
+[Unit]
+Description=Hotswap Controller Setting Changing
+Before=xyz.openbmc_project.Hwmon@.service
+
+[Service]
+ExecStart=/usr/bin/gsj-hotswap-change-setting.sh
+Restart=no
+Type=oneshot
+RemainAfterExit=true
+StandardOutput=syslog
+
+[Install]
+WantedBy=multi-user.target

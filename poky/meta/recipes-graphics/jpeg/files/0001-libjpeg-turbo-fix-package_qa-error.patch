@@ -19,7 +19,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 2bc3458..ea3041e 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -189,10 +189,6 @@ endif()
+@@ -191,10 +191,6 @@ endif()
  report_option(ENABLE_SHARED "Shared libraries")
  report_option(ENABLE_STATIC "Static libraries")
  
@@ -27,6 +27,6 @@ index 2bc3458..ea3041e 100644
 -  set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR})
 -endif()
 -
- if(WITH_12BIT)
-   set(WITH_ARITH_DEC 0)
-   set(WITH_ARITH_ENC 0)
+ if(WITH_JPEG8 OR WITH_JPEG7)
+   set(WITH_ARITH_ENC 1)
+   set(WITH_ARITH_DEC 1)

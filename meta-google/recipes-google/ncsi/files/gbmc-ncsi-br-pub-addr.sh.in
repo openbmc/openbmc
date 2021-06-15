@@ -1,0 +1,101 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[ -z "${gbmc_ncsi_br_pub_addr_lib-}" ] || return
+
+gbmc_ncsi_br_pub_addr_init=
+gbmc_ncsi_br_pub_addr_lastip=
+
+gbmc_ncsi_br_pub_addr_update() {
+  [ -n "$gbmc_ncsi_br_pub_addr_init" ] || return
+
+  printf 'gBMC Bridge Pub Addr from NCSI: %s\n' \
+    "${gbmc_ncsi_br_pub_addr_lastip:-(deleted)}" >&2
+
+  local pfx_bytes=()
+  if [ -n "$gbmc_ncsi_br_pub_addr_lastip" ]; then
+    ip_to_bytes pfx_bytes "$gbmc_ncsi_br_pub_addr_lastip"
+    # Ensure we don't have more than a /64 address
+    local i
+    for (( i = 8; i < 16; ++i )); do
+      if (( pfx_bytes[$i] != 0 )); then
+        pfx_bytes=()
+        break
+      fi
+    done
+  fi
+
+  local contents='[Network]'$'\n'
+  if (( ${#pfx_bytes[@]} != 0 )); then
+    pfx_bytes[8]=0xfd
+    local stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
+    pfx_bytes[9]=0x01
+    local ncsi_pfx="$(ip_bytes_to_str pfx_bytes)"
+    local here=
+    read -r -d '' here <<EOF
+Address=$ncsi_pfx/128
+IPv6PrefixDelegation=yes
+[IPv6PrefixDelegation]
+RouterLifetimeSec=60
+[IPv6Prefix]
+Prefix=$stateless_pfx/80
+PreferredLifetimeSec=60
+ValidLifetimeSec=60
+[IPv6RoutePrefix]
+Route=$ncsi_pfx/80
+LifetimeSec=60
+[Route]
+Destination=$stateless_pfx/72
+Type=unreachable
+Metric=1024
+EOF
+    contents+="$here"$'\n'
+  fi
+
+  local file
+  for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-public.conf; do
+    mkdir -p -m 755 "$(dirname "$file")"
+    printf '%s' "$contents" >"$file"
+  done
+
+  # Ensure that systemd-networkd performs a reconfiguration as it doesn't
+  # currently check the mtime of drop-in files.
+  touch -c /lib/systemd/network/*-bmc-gbmcbr.network
+
+  if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
+    networkctl reload
+    networkctl reconfigure gbmcbr
+  fi
+}
+
+gbmc_ncsi_br_pub_addr_hook() {
+  if [ "$change" = 'init' ]; then
+    gbmc_ncsi_br_pub_addr_init=1
+    gbmc_ncsi_br_pub_addr_update
+  elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' ] &&
+     [ "$scope" = 'global' -a "$fam" = 'inet6' ]; then
+    if [ "$action" = 'add' -a "$ip" != "$gbmc_ncsi_br_pub_addr_lastip" ]; then
+      gbmc_ncsi_br_pub_addr_lastip="$ip"
+      gbmc_ncsi_br_pub_addr_update
+    fi
+    if [ "$action" = 'del' -a "$ip" = "$gbmc_ncsi_br_pub_addr_lastip" ]; then
+      gbmc_ncsi_br_pub_addr_lastip=
+      gbmc_ncsi_br_pub_addr_update
+    fi
+  fi
+}
+
+GBMC_IP_MONITOR_HOOKS+=(gbmc_ncsi_br_pub_addr_hook)
+
+gbmc_ncsi_br_pub_addr_lib=1

@@ -18,7 +18,7 @@ Date:   Tue Feb 9 14:56:23 2010 +0100
  soname	= ${libname}.so.${MVER}
  
  # overwritten by caller (e.g.: debian/rules)
-@@ -72,6 +72,7 @@ install_doc:	docs/lockdev.3
+@@ -73,6 +73,7 @@ install_doc:	docs/lockdev.3
  install_run:	${shared}
  	install -m755 -d	${libdir}
  	install -m644 ${shared}	${libdir}

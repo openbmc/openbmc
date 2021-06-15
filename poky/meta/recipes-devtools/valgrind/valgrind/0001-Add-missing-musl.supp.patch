@@ -1,0 +1,72 @@
+From 61bc8664f93cd980831c9da4a3e8a385b089a0ab Mon Sep 17 00:00:00 2001
+From: Yi Fan Yu <yifan.yu@windriver.com>
+Date: Tue, 23 Mar 2021 09:32:22 -0700
+Subject: [PATCH] Add missing musl.supp
+
+3.17 did not ship musl.supp in the tarball.
+
+This is a workaround until next release.
+
+Upstream-Status: Backport [dde556d51f8226a6de564a00bf82536bb7042c54]
+
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
+---
+ musl.supp | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+ create mode 100644 musl.supp
+
+diff --git a/musl.supp b/musl.supp
+new file mode 100644
+index 000000000..864172a24
+--- /dev/null
++++ b/musl.supp
+@@ -0,0 +1,46 @@
++# Suppressions for musl libc
++# See: https://www.openwall.com/lists/musl/2017/06/15/4
++
++{
++   musl-dynlink-false-positive1
++   Memcheck:Leak
++   fun:calloc
++   fun:load_direct_deps
++   fun:load_deps
++   fun:load_deps
++   fun:__dls3
++   fun:__dls2b
++   fun:__dls2
++}
++
++{
++   musl-dynlink-false-positive2
++   Memcheck:Leak
++   fun:calloc
++   fun:load_direct_deps
++   fun:load_deps
++   fun:load_deps
++   fun:__dls3
++   fun:__dls2
++}
++
++{
++   musl-dynlink-false-positive3
++   Memcheck:Leak
++   fun:calloc
++   fun:load_library
++   fun:load_preload
++   fun:__dls3
++   fun:__dls2b
++   fun:__dls2
++}
++
++{
++   musl-dynlink-false-positive4
++   Memcheck:Leak
++   fun:calloc
++   fun:load_library
++   fun:load_preload
++   fun:__dls3
++   fun:__dls2
++}
+-- 
+2.17.1
+

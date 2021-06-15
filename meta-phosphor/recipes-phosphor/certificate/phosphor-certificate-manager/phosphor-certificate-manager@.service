@@ -2,7 +2,7 @@
 Description=Phosphor certificate manager for %I
 
 [Service]
-EnvironmentFile={envfiledir}/obmc/cert/%I
+EnvironmentFile=/usr/share/phosphor-certificate-manager/%I
 ExecStart=/usr/bin/env phosphor-certificate-manager --endpoint=${{ENDPOINT}} --path=${{CERTPATH}} --unit=${{UNIT}} --type=${{TYPE}}
 SyslogIdentifier=phosphor-certificate-manager
 Restart=always

@@ -1,0 +1,98 @@
+From 04e8a611e958f0da1ccac61acae3a6f1a5168b20 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 13 Jul 2018 18:08:14 +0800
+Subject: [PATCH] support musl
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ mozglue/misc/TimeStamp_darwin.cpp            | 1 -
+ mozglue/misc/TimeStamp_posix.cpp             | 1 -
+ nsprpub/pr/src/misc/prsystem.c               | 1 -
+ python/psutil/psutil/_psutil_bsd.c           | 1 -
+ python/psutil/psutil/_psutil_osx.c           | 1 -
+ python/psutil/psutil/arch/bsd/process_info.c | 1 -
+ python/psutil/psutil/arch/osx/process_info.c | 1 -
+ 9 files changed, 3 insertions(+), 12 deletions(-)
+
+--- a/mozglue/misc/TimeStamp_darwin.cpp
++++ b/mozglue/misc/TimeStamp_darwin.cpp
+@@ -19,7 +19,6 @@
+ 
+ #include <mach/mach_time.h>
+ #include <sys/time.h>
+-#include <sys/sysctl.h>
+ #include <time.h>
+ #include <unistd.h>
+ 
+--- a/mozglue/misc/TimeStamp_posix.cpp
++++ b/mozglue/misc/TimeStamp_posix.cpp
+@@ -21,7 +21,6 @@
+ #if defined(__DragonFly__) || defined(__FreeBSD__) || defined(__NetBSD__) || \
+     defined(__OpenBSD__)
+ #include <sys/param.h>
+-#include <sys/sysctl.h>
+ #endif
+ 
+ #if defined(__DragonFly__) || defined(__FreeBSD__)
+--- a/nsprpub/pr/src/misc/prsystem.c
++++ b/nsprpub/pr/src/misc/prsystem.c
+@@ -27,7 +27,6 @@
+     || defined(OPENBSD) || defined(DRAGONFLY) || defined(DARWIN)
+ #define _PR_HAVE_SYSCTL
+ #include <sys/param.h>
+-#include <sys/sysctl.h>
+ #endif
+ 
+ #if defined(DARWIN)
+--- a/third_party/python/psutil/psutil/_psutil_bsd.c
++++ b/third_party/python/psutil/psutil/_psutil_bsd.c
+@@ -29,7 +29,6 @@
+ #include <paths.h>
+ #include <sys/types.h>
+ #include <sys/param.h>
+-#include <sys/sysctl.h>
+ #include <sys/user.h>
+ #include <sys/proc.h>
+ #include <sys/file.h>
+--- a/third_party/python/psutil/psutil/_psutil_osx.c
++++ b/third_party/python/psutil/psutil/_psutil_osx.c
+@@ -13,7 +13,6 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <utmpx.h>
+-#include <sys/sysctl.h>
+ #include <sys/vmmeter.h>
+ #include <libproc.h>
+ #include <sys/proc_info.h>
+--- a/third_party/python/psutil/psutil/arch/osx/process_info.c
++++ b/third_party/python/psutil/psutil/arch/osx/process_info.c
+@@ -16,7 +16,6 @@
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <signal.h>
+-#include <sys/sysctl.h>
+ #include <libproc.h>
+ 
+ #include "process_info.h"
+--- a/memory/build/Mutex.h
++++ b/memory/build/Mutex.h
+@@ -42,7 +42,7 @@ struct Mutex {
+     if (pthread_mutexattr_init(&attr) != 0) {
+       return false;
+     }
+-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ADAPTIVE_NP);
++    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_STALLED);
+     if (pthread_mutex_init(&mMutex, &attr) != 0) {
+       pthread_mutexattr_destroy(&attr);
+       return false;
+@@ -102,7 +102,7 @@ typedef Mutex StaticMutex;
+ 
+ #if defined(XP_DARWIN)
+ #define STATIC_MUTEX_INIT OS_SPINLOCK_INIT
+-#elif defined(XP_LINUX) && !defined(ANDROID)
++#elif defined(XP_LINUX) && !defined(ANDROID) && defined(__GLIBC__)
+ #define STATIC_MUTEX_INIT PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP
+ #else
+ #define STATIC_MUTEX_INIT PTHREAD_MUTEX_INITIALIZER

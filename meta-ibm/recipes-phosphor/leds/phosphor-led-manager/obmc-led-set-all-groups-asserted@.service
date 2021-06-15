@@ -1,0 +1,13 @@
+[Unit]
+Description=Set the Asserted property of all the LED groups to %i
+Wants=xyz.openbmc_project.LED.GroupManager
+After=xyz.openbmc_project.LED.GroupManager
+After=op-reset-chassis-running@0.service
+ConditionPathExists=!/run/openbmc/chassis@0-on
+
+[Service]
+Type=oneshot
+Restart=no
+EnvironmentFile={envfiledir}/obmc/led/set-all/groups/config
+ExecStart=/bin/bash -c "led-set-all-groups-asserted.sh %i ${{EXCLUDED_GROUPS}}"
+SyslogIdentifier=obmc-led-set-all-groups-asserted

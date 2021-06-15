@@ -1,0 +1,34 @@
+Address platforms with no __int128.
+
+Fixes remaining pieces from
+https://github.com/libffi/libffi/commit/6663047f56c2932a6b10a790f4ac6666dd181326
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/src/powerpc/ffi_linux64.c.org	2019-12-05 14:48:33.140579431 -0800
++++ a/src/powerpc/ffi_linux64.c	2019-12-05 14:53:58.827244495 -0800
+@@ -680,9 +680,9 @@ ffi_prep_args64 (extended_cif *ecif, uns
+                     {
+                       if (vecarg_count < NUM_VEC_ARG_REGISTERS64
+                           && i < nfixedargs)
+-                        *vec_base.f128++ = *arg.f128++;
++		        memcpy (vec_base.f128++, arg.f128, sizeof (float128));
+                       else
+-                        *next_arg.f128 = *arg.f128++;
++		        memcpy (next_arg.f128, arg.f128++, sizeof (float128));
+                       if (++next_arg.f128 == gpr_end.f128)
+                         next_arg.f128 = rest.f128;
+                       vecarg_count++;
+@@ -986,9 +986,9 @@ ffi_closure_helper_LINUX64 (ffi_cif *cif
+                   do
+                     {
+                       if (pvec < end_pvec && i < nfixedargs)
+-                        *to.f128 = *pvec++;
++		        memcpy (to.f128, pvec++, sizeof (float128));
+                       else
+-                        *to.f128 = *from.f128;
++		        memcpy (to.f128, from.f128, sizeof (float128));
+                       to.f128++;
+                       from.f128++;
+                     }

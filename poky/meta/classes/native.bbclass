@@ -5,19 +5,11 @@ inherit relocatable
 # no need for them to be a direct target of 'world'
 EXCLUDE_FROM_WORLD = "1"
 
-PACKAGES = ""
-PACKAGES_class-native = ""
-PACKAGES_DYNAMIC = ""
-PACKAGES_DYNAMIC_class-native = ""
 PACKAGE_ARCH = "${BUILD_ARCH}"
 
 # used by cmake class
 OECMAKE_RPATH = "${libdir}"
 OECMAKE_RPATH_class-native = "${libdir}"
-
-# When this class has packaging enabled, setting 
-# RPROVIDES becomes unnecessary.
-RPROVIDES = "${PN}"
 
 TARGET_ARCH = "${BUILD_ARCH}"
 TARGET_OS = "${BUILD_OS}"
@@ -89,6 +81,7 @@ export lt_cv_sys_lib_dlsearch_path_spec = "${libdir} ${base_libdir} /lib /lib64 
 
 NATIVE_PACKAGE_PATH_SUFFIX ?= ""
 bindir .= "${NATIVE_PACKAGE_PATH_SUFFIX}"
+sbindir .= "${NATIVE_PACKAGE_PATH_SUFFIX}"
 base_libdir .= "${NATIVE_PACKAGE_PATH_SUFFIX}"
 libdir .= "${NATIVE_PACKAGE_PATH_SUFFIX}"
 libexecdir .= "${NATIVE_PACKAGE_PATH_SUFFIX}"
@@ -126,6 +119,7 @@ python native_virtclass_handler () {
     pn = e.data.getVar("PN")
     if not pn.endswith("-native"):
         return
+    bpn = e.data.getVar("BPN")
 
     # Set features here to prevent appends and distro features backfill
     # from modifying native distro features
@@ -137,7 +131,7 @@ python native_virtclass_handler () {
     if "native" not in classextend:
         return
 
-    def map_dependencies(varname, d, suffix = ""):
+    def map_dependencies(varname, d, suffix = "", selfref=True):
         if suffix:
             varname = varname + "_" + suffix
         deps = d.getVar(varname)
@@ -147,22 +141,28 @@ python native_virtclass_handler () {
         newdeps = []
         for dep in deps:
             if dep == pn:
-                continue
+                if not selfref:
+                    continue
+                newdeps.append(dep)
             elif "-cross-" in dep:
                 newdeps.append(dep.replace("-cross", "-native"))
             elif not dep.endswith("-native"):
-                newdeps.append(dep + "-native")
+                # Replace ${PN} with ${BPN} in the dependency to make sure
+                # dependencies on, e.g., ${PN}-foo become ${BPN}-foo-native
+                # rather than ${BPN}-native-foo-native.
+                newdeps.append(dep.replace(pn, bpn) + "-native")
             else:
                 newdeps.append(dep)
-        d.setVar(varname, " ".join(newdeps))
+        d.setVar(varname, " ".join(newdeps), parsing=True)
 
-    map_dependencies("DEPENDS", e.data)
-    for pkg in [e.data.getVar("PN"), "", "${PN}"]:
+    map_dependencies("DEPENDS", e.data, selfref=False)
+    for pkg in e.data.getVar("PACKAGES", False).split():
         map_dependencies("RDEPENDS", e.data, pkg)
         map_dependencies("RRECOMMENDS", e.data, pkg)
         map_dependencies("RSUGGESTS", e.data, pkg)
         map_dependencies("RPROVIDES", e.data, pkg)
         map_dependencies("RREPLACES", e.data, pkg)
+    map_dependencies("PACKAGES", e.data)
 
     provides = e.data.getVar("PROVIDES")
     nprovides = []
@@ -170,7 +170,7 @@ python native_virtclass_handler () {
         if prov.find(pn) != -1:
             nprovides.append(prov)
         elif not prov.endswith("-native"):
-            nprovides.append(prov.replace(prov, prov + "-native"))
+            nprovides.append(prov + "-native")
         else:
             nprovides.append(prov)
     e.data.setVar("PROVIDES", ' '.join(nprovides))
@@ -185,11 +185,11 @@ python do_addto_recipe_sysroot () {
     bb.build.exec_func("extend_recipe_sysroot", d)
 }
 addtask addto_recipe_sysroot after do_populate_sysroot
+do_addto_recipe_sysroot[deptask] = "do_populate_sysroot"
 
 inherit nopackages
 
 do_packagedata[stamp-extra-info] = ""
-do_populate_sysroot[stamp-extra-info] = ""
 
 USE_NLS = "no"
 

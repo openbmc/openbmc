@@ -65,17 +65,17 @@ def SystemdUnit(unit):
             self.unit = unit
 
         def __getattr__(self, item):
-            if item is 'name':
+            if item == 'name':
                 return self.unit
-            if item is 'is_activated':
+            if item == 'is_activated':
                 return self.unit.startswith('dbus-')
-            if item is 'is_template':
+            if item == 'is_template':
                 return '@.' in self.unit
-            if item is 'is_instance':
+            if item == 'is_instance':
                 return '@' in self.unit and not self.is_template
             if item in ['is_service', 'is_target']:
                 return self.unit.split('.')[-1] == item
-            if item is 'base':
+            if item == 'base':
                 cls = self.unit.split('.')[-1]
                 base = self.unit.replace('dbus-', '')
                 base = base.replace('.%s' % cls, '')
@@ -84,13 +84,13 @@ def SystemdUnit(unit):
                 if self.is_template:
                     base = base.rstrip('@')
                 return base
-            if item is 'instance' and self.is_instance:
+            if item == 'instance' and self.is_instance:
                 inst = self.unit.rsplit('@')[-1]
                 return inst.rsplit('.')[0]
-            if item is 'template' and self.is_instance:
+            if item == 'template' and self.is_instance:
                 cls = self.unit.split('.')[-1]
                 return '%s@.%s' % (self.base, cls)
-            if item is 'template' and self.is_template:
+            if item == 'template' and self.is_template:
                 return '.'.join(self.base.split('@')[:-1])
 
             raise AttributeError(item)
@@ -130,8 +130,11 @@ python() {
                 'base_bindir',
                 'bindir',
                 'sbindir',
+                'libexecdir',
                 'envfiledir',
                 'sysconfdir',
+                'localstatedir',
+                'datadir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
             set_append(d, 'SYSTEMD_SUBSTITUTIONS',
                 '%s:%s:%s' % (x, d.getVar(x, True), file))
@@ -162,11 +165,11 @@ python() {
 
         var = 'SYSTEMD_USER_%s' % file
         user = listvar_to_list(d, var)
-        if len(user) is 0:
+        if len(user) == 0:
             var = 'SYSTEMD_USER_%s' % pkg
             user = listvar_to_list(d, var)
-        if len(user) is not 0:
-            if len(user) is not 1:
+        if len(user) != 0:
+            if len(user) != 1:
                 bb.fatal('Too many users assigned to %s: \'%s\'' % (var, ' '.join(user)))
 
             user = user[0]
@@ -336,6 +339,9 @@ do_install_append() {
                 sed -i -e 's,@BASE_BINDIR@,${base_bindir},g' \
                         -e 's,@BINDIR@,${bindir},g' \
                         -e 's,@SBINDIR@,${sbindir},g' \
+                        -e 's,@LIBEXECDIR@,${libexecdir},g' \
+                        -e 's,@LOCALSTATEDIR@,${localstatedir},g' \
+                        -e 's,@DATADIR@,${datadir},g' \
                         ${D}${systemd_system_unitdir}/$s
         done
 }

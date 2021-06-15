@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+device=$1
+if [ "$device" = "" ]; then
+    echo "Usage: zram-swap-deinit <device>"
+    exit 1
+fi
+
+sysblockdev=/sys/block/$(basename $device)
+if [ ! -d $sysblockdev ]; then
+    echo "Block device not found in sysfs"
+    exit 1
+fi
+
+# zramctl -r is not suitable as it also removes the actual device. Recreating
+# it is non-trivial, especially if not /dev/zram0 is used...
+echo 1 > ${sysblockdev}/reset
+

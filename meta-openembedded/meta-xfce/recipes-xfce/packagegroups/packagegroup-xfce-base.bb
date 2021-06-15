@@ -1,10 +1,8 @@
 SUMMARY = "All packages required for a base installation of XFCE"
 SECTION = "x11/wm"
-LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 PR = "r5"
 
-inherit packagegroup distro_features_check
+inherit packagegroup features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
@@ -15,7 +13,6 @@ RDEPENDS_${PN} = " \
     xfdesktop \
     xfce4-panel \
     \
-    gtk-xfce-engine \
     librsvg-gtk \
     \
     xfce4-panel-plugin-actions \

@@ -3,6 +3,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 SUMMARY = "Basic systemd-boot configuration files"
 
 RPROVIDES_${PN} += "virtual/systemd-bootconf"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit systemd-boot-cfg
 

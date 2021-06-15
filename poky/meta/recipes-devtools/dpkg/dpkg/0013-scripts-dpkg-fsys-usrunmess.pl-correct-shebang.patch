@@ -1,0 +1,23 @@
+From 0decc62904571582147f2273fa1b521e00485dda Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 3 Feb 2021 20:47:58 +0100
+Subject: [PATCH] scripts/dpkg-fsys-usrunmess.pl: correct shebang
+
+Otherwise automake will write the full native perl path into it.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ scripts/dpkg-fsys-usrunmess.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/dpkg-fsys-usrunmess.pl b/scripts/dpkg-fsys-usrunmess.pl
+index 9220df3c0..9ce368955 100755
+--- a/scripts/dpkg-fsys-usrunmess.pl
++++ b/scripts/dpkg-fsys-usrunmess.pl
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ #
+ # dpkg-fsys-usrunmess - Undoes the merged-/usr-via-aliased-dirs mess
+ #

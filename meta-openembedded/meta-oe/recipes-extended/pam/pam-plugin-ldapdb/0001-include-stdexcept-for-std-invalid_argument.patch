@@ -1,0 +1,25 @@
+From 3e97c9004f4ec58ca3696ee6298f91e6eeb76e04 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Dec 2019 14:46:25 -0800
+Subject: [PATCH] include <stdexcept> for std::invalid_argument
+
+Upstream-Status: Submitted [https://github.com/rmbreak/pam_ldapdb/pull/11]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pam_ldapdb.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/pam_ldapdb.cpp b/pam_ldapdb.cpp
+index 9baf1e6..be5d85c 100644
+--- a/pam_ldapdb.cpp
++++ b/pam_ldapdb.cpp
+@@ -1,5 +1,6 @@
+ #include <map>
+ #include <string>
++#include <stdexcept>
+ #include <utility>
+ #include <syslog.h>
+ #include <pwd.h>
+-- 
+2.24.1
+

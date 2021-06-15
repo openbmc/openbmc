@@ -1,0 +1,61 @@
+From 788469badc4cd6a618e02d52883511cfbb00ca34 Mon Sep 17 00:00:00 2001
+From: Vinay Senthil <vinays@xilinx.com>
+Date: Tue, 30 Jul 2019 15:53:25 -0700
+Subject: [PATCH] resizer_PL notebooks for ZCU104 and Ultra96: changed default
+ bitstream location
+
+Location is no longer /home/xilinx. Now it is in a bitsream folder in the same directory as the notebook.
+
+Signed-off-by: Vinay Senthil <vinays@xilinx.com>
+---
+ boards/Ultra96/resizer/notebooks/resizer_PL.ipynb | 4 ++--
+ boards/ZCU104/resizer/notebooks/resizer_PL.ipynb  | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/boards/Ultra96/resizer/notebooks/resizer_PL.ipynb b/boards/Ultra96/resizer/notebooks/resizer_PL.ipynb
+index 1658d78..cd04d93 100644
+--- a/boards/Ultra96/resizer/notebooks/resizer_PL.ipynb
++++ b/boards/Ultra96/resizer/notebooks/resizer_PL.ipynb
+@@ -78,7 +78,7 @@
+    "outputs": [],
+    "source": [
+     "resize_design = Overlay(\n",
+-    "    \"/usr/local/lib/python3.6/dist-packages/helloworld/bitstream/resizer.bit\")"
++    "    \"bitstream/resizer.bit\")"
+    ]
+   },
+   {
+@@ -497,7 +497,7 @@
+    "name": "python",
+    "nbconvert_exporter": "python",
+    "pygments_lexer": "ipython3",
+-   "version": "3.6.5"
++   "version": "3.7.0"
+   }
+  },
+  "nbformat": 4,
+diff --git a/boards/ZCU104/resizer/notebooks/resizer_PL.ipynb b/boards/ZCU104/resizer/notebooks/resizer_PL.ipynb
+index 1658d78..cd04d93 100644
+--- a/boards/ZCU104/resizer/notebooks/resizer_PL.ipynb
++++ b/boards/ZCU104/resizer/notebooks/resizer_PL.ipynb
+@@ -78,7 +78,7 @@
+    "outputs": [],
+    "source": [
+     "resize_design = Overlay(\n",
+-    "    \"/usr/local/lib/python3.6/dist-packages/helloworld/bitstream/resizer.bit\")"
++    "    \"bitstream/resizer.bit\")"
+    ]
+   },
+   {
+@@ -497,7 +497,7 @@
+    "name": "python",
+    "nbconvert_exporter": "python",
+    "pygments_lexer": "ipython3",
+-   "version": "3.6.5"
++   "version": "3.7.0"
+   }
+  },
+  "nbformat": 4,
+-- 
+2.7.4
+

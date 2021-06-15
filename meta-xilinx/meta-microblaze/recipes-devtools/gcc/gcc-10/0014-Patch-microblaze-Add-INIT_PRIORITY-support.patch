@@ -1,0 +1,101 @@
+From b9a9e8f9d0994c76819ec605a0b7cd113f3b2cf0 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 17 Jan 2017 14:41:58 +0530
+Subject: [PATCH 14/54] [Patch, microblaze]: Add INIT_PRIORITY support Added
+ TARGET_ASM_CONSTRUCTOR and TARGET_ASM_DESTRUCTOR macros.
+
+These macros allows users to control the order of initialization
+of objects defined at namespace scope with the init_priority
+attribute by specifying a relative priority, a constant integral
+expression currently bounded between 101 and 65535 inclusive.
+
+Lower numbers indicate a higher priority.
+
+Changelog
+
+2013-11-26  Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
+ * gcc/config/microblaze/microblaze.c: Add microblaze_asm_constructor,
+   microblaze_asm_destructor. Define TARGET_ASM_CONSTRUCTOR and
+   TARGET_ASM_DESTRUCTOR.
+
+Signed-off-by:nagaraju <nmekala@xilix.com>
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+---
+ gcc/config/microblaze/microblaze.c | 53 ++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 0186171c04c..9eae5515c60 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -2634,6 +2634,53 @@ print_operand_address (FILE * file, rtx addr)
+     }
+ }
+ 
++/* Output an element in the table of global constructors. */
++void
++microblaze_asm_constructor (rtx symbol ATTRIBUTE_UNUSED, int priority)
++{
++    const char *section = ".ctors";
++    char buf[16];
++
++    if (priority != DEFAULT_INIT_PRIORITY)
++      {
++        sprintf (buf, ".ctors.%.5u",
++                /* Invert the numbering so the linker puts us in the proper
++                   order; constructors are run from right to left, and the
++                   linker sorts in increasing order.  */
++                MAX_INIT_PRIORITY - priority);
++        section = buf;
++      }
++
++    switch_to_section (get_section (section, 0, NULL));
++    assemble_align (POINTER_SIZE);
++    fputs ("\t.word\t", asm_out_file);
++    output_addr_const (asm_out_file, symbol);
++    fputs ("\n", asm_out_file);
++}
++
++/* Output an element in the table of global destructors. */
++void
++microblaze_asm_destructor (rtx symbol, int priority)
++{
++    const char *section = ".dtors";
++    char buf[16];
++    if (priority != DEFAULT_INIT_PRIORITY)
++      {
++        sprintf (buf, ".dtors.%.5u",
++                 /* Invert the numbering so the linker puts us in the proper
++                    order; constructors are run from right to left, and the
++                    linker sorts in increasing order.  */
++                MAX_INIT_PRIORITY - priority);
++        section = buf;
++      }
++
++    switch_to_section (get_section (section, 0, NULL));
++    assemble_align (POINTER_SIZE);
++    fputs ("\t.word\t", asm_out_file);
++    output_addr_const (asm_out_file, symbol);
++    fputs ("\n", asm_out_file);
++}
++
+ /* Emit either a label, .comm, or .lcomm directive, and mark that the symbol
+    is used, so that we don't emit an .extern for it in 
+    microblaze_asm_file_end.  */
+@@ -3975,6 +4022,12 @@ microblaze_starting_frame_offset (void)
+ #undef TARGET_ATTRIBUTE_TABLE
+ #define TARGET_ATTRIBUTE_TABLE          microblaze_attribute_table
+ 
++#undef TARGET_ASM_CONSTRUCTOR
++#define TARGET_ASM_CONSTRUCTOR          microblaze_asm_constructor
++
++#undef TARGET_ASM_DESTRUCTOR
++#define TARGET_ASM_DESTRUCTOR           microblaze_asm_destructor
++
+ #undef TARGET_IN_SMALL_DATA_P
+ #define TARGET_IN_SMALL_DATA_P          microblaze_elf_in_small_data_p
+ 
+-- 
+2.17.1
+

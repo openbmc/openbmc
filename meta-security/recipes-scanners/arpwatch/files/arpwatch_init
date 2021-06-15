@@ -1,0 +1,123 @@
+#!/bin/sh
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+NAME=arpwatch
+DAEMON=/usr/sbin/$NAME
+DESC="Ethernet/FDDI station monitor daemon"
+DATADIR=/var/lib/$NAME
+RETVAL=0
+
+. /etc/init.d/functions
+
+### You shouldn't touch anything below unless you know what you are doing.
+
+[ -f /etc/default/arpwatch ] && . /etc/default/arpwatch
+
+# Decide whether we have to deal with multiple interfaces.
+CONF=/etc/arpwatch.conf
+MULTIPLE=0
+if [ -r $CONF ]; then
+	grep -c '^[a-z]' $CONF 2>&1 >/dev/null && MULTIPLE=1
+fi
+
+# Check whether we have to drop privileges.
+if [ -n "$RUNAS" ]; then
+	if getent passwd "$RUNAS" >/dev/null; then
+		ARGS="-u ${RUNAS} $ARGS"
+	else
+		RUNAS=""
+	fi
+fi
+
+start_instance () {
+	IFACE=$1
+	INSTANCE=${NAME}-${IFACE}
+	DATAFILE=$DATADIR/${IFACE}.dat
+	IFACE_OPTS="-P /var/run/${INSTANCE}.pid -i ${IFACE} -f ${DATAFILE} $2"
+
+	echo -n "Starting $DESC: "
+	if [ ! -f $DATAFILE ]; then
+		echo -n "(creating $DATAFILE) " :> $DATAFILE
+	fi
+	if [ -n "$RUNAS" ]; then
+		echo -n "(chown $RUNAS $DATAFILE) "
+		chown $RUNAS $DATAFILE
+	fi
+	start-stop-daemon --start --quiet \
+		--pidfile /var/run/${INSTANCE}.pid \
+		--exec $DAEMON -- $IFACE_OPTS $ARGS
+	echo "${INSTANCE}."
+	ps h -C $NAME -o pid,args | \
+		awk "/$IFACE/ { print \$1 }" > /var/run/${INSTANCE}.pid
+}
+
+stop_instance () {
+	IFACE=$1
+	INSTANCE=${NAME}-${IFACE}
+	[ -f /var/run/${INSTANCE}.pid ] || return 0
+	echo -n "Stopping $DESC: "
+	start-stop-daemon --stop --quiet --oknodo \
+		--pidfile /var/run/${INSTANCE}.pid
+	echo "${INSTANCE}."
+	rm -f /var/run/${INSTANCE}.pid
+}
+
+process_loop_break_line () {
+	__IFACE=$1
+	shift
+	__IOPTS="$@"
+}
+
+process_loop () {
+	OPERATION=$1
+	grep '^[a-z]' $CONF 2>/dev/null | \
+	while read LINE
+	do
+		process_loop_break_line $LINE
+		I=$__IFACE
+		I_OPTS="$__IOPTS"
+		$OPERATION $I "$I_OPTS"
+	done
+}
+
+startup () {
+  	process_loop start_instance
+}
+
+shutdown () {
+	process_loop stop_instance
+}
+
+case "$1" in
+  start)
+  	startup
+	;;
+  stop)
+  	shutdown
+	;;
+  reload)
+  	echo "Reload operation not supported -- use restart."
+	RETVAL=2
+	;;
+  restart|force-reload)
+	#
+	#	If the "reload" option is implemented, move the "force-reload"
+	#	option to the "reload" entry above. If not, "force-reload" is
+	#	just the same as "restart".
+	#
+	shutdown
+	sleep 1
+	startup
+	;;
+  status)
+      status_of_proc $DAEMON $NAME
+      ;;
+  *)
+	N=/etc/init.d/$NAME
+	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	RETVAL=2
+	;;
+esac
+
+exit $RETVAL

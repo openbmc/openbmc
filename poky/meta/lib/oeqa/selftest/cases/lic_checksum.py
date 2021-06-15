@@ -1,16 +1,18 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import tempfile
 
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake
 from oeqa.utils import CommandError
-from oeqa.core.decorator.oeid import OETestID
 
 class LicenseTests(OESelftestTestCase):
 
     # Verify that changing a license file that has an absolute path causes
     # the license qa to fail due to a mismatched md5sum.
-    @OETestID(1197)
     def test_nonmatching_checksum(self):
         bitbake_cmd = '-c populate_lic emptytest'
         error_msg = 'emptytest: The new md5 checksum is 8d777f385d3dfec8815d20f7496026dc'

@@ -1,0 +1,10 @@
+[Unit]
+Description=System unit to hard reset or system reset chassis
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/bin/tray_powercycle.sh
+
+[Install]
+WantedBy=chassis-system-reset.target

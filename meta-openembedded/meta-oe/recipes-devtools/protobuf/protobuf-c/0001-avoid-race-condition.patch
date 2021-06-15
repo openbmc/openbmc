@@ -1,0 +1,36 @@
+From 216e31260b618ec73862f9f5336597f391444dac Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Sun, 29 Sep 2019 17:20:42 +0800
+Subject: [PATCH] avoid race condition
+
+It's possible that the cxx-generate-packed-data.cc is compiled
+while the t/test-full.pb.h is being generated. This will result
+the following error.
+
+  DEBUG:	./t/test-full.pb.h:4:0: error: unterminated #ifndef
+  ./t/test-full.pb.h:4:0: error: unterminated #ifndef
+
+Add a dependency to avoid such problem.
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index b0cb065..1608ae0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -156,6 +156,7 @@ noinst_PROGRAMS += \
+ t_generated_code2_cxx_generate_packed_data_SOURCES = \
+ 	t/generated-code2/cxx-generate-packed-data.cc \
+ 	t/test-full.pb.cc
++t/generated-code2/cxx-generate-packed-data.cc: t/test-full.pb.h
+ $(t_generated_code2_cxx_generate_packed_data_OBJECTS): t/test-full.pb.h
+ t_generated_code2_cxx_generate_packed_data_CXXFLAGS = \
+ 	$(AM_CXXFLAGS) \
+-- 
+2.17.1
+

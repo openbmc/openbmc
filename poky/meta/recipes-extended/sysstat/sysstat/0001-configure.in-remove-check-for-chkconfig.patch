@@ -1,0 +1,31 @@
+From 1590cc614aaf0fb81cd804414d6c9d5a9227352c Mon Sep 17 00:00:00 2001
+From: Wenlin Kang <wenlin.kang@windriver.com>
+Date: Tue, 5 Nov 2019 16:16:44 +0800
+Subject: [PATCH] configure.in: remove check for chkconfig
+
+chkconfig can't work on cross-platform, so should remove check for it.
+
+Upstream-Status: Inappropriate [ embedded specific ]
+
+Signed-off-by: Wenlin Kang <wenlin.kang@windriver.com>
+---
+ configure.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/configure.in b/configure.in
+index 48b9a31..cedeb43 100644
+--- a/configure.in
++++ b/configure.in
+@@ -42,7 +42,8 @@ AC_SUBST(VER_JSON)
+ AC_SUBST(VER_XML)
+ 
+ AC_PATH_PROG(PATH_CP, cp)
+-AC_PATH_PROG(PATH_CHKCONFIG, chkconfig)
++#AC_PATH_PROG(PATH_CHKCONFIG, chkconfig)
++AC_SUBST(PATH_CHKCONFIG)
+ 
+ # Check for systemd
+ AC_CHECK_PROG(PKG_CONFIG, pkg-config, pkg-config)
+-- 
+1.9.1
+

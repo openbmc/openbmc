@@ -1,0 +1,397 @@
+{
+    "version": "R05",
+    "sensors": [
+        {
+            "name": "fan0",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan0",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/@Fan_0_To_4_Hwmon@/pwm1",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "fan1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fan1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/@Fan_0_To_4_Hwmon@/pwm2",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "fb_fan0",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fb_fan0",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/@Fan_0_To_4_Hwmon@/pwm3",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "fb_fan1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fb_fan1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/@Fan_0_To_4_Hwmon@/pwm4",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "fb_fan2",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/fb_fan2",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/f0103000.pwm-fan-controller/hwmon/@Fan_0_To_4_Hwmon@/pwm5",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "fleeting0",
+            "type": "margin",
+            "readPath": "/xyz/openbmc_project/extsensors/margin/fleeting0",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "fleeting1",
+            "type": "margin",
+            "readPath": "/xyz/openbmc_project/extsensors/margin/fleeting1",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "fleeting2",
+            "type": "margin",
+            "readPath": "/xyz/openbmc_project/extsensors/margin/fleeting2",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "cputemp",
+            "type": "margin",
+            "readPath": "/xyz/openbmc_project/extsensors/margin/cputemp",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "zone0_vr",
+            "type": "margin",
+            "readPath": "/xyz/openbmc_project/extsensors/margin/zone0_vr",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "nvme",
+            "type": "margin",
+            "readPath": "/xyz/openbmc_project/extsensors/margin/nvme",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "p12v_fan",
+            "type": "margin",
+            "readPath": "/xyz/openbmc_project/extsensors/margin/p12v_fan",
+            "writePath": "",
+            "min": 0,
+            "max": 0,
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        }
+    ],
+    "zones": [
+        {
+            "id": 0,
+            "minThermalOutput": 0.0,
+            "failsafePercent": 100.0,
+            "pids": [
+                {
+                    "name": "fan0",
+                    "type": "fan",
+                    "inputs": [
+                        "fan0"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 0.1,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0056,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 15.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "fan1",
+                    "type": "fan",
+                    "inputs": [
+                        "fan1"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 0.1,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0056,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 15.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "cputemp",
+                    "type": "margin",
+                    "inputs": [
+                        "cputemp"
+                    ],
+                    "setpoint": 10.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 714.0,
+                        "integralCoeff": 9.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "zone0_vr",
+                    "type": "margin",
+                    "inputs": [
+                        "zone0_vr"
+                    ],
+                    "setpoint": 10.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 536.0,
+                        "integralCoeff": 9.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "fleeting0",
+                    "type": "margin",
+                    "inputs": [
+                        "fleeting0"
+                    ],
+                    "setpoint": 10.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 536.0,
+                        "integralCoeff": 9.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "fleeting1",
+                    "type": "margin",
+                    "inputs": [
+                        "fleeting1"
+                    ],
+                    "setpoint": 10.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 536.0,
+                        "integralCoeff": 18.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "fleeting2",
+                    "type": "margin",
+                    "inputs": [
+                        "fleeting2"
+                    ],
+                    "setpoint": 10.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 536.0,
+                        "integralCoeff": 18.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "minThermalOutput": 0.0,
+            "failsafePercent": 100.0,
+            "pids": [
+                {
+                    "name": "fb_fan0",
+                    "type": "fan",
+                    "inputs": [
+                        "fb_fan0"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 0.1,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0056,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 15.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "fb_fan1",
+                    "type": "fan",
+                    "inputs": [
+                        "fb_fan1"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 0.1,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0056,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 15.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "fb_fan2",
+                    "type": "fan",
+                    "inputs": [
+                        "fb_fan2"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 0.1,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0056,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 15.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "nvme",
+                    "type": "margin",
+                    "inputs": [
+                        "nvme"
+                    ],
+                    "setpoint": 10.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 1250.0,
+                        "integralCoeff": 12.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                },
+                {
+                    "name": "p12v_fan",
+                    "type": "margin",
+                    "inputs": [
+                        "p12v_fan"
+                    ],
+                    "setpoint": 10.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 268.0,
+                        "integralCoeff": 4.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 0.0,
+                        "integralLimit_min": 2679.0,
+                        "integralLimit_max": 18000.0,
+                        "outLim_min": 2679.0,
+                        "outLim_max": 18000.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0
+                    }
+                }
+            ]
+        }
+    ]
+}

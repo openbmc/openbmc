@@ -15,7 +15,7 @@
 PATH=/sbin:/bin:/usr/bin:/usr/sbin
 
 DAEMON=/usr/sbin/chronyd
-PIDFILE=/var/run/chronyd.pid
+PIDFILE=/run/chrony/chronyd.pid
 
 test -x $DAEMON -a -r /etc/chrony.conf || exit 0
 

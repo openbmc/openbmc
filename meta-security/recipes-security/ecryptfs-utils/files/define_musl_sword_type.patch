@@ -1,0 +1,15 @@
+Index: ecryptfs-utils-111/src/utils/mount.ecryptfs_private.c
+===================================================================
+--- ecryptfs-utils-111.orig/src/utils/mount.ecryptfs_private.c
++++ ecryptfs-utils-111/src/utils/mount.ecryptfs_private.c
+@@ -45,6 +45,10 @@
+ #include <values.h>
+ #include "../include/ecryptfs.h"
+ 
++#ifndef __SWORD_TYPE
++typedef __typeof__( ((struct statfs *)0)->f_type )	__SWORD_TYPE;
++#endif
++
+ /* Perhaps a future version of this program will allow these to be configurable
+  * by the system administrator (or user?) at run time.  For now, these are set
+  * to reasonable values to reduce the burden of input validation.

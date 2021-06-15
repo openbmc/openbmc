@@ -1,0 +1,9 @@
+{
+  "0" : {
+    "access_mode" : "always_available",
+    "user_auth_disabled" : false,
+    "per_msg_auth_disabled" : false,
+    "alerting_disabled" : false,
+    "priv_limit" : "priv-admin"
+  }
+}

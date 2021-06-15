@@ -1,0 +1,43 @@
+From 4acda6d01c5abd33f1a1a3275fd695363f59473f Mon Sep 17 00:00:00 2001
+From: Alex Stewart <alex.stewart@ni.com>
+Date: Tue, 15 Dec 2020 15:17:54 -0600
+Subject: [opkg][opkg-0.4.4 PATCH] tests: let the OS negotiate relative package
+ dirs
+
+In cases where a regression test requires that a package be installed to
+a subdirectory in the test feed, the opk.py module will attempt to
+resolve the subdirectory and rebase it to the root of the test feed.
+
+This is unnecessary, since all operations which make use of the
+subdirectory path do so from the perspective of the test feed already.
+Further, the rebase implementation breaks in cases where the test feed
+is beyond a symlink.
+
+Remove the resolve-and-rebase logic, and allow the OS to negotiate the
+relative path.
+
+Upstream-Status: Submitted [https://groups.google.com/g/opkg-devel/c/dE1o7_OVQSY]
+
+Signed-off-by: Alex Stewart <alex.stewart@ni.com>
+---
+ tests/opk.py | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/tests/opk.py b/tests/opk.py
+index 692339567f72441766c8e658edc5bdf6a339f77d..711abacaeb328283e31524f6a49305fc7d39696a 100644
+--- a/tests/opk.py
++++ b/tests/opk.py
+@@ -58,9 +58,7 @@ class Opk:
+         if 'Version' not in control.keys():
+             control['Version'] = '1.0'
+         if subdirectory is not None:
+-            subdir = Path(subdirectory).resolve()
+-            opkdir = Path(cfg.opkdir)
+-            self._relative_dir = subdir.relative_to(opkdir)
++            self._relative_dir = Path(subdirectory)
+         else:
+             self._relative_dir = None
+         self.control = control
+-- 
+2.29.2
+

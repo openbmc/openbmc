@@ -1,0 +1,31 @@
+From 18cc69460d2a0c756880bd54fda36afb0173ea02 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 19 Dec 2019 19:47:36 -0800
+Subject: [PATCH] define BASELIB make variable
+
+This helps to override the default libdir from environment
+
+Upstream-Status: Submitted [https://github.com/foo86/dcadec/pull/61]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index a503698..8f323be 100644
+--- a/Makefile
++++ b/Makefile
+@@ -7,8 +7,9 @@ API_PATCH = 0
+ CFLAGS := -std=gnu99 -D_FILE_OFFSET_BITS=64 -Wall -Wextra -O3 -ffast-math -g -MMD $(CFLAGS)
+ 
+ PREFIX ?= /usr/local
++BASELIB ?= lib
+ BINDIR ?= $(PREFIX)/bin
+-LIBDIR ?= $(PREFIX)/lib
++LIBDIR ?= $(PREFIX)/$(BASELIB)
+ INCLUDEDIR ?= $(PREFIX)/include
+ 
+ SRC_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+-- 
+2.24.1
+

@@ -1,7 +1,0 @@
-[Unit]
-Description=Chassis%i (Reset Check)
-Conflicts=obmc-chassis-poweroff@%i.target
-RefuseManualStop=yes
-
-[Install]
-WantedBy=multi-user.target

@@ -3,13 +3,10 @@ HOMEPAGE = "http://www.djangoproject.com/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f09eb47206614a4954c51db8a94840fa"
 
-SRC_URI[md5sum] = "38e82b59a1c27bbf98ccf0564ead7426"
-SRC_URI[sha256sum] = "eb9271f0874f53106a2719c0c35ce67631f6cc27cf81a60c6f8c9817b35a3f6e"
-
 PYPI_PACKAGE = "Django"
 inherit pypi
 
-UPSTREAM_CHECK_REGEX = "(?P<pver>1(\.\d+)+)"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)/"
 
 FILES_${PN} += "${datadir}/django"
 
@@ -31,4 +28,7 @@ RDEPENDS_${PN} += "\
     ${PYTHON_PN}-threading \
     ${PYTHON_PN}-unixadmin \
     ${PYTHON_PN}-xml \
+    ${PYTHON_PN}-distutils \
 "
+
+CVE_PRODUCT = "django"

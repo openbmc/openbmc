@@ -1,0 +1,230 @@
+From 6587a1cae28468f5a49659a39040f60e425827a7 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 17 Nov 2020 13:06:41 +0530
+Subject: [PATCH 09/11] [Patch,MicroBlaze] : Added MB-64 support to
+ strcmp/strcpy/strlen files Signed-off-by:Mahesh Bodapati<mbodapat@xilinx.com>
+
+---
+ newlib/libc/machine/microblaze/strcmp.c | 63 ++++++++++++++++++++++++-
+ newlib/libc/machine/microblaze/strcpy.c | 57 ++++++++++++++++++++++
+ newlib/libc/machine/microblaze/strlen.c | 38 +++++++++++++++
+ 3 files changed, 157 insertions(+), 1 deletion(-)
+
+diff --git a/newlib/libc/machine/microblaze/strcmp.c b/newlib/libc/machine/microblaze/strcmp.c
+index 3119d82c5..2cfef7388 100644
+--- a/newlib/libc/machine/microblaze/strcmp.c
++++ b/newlib/libc/machine/microblaze/strcmp.c
+@@ -133,6 +133,66 @@ strcmp (const char *s1,
+ 
+ #include "mb_endian.h"
+ 
++#ifdef __arch64__
++    asm volatile ("                                          \n\
++        orl      r9, r0, r0               /* Index register */ \n\
++check_alignment:                                             \n\
++        andli    r3, r5, 3                                    \n\
++        andli    r4, r6, 3                                    \n\
++        beanei    r3, try_align_args                           \n\
++        beanei    r4, regular_strcmp     /* At this point we don't have a choice */ \n\
++cmp_loop:                                                                       \n"
++        LOAD4BYTES("r3", "r5", "r9")
++        LOAD4BYTES("r4", "r6", "r9")
++"                                                                                      \n\
++        pcmplbf  r7, r3, r0              /* See if there is Null byte */                         \n\
++        beanei    r7, end_cmp_loop        /* IF yes (r7 > 0) use byte compares in end_cmp_loop */ \n\
++        cmplu    r7, r4, r3              /* ELSE compare whole word */                   \n\
++        beanei    r7, end_cmp                                                             \n\
++        addlik   r9, r9, 4               /* delay slot */                                \n\
++        breaid    cmp_loop                                                                \n\
++        nop		               /* delay slot */                                \n\
++end_cmp_loop:                                                                           \n\
++        lbu     r3, r5, r9              /* byte compare loop */                         \n\
++        lbu     r4, r6, r9                                                              \n\
++        cmplu    r7, r4, r3              /* Compare bytes */                             \n\
++        beanei    r7, end_cmp_early                                                       \n\
++        addlik   r9, r9, 1               /* delay slot */                        \n\
++        beaneid   r3, end_cmp_loop        /* If reached null on one string, terminate */  \n\
++        nop					                              \n\
++end_cmp_early:                                                                  \n\
++        orl   r3, r0, r7               /* delay slot */                        \n\
++        rtsd    r15, 8                                                          \n\
++        nop		                                                         \n\
++try_align_args:                                                                 \n\
++        xorl     r7, r4, r3                                                      \n\
++        beanei    r7, regular_strcmp      /* cannot align args */                 \n\
++        rsublik  r10, r3, 4              /* Number of initial bytes to align */  \n\
++align_loop:                                                                     \n\
++        lbu     r3, r5, r9                                                      \n\
++        lbu     r4, r6, r9                                                      \n\
++        cmplu    r7, r4, r3                                                      \n\
++        beanei    r7, end_cmp                                                     \n\
++        beaeqi    r3, end_cmp                                                     \n\
++        addlik   r10, r10, -1                                                    \n\
++        addlik   r9, r9, 1                                                       \n\
++        beaeqid   r10, cmp_loop                                                   \n\
++        nop		                                                           \n\
++        breai     align_loop                                                      \n\
++regular_strcmp:                                                                 \n\
++        lbu     r3, r5, r9                                                      \n\
++        lbu     r4, r6, r9                                                      \n\
++        cmplu    r7, r4, r3                                                      \n\
++        beanei    r7, end_cmp                                                     \n\
++        beaeqi    r3, end_cmp                                                     \n\
++        addlik   r9, r9, 1                                                       \n\
++        breaid    regular_strcmp                                                  \n\
++        nop									\n\
++end_cmp:                                                                        \n\
++        orl       r3, r0, r7                                                       \n\
++        rtsd    r15, 8                                                          \n\
++        nop              /* Return strcmp result */");
++#else
+     asm volatile ("                                          \n\
+         or      r9, r0, r0               /* Index register */\n\
+ check_alignment:                                             \n\
+@@ -181,11 +241,12 @@ regular_strcmp:
+         bnei    r7, end_cmp                                                     \n\
+         beqi    r3, end_cmp                                                     \n\
+         brid    regular_strcmp                                                  \n\
+-        addik   r9, r9, 1                                                       \n\
++        addik	r9, r9, 1
+ end_cmp:                                                                        \n\
+         rtsd    r15, 8                                                          \n\
+         or      r3, r0, r7              /* Return strcmp result */");
+ 
++#endif
+ #endif /* ! HAVE_HW_PCMP */
+ }
+ 
+diff --git a/newlib/libc/machine/microblaze/strcpy.c b/newlib/libc/machine/microblaze/strcpy.c
+index 62072fa28..6dbc60d77 100644
+--- a/newlib/libc/machine/microblaze/strcpy.c
++++ b/newlib/libc/machine/microblaze/strcpy.c
+@@ -125,6 +125,62 @@ strcpy (char *__restrict dst0,
+ #else    
+ 
+ #include "mb_endian.h"
++#ifdef __arch64__
++
++  asm volatile ("                                                   \n\
++        orl      r9, r0, r0              /* Index register */        \n\
++check_alignment:                                                    \n\
++        andli    r3, r5, 3                                           \n\
++        andli    r4, r6, 3                                           \n\
++        beanei    r3, try_align_args                                  \n\
++        beanei    r4, regular_strcpy      /* At this point we dont have a choice */       \n\
++cpy_loop:                                   \n"
++        LOAD4BYTES("r3", "r6", "r9")
++"                                           \n\
++        pcmplbf  r4, r0, r3                  \n\
++        beanei    r4, cpy_bytes           /* If r4 != 0, then null present within string */\n"
++        STORE4BYTES("r3", "r5", "r9")
++"                                           \n\
++        addlik   r9, r9, 4                   \n\
++        breaid    cpy_loop                    \n\
++	nop					\n\
++cpy_bytes:                                  \n\
++        lbu     r3, r6, r9                  \n\
++        sb      r3, r5, r9                  \n\
++        addlik   r4, r4, -1                  \n\
++        addlik   r9, r9, 1               /* delay slot */\n\
++        beaneid   r4, cpy_bytes               \n\
++	nop					\n\
++cpy_null:                                   \n\
++        orl      r3, r0, r5              /* Return strcpy result */\n\
++        rtsd    r15, 8                      \n\
++	nop					\n\
++try_align_args:                             \n\
++        xorl     r7, r4, r3                  \n\
++        beanei    r7, regular_strcpy      /* cannot align args */\n\
++        rsublik  r10, r3, 4              /* Number of initial bytes to align */\n\
++align_loop:                                 \n\
++        lbu     r3, r6, r9                  \n\
++        sb      r3, r5, r9                  \n\
++        addlik   r10, r10, -1                \n\
++        beaeqid   r3, end_cpy             /* Break if we have seen null character */\n\
++	nop					\n\
++        addlik   r9, r9, 1                   \n\
++        beaneid   r10, align_loop             \n\
++	nop					\n\
++        breai     cpy_loop                    \n\
++regular_strcpy:                             \n\
++        lbu     r3, r6, r9                  \n\
++        sb      r3, r5, r9                  \n\
++        addlik   r9, r9, 1                   \n\
++        beaneid   r3, regular_strcpy          \n\
++	nop					\n\
++end_cpy:                                    \n\
++        orl      r3, r0, r5  			\n\
++        rtsd    r15, 8                      \n\
++	nop			 /* Return strcpy result */");
++
++#else
+ 
+   asm volatile ("                                                   \n\
+         or      r9, r0, r0              /* Index register */        \n\
+@@ -171,6 +227,7 @@ regular_strcpy:                             \n\
+ end_cpy:                                    \n\
+         rtsd    r15, 8                      \n\
+         or      r3, r0, r5              /* Return strcpy result */");
++#endif
+ #endif /* ! HAVE_HW_PCMP */
+ }
+ 
+diff --git a/newlib/libc/machine/microblaze/strlen.c b/newlib/libc/machine/microblaze/strlen.c
+index acb4464bc..b6f2d3c13 100644
+--- a/newlib/libc/machine/microblaze/strlen.c
++++ b/newlib/libc/machine/microblaze/strlen.c
+@@ -116,6 +116,43 @@ strlen (const char *str)
+ 
+ #include "mb_endian.h"
+ 
++#ifdef __arch64__
++  asm volatile ("                                               \n\
++        orl      r9, r0, r0              /* Index register */    \n\
++check_alignment:                                                \n\
++        andli    r3, r5, 3                                       \n\
++        beanei    r3, align_arg                                   \n\
++len_loop:                                                       \n"
++        LOAD4BYTES("r3", "r5", "r9")
++"                                                               \n\
++        pcmplbf  r4, r3, r0                                      \n\
++        beanei    r4, end_len                                     \n\
++        addlik   r9, r9, 4                                       \n\
++        breaid    len_loop                                        \n\
++        nop		                                        \n\
++end_len:                                                        \n\
++        lbu     r3, r5, r9                                      \n\
++        beaeqi    r3, done_len                                    \n\
++        addlik   r9, r9, 1                                       \n\
++        breaid    end_len                                         \n\
++        nop		                                       \n\
++done_len:                                                       \n\
++        orl      r3, r0, r9              /* Return len */        \n\
++        rtsd    r15, 8                                          \n\
++        nop						        \n\
++align_arg:                                                      \n\
++        rsublik  r10, r3, 4                                      \n\
++align_loop:                                                     \n\
++        lbu     r3, r5, r9                                      \n\
++        addlik   r10, r10, -1                                    \n\
++        beaeqid   r3, done_len                                    \n\
++        nop		                                       \n\
++        addlik   r9, r9, 1                                       \n\
++        beaneid   r10, align_loop                                 \n\
++        nop		                                        \n\
++        breai     len_loop");
++
++#else
+   asm volatile ("                                               \n\
+         or      r9, r0, r0              /* Index register */    \n\
+ check_alignment:                                                \n\
+@@ -146,5 +183,6 @@ align_loop:                                                     \n\
+         addik   r9, r9, 1                                       \n\
+         bri     len_loop");
+ 
++#endif
+ #endif  /* ! HAVE_HW_PCMP */
+ }
+-- 
+2.17.1
+

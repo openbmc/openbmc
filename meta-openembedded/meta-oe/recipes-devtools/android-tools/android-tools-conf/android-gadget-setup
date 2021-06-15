@@ -9,6 +9,15 @@
 # model=$(getprop ro.product.model Android)
 # serial=$(getprop ro.serialno 0123456789ABCDEF)
 
+#below are now needed in order to use FunctionFS for ADB, tested to work with 3.4+ kernels
+if grep -q functionfs /proc/filesystems; then
+    mkdir -p /dev/usb-ffs/adb
+    mount -t functionfs adb /dev/usb-ffs/adb
+    #android-gadget-setup doesn't provide below 2 and without them it won't work, so we provide them here.
+    echo adb > /sys/class/android_usb/android0/f_ffs/aliases
+    echo ffs > /sys/class/android_usb/android0/functions
+fi
+
 manufacturer="$(cat /system/build.prop | grep -o 'ro.product.manufacturer=.*' | cut -d'=' -f 2)"
 model="$(cat /system/build.prop | grep -o 'ro.product.model=.*' | cut -d'=' -f 2)"
 # get the device serial number from /proc/cmdline directly(since we have no getprop on

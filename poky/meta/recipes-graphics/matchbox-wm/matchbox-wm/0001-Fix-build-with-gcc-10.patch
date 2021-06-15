@@ -1,0 +1,41 @@
+From 8a8f8446e803cad04d7bbceaab78ee45d9778c3c Mon Sep 17 00:00:00 2001
+From: Adrian Bunk <bunk@stusta.de>
+Date: Tue, 12 May 2020 09:44:05 +0300
+Subject: Fix build with gcc 10
+
+Upstream-Status: Pending
+Signed-off-by: Adrian Bunk <bunk@stusta.de>
+---
+ src/mbtheme.h | 2 +-
+ src/structs.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/mbtheme.h b/src/mbtheme.h
+index aa9a7c5..ad03bde 100644
+--- a/src/mbtheme.h
++++ b/src/mbtheme.h
+@@ -46,7 +46,7 @@ typedef struct _mb_theme_param
+ 
+ } MBThemeParam;
+ 
+-enum {
++typedef enum {
+   LAYER_GRADIENT_HORIZ = 1,
+   LAYER_GRADIENT_VERT,
+   LAYER_LABEL,
+diff --git a/src/structs.h b/src/structs.h
+index 24985e7..8f53e72 100644
+--- a/src/structs.h
++++ b/src/structs.h
+@@ -148,7 +148,7 @@
+ 
+ /* Atoms, if you change these check ewmh_init() first */
+ 
+-enum {
++typedef enum {
+   WM_STATE = 0,
+   WM_CHANGE_STATE,
+   WM_PROTOCOLS,
+-- 
+2.17.1
+

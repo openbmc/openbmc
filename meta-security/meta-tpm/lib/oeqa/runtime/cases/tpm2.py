@@ -16,9 +16,9 @@ class Tpm2Test(OERuntimeTestCase):
         if expected_endlines:
             self.fail('Missing expected line endings:\n  %s' % '\n  '.join(expected_endlines))
 
-    @OEHasPackage(['tpm2.0-tss'])
+    @OEHasPackage(['tpm2-tss'])
     @OEHasPackage(['tpm2-abrmd'])
-    @OEHasPackage(['tpm2.0-tools'])
+    @OEHasPackage(['tpm2-tools'])
     @OEHasPackage(['ibmswtpm2'])
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     def test_tpm2_sim(self):

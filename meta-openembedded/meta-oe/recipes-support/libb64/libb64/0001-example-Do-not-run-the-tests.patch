@@ -1,0 +1,27 @@
+From 68f66d1583be670eb8d5f3f38dbd5dd1d63b733c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 Mar 2021 21:41:04 -0700
+Subject: [PATCH] example: Do not run the tests
+
+Upstream-Status: Inappropritate [Cross-compile specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ examples/Makefile | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/examples/Makefile b/examples/Makefile
+index d9667a5..554b346 100644
+--- a/examples/Makefile
++++ b/examples/Makefile
+@@ -33,11 +33,8 @@ depend: $(SOURCES)
+ 	makedepend -f- $(CFLAGS) $(SOURCES) 2> /dev/null 1> depend
+ 
+ test-c-example1: c-example1
+-	./c-example1
+ 
+ test-c-example2: c-example2
+-	./c-example2 loremgibson.txt encoded.txt decoded.txt
+-	diff -q loremgibson.txt decoded.txt
+ 
+ test: test-c-example1 test-c-example2
+ 

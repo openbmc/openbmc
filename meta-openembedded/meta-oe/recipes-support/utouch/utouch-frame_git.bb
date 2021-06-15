@@ -12,9 +12,10 @@ inherit autotools pkgconfig
 SRC_URI = "git://bitmath.org/git/frame.git;protocol=http \
            file://remove-man-page-creation.patch \
            file://0001-include-sys-stat.h-for-fixing-build-issue-on-musl.patch \
+           file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \
            "
 SRCREV = "95363d5a1f7394d71144bf3b408ef4e6db4350fc"
 
 PV = "1.1.2+git${SRCPV}"
 
-S = "${WORKDIR}/git/"
+S = "${WORKDIR}/git"

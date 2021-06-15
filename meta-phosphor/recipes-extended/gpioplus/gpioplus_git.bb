@@ -6,18 +6,14 @@ PV = "0.1+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 
-DEPENDS += " \
-        autoconf-archive-native \
-        "
-
-EXTRA_OECONF_append += " \
-        --disable-examples \
-        --disable-tests \
+EXTRA_OEMESON = " \
+        -Dexamples=false \
+        -Dtests=disabled \
         "
 
 SRC_URI += "git://github.com/openbmc/gpioplus"
-SRCREV = "48e6288da8486a25fd52e944fb0f7148fc1c02db"
+SRCREV = "71e795a279f1d30b6aca2509dd80c9b072f15efa"
 
 S = "${WORKDIR}/git"

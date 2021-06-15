@@ -1,0 +1,25 @@
+From e90101128dfe75b9b1a0575a0179d211f677e6ad Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 30 Aug 2019 13:19:50 -0700
+Subject: [PATCH] include limits.h
+
+Fixes
+error: use of undeclared identifier 'PATH_MAX'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/ssieventmonitor.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/ssieventmonitor.cpp b/tools/ssieventmonitor.cpp
+index 3eed877..0d11975 100644
+--- a/tools/ssieventmonitor.cpp
++++ b/tools/ssieventmonitor.cpp
+@@ -34,6 +34,7 @@
+ #include <unistd.h>
+ #include <dirent.h>
+ #include <errno.h>
++#include <limits.h>
+ #include <sys/fcntl.h>
+ #include <sys/select.h>
+ #include <sys/wait.h>

@@ -1,6 +1,9 @@
-from django.core.management.base import BaseCommand, CommandError
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+from django.core.management.base import BaseCommand
 from orm.models import Build
-import os
 
 
 

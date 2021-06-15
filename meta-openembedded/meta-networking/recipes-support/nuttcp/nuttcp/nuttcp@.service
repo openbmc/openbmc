@@ -1,0 +1,8 @@
+[Unit]
+Description=Network Performance Testing Server
+After=local-fs.target
+
+[Service]
+User=nobody
+ExecStart=/usr/bin/nuttcp -S
+StandardInput=socket

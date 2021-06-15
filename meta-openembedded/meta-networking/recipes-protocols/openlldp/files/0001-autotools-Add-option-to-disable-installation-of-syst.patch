@@ -1,0 +1,57 @@
+From dc3f2250908587710f109c80ddf8a94f0bc40b82 Mon Sep 17 00:00:00 2001
+From: Jonathan Richardson <jonathan.richardson@broadcom.com>
+Date: Fri, 6 Apr 2018 10:49:04 -0700
+Subject: [PATCH] autotools: Add option to disable installation of systemd conf
+ files
+
+Add option to configure.ac to enable or disable install of systemd conf
+files. If --with-systemdsystemunitdir is passed to configure then the
+files will be installed to the provided directory. If the option isn't
+provided then the value is determined from the systemd pkgconfig file,
+if found in PKG_CONFIG_PATH.
+
+This change is required because Makefile.am always installed the files
+to a hard coded path that couldn't be changed.
+
+
+Signed-off-by: Jonathan Richardson <jonathan.richardson@broadcom.com>
+---
+ Makefile.am  | 3 ++-
+ configure.ac | 9 +++++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 292c0fd..0fb9bb0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -138,8 +138,9 @@ install-data-hook:	installdirs-local
+ pkgconfigdir = ${libdir}/pkgconfig
+ pkgconfig_DATA = lldpad.pc liblldp_clif.pc
+ 
+-systemdsystemunitdir = $(prefix)/lib/systemd/system
++if HAVE_SYSTEMD
+ dist_systemdsystemunit_DATA = lldpad.service lldpad.socket
++endif
+ 
+ bashcompletiondir = $(sysconfdir)/bash_completion.d
+ dist_bashcompletion_DATA = contrib/bash_completion/lldpad contrib/bash_completion/lldptool
+diff --git a/configure.ac b/configure.ac
+index 0667446..f75f433 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -95,6 +95,15 @@ AC_TYPE_UINT16_T
+ AC_TYPE_UINT32_T
+ AC_TYPE_UINT8_T
+ 
++# Support for systemd unit files.
++AC_ARG_WITH([systemdsystemunitdir],
++        AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files]),
++        [], [with_systemdsystemunitdir=$($PKG_CONFIG --variable=systemdsystemunitdir systemd)])
++if test "x$with_systemdsystemunitdir" != xno; then
++        AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
++fi
++AM_CONDITIONAL(HAVE_SYSTEMD, [test -n "$with_systemdsystemunitdir" -a "x$with_systemdsystemunitdir" != xno ])
++
+ AC_CONFIG_FILES([Makefile include/version.h lldpad.spec lldpad.pc liblldp_clif.pc])
+ AC_CONFIG_MACRO_DIR([m4])
+ AC_OUTPUT

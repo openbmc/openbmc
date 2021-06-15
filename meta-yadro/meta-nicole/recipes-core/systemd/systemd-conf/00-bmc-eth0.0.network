@@ -1,0 +1,11 @@
+[Match]
+Name=eth0
+KernelCommandLine=bmcposition=0
+[Network]
+VLAN=eth0.4004
+DHCP=true
+LinkLocalAddressing=yes
+IPv6AcceptRA=false
+Address=10.9.0.1/24
+[DHCP]
+ClientIdentifier=mac

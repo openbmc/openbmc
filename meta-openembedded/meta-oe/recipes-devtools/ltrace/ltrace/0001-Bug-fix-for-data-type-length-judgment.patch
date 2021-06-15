@@ -1,0 +1,42 @@
+From 5226333bddb755dbefd780d31450e0238dd5d3bd Mon Sep 17 00:00:00 2001
+From: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+Date: Wed, 16 Oct 2019 08:24:23 +0900
+Subject: [PATCH] Bug fix for data type length judgment.
+
+...
+if (byte_size == sizeof(long)) {
+
+	*type = is_signed ? ARGTYPE_LONG : ARGTYPE_ULONG;
+
+	return true;
+
+}
+...
+
+If ltrace's target command has a dbg package, ltrace will look for the debug file and analyze its contents.
+Ltrace determines the type of analysis result variable. The type of the variable is longlong.
+On 32-bit systems, longlong is 8 and long is 4 (same as in).
+An error occurred because the ltrace code did not process a variable of length 8.
+
+Upstream-Status: Pending
+Signed-off-by: Wang Mingyu <wangmy.fnst@cn.fujitsu.com>
+---
+ dwarf_prototypes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dwarf_prototypes.c b/dwarf_prototypes.c
+index bfac177..9887d4b 100644
+--- a/dwarf_prototypes.c
++++ b/dwarf_prototypes.c
+@@ -190,7 +190,7 @@ static bool get_integer_base_type(enum arg_type *type, int byte_size,
+ 		return true;
+ 	}
+ 
+-	if (byte_size == sizeof(long)) {
++	if (byte_size == sizeof(long long)) {
+ 		*type = is_signed ? ARGTYPE_LONG : ARGTYPE_ULONG;
+ 		return true;
+ 	}
+-- 
+2.7.4
+

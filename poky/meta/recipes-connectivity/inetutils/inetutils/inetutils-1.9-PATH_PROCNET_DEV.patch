@@ -1,4 +1,10 @@
-inetutils: define PATH_PROCNET_DEV if not already defined
+From 101130f422dd5c01a1459645d7b2a5b8d19720ab Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Wed, 6 Mar 2019 09:36:11 -0500
+Subject: [PATCH] inetutils: define PATH_PROCNET_DEV if not already defined
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 this prevents the following compilation error :
 system/linux.c:401:15: error: 'PATH_PROCNET_DEV' undeclared (first use in this function)
@@ -9,11 +15,16 @@ this patch comes from :
 Upstream-Status: Inappropriate [not author]
 
 Signed-of-by: Eric Bénard <eric@eukrea.com>
+
 ---
-diff -Naur inetutils-1.9.orig/ifconfig/system/linux.c inetutils-1.9/ifconfig/system/linux.c
---- inetutils-1.9.orig/ifconfig/system/linux.c	2012-01-04 16:31:36.000000000 -0500
-+++ inetutils-1.9/ifconfig/system/linux.c	2012-01-04 16:40:53.000000000 -0500
-@@ -49,6 +49,10 @@
+ ifconfig/system/linux.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/ifconfig/system/linux.c b/ifconfig/system/linux.c
+index e453b46..4268ca9 100644
+--- a/ifconfig/system/linux.c
++++ b/ifconfig/system/linux.c
+@@ -53,6 +53,10 @@
  #include "../ifconfig.h"
  
  

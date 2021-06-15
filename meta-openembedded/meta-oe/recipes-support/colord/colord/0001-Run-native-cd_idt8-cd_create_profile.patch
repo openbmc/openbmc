@@ -1,0 +1,59 @@
+From 5aad8831c0fb71940d6c4f982b0b30ffb6ae33b3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 12 May 2019 22:47:05 +0200
+Subject: [PATCH] Run native cd_idt8/cd_create_profile
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ data/cmf/meson.build        | 2 +-
+ data/illuminant/meson.build | 2 +-
+ data/profiles/meson.build   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/data/cmf/meson.build b/data/cmf/meson.build
+index a693cd7..1ae3613 100644
+--- a/data/cmf/meson.build
++++ b/data/cmf/meson.build
+@@ -2,7 +2,7 @@ foreach arg: [ 'CIE1964-10deg-XYZ', 'CIE1931-2deg-XYZ' ]
+   custom_target(arg,
+     input: arg + '.csv',
+     output: arg + '.cmf',
+-    command: [ cd_idt8, 'create-cmf', '@OUTPUT@', '@INPUT@', '1.0' ],
++    command: [ 'cd_idt8', 'create-cmf', '@OUTPUT@', '@INPUT@', '1.0' ],
+     install: true,
+     install_dir: join_paths(datadir, 'colord', 'cmf')
+   )
+diff --git a/data/illuminant/meson.build b/data/illuminant/meson.build
+index f8dfa07..ad7dced 100644
+--- a/data/illuminant/meson.build
++++ b/data/illuminant/meson.build
+@@ -24,7 +24,7 @@ foreach arg: generated_spectra
+   custom_target(arg,
+     input: arg + '.csv',
+     output: arg + '.sp',
+-    command: [ cd_idt8, 'create-sp', '@OUTPUT@', '@INPUT@', '100.0' ],
++    command: [ 'cd_idt8', 'create-sp', '@OUTPUT@', '@INPUT@', '100.0' ],
+     install: true,
+     install_dir: join_paths(datadir, 'colord', 'illuminant')
+   )
+diff --git a/data/profiles/meson.build b/data/profiles/meson.build
+index 591b97d..2cef011 100644
+--- a/data/profiles/meson.build
++++ b/data/profiles/meson.build
+@@ -59,7 +59,7 @@ foreach arg: icc_profiles
+   generated_icc = custom_target(arg + '.icc',
+     input: xml_i18n,
+     output: arg + '.icc',
+-    command: [ cd_create_profile, '--output=@OUTPUT@', '@INPUT@' ],
++    command: [ 'cd_create_profile', '--output=@OUTPUT@', '@INPUT@' ],
+     install: true,
+     install_dir: join_paths(datadir, 'color', 'icc', 'colord'),
+   )
+-- 
+2.20.1
+

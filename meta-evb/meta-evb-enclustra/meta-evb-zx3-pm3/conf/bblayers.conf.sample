@@ -13,6 +13,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-perl \
   ##OEROOT##/meta-openembedded/meta-python \
   ##OEROOT##/meta-openembedded/meta-webserver \
+  ##OEROOT##/meta-security \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-xilinx/meta-xilinx-bsp/ \
   ##OEROOT##/meta-evb \
@@ -27,6 +28,7 @@ BBLAYERS_NON_REMOVABLE ?= " \
 ##OEROOT##/meta-openembedded/meta-perl \
 ##OEROOT##/meta-openembedded/meta-python \
 ##OEROOT##/meta-openembedded/meta-webserver \
+##OEROOT##/meta-security \
 ##OEROOT##/meta-phosphor \
 ##OEROOT##/meta-xilinx/meta-xilinx-bsp/ \
 ##OEROOT##/meta-evb \

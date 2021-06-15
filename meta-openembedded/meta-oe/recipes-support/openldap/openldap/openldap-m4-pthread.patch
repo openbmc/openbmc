@@ -1,8 +1,8 @@
 Upstream-Status: Pending
 
---- openldap-2.3.11/build/openldap.m4.orig	2005-11-11 00:11:18.604322590 -0800
-+++ openldap-2.3.11/build/openldap.m4	2005-11-11 00:26:21.621145856 -0800
-@@ -788,7 +788,7 @@ AC_DEFUN([OL_PTHREAD_TEST_FUNCTION],[[
+--- a/build/openldap.m4
++++ b/build/openldap.m4
+@@ -651,7 +651,7 @@ AC_DEFUN([OL_PTHREAD_TEST_FUNCTION],[[
  ]])
  
  AC_DEFUN([OL_PTHREAD_TEST_PROGRAM],
@@ -11,7 +11,7 @@ Upstream-Status: Pending
  
  int main(argc, argv)
  	int argc;
-@@ -796,7 +796,7 @@ int main(argc, argv)
+@@ -659,7 +659,7 @@ int main(argc, argv)
  {
  OL_PTHREAD_TEST_FUNCTION
  }

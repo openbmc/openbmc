@@ -1,5 +1,9 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars
+from oeqa.utils.commands import runCmd, bitbake, get_bb_var, get_bb_vars, create_temp_layer
 import os
 import oe
 import glob
@@ -7,7 +11,6 @@ import re
 import shutil
 import tempfile
 from contextlib import contextmanager
-from oeqa.core.decorator.oeid import OETestID
 from oeqa.utils.ftools import write_file
 
 
@@ -27,7 +30,8 @@ class Signing(OESelftestTestCase):
         self.secret_key_path = os.path.join(self.testlayer_path, 'files', 'signing', "key.secret")
 
         nsysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "gnupg-native")
-        runCmd('gpg --batch --homedir %s --import %s %s' % (self.gpg_dir, self.pub_key_path, self.secret_key_path), native_sysroot=nsysroot)
+
+        runCmd('gpg --agent-program=`which gpg-agent`\|--auto-expand-secmem --batch --homedir %s --import %s %s' % (self.gpg_dir, self.pub_key_path, self.secret_key_path), native_sysroot=nsysroot)
         return nsysroot + get_bb_var("bindir_native")
 
 
@@ -40,7 +44,9 @@ class Signing(OESelftestTestCase):
         origenv = os.environ.copy()
 
         for e in os.environ:
-            if builddir in os.environ[e]:
+            if builddir + "/" in os.environ[e]:
+                os.environ[e] = os.environ[e].replace(builddir + "/", newbuilddir + "/")
+            if os.environ[e].endswith(builddir):
                 os.environ[e] = os.environ[e].replace(builddir, newbuilddir)
 
         os.chdir(newbuilddir)
@@ -51,7 +57,6 @@ class Signing(OESelftestTestCase):
                 os.environ[e] = origenv[e]
             os.chdir(builddir)
 
-    @OETestID(1362)
     def test_signing_packages(self):
         """
         Summary:     Test that packages can be signed in the package feed
@@ -116,7 +121,6 @@ class Signing(OESelftestTestCase):
         bitbake('core-image-minimal')
 
 
-    @OETestID(1382)
     def test_signing_sstate_archive(self):
         """
         Summary:     Test that sstate archives can be signed
@@ -155,8 +159,8 @@ class Signing(OESelftestTestCase):
             bitbake('-c clean %s' % test_recipe)
             bitbake('-c populate_lic %s' % test_recipe)
 
-            recipe_sig = glob.glob(sstatedir + '/*/*:ed:*_populate_lic.tgz.sig')
-            recipe_tgz = glob.glob(sstatedir + '/*/*:ed:*_populate_lic.tgz')
+            recipe_sig = glob.glob(sstatedir + '/*/*/*:ed:*_populate_lic.tgz.sig')
+            recipe_tgz = glob.glob(sstatedir + '/*/*/*:ed:*_populate_lic.tgz')
 
             self.assertEqual(len(recipe_sig), 1, 'Failed to find .sig file.')
             self.assertEqual(len(recipe_tgz), 1, 'Failed to find .tgz file.')
@@ -169,7 +173,6 @@ class Signing(OESelftestTestCase):
 
 class LockedSignatures(OESelftestTestCase):
 
-    @OETestID(1420)
     def test_locked_signatures(self):
         """
         Summary:     Test locked signature mechanism
@@ -179,10 +182,10 @@ class LockedSignatures(OESelftestTestCase):
         AutomatedBy: Daniel Istrate <daniel.alexandrux.istrate@intel.com>
         """
 
+        import uuid
+
         test_recipe = 'ed'
         locked_sigs_file = 'locked-sigs.inc'
-
-        self.add_command_to_tearDown('rm -f %s' % os.path.join(self.builddir, locked_sigs_file))
 
         bitbake(test_recipe)
         # Generate locked sigs include file
@@ -195,21 +198,29 @@ class LockedSignatures(OESelftestTestCase):
         # Build a locked recipe
         bitbake(test_recipe)
 
-        # Make a change that should cause the locked task signature to change
-        recipe_append_file = test_recipe + '_' + get_bb_var('PV', test_recipe) + '.bbappend'
-        recipe_append_path = os.path.join(self.testlayer_path, 'recipes-test', test_recipe, recipe_append_file)
-        feature = 'SUMMARY += "test locked signature"\n'
+        templayerdir = tempfile.mkdtemp(prefix='signingqa')
+        create_temp_layer(templayerdir, 'selftestsigning')
+        runCmd('bitbake-layers add-layer %s' % templayerdir)
 
-        os.mkdir(os.path.join(self.testlayer_path, 'recipes-test', test_recipe))
+        # Make a change that should cause the locked task signature to change
+        # Use uuid so hash equivalance server isn't triggered
+        recipe_append_file = test_recipe + '_' + get_bb_var('PV', test_recipe) + '.bbappend'
+        recipe_append_path = os.path.join(templayerdir, 'recipes-test', test_recipe, recipe_append_file)
+        feature = 'SUMMARY_${PN} = "test locked signature%s"\n' % uuid.uuid4()
+
+        os.mkdir(os.path.join(templayerdir, 'recipes-test'))
+        os.mkdir(os.path.join(templayerdir, 'recipes-test', test_recipe))
         write_file(recipe_append_path, feature)
 
-        self.add_command_to_tearDown('rm -rf %s' % os.path.join(self.testlayer_path, 'recipes-test', test_recipe))
+        self.add_command_to_tearDown('bitbake-layers remove-layer %s' % templayerdir)
+        self.add_command_to_tearDown('rm -f %s' % os.path.join(self.builddir, locked_sigs_file))
+        self.add_command_to_tearDown('rm -rf %s' % templayerdir)
 
         # Build the recipe again
         ret = bitbake(test_recipe)
 
         # Verify you get the warning and that the real task *isn't* run (i.e. the locked signature has worked)
-        patt = r'WARNING: The %s:do_package sig is computed to be \S+, but the sig is locked to \S+ in SIGGEN_LOCKEDSIGS\S+' % test_recipe
+        patt = r'The %s:do_package sig is computed to be \S+, but the sig is locked to \S+ in SIGGEN_LOCKEDSIGS\S+' % test_recipe
         found_warn = re.search(patt, ret.output)
 
         self.assertIsNotNone(found_warn, "Didn't find the expected warning message. Output: %s" % ret.output)

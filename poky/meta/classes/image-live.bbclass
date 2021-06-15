@@ -22,7 +22,7 @@
 # ${HDDIMG_ID} - FAT image volume-id
 # ${ROOTFS} - indicates a filesystem image to include as the root filesystem (optional)
 
-inherit live-vm-common
+inherit live-vm-common image-artifact-names
 
 do_bootimg[depends] += "dosfstools-native:do_populate_sysroot \
                         mtools-native:do_populate_sysroot \
@@ -30,14 +30,14 @@ do_bootimg[depends] += "dosfstools-native:do_populate_sysroot \
                         virtual/kernel:do_deploy \
                         ${MLPREFIX}syslinux:do_populate_sysroot \
                         syslinux-native:do_populate_sysroot \
-                        ${PN}:do_image_${@d.getVar('LIVE_ROOTFS_TYPE').replace('-', '_')} \
+                        ${@'%s:do_image_%s' % (d.getVar('PN'), d.getVar('LIVE_ROOTFS_TYPE').replace('-', '_')) if d.getVar('ROOTFS') else ''} \
                         "
 
 
 LABELS_LIVE ?= "boot install"
 ROOT_LIVE ?= "root=/dev/ram0"
 INITRD_IMAGE_LIVE ?= "${MLPREFIX}core-image-minimal-initramfs"
-INITRD_LIVE ?= "${DEPLOY_DIR_IMAGE}/${INITRD_IMAGE_LIVE}-${MACHINE}.cpio.gz"
+INITRD_LIVE ?= "${DEPLOY_DIR_IMAGE}/${INITRD_IMAGE_LIVE}-${MACHINE}.${INITRAMFS_FSTYPES}"
 
 LIVE_ROOTFS_TYPE ?= "ext4"
 ROOTFS ?= "${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${LIVE_ROOTFS_TYPE}"
@@ -234,7 +234,7 @@ build_hddimg() {
 				bberror "${HDDDIR}/rootfs.img rootfs size is greather than or equal to 4GB,"
 				bberror "and this doesn't work on a FAT filesystem. You can either:"
 				bberror "1) Reduce the size of rootfs.img, or,"
-				bbfatal "2) Use wic, vmdk or vdi instead of hddimg\n"
+				bbfatal "2) Use wic, vmdk,vhd, vhdx or vdi instead of hddimg\n"
 			fi
 		fi
 
@@ -261,4 +261,4 @@ python do_bootimg() {
 do_bootimg[subimages] = "hddimg iso"
 do_bootimg[imgsuffix] = "."
 
-addtask bootimg before do_image_complete
+addtask bootimg before do_image_complete after do_rootfs

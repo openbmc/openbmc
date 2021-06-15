@@ -1,0 +1,30 @@
+From 451e8458e45926e4e1c0433864ac4cf8b05d792b Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Fri, 27 Nov 2020 03:12:26 -0500
+Subject: [PATCH] all host_applications: remove non-existent projects
+
+The ALL_APPS symbol will optionally build an additional set of projects,
+however, several of them don't exist anymore. Remove them from the list of
+ALL_APPS.
+
+Upstream-status: submitted [https://github.com/raspberrypi/userland/pull/661]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ host_applications/linux/CMakeLists.txt | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/host_applications/linux/CMakeLists.txt b/host_applications/linux/CMakeLists.txt
+index 928b637..554ae46 100644
+--- a/host_applications/linux/CMakeLists.txt
++++ b/host_applications/linux/CMakeLists.txt
+@@ -14,10 +14,6 @@ add_subdirectory(apps/dtoverlay)
+ add_subdirectory(apps/dtmerge)
+ 
+ if(ALL_APPS)
+- add_subdirectory(apps/vcdbg)
+- add_subdirectory(libs/elftoolchain)
+- # add_subdirectory(apps/smct)
+- add_subdirectory(apps/edid_parser)
+  add_subdirectory(apps/hello_pi)
+ endif()
+ 

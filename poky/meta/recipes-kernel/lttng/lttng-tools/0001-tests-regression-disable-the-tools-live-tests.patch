@@ -1,0 +1,55 @@
+From de9fc501e775cae05f1f87534b4237cd78e8d9a8 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 24 Jan 2020 18:03:25 +0100
+Subject: [PATCH] tests/regression: disable the tools/live tests
+
+They have been found to sporadically fail; the issue has been
+reported upstream and they will work to investigate and fix:
+https://bugs.lttng.org/issues/1217
+
+Upstream-Status: Inappropriate [upstream is working on a real fix]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ tests/regression/Makefile.am | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/tests/regression/Makefile.am b/tests/regression/Makefile.am
+index cbac90d..d467886 100644
+--- a/tests/regression/Makefile.am
++++ b/tests/regression/Makefile.am
+@@ -11,16 +11,10 @@ TESTS = tools/filtering/test_invalid_filter \
+ 	tools/filtering/test_valid_filter \
+ 	tools/streaming/test_ust \
+ 	tools/health/test_thread_ok \
+-	tools/live/test_ust \
+-	tools/live/test_ust_tracefile_count \
+-	tools/live/test_lttng_ust \
+ 	tools/tracefile-limits/test_tracefile_count \
+ 	tools/tracefile-limits/test_tracefile_size \
+-	tools/exclusion/test_exclusion \
+ 	tools/snapshots/test_ust_fast \
+-	tools/snapshots/test_ust_streaming \
+ 	tools/save-load/test_save \
+-	tools/save-load/test_load \
+ 	tools/save-load/test_autoload \
+ 	tools/mi/test_mi \
+ 	tools/wildcard/test_event_wildcard \
+@@ -38,8 +32,7 @@ TESTS = tools/filtering/test_invalid_filter \
+ 	tools/working-directory/test_relayd_working_directory \
+ 	tools/notification/test_notification_multi_app \
+ 	tools/clear/test_ust \
+-	tools/clear/test_kernel \
+-	tools/tracker/test_event_tracker
++	tools/clear/test_kernel
+ 
+ if HAVE_LIBLTTNG_UST_CTL
+ SUBDIRS += ust
+@@ -60,7 +53,6 @@ TESTS += ust/before-after/test_before_after \
+ 	ust/multi-lib/test_multi_lib \
+ 	ust/rotation-destroy-flush/test_rotation_destroy_flush \
+ 	ust/namespaces/test_ns_contexts \
+-	ust/namespaces/test_ns_contexts_change \
+ 	tools/metadata/test_ust \
+ 	tools/relayd-grouping/test_ust
+ endif # HAVE_LIBLTTNG_UST_CTL

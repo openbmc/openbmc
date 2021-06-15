@@ -1,4 +1,4 @@
-From 2bcd0b9f6310bacdc554e077e85319a5e90e5ce0 Mon Sep 17 00:00:00 2001
+From 18c2c06017784cd641cc8a3deee5fc472008f7f4 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:24:50 +0200
 Subject: [PATCH] Set libsolv variables with pkg-config (cmake's own module
@@ -13,16 +13,16 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 0b405cb..cd91f08 100644
+index 16b63308..b722d4fb 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -46,7 +46,8 @@ endif(APPLE)
- PKG_CHECK_MODULES(GLIB gio-unix-2.0>=2.46.0 REQUIRED)
- pkg_check_modules(SMARTCOLS REQUIRED smartcols)
- FIND_LIBRARY (RPMDB_LIBRARY NAMES rpmdb)
--find_package (LibSolv 0.6.30 REQUIRED COMPONENTS ext)
+@@ -45,7 +45,8 @@ endif()
+ 
+ # build dependencies
+ find_package(Gpgme REQUIRED)
+-find_package(LibSolv 0.6.30 REQUIRED COMPONENTS ext)
 +PKG_CHECK_MODULES (LIBSOLV REQUIRED libsolv)
 +set(LIBSOLV_LIBRARY ${LIBSOLV_LIBRARIES})
- if (ENABLE_RHSM_SUPPORT)
-     pkg_check_modules (RHSM REQUIRED librhsm>=0.0.3)
-     include_directories (${RHSM_INCLUDE_DIRS})
+ find_package(OpenSSL REQUIRED)
+ 
+ 

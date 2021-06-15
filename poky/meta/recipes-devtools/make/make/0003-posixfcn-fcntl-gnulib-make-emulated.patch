@@ -1,0 +1,79 @@
+From 3d074c8fca5fcf3e6b83d33788f35a8f1b3a44a2 Mon Sep 17 00:00:00 2001
+From: Jens Rehsack <sno@netbsd.org>
+Date: Fri, 21 Feb 2020 19:29:49 +0100
+Subject: [PATCH 3/3] posixfcn: fcntl: gnulib > make-emulated
+
+Rate the fcntl emulation from gnulib higher than the own one.
+
+Signed-off-by: Jens Rehsack <sno@netbsd.org>
+---
+Upstream-Status: Pending (https://savannah.gnu.org/bugs/?57888)
+
+ src/output.h              | 19 ++++++++++++++-----
+ src/w32/compat/posixfcn.c |  2 ++
+ 2 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/src/output.h b/src/output.h
+index a506505..d3ce6b7 100644
+--- a/src/output.h
++++ b/src/output.h
+@@ -67,14 +67,21 @@ void output_dump (struct output *out);
+ 
+ # ifdef WINDOWS32
+ /* For emulations in w32/compat/posixfcn.c.  */
+-#  define F_GETFD 1
+-#  define F_SETLKW 2
++#  ifndef F_GETFD
++#   define F_GETFD 1
++#  endif
++#  ifndef F_SETLKW
++#   define F_SETLKW 2
++#  endif
+ /* Implementation note: None of the values of l_type below can be zero
+    -- they are compared with a static instance of the struct, so zero
+    means unknown/invalid, see w32/compat/posixfcn.c. */
+-#  define F_WRLCK 1
+-#  define F_UNLCK 2
+-
++#  ifndef F_WRLCK
++#   define F_WRLCK 1
++#  endif
++#  ifndef F_UNLCK
++#   define F_UNLCK 2
++#  endif
+ struct flock
+   {
+     short l_type;
+@@ -89,7 +96,9 @@ struct flock
+ typedef intptr_t sync_handle_t;
+ 
+ /* Public functions emulated/provided in posixfcn.c.  */
++#  ifndef HAVE_GNULIB_FCNTL
+ int fcntl (intptr_t fd, int cmd, ...);
++#  endif
+ intptr_t create_mutex (void);
+ int same_stream (FILE *f1, FILE *f2);
+ 
+diff --git a/src/w32/compat/posixfcn.c b/src/w32/compat/posixfcn.c
+index 975dfb7..d337b9c 100644
+--- a/src/w32/compat/posixfcn.c
++++ b/src/w32/compat/posixfcn.c
+@@ -29,6 +29,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ #ifndef NO_OUTPUT_SYNC
+ /* Support for OUTPUT_SYNC and related functionality.  */
+ 
++#ifndef HAVE_GNULIB_FCNTL
+ /* Emulation of fcntl that supports only F_GETFD and F_SETLKW.  */
+ int
+ fcntl (intptr_t fd, int cmd, ...)
+@@ -142,6 +143,7 @@ fcntl (intptr_t fd, int cmd, ...)
+         return -1;
+     }
+ }
++#endif /* GNULIB_TEST_FCNTL */
+ 
+ static intptr_t mutex_handle = -1;
+ 
+-- 
+2.17.1
+

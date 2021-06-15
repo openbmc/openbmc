@@ -1,0 +1,36 @@
+From 1118b1912916924bbfa3fd4dced9dfed01fbf0e0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 9 Mar 2020 09:44:33 -0700
+Subject: [PATCH] configure: Check for clock_gettime seprately from
+ __NR_clock_gettime
+
+This helps prioritize using clock_gettime API from libc over syscall
+since direct use of __NR_clock_gettime is not time64-safe
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -125,6 +125,10 @@ case $host in
+ esac
+ 
+ AC_CHECK_HEADERS(syscall.h sys/syscall.h mach/mach_time.h)
++
++AC_MSG_CHECKING([for clock_gettime])
++AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE([HAVE_CLOCK_GETTIME], [1], [use clock_gettime])],)
++
+ AC_MSG_CHECKING([for __NR_clock_gettime syscall])
+ AC_COMPILE_IFELSE(
+     [AC_LANG_PROGRAM(
+@@ -143,7 +147,6 @@ AC_COMPILE_IFELSE(
+     ],
+     [
+         AC_MSG_RESULT([no])
+-        AC_SEARCH_LIBS([clock_gettime], [rt], [AC_DEFINE([HAVE_CLOCK_GETTIME], [1], [use clock_gettime])],)
+     ])
+ 
+ AC_CHECK_HEADER(linux/netlink.h,

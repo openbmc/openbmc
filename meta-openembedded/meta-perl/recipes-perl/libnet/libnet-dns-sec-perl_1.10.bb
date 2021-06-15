@@ -29,5 +29,3 @@ RDEPENDS_${PN} = " \
     perl-module-mime-base64 \
     perl-module-test-more \
 "
-
-BBCLASSEXTEND = "native"

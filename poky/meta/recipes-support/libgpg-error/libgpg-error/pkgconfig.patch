@@ -1,4 +1,4 @@
-From ec309e20b5a27d42a5fb915c328d61e924ab5f19 Mon Sep 17 00:00:00 2001
+From 62651c5c7b4a391f16dbe1b09c6e220efe5c8a35 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 29 Mar 2018 15:12:17 +0800
 Subject: [PATCH] support pkgconfig
@@ -11,18 +11,17 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 Refactored for 1.33
 Signed-off-by: Armin Kuster <akuster808@gmail.com>
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 
 ---
- configure.ac        |  1 +
- src/gpg-error.m4    | 71 +++--------------------------------------------------
- 4 files changed, 18 insertions(+), 69 deletions(-)
- create mode 100644 src/gpg-error.pc.in
+ src/gpg-error.m4 | 159 +----------------------------------------------
+ 1 file changed, 3 insertions(+), 156 deletions(-)
 
-Index: libgpg-error-1.33/src/gpg-error.m4
-===================================================================
---- libgpg-error-1.33.orig/src/gpg-error.m4
-+++ libgpg-error-1.33/src/gpg-error.m4
-@@ -26,139 +26,13 @@ dnl is added to the gpg_config_script_wa
+diff --git a/src/gpg-error.m4 b/src/gpg-error.m4
+index d910754..76f045c 100644
+--- a/src/gpg-error.m4
++++ b/src/gpg-error.m4
+@@ -27,156 +27,12 @@ dnl is added to the gpg_config_script_warn variable.
  dnl
  AC_DEFUN([AM_PATH_GPG_ERROR],
  [ AC_REQUIRE([AC_CANONICAL_HOST])
@@ -31,12 +30,10 @@ Index: libgpg-error-1.33/src/gpg-error.m4
 -  dnl since that is consistent with how our three siblings use the directory/
 -  dnl package name in --with-$dir_name-prefix=PFX.
 -  AC_ARG_WITH(libgpg-error-prefix,
--              AC_HELP_STRING([--with-libgpg-error-prefix=PFX],
+-              AS_HELP_STRING([--with-libgpg-error-prefix=PFX],
 -                             [prefix where GPG Error is installed (optional)]),
 -              [gpg_error_config_prefix="$withval"])
-+  min_gpg_error_version=ifelse([$1], ,0.0,$1)
-+  PKG_CHECK_MODULES(GPG_ERROR, [gpg-error >= $min_gpg_error_version], [ok=yes], [ok=no])
- 
+-
 -  dnl Accept --with-gpg-error-prefix and make it work the same as
 -  dnl --with-libgpg-error-prefix above, for backwards compatibility,
 -  dnl but do not document this old, inconsistently-named option.
@@ -66,45 +63,78 @@ Index: libgpg-error-1.33/src/gpg-error.m4
 -  min_gpg_error_version=ifelse([$1], ,1.33,$1)
 -  ok=no
 -
--  if test "$prefix" = NONE ; then
--    prefix_option_expanded=/usr/local
--  else
--    prefix_option_expanded="$prefix"
--  fi
--  if test "$exec_prefix" = NONE ; then
--    exec_prefix_option_expanded=$prefix_option_expanded
--  else
--    exec_prefix_option_expanded=$(prefix=$prefix_option_expanded eval echo $exec_prefix)
--  fi
--  libdir_option_expanded=$(prefix=$prefix_option_expanded exec_prefix=$exec_prefix_option_expanded eval echo $libdir)
--
--  if test -f $libdir_option_expanded/pkgconfig/gpg-error.pc; then
--    gpgrt_libdir=$libdir_option_expanded
--  else
--    if crt1_path=$(${CC:-cc} -print-file-name=crt1.o 2>/dev/null); then
--      if possible_libdir=$(cd ${crt1_path%/*} && pwd 2>/dev/null); then
--        if test -f $possible_libdir/pkgconfig/gpg-error.pc; then
--          gpgrt_libdir=$possible_libdir
+-  AC_PATH_PROG(GPGRT_CONFIG, gpgrt-config, no)
+-  if test "$GPGRT_CONFIG" != "no"; then
+-    # Determine gpgrt_libdir
+-    #
+-    # Get the prefix of gpgrt-config assuming it's something like:
+-    #   <PREFIX>/bin/gpgrt-config
+-    gpgrt_prefix=${GPGRT_CONFIG%/*/*}
+-    possible_libdir1=${gpgrt_prefix}/lib
+-    # Determine by using system libdir-format with CC, it's like:
+-    #   Normal style: /usr/lib
+-    #   GNU cross style: /usr/<triplet>/lib
+-    #   Debian style: /usr/lib/<multiarch-name>
+-    #   Fedora/openSUSE style: /usr/lib, /usr/lib32 or /usr/lib64
+-    # It is assumed that CC is specified to the one of host on cross build.
+-    if libdir_candidates=$(${CC:-cc} -print-search-dirs | \
+-          sed -n -e "/^libraries/{s/libraries: =//;s/:/\n/gp}"); then
+-      # From the output of -print-search-dirs, select valid pkgconfig dirs.
+-      libdir_candidates=$(for dir in $libdir_candidates; do
+-        if p=$(cd $dir 2>/dev/null && pwd); then
+-          test -d "$p/pkgconfig" && echo $p;
 -        fi
--      fi
--    fi
--  fi
+-      done)
 -
--  if test "$GPG_ERROR_CONFIG" = "no" -a -n "$gpgrt_libdir"; then
--    AC_PATH_PROG(GPGRT_CONFIG, gpgrt-config, no)
--    if test "$GPGRT_CONFIG" = "no"; then
--      unset GPGRT_CONFIG
+-      for possible_libdir0 in $libdir_candidates; do
+-        # possible_libdir0:
+-        #   Fallback candidate, the one of system-installed (by $CC)
+-        #   (/usr/<triplet>/lib, /usr/lib/<multiarch-name> or /usr/lib32)
+-        # possible_libdir1:
+-        #   Another candidate, user-locally-installed
+-        #   (<gpgrt_prefix>/lib)
+-        # possible_libdir2
+-        #   Most preferred
+-        #   (<gpgrt_prefix>/<triplet>/lib,
+-        #    <gpgrt_prefix>/lib/<multiarch-name> or <gpgrt_prefix>/lib32)
+-        if test "${possible_libdir0##*/}" = "lib"; then
+-          possible_prefix0=${possible_libdir0%/lib}
+-          possible_prefix0_triplet=${possible_prefix0##*/}
+-          if test -z "$possible_prefix0_triplet"; then
+-            continue
+-          fi
+-          possible_libdir2=${gpgrt_prefix}/$possible_prefix0_triplet/lib
+-        else
+-          possible_prefix0=${possible_libdir0%%/lib*}
+-          possible_libdir2=${gpgrt_prefix}${possible_libdir0#$possible_prefix0}
+-        fi
+-        if test -f ${possible_libdir2}/pkgconfig/gpg-error.pc; then
+-          gpgrt_libdir=${possible_libdir2}
+-        elif test -f ${possible_libdir1}/pkgconfig/gpg-error.pc; then
+-          gpgrt_libdir=${possible_libdir1}
+-        elif test -f ${possible_libdir0}/pkgconfig/gpg-error.pc; then
+-          gpgrt_libdir=${possible_libdir0}
+-        fi
+-        if test -n "$gpgrt_libdir"; then break; fi
+-      done
 -    else
--      GPGRT_CONFIG="$GPGRT_CONFIG --libdir=$gpgrt_libdir"
--      if $GPGRT_CONFIG gpg-error >/dev/null 2>&1; then
--        GPG_ERROR_CONFIG="$GPGRT_CONFIG gpg-error"
--        AC_MSG_NOTICE([Use gpgrt-config with $gpgrt_libdir as gpg-error-config])
--        gpg_error_config_version=`$GPG_ERROR_CONFIG --modversion`
--      else
--        unset GPGRT_CONFIG
--      fi
+-      # When we cannot determine system libdir-format, use this:
+-      gpgrt_libdir=${possible_libdir1}
 -    fi
 -  else
+-    unset GPGRT_CONFIG
+-  fi
+-
+-  if test -n "$gpgrt_libdir"; then
+-    GPGRT_CONFIG="$GPGRT_CONFIG --libdir=$gpgrt_libdir"
+-    if $GPGRT_CONFIG gpg-error >/dev/null 2>&1; then
+-      GPG_ERROR_CONFIG="$GPGRT_CONFIG gpg-error"
+-      AC_MSG_NOTICE([Use gpgrt-config with $gpgrt_libdir as gpg-error-config])
+-      gpg_error_config_version=`$GPG_ERROR_CONFIG --modversion`
+-    else
+-      unset GPGRT_CONFIG
+-    fi
+-  elif test "$GPG_ERROR_CONFIG" != "no"; then
 -    gpg_error_config_version=`$GPG_ERROR_CONFIG --version`
 -  fi
 -  if test "$GPG_ERROR_CONFIG" != "no"; then
@@ -125,24 +155,10 @@ Index: libgpg-error-1.33/src/gpg-error.m4
 -            fi
 -        fi
 -    fi
--    if test -z "$GPGRT_CONFIG" -a -n "$gpgrt_libdir"; then
--      if test "$major" -gt 1 -o "$major" -eq 1 -a "$minor" -ge 33; then
--        AC_PATH_PROG(GPGRT_CONFIG, gpgrt-config, no)
--        if test "$GPGRT_CONFIG" = "no"; then
--          unset GPGRT_CONFIG
--        else
--          GPGRT_CONFIG="$GPGRT_CONFIG --libdir=$gpgrt_libdir"
--          if $GPGRT_CONFIG gpg-error >/dev/null 2>&1; then
--            GPG_ERROR_CONFIG="$GPGRT_CONFIG gpg-error"
--            AC_MSG_NOTICE([Use gpgrt-config with $gpgrt_libdir as gpg-error-config])
--          else
--            unset GPGRT_CONFIG
--          fi
--        fi
--      fi
--    fi
 -  fi
 -  AC_MSG_CHECKING(for GPG Error - version >= $min_gpg_error_version)
++  min_gpg_error_version=ifelse([$1], ,0.0,$1)
++  PKG_CHECK_MODULES(GPG_ERROR, [gpg-error >= $min_gpg_error_version], [ok=yes], [ok=no])
    if test $ok = yes; then
 -    GPG_ERROR_CFLAGS=`$GPG_ERROR_CONFIG --cflags`
 -    GPG_ERROR_LIBS=`$GPG_ERROR_CONFIG --libs`
@@ -165,7 +181,7 @@ Index: libgpg-error-1.33/src/gpg-error.m4
      fi
      if test x"$gpg_error_config_host" != xnone ; then
        if test x"$gpg_error_config_host" != x"$host" ; then
-@@ -174,15 +48,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
+@@ -192,15 +48,6 @@ AC_DEFUN([AM_PATH_GPG_ERROR],
        fi
      fi
    else

@@ -17,6 +17,16 @@ prelink_image () {
 	pre_prelink_size=`du -ks ${IMAGE_ROOTFS} | awk '{size = $1 ; print size }'`
 	echo "Size before prelinking $pre_prelink_size."
 
+	# The filesystem may not contain sysconfdir so establish what is present
+	# to enable cleanup after temporary creation of sysconfdir if needed
+	presentdir="${IMAGE_ROOTFS}${sysconfdir}"
+	while [ "${IMAGE_ROOTFS}" != "${presentdir}" ] ; do
+		[ ! -d "${presentdir}" ] || break
+		presentdir=`dirname "${presentdir}"`
+	done
+
+	mkdir -p "${IMAGE_ROOTFS}${sysconfdir}"
+
 	# We need a prelink conf on the filesystem, add one if it's missing
 	if [ ! -e ${IMAGE_ROOTFS}${sysconfdir}/prelink.conf ]; then
 		cp ${STAGING_ETCDIR_NATIVE}/prelink.conf \
@@ -58,6 +68,13 @@ prelink_image () {
 	else
 		rm $ldsoconf
 	fi
+
+	# Remove any directories temporarily created for sysconfdir
+	cleanupdir="${IMAGE_ROOTFS}${sysconfdir}"
+	while [ "${presentdir}" != "${cleanupdir}" ] ; do
+		rmdir "${cleanupdir}"
+		cleanupdir=`dirname ${cleanupdir}`
+	done
 
 	pre_prelink_size=`du -ks ${IMAGE_ROOTFS} | awk '{size = $1 ; print size }'`
 	echo "Size after prelinking $pre_prelink_size."

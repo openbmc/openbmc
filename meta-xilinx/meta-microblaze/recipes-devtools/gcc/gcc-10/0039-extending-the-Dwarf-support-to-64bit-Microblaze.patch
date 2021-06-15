@@ -1,0 +1,25 @@
+From e51fb2d87f412d1f7045050c5c2df664766de706 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Mon, 15 Oct 2018 12:00:10 +0530
+Subject: [PATCH 39/54] extending the Dwarf support to 64bit Microblaze
+
+---
+ gcc/config/microblaze/microblaze.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 60c552958b8..747adcc7a70 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -207,7 +207,7 @@ extern enum pipeline_type microblaze_pipe;
+ /* Use DWARF 2 debugging information by default.  */
+ #define DWARF2_DEBUGGING_INFO 1
+ #define PREFERRED_DEBUGGING_TYPE DWARF2_DEBUG
+-#define DWARF2_ADDR_SIZE 4
++#define DWARF2_ADDR_SIZE (TARGET_MB_64 ? 8 : 4)
+ 
+ /* Target machine storage layout */
+ 
+-- 
+2.17.1
+

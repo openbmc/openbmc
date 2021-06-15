@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: MIT
+#
+
 import os
 import re
 
@@ -5,33 +9,32 @@ import oeqa.utils.ftools as ftools
 from oeqa.utils.commands import runCmd, get_bb_var, get_bb_vars
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.core.decorator.oeid import OETestID
 
 class BitbakeLayers(OESelftestTestCase):
 
-    @OETestID(756)
+    def test_bitbakelayers_layerindexshowdepends(self):
+        result = runCmd('bitbake-layers layerindex-show-depends meta-poky')
+        find_in_contents = re.search("openembedded-core", result.output)
+        self.assertTrue(find_in_contents, msg = "openembedded-core should have been listed at this step. bitbake-layers layerindex-show-depends meta-poky output: %s" % result.output)
+
     def test_bitbakelayers_showcrossdepends(self):
         result = runCmd('bitbake-layers show-cross-depends')
-        self.assertTrue('aspell' in result.output, msg = "No dependencies were shown. bitbake-layers show-cross-depends output: %s" % result.output)
+        self.assertIn('aspell', result.output)
 
-    @OETestID(83)
     def test_bitbakelayers_showlayers(self):
         result = runCmd('bitbake-layers show-layers')
-        self.assertTrue('meta-selftest' in result.output, msg = "No layers were shown. bitbake-layers show-layers output: %s" % result.output)
+        self.assertIn('meta-selftest', result.output)
 
-    @OETestID(93)
     def test_bitbakelayers_showappends(self):
         recipe = "xcursor-transparent-theme"
         bb_file = self.get_recipe_basename(recipe)
         result = runCmd('bitbake-layers show-appends')
-        self.assertTrue(bb_file in result.output, msg="%s file was not recognised. bitbake-layers show-appends output: %s" % (bb_file, result.output))
+        self.assertIn(bb_file, result.output)
 
-    @OETestID(90)
     def test_bitbakelayers_showoverlayed(self):
         result = runCmd('bitbake-layers show-overlayed')
-        self.assertTrue('aspell' in result.output, msg="aspell overlayed recipe was not recognised bitbake-layers show-overlayed %s" % result.output)
+        self.assertIn('aspell', result.output)
 
-    @OETestID(95)
     def test_bitbakelayers_flatten(self):
         recipe = "xcursor-transparent-theme"
         recipe_path = "recipes-graphics/xcursor-transparent-theme"
@@ -46,7 +49,6 @@ class BitbakeLayers(OESelftestTestCase):
         find_in_contents = re.search("##### bbappended from meta-selftest #####\n(.*\n)*include test_recipe.inc", contents)
         self.assertTrue(find_in_contents, msg = "Flattening layers did not work. bitbake-layers flatten output: %s" % result.output)
 
-    @OETestID(1195)
     def test_bitbakelayers_add_remove(self):
         test_layer = os.path.join(get_bb_var('COREBASE'), 'meta-skeleton')
         result = runCmd('bitbake-layers show-layers')
@@ -64,7 +66,6 @@ class BitbakeLayers(OESelftestTestCase):
         result = runCmd('bitbake-layers show-layers')
         self.assertNotIn('meta-skeleton', result.output, msg = "meta-skeleton should have been removed at this step.  bitbake-layers show-layers output: %s" % result.output)
 
-    @OETestID(1384)
     def test_bitbakelayers_showrecipes(self):
         result = runCmd('bitbake-layers show-recipes')
         self.assertIn('aspell:', result.output)

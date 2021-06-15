@@ -2,7 +2,6 @@ __all__ = [
     'HTML5TreeBuilder',
     ]
 
-from pdb import set_trace
 import warnings
 from bs4.builder import (
     PERMISSIVE,
@@ -322,7 +321,7 @@ class Element(treebuildersbase.Node):
         return self.element.contents
 
     def getNameTuple(self):
-        if self.namespace == None:
+        if self.namespace is None:
             return namespaces["html"], self.name
         else:
             return self.namespace, self.name

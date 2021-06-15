@@ -1,0 +1,37 @@
+From dc14022a99dc017c52c484efb32729729baf854c Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 4 May 2021 22:07:32 +0200
+Subject: [PATCH 2/2] dnf/rpm/miscutils.py: do not hardcode /usr/bin/rpmkeys
+
+Some build systems (e.g. Yocto) place a specially configured
+rpmkeys executable elsewhere and set up PATH accordingly;
+it's better to always take it from there.
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/dnf/pull/1763]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ dnf/rpm/miscutils.py | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/dnf/rpm/miscutils.py b/dnf/rpm/miscutils.py
+index 7e33d4c42..fcd956db9 100644
+--- a/dnf/rpm/miscutils.py
++++ b/dnf/rpm/miscutils.py
+@@ -30,11 +30,9 @@ logger = logging.getLogger('dnf')
+ 
+ 
+ def _verifyPkgUsingRpmkeys(package, installroot):
+-    rpmkeys_binary = '/usr/bin/rpmkeys'
+-    if not os.path.isfile(rpmkeys_binary):
+-        rpmkeys_binary = which("rpmkeys")
+-        logger.info(_('Using rpmkeys executable from {path} to verify signature for package: {package}.').format(
+-            path=rpmkeys_binary, package=package))
++    rpmkeys_binary = which("rpmkeys")
++    logger.info(_('Using rpmkeys executable from {path} to verify signature for package: {package}.').format(
++        path=rpmkeys_binary, package=package))
+ 
+     if not os.path.isfile(rpmkeys_binary):
+         logger.critical(_('Cannot find rpmkeys executable to verify signatures.'))
+-- 
+2.31.1
+

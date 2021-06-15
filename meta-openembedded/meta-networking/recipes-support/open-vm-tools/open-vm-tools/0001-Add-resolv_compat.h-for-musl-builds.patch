@@ -1,0 +1,72 @@
+From c0c36ba5dd7047710e4c3135f147ce4119021200 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <trevor.gamblin@windriver.com>
+Date: Wed, 14 Apr 2021 10:24:52 -0400
+Subject: [PATCH] Add resolv_compat.h for musl builds
+
+musl doesn't implement res_ninit, so it needs to be defined
+independently for musl builds. This patch is based on the one at
+https://gitweb.gentoo.org/proj/musl.git/tree/dev-qt/qtwebengine/files/qtwebengine-5.7.0-musl-resolver.patch?id=7f4100326793d55d45d0f5bb6178827ce6173513
+
+Upstream-Status: Pending
+
+Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
+---
+ open-vm-tools/lib/nicInfo/nicInfoPosix.c  |  4 +++
+ open-vm-tools/lib/nicInfo/resolv_compat.h | 30 +++++++++++++++++++++++
+ 2 files changed, 34 insertions(+)
+ create mode 100644 open-vm-tools/lib/nicInfo/resolv_compat.h
+
+diff --git a/open-vm-tools/lib/nicInfo/nicInfoPosix.c b/open-vm-tools/lib/nicInfo/nicInfoPosix.c
+index 8710c542..25f3146e 100644
+--- a/open-vm-tools/lib/nicInfo/nicInfoPosix.c
++++ b/open-vm-tools/lib/nicInfo/nicInfoPosix.c
+@@ -70,6 +70,10 @@
+ #   include <net/if.h>
+ #endif
+ 
++#if !defined(__GLIBC__)
++#include "resolv_compat.h"
++#endif
++
+ /*
+  * resolver(3) and IPv6:
+  *
+diff --git a/open-vm-tools/lib/nicInfo/resolv_compat.h b/open-vm-tools/lib/nicInfo/resolv_compat.h
+new file mode 100644
+index 00000000..d768464b
+--- /dev/null
++++ b/open-vm-tools/lib/nicInfo/resolv_compat.h
+@@ -0,0 +1,30 @@
++#if !defined(__GLIBC__)
++/***************************************************************************
++ * resolv_compat.h
++ *
++ * Mimick GLIBC's res_ninit() and res_nclose() for musl libc
++ * Note: res_init() is actually deprecated according to
++ * http://docs.oracle.com/cd/E36784_01/html/E36875/res-nclose-3resolv.html
++ **************************************************************************/
++#include <string.h>
++
++static inline int res_ninit(res_state statp)
++{
++	int rc = res_init();
++	if (statp != &_res) {
++		memcpy(statp, &_res, sizeof(*statp));
++	}
++	return rc;
++}
++
++static inline int res_nclose(res_state statp)
++{
++	if (!statp)
++		return -1;
++	if (statp != &_res) {
++		memset(statp, 0, sizeof(*statp));
++	}
++	return 0;
++}
++#endif
++
+-- 
+2.30.2
+

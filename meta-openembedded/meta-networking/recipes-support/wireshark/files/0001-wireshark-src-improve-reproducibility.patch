@@ -1,0 +1,44 @@
+From 0a9ab056ce7582033a21d6bc541ece520bf2b0b6 Mon Sep 17 00:00:00 2001
+From: Oleksiy Obitotskyy <oobitots@cisco.com>
+Date: Thu, 26 Nov 2020 05:38:31 -0800
+Subject: [PATCH] wireshark-src: improve reproducibility
+
+Cut absolute path for filename in generated code
+comments.
+
+Upstream-Status: Pending
+Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
+---
+ tools/make-plugin-reg.py | 2 +-
+ tools/ncp2222.py         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/make-plugin-reg.py b/tools/make-plugin-reg.py
+index 66b4656..c52b3fc 100755
+--- a/tools/make-plugin-reg.py
++++ b/tools/make-plugin-reg.py
+@@ -28,7 +28,7 @@ preamble = """\
+  *
+  * Generated automatically from %s.
+  */
+-""" % (sys.argv[0])
++""" % (os.path.basename(sys.argv[0]))
+ 
+ # Create the proper list of filenames
+ filenames = []
+diff --git a/tools/ncp2222.py b/tools/ncp2222.py
+index 1dea4ec..dc376e3 100755
+--- a/tools/ncp2222.py
++++ b/tools/ncp2222.py
+@@ -5858,7 +5858,7 @@ def produce_code():
+ 
+     print("/*")
+     print(" * Do not modify this file. Changes will be overwritten.")
+-    print(" * Generated automatically from %s" % (sys.argv[0]))
++    print(" * Generated automatically from %s" % (os.path.basename(sys.argv[0])))
+     print(" */\n")
+ 
+     print("""
+-- 
+2.26.2.Cisco
+

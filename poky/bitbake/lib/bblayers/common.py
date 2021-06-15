@@ -1,3 +1,7 @@
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
 import argparse
 import logging
 import os
@@ -13,7 +17,7 @@ class LayerPlugin():
     def tinfoil_init(self, tinfoil):
         self.tinfoil = tinfoil
         self.bblayers = (self.tinfoil.config_data.getVar('BBLAYERS') or "").split()
-        layerconfs = self.tinfoil.config_data.varhistory.get_variable_items_files('BBFILE_COLLECTIONS', self.tinfoil.config_data)
+        layerconfs = self.tinfoil.config_data.varhistory.get_variable_items_files('BBFILE_COLLECTIONS')
         self.bbfile_collections = {layer: os.path.dirname(os.path.dirname(path)) for layer, path in layerconfs.items()}
 
     @staticmethod

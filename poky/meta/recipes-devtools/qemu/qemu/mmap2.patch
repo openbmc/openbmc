@@ -1,0 +1,39 @@
+When using qemu-i386 to build qemux86 webkitgtk on musl, it sits in an
+infinite loop of mremap calls of ever decreasing/increasing addresses.
+
+I suspect something in the musl memory allocation code loops indefinitely
+if it only sees ENOMEM and only exits when it hits EFAULT.
+
+According to the docs, trying to mremap outside the address space
+can/should return EFAULT and changing this allows the build to succeed.
+
+A better return value for the other cases of invalid addresses is EINVAL
+rather than ENOMEM so adjust the other part of the test to this.
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/qemu-devel/2021-01/msg01355.html]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
+
+Index: qemu-6.0.0/linux-user/mmap.c
+===================================================================
+--- qemu-6.0.0.orig/linux-user/mmap.c
++++ qemu-6.0.0/linux-user/mmap.c
+@@ -733,12 +733,16 @@ abi_long target_mremap(abi_ulong old_add
+     int prot;
+     void *host_addr;
+ 
+-    if (!guest_range_valid_untagged(old_addr, old_size) ||
+-        ((flags & MREMAP_FIXED) &&
++    if (!guest_range_valid_untagged(old_addr, old_size)) {
++        errno = EFAULT;
++        return -1;
++    }
++    
++    if (((flags & MREMAP_FIXED) &&
+          !guest_range_valid_untagged(new_addr, new_size)) ||
+         ((flags & MREMAP_MAYMOVE) == 0 &&
+          !guest_range_valid_untagged(old_addr, new_size))) {
+-        errno = ENOMEM;
++        errno = EINVAL;
+         return -1;
+     }
+ 

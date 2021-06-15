@@ -1,0 +1,92 @@
+From aaf8a4a5b82baff679f557ed83b25af6ff2919cf Mon Sep 17 00:00:00 2001
+From: Alexander Amelkin <a.amelkin@yadro.com>
+Date: Thu, 23 May 2019 20:39:57 +0300
+Subject: [PATCH] Add support for persistent-only settings
+
+Some settings such as Boot Initiator Mailbox do not support
+one-time setting mode (as per IPMI 2.0 specification).
+
+This commit adds support for such persistent-only settings.
+
+Partially resolves openbmc/openbmc#3391
+
+Change-Id: Iec8e2f5bddbc50d270916567effe334f10db2987
+Signed-off-by: Alexander Amelkin <a.amelkin@yadro.com>
+Signed-off-by: Ivan Mikhaylov <i.mikhaylov@yadro.com>
+---
+ settings.cpp | 35 +++++++++++++++++++++++++++++++----
+ 1 file changed, 31 insertions(+), 4 deletions(-)
+
+diff --git a/settings.cpp b/settings.cpp
+index 2fa2511..6002365 100644
+--- a/settings.cpp
++++ b/settings.cpp
+@@ -95,19 +95,44 @@ namespace boot
+ std::tuple<Path, OneTimeEnabled> setting(const Objects& objects,
+                                          const Interface& iface)
+ {
+-    constexpr auto bootObjCount = 2;
++    constexpr auto ambiguousOperationCount = 2;
+     constexpr auto oneTime = "one_time";
+     constexpr auto enabledIntf = "xyz.openbmc_project.Object.Enable";
++    bool oneTimeEnabled = false;
+ 
+     const std::vector<Path>& paths = objects.map.at(iface);
+     auto count = paths.size();
+-    if (count != bootObjCount)
++    if (!count)
+     {
+-        log<level::ERR>("Exactly two objects expected",
++        // If there are no objects implementing the requested interface,
++        // that must be an error.
++        log<level::ERR>("Interface objects not found",
++                        entry("INTERFACE=%s", iface.c_str()));
++        elog<InternalFailure>();
++    }
++    else if (count < ambiguousOperationCount)
++    {
++        // On the contrary, if there is just one object, that may mean
++        // that this particular interface doesn't support one-time
++        // setting mode (e.g. Boot Initiator Mailbox).
++        // That is not an error, just return the regular setting.
++        // If there's just one object, that's the only kind of setting
++        // mode this interface supports, so just return that setting path.
++        const Path& regularSetting = paths[0];
++        return std::make_tuple(regularSetting, oneTimeEnabled);
++    }
++    else if (count > ambiguousOperationCount)
++    {
++        // Something must be wrong if there are more objects than expected
++        log<level::ERR>("Exactly 1 or 2 interface objects are required",
+                         entry("INTERFACE=%s", iface.c_str()),
+                         entry("COUNT=%d", count));
+         elog<InternalFailure>();
+     }
++
++    // We are here because there were exactly two objects implementing the
++    // same interface. Take those two and find out which of them is the
++    // one-time setting, consider the other the persistent setting.
+     size_t index = 0;
+     if (std::string::npos == paths[0].rfind(oneTime))
+     {
+@@ -116,6 +141,8 @@ std::tuple<Path, OneTimeEnabled> setting(const Objects& objects,
+     const Path& oneTimeSetting = paths[index];
+     const Path& regularSetting = paths[!index];
+ 
++    // Now see if the one-time setting is enabled and return the path for it
++    // if so. Otherwise return the path for the persistent setting.
+     auto method = objects.bus.new_method_call(
+         objects.service(oneTimeSetting, iface).c_str(), oneTimeSetting.c_str(),
+         ipmi::PROP_INTF, "Get");
+@@ -131,7 +158,7 @@ std::tuple<Path, OneTimeEnabled> setting(const Objects& objects,
+ 
+     std::variant<bool> enabled;
+     reply.read(enabled);
+-    auto oneTimeEnabled = std::get<bool>(enabled);
++    oneTimeEnabled = std::get<bool>(enabled);
+     const Path& setting = oneTimeEnabled ? oneTimeSetting : regularSetting;
+     return std::make_tuple(setting, oneTimeEnabled);
+ }
+-- 
+2.21.1
+

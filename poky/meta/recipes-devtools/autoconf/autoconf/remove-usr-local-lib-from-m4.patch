@@ -1,17 +1,18 @@
-We have problem using hardcoded directories like /usr/local here
-which will be checked for cross builds. This is a special case which
-is valid for AIX only. We do not have AIX as one of our supported
-build host or target. Therefore we get rid of the hardcoded paths
-and make life easier for cross compilation process.
+From a08643ac3fef884900d6cfa161f0acec3ef104d1 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Thu, 12 Mar 2020 17:25:37 +0000
+Subject: [PATCH 1/7] remove-usr-local-lib-from-m4.patch
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ lib/autoconf/functions.m4 | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-Upstream-Status: Inappropriate [Upstream does care for AIX while we may not]
-Index: autoconf-2.68/lib/autoconf/functions.m4
-===================================================================
---- autoconf-2.68.orig/lib/autoconf/functions.m4	2010-09-22 14:52:19.000000000 -0700
-+++ autoconf-2.68/lib/autoconf/functions.m4	2011-08-03 11:57:05.822199513 -0700
-@@ -749,15 +749,6 @@ if test $ac_have_func = no; then
+diff --git a/lib/autoconf/functions.m4 b/lib/autoconf/functions.m4
+index 12f60b99..07da7941 100644
+--- a/lib/autoconf/functions.m4
++++ b/lib/autoconf/functions.m4
+@@ -801,15 +801,6 @@ if test $ac_have_func = no; then
      [LIBS="-lutil $LIBS" ac_have_func=yes ac_cv_func_getloadavg_setgid=yes])
  fi
  
@@ -27,3 +28,6 @@ Index: autoconf-2.68/lib/autoconf/functions.m4
  # Make sure it is really in the library, if we think we found it,
  # otherwise set up the replacement function.
  AC_CHECK_FUNCS(getloadavg, [],
+-- 
+2.25.1
+

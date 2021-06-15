@@ -11,4 +11,15 @@ avahi:x:509:
 avahi-autoipd:x:510:
 rpc:x:511:
 rpcuser:x:513:
-
+dhcpcd:x:514:
+sshd:x:516:
+lpadmin:x:517:
+crontab:x:518:
+tracing:x:519:
+pulse:x:520:
+bind:x:521:
+builder:x:522:
+_apt:x:523:
+weston-launch:x:524:
+weston:x:525:
+wayland:x:526:
