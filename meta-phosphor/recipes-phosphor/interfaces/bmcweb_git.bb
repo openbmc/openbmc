@@ -9,6 +9,7 @@ DEPENDS = " \
     gtest \
     nlohmann-json \
     libtinyxml2 \
+    nghttp2 \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gtest', '', d)} \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gmock', '', d)} \
 "
