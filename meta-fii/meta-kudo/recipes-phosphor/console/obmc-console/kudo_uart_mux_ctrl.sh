@@ -18,13 +18,7 @@
 # Usage: ampere_uartmux_ctrl.sh <CPU UART port number> <UARTx_MODE>
 #        <UARTx_MODE> of 1 sets CPU To BSP
 #        <UARTx_MODE> of 2 sets SCP1 to SI2 
-function set_gpio_ctrl() {
-  echo $1 > /sys/class/gpio/export
-  echo $2 > /sys/class//gpio/gpio$1/direction
-  echo $3 > /sys/class/gpio/gpio$1/value
-  echo $1 > /sys/class/gpio/unexport
-}
-
+source /usr/sbin/kudo-lib.sh
 
 if [ $# -lt 1 ]; then
   exit 1
