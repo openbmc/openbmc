@@ -11,6 +11,7 @@ SRC_URI += " \
   file://gbmc-ncsi-sslh.service \
   file://gbmc-ncsi-nft.sh.in \
   file://gbmc-ncsi-br-pub-addr.sh.in \
+  file://gbmc-ncsi-set-nicenabled.service.in \
   "
 
 S = "${WORKDIR}"
@@ -30,6 +31,7 @@ FILES_${PN} += " \
 SYSTEMD_SERVICE_${PN} += " \
   gbmc-ncsi-sslh.service \
   gbmc-ncsi-sslh.socket \
+  gbmc-ncsi-set-nicenabled.service \
   "
 
 do_install_append() {
@@ -75,4 +77,7 @@ do_install_append() {
   sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-br-pub-addr.sh.in \
     >${WORKDIR}/gbmc-ncsi-br-pub-addr.sh
   install -m644 ${WORKDIR}/gbmc-ncsi-br-pub-addr.sh $mondir
+
+  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-set-nicenabled.service.in \
+    >${D}${systemd_system_unitdir}/gbmc-ncsi-set-nicenabled.service
 }

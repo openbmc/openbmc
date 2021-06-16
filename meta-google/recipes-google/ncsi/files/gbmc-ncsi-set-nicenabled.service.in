@@ -1,0 +1,17 @@
+[Unit]
+Description=Set NICEnabled property to true
+Wants=xyz.openbmc_project.Network.service
+After=xyz.openbmc_project.Network.service
+Wants=mapper-wait@-xyz-openbmc_project-network-@NCSI_IF@.service
+After=mapper-wait@-xyz-openbmc_project-network-@NCSI_IF@.service
+StartLimitIntervalSec=10
+StartLimitBurst=3
+
+[Service]
+Type=oneshot
+ExecStart=busctl set-property xyz.openbmc_project.Network /xyz/openbmc_project/network/@NCSI_IF@ xyz.openbmc_project.Network.EthernetInterface NICEnabled b true
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
