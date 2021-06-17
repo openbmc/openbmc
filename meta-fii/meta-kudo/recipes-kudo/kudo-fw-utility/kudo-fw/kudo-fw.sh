@@ -41,6 +41,8 @@ function fwbios() {
     dd if=$1 bs=1024 skip=17156 count=256 of=/run/initramfs/myscp.img
     fwscp /run/initramfs/myscp.img
   fi
+  # Disable LPI mode NV_SI_CPU_LPI_FREQ_DISABLE.
+  nvparm -s 0x1 -o 0x114090
   rm -f $1
 }
 
