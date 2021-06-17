@@ -84,15 +84,25 @@ FAN_CONTROL_TGT = "obmc-fan-control-ready@{0}.target"
 TMPL_CONTROL = "phosphor-fan-control@.service"
 INSTFMT_CONTROL = "phosphor-fan-control@{0}.service"
 FMT_CONTROL = "../${TMPL_CONTROL}:${FAN_CONTROL_TGT}.requires/${INSTFMT_CONTROL}"
+FMT_CONTROL_MUSR = "../${TMPL_CONTROL}:${MULTI_USR_TGT}.wants/${INSTFMT_CONTROL}"
+FMT_CONTROL_PWRON = "../${TMPL_CONTROL}:${POWERON_TGT}.requires/${INSTFMT_CONTROL}"
 
 TMPL_CONTROL_INIT = "phosphor-fan-control-init@.service"
 INSTFMT_CONTROL_INIT = "phosphor-fan-control-init@{0}.service"
 FMT_CONTROL_INIT = "../${TMPL_CONTROL_INIT}:${POWERON_TGT}.wants/${INSTFMT_CONTROL_INIT}"
 
 FILES_${PN}-control = "${bindir}/phosphor-fan-control"
-SYSTEMD_SERVICE_${PN}-control += "${TMPL_CONTROL} ${TMPL_CONTROL_INIT}"
-SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN}-control += "${@compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE_${PN}-control += "${TMPL_CONTROL}"
+SYSTEMD_SERVICE_${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', '', '${TMPL_CONTROL_INIT}', d)}"
+
+# JSON: Linked to multi-user and poweron
+# YAML: Linked to fans-ready and fan control-init poweron
+SYSTEMD_LINK_${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+        compose_list(d, 'FMT_CONTROL_MUSR', 'OBMC_CHASSIS_INSTANCES'), \
+        compose_list(d, 'FMT_CONTROL', 'OBMC_CHASSIS_INSTANCES'), d)}"
+SYSTEMD_LINK_${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+        compose_list(d, 'FMT_CONTROL_PWRON', 'OBMC_CHASSIS_INSTANCES'), \
+        compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHASSIS_INSTANCES'), d)}"
 
 # --------------------------------------
 # ${PN}-monitor specific configuration
