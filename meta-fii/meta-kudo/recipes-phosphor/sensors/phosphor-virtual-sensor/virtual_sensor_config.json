@@ -14,6 +14,19 @@
             "WarningHigh": 85,
             "WarningLow": 0
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -22,13 +35,13 @@
                     "ParamName": "V1",
                     "Desc":
                     {
-                        "Name": "CPU0_NBM_V",
+                        "Name": "CPU0_NBM_TEMP_V",
                         "SensorType": "voltage"
                     }
                 }
             ]
         },
-        "Expression": "(V1 - 2.73) * 100"
+        "Expression": "(V1 == V1) ? (V1 - 2.73) * 100 : NULL"
     },
     {
         "Desc":
@@ -45,6 +58,19 @@
             "WarningHigh": 85,
             "WarningLow": 0
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -53,13 +79,13 @@
                     "ParamName": "V2",
                     "Desc":
                     {
-                        "Name": "CPU1_NBM_V",
+                        "Name": "CPU1_NBM_TEMP_V",
                         "SensorType": "voltage"
                     }
                 }
             ]
         },
-        "Expression": "(V2 - 2.73) * 100"
+        "Expression": "(V2 == V2) ? (V2 - 2.73) * 100 : NULL"
     },
     {
         "Desc":
@@ -76,6 +102,19 @@
             "WarningHigh": 85,
             "WarningLow": 0
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -146,7 +185,7 @@
                 }
             ]
         },
-        "Expression": "max((CH0 == CH0) ? CH0 : 0,(CH1 == CH1) ? CH1 : 0,(CH2 == CH2) ? CH2 : 0,(CH3 == CH3) ? CH3 : 0,(CH4 == CH4) ? CH4 : 0,(CH5 == CH5) ? CH5 : 0,(CH6 == CH6) ? CH6 : 0,(CH7 == CH7) ? CH7 : 0)"
+        "Expression": "max((CH0 == CH0) ? CH0 : NULL,(CH1 == CH1) ? CH1 : NULL,(CH2 == CH2) ? CH2 : NULL,(CH3 == CH3) ? CH3 : NULL,(CH4 == CH4) ? CH4 : NULL,(CH5 == CH5) ? CH5 : NULL,(CH6 == CH6) ? CH6 : NULL,(CH7 == CH7) ? CH7 : NULL)"
     },
     {
         "Desc":
@@ -163,6 +202,19 @@
             "WarningHigh": 85,
             "WarningLow": 0
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -233,7 +285,7 @@
                 }
             ]
         },
-        "Expression": "max((CH0 == CH0) ? CH0 : 0,(CH1 == CH1) ? CH1 : 0,(CH2 == CH2) ? CH2 : 0,(CH3 == CH3) ? CH3 : 0,(CH4 == CH4) ? CH4 : 0,(CH5 == CH5) ? CH5 : 0,(CH6 == CH6) ? CH6 : 0,(CH7 == CH7) ? CH7 : 0)"
+        "Expression": "max((CH0 == CH0) ? CH0 : NULL,(CH1 == CH1) ? CH1 : NULL,(CH2 == CH2) ? CH2 : NULL,(CH3 == CH3) ? CH3 : NULL,(CH4 == CH4) ? CH4 : NULL,(CH5 == CH5) ? CH5 : NULL,(CH6 == CH6) ? CH6 : NULL,(CH7 == CH7) ? CH7 : NULL)"
     },
     {
         "Desc":
@@ -246,10 +298,21 @@
         "Threshold" :
         {
             "CriticalHigh": 2.999,
-            "CriticalLow": 0,
-            "WarningHigh": 0,
-            "WarningLow": 0
+            "CriticalLow": 0
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -272,7 +335,7 @@
                 }
             ]
         },
-        "Expression": "(V1 + V2) >= 0 ? (V1 + V2) : -1"
+        "Expression": "(V1 + V2) >= 0 ? (V1 + V2) : NULL"
     },
     {
         "Desc":
@@ -285,10 +348,21 @@
         "Threshold" :
         {
             "CriticalHigh": 2.999,
-            "CriticalLow": 0,
-            "WarningHigh": 0,
-            "WarningLow": 0
+            "CriticalLow": 0
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -311,7 +385,7 @@
                 }
             ]
         },
-        "Expression": "(V1 + V2) >= 0 ? (V1 + V2) : -1"
+        "Expression": "(V1 + V2) >= 0 ? (V1 + V2) : NULL"
     },
     {
         "Desc":
@@ -324,10 +398,21 @@
         "Threshold" :
         {
             "CriticalHigh": 29.987,
-            "CriticalLow": 0,
-            "WarningHigh": 0,
-            "WarningLow": 0
+            "CriticalLow": 0
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -350,7 +435,7 @@
                 }
             ]
         },
-        "Expression": "(P1 + P2) >= 0 ? (P1 + P2) : -1"
+        "Expression": "(P1 + P2) >= 0 ? (P1 + P2) : NULL"
     },
     {
         "Desc":
@@ -363,10 +448,21 @@
         "Threshold" :
         {
             "CriticalHigh": 29.987,
-            "CriticalLow": 0,
-            "WarningHigh": 0,
-            "WarningLow": 0
+            "CriticalLow": 0
         },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ],
+            [
+                "inventory",
+                "sensors",
+                "/xyz/openbmc_project/inventory/system/board/Kudo_MB"
+            ]
+        ],
         "Params":
         {
             "DbusParam":
@@ -389,6 +485,7 @@
                 }
             ]
         },
-        "Expression": "(P1 + P2) >= 0 ? (P1 + P2) : -1"
+        "Expression": "(P1 + P2) >= 0 ? (P1 + P2) : NULL"
     }
 ]
+
