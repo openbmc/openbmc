@@ -47,6 +47,7 @@ SYSTEMD_OVERRIDE_phosphor-fan-monitor_p10bmc += "fan-watchdog-conflicts.conf:pho
 
 # Witherspoon fan control service linking
 # Link fan control init service
+SYSTEMD_SERVICE_${PN}-control_witherspoon += "${TMPL_CONTROL} ${TMPL_CONTROL_INIT}"
 SYSTEMD_LINK_${PN}-control_witherspoon += "${@compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHASSIS_INSTANCES')}"
 # Link fan control service to be started at standby
 FMT_CONTROL_STDBY_witherspoon = "../${TMPL_CONTROL}:${MULTI_USR_TGT}.wants/${INSTFMT_CONTROL}"
