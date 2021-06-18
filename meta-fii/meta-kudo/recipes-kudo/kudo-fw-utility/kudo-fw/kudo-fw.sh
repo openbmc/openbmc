@@ -91,6 +91,30 @@ function fwscpback() {
   rm -f $1
 }
 
+function fwmb_pwr_seq(){
+  #$1 0x40 seq config file
+  #$2 0x41 seq config file
+  if [[ ! -e $1 ]]; then
+    echo "$1 file does not exist"
+    exit 1
+  fi
+  if [[ ! -e $2 ]]; then
+    echo "$2 file does not exist"
+    exit 1
+  fi
+  echo 32-0040 > /sys/bus/i2c/drivers/adm1266/unbind
+  echo 32-0041 > /sys/bus/i2c/drivers/adm1266/unbind
+  adm1266_fw_fx $1 $2
+  if [ $? -ne  0 ]; then
+    echo "The power seq flash failed" >&2
+    exit 1
+  fi
+  echo 32-0040 > /sys/bus/i2c/drivers/adm1266/bind
+  echo 32-0041 > /sys/bus/i2c/drivers/adm1266/bind
+  rm -f $1
+  rm -f $2
+  exit 0
+}
 
 case $1 in
   bios)
@@ -107,6 +131,9 @@ case $1 in
     ;;
   scpback)
     fwscpback $2
+    ;;
+  mbseq)
+    fwmb_pwr_seq $2 $3
     ;;
   *)
     ;;

@@ -70,10 +70,10 @@ function reset() {
       set_gpio_ctrl 203 out 0
       ;;
     display)
-      echo "Virtual reset   #94" $(get set_gpio_ctrl 94)
-      echo "S0 System reset #65" $(get set_gpio_ctrl 65)
-      echo "Power Button   #203" $(get set_gpio_ctrl 203)
-      echo "BMC_CPU SHD Req #70" $(get set_gpio_ctrl 70)
+      echo "Virtual reset   #94" $(get_gpio_ctrl 94)
+      echo "S0 System reset #65" $(get_gpio_ctrl 65)
+      echo "Power Button   #203" $(get_gpio_ctrl 203)
+      echo "BMC_CPU SHD Req #70" $(get_gpio_ctrl 70)
       ;;
     *)
       usage_rst
