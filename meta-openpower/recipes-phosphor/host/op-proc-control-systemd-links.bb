@@ -57,6 +57,10 @@ pkg_postinst_${PN}() {
 		LINK="$D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.requires/proc-pre-poweroff@0.service"
 		TARGET="../proc-pre-poweroff@.service"
 		ln -s $TARGET $LINK
+
+		LINK="$D$systemd_system_unitdir/obmc-host-reset@0.target.requires/op-reset-host-check@0.service"
+		TARGET="../op-reset-host-check@.service"
+		ln -s $TARGET $LINK
     fi
 
 	# If the memory preserving reboot feature is enabled, set it up

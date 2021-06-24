@@ -11,7 +11,7 @@ inherit meson obmc-phosphor-utils pkgconfig
 inherit systemd
 
 SRC_URI += "git://github.com/openbmc/openpower-proc-control"
-SRCREV = "f8c14bcfd507e0224fe258d38bdef8d32ebfbf48"
+SRCREV = "3292c0676e1261436ff20d87e655210ac2dd5fd7"
 
 DEPENDS += " \
         phosphor-logging \
@@ -39,4 +39,6 @@ SYSTEMD_SERVICE_${PN} +=  " \
                          op-enter-mpreboot@.service \
                          ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'phal-reinit-devtree.service', '', d)} \
                          ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'proc-pre-poweroff@.service', '', d)} \
+                         ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'op-reset-host-check@.service', '', d)} \
+                         ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'op-reset-host-clear.service', '', d)} \
                          "
