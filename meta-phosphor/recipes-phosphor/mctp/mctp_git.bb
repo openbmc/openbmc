@@ -15,9 +15,11 @@ SRCREV = "cfeaef8ecb0ab8c59ea4e145603523e599d60014"
 
 DEPENDS += "autoconf-archive-native \
             systemd \
-            "
+           "
 
-SYSTEMD_SERVICE_${PN} = "mctp-demux.service"
+SYSTEMD_SERVICE_${PN} = "mctp-demux.service \
+                         mctp-demux.socket \
+                        "
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}, \
