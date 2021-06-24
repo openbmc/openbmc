@@ -6,36 +6,30 @@ PV = "0.1+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
-inherit autotools pkgconfig
-inherit systemd
-inherit obmc-phosphor-ipmiprovider-symlink
+inherit meson pkgconfig systemd
 
-DEPENDS += "autoconf-archive-native"
-DEPENDS += "sdbusplus"
-DEPENDS += "phosphor-logging"
-DEPENDS += "phosphor-ipmi-host"
-DEPENDS += "nlohmann-json"
+DEPENDS += " \
+  nlohmann-json \
+  phosphor-dbus-interfaces \
+  phosphor-logging \
+  phosphor-ipmi-host \
+  sdbusplus \
+  systemd \
+  "
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/google-ipmi-sys"
-SRCREV = "3b1b427c1fa4bcddcab1fc003410e5fa5d7a8334"
+SRCREV = "ac730af213ab4912be5cbe8d260485ca666f2176"
 
-FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
-FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
-FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
-FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
-
-HOSTIPMI_PROVIDER_LIBRARY += "libsyscmds.so"
+FILES_${PN} += "${libdir}/ipmid-providers"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "gbmc-psu-hardreset.target"
+SYSTEMD_SERVICE_${PN} += " \
+  gbmc-host-poweroff.target \
+  gbmc-psu-hardreset.target \
+  "
 
-EXTRA_OECONF += "--disable-tests"
+EXTRA_OEMESON += "-Dtests=disabled"
 
 CXXFLAGS_append_gbmc = '${@"" if not d.getVar("GBMC_NCSI_IF_NAME") else \
   " -DNCSI_IPMI_CHANNEL=1 -DNCSI_IF_NAME=" + d.getVar("GBMC_NCSI_IF_NAME")}'
-
-do_install_append() {
-	install -d ${D}${systemd_system_unitdir}
-	install -m 0644 ${S}/gbmc-psu-hardreset.target ${D}${systemd_system_unitdir}
-}
