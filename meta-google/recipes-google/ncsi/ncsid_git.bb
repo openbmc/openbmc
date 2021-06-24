@@ -6,6 +6,10 @@ require ../google-misc/google-misc.inc
 
 inherit systemd
 
+EXTRA_OEMESON = " \
+        -Dtests=disabled \
+        "
+
 SYSTEMD_SERVICE_${PN} += " \
   dhcp4@.service \
   dhcp6@.service \
