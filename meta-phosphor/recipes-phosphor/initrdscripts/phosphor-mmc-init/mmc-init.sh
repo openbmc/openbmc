@@ -49,6 +49,18 @@ if ! mount /dev/disk/by-partlabel/"$(get_root)" $rodir -t ext4 -o ro; then
 fi
 
 rwfsdev="/dev/disk/by-partlabel/rwfs"
+mkdir -p /var/lock
+if test $(fw_printenv -n rwreset) = "true"; then
+    echo "Factory reset requested."
+    if ! mkfs.ext4 -F "${rwfsdev}"; then
+        echo "Reformat for factory reset failed."
+        /bin/sh
+    else
+        fw_setenv rwreset
+        echo "Formatting of rwfs is complete."
+    fi
+fi
+
 fsck.ext4 -p "${rwfsdev}"
 if ! mount "${rwfsdev}" $rodir/var -t ext4 -o rw; then
     /bin/sh
