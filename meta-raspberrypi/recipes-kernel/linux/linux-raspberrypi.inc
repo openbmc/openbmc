@@ -14,6 +14,7 @@ require recipes-kernel/linux/linux-yocto.inc
 SRC_URI += " \
     ${@bb.utils.contains("INITRAMFS_IMAGE_BUNDLE", "1", "file://initramfs-image-bundle.cfg", "", d)} \
     ${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "file://vc4graphics.cfg", "", d)} \
+    ${@bb.utils.contains("MACHINE_FEATURES", "wm8960", "file://wm8960.cfg", "", d)} \
     "
 
 KCONFIG_MODE = "--alldefconfig"

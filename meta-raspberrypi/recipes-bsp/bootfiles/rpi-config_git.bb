@@ -30,6 +30,8 @@ GPIO_IR_TX ?= "17"
 
 CAN_OSCILLATOR ?= "16000000"
 
+WM8960="${@bb.utils.contains("MACHINE_FEATURES", "wm8960", "1", "0", d)}"
+
 inherit deploy nopackages
 
 do_deploy() {
@@ -250,6 +252,12 @@ do_deploy() {
                 echo  "enable_gic=1" >> $CONFIG
                 ;;
         esac
+    fi
+
+    # WM8960 support
+    if [ "${WM8960}" = "1" ]; then
+        echo "# Enable WM8960" >> $CONFIG
+        echo "dtoverlay=wm8960-soundcard" >> $CONFIG
     fi
 }
 

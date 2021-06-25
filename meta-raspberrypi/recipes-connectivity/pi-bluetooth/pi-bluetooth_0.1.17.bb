@@ -10,7 +10,7 @@ SRC_URI = "\
     git://github.com/RPi-Distro/pi-bluetooth \
     file://0001-bthelper-correct-path-for-hciconfig-under-Yocto.patch \
 "
-SRCREV = "cbdbcb66bcc5b9af05f1a9fffe2254c872bb0ace"
+SRCREV = "fd4775bf90e037551532fc214a958074830bb80d"
 
 S = "${WORKDIR}/git"
 
