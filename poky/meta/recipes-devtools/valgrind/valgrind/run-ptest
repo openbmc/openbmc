@@ -32,12 +32,19 @@ if [ "$arch" = "aarch64" ]; then
    done
 fi
 
+echo "Run flaky tests using taskset to limit them to a single core."
+for i in `cat taskset_nondeterministic_tests`; do
+   taskset 0x00000001 perl tests/vg_regtest --valgrind=${VALGRIND_BIN} --valgrind-lib=${VALGRIND_LIBEXECDIR} --yocto-ptest $i 2>&1|tee -a ${LOG}
+   mv $i.vgtest $i.IGNORE
+done
+
+
 cd ${VALGRIND_LIB}/ptest && ./tests/vg_regtest \
     --valgrind=${VALGRIND_BIN} \
     --valgrind-lib=${VALGRIND_LIBEXECDIR} \
     --yocto-ptest \
     gdbserver_tests ${TOOLS} ${EXP_TOOLS} \
-    2>&1|tee ${LOG}  
+    2>&1|tee -a ${LOG}  
 
 cd ${VALGRIND_LIB}/ptest && \
     ./tests/post_regtest_checks $(pwd) \
@@ -53,6 +60,11 @@ fi
 
 echo "Restore valgrind tests that are non-deterministc"
 for i in `cat remove-for-all`; do
+   mv $i.IGNORE $i.vgtest;
+done
+
+echo "Restore flaky and other non-deterministic tests"
+for i in `cat taskset_nondeterministic_tests`; do
    mv $i.IGNORE $i.vgtest;
 done
 

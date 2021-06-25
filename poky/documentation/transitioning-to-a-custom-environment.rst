@@ -47,7 +47,7 @@ Transitioning to a custom environment for systems development
 #. **Based on the layers you've chosen, make needed changes in your
    configuration**.
    For instance, you've chosen a machine type and added in the corresponding BSP
-   layer. You'll then need to change the value of the ``MACHINE`` variable in your
+   layer. You'll then need to change the value of the :term:`MACHINE` variable in your
    configuration file (build/local.conf) to point to that same machine
    type. There could be other layer-specific settings you need to change as
    well. Each layer has a ``README`` document that you can look at for this type of

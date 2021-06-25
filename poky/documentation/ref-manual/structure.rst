@@ -251,9 +251,9 @@ variables are hard-coded for various reasons but such variables are
 relatively rare.
 
 At a minimum, you would normally edit this file to select the target
-``MACHINE``, which package types you wish to use
+:term:`MACHINE`, which package types you wish to use
 (:term:`PACKAGE_CLASSES`), and the location from
-which you want to access downloaded files (``DL_DIR``).
+which you want to access downloaded files (:term:`DL_DIR`).
 
 If ``local.conf`` is not present when you start the build, the
 OpenEmbedded build system creates it from ``local.conf.sample`` when you
@@ -336,7 +336,7 @@ the build.
 This directory contains downloaded upstream source tarballs. You can
 reuse the directory for multiple builds or move the directory to another
 location. You can control the location of this directory through the
-``DL_DIR`` variable.
+:term:`DL_DIR` variable.
 
 .. _structure-build-sstate-cache:
 
@@ -346,7 +346,7 @@ location. You can control the location of this directory through the
 This directory contains the shared state cache. You can reuse the
 directory for multiple builds or move the directory to another location.
 You can control the location of this directory through the
-``SSTATE_DIR`` variable.
+:term:`SSTATE_DIR` variable.
 
 .. _structure-build-tmp:
 
@@ -548,7 +548,7 @@ section in the Yocto Project Overview and Concepts Manual.
 ------------------
 
 This directory contains general logs that are not otherwise placed using
-the package's ``WORKDIR``. Examples of logs are the output from the
+the package's :term:`WORKDIR`. Examples of logs are the output from the
 ``do_check_pkg`` or ``do_distro_check`` tasks. Running a build does not
 necessarily mean this directory is created.
 
@@ -569,7 +569,7 @@ It is worth considering the structure of a typical work directory. As an
 example, consider ``linux-yocto-kernel-3.0`` on the machine ``qemux86``
 built within the Yocto Project. For this package, a work directory of
 ``tmp/work/qemux86-poky-linux/linux-yocto/3.0+git1+<.....>``, referred
-to as the ``WORKDIR``, is created. Within this directory, the source is
+to as the :term:`WORKDIR`, is created. Within this directory, the source is
 unpacked to ``linux-qemux86-standard-build`` and then patched by Quilt.
 (See the ":ref:`dev-manual/common-tasks:using quilt in your workflow`" section in
 the Yocto Project Development Tasks Manual for more information.) Within
@@ -577,7 +577,7 @@ the ``linux-qemux86-standard-build`` directory, standard Quilt
 directories ``linux-3.0/patches`` and ``linux-3.0/.pc`` are created, and
 standard Quilt commands can be used.
 
-There are other directories generated within ``WORKDIR``. The most
+There are other directories generated within :term:`WORKDIR`. The most
 important directory is ``WORKDIR/temp/``, which has log files for each
 task (``log.do_*.pid``) and contains the scripts BitBake runs for each
 task (``run.do_*.pid``). The ``WORKDIR/image/`` directory is where "make
@@ -709,7 +709,7 @@ support for a new machine to the Yocto Project, look in this directory.
 
 The contents of this directory controls any distribution-specific
 configurations. For the Yocto Project, the ``defaultsetup.conf`` is the
-main file here. This directory includes the versions and the ``SRCDATE``
+main file here. This directory includes the versions and the :term:`SRCDATE`
 definitions for applications that are configured here. An example of an
 alternative configuration might be ``poky-bleeding.conf``. Although this
 file mainly inherits its configuration from Poky.

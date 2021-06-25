@@ -1,4 +1,4 @@
-From 18c527991deee93170a887b6da622560d5606913 Mon Sep 17 00:00:00 2001
+From 0f4667f0bb4b000d74ade07e90bd690b7217a19d Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:18:47 +0800
 Subject: [PATCH] musl-libs
@@ -82,7 +82,7 @@ index ecb4d01..edc85e3 100644
  #include <stdint.h>
  
 diff --git a/libdwfl/linux-kernel-modules.c b/libdwfl/linux-kernel-modules.c
-index 6edb27f..f331e3c 100644
+index c0f8dfa..aa78033 100644
 --- a/libdwfl/linux-kernel-modules.c
 +++ b/libdwfl/linux-kernel-modules.c
 @@ -50,6 +50,7 @@

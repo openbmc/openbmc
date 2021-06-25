@@ -23,6 +23,10 @@ PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}"
 
 EXTRA_OECONF += "--disable-stripping"
 
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE_${PN} = "sysstat.service"
+SYSTEMD_AUTO_ENABLE = "enable"
+
 do_configure_prepend() {
     export sa_lib_dir=${libexecdir}/sa
 }

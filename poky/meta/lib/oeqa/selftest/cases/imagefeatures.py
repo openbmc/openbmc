@@ -68,18 +68,6 @@ class ImageFeatures(OESelftestTestCase):
                     self.assertEqual(status, 0, 'ssh to user tester failed with %s' % output)
 
 
-    def test_clutter_image_can_be_built(self):
-        """
-        Summary:     Check if clutter image can be built
-        Expected:    1. core-image-clutter can be built
-        Product:     oe-core
-        Author:      Ionut Chisanovici <ionutx.chisanovici@intel.com>
-        AutomatedBy: Daniel Istrate <daniel.alexandrux.istrate@intel.com>
-        """
-
-        # Build a core-image-clutter
-        bitbake('core-image-clutter')
-
     def test_wayland_support_in_image(self):
         """
         Summary:     Check Wayland support in image

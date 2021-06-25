@@ -648,13 +648,6 @@ compiled binary. To handle this, BitBake calls the
 each successful setscene task to know whether or not it needs to obtain
 the dependencies of that task.
 
-Finally, after all the setscene tasks have executed, BitBake calls the
-function listed in
-:term:`BB_SETSCENE_VERIFY_FUNCTION2`
-with the list of tasks BitBake thinks has been "covered". The metadata
-can then ensure that this list is correct and can inform BitBake that it
-wants specific tasks to be run regardless of the setscene result.
-
 You can find more information on setscene metadata in the
 :ref:`bitbake-user-manual/bitbake-user-manual-metadata:task checksums and setscene`
 section.

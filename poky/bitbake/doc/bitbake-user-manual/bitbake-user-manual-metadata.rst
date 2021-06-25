@@ -1650,10 +1650,15 @@ user interfaces:
 Variants - Class Extension Mechanism
 ====================================
 
-BitBake supports two features that facilitate creating from a single
-recipe file multiple incarnations of that recipe file where all
-incarnations are buildable. These features are enabled through the
-:term:`BBCLASSEXTEND` and :term:`BBVERSIONS` variables.
+BitBake supports multiple incarnations of a recipe file via the
+:term:`BBCLASSEXTEND` variable.
+
+The :term:`BBCLASSEXTEND` variable is a space separated list of classes used
+to "extend" the recipe for each variant. Here is an example that results in a
+second incarnation of the current recipe being available. This second
+incarnation will have the "native" class inherited. ::
+
+      BBCLASSEXTEND = "native"
 
 .. note::
 
@@ -1662,34 +1667,6 @@ incarnations are buildable. These features are enabled through the
    :term:`DEPENDS` variables would need to be modified by the extension
    class. For specific examples, see the OE-Core native , nativesdk , and
    multilib classes.
-
--  ``BBCLASSEXTEND``: This variable is a space separated list of
-   classes used to "extend" the recipe for each variant. Here is an
-   example that results in a second incarnation of the current recipe
-   being available. This second incarnation will have the "native" class
-   inherited. ::
-
-      BBCLASSEXTEND = "native"
-
--  ``BBVERSIONS``: This variable allows a single recipe to build
-   multiple versions of a project from a single recipe file. You can
-   also specify conditional metadata (using the
-   :term:`OVERRIDES` mechanism) for a single
-   version, or an optionally named range of versions. Here is an
-   example::
-
-      BBVERSIONS = "1.0 2.0 git"
-      SRC_URI_git = "git://someurl/somepath.git"
-
-      BBVERSIONS = "1.0.[0-6]:1.0.0+ 1.0.[7-9]:1.0.7+"
-      SRC_URI_append_1.0.7+ = "file://some_patch_which_the_new_versions_need.patch;patch=1"
-
-   The name of the range defaults to the original version of the recipe. For
-   example, in OpenEmbedded, the recipe file ``foo_1.0.0+.bb`` creates a default
-   name range of ``1.0.0+``. This is useful because the range name is not only
-   placed into overrides, but it is also made available for the metadata to use
-   in the variable that defines the base recipe versions for use in ``file://``
-   search paths (:term:`FILESPATH`).
 
 Dependencies
 ============
@@ -1942,10 +1919,6 @@ The following list describes related variables:
 -  :term:`BB_SETSCENE_DEPVALID`:
    Specifies a function BitBake calls that determines whether BitBake
    requires a setscene dependency to be met.
-
--  :term:`BB_SETSCENE_VERIFY_FUNCTION2`:
-   Specifies a function to call that verifies the list of planned task
-   execution before the main task execution happens.
 
 -  :term:`BB_STAMP_POLICY`: Defines the mode
    for comparing timestamps of stamp files.

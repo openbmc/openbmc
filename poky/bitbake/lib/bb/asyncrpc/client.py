@@ -103,13 +103,18 @@ class AsyncClient(object):
 
         return await self._send_wrapper(proc)
 
+    async def ping(self):
+        return await self.send_message(
+            {'ping': {}}
+        )
+
 
 class Client(object):
     def __init__(self):
         self.client = self._get_async_client()
         self.loop = asyncio.new_event_loop()
 
-        self._add_methods('connect_tcp', 'close')
+        self._add_methods('connect_tcp', 'close', 'ping')
 
     @abc.abstractmethod
     def _get_async_client(self):

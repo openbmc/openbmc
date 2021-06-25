@@ -26,6 +26,7 @@ UBOOT_ENTRYPOINT_riscv32 = "0x80400000"
 UBOOT_ENTRYPOINT_riscv64 = "0x80200000"
 
 # qemuboot options
+QB_SMP = "-smp 4"
 QB_KERNEL_CMDLINE_APPEND = "earlycon=sbi"
 QB_MACHINE = "-machine virt"
 QB_DEFAULT_BIOS = "fw_jump.elf"

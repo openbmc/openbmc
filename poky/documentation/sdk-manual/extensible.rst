@@ -15,9 +15,8 @@ hardware, and ease integration into the rest of the
 .. note::
 
    For a side-by-side comparison of main features supported for an
-   extensible SDK as compared to a standard SDK, see the "
-   Introduction
-   " section.
+   extensible SDK as compared to a standard SDK, see the
+   :ref:`sdk-manual/intro:introduction` section.
 
 In addition to the functionality available through ``devtool``, you can
 alternatively make use of the toolchain directly, for example from
@@ -89,9 +88,9 @@ the SDK for ``core-image-sato`` and using the current &DISTRO; snapshot::
 .. note::
 
    As an alternative to downloading an SDK, you can build the SDK
-   installer. For information on building the installer, see the "
-   Building an SDK Installer
-   " section.
+   installer. For information on building the installer, see the
+   :ref:`sdk-manual/appendix-obtain:building an sdk installer`
+   section.
 
 The SDK and toolchains are self-contained and by default are installed
 into the ``poky_sdk`` folder in your home directory. You can choose to
@@ -439,7 +438,7 @@ command:
 
       With this scenario, there is no ``srctree`` argument. Consequently, the
       default behavior of the ``devtool modify`` command is to extract
-      the source files pointed to by the ``SRC_URI`` statements into a
+      the source files pointed to by the :term:`SRC_URI` statements into a
       local Git structure. Furthermore, the location for the extracted
       source is the default area within the ``devtool`` workspace. The
       result is that the command sets up both the source code and an
@@ -447,7 +446,7 @@ command:
       original location.
 
       Additionally, if you have any non-patch local files (i.e. files
-      referred to with ``file://`` entries in ``SRC_URI`` statement
+      referred to with ``file://`` entries in :term:`SRC_URI` statement
       excluding ``*.patch/`` or ``*.diff``), these files are copied to
       an ``oe-local-files`` folder under the newly created source tree.
       Copying the files here gives you a convenient area from which you
@@ -477,7 +476,7 @@ command:
          devtool
          command.
 
-      As with all extractions, the command uses the recipe's ``SRC_URI``
+      As with all extractions, the command uses the recipe's :term:`SRC_URI`
       statements to locate the source files and any associated patch
       files. Non-patch files are copied to an ``oe-local-files`` folder
       under the newly created source tree.
@@ -604,11 +603,11 @@ counterparts.
 .. note::
 
    Several methods exist by which you can upgrade recipes -
-   devtool upgrade
+   ``devtool upgrade``
    happens to be one. You can read about all the methods by which you
-   can upgrade recipes in the "
-   Upgrading Recipes
-   " section of the Yocto Project Development Tasks Manual.
+   can upgrade recipes in the
+   :ref:`dev-manual/common-tasks:upgrading recipes` section
+   of the Yocto Project Development Tasks Manual.
 
 The ``devtool upgrade`` command is flexible enough to allow you to
 specify source code revision and versioning schemes, extract code into
@@ -656,18 +655,18 @@ The following diagram shows the common development flow used with the
       don't use "-V", the command upgrades the recipe to the latest
       version.
 
-   If the source files pointed to by the ``SRC_URI`` statement in the
+   If the source files pointed to by the :term:`SRC_URI` statement in the
    recipe are in a Git repository, you must provide the "-S" option and
    specify a revision for the software.
 
-   Once ``devtool`` locates the recipe, it uses the ``SRC_URI`` variable
+   Once ``devtool`` locates the recipe, it uses the :term:`SRC_URI` variable
    to locate the source code and any local patch files from other
    developers. The result is that the command sets up the source code,
    the new version of the recipe, and an append file all within the
    workspace.
 
    Additionally, if you have any non-patch local files (i.e. files
-   referred to with ``file://`` entries in ``SRC_URI`` statement
+   referred to with ``file://`` entries in :term:`SRC_URI` statement
    excluding ``*.patch/`` or ``*.diff``), these files are copied to an
    ``oe-local-files`` folder under the newly created source tree.
    Copying the files here gives you a convenient area from which you can
@@ -677,7 +676,7 @@ The following diagram shows the common development flow used with the
 
 2. *Resolve any Conflicts created by the Upgrade*: Conflicts could happen
    after upgrading the software to a new version. Conflicts occur
-   if your recipe specifies some patch files in ``SRC_URI`` that
+   if your recipe specifies some patch files in :term:`SRC_URI` that
    conflict with changes made in the new version of the software. For
    such cases, you need to resolve the conflicts by editing the source
    and following the normal ``git rebase`` conflict resolution process.
@@ -833,7 +832,7 @@ result from naming not being recognized or because the dependency simply
 is not available. For cases where the dependency is not available, you
 must use the ``devtool add`` command to add an additional recipe that
 satisfies the dependency. Once you add that recipe, you need to update
-the ``DEPENDS`` variable in the original recipe to include the new
+the :term:`DEPENDS` variable in the original recipe to include the new
 recipe.
 
 If you need to add runtime dependencies, you can do so by adding the
@@ -862,7 +861,7 @@ license. If so, the command sets the
 :term:`LICENSE` value accordingly.
 You should double-check the value added by the command against the
 documentation or source files for the software you are building and, if
-necessary, update that ``LICENSE`` value.
+necessary, update that :term:`LICENSE` value.
 
 The ``devtool add`` command also sets the
 :term:`LIC_FILES_CHKSUM`
@@ -870,16 +869,16 @@ value to point to all files that appear to be license-related. Realize
 that license statements often appear in comments at the top of source
 files or within the documentation. In such cases, the command does not
 recognize those license statements. Consequently, you might need to
-amend the ``LIC_FILES_CHKSUM`` variable to point to one or more of those
-comments if present. Setting ``LIC_FILES_CHKSUM`` is particularly
+amend the :term:`LIC_FILES_CHKSUM` variable to point to one or more of those
+comments if present. Setting :term:`LIC_FILES_CHKSUM` is particularly
 important for third-party software. The mechanism attempts to ensure
 correct licensing should you upgrade the recipe to a newer upstream
 version in future. Any change in licensing is detected and you receive
 an error prompting you to check the license text again.
 
 If the ``devtool add`` command cannot determine licensing information,
-``devtool`` sets the ``LICENSE`` value to "CLOSED" and leaves the
-``LIC_FILES_CHKSUM`` value unset. This behavior allows you to continue
+``devtool`` sets the :term:`LICENSE` value to "CLOSED" and leaves the
+:term:`LIC_FILES_CHKSUM` value unset. This behavior allows you to continue
 with development even though the settings are unlikely to be correct in
 all cases. You should check the documentation or source files for the
 software you are building to determine the actual license.
@@ -905,7 +904,7 @@ mind:
    hardcoding tools within the toolchain such as ``gcc`` and ``g++``.
 
 -  The environment in which Make runs is set up with various standard
-   variables for compilation (e.g. ``CC``, ``CXX``, and so forth) in a
+   variables for compilation (e.g. :term:`CC`, :term:`CXX`, and so forth) in a
    similar manner to the environment set up by the SDK's environment
    setup script. One easy way to see these variables is to run the
    ``devtool build`` command on the recipe and then look in
@@ -921,7 +920,7 @@ mind:
    the command line, add the variable setting to
    :term:`EXTRA_OEMAKE` or
    :term:`PACKAGECONFIG_CONFARGS`
-   within the recipe. Here is an example using ``EXTRA_OEMAKE``::
+   within the recipe. Here is an example using :term:`EXTRA_OEMAKE`::
 
       EXTRA_OEMAKE += "'CC=${CC}' 'CXX=${CXX}'"
 
@@ -1087,20 +1086,20 @@ extras specified by
 :term:`EXTRA_OECONF` or
 :term:`PACKAGECONFIG_CONFARGS`
 set within the recipe. If you wish to pass additional options, add them
-to ``EXTRA_OECONF`` or ``PACKAGECONFIG_CONFARGS``. Other supported build
+to :term:`EXTRA_OECONF` or :term:`PACKAGECONFIG_CONFARGS`. Other supported build
 tools have similar variables (e.g.
 :term:`EXTRA_OECMAKE` for
 CMake, :term:`EXTRA_OESCONS`
 for Scons, and so forth). If you need to pass anything on the ``make``
-command line, you can use ``EXTRA_OEMAKE`` or the
+command line, you can use :term:`EXTRA_OEMAKE` or the
 :term:`PACKAGECONFIG_CONFARGS`
 variables to do so.
 
 You can use the ``devtool configure-help`` command to help you set the
 arguments listed in the previous paragraph. The command determines the
 exact options being passed, and shows them to you along with any custom
-arguments specified through ``EXTRA_OECONF`` or
-``PACKAGECONFIG_CONFARGS``. If applicable, the command also shows you
+arguments specified through :term:`EXTRA_OECONF` or
+:term:`PACKAGECONFIG_CONFARGS`. If applicable, the command also shows you
 the output of the configure script's "--help" option as a
 reference.
 
@@ -1152,16 +1151,16 @@ the ``oe-workdir/packages-split`` directory, which contains a
 subdirectory for each package. Apart from some advanced cases, the
 :term:`PACKAGES` and
 :term:`FILES` variables controls
-splitting. The ``PACKAGES`` variable lists all of the packages to be
-produced, while the ``FILES`` variable specifies which files to include
+splitting. The :term:`PACKAGES` variable lists all of the packages to be
+produced, while the :term:`FILES` variable specifies which files to include
 in each package by using an override to specify the package. For
 example, ``FILES_${PN}`` specifies the files to go into the main package
 (i.e. the main package has the same name as the recipe and
 ``${``\ :term:`PN`\ ``}`` evaluates to the
-recipe name). The order of the ``PACKAGES`` value is significant. For
-each installed file, the first package whose ``FILES`` value matches the
-file is the package into which the file goes. Both the ``PACKAGES`` and
-``FILES`` variables have default values. Consequently, you might find
+recipe name). The order of the :term:`PACKAGES` value is significant. For
+each installed file, the first package whose :term:`FILES` value matches the
+file is the package into which the file goes. Both the :term:`PACKAGES` and
+:term:`FILES` variables have default values. Consequently, you might find
 you do not even need to set these variables in your recipe unless the
 software the recipe is building installs files into non-standard
 locations.

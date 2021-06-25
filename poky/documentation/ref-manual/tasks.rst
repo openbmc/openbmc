@@ -57,7 +57,7 @@ the current working directory set to ``${``\ :term:`B`\ ``}``.
 The default behavior of this task is to run ``oe_runmake clean`` if a
 makefile (``Makefile``, ``makefile``, or ``GNUmakefile``) is found and
 :term:`CLEANBROKEN` is not set to "1". If no such
-file is found or the ``CLEANBROKEN`` variable is set to "1", the
+file is found or the :term:`CLEANBROKEN` variable is set to "1", the
 ``do_configure`` task does nothing.
 
 .. _ref-tasks-configure_ptest_base:
@@ -308,17 +308,17 @@ This recipe has two patch files located here::
 
    poky/meta/recipes-connectivity/bluez5/bluez5
 
-In the ``bluez5`` recipe, the ``SRC_URI`` statements point to the source
+In the ``bluez5`` recipe, the :term:`SRC_URI` statements point to the source
 and patch files needed to build the package.
 
 .. note::
 
-   In the case for the ``bluez5_5.48.bb`` recipe, the ``SRC_URI`` statements
+   In the case for the ``bluez5_5.48.bb`` recipe, the :term:`SRC_URI` statements
    are from an include file ``bluez5.inc``.
 
 As mentioned earlier, the build system treats files whose file types are
 ``.patch`` and ``.diff`` as patch files. However, you can use the
-"apply=yes" parameter with the ``SRC_URI`` statement to indicate any
+"apply=yes" parameter with the :term:`SRC_URI` statement to indicate any
 file as a patch file::
 
    SRC_URI = " \
@@ -329,7 +329,7 @@ file as a patch file::
 Conversely, if you have a directory full of patch files and you want to
 exclude some so that the ``do_patch`` task does not apply them during
 the patch phase, you can use the "apply=no" parameter with the
-``SRC_URI`` statement::
+:term:`SRC_URI` statement::
 
    SRC_URI = " \
        git://path_to_repo/some_package \
@@ -430,7 +430,7 @@ variable also plays a role in where unpacked source files ultimately
 reside. For more information on how source files are unpacked, see the
 ":ref:`overview-manual/concepts:source fetching`"
 section in the Yocto Project Overview and Concepts Manual and also see
-the ``WORKDIR`` and ``S`` variable descriptions.
+the :term:`WORKDIR` and :term:`S` variable descriptions.
 
 Manually Called Tasks
 =====================

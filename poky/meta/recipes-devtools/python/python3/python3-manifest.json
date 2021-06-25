@@ -814,6 +814,7 @@
             "shell",
             "smtpd",
             "sqlite3",
+	    "statistics",
             "stringold",
             "syslog",
             "terminal",
@@ -1084,6 +1085,20 @@
             "${libdir}/python${PYTHON_MAJMIN}/sqlite3"
         ],
         "cached": []
+    },
+    "statistics": {
+	"summary": "Basic statistics module",
+	"rdepends": [
+	    "core",
+	    "math",
+	    "numbers"
+	],
+	"files": [
+	    "${libdir}/python${PYTHON_MAJMIN}/statistics.py"
+	],
+	"cached": [
+	    "${libdir}/python${PYTHON_MAJMIN}/__pycache__/statistics.*.pyc"
+	]
     },
     "stringold": {
         "summary": "Python string APIs [deprecated]",

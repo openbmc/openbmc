@@ -80,17 +80,16 @@ python create_source_date_epoch_stamp() {
     import oe.reproducible
 
     epochfile = d.getVar('SDE_FILE')
-    # If it exists we need to regenerate as the sources may have changed
-    if os.path.isfile(epochfile):
-        bb.debug(1, "Deleting existing SOURCE_DATE_EPOCH from: %s" % epochfile)
-        os.remove(epochfile)
+    tmp_file = "%s.new" % epochfile
 
     source_date_epoch = oe.reproducible.get_source_date_epoch(d, d.getVar('S'))
 
     bb.debug(1, "SOURCE_DATE_EPOCH: %d" % source_date_epoch)
     bb.utils.mkdirhier(d.getVar('SDE_DIR'))
-    with open(epochfile, 'w') as f:
+    with open(tmp_file, 'w') as f:
         f.write(str(source_date_epoch))
+
+    os.rename(tmp_file, epochfile)
 }
 
 def get_source_date_epoch_value(d):
@@ -100,7 +99,7 @@ def get_source_date_epoch_value(d):
 
     epochfile = d.getVar('SDE_FILE')
     source_date_epoch = int(d.getVar('SOURCE_DATE_EPOCH_FALLBACK'))
-    if os.path.isfile(epochfile):
+    try:
         with open(epochfile, 'r') as f:
             s = f.read()
             try:
@@ -113,7 +112,7 @@ def get_source_date_epoch_value(d):
                 bb.warn("SOURCE_DATE_EPOCH value '%s' is invalid. Reverting to SOURCE_DATE_EPOCH_FALLBACK" % s)
                 source_date_epoch = int(d.getVar('SOURCE_DATE_EPOCH_FALLBACK'))
         bb.debug(1, "SOURCE_DATE_EPOCH: %d" % source_date_epoch)
-    else:
+    except FileNotFoundError:
         bb.debug(1, "Cannot find %s. SOURCE_DATE_EPOCH will default to %d" % (epochfile, source_date_epoch))
 
     d.setVar('__CACHED_SOURCE_DATE_EPOCH', str(source_date_epoch))

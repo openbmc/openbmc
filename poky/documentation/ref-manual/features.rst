@@ -10,10 +10,10 @@ can select, and a reference on feature backfilling.
 
 Features provide a mechanism for working out which packages should be
 included in the generated images. Distributions can select which
-features they want to support through the ``DISTRO_FEATURES`` variable,
+features they want to support through the :term:`DISTRO_FEATURES` variable,
 which is set or appended to in a distribution's configuration file such
 as ``poky.conf``, ``poky-tiny.conf``, ``poky-lsb.conf`` and so forth.
-Machine features are set in the ``MACHINE_FEATURES`` variable, which is
+Machine features are set in the :term:`MACHINE_FEATURES` variable, which is
 set in the machine configuration file and specifies the hardware
 features for a given machine.
 
@@ -267,7 +267,7 @@ these valid features is as follows:
 -  *ssh-server-openssh:* Installs the OpenSSH SSH server, which is more
    full-featured than Dropbear. Note that if both the OpenSSH SSH server
    and the Dropbear minimal SSH server are present in
-   ``IMAGE_FEATURES``, then OpenSSH will take precedence and Dropbear
+   :term:`IMAGE_FEATURES`, then OpenSSH will take precedence and Dropbear
    will not be installed.
 
 -  *tools-debug:* Installs debugging tools such as ``strace`` and
@@ -323,27 +323,27 @@ Here are two examples to help illustrate feature backfilling:
 -  *The "pulseaudio" distro feature option*: Previously, PulseAudio
    support was enabled within the Qt and GStreamer frameworks. Because
    of this, the feature is backfilled and thus enabled for all distros
-   through the ``DISTRO_FEATURES_BACKFILL`` variable in the
+   through the :term:`DISTRO_FEATURES_BACKFILL` variable in the
    ``meta/conf/bitbake.conf`` file. However, your distro needs to
    disable the feature. You can disable the feature without affecting
    other existing distro configurations that need PulseAudio support by
-   adding "pulseaudio" to ``DISTRO_FEATURES_BACKFILL_CONSIDERED`` in
+   adding "pulseaudio" to :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED` in
    your distro's ``.conf`` file. Adding the feature to this variable
-   when it also exists in the ``DISTRO_FEATURES_BACKFILL`` variable
+   when it also exists in the :term:`DISTRO_FEATURES_BACKFILL` variable
    prevents the build system from adding the feature to your
-   configuration's ``DISTRO_FEATURES``, effectively disabling the
+   configuration's :term:`DISTRO_FEATURES`, effectively disabling the
    feature for that particular distro.
 
 -  *The "rtc" machine feature option*: Previously, real time clock (RTC)
    support was enabled for all target devices. Because of this, the
    feature is backfilled and thus enabled for all machines through the
-   ``MACHINE_FEATURES_BACKFILL`` variable in the
+   :term:`MACHINE_FEATURES_BACKFILL` variable in the
    ``meta/conf/bitbake.conf`` file. However, your target device does not
    have this capability. You can disable RTC support for your device
    without affecting other machines that need RTC support by adding the
-   feature to your machine's ``MACHINE_FEATURES_BACKFILL_CONSIDERED``
+   feature to your machine's :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`
    list in the machine's ``.conf`` file. Adding the feature to this
-   variable when it also exists in the ``MACHINE_FEATURES_BACKFILL``
+   variable when it also exists in the :term:`MACHINE_FEATURES_BACKFILL`
    variable prevents the build system from adding the feature to your
-   configuration's ``MACHINE_FEATURES``, effectively disabling RTC
+   configuration's :term:`MACHINE_FEATURES`, effectively disabling RTC
    support for that particular machine.

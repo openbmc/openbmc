@@ -5,13 +5,13 @@ Subject: [PATCH] Do not try to obtain PYTHON_INSTALL_DIR by running python.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
  librepo/python/CMakeLists.txt | 12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/librepo/python/CMakeLists.txt b/librepo/python/CMakeLists.txt
-index 52fc39e..2024407 100644
+index 8523ca7..06e5f7b 100644
 --- a/librepo/python/CMakeLists.txt
 +++ b/librepo/python/CMakeLists.txt
 @@ -16,12 +16,12 @@ SET (librepomodule_SRCS
@@ -20,16 +20,19 @@ index 52fc39e..2024407 100644
  
 -EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
 -from sys import stdout
--from distutils import sysconfig
--path=sysconfig.get_python_lib(True, prefix='${CMAKE_INSTALL_PREFIX}')
+-from sysconfig import get_path
+-path=get_path(name='platlib', vars={'platbase':'${CMAKE_INSTALL_PREFIX}'})
 -stdout.write(path)"
 -OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
 +#EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
 +#from sys import stdout
-+#from distutils import sysconfig
-+#path=sysconfig.get_python_lib(True, prefix='${CMAKE_INSTALL_PREFIX}')
++#from sysconfig import get_path
++#path=get_path(name='platlib', vars={'platbase':'${CMAKE_INSTALL_PREFIX}'})
 +#stdout.write(path)"
 +#OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
  INCLUDE_DIRECTORIES (${PYTHON_INCLUDE_PATH})
  
  MESSAGE(STATUS "Python3 install dir is ${PYTHON_INSTALL_DIR}")
+-- 
+2.25.1
+

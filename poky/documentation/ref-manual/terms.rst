@@ -97,11 +97,11 @@ universal, the list includes them just in case:
       .. note::
 
          By default, the Build Directory contains :term:`TMPDIR`, which is a
-         temporary directory the build system uses for its work. ``TMPDIR`` cannot
+         temporary directory the build system uses for its work. :term:`TMPDIR` cannot
          be under NFS. Thus, by default, the Build Directory cannot be under
          NFS. However, if you need the Build Directory to be under NFS, you can
-         set this up by setting ``TMPDIR`` in your ``local.conf`` file to use a local
-         drive. Doing so effectively separates ``TMPDIR`` from :term:`TOPDIR`, which is the
+         set this up by setting :term:`TMPDIR` in your ``local.conf`` file to use a local
+         drive. Doing so effectively separates :term:`TMPDIR` from :term:`TOPDIR`, which is the
          Build Directory.
 
    :term:`Build Host`

@@ -1,4 +1,4 @@
-From ce3b1403bd88261b5461a9dcb7d6d6be9185703e Mon Sep 17 00:00:00 2001
+From 72819106d0e5666d172d39c24c19e4e7a3b8be0e Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 1 May 2019 22:15:03 +0100
 Subject: [PATCH] Fix error on musl:
@@ -19,7 +19,7 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  1 file changed, 5 insertions(+)
 
 diff --git a/tests/elfstrmerge.c b/tests/elfstrmerge.c
-index abbdf3f..bd90f4d 100644
+index 197c6a5..3683672 100644
 --- a/tests/elfstrmerge.c
 +++ b/tests/elfstrmerge.c
 @@ -33,6 +33,11 @@

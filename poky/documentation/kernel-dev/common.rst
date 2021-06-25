@@ -70,7 +70,7 @@ section:
    :term:`MACHINE` variable is set to
    "qemux86-64", which is fine if you are building for the QEMU emulator
    in 64-bit mode. However, if you are not, you need to set the
-   ``MACHINE`` variable appropriately in your ``conf/local.conf`` file
+   :term:`MACHINE` variable appropriately in your ``conf/local.conf`` file
    found in the
    :term:`Build Directory` (i.e.
    ``poky/build`` in this example).
@@ -248,7 +248,7 @@ section:
    :term:`MACHINE` variable is set to
    "qemux86-64", which is fine if you are building for the QEMU emulator
    in 64-bit mode. However, if you are not, you need to set the
-   ``MACHINE`` variable appropriately in your ``conf/local.conf`` file
+   :term:`MACHINE` variable appropriately in your ``conf/local.conf`` file
    found in the
    :term:`Build Directory` (i.e.
    ``poky/build`` in this example).
@@ -474,7 +474,7 @@ variable as follows::
 The path ``${``\ :term:`THISDIR`\ ``}/${``\ :term:`PN`\ ``}``
 expands to "linux-yocto" in the current directory for this example. If
 you add any new files that modify the kernel recipe and you have
-extended ``FILESPATH`` as described above, you must place the files in
+extended :term:`FILESPATH` as described above, you must place the files in
 your layer in the following area::
 
    your-layer/recipes-kernel/linux/linux-yocto/
@@ -553,7 +553,7 @@ the append file.
 
 For example, suppose you had some configuration options in a file called
 ``network_configs.cfg``. You can place that file inside a directory
-named ``linux-yocto`` and then add a ``SRC_URI`` statement such as the
+named ``linux-yocto`` and then add a :term:`SRC_URI` statement such as the
 following to the append file. When the OpenEmbedded build system builds
 the kernel, the configuration options are picked up and applied.
 ::
@@ -563,7 +563,7 @@ the kernel, the configuration options are picked up and applied.
 To group related configurations into multiple files, you perform a
 similar procedure. Here is an example that groups separate
 configurations specifically for Ethernet and graphics into their own
-files and adds the configurations by using a ``SRC_URI`` statement like
+files and adds the configurations by using a :term:`SRC_URI` statement like
 the following in your append file::
 
    SRC_URI += "file://myconfig.cfg \
@@ -643,7 +643,7 @@ following lines to the linux-yocto ``.bbappend`` file in your layer::
    FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
    SRC_URI += "file://defconfig"
 
-The ``SRC_URI`` tells the build system how to search
+The :term:`SRC_URI` tells the build system how to search
 for the file, while the
 :term:`FILESEXTRAPATHS`
 extends the :term:`FILESPATH`
@@ -684,7 +684,7 @@ with the following content (without indentation)::
    CONFIG_SERIAL_CORE_CONSOLE=y
 
 Next, include this
-configuration fragment and extend the ``FILESPATH`` variable in your
+configuration fragment and extend the :term:`FILESPATH` variable in your
 ``.bbappend`` file::
 
    FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
@@ -722,7 +722,7 @@ form::
    KBUILD_DEFCONFIG_KMACHINE ?= "defconfig_file"
 
 Here is an example
-that assigns the ``KBUILD_DEFCONFIG`` variable based on "raspberrypi2"
+that assigns the :term:`KBUILD_DEFCONFIG` variable based on "raspberrypi2"
 and provides the path to the "in-tree" ``defconfig`` file to be used for
 a Raspberry Pi 2, which is based on the Broadcom 2708/2709 chipset::
 
@@ -734,7 +734,7 @@ Aside from modifying your kernel recipe and providing your own
 a kernel's ``linux-``\ `machine`\ ``.inc`` file). In other words, if the
 build system detects a statement that identifies an "out-of-tree"
 ``defconfig`` file, that statement will override your
-``KBUILD_DEFCONFIG`` variable.
+:term:`KBUILD_DEFCONFIG` variable.
 
 See the
 :term:`KBUILD_DEFCONFIG`
@@ -1349,10 +1349,10 @@ be picked up and applied when the kernel is built::
    SRC_URI += "file://myconfig.cfg"
 
 As mentioned earlier, you can group related configurations into multiple
-files and name them all in the ``SRC_URI`` statement as well. For
+files and name them all in the :term:`SRC_URI` statement as well. For
 example, you could group separate configurations specifically for
 Ethernet and graphics into their own files and add those by using a
-``SRC_URI`` statement like the following in your append file::
+:term:`SRC_URI` statement like the following in your append file::
 
    SRC_URI += "file://myconfig.cfg \
                file://eth.cfg \
@@ -1628,11 +1628,11 @@ Here are some basic steps you can use to work with your own sources:
    appropriate for your project:
 
    -  :term:`SRC_URI`: The
-      ``SRC_URI`` should specify a Git repository that uses one of the
+      :term:`SRC_URI` should specify a Git repository that uses one of the
       supported Git fetcher protocols (i.e. ``file``, ``git``, ``http``,
-      and so forth). The ``SRC_URI`` variable should also specify either
+      and so forth). The :term:`SRC_URI` variable should also specify either
       a ``defconfig`` file or some configuration fragment files. The
-      skeleton recipe provides an example ``SRC_URI`` as a syntax
+      skeleton recipe provides an example :term:`SRC_URI` as a syntax
       reference.
 
    -  :term:`LINUX_VERSION`:
@@ -1650,16 +1650,16 @@ Here are some basic steps you can use to work with your own sources:
       indicate to the OpenEmbedded build system that the recipe has
       changed.
 
-   -  :term:`PV`: The default ``PV``
+   -  :term:`PV`: The default :term:`PV`
       assignment is typically adequate. It combines the
-      ``LINUX_VERSION`` with the Source Control Manager (SCM) revision
+      :term:`LINUX_VERSION` with the Source Control Manager (SCM) revision
       as derived from the :term:`SRCPV`
       variable. The combined results are a string with the following
       form::
 
          3.19.11+git1+68a635bf8dfb64b02263c1ac80c948647cc76d5f_1+218bd8d2022b9852c60d32f0d770931e3cf343e2
 
-      While lengthy, the extra verbosity in ``PV`` helps ensure you are
+      While lengthy, the extra verbosity in :term:`PV` helps ensure you are
       using the exact sources from which you intend to build.
 
    -  :term:`COMPATIBLE_MACHINE`:
@@ -1773,7 +1773,7 @@ information to build modules. If your module ``Makefile`` uses a
 different variable, you might want to override the
 :ref:`ref-tasks-compile` step, or
 create a patch to the ``Makefile`` to work with the more typical
-``KERNEL_SRC`` or ``KERNEL_PATH`` variables.
+:term:`KERNEL_SRC` or :term:`KERNEL_PATH` variables.
 
 After you have prepared your recipe, you will likely want to include the
 module in your images. To do this, see the documentation for the
@@ -1886,23 +1886,23 @@ build stops. Kernel features are the last elements processed for
 configuring and patching the kernel. Therefore, adding features in this
 manner is a way to enforce specific features are present and enabled
 without needing to do a full audit of any other layer's additions to the
-``SRC_URI`` statement.
+:term:`SRC_URI` statement.
 
 You add a kernel feature by providing the feature as part of the
-``KERNEL_FEATURES`` variable and by providing the path to the feature's
+:term:`KERNEL_FEATURES` variable and by providing the path to the feature's
 ``.scc`` file, which is relative to the root of the kernel Metadata. The
 OpenEmbedded build system searches all forms of kernel Metadata on the
-``SRC_URI`` statement regardless of whether the Metadata is in the
+:term:`SRC_URI` statement regardless of whether the Metadata is in the
 "kernel-cache", system kernel Metadata, or a recipe-space Metadata (i.e.
 part of the kernel recipe). See the
 ":ref:`kernel-dev/advanced:kernel metadata location`" section for
 additional information.
 
-When you specify the feature's ``.scc`` file on the ``SRC_URI``
+When you specify the feature's ``.scc`` file on the :term:`SRC_URI`
 statement, the OpenEmbedded build system adds the directory of that
 ``.scc`` file along with all its subdirectories to the kernel feature
 search path. Because subdirectories are searched, you can reference a
-single ``.scc`` file in the ``SRC_URI`` statement to reference multiple
+single ``.scc`` file in the :term:`SRC_URI` statement to reference multiple
 kernel features.
 
 Consider the following example that adds the "test.scc" feature to the
@@ -1910,7 +1910,7 @@ build.
 
 1. *Create the Feature File:* Create a ``.scc`` file and locate it just
    as you would any other patch file, ``.cfg`` file, or fetcher item you
-   specify in the ``SRC_URI`` statement.
+   specify in the :term:`SRC_URI` statement.
 
    .. note::
 
@@ -1937,7 +1937,7 @@ build.
    a similarly named configuration fragment file ``test.cfg``.
 
 2. *Add the Feature File to SRC_URI:* Add the ``.scc`` file to the
-   recipe's ``SRC_URI`` statement::
+   recipe's :term:`SRC_URI` statement::
 
       SRC_URI_append = " file://test.scc"
 
@@ -1945,7 +1945,7 @@ build.
    appended to the existing path.
 
 3. *Specify the Feature as a Kernel Feature:* Use the
-   ``KERNEL_FEATURES`` statement to specify the feature as a kernel
+   :term:`KERNEL_FEATURES` statement to specify the feature as a kernel
    feature::
 
       KERNEL_FEATURES_append = " test.scc"

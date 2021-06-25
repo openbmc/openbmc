@@ -68,13 +68,9 @@ do_install() {
         echo "${libdir}" >> ${D}${sysconfdir}/ld-musl-${MUSL_LDSO_ARCH}.path
 	rm -f ${D}${bindir}/ldd ${D}${GLIBC_LDSO}
 	lnr ${D}${libdir}/libc.so ${D}${bindir}/ldd
-	lnr ${D}${libdir}/libc.so ${D}${GLIBC_LDSO}
 }
 
-PACKAGES =+ "${PN}-glibc-compat"
-
 FILES_${PN} += "/lib/ld-musl-${MUSL_LDSO_ARCH}.so.1 ${sysconfdir}/ld-musl-${MUSL_LDSO_ARCH}.path"
-FILES_${PN}-glibc-compat += "${GLIBC_LDSO}"
 FILES_${PN}-staticdev = "${libdir}/libc.a"
 FILES_${PN}-dev =+ "${libdir}/libcrypt.a ${libdir}/libdl.a ${libdir}/libm.a \
                     ${libdir}/libpthread.a ${libdir}/libresolv.a \
@@ -88,3 +84,5 @@ RPROVIDES_${PN} += "ldd libsegfault rtld(GNU_HASH)"
 LEAD_SONAME = "libc.so"
 INSANE_SKIP_${PN}-dev = "staticdev"
 INSANE_SKIP_${PN} = "libdir"
+
+UPSTREAM_CHECK_COMMITS = "1"

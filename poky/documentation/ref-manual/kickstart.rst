@@ -106,13 +106,15 @@ the ``part`` and ``partition`` commands:
 -  ``--fstype``: Sets the file system type for the partition. Valid
    values are:
 
-   -  ``ext4``
+   -  ``btrfs``
 
-   -  ``ext3``
+   -  ``erofs``
 
    -  ``ext2``
 
-   -  ``btrfs``
+   -  ``ext3``
+
+   -  ``ext4``
 
    -  ``squashfs``
 

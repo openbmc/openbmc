@@ -104,7 +104,7 @@ patch, or BSP:
       repository organized under the "Yocto Linux Kernel" heading in the
       :yocto_git:`Yocto Project Source Repositories <>`.
 
-   -  Areas pointed to by ``SRC_URI`` statements found in kernel recipes.
+   -  Areas pointed to by :term:`SRC_URI` statements found in kernel recipes.
 
    For a typical build, the target of the search is a feature
    description in an ``.scc`` file whose name follows this format (e.g.

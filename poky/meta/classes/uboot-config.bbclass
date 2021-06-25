@@ -71,6 +71,10 @@ UBOOT_MKIMAGE_SIGN ?= "${UBOOT_MKIMAGE}"
 UBOOT_MKIMAGE_SIGN_ARGS ?= ""
 SPL_MKIMAGE_SIGN_ARGS ?= ""
 
+# Options to deploy the u-boot device tree
+UBOOT_DTB ?= ""
+UBOOT_DTB_BINARY ??= ""
+
 python () {
     ubootmachine = d.getVar("UBOOT_MACHINE")
     ubootconfigflags = d.getVarFlags('UBOOT_CONFIG')

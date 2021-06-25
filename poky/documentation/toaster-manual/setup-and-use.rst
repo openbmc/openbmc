@@ -625,7 +625,7 @@ To specify ``bash`` 3.2.48 as the version to build, enter
    :scale: 75%
 
 After clicking the "Add variable" button, the settings for
-``PREFERRED_VERSION`` are added to the bottom of the BitBake variables
+:term:`PREFERRED_VERSION` are added to the bottom of the BitBake variables
 list. With these settings, the OpenEmbedded build system builds the
 desired version of the recipe rather than the default version:
 

@@ -40,6 +40,8 @@ def get_glibc_loader(d):
         dynamic_loader = "${base_libdir}/ld-linux-mipsn8.so.1"
     elif targetarch.startswith("mips"):
         dynamic_loader = "${base_libdir}/ld.so.1"
+    elif targetarch == "powerpc64le":
+        dynamic_loader = "${base_libdir}/ld64.so.2"
     elif targetarch == "powerpc64":
         dynamic_loader = "${base_libdir}/ld64.so.1"
     elif targetarch == "x86_64":
@@ -52,6 +54,8 @@ def get_glibc_loader(d):
         dynamic_loader = "${base_libdir}/ld-linux-aarch64${ARMPKGSFX_ENDIAN_64}.so.1"
     elif targetarch.startswith("riscv64"):
         dynamic_loader = "${base_libdir}/ld-linux-riscv64-lp64${@['d', ''][d.getVar('TARGET_FPU') == 'soft']}.so.1"
+    elif targetarch.startswith("riscv32"):
+        dynamic_loader = "${base_libdir}/ld-linux-riscv32-ilp32${@['d', ''][d.getVar('TARGET_FPU') == 'soft']}.so.1"
     return dynamic_loader
 
 def get_linuxloader(d):

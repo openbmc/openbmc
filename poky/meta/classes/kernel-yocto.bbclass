@@ -631,7 +631,31 @@ do_validate_branches() {
 	# if SRCREV is AUTOREV it shows up as AUTOINC there's nothing to
 	# check and we can exit early
 	if [ "${machine_srcrev}" = "AUTOINC" ]; then
+	    linux_yocto_dev='${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/kernel", "linux-yocto-dev", "1", "", d)}'
+	    if [ -n "$linux_yocto_dev" ]; then
+		git checkout -q -f ${machine_branch}
+		ver=$(grep "^VERSION =" ${S}/Makefile | sed s/.*=\ *//)
+		patchlevel=$(grep "^PATCHLEVEL =" ${S}/Makefile | sed s/.*=\ *//)
+		sublevel=$(grep "^SUBLEVEL =" ${S}/Makefile | sed s/.*=\ *//)
+		kver="$ver.$patchlevel"
+		bbnote "dev kernel: performing version -> branch -> SRCREV validation"
+		bbnote "dev kernel: recipe version ${LINUX_VERSION}, src version: $kver"
+		echo "${LINUX_VERSION}" | grep -q $kver
+		if [ $? -ne 0 ]; then
+		    version="$(echo ${LINUX_VERSION} | sed 's/\+.*$//g')"
+		    versioned_branch="v$version/$machine_branch"
+
+		    machine_branch=$versioned_branch
+		    force_srcrev="$(git rev-parse $machine_branch 2> /dev/null)"
+		    if [ $? -ne 0 ]; then
+			bbfatal "kernel version mismatch detected, and no valid branch $machine_branch detected"
+		    fi
+
+		    bbnote "dev kernel: adjusting branch to $machine_branch, srcrev to: $force_srcrev"
+		fi
+	    else
 		bbnote "SRCREV validation is not required for AUTOREV"
+	    fi
 	elif [ "${machine_srcrev}" = "" ]; then
 		if [ "${SRCREV}" != "AUTOINC" ] && [ "${SRCREV}" != "INVALID" ]; then
 		       # SRCREV_machine_<MACHINE> was not set. This means that a custom recipe

@@ -15,15 +15,15 @@ PACKAGECONFIG[secureboot] = ",,,"
 SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https \
            file://0001-ovmf-update-path-to-native-BaseTools.patch \
            file://0002-BaseTools-makefile-adjust-to-build-in-under-bitbake.patch \
-           file://0004-ovmf-Update-to-latest.patch \
-           file://zero.patch \
-           file://debug_prefix_map.patch \
-           file://reproducible.patch \
+           file://0003-ovmf-Update-to-latest.patch \
+           file://0004-Strip-build-paths.patch \
+           file://0005-debug-prefix-map.patch \
+           file://0006-reproducible.patch \
            file://0001-Fix-VLA-parameter-warning.patch \
            "
 
-PV = "edk2-stable202102"
-SRCREV = "ef91b07388e1c0a50c604e5350eeda98428ccea6"
+PV = "edk2-stable202105"
+SRCREV = "e1999b264f1f9d7230edf2448f757c73da567832"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>edk2-stable.*)"
 
 inherit deploy

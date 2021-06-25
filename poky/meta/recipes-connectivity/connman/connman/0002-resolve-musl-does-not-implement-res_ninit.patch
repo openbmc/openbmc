@@ -1,4 +1,4 @@
-From c7734e1547db967eccf242fe4b9e8a30b9ff141c Mon Sep 17 00:00:00 2001
+From 01974865e4d331eeaf25248bee1bb96539c450d9 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 6 Apr 2015 23:02:21 -0700
 Subject: [PATCH] resolve: musl does not implement res_ninit
@@ -15,7 +15,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 13 insertions(+), 21 deletions(-)
 
 diff --git a/gweb/gresolv.c b/gweb/gresolv.c
-index 38a554e..a9e8740 100644
+index 954e7cf..2a9bc51 100644
 --- a/gweb/gresolv.c
 +++ b/gweb/gresolv.c
 @@ -36,6 +36,7 @@
@@ -26,7 +26,7 @@ index 38a554e..a9e8740 100644
  
  #include "gresolv.h"
  
-@@ -877,8 +878,6 @@ GResolv *g_resolv_new(int index)
+@@ -878,8 +879,6 @@ GResolv *g_resolv_new(int index)
  	resolv->index = index;
  	resolv->nameserver_list = NULL;
  
@@ -35,7 +35,7 @@ index 38a554e..a9e8740 100644
  	return resolv;
  }
  
-@@ -918,8 +917,6 @@ void g_resolv_unref(GResolv *resolv)
+@@ -919,8 +918,6 @@ void g_resolv_unref(GResolv *resolv)
  
  	flush_nameservers(resolv);
  
@@ -44,7 +44,7 @@ index 38a554e..a9e8740 100644
  	g_free(resolv);
  }
  
-@@ -1022,24 +1019,19 @@ guint g_resolv_lookup_hostname(GResolv *resolv, const char *hostname,
+@@ -1023,24 +1020,19 @@ guint g_resolv_lookup_hostname(GResolv *resolv, const char *hostname,
  	debug(resolv, "hostname %s", hostname);
  
  	if (!resolv->nameserver_list) {

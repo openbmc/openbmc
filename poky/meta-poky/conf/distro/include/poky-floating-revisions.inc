@@ -26,8 +26,6 @@ SRCREV_pn-sato-icon-theme ?= "${AUTOREV}"
 SRCREV_pn-matchbox-desktop-sato ?= "${AUTOREV}"
 SRCREV_pn-oh-puzzles ?= "${AUTOREV}"
 SRCREV_pn-libowl ?= "${AUTOREV}"
-SRCREV_pn-clutter ?= "${AUTOREV}"
-SRCREV_pn-clutter-gst ?= "${AUTOREV}"
 SRCREV_pn-libmatchbox ?= "${AUTOREV}"
 SRCREV_pn-ofono ?= "${AUTOREV}"
 

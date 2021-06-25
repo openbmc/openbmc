@@ -12,6 +12,7 @@ SRC_URI = "git://github.com/rpm-software-management/libdnf;branch=dnf-4-master \
            file://0001-Look-fo-sphinx-only-if-documentation-is-actually-ena.patch \
            file://enable_test_data_dir_set.patch \
            file://0001-libdnf-config.h-avoid-the-use-of-non-portable-__WORD.patch \
+           file://0001-drop-FindPythonInstDir.cmake.patch \
            "
 
 SRCREV = "669a5c691acba91693d238d6262ac99a440aa9b3"

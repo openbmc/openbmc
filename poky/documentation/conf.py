@@ -92,6 +92,9 @@ intersphinx_mapping = {
     'bitbake': ('https://docs.yoctoproject.org/bitbake/', None)
 }
 
+# Suppress "WARNING: unknown mimetype for ..."
+suppress_warnings = ['epub.unknown_project_files']
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

@@ -8,6 +8,8 @@ import os
 import sys
 import signal
 import time
+import glob
+import subprocess
 from collections import defaultdict
 
 from .ssh import OESSHTarget
@@ -36,6 +38,8 @@ class OEQemuTarget(OESSHTarget):
         self.ovmf = ovmf
         self.use_slirp = slirp
         self.boot_patterns = boot_patterns
+        self.dump_dir = dump_dir
+        self.bootlog = bootlog
 
         self.runner = QemuRunner(machine=machine, rootfs=rootfs, tmpdir=tmpdir,
                                  deploy_dir_image=dir_image, display=display,
@@ -74,7 +78,28 @@ class OEQemuTarget(OESSHTarget):
                 self.server_ip = self.runner.server_ip
         else:
             self.stop()
-            raise RuntimeError("FAILED to start qemu - check the task log and the boot log")
+            # Display the first 20 lines of top and
+            # last 20 lines of the bootlog when the
+            # target is not being booted up.
+            topfile = glob.glob(self.dump_dir + "/*_qemu/host_*_top")
+            msg = "\n\n===== start: snippet =====\n\n"
+            for f in topfile:
+                msg += "file: %s\n\n" % f
+                with open(f) as tf:
+                    for x in range(20):
+                        msg += next(tf)
+            msg += "\n\n===== end: snippet =====\n\n"
+            blcmd = ["tail", "-20", self.bootlog]
+            msg += "===== start: snippet =====\n\n"
+            try:
+                out = subprocess.check_output(blcmd, stderr=subprocess.STDOUT, timeout=1).decode('utf-8')
+                msg += "file: %s\n\n" % self.bootlog
+                msg += out
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError) as err:
+                msg += "Error running command: %s\n%s\n" % (blcmd, err)
+            msg += "\n\n===== end: snippet =====\n"
+
+            raise RuntimeError("FAILED to start qemu - check the task log and the boot log %s" % (msg))
 
     def stop(self):
         self.runner.stop()

@@ -23,10 +23,6 @@ overview of their function and contents.
       systems extend the functionality of the variable as it is
       described here in this glossary.
 
-   -  Finally, there are variables mentioned in this glossary that do
-      not appear in the BitBake glossary. These other variables are
-      variables used in systems that use BitBake.
-
 .. glossary::
 
    :term:`ASSUME_PROVIDED`
@@ -313,6 +309,16 @@ overview of their function and contents.
       However, the more accurate the data returned, the more efficient the
       build will be.
 
+   :term:`BB_HASHSERVE`
+      Specifies the Hash Equivalence server to use.
+
+      If set to ``auto``, BitBake automatically starts its own server
+      over a UNIX domain socket.
+
+      If set to ``host:port``, BitBake will use a remote server on the
+      specified host. This allows multiple clients to share the same
+      hash equivalence data.
+
    :term:`BB_INVALIDCONF`
       Used in combination with the ``ConfigParsed`` event to trigger
       re-parsing the base metadata (i.e. all the recipes). The
@@ -425,17 +431,6 @@ overview of their function and contents.
       dependencies also need to be run is highly dependent on the metadata.
       The function specified by this variable returns a "True" or "False"
       depending on whether the dependency needs to be met.
-
-   :term:`BB_SETSCENE_VERIFY_FUNCTION2`
-      Specifies a function to call that verifies the list of planned task
-      execution before the main task execution happens. The function is
-      called once BitBake has a list of setscene tasks that have run and
-      either succeeded or failed.
-
-      The function allows for a task list check to see if they make sense.
-      Even if BitBake was planning to skip a task, the returned value of
-      the function can force BitBake to run the task, which is necessary
-      under certain metadata defined circumstances.
 
    :term:`BB_SIGNATURE_EXCLUDE_FLAGS`
       Lists variable flags (varflags) that can be safely excluded from
@@ -796,16 +791,6 @@ overview of their function and contents.
    :term:`BBTARGETS`
       Allows you to use a configuration file to add to the list of
       command-line target recipes you want to build.
-
-   :term:`BBVERSIONS`
-      Allows a single recipe to build multiple versions of a project from a
-      single recipe file. You also able to specify conditional metadata
-      using the :term:`OVERRIDES` mechanism for a
-      single version or for an optionally named range of versions.
-
-      For more information on ``BBVERSIONS``, see the
-      ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:variants - class extension mechanism`"
-      section.
 
    :term:`BITBAKE_UI`
       Used to specify the UI module to use when running BitBake. Using this

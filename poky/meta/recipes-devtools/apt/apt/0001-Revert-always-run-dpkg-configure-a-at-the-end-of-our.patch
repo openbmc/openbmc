@@ -1,4 +1,4 @@
-From 76f8386cac7f13688b386686e0b1fc4b1b574f53 Mon Sep 17 00:00:00 2001
+From 393ac20efc66bfc000a2457e093e369b934c5a50 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 21 May 2020 20:13:25 +0000
 Subject: [PATCH] Revert "always run 'dpkg --configure -a' at the end of our

@@ -1,23 +1,22 @@
-From 667c0cf97dadc4f5994d26ec3984f559a05ec406 Mon Sep 17 00:00:00 2001
+From 19d4c7f9812062a683b3ba60b35aac0461190456 Mon Sep 17 00:00:00 2001
 From: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
 Date: Fri, 26 Jul 2019 17:34:26 -0400
-Subject: [PATCH 2/4] BaseTools: makefile: adjust to build in under bitbake
+Subject: [PATCH 2/6] BaseTools: makefile: adjust to build in under bitbake
 
 Prepend the build flags with those of bitbake. This is to build
 using the bitbake native sysroot include and library directories.
 
 Signed-off-by: Ricardo Neri <ricardo.neri@linux.intel.com>
 Upstream-Status: Pending
-
 ---
  BaseTools/Source/C/Makefiles/header.makefile | 17 +++++++++--------
  1 file changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/BaseTools/Source/C/Makefiles/header.makefile b/BaseTools/Source/C/Makefiles/header.makefile
-index 1c105ee7d4..d5eea3864e 100644
+index 0df728f327..1299d47c87 100644
 --- a/BaseTools/Source/C/Makefiles/header.makefile
 +++ b/BaseTools/Source/C/Makefiles/header.makefile
-@@ -69,35 +69,36 @@ $(error Bad HOST_ARCH)
+@@ -75,35 +75,36 @@ $(error Bad HOST_ARCH)
  endif
  
  INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE)
@@ -63,5 +62,5 @@ index 1c105ee7d4..d5eea3864e 100644
  #
  # Snow Leopard  is a 32-bit and 64-bit environment. uname -m returns i386, but gcc defaults
 -- 
-2.28.0
+2.32.0
 

@@ -15,6 +15,7 @@ SRC_URI = "git://git.eclipse.org/gitroot/tcf/org.eclipse.tcf.agent \
            file://ldflags.patch \
            file://tcf-agent.init \
            file://tcf-agent.service \
+           file://0001-Fixed-copyright-messages.patch \
           "
 
 DEPENDS = "util-linux openssl"

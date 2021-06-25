@@ -1,4 +1,4 @@
-From 6aa15fe548e5b1d6ca3b373779beb7521ea95ba9 Mon Sep 17 00:00:00 2001
+From 897900f3f9084c5542097851323bba3f2691df20 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 15 Jan 2020 17:16:28 +0100
 Subject: [PATCH] tests: do not statically link a test
@@ -7,26 +7,27 @@ This fails on e.g. centos 7
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  progs/Makefile | 2 +-
  tests/Makefile | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/progs/Makefile b/progs/Makefile
-index 1d7fc7a..37db8f7 100644
+index 289186e..071a285 100644
 --- a/progs/Makefile
 +++ b/progs/Makefile
-@@ -42,7 +42,7 @@ endif
- test: $(PROGS)
+@@ -49,7 +49,7 @@ capsh: capsh.c capshdoc.h.cf $(DEPS)
+ 	$(CC) $(IPATH) $(CAPSH_SHELL) $(CFLAGS) -o $@ $< $(LIBCAPLIB) $(LDFLAGS)
  
- tcapsh-static: capsh.c $(DEPS)
+ tcapsh-static: capsh.c capshdoc.h.cf $(DEPS)
 -	$(CC) $(IPATH) $(CAPSH_SHELL) $(CFLAGS) -o $@ $< $(LIBCAPLIB) $(LDFLAGS) --static
 +	$(CC) $(IPATH) $(CAPSH_SHELL) $(CFLAGS) -o $@ $< $(LIBCAPLIB) $(LDFLAGS)
  
  sudotest: test tcapsh-static
  	sudo $(LDPATH) ./quicktest.sh
 diff --git a/tests/Makefile b/tests/Makefile
-index 01f7589..094ec57 100644
+index 4a5f2f9..4266d86 100644
 --- a/tests/Makefile
 +++ b/tests/Makefile
 @@ -22,7 +22,7 @@ ifeq ($(PTHREADS),yes)
@@ -38,7 +39,7 @@ index 01f7589..094ec57 100644
  DEPS=../libcap/libcap.a
  ifeq ($(PTHREADS),yes)
  DEPS +=  ../libcap/libpsx.a
-@@ -106,7 +106,7 @@ noexploit: exploit.o $(DEPS)
+@@ -113,7 +113,7 @@ noexploit: exploit.o $(DEPS)
  
  # This one runs in a chroot with no shared library files.
  noop: noop.c
@@ -46,7 +47,4 @@ index 01f7589..094ec57 100644
 +	$(CC) $(CFLAGS) $< -o $@
  
  clean:
- 	rm -f psx_test libcap_psx_test libcap_launch_test *~
--- 
-2.17.1
-
+ 	rm -f psx_test libcap_psx_test libcap_launch_test uns_test *~

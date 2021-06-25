@@ -21,6 +21,7 @@ SRC_URI = "${GNU_MIRROR}/coreutils/${BP}.tar.xz \
            file://0001-local.mk-fix-cross-compiling-problem.patch \
            file://run-ptest \
            file://0001-ls-restore-8.31-behavior-on-removed-directories.patch \
+           file://0001-fts-remove-NOSTAT_LEAF_OPTIMIZATION.patch \
            "
 
 SRC_URI[md5sum] = "022042695b7d5bcf1a93559a9735e668"

@@ -29,6 +29,14 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://determinism.patch \
            file://0001-tests-meson.build-use-relative-path-to-refer-to-file.patch \
            file://0001-configure-fix-detection-of-gdbus-codegen.patch \
+           file://0001-vhost-user-gpu-fix-memory-disclosure-in-virgl_cmd_ge.patch \
+           file://0002-vhost-user-gpu-fix-resource-leak-in-vg_resource_crea.patch \
+           file://0003-vhost-user-gpu-fix-memory-leak-in-vg_resource_attach.patch \
+           file://0004-vhost-user-gpu-fix-memory-leak-while-calling-vg_reso.patch \
+           file://0005-vhost-user-gpu-fix-memory-leak-in-virgl_cmd_resource.patch \
+           file://0006-vhost-user-gpu-fix-memory-leak-in-virgl_resource_att.patch \
+           file://0007-vhost-user-gpu-fix-OOB-write-in-virgl_cmd_get_capset.patch \
+           file://0001-linux-user-Tag-vsx-with-ieee128-fpbits.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 

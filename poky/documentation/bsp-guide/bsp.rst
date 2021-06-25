@@ -95,11 +95,11 @@ layer and from it build an image. Here is an example::
 
 .. note::
 
-   Ordering and :term:`BBFILE_PRIORITY` for the layers listed in ``BBLAYERS``
+   Ordering and :term:`BBFILE_PRIORITY` for the layers listed in :term:`BBLAYERS`
    matter. For example, if multiple layers define a machine configuration, the
    OpenEmbedded build system uses the last layer searched given similar layer
    priorities. The build system works from the top-down through the layers
-   listed in ``BBLAYERS``.
+   listed in :term:`BBLAYERS`.
 
 Some BSPs require or depend on additional layers beyond the BSP's root
 layer in order to be functional. In this case, you need to specify these
@@ -685,7 +685,7 @@ statements as follows::
 
 .. note::
 
-   When the preferred provider is assumed by default, the ``PREFERRED_PROVIDER``
+   When the preferred provider is assumed by default, the :term:`PREFERRED_PROVIDER`
    statement does not appear in the ``"bsp_root_name".conf`` file.
 
 You would use the ``linux-yocto_4.4.bbappend`` file to append specific
@@ -1121,15 +1121,15 @@ list describes them in order of preference:
    how to use these variables.
 
    If you build as you normally would, without specifying any recipes in
-   the ``LICENSE_FLAGS_WHITELIST``, the build stops and provides you
+   the :term:`LICENSE_FLAGS_WHITELIST`, the build stops and provides you
    with the list of recipes that you have tried to include in the image
-   that need entries in the ``LICENSE_FLAGS_WHITELIST``. Once you enter
+   that need entries in the :term:`LICENSE_FLAGS_WHITELIST`. Once you enter
    the appropriate license flags into the whitelist, restart the build
    to continue where it left off. During the build, the prompt will not
    appear again since you have satisfied the requirement.
 
    Once the appropriate license flags are on the white list in the
-   ``LICENSE_FLAGS_WHITELIST`` variable, you can build the encumbered
+   :term:`LICENSE_FLAGS_WHITELIST` variable, you can build the encumbered
    image with no change at all to the normal build process.
 
 #. *Get a Pre-Built Version of the BSP:* You can get this type of BSP by
@@ -1142,7 +1142,7 @@ list describes them in order of preference:
    click-through license agreements presented by the website. If you
    want to build the image yourself using the recipes contained within
    the BSP tarball, you will still need to create an appropriate
-   ``LICENSE_FLAGS_WHITELIST`` to match the encumbered recipes in the
+   :term:`LICENSE_FLAGS_WHITELIST` to match the encumbered recipes in the
    BSP.
 
 .. note::
@@ -1405,7 +1405,7 @@ Project Reference Manual.
 
    The BeagleBone development board requires an SPL to boot and that SPL
    file type must be MLO. Consequently, the machine configuration needs
-   to define ``SPL_BINARY`` as ``MLO``.
+   to define :term:`SPL_BINARY` as ``MLO``.
 
    .. note::
 

@@ -88,8 +88,8 @@ documentation.
 Yocto Project documentation website
 ===================================
 
-A new website has been created to host the Yocto Project
-documentation, it can be found at: https://docs.yoctoproject.org/.
+The website hosting the Yocto Project documentation, can be found
+at: https://docs.yoctoproject.org/.
 
 The entire Yocto Project documentation, as well as the BitBake manual,
 is published on this website, including all previously released

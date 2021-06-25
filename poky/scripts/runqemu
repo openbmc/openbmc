@@ -18,6 +18,7 @@ import shutil
 import glob
 import configparser
 import signal
+import time
 
 class RunQemuError(Exception):
     """Custom exception to raise on known errors."""
@@ -1201,8 +1202,10 @@ class BaseConfig(object):
         tmpfsdir = os.environ.get("RUNQEMU_TMPFS_DIR", None)
         if self.snapshot and tmpfsdir:
             newrootfs = os.path.join(tmpfsdir, os.path.basename(self.rootfs)) + "." + str(os.getpid())
+            logger.info("Copying rootfs to %s" % newrootfs)
+            copy_start = time.time()
             shutil.copyfile(self.rootfs, newrootfs)
-            #print("Copying rootfs to tmpfs: %s" % newrootfs)
+            logger.info("Copy done in %s seconds" % (time.time() - copy_start))
             self.rootfs = newrootfs
             # Don't need a second copy now!
             self.snapshot = False

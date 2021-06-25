@@ -43,7 +43,7 @@ FILES_${PN}-staticdev += "${libdir}/*.a ${base_libdir}/*.a"
 FILES_nscd = "${sbindir}/nscd* ${sysconfdir}/init.d/nscd ${systemd_unitdir}/system/nscd* ${sysconfdir}/tmpfiles.d/nscd.conf \
               ${sysconfdir}/nscd.conf ${sysconfdir}/default/volatiles/98_nscd ${localstatedir}/db/nscd"
 FILES_${PN}-mtrace = "${bindir}/mtrace"
-FILES_tzcode = "${bindir}/tzselect ${sbindir}/zic ${sbindir}/zdump"
+FILES_tzcode = "${bindir}/tzselect ${sbindir}/zic ${bindir}/zdump"
 FILES_${PN}-utils = "${bindir}/* ${sbindir}/*"
 FILES_catchsegv = "${bindir}/catchsegv"
 RDEPENDS_catchsegv = "libsegfault"

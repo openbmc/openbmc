@@ -1,0 +1,54 @@
+From 6064875bff2e52ba63f01911eb4deb79259c5e3b Mon Sep 17 00:00:00 2001
+From: Carlos Miguel Ferreira <carlosmf.pt@gmail.com>
+Date: Thu, 3 Jun 2021 23:10:37 +0100
+Subject: [PATCH] Fixes wrong type for mutex in regex v5
+
+With the Boost.Regex to ehader-only library, the declaration
+of a mutex that should have been changed from boost::static_mutex
+to std::mutex was left behind. This was preventing regex from
+being built for older arm platforms [1]
+
+[1]: https://github.com/openwrt/packages/issues/15725
+
+Upstream-Status: Submitted [https://github.com/boostorg/regex/pull/132]
+
+Signed-off-by: Carlos Miguel Ferreira <carlosmf.pt@gmail.com>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ boost/regex/v5/mem_block_cache.hpp | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/boost/regex/v5/mem_block_cache.hpp b/boost/regex/v5/mem_block_cache.hpp
+index 0af4eae1..eb3ec776 100644
+--- a/boost/regex/v5/mem_block_cache.hpp
++++ b/boost/regex/v5/mem_block_cache.hpp
+@@ -85,10 +85,10 @@ struct mem_block_node
+ struct mem_block_cache
+ {
+    // this member has to be statically initialsed:
+-   mem_block_node* next;
+-   unsigned cached_blocks;
++   mem_block_node* next { nullptr };
++   unsigned cached_blocks { 0 };
+ #ifdef BOOST_HAS_THREADS
+-   boost::static_mutex mut;
++   std::mutex mut;
+ #endif
+ 
+    ~mem_block_cache()
+@@ -133,11 +133,7 @@ struct mem_block_cache
+    }
+    static mem_block_cache& instance()
+    {
+-#ifdef BOOST_HAS_THREADS
+-      static mem_block_cache block_cache = { 0, 0, BOOST_STATIC_MUTEX_INIT, };
+-#else
+-      static mem_block_cache block_cache = { 0, 0, };
+-#endif
++      static mem_block_cache block_cache;
+       return block_cache;
+    }
+ };
+-- 
+2.29.2
+

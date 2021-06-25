@@ -65,7 +65,7 @@ class QemuRunner:
         self.boot_patterns = boot_patterns
         self.tmpfsdir = tmpfsdir
 
-        self.runqemutime = 120
+        self.runqemutime = 300
         if not workdir:
             workdir = os.getcwd()
         self.qemu_pidfile = workdir + '/pidfile_' + str(os.getpid())
@@ -192,6 +192,12 @@ class QemuRunner:
         qmp_file = "." + next(tempfile._get_candidate_names())
         qmp_param = ' -S -qmp unix:./%s,server,wait' % (qmp_file)
         qmp_port = self.tmpdir + "/" + qmp_file
+        # Create a second socket connection for debugging use, 
+        # note this will NOT cause qemu to block waiting for the connection
+        qmp_file2 = "." + next(tempfile._get_candidate_names())
+        qmp_param += ' -qmp unix:./%s,server,nowait' % (qmp_file2)
+        qmp_port2 = self.tmpdir + "/" + qmp_file2
+        self.logger.info("QMP Available for connection at %s" % (qmp_port2))
 
         try:
             if self.serial_ports >= 2:
@@ -342,7 +348,24 @@ class QemuRunner:
         finally:
             os.chdir(origpath)
 
-        # Release the qemu porcess to continue running
+        # We worry that mmap'd libraries may cause page faults which hang the qemu VM for periods
+        # causing failures. Before we "start" qemu, read through it's mapped files to try and 
+        # ensure we don't hit page faults later
+        mapdir = "/proc/" + str(self.qemupid) + "/map_files/"
+        try:
+            for f in os.listdir(mapdir):
+                linktarget = os.readlink(os.path.join(mapdir, f))
+                if not linktarget.startswith("/") or linktarget.startswith("/dev") or "deleted" in linktarget:
+                    continue
+                with open(linktarget, "rb") as readf:
+                    data = True
+                    while data:
+                        data = readf.read(4096)
+        # Centos7 doesn't allow us to read /map_files/
+        except PermissionError:
+            pass
+
+        # Release the qemu process to continue running
         self.run_monitor('cont')
 
         # We are alive: qemu is running

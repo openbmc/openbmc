@@ -1,0 +1,41 @@
+From 77fe3ad2ab2953ccdf6e9417cbecc060b45d3e55 Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Sun, 30 May 2021 10:32:08 +0200
+Subject: [PATCH] tools: image-host: fix wrong return value
+
+The return value '-ENOSPC' of fit_set_timestamp function does not match
+the caller fit_image_write_sig's expection which is '-FDT_ERR_NOSPACE'.
+
+Fix it by not calling fit_set_timestamp, but call fdt_setprop instead.
+
+This fixes a following mkimage error:
+| Can't write signature for 'signature@1' signature node in
+| 'conf@imx6ull-colibri-wifi-eval-v3.dtb' conf node: <unknown error>
+| mkimage Can't add hashes to FIT blob: -1
+
+Upstream-Status: Submitted [ https://patchwork.ozlabs.org/project/uboot/patch/20210531070451.6561-1-liu.ming50@gmail.com ]
+
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+---
+ tools/image-host.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tools/image-host.c b/tools/image-host.c
+index 270d36fe45..73095461a7 100644
+--- a/tools/image-host.c
++++ b/tools/image-host.c
+@@ -132,8 +132,10 @@ static int fit_image_write_sig(void *fit, int noffset, uint8_t *value,
+ 	if (!ret) {
+ 		time_t timestamp = imagetool_get_source_date(cmdname,
+ 							     time(NULL));
++		uint32_t t = cpu_to_uimage(timestamp);
+ 
+-		ret = fit_set_timestamp(fit, noffset, timestamp);
++		ret = fdt_setprop(fit, noffset, FIT_TIMESTAMP_PROP, &t,
++			sizeof(uint32_t));
+ 	}
+ 	if (region_prop && !ret) {
+ 		uint32_t strdata[2];
+-- 
+2.29.0
+

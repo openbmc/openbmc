@@ -62,8 +62,10 @@ codename are likely to be compatible and thus work together.
 
 Releases are given a nominal release version as well but the codename is
 used in repositories for this reason. You can find information on Yocto
-Project releases and codenames at
-:yocto_wiki:`/Releases`.
+Project releases and codenames at :yocto_wiki:`/Releases`.
+
+Our :doc:`/migration-guides/index` detail how to migrate from one release of
+the Yocto Project to the next.
 
 Stable Release Process
 ======================
@@ -164,9 +166,8 @@ repository.
 
 .. note::
 
-   You can find all these branches in the Yocto Project
-   Source Repositories
-   .
+   You can find all these branches in the
+   :ref:`overview-manual/development-environment:yocto project source repositories`.
 
 Testing within these public branches ensures in a publicly visible way
 that all of the main supposed architectures and recipes in OE-Core

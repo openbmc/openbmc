@@ -15,5 +15,9 @@ SRC_URI = "${GNU_MIRROR}/gdb/gdb-${PV}.tar.xz \
            file://0009-resolve-restrict-keyword-conflict.patch \
            file://0010-Fix-invalid-sigprocmask-call.patch \
            file://0011-gdbserver-ctrl-c-handling.patch \
+           file://0012-arc-Add-support-for-signal-handlers.patch \
+           file://0013-arc-Add-support-for-signal-frames-for-Linux-targets.patch \
+           file://0014-arc-Take-into-account-the-REGNUM-in-supply-collect-g.patch \
+           file://0015-gdb-Add-native-support-for-ARC-in-GNU-Linux.patch \
            "
 SRC_URI[sha256sum] = "aaa1223d534c9b700a8bec952d9748ee1977513f178727e1bee520ee000b4f29"

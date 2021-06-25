@@ -1,0 +1,2 @@
+helgrind/tests/hg05_race2
+helgrind/tests/tc09_bad_unlock

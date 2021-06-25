@@ -46,10 +46,6 @@ Following is a list of supported recipes:
 -  ``core-image-base``: A console-only image that fully supports the
    target device hardware.
 
--  ``core-image-clutter``: An image with support for the Open GL-based
-   toolkit Clutter, which enables development of rich and animated
-   graphical user interfaces.
-
 -  ``core-image-full-cmdline``: A console-only image with more
    full-featured Linux system functionality installed.
 

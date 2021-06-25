@@ -1,5 +1,6 @@
 [Match]
 Type=ether
+Name=!veth*
 KernelCommandLine=!nfsroot
 KernelCommandLine=!ip
 

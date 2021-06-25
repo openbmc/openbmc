@@ -13,7 +13,6 @@ Yocto Project Reference Manual
    system-requirements
    terms
    release-process
-   migration
    structure
    classes
    tasks

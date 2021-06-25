@@ -1,0 +1,46 @@
+From 82be2b7b9758a2f62ee11931da674cd541076041 Mon Sep 17 00:00:00 2001
+From: Tim Orling <ticotimo@gmail.com>
+Date: Sat, 22 May 2021 11:20:46 -0700
+Subject: [PATCH] Fix man page installation
+
+Fixes:
+  error: can't copy 'build/doc/man/scons.1': doesn't exist or not a regular file
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Tim Orling <ticotimo@gmail.com>
+---
+ MANIFEST.in | 2 +-
+ setup.cfg   | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/MANIFEST.in b/MANIFEST.in
+index 04ec000..937f6f3 100644
+--- a/MANIFEST.in
++++ b/MANIFEST.in
+@@ -4,7 +4,7 @@ recursive-include SCons/Tool/docbook *
+ include LICENSE
+ 
+ include scons.1 sconsign.1 scons-time.1
+-recursive-include build/doc/man *.1
++#recursive-include build/doc/man *.1
+ 
+ 
+ 
+diff --git a/setup.cfg b/setup.cfg
+index 37e5204..677c00a 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -56,9 +56,9 @@ console_scripts =
+ scons.tool.docbook = *.*
+ 
+ [options.data_files]
+-. = build/doc/man/scons.1
+-	build/doc/man/scons-time.1
+-	build/doc/man/sconsign.1
++. = scons.1
++	scons-time.1
++	sconsign.1
+ 
+ [sdist]
+ dist-dir = build/dist

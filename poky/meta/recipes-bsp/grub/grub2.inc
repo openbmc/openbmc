@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 CVE_PRODUCT = "grub2"
 
-SRC_URI = "https://alpha.gnu.org/gnu/grub/grub-${REALPV}.tar.xz \
+SRC_URI = "${GNU_MIRROR}/grub/grub-${PV}.tar.gz \
            file://0001-Disable-mfpmath-sse-as-well-when-SSE-is-disabled.patch \
            file://autogen.sh-exclude-pc.patch \
            file://grub-module-explicitly-keeps-symbole-.module_license.patch \
@@ -22,25 +22,10 @@ SRC_URI = "https://alpha.gnu.org/gnu/grub/grub-${REALPV}.tar.xz \
            file://0001-RISC-V-Restore-the-typcast-to-long.patch \
 "
 
-SRC_URI[sha256sum] = "2c87f1f21e2ab50043e6cd9163c08f1b6c3a6171556bf23ff9ed65b074145484"
-
-REALPV = "2.06~rc1"
-PV = "2.04+${REALPV}"
-
-# Fixed in 2.06~rc1, can be removed for 2.06 final
-CVE_CHECK_WHITELIST += "\
-    CVE-2020-14308 CVE-2020-14309 CVE-2020-14310 CVE-2020-14311 CVE-2020-10713 \
-    CVE-2020-14372 CVE-2020-15705 CVE-2020-15706 CVE-2020-15707 \
-    CVE-2020-25632 CVE-2020-25647 CVE-2020-27749 CVE-2020-27779 \
-    CVE-2021-3418 CVE-2021-20225 CVE-2021-20233"
+SRC_URI[sha256sum] = "23b64b4c741569f9426ed2e3d0e6780796fca081bee4c99f62aa3f53ae803f5f"
 
 # Applies only to RHEL
 CVE_CHECK_WHITELIST += "CVE-2019-14865"
-
-S = "${WORKDIR}/grub-${REALPV}"
-
-UPSTREAM_CHECK_URI = "${GNU_MIRROR}/grub"
-UPSTREAM_CHECK_REGEX = "grub-(?P<pver>\d+(\.\d+)+)\.tar\.(gz|xz)"
 
 DEPENDS = "flex-native bison-native gettext-native"
 

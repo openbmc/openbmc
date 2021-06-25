@@ -1,0 +1,46 @@
+Fixes to make the perl build reproducible:
+
+a) Remove the \n from configure_attr.sh since it gets quoted differently depending on
+   whether the shell is bash or dash which can cause the test result to be incorrect.
+   Reported upstream: https://github.com/arsv/perl-cross/issues/87
+
+b) Sort the order of the module lists from configure_mods.sh since otherwise
+   the result isn't the same leading to makefile differences.
+   Reported upstream: https://github.com/arsv/perl-cross/issues/88
+
+c) Sort the Encode::Byte byte_t.fnm file output (and the makefile depends whilst 
+   there for good measure)
+   This needs to go to upstream perl (not done)
+
+d) Use bash for perl-cross configure since otherwise trnl gets set to "\n" with bash
+   and "" with dash
+   Reported upstream: https://github.com/arsv/perl-cross/issues/87
+
+RP 2020/2/7
+
+Upstream-Status: Pending [75% submitted]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
+
+Index: perl-5.30.1/cnf/configure_mods.sh
+===================================================================
+--- perl-5.30.1.orig/cnf/configure_mods.sh
++++ perl-5.30.1/cnf/configure_mods.sh
+@@ -82,7 +82,7 @@ extonlyif() {
+ }
+ 
+ definetrimspaces() {
+-	v=`echo "$2" | sed -r -e 's/\s+/ /g' -e 's/^\s+//' -e 's/\s+$//'`
++	v=`echo "$2" | sed -r -e 's/\s+/ /g' -e 's/^\s+//' -e 's/\s+$//' | xargs -n1 | LANG=C sort | xargs`
+ 	define $1 "$v"
+ }
+ 
+Index: perl-5.30.1/cnf/configure
+===================================================================
+--- perl-5.30.1.orig/cnf/configure
++++ perl-5.30.1/cnf/configure
+@@ -1,4 +1,4 @@
+-#!/bin/sh
++#!/bin/bash
+ 
+ base=${0%/*}; test -z "$base" && base=.
+ 

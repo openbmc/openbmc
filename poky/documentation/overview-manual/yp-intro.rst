@@ -248,8 +248,7 @@ accomplish this through a recipe that is a BitBake append
 .. note::
 
    For general information on BSP layer structure, see the
-   :doc:`/bsp-guide/index`
-   .
+   :doc:`/bsp-guide/index`.
 
 The :term:`Source Directory`
 contains both general layers and BSP layers right out of the box. You

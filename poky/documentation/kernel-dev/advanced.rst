@@ -46,15 +46,15 @@ linux-yocto recipe.
 
 Every linux-yocto style recipe must define the
 :term:`KMACHINE` variable. This
-variable is typically set to the same value as the ``MACHINE`` variable,
+variable is typically set to the same value as the :term:`MACHINE` variable,
 which is used by :term:`BitBake`.
 However, in some cases, the variable might instead refer to the
-underlying platform of the ``MACHINE``.
+underlying platform of the :term:`MACHINE`.
 
-Multiple BSPs can reuse the same ``KMACHINE`` name if they are built
+Multiple BSPs can reuse the same :term:`KMACHINE` name if they are built
 using the same BSP description. Multiple Corei7-based BSPs could share
-the same "intel-corei7-64" value for ``KMACHINE``. It is important to
-realize that ``KMACHINE`` is just for kernel mapping, while ``MACHINE``
+the same "intel-corei7-64" value for :term:`KMACHINE`. It is important to
+realize that :term:`KMACHINE` is just for kernel mapping, while :term:`MACHINE`
 is the machine type within a BSP Layer. Even with this distinction,
 however, these two variables can hold the same value. See the
 ":ref:`kernel-dev/advanced:bsp descriptions`" section for more information.
@@ -66,7 +66,7 @@ to indicate the branch.
 
 .. note::
 
-   You can use the ``KBRANCH`` value to define an alternate branch typically
+   You can use the :term:`KBRANCH` value to define an alternate branch typically
    with a machine override as shown here from the ``meta-yocto-bsp`` layer::
 
            KBRANCH_edgerouter = "standard/edgerouter"
@@ -81,8 +81,8 @@ variables:
 
 :term:`LINUX_KERNEL_TYPE`
 defines the kernel type to be used in assembling the configuration. If
-you do not specify a ``LINUX_KERNEL_TYPE``, it defaults to "standard".
-Together with ``KMACHINE``, ``LINUX_KERNEL_TYPE`` defines the search
+you do not specify a :term:`LINUX_KERNEL_TYPE`, it defaults to "standard".
+Together with :term:`KMACHINE`, :term:`LINUX_KERNEL_TYPE` defines the search
 arguments used by the kernel tools to find the appropriate description
 within the kernel Metadata with which to build out the sources and
 configuration. The linux-yocto recipes define "standard", "tiny", and
@@ -90,21 +90,21 @@ configuration. The linux-yocto recipes define "standard", "tiny", and
 section for more information on kernel types.
 
 During the build, the kern-tools search for the BSP description file
-that most closely matches the ``KMACHINE`` and ``LINUX_KERNEL_TYPE``
+that most closely matches the :term:`KMACHINE` and :term:`LINUX_KERNEL_TYPE`
 variables passed in from the recipe. The tools use the first BSP
 description they find that matches both variables. If the tools cannot find
 a match, they issue a warning.
 
-The tools first search for the ``KMACHINE`` and then for the
-``LINUX_KERNEL_TYPE``. If the tools cannot find a partial match, they
-will use the sources from the ``KBRANCH`` and any configuration
+The tools first search for the :term:`KMACHINE` and then for the
+:term:`LINUX_KERNEL_TYPE`. If the tools cannot find a partial match, they
+will use the sources from the :term:`KBRANCH` and any configuration
 specified in the :term:`SRC_URI`.
 
 You can use the
 :term:`KERNEL_FEATURES`
 variable to include features (configuration fragments, patches, or both)
-that are not already included by the ``KMACHINE`` and
-``LINUX_KERNEL_TYPE`` variable combination. For example, to include a
+that are not already included by the :term:`KMACHINE` and
+:term:`LINUX_KERNEL_TYPE` variable combination. For example, to include a
 feature specified as "features/netfilter/netfilter.scc", specify::
 
    KERNEL_FEATURES += "features/netfilter/netfilter.scc"
@@ -116,7 +116,7 @@ specify::
    KERNEL_FEATURES_append_qemux86 = " cfg/sound.scc"
 
 The value of
-the entries in ``KERNEL_FEATURES`` are dependent on their location
+the entries in :term:`KERNEL_FEATURES` are dependent on their location
 within the kernel Metadata itself. The examples here are taken from the
 ``yocto-kernel-cache`` repository. Each branch of this repository
 contains "features" and "cfg" subdirectories at the top-level. For more
@@ -344,7 +344,7 @@ as how an additional feature description file is included with the
 
 Typically, features are less granular than configuration fragments and
 are more likely than configuration fragments and patches to be the types
-of things you want to specify in the ``KERNEL_FEATURES`` variable of the
+of things you want to specify in the :term:`KERNEL_FEATURES` variable of the
 Linux kernel recipe. See the
 ":ref:`kernel-dev/advanced:using kernel metadata in a recipe`" section earlier
 in the manual.
@@ -509,12 +509,12 @@ description as meeting the criteria set by the recipe being built. This
 example supports the "beaglebone" machine for the "standard" kernel and
 the "arm" architecture.
 
-Be aware that there is no hard link between the ``KTYPE`` variable and a kernel
+Be aware that there is no hard link between the :term:`KTYPE` variable and a kernel
 type description file. Thus, if you do not have the
 kernel type defined in your kernel Metadata as it is here, you only need
 to ensure that the
 :term:`LINUX_KERNEL_TYPE`
-variable in the kernel recipe and the ``KTYPE`` variable in the BSP
+variable in the kernel recipe and the :term:`KTYPE` variable in the BSP
 description file match.
 
 To separate your kernel policy from your hardware configuration, you
@@ -657,7 +657,7 @@ Notice again the three critical variables:
 :term:`KMACHINE`,
 :term:`KTYPE`, and
 :term:`KARCH`. Of these variables, only
-``KTYPE`` has changed to specify the "tiny" kernel type.
+:term:`KTYPE` has changed to specify the "tiny" kernel type.
 
 Kernel Metadata Location
 ========================
@@ -693,7 +693,7 @@ directory hierarchy below
 a linux-yocto recipe or for a Linux kernel recipe derived by copying and
 modifying
 ``oe-core/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb`` to
-a recipe in your layer, ``FILESEXTRAPATHS`` is typically set to
+a recipe in your layer, :term:`FILESEXTRAPATHS` is typically set to
 ``${``\ :term:`THISDIR`\ ``}/${``\ :term:`PN`\ ``}``.
 See the ":ref:`kernel-dev/common:modifying an existing recipe`"
 section for more information.
@@ -718,10 +718,10 @@ and fetches any files referenced in the ``.scc`` files by the
 ``include``, ``patch``, or ``kconf`` commands. Because of this, it is
 necessary to bump the recipe :term:`PR`
 value when changing the content of files not explicitly listed in the
-``SRC_URI``.
+:term:`SRC_URI`.
 
 If the BSP description is in recipe space, you cannot simply list the
-``*.scc`` in the ``SRC_URI`` statement. You need to use the following
+``*.scc`` in the :term:`SRC_URI` statement. You need to use the following
 form from your kernel append file::
 
    SRC_URI_append_myplatform = " \
@@ -735,7 +735,7 @@ When stored outside of the recipe-space, the kernel Metadata files
 reside in a separate repository. The OpenEmbedded build system adds the
 Metadata to the build as a "type=kmeta" repository through the
 :term:`SRC_URI` variable. As an
-example, consider the following ``SRC_URI`` statement from the
+example, consider the following :term:`SRC_URI` statement from the
 ``linux-yocto_4.12.bb`` kernel recipe::
 
    SRC_URI = "git://git.yoctoproject.org/linux-yocto-4.12.git;name=machine;branch=${KBRANCH}; \
@@ -744,20 +744,20 @@ example, consider the following ``SRC_URI`` statement from the
 
 ``${KMETA}``, in this context, is simply used to name the directory into
 which the Git fetcher places the Metadata. This behavior is no different
-than any multi-repository ``SRC_URI`` statement used in a recipe (e.g.
+than any multi-repository :term:`SRC_URI` statement used in a recipe (e.g.
 see the previous section).
 
 You can keep kernel Metadata in a "kernel-cache", which is a directory
 containing configuration fragments. As with any Metadata kept outside
-the recipe-space, you simply need to use the ``SRC_URI`` statement with
+the recipe-space, you simply need to use the :term:`SRC_URI` statement with
 the "type=kmeta" attribute. Doing so makes the kernel Metadata available
 during the configuration phase.
 
-If you modify the Metadata, you must not forget to update the ``SRCREV``
+If you modify the Metadata, you must not forget to update the :term:`SRCREV`
 statements in the kernel's recipe. In particular, you need to update the
 ``SRCREV_meta`` variable to match the commit in the ``KMETA`` branch you
 wish to use. Changing the data in these branches and not updating the
-``SRCREV`` statements to match will cause the build to fetch an older
+:term:`SRCREV` statements to match will cause the build to fetch an older
 commit.
 
 Organizing Your Source
@@ -820,7 +820,7 @@ patches into a feature.
 
 Once you have a new branch, you can set up your kernel Metadata to use
 the branch a couple different ways. In the recipe, you can specify the
-new branch as the ``KBRANCH`` to use for the board as follows::
+new branch as the :term:`KBRANCH` to use for the board as follows::
 
    KBRANCH = "mynewbranch"
 

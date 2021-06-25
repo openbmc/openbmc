@@ -2348,7 +2348,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-clutter) to name a few. ",
+          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base) to name a few. ",
           "expected_results": " All recipes are built correctly \n\n"
         },
         "4": {
@@ -2382,7 +2382,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-clutter) to name a few. \n\n",
+          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base) to name a few. \n\n",
           "expected_results": "All recipes are built correctly \n\n"
         },
         "4": {
@@ -2420,7 +2420,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Build 4 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-clutter) to name a few. \n\n",
+          "action": "Build 4 recipes example (core-image-sato, core-image-minimal, core-image-base) to name a few. \n\n",
           "expected_results": " All recipes are built correctly \n\n"
         },
         "4": {

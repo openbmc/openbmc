@@ -927,6 +927,11 @@ def add_tasks(tasklist, d):
                 task_deps[name] = {}
             if name in flags:
                 deptask = d.expand(flags[name])
+                if name in ['noexec', 'fakeroot', 'nostamp']:
+                    if deptask != '1':
+                        bb.warn("In a future version of BitBake, setting the '{}' flag to something other than '1' "
+                                "will result in the flag not being set. See YP bug #13808.".format(name))
+
                 task_deps[name][task] = deptask
         getTask('mcdepends')
         getTask('depends')

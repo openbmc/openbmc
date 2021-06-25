@@ -47,9 +47,18 @@ index b7e18768e3..3195ab205d 100644
  #if SIZEOF_DEV_T == 8
  #  define DEV_FMT "%" PRIu64
 diff --git a/src/basic/rlimit-util.c b/src/basic/rlimit-util.c
-index 23d108d5df..94373c9422 100644
+index 23d108d5df..b037734ee3 100644
 --- a/src/basic/rlimit-util.c
 +++ b/src/basic/rlimit-util.c
+@@ -43,7 +43,7 @@ int setrlimit_closest(int resource, const struct rlimit *rlim) {
+             fixed.rlim_max == highest.rlim_max)
+                 return 0;
+ 
+-        log_debug("Failed at setting rlimit " RLIM_FMT " for resource RLIMIT_%s. Will attempt setting value " RLIM_FMT " instead.", rlim->rlim_max, rlimit_to_string(resource), fixed.rlim_max);
++        log_debug("Failed at setting rlimit " RLIM_FMT " for resource RLIMIT_%s. Will attempt setting value " RLIM_FMT " instead.", (uintmax_t)rlim->rlim_max, rlimit_to_string(resource), (uintmax_t)fixed.rlim_max);
+ 
+         if (setrlimit(resource, &fixed) < 0)
+                 return -errno;
 @@ -308,13 +308,13 @@ int rlimit_format(const struct rlimit *rl, char **ret) {
          if (rl->rlim_cur >= RLIM_INFINITY && rl->rlim_max >= RLIM_INFINITY)
                  s = strdup("infinity");

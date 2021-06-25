@@ -7,4 +7,5 @@ SRC_URI += " \
            file://0001-Don-t-set-up-arch-instruction-set-flags-we-do-that-o.patch \
            file://0001-dont-setup-compiler-flags-m32-m64.patch \
            file://0001-fiber-libs-Define-SYS_futex-if-it-does-not-exist.patch \
+           file://0001-Fixes-wrong-type-for-mutex-in-regex-v5.patch \
            "

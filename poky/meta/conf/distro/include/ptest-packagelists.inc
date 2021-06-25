@@ -88,7 +88,6 @@ PTESTS_SLOW_remove_riscv64 = "valgrind-ptest"
 PTESTS_PROBLEMS_append_riscv64 = "valgrind-ptest"
 
 #    ruby-ptest \ # Timeout
-#    clutter-1.0-ptest \ # Doesn't build due to depends on cogl-1.0
 #    lz4-ptest \ # Needs a rewrite
 #    rt-tests-ptest \ # Needs to be checked whether it runs at all
 #    bash-ptest \ # Test outcomes are non-deterministic by design
@@ -102,7 +101,6 @@ PTESTS_PROBLEMS_append_riscv64 = "valgrind-ptest"
 
 PTESTS_PROBLEMS = "\
     ruby-ptest \
-    clutter-1.0-ptest \
     lz4-ptest \
     rt-tests-ptest \
     bash-ptest \

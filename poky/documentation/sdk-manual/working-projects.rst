@@ -135,9 +135,8 @@ project:
 
       To learn about environment variables established when you run the
       cross-toolchain environment setup script and how they are used or
-      overridden when the Makefile, see the "
-      Makefile-Based Projects
-      " section.
+      overridden by the Makefile, see the
+      :ref:`sdk-manual/working-projects:makefile-based projects` section.
 
    This next command is a simple way to verify the installation of your
    project. Running the command prints the architecture on which the
@@ -279,9 +278,9 @@ example:
       $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
 
 3. *Create the Makefile:* For this example, the Makefile contains
-   two lines that can be used to set the ``CC`` variable. One line is
+   two lines that can be used to set the :term:`CC` variable. One line is
    identical to the value that is set when you run the SDK environment
-   setup script, and the other line sets ``CC`` to "gcc", the default
+   setup script, and the other line sets :term:`CC` to "gcc", the default
    GNU compiler on the build host::
 
       # CC=i586-poky-linux-gcc -m32 -march=i586 --sysroot=/opt/poky/2.5/sysroots/i586-poky-linux
@@ -298,7 +297,7 @@ example:
 
 4. *Make the Project:* Use the ``make`` command to create the binary
    output file. Because variables are commented out in the Makefile, the
-   value used for ``CC`` is the value set when the SDK environment setup
+   value used for :term:`CC` is the value set when the SDK environment setup
    file was run::
 
       $ make
@@ -307,10 +306,10 @@ example:
       i586-poky-linux-gcc -m32 -march=i586 --sysroot=/opt/poky/2.5/sysroots/i586-poky-linux main.o module.o -o target_bin
 
    From the results of the previous command, you can see that
-   the compiler used was the compiler established through the ``CC``
+   the compiler used was the compiler established through the :term:`CC`
    variable defined in the setup script.
 
-   You can override the ``CC`` environment variable with the same
+   You can override the :term:`CC` environment variable with the same
    variable as set from the Makefile by uncommenting the line in the
    Makefile and running ``make`` again.
    ::
@@ -334,7 +333,7 @@ example:
    variable as part of the command line. Go into the Makefile and
    re-insert the comment character so that running ``make`` uses the
    established SDK compiler. However, when you run ``make``, use a
-   command-line argument to set ``CC`` to "gcc"::
+   command-line argument to set :term:`CC` to "gcc"::
 
       $ make clean
       rm -rf *.o
