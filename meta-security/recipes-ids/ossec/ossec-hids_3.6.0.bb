@@ -161,3 +161,5 @@ USERADD_PARAM_${PN} = "--system --home-dir /var/ossec -g ossec --shell /bin/fals
 GROUPADD_PARAM_${PN} = "--system ossec"
 
 RDEPENDS_${PN} = "openssl bash"
+
+COMPATIBLE_HOST_libc-musl = "null"

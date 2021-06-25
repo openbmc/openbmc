@@ -5,14 +5,14 @@ SECTION = "security"
 HOMEPAGE = "https://www.openwall.com/lkrg/"
 LICENSE = "GPLv2"
 
-LIC_FILES_CHKSUM = "file://LICENSE;md5=d931f44a1f4be309bcdac742d7ed92f9"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=5105ead24b08a32954f34cbaa7112432"
 
 DEPENDS = "virtual/kernel elfutils"
 
 SRC_URI = "https://www.openwall.com/lkrg/lkrg-${PV}.tar.gz \
            file://makefile_cleanup.patch "
 
-SRC_URI[sha256sum] = "a997e4d98962c359f3af163bbcfa38a736d2a50bfe35c15065b74cb57f8742bf"
+SRC_URI[sha256sum] = "cabbee1addbf3ae23a584203831e4bd1b730d22bfd1b3e44883214f220b3babd"
 
 S = "${WORKDIR}/lkrg-${PV}"
 

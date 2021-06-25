@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS_prepend_harden := "${THISDIR}/files:"
 
 SRC_URI_append_harden = " file://mountall.sh"
 

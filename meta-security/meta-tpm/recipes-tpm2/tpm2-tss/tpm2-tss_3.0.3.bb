@@ -17,7 +17,7 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[oxygen] = ",--disable-doxygen-doc, "
 PACKAGECONFIG[fapi] = "--enable-fapi,--disable-fapi,json-c "
 
-EXTRA_OECONF += "--enable-static --with-udevrulesdir=${base_prefix}/lib/udev/rules.d/"
+EXTRA_OECONF += "--enable-static --with-udevrulesdir=${nonarch_base_libdir}/udev/rules.d/"
 EXTRA_OECONF_remove = " --disable-static"
 
 
@@ -73,6 +73,6 @@ FILES_libtss2-dev = " \
     ${libdir}/libtss2*so"
 FILES_libtss2-staticdev = "${libdir}/libtss*a"
 
-FILES_${PN} = "${libdir}/udev ${base_prefix}/lib/udev"
+FILES_${PN} = "${libdir}/udev ${nonarch_base_libdir}/udev"
 
 RDEPENDS_libtss2 = "libgcrypt"

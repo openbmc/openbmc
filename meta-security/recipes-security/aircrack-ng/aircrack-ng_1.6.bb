@@ -9,8 +9,8 @@ DEPENDS = "libnl openssl sqlite3 libpcre libpcap"
 
 SRC_URI = "http://download.aircrack-ng.org/${BP}.tar.gz"
 
-SRC_URI[md5sum] = "c7c5b076dee0c25ee580b0f56f455623"
-SRC_URI[sha256sum] = "8ae08a7c28741f6ace2769267112053366550e7f746477081188ad38410383ca"
+SRC_URI[md5sum] = "22ddc85549b51ed0da0931d01ef215e5"
+SRC_URI[sha256sum] = "4f0bfd486efc6ea7229f7fbc54340ff8b2094a0d73e9f617e0a39f878999a247"
 
 inherit autotools-brokensep pkgconfig
 
@@ -29,6 +29,8 @@ do_install () {
     make DESTDIR=${D} ${OEMAKE_EXTRA} ext_scripts=true install
 }
 
-FILES_${PN} += "/usr/local/"
+FILES_${PN} += "${libdir}/*.so"
+FILES_SOLIBSDEV = ""
+INSANE_SKIP_${PN} += "dev-so"
 
 RDEPENDS_${PN} = "libpcap"

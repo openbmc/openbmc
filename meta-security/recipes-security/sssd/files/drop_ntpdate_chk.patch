@@ -1,0 +1,28 @@
+nsupdate path is needed for various exec call
+but don't run natvie tests on it.
+
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: sssd-2.5.0/src/external/nsupdate.m4
+===================================================================
+--- sssd-2.5.0.orig/src/external/nsupdate.m4
++++ sssd-2.5.0/src/external/nsupdate.m4
+@@ -3,16 +3,4 @@ AC_MSG_CHECKING(for executable nsupdate)
+ if test -x "$NSUPDATE"; then
+   AC_DEFINE_UNQUOTED([NSUPDATE_PATH], ["$NSUPDATE"], [The path to nsupdate])
+   AC_MSG_RESULT(yes)
+-
+-  AC_MSG_CHECKING(for nsupdate 'realm' support')
+-  if AC_RUN_LOG([echo realm |$NSUPDATE >&2]); then
+-    AC_MSG_RESULT([yes])
+-  else
+-    AC_MSG_RESULT([no])
+-    AC_MSG_ERROR([nsupdate does not support 'realm'])
+-  fi
+-
+-else
+-  AC_MSG_RESULT([no])
+-  AC_MSG_ERROR([nsupdate is not available])
+ fi

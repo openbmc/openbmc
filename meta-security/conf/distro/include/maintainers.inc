@@ -1,4 +1,4 @@
-# meta-securiyt Maintainers File
+# meta-security Maintainers File
 #
 # This file contains a list of recipe maintainers.
 #

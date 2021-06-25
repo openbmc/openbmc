@@ -8,8 +8,8 @@ DEPENDS = "glibc llvm libtool db openssl zlib curl libxml2 bison pcre2 json-c li
  
 LIC_FILES_CHKSUM = "file://COPYING.txt;beginline=2;endline=3;md5=f7029fbbc5898b273d5902896f7bbe17"
 
-# May 2nd
-SRCREV = "de0086aa918b79cd22570d0c05977a288b197e23"
+# May 15th
+SRCREV = "fe96de86bb90c489aa509ee9135f776b7a2a7eb4"
 
 SRC_URI = "git://github.com/vrtadmin/clamav-devel;branch=dev/0.104 \
     file://clamd.conf \

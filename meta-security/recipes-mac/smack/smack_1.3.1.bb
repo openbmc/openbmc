@@ -13,6 +13,11 @@ SRC_URI = " \
 
 PV = "1.3.1"
 
+# CVE-2014-0363, CVE-2014-0364, CVE-2016-10027 is valnerble for other product.
+CVE_CHECK_WHITELIST += "CVE-2014-0363"
+CVE_CHECK_WHITELIST += "CVE-2014-0364"
+CVE_CHECK_WHITELIST += "CVE-2016-10027"
+
 inherit autotools update-rc.d pkgconfig ptest
 inherit ${@bb.utils.contains('VIRTUAL-RUNTIME_init_manager','systemd','systemd','', d)}
 inherit features_check

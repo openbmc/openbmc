@@ -1,6 +1,25 @@
 meta-tpm layer
 ==============
 
+The bbappend files for some recipes (e.g. linux-yocto) in this layer need
+to have 'tpm' in DISTRO_FEATURES to have effect.
+To enable them, add in configuration file the following line.
+
+  DISTRO_FEATURES_append = " tmp"
+
+If meta-tpm is included, but tpm is not enabled as a
+distro feature a warning is printed at parse time:
+
+    You have included the meta-tpm layer, but
+    'tpm' has not been enabled in your DISTRO_FEATURES. Some bbappend files
+    and preferred version setting may not take effect.
+
+If you know what you are doing, this warning can be disabled by setting the following
+variable in your configuration:
+
+  SKIP_META_TPM_SANITY_CHECK = 1
+
+
 This layer contains base TPM recipes.
 
 Dependencies

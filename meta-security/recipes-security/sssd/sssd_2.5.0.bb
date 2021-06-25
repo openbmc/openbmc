@@ -5,8 +5,8 @@ SECTION = "base"
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-DEPENDS = "openldap cyrus-sasl libtdb ding-libs libpam c-ares krb5 autoconf-archive"
-DEPENDS_append = " libldb dbus libtalloc libpcre glib-2.0 popt e2fsprogs libtevent"
+DEPENDS = "acl attr openldap cyrus-sasl libtdb ding-libs libpam c-ares krb5 autoconf-archive"
+DEPENDS_append = " libldb dbus libtalloc libpcre glib-2.0 popt e2fsprogs libtevent bind p11-kit"
 
 DEPENDS_append_libc-musl = " musl-nscd"
 
@@ -15,16 +15,15 @@ DEPENDS_append_libc-musl = " musl-nscd"
 DEPENDS += "${@bb.utils.contains('PACKAGECONFIG', 'nss', '', \
                bb.utils.contains('PACKAGECONFIG', 'crypto', '', 'nss', d), d)}"
 
-SRC_URI = "https://releases.pagure.org/SSSD/${BPN}/${BP}.tar.gz \
+SRC_URI = "https://github.com/SSSD/sssd/releases/download/2.5.0/sssd-2.5.0.tar.gz \
            file://sssd.conf \
            file://volatiles.99_sssd \
+           file://no_gen.patch \
+           file://fix_gid.patch \
+           file://drop_ntpdate_chk.patch \
            file://fix-ldblibdir.patch \
-           file://0001-build-Don-t-use-AC_CHECK_FILE-when-building-manpages.patch \
-           file://0001-nss-Collision-with-external-nss-symbol.patch \
-           file://0002-Provide-missing-defines-which-otherwise-are-availabl.patch \
            "
-
-SRC_URI[sha256sum] = "2e1a7bf036b583f686d35164f2d79bdf4857b98f51fe8b0d17aa0fa756e4d0c0"
+SRC_URI[sha256sum] = "afa62d7d8d23fca3aba093abe4ec0d14e7d9346c5b28ceb7c2c624bed98caa06"
 
 inherit autotools pkgconfig gettext python3-dir features_check systemd
 
@@ -34,7 +33,7 @@ SSSD_UID ?= "root"
 SSSD_GID ?= "root"
 
 CACHED_CONFIGUREVARS = "ac_cv_member_struct_ldap_conncb_lc_arg=no \
-    ac_cv_path_NSUPDATE=${bindir} ac_cv_prog_HAVE_PYTHON3=${PYTHON_DIR} \
+    ac_cv_prog_HAVE_PYTHON3=${PYTHON_DIR} \
     "
 
 PACKAGECONFIG ?="nss nscd autofs sudo infopipe"
@@ -42,13 +41,13 @@ PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', 
 PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 
 PACKAGECONFIG[autofs] = "--with-autofs, --with-autofs=no"
-PACKAGECONFIG[crypto] = "--with-crypto=libcrypto, , libcrypto"
+PACKAGECONFIG[crypto] = ", , libcrypto"
 PACKAGECONFIG[curl] = "--with-kcm, --without-kcm, curl jansson"
 PACKAGECONFIG[infopipe] = "--with-infopipe, --with-infopipe=no, "
 PACKAGECONFIG[manpages] = "--with-manpages, --with-manpages=no, libxslt-native docbook-xml-dtd4-native docbook-xsl-stylesheets-native"
 PACKAGECONFIG[nl] = "--with-libnl, --with-libnl=no, libnl"
 PACKAGECONFIG[nscd] = "--with-nscd=${sbindir}, --with-nscd=no "
-PACKAGECONFIG[nss] = "--with-crypto=nss, ,nss,"
+PACKAGECONFIG[nss] = ", ,nss,"
 PACKAGECONFIG[python3] = "--with-python3-bindings, --without-python3-bindings"
 PACKAGECONFIG[samba] = "--with-samba, --with-samba=no, samba"
 PACKAGECONFIG[selinux] = "--with-selinux, --with-selinux=no --with-semanage=no, libselinux"
@@ -65,6 +64,7 @@ EXTRA_OECONF += " \
     --without-python2-bindings \
     --without-secrets \
     --with-xml-catalog-path=${STAGING_ETCDIR_NATIVE}/xml/catalog \
+    --with-pid-path=/run \
 "
 
 do_configure_prepend() {
@@ -75,6 +75,9 @@ do_configure_prepend() {
     sed -i -e "s#\$sss_extra_libdir##" ${S}/src/external/libresolv.m4
 }
 
+do_compile_prepend () {
+     echo '#define NSUPDATE_PATH "${bindir}"' >> ${B}/config.h
+}
 do_install () {
     oe_runmake install  DESTDIR="${D}"
     rmdir --ignore-fail-on-non-empty "${D}/${bindir}"
@@ -87,8 +90,8 @@ do_install () {
         echo "d /var/log/sssd 0750 - - - -" > ${D}${sysconfdir}/tmpfiles.d/sss.conf
     fi
 
-    # Remove /var/run as it is created on startup
-    rm -rf ${D}${localstatedir}/run
+    # Remove /run as it is created on startup
+    rm -rf ${D}/run
 
     rm -f ${D}${systemd_system_unitdir}/sssd-secrets.*
 }
@@ -119,10 +122,10 @@ SYSTEMD_SERVICE_${PN} = " \
 "
 SYSTEMD_AUTO_ENABLE = "disable"
 
-FILES_${PN} += "${libdir} ${datadir} ${base_libdir}/security/pam_sss.so"
+FILES_${PN} += "${libdir} ${datadir} ${base_libdir}/security/pam_sss*.so"
 FILES_${PN}-dev = " ${includedir}/* ${libdir}/*la ${libdir}/*/*la"
 
 # The package contains symlinks that trip up insane
 INSANE_SKIP_${PN} = "dev-so"
 
-RDEPENDS_${PN} = "bind dbus libldb libpam"
+RDEPENDS_${PN} = "bind bind-utils dbus libldb libpam"

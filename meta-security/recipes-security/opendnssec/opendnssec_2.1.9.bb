@@ -10,7 +10,7 @@ SRC_URI = "https://dist.opendnssec.org/source/opendnssec-${PV}.tar.gz \
            file://libdns_conf_fix.patch \
            "
 
-SRC_URI[sha256sum] = "900a213103ff19a405e446327fbfcea9ec13e405283d87b6ffc24a10d9a268f5"
+SRC_URI[sha256sum] = "6d1d466c8d7f507f3e665f4bfe4d16a68d6bff9d7c2ab65f852e2b2a821c28b5"
 
 inherit autotools pkgconfig perlnative
 
