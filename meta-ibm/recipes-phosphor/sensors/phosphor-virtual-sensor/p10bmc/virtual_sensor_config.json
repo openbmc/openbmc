@@ -27,5 +27,31 @@
             ]
         },
         "Expression": "T0"
+    },
+    {
+        "Desc":
+        {
+            "Name": "Altitude",
+            "SensorType": "altitude"
+        },
+        "Threshold" :
+        {
+            "WarningHigh": 3050
+        },
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "P0",
+                    "Desc":
+                    {
+                        "Name": "Station_Pressure",
+                        "SensorType": "pressure"
+                    }
+                }
+            ]
+        },
+        "Expression": "44330.0 * (1.0 - ((P0/101325.0) ^ (1/5.255)))"
     }
 ]
