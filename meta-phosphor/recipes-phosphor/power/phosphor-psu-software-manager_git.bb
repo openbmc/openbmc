@@ -2,7 +2,7 @@ HOMEPAGE = "https://github.com/openbmc/phosphor-psu-code-mgmt"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 SRC_URI += "git://github.com/openbmc/phosphor-psu-code-mgmt"
-SRCREV = "de27029319bf04250d7660976091b7c297ed3c41"
+SRCREV = "7905f587ac6aace27e7238a815b7cf5c1025c6ea"
 SUMMARY = "Phosphor PSU software manager"
 DESCRIPTION = "Providing PSU firmware version and upgrade"
 
