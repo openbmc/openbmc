@@ -8,12 +8,12 @@ function fw_rev() {
     case $1 in
     cpldb)
         rsp=($(i2cget -y -f -a 13 0x76 0x00 i 5))
-        ver=$(printf '%d.%d.%d.%d' ${rsp[6]} ${rsp[5]} ${rsp[4]} ${rsp[3]})
+        ver=$(printf '%d.%d.%d.%d' ${rsp[5]} ${rsp[4]} ${rsp[3]} ${rsp[2]})
         ;;
     cpldm)
         I2C_BUS_DEV=$(readlink "/sys/bus/i2c/devices/4-0077/channel-2" | cut -c 8-)
         rsp=($(i2cget -y -f -a $I2C_BUS_DEV 0x76 0x00 i 5))
-        ver=$(printf '%d.%d.%d.%d' ${rsp[6]} ${rsp[5]} ${rsp[4]} ${rsp[3]})
+        ver=$(printf '%d.%d.%d.%d' ${rsp[5]} ${rsp[4]} ${rsp[3]} ${rsp[2]})
         ;;
     *)
         ;;
