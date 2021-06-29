@@ -1,8 +1,10 @@
 {
-  "PostComplete": "POST_COMPLETE",
-  "PwrButton": "POWER_BUTTON",
-  "PwrOK": "PS_PWROK",
-  "PwrOut": "POWER_OUT",
-  "RstButton": "RESET_BUTTON",
-  "RstOut": "RESET_OUT"
+  "gpio_configs":{
+      "PostComplete": "POST_COMPLETE",
+      "PwrButton": "POWER_BUTTON",
+      "PwrOK": "PS_PWROK",
+      "PwrOut": "POWER_OUT",
+      "RstButton": "RESET_BUTTON",
+      "RstOut": "RESET_OUT"
+  }
 }
