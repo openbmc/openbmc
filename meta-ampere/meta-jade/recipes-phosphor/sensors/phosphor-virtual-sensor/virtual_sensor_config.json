@@ -1,0 +1,36 @@
+[
+    {
+        "Desc":
+        {
+            "Name": "total_power",
+            "SensorType": "power"
+        },
+        "Threshold" :
+        {
+        },
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "PSU0_POUTPUT",
+                    "Desc":
+                    {
+                        "Name": "PSU0_POUTPUT",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "PSU1_POUTPUT",
+                    "Desc":
+                    {
+                        "Name": "PSU1_POUTPUT",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "PSU0_POUTPUT + PSU1_POUTPUT"
+    }
+]
+
