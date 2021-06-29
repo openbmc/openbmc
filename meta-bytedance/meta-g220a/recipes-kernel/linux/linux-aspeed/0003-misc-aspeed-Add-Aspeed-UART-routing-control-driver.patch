@@ -1,7 +1,7 @@
-From dc37d698586a7ca4e4381ef7726249fa70d14c89 Mon Sep 17 00:00:00 2001
+From e0769dda0adcabc41d322726b16148e3960473c1 Mon Sep 17 00:00:00 2001
 From: Oskar Senft <osk@google.com>
 Date: Wed, 8 Aug 2018 10:15:05 -0400
-Subject: [PATCH 3/5] misc: aspeed: Add Aspeed UART routing control driver.
+Subject: [PATCH] misc: aspeed: Add Aspeed UART routing control driver.
 
 This driver adds sysfs files that allow the BMC userspace to configure
 how UARTs and physical serial I/O ports are routed.
@@ -102,12 +102,12 @@ index 000000000000..cf1c2a466875
 +$ cat /sys/bus/platform/drivers/aspeed-uart-routing/*.uart_routing/uart1
 +io1 io2 io3 io4 uart2 [uart3] uart4 io6
 diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
-index d8626a0d3e31..48a519c59bdf 100644
+index 54cfb599cd3e..9d2d95ab313a 100644
 --- a/drivers/misc/Kconfig
 +++ b/drivers/misc/Kconfig
-@@ -451,6 +451,12 @@ config MCTP_LPC
- 	  Implements the MCTP LPC binding via KCS LPC IO cycles for control and
-           LPC FWH cycles for data
+@@ -487,6 +487,12 @@ config NPCM7XX_JTAG_MASTER
+ 	help
+ 	  Control PSPI/GPIO to transmit jtag signals to support jtag master function.
  
 +config ASPEED_UART_ROUTING
 +	tristate "Aspeed ast2500 UART routing control"
@@ -115,17 +115,17 @@ index d8626a0d3e31..48a519c59bdf 100644
 +	  If you want to configure UART routing on Aspeed BMC platforms, enable
 +	  this option.
 +
- config MISC_RTSX
- 	tristate
- 	default MISC_RTSX_PCI || MISC_RTSX_USB
+ source "drivers/misc/c2port/Kconfig"
+ source "drivers/misc/eeprom/Kconfig"
+ source "drivers/misc/cb710/Kconfig"
 diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
-index 183970192ced..4e67e21c2e65 100644
+index 39e5ba5d0985..77e95db728da 100644
 --- a/drivers/misc/Makefile
 +++ b/drivers/misc/Makefile
-@@ -60,3 +60,4 @@ obj-$(CONFIG_XILINX_SDFEC)	+= xilinx_sdfec.o
+@@ -60,3 +60,4 @@ obj-$(CONFIG_HISI_HIKEY_USB)	+= hisi_hikey_usb.o
  obj-$(CONFIG_NPCM7XX_LPC_BPC)	+= npcm7xx-lpc-bpc.o
  obj-$(CONFIG_NPCM7XX_PCI_MBOX)	+= npcm7xx-pci-mbox.o
- obj-$(CONFIG_MCTP_LPC)		+= mctp-lpc.o
+ obj-$(CONFIG_NPCM7XX_JTAG_MASTER)	+= npcm7xx-jtag-master.o
 +obj-$(CONFIG_ASPEED_UART_ROUTING) += aspeed-uart-routing.o
 diff --git a/drivers/misc/aspeed-uart-routing.c b/drivers/misc/aspeed-uart-routing.c
 new file mode 100644
