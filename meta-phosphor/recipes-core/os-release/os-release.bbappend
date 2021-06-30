@@ -15,7 +15,15 @@ def run_git(d, cmd):
         bb.warn("Unexpected exception from 'git' call: %s" % e)
         pass
 
-DISTRO_VERSION ??= "${@run_git(d, 'describe --dirty')}"
+# DISTRO_VERSION can be overridden by a bbappend or config, so it must be a
+# weak override.  But, when a variable is weakly overridden the definition
+# and not the contents are used in the task-hash (for sstate reuse).  We need
+# a strong variable in the vardeps chain for do_compile so that we get the
+# contents of the 'git describe --dirty' call.  Create a strong/immediate
+# indirection via PHOSPHOR_OS_RELEASE_DISTRO_VERSION.
+PHOSPHOR_OS_RELEASE_DISTRO_VERSION := "${@run_git(d, 'describe --dirty')}"
+DISTRO_VERSION ??= "${PHOSPHOR_OS_RELEASE_DISTRO_VERSION}"
+
 VERSION = "${@'-'.join(d.getVar('VERSION_ID').split('-')[0:2])}"
 
 BUILD_ID := "${@run_git(d, 'describe --abbrev=0')}"
