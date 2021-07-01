@@ -20,6 +20,7 @@ OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " phosphor-ipmi-blobs-binarystore"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " phosphor-virtual-sensor"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " acpi-power-state-daemon"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " virtual/obmc-gpio-presence"
+OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " ipmitool"
 
 # Add back packages that were part of packagegroup-obmc-apps-extras
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " phosphor-hwmon"
@@ -27,6 +28,8 @@ OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " phosphor-inventory-manager"
 # Required for obmc-bmcweb
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " bmcweb"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " phosphor-bmcweb-cert-config"
+OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " phosphor-nslcd-authority-cert-config"
+OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " phosphor-user-manager"
 # Required for LEDs. Part of obmc-leds
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " ${VIRTUAL-RUNTIME_obmc-leds-manager}"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " ${VIRTUAL-RUNTIME_obmc-leds-sysfs}"
