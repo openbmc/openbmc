@@ -128,8 +128,20 @@ set_hdd_prsnt() {
   fi
 }
 
-KERNEL_FIU_ID="c0000000.fiu"
+KERNEL_FIU_ID="c0000000.spi"
 KERNEL_SYSFS_FIU="/sys/bus/platform/drivers/NPCM-FIU"
+
+# the node of FIU is spi for kernel 5.10, but
+# for less than or equal kernel 5.4, the node
+# is fiu
+for fname in $(find ${KERNEL_SYSFS_FIU} -type l)
+do
+    if [ "${fname##*\.}" == "fiu" ]
+    then
+        KERNEL_FIU_ID="c0000000.fiu"
+        break
+    fi
+done
 
 bind_host_mtd() {
   set_gpio_direction 'SPI_SW_SELECT' high
@@ -171,13 +183,6 @@ verify_host_bios() {
 
   echo "BIOS verification complete!"
   unbind_host_mtd
-}
-
-reset_phy() {
-  ifconfig eth1 down
-  set_gpio_direction 'RST_BMC_PHY_N' low
-  set_gpio_direction 'RST_BMC_PHY_N' high
-  ifconfig eth1 up
 }
 
 parse_pe_fru() {
@@ -225,6 +230,14 @@ check_power_status() {
     echo $res0
 }
 
+clk_buf_bus_switch="11-0076"
+clk_buf_driver="/sys/bus/i2c/drivers/pca954x/"
+
+bind_clk_buf_switch() {
+  echo "Re-bind i2c bus 11 clk_buf_switch"
+  echo "${clk_buf_bus_switch}" > "${clk_buf_driver}"/bind
+}
+
 main() {
   get_board_rev_id
   get_board_sku_id
@@ -237,8 +250,6 @@ main() {
   fi
 
   check_board_sku
-
-  reset_phy
 
   if [[ $(check_power_status) != \
        'xyz.openbmc_project.State.Chassis.PowerState.On' ]]; then
@@ -257,6 +268,9 @@ main() {
         xyz.openbmc_project.State.Host \
         RequestedHostTransition s \
         xyz.openbmc_project.State.Host.Transition.On
+
+    sleep 1
+    bind_clk_buf_switch
   else
     echo "Host is already running, doing nothing!" >&2
   fi
