@@ -12,7 +12,7 @@ check_usb_local_administered() {
 # Set the locally administered bit (the second least-significant
 # bit of the first octet) of the MAC address
 set_local_administered_bit() {
-    mac="$(cat $1)"
+    mac="$(tr -d '\0' < $1)"
     first_byte="${mac:0:2}"
     first_byte="$((0x$first_byte|2))"
     first_byte="$(printf "%02x\n" "$first_byte")"
