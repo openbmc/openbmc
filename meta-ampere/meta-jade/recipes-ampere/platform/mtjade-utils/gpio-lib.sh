@@ -1,7 +1,8 @@
 #!/bin/bash
+source /usr/sbin/gpio-defs.sh
 
 function gpio_number() {
-	GPIO_BASE=$(cat /sys/class/gpio/gpio*/base)
+	GPIO_BASE=$(cat /sys/class/gpio/gpiochip$GPIO_CHIP0_BASE/base)
 	echo $((${GPIO_BASE} + $1))
 }
 
