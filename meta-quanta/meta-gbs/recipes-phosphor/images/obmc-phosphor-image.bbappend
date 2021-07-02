@@ -21,6 +21,7 @@ OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " phosphor-virtual-sensor"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " acpi-power-state-daemon"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " virtual/obmc-gpio-presence"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " ipmitool"
+OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " phosphor-health-monitor"
 
 # Add back packages that were part of packagegroup-obmc-apps-extras
 OBMC_IMAGE_EXTRA_INSTALL_append_gbs = " phosphor-hwmon"
