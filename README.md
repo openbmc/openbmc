@@ -168,7 +168,7 @@ The Technical Steering Committee (TSC) guides the project. Members are:
  * Sai Dasari, Facebook
  * James Mihm, Intel
  * Sagar Dharia, Microsoft
- * Supreeth Venkatesh, Arm
+ * Samer El-Haj-Mahmoud, Arm
 
 ## Contact
 - Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
