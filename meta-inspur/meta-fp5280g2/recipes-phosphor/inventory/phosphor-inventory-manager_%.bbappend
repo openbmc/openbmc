@@ -1,8 +1,8 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 PACKAGECONFIG_append = " associations"
-SRC_URI_append = " file://associations.json"
+SRC_URI += " file://associations.json"
 
-DEPENDS_append_fp5280g2 = " phosphor-inventory-manager-chassis"
+DEPENDS += " phosphor-inventory-manager-chassis"
 
 do_install_append() {
     install -d ${D}${base_datadir}
