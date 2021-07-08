@@ -16,7 +16,7 @@ import os
 import sys
 import datetime
 
-current_version = "3.1.8"
+current_version = "3.1.9"
 
 # String used in sidebar
 version = 'Version: ' + current_version

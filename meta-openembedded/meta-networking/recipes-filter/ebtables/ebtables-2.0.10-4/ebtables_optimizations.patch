@@ -1,0 +1,19 @@
+ebtables: use optimizations from bitbake
+
+Enables building with O2 or Os to create smaller binaries.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Mikko Rapeli <mikko.rapeli@bmw.de>
+
+--- a/Makefile	2021-04-16 12:43:40.475431286 +0000
++++ b/Makefile	2021-04-16 12:45:23.654597711 +0000
+@@ -18,7 +18,7 @@ SYSCONFIGDIR:=/etc/sysconfig
+ DESTDIR:=
+ 
+ CFLAGS:=-Wall -Wunused -Werror
+-CFLAGS_SH_LIB:=-fPIC -O3
++CFLAGS_SH_LIB:=-fPIC
+ CC:=gcc
+ 
+ ifeq ($(shell uname -m),sparc64)

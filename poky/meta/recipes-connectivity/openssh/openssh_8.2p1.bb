@@ -24,6 +24,7 @@ SRC_URI = "http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${PV}.tar
            file://fix-potential-signed-overflow-in-pointer-arithmatic.patch \
            file://sshd_check_keys \
            file://add-test-support-for-busybox.patch \
+           file://CVE-2020-14145.patch \
            "
 SRC_URI[md5sum] = "3076e6413e8dbe56d33848c1054ac091"
 SRC_URI[sha256sum] = "43925151e6cf6cee1450190c0e9af4dc36b41c12737619edff8bcebdff64e671"
@@ -35,7 +36,17 @@ CVE_CHECK_WHITELIST += "CVE-2007-2768"
 # and when running in a Kerberos environment. As such it is not relevant to OpenEmbedded
 CVE_CHECK_WHITELIST += "CVE-2014-9278"
 
-# CVE only applies to some distributed RHEL binaries
+# As per upstream, because of the way scp is based on a historical protocol called rcp
+# which relies on that style of argument passing and therefore encounters expansion
+# problems. Making changes to how the scp command line works breaks the pattern used
+# by scp consumers. Upstream therefore recommends the use of rsync in the place of
+# scp for better security. https://bugzilla.redhat.com/show_bug.cgi?id=1860487
+CVE_CHECK_WHITELIST += "CVE-2020-15778"
+
+# CVE-2008-3844 was reported in OpenSSH on Red Hat Enterprise Linux and
+# certain packages may have been compromised. This CVE is not applicable
+# as our source is OpenBSD. https://securitytracker.com/id?1020730
+# https://www.securityfocus.com/bid/30794
 CVE_CHECK_WHITELIST += "CVE-2008-3844"
 
 PAM_SRC_URI = "file://sshd"

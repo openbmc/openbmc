@@ -2,6 +2,7 @@
 import sys
 import os
 import subprocess
+import resource
 
 env = os.environ.copy()
 args = sys.argv[1:]
@@ -44,6 +45,14 @@ if targettype == "user":
     qemuargs += ["-L", sysroot]
     qemuargs += ["-E", "LD_LIBRARY_PATH={}".format(":".join(libpaths))]
     command = qemuargs + args
+
+    # We've seen qemu-arm using up all system memory for some glibc
+    # tests e.g. nptl/tst-pthread-timedlock-lockloop
+    # Cap at 8GB since no test should need more than that
+    # (5GB adds 7 failures for qemuarm glibc test run)
+    limit = 8*1024*1024*1024
+    resource.setrlimit(resource.RLIMIT_AS, (limit, limit))
+
 elif targettype == "ssh":
     host = os.environ.get("SSH_HOST", None)
     user = os.environ.get("SSH_HOST_USER", None)

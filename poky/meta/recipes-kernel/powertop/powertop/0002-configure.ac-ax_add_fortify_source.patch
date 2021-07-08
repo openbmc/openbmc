@@ -1,0 +1,70 @@
+From 0d833743954ac1c58773cbf7a78fe0dc8105ae4a Mon Sep 17 00:00:00 2001
+From: Joe Konno <joe.konno@linux.intel.com>
+Date: Tue, 11 Feb 2020 14:15:42 -0800
+Subject: [PATCH] configure.ac: ax_add_fortify_source
+
+Use a maintained autoconf-archive macro to determine whether we need to
+add -D_FORTIFY_SOURCE=3D2, or if the underlying OS (or toolchain) has it
+baked in.
+
+Signed-off-by: Joe Konno <joe.konno@intel.com>
+
+Fixes:
+  aclocal: error: too many loops
+
+Upstream-Status: Backport from 2.12
+Signed-off-by: Tim Orling <timothy.t.orling@intel.com>
+---
+ configure.ac                |  2 +-
+ m4/gcc_fortify_source_cc.m4 | 29 -----------------------------
+ 2 files changed, 1 insertion(+), 30 deletions(-)
+ delete mode 100644 m4/gcc_fortify_source_cc.m4
+
+diff --git a/configure.ac b/configure.ac
+index d6a15e1..d68369c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -36,7 +36,7 @@ AC_PROG_LIBTOOL
+ AC_PROG_CC
+ AC_PROG_INSTALL
+ AM_PROG_CC_C_O
+-GCC_FORTIFY_SOURCE_CC
++AX_ADD_FORTIFY_SOURCE
+ AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+ 
+ # Checks for libraries.
+diff --git a/m4/gcc_fortify_source_cc.m4 b/m4/gcc_fortify_source_cc.m4
+deleted file mode 100644
+index 1206672..0000000
+--- a/m4/gcc_fortify_source_cc.m4
++++ /dev/null
+@@ -1,29 +0,0 @@
+-dnl GCC_FORTIFY_SOURCE_CC
+-dnl checks -D_FORTIFY_SOURCE with the C++ compiler, if it exists then
+-dnl updates CXXCPP
+-AC_DEFUN([GCC_FORTIFY_SOURCE_CC],[
+-  AC_LANG_ASSERT([C++])
+-  AS_IF([test "X$CXX" != "X"], [
+-    AC_MSG_CHECKING([for FORTIFY_SOURCE support])
+-    fs_old_cxxcpp="$CXXCPP"
+-    fs_old_cxxflags="$CXXFLAGS"
+-    CXXCPP="$CXXCPP -D_FORTIFY_SOURCE=2"
+-    CXXFLAGS="$CXXFLAGS -Werror"
+-    AC_COMPILE_IFELSE([
+-      AC_LANG_PROGRAM([[]], [[
+-        int main(void) {
+-        #if !(__GNUC_PREREQ (4, 1) )
+-        #error No FORTIFY_SOURCE support
+-        #endif
+-          return 0;
+-        }
+-      ]], [
+-        AC_MSG_RESULT([yes])
+-      ], [
+-        AC_MSG_RESULT([no])
+-        CXXCPP="$fs_old_cxxcpp"
+-      ])
+-    ])
+-    CXXFLAGS="$fs_old_cxxflags"
+-  ])
+-])

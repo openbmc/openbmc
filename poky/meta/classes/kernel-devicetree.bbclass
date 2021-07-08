@@ -9,6 +9,9 @@ FILES_${KERNEL_PACKAGE_NAME}-image-zimage-bundle = "/${KERNEL_IMAGEDEST}/zImage-
 # Generate kernel+devicetree bundle
 KERNEL_DEVICETREE_BUNDLE ?= "0"
 
+# dtc flags passed via DTC_FLAGS env variable
+KERNEL_DTC_FLAGS ?= ""
+
 normalize_dtb () {
 	dtb="$1"
 	if echo $dtb | grep -q '/dts/'; then
@@ -50,6 +53,10 @@ do_configure_append() {
 }
 
 do_compile_append() {
+	if [ -n "${KERNEL_DTC_FLAGS}" ]; then
+		export DTC_FLAGS="${KERNEL_DTC_FLAGS}"
+	fi
+
 	for dtbf in ${KERNEL_DEVICETREE}; do
 		dtb=`normalize_dtb "$dtbf"`
 		oe_runmake $dtb CC="${KERNEL_CC} $cc_extra " LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS}

@@ -5,19 +5,33 @@ python __anonymous() {
         raise bb.parse.SkipRecipe(msg)
 }
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/linux-raspberrypi:"
+LINUX_VERSION ?= "5.10.y"
+LINUX_RPI_BRANCH ?= "rpi-5.10.y"
+LINUX_RPI_KMETA_BRANCH ?= "yocto-5.10"
 
-LINUX_VERSION ?= "4.19"
-LINUX_RPI_BRANCH ?= "rpi-4.19.y"
+# Set default SRCREVs. Both the machine and meta SRCREVs are statically set
+# to the as in 5.10 recipe, and hence prevent network access during parsing. If
+# linux-yocto-dev is the preferred provider, they will be overridden to
+# AUTOREV in following anonymous python routine and resolved when the
+# variables are finalized.
+SRCREV_machine ?= '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/kernel", "linux-raspberrypi-dev", "${AUTOREV}", "89399e6e7e33d6260a954603ca03857df594ffd3", d)}'
+SRCREV_meta ?= '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/kernel", "linux-raspberrypi-dev", "${AUTOREV}", "a19886b00ea7d874fdd60d8e3435894bb16e6434", d)}'
 
-SRCREV = "${AUTOREV}"
+KMETA = "kernel-meta"
+
 SRC_URI = " \
-    git://github.com/raspberrypi/linux.git;protocol=git;branch=${LINUX_RPI_BRANCH} \
+    git://github.com/raspberrypi/linux.git;name=machine;branch=${LINUX_RPI_BRANCH} \
+    git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=${LINUX_RPI_KMETA_BRANCH};destsuffix=${KMETA} \
+    file://powersave.cfg \
+    file://android-drivers.cfg \
     "
+
 require linux-raspberrypi.inc
+
+LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
+
+KERNEL_EXTRA_ARGS += "DTC_FLAGS='-@ -H epapr'"
 
 # Disable version check so that we don't have to edit this recipe every time
 # upstream bumps the version
 KERNEL_VERSION_SANITY_SKIP = "1"
-
-LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"

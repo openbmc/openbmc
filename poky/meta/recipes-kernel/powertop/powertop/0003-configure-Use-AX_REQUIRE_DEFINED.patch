@@ -1,0 +1,29 @@
+From fbf74492236676e844b021b0dbb45b1ca43a0410 Mon Sep 17 00:00:00 2001
+From: David King <amigadave@amigadave.com>
+Date: Thu, 15 Apr 2021 11:45:13 +0100
+Subject: [PATCH] configure: Use AX_REQUIRE_DEFINED
+
+Require additional macros to be defined early, to avoid an aclocal
+"too many loops" error when copying macros.
+
+Upstream-Status: Backport from tip
+
+Signed-off-by: Tim Orling <ticotimo@gmail.com>
+---
+ configure.ac | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index d68369c..b90831b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -29,6 +29,9 @@ AM_GNU_GETTEXT([external])
+ AM_GNU_GETTEXT_VERSION([0.18.2])
+ 
+ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
++AX_REQUIRE_DEFINED([AX_ADD_FORTIFY_SOURCE])
++AX_REQUIRE_DEFINED([AX_CXX_COMPILE_STDCXX])
++AX_REQUIRE_DEFINED([AX_PTHREAD])
+ # Checks for programs.
+ AC_PROG_CPP
+ AC_PROG_CXX

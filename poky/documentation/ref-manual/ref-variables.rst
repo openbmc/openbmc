@@ -3811,6 +3811,15 @@ system and gives an overview of their function and contents.
 
          KERNEL_ARTIFACT_NAME ?= "${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
+   :term:`KERNEL_DTC_FLAGS`
+      Specifies the ``dtc`` flags that are passed to the Linux kernel build
+      system when generating the device trees (via ``DTC_FLAGS`` environment
+      variable).
+
+      In order to use this variable, the
+      :ref:`kernel-devicetree <ref-classes-kernel-devicetree>` class must
+      be inherited.
+
    :term:`KERNEL_EXTRA_ARGS`
       Specifies additional ``make`` command-line arguments the OpenEmbedded
       build system passes on when compiling the kernel.

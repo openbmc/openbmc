@@ -54,6 +54,7 @@ SRC_URI = "git://github.com/opencv/opencv.git;name=opencv \
            file://CVE-2019-14493.patch \
            file://CVE-2019-15939.patch \
            file://CVE-2019-19624.patch \
+           file://CVE-2019-5063_and_2019-5064.patch \
            "
 PV = "4.1.0"
 

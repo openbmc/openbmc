@@ -706,6 +706,8 @@ def sstate_package(ss, d):
 
     return
 
+sstate_package[vardepsexclude] += "SSTATE_SIG_KEY"
+
 def pstaging_fetch(sstatefetch, d):
     import bb.fetch2
 

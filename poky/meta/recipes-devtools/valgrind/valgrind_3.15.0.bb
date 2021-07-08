@@ -107,7 +107,7 @@ VALGRINDARCH_mipsel = "mips32"
 VALGRINDARCH_mips64el = "mips64"
 VALGRINDARCH_powerpc = "ppc"
 VALGRINDARCH_powerpc64 = "ppc64"
-VALGRINDARCH_powerpc64el = "ppc64le"
+VALGRINDARCH_powerpc64le = "ppc64le"
 
 INHIBIT_PACKAGE_STRIP_FILES = "${PKGD}${libdir}/valgrind/vgpreload_memcheck-${VALGRINDARCH}-linux.so"
 

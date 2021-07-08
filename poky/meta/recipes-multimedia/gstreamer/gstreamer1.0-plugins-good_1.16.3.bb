@@ -8,6 +8,8 @@ SRC_URI = " \
             https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${PV}.tar.xz \
             file://0001-qmlgl-ensure-Qt-defines-GLsync-to-fix-compile-on-som.patch \
             file://0001-qt-include-ext-qt-gstqtgl.h-instead-of-gst-gl-gstglf.patch \
+            file://CVE-2021-3497.patch \
+            file://CVE-2021-3498.patch \
             "
 
 SRC_URI[md5sum] = "c79b6c2f8eaadb2bb66615b694db399e"
