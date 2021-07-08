@@ -1,4 +1,7 @@
 #!/bin/bash
+#ampere_platform_config.sh is platform configuration file
+source /usr/sbin/gpio-defs.sh
+
 # Usage of this utility
 function usage() {
   echo "usage: power-util mb [on|status|cycle|reset|graceful_reset|force_reset|soft_off]";
@@ -43,9 +46,9 @@ graceful_shutdown() {
 soft_off() {
   # Trigger shutdown_req
   touch /run/openbmc/host@0-softpoweroff
-  gpioset -l 0 49=1
+  gpioset -l $GPIO_CHIP0_IDX $S0_SHD_REQ_L=1
   sleep 1s
-  gpioset -l 0 49=0
+  gpioset -l $GPIO_CHIP0_IDX $S0_SHD_REQ_L=0
 
   # Wait for shutdown_ack from the host in 30 seconds
   cnt=30
@@ -89,9 +92,9 @@ force_reset() {
     fi
   fi
   echo "Triggering sysreset pin"
-  gpioset -l 0 91=1
+  gpioset -l $GPIO_CHIP0_IDX $S0_SYSRESET_L=1
   sleep 1
-  gpioset -l 0 91=0
+  gpioset -l $GPIO_CHIP0_IDX $S0_SYSRESET_L=0
 }
 
 if [ $# -lt 2 ]; then
