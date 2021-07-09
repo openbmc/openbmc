@@ -164,7 +164,6 @@ QUIESCE_INSTFMT = "obmc-host-quiesce@{1}.target"
 QUIESCE_FMT = "../${QUIESCE_TMPL}:${CRASH_TIMEOUT_TGTFMT}.wants/${QUIESCE_INSTFMT}"
 
 SYSTEMD_SERVICE_${PN}-obmc-targets += " \
-        obmc-mapper.target \
         obmc-fans-ready.target \
         obmc-fan-control.target \
         obmc-fan-control-ready@.target \
@@ -184,6 +183,6 @@ SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'FAN_LINK_FMT', 'OBMC_CHA
 SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERROR_TARGETS', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "3ac78dfd6e3c6bf1c673e6acc8e6dc2deb6bd98b"
+SRCREV = "65bfcf57920d6fac62dbc9dd4a4fabdfe0c53228"
 
 S = "${WORKDIR}/git"
