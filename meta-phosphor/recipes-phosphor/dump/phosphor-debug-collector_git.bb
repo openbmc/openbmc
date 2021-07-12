@@ -38,6 +38,7 @@ DEPENDS += " \
         ${PYTHON_PN}-pyyaml-native \
         ${PYTHON_PN}-setuptools-native \
         ${PYTHON_PN}-mako-native \
+        fmt \
 "
 
 RDEPENDS_${PN}-manager += " \
