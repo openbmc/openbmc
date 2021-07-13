@@ -260,21 +260,20 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
             logger.warning('By user choice, the following patches will NOT be applied to the new source tree:\n  %s' % '\n  '.join([os.path.basename(patch) for patch in patches]))
     else:
         __run('git checkout devtool-patched -b %s' % branch)
-        skiptag = False
-        try:
-            __run('git rebase %s' % rev)
-        except bb.process.ExecutionError as e:
-            skiptag = True
-            if 'conflict' in e.stdout:
-                logger.warning('Command \'%s\' failed:\n%s\n\nYou will need to resolve conflicts in order to complete the upgrade.' % (e.command, e.stdout.rstrip()))
-            else:
-                logger.warning('Command \'%s\' failed:\n%s' % (e.command, e.stdout))
-        if not skiptag:
-            if uri.startswith('git://') or uri.startswith('gitsm://'):
-                suffix = 'new'
-            else:
-                suffix = newpv
-            __run('git tag -f devtool-patched-%s' % suffix)
+        (stdout, _) = __run('git branch --list devtool-override-*')
+        branches_to_rebase = [branch] + stdout.split()
+        for b in branches_to_rebase:
+            logger.info("Rebasing {} onto {}".format(b, rev))
+            __run('git checkout %s' % b)
+            try:
+                __run('git rebase %s' % rev)
+            except bb.process.ExecutionError as e:
+                if 'conflict' in e.stdout:
+                    logger.warning('Command \'%s\' failed:\n%s\n\nYou will need to resolve conflicts in order to complete the upgrade.' % (e.command, e.stdout.rstrip()))
+                    __run('git rebase --abort')
+                else:
+                    logger.warning('Command \'%s\' failed:\n%s' % (e.command, e.stdout))
+        __run('git checkout %s' % branch)
 
     if tmpsrctree:
         if keep_temp:

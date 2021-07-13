@@ -1,0 +1,47 @@
+From 0851278471472c6be69a936cc3698aa50a646ffd Mon Sep 17 00:00:00 2001
+From: Lei Maohui <leimaohui@cn.fujitsu.com>
+Date: Wed, 12 May 2021 17:06:31 +0900
+Subject: [PATCH] aarch64: Fix a plthook crash on aarch64 with binutils2.35.1
+ and later versions
+
+plthook is always crashed in Ubuntu 20.10 aarch64, which uses binutils 2.35.1.
+Since the `plt_entsize` is not automatically set in this version, we have to
+explicitly set the value.
+
+This patch fixes the following problem.
+
+  $ uname -m
+  aarch64
+
+  $ cat /etc/os-release | grep PRETTY_NAME
+  PRETTY_NAME="Ubuntu 20.10"
+
+  $ gcc -pg tests/s-abc.c
+
+  $ uftrace record a.out
+  WARN: child terminated by signal: 7: Bus error
+
+Fixed: #1254
+
+Upstream-status: submitted [Sent to https://github.com/namhyung/uftrace/pull/1248]
+
+Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
+---
+ utils/symbol.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/utils/symbol.c b/utils/symbol.c
+index 29a1d295..01e52dab 100644
+--- a/utils/symbol.c
++++ b/utils/symbol.c
+@@ -560,6 +560,7 @@ int load_elf_dynsymtab(struct symtab *dsymtab, struct uftrace_elf_data *elf,
+ 	}
+ 	else if (elf->ehdr.e_machine == EM_AARCH64) {
+ 		plt_addr += 16;    /* AARCH64 PLT0 size is 32 */
++		plt_entsize = 16;
+ 	}
+ 	else if (elf->ehdr.e_machine == EM_386) {
+ 		plt_entsize += 12;
+-- 
+2.25.1
+

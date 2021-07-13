@@ -76,6 +76,15 @@ CVE_CHECK_WHITELIST += "CVE-2007-0998"
 # https://bugzilla.redhat.com/show_bug.cgi?id=1609015#c11
 CVE_CHECK_WHITELIST += "CVE-2018-18438"
 
+# Following CVE's affect ESP (NCR53C90) part of chip STP2000 (Master I/O).
+# On Sparc32 it is the NCR89C100 part of the chip.
+# On Macintosh Quadra it is NCR53C96.
+# Both are not supported by yocto.
+# Reference: https://www.openwall.com/lists/oss-security/2021/04/16/3
+CVE_CHECK_WHITELIST += "CVE-2020-35504"
+CVE_CHECK_WHITELIST += "CVE-2020-35505"
+CVE_CHECK_WHITELIST += "CVE-2020-35506"
+
 COMPATIBLE_HOST_mipsarchn32 = "null"
 COMPATIBLE_HOST_mipsarchn64 = "null"
 

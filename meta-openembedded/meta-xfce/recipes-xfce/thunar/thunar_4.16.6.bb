@@ -8,6 +8,10 @@ inherit xfce gobject-introspection features_check mime-xdg
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
+SRC_URI += "file://CVE-2021-32563-1.patch \
+            file://CVE-2021-32563-2.patch \
+           "
+
 SRC_URI[sha256sum] = "cb531d3fe67196a43ca04979ef271ece7858bbc80c15b0ee4323c1252a1a02b7"
 
 PACKAGECONFIG ??= ""

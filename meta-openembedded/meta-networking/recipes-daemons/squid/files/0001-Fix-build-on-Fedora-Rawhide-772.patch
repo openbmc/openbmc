@@ -11,10 +11,8 @@ Upstream-Status: Backport [https://github.com/kraj/squid/commit/1f8b5f0e1cc27634
  src/Makefile.am               | 4 ++++
  src/ip/QosConfig.cc           | 1 +
  src/ipc/mem/PageStack.cc      | 1 +
- src/proxyp/Parser.cc          | 1 +
- src/security/ServerOptions.cc | 2 ++
  src/ssl/helper.cc             | 2 ++
- 6 files changed, 11 insertions(+)
+ 4 files changed, 8 insertions(+)
 
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
@@ -70,17 +68,6 @@ Upstream-Status: Backport [https://github.com/kraj/squid/commit/1f8b5f0e1cc27634
  
  /// used to mark a stack slot available for storing free page offsets
  const Ipc::Mem::PageStack::Value Writable = 0;
---- a/src/security/ServerOptions.cc
-+++ b/src/security/ServerOptions.cc
-@@ -24,6 +24,8 @@
- #endif
- #endif
- 
-+#include <limits>
-+
- Security::ServerOptions &
- Security::ServerOptions::operator =(const Security::ServerOptions &old) {
-     if (this != &old) {
 --- a/src/ssl/helper.cc
 +++ b/src/ssl/helper.cc
 @@ -19,6 +19,8 @@
@@ -92,14 +79,4 @@ Upstream-Status: Backport [https://github.com/kraj/squid/commit/1f8b5f0e1cc27634
  Ssl::CertValidationHelper::LruCache *Ssl::CertValidationHelper::HelperCache = nullptr;
  
  #if USE_SSL_CRTD
---- a/src/acl/ConnMark.cc
-+++ b/src/acl/ConnMark.cc
-@@ -16,6 +16,8 @@
- #include "http/Stream.h"
- #include "sbuf/Stream.h"
  
-+#include <limits>
-+
- bool
- Acl::ConnMark::empty() const
- {

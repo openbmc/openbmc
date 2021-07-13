@@ -50,6 +50,10 @@ python do_rootfs(){
         if os.path.lexists(manifest_link):
             os.remove(manifest_link)
         os.symlink(os.path.basename(manifest_name), manifest_link)
+    # A lot of postprocess commands assume the existence of rootfs/etc
+    sysconfdir = d.getVar("IMAGE_ROOTFS") + d.getVar('sysconfdir')
+    bb.utils.mkdirhier(sysconfdir)
+
     execute_pre_post_process(d, d.getVar('ROOTFS_POSTPROCESS_COMMAND'))
 }
 

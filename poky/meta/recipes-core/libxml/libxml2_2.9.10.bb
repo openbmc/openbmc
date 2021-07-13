@@ -26,7 +26,10 @@ SRC_URI = "http://www.xmlsoft.org/sources/libxml2-${PV}.tar.gz;name=libtar \
            file://fix-python39.patch \
            file://CVE-2021-3517.patch \
            file://CVE-2021-3516.patch \
+           file://CVE-2021-3518-0001.patch \
+           file://CVE-2021-3518-0002.patch \
            file://CVE-2021-3537.patch \
+           file://CVE-2021-3541.patch \
            "
 
 SRC_URI[libtar.md5sum] = "10942a1dc23137a8aa07f0639cbfece5"

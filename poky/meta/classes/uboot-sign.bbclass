@@ -196,10 +196,9 @@ concat_spl_dtb() {
 # signing, and kernel will deploy UBOOT_DTB_BINARY after signs it.
 install_helper() {
 	if [ -f "${UBOOT_DTB_BINARY}" ]; then
-		install -d ${D}${datadir}
 		# UBOOT_DTB_BINARY is a symlink to UBOOT_DTB_IMAGE, so we
 		# need both of them.
-		install ${UBOOT_DTB_BINARY} ${D}${datadir}/${UBOOT_DTB_IMAGE}
+		install -Dm 0644 ${UBOOT_DTB_BINARY} ${D}${datadir}/${UBOOT_DTB_IMAGE}
 		ln -sf ${UBOOT_DTB_IMAGE} ${D}${datadir}/${UBOOT_DTB_BINARY}
 	else
 		bbwarn "${UBOOT_DTB_BINARY} not found"
@@ -209,14 +208,13 @@ install_helper() {
 # Install SPL dtb and u-boot nodtb to datadir, 
 install_spl_helper() {
 	if [ -f "${SPL_DIR}/${SPL_DTB_BINARY}" ]; then
-		install -d ${D}${datadir}
-		install ${SPL_DIR}/${SPL_DTB_BINARY} ${D}${datadir}/${SPL_DTB_IMAGE}
+		install -Dm 0644 ${SPL_DIR}/${SPL_DTB_BINARY} ${D}${datadir}/${SPL_DTB_IMAGE}
 		ln -sf ${SPL_DTB_IMAGE} ${D}${datadir}/${SPL_DTB_BINARY}
 	else
 		bbwarn "${SPL_DTB_BINARY} not found"
 	fi
 	if [ -f "${UBOOT_NODTB_BINARY}" ] ; then
-		install ${UBOOT_NODTB_BINARY} ${D}${datadir}/${UBOOT_NODTB_IMAGE}
+		install -Dm 0644 ${UBOOT_NODTB_BINARY} ${D}${datadir}/${UBOOT_NODTB_IMAGE}
 		ln -sf ${UBOOT_NODTB_IMAGE} ${D}${datadir}/${UBOOT_NODTB_BINARY}
 	else
 		bbwarn "${UBOOT_NODTB_BINARY} not found"

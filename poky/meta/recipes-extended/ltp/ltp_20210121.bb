@@ -42,6 +42,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
            file://0001-open_posix_testsuite-generate-makefiles.sh-Avoid-inc.patch \
            file://0002-Makefile-Avoid-wildcard-determinism-issues.patch \
            file://0003-syscalls-swapon-swapoff-Move-common-library-to-libs.patch \
+           file://disable_hanging_tests.patch \
            "
 
 S = "${WORKDIR}/git"

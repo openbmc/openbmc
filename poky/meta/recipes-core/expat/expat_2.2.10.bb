@@ -25,3 +25,5 @@ do_install_ptest_class-target() {
 }
 
 BBCLASSEXTEND += "native nativesdk"
+
+CVE_PRODUCT = "expat libexpat"

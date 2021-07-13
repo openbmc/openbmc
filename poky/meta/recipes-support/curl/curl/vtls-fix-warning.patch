@@ -1,0 +1,40 @@
+From b31d9ccfc2da288900e6857ad8d048c612328cac Mon Sep 17 00:00:00 2001
+From: Jay Satiro <raysatiro@yahoo.com>
+Date: Sun, 20 Jun 2021 16:42:58 -0400
+Subject: [PATCH] vtls: fix warning due to function prototype mismatch
+
+b09c8ee changed the function prototype. Caught by Visual Studio.
+
+Upstream-Status: Backport [https://github.com/curl/curl/commit/b31d9ccfc2da288900e6857ad8d048c612328cac]
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ lib/vtls/vtls.c | 2 +-
+ lib/vtls/vtls.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/vtls/vtls.c b/lib/vtls/vtls.c
+index 82883c9c55e2..fe43703bf8b8 100644
+--- a/lib/vtls/vtls.c
++++ b/lib/vtls/vtls.c
+@@ -497,7 +497,7 @@ void Curl_ssl_delsessionid(struct Curl_easy *data, void *ssl_sessionid)
+  */
+ CURLcode Curl_ssl_addsessionid(struct Curl_easy *data,
+                                struct connectdata *conn,
+-                               bool isProxy,
++                               const bool isProxy,
+                                void *ssl_sessionid,
+                                size_t idsize,
+                                int sockindex)
+diff --git a/lib/vtls/vtls.h b/lib/vtls/vtls.h
+index a0585c9cec4c..f1a9b8033ae5 100644
+--- a/lib/vtls/vtls.h
++++ b/lib/vtls/vtls.h
+@@ -247,7 +247,7 @@ void Curl_ssl_sessionid_unlock(struct Curl_easy *data);
+  */
+ bool Curl_ssl_getsessionid(struct Curl_easy *data,
+                            struct connectdata *conn,
+-                           const bool isproxy,
++                           const bool isProxy,
+                            void **ssl_sessionid,
+                            size_t *idsize, /* set 0 if unknown */
+                            int sockindex);

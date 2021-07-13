@@ -1,0 +1,31 @@
+From 2c26eeef12f0204fb85d6bf40b4e7a1e2ddcdf24 Mon Sep 17 00:00:00 2001
+From: Daniel Stenberg <daniel@haxx.se>
+Date: Mon, 29 Mar 2021 12:50:57 +0200
+Subject: [PATCH] vtls: fix addsessionid for non-proxy builds
+
+Follow-up to b09c8ee15771c61
+Fixes #6812
+Closes #6811
+
+Upstream-Status: Backport [https://github.com/curl/curl/commit/2c26eeef12f0204fb85d6bf40b4e7a1e2ddcdf24]
+Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+---
+ lib/vtls/vtls.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/lib/vtls/vtls.c b/lib/vtls/vtls.c
+index 95fd6356285f..2e07df0a0462 100644
+--- a/lib/vtls/vtls.c
++++ b/lib/vtls/vtls.c
+@@ -504,11 +504,8 @@ CURLcode Curl_ssl_addsessionid(struct Curl_easy *data,
+   const char *hostname = isProxy ? conn->http_proxy.host.name :
+     conn->host.name;
+ #else
+-  /* proxy support disabled */
+-  const bool isProxy = FALSE;
+   struct ssl_primary_config * const ssl_config = &conn->ssl_config;
+   const char *hostname = conn->host.name;
+-  (void)sockindex;
+ #endif
+   (void)sockindex;
+   DEBUGASSERT(SSL_SET_OPTION(primary.sessionid));
