@@ -31,5 +31,3 @@ DEPENDS_remove_class-native = "phosphor-logging"
 
 # Do not depend on phosphor-logging for native SDK build
 DEPENDS_remove_class-nativesdk = "phosphor-logging"
-
-BBCLASSEXTEND += "native nativesdk"
