@@ -30,11 +30,13 @@ export CXXFLAGS = "${BUILD_CXXFLAGS}"
 
 FILES:${PN} += "${datadir}/www/*"
 
+EXTRA_OENPM ?= ""
+
 do_compile () {
     cd ${S}
     rm -rf node_modules
     npm --loglevel info --proxy=${http_proxy} --https-proxy=${https_proxy} install
-    npm run build
+    npm run build ${EXTRA_OENPM}
 }
 
 do_install () {
