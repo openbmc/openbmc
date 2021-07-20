@@ -1,0 +1,6 @@
+[Unit]
+Description=Verify the Flash Image File
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/inplace-gbmc-verify.sh

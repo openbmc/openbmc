@@ -1,0 +1,9 @@
+[Unit]
+Description=Version string for inplace BMC
+
+[Service]
+Type=oneshot
+StandardOutput=file:/run/inplace-gbmc-version
+StandardError=journal
+ExecStartPre=/bin/rm -f /run/inplace-gbmc-version
+ExecStart=/usr/bin/inplace-gbmc-version.sh
