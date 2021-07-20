@@ -15,6 +15,8 @@
 # limitations under the License.
 
 do_flash () {
+        OFFSET=$1
+
 	# Check the PNOR partition available
 	HOST_MTD=$(cat /proc/mtd | grep "pnor" | sed -n 's/^\(.*\):.*/\1/p')
 	if [ -z "$HOST_MTD" ];
@@ -30,18 +32,10 @@ do_flash () {
 			echo "Fail to probe Host SPI-NOR device"
 			exit 1
 		fi
-
-		echo "--- Flashing firmware to @/dev/$HOST_MTD"
-		flash_eraseall /dev/$HOST_MTD
-		flashcp -v $IMAGE /dev/$HOST_MTD
-
-		echo "--- Unbind the ASpeed SMC driver"
-		echo 1e630000.spi > /sys/bus/platform/drivers/aspeed-smc/unbind
-	else
-		echo "--- Flashing firmware to @/dev/$HOST_MTD"
-		flash_eraseall /dev/$HOST_MTD
-		flashcp -v $IMAGE /dev/$HOST_MTD
 	fi
+
+	echo "--- Flashing firmware to @/dev/$HOST_MTD offset=$OFFSET"
+	flashcp -v $IMAGE /dev/$HOST_MTD $OFFSET
 }
 
 
@@ -84,7 +78,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Flash the firmware
-do_flash
+do_flash 0x400000
 
 # Switch the host SPI bus to HOST."
 echo "--- Switch the host SPI bus to HOST."
@@ -99,5 +93,5 @@ if [ "$chassisstate" == 'On' ];
 then
 	sleep 5
 	echo "Turn on the Host"
-	obmcutil chassison
+	obmcutil poweron
 fi
