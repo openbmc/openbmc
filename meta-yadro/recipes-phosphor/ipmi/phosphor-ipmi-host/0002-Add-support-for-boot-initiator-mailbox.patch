@@ -1,4 +1,4 @@
-From ec6765e9aa35871f8d02cb0b5b47d96be18f4804 Mon Sep 17 00:00:00 2001
+From a193c5ce59758ed5971b5bd7494f1aaf3489ed9d Mon Sep 17 00:00:00 2001
 From: Alexander Amelkin <a.amelkin@yadro.com>
 Date: Mon, 8 Apr 2019 17:58:42 +0300
 Subject: [PATCH] Add support for boot initiator mailbox
@@ -21,35 +21,37 @@ Resolves openbmc/openbmc#3391
 Change-Id: Iccbf74c0775f20c70e8deaa7b0a8bd995ebbffea
 Signed-off-by: Alexander Amelkin <a.amelkin@yadro.com>
 Signed-off-by: Ivan Mikhaylov <i.mikhaylov@yadro.com>
+
 ---
- chassishandler.cpp | 328 ++++++++++++++++++++++++++++++++++++++++++++-
+ chassishandler.cpp | 329 ++++++++++++++++++++++++++++++++++++++++++++-
  chassishandler.hpp |   1 +
- 2 files changed, 325 insertions(+), 4 deletions(-)
+ 2 files changed, 326 insertions(+), 4 deletions(-)
 
 diff --git a/chassishandler.cpp b/chassishandler.cpp
-index 3250b2c..48cda21 100644
+index fb3d644..7f92b85 100644
 --- a/chassishandler.cpp
 +++ b/chassishandler.cpp
-@@ -136,6 +136,7 @@ namespace internal
+@@ -131,6 +131,7 @@ namespace internal
  {
  
  constexpr auto bootModeIntf = "xyz.openbmc_project.Control.Boot.Mode";
 +constexpr auto bootMboxIntf = "xyz.openbmc_project.Control.Boot.Mailbox";
+ constexpr auto bootTypeIntf = "xyz.openbmc_project.Control.Boot.Type";
  constexpr auto bootSourceIntf = "xyz.openbmc_project.Control.Boot.Source";
  constexpr auto powerRestoreIntf =
-     "xyz.openbmc_project.Control.Power.RestorePolicy";
-@@ -151,8 +152,8 @@ settings::Objects& getObjects()
+@@ -147,8 +148,9 @@ settings::Objects& getObjects()
      if (objectsPtr == nullptr)
      {
          objectsPtr = std::make_unique<settings::Objects>(
--            dbus, std::vector<std::string>{bootModeIntf, bootSourceIntf,
--                                           powerRestoreIntf});
-+            dbus, std::vector<std::string>{bootMboxIntf, bootModeIntf,
-+                                           bootSourceIntf, powerRestoreIntf});
+-            dbus, std::vector<std::string>{bootModeIntf, bootTypeIntf,
+-                                           bootSourceIntf, powerRestoreIntf});
++            dbus,
++            std::vector<std::string>{bootMboxIntf, bootModeIntf, bootTypeIntf,
++                                     bootSourceIntf, powerRestoreIntf});
      }
      return *objectsPtr;
  }
-@@ -1670,6 +1671,127 @@ static ipmi::Cc setBootMode(const Mode::Modes& mode)
+@@ -1708,6 +1710,127 @@ static ipmi::Cc setBootType(ipmi::Context::ptr& ctx, const Type::Types& type)
      return ipmi::ccSuccess;
  }
  
@@ -174,15 +176,15 @@ index 3250b2c..48cda21 100644
 +static constexpr size_t normalBlockSize = 16;
 +static constexpr size_t IANAEnterpriseLength = 3;
 +
- /** @brief implements the Get Chassis system boot option
-  *  @param bootOptionParameter   - boot option parameter selector
-  *  @param reserved1    - reserved bit
-@@ -1783,6 +1905,87 @@ ipmi::RspType<ipmi::message::Payload>
+ static constexpr uint8_t setComplete = 0x0;
+ static constexpr uint8_t setInProgress = 0x1;
+ static uint8_t transferStatus = setComplete;
+@@ -1882,6 +2005,87 @@ ipmi::RspType<ipmi::message::Payload>
              return ipmi::responseUnspecifiedError();
          }
      }
-+    else if (static_cast<uint8_t>(bootOptionParameter) ==
-+             static_cast<uint8_t>(BootOptionParameter::bootInitiatorMbox))
++    else if (types::enum_cast<BootOptionParameter>(bootOptionParameter) ==
++             BootOptionParameter::bootInitiatorMbox)
 +    {
 +        // Only allow reading the boot initiator mailbox if Mailbox is supported
 +        //
@@ -265,9 +267,9 @@ index 3250b2c..48cda21 100644
      else
      {
          if ((bootOptionParameter >= oemParmStart) &&
-@@ -1825,9 +2028,8 @@ ipmi::RspType<> ipmiChassisSetSysBootOptions(ipmi::Context::ptr ctx,
-     using namespace boot_options;
-     ipmi::Cc rc;
+@@ -1946,9 +2150,8 @@ ipmi::RspType<> ipmiChassisSetSysBootOptions(ipmi::Context::ptr ctx,
+         return ipmi::responseSuccess();
+     }
  
 -    /*  000101
 +    /*
@@ -275,13 +277,13 @@ index 3250b2c..48cda21 100644
 -     * This is the only parameter used by petitboot.
       */
  
-     if (parameterSelector ==
-@@ -1954,6 +2156,124 @@ ipmi::RspType<> ipmiChassisSetSysBootOptions(ipmi::Context::ptr ctx,
+     if (types::enum_cast<BootOptionParameter>(parameterSelector) ==
+@@ -2084,6 +2287,124 @@ ipmi::RspType<> ipmiChassisSetSysBootOptions(ipmi::Context::ptr ctx,
              return ipmi::responseUnspecifiedError();
          }
      }
-+    else if (parameterSelector ==
-+             static_cast<uint7_t>(BootOptionParameter::bootInitiatorMbox))
++    else if (types::enum_cast<BootOptionParameter>(parameterSelector) ==
++             BootOptionParameter::bootInitiatorMbox)
 +    {
 +        // Only allow writing to boot initiator mailbox if:
 +        // 1. Mailbox is supported
@@ -398,21 +400,18 @@ index 3250b2c..48cda21 100644
 +            return ipmi::responseUnspecifiedError();
 +        }
 +    }
-     else if (parameterSelector ==
-              static_cast<uint7_t>(BootOptionParameter::bootInfo))
+     else if (types::enum_cast<BootOptionParameter>(parameterSelector) ==
+              BootOptionParameter::bootInfo)
      {
 diff --git a/chassishandler.hpp b/chassishandler.hpp
-index 93de2c0..33ad25f 100644
+index 2957127..a783bff 100644
 --- a/chassishandler.hpp
 +++ b/chassishandler.hpp
-@@ -48,6 +48,7 @@ enum class BootOptionParameter : size_t
- {
+@@ -51,6 +51,7 @@ enum class BootOptionParameter : size_t
+     bootFlagValidClr = 0x3,
      bootInfo = 0x4,
      bootFlags = 0x5,
 +    bootInitiatorMbox = 0x07,
      opalNetworkSettings = 0x61
  };
  
--- 
-2.26.2
-
