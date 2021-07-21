@@ -7,7 +7,6 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 inherit meson
-inherit pkgconfig
 
 DEPENDS += " \
     sdbusplus \
@@ -23,5 +22,5 @@ PACKAGECONFIG ??= " obmc-phosphor-image reboot-guard-support "
 PACKAGECONFIG_append_df-openpower = "openpower-support"
 
 SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-fwupdate"
-SRCREV = "f141bdf92f92971caa4e8e5eb0727821241416e8"
+SRCREV = "0e3c0714f344a2f7f289c851434955360e6f075b"
 S = "${WORKDIR}/git"
