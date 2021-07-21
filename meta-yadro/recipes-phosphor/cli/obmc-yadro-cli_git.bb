@@ -13,10 +13,11 @@ DEPENDS = "phosphor-user-manager"
 RDEPENDS_${PN} = " \
     ${VIRTUAL-RUNTIME_base-utils} \
     bash \
-    obmc-console \
     obmc-yadro-fwupdate \
     obmc-yadro-lssensors \
     obmc-yadro-netconfig \
+    phosphor-debug-collector-dreport \
+    phosphor-debug-collector-scripts \
     sudo \
     systemd \
 "
@@ -27,11 +28,12 @@ RDEPENDS_${PN} = " \
 # Directory with command handlers
 FILES_${PN} += "${datadir}/cli"
 
+MACHINE_NAME ?= "${MACHINE}"
 # Custom installation procedure
 do_install() {
   ${B}/install.sh \
     --dir ${D} \
-    --machine ${@'${MACHINE}'.split('-')[0]} \
+    --machine ${@'${MACHINE_NAME}'.split('-')[0]} \
     --admin priv-admin \
     --operator priv-operator \
     --user priv-user
@@ -40,4 +42,4 @@ do_install() {
 # Source code repository
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-cli"
-SRCREV = "29768c2fb743318d459a40281e328ee8e8944a75"
+SRCREV = "76743c3706516bae6b2bb8749706b4ea673e9358"
