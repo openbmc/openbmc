@@ -16,4 +16,4 @@ DEPENDS = "sdbusplus"
 # Source code repository
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-netconfig.git"
-SRCREV  = "b300465732616c6d456bdc2df2cce9d1246636a8"
+SRCREV  = "1d991868023b80a9361a7a46c6e6b8058b482f01"
