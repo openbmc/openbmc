@@ -161,7 +161,7 @@
 9:
   entityID: 0x1D
   sensorType: 0x04
-  path: /xyz/openbmc_project/sensors/fan_tach/P0_Fan_Speed
+  path: /xyz/openbmc_project/sensors/fan_tach/P0_Fan
   sensorReadingType: 0x01
   multiplierM: 40
   offsetB: 0
@@ -183,7 +183,7 @@
 10:
   entityID: 0x1D
   sensorType: 0x04
-  path: /xyz/openbmc_project/sensors/fan_tach/P1_Fan_Speed
+  path: /xyz/openbmc_project/sensors/fan_tach/P1_Fan
   sensorReadingType: 0x01
   multiplierM: 40
   offsetB: 0
