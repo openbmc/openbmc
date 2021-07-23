@@ -750,6 +750,11 @@ fakeroot python do_populate_sdk_ext() {
     if d.getVar('SDK_ARCH') != d.getVar('BUILD_ARCH'):
         bb.fatal('The extensible SDK can currently only be built for the same architecture as the machine being built on - SDK_ARCH is set to %s (likely via setting SDKMACHINE) which is different from the architecture of the build machine (%s). Unable to continue.' % (d.getVar('SDK_ARCH'), d.getVar('BUILD_ARCH')))
 
+    # FIXME hopefully we can remove this restriction at some point, but the eSDK
+    # can only be built for the primary (default) multiconfig
+    if d.getVar('BB_CURRENT_MC') != 'default':
+        bb.fatal('The extensible SDK can currently only be built for the default multiconfig.  Currently trying to build for %s.' % d.getVar('BB_CURRENT_MC'))
+
     d.setVar('SDK_INSTALL_TARGETS', get_sdk_install_targets(d))
     if d.getVar('SDK_INCLUDE_BUILDTOOLS') == '1':
         buildtools_fn = get_current_buildtools(d)

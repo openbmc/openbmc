@@ -56,6 +56,7 @@ SRC_URI =  "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0028-readlib-Add-OECORE_KNOWN_INTERPRETER_NAMES-to-known-.patch \
            file://0029-wordsize.h-Unify-the-header-between-arm-and-aarch64.patch \
            file://0030-powerpc-Do-not-ask-compiler-for-finding-arch.patch \
+           file://mte-backports.patch \
            "
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build-${TARGET_SYS}"
@@ -91,7 +92,7 @@ EXTRA_OECONF += "${@get_libc_fpu_setting(bb, d)}"
 EXTRA_OECONF_append_x86 = " --enable-cet"
 EXTRA_OECONF_append_x86-64 = " --enable-cet"
 
-PACKAGECONFIG ??= "nscd"
+PACKAGECONFIG ??= "nscd memory-tagging"
 PACKAGECONFIG[nscd] = "--enable-nscd,--disable-nscd"
 PACKAGECONFIG[memory-tagging] = "--enable-memory-tagging,--disable-memory-tagging"
 

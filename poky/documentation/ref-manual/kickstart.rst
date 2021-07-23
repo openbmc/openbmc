@@ -208,7 +208,7 @@ supports the following options:
    bootloader times out and boots the default option.
 
 -  ``--append``: Specifies kernel parameters. These parameters will be
-   added to the syslinux ``APPEND`` or ``grub`` kernel command line.
+   added to the syslinux :term:`APPEND` or ``grub`` kernel command line.
 
 -  ``--configfile``: Specifies a user-defined configuration file for
    the bootloader. You can provide a full pathname for the file or a

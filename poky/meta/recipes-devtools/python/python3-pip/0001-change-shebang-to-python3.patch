@@ -1,32 +1,30 @@
-From e7a00e9b5104ae2fbcea32a35c85760b77fae7e5 Mon Sep 17 00:00:00 2001
-From: Changqing Li <changqing.li@windriver.com>
-Date: Thu, 23 Apr 2020 09:42:10 +0000
+From baa85a4dab2e8d64eb25d1181b6420db25ce919a Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <trevor.gamblin@windriver.com>
+Date: Tue, 22 Jun 2021 12:31:46 -0400
 Subject: [PATCH] change shebang to python3
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate (OE-specific)
 
-pip will drop support of python2 from 21.0
+Despite no longer supporting python2, some files in the pip source refer
+to "python" instead of "python3", so patch them as needed to ensure that
+they correctly reference the python3 binary.
 
-Signed-off-by: Changqing Li <changqing.li@windriver.com>
+Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
 ---
- src/pip/_internal/__init__.py             | 2 +-
- src/pip/_vendor/appdirs.py                | 2 +-
- src/pip/_vendor/chardet/cli/chardetect.py | 2 +-
- src/pip/_vendor/requests/certs.py         | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ src/pip/_vendor/appdirs.py                    | 2 +-
+ src/pip/_vendor/chardet/langbulgarianmodel.py | 2 +-
+ src/pip/_vendor/chardet/langgreekmodel.py     | 2 +-
+ src/pip/_vendor/chardet/langhebrewmodel.py    | 2 +-
+ src/pip/_vendor/chardet/langhungarianmodel.py | 2 +-
+ src/pip/_vendor/chardet/langrussianmodel.py   | 2 +-
+ src/pip/_vendor/chardet/langthaimodel.py      | 2 +-
+ src/pip/_vendor/chardet/langturkishmodel.py   | 2 +-
+ src/pip/_vendor/chardet/metadata/languages.py | 2 +-
+ src/pip/_vendor/requests/certs.py             | 2 +-
+ 10 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/src/pip/_internal/__init__.py b/src/pip/_internal/__init__.py
-index 3aa8a46..e1ad179 100755
---- a/src/pip/_internal/__init__.py
-+++ b/src/pip/_internal/__init__.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- import pip._internal.utils.inject_securetransport  # noqa
- from pip._internal.utils.typing import MYPY_CHECK_RUNNING
- 
 diff --git a/src/pip/_vendor/appdirs.py b/src/pip/_vendor/appdirs.py
-index 3a52b75..ad3f81d 100644
+index 33a3b7741..60b9ef5f7 100644
 --- a/src/pip/_vendor/appdirs.py
 +++ b/src/pip/_vendor/appdirs.py
 @@ -1,4 +1,4 @@
@@ -35,18 +33,88 @@ index 3a52b75..ad3f81d 100644
  # -*- coding: utf-8 -*-
  # Copyright (c) 2005-2010 ActiveState Software Inc.
  # Copyright (c) 2013 Eddy Petrișor
-diff --git a/src/pip/_vendor/chardet/cli/chardetect.py b/src/pip/_vendor/chardet/cli/chardetect.py
-index c61136b..a497e98 100644
---- a/src/pip/_vendor/chardet/cli/chardetect.py
-+++ b/src/pip/_vendor/chardet/cli/chardetect.py
+diff --git a/src/pip/_vendor/chardet/langbulgarianmodel.py b/src/pip/_vendor/chardet/langbulgarianmodel.py
+index e963a5097..97ea6cea8 100644
+--- a/src/pip/_vendor/chardet/langbulgarianmodel.py
++++ b/src/pip/_vendor/chardet/langbulgarianmodel.py
 @@ -1,4 +1,4 @@
 -#!/usr/bin/env python
 +#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ 
+ from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
+diff --git a/src/pip/_vendor/chardet/langgreekmodel.py b/src/pip/_vendor/chardet/langgreekmodel.py
+index d99528ede..4a127ea83 100644
+--- a/src/pip/_vendor/chardet/langgreekmodel.py
++++ b/src/pip/_vendor/chardet/langgreekmodel.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ 
+ from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
+diff --git a/src/pip/_vendor/chardet/langhebrewmodel.py b/src/pip/_vendor/chardet/langhebrewmodel.py
+index 484c652a4..676c1a711 100644
+--- a/src/pip/_vendor/chardet/langhebrewmodel.py
++++ b/src/pip/_vendor/chardet/langhebrewmodel.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ 
+ from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
+diff --git a/src/pip/_vendor/chardet/langhungarianmodel.py b/src/pip/_vendor/chardet/langhungarianmodel.py
+index bbc5cda64..042eae70a 100644
+--- a/src/pip/_vendor/chardet/langhungarianmodel.py
++++ b/src/pip/_vendor/chardet/langhungarianmodel.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ 
+ from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
+diff --git a/src/pip/_vendor/chardet/langrussianmodel.py b/src/pip/_vendor/chardet/langrussianmodel.py
+index 5594452b5..564b02e58 100644
+--- a/src/pip/_vendor/chardet/langrussianmodel.py
++++ b/src/pip/_vendor/chardet/langrussianmodel.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ 
+ from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
+diff --git a/src/pip/_vendor/chardet/langthaimodel.py b/src/pip/_vendor/chardet/langthaimodel.py
+index 9a37db573..c97487959 100644
+--- a/src/pip/_vendor/chardet/langthaimodel.py
++++ b/src/pip/_vendor/chardet/langthaimodel.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ 
+ from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
+diff --git a/src/pip/_vendor/chardet/langturkishmodel.py b/src/pip/_vendor/chardet/langturkishmodel.py
+index 43f4230ae..7e710c371 100644
+--- a/src/pip/_vendor/chardet/langturkishmodel.py
++++ b/src/pip/_vendor/chardet/langturkishmodel.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
+ 
+ from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
+diff --git a/src/pip/_vendor/chardet/metadata/languages.py b/src/pip/_vendor/chardet/metadata/languages.py
+index 3237d5abf..aa2ec7c35 100644
+--- a/src/pip/_vendor/chardet/metadata/languages.py
++++ b/src/pip/_vendor/chardet/metadata/languages.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ # -*- coding: utf-8 -*-
  """
- Script which takes one or more file paths and reports on their detected
- encodings
+ Metadata about languages used by our model training code for our
 diff --git a/src/pip/_vendor/requests/certs.py b/src/pip/_vendor/requests/certs.py
-index 06a594e..bfa7839 100644
+index 06a594e58..bfa7839a4 100644
 --- a/src/pip/_vendor/requests/certs.py
 +++ b/src/pip/_vendor/requests/certs.py
 @@ -1,4 +1,4 @@
@@ -56,5 +124,5 @@ index 06a594e..bfa7839 100644
  
  """
 -- 
-2.24.1
+2.31.1
 

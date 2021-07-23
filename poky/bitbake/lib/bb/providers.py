@@ -133,7 +133,7 @@ def findPreferredProvider(pn, cfgData, dataCache, pkg_pn = None, item = None):
 
     if required_v is not None:
         if preferred_v is not None:
-            logger.warn("REQUIRED_VERSION and PREFERRED_VERSION for package %s%s are both set using REQUIRED_VERSION %s", pn, itemstr, required_v)
+            logger.warning("REQUIRED_VERSION and PREFERRED_VERSION for package %s%s are both set using REQUIRED_VERSION %s", pn, itemstr, required_v)
         else:
             logger.debug("REQUIRED_VERSION is set for package %s%s", pn, itemstr)
         # REQUIRED_VERSION always takes precedence over PREFERRED_VERSION
@@ -173,7 +173,7 @@ def findPreferredProvider(pn, cfgData, dataCache, pkg_pn = None, item = None):
             pv_str = '%s:%s' % (preferred_e, pv_str)
         if preferred_file is None:
             if not required:
-                logger.warn("preferred version %s of %s not available%s", pv_str, pn, itemstr)
+                logger.warning("preferred version %s of %s not available%s", pv_str, pn, itemstr)
             available_vers = []
             for file_set in pkg_pn:
                 for f in file_set:
@@ -185,7 +185,7 @@ def findPreferredProvider(pn, cfgData, dataCache, pkg_pn = None, item = None):
                         available_vers.append(ver_str)
             if available_vers:
                 available_vers.sort()
-                logger.warn("versions of %s available: %s", pn, ' '.join(available_vers))
+                logger.warning("versions of %s available: %s", pn, ' '.join(available_vers))
             if required:
                 logger.error("required version %s of %s not available%s", pv_str, pn, itemstr)
         else:

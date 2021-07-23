@@ -7,14 +7,13 @@ This fails on e.g. centos 7
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
  progs/Makefile | 2 +-
  tests/Makefile | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/progs/Makefile b/progs/Makefile
-index 289186e..071a285 100644
+index 3e82862..48533f3 100644
 --- a/progs/Makefile
 +++ b/progs/Makefile
 @@ -49,7 +49,7 @@ capsh: capsh.c capshdoc.h.cf $(DEPS)
@@ -24,8 +23,8 @@ index 289186e..071a285 100644
 -	$(CC) $(IPATH) $(CAPSH_SHELL) $(CFLAGS) -o $@ $< $(LIBCAPLIB) $(LDFLAGS) --static
 +	$(CC) $(IPATH) $(CAPSH_SHELL) $(CFLAGS) -o $@ $< $(LIBCAPLIB) $(LDFLAGS)
  
- sudotest: test tcapsh-static
- 	sudo $(LDPATH) ./quicktest.sh
+ uns_test: ../tests/uns_test.c
+ 	$(MAKE) -C ../tests uns_test
 diff --git a/tests/Makefile b/tests/Makefile
 index 4a5f2f9..4266d86 100644
 --- a/tests/Makefile
@@ -48,3 +47,6 @@ index 4a5f2f9..4266d86 100644
  
  clean:
  	rm -f psx_test libcap_psx_test libcap_launch_test uns_test *~
+-- 
+2.25.1
+

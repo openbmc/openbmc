@@ -374,7 +374,7 @@ class RecipetoolTests(RecipetoolBase):
         # Try adding a recipe
         temprecipe = os.path.join(self.tempdir, 'recipe')
         os.makedirs(temprecipe)
-        pv = '1.7.3.0'
+        pv = '1.7.4.1'
         srcuri = 'http://www.dest-unreach.org/socat/download/socat-%s.tar.bz2' % pv
         result = runCmd('recipetool create %s -o %s' % (srcuri, temprecipe))
         dirlist = os.listdir(temprecipe)

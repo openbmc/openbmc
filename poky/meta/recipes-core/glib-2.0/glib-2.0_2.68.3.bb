@@ -17,6 +17,8 @@ SRC_URI = "${GNOME_MIRROR}/glib/${SHRT_VER}/glib-${PV}.tar.xz \
            file://0001-meson-Run-atomics-test-on-clang-as-well.patch \
            file://0001-gio-tests-resources.c-comment-out-a-build-host-only-.patch \
            file://0001-gio-tests-codegen.py-bump-timeout-to-100-seconds.patch \
+           file://time-test.patch \
+           file://0001-correctly-use-3-parameters-for-close_range.patch \
            "
 SRC_URI_append_class-native = " file://relocate-modules.patch"
 

@@ -13,6 +13,9 @@ LOCALE_UTF8_IS_DEFAULT_class-nativesdk = "0"
 # seccomp is not yet ported to rv32
 DISTRO_FEATURES_DEFAULT_remove_riscv32 = "seccomp"
 
+# seccomp is not yet ported to ARC
+DISTRO_FEATURES_DEFAULT_remove_arc = "seccomp"
+
 DISTRO_FEATURES_DEFAULT ?= "acl alsa argp bluetooth debuginfod ext2 ipv4 ipv6 largefile pcmcia usbgadget usbhost wifi xattr nfs zeroconf pci 3g nfc x11 vfat seccomp"
 DISTRO_FEATURES ?= "${DISTRO_FEATURES_DEFAULT}"
 IMAGE_FEATURES ?= ""

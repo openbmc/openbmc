@@ -4,25 +4,21 @@ DESCRIPTION = "${SUMMARY}"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=25a3927bff3ee4f5b21bcb0ed3fcd6bb"
 
-SRC_URI = "git://github.com/fedora-modularity/libmodulemd;protocol=https;branch=main \
-           file://0001-modulemd-generate-the-manpage-only-if-the-feature-is.patch \
-           "
+SRC_URI = "git://github.com/fedora-modularity/libmodulemd;protocol=https;branch=main"
 
-PV = "2.12.1"
-SRCREV = "c0897fa0e9d7d1305fd4813b1010c1d4cca42346"
+PV = "2.13.0"
+SRCREV = "1a032da198333ee77bdbe4be65e60eb4115ea73f"
 
 S = "${WORKDIR}/git"
 
-inherit meson gobject-introspection python3-dir
+inherit meson gobject-introspection
 
-EXTRA_OEMESON = "-Dwith_docs=false -Drpmio=disabled -Dlibmagic=disabled -Dwith_manpages=disabled -Dgobject_overrides_dir_py3=${PYTHON_SITEPACKAGES_DIR}/gi/overrides"
+EXTRA_OEMESON = "-Dwith_py3=false -Dwith_docs=false -Drpmio=disabled -Dlibmagic=disabled -Dwith_manpages=disabled -Dgobject_overrides_dir_py3=${PYTHON_SITEPACKAGES_DIR}/gi/overrides"
 
-DEPENDS += "glib-2.0 libyaml glib-2.0-native python3"
+DEPENDS += "glib-2.0 libyaml glib-2.0-native"
 
 BBCLASSEXTEND = "native nativesdk"
 
 GIR_MESON_OPTION = 'skip_introspection'
 GIR_MESON_ENABLE_FLAG = 'false'
 GIR_MESON_DISABLE_FLAG = 'true'
-
-FILES_${PN} += "${libdir}/${PYTHON_DIR}/*"

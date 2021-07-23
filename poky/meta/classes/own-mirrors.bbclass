@@ -10,4 +10,5 @@ osc://.*/.*     ${SOURCE_MIRROR_URL} \n \
 https?$://.*/.* ${SOURCE_MIRROR_URL} \n \
 ftp://.*/.*     ${SOURCE_MIRROR_URL} \n \
 npm://.*/?.*    ${SOURCE_MIRROR_URL} \n \
+s3://.*/.*      ${SOURCE_MIRROR_URL} \n \
 "

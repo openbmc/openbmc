@@ -18,6 +18,7 @@ class BaseDumper(object):
         # Some testing doesn't inherit testimage, so it is needed
         # to set some defaults.
         self.parent_dir = parent_dir
+        self.dump_dir = parent_dir
         dft_cmds = """  top -bn1
                         iostat -x -z -N -d -p ALL 20 2
                         ps -ef
@@ -47,7 +48,7 @@ class BaseDumper(object):
                 raise err
         self.dump_dir = dump_dir
 
-    def _write_dump(self, command, output):
+    def _construct_filename(self, command):
         if isinstance(self, HostDumper):
             prefix = "host"
         elif isinstance(self, TargetDumper):
@@ -61,6 +62,10 @@ class BaseDumper(object):
             fullname = os.path.join(self.dump_dir, filename)
             if not os.path.exists(fullname):
                 break
+        return fullname
+
+    def _write_dump(self, command, output):
+        fullname = self._construct_filename(command)
         if isinstance(self, MonitorDumper):
             with open(fullname, 'w') as json_file:
                 json.dump(output, json_file, indent=4)
@@ -117,8 +122,16 @@ class MonitorDumper(BaseDumper):
         if dump_dir:
             self.dump_dir = dump_dir
         for cmd in self.cmds:
+            cmd_name = cmd.split()[0]
             try:
-                output = self.runner.run_monitor(cmd)
-                self._write_dump(cmd, output)
-            except:
-                print("Failed to dump QMP CMD: %s" % (cmd))
+                if len(cmd.split()) > 1:
+                    cmd_args = cmd.split()[1]
+                    if "%s" in cmd_args:
+                        filename = self._construct_filename(cmd_name)
+                    cmd_data = json.loads(cmd_args % (filename))
+                    output = self.runner.run_monitor(cmd_name, cmd_data)
+                else:
+                    output = self.runner.run_monitor(cmd_name)
+                self._write_dump(cmd_name, output)
+            except Exception as e:
+                print("Failed to dump QMP CMD: %s with\nExecption: %s" % (cmd_name, e))

@@ -1,0 +1,71 @@
+From 09f846fbdeb19193e778ce51baa77bd03c38372e Mon Sep 17 00:00:00 2001
+From: garrison <garrison@qemu15.qemu-network>
+Date: Fri, 4 Jun 2021 22:13:02 +0000
+Subject: [PATCH] build-sys: meson: check if NEON code can be compiled on arm
+
+When Meson SIMD module returns HAVE_NEON=1 on arm host, do extra compile check
+to verify compiler can actually handle NEON code.
+
+Related Meson issue #6361 https://github.com/mesonbuild/meson/issues/6361
+
+Part-of: <https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/574>
+
+Upstream-Status: Backport[https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/commit/6d2a49a6a1eacc2096d0d9473a074421c181ab56]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ src/pulsecore/meson.build | 41 +++++++++++++++++++++++++++++----------
+ 1 file changed, 31 insertions(+), 10 deletions(-)
+
+diff --git a/src/pulsecore/meson.build b/src/pulsecore/meson.build
+index 99a702e..d0b7990 100644
+--- a/src/pulsecore/meson.build
++++ b/src/pulsecore/meson.build
+@@ -172,16 +172,37 @@ endif
+ 
+ # FIXME: SIMD support (ORC)
+ simd = import('unstable-simd')
+-libpulsecore_simd = simd.check('libpulsecore_simd',
+-  mmx : ['remap_mmx.c', 'svolume_mmx.c'],
+-  sse : ['remap_sse.c', 'sconv_sse.c', 'svolume_sse.c'],
+-  neon : ['remap_neon.c', 'sconv_neon.c', 'mix_neon.c'],
+-  c_args : [pa_c_args],
+-  include_directories : [configinc, topinc],
+-  implicit_include_directories : false,
+-  compiler : cc)
+-libpulsecore_simd_lib = libpulsecore_simd[0]
+-cdata.merge_from(libpulsecore_simd[1])
++simd_variants = [
++  { 'mmx' : ['remap_mmx.c', 'svolume_mmx.c'] },
++  { 'sse' : ['remap_sse.c', 'sconv_sse.c', 'svolume_sse.c'] },
++  { 'neon' : ['remap_neon.c', 'sconv_neon.c', 'mix_neon.c'] },
++]
++
++libpulsecore_simd_lib = []
++
++foreach simd_kwargs : simd_variants
++
++  if host_machine.cpu_family() == 'arm' and 'neon' in simd_kwargs
++    if not cc.compiles('''
++        #include <arm_neon.h>
++        int main() {
++            return sizeof(uint8x8_t) + sizeof(int32x4_t) + sizeof(float32x4_t);
++        }
++        ''', name : 'neon code')
++      continue
++    endif
++  endif
++
++  libpulsecore_simd = simd.check('libpulsecore_simd',
++    kwargs : simd_kwargs,
++    c_args : [pa_c_args],
++    include_directories : [configinc, topinc],
++    implicit_include_directories : false,
++    compiler : cc)
++
++  libpulsecore_simd_lib += libpulsecore_simd[0]
++  cdata.merge_from(libpulsecore_simd[1])
++endforeach
+ 
+ # FIXME: Implement Windows support
+ #'mutex-win32.c',

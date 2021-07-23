@@ -344,10 +344,8 @@ class PackageManager(object, metaclass=ABCMeta):
     def install_complementary(self, globs=None):
         """
         Install complementary packages based upon the list of currently installed
-        packages e.g. locales, *-dev, *-dbg, etc. This will only attempt to install
-        these packages, if they don't exist then no error will occur.  Note: every
-        backend needs to call this function explicitly after the normal package
-        installation
+        packages e.g. locales, *-dev, *-dbg, etc. Note: every backend needs to
+        call this function explicitly after the normal package installation.
         """
         if globs is None:
             globs = self.d.getVar('IMAGE_INSTALL_COMPLEMENTARY')
@@ -398,7 +396,7 @@ class PackageManager(object, metaclass=ABCMeta):
                 bb.note("Installing complementary packages ... %s (skipped already provided packages %s)" % (
                     ' '.join(install_pkgs),
                     ' '.join(skip_pkgs)))
-                self.install(install_pkgs, attempt_only=True)
+                self.install(install_pkgs)
             except subprocess.CalledProcessError as e:
                 bb.fatal("Could not compute complementary packages list. Command "
                          "'%s' returned %d:\n%s" %

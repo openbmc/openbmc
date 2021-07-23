@@ -1,0 +1,26 @@
+From 00b6bc440a75443f9bea431bbb41df50469b5093 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Jun 2021 23:13:20 -0700
+Subject: [PATCH] configure.ac: Bump version to 2.5.99
+
+Upstream-Status: Inappropriate [Needed for git builds only]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3e87734..48e796f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -19,7 +19,7 @@ dnl #
+ dnl ####
+ dnl libseccomp defines
+ dnl ####
+-AC_INIT([libseccomp], [0.0.0])
++AC_INIT([libseccomp], [2.5.99])
+
+ dnl ####
+ dnl autoconf configuration
+--
+2.32.0

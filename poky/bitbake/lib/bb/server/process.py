@@ -147,7 +147,7 @@ class ProcessServer():
                 conn = newconnections.pop(-1)
                 fds.append(conn)
                 self.controllersock = conn
-            elif self.timeout is None and not ready:
+            elif not self.timeout and not ready:
                 serverlog("No timeout, exiting.")
                 self.quit = True
 

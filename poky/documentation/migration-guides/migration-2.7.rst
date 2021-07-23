@@ -72,7 +72,7 @@ License Value Corrections
 The following corrections have been made to the
 :term:`LICENSE` values set by recipes:
 
-- *socat*: Corrected ``LICENSE`` to be "GPLv2" rather than "GPLv2+".
+- *socat*: Corrected :term:`LICENSE` to be "GPLv2" rather than "GPLv2+".
 - *libgfortran*: Set license to "GPL-3.0-with-GCC-exception".
 - *elfutils*: Removed "Elfutils-Exception" and set to "GPLv2" for shared libraries
 

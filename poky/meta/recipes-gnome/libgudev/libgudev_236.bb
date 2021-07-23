@@ -26,3 +26,8 @@ GTKDOC_MESON_OPTION = "gtk_doc"
 
 UPSTREAM_CHECK_URI = "http://ftp.gnome.org/pub/GNOME/sources/libgudev/"
 UPSTREAM_CHECK_REGEX = "(?P<pver>(\d+))"
+
+# This isn't a GNOME-style version do gnome_verdir fails. Just return the
+# version as that is how the directory is structured.
+def gnome_verdir(v):
+    return v

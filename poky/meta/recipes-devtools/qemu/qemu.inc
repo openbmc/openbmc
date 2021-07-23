@@ -37,6 +37,8 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://0006-vhost-user-gpu-fix-memory-leak-in-virgl_resource_att.patch \
            file://0007-vhost-user-gpu-fix-OOB-write-in-virgl_cmd_get_capset.patch \
            file://0001-linux-user-Tag-vsx-with-ieee128-fpbits.patch \
+           file://CVE-2021-3527-1.patch \
+           file://CVE-2021-3527-2.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 

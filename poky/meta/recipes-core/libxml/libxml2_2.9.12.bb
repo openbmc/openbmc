@@ -67,7 +67,7 @@ PACKAGE_BEFORE_PN += "${PN}-utils"
 PACKAGES += "${PN}-python"
 
 FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
-FILES_${PN}-dev += "${libdir}/xml2Conf.sh ${libdir}/cmake/*"
+FILES_${PN}-dev += "${libdir}/xml2Conf.sh"
 FILES_${PN}-utils = "${bindir}/*"
 FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
 

@@ -20,7 +20,7 @@ do_compile() {
 }
 
 do_install() {
-    ./b2 install --prefix=${prefix} staging-prefix=${D}${prefix}
+    HOME=/var/run ./b2 install --prefix=${prefix} staging-prefix=${D}${prefix}
 }
 
 # The build is either release mode (pre-stripped) or debug (-O0).

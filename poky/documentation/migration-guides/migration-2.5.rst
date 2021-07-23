@@ -278,12 +278,12 @@ The following are additional changes:
    performance and compression. In order to build a live image with
    squashfs+lz4 compression enabled you should now set
    ``LIVE_ROOTFS_TYPE = "squashfs-lz4"`` and ensure that ``live`` is in
-   ``IMAGE_FSTYPES``.
+   :term:`IMAGE_FSTYPES`.
 
 -  Recipes with an unconditional dependency on ``libpam`` are only
    buildable with ``pam`` in :term:`DISTRO_FEATURES`. If the dependency is
    truly optional then it is recommended that the dependency be
-   conditional upon ``pam`` being in ``DISTRO_FEATURES``.
+   conditional upon ``pam`` being in :term:`DISTRO_FEATURES`.
 
 -  For EFI-based machines, the bootloader (``grub-efi`` by default) is
    installed into the image at /boot. Wic can be used to split the

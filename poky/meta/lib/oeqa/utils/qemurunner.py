@@ -236,6 +236,7 @@ class QemuRunner:
         # to be a proper fix but this will suffice for now.
         self.runqemu = subprocess.Popen(launch_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, preexec_fn=os.setpgrp, env=env, cwd=self.tmpdir)
         output = self.runqemu.stdout
+        launch_time = time.time()
 
         #
         # We need the preexec_fn above so that all runqemu processes can easily be killed
@@ -339,6 +340,10 @@ class QemuRunner:
 
             try:
                 self.qmp.connect()
+                connect_time = time.time()
+                self.logger.info("QMP connected to QEMU at %s and took %s seconds" %
+                                  (time.strftime("%D %H:%M:%S"),
+                                   time.time() - launch_time))
             except OSError as msg:
                 self.logger.warning("Failed to connect qemu monitor socket: %s File: %s" % (msg, msg.filename))
                 return False
@@ -354,19 +359,25 @@ class QemuRunner:
         mapdir = "/proc/" + str(self.qemupid) + "/map_files/"
         try:
             for f in os.listdir(mapdir):
-                linktarget = os.readlink(os.path.join(mapdir, f))
-                if not linktarget.startswith("/") or linktarget.startswith("/dev") or "deleted" in linktarget:
+                try:
+                    linktarget = os.readlink(os.path.join(mapdir, f))
+                    if not linktarget.startswith("/") or linktarget.startswith("/dev") or "deleted" in linktarget:
+                        continue
+                    with open(linktarget, "rb") as readf:
+                        data = True
+                        while data:
+                            data = readf.read(4096)
+                except FileNotFoundError:
                     continue
-                with open(linktarget, "rb") as readf:
-                    data = True
-                    while data:
-                        data = readf.read(4096)
         # Centos7 doesn't allow us to read /map_files/
         except PermissionError:
             pass
 
         # Release the qemu process to continue running
         self.run_monitor('cont')
+        self.logger.info("QMP released QEMU at %s and took %s seconds from connect" %
+                          (time.strftime("%D %H:%M:%S"),
+                           time.time() - connect_time))
 
         # We are alive: qemu is running
         out = self.getOutput(output)
@@ -594,8 +605,12 @@ class QemuRunner:
                         return True
         return False
 
-    def run_monitor(self, command, timeout=60):
-        return self.qmp.cmd(command)
+    def run_monitor(self, command, args=None, timeout=60):
+        if hasattr(self, 'qmp') and self.qmp:
+            if args is not None:
+                return self.qmp.cmd(command, args)
+            else:
+                return self.qmp.cmd(command)
 
     def run_serial(self, command, raw=False, timeout=60):
         # We assume target system have echo to get command status

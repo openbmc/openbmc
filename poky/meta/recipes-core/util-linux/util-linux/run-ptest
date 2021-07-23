@@ -13,31 +13,12 @@ current_path=$(readlink -f $0)
 export bindir=$(dirname $current_path)
 export PATH=$bindir/bin:$PATH
 
-cd tests || exit 1                                                          
-
-comps=$(find ts/ -type f -perm -111 -regex ".*/[^\.~]*" |  sort)
-
-
-echo
-echo "-------------------- util-linux regression tests --------------------"
-echo
-echo "                    For development purpose only.                    "
-echo "                 Don't execute on production system!                 "
-echo
-
-res=0
-count=0
-for ts in $comps; 
-do 
-   $ts | sed -u '{        
+./tests/run.sh --use-system-commands --parsable --show-diff | sed -u '{
       s/^\(.*\):\(.*\) \.\.\. OK$/PASS: \1:\2/                              
       s/^\(.*\):\(.*\) \.\.\. FAILED \(.*\)$/FAIL: \1:\2 \3/                
       s/^\(.*\):\(.*\) \.\.\. SKIPPED \(.*\)$/SKIP: \1:\2 \3/               
-   }' 
-done
-
+   }'
 
 if [ "x$UDEV_PID" != "x" ]; then
     /etc/init.d/udev start
 fi
-

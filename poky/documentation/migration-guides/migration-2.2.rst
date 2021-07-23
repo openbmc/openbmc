@@ -271,7 +271,7 @@ update the references to ensure they continue to work.
 The :term:`IMGDEPLOYDIR` variable was introduced to allow sstate caching of
 image creation results. Image recipes defining custom :term:`IMAGE_CMD` or
 doing postprocessing on the generated images need to be adapted to use
-``IMGDEPLOYDIR`` instead of :term:`DEPLOY_DIR_IMAGE`. ``IMAGE_MANIFEST``
+:term:`IMGDEPLOYDIR` instead of :term:`DEPLOY_DIR_IMAGE`. :term:`IMAGE_MANIFEST`
 creation and symlinking of the most recent image file will fail otherwise.
 
 .. _migration-2.2-bitbake-changes:
@@ -292,7 +292,7 @@ The following changes took place for BitBake:
    change is more in-line with how the other fetchers work for source
    control systems. Recipes that fetch from Perforce will need to be
    updated to use :term:`SRCREV` in place of specifying the source revision
-   within ``SRC_URI``.
+   within :term:`SRC_URI`.
 
 -  Some of BitBake's internal code structures for accessing the recipe
    cache needed to be changed to support the new multi-configuration

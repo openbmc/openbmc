@@ -2,6 +2,6 @@
 
 mkdir -p /etc/udev/mount.blacklist.d
 echo /dev/sda1 >> /etc/udev/mount.blacklist.d/parted-tmp
-rm -f *.log
+rm -f tests/*.log
 make -C tests test-suite.log
 rm /etc/udev/mount.blacklist.d/parted-tmp

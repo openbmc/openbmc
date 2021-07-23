@@ -4,9 +4,9 @@ Date: Fri, 27 Nov 2020 15:28:42 +0000
 Subject: [PATCH] arm/sysv: reverted clang VFP mitigation
 
 Since commit e3d2812ce43940aacae5bab2d0e965278cb1e7ea,
-seperate instructions were used when compiling under clang, 
+seperate instructions were used when compiling under clang,
 as clang didn't allow the directives at the time. This mitigation
-now causes compilation to fail under clang 10, as described by 
+now causes compilation to fail under clang 10, as described by
 https://github.com/libffi/libffi/issues/607. Now that
 clang supports the LDC and SDC instructions, this mitigation
 has been reverted.
@@ -18,25 +18,25 @@ Signed-off-by: Brett Warren <brett.warren@arm.com>
  1 file changed, 33 deletions(-)
 
 diff --git a/src/arm/sysv.S b/src/arm/sysv.S
-index 63180a4..e3ce526 100644
+index fb36213..e4272a1 100644
 --- a/src/arm/sysv.S
 +++ b/src/arm/sysv.S
-@@ -128,13 +128,8 @@ ARM_FUNC_START(ffi_call_VFP)
- 	cfi_startproc
+@@ -142,13 +142,8 @@ ARM_FUNC_START(ffi_call_VFP)
  
  	cmp	r3, #3			@ load only d0 if possible
+ 	ite	le
 -#ifdef __clang__
--	vldrle d0, [sp]
--	vldmgt sp, {d0-d7}
+-	vldrle d0, [r0]
+-	vldmgt r0, {d0-d7}
 -#else
- 	ldcle	p11, cr0, [r0]		@ vldrle d0, [sp]
- 	ldcgt	p11, cr0, [r0], {16}	@ vldmgt sp, {d0-d7}
+ 	ldcle	p11, cr0, [r0]		@ vldrle d0, [r0]
+ 	ldcgt	p11, cr0, [r0], {16}	@ vldmgt r0, {d0-d7}
 -#endif
  	add	r0, r0, #64		@ discard the vfp register args
  	/* FALLTHRU */
  ARM_FUNC_END(ffi_call_VFP)
-@@ -172,25 +167,13 @@ ARM_FUNC_START(ffi_call_SYSV)
- 	nop
+@@ -193,25 +188,13 @@ ARM_FUNC_START(ffi_call_SYSV)
+ #endif
  0:
  E(ARM_TYPE_VFP_S)
 -#ifdef __clang__
@@ -61,7 +61,7 @@ index 63180a4..e3ce526 100644
  	pop	{fp,pc}
  E(ARM_TYPE_INT64)
  	str	r1, [r2, #4]
-@@ -287,11 +270,7 @@ ARM_FUNC_START(ffi_closure_VFP)
+@@ -320,11 +303,7 @@ ARM_FUNC_START(ffi_closure_VFP)
  	add	ip, sp, #16
  	sub	sp, sp, #64+32			@ allocate frame
  	cfi_adjust_cfa_offset(64+32)
@@ -73,7 +73,7 @@ index 63180a4..e3ce526 100644
  	stmdb	sp!, {ip,lr}
  
  	/* See above.  */
-@@ -320,25 +299,13 @@ ARM_FUNC_START_LOCAL(ffi_closure_ret)
+@@ -358,25 +337,13 @@ ARM_FUNC_START_LOCAL(ffi_closure_ret)
  	cfi_rel_offset(lr, 4)
  0:
  E(ARM_TYPE_VFP_S)
@@ -82,23 +82,23 @@ index 63180a4..e3ce526 100644
 -#else
  	ldc	p10, cr0, [r2]			@ vldr s0, [r2]
 -#endif
- 	ldm	sp, {sp,pc}
+ 	b	call_epilogue
  E(ARM_TYPE_VFP_D)
 -#ifdef __clang__
 -	vldr d0, [r2]
 -#else
  	ldc	p11, cr0, [r2]			@ vldr d0, [r2]
 -#endif
- 	ldm	sp, {sp,pc}
+ 	b	call_epilogue
  E(ARM_TYPE_VFP_N)
 -#ifdef __clang__
 -	vldm r2, {d0-d3}
 -#else
  	ldc	p11, cr0, [r2], {8}		@ vldm r2, {d0-d3}
 -#endif
- 	ldm	sp, {sp,pc}
+ 	b	call_epilogue
  E(ARM_TYPE_INT64)
  	ldr	r1, [r2, #4]
 -- 
-2.17.1
+2.25.1
 

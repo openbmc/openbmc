@@ -19,11 +19,9 @@ inherit cmake pkgconfig
 
 PROVIDES += "llvm${PV}"
 
-MAJOR_VERSION = "12"
-MINOR_VERSION = "0"
-PATCH_VERSION = "0"
+PV = "12.0.0"
 
-PV = "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
+MAJOR_VERSION = "${@oe.utils.trim_version("${PV}", 1)}"
 
 LLVM_RELEASE = "${PV}"
 LLVM_DIR = "llvm${LLVM_RELEASE}"
@@ -178,7 +176,7 @@ FILES_${PN}-llvmhello = "\
 FILES_${PN}-dev += " \
     ${libdir}/${LLVM_DIR}/llvm-config \
     ${libdir}/${LLVM_DIR}/libRemarks.so \
-    ${libdir}/${LLVM_DIR}/libLLVM-${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}.so \
+    ${libdir}/${LLVM_DIR}/libLLVM-${PV}.so \
 "
 
 FILES_${PN}-staticdev += "\

@@ -53,6 +53,8 @@ do_configure_class-target() {
     -Dsoname=libperl.so.5 \
     -Dvendorprefix=${prefix} \
     -Darchlibexp=${STAGING_LIBDIR}/perl5/${PV}/${TARGET_ARCH}-linux \
+    -Dlibpth='${libdir} ${base_libdir}' \
+    -Dglibpth='${libdir} ${base_libdir}' \
     ${PACKAGECONFIG_CONFARGS}
 
     #perl.c uses an ARCHLIB_EXP define to generate compile-time code that

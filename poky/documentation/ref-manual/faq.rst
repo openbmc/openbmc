@@ -292,7 +292,7 @@ download directory. If that location fails, Poky tries
 :term:`MIRRORS` in that order.
 
 Assuming your distribution is "poky", the OpenEmbedded build system uses
-the Yocto Project source ``PREMIRRORS`` by default for SCM-based
+the Yocto Project source :term:`PREMIRRORS` by default for SCM-based
 sources, upstreams for normal tarballs, and then falls back to a number
 of other mirrors including the Yocto Project source mirror if those
 fail.

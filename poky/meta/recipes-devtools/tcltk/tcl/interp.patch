@@ -1,0 +1,32 @@
+The interp-36.7 patch has race conditions and is missing cleanup.  This patch by
+a Tcl maintainer should improve matters.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/tests/interp.test b/tests/interp.test
+index d7424847f..fc90990f3 100644
+--- a/tests/interp.test
++++ b/tests/interp.test
+@@ -3595,17 +3595,18 @@ test interp-36.7 {ChildBgerror sets error handler of child [1999035]} -setup {
+         variable result
+         set result [lindex $args 0]
+     }
++    set tout [after 5000 {set result timeout}]
+ } -body {
+     child eval {
+         variable done {}
+         after 0 error foo
+-        after 10 [list ::set [namespace which -variable done] {}]
+-        vwait [namespace which -variable done]
+     }
++    vwait result
+     set result
+ } -cleanup {
++    after cancel $tout
+     variable result {}
+-    unset -nocomplain result
++    unset -nocomplain result tout
+     interp delete child
+ } -result foo
+ 

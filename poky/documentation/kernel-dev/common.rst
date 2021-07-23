@@ -81,7 +81,7 @@ section:
    variable to include kernel modules.
 
    In this example we wish to build for qemux86 so we must set the
-   ``MACHINE`` variable to "qemux86" and also add the "kernel-modules".
+   :term:`MACHINE` variable to "qemux86" and also add the "kernel-modules".
    As described we do this by appending to ``conf/local.conf``::
 
       MACHINE = "qemux86"
@@ -259,7 +259,7 @@ section:
    variable to include kernel modules.
 
    In this example we wish to build for qemux86 so we must set the
-   ``MACHINE`` variable to "qemux86" and also add the "kernel-modules".
+   :term:`MACHINE` variable to "qemux86" and also add the "kernel-modules".
    As described we do this by appending to ``conf/local.conf``::
 
       MACHINE = "qemux86"
@@ -588,7 +588,7 @@ recipe is processed.
    added to the Yocto Project.
 
    In general, however, the Yocto Project maintainers take care of
-   moving the ``SRC_URI``-specified configuration options to the
+   moving the :term:`SRC_URI`-specified configuration options to the
    kernel's ``meta`` branch. Not only is it easier for BSP developers
    not to have to put those configurations in the branch,
    but having the maintainers do it allows them to apply 'global'
@@ -730,7 +730,7 @@ a Raspberry Pi 2, which is based on the Broadcom 2708/2709 chipset::
 
 Aside from modifying your kernel recipe and providing your own
 ``defconfig`` file, you need to be sure no files or statements set
-``SRC_URI`` to use a ``defconfig`` other than your "in-tree" file (e.g.
+:term:`SRC_URI` to use a ``defconfig`` other than your "in-tree" file (e.g.
 a kernel's ``linux-``\ `machine`\ ``.inc`` file). In other words, if the
 build system detects a statement that identifies an "out-of-tree"
 ``defconfig`` file, that statement will override your

@@ -116,7 +116,7 @@ It's useful to have some idea of how the tasks defined by the
 
 -  :ref:`ref-tasks-compile` - Runs ``make`` with
    arguments that specify the compiler and linker. You can pass
-   additional arguments through the ``EXTRA_OEMAKE`` variable.
+   additional arguments through the :term:`EXTRA_OEMAKE` variable.
 
 -  :ref:`ref-tasks-install` - Runs ``make install`` and
    passes in ``${``\ :term:`D`\ ``}`` as ``DESTDIR``.
@@ -932,20 +932,6 @@ specified by :term:`EFI_PROVIDER` if
 Normally, you do not use this class directly. Instead, you add "live" to
 :term:`IMAGE_FSTYPES`.
 
-.. _ref-classes-image-mklibs:
-
-``image-mklibs.bbclass``
-========================
-
-The ``image-mklibs`` class enables the use of the ``mklibs`` utility
-during the :ref:`ref-tasks-rootfs` task, which optimizes
-the size of libraries contained in the image.
-
-By default, the class is enabled in the ``local.conf.template`` using
-the :term:`USER_CLASSES` variable as follows::
-
-   USER_CLASSES ?= "buildstats image-mklibs image-prelink"
-
 .. _ref-classes-image-prelink:
 
 ``image-prelink.bbclass``
@@ -959,7 +945,7 @@ time.
 By default, the class is enabled in the ``local.conf.template`` using
 the :term:`USER_CLASSES` variable as follows::
 
-   USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+   USER_CLASSES ?= "buildstats image-prelink"
 
 .. _ref-classes-insane:
 
@@ -995,7 +981,7 @@ are meant to detect real or potential problems in the packaged
 output. So exercise caution when disabling these checks.
 
 Here are the tests you can list with the :term:`WARN_QA` and
-``ERROR_QA`` variables:
+:term:`ERROR_QA` variables:
 
 -  ``already-stripped:`` Checks that produced binaries have not
    already been stripped prior to the build system extracting debug
@@ -1030,7 +1016,7 @@ Here are the tests you can list with the :term:`WARN_QA` and
    adds a dependency on the ``initscripts-functions`` package to
    packages that install an initscript that refers to
    ``/etc/init.d/functions``. The recipe should really have an explicit
-   ``RDEPENDS`` for the package in question on ``initscripts-functions``
+   :term:`RDEPENDS` for the package in question on ``initscripts-functions``
    so that the OpenEmbedded build system is able to ensure that the
    ``initscripts`` recipe is actually built and thus the
    ``initscripts-functions`` package is made available.
@@ -1200,7 +1186,7 @@ Here are the tests you can list with the :term:`WARN_QA` and
    turn into ``FILES = "xyz"``.
 
 -  ``rpaths:`` Checks for rpaths in the binaries that contain build
-   system paths such as ``TMPDIR``. If this test fails, bad ``-rpath``
+   system paths such as :term:`TMPDIR`. If this test fails, bad ``-rpath``
    options are being passed to the linker commands and your binaries
    have potential security issues.
 
@@ -1273,7 +1259,7 @@ themselves.
 
 The ``kernel`` class handles building Linux kernels. The class contains
 code to build all kernel trees. All needed headers are staged into the
-``STAGING_KERNEL_DIR`` directory to allow out-of-tree module builds
+:term:`STAGING_KERNEL_DIR` directory to allow out-of-tree module builds
 using the :ref:`module <ref-classes-module>` class.
 
 This means that each built kernel module is packaged separately and

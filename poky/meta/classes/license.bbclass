@@ -63,14 +63,6 @@ def add_package_and_files(d):
         # first in PACKAGES to be sure that nothing else gets LICENSE_FILES_DIRECTORY
         d.setVar('PACKAGES', "%s %s" % (pn_lic, packages))
         d.setVar('FILES_' + pn_lic, files)
-    for pn in packages.split():
-        if pn == pn_lic:
-            continue
-        rrecommends_pn = d.getVar('RRECOMMENDS_' + pn)
-        if rrecommends_pn:
-            d.setVar('RRECOMMENDS_' + pn, "%s %s" % (pn_lic, rrecommends_pn))
-        else:
-            d.setVar('RRECOMMENDS_' + pn, "%s" % (pn_lic))
 
 def copy_license_files(lic_files_paths, destdir):
     import shutil

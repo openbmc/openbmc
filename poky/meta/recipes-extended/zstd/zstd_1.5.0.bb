@@ -29,10 +29,12 @@ ZSTD_LEGACY_SUPPORT ??= "4"
 
 do_compile () {
     oe_runmake ${PACKAGECONFIG_CONFARGS} ZSTD_LEGACY_SUPPORT=${ZSTD_LEGACY_SUPPORT}
+    oe_runmake ${PACKAGECONFIG_CONFARGS} ZSTD_LEGACY_SUPPORT=${ZSTD_LEGACY_SUPPORT} -C contrib/pzstd
 }
 
 do_install () {
     oe_runmake install 'DESTDIR=${D}'
+    oe_runmake install 'DESTDIR=${D}' PREFIX=${prefix} -C contrib/pzstd
 }
 
 BBCLASSEXTEND = "native nativesdk"

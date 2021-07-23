@@ -62,12 +62,12 @@ Makefile Environment Changes
 ----------------------------
 
 :term:`EXTRA_OEMAKE` now defaults to "" instead of
-"-e MAKEFLAGS=". Setting ``EXTRA_OEMAKE`` to "-e MAKEFLAGS=" by default
+"-e MAKEFLAGS=". Setting :term:`EXTRA_OEMAKE` to "-e MAKEFLAGS=" by default
 was a historical accident that has required many classes (e.g.
 ``autotools``, ``module``) and recipes to override this default in order
 to work with sensible build systems. When upgrading to the release, you
 must edit any recipe that relies upon this old default by either setting
-``EXTRA_OEMAKE`` back to "-e MAKEFLAGS=" or by explicitly setting any
+:term:`EXTRA_OEMAKE` back to "-e MAKEFLAGS=" or by explicitly setting any
 required variable value overrides using :term:`EXTRA_OEMAKE`, which is
 typically only needed when a Makefile sets a default value for a
 variable that is inappropriate for cross-compilation using the "="

@@ -25,6 +25,7 @@ SRC_URI = "https://github.com/lathiat/avahi/releases/download/v${PV}/avahi-${PV}
            file://initscript.patch \
            file://0001-Fix-opening-etc-resolv.conf-error.patch \
            file://handle-hup.patch \
+           file://local-ping.patch \
            "
 
 UPSTREAM_CHECK_URI = "https://github.com/lathiat/avahi/releases/"

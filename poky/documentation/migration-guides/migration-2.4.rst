@@ -51,7 +51,7 @@ occurred:
       ``su`` is normally provided through the shadow file format. The
       main ``util-linux`` package has runtime dependencies (i.e.
       :term:`RDEPENDS`) on the ``util-linux-su`` package
-      when "pam" is in ``DISTRO_FEATURES``.
+      when "pam" is in :term:`DISTRO_FEATURES`.
 
    -  The ``switch_root`` program is now packaged in a separate
       "util-linux-switch-root" package for small initramfs images that
@@ -72,10 +72,10 @@ occurred:
    change also eliminates needing to pull in the entire ``initscripts``
    package. The main ``initscripts`` package has a runtime dependency
    (i.e. :term:`RDEPENDS`) on the ``sushell`` package when "selinux" is in
-   ``DISTRO_FEATURES``.
+   :term:`DISTRO_FEATURES`.
 
 -  ``glib-2.0``: The ``glib-2.0`` package now has a recommended
-   runtime dependency (i.e. ``RRECOMMENDS``) on the ``shared-mime-info``
+   runtime dependency (i.e. :term:`RRECOMMENDS`) on the ``shared-mime-info``
    package, since large portions of GIO are not useful without the MIME
    database. You can remove the dependency by using the
    :term:`BAD_RECOMMENDATIONS` variable if

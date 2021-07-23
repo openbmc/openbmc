@@ -7,13 +7,15 @@ LIC_FILES_CHKSUM = "file://LICENSE;beginline=0;endline=1;md5=8eac08d22113880357c
 
 DEPENDS += "gperf-native"
 
-SRCREV = "4bf70431a339a2886ab8c82e9a45378f30c6e6c7"
+PV .= "+git${SRCPV}"
+SRCREV = "5822e50c2920ce597d038077dea4a0eedf193f86"
 
-SRC_URI = "git://github.com/seccomp/libseccomp.git;branch=release-2.5 \
+SRC_URI = "git://github.com/seccomp/libseccomp.git;branch=main \
+           file://0001-configure.ac-Bump-version-to-2.5.99.patch \
+           file://0001-arch-Add-riscv32-architecture-support.patch \
+           file://0002-Regenerate-syscall-cvs-file-from-5.13-rc5-kernel.patch \
            file://run-ptest \
            "
-
-COMPATIBLE_HOST_riscv32 = "null"
 
 S = "${WORKDIR}/git"
 

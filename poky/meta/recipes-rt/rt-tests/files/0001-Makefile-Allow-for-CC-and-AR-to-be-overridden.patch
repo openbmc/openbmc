@@ -1,4 +1,4 @@
-From b608a817df2b652cd5fa1b5a7cf14b7d2d8afd5f Mon Sep 17 00:00:00 2001
+From 7b0ab10370cad38e26c5ffaaa55a1fd77fff0f18 Mon Sep 17 00:00:00 2001
 From: Randy Witt <randy.e.witt@intel.com>
 Date: Fri, 16 Oct 2020 16:54:30 -0700
 Subject: [PATCH] Makefile: Allow for CC and AR to be overridden
@@ -9,16 +9,17 @@ commit 7763cf316d7896fa05b816a46998f0827ab6e6eb.
 Signed-off-by: Randy Witt <randy.e.witt@intel.com>
 
 Upstream-Status: Inappropriate [other]
+
 ---
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 636f191..9f57d2c 100644
+index 63cd77c..495d6bb 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -1,6 +1,6 @@
- VERSION = 1.10
+ VERSION = 2.1
 -CC = $(CROSS_COMPILE)gcc
 -AR = $(CROSS_COMPILE)ar
 +CC ?= $(CROSS_COMPILE)gcc
@@ -26,6 +27,3 @@ index 636f191..9f57d2c 100644
  
  OBJDIR = bld
  
--- 
-2.29.2
-

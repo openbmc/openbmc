@@ -13,7 +13,7 @@ The QEMU recipe now uses a number of
 :term:`PACKAGECONFIG` options to enable various
 optional features. The method used to set defaults for these options
 means that existing ``local.conf`` files will need to be modified to
-append to ``PACKAGECONFIG`` for ``qemu-native`` and ``nativesdk-qemu``
+append to :term:`PACKAGECONFIG` for ``qemu-native`` and ``nativesdk-qemu``
 instead of setting it. In other words, to enable graphical output for
 QEMU, you should now have these lines in ``local.conf``::
 

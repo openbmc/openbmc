@@ -6,6 +6,9 @@
 # This is mainly used by the gstreamer1.0-plugins-* plugin set recipes,
 # but can be used in any recipe that produces GStreamer plugins.
 
+# Dynamically generate packages for all enabled plugins
+PACKAGES_DYNAMIC = "^${PN}-.* ^libgst.*"
+
 PACKAGESPLITFUNCS_prepend = " split_gstreamer10_packages "
 PACKAGESPLITFUNCS_append = " set_gstreamer10_metapkg_rdepends "
 

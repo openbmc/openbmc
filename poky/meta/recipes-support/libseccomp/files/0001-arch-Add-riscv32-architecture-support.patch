@@ -1,0 +1,734 @@
+From 6d127a0463ea2d7bb5021562678324e28e0407e5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Jun 2021 19:45:34 -0700
+Subject: [PATCH 1/2] arch: Add riscv32 architecture support
+
+Support for rv32 was upstreamed into 5.4+ kernel
+
+Upstream-Status: Submitted [https://github.com/seccomp/libseccomp/pull/327]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CREDITS                            |  1 +
+ README.md                          |  1 +
+ doc/man/man1/scmp_sys_resolver.1   |  2 +-
+ doc/man/man3/seccomp_arch_add.3    |  1 +
+ include/seccomp-syscalls.h         | 31 ++++++++++++++++++
+ include/seccomp.h.in               |  9 ++++++
+ src/Makefile.am                    |  1 +
+ src/arch-riscv32.c                 | 31 ++++++++++++++++++
+ src/arch-riscv32.h                 | 22 +++++++++++++
+ src/arch-syscall-dump.c            |  4 +++
+ src/arch-syscall-validate          | 51 +++++++++++++++++++++++++++++-
+ src/arch.c                         | 11 ++++++-
+ src/gen_pfc.c                      |  2 ++
+ src/python/libseccomp.pxd          |  1 +
+ src/python/seccomp.pyx             |  2 ++
+ src/syscalls.c                     |  1 +
+ src/syscalls.csv                   |  2 +-
+ src/syscalls.h                     |  2 ++
+ src/system.c                       |  1 +
+ tests/15-basic-resolver.c          |  1 +
+ tests/16-sim-arch_basic.c          |  6 ++++
+ tests/16-sim-arch_basic.py         |  1 +
+ tests/23-sim-arch_all_le_basic.c   |  3 ++
+ tests/23-sim-arch_all_le_basic.py  |  1 +
+ tests/56-basic-iterate_syscalls.c  |  1 +
+ tests/56-basic-iterate_syscalls.py |  1 +
+ tests/regression                   |  5 +--
+ tools/scmp_arch_detect.c           |  3 ++
+ tools/scmp_bpf_disasm.c            |  2 ++
+ tools/scmp_bpf_sim.c               |  2 ++
+ tools/util.c                       |  6 +++-
+ tools/util.h                       |  7 ++++
+ 32 files changed, 208 insertions(+), 7 deletions(-)
+ create mode 100644 src/arch-riscv32.c
+ create mode 100644 src/arch-riscv32.h
+
+diff --git a/CREDITS b/CREDITS
+index d6bbc2a..ad2f7e0 100644
+--- a/CREDITS
++++ b/CREDITS
+@@ -33,6 +33,7 @@ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+ Jonah Petri <jonah@petri.us>
+ Justin Cormack <justin.cormack@docker.com>
+ Kees Cook <keescook@chromium.org>
++Khem Raj <raj.khem@gmail.com>
+ Kyle R. Conway <kyle.r.conway@gmail.com>
+ Kenta Tada <Kenta.Tada@sony.com>
+ Luca Bruno <lucab@debian.org>
+diff --git a/README.md b/README.md
+index ba02186..2cd718f 100644
+--- a/README.md
++++ b/README.md
+@@ -54,6 +54,7 @@ The libseccomp library currently supports the architectures listed below:
+ * 32-bit s390 (s390)
+ * 64-bit s390x (s390x)
+ * 64-bit RISC-V (riscv64)
++* 32-bit RISC-V (riscv32)
+ * 32-bit SuperH big endian (sheb)
+ * 32-bit SuperH (sh)
+
+diff --git a/doc/man/man1/scmp_sys_resolver.1 b/doc/man/man1/scmp_sys_resolver.1
+index 267187b..fc68d18 100644
+--- a/doc/man/man1/scmp_sys_resolver.1
++++ b/doc/man/man1/scmp_sys_resolver.1
+@@ -36,7 +36,7 @@ The architecture to use for resolving the system call.  Valid
+ .I ARCH
+ values are "x86", "x86_64", "x32", "arm", "aarch64", "mips", "mipsel", "mips64",
+ "mipsel64", "mips64n32", "mipsel64n32", "parisc", "parisc64", "ppc", "ppc64",
+-"ppc64le", "s390", "s390x", "sheb" and "sh".
++"ppc64le", "riscv32", "s390", "s390x", "sheb" and "sh".
+ .TP
+ .B \-t
+ If necessary, translate the system call name to the proper system call number,
+diff --git a/doc/man/man3/seccomp_arch_add.3 b/doc/man/man3/seccomp_arch_add.3
+index 7baa21e..8966b3a 100644
+--- a/doc/man/man3/seccomp_arch_add.3
++++ b/doc/man/man3/seccomp_arch_add.3
+@@ -30,6 +30,7 @@ seccomp_arch_add, seccomp_arch_remove, seccomp_arch_exist, seccomp_arch_native \
+ .B #define SCMP_ARCH_S390X
+ .B #define SCMP_ARCH_PARISC
+ .B #define SCMP_ARCH_PARISC64
++.B #define SCMP_ARCH_RISCV32
+ .B #define SCMP_ARCH_RISCV64
+ .sp
+ .BI "uint32_t seccomp_arch_resolve_name(const char *" arch_name ");"
+diff --git a/include/seccomp-syscalls.h b/include/seccomp-syscalls.h
+index c694db1..c6ea5ca 100644
+--- a/include/seccomp-syscalls.h
++++ b/include/seccomp-syscalls.h
+@@ -275,6 +275,13 @@
+ #define __PNR_ppoll				-10241
+ #define __PNR_renameat				-10242
+ #define __PNR_riscv_flush_icache		-10243
++#define __PNR_fstat				-10244
++#define __PNR_futex				-10245
++#define __PNR_nanosleep				-10246
++#define __PNR_lseek				-10247
++#define __PNR_clock_gettime			-10248
++#define __PNR_clock_nanosleep			-10249
++#define __PNR_gettimeofday			-10250
+
+ /*
+  * libseccomp syscall definitions
+@@ -442,7 +449,11 @@
+ #define __SNR_clock_getres_time64	__PNR_clock_getres_time64
+ #endif
+
++#ifdef __NR_clock_gettime
+ #define __SNR_clock_gettime		__NR_clock_gettime
++#else
++#define __SNR_clock_gettime		__PNR_clock_gettime
++#endif
+
+ #ifdef __NR_clock_gettime64
+ #define __SNR_clock_gettime64		__NR_clock_gettime64
+@@ -450,7 +461,11 @@
+ #define __SNR_clock_gettime64		__PNR_clock_gettime64
+ #endif
+
++#ifdef __NR_clock_nanosleep
+ #define __SNR_clock_nanosleep		__NR_clock_nanosleep
++#else
++#define __SNR_clock_nanosleep		__PNR_clock_nanosleep
++#endif
+
+ #ifdef __NR_clock_nanosleep_time64
+ #define __SNR_clock_nanosleep_time64	__NR_clock_nanosleep_time64
+@@ -710,7 +725,11 @@
+ #define __SNR_ftruncate64		__PNR_ftruncate64
+ #endif
+
++#ifdef __NR_futex
+ #define __SNR_futex			__NR_futex
++#else
++#define __SNR_futex			__PNR_futex
++#endif
+
+ #ifdef __NR_futex_time64
+ #define __SNR_futex_time64		__NR_futex_time64
+@@ -896,7 +915,11 @@
+
+ #define __SNR_gettid			__NR_gettid
+
++#ifdef __NR_gettimeofday
+ #define __SNR_gettimeofday		__NR_gettimeofday
++#else
++#define __SNR_gettimeofday		__PNR_gettimeofday
++#endif
+
+ #ifdef __NR_getuid
+ #define __SNR_getuid			__NR_getuid
+@@ -1046,7 +1069,11 @@
+
+ #define __SNR_lremovexattr		__NR_lremovexattr
+
++#ifdef __NR_lseek
+ #define __SNR_lseek			__NR_lseek
++#else
++#define __SNR_lseek			__PNR_lseek
++#endif
+
+ #define __SNR_lsetxattr			__NR_lsetxattr
+
+@@ -1218,7 +1245,11 @@
+
+ #define __SNR_name_to_handle_at			__NR_name_to_handle_at
+
++#ifdef __NR_nanosleep
+ #define __SNR_nanosleep			__NR_nanosleep
++#else
++#define __SNR_nanosleep			__PNR_nanosleep
++#endif
+
+ #ifdef __NR_newfstatat
+ #define __SNR_newfstatat		__NR_newfstatat
+diff --git a/include/seccomp.h.in b/include/seccomp.h.in
+index 333a89c..2e911db 100644
+--- a/include/seccomp.h.in
++++ b/include/seccomp.h.in
+@@ -214,7 +214,16 @@ struct scmp_arg_cmp {
+ #endif /* EM_RISCV */
+ #define AUDIT_ARCH_RISCV64	(EM_RISCV|__AUDIT_ARCH_64BIT|__AUDIT_ARCH_LE)
+ #endif /* AUDIT_ARCH_RISCV64 */
++
++#ifndef AUDIT_ARCH_RISCV32
++#ifndef EM_RISCV
++#define EM_RISCV		243
++#endif /* EM_RISCV */
++#define AUDIT_ARCH_RISCV32	(EM_RISCV|__AUDIT_ARCH_LE)
++#endif /* AUDIT_ARCH_RISCV32 */
++
+ #define SCMP_ARCH_RISCV64	AUDIT_ARCH_RISCV64
++#define SCMP_ARCH_RISCV32	AUDIT_ARCH_RISCV32
+
+ /**
+  * The SuperH architecture tokens
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 7b59810..7961925 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -44,6 +44,7 @@ SOURCES_ALL = \
+ 	arch-ppc.h arch-ppc.c \
+ 	arch-ppc64.h arch-ppc64.c \
+ 	arch-riscv64.h arch-riscv64.c \
++	arch-riscv32.h arch-riscv32.c \
+ 	arch-s390.h arch-s390.c \
+ 	arch-s390x.h arch-s390x.c \
+ 	arch-sh.h arch-sh.c \
+diff --git a/src/arch-riscv32.c b/src/arch-riscv32.c
+new file mode 100644
+index 0000000..53b3126
+--- /dev/null
++++ b/src/arch-riscv32.c
+@@ -0,0 +1,31 @@
++/*
++ * This library is free software; you can redistribute it and/or modify it
++ * under the terms of version 2.1 of the GNU Lesser General Public License as
++ * published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
++ * for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this library; if not, see <http://www.gnu.org/licenses>.
++ */
++
++#include <stdlib.h>
++#include <errno.h>
++#include <linux/audit.h>
++
++#include "arch.h"
++#include "arch-riscv32.h"
++
++const struct arch_def arch_def_riscv32 = {
++	.token = SCMP_ARCH_RISCV32,
++	.token_bpf = AUDIT_ARCH_RISCV32,
++	.size = ARCH_SIZE_32,
++	.endian = ARCH_ENDIAN_LITTLE,
++	.syscall_resolve_name = riscv32_syscall_resolve_name,
++	.syscall_resolve_num = riscv32_syscall_resolve_num,
++	.syscall_rewrite = NULL,
++	.rule_add = NULL,
++};
+diff --git a/src/arch-riscv32.h b/src/arch-riscv32.h
+new file mode 100644
+index 0000000..082a77d
+--- /dev/null
++++ b/src/arch-riscv32.h
+@@ -0,0 +1,22 @@
++/*
++ * This library is free software; you can redistribute it and/or modify it
++ * under the terms of version 2.1 of the GNU Lesser General Public License as
++ * published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
++ * for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with this library; if not, see <http://www.gnu.org/licenses>.
++ */
++
++#ifndef _ARCH_RISCV32_H
++#define _ARCH_RISCV32_H
++
++#include "arch.h"
++
++ARCH_DECL(riscv32)
++
++#endif
+diff --git a/src/arch-syscall-dump.c b/src/arch-syscall-dump.c
+index 843483b..c6ab57d 100644
+--- a/src/arch-syscall-dump.c
++++ b/src/arch-syscall-dump.c
+@@ -43,6 +43,7 @@
+ #include "arch-ppc.h"
+ #include "arch-ppc64.h"
+ #include "arch-riscv64.h"
++#include "arch-riscv32.h"
+ #include "arch-s390.h"
+ #include "arch-s390x.h"
+ #include "arch-sh.h"
+@@ -135,6 +136,9 @@ int main(int argc, char *argv[])
+ 		case SCMP_ARCH_RISCV64:
+ 			sys = riscv64_syscall_iterate(iter);
+ 			break;
++		case SCMP_ARCH_RISCV32:
++			sys = riscv32_syscall_iterate(iter);
++			break;
+ 		case SCMP_ARCH_S390:
+ 			sys = s390_syscall_iterate(iter);
+ 			break;
+diff --git a/src/arch-syscall-validate b/src/arch-syscall-validate
+index 68bebef..85c7f3d 100755
+--- a/src/arch-syscall-validate
++++ b/src/arch-syscall-validate
+@@ -519,6 +519,49 @@ function dump_lib_riscv64() {
+ 	dump_lib_arch riscv64 | mangle_lib_syscall riscv64
+ }
+
++#
++# Dump the riscv32 system syscall table
++#
++# Arguments:
++#     1    path to the kernel source
++#
++#  Dump the architecture's syscall table to stdout.
++#
++function dump_sys_riscv32() {
++	local sed_filter=""
++
++	sed_filter+='s/__NR3264_fadvise64/223/;'
++	sed_filter+='s/__NR3264_fcntl/25/;'
++	sed_filter+='s/__NR3264_fstatat/79/;'
++	sed_filter+='s/__NR3264_fstatfs/44/;'
++	sed_filter+='s/__NR3264_ftruncate/46/;'
++	sed_filter+='s/__NR3264_lseek/62/;'
++	sed_filter+='s/__NR3264_mmap/222/;'
++	sed_filter+='s/__NR3264_sendfile/71/;'
++	sed_filter+='s/__NR3264_statfs/43/;'
++	sed_filter+='s/__NR3264_truncate/45/;'
++	sed_filter+='s/__NR3264_fstat/80/;'
++
++	gcc -E -dM -I$1/include/uapi \
++		-D__BITS_PER_LONG=32 \
++		$1/arch/riscv/include/uapi/asm/unistd.h | \
++		grep "^#define __NR_" | \
++		sed '/__NR_syscalls/d' | \
++		sed 's/(__NR_arch_specific_syscall + 15)/259/' | \
++		sed '/__NR_arch_specific_syscall/d' | \
++		sed 's/#define[ \t]\+__NR_\([^ \t]\+\)[ \t]\+\(.*\)/\1,\2/' | \
++		sed $sed_filter | sort
++}
++
++#
++# Dump the riscv32 library syscall table
++#
++#  Dump the library's syscall table to stdout.
++#
++function dump_lib_riscv32() {
++	dump_lib_arch riscv32 | mangle_lib_syscall riscv32
++}
++
+ #
+ # Dump the s390 system syscall table
+ #
+@@ -639,6 +682,9 @@ function dump_sys() {
+ 	ppc64)
+ 		dump_sys_ppc64 "$2"
+ 		;;
++	riscv32)
++		dump_sys_riscv32 "$2"
++		;;
+ 	riscv64)
+ 		dump_sys_riscv64 "$2"
+ 		;;
+@@ -706,6 +752,9 @@ function dump_lib() {
+ 	ppc64)
+ 		dump_lib_ppc64
+ 		;;
++	riscv32)
++		dump_lib_riscv32
++		;;
+ 	riscv64)
+ 		dump_lib_riscv64
+ 		;;
+@@ -751,7 +800,7 @@ function gen_csv() {
+ 	abi_list+=" mips mips64 mips64n32"
+ 	abi_list+=" parisc parisc64"
+ 	abi_list+=" ppc ppc64"
+-	abi_list+=" riscv64"
++	abi_list+=" riscv32 riscv64"
+ 	abi_list+=" s390 s390x"
+ 	abi_list+=" sh"
+
+diff --git a/src/arch.c b/src/arch.c
+index 6ab922f..acf80af 100644
+--- a/src/arch.c
++++ b/src/arch.c
+@@ -43,6 +43,7 @@
+ #include "arch-ppc.h"
+ #include "arch-ppc64.h"
+ #include "arch-riscv64.h"
++#include "arch-riscv32.h"
+ #include "arch-s390.h"
+ #include "arch-s390x.h"
+ #include "arch-sh.h"
+@@ -97,8 +98,12 @@ const struct arch_def *arch_def_native = &arch_def_ppc;
+ const struct arch_def *arch_def_native = &arch_def_s390x;
+ #elif __s390__
+ const struct arch_def *arch_def_native = &arch_def_s390;
+-#elif __riscv && __riscv_xlen == 64
++#elif __riscv
++#if __riscv_xlen == 64
+ const struct arch_def *arch_def_native = &arch_def_riscv64;
++#elif __riscv_xlen == 32
++const struct arch_def *arch_def_native = &arch_def_riscv32;
++#endif
+ #elif __sh__
+ #ifdef __BIG_ENDIAN__
+ const struct arch_def *arch_def_native = &arch_def_sheb;
+@@ -167,6 +172,8 @@ const struct arch_def *arch_def_lookup(uint32_t token)
+ 		return &arch_def_s390;
+ 	case SCMP_ARCH_S390X:
+ 		return &arch_def_s390x;
++	case SCMP_ARCH_RISCV32:
++		return &arch_def_riscv32;
+ 	case SCMP_ARCH_RISCV64:
+ 		return &arch_def_riscv64;
+ 	case SCMP_ARCH_SHEB:
+@@ -223,6 +230,8 @@ const struct arch_def *arch_def_lookup_name(const char *arch_name)
+ 		return &arch_def_s390;
+ 	else if (strcmp(arch_name, "s390x") == 0)
+ 		return &arch_def_s390x;
++	else if (strcmp(arch_name, "riscv32") == 0)
++		return &arch_def_riscv32;
+ 	else if (strcmp(arch_name, "riscv64") == 0)
+ 		return &arch_def_riscv64;
+ 	else if (strcmp(arch_name, "sheb") == 0)
+diff --git a/src/gen_pfc.c b/src/gen_pfc.c
+index c7fb536..d45e181 100644
+--- a/src/gen_pfc.c
++++ b/src/gen_pfc.c
+@@ -87,6 +87,8 @@ static const char *_pfc_arch(const struct arch_def *arch)
+ 		return "s390x";
+ 	case SCMP_ARCH_S390:
+ 		return "s390";
++	case SCMP_ARCH_RISCV32:
++		return "riscv32";
+ 	case SCMP_ARCH_RISCV64:
+ 		return "riscv64";
+ 	case SCMP_ARCH_SHEB:
+diff --git a/src/python/libseccomp.pxd b/src/python/libseccomp.pxd
+index 0629bf1..000d503 100644
+--- a/src/python/libseccomp.pxd
++++ b/src/python/libseccomp.pxd
+@@ -51,6 +51,7 @@ cdef extern from "seccomp.h":
+         SCMP_ARCH_PPC64LE
+         SCMP_ARCH_S390
+         SCMP_ARCH_S390X
++        SCMP_ARCH_RISCV32
+         SCMP_ARCH_RISCV64
+
+     cdef enum scmp_filter_attr:
+diff --git a/src/python/seccomp.pyx b/src/python/seccomp.pyx
+index 1a9eb24..c94ad1d 100644
+--- a/src/python/seccomp.pyx
++++ b/src/python/seccomp.pyx
+@@ -214,6 +214,7 @@ cdef class Arch:
+     PARISC64 - 64-bit PA-RISC
+     PPC64 - 64-bit PowerPC
+     PPC - 32-bit PowerPC
++    RISCV32 - 32-bit RISC-V
+     RISCV64 - 64-bit RISC-V
+     """
+
+@@ -238,6 +239,7 @@ cdef class Arch:
+     PPC64LE = libseccomp.SCMP_ARCH_PPC64LE
+     S390 = libseccomp.SCMP_ARCH_S390
+     S390X = libseccomp.SCMP_ARCH_S390X
++    RISCV32 = libseccomp.SCMP_ARCH_RISCV32
+     RISCV64 = libseccomp.SCMP_ARCH_RISCV64
+
+     def __cinit__(self, arch=libseccomp.SCMP_ARCH_NATIVE):
+diff --git a/src/syscalls.c b/src/syscalls.c
+index ddb84fa..34e08d9 100644
+--- a/src/syscalls.c
++++ b/src/syscalls.c
+@@ -55,3 +55,4 @@ ARCH_DEF(sh)
+ ARCH_DEF(x32)
+ ARCH_DEF(x86)
+ ARCH_DEF(riscv64)
++ARCH_DEF(riscv32)
+diff --git a/src/syscalls.csv b/src/syscalls.csv
+index fbd1058..0ee6c15 100644
+--- a/src/syscalls.csv
++++ b/src/syscalls.csv
+@@ -1,4 +1,4 @@
+-#syscall (v5.12.0-rc7 2021-04-17),x86,x86_64,x32,arm,aarch64,mips,mips64,mips64n32,parisc,parisc64,ppc,ppc64,riscv64,s390,s390x,sh
++#syscall (v5.12.0-rc7 2021-04-17),x86,x86_64,x32,arm,aarch64,mips,mips64,mips64n32,parisc,parisc64,ppc,ppc64,riscv32,riscv64,s390,s390x,sh
+ accept,PNR,43,43,285,202,168,42,42,35,35,330,330,202,PNR,PNR,344
+ accept4,364,288,288,366,242,334,293,297,320,320,344,344,242,364,364,358
+ access,33,21,21,33,PNR,33,20,20,33,33,33,33,PNR,33,33,33
+diff --git a/src/syscalls.h b/src/syscalls.h
+index 4f959af..49887ba 100644
+--- a/src/syscalls.h
++++ b/src/syscalls.h
+@@ -28,6 +28,7 @@
+ #include "arch-x86.h"
+ #include "arch-x86.h"
+ #include "arch-riscv64.h"
++#include "arch-riscv32.h"
+
+ /* NOTE: changes to the arch_syscall_table layout may require changes to the
+  *       generate_syscalls_perf.sh and arch-syscall-validate scripts */
+@@ -49,6 +50,7 @@ struct arch_syscall_table {
+ 	int parisc64;
+ 	int ppc;
+ 	int ppc64;
++	int riscv32;
+ 	int riscv64;
+ 	int s390;
+ 	int s390x;
+diff --git a/src/system.c b/src/system.c
+index ae445bf..063e6be 100644
+--- a/src/system.c
++++ b/src/system.c
+@@ -130,6 +130,7 @@ int sys_chk_seccomp_syscall(void)
+ 	case SCMP_ARCH_PPC64LE:
+ 	case SCMP_ARCH_S390:
+ 	case SCMP_ARCH_S390X:
++	case SCMP_ARCH_RISCV32:
+ 	case SCMP_ARCH_RISCV64:
+ 		break;
+ 	default:
+diff --git a/tests/15-basic-resolver.c b/tests/15-basic-resolver.c
+index 2679270..57092f3 100644
+--- a/tests/15-basic-resolver.c
++++ b/tests/15-basic-resolver.c
+@@ -45,6 +45,7 @@ unsigned int arch_list[] = {
+ 	SCMP_ARCH_S390X,
+ 	SCMP_ARCH_PARISC,
+ 	SCMP_ARCH_PARISC64,
++	SCMP_ARCH_RISCV32,
+ 	SCMP_ARCH_RISCV64,
+ 	-1
+ };
+diff --git a/tests/16-sim-arch_basic.c b/tests/16-sim-arch_basic.c
+index 4fcbb5c..662e081 100644
+--- a/tests/16-sim-arch_basic.c
++++ b/tests/16-sim-arch_basic.c
+@@ -90,6 +90,9 @@ int main(int argc, char *argv[])
+ 	if (rc != 0)
+ 		goto out;
+ 	rc = seccomp_arch_add(ctx, SCMP_ARCH_PPC64LE);
++	if (rc != 0)
++		goto out;
++	rc = seccomp_arch_add(ctx, SCMP_ARCH_RISCV32);
+ 	if (rc != 0)
+ 		goto out;
+ 	rc = seccomp_arch_add(ctx, SCMP_ARCH_RISCV64);
+@@ -160,6 +163,9 @@ int main(int argc, char *argv[])
+ 	if (rc != 0)
+ 		goto out;
+ 	rc = seccomp_arch_remove(ctx, SCMP_ARCH_PPC64LE);
++	if (rc != 0)
++		goto out;
++	rc = seccomp_arch_remove(ctx, SCMP_ARCH_RISCV32);
+ 	if (rc != 0)
+ 		goto out;
+ 	rc = seccomp_arch_remove(ctx, SCMP_ARCH_RISCV64);
+diff --git a/tests/16-sim-arch_basic.py b/tests/16-sim-arch_basic.py
+index f22c985..d5e93a2 100755
+--- a/tests/16-sim-arch_basic.py
++++ b/tests/16-sim-arch_basic.py
+@@ -44,6 +44,7 @@ def test(args):
+     f.add_arch(Arch("mipsel64"))
+     f.add_arch(Arch("mipsel64n32"))
+     f.add_arch(Arch("ppc64le"))
++    f.add_arch(Arch("riscv32"))
+     f.add_arch(Arch("riscv64"))
+     f.add_arch(Arch("sh"))
+     f.add_rule(ALLOW, "read", Arg(0, EQ, sys.stdin.fileno()))
+diff --git a/tests/23-sim-arch_all_le_basic.c b/tests/23-sim-arch_all_le_basic.c
+index 08f030c..ec73224 100644
+--- a/tests/23-sim-arch_all_le_basic.c
++++ b/tests/23-sim-arch_all_le_basic.c
+@@ -75,6 +75,9 @@ int main(int argc, char *argv[])
+ 	if (rc != 0)
+ 		goto out;
+ 	rc = seccomp_arch_add(ctx, seccomp_arch_resolve_name("sh"));
++	if (rc != 0)
++		goto out;
++	rc = seccomp_arch_add(ctx, seccomp_arch_resolve_name("riscv32"));
+ 	if (rc != 0)
+ 		goto out;
+
+diff --git a/tests/23-sim-arch_all_le_basic.py b/tests/23-sim-arch_all_le_basic.py
+index 12bb243..1eebc20 100755
+--- a/tests/23-sim-arch_all_le_basic.py
++++ b/tests/23-sim-arch_all_le_basic.py
+@@ -40,6 +40,7 @@ def test(args):
+     f.add_arch(Arch("mipsel64"))
+     f.add_arch(Arch("mipsel64n32"))
+     f.add_arch(Arch("ppc64le"))
++    f.add_arch(Arch("riscv32"))
+     f.add_arch(Arch("riscv64"))
+     f.add_arch(Arch("sh"))
+     f.add_rule(ALLOW, "read", Arg(0, EQ, sys.stdin.fileno()))
+diff --git a/tests/56-basic-iterate_syscalls.c b/tests/56-basic-iterate_syscalls.c
+index 5e7ab67..c11ca8c 100644
+--- a/tests/56-basic-iterate_syscalls.c
++++ b/tests/56-basic-iterate_syscalls.c
+@@ -46,6 +46,7 @@ unsigned int arch_list[] = {
+ 	SCMP_ARCH_S390X,
+ 	SCMP_ARCH_PARISC,
+ 	SCMP_ARCH_PARISC64,
++	SCMP_ARCH_RISCV32,
+ 	SCMP_ARCH_RISCV64,
+ 	-1
+ };
+diff --git a/tests/56-basic-iterate_syscalls.py b/tests/56-basic-iterate_syscalls.py
+index 77a5b89..2e860bf 100755
+--- a/tests/56-basic-iterate_syscalls.py
++++ b/tests/56-basic-iterate_syscalls.py
+@@ -37,6 +37,7 @@ arch_list = ["x86",
+              "mipsel64",
+              "mipsel64n32",
+              "ppc64le",
++             "riscv32",
+              "riscv64"]
+
+ def test_arch(arch, init):
+diff --git a/tests/regression b/tests/regression
+index 53dab75..2869629 100755
+--- a/tests/regression
++++ b/tests/regression
+@@ -26,7 +26,7 @@ GLBL_ARCH_LE_SUPPORT=" \
+ 	arm aarch64 \
+ 	mipsel mipsel64 mipsel64n32 \
+ 	ppc64le \
+-	riscv64 \
++	riscv32 riscv64 \
+ 	sh"
+ GLBL_ARCH_BE_SUPPORT=" \
+ 	mips mips64 mips64n32 \
+@@ -41,6 +41,7 @@ GLBL_ARCH_32B_SUPPORT=" \
+ 	mips mipsel mips64n32 mipsel64n32 \
+ 	parisc \
+ 	ppc \
++	riscv32 \
+ 	s390 \
+ 	sheb sh"
+
+@@ -785,7 +786,7 @@ function run_test_live() {
+
+ 	# setup the arch specific return values
+ 	case "$arch" in
+-	x86|x86_64|x32|arm|aarch64|parisc|parisc64|ppc|ppc64|ppc64le|ppc|s390|s390x|riscv64|sh|sheb)
++	x86|x86_64|x32|arm|aarch64|parisc|parisc64|ppc|ppc64|ppc64le|ppc|s390|s390x|riscv32|riscv64|sh|sheb)
+ 		rc_kill_process=159
+ 		rc_kill=159
+ 		rc_allow=160
+diff --git a/tools/scmp_arch_detect.c b/tools/scmp_arch_detect.c
+index b6bd2bb..7789970 100644
+--- a/tools/scmp_arch_detect.c
++++ b/tools/scmp_arch_detect.c
+@@ -129,6 +129,9 @@ int main(int argc, char *argv[])
+ 		case SCMP_ARCH_SH:
+ 			printf("sh\n");
+ 			break;
++		case SCMP_ARCH_RISCV32:
++			printf("riscv32\n");
++			break;
+ 		default:
+ 			printf("unknown\n");
+ 		}
+diff --git a/tools/scmp_bpf_disasm.c b/tools/scmp_bpf_disasm.c
+index b95cdeb..49a89c7 100644
+--- a/tools/scmp_bpf_disasm.c
++++ b/tools/scmp_bpf_disasm.c
+@@ -510,6 +510,8 @@ int main(int argc, char *argv[])
+ 				arch = AUDIT_ARCH_S390X;
+ 			else if (strcmp(optarg, "riscv64") == 0)
+ 				arch = AUDIT_ARCH_RISCV64;
++			else if (strcmp(optarg, "riscv32") == 0)
++				arch = AUDIT_ARCH_RISCV32;
+ 			else
+ 				exit_usage(argv[0]);
+ 			break;
+diff --git a/tools/scmp_bpf_sim.c b/tools/scmp_bpf_sim.c
+index 04edfbc..53e6575 100644
+--- a/tools/scmp_bpf_sim.c
++++ b/tools/scmp_bpf_sim.c
+@@ -285,6 +285,8 @@ int main(int argc, char *argv[])
+ 				arch = AUDIT_ARCH_S390;
+ 			else if (strcmp(optarg, "s390x") == 0)
+ 				arch = AUDIT_ARCH_S390X;
++			else if (strcmp(optarg, "riscv32") == 0)
++				arch = AUDIT_ARCH_RISCV32;
+ 			else if (strcmp(optarg, "riscv64") == 0)
+ 				arch = AUDIT_ARCH_RISCV64;
+ 			else if (strcmp(optarg, "sheb") == 0)
+diff --git a/tools/util.c b/tools/util.c
+index afea6c9..1fc1f62 100644
+--- a/tools/util.c
++++ b/tools/util.c
+@@ -78,8 +78,12 @@
+ #define ARCH_NATIVE		AUDIT_ARCH_S390X
+ #elif __s390__
+ #define ARCH_NATIVE		AUDIT_ARCH_S390
+-#elif __riscv && __riscv_xlen == 64
++#elif __riscv
++#if __riscv_xlen == 64
+ #define ARCH_NATIVE		AUDIT_ARCH_RISCV64
++#elif __riscv_xlen == 32
++#define ARCH_NATIVE		AUDIT_ARCH_RISCV32
++#endif
+ #elif __sh__
+ #ifdef __BIG_ENDIAN__
+ #define ARCH_NATIVE		AUDIT_ARCH_SH
+diff --git a/tools/util.h b/tools/util.h
+index 6c2ca33..4d16e38 100644
+--- a/tools/util.h
++++ b/tools/util.h
+@@ -79,6 +79,13 @@
+ #define AUDIT_ARCH_RISCV64	(EM_RISCV|__AUDIT_ARCH_64BIT|__AUDIT_ARCH_LE)
+ #endif /* AUDIT_ARCH_RISCV64 */
+
++#ifndef AUDIT_ARCH_RISCV32
++#ifndef EM_RISCV
++#define EM_RISCV		243
++#endif /* EM_RISCV */
++#define AUDIT_ARCH_RISCV32	(EM_RISCV|__AUDIT_ARCH_LE)
++#endif /* AUDIT_ARCH_RISCV32 */
++
+ extern uint32_t arch;
+
+ uint16_t ttoh16(uint32_t arch, uint16_t val);
+--
+2.32.0

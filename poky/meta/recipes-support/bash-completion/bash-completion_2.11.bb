@@ -37,6 +37,4 @@ PACKAGES =+ "${PN}-extra"
 FILES_${PN}-extra = "${datadir}/${BPN}/completions/ \
     ${datadir}/${BPN}/helpers/"
 
-FILES_${PN}-dev += "${datadir}/cmake"
-
 BBCLASSEXTEND = "nativesdk"

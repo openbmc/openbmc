@@ -280,7 +280,7 @@ system and gives an overview of their function and contents.
          S = "${WORKDIR}/${BP}"
 
       You can separate the (:term:`S`) directory and the directory pointed to
-      by the ``B`` variable. Most Autotools-based recipes support
+      by the :term:`B` variable. Most Autotools-based recipes support
       separating these directories. The build system defaults to using
       separate directories for ``gcc`` and some kernel recipes.
 
@@ -553,7 +553,7 @@ system and gives an overview of their function and contents.
          BB_SERVER_TIMEOUT = "20"
 
       If you want the server to never be unloaded,
-      set ``BB_SERVER_TIMEOUT`` to "-1".
+      set :term:`BB_SERVER_TIMEOUT` to "-1".
 
    :term:`BBCLASSEXTEND`
       Allows you to extend a recipe so that it builds variants of the
@@ -577,7 +577,7 @@ system and gives an overview of their function and contents.
          variants by rewriting variable values and applying overrides such
          as ``_class-native``. For example, to generate a native version of
          a recipe, a :term:`DEPENDS` on "foo" is rewritten
-         to a ``DEPENDS`` on "foo-native".
+         to a :term:`DEPENDS` on "foo-native".
 
          Even when using :term:`BBCLASSEXTEND`, the recipe is only parsed once.
          Parsing once adds some limitations. For example, it is not
@@ -892,13 +892,13 @@ system and gives an overview of their function and contents.
       the :term:`BUILD_CFLAGS` and
       :term:`BUILDSDK_CFLAGS` default values.
 
-      The default value of the ``BUILD_OPTIMIZATION`` variable is "-O2
+      The default value of the :term:`BUILD_OPTIMIZATION` variable is "-O2
       -pipe".
 
    :term:`BUILD_OS`
       Specifies the operating system in use on the build host (e.g.
       "linux"). The OpenEmbedded build system sets the value of
-      ``BUILD_OS`` from the OS reported by the ``uname`` command - the
+      :term:`BUILD_OS` from the OS reported by the ``uname`` command - the
       first word, converted to lower-case characters.
 
    :term:`BUILD_PREFIX`
@@ -1021,6 +1021,20 @@ system and gives an overview of their function and contents.
 
          BUILDHISTORY_IMAGE_FILES ?= "/etc/passwd /etc/group"
 
+   :term:`BUILDHISTORY_PATH_PREFIX_STRIP`
+      When inheriting the :ref:`buildhistory <ref-classes-buildhistory>`
+      class, this variable specifies a common path prefix that should be
+      stripped off the beginning of paths in the task signature list when the
+      ``task`` feature is active in :term:`BUILDHISTORY_FEATURES`. This can be
+      useful when build history is populated from multiple sources that may not
+      all use the same top level directory.
+
+      By default, the ``buildhistory`` class sets the variable as follows::
+
+         BUILDHISTORY_PATH_PREFIX_STRIP ?= ""
+
+      In this case, no prefixes will be stripped.
+
    :term:`BUILDHISTORY_PUSH_REPO`
       When inheriting the :ref:`buildhistory <ref-classes-buildhistory>`
       class, this variable optionally specifies a remote repository to
@@ -1114,7 +1128,7 @@ system and gives an overview of their function and contents.
 
       .. note::
 
-         ``CLASSOVERRIDE`` gets its default "class-target" value from the
+         :term:`CLASSOVERRIDE` gets its default "class-target" value from the
          ``bitbake.conf`` file.
 
       As an example, the following override allows you to install extra
@@ -1205,7 +1219,7 @@ system and gives an overview of their function and contents.
 
    :term:`COMPONENTS_DIR`
       Stores sysroot components for each recipe. The OpenEmbedded build
-      system uses ``COMPONENTS_DIR`` when constructing recipe-specific
+      system uses :term:`COMPONENTS_DIR` when constructing recipe-specific
       sysroots for other recipes.
 
       The default is
@@ -1611,7 +1625,7 @@ system and gives an overview of their function and contents.
             ":ref:`overview-manual/concepts:automatically added runtime dependencies`"
             section in the Yocto Project Overview and Concepts Manual,
             runtime dependencies will often be added automatically, meaning
-            ``DEPENDS`` alone is sufficient for most recipes.
+            :term:`DEPENDS` alone is sufficient for most recipes.
 
          -  Counterintuitively, :term:`DEPENDS` is often necessary even for
             recipes that install precompiled components. For example, if
@@ -1652,7 +1666,7 @@ system and gives an overview of their function and contents.
       "package_deb".
 
       The BitBake configuration file initially defines the
-      ``DEPLOY_DIR_DEB`` variable as a sub-folder of
+      :term:`DEPLOY_DIR_DEB` variable as a sub-folder of
       :term:`DEPLOY_DIR`::
 
          DEPLOY_DIR_DEB = "${DEPLOY_DIR}/deb"
@@ -2568,7 +2582,7 @@ system and gives an overview of their function and contents.
    :term:`FONT_EXTRA_RDEPENDS`
       When inheriting the :ref:`fontcache <ref-classes-fontcache>` class,
       this variable specifies the runtime dependencies for font packages.
-      By default, the ``FONT_EXTRA_RDEPENDS`` is set to "fontconfig-utils".
+      By default, the :term:`FONT_EXTRA_RDEPENDS` is set to "fontconfig-utils".
 
    :term:`FONT_PACKAGES`
       When inheriting the :ref:`fontcache <ref-classes-fontcache>` class,
@@ -3005,7 +3019,7 @@ system and gives an overview of their function and contents.
 
          -  If an image recipe uses the "inherit image" line and you are
             setting :term:`IMAGE_FSTYPES` inside the recipe, you must set
-            ``IMAGE_FSTYPES`` prior to using the "inherit image" line.
+            :term:`IMAGE_FSTYPES` prior to using the "inherit image" line.
 
          -  Due to the way the OpenEmbedded build system processes this
             variable, you cannot update its contents by using ``_append``
@@ -3334,13 +3348,13 @@ system and gives an overview of their function and contents.
    :term:`IMGDEPLOYDIR`
       When inheriting the :ref:`image <ref-classes-image>` class directly or
       through the :ref:`core-image <ref-classes-core-image>` class, the
-      ``IMGDEPLOYDIR`` points to a temporary work area for deployed files
+      :term:`IMGDEPLOYDIR` points to a temporary work area for deployed files
       that is set in the ``image`` class as follows::
 
          IMGDEPLOYDIR = "${WORKDIR}/deploy-${PN}-image-complete"
 
       Recipes inheriting the ``image`` class should copy files to be
-      deployed into ``IMGDEPLOYDIR``, and the class will take care of
+      deployed into :term:`IMGDEPLOYDIR`, and the class will take care of
       copying them into :term:`DEPLOY_DIR_IMAGE` afterwards.
 
    :term:`INC_PR`
@@ -3698,7 +3712,7 @@ system and gives an overview of their function and contents.
       - qemu
       - mips
 
-      You define the ``KARCH`` variable in the :ref:`kernel-dev/advanced:bsp descriptions`.
+      You define the :term:`KARCH` variable in the :ref:`kernel-dev/advanced:bsp descriptions`.
 
    :term:`KBRANCH`
       A regular expression used by the build process to explicitly identify
@@ -4653,7 +4667,7 @@ system and gives an overview of their function and contents.
 
    :term:`module_autoload`
       This variable has been replaced by the :term:`KERNEL_MODULE_AUTOLOAD`
-      variable. You should replace all occurrences of ``module_autoload``
+      variable. You should replace all occurrences of :term:`module_autoload`
       with additions to :term:`KERNEL_MODULE_AUTOLOAD`, for example::
 
          module_autoload_rfcomm = "rfcomm"
@@ -4684,9 +4698,9 @@ system and gives an overview of their function and contents.
       You must use the kernel module name override.
 
       Run ``man modprobe.d`` in the shell to find out more information on
-      the exact syntax you want to provide with ``module_conf``.
+      the exact syntax you want to provide with :term:`module_conf`.
 
-      Including ``module_conf`` causes the OpenEmbedded build system to
+      Including :term:`module_conf` causes the OpenEmbedded build system to
       populate the ``/etc/modprobe.d/modname.conf`` file with
       ``modprobe.d`` syntax lines. Here is an example that adds the options
       ``arg1`` and ``arg2`` to a module named ``mymodule``::
@@ -4876,7 +4890,7 @@ system and gives an overview of their function and contents.
       information, see the ":ref:`dev-manual/common-tasks:using a development shell`" section in
       the Yocto Project Development Tasks Manual.
 
-      You can use the following values for the ``OE_TERMINAL`` variable:
+      You can use the following values for the :term:`OE_TERMINAL` variable:
 
       - auto
       - gnome
@@ -5260,7 +5274,7 @@ system and gives an overview of their function and contents.
          PACKAGECONFIG[f2] = "\
               ... and so on and so on ...
 
-      The ``PACKAGECONFIG`` variable itself specifies a space-separated
+      The :term:`PACKAGECONFIG` variable itself specifies a space-separated
       list of the features to enable. Following the features, you can
       determine the behavior of each feature by providing up to six
       order-dependent arguments, which are separated by commas. You can
@@ -5600,7 +5614,7 @@ system and gives an overview of their function and contents.
 
       If applicable, the :term:`PN` variable also contains any special suffix
       or prefix. For example, using ``bash`` to build packages for the
-      native machine, ``PN`` is ``bash-native``. Using ``bash`` to build
+      native machine, :term:`PN` is ``bash-native``. Using ``bash`` to build
       packages for the target and for Multilib, :term:`PN` would be ``bash``
       and ``lib64-bash``, respectively.
 
@@ -5670,7 +5684,7 @@ system and gives an overview of their function and contents.
          :term:`PR` does not need to be increased for changes that do not change the
          package contents or metadata.
 
-      Because manually managing ``PR`` can be cumbersome and error-prone,
+      Because manually managing :term:`PR` can be cumbersome and error-prone,
       an automated solution exists. See the
       ":ref:`dev-manual/common-tasks:working with a pr service`" section
       in the Yocto Project Development Tasks Manual for more information.
@@ -6042,7 +6056,7 @@ system and gives an overview of their function and contents.
 
       In the example,
       the development package depends on the ``perl`` package. Thus, the
-      ``RDEPENDS`` variable has the ``${PN}-dev`` package name as part of
+      :term:`RDEPENDS` variable has the ``${PN}-dev`` package name as part of
       the variable.
 
       .. note::
@@ -7079,7 +7093,7 @@ system and gives an overview of their function and contents.
 
    :term:`SRC_URI_OVERRIDES_PACKAGE_ARCH`
       By default, the OpenEmbedded build system automatically detects
-      whether ``SRC_URI`` contains files that are machine-specific. If so,
+      whether :term:`SRC_URI` contains files that are machine-specific. If so,
       the build system automatically changes :term:`PACKAGE_ARCH`. Setting this
       variable to "0" disables this behavior.
 
@@ -7292,7 +7306,7 @@ system and gives an overview of their function and contents.
 
             ``-native`` recipes are not installed into host paths like such
             as ``/usr``. Rather, these recipes are installed into
-            ``STAGING_DIR_NATIVE``. When compiling ``-native`` recipes,
+            :term:`STAGING_DIR_NATIVE`. When compiling ``-native`` recipes,
             standard build environment variables such as
             :term:`CPPFLAGS` and
             :term:`CFLAGS` are set up so that both host paths
@@ -7726,13 +7740,13 @@ system and gives an overview of their function and contents.
       Specifies the prefix used for the toolchain binary target tools.
 
       Depending on the type of recipe and the build target,
-      ``TARGET_PREFIX`` is set as follows:
+      :term:`TARGET_PREFIX` is set as follows:
 
       -  For recipes building for the target machine, the value is
          "${:term:`TARGET_SYS`}-".
 
       -  For native recipes, the build system sets the variable to the
-         value of ``BUILD_PREFIX``.
+         value of :term:`BUILD_PREFIX`.
 
       -  For native SDK recipes (``nativesdk``), the build system sets the
          variable to the value of :term:`SDK_PREFIX`.
@@ -7778,7 +7792,7 @@ system and gives an overview of their function and contents.
       separate to avoid potential conflicts.
 
       In the ``defaultsetup.conf`` file, the default value of
-      ``TCLIBCAPPEND`` is "-${TCLIBC}". However, distros such as poky,
+      :term:`TCLIBCAPPEND` is "-${TCLIBC}". However, distros such as poky,
       which normally only support one ``libc`` variant, set
       :term:`TCLIBCAPPEND` to "" in their distro configuration file resulting
       in no suffix being applied.
@@ -7960,7 +7974,7 @@ system and gives an overview of their function and contents.
       ``BaseTarget`` class, which is an abstract class that cannot be used
       as a value of :term:`TEST_TARGET`.
 
-      You can provide the following arguments with ``TEST_TARGET``:
+      You can provide the following arguments with :term:`TEST_TARGET`:
 
       -  *"qemu":* Boots a QEMU image and runs the tests. See the
          ":ref:`dev-manual/common-tasks:enabling runtime tests on qemu`" section
@@ -8298,7 +8312,7 @@ system and gives an overview of their function and contents.
       In this example, "sd" is selected as the configuration of the possible four for the
       :term:`UBOOT_MACHINE`. The "sd" configuration defines
       "mx6qsabreauto_config" as the value for :term:`UBOOT_MACHINE`, while the
-      "sdcard" specifies the ``IMAGE_FSTYPES`` to use for the U-Boot image.
+      "sdcard" specifies the :term:`IMAGE_FSTYPES` to use for the U-Boot image.
 
       For more information on how the :term:`UBOOT_CONFIG` is handled, see the
       :ref:`uboot-config <ref-classes-uboot-config>`
@@ -8357,7 +8371,7 @@ system and gives an overview of their function and contents.
    :term:`UBOOT_MKIMAGE_DTCOPTS`
       Options for the device tree compiler passed to mkimage '-D'
       feature while creating FIT image in :ref:`kernel-fitimage <ref-classes-kernel-fitimage>` class.
-      If ``UBOOT_MKIMAGE_DTCOPTS`` is not set then kernel-fitimage will not
+      If :term:`UBOOT_MKIMAGE_DTCOPTS` is not set then kernel-fitimage will not
       pass the ``-D`` option to mkimage.
 
    :term:`UBOOT_MKIMAGE_SIGN`
@@ -8502,11 +8516,11 @@ system and gives an overview of their function and contents.
    :term:`USER_CLASSES`
       A list of classes to globally inherit. These classes are used by the
       OpenEmbedded build system to enable extra features (e.g.
-      ``buildstats``, ``image-mklibs``, and so forth).
+      ``buildstats``, ``image-prelink``, and so forth).
 
       The default list is set in your ``local.conf`` file::
 
-         USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+         USER_CLASSES ?= "buildstats image-prelink"
 
       For more information, see
       ``meta-poky/conf/local.conf.sample`` in the :term:`Source Directory`.

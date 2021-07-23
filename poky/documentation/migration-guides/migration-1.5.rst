@@ -124,7 +124,7 @@ The following directory changes exist:
    need to refer to this directory. The ``runqemu`` script now uses this
    variable to find images and kernel binaries and will use BitBake to
    determine the directory. Alternatively, you can set the
-   ``DEPLOY_DIR_IMAGE`` variable in the external environment.
+   :term:`DEPLOY_DIR_IMAGE` variable in the external environment.
 
 -  When buildhistory is enabled, its output is now written under the
    :term:`Build Directory` rather than
@@ -333,7 +333,7 @@ Following is a list of short entries describing other changes:
    :term:`BAD_RECOMMENDATIONS` supports
    pre-renamed package names.
 
--  ``classes/rootfs_rpm``: Implement ``BAD_RECOMMENDATIONS`` for RPM.
+-  ``classes/rootfs_rpm``: Implement :term:`BAD_RECOMMENDATIONS` for RPM.
 
 -  ``systemd``: Remove ``systemd_unitdir`` if ``systemd`` is not in
    :term:`DISTRO_FEATURES`.

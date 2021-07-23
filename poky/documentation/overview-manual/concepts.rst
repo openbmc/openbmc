@@ -774,7 +774,7 @@ Build Directory's hierarchy:
 
    -  :term:`BPN`: The name of the recipe
       used to build the package. The :term:`BPN` variable is a version of
-      the ``PN`` variable but with common prefixes and suffixes removed.
+      the :term:`PN` variable but with common prefixes and suffixes removed.
 
    -  :term:`PV`: The version of the
       recipe used to build the package.
@@ -1918,7 +1918,7 @@ shared state files. Here is an example::
 
 .. note::
 
-   The shared state directory (``SSTATE_DIR``) is organized into two-character
+   The shared state directory (:term:`SSTATE_DIR`) is organized into two-character
    subdirectories, where the subdirectory names are based on the first two
    characters of the hash.
    If the shared state directory structure for a mirror has the same structure
@@ -2028,7 +2028,7 @@ dependencies, you must manually declare the dependencies.
 
    .. note::
 
-      By default, ``foo-dev`` also has an ``RDEPENDS``-style dependency on
+      By default, ``foo-dev`` also has an :term:`RDEPENDS`-style dependency on
       ``foo``, because the default value of ``RDEPENDS_${PN}-dev`` (set in
       bitbake.conf) includes "${PN}".
 

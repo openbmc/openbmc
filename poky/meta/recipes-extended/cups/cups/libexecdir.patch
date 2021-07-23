@@ -1,0 +1,27 @@
+Use $libexecdir instead of hardcoding $prefix/lib as this breaks multilib builds.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/config-scripts/cups-directories.m4 b/config-scripts/cups-directories.m4
+index 1430af3a6..6efedc604 100644
+--- a/config-scripts/cups-directories.m4
++++ b/config-scripts/cups-directories.m4
+@@ -265,7 +265,7 @@ case "$host_os_name" in
+ 	*-gnu)
+ 		# GNUs
+ 		INSTALL_SYSV="install-sysv"
+-		CUPS_SERVERBIN="$exec_prefix/lib/cups"
++		CUPS_SERVERBIN="$libexecdir/cups"
+ 		;;
+ 	*bsd* | darwin*)
+ 		# *BSD and Darwin (macOS)
+@@ -275,7 +275,7 @@ case "$host_os_name" in
+ 	*)
+ 		# All others
+ 		INSTALL_SYSV="install-sysv"
+-		CUPS_SERVERBIN="$exec_prefix/lib/cups"
++		CUPS_SERVERBIN="$libexecdir/cups"
+ 		;;
+ esac
+ 

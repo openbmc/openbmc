@@ -152,6 +152,8 @@ class QemuTarget(BaseTarget):
 
         self.target_dumper = TargetDumper(dump_target_cmds, dump_dir, self.runner)
         self.monitor_dumper = MonitorDumper(dump_monitor_cmds, dump_dir, self.runner)
+        if (self.monitor_dumper):
+            self.monitor_dumper.create_dir("qmp")
 
     def deploy(self):
         bb.utils.mkdirhier(self.testdir)

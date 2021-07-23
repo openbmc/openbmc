@@ -130,6 +130,7 @@ testimage_dump_host () {
 testimage_dump_monitor () {
     query-status
     query-block
+    dump-guest-memory {"paging":false,"protocol":"file:%s.img"}
 }
 
 python do_testimage() {

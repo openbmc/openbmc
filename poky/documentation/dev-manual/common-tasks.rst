@@ -268,7 +268,7 @@ following list:
       quickly.
 
       In summary, you need to place all files referenced from
-      ``SRC_URI`` in a machine-specific subdirectory within the layer in
+      :term:`SRC_URI` in a machine-specific subdirectory within the layer in
       order to restrict those files to machine-specific builds.
 
 -  *Perform Steps to Apply for Yocto Project Compatibility:* If you want
@@ -1305,7 +1305,7 @@ scanning directory locations for local files in :term:`SRC_URI`.
 
 The :term:`SRC_URI` variable in your recipe must define each unique location
 for your source files. It is good practice to not hard-code version
-numbers in a URL used in ``SRC_URI``. Rather than hard-code these
+numbers in a URL used in :term:`SRC_URI`. Rather than hard-code these
 values, use ``${``\ :term:`PV`\ ``}``,
 which causes the fetch process to use the version specified in the
 recipe filename. Specifying the version in this manner means that
@@ -2743,7 +2743,7 @@ recognizes the machine as "crownbay".
 The most important variables you must set in your machine configuration
 file or include from a lower-level configuration file are as follows:
 
--  ``TARGET_ARCH`` (e.g. "arm")
+-  :term:`TARGET_ARCH` (e.g. "arm")
 
 -  ``PREFERRED_PROVIDER_virtual/kernel``
 
@@ -2751,9 +2751,9 @@ file or include from a lower-level configuration file are as follows:
 
 You might also need these variables:
 
--  ``SERIAL_CONSOLES`` (e.g. "115200;ttyS0 115200;ttyS1")
+-  :term:`SERIAL_CONSOLES` (e.g. "115200;ttyS0 115200;ttyS1")
 
--  ``KERNEL_IMAGETYPE`` (e.g. "zImage")
+-  :term:`KERNEL_IMAGETYPE` (e.g. "zImage")
 
 -  :term:`IMAGE_FSTYPES` (e.g. "tar.gz jffs2")
 
@@ -3277,7 +3277,7 @@ The actual directory depends on several things:
 
 -  :term:`EXTENDPE`: The epoch - (if
    :term:`PE` is not specified, which is
-   usually the case for most recipes, then ``EXTENDPE`` is blank).
+   usually the case for most recipes, then :term:`EXTENDPE` is blank).
 
 -  :term:`PV`: The recipe version.
 
@@ -4167,7 +4167,7 @@ your tunings to best consider build times and package feed maintenance.
       If :term:`DISTRO` settings change or fundamental configuration settings
       such as the filesystem layout, you need to work with a clean :term:`TMPDIR`.
       Sharing :term:`TMPDIR` under these circumstances might work but since it is
-      not guaranteed, you should use a clean ``TMPDIR``.
+      not guaranteed, you should use a clean :term:`TMPDIR`.
 
 -  *Enable the Appropriate Package Architecture:* By default, the
    OpenEmbedded build system enables three levels of package
@@ -4392,7 +4392,7 @@ directory:
       INHERIT += "own-mirrors"
       BB_NO_NETWORK = "1"
 
-   The ``SOURCE_MIRROR_URL`` and ``own-mirror``
+   The :term:`SOURCE_MIRROR_URL` and ``own-mirror``
    class set up the system to use the downloads directory as your "own
    mirror". Using the :term:`BB_NO_NETWORK` variable makes sure that
    BitBake's fetching process in step 3 stays local, which means files
@@ -4676,7 +4676,7 @@ needed.
 
 For the most part, the Multilib class extension works automatically to
 extend the package name from ``${PN}`` to ``${MLPREFIX}${PN}``, where
-``MLPREFIX`` is the particular multilib (e.g. "lib32-" or "lib64-").
+:term:`MLPREFIX` is the particular multilib (e.g. "lib32-" or "lib64-").
 Standard variables such as
 :term:`DEPENDS`,
 :term:`RDEPENDS`,
@@ -6258,7 +6258,7 @@ the following:
    software being packaged. Do not confuse :term:`PV` with the binary
    package version.
 
--  ``PR``: The recipe revision.
+-  :term:`PR`: The recipe revision.
 
 -  :term:`SRCPV`: The OpenEmbedded
    build system uses this string to help define the value of :term:`PV` when
@@ -7946,8 +7946,8 @@ output from this command::
    Here are some notes on using the ``buildhistory-collect-srcrevs`` command:
 
    -  By default, only values where the :term:`SRCREV` was not hardcoded
-      (usually when ``AUTOREV`` is used) are reported. Use the ``-a``
-      option to see all ``SRCREV`` values.
+      (usually when :term:`AUTOREV` is used) are reported. Use the ``-a``
+      option to see all :term:`SRCREV` values.
 
    -  The output statements might not have any effect if overrides are
       applied elsewhere in the build system configuration. Use the
@@ -8002,7 +8002,7 @@ Here is an example of ``image-info.txt``:
 
    DISTRO = poky
    DISTRO_VERSION = 1.7
-   USER_CLASSES = buildstats image-mklibs image-prelink
+   USER_CLASSES = buildstats image-prelink
    IMAGE_CLASSES = image_types
    IMAGE_FEATURES = debug-tweaks
    IMAGE_LINGUAS =

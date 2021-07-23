@@ -243,7 +243,7 @@ The following sanity check changes occurred.
 -  Setting ``DEPENDS_${PN}`` anywhere (i.e. typically in a recipe) now
    triggers an error. The error is triggered because
    :term:`DEPENDS` is not a package-specific variable
-   unlike RDEPENDS. You should set ``DEPENDS`` instead.
+   unlike RDEPENDS. You should set :term:`DEPENDS` instead.
 
 -  systemd currently does not work well with the musl C library because
    only upstream officially supports linking the library with glibc.

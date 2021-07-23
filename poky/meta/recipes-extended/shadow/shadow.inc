@@ -173,6 +173,8 @@ inherit update-alternatives
 ALTERNATIVE_PRIORITY = "200"
 
 ALTERNATIVE_${PN} = "passwd chfn chsh chpasswd vipw vigr nologin"
+ALTERNATIVE_LINK_NAME[chfn] = "${bindir}/chfn"
+ALTERNATIVE_LINK_NAME[chsh] = "${bindir}/chsh"
 ALTERNATIVE_LINK_NAME[chpasswd] = "${sbindir}/chpasswd"
 ALTERNATIVE_LINK_NAME[vipw] = "${base_sbindir}/vipw"
 ALTERNATIVE_LINK_NAME[vigr] = "${base_sbindir}/vigr"

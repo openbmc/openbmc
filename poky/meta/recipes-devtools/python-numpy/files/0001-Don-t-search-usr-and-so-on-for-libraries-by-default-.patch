@@ -8,16 +8,15 @@ Subject: [PATCH] Don't search /usr and so on for libraries by default to
 Upstream-Status: Inappropriate (As the code stands, this is a hack)
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
- numpy/distutils/system_info.py | 42 ++++------------------------------
- 1 file changed, 5 insertions(+), 37 deletions(-)
+ numpy/distutils/system_info.py | 42 +++++-----------------------------
+ 1 file changed, 6 insertions(+), 36 deletions(-)
 
 diff --git a/numpy/distutils/system_info.py b/numpy/distutils/system_info.py
-index 3a6a7b2..6c2c3da 100644
+index 82e864a..135246d 100644
 --- a/numpy/distutils/system_info.py
 +++ b/numpy/distutils/system_info.py
-@@ -309,45 +309,13 @@ if sys.platform == 'win32':
+@@ -323,44 +323,14 @@ if sys.platform == 'win32':
          add_system_root(os.path.join(conda_dir, 'Library'))
  
  else:
@@ -25,7 +24,7 @@ index 3a6a7b2..6c2c3da 100644
 -                                 '/opt/local/lib', '/sw/lib'], platform_bits)
      default_runtime_dirs = []
 -    default_include_dirs = ['/usr/local/include',
--                            '/opt/include', '/usr/include',
+-                            '/opt/include',
 -                            # path of umfpack under macports
 -                            '/opt/local/include/ufsparse',
 -                            '/opt/local/include', '/sw/include',
@@ -34,8 +33,7 @@ index 3a6a7b2..6c2c3da 100644
 -
 -    default_x11_lib_dirs = libpaths(['/usr/X11R6/lib', '/usr/X11/lib',
 -                                     '/usr/lib'], platform_bits)
--    default_x11_include_dirs = ['/usr/X11R6/include', '/usr/X11/include',
--                                '/usr/include']
+-    default_x11_include_dirs = ['/usr/X11R6/include', '/usr/X11/include']
 -
 -    if os.path.exists('/usr/lib/X11'):
 -        globbed_x11_dir = glob('/usr/lib/*/libX11.so')
@@ -59,15 +57,16 @@ index 3a6a7b2..6c2c3da 100644
 -                # gcc supports the "-print-multiarch" option
 -                default_x11_lib_dirs += [os.path.join("/usr/lib/", triplet)]
 -                default_lib_dirs += [os.path.join("/usr/lib/", triplet)]
+ 
 +    default_lib_dirs = libpaths(['/deadir/lib'], platform_bits)
 +    default_include_dirs = ['/deaddir/include']
 +    default_src_dirs = ['.', '/deaddir/src']
- 
++
 +    default_x11_lib_dirs = libpaths(['/deaddir/lib'], platform_bits)
 +    default_x11_include_dirs = ['/deaddir/include']
  
  if os.path.join(sys.prefix, 'lib') not in default_lib_dirs:
      default_lib_dirs.insert(0, os.path.join(sys.prefix, 'lib'))
 -- 
-2.17.1
+2.25.1
 

@@ -48,7 +48,6 @@ do_install_append () {
 }
 
 FILES_${PN} += "${datadir}/sgml"
-FILES_${PN}-dev += "${libdir}/cmake"
 FILES_${PN}-doc = ""
 
 SYSROOT_PREPROCESS_FUNCS_append_class-native = " gtkdoc_makefiles_sysroot_preprocess"

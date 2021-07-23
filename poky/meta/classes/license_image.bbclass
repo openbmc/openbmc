@@ -1,5 +1,15 @@
 ROOTFS_LICENSE_DIR = "${IMAGE_ROOTFS}/usr/share/common-licenses"
 
+# This requires LICENSE_CREATE_PACKAGE=1 to work too
+COMPLEMENTARY_GLOB[lic-pkgs] = "*-lic"
+
+python() {
+    if not oe.data.typed_value('LICENSE_CREATE_PACKAGE', d):
+        features = set(oe.data.typed_value('IMAGE_FEATURES', d))
+        if 'lic-pkgs' in features:
+            bb.error("'lic-pkgs' in IMAGE_FEATURES but LICENSE_CREATE_PACKAGE not enabled to generate -lic packages")
+}
+
 python write_package_manifest() {
     # Get list of installed packages
     license_image_dir = d.expand('${LICENSE_DIRECTORY}/${IMAGE_NAME}')

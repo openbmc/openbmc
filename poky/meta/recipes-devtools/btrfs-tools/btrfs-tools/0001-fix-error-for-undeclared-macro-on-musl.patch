@@ -1,0 +1,28 @@
+From a9802902d37b83c2c992cfe34179312f7209a962 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Mon, 19 Jul 2021 10:12:12 +0900
+Subject: [PATCH] fix error for undeclared macro on musl 
+
+Fixes the following compilation errors with musl that does not have
+NAME_MAX declared:
+'NAME_MAX' undeclared (first use in this function)
+
+Upstream-Status: Pending
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ cmds/filesystem-usage.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/cmds/filesystem-usage.c b/cmds/filesystem-usage.c
+index 50d8995e..856e9d7b 100644
+--- a/cmds/filesystem-usage.c
++++ b/cmds/filesystem-usage.c
+@@ -24,6 +24,7 @@
+ #include <stdarg.h>
+ #include <getopt.h>
+ #include <fcntl.h>
++#include <limits.h>
+ 
+ #include "common/utils.h"
+ #include "kerncompat.h"

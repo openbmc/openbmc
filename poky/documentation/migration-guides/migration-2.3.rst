@@ -36,7 +36,7 @@ Consider the following:
    has a ``pkg_postinst`` that calls ``systemctl`` if "systemd" is in
    :term:`DISTRO_FEATURES`. In the example,
    ``systemd-systemctl-native`` is added to :term:`PACKAGE_WRITE_DEPS`,
-   which is also conditional on "systemd" being in ``DISTRO_FEATURES``.
+   which is also conditional on "systemd" being in :term:`DISTRO_FEATURES`.
 
 -  Examine Recipes that Use ``SSTATEPOSTINSTFUNCS``: You need to
    examine any recipe that uses ``SSTATEPOSTINSTFUNCS`` and determine

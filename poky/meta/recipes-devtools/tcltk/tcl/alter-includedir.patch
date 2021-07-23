@@ -18,8 +18,8 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 
 diff --git a/Makefile.in b/Makefile.in
 index 0370491..daa569a 100644
---- a/Makefile.in
-+++ b/Makefile.in
+--- a/unix/Makefile.in
++++ b/unix/Makefile.in
 @@ -57,7 +57,7 @@ SCRIPT_INSTALL_DIR	= $(INSTALL_ROOT)$(TCL_LIBRARY)
  MODULE_INSTALL_DIR	= $(SCRIPT_INSTALL_DIR)/../tcl8
  
@@ -29,32 +29,10 @@ index 0370491..daa569a 100644
  
  # Path to the private tcl header dir:
  PRIVATE_INCLUDE_DIR	= @PRIVATE_INCLUDE_DIR@
-diff --git a/configure b/configure
-index 181b9b3..f4cc225 100755
---- a/configure
-+++ b/configure
-@@ -10166,7 +10166,7 @@ eval "TCL_LIB_FILE=libtcl${LIB_SUFFIX}"
- eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
- 
- test -z "$TCL_LIBRARY" && TCL_LIBRARY='$(libdir)/tcl$(VERSION)'
--PRIVATE_INCLUDE_DIR='$(includedir)'
-+PRIVATE_INCLUDE_DIR='$(includedir)/tcl$(VERSION)'
- HTML_DIR='$(DISTDIR)/html'
- 
- # Note:  in the following variable, it's important to use the absolute
-@@ -10323,7 +10323,7 @@ TCL_BUILD_STUB_LIB_PATH="`pwd`/${TCL_STUB_LIB_FILE}"
- TCL_STUB_LIB_PATH="${TCL_STUB_LIB_DIR}/${TCL_STUB_LIB_FILE}"
- 
- # Install time header dir can be set via --includedir
--eval "TCL_INCLUDE_SPEC=\"-I${includedir}\""
-+eval "TCL_INCLUDE_SPEC=\"-I${includedir}/tcl${VERSION}\""
- 
- #------------------------------------------------------------------------
- # tclConfig.sh refers to this by a different name
 diff --git a/configure.in b/configure.in
 index 9f96e2b..e323e02 100644
---- a/configure.in
-+++ b/configure.in
+--- a/unix/configure.in
++++ b/unix/configure.in
 @@ -773,7 +773,7 @@ eval "TCL_LIB_FILE=libtcl${LIB_SUFFIX}"
  eval "TCL_LIB_FILE=${TCL_LIB_FILE}"
  

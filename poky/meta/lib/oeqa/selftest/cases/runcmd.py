@@ -27,8 +27,8 @@ class RunCmdTests(OESelftestTestCase):
 
     # The delta is intentionally smaller than the timeout, to detect cases where
     # we incorrectly apply the timeout more than once.
-    TIMEOUT = 5
-    DELTA = 3
+    TIMEOUT = 10
+    DELTA = 8
 
     def test_result_okay(self):
         result = runCmd("true")

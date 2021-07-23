@@ -834,7 +834,10 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None):
                   'SSH_AUTH_SOCK', 'SSH_AGENT_PID',
                   'SOCKS5_USER', 'SOCKS5_PASSWD',
                   'DBUS_SESSION_BUS_ADDRESS',
-                  'P4CONFIG']
+                  'P4CONFIG',
+                  'AWS_ACCESS_KEY_ID',
+                  'AWS_SECRET_ACCESS_KEY',
+                  'AWS_DEFAULT_REGION']
 
     if not cleanup:
         cleanup = []

@@ -430,7 +430,7 @@ The following miscellaneous changes occurred:
    .. note::
 
       ``genericx86`` and ``genericx86-64`` retain ``kernel-modules`` as part of
-      the ``RRECOMMENDS`` variable setting.
+      the :term:`RRECOMMENDS` variable setting.
 
 -  The ``LGPLv2_WHITELIST_GPL-3.0`` variable has been removed. If you
    are setting this variable in your configuration, set or append it to

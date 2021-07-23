@@ -17,8 +17,8 @@ Signed-off-by: Nitin A Kamble <nitin.a.kamble@intel.com>
 
 Index: unix/Makefile.in
 ===================================================================
---- unix.orig/Makefile.in	2013-11-10 23:38:01.787425628 -0800
-+++ unix/Makefile.in	2013-11-10 23:37:59.807425578 -0800
+--- a/unix.orig/Makefile.in	2013-11-10 23:38:01.787425628 -0800
++++ b/unix/Makefile.in	2013-11-10 23:37:59.807425578 -0800
 @@ -686,7 +686,7 @@
  # tcltest executable gets the build directory burned into its ld search path.
  # This keeps tcltest from picking up an already installed version of the Tcl

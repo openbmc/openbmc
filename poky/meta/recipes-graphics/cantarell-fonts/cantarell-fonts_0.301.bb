@@ -20,3 +20,8 @@ HASHEQUIV_HASH_VERSION .= ".2"
 EXTRA_OEMESON += "-Duseprebuilt=true -Dbuildappstream=false"
 
 FILES_${PN} = "${datadir}/fonts ${datadir}/fontconfig"
+
+# This isn't a GNOME-style version do gnome_verdir fails. Just return the
+# version as that is how the directory is structured.
+def gnome_verdir(v):
+    return v

@@ -38,6 +38,8 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            ${@["", "file://mdev.cfg"][(d.getVar('VIRTUAL-RUNTIME_dev_manager') == 'busybox-mdev')]} \
            file://syslog.cfg \
            file://unicode.cfg \
+           file://rev.cfg \
+           file://pgrep.cfg \
            file://rcS \
            file://rcK \
            file://makefile-libbb-race.patch \
@@ -45,9 +47,8 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://0001-testsuite-use-www.example.org-for-wget-test-cases.patch \
            file://0001-du-l-works-fix-to-use-145-instead-of-144.patch \
            file://0001-sysctl-ignore-EIO-of-stable_secret-below-proc-sys-ne.patch \
-           file://rev.cfg \
-           file://pgrep.cfg \
            file://0001-gen_build_files-Use-C-locale-when-calling-sed-on-glo.patch \
+           file://0001-mktemp-add-tmpdir-option.patch \
            "
 SRC_URI_append_libc-musl = " file://musl.cfg "
 
