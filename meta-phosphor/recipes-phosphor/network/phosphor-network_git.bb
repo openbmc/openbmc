@@ -29,7 +29,7 @@ PACKAGECONFIG[default-link-local-autoconf] = "-Ddefault-link-local-autoconf=true
 PACKAGECONFIG[default-ipv6-accept-ra] = "-Ddefault-ipv6-accept-ra=true,-Ddefault-ipv6-accept-ra=false,,"
 PACKAGECONFIG[nic-ethtool] = "-Dnic-ethtool=true,-Dnic-ethtool=false,,"
 PACKAGECONFIG[sync-mac] = "-Dsync-mac=true,-Dsync-mac=false,nlohmann-json,"
-PACKAGECONFIG[ibm-hyp-nw-config] = "-Dhyp-nw-config=true,-Dhyp-nw-config=false,,"
+PACKAGECONFIG[hyp-nw-config] = "-Dhyp-nw-config=true, -Dhyp-nw-config=false,,"
 
 S = "${WORKDIR}/git"
 
@@ -37,6 +37,6 @@ FILES:${PN} += "${datadir}/dbus-1/system.d"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.Network.service"
-SYSTEMD_SERVICE:${PN}:append = "${@bb.utils.contains('PACKAGECONFIG', 'ibm-hyp-nw-config', ' xyz.openbmc_project.Network.Hypervisor.service', '', d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'hyp-nw-config', 'xyz.openbmc_project.Network.Hypervisor.service', '', d)}"
 
 EXTRA_OEMESON:append = " -Dtests=disabled"
