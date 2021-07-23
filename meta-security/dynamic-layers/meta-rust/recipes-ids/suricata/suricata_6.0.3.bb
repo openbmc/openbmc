@@ -2,9 +2,12 @@ SUMMARY = "The Suricata Engine is an Open Source Next Generation Intrusion Detec
 
 require suricata.inc
 
-DEPENDS = "lz4 libhtp"
-
 LIC_FILES_CHKSUM = "file://LICENSE;beginline=1;endline=2;md5=c70d8d3310941dcdfcd1e02800a1f548"
+
+SRC_URI = "http://www.openinfosecfoundation.org/download/suricata-${PV}.tar.gz"
+SRC_URI[sha256sum] = "daf134bb2d7c980035e9ae60f7aaf313323a809340009f26e48110ccde81f602"
+
+DEPENDS = "lz4 libhtp"
 
 SRC_URI += " \
     file://volatiles.03_suricata \
@@ -84,6 +87,16 @@ SRC_URI += " \
     crate://crates.io/log/0.4.0 \
     crate://crates.io/rand_hc/0.2.0 \
     crate://crates.io/wasi/0.9.0+wasi-snapshot-preview1 \
+    crate://crates.io/sawp/0.5.0 \
+    crate://crates.io/sawp-modbus/0.5.0 \
+    crate://crates.io/brotli/3.3.0 \
+    crate://crates.io/flate2/1.0.20 \
+    crate://crates.io/alloc-no-stdlib/2.0.1 \
+    crate://crates.io/alloc-stdlib/0.2.1 \
+    crate://crates.io/brotli-decompressor/2.3.1 \
+    crate://crates.io/crc32fast/1.2.1 \
+    crate://crates.io/miniz_oxide/0.4.4 \
+    crate://crates.io/adler/1.0.2 \
     "
 
 # test case support

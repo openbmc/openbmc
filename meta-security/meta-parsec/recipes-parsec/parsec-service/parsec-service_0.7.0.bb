@@ -10,8 +10,7 @@ SRC_URI += "crate://crates.io/parsec-service/${PV} \
             file://parsec-tmpfiles.conf \
 "
 
-DEPENDS = "tpm2-tss"
-TOOLCHAIN = "clang"
+DEPENDS = "tpm2-tss clang-native"
 
 CARGO_BUILD_FLAGS += " --features all-providers,cryptoki/generate-bindings,tss-esapi/generate-bindings"
 

@@ -1,0 +1,53 @@
+fix musl build failures
+
+Missing _PATH_HOSTS and some NETDB defines when musl is enabled.
+
+These are work arounds for now while we figure out where the real fix should reside (musl, gcompact, sssd):
+
+./sssd-2.5.1/src/providers/fail_over.c:1199:19: error: '_PATH_HOSTS' undeclared (first use in this function)
+|  1199 |                   _PATH_HOSTS);
+|       |                   ^~~~~~~~~~~
+
+and 
+
+i./sssd-2.5.1/src/sss_client/nss_ipnetworks.c:415:21: error: 'NETDB_INTERNAL' undeclared (first use in this function)
+|   415 |         *h_errnop = NETDB_INTERNAL;
+
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: sssd-2.5.1/src/providers/fail_over.c
+===================================================================
+--- sssd-2.5.1.orig/src/providers/fail_over.c
++++ sssd-2.5.1/src/providers/fail_over.c
+@@ -31,6 +31,10 @@
+ #include <talloc.h>
+ #include <netdb.h>
+ 
++#if !defined(_PATH_HOSTS)
++#define _PATH_HOSTS     "/etc/hosts"
++#endif
++
+ #include "util/dlinklist.h"
+ #include "util/refcount.h"
+ #include "util/util.h"
+Index: sssd-2.5.1/src/sss_client/sss_cli.h
+===================================================================
+--- sssd-2.5.1.orig/src/sss_client/sss_cli.h
++++ sssd-2.5.1/src/sss_client/sss_cli.h
+@@ -44,6 +44,14 @@ typedef int errno_t;
+ #define EOK 0
+ #endif
+ 
++#ifndef NETDB_INTERNAL
++# define NETDB_INTERNAL (-1)
++#endif
++
++#ifndef NETDB_SUCCESS
++# define NETDB_SUCCESS (0)
++#endif
++
+ #define SSS_NSS_PROTOCOL_VERSION 1
+ #define SSS_PAM_PROTOCOL_VERSION 3
+ #define SSS_SUDO_PROTOCOL_VERSION 1

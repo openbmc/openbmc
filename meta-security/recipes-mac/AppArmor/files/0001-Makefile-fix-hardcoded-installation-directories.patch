@@ -1,0 +1,51 @@
+From 363114dcd72abf1c0dcd637c66037227b8be229b Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 21 Jun 2021 14:18:30 +0800
+Subject: [PATCH 1/2] Makefile: fix hardcoded installation directories
+
+Update the installation directories to fix the do_install error for
+multilib and usrmerge.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ changehat/pam_apparmor/Makefile | 2 +-
+ parser/Makefile                 | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/changehat/pam_apparmor/Makefile b/changehat/pam_apparmor/Makefile
+index f6ece2d1..0143ae9f 100644
+--- a/changehat/pam_apparmor/Makefile
++++ b/changehat/pam_apparmor/Makefile
+@@ -77,7 +77,7 @@ $(NAME).so: ${OBJECTS}
+ 
+ # need some better way of determining this
+ DESTDIR=/
+-SECDIR ?= ${DESTDIR}/lib/security
++SECDIR ?= ${DESTDIR}/${base_libdir}/security
+ 
+ .PHONY: install
+ install: $(NAME).so
+diff --git a/parser/Makefile b/parser/Makefile
+index 8250ac45..cf18bc11 100644
+--- a/parser/Makefile
++++ b/parser/Makefile
+@@ -23,10 +23,10 @@ COMMONDIR=../common/
+ include $(COMMONDIR)/Make.rules
+ 
+ DESTDIR=/
+-APPARMOR_BIN_PREFIX=${DESTDIR}/lib/apparmor
+-SBINDIR=${DESTDIR}/sbin
+-USR_SBINDIR=${DESTDIR}/usr/sbin
+-SYSTEMD_UNIT_DIR=${DESTDIR}/usr/lib/systemd/system
++APPARMOR_BIN_PREFIX=${DESTDIR}/${nonarch_base_libdir}/apparmor
++SBINDIR=${DESTDIR}/${base_sbindir}
++USR_SBINDIR=${DESTDIR}/${sbindir}
++SYSTEMD_UNIT_DIR=${DESTDIR}/${systemd_system_unitdir}
+ CONFDIR=/etc/apparmor
+ INSTALL_CONFDIR=${DESTDIR}${CONFDIR}
+ LOCALEDIR=/usr/share/locale
+-- 
+2.17.1
+

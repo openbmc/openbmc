@@ -66,7 +66,7 @@ qemux86:
 
 qemux86-musl:
   extends: .musl
-  needs: ['qemux86-parsec']
+  needs: ['qemux86']
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 

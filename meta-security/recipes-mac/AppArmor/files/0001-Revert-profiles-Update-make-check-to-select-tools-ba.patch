@@ -6,7 +6,7 @@ Subject: [PATCH] Revert "profiles: Update 'make check' to select tools based
 
 This reverts commit 6016f931ebf7b61e1358f19453ef262d9d184a4e.
 
-Upstream-Statue: OE specific
+Upstream-Status: Inappropriate [OE specific]
 These changes cause during packaging with perms changing.
 
 Signed-off-by: Armin Kuster <akuster808@gmail.com>

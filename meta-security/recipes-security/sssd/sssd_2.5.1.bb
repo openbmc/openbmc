@@ -15,15 +15,17 @@ DEPENDS_append_libc-musl = " musl-nscd"
 DEPENDS += "${@bb.utils.contains('PACKAGECONFIG', 'nss', '', \
                bb.utils.contains('PACKAGECONFIG', 'crypto', '', 'nss', d), d)}"
 
-SRC_URI = "https://github.com/SSSD/sssd/releases/download/2.5.0/sssd-2.5.0.tar.gz \
+SRC_URI = "https://github.com/SSSD/sssd/releases/download/${PV}/sssd-${PV}.tar.gz \
            file://sssd.conf \
            file://volatiles.99_sssd \
            file://no_gen.patch \
            file://fix_gid.patch \
            file://drop_ntpdate_chk.patch \
            file://fix-ldblibdir.patch \
+           file://musl_fixup.patch \
            "
-SRC_URI[sha256sum] = "afa62d7d8d23fca3aba093abe4ec0d14e7d9346c5b28ceb7c2c624bed98caa06"
+
+SRC_URI[sha256sum] = "ce2f5d84a3f1750093318afd27f4fd75b1e3e75f7d80fc42d21a40cc54b58ea4"
 
 inherit autotools pkgconfig gettext python3-dir features_check systemd
 

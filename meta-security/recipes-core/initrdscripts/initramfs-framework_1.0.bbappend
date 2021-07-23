@@ -1,1 +1,1 @@
-require ${@bb.utils.contains('IMAGE_CLASSES', 'dm-verity', 'initramfs-framework.inc', '', d)}
+require ${@bb.utils.contains('IMAGE_CLASSES', 'dm-verity-img', 'initramfs-framework.inc', '', d)}

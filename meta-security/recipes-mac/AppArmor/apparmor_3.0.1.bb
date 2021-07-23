@@ -15,24 +15,16 @@ DEPENDS = "bison-native apr gettext-native coreutils-native swig-native"
 
 SRC_URI = " \
     git://gitlab.com/apparmor/apparmor.git;protocol=https;branch=apparmor-3.0 \
+    file://run-ptest \
     file://disable_perl_h_check.patch \
     file://crosscompile_perl_bindings.patch \
-    file://apparmor.rc \
-    file://functions \
-    file://apparmor \
-    file://apparmor.service \
     file://0001-Makefile.am-suppress-perllocal.pod.patch \
-    file://run-ptest \
-    file://0001-apparmor-fix-manpage-order.patch \
     file://0001-Revert-profiles-Update-make-check-to-select-tools-ba.patch \
-    file://0001-libapparmor-add-missing-include-for-socklen_t.patch \
-    file://0002-libapparmor-add-aa_features_new_from_file-to-public-.patch \
-    file://0003-libapparmor-add-_aa_asprintf-to-private-symbols.patch \
-    file://0001-aa_status-Fix-build-issue-with-musl.patch \
-    file://0001-parser-Makefile-dont-force-host-cpp-to-detect-reallo.patch \
+    file://0001-Makefile-fix-hardcoded-installation-directories.patch \
+    file://0001-rc.apparmor.debian-add-missing-functions.patch \
     "
 
-SRCREV = "5d51483bfecf556183558644dc8958135397a7e2"
+SRCREV = "b0f08aa9d678197b8e3477c2fbff790f50a1de5e"
 S = "${WORKDIR}/git"
 
 PARALLEL_MAKE = ""
@@ -85,8 +77,6 @@ do_compile () {
 }
 
 do_install () {
-    install -d ${D}/${INIT_D_DIR}
-    install -d ${D}/lib/apparmor
     oe_runmake -C ${B}/libraries/libapparmor DESTDIR="${D}" install
     oe_runmake -C ${B}/binutils DESTDIR="${D}" install
     oe_runmake -C ${B}/utils DESTDIR="${D}" install
@@ -102,16 +92,16 @@ do_install () {
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
-        install -d ${D}/lib/security
         oe_runmake -C ${B}/changehat/pam_apparmor DESTDIR="${D}" install
     fi
 
-    install -m 755 ${WORKDIR}/apparmor ${D}/${INIT_D_DIR}/apparmor
-    install -m 755 ${WORKDIR}/functions ${D}/lib/apparmor
+    if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)}; then
+        install -d ${D}${sysconfdir}/init.d
+        install -m 755 ${B}/parser/rc.apparmor.debian ${D}${sysconfdir}/init.d/apparmor
+    fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        install -d ${D}${systemd_system_unitdir}
-        install -m 0644 ${WORKDIR}/apparmor.service ${D}${systemd_system_unitdir}
+        oe_runmake -C ${B}/parser DESTDIR="${D}" install-systemd
     fi
 }
 
@@ -158,15 +148,6 @@ do_install_ptest_arm() {
   :
 }
 
-pkg_postinst_ontarget_${PN} () {
-if [ ! -d /etc/apparmor.d/cache ] ; then
-    mkdir /etc/apparmor.d/cache
-fi
-}
-
-# We need the init script so don't rm it
-RMINITDIR_class-target_remove = " rm_sysvinit_initddir"
-
 INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME = "apparmor"
 INITSCRIPT_PARAMS = "start 16 2 3 4 5 . stop 35 0 1 6 ."
@@ -177,9 +158,9 @@ SYSTEMD_AUTO_ENABLE ?= "enable"
 
 PACKAGES += "mod-${PN}"
 
-FILES_${PN} += "/lib/apparmor/ /lib/security/ ${sysconfdir}/apparmor ${nonarch_libdir}/${PYTHON_DIR}/site-packages"
+FILES_${PN} += "${nonarch_base_libdir}/apparmor/ ${base_libdir}/security/ ${sysconfdir}/apparmor ${nonarch_libdir}/${PYTHON_DIR}/site-packages"
 FILES_mod-${PN} = "${libdir}/apache2/modules/*"
-FILES_${PN}-dbg += "/lib/security/"
+FILES_${PN}-dbg += "${base_libdir}/security/.debug"
 
 DEPENDS_append_libc-musl = " fts "
 RDEPENDS_${PN}_libc-musl +=  "musl-utils"

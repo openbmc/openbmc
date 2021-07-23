@@ -3,6 +3,11 @@ header:
     includes: 
         - kas-security-base.yml
 
+repos:
+  meta-rust:
+    url: https://github.com/meta-rust/meta-rust.git
+    refspec: master
+
 local_conf_header:
   alt: |
       DISTRO_FEATURES_append = " systemd"

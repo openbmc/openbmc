@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/initramfs-framework-dm:"
 
 SRC_URI_append = "\
     file://dmverity \
