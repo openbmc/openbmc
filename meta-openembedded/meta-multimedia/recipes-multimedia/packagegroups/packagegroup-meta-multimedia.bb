@@ -85,7 +85,7 @@ RDEPENDS_packagegroup-meta-multimedia-connectivity = "\
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "gupnp-tools", "", d)} \
     gupnp \
     libupnp \
-    rygel \
+    ${@bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data", "rygel", "", d)} \
 "
 RDEPENDS_packagegroup-meta-multimedia-dvb = "\
     oscam \
@@ -99,8 +99,7 @@ RDEPENDS_packagegroup-meta-multimedia-mkv = "\
 
 RDEPENDS_packagegroup-meta-multimedia-support = "\
     crossguid \
-    libmediaart-2.0 \
-    libmediaart \
+    ${@bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data", "libmediaart-2.0", "", d)} \
     gst-instruments \
     libsrtp \
     srt \

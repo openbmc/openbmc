@@ -1,0 +1,279 @@
+From 6d1800a305698f801236a2d73ebe178fa2d1139d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ga=C3=ABl=20Bonithon?= <gael@xfce.org>
+Date: Sat, 12 Jun 2021 16:45:56 +0200
+Subject: [PATCH] Plugin support: Properly handle plugin settings
+
+What was done in !92 was strictly speaking only suitable for one plugin.
+This could be extended to several plugins by adding a `.gschema.xml`
+file in `plugins/`, intermediate between the one of the application and
+those of the plugins, or by refactoring the Makefiles with inclusions
+and a single call to `@GSETTINGS_RULES@`.
+
+But in any case, due to the relative rigidity of the `.gschema.xml` file
+format and the internal workings of `glib-compile-schemas`, this would
+only be suitable for plugins that are present at compile time, i.e.
+"fake plugins".
+
+Instead, this commit adds the plugin settings at load time, as is
+natural and as the `GSettingsSchema` documentation states. To do this,
+the setting store is extended to contain several roots: the application
+root and the plugin roots.
+
+For the latter, a unified naming convention is preserved, with the
+prefix `org.xfce.mousepad.plugins.`, but they are in fact completely
+independent of each other and independent of the application root.
+
+Fixes #136, related to !92.
+
+Upstream-Status: Backport [https://gitlab.xfce.org/apps/mousepad/-/commit/0d9d4f05aace800118d0a390e4e5dc5ebb940ca5]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ mousepad/mousepad-application.c               | 12 +++-
+ mousepad/mousepad-settings-store.c            | 70 ++++++++++++-------
+ mousepad/mousepad-settings-store.h            |  3 +
+ mousepad/mousepad-settings.c                  | 14 +++-
+ mousepad/mousepad-settings.h                  |  1 +
+ mousepad/org.xfce.mousepad.gschema.xml        |  1 -
+ ...g.xfce.mousepad.plugins.gspell.gschema.xml |  4 --
+ 7 files changed, 71 insertions(+), 34 deletions(-)
+
+diff --git a/mousepad/mousepad-application.c b/mousepad/mousepad-application.c
+index d9a64ff..378d78e 100644
+--- a/mousepad/mousepad-application.c
++++ b/mousepad/mousepad-application.c
+@@ -721,7 +721,7 @@ mousepad_application_load_plugins (MousepadApplication *application)
+   GError                  *error = NULL;
+   GDir                    *dir;
+   const gchar             *basename;
+-  gchar                   *provider_name;
++  gchar                   *provider_name, *schema_id;
+   gchar                  **strs;
+   gsize                    n_strs;
+ 
+@@ -775,6 +775,16 @@ mousepad_application_load_plugins (MousepadApplication *application)
+                                            application, G_CONNECT_SWAPPED);
+           g_action_map_add_action (G_ACTION_MAP (application), G_ACTION (action));
+ 
++          /* add its settings to the setting store */
++          if (g_str_has_prefix (provider_name, "mousepad-plugin-"))
++            schema_id = provider_name + 16;
++          else
++            schema_id = provider_name;
++
++          schema_id = g_strconcat (MOUSEPAD_ID, ".plugins.", schema_id, NULL);
++          mousepad_settings_add_root (schema_id);
++          g_free (schema_id);
++
+           /* instantiate this provider types and initialize its action state */
+           if (g_strv_contains ((const gchar *const *) strs, provider_name))
+             {
+diff --git a/mousepad/mousepad-settings-store.c b/mousepad/mousepad-settings-store.c
+index de989bd..d117c53 100644
+--- a/mousepad/mousepad-settings-store.c
++++ b/mousepad/mousepad-settings-store.c
+@@ -29,9 +29,11 @@
+ 
+ struct MousepadSettingsStore_
+ {
+-  GObject     parent;
+-  GSettings  *root;
+-  GHashTable *keys;
++  GObject parent;
++
++  GSettingsBackend *backend;
++  GList            *roots;
++  GHashTable       *keys;
+ };
+ 
+ 
+@@ -76,8 +78,10 @@ mousepad_setting_key_new (const gchar *key_name,
+ 
+ 
+ static void
+-mousepad_setting_key_free (MousepadSettingKey *key)
++mousepad_setting_key_free (gpointer data)
+ {
++  MousepadSettingKey *key = data;
++
+   if (G_LIKELY (key != NULL))
+     {
+       g_object_unref (key->settings);
+@@ -138,16 +142,16 @@ mousepad_settings_store_class_init (MousepadSettingsStoreClass *klass)
+ static void
+ mousepad_settings_store_finalize (GObject *object)
+ {
+-  MousepadSettingsStore *self;
++  MousepadSettingsStore *self = MOUSEPAD_SETTINGS_STORE (object);
+ 
+   g_return_if_fail (MOUSEPAD_IS_SETTINGS_STORE (object));
+ 
+-  self = MOUSEPAD_SETTINGS_STORE (object);
++  if (self->backend != NULL)
++    g_object_unref (self->backend);
+ 
++  g_list_free_full (self->roots, g_object_unref);
+   g_hash_table_destroy (self->keys);
+ 
+-  g_object_unref (self->root);
+-
+   G_OBJECT_CLASS (mousepad_settings_store_parent_class)->finalize (object);
+ }
+ 
+@@ -212,28 +216,19 @@ static void
+ mousepad_settings_store_init (MousepadSettingsStore *self)
+ {
+ #ifdef MOUSEPAD_SETTINGS_KEYFILE_BACKEND
+-  GSettingsBackend *backend;
+-  gchar            *conf_file;
+-  conf_file = g_build_filename (g_get_user_config_dir (),
+-                                "Mousepad",
+-                                "settings.conf",
+-                                NULL);
+-  backend = g_keyfile_settings_backend_new (conf_file, "/", NULL);
++  gchar *conf_file;
++
++  conf_file = g_build_filename (g_get_user_config_dir (), "Mousepad", "settings.conf", NULL);
++  self->backend = g_keyfile_settings_backend_new (conf_file, "/", NULL);
+   g_free (conf_file);
+-  self->root = g_settings_new_with_backend (MOUSEPAD_ID, backend);
+-  g_object_unref (backend);
+ #else
+-  self->root = g_settings_new (MOUSEPAD_ID);
++  self->backend = NULL;
+ #endif
+ 
+-  self->keys = g_hash_table_new_full (g_str_hash,
+-                                      g_str_equal,
+-                                      NULL,
+-                                      (GDestroyNotify) mousepad_setting_key_free);
++  self->roots = NULL;
++  self->keys = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, mousepad_setting_key_free);
+ 
+-  mousepad_settings_store_add_settings (self, MOUSEPAD_ID,
+-                                        g_settings_schema_source_get_default (),
+-                                        self->root);
++  mousepad_settings_store_add_root (self, MOUSEPAD_ID);
+ }
+ 
+ 
+@@ -246,6 +241,31 @@ mousepad_settings_store_new (void)
+ 
+ 
+ 
++void
++mousepad_settings_store_add_root (MousepadSettingsStore *self,
++                                  const gchar           *schema_id)
++{
++  GSettingsSchemaSource *source;
++  GSettingsSchema       *schema;
++  GSettings             *root;
++
++  source = g_settings_schema_source_get_default ();
++  schema = g_settings_schema_source_lookup (source, schema_id, TRUE);
++
++  /* exit silently if no schema is found: plugins may have settings or not */
++  if (schema == NULL)
++    return;
++
++  root = g_settings_new_full (schema, self->backend, NULL);
++  g_settings_schema_unref (schema);
++
++  self->roots = g_list_prepend (self->roots, root);
++
++  mousepad_settings_store_add_settings (self, schema_id, source, root);
++}
++
++
++
+ const gchar *
+ mousepad_settings_store_lookup_key_name (MousepadSettingsStore *self,
+                                          const gchar           *setting)
+diff --git a/mousepad/mousepad-settings-store.h b/mousepad/mousepad-settings-store.h
+index 3f5cae1..4842036 100644
+--- a/mousepad/mousepad-settings-store.h
++++ b/mousepad/mousepad-settings-store.h
+@@ -38,6 +38,9 @@ GType                  mousepad_settings_store_get_type        (void);
+ 
+ MousepadSettingsStore *mousepad_settings_store_new             (void);
+ 
++void                   mousepad_settings_store_add_root        (MousepadSettingsStore  *store,
++                                                                const gchar            *schema_id);
++
+ const gchar           *mousepad_settings_store_lookup_key_name (MousepadSettingsStore  *store,
+                                                                 const gchar            *setting);
+ 
+diff --git a/mousepad/mousepad-settings.c b/mousepad/mousepad-settings.c
+index d071de6..66b338d 100644
+--- a/mousepad/mousepad-settings.c
++++ b/mousepad/mousepad-settings.c
+@@ -24,6 +24,15 @@ static MousepadSettingsStore *settings_store = NULL;
+ 
+ 
+ 
++void
++mousepad_settings_init (void)
++{
++  if (settings_store == NULL)
++    settings_store = mousepad_settings_store_new ();
++}
++
++
++
+ void
+ mousepad_settings_finalize (void)
+ {
+@@ -39,10 +48,9 @@ mousepad_settings_finalize (void)
+ 
+ 
+ void
+-mousepad_settings_init (void)
++mousepad_settings_add_root (const gchar *schema_id)
+ {
+-  if (settings_store == NULL)
+-    settings_store = mousepad_settings_store_new ();
++  mousepad_settings_store_add_root (settings_store, schema_id);
+ }
+ 
+ 
+diff --git a/mousepad/mousepad-settings.h b/mousepad/mousepad-settings.h
+index bc63d11..615be51 100644
+--- a/mousepad/mousepad-settings.h
++++ b/mousepad/mousepad-settings.h
+@@ -87,6 +87,7 @@ G_BEGIN_DECLS
+ 
+ void       mousepad_settings_init          (void);
+ void       mousepad_settings_finalize      (void);
++void       mousepad_settings_add_root      (const gchar        *schema_id);
+ 
+ void       mousepad_setting_bind           (const gchar        *setting,
+                                             gpointer            object,
+diff --git a/mousepad/org.xfce.mousepad.gschema.xml b/mousepad/org.xfce.mousepad.gschema.xml
+index e802719..8509ee3 100644
+--- a/mousepad/org.xfce.mousepad.gschema.xml
++++ b/mousepad/org.xfce.mousepad.gschema.xml
+@@ -39,7 +39,6 @@
+ 
+   <!-- generic schemas -->
+   <schema id="org.xfce.mousepad" path="/org/xfce/mousepad/" gettext-domain="mousepad">
+-    <child name="plugins" schema="org.xfce.mousepad.plugins"/>
+     <child name="preferences" schema="org.xfce.mousepad.preferences"/>
+     <child name="state" schema="org.xfce.mousepad.state"/>
+   </schema>
+diff --git a/plugins/gspell-plugin/org.xfce.mousepad.plugins.gspell.gschema.xml b/plugins/gspell-plugin/org.xfce.mousepad.plugins.gspell.gschema.xml
+index 6db65b6..95295ba 100644
+--- a/plugins/gspell-plugin/org.xfce.mousepad.plugins.gspell.gschema.xml
++++ b/plugins/gspell-plugin/org.xfce.mousepad.plugins.gspell.gschema.xml
+@@ -1,9 +1,5 @@
+ <schemalist>
+ 
+-  <schema id="org.xfce.mousepad.plugins" path="/org/xfce/mousepad/plugins/" gettext-domain="mousepad">
+-    <child name="gspell" schema="org.xfce.mousepad.plugins.gspell"/>
+-  </schema>
+-
+   <schema id="org.xfce.mousepad.plugins.gspell" path="/org/xfce/mousepad/plugins/gspell/" gettext-domain="mousepad">
+     <child name="preferences" schema="org.xfce.mousepad.plugins.gspell.preferences"/>
+   </schema>
+-- 
+2.17.1
+

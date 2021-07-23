@@ -12,8 +12,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  third-party/folly/folly/detail/Futex.cpp | 10 ++++++++--
  1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/third-party/folly/folly/detail/Futex.cpp b/third-party/folly/folly/detail/Futex.cpp
-index 62d6ea2b2..a914a8c73 100644
 --- a/third-party/folly/folly/detail/Futex.cpp
 +++ b/third-party/folly/folly/detail/Futex.cpp
 @@ -48,9 +48,15 @@ namespace {
@@ -42,6 +40,3 @@ index 62d6ea2b2..a914a8c73 100644
        addr, /* addr1 */
        op, /* op */
        expected, /* val */
--- 
-2.29.2
-

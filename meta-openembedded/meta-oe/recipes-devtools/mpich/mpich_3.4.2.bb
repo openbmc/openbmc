@@ -31,7 +31,8 @@ PACKAGECONFIG += " \
 "
 PACKAGECONFIG[x11] = "--with-x --x-includes=${STAGING_INCDIR} --x-libraries=${STAGING_LIBDIR},--without-x,virtual/libx11"
 
-LDFLAGS_append_x86-64 = " -lgcc"
+LDFLAGS_append_libc-glibc_x86-64 = " -lgcc"
+LDFLAGS_append_libc-glibc_x86 = " -lgcc"
 
 inherit autotools gettext pkgconfig
 

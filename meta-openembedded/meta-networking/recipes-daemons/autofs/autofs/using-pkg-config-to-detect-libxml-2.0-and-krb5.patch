@@ -16,33 +16,21 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  configure.in | 16 ++++++++++++++--
  1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/configure.in b/configure.in
-index f5fbb35..76ecb40 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -211,8 +211,20 @@ fi
- AC_SUBST(ENABLE_FEDFS)
- 
- # LDAP SASL auth needs libxml and Kerberos
--AF_CHECK_LIBXML()
+@@ -215,7 +215,14 @@ PKG_CHECK_MODULES([XML], [libxml-2.0], [
+   AC_DEFINE(LIBXML2_WORKAROUND, 1, [Use libxml2 tsd usage workaround])
+ ], [HAVE_LIBXML=0])
+
 -AF_CHECK_KRB5()
-+PKG_CHECK_MODULES(XML, [libxml-2.0],HAVE_LIBXML=1,HAVE_LIBXML=0)
-+AC_SUBST([HAVE_LIBXML])
-+XML_FLAGS=$XML_CFLAGS
-+
-+PKG_CHECK_MODULES(KRB5, [krb5],HAVE_KRB5=1,HAVE_KRB5=0)
-+AC_SUBST([HAVE_KRB5])
-+if test "x$HAVE_KRB5" = "x1"; then
++PKG_CHECK_MODULES(KRB5, [krb5], [
++  HAVE_KRB5=1
 +  SAVE_CFLAGS=$CFLAGS
 +  SAVE_LIBS=$LIBS
 +  CFLAGS="$CFLAGS $KRB5_FLAGS"
 +  LIBS="$LIBS $KRB5_LIBS"
-+
 +  AC_CHECK_FUNCS([krb5_principal_get_realm])
-+fi
- 
++], [HAVE_KRB5=0])
+
  AC_SEARCH_LIBS([versionsort],[])
  if test "$ac_cv_search_versionsort" = "no"; then
--- 
-2.7.4
-

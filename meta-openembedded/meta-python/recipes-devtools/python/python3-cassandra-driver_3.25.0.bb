@@ -10,17 +10,11 @@ SRCNAME = "cassandra-driver"
 
 SRC_URI[sha256sum] = "8ad7d7c090eb1cac6110b3bfc1fd2d334ac62f415aac09350ebb8d241b7aa7ee"
 
-DISTUTILS_BUILD_ARGS += " \
-    --no-libev \
-"
-DISTUTILS_INSTALL_ARGS += " \
-    --no-libev \
-"
-
 inherit pypi setuptools3
 
 RDEPENDS_${PN} += "\
     ${PYTHON_PN}-cython \
+    ${PYTHON_PN}-geomet \
     ${PYTHON_PN}-json \
     ${PYTHON_PN}-misc \
     ${PYTHON_PN}-multiprocessing \

@@ -8,17 +8,17 @@ Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -115,6 +115,7 @@ check_cxx_compiler_flag (-Wunnamed-type-
- check_symbol_exists (snprintf stdio.h HAVE_SNPRINTF)
+@@ -144,6 +144,7 @@ check_cxx_compiler_flag (-Wunnamed-type-
+ check_symbol_exists (snprintf cstdio HAVE_SNPRINTF)
  
  check_library_exists (dbghelp UnDecorateSymbolName "" HAVE_DBGHELP)
 +check_library_exists (execinfo backtrace "" HAVE_EXECINFO)
  
- find_package(Libunwind)
- 
-@@ -471,6 +472,10 @@ if (Libunwind_FOUND)
-   target_link_libraries (glog PUBLIC unwind)
- endif (Libunwind_FOUND)
+ check_cxx_source_compiles ("
+ #include <cstdlib>
+@@ -584,6 +585,10 @@ if (Unwind_FOUND)
+   set (Unwind_DEPENDENCY "find_dependency (Unwind ${Unwind_VERSION})")
+ endif (Unwind_FOUND)
  
 +if (HAVE_EXECINFO)
 +  target_link_libraries (glog PUBLIC execinfo)

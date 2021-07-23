@@ -1,6 +1,6 @@
-From a9831f1cbf93fb18dd951453635f488037454ce9 Mon Sep 17 00:00:00 2001
-From: Abseil Team <absl-team@google.com>
-Date: Mon, 3 May 2021 07:37:39 -0700
+From c9250af98f48e4aa734cab0e2f5ae1f780c05ad0 Mon Sep 17 00:00:00 2001
+From: Zang Ruochen <zangrc.fnst@fujitsu.com>
+Date: Fri, 11 Jun 2021 10:53:37 +0900
 Subject: [PATCH] Export of internal Abseil changes
 
 --
@@ -27,15 +27,16 @@ Cmake builds should only install pkg-config when explicitly requested.
 PiperOrigin-RevId: 371403419
 GitOrigin-RevId: cf88f9cf40eab54c06bca7f20795352ec23bb583
 Change-Id: I4360a18c638a4d901ff44ab1e0a9d8f321c302ea
+
+Signed-off-by: Zang Ruochen <zangrc.fnst@fujitsu.com>
 ---
  CMake/AbseilHelpers.cmake                        | 3 ++-
- absl/debugging/failure_signal_handler.cc         | 3 ++-
  absl/strings/internal/str_format/arg.h           | 8 ++++++++
  absl/strings/internal/str_format/convert_test.cc | 3 +++
- 4 files changed, 15 insertions(+), 2 deletions(-)
+ 3 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/CMake/AbseilHelpers.cmake b/CMake/AbseilHelpers.cmake
-index 1f754392..1a80b5b4 100644
+index 54fb8df3..a32b94d5 100644
 --- a/CMake/AbseilHelpers.cmake
 +++ b/CMake/AbseilHelpers.cmake
 @@ -141,7 +141,8 @@ function(absl_cc_library)
@@ -48,20 +49,6 @@ index 1f754392..1a80b5b4 100644
      if(NOT ABSL_CC_LIB_TESTONLY)
        if(absl_VERSION)
          set(PC_VERSION "${absl_VERSION}")
-diff --git a/absl/debugging/failure_signal_handler.cc b/absl/debugging/failure_signal_handler.cc
-index e458a795..689e5979 100644
---- a/absl/debugging/failure_signal_handler.cc
-+++ b/absl/debugging/failure_signal_handler.cc
-@@ -136,7 +136,8 @@ static bool SetupAlternateStackOnce() {
- #else
-   const size_t page_mask = sysconf(_SC_PAGESIZE) - 1;
- #endif
--  size_t stack_size = (std::max(SIGSTKSZ, 65536) + page_mask) & ~page_mask;
-+  size_t stack_size =
-+      (std::max<size_t>(SIGSTKSZ, 65536) + page_mask) & ~page_mask;
- #if defined(ABSL_HAVE_ADDRESS_SANITIZER) || \
-     defined(ABSL_HAVE_MEMORY_SANITIZER) || defined(ABSL_HAVE_THREAD_SANITIZER)
-   // Account for sanitizer instrumentation requiring additional stack space.
 diff --git a/absl/strings/internal/str_format/arg.h b/absl/strings/internal/str_format/arg.h
 index 7040c866..3c91be70 100644
 --- a/absl/strings/internal/str_format/arg.h
@@ -96,5 +83,5 @@ index 926283cf..91e03609 100644
  
  TEST_F(FormatConvertTest, NullString) {
 -- 
-2.31.1
+2.25.1
 

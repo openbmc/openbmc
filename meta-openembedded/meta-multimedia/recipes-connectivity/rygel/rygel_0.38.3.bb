@@ -12,7 +12,10 @@ DEPENDS = "libxml2 glib-2.0 gssdp gupnp gupnp-av gupnp-dlna gstreamer1.0 gstream
 RDEPENDS_${PN} = "gstreamer1.0-plugins-base-playback shared-mime-info"
 RRECOMMENDS_${PN} = "rygel-plugin-media-export"
 
-inherit gnomebase vala gobject-introspection gettext systemd
+inherit gnomebase vala gobject-introspection gettext systemd features_check
+
+# gobject-introspection is mandatory for libmediaart-2.0 and cannot be configured
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 
 SRC_URI[archive.md5sum] = "7f95401903a3f855b464d5152b9d4c07"
 SRC_URI[archive.sha256sum] = "08c21a577f7bdad26446a75ffa32778b26842c3b1188165f0b19818559747d00"

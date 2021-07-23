@@ -67,6 +67,7 @@ RDEPENDS_packagegroup-meta-networking-connectivity = "\
     wolfssl \
     autossh \
     bearssl \
+    dhcp-relay \
 "
 
 RDEPENDS_packagegroup-meta-networking-connectivity_remove_libc-musl = "rdist"

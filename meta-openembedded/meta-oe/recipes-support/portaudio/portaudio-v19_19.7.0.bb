@@ -8,6 +8,7 @@ PV = "v190700"
 SRC_URI = " \
     git://github.com/PortAudio/portaudio.git \
     file://0001-Find-jack.patch \
+    file://0001-cmake-Use-GNUInstallDirs.patch \
 "
 SRCREV = "147dd722548358763a8b649b3e4b41dfffbcfbb6"
 S = "${WORKDIR}/git"

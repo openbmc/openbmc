@@ -61,6 +61,9 @@ PACKAGECONFIG[system-pcre] = "--use-system-pcre,,libpcre,"
 
 MONGO_ARCH ?= "${HOST_ARCH}"
 MONGO_ARCH_powerpc64le = "ppc64le"
+WIREDTIGER ?= "off"
+WIREDTIGER_x86-64 = "on"
+WIREDTIGER_aarch64 = "on"
 
 EXTRA_OESCONS = "PREFIX=${prefix} \
                  DESTDIR=${D} \
@@ -75,7 +78,7 @@ EXTRA_OESCONS = "PREFIX=${prefix} \
                  --use-system-zlib \
                  --nostrip \
                  --endian=${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', 'little', 'big', d)} \
-                 --wiredtiger=${@['off','on'][d.getVar('SITEINFO_BITS') != '32']} \
+                 --wiredtiger='${WIREDTIGER}' \
                  --separate-debug \
                  ${PACKAGECONFIG_CONFARGS}"
 

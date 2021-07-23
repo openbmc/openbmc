@@ -245,6 +245,7 @@ RDEPENDS_packagegroup-meta-oe-devtools ="\
     lemon \
     flatbuffers \
     heaptrack \
+    libparse-yapp-perl \
     libubox \
     ltrace \
     lua \
@@ -355,6 +356,7 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
     libleak \
     libuio \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "libwmf", "", d)} \
+    libyang \
     lprng \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "icewm", "", d)} \
     md5deep \
@@ -425,6 +427,7 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
     wxwidgets \
     zlog \
     zstd \
+    zsync-curl \
     redis-plus-plus \
 "
 RDEPENDS_packagegroup-meta-oe-extended_append_libc-musl = " libexecinfo"
@@ -437,8 +440,8 @@ RDEPENDS_packagegroup-meta-oe-extended_remove_mips = "sysdig"
 RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc = "upm mraa minifi-cpp"
 RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc64 = "upm mraa minifi-cpp"
 RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc64le = "upm mraa"
-RDEPENDS_packagegroup-meta-oe-extended_remove_riscv64 = "upm libleak mraa sysdig tiptop"
-RDEPENDS_packagegroup-meta-oe-extended_remove_riscv32 = "upm libleak mraa sysdig tiptop"
+RDEPENDS_packagegroup-meta-oe-extended_remove_riscv64 = "upm libleak libyang mraa sysdig tiptop"
+RDEPENDS_packagegroup-meta-oe-extended_remove_riscv32 = "upm libleak libyang mraa sysdig tiptop"
 
 RDEPENDS_packagegroup-meta-oe-extended-python2 ="\
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", bb.utils.contains('I_SWEAR_TO_MIGRATE_TO_PYTHON3', 'yes', 'openlmi-tools', '', d), "", d)} \
@@ -933,6 +936,7 @@ RDEPENDS_packagegroup-meta-oe-test ="\
     bats \
     cmocka \
     cppunit \
+    cpputest \
     cukinia \
     cunit \
     cxxtest \

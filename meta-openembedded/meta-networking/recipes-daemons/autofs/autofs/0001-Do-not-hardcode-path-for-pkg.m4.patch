@@ -15,12 +15,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  configure.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure.in b/configure.in
-index 493b9f1..268d06b 100644
 --- a/configure.in
 +++ b/configure.in
 @@ -12,7 +12,7 @@ define([AC_CACHE_SAVE], )dnl
- AC_INIT(.autofs-5.1.6)
+ AC_INIT(.autofs-5.1.7)
  
  # for pkg-config macros
 -m4_include([/usr/share/aclocal/pkg.m4])
@@ -28,6 +26,3 @@ index 493b9f1..268d06b 100644
  
  #
  # autofs installs by default in /usr
--- 
-2.7.4
-

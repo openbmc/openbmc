@@ -1,0 +1,43 @@
+From 6e3d01f1ff199383b78a7504858c374fbce05f4e Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Thu, 10 Jun 2021 11:11:07 +0800
+Subject: [PATCH] install.sh: consider multilib
+
+It may install files to /usr/lib64 when multilib is enabled. Add an
+optional parameter for install.sh to support it.
+
+Upstream-Status: Submitted [https://github.com/bats-core/bats-core/pull/452]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ install.sh | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/install.sh b/install.sh
+index e660866..d91159e 100755
+--- a/install.sh
++++ b/install.sh
+@@ -4,6 +4,7 @@ set -e
+ 
+ BATS_ROOT="${0%/*}"
+ PREFIX="$1"
++BASELIB="${2:-lib}"
+ 
+ if [[ -z "$PREFIX" ]]; then
+   printf '%s\n' \
+@@ -12,10 +13,10 @@ if [[ -z "$PREFIX" ]]; then
+   exit 1
+ fi
+ 
+-install -d -m 755 "$PREFIX"/{bin,libexec/bats-core,lib/bats-core,share/man/man{1,7}}
++install -d -m 755 "$PREFIX"/{bin,libexec/bats-core,${BASELIB}/bats-core,share/man/man{1,7}}
+ install -m 755 "$BATS_ROOT/bin"/* "$PREFIX/bin"
+ install -m 755 "$BATS_ROOT/libexec/bats-core"/* "$PREFIX/libexec/bats-core"
+-install -m 755 "$BATS_ROOT/lib/bats-core"/* "$PREFIX/lib/bats-core"
++install -m 755 "$BATS_ROOT/lib/bats-core"/* "$PREFIX/${BASELIB}/bats-core"
+ install -m 644 "$BATS_ROOT/man/bats.1" "$PREFIX/share/man/man1"
+ install -m 644 "$BATS_ROOT/man/bats.7" "$PREFIX/share/man/man7"
+ 
+-- 
+2.17.1
+

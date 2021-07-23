@@ -22,10 +22,21 @@ PACKAGECONFIG[pam] = "--enable-pam --with-pamdir=${base_libdir}/security,--disab
 
 inherit autotools pkgconfig
 
+do_configure_prepend() {
+    # want installed to /usr/sbin rather than /sbin to be DISTRO_FEATURES usrmerge compliant
+    # must override ROOTSBINDIR (default '/sbin'),
+    # setting --exec-prefix or --prefix in EXTRA_OECONF does not work
+    if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','fakse',d)}; then
+        export ROOTSBINDIR=${sbindir}
+    fi
+}
+
 do_install_append() {
-    # Remove empty /usr/bin and /usr/sbin directories since the mount helper
-    # is installed to /sbin
-    rmdir --ignore-fail-on-non-empty ${D}${bindir} ${D}${sbindir}
+    if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','false','true',d)}; then
+        # Remove empty /usr/bin and /usr/sbin directories since the mount helper
+        # is installed to /sbin
+        rmdir --ignore-fail-on-non-empty ${D}${bindir} ${D}${sbindir}
+    fi
 }
 
 FILES_${PN} += "${base_libdir}/security"

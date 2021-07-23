@@ -8,7 +8,7 @@ When sending single patches, please use something like:
 
    git send-email -1 -M \
         --to openembedded-devel@lists.openembedded.org \
-        --subject-prefix=meta-networking][PATCH
+        --subject-prefix='meta-networking][PATCH'
 
 You may also contact the maintainers directly.
 

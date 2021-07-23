@@ -1,0 +1,50 @@
+From 6455448eb060d03a534539f1a424e2d3e44319e1 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 20 Jun 2019 14:11:16 +0800
+Subject: [PATCH] Add config option without-valgrind
+
+Upstream-Status: Pending
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+
+Update patch to version 4.10.5
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ lib/replace/wscript | 5 +++--
+ wscript             | 4 ++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/lib/replace/wscript b/lib/replace/wscript
+index 2c856b6..bc726f7 100644
+--- a/lib/replace/wscript
++++ b/lib/replace/wscript
+@@ -121,8 +121,9 @@ def configure(conf):
+     conf.CHECK_HEADERS('sys/fileio.h sys/filesys.h sys/dustat.h sys/sysmacros.h')
+     conf.CHECK_HEADERS('xfs/libxfs.h netgroup.h')
+ 
+-    conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h')
+-    conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h')
++    if not Options.options.disable_valgrind:
++        conf.CHECK_HEADERS('valgrind.h valgrind/valgrind.h')
++        conf.CHECK_HEADERS('valgrind/memcheck.h valgrind/helgrind.h')
+     conf.CHECK_HEADERS('nss_common.h nsswitch.h ns_api.h')
+     conf.CHECK_HEADERS('sys/extattr.h sys/ea.h sys/proplist.h sys/cdefs.h')
+     conf.CHECK_HEADERS('utmp.h utmpx.h lastlog.h')
+diff --git a/wscript b/wscript
+index 83d9421..969b07a 100644
+--- a/wscript
++++ b/wscript
+@@ -123,6 +123,10 @@ def options(opt):
+                   help=("Disable RELRO builds"),
+                   action="store_false", dest='enable_relro')
+ 
++    opt.add_option('--without-valgrind',
++                   help=("Disable use of the valgrind headers"),
++                   action="store_true", dest='disable_valgrind', default=False)
++
+     gr = opt.option_group('developer options')
+ 
+     opt.load('python') # options for disabling pyc or pyo compilation
+-- 
+2.17.1
+

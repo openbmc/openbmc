@@ -8,13 +8,11 @@ Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
  src/util.c | 6 ++++++
  1 file changed, 6 insertions(+)
 
-diff --git a/src/util.c b/src/util.c
-index 7e59985..eb8e573 100644
 --- a/src/util.c
 +++ b/src/util.c
-@@ -23,6 +23,12 @@
- 
+@@ -24,6 +24,12 @@
  #include "util.h"
+ #include "netplan.h"
  
 +/* Don't fail if the standard library
 + * doesn't provide brace expansion */
@@ -25,6 +23,3 @@ index 7e59985..eb8e573 100644
  GHashTable* wifi_frequency_24;
  GHashTable* wifi_frequency_5;
  
--- 
-2.25.1
-

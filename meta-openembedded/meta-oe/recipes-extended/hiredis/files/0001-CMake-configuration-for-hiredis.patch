@@ -1,0 +1,117 @@
+From 2dc0c7e4a3fa7ecc92ee5e22f1d8ee48c2b333a8 Mon Sep 17 00:00:00 2001
+From: Thomas Lee <debian@tomlee.co>
+Date: Sun, 4 Nov 2018 22:59:09 +0000
+Subject: [PATCH] CMake configuration for hiredis
+
+Last-Update: 2018-09-26
+
+Upstream-Status: Backport [Ubuntu 20.04]
+---
+ HiredisConfig.cmake.in        |  5 +++++
+ HiredisConfigVersion.cmake.in | 22 ++++++++++++++++++++++
+ Makefile                      | 17 ++++++++++++++++-
+ 3 files changed, 43 insertions(+), 1 deletion(-)
+ create mode 100644 HiredisConfig.cmake.in
+ create mode 100644 HiredisConfigVersion.cmake.in
+
+diff --git a/HiredisConfig.cmake.in b/HiredisConfig.cmake.in
+new file mode 100644
+index 0000000..2cce290
+--- /dev/null
++++ b/HiredisConfig.cmake.in
+@@ -0,0 +1,5 @@
++find_path(HIREDIS_INCLUDE_DIRS hiredis/hiredis.h HINTS "/usr/include")
++find_library(HIREDIS_LIB_HIREDIS NAMES hiredis HINTS "/usr/lib")
++
++set(HIREDIS_LIBRARIES ${HIREDIS_LIB_HIREDIS})
++
+diff --git a/HiredisConfigVersion.cmake.in b/HiredisConfigVersion.cmake.in
+new file mode 100644
+index 0000000..584144a
+--- /dev/null
++++ b/HiredisConfigVersion.cmake.in
+@@ -0,0 +1,22 @@
++set(PACKAGE_VERSION "@HIREDIS_VERSION@")
++
++string(REPLACE "." ";" HIREDIS_VERSION_COMPONENTS ${PACKAGE_VERSION})
++string(REPLACE "." ";" REQUESTED_VERSION_COMPONENTS ${PACKAGE_FIND_VERSION})
++
++list(GET HIREDIS_VERSION_COMPONENTS 0 HIREDIS_VERSION_MAJOR)
++list(GET HIREDIS_VERSION_COMPONENTS 1 HIREDIS_VERSION_MINOR)
++
++list(GET REQUESTED_VERSION_COMPONENTS 0 REQUESTED_VERSION_MAJOR)
++list(GET REQUESTED_VERSION_COMPONENTS 1 REQUESTED_VERSION_MINOR)
++
++if(("${HIREDIS_VERSION_MAJOR}" EQUAL "${REQUESTED_VERSION_MAJOR}") AND
++    (("${HIREDIS_VERSION_MINOR}" EQUAL "${REQUESTED_VERSION_MINOR}") OR
++     ("${HIREDIS_VERSION_MINOR}" GREATER "${REQUESTED_VERSION_MINOR}")))
++    set(PACKAGE_VERSION_COMPATIBLE TRUE)
++    if("${PACKAGE_VERSION}" VERSION_EQUAL "${PACKAGE_FIND_VERSION}")
++        set(PACKAGE_VERSION_EXACT TRUE)
++    endif()
++else()
++    set(PACKAGE_VERSION_COMPATIBLE FALSE)
++endif()
++
+diff --git a/Makefile b/Makefile
+index 339727f..43704cd 100644
+--- a/Makefile
++++ b/Makefile
+@@ -8,6 +8,8 @@ EXAMPLES=hiredis-example hiredis-example-libevent hiredis-example-libev hiredis-
+ TESTS=hiredis-test
+ LIBNAME=libhiredis
+ PKGCONFNAME=hiredis.pc
++CMAKECONFNAME=HiredisConfig.cmake
++CMAKEVERSNAME=HiredisConfigVersion.cmake
+ 
+ HIREDIS_MAJOR=$(shell grep HIREDIS_MAJOR hiredis.h | awk '{print $$3}')
+ HIREDIS_MINOR=$(shell grep HIREDIS_MINOR hiredis.h | awk '{print $$3}')
+@@ -19,9 +21,11 @@ PREFIX?=/usr/local
+ INCLUDE_PATH?=include/hiredis
+ LIBRARY_PATH?=lib
+ PKGCONF_PATH?=pkgconfig
++CMAKE_PATH?=cmake/Hiredis
+ INSTALL_INCLUDE_PATH= $(DESTDIR)$(PREFIX)/$(INCLUDE_PATH)
+ INSTALL_LIBRARY_PATH= $(DESTDIR)$(PREFIX)/$(LIBRARY_PATH)
+ INSTALL_PKGCONF_PATH= $(INSTALL_LIBRARY_PATH)/$(PKGCONF_PATH)
++INSTALL_CMAKE_PATH= $(INSTALL_LIBRARY_PATH)/$(CMAKE_PATH)
+ 
+ # redis-server configuration used for testing
+ REDIS_PORT=56379
+@@ -150,6 +154,7 @@ check: hiredis-test
+ 
+ clean:
+ 	rm -rf $(DYLIBNAME) $(STLIBNAME) $(TESTS) $(PKGCONFNAME) examples/hiredis-example* *.o *.gcda *.gcno *.gcov
++	rm -f $(CMAKECONFNAME) $(CMAKEVERSNAME)
+ 
+ dep:
+ 	$(CC) -MM *.c
+@@ -169,7 +174,14 @@ $(PKGCONFNAME): hiredis.h
+ 	@echo Libs: -L\$${libdir} -lhiredis >> $@
+ 	@echo Cflags: -I\$${includedir} -D_FILE_OFFSET_BITS=64 >> $@
+ 
+-install: $(DYLIBNAME) $(STLIBNAME) $(PKGCONFNAME)
++$(CMAKECONFNAME): $(CMAKECONFNAME).in
++	cp $(CMAKECONFNAME).in $(CMAKECONFNAME)
++
++$(CMAKEVERSNAME): $(CMAKEVERSNAME).in
++	sed -e "s,@HIREDIS_VERSION@,$(HIREDIS_MAJOR).$(HIREDIS_MINOR).$(HIREDIS_PATCH),g" \
++		$(CMAKEVERSNAME).in >$(CMAKEVERSNAME)
++
++install: $(DYLIBNAME) $(STLIBNAME) $(PKGCONFNAME) $(CMAKECONFNAME) $(CMAKEVERSNAME)
+ 	mkdir -p $(INSTALL_INCLUDE_PATH) $(INSTALL_INCLUDE_PATH)/adapters $(INSTALL_LIBRARY_PATH)
+ 	$(INSTALL) hiredis.h async.h read.h sds.h $(INSTALL_INCLUDE_PATH)
+ 	$(INSTALL) adapters/*.h $(INSTALL_INCLUDE_PATH)/adapters
+@@ -178,6 +190,9 @@ install: $(DYLIBNAME) $(STLIBNAME) $(PKGCONFNAME)
+ 	$(INSTALL) $(STLIBNAME) $(INSTALL_LIBRARY_PATH)
+ 	mkdir -p $(INSTALL_PKGCONF_PATH)
+ 	$(INSTALL) $(PKGCONFNAME) $(INSTALL_PKGCONF_PATH)
++	mkdir -p $(INSTALL_CMAKE_PATH)
++	$(INSTALL) $(CMAKECONFNAME) $(INSTALL_CMAKE_PATH)
++	$(INSTALL) $(CMAKEVERSNAME) $(INSTALL_CMAKE_PATH)
+ 
+ 32bit:
+ 	@echo ""
+-- 
+2.27.0
+

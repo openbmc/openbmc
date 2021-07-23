@@ -16,29 +16,27 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  modules/lookup_multi.c | 2 +-
  2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/daemon/lookup.c b/daemon/lookup.c
-index 18df935..d35d484 100644
 --- a/daemon/lookup.c
 +++ b/daemon/lookup.c
-@@ -382,7 +382,7 @@ static int read_file_source_instance(struct autofs_point *ap, struct map_source
- 	if (!S_ISREG(st.st_mode))
+@@ -397,7 +397,7 @@ static int read_file_source_instance(str
  		return NSS_STATUS_NOTFOUND;
+ 	}
  
 -	if (st.st_mode & __S_IEXEC)
 +	if (st.st_mode & S_IEXEC)
  		type = src_prog;
  	else
  		type = src_file;
-@@ -942,7 +942,7 @@ static int lookup_name_file_source_instance(struct autofs_point *ap, struct map_
- 	if (!S_ISREG(st.st_mode))
+@@ -930,7 +930,7 @@ static int lookup_name_file_source_insta
  		return NSS_STATUS_NOTFOUND;
+ 	}
  
 -	if (st.st_mode & __S_IEXEC)
 +	if (st.st_mode & S_IEXEC)
  		type = src_prog;
  	else
  		type = src_file;
-@@ -1118,7 +1118,7 @@ static struct map_source *lookup_get_map_source(struct master_mapent *entry)
+@@ -1077,7 +1077,7 @@ static struct map_source *lookup_get_map
  	if (!S_ISREG(st.st_mode))
  		return NULL;
  
@@ -47,11 +45,9 @@ index 18df935..d35d484 100644
  		type = "program";
  	else
  		type = "file";
-diff --git a/modules/lookup_multi.c b/modules/lookup_multi.c
-index bb9f88c..cf109de 100644
 --- a/modules/lookup_multi.c
 +++ b/modules/lookup_multi.c
-@@ -247,7 +247,7 @@ static struct lookup_mod *nss_open_lookup(const char *format, int argc, const ch
+@@ -247,7 +247,7 @@ static struct lookup_mod *nss_open_looku
  				continue;
  			}
  
@@ -60,6 +56,3 @@ index bb9f88c..cf109de 100644
  				type = src_prog;
  			else
  				type = src_file;
--- 
-2.7.4
-

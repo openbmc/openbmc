@@ -5,7 +5,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/klcc/klcc.in
 +++ b/klcc/klcc.in
-@@ -207,6 +207,24 @@ while ( defined($a = shift(@ARGV)) ) {
+@@ -207,6 +207,27 @@ while ( defined($a = shift(@ARGV)) ) {
      } elsif ( $a =~ /^--([sysroot=])(.*)$/ ) {
  	# Override gcc encoded sysroot
  	push(@ccopt, $a);
@@ -25,6 +25,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +	# Allow clang options
 +	push(@ccopt, $a);
 +    } elsif ( $a =~ '--unwindlib=.*' ) {
++	# Allow clang options
++	push(@ccopt, $a);
++    } elsif ( $a =~ '-rtlib=.*' ) {
 +	# Allow clang options
 +	push(@ccopt, $a);
      } else {

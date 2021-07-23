@@ -66,3 +66,6 @@ RRECOMMENDS_${PN} = " \
                      busybox \
                      coreutils \
                     "
+
+# CVE-2010-4176 affects only Fedora
+CVE_CHECK_WHITELIST += "CVE-2010-4176"

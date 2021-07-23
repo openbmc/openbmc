@@ -49,6 +49,8 @@ do_install_append() {
     done
 }
 
+GSETTINGS_PACKAGE = "${PN}-gsettings"
+
 FILES_${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/gnome-control-center \
@@ -56,9 +58,9 @@ FILES_${PN} += " \
     ${systemd_user_unitdir} \
 "
 
-RDEPENDS_${PN} += "gsettings-desktop-schemas gdm-base librsvg-gtk"
+RDEPENDS_${PN} += "gsettings-desktop-schemas gdm-base librsvg-gtk ${PN}-gsettings"
 
-PACKAGES =+ "${PN}-tools"
+PACKAGES =+ "${PN}-tools ${PN}-gsettings"
 FILES_${PN}-tools = "${bindir}/*-tool"
 RDEPENDS_${PN}-tools = "python3-core"
 

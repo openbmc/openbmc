@@ -1,0 +1,23 @@
+From 1a69d4cc3f97e348dba9714c7ec60da1a8650664 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Jun 2021 22:05:36 -0700
+Subject: [PATCH] jemalloc_helper: Limit the mm_malloc.h hack to glibc on linux
+
+Musl does not need this hack
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ port/jemalloc_helper.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/port/jemalloc_helper.h
++++ b/port/jemalloc_helper.h
+@@ -5,7 +5,7 @@
+ 
+ #pragma once
+ 
+-#if defined(__clang__)
++#if defined(__clang__) && defined(__GLIBC__)
+ // glibc's `posix_memalign()` declaration specifies `throw()` while clang's
+ // declaration does not. There is a hack in clang to make its re-declaration
+ // compatible with glibc's if they are declared consecutively. That hack breaks

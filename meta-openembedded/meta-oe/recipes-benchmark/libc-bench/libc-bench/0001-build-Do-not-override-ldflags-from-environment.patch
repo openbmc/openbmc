@@ -1,0 +1,30 @@
+From 419dac71dd524a39ad2333e91334b4650e277a78 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 25 Jun 2021 09:43:00 -0700
+Subject: [PATCH] build: Do not override ldflags from environment
+
+bitbake passed LDFLAGS contain important information e.g. which compiler
+runtime to link etc. Therefore append -static to LDFLAGS instead
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index efda5c0..a867876 100644
+--- a/Makefile
++++ b/Makefile
+@@ -3,7 +3,7 @@ SRCS = $(sort $(wildcard *.c))
+ OBJS = $(SRCS:.c=.o)
+ 
+ CFLAGS = -Os -D_XOPEN_SOURCE=700
+-LDFLAGS = -static
++LDFLAGS += -static
+ LIBS = -lpthread -lrt -lpthread
+ 
+ 
+-- 
+2.32.0
+

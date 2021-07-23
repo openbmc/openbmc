@@ -16,3 +16,5 @@ RDEPENDS_${PN} += "\
     ${PYTHON_PN}-stringold \
     ${PYTHON_PN}-threading \
 "
+
+BBCLASSEXTEND = "native nativesdk"

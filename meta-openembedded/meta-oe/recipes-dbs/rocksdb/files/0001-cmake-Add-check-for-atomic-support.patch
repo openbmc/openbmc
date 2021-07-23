@@ -25,11 +25,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 74 insertions(+)
  create mode 100644 cmake/modules/CheckAtomic.cmake
 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f9c8f3346..4d604004b 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -852,7 +852,12 @@ endif()
+@@ -935,7 +935,12 @@ endif()
  if(WIN32)
    set(SYSTEM_LIBS ${SYSTEM_LIBS} shlwapi.lib rpcrt4.lib)
  else()
@@ -41,10 +39,7 @@ index f9c8f3346..4d604004b 100644
 +  endif()
  endif()
  
- add_library(${ROCKSDB_STATIC_LIB} STATIC ${SOURCES})
-diff --git a/cmake/modules/CheckAtomic.cmake b/cmake/modules/CheckAtomic.cmake
-new file mode 100644
-index 000000000..8b7dc8a37
+ add_library(${ROCKSDB_STATIC_LIB} STATIC ${SOURCES} ${BUILD_VERSION_CC})
 --- /dev/null
 +++ b/cmake/modules/CheckAtomic.cmake
 @@ -0,0 +1,69 @@
@@ -117,6 +112,3 @@ index 000000000..8b7dc8a37
 +  endif()
 +endif()
 +
--- 
-2.28.0
-

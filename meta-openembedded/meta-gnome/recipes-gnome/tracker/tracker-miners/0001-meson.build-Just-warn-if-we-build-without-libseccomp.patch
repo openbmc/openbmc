@@ -23,8 +23,8 @@ diff --git a/meson.build b/meson.build
 index 71a9df4..1eaa1a0 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -279,7 +279,7 @@ cpu_supports_seccomp = not unsupported_cpus.contains(host_cpu)
- seccomp_required = system_supports_seccomp and cpu_supports_seccomp
+@@ 299,7 +299,7 @@ cpu_supports_seccomp = not unsupported_cpus.contains(host_cpu)
+ seccomp_required = system_supports_seccomp and cpu_supports_seccomp and get_option('seccomp') and get_option('extract')
  
  if not libseccomp.found() and seccomp_required
 -  error('Libseccomp is mandatory for sandboxed metadata extraction')

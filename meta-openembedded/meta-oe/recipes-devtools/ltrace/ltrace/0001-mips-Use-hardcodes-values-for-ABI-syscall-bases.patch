@@ -1,0 +1,50 @@
+From ed8dbe1c793f2f770fef61adc4390277f903cceb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 9 Jul 2021 01:32:42 -0700
+Subject: [PATCH] mips: Use hardcodes values for ABI syscall bases
+
+mips kernels 5.13+ have stopped exposing the UAPIs which provided these
+defines, the values are more or less static so just use the hardcoded
+values for now. Use __NR_syscalls to get number of syscalls supported
+and include asm-generic/unistd.h to get this definition
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdeps/linux-gnu/mips/trace.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/sysdeps/linux-gnu/mips/trace.c b/sysdeps/linux-gnu/mips/trace.c
+index d54818e..e72184d 100644
+--- a/sysdeps/linux-gnu/mips/trace.c
++++ b/sysdeps/linux-gnu/mips/trace.c
+@@ -33,6 +33,7 @@
+ #include <asm/unistd.h>
+ #include <assert.h>
+ #include <asm/unistd.h>
++#include <asm-generic/unistd.h>
+ 
+ #include "backend.h"
+ #include "common.h"
+@@ -135,12 +136,12 @@ syscall_p(struct process *proc, int status, int *sysnum)
+ 	int min_syscall, max_syscall, sigreturn, rt_sigreturn;
+ 	struct callstack_element *top = NULL;
+ 	int depth = proc->callstack_depth;
+-	const int syscallbase[] = {__NR_O32_Linux, __NR_N32_Linux,
+-				   __NR_64_Linux, __NR_O32_Linux};
+-	const int syscallnum[] = {__NR_O32_Linux_syscalls,
+-				  __NR_N32_Linux_syscalls,
+-				  __NR_64_Linux_syscalls,
+-				  __NR_O32_Linux_syscalls};
++	const int syscallbase[] = {4000, 6000,
++				   5000, 4000};
++	const int syscallnum[] = {__NR_syscalls,
++				  __NR_syscalls,
++				  __NR_syscalls,
++				  __NR_syscalls};
+ 	const int rt_sigreturn_list[] = {193, 211, 211, 193};
+ 	const int sigreturn_list[] = {119, -1, -1, 119};
+ 
+-- 
+2.32.0
+

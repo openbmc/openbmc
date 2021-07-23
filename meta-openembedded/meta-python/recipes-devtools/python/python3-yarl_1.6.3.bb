@@ -7,6 +7,7 @@ SRC_URI[sha256sum] = "8a9066529240171b68893d60dca86a763eae2139dd42f42106b03cf4b4
 
 SRC_URI += " \
     file://run-ptest \
+    file://0001-Drop-tests-for-semicolon-as-a-separator.patch \
 "
 
 PYPI_PACKAGE = "yarl"

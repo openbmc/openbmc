@@ -89,6 +89,7 @@ do_install() {
     install -d ${D}${MINIFI_BIN}
     install -d ${D}${MINIFI_HOME}/conf
     install -m 755 -d ${D}${localstatedir}/lib/minifi
+    install -m 755 -d ${D}${libexecdir}/minifi-python
     cp -a ${WORKDIR}/minifi-install/usr/bin/*   ${D}${MINIFI_BIN}/
     cp -a ${WORKDIR}/minifi-install/usr/conf/*  ${D}${MINIFI_HOME}/conf/
 
@@ -101,6 +102,8 @@ do_install() {
     sed -i 's|nifi.database.content.repository.directory.default=.*|nifi.database.content.repository.directory.default='${MINIFI_RUN}'/content_repository|g' \
         ${D}${MINIFI_HOME}/conf/minifi.properties
     sed -i 's|nifi.flow.configuration.file=.*|nifi.flow.configuration.file='${MINIFI_HOME}'/conf/config.yml|g' \
+        ${D}${MINIFI_HOME}/conf/minifi.properties
+    sed -i 's|nifi.python.processor.dir=.*|nifi.python.processor.dir=${libexecdir}/minifi-python|g' \
         ${D}${MINIFI_HOME}/conf/minifi.properties
 
     sed -i 's|export MINIFI_HOME=.*|export MINIFI_HOME='${MINIFI_HOME}'|g' ${D}${MINIFI_BIN}/minifi.sh
@@ -136,3 +139,5 @@ pkg_postinst_${PN}() {
         fi
     fi
 }
+
+CLEANBROKEN = "1"

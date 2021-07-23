@@ -8,6 +8,7 @@ SRC_URI  = "\
     http://http.debian.net/debian/pool/main/d/debootstrap/debootstrap_${PV}.tar.gz \
     file://0001-support-to-override-usr-sbin-and-usr-share.patch \
     file://0002-support-to-override-usr-bin-arch-test.patch \
+    file://0001-do-not-hardcode-the-full-path-of-dpkg.patch \
 "
 
 SRC_URI[md5sum] = "8a5e97f60236c3a63f715c056a5f0e29"

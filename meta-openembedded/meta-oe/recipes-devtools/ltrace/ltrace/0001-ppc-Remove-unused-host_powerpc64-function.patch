@@ -1,0 +1,37 @@
+From 4517bf59838f40eb6e3f46e39adb5e5090c59df8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Jun 2021 18:14:36 -0700
+Subject: [PATCH] ppc: Remove unused host_powerpc64 function
+
+This function is dead code, remove it which avoids compiler warnings
+with clang
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdeps/linux-gnu/ppc/plt.c | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/sysdeps/linux-gnu/ppc/plt.c b/sysdeps/linux-gnu/ppc/plt.c
+index 5f81889..9d1838b 100644
+--- a/sysdeps/linux-gnu/ppc/plt.c
++++ b/sysdeps/linux-gnu/ppc/plt.c
+@@ -142,16 +142,6 @@
+ #define PPC64_PLT_STUB_SIZE 4
+ #endif
+ 
+-static inline int
+-host_powerpc64()
+-{
+-#ifdef __powerpc64__
+-	return 1;
+-#else
+-	return 0;
+-#endif
+-}
+-
+ static void
+ mark_as_resolved(struct library_symbol *libsym, GElf_Addr value)
+ {
+-- 
+2.32.0
+

@@ -12,7 +12,6 @@ SRC_URI = "https://downloads.mariadb.org/interstitial/${BP}/source/${BP}.tar.gz 
            file://mysql-systemd-start \
            file://configure.cmake-fix-valgrind.patch \
            file://support-files-CMakeLists.txt-fix-do_populate_sysroot.patch \
-           file://sql-CMakeLists.txt-fix-gen_lex_hash-not-found.patch \
            file://0001-disable-ucontext-on-musl.patch \
            file://c11_atomics.patch \
            file://clang_version_header_conflict.patch \
@@ -21,12 +20,12 @@ SRC_URI = "https://downloads.mariadb.org/interstitial/${BP}/source/${BP}.tar.gz 
            file://0001-innobase-Define-__NR_futex-if-it-does-not-exist.patch \
            file://0001-aio_linux-Check-if-syscall-exists-before-using-it.patch \
            file://sys_futex.patch \
-           file://cross-compiling.patch \
            file://ssize_t.patch \
+           file://mm_malloc.patch \
           "
 SRC_URI_append_libc-musl = " file://ppc-remove-glibc-dep.patch"
 
-SRC_URI[sha256sum] = "a5ff32f9fcaaf26bf5cba94accc7b246d2d5eb75710d027e40122df6bac0babb"
+SRC_URI[sha256sum] = "761053605fe30ce393f324852117990350840a93b3e6305ef4d2f8c8305cc47a"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 
@@ -37,15 +36,15 @@ BINCONFIG_GLOB = "mysql_config"
 inherit cmake gettext binconfig update-rc.d useradd systemd multilib_script
 
 MULTILIB_SCRIPTS = "${PN}-server:${bindir}/mariadbd-safe \
-                    ${PN}-server:${bindir}/mariadb-install-db"
+                    ${PN}-setupdb:${bindir}/mariadb-install-db"
 
 INITSCRIPT_PACKAGES = "${PN}-server ${PN}-setupdb"
 INITSCRIPT_NAME_${PN}-server = "mysqld"
 INITSCRIPT_PARAMS_${PN}-server ?= "start 45 5 . stop 45 0 6 1 ."
 
-USERADD_PACKAGES = "${PN}-server"
-USERADD_PARAM_${PN}-server = "--system --home-dir /var/mysql -g mysql --shell /bin/false mysql"
-GROUPADD_PARAM_${PN}-server = "--system mysql"
+USERADD_PACKAGES = "${PN}-setupdb"
+USERADD_PARAM_${PN}-setupdb = "--system --home-dir /var/mysql -g mysql --shell /bin/false mysql"
+GROUPADD_PARAM_${PN}-setupdb = "--system mysql"
 
 INITSCRIPT_NAME_${PN}-setupdb = "install_db"
 INITSCRIPT_PARAMS_${PN}-setupdb ?= "defaults 44 44"
@@ -57,16 +56,18 @@ SYSTEMD_AUTO_ENABLE_${PN}-server ?= "disable"
 SYSTEMD_SERVICE_${PN}-setupdb = "install_db.service"
 SYSTEMD_AUTO_ENABLE_${PN}-setupdb ?= "enable"
 ALLOW_EMPTY_${PN}-setupdb ?= "1"
-FILES_${PN}-setupdb = "${sysconfdir}/init.d/install_db"
+FILES_${PN}-setupdb = "${sysconfdir}/init.d/install_db \
+                       ${bindir}/mariadb-install-db \
+                       ${bindir}/my_print_defaults \
+                       ${bindir}/mysql_install_db \
+                       ${bindir}/mysql-systemd-start \
+                       "
 
-EXTRA_OEMAKE = "'GEN_LEX_HASH=${STAGING_BINDIR_NATIVE}/gen_lex_hash'"
-
-PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)} setupdb"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG_class-native = ""
 PACKAGECONFIG[pam] = ",-DWITHOUT_AUTH_PAM=TRUE,libpam"
 PACKAGECONFIG[valgrind] = "-DWITH_VALGRIND=TRUE,-DWITH_VALGRIND=FALSE,valgrind"
 PACKAGECONFIG[krb5] = ", ,krb5"
-PACKAGECONFIG[setupdb] = ", ,,${PN}-setupdb"
 PACKAGECONFIG[zstd] = "-DWITH_ROCKSDB_ZSTD=ON,-DWITH_ROCKSDB_ZSTD=OFF,zstd"
 
 # MariaDB doesn't link properly with gold
@@ -94,6 +95,8 @@ EXTRA_OECMAKE = "-DWITH_EMBEDDED_SERVER=ON \
                  -DCAT_EXECUTABLE=`which cat` \
                  -DCMAKE_AR:FILEPATH=${AR}"
 
+EXTRA_OECMAKE_prepend_class-target = "-DCMAKE_CROSSCOMPILING_EMULATOR=${WORKDIR}/qemuwrapper "
+
 # With Ninja it fails with:
 # make: *** No rule to make target `install'.  Stop.
 OECMAKE_GENERATOR = "Unix Makefiles"
@@ -116,12 +119,18 @@ do_generate_toolchain_file_append_class-native () {
     sed -i "/set( CMAKE_SYSTEM_PROCESSOR/d" ${WORKDIR}/toolchain.cmake
 }
 
-do_compile_prepend_class-target () {
-    # These need to be in-tree or make will think they need to be built,
-    # and since we're cross-compiling that is disabled
-    cp ${STAGING_BINDIR_NATIVE}/comp_err ${S}/extra
-    cp ${STAGING_BINDIR_NATIVE}/comp_sql ${S}/scripts
+do_configure_prepend_class-target () {
+	# Write out a qemu wrapper that will be used by cmake
+	# so that it can run target helper binaries through that.
+	qemu_binary="${@qemu_wrapper_cmdline(d, d.getVar('STAGING_DIR_HOST'), [d.expand('${STAGING_DIR_HOST}${libdir}'),d.expand('${STAGING_DIR_HOST}${base_libdir}')])}"
+	cat > ${WORKDIR}/qemuwrapper << EOF
+#!/bin/sh
+$qemu_binary "\$@"
+EOF
+	chmod +x ${WORKDIR}/qemuwrapper
+}
 
+do_compile_prepend_class-target () {
     if [ "${@bb.utils.contains('PACKAGECONFIG', 'krb5', 'yes', 'no', d)}" = "no" ]; then
         if ! [ -e ${B}/include/openssl/kssl.h ] ; then
             mkdir -p ${B}/include/openssl
@@ -131,11 +140,6 @@ do_compile_prepend_class-target () {
             echo "#endif" >>${B}/include/openssl/kssl.h
         fi
     fi
-    # workaround to handle out-of-source build from source package
-    yacc_files="sql_yacc.hh sql_yacc.cc sql_yacc_ora.hh sql_yacc_ora.cc"
-    for yacc_file in ${yacc_files}; do
-        cp ${S}/sql/${yacc_file} ${B}/sql/${yacc_file}
-    done
 }
 
 SYSROOT_PREPROCESS_FUNCS += "mariadb_sysroot_preprocess"
@@ -185,10 +189,10 @@ do_install() {
     fi
 }
 
-PACKAGES = "${PN}-dbg ${PN} \
+PACKAGES = "${PN}-dbg ${PN}-setupdb ${PN} \
     libmysqlclient-r libmysqlclient-r-dev libmysqlclient-r-staticdev \
     libmysqlclient libmysqlclient-dev libmysqlclient-staticdev \
-    libmysqld libmysqld-dev ${PN}-client ${PN}-server ${PN}-setupdb ${PN}-leftovers"
+    libmysqld libmysqld-dev ${PN}-client ${PN}-server ${PN}-leftovers"
 CONFFILES_${PN}-server += "${sysconfdir}/my.cnf ${sysconfdir}/my.cnf.d/server.cnf"
 CONFFILES_${PN}-client += "${sysconfdir}/my.cnf.d/mysql-clients.cnf"
 CONFFILES_libmysqlclient += "${sysconfdir}/my.cnf.d/client.cnf"
@@ -291,7 +295,6 @@ FILES_${PN}-server = "\
     ${bindir}/mysql_convert_table_format \
     ${bindir}/mariadb-convert-table-format \
     ${bindir}/mysql_install_db \
-    ${bindir}/mariadb-install-db \
     ${bindir}/mysql_secure_installation \
     ${bindir}/mariadb-secure-installation \
     ${bindir}/mysql_setpermission \

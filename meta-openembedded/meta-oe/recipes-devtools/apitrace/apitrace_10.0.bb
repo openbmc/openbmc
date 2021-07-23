@@ -5,9 +5,9 @@ LICENSE = "MIT & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=aeb969185a143c3c25130bc2c3ef9a50 \
                     file://thirdparty/snappy/COPYING;md5=f62f3080324a97b3159a7a7e61812d0c"
 
-SRCREV = "03e4e9d2cab4f1a61d3f589785641a73dff027c5"
-SRC_URI = "git://github.com/${BPN}/${BPN}.git \
-           file://0001-libbacktrace-include-config.h.patch \
+SRCREV = "9d42f667e2a36a6624d92b9bd697de097cc4e619"
+PV .= "+10.0.1+git${SRCPV}"
+SRC_URI = "gitsm://github.com/${BPN}/${BPN}.git \
           "
 
 S = "${WORKDIR}/git"

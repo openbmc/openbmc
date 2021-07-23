@@ -15,6 +15,8 @@ JIT_mipsarchn64 = ""
 JIT_riscv64 = ""
 JIT_riscv32 = ""
 JIT_powerpc = ""
+JIT_powerpc64le = ""
+JIT_powerpc64 = ""
 
 DEPENDS += "libb64 lua${JIT} zlib c-ares grpc-native grpc curl ncurses jsoncpp tbb jq openssl elfutils protobuf protobuf-native jq-native"
 RDEPENDS_${PN} = "bash"

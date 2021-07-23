@@ -10,6 +10,7 @@ SRCREV = "b6b2ce5f9f87a09b14499cb00c600c601f022634"
 PV = "20110206+git${SRCPV}"
 
 SRC_URI = "git://git.musl-libc.org/libc-bench \
+           file://0001-build-Do-not-override-ldflags-from-environment.patch \
            "
 
 S = "${WORKDIR}/git"
