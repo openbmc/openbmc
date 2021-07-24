@@ -36,10 +36,8 @@ IMAGE_FEATURES_remove_witherspoon = "obmc-user-mgmt-ldap"
 # Override defaults from meta-phosphor/conf/distro/include/phosphor-defaults.inc
 inherit extrausers
 
-# The password hash used here is the traditional 0penBmc password.
-
 #IBM_EXTRA_USERS_PARAMS += " \
-#  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
+#  usermod -p ${DEFAULT_OPENBMC_PASSWORD} root; \
 #  "
 
 # Add group "wheel" (before adding the "service" account).
@@ -50,13 +48,13 @@ IBM_EXTRA_USERS_PARAMS += " \
 # Add the "admin" account.
 IBM_EXTRA_USERS_PARAMS += " \
   useradd -M -d / --groups priv-admin,redfish,web -s /sbin/nologin admin; \
-  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' admin; \
+  usermod -p ${DEFAULT_OPENBMC_PASSWORD} admin; \
   "
 
 # Add the "service" account.
 IBM_EXTRA_USERS_PARAMS += " \
   useradd -M -d / --groups priv-admin,redfish,web,wheel service; \
-  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' service; \
+  usermod -p ${DEFAULT_OPENBMC_PASSWORD} service; \
   "
 
 # This is recipe specific to ensure it takes effect.

@@ -246,6 +246,10 @@ EXTRA_OEMESON_append_class-target = " -Db_lto=true"
 # Override this in your local.conf
 inherit extrausers
 
+# This is the default password for the OpenBMC root user account (0penBmc)
+# salted and hashed with SHA512 suitable for /etc/shadow or `usermod -p`.
+DEFAULT_OPENBMC_PASSWORD = "'\$6\$UGMqyqdG\$GqTb3tXPFx9AJlzTw/8X5RoW2Z.100dT.acuk8AFJfNQYr.ZRL8itMIgLqsdq46RNHgiv78XayOSl.IbR4DFU.'"
+
 EXTRA_USERS_PARAMS_pn-obmc-phosphor-image = " \
-  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
+  usermod -p ${DEFAULT_OPENBMC_PASSWORD} root; \
   "
