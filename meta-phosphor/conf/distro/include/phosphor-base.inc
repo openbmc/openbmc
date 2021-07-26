@@ -101,6 +101,7 @@ DISTRO_FEATURES_DEFAULT = " \
         pam \
         slp \
         systemd \
+        apparmor \
         "
 
 DISTRO_FEATURES += " \
