@@ -1,10 +1,34 @@
 {
-  "gpio_configs":{
-      "PostComplete": "POST_COMPLETE",
-      "PwrButton": "POWER_BUTTON",
-      "PwrOK": "PS_PWROK",
-      "PwrOut": "POWER_OUT",
-      "RstButton": "RESET_BUTTON",
-      "RstOut": "RESET_OUT"
-  }
+  "gpio_configs":[
+    {
+        "Name" : "PostComplete",
+        "LineName" : "POST_COMPLETE",
+        "Type" : "GPIO"
+    },
+    {
+        "Name" : "PowerButton",
+        "LineName" : "POWER_BUTTON",
+        "Type" : "GPIO"
+    },
+    {
+        "Name" : "PowerOk",
+        "LineName" : "PS_PWROK",
+        "Type" : "GPIO"
+    },
+    {
+        "Name" : "PowerOut",
+        "LineName" : "POWER_OUT",
+        "Type" : "GPIO"
+    },
+    {
+        "Name" : "ResetButton",
+        "LineName" : "RESET_BUTTON",
+        "Type" : "GPIO"
+    },
+    {
+        "Name" : "ResetOut",
+        "LineName" : "RESET_OUT",
+        "Type" : "GPIO"
+    }
+  ]
 }
