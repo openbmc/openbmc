@@ -13,6 +13,7 @@ PACKAGES = ' \
             packagegroup-base-extended \
             packagegroup-distro-base \
             packagegroup-machine-base \
+            packagegroup-security-mac \
             \
             ${@bb.utils.contains("MACHINE_FEATURES", "acpi", "packagegroup-base-acpi", "",d)} \
             ${@bb.utils.contains("MACHINE_FEATURES", "alsa", "packagegroup-base-alsa", "", d)} \
@@ -50,6 +51,7 @@ VIRTUAL-RUNTIME_keymaps ?= "keymaps"
 RDEPENDS_packagegroup-base = "\
     packagegroup-distro-base \
     packagegroup-machine-base \
+    packagegroup-security-mac \
     \
     module-init-tools \
     ${@bb.utils.contains('MACHINE_FEATURES', 'apm', 'packagegroup-base-apm', '',d)} \
@@ -343,3 +345,4 @@ RDEPENDS_packagegroup-base-serial = "\
 SUMMARY_packagegroup-base-phone = "Cellular telephony (voice) support"
 RDEPENDS_packagegroup-base-phone = "\
     ofono"
+
