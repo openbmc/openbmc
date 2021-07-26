@@ -1,5 +1,5 @@
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://COPYING;md5=1b886630cdc9a17c26250934beda407d"
+LIC_FILES_CHKSUM = "file://COPYING;md5=667d4ad55f5fbf4c3e853e8acd0f74de"
 
 PV = "0.1+git${SRCPV}"
 SRC_URI = "git://github.com/yrutschle/conf2struct"
