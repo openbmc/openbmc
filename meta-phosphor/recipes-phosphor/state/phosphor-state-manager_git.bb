@@ -82,7 +82,6 @@ FILES_${PN}-discover = "${bindir}/phosphor-discover-system-state"
 SYSTEMD_SERVICE_${PN}-discover += "phosphor-discover-system-state@.service"
 
 FILES_${PN}-host-check = "${bindir}/phosphor-host-check"
-SYSTEMD_SERVICE_${PN}-host-check += "phosphor-reset-host-check@.service"
 SYSTEMD_SERVICE_${PN}-host-check += "phosphor-reset-host-running@.service"
 
 SYSTEMD_SERVICE_${PN}-reset-sensor-states += "phosphor-reset-sensor-states@.service"
@@ -183,6 +182,6 @@ SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'FAN_LINK_FMT', 'OBMC_CHA
 SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERROR_TARGETS', 'OBMC_HOST_INSTANCES')}"
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "65bfcf57920d6fac62dbc9dd4a4fabdfe0c53228"
+SRCREV = "0d1c3f1f9329c853677f0581287afef83eeea0f0"
 
 S = "${WORKDIR}/git"
