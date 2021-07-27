@@ -170,6 +170,7 @@ RDEPENDS_${PN}_libc-glibc +=  "glibc-utils"
 RDEPENDS_${PN} +=  "${@["coreutils findutils", ""][(d.getVar('VIRTUAL-RUNTIME_init_manager') == 'systemd')]} ${@bb.utils.contains('PACKAGECONFIG','python','python3-core python3-modules','', d)}"
 RDEPENDS_${PN}_remove += "${@bb.utils.contains('PACKAGECONFIG','perl','','perl', d)}"
 RDEPENDS_${PN}-ptest += "perl coreutils dbus-lib bash"
+RDEPENDS_${PN} += "coreutils findutils"
 
 INSANE_SKIP_${PN} = "ldflags"
 PRIVATE_LIBS_${PN}-ptest = "libapparmor.so*"
