@@ -102,6 +102,7 @@ DISTRO_FEATURES_DEFAULT = " \
         slp \
         systemd \
         apparmor \
+	seccomp \
         "
 
 DISTRO_FEATURES += " \
