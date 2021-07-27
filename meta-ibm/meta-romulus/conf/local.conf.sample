@@ -96,6 +96,7 @@ PACKAGE_CLASSES ?= "package_rpm"
 SANITY_TESTED_DISTROS_append ?= " *"
 
 DISTRO_FEATURES_append = " security"
+IMAGE_INSTALL += "findutils"
 #
 # Extra image configuration defaults
 #
