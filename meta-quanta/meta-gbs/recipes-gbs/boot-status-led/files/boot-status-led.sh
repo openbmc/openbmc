@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BOOT_SERVICE_NAME="xyz.openbmc_project.State.Host"
+BOOT_SERVICE_NAME="xyz.openbmc_project.State.Host0"
 BOOT_STATUS_OBJPATH="/xyz/openbmc_project/state/os"
 BOOT_INTERFACE_NAME="xyz.openbmc_project.State.OperatingSystem.Status"
 BOOT_Property="OperatingSystemState"
@@ -11,7 +11,7 @@ LED_STANDBY_OBJPATH="/xyz/openbmc_project/led/groups/boot_status_standby"
 LED_INTERFACE_NAME="xyz.openbmc_project.Led.Group"
 LED_Property="Asserted"
 
-PWR_STATE_SERVICE="xyz.openbmc_project.State.Chassis"
+PWR_STATE_SERVICE="xyz.openbmc_project.State.Chassis0"
 PWR_STATE_OBJPATH="/xyz/openbmc_project/state/chassis0"
 PWR_STATE_INTERFACE_NAME="xyz.openbmc_project.State.Chassis"
 PWR_STATE_Property="CurrentPowerState"

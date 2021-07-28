@@ -16,7 +16,7 @@
 
 main() {
   local pgd_val
-  pgd_val="$(busctl get-property -j xyz.openbmc_project.State.Chassis \
+  pgd_val="$(busctl get-property -j xyz.openbmc_project.State.Chassis0 \
            /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis \
            CurrentPowerState | jq -r '.["data"]')"
 
