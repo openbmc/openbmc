@@ -4,6 +4,7 @@ SUMMARY = "U-Boot bootloader fw_printenv/setenv utilities"
 DEPENDS += "mtd-utils"
 
 PROVIDES += "u-boot-fw-utils"
+RPROVIDES:${PN} += "u-boot-fw-utils"
 
 SRC_URI += "file://fw_env_ast2600_nor.config"
 SRC_URI += "file://fw_env_ast2600_mmc.config"
