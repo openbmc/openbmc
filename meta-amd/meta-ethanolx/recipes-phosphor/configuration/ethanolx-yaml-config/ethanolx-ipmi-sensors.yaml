@@ -1414,3 +1414,113 @@
         Offsets:
           0xFF:
             type: double
+
+67:
+  sensorType: 0x02
+  entityID: 0x07
+  path: /xyz/openbmc_project/sensors/voltage/5_DUAL
+  sensorName: 5_DUAL
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  multiplierM: 30
+  scale: 0
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+68:
+  sensorType: 0x02
+  entityID: 0x07
+  path: /xyz/openbmc_project/sensors/voltage/33_DUAL
+  sensorName: 33_DUAL
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  multiplierM: 15
+  scale: 0
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+69:
+  sensorType: 0x02
+  entityID: 0x07
+  path: /xyz/openbmc_project/sensors/voltage/12_RUN
+  sensorName: 12_RUN
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  multiplierM: 60
+  scale: 0
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+70:
+  sensorType: 0x02
+  entityID: 0x07
+  path: /xyz/openbmc_project/sensors/voltage/5_RUN
+  sensorName: 5_RUN
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  multiplierM: 30
+  scale: 0
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+71:
+  sensorType: 0x02
+  entityID: 0x07
+  path: /xyz/openbmc_project/sensors/voltage/33_RUN
+  sensorName: 33_RUN
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  multiplierM: 15
+  scale: 0
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  mutability: Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
