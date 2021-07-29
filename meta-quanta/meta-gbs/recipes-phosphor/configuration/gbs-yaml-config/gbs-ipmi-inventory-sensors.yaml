@@ -433,6 +433,11 @@
   sensorID: 0xFC
   sensorType: 0x25
   offset: 0x01
+/xyz/openbmc_project/inventory/system/chassis/entity/pwrgd_p12v_slots:
+  eventReadingType: 0x6f
+  sensorID: 0xFD
+  sensorType: 0x25
+  offset: 0x01
 # map non-IPMI-SEL to the system event sensor as "Undetermined system hardware failure."
 /xyz/openbmc_project/inventory/system:
   eventReadingType: 0x6f

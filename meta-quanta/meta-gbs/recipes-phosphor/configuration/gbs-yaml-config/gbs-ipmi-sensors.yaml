@@ -1279,3 +1279,24 @@
   sensorReadingType: 0x6f
   sensorType: 0x25
   serviceInterface: org.freedesktop.DBus.Properties
+
+0xFD:
+  entityID: 0x13
+  entityInstance: 0
+  interfaces:
+    xyz.openbmc_project.Inventory.Item:
+      Present:
+        Offsets:
+          0x00:
+            assert: true
+            type: bool
+          0x01:
+            assert: false
+            type: bool
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/inventory/system/chassis/entity/pwrgd_p12v_slots
+  readingType: assertion
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 0x6f
+  sensorType: 0x25
+  serviceInterface: org.freedesktop.DBus.Properties
