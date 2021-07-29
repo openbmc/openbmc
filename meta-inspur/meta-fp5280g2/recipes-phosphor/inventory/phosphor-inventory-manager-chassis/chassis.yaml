@@ -9,5 +9,5 @@ events:
               /system/chassis:
                 xyz.openbmc_project.Inventory.Item.Chassis:
                   Type:
-                    value: "RackMount"
+                    value: "xyz.openbmc_project.Inventory.Item.Chassis.ChassisType.RackMount"
                     type: string
