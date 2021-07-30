@@ -1,2 +1,1 @@
-# Enable threshold monitoring
-EXTRA_OECMAKE_append_kudo = " -DSEL_LOGGER_MONITOR_THRESHOLD_EVENTS=ON"
+PACKAGECONFIG_append_kudo = " log-threshold"
