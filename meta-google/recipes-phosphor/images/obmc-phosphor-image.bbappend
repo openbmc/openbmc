@@ -19,3 +19,6 @@ OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = \
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " ipmitool"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " iotools"
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " lrzsz"
+
+# Add gBMC update recipes
+OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " dummy-gbmc-update"
