@@ -24,6 +24,9 @@ S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-hostlogger"
 SRCREV = "042b5ba8438d1423f807feb5ef739cda063ea8d2"
 
+# Disable unit tests
+EXTRA_OEMESON += "-Dtests=disabled"
+
 # Systemd service template
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "hostlogger@.service"
