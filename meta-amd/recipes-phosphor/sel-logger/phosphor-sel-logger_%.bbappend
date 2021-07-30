@@ -1,3 +1,1 @@
-# Enable threshold monitoring
-EXTRA_OECMAKE += "-DSEL_LOGGER_MONITOR_THRESHOLD_EVENTS=ON"
-EXTRA_OECMAKE += "-DREDFISH_LOG_MONITOR_PULSE_EVENTS=ON"
+PACKAGECONFIG_append = " log-threshold log-pulse"
