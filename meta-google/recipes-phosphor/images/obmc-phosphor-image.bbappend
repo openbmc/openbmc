@@ -22,3 +22,4 @@ OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " lrzsz"
 
 # Add gBMC update recipes
 OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " dummy-gbmc-update"
+OBMC_IMAGE_EXTRA_INSTALL_append_gbmc = " virtual/bmc-update"
