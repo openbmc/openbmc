@@ -61,7 +61,12 @@ pkg_postinst_${PN}() {
 		LINK="$D$systemd_system_unitdir/obmc-host-reset@0.target.requires/op-reset-host-check@0.service"
 		TARGET="../op-reset-host-check@.service"
 		ln -s $TARGET $LINK
-    fi
+
+		mkdir -p $D$systemd_system_unitdir/multi-user.target.wants
+		LINK="$D$systemd_system_unitdir/multi-user.target.wants/phal-import-devtree@0.service"
+		TARGET="../phal-import-devtree@.service"
+		ln -s $TARGET $LINK
+	fi
 
 	# If the memory preserving reboot feature is enabled, set it up
 	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'mpreboot', d)}" = mpreboot ]; then
@@ -110,6 +115,9 @@ pkg_prerm_${PN}() {
 		rm $LINK
 
 		LINK="$D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.requires/proc-pre-poweroff@0.service"
+		rm $LINK
+
+		LINK="$D$systemd_system_unitdir/multi-user.target.wants/phal-import-devtree@0.service"
 		rm $LINK
 	fi
 
