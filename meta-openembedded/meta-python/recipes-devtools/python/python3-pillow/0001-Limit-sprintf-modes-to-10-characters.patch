@@ -1,0 +1,49 @@
+From 5f4504bb03f4edeeef8c2633dc5ba03a4c2a8a97 Mon Sep 17 00:00:00 2001
+From: Andrew Murray <radarhere@users.noreply.github.com>
+Date: Tue, 15 Jun 2021 15:14:26 +1000
+Subject: [PATCH 1/1] Limit sprintf modes to 10 characters
+
+Needed to make CVE-2021-34552 fix apply cleanly.
+
+commit 5f4504bb03f4edeeef8c2633dc5ba03a4c2a8a97 (unmodified)
+
+Upstream-Status: Backport
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+---
+ src/libImaging/Convert.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/src/libImaging/Convert.c b/src/libImaging/Convert.c
+index 8c7be36a2..1fa74a13b 100644
+--- a/src/libImaging/Convert.c
++++ b/src/libImaging/Convert.c
+@@ -1594,9 +1594,8 @@ convert(
+ #ifdef notdef
+         return (Imaging)ImagingError_ValueError("conversion not supported");
+ #else
+-        static char buf[256];
+-        /* FIXME: may overflow if mode is too large */
+-        sprintf(buf, "conversion from %s to %s not supported", imIn->mode, mode);
++        static char buf[100];
++        sprintf(buf, "conversion from %.10s to %.10s not supported", imIn->mode, mode);
+         return (Imaging)ImagingError_ValueError(buf);
+ #endif
+     }
+@@ -1645,11 +1644,10 @@ ImagingConvertTransparent(Imaging imIn, const char *mode, int r, int g, int b) {
+     }
+ #else
+     {
+-        static char buf[256];
+-        /* FIXME: may overflow if mode is too large */
++        static char buf[100];
+         sprintf(
+             buf,
+-            "conversion from %s to %s not supported in convert_transparent",
++            "conversion from %.10s to %.10s not supported in convert_transparent",
+             imIn->mode,
+             mode);
+         return (Imaging)ImagingError_ValueError(buf);
+-- 
+2.29.2
+

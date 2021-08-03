@@ -7,7 +7,9 @@ LIC_FILES_CHKSUM = "file://COPYING.txt;md5=7c13b3376cea0ce68d2d2da0a1b3a72c"
 SRCREV = "565bf68eccfdbbf22cf5cb6d792e23de564665c7"
 PV = "0.21+git${SRCPV}"
 
-SRC_URI = "git://github.com/analogdevicesinc/libiio.git;protocol=https"
+SRC_URI = "git://github.com/analogdevicesinc/libiio.git;protocol=https \
+           file://0001-python-Do-not-verify-whether-libiio-is-installed-whe.patch \
+"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 
 S = "${WORKDIR}/git"

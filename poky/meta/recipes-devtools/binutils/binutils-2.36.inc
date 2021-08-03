@@ -41,5 +41,8 @@ SRC_URI = "\
      file://0014-Fix-rpath-in-libtool-when-sysroot-is-enabled.patch \
      file://0015-sync-with-OE-libtool-changes.patch \
      file://0016-Check-for-clang-before-checking-gcc-version.patch \
+     file://0001-CVE-2021-20197.patch \
+     file://0002-CVE-2021-20197.patch \
+     file://0003-CVE-2021-20197.patch \
 "
 S  = "${WORKDIR}/git"

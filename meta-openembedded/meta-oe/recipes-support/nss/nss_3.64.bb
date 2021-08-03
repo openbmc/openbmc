@@ -282,3 +282,6 @@ FILES_${PN}-dev = "\
 RDEPENDS_${PN}-smime = "perl"
 
 BBCLASSEXTEND = "native nativesdk"
+
+# CVE-2006-5201 affects only Sun Solaris
+CVE_CHECK_WHITELIST += "CVE-2006-5201"

@@ -1,8 +1,8 @@
 require mariadb.inc
 
-EXTRA_OECMAKE += "-DSTACK_DIRECTION=-1"
+inherit qemu
 
-DEPENDS += "mariadb-native bison-native libpcre2 curl openssl ncurses zlib libaio libedit libevent libxml2"
+DEPENDS += "qemu-native bison-native boost libpcre2 curl openssl ncurses zlib libaio libedit libevent libxml2"
 
 PROVIDES += "mysql5 libmysqlclient"
 

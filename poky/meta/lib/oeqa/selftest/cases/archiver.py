@@ -35,11 +35,11 @@ class Archiver(OESelftestTestCase):
         src_path = os.path.join(bb_vars['DEPLOY_DIR_SRC'], bb_vars['TARGET_SYS'])
 
         # Check that include_recipe was included
-        included_present = len(glob.glob(src_path + '/%s-*' % include_recipe))
+        included_present = len(glob.glob(src_path + '/%s-*/*' % include_recipe))
         self.assertTrue(included_present, 'Recipe %s was not included.' % include_recipe)
 
         # Check that exclude_recipe was excluded
-        excluded_present = len(glob.glob(src_path + '/%s-*' % exclude_recipe))
+        excluded_present = len(glob.glob(src_path + '/%s-*/*' % exclude_recipe))
         self.assertFalse(excluded_present, 'Recipe %s was not excluded.' % exclude_recipe)
 
     def test_archiver_filters_by_type(self):
@@ -67,11 +67,11 @@ class Archiver(OESelftestTestCase):
         src_path_native = os.path.join(bb_vars['DEPLOY_DIR_SRC'], bb_vars['BUILD_SYS'])
 
         # Check that target_recipe was included
-        included_present = len(glob.glob(src_path_target + '/%s-*' % target_recipe))
+        included_present = len(glob.glob(src_path_target + '/%s-*/*' % target_recipe))
         self.assertTrue(included_present, 'Recipe %s was not included.' % target_recipe)
 
         # Check that native_recipe was excluded
-        excluded_present = len(glob.glob(src_path_native + '/%s-*' % native_recipe))
+        excluded_present = len(glob.glob(src_path_native + '/%s-*/*' % native_recipe))
         self.assertFalse(excluded_present, 'Recipe %s was not excluded.' % native_recipe)
 
     def test_archiver_filters_by_type_and_name(self):
@@ -104,17 +104,17 @@ class Archiver(OESelftestTestCase):
         src_path_native = os.path.join(bb_vars['DEPLOY_DIR_SRC'], bb_vars['BUILD_SYS'])
 
         # Check that target_recipe[0] and native_recipes[1] were included
-        included_present = len(glob.glob(src_path_target + '/%s-*' % target_recipes[0]))
+        included_present = len(glob.glob(src_path_target + '/%s-*/*' % target_recipes[0]))
         self.assertTrue(included_present, 'Recipe %s was not included.' % target_recipes[0])
 
-        included_present = len(glob.glob(src_path_native + '/%s-*' % native_recipes[1]))
+        included_present = len(glob.glob(src_path_native + '/%s-*/*' % native_recipes[1]))
         self.assertTrue(included_present, 'Recipe %s was not included.' % native_recipes[1])
 
         # Check that native_recipes[0] and target_recipes[1] were excluded
-        excluded_present = len(glob.glob(src_path_native + '/%s-*' % native_recipes[0]))
+        excluded_present = len(glob.glob(src_path_native + '/%s-*/*' % native_recipes[0]))
         self.assertFalse(excluded_present, 'Recipe %s was not excluded.' % native_recipes[0])
 
-        excluded_present = len(glob.glob(src_path_target + '/%s-*' % target_recipes[1]))
+        excluded_present = len(glob.glob(src_path_target + '/%s-*/*' % target_recipes[1]))
         self.assertFalse(excluded_present, 'Recipe %s was not excluded.' % target_recipes[1])
 
 

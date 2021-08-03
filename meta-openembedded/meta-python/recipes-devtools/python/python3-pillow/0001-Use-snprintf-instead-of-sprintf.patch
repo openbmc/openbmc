@@ -1,0 +1,43 @@
+From 518ee3722a99d7f7d890db82a20bd81c1c0327fb Mon Sep 17 00:00:00 2001
+From: Andrew Murray <radarhere@users.noreply.github.com>
+Date: Wed, 30 Jun 2021 23:47:10 +1000
+Subject: [PATCH 1/1] Use snprintf instead of sprintf
+
+Fix CVE-2021-34552.
+
+commit 518ee3722a99d7f7d890db82a20bd81c1c0327fb (unmodified)
+
+Upstream-Status: Backport
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+
+---
+ src/libImaging/Convert.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/libImaging/Convert.c b/src/libImaging/Convert.c
+index 1fa74a13b..9012cfcd7 100644
+--- a/src/libImaging/Convert.c
++++ b/src/libImaging/Convert.c
+@@ -1595,7 +1595,7 @@ convert(
+         return (Imaging)ImagingError_ValueError("conversion not supported");
+ #else
+         static char buf[100];
+-        sprintf(buf, "conversion from %.10s to %.10s not supported", imIn->mode, mode);
++        snprintf(buf, 100, "conversion from %.10s to %.10s not supported", imIn->mode, mode);
+         return (Imaging)ImagingError_ValueError(buf);
+ #endif
+     }
+@@ -1645,8 +1645,9 @@ ImagingConvertTransparent(Imaging imIn, const char *mode, int r, int g, int b) {
+ #else
+     {
+         static char buf[100];
+-        sprintf(
++        snprintf(
+             buf,
++            100,
+             "conversion from %.10s to %.10s not supported in convert_transparent",
+             imIn->mode,
+             mode);
+-- 
+2.29.2
+

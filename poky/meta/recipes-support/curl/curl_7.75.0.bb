@@ -15,6 +15,8 @@ SRC_URI = "https://curl.haxx.se/download/curl-${PV}.tar.bz2 \
            file://0002-transfer-strip-credentials-from-the-auto-referer-hea.patch \
            file://vtls-fix-addsessionid.patch \
            file://vtls-fix-warning.patch \
+           file://CVE-2021-22898.patch \
+           file://CVE-2021-22897.patch \
 "
 
 SRC_URI[sha256sum] = "50552d4501c178e4cc68baaecc487f466a3d6d19bbf4e50a01869effb316d026"
