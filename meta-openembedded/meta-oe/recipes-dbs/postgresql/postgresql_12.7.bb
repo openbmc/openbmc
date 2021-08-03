@@ -1,6 +1,6 @@
 require postgresql.inc
 
-LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=fc4ce21960f0c561460d750bc270d11f"
+LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=255f15687738db8068fbe9b938c90217"
 
 SRC_URI += "\
    file://not-check-libperl.patch \
@@ -8,4 +8,4 @@ SRC_URI += "\
    file://0001-Improve-reproducibility.patch \
 "
 
-SRC_URI[sha256sum] = "bd0d25341d9578b5473c9506300022de26370879581f5fddd243a886ce79ff95"
+SRC_URI[sha256sum] = "8490741f47c88edc8b6624af009ce19fda4dc9b31c4469ce2551d84075d5d995"

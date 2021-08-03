@@ -19,8 +19,8 @@ SRC_URI = "https://downloads.mariadb.org/interstitial/${BP}/source/${BP}.tar.gz 
            file://clang_version_header_conflict.patch \
            file://fix-arm-atomic.patch \
           "
-SRC_URI[md5sum] = "e8193b9cd008b6d7f177f5a5c44c7a9f"
-SRC_URI[sha256sum] = "a7b104e264311cd46524ae546ff0c5107978373e4a01cf7fd8a241454548d16e"
+SRC_URI[md5sum] = "c3bc7a3eca3b0bbae5748f7b22a55c0c"
+SRC_URI[sha256sum] = "87d5e29ee1f18de153266ec658138607703ed2a05b3ffb1f89091d33f4abf545"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/releases"
 

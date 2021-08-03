@@ -1,0 +1,36 @@
+add __divmoddi4 builtin
+
+GCC 11 will generate it in code
+
+void foo(unsigned char *u8Second, unsigned int *u32Nanosecond, long long timeSpec)
+{
+    long long i64Div;
+    int i32Div;
+    int i32Rem;
+    i64Div = timeSpec;
+    i32Rem = (int)(i64Div % 1000000000);
+    i64Div /= 1000000000;
+    *u32Nanosecond = i32Rem;
+    i32Rem = (int)(i64Div % 60);
+    *u8Second = i32Rem;
+}
+
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/src/VBox/Runtime/common/math/gcc/divdi3.c
++++ b/src/VBox/Runtime/common/math/gcc/divdi3.c
+@@ -68,3 +68,12 @@ __divdi3(a, b)
+ 		uq = - uq;
+ 	return uq;
+ }
++
++quad_t
++__divmoddi4(quad_t a, quad_t b, quad_t* rem)
++{
++	quad_t d = __divdi3(a,b);
++	*rem = a - (d*b);
++	return d;
++}
++

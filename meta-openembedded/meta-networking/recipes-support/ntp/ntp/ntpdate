@@ -52,3 +52,8 @@ if [ -x /usr/bin/lockfile-create ] ; then
 fi
 
 ) &
+
+# wait for all subprocesses to finish
+# this is required when using systemd service as ntpd will start before ntpdate finishes
+# and results in a bind error (port 123)
+wait

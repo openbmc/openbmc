@@ -1,0 +1,36 @@
+ * check-requirements now gives iptables output on failure. Patch thanks to
+    S. Nizio.
+
+Written by Jamie Strandboge <jamie@canonical.com>
+
+The patch was imported from git://git.launchpad.net/ufw
+commit id 9a6d8beb4cb1d1646c7d2a19e4aea9898f4571bb
+
+Removed ChangeLog patch due to backport status of this patch.
+
+Upstream-Status: Backport
+Signed-off-by: Jate Sujjavanich <jatedev@gmail.com>
+
+--- check-requirements.orig 2012-12-03 16:37:20.214274095 +0100
++++ ufw-0.33/tests/check-requirements   2012-12-03 16:40:16.298728133 +0100
+@@ -29,14 +29,19 @@
+         runtime="yes"
+         shift 1
+     fi
+-    if $@ >/dev/null 2>&1 ; then
++    local output ret=0
++    # make sure to always return success below because of set -e
++    output=$( "$@" 2>&1 ) || ret=$?
++    if [ $ret -eq 0 ]; then
+         echo pass
+     else
+         if [ "$runtime" = "yes" ]; then
+             echo "FAIL (no runtime support)"
++            echo "error was: $output"
+             error_runtime="yes"
+         else
+             echo FAIL
++            echo "error was: $output"
+             error="yes"
+         fi
+     fi

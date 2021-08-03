@@ -1,0 +1,106 @@
+empty our IPT_MODULES and update documentation
+
+empty out IPT_MODULES and update documentation regarding modern use of
+connection tracking modules.
+
+Patch from git://git.launchpad.net/ufw
+Commit aefb842b73726c245157096fb8992c3e82833147
+
+Written by Jamie Strandboge <jamie@ubuntu.com>
+
+Merged patch so they applied to 0.33 with missing code. Unit tests are not
+in this version.
+
+Upstream-Status: Backport
+Signed-off-by: Jate Sujjavanich <jatedev@gmail.com>
+
+
+diff --git a/conf/ufw.defaults b/conf/ufw.defaults
+index 330ad88..b3eba8f 100644
+--- a/conf/ufw.defaults
++++ b/conf/ufw.defaults
+@@ -34,12 +34,13 @@ MANAGE_BUILTINS=no
+ # only enable if using iptables backend
+ IPT_SYSCTL=#CONFIG_PREFIX#/ufw/sysctl.conf
+ 
+-# Extra connection tracking modules to load. Complete list can be found in
+-# net/netfilter/Kconfig of your kernel source. Some common modules:
++# Extra connection tracking modules to load. IPT_MODULES should typically be
++# empty for new installations and modules added only as needed. See
++# 'CONNECTION HELPERS' from 'man ufw-framework' for details. Complete list can
++# be found in net/netfilter/Kconfig of your kernel source. Some common modules:
+ # nf_conntrack_irc, nf_nat_irc: DCC (Direct Client to Client) support
+ # nf_conntrack_netbios_ns: NetBIOS (samba) client support
+ # nf_conntrack_pptp, nf_nat_pptp: PPTP over stateful firewall/NAT
+ # nf_conntrack_ftp, nf_nat_ftp: active FTP support
+ # nf_conntrack_tftp, nf_nat_tftp: TFTP support (server side)
+-IPT_MODULES="nf_conntrack_ftp nf_nat_ftp nf_conntrack_netbios_ns"
+-
++IPT_MODULES=""
+
+diff --git a/doc/ufw-framework.8 b/doc/ufw-framework.8
+index eef28e1..97dc8c5 100644
+--- a/doc/ufw-framework.8
++++ b/doc/ufw-framework.8
+@@ -115,5 +115,10 @@ IPT_MODULES in #CONFIG_PREFIX#/default/ufw. Some popular modules to load are:
+   nf_conntrack_tftp
+   nf_nat_tftp
++.PP
++Unconditional loading of connection tracking modules (nf_conntrack_*) in this
++manner is deprecated. \fBufw\fR continues to support the functionality but new
++configuration should only contain the specific modules required for the site.
++For more information, see CONNECTION HELPERS.
+ 
+ .SH "KERNEL PARAMETERS"
+ .PP
+@@ 240,5 +245,50 @@ Add the necessary \fBufw\fR rules:
+ # ufw allow in on eth1 from 10.0.0.100 to any port 22 proto tcp
+ 
++.SH "CONNECTION HELPERS"
++.PP
++Various protocols require the use of netfilter connection tracking helpers to
++group related packets into RELATED flows to make rulesets clearer and more
++precise. For example, with a couple of kernel modules and a couple of rules, a
++ruleset could simply allow a connection to FTP port 21, then the kernel would
++examine the traffic and mark the other FTP data packets as RELATED to the
++initial connection.
++.PP
++When the helpers were first introduced, one could only configure the modules as
++part of module load (eg, if your FTP server listened on a different port than
++21, you'd have to load the nf_conntrack_ftp module specifying the correct
++port). Over time it was understood that unconditionally using connection
++helpers could lead to abuse, in part because some protocols allow user
++specified data that would allow traversing the firewall in undesired ways. As
++of kernel 4.7, automatic conntrack helper assignment (ie, handling packets for
++a given port and all IP addresses) is disabled (the old behavior can be
++restored by setting net/netfilter/nf_conntrack_helper=1 in
++#CONFIG_PREFIX#/ufw/sysctl.conf). Firewalls should now instead use the CT
++target to associate traffic with a particular helper and then set RELATED rules
++to use the helper. This allows sites to tailor the use of helpers and help
++avoid abuse.
++.PP
++In general, to use helpers securely, the following needs to happen:
++.IP 1.
++net/netfilter/nf_conntrack_helper should be set to 0 (default)
++.IP 2.
++create a rule for the start of a connection (eg for FTP, port 21)
++.IP 3.
++create a helper rule to associate the helper with this connection
++.IP 4.
++create a helper rule to associate a RELATED flow with this connection
++.IP 5.
++if needed, add the corresponding nf_conntrack_* module to IPT_MODULES
++.IP 6.
++optionally add the corresponding nf_nat_* module to IPT_MODULES
++.PP
++In general it is desirable to make connection helper rules as specific as
++possible and ensure anti\-spoofing is correctly setup for your site to avoid
++security issues in your ruleset. For more information, see ANTI\-SPOOFING,
++above, and <https://home.regit.org/netfilter-en/secure-use-of-helpers/>.
++.PP
++Currently helper rules must be managed in via the RULES FILES. A future version
++of \fBufw\fR will introduce syntax for working with helper rules.
++
+ .SH SEE ALSO
+ .PP
+ \fBufw\fR(8), \fBiptables\fR(8), \fBip6tables\fR(8), \fBiptables\-restore\fR(8), \fBip6tables\-restore\fR(8), \fBsysctl\fR(8), \fBsysctl.conf\fR(5)

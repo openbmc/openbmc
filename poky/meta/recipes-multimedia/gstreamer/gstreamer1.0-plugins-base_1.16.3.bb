@@ -15,9 +15,14 @@ SRC_URI = " \
             file://0003-ssaparse-enhance-SSA-text-lines-parsing.patch \
             file://0005-viv-fb-Make-sure-config.h-is-included.patch \
             file://0009-glimagesink-Downrank-to-marginal.patch \
+            file://CVE-2021-3522.patch \
             "
 SRC_URI[md5sum] = "e3ddb1bae9fb510b49a295f212f1e6e4"
 SRC_URI[sha256sum] = "9f02678b0bbbcc9eff107d3bd89d83ce92fec2154cd607c7c8bd34dc7fee491c"
+
+# CPE entries for gst-plugins-base are listed as gstreamer issues
+# so we need to ignore the false hit
+CVE_CHECK_WHITELIST += "CVE-2021-3522"
 
 S = "${WORKDIR}/gst-plugins-base-${PV}"
 

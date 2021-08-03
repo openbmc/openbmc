@@ -1,0 +1,33 @@
+tests/check-requirements: simplify and support python 3.8
+
+Written by: Jamie Strandboge <jamie@ubuntu.com>
+
+The patch was imported from git://git.launchpad.net/ufw
+commit id e30f8bc2aeb317d152e74a270a8e1336de06cee6
+
+Upstream-Status: Backport
+
+Signed-off-by: Jate Sujjavanich <jatedev@gmail.com>
+
+diff --git a/tests/check-requirements b/tests/check-requirements
+index e873703..82fab08 100755
+--- a/tests/check-requirements
++++ b/tests/check-requirements
+@@ -45,7 +45,7 @@ runcmd() {
+ # check python
+ found_python="no"
+ echo -n "Has python: "
+-for exe in python2.7 python2.6 python2.5 python3.2 python; do
++for exe in python3 python2 python; do
+     if ! which $exe >/dev/null 2>&1; then
+         continue
+     fi
+@@ -54,7 +54,7 @@ for exe in python2.7 python2.6 python2.5 python3.2 python; do
+         echo "pass (binary: $exe, version: $v, py2)"
+         found_python="yes"
+         break
+-    elif echo "$v" | grep -q "^3.[2]"; then
++    elif echo "$v" | grep -q "^3.[2-8]"; then
+         echo "pass (binary: $exe, version: $v, py3)"
+         found_python="yes"
+         break

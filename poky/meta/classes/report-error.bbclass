@@ -6,8 +6,6 @@
 #
 # Licensed under the MIT license, see COPYING.MIT for details
 
-inherit base
-
 ERR_REPORT_DIR ?= "${LOG_DIR}/error-report"
 
 def errorreport_getdata(e):

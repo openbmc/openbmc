@@ -97,8 +97,7 @@ SRC_URI = "git://github.com/xrmx/bootchart.git \
           "
 
 S = "${WORKDIR}/git"
-SRCREV = "331ada031f1d65f6d934d918f896e1c708c64bf7"
-PV .= "+git${SRCPV}"
+SRCREV = "868a2afab9da34f32c007d773b77253c93104636"
 
 inherit systemd update-rc.d python3native update-alternatives
 

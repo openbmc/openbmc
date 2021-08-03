@@ -1,0 +1,2895 @@
+adjust runtime tests to use daytime/port 13 instead of ssh/port 22 everywhere
+
+and adjust to use daytime/port 13 instead of http/port 80 and https/port 443 in
+good/logging and ipv6/bad_args6 (Closes: 849628)
+
+Patch from git://git.launchpad.net/ufw
+Commit f1ecc2475f8612f1ea87bd43a088d39009145dd8
+
+Written by Jamie Strandboge <jamie@ubuntu.com>
+
+Removed code not present (tests/live_route).
+Omitted result output that did not seem to change.
+
+Upstream-Status: Backport
+Signed-off-by: Jate Sujjavanich <jatedev@gmail.com>
+
+diff --git a/tests/root/bugs/result b/tests/root/bugs/result
+index 34bee1a..d1fab59 100644
+--- a/tests/root/bugs/result
++++ b/tests/root/bugs/result
+@@ -94,7 +94,7 @@ Could not delete non-existent rule
+ 
+ 
+ iptables -L -n:
+-ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0           tcp dpt:80 /* 'dapp_Apache' */ 
++ACCEPT     tcp  --  0.0.0.0/0            0.0.0.0/0            tcp dpt:80 /* 'dapp_Apache' */ 
+ 
+ Chain ufw-user-limit (0 references)
+ 10: delete allow Apache
+@@ -254,7 +254,7 @@ WARN: Checks disabled
+ Status: active
+ 
+ 
+-37: delete allow 22
++37: delete allow 13
+ WARN: Checks disabled
+ Could not delete non-existent rule
+ Could not delete non-existent rule (v6)
+@@ -266,7 +266,7 @@ Could not delete non-existent rule
+ Could not delete non-existent rule (v6)
+ 
+ 
+-39: delete allow to 127.0.0.1 port 22
++39: delete allow to 127.0.0.1 port 13
+ WARN: Checks disabled
+ Could not delete non-existent rule
+ 
+@@ -276,7 +276,7 @@ WARN: Checks disabled
+ Could not delete non-existent rule
+ 
+ 
+-41: delete allow to ::1 port 22
++41: delete allow to ::1 port 13
+ WARN: Checks disabled
+ Could not delete non-existent rule (v6)
+ 
+diff --git a/tests/root/bugs/runtest.sh b/tests/root/bugs/runtest.sh
+index 0c4db9b..4bd68d7 100755
+--- a/tests/root/bugs/runtest.sh
++++ b/tests/root/bugs/runtest.sh
+@@ -93,11 +93,11 @@ sed -i "s/IPV6=.*/IPV6=yes/" $TESTPATH/etc/default/ufw
+ do_cmd "0" nostats disable
+ do_cmd "0" nostats enable
+ do_cmd "0"  status
+-do_cmd "0"  delete allow 22
++do_cmd "0"  delete allow 13
+ do_cmd "0"  delete allow Apache
+-do_cmd "0"  delete allow to 127.0.0.1 port 22
++do_cmd "0"  delete allow to 127.0.0.1 port 13
+ do_cmd "0"  delete allow to 127.0.0.1 app Apache
+-do_cmd "0"  delete allow to ::1 port 22
++do_cmd "0"  delete allow to ::1 port 13
+ do_cmd "0"  delete allow to ::1 app Apache
+ do_cmd "0"  status
+ 
+diff --git a/tests/root/live/result b/tests/root/live/result
+index 7b183c5..e862327 100644
+--- a/tests/root/live/result
++++ b/tests/root/live/result
+@@ -71,7 +71,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-14: limit 22/tcp
++14: limit 13/tcp
+ WARN: Checks disabled
+ Rule added
+ Skipping unsupported IPv6 'limit' rule
+@@ -103,7 +103,7 @@ Anywhere                   ALLOW       172.16.0.0/12
+ Anywhere                   ALLOW       192.168.0.0/16
+ 514/udp                    DENY        1.2.3.4
+ 1.2.3.4 5469/udp           ALLOW       1.2.3.5 5469/udp
+-22/tcp                     LIMIT       Anywhere
++13/tcp                     LIMIT       Anywhere
+ 53                         ALLOW       Anywhere (v6)
+ 23/tcp                     ALLOW       Anywhere (v6)
+ 25/tcp                     ALLOW       Anywhere (v6)
+@@ -144,9 +144,9 @@ Anywhere                   ALLOW       192.168.0.0/16
+ ### tuple ### allow udp 5469 1.2.3.4 5469 1.2.3.5 in
+ -A ufw-user-input -p udp -d 1.2.3.4 --dport 5469 -s 1.2.3.5 --sport 5469 -j ACCEPT
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ ### tuple ### allow any 53 ::/0 any ::/0 in
+ -A ufw6-user-input -p tcp --dport 53 -j ACCEPT
+ -A ufw6-user-input -p udp --dport 53 -j ACCEPT
+@@ -221,7 +221,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-28: delete limit 22/tcp
++28: delete limit 13/tcp
+ WARN: Checks disabled
+ Rule deleted
+ Skipping unsupported IPv6 'limit' rule
+@@ -311,7 +311,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-46: limit 22/tcp
++46: limit 13/tcp
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -332,7 +332,7 @@ Anywhere                   ALLOW       172.16.0.0/12
+ Anywhere                   ALLOW       192.168.0.0/16
+ 514/udp                    DENY        1.2.3.4
+ 1.2.3.4 5469/udp           ALLOW       1.2.3.5 5469/udp
+-22/tcp                     LIMIT       Anywhere
++13/tcp                     LIMIT       Anywhere
+ 
+ 
+ 
+@@ -367,9 +367,9 @@ Anywhere                   ALLOW       192.168.0.0/16
+ ### tuple ### allow udp 5469 1.2.3.4 5469 1.2.3.5 in
+ -A ufw-user-input -p udp -d 1.2.3.4 --dport 5469 -s 1.2.3.5 --sport 5469 -j ACCEPT
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ TESTING ARGS (delete allow/deny to/from)
+ 48: delete allow 53
+ WARN: Checks disabled
+@@ -421,7 +421,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-58: delete limit 22/tcp
++58: delete limit 13/tcp
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -667,7 +667,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-99: limit 22/tcp
++99: limit 13/tcp
+ WARN: Checks disabled
+ Rule added
+ Skipping unsupported IPv6 'limit' rule
+@@ -699,7 +699,7 @@ Status: active
+ [ 8] Anywhere                   ALLOW IN    192.168.0.0/16
+ [ 9] 514/udp                    DENY IN     1.2.3.4
+ [10] 1.2.3.4 5469/udp           ALLOW IN    1.2.3.5 5469/udp
+-[11] 22/tcp                     LIMIT IN    Anywhere
++[11] 13/tcp                     LIMIT IN    Anywhere
+ [12] 53                         ALLOW IN    Anywhere (v6)
+ [13] 23/tcp                     ALLOW IN    Anywhere (v6)
+ [14] 25/tcp                     ALLOW IN    Anywhere (v6)
+@@ -763,7 +763,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-113: delete limit 22/tcp
++113: delete limit 13/tcp
+ WARN: Checks disabled
+ Rule deleted
+ Skipping unsupported IPv6 'limit' rule
+@@ -841,7 +841,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-129: limit 22/tcp
++129: limit 13/tcp
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -862,7 +862,7 @@ Status: active
+ [ 8] Anywhere                   ALLOW IN    192.168.0.0/16
+ [ 9] 514/udp                    DENY IN     1.2.3.4
+ [10] 1.2.3.4 5469/udp           ALLOW IN    1.2.3.5 5469/udp
+-[11] 22/tcp                     LIMIT IN    Anywhere
++[11] 13/tcp                     LIMIT IN    Anywhere
+ 
+ 
+ 
+@@ -916,7 +916,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-141: delete limit 22/tcp
++141: delete limit 13/tcp
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -943,7 +943,7 @@ Rule added (v6)
+ 146: deny in on eth1:1
+ 
+ 
+-147: reject in on eth1 to 192.168.0.1 port 22
++147: reject in on eth1 to 192.168.0.1 port 13
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -958,7 +958,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-150: deny in on eth1 to 192.168.0.1 port 22 from 10.0.0.1
++150: deny in on eth1 to 192.168.0.1 port 13 from 10.0.0.1
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -968,7 +968,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-152: limit in on eth1 to 192.168.0.1 port 22 from 10.0.0.1 port 80
++152: limit in on eth1 to 192.168.0.1 port 13 from 10.0.0.1 port 80
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1002,12 +1002,12 @@ Status: active
+      To                         Action      From
+      --                         ------      ----
+ [ 1] Anywhere on eth1           ALLOW IN    Anywhere
+-[ 2] 192.168.0.1 22 on eth1     REJECT IN   Anywhere
++[ 2] 192.168.0.1 13 on eth1     REJECT IN   Anywhere
+ [ 3] Anywhere on eth1           LIMIT IN    10.0.0.1 80
+ [ 4] 192.168.0.1 on eth1        ALLOW IN    10.0.0.1
+-[ 5] 192.168.0.1 22 on eth1     DENY IN     10.0.0.1
++[ 5] 192.168.0.1 13 on eth1     DENY IN     10.0.0.1
+ [ 6] 192.168.0.1 on eth1        REJECT IN   10.0.0.1 80
+-[ 7] 192.168.0.1 22 on eth1     LIMIT IN    10.0.0.1 80
++[ 7] 192.168.0.1 13 on eth1     LIMIT IN    10.0.0.1 80
+ [ 8] Anywhere on eth0           ALLOW IN    Anywhere (log)
+ [ 9] 10.0.0.1 24/tcp on eth0    ALLOW IN    192.168.0.1 (log)
+ [10] 10.0.0.1 25/tcp on eth0    DENY IN     192.168.0.1 (log-all)
+@@ -1031,12 +1031,12 @@ Status: active
+      To                         Action      From
+      --                         ------      ----
+ [ 1] Anywhere on eth1           ALLOW IN    Anywhere
+-[ 2] 192.168.0.1 22 on eth1     REJECT IN   Anywhere
++[ 2] 192.168.0.1 13 on eth1     REJECT IN   Anywhere
+ [ 3] Anywhere on eth1           LIMIT IN    10.0.0.1 80
+ [ 4] 192.168.0.1 on eth1        ALLOW IN    10.0.0.1
+-[ 5] 192.168.0.1 22 on eth1     DENY IN     10.0.0.1
++[ 5] 192.168.0.1 13 on eth1     DENY IN     10.0.0.1
+ [ 6] 192.168.0.1 on eth1        REJECT IN   10.0.0.1 80
+-[ 7] 192.168.0.1 22 on eth1     LIMIT IN    10.0.0.1 80
++[ 7] 192.168.0.1 13 on eth1     LIMIT IN    10.0.0.1 80
+ [ 8] Samba on eth2              ALLOW IN    Anywhere
+ [ 9] Anywhere on eth0           ALLOW IN    Anywhere (log)
+ [10] 10.0.0.1 24/tcp on eth0    ALLOW IN    192.168.0.1 (log)
+@@ -1052,9 +1052,9 @@ Status: active
+ ### tuple ### allow any any 0.0.0.0/0 any 0.0.0.0/0 in_eth1
+ -A ufw-user-input -i eth1 -j ACCEPT
+ 
+-### tuple ### reject any 22 192.168.0.1 any 0.0.0.0/0 in_eth1
+--A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 22 -j REJECT --reject-with tcp-reset
+--A ufw-user-input -i eth1 -p udp -d 192.168.0.1 --dport 22 -j REJECT
++### tuple ### reject any 13 192.168.0.1 any 0.0.0.0/0 in_eth1
++-A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 13 -j REJECT --reject-with tcp-reset
++-A ufw-user-input -i eth1 -p udp -d 192.168.0.1 --dport 13 -j REJECT
+ --
+ ### tuple ### limit any any 0.0.0.0/0 80 10.0.0.1 in_eth1
+ -A ufw-user-input -i eth1 -p tcp -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
+@@ -1063,17 +1063,17 @@ Status: active
+ ### tuple ### allow any any 192.168.0.1 any 10.0.0.1 in_eth1
+ -A ufw-user-input -i eth1 -d 192.168.0.1 -s 10.0.0.1 -j ACCEPT
+ 
+-### tuple ### deny any 22 192.168.0.1 any 10.0.0.1 in_eth1
+--A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 -j DROP
+--A ufw-user-input -i eth1 -p udp -d 192.168.0.1 --dport 22 -s 10.0.0.1 -j DROP
++### tuple ### deny any 13 192.168.0.1 any 10.0.0.1 in_eth1
++-A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 -j DROP
++-A ufw-user-input -i eth1 -p udp -d 192.168.0.1 --dport 13 -s 10.0.0.1 -j DROP
+ --
+ ### tuple ### reject any any 192.168.0.1 80 10.0.0.1 in_eth1
+ -A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 -s 10.0.0.1 --sport 80 -j REJECT --reject-with tcp-reset
+ -A ufw-user-input -i eth1 -p udp -d 192.168.0.1 -s 10.0.0.1 --sport 80 -j REJECT
+ --
+-### tuple ### limit any 22 192.168.0.1 80 10.0.0.1 in_eth1
+--A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit any 13 192.168.0.1 80 10.0.0.1 in_eth1
++-A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ --
+ ### tuple ### allow udp 137,138 0.0.0.0/0 any 0.0.0.0/0 Samba - in_eth2
+ -A ufw-user-input -i eth2 -p udp -m multiport --dports 137,138 -j ACCEPT -m comment --comment 'dapp_Samba'
+@@ -1124,7 +1124,7 @@ Rule deleted
+ Rule deleted (v6)
+ 
+ 
+-161: delete reject in on eth1 to 192.168.0.1 port 22
++161: delete reject in on eth1 to 192.168.0.1 port 13
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1139,7 +1139,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-164: delete deny in on eth1 to 192.168.0.1 port 22 from 10.0.0.1
++164: delete deny in on eth1 to 192.168.0.1 port 13 from 10.0.0.1
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1149,7 +1149,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-166: delete limit in on eth1 to 192.168.0.1 port 22 from 10.0.0.1 port 80
++166: delete limit in on eth1 to 192.168.0.1 port 13 from 10.0.0.1 port 80
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1198,7 +1198,7 @@ Rule added (v6)
+ 175: deny out on eth1:1
+ 
+ 
+-176: reject out on eth1 to 192.168.0.1 port 22
++176: reject out on eth1 to 192.168.0.1 port 13
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1213,7 +1213,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-179: deny out on eth1 to 192.168.0.1 port 22 from 10.0.0.1
++179: deny out on eth1 to 192.168.0.1 port 13 from 10.0.0.1
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1223,7 +1223,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-181: limit out on eth1 to 192.168.0.1 port 22 from 10.0.0.1 port 80
++181: limit out on eth1 to 192.168.0.1 port 13 from 10.0.0.1 port 80
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1257,12 +1257,12 @@ Status: active
+      To                         Action      From
+      --                         ------      ----
+ [ 1] Anywhere                   ALLOW OUT   Anywhere on eth1 (out)
+-[ 2] 192.168.0.1 22             REJECT OUT  Anywhere on eth1 (out)
++[ 2] 192.168.0.1 13             REJECT OUT  Anywhere on eth1 (out)
+ [ 3] Anywhere                   LIMIT OUT   10.0.0.1 80 on eth1 (out)
+ [ 4] 192.168.0.1                ALLOW OUT   10.0.0.1 on eth1 (out)
+-[ 5] 192.168.0.1 22             DENY OUT    10.0.0.1 on eth1 (out)
++[ 5] 192.168.0.1 13             DENY OUT    10.0.0.1 on eth1 (out)
+ [ 6] 192.168.0.1                REJECT OUT  10.0.0.1 80 on eth1 (out)
+-[ 7] 192.168.0.1 22             LIMIT OUT   10.0.0.1 80 on eth1 (out)
++[ 7] 192.168.0.1 13             LIMIT OUT   10.0.0.1 80 on eth1 (out)
+ [ 8] Anywhere                   ALLOW OUT   Anywhere on eth0 (log, out)
+ [ 9] 10.0.0.1 24/tcp            ALLOW OUT   192.168.0.1 on eth0 (log, out)
+ [10] 10.0.0.1 25/tcp            DENY OUT    192.168.0.1 on eth0 (log-all, out)
+@@ -1286,12 +1286,12 @@ Status: active
+      To                         Action      From
+      --                         ------      ----
+ [ 1] Anywhere                   ALLOW OUT   Anywhere on eth1 (out)
+-[ 2] 192.168.0.1 22             REJECT OUT  Anywhere on eth1 (out)
++[ 2] 192.168.0.1 13             REJECT OUT  Anywhere on eth1 (out)
+ [ 3] Anywhere                   LIMIT OUT   10.0.0.1 80 on eth1 (out)
+ [ 4] 192.168.0.1                ALLOW OUT   10.0.0.1 on eth1 (out)
+-[ 5] 192.168.0.1 22             DENY OUT    10.0.0.1 on eth1 (out)
++[ 5] 192.168.0.1 13             DENY OUT    10.0.0.1 on eth1 (out)
+ [ 6] 192.168.0.1                REJECT OUT  10.0.0.1 80 on eth1 (out)
+-[ 7] 192.168.0.1 22             LIMIT OUT   10.0.0.1 80 on eth1 (out)
++[ 7] 192.168.0.1 13             LIMIT OUT   10.0.0.1 80 on eth1 (out)
+ [ 8] Samba                      ALLOW OUT   Anywhere on eth2 (out)
+ [ 9] Anywhere                   ALLOW OUT   Anywhere on eth0 (log, out)
+ [10] 10.0.0.1 24/tcp            ALLOW OUT   192.168.0.1 on eth0 (log, out)
+@@ -1307,9 +1307,9 @@ Status: active
+ ### tuple ### allow any any 0.0.0.0/0 any 0.0.0.0/0 out_eth1
+ -A ufw-user-output -o eth1 -j ACCEPT
+ 
+-### tuple ### reject any 22 192.168.0.1 any 0.0.0.0/0 out_eth1
+--A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 22 -j REJECT --reject-with tcp-reset
+--A ufw-user-output -o eth1 -p udp -d 192.168.0.1 --dport 22 -j REJECT
++### tuple ### reject any 13 192.168.0.1 any 0.0.0.0/0 out_eth1
++-A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 13 -j REJECT --reject-with tcp-reset
++-A ufw-user-output -o eth1 -p udp -d 192.168.0.1 --dport 13 -j REJECT
+ --
+ ### tuple ### limit any any 0.0.0.0/0 80 10.0.0.1 out_eth1
+ -A ufw-user-output -o eth1 -p tcp -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
+@@ -1318,17 +1318,17 @@ Status: active
+ ### tuple ### allow any any 192.168.0.1 any 10.0.0.1 out_eth1
+ -A ufw-user-output -o eth1 -d 192.168.0.1 -s 10.0.0.1 -j ACCEPT
+ 
+-### tuple ### deny any 22 192.168.0.1 any 10.0.0.1 out_eth1
+--A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 -j DROP
+--A ufw-user-output -o eth1 -p udp -d 192.168.0.1 --dport 22 -s 10.0.0.1 -j DROP
++### tuple ### deny any 13 192.168.0.1 any 10.0.0.1 out_eth1
++-A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 -j DROP
++-A ufw-user-output -o eth1 -p udp -d 192.168.0.1 --dport 13 -s 10.0.0.1 -j DROP
+ --
+ ### tuple ### reject any any 192.168.0.1 80 10.0.0.1 out_eth1
+ -A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 -s 10.0.0.1 --sport 80 -j REJECT --reject-with tcp-reset
+ -A ufw-user-output -o eth1 -p udp -d 192.168.0.1 -s 10.0.0.1 --sport 80 -j REJECT
+ --
+-### tuple ### limit any 22 192.168.0.1 80 10.0.0.1 out_eth1
+--A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit any 13 192.168.0.1 80 10.0.0.1 out_eth1
++-A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ --
+ ### tuple ### allow udp 137,138 0.0.0.0/0 any 0.0.0.0/0 Samba - out_eth2
+ -A ufw-user-output -o eth2 -p udp -m multiport --dports 137,138 -j ACCEPT -m comment --comment 'dapp_Samba'
+@@ -1379,7 +1379,7 @@ Rule deleted
+ Rule deleted (v6)
+ 
+ 
+-190: delete reject out on eth1 to 192.168.0.1 port 22
++190: delete reject out on eth1 to 192.168.0.1 port 13
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1394,7 +1394,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-193: delete deny out on eth1 to 192.168.0.1 port 22 from 10.0.0.1
++193: delete deny out on eth1 to 192.168.0.1 port 13 from 10.0.0.1
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1404,7 +1404,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-195: delete limit out on eth1 to 192.168.0.1 port 22 from 10.0.0.1 port 80
++195: delete limit out on eth1 to 192.168.0.1 port 13 from 10.0.0.1 port 80
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1452,7 +1452,7 @@ Rule added
+ 204: deny in on eth1:1
+ 
+ 
+-205: reject in on eth1 to 192.168.0.1 port 22
++205: reject in on eth1 to 192.168.0.1 port 13
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1467,7 +1467,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-208: deny in on eth1 to 192.168.0.1 port 22 from 10.0.0.1
++208: deny in on eth1 to 192.168.0.1 port 13 from 10.0.0.1
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1477,7 +1477,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-210: limit in on eth1 to 192.168.0.1 port 22 from 10.0.0.1 port 80
++210: limit in on eth1 to 192.168.0.1 port 13 from 10.0.0.1 port 80
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1509,12 +1509,12 @@ Status: active
+      To                         Action      From
+      --                         ------      ----
+ [ 1] Anywhere on eth1           ALLOW IN    Anywhere
+-[ 2] 192.168.0.1 22 on eth1     REJECT IN   Anywhere
++[ 2] 192.168.0.1 13 on eth1     REJECT IN   Anywhere
+ [ 3] Anywhere on eth1           LIMIT IN    10.0.0.1 80
+ [ 4] 192.168.0.1 on eth1        ALLOW IN    10.0.0.1
+-[ 5] 192.168.0.1 22 on eth1     DENY IN     10.0.0.1
++[ 5] 192.168.0.1 13 on eth1     DENY IN     10.0.0.1
+ [ 6] 192.168.0.1 on eth1        REJECT IN   10.0.0.1 80
+-[ 7] 192.168.0.1 22 on eth1     LIMIT IN    10.0.0.1 80
++[ 7] 192.168.0.1 13 on eth1     LIMIT IN    10.0.0.1 80
+ [ 8] Anywhere on eth0           ALLOW IN    Anywhere (log)
+ [ 9] 10.0.0.1 24/tcp on eth0    ALLOW IN    192.168.0.1 (log)
+ [10] 10.0.0.1 25/tcp on eth0    DENY IN     192.168.0.1 (log-all)
+@@ -1534,12 +1534,12 @@ Status: active
+      To                         Action      From
+      --                         ------      ----
+ [ 1] Anywhere on eth1           ALLOW IN    Anywhere
+-[ 2] 192.168.0.1 22 on eth1     REJECT IN   Anywhere
++[ 2] 192.168.0.1 13 on eth1     REJECT IN   Anywhere
+ [ 3] Anywhere on eth1           LIMIT IN    10.0.0.1 80
+ [ 4] 192.168.0.1 on eth1        ALLOW IN    10.0.0.1
+-[ 5] 192.168.0.1 22 on eth1     DENY IN     10.0.0.1
++[ 5] 192.168.0.1 13 on eth1     DENY IN     10.0.0.1
+ [ 6] 192.168.0.1 on eth1        REJECT IN   10.0.0.1 80
+-[ 7] 192.168.0.1 22 on eth1     LIMIT IN    10.0.0.1 80
++[ 7] 192.168.0.1 13 on eth1     LIMIT IN    10.0.0.1 80
+ [ 8] Samba on eth2              ALLOW IN    Anywhere
+ [ 9] Anywhere on eth0           ALLOW IN    Anywhere (log)
+ [10] 10.0.0.1 24/tcp on eth0    ALLOW IN    192.168.0.1 (log)
+@@ -1551,9 +1551,9 @@ Status: active
+ ### tuple ### allow any any 0.0.0.0/0 any 0.0.0.0/0 in_eth1
+ -A ufw-user-input -i eth1 -j ACCEPT
+ 
+-### tuple ### reject any 22 192.168.0.1 any 0.0.0.0/0 in_eth1
+--A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 22 -j REJECT --reject-with tcp-reset
+--A ufw-user-input -i eth1 -p udp -d 192.168.0.1 --dport 22 -j REJECT
++### tuple ### reject any 13 192.168.0.1 any 0.0.0.0/0 in_eth1
++-A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 13 -j REJECT --reject-with tcp-reset
++-A ufw-user-input -i eth1 -p udp -d 192.168.0.1 --dport 13 -j REJECT
+ --
+ ### tuple ### limit any any 0.0.0.0/0 80 10.0.0.1 in_eth1
+ -A ufw-user-input -i eth1 -p tcp -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
+@@ -1562,17 +1562,17 @@ Status: active
+ ### tuple ### allow any any 192.168.0.1 any 10.0.0.1 in_eth1
+ -A ufw-user-input -i eth1 -d 192.168.0.1 -s 10.0.0.1 -j ACCEPT
+ 
+-### tuple ### deny any 22 192.168.0.1 any 10.0.0.1 in_eth1
+--A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 -j DROP
+--A ufw-user-input -i eth1 -p udp -d 192.168.0.1 --dport 22 -s 10.0.0.1 -j DROP
++### tuple ### deny any 13 192.168.0.1 any 10.0.0.1 in_eth1
++-A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 -j DROP
++-A ufw-user-input -i eth1 -p udp -d 192.168.0.1 --dport 13 -s 10.0.0.1 -j DROP
+ --
+ ### tuple ### reject any any 192.168.0.1 80 10.0.0.1 in_eth1
+ -A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 -s 10.0.0.1 --sport 80 -j REJECT --reject-with tcp-reset
+ -A ufw-user-input -i eth1 -p udp -d 192.168.0.1 -s 10.0.0.1 --sport 80 -j REJECT
+ --
+-### tuple ### limit any 22 192.168.0.1 80 10.0.0.1 in_eth1
+--A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit any 13 192.168.0.1 80 10.0.0.1 in_eth1
++-A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -i eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ --
+ ### tuple ### allow udp 137,138 0.0.0.0/0 any 0.0.0.0/0 Samba - in_eth2
+ -A ufw-user-input -i eth2 -p udp -m multiport --dports 137,138 -j ACCEPT -m comment --comment 'dapp_Samba'
+@@ -1603,7 +1603,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-219: delete reject in on eth1 to 192.168.0.1 port 22
++219: delete reject in on eth1 to 192.168.0.1 port 13
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1618,7 +1618,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-222: delete deny in on eth1 to 192.168.0.1 port 22 from 10.0.0.1
++222: delete deny in on eth1 to 192.168.0.1 port 13 from 10.0.0.1
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1628,7 +1628,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-224: delete limit in on eth1 to 192.168.0.1 port 22 from 10.0.0.1 port 80
++224: delete limit in on eth1 to 192.168.0.1 port 13 from 10.0.0.1 port 80
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1673,7 +1673,7 @@ Rule added
+ 233: deny out on eth1:1
+ 
+ 
+-234: reject out on eth1 to 192.168.0.1 port 22
++234: reject out on eth1 to 192.168.0.1 port 13
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1688,7 +1688,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-237: deny out on eth1 to 192.168.0.1 port 22 from 10.0.0.1
++237: deny out on eth1 to 192.168.0.1 port 13 from 10.0.0.1
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1698,7 +1698,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-239: limit out on eth1 to 192.168.0.1 port 22 from 10.0.0.1 port 80
++239: limit out on eth1 to 192.168.0.1 port 13 from 10.0.0.1 port 80
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1730,12 +1730,12 @@ Status: active
+      To                         Action      From
+      --                         ------      ----
+ [ 1] Anywhere                   ALLOW OUT   Anywhere on eth1 (out)
+-[ 2] 192.168.0.1 22             REJECT OUT  Anywhere on eth1 (out)
++[ 2] 192.168.0.1 13             REJECT OUT  Anywhere on eth1 (out)
+ [ 3] Anywhere                   LIMIT OUT   10.0.0.1 80 on eth1 (out)
+ [ 4] 192.168.0.1                ALLOW OUT   10.0.0.1 on eth1 (out)
+-[ 5] 192.168.0.1 22             DENY OUT    10.0.0.1 on eth1 (out)
++[ 5] 192.168.0.1 13             DENY OUT    10.0.0.1 on eth1 (out)
+ [ 6] 192.168.0.1                REJECT OUT  10.0.0.1 80 on eth1 (out)
+-[ 7] 192.168.0.1 22             LIMIT OUT   10.0.0.1 80 on eth1 (out)
++[ 7] 192.168.0.1 13             LIMIT OUT   10.0.0.1 80 on eth1 (out)
+ [ 8] Anywhere                   ALLOW OUT   Anywhere on eth0 (log, out)
+ [ 9] 10.0.0.1 24/tcp            ALLOW OUT   192.168.0.1 on eth0 (log, out)
+ [10] 10.0.0.1 25/tcp            DENY OUT    192.168.0.1 on eth0 (log-all, out)
+@@ -1755,12 +1755,12 @@ Status: active
+      To                         Action      From
+      --                         ------      ----
+ [ 1] Anywhere                   ALLOW OUT   Anywhere on eth1 (out)
+-[ 2] 192.168.0.1 22             REJECT OUT  Anywhere on eth1 (out)
++[ 2] 192.168.0.1 13             REJECT OUT  Anywhere on eth1 (out)
+ [ 3] Anywhere                   LIMIT OUT   10.0.0.1 80 on eth1 (out)
+ [ 4] 192.168.0.1                ALLOW OUT   10.0.0.1 on eth1 (out)
+-[ 5] 192.168.0.1 22             DENY OUT    10.0.0.1 on eth1 (out)
++[ 5] 192.168.0.1 13             DENY OUT    10.0.0.1 on eth1 (out)
+ [ 6] 192.168.0.1                REJECT OUT  10.0.0.1 80 on eth1 (out)
+-[ 7] 192.168.0.1 22             LIMIT OUT   10.0.0.1 80 on eth1 (out)
++[ 7] 192.168.0.1 13             LIMIT OUT   10.0.0.1 80 on eth1 (out)
+ [ 8] Samba                      ALLOW OUT   Anywhere on eth2 (out)
+ [ 9] Anywhere                   ALLOW OUT   Anywhere on eth0 (log, out)
+ [10] 10.0.0.1 24/tcp            ALLOW OUT   192.168.0.1 on eth0 (log, out)
+@@ -1772,9 +1772,9 @@ Status: active
+ ### tuple ### allow any any 0.0.0.0/0 any 0.0.0.0/0 out_eth1
+ -A ufw-user-output -o eth1 -j ACCEPT
+ 
+-### tuple ### reject any 22 192.168.0.1 any 0.0.0.0/0 out_eth1
+--A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 22 -j REJECT --reject-with tcp-reset
+--A ufw-user-output -o eth1 -p udp -d 192.168.0.1 --dport 22 -j REJECT
++### tuple ### reject any 13 192.168.0.1 any 0.0.0.0/0 out_eth1
++-A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 13 -j REJECT --reject-with tcp-reset
++-A ufw-user-output -o eth1 -p udp -d 192.168.0.1 --dport 13 -j REJECT
+ --
+ ### tuple ### limit any any 0.0.0.0/0 80 10.0.0.1 out_eth1
+ -A ufw-user-output -o eth1 -p tcp -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
+@@ -1783,17 +1783,17 @@ Status: active
+ ### tuple ### allow any any 192.168.0.1 any 10.0.0.1 out_eth1
+ -A ufw-user-output -o eth1 -d 192.168.0.1 -s 10.0.0.1 -j ACCEPT
+ 
+-### tuple ### deny any 22 192.168.0.1 any 10.0.0.1 out_eth1
+--A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 -j DROP
+--A ufw-user-output -o eth1 -p udp -d 192.168.0.1 --dport 22 -s 10.0.0.1 -j DROP
++### tuple ### deny any 13 192.168.0.1 any 10.0.0.1 out_eth1
++-A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 -j DROP
++-A ufw-user-output -o eth1 -p udp -d 192.168.0.1 --dport 13 -s 10.0.0.1 -j DROP
+ --
+ ### tuple ### reject any any 192.168.0.1 80 10.0.0.1 out_eth1
+ -A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 -s 10.0.0.1 --sport 80 -j REJECT --reject-with tcp-reset
+ -A ufw-user-output -o eth1 -p udp -d 192.168.0.1 -s 10.0.0.1 --sport 80 -j REJECT
+ --
+-### tuple ### limit any 22 192.168.0.1 80 10.0.0.1 out_eth1
+--A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 22 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit any 13 192.168.0.1 80 10.0.0.1 out_eth1
++-A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-output -o eth1 -p tcp -d 192.168.0.1 --dport 13 -s 10.0.0.1 --sport 80 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ --
+ ### tuple ### allow udp 137,138 0.0.0.0/0 any 0.0.0.0/0 Samba - out_eth2
+ -A ufw-user-output -o eth2 -p udp -m multiport --dports 137,138 -j ACCEPT -m comment --comment 'dapp_Samba'
+@@ -1824,7 +1824,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-248: delete reject out on eth1 to 192.168.0.1 port 22
++248: delete reject out on eth1 to 192.168.0.1 port 13
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1839,7 +1839,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-251: delete deny out on eth1 to 192.168.0.1 port 22 from 10.0.0.1
++251: delete deny out on eth1 to 192.168.0.1 port 13 from 10.0.0.1
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1849,7 +1849,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-253: delete limit out on eth1 to 192.168.0.1 port 22 from 10.0.0.1 port 80
++253: delete limit out on eth1 to 192.168.0.1 port 13 from 10.0.0.1 port 80
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -2591,7 +2591,7 @@ Verify secondary chains
+ 494: disable
+ 
+ 
+-495: allow 22/tcp
++495: allow 13/tcp
+ 
+ 
+ 496: enable
+@@ -2675,7 +2675,7 @@ Verify secondary chains
+ 522: enable
+ 
+ 
+-523: delete allow 22/tcp
++523: delete allow 13/tcp
+ 
+ 
+ Reset test
+@@ -3033,7 +3033,7 @@ Setting IPV6 to yes
+ 588: enable
+ 
+ 
+-589: limit 22/tcp
++589: limit 13/tcp
+ 
+ 
+ 590: allow in on eth0 to 2001::211:aaaa:bbbb:d54c port 123 proto tcp
+@@ -3045,12 +3045,12 @@ Setting IPV6 to yes
+ 592: show added
+ WARN: Checks disabled
+ Added user rules (see 'ufw status' for running firewall):
+-ufw limit 22/tcp
++ufw limit 13/tcp
+ ufw deny Samba
+ ufw allow in on eth0 to 2001::211:aaaa:bbbb:d54c port 123 proto tcp
+ 
+ 
+-593: delete limit 22/tcp
++593: delete limit 13/tcp
+ 
+ 
+ 594: delete allow in on eth0 to 2001::211:aaaa:bbbb:d54c port 123 proto tcp
+@@ -3072,7 +3072,7 @@ Setting IPV6 to no
+ 598: enable
+ 
+ 
+-599: limit 22/tcp
++599: limit 13/tcp
+ 
+ 
+ 600: deny Samba
+@@ -3081,11 +3081,11 @@ Setting IPV6 to no
+ 601: show added
+ WARN: Checks disabled
+ Added user rules (see 'ufw status' for running firewall):
+-ufw limit 22/tcp
++ufw limit 13/tcp
+ ufw deny Samba
+ 
+ 
+-602: delete limit 22/tcp
++602: delete limit 13/tcp
+ 
+ 
+ 603: delete deny Samba
+diff --git a/tests/root/live/runtest.sh b/tests/root/live/runtest.sh
+index 3dd4e35..228e3e6 100755
+--- a/tests/root/live/runtest.sh
++++ b/tests/root/live/runtest.sh
+@@ -43,7 +43,7 @@ do
+ 	do_cmd "0" allow from 192.168.0.0/16
+ 	do_cmd "0" deny proto udp from 1.2.3.4 to any port 514
+ 	do_cmd "0" allow proto udp from 1.2.3.5 port 5469 to 1.2.3.4 port 5469
+-	do_cmd "0" limit 22/tcp
++	do_cmd "0" limit 13/tcp
+ 	if [ "$ipv6" = "yes" ]; then
+ 		do_cmd "0" deny proto tcp from 2001:db8::/32 to any port 25
+ 		do_cmd "0" deny from 2001:db8::/32 port 26 to 2001:db8:3:4:5:6:7:8
+@@ -63,7 +63,7 @@ do
+ 	do_cmd "0" delete allow from 192.168.0.0/16
+ 	do_cmd "0" delete deny proto udp from 1.2.3.4 to any port 514
+ 	do_cmd "0" delete allow proto udp from 1.2.3.5 port 5469 to 1.2.3.4 port 5469
+-	do_cmd "0" delete limit 22/tcp
++	do_cmd "0" delete limit 13/tcp
+ 	if [ "$ipv6" = "yes" ]; then
+ 		do_cmd "0" delete deny proto tcp from 2001:db8::/32 to any port 25
+ 		do_cmd "0" delete deny from 2001:db8::/32 port 26 to 2001:db8:3:4:5:6:7:8
+@@ -132,7 +132,7 @@ do
+ 	do_cmd "0" allow from 192.168.0.0/16
+ 	do_cmd "0" deny proto udp from 1.2.3.4 to any port 514
+ 	do_cmd "0" allow proto udp from 1.2.3.5 port 5469 to 1.2.3.4 port 5469
+-	do_cmd "0" limit 22/tcp
++	do_cmd "0" limit 13/tcp
+ 	if [ "$ipv6" = "yes" ]; then
+ 		do_cmd "0" deny proto tcp from 2001:db8::/32 to any port 25
+ 		do_cmd "0" deny from 2001:db8::/32 port 26 to 2001:db8:3:4:5:6:7:8
+@@ -149,7 +149,7 @@ do
+ 	do_cmd "0" delete allow from 192.168.0.0/16
+ 	do_cmd "0" delete deny proto udp from 1.2.3.4 to any port 514
+ 	do_cmd "0" delete allow proto udp from 1.2.3.5 port 5469 to 1.2.3.4 port 5469
+-	do_cmd "0" delete limit 22/tcp
++	do_cmd "0" delete limit 13/tcp
+ 	if [ "$ipv6" = "yes" ]; then
+ 		do_cmd "0" delete deny proto tcp from 2001:db8::/32 to any port 25
+ 		do_cmd "0" delete deny from 2001:db8::/32 port 26 to 2001:db8:3:4:5:6:7:8
+@@ -168,12 +168,12 @@ do
+ 
+         do_cmd "0" allow $i on eth1
+         do_cmd "1" null deny $i on eth1:1
+-        do_cmd "0" reject $i on eth1 to 192.168.0.1 port 22
++        do_cmd "0" reject $i on eth1 to 192.168.0.1 port 13
+         do_cmd "0" limit $i on eth1 from 10.0.0.1 port 80
+         do_cmd "0" allow $i on eth1 to 192.168.0.1 from 10.0.0.1
+-        do_cmd "0" deny $i on eth1 to 192.168.0.1 port 22 from 10.0.0.1
++        do_cmd "0" deny $i on eth1 to 192.168.0.1 port 13 from 10.0.0.1
+         do_cmd "0" reject $i on eth1 to 192.168.0.1 from 10.0.0.1 port 80
+-        do_cmd "0" limit $i on eth1 to 192.168.0.1 port 22 from 10.0.0.1 port 80
++        do_cmd "0" limit $i on eth1 to 192.168.0.1 port 13 from 10.0.0.1 port 80
+ 
+ 	do_cmd "0" allow $i on eth0 log
+ 	do_cmd "0" allow $i on eth0 log from 192.168.0.1 to 10.0.0.1 port 24 proto tcp
+@@ -189,12 +189,12 @@ do
+ 
+ 	# delete what we added
+         do_cmd "0" delete allow $i on eth1
+-        do_cmd "0" delete reject $i on eth1 to 192.168.0.1 port 22
++        do_cmd "0" delete reject $i on eth1 to 192.168.0.1 port 13
+         do_cmd "0" delete limit $i on eth1 from 10.0.0.1 port 80
+         do_cmd "0" delete allow $i on eth1 to 192.168.0.1 from 10.0.0.1
+-        do_cmd "0" delete deny $i on eth1 to 192.168.0.1 port 22 from 10.0.0.1
++        do_cmd "0" delete deny $i on eth1 to 192.168.0.1 port 13 from 10.0.0.1
+         do_cmd "0" delete reject $i on eth1 to 192.168.0.1 from 10.0.0.1 port 80
+-        do_cmd "0" delete limit $i on eth1 to 192.168.0.1 port 22 from 10.0.0.1 port 80
++        do_cmd "0" delete limit $i on eth1 to 192.168.0.1 port 13 from 10.0.0.1 port 80
+ 
+ 	do_cmd "0" delete allow $i on eth0 log
+ 	do_cmd "0" delete allow $i on eth0 log from 192.168.0.1 to 10.0.0.1 port 24 proto tcp
+@@ -312,7 +312,7 @@ do_cmd "0" nostats disable
+ echo "'Resource temporarily unavailable' test" >> $TESTTMP/result
+ do_cmd "0" nostats disable
+ $TESTSTATE/ufw-init flush-all >/dev/null
+-do_cmd "0" nostats allow 22/tcp
++do_cmd "0" nostats allow 13/tcp
+ do_cmd "0" nostats enable
+ $TESTSTATE/ufw-init stop >/dev/null
+ for i in `seq 1 25`; do
+@@ -327,7 +327,7 @@ for i in `seq 1 25`; do
+     let count=count+1
+ done
+ do_cmd "0" nostats enable
+-do_cmd "0" nostats delete allow 22/tcp
++do_cmd "0" nostats delete allow 13/tcp
+ 
+ echo "Reset test" >> $TESTTMP/result
+ do_cmd "0" nostats enable
+@@ -445,13 +445,13 @@ do
+     sed -i "s/IPV6=.*/IPV6=$ipv6/" $TESTPATH/etc/default/ufw
+     do_cmd "0" nostats disable
+     do_cmd "0" nostats enable
+-    do_cmd "0" nostats limit 22/tcp
++    do_cmd "0" nostats limit 13/tcp
+     if [ "$ipv6" = "yes" ]; then
+         do_cmd "0" nostats allow in on eth0 to 2001::211:aaaa:bbbb:d54c port 123 proto tcp
+     fi
+     do_cmd "0" nostats deny Samba
+     do_cmd "0" show added
+-    do_cmd "0" nostats delete limit 22/tcp
++    do_cmd "0" nostats delete limit 13/tcp
+     if [ "$ipv6" = "yes" ]; then
+         do_cmd "0" nostats delete allow in on eth0 to 2001::211:aaaa:bbbb:d54c port 123 proto tcp
+     fi
+diff --git a/tests/root/live_apps/result b/tests/root/live_apps/result
+index cb97ffb..1d9338e 100644
+--- a/tests/root/live_apps/result
++++ b/tests/root/live_apps/result
+@@ -31,7 +31,7 @@ Rule added
+ Rule added (v6)
+ 
+ 
+-6: allow to any app Samba from any port 22
++6: allow to any app Samba from any port 13
+ WARN: Checks disabled
+ Rule added
+ Rule added (v6)
+@@ -58,7 +58,7 @@ WARN: Checks disabled
+ Rule added (v6)
+ 
+ 
+-11: allow to 2001:db8::/32 app Samba from 2001:db8::/32 port 22
++11: allow to 2001:db8::/32 app Samba from 2001:db8::/32 port 13
+ WARN: Checks disabled
+ Rule added (v6)
+ 
+@@ -78,18 +78,18 @@ Apache                     ALLOW       Anywhere
+ Samba                      ALLOW       Anywhere
+ Anywhere                   ALLOW       Samba
+ Samba                      ALLOW       Bind9
+-Samba                      ALLOW       22
++Samba                      ALLOW       13
+ Apache                     ALLOW       88
+ Apache (v6)                ALLOW       Anywhere (v6)
+ Samba (v6)                 ALLOW       Anywhere (v6)
+ Anywhere (v6)              ALLOW       Samba (v6)
+ Samba (v6)                 ALLOW       Bind9 (v6)
+-Samba (v6)                 ALLOW       22
++Samba (v6)                 ALLOW       13
+ Apache (v6)                ALLOW       88
+ 2001:db8::/32 Samba        ALLOW       Anywhere (v6)
+ Anywhere (v6)              ALLOW       2001:db8::/32 Samba
+ 2001:db8::/32 Samba        ALLOW       2001:db8::/32 Bind9
+-2001:db8::/32 Samba        ALLOW       2001:db8::/32 22
++2001:db8::/32 Samba        ALLOW       2001:db8::/32 13
+ 2001:db8::/32 Apache       ALLOW       2001:db8::/32 88
+ 
+ 
+@@ -110,8 +110,8 @@ Anywhere                   ALLOW IN    137,138/udp (Samba)
+ Anywhere                   ALLOW IN    139,445/tcp (Samba)
+ 137,138/udp (Samba)        ALLOW IN    53/udp (Bind9)
+ 139,445/tcp (Samba)        ALLOW IN    53/tcp (Bind9)
+-137,138/udp (Samba)        ALLOW IN    22/udp
+-139,445/tcp (Samba)        ALLOW IN    22/tcp
++137,138/udp (Samba)        ALLOW IN    13/udp
++139,445/tcp (Samba)        ALLOW IN    13/tcp
+ 80/tcp (Apache)            ALLOW IN    88/tcp
+ 80/tcp (Apache (v6))       ALLOW IN    Anywhere (v6)
+ 137,138/udp (Samba (v6))   ALLOW IN    Anywhere (v6)
+@@ -120,8 +120,8 @@ Anywhere (v6)              ALLOW IN    137,138/udp (Samba (v6))
+ Anywhere (v6)              ALLOW IN    139,445/tcp (Samba (v6))
+ 137,138/udp (Samba (v6))   ALLOW IN    53/udp (Bind9 (v6))
+ 139,445/tcp (Samba (v6))   ALLOW IN    53/tcp (Bind9 (v6))
+-137,138/udp (Samba (v6))   ALLOW IN    22/udp
+-139,445/tcp (Samba (v6))   ALLOW IN    22/tcp
++137,138/udp (Samba (v6))   ALLOW IN    13/udp
++139,445/tcp (Samba (v6))   ALLOW IN    13/tcp
+ 80/tcp (Apache (v6))       ALLOW IN    88/tcp
+ 2001:db8::/32 137,138/udp (Samba) ALLOW IN    Anywhere (v6)
+ 2001:db8::/32 139,445/tcp (Samba) ALLOW IN    Anywhere (v6)
+@@ -129,8 +129,8 @@ Anywhere (v6)              ALLOW IN    2001:db8::/32 137,138/udp (Samba)
+ Anywhere (v6)              ALLOW IN    2001:db8::/32 139,445/tcp (Samba)
+ 2001:db8::/32 137,138/udp (Samba) ALLOW IN    2001:db8::/32 53/udp (Bind9)
+ 2001:db8::/32 139,445/tcp (Samba) ALLOW IN    2001:db8::/32 53/tcp (Bind9)
+-2001:db8::/32 137,138/udp (Samba) ALLOW IN    2001:db8::/32 22/udp
+-2001:db8::/32 139,445/tcp (Samba) ALLOW IN    2001:db8::/32 22/tcp
++2001:db8::/32 137,138/udp (Samba) ALLOW IN    2001:db8::/32 13/udp
++2001:db8::/32 139,445/tcp (Samba) ALLOW IN    2001:db8::/32 13/tcp
+ 2001:db8::/32 80/tcp (Apache) ALLOW IN    2001:db8::/32 88/tcp
+ 
+ 
+@@ -159,7 +159,7 @@ Rule deleted
+ Rule deleted (v6)
+ 
+ 
+-19: delete allow to any app Samba from any port 22
++19: delete allow to any app Samba from any port 13
+ WARN: Checks disabled
+ Rule deleted
+ Rule deleted (v6)
+@@ -186,7 +186,7 @@ WARN: Checks disabled
+ Rule deleted (v6)
+ 
+ 
+-24: delete allow to 2001:db8::/32 app Samba from 2001:db8::/32 port 22
++24: delete allow to 2001:db8::/32 app Samba from 2001:db8::/32 port 13
+ WARN: Checks disabled
+ Rule deleted (v6)
+ 
+@@ -228,7 +228,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-33: allow to any app Samba from any port 22
++33: allow to any app Samba from any port 13
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -253,7 +253,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-38: allow to 192.168.2.0/24 app Samba from 192.168.2.0/24 port 22
++38: allow to 192.168.2.0/24 app Samba from 192.168.2.0/24 port 13
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -273,12 +273,12 @@ Apache                     ALLOW       Anywhere
+ Samba                      ALLOW       Anywhere
+ Anywhere                   ALLOW       Samba
+ Samba                      ALLOW       Bind9
+-Samba                      ALLOW       22
++Samba                      ALLOW       13
+ Apache                     ALLOW       88
+ 192.168.2.0/24 Samba       ALLOW       Anywhere
+ Anywhere                   ALLOW       192.168.2.0/24 Samba
+ 192.168.2.0/24 Samba       ALLOW       192.168.2.0/24 Bind9
+-192.168.2.0/24 Samba       ALLOW       192.168.2.0/24 22
++192.168.2.0/24 Samba       ALLOW       192.168.2.0/24 13
+ 192.168.2.0/24 Apache      ALLOW       192.168.2.0/24 88
+ 
+ 
+@@ -299,8 +299,8 @@ Anywhere                   ALLOW IN    137,138/udp (Samba)
+ Anywhere                   ALLOW IN    139,445/tcp (Samba)
+ 137,138/udp (Samba)        ALLOW IN    53/udp (Bind9)
+ 139,445/tcp (Samba)        ALLOW IN    53/tcp (Bind9)
+-137,138/udp (Samba)        ALLOW IN    22/udp
+-139,445/tcp (Samba)        ALLOW IN    22/tcp
++137,138/udp (Samba)        ALLOW IN    13/udp
++139,445/tcp (Samba)        ALLOW IN    13/tcp
+ 80/tcp (Apache)            ALLOW IN    88/tcp
+ 192.168.2.0/24 137,138/udp (Samba) ALLOW IN    Anywhere
+ 192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    Anywhere
+@@ -308,8 +308,8 @@ Anywhere                   ALLOW IN    192.168.2.0/24 137,138/udp (Samba)
+ Anywhere                   ALLOW IN    192.168.2.0/24 139,445/tcp (Samba)
+ 192.168.2.0/24 137,138/udp (Samba) ALLOW IN    192.168.2.0/24 53/udp (Bind9)
+ 192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    192.168.2.0/24 53/tcp (Bind9)
+-192.168.2.0/24 137,138/udp (Samba) ALLOW IN    192.168.2.0/24 22/udp
+-192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    192.168.2.0/24 22/tcp
++192.168.2.0/24 137,138/udp (Samba) ALLOW IN    192.168.2.0/24 13/udp
++192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    192.168.2.0/24 13/tcp
+ 192.168.2.0/24 80/tcp (Apache) ALLOW IN    192.168.2.0/24 88/tcp
+ 
+ 
+@@ -334,7 +334,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-46: delete allow to any app Samba from any port 22
++46: delete allow to any app Samba from any port 13
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -359,7 +359,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-51: delete allow to 192.168.2.0/24 app Samba from 192.168.2.0/24 port 22
++51: delete allow to 192.168.2.0/24 app Samba from 192.168.2.0/24 port 13
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -406,7 +406,7 @@ Rule added
+ Rule added (v6)
+ 
+ 
+-60: allow to any app Samba from any port 22
++60: allow to any app Samba from any port 13
+ WARN: Checks disabled
+ Rule added
+ Rule added (v6)
+@@ -433,7 +433,7 @@ WARN: Checks disabled
+ Rule added (v6)
+ 
+ 
+-65: allow to 2001:db8::/32 app Samba from 2001:db8::/32 port 22
++65: allow to 2001:db8::/32 app Samba from 2001:db8::/32 port 13
+ WARN: Checks disabled
+ Rule added (v6)
+ 
+@@ -453,18 +453,18 @@ Apache                     ALLOW       Anywhere
+ Samba                      ALLOW       Anywhere
+ Anywhere                   ALLOW       Samba
+ Samba                      ALLOW       Bind9
+-Samba                      ALLOW       22
++Samba                      ALLOW       13
+ Apache                     ALLOW       88
+ Apache (v6)                ALLOW       Anywhere (v6)
+ Samba (v6)                 ALLOW       Anywhere (v6)
+ Anywhere (v6)              ALLOW       Samba (v6)
+ Samba (v6)                 ALLOW       Bind9 (v6)
+-Samba (v6)                 ALLOW       22
++Samba (v6)                 ALLOW       13
+ Apache (v6)                ALLOW       88
+ 2001:db8::/32 Samba        ALLOW       Anywhere (v6)
+ Anywhere (v6)              ALLOW       2001:db8::/32 Samba
+ 2001:db8::/32 Samba        ALLOW       2001:db8::/32 Bind9
+-2001:db8::/32 Samba        ALLOW       2001:db8::/32 22
++2001:db8::/32 Samba        ALLOW       2001:db8::/32 13
+ 2001:db8::/32 Apache       ALLOW       2001:db8::/32 88
+ 
+ 
+@@ -485,8 +485,8 @@ Anywhere                   ALLOW IN    137,138/udp (Samba)
+ Anywhere                   ALLOW IN    139,445/tcp (Samba)
+ 137,138/udp (Samba)        ALLOW IN    53/udp (Bind9)
+ 139,445/tcp (Samba)        ALLOW IN    53/tcp (Bind9)
+-137,138/udp (Samba)        ALLOW IN    22/udp
+-139,445/tcp (Samba)        ALLOW IN    22/tcp
++137,138/udp (Samba)        ALLOW IN    13/udp
++139,445/tcp (Samba)        ALLOW IN    13/tcp
+ 80/tcp (Apache)            ALLOW IN    88/tcp
+ 80/tcp (Apache (v6))       ALLOW IN    Anywhere (v6)
+ 137,138/udp (Samba (v6))   ALLOW IN    Anywhere (v6)
+@@ -495,8 +495,8 @@ Anywhere (v6)              ALLOW IN    137,138/udp (Samba (v6))
+ Anywhere (v6)              ALLOW IN    139,445/tcp (Samba (v6))
+ 137,138/udp (Samba (v6))   ALLOW IN    53/udp (Bind9 (v6))
+ 139,445/tcp (Samba (v6))   ALLOW IN    53/tcp (Bind9 (v6))
+-137,138/udp (Samba (v6))   ALLOW IN    22/udp
+-139,445/tcp (Samba (v6))   ALLOW IN    22/tcp
++137,138/udp (Samba (v6))   ALLOW IN    13/udp
++139,445/tcp (Samba (v6))   ALLOW IN    13/tcp
+ 80/tcp (Apache (v6))       ALLOW IN    88/tcp
+ 2001:db8::/32 137,138/udp (Samba) ALLOW IN    Anywhere (v6)
+ 2001:db8::/32 139,445/tcp (Samba) ALLOW IN    Anywhere (v6)
+@@ -504,8 +504,8 @@ Anywhere (v6)              ALLOW IN    2001:db8::/32 137,138/udp (Samba)
+ Anywhere (v6)              ALLOW IN    2001:db8::/32 139,445/tcp (Samba)
+ 2001:db8::/32 137,138/udp (Samba) ALLOW IN    2001:db8::/32 53/udp (Bind9)
+ 2001:db8::/32 139,445/tcp (Samba) ALLOW IN    2001:db8::/32 53/tcp (Bind9)
+-2001:db8::/32 137,138/udp (Samba) ALLOW IN    2001:db8::/32 22/udp
+-2001:db8::/32 139,445/tcp (Samba) ALLOW IN    2001:db8::/32 22/tcp
++2001:db8::/32 137,138/udp (Samba) ALLOW IN    2001:db8::/32 13/udp
++2001:db8::/32 139,445/tcp (Samba) ALLOW IN    2001:db8::/32 13/tcp
+ 2001:db8::/32 80/tcp (Apache) ALLOW IN    2001:db8::/32 88/tcp
+ 
+ 
+@@ -532,18 +532,18 @@ Apache                     ALLOW       Anywhere
+ Samba                      ALLOW       Anywhere
+ Anywhere                   ALLOW       Samba
+ Samba                      ALLOW       Bind9
+-Samba                      ALLOW       22
++Samba                      ALLOW       13
+ Apache                     ALLOW       88
+ Apache (v6)                ALLOW       Anywhere (v6)
+ Samba (v6)                 ALLOW       Anywhere (v6)
+ Anywhere (v6)              ALLOW       Samba (v6)
+ Samba (v6)                 ALLOW       Bind9 (v6)
+-Samba (v6)                 ALLOW       22
++Samba (v6)                 ALLOW       13
+ Apache (v6)                ALLOW       88
+ 2001:db8::/32 Samba        ALLOW       Anywhere (v6)
+ Anywhere (v6)              ALLOW       2001:db8::/32 Samba
+ 2001:db8::/32 Samba        ALLOW       2001:db8::/32 Bind9
+-2001:db8::/32 Samba        ALLOW       2001:db8::/32 22
++2001:db8::/32 Samba        ALLOW       2001:db8::/32 13
+ 2001:db8::/32 Apache       ALLOW       2001:db8::/32 88
+ 
+ 
+@@ -564,8 +564,8 @@ Anywhere                   ALLOW IN    138,9999/udp (Samba)
+ Anywhere                   ALLOW IN    139,445/tcp (Samba)
+ 138,9999/udp (Samba)       ALLOW IN    53/udp (Bind9)
+ 139,445/tcp (Samba)        ALLOW IN    53/tcp (Bind9)
+-138,9999/udp (Samba)       ALLOW IN    22/udp
+-139,445/tcp (Samba)        ALLOW IN    22/tcp
++138,9999/udp (Samba)       ALLOW IN    13/udp
++139,445/tcp (Samba)        ALLOW IN    13/tcp
+ 8888/tcp (Apache)          ALLOW IN    88/tcp
+ 8888/tcp (Apache (v6))     ALLOW IN    Anywhere (v6)
+ 138,9999/udp (Samba (v6))  ALLOW IN    Anywhere (v6)
+@@ -574,8 +574,8 @@ Anywhere (v6)              ALLOW IN    138,9999/udp (Samba (v6))
+ Anywhere (v6)              ALLOW IN    139,445/tcp (Samba (v6))
+ 138,9999/udp (Samba (v6))  ALLOW IN    53/udp (Bind9 (v6))
+ 139,445/tcp (Samba (v6))   ALLOW IN    53/tcp (Bind9 (v6))
+-138,9999/udp (Samba (v6))  ALLOW IN    22/udp
+-139,445/tcp (Samba (v6))   ALLOW IN    22/tcp
++138,9999/udp (Samba (v6))  ALLOW IN    13/udp
++139,445/tcp (Samba (v6))   ALLOW IN    13/tcp
+ 8888/tcp (Apache (v6))     ALLOW IN    88/tcp
+ 2001:db8::/32 138,9999/udp (Samba) ALLOW IN    Anywhere (v6)
+ 2001:db8::/32 139,445/tcp (Samba) ALLOW IN    Anywhere (v6)
+@@ -583,8 +583,8 @@ Anywhere (v6)              ALLOW IN    2001:db8::/32 138,9999/udp (Samba)
+ Anywhere (v6)              ALLOW IN    2001:db8::/32 139,445/tcp (Samba)
+ 2001:db8::/32 138,9999/udp (Samba) ALLOW IN    2001:db8::/32 53/udp (Bind9)
+ 2001:db8::/32 139,445/tcp (Samba) ALLOW IN    2001:db8::/32 53/tcp (Bind9)
+-2001:db8::/32 138,9999/udp (Samba) ALLOW IN    2001:db8::/32 22/udp
+-2001:db8::/32 139,445/tcp (Samba) ALLOW IN    2001:db8::/32 22/tcp
++2001:db8::/32 138,9999/udp (Samba) ALLOW IN    2001:db8::/32 13/udp
++2001:db8::/32 139,445/tcp (Samba) ALLOW IN    2001:db8::/32 13/tcp
+ 2001:db8::/32 8888/tcp (Apache) ALLOW IN    2001:db8::/32 88/tcp
+ 
+ 
+@@ -613,7 +613,7 @@ Rule deleted
+ Rule deleted (v6)
+ 
+ 
+-77: delete allow to any app Samba from any port 22
++77: delete allow to any app Samba from any port 13
+ WARN: Checks disabled
+ Rule deleted
+ Rule deleted (v6)
+@@ -640,7 +640,7 @@ WARN: Checks disabled
+ Rule deleted (v6)
+ 
+ 
+-82: delete allow to 2001:db8::/32 app Samba from 2001:db8::/32 port 22
++82: delete allow to 2001:db8::/32 app Samba from 2001:db8::/32 port 13
+ WARN: Checks disabled
+ Rule deleted (v6)
+ 
+@@ -682,7 +682,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-91: allow to any app Samba from any port 22
++91: allow to any app Samba from any port 13
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -707,7 +707,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-96: allow to 192.168.2.0/24 app Samba from 192.168.2.0/24 port 22
++96: allow to 192.168.2.0/24 app Samba from 192.168.2.0/24 port 13
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -727,12 +727,12 @@ Apache                     ALLOW       Anywhere
+ Samba                      ALLOW       Anywhere
+ Anywhere                   ALLOW       Samba
+ Samba                      ALLOW       Bind9
+-Samba                      ALLOW       22
++Samba                      ALLOW       13
+ Apache                     ALLOW       88
+ 192.168.2.0/24 Samba       ALLOW       Anywhere
+ Anywhere                   ALLOW       192.168.2.0/24 Samba
+ 192.168.2.0/24 Samba       ALLOW       192.168.2.0/24 Bind9
+-192.168.2.0/24 Samba       ALLOW       192.168.2.0/24 22
++192.168.2.0/24 Samba       ALLOW       192.168.2.0/24 13
+ 192.168.2.0/24 Apache      ALLOW       192.168.2.0/24 88
+ 
+ 
+@@ -753,8 +753,8 @@ Anywhere                   ALLOW IN    137,138/udp (Samba)
+ Anywhere                   ALLOW IN    139,445/tcp (Samba)
+ 137,138/udp (Samba)        ALLOW IN    53/udp (Bind9)
+ 139,445/tcp (Samba)        ALLOW IN    53/tcp (Bind9)
+-137,138/udp (Samba)        ALLOW IN    22/udp
+-139,445/tcp (Samba)        ALLOW IN    22/tcp
++137,138/udp (Samba)        ALLOW IN    13/udp
++139,445/tcp (Samba)        ALLOW IN    13/tcp
+ 80/tcp (Apache)            ALLOW IN    88/tcp
+ 192.168.2.0/24 137,138/udp (Samba) ALLOW IN    Anywhere
+ 192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    Anywhere
+@@ -762,8 +762,8 @@ Anywhere                   ALLOW IN    192.168.2.0/24 137,138/udp (Samba)
+ Anywhere                   ALLOW IN    192.168.2.0/24 139,445/tcp (Samba)
+ 192.168.2.0/24 137,138/udp (Samba) ALLOW IN    192.168.2.0/24 53/udp (Bind9)
+ 192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    192.168.2.0/24 53/tcp (Bind9)
+-192.168.2.0/24 137,138/udp (Samba) ALLOW IN    192.168.2.0/24 22/udp
+-192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    192.168.2.0/24 22/tcp
++192.168.2.0/24 137,138/udp (Samba) ALLOW IN    192.168.2.0/24 13/udp
++192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    192.168.2.0/24 13/tcp
+ 192.168.2.0/24 80/tcp (Apache) ALLOW IN    192.168.2.0/24 88/tcp
+ 
+ 
+@@ -790,12 +790,12 @@ Apache                     ALLOW       Anywhere
+ Samba                      ALLOW       Anywhere
+ Anywhere                   ALLOW       Samba
+ Samba                      ALLOW       Bind9
+-Samba                      ALLOW       22
++Samba                      ALLOW       13
+ Apache                     ALLOW       88
+ 192.168.2.0/24 Samba       ALLOW       Anywhere
+ Anywhere                   ALLOW       192.168.2.0/24 Samba
+ 192.168.2.0/24 Samba       ALLOW       192.168.2.0/24 Bind9
+-192.168.2.0/24 Samba       ALLOW       192.168.2.0/24 22
++192.168.2.0/24 Samba       ALLOW       192.168.2.0/24 13
+ 192.168.2.0/24 Apache      ALLOW       192.168.2.0/24 88
+ 
+ 
+@@ -816,8 +816,8 @@ Anywhere                   ALLOW IN    138,9999/udp (Samba)
+ Anywhere                   ALLOW IN    139,445/tcp (Samba)
+ 138,9999/udp (Samba)       ALLOW IN    53/udp (Bind9)
+ 139,445/tcp (Samba)        ALLOW IN    53/tcp (Bind9)
+-138,9999/udp (Samba)       ALLOW IN    22/udp
+-139,445/tcp (Samba)        ALLOW IN    22/tcp
++138,9999/udp (Samba)       ALLOW IN    13/udp
++139,445/tcp (Samba)        ALLOW IN    13/tcp
+ 8888/tcp (Apache)          ALLOW IN    88/tcp
+ 192.168.2.0/24 138,9999/udp (Samba) ALLOW IN    Anywhere
+ 192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    Anywhere
+@@ -825,8 +825,8 @@ Anywhere                   ALLOW IN    192.168.2.0/24 138,9999/udp (Samba)
+ Anywhere                   ALLOW IN    192.168.2.0/24 139,445/tcp (Samba)
+ 192.168.2.0/24 138,9999/udp (Samba) ALLOW IN    192.168.2.0/24 53/udp (Bind9)
+ 192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    192.168.2.0/24 53/tcp (Bind9)
+-192.168.2.0/24 138,9999/udp (Samba) ALLOW IN    192.168.2.0/24 22/udp
+-192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    192.168.2.0/24 22/tcp
++192.168.2.0/24 138,9999/udp (Samba) ALLOW IN    192.168.2.0/24 13/udp
++192.168.2.0/24 139,445/tcp (Samba) ALLOW IN    192.168.2.0/24 13/tcp
+ 192.168.2.0/24 8888/tcp (Apache) ALLOW IN    192.168.2.0/24 88/tcp
+ 
+ 
+@@ -851,7 +851,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-108: delete allow to any app Samba from any port 22
++108: delete allow to any app Samba from any port 13
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -876,7 +876,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-113: delete allow to 192.168.2.0/24 app Samba from 192.168.2.0/24 port 22
++113: delete allow to 192.168.2.0/24 app Samba from 192.168.2.0/24 port 13
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1356,7 +1356,7 @@ WARN: Checks disabled
+ Rule added
+ 
+ 
+-164: allow 22
++164: allow 13
+ WARN: Checks disabled
+ Rule added
+ 
+@@ -1435,9 +1435,9 @@ Rule inserted
+ ### tuple ### allow tcp 139,445 10.0.0.1 any 192.168.0.1 Samba - in
+ -A ufw-user-input -p tcp -m multiport --dports 139,445 -d 10.0.0.1 -s 192.168.0.1 -j ACCEPT -m comment --comment 'dapp_Samba'
+ 
+-### tuple ### allow any 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -j ACCEPT
+--A ufw-user-input -p udp --dport 22 -j ACCEPT
++### tuple ### allow any 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -j ACCEPT
++-A ufw-user-input -p udp --dport 13 -j ACCEPT
+ 
+ ### END RULES ###
+ 
+@@ -1488,7 +1488,7 @@ WARN: Checks disabled
+ Rule deleted
+ 
+ 
+-173: delete allow 22
++173: delete allow 13
+ WARN: Checks disabled
+ Rule deleted
+ 
+@@ -1799,7 +1799,7 @@ Rule added
+ Rule added (v6)
+ 
+ 
+-192: allow 22
++192: allow 13
+ WARN: Checks disabled
+ Rule added
+ Rule added (v6)
+@@ -1880,9 +1880,9 @@ Rule inserted
+ ### tuple ### allow tcp 139,445 10.0.0.1 any 192.168.0.1 Samba - in
+ -A ufw-user-input -p tcp -m multiport --dports 139,445 -d 10.0.0.1 -s 192.168.0.1 -j ACCEPT -m comment --comment 'dapp_Samba'
+ 
+-### tuple ### allow any 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -j ACCEPT
+--A ufw-user-input -p udp --dport 22 -j ACCEPT
++### tuple ### allow any 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -j ACCEPT
++-A ufw-user-input -p udp --dport 13 -j ACCEPT
+ 
+ ### END RULES ###
+ 
+@@ -1923,9 +1923,9 @@ COMMIT
+ ### tuple ### allow tcp 139,445 ::/0 any ::/0 Samba - in
+ -A ufw6-user-input -p tcp -m multiport --dports 139,445 -j ACCEPT -m comment --comment 'dapp_Samba'
+ 
+-### tuple ### allow any 22 ::/0 any ::/0 in
+--A ufw6-user-input -p tcp --dport 22 -j ACCEPT
+--A ufw6-user-input -p udp --dport 22 -j ACCEPT
++### tuple ### allow any 13 ::/0 any ::/0 in
++-A ufw6-user-input -p tcp --dport 13 -j ACCEPT
++-A ufw6-user-input -p udp --dport 13 -j ACCEPT
+ 
+ ### END RULES ###
+ 
+@@ -1949,7 +1949,7 @@ Rule deleted
+ Rule deleted (v6)
+ 
+ 
+-201: delete allow 22
++201: delete allow 13
+ WARN: Checks disabled
+ Rule deleted
+ Rule deleted (v6)
+@@ -2606,7 +2606,7 @@ Setting IPV6 to yes
+ 278: allow Samba
+ 
+ 
+-279: allow 22/tcp
++279: allow 13/tcp
+ 
+ 
+ ### tuple ### allow udp any 0.0.0.0/0 137,138 0.0.0.0/0 - Samba in
+@@ -2621,8 +2621,8 @@ Setting IPV6 to yes
+ ### tuple ### allow tcp 139,445 0.0.0.0/0 any 0.0.0.0/0 Samba - in
+ -A ufw-user-input -p tcp -m multiport --dports 139,445 -j ACCEPT -m comment --comment 'dapp_Samba'
+ 
+-### tuple ### allow tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -j ACCEPT
++### tuple ### allow tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -j ACCEPT
+ 
+ ### tuple ### allow udp any ::/0 137,138 ::/0 - Samba in
+ -A ufw6-user-input -p udp -m multiport --sports 137,138 -j ACCEPT -m comment --comment 'sapp_Samba'
+@@ -2636,8 +2636,8 @@ Setting IPV6 to yes
+ ### tuple ### allow tcp 139,445 ::/0 any ::/0 Samba - in
+ -A ufw6-user-input -p tcp -m multiport --dports 139,445 -j ACCEPT -m comment --comment 'dapp_Samba'
+ 
+-### tuple ### allow tcp 22 ::/0 any ::/0 in
+--A ufw6-user-input -p tcp --dport 22 -j ACCEPT
++### tuple ### allow tcp 13 ::/0 any ::/0 in
++-A ufw6-user-input -p tcp --dport 13 -j ACCEPT
+ 
+ 280: --force delete 6
+ 
+@@ -2706,7 +2706,7 @@ Setting IPV6 to no
+ 289: allow Samba
+ 
+ 
+-290: allow 22/tcp
++290: allow 13/tcp
+ 
+ 
+ ### tuple ### allow udp any 0.0.0.0/0 137,138 0.0.0.0/0 - Samba in
+@@ -2721,8 +2721,8 @@ Setting IPV6 to no
+ ### tuple ### allow tcp 139,445 0.0.0.0/0 any 0.0.0.0/0 Samba - in
+ -A ufw-user-input -p tcp -m multiport --dports 139,445 -j ACCEPT -m comment --comment 'dapp_Samba'
+ 
+-### tuple ### allow tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -j ACCEPT
++### tuple ### allow tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -j ACCEPT
+ 
+ 291: --force delete 3
+ 
+diff --git a/tests/root/live_apps/runtest.sh b/tests/root/live_apps/runtest.sh
+index 04bbde3..5feb86c 100755
+--- a/tests/root/live_apps/runtest.sh
++++ b/tests/root/live_apps/runtest.sh
+@@ -51,7 +51,7 @@ do
+ 		do_cmd "0"  allow to $loc app Samba
+ 		do_cmd "0"  allow from $loc app Samba
+ 		do_cmd "0"  allow to $loc app Samba from $loc app Bind9
+-		do_cmd "0"  allow to $loc app Samba from $loc port 22
++		do_cmd "0"  allow to $loc app Samba from $loc port 13
+ 		do_cmd "0"  allow to $loc app Apache from $loc port 88
+ 	done
+ 	do_cmd "0" status
+@@ -78,7 +78,7 @@ do
+ 		do_cmd "0"  delete allow to $loc app Samba
+ 		do_cmd "0"  delete allow from $loc app Samba
+ 		do_cmd "0"  delete allow to $loc app Samba from $loc app Bind9
+-		do_cmd "0"  delete allow to $loc app Samba from $loc port 22
++		do_cmd "0"  delete allow to $loc app Samba from $loc port 13
+ 		do_cmd "0"  delete allow to $loc app Apache from $loc port 88
+ 	done
+ 	do_cmd "0" status
+@@ -188,7 +188,7 @@ for ipv6 in no yes ; do
+     cat $TESTSTATE/user6.rules >> $TESTTMP/result
+ 
+     do_cmd "0" allow Samba
+-    do_cmd "0" allow 22
++    do_cmd "0" allow 13
+     do_cmd "0" insert 2 allow from any to any app Samba
+     do_cmd "0" insert 2 allow from 192.168.0.1 to 10.0.0.1 app Samba
+     do_cmd "0" insert 2 allow from 192.168.0.1 to any app Samba
+@@ -209,7 +209,7 @@ for ipv6 in no yes ; do
+     }
+ 
+     do_cmd "0" delete allow Samba
+-    do_cmd "0" delete allow 22
++    do_cmd "0" delete allow 13
+     do_cmd "0" delete allow from any to any app Samba
+     do_cmd "0" delete allow from 192.168.0.1 to 10.0.0.1 app Samba
+     do_cmd "0" delete allow from 192.168.0.1 to any app Samba
+@@ -258,7 +258,7 @@ do
+ 
+     do_cmd "0" nostats allow from any app Samba
+     do_cmd "0" nostats allow Samba
+-    do_cmd "0" nostats allow 22/tcp
++    do_cmd "0" nostats allow 13/tcp
+ 
+     grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+     if [ "$ipv6" = "yes" ]; then
+@@ -267,16 +267,16 @@ do
+ 
+     if [ "$ipv6" = "yes" ]; then
+         do_cmd "0" null --force delete 6
+-        grep -v -q "^### tuple ### allow any 22 " $TESTSTATE/user6.rules || {
+-            echo "Failed: Found port '22' in user6.rules" >> $TESTTMP/result
++        grep -v -q "^### tuple ### allow any 13 " $TESTSTATE/user6.rules || {
++            echo "Failed: Found port '13' in user6.rules" >> $TESTTMP/result
+             exit 1
+         }
+         grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+     fi
+ 
+     do_cmd "0" null --force delete 3
+-    grep -v -q "^### tuple ### allow any 22 " $TESTSTATE/user.rules || {
+-        echo "Failed: Found port '22' in user.rules" >> $TESTTMP/result
++    grep -v -q "^### tuple ### allow any 13 " $TESTSTATE/user.rules || {
++        echo "Failed: Found port '13' in user.rules" >> $TESTTMP/result
+         exit 1
+     }
+     grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+diff --git a/tests/root/valid/result b/tests/root/valid/result
+index 320a728..752b6f2 100644
+--- a/tests/root/valid/result
++++ b/tests/root/valid/result
+@@ -215,7 +215,7 @@ Rules updated
+ ### tuple ### deny tcp 25 192.168.0.1 any 10.0.0.0/8 in
+ -A ufw-user-input -p tcp -d 192.168.0.1 --dport 25 -s 10.0.0.0/8 -j DROP
+ 
+-26: limit 22/tcp
++26: limit 13/tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+@@ -233,9 +233,9 @@ Rules updated
+ ### tuple ### deny tcp 25 192.168.0.1 any 10.0.0.0/8 in
+ -A ufw-user-input -p tcp -d 192.168.0.1 --dport 25 -s 10.0.0.0/8 -j DROP
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ 27: deny 53
+ WARN: Checks disabled
+ Rules updated
+@@ -254,9 +254,9 @@ Rules updated
+ ### tuple ### deny tcp 25 192.168.0.1 any 10.0.0.0/8 in
+ -A ufw-user-input -p tcp -d 192.168.0.1 --dport 25 -s 10.0.0.0/8 -j DROP
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ 28: allow 80/tcp
+ WARN: Checks disabled
+ Rules updated
+@@ -275,9 +275,9 @@ Rules updated
+ ### tuple ### deny tcp 25 192.168.0.1 any 10.0.0.0/8 in
+ -A ufw-user-input -p tcp -d 192.168.0.1 --dport 25 -s 10.0.0.0/8 -j DROP
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ 29: allow from 10.0.0.0/8
+ WARN: Checks disabled
+ Rules updated
+@@ -296,9 +296,9 @@ Rules updated
+ ### tuple ### deny tcp 25 192.168.0.1 any 10.0.0.0/8 in
+ -A ufw-user-input -p tcp -d 192.168.0.1 --dport 25 -s 10.0.0.0/8 -j DROP
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ --
+ ### tuple ### allow any any 0.0.0.0/0 any 10.0.0.0/8 in
+ -A ufw-user-input -s 10.0.0.0/8 -j ACCEPT
+@@ -321,9 +321,9 @@ Rules updated
+ ### tuple ### deny tcp 25 192.168.0.1 any 10.0.0.0/8 in
+ -A ufw-user-input -p tcp -d 192.168.0.1 --dport 25 -s 10.0.0.0/8 -j DROP
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ --
+ ### tuple ### allow any any 0.0.0.0/0 any 10.0.0.0/8 in
+ -A ufw-user-input -s 10.0.0.0/8 -j ACCEPT
+@@ -349,9 +349,9 @@ Rules updated
+ ### tuple ### deny tcp 25 192.168.0.1 any 10.0.0.0/8 in
+ -A ufw-user-input -p tcp -d 192.168.0.1 --dport 25 -s 10.0.0.0/8 -j DROP
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ --
+ ### tuple ### allow any any 0.0.0.0/0 any 10.0.0.0/8 in
+ -A ufw-user-input -s 10.0.0.0/8 -j ACCEPT
+@@ -380,9 +380,9 @@ Rules updated
+ ### tuple ### deny tcp 25 192.168.0.1 any 10.0.0.0/8 in
+ -A ufw-user-input -p tcp -d 192.168.0.1 --dport 25 -s 10.0.0.0/8 -j DROP
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ --
+ ### tuple ### allow any any 0.0.0.0/0 any 10.0.0.0/8 in
+ -A ufw-user-input -s 10.0.0.0/8 -j ACCEPT
+@@ -414,9 +414,9 @@ Rules updated
+ ### tuple ### deny tcp 25 192.168.0.1 any 10.0.0.0/8 in
+ -A ufw-user-input -p tcp -d 192.168.0.1 --dport 25 -s 10.0.0.0/8 -j DROP
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ --
+ ### tuple ### allow any any 0.0.0.0/0 any 10.0.0.0/8 in
+ -A ufw-user-input -s 10.0.0.0/8 -j ACCEPT
+@@ -451,9 +451,9 @@ Rules updated
+ ### tuple ### deny tcp 25 192.168.0.1 any 10.0.0.0/8 in
+ -A ufw-user-input -p tcp -d 192.168.0.1 --dport 25 -s 10.0.0.0/8 -j DROP
+ 
+-### tuple ### limit tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set
+--A ufw-user-input -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
++### tuple ### limit tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --set
++-A ufw-user-input -p tcp --dport 13 -m conntrack --ctstate NEW -m recent --update --seconds 30 --hitcount 6 -j ufw-user-limit
+ --
+ ### tuple ### allow any any 0.0.0.0/0 any 10.0.0.0/8 in
+ -A ufw-user-input -s 10.0.0.0/8 -j ACCEPT
+@@ -483,7 +483,7 @@ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-37: delete limit 22/tcp
++37: delete limit 13/tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+@@ -659,41 +659,41 @@ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-66: allow ssh
++66: allow daytime
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow any 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -j ACCEPT
+--A ufw-user-input -p udp --dport 22 -j ACCEPT
+-67: delete allow ssh
++### tuple ### allow any 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -j ACCEPT
++-A ufw-user-input -p udp --dport 13 -j ACCEPT
++67: delete allow daytime
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-68: allow ssh/tcp
++68: allow daytime/tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow tcp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 -j ACCEPT
++### tuple ### allow tcp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 -j ACCEPT
+ 
+-69: delete allow ssh/tcp
++69: delete allow daytime/tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-70: allow ssh/udp
++70: allow daytime/udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow udp 22 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p udp --dport 22 -j ACCEPT
++### tuple ### allow udp 13 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p udp --dport 13 -j ACCEPT
+ 
+-71: delete allow ssh/udp
++71: delete allow daytime/udp
+ WARN: Checks disabled
+ Rules updated
+ 
+@@ -1679,28 +1679,28 @@ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-219: allow to any port smtp from any port ssh
++219: allow to any port smtp from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow tcp 25 0.0.0.0/0 22 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 25 --sport 22 -j ACCEPT
++### tuple ### allow tcp 25 0.0.0.0/0 13 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 25 --sport 13 -j ACCEPT
+ 
+-220: delete allow to any port smtp from any port ssh
++220: delete allow to any port smtp from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-221: allow to any port ssh from any port smtp
++221: allow to any port daytime from any port smtp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow tcp 22 0.0.0.0/0 25 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 --sport 25 -j ACCEPT
++### tuple ### allow tcp 13 0.0.0.0/0 25 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 --sport 25 -j ACCEPT
+ 
+-222: delete allow to any port ssh from any port smtp
++222: delete allow to any port daytime from any port smtp
+ WARN: Checks disabled
+ Rules updated
+ 
+@@ -1744,28 +1744,28 @@ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-229: allow to any port tftp from any port ssh
++229: allow to any port tftp from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow udp 69 0.0.0.0/0 22 0.0.0.0/0 in
+--A ufw-user-input -p udp --dport 69 --sport 22 -j ACCEPT
++### tuple ### allow udp 69 0.0.0.0/0 13 0.0.0.0/0 in
++-A ufw-user-input -p udp --dport 69 --sport 13 -j ACCEPT
+ 
+-230: delete allow to any port tftp from any port ssh
++230: delete allow to any port tftp from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-231: allow to any port ssh from any port tftp
++231: allow to any port daytime from any port tftp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow udp 22 0.0.0.0/0 69 0.0.0.0/0 in
+--A ufw-user-input -p udp --dport 22 --sport 69 -j ACCEPT
++### tuple ### allow udp 13 0.0.0.0/0 69 0.0.0.0/0 in
++-A ufw-user-input -p udp --dport 13 --sport 69 -j ACCEPT
+ 
+-232: delete allow to any port ssh from any port tftp
++232: delete allow to any port daytime from any port tftp
+ WARN: Checks disabled
+ Rules updated
+ 
+@@ -1796,41 +1796,41 @@ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-237: allow to any port ssh from any port 23
++237: allow to any port daytime from any port 23
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow any 22 0.0.0.0/0 23 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 --sport 23 -j ACCEPT
+--A ufw-user-input -p udp --dport 22 --sport 23 -j ACCEPT
+-238: delete allow to any port ssh from any port 23
++### tuple ### allow any 13 0.0.0.0/0 23 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 --sport 23 -j ACCEPT
++-A ufw-user-input -p udp --dport 13 --sport 23 -j ACCEPT
++238: delete allow to any port daytime from any port 23
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-239: allow to any port 23 from any port ssh
++239: allow to any port 23 from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow any 23 0.0.0.0/0 22 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 23 --sport 22 -j ACCEPT
+--A ufw-user-input -p udp --dport 23 --sport 22 -j ACCEPT
+-240: delete allow to any port 23 from any port ssh
++### tuple ### allow any 23 0.0.0.0/0 13 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 23 --sport 13 -j ACCEPT
++-A ufw-user-input -p udp --dport 23 --sport 13 -j ACCEPT
++240: delete allow to any port 23 from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-241: allow to any port ssh from any port domain
++241: allow to any port daytime from any port domain
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow any 22 0.0.0.0/0 53 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 --sport 53 -j ACCEPT
+--A ufw-user-input -p udp --dport 22 --sport 53 -j ACCEPT
+-242: delete allow to any port ssh from any port domain
++### tuple ### allow any 13 0.0.0.0/0 53 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 --sport 53 -j ACCEPT
++-A ufw-user-input -p udp --dport 13 --sport 53 -j ACCEPT
++242: delete allow to any port daytime from any port domain
+ WARN: Checks disabled
+ Rules updated
+ 
+@@ -1848,28 +1848,28 @@ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-245: allow to any port smtp from any port ssh proto tcp
++245: allow to any port smtp from any port daytime proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow tcp 25 0.0.0.0/0 22 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 25 --sport 22 -j ACCEPT
++### tuple ### allow tcp 25 0.0.0.0/0 13 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 25 --sport 13 -j ACCEPT
+ 
+-246: delete allow to any port smtp from any port ssh proto tcp
++246: delete allow to any port smtp from any port daytime proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-247: allow to any port ssh from any port smtp proto tcp
++247: allow to any port daytime from any port smtp proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow tcp 22 0.0.0.0/0 25 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 --sport 25 -j ACCEPT
++### tuple ### allow tcp 13 0.0.0.0/0 25 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 --sport 25 -j ACCEPT
+ 
+-248: delete allow to any port ssh from any port smtp proto tcp
++248: delete allow to any port daytime from any port smtp proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+@@ -1913,28 +1913,28 @@ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-255: allow to any port tftp from any port ssh proto udp
++255: allow to any port tftp from any port daytime proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow udp 69 0.0.0.0/0 22 0.0.0.0/0 in
+--A ufw-user-input -p udp --dport 69 --sport 22 -j ACCEPT
++### tuple ### allow udp 69 0.0.0.0/0 13 0.0.0.0/0 in
++-A ufw-user-input -p udp --dport 69 --sport 13 -j ACCEPT
+ 
+-256: delete allow to any port tftp from any port ssh proto udp
++256: delete allow to any port tftp from any port daytime proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-257: allow to any port ssh from any port tftp proto udp
++257: allow to any port daytime from any port tftp proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow udp 22 0.0.0.0/0 69 0.0.0.0/0 in
+--A ufw-user-input -p udp --dport 22 --sport 69 -j ACCEPT
++### tuple ### allow udp 13 0.0.0.0/0 69 0.0.0.0/0 in
++-A ufw-user-input -p udp --dport 13 --sport 69 -j ACCEPT
+ 
+-258: delete allow to any port ssh from any port tftp proto udp
++258: delete allow to any port daytime from any port tftp proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+@@ -1965,80 +1965,80 @@ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-263: allow to any port ssh from any port 23 proto tcp
++263: allow to any port daytime from any port 23 proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow tcp 22 0.0.0.0/0 23 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 --sport 23 -j ACCEPT
++### tuple ### allow tcp 13 0.0.0.0/0 23 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 --sport 23 -j ACCEPT
+ 
+-264: delete allow to any port ssh from any port 23 proto tcp
++264: delete allow to any port daytime from any port 23 proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-265: allow to any port 23 from any port ssh proto tcp
++265: allow to any port 23 from any port daytime proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow tcp 23 0.0.0.0/0 22 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 23 --sport 22 -j ACCEPT
++### tuple ### allow tcp 23 0.0.0.0/0 13 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 23 --sport 13 -j ACCEPT
+ 
+-266: delete allow to any port 23 from any port ssh proto tcp
++266: delete allow to any port 23 from any port daytime proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-267: allow to any port ssh from any port domain proto tcp
++267: allow to any port daytime from any port domain proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow tcp 22 0.0.0.0/0 53 0.0.0.0/0 in
+--A ufw-user-input -p tcp --dport 22 --sport 53 -j ACCEPT
++### tuple ### allow tcp 13 0.0.0.0/0 53 0.0.0.0/0 in
++-A ufw-user-input -p tcp --dport 13 --sport 53 -j ACCEPT
+ 
+-268: delete allow to any port ssh from any port domain proto tcp
++268: delete allow to any port daytime from any port domain proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-269: allow to any port ssh from any port 23 proto udp
++269: allow to any port daytime from any port 23 proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow udp 22 0.0.0.0/0 23 0.0.0.0/0 in
+--A ufw-user-input -p udp --dport 22 --sport 23 -j ACCEPT
++### tuple ### allow udp 13 0.0.0.0/0 23 0.0.0.0/0 in
++-A ufw-user-input -p udp --dport 13 --sport 23 -j ACCEPT
+ 
+-270: delete allow to any port ssh from any port 23 proto udp
++270: delete allow to any port daytime from any port 23 proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-271: allow to any port 23 from any port ssh proto udp
++271: allow to any port 23 from any port daytime proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow udp 23 0.0.0.0/0 22 0.0.0.0/0 in
+--A ufw-user-input -p udp --dport 23 --sport 22 -j ACCEPT
++### tuple ### allow udp 23 0.0.0.0/0 13 0.0.0.0/0 in
++-A ufw-user-input -p udp --dport 23 --sport 13 -j ACCEPT
+ 
+-272: delete allow to any port 23 from any port ssh proto udp
++272: delete allow to any port 23 from any port daytime proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-273: allow to any port ssh from any port domain proto udp
++273: allow to any port daytime from any port domain proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow udp 22 0.0.0.0/0 53 0.0.0.0/0 in
+--A ufw-user-input -p udp --dport 22 --sport 53 -j ACCEPT
++### tuple ### allow udp 13 0.0.0.0/0 53 0.0.0.0/0 in
++-A ufw-user-input -p udp --dport 13 --sport 53 -j ACCEPT
+ 
+-274: delete allow to any port ssh from any port domain proto udp
++274: delete allow to any port daytime from any port domain proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+@@ -2196,41 +2196,41 @@ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-297: allow to 192.168.0.1 port 80:83,22 proto tcp
++297: allow to 192.168.0.1 port 80:83,13 proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow tcp 22,80:83 192.168.0.1 any 0.0.0.0/0 in
+--A ufw-user-input -p tcp -m multiport --dports 22,80:83 -d 192.168.0.1 -j ACCEPT
++### tuple ### allow tcp 13,80:83 192.168.0.1 any 0.0.0.0/0 in
++-A ufw-user-input -p tcp -m multiport --dports 13,80:83 -d 192.168.0.1 -j ACCEPT
+ 
+-298: delete allow to 192.168.0.1 port 80:83,22 proto tcp
++298: delete allow to 192.168.0.1 port 80:83,13 proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-299: allow from 192.168.0.1 port 35:39 to 192.168.0.2 port 22 proto tcp
++299: allow from 192.168.0.1 port 35:39 to 192.168.0.2 port 13 proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow tcp 22 192.168.0.2 35:39 192.168.0.1 in
+--A ufw-user-input -p tcp -m multiport --dports 22 -m multiport --sports 35:39 -d 192.168.0.2 -s 192.168.0.1 -j ACCEPT
++### tuple ### allow tcp 13 192.168.0.2 35:39 192.168.0.1 in
++-A ufw-user-input -p tcp -m multiport --dports 13 -m multiport --sports 35:39 -d 192.168.0.2 -s 192.168.0.1 -j ACCEPT
+ 
+-300: delete allow from 192.168.0.1 port 35:39 to 192.168.0.2 port 22 proto tcp
++300: delete allow from 192.168.0.1 port 35:39 to 192.168.0.2 port 13 proto tcp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-301: allow to any port 23,21,15:19,22 from any port 24:26 proto udp
++301: allow to any port 23,21,15:19,13 from any port 24:26 proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### allow udp 15:19,21,22,23 0.0.0.0/0 24:26 0.0.0.0/0 in
+--A ufw-user-input -p udp -m multiport --dports 15:19,21,22,23 -m multiport --sports 24:26 -j ACCEPT
++### tuple ### allow udp 13,15:19,21,23 0.0.0.0/0 24:26 0.0.0.0/0 in
++-A ufw-user-input -p udp -m multiport --dports 13,15:19,21,23 -m multiport --sports 24:26 -j ACCEPT
+ 
+-302: delete allow to any port 23,21,15:19,22 from any port 24:26 proto udp
++302: delete allow to any port 23,21,15:19,13 from any port 24:26 proto udp
+ WARN: Checks disabled
+ Rules updated
+ 
+@@ -2274,15 +2274,15 @@ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-309: deny 23,21,15:19,22/udp
++309: deny 23,21,15:19,13/udp
+ WARN: Checks disabled
+ Rules updated
+ 
+ 
+-### tuple ### deny udp 15:19,21,22,23 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p udp -m multiport --dports 15:19,21,22,23 -j DROP
++### tuple ### deny udp 13,15:19,21,23 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p udp -m multiport --dports 13,15:19,21,23 -j DROP
+ 
+-310: delete deny 23,21,15:19,22/udp
++310: delete deny 23,21,15:19,13/udp
+ WARN: Checks disabled
+ Rules updated
+ 
+diff --git a/tests/root/valid/runtest.sh b/tests/root/valid/runtest.sh
+index aa03d99..feeacba 100755
+--- a/tests/root/valid/runtest.sh
++++ b/tests/root/valid/runtest.sh
+@@ -76,7 +76,7 @@ do_cmd "0"  deny to any port 80 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  deny from 10.0.0.0/8 to 192.168.0.1 port 25 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  limit 22/tcp
++do_cmd "0"  limit 13/tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  deny 53
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+@@ -97,7 +97,7 @@ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ 
+ do_cmd "0"  delete allow 25/tcp
+ do_cmd "0"  delete deny from 10.0.0.0/8 to 192.168.0.1 port 25 proto tcp
+-do_cmd "0"  delete limit 22/tcp
++do_cmd "0"  delete limit 13/tcp
+ do_cmd "0"  delete deny 53
+ do_cmd "0"  delete allow 80/tcp
+ do_cmd "0"  delete allow from 10.0.0.0/8
+@@ -160,19 +160,19 @@ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow tftp/udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ 
+-do_cmd "0"  allow ssh
++do_cmd "0"  allow daytime
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow ssh
++do_cmd "0"  delete allow daytime
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ 
+-do_cmd "0"  allow ssh/tcp
++do_cmd "0"  allow daytime/tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow ssh/tcp
++do_cmd "0"  delete allow daytime/tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ 
+-do_cmd "0"  allow ssh/udp
++do_cmd "0"  allow daytime/udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow ssh/udp
++do_cmd "0"  delete allow daytime/udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ 
+ 
+@@ -250,13 +250,13 @@ do_cmd "0"  allow to any port smtp from any port smtp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port smtp from any port smtp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port smtp from any port ssh
++do_cmd "0"  allow to any port smtp from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port smtp from any port ssh
++do_cmd "0"  delete allow to any port smtp from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port smtp
++do_cmd "0"  allow to any port daytime from any port smtp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port smtp
++do_cmd "0"  delete allow to any port daytime from any port smtp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  allow to any port smtp from any port 23
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+@@ -270,13 +270,13 @@ do_cmd "0"  allow to any port tftp from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port tftp from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port tftp from any port ssh
++do_cmd "0"  allow to any port tftp from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port tftp from any port ssh
++do_cmd "0"  delete allow to any port tftp from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port tftp
++do_cmd "0"  allow to any port daytime from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port tftp
++do_cmd "0"  delete allow to any port daytime from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  allow to any port tftp from any port 23
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+@@ -286,30 +286,30 @@ do_cmd "0"  allow to any port 23 from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port 23 from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port 23
++do_cmd "0"  allow to any port daytime from any port 23
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port 23
++do_cmd "0"  delete allow to any port daytime from any port 23
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port 23 from any port ssh
++do_cmd "0"  allow to any port 23 from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port 23 from any port ssh
++do_cmd "0"  delete allow to any port 23 from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port domain
++do_cmd "0"  allow to any port daytime from any port domain
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port domain
++do_cmd "0"  delete allow to any port daytime from any port domain
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ 
+ do_cmd "0"  allow to any port smtp from any port smtp proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port smtp from any port smtp proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port smtp from any port ssh proto tcp
++do_cmd "0"  allow to any port smtp from any port daytime proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port smtp from any port ssh proto tcp
++do_cmd "0"  delete allow to any port smtp from any port daytime proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port smtp proto tcp
++do_cmd "0"  allow to any port daytime from any port smtp proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port smtp proto tcp
++do_cmd "0"  delete allow to any port daytime from any port smtp proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  allow to any port smtp from any port 23 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+@@ -323,13 +323,13 @@ do_cmd "0"  allow to any port tftp from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port tftp from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port tftp from any port ssh proto udp
++do_cmd "0"  allow to any port tftp from any port daytime proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port tftp from any port ssh proto udp
++do_cmd "0"  delete allow to any port tftp from any port daytime proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port tftp proto udp
++do_cmd "0"  allow to any port daytime from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port tftp proto udp
++do_cmd "0"  delete allow to any port daytime from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  allow to any port tftp from any port 23 proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+@@ -339,29 +339,29 @@ do_cmd "0"  allow to any port 23 from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port 23 from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port 23 proto tcp
++do_cmd "0"  allow to any port daytime from any port 23 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port 23 proto tcp
++do_cmd "0"  delete allow to any port daytime from any port 23 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port 23 from any port ssh proto tcp
++do_cmd "0"  allow to any port 23 from any port daytime proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port 23 from any port ssh proto tcp
++do_cmd "0"  delete allow to any port 23 from any port daytime proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port domain proto tcp
++do_cmd "0"  allow to any port daytime from any port domain proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port domain proto tcp
++do_cmd "0"  delete allow to any port daytime from any port domain proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port 23 proto udp
++do_cmd "0"  allow to any port daytime from any port 23 proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port 23 proto udp
++do_cmd "0"  delete allow to any port daytime from any port 23 proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port 23 from any port ssh proto udp
++do_cmd "0"  allow to any port 23 from any port daytime proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port 23 from any port ssh proto udp
++do_cmd "0"  delete allow to any port 23 from any port daytime proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port domain proto udp
++do_cmd "0"  allow to any port daytime from any port domain proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port domain proto udp
++do_cmd "0"  delete allow to any port daytime from any port domain proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ 
+ echo "TESTING NETMASK" >> $TESTTMP/result
+@@ -413,17 +413,17 @@ do_cmd "0" allow to 192.168.0.1 port 80:83 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0" delete allow to 192.168.0.1 port 80:83 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0" allow to 192.168.0.1 port 80:83,22 proto tcp
++do_cmd "0" allow to 192.168.0.1 port 80:83,13 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0" delete allow to 192.168.0.1 port 80:83,22 proto tcp
++do_cmd "0" delete allow to 192.168.0.1 port 80:83,13 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0" allow from 192.168.0.1 port 35:39 to 192.168.0.2 port 22 proto tcp
++do_cmd "0" allow from 192.168.0.1 port 35:39 to 192.168.0.2 port 13 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0" delete allow from 192.168.0.1 port 35:39 to 192.168.0.2 port 22 proto tcp
++do_cmd "0" delete allow from 192.168.0.1 port 35:39 to 192.168.0.2 port 13 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0" allow to any port 23,21,15:19,22 from any port 24:26 proto udp
++do_cmd "0" allow to any port 23,21,15:19,13 from any port 24:26 proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0" delete allow to any port 23,21,15:19,22 from any port 24:26 proto udp
++do_cmd "0" delete allow to any port 23,21,15:19,13 from any port 24:26 proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0" allow 34,35/tcp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+@@ -437,9 +437,9 @@ do_cmd "0" deny 35:39/udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ do_cmd "0" delete deny 35:39/udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0" deny 23,21,15:19,22/udp
++do_cmd "0" deny 23,21,15:19,13/udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+-do_cmd "0" delete deny 23,21,15:19,22/udp
++do_cmd "0" delete deny 23,21,15:19,13/udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ 
+ cleanup
+diff --git a/tests/root/valid6/result b/tests/root/valid6/result
+index 74fcd86..f568a2f 100644
+--- a/tests/root/valid6/result
++++ b/tests/root/valid6/result
+@@ -1049,31 +1049,31 @@ Rules updated
+ Rules updated (v6)
+ 
+ 
+-164: allow to any port smtp from any port ssh
++164: allow to any port smtp from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow tcp 25 ::/0 22 ::/0 in
+--A ufw6-user-input -p tcp --dport 25 --sport 22 -j ACCEPT
++### tuple ### allow tcp 25 ::/0 13 ::/0 in
++-A ufw6-user-input -p tcp --dport 25 --sport 13 -j ACCEPT
+ 
+-165: delete allow to any port smtp from any port ssh
++165: delete allow to any port smtp from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-166: allow to any port ssh from any port smtp
++166: allow to any port daytime from any port smtp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow tcp 22 ::/0 25 ::/0 in
+--A ufw6-user-input -p tcp --dport 22 --sport 25 -j ACCEPT
++### tuple ### allow tcp 13 ::/0 25 ::/0 in
++-A ufw6-user-input -p tcp --dport 13 --sport 25 -j ACCEPT
+ 
+-167: delete allow to any port ssh from any port smtp
++167: delete allow to any port daytime from any port smtp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+@@ -1124,31 +1124,31 @@ Rules updated
+ Rules updated (v6)
+ 
+ 
+-174: allow to any port tftp from any port ssh
++174: allow to any port tftp from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow udp 69 ::/0 22 ::/0 in
+--A ufw6-user-input -p udp --dport 69 --sport 22 -j ACCEPT
++### tuple ### allow udp 69 ::/0 13 ::/0 in
++-A ufw6-user-input -p udp --dport 69 --sport 13 -j ACCEPT
+ 
+-175: delete allow to any port tftp from any port ssh
++175: delete allow to any port tftp from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-176: allow to any port ssh from any port tftp
++176: allow to any port daytime from any port tftp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow udp 22 ::/0 69 ::/0 in
+--A ufw6-user-input -p udp --dport 22 --sport 69 -j ACCEPT
++### tuple ### allow udp 13 ::/0 69 ::/0 in
++-A ufw6-user-input -p udp --dport 13 --sport 69 -j ACCEPT
+ 
+-177: delete allow to any port ssh from any port tftp
++177: delete allow to any port daytime from any port tftp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+@@ -1184,46 +1184,46 @@ Rules updated
+ Rules updated (v6)
+ 
+ 
+-182: allow to any port ssh from any port 23
++182: allow to any port daytime from any port 23
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow any 22 ::/0 23 ::/0 in
+--A ufw6-user-input -p tcp --dport 22 --sport 23 -j ACCEPT
+--A ufw6-user-input -p udp --dport 22 --sport 23 -j ACCEPT
+-183: delete allow to any port ssh from any port 23
++### tuple ### allow any 13 ::/0 23 ::/0 in
++-A ufw6-user-input -p tcp --dport 13 --sport 23 -j ACCEPT
++-A ufw6-user-input -p udp --dport 13 --sport 23 -j ACCEPT
++183: delete allow to any port daytime from any port 23
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-184: allow to any port 23 from any port ssh
++184: allow to any port 23 from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow any 23 ::/0 22 ::/0 in
+--A ufw6-user-input -p tcp --dport 23 --sport 22 -j ACCEPT
+--A ufw6-user-input -p udp --dport 23 --sport 22 -j ACCEPT
+-185: delete allow to any port 23 from any port ssh
++### tuple ### allow any 23 ::/0 13 ::/0 in
++-A ufw6-user-input -p tcp --dport 23 --sport 13 -j ACCEPT
++-A ufw6-user-input -p udp --dport 23 --sport 13 -j ACCEPT
++185: delete allow to any port 23 from any port daytime
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-186: allow to any port ssh from any port domain
++186: allow to any port daytime from any port domain
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow any 22 ::/0 53 ::/0 in
+--A ufw6-user-input -p tcp --dport 22 --sport 53 -j ACCEPT
+--A ufw6-user-input -p udp --dport 22 --sport 53 -j ACCEPT
+-187: delete allow to any port ssh from any port domain
++### tuple ### allow any 13 ::/0 53 ::/0 in
++-A ufw6-user-input -p tcp --dport 13 --sport 53 -j ACCEPT
++-A ufw6-user-input -p udp --dport 13 --sport 53 -j ACCEPT
++187: delete allow to any port daytime from any port domain
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+@@ -1244,31 +1244,31 @@ Rules updated
+ Rules updated (v6)
+ 
+ 
+-190: allow to any port smtp from any port ssh proto tcp
++190: allow to any port smtp from any port daytime proto tcp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow tcp 25 ::/0 22 ::/0 in
+--A ufw6-user-input -p tcp --dport 25 --sport 22 -j ACCEPT
++### tuple ### allow tcp 25 ::/0 13 ::/0 in
++-A ufw6-user-input -p tcp --dport 25 --sport 13 -j ACCEPT
+ 
+-191: delete allow to any port smtp from any port ssh proto tcp
++191: delete allow to any port smtp from any port daytime proto tcp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-192: allow to any port ssh from any port smtp proto tcp
++192: allow to any port daytime from any port smtp proto tcp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow tcp 22 ::/0 25 ::/0 in
+--A ufw6-user-input -p tcp --dport 22 --sport 25 -j ACCEPT
++### tuple ### allow tcp 13 ::/0 25 ::/0 in
++-A ufw6-user-input -p tcp --dport 13 --sport 25 -j ACCEPT
+ 
+-193: delete allow to any port ssh from any port smtp proto tcp
++193: delete allow to any port daytime from any port smtp proto tcp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+@@ -1319,31 +1319,31 @@ Rules updated
+ Rules updated (v6)
+ 
+ 
+-200: allow to any port tftp from any port ssh proto udp
++200: allow to any port tftp from any port daytime proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow udp 69 ::/0 22 ::/0 in
+--A ufw6-user-input -p udp --dport 69 --sport 22 -j ACCEPT
++### tuple ### allow udp 69 ::/0 13 ::/0 in
++-A ufw6-user-input -p udp --dport 69 --sport 13 -j ACCEPT
+ 
+-201: delete allow to any port tftp from any port ssh proto udp
++201: delete allow to any port tftp from any port daytime proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-202: allow to any port ssh from any port tftp proto udp
++202: allow to any port daytime from any port tftp proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow udp 22 ::/0 69 ::/0 in
+--A ufw6-user-input -p udp --dport 22 --sport 69 -j ACCEPT
++### tuple ### allow udp 13 ::/0 69 ::/0 in
++-A ufw6-user-input -p udp --dport 13 --sport 69 -j ACCEPT
+ 
+-203: delete allow to any port ssh from any port tftp proto udp
++203: delete allow to any port daytime from any port tftp proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+@@ -1379,91 +1379,91 @@ Rules updated
+ Rules updated (v6)
+ 
+ 
+-208: allow to any port ssh from any port 23 proto tcp
++208: allow to any port daytime from any port 23 proto tcp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow tcp 22 ::/0 23 ::/0 in
+--A ufw6-user-input -p tcp --dport 22 --sport 23 -j ACCEPT
++### tuple ### allow tcp 13 ::/0 23 ::/0 in
++-A ufw6-user-input -p tcp --dport 13 --sport 23 -j ACCEPT
+ 
+-209: delete allow to any port ssh from any port 23 proto tcp
++209: delete allow to any port daytime from any port 23 proto tcp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-210: allow to any port 23 from any port ssh proto tcp
++210: allow to any port 23 from any port daytime proto tcp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow tcp 23 ::/0 22 ::/0 in
+--A ufw6-user-input -p tcp --dport 23 --sport 22 -j ACCEPT
++### tuple ### allow tcp 23 ::/0 13 ::/0 in
++-A ufw6-user-input -p tcp --dport 23 --sport 13 -j ACCEPT
+ 
+-211: delete allow to any port 23 from any port ssh proto tcp
++211: delete allow to any port 23 from any port daytime proto tcp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-212: allow to any port ssh from any port domain proto tcp
++212: allow to any port daytime from any port domain proto tcp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow tcp 22 ::/0 53 ::/0 in
+--A ufw6-user-input -p tcp --dport 22 --sport 53 -j ACCEPT
++### tuple ### allow tcp 13 ::/0 53 ::/0 in
++-A ufw6-user-input -p tcp --dport 13 --sport 53 -j ACCEPT
+ 
+-213: delete allow to any port ssh from any port domain proto tcp
++213: delete allow to any port daytime from any port domain proto tcp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-214: allow to any port ssh from any port 23 proto udp
++214: allow to any port daytime from any port 23 proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow udp 22 ::/0 23 ::/0 in
+--A ufw6-user-input -p udp --dport 22 --sport 23 -j ACCEPT
++### tuple ### allow udp 13 ::/0 23 ::/0 in
++-A ufw6-user-input -p udp --dport 13 --sport 23 -j ACCEPT
+ 
+-215: delete allow to any port ssh from any port 23 proto udp
++215: delete allow to any port daytime from any port 23 proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-216: allow to any port 23 from any port ssh proto udp
++216: allow to any port 23 from any port daytime proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow udp 23 ::/0 22 ::/0 in
+--A ufw6-user-input -p udp --dport 23 --sport 22 -j ACCEPT
++### tuple ### allow udp 23 ::/0 13 ::/0 in
++-A ufw6-user-input -p udp --dport 23 --sport 13 -j ACCEPT
+ 
+-217: delete allow to any port 23 from any port ssh proto udp
++217: delete allow to any port 23 from any port daytime proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-218: allow to any port ssh from any port domain proto udp
++218: allow to any port daytime from any port domain proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow udp 22 ::/0 53 ::/0 in
+--A ufw6-user-input -p udp --dport 22 --sport 53 -j ACCEPT
++### tuple ### allow udp 13 ::/0 53 ::/0 in
++-A ufw6-user-input -p udp --dport 13 --sport 53 -j ACCEPT
+ 
+-219: delete allow to any port ssh from any port domain proto udp
++219: delete allow to any port daytime from any port domain proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+@@ -1575,63 +1575,63 @@ WARN: Checks disabled
+ Rules updated (v6)
+ 
+ 
+-236: allow to 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 80:83,22 proto tcp
++236: allow to 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 80:83,13 proto tcp
+ WARN: Checks disabled
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow tcp 22,80:83 2001:db8:85a3:8d3:1319:8a2e:370:7341 any ::/0 in
+--A ufw6-user-input -p tcp -m multiport --dports 22,80:83 -d 2001:db8:85a3:8d3:1319:8a2e:370:7341 -j ACCEPT
++### tuple ### allow tcp 13,80:83 2001:db8:85a3:8d3:1319:8a2e:370:7341 any ::/0 in
++-A ufw6-user-input -p tcp -m multiport --dports 13,80:83 -d 2001:db8:85a3:8d3:1319:8a2e:370:7341 -j ACCEPT
+ 
+-237: delete allow to 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 80:83,22 proto tcp
++237: delete allow to 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 80:83,13 proto tcp
+ WARN: Checks disabled
+ Rules updated (v6)
+ 
+ 
+-238: allow from 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 35:39 to 2001:db8:85a3:8d3:1319:8a2e:370:7342 port 22 proto tcp
++238: allow from 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 35:39 to 2001:db8:85a3:8d3:1319:8a2e:370:7342 port 13 proto tcp
+ WARN: Checks disabled
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow tcp 22 2001:db8:85a3:8d3:1319:8a2e:370:7342 35:39 2001:db8:85a3:8d3:1319:8a2e:370:7341 in
+--A ufw6-user-input -p tcp -m multiport --dports 22 -m multiport --sports 35:39 -d 2001:db8:85a3:8d3:1319:8a2e:370:7342 -s 2001:db8:85a3:8d3:1319:8a2e:370:7341 -j ACCEPT
++### tuple ### allow tcp 13 2001:db8:85a3:8d3:1319:8a2e:370:7342 35:39 2001:db8:85a3:8d3:1319:8a2e:370:7341 in
++-A ufw6-user-input -p tcp -m multiport --dports 13 -m multiport --sports 35:39 -d 2001:db8:85a3:8d3:1319:8a2e:370:7342 -s 2001:db8:85a3:8d3:1319:8a2e:370:7341 -j ACCEPT
+ 
+-239: delete allow from 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 35:39 to 2001:db8:85a3:8d3:1319:8a2e:370:7342 port 22 proto tcp
++239: delete allow from 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 35:39 to 2001:db8:85a3:8d3:1319:8a2e:370:7342 port 13 proto tcp
+ WARN: Checks disabled
+ Rules updated (v6)
+ 
+ 
+-240: allow to any port 23,21,15:19,22 from any port 24:26 proto udp
++240: allow to any port 23,21,15:19,13 from any port 24:26 proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow udp 15:19,21,22,23 0.0.0.0/0 24:26 0.0.0.0/0 in
+--A ufw-user-input -p udp -m multiport --dports 15:19,21,22,23 -m multiport --sports 24:26 -j ACCEPT
++### tuple ### allow udp 13,15:19,21,23 0.0.0.0/0 24:26 0.0.0.0/0 in
++-A ufw-user-input -p udp -m multiport --dports 13,15:19,21,23 -m multiport --sports 24:26 -j ACCEPT
+ 
+-### tuple ### allow udp 15:19,21,22,23 ::/0 24:26 ::/0 in
+--A ufw6-user-input -p udp -m multiport --dports 15:19,21,22,23 -m multiport --sports 24:26 -j ACCEPT
++### tuple ### allow udp 13,15:19,21,23 ::/0 24:26 ::/0 in
++-A ufw6-user-input -p udp -m multiport --dports 13,15:19,21,23 -m multiport --sports 24:26 -j ACCEPT
+ 
+-241: delete allow to any port 23,21,15:19,22 from any port 24:26 proto udp
++241: delete allow to any port 23,21,15:19,13 from any port 24:26 proto udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-242: allow 23,21,15:19,22/udp
++242: allow 23,21,15:19,13/udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+ 
+ 
+-### tuple ### allow udp 15:19,21,22,23 0.0.0.0/0 any 0.0.0.0/0 in
+--A ufw-user-input -p udp -m multiport --dports 15:19,21,22,23 -j ACCEPT
++### tuple ### allow udp 13,15:19,21,23 0.0.0.0/0 any 0.0.0.0/0 in
++-A ufw-user-input -p udp -m multiport --dports 13,15:19,21,23 -j ACCEPT
+ 
+-### tuple ### allow udp 15:19,21,22,23 ::/0 any ::/0 in
+--A ufw6-user-input -p udp -m multiport --dports 15:19,21,22,23 -j ACCEPT
++### tuple ### allow udp 13,15:19,21,23 ::/0 any ::/0 in
++-A ufw6-user-input -p udp -m multiport --dports 13,15:19,21,23 -j ACCEPT
+ 
+-243: delete allow 23,21,15:19,22/udp
++243: delete allow 23,21,15:19,13/udp
+ WARN: Checks disabled
+ Rules updated
+ Rules updated (v6)
+diff --git a/tests/root/valid6/runtest.sh b/tests/root/valid6/runtest.sh
+index 1695dd1..d08e6f3 100755
+--- a/tests/root/valid6/runtest.sh
++++ b/tests/root/valid6/runtest.sh
+@@ -154,13 +154,13 @@ do_cmd "0"  allow to any port smtp from any port smtp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port smtp from any port smtp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port smtp from any port ssh
++do_cmd "0"  allow to any port smtp from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port smtp from any port ssh
++do_cmd "0"  delete allow to any port smtp from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port smtp
++do_cmd "0"  allow to any port daytime from any port smtp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port smtp
++do_cmd "0"  delete allow to any port daytime from any port smtp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0"  allow to any port smtp from any port 23
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+@@ -174,13 +174,13 @@ do_cmd "0"  allow to any port tftp from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port tftp from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port tftp from any port ssh
++do_cmd "0"  allow to any port tftp from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port tftp from any port ssh
++do_cmd "0"  delete allow to any port tftp from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port tftp
++do_cmd "0"  allow to any port daytime from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port tftp
++do_cmd "0"  delete allow to any port daytime from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0"  allow to any port tftp from any port 23
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+@@ -190,30 +190,30 @@ do_cmd "0"  allow to any port 23 from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port 23 from any port tftp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port 23
++do_cmd "0"  allow to any port daytime from any port 23
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port 23
++do_cmd "0"  delete allow to any port daytime from any port 23
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port 23 from any port ssh
++do_cmd "0"  allow to any port 23 from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port 23 from any port ssh
++do_cmd "0"  delete allow to any port 23 from any port daytime
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port domain
++do_cmd "0"  allow to any port daytime from any port domain
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port domain
++do_cmd "0"  delete allow to any port daytime from any port domain
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ 
+ do_cmd "0"  allow to any port smtp from any port smtp proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port smtp from any port smtp proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port smtp from any port ssh proto tcp
++do_cmd "0"  allow to any port smtp from any port daytime proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port smtp from any port ssh proto tcp
++do_cmd "0"  delete allow to any port smtp from any port daytime proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port smtp proto tcp
++do_cmd "0"  allow to any port daytime from any port smtp proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port smtp proto tcp
++do_cmd "0"  delete allow to any port daytime from any port smtp proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0"  allow to any port smtp from any port 23 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+@@ -227,13 +227,13 @@ do_cmd "0"  allow to any port tftp from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port tftp from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port tftp from any port ssh proto udp
++do_cmd "0"  allow to any port tftp from any port daytime proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port tftp from any port ssh proto udp
++do_cmd "0"  delete allow to any port tftp from any port daytime proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port tftp proto udp
++do_cmd "0"  allow to any port daytime from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port tftp proto udp
++do_cmd "0"  delete allow to any port daytime from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0"  allow to any port tftp from any port 23 proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+@@ -243,29 +243,29 @@ do_cmd "0"  allow to any port 23 from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0"  delete allow to any port 23 from any port tftp proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port 23 proto tcp
++do_cmd "0"  allow to any port daytime from any port 23 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port 23 proto tcp
++do_cmd "0"  delete allow to any port daytime from any port 23 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port 23 from any port ssh proto tcp
++do_cmd "0"  allow to any port 23 from any port daytime proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port 23 from any port ssh proto tcp
++do_cmd "0"  delete allow to any port 23 from any port daytime proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port domain proto tcp
++do_cmd "0"  allow to any port daytime from any port domain proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port domain proto tcp
++do_cmd "0"  delete allow to any port daytime from any port domain proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port 23 proto udp
++do_cmd "0"  allow to any port daytime from any port 23 proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port 23 proto udp
++do_cmd "0"  delete allow to any port daytime from any port 23 proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port 23 from any port ssh proto udp
++do_cmd "0"  allow to any port 23 from any port daytime proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port 23 from any port ssh proto udp
++do_cmd "0"  delete allow to any port 23 from any port daytime proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  allow to any port ssh from any port domain proto udp
++do_cmd "0"  allow to any port daytime from any port domain proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0"  delete allow to any port ssh from any port domain proto udp
++do_cmd "0"  delete allow to any port daytime from any port domain proto udp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ 
+ echo "TESTING NETMASK" >> $TESTTMP/result
+@@ -303,24 +303,24 @@ do_cmd "0" allow to 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 80:83 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ do_cmd "0" delete allow to 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 80:83 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0" allow to 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 80:83,22 proto tcp
++do_cmd "0" allow to 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 80:83,13 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0" delete allow to 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 80:83,22 proto tcp
++do_cmd "0" delete allow to 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 80:83,13 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0" allow from 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 35:39 to 2001:db8:85a3:8d3:1319:8a2e:370:7342 port 22 proto tcp
++do_cmd "0" allow from 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 35:39 to 2001:db8:85a3:8d3:1319:8a2e:370:7342 port 13 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0" delete allow from 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 35:39 to 2001:db8:85a3:8d3:1319:8a2e:370:7342 port 22 proto tcp
++do_cmd "0" delete allow from 2001:db8:85a3:8d3:1319:8a2e:370:7341 port 35:39 to 2001:db8:85a3:8d3:1319:8a2e:370:7342 port 13 proto tcp
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0" allow to any port 23,21,15:19,22 from any port 24:26 proto udp
++do_cmd "0" allow to any port 23,21,15:19,13 from any port 24:26 proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0" delete allow to any port 23,21,15:19,22 from any port 24:26 proto udp
++do_cmd "0" delete allow to any port 23,21,15:19,13 from any port 24:26 proto udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0" allow 23,21,15:19,22/udp
++do_cmd "0" allow 23,21,15:19,13/udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+-do_cmd "0" delete allow 23,21,15:19,22/udp
++do_cmd "0" delete allow 23,21,15:19,13/udp
+ grep -A2 "tuple" $TESTSTATE/user.rules >> $TESTTMP/result
+ grep -A2 "tuple" $TESTSTATE/user6.rules >> $TESTTMP/result
+ 

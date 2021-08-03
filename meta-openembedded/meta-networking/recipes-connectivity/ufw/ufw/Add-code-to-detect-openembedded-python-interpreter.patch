@@ -1,0 +1,33 @@
+Add code to detect openembedded python interpreter
+
+OE does not use /usr/bin/env as part of the interpreter, so it does not
+update ufw with the interpreter name.
+
+Upstream-Status: Inappropriate (Embedded)
+Signed-off-by: Jate Sujjavanich <jatedev@gmail.com>
+---
+ setup.py | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/setup.py b/setup.py
+index 75c1105..3f9a5e0 100644
+--- a/setup.py
++++ b/setup.py
+@@ -128,6 +128,14 @@ class Install(_install, object):
+                              "-i.jjm",
+                              "1s%^#.*python.*%#! " + sys.executable + "%g",
+                              'staging/ufw'])
++        elif '-native/python' in sys.executable and \
++            os.path.basename(sys.executable) in ['python', 'python3']:
++            print("Detected oe native python " + os.path.basename(sys.executable))
++            subprocess.call(["sed",
++                             "-i.jjm",
++                            "1s%python$%"
++                            + os.path.basename(sys.executable) + "%g",
++                             'staging/ufw'])
+ 
+         self.copy_file('staging/ufw', script)
+         self.copy_file('doc/ufw.8', manpage)
+-- 
+2.7.4
+

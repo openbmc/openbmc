@@ -1,0 +1,93 @@
+support ./setup.py build (LP: #819600)
+
+Written by Jamie Strandboge <jamie@canonical.com>
+
+The patch was imported from git://git.launchpad.net/ufw
+commit id 10dc74cdc0948e4038d2921e7428cbf2896df98c
+
+Removed ChangeLog patch due to backport status of this patch.
+Modified for statement to match the one in 0.33 setup.py
+
+Upstream-Status: Backport
+Signed-off-by: Jate Sujjavanich <jatedev@gmail.com>
+
+diff --git a/setup.py b/setup.py
+index 730c568..4e1ec9a 100644
+--- a/setup.py
++++ b/setup.py
+@@ -64,37 +64,44 @@ class Install(_install, object):
+         real_sharedir = os.path.join(real_prefix, 'share', 'ufw')
+ 
+         # Update the modules' paths
+-        for file in [ 'common.py', 'util.py' ]:
+-            print("Updating " + file)
+-            subprocess.call(["sed",
+-                             "-i",
+-                             "s%#CONFIG_PREFIX#%" + real_confdir + "%g",
+-                             os.path.join('staging', file)])
+-
+-            subprocess.call(["sed",
+-                             "-i",
+-                             "s%#STATE_PREFIX#%" + real_statedir + "%g",
+-                             os.path.join('staging', file)])
+-
+-            subprocess.call(["sed",
+-                             "-i",
+-                             "s%#PREFIX#%" + real_prefix + "%g",
+-                             os.path.join('staging', file)])
+-
+-            subprocess.call(["sed",
+-                             "-i",
+-                             "s%#IPTABLES_DIR#%" + iptables_dir + "%g",
+-                             os.path.join('staging', file)])
+-
+-            subprocess.call(["sed",
+-                             "-i",
+-                             "s%#SHARE_DIR#%" + real_sharedir + "%g",
+-                             os.path.join('staging', file)])
+-
+-            subprocess.call(["sed",
+-                             "-i.jjm",
+-                             "s%/sbin/iptables%" + iptables_exe + "%g",
+-                             os.path.join('staging', file)])
++        for fn in [ 'common.py', 'util.py' ]:
++            # 'staging' is used with just 'install' but build_lib is used when
++            # using 'build'. We could probably override 'def build()' but this
++            # at least works
++            for d in [os.path.join(self.build_lib, "ufw"), 'staging']:
++                f = os.path.join(d, fn)
++                if not os.path.exists(f):
++                    continue
++                print("Updating " + f)
++                subprocess.call(["sed",
++                                "-i",
++                                "s%#CONFIG_PREFIX#%" + real_confdir + "%g",
++                                f])
++
++                subprocess.call(["sed",
++                                "-i",
++                                "s%#STATE_PREFIX#%" + real_statedir + "%g",
++                                f])
++
++                subprocess.call(["sed",
++                                "-i",
++                                "s%#PREFIX#%" + real_prefix + "%g",
++                                f])
++
++                subprocess.call(["sed",
++                                "-i",
++                                "s%#IPTABLES_DIR#%" + iptables_dir + "%g",
++                                f])
++
++                subprocess.call(["sed",
++                                "-i",
++                                "s%#SHARE_DIR#%" + real_sharedir + "%g",
++                                f])
++
++                subprocess.call(["sed",
++                                "-i.jjm",
++                                "s%/sbin/iptables%" + iptables_exe + "%g",
++                                f])
+ 
+         # Now byte-compile everything
+         super(Install, self).run()

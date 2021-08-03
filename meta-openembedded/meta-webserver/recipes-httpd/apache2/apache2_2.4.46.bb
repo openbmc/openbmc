@@ -15,6 +15,11 @@ SRC_URI = "${APACHE_MIRROR}/httpd/httpd-${PV}.tar.bz2 \
            file://0007-apache2-allow-to-disable-selinux-support.patch \
            file://apache-configure_perlbin.patch \
            file://0001-support-apxs.in-force-destdir-to-be-empty-string.patch \
+           file://CVE-2020-13950.patch \
+           file://CVE-2020-35452.patch \
+           file://CVE-2021-26690.patch \
+           file://CVE-2021-26691.patch \
+           file://CVE-2021-30641.patch \
           "
 
 SRC_URI_append_class-target = " \

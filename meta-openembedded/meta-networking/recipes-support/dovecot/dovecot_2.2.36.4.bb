@@ -67,3 +67,6 @@ FILES_${PN} += "${libdir}/dovecot/*plugin.so \
 FILES_${PN}-staticdev += "${libdir}/dovecot/*/*.a"
 FILES_${PN}-dev += "${libdir}/dovecot/libdovecot*.so"
 FILES_${PN}-dbg += "${libdir}/dovecot/*/.debug"
+
+# CVE-2016-4983 affects only postinstall script on specific distribution
+CVE_CHECK_WHITELIST += "CVE-2016-4983"
