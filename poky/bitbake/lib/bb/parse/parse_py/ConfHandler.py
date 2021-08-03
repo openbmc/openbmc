@@ -20,7 +20,7 @@ from bb.parse import ParseError, resolve_file, ast, logger, handle
 __config_regexp__  = re.compile( r"""
     ^
     (?P<exp>export\s+)?
-    (?P<var>[a-zA-Z0-9\-_+.${}/~]+?)
+    (?P<var>[a-zA-Z0-9\-_+.${}/~:]+?)
     (\[(?P<flag>[a-zA-Z0-9\-_+.]+)\])?
 
     \s* (
