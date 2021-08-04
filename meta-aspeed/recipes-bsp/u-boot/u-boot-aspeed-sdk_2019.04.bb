@@ -14,6 +14,10 @@ SRC_URI += " \
             file://rsa_pub_oem_dss_key.pem;sha256sum=40132a694a10af2d1b094b1cb5adab4d6b4db2a35e02d848b2b6a85e60738264 \
            "
 
+SOCSEC_SIGN_KEY ?= "${WORKDIR}/rsa_oem_dss_key.pem"
+SOCSEC_SIGN_ALGO ?= "RSA4096_SHA512"
+SOCSEC_SIGN_EXTRA_OPTS ?= "--stack_intersects_verification_region=false"
+
 UBOOT_ENV_SIZE:df-phosphor-mmc = "0x10000"
 UBOOT_ENV:df-phosphor-mmc = "u-boot-env"
 UBOOT_ENV_SUFFIX:df-phosphor-mmc = "bin"
