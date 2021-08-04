@@ -4,7 +4,7 @@ source /usr/sbin/gpio-defs.sh
 
 # Usage of this utility
 function usage() {
-  echo "usage: power-util mb [on|status|cycle|reset|graceful_reset|force_reset|soft_off]";
+  echo "usage: power-util mb [status|shutdown_ack|force_reset|soft_off]";
 }
 
 power_status() {
@@ -22,24 +22,8 @@ shutdown_ack() {
     touch /run/openbmc/host@0-softpoweroff-shutdown-ack
   else
     echo "Receive shutdown ACK triggered"
-<<<<<<< HEAD
-  fi
-}
-
-graceful_shutdown() {
-  if [ -f "/run/openbmc/host@0-request" ]; then
-    echo "shutdown host immediately"
-    power_off
-  else
-    echo "Triggering graceful shutdown"
-    gpioset -l 0 49=1
-    sleep 1
-    gpioset -l 0 49=0
-    sleep 30s
-=======
     sleep 3
     systemctl start obmc-chassis-poweroff@0.target
->>>>>>> 397e033ef... meta-ampere: power control: refactor host power control
   fi
 }
 
