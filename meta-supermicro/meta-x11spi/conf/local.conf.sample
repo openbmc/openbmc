@@ -215,8 +215,4 @@ BB_DISKMON_DIRS = "\
 CONF_VERSION = "1"
 
 # Set the root password to '0penBmc'
-INHERIT += "extrausers"
-
-EXTRA_USERS_PARAMS = " \
-  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
-  "
+# Defaults from meta-phosphor/conf/distro/include/phosphor-defaults.inc

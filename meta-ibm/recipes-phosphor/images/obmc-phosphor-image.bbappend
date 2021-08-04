@@ -33,6 +33,7 @@ IMAGE_FEATURES_remove_witherspoon = "obmc-user-mgmt-ldap"
 #     The service account does not have a home directory.  The home directory is
 #     set to / (the root directory) to allow dropbear ssh connections.
 
+# Override defaults from meta-phosphor/conf/distro/include/phosphor-defaults.inc
 inherit extrausers
 
 # The password hash used here is the traditional 0penBmc password.

@@ -243,6 +243,7 @@ SECURITY_CFLAGS_pn-pldm = ""
 EXTRA_OEMESON_append_class-target = " -Db_lto=true"
 
 # Set the root password to '0penBmc'
+# Override this in your local.conf
 inherit extrausers
 
 EXTRA_USERS_PARAMS_pn-obmc-phosphor-image = " \
