@@ -4,14 +4,14 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "git://github.com/yrutschle/sslh"
-SRCREV = "de0ec959d944d719cc75736864290dc35c3ff685"
+SRCREV = "63f9c4a582f79f4d0e484efe0ccaeed77a79f7df"
 S = "${WORKDIR}/git"
 
 DEPENDS += "libbsd"
 DEPENDS += "libcap"
 DEPENDS += "libconfig"
 DEPENDS += "systemd"
-DEPENDS += "pcre"
+DEPENDS += "pcre2"
 
 EXTRA_OEMAKE += "DESTDIR=${D}"
 EXTRA_OEMAKE += "PREFIX=${prefix}"
