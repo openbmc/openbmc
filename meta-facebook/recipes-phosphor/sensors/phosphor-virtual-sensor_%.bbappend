@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}/${MACHINE}:"
 
-SRC_URI_append = " file://${MACHINE}_sensor_config.json"
+SRC_URI:append = " file://${MACHINE}_sensor_config.json"
 
-do_install_append() {
+do_install:append() {
 
     install -d ${D}/usr/share/phosphor-virtual-sensor
 

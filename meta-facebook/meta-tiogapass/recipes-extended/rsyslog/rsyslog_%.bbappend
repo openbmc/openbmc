@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://rsyslog.conf \
            file://rsyslog.logrotate \
@@ -6,12 +6,12 @@ SRC_URI += "file://rsyslog.conf \
            file://rotate-event-logs.timer \
 "
 
-PACKAGECONFIG_append = " imjournal"
+PACKAGECONFIG:append = " imjournal"
 
-do_install_append() {
+do_install:append() {
         install -m 0644 ${WORKDIR}/rotate-event-logs.service ${D}${systemd_system_unitdir}
         install -m 0644 ${WORKDIR}/rotate-event-logs.timer ${D}${systemd_system_unitdir}
         rm ${D}${sysconfdir}/rsyslog.d/imjournal.conf
 }
 
-SYSTEMD_SERVICE_${PN} += " rotate-event-logs.service rotate-event-logs.timer"
+SYSTEMD_SERVICE:${PN} += " rotate-event-logs.service rotate-event-logs.timer"
