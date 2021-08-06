@@ -59,7 +59,7 @@ sign_spl() {
 }
 
 
-do_deploy_append() {
+do_deploy:append() {
     if [ "${SOCSEC_SIGN_ENABLE}" = "1" -a -n "${SPL_BINARY}" ] ; then
         sign_spl
     fi

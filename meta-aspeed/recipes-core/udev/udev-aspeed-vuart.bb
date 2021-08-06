@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 S = "${WORKDIR}"
 SRC_URI += "file://61-aspeed-vuart.rules"
 
-RDEPENDS_${PN} += "udev"
+RDEPENDS:${PN} += "udev"
 
 do_install() {
     install -d ${D}/lib/udev/rules.d
