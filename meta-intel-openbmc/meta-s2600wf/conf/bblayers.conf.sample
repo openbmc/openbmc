@@ -1,6 +1,6 @@
 # LAYER_CONF_VERSION is increased each time build/conf/bblayers.conf
 # changes incompatibly
-LCONF_VERSION = "9"
+LCONF_VERSION = "8"
 
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""

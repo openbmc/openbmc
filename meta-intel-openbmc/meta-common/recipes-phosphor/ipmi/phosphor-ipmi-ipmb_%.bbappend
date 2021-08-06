@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI_append = " file://ipmb-channels.json"
+SRC_URI:append = " file://ipmb-channels.json"
 
-do_install_append(){
+do_install:append(){
     install -m 0644 -D ${WORKDIR}/ipmb-channels.json \
                    ${D}/usr/share/ipmbbridge
 }

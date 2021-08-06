@@ -21,12 +21,12 @@ LIBRARY_NAMES = "libzinteloemcmds.so"
 HOSTIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
 NETIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
 
-FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
-FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
-FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
-FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV}"
+FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
+FILES:${PN}:append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
+FILES:${PN}:append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
+FILES:${PN}-dev:append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV}"
 
-do_install_append(){
+do_install:append(){
    install -d ${D}${includedir}/intel-ipmi-oem
    install -m 0644 -D ${S}/include/*.hpp ${D}${includedir}/intel-ipmi-oem
 }

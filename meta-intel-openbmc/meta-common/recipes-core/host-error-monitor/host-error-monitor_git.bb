@@ -11,6 +11,6 @@ SRCREV = "4a6e45c4c2f38bc64afe5faac05ea82b3adb8d93"
 
 S = "${WORKDIR}/git"
 
-SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.HostErrorMonitor.service"
+SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.HostErrorMonitor.service"
 
 EXTRA_OECMAKE = "-DYOCTO=1"

@@ -1,1 +1,1 @@
-FILESEXTRAPATHS_prepend_s2600wf := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:s2600wf := "${THISDIR}/${PN}:"

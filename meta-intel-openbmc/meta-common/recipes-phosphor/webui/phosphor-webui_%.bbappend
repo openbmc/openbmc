@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend_intel := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:intel := "${THISDIR}/${PN}:"
 
-SRC_URI_append_intel = " file://config.json"
+SRC_URI:append:intel = " file://config.json"
 
-do_compile_prepend_intel() {
+do_compile:prepend:intel() {
         cp -r ${WORKDIR}/config.json ${S}/
 }
 

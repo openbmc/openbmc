@@ -1,1 +1,1 @@
-PACKAGECONFIG_append_intel = " log-threshold"
+PACKAGECONFIG:append:intel = " log-threshold"

@@ -12,7 +12,7 @@ SRCREV = "bcc7ce1f418c1a16a7868fee62499fa677242254"
 
 S = "${WORKDIR}/git"
 
-SYSTEMD_SERVICE_${PN} = "xyz.openbmc_project.PFR.Manager.service"
+SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.PFR.Manager.service"
 
 DEPENDS += " \
     sdbusplus \
