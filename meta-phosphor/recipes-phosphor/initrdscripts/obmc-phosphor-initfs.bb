@@ -7,7 +7,7 @@ PR = "r1"
 
 inherit allarch
 
-RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_base-utils}"
+RDEPENDS:${PN} += "${VIRTUAL-RUNTIME_base-utils}"
 
 S = "${WORKDIR}"
 SRC_URI += "file://obmc-init.sh"
@@ -31,5 +31,5 @@ do_install() {
         mknod -m 622 ${D}/dev/console c 5 1
 }
 
-FILES_${PN} += " /init /shutdown /update /whitelist /dev "
-FILES_${PN} += " /init-options /init-download-url "
+FILES:${PN} += " /init /shutdown /update /whitelist /dev "
+FILES:${PN} += " /init-options /init-download-url "

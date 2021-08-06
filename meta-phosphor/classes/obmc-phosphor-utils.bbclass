@@ -1,4 +1,4 @@
-def set_append(d, var, val, sep=' '):
+def set_doappend(d, var, val, sep=' '):
     values = (d.getVar(var, True) or '').split(sep)
     if filter(bool, values):
         d.appendVar(var, '%s%s' %(sep, val))

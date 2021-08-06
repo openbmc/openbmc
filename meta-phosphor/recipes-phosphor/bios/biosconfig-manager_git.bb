@@ -18,7 +18,7 @@ SRCREV = "5e2cb7206e695662f09c7cb4e0c73ba11686acaa"
 inherit meson pkgconfig systemd
 
 S = "${WORKDIR}/git"
-SYSTEMD_SERVICE_${PN} = "xyz.openbmc_project.biosconfig_manager.service \
+SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.biosconfig_manager.service \
                          xyz.openbmc_project.biosconfig_password.service"
 
 DEPENDS = " boost \

@@ -1,6 +1,6 @@
 # Base image version class extension
 
-DEPENDS_append = " os-release"
+DEPENDS:append = " os-release"
 
 def do_get_version(d):
     import configparser

@@ -1,1 +1,1 @@
-EXTRA_OECMAKE_append_openbmc-phosphor = "-DBOOST_URL_STANDALONE=ON"
+EXTRA_OECMAKE:append:openbmc-phosphor = "-DBOOST_URL_STANDALONE=ON"

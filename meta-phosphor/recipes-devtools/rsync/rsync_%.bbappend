@@ -1,7 +1,7 @@
-EXTRA_OECONF_append_class-target += " --disable-largefile --disable-locale \
+EXTRA_OECONF:append:class-target += " --disable-largefile --disable-locale \
                                       --disable-iconv --without-included-popt \
                                       --without-included-zlib"
 
 PACKAGECONFIG = ""
 
-DEPENDS_append_class-target = " popt zlib"
+DEPENDS:append:class-target = " popt zlib"

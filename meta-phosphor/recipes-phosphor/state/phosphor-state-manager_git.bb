@@ -23,7 +23,7 @@ STATE_MGR_PACKAGES = " \
     ${PN}-scheduled-host-transition \
 "
 PACKAGE_BEFORE_PN += "${STATE_MGR_PACKAGES}"
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 DBUS_PACKAGES = "${STATE_MGR_PACKAGES}"
 
@@ -38,10 +38,10 @@ SYSTEMD_PACKAGES = "${PN}-discover \
 # sensors on a BMC reset or system power loss.
 # Neither is required for host state function but are
 # recommended to deal properly with these reset scenarios.
-RRECOMMENDS_${PN}-host = "${PN}-host-check ${PN}-reset-sensor-states"
+RRECOMMENDS:${PN}-host = "${PN}-host-check ${PN}-reset-sensor-states"
 
 # The obmc-targets are the base targets required to boot a computer system
-RRECOMMENDS_${PN}-host += "${PN}-obmc-targets"
+RRECOMMENDS:${PN}-host += "${PN}-obmc-targets"
 
 inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
@@ -55,45 +55,45 @@ DEPENDS += "libcereal"
 DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
 
-RDEPENDS_${PN}-chassis += "bash"
+RDEPENDS:${PN}-chassis += "bash"
 
 EXTRA_OEMESON += "-Dtests=disabled"
 
-FILES_${PN}-host = "${bindir}/phosphor-host-state-manager"
-DBUS_SERVICE_${PN}-host += "xyz.openbmc_project.State.Host.service"
-DBUS_SERVICE_${PN}-host += "phosphor-reboot-host@.service"
-SYSTEMD_SERVICE_${PN}-host += "phosphor-reset-host-reboot-attempts@.service"
-SYSTEMD_SERVICE_${PN}-host += "phosphor-clear-one-time@.service"
-SYSTEMD_SERVICE_${PN}-host += "phosphor-set-host-transition-to-running@.service"
-SYSTEMD_SERVICE_${PN}-host += "phosphor-set-host-transition-to-off@.service"
+FILES:${PN}-host = "${bindir}/phosphor-host-state-manager"
+DBUS_SERVICE:${PN}-host += "xyz.openbmc_project.State.Host.service"
+DBUS_SERVICE:${PN}-host += "phosphor-reboot-host@.service"
+SYSTEMD_SERVICE:${PN}-host += "phosphor-reset-host-reboot-attempts@.service"
+SYSTEMD_SERVICE:${PN}-host += "phosphor-clear-one-time@.service"
+SYSTEMD_SERVICE:${PN}-host += "phosphor-set-host-transition-to-running@.service"
+SYSTEMD_SERVICE:${PN}-host += "phosphor-set-host-transition-to-off@.service"
 
-FILES_${PN}-chassis = "${bindir}/phosphor-chassis-state-manager"
-DBUS_SERVICE_${PN}-chassis += "xyz.openbmc_project.State.Chassis.service"
+FILES:${PN}-chassis = "${bindir}/phosphor-chassis-state-manager"
+DBUS_SERVICE:${PN}-chassis += "xyz.openbmc_project.State.Chassis.service"
 
-FILES_${PN}-chassis += "${bindir}/obmcutil"
+FILES:${PN}-chassis += "${bindir}/obmcutil"
 
-FILES_${PN}-bmc = "${bindir}/phosphor-bmc-state-manager"
-DBUS_SERVICE_${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
+FILES:${PN}-bmc = "${bindir}/phosphor-bmc-state-manager"
+DBUS_SERVICE:${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
 
-FILES_${PN}-hypervisor = "${bindir}/phosphor-hypervisor-state-manager"
-DBUS_SERVICE_${PN}-hypervisor += "xyz.openbmc_project.State.Hypervisor.service"
+FILES:${PN}-hypervisor = "${bindir}/phosphor-hypervisor-state-manager"
+DBUS_SERVICE:${PN}-hypervisor += "xyz.openbmc_project.State.Hypervisor.service"
 
-FILES_${PN}-discover = "${bindir}/phosphor-discover-system-state"
-SYSTEMD_SERVICE_${PN}-discover += "phosphor-discover-system-state@.service"
+FILES:${PN}-discover = "${bindir}/phosphor-discover-system-state"
+SYSTEMD_SERVICE:${PN}-discover += "phosphor-discover-system-state@.service"
 
-FILES_${PN}-host-check = "${bindir}/phosphor-host-check"
-SYSTEMD_SERVICE_${PN}-host-check += "phosphor-reset-host-running@.service"
+FILES:${PN}-host-check = "${bindir}/phosphor-host-check"
+SYSTEMD_SERVICE:${PN}-host-check += "phosphor-reset-host-running@.service"
 
-SYSTEMD_SERVICE_${PN}-reset-sensor-states += "phosphor-reset-sensor-states@.service"
+SYSTEMD_SERVICE:${PN}-reset-sensor-states += "phosphor-reset-sensor-states@.service"
 
-FILES_${PN}-systemd-target-monitor = " \
+FILES:${PN}-systemd-target-monitor = " \
     ${bindir}/phosphor-systemd-target-monitor \
     ${sysconfdir}/phosphor-systemd-target-monitor/phosphor-target-monitor-default.json \
     "
-SYSTEMD_SERVICE_${PN}-systemd-target-monitor += "phosphor-systemd-target-monitor.service"
+SYSTEMD_SERVICE:${PN}-systemd-target-monitor += "phosphor-systemd-target-monitor.service"
 
-FILES_${PN}-scheduled-host-transition = "${bindir}/phosphor-scheduled-host-transition"
-DBUS_SERVICE_${PN}-scheduled-host-transition += "xyz.openbmc_project.State.ScheduledHostTransition.service"
+FILES:${PN}-scheduled-host-transition = "${bindir}/phosphor-scheduled-host-transition"
+DBUS_SERVICE:${PN}-scheduled-host-transition += "xyz.openbmc_project.State.ScheduledHostTransition.service"
 
 # Chassis power synchronization targets
 # - start-pre:         Services to run before we start power on process
@@ -162,17 +162,17 @@ CRASH_TIMEOUT_TGTFMT = "obmc-host-{0}@{1}.target"
 QUIESCE_INSTFMT = "obmc-host-quiesce@{1}.target"
 QUIESCE_FMT = "../${QUIESCE_TMPL}:${CRASH_TIMEOUT_TGTFMT}.wants/${QUIESCE_INSTFMT}"
 
-SYSTEMD_SERVICE_${PN}-obmc-targets += " \
+SYSTEMD_SERVICE:${PN}-obmc-targets += " \
         obmc-fans-ready.target \
         obmc-fan-control.target \
         obmc-fan-control-ready@.target \
         obmc-fan-watchdog-takeover.target \
         "
 
-SYSTEMD_SERVICE_${PN}-obmc-targets += "${@compose_list(d, 'CHASSIS_SYNCH_FMT', 'CHASSIS_SYNCH_TARGETS')}"
-SYSTEMD_SERVICE_${PN}-obmc-targets += "${@compose_list(d, 'CHASSIS_ACTION_FMT', 'CHASSIS_ACTION_TARGETS')}"
-SYSTEMD_SERVICE_${PN}-obmc-targets += "${@compose_list(d, 'HOST_SYNCH_FMT', 'HOST_SYNCH_TARGETS')}"
-SYSTEMD_SERVICE_${PN}-obmc-targets += "${@compose_list(d, 'HOST_ACTION_FMT', 'HOST_ACTION_TARGETS')}"
+SYSTEMD_SERVICE:${PN}-obmc-targets += "${@compose_list(d, 'CHASSIS_SYNCH_FMT', 'CHASSIS_SYNCH_TARGETS')}"
+SYSTEMD_SERVICE:${PN}-obmc-targets += "${@compose_list(d, 'CHASSIS_ACTION_FMT', 'CHASSIS_ACTION_TARGETS')}"
+SYSTEMD_SERVICE:${PN}-obmc-targets += "${@compose_list(d, 'HOST_SYNCH_FMT', 'HOST_SYNCH_TARGETS')}"
+SYSTEMD_SERVICE:${PN}-obmc-targets += "${@compose_list(d, 'HOST_ACTION_FMT', 'HOST_ACTION_TARGETS')}"
 
 SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'CHASSIS_LINK_SYNCH_FMT', 'CHASSIS_SYNCH_TARGETS', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_LINK_${PN}-obmc-targets += "${@compose_list(d, 'CHASSIS_LINK_ACTION_FMT', 'CHASSIS_ACTION_TARGETS', 'OBMC_CHASSIS_INSTANCES')}"

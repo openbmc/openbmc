@@ -11,7 +11,7 @@ INSECURE_KEY = "${@'${SIGNING_KEY}' == '${STAGING_DIR_NATIVE}${datadir}/OpenBMC.
 DEPENDS += "openssl-native"
 DEPENDS += "${@oe.utils.conditional('INSECURE_KEY', 'True', 'phosphor-insecure-signing-key-native', '', d)}"
 
-FILES_${PN} += "${sysconfdir}/activationdata/"
+FILES:${PN} += "${sysconfdir}/activationdata/"
 
 SIGNING_KEY ?= "${STAGING_DIR_NATIVE}${datadir}/OpenBMC.priv"
 SIGNING_KEY_TYPE = "${@os.path.splitext(os.path.basename('${SIGNING_KEY}'))[0]}"
@@ -27,4 +27,4 @@ do_install() {
 	install -m 644 ${WORKDIR}/hashfunc ${idir}
 }
 
-SYSROOT_DIRS_append = " ${sysconfdir}"
+SYSROOT_DIRS:append = " ${sysconfdir}"

@@ -231,16 +231,16 @@ require conf/distro/include/security_flags.inc
 
 # Disable security on croserver.
 # Remove if https://github.com/open-power/eCMD/pull/433 is ever merged
-SECURITY_STRINGFORMAT_pn-croserver = ""
+SECURITY_STRINGFORMAT:pn-croserver = ""
 # obmc-libobmc-intf doesn't compile with security flags enabled
-SECURITY_CFLAGS_pn-obmc-libobmc-intf = ""
+SECURITY_CFLAGS:pn-obmc-libobmc-intf = ""
 
 # remove when https://gerrit.openbmc-project.xyz/c/openbmc/pldm/+/39984
 # is merged and rev bumped
-SECURITY_CFLAGS_pn-pldm = ""
+SECURITY_CFLAGS:pn-pldm = ""
 
 # We generally want to enable LTO with meson
-EXTRA_OEMESON_append_class-target = " -Db_lto=true"
+EXTRA_OEMESON:append:class-target = " -Db_lto=true"
 
 # Set the root password to '0penBmc'
 # Override this in your local.conf
@@ -250,6 +250,6 @@ inherit extrausers
 # salted and hashed with SHA512 suitable for /etc/shadow or `usermod -p`.
 DEFAULT_OPENBMC_PASSWORD = "'\$6\$UGMqyqdG\$GqTb3tXPFx9AJlzTw/8X5RoW2Z.100dT.acuk8AFJfNQYr.ZRL8itMIgLqsdq46RNHgiv78XayOSl.IbR4DFU.'"
 
-EXTRA_USERS_PARAMS_pn-obmc-phosphor-image = " \
+EXTRA_USERS_PARAMS:pn-obmc-phosphor-image = " \
   usermod -p ${DEFAULT_OPENBMC_PASSWORD} root; \
   "

@@ -26,4 +26,4 @@ IMAGE_FSTYPES += "${@bb.utils.contains('DISTRO_FEATURES', \
 INITRAMFS_CTYPE ?= "xz"
 INITRAMFS_FSTYPES = "cpio.${INITRAMFS_CTYPE}"
 INITRAMFS_IMAGE = "obmc-phosphor-initramfs"
-INITRAMFS_IMAGE_df-obmc-ubi-fs = ""
+INITRAMFS_IMAGE:df-obmc-ubi-fs = ""

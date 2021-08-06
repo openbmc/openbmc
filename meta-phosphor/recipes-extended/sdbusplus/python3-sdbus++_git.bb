@@ -22,7 +22,7 @@ DEPENDS += " \
     ${PYTHON_PN}-pyyaml-native \
     "
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-inflection \
     ${PYTHON_PN}-mako \
     ${PYTHON_PN}-pyyaml \

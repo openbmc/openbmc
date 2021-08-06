@@ -8,13 +8,13 @@ inherit obmc-phosphor-dbus-service
 inherit pkgconfig
 
 PROVIDES += "virtual/obmc-host-ctl"
-RPROVIDES_${PN} += "virtual-obmc-host-ctl"
+RPROVIDES:${PN} += "virtual-obmc-host-ctl"
 
 SKELETON_DIR = "op-hostctl"
 
 FMT = "org.openbmc.control.Host@{0}.service"
-DBUS_SERVICE_${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
-SYSTEMD_SERVICE_${PN} = " \
+DBUS_SERVICE:${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_SERVICE:${PN} = " \
         op-start-host@.service \
         "
 

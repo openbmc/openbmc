@@ -6,7 +6,7 @@ PV = "1.0+git${SRCPV}"
 inherit skeleton-python
 inherit obmc-phosphor-dbus-service
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
         python-dbus \
         python-compression \
         python-shell \
@@ -17,4 +17,4 @@ RDEPENDS_${PN} += "\
         "
 
 SKELETON_DIR = "pyflashbmc"
-DBUS_SERVICE_${PN} += "org.openbmc.control.BmcFlash.service"
+DBUS_SERVICE:${PN} += "org.openbmc.control.BmcFlash.service"

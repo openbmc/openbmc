@@ -11,4 +11,4 @@ inherit pkgconfig
 SKELETON_DIR = "bmcctl"
 
 FMT = "org.openbmc.control.Bmc@{0}.service"
-DBUS_SERVICE_${PN} += "${@compose_list(d, 'FMT', 'OBMC_BMC_INSTANCES')}"
+DBUS_SERVICE:${PN} += "${@compose_list(d, 'FMT', 'OBMC_BMC_INSTANCES')}"

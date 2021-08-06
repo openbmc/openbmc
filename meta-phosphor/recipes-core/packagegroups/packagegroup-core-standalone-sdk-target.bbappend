@@ -1,4 +1,4 @@
-RRECOMMENDS_${PN}_append = " \
+RRECOMMENDS:${PN}:append = " \
     googletest \
     libstdc++-staticdev \
     phosphor-dbus-interfaces-yaml \

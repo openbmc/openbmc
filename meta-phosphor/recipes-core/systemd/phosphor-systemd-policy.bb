@@ -10,8 +10,8 @@ DEPENDS += "systemd"
 SRC_URI += "file://service-restart-policy.conf"
 SRC_URI += "file://journald-maxlevel-policy.conf"
 
-FILES_${PN} += "${systemd_unitdir}/system.conf.d/service-restart-policy.conf"
-FILES_${PN} += "${systemd_unitdir}/journald.conf.d/journald-maxlevel-policy.conf"
+FILES:${PN} += "${systemd_unitdir}/system.conf.d/service-restart-policy.conf"
+FILES:${PN} += "${systemd_unitdir}/journald.conf.d/journald-maxlevel-policy.conf"
 
 
 do_install() {

@@ -6,11 +6,11 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit allarch
 
-RDEPENDS_${PN} += "phosphor-power-sequencer"
+RDEPENDS:${PN} += "phosphor-power-sequencer"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-pkg_postinst_${PN}() {
+pkg_postinst:${PN}() {
 	mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants
 	mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
 
@@ -23,7 +23,7 @@ pkg_postinst_${PN}() {
 	ln -s $TARGET $LINK
 }
 
-pkg_prerm_${PN}() {
+pkg_prerm:${PN}() {
 	LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants/pseq-monitor.service"
 	rm $LINK
 	LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants/pseq-monitor-pgood.service"

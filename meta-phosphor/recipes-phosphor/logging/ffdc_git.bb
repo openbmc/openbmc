@@ -7,7 +7,7 @@ require recipes-phosphor/dump/phosphor-debug-collector.inc
 
 DEPENDS += "systemd"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
         ${VIRTUAL-RUNTIME_base-utils} \
         "
 

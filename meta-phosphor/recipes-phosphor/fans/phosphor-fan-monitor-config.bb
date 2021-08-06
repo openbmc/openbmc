@@ -15,4 +15,4 @@ do_install() {
     install -D monitor.yaml ${D}${monitor_datadir}/monitor.yaml
 }
 
-FILES_${PN} += "${monitor_datadir}/monitor.yaml"
+FILES:${PN} += "${monitor_datadir}/monitor.yaml"

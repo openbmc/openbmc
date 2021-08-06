@@ -10,7 +10,7 @@ inherit image_version
 
 # Image composition
 FLASH_KERNEL_IMAGE ?= "fitImage-${INITRAMFS_IMAGE}-${MACHINE}-${MACHINE}"
-FLASH_KERNEL_IMAGE_df-obmc-ubi-fs ?= "fitImage-${MACHINE}.bin"
+FLASH_KERNEL_IMAGE:df-obmc-ubi-fs ?= "fitImage-${MACHINE}.bin"
 
 IMAGE_BASETYPE ?= "squashfs-xz"
 OVERLAY_BASETYPE ?= "jffs2"
@@ -21,12 +21,12 @@ FLASH_EXT4_OVERLAY_BASETYPE ?= "ext4"
 
 IMAGE_TYPES += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar mmc-ext4-tar"
 
-IMAGE_TYPEDEP_mtd-static = "${IMAGE_BASETYPE}"
-IMAGE_TYPEDEP_mtd-static-tar = "${IMAGE_BASETYPE}"
-IMAGE_TYPEDEP_mtd-static-alltar = "mtd-static"
-IMAGE_TYPEDEP_mtd-ubi = "${FLASH_UBI_BASETYPE}"
-IMAGE_TYPEDEP_mtd-ubi-tar = "${FLASH_UBI_BASETYPE}"
-IMAGE_TYPEDEP_mmc-ext4-tar = "${FLASH_EXT4_BASETYPE}"
+IMAGE_TYPEDEP:mtd-static = "${IMAGE_BASETYPE}"
+IMAGE_TYPEDEP:mtd-static-tar = "${IMAGE_BASETYPE}"
+IMAGE_TYPEDEP:mtd-static-alltar = "mtd-static"
+IMAGE_TYPEDEP:mtd-ubi = "${FLASH_UBI_BASETYPE}"
+IMAGE_TYPEDEP:mtd-ubi-tar = "${FLASH_UBI_BASETYPE}"
+IMAGE_TYPEDEP:mmc-ext4-tar = "${FLASH_EXT4_BASETYPE}"
 IMAGE_TYPES_MASKED += "mtd-static mtd-static-alltar mtd-static-tar mtd-ubi mtd-ubi-tar mmc-ext4-tar"
 
 # Flash characteristics in KB unless otherwise noted
@@ -41,21 +41,21 @@ FLASH_NOR_UBI_OVERHEAD ?= "64"
 FLASH_UBOOT_SPL_SIZE ?= "64"
 FLASH_UBOOT_OFFSET ?= "0"
 FLASH_KERNEL_OFFSET ?= "512"
-FLASH_KERNEL_OFFSET_flash-65536 ?= "1024"
-FLASH_KERNEL_OFFSET_flash-131072 ?= "1024"
+FLASH_KERNEL_OFFSET:flash-65536 ?= "1024"
+FLASH_KERNEL_OFFSET:flash-131072 ?= "1024"
 FLASH_UBI_OFFSET ?= "${FLASH_KERNEL_OFFSET}"
 FLASH_ROFS_OFFSET ?= "4864"
-FLASH_ROFS_OFFSET_flash-65536 ?= "10240"
-FLASH_ROFS_OFFSET_flash-131072 ?= "10240"
+FLASH_ROFS_OFFSET:flash-65536 ?= "10240"
+FLASH_ROFS_OFFSET:flash-131072 ?= "10240"
 FLASH_RWFS_OFFSET ?= "28672"
-FLASH_RWFS_OFFSET_flash-65536 ?= "43008"
-FLASH_RWFS_OFFSET_flash-131072 ?= "98304"
+FLASH_RWFS_OFFSET:flash-65536 ?= "43008"
+FLASH_RWFS_OFFSET:flash-131072 ?= "98304"
 
 # UBI volume sizes in KB unless otherwise noted.
 FLASH_UBI_RWFS_SIZE ?= "6144"
-FLASH_UBI_RWFS_SIZE_flash-131072 ?= "32768"
+FLASH_UBI_RWFS_SIZE:flash-131072 ?= "32768"
 FLASH_UBI_RWFS_TXT_SIZE ?= "6MiB"
-FLASH_UBI_RWFS_TXT_SIZE_flash-131072 ?= "32MiB"
+FLASH_UBI_RWFS_TXT_SIZE:flash-131072 ?= "32MiB"
 
 # eMMC sizes in KB unless otherwise noted.
 MMC_UBOOT_SIZE ?= "1024"
@@ -96,10 +96,10 @@ JFFS2_RWFS_CMD = "mkfs.jffs2 --root=jffs2 --faketime --output=${IMGDEPLOYDIR}/${
 UBIFS_RWFS_CMD = "mkfs.ubifs -r ubifs -c ${FLASH_UBI_RWFS_LEBS} -m ${FLASH_PAGE_SIZE} -e ${FLASH_LEB_SIZE} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ubifs"
 EXT4_RWFS_CMD = "mkfs.ext4 -F ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.ext4"
 
-FLASH_STATIC_RWFS_CMD_static-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
-FLASH_UBI_RWFS_CMD_ubi-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
-FLASH_UBI_RWFS_CMD_ubi-rwfs-ubifs = "${UBIFS_RWFS_CMD}"
-FLASH_EXT4_RWFS_CMD_mmc-rwfs-ext4 = "${EXT4_RWFS_CMD}"
+FLASH_STATIC_RWFS_CMD:static-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
+FLASH_UBI_RWFS_CMD:ubi-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
+FLASH_UBI_RWFS_CMD:ubi-rwfs-ubifs = "${UBIFS_RWFS_CMD}"
+FLASH_EXT4_RWFS_CMD:mmc-rwfs-ext4 = "${EXT4_RWFS_CMD}"
 
 mk_empty_image() {
 	image_dst="$1"

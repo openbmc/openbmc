@@ -17,7 +17,7 @@ DEPENDS += "autoconf-archive-native \
             systemd \
            "
 
-SYSTEMD_SERVICE_${PN} = "mctp-demux.service \
+SYSTEMD_SERVICE:${PN} = "mctp-demux.service \
                          mctp-demux.socket \
                         "
 
@@ -27,9 +27,9 @@ PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir},
 
 PACKAGECONFIG[astlpc-raw-kcs] = "--enable-astlpc-raw-kcs,--disable-astlpc-raw-kcs,udev,udev"
 
-CONFFILES_${PN} = "${sysconfdir}/default/mctp"
+CONFFILES:${PN} = "${sysconfdir}/default/mctp"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${sysconfdir}/default
 	install -m 0644 ${WORKDIR}/default ${D}${sysconfdir}/default/mctp
 }

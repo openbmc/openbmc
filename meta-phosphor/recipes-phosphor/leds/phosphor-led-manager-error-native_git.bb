@@ -11,7 +11,7 @@ require phosphor-led-manager.inc
 
 S = "${WORKDIR}/git"
 
-do_install_append() {
+do_install:append() {
     SRC=${S}/xyz/openbmc_project/Led/
     DEST=${D}${yaml_dir}/xyz/openbmc_project/Led/
     install -d ${DEST}/Fru

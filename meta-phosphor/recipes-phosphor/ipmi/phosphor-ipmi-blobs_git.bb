@@ -18,7 +18,7 @@ S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-blobs"
 SRCREV = "f39e668c2b87c9453e0e28d5a8886b81ed80c50e"
 
-FILES_${PN} += "${libdir}/ipmid-providers"
+FILES:${PN} += "${libdir}/ipmid-providers"
 
 EXTRA_OEMESON += " \
   -Dtests=disabled \

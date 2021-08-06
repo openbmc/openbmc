@@ -44,14 +44,14 @@ EXTRA_OECONF = "--disable-tests --disable-build-host-tool"
 
 # Set this variable in your recipe to set it instead of using MAPPED_ADDRESS directly.
 IPMI_FLASH_BMC_ADDRESS ?= "0"
-EXTRA_OECONF_append = " MAPPED_ADDRESS=${IPMI_FLASH_BMC_ADDRESS}"
+EXTRA_OECONF:append = " MAPPED_ADDRESS=${IPMI_FLASH_BMC_ADDRESS}"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-flash"
 SRCREV = "0077e34cfaca539f750014aa63ff491dca70ee1d"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} += "phosphor-ipmi-flash-bmc-prepare.target \
+SYSTEMD_SERVICE:${PN} += "phosphor-ipmi-flash-bmc-prepare.target \
  phosphor-ipmi-flash-bmc-verify.target \
  phosphor-ipmi-flash-bmc-update.target"
 
@@ -60,12 +60,12 @@ HOST_BIOS_TARGETS = "phosphor-ipmi-flash-bios-prepare.target \
  phosphor-ipmi-flash-bios-verify.target \
  phosphor-ipmi-flash-bios-update.target"
 
-SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'host-bios', '${HOST_BIOS_TARGETS}', '', d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'host-bios', '${HOST_BIOS_TARGETS}', '', d)}"
 
-FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
-FILES_${PN}_append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
-FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
-FILES_${PN}_append = " ${libdir}/tmpfiles.d"
+FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
+FILES:${PN}:append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
+FILES:${PN}-dev:append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
+FILES:${PN}:append = " ${libdir}/tmpfiles.d"
 
 BLOBIPMI_PROVIDER_LIBRARY += "libfirmwareblob.so"
 BLOBIPMI_PROVIDER_LIBRARY += "libversionblob.so"

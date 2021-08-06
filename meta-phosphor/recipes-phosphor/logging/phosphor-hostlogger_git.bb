@@ -16,8 +16,8 @@ DEPENDS += " \
             phosphor-logging \
             zlib \
            "
-RDEPENDS_${PN} += "obmc-console"
-RRECOMMENDS_${PN} += "phosphor-debug-collector"
+RDEPENDS:${PN} += "obmc-console"
+RRECOMMENDS:${PN} += "phosphor-debug-collector"
 
 # Source code repository
 S = "${WORKDIR}/git"
@@ -29,7 +29,7 @@ EXTRA_OEMESON += "-Dtests=disabled"
 
 # Systemd service template
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "hostlogger@.service"
+SYSTEMD_SERVICE:${PN} = "hostlogger@.service"
 
 # Default service instance to install (single-host mode)
 DEFAULT_INSTANCE = "ttyVUART0"
@@ -42,7 +42,7 @@ CUSTOM_CONFIGS = "${@custom_configs('${WORKDIR}')}"
 CUSTOM_SERVICES = "${@custom_services('${CUSTOM_CONFIGS}')}"
 
 # Preset systemd units
-SYSTEMD_SERVICE_${PN} += "${@'${CUSTOM_SERVICES}' if len('${CUSTOM_SERVICES}') \
+SYSTEMD_SERVICE:${PN} += "${@'${CUSTOM_SERVICES}' if len('${CUSTOM_SERVICES}') \
                                                   else '${DEFAULT_SERVICE}'}"
 
 # Gets list of custom config files in a directory
@@ -55,7 +55,7 @@ def custom_services(configs):
     return ' '.join(['hostlogger@' + i.replace('.conf', '.service') \
                      for i in configs.split()])
 
-do_install_append() {
+do_install:append() {
   # Install config files
   if [ -n "${CUSTOM_CONFIGS}" ]; then
     for CONFIG_FILE in ${CUSTOM_CONFIGS}; do

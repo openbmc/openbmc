@@ -1,4 +1,4 @@
-pkg_postinst_${PN}-obmc-targets_append() {
+pkg_postinst:${PN}-obmc-targets:append() {
 
     mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
     LINK="$D$systemd_system_unitdir/multi-user.target.requires/obmc-host-reset@0.target"
@@ -81,7 +81,7 @@ pkg_postinst_${PN}-obmc-targets_append() {
     ln -s $TARGET $LINK
 }
 
-pkg_prerm_${PN}-obmc-targets_append() {
+pkg_prerm:${PN}-obmc-targets:append() {
 
     LINK="$D$systemd_system_unitdir/multi-user.target.requires/obmc-host-reset@0.target"
     rm $LINK

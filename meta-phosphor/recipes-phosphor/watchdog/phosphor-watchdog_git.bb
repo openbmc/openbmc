@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
 
-RPROVIDES_${PN} += "virtual/obmc-watchdog"
+RPROVIDES:${PN} += "virtual/obmc-watchdog"
 PROVIDES += "virtual/obmc-watchdog"
 
 DEPENDS += "cli11"
@@ -40,10 +40,10 @@ OBMC_HOST_WATCHDOG_INSTANCES = "poweron"
 # an argument, so making it this way.
 WATCHDOG_TMPL = "phosphor-watchdog@.service"
 ENABLE_WATCHDOG_TMPL = "obmc-enable-host-watchdog@.service"
-SYSTEMD_SERVICE_${PN} += "${WATCHDOG_TMPL}"
+SYSTEMD_SERVICE:${PN} += "${WATCHDOG_TMPL}"
 
 # To Enable Host Watchdog early during poweron
-SYSTEMD_SERVICE_${PN} += "${ENABLE_WATCHDOG_TMPL}"
+SYSTEMD_SERVICE:${PN} += "${ENABLE_WATCHDOG_TMPL}"
 
 WATCHDOG_TGTFMT = "phosphor-watchdog@{0}.service"
 ENABLE_WATCHDOG_TGTFMT = "obmc-enable-host-watchdog@{0}.service"

@@ -15,7 +15,7 @@ SRCREV = "a19b509352cc7d9fcacf345f81163bf6998ec7b4"
 inherit meson pkgconfig systemd
 
 S = "${WORKDIR}/git"
-SYSTEMD_SERVICE_${PN} = "srvcfg-manager.service"
+SYSTEMD_SERVICE:${PN} = "srvcfg-manager.service"
 
 DEPENDS = " \
     boost \

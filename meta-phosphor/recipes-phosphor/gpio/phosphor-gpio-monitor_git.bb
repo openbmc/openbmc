@@ -14,11 +14,11 @@ GPIO_PACKAGES = " \
 "
 
 PACKAGE_BEFORE_PN += "${GPIO_PACKAGES}"
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 SYSTEMD_PACKAGES = "${GPIO_PACKAGES}"
 
-RPROVIDES_${PN}-monitor += "virtual/obmc-gpio-monitor"
-RPROVIDES_${PN}-presence += "virtual/obmc-gpio-presence"
+RPROVIDES:${PN}-monitor += "virtual/obmc-gpio-monitor"
+RPROVIDES:${PN}-presence += "virtual/obmc-gpio-presence"
 
 PROVIDES += "virtual/obmc-gpio-monitor"
 PROVIDES += "virtual/obmc-gpio-presence"
@@ -33,15 +33,15 @@ DEPENDS += "libgpiod"
 DEPENDS += "cli11"
 DEPENDS += "nlohmann-json"
 
-SYSTEMD_SERVICE_${PN}-monitor += "phosphor-multi-gpio-monitor.service"
-SYSTEMD_SERVICE_${PN}-monitor += "phosphor-gpio-monitor@.service"
-SYSTEMD_SERVICE_${PN}-presence += "phosphor-gpio-presence@.service"
+SYSTEMD_SERVICE:${PN}-monitor += "phosphor-multi-gpio-monitor.service"
+SYSTEMD_SERVICE:${PN}-monitor += "phosphor-gpio-monitor@.service"
+SYSTEMD_SERVICE:${PN}-presence += "phosphor-gpio-presence@.service"
 
-FILES_${PN}-monitor += "${bindir}/phosphor-gpio-monitor"
-FILES_${PN}-monitor += "${bindir}/phosphor-multi-gpio-monitor"
-FILES_${PN}-monitor += "${bindir}/phosphor-gpio-util"
-FILES_${PN}-monitor += "${base_libdir}/udev/rules.d/99-gpio-keys.rules"
-FILES_${PN}-presence += "${bindir}/phosphor-gpio-presence"
+FILES:${PN}-monitor += "${bindir}/phosphor-gpio-monitor"
+FILES:${PN}-monitor += "${bindir}/phosphor-multi-gpio-monitor"
+FILES:${PN}-monitor += "${bindir}/phosphor-gpio-util"
+FILES:${PN}-monitor += "${base_libdir}/udev/rules.d/99-gpio-keys.rules"
+FILES:${PN}-presence += "${bindir}/phosphor-gpio-presence"
 
 SRC_URI += "git://github.com/openbmc/phosphor-gpio-monitor"
 SRCREV = "b08a0f691740ef21e28547a57981b1043d46d8ce"

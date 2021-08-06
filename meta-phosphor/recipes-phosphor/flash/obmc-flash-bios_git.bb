@@ -10,5 +10,5 @@ inherit obmc-phosphor-dbus-service
 inherit pkgconfig
 
 SKELETON_DIR = "flashbios"
-DBUS_SERVICE_${PN} += "org.openbmc.control.Flash.service"
-SYSTEMD_SERVICE_${PN} += "obmc-flash-init.service"
+DBUS_SERVICE:${PN} += "org.openbmc.control.Flash.service"
+SYSTEMD_SERVICE:${PN} += "obmc-flash-init.service"

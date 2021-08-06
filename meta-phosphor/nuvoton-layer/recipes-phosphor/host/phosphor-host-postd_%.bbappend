@@ -1,1 +1,1 @@
-SNOOP_DEVICE_npcm7xx = "npcm7xx-lpc-bpc0"
+SNOOP_DEVICE:npcm7xx = "npcm7xx-lpc-bpc0"

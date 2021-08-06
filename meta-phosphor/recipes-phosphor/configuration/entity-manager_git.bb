@@ -29,16 +29,16 @@ EXTRA_ENTITY_MANAGER_PACKAGES = " \
 
 PACKAGE_BEFORE_PN = "${EXTRA_ENTITY_MANAGER_PACKAGES}"
 
-do_install_append() {
+do_install:append() {
     install -D ${WORKDIR}/blocklist.json ${D}${datadir}/${BPN}/blacklist.json
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1/system-services/xyz.openbmc_project.EntityManager.service \
     "
-FILES_fru-device = "${bindir}/fru-device ${datadir}/${BPN}/blacklist.json"
+FILES:fru-device = "${bindir}/fru-device ${datadir}/${BPN}/blacklist.json"
 
 SYSTEMD_PACKAGES = "${PN} ${EXTRA_ENTITY_MANAGER_PACKAGES}"
-SYSTEMD_SERVICE_${PN} = "xyz.openbmc_project.EntityManager.service"
-SYSTEMD_SERVICE_fru-device = "xyz.openbmc_project.FruDevice.service"
-SYSTEMD_AUTO_ENABLE_fru-device_ibm-power-cpu = "disable"
+SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.EntityManager.service"
+SYSTEMD_SERVICE:fru-device = "xyz.openbmc_project.FruDevice.service"
+SYSTEMD_AUTO_ENABLE:fru-device_ibm-power-cpu = "disable"

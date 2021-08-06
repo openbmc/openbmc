@@ -9,7 +9,7 @@ PV = "v1.6+git${SRCPV}"
 inherit obmc-phosphor-systemd
 
 S = "${WORKDIR}/git"
-FILES_${PN} = "${sbindir}"
+FILES:${PN} = "${sbindir}"
 
 do_compile() {
     # CC is overridden in the Makefile, so override it harder in the invocation
@@ -23,4 +23,4 @@ do_install() {
     install -m 0755 iotools ${D}${sbindir}
 }
 
-SYSTEMD_SERVICE_${PN} += "iotools-setup.service"
+SYSTEMD_SERVICE:${PN} += "iotools-setup.service"

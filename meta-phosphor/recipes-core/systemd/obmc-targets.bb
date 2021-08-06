@@ -11,6 +11,6 @@ SRC_URI += "\
     file://obmc-mapper.target \
 "
 
-SYSTEMD_SERVICE_${PN} += " \
+SYSTEMD_SERVICE:${PN} += " \
     obmc-mapper.target \
 "

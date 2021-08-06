@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/openbmc/webui-vue.git"
 SRCREV = "03dc2b7b9f0672aac84349fbc77aab55403447e0"
 S = "${WORKDIR}/git"
 
-DEPENDS_prepend = "nodejs-native nlf-native "
+DEPENDS:prepend = "nodejs-native nlf-native "
 
 # allarch is required because the files this recipe produces (html and
 # javascript) are valid for any target, regardless of architecture.  The allarch
@@ -28,7 +28,7 @@ export CFLAGS = "${BUILD_CFLAGS}"
 export CPPFLAGS = "${BUILD_CPPFLAGS}"
 export CXXFLAGS = "${BUILD_CXXFLAGS}"
 
-FILES_${PN} += "${datadir}/www/*"
+FILES:${PN} += "${datadir}/www/*"
 
 do_compile () {
     cd ${S}

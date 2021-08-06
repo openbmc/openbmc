@@ -10,6 +10,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit allarch
 
-RDEPENDS_${PN} += "phosphor-power"
+RDEPENDS:${PN} += "phosphor-power"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"

@@ -11,7 +11,7 @@ inherit phosphor-settings-manager
 
 require phosphor-settings-manager.inc
 
-DBUS_SERVICE_${PN} = "xyz.openbmc_project.Settings.service"
+DBUS_SERVICE:${PN} = "xyz.openbmc_project.Settings.service"
 
 DEPENDS += "${PYTHON_PN}-pyyaml-native"
 DEPENDS += "${PYTHON_PN}-mako-native"

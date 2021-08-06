@@ -2,7 +2,7 @@ inherit phosphor-dbus-yaml
 
 LOGGING_YAML_SUBDIRS ??= "${OBMC_ORG_YAML_SUBDIRS}"
 
-do_install_append() {
+do_install:append() {
     for yaml_d in ${LOGGING_YAML_SUBDIRS} ;
     do
         if [ ! -d ${S}/${yaml_d} ];

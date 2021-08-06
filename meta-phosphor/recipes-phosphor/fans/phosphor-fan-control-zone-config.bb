@@ -14,4 +14,4 @@ do_install() {
     install -D zones.yaml ${D}${control_datadir}/zones.yaml
 }
 
-FILES_${PN} += "${control_datadir}/zones.yaml"
+FILES:${PN} += "${control_datadir}/zones.yaml"

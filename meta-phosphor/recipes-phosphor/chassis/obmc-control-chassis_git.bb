@@ -6,7 +6,7 @@ PV = "1.0+git${SRCPV}"
 inherit skeleton-python
 inherit obmc-phosphor-dbus-service
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
         python-dbus \
         python-pygobject \
         python-netclient \
@@ -16,4 +16,4 @@ RDEPENDS_${PN} += "\
 SKELETON_DIR = "pychassisctl"
 
 FMT = "org.openbmc.control.Chassis@{0}.service"
-DBUS_SERVICE_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
+DBUS_SERVICE:${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"

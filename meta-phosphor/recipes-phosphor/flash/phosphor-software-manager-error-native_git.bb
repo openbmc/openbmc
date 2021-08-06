@@ -11,7 +11,7 @@ require phosphor-software-manager.inc
 
 S = "${WORKDIR}/git"
 
-do_install_append() {
+do_install:append() {
     SRC=${S}/xyz/openbmc_project/Software/
     DEST=${D}${yaml_dir}/xyz/openbmc_project/Software/
     install -d ${DEST}

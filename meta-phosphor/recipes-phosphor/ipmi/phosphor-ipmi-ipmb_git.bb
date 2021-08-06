@@ -9,7 +9,7 @@ PV = "0.1+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-SYSTEMD_SERVICE_${PN} = "ipmb.service"
+SYSTEMD_SERVICE:${PN} = "ipmb.service"
 
 DEPENDS = "sdbusplus \
            phosphor-logging \
@@ -19,4 +19,4 @@ DEPENDS = "sdbusplus \
 
 S = "${WORKDIR}/git"
 inherit cmake systemd
-FILES_${PN} += "/usr/share/ipmbbridge/ipmb-channels.json"
+FILES:${PN} += "/usr/share/ipmbbridge/ipmb-channels.json"

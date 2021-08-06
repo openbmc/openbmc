@@ -22,6 +22,6 @@ DEPENDS = "boost \
            sdbusplus \
            systemd"
 
-SYSTEMD_SERVICE_${PN} = "xyz.openbmc_project.Telemetry.service"
+SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.Telemetry.service"
 EXTRA_OEMESON = "-Dbuildtest=false"
 

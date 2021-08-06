@@ -24,8 +24,8 @@ DEPENDS = " \
 
 # The default config of this repo depends on utils from phosphor-power.
 # If your system does not depend on phosphor-power, please use
-# RDEPENDS_${PN}_remove to remove the dependency.
-RDEPENDS_${PN} += "phosphor-power"
+# RDEPENDS:${PN}:remove to remove the dependency.
+RDEPENDS:${PN} += "phosphor-power"
 
 # The below configs are expected to be overriden by machine layer
 
@@ -48,5 +48,5 @@ EXTRA_OEMESON = " \
         ${PSU_UPDATE_SERVICE} \
         "
 
-SYSTEMD_SERVICE_${PN} = "xyz.openbmc_project.Software.Psu.Updater.service"
-SYSTEMD_SERVICE_${PN} += "psu-update@.service"
+SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.Software.Psu.Updater.service"
+SYSTEMD_SERVICE:${PN} += "psu-update@.service"

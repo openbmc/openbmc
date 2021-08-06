@@ -6,12 +6,12 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit allarch
 
-RDEPENDS_${PN}-monitor += "phosphor-power-monitor"
+RDEPENDS:${PN}-monitor += "phosphor-power-monitor"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 
-pkg_postinst_${PN}() {
+pkg_postinst:${PN}() {
 	mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
 
 	[ -z "${OBMC_POWER_SUPPLY_INSTANCES}" ] && echo "No power supply instance defined" && exit 1
@@ -23,7 +23,7 @@ pkg_postinst_${PN}() {
 	done
 }
 
-pkg_prerm_${PN}() {
+pkg_prerm:${PN}() {
 	[ -z "${OBMC_POWER_SUPPLY_INSTANCES}" ] && echo "No power supply instance defined" && exit 1
 
 	for inst in ${OBMC_POWER_SUPPLY_INSTANCES}; do

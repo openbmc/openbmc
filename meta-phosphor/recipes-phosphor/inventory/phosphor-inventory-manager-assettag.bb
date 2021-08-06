@@ -15,4 +15,4 @@ do_install() {
         install -D assettag.yaml ${D}${base_datadir}/events.d/assettag.yaml
 }
 
-FILES_${PN} += "${base_datadir}/events.d/assettag.yaml"
+FILES:${PN} += "${base_datadir}/events.d/assettag.yaml"

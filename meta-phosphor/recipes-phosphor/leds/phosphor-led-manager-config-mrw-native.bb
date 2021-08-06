@@ -10,7 +10,7 @@ PROVIDES += "virtual/phosphor-led-manager-config-native"
 DEPENDS += "mrw-native mrw-perl-tools-native"
 
 # Generate a YAML files based on MRW input
-do_install_append() {
+do_install:append() {
     USE_MRW="${@bb.utils.contains('DISTRO_FEATURES', 'obmc-mrw', 'yes', 'no', d)}"
     DEST=${D}${datadir}/phosphor-led-manager
 

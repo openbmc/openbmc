@@ -12,7 +12,7 @@ S = "${WORKDIR}"
 
 PROVIDES += "virtual/phosphor-ipmi-fru-read-not-sent-by-host-inventory"
 
-do_install_append() {
+do_install:append() {
     DEST=${D}${config_datadir}
     install -d ${DEST}
     install fru-config-not-sent-by-host.yaml ${DEST}/fru-config-not-sent-by-host.yaml

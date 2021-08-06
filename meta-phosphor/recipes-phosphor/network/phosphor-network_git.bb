@@ -32,9 +32,9 @@ PACKAGECONFIG[sync-mac] = "-Dsync-mac=true,-Dsync-mac=false,nlohmann-json,"
 
 S = "${WORKDIR}/git"
 
-FILES_${PN} += "${datadir}/dbus-1/system.d"
+FILES:${PN} += "${datadir}/dbus-1/system.d"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Network.service"
+SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.Network.service"
 
 EXTRA_OEMESON += "-Dtests=disabled"

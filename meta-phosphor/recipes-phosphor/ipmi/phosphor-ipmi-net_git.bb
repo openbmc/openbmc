@@ -15,14 +15,14 @@ DEPENDS += "phosphor-mapper"
 DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-host"
 
-RRECOMMENDS_${PN} = "pam-ipmi"
+RRECOMMENDS:${PN} = "pam-ipmi"
 
 SRC_URI += "git://github.com/openbmc/phosphor-net-ipmid"
 SRCREV = "05c1447d75b89d597138eabba1c9da2b281d1bc3"
 
 S = "${WORKDIR}/git"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
         ${systemd_system_unitdir}/${PN}@.service \
         ${systemd_system_unitdir}/${PN}@.socket \
         "
@@ -32,7 +32,7 @@ DEFAULT_RMCPP_IFACE = "eth0"
 RMCPP_IFACE ?= "${DEFAULT_RMCPP_IFACE}"
 
 # install parameterized service and socket files
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
         ${PN}@${RMCPP_IFACE}.service \
         ${PN}@${RMCPP_IFACE}.socket \
         "
@@ -41,7 +41,7 @@ SYSTEMD_SERVICE_${PN} = " \
 # following lines in a bbappend:
 #
 # ALT_RMCPP_IFACE = "eth1"
-# SYSTEMD_SERVICE_${PN} += " \
+# SYSTEMD_SERVICE:${PN} += " \
 #     ${PN}@${ALT_RMCPP_IFACE}.service \
 #     ${PN}@${ALT_RMCPP_IFACE}.socket \
 #     "

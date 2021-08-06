@@ -26,7 +26,7 @@ SRCREV = "e295fd9d6f7572b49b2c6b72e715a01eb68807d0"
 
 PV = "0.1+git${SRCPV}"
 
-SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Logging.IPMI.service"
+SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.Logging.IPMI.service"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[log-threshold] = "-Dlog-threshold=true,-Dlog-threshold=false,"

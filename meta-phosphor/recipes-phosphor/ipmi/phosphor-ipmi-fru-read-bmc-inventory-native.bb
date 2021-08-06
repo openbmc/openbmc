@@ -12,7 +12,7 @@ S = "${WORKDIR}"
 
 PROVIDES += "virtual/phosphor-ipmi-fru-read-bmc-inventory"
 
-do_install_append() {
+do_install:append() {
     DEST=${D}${config_datadir}
     install -d ${DEST}
     install bmc-fru-config.yaml ${DEST}/bmc-fru-config.yaml

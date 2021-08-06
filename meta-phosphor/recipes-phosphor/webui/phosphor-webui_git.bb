@@ -9,11 +9,11 @@ SRC_URI = "git://github.com/openbmc/phosphor-webui.git"
 SRCREV = "51229f8005cb20a12e8d0f057d4565f31d84fa29"
 S = "${WORKDIR}/git"
 
-DEPENDS_prepend = "nodejs-native "
+DEPENDS:prepend = "nodejs-native "
 
 inherit allarch
 
-FILES_${PN} += "${datadir}/www/*"
+FILES:${PN} += "${datadir}/www/*"
 
 do_compile () {
     cd ${S}

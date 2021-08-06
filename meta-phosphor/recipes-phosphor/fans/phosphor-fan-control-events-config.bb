@@ -14,4 +14,4 @@ do_install() {
     install -D events.yaml ${D}${control_datadir}/events.yaml
 }
 
-FILES_${PN} += "${control_datadir}/events.yaml"
+FILES:${PN} += "${control_datadir}/events.yaml"

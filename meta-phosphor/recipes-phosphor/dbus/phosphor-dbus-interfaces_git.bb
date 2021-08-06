@@ -31,8 +31,8 @@ pdi_meson_config[vardeps] = "OBMC_ORG_YAML_SUBDIRS"
 
 # Markdown files are installed into /usr/share/phosphor-dbus-interfaces so
 # add them to the 'doc' subpackage.
-FILES_${PN}-doc += "${datadir}/${BPN}"
+FILES:${PN}-doc += "${datadir}/${BPN}"
 
-EXTRA_OEMESON_append = " \
+EXTRA_OEMESON:append = " \
         -Db_lto=true \
         ${@pdi_meson_config(d)}"

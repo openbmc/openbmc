@@ -8,9 +8,9 @@ SRC_URI += "file://noverify-bmc-update.service"
 SRC_URI += "file://noverify-bmc-verify.service"
 SRC_URI += "file://config-bmc.json"
 
-SYSTEMD_SERVICE_${PN} += "noverify-bmc-update.service"
-SYSTEMD_SERVICE_${PN} += "noverify-bmc-verify.service"
-FILES_${PN} += "${datadir}/phosphor-ipmi-flash/config-bmc.json"
+SYSTEMD_SERVICE:${PN} += "noverify-bmc-update.service"
+SYSTEMD_SERVICE:${PN} += "noverify-bmc-verify.service"
+FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-bmc.json"
 
 do_install() {
   install -d ${D}${datadir}/phosphor-ipmi-flash

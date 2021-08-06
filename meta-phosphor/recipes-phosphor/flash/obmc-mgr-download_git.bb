@@ -6,7 +6,7 @@ PV = "1.0+git${SRCPV}"
 inherit skeleton-python
 inherit obmc-phosphor-dbus-service
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
         python-dbus \
         python-pygobject \
         python-subprocess \
@@ -14,4 +14,4 @@ RDEPENDS_${PN} += "\
         "
 
 SKELETON_DIR = "pydownloadmgr"
-DBUS_SERVICE_${PN} += "org.openbmc.managers.Download.service"
+DBUS_SERVICE:${PN} += "org.openbmc.managers.Download.service"

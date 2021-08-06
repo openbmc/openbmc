@@ -12,11 +12,11 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-logging"
 
-RDEPENDS_${PN} += "phosphor-sel-logger"
+RDEPENDS:${PN} += "phosphor-sel-logger"
 
 SRC_URI = "git://github.com/openbmc/phosphor-ecc.git"
 SRCREV = "0841f8abf9b38f981d443ecc552cc2b014764bbf"
 
 S = "${WORKDIR}/git"
 
-SYSTEMD_SERVICE_${PN} = " ${PN}.service"
+SYSTEMD_SERVICE:${PN} = " ${PN}.service"

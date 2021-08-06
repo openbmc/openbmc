@@ -14,16 +14,16 @@ inherit systemd
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "fbterm"
+RDEPENDS:${PN} += "fbterm"
 
 SRCREV = "26ac7f7bd6af52db63451d3633bcf1b167eea3d1"
 PV = "0.1+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-SYSTEMD_SERVICE_${PN} += "uart-render-controller.service"
+SYSTEMD_SERVICE:${PN} += "uart-render-controller.service"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/uart-render-controller.service ${D}${systemd_system_unitdir}/
 }

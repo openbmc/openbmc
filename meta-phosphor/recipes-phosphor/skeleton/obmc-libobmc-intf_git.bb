@@ -20,13 +20,13 @@ SRC_URI += "file://gpio_defs.json"
 # rootfs for applicaitons to use this library.
 # This next line tells bitbake to skip the check which
 # ensures no links are put in the rootfs
-INSANE_SKIP_${PN} += "dev-so"
+INSANE_SKIP:${PN} += "dev-so"
 
 # Ensure the library is not in the dev package
 FILES_SOLIBSDEV = ""
 
 # Now add the link to the production package
-FILES_${PN} += "${libdir}/libopenbmc_intf.so"
+FILES:${PN} += "${libdir}/libopenbmc_intf.so"
 
 do_install() {
         oe_runmake install DESTDIR=${D}

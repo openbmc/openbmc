@@ -17,7 +17,7 @@ SRC_URI = " \
     file://cs_privilege_levels.json \
     "
 
-FILES_${PN} = " \
+FILES:${PN} = " \
     ${datadir}/ipmi-providers/cipher_list.json \
     ${datadir}/ipmi-providers/dcmi_cap.json \
     ${datadir}/ipmi-providers/dcmi_sensors.json \

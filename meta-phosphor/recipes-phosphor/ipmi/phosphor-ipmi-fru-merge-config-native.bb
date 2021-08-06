@@ -15,7 +15,7 @@ DEPENDS += "virtual/phosphor-ipmi-fru-read-bmc-inventory"
 DEPENDS += "virtual/phosphor-ipmi-fru-read-not-sent-by-host-inventory"
 PROVIDES += "virtual/phosphor-ipmi-fru-merge-config"
 
-do_install_append() {
+do_install:append() {
   SRC=${config_datadir}
   DEST=${D}${config_datadir}
   install -d ${DEST}

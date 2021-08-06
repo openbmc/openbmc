@@ -4,7 +4,7 @@ first 'init' program more efficiently."
 
 # Init scripts
 INIT_PACKAGE = "obmc-phosphor-initfs"
-INIT_PACKAGE_df-phosphor-mmc = "phosphor-mmc-init"
+INIT_PACKAGE:df-phosphor-mmc = "phosphor-mmc-init"
 
 PACKAGE_INSTALL = "${VIRTUAL-RUNTIME_base-utils} base-passwd ${ROOTFS_BOOTSTRAP_INSTALL} ${INIT_PACKAGE}"
 
@@ -25,6 +25,6 @@ IMAGE_ROOTFS_EXTRA_SPACE = "0"
 # Needed for the set_user_group functions to succeed
 DEPENDS += "shadow-native"
 
-PACKAGE_INSTALL_remove = "shadow"
+PACKAGE_INSTALL:remove = "shadow"
 PACKAGE_EXCLUDE = "shadow"
 BAD_RECOMMENDATIONS += "busybox-syslog"

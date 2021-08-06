@@ -70,7 +70,7 @@ FEATURE_PACKAGES_obmc-user-mgmt-ldap ?= "packagegroup-obmc-apps-user-mgmt-ldap"
 # FIXME: phosphor-net-ipmi depends on phosphor-ipmi-host !?!? and
 # cannot be built on core-qemu machines because of the dependency
 # tree under phosphor-ipmi-host
-FEATURE_PACKAGES_obmc-net-ipmi_qemuall = ""
+FEATURE_PACKAGES_obmc-net-ipmi:qemuall = ""
 
 # Add new packages to be installed to a package group in
 # packagegroup-obmc-apps, not here.

@@ -10,7 +10,7 @@ SRCREV = "2d2f3dab4253a3d6edf6bef98c5f880f51d2394b"
 
 PV = "1.0+git${SRCPV}"
 
-SYSTEMD_SERVICE_${PN} += "start-ipkvm.service"
+SYSTEMD_SERVICE:${PN} += "start-ipkvm.service"
 
 S = "${WORKDIR}/git"
 

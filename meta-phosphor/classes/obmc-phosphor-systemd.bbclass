@@ -2,7 +2,7 @@
 #
 # Prior to inheriting this class, recipes can define services like this:
 #
-# SYSTEMD_SERVICE_${PN} = "foo.service bar.socket baz@.service"
+# SYSTEMD_SERVICE:${PN} = "foo.service bar.socket baz@.service"
 #
 # and these files will be added to the main package if they exist.
 #
@@ -56,7 +56,7 @@ envfiledir ?= "${sysconfdir}/default"
 # If there are users to be added, we'll add them in our post-parse.
 # If not...there don't seem to be any ill effects...
 USERADD_PACKAGES ?= " "
-USERADD_PARAM_${PN} ?= ";"
+USERADD_PARAM:${PN} ?= ";"
 
 
 def SystemdUnit(unit):
@@ -136,7 +136,7 @@ python() {
                 'localstatedir',
                 'datadir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS',
+            set_doappend(d, 'SYSTEMD_SUBSTITUTIONS',
                 '%s:%s:%s' % (x, d.getVar(x, True), file))
 
 
@@ -148,9 +148,9 @@ python() {
 
         name = unit.name
         unit_dir = d.getVar('systemd_system_unitdir', True)
-        set_append(d, 'SRC_URI', 'file://%s' % name)
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, name))
-        set_append(d, '_INSTALL_SD_UNITS', name)
+        set_doappend(d, 'SRC_URI', 'file://%s' % name)
+        set_doappend(d, 'FILES:%s' % pkg, '%s/%s' % (unit_dir, name))
+        set_doappend(d, '_INSTALL_SD_UNITS', name)
         add_default_subs(d, name)
 
 
@@ -173,38 +173,38 @@ python() {
                 bb.fatal('Too many users assigned to %s: \'%s\'' % (var, ' '.join(user)))
 
             user = user[0]
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS',
+            set_doappend(d, 'SYSTEMD_SUBSTITUTIONS',
                 'USER:%s:%s' % (user, file))
-            if user not in d.getVar('USERADD_PARAM_%s' % pkg, True):
-                set_append(
+            if user not in d.getVar('USERADD_PARAM:%s' % pkg, True):
+                set_doappend(
                     d,
-                    'USERADD_PARAM_%s' % pkg,
+                    'USERADD_PARAM:%s' % pkg,
                     '%s' % (' '.join(opts + [user])),
                     ';')
             if pkg not in d.getVar('USERADD_PACKAGES', True):
-                set_append(d, 'USERADD_PACKAGES', pkg)
+                set_doappend(d, 'USERADD_PACKAGES', pkg)
 
 
     def add_env_file(d, name, pkg):
-        set_append(d, 'SRC_URI', 'file://%s' % name)
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' \
+        set_doappend(d, 'SRC_URI', 'file://%s' % name)
+        set_doappend(d, 'FILES:%s' % pkg, '%s/%s' \
             % (d.getVar('envfiledir', True), name))
-        set_append(d, '_INSTALL_ENV_FILES', name)
+        set_doappend(d, '_INSTALL_ENV_FILES', name)
 
 
     def install_link(d, spec, pkg):
         tgt, dest = spec.split(':')
 
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' \
+        set_doappend(d, 'FILES:%s' % pkg, '%s/%s' \
             % (d.getVar('systemd_system_unitdir', True), dest))
-        set_append(d, '_INSTALL_LINKS', spec)
+        set_doappend(d, '_INSTALL_LINKS', spec)
 
 
     def add_override(d, spec, pkg):
         tmpl, dest = spec.split(':')
-        set_append(d, '_INSTALL_OVERRIDES', '%s' % spec)
+        set_doappend(d, '_INSTALL_OVERRIDES', '%s' % spec)
         unit_dir = d.getVar('systemd_system_unitdir', True)
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, dest))
+        set_doappend(d, 'FILES:%s' % pkg, '%s/%s' % (unit_dir, dest))
         add_default_subs(d, '%s' % dest)
         add_sd_user(d, '%s' % dest, pkg)
 
@@ -215,11 +215,11 @@ python() {
     d.appendVarFlag('do_install', 'postfuncs', ' systemd_do_postinst')
 
     pn = d.getVar('PN', True)
-    if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
-        d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
+    if d.getVar('SYSTEMD_SERVICE:%s' % pn, True) is None:
+        d.setVar('SYSTEMD_SERVICE:%s' % pn, '%s.service' % pn)
 
     for pkg in listvar_to_list(d, 'SYSTEMD_PACKAGES'):
-        svc = listvar_to_list(d, 'SYSTEMD_SERVICE_%s' % pkg)
+        svc = listvar_to_list(d, 'SYSTEMD_SERVICE:%s' % pkg)
         svc = [SystemdUnit(x) for x in svc]
         tmpl = [x.template for x in svc if x.is_instance]
         tmpl = list(set(tmpl))
@@ -329,7 +329,7 @@ python systemd_do_postinst() {
 }
 
 
-do_install_append() {
+do_install:append() {
         # install systemd service/socket/template files
         [ -z "${_INSTALL_SD_UNITS}" ] || \
                 install -d ${D}${systemd_system_unitdir}

@@ -13,11 +13,11 @@ python() {
     syscnfdir = d.getVar('sysconfdir', True)
     dest_dir = d.getVar('D', True)
 
-    set_append(d, 'AVAHI_SERVICES_DIR', os.path.join(
+    set_doappend(d, 'AVAHI_SERVICES_DIR', os.path.join(
         dest_dir+syscnfdir,
         'avahi',
         'services'))
-    set_append(d, 'SLP_SERVICES_DIR', os.path.join(
+    set_doappend(d, 'SLP_SERVICES_DIR', os.path.join(
         dest_dir+syscnfdir,
         'slp',
         'services'))
@@ -26,18 +26,18 @@ python() {
     for pkg in listvar_to_list(d, 'DISCOVERY_SVC_PACKAGES'):
         for service in listvar_to_list(d, 'REGISTERED_SERVICES_%s' % pkg):
             if avahi_enabled:
-                set_append(d, 'RRECOMMENDS_%s' % pkg, 'avahi-daemon')
+                set_doappend(d, 'RRECOMMENDS:%s' % pkg, 'avahi-daemon')
                 svc_name, svc_type, svc_port, svc_txt_data = service.split(':')
-                set_append(d, 'FILES_%s' % pkg, os.path.join(
+                set_doappend(d, 'FILES:%s' % pkg, os.path.join(
                     syscnfdir,
                     'avahi',
                     'services',
                     '%s.service' % svc_name))
 
             if slp_enabled:
-                set_append(d, 'RRECOMMENDS_%s' % pkg, 'slpd-lite')
+                set_doappend(d, 'RRECOMMENDS:%s' % pkg, 'slpd-lite')
                 svc_name, svc_type, svc_port, svc_txt_data = service.split(':')
-                set_append(d, 'FILES_%s' % pkg, os.path.join(
+                set_doappend(d, 'FILES:%s' % pkg, os.path.join(
                     syscnfdir,
                     'slp',
                     'services',

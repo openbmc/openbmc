@@ -17,7 +17,7 @@ inherit autotools \
 
 PACKAGE_BEFORE_PN = "phosphor-msl-verify"
 SYSTEMD_PACKAGES = "${PN} phosphor-msl-verify"
-SYSTEMD_SERVICE_phosphor-msl-verify = "phosphor-msl-verify.service"
+SYSTEMD_SERVICE:phosphor-msl-verify = "phosphor-msl-verify.service"
 
 DEPENDS += " \
         ${PN}-config \
@@ -33,7 +33,7 @@ DEPENDS += " \
         ${PYTHON_PN}-mako-native \
         "
 
-FILES_phosphor-msl-verify = "${bindir}/phosphor-msl-verify"
+FILES:phosphor-msl-verify = "${bindir}/phosphor-msl-verify"
 
 S = "${WORKDIR}/git"
 

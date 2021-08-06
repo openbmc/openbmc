@@ -22,7 +22,7 @@ def get_service(d):
     else:
       return " ".join(["xyz.openbmc_project.State.Boot.PostCode@{}.service".format(x) for x in d.getVar('OBMC_HOST_INSTANCES').split()])
 
-SYSTEMD_SERVICE_${PN} = "${@get_service(d)}"
+SYSTEMD_SERVICE:${PN} = "${@get_service(d)}"
 
 DEPENDS += " \
     sdbusplus \
@@ -30,5 +30,5 @@ DEPENDS += " \
     phosphor-logging \
     "
 
-FILES_${PN}  += "${systemd_system_unitdir}/xyz.openbmc_project.State.Boot.PostCode@.service"
-FILES_${PN}  += "${systemd_system_unitdir}/xyz.openbmc_project.State.Boot.PostCode.service"
+FILES:${PN}  += "${systemd_system_unitdir}/xyz.openbmc_project.State.Boot.PostCode@.service"
+FILES:${PN}  += "${systemd_system_unitdir}/xyz.openbmc_project.State.Boot.PostCode.service"

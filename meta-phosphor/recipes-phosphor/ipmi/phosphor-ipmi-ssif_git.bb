@@ -8,11 +8,11 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7ca
 inherit meson pkgconfig
 inherit systemd
 
-SYSTEMD_SERVICE_${PN} = "ssifbridge.service"
+SYSTEMD_SERVICE:${PN} = "ssifbridge.service"
 
 PROVIDES += "virtual/obmc-host-ipmi-hw"
-RPROVIDES_${PN} += "virtual-obmc-host-ipmi-hw"
-RRECOMMENDS_${PN} += "phosphor-ipmi-host"
+RPROVIDES:${PN} += "virtual-obmc-host-ipmi-hw"
+RRECOMMENDS:${PN} += "phosphor-ipmi-host"
 
 DEPENDS += "systemd"
 DEPENDS += "phosphor-logging"

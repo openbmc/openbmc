@@ -13,7 +13,7 @@ inherit cmake pkgconfig systemd
 
 BUTTON_PACKAGES="${PN}-signals ${PN}-handler"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 PACKAGE_BEFORE_PN += "${BUTTON_PACKAGES}"
 PACKAGECONFIG ??= "signals handler"
 SYSTEMD_PACKAGES = "${BUTTON_PACKAGES}"
@@ -21,11 +21,11 @@ SYSTEMD_PACKAGES = "${BUTTON_PACKAGES}"
 PACKAGECONFIG[signals] = ",,gpioplus nlohmann-json,"
 PACKAGECONFIG[handler] = ",,,phosphor-state-manager-chassis phosphor-state-manager-host"
 
-FILES_${PN}-signals = "${bindir}/buttons"
-SYSTEMD_SERVICE_${PN}-signals = "xyz.openbmc_project.Chassis.Buttons.service"
+FILES:${PN}-signals = "${bindir}/buttons"
+SYSTEMD_SERVICE:${PN}-signals = "xyz.openbmc_project.Chassis.Buttons.service"
 
-FILES_${PN}-handler = "${bindir}/button-handler"
-SYSTEMD_SERVICE_${PN}-handler = "phosphor-button-handler.service"
+FILES:${PN}-handler = "${bindir}/button-handler"
+SYSTEMD_SERVICE:${PN}-handler = "phosphor-button-handler.service"
 
 DEPENDS += " \
     systemd \

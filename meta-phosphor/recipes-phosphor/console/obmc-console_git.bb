@@ -31,14 +31,14 @@ PV = "1.0+git${SRCPV}"
 
 REGISTERED_SERVICES_${PN} += "obmc_console:tcp:2200:"
 
-SYSTEMD_SERVICE_${PN} += "obmc-console-ssh@.service \
+SYSTEMD_SERVICE:${PN} += "obmc-console-ssh@.service \
                 obmc-console-ssh.socket \
                 obmc-console@.service \
                 "
 
-FILES_${PN} += "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
+FILES:${PN} += "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
 
-do_install_append() {
+do_install:append() {
         # Install the server configuration
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
         if test -f "${WORKDIR}/${BPN}.conf"; then

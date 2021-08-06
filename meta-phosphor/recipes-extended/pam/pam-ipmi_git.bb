@@ -16,7 +16,7 @@ inherit autotools pkgconfig
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "openssl libpam"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
                ${base_libdir}/security/ \
                ${sysconfdir}/key_file \
                ${sysconfdir}/ipmi_pass \

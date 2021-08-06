@@ -31,4 +31,4 @@ PACKAGECONFIG[triggers] = " \
     -Dtriggers=[], \
     systemd udev"
 
-SYSTEMD_SERVICE_${PN} += "debug-trigger@.service"
+SYSTEMD_SERVICE:${PN} += "debug-trigger@.service"

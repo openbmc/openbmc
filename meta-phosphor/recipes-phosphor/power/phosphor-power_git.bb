@@ -23,7 +23,7 @@ POWER_SERVICE_PACKAGES = " \
 POWER_UTIL_PACKAGES = "${PN}-utils"
 
 PACKAGE_BEFORE_PN = "${POWER_SERVICE_PACKAGES} ${POWER_UTIL_PACKAGES}"
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 SYSTEMD_PACKAGES = "${POWER_SERVICE_PACKAGES}"
 
@@ -55,18 +55,18 @@ REGS_CONF_SVC = "phosphor-regulators-config.service"
 REGS_MON_ENA_SVC = "phosphor-regulators-monitor-enable.service"
 REGS_MON_DIS_SVC = "phosphor-regulators-monitor-disable.service"
 
-SYSTEMD_SERVICE_${PN}-sequencer = "${SEQ_MONITOR_SVC} ${SEQ_PGOOD_SVC}"
-SYSTEMD_SERVICE_${PN}-monitor = "${@bb.utils.contains('PACKAGECONFIG', 'monitor', '${PSU_MONITOR_TMPL}', '', d)}"
-SYSTEMD_SERVICE_${PN}-psu-monitor = "${PSU_MONITOR_SVC}"
-SYSTEMD_SERVICE_${PN}-regulators = "${REGS_SVC} ${REGS_CONF_SVC} ${REGS_MON_ENA_SVC} ${REGS_MON_DIS_SVC}"
+SYSTEMD_SERVICE:${PN}-sequencer = "${SEQ_MONITOR_SVC} ${SEQ_PGOOD_SVC}"
+SYSTEMD_SERVICE:${PN}-monitor = "${@bb.utils.contains('PACKAGECONFIG', 'monitor', '${PSU_MONITOR_TMPL}', '', d)}"
+SYSTEMD_SERVICE:${PN}-psu-monitor = "${PSU_MONITOR_SVC}"
+SYSTEMD_SERVICE:${PN}-regulators = "${REGS_SVC} ${REGS_CONF_SVC} ${REGS_MON_ENA_SVC} ${REGS_MON_DIS_SVC}"
 
 
 # TODO: cold-redundancy is not installed in the repo yet
-# FILES_${PN}-cold-redundancy = "${bindir}/cold-redundancy"
+# FILES:${PN}-cold-redundancy = "${bindir}/cold-redundancy"
 
-FILES_${PN}-monitor = "${bindir}/psu-monitor"
-FILES_${PN}-psu-monitor = "${bindir}/phosphor-psu-monitor ${datadir}/phosphor-psu-monitor"
-FILES_${PN}-regulators = "${bindir}/phosphor-regulators ${datadir}/phosphor-regulators"
-FILES_${PN}-regulators += "${bindir}/regsctl"
-FILES_${PN}-sequencer = "${bindir}/pseq-monitor"
-FILES_${PN}-utils = "${bindir}/psutils"
+FILES:${PN}-monitor = "${bindir}/psu-monitor"
+FILES:${PN}-psu-monitor = "${bindir}/phosphor-psu-monitor ${datadir}/phosphor-psu-monitor"
+FILES:${PN}-regulators = "${bindir}/phosphor-regulators ${datadir}/phosphor-regulators"
+FILES:${PN}-regulators += "${bindir}/regsctl"
+FILES:${PN}-sequencer = "${bindir}/pseq-monitor"
+FILES:${PN}-utils = "${bindir}/psutils"
