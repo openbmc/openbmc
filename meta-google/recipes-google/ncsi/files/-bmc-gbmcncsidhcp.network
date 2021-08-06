@@ -1,0 +1,9 @@
+[Match]
+Name=gbmcncsidhcp
+[Network]
+DHCP=false
+IPv6AcceptRA=false
+LLMNR=false
+MulticastDNS=false
+LinkLocalAddressing=ipv6
+Address=fdb5:0481:10ce::1/64

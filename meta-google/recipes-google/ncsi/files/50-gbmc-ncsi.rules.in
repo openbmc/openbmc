@@ -31,4 +31,10 @@ table inet filter {
         ip6 daddr fdb5:0481:10ce::/64 drop
         ip6 saddr fdb5:0481:10ce::/64 drop
     }
+    chain ncsi_dhcp_input {
+        type filter hook input priority 0; policy drop;
+        iifname != ncsigbmc accept
+        ip6 nexthdr icmpv6 accept
+        udp dport 547 accept
+    }
 }
