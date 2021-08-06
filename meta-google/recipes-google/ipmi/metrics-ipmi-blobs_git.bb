@@ -13,6 +13,6 @@ DEPENDS += " \
   protobuf \
   "
 
-FILES_${PN} += "${libdir}/blob-ipmid"
+FILES:${PN} += "${libdir}/blob-ipmid"
 
 EXTRA_OEMESON += "-Dtests=disabled"

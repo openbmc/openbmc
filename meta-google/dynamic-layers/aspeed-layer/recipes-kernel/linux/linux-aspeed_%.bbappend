@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/../../../../recipes-kernel/linux/files:"
-SRC_URI_append_gbmc = " file://gbmc.cfg"
-SRC_URI_append_gbmc_dev = " file://gbmc-dev.cfg"
-SRC_URI_append_gbmc_prod = " file://gbmc-prod.cfg"
+FILESEXTRAPATHS:prepend := "${THISDIR}/../../../../recipes-kernel/linux/files:"
+SRC_URI:append:gbmc = " file://gbmc.cfg"
+SRC_URI:append:gbmc:dev = " file://gbmc-dev.cfg"
+SRC_URI:append:gbmc:prod = " file://gbmc-prod.cfg"

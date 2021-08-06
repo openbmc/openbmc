@@ -16,25 +16,25 @@ SRC_URI += " \
 
 S = "${WORKDIR}"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
   gbmc-ip-monitor \
   ncsid \
   nftables-systemd \
   sslh \
   "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
   ${datadir}/gbmc-ip-monitor \
   ${systemd_unitdir} \
   "
 
-SYSTEMD_SERVICE_${PN} += " \
+SYSTEMD_SERVICE:${PN} += " \
   gbmc-ncsi-sslh.service \
   gbmc-ncsi-sslh.socket \
   gbmc-ncsi-set-nicenabled.service \
   "
 
-do_install_append() {
+do_install:append() {
   if_name='${GBMC_NCSI_IF_NAME}'
   if [ -z "$if_name" ]; then
     echo "Missing if_name" >&2

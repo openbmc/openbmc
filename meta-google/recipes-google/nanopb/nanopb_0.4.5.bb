@@ -13,12 +13,12 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "protobuf-native python3-protobuf"
 
-RDEPENDS_${PN}-generator += "python3 python3-protobuf"
+RDEPENDS:${PN}-generator += "python3 python3-protobuf"
 
-PACKAGES_prepend = "${PN}-generator ${PN}-runtime "
+PACKAGES:prepend = "${PN}-generator ${PN}-runtime "
 
-FILES_${PN}-generator = "${libdir}/python* ${bindir}"
+FILES:${PN}-generator = "${libdir}/python* ${bindir}"
 
-FILES_${PN}-runtime = "${libdir}/*.so.*"
+FILES:${PN}-runtime = "${libdir}/*.so.*"
 
 BBCLASSEXTEND = "native"

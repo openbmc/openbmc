@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 SRC_URI += "file://certs/authority/"
 
-FILES_${PN} = "${sysconfdir}/ssl/certs/authority/*"
+FILES:${PN} = "${sysconfdir}/ssl/certs/authority/*"
 
 do_install(){
     install -d ${D}${sysconfdir}/ssl/certs/authority

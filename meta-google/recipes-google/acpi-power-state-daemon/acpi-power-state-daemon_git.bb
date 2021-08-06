@@ -12,7 +12,7 @@ DEPENDS += " \
   systemd \
   "
 
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
   acpi-power-state.service \
   host-s0-state.target \
   host-s5-state.target \

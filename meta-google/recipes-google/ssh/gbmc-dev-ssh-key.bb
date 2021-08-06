@@ -7,7 +7,7 @@ SRC_URI += "file://gbmc-dev.pub"
 
 S = "${WORKDIR}"
 
-FILES_${PN} += " ${datadir}/authorized_keys.d"
+FILES:${PN} += " ${datadir}/authorized_keys.d"
 
 do_install() {
   install -d ${D}${datadir}/authorized_keys.d/root

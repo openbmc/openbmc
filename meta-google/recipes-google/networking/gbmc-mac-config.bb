@@ -12,14 +12,14 @@ SRC_URI += " \
 
 S = "${WORKDIR}"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
   bash \
   ipmi-fru-sh \
   "
 
-FILES_${PN} += "${systemd_unitdir}"
+FILES:${PN} += "${systemd_unitdir}"
 
-SYSTEMD_SERVICE_${PN} += "gbmc-mac-config.service"
+SYSTEMD_SERVICE:${PN} += "gbmc-mac-config.service"
 
 GBMC_MAC_EEPROM_OF_NAME ?= ""
 
@@ -28,7 +28,7 @@ GBMC_MAC_EEPROM_OF_NAME ?= ""
 #   Ex. "[0]=eth0 [2]=eth2"
 GBMC_MAC_IF_MAP ?= ""
 
-do_install_append() {
+do_install:append() {
   if [ -z '${GBMC_MAC_EEPROM_OF_NAME}' ]; then
     echo 'Missing GBMC_MAC_EEPROM_OF_NAME' >&2
     exit 1

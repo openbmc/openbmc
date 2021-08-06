@@ -1,8 +1,8 @@
 # We want to be able to manage our coredumps
-PACKAGECONFIG_append_gbmc = " coredump"
+PACKAGECONFIG:append:gbmc = " coredump"
 
 # Disable timesync as we don't use it and it makes rebooting much slower
-PACKAGECONFIG_remove_gbmc = "timesyncd"
+PACKAGECONFIG:remove:gbmc = "timesyncd"
 
 # We don't need any legacy sysv rc compatability
-PACKAGECONFIG_remove_gbmc = "sysvinit"
+PACKAGECONFIG:remove:gbmc = "sysvinit"
