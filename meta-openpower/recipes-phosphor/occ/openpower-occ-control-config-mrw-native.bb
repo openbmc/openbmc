@@ -11,7 +11,7 @@ PROVIDES += "virtual/openpower-occ-control-config-native"
 DEPENDS += "mrw-native mrw-perl-tools-native"
 
 # Generate a YAML files based on MRW input
-do_install_append() {
+do_install:append() {
     install -d ${YAML_DEST}/
     ${STAGING_BINDIR_NATIVE}/perl-native/perl \
     ${STAGING_BINDIR_NATIVE}/gen_occ_map.pl \

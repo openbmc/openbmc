@@ -33,4 +33,4 @@ do_install() {
     install -m 0644 ${WORKDIR}/croserver.service ${D}${systemd_system_unitdir}/
 }
 
-FILES_${PN} += "${systemd_system_unitdir}/croserver.service"
+FILES:${PN} += "${systemd_system_unitdir}/croserver.service"

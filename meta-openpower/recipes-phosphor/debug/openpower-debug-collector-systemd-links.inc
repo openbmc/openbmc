@@ -1,4 +1,4 @@
-pkg_postinst_${PN}_append() {
+pkg_postinst:${PN}:append() {
 	mkdir -p $D$systemd_system_unitdir/obmc-host-crash@0.target.wants
 	mkdir -p $D$systemd_system_unitdir/obmc-host-timeout@0.target.wants
 
@@ -20,7 +20,7 @@ pkg_postinst_${PN}_append() {
 	ln -s $TARGET $LINK
 }
 
-pkg_prerm_${PN}_append() {
+pkg_prerm:${PN}:append() {
 	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'mpreboot', d)}" != mpreboot ]; then
 		LINK="$D$systemd_system_unitdir/obmc-host-crash@0.target.wants/openpower-debug-collector-checkstop@0.service"
 		rm $LINK

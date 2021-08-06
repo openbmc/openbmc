@@ -7,7 +7,7 @@ inherit obmc-phosphor-systemd
 inherit allarch
 
 DEPENDS += "virtual/obmc-gpio-monitor"
-RDEPENDS_${PN} += "virtual/obmc-gpio-monitor"
+RDEPENDS:${PN} += "virtual/obmc-gpio-monitor"
 
 # For now, monitoring checkstop is the only usecase
 OBMC_HOST_MONITOR_INSTANCES = "checkstop"
@@ -19,7 +19,7 @@ SYSTEMD_ENVIRONMENT_FILE_${PN} +="obmc/gpio/checkstop"
 # This package is not supplying the unit file and also this is not a native
 # recipe since state-mgmt needs this package at runtime. Unsetting this below
 # variable will let the build go through
-SYSTEMD_SERVICE_${PN} ?=""
+SYSTEMD_SERVICE:${PN} ?=""
 
 # Install the override to set up a Conflicts relation
 SYSTEMD_OVERRIDE_${PN} +="checkstop.conf:phosphor-gpio-monitor@checkstop.service.d/checkstop.conf"

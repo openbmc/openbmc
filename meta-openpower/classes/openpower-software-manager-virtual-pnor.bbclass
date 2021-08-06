@@ -1,10 +1,10 @@
-PACKAGECONFIG_append = " virtual_pnor"
+PACKAGECONFIG:append = " virtual_pnor"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
         bash \
 "
 
-SYSTEMD_SERVICE_${PN} += " \
+SYSTEMD_SERVICE:${PN} += " \
         obmc-vpnor-updatesymlinks.service \
         obmc-vpnor-check-clearvolatile@.service \
         obmc-vpnor-enable-clearvolatile@.service \

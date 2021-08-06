@@ -10,7 +10,7 @@ OBMC_MACHINE_FEATURES += "\
         "
 
 # Add OpenPOWER OEM commands handler library
-VIRTUAL-RUNTIME_phosphor-ipmi-providers_append_df-openpower = " \
+VIRTUAL-RUNTIME_phosphor-ipmi-providers:append:df-openpower = " \
     openpower-ipmi-oem \
 "
 

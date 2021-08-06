@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://plugins.d/guard"
 
 install_openpower_plugins() {
@@ -13,6 +13,6 @@ python link_openpower_plugins() {
 }
 
 DEBUG_COLLECTOR_INSTALL_POSTFUNCS ?= ""
-DEBUG_COLLECTOR_INSTALL_POSTFUNCS_df-openpower ?= "install_openpower_plugins link_openpower_plugins"
+DEBUG_COLLECTOR_INSTALL_POSTFUNCS:df-openpower ?= "install_openpower_plugins link_openpower_plugins"
 
 do_install[postfuncs] += "${DEBUG_COLLECTOR_INSTALL_POSTFUNCS}"

@@ -18,6 +18,6 @@ DEPENDS = " \
         libekb pdbg autoconf-archive guard \
         "
 
-RDEPENDS_${PN} = "phal-devtree"
+RDEPENDS:${PN} = "phal-devtree"
 
 EXTRA_OECONF = "CHIP=p10"

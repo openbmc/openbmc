@@ -23,7 +23,7 @@ DEPENDS += " \
         autoconf-archive-native \
         "
 
-SYSTEMD_SERVICE_${PN} += "op-vpd-parser.service"
+SYSTEMD_SERVICE:${PN} += "op-vpd-parser.service"
 
 S = "${WORKDIR}/git"
 
@@ -33,7 +33,7 @@ EXTRA_OEMESON = " \
              -DPROP_YAML=${STAGING_DIR_NATIVE}${properties_datadir}/out.yaml \
              "
 
-do_install_append() {
+do_install:append() {
         SRC=${STAGING_DATADIR_NATIVE}${inventory_datadir_name}
         DEST=${D}${inventory_envdir}
         install -d ${DEST}

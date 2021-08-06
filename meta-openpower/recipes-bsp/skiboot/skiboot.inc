@@ -3,7 +3,7 @@ LICENSE = "Apache-2.0"
 
 SRC_URI += "git://github.com/open-power/skiboot.git;branch=skiboot-6.5.x"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/skiboot:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/skiboot:"
 
 LIC_FILES_CHKSUM = "file://${S}/LICENCE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
@@ -27,6 +27,6 @@ do_install() {
 }
 
 # libflash.so is a SONAME and is strongly required in the production
-INSANE_SKIP_${PN}_append = "dev-so"
+INSANE_SKIP:${PN}:append = "dev-so"
 FILES_SOLIBSDEV = ""
-FILES_${PN}_append = " ${libdir}/libflash.so"
+FILES:${PN}:append = " ${libdir}/libflash.so"

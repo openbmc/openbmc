@@ -23,11 +23,11 @@ S = "${WORKDIR}/git"
 APPS = "checkstop watchdog"
 
 DEBUG_TMPL = "openpower-debug-collector-{0}@.service"
-SYSTEMD_SERVICE_${PN} += "${@compose_list(d, 'DEBUG_TMPL', 'APPS')}"
+SYSTEMD_SERVICE:${PN} += "${@compose_list(d, 'DEBUG_TMPL', 'APPS')}"
 
 
 # Do not depend on phosphor-logging for native build
-DEPENDS_remove_class-native = "phosphor-logging"
+DEPENDS:remove:class-native = "phosphor-logging"
 
 # Do not depend on phosphor-logging for native SDK build
-DEPENDS_remove_class-nativesdk = "phosphor-logging"
+DEPENDS:remove:class-nativesdk = "phosphor-logging"

@@ -21,13 +21,13 @@ S = "${WORKDIR}/git"
 
 inherit meson systemd
 
-SYSTEMD_SERVICE_${PN} = "attn_handler.service"
+SYSTEMD_SERVICE:${PN} = "attn_handler.service"
 
 DEPENDS = "boost libgpiod pdbg phosphor-logging sdbusplus openpower-libhei \
            nlohmann-json valijson"
 
 # This is required so that libhei is installed with the chip data files.
-RDEPENDS_${PN} += "openpower-libhei"
+RDEPENDS:${PN} += "openpower-libhei"
 
 # Conditionally pull in PHAL APIs, if available.
 PACKAGECONFIG ??= "${@bb.utils.filter('OBMC_MACHINE_FEATURES', 'phal', d)}"
