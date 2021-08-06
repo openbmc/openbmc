@@ -1,0 +1,6 @@
+[Unit]
+Description=Power off host
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/host_poweroff.sh

@@ -1,0 +1,6 @@
+[Unit]
+Description=Powercycle host
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/host_powercycle.sh

@@ -1,0 +1,7 @@
+[Unit]
+Description=Warm Reset Host
+
+[Service]
+Type=oneshot
+Environment=DONT_STOP_WATCHDOG=1
+ExecStart=/usr/bin/host_reset.sh warm

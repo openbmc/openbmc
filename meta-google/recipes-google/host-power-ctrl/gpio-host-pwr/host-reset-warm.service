@@ -1,0 +1,6 @@
+[Unit]
+Description=Warm Reset Host
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/host_reset.sh warm

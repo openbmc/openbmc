@@ -1,0 +1,11 @@
+[Unit]
+Description=Ensure host is off on clean AC cycle
+Before=host-poweron.service
+Before=firmware-updates-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/host_ensure_off.sh
+
+[Install]
+WantedBy=multi-user.target
