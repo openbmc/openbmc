@@ -1,10 +1,10 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/network:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/network:"
 
 SRC_URI += " file://ncsi-netlink.service"
-SYSTEMD_SERVICE_${PN} += " ncsi-netlink.service"
-FILES_${PN} += "${datadir}/network/*.json"
+SYSTEMD_SERVICE:${PN} += " ncsi-netlink.service"
+FILES:${PN} += "${datadir}/network/*.json"
 
-PACKAGECONFIG_append = " sync-mac"
+PACKAGECONFIG:append = " sync-mac"
 
 install_network_configuration(){
     install -d ${D}${systemd_system_unitdir}
@@ -13,22 +13,22 @@ install_network_configuration(){
     install -m 0644 ${WORKDIR}/inventory-object-map.json ${D}${datadir}/network/config.json
 }
 
-SRC_URI_append_p10bmc = " file://inventory-object-map.json"
-do_install_append_p10bmc(){
+SRC_URI:append:p10bmc = " file://inventory-object-map.json"
+do_install:append:p10bmc(){
     install_network_configuration
 }
 
-SRC_URI_append_ibm-ac-server = " file://inventory-object-map.json"
-do_install_append_ibm-ac-server() {
+SRC_URI:append:ibm-ac-server = " file://inventory-object-map.json"
+do_install:append:ibm-ac-server() {
     install_network_configuration
 }
 
-SRC_URI_append_mihawk = " file://inventory-object-map.json"
-do_install_append_mihawk() {
+SRC_URI:append:mihawk = " file://inventory-object-map.json"
+do_install:append:mihawk() {
     install_network_configuration
 }
 
-SRC_URI_append_witherspoon-tacoma = " file://inventory-object-map.json"
-do_install_append_witherspoon-tacoma(){
+SRC_URI:append:witherspoon-tacoma = " file://inventory-object-map.json"
+do_install:append:witherspoon-tacoma(){
     install_network_configuration
 }

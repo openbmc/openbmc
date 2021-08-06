@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI_remove = "file://${BPN}.conf"
+SRC_URI:remove = "file://${BPN}.conf"
 SRC_URI += "file://server.ttyVUART0.conf"
 
 install_concurrent_console_config() {
@@ -27,38 +27,38 @@ install_concurrent_console_config() {
         install -m 0644 ${WORKDIR}/server.ttyVUART1.conf ${D}${sysconfdir}/${BPN}/
 }
 
-SRC_URI_append_p10bmc = " file://client.2201.conf"
-SRC_URI_append_p10bmc = " file://server.ttyVUART1.conf"
+SRC_URI:append:p10bmc = " file://client.2201.conf"
+SRC_URI:append:p10bmc = " file://server.ttyVUART1.conf"
 
-REGISTERED_SERVICES_${PN}_append_p10bmc = " obmc_console_guests:tcp:2201:"
+REGISTERED_SERVICES_${PN}:append:p10bmc = " obmc_console_guests:tcp:2201:"
 
-SYSTEMD_SERVICE_${PN}_append_p10bmc = " obmc-console-ssh@2200.service \
+SYSTEMD_SERVICE:${PN}:append:p10bmc = " obmc-console-ssh@2200.service \
 		obmc-console-ssh@2201.service \
                 "
-SYSTEMD_SERVICE_${PN}_remove_p10bmc = "obmc-console-ssh.socket"
+SYSTEMD_SERVICE:${PN}:remove:p10bmc = "obmc-console-ssh.socket"
 
-FILES_${PN}_remove_p10bmc = "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
+FILES:${PN}:remove:p10bmc = "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
 
-EXTRA_OECONF_append_p10bmc = " --enable-concurrent-servers"
+EXTRA_OECONF:append:p10bmc = " --enable-concurrent-servers"
 
-do_install_append_p10bmc() {
+do_install:append:p10bmc() {
         install_concurrent_console_config
 }
 
-SRC_URI_append_witherspoon-tacoma = " file://client.2201.conf"
-SRC_URI_append_witherspoon-tacoma = " file://server.ttyVUART1.conf"
+SRC_URI:append:witherspoon-tacoma = " file://client.2201.conf"
+SRC_URI:append:witherspoon-tacoma = " file://server.ttyVUART1.conf"
 
-REGISTERED_SERVICES_${PN}_append_witherspoon-tacoma = " obmc_console_guests:tcp:2201:"
+REGISTERED_SERVICES_${PN}:append:witherspoon-tacoma = " obmc_console_guests:tcp:2201:"
 
-SYSTEMD_SERVICE_${PN}_append_witherspoon-tacoma = " obmc-console-ssh@2200.service \
+SYSTEMD_SERVICE:${PN}:append:witherspoon-tacoma = " obmc-console-ssh@2200.service \
 		obmc-console-ssh@2201.service \
                 "
-SYSTEMD_SERVICE_${PN}_remove_witherspoon-tacoma = "obmc-console-ssh.socket"
+SYSTEMD_SERVICE:${PN}:remove:witherspoon-tacoma = "obmc-console-ssh.socket"
 
-FILES_${PN}_remove_witherspoon-tacoma = "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
+FILES:${PN}:remove:witherspoon-tacoma = "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
 
-EXTRA_OECONF_append_witherspoon-tacoma = " --enable-concurrent-servers"
+EXTRA_OECONF:append:witherspoon-tacoma = " --enable-concurrent-servers"
 
-do_install_append_witherspoon-tacoma() {
+do_install:append:witherspoon-tacoma() {
         install_concurrent_console_config
 }

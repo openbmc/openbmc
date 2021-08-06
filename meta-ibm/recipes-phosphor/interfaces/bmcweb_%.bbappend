@@ -1,4 +1,4 @@
-EXTRA_OEMESON_append = " \
+EXTRA_OEMESON:append = " \
     -Dinsecure-tftp-update=enabled \
     -Dibm-management-console=enabled \
 "

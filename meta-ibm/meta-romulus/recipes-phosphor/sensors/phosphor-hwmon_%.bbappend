@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend_romulus := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:romulus := "${THISDIR}/${PN}:"
 
-EXTRA_OEMESON_append_romulus = " -Dnegative-errno-on-fail=true"
+EXTRA_OEMESON:append:romulus = " -Dnegative-errno-on-fail=true"
 
 CHIPS = " \
         bus@1e78a000/i2c-bus@440/w83773g@4c \
@@ -21,5 +21,5 @@ OCCSFMT = "devices/platform/gpio-fsi/fsi0/slave@00--00/{0}.conf"
 OCCITEMS = "${@compose_list(d, 'OCCSFMT', 'OCCS')}"
 
 ENVS = "obmc/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_romulus = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_romulus = " ${@compose_list(d, 'ENVS', 'OCCITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}:append:romulus = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}:append:romulus = " ${@compose_list(d, 'ENVS', 'OCCITEMS')}"

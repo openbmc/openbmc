@@ -15,7 +15,7 @@ COMPATIBLE_MACHINE_${MACHINE} = "^${MACHINE}$"
 KERNEL_CLASSES ?= "kernel-uimage"
 KERNEL_IMAGETYPE ?= "uImage"
 
-do_patch_append() {
+do_patch:append() {
     for DTB in "${KERNEL_DEVICETREE}"; do
         DT=`basename ${DTB} .dtb`
         if [ -r "${WORKDIR}/${DT}.dts" ]; then
@@ -28,4 +28,4 @@ do_patch_append() {
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
 
-INSANE_SKIP_kernel-vmlinux = "ldflags"
+INSANE_SKIP:kernel-vmlinux = "ldflags"

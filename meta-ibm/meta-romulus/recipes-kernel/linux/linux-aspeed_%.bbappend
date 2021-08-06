@@ -1,2 +1,2 @@
-FILESEXTRAPATHS_prepend_romulus := "${THISDIR}/${PN}:"
-SRC_URI_append_romulus = " file://romulus.cfg"
+FILESEXTRAPATHS:prepend:romulus := "${THISDIR}/${PN}:"
+SRC_URI:append:romulus = " file://romulus.cfg"

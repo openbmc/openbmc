@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit allarch
 inherit phosphor-dbus-monitor
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI += "file://power-supply-policy.yaml"
 
@@ -14,4 +14,4 @@ do_install() {
         install -D ${WORKDIR}/power-supply-policy.yaml ${D}${config_dir}/power-supply-policy.yaml
 }
 
-FILES_${PN} += "${config_dir}/power-supply-policy.yaml"
+FILES:${PN} += "${config_dir}/power-supply-policy.yaml"

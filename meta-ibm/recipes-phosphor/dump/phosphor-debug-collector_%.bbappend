@@ -1,10 +1,10 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
-PACKAGECONFIG_append_p10bmc = " host-dump-transport-pldm"
-PACKAGECONFIG_append_witherspoon-tacoma = " host-dump-transport-pldm"
+PACKAGECONFIG:append:p10bmc = " host-dump-transport-pldm"
+PACKAGECONFIG:append:witherspoon-tacoma = " host-dump-transport-pldm"
 
-PACKAGECONFIG_append_p10bmc = " openpower-dumps-extension"
-PACKAGECONFIG_append_witherspoon-tacoma = " openpower-dumps-extension"
+PACKAGECONFIG:append:p10bmc = " openpower-dumps-extension"
+PACKAGECONFIG:append:witherspoon-tacoma = " openpower-dumps-extension"
 
 SRC_URI += "file://plugins.d/ibm_elogall"
 SRC_URI += "file://plugins.d/pels"
@@ -47,6 +47,6 @@ python link_ibm_bad_vpd() {
 }
 
 IBM_INSTALL_POSTFUNCS = "install_ibm_plugins link_ibm_plugins"
-IBM_INSTALL_POSTFUNCS_p10bmc += "install_dreport_header install_ibm_bad_vpd link_ibm_bad_vpd"
+IBM_INSTALL_POSTFUNCS:p10bmc += "install_dreport_header install_ibm_bad_vpd link_ibm_bad_vpd"
 
 do_install[postfuncs] += "${IBM_INSTALL_POSTFUNCS}"

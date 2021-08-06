@@ -1,7 +1,7 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_append_p10bmc = " file://mctp"
-SRC_URI_append_witherspoon-tacoma = " file://mctp"
+SRC_URI:append:p10bmc = " file://mctp"
+SRC_URI:append:witherspoon-tacoma = " file://mctp"
 
-PACKAGECONFIG_append_p10bmc = " astlpc-raw-kcs"
-PACKAGECONFIG_append_witherspoon-tacoma = " astlpc-raw-kcs"
+PACKAGECONFIG:append:p10bmc = " astlpc-raw-kcs"
+PACKAGECONFIG:append:witherspoon-tacoma = " astlpc-raw-kcs"

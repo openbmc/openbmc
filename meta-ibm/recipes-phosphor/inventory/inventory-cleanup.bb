@@ -14,4 +14,4 @@ do_install() {
         install -D inventory-cleanup.yaml ${D}${base_datadir}/events.d/inventory-cleanup.yaml
 }
 
-FILES_${PN} += "${base_datadir}/events.d/inventory-cleanup.yaml"
+FILES:${PN} += "${base_datadir}/events.d/inventory-cleanup.yaml"

@@ -31,8 +31,8 @@ SRC_URI += "file://policyTable.json"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[policy-interface] = "--enable-policy-interface, --disable-policy-interface,,"
 
-PACKAGECONFIG_ibm-ac-server = "policy-interface"
-PACKAGECONFIG_mihawk = "policy-interface"
+PACKAGECONFIG:ibm-ac-server = "policy-interface"
+PACKAGECONFIG:mihawk = "policy-interface"
 
 SERVICE = "com.ibm.Logging.service"
 DBUS_SERVICE_${PN} += "${SERVICE}"
@@ -43,7 +43,7 @@ DBUS_SERVICE_${PN} += "${SERVICE}"
 LOG_FMT = "../${SERVICE}:xyz.openbmc_project.Logging.service.wants/${SERVICE}"
 SYSTEMD_LINK_${PN} += "${LOG_FMT}"
 
-do_install_append(){
+do_install:append(){
 
     install -d ${D}${datadir}/ibm-logging
 

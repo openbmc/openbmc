@@ -1,10 +1,10 @@
-OBMC_IMAGE_EXTRA_INSTALL_append_ibm-ac-server = " mboxd max31785-msl phosphor-msl-verify liberation-fonts uart-render-controller first-boot-set-hostname"
-OBMC_IMAGE_EXTRA_INSTALL_append_p10bmc = " mboxd ibmtpm2tss"
-OBMC_IMAGE_EXTRA_INSTALL_append_witherspoon-tacoma = " ibmtpm2tss"
-OBMC_IMAGE_EXTRA_INSTALL_append_mihawk = " mboxd liberation-fonts uart-render-controller "
+OBMC_IMAGE_EXTRA_INSTALL:append:ibm-ac-server = " mboxd max31785-msl phosphor-msl-verify liberation-fonts uart-render-controller first-boot-set-hostname"
+OBMC_IMAGE_EXTRA_INSTALL:append:p10bmc = " mboxd ibmtpm2tss"
+OBMC_IMAGE_EXTRA_INSTALL:append:witherspoon-tacoma = " ibmtpm2tss"
+OBMC_IMAGE_EXTRA_INSTALL:append:mihawk = " mboxd liberation-fonts uart-render-controller "
 
 # remove so things fit in available flash space
-IMAGE_FEATURES_remove_witherspoon = "obmc-user-mgmt-ldap"
+IMAGE_FEATURES:remove:witherspoon = "obmc-user-mgmt-ldap"
 
 # Optionally configure IBM service accounts
 #
@@ -58,7 +58,7 @@ IBM_EXTRA_USERS_PARAMS += " \
   "
 
 # This is recipe specific to ensure it takes effect.
-EXTRA_USERS_PARAMS_pn-obmc-phosphor-image += "${@bb.utils.contains('DISTRO_FEATURES', 'ibm-service-account-policy', "${IBM_EXTRA_USERS_PARAMS}", '', d)}"
+EXTRA_USERS_PARAMS:pn-obmc-phosphor-image += "${@bb.utils.contains('DISTRO_FEATURES', 'ibm-service-account-policy', "${IBM_EXTRA_USERS_PARAMS}", '', d)}"
 
 # The service account needs sudo.
-IMAGE_INSTALL_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ibm-service-account-policy', 'sudo', '', d)}"
+IMAGE_INSTALL:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ibm-service-account-policy', 'sudo', '', d)}"
