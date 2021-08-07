@@ -1,10 +1,10 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-PACKAGECONFIG_append = " associations"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+PACKAGECONFIG:append = " associations"
 SRC_URI += " file://associations.json"
 
 DEPENDS += " phosphor-inventory-manager-chassis"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${base_datadir}
     install -m 0755 ${WORKDIR}/associations.json ${D}${base_datadir}/associations.json
 }

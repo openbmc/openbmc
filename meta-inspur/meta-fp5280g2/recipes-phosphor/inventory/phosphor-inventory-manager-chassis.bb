@@ -15,4 +15,4 @@ do_install() {
         install -D chassis.yaml ${D}${base_datadir}/events.d/chassis.yaml
 }
 
-FILES_${PN} += "${base_datadir}/events.d/chassis.yaml"
+FILES:${PN} += "${base_datadir}/events.d/chassis.yaml"

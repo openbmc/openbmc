@@ -16,5 +16,5 @@ do_install() {
         install -m 0755 ${S}/fp5280g2-psu-update ${D}${bindir}/fp5280g2-psu-update
 }
 
-INSANE_SKIP_${PN} = "ldflags"
+INSANE_SKIP:${PN} = "ldflags"
 
