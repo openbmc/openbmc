@@ -11,7 +11,7 @@ SRC_URI = " \
           file://ampere_host_check.sh \
           "
 
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 do_install() {
     install -d ${D}/usr/sbin

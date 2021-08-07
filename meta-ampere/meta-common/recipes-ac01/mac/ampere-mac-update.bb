@@ -10,17 +10,17 @@ inherit systemd
 inherit obmc-phosphor-systemd
 
 DEPENDS = "systemd"
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
-FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 
 SRC_URI += " \
             file://ampere_update_mac.sh \
            "
 
-SYSTEMD_SERVICE_${PN} = "ampere_update_mac.service"
+SYSTEMD_SERVICE:${PN} = "ampere_update_mac.service"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/${sbindir}
     install -m 755 ${WORKDIR}/ampere_update_mac.sh ${D}/${sbindir}
 }

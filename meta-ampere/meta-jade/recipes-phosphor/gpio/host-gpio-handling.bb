@@ -6,11 +6,11 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7ca
 inherit obmc-phosphor-systemd
 
 DEPENDS += "virtual/obmc-gpio-monitor"
-RDEPENDS_${PN} += "virtual/obmc-gpio-monitor"
+RDEPENDS:${PN} += "virtual/obmc-gpio-monitor"
 
 OBMC_HOST_ACK_MONITOR_INSTANCES = "reboot_ack shutdown_ack"
 
-SYSTEMD_ENVIRONMENT_FILE_${PN} +="obmc/gpio/reboot_ack \
+SYSTEMD_ENVIRONMENT_FILE:${PN} +="obmc/gpio/reboot_ack \
                                   obmc/gpio/shutdown_ack \
                                  "
 
@@ -19,5 +19,5 @@ INSTFMT = "phosphor-gpio-monitor@{0}.service"
 TGT = "multi-user.target"
 FMT = "../${TMPL}:${TGT}.requires/${INSTFMT}"
 
-SYSTEMD_SERVICE_${PN} += "ampere-host-shutdown-ack@.service"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_ACK_MONITOR_INSTANCES')}"
+SYSTEMD_SERVICE:${PN} += "ampere-host-shutdown-ack@.service"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT', 'OBMC_HOST_ACK_MONITOR_INSTANCES')}"

@@ -1,11 +1,11 @@
-FILESEXTRAPATHS_append := "${THISDIR}/${PN}:"
-RDEPENDS_${PN} += "bash"
+FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
+RDEPENDS:${PN} += "bash"
 
 # Remove what installed by common recipe
 OBMC_CONSOLE_HOST_TTY = ""
-SYSTEMD_SUBSTITUTIONS_remove += "OBMC_CONSOLE_HOST_TTY:${OBMC_CONSOLE_HOST_TTY}:${PN}-ssh@.service"
-SYSTEMD_SUBSTITUTIONS_remove += "OBMC_CONSOLE_HOST_TTY:${OBMC_CONSOLE_HOST_TTY}:${PN}-ssh.socket"
-SYSTEMD_SERVICE_${PN}_remove = " \
+SYSTEMD_SUBSTITUTIONS:remove += "OBMC_CONSOLE_HOST_TTY:${OBMC_CONSOLE_HOST_TTY}:${PN}-ssh@.service"
+SYSTEMD_SUBSTITUTIONS:remove += "OBMC_CONSOLE_HOST_TTY:${OBMC_CONSOLE_HOST_TTY}:${PN}-ssh.socket"
+SYSTEMD_SERVICE:${PN}:remove = " \
                           ${PN}-ssh.socket \
                           ${PN}-ssh@.service \
                         "
@@ -27,12 +27,12 @@ SRC_URI += "${@compose_list(d, 'CONSOLE_SSH_SERVICE_FILE_FMT', 'HOST_CONSOLE_TTY
 CONSOLE_SSH_SOCKET_FMT = "${PN}-{0}-ssh.socket"
 CONSOLE_SSH_SERVICE_FMT = "${PN}-{0}-ssh@.service"
 
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
                           ${PN}@.service \
                           ${@compose_list(d, 'CONSOLE_SSH_SOCKET_FMT', 'HOST_CONSOLE_TTY')} \
                           ${@compose_list(d, 'CONSOLE_SSH_SERVICE_FMT', 'HOST_CONSOLE_TTY')} \
                         "
-do_install_append() {
+do_install:append() {
     for i in ${HOST_CONSOLE_TTY}
     do
         install -m 0644 ${WORKDIR}/server.${i}.conf ${D}${sysconfdir}/${BPN}/server.${i}.conf

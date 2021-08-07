@@ -22,10 +22,10 @@ do_install() {
         ${D}${datadir}/${BPN}/ipmi-fru-read.yaml
 }
 
-FILES_${PN}-dev = " \
+FILES:${PN}-dev = " \
     ${datadir}/${BPN}/ipmi-sensors-${MACHINE}.yaml \
     ${datadir}/${BPN}/ipmi-extra-properties.yaml \
     ${datadir}/${BPN}/ipmi-fru-read.yaml \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
