@@ -42,6 +42,7 @@ do_install () {
     do
         # Remove hardcoded relative paths
         sed -i -e 's#..\/utils\/##' ${script}
+        sed -i -e 's#. ..\/Switches#${bindir}#g' ${script}
 
         script_basename=`basename ${script}`
         install -m 0755 $script ${D}${libdir}/${BPN}/${script_basename}
@@ -54,7 +55,7 @@ do_install () {
         # if the script includes any helper scripts from the $libdir
         # directory then change the source path to the absolute path
         # to reflect the install location of the helper scripts.
-        sed -i -e "s#source ../include#source ${libdir}/${BPN}#g" ${script}
+        sed -i -e "s#. ../include#. ${libdir}/${BPN}#g" ${script}
         # Remove hardcoded relative paths
         sed -i -e 's#..\/utils\/##' ${script}
 
@@ -62,7 +63,7 @@ do_install () {
         install -m 0755 $script ${D}${bindir}/${script_basename}
     done
 }
-RDEPENDS_${PN} +="bash"
+RDEPENDS:${PN} +="bash"
 
 # http://errors.yoctoproject.org/Errors/Details/186956/
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'

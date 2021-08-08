@@ -13,4 +13,4 @@ SRC_URI[sha256sum] = "ab8a5fe6f68fb1789190e498243a1d1385de3f64e984f470cbd3d1eb77
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[qrencode] = "--enable-libqrencode,--disable-libqrencode,qrencode"
 
-FILES_${PN} += "${datadir}/metainfo"
+FILES:${PN} += "${datadir}/metainfo"

@@ -13,7 +13,7 @@ SRC_URI +=" \
 	file://run-ptest \
 "
 
-RDEPENDS_${PN}_ptest +=" \
+RDEPENDS:${PN}_ptest +=" \
 	${PYTHON_PN}_pytest \
 "
 
@@ -22,6 +22,6 @@ do_install_ptest() {
 }
 
 
-RDEPENDS_${PN} += "${PYTHON_PN}-pytest"
+RDEPENDS:${PN} += "${PYTHON_PN}-pytest"
 
 BBCLASSEXTEND = "native nativesdk"

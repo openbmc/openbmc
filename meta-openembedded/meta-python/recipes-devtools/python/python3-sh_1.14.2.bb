@@ -9,7 +9,7 @@ PYPI_PACKAGE = "sh"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-codecs \
     ${PYTHON_PN}-core \
     ${PYTHON_PN}-io \

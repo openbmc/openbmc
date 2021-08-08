@@ -24,10 +24,10 @@ CACHED_CONFIGUREVARS += " \
 "
 
 # ifunc doesn't appear to work on mips, casuses libbfd assertion failures
-CACHED_CONFIGUREVARS_append_mipsarch = " libc_cv_ld_gnu_indirect_function=no"
+CACHED_CONFIGUREVARS:append:mipsarch = " libc_cv_ld_gnu_indirect_function=no"
 
 GLIBC_EXTRA_OECONF ?= ""
-GLIBC_EXTRA_OECONF_class-nativesdk = ""
+GLIBC_EXTRA_OECONF:class-nativesdk = ""
 
 # glibc uses PARALLELMFLAGS variable to pass parallel build info so transfer
 # PARALLEL_MAKE into PARALLELMFLAGS and empty out PARALLEL_MAKE
@@ -41,12 +41,12 @@ PARALLEL_MAKE = ""
 # ensure make uses /bin/bash
 EXTRA_OEMAKE += "SHELL=/bin/bash"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	sed -e "s#@BASH@#/bin/sh#" -i ${S}/elf/ldd.bash.in
 }
 
 # Enable backtrace from abort()
-do_configure_append_arm () {
+do_configure:append:arm () {
 	echo "CFLAGS-abort.c = -fasynchronous-unwind-tables" >> ${B}/configparms
 	echo "CFLAGS-raise.c = -fasynchronous-unwind-tables" >> ${B}/configparms
 }

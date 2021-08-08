@@ -13,4 +13,4 @@ SRC_URI[sha256sum] = "816927a350f38d56072aeca5dfb10221fe1dc653745853d30a216637f5
 PYPI_PACKAGE = "PyMySQL"
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "${PYTHON_PN}-cryptography"
+RDEPENDS:${PN} += "${PYTHON_PN}-cryptography"

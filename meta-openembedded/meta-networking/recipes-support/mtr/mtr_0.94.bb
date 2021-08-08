@@ -22,4 +22,4 @@ PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 
 PACKAGES += "${PN}-bash-completions"
 
-FILES_${PN}-bash-completions = "${datadir}/bash-completion/"
+FILES:${PN}-bash-completions = "${datadir}/bash-completion/"

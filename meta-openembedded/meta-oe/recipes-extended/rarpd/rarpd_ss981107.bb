@@ -45,7 +45,7 @@ do_install() {
 inherit systemd
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "rarpd.service"
+SYSTEMD_SERVICE:${PN} = "rarpd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"

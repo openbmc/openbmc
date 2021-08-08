@@ -9,16 +9,16 @@ require qemu-native.inc
 # and avoid file clashes
 DEPENDS = "glib-2.0-native zlib-native pixman-native qemu-native bison-native"
 
-EXTRA_OECONF_append = " --target-list=${@get_qemu_system_target_list(d)}"
+EXTRA_OECONF:append = " --target-list=${@get_qemu_system_target_list(d)}"
 
 PACKAGECONFIG ??= "fdt alsa kvm pie \
     ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'virglrenderer glx', '', d)} \
 "
 
 # Handle distros such as CentOS 5 32-bit that do not have kvm support
-PACKAGECONFIG_remove = "${@'kvm' if not os.path.exists('/usr/include/linux/kvm.h') else ''}"
+PACKAGECONFIG:remove = "${@'kvm' if not os.path.exists('/usr/include/linux/kvm.h') else ''}"
 
-do_install_append() {
+do_install:append() {
     install -Dm 0755 ${WORKDIR}/powerpc_rom.bin ${D}${datadir}/qemu
 
     # The following is also installed by qemu-native

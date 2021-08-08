@@ -15,7 +15,7 @@ DEPENDS = " \
 "
 DEPENDS += "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
-RDEPENDS_${PN} = "acl"
+RDEPENDS:${PN} = "acl"
 
 SRC_URI = "git://github.com/storaged-project/udisks.git;branch=master"
 SRCREV = "da6d9480fefeb0ffdf8a84626b5096827d8d7030"
@@ -29,13 +29,13 @@ REQUIRED_DISTRO_FEATURES = "polkit"
 
 EXTRA_OECONF = "--disable-man --disable-gtk-doc"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # | configure.ac:656: error: required file 'build-aux/config.rpath' not found
     mkdir -p ${S}/build-aux
     touch ${S}/build-aux/config.rpath
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1/ \
     ${datadir}/polkit-1 \
     ${datadir}/bash-completion \
@@ -46,8 +46,8 @@ FILES_${PN} += " \
 "
 
 PACKAGES =+ "${PN}-libs"
-FILES_${PN}-libs = "${libdir}/lib*${SOLIBS}"
-FILES_${PN} += "${nonarch_libdir}/tmpfiles.d"
+FILES:${PN}-libs = "${libdir}/lib*${SOLIBS}"
+FILES:${PN} += "${nonarch_libdir}/tmpfiles.d"
 
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 SYSTEMD_AUTO_ENABLE = "disable"

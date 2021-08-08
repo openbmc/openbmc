@@ -19,11 +19,9 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  src/shared/format-table.c          | 36 ++++++++++++++++++++----------
  3 files changed, 38 insertions(+), 31 deletions(-)
 
-diff --git a/src/basic/sort-util.h b/src/basic/sort-util.h
-index 49586a4a24..d92a5ab0ed 100644
 --- a/src/basic/sort-util.h
 +++ b/src/basic/sort-util.h
-@@ -55,18 +55,4 @@ static inline void _qsort_safe(void *base, size_t nmemb, size_t size, __compar_f
+@@ -56,18 +56,4 @@ static inline void _qsort_safe(void *bas
                  _qsort_safe((p), (n), sizeof((p)[0]), (__compar_fn_t) _func_); \
          })
  
@@ -42,11 +40,9 @@ index 49586a4a24..d92a5ab0ed 100644
 -        })
 -
  int cmp_int(const int *a, const int *b);
-diff --git a/src/libsystemd/sd-hwdb/hwdb-util.c b/src/libsystemd/sd-hwdb/hwdb-util.c
-index fd45ff0f54..ac4b63c49b 100644
---- a/src/libsystemd/sd-hwdb/hwdb-util.c
-+++ b/src/libsystemd/sd-hwdb/hwdb-util.c
-@@ -126,9 +126,13 @@ static struct trie* trie_free(struct trie *trie) {
+--- a/src/shared/hwdb-util.c
++++ b/src/shared/hwdb-util.c
+@@ -127,9 +127,13 @@ static struct trie* trie_free(struct tri
  
  DEFINE_TRIVIAL_CLEANUP_FUNC(struct trie*, trie_free);
  
@@ -63,7 +59,7 @@ index fd45ff0f54..ac4b63c49b 100644
  }
  
  static int trie_node_add_value(struct trie *trie, struct trie_node *node,
-@@ -156,7 +160,10 @@ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
+@@ -157,7 +161,10 @@ static int trie_node_add_value(struct tr
                          .value_off = v,
                  };
  
@@ -75,7 +71,7 @@ index fd45ff0f54..ac4b63c49b 100644
                  if (val) {
                          /* At this point we have 2 identical properties on the same match-string.
                           * Since we process files in order, we just replace the previous value. */
-@@ -182,7 +189,9 @@ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
+@@ -183,7 +190,9 @@ static int trie_node_add_value(struct tr
                  .line_number = line_number,
          };
          node->values_count++;
@@ -86,11 +82,9 @@ index fd45ff0f54..ac4b63c49b 100644
          return 0;
  }
  
-diff --git a/src/shared/format-table.c b/src/shared/format-table.c
-index dccb796b26..c3ab8ac296 100644
 --- a/src/shared/format-table.c
 +++ b/src/shared/format-table.c
-@@ -1290,30 +1290,32 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t
+@@ -1282,30 +1282,32 @@ static int cell_data_compare(TableData *
          return CMP(index_a, index_b);
  }
  
@@ -133,7 +127,7 @@ index dccb796b26..c3ab8ac296 100644
          }
  
          /* Order identical lines by the order there were originally added in */
-@@ -1952,7 +1954,12 @@ int table_print(Table *t, FILE *f) {
+@@ -1944,7 +1946,12 @@ int table_print(Table *t, FILE *f) {
                  for (size_t i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  
@@ -147,7 +141,7 @@ index dccb796b26..c3ab8ac296 100644
          }
  
          if (t->display_map)
-@@ -2580,7 +2587,12 @@ int table_to_json(Table *t, JsonVariant **ret) {
+@@ -2572,7 +2579,12 @@ int table_to_json(Table *t, JsonVariant
                  for (size_t i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  

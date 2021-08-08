@@ -7,4 +7,4 @@ inherit xfce-panel-plugin
 
 SRC_URI[sha256sum] = "4db780178e529391d53da180e49386904e69a5a33b3bd5185835d0a7e6ff5ac5"
 
-FILES_${PN} += "${datadir}/xfce4/eyes"
+FILES:${PN} += "${datadir}/xfce4/eyes"

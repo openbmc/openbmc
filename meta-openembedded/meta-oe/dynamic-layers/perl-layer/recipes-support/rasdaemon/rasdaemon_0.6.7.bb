@@ -12,7 +12,7 @@ SRCREV = "aa96737648d867a3d73e4151d05b54bbab494605"
 
 S = "${WORKDIR}/git"
 
-RDEPENDS_${BPN} = "perl perl-module-file-basename perl-module-file-find perl-module-file-spec perl-module-getopt-long \
+RDEPENDS:${BPN} = "perl perl-module-file-basename perl-module-file-find perl-module-file-spec perl-module-getopt-long \
 	perl-module-posix perl-module-file-glob libdbi-perl libdbd-sqlite-perl"
 
 inherit autotools pkgconfig update-rc.d systemd
@@ -29,27 +29,27 @@ PACKAGECONFIG[hisi-ns-decode] = "--enable-hisi-ns-decode,--disable-hisi-ns-decod
 PACKAGECONFIG[non-standard] = "--enable-non-standard,--disable-non-standard"
 PACKAGECONFIG[abrt-report] = "--enable-abrt-report,--disable-abrt-report"
 
-DEPENDS_append_libc-musl = " argp-standalone"
-LDFLAGS_append_libc-musl = " -largp"
+DEPENDS:append:libc-musl = " argp-standalone"
+LDFLAGS:append:libc-musl = " -largp"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	( cd ${S}; autoreconf -vfi )
 }
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${sysconfdir}/init.d
 	install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/rasdaemon
 	install -d ${D}${systemd_unitdir}/system
 	install -m 0644 ${WORKDIR}/rasdaemon.service ${D}${systemd_unitdir}/system
 }
 
-FILES_${PN} += "${sbindir}/rasdaemon \
+FILES:${PN} += "${sbindir}/rasdaemon \
 		${sysconfdir}/init.d \
 		${systemd_unitdir}/system/rasdaemon.service"
 
-SYSTEMD_SERVICE_${PN} = "rasdaemon.service"
+SYSTEMD_SERVICE:${PN} = "rasdaemon.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
 INITSCRIPT_PACKAGES = "${PN}"
-INITSCRIPT_NAME_${PN} = "rasdaemon"
-INITSCRIPT_PARAMS_${PN} = "defaults 89"
+INITSCRIPT_NAME:${PN} = "rasdaemon"
+INITSCRIPT_PARAMS:${PN} = "defaults 89"

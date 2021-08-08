@@ -21,14 +21,14 @@ SRC_URI = "git://github.com/diamon/minicoredumper;protocol=https \
 
 S = "${WORKDIR}/git"
 
-SYSTEMD_SERVICE_${PN} = "minicoredumper.service"
+SYSTEMD_SERVICE:${PN} = "minicoredumper.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
 INITSCRIPT_PACKAGES = "${PN}"
-INITSCRIPT_NAME_${PN} = "minicoredumper"
-INITSCRIPT_PARAMS_${PN} = "defaults 89"
+INITSCRIPT_NAME:${PN} = "minicoredumper"
+INITSCRIPT_PARAMS:${PN} = "defaults 89"
 
-do_install_append() {
+do_install:append() {
     rmdir ${D}${localstatedir}/run
     install -d ${D}/${sysconfdir}/minicoredumper
     cp -rf ${S}/etc/* ${D}/${sysconfdir}/
@@ -44,4 +44,4 @@ do_install_append() {
 }
 
 # http://errors.yoctoproject.org/Errors/Details/186966/
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'

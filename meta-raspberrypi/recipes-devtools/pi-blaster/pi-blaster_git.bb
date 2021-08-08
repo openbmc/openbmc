@@ -15,8 +15,8 @@ SRCREV = "befd8ef36e5066e4d444ef47fe4020787e541248"
 inherit update-rc.d autotools
 
 INITSCRIPT_PACKAGES = "${PN}"
-INITSCRIPT_NAME_${PN} = "${PN}.boot.sh"
-INITSCRIPT_PARAMS_${PN} = "defaults 15 85"
+INITSCRIPT_NAME:${PN} = "${PN}.boot.sh"
+INITSCRIPT_PARAMS:${PN} = "defaults 15 85"
 
 COMPATIBLE_MACHINE = "^rpi$"
 

@@ -28,6 +28,6 @@ module_do_install() {
     ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/kernel/${MODULE_NAME}/${MODULE_NAME}.ko
 }
 
-RPROVIDES_${PN} += "kernel-module-lkrg"
+RPROVIDES:${PN} += "kernel-module-lkrg"
 
 COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"

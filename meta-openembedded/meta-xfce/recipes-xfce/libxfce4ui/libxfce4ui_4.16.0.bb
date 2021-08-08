@@ -22,7 +22,7 @@ PACKAGECONFIG[gladeui2] = "--enable-gladeui2,--disable-gladeui2,glade"
 PACKAGECONFIG[startup-notification] = "--enable-startup-notification,--disable-startup-notification,startup-notification"
 
 PACKAGES += "${PN}-glade"
-FILES_${PN}-glade = " \
+FILES:${PN}-glade = " \
     ${libdir}/glade \
     ${datadir}/glade \
 "

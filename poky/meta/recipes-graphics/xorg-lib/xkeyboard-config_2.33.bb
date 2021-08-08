@@ -20,11 +20,11 @@ DEPENDS = "util-macros libxslt-native"
 
 EXTRA_OECONF = "--with-xkb-rules-symlink=xorg --disable-runtime-deps"
 
-FILES_${PN} += "${datadir}/X11/xkb"
+FILES:${PN} += "${datadir}/X11/xkb"
 
 inherit autotools pkgconfig gettext python3native
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${datadir}/X11/xkb/compiled
     cd ${D}${datadir}/X11/xkb/rules && ln -sf base xorg
 }

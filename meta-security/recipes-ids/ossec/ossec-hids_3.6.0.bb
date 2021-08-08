@@ -44,7 +44,7 @@ do_install(){
   install -m 640 ${D}/${sysconfdir}/ossec-init.conf ${D}/var/ossec/${sysconfdir}/ossec-init.conf
 }
 
-pkg_postinst_ontarget_${PN} () {
+pkg_postinst_ontarget:${PN} () {
     DIR="/var/ossec"
 
     usermod -g ossec -G ossec -a root
@@ -157,9 +157,9 @@ pkg_postinst_ontarget_${PN} () {
 }
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --home-dir /var/ossec -g ossec --shell /bin/false ossec"
-GROUPADD_PARAM_${PN} = "--system ossec"
+USERADD_PARAM:${PN} = "--system --home-dir /var/ossec -g ossec --shell /bin/false ossec"
+GROUPADD_PARAM:${PN} = "--system ossec"
 
-RDEPENDS_${PN} = "openssl bash"
+RDEPENDS:${PN} = "openssl bash"
 
-COMPATIBLE_HOST_libc-musl = "null"
+COMPATIBLE_HOST:libc-musl = "null"

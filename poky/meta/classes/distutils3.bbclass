@@ -10,7 +10,7 @@ DISTUTILS_INSTALL_ARGS ?= "--root=${D} \
     --install-data=${datadir}"
 
 DISTUTILS_PYTHON = "python3"
-DISTUTILS_PYTHON_class-native = "nativepython3"
+DISTUTILS_PYTHON:class-native = "nativepython3"
 
 DISTUTILS_SETUP_PATH ?= "${S}"
 

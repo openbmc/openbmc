@@ -27,20 +27,20 @@ SRC_URI[archive.sha256sum] = "55e394a82cb65678b1ab49526cf5bd43f00d8fba21476a4849
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
-UNKNOWN_CONFIGURE_WHITELIST_append = " introspection"
+UNKNOWN_CONFIGURE_WHITELIST:append = " introspection"
 
 GTKDOC_MESON_OPTION = "gtk_doc"
 
 PACKAGES += "${PN}-python"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/metainfo \
 "
 
-FILES_${PN}-python += " \
+FILES:${PN}-python += " \
     ${PYTHON_SITEPACKAGES_DIR} \
 "
 
-RDEPENDS_${PN} += "gsettings-desktop-schemas"
-RRECOMMENDS_${PN} += "source-code-pro-fonts"
+RDEPENDS:${PN} += "gsettings-desktop-schemas"
+RRECOMMENDS:${PN} += "source-code-pro-fonts"

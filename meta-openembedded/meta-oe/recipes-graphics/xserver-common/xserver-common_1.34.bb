@@ -12,7 +12,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 SRC_URI[md5sum] = "82f2f84cd96610e8f7b92c700cd31c14"
 SRC_URI[sha256sum] = "cd04c33418f776b1e13fcc7af3d6bd0c7cccd03fbabd7dbcd97f88166cc34210"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
     file://0001-COPYING-add-GPLv2-license-file.patch \
     file://0002-add-setdpi-Xinit.d-script.patch \
     file://0006-add-support-for-etc-X11-xserver-system.patch \
@@ -27,7 +27,7 @@ SRC_URI_append = " \
     file://0001-Don-t-install-Xsession-or-Xserver.patch \
 "
 
-do_install_append() {
+do_install:append() {
     sed -i 's:^BINDIR=.*$:BINDIR=${bindir}:' ${D}/etc/X11/xserver-common
     # Rename all Xsession files not ending with .sh
     # Unfortunatelly when xinput-calibrator was moved to oe-core
@@ -38,8 +38,8 @@ do_install_append() {
     done
 }
 
-RDEPENDS_${PN} = "xmodmap xrandr xdpyinfo fbset xinput-calibrator"
+RDEPENDS:${PN} = "xmodmap xrandr xdpyinfo fbset xinput-calibrator"
 
-RCONFLICTS_${PN} = "xserver-kdrive-common x11-common"
-RREPLACES_${PN} = "xserver-kdrive-common x11-common"
+RCONFLICTS:${PN} = "xserver-kdrive-common x11-common"
+RREPLACES:${PN} = "xserver-kdrive-common x11-common"
 

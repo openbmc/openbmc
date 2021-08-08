@@ -1,0 +1,1422 @@
+From a1364805fc74b5690f763033c0c9b43f27613572 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Fri, 16 Jul 2021 15:47:08 -0400
+Subject: [PATCH] Update helgrind and drd suppression libc and libpthread paths
+ in glibc 2.34
+
+glibc 2.34 moved all pthread functions into the main libc library.
+And it changed the (in memory) path of the main libc library to
+libc.so.6 (before it was libc-2.xx.so).
+
+This breaks various standard suppressions for helgrind and drd.
+Fix this by doing a configure check for whether we are using glibc
+2.34 by checking whether pthread_create is in libc instead of in
+libpthread. If we are using glibc then define GLIBC_LIBC_PATH and
+GLIBC_LIBPTHREAD_PATH variables that point to the (regexp) path
+of the library that contains all libc functions and pthread functions
+(which will be the same path for glibc 2.34+).
+
+Rename glibc-2.34567-NPTL-helgrind.supp to glibc-2.X-helgrind.supp.in
+and glibc-2.X-drd.supp to glibc-2.X-drd.supp.in and replace the
+GLIBC_LIBC_PATH and GLIBC_LIBPTHREAD_PATH at configure time.
+
+The same could be done for the glibc-2.X.supp.in file, but hasn't
+yet because it looks like most suppressions in that file are obsolete.
+
+Upstream-Status: Backport
+---
+ Makefile.am                                   |  2 +-
+ configure.ac                                  | 37 +++++++++++++++++--
+ glibc-2.X-drd.supp => glibc-2.X-drd.supp.in   |  6 ++-
+ ...elgrind.supp => glibc-2.X-helgrind.supp.in | 16 ++++----
+ 4 files changed, 47 insertions(+), 14 deletions(-)
+ rename glibc-2.X-drd.supp => glibc-2.X-drd.supp.in (97%)
+ rename glibc-2.34567-NPTL-helgrind.supp => glibc-2.X-helgrind.supp.in (95%)
+
+Index: valgrind-3.17.0/Makefile.am
+===================================================================
+--- valgrind-3.17.0.orig/Makefile.am
++++ valgrind-3.17.0/Makefile.am
+@@ -41,7 +41,7 @@ SUPP_FILES = \
+ 	glibc-2.2.supp glibc-2.3.supp glibc-2.4.supp glibc-2.5.supp \
+ 	glibc-2.6.supp glibc-2.7.supp glibc-2.X.supp.in \
+ 	xfree-3.supp xfree-4.supp \
+-	glibc-2.34567-NPTL-helgrind.supp \
++	glibc-2.X-helgrind.supp \
+ 	glibc-2.2-LinuxThreads-helgrind.supp \
+ 	glibc-2.X-drd.supp \
+ 	darwin9.supp darwin9-drd.supp \
+Index: valgrind-3.17.0/configure.ac
+===================================================================
+--- valgrind-3.17.0.orig/configure.ac
++++ valgrind-3.17.0/configure.ac
+@@ -1090,6 +1090,31 @@ if test x$GLIBC_VERSION = x; then
+     fi
+ fi
+ 
++# If this is glibc then figure out the generic (in file) libc.so and
++# libpthread.so file paths to use in suppressions. Before 2.34 libpthread
++# was a separate library, afterwards it was merged into libc.so and
++# the library is called libc.so.6 (before it was libc-2.[0-9]+.so).
++# Use this fact to set GLIBC_LIBC_PATH and GLIBC_LIBPTHREAD_PATH.
++case ${GLIBC_VERSION} in
++2*)
++  AC_MSG_CHECKING([whether pthread_create needs libpthread])
++  AC_LINK_IFELSE([AC_LANG_CALL([], [pthread_create])],
++  [
++    AC_MSG_RESULT([no])
++    GLIBC_LIBC_PATH="*/lib*/libc.so.6"
++    GLIBC_LIBPTHREAD_PATH="$GLIBC_LIBC_PATH"
++  ], [
++    AC_MSG_RESULT([yes])
++    GLIBC_LIBC_PATH="*/lib*/libc-2.*so*"
++    GLIBC_LIBPTHREAD_PATH="*/lib*/libpthread-2.*so*"
++  ])
++  ;;
++*)
++  AC_MSG_CHECKING([not glibc...])
++  AC_MSG_RESULT([${GLIBC_VERSION}])
++  ;;
++esac
++
+ AC_MSG_CHECKING([the glibc version])
+ 
+ case "${GLIBC_VERSION}" in
+@@ -1102,13 +1127,13 @@ case "${GLIBC_VERSION}" in
+      2.[[3-6]])
+ 	AC_MSG_RESULT(${GLIBC_VERSION} family)
+         DEFAULT_SUPP="$srcdir/glibc-${GLIBC_VERSION}.supp ${DEFAULT_SUPP}"
+-        DEFAULT_SUPP="$srcdir/glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
++        DEFAULT_SUPP="$srcdir/glibc-2.X-helgrind.supp ${DEFAULT_SUPP}"
+         DEFAULT_SUPP="$srcdir/glibc-2.X-drd.supp ${DEFAULT_SUPP}"
+ 	;;
+      2.[[7-9]])
+ 	AC_MSG_RESULT(${GLIBC_VERSION} family)
+ 	DEFAULT_SUPP="glibc-2.X.supp ${DEFAULT_SUPP}"
+-        DEFAULT_SUPP="$srcdir/glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
++        DEFAULT_SUPP="$srcdir/glibc-2.X-helgrind.supp ${DEFAULT_SUPP}"
+         DEFAULT_SUPP="$srcdir/glibc-2.X-drd.supp ${DEFAULT_SUPP}"
+ 	;;
+      2.10|2.11)
+@@ -1116,7 +1141,7 @@ case "${GLIBC_VERSION}" in
+ 	AC_DEFINE([GLIBC_MANDATORY_STRLEN_REDIRECT], 1,
+ 		  [Define to 1 if strlen() has been optimized heavily (amd64 glibc >= 2.10)])
+ 	DEFAULT_SUPP="glibc-2.X.supp ${DEFAULT_SUPP}"
+-        DEFAULT_SUPP="$srcdir/glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
++        DEFAULT_SUPP="$srcdir/glibc-2.X-helgrind.supp ${DEFAULT_SUPP}"
+         DEFAULT_SUPP="$srcdir/glibc-2.X-drd.supp ${DEFAULT_SUPP}"
+ 	;;
+      2.*)
+@@ -1126,7 +1151,7 @@ case "${GLIBC_VERSION}" in
+ 	AC_DEFINE([GLIBC_MANDATORY_INDEX_AND_STRLEN_REDIRECT], 1,
+ 		  [Define to 1 if index() and strlen() have been optimized heavily (x86 glibc >= 2.12)])
+ 	DEFAULT_SUPP="glibc-2.X.supp ${DEFAULT_SUPP}"
+-        DEFAULT_SUPP="$srcdir/glibc-2.34567-NPTL-helgrind.supp ${DEFAULT_SUPP}"
++        DEFAULT_SUPP="$srcdir/glibc-2.X-helgrind.supp ${DEFAULT_SUPP}"
+         DEFAULT_SUPP="$srcdir/glibc-2.X-drd.supp ${DEFAULT_SUPP}"
+ 	;;
+      darwin)
+@@ -1157,6 +1182,8 @@ case "${GLIBC_VERSION}" in
+ esac
+ 
+ AC_SUBST(GLIBC_VERSION)
++AC_SUBST(GLIBC_LIBC_PATH)
++AC_SUBST(GLIBC_LIBPTHREAD_PATH)
+ 
+ 
+ if test "$VGCONF_OS" != "solaris"; then
+@@ -4910,6 +4937,8 @@ AC_CONFIG_FILES([
+    valgrind.spec
+    valgrind.pc
+    glibc-2.X.supp
++   glibc-2.X-helgrind.supp
++   glibc-2.X-drd.supp
+    docs/Makefile 
+    tests/Makefile 
+    tests/vg_regtest 
+Index: valgrind-3.17.0/glibc-2.X-drd.supp
+===================================================================
+--- valgrind-3.17.0.orig/glibc-2.X-drd.supp
++++ /dev/null
+@@ -1,330 +0,0 @@
+-#
+-# Suppression patterns for ld, the dynamic loader.
+-#
+-
+-# Suppress all data races triggered by ld.
+-{
+-   drd-ld
+-   drd:ConflictingAccess
+-   obj:*/lib*/ld-*.so
+-}
+-
+-#
+-# Suppression patterns for libc.
+-#
+-
+-# Suppress all data races where the topmost frame is inside libc.so. Although
+-# this could hide some real data races, unfortunately this is the only way to
+-# not report any false positives on stdio functions. The glibc functions
+-# manipulating FILE objects use locking primitives that cannot be intercepted
+-# easily. See also the definitions of _IO_lock_lock() etc. in the file
+-# nptl/sysdeps/pthread/bits/stdio-lock.h in the glibc source tree.
+-{
+-   drd-libc-stdio
+-   drd:ConflictingAccess
+-   obj:*/lib*/libc-*
+-}
+-{
+-   drd-libc-thread-cancellation-test
+-   drd:ConflictingAccess
+-   fun:write
+-}
+-{
+-   drd-libc-random
+-   drd:ConflictingAccess
+-   fun:random_r
+-   fun:random
+-}
+-
+-#
+-# Suppression patterns for libstdc++, the implementation of the standard C++
+-# library included with the gcc compiler.
+-#
+-# Note: several versions of the libstdc++ library (4.2.2, 4.3.2, 4.4.0, 4.5.0
+-# and their predecessors) contain an implementation of the std::string class
+-# that triggers conflicting memory accesses. See also
+-# http://gcc.gnu.org/bugzilla/show_bug.cgi?id=40518
+-#
+-
+-# {
+-#    drd-libstdc++-std::string::string()
+-#    drd:ConflictingAccess
+-#    fun:_ZNSsC1ERKSs
+-# }
+-
+-{
+-   drd-libstdc++-cxa_guard_release
+-   drd:CondErr
+-   fun:pthread_cond_broadcast@*
+-   fun:__cxa_guard_release
+-}
+-{
+-   drd-libstdc++-std::__ostream_insert()
+-   drd:ConflictingAccess
+-   fun:_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l
+-   fun:_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc
+-}
+-{
+-   drd-libstdc++-std::ostream::_M_insert<long>()
+-   drd:ConflictingAccess
+-   ...
+-   fun:_ZNSo9_M_insertIlEERSoT_
+-}
+-
+-
+-#
+-# Suppression patterns for libpthread.
+-#
+-
+-{
+-   drd-libpthread-pthread_create
+-   drd:ConflictingAccess
+-   ...
+-   fun:pthread_create*
+-}
+-{
+-   drd-libpthread-pthread_join
+-   drd:ConflictingAccess
+-   fun:pthread_join
+-   fun:pthread_join
+-}
+-{
+-   drd-libpthread-__deallocate_stack
+-   drd:ConflictingAccess
+-   ...
+-   fun:__deallocate_stack
+-}
+-{
+-   drd-libpthread-__free_stacks
+-   drd:ConflictingAccess
+-   fun:__free_stacks
+-}
+-{
+-   drd-libpthread-__free_tcb
+-   drd:ConflictingAccess
+-   ...
+-   fun:__free_tcb
+-}
+-{
+-   drd-libpthread-__nptl_deallocate_tsd
+-   drd:ConflictingAccess
+-   fun:__nptl_deallocate_tsd
+-}
+-{
+-   drd-libpthread-pthread_detach
+-   drd:ConflictingAccess
+-   fun:pthread_detach
+-   fun:pthread_detach
+-}
+-{
+-   drd-libpthread-pthread_once
+-   drd:ConflictingAccess
+-   fun:pthread_once
+-}
+-{
+-   drd-libpthread-pthread_cancel_init
+-   drd:ConflictingAccess
+-   fun:pthread_cancel_init
+-}
+-{
+-   drd-libpthread-pthread_cancel
+-   drd:ConflictingAccess
+-   fun:pthread_cancel
+-   fun:pthread_cancel_intercept
+-}
+-{
+-   drd-libpthread-_Unwind_ForcedUnwind
+-   drd:ConflictingAccess
+-   ...
+-   fun:_Unwind_ForcedUnwind
+-}
+-{
+-   drd-libpthread-_Unwind_GetCFA
+-   drd:ConflictingAccess
+-   fun:_Unwind_GetCFA
+-}
+-{
+-   drd-libpthread-_Unwind_Resume
+-   drd:ConflictingAccess
+-   ...
+-   fun:_Unwind_Resume
+-}
+-{
+-   drd-libpthread-?
+-   drd:ConflictingAccess
+-   obj:*/lib/libgcc_s.so.1
+-}
+-{
+-   drd-libpthread-nanosleep
+-   drd:ConflictingAccess
+-   fun:nanosleep
+-}
+-
+-#
+-# Suppression patterns for libgomp.
+-#
+-
+-# Unfortunately many statements in libgomp trigger conflicting accesses. It is
+-# not clear to me which of these are safe and which ones not. See also
+-# http://gcc.gnu.org/bugzilla/show_bug.cgi?id=40362
+-{
+-   drd-libgomp
+-   drd:ConflictingAccess
+-   obj:/usr/lib*/libgomp.so*
+-}
+-
+-#
+-# Suppression patterns for libX11.
+-#
+-
+-{
+-   drd-libX11-XCreateFontSet
+-   drd:CondErr
+-   fun:pthread_cond_init*
+-   fun:_XReply
+-   fun:XListFontsWithInfo
+-   obj:/usr/lib*/libX11.so*
+-   fun:XCreateOC
+-   fun:XCreateFontSet
+-}
+-
+-#
+-# Suppression patterns for libxcb.
+-#
+-
+-{
+-   drd-libxcb-xcb_wait_for_reply
+-   drd:CondErr
+-   ...
+-   fun:pthread_cond_destroy*
+-   fun:xcb_wait_for_reply
+-}
+-
+-#
+-# Suppression patterns for libglib.
+-#
+-
+-{
+-   drd-libglib-access-g_threads_got_initialized
+-   drd:ConflictingAccess
+-   ...
+-   fun:g_slice_alloc
+-   fun:g_ptr_array_sized_new
+-}
+-{
+-   drd-libglib-access-g_threads_got_initialized
+-   drd:ConflictingAccess
+-   ...
+-   fun:_ZN27QEventDispatcherGlibPrivateC1EP13_GMainContext
+-   fun:_ZN20QEventDispatcherGlibC1EP7QObject
+-   obj:/usr/lib*/libQtCore.so.4.*
+-   obj:/usr/lib*/libQtCore.so.4.*
+-}
+-{
+-   drd-libglib-access-g_mem_initialized
+-   drd:ConflictingAccess
+-   fun:g_malloc0
+-}
+-{
+-   drd-libglib-g_private_get_posix_impl
+-   drd:ConflictingAccess
+-   fun:g_private_get_posix_impl
+-}
+-{
+-   drd-libglib-g_private_set_posix_impl
+-   drd:ConflictingAccess
+-   fun:g_private_set_posix_impl
+-}
+-{
+-   drd-libglib-g_get_language_names
+-   drd:ConflictingAccess
+-   fun:g_slice_free_chain_with_offset
+-}
+-{
+-   drd-libglib-g_main_context_new
+-   drd:ConflictingAccess
+-   fun:fcntl
+-   obj:/usr/lib*/libglib-*.so*
+-   fun:g_main_context_new
+-}
+-
+-#
+-# Suppression patterns for libQtCore.
+-#
+-
+-{
+-   drd-libQtCore-deref-that-calls-QThreadData-destructor
+-   drd:ConflictingAccess
+-   fun:_ZN11QThreadDataD1Ev
+-   obj:/usr/lib*/libQtCore.so.4.*
+-}
+-{
+-   drd-libQtCore-4.0/4.1-Q_GLOBAL_STATIC-connectionList
+-   drd:ConflictingAccess
+-   obj:/usr/lib*/libQtCore.so.4.*
+-   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
+-   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
+-}
+-{
+-   drd-libQtCore-QObjectPrivate::clearGuards(QObject*)
+-   drd:ConflictingAccess
+-   fun:_ZN14QReadWriteLock12lockForWriteEv
+-   fun:_ZN14QObjectPrivate11clearGuardsEP7QObject
+-   fun:_ZN7QObjectD2Ev
+-}
+-{
+-   drd-libQtCore-QObjectPrivate::clearGuards(QObject*)
+-   drd:ConflictingAccess
+-   fun:_ZN14QReadWriteLock12lockForWriteEv
+-   fun:_ZN12QWriteLocker6relockEv
+-   fun:_ZN12QWriteLockerC1EP14QReadWriteLock
+-   fun:_ZN14QObjectPrivate11clearGuardsEP7QObject
+-   fun:_ZN7QObjectD2Ev
+-   fun:_ZN24QAbstractEventDispatcherD2Ev
+-   fun:_ZN20QEventDispatcherGlibD0Ev
+-}
+-{
+-   drd-libQtCore-QMutexPool::get(void const*)
+-   drd:ConflictingAccess
+-   fun:_ZN10QMutexPool3getEPKv
+-}
+-{
+-   drd-libQtCore-qt_gettime_is_monotonic()
+-   drd:ConflictingAccess
+-   fun:_Z23qt_gettime_is_monotonicv
+-}
+-
+-#
+-# Suppression patterns for libboost.
+-#
+-
+-# Suppress the races on boost::once_flag::epoch and on
+-# boost::detail::this_thread_epoch. See also the source file
+-# boost/thread/pthread/once.hpp in the Boost source tree
+-# (https://svn.boost.org/trac/boost/browser/trunk/boost/thread/pthread/once.hpp).
+-{
+-   drd-libboost-boost::call_once<void (*)()>(boost::once_flag&, void (*)())
+-   drd:ConflictingAccess
+-   ...
+-   fun:_ZN5boost9call_onceIPFvvEEEvRNS_9once_flagET_
+-}
+-{
+-   drd-libboost-boost::detail::get_once_per_thread_epoch()
+-   drd:ConflictingAccess
+-   fun:_ZN5boost6detail25get_once_per_thread_epochEv
+-}
+-# Suppress the race reports on boost::detail::current_thread_tls_key. See also
+-# https://svn.boost.org/trac/boost/ticket/3526 for more information about why
+-# the access pattern of current_thread_tls_key is safe.
+-{
+-   drd-libboost-boost::detail::get_current_thread_data()
+-   drd:ConflictingAccess
+-   ...
+-   fun:_ZN5boost6detail23get_current_thread_dataEv
+-}
+-{
+-   drd-libboost-boost::detail::set_current_thread_data(boost::detail::thread_data_base*)
+-   drd:ConflictingAccess
+-   ...
+-   fun:_ZN5boost6detail23set_current_thread_dataEPNS0_16thread_data_baseE
+-}
+Index: valgrind-3.17.0/glibc-2.X-drd.supp.in
+===================================================================
+--- /dev/null
++++ valgrind-3.17.0/glibc-2.X-drd.supp.in
+@@ -0,0 +1,332 @@
++# IMPORTANT: DO NOT EDIT glibc-2.X-drd.supp, as it is as a generated
++# file.  Instead edit glibc-2.X-drd.supp.in.
++#
++# Suppression patterns for ld, the dynamic loader.
++#
++
++# Suppress all data races triggered by ld.
++{
++   drd-ld
++   drd:ConflictingAccess
++   obj:*/lib*/ld*.so*
++}
++
++#
++# Suppression patterns for libc.
++#
++
++# Suppress all data races where the topmost frame is inside libc.so. Although
++# this could hide some real data races, unfortunately this is the only way to
++# not report any false positives on stdio functions. The glibc functions
++# manipulating FILE objects use locking primitives that cannot be intercepted
++# easily. See also the definitions of _IO_lock_lock() etc. in the file
++# nptl/sysdeps/pthread/bits/stdio-lock.h in the glibc source tree.
++{
++   drd-libc-stdio
++   drd:ConflictingAccess
++   obj:@GLIBC_LIBC_PATH@
++}
++{
++   drd-libc-thread-cancellation-test
++   drd:ConflictingAccess
++   fun:write
++}
++{
++   drd-libc-random
++   drd:ConflictingAccess
++   fun:random_r
++   fun:random
++}
++
++#
++# Suppression patterns for libstdc++, the implementation of the standard C++
++# library included with the gcc compiler.
++#
++# Note: several versions of the libstdc++ library (4.2.2, 4.3.2, 4.4.0, 4.5.0
++# and their predecessors) contain an implementation of the std::string class
++# that triggers conflicting memory accesses. See also
++# http://gcc.gnu.org/bugzilla/show_bug.cgi?id=40518
++#
++
++# {
++#    drd-libstdc++-std::string::string()
++#    drd:ConflictingAccess
++#    fun:_ZNSsC1ERKSs
++# }
++
++{
++   drd-libstdc++-cxa_guard_release
++   drd:CondErr
++   fun:pthread_cond_broadcast@*
++   fun:__cxa_guard_release
++}
++{
++   drd-libstdc++-std::__ostream_insert()
++   drd:ConflictingAccess
++   fun:_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l
++   fun:_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc
++}
++{
++   drd-libstdc++-std::ostream::_M_insert<long>()
++   drd:ConflictingAccess
++   ...
++   fun:_ZNSo9_M_insertIlEERSoT_
++}
++
++
++#
++# Suppression patterns for libpthread.
++#
++
++{
++   drd-libpthread-pthread_create
++   drd:ConflictingAccess
++   ...
++   fun:pthread_create*
++}
++{
++   drd-libpthread-pthread_join
++   drd:ConflictingAccess
++   fun:pthread_join
++   fun:pthread_join
++}
++{
++   drd-libpthread-__deallocate_stack
++   drd:ConflictingAccess
++   ...
++   fun:__deallocate_stack
++}
++{
++   drd-libpthread-__free_stacks
++   drd:ConflictingAccess
++   fun:__free_stacks
++}
++{
++   drd-libpthread-__free_tcb
++   drd:ConflictingAccess
++   ...
++   fun:__free_tcb
++}
++{
++   drd-libpthread-__nptl_deallocate_tsd
++   drd:ConflictingAccess
++   fun:__nptl_deallocate_tsd
++}
++{
++   drd-libpthread-pthread_detach
++   drd:ConflictingAccess
++   fun:pthread_detach
++   fun:pthread_detach
++}
++{
++   drd-libpthread-pthread_once
++   drd:ConflictingAccess
++   fun:pthread_once
++}
++{
++   drd-libpthread-pthread_cancel_init
++   drd:ConflictingAccess
++   fun:pthread_cancel_init
++}
++{
++   drd-libpthread-pthread_cancel
++   drd:ConflictingAccess
++   fun:pthread_cancel
++   fun:pthread_cancel_intercept
++}
++{
++   drd-libpthread-_Unwind_ForcedUnwind
++   drd:ConflictingAccess
++   ...
++   fun:_Unwind_ForcedUnwind
++}
++{
++   drd-libpthread-_Unwind_GetCFA
++   drd:ConflictingAccess
++   fun:_Unwind_GetCFA
++}
++{
++   drd-libpthread-_Unwind_Resume
++   drd:ConflictingAccess
++   ...
++   fun:_Unwind_Resume
++}
++{
++   drd-libpthread-?
++   drd:ConflictingAccess
++   obj:*/lib/libgcc_s.so.1
++}
++{
++   drd-libpthread-nanosleep
++   drd:ConflictingAccess
++   fun:nanosleep
++}
++
++#
++# Suppression patterns for libgomp.
++#
++
++# Unfortunately many statements in libgomp trigger conflicting accesses. It is
++# not clear to me which of these are safe and which ones not. See also
++# http://gcc.gnu.org/bugzilla/show_bug.cgi?id=40362
++{
++   drd-libgomp
++   drd:ConflictingAccess
++   obj:/usr/lib*/libgomp.so*
++}
++
++#
++# Suppression patterns for libX11.
++#
++
++{
++   drd-libX11-XCreateFontSet
++   drd:CondErr
++   fun:pthread_cond_init*
++   fun:_XReply
++   fun:XListFontsWithInfo
++   obj:/usr/lib*/libX11.so*
++   fun:XCreateOC
++   fun:XCreateFontSet
++}
++
++#
++# Suppression patterns for libxcb.
++#
++
++{
++   drd-libxcb-xcb_wait_for_reply
++   drd:CondErr
++   ...
++   fun:pthread_cond_destroy*
++   fun:xcb_wait_for_reply
++}
++
++#
++# Suppression patterns for libglib.
++#
++
++{
++   drd-libglib-access-g_threads_got_initialized
++   drd:ConflictingAccess
++   ...
++   fun:g_slice_alloc
++   fun:g_ptr_array_sized_new
++}
++{
++   drd-libglib-access-g_threads_got_initialized
++   drd:ConflictingAccess
++   ...
++   fun:_ZN27QEventDispatcherGlibPrivateC1EP13_GMainContext
++   fun:_ZN20QEventDispatcherGlibC1EP7QObject
++   obj:/usr/lib*/libQtCore.so.4.*
++   obj:/usr/lib*/libQtCore.so.4.*
++}
++{
++   drd-libglib-access-g_mem_initialized
++   drd:ConflictingAccess
++   fun:g_malloc0
++}
++{
++   drd-libglib-g_private_get_posix_impl
++   drd:ConflictingAccess
++   fun:g_private_get_posix_impl
++}
++{
++   drd-libglib-g_private_set_posix_impl
++   drd:ConflictingAccess
++   fun:g_private_set_posix_impl
++}
++{
++   drd-libglib-g_get_language_names
++   drd:ConflictingAccess
++   fun:g_slice_free_chain_with_offset
++}
++{
++   drd-libglib-g_main_context_new
++   drd:ConflictingAccess
++   fun:fcntl
++   obj:/usr/lib*/libglib-*.so*
++   fun:g_main_context_new
++}
++
++#
++# Suppression patterns for libQtCore.
++#
++
++{
++   drd-libQtCore-deref-that-calls-QThreadData-destructor
++   drd:ConflictingAccess
++   fun:_ZN11QThreadDataD1Ev
++   obj:/usr/lib*/libQtCore.so.4.*
++}
++{
++   drd-libQtCore-4.0/4.1-Q_GLOBAL_STATIC-connectionList
++   drd:ConflictingAccess
++   obj:/usr/lib*/libQtCore.so.4.*
++   fun:_ZN11QMetaObject8activateEP7QObjectiiPPv
++   fun:_ZN11QMetaObject8activateEP7QObjectPKS_iPPv
++}
++{
++   drd-libQtCore-QObjectPrivate::clearGuards(QObject*)
++   drd:ConflictingAccess
++   fun:_ZN14QReadWriteLock12lockForWriteEv
++   fun:_ZN14QObjectPrivate11clearGuardsEP7QObject
++   fun:_ZN7QObjectD2Ev
++}
++{
++   drd-libQtCore-QObjectPrivate::clearGuards(QObject*)
++   drd:ConflictingAccess
++   fun:_ZN14QReadWriteLock12lockForWriteEv
++   fun:_ZN12QWriteLocker6relockEv
++   fun:_ZN12QWriteLockerC1EP14QReadWriteLock
++   fun:_ZN14QObjectPrivate11clearGuardsEP7QObject
++   fun:_ZN7QObjectD2Ev
++   fun:_ZN24QAbstractEventDispatcherD2Ev
++   fun:_ZN20QEventDispatcherGlibD0Ev
++}
++{
++   drd-libQtCore-QMutexPool::get(void const*)
++   drd:ConflictingAccess
++   fun:_ZN10QMutexPool3getEPKv
++}
++{
++   drd-libQtCore-qt_gettime_is_monotonic()
++   drd:ConflictingAccess
++   fun:_Z23qt_gettime_is_monotonicv
++}
++
++#
++# Suppression patterns for libboost.
++#
++
++# Suppress the races on boost::once_flag::epoch and on
++# boost::detail::this_thread_epoch. See also the source file
++# boost/thread/pthread/once.hpp in the Boost source tree
++# (https://svn.boost.org/trac/boost/browser/trunk/boost/thread/pthread/once.hpp).
++{
++   drd-libboost-boost::call_once<void (*)()>(boost::once_flag&, void (*)())
++   drd:ConflictingAccess
++   ...
++   fun:_ZN5boost9call_onceIPFvvEEEvRNS_9once_flagET_
++}
++{
++   drd-libboost-boost::detail::get_once_per_thread_epoch()
++   drd:ConflictingAccess
++   fun:_ZN5boost6detail25get_once_per_thread_epochEv
++}
++# Suppress the race reports on boost::detail::current_thread_tls_key. See also
++# https://svn.boost.org/trac/boost/ticket/3526 for more information about why
++# the access pattern of current_thread_tls_key is safe.
++{
++   drd-libboost-boost::detail::get_current_thread_data()
++   drd:ConflictingAccess
++   ...
++   fun:_ZN5boost6detail23get_current_thread_dataEv
++}
++{
++   drd-libboost-boost::detail::set_current_thread_data(boost::detail::thread_data_base*)
++   drd:ConflictingAccess
++   ...
++   fun:_ZN5boost6detail23set_current_thread_dataEPNS0_16thread_data_baseE
++}
+Index: valgrind-3.17.0/glibc-2.34567-NPTL-helgrind.supp
+===================================================================
+--- valgrind-3.17.0.orig/glibc-2.34567-NPTL-helgrind.supp
++++ /dev/null
+@@ -1,301 +0,0 @@
+-
+-# FIXME 22 Jan 09: helgrind-glibc2X-005 overlaps with a lot of
+-# other stuff.  They should be removed.
+-
+-##----------------------------------------------------------------------##
+-# Suppressions for the Helgrind tool when using 
+-# a glibc-2.{3,4,5,6,7,8,9} system
+-
+-####################################################
+-# glibc-2.X specific
+-# These are generic cover-alls which catch a lot of stuff
+-# in various combinations of ld, libc and libpthread
+-#
+-# Note this is heavyhanded and not very clever:
+-#
+-# - suppress anything that has its top frame in ld.so
+-#   That's fine, since it's mostly dynamic linking stuff,
+-#   which has various deliberate (harmless) races
+-#
+-# - suppress anything that has its top frame in libc.so.
+-#   This really isn't clever, since it could hide some 
+-#   legitimate races.  But the problem is, if we don't do
+-#   this, then loads of errors to do with stdio are reported, because
+-#   H fails to see glibc's internal locking/unlocking of FILE*s
+-#   as required by POSIX.  A better solution is needed.
+-#
+-# - some of the stdio functions in newer glibc manipulate stdio
+-#   FILE*s state through mempcpy, which we intercept, so we also need
+-#   to suppress such manipulations.
+-
+-#{
+-#   helgrind-glibc2X-001
+-#   Helgrind:Race
+-#   obj:*/lib*/ld-2.*so*
+-#}
+-
+-# helgrind-glibc2X-002 was merged into helgrind-glibc2X-001
+-
+-# helgrind-glibc2X-003 was merged into helgrind-glibc2X-001
+-
+-{
+-   helgrind-glibc2X-004
+-   Helgrind:Race
+-   obj:*/lib*/libc-2.*so*
+-}
+-
+-{
+-   helgrind-glibc-io-xsputn-mempcpy
+-   Helgrind:Race
+-   fun:__GI_mempcpy
+-   fun:_IO_*xsputn*
+-   obj:*/lib*/libc-2.*so*
+-}
+-
+-{
+-   helgrind-glibc2X-005
+-   Helgrind:Race
+-   obj:*/lib*/libpthread-2.*so*
+-}
+-
+-# helgrind-glibc2X-006 was merged into helgrind-glibc2X-005
+-
+-# helgrind-glibc2X-007 was merged into helgrind-glibc2X-001
+-
+-# helgrind-glibc2X-008 was merged into helgrind-glibc2X-004
+-
+-# helgrind-glibc2X-009 was merged into helgrind-glibc2X-004
+-
+-# helgrind-glibc2X-010 was merged into helgrind-glibc2X-001
+-
+-# helgrind-glibc2X-011 was merged into helgrind-glibc2X-004
+-
+-# helgrind-glibc2X-012 was merged into helgrind-glibc2X-001
+-
+-# helgrind-glibc2X-013 was merged into helgrind-glibc2X-001
+-
+-# helgrind-glibc2X-014 was merged into helgrind-glibc2X-001
+-
+-# helgrind-glibc2X-015 was merged into helgrind-glibc2X-004
+-
+-# helgrind-glibc2X-016 was merged into helgrind-glibc2X-004
+-
+-# These are very ugly.  They are needed to suppress errors inside (eg)
+-# NPTL's pthread_cond_signal.  Why only one stack frame -- at least we
+-# should see the wrapper calling the real functions, right?
+-# Unfortunately, no: the real functions are handwritten assembly (in
+-# the glibc-2.5 sources) and does not create a proper stack frame.
+-# Therefore it's only one level of unwinding before we're back out in
+-# user code rather than the 2 levels you'd expect.
+-{
+-   helgrind-glibc2X-101
+-   Helgrind:Race
+-   obj:*/lib*/libpthread-2.*so*
+-   fun:pthread_*
+-}
+-{
+-   helgrind-glibc2X-102
+-   Helgrind:Race
+-   fun:mythread_wrapper
+-   obj:*/lib*/libpthread-2.*so*
+-}
+-{
+-   helgrind-glibc2X-103
+-   Helgrind:Race
+-   fun:pthread_cond_*@@GLIBC_2.*
+-}
+-{
+-   helgrind-glibc2X-104
+-   Helgrind:Race
+-   fun:__lll_mutex_*
+-}
+-{
+-   helgrind-glibc2X-105
+-   Helgrind:Race
+-   fun:pthread_rwlock_*lock*
+-}
+-{
+-   helgrind-glibc2X-106
+-   Helgrind:Race
+-   fun:__lll_lock_wait
+-}
+-{
+-   helgrind-glibc2X-107
+-   Helgrind:Race
+-   obj:*/lib*/libpthread-2.*so*
+-   fun:sem_*
+-}
+-{
+-   helgrind-glibc2X-108
+-   Helgrind:Race
+-   fun:clone
+-}
+-{
+-   helgrind-glibc2X-109
+-   Helgrind:Race
+-   fun:start_thread
+-}
+-{
+-   helgrind-glibc2X-110
+-   Helgrind:Race
+-   obj:*/lib*/libc-2.*so*
+-   fun:pthread_*
+-}
+-{
+-   helgrind-glibc2X-111
+-   Helgrind:Race
+-   fun:__lll_*lock_*
+-}
+-{
+-   helgrind-glibc2X-113
+-   Helgrind:Race
+-   fun:pthread_barrier_wait*
+-}
+-
+-
+-####################################################
+-# qt4 specific (GNU mangling)
+-#
+-{
+-   helgrind-qt4---QMutex::lock()-QMutex::lock()
+-   Helgrind:Race
+-   ...
+-   fun:_ZN6QMutex4lockEv
+-   fun:_ZN6QMutex4lockEv
+-}
+-
+-{                                                               
+-   helgrind-qt4---QMutex::unlock()-QMutex::unlock()
+-   Helgrind:Race                                                
+-   ...
+-   fun:_ZN6QMutex6unlockEv                                      
+-   fun:_ZN6QMutex6unlockEv
+-}
+-
+-{
+-   helgrind-qt4---pthread_setspecific-QThreadPrivate::start(void*)
+-   Helgrind:Race
+-   fun:pthread_setspecific
+-   fun:_ZN14QThreadPrivate5startEPv
+-}
+-
+-
+-####################################################
+-# Other stuff.
+-#
+-# pthread_exit apparently calls some kind of unwind
+-# mechanism - maybe to remove some number of frames
+-# from the thread's stack, so as to get back to the 
+-# outermost frame for the thread?  Anyway..
+-
+-{
+-   helgrind---*Unwind*-...-pthread_exit
+-   Helgrind:Race
+-   fun:*Unwind*
+-   ...
+-   fun:pthread_exit
+-}
+-
+-{
+-   helgrind---...-*Unwind*-*pthread_unwind*
+-   Helgrind:Race
+-   ...
+-   fun:*Unwind*
+-   fun:*pthread_unwind*
+-}
+-
+-{
+-   helgrind---...-*Unwind*-*pthread_unwind*
+-   Helgrind:Race
+-   ...
+-   fun:_Unwind*
+-   ...
+-   fun:_Unwind_Backtrace
+-}
+-
+-
+-
+-
+-####################################################
+-# To do with thread stack allocation and deallocation?
+-#
+-{
+-   helgrind---free_stacks-__deallocate_stack
+-   Helgrind:Race
+-   fun:free_stacks
+-   fun:__deallocate_stack
+-}
+-
+-{
+-   helgrind---__deallocate_stack-start_thread-clone
+-   Helgrind:Race
+-   fun:__deallocate_stack
+-   fun:start_thread
+-   fun:clone
+-}
+-
+-
+-####################################################
+-# To do with pthread_{set,get}specific
+-#
+-{
+-   helgrind---pthread_setspecific
+-   Helgrind:Race
+-   fun:pthread_setspecific
+-}
+-
+-{
+-   helgrind---pthread_getspecific
+-   Helgrind:Race
+-   fun:pthread_getspecific
+-}
+-
+-
+-####################################################
+-# To do with dynamic linking
+-#
+-# helgrind---ld.so-...-dlsym was merged into helgrind-glibc2X-001
+-
+-{
+-   helgrind---_dl_allocate_tls 
+-   Helgrind:Race
+-   fun:mempcpy
+-   fun:_dl_allocate_tls_init
+-   ...
+-   fun:pthread_create@@GLIBC_2.2*
+-   fun:pthread_create_WRK
+-   fun:pthread_create@*
+-}
+-
+-{
+-   helgrind---_dl_allocate_tls2
+-   Helgrind:Race
+-   fun:memcpy
+-   fun:__mempcpy_inline
+-   fun:_dl_allocate_tls_init
+-   ...
+-   fun:pthread_create@@GLIBC_2.2*
+-   fun:pthread_create_WRK
+-   fun:pthread_create@*
+-}
+-
+-####################################################
+-# To do with GNU libgomp
+-#
+-{
+-   helgrind---libgomp43-1
+-   Helgrind:Race
+-   fun:gomp_ordered_sync
+-}
+-
+-{
+-   helgrind---libgomp43-1
+-   Helgrind:Race
+-   fun:gomp_ordered_next
+-}
+-
+-{
+-   helgrind---libgomp43-1
+-   Helgrind:Race
+-   fun:gomp_ordered_last
+-}
+Index: valgrind-3.17.0/glibc-2.X-helgrind.supp.in
+===================================================================
+--- /dev/null
++++ valgrind-3.17.0/glibc-2.X-helgrind.supp.in
+@@ -0,0 +1,303 @@
++# IMPORTANT: DO NOT EDIT glibc-2.X-helgrind.supp, as it is as a generated
++# file.  Instead edit glibc-2.X-helgrind.supp.in.
++
++# FIXME 22 Jan 09: helgrind-glibc2X-005 overlaps with a lot of
++# other stuff.  They should be removed.
++
++##----------------------------------------------------------------------##
++# Suppressions for the Helgrind tool when using 
++# a glibc-2.{3,4,5,6,7,8,9} system
++
++####################################################
++# glibc-2.X specific
++# These are generic cover-alls which catch a lot of stuff
++# in various combinations of ld, libc and libpthread
++#
++# Note this is heavyhanded and not very clever:
++#
++# - suppress anything that has its top frame in ld.so
++#   That's fine, since it's mostly dynamic linking stuff,
++#   which has various deliberate (harmless) races
++#
++# - suppress anything that has its top frame in libc.so.
++#   This really isn't clever, since it could hide some 
++#   legitimate races.  But the problem is, if we don't do
++#   this, then loads of errors to do with stdio are reported, because
++#   H fails to see glibc's internal locking/unlocking of FILE*s
++#   as required by POSIX.  A better solution is needed.
++#
++# - some of the stdio functions in newer glibc manipulate stdio
++#   FILE*s state through mempcpy, which we intercept, so we also need
++#   to suppress such manipulations.
++
++#{
++#   helgrind-glibc2X-001
++#   Helgrind:Race
++#   obj:*/lib*/ld-2.*so*
++#}
++
++# helgrind-glibc2X-002 was merged into helgrind-glibc2X-001
++
++# helgrind-glibc2X-003 was merged into helgrind-glibc2X-001
++
++{
++   helgrind-glibc2X-004
++   Helgrind:Race
++   obj:@GLIBC_LIBC_PATH@
++}
++
++{
++   helgrind-glibc-io-xsputn-mempcpy
++   Helgrind:Race
++   fun:__GI_mempcpy
++   fun:_IO_*xsputn*
++   obj:@GLIBC_LIBC_PATH@
++}
++
++{
++   helgrind-glibc2X-005
++   Helgrind:Race
++   obj:@GLIBC_LIBPTHREAD_PATH@
++}
++
++# helgrind-glibc2X-006 was merged into helgrind-glibc2X-005
++
++# helgrind-glibc2X-007 was merged into helgrind-glibc2X-001
++
++# helgrind-glibc2X-008 was merged into helgrind-glibc2X-004
++
++# helgrind-glibc2X-009 was merged into helgrind-glibc2X-004
++
++# helgrind-glibc2X-010 was merged into helgrind-glibc2X-001
++
++# helgrind-glibc2X-011 was merged into helgrind-glibc2X-004
++
++# helgrind-glibc2X-012 was merged into helgrind-glibc2X-001
++
++# helgrind-glibc2X-013 was merged into helgrind-glibc2X-001
++
++# helgrind-glibc2X-014 was merged into helgrind-glibc2X-001
++
++# helgrind-glibc2X-015 was merged into helgrind-glibc2X-004
++
++# helgrind-glibc2X-016 was merged into helgrind-glibc2X-004
++
++# These are very ugly.  They are needed to suppress errors inside (eg)
++# NPTL's pthread_cond_signal.  Why only one stack frame -- at least we
++# should see the wrapper calling the real functions, right?
++# Unfortunately, no: the real functions are handwritten assembly (in
++# the glibc-2.5 sources) and does not create a proper stack frame.
++# Therefore it's only one level of unwinding before we're back out in
++# user code rather than the 2 levels you'd expect.
++{
++   helgrind-glibc2X-101
++   Helgrind:Race
++   obj:@GLIBC_LIBPTHREAD_PATH@
++   fun:pthread_*
++}
++{
++   helgrind-glibc2X-102
++   Helgrind:Race
++   fun:mythread_wrapper
++   obj:@GLIBC_LIBPTHREAD_PATH@
++}
++{
++   helgrind-glibc2X-103
++   Helgrind:Race
++   fun:pthread_cond_*@@GLIBC_2.*
++}
++{
++   helgrind-glibc2X-104
++   Helgrind:Race
++   fun:__lll_mutex_*
++}
++{
++   helgrind-glibc2X-105
++   Helgrind:Race
++   fun:pthread_rwlock_*lock*
++}
++{
++   helgrind-glibc2X-106
++   Helgrind:Race
++   fun:__lll_lock_wait
++}
++{
++   helgrind-glibc2X-107
++   Helgrind:Race
++   obj:@GLIBC_LIBPTHREAD_PATH@
++   fun:sem_*
++}
++{
++   helgrind-glibc2X-108
++   Helgrind:Race
++   fun:clone
++}
++{
++   helgrind-glibc2X-109
++   Helgrind:Race
++   fun:start_thread
++}
++{
++   helgrind-glibc2X-110
++   Helgrind:Race
++   obj:@GLIBC_LIBC_PATH@
++   fun:pthread_*
++}
++{
++   helgrind-glibc2X-111
++   Helgrind:Race
++   fun:__lll_*lock_*
++}
++{
++   helgrind-glibc2X-113
++   Helgrind:Race
++   fun:pthread_barrier_wait*
++}
++
++
++####################################################
++# qt4 specific (GNU mangling)
++#
++{
++   helgrind-qt4---QMutex::lock()-QMutex::lock()
++   Helgrind:Race
++   ...
++   fun:_ZN6QMutex4lockEv
++   fun:_ZN6QMutex4lockEv
++}
++
++{                                                               
++   helgrind-qt4---QMutex::unlock()-QMutex::unlock()
++   Helgrind:Race                                                
++   ...
++   fun:_ZN6QMutex6unlockEv                                      
++   fun:_ZN6QMutex6unlockEv
++}
++
++{
++   helgrind-qt4---pthread_setspecific-QThreadPrivate::start(void*)
++   Helgrind:Race
++   fun:pthread_setspecific
++   fun:_ZN14QThreadPrivate5startEPv
++}
++
++
++####################################################
++# Other stuff.
++#
++# pthread_exit apparently calls some kind of unwind
++# mechanism - maybe to remove some number of frames
++# from the thread's stack, so as to get back to the 
++# outermost frame for the thread?  Anyway..
++
++{
++   helgrind---*Unwind*-...-pthread_exit
++   Helgrind:Race
++   fun:*Unwind*
++   ...
++   fun:pthread_exit
++}
++
++{
++   helgrind---...-*Unwind*-*pthread_unwind*
++   Helgrind:Race
++   ...
++   fun:*Unwind*
++   fun:*pthread_unwind*
++}
++
++{
++   helgrind---...-*Unwind*-*pthread_unwind*
++   Helgrind:Race
++   ...
++   fun:_Unwind*
++   ...
++   fun:_Unwind_Backtrace
++}
++
++
++
++
++####################################################
++# To do with thread stack allocation and deallocation?
++#
++{
++   helgrind---free_stacks-__deallocate_stack
++   Helgrind:Race
++   fun:free_stacks
++   fun:__deallocate_stack
++}
++
++{
++   helgrind---__deallocate_stack-start_thread-clone
++   Helgrind:Race
++   fun:__deallocate_stack
++   fun:start_thread
++   fun:clone
++}
++
++
++####################################################
++# To do with pthread_{set,get}specific
++#
++{
++   helgrind---pthread_setspecific
++   Helgrind:Race
++   fun:pthread_setspecific
++}
++
++{
++   helgrind---pthread_getspecific
++   Helgrind:Race
++   fun:pthread_getspecific
++}
++
++
++####################################################
++# To do with dynamic linking
++#
++# helgrind---ld.so-...-dlsym was merged into helgrind-glibc2X-001
++
++{
++   helgrind---_dl_allocate_tls 
++   Helgrind:Race
++   fun:mempcpy
++   fun:_dl_allocate_tls_init
++   ...
++   fun:pthread_create@@GLIBC_2.2*
++   fun:pthread_create_WRK
++   fun:pthread_create@*
++}
++
++{
++   helgrind---_dl_allocate_tls2
++   Helgrind:Race
++   fun:memcpy
++   fun:__mempcpy_inline
++   fun:_dl_allocate_tls_init
++   ...
++   fun:pthread_create@@GLIBC_2.2*
++   fun:pthread_create_WRK
++   fun:pthread_create@*
++}
++
++####################################################
++# To do with GNU libgomp
++#
++{
++   helgrind---libgomp43-1
++   Helgrind:Race
++   fun:gomp_ordered_sync
++}
++
++{
++   helgrind---libgomp43-1
++   Helgrind:Race
++   fun:gomp_ordered_next
++}
++
++{
++   helgrind---libgomp43-1
++   Helgrind:Race
++   fun:gomp_ordered_last
++}

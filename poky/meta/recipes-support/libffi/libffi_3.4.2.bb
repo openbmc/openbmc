@@ -19,14 +19,14 @@ UPSTREAM_CHECK_URI = "https://github.com/libffi/libffi/releases/"
 UPSTREAM_CHECK_REGEX = "libffi-(?P<pver>\d+(\.\d+)+)\.tar"
 
 EXTRA_OECONF += "--disable-builddir --disable-exec-static-tramp"
-EXTRA_OEMAKE_class-target = "LIBTOOLFLAGS='--tag=CC'"
+EXTRA_OEMAKE:class-target = "LIBTOOLFLAGS='--tag=CC'"
 inherit autotools texinfo multilib_header
 
-do_install_append() {
+do_install:append() {
 	oe_multilib_header ffi.h ffitarget.h
 }
 
-FILES_${PN}-dev += "${libdir}/libffi-${PV}"
+FILES:${PN}-dev += "${libdir}/libffi-${PV}"
 
 # Doesn't compile in MIPS16e mode due to use of hand-written
 # assembly

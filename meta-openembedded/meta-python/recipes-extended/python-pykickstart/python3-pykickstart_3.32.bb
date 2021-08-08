@@ -3,10 +3,10 @@ HOMEPAGE = "http://fedoraproject.org/wiki/pykickstart"
 LICENSE = "GPLv2+"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 DEPENDS = "python3"
-RDEPENDS_${PN} = "python3 \
+RDEPENDS:${PN} = "python3 \
                   python3-requests \
                   python3-six \
 "

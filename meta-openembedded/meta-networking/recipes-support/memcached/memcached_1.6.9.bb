@@ -15,7 +15,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=7e5ded7363d335e1bb18013ca08046ff"
 inherit autotools
 
 DEPENDS += "libevent"
-RDEPENDS_${PN} += "perl perl-module-posix perl-module-autoloader \
+RDEPENDS:${PN} += "perl perl-module-posix perl-module-autoloader \
     perl-module-tie-hash bash \
     "
 
@@ -44,7 +44,7 @@ inherit update-rc.d
 INITSCRIPT_NAME = "memcached"
 INITSCRIPT_PARAMS = "defaults"
 
-do_install_append() {
+do_install:append() {
     install -D -m 755 ${S}/scripts/memcached-init ${D}${sysconfdir}/init.d/memcached
     mkdir -p ${D}/usr/share/memcached/scripts
     install -m 755 ${S}/scripts/memcached-tool ${D}/usr/share/memcached/scripts

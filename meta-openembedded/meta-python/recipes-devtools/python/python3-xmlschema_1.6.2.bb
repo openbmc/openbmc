@@ -12,7 +12,7 @@ DEPENDS += "\
     ${PYTHON_PN}-elementpath-native \
 "
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-elementpath \
     ${PYTHON_PN}-modules \
 "

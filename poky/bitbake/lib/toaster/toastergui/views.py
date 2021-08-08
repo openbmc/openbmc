@@ -1708,7 +1708,7 @@ if True:
             except ProjectVariable.DoesNotExist:
                 pass
             try:
-                return_data['image_install_append'] = ProjectVariable.objects.get(project = prj, name = "IMAGE_INSTALL_append").value,
+                return_data['image_install:append'] = ProjectVariable.objects.get(project = prj, name = "IMAGE_INSTALL:append").value,
             except ProjectVariable.DoesNotExist:
                 pass
             try:
@@ -1839,7 +1839,7 @@ if True:
         except ProjectVariable.DoesNotExist:
             pass
         try:
-            context['image_install_append'] =  ProjectVariable.objects.get(project = prj, name = "IMAGE_INSTALL_append").value
+            context['image_install:append'] =  ProjectVariable.objects.get(project = prj, name = "IMAGE_INSTALL:append").value
             context['image_install_append_defined'] = "1"
         except ProjectVariable.DoesNotExist:
             pass

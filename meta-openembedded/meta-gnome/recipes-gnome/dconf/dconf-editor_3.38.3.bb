@@ -10,7 +10,7 @@ inherit gnomebase vala gettext gsettings bash-completion
 
 SRC_URI[archive.sha256sum] = "571af4c7dad4f049b53e6cd728b79addf08c27ddab6bc57b396d211866ee79e3"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/metainfo \
 "

@@ -47,7 +47,7 @@ do_install_ptest () {
 	 rm ${D}${PTEST_PATH}/Makefile.config ${D}${PTEST_PATH}/xconfig.h ${D}${PTEST_PATH}/xconfig.sh
 }
 
-python populate_packages_prepend() {
+python populate_packages:prepend() {
     # Put all *.t files from the lib dir in the ptest package
     # do_split_packages requires a pair of () in the regex, but we have nothing
     # to match, so use an empty pair.
@@ -56,8 +56,8 @@ python populate_packages_prepend() {
             '${PN}-ptest%s', '%s', recursive=True, match_path=True)
 }
 
-RDEPENDS_${PN}-ptest += "${PN}-modules ${PN}-doc sed"
+RDEPENDS:${PN}-ptest += "${PN}-modules ${PN}-doc sed"
 
 # The perl-ptest package contains Perl internal modules and generating file
 # dependencies for it causes problems.
-SKIP_FILEDEPS_${PN}-ptest = '1'
+SKIP_FILEDEPS:${PN}-ptest = '1'

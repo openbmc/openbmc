@@ -1,6 +1,6 @@
 inherit ptest
 
-FILESEXTRAPATHS_prepend := "${COREBASE}/meta/files:"
+FILESEXTRAPATHS:prepend := "${COREBASE}/meta/files:"
 
 SRC_URI += "file://ptest-perl/run-ptest"
 
@@ -13,9 +13,9 @@ do_install_ptest_perl() {
 	chown -R root:root ${D}${PTEST_PATH}
 }
 
-FILES_${PN}-ptest_prepend = "${PTEST_PATH}/t/* ${PTEST_PATH}/run-ptest "
+FILES:${PN}-ptest:prepend = "${PTEST_PATH}/t/* ${PTEST_PATH}/run-ptest "
 
-RDEPENDS_${PN}-ptest_prepend = "perl "
+RDEPENDS:${PN}-ptest:prepend = "perl "
 
 addtask install_ptest_perl after do_install_ptest_base before do_package
 

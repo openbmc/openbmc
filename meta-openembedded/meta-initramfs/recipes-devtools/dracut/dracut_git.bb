@@ -14,7 +14,7 @@ SRC_URI = "git://git.kernel.org/pub/scm/boot/dracut/dracut.git;protocol=http \
            "
 
 DEPENDS += "kmod"
-DEPENDS_append_libc-musl = " fts"
+DEPENDS:append:libc-musl = " fts"
 
 inherit bash-completion pkgconfig
 
@@ -37,7 +37,7 @@ PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_unitdir}/system/
 
 EXTRA_OEMAKE += 'libdir=${prefix}/lib LDLIBS="${LDLIBS}"'
 
-LDLIBS_append_libc-musl = " -lfts"
+LDLIBS:append:libc-musl = " -lfts"
 
 do_configure() {
     ./configure ${EXTRA_OECONF}
@@ -50,18 +50,18 @@ do_install() {
     chown -R root:root ${D}/${prefix}/lib/dracut/modules.d
 }
 
-FILES_${PN} += "${prefix}/lib/kernel \
+FILES:${PN} += "${prefix}/lib/kernel \
                 ${prefix}/lib/dracut \
                 ${systemd_unitdir} \
                "
-FILES_${PN}-dbg += "${prefix}/lib/dracut/.debug"
+FILES:${PN}-dbg += "${prefix}/lib/dracut/.debug"
 
-CONFFILES_${PN} += "${sysconfdir}/dracut.conf"
+CONFFILES:${PN} += "${sysconfdir}/dracut.conf"
 
-RDEPENDS_${PN} = "findutils cpio util-linux-blkid util-linux-getopt util-linux bash ldd"
+RDEPENDS:${PN} = "findutils cpio util-linux-blkid util-linux-getopt util-linux bash ldd"
 
 # This could be optimized a bit, but let's avoid non-booting systems :)
-RRECOMMENDS_${PN} = " \
+RRECOMMENDS:${PN} = " \
                      kernel-modules \
                      busybox \
                      coreutils \

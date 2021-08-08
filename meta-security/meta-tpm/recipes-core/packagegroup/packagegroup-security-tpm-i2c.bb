@@ -7,8 +7,8 @@ inherit packagegroup
 
 PACKAGES = "packagegroup-security-tpm-i2c"
 
-SUMMARY_packagegroup-security-tpm-i2c = "Security TPM i2c support"
-RDEPENDS_packagegroup-security-tpm-i2c = " \
+SUMMARY:packagegroup-security-tpm-i2c = "Security TPM i2c support"
+RDEPENDS:packagegroup-security-tpm-i2c = " \
     ${@bb.utils.contains('MACHINE_FEATURES', 'tpm', 'packagegroup-security-tpm', '', d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'tpm2', 'packagegroup-security-tpm2', '', d)} \
     kernel-module-tpm-i2c-atmel \

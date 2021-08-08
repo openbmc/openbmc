@@ -28,10 +28,10 @@ EXTRA_OECMAKE = " \
     -DBUILD_PYTHON_BINDINGS=ON \
 "
 
-RDEPENDS_${PN}-python = " python3-core "
-RDEPENDS_${PN} = " python3-core "
+RDEPENDS:${PN}-python = " python3-core "
+RDEPENDS:${PN} = " python3-core "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/${PYTHON_DIR}/site-packages/iec61850.py \
     ${libdir}/${PYTHON_DIR}/site-packages/_iec61850.so \
 "

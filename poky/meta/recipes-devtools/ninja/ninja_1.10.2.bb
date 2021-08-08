@@ -15,7 +15,7 @@ S = "${WORKDIR}/git"
 
 do_configure[noexec] = "1"
 
-do_compile_class-native() {
+do_compile:class-native() {
 	python3 ./configure.py --bootstrap
 }
 

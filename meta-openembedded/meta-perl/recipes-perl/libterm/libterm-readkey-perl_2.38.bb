@@ -28,11 +28,11 @@ DEPENDS = "libterm-readkey-perl-native"
 
 inherit cpan ptest-perl
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     perl-module-test-more \
 "
 
-do_configure_append () {
+do_configure:append () {
     # Hack the dynamic module loader so that it use native modules since it can't load
     # the target ones.
     if [ "${BUILD_SYS}" != "${HOST_SYS}" ]; then

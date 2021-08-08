@@ -36,7 +36,7 @@ SRC_URI = "https://download.tuxfamily.org/chrony/chrony-${PV}.tar.gz \
     file://arm_eabi.patch \
 "
 
-SRC_URI_append_libc-musl = " \
+SRC_URI:append:libc-musl = " \
     file://0001-Fix-compilation-with-musl.patch \
 "
 SRC_URI[sha256sum] = "ed76f2d3f9347ac6221a91ad4bd553dd0565ac188cd7490d0801d08f7171164c"
@@ -119,20 +119,20 @@ do_install() {
     sed -i 's!^EnvironmentFile=.*!EnvironmentFile=-${sysconfdir}/default/chronyd!' ${D}${systemd_unitdir}/system/chronyd.service
 }
 
-FILES_${PN} = "${sbindir}/chronyd ${sysconfdir} ${localstatedir}/lib/chrony ${localstatedir}"
-CONFFILES_${PN} = "${sysconfdir}/chrony.conf"
+FILES:${PN} = "${sbindir}/chronyd ${sysconfdir} ${localstatedir}/lib/chrony ${localstatedir}"
+CONFFILES:${PN} = "${sysconfdir}/chrony.conf"
 INITSCRIPT_NAME = "chronyd"
 INITSCRIPT_PARAMS = "defaults"
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "chronyd.service"
+SYSTEMD_SERVICE:${PN} = "chronyd.service"
 
 # It's probably a bad idea to run chrony and another time daemon on
 # the same system.  systemd includes the SNTP client 'timesyncd', which
 # will be disabled by chronyd.service, however it will remain on the rootfs
-# wasting 150 kB unless you put 'PACKAGECONFIG_remove_pn-systemd = "timesyncd"'
+# wasting 150 kB unless you put 'PACKAGECONFIG:remove:pn-systemd = "timesyncd"'
 # in a conf file or bbappend somewhere.
-RCONFLICTS_${PN} = "ntp ntimed"
+RCONFLICTS:${PN} = "ntp ntimed"
 
 # Separate the client program into its own package
 PACKAGES =+ "chronyc"
-FILES_chronyc = "${bindir}/chronyc"
+FILES:chronyc = "${bindir}/chronyc"

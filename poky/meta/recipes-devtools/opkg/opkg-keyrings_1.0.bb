@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 # Distro-specific keys can be added to this package in two ways:
 #
 #   1) In a .bbappend, add .gpg and/or .asc files to SRC_URI and install them to
-#      ${D}${datadir}/opkg/keyrings/ in a do_install_append function. These
+#      ${D}${datadir}/opkg/keyrings/ in a do_install:append function. These
 #      files should not be named 'key-$name.gpg' to ensure they don't conflict
 #      with keys exported as per (2).
 #
@@ -30,12 +30,12 @@ do_install () {
     done
 }
 
-FILES_${PN} = "${datadir}/opkg/keyrings"
+FILES:${PN} = "${datadir}/opkg/keyrings"
 
 # We need 'opkg-key' to run the postinst script
-RDEPENDS_${PN} = "opkg"
+RDEPENDS:${PN} = "opkg"
 
-pkg_postinst_ontarget_${PN} () {
+pkg_postinst_ontarget:${PN} () {
     if test -x ${bindir}/opkg-key
     then
         ${bindir}/opkg-key populate

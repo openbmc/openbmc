@@ -27,13 +27,13 @@ CACHED_CONFIGUREVARS += "am_cv_python_pythondir=${PYTHON_SITEPACKAGES_DIR}/lowpa
 
 CFLAGS += "-Wno-initializer-overrides"
 
-do_install_append() {
+do_install:append() {
     rmdir ${D}${localstatedir}/run
 }
 
-FILES_${PN}-dbg += "${libexecdir}/lowpan-tools/.debug/"
+FILES:${PN}-dbg += "${libexecdir}/lowpan-tools/.debug/"
 
 PACKAGES =+ "${PN}-python"
-FILES_${PN}-python = "${libdir}/python*"
+FILES:${PN}-python = "${libdir}/python*"
 
 PNBLACKLIST[lowpan-tools] ?= "WARNING these tools are deprecated! Use wpan-tools instead"

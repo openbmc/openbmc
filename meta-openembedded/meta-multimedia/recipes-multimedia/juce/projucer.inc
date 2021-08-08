@@ -11,7 +11,7 @@ inherit pkgconfig features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 DEPENDS = "libx11 libxext libxinerama libxrandr libxcursor freetype alsa-lib curl bzip2 libpng harfbuzz glib-2.0 libpcre"
-DEPENDS_append_libc-musl = " libexecinfo"
+DEPENDS:append:libc-musl = " libexecinfo"
 
 SRCREV = "90e8da0cfb54ac593cdbed74c3d0c9b09bad3a9f"
 BRANCH = "master"
@@ -30,11 +30,11 @@ JUCE_PROJUCER = "${JUCE_PROJUCER_MAKEFILE_PATH}/build/Projucer"
 # not work on cross builds
 EXTRA_OEMAKE = "V=1 JUCE_ARCH_LABEL=${TARGET_ARCH} TARGET_ARCH='-g'"
 
-LDFLAGS_append_mipsarcho32 = " -latomic"
-LDFLAGS_append_powerpc = " -latomic"
-LDFLAGS_append_riscv64 = " -latomic"
-LDFLAGS_append_riscv32 = " -latomic"
-LDFLAGS_append_armv5 = " -latomic"
+LDFLAGS:append:mipsarcho32 = " -latomic"
+LDFLAGS:append:powerpc = " -latomic"
+LDFLAGS:append:riscv64 = " -latomic"
+LDFLAGS:append:riscv32 = " -latomic"
+LDFLAGS:append:armv5 = " -latomic"
 
 do_configure() {
   cd ${JUCE_PROJUCER_MAKEFILE_PATH}
@@ -51,4 +51,4 @@ do_install() {
   install -m 0755 ${JUCE_PROJUCER} ${D}${bindir}
 }
 # error: '_NL_IDENTIFICATION_LANGUAGE' was not declared in this scope
-COMPATIBLE_HOST_libc-musl = "null"
+COMPATIBLE_HOST:libc-musl = "null"

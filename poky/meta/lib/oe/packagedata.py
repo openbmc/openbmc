@@ -19,7 +19,7 @@ def read_pkgdatafile(fn):
         import re
         with open(fn, 'r') as f:
             lines = f.readlines()
-        r = re.compile("([^:]+):\s*(.*)")
+        r = re.compile("(^.+?):\s+(.*)")
         for l in lines:
             m = r.match(l)
             if m:

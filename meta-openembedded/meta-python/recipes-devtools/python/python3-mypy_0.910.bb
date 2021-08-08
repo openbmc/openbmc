@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "704098302473cb31a218f1775a873b376b30b4c18229421e9e9dc8916f
 
 BBCLASSEXTEND = "native"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-mypy-extensions \
     ${PYTHON_PN}-typed-ast \
     ${PYTHON_PN}-typing-extensions \

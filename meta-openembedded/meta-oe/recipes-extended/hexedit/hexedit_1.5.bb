@@ -15,6 +15,6 @@ S = "${WORKDIR}/git"
 
 inherit autotools-brokensep update-alternatives
 
-ALTERNATIVE_${PN} = "hexedit"
+ALTERNATIVE:${PN} = "hexedit"
 ALTERNATIVE_LINK_NAME[hexedit] = "${bindir}/hexedit"
 

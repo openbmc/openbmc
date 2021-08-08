@@ -21,11 +21,11 @@ DEPENDS += "virtual/crypt"
 
 EXTRA_OECONF += "--disable-static"
 
-do_configure_prepend () {
+do_configure:prepend () {
     export CONFIG_SITE=./config-site.${P}
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
     for m in `find . -name "Makefile"` ; do
         sed -i -e 's:^program_transform_name =.*:program_transform_name =:g' ${m}
     done

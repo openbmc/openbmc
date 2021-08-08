@@ -18,4 +18,4 @@ EXTRA_OECONF = "--disable-doxygen"
 
 PACKAGES =+ "libinotifytools"
 
-FILES_libinotifytools = "${libdir}/lib*.so.*"
+FILES:libinotifytools = "${libdir}/lib*.so.*"

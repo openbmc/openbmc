@@ -11,4 +11,4 @@ SRCREV = "42e96b13dda2afabbcec2622612d13495a415caa"
 
 S = "${WORKDIR}/git"
 
-RDEPENDS_${PN} = "python3 python3-setuptools-scm"
+RDEPENDS:${PN} = "python3 python3-setuptools-scm"

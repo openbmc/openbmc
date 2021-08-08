@@ -53,14 +53,14 @@ EOF
     fi
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 # run this on host and on target
 if [ "${SERIAL_CONSOLES_CHECK}" = "" ]; then
        exit 0
 fi
 }
 
-pkg_postinst_ontarget_${PN} () {
+pkg_postinst_ontarget:${PN} () {
 # run this on the target
 if [ -e /proc/consoles ]; then
 	tmp="${SERIAL_CONSOLES_CHECK}"
@@ -84,10 +84,10 @@ fi
 # Set PACKAGE_ARCH appropriately.
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} = "${sysconfdir}/inittab ${base_bindir}/start_getty"
-CONFFILES_${PN} = "${sysconfdir}/inittab"
+FILES:${PN} = "${sysconfdir}/inittab ${base_bindir}/start_getty"
+CONFFILES:${PN} = "${sysconfdir}/inittab"
 
 USE_VT ?= "1"
 SYSVINIT_ENABLED_GETTYS ?= "1"
 
-RCONFLICTS_${PN} = "busybox-inittab"
+RCONFLICTS:${PN} = "busybox-inittab"

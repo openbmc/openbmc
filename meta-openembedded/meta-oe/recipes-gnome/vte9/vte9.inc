@@ -2,7 +2,7 @@ SUMMARY = "Virtual terminal emulator GTK+ widget library"
 BUGTRACKER = "https://bugzilla.gnome.org/buglist.cgi?product=vte"
 LICENSE = "LGPLv2.0"
 DEPENDS = " glib-2.0 gtk+ intltool-native gnome-common-native ncurses"
-RDEPENDS_libvte = "vte-termcap"
+RDEPENDS:libvte = "vte-termcap"
 
 # help gnomebase get the SRC_URI correct
 GNOMEBN = "vte"
@@ -14,5 +14,5 @@ ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 EXTRA_OECONF = "--disable-python"
 
 PACKAGES =+ "libvte9 vte9-termcap"
-FILES_libvte9 = "${libdir}/*.so.* ${libexecdir}/gnome-pty-helper"
-FILES_vte9-termcap = "${datadir}/vte/termcap-0.0"
+FILES:libvte9 = "${libdir}/*.so.* ${libexecdir}/gnome-pty-helper"
+FILES:vte9-termcap = "${datadir}/vte/termcap-0.0"

@@ -22,7 +22,7 @@ Index: git/CMakeLists.txt
  if(C_LINUX)
      if(CMAKE_COMPILER_IS_GNUCXX)
          # Set _GNU_SOURCE for O_LARGEFILE, O_CLOEXEC, O_DIRECTORY, O_NOFOLLOW, etc flags on older systems
-@@ -512,14 +506,8 @@ include(TestInline)
+@@ -581,14 +575,8 @@ include(TestInline)
  include(CheckFileOffsetBits)
  # Determine how to pack structs on this platform.
  include(CheckStructPacking)

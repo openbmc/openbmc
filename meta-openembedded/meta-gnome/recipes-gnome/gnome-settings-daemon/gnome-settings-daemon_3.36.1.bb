@@ -42,7 +42,7 @@ PACKAGECONFIG[nm] = "-Dnetwork_manager=true,-Dnetwork_manager=false,networkmanag
 PACKAGECONFIG[smartcard] = "-Dsmartcard=true,-Dsmartcard=false,nss"
 PACKAGECONFIG[wayland] = "-Dwayland=true,-Dwayland=false,wayland"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${systemd_user_unitdir} \
     ${libdir}/gnome-settings-daemon-3.0/libgsd.so \
 "

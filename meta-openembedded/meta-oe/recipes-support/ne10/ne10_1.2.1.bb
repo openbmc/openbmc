@@ -17,13 +17,13 @@ inherit cmake
 
 # Incompatible with archs other than armv7, armv7ve and aarch64
 COMPATIBLE_MACHINE = "(^$)"
-COMPATIBLE_MACHINE_aarch64 = "(.*)"
-COMPATIBLE_MACHINE_armv7a = "(.*)"
-COMPATIBLE_MACHINE_armv7ve = "(.*)"
+COMPATIBLE_MACHINE:aarch64 = "(.*)"
+COMPATIBLE_MACHINE:armv7a = "(.*)"
+COMPATIBLE_MACHINE:armv7ve = "(.*)"
 NE10_TARGET_ARCH = ""
-NE10_TARGET_ARCH_aarch64 = "aarch64"
-NE10_TARGET_ARCH_armv7a = "armv7"
-NE10_TARGET_ARCH_armv7ve = "armv7"
+NE10_TARGET_ARCH:aarch64 = "aarch64"
+NE10_TARGET_ARCH:armv7a = "armv7"
+NE10_TARGET_ARCH:armv7ve = "armv7"
 
 EXTRA_OECMAKE = '-DGNULINUX_PLATFORM=ON -DNE10_BUILD_SHARED=ON -DNE10_LINUX_TARGET_ARCH="${NE10_TARGET_ARCH}"'
 
@@ -38,4 +38,4 @@ do_install() {
 
 # ERROR: QA Issue: ELF binary 'ne10/1.2.1-r0/packages-split/ne10/usr/lib/libNE10.so.10' has relocations in .text [textrel]
 # ERROR: QA Issue: ELF binary 'ne10/1.2.1-r0/packages-split/ne10/usr/lib/libNE10.so.10' has relocations in .text [textrel]
-INSANE_SKIP_${PN} += "textrel"
+INSANE_SKIP:${PN} += "textrel"

@@ -17,13 +17,13 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
 
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'
 
 EXTRA_OECONF = "--libdir=${base_libdir}"
 
-RDEPENDS_${PN} = "avahi-daemon"
+RDEPENDS:${PN} = "avahi-daemon"
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 	sed '
 		/^hosts:/ !b
 		/\<mdns\(4\|6\)\?\(_minimal\)\?\>/ b
@@ -31,7 +31,7 @@ pkg_postinst_${PN} () {
 		' -i $D${sysconfdir}/nsswitch.conf
 }
 
-pkg_prerm_${PN} () {
+pkg_prerm:${PN} () {
 	sed '
 		/^hosts:/ !b
 		s/[[:blank:]]\+mdns\(4\|6\)\?\(_minimal\( \[NOTFOUND=return\]\)\?\)\?//g

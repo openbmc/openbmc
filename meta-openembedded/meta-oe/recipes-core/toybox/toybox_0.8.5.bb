@@ -13,7 +13,7 @@ SRC_URI[sha256sum] = "bfd230c187726347f7e31a1fc5841705871dfe4f3cbc6628f512b54e57
 
 SECTION = "base"
 
-RDEPENDS_${PN} = "${@["", "toybox-inittab"][(d.getVar('VIRTUAL-RUNTIME_init_manager') == 'toybox')]}"
+RDEPENDS:${PN} = "${@["", "toybox-inittab"][(d.getVar('VIRTUAL-RUNTIME_init_manager') == 'toybox')]}"
 
 TOYBOX_BIN = "generated/unstripped/toybox"
 
@@ -24,7 +24,7 @@ TOYBOX_BIN = "generated/unstripped/toybox"
 # CROSS_COMPILE = compiler prefix
 CFLAGS += "${TOOLCHAIN_OPTIONS} ${TUNE_CCARGS}"
 
-COMPILER_toolchain-clang = "clang"
+COMPILER:toolchain-clang = "clang"
 COMPILER  ?= "gcc"
 
 PACKAGECONFIG ??= "no-iconv no-getconf"
@@ -45,7 +45,7 @@ do_configure() {
     fi
 
     # Copy defconfig to .config if .config does not exist. This allows
-    # recipes to manage the .config themselves in do_configure_prepend().
+    # recipes to manage the .config themselves in do_configure:prepend().
     if [ -f "${WORKDIR}/defconfig" ] && [ ! -f "${B}/.config" ]; then
         cp "${WORKDIR}/defconfig" "${B}/.config"
     fi
@@ -95,7 +95,7 @@ do_install() {
 # over busybox where possible but not over other packages
 ALTERNATIVE_PRIORITY = "60"
 
-python do_package_prepend () {
+python do_package:prepend () {
     # Read links from /etc/toybox.links and create appropriate
     # update-alternatives variables
 
@@ -107,7 +107,7 @@ python do_package_prepend () {
     for alt_link_name in f:
         alt_link_name = alt_link_name.strip()
         alt_name = os.path.basename(alt_link_name)
-        d.appendVar('ALTERNATIVE_%s' % (pn), ' ' + alt_name)
+        d.appendVar('ALTERNATIVE:%s' % (pn), ' ' + alt_name)
         d.setVarFlag('ALTERNATIVE_LINK_NAME', alt_name, alt_link_name)
         d.setVarFlag('ALTERNATIVE_TARGET', alt_name, target)
     f.close()

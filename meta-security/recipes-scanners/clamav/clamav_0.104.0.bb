@@ -8,10 +8,10 @@ DEPENDS = "glibc llvm libtool db openssl zlib curl libxml2 bison pcre2 json-c li
  
 LIC_FILES_CHKSUM = "file://COPYING.txt;beginline=2;endline=3;md5=f7029fbbc5898b273d5902896f7bbe17"
 
-# May 15th
-SRCREV = "fe96de86bb90c489aa509ee9135f776b7a2a7eb4"
+# July 27th
+SRCREV = "c389dfa4c3af92b006ada4f7595bbc3e6df3f356"
 
-SRC_URI = "git://github.com/vrtadmin/clamav-devel;branch=dev/0.104 \
+SRC_URI = "git://github.com/vrtadmin/clamav-devel;branch=rel/0.104 \
     file://clamd.conf \
     file://freshclam.conf \
     file://volatiles.03_clamav \
@@ -52,7 +52,7 @@ PACKAGECONFIG[systemd] = "-DENABLE_SYSTEMD=ON -DSYSTEMD_UNIT_DIR=${systemd_syste
 
 export OECMAKE_C_FLAGS += " -I${STAGING_INCDIR} -L ${RECIPE_SYSROOT}${nonarch_libdir} -L${STAGING_LIBDIR} -lpthread" 
 
-do_install_append () {
+do_install:append () {
     install -d ${D}/${sysconfdir}
     install -d ${D}/${localstatedir}/lib/clamav
     install -d ${D}${sysconfdir}/clamav ${D}${sysconfdir}/default/volatiles
@@ -76,7 +76,7 @@ do_install_append () {
     oe_multilib_header clamav-types.h
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     if [ -z "$D" ]; then
         if command -v systemd-tmpfiles >/dev/null; then
             systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/clamav.conf
@@ -89,17 +89,17 @@ pkg_postinst_${PN} () {
 
 PACKAGES += "${PN}-daemon ${PN}-clamdscan ${PN}-freshclam ${PN}-libclamav"
 
-FILES_${PN} = "${bindir}/clambc ${bindir}/clamscan ${bindir}/clamsubmit ${sbindir}/clamonacc \
+FILES:${PN} = "${bindir}/clambc ${bindir}/clamscan ${bindir}/clamsubmit ${sbindir}/clamonacc \
                 ${bindir}/*sigtool ${mandir}/man1/clambc* ${mandir}/man1/clamscan* \
                 ${mandir}/man1/sigtool* ${mandir}/man1/clambsubmit*  \
                 ${docdir}/clamav/*"
 
-FILES_${PN}-clamdscan = " ${bindir}/clamdscan \
+FILES:${PN}-clamdscan = " ${bindir}/clamdscan \
                         ${docdir}/clamdscan/* \
                         ${mandir}/man1/clamdscan* \
                         "
 
-FILES_${PN}-daemon = "${bindir}/clamconf ${bindir}/clamdtop ${sbindir}/clamd \
+FILES:${PN}-daemon = "${bindir}/clamconf ${bindir}/clamdtop ${sbindir}/clamd \
                         ${mandir}/man1/clamconf* ${mandir}/man1/clamdtop* \
                         ${mandir}/man5/clamd*  ${mandir}/man8/clamd* \
                         ${sysconfdir}/clamd.conf* \
@@ -111,7 +111,7 @@ FILES_${PN}-daemon = "${bindir}/clamconf ${bindir}/clamdtop ${sbindir}/clamd \
                         ${systemd_system_unitdir}/clamav-clamonacc.service \
                         "
 
-FILES_${PN}-freshclam = "${bindir}/freshclam \
+FILES:${PN}-freshclam = "${bindir}/freshclam \
                         ${sysconfdir}/freshclam.conf*  \
                         /usr/etc/freshclam.conf*  \
                         ${sysconfdir}/clamav ${sysconfdir}/default/volatiles \
@@ -121,33 +121,33 @@ FILES_${PN}-freshclam = "${bindir}/freshclam \
                         ${mandir}/man5/freshclam.conf.* \
                         ${systemd_system_unitdir}/clamav-freshclam.service"
 
-FILES_${PN}-dev = " ${bindir}/clamav-config ${libdir}/*.la \
+FILES:${PN}-dev = " ${bindir}/clamav-config ${libdir}/*.la \
                     ${libdir}/pkgconfig/*.pc \
                     ${mandir}/man1/clamav-config.* \
                     ${includedir}/*.h ${docdir}/libclamav* "
 
-FILES_${PN}-staticdev = "${libdir}/*.a"
+FILES:${PN}-staticdev = "${libdir}/*.a"
 
-FILES_${PN}-libclamav = "${libdir}/libclamav.so* ${libdir}/libclammspack.so* \
+FILES:${PN}-libclamav = "${libdir}/libclamav.so* ${libdir}/libclammspack.so* \
                          ${libdir}/libfreshclam.so* ${docdir}/libclamav/* \
                          ${libdir}/libmspack* "
 
-FILES_${PN}-doc = "${mandir}/man/* \
+FILES:${PN}-doc = "${mandir}/man/* \
                    ${datadir}/man/* \
                    ${docdir}/* "
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system ${CLAMAV_UID}"
-USERADD_PARAM_${PN} = "--system -g ${CLAMAV_GID} --home-dir  \
+GROUPADD_PARAM:${PN} = "--system ${CLAMAV_UID}"
+USERADD_PARAM:${PN} = "--system -g ${CLAMAV_GID} --home-dir  \
     ${localstatedir}/lib/${BPN} \
     --no-create-home  --shell /sbin/nologin ${BPN}"
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
 SYSTEMD_PACKAGES  = "${PN}-daemon ${PN}-freshclam"
-SYSTEMD_SERVICE_${PN}-daemon = "clamav-daemon.service"
-SYSTEMD_SERVICE_${PN}-freshclam = "clamav-freshclam.service"
+SYSTEMD_SERVICE:${PN}-daemon = "clamav-daemon.service"
+SYSTEMD_SERVICE:${PN}-freshclam = "clamav-freshclam.service"
 
-RDEPENDS_${PN} = "openssl ncurses-libncurses libxml2 libbz2 ncurses-libtinfo curl libpcre2 clamav-freshclam clamav-libclamav"
-RDEPENDS_${PN}-daemon = "clamav"
+RDEPENDS:${PN} = "openssl ncurses-libncurses libxml2 libbz2 ncurses-libtinfo curl libpcre2 clamav-freshclam clamav-libclamav"
+RDEPENDS:${PN}-daemon = "clamav"

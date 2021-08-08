@@ -1,22 +1,22 @@
-SUMMARY_${PN}-ptest ?= "${SUMMARY} - Package test files"
-DESCRIPTION_${PN}-ptest ?= "${DESCRIPTION}  \
+SUMMARY:${PN}-ptest ?= "${SUMMARY} - Package test files"
+DESCRIPTION:${PN}-ptest ?= "${DESCRIPTION}  \
 This package contains a test directory ${PTEST_PATH} for package test purposes."
 
 PTEST_PATH ?= "${libdir}/${BPN}/ptest"
 PTEST_BUILD_HOST_FILES ?= "Makefile"
 PTEST_BUILD_HOST_PATTERN ?= ""
 
-FILES_${PN}-ptest += "${PTEST_PATH}"
-SECTION_${PN}-ptest = "devel"
-ALLOW_EMPTY_${PN}-ptest = "1"
+FILES:${PN}-ptest += "${PTEST_PATH}"
+SECTION:${PN}-ptest = "devel"
+ALLOW_EMPTY:${PN}-ptest = "1"
 PTEST_ENABLED = "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', '1', '0', d)}"
-PTEST_ENABLED_class-native = ""
-PTEST_ENABLED_class-nativesdk = ""
-PTEST_ENABLED_class-cross-canadian = ""
-RDEPENDS_${PN}-ptest += "${PN}"
-RDEPENDS_${PN}-ptest_class-native = ""
-RDEPENDS_${PN}-ptest_class-nativesdk = ""
-RRECOMMENDS_${PN}-ptest += "ptest-runner"
+PTEST_ENABLED:class-native = ""
+PTEST_ENABLED:class-nativesdk = ""
+PTEST_ENABLED:class-cross-canadian = ""
+RDEPENDS:${PN}-ptest += "${PN}"
+RDEPENDS:${PN}-ptest:class-native = ""
+RDEPENDS:${PN}-ptest:class-nativesdk = ""
+RRECOMMENDS:${PN}-ptest += "ptest-runner"
 
 PACKAGES =+ "${@bb.utils.contains('PTEST_ENABLED', '1', '${PN}-ptest', '', d)}"
 
@@ -73,7 +73,7 @@ PTEST_BINDIR_PKGD_PATH = "${PKGD}${PTEST_PATH}/bin"
 # This function needs to run after apply_update_alternative_renames because the
 # aforementioned function will update the ALTERNATIVE_LINK_NAME flag. Append is
 # used here to make this function to run as late as possible.
-PACKAGE_PREPROCESS_FUNCS_append = "${@bb.utils.contains('PTEST_BINDIR', '1', \
+PACKAGE_PREPROCESS_FUNCS:append = "${@bb.utils.contains('PTEST_BINDIR', '1', \
                                     bb.utils.contains('PTEST_ENABLED', '1', ' ptest_update_alternatives', '', d), '', d)}"
 
 python ptest_update_alternatives() {

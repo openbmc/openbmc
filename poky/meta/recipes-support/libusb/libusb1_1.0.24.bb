@@ -20,12 +20,12 @@ S = "${WORKDIR}/libusb-${PV}"
 
 inherit autotools pkgconfig ptest
 
-PACKAGECONFIG_class-target ??= "udev"
+PACKAGECONFIG:class-target ??= "udev"
 PACKAGECONFIG[udev] = "--enable-udev,--disable-udev,udev"
 
 EXTRA_OECONF = "--libdir=${base_libdir}"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${libdir}
 	if [ ! ${D}${libdir} -ef ${D}${base_libdir} ]; then
 		mv ${D}${base_libdir}/pkgconfig ${D}${libdir}
@@ -40,6 +40,6 @@ do_install_ptest() {
     install -m 755 ${B}/tests/.libs/stress ${D}${PTEST_PATH}         
 }
 
-FILES_${PN} += "${base_libdir}/*.so.*"
+FILES:${PN} += "${base_libdir}/*.so.*"
 
-FILES_${PN}-dev += "${base_libdir}/*.so ${base_libdir}/*.la"
+FILES:${PN}-dev += "${base_libdir}/*.so ${base_libdir}/*.la"

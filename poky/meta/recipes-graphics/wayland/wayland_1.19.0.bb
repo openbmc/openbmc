@@ -28,11 +28,11 @@ PACKAGECONFIG ??= "dtd-validation"
 PACKAGECONFIG[dtd-validation] = "-Ddtd_validation=true,-Ddtd_validation=false,libxml2,,"
 
 EXTRA_OEMESON = "-Ddocumentation=false"
-EXTRA_OEMESON_class-native = "-Ddocumentation=false -Dlibraries=false"
+EXTRA_OEMESON:class-native = "-Ddocumentation=false -Dlibraries=false"
 
 # Wayland installs a M4 macro for other projects to use, which uses the target
 # pkg-config to find files.  Replace pkg-config with pkg-config-native.
-do_install_append_class-native() {
+do_install:append:class-native() {
   sed -e 's,PKG_CHECK_MODULES(.*),,g' \
       -e 's,$PKG_CONFIG,pkg-config-native,g' \
       -i ${D}/${datadir}/aclocal/wayland-scanner.m4
@@ -47,16 +47,16 @@ do_install_ptest() {
     cp -rf ${S}/egl/wayland-egl-symbols-check ${D}${PTEST_PATH}/tests/
 }
 
-sysroot_stage_all_append_class-target () {
+sysroot_stage_all:append:class-target () {
 	rm ${SYSROOT_DESTDIR}/${datadir}/aclocal/wayland-scanner.m4
 	cp ${STAGING_DATADIR_NATIVE}/aclocal/wayland-scanner.m4 ${SYSROOT_DESTDIR}/${datadir}/aclocal/
 }
 
 PACKAGES += "${PN}-tools"
 
-FILES_${PN} = "${libdir}/*${SOLIBS}"
-FILES_${PN}-tools += "${bindir} ${datadir}/wayland"
+FILES:${PN} = "${libdir}/*${SOLIBS}"
+FILES:${PN}-tools += "${bindir} ${datadir}/wayland"
 
 BBCLASSEXTEND = "native nativesdk"
 
-RDEPENDS_${PN}-ptest += "binutils sed ${PN}-tools"
+RDEPENDS:${PN}-ptest += "binutils sed ${PN}-tools"

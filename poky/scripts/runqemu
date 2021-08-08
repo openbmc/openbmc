@@ -776,7 +776,7 @@ class BaseConfig(object):
                 raise RunQemuError('BIOS not found: %s' % bios_match_name)
 
         if not os.path.exists(self.bios):
-            raise RunQemuError("KERNEL %s not found" % self.bios)
+            raise RunQemuError("BIOS %s not found" % self.bios)
 
 
     def check_mem(self):
@@ -1443,12 +1443,14 @@ class BaseConfig(object):
             kernel_opts = "-kernel %s -append '%s %s %s %s'" % (self.kernel, self.kernel_cmdline,
                                                                 self.kernel_cmdline_script, self.get('QB_KERNEL_CMDLINE_APPEND'),
                                                                 self.bootparams)
-            if self.bios:
-                kernel_opts += " -bios %s" % self.bios
             if self.dtb:
                 kernel_opts += " -dtb %s" % self.dtb
         else:
             kernel_opts = ""
+
+        if self.bios:
+            self.qemu_opt += " -bios %s" % self.bios
+
         cmd = "%s %s" % (self.qemu_opt, kernel_opts)
         cmds = shlex.split(cmd)
         logger.info('Running %s\n' % cmd)

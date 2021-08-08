@@ -25,5 +25,5 @@ EXTRA_OECONF = " --enable-shared "
 
 PACKAGES =+ "a52dec a52dec-doc"
 
-FILES_a52dec = " ${bindir}/* "
-FILES_a52dec-doc = " ${mandir}/man1/* "
+FILES:a52dec = " ${bindir}/* "
+FILES:a52dec-doc = " ${mandir}/man1/* "

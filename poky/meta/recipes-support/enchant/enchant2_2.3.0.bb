@@ -24,8 +24,8 @@ PACKAGECONFIG ??= "aspell"
 PACKAGECONFIG[aspell]  = "--with-aspell,--without-aspell,aspell,aspell"
 PACKAGECONFIG[hunspell]  = "--with-hunspell,--without-hunspell,hunspell,hunspell"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/enchant-2 \
     ${libdir}/enchant-2 \
 "
-FILES_${PN}-staticdev += "${libdir}/enchant-2/*.a"
+FILES:${PN}-staticdev += "${libdir}/enchant-2/*.a"

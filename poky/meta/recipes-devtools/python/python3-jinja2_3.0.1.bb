@@ -24,13 +24,13 @@ do_install_ptest() {
     cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
 }
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
         ${PYTHON_PN}-toml \
 	${PYTHON_PN}-unixadmin \
 "
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-asyncio \
     ${PYTHON_PN}-crypt \
     ${PYTHON_PN}-io \

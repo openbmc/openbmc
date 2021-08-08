@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;beginline=1;endline=19;md5=7a7126e068206290f3
 
 inherit pypi setuptools3
 
-SRC_URI_append_class-native = " file://0001-conditionally-do-not-fetch-code-by-easy_install.patch"
+SRC_URI:append:class-native = " file://0001-conditionally-do-not-fetch-code-by-easy_install.patch"
 
 SRC_URI += "file://0001-change-shebang-to-python3.patch"
 
@@ -14,7 +14,7 @@ SRC_URI[sha256sum] = "cfca9c97e7eebbc8abe18d5e5e962a08dcad55bb63afddd82d681de4d2
 
 DEPENDS += "${PYTHON_PN}"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
   ${PYTHON_PN}-2to3 \
   ${PYTHON_PN}-compile \
   ${PYTHON_PN}-compression \
@@ -36,7 +36,7 @@ RDEPENDS_${PN} = "\
   ${PYTHON_PN}-xml \
 "
 
-do_install_prepend() {
+do_install:prepend() {
     install -d ${D}${PYTHON_SITEPACKAGES_DIR}
 }
 
@@ -46,8 +46,8 @@ BBCLASSEXTEND = "native nativesdk"
 # and easy_install. Ship it in a separate package so that it can be used by
 # minimal distributions.
 PACKAGES =+ "${PYTHON_PN}-pkg-resources "
-FILES_${PYTHON_PN}-pkg-resources = "${PYTHON_SITEPACKAGES_DIR}/pkg_resources/*"
-RDEPENDS_${PYTHON_PN}-pkg-resources = "\
+FILES:${PYTHON_PN}-pkg-resources = "${PYTHON_SITEPACKAGES_DIR}/pkg_resources/*"
+RDEPENDS:${PYTHON_PN}-pkg-resources = "\
   ${PYTHON_PN}-compression \
   ${PYTHON_PN}-email \
   ${PYTHON_PN}-plistlib \

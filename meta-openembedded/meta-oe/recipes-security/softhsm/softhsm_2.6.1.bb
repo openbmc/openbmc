@@ -26,5 +26,5 @@ PACKAGECONFIG[botan] = "--with-botan=${STAGING_DIR_HOST}/usr --with-crypto-backe
 PACKAGECONFIG[migrate] = "--with-migrate"
 PACKAGECONFIG[pk11] = "--enable-p11-kit --with-p11-kit==${STAGING_DIR_HOST}/usr, --without-p11-kit, p11-kit, p11-kit"
 
-RDEPENDS_${PN} = "sqlite3"
+RDEPENDS:${PN} = "sqlite3"
 BBCLASSEXTEND = "native nativesdk"

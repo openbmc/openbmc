@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "87c1dd7f0f80fcd3d1396bce9fd9962e7791e748dc0584802f8d10cc95
 
 DEPENDS += "openssl"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     perl-module-config \
     perl-module-exporter \
     perl-module-extutils-mm \
@@ -31,6 +31,6 @@ BBCLASSEXTEND = "native"
 # for backwards compatibility
 PROVIDES_${PN} += "libcrypt-openssl-guess"
 
-RDEPENDS_${PN}-ptest += "\
+RDEPENDS:${PN}-ptest += "\
     perl-module-test-more \
 "

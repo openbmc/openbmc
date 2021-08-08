@@ -11,11 +11,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
 SECTION = "devel"
 
 DEPENDS = "popt binutils"
-DEPENDS_append_powerpc64 = " libpfm4"
-DEPENDS_append_powerpc64le = " libpfm4"
+DEPENDS:append:powerpc64 = " libpfm4"
+DEPENDS:append:powerpc64le = " libpfm4"
 
-COMPATIBLE_HOST_riscv64 = "null"
-COMPATIBLE_HOST_riscv32 = "null"
+COMPATIBLE_HOST:riscv64 = "null"
+COMPATIBLE_HOST:riscv32 = "null"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz \
            file://acinclude.m4 \
@@ -68,8 +68,8 @@ do_install_ptest() {
 		libutil++/tests/file_manip_tests.o ${D}${PTEST_PATH}/libutil++/tests
 }
 
-RDEPENDS_${PN} = "binutils-symlinks"
+RDEPENDS:${PN} = "binutils-symlinks"
 
-FILES_${PN} = "${bindir} ${libdir}/${BPN}/lib*${SOLIBS} ${datadir}/${BPN}"
-FILES_${PN}-dev += "${libdir}/${BPN}/lib*${SOLIBSDEV} ${libdir}/${BPN}/lib*.la"
-FILES_${PN}-staticdev += "${libdir}/${BPN}/lib*.a"
+FILES:${PN} = "${bindir} ${libdir}/${BPN}/lib*${SOLIBS} ${datadir}/${BPN}"
+FILES:${PN}-dev += "${libdir}/${BPN}/lib*${SOLIBSDEV} ${libdir}/${BPN}/lib*.la"
+FILES:${PN}-staticdev += "${libdir}/${BPN}/lib*.a"

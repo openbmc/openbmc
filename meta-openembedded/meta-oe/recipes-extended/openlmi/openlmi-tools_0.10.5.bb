@@ -18,7 +18,7 @@ SRC_URI[sha256sum] = "292b8f5f2250655a4add8183c529b73358bc980bd4f23cfa484a940953
 
 S = "${WORKDIR}/${BP}/cli"
 
-do_configure_prepend() {
+do_configure:prepend() {
     sed 's/@@VERSION@@/$(VERSION)/g' ${S}/setup.py.skel > ${S}/setup.py
 }
 

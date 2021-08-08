@@ -18,15 +18,15 @@ SRC_URI[sha256sum] = "ca43439707976f6664fe3f6eb7f356a51ac7d7f8a4e246ef4d1b16305e
 COMPATIBLE_HOST = "(i.86|x86_64|aarch64|powerpc64).*-linux"
 
 DEPENDS = "libpcre glib-2.0 dtc bison-native libbsd"
-DEPENDS_append_libc-musl = " libexecinfo"
+DEPENDS:append:libc-musl = " libexecinfo"
 
 # Use brokensep for now (https://github.com/ColinIanKing/fwts/issues/2)
 inherit autotools-brokensep bash-completion pkgconfig
 
-LDFLAGS_append_libc-musl = " -lexecinfo"
+LDFLAGS:append:libc-musl = " -lexecinfo"
 
-FILES_${PN} += "${libdir}/fwts/lib*${SOLIBS}"
-FILES_${PN}-dev += "${libdir}/fwts/lib*${SOLIBSDEV} ${libdir}/fwts/lib*.la"
-FILES_${PN}-staticdev += "${libdir}/fwts/lib*a"
+FILES:${PN} += "${libdir}/fwts/lib*${SOLIBS}"
+FILES:${PN}-dev += "${libdir}/fwts/lib*${SOLIBSDEV} ${libdir}/fwts/lib*.la"
+FILES:${PN}-staticdev += "${libdir}/fwts/lib*a"
 
-RDEPENDS_${PN} += "dtc"
+RDEPENDS:${PN} += "dtc"

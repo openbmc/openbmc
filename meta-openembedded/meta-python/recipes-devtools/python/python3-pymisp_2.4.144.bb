@@ -9,7 +9,7 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-dateutil \
     ${PYTHON_PN}-json \
     ${PYTHON_PN}-jsonschema \
@@ -20,5 +20,5 @@ RDEPENDS_${PN} += " \
 "
 
 # Fixes: python3-pymisp requires /bin/bash, but no
-# providers found in RDEPENDS_python3-pymisp? [file-rdep]
-RDEPENDS_${PN} += "bash"
+# providers found in RDEPENDS:python3-pymisp? [file-rdep]
+RDEPENDS:${PN} += "bash"

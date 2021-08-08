@@ -8,10 +8,10 @@ SECTION = "console/utils"
 inherit autotools texinfo
 export DEFS="NO_ASM"
 
-EXTRA_OEMAKE_class-target = "GREP=${base_bindir}/grep"
-EXTRA_OECONF_append_libc-musl = " gl_cv_func_fflush_stdin=yes "
+EXTRA_OEMAKE:class-target = "GREP=${base_bindir}/grep"
+EXTRA_OECONF:append:libc-musl = " gl_cv_func_fflush_stdin=yes "
 
-do_install_append () {
+do_install:append () {
 	if [ "${base_bindir}" != "${bindir}" ]; then
 		# Rename and move files into /bin (FHS), which is typical place for gzip
 		install -d ${D}${base_bindir}
@@ -25,7 +25,7 @@ do_install_append () {
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN} = "gunzip gzip zcat"
+ALTERNATIVE:${PN} = "gunzip gzip zcat"
 ALTERNATIVE_LINK_NAME[gunzip] = "${base_bindir}/gunzip"
 ALTERNATIVE_LINK_NAME[gzip] = "${base_bindir}/gzip"
 ALTERNATIVE_LINK_NAME[zcat] = "${base_bindir}/zcat"

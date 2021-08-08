@@ -7,5 +7,10 @@ for i in $IMPORT_SCHEMAS; do
 done
 
 for i in $ENABLED_SCHEMAS; do
-    ls /sys/class/udc/ > /sys/kernel/config/usb_gadget/"$i"/UDC
+    configured_udc=$(eval 'echo ${UDC_FOR_SCHEMA_'"$i"'}')
+    if [ -n "${configured_udc}" ] && [ -e "/sys/class/udc/${configured_udc}" ]; then
+        echo ${configured_udc} > /sys/kernel/config/usb_gadget/"$i"/UDC
+    else
+        ls /sys/class/udc/ > /sys/kernel/config/usb_gadget/"$i"/UDC
+    fi
 done

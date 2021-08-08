@@ -9,7 +9,7 @@ LICENSE = "Artistic-1.0|GPL-1.0+"
 LIC_FILES_CHKSUM = "file://lib/Authen/SASL/Perl.pm;beginline=1;endline=3;md5=17123315bbcda19f484c07227594a609"
 
 DEPENDS = "perl"
-RDEPENDS_${PN} = "libdigest-hmac-perl"
+RDEPENDS:${PN} = "libdigest-hmac-perl"
 
 SRC_URI = "http://www.cpan.org/authors/id/G/GB/GBARR/Authen-SASL-${PV}.tar.gz \
            file://run-ptest \

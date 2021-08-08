@@ -1,5 +1,5 @@
 require libva.inc
 
-do_install_append () {
+do_install:append () {
 	rm -f ${D}${libdir}/*.so*
 }

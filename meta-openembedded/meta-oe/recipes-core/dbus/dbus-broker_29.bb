@@ -17,15 +17,15 @@ DEPENDS = "expat systemd"
 DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'libselinux (>= 3.2)', '', d)}"
 DEPENDS += " ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'audit (>= 3.0)', '', d)}"
 
-RDEPENDS_${PN} += "dbus-common"
+RDEPENDS:${PN} += "dbus-common"
 
 REQUIRED_DISTRO_FEATURES = "systemd"
 
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
-FILES_${PN} += "${systemd_system_unitdir}"
-FILES_${PN} += "${systemd_user_unitdir}"
-FILES_${PN} += "${nonarch_libdir}/systemd/catalog"
+FILES:${PN} += "${systemd_system_unitdir}"
+FILES:${PN} += "${systemd_user_unitdir}"
+FILES:${PN} += "${nonarch_libdir}/systemd/catalog"
 
 EXTRA_OEMESON += " -Dselinux=${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}"
 EXTRA_OEMESON += " -Daudit=${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'true', 'false', d)}"

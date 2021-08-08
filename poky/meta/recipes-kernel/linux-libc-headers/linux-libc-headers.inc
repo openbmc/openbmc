@@ -75,15 +75,15 @@ do_install() {
 	find ${D}${includedir} -name ..install.cmd | xargs rm -f
 }
 
-do_install_append_aarch64 () {
+do_install:append:aarch64 () {
         do_install_armmultilib
 }
 
-do_install_append_arm () {
+do_install:append:arm () {
 	do_install_armmultilib
 }
 
-do_install_append_armeb () {
+do_install:append:armeb () {
 	do_install_armmultilib
 }
 
@@ -103,8 +103,8 @@ do_install_armmultilib () {
 
 BBCLASSEXTEND = "nativesdk"
 
-RDEPENDS_${PN}-dev = ""
-RRECOMMENDS_${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
+RDEPENDS:${PN}-dev = ""
+RRECOMMENDS:${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
 
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS += "unifdef-native bison-native rsync-native"

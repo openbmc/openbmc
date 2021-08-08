@@ -25,16 +25,16 @@ GTKDOC_MESON_DISABLE_FLAG = "disabled"
 
 inherit meson gtk-doc gobject-introspection
 
-FILES_${PN} += "${libdir}/gstreamer-1.0/*.so"
-FILES_${PN}-dev += "${libdir}/gstreamer-1.0/*.la"
-FILES_${PN}-staticdev += "${libdir}/gstreamer-1.0/*.a"
-FILES_${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"
+FILES:${PN} += "${libdir}/gstreamer-1.0/*.so"
+FILES:${PN}-dev += "${libdir}/gstreamer-1.0/*.la"
+FILES:${PN}-staticdev += "${libdir}/gstreamer-1.0/*.a"
+FILES:${PN}-dbg += "${libdir}/gstreamer-1.0/.debug"
 
-do_configure_prepend() {
+do_configure:prepend() {
     mkdir ${S}/m4 || true
 }
 
-do_compile_append() {
+do_compile:append() {
     for i in $(find ${B} -name "*.pc") ; do
         sed -i -e s:${STAGING_DIR_TARGET}::g \
                -e s:/${TARGET_SYS}::g \

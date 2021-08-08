@@ -1,7 +1,7 @@
 
 TUNEVALID[bigendian] = "Enable big-endian mode."
 
-ARMPKGARCH = "${ARMPKGARCH_tune-${DEFAULTTUNE}}"
+ARMPKGARCH = "${ARMPKGARCH:tune-${DEFAULTTUNE}}"
 ARMPKGSFX_ENDIAN = "${@bb.utils.contains('TUNE_FEATURES', 'bigendian', 'b', '', d)}"
 ARMPKGSFX_FPU ??= ""
 ARMPKGSFX_DSP ??= ""

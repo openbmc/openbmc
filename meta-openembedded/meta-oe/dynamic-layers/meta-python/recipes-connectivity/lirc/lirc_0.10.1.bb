@@ -1,8 +1,8 @@
 DESCRIPTION = "LIRC is a package that allows you to decode and send infra-red signals of many commonly used remote controls."
-DESCRIPTION_append_lirc = " This package contains the lirc daemon, libraries and tools."
-DESCRIPTION_append_lirc-exec = " This package contains a daemon that runs programs on IR signals."
-DESCRIPTION_append_lirc-remotes = " This package contains some config files for remotes."
-DESCRIPTION_append_lirc-nslu2example = " This package contains a working config for RC5 remotes and a modified NSLU2."
+DESCRIPTION:append:lirc = " This package contains the lirc daemon, libraries and tools."
+DESCRIPTION:append:lirc-exec = " This package contains a daemon that runs programs on IR signals."
+DESCRIPTION:append:lirc-remotes = " This package contains some config files for remotes."
+DESCRIPTION:append:lirc-nslu2example = " This package contains a working config for RC5 remotes and a modified NSLU2."
 HOMEPAGE = "http://www.lirc.org"
 SECTION = "console/network"
 LICENSE = "GPLv2"
@@ -24,10 +24,10 @@ SRC_URI[md5sum] = "86c3f8e4efaba10571addb8313d1e040"
 SRC_URI[sha256sum] = "8b753c60df2a7f5dcda2db72c38e448ca300c3b4f6000c1501fcb0bd5df414f2"
 
 SYSTEMD_PACKAGES = "lirc lirc-exec"
-SYSTEMD_SERVICE_${PN} = "lircd.service lircmd.service lircd-setup.service lircd-uinput.service"
-SYSTEMD_SERVICE_${PN}-exec = "irexec.service"
-SYSTEMD_AUTO_ENABLE_lirc = "enable"
-SYSTEMD_AUTO_ENABLE_lirc-exec = "enable"
+SYSTEMD_SERVICE:${PN} = "lircd.service lircmd.service lircd-setup.service lircd-uinput.service"
+SYSTEMD_SERVICE:${PN}-exec = "irexec.service"
+SYSTEMD_AUTO_ENABLE:lirc = "enable"
+SYSTEMD_AUTO_ENABLE:lirc-exec = "enable"
 
 inherit autotools pkgconfig systemd python3native distutils-common-base
 
@@ -43,12 +43,12 @@ CACHED_CONFIGUREVARS = "HAVE_WORKING_POLL=yes"
 #EXTRA_OEMAKE = 'SUBDIRS="lib daemons tools"'
 
 # Ensure python-pkg/VERSION exists
-do_configure_append() {
+do_configure:append() {
     cp ${S}/VERSION ${S}/python-pkg/
 }
 
 # Create PYTHON_TARBALL which LIRC needs for install-nodist_pkgdataDATA
-do_install_prepend() {
+do_install:prepend() {
     rm -rf ${WORKDIR}/${PN}-${PV}/python-pkg/dist/
     mkdir ${WORKDIR}/${PN}-${PV}/python-pkg/dist/
     tar --exclude='${WORKDIR}/${PN}-${PV}/python-pkg/*' -czf ${WORKDIR}/${PN}-${PV}/python-pkg/dist/${PN}-${PV}.tar.gz ${S}
@@ -57,7 +57,7 @@ do_install_prepend() {
 # In code, path to python is a variable that is replaced with path to native version of it
 # during the configure stage, e.g ../recipe-sysroot-native/usr/bin/python3-native/python3.
 # Replace it with #!/usr/bin/env python3
-do_install_append() {
+do_install:append() {
     sed -i '1c#!/usr/bin/env python3' ${D}${bindir}/lirc-setup \
                                       ${D}${PYTHON_SITEPACKAGES_DIR}/lirc-setup/lirc-setup \
                                       ${D}${bindir}/irtext2udp \
@@ -82,28 +82,28 @@ do_install_append() {
 
 PACKAGES =+ "${PN}-contrib ${PN}-exec ${PN}-plugins ${PN}-python"
 
-RDEPENDS_${PN} = "bash python3"
-RDEPENDS_${PN}-exec = "${PN}"
-RDEPENDS_${PN}-python = "python3-shell python3-pyyaml python3-datetime python3-netclient python3-stringold"
+RDEPENDS:${PN} = "bash python3"
+RDEPENDS:${PN}-exec = "${PN}"
+RDEPENDS:${PN}-python = "python3-shell python3-pyyaml python3-datetime python3-netclient python3-stringold"
 
-RRECOMMENDS_${PN} = "${PN}-exec ${PN}-plugins"
+RRECOMMENDS:${PN} = "${PN}-exec ${PN}-plugins"
 
-FILES_${PN}-plugins = "${libdir}/lirc/plugins/*.so ${datadir}/lirc/configs"
-FILES_${PN}-contrib = "${datadir}/lirc/contrib"
-FILES_${PN}-exec = "${bindir}/irexec ${sysconfdir}/lircexec ${systemd_unitdir}/system/irexec.service"
-FILES_${PN} += "${systemd_unitdir}/system/lircexec.init"
-FILES_${PN} += "${systemd_unitdir}/system/lircd.service"
-FILES_${PN} += "${systemd_unitdir}/system/lircd.socket"
-FILES_${PN} += "${libdir}/tmpfiles.d/lirc.conf"
-FILES_${PN}-dbg += "${libdir}/lirc/plugins/.debug"
-FILES_${PN}-python += "${bindir}/irdb-get ${bindir}/irtext2udp ${bindir}/lircd-setup ${bindir}/pronto2lirc ${libdir}/python*/site-packages"
+FILES:${PN}-plugins = "${libdir}/lirc/plugins/*.so ${datadir}/lirc/configs"
+FILES:${PN}-contrib = "${datadir}/lirc/contrib"
+FILES:${PN}-exec = "${bindir}/irexec ${sysconfdir}/lircexec ${systemd_unitdir}/system/irexec.service"
+FILES:${PN} += "${systemd_unitdir}/system/lircexec.init"
+FILES:${PN} += "${systemd_unitdir}/system/lircd.service"
+FILES:${PN} += "${systemd_unitdir}/system/lircd.socket"
+FILES:${PN} += "${libdir}/tmpfiles.d/lirc.conf"
+FILES:${PN}-dbg += "${libdir}/lirc/plugins/.debug"
+FILES:${PN}-python += "${bindir}/irdb-get ${bindir}/irtext2udp ${bindir}/lircd-setup ${bindir}/pronto2lirc ${libdir}/python*/site-packages"
 
 INITSCRIPT_PACKAGES = "lirc lirc-exec"
-INITSCRIPT_NAME_lirc-exec = "lircexec"
-INITSCRIPT_PARAMS_lirc-exec = "defaults 21"
+INITSCRIPT_NAME:lirc-exec = "lircexec"
+INITSCRIPT_PARAMS:lirc-exec = "defaults 21"
 
 # this is for distributions that don't use udev
-pkg_postinst_${PN}_append() {
+pkg_postinst:${PN}:append() {
     if [ ! -c $D/dev/lirc -a ! -f /sbin/udevd ]; then mknod $D/dev/lirc c 61 0; fi
 }
 

@@ -17,13 +17,13 @@ S = "${WORKDIR}/git"
 
 EXTRA_OEMAKE += "PLATFORM=${RISCV_SBI_PLAT} I=${D} FW_PIC=n"
 # If RISCV_SBI_PAYLOAD is set then include it as a payload
-EXTRA_OEMAKE_append = " ${@riscv_get_extra_oemake_image(d)}"
-EXTRA_OEMAKE_append = " ${@riscv_get_extra_oemake_fdt(d)}"
+EXTRA_OEMAKE:append = " ${@riscv_get_extra_oemake_image(d)}"
+EXTRA_OEMAKE:append = " ${@riscv_get_extra_oemake_fdt(d)}"
 
 # Required if specifying a custom payload
 do_compile[depends] += "${@riscv_get_do_compile_depends(d)}"
 
-do_install_append() {
+do_install:append() {
 	# In the future these might be required as a dependency for other packages.
 	# At the moment just delete them to avoid warnings
 	rm -r ${D}/include
@@ -39,9 +39,9 @@ do_deploy () {
 
 addtask deploy before do_build after do_install
 
-FILES_${PN} += "/share/opensbi/*/${RISCV_SBI_PLAT}/firmware/fw_jump.*"
-FILES_${PN} += "/share/opensbi/*/${RISCV_SBI_PLAT}/firmware/fw_payload.*"
-FILES_${PN} += "/share/opensbi/*/${RISCV_SBI_PLAT}/firmware/fw_dynamic.*"
+FILES:${PN} += "/share/opensbi/*/${RISCV_SBI_PLAT}/firmware/fw_jump.*"
+FILES:${PN} += "/share/opensbi/*/${RISCV_SBI_PLAT}/firmware/fw_payload.*"
+FILES:${PN} += "/share/opensbi/*/${RISCV_SBI_PLAT}/firmware/fw_dynamic.*"
 
 COMPATIBLE_HOST = "(riscv64|riscv32).*"
 INHIBIT_PACKAGE_STRIP = "1"

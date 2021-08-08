@@ -15,7 +15,7 @@ SRC_URI[sha256sum] = "de67caa102aa4c8fbed5300e5a0262e40411c4cc79f4379a8d34eed797
 
 inherit distutils3 cmake gettext
 
-do_install_append() {
+do_install:append() {
     # these files seem to only be used by symbian and trigger QA warnings
     rm -rf ${D}/usr/share/gammu
     #install default configuration files
@@ -42,19 +42,19 @@ EXTRA_OECMAKE = " \
 
 PACKAGES =+ "${PN}-smsd libgammu libgsmsd python-${PN}"
 
-FILES_${PN} = "${bindir}/gammu ${bindir}/jadmaker ${sysconfdir}/bash_completion.d/gammu \
+FILES:${PN} = "${bindir}/gammu ${bindir}/jadmaker ${sysconfdir}/bash_completion.d/gammu \
     ${bindir}/gammu-detect ${sysconfdir}/gammurc"
-CONFFILES_${PN} = "${sysconfdir}/gammurc"
-FILES_${PN}-smsd = "${bindir}/gammu-smsd* ${sysconfdir}/gammu-smsdrc"
-CONFFILES_${PN}-smsd = "${sysconfdir}/gammu-smsdrc"
-FILES_${PN}-dev += "${bindir}/gammu-config ${libdir}/*.so"
-FILES_${PN}-dbg += "${bindir}/.debug ${libdir}/.debug ${PYTHON_SITEPACKAGES_DIR}/gammu/.debug"
-FILES_libgammu = "${libdir}/libGammu.so.*"
-FILES_libgsmsd = "${libdir}/libgsmsd.so.*"
-FILES_python-${PN} = "${PYTHON_SITEPACKAGES_DIR}/gammu/*.??"
+CONFFILES:${PN} = "${sysconfdir}/gammurc"
+FILES:${PN}-smsd = "${bindir}/gammu-smsd* ${sysconfdir}/gammu-smsdrc"
+CONFFILES:${PN}-smsd = "${sysconfdir}/gammu-smsdrc"
+FILES:${PN}-dev += "${bindir}/gammu-config ${libdir}/*.so"
+FILES:${PN}-dbg += "${bindir}/.debug ${libdir}/.debug ${PYTHON_SITEPACKAGES_DIR}/gammu/.debug"
+FILES:libgammu = "${libdir}/libGammu.so.*"
+FILES:libgsmsd = "${libdir}/libgsmsd.so.*"
+FILES:python-${PN} = "${PYTHON_SITEPACKAGES_DIR}/gammu/*.??"
 
-RDEPENDS_${PN} += "bash"
-RDEPENDS_${PN}-dev += "bash"
+RDEPENDS:${PN} += "bash"
+RDEPENDS:${PN}-dev += "bash"
 
 # Fails to build with thumb-1 (qemuarm)
 # gammu-1.32.0/libgammu/service/sms/gsmems.c:542:1: internal compiler error: in patch_jump_insn, at cfgrtl.c:1275

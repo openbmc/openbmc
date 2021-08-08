@@ -18,7 +18,7 @@ S = "${WORKDIR}/perl-ldap-${PV}"
 
 inherit cpan ptest-perl
 
-do_configure_prepend() {
+do_configure:prepend() {
     perl -pi -e 's/auto_install_now.*//g' Makefile.PL
 }
 
@@ -27,14 +27,14 @@ do_install_ptest() {
 	chown -R root:root ${D}${PTEST_PATH}
 }
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     libconvert-asn1-perl \
     libio-socket-ssl-perl \
     libauthen-sasl-perl \
     perl-module-integer \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     libxml-sax-base-perl \
     libxml-sax-writer-perl \
     perl-module-file-compare \

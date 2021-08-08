@@ -10,11 +10,11 @@ inherit pypi setuptools3
 
 SRC_URI[sha256sum] = "106bc8d6dc6a0ff7c9196a47570432036f41d556b779c6b4e618085f57e39e67"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-shell \
 "
 
-do_install_prepend() {
+do_install:prepend() {
     export RUAMEL_NO_PIP_INSTALL_CHECK=1
 }
 

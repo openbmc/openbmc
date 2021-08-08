@@ -26,4 +26,4 @@ inherit autotools pkgconfig features_check mime-xdg
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 EXTRA_OECONF = "--disable-emacs --disable-print"
-FILES_${PN} += "${datadir}/icons"
+FILES:${PN} += "${datadir}/icons"

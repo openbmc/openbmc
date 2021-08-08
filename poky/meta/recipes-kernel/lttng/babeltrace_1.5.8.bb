@@ -21,7 +21,7 @@ EXTRA_OECONF = "--disable-debug-info"
 
 ASNEEDED = ""
 
-RDEPENDS_${PN}-ptest += "bash gawk"
+RDEPENDS:${PN}-ptest += "bash gawk"
 
 addtask do_patch_ptest_path after do_patch before do_configure
 do_patch_ptest_path () {

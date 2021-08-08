@@ -23,18 +23,18 @@ PARALLEL_MAKE = ""
 
 inherit autotools
 
-do_install_append() {
+do_install:append() {
 	# compatdir
 	install -d ${D}${sysconfdir}/bash_completion.d/
 	echo '. ${datadir}/${BPN}/bash_completion' >${D}${sysconfdir}/bash_completion
 
 }
 
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 # Some recipes are providing ${PN}-bash-completion packages
 PACKAGES =+ "${PN}-extra"
-FILES_${PN}-extra = "${datadir}/${BPN}/completions/ \
+FILES:${PN}-extra = "${datadir}/${BPN}/completions/ \
     ${datadir}/${BPN}/helpers/"
 
 BBCLASSEXTEND = "nativesdk"

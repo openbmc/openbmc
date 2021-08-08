@@ -37,10 +37,10 @@ UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/opensaf/files/releases"
 inherit autotools useradd systemd pkgconfig
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "-f -r opensaf"
-USERADD_PARAM_${PN} =  "-r -g opensaf -d ${datadir}/opensaf/ -s ${sbindir}/nologin -c \"OpenSAF\" opensaf"
+GROUPADD_PARAM:${PN} = "-f -r opensaf"
+USERADD_PARAM:${PN} =  "-r -g opensaf -d ${datadir}/opensaf/ -s ${sbindir}/nologin -c \"OpenSAF\" opensaf"
 
-SYSTEMD_SERVICE_${PN} += "opensafd.service"
+SYSTEMD_SERVICE:${PN} += "opensafd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 PACKAGECONFIG[systemd] = ",,systemd"
@@ -53,7 +53,7 @@ CPPFLAGS += "-Wno-error=stringop-overflow= -Wno-error=stringop-truncation"
 CXXFLAGS += "-Wno-error=stringop-overflow= -Wno-error=stringop-truncation -Wno-error=format-truncation="
 LDFLAGS += "-Wl,--as-needed -latomic -Wl,--no-as-needed"
 
-do_install_append() {
+do_install:append() {
     rm -fr "${D}${localstatedir}/lock"
     rm -fr "${D}${localstatedir}/run"
     rmdir --ignore-fail-on-non-empty "${D}${localstatedir}"
@@ -64,15 +64,15 @@ do_install_append() {
     fi
 }
 
-FILES_${PN} += "${libdir}/libSa*.so ${systemd_unitdir}/system/*.service"
-FILES_${PN}-dev += "${libdir}/libopensaf_core.so"
-FILES_${PN}-staticdev += "${PKGLIBDIR}/*.a"
+FILES:${PN} += "${libdir}/libSa*.so ${systemd_unitdir}/system/*.service"
+FILES:${PN}-dev += "${libdir}/libopensaf_core.so"
+FILES:${PN}-staticdev += "${PKGLIBDIR}/*.a"
 
-INSANE_SKIP_${PN} = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"
 
-RDEPENDS_${PN} += "bash python3-core"
+RDEPENDS:${PN} += "bash python3-core"
 
 # http://errors.yoctoproject.org/Errors/Details/186970/
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'
 
 FILES_SOLIBSDEV = ""

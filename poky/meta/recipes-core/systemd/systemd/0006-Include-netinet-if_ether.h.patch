@@ -56,8 +56,6 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  src/udev/udev-builtin-net_setup_link.c    | 1 +
  21 files changed, 26 insertions(+), 8 deletions(-)
 
-diff --git a/src/libsystemd-network/sd-dhcp6-client.c b/src/libsystemd-network/sd-dhcp6-client.c
-index 410bfda10e..e70ed8be92 100644
 --- a/src/libsystemd-network/sd-dhcp6-client.c
 +++ b/src/libsystemd-network/sd-dhcp6-client.c
 @@ -5,7 +5,6 @@
@@ -68,8 +66,6 @@ index 410bfda10e..e70ed8be92 100644
  #include <linux/if_infiniband.h>
  
  #include "sd-dhcp6-client.h"
-diff --git a/src/libsystemd/sd-netlink/netlink-types.c b/src/libsystemd/sd-netlink/netlink-types.c
-index ed7b9a8cd1..112c0b09e4 100644
 --- a/src/libsystemd/sd-netlink/netlink-types.c
 +++ b/src/libsystemd/sd-netlink/netlink-types.c
 @@ -3,6 +3,7 @@
@@ -80,8 +76,6 @@ index ed7b9a8cd1..112c0b09e4 100644
  #include <linux/can/vxcan.h>
  #include <linux/netlink.h>
  #include <linux/rtnetlink.h>
-diff --git a/src/machine/machine-dbus.c b/src/machine/machine-dbus.c
-index e7c4ed3c7c..3a1e4f9072 100644
 --- a/src/machine/machine-dbus.c
 +++ b/src/machine/machine-dbus.c
 @@ -3,6 +3,7 @@
@@ -92,8 +86,6 @@ index e7c4ed3c7c..3a1e4f9072 100644
  
  /* When we include libgen.h because we need dirname() we immediately
   * undefine basename() since libgen.h defines it as a macro to the POSIX
-diff --git a/src/network/netdev/bond.c b/src/network/netdev/bond.c
-index cf7ca88d6f..34ab468191 100644
 --- a/src/network/netdev/bond.c
 +++ b/src/network/netdev/bond.c
 @@ -1,5 +1,6 @@
@@ -103,8 +95,6 @@ index cf7ca88d6f..34ab468191 100644
  #include "alloc-util.h"
  #include "bond.h"
  #include "bond-util.h"
-diff --git a/src/network/netdev/bridge.c b/src/network/netdev/bridge.c
-index 38432f1578..79ccfe578e 100644
 --- a/src/network/netdev/bridge.c
 +++ b/src/network/netdev/bridge.c
 @@ -1,5 +1,6 @@
@@ -114,8 +104,6 @@ index 38432f1578..79ccfe578e 100644
  #include <net/if.h>
  
  #include "bridge.h"
-diff --git a/src/network/netdev/macsec.c b/src/network/netdev/macsec.c
-index 77c5f8c4e7..04be1b4ab2 100644
 --- a/src/network/netdev/macsec.c
 +++ b/src/network/netdev/macsec.c
 @@ -1,5 +1,6 @@
@@ -125,8 +113,6 @@ index 77c5f8c4e7..04be1b4ab2 100644
  #include <netinet/in.h>
  #include <linux/if_ether.h>
  #include <linux/if_macsec.h>
-diff --git a/src/network/netdev/netdev-gperf.gperf b/src/network/netdev/netdev-gperf.gperf
-index 8abe044890..3c54c58928 100644
 --- a/src/network/netdev/netdev-gperf.gperf
 +++ b/src/network/netdev/netdev-gperf.gperf
 @@ -3,6 +3,7 @@
@@ -137,8 +123,6 @@ index 8abe044890..3c54c58928 100644
  #include <stddef.h>
  #include "bareudp.h"
  #include "batadv.h"
-diff --git a/src/network/netdev/netdev.c b/src/network/netdev/netdev.c
-index b31f0fa81a..c80e1ff537 100644
 --- a/src/network/netdev/netdev.c
 +++ b/src/network/netdev/netdev.c
 @@ -1,5 +1,6 @@
@@ -148,20 +132,6 @@ index b31f0fa81a..c80e1ff537 100644
  #include <net/if.h>
  #include <netinet/in.h>
  #include <unistd.h>
-diff --git a/src/network/networkd-brvlan.c b/src/network/networkd-brvlan.c
-index 2847b336c9..4d6af8c642 100644
---- a/src/network/networkd-brvlan.c
-+++ b/src/network/networkd-brvlan.c
-@@ -4,6 +4,7 @@
- ***/
- 
- #include <netinet/in.h>
-+#include <netinet/if_ether.h>
- #include <linux/if_bridge.h>
- #include <stdbool.h>
- 
-diff --git a/src/network/networkd-dhcp-common.c b/src/network/networkd-dhcp-common.c
-index 00d055cf8d..65821c1d31 100644
 --- a/src/network/networkd-dhcp-common.c
 +++ b/src/network/networkd-dhcp-common.c
 @@ -1,7 +1,8 @@
@@ -173,8 +143,8 @@ index 00d055cf8d..65821c1d31 100644
 +#include <net/if.h>
  
  #include "bus-error.h"
- #include "dhcp-internal.h"
-@@ -11,6 +12,7 @@
+ #include "dhcp-identifier.h"
+@@ -13,6 +14,7 @@
  #include "networkd-dhcp-common.h"
  #include "networkd-link.h"
  #include "networkd-manager.h"
@@ -182,8 +152,6 @@ index 00d055cf8d..65821c1d31 100644
  #include "networkd-network.h"
  #include "parse-util.h"
  #include "socket-util.h"
-diff --git a/src/network/networkd-dhcp-server.c b/src/network/networkd-dhcp-server.c
-index 5cdf432c27..93cffb9863 100644
 --- a/src/network/networkd-dhcp-server.c
 +++ b/src/network/networkd-dhcp-server.c
 @@ -1,8 +1,8 @@
@@ -197,8 +165,6 @@ index 5cdf432c27..93cffb9863 100644
  
  #include "sd-dhcp-server.h"
  
-diff --git a/src/network/networkd-dhcp4.c b/src/network/networkd-dhcp4.c
-index 23dc3a45db..7ae6c2467a 100644
 --- a/src/network/networkd-dhcp4.c
 +++ b/src/network/networkd-dhcp4.c
 @@ -1,9 +1,9 @@
@@ -212,8 +178,6 @@ index 23dc3a45db..7ae6c2467a 100644
  
  #include "escape.h"
  #include "alloc-util.h"
-diff --git a/src/network/networkd-dhcp6.c b/src/network/networkd-dhcp6.c
-index aa077d6219..4f6ce22059 100644
 --- a/src/network/networkd-dhcp6.c
 +++ b/src/network/networkd-dhcp6.c
 @@ -3,9 +3,9 @@
@@ -227,11 +191,9 @@ index aa077d6219..4f6ce22059 100644
  
  #include "sd-dhcp6-client.h"
  
-diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
-index 8219d95b0d..c92230453b 100644
 --- a/src/network/networkd-link.c
 +++ b/src/network/networkd-link.c
-@@ -1,8 +1,8 @@
+@@ -1,9 +1,10 @@
  /* SPDX-License-Identifier: LGPL-2.1-or-later */
  
 +#include <netinet/if_ether.h>
@@ -239,10 +201,10 @@ index 8219d95b0d..c92230453b 100644
  #include <linux/if.h>
 -#include <linux/if_arp.h>
  #include <linux/if_link.h>
++#include <linux/netdevice.h>
+ #include <sys/socket.h>
  #include <unistd.h>
  
-diff --git a/src/network/networkd-network.c b/src/network/networkd-network.c
-index e5ffd35b6f..871ebb32c6 100644
 --- a/src/network/networkd-network.c
 +++ b/src/network/networkd-network.c
 @@ -1,5 +1,6 @@
@@ -252,24 +214,6 @@ index e5ffd35b6f..871ebb32c6 100644
  #include <net/if.h>
  #include <netinet/in.h>
  #include <linux/netdevice.h>
-diff --git a/src/network/networkd-route.c b/src/network/networkd-route.c
-index a74541a6c9..a10549b336 100644
---- a/src/network/networkd-route.c
-+++ b/src/network/networkd-route.c
-@@ -1,7 +1,10 @@
- /* SPDX-License-Identifier: LGPL-2.1-or-later */
- 
- #include <linux/icmpv6.h>
--#include <linux/ipv6_route.h>
-+/* linux/ipv6_route.h conflicts with netinet/in.h so define manually */
-+#ifndef IP6_RT_PRIO_USER
-+#define IP6_RT_PRIO_USER       1024
-+#endif
- 
- #include "alloc-util.h"
- #include "netlink-util.h"
-diff --git a/src/network/test-network-tables.c b/src/network/test-network-tables.c
-index ce34449554..0b5dc01182 100644
 --- a/src/network/test-network-tables.c
 +++ b/src/network/test-network-tables.c
 @@ -1,5 +1,6 @@
@@ -279,8 +223,6 @@ index ce34449554..0b5dc01182 100644
  #include "bond.h"
  #include "dhcp6-internal.h"
  #include "dhcp6-protocol.h"
-diff --git a/src/shared/ethtool-util.c b/src/shared/ethtool-util.c
-index 654d36a83a..f4ed42d543 100644
 --- a/src/shared/ethtool-util.c
 +++ b/src/shared/ethtool-util.c
 @@ -1,5 +1,6 @@
@@ -290,8 +232,6 @@ index 654d36a83a..f4ed42d543 100644
  #include <net/if.h>
  #include <sys/ioctl.h>
  #include <linux/ethtool.h>
-diff --git a/src/shared/ethtool-util.h b/src/shared/ethtool-util.h
-index 11e2906681..a171df0737 100644
 --- a/src/shared/ethtool-util.h
 +++ b/src/shared/ethtool-util.h
 @@ -3,6 +3,7 @@
@@ -302,8 +242,6 @@ index 11e2906681..a171df0737 100644
  #include <linux/ethtool.h>
  
  #include "conf-parser.h"
-diff --git a/src/udev/net/link-config.c b/src/udev/net/link-config.c
-index 31e5d0cd67..f25f821364 100644
 --- a/src/udev/net/link-config.c
 +++ b/src/udev/net/link-config.c
 @@ -1,5 +1,6 @@
@@ -313,8 +251,6 @@ index 31e5d0cd67..f25f821364 100644
  #include <linux/netdevice.h>
  #include <netinet/ether.h>
  #include <unistd.h>
-diff --git a/src/udev/udev-builtin-net_setup_link.c b/src/udev/udev-builtin-net_setup_link.c
-index 87e1fb133e..13876029d0 100644
 --- a/src/udev/udev-builtin-net_setup_link.c
 +++ b/src/udev/udev-builtin-net_setup_link.c
 @@ -1,5 +1,6 @@
@@ -324,3 +260,76 @@ index 87e1fb133e..13876029d0 100644
  #include "alloc-util.h"
  #include "device-util.h"
  #include "errno-util.h"
+--- a/src/network/networkd-bridge-vlan.c
++++ b/src/network/networkd-bridge-vlan.c
+@@ -4,6 +4,7 @@
+ ***/
+ 
+ #include <netinet/in.h>
++#include <netinet/if_ether.h>
+ #include <linux/if_bridge.h>
+ #include <stdbool.h>
+ 
+--- a/src/basic/linux/in6.h
++++ b/src/basic/linux/in6.h
+@@ -1,10 +1,10 @@
+ /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
+ /*
+- *	Types and definitions for AF_INET6 
+- *	Linux INET6 implementation 
++ *	Types and definitions for AF_INET6
++ *	Linux INET6 implementation
+  *
+  *	Authors:
+- *	Pedro Roque		<roque@di.fc.ul.pt>	
++ *	Pedro Roque		<roque@di.fc.ul.pt>
+  *
+  *	Sources:
+  *	IPv6 Program Interfaces for BSD Systems
+@@ -19,8 +19,8 @@
+  *      2 of the License, or (at your option) any later version.
+  */
+ 
+-#ifndef _UAPI_LINUX_IN6_H
+-#define _UAPI_LINUX_IN6_H
++#ifndef _LINUX_IN6_H
++#define _LINUX_IN6_H
+ 
+ #include <linux/types.h>
+ #include <linux/libc-compat.h>
+@@ -97,7 +97,7 @@ struct in6_flowlabel_req {
+ 
+ 
+ /*
+- *	Bitmask constant declarations to help applications select out the 
++ *	Bitmask constant declarations to help applications select out the
+  *	flow label and priority fields.
+  *
+  *	Note that this are in host byte order while the flowinfo field of
+@@ -298,4 +298,4 @@ struct in6_flowlabel_req {
+  * ...
+  * MRT6_MAX
+  */
+-#endif /* _UAPI_LINUX_IN6_H */
++#endif /* _LINUX_IN6_H */
+--- a/src/network/networkd-route.c
++++ b/src/network/networkd-route.c
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: LGPL-2.1-or-later */
+ 
++#include <netinet/in.h>
+ #include <linux/icmpv6.h>
+ #include <linux/ipv6_route.h>
+ #include <linux/nexthop.h>
+--- a/src/network/networkd-setlink.c
++++ b/src/network/networkd-setlink.c
+@@ -1,8 +1,8 @@
+ /* SPDX-License-Identifier: LGPL-2.1-or-later */
+ 
+ #include <netinet/in.h>
++#include <net/if_arp.h>
+ #include <linux/if.h>
+-#include <linux/if_arp.h>
+ 
+ #include "missing_network.h"
+ #include "netlink-util.h"

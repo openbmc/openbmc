@@ -28,5 +28,5 @@ do_install() {
 
 PACKAGES =+ "${PN}-configs"
 
-FILES_${PN}-configs = "${docdir}"
-FILES_${PN}-doc = "${mandir}"
+FILES:${PN}-configs = "${docdir}"
+FILES:${PN}-doc = "${mandir}"

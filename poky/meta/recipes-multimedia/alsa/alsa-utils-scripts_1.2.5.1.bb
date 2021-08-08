@@ -3,12 +3,12 @@ require alsa-utils.inc
 SUMMARY = "Shell scripts that show help info and create ALSA configuration files"
 PROVIDES = "alsa-utils-alsaconf"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/alsa-utils:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/alsa-utils:"
 
 PACKAGES = "${PN}"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
-FILES_${PN} = "${sbindir}/alsaconf \
+FILES:${PN} = "${sbindir}/alsaconf \
                ${sbindir}/alsa-info.sh \
                ${sbindir}/alsabat-test.sh \
               "

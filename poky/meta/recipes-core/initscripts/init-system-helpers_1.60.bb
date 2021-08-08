@@ -32,10 +32,10 @@ do_install() {
 
 PACKAGES += "${PN}-invoke-rc.d ${PN}-service"
 
-FILES_${PN} = ""
-FILES_${PN}-invoke-rc.d = "${sbindir}/invoke-rc.d"
-FILES_${PN}-service = "${sbindir}/service"
+FILES:${PN} = ""
+FILES:${PN}-invoke-rc.d = "${sbindir}/invoke-rc.d"
+FILES:${PN}-service = "${sbindir}/service"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RRECOMMENDS_${PN} += "${PN}-invoke-rc.d ${PN}-service"
+RRECOMMENDS:${PN} += "${PN}-invoke-rc.d ${PN}-service"

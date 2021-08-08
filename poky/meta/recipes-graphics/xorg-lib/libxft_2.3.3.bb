@@ -27,7 +27,7 @@ XORG_PN = "libXft"
 
 BBCLASSEXTEND = "native nativesdk"
 
-python () {
-        if d.getVar('DEBIAN_NAMES'):
-            d.setVar('PKG_${PN}', '${MLPREFIX}libxft2')
+python populate_packages:prepend () {
+    if d.getVar('DEBIAN_NAMES'):
+        d.setVar('PKG:${PN}', '${MLPREFIX}libxft2')
 }

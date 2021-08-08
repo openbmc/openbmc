@@ -27,7 +27,7 @@ SRC_URI = "${BASE_SRC_URI} \
 "
 SRC_URI[sha256sum] = "cfb49aab82bd179651e23eeeb69606f51b0ddc575ca55c3d35e2457469024cfa"
 
-SRC_URI_class-native = "${BASE_SRC_URI}"
+SRC_URI:class-native = "${BASE_SRC_URI}"
 
 UPSTREAM_CHECK_REGEX = "tcl(?P<pver>\d+(\.\d+)+)-src"
 
@@ -59,13 +59,13 @@ do_install() {
 SYSROOT_DIRS += "${bindir_crossscripts}"
 
 PACKAGES =+ "tcl-lib"
-FILES_tcl-lib = "${libdir}/libtcl8.6.so.*"
-FILES_${PN} += "${libdir}/tcl${VER} ${libdir}/tcl8.6 ${libdir}/tcl8"
-FILES_${PN}-dev += "${libdir}/tclConfig.sh ${libdir}/tclooConfig.sh"
+FILES:tcl-lib = "${libdir}/libtcl8.6.so.*"
+FILES:${PN} += "${libdir}/tcl${VER} ${libdir}/tcl8.6 ${libdir}/tcl8"
+FILES:${PN}-dev += "${libdir}/tclConfig.sh ${libdir}/tclooConfig.sh"
 
 # isn't getting picked up by shlibs code
-RDEPENDS_${PN} += "tcl-lib"
-RDEPENDS_${PN}-ptest += "libgcc"
+RDEPENDS:${PN} += "tcl-lib"
+RDEPENDS:${PN}-ptest += "libgcc"
 
 BBCLASSEXTEND = "native nativesdk"
 

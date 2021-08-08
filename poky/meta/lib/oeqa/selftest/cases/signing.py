@@ -145,7 +145,7 @@ class Signing(OESelftestTestCase):
         feature += 'GPG_PATH = "%s"\n' % self.gpg_dir
         feature += 'SSTATE_DIR = "%s"\n' % sstatedir
         # Any mirror might have partial sstate without .sig files, triggering failures
-        feature += 'SSTATE_MIRRORS_forcevariable = ""\n'
+        feature += 'SSTATE_MIRRORS:forcevariable = ""\n'
 
         self.write_config(feature)
 
@@ -206,7 +206,7 @@ class LockedSignatures(OESelftestTestCase):
         # Use uuid so hash equivalance server isn't triggered
         recipe_append_file = test_recipe + '_' + get_bb_var('PV', test_recipe) + '.bbappend'
         recipe_append_path = os.path.join(templayerdir, 'recipes-test', test_recipe, recipe_append_file)
-        feature = 'SUMMARY_${PN} = "test locked signature%s"\n' % uuid.uuid4()
+        feature = 'SUMMARY:${PN} = "test locked signature%s"\n' % uuid.uuid4()
 
         os.mkdir(os.path.join(templayerdir, 'recipes-test'))
         os.mkdir(os.path.join(templayerdir, 'recipes-test', test_recipe))

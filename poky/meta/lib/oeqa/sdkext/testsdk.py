@@ -70,7 +70,7 @@ class TestSDKExt(TestSDKBase):
                 f.write('SSTATE_MIRRORS += " \\n file://.* file://%s/PATH"\n' % test_data.get('SSTATE_DIR'))
                 f.write('SOURCE_MIRROR_URL = "file://%s"\n' % test_data.get('DL_DIR'))
                 f.write('INHERIT += "own-mirrors"\n')
-                f.write('PREMIRRORS_prepend = " git://git.yoctoproject.org/.* git://%s/git2/git.yoctoproject.org.BASENAME \\n "\n' % test_data.get('DL_DIR'))
+                f.write('PREMIRRORS:prepend = " git://git.yoctoproject.org/.* git://%s/git2/git.yoctoproject.org.BASENAME \\n "\n' % test_data.get('DL_DIR'))
 
             # We need to do this in case we have a minimal SDK
             subprocess.check_output(". %s > /dev/null; devtool sdk-install meta-extsdk-toolchain" % \

@@ -19,8 +19,8 @@
 
 inherit python3native
 
-DEPENDS_prepend = "nodejs-native "
-RDEPENDS_${PN}_append_class-target = " nodejs"
+DEPENDS:prepend = "nodejs-native "
+RDEPENDS:${PN}:append:class-target = " nodejs"
 
 NPM_INSTALL_DEV ?= "0"
 
@@ -312,7 +312,7 @@ npm_do_install() {
     ln -fs node_modules ${D}/${nonarch_libdir}/node
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${bindir} \
     ${nonarch_libdir} \
 "

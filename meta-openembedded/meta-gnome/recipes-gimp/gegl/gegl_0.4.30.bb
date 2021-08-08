@@ -28,7 +28,7 @@ SRC_URI = " \
 SRC_URI[sha256sum] = "c112782cf4096969e23217ccdfabe42284e35d5435ff0c43d40e4c70faeca8dd"
 
 PACKAGECONFIG ??= "gexiv2 jpeg libpng libraw librsvg pango poppler sdl2"
-PACKAGECONFIG_class-native = "libpng librsvg"
+PACKAGECONFIG:class-native = "libpng librsvg"
 
 PACKAGECONFIG[jasper] = "-Djasper=enabled,-Djasper=disabled,jasper"
 PACKAGECONFIG[gexiv2] = "-Dgexiv2=enabled,-Dgexiv2=disabled,gexiv2"
@@ -47,7 +47,7 @@ PACKAGECONFIG[tiff] = "-Dlibtiff=enabled,-Dlibtiff=disabled,tiff"
 PACKAGECONFIG[webp] = "-Dwebp=enabled,-Dwebp=disabled,webp"
 
 # There are a couple of non-symlink .so files installed into libdir, which need to go into main package
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/*.so \
     ${libdir}/gegl-${SHPV}/*.json \
     ${libdir}/gegl-${SHPV}/*.so \

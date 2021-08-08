@@ -6,22 +6,22 @@ DEPENDS += "qemu-native bison-native boost libpcre2 curl openssl ncurses zlib li
 
 PROVIDES += "mysql5 libmysqlclient"
 
-RPROVIDES_${PN} += "mysql5"
-RREPLACES_${PN} += "mysql5"
-RCONFLICTS_${PN} += "mysql5"
+RPROVIDES:${PN} += "mysql5"
+RREPLACES:${PN} += "mysql5"
+RCONFLICTS:${PN} += "mysql5"
 
-RPROVIDES_${PN}-dbg += "mysql5-dbg"
-RREPLACES_${PN}-dbg += "mysql5-dbg"
-RCONFLICTS_${PN}-dbg += "mysql5-dbg"
+RPROVIDES:${PN}-dbg += "mysql5-dbg"
+RREPLACES:${PN}-dbg += "mysql5-dbg"
+RCONFLICTS:${PN}-dbg += "mysql5-dbg"
 
-RPROVIDES_${PN}-leftovers += "mysql5-leftovers"
-RREPLACES_${PN}-leftovers += "mysql5-leftovers"
-RCONFLICTS_${PN}-leftovers += "mysql5-leftovers"
+RPROVIDES:${PN}-leftovers += "mysql5-leftovers"
+RREPLACES:${PN}-leftovers += "mysql5-leftovers"
+RCONFLICTS:${PN}-leftovers += "mysql5-leftovers"
 
-RPROVIDES_${PN}-client += "mysql5-client"
-RREPLACES_${PN}-client += "mysql5-client"
-RCONFLICTS_${PN}-client += "mysql5-client"
+RPROVIDES:${PN}-client += "mysql5-client"
+RREPLACES:${PN}-client += "mysql5-client"
+RCONFLICTS:${PN}-client += "mysql5-client"
 
-RPROVIDES_${PN}-server += "mysql5-server"
-RREPLACES_${PN}-server += "mysql5-server"
-RCONFLICTS_${PN}-server += "mysql5-server"
+RPROVIDES:${PN}-server += "mysql5-server"
+RREPLACES:${PN}-server += "mysql5-server"
+RCONFLICTS:${PN}-server += "mysql5-server"

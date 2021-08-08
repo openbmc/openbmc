@@ -5,7 +5,7 @@ inherit packagegroup features_check
 # rdepends on font recipes with this restriction
 REQUIRED_DISTRO_FEATURES = "x11"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     font-adobe-100dpi \
     font-adobe-utopia-100dpi \
     font-bh-100dpi \

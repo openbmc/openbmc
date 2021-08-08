@@ -16,9 +16,9 @@ do_install() {
 
 PACKAGES = "libklibc libklibc-staticdev libklibc-dev"
 
-FILES_libklibc = "${libdir}/klibc-*.so"
-FILES_libklibc-staticdev = "${libdir}/klibc/lib/libc.a"
-FILES_libklibc-dev = "${libdir}/klibc.so \
+FILES:libklibc = "${libdir}/klibc-*.so"
+FILES:libklibc-staticdev = "${libdir}/klibc/lib/libc.a"
+FILES:libklibc-dev = "${libdir}/klibc.so \
                       ${libdir}/klibc/lib/* \
                       ${libdir}/klibc/include/* \
                       "

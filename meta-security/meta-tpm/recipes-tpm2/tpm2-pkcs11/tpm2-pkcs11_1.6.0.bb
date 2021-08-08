@@ -18,16 +18,16 @@ S = "${WORKDIR}/git"
 
 inherit autotools-brokensep pkgconfig python3native
 
-do_configure_prepend () {
+do_configure:prepend () {
     ${S}/bootstrap
 }
 
-do_compile_append() {
+do_compile:append() {
     cd ${S}/tools
     python3 setup.py build
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${libdir}/pkcs11
     install -d ${D}${datadir}/p11-kit
     rm -f ${D}${libdir}/pkcs11/libtpm2_pkcs11.so
@@ -41,15 +41,15 @@ do_install_append() {
 
 PACKAGES =+ "${PN}-tools"
 
-FILES_${PN}-tools = "\
+FILES:${PN}-tools = "\
     ${bindir}/tpm2_ptool \
     ${libdir}/${PYTHON_DIR}/* \
     "
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${libdir}/pkcs11/* \
     ${datadir}/p11-kit/* \
     "
 
 RDEPNDS_${PN} = "tpm2-tools"
-RDEPENDS_${PN}-tools += "${PYTHON_PN}-setuptools ${PYTHON_PN}-pyyaml ${PYTHON_PN}-cryptography ${PYTHON_PN}-pyasn1-modules"
+RDEPENDS:${PN}-tools += "${PYTHON_PN}-setuptools ${PYTHON_PN}-pyyaml ${PYTHON_PN}-cryptography ${PYTHON_PN}-pyasn1-modules"

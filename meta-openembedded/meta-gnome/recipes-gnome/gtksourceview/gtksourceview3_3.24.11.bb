@@ -18,4 +18,4 @@ SRC_URI = "http://ftp.gnome.org/pub/gnome/sources/gtksourceview/3.24/${PNAME}-${
 SRC_URI[md5sum] = "b748da426a7d64e1304f0c532b0f2a67"
 SRC_URI[sha256sum] = "691b074a37b2a307f7f48edc5b8c7afa7301709be56378ccf9cc9735909077fd"
 
-FILES_${PN} += " ${datadir}/gtksourceview-3.0"
+FILES:${PN} += " ${datadir}/gtksourceview-3.0"

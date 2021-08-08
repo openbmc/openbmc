@@ -12,7 +12,7 @@ inherit pypi setuptools3
 PACKAGECONFIG ?= "yaml"
 PACKAGECONFIG[yaml] = ",,,${PYTHON_PN}-pyyaml"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-core \
     ${PYTHON_PN}-shell \
     ${PYTHON_PN}-json \

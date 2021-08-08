@@ -16,10 +16,10 @@ SRC_URI = "http://dist.schmorp.de/rxvt-unicode/Attic/rxvt-unicode-${PV}.tar.bz2 
 inherit autotools pkgconfig update-alternatives
 
 PROVIDES = "virtual/x-terminal-emulator"
-ALTERNATIVE_${PN} = "x-terminal-emulator"
+ALTERNATIVE:${PN} = "x-terminal-emulator"
 ALTERNATIVE_TARGET[x-terminal-emulator] = "${bindir}/rxvt"
 
-CFLAGS_append = " -fpermissive"
+CFLAGS:append = " -fpermissive"
 
 EXTRA_OECONF = "--enable-xim \
 		--enable-utmp --enable-wtmp --enable-lastlog \
@@ -31,25 +31,25 @@ EXTRA_OECONF = "--enable-xim \
 		--enable-combining --disable-perl \
 		--with-x=${STAGING_DIR_HOST}${prefix}"
 
-EXTRA_OECONF_append_libc-musl = " --disable-wtmp --disable-lastlog"
+EXTRA_OECONF:append:libc-musl = " --disable-wtmp --disable-lastlog"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[startup] = "--enable-startup-notification,--disable-startup-notification,startup-notification,"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	if [ ! -e ${S}/acinclude.m4 ]; then
 		cp ${S}/aclocal.m4 ${S}/acinclude.m4
 	fi
 }
 
-do_compile_prepend () {
+do_compile:prepend () {
 	echo '#define UTMP_FILE "${localstatedir}/run/utmp"' >> config.h
 	echo '#define WTMP_FILE "${localstatedir}/log/wtmp"' >> config.h
 	echo '#define LASTLOG_FILE "${localstatedir}/log/lastlog"' >> config.h
 	echo '#define HAVE_XLOCALE 1' >> config.h
 }
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}/${datadir}
 	install -d ${D}/${datadir}/applications
 	install -d ${D}/${datadir}/pixmaps/
@@ -58,4 +58,4 @@ do_install_append () {
 	install -m 0644 ${WORKDIR}/rxvt.desktop ${D}/${datadir}/applications
 }
 
-FILES_${PN} += "${datadir}/applications/rxvt.desktop ${datadir}/pixmaps/rxvt.png"
+FILES:${PN} += "${datadir}/applications/rxvt.desktop ${datadir}/pixmaps/rxvt.png"

@@ -17,11 +17,11 @@ EXTRA_OECONF = "--without-libgnutls-prefix --without-libssl-prefix \
 EXTRA_OEMAKE += 'TOOLCHAIN_OPTIONS="${TOOLCHAIN_OPTIONS}" \
                  DEBUG_PREFIX_MAP="${DEBUG_PREFIX_MAP}"'
 
-ALTERNATIVE_${PN} = "wget"
-ALTERNATIVE_${PN}_class-nativesdk = ""
+ALTERNATIVE:${PN} = "wget"
+ALTERNATIVE:${PN}:class-nativesdk = ""
 ALTERNATIVE_PRIORITY = "100"
 
-RRECOMMENDS_${PN} += "ca-certificates"
+RRECOMMENDS:${PN} += "ca-certificates"
 
 BBCLASSEXTEND = "nativesdk"
 

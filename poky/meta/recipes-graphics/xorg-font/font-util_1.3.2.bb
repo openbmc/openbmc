@@ -10,13 +10,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5df208ec65eb84ce5bb8d82d8f3b9675 \
                     file://map-ISO8859-1;beginline=9;endline=23;md5=1cecb984063248f29ffe5c46f5c04f34"
 
 DEPENDS = "encodings util-macros"
-DEPENDS_class-native = "util-macros-native"
-RDEPENDS_${PN} = "mkfontdir mkfontscale encodings"
-RDEPENDS_${PN}_class-native = ""
+DEPENDS:class-native = "util-macros-native"
+RDEPENDS:${PN} = "mkfontdir mkfontscale encodings"
+RDEPENDS:${PN}:class-native = ""
 
 BBCLASSEXTEND = "native"
 
 SRC_URI[md5sum] = "3d6adb76fdd072db8c8fae41b40855e8"
 SRC_URI[sha256sum] = "3ad880444123ac06a7238546fa38a2a6ad7f7e0cc3614de7e103863616522282"
 
-SYSROOT_DIRS_BLACKLIST_remove = "${datadir}/fonts"
+SYSROOT_DIRS_BLACKLIST:remove = "${datadir}/fonts"

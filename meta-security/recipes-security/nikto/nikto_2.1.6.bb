@@ -111,7 +111,7 @@ do_install() {
     install -m 0644 docs/nikto_manual.html    ${D}${datadir}/doc/nikto
 }
 
-RDEPENDS_${PN} = "perl libnet-ssleay-perl libwhisker2-perl \
+RDEPENDS:${PN} = "perl libnet-ssleay-perl libwhisker2-perl \
     perl-module-getopt-long perl-module-time-local \
     perl-module-io-socket perl-module-overloading \
     perl-module-base perl-module-b perl-module-bytes"

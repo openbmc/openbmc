@@ -23,11 +23,11 @@ S = "${WORKDIR}/${BPN}_${PV}/src/current"
 # explicitly listed below. Another, the iozone3 Makefile
 # needs to be told about the cross-compiler explicitly here.
 #
-EXTRA_OEMAKE_powerpc = "linux-powerpc CC='${CC}' GCC='${CC}'"
-EXTRA_OEMAKE_powerpc64 = "linux-powerpc64 CC='${CC}' GCC='${CC}'"
-EXTRA_OEMAKE_powerpc64le = "linux-powerpc64 CC='${CC}' GCC='${CC}'"
-EXTRA_OEMAKE_x86-64 = "linux-AMD64 CC='${CC}' GCC='${CC}'"
-EXTRA_OEMAKE_arm = "linux-arm CC='${CC}' GCC='${CC}'"
+EXTRA_OEMAKE:powerpc = "linux-powerpc CC='${CC}' GCC='${CC}'"
+EXTRA_OEMAKE:powerpc64 = "linux-powerpc64 CC='${CC}' GCC='${CC}'"
+EXTRA_OEMAKE:powerpc64le = "linux-powerpc64 CC='${CC}' GCC='${CC}'"
+EXTRA_OEMAKE:x86-64 = "linux-AMD64 CC='${CC}' GCC='${CC}'"
+EXTRA_OEMAKE:arm = "linux-arm CC='${CC}' GCC='${CC}'"
 EXTRA_OEMAKE = "linux CC='${CC}' GCC='${CC}'"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
@@ -55,7 +55,7 @@ do_install() {
     install -m 0644 ${WORKDIR}/${BPN}_${PV}/docs/Run_rules.doc ${D}${datadir}/doc/${BPN}/
 }
 
-FILES_${PN} += "${datadir}/doc/${PN}/copyright.txt"
+FILES:${PN} += "${datadir}/doc/${PN}/copyright.txt"
 
 # LICENSE:
 #

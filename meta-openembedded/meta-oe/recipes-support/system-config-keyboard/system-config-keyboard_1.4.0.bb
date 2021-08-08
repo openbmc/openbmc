@@ -17,11 +17,11 @@ do_install() {
     oe_runmake 'DESTDIR=${D}' install
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
     rm -rf ${D}/usr
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
    ${libdir}/python${PYTHON_BASEVERSION}/* \
    ${datadir}/* \
 "

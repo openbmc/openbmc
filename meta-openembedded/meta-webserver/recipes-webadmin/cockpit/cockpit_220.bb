@@ -17,9 +17,9 @@ inherit gettext pkgconfig autotools systemd features_check
 
 DEPENDS += "glib-2.0-native intltool-native gnutls virtual/gettext json-glib krb5 libpam systemd"
 
-COMPATIBLE_HOST_libc-musl = "null"
+COMPATIBLE_HOST:libc-musl = "null"
 
-RDEPENDS_${PN} += "glib-networking"
+RDEPENDS:${PN} += "glib-networking"
 
 REQUIRED_DISTRO_FEATURES = "systemd pam"
 
@@ -67,59 +67,59 @@ PACKAGES =+ " \
 "
 SYSTEMD_PACKAGES = "${PN}-ws"
 
-FILES_${PN}-pcp = " \
+FILES:${PN}-pcp = " \
     ${libexecdir}/cockpit-pcp \
     ${datadir}/cockpit/pcp \
     ${localstatedir}/lib/pcp/config/pmlogconf/tools/cockpit \
 "
-FILES_${PN}-realmd = "${datadir}/cockpit/realmd"
-FILES_${PN}-tuned = "${datadir}/cockpit/tuned"
-FILES_${PN}-shell = "${datadir}/cockpit/shell"
-FILES_${PN}-systemd = "${datadir}/cockpit/systemd"
-FILES_${PN}-users = "${datadir}/cockpit/users"
-FILES_${PN}-kdump = " \
+FILES:${PN}-realmd = "${datadir}/cockpit/realmd"
+FILES:${PN}-tuned = "${datadir}/cockpit/tuned"
+FILES:${PN}-shell = "${datadir}/cockpit/shell"
+FILES:${PN}-systemd = "${datadir}/cockpit/systemd"
+FILES:${PN}-users = "${datadir}/cockpit/users"
+FILES:${PN}-kdump = " \
     ${datadir}/cockpit/kdump \
     ${datadir}/metainfo/org.cockpit-project.cockpit-kdump.metainfo.xml \
 "
-FILES_${PN}-sosreport = " \
+FILES:${PN}-sosreport = " \
     ${datadir}/cockpit/sosreport \
     ${datadir}/metainfo/org.cockpit-project.cockpit-sosreport.metainfo.xml \
     ${datadir}/pixmaps/cockpit-sosreport.png \
 "
-FILES_${PN}-storaged = " \
+FILES:${PN}-storaged = " \
     ${datadir}/cockpit/storaged \
     ${datadir}/metainfo/org.cockpit-project.cockpit-storaged.metainfo.xml \
 "
 
-FILES_${PN}-networkmanager = "${datadir}/cockpit/networkmanager"
-RDEPENDS_${PN}-networkmanager = "networkmanager"
+FILES:${PN}-networkmanager = "${datadir}/cockpit/networkmanager"
+RDEPENDS:${PN}-networkmanager = "networkmanager"
 
-FILES_${PN}-machines = " \
+FILES:${PN}-machines = " \
     ${datadir}/cockpit/machines \
     ${datadir}/metainfo/org.cockpit-project.cockpit-machines.metainfo.xml \
 "
-FILES_${PN}-selinux = " \
+FILES:${PN}-selinux = " \
     ${datadir}/cockpit/selinux \
     ${datadir}/metainfo/org.cockpit-project.cockpit-selinux.metainfo.xml \
 "
-FILES_${PN}-playground = "${datadir}/cockpit/playground"
-FILES_${PN}-docker = " \
+FILES:${PN}-playground = "${datadir}/cockpit/playground"
+FILES:${PN}-docker = " \
     ${datadir}/cockpit/docker \
     ${datadir}/metainfo/org.cockpit-project.cockpit-docker.metainfo.xml \
 "
-FILES_${PN}-dashboard = "${datadir}/cockpit/dashboard"
-ALLOW_EMPTY_${PN}-dashboard = "1"
+FILES:${PN}-dashboard = "${datadir}/cockpit/dashboard"
+ALLOW_EMPTY:${PN}-dashboard = "1"
 
-FILES_${PN}-bridge = " \
+FILES:${PN}-bridge = " \
     ${bindir}/cockpit-bridge \
     ${libexec}/cockpit-askpass \
 "
-RDEPENDS_${PN}-bridge = ""
+RDEPENDS:${PN}-bridge = ""
 
-FILES_${PN}-desktop = "${libexecdir}/cockpit-desktop"
-RDEPENDS_${PN}-desktop += "bash"
+FILES:${PN}-desktop = "${libexecdir}/cockpit-desktop"
+RDEPENDS:${PN}-desktop += "bash"
 
-FILES_${PN}-ws = " \
+FILES:${PN}-ws = " \
     ${sysconfdir}/cockpit/ws-certs.d \
     ${sysconfdir}/pam.d/cockpit \
     ${sysconfdir}/issue.d/cockpit.issue \
@@ -150,14 +150,14 @@ FILES_${PN}-ws = " \
     ${datadir}/cockpit/static \
     ${datadir}/cockpit/branding \
 "
-CONFFILES_${PN}-ws += " \
+CONFFILES:${PN}-ws += " \
     ${sysconfdir}/issue.d/cockpit.issue \
     ${sysconfdir}/motd.d/cockpit \
 "
-RDEPENDS_${PN}-ws += "openssl-bin"
-SYSTEMD_SERVICE_${PN}-ws = "cockpit.socket"
+RDEPENDS:${PN}-ws += "openssl-bin"
+SYSTEMD_SERVICE:${PN}-ws = "cockpit.socket"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/cockpit/base1 \
     ${sysconfdir}/cockpit/machines.d \
     ${datadir}/polkit-1/actions/org.cockpit-project.cockpit-bridge.policy \
@@ -167,9 +167,9 @@ FILES_${PN} += " \
     ${datadir}/metainfo/cockpit.appdata.xml \
     ${datadir}/pixmaps/cockpit.png \
 "
-RDEPENDS_${PN} += "${PN}-bridge"
+RDEPENDS:${PN} += "${PN}-bridge"
 
-do_install_append() {
+do_install:append() {
     pkgdatadir=${datadir}/cockpit
 
     chmod 4750 ${D}${libexecdir}/cockpit-session
@@ -181,7 +181,7 @@ do_install_append() {
     rm -rf ${D}${libdir}/firewalld
 
     if ! ${@bb.utils.contains('PACKAGECONFIG', 'storaged', 'true', 'false', d)}; then
-        for filename in ${FILES_${PN}-storaged}
+        for filename in ${FILES:${PN}-storaged}
         do
             rm -rf ${D}$filename
         done

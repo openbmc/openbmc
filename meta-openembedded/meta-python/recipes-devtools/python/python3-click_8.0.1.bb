@@ -16,7 +16,7 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 	${PYTHON_PN}-terminal \
 	${PYTHON_PN}-unixadmin \
@@ -31,7 +31,7 @@ UPSTREAM_CHECK_REGEX = "click/(?P<pver>\d+(\.\d+)+)/"
 
 CLEANBROKEN = "1"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-io \
     ${PYTHON_PN}-threading \
     "

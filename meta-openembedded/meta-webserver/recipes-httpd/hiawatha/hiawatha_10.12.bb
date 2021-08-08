@@ -6,7 +6,7 @@ DEPENDS = "libxml2 libxslt virtual/crypt"
 
 SECTION = "net"
 
-SRC_URI = "http://hiawatha-webserver.org/files/${BP}.tar.gz \
+SRC_URI = "http://hiawatha-webserver.org/files/hiawatha-10/${BP}.tar.gz \
            file://hiawatha-init \
            file://hiawatha.service "
 
@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "61bf41146c51244769984135529fcffd0f6cb92be18dc12d460effc42f
 INITSCRIPT_NAME = "hiawatha"
 INITSCRIPT_PARAMS = "defaults 70"
 
-SYSTEMD_SERVICE_${PN} = "hiawatha.service"
+SYSTEMD_SERVICE:${PN} = "hiawatha.service"
 
 inherit cmake update-rc.d systemd
 
@@ -35,7 +35,7 @@ EXTRA_OECMAKE = " -DENABLE_IPV6=OFF \
                   -DCMAKE_INSTALL_LIBDIR=${libdir} \
                   -DCMAKE_INSTALL_FULL_LOCALSTATEDIR=${localstatedir}"
 
-do_install_append() {
+do_install:append() {
     # Copy over init script and sed in the correct sbin path
     sed -i 's,sed_sbin_path,${sbindir},' ${WORKDIR}/hiawatha-init
     mkdir -p ${D}${sysconfdir}/init.d
@@ -53,7 +53,7 @@ do_install_append() {
     rmdir --ignore-fail-on-non-empty "${D}${localstatedir}" "${D}${localstatedir}/run"
 }
 
-CONFFILES_${PN} = " \
+CONFFILES:${PN} = " \
     ${sysconfdir}/hiawatha/cgi-wrapper.conf \
     ${sysconfdir}/hiawatha/hiawatha.conf \
     ${sysconfdir}/hiawatha/index.xslt \
@@ -61,4 +61,4 @@ CONFFILES_${PN} = " \
     ${sysconfdir}/hiawatha/php-fcgi.conf \
 "
 
-FILES_${PN}-dev = "${libdir}/hiawatha/*${SOLIBSDEV}"
+FILES:${PN}-dev = "${libdir}/hiawatha/*${SOLIBSDEV}"

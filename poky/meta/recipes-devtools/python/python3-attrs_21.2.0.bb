@@ -7,11 +7,11 @@ SRC_URI[sha256sum] = "ef6aaac3ca6cd92904cdd0d83f629a15f18053ec84e6432106f7a4d04a
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN}_class-target += " \
+RDEPENDS:${PN}:class-target += " \
     ${PYTHON_PN}-crypt \
     ${PYTHON_PN}-ctypes \
 "
-RDEPENDS_${PN}_class-nativesdk += " \
+RDEPENDS:${PN}:class-nativesdk += " \
     ${PYTHON_PN}-crypt \
     ${PYTHON_PN}-ctypes \
 "

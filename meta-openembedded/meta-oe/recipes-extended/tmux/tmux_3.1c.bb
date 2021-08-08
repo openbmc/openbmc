@@ -18,7 +18,7 @@ inherit autotools pkgconfig
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[utempter] = "ac_cv_header_utempter_h=yes,ac_cv_header_utempter_h=no,libutempter,"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # The 'compat' directory is needed for output during the build but it's
     # not automatically created when building outside the source directory.
     mkdir -p ${B}/compat

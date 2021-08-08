@@ -37,10 +37,10 @@ CFLAGS += " -D_GNU_SOURCE -Wno-deprecated-declarations"
 LDFLAGS += " -L${STAGING_LIBDIR} -lutil -lcrypt"
 
 PACKAGECONFIG ??= ""
-PACKAGECONFIG_append = " ${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
+PACKAGECONFIG:append = " ${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG[pam] = " , --without-pam, libpam, libpam"
 
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'
 
 do_configure () {
     ./configure --prefix=${prefix} --exec-prefix=${exec_prefix}
@@ -82,15 +82,15 @@ do_install () {
 
 PACKAGES = "${PN}-client ${PN}-server ${PN}-doc ${BPN}-dbg"
 
-FILES_${PN}-client = "${bindir}/*"
-FILES_${PN}-server = "${sbindir}/* ${sysconfdir}"
-FILES_${PN}-doc = "${mandir}"
-FILES_${PN}-dbg = "${prefix}/src/debug \
+FILES:${PN}-client = "${bindir}/*"
+FILES:${PN}-server = "${sbindir}/* ${sysconfdir}"
+FILES:${PN}-doc = "${mandir}"
+FILES:${PN}-dbg = "${prefix}/src/debug \
                    ${sbindir}/.debug ${bindir}/.debug"
 
 ALTERNATIVE_PRIORITY = "80"
-ALTERNATIVE_${PN}-client = "rcp rexec rlogin rsh"
-ALTERNATIVE_${PN}-server = "rshd rexecd rlogind"
+ALTERNATIVE:${PN}-client = "rcp rexec rlogin rsh"
+ALTERNATIVE:${PN}-server = "rshd rexecd rlogind"
 ALTERNATIVE_LINK_NAME[server] = "${bindir}/rshd"
 ALTERNATIVE_TARGET[rshd] = "${sbindir}/in.rshd"
 ALTERNATIVE_LINK_NAME[rexecd] = "${bindir}/rexecd"
@@ -98,8 +98,8 @@ ALTERNATIVE_TARGET[rexecd] = "${sbindir}/in.rexecd"
 ALTERNATIVE_LINK_NAME[rlogind] = "${bindir}/rlogind"
 ALTERNATIVE_TARGET[rlogind] = "${sbindir}/in.rlogind"
 
-RCONFLICTS_${PN}-server += "inetutils-rshd"
-RPROVIDES_${PN}-server = "rshd"
+RCONFLICTS:${PN}-server += "inetutils-rshd"
+RPROVIDES:${PN}-server = "rshd"
 
-RDEPENDS_${PN}-server = "xinetd"
-RDEPENDS_${PN}-server += "tcp-wrappers"
+RDEPENDS:${PN}-server = "xinetd"
+RDEPENDS:${PN}-server += "tcp-wrappers"

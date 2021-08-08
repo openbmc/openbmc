@@ -23,7 +23,7 @@ S = "${WORKDIR}/git"
 # force native X11 ui as we don't have gtk+ in DEPENDS
 EXTRA_OECONF += "--with-gui=x11"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${bindir}
     install -m 0755 ${S}/scripts/xinput_calibrator_pointercal.sh ${D}${bindir}/xinput_calibrator_once.sh
 
@@ -34,6 +34,6 @@ do_install_append() {
     sed -e 's,^Exec=.*,Exec=${bindir}/xinput_calibrator_once.sh,' ${S}/scripts/xinput_calibrator.desktop > ${D}${sysconfdir}/xdg/autostart/xinput_calibrator.desktop
 }
 
-FILES_${PN} += "${sysconfdir}/xdg/autostart"
-RDEPENDS_${PN} = "xinput formfactor"
-RRECOMMENDS_${PN} = "pointercal-xinput"
+FILES:${PN} += "${sysconfdir}/xdg/autostart"
+RDEPENDS:${PN} = "xinput formfactor"
+RRECOMMENDS:${PN} = "pointercal-xinput"

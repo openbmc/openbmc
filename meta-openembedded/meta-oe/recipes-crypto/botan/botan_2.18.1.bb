@@ -12,9 +12,9 @@ S = "${WORKDIR}/Botan-${PV}"
 inherit python3native siteinfo lib_package
 
 CPU ?= "${TARGET_ARCH}"
-CPU_x86 = "x86_32"
-CPU_armv7a = "armv7"
-CPU_armv7ve = "armv7"
+CPU:x86 = "x86_32"
+CPU:armv7a = "armv7"
+CPU:armv7ve = "armv7"
 
 do_configure() {
 	python3 ${S}/configure.py \
@@ -45,8 +45,8 @@ do_install() {
 
 PACKAGES += "${PN}-python3"
 
-FILES_${PN}-python3 = "${libdir}/python3"
+FILES:${PN}-python3 = "${libdir}/python3"
 
-RDEPENDS_${PN}-python3 += "python3"
+RDEPENDS:${PN}-python3 += "python3"
 
-COMPATIBLE_HOST_riscv32 = "null"
+COMPATIBLE_HOST:riscv32 = "null"

@@ -20,7 +20,7 @@ S = "${WORKDIR}/${BPN}"
 
 PR = "r1"
 
-do_compile_prepend() {
+do_compile:prepend() {
     # PO subdir must be in build directory
     if [ ! ${S} = ${B} ]; then
         mkdir -p ${B}/po
@@ -28,11 +28,11 @@ do_compile_prepend() {
     fi
 }
 
-ALTERNATIVE_${PN} = "volname eject"
+ALTERNATIVE:${PN} = "volname eject"
 ALTERNATIVE_LINK_NAME[volname] = "${bindir}/volname"
 ALTERNATIVE_LINK_NAME[eject] = "${bindir}/eject"
 ALTERNATIVE_PRIORITY[volname] = "100"
 ALTERNATIVE_PRIORITY[eject] = "100"
 
-ALTERNATIVE_${PN}-doc = "eject.1"
+ALTERNATIVE:${PN}-doc = "eject.1"
 ALTERNATIVE_LINK_NAME[eject.1] = "${mandir}/man1/eject.1"

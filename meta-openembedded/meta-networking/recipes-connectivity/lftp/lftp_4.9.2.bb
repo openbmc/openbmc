@@ -23,9 +23,9 @@ PACKAGECONFIG[gnutls] = "--with-gnutls, --without-gnutls, gnutls"
 PACKAGECONFIG[readline] = "--with-readline=${STAGING_INCDIR}/.. --with-readline-inc=${STAGING_INCDIR} --with-readline-lib=-lreadline, --with-readline=no, readline"
 PACKAGECONFIG[expat] = "--with-expat=${STAGING_INCDIR}/.. --with-expat-inc=${STAGING_INCDIR} --with-expat-lib=-lexpat, , expat"
 
-do_install_append() {
+do_install:append() {
 	rm -rf ${D}${libdir}/charset.alias
 }
-FILES_${PN} += "${datadir}/icons/hicolor"
-FILES_${PN}-dbg += "${libdir}/lftp/${PV}/.debug"
-RDEPENDS_${PN} = "perl bash readline"
+FILES:${PN} += "${datadir}/icons/hicolor"
+FILES:${PN}-dbg += "${libdir}/lftp/${PV}/.debug"
+RDEPENDS:${PN} = "perl bash readline"

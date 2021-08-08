@@ -24,32 +24,32 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[fuse] = " --enable-fuse, --disable-fuse, fuse"
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system xrdp"
-USERADD_PARAM_${PN}  = "--system --home /var/run/xrdp -g xrdp \
+GROUPADD_PARAM:${PN} = "--system xrdp"
+USERADD_PARAM:${PN}  = "--system --home /var/run/xrdp -g xrdp \
                         --no-create-home --shell /bin/false xrdp"
 
-FILES_${PN} += "${datadir}/dbus-1/services/*.service \
+FILES:${PN} += "${datadir}/dbus-1/services/*.service \
                 ${datadir}/dbus-1/accessibility-services/*.service "
 
-FILES_${PN}-dev += "${libdir}/xrdp/libcommon.so \
+FILES:${PN}-dev += "${libdir}/xrdp/libcommon.so \
                     ${libdir}/xrdp/libxrdp.so \
                     ${libdir}/xrdp/libscp.so \
                     ${libdir}/xrdp/libxrdpapi.so "
 
 EXTRA_OECONF = "--enable-pam-config=suse"
 
-do_configure_prepend() {
+do_configure:prepend() {
     cd ${S}
     ./bootstrap
     cd -
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
     sed -i 's/(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am/(MAKE) $(AM_MAKEFLAGS) install-exec-am/g' ${S}/keygen/Makefile.in
 }
 
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${sysconfdir}
 	install -d ${D}${sysconfdir}/xrdp
 	install -d ${D}${sysconfdir}/xrdp/pam.d
@@ -73,9 +73,9 @@ do_install_append() {
 	chown xrdp:xrdp ${D}${sysconfdir}/xrdp
 }
 
-SYSTEMD_SERVICE_${PN} = "xrdp.service xrdp-sesman.service"
+SYSTEMD_SERVICE:${PN} = "xrdp.service xrdp-sesman.service"
 
-pkg_postinst_${PN}() {
+pkg_postinst:${PN}() {
 	if test -z "$D"
 	then
 		if test -x ${bindir}/xrdp-keygen

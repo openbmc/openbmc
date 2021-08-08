@@ -18,4 +18,4 @@ repos:
 
 local_conf_header:
   meta-parsec: |
-    IMAGE_INSTALL_append = " parsec-service parsec-tool"
+    IMAGE_INSTALL:append = " parsec-service parsec-tool"

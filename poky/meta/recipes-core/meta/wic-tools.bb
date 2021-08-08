@@ -8,10 +8,10 @@ DEPENDS = "\
            btrfs-tools-native squashfs-tools-native pseudo-native \
            e2fsprogs-native util-linux-native tar-native\
            "
-DEPENDS_append_x86 = " syslinux-native syslinux grub-efi systemd-boot"
-DEPENDS_append_x86-64 = " syslinux-native syslinux grub-efi systemd-boot"
-DEPENDS_append_x86-x32 = " syslinux-native syslinux grub-efi"
-DEPENDS_append_aarch64 = " grub-efi systemd-boot"
+DEPENDS:append:x86 = " syslinux-native syslinux grub-efi systemd-boot"
+DEPENDS:append:x86-64 = " syslinux-native syslinux grub-efi systemd-boot"
+DEPENDS:append:x86-x32 = " syslinux-native syslinux grub-efi"
+DEPENDS:append:aarch64 = " grub-efi systemd-boot"
 
 INHIBIT_DEFAULT_DEPS = "1"
 

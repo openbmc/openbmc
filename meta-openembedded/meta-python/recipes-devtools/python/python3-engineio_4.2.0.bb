@@ -9,7 +9,7 @@ inherit pypi setuptools3
 
 PYPI_PACKAGE = "python-engineio"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
 	python3-netclient \
 	python3-json \
 	python3-logging \

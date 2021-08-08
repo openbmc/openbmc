@@ -14,6 +14,6 @@ CLEANBROKEN = "1"
 
 PYPI_PACKAGE = "luma.oled"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
 	${PYTHON_PN}-luma-core \
 "

@@ -7,7 +7,7 @@ SRC_URI[sha256sum] = "0c9e5b9445621138521e912016ae39b3badadd2607140dcbb0c8062934
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     python3-apply-defaults \
     python3-asyncio \
     python3-core \

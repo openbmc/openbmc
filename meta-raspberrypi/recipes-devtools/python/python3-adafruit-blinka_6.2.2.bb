@@ -12,7 +12,7 @@ inherit setuptools3
 
 DEPENDS += "python3-setuptools-scm-native"
 
-do_install_append() {
+do_install:append() {
 # it ships ./bcm283x/pulseio/libgpiod_pulsein which is a prebuilt
 # 32bit binary therefore we should make this specific to 32bit rpi machines (based on bcm283x) only
     if [ ${@bb.utils.contains('TUNE_FEATURES', 'callconvention-hard', '1', '0', d)} = "0" ]; then
@@ -20,11 +20,11 @@ do_install_append() {
     fi
 }
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     libgpiod \
     python3-adafruit-platformdetect \
     python3-adafruit-pureio \
     python3-core \
 "
 
-RDEPENDS_${PN}_append_rpi = " rpi-gpio"
+RDEPENDS:${PN}:append:rpi = " rpi-gpio"

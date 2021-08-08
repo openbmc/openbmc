@@ -10,7 +10,7 @@ SRC_URI[sha256sum] = "4173403ad4cf76732192099f833fbfbf3cd8104e0246b3844187ae384d
 
 DEPENDS += "libcrypt-openssl-guess-perl-native openssl"
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     libcrypt-openssl-random-perl \
     perl-module-autoloader \
     perl-module-carp \
@@ -30,7 +30,7 @@ do_compile() {
     cpan_do_compile
 }
 
-RDEPENDS_${PN}-ptest = " \
+RDEPENDS:${PN}-ptest = " \
     ${PN} \
     perl-module-file-copy \
     perl-module-test \

@@ -6,9 +6,9 @@ LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 DEPENDS = "acl attr openldap cyrus-sasl libtdb ding-libs libpam c-ares krb5 autoconf-archive"
-DEPENDS_append = " libldb dbus libtalloc libpcre glib-2.0 popt e2fsprogs libtevent bind p11-kit"
+DEPENDS:append = " libldb dbus libtalloc libpcre glib-2.0 popt e2fsprogs libtevent bind p11-kit"
 
-DEPENDS_append_libc-musl = " musl-nscd"
+DEPENDS:append:libc-musl = " musl-nscd"
 
 # If no crypto has been selected, default to DEPEND on nss, since that's what
 # sssd will pick if no active choice is made during configure
@@ -69,7 +69,7 @@ EXTRA_OECONF += " \
     --with-pid-path=/run \
 "
 
-do_configure_prepend() {
+do_configure:prepend() {
     mkdir -p ${AUTOTOOLS_AUXDIR}/build
     cp ${STAGING_DATADIR_NATIVE}/gettext/config.rpath ${AUTOTOOLS_AUXDIR}/build/
 
@@ -77,7 +77,7 @@ do_configure_prepend() {
     sed -i -e "s#\$sss_extra_libdir##" ${S}/src/external/libresolv.m4
 }
 
-do_compile_prepend () {
+do_compile:prepend () {
      echo '#define NSUPDATE_PATH "${bindir}"' >> ${B}/config.h
 }
 do_install () {
@@ -98,18 +98,18 @@ do_install () {
     rm -f ${D}${systemd_system_unitdir}/sssd-secrets.*
 }
 
-pkg_postinst_ontarget_${PN} () {
+pkg_postinst_ontarget:${PN} () {
 if [ -e /etc/init.d/populate-volatile.sh ] ; then
     ${sysconfdir}/init.d/populate-volatile.sh update
 fi
     chown ${SSSD_UID}:${SSSD_GID} ${sysconfdir}/${BPN}/${BPN}.conf
 }
 
-CONFFILES_${PN} = "${sysconfdir}/${BPN}/${BPN}.conf"
+CONFFILES:${PN} = "${sysconfdir}/${BPN}/${BPN}.conf"
 
 INITSCRIPT_NAME = "sssd"
 INITSCRIPT_PARAMS = "start 02 5 3 2 . stop 20 0 1 6 ."
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
     ${@bb.utils.contains('PACKAGECONFIG', 'autofs', 'sssd-autofs.service sssd-autofs.socket', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'curl', 'sssd-kcm.service sssd-kcm.socket', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'infopipe', 'sssd-ifp.service ', '', d)} \
@@ -124,10 +124,10 @@ SYSTEMD_SERVICE_${PN} = " \
 "
 SYSTEMD_AUTO_ENABLE = "disable"
 
-FILES_${PN} += "${libdir} ${datadir} ${base_libdir}/security/pam_sss*.so"
-FILES_${PN}-dev = " ${includedir}/* ${libdir}/*la ${libdir}/*/*la"
+FILES:${PN} += "${libdir} ${datadir} ${base_libdir}/security/pam_sss*.so"
+FILES:${PN}-dev = " ${includedir}/* ${libdir}/*la ${libdir}/*/*la"
 
 # The package contains symlinks that trip up insane
-INSANE_SKIP_${PN} = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"
 
-RDEPENDS_${PN} = "bind bind-utils dbus libldb libpam"
+RDEPENDS:${PN} = "bind bind-utils dbus libldb libpam"

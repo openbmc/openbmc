@@ -1,5 +1,5 @@
 SUMMARY = "Open Package Manager"
-SUMMARY_libopkg = "Open Package Manager library"
+SUMMARY:libopkg = "Open Package Manager library"
 SECTION = "base"
 HOMEPAGE = "http://code.google.com/p/opkg/"
 DESCRIPTION = "Opkg is a lightweight package management system based on Ipkg."
@@ -44,9 +44,9 @@ PACKAGECONFIG[sha256] = "--enable-sha256,--disable-sha256"
 PACKAGECONFIG[libsolv] = "--with-libsolv,--without-libsolv,libsolv"
 
 EXTRA_OECONF += " --disable-pathfinder"
-EXTRA_OECONF_class-native = "--localstatedir=/${@os.path.relpath('${localstatedir}', '${STAGING_DIR_NATIVE}')} --sysconfdir=/${@os.path.relpath('${sysconfdir}', '${STAGING_DIR_NATIVE}')}"
+EXTRA_OECONF:class-native = "--localstatedir=/${@os.path.relpath('${localstatedir}', '${STAGING_DIR_NATIVE}')} --sysconfdir=/${@os.path.relpath('${sysconfdir}', '${STAGING_DIR_NATIVE}')}"
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}${sysconfdir}/opkg
 	install -m 0644 ${WORKDIR}/opkg.conf ${D}${sysconfdir}/opkg/opkg.conf
 	echo "option lists_dir ${OPKGLIBDIR}/opkg/lists" >>${D}${sysconfdir}/opkg/opkg.conf
@@ -60,7 +60,7 @@ do_install_ptest () {
 	sed -i -e '/@PYTHONPATH=. $(PYTHON) $^/a\\t@if [ "$$?" != "0" ];then echo "FAIL:"$^;else echo "PASS:"$^;fi' ${D}${PTEST_PATH}/tests/Makefile
 }
 
-WARN_QA_append += "openssl-deprecation"
+WARN_QA:append += "openssl-deprecation"
 QAPKGTEST[openssl-deprecation] = "package_qa_check_openssl_deprecation"
 def package_qa_check_openssl_deprecation (package, d, messages):
     sane = True
@@ -73,16 +73,16 @@ def package_qa_check_openssl_deprecation (package, d, messages):
     return sane
 
 
-RDEPENDS_${PN} = "${VIRTUAL-RUNTIME_update-alternatives} opkg-arch-config libarchive"
-RDEPENDS_${PN}_class-native = ""
-RDEPENDS_${PN}_class-nativesdk = ""
-RDEPENDS_${PN}-ptest += "make binutils python3-core python3-compression"
-RREPLACES_${PN} = "opkg-nogpg opkg-collateral"
-RCONFLICTS_${PN} = "opkg-collateral"
-RPROVIDES_${PN} = "opkg-collateral"
+RDEPENDS:${PN} = "${VIRTUAL-RUNTIME_update-alternatives} opkg-arch-config libarchive"
+RDEPENDS:${PN}:class-native = ""
+RDEPENDS:${PN}:class-nativesdk = ""
+RDEPENDS:${PN}-ptest += "make binutils python3-core python3-compression"
+RREPLACES:${PN} = "opkg-nogpg opkg-collateral"
+RCONFLICTS:${PN} = "opkg-collateral"
+RPROVIDES:${PN} = "opkg-collateral"
 
-FILES_libopkg = "${libdir}/*.so.* ${OPKGLIBDIR}/opkg/"
+FILES:libopkg = "${libdir}/*.so.* ${OPKGLIBDIR}/opkg/"
 
 BBCLASSEXTEND = "native nativesdk"
 
-CONFFILES_${PN} = "${sysconfdir}/opkg/opkg.conf"
+CONFFILES:${PN} = "${sysconfdir}/opkg/opkg.conf"

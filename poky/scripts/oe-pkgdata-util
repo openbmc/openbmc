@@ -96,7 +96,7 @@ def glob(args):
                 pn = os.path.basename(pkgdata_file)
                 with open(pkgdata_file, 'r') as f:
                     for line in f:
-                        if line.startswith("PKG_%s:" % pn):
+                        if line.startswith("PKG:%s:" % pn):
                             renamed = line.split(': ')[1].rstrip()
                 return renamed
 
@@ -213,7 +213,7 @@ def lookup_pkglist(pkgs, pkgdata_dir, reverse):
                 with open(pkgfile, 'r') as f:
                     for line in f:
                         fields = line.rstrip().split(': ')
-                        if fields[0] == 'PKG_%s' % pkg:
+                        if fields[0] == 'PKG:%s' % pkg:
                             mappings[pkg].append(fields[1])
                             break
     return mappings

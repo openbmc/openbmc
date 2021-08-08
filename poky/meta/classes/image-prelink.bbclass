@@ -1,6 +1,6 @@
 do_rootfs[depends] += "prelink-native:do_populate_sysroot"
 
-IMAGE_PREPROCESS_COMMAND_append_libc-glibc = " prelink_setup; prelink_image; "
+IMAGE_PREPROCESS_COMMAND:append:libc-glibc = " prelink_setup; prelink_image; "
 
 python prelink_setup () {
     oe.utils.write_ld_so_conf(d)

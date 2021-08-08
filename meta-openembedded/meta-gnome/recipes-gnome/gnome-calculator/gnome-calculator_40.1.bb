@@ -29,7 +29,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI[archive.sha256sum] = "7fe6c561f7b1f485ac106219772e45cc135c983bfa4278dd2d3fd83b57ff6af6"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/metainfo \
     ${datadir}/gnome-shell \

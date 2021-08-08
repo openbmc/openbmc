@@ -23,10 +23,10 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 
 # ZNC has a custom autogen.sh that states that this command is needed *and* expected to fail
-do_configure_prepend() {
+do_configure:prepend() {
     automake --add-missing || true
 }
 
-do_install_append() {
+do_install:append() {
     sed -i -e 's|${DEBUG_PREFIX_MAP}||g; s|--sysroot=${STAGING_DIR_TARGET}||g' ${D}${libdir}/pkgconfig/*.pc
 }

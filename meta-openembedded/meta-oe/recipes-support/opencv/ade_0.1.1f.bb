@@ -19,4 +19,4 @@ S = "${WORKDIR}/git"
 
 EXTRA_OECMAKE += " -DCMAKE_BUILD_TYPE=Release"
 
-FILES_${PN}-dev += "${datadir}/${BPN}/*.cmake"
+FILES:${PN}-dev += "${datadir}/${BPN}/*.cmake"

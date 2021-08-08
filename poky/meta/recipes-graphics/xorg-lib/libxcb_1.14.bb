@@ -21,7 +21,7 @@ DEPENDS = "xcb-proto xorgproto libxau libpthread-stubs libxdmcp"
 
 PACKAGES_DYNAMIC = "^${PN}-.*"
 
-FILES_${PN} = "${libdir}/libxcb.so.*"
+FILES:${PN} = "${libdir}/libxcb.so.*"
 
 inherit autotools pkgconfig features_check
 
@@ -30,10 +30,10 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 export PYTHON = "python3"
 
-do_install_append () {
+do_install:append () {
 	chown root.root ${D}${datadir}/doc/${BPN}/tutorial -R
 }
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     do_split_packages(d, '${libdir}', r'^libxcb-(.*)\.so\..*$', '${PN}-%s', 'XCB library module for %s', allow_links=True)
 }

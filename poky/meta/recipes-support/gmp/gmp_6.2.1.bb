@@ -19,16 +19,16 @@ SRC_URI[sha256sum] = "eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a3
 acpaths = ""
 
 EXTRA_OECONF += " --enable-cxx=detect"
-EXTRA_OECONF_mipsarchr6_append = " --disable-assembly"
+EXTRA_OECONF:mipsarchr6:append = " --disable-assembly"
 
 PACKAGES =+ "libgmpxx"
-FILES_libgmpxx = "${libdir}/libgmpxx${SOLIBS}"
+FILES:libgmpxx = "${libdir}/libgmpxx${SOLIBS}"
 
-do_install_append() {
+do_install:append() {
 	oe_multilib_header gmp.h
 }
 
-do_install_prepend_class-target() {
+do_install:prepend:class-target() {
         sed -i \
         -e "s|--sysroot=${STAGING_DIR_HOST}||g" \
         -e "s|${DEBUG_PREFIX_MAP}||g" \

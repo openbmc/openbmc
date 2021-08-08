@@ -59,7 +59,7 @@ EXTRA_OECONF += "\
 "
 export PKG_CONFIG = "${STAGING_BINDIR_NATIVE}/pkg-config"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	if [ "${@bb.utils.contains('DEPENDS', 'gtk+', '1', '0', d)}" = "0" ]
 	then
 		export GTK2_CFLAGS=""
@@ -67,14 +67,14 @@ do_configure_prepend () {
 	fi
 }
 
-do_compile_prepend () {
+do_compile:prepend () {
 	# Disable rpaths
 	sed -i -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' ${B}/${TARGET_SYS}-libtool
 	sed -i -e 's|^sys_lib_dlsearch_path_spec=.*|sys_lib_dlsearch_path_spec=""|g' ${B}/${TARGET_SYS}-libtool
 	sed -i -e 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' ${B}/${TARGET_SYS}-libtool
 }
 
-do_install_append() {
+do_install:append() {
 	if [ -e ${D}${nonarch_libdir}/systemd/system/boinc-client.service ]; then
 		install -d ${D}${systemd_system_unitdir}
 		mv \
@@ -86,6 +86,6 @@ do_install_append() {
 	fi
 }
 
-SYSTEMD_SERVICE_${PN} = "boinc-client.service"
+SYSTEMD_SERVICE:${PN} = "boinc-client.service"
 
-FILES_${PN} += "${libdir}/systemd"
+FILES:${PN} += "${libdir}/systemd"

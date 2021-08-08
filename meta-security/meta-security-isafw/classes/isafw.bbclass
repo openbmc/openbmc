@@ -41,7 +41,7 @@ python do_analysesource() {
     recipe.version = recipe.version.split('+git', 1)[0]
 
     for p in d.getVar('PACKAGES', True).split():
-        license = str(d.getVar('LICENSE_' + p, True))
+        license = str(d.getVar('LICENSE:' + p, True))
         if license == "None":
             license = d.getVar('LICENSE', True)
         license = license.replace("(", "")

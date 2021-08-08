@@ -22,14 +22,14 @@ S = "${WORKDIR}/git"
 
 inherit gettext autotools perlnative pkgconfig systemd
 
-EXTRA_OECONF_append_class-target = " --with-driver=redhat"
+EXTRA_OECONF:append:class-target = " --with-driver=redhat"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "--with-sysinit=systemd,--with-sysinit=initscripts,"
 
 EXTRA_AUTORECONF += "-I ${S}/gnulib/m4"
 
-do_configure_prepend() {
+do_configure:prepend() {
     currdir=`pwd`
     cd ${S}
 
@@ -49,7 +49,7 @@ do_configure_prepend() {
     cd $currdir
 }
 
-do_install_append() {
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
        install -d ${D}${systemd_unitdir}/system
        if [ -d "${D}${libdir}/systemd/system" ]; then
@@ -67,9 +67,9 @@ do_install_append() {
     fi
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
         ${libdir} \
         ${nonarch_libdir} \
         "
 
-SYSTEMD_SERVICE_${PN} = "netcf-transaction.service"
+SYSTEMD_SERVICE:${PN} = "netcf-transaction.service"

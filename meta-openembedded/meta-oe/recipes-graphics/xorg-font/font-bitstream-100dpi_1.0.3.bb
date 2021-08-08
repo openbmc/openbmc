@@ -7,8 +7,8 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=30330812324ff9d9bd9ea645bb944427"
 
 DEPENDS = "util-macros-native font-util-native bdftopcf-native"
-RDEPENDS_${PN} = "encodings font-util"
-RDEPENDS_${PN}_class-native = "font-util-native"
+RDEPENDS:${PN} = "encodings font-util"
+RDEPENDS:${PN}:class-native = "font-util-native"
 
 inherit features_check
 # depends on bdftopcf-native -> virtual/libx11

@@ -24,14 +24,14 @@ class SysrootTests(OESelftestTestCase):
         self.write_config("""
 PREFERRED_PROVIDER_virtual/sysroot-test = "sysroot-test-arch1"
 MACHINE = "qemux86"
-TESTSTRING_pn-sysroot-test-arch1 = "%s"
-TESTSTRING_pn-sysroot-test-arch2 = "%s"
+TESTSTRING:pn-sysroot-test-arch1 = "%s"
+TESTSTRING:pn-sysroot-test-arch2 = "%s"
 """ % (uuid1, uuid2))
         bitbake("sysroot-test")
         self.write_config("""
 PREFERRED_PROVIDER_virtual/sysroot-test = "sysroot-test-arch2"
 MACHINE = "qemux86copy"
-TESTSTRING_pn-sysroot-test-arch1 = "%s"
-TESTSTRING_pn-sysroot-test-arch2 = "%s"
+TESTSTRING:pn-sysroot-test-arch1 = "%s"
+TESTSTRING:pn-sysroot-test-arch2 = "%s"
 """ % (uuid1, uuid2))
         bitbake("sysroot-test")

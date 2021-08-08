@@ -8,7 +8,7 @@ LCOV supports statement, function and branch coverage measurement."
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     libjson-perl \
     libperlio-gzip-perl \
     perl \
@@ -44,7 +44,7 @@ RDEPENDS_${PN} += " \
     perl-module-tie-hash \
 "
 
-RDEPENDS_${PN}_append_class-target = " \
+RDEPENDS:${PN}:append:class-target = " \
     gcov \
     gcov-symlinks \
 "

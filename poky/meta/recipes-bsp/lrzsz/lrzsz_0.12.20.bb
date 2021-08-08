@@ -38,7 +38,7 @@ inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
 
-ALTERNATIVE_${PN} = "rz rx rb sz sx sb"
+ALTERNATIVE:${PN} = "rz rx rb sz sx sb"
 
 ALTERNATIVE_TARGET[rz] = "${bindir}/lrz"
 ALTERNATIVE_TARGET[rx] = "${bindir}/lrz"

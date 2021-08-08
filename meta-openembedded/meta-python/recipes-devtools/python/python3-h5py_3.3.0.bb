@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=113251d71fb0384712c719b567261c5c"
 
 SRC_URI[sha256sum] = "e0dac887d779929778b3cfd13309a939359cc9e74756fc09af7c527a82797186"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
            file://0001-setup_build.py-avoid-absolute-path.patch \
            file://0001-setup.py-Fix-numpy-version.patch \
           "
@@ -24,7 +24,7 @@ DEPENDS = "python3-pkgconfig-native \
            hdf5 \
           "
 
-RDEPENDS_${PN} = "python3-numpy \
+RDEPENDS:${PN} = "python3-numpy \
                   python3-six \
                  "
 

@@ -18,6 +18,6 @@ DEPENDS += " \
 
 SRC_URI[archive.sha256sum] = "664bacf2f3dd65ef00a43f79487351ab64a6c4c629c56ac0ceb1723c2eb66aae"
 
-RDEPENDS_${PN} += "python3-core yelp-xsl"
+RDEPENDS:${PN} += "python3-core yelp-xsl"
 
 BBCLASSEXTEND = "native"

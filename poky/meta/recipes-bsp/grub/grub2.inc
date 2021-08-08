@@ -30,21 +30,21 @@ CVE_CHECK_WHITELIST += "CVE-2019-14865"
 DEPENDS = "flex-native bison-native gettext-native"
 
 COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*|riscv.*)-(linux.*|freebsd.*)'
-COMPATIBLE_HOST_armv7a = 'null'
-COMPATIBLE_HOST_armv7ve = 'null'
+COMPATIBLE_HOST:armv7a = 'null'
+COMPATIBLE_HOST:armv7ve = 'null'
 
 # configure.ac has code to set this automagically from the target tuple
 # but the OE freeform one (core2-foo-bar-linux) don't work with that.
 
-GRUBPLATFORM_arm = "efi"
-GRUBPLATFORM_aarch64 = "efi"
-GRUBPLATFORM_riscv32 = "efi"
-GRUBPLATFORM_riscv64 = "efi"
+GRUBPLATFORM:arm = "efi"
+GRUBPLATFORM:aarch64 = "efi"
+GRUBPLATFORM:riscv32 = "efi"
+GRUBPLATFORM:riscv64 = "efi"
 GRUBPLATFORM ??= "pc"
 
 inherit autotools gettext texinfo pkgconfig
 
-CFLAGS_remove = "-O2"
+CFLAGS:remove = "-O2"
 
 EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
                 --disable-grub-mkfont \
@@ -70,7 +70,7 @@ BUILD_LDFLAGS = ""
 
 export PYTHON = "python3"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	cd ${S}
 	FROM_BOOTSTRAP=1 ${S}/autogen.sh
 	cd ${B}

@@ -24,10 +24,10 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 EXTRA_AUTORECONF = ""
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${datadir}/mime \
 "
 
-do_install_append () {
+do_install:append () {
     rm -rf ${D}${datadir}/mimelnk
 }

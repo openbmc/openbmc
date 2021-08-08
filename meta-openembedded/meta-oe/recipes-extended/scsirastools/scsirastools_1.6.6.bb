@@ -23,25 +23,25 @@ inherit autotools update-rc.d
 EXTRA_OEMAKE += "CC='${CC}'"
 
 
-do_configure_append() {
+do_configure:append() {
 	oe_runmake -C mdadm.d mdadm-1.3.0
 	patch -p0 < ${WORKDIR}/mdadm.patch
 }
 INITSCRIPT_PACKAGES = "${PN}-diskmon ${PN}-raidmon"
-INITSCRIPT_NAME_${PN}-diskmon = "sgdisk"
-INITSCRIPT_PARAMS_${PN}-diskmon = "defaults 80 20"
-INITSCRIPT_NAME_${PN}-raidmon = "sgraid"
-INITSCRIPT_PARAMS_${PN}-raidmon = "defaults 80 20"
+INITSCRIPT_NAME:${PN}-diskmon = "sgdisk"
+INITSCRIPT_PARAMS:${PN}-diskmon = "defaults 80 20"
+INITSCRIPT_NAME:${PN}-raidmon = "sgraid"
+INITSCRIPT_PARAMS:${PN}-raidmon = "defaults 80 20"
 
 PACKAGES =+ "${PN}-diskmon"
 PACKAGES =+ "${PN}-raidmon"
 
-RPROVIDES_${PN}-dbg += "${PN}-diskmon-dbg ${PN}-raidmon-dbg"
+RPROVIDES:${PN}-dbg += "${PN}-diskmon-dbg ${PN}-raidmon-dbg"
 
-FILES_${PN}-diskmon = "${sbindir}/sgdiskmon ${sysconfdir}/init.d/sgdisk"
+FILES:${PN}-diskmon = "${sbindir}/sgdiskmon ${sysconfdir}/init.d/sgdisk"
 
-FILES_${PN}-raidmon = "${sbindir}/sgraidmon ${sysconfdir}/init.d/sgraid"
+FILES:${PN}-raidmon = "${sbindir}/sgraidmon ${sysconfdir}/init.d/sgraid"
 
-RDEPENDS_${PN} += "bash"
-RDEPENDS_${PN}-diskmon += "${PN} bash"
-RDEPENDS_${PN}-raidmon += "${PN} bash"
+RDEPENDS:${PN} += "bash"
+RDEPENDS:${PN}-diskmon += "${PN} bash"
+RDEPENDS:${PN}-raidmon += "${PN} bash"

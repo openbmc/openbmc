@@ -14,8 +14,8 @@ SRC_URI = "https://download.geany.org/${BP}.tar.bz2 \
           "
 SRC_URI[sha256sum] = "18c5756444c1d8bcd737c8ecfd4ef0b3607c924fc02560d4e8b78f6121531a18"
 
-FILES_${PN} += "${datadir}/icons"
+FILES:${PN} += "${datadir}/icons"
 
 EXTRA_OECONF = "--disable-html-docs"
 
-RRECOMMENDS_${PN} += "source-code-pro-fonts"
+RRECOMMENDS:${PN} += "source-code-pro-fonts"

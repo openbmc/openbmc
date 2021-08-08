@@ -20,4 +20,4 @@ do_install() {
 
 PACKAGES = "${PN}"
 
-FILES_${PN} = "*"
+FILES:${PN} = "*"

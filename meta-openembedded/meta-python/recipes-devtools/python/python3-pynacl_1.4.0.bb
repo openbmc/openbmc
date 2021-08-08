@@ -17,16 +17,16 @@ DEPENDS += "\
     libsodium \
 "
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-cffi \
     libsodium \
 "
 
-do_compile_prepend() {
+do_compile:prepend() {
     export SODIUM_INSTALL=system
 }
 
-do_install_prepend() {
+do_install:prepend() {
     export SODIUM_INSTALL=system
 }

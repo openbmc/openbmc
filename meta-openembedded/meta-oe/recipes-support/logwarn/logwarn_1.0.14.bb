@@ -31,7 +31,7 @@ CACHED_CONFIGUREVARS += " \
 
 # Make sure some files exist for autoreconf.
 #
-do_configure_prepend () {
+do_configure:prepend () {
     touch ${S}/NEWS
     touch ${S}/ChangeLog
     touch ${S}/README
@@ -39,7 +39,7 @@ do_configure_prepend () {
 
 # Create a directory for logfile state info, usually under /var/lib.
 #
-do_install_append () {
+do_install:append () {
     install -d ${D}${lcl_default_state_dir}
 }
 
@@ -47,6 +47,6 @@ do_install_append () {
 #
 PACKAGES += "${PN}-nagios"
 
-FILES_${PN}-nagios = "${nonarch_libdir}/nagios"
+FILES:${PN}-nagios = "${nonarch_libdir}/nagios"
 
-RDEPENDS_${PN}-nagios += "bash coreutils sed"
+RDEPENDS:${PN}-nagios += "bash coreutils sed"

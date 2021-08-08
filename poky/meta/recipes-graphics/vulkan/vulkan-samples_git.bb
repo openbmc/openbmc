@@ -11,7 +11,7 @@ SRC_URI = "gitsm://github.com/KhronosGroup/Vulkan-Samples.git \
            "
 
 UPSTREAM_CHECK_COMMITS = "1"
-SRCREV = "47c5237be21209afc945e43d03ae409fa80a0155"
+SRCREV = "43ee480644a20dbc8d4983b22578068f8bed7571"
 
 UPSTREAM_CHECK_GITTAGREGEX = "These are not the releases you're looking for"
 S = "${WORKDIR}/git"
@@ -20,7 +20,7 @@ REQUIRED_DISTRO_FEATURES = 'vulkan'
 
 inherit cmake features_check
 
-FILES_${PN} += "${datadir}"
+FILES:${PN} += "${datadir}"
 
 #
 # There is code to remove the prefix CMAKE_SOURCE_DIR from __FILENAME__ paths
@@ -32,3 +32,6 @@ EXTRA_OECMAKE += "-DCMAKE_DEBUG_SRCDIR=/usr/src/debug/${PN}/${EXTENDPE}${PV}-${P
 # from some builds depending on the point the PCH was compiled. Disable it to be
 # deterministic
 EXTRA_OECMAKE += "-DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON"
+
+# This needs to be specified explicitly to avoid xcb/xlib dependencies
+EXTRA_OECMAKE += "-DVKB_WSI_SELECTION=D2D"

@@ -199,7 +199,7 @@ def check_toolchain_tune_args(data, tune, multilib, errs):
 
 def check_toolchain_args_present(data, tune, multilib, tune_errors, which):
     args_set = (data.getVar("TUNE_%s" % which) or "").split()
-    args_wanted = (data.getVar("TUNEABI_REQUIRED_%s_tune-%s" % (which, tune)) or "").split()
+    args_wanted = (data.getVar("TUNEABI_REQUIRED_%s:tune-%s" % (which, tune)) or "").split()
     args_missing = []
 
     # If no args are listed/required, we are done.
@@ -227,7 +227,7 @@ def check_toolchain_tune(data, tune, multilib):
         overrides = localdata.getVar("OVERRIDES", False) + ":virtclass-multilib-" + multilib
         localdata.setVar("OVERRIDES", overrides)
     bb.debug(2, "Sanity-checking tuning '%s' (%s) features:" % (tune, multilib))
-    features = (localdata.getVar("TUNE_FEATURES_tune-%s" % tune) or "").split()
+    features = (localdata.getVar("TUNE_FEATURES:tune-%s" % tune) or "").split()
     if not features:
         return "Tuning '%s' has no defined features, and cannot be used." % tune
     valid_tunes = localdata.getVarFlags('TUNEVALID') or {}
@@ -249,7 +249,7 @@ def check_toolchain_tune(data, tune, multilib):
             tune_errors.append("Feature '%s' is not defined." % feature)
     whitelist = localdata.getVar("TUNEABI_WHITELIST")
     if whitelist:
-        tuneabi = localdata.getVar("TUNEABI_tune-%s" % tune)
+        tuneabi = localdata.getVar("TUNEABI:tune-%s" % tune)
         if not tuneabi:
             tuneabi = tune
         if True not in [x in whitelist.split() for x in tuneabi.split()]:
@@ -281,7 +281,7 @@ def check_toolchain(data):
                 seen_libs.append(lib)
             if not lib in global_multilibs:
                 tune_error_set.append("Multilib %s is not present in MULTILIB_GLOBAL_VARIANTS" % lib)
-            tune = data.getVar("DEFAULTTUNE_virtclass-multilib-%s" % lib)
+            tune = data.getVar("DEFAULTTUNE:virtclass-multilib-%s" % lib)
             if tune in seen_tunes:
                 tune_error_set.append("The tuning '%s' appears in more than one multilib." % tune)
             else:

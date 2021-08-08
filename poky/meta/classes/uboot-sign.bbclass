@@ -19,7 +19,7 @@
 # The tasks sequence is set as below, using DEPLOY_IMAGE_DIR as common place to
 # treat the device tree blob:
 #
-# * u-boot:do_install_append
+# * u-boot:do_install:append
 #   Install UBOOT_DTB_BINARY to datadir, so that kernel can use it for
 #   signing, and kernel will deploy UBOOT_DTB_BINARY after signs it.
 #
@@ -227,7 +227,7 @@ install_spl_helper() {
 	touch ${D}/${datadir}/${UBOOT_ITS_IMAGE}
 }
 
-do_install_append() {
+do_install:append() {
 	if [ "${PN}" = "${UBOOT_PN}" ]; then
 		if [ -n "${UBOOT_CONFIG}" ]; then
 			for config in ${UBOOT_MACHINE}; do
@@ -416,7 +416,7 @@ do_uboot_assemble_fitimage() {
 
 addtask uboot_assemble_fitimage before do_deploy after do_compile
 
-do_deploy_prepend_pn-${UBOOT_PN}() {
+do_deploy:prepend:pn-${UBOOT_PN}() {
 	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a -n "${UBOOT_DTB_BINARY}" ] ; then
 		concat_dtb
 	fi
@@ -446,7 +446,7 @@ do_deploy_prepend_pn-${UBOOT_PN}() {
 
 }
 
-do_deploy_append_pn-${UBOOT_PN}() {
+do_deploy:append:pn-${UBOOT_PN}() {
 	# If we're creating a u-boot fitImage, point u-boot.bin
 	# symlink since it might get used by image recipes
 	if [ "${UBOOT_FITIMAGE_ENABLE}" = "1" ] ; then

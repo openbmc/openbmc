@@ -1,6 +1,6 @@
 require libcap-ng.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/libcap-ng:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/libcap-ng:"
 
 SUMMARY .= " - python"
 
@@ -12,7 +12,7 @@ S = "${WORKDIR}/libcap-ng-${PV}"
 
 EXTRA_OECONF += "--with-python --with-python3"
 
-do_install_append() {
+do_install:append() {
     rm -rf ${D}${bindir}
     rm -rf ${D}${libdir}/.debug
     rm -f ${D}${libdir}/lib*
@@ -23,6 +23,6 @@ do_install_append() {
 
 # PACKAGES = "${PN}"
 
-FILES_${PN} = "${libdir}/python${PYTHON_BASEVERSION}"
-FILES_${PN}-dbg =+ "${PYTHON_SITEPACKAGES_DIR}/.debug/_capng.so"
+FILES:${PN} = "${libdir}/python${PYTHON_BASEVERSION}"
+FILES:${PN}-dbg =+ "${PYTHON_SITEPACKAGES_DIR}/.debug/_capng.so"
 

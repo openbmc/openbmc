@@ -13,7 +13,7 @@ FONT_PACKAGES = "${PN}-color ${PN}-regular"
 
 S = "${WORKDIR}/git"
 
-FILES_${PN}-color = "${datadir}/fonts/truetype/NotoColorEmoji.ttf"
-FILES_${PN}-regular = "${datadir}/fonts/truetype/NotoEmoji-Regular.ttf"
+FILES:${PN}-color = "${datadir}/fonts/truetype/NotoColorEmoji.ttf"
+FILES:${PN}-regular = "${datadir}/fonts/truetype/NotoEmoji-Regular.ttf"
 
 do_compile[noexec] = "1"

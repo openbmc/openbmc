@@ -17,6 +17,6 @@ inherit cmake
 
 S = "${WORKDIR}/git"
 
-do_install_append(){
+do_install:append(){
     chrpath -d ${D}${libdir}/libcppkafka.so.0.3.1
 }

@@ -50,4 +50,4 @@ do_install () {
     lnr ${D}${nonarch_libdir}/os-release ${D}${sysconfdir}/os-release
 }
 
-FILES_${PN} += "${nonarch_libdir}/os-release"
+FILES:${PN} += "${nonarch_libdir}/os-release"

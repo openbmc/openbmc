@@ -26,7 +26,7 @@ CACHED_CONFIGUREVARS += "ac_cv_lib_ndbm_main=no ac_cv_lib_dbm_main=no"
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_install_append () {
+do_install:append () {
     # Create a symlink to ndbm.h and gdbm.h in include/gdbm to let other packages to find
     # these headers
     install -d ${D}${includedir}/gdbm
@@ -34,7 +34,7 @@ do_install_append () {
     ln -sf ../gdbm.h ${D}/${includedir}/gdbm/gdbm.h
 }
 
-RDEPENDS_${PN}-ptest += "diffutils ${PN}-bin"
+RDEPENDS:${PN}-ptest += "diffutils ${PN}-bin"
 
 do_compile_ptest() {
     oe_runmake -C tests buildtests
@@ -42,5 +42,5 @@ do_compile_ptest() {
 
 PACKAGES =+ "${PN}-compat \
             "
-FILES_${PN}-compat = "${libdir}/libgdbm_compat${SOLIBS} \
+FILES:${PN}-compat = "${libdir}/libgdbm_compat${SOLIBS} \
                      "

@@ -51,5 +51,5 @@ do_install() {
 INITSCRIPT_NAME = "vblade"
 INITSCRIPT_PARAMS = "start 30 . stop 70 0 1 2 3 4 5 6 ."
 
-SYSTEMD_SERVICE_${PN} = "vblade.service"
+SYSTEMD_SERVICE:${PN} = "vblade.service"
 SYSTEMD_AUTO_ENABLE = "disable"

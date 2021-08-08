@@ -19,10 +19,10 @@ S = "${WORKDIR}/git"
 inherit autotools pkgconfig
 
 # Busybox ip doesn't support can interface configuration, use the real thing
-RDEPENDS_${PN} += "iproute2"
+RDEPENDS:${PN} += "iproute2"
 
 ALTERNATIVE_PRIORITY = "90"
-ALTERNATIVE_${PN} = "candump cansend cansequence"
+ALTERNATIVE:${PN} = "candump cansend cansequence"
 ALTERNATIVE_LINK_NAME[candump] = "${bindir}/candump"
 ALTERNATIVE_LINK_NAME[cansend] = "${bindir}/cansend"
 ALTERNATIVE_LINK_NAME[cansequence] = "${bindir}/cansequence"

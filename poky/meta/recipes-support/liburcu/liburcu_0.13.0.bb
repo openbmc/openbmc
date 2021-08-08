@@ -18,8 +18,8 @@ SRC_URI[sha256sum] = "cbb20dbe1a892c2a4d8898bac4316176e585392693d498766ccbbc68cf
 S = "${WORKDIR}/userspace-rcu-${PV}"
 inherit autotools multilib_header
 
-CPPFLAGS_append_riscv64  = " -pthread -D_REENTRANT"
+CPPFLAGS:append:riscv64  = " -pthread -D_REENTRANT"
 
-do_install_append() {
+do_install:append() {
     oe_multilib_header urcu/config.h
 }

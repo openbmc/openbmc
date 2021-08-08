@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464 \
                     file://src/ls.c;beginline=1;endline=15;md5=b7d80abf5b279320fb0e4b1007ed108b \
                     "
 DEPENDS = "gmp libcap"
-DEPENDS_class-native = ""
+DEPENDS:class-native = ""
 
 inherit autotools gettext texinfo
 
@@ -31,21 +31,21 @@ SRC_URI[sha256sum] = "4458d8de7849df44ccab15e16b1548b285224dbba5f08fac070c1c0e0b
 # runcon is not really a sandbox command, use `runcon ... setsid ...` to avoid this particular issue.
 CVE_CHECK_WHITELIST += "CVE-2016-2781"
 
-EXTRA_OECONF_class-native = "--without-gmp"
-EXTRA_OECONF_class-target = "--enable-install-program=arch,hostname --libexecdir=${libdir}"
-EXTRA_OECONF_class-nativesdk = "--enable-install-program=arch,hostname"
+EXTRA_OECONF:class-native = "--without-gmp"
+EXTRA_OECONF:class-target = "--enable-install-program=arch,hostname --libexecdir=${libdir}"
+EXTRA_OECONF:class-nativesdk = "--enable-install-program=arch,hostname"
 
 # acl and xattr are not default features
 #
-PACKAGECONFIG_class-target ??= "\
+PACKAGECONFIG:class-target ??= "\
     ${@bb.utils.filter('DISTRO_FEATURES', 'acl xattr', d)} \
 "
 
 # The lib/oe/path.py requires xattr
-PACKAGECONFIG_class-native ??= "xattr"
+PACKAGECONFIG:class-native ??= "xattr"
 
 # oe-core builds need xattr support
-PACKAGECONFIG_class-nativesdk ??= "xattr"
+PACKAGECONFIG:class-nativesdk ??= "xattr"
 
 # with, without, depends, rdepends
 #
@@ -71,16 +71,16 @@ sbindir_progs= "chroot"
 # coreutils-stdbuf without getting the rest of coreutils, but make
 # coreutils itself pull in stdbuf, so IMAGE_INSTALL += "coreutils"
 # always provides all coreutils
-PACKAGE_BEFORE_PN_class-target += "${@bb.utils.contains('PACKAGECONFIG', 'single-binary', '', 'coreutils-stdbuf', d)}"
-FILES_coreutils-stdbuf = "${bindir}/stdbuf ${libdir}/coreutils/libstdbuf.so"
-RDEPENDS_coreutils_class-target += "${@bb.utils.contains('PACKAGECONFIG', 'single-binary', '', 'coreutils-stdbuf', d)}"
+PACKAGE_BEFORE_PN:class-target += "${@bb.utils.contains('PACKAGECONFIG', 'single-binary', '', 'coreutils-stdbuf', d)}"
+FILES:coreutils-stdbuf = "${bindir}/stdbuf ${libdir}/coreutils/libstdbuf.so"
+RDEPENDS:coreutils:class-target += "${@bb.utils.contains('PACKAGECONFIG', 'single-binary', '', 'coreutils-stdbuf', d)}"
 
 # However, when the single-binary PACKAGECONFIG is used, stdbuf
 # functionality is built into the single coreutils binary, so there's
 # no point splitting /usr/bin/stdbuf to its own package. Instead, add
 # an RPROVIDE so that rdepending on coreutils-stdbuf will work
 # regardless of whether single-binary is in effect.
-RPROVIDES_coreutils += "${@bb.utils.contains('PACKAGECONFIG', 'single-binary', 'coreutils-stdbuf', '', d)}"
+RPROVIDES:coreutils += "${@bb.utils.contains('PACKAGECONFIG', 'single-binary', 'coreutils-stdbuf', '', d)}"
 
 # Let aclocal use the relative path for the m4 file rather than the
 # absolute since coreutils has a lot of m4 files, otherwise there might
@@ -89,20 +89,20 @@ RPROVIDES_coreutils += "${@bb.utils.contains('PACKAGECONFIG', 'single-binary', '
 acpaths = "-I ./m4"
 
 # Deal with a separate builddir failure if src doesn't exist when creating version.c/version.h
-do_compile_prepend () {
+do_compile:prepend () {
 	mkdir -p ${B}/src
 }
 
-do_install_class-native() {
+do_install:class-native() {
 	autotools_do_install
 	# remove groups to fix conflict with shadow-native
 	rm -f ${D}${STAGING_BINDIR_NATIVE}/groups
 	# The return is a must since native doesn't need the
-	# do_install_append() in the below.
+	# do_install:append() in the below.
 	return
 }
 
-do_install_append() {
+do_install:append() {
 	for i in df mktemp nice printenv base64; do mv ${D}${bindir}/$i ${D}${bindir}/$i.${BPN}; done
 
 	install -d ${D}${base_bindir}
@@ -122,8 +122,8 @@ inherit update-alternatives
 ALTERNATIVE_PRIORITY = "100"
 # Make hostname's priority higher than busybox but lower than net-tools
 ALTERNATIVE_PRIORITY[hostname] = "90"
-ALTERNATIVE_${PN} = "lbracket ${bindir_progs} ${base_bindir_progs} ${sbindir_progs} base32 base64 nice printenv mktemp df"
-ALTERNATIVE_${PN}-doc = "base64.1 nice.1 mktemp.1 df.1 groups.1 kill.1 uptime.1 stat.1 hostname.1"
+ALTERNATIVE:${PN} = "lbracket ${bindir_progs} ${base_bindir_progs} ${sbindir_progs} base32 base64 nice printenv mktemp df"
+ALTERNATIVE:${PN}-doc = "base64.1 nice.1 mktemp.1 df.1 groups.1 kill.1 uptime.1 stat.1 hostname.1"
 
 ALTERNATIVE_LINK_NAME[hostname.1] = "${mandir}/man1/hostname.1"
 
@@ -166,12 +166,12 @@ BBCLASSEXTEND = "native nativesdk"
 
 inherit ptest
 
-RDEPENDS_${PN}-ptest += "bash findutils gawk liberror-perl make perl perl-modules python3-core sed shadow"
+RDEPENDS:${PN}-ptest += "bash findutils gawk liberror-perl make perl perl-modules python3-core sed shadow"
 
 # -dev automatic dependencies fails as we don't want libmodule-build-perl-dev, its too heavy
 # may need tweaking if DEPENDS changes
-RRECOMMENDS_coreutils-dev[nodeprrecs] = "1"
-RRECOMMENDS_coreutils-dev = "acl-dev attr-dev gmp-dev libcap-dev bash-dev findutils-dev gawk-dev shadow-dev"
+RRECOMMENDS:coreutils-dev[nodeprrecs] = "1"
+RRECOMMENDS:coreutils-dev = "acl-dev attr-dev gmp-dev libcap-dev bash-dev findutils-dev gawk-dev shadow-dev"
 
 do_install_ptest () {
     install -d ${D}${PTEST_PATH}/tests
@@ -206,7 +206,7 @@ do_install_ptest () {
     sed -i s:@libdir@:${libdir}:g ${D}${PTEST_PATH}/run-ptest
 }
 
-FILES_${PN}-ptest += "${bindir}/getlimits"
+FILES:${PN}-ptest += "${bindir}/getlimits"
 
 # These are specific to Opensuse
 CVE_WHITELIST += "CVE-2013-0221 CVE-2013-0222 CVE-2013-0223"

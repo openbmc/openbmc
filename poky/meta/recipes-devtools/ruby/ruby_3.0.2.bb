@@ -1,6 +1,6 @@
 require ruby.inc
 
-DEPENDS_append_libc-musl = " libucontext"
+DEPENDS:append:libc-musl = " libucontext"
 
 SRC_URI += " \
            file://remove_has_include_macros.patch \
@@ -26,16 +26,16 @@ EXTRA_OECONF = "\
     --with-pkg-config=pkg-config \
 "
 
-EXTRA_OECONF_append_libc-musl = "\
+EXTRA_OECONF:append:libc-musl = "\
     LIBS='-lucontext' \
     ac_cv_func_isnan=yes \
     ac_cv_func_isinf=yes \
 "
 
-EXTRA_OECONF_append_libc-musl_riscv64 = "\
+EXTRA_OECONF:append:libc-musl:riscv64 = "\
     --with-coroutine=copy \
 "
-EXTRA_OECONF_append_libc-musl_riscv32 = "\
+EXTRA_OECONF:append:libc-musl:riscv32 = "\
     --with-coroutine=copy \
 "
 
@@ -43,7 +43,7 @@ do_install() {
     oe_runmake 'DESTDIR=${D}' install
 }
 
-do_install_append_class-target () {
+do_install:append:class-target () {
     # Find out rbconfig.rb from .installed.list
     rbconfig_rb=`grep rbconfig.rb ${B}/.installed.list`
     # Remove build host directories
@@ -80,17 +80,17 @@ do_install_ptest () {
 
 PACKAGES =+ "${PN}-ri-docs ${PN}-rdoc"
 
-SUMMARY_${PN}-ri-docs = "ri (Ruby Interactive) documentation for the Ruby standard library"
-RDEPENDS_${PN}-ri-docs = "${PN}"
-FILES_${PN}-ri-docs += "${datadir}/ri"
+SUMMARY:${PN}-ri-docs = "ri (Ruby Interactive) documentation for the Ruby standard library"
+RDEPENDS:${PN}-ri-docs = "${PN}"
+FILES:${PN}-ri-docs += "${datadir}/ri"
 
-SUMMARY_${PN}-rdoc = "RDoc documentation generator from Ruby source"
-RDEPENDS_${PN}-rdoc = "${PN}"
-FILES_${PN}-rdoc += "${libdir}/ruby/*/rdoc ${bindir}/rdoc"
+SUMMARY:${PN}-rdoc = "RDoc documentation generator from Ruby source"
+RDEPENDS:${PN}-rdoc = "${PN}"
+FILES:${PN}-rdoc += "${libdir}/ruby/*/rdoc ${bindir}/rdoc"
 
-FILES_${PN} += "${datadir}/rubygems"
+FILES:${PN} += "${datadir}/rubygems"
 
-FILES_${PN}-ptest_append_class-target = "\
+FILES:${PN}-ptest:append:class-target = "\
     ${libdir}/ruby/include \
     ${libdir}/ruby/${SHRT_VER}.0/*/-test- \
 "

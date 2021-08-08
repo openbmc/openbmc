@@ -1,13 +1,13 @@
 SUMMARY = "PC/SC Lite smart card framework and applications"
 HOMEPAGE = "http://pcsclite.alioth.debian.org/"
 LICENSE = "BSD & GPLv3+"
-LICENSE_${PN} = "BSD"
-LICENSE_${PN}-lib = "BSD"
-LICENSE_${PN}-doc = "BSD"
-LICENSE_${PN}-dev = "BSD"
-LICENSE_${PN}-dbg = "BSD & GPLv3+"
-LICENSE_${PN}-spy = "GPLv3+"
-LICENSE_${PN}-spy-dev = "GPLv3+"
+LICENSE:${PN} = "BSD"
+LICENSE:${PN}-lib = "BSD"
+LICENSE:${PN}-doc = "BSD"
+LICENSE:${PN}-dev = "BSD"
+LICENSE:${PN}-dbg = "BSD & GPLv3+"
+LICENSE:${PN}-spy = "GPLv3+"
+LICENSE:${PN}-spy-dev = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=628c01ba985ecfa21677f5ee2d5202f6"
 
 SRC_URI = "\
@@ -27,33 +27,33 @@ EXTRA_OECONF = " \
 S = "${WORKDIR}/pcsc-lite-${PV}"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} udev"
-PACKAGECONFIG_class-native ??= ""
+PACKAGECONFIG:class-native ??= ""
 
 PACKAGECONFIG[systemd]  = ",--disable-libsystemd,systemd,"
 PACKAGECONFIG[udev] = "--enable-libudev,--disable-libudev,udev"
 
 PACKAGES = "${PN} ${PN}-dbg ${PN}-dev ${PN}-lib ${PN}-doc ${PN}-spy ${PN}-spy-dev"
 
-RRECOMMENDS_${PN} = "ccid"
-RRECOMMENDS_${PN}_class-native = ""
-RPROVIDES_${PN}_class-native += "pcsc-lite-lib-native"
+RRECOMMENDS:${PN} = "ccid"
+RRECOMMENDS:${PN}:class-native = ""
+RPROVIDES:${PN}:class-native += "pcsc-lite-lib-native"
 
-FILES_${PN} = "${sbindir}/pcscd"
-FILES_${PN}-lib = "${libdir}/libpcsclite*${SOLIBS}"
-FILES_${PN}-dev = "${includedir} \
+FILES:${PN} = "${sbindir}/pcscd"
+FILES:${PN}-lib = "${libdir}/libpcsclite*${SOLIBS}"
+FILES:${PN}-dev = "${includedir} \
                    ${libdir}/pkgconfig \
                    ${libdir}/libpcsclite.la \
                    ${libdir}/libpcsclite.so"
 
-FILES_${PN}-spy = "${bindir}/pcsc-spy \
+FILES:${PN}-spy = "${bindir}/pcsc-spy \
                    ${libdir}/libpcscspy*${SOLIBS}"
-FILES_${PN}-spy-dev = "${libdir}/libpcscspy.la \
+FILES:${PN}-spy-dev = "${libdir}/libpcscspy.la \
                        ${libdir}/libpcscspy.so "
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "pcscd.socket"
-RDEPENDS_${PN}-spy +="python3"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
+SYSTEMD_SERVICE:${PN} = "pcscd.socket"
+RDEPENDS:${PN}-spy +="python3"
 
 BBCLASSEXTEND = "native"

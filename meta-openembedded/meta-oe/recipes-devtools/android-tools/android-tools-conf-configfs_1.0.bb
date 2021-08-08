@@ -27,9 +27,9 @@ do_install() {
     install -m 0644 ${WORKDIR}/10-adbd-configfs.conf ${D}${systemd_unitdir}/system/android-tools-adbd.service.d
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${systemd_unitdir}/system/ \
 "
 
 PROVIDES += "android-tools-conf"
-RPROVIDES_${PN} = "android-tools-conf"
+RPROVIDES:${PN} = "android-tools-conf"

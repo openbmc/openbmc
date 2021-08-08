@@ -27,4 +27,4 @@ EXTRA_OECMAKE += "-DCOMPILE_TESTS=NO -DCOMPILE_STUBGEN=NO -DCOMPILE_EXAMPLES=NO 
                   -DCMAKE_LIBRARY_PATH=${libdir} \
 "
 
-FILES_${PN}-dev += "${libdir}/libjson-rpc-cpp/cmake"
+FILES:${PN}-dev += "${libdir}/libjson-rpc-cpp/cmake"

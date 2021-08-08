@@ -1,3 +1,8 @@
+From 50499e4482d40cff2ef05905c658ba4380e7e6fc Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Thu, 7 Jan 2016 21:13:07 +0000
+Subject: [PATCH] freetype: enable out-of-tree builds, and use host zlib
+
 Freetype think that it knows best about where libtool is, and explicitly the
 libtool autoconf macros telling it where to find the libtool script.  Of course
 we prefix the script with the target triplet, so it's wrong.  Fix this by
@@ -7,8 +12,20 @@ put libtool is used.
 Upstream-Status: Pending
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
---- freetype-2.6/builds/unix/unix-cc.in.orig	2016-01-07 19:21:45.244943479 +0000
-+++ freetype-2.6/builds/unix/unix-cc.in	2016-01-07 19:21:50.213112131 +0000
-@@ -19,1 +18,1 @@
+---
+ builds/unix/unix-cc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/builds/unix/unix-cc.in b/builds/unix/unix-cc.in
+index 89be450..72609d3 100644
+--- a/builds/unix/unix-cc.in
++++ b/builds/unix/unix-cc.in
+@@ -16,7 +16,7 @@ CC           := @CC@
+ COMPILER_SEP := $(SEP)
+ FT_LIBTOOL_DIR ?= $(PLATFORM_DIR)
+ 
 -LIBTOOL := $(FT_LIBTOOL_DIR)/libtool
 +LIBTOOL := $(FT_LIBTOOL_DIR)/@LIBTOOL@ --tag CC
+ 
+ 
+ # The object file extension (for standard and static libraries).  This can be

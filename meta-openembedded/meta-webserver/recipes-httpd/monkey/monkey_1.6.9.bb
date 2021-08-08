@@ -26,7 +26,7 @@ EXTRA_OECMAKE = "-DINSTALL_LOGDIR=${localstatedir}/log/monkey/ \
                  -DWITH_SYSTEM_MALLOC=1 \
                 "
 
-EXTRA_OECMAKE_append_libc-musl = " -DWITH_MUSL=1 "
+EXTRA_OECMAKE:append:libc-musl = " -DWITH_MUSL=1 "
 
 # GCC-10+ defaults to -fno-common
 CFLAGS += "-fcommon"
@@ -37,7 +37,7 @@ inherit cmake pkgconfig update-rc.d systemd
 
 OECMAKE_GENERATOR = "Unix Makefiles"
 
-do_install_append() {
+do_install:append() {
     rm -rf ${D}/run
     rm -rf ${D}${localstatedir}/run
     install -Dm 0755 ${WORKDIR}/monkey.init ${D}${sysconfdir}/init.d/monkey
@@ -50,16 +50,16 @@ do_install_append() {
 INITSCRIPT_NAME = "monkey"
 INITSCRIPT_PARAMS = "defaults 70"
 
-SYSTEMD_SERVICE_${PN} = "monkey.service"
+SYSTEMD_SERVICE:${PN} = "monkey.service"
 
 PACKAGES += "${PN}-plugins"
 
-FILES_${PN}-plugins = "${libdir}/monkey-*.so"
+FILES:${PN}-plugins = "${libdir}/monkey-*.so"
 
-FILES_${PN} += "${localstatedir}/www/monkey/ /run"
+FILES:${PN} += "${localstatedir}/www/monkey/ /run"
 
 
-CONFFILES_${PN} = "${sysconfdir}/monkey/monkey.conf \
+CONFFILES:${PN} = "${sysconfdir}/monkey/monkey.conf \
                    ${sysconfdir}/monkey/sites/default \
                    ${sysconfdir}/monkey/monkey.mime \
                    ${sysconfdir}/monkey/plugins.load \

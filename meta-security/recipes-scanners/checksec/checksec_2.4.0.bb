@@ -16,4 +16,4 @@ do_install() {
     install -m 0755 ${S}/checksec ${D}${bindir}
 }
 
-RDEPENDS_${PN} = "bash openssl-bin binutils"
+RDEPENDS:${PN} = "bash openssl-bin binutils"

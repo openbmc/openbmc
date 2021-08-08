@@ -1,4 +1,4 @@
-From bb229568e505f2276ca58b72fef6781034fa839f Mon Sep 17 00:00:00 2001
+From 02374940dd34fddd2b04624af3f23e01f9cb81cd Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 31 Mar 2017 11:42:03 -0700
 Subject: [PATCH] Detect 64-bit MIPS targets

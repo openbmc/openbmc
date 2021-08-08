@@ -22,7 +22,7 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 inherit cpan ptest-perl
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     perl-module-carp \
     perl-module-exporter \
     perl-module-extutils-makemaker \
@@ -40,6 +40,6 @@ RDEPENDS_${PN} = " \
     perl-module-warnings \
 "
 
-RDEPENDS_${PN}-ptest += "perl-module-perlio"
+RDEPENDS:${PN}-ptest += "perl-module-perlio"
 
 BBCLASSEXTEND = "native"

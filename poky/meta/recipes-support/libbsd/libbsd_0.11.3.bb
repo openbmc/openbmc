@@ -28,7 +28,7 @@ HOMEPAGE = "https://libbsd.freedesktop.org/wiki/"
 # License: public-domain
 # License: public-domain-Colin-Plumb
 LICENSE = "BSD-3-Clause & BSD-4-Clause & ISC & PD"
-LICENSE_${PN} = "BSD-3-Clause & ISC & PD"
+LICENSE:${PN} = "BSD-3-Clause & ISC & PD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=adf6172075bcc5837e33a8a688eb7e22"
 SECTION = "libs"
 

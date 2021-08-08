@@ -207,7 +207,7 @@ an entire Linux distribution, including the toolchain, from source.
           https://docs.yoctoproject.org
 
       For more information about OpenEmbedded see their website:
-          http://www.openembedded.org/
+          https://www.openembedded.org/
 
       ### Shell environment set up for builds. ###
 
@@ -215,11 +215,18 @@ an entire Linux distribution, including the toolchain, from source.
 
       Common targets are:
           core-image-minimal
+          core-image-full-cmdline
           core-image-sato
+          core-image-weston
           meta-toolchain
           meta-ide-support
 
       You can also run generated QEMU images with a command like 'runqemu qemux86-64'
+
+      Other commonly useful commands are:
+       - 'devtool' and 'recipetool' handle common recipe tasks
+       - 'bitbake-layers' handles common layer tasks
+       - 'oe-pkgdata-util' handles common target package tasks
 
    Among other things, the script creates the :term:`Build Directory`, which is
    ``build`` in this case and is located in the :term:`Source Directory`.  After
@@ -260,8 +267,9 @@ an entire Linux distribution, including the toolchain, from source.
 
    For information on using the ``bitbake`` command, see the
    :ref:`overview-manual/concepts:bitbake` section in the Yocto Project Overview and
-   Concepts Manual, or see the ":ref:`BitBake Command
-   <bitbake:bitbake-user-manual/bitbake-user-manual-intro:the bitbake command>`" section in the BitBake User Manual.
+   Concepts Manual, or see
+   :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-intro:the bitbake command`
+   in the BitBake User Manual.
 
 #. **Simulate Your Image Using QEMU:** Once this particular image is
    built, you can start QEMU, which is a Quick EMUlator that ships with

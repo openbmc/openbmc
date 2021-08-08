@@ -26,15 +26,15 @@ PACKAGES =+ "${PN}-gst"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[gst] = "-Dgstreamer=enabled,-Dgstreamer=disabled,gstreamer1.0 gstreamer1.0-plugins-base"
 
-RDEPENDS_${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland qt', 'qtwayland', '', d)}"
+RDEPENDS:${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'wayland qt', 'qtwayland', '', d)}"
 
 inherit meson pkgconfig python3native
 
-do_configure_prepend() {
+do_configure:prepend() {
     sed -i -e 's|py_compile=True,||' ${S}/utils/ipc/mojo/public/tools/mojom/mojom/generate/template_expander.py
 }
 
-do_install_append() {
+do_install:append() {
     chrpath -d ${D}${libdir}/libcamera.so
 }
 
@@ -51,6 +51,6 @@ do_recalculate_ipa_signatures_package() {
     ${S}/src/ipa/ipa-sign-install.sh ${B}/src/ipa-priv-key.pem "${modules}"
 }
 
-FILES_${PN}-dev = "${includedir} ${libdir}/pkgconfig"
-FILES_${PN} += " ${libdir}/libcamera.so"
-FILES_${PN}-gst = "${libdir}/gstreamer-1.0/libgstlibcamera.so"
+FILES:${PN}-dev = "${includedir} ${libdir}/pkgconfig"
+FILES:${PN} += " ${libdir}/libcamera.so"
+FILES:${PN}-gst = "${libdir}/gstreamer-1.0/libgstlibcamera.so"

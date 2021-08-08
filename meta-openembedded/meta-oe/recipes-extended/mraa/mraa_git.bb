@@ -22,7 +22,7 @@ inherit cmake distutils3-base
 
 DEPENDS += "json-c"
 
-EXTRA_OECMAKE_append = " -DINSTALLTOOLS:BOOL=ON -DFIRMATA=ON -DCMAKE_SKIP_RPATH=ON -DPYTHON2_LIBRARY=OFF \
+EXTRA_OECMAKE:append = " -DINSTALLTOOLS:BOOL=ON -DFIRMATA=ON -DCMAKE_SKIP_RPATH=ON -DPYTHON2_LIBRARY=OFF \
                          -DPYTHON3_PACKAGES_PATH:PATH=${baselib}/python${PYTHON_BASEVERSION}/site-packages \
                          -DPYTHON_LIBRARY=${STAGING_LIBDIR}/lib${PYTHON_DIR}${PYTHON_ABI}.so \
                          -DPYTHON_INCLUDE_DIR=${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI} \
@@ -31,20 +31,20 @@ EXTRA_OECMAKE_append = " -DINSTALLTOOLS:BOOL=ON -DFIRMATA=ON -DCMAKE_SKIP_RPATH=
 # Prepend mraa-utils to make sure bindir ends up in there
 PACKAGES =+ "${PN}-utils"
 
-FILES_${PN}-doc += "${datadir}/mraa/examples/"
+FILES:${PN}-doc += "${datadir}/mraa/examples/"
 
-FILES_${PN}-utils = "${bindir}/"
+FILES:${PN}-utils = "${bindir}/"
 
 # override this in local.conf to get needed bindings.
-# BINDINGS_pn-mraa="python"
+# BINDINGS:pn-mraa="python"
 # will result in only the python bindings being built/packaged.
 # Note: 'nodejs' is disabled by default because the bindings
 # generation currently fails with nodejs (>v7.x).
 BINDINGS ??= "python"
 
 # nodejs isn't available for armv4/armv5 architectures
-BINDINGS_armv4 ??= "python"
-BINDINGS_armv5 ??= "python"
+BINDINGS:armv4 ??= "python"
+BINDINGS:armv5 ??= "python"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('PACKAGES', 'node-${PN}', 'nodejs', '', d)} \
  ${@bb.utils.contains('PACKAGES', '${PYTHON_PN}-${PN}', 'python', '', d)}"
@@ -53,11 +53,11 @@ PACKAGECONFIG[python] = "-DBUILDSWIGPYTHON=ON, -DBUILDSWIGPYTHON=OFF, swig-nativ
 PACKAGECONFIG[nodejs] = "-DBUILDSWIGNODE=ON, -DBUILDSWIGNODE=OFF, swig-native nodejs-native,"
 PACKAGECONFIG[ft4222] = "-DUSBPLAT=ON -DFTDI4222=ON, -DUSBPLAT=OFF -DFTDI4222=OFF,, libft4222"
 
-FILES_${PYTHON_PN}-${PN} = "${PYTHON_SITEPACKAGES_DIR}/"
-RDEPENDS_${PYTHON_PN}-${PN} += "${PYTHON_PN}"
+FILES:${PYTHON_PN}-${PN} = "${PYTHON_SITEPACKAGES_DIR}/"
+RDEPENDS:${PYTHON_PN}-${PN} += "${PYTHON_PN}"
 
-FILES_node-${PN} = "${prefix}/lib/node_modules/"
-RDEPENDS_node-${PN} += "nodejs"
+FILES:node-${PN} = "${prefix}/lib/node_modules/"
+RDEPENDS:node-${PN} += "nodejs"
 
 ### Include desired language bindings ###
 PACKAGES =+ "${@bb.utils.contains('BINDINGS', 'nodejs', 'node-${PN}', '', d)}"

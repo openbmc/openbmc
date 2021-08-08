@@ -8,6 +8,7 @@
 #
 
 import sys
+import traceback
 
 try:
     import gi
@@ -196,6 +197,7 @@ def main(server, eventHandler, params):
     gtkgui.start()
 
     try:
+        params.updateToServer(server, os.environ.copy())
         params.updateFromServer(server)
         cmdline = params.parseActions()
         if not cmdline:
@@ -217,6 +219,9 @@ def main(server, eventHandler, params):
             return 1
     except client.Fault as x:
         print("XMLRPC Fault getting commandline:\n %s" % x)
+        return
+    except Exception as e:
+        print("Exception in startup:\n %s" % traceback.format_exc())
         return
 
     if gtkthread.quit.isSet():

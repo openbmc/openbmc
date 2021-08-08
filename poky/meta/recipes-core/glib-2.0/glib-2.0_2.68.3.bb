@@ -20,7 +20,7 @@ SRC_URI = "${GNOME_MIRROR}/glib/${SHRT_VER}/glib-${PV}.tar.xz \
            file://time-test.patch \
            file://0001-correctly-use-3-parameters-for-close_range.patch \
            "
-SRC_URI_append_class-native = " file://relocate-modules.patch"
+SRC_URI:append:class-native = " file://relocate-modules.patch"
 
 SRC_URI[sha256sum] = "e7e1a3c20c026109c45c9ec4a31d8dcebc22e86c69486993e565817d64be3138"
 

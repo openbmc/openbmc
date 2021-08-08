@@ -13,7 +13,7 @@ PACKAGECONFIG[gtk] = "--with-gtk,--without-gtk --without-gnome,gtk+"
 # use system popt by default
 PACKAGECONFIG[popt] = "--without-included-popt,--with-included-popt,popt"
 
-RRECOMMENDS_${PN}-server = "avahi-daemon"
+RRECOMMENDS:${PN}-server = "avahi-daemon"
 
 SRC_URI = "git://github.com/distcc/distcc.git \
            file://default \
@@ -33,7 +33,7 @@ EXTRA_OECONF += "--disable-Werror PYTHON='' --disable-pump-mode"
 PACKAGE_BEFORE_PN = "${PN}-distmon-gnome ${PN}-server"
 
 USERADD_PACKAGES = "${PN}-server"
-USERADD_PARAM_${PN}-server = "--system \
+USERADD_PARAM:${PN}-server = "--system \
                        --home /dev/null \
                        --no-create-home \
                        --gid nogroup \
@@ -43,7 +43,7 @@ UPDATERCPN = "${PN}-server"
 INITSCRIPT_NAME = "distcc"
 
 SYSTEMD_PACKAGES = "${PN}-server"
-SYSTEMD_SERVICE_${PN}-server = "distcc.service"
+SYSTEMD_SERVICE:${PN}-server = "distcc.service"
 
 do_install() {
     # Improve reproducibility: compress w/o timestamps
@@ -57,10 +57,10 @@ do_install() {
     sed -i -e 's,@BINDIR@,${bindir},g' ${D}${systemd_unitdir}/system/distcc.service
 }
 
-FILES_${PN}-server = "${sysconfdir} \
+FILES:${PN}-server = "${sysconfdir} \
                       ${bindir}/distccd \
                       ${sbindir}"
-FILES_${PN}-distmon-gnome = "${bindir}/distccmon-gnome \
+FILES:${PN}-distmon-gnome = "${bindir}/distccmon-gnome \
                              ${datadir}/applications \
                              ${datadir}/pixmaps"
 

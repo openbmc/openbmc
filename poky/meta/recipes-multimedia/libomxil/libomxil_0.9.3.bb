@@ -36,10 +36,10 @@ PACKAGECONFIG[amr] = "--enable-amr,,"
 # The .so files under ${libdir}/bellagio are not intended to be versioned and symlinked.
 # Make sure they get packaged in the main package.
 #
-FILES_${PN} += "${libdir}/bellagio/*.so \
+FILES:${PN} += "${libdir}/bellagio/*.so \
                 ${libdir}/omxloaders/*${SOLIBS}"
-FILES_${PN}-staticdev += "${libdir}/bellagio/*.a \
+FILES:${PN}-staticdev += "${libdir}/bellagio/*.a \
                           ${libdir}/omxloaders/*.a"
-FILES_${PN}-dev += "${libdir}/bellagio/*.la \
+FILES:${PN}-dev += "${libdir}/bellagio/*.la \
                     ${libdir}/omxloaders/*.la \
                     ${libdir}/omxloaders/*${SOLIBSDEV}"

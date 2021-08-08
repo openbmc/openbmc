@@ -9,12 +9,12 @@ DEPENDS = "e2fsprogs-native"
 
 PACKAGECONFIG ?= "zlib bz2 xz lzo zstd"
 
-PACKAGECONFIG_append_class-target = "\
+PACKAGECONFIG:append:class-target = "\
 	${@bb.utils.filter('DISTRO_FEATURES', 'acl xattr', d)} \
 "
 
 DEPENDS_BZIP2 = "bzip2-replacement-native"
-DEPENDS_BZIP2_class-target = "bzip2"
+DEPENDS_BZIP2:class-target = "bzip2"
 
 PACKAGECONFIG[acl] = "--enable-acl,--disable-acl,acl,"
 PACKAGECONFIG[xattr] = "--enable-xattr,--disable-xattr,attr,"
@@ -41,7 +41,7 @@ inherit autotools update-alternatives pkgconfig
 CPPFLAGS += "-I${WORKDIR}/extra-includes"
 
 do_configure[cleandirs] += "${WORKDIR}/extra-includes"
-do_configure_prepend() {
+do_configure:prepend() {
 	# We just need the headers for some type constants, so no need to
 	# build all of e2fsprogs for the target
 	cp -R ${STAGING_INCDIR_NATIVE}/ext2fs ${WORKDIR}/extra-includes/
@@ -50,16 +50,16 @@ do_configure_prepend() {
 ALTERNATIVE_PRIORITY = "80"
 
 PACKAGES =+ "bsdtar"
-FILES_bsdtar = "${bindir}/bsdtar"
+FILES:bsdtar = "${bindir}/bsdtar"
 
-ALTERNATIVE_bsdtar = "tar"
+ALTERNATIVE:bsdtar = "tar"
 ALTERNATIVE_LINK_NAME[tar] = "${base_bindir}/tar"
 ALTERNATIVE_TARGET[tar] = "${bindir}/bsdtar"
 
 PACKAGES =+ "bsdcpio"
-FILES_bsdcpio = "${bindir}/bsdcpio"
+FILES:bsdcpio = "${bindir}/bsdcpio"
 
-ALTERNATIVE_bsdcpio = "cpio"
+ALTERNATIVE:bsdcpio = "cpio"
 ALTERNATIVE_LINK_NAME[cpio] = "${base_bindir}/cpio"
 ALTERNATIVE_TARGET[cpio] = "${bindir}/bsdcpio"
 

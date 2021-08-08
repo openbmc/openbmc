@@ -7,7 +7,7 @@ usability, and features."
 SECTION = "console/network"
 
 DEPENDS = "curl libmaxminddb libpcap lua mariadb ndpi json-c rrdtool zeromq"
-RDEPENDS_${PN} = "bash redis"
+RDEPENDS:${PN} = "bash redis"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
@@ -26,24 +26,24 @@ S = "${WORKDIR}/git"
 # don't use the lua under thirdparty as it supports cross compiling badly
 export LUA_LIB = "${STAGING_LIBDIR}/liblua.a"
 
-LDFLAGS_append_mipsarch = " -latomic"
-LDFLAGS_append_powerpc = " -latomic"
-LDFLAGS_append_riscv32 = " -latomic"
+LDFLAGS:append:mipsarch = " -latomic"
+LDFLAGS:append:powerpc = " -latomic"
+LDFLAGS:append:riscv32 = " -latomic"
 inherit autotools-brokensep gettext systemd
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${WORKDIR}/ntopng.service ${D}${systemd_unitdir}/system
 }
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${systemd_unitdir}/system/ntopng.service"
 
-FILES_${PN}-doc += "\
+FILES:${PN}-doc += "\
     /usr/man/man8/ntopng.8"
 
-do_configure_prepend() {
+do_configure:prepend() {
     ${S}/autogen.sh
 }
 
-SYSTEMD_SERVICE_${PN} = "ntopng.service"
+SYSTEMD_SERVICE:${PN} = "ntopng.service"

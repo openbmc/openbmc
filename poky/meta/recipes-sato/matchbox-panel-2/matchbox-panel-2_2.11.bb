@@ -19,9 +19,9 @@ REQUIRED_DISTRO_FEATURES = "x11"
 # SRCREV tagged 2.11 plus some autotools fixes
 SRCREV = "f82ca3f42510fb3ef10f598b393eb373a2c34ca7"
 
-RPROVIDES_${PN} = "matchbox-panel"
-RREPLACES_${PN} = "matchbox-panel"
-RCONFLICTS_${PN} = "matchbox-panel"
+RPROVIDES:${PN} = "matchbox-panel"
+RREPLACES:${PN} = "matchbox-panel"
+RCONFLICTS:${PN} = "matchbox-panel"
 
 SRC_URI = "git://git.yoctoproject.org/${BPN} \
            file://0001-applets-systray-Allow-icons-to-be-smaller.patch \
@@ -33,10 +33,10 @@ EXTRA_OECONF += " ${@bb.utils.contains("MACHINE_FEATURES", "apm", "--with-batter
 
 S = "${WORKDIR}/git"
 
-FILES_${PN} += "${libdir}/matchbox-panel/*.so \
+FILES:${PN} += "${libdir}/matchbox-panel/*.so \
                 ${datadir}/matchbox-panel/brightness/*.png \
                 ${datadir}/matchbox-panel/startup/*.png \
                 ${datadir}/icons/"
-FILES_${PN}-dev += "${libdir}/matchbox-panel/*.la"
+FILES:${PN}-dev += "${libdir}/matchbox-panel/*.la"
 
 inherit autotools pkgconfig features_check gettext

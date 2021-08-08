@@ -13,7 +13,7 @@ DEPENDS = "sg3-utils udev"
 
 inherit autotools systemd
 
-SYSTEMD_SERVICE_${PN} = "ledmon.service"
+SYSTEMD_SERVICE:${PN} = "ledmon.service"
 
 # 0.93
 SRC_URI = "git://github.com/intel/ledmon;branch=master \
@@ -24,7 +24,7 @@ SRC_URI = "git://github.com/intel/ledmon;branch=master \
 SRCREV = "1d72f9cb5c9163b2ecdf19709935720e65f5b90e"
 
 COMPATIBLE_HOST = "(i.86|x86_64).*-linux"
-COMPATIBLE_HOST_libc-musl = "null"
+COMPATIBLE_HOST:libc-musl = "null"
 
 S = "${WORKDIR}/git"
 EXTRA_OEMAKE = "CC='${CC}' LDFLAGS='${LDFLAGS}' CFLAGS='${CFLAGS}'"
@@ -33,7 +33,7 @@ EXTRA_OEMAKE = "CC='${CC}' LDFLAGS='${LDFLAGS}' CFLAGS='${CFLAGS}'"
 # We need to add this include path in CFLAGS.
 CFLAGS += "-I${S}/config"
 
-do_install_append() {
+do_install:append() {
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
 	        install -d ${D}${systemd_unitdir}/system
 	        install -m 0755 ${S}/systemd/ledmon.service ${D}${systemd_unitdir}/system

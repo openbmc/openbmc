@@ -19,7 +19,7 @@ inherit autotools pkgconfig update-rc.d systemd gobject-introspection-data
 
 INITSCRIPT_NAME = "ofono"
 INITSCRIPT_PARAMS = "defaults 22"
-SYSTEMD_SERVICE_${PN} = "ofono.service"
+SYSTEMD_SERVICE:${PN} = "ofono.service"
 
 PACKAGECONFIG ??= "\
     ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
@@ -30,26 +30,26 @@ PACKAGECONFIG[bluez] = "--enable-bluetooth, --disable-bluetooth, bluez5"
 
 EXTRA_OECONF += "--enable-test --enable-external-ell"
 
-do_configure_prepend() {
+do_configure:prepend() {
     bbnote "Removing bundled ell from ${S}/ell to prevent including it"
     rm -rf ${S}/ell
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}/init.d/
     install -m 0755 ${WORKDIR}/ofono ${D}${sysconfdir}/init.d/ofono
 }
 
 PACKAGES =+ "${PN}-tests"
 
-FILES_${PN} += "${systemd_unitdir}"
-FILES_${PN}-tests = "${libdir}/${BPN}/test"
+FILES:${PN} += "${systemd_unitdir}"
+FILES:${PN}-tests = "${libdir}/${BPN}/test"
 
-RDEPENDS_${PN} += "dbus"
-RDEPENDS_${PN}-tests = "\
+RDEPENDS:${PN} += "dbus"
+RDEPENDS:${PN}-tests = "\
     python3-core \
     python3-dbus \
     ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'python3-pygobject', '', d)} \
 "
 
-RRECOMMENDS_${PN} += "kernel-module-tun mobile-broadband-provider-info"
+RRECOMMENDS:${PN} += "kernel-module-tun mobile-broadband-provider-info"

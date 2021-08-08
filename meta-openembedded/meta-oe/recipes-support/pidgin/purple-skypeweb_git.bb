@@ -21,6 +21,6 @@ do_install() {
     oe_runmake -C skypeweb DESTDIR="${D}" install;
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir} \
 "

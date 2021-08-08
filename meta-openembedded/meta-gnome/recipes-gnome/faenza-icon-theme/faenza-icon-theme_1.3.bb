@@ -23,4 +23,4 @@ do_install() {
     chown -R root:root ${D}${datadir}
 }
 
-FILES_${PN} += "${datadir}/icons ${datadir}/themes"
+FILES:${PN} += "${datadir}/icons ${datadir}/themes"

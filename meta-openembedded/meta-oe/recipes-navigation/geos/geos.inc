@@ -11,11 +11,11 @@ inherit autotools pkgconfig binconfig
 
 PACKAGES =+ "geoslib ${PN}-c1"
 
-DESCRIPTION_${PN}lib = "Geometry engine for Geographic Information Systems - C++ Library"
-FILES_${PN}lib += "${libdir}/libgeos-${PV}.so"
+DESCRIPTION:${PN}lib = "Geometry engine for Geographic Information Systems - C++ Library"
+FILES:${PN}lib += "${libdir}/libgeos-${PV}.so"
 
-DESCRIPTION_${PN}-c1 = "Geometry engine for Geographic Information Systems - C Library"
-FILES_${PN}-c1 += "${libdir}/libgeos_c.so.*"
+DESCRIPTION:${PN}-c1 = "Geometry engine for Geographic Information Systems - C Library"
+FILES:${PN}-c1 += "${libdir}/libgeos_c.so.*"
 
-ALLOW_EMPTY_${PN} = "1"
-RDEPENDS_${PN} += "geoslib ${PN}-c1"
+ALLOW_EMPTY:${PN} = "1"
+RDEPENDS:${PN} += "geoslib ${PN}-c1"

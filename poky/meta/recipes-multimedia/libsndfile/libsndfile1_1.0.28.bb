@@ -37,7 +37,7 @@ PACKAGECONFIG[regtest] = "--enable-sqlite,--disable-sqlite,sqlite3"
 
 inherit autotools lib_package pkgconfig multilib_header
 
-do_install_append() {
+do_install:append() {
     oe_multilib_header sndfile.h
 }
 

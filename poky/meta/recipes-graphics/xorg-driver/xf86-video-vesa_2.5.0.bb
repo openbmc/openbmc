@@ -13,7 +13,7 @@ DEPENDS += "virtual/libx11 xorgproto libpciaccess"
 
 COMPATIBLE_HOST = '(i.86|x86_64).*-linux'
 
-RRECOMMENDS_${PN} += "xserver-xorg-module-libint10"
+RRECOMMENDS:${PN} += "xserver-xorg-module-libint10"
 
 SRC_URI[sha256sum] = "1f1624f3c73906801ad1bc98335a2cb5676a7a4d18e5374d9a1d18464e54c659"
 

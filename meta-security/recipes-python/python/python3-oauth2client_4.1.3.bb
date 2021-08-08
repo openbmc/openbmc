@@ -8,4 +8,4 @@ SRC_URI[sha256sum] = "d486741e451287f69568a4d26d70d9acd73a2bbfa275746c535b420989
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} = "python3-six python3-rsa python3-httplib2 python3-pyasn1 python3-pyasn1-modules"
+RDEPENDS:${PN} = "python3-six python3-rsa python3-httplib2 python3-pyasn1 python3-pyasn1-modules"

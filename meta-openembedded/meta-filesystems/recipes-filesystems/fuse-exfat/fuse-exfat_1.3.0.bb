@@ -12,7 +12,7 @@ SRC_URI = "https://github.com/relan/exfat/releases/download/v${PV}/${BP}.tar.gz"
 UPSTREAM_CHECK_URI = "https://github.com/relan/exfat/releases"
 
 DEPENDS = "fuse virtual/libc"
-RRECOMMENDS_${PN} = "util-linux-mount"
+RRECOMMENDS:${PN} = "util-linux-mount"
 
 inherit autotools pkgconfig
 

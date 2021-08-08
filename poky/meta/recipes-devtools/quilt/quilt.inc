@@ -14,36 +14,36 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/quilt/quilt-${PV}.tar.gz \
         file://0001-tests-Allow-different-output-from-mv.patch \
 "
 
-SRC_URI_append_class-target = " file://gnu_patch_test_fix_target.patch"
+SRC_URI:append:class-target = " file://gnu_patch_test_fix_target.patch"
 
 SRC_URI[md5sum] = "6800c2404a2c0598ab2eff92a636ba70"
 SRC_URI[sha256sum] = "314b319a6feb13bf9d0f9ffa7ce6683b06919e734a41275087ea457cc9dc6e07"
 
 inherit autotools-brokensep ptest
 
-INHIBIT_AUTOTOOLS_DEPS_class-native = "1"
-PATCHTOOL_class-native = "patch"
+INHIBIT_AUTOTOOLS_DEPS:class-native = "1"
+PATCHTOOL:class-native = "patch"
 
 CLEANBROKEN = "1"
 
 EXTRA_OECONF = "--with-perl='${USRBINPATH}/env perl' --with-patch=patch"
-EXTRA_OECONF_append_class-native = " --disable-nls"
+EXTRA_OECONF:append:class-native = " --disable-nls"
 EXTRA_AUTORECONF += "--exclude=aclocal"
 
 CACHED_CONFIGUREVARS += "ac_cv_path_BASH=/bin/bash ac_cv_path_COLUMN=column"
 
 # Make sure we don't have "-w" in shebang lines: it breaks using
 # "/usr/bin/env perl" as parser
-do_configure_prepend () {
+do_configure:prepend () {
 	find ${S} -name "*.in" -exec sed -i -e "1s,^#\!.*@PERL@ -w$,#\! @PERL@\nuse warnings;," {} \;
 }
 
 # Don't setup symlinks to host utilities, we don't need them
-do_configure_append () {
+do_configure:append () {
 	sed -e 's,^COMPAT_SYMLINKS.*:=.*,COMPAT_SYMLINKS	:=,' -i ${S}/Makefile
 }
 
-do_configure_class-native () {
+do_configure:class-native () {
     oe_runconf
 }
 
@@ -54,7 +54,7 @@ do_install () {
 	rm -rf ${D}/${datadir}/emacs
 }
 
-do_install_append_class-native () {
+do_install:append:class-native () {
     # Dummy quiltrc file for patch.bbclass
     install -d ${D}${sysconfdir}/
     touch ${D}${sysconfdir}/quiltrc
@@ -75,16 +75,16 @@ do_install_ptest() {
 
 PACKAGES += "guards guards-doc"
 
-FILES_${PN} = "${sysconfdir} ${datadir}/quilt \
+FILES:${PN} = "${sysconfdir} ${datadir}/quilt \
                ${bindir}/quilt ${libdir}/quilt"
-FILES_guards = "${bindir}/guards"
-FILES_${PN}-doc = "${mandir}/man1/quilt.1 ${docdir}/${BPN}"
-FILES_guards-doc = "${mandir}/man1/guards.1"
+FILES:guards = "${bindir}/guards"
+FILES:${PN}-doc = "${mandir}/man1/quilt.1 ${docdir}/${BPN}"
+FILES:guards-doc = "${mandir}/man1/guards.1"
 
-RDEPENDS_${PN} = "bash patch diffstat bzip2 util-linux less"
-RDEPENDS_${PN}_class-native = "diffstat-native patch-native bzip2-native"
+RDEPENDS:${PN} = "bash patch diffstat bzip2 util-linux less"
+RDEPENDS:${PN}:class-native = "diffstat-native patch-native bzip2-native"
 
-RDEPENDS_${PN}-ptest = "make file sed gawk diffutils findutils ed perl \
+RDEPENDS:${PN}-ptest = "make file sed gawk diffutils findutils ed perl \
                         perl-module-filehandle perl-module-getopt-std \
                         perl-module-posix perl-module-file-temp \
                         perl-module-text-parsewords perl-module-overloading \

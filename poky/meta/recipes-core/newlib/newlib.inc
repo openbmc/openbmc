@@ -25,7 +25,7 @@ S = "${WORKDIR}/newlib-${PV}"
 B = "${WORKDIR}/build"
 
 ## disable stdlib
-TARGET_CC_ARCH_append = " -nostdlib"
+TARGET_CC_ARCH:append = " -nostdlib"
 
 EXTRA_OECONF = " \
                 --build=${BUILD_SYS}  \
@@ -50,5 +50,5 @@ do_install() {
 	oe_runmake install DESTDIR='${D}'
 }
 
-COMPATIBLE_HOST_libc-musl_class-target = "null"
-COMPATIBLE_HOST_libc-glibc_class-target = "null"
+COMPATIBLE_HOST:libc-musl:class-target = "null"
+COMPATIBLE_HOST:libc-glibc:class-target = "null"

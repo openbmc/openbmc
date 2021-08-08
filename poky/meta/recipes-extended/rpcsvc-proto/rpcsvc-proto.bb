@@ -27,13 +27,13 @@ S = "${WORKDIR}/git"
 
 inherit autotools gettext
 
-EXTRA_OEMAKE_class-native = " -C rpcgen"
+EXTRA_OEMAKE:class-native = " -C rpcgen"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	touch ${S}/ABOUT-NLS
 }
 
-do_install_append() {
+do_install:append() {
 	# They come from quota recipe
 	rm -rf ${D}${includedir}/rpcsvc/rquota.[hx]
 }

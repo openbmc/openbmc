@@ -32,11 +32,11 @@ S = "${WORKDIR}/dhcp-4.4.2-P1"
 
 inherit autotools-brokensep systemd
 
-SYSTEMD_SERVICE_${PN} = "dhcrelay.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "disable"
+SYSTEMD_SERVICE:${PN} = "dhcrelay.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
 CFLAGS += "-D_GNU_SOURCE -fcommon"
-LDFLAGS_append = " -pthread"
+LDFLAGS:append = " -pthread"
 
 EXTRA_OECONF = "--enable-paranoia \
                 --disable-static \
@@ -46,13 +46,13 @@ EXTRA_OECONF = "--enable-paranoia \
 EXTRA_OEMAKE += "LIBTOOL='${S}/${HOST_SYS}-libtool'"
 
 # Enable shared libs per dhcp README
-do_configure_prepend () {
+do_configure:prepend () {
     cp configure.ac+lt configure.ac
     rm ${S}/bind/bind.tar.gz
     mv ${WORKDIR}/bind.tar.gz ${S}/bind/
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
     rm -rf ${S}/bind/bind-9.11.32/
     tar xf ${S}/bind/bind.tar.gz -C ${S}/bind
     install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}/bind/bind-9.11.32/
@@ -62,7 +62,7 @@ do_compile_prepend() {
     install -m 0755 ${S}/${HOST_SYS}-libtool ${S}/bind/bind-9.11.32/
 }
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${sysconfdir}/default
     install -m 0644 ${WORKDIR}/default-relay ${D}${sysconfdir}/default/dhcp-relay
 

@@ -15,7 +15,7 @@ SRC_URI = "http://ftp.mozilla.org/pub/nspr/releases/v${PV}/src/nspr-${PV}.tar.gz
            file://nspr.pc.in \
 "
 
-CACHED_CONFIGUREVARS_append_libc-musl = " CFLAGS='${CFLAGS} -D_PR_POLL_AVAILABLE \
+CACHED_CONFIGUREVARS:append:libc-musl = " CFLAGS='${CFLAGS} -D_PR_POLL_AVAILABLE \
                                           -D_PR_HAVE_OFF64_T -D_PR_INET6 -D_PR_HAVE_INET_NTOP \
                                           -D_PR_HAVE_GETHOSTBYNAME2 -D_PR_HAVE_GETADDRINFO \
                                           -D_PR_INET6_PROBE -DNO_DLOPEN_NULL'"
@@ -30,7 +30,7 @@ CVE_PRODUCT = "netscape_portable_runtime"
 
 S = "${WORKDIR}/nspr-${PV}/nspr"
 
-RDEPENDS_${PN}-dev += "perl"
+RDEPENDS:${PN}-dev += "perl"
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 TESTS = " \
@@ -160,15 +160,15 @@ PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 # preferred path upstream.
 EXTRA_OECONF += "--includedir=${includedir}/nspr"
 
-do_compile_prepend() {
+do_compile:prepend() {
 	oe_runmake CROSS_COMPILE=1 CFLAGS="-DXP_UNIX ${BUILD_CFLAGS}" LDFLAGS="" CC="${BUILD_CC}" -C config export
 }
 
-do_compile_append() {
+do_compile:append() {
 	oe_runmake -C pr/tests
 }
 
-do_install_append() {
+do_install:append() {
     install -D ${WORKDIR}/nspr.pc.in ${D}${libdir}/pkgconfig/nspr.pc
     sed -i  \
     -e 's:NSPRVERSION:${PV}:g' \
@@ -190,8 +190,8 @@ do_install_append() {
     rm ${D}${bindir}/compile-et.pl ${D}${bindir}/prerr.properties
 }
 
-FILES_${PN} = "${libdir}/lib*.so"
-FILES_${PN}-dev = "${bindir}/* ${libdir}/nspr/tests/* ${libdir}/pkgconfig \
+FILES:${PN} = "${libdir}/lib*.so"
+FILES:${PN}-dev = "${bindir}/* ${libdir}/nspr/tests/* ${libdir}/pkgconfig \
                 ${includedir}/* ${datadir}/aclocal/* "
 
 BBCLASSEXTEND = "native nativesdk"

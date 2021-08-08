@@ -38,11 +38,11 @@ inherit autotools pkgconfig binconfig-disabled ptest
 
 inherit ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python3native', '', d)}
 
-RDEPENDS_${PN}-ptest += "bash make ${@bb.utils.contains('PACKAGECONFIG', 'python', 'libgcc python3-core python3-logging python3-shell  python3-stringold python3-threading python3-unittest ${PN}-python', '', d)}"
+RDEPENDS:${PN}-ptest += "bash make ${@bb.utils.contains('PACKAGECONFIG', 'python', 'libgcc python3-core python3-logging python3-shell  python3-stringold python3-threading python3-unittest ${PN}-python', '', d)}"
 
-RDEPENDS_${PN}-python += "${@bb.utils.contains('PACKAGECONFIG', 'python', 'python3-core', '', d)}"
+RDEPENDS:${PN}-python += "${@bb.utils.contains('PACKAGECONFIG', 'python', 'python3-core', '', d)}"
 
-RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-gconv-ebcdic-us \
+RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-gconv-ebcdic-us \
                                            glibc-gconv-ibm1141 \
                                            glibc-gconv-iso8859-5 \
                                            glibc-gconv-euc-jp \
@@ -53,25 +53,25 @@ export PYTHON_SITE_PACKAGES="${PYTHON_SITEPACKAGES_DIR}"
 
 # WARNING: zlib is required for RPM use
 EXTRA_OECONF = "--without-debug --without-legacy --with-catalog --without-docbook --with-c14n --without-lzma --with-fexceptions"
-EXTRA_OECONF_class-native = "--without-legacy --without-docbook --with-c14n --without-lzma --with-zlib"
-EXTRA_OECONF_class-nativesdk = "--without-legacy --without-docbook --with-c14n --without-lzma --with-zlib"
-EXTRA_OECONF_linuxstdbase = "--with-debug --with-legacy --with-docbook --with-c14n --without-lzma --with-zlib"
+EXTRA_OECONF:class-native = "--without-legacy --without-docbook --with-c14n --without-lzma --with-zlib"
+EXTRA_OECONF:class-nativesdk = "--without-legacy --without-docbook --with-c14n --without-lzma --with-zlib"
+EXTRA_OECONF:linuxstdbase = "--with-debug --with-legacy --with-docbook --with-c14n --without-lzma --with-zlib"
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     # autonamer would call this libxml2-2, but we don't want that
     if d.getVar('DEBIAN_NAMES'):
-        d.setVar('PKG_libxml2', '${MLPREFIX}libxml2')
+        d.setVar('PKG:libxml2', '${MLPREFIX}libxml2')
 }
 
 PACKAGE_BEFORE_PN += "${PN}-utils"
 PACKAGES += "${PN}-python"
 
-FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
-FILES_${PN}-dev += "${libdir}/xml2Conf.sh"
-FILES_${PN}-utils = "${bindir}/*"
-FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
+FILES:${PN}-dev += "${libdir}/xml2Conf.sh"
+FILES:${PN}-utils = "${bindir}/*"
+FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	# executables take longer to package: these should not be executable
 	find ${S}/xmlconf/ -type f -exec chmod -x {} \+
 }
@@ -101,7 +101,7 @@ do_install_ptest () {
 	    {} +
 }
 
-do_install_append_class-native () {
+do_install:append:class-native () {
 	# Docs are not needed in the native case
 	rm ${D}${datadir}/gtk-doc -rf
 }

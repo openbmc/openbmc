@@ -6,7 +6,7 @@ EXTRA_OECONF += "--without-python --without-python3"
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_install_append() {
+do_install:append() {
 	# Moving libcap-ng to base_libdir
 	if [ ! ${D}${libdir} -ef ${D}${base_libdir} ]; then
 		mkdir -p ${D}/${base_libdir}/

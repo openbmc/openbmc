@@ -13,12 +13,12 @@ export CCSHARED  = "-fPIC -DPIC"
 # the python executable
 export LINKFORSHARED = "${SECURITY_CFLAGS} -Xlinker -export-dynamic"
 
-FILES_${PN} += "${libdir}/* ${libdir}/${PYTHON_DIR}/*"
+FILES:${PN} += "${libdir}/* ${libdir}/${PYTHON_DIR}/*"
 
-FILES_${PN}-staticdev += "\
+FILES:${PN}-staticdev += "\
   ${PYTHON_SITEPACKAGES_DIR}/*.a \
 "
-FILES_${PN}-dev += "\
+FILES:${PN}-dev += "\
   ${datadir}/pkgconfig \
   ${libdir}/pkgconfig \
   ${PYTHON_SITEPACKAGES_DIR}/*.la \

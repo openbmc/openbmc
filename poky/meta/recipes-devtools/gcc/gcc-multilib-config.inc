@@ -170,7 +170,7 @@ python gcc_multilib_setup() {
     header_config_files = gcc_header_config_files[target_arch]
 
     ml_list = ['DEFAULTTUNE_MULTILIB_ORIGINAL' if mlprefix else 'DEFAULTTUNE']
-    mltunes = [('DEFAULTTUNE_virtclass-multilib-%s' % ml) for ml in multilibs]
+    mltunes = [('DEFAULTTUNE:virtclass-multilib-%s' % ml) for ml in multilibs]
     if mlprefix:
         mlindex = 0
         for ml in multilibs:

@@ -12,5 +12,5 @@ do_install () {
     install ${WORKDIR}/ima_policy_appraise_all ${D}/${sysconfdir}/ima/ima-policy
 }
 
-FILES_${PN} = "${sysconfdir}/ima"
-RDEPENDS_${PN} = "ima-evm-utils"
+FILES:${PN} = "${sysconfdir}/ima"
+RDEPENDS:${PN} = "ima-evm-utils"

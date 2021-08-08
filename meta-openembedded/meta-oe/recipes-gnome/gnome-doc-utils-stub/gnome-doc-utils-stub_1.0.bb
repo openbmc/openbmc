@@ -9,10 +9,10 @@ SRC_URI = "file://gnome-doc-utils.m4"
 
 PROVIDES = "gnome-doc-utils"
 
-do_install_append() {
+do_install:append() {
         install -d ${D}${datadir}/aclocal/
         install ${WORKDIR}/gnome-doc-utils.m4 ${D}${datadir}/aclocal/
 }
 
-FILES_${PN} += "${datadir}"
+FILES:${PN} += "${datadir}"
 

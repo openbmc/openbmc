@@ -21,13 +21,13 @@ EXTRA_AUTORECONF += "--exclude=autoheader"
 
 LEAD_SONAME = "libreadline.so"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	if [ ! -e ${S}/acinclude.m4 ]; then
 		cat ${S}/aclocal.m4 > ${S}/acinclude.m4
 	fi
 }
 
-do_install_append () {
+do_install:append () {
 	# Make install doesn't properly install these
 	oe_libinstall -so -C shlib libhistory ${D}${libdir}
 	oe_libinstall -so -C shlib libreadline ${D}${libdir}
@@ -42,15 +42,15 @@ do_install_append () {
 
 BBCLASSEXTEND = "native nativesdk"
 
-CONFFILES_${PN} += "${sysconfdir}/inputrc"
+CONFFILES:${PN} += "${sysconfdir}/inputrc"
 
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN}-doc = "history.3"
+ALTERNATIVE:${PN}-doc = "history.3"
 ALTERNATIVE_LINK_NAME[history.3] = "${mandir}/man3/history.3"
 
 # OpenSuse injects versions into libreadline leading to conficits between our native one and theirs
 # see their spec file for where this is injected. Extra versioning is harmless so we just do the same.
-SRC_URI_append_class-native = " file://rl-native.map"
-LDFLAGS_append_class-native = " -Wl,--version-script=${WORKDIR}/rl-native.map"
+SRC_URI:append:class-native = " file://rl-native.map"
+LDFLAGS:append:class-native = " -Wl,--version-script=${WORKDIR}/rl-native.map"

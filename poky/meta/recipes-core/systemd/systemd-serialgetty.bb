@@ -46,7 +46,7 @@ do_install() {
 }
 
 # This is a machine specific file
-FILES_${PN} = "${systemd_unitdir}/system/*.service ${sysconfdir}"
+FILES:${PN} = "${systemd_unitdir}/system/*.service ${sysconfdir}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"

@@ -11,13 +11,14 @@ from . import chunkify, DEFAULT_MAX_CHUNK
 
 
 class AsyncClient(object):
-    def __init__(self, proto_name, proto_version, logger):
+    def __init__(self, proto_name, proto_version, logger, timeout=30):
         self.reader = None
         self.writer = None
         self.max_chunk = DEFAULT_MAX_CHUNK
         self.proto_name = proto_name
         self.proto_version = proto_version
         self.logger = logger
+        self.timeout = timeout
 
     async def connect_tcp(self, address, port):
         async def connect_sock():
@@ -70,14 +71,18 @@ class AsyncClient(object):
 
     async def send_message(self, msg):
         async def get_line():
-            line = await self.reader.readline()
+            try:
+                line = await asyncio.wait_for(self.reader.readline(), self.timeout)
+            except asyncio.TimeoutError:
+                raise ConnectionError("Timed out waiting for server")
+
             if not line:
                 raise ConnectionError("Connection closed")
 
             line = line.decode("utf-8")
 
             if not line.endswith("\n"):
-                raise ConnectionError("Bad message %r" % msg)
+                raise ConnectionError("Bad message %r" % (line))
 
             return line
 

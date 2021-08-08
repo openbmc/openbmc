@@ -8,7 +8,7 @@ PYPI_PACKAGE = "ipython"
 
 SRC_URI[sha256sum] = "54bbd1fe3882457aaf28ae060a5ccdef97f212a741754e420028d4ec5c2291dc"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-setuptools \
     ${PYTHON_PN}-jedi \
     ${PYTHON_PN}-decorator \

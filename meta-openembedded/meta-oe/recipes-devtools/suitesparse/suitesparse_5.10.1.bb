@@ -12,20 +12,20 @@ S = "${WORKDIR}/git"
 DEPENDS = "cmake-native lapack gmp mpfr chrpath-native"
 
 PROVIDES = "mongoose graphblas"
-RPROVIDES_${PN} = "mongoose graphblas"
+RPROVIDES:${PN} = "mongoose graphblas"
 
 # The values of $CC, $CXX, and $LD that Bitbake uses have spaces in them which
 # causes problems when the SuiteSparse Makefiles try to pass these values on
 # the command line. To get around this problem, set these variables to only the
 # program name and prepend the rest of the value onto the corresponding FLAGS
 # variable.
-CFLAGS_prepend := "${@" ".join(d.getVar('CC', True).split()[1:])} "
+CFLAGS:prepend := "${@" ".join(d.getVar('CC', True).split()[1:])} "
 export CC := "${@d.getVar('CC', True).split()[0]}"
 
-CXXFLAGS_prepend := "${@" ".join(d.getVar('CXX', True).split()[1:])} "
+CXXFLAGS:prepend := "${@" ".join(d.getVar('CXX', True).split()[1:])} "
 export CXX := "${@d.getVar('CXX', True).split()[0]}"
 
-LDFLAGS_prepend := "${@" ".join(d.getVar('LD', True).split()[1:])} "
+LDFLAGS:prepend := "${@" ".join(d.getVar('LD', True).split()[1:])} "
 export LD := "${@d.getVar('LD', True).split()[0]}"
 
 export CMAKE_OPTIONS = " \
@@ -48,7 +48,7 @@ do_install () {
         done
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/libmongoose.so.* \
     ${libdir}/libgraphblas.so.* \
     ${libdir}/libmetis.so.* \
@@ -69,7 +69,7 @@ FILES_${PN} += " \
     ${bindir}/mongoose \
 "
 
-FILES_${PN}-staticdev += "${libdir}/libmongoose.a"
-FILES_${PN}-dev += "${includedir} ${libdir}/*.so"
+FILES:${PN}-staticdev += "${libdir}/libmongoose.a"
+FILES:${PN}-dev += "${includedir} ${libdir}/*.so"
 
 EXCLUDE_FROM_WORLD = "1"

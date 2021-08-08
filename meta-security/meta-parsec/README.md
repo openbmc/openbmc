@@ -53,7 +53,7 @@ other layers needed. e.g.:
 To include the Parsec service into your image add following into the
 local.conf:
 
-    IMAGE_INSTALL_append = " parsec-service"
+    IMAGE_INSTALL:append = " parsec-service"
 
   The Parsec service will be deployed into the image built with all the supported
 providers and with the default config file from the Parsec repository:
@@ -86,7 +86,7 @@ Manual testing with runqemu
   This layer also contains a recipe for pasec-tool which can be used for
 manual testing of the Parsec service:
 
-    IMAGE_INSTALL_append += " parsec-tools"
+    IMAGE_INSTALL:append += " parsec-tools"
 
   There are a series of Parsec Demo videos showing how to use parsec-tool
 to test the Parsec service base functionality:
@@ -103,7 +103,7 @@ enabled. No changes required for manual testing.
   The Software HSM can be used for manual testing of the provider by
 including it into your test image:
 
-    IMAGE_INSTALL_append += " softhsm"
+    IMAGE_INSTALL:append += " softhsm"
 
 Inside the running VM:
 - Stop Parsec
@@ -134,7 +134,7 @@ systemctl start parsec
   The IBM Software TPM service can be used for manual testing of the provider by
 including it into your test image:
 
-    IMAGE_INSTALL_append += " ibmswtpm2 tpm2-tools libtss2 libtss2-tcti-mssim"
+    IMAGE_INSTALL:append += " ibmswtpm2 tpm2-tools libtss2 libtss2-tcti-mssim"
 
 Inside the running VM:
 - Stop Parsec

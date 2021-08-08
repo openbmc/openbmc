@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/hboetes/mg \
            file://0001-fileio-Include-sys-param.h-for-MAXNAMLEN.patch \
            file://0002-fileio-Define-DEFFILEMODE-if-platform-is-missing.patch \
            "
-SRC_URI_append_libc-musl = "\
+SRC_URI:append:libc-musl = "\
            file://0001-Undefine-REGEX-for-musl-based-systems.patch \
            "
 

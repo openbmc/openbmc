@@ -7,7 +7,7 @@ HOMEPAGE = "http://pkgconf.org"
 BUGTRACKER = "https://github.com/pkgconf/pkgconf/issues"
 SECTION = "devel"
 PROVIDES += "pkgconfig"
-RPROVIDES_${PN} += "pkgconfig"
+RPROVIDES:${PN} += "pkgconfig"
 
 # The pkgconf license seems to be functionally equivalent to BSD-2-Clause or
 # ISC, but has different wording, so needs its own name.
@@ -26,13 +26,13 @@ inherit autotools
 
 EXTRA_OECONF += "--with-pkg-config-dir='${libdir}/pkgconfig:${datadir}/pkgconfig'"
 
-do_install_append () {
+do_install:append () {
     # Install a wrapper which deals, as much as possible with pkgconf vs
     # pkg-config compatibility issues.
     install -m 0755 "${WORKDIR}/pkg-config-wrapper" "${D}${bindir}/pkg-config"
 }
 
-do_install_append_class-native () {
+do_install:append:class-native () {
     # Install a pkg-config-native wrapper that will use the native sysroot instead
     # of the MACHINE sysroot, for using pkg-config when building native tools.
     sed -e "s|@PATH_NATIVE@|${PKG_CONFIG_PATH}|" \
@@ -47,11 +47,11 @@ do_install_append_class-native () {
 # When using the RPM generated automatic package dependencies, some packages
 # will end up requiring 'pkgconfig(pkg-config)'.  Allow this behavior by
 # specifying an appropriate provide.
-RPROVIDES_${PN} += "pkgconfig(pkg-config)"
+RPROVIDES:${PN} += "pkgconfig(pkg-config)"
 
 # Include pkg.m4 in the main package, leaving libpkgconf dev files in -dev
-FILES_${PN}-dev_remove = "${datadir}/aclocal"
-FILES_${PN} += "${datadir}/aclocal"
+FILES:${PN}-dev:remove = "${datadir}/aclocal"
+FILES:${PN} += "${datadir}/aclocal"
 
 BBCLASSEXTEND += "native nativesdk"
 
@@ -64,4 +64,4 @@ pkgconf_sstate_fixup_esdk () {
    fi
 }
 
-SSTATEPOSTUNPACKFUNCS_append_class-native = " pkgconf_sstate_fixup_esdk"
+SSTATEPOSTUNPACKFUNCS:append:class-native = " pkgconf_sstate_fixup_esdk"

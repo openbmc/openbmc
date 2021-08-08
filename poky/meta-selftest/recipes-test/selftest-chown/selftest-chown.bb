@@ -10,7 +10,7 @@ S = "${WORKDIR}"
 inherit useradd allarch
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "-u 1234 -M test"
+USERADD_PARAM:${PN} = "-u 1234 -M test"
 TESTDIR = "${D}${sysconfdir}/selftest-chown"
 
 do_install() {
@@ -27,4 +27,4 @@ do_install() {
 	chown -R test:test ${TESTDIR}/fifotest
 }
 
-FILES_${PN} = "${sysconfdir}/selftest-chown/*"
+FILES:${PN} = "${sysconfdir}/selftest-chown/*"

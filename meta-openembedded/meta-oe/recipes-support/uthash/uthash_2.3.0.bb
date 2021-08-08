@@ -40,7 +40,7 @@ do_install_ptest() {
 
 # The main package is empty and non-existent, so -dev
 # should not depend on it...
-RDEPENDS_${PN}-dev = ""
-RDEPENDS_${PN}-ptest_remove = "${PN}"
+RDEPENDS:${PN}-dev = ""
+RDEPENDS:${PN}-ptest:remove = "${PN}"
 
 BBCLASSEXTEND = "native"

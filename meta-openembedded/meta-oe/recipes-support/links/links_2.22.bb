@@ -1,7 +1,7 @@
 require links.inc
 
 DEPENDS += "gpm"
-RCONFLICTS_${PN} = "links-x11"
+RCONFLICTS:${PN} = "links-x11"
 
 EXTRA_OECONF = "--enable-graphics \
                 --with-ssl=${STAGING_LIBDIR}/.. --with-libjpeg \

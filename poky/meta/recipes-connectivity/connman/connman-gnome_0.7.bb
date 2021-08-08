@@ -23,8 +23,8 @@ S = "${WORKDIR}/git"
 inherit autotools-brokensep gtk-icon-cache pkgconfig features_check
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
-RDEPENDS_${PN} = "connman"
+RDEPENDS:${PN} = "connman"
 
-do_install_append() {
+do_install:append() {
     install -m 0644 ${WORKDIR}/images/* ${D}/usr/share/icons/hicolor/22x22/apps/
 }

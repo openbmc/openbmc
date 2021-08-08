@@ -14,7 +14,7 @@ SRC_URI = "git://github.com/systemd/systemd-bootchart.git;protocol=https \
            file://no_lto.patch \
 "
 
-SRC_URI_append_libc-musl = " \
+SRC_URI:append:libc-musl = " \
     file://0001-comparison_fn_t-is-glibc-specific-use-raw-signature-.patch \
     file://0002-musl-does-not-provide-printf-h.patch \
     file://0003-musl-does-not-provide-canonicalize_file_name.patch \
@@ -31,14 +31,14 @@ inherit pkgconfig autotools systemd features_check
 
 REQUIRED_DISTRO_FEATURES = "systemd"
 
-SYSTEMD_SERVICE_${PN} = "systemd-bootchart.service"
+SYSTEMD_SERVICE:${PN} = "systemd-bootchart.service"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # intltool.m4 is a soft link to /usr/share/aclocal/m4, delete it and use the one in our sysroot
     rm -f ${S}/m4/intltool.m4
 }
 
-FILES_${PN} += "${systemd_unitdir}/systemd-bootchart"
+FILES:${PN} += "${systemd_unitdir}/systemd-bootchart"
 
 EXTRA_OECONF = " --with-rootprefix=${root_prefix} \
                  --with-rootlibdir=${base_libdir}"

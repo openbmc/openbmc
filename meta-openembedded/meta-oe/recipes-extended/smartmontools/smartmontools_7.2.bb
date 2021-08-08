@@ -28,10 +28,10 @@ SRC_URI[sha256sum] = "5cd98a27e6393168bc6aaea070d9e1cd551b0f898c52f66b2ff2e5d274
 
 inherit autotools update-rc.d systemd
 
-SYSTEMD_SERVICE_${PN} = "smartd.service"
+SYSTEMD_SERVICE:${PN} = "smartd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-do_install_append () {
+do_install:append () {
     #install the init.d/smartd
     install -d ${D}${sysconfdir}/init.d
     install -p -m 0755 ${WORKDIR}/initd.smartd ${D}${sysconfdir}/init.d/smartd
@@ -50,4 +50,4 @@ do_install_append () {
 INITSCRIPT_NAME = "smartd"
 INITSCRIPT_PARAMS = "start 60 2 3 4 5 . stop 60 0 1 6 ."
 
-RDEPENDS_${PN} += "mailx"
+RDEPENDS:${PN} += "mailx"

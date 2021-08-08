@@ -21,7 +21,7 @@ EXTRA_OECONF = "\
 
 # speexdsp was split off from speex in 1.2rc2. Older versions of speex can't
 # be installed together with speexdsp, since they contain overlapping files.
-RCONFLICTS_${PN} = "speex (< 1.2rc2)"
-RCONFLICTS_${PN}-dbg = "speex-dbg (< 1.2rc2)"
-RCONFLICTS_${PN}-dev = "speex-dev (< 1.2rc2)"
-RCONFLICTS_${PN}-staticdev = "speex-staticdev (< 1.2rc2)"
+RCONFLICTS:${PN} = "speex (< 1.2rc2)"
+RCONFLICTS:${PN}-dbg = "speex-dbg (< 1.2rc2)"
+RCONFLICTS:${PN}-dev = "speex-dev (< 1.2rc2)"
+RCONFLICTS:${PN}-staticdev = "speex-staticdev (< 1.2rc2)"

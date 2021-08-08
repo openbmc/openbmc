@@ -55,17 +55,17 @@ do_install () {
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN} = "telnet"
+ALTERNATIVE:${PN} = "telnet"
 ALTERNATIVE_LINK_NAME[telnet] = "${bindir}/telnet"
 ALTERNATIVE_TARGET[telnet] = "${bindir}/telnet.${PN}"
 
-ALTERNATIVE_${PN}-doc = "telnetd.8"
+ALTERNATIVE:${PN}-doc = "telnetd.8"
 ALTERNATIVE_LINK_NAME[telnetd.8] = "${mandir}/man8/telnetd.8"
 
 SRC_URI[md5sum] = "d6beabaaf53fe6e382c42ce3faa05a36"
 SRC_URI[sha256sum] = "9c80d5c7838361a328fb6b60016d503def9ce53ad3c589f3b08ff71a2bb88e00"
-FILES_${PN} += "${sbindir}/in.* ${libdir}/* ${sysconfdir}/xinetd.d/*"
+FILES:${PN} += "${sbindir}/in.* ${libdir}/* ${sysconfdir}/xinetd.d/*"
 
 # http://errors.yoctoproject.org/Errors/Details/186954/
-COMPATIBLE_HOST_libc-musl = 'null'
-RCONFLICTS_${PN} = "inetutils-telnetd"
+COMPATIBLE_HOST:libc-musl = 'null'
+RCONFLICTS:${PN} = "inetutils-telnetd"

@@ -2,7 +2,7 @@ DESCRIPTION = "Audio processing bits of the WebRTC reference implementation"
 HOMEPAGE = "https://www.freedesktop.org/software/pulseaudio/webrtc-audio-processing/"
 SECTION = "audio"
 
-DEPENDS_append_libc-musl = " libexecinfo"
+DEPENDS:append:libc-musl = " libexecinfo"
 
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=da08a38a32a340c5d91e13ee86a118f2 \
@@ -19,5 +19,5 @@ SRC_URI = "http://freedesktop.org/software/pulseaudio/webrtc-audio-processing/${
 SRC_URI[md5sum] = "6e10724ca34bcbc715a4c208273acb0c"
 SRC_URI[sha256sum] = "a0fdd938fd85272d67e81572c5a4d9e200a0c104753cb3c209ded175ce3c5dbf"
 
-LDFLAGS_append_libc-musl = " -lexecinfo"
+LDFLAGS:append:libc-musl = " -lexecinfo"
 inherit autotools pkgconfig

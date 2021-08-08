@@ -29,4 +29,4 @@ EXTRA_OECONF = "--disable-gui \
 
 PACKAGECONFIG[mi] = "--enable-mi,--disable-mi,json-c"
 
-FILES_${PN} += "${datadir}/emacs/site-lisp"
+FILES:${PN} += "${datadir}/emacs/site-lisp"

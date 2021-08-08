@@ -13,8 +13,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  lib/log.c          |  6 +++++-
  3 files changed, 24 insertions(+), 7 deletions(-)
 
-diff --git a/daemon/automount.c b/daemon/automount.c
-index e476f6b..3a1514b 100644
 --- a/daemon/automount.c
 +++ b/daemon/automount.c
 @@ -1,7 +1,7 @@
@@ -50,7 +48,7 @@ index e476f6b..3a1514b 100644
  #include "automount.h"
  #if defined(LIBXML2_WORKAROUND) || defined(TIRPC_WORKAROUND)
  #include <dlfcn.h>
-@@ -282,7 +290,7 @@ int rmdir_path(struct autofs_point *ap, const char *path, dev_t dev)
+@@ -282,7 +290,7 @@ int rmdir_path(struct autofs_point *ap,
  			     dev, buf, st.st_dev);
  			return -1;
  		}
@@ -59,7 +57,7 @@ index e476f6b..3a1514b 100644
  		/*
  		 * Last element of path may be a symbolic link; all others
  		 * are directories (and the last directory element is
-@@ -455,7 +463,7 @@ int count_mounts(struct autofs_point *ap, const char *path, dev_t dev)
+@@ -455,7 +463,7 @@ int count_mounts(struct autofs_point *ap
  
  	counter.count = 0;
  	counter.dev = dev;
@@ -68,7 +66,7 @@ index e476f6b..3a1514b 100644
  	if (walk_tree(path, counter_fn, 1, ap, &counter) == -1)
  		return -1;
  
-@@ -811,7 +819,7 @@ static char *automount_path_to_fifo(unsigned logopt, const char *path)
+@@ -811,7 +819,7 @@ static char *automount_path_to_fifo(unsi
  	/*
  	 *  An automount path can be made up of subdirectories.  So, to
  	 *  create the fifo name, we will just replace instances of '/' with
@@ -77,7 +75,7 @@ index e476f6b..3a1514b 100644
  	 */
  	p = fifo_name + strlen(fifodir);
  	while (*p != '\0') {
-@@ -1640,7 +1648,7 @@ static void return_start_status(void *arg)
+@@ -1640,7 +1648,7 @@ static void return_start_status(void *ar
  	sc->done = 1;
  
  	/*
@@ -86,8 +84,6 @@ index e476f6b..3a1514b 100644
  	 * the startup process.
  	 */
  	status = pthread_cond_signal(&sc->cond);
-diff --git a/include/hash.h b/include/hash.h
-index 2447f29..6f0dee6 100644
 --- a/include/hash.h
 +++ b/include/hash.h
 @@ -5,6 +5,11 @@
@@ -102,11 +98,9 @@ index 2447f29..6f0dee6 100644
  
  /*
   * The "GOLDEN_RATIO_PRIME" is used in ifs/btrfs/brtfs_inode.h and
-diff --git a/lib/log.c b/lib/log.c
-index 0cb47d7..39b1e3b 100644
 --- a/lib/log.c
 +++ b/lib/log.c
-@@ -38,7 +38,11 @@ static char *prepare_attempt_prefix(const char *msg)
+@@ -38,7 +38,11 @@ static char *prepare_attempt_prefix(cons
  	char buffer[ATTEMPT_ID_SIZE + 1];
  	char *prefixed_msg = NULL;
  
@@ -119,6 +113,3 @@ index 0cb47d7..39b1e3b 100644
  	if (attempt_id) {
  		int len = sizeof(buffer) + 1 + strlen(msg) + 1;
  
--- 
-2.32.0
-

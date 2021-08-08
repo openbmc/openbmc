@@ -29,4 +29,4 @@ inherit autotools
 
 S = "${WORKDIR}/git"
 
-CPPFLAGS_append = " -Wno-error"
+CPPFLAGS:append = " -Wno-error"

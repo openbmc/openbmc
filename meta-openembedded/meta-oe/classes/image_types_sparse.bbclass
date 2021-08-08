@@ -1,7 +1,7 @@
 inherit image_types
 
 CONVERSIONTYPES += "sparse"
-CONVERSION_CMD_sparse() {
+CONVERSION_CMD:sparse() {
     in="${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}"
     out="${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.sparse"
     case "${type}" in

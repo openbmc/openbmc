@@ -20,7 +20,7 @@ do_install_ptest() {
 	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
 }
 
-RDEPENDS_${PN}-ptest += "\
+RDEPENDS:${PN}-ptest += "\
     python3-colorama \
     python3-jsonschema \
     python3-pylint \
@@ -28,7 +28,7 @@ RDEPENDS_${PN}-ptest += "\
     python3-pytest-benchmark \
     python3-pytest-cache \
 "
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     python3-core \
     python3-urllib3 \
     python3-numbers \

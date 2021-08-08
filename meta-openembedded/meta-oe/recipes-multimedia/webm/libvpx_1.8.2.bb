@@ -23,9 +23,9 @@ CFLAGS += "-fPIC"
 export CC
 export LD = "${CC}"
 
-VPXTARGET_armv5te = "armv5te-linux-gcc"
-VPXTARGET_armv6 = "armv6-linux-gcc"
-VPXTARGET_armv7a = "armv7-linux-gcc"
+VPXTARGET:armv5te = "armv5te-linux-gcc"
+VPXTARGET:armv6 = "armv6-linux-gcc"
+VPXTARGET:armv7a = "armv7-linux-gcc"
 VPXTARGET ?= "generic-gnu"
 
 CONFIGUREOPTS = " \

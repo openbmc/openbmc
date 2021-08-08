@@ -17,13 +17,13 @@ inherit meson pkgconfig gettext python3native mime
 
 EXTRA_OEMESON = "-Dupdate-mimedb=true"
 
-FILES_${PN} += "${datadir}/mime"
-FILES_${PN}-dev += "${datadir}/pkgconfig/shared-mime-info.pc ${datadir}/gettext/its"
+FILES:${PN} += "${datadir}/mime"
+FILES:${PN}-dev += "${datadir}/pkgconfig/shared-mime-info.pc ${datadir}/gettext/its"
 
 # freedesktop.org.xml is only required when updating the mime database,
 # package it separately
 PACKAGES =+ "shared-mime-info-data"
-FILES_shared-mime-info-data = "${datadir}/mime/packages/freedesktop.org.xml"
-RDEPENDS_shared-mime-info-data = "shared-mime-info"
+FILES:shared-mime-info-data = "${datadir}/mime/packages/freedesktop.org.xml"
+RDEPENDS:shared-mime-info-data = "shared-mime-info"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 SECTION = "libs"
 
 DEPENDS = "glib-2.0 gdk-pixbuf-native shared-mime-info"
-DEPENDS_remove_class-native = "gdk-pixbuf-native"
+DEPENDS:remove:class-native = "gdk-pixbuf-native"
 
 MAJ_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 
@@ -37,34 +37,34 @@ GDK_PIXBUF_LOADERS ?= "png jpeg"
 
 PACKAGECONFIG = "${GDK_PIXBUF_LOADERS} \
                  ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)}"
-PACKAGECONFIG_class-native = "${GDK_PIXBUF_LOADERS}"
+PACKAGECONFIG:class-native = "${GDK_PIXBUF_LOADERS}"
 
 PACKAGECONFIG[png] = "-Dpng=true,-Dpng=false,libpng"
 PACKAGECONFIG[jpeg] = "-Djpeg=true,-Djpeg=false,jpeg"
 PACKAGECONFIG[tiff] = "-Dtiff=true,-Dtiff=false,tiff"
 PACKAGECONFIG[tests] = "-Dinstalled_tests=true,-Dinstalled_tests=false"
 
-EXTRA_OEMESON_class-target = " \
+EXTRA_OEMESON:class-target = " \
     -Duse_prebuilt_tools=true \
 "
 
-EXTRA_OEMESON_class-nativesdk = " \
+EXTRA_OEMESON:class-nativesdk = " \
     -Duse_prebuilt_tools=true \
 "
 
 PACKAGES =+ "${PN}-xlib"
 
 # For GIO image type sniffing
-RDEPENDS_${PN} = "shared-mime-info"
+RDEPENDS:${PN} = "shared-mime-info"
 
-FILES_${PN}-xlib = "${libdir}/*pixbuf_xlib*${SOLIBS}"
-ALLOW_EMPTY_${PN}-xlib = "1"
+FILES:${PN}-xlib = "${libdir}/*pixbuf_xlib*${SOLIBS}"
+ALLOW_EMPTY:${PN}-xlib = "1"
 
-FILES_${PN} += "${libdir}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders"
+FILES:${PN} += "${libdir}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders"
 
-FILES_${PN}-bin += "${datadir}/thumbnailers/gdk-pixbuf-thumbnailer.thumbnailer"
+FILES:${PN}-bin += "${datadir}/thumbnailers/gdk-pixbuf-thumbnailer.thumbnailer"
 
-FILES_${PN}-dev += " \
+FILES:${PN}-dev += " \
 	${bindir}/gdk-pixbuf-csource \
 	${bindir}/gdk-pixbuf-pixdata \
         ${bindir}/gdk-pixbuf-print-mime-types \
@@ -73,9 +73,9 @@ FILES_${PN}-dev += " \
 "
 
 PACKAGES_DYNAMIC += "^gdk-pixbuf-loader-.*"
-PACKAGES_DYNAMIC_class-native = ""
+PACKAGES_DYNAMIC:class-native = ""
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     postinst_pixbufloader = d.getVar("postinst_pixbufloader")
 
     loaders_root = d.expand('${libdir}/gdk-pixbuf-2.0/${LIBV}/loaders')
@@ -85,10 +85,10 @@ python populate_packages_prepend () {
 
     # The test suite exercises all the loaders, so ensure they are all
     # dependencies of the ptest package.
-    d.appendVar("RDEPENDS_%s-ptest" % d.getVar('PN'), " " + packages)
+    d.appendVar("RDEPENDS:%s-ptest" % d.getVar('PN'), " " + packages)
 }
 
-do_install_append() {
+do_install:append() {
 	# Copy gdk-pixbuf-query-loaders into libdir so it is always available
 	# in multilib builds.
 	cp ${D}/${bindir}/gdk-pixbuf-query-loaders ${D}/${libdir}/gdk-pixbuf-2.0/
@@ -100,7 +100,7 @@ do_install_ptest() {
 	rm ${D}/${datadir}/installed-tests/gdk-pixbuf/pixbuf-randomly-modified.test
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
 	find ${D}${libdir} -name "libpixbufloader-*.la" -exec rm \{\} \;
 
 	create_wrapper ${D}/${bindir}/gdk-pixbuf-csource \

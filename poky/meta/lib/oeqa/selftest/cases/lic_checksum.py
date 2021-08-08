@@ -21,7 +21,7 @@ class LicenseTests(OESelftestTestCase):
         os.close(lic_file)
         self.track_for_cleanup(lic_path)
 
-        self.write_config("INHERIT_remove = \"report-error\"")
+        self.write_config("INHERIT:remove = \"report-error\"")
 
         self.write_recipeinc('emptytest', """
 INHIBIT_DEFAULT_DEPS = "1"

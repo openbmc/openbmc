@@ -8,14 +8,14 @@ SRC_URI[sha256sum] = "7979803c74610e11ef0c0d68a2942b152df52da55336e0c9d58daf1831
 
 DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
     file://0001-setup.py-remove-the-dependency-on-m2r.patch \
 "
 
 PYPI_PACKAGE = "Automat"
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
    ${PYTHON_PN}-attrs \
    ${PYTHON_PN}-six \
 "

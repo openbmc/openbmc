@@ -229,7 +229,7 @@ USERADD_GID_TABLES += "files/static-group"
     def test_no_busybox_base_utils(self):
         config = """
 # Enable wayland
-DISTRO_FEATURES_append += "pam opengl wayland"
+DISTRO_FEATURES:append += "pam opengl wayland"
 
 # Switch to systemd
 DISTRO_FEATURES += "systemd"

@@ -122,7 +122,7 @@ CARGO_SRC_DIR = "rust"
 B = "${S}"
 
 PACKAGECONFIG ??= "jansson file pcre yaml python pcap cap-ng net nfnetlink nss nspr "
-PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'unittests', '', d)}"
+PACKAGECONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'unittests', '', d)}"
 
 PACKAGECONFIG[pcre] = "--with-libpcre-includes=${STAGING_INCDIR} --with-libpcre-libraries=${STAGING_LIBDIR}, ,libpcre ," 
 PACKAGECONFIG[yaml] = "--with-libyaml-includes=${STAGING_INCDIR} --with-libyaml-libraries=${STAGING_LIBDIR}, ,libyaml ,"
@@ -143,7 +143,7 @@ export logdir = "${localstatedir}/log"
 
 CACHED_CONFIGUREVARS = "ac_cv_func_malloc_0_nonnull=yes ac_cv_func_realloc_0_nonnull=yes"
 
-do_configure_prepend () {
+do_configure:prepend () {
     oe_runconf
 }
 
@@ -189,7 +189,7 @@ do_install () {
     sed -i -e "s:#!.*$:#!${USRBINPATH}/env ${PYTHON_PN}:g" ${D}${bindir}/suricatactl
 }
 
-pkg_postinst_ontarget_${PN} () {
+pkg_postinst_ontarget:${PN} () {
 if command -v systemd-tmpfiles >/dev/null; then
     systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/suricata.conf
 elif [ -e ${sysconfdir}/init.d/populate-volatile.sh ]; then
@@ -200,7 +200,7 @@ fi
 SYSTEMD_PACKAGES = "${PN}"
 
 PACKAGES =+ "${PN}-python"
-FILES_${PN} += "${systemd_unitdir} ${sysconfdir}/tmpfiles.d"
-FILES_${PN}-python = "${bindir}/suricatasc ${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN} += "${systemd_unitdir} ${sysconfdir}/tmpfiles.d"
+FILES:${PN}-python = "${bindir}/suricatasc ${PYTHON_SITEPACKAGES_DIR}"
 
-CONFFILES_${PN} = "${sysconfdir}/suricata/suricata.yaml"
+CONFFILES:${PN} = "${sysconfdir}/suricata/suricata.yaml"

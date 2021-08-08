@@ -34,7 +34,7 @@ do_install () {
     install -m 0644 debian/xl2tpd.default ${D}${sysconfdir}/default/xl2tpd
 }
 
-CONFFILES_${PN} += "${sysconfdir}/xl2tpd.conf ${sysconfdir}/default/xl2tpd"
+CONFFILES:${PN} += "${sysconfdir}/xl2tpd.conf ${sysconfdir}/default/xl2tpd"
 
 INITSCRIPT_PACKAGES = "${PN}"
-INITSCRIPT_NAME_${PN} = "xl2tpd"
+INITSCRIPT_NAME:${PN} = "xl2tpd"

@@ -10,14 +10,14 @@ SRC_URI = "http://levien.com/type/myfonts/Inconsolata.otf \
 
 S = "${WORKDIR}/ttf-inconsolata-${PV}"
 
-FILES_${PN} = "${datadir}/fonts/truetype/Inconsolata.ttf \
+FILES:${PN} = "${datadir}/fonts/truetype/Inconsolata.ttf \
     ${datadir}/doc/ttf-inconsolata/*"
 
 do_configure() {
     cp -fr ${WORKDIR}/Inconsolata.otf ${S}/Inconsolata.ttf
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${datadir}/doc/ttf-inconsolata/
     install -m 0644 ${WORKDIR}/OFL.txt ${D}${datadir}/doc/ttf-inconsolata/
 }

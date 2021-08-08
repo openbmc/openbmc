@@ -39,11 +39,11 @@ PACKAGECONFIG[gtk3] = "--with-gtk=gtk3, --without-gtk, gtk+3"
 PACKAGECONFIG[qt5] = "--with-qt5, --without-qt5, qtbase qtbase-native qtx11extras qtsvg, qtbase"
 PACKAGECONFIG[imagemagick] = "--with-imagemagick, --without-imagemagick, imagemagick"
 
-FILES_${PN} += "${bindir} \
+FILES:${PN} += "${bindir} \
     ${@bb.utils.contains('DEPENDS', 'python3-native', '${libdir}', '', d)} \
 "
 
-CPPFLAGS_append = "\
+CPPFLAGS:append = "\
     ${@bb.utils.contains('PACKAGECONFIG', 'qt5', '\
     -I${STAGING_INCDIR}/QtX11Extras \
     -I${STAGING_INCDIR}/dbus-1.0 \
@@ -51,8 +51,8 @@ CPPFLAGS_append = "\
     ', '', d)} \
 "
 
-TARGET_CXXFLAGS_append = " -fPIC"
+TARGET_CXXFLAGS:append = " -fPIC"
 
-do_configure_prepend() {
+do_configure:prepend() {
     install -m 755 ${STAGING_DATADIR_NATIVE}/gettext/ABOUT-NLS ${S}/
 }

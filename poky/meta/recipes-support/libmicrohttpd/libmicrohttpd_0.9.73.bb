@@ -17,14 +17,14 @@ CFLAGS += "-pthread -D_REENTRANT"
 EXTRA_OECONF += "--disable-static --with-gnutls=${STAGING_LIBDIR}/../"
 
 PACKAGECONFIG ?= "curl https"
-PACKAGECONFIG_append_class-target = "\
+PACKAGECONFIG:append:class-target = "\
         ${@bb.utils.filter('DISTRO_FEATURES', 'largefile', d)} \
 "
 PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile,,"
 PACKAGECONFIG[curl] = "--enable-curl,--disable-curl,curl,"
 PACKAGECONFIG[https] = "--enable-https,--disable-https,libgcrypt gnutls,"
 
-do_compile_append() {
+do_compile:append() {
     sed -i s:-L${STAGING_LIBDIR}::g libmicrohttpd.pc
 }
 

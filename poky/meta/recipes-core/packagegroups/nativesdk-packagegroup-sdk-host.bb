@@ -9,7 +9,7 @@ inherit packagegroup nativesdk
 
 PACKAGEGROUP_DISABLE_COMPLEMENTARY = "1"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     nativesdk-pkgconfig \
     nativesdk-qemu \
     nativesdk-qemu-helper \
@@ -29,7 +29,7 @@ RDEPENDS_${PN} = "\
     nativesdk-flex \
     "
 
-RDEPENDS_${PN}_darwin = "\
+RDEPENDS:${PN}:darwin = "\
     nativesdk-pkgconfig \
     nativesdk-opkg \
     nativesdk-libtool \

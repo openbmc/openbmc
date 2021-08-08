@@ -21,7 +21,7 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'i686', ' -march=i686', ''
 
 # Extra tune selections
 AVAILTUNES += "i686"
-TUNE_FEATURES_tune-i686 = "${TUNE_FEATURES_tune-x86} i686"
-BASE_LIB_tune-i686 = "lib"
-TUNE_PKGARCH_tune-i686 = "i686"
-PACKAGE_EXTRA_ARCHS_tune-i686 = "${PACKAGE_EXTRA_ARCHS_tune-i586} i686"
+TUNE_FEATURES:tune-i686 = "${TUNE_FEATURES:tune-x86} i686"
+BASE_LIB:tune-i686 = "lib"
+TUNE_PKGARCH:tune-i686 = "i686"
+PACKAGE_EXTRA_ARCHS:tune-i686 = "${PACKAGE_EXTRA_ARCHS:tune-i586} i686"

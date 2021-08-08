@@ -12,7 +12,7 @@ SRC_URI[sha256sum] = "e4b7e306475bf9427d1757578f0e4528930c84c44eaa3f167d4c42f110
 
 S = "${WORKDIR}/wqy-zenhei"
 
-do_install_append () {
+do_install:append () {
     sed -i -e '/<string>[^W]/d' ${S}/44-wqy-zenhei.conf
     install -d ${D}${sysconfdir}/fonts/conf.d
 
@@ -24,4 +24,4 @@ do_install_append () {
 PACKAGES = "${PN}"
 FONT_PACKAGES = "${PN}"
 
-FILES_${PN} = "${datadir}/fonts ${sysconfdir}"
+FILES:${PN} = "${datadir}/fonts ${sysconfdir}"

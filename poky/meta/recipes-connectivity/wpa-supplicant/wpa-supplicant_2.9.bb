@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=279b4f5abb9c153c285221855ddb78cc \
                     file://README;beginline=1;endline=56;md5=e7d3dbb01f75f0b9799e192731d1e1ff \
                     file://wpa_supplicant/wpa_supplicant.c;beginline=1;endline=12;md5=0a8b56d3543498b742b9c0e94cc2d18b"
 DEPENDS = "dbus libnl"
-RRECOMMENDS_${PN} = "wpa-supplicant-passphrase wpa-supplicant-cli"
+RRECOMMENDS:${PN} = "wpa-supplicant-passphrase wpa-supplicant-cli"
 
 PACKAGECONFIG ??= "openssl"
 PACKAGECONFIG[gnutls] = ",,gnutls libgcrypt"
@@ -16,7 +16,7 @@ PACKAGECONFIG[openssl] = ",,openssl"
 
 inherit pkgconfig systemd
 
-SYSTEMD_SERVICE_${PN} = "wpa_supplicant.service"
+SYSTEMD_SERVICE:${PN} = "wpa_supplicant.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 SRC_URI = "http://w1.fi/releases/wpa_supplicant-${PV}.tar.gz  \
@@ -41,11 +41,11 @@ CVE_PRODUCT = "wpa_supplicant"
 
 S = "${WORKDIR}/wpa_supplicant-${PV}"
 
-PACKAGES_prepend = "wpa-supplicant-passphrase wpa-supplicant-cli "
-FILES_wpa-supplicant-passphrase = "${bindir}/wpa_passphrase"
-FILES_wpa-supplicant-cli = "${sbindir}/wpa_cli"
-FILES_${PN} += "${datadir}/dbus-1/system-services/* ${systemd_system_unitdir}/*"
-CONFFILES_${PN} += "${sysconfdir}/wpa_supplicant.conf"
+PACKAGES:prepend = "wpa-supplicant-passphrase wpa-supplicant-cli "
+FILES:wpa-supplicant-passphrase = "${bindir}/wpa_passphrase"
+FILES:wpa-supplicant-cli = "${sbindir}/wpa_cli"
+FILES:${PN} += "${datadir}/dbus-1/system-services/* ${systemd_system_unitdir}/*"
+CONFFILES:${PN} += "${sysconfdir}/wpa_supplicant.conf"
 
 do_configure () {
 	${MAKE} -C wpa_supplicant clean
@@ -108,7 +108,7 @@ do_install () {
 	install -m 0644 ${WORKDIR}/99_wpa_supplicant ${D}/etc/default/volatiles
 }
 
-pkg_postinst_wpa-supplicant () {
+pkg_postinst:wpa-supplicant () {
 	# If we're offline, we don't need to do this.
 	if [ "x$D" = "x" ]; then
 		killall -q -HUP dbus-daemon || true

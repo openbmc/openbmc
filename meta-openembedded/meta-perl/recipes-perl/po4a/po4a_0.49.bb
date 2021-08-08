@@ -21,7 +21,7 @@ DEPENDS = " \
     libunicode-linebreak-perl \
 "
 
-RRECOMMENDS_${PN} = " \
+RRECOMMENDS:${PN} = " \
     libtext-wrapi18n-perl \
     libterm-readkey-perl \
     liblocale-gettext-perl \

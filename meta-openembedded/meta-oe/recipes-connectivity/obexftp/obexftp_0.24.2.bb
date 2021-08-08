@@ -23,7 +23,7 @@ PACKAGECONFIG ?= ""
 PACKAGECONFIG[fuse] = "-DENABLE_FUSE=ON,-DENABLE_FUSE=OFF,fuse"
 PACKAGECONFIG[swig] = "-DENABLE_SWIG=ON,-DENABLE_SWIG=OFF,swig"
 
-DEPENDS_remove_class-native = "fuse-native"
+DEPENDS:remove:class-native = "fuse-native"
 
 S = "${WORKDIR}/${BP}-Source"
 
@@ -32,11 +32,11 @@ EXTRA_OECMAKE += "-DCMAKE_SKIP_RPATH=ON \
                   -DENABLE_RUBY=OFF -DENABLE_TCL=OFF \
 "
 
-do_compile_class-native () {
+do_compile:class-native () {
     oe_runmake crctable
 }
 
-do_install_class-native () {
+do_install:class-native () {
     install -D -m 0755 ${B}/bfb/crctable ${D}${bindir}/crctable
 }
 

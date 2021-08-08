@@ -24,11 +24,11 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 PACKAGECONFIG ??= "${@bb.utils.contains_any('DISTRO_FEATURES', [ 'directfb', 'wayland', 'x11' ], 'cairo', '', d)}"
 
-RDEPENDS_${PN} += "python3-pkgutil"
+RDEPENDS:${PN} += "python3-pkgutil"
 
 # python3-pycairo is checked on configuration -> DEPENDS
 # we don't link against python3-pycairo -> RDEPENDS
 PACKAGECONFIG[cairo] = "-Dpycairo=enabled,-Dpycairo=disabled, cairo python3-pycairo, python3-pycairo"
 
 BBCLASSEXTEND = "native"
-PACKAGECONFIG_class-native = ""
+PACKAGECONFIG:class-native = ""

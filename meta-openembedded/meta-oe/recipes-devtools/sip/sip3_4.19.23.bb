@@ -20,9 +20,9 @@ PACKAGES += "python3-sip3"
 BBCLASSEXTEND = "native"
 
 CONFIGURE_SYSROOT = "${STAGING_DIR_HOST}"
-CONFIGURE_SYSROOT_class-native = "${STAGING_DIR_NATIVE}"
+CONFIGURE_SYSROOT:class-native = "${STAGING_DIR_NATIVE}"
 
-do_configure_prepend() {
+do_configure:prepend() {
     echo "py_platform = linux" > sip.cfg
     echo "py_inc_dir = ${STAGING_INCDIR}/python%(py_major).%(py_minor)${PYTHON_ABI}" >> sip.cfg
     echo "sip_bin_dir = ${D}/${bindir}" >> sip.cfg
@@ -36,5 +36,5 @@ do_install() {
     oe_runmake install
 }
 
-FILES_python3-sip3 = "${libdir}/${PYTHON_DIR}/site-packages/"
-FILES_${PN}-dbg += "${libdir}/${PYTHON_DIR}/site-packages/.debug"
+FILES:python3-sip3 = "${libdir}/${PYTHON_DIR}/site-packages/"
+FILES:${PN}-dbg += "${libdir}/${PYTHON_DIR}/site-packages/.debug"

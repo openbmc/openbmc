@@ -8,4 +8,4 @@ PYPI_PACKAGE = "Flask-SQLAlchemy"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} = "${PYTHON_PN}-sqlalchemy ${PYTHON_PN}-flask"
+RDEPENDS:${PN} = "${PYTHON_PN}-sqlalchemy ${PYTHON_PN}-flask"

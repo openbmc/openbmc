@@ -7,6 +7,6 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'strongarm', ' -mcpu=stron
 MACHINEOVERRIDES =. "${@bb.utils.contains('TUNE_FEATURES', 'strongarm', 'armv4:', '', d)}"
 
 AVAILTUNES += "strongarm"
-ARMPKGARCH_tune-strongarm = "strongarm"
-TUNE_FEATURES_tune-strongarm = "arm strongarm"
-PACKAGE_EXTRA_ARCHS_tune-strongarm = "${PACKAGE_EXTRA_ARCHS_tune-armv4} strongarm"
+ARMPKGARCH:tune-strongarm = "strongarm"
+TUNE_FEATURES:tune-strongarm = "arm strongarm"
+PACKAGE_EXTRA_ARCHS:tune-strongarm = "${PACKAGE_EXTRA_ARCHS:tune-armv4} strongarm"

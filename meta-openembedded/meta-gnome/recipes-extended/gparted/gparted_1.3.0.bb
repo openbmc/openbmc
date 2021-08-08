@@ -22,15 +22,15 @@ DEPENDS += " \
     parted \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/appdata \
     ${datadir}/icons \
 "
 
 PACKAGES += "${PN}-polkit"
-FILES_${PN}-polkit = "${datadir}/polkit-1"
+FILES:${PN}-polkit = "${datadir}/polkit-1"
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'polkit', '${PN}-polkit', '', d)} \
     dosfstools \
     mtools \

@@ -13,7 +13,7 @@ SRC_URI = "https://people.redhat.com/sgrubb/libcap-ng/libcap-ng-${PV}.tar.gz \
 
 SRC_URI[sha256sum] = "52c083b77c2b0d8449dee141f9c3eba76e6d4c5ad44ef05df25891126cb85ae9"
 
-EXTRA_OECONF_append_class-target = " --with-capability_header=${STAGING_INCDIR}/linux/capability.h"
-EXTRA_OECONF_append_class-nativesdk = " --with-capability_header=${STAGING_INCDIR}/linux/capability.h"
+EXTRA_OECONF:append:class-target = " --with-capability_header=${STAGING_INCDIR}/linux/capability.h"
+EXTRA_OECONF:append:class-nativesdk = " --with-capability_header=${STAGING_INCDIR}/linux/capability.h"
 
 BBCLASSEXTEND = "native nativesdk"

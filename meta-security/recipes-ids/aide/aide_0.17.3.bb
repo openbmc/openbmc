@@ -25,7 +25,7 @@ PACKAGECONFIG[gcrypt] = "--with-gcrypt, --without-gcrypt, libgcrypt, libgcrypt"
 PACKAGECONFIG[mhash] = "--with-mhash, --without-mhash, libmhash, libmhash"
 PACKAGECONFIG[e2fsattrs] = "--with-e2fsattrs, --without-e2fsattrs, e2fsprogs, e2fsprogs"
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${libdir}/${PN}/logs   
     install -d ${D}${sysconfdir}   
     install ${WORKDIR}/aide.conf ${D}${sysconfdir}/
@@ -33,9 +33,9 @@ do_install_append () {
 
 CONF_FILE = "${sysconfdir}/aide.conf"
 
-FILES_${PN} += "${libdir}/${PN} ${sysconfdir}/aide.conf"
+FILES:${PN} += "${libdir}/${PN} ${sysconfdir}/aide.conf"
 
-pkg_postinst_ontarget_${PN} () {
+pkg_postinst_ontarget:${PN} () {
     /usr/bin/aide -i
 }
 RDPENDS_${PN} = "bison, libpcre"

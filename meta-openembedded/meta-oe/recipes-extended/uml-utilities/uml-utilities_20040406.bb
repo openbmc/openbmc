@@ -25,7 +25,7 @@ do_install() {
     oe_runmake install DESTDIR=${D}
 }
 
-FILES_${PN} += "${libdir}/uml"
+FILES:${PN} += "${libdir}/uml"
 
-ALTERNATIVE_${PN} = "tunctl"
+ALTERNATIVE:${PN} = "tunctl"
 ALTERNATIVE_LINK_NAME[tunctl] = "${bindir}/tunctl"

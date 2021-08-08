@@ -30,8 +30,8 @@ EXTRA_OECONF = " \
 EXTRA_OECONF_ARM = " \
     ${@bb.utils.contains("TUNE_FEATURES","neon","--enable-neon","--disable-neon",d)} \
 "
-EXTRA_OECONF_append_arm = " ${EXTRA_OECONF_ARM}"
-EXTRA_OECONF_append_armeb = " ${EXTRA_OECONF_ARM}"
+EXTRA_OECONF:append:arm = " ${EXTRA_OECONF_ARM}"
+EXTRA_OECONF:append:armeb = " ${EXTRA_OECONF_ARM}"
 
 inherit autotools lib_package
 
@@ -51,5 +51,5 @@ PACKAGECONFIG[gl] = "--enable-gl,--disable-gl,mesa-glut"
 
 PACKAGES =+ "${PN}-gif2webp"
 
-DESCRIPTION_${PN}-gif2webp = "Simple tool to convert animated GIFs to WebP"
-FILES_${PN}-gif2webp = "${bindir}/gif2webp"
+DESCRIPTION:${PN}-gif2webp = "Simple tool to convert animated GIFs to WebP"
+FILES:${PN}-gif2webp = "${bindir}/gif2webp"

@@ -10,7 +10,7 @@ SRC_URI += "file://run-ptest \
 
 DEPENDS = "dbus glib-2.0"
 
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
 S="${WORKDIR}/dbus-${PV}"
 FILESEXTRAPATHS =. "${FILE_DIRNAME}/dbus:"
@@ -58,7 +58,7 @@ do_install_ptest() {
         sed -i -e 's;@PTEST_PATH@;${PTEST_PATH};g'  ${D}${PTEST_PATH}/run-ptest
 }
 
-RDEPENDS_${PN}-ptest += "bash make dbus"
-RDEPENDS_${PN}-ptest_remove = "${PN}"
+RDEPENDS:${PN}-ptest += "bash make dbus"
+RDEPENDS:${PN}-ptest:remove = "${PN}"
 
-PRIVATE_LIBS_${PN}-ptest = "libdbus-1.so.3"
+PRIVATE_LIBS:${PN}-ptest = "libdbus-1.so.3"

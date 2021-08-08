@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "5bae043042c19c31f77eb8464e56a01a5454e0b39fa07cf7ad0f1bfc9c
 
 inherit autotools python3native update-rc.d pkgconfig systemd
 
-SYSTEMD_SERVICE_${PN} = "collectd.service"
+SYSTEMD_SERVICE:${PN} = "collectd.service"
 
 # Floatingpoint layout, architecture dependent
 # 'nothing', 'endianflip' or 'intswap'
@@ -59,7 +59,7 @@ EXTRA_OECONF = " \
                 --disable-notify_desktop --disable-werror \
 "
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/collectd.init ${D}${sysconfdir}/init.d/collectd
     sed -i 's!/usr/sbin/!${sbindir}/!g' ${D}${sysconfdir}/init.d/collectd
@@ -80,7 +80,7 @@ do_install_append() {
         ${D}${systemd_unitdir}/system/collectd.service
 }
 
-CONFFILES_${PN} = "${sysconfdir}/collectd.conf"
+CONFFILES:${PN} = "${sysconfdir}/collectd.conf"
 
 INITSCRIPT_NAME = "collectd"
 INITSCRIPT_PARAMS = "defaults"

@@ -9,6 +9,6 @@ DEPENDS += "python3-distutils-extra-native"
 
 SRC_URI[sha256sum] = "1f6facee57a659af560f06024ca6f98aa4d638bf57a8bcfb613b4dc70fcc3b47"
 
-FILES_${PN} += "${datadir}/metainfo"
+FILES:${PN} += "${datadir}/metainfo"
 
-RDEPENDS_${PN} += "python3-pygobject python3-dbus"
+RDEPENDS:${PN} += "python3-pygobject python3-dbus"

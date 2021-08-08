@@ -8,7 +8,7 @@ WAF_PYTHON ?= "python3"
 B = "${WORKDIR}/build"
 do_configure[cleandirs] += "${B}"
 
-EXTRA_OECONF_append = " ${PACKAGECONFIG_CONFARGS}"
+EXTRA_OECONF:append = " ${PACKAGECONFIG_CONFARGS}"
 
 EXTRA_OEWAF_BUILD ??= ""
 # In most cases, you want to pass the same arguments to `waf build` and `waf

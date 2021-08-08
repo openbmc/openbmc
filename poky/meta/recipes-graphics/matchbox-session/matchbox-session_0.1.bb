@@ -7,7 +7,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://matchbox-session;endline=20;md5=180f1c169a15d059a56c30094f6fb5ea"
 
 SECTION = "x11"
-RCONFLICTS_${PN} = "matchbox-common"
+RCONFLICTS:${PN} = "matchbox-common"
 
 SRC_URI = "file://matchbox-session"
 S = "${WORKDIR}"
@@ -16,7 +16,7 @@ PR = "r4"
 
 inherit update-alternatives
 
-ALTERNATIVE_${PN} = "x-session-manager"
+ALTERNATIVE:${PN} = "x-session-manager"
 ALTERNATIVE_TARGET[x-session-manager] = "${bindir}/matchbox-session"
 ALTERNATIVE_PRIORITY = "100"
 

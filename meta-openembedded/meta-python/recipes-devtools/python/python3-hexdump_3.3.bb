@@ -19,7 +19,7 @@ S = "${WORKDIR}"
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_install_append() {
+do_install:append() {
     rm ${D}${datadir}/data/hexfile.bin
     rmdir ${D}${datadir}/data ${D}${datadir}
 }

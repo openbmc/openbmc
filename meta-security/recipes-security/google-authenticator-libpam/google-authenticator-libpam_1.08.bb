@@ -18,6 +18,6 @@ REQUIRED_DISTRO_FEATURES = "pam"
 EXTRA_OECONF = "--libdir=${base_libdir}" 
 
 PACKAGES += "pam-google-authenticator"
-FILES_pam-google-authenticator = "${base_libdir}/security/pam_google_authenticator.so"
+FILES:pam-google-authenticator = "${base_libdir}/security/pam_google_authenticator.so"
 
 RDEPNEDS_pam-google-authenticator  = "libpam"

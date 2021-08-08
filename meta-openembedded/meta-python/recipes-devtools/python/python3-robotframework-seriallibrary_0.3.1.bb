@@ -12,7 +12,7 @@ inherit pypi setuptools3
 
 SRC_URI += "file://e31d5fdf2ea00ac6349e64580a20816783064dd4.patch"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-pyserial \
     ${PYTHON_PN}-robotframework \
 "

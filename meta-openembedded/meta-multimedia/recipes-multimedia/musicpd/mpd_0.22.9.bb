@@ -68,7 +68,7 @@ PACKAGECONFIG[vorbis] = "-Dvorbis=enabled,-Dvorbis=disabled,libvorbis libogg"
 PACKAGECONFIG[wavpack] = "-Dwavpack=enabled,-Dwavpack=disabled,wavpack"
 PACKAGECONFIG[zlib] = "-Dzlib=enabled,-Dzlib=disabled,zlib"
 
-do_install_append() {
+do_install:append() {
     install -o mpd -d \
         ${D}/${localstatedir}/lib/mpd \
         ${D}/${localstatedir}/lib/mpd/playlists
@@ -89,13 +89,13 @@ do_install_append() {
     rm -rf ${D}${datadir}/icons
 }
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "mpd.socket"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
+SYSTEMD_SERVICE:${PN} = "mpd.socket"
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = " \
+USERADD_PARAM:${PN} = " \
     --system --no-create-home \
     --home ${localstatedir}/lib/mpd \
     --groups audio \

@@ -18,7 +18,7 @@ inherit autotools
 
 CVE_PRODUCT = "netcat_project:netcat"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${bindir}
     mv ${D}${bindir}/nc ${D}${bindir}/nc.${BPN}
 }

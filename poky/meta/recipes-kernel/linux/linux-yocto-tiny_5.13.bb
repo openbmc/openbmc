@@ -1,12 +1,12 @@
 KBRANCH ?= "v5.13/standard/tiny/base"
-KBRANCH_qemuarm  ?= "v5.13/standard/tiny/arm-versatile-926ejs"
+KBRANCH:qemuarm  ?= "v5.13/standard/tiny/arm-versatile-926ejs"
 
 LINUX_KERNEL_TYPE = "tiny"
 KCONFIG_MODE = "--allnoconfig"
 
 require recipes-kernel/linux/linux-yocto.inc
 
-LINUX_VERSION ?= "5.13.4"
+LINUX_VERSION ?= "5.13.5"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 DEPENDS += "${@bb.utils.contains('ARCH', 'x86', 'elfutils-native', '', d)}"
@@ -15,9 +15,9 @@ DEPENDS += "openssl-native util-linux-native"
 KMETA = "kernel-meta"
 KCONF_BSP_AUDIT_LEVEL = "2"
 
-SRCREV_machine_qemuarm ?= "e394a72e8bc77484bf7bae8c842c75b23cc3dd63"
-SRCREV_machine ?= "7275d462cec720120d1767e277a2525d88901c80"
-SRCREV_meta ?= "ab5f1940535350791d2e111e0e16b08be277568d"
+SRCREV_machine:qemuarm ?= "52d457436c83b3ce994a12d5387c532df7859e3d"
+SRCREV_machine ?= "e167b61e5f9f6e6de8d57f72ed022ea6cdf9ba85"
+SRCREV_meta ?= "45ba17c2208f4b39c36fdb748df5929b8f6b6f83"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
@@ -29,4 +29,4 @@ COMPATIBLE_MACHINE = "qemux86|qemux86-64|qemuarm|qemuarmv5"
 # Functionality flags
 KERNEL_FEATURES = ""
 
-KERNEL_DEVICETREE_qemuarmv5 = "versatile-pb.dtb"
+KERNEL_DEVICETREE:qemuarmv5 = "versatile-pb.dtb"

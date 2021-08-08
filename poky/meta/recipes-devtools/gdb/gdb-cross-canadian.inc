@@ -21,7 +21,7 @@ PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod, nativesdk-
 
 SSTATE_DUPWHITELIST += "${STAGING_DATADIR}/gdb"
 
-do_configure_prepend() {
+do_configure:prepend() {
 cat > ${WORKDIR}/python << EOF
 #! /bin/sh
 case "\$2" in
@@ -37,7 +37,7 @@ EOF
 
 # we don't want gdb to provide bfd/iberty/opcodes, which instead will override the
 # right bits installed by binutils.
-do_install_append() {
+do_install:append() {
 	rm -rf ${D}${exec_prefix}/lib
 	cross_canadian_bindirlinks
 }

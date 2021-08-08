@@ -52,8 +52,8 @@ do_install () {
 }
 
 PACKAGES =+ "${PN}-ids libpci"
-FILES_${PN}-ids = "${datadir}/pci.ids*"
-FILES_libpci = "${libdir}/libpci.so.*"
-SUMMARY_${PN}-ids = "PCI utilities - device ID database"
-DESCRIPTION_${PN}-ids = "Package providing the PCI device ID database for pciutils."
-RDEPENDS_${PN} += "${PN}-ids"
+FILES:${PN}-ids = "${datadir}/pci.ids*"
+FILES:libpci = "${libdir}/libpci.so.*"
+SUMMARY:${PN}-ids = "PCI utilities - device ID database"
+DESCRIPTION:${PN}-ids = "Package providing the PCI device ID database for pciutils."
+RDEPENDS:${PN} += "${PN}-ids"

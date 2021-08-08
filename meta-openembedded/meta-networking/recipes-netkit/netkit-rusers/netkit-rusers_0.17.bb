@@ -59,14 +59,14 @@ EOF
 }
 
 PACKAGES = "${PN}-client ${PN}-server ${PN}-doc ${BPN}-dbg"
-FILES_${PN}-client = "${bindir}/*"
-FILES_${PN}-server = "${sbindir}/* ${sysconfdir}"
-FILES_${PN}-doc = "${mandir}"
-FILES_${PN}-dbg = "${prefix}/src/debug \
+FILES:${PN}-client = "${bindir}/*"
+FILES:${PN}-server = "${sbindir}/* ${sysconfdir}"
+FILES:${PN}-doc = "${mandir}"
+FILES:${PN}-dbg = "${prefix}/src/debug \
             ${bindir}/.debug ${sbindir}/.debug"
 
-RDEPENDS_${PN}-server += "tcp-wrappers xinetd rpcbind"
+RDEPENDS:${PN}-server += "tcp-wrappers xinetd rpcbind"
 
 # http://errors.yoctoproject.org/Errors/Details/186962/
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'
 PNBLACKLIST[netkit-rusers] ?= "Fails to build rup.c:51:10: fatal error: rstat.h: No such file or directory"

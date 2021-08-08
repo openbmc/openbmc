@@ -11,16 +11,16 @@ SRC_URI[sha256sum] = "5b2b8882ec8a3c3733cce6965cc098b6d80b417f21229ab90b18fe551d
 
 PYPI_PACKAGE = "supervisor"
 inherit pypi systemd setuptools3
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-meld3 \
 "
 
 SRC_URI += "file://supervisord.conf \
 	    file://supervisor.service \
 	"
-SYSTEMD_SERVICE_${PN} = "supervisor.service"
+SYSTEMD_SERVICE:${PN} = "supervisor.service"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${sysconfdir}/supervisor
 	install -d ${D}${systemd_system_unitdir}
 

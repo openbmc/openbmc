@@ -22,4 +22,4 @@ REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
 # colord
 REQUIRED_DISTRO_FEATURES += "polkit"
 
-UNKNOWN_CONFIGURE_WHITELIST_append = " introspection"
+UNKNOWN_CONFIGURE_WHITELIST:append = " introspection"

@@ -37,4 +37,4 @@ PACKAGECONFIG[avahi] = "--with-avahi,--without-avahi,avahi"
 PACKAGECONFIG[xinerama] = "--with-xinerama,--without-xinerama,libxinerama"
 PACKAGECONFIG[x11] = "--with-x,--without-x, libxdamage libxext libxfixes libxrandr libxtst virtual/libx11"
 
-RRECOMMENDS_${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'fbdev', 'kernel-module-uinput', '', d)}"
+RRECOMMENDS:${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'fbdev', 'kernel-module-uinput', '', d)}"

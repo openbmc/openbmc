@@ -11,7 +11,7 @@ inherit pypi setuptools3
 
 DEPENDS += "${PYTHON_PN}-toml-native"
 
-RDEPENDS_${PN} += "${PYTHON_PN}-compression \
+RDEPENDS:${PN} += "${PYTHON_PN}-compression \
                    ${PYTHON_PN}-math \
                    ${PYTHON_PN}-more-itertools"
 

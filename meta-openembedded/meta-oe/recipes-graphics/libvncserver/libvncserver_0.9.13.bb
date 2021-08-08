@@ -40,7 +40,7 @@ PACKAGECONFIG[websockets] = "-DWITH_WEBSOCKETS=ON,-DWITH_WEBSOCKETS=OFF,"
 PACKAGECONFIG[zlib] = "-DWITH_ZLIB=ON,-DWITH_ZLIB=OFF,zlib"
 
 PACKAGE_BEFORE_PN = "libvncclient"
-FILES_libvncclient = "${libdir}/libvncclient.*"
+FILES:libvncclient = "${libdir}/libvncclient.*"
 
 inherit cmake
 

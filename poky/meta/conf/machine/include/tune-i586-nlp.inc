@@ -13,7 +13,7 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'i586-nlp', ' -march=i586 
 
 # Quark tune feature
 AVAILTUNES = "i586-nlp-32"
-TUNE_FEATURES_tune-i586-nlp-32 = "${TUNE_FEATURES_tune-x86} i586-nlp"
-BASE_LIB_tune-i586-nlp-32 = "lib"
-TUNE_PKGARCH_tune-i586-nlp-32 = "i586-nlp-32"
-PACKAGE_EXTRA_ARCHS_tune-i586-nlp-32 = "i586-nlp-32"
+TUNE_FEATURES:tune-i586-nlp-32 = "${TUNE_FEATURES:tune-x86} i586-nlp"
+BASE_LIB:tune-i586-nlp-32 = "lib"
+TUNE_PKGARCH:tune-i586-nlp-32 = "i586-nlp-32"
+PACKAGE_EXTRA_ARCHS:tune-i586-nlp-32 = "i586-nlp-32"

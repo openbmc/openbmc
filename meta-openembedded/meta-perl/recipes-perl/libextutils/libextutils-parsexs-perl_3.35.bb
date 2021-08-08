@@ -21,7 +21,7 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 inherit cpan
 
-RDEPENDS_${PN} += " perl-module-carp \
+RDEPENDS:${PN} += " perl-module-carp \
     perl-module-cwd \
     perl-module-dynaloader \
     perl-module-extutils-cbuilder \
@@ -33,7 +33,7 @@ RDEPENDS_${PN} += " perl-module-carp \
     perl-module-test-more \
 "
 
-RPROVIDES_${PN} += " libextutils-parsexs-constants-perl \
+RPROVIDES:${PN} += " libextutils-parsexs-constants-perl \
     libextutils-parsexs-countlines-perl \
     libextutils-parsexs-eval-perl \
     libextutils-parsexs-utilities-perl \

@@ -36,7 +36,7 @@ inherit update-rc.d systemd
 INITSCRIPT_NAME = "apmd"
 INITSCRIPT_PARAMS = "defaults"
 
-SYSTEMD_SERVICE_${PN} = "apmd.service"
+SYSTEMD_SERVICE:${PN} = "apmd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 EXTRA_OEMAKE = "-e MAKEFLAGS="
@@ -81,5 +81,5 @@ do_install() {
 
 PACKAGES =+ "libapm apm"
 
-FILES_libapm = "${libdir}/libapm${SOLIBS}"
-FILES_apm = "${bindir}/apm*"
+FILES:libapm = "${libdir}/libapm${SOLIBS}"
+FILES:apm = "${bindir}/apm*"

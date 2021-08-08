@@ -8,7 +8,7 @@ SECTION = "libraries"
 LICENSE = "Artistic-1.0|GPLv1+"
 LIC_FILES_CHKSUM = "file://README;beginline=21;endline=23;md5=f36550f59a0ae5e6e3b0be6a4da60d26"
 
-RDEPENDS_${PN} += "perl libipc-signal-perl"
+RDEPENDS:${PN} += "perl libipc-signal-perl"
 
 S = "${WORKDIR}/Proc-WaitStat-${PV}"
 

@@ -22,4 +22,4 @@ do_install() {
     install -m 0644 ${S}${JQUERYDOCDIR}/copyright ${D}${JQUERYDOCDIR}/
 }
 
-FILES_${PN} = "/usr/share/javascript/jquery"
+FILES:${PN} = "/usr/share/javascript/jquery"

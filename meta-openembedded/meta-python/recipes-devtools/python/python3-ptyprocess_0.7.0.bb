@@ -14,7 +14,7 @@ UPSTREAM_CHECK_URI = "https://pypi.python.org/pypi/ptyprocess"
 
 S = "${WORKDIR}/${SRCNAME}-${PV}"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-core \
     ${PYTHON_PN}-fcntl \
     ${PYTHON_PN}-terminal \
@@ -29,7 +29,7 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 	${PYTHON_PN}-fcntl \
 	${PYTHON_PN}-terminal \

@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=bd4d7ab13df98988b1ca2a4e01c8c163"
 SRC_URI = "http://www.mpich.org/static/downloads/${PV}/mpich-${PV}.tar.gz"
 SRC_URI[sha256sum] = "5c19bea8b84e8d74cca5f047e82b147ff3fba096144270e3911ad623d6c587bf"
 
-RDEPENDS_${PN} += "bash perl libxml2"
+RDEPENDS:${PN} += "bash perl libxml2"
 
 EXTRA_OECONF = "--enable-debuginfo \
     --enable-fast \
@@ -31,8 +31,8 @@ PACKAGECONFIG += " \
 "
 PACKAGECONFIG[x11] = "--with-x --x-includes=${STAGING_INCDIR} --x-libraries=${STAGING_LIBDIR},--without-x,virtual/libx11"
 
-LDFLAGS_append_libc-glibc_x86-64 = " -lgcc"
-LDFLAGS_append_libc-glibc_x86 = " -lgcc"
+LDFLAGS:append:libc-glibc:x86-64 = " -lgcc"
+LDFLAGS:append:libc-glibc:x86 = " -lgcc"
 
 inherit autotools gettext pkgconfig
 
@@ -51,7 +51,7 @@ do_configure() {
     oe_runconf
 }
 
-do_install_append() {
+do_install:append() {
     sed -i 's,${S}/,,g' ${D}/${libdir}/libmpi.la
     sed -i 's,${DEBUG_PREFIX_MAP},,g' ${D}/${libdir}/pkgconfig/mpich.pc
 }

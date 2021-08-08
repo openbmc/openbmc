@@ -58,7 +58,7 @@ S = "${WORKDIR}/git"
 
 inherit systemd pkgconfig
 
-SYSTEMD_SERVICE_${PN} = "multipathd.service"
+SYSTEMD_SERVICE:${PN} = "multipathd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
@@ -68,8 +68,8 @@ TARGET_CC_ARCH += "${LDFLAGS}"
 # that only works on ARM when thumb is disabled. Otherwise one gets:
 #   Error: shifts in CMP/MOV instructions are only supported in unified syntax -- `mov r12,r12,ror#3'
 #   ../Makefile.inc:66: recipe for target 'debug.o' failed
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
 
 # The exact version of SYSTEMD does not matter but should be greater than 209.
 #
@@ -100,23 +100,23 @@ do_install() {
     ${D}${sysconfdir}/multipath.conf.example
 }
 
-FILES_${PN}-dbg += "${base_libdir}/multipath/.debug"
+FILES:${PN}-dbg += "${base_libdir}/multipath/.debug"
 
 PACKAGES =+ "${PN}-libs"
-FILES_${PN}-libs = "${base_libdir}/lib*.so.* \
+FILES:${PN}-libs = "${base_libdir}/lib*.so.* \
                     ${base_libdir}/multipath/lib*.so*"
-RDEPENDS_${PN} += "${PN}-libs bash"
+RDEPENDS:${PN} += "${PN}-libs bash"
 
 PROVIDES += "device-mapper-multipath"
-RPROVIDES_${PN} += "device-mapper-multipath"
-RPROVIDES_${PN}-libs += "device-mapper-multipath-libs"
+RPROVIDES:${PN} += "device-mapper-multipath"
+RPROVIDES:${PN}-libs += "device-mapper-multipath-libs"
 
-FILES_${PN}-dev += "${base_libdir}/pkgconfig"
+FILES:${PN}-dev += "${base_libdir}/pkgconfig"
 
 PACKAGES =+ "kpartx"
-FILES_kpartx = "${base_sbindir}/kpartx \
+FILES:kpartx = "${base_sbindir}/kpartx \
                 ${nonarch_base_libdir}/udev/kpartx_id \
                "
 
-RDEPENDS_${PN} += "kpartx"
+RDEPENDS:${PN} += "kpartx"
 PARALLEL_MAKE = ""

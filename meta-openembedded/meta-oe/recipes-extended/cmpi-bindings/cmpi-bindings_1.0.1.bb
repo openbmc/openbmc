@@ -30,13 +30,13 @@ EXTRA_OECMAKE = "-DLIB='${baselib}' \
 # ninja: error: build.ninja:282: bad $-escape (literal $ must be written as $$)
 OECMAKE_GENERATOR = "Unix Makefiles"
 
-do_configure_prepend() {
+do_configure:prepend() {
     export STAGING_LIBDIR=${STAGING_LIBDIR}
     export STAGING_INCDIR=${STAGING_INCDIR}
     export ENV_INSTALL_PATH=${PYTHON_SITEPACKAGES_DIR}
 }
 
-FILES_${PN} =+"${libdir}/cmpi/libpyCmpiProvider.so ${PYTHON_SITEPACKAGES_DIR}/*"
-FILES_${PN}-dbg =+ "${libdir}/cmpi/.debug/libpyCmpiProvider.so"
+FILES:${PN} =+"${libdir}/cmpi/libpyCmpiProvider.so ${PYTHON_SITEPACKAGES_DIR}/*"
+FILES:${PN}-dbg =+ "${libdir}/cmpi/.debug/libpyCmpiProvider.so"
 
 BBCLASSEXTEND = "native"

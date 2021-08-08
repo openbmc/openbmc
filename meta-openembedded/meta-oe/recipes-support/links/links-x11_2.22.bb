@@ -1,7 +1,7 @@
 require links.inc
 
 DEPENDS += "virtual/libx11"
-RCONFLICTS_${PN} = "links"
+RCONFLICTS:${PN} = "links"
 
 inherit features_check
 # depends on virtual/libx11
@@ -21,7 +21,7 @@ EXTRA_OECONF = "--enable-graphics \
                 --without-directfb --without-pmshell --without-atheos \
                 --with-x --without-gpm"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/${datadir}/applications
     install -m 0644 ${WORKDIR}/links2.desktop ${D}/${datadir}/applications
     install -d ${D}/${datadir}/pixmaps

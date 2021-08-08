@@ -28,7 +28,7 @@ PACKAGECONFIG[systemd] = "-Dlogind=libsystemd,-Dlogind=none,systemd"
 
 SRC_URI[archive.sha256sum] = "2a4b99ac11ca23394b28c5584b9e96284e8c5a4da65cf06207de54f42b1ff141"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/metainfo \
     ${datadir}/dbus-1 \
 "

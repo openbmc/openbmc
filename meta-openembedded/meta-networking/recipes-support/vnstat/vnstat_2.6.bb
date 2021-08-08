@@ -13,10 +13,10 @@ inherit autotools pkgconfig systemd
 
 EXTRA_OECONF = "--disable-extra-paths"
 
-do_install_append() {
+do_install:append() {
     install -Dm644 ${S}/examples/systemd/vnstat.service "${D}${systemd_system_unitdir}/vnstat.service"
 }
 
 PARALLEL_MAKEINST = ""
 
-SYSTEMD_SERVICE_${PN} = "vnstat.service"
+SYSTEMD_SERVICE:${PN} = "vnstat.service"

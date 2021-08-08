@@ -19,6 +19,6 @@ EXTRA_OEMAKE = "PREFIX=${prefix} LIBRARY_PATH=${baselib}"
 # By default INSTALL variable in Makefile is equal to 'cp -a', which preserves
 # ownership and causes host-user-contamination QA issue.
 # And PREFIX defaults to /usr/local.
-do_install_prepend() {
+do_install:prepend() {
   export INSTALL='cp -r'
 }

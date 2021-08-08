@@ -22,7 +22,7 @@ DEPENDS += " \
     openjpeg \
 "
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-misc \
     ${PYTHON_PN}-logging \
     ${PYTHON_PN}-numbers \
@@ -32,6 +32,6 @@ CVE_PRODUCT = "pillow"
 
 S = "${WORKDIR}/git"
 
-RPROVIDES_${PN} += "python3-imaging"
+RPROVIDES:${PN} += "python3-imaging"
 
 BBCLASSEXTEND = "native"

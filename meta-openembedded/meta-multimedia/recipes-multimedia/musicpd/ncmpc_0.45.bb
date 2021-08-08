@@ -11,7 +11,7 @@ DEPENDS += " \
     libmpdclient \
 "
 
-RDEPENDS_${PN} += "python3-core"
+RDEPENDS:${PN} += "python3-core"
 
 PACKAGECONFIG ??= "colors locale mouse nls regex help_screen library_screen search_screen song_screen key_screen lyrics_screen outputs_screen"
 

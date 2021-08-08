@@ -32,7 +32,7 @@ PROVIDES = "virtual/dtb"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 SYSROOT_DIRS += "/boot/devicetree"
-FILES_${PN} = "/boot/devicetree/*.dtb /boot/devicetree/*.dtbo"
+FILES:${PN} = "/boot/devicetree/*.dtb /boot/devicetree/*.dtbo"
 
 S = "${WORKDIR}"
 B = "${WORKDIR}/build"

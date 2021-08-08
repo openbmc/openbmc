@@ -4,9 +4,9 @@ HOMEPAGE = "http://developer.apple.com/networking/bonjour/"
 LICENSE = "Apache-2.0 & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://../LICENSE;md5=31c50371921e0fb731003bbc665f29bf"
 
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'
 
-RPROVIDES_${PN} += "libdns_sd.so"
+RPROVIDES:${PN} += "libdns_sd.so"
 
 SRC_URI = "https://opensource.apple.com/tarballs/mDNSResponder/mDNSResponder-${PV}.tar.gz \
            file://mdns.service \
@@ -83,13 +83,13 @@ do_install () {
     install -m 0644 ${WORKDIR}/mdns.service ${D}${systemd_unitdir}/system/
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     sed -e '/^hosts:/s/\s*\<mdns\>//' \
         -e 's/\(^hosts:.*\)\(\<files\>\)\(.*\)\(\<dns\>\)\(.*\)/\1\2 mdns\3\4\5/' \
         -i $D/etc/nsswitch.conf
 }
 
-pkg_prerm_${PN} () {
+pkg_prerm:${PN} () {
     sed -e '/^hosts:/s/\s*\<mdns\>//' \
         -e '/^hosts:/s/\s*mdns//' \
         -i $D/etc/nsswitch.conf
@@ -97,18 +97,18 @@ pkg_prerm_${PN} () {
 
 inherit systemd
 
-SYSTEMD_SERVICE_${PN} = "mdns.service"
+SYSTEMD_SERVICE:${PN} = "mdns.service"
 
-FILES_${PN} += "${systemd_unitdir}/system/mdns.service"
-FILES_${PN} += "${libdir}/libdns_sd.so.1 \
+FILES:${PN} += "${systemd_unitdir}/system/mdns.service"
+FILES:${PN} += "${libdir}/libdns_sd.so.1 \
                 ${bindir}/dns-sd \
                 ${libdir}/libnss_mdns-0.2.so \
                 ${sysconfdir}/nss_mdns.conf"
 
-FILES_${PN}-dev += "${libdir}/libdns_sd.so \
+FILES:${PN}-dev += "${libdir}/libdns_sd.so \
                     ${includedir}/dns_sd.h "
 
-FILES_${PN}-man += "${mandir}/man8/mdnsd.8 \
+FILES:${PN}-man += "${mandir}/man8/mdnsd.8 \
                     ${mandir}/man5/nss_mdns.conf.5 \
                     ${mandir}/man8/libnss_mdns.8"
 

@@ -8,7 +8,7 @@ SRC_URI += "file://remove.ldconfig.call.patch \
            file://0001-lib-ext2fs-unix_io.c-revert-parts-of-libext2fs-fix-p.patch \
            "
 
-SRC_URI_append_class-native = " file://e2fsprogs-fix-missing-check-for-permission-denied.patch \
+SRC_URI:append:class-native = " file://e2fsprogs-fix-missing-check-for-permission-denied.patch \
                                 file://quiet-debugfs.patch \
 "
 
@@ -21,14 +21,14 @@ EXTRA_OECONF += "--libdir=${base_libdir} --sbindir=${base_sbindir} \
                 --disable-libblkid --enable-verbose-makecmds \
                 --with-crond-dir=no"
 
-EXTRA_OECONF_darwin = "--libdir=${base_libdir} --sbindir=${base_sbindir} --enable-bsd-shlibs"
+EXTRA_OECONF:darwin = "--libdir=${base_libdir} --sbindir=${base_sbindir} --enable-bsd-shlibs"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[fuse] = '--enable-fuse2fs,--disable-fuse2fs,fuse'
 
 # make locale rules sometimes fire, sometimes don't as git doesn't preserve
 # file mktime. Touch the files introducing non-determinism to the build
-do_compile_prepend (){
+do_compile:prepend (){
 	find ${S}/po -type f -name "*.po" -exec touch {} +
 }
 
@@ -68,57 +68,57 @@ e2fsprogs_conf_fixup () {
 	done
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
 	e2fsprogs_conf_fixup
 }
 
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
 	e2fsprogs_conf_fixup
 }
 
-do_install_append_class-target() {
+do_install:append:class-target() {
 	mv ${D}${base_sbindir}/mke2fs ${D}${base_sbindir}/mke2fs.e2fsprogs
 	mv ${D}${base_sbindir}/mkfs.ext2 ${D}${base_sbindir}/mkfs.ext2.e2fsprogs
 	mv ${D}${base_sbindir}/tune2fs ${D}${base_sbindir}/tune2fs.e2fsprogs
 }
 
-RDEPENDS_e2fsprogs = "e2fsprogs-badblocks e2fsprogs-dumpe2fs"
-RRECOMMENDS_e2fsprogs = "e2fsprogs-mke2fs e2fsprogs-e2fsck"
+RDEPENDS:e2fsprogs = "e2fsprogs-badblocks e2fsprogs-dumpe2fs"
+RRECOMMENDS:e2fsprogs = "e2fsprogs-mke2fs e2fsprogs-e2fsck"
 
 PACKAGES =+ "e2fsprogs-badblocks e2fsprogs-dumpe2fs e2fsprogs-e2fsck e2fsprogs-e2scrub e2fsprogs-mke2fs e2fsprogs-resize2fs e2fsprogs-tune2fs"
 PACKAGES =+ "libcomerr libss libe2p libext2fs"
 
-FILES_e2fsprogs-dumpe2fs = "${base_sbindir}/dumpe2fs"
-FILES_e2fsprogs-resize2fs = "${base_sbindir}/resize2fs*"
-FILES_e2fsprogs-e2fsck = "${base_sbindir}/e2fsck ${base_sbindir}/fsck.ext*"
-FILES_e2fsprogs-e2scrub = "${base_sbindir}/e2scrub*"
-FILES_e2fsprogs-mke2fs = "${base_sbindir}/mke2fs.e2fsprogs ${base_sbindir}/mkfs.ext* ${sysconfdir}/mke2fs.conf"
-FILES_e2fsprogs-tune2fs = "${base_sbindir}/tune2fs.e2fsprogs ${base_sbindir}/e2label"
-FILES_e2fsprogs-badblocks = "${base_sbindir}/badblocks"
-FILES_libcomerr = "${base_libdir}/libcom_err.so.*"
-FILES_libss = "${base_libdir}/libss.so.*"
-FILES_libe2p = "${base_libdir}/libe2p.so.*"
-FILES_libext2fs = "${libdir}/e2initrd_helper ${base_libdir}/libext2fs.so.*"
-FILES_${PN}-dev += "${datadir}/*/*.awk ${datadir}/*/*.sed ${base_libdir}/*.so ${bindir}/compile_et ${bindir}/mk_cmds"
+FILES:e2fsprogs-dumpe2fs = "${base_sbindir}/dumpe2fs"
+FILES:e2fsprogs-resize2fs = "${base_sbindir}/resize2fs*"
+FILES:e2fsprogs-e2fsck = "${base_sbindir}/e2fsck ${base_sbindir}/fsck.ext*"
+FILES:e2fsprogs-e2scrub = "${base_sbindir}/e2scrub*"
+FILES:e2fsprogs-mke2fs = "${base_sbindir}/mke2fs.e2fsprogs ${base_sbindir}/mkfs.ext* ${sysconfdir}/mke2fs.conf"
+FILES:e2fsprogs-tune2fs = "${base_sbindir}/tune2fs.e2fsprogs ${base_sbindir}/e2label"
+FILES:e2fsprogs-badblocks = "${base_sbindir}/badblocks"
+FILES:libcomerr = "${base_libdir}/libcom_err.so.*"
+FILES:libss = "${base_libdir}/libss.so.*"
+FILES:libe2p = "${base_libdir}/libe2p.so.*"
+FILES:libext2fs = "${libdir}/e2initrd_helper ${base_libdir}/libext2fs.so.*"
+FILES:${PN}-dev += "${datadir}/*/*.awk ${datadir}/*/*.sed ${base_libdir}/*.so ${bindir}/compile_et ${bindir}/mk_cmds"
 
-ALTERNATIVE_${PN} = "chattr"
+ALTERNATIVE:${PN} = "chattr"
 ALTERNATIVE_PRIORITY = "100"
 ALTERNATIVE_LINK_NAME[chattr] = "${base_bindir}/chattr"
 ALTERNATIVE_TARGET[chattr] = "${base_bindir}/chattr.e2fsprogs"
 
-ALTERNATIVE_${PN}-doc = "fsck.8"
+ALTERNATIVE:${PN}-doc = "fsck.8"
 ALTERNATIVE_LINK_NAME[fsck.8] = "${mandir}/man8/fsck.8"
 
-ALTERNATIVE_${PN}-mke2fs = "mke2fs mkfs.ext2"
+ALTERNATIVE:${PN}-mke2fs = "mke2fs mkfs.ext2"
 ALTERNATIVE_LINK_NAME[mke2fs] = "${base_sbindir}/mke2fs"
 ALTERNATIVE_LINK_NAME[mkfs.ext2] = "${base_sbindir}/mkfs.ext2"
 
-ALTERNATIVE_${PN}-tune2fs = "tune2fs"
+ALTERNATIVE:${PN}-tune2fs = "tune2fs"
 ALTERNATIVE_LINK_NAME[tune2fs] = "${base_sbindir}/tune2fs"
 
-RDEPENDS_e2fsprogs-e2scrub = "bash"
-RDEPENDS_${PN}-ptest += "coreutils procps bash bzip2 diffutils perl sed"
-RDEPENDS_${PN}-ptest += "e2fsprogs-badblocks e2fsprogs-dumpe2fs e2fsprogs-e2fsck e2fsprogs-mke2fs e2fsprogs-resize2fs e2fsprogs-tune2fs"
+RDEPENDS:e2fsprogs-e2scrub = "bash"
+RDEPENDS:${PN}-ptest += "coreutils procps bash bzip2 diffutils perl sed"
+RDEPENDS:${PN}-ptest += "e2fsprogs-badblocks e2fsprogs-dumpe2fs e2fsprogs-e2fsck e2fsprogs-mke2fs e2fsprogs-resize2fs e2fsprogs-tune2fs"
 
 do_compile_ptest() {
 	oe_runmake -C ${B}/tests

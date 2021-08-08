@@ -17,7 +17,7 @@ DEPENDS += " \
     freetype \
     "
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-numpy \
     ${PYTHON_PN}-rtimu \
     ${PYTHON_PN}-pillow \

@@ -9,14 +9,14 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=4de99aac27b470c29c6c309e0c279b65 \
                     "
 DEPENDS += "libevent"
 DEPENDS += "${PYTHON_PN}-greenlet"
-RDEPENDS_${PN} = "${PYTHON_PN}-greenlet \
+RDEPENDS:${PN} = "${PYTHON_PN}-greenlet \
 		  ${PYTHON_PN}-mime \
 		  ${PYTHON_PN}-pprint \
 		 "
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/python-gevent:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/python-gevent:"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
     file://libev-conf.patch;patch=1;pnum=1 \
 "
 
@@ -25,7 +25,7 @@ SRC_URI[sha256sum] = "520cc2a029a9eef436e4e56b007af7859315cafa21937d43c1d5269f12
 # The python-gevent has no autoreconf ability
 # and the logic for detecting a cross compile is flawed
 # so always force a cross compile
-do_configure_append() {
+do_configure:append() {
 	sed -i -e 's/^cross_compiling=no/cross_compiling=yes/' ${S}/deps/libev/configure
 	sed -i -e 's/^cross_compiling=no/cross_compiling=yes/' ${S}/deps/c-ares/configure
 }

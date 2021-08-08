@@ -14,6 +14,6 @@ do_install() {
     oe_runmake install DESTDIR=${D} RULESDIR=${D}/${nonarch_base_libdir}/udev/rules.d
 }
 
-RDEPENDS_${PN} = "usb-modeswitch (>= 2.4.0)"
-FILES_${PN} += "${nonarch_base_libdir}/udev/rules.d/ \
+RDEPENDS:${PN} = "usb-modeswitch (>= 2.4.0)"
+FILES:${PN} += "${nonarch_base_libdir}/udev/rules.d/ \
                 ${datadir}/usb_modeswitch"

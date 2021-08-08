@@ -12,7 +12,7 @@ CLEANBROKEN = "1"
 
 PYPI_PACKAGE = "luma.core"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
 	${PYTHON_PN}-pillow \
 	${PYTHON_PN}-threading \
 	${PYTHON_PN}-smbus2 \

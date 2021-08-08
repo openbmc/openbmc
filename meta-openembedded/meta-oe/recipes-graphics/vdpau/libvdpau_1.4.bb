@@ -14,10 +14,10 @@ inherit features_check meson
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
-do_install_append() {
+do_install:append() {
     rm -f ${D}${libdir}/*/*.la
 }
 
-FILES_${PN}-dbg += "${libdir}/vdpau/.debug"
-FILES_${PN}-dev += "${libdir}/vdpau/lib*${SOLIBSDEV}"
-FILES_${PN} += "${libdir}/vdpau/lib*${SOLIBS}"
+FILES:${PN}-dbg += "${libdir}/vdpau/.debug"
+FILES:${PN}-dev += "${libdir}/vdpau/lib*${SOLIBSDEV}"
+FILES:${PN} += "${libdir}/vdpau/lib*${SOLIBS}"

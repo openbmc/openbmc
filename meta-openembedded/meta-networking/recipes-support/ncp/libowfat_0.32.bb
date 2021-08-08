@@ -27,6 +27,6 @@ do_install() {
         MAN3DIR=${mandir}/man3
 }
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 BBCLASSEXTEND = "native nativesdk"

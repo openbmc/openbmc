@@ -26,7 +26,7 @@ PE = "1"
 
 DEPENDS = "virtual/libintl intltool-native cairo dbus gdk-pixbuf glib-2.0 gtk+3 virtual/libx11 libxcb pango iso-codes"
 DEPENDS += "${@bb.utils.contains("DISTRO_FEATURES", "systemd", "", "consolekit", d)}"
-DEPENDS_append_libc-musl = " libexecinfo"
+DEPENDS:append:libc-musl = " libexecinfo"
 
 # combine oe-core way with angstrom DISTRO_TYPE
 DISTRO_TYPE ?= "${@bb.utils.contains("IMAGE_FEATURES", "debug-tweaks", "debug", "",d)}"
@@ -35,19 +35,19 @@ inherit autotools pkgconfig gettext systemd features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
-CFLAGS_append = " -fno-builtin-fork -fno-builtin-memset -fno-builtin-strstr "
-LDFLAGS_append_libc-musl = " -lexecinfo"
+CFLAGS:append = " -fno-builtin-fork -fno-builtin-memset -fno-builtin-strstr "
+LDFLAGS:append:libc-musl = " -lexecinfo"
 
 EXTRA_OECONF += "--enable-gtk3=yes --enable-password=yes --with-x -with-xconn=xcb \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '--with-systemdsystemunitdir=${systemd_unitdir}/system/ --disable-consolekit', '--without-systemdsystemunitdir', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '--with-pam', '--without-pam', d)} \
 "
 
-do_configure_prepend() {
+do_configure:prepend() {
     cp ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/po/
 }
 
-do_compile_append() {
+do_compile:append() {
     # default background configured not available / no password field available / no default screensaver
     sed -i     -e 's,bg=,# bg=,g' \
         -e 's,# skip_password=,skip_password=,g' \
@@ -57,7 +57,7 @@ do_compile_append() {
     oe_runmake -C ${B}/data lxdm.conf
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${localstatedir}/lib/lxdm
     install -m 644 ${WORKDIR}/lxdm.conf ${D}${localstatedir}/lib/lxdm
     if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
@@ -69,7 +69,7 @@ do_install_append() {
 }
 
 # make installed languages choosable
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 langs=""
 for lang in `find $D${libdir}/locale -maxdepth 1 | grep _ | sort`; do
 lang=`basename $lang`
@@ -82,9 +82,9 @@ done
 sed -i "s:last_langs=.*$:last_langs=$langs:g" $D${localstatedir}/lib/lxdm/lxdm.conf
 }
 
-RDEPENDS_${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-loginuid', '', d)} setxkbmap bash librsvg-gtk"
+RDEPENDS:${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-loginuid', '', d)} setxkbmap bash librsvg-gtk"
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "lxdm.service"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
+SYSTEMD_SERVICE:${PN} = "lxdm.service"

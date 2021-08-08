@@ -6,8 +6,8 @@ library does not rely on another cryptographic library but provides \
 hooks for easy integration with Libgcrypt. "
 HOMEPAGE = "http://www.gnupg.org/related_software/libksba/"
 LICENSE = "GPLv3+ & (GPLv2+ | LGPLv3+)"
-LICENSE_${PN} = "GPLv2+ | LGPLv3+"
-LICENSE_${PN}-doc = "GPLv3+"
+LICENSE:${PN} = "GPLv2+ | LGPLv3+"
+LICENSE:${PN}-doc = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fd541d83f75d038c4e0617b672ed8bda \
                     file://COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://COPYING.GPLv3;md5=2f31b266d3440dd7ee50f92cf67d8e6c \
@@ -26,7 +26,7 @@ SRC_URI = "${GNUPG_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
 
 SRC_URI[sha256sum] = "dad683e6f2d915d880aa4bed5cea9a115690b8935b78a1bbe01669189307a48b"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	# Else these could be used in preference to those in aclocal-copy
 	rm -f ${S}/m4/gpg-error.m4
 }

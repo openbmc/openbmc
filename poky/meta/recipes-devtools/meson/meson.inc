@@ -24,11 +24,11 @@ UPSTREAM_CHECK_REGEX = "meson-(?P<pver>\d+(\.\d+)+)\.tar"
 
 inherit setuptools3
 
-RDEPENDS_${PN} = "ninja python3-modules python3-pkg-resources"
+RDEPENDS:${PN} = "ninja python3-modules python3-pkg-resources"
 
-FILES_${PN} += "${datadir}/polkit-1"
+FILES:${PN} += "${datadir}/polkit-1"
 
-do_install_append () {
+do_install:append () {
 	# As per the same issue in the python recipe itself:
 	# Unfortunately the following pyc files are non-deterministc due to 'frozenset'
 	# being written without strict ordering, even with PYTHONHASHSEED = 0

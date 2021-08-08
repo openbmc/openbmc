@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 SRC_URI = "https://ftp.gnu.org/pub/gnu/emacs/emacs-${PV}.tar.xz \
            file://emacs-glibc-2.34.patch \
           "
-SRC_URI_append_class-target = " file://usemake-docfile-native.patch"
+SRC_URI:append:class-target = " file://usemake-docfile-native.patch"
 
 SRC_URI[sha256sum] = "b4a7cc4e78e63f378624e0919215b910af5bb2a0afc819fad298272e9f40c1b9"
 
@@ -22,24 +22,24 @@ PACKAGECONFIG ??= "gnutls kerberos libgmp"
 EXTRA_OECONF = " --with-x=no --with-dumping=none"
 
 DEPENDS = "ncurses"
-DEPENDS_append_class-target = " emacs-native"
+DEPENDS:append:class-target = " emacs-native"
 
 inherit autotools mime-xdg
 
 
-do_compile_class-native (){
+do_compile:class-native (){
     cd ${B}/lib-src
     oe_runmake make-docfile
     oe_runmake make-fingerprint
 }
-do_install_class-native(){
+do_install:class-native(){
     install -d ${D}${bindir}
     install -m 755 ${B}/lib-src/make-docfile ${D}/${bindir}/
     install -m 755 ${B}/lib-src/make-fingerprint ${D}/${bindir}/
 }
 
 
-do_install_append(){
+do_install:append(){
     # Delete systemd stuff, extend using DISTRO_FEATURES?
     rm -rf ${D}/${libdir}
     # Extra stuff which isnt needed
@@ -59,13 +59,13 @@ do_install_append(){
 # The lists of files are long but are worth it
 # Installing "emacs" installs the base package
 PACKAGE_BEFORE_PN = "${PN}-minimal ${PN}-base ${PN}-full"
-RPROVIDES_${PN}-base = "${PN}"
-RDEPENDS_${PN}-base_class-target = "${PN}-minimal"
-RDEPENDS_${PN}-full_class-target = "${PN}"
+RPROVIDES:${PN}-base = "${PN}"
+RDEPENDS:${PN}-base:class-target = "${PN}-minimal"
+RDEPENDS:${PN}-full:class-target = "${PN}"
 
 
 # A minimal version of emacs that works
-FILES_${PN}-minimal = " \
+FILES:${PN}-minimal = " \
     ${datadir}/${BPN}/${PV}/lisp/loadup.el \
     ${datadir}/${BPN}/${PV}/lisp/emacs-lisp/byte-run.elc \
     ${datadir}/${BPN}/${PV}/lisp/emacs-lisp/backquote.elc \
@@ -185,7 +185,7 @@ FILES_${PN}-minimal = " \
 
 
 # What works for "most" is relative, but this can be easily extended if needed
-FILES_${PN}-base = " \
+FILES:${PN}-base = " \
     ${datadir}/${BPN}/${PV}/etc/srecode \
     ${datadir}/${BPN}/${PV}/etc/e \
     ${datadir}/${BPN}/${PV}/etc/forms \
@@ -253,8 +253,8 @@ FILES_${PN}-base = " \
 "
 
 # Restore FILES for the full package to catch everything left
-FILES_${PN}-full = "${FILES_${PN}}"
-FILES_${PN}-full_append = " ${datadir}/icons"
+FILES:${PN}-full = "${FILES:${PN}}"
+FILES:${PN}-full:append = " ${datadir}/icons"
 
 
 # The following does NOT build a native emacs.

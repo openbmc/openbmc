@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "905f84c712230b2c592c19470d3ca8d552de726050d1d1716282a1f614
 
 inherit pypi ptest setuptools3
 
-RDEPENDS_${PN} = "${PYTHON_PN}-pyasn1"
+RDEPENDS:${PN} = "${PYTHON_PN}-pyasn1"
 
 BBCLASSEXTEND = "native nativesdk"
 
@@ -19,7 +19,7 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 "
 

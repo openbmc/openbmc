@@ -1,2 +1,2 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-SPLASH_IMAGES_rpi = "file://psplash-raspberrypi-img.h;outsuffix=raspberrypi"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+SPLASH_IMAGES:rpi = "file://psplash-raspberrypi-img.h;outsuffix=raspberrypi"

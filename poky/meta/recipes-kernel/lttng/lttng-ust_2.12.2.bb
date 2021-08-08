@@ -20,12 +20,12 @@ include lttng-platforms.inc
 EXTRA_OECONF = "--disable-numa"
 
 DEPENDS = "liburcu util-linux"
-RDEPENDS_${PN}-bin = "python3-core"
+RDEPENDS:${PN}-bin = "python3-core"
 
 # For backwards compatibility after rename
-RPROVIDES_${PN} = "lttng2-ust"
-RREPLACES_${PN} = "lttng2-ust"
-RCONFLICTS_${PN} = "lttng2-ust"
+RPROVIDES:${PN} = "lttng2-ust"
+RREPLACES:${PN} = "lttng2-ust"
+RCONFLICTS:${PN} = "lttng2-ust"
 
 PE = "2"
 
@@ -41,11 +41,11 @@ PACKAGECONFIG[examples] = "--enable-examples, --disable-examples,"
 PACKAGECONFIG[manpages] = "--enable-man-pages, --disable-man-pages, asciidoc-native xmlto-native libxslt-native"
 PACKAGECONFIG[python3-agent] = "--enable-python-agent ${PYTHON_OPTION}, --disable-python-agent, python3, python3"
 
-FILES_${PN} += " ${PYTHON_SITEPACKAGES_DIR}/*"
-FILES_${PN}-staticdev += " ${PYTHON_SITEPACKAGES_DIR}/*.a"
-FILES_${PN}-dev += " ${PYTHON_SITEPACKAGES_DIR}/*.la"
+FILES:${PN} += " ${PYTHON_SITEPACKAGES_DIR}/*"
+FILES:${PN}-staticdev += " ${PYTHON_SITEPACKAGES_DIR}/*.a"
+FILES:${PN}-dev += " ${PYTHON_SITEPACKAGES_DIR}/*.la"
 
-do_install_append() {
+do_install:append() {
         # Patch python tools to use Python 3; they should be source compatible, but
         # still refer to Python 2 in the shebang
         sed -i -e '1s,#!.*python.*,#!${bindir}/python3,' ${D}${bindir}/lttng-gen-tp

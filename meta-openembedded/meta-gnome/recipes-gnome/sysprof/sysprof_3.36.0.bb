@@ -33,9 +33,9 @@ EXTRA_OEMESON += "-Dsystemdunitdir=${systemd_unitdir}/system"
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 
-SYSTEMD_SERVICE_${PN} = "${@bb.utils.contains('PACKAGECONFIG', 'sysprofd', 'sysprof2.service sysprof3.service', '', d)}"
+SYSTEMD_SERVICE:${PN} = "${@bb.utils.contains('PACKAGECONFIG', 'sysprofd', 'sysprof2.service sysprof3.service', '', d)}"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1/system-services \
     ${datadir}/dbus-1/system.d \
     ${datadir}/dbus-1/interfaces \

@@ -49,7 +49,7 @@ EXTRA_OEMAKE = "-e MAKEFLAGS= STRIP=true LF2='' \
                 'CF_NOOPT=-I. -Ibzip2 -DUNIX ${CFLAGS}'"
 
 export LD = "${CC}"
-LD_class-native = "${CC}"
+LD:class-native = "${CC}"
 
 do_compile() {
         oe_runmake -f unix/Makefile generic
@@ -66,7 +66,7 @@ inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
 
-ALTERNATIVE_${PN} = "unzip"
+ALTERNATIVE:${PN} = "unzip"
 ALTERNATIVE_LINK_NAME[unzip] = "${bindir}/unzip"
 
 BBCLASSEXTEND = "native nativesdk"

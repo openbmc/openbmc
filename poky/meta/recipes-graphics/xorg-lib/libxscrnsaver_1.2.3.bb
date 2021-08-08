@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=21fd154ee757813632ada871a34113fb"
 
 DEPENDS += "libxext xorgproto"
 PROVIDES = "libxss"
-RREPLACES_${PN} = "libxss"
+RREPLACES:${PN} = "libxss"
 PE = "1"
 
 XORG_PN = "libXScrnSaver"

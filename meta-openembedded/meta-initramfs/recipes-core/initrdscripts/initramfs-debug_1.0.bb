@@ -11,4 +11,4 @@ do_install() {
 
 inherit allarch
 
-FILES_${PN} += " /init "
+FILES:${PN} += " /init "

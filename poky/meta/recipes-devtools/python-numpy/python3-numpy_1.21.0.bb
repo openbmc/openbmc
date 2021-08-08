@@ -25,10 +25,10 @@ S = "${WORKDIR}/numpy-${PV}"
 
 CLEANBROKEN = "1"
 
-FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/numpy/core/lib/*.a ${PYTHON_SITEPACKAGES_DIR}/numpy/random/lib/*.a"
+FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/numpy/core/lib/*.a ${PYTHON_SITEPACKAGES_DIR}/numpy/random/lib/*.a"
 
 # install what is needed for numpy.test()
-RDEPENDS_${PN} = "${PYTHON_PN}-unittest \
+RDEPENDS:${PN} = "${PYTHON_PN}-unittest \
                   ${PYTHON_PN}-difflib \
                   ${PYTHON_PN}-pprint \
                   ${PYTHON_PN}-pickle \
@@ -48,7 +48,7 @@ RDEPENDS_${PN} = "${PYTHON_PN}-unittest \
                   ${PYTHON_PN}-threading \
                   ${PYTHON_PN}-multiprocessing \
 "
-RDEPENDS_${PN}-ptest += "${PYTHON_PN}-pytest \
+RDEPENDS:${PN}-ptest += "${PYTHON_PN}-pytest \
                          ${PYTHON_PN}-hypothesis \
                          ${PYTHON_PN}-sortedcontainers \
                          ${PYTHON_PN}-resource \

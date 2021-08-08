@@ -5,7 +5,7 @@ LICENSE = "LGPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=55ca817ccb7d5b5b66355690e9abc605"
 
 DEPENDS = "zlib openssl (>= 0.9.8) dbus readline"
-DEPENDS_append_libc-musl = " argp-standalone libexecinfo"
+DEPENDS:append:libc-musl = " argp-standalone libexecinfo"
 
 SRC_URI = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${BPN}/${BP}.tar.gz \
            file://04_signed_request.diff \
@@ -28,31 +28,31 @@ SRC_URI = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.
 SRC_URI[md5sum] = "2760dac31a43d452a19a3147bfde571c"
 SRC_URI[sha256sum] = "8403f5fbf83aa9ac0c6ce15d97fd85607488152aa84e007b7d0621b8ebc07633"
 
-COMPATIBLE_HOST_libc-musl = "null"
+COMPATIBLE_HOST:libc-musl = "null"
 
 inherit autotools-brokensep pkgconfig
 
-TARGET_CFLAGS_append = " -fno-tree-dce -fno-optimize-sibling-calls"
+TARGET_CFLAGS:append = " -fno-tree-dce -fno-optimize-sibling-calls"
 
-LDFLAGS_append = " -Wl,-rpath-link,${CROSS_DIR}/${TARGET_SYS}/lib"
+LDFLAGS:append = " -Wl,-rpath-link,${CROSS_DIR}/${TARGET_SYS}/lib"
 
 EXTRA_OECONF = " --without-tcl --without-qt --without-pam --without-valgrind"
 
-PACKAGES_prepend = "libuniconf "
-PACKAGES_prepend = "uniconfd "
-PACKAGES_prepend = "libwvstreams-base "
-PACKAGES_prepend = "libwvstreams-extras "
-PACKAGES_prepend = "${PN}-valgrind "
+PACKAGES:prepend = "libuniconf "
+PACKAGES:prepend = "uniconfd "
+PACKAGES:prepend = "libwvstreams-base "
+PACKAGES:prepend = "libwvstreams-extras "
+PACKAGES:prepend = "${PN}-valgrind "
 
-RPROVIDES_${PN}-dbg += "libuniconf-dbg uniconfd-dbg libwvstreams-base-dbg libwvstreams-extras-dbg"
+RPROVIDES:${PN}-dbg += "libuniconf-dbg uniconfd-dbg libwvstreams-base-dbg libwvstreams-extras-dbg"
 
-FILES_libuniconf     = "${libdir}/libuniconf.so.*"
+FILES:libuniconf     = "${libdir}/libuniconf.so.*"
 
-FILES_uniconfd     = "${sbindir}/uniconfd ${sysconfdir}/uniconf.conf ${localstatedir}/uniconf"
+FILES:uniconfd     = "${sbindir}/uniconfd ${sysconfdir}/uniconf.conf ${localstatedir}/uniconf"
 
-FILES_libwvstreams-base     = "${libdir}/libwvutils.so.*"
+FILES:libwvstreams-base     = "${libdir}/libwvutils.so.*"
 
-FILES_libwvstreams-extras     = "${libdir}/libwvbase.so.* ${libdir}/libwvstreams.so.*"
+FILES:libwvstreams-extras     = "${libdir}/libwvbase.so.* ${libdir}/libwvstreams.so.*"
 
-FILES_${PN}-valgrind = "${libdir}/valgrind/wvstreams.supp"
-RDEPENDS_${PN} += "perl"
+FILES:${PN}-valgrind = "${libdir}/valgrind/wvstreams.supp"
+RDEPENDS:${PN} += "perl"

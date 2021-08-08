@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "25dbb2e9847aaa686a8a21e84e3d101db8b79f5cb992e044fc54210ab8
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-attrs \
     ${PYTHON_PN}-colorama \
     ${PYTHON_PN}-pyperclip \

@@ -12,7 +12,7 @@ SRC_URI += " \
         file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
        ${PYTHON_PN}-pytest \
 "
 
@@ -20,7 +20,7 @@ do_install_ptest() {
        cp -f ${S}/test_umsgpack.py ${D}${PTEST_PATH}/
 }
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-datetime \
 "
 

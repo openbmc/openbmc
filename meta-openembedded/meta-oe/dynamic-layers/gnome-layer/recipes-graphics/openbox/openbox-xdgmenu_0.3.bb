@@ -33,4 +33,4 @@ do_install() {
     install -m 0755 openbox-xdgmenu ${D}${bindir}
 }
 
-RDEPENDS_${PN} += "virtual/x-terminal-emulator"
+RDEPENDS:${PN} += "virtual/x-terminal-emulator"

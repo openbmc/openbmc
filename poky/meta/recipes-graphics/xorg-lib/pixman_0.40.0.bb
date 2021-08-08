@@ -31,5 +31,7 @@ EXTRA_OEMESON = "-Dgtk=disabled -Dlibpng=disabled"
 # ld: pixman/libpixman-mmx.a(pixman-mmx.c.o):
 # linking mips:loongson_2f module with previous mips:isa64 modules 
 EXTRA_OEMESON += "-Dloongson-mmi=disabled"
+# disable iwmmxt due to compile fails on most arm platforms.
+EXTRA_OEMESON += "-Diwmmxt=disabled"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "ab19f840712e6951e51c29e44c43b3b2fa42e93693f98f8969cc763a4f
 
 DEPENDS= "openssl lua libpcre2"
 
-EXTRA_OEMAKE_append = " PREFIX=${prefix}"
+EXTRA_OEMAKE:append = " PREFIX=${prefix}"
 
 do_install(){
     oe_runmake DESTDIR=${D} install

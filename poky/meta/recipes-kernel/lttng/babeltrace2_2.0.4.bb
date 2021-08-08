@@ -24,12 +24,12 @@ EXTRA_OECONF = "--disable-debug-info"
 PACKAGECONFIG ??= "manpages"
 PACKAGECONFIG[manpages] = ", --disable-man-pages, asciidoc-native xmlto-native"
 
-FILES_${PN}-staticdev += "${libdir}/babeltrace2/plugins/*.a"
-FILES_${PN} += "${libdir}/babeltrace2/plugins/*.so"
+FILES:${PN}-staticdev += "${libdir}/babeltrace2/plugins/*.a"
+FILES:${PN} += "${libdir}/babeltrace2/plugins/*.so"
 
 ASNEEDED = ""
 
-RDEPENDS_${PN}-ptest += "bash gawk python3"
+RDEPENDS:${PN}-ptest += "bash gawk python3"
 
 do_compile_ptest () {
     make -C tests all

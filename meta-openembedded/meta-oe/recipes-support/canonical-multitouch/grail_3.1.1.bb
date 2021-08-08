@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = " \
 inherit autotools pkgconfig
 
 DEPENDS = "frame"
-CXXFLAGS_append_toolchain-clang = " -Wno-pessimizing-move"
+CXXFLAGS:append:toolchain-clang = " -Wno-pessimizing-move"
 SRC_URI = "https://launchpad.net/${BPN}/trunk/${PV}/+download/${BPN}-${PV}.tar.bz2"
 
 UPSTREAM_CHECK_URI = "https://launchpad.net/grail/trunk"
@@ -23,5 +23,5 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 PACKAGECONFIG[x11] = "--with-x11, --without-x11, libxi"
 
 PACKAGE_BEFORE_PN += "${PN}-test"
-FILES_${PN}-test = "${bindir}/grail-test*"
+FILES:${PN}-test = "${bindir}/grail-test*"
 SECURITY_CFLAGS = "${SECURITY_NO_PIE_CFLAGS}"

@@ -22,8 +22,8 @@ DEPENDS = " \
     libxkbfile \
 "
 
-DEPENDS_append_libc-musl = " libexecinfo"
-LDFLAGS_append_libc-musl = " -lexecinfo"
+DEPENDS:append:libc-musl = " libexecinfo"
+LDFLAGS:append:libc-musl = " -lexecinfo"
 
 SRCREV = "045862cc7d7dd986b349c68131df2f86b9b1cd9c"
 SRC_URI = "git://gitlab.com/Remmina/Remmina;protocol=https"
@@ -38,9 +38,9 @@ PACKAGECONFIG[spice] = "-DWITH_SPICE=ON, -DWITH_SPICE=OFF, spice spice-protocol"
 # Switch on gtk support in avahi recipe if you want to enable avahi support
 PACKAGECONFIG[avahi] = "-DWITH_AVAHI=ON, -DWITH_AVAHI=OFF, avahi"
 
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
-FILES_${PN}+= " \
+FILES:${PN}+= " \
     ${datadir}/metainfo \
     ${datadir}/mime \
 "

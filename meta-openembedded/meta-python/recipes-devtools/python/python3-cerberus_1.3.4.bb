@@ -4,7 +4,7 @@ SECTION = "devel/python"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=48f8e9432d0dac5e0e7a18211a0bacdb"
 
-RDEPENDS_${PN} += "python3-setuptools"
+RDEPENDS:${PN} += "python3-setuptools"
 
 # The PyPI package uses a capital letter so we have to specify this explicitly
 PYPI_PACKAGE = "Cerberus"

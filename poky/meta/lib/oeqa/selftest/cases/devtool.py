@@ -373,7 +373,7 @@ class DevtoolAddTests(DevtoolBase):
         recipefile = '%s/recipes/libftdi/libftdi_%s.bb' % (self.workspacedir, version)
         result = runCmd('recipetool setvar %s EXTRA_OECMAKE -- \'-DPYTHON_BINDINGS=OFF -DLIBFTDI_CMAKE_CONFIG_DIR=${datadir}/cmake/Modules\'' % recipefile)
         with open(recipefile, 'a') as f:
-            f.write('\nFILES_${PN}-dev += "${datadir}/cmake/Modules"\n')
+            f.write('\nFILES:${PN}-dev += "${datadir}/cmake/Modules"\n')
             # We don't have the ability to pick up this dependency automatically yet...
             f.write('\nDEPENDS += "libusb1"\n')
             f.write('\nTESTLIBOUTPUT = "${COMPONENTS_DIR}/${TUNE_PKGARCH}/${PN}/${libdir}"\n')
@@ -975,7 +975,7 @@ class DevtoolUpdateTests(DevtoolBase):
         self.assertExists(patchfile, 'Patch file not created')
 
         # Check bbappend contents
-        expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
+        expectedlines = ['FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"\n',
                          '\n',
                          'SRC_URI += "file://0001-Add-our-custom-version.patch"\n',
                          '\n']
@@ -990,7 +990,7 @@ class DevtoolUpdateTests(DevtoolBase):
         result = runCmd('git reset HEAD^', cwd=tempsrcdir)
         result = runCmd('devtool update-recipe %s -a %s' % (testrecipe, templayerdir))
         self.assertNotExists(patchfile, 'Patch file not deleted')
-        expectedlines2 = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
+        expectedlines2 = ['FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"\n',
                          '\n']
         with open(bbappendfile, 'r') as f:
             self.assertEqual(expectedlines2, f.readlines())

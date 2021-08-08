@@ -66,14 +66,14 @@ INITSCRIPT_NAME = "arpwatch"
 INITSCRIPT_PARAMS = "start 02 2 3 4 5 . stop 20 0 1 6 ."
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system ${ARPWATCH_UID}"
-USERADD_PARAM_${PN} = "--system -g ${ARPWATCH_GID} --home-dir  \
+GROUPADD_PARAM:${PN} = "--system ${ARPWATCH_UID}"
+USERADD_PARAM:${PN} = "--system -g ${ARPWATCH_GID} --home-dir  \
     ${localstatedir}/spool/${BPN} \
     --no-create-home  --shell /bin/false ${BPN}"
 
 CONFFILE_FILES = "${sysconfdir}/${PN}.conf"
 
-FILES_${PN} = "${bindir} ${sbindir} ${prefix}/etc/rc.d \
+FILES:${PN} = "${bindir} ${sbindir} ${prefix}/etc/rc.d \
                ${sysconfdir} /var/lib/arpwatch"
 
-RDEPENDS_${PN} = "libpcap postfix postfix-cfg"
+RDEPENDS:${PN} = "libpcap postfix postfix-cfg"

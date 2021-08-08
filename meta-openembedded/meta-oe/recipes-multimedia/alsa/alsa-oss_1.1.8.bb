@@ -13,10 +13,10 @@ inherit autotools
 
 LEAD_SONAME = "libaoss.so.0"
 
-do_configure_prepend () {
+do_configure:prepend () {
     touch NEWS README AUTHORS ChangeLog
     sed -i "s/libaoss.so/${LEAD_SONAME}/" ${S}/alsa/aoss.in
 }
 
 # http://errors.yoctoproject.org/Errors/Details/186961/
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'

@@ -19,11 +19,11 @@ EXTRA_OECONF = " \
     --disable-schemas-compile \
 "
 
-SYSTEMD_SERVICE_${PN} = "${BPN}-mechanism.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "disable"
+SYSTEMD_SERVICE:${PN} = "${BPN}-mechanism.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
 RRECOMENDS_${PN} += "adwaita-icon-theme"
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     python3-core \
     python3-dbus \
     packagegroup-tools-bluetooth \
@@ -32,7 +32,7 @@ RDEPENDS_${PN} += " \
 PACKAGECONFIG ??= "thunar"
 PACKAGECONFIG[thunar] = "--enable-thunar-sendto,--disable-thunar-sendto"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/Thunar \
     ${systemd_user_unitdir} \
@@ -40,12 +40,12 @@ FILES_${PN} += " \
     ${PYTHON_SITEPACKAGES_DIR} \
 "
 
-FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/_blueman.a"
+FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/_blueman.a"
 
 # In code, path to python is a variable that is replaced with path to native version of it
 # during the configure stage, e.g ../recipe-sysroot-native/usr/bin/python3-native/python3.
 # Replace it with #!/usr/bin/env python3
-do_install_append() {
+do_install:append() {
     sed -i "1s/.*/#!\/usr\/bin\/env python3/" ${D}${prefix}/libexec/blueman-rfcomm-watcher \
                                               ${D}${prefix}/libexec/blueman-mechanism \
                                               ${D}${bindir}/blueman-adapters \

@@ -15,4 +15,4 @@ BPN = "gnome-menus"
 SRC_URI[archive.md5sum] = "a8fd71fcf31a87fc799d80396a526829"
 SRC_URI[archive.sha256sum] = "d9348f38bde956fc32753b28c1cde19c175bfdbf1f4d5b06003b3aa09153bb1f"
 
-FILES_${PN} += "${datadir}/desktop-directories/"
+FILES:${PN} += "${datadir}/desktop-directories/"

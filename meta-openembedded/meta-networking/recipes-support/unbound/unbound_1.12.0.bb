@@ -17,7 +17,7 @@ SRCREV="52b04806f4236c37acd10179ab465a54adc7e86a"
 inherit autotools pkgconfig systemd update-rc.d
 
 DEPENDS = "openssl libevent libtool-native bison-native expat"
-RDEPENDS_${PN} = "bash openssl-bin daemonize"
+RDEPENDS:${PN} = "bash openssl-bin daemonize"
 
 S = "${WORKDIR}/git"
 
@@ -32,7 +32,7 @@ PACKAGECONFIG[dnscrypt] = "--enable-dnscrypt, --disable-dnscrypt, libsodium"
 PACKAGECONFIG[largefile] = "--enable-largefile,--disable-largefile,,"
 PACKAGECONFIG[systemd] = "--enable-systemd,--disable-systemd,systemd"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${systemd_unitdir}/system
 	install -m 0644 ${B}/contrib/unbound.service ${D}${systemd_unitdir}/system
 
@@ -40,7 +40,7 @@ do_install_append() {
 	install -m 0755 ${S}/contrib/unbound.init ${D}${sysconfdir}/init.d/unbound
 }
 
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
 INITSCRIPT_NAME = "unbound"
 INITSCRIPT_PARAMS = "defaults"

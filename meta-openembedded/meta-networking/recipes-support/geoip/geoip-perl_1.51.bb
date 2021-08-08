@@ -31,5 +31,5 @@ do_install_ptest () {
     install ${S}/t/data/* ${D}${PTEST_PATH}/t/data
 }
 
-FILES_${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/Geo/IP/.debug"
+FILES:${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/Geo/IP/.debug"
 

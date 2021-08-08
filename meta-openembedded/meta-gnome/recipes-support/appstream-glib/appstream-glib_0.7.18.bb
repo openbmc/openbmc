@@ -26,9 +26,9 @@ EXTRA_OEMESON = " \
     -Drpm=false \
 "
 
-FILES_${PN} += "${libdir}/asb-plugins-5"
+FILES:${PN} += "${libdir}/asb-plugins-5"
 
-FILES_${PN}-dev += " \
+FILES:${PN}-dev += " \
     ${datadir}/installed-tests \
     ${datadir}/gettext \
 "

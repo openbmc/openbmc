@@ -26,9 +26,9 @@ S = "${WORKDIR}/fluent-bit-${PV}"
 DEPENDS = "zlib bison-native flex-native"
 DEPENDS += "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
-DEPENDS_append_libc-musl = " fts "
+DEPENDS:append:libc-musl = " fts "
 
-INSANE_SKIP_${PN}-dev += "dev-elf"
+INSANE_SKIP:${PN}-dev += "dev-elf"
 
 LTO = ""
 
@@ -49,8 +49,8 @@ EXTRA_OECMAKE += "-DFLB_SHARED_LIB=Off -DFLB_EXAMPLES=Off "
 
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES','systemd','-DFLB_SYSTEMD=On','',d)}"
 
-EXTRA_OECMAKE_append_riscv64 = " -DFLB_DEPS='atomic'"
-EXTRA_OECMAKE_append_riscv32 = " -DFLB_DEPS='atomic'"
+EXTRA_OECMAKE:append:riscv64 = " -DFLB_DEPS='atomic'"
+EXTRA_OECMAKE:append:riscv32 = " -DFLB_DEPS='atomic'"
 
 # Kafka Output plugin (disabled by default): note that when
 # enabling Kafka output plugin, the backend library librdkafka
@@ -63,5 +63,5 @@ inherit cmake systemd
 
 CFLAGS += "-fcommon"
 
-SYSTEMD_SERVICE_${PN} = "td-agent-bit.service"
-TARGET_CC_ARCH_append = " ${SELECTED_OPTIMIZATION}"
+SYSTEMD_SERVICE:${PN} = "td-agent-bit.service"
+TARGET_CC_ARCH:append = " ${SELECTED_OPTIMIZATION}"

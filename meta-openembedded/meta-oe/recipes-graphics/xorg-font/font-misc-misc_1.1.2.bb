@@ -7,7 +7,7 @@ LICENSE = "PD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=200c507f595ee97008c7c5c3e94ab9a8"
 
 DEPENDS = "util-macros-native font-util-native bdftopcf-native font-util"
-RDEPENDS_${PN} = "encodings font-util"
+RDEPENDS:${PN} = "encodings font-util"
 
 inherit features_check
 # depends on bdftopcf-native -> virtual/libx11

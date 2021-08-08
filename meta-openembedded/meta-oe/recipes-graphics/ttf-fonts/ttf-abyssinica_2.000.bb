@@ -12,4 +12,4 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 SRC_URI[sha256sum] = "274204a53b30f64cca662d78c7199e3c0325ea95ad4109886b47af734c92d0f9"
 
 FONT_PACKAGES = "${PN}"
-FILES_${PN} = "${datadir}"
+FILES:${PN} = "${datadir}"

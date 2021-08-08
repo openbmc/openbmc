@@ -15,10 +15,10 @@ SRC_URI[sha256sum] = "291ac350cc5eb4a01b0d651ca99fae64cee8a1c06b2005277fab5a4356
 
 S = "${WORKDIR}"
 PACKAGES = "${PN} ${PN}-dev"
-FILES_${PN}-dev = "${includedir}/libintl.h ${libdir}/libintl.a"
-INSANE_SKIP_${PN}-dev = "staticdev"
-ALLOW_EMPTY_${PN} = "1"
-CFLAGS_append = " -fPIC -Wall -I ../../include ${@['-DSTUB_ONLY', ''][d.getVar('USE_NLS') != 'no']}"
+FILES:${PN}-dev = "${includedir}/libintl.h ${libdir}/libintl.a"
+INSANE_SKIP:${PN}-dev = "staticdev"
+ALLOW_EMPTY:${PN} = "1"
+CFLAGS:append = " -fPIC -Wall -I ../../include ${@['-DSTUB_ONLY', ''][d.getVar('USE_NLS') != 'no']}"
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 do_compile() {

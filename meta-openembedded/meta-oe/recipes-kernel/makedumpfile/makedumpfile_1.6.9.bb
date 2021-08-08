@@ -14,14 +14,14 @@ SRCBRANCH ?= "master"
 SRCREV = "a9ad811c15e769c8e6d8d915a05cebc32f2ea2f5"
 
 DEPENDS = "bzip2 zlib elfutils xz"
-RDEPENDS_${PN}-tools = "perl ${PN}"
+RDEPENDS:${PN}-tools = "perl ${PN}"
 
 # arm and aarch64 would compile but has never been tested upstream.  mips would not compile.
 #
 COMPATIBLE_HOST = "(x86_64|i.86|powerpc|arm|aarch64).*-linux"
 
 PACKAGES =+ "${PN}-tools"
-FILES_${PN}-tools = "${bindir}/*.pl"
+FILES:${PN}-tools = "${bindir}/*.pl"
 
 SRC_URI = "\
     git://github.com/makedumpfile/makedumpfile;branch=${SRCBRANCH} \

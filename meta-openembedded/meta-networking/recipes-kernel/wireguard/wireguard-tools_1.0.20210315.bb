@@ -16,11 +16,11 @@ do_install () {
         install
 }
 
-FILES_${PN} = " \
+FILES:${PN} = " \
     ${sysconfdir} \
     ${systemd_system_unitdir} \
     ${bindir} \
 "
 
-RDEPENDS_${PN} = "bash"
-RRECOMMENDS_${PN} = "kernel-module-wireguard"
+RDEPENDS:${PN} = "bash"
+RRECOMMENDS:${PN} = "kernel-module-wireguard"

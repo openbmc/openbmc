@@ -48,19 +48,19 @@ PACKAGECONFIG[cups] = "-DWITH_CUPS=ON,-DWITH_CUPS=OFF,cups"
 PACKAGES =+ "libfreerdp"
 
 LEAD_SONAME = "libfreerdp.so"
-FILES_libfreerdp = "${libdir}/lib*${SOLIBS}"
+FILES:libfreerdp = "${libdir}/lib*${SOLIBS}"
 
 PACKAGES_DYNAMIC += "^libfreerdp-plugin-.*"
 
 # we will need winpr-makecert to generate TLS certificates
-do_install_append () {
+do_install:append () {
     install -d ${D}${bindir}
     install -m755 winpr/tools/makecert-cli/winpr-makecert ${D}${bindir}
     rm -rf ${D}${libdir}/cmake
     rm -rf ${D}${libdir}/freerdp
 }
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     freerdp_root = d.expand('${libdir}/freerdp')
 
     do_split_packages(d, freerdp_root, '^(audin_.*)\.so$',

@@ -4,4 +4,4 @@
 # We therefore enable pie unconditionally for native recipes where static libs are
 # used such as libiberty from binutils, for now, until our minimum distro set is
 # all default pie.
-BUILD_CFLAGS_append_pn-binutils-native = " -pie -fpie"
+BUILD_CFLAGS:append:pn-binutils-native = " -pie -fpie"

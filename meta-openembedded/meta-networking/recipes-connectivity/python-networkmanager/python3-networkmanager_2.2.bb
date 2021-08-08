@@ -10,4 +10,4 @@ SRC_URI[sha256sum] = "de6eb921d94aba7549f428ed2b3aa482a5d543ecb6965cbaa0fbb555ab
 PYPI_PACKAGE = "python-networkmanager"
 inherit pypi setuptools3
 
-RDEPENDS_${PN} = "networkmanager python3-dbus python3-six"
+RDEPENDS:${PN} = "networkmanager python3-dbus python3-six"

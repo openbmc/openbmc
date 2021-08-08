@@ -26,7 +26,7 @@ SRC_URI = "${SAMBA_MIRROR}/stable/samba-${PV}.tar.gz \
            file://0009-source3-wscript-disable-check-fcntl-RW_HINTS.patch \
            "
 
-SRC_URI_append_libc-musl = " \
+SRC_URI:append:libc-musl = " \
            file://netdb_defines.patch \
            file://samba-pam.patch \
            file://samba-4.3.9-remove-getpwent_r.patch \
@@ -45,31 +45,31 @@ inherit systemd waf-samba cpan-base perlnative update-rc.d perl-version
 CVE_CHECK_WHITELIST += "CVE-2011-2411" 
 
 # remove default added RDEPENDS on perl
-RDEPENDS_${PN}_remove = "perl"
+RDEPENDS:${PN}:remove = "perl"
 
 DEPENDS += "readline virtual/libiconv zlib popt libtalloc libtdb libtevent libldb libaio libpam libtasn1 jansson libparse-yapp-perl-native gnutls"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
-DEPENDS_append_libc-musl = " libtirpc"
-CFLAGS_append_libc-musl = " -I${STAGING_INCDIR}/tirpc"
-LDFLAGS_append_libc-musl = " -ltirpc"
+DEPENDS:append:libc-musl = " libtirpc"
+CFLAGS:append:libc-musl = " -I${STAGING_INCDIR}/tirpc"
+LDFLAGS:append:libc-musl = " -ltirpc"
 
-COMPATIBLE_HOST_riscv32 = "null"
+COMPATIBLE_HOST:riscv32 = "null"
 
 INITSCRIPT_NAME = "samba"
 INITSCRIPT_PARAMS = "start 20 3 5 . stop 20 0 1 6 ."
 
 SYSTEMD_PACKAGES = "${PN}-base ${PN}-ad-dc winbind"
-SYSTEMD_SERVICE_${PN}-base = "nmb.service smb.service"
-SYSTEMD_SERVICE_${PN}-ad-dc = "${@bb.utils.contains('PACKAGECONFIG', 'ad-dc', 'samba.service', '', d)}"
-SYSTEMD_SERVICE_winbind = "winbind.service"
+SYSTEMD_SERVICE:${PN}-base = "nmb.service smb.service"
+SYSTEMD_SERVICE:${PN}-ad-dc = "${@bb.utils.contains('PACKAGECONFIG', 'ad-dc', 'samba.service', '', d)}"
+SYSTEMD_SERVICE:winbind = "winbind.service"
 
 # There are prerequisite settings to enable ad-dc, so disable the service by default.
 # Reference:
 # https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller
-SYSTEMD_AUTO_ENABLE_${PN}-ad-dc = "disable"
+SYSTEMD_AUTO_ENABLE:${PN}-ad-dc = "disable"
 
 #cross_compile cannot use preforked process, since fork process earlier than point subproces.popen
 #to cross Popen
@@ -81,7 +81,7 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd zeroconf', d)}
                    acl cups ad-dc ldap mitkrb5 \
 "
 
-RDEPENDS_${PN}-ctdb-tests += "bash util-linux-getopt"
+RDEPENDS:${PN}-ctdb-tests += "bash util-linux-getopt"
 
 PACKAGECONFIG[acl] = "--with-acl-support,--without-acl-support,acl"
 PACKAGECONFIG[fam] = "--with-fam,--without-fam,gamin"
@@ -130,7 +130,7 @@ EXTRA_OECONF += "--enable-fhs \
 
 LDFLAGS += "-Wl,-z,relro,-z,now ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
 
-do_configure_append () {
+do_configure:append () {
     cd ${S}/pidl/
     perl Makefile.PL PREFIX=${prefix}
     sed -e 's,VENDORPREFIX)/lib/perl,VENDORPREFIX)/${baselib}/perl,g' \
@@ -138,11 +138,11 @@ do_configure_append () {
 
 }
 
-do_compile_append () {
+do_compile:append () {
     oe_runmake -C ${S}/pidl
 }
 
-do_install_append() {
+do_install:append() {
     for section in 1 5 7; do
         install -d ${D}${mandir}/man$section
         install -m 0644 ctdb/doc/*.$section ${D}${mandir}/man$section
@@ -223,7 +223,7 @@ PACKAGES =+ "${PN}-python3 ${PN}-pidl \
 python samba_populate_packages() {
     def module_hook(file, pkg, pattern, format, basename):
         pn = d.getVar('PN')
-        d.appendVar('RRECOMMENDS_%s-base' % pn, ' %s' % pkg)
+        d.appendVar('RRECOMMENDS:%s-base' % pn, ' %s' % pkg)
 
     mlprefix = d.getVar('MLPREFIX') or ''
     pam_libdir = d.expand('${base_libdir}/security')
@@ -240,25 +240,25 @@ python samba_populate_packages() {
     do_split_packages(d, moduledir, '^(.*)\.so$', 'samba-pdb-%s', 'Samba %s password backend', hook=module_hook, extra_depends='', prepend=True)
 }
 
-PACKAGESPLITFUNCS_prepend = "samba_populate_packages "
+PACKAGESPLITFUNCS:prepend = "samba_populate_packages "
 PACKAGES_DYNAMIC = "samba-auth-.* samba-pdb-.*"
 
-RDEPENDS_${PN} += "${PN}-base ${PN}-python3 ${PN}-dsdb-modules python3"
-RDEPENDS_${PN}-python3 += "pytalloc python3-tdb"
+RDEPENDS:${PN} += "${PN}-base ${PN}-python3 ${PN}-dsdb-modules python3"
+RDEPENDS:${PN}-python3 += "pytalloc python3-tdb"
 
-FILES_${PN}-base = "${sbindir}/nmbd \
+FILES:${PN}-base = "${sbindir}/nmbd \
                     ${sbindir}/smbd \
                     ${sysconfdir}/init.d \
                     ${systemd_system_unitdir}/nmb.service \
                     ${systemd_system_unitdir}/smb.service"
 
-FILES_${PN}-ad-dc = "${sbindir}/samba \
+FILES:${PN}-ad-dc = "${sbindir}/samba \
                      ${systemd_system_unitdir}/samba.service \
                      ${libdir}/krb5/plugins/kdb/samba.so \
 "
-RDEPENDS_${PN}-ad-dc = "krb5-kdc"
+RDEPENDS:${PN}-ad-dc = "krb5-kdc"
 
-FILES_${PN}-ctdb-tests = "${bindir}/ctdb_run_tests \
+FILES:${PN}-ctdb-tests = "${bindir}/ctdb_run_tests \
                           ${bindir}/ctdb_run_cluster_tests \
                           ${sysconfdir}/ctdb/nodes \
                           ${datadir}/ctdb-tests \
@@ -266,34 +266,34 @@ FILES_${PN}-ctdb-tests = "${bindir}/ctdb_run_tests \
                           ${localstatedir}/lib/ctdb \
                          "
 
-FILES_${BPN}-common = "${sysconfdir}/default \
+FILES:${BPN}-common = "${sysconfdir}/default \
                        ${sysconfdir}/samba \
                        ${sysconfdir}/tmpfiles.d \
                        ${localstatedir}/lib/samba \
                        ${localstatedir}/spool/samba \
 "
 
-FILES_${PN} += "${libdir}/vfs/*.so \
+FILES:${PN} += "${libdir}/vfs/*.so \
                 ${libdir}/charset/*.so \
                 ${libdir}/*.dat \
                 ${libdir}/auth/*.so \
                 ${datadir}/ctdb/events/* \
 "
 
-FILES_${PN}-dsdb-modules = "${libdir}/samba/ldb"
+FILES:${PN}-dsdb-modules = "${libdir}/samba/ldb"
 
-FILES_${PN}-testsuite = "${bindir}/gentest \
+FILES:${PN}-testsuite = "${bindir}/gentest \
                          ${bindir}/locktest \
                          ${bindir}/masktest \
                          ${bindir}/ndrdump \
                          ${bindir}/smbtorture"
 
-FILES_registry-tools = "${bindir}/regdiff \
+FILES:registry-tools = "${bindir}/regdiff \
                         ${bindir}/regpatch \
                         ${bindir}/regshell \
                         ${bindir}/regtree"
 
-FILES_winbind = "${sbindir}/winbindd \
+FILES:winbind = "${sbindir}/winbindd \
                  ${bindir}/wbinfo \
                  ${bindir}/ntlm_auth \
                  ${libdir}/samba/idmap \
@@ -303,9 +303,9 @@ FILES_winbind = "${sbindir}/winbindd \
                  ${sysconfdir}/init.d/winbind \
                  ${systemd_system_unitdir}/winbind.service"
 
-FILES_${PN}-python3 = "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN}-python3 = "${PYTHON_SITEPACKAGES_DIR}"
 
-FILES_smbclient = "${bindir}/cifsdd \
+FILES:smbclient = "${bindir}/cifsdd \
                    ${bindir}/rpcclient \
                    ${bindir}/smbcacls \
                    ${bindir}/smbclient \
@@ -316,31 +316,31 @@ FILES_smbclient = "${bindir}/cifsdd \
                    ${bindir}/smbtree \
                    ${libdir}/samba/smbspool_krb5_wrapper"
 
-RDEPENDS_${PN}-pidl_append = " perl libparse-yapp-perl"
-FILES_${PN}-pidl = "${bindir}/pidl \
+RDEPENDS:${PN}-pidl:append = " perl libparse-yapp-perl"
+FILES:${PN}-pidl = "${bindir}/pidl \
                     ${libdir}/perl5 \
                    "
 
-RDEPENDS_${PN}-client = "\
+RDEPENDS:${PN}-client = "\
     smbclient \
     winbind \
     registry-tools \
     ${PN}-pidl \
     "
 
-ALLOW_EMPTY_${PN}-client = "1"
+ALLOW_EMPTY:${PN}-client = "1"
 
-RDEPENDS_${PN}-server = "\
+RDEPENDS:${PN}-server = "\
     ${PN} \
     winbind \
     registry-tools \
     "
 
-ALLOW_EMPTY_${PN}-server = "1"
+ALLOW_EMPTY:${PN}-server = "1"
 
-RDEPENDS_${PN}-test = "\
+RDEPENDS:${PN}-test = "\
     ${PN}-ctdb-tests \
     ${PN}-testsuite \
     "
 
-ALLOW_EMPTY_${PN}-test = "1"
+ALLOW_EMPTY:${PN}-test = "1"

@@ -40,6 +40,6 @@ do_install() {
 }
 
 PACKAGES += "${PN}-consolefonts ${PN}-consoletrans ${PN}-pcf"
-FILES_${PN}-consolefonts = "${datadir}/consolefonts"
-FILES_${PN}-consoletrans = "${datadir}/consoletrans"
-FILES_${PN}-pcf = "${datadir}/fonts/terminus"
+FILES:${PN}-consolefonts = "${datadir}/consolefonts"
+FILES:${PN}-consoletrans = "${datadir}/consoletrans"
+FILES:${PN}-pcf = "${datadir}/fonts/terminus"

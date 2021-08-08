@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS += "openssl attr keyutils"
 
-DEPENDS_class-native += "openssl-native keyutils-native"
+DEPENDS:class-native += "openssl-native keyutils-native"
 
 PV = "1.2.1+git${SRCPV}"
 SRCREV = "3eab1f93b634249c1720f65fcb495b1996f0256e"
@@ -26,13 +26,13 @@ S = "${WORKDIR}/git"
 inherit pkgconfig autotools features_check
 
 REQUIRED_DISTRO_FEATURES = "ima"
-REQUIRED_DISTRO_FEATURES_class-native = ""
+REQUIRED_DISTRO_FEATURES:class-native = ""
 
-EXTRA_OECONF_append_class-target = " --with-kernel-headers=${STAGING_KERNEL_BUILDDIR}"
+EXTRA_OECONF:append:class-target = " --with-kernel-headers=${STAGING_KERNEL_BUILDDIR}"
 
 # blkid is called by evmctl when creating evm checksums.
 # This is less useful when signing files on the build host,
 # so disable it when compiling on the host.
-RDEPENDS_${PN}_append_class-target = " util-linux-blkid libcrypto attr libattr keyutils"
+RDEPENDS:${PN}:append:class-target = " util-linux-blkid libcrypto attr libattr keyutils"
 
 BBCLASSEXTEND = "native nativesdk"

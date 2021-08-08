@@ -14,7 +14,7 @@ LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=70dc2bac4d0ce4448da873cd86b123fc"
 
 DEPENDS = "ghostscript-native tiff jpeg fontconfig cups libpng"
-DEPENDS_class-native = "libpng-native"
+DEPENDS:class-native = "libpng-native"
 
 UPSTREAM_CHECK_URI = "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases"
 UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)\.tar"
@@ -40,7 +40,7 @@ SRC_URI = "${SRC_URI_BASE} \
            file://cups-no-gcrypt.patch \
            "
 
-SRC_URI_class-native = "${SRC_URI_BASE} \
+SRC_URI:class-native = "${SRC_URI_BASE} \
                         file://ghostscript-9.21-native-fix-disable-system-libtiff.patch \
                         file://base-genht.c-add-a-preprocessor-define-to-allow-fope.patch \
                         "
@@ -49,13 +49,13 @@ SRC_URI[sha256sum] = "0646bb97f6f4d10a763f4919c54fa28b4fbdd3dff8e7de3410431c8176
 
 # Put something like
 #
-#   PACKAGECONFIG_append_pn-ghostscript = " x11"
+#   PACKAGECONFIG:append:pn-ghostscript = " x11"
 #
 # in local.conf to enable building with X11.  Be careful.  The order
 # of the overrides matters!
 #
 #PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)}"
-PACKAGECONFIG_class-native = ""
+PACKAGECONFIG:class-native = ""
 
 PACKAGECONFIG[x11] = "--with-x --x-includes=${STAGING_INCDIR} --x-libraries=${STAGING_LIBDIR}, \
                       --without-x, virtual/libx11 libxext libxt gtk+3\
@@ -68,11 +68,11 @@ EXTRA_OECONF = "--without-libpaper --with-system-libtiff --without-jbig2dec \
                 CUPSCONFIG="${STAGING_BINDIR_CROSS}/cups-config" \
                 "
 
-EXTRA_OECONF_append_mipsarcho32 = " --with-large_color_index=0"
+EXTRA_OECONF:append:mipsarcho32 = " --with-large_color_index=0"
 
 # Explicity disable libtiff, fontconfig,
 # freetype, cups for ghostscript-native
-EXTRA_OECONF_class-native = "--without-x --with-system-libtiff=no \
+EXTRA_OECONF:class-native = "--without-x --with-system-libtiff=no \
                              --without-jbig2dec --without-libpaper \
                              --with-fontpath=${datadir}/fonts \
                              --without-libidn --disable-fontconfig \
@@ -86,11 +86,11 @@ BUILD_CFLAGS += "-DHAVE_SYS_TIME_H=1"
 
 inherit autotools-brokensep
 
-do_configure_prepend_class-target () {
+do_configure:prepend:class-target () {
         rm -rf ${S}/jpeg/
 }
 
-do_configure_append () {
+do_configure:append () {
 	# copy tools from the native ghostscript build
 	if [ "${PN}" != "ghostscript-native" ]; then
 		mkdir -p obj/aux soobj
@@ -100,20 +100,20 @@ do_configure_append () {
 	fi
 }
 
-do_install_append () {
+do_install:append () {
     mkdir -p ${D}${datadir}/ghostscript/${PV}/
     cp -r ${S}/Resource ${D}${datadir}/ghostscript/${PV}/
     cp -r ${S}/iccprofiles ${D}${datadir}/ghostscript/${PV}/
 }
 
-do_compile_class-native () {
+do_compile:class-native () {
     mkdir -p obj
     for i in genarch genconf mkromfs echogs gendev genht packps; do
         oe_runmake obj/aux/$i
     done
 }
 
-do_install_class-native () {
+do_install:class-native () {
     install -d ${D}${bindir}/ghostscript-${PV}
     for i in genarch genconf mkromfs echogs gendev genht packps; do
         install -m 755 obj/aux/$i ${D}${bindir}/ghostscript-${PV}/$i

@@ -32,17 +32,17 @@ PACKAGES =+ "${PN}-icu ${PN}-icu-dev ${PN}-subset"
 
 LEAD_SONAME = "libharfbuzz.so"
 
-do_install_append() {
+do_install:append() {
     # If no tools are installed due to PACKAGECONFIG then this directory is
     #still installed, so remove it to stop packaging wanings.
     rmdir --ignore-fail-on-non-empty ${D}${bindir}
 }
 
-FILES_${PN}-icu = "${libdir}/libharfbuzz-icu.so.*"
-FILES_${PN}-icu-dev = "${libdir}/libharfbuzz-icu.la \
+FILES:${PN}-icu = "${libdir}/libharfbuzz-icu.so.*"
+FILES:${PN}-icu-dev = "${libdir}/libharfbuzz-icu.la \
                        ${libdir}/libharfbuzz-icu.so \
                        ${libdir}/pkgconfig/harfbuzz-icu.pc \
 "
-FILES_${PN}-subset = "${libdir}/libharfbuzz-subset.so.*"
+FILES:${PN}-subset = "${libdir}/libharfbuzz-subset.so.*"
 
 BBCLASSEXTEND = "native nativesdk"

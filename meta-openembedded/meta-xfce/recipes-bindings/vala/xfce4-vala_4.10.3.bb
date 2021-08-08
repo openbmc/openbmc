@@ -14,6 +14,6 @@ SRC_URI = " \
 SRC_URI[md5sum] = "0bbb1d6e473e0fe9b335b7b1b49d8a71"
 SRC_URI[sha256sum] = "07a8f2b7c09fcdd3d86e0c52adea3c58ca011d0142a93997a01b4af77260ae7b"
 
-FILES_${PN} += "${datadir}/vala-*/vapi"
+FILES:${PN} += "${datadir}/vala-*/vapi"
 
-RDEPENDS_${PN} = "vala"
+RDEPENDS:${PN} = "vala"

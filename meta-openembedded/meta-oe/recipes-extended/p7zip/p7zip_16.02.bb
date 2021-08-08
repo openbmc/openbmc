@@ -17,13 +17,13 @@ SRC_URI[sha256sum] = "5eb20ac0e2944f6cb9c2d51dd6c4518941c185347d4089ea89087ffdd6
 
 S = "${WORKDIR}/${BPN}_${PV}"
 
-do_compile_append() {
+do_compile:append() {
     oe_runmake 7z
 }
-FILES_${PN} += "${libdir}/* ${bindir}/7z"
+FILES:${PN} += "${libdir}/* ${bindir}/7z"
 
 FILES_SOLIBSDEV = ""
-INSANE_SKIP_${PN} += "dev-so"
+INSANE_SKIP:${PN} += "dev-so"
 
 do_install() {
 	install -d ${D}${bindir}
@@ -36,7 +36,7 @@ do_install() {
 	install -m 0755 ${S}/bin/7z.so ${D}${libdir}/lib7z.so
 }
 
-RPROVIDES_${PN} += "lib7z.so()(64bit) 7z lib7z.so"
-RPROVIDES_${PN}-dev += "lib7z.so()(64bit) 7z lib7z.so"
+RPROVIDES:${PN} += "lib7z.so()(64bit) 7z lib7z.so"
+RPROVIDES:${PN}-dev += "lib7z.so()(64bit) 7z lib7z.so"
 
 BBCLASSEXTEND = "native nativesdk"

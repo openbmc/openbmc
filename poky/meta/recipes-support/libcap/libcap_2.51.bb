@@ -21,7 +21,7 @@ UPSTREAM_CHECK_URI = "https://www.kernel.org/pub/linux/libs/security/linux-privs
 inherit lib_package
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
-PACKAGECONFIG_class-native ??= ""
+PACKAGECONFIG:class-native ??= ""
 
 PACKAGECONFIG[pam] = "PAM_CAP=yes,PAM_CAP=no,libpam"
 
@@ -33,7 +33,7 @@ EXTRA_OEMAKE = " \
   BUILD_GPERF=yes \
 "
 
-EXTRA_OEMAKE_append_class-target = " SYSTEM_HEADERS=${STAGING_INCDIR}"
+EXTRA_OEMAKE:append:class-target = " SYSTEM_HEADERS=${STAGING_INCDIR}"
 
 do_compile() {
 	unset CFLAGS BUILD_CFLAGS
@@ -54,7 +54,7 @@ do_install() {
 		SBINDIR="${sbindir}"
 }
 
-do_install_append() {
+do_install:append() {
 	# Move the library to base_libdir
 	install -d ${D}${base_libdir}
 	if [ ! ${D}${libdir} -ef ${D}${base_libdir} ]; then
@@ -65,9 +65,9 @@ do_install_append() {
 	fi
 }
 
-FILES_${PN}-dev += "${base_libdir}/*.so"
+FILES:${PN}-dev += "${base_libdir}/*.so"
 
 # pam files
-FILES_${PN} += "${base_libdir}/security/*.so"
+FILES:${PN} += "${base_libdir}/security/*.so"
 
 BBCLASSEXTEND = "native nativesdk"

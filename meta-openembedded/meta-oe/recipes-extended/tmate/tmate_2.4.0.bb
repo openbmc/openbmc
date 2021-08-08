@@ -5,7 +5,7 @@ HOMEPAGE = "https://tmate.io/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f7d9aab84ec6567139a4755c48d147fb"
 
-DEPENDS_append = " libevent libssh msgpack-c ncurses"
+DEPENDS:append = " libevent libssh msgpack-c ncurses"
 SRC_URI = "\
     git://github.com/tmate-io/tmate.git;protocol=https \
 "

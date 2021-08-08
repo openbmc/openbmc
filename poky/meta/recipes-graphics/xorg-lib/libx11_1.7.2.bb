@@ -12,6 +12,7 @@ PE = "1"
 
 SRC_URI += "file://Fix-hanging-issue-in-_XReply.patch \
            file://disable_tests.patch \
+           file://keysym.patch \
            "
 
 SRC_URI[sha256sum] = "1cfa35e37aaabbe4792e9bb690468efefbfbf6b147d9c69d6f90d13c3092ea6c"
@@ -35,8 +36,8 @@ PACKAGES =+ "${PN}-xcb"
 
 inherit gettext
 
-FILES_${PN} += "${datadir}/X11/XKeysymDB ${datadir}/X11/XErrorDB ${datadir}/X11/Xcms.txt"
-FILES_${PN}-xcb += "${libdir}/libX11-xcb.so.*"
-FILES_${PN}-locale += "${datadir}/X11/locale ${libdir}/X11/locale"
+FILES:${PN} += "${datadir}/X11/XKeysymDB ${datadir}/X11/XErrorDB ${datadir}/X11/Xcms.txt"
+FILES:${PN}-xcb += "${libdir}/libX11-xcb.so.*"
+FILES:${PN}-locale += "${datadir}/X11/locale ${libdir}/X11/locale"
 
 BBCLASSEXTEND = "native nativesdk"

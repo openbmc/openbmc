@@ -20,16 +20,16 @@ DEPENDS = "sysfsutils"
 
 inherit autotools-brokensep update-alternatives
 
-ALTERNATIVE_${PN} = "brctl"
+ALTERNATIVE:${PN} = "brctl"
 ALTERNATIVE_PRIORITY[brctl] = "100"
 ALTERNATIVE_LINK_NAME[brctl] = "${sbindir}/brctl"
 
 EXTRA_OECONF = "--with-linux-headers=${STAGING_INCDIR}"
 
-do_install_append () {
+do_install:append () {
     install -d ${D}/${datadir}/bridge-utils
     install -d ${D}/${sysconfdir}/network/if-pre-up.d
     install -d ${D}/${sysconfdir}/network/if-post-down.d
 }
 
-RRECOMMENDS_${PN} = "kernel-module-bridge"
+RRECOMMENDS:${PN} = "kernel-module-bridge"

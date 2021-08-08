@@ -13,24 +13,24 @@ DEPENDS = "bison-native flex-native"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/libcg/${BPN}/v0.41/${BPN}-${PV}.tar.bz2 \
            file://CVE-2018-14348.patch"
-SRC_URI_append_libc-musl = " file://musl-decls-compat.patch"
+SRC_URI:append:libc-musl = " file://musl-decls-compat.patch"
 
 SRC_URI[md5sum] = "3dea9d50b8a5b73ff0bf1cdcb210f63f"
 SRC_URI[sha256sum] = "e4e38bdc7ef70645ce33740ddcca051248d56b53283c0dc6d404e17706f6fb51"
 
 UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/libcg/files/libcgroup/"
 
-DEPENDS_append_libc-musl = " fts "
-EXTRA_OEMAKE_append_libc-musl = " LIBS=-lfts"
+DEPENDS:append:libc-musl = " fts "
+EXTRA_OEMAKE:append:libc-musl = " LIBS=-lfts"
 
 PACKAGECONFIG = "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG[pam] = "--enable-pam-module-dir=${base_libdir}/security --enable-pam=yes,--enable-pam=no,libpam"
 
 PACKAGES =+ "cgroups-pam-plugin"
-FILES_cgroups-pam-plugin = "${base_libdir}/security/pam_cgroup.so*"
-FILES_${PN}-dev += "${base_libdir}/security/*.la"
+FILES:cgroups-pam-plugin = "${base_libdir}/security/pam_cgroup.so*"
+FILES:${PN}-dev += "${base_libdir}/security/*.la"
 
-do_install_append() {
+do_install:append() {
 	# Moving libcgroup to base_libdir
 	if [ ! ${D}${libdir} -ef ${D}${base_libdir} ]; then
 		mkdir -p ${D}/${base_libdir}/

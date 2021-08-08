@@ -189,8 +189,8 @@ class Wic(WicTestCase):
     def test_iso_image(self):
         """Test creation of hybrid iso image with legacy and EFI boot"""
         config = 'INITRAMFS_IMAGE = "core-image-minimal-initramfs"\n'\
-                 'MACHINE_FEATURES_append = " efi"\n'\
-                 'DEPENDS_pn-core-image-minimal += "syslinux"\n'
+                 'MACHINE_FEATURES:append = " efi"\n'\
+                 'DEPENDS:pn-core-image-minimal += "syslinux"\n'
         self.append_config(config)
         bitbake('core-image-minimal core-image-minimal-initramfs')
         self.remove_config(config)
@@ -216,7 +216,7 @@ class Wic(WicTestCase):
     @only_for_arch(['i586', 'i686', 'x86_64'])
     def test_bootloader_config(self):
         """Test creation of directdisk-bootloader-config image"""
-        config = 'DEPENDS_pn-core-image-minimal += "syslinux"\n'
+        config = 'DEPENDS:pn-core-image-minimal += "syslinux"\n'
         self.append_config(config)
         bitbake('core-image-minimal')
         self.remove_config(config)
@@ -227,7 +227,7 @@ class Wic(WicTestCase):
     @only_for_arch(['i586', 'i686', 'x86_64'])
     def test_systemd_bootdisk(self):
         """Test creation of systemd-bootdisk image"""
-        config = 'MACHINE_FEATURES_append = " efi"\n'
+        config = 'MACHINE_FEATURES:append = " efi"\n'
         self.append_config(config)
         bitbake('core-image-minimal')
         self.remove_config(config)
@@ -259,7 +259,7 @@ class Wic(WicTestCase):
         """Test default output location"""
         for fname in glob("directdisk-*.direct"):
             os.remove(fname)
-        config = 'DEPENDS_pn-core-image-minimal += "syslinux"\n'
+        config = 'DEPENDS:pn-core-image-minimal += "syslinux"\n'
         self.append_config(config)
         bitbake('core-image-minimal')
         self.remove_config(config)
@@ -757,7 +757,7 @@ class Wic2(WicTestCase):
     def test_wic_image_type(self):
         """Test building wic images by bitbake"""
         config = 'IMAGE_FSTYPES += "wic"\nWKS_FILE = "wic-image-minimal"\n'\
-                 'MACHINE_FEATURES_append = " efi"\n'
+                 'MACHINE_FEATURES:append = " efi"\n'
         self.append_config(config)
         self.assertEqual(0, bitbake('wic-image-minimal').status)
         self.remove_config(config)
@@ -777,7 +777,7 @@ class Wic2(WicTestCase):
     def test_qemu(self):
         """Test wic-image-minimal under qemu"""
         config = 'IMAGE_FSTYPES += "wic"\nWKS_FILE = "wic-image-minimal"\n'\
-                 'MACHINE_FEATURES_append = " efi"\n'
+                 'MACHINE_FEATURES:append = " efi"\n'
         self.append_config(config)
         self.assertEqual(0, bitbake('wic-image-minimal').status)
         self.remove_config(config)
@@ -1035,7 +1035,7 @@ class Wic2(WicTestCase):
     @only_for_arch(['i586', 'i686', 'x86_64'])
     def test_biosplusefi_plugin_qemu(self):
         """Test biosplusefi plugin in qemu"""
-        config = 'IMAGE_FSTYPES = "wic"\nWKS_FILE = "test_biosplusefi_plugin.wks"\nMACHINE_FEATURES_append = " efi"\n'
+        config = 'IMAGE_FSTYPES = "wic"\nWKS_FILE = "test_biosplusefi_plugin.wks"\nMACHINE_FEATURES:append = " efi"\n'
         self.append_config(config)
         self.assertEqual(0, bitbake('core-image-minimal').status)
         self.remove_config(config)
@@ -1072,7 +1072,7 @@ class Wic2(WicTestCase):
         # If an image hasn't been built yet, directory ${STAGING_DATADIR}/syslinux won't exists and _get_bootimg_dir()
         #   will raise with "Couldn't find correct bootimg_dir"
         # The easiest way to work-around this issue is to make sure we already built an image here, hence the bitbake call
-        config = 'IMAGE_FSTYPES = "wic"\nWKS_FILE = "test_biosplusefi_plugin.wks"\nMACHINE_FEATURES_append = " efi"\n'
+        config = 'IMAGE_FSTYPES = "wic"\nWKS_FILE = "test_biosplusefi_plugin.wks"\nMACHINE_FEATURES:append = " efi"\n'
         self.append_config(config)
         self.assertEqual(0, bitbake('core-image-minimal').status)
         self.remove_config(config)

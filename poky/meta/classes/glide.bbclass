@@ -2,8 +2,8 @@
 #
 # Copyright 2018 (C) O.S. Systems Software LTDA.
 
-DEPENDS_append = " glide-native"
+DEPENDS:append = " glide-native"
 
-do_compile_prepend() {
+do_compile:prepend() {
     ( cd ${B}/src/${GO_IMPORT} && glide install )
 }

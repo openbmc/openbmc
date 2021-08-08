@@ -21,4 +21,4 @@ inherit autotools-brokensep
 
 S = "${WORKDIR}/sg3_utils-${PV}"
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"

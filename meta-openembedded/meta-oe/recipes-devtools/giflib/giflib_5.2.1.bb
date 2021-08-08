@@ -16,9 +16,9 @@ do_install() {
 }
 
 PACKAGES += "${PN}-utils"
-FILES_${PN} = "${libdir}/libgif.so.*"
-FILES_${PN}-utils = "${bindir}"
+FILES:${PN} = "${libdir}/libgif.so.*"
+FILES:${PN}-utils = "${bindir}"
 
 BBCLASSEXTEND = "native"
 
-RDEPENDS_${PN}-utils = "perl"
+RDEPENDS:${PN}-utils = "perl"

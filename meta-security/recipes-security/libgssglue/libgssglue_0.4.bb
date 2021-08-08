@@ -33,11 +33,11 @@ SRC_URI[md5sum] = "5ce81940965fa68c7635c42dcafcddfe"
 SRC_URI[sha256sum] = "bb47b2de78409f461811d0db8595c66e6631a9879c3621a35e4434b104ee52f5"
 
 # gssglue can use krb5, spkm3... as gssapi library, configurable
-RRECOMMENDS_${PN} += "krb5"
+RRECOMMENDS:${PN} += "krb5"
 
 inherit autotools
 
-do_install_append() {
+do_install:append() {
     # install some docs
     install -d -m 0755 ${D}${docdir}/${BPN}
     install -m 0644 ${S}/AUTHORS ${S}/ChangeLog ${S}/NEWS ${S}/README ${D}${docdir}/${BPN}

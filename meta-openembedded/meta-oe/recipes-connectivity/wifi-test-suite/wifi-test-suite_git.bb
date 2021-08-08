@@ -36,4 +36,4 @@ do_install () {
 	install -m 0755 ${S}/scripts/sta_reset_parm ${D}${sbindir}
 }
 
-RDEPENDS_${PN} = "wpa-supplicant"
+RDEPENDS:${PN} = "wpa-supplicant"

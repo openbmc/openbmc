@@ -12,7 +12,7 @@ DEPENDS += "\
     python3-cppy-native \
 "
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     python3-core \
     python3-setuptools \
 "

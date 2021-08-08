@@ -20,15 +20,15 @@ PACKAGECONFIG[curses] = "--enable-curses,--disable-curses,ncurses"
 
 PACKAGES += "libaspell libpspell libpspell-dev aspell-utils"
 
-FILES_${PN}-dbg += "${libdir}/aspell-0.60/.debu*"
-FILES_libaspell = "${libdir}/libaspell.so.* ${libdir}/aspell*"
-FILES_aspell-utils = "${bindir}/word-list-compress ${bindir}/aspell-import ${bindir}/run-with-aspell ${bindir}/pre*"
-FILES_${PN} = "${bindir}/aspell"
-FILES_libpspell = "${libdir}/libpspell.so.*"
-FILES_libpspell-dev = "${libdir}/libpspell* ${bindir}/pspell-config ${includedir}/pspell"
+FILES:${PN}-dbg += "${libdir}/aspell-0.60/.debu*"
+FILES:libaspell = "${libdir}/libaspell.so.* ${libdir}/aspell*"
+FILES:aspell-utils = "${bindir}/word-list-compress ${bindir}/aspell-import ${bindir}/run-with-aspell ${bindir}/pre*"
+FILES:${PN} = "${bindir}/aspell"
+FILES:libpspell = "${libdir}/libpspell.so.*"
+FILES:libpspell-dev = "${libdir}/libpspell* ${bindir}/pspell-config ${includedir}/pspell"
 
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
-ARM_INSTRUCTION_SET_armv6 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
+ARM_INSTRUCTION_SET:armv6 = "arm"
 
 inherit autotools gettext

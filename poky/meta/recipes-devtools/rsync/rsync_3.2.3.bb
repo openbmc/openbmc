@@ -45,15 +45,15 @@ EXTRA_OECONF = "--disable-simd --disable-md2man --disable-asm --with-nobody-grou
 
 # rsync 3.0 uses configure.sh instead of configure, and
 # makefile checks the existence of configure.sh
-do_configure_prepend () {
+do_configure:prepend () {
 	rm -f ${S}/configure ${S}/configure.sh
 }
 
-do_configure_append () {
+do_configure:append () {
 	cp -f ${S}/configure ${S}/configure.sh
 }
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${sysconfdir}
 	install -m 0644 ${WORKDIR}/rsyncd.conf ${D}${sysconfdir}
 }

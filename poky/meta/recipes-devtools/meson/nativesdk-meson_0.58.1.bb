@@ -13,7 +13,7 @@ SRC_URI += "file://meson-setup.py \
 #   real paths by meson-setup.sh when the SDK is extracted.
 # - Some overrides aren't needed, since the SDK injects paths that take care of
 #   them.
-do_install_append() {
+do_install:append() {
     install -d ${D}${datadir}/meson
     cat >${D}${datadir}/meson/meson.cross.template <<EOF
 [binaries]
@@ -47,10 +47,10 @@ EOF
     install -m 0755 ${WORKDIR}/meson-wrapper ${D}${bindir}/meson
 }
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     nativesdk-ninja \
     nativesdk-python3 \
     nativesdk-python3-setuptools \
     "
 
-FILES_${PN} += "${datadir}/meson ${SDKPATHNATIVE}"
+FILES:${PN} += "${datadir}/meson ${SDKPATHNATIVE}"

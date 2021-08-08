@@ -18,4 +18,4 @@ EXTRA_OECMAKE = "-DLONGLONG=ON \
                  -DEXTENSIONS=OFF \
                  "
 
-FILES_${PN}-dev += "${libdir}/CppUTest/cmake/*"
+FILES:${PN}-dev += "${libdir}/CppUTest/cmake/*"

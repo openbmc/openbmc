@@ -19,12 +19,12 @@ PACKAGECONFIG ??= " \
 PACKAGECONFIG[notify] = "--enable-libnotify,--disable-libnotify,libnotify"
 PACKAGECONFIG[sound-setter] = "--enable-sound-settings, --disable-sound-settings, libcanberra, libcanberra-gtk2 sound-theme-freedesktop"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/xfce4 \
     ${datadir}/xfce4 \
 "
 
-RRECOMMENDS_${PN} += "adwaita-icon-theme"
-RRECOMMENDS_${PN} += "${@bb.utils.contains('DISTRO_FEATURES','alsa','libcanberra-alsa','',d)}"
-RRECOMMENDS_${PN} += "${@bb.utils.contains('DISTRO_FEATURES','pulseaudio','libcanberra-pulse','',d)}"
-RRECOMMENDS_${PN} += "${@bb.utils.contains('DISTRO_FEATURES','systemd','xfce4-datetime-setter','',d)}"
+RRECOMMENDS:${PN} += "adwaita-icon-theme"
+RRECOMMENDS:${PN} += "${@bb.utils.contains('DISTRO_FEATURES','alsa','libcanberra-alsa','',d)}"
+RRECOMMENDS:${PN} += "${@bb.utils.contains('DISTRO_FEATURES','pulseaudio','libcanberra-pulse','',d)}"
+RRECOMMENDS:${PN} += "${@bb.utils.contains('DISTRO_FEATURES','systemd','xfce4-datetime-setter','',d)}"

@@ -100,7 +100,7 @@ def read_workspace():
         _enable_workspace_layer(config.workspace_path, config, basepath)
 
     logger.debug('Reading workspace in %s' % config.workspace_path)
-    externalsrc_re = re.compile(r'^EXTERNALSRC(_pn-([^ =]+))? *= *"([^"]*)"$')
+    externalsrc_re = re.compile(r'^EXTERNALSRC(:pn-([^ =]+))? *= *"([^"]*)"$')
     for fn in glob.glob(os.path.join(config.workspace_path, 'appends', '*.bbappend')):
         with open(fn, 'r') as f:
             pnvalues = {}

@@ -22,12 +22,12 @@ do_install() {
     done
 }
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     icondir = bb.data.expand('${datadir}/icons', d)
     do_split_packages(d, icondir, '^(.*)', '%s', 'Open Zone cursors %s', allow_dirs=True)
 }
 
-FILES_${PN} += "${datadir}/icons"
+FILES:${PN} += "${datadir}/icons"
 
 PACKAGES_DYNAMIC += "^openzone-.*"
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"

@@ -28,12 +28,12 @@ EXTRA_OECONF = "--enable-shared --disable-static \
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'polkit', d)}"
 # We really don't want Polkit for native
-PACKAGECONFIG_class-native = ""
+PACKAGECONFIG:class-native = ""
 
 PACKAGECONFIG[polkit] = "--enable-defaults-service,--disable-defaults-service,polkit"
 PACKAGECONFIG[debug] = "--enable-debug=yes, --enable-debug=minimum"
 
-do_install_append() {
+do_install:append() {
 	# this directory need to be created to avoid an Error 256 at gdm launch
 	install -d ${D}${sysconfdir}/gconf/gconf.xml.system
 
@@ -42,19 +42,19 @@ do_install_append() {
 	rm -f ${D}${libdir}/gio/*/*.*a
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
 	create_wrapper ${D}/${bindir}/gconftool-2 \
 		GCONF_BACKEND_DIR=${STAGING_LIBDIR_NATIVE}/GConf/2
 }
 
-FILES_${PN} += "${libdir}/GConf/* \
+FILES:${PN} += "${libdir}/GConf/* \
                 ${libdir}/gio/*/*.so \
                 ${datadir}/polkit* \
                 ${datadir}/dbus-1/services/*.service \
                 ${datadir}/dbus-1/system-services/*.service \
                "
-RDEPENDS_${PN} = "python3-xml"
+RDEPENDS:${PN} = "python3-xml"
 
-FILES_${PN}-dev += "${datadir}/sgml/gconf/gconf-1.0.dtd"
+FILES:${PN}-dev += "${datadir}/sgml/gconf/gconf-1.0.dtd"
 
 BBCLASSEXTEND = "native"

@@ -26,7 +26,7 @@ inherit systemd autotools-brokensep update-rc.d
 EXTRA_OECONF = " --prefix=${prefix} --enable-shared"
 EXTRA_OEMAKE += "SYSTEMDDIR=${D}${systemd_unitdir}/system"
 
-do_install_append () {
+do_install:append () {
     oe_runmake INCDIR=${D}${includedir}/libisns/ install_hdrs
     oe_runmake LIBDIR=${D}${libdir} install_lib
 
@@ -35,6 +35,6 @@ do_install_append () {
         ${D}${sysconfdir}/init.d/openisns
 }
 
-FILES_${PN} += "${libdir} ${systemd_unitdir}"
+FILES:${PN} += "${libdir} ${systemd_unitdir}"
 
 INITSCRIPT_NAME = "openisns"

@@ -18,11 +18,11 @@ SRC_URI = " \
         git://github.com/CanonicalLtd/netplan.git \
         file://0001-Handle-enum-element-override.patch \
 "
-SRC_URI_append_libc-musl = " file://0001-don-t-fail-if-GLOB_BRACE-is-not-defined.patch"
+SRC_URI:append:libc-musl = " file://0001-don-t-fail-if-GLOB_BRACE-is-not-defined.patch"
 
 DEPENDS = "glib-2.0 libyaml ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
-RDEPENDS_${PN} = "python3 python3-core python3-pyyaml python3-netifaces python3-nose python3-coverage python3-pycodestyle python3-pyflakes util-linux-libuuid libnetplan"
+RDEPENDS:${PN} = "python3 python3-core python3-pyyaml python3-netifaces python3-nose python3-coverage python3-pycodestyle python3-pyflakes util-linux-libuuid libnetplan"
 
 inherit pkgconfig systemd
 
@@ -56,6 +56,6 @@ do_install() {
 
 PACKAGES += "${PN}-dbus libnetplan"
 
-FILES_libnetplan = "${libdir}/libnetplan.so.0.0"
-FILES_${PN} = "${sbindir} ${base_libdir}/netplan/generate ${datadir}/netplan ${sysconfdir}/netplan ${systemd_unitdir}"
-FILES_${PN}-dbus = "${base_libdir}/netplan/netplan-dbus ${datadir}/dbus-1"
+FILES:libnetplan = "${libdir}/libnetplan.so.0.0"
+FILES:${PN} = "${sbindir} ${base_libdir}/netplan/generate ${datadir}/netplan ${sysconfdir}/netplan ${systemd_unitdir}"
+FILES:${PN}-dbus = "${base_libdir}/netplan/netplan-dbus ${datadir}/dbus-1"

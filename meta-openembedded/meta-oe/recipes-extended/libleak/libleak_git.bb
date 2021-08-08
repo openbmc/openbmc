@@ -31,8 +31,8 @@ do_install () {
 
 FILES_SOLIBSDEV = ""
 
-FILES_${PN} += "${libdir}/libleak.so"
+FILES:${PN} += "${libdir}/libleak.so"
 
 # libunwind does not support RISCV yet
-COMPATIBLE_HOST_riscv64 = "null"
-COMPATIBLE_HOST_riscv32 = "null"
+COMPATIBLE_HOST:riscv64 = "null"
+COMPATIBLE_HOST:riscv32 = "null"

@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/pravins/lohit.git;branch=master"
 DEPENDS = "fontforge-native"
 S = "${WORKDIR}/git"
 FONT_PACKAGES = "${PN}"
-FILES_${PN} = "${datadir}"
+FILES:${PN} = "${datadir}"
 
 inherit python3native
 

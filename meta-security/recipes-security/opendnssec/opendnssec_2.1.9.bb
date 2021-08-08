@@ -27,8 +27,8 @@ PACKAGECONFIG[mysql] = "--with-mysql=yes, , mariadb, mariadb"
 PACKAGECONFIG[readline]  = "--with-readline, --without-readline, readline"
 PACKAGECONFIG[unwind] = "--with-libunwind, --without-libunwind"
 
-do_install_append () {
+do_install:append () {
     rm -rf ${D}${localstatedir}/run
 }
 
-RDEPENDS_${PN} = "softhsm"
+RDEPENDS:${PN} = "softhsm"

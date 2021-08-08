@@ -21,4 +21,4 @@ inherit cmake features_check
 
 EXTRA_OECMAKE += "-DSYNERGY_BUILD_LEGACY_GUI=OFF"
 
-FILES_${PN} += "${datadir}/icons/hicolor"
+FILES:${PN} += "${datadir}/icons/hicolor"

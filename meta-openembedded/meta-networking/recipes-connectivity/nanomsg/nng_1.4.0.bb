@@ -21,4 +21,4 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[mbedtls] = "-DNNG_ENABLE_TLS=ON,-DNNG_ENABLE_TLS=OFF,mbedtls"
 
 PACKAGES =+ "${PN}-tools"
-FILES_${PN}-tools = "${bindir}/*"
+FILES:${PN}-tools = "${bindir}/*"

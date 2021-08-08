@@ -34,7 +34,7 @@ SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
            file://makerace.patch \
            "
 
-SRC_URI_append_class-native = " \
+SRC_URI:append:class-native = " \
            file://0001-distutils-sysconfig-append-STAGING_LIBDIR-python-sys.patch \
            file://12-distutils-prefix-is-inside-staging-area.patch \
            file://0001-Don-t-search-system-for-headers-libraries.patch \
@@ -65,24 +65,27 @@ inherit autotools pkgconfig qemu ptest multilib_header update-alternatives
 
 MULTILIB_SUFFIX = "${@d.getVar('base_libdir',1).split('/')[-1]}"
 
-ALTERNATIVE_${PN}-dev = "python3-config"
+ALTERNATIVE:${PN}-dev = "python3-config"
 ALTERNATIVE_LINK_NAME[python3-config] = "${bindir}/python${PYTHON_MAJMIN}-config"
 ALTERNATIVE_TARGET[python3-config] = "${bindir}/python${PYTHON_MAJMIN}-config-${MULTILIB_SUFFIX}"
 
 
 DEPENDS = "bzip2-replacement-native libffi bzip2 openssl sqlite3 zlib virtual/libintl xz virtual/crypt util-linux libtirpc libnsl2 autoconf-archive-native"
-DEPENDS_append_class-target = " python3-native"
-DEPENDS_append_class-nativesdk = " python3-native"
+DEPENDS:append:class-target = " python3-native"
+DEPENDS:append:class-nativesdk = " python3-native"
+
+# force to use the mutex+cond implementation (https://bugs.python.org/issue41710)
+CFLAGS += "-DHAVE_BROKEN_POSIX_SEMAPHORES"
 
 EXTRA_OECONF = " --without-ensurepip --enable-shared --with-platlibdir=${baselib}"
-EXTRA_OECONF_append_class-native = " --bindir=${bindir}/${PN}"
+EXTRA_OECONF:append:class-native = " --bindir=${bindir}/${PN}"
 
 export CROSSPYTHONPATH="${STAGING_LIBDIR_NATIVE}/python${PYTHON_MAJMIN}/lib-dynload/"
 
 EXTRANATIVEPATH += "python3-native"
 
 # LTO will be enabled via packageconfig depending upong distro features
-LTO_class-target = ""
+LTO:class-target = ""
 
 CACHED_CONFIGUREVARS = " \
                 ac_cv_file__dev_ptmx=yes \
@@ -98,9 +101,9 @@ def possibly_include_pgo(d):
     
     return ''
 
-PACKAGECONFIG_class-target ??= "readline ${@possibly_include_pgo(d)} gdbm ${@bb.utils.filter('DISTRO_FEATURES', 'lto', d)}"
-PACKAGECONFIG_class-native ??= "readline gdbm"
-PACKAGECONFIG_class-nativesdk ??= "readline gdbm"
+PACKAGECONFIG:class-target ??= "readline ${@possibly_include_pgo(d)} gdbm ${@bb.utils.filter('DISTRO_FEATURES', 'lto', d)}"
+PACKAGECONFIG:class-native ??= "readline gdbm"
+PACKAGECONFIG:class-nativesdk ??= "readline gdbm"
 PACKAGECONFIG[readline] = ",,readline"
 # Use profile guided optimisation by running PyBench inside qemu-user
 PACKAGECONFIG[pgo] = "--enable-optimizations,,qemu-native"
@@ -108,7 +111,7 @@ PACKAGECONFIG[tk] = ",,tk"
 PACKAGECONFIG[gdbm] = ",,gdbm"
 PACKAGECONFIG[lto] = "--with-lto,,"
 
-do_configure_prepend () {
+do_configure:prepend () {
     mkdir -p ${B}/Modules
     cat > ${B}/Modules/Setup.local << EOF
 *disabled*
@@ -117,7 +120,7 @@ ${@bb.utils.contains('PACKAGECONFIG', 'readline', '', 'readline', d)}
 EOF
 }
 
-CPPFLAGS_append = " -I${STAGING_INCDIR}/ncursesw -I${STAGING_INCDIR}/uuid"
+CPPFLAGS:append = " -I${STAGING_INCDIR}/ncursesw -I${STAGING_INCDIR}/uuid"
 
 EXTRA_OEMAKE = '\
   STAGING_LIBDIR=${STAGING_LIBDIR} \
@@ -125,7 +128,7 @@ EXTRA_OEMAKE = '\
   LIB=${baselib} \
 '
 
-do_compile_prepend_class-target() {
+do_compile:prepend:class-target() {
        if ${@bb.utils.contains('PACKAGECONFIG', 'pgo', 'true', 'false', d)}; then
                 qemu_binary="${@qemu_wrapper_cmdline(d, '${STAGING_DIR_TARGET}', ['${B}', '${STAGING_DIR_TARGET}/${base_libdir}'])}"
                 cat >pgo-wrapper <<EOF
@@ -137,15 +140,15 @@ EOF
         fi
 }
 
-do_install_prepend() {
+do_install:prepend() {
         ${WORKDIR}/check_build_completeness.py ${T}/log.do_compile
 }
 
-do_install_append_class-target() {
+do_install:append:class-target() {
         oe_multilib_header python${PYTHON_MAJMIN}/pyconfig.h
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
         # Make sure we use /usr/bin/env python
         for PYTHSCRIPT in `grep -rIl ${bindir}/${PN}/python ${D}${bindir}/${PN}`; do
                 sed -i -e '1s|^#!.*|#!/usr/bin/env python3|' $PYTHSCRIPT
@@ -157,7 +160,7 @@ do_install_append_class-native() {
         ln -s python3-native/python3 ${D}${bindir}/nativepython3
 }
 
-do_install_append() {
+do_install:append() {
         mkdir -p ${D}${libdir}/python-sysconfigdata
         sysconfigfile=`find ${D} -name _sysconfig*.py`
         cp $sysconfigfile ${D}${libdir}/python-sysconfigdata/_sysconfigdata.py
@@ -179,7 +182,7 @@ do_install_append() {
         rm ${D}${libdir}/python${PYTHON_MAJMIN}/test/__pycache__/test_xml_etree.cpython*
 }
 
-do_install_append_class-nativesdk () {
+do_install:append:class-nativesdk () {
     # Make sure we use /usr/bin/env python
     for PYTHSCRIPT in `grep -rIl ${bindir}/python ${D}${bindir}`; do
          sed -i -e '1s|^#!.*|#!/usr/bin/env python3|' $PYTHSCRIPT
@@ -257,7 +260,7 @@ python(){
         if pypackage not in rprovides:
               rprovides.append(pypackage)
 
-    d.setVar('RPROVIDES_class-native', ' '.join(rprovides))
+    d.setVar('RPROVIDES:class-native', ' '.join(rprovides))
 
     # Then work on the target
     include_pycs = d.getVar('INCLUDE_PYCS')
@@ -275,33 +278,33 @@ python(){
             newpackages.append(pypackage)
 
         # "Build" python's manifest FILES, RDEPENDS and SUMMARY
-        d.setVar('FILES_' + pypackage, '')
+        d.setVar('FILES:' + pypackage, '')
         for value in python_manifest[key]['files']:
-            d.appendVar('FILES_' + pypackage, ' ' + value)
+            d.appendVar('FILES:' + pypackage, ' ' + value)
 
         # Add cached files
         if include_pycs == '1':
             for value in python_manifest[key]['cached']:
-                    d.appendVar('FILES_' + pypackage, ' ' + value)
+                    d.appendVar('FILES:' + pypackage, ' ' + value)
 
         for value in python_manifest[key]['rdepends']:
             # Make it work with or without $PN
             if '${PN}' in value:
                 value=value.split('-', 1)[1]
-            d.appendVar('RDEPENDS_' + pypackage, ' ' + pn + '-' + value)
+            d.appendVar('RDEPENDS:' + pypackage, ' ' + pn + '-' + value)
 
         for value in python_manifest[key].get('rrecommends', ()):
             if '${PN}' in value:
                 value=value.split('-', 1)[1]
-            d.appendVar('RRECOMMENDS_' + pypackage, ' ' + pn + '-' + value)
+            d.appendVar('RRECOMMENDS:' + pypackage, ' ' + pn + '-' + value)
 
-        d.setVar('SUMMARY_' + pypackage, python_manifest[key]['summary'])
+        d.setVar('SUMMARY:' + pypackage, python_manifest[key]['summary'])
 
     # Prepending so to avoid python-misc getting everything
     packages = newpackages + packages
     d.setVar('PACKAGES', ' '.join(packages))
-    d.setVar('ALLOW_EMPTY_${PN}-modules', '1')
-    d.setVar('ALLOW_EMPTY_${PN}-pkgutil', '1')
+    d.setVar('ALLOW_EMPTY:${PN}-modules', '1')
+    d.setVar('ALLOW_EMPTY:${PN}-pkgutil', '1')
 }
 
 # Files needed to create a new manifest
@@ -326,30 +329,30 @@ do_create_manifest() {
 addtask do_create_manifest after do_patch do_prepare_recipe_sysroot
 
 # manual dependency additions
-RRECOMMENDS_${PN}-core_append_class-nativesdk = " nativesdk-python3-modules"
-RRECOMMENDS_${PN}-crypt_append_class-target = " ${MLPREFIX}openssl ${MLPREFIX}ca-certificates"
-RRECOMMENDS_${PN}-crypt_append_class-nativesdk = " ${MLPREFIX}openssl ${MLPREFIX}ca-certificates"
+RRECOMMENDS:${PN}-core:append:class-nativesdk = " nativesdk-python3-modules"
+RRECOMMENDS:${PN}-crypt:append:class-target = " ${MLPREFIX}openssl ${MLPREFIX}ca-certificates"
+RRECOMMENDS:${PN}-crypt:append:class-nativesdk = " ${MLPREFIX}openssl ${MLPREFIX}ca-certificates"
 
 # For historical reasons PN is empty and provided by python3-modules
-FILES_${PN} = ""
-RPROVIDES_${PN}-modules = "${PN}"
+FILES:${PN} = ""
+RPROVIDES:${PN}-modules = "${PN}"
 
-FILES_${PN}-pydoc += "${bindir}/pydoc${PYTHON_MAJMIN} ${bindir}/pydoc3"
-FILES_${PN}-idle += "${bindir}/idle3 ${bindir}/idle${PYTHON_MAJMIN}"
+FILES:${PN}-pydoc += "${bindir}/pydoc${PYTHON_MAJMIN} ${bindir}/pydoc3"
+FILES:${PN}-idle += "${bindir}/idle3 ${bindir}/idle${PYTHON_MAJMIN}"
 
 # provide python-pyvenv from python3-venv
-RPROVIDES_${PN}-venv += "${MLPREFIX}python3-pyvenv"
+RPROVIDES:${PN}-venv += "${MLPREFIX}python3-pyvenv"
 
 # package libpython3
 PACKAGES =+ "libpython3 libpython3-staticdev"
-FILES_libpython3 = "${libdir}/libpython*.so.*"
-FILES_libpython3-staticdev += "${libdir}/python${PYTHON_MAJMIN}/config-${PYTHON_MAJMIN}-*/libpython${PYTHON_MAJMIN}.a"
-INSANE_SKIP_${PN}-dev += "dev-elf"
-INSANE_SKIP_${PN}-ptest = "dev-deps"
+FILES:libpython3 = "${libdir}/libpython*.so.*"
+FILES:libpython3-staticdev += "${libdir}/python${PYTHON_MAJMIN}/config-${PYTHON_MAJMIN}-*/libpython${PYTHON_MAJMIN}.a"
+INSANE_SKIP:${PN}-dev += "dev-elf"
+INSANE_SKIP:${PN}-ptest = "dev-deps"
 
 # catch all the rest (unsorted)
 PACKAGES += "${PN}-misc"
-RDEPENDS_${PN}-misc += "\
+RDEPENDS:${PN}-misc += "\
   ${PN}-core \
   ${PN}-email \
   ${PN}-codecs \
@@ -358,26 +361,26 @@ RDEPENDS_${PN}-misc += "\
   ${PN}-audio \
   ${PN}-numbers \
 "
-RDEPENDS_${PN}-modules_append_class-target = " ${MLPREFIX}python3-misc"
-RDEPENDS_${PN}-modules_append_class-nativesdk = " ${MLPREFIX}python3-misc"
-FILES_${PN}-misc = "${libdir}/python${PYTHON_MAJMIN} ${libdir}/python${PYTHON_MAJMIN}/lib-dynload"
+RDEPENDS:${PN}-modules:append:class-target = " ${MLPREFIX}python3-misc"
+RDEPENDS:${PN}-modules:append:class-nativesdk = " ${MLPREFIX}python3-misc"
+FILES:${PN}-misc = "${libdir}/python${PYTHON_MAJMIN} ${libdir}/python${PYTHON_MAJMIN}/lib-dynload"
 
 # catch manpage
 PACKAGES += "${PN}-man"
-FILES_${PN}-man = "${datadir}/man"
+FILES:${PN}-man = "${datadir}/man"
 
 # See https://bugs.python.org/issue18748 and https://bugs.python.org/issue37395
-RDEPENDS_libpython3_append_libc-glibc = " libgcc"
-RDEPENDS_${PN}-ctypes_append_libc-glibc = " ${MLPREFIX}ldconfig"
-RDEPENDS_${PN}-ptest = "${PN}-modules ${PN}-tests ${PN}-dev unzip bzip2 libgcc tzdata-europe coreutils sed"
-RDEPENDS_${PN}-ptest_append_libc-glibc = " locale-base-tr-tr.iso-8859-9"
-RDEPENDS_${PN}-tkinter += "${@bb.utils.contains('PACKAGECONFIG', 'tk', 'tk tk-lib', '', d)}"
-RDEPENDS_${PN}-idle += "${@bb.utils.contains('PACKAGECONFIG', 'tk', '${PN}-tkinter tcl', '', d)}"
-RDEPENDS_${PN}-dev = ""
-RDEPENDS_${PN}-pydoc += "${PN}-io"
+RDEPENDS:libpython3:append:libc-glibc = " libgcc"
+RDEPENDS:${PN}-ctypes:append:libc-glibc = " ${MLPREFIX}ldconfig"
+RDEPENDS:${PN}-ptest = "${PN}-modules ${PN}-tests ${PN}-dev unzip bzip2 libgcc tzdata-europe coreutils sed"
+RDEPENDS:${PN}-ptest:append:libc-glibc = " locale-base-tr-tr.iso-8859-9"
+RDEPENDS:${PN}-tkinter += "${@bb.utils.contains('PACKAGECONFIG', 'tk', 'tk tk-lib', '', d)}"
+RDEPENDS:${PN}-idle += "${@bb.utils.contains('PACKAGECONFIG', 'tk', '${PN}-tkinter tcl', '', d)}"
+RDEPENDS:${PN}-dev = ""
+RDEPENDS:${PN}-pydoc += "${PN}-io"
 
-RDEPENDS_${PN}-tests_append_class-target = " ${MLPREFIX}bash"
-RDEPENDS_${PN}-tests_append_class-nativesdk = " ${MLPREFIX}bash"
+RDEPENDS:${PN}-tests:append:class-target = " ${MLPREFIX}bash"
+RDEPENDS:${PN}-tests:append:class-nativesdk = " ${MLPREFIX}bash"
 
 # Python's tests contain large numbers of files we don't need in the recipe sysroots
 SYSROOT_PREPROCESS_FUNCS += " py3_sysroot_cleanup"

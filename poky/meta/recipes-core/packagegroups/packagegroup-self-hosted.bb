@@ -24,7 +24,7 @@ PACKAGES = "\
     packagegroup-self-hosted-host-tools \
     "
 
-RDEPENDS_packagegroup-self-hosted = "\
+RDEPENDS:packagegroup-self-hosted = "\
     packagegroup-self-hosted-debug \
     packagegroup-self-hosted-sdk \
     packagegroup-self-hosted-extended \
@@ -32,7 +32,7 @@ RDEPENDS_packagegroup-self-hosted = "\
     packagegroup-self-hosted-host-tools \
     "
 
-RDEPENDS_packagegroup-self-hosted-host-tools = "\
+RDEPENDS:packagegroup-self-hosted-host-tools = "\
     e2fsprogs \
     e2fsprogs-e2fsck \
     e2fsprogs-mke2fs \
@@ -49,9 +49,9 @@ RDEPENDS_packagegroup-self-hosted-host-tools = "\
     screen \
     "
 PSEUDO = "pseudo"
-PSEUDO_libc-musl = ""
+PSEUDO:libc-musl = ""
 
-RRECOMMENDS_packagegroup-self-hosted-host-tools = "\
+RRECOMMENDS:packagegroup-self-hosted-host-tools = "\
     kernel-module-tun \
     kernel-module-iptable-raw \
     kernel-module-iptable-nat \
@@ -59,7 +59,7 @@ RRECOMMENDS_packagegroup-self-hosted-host-tools = "\
     kernel-module-iptable-filter \
 	"
 
-RDEPENDS_packagegroup-self-hosted-sdk = "\
+RDEPENDS:packagegroup-self-hosted-sdk = "\
     autoconf \
     automake \
     binutils \
@@ -87,18 +87,18 @@ RDEPENDS_packagegroup-self-hosted-sdk = "\
     quilt \
     sed \
     "
-RDEPENDS_packagegroup-self-hosted-sdk_append_mingw32 = "\
+RDEPENDS:packagegroup-self-hosted-sdk:append:mingw32 = "\
     libssp \
     libssp-dev \
     libssp-staticdev \
     "
 # rpcsvc-proto: for rpcgen
-RDEPENDS_packagegroup-self-hosted-sdk_append_libc-glibc = "\
+RDEPENDS:packagegroup-self-hosted-sdk:append:libc-glibc = "\
     glibc-gconv-ibm850 \
     glibc-utils \
     rpcsvc-proto \
     "
-RDEPENDS_packagegroup-self-hosted-debug = " \
+RDEPENDS:packagegroup-self-hosted-debug = " \
     gdb \
     gdbserver \
     rsync \
@@ -106,7 +106,7 @@ RDEPENDS_packagegroup-self-hosted-debug = " \
     tcf-agent"
 
 
-RDEPENDS_packagegroup-self-hosted-extended = "\
+RDEPENDS:packagegroup-self-hosted-extended = "\
     bzip2 \
     chrpath \
     cpio \
@@ -177,7 +177,7 @@ RDEPENDS_packagegroup-self-hosted-extended = "\
     "
 
 
-RDEPENDS_packagegroup-self-hosted-graphics = "\
+RDEPENDS:packagegroup-self-hosted-graphics = "\
     builder \
     libgl \
     libgl-dev \

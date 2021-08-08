@@ -39,4 +39,4 @@ EXTRA_OECONF += '${@oe.utils.conditional( "ROOTLESS_X", "1", " --enable-kms-only
 
 COMPATIBLE_HOST = '(i.86|x86_64).*-linux'
 
-FILES_${PN} += "${datadir}/polkit-1"
+FILES:${PN} += "${datadir}/polkit-1"

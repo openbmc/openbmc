@@ -13,7 +13,7 @@ EXTRA_OECONF = " \
     --disable-xnvctrl \
 "
 
-do_configure_prepend() {
+do_configure:prepend() {
     sed -i 's:LIBSENSORS_CFLAGS=.*:LIBSENSORS_CFLAGS=-I${STAGING_INCDIR}:g' ${S}/configure.ac
 }
 

@@ -17,23 +17,23 @@ SRC_URI[sha256sum] = "67c74d94196b153b774ab9f89b2fa6c6ba79352407037c8c14d5aeb334
 UPSTREAM_CHECK_URI = "https://launchpad.net/intltool/trunk/"
 
 DEPENDS = "libxml-parser-perl-native"
-RDEPENDS_${PN} = "gettext-dev libxml-parser-perl"
-DEPENDS_class-native = "libxml-parser-perl-native gettext-native"
+RDEPENDS:${PN} = "gettext-dev libxml-parser-perl"
+DEPENDS:class-native = "libxml-parser-perl-native gettext-native"
 
 inherit autotools pkgconfig perlnative
 
 export PERL = "${bindir}/env perl"
-PERL_class-native = "/usr/bin/env nativeperl"
-PERL_class-nativesdk = "/usr/bin/env perl"
+PERL:class-native = "/usr/bin/env nativeperl"
+PERL:class-nativesdk = "/usr/bin/env perl"
 
 # gettext is assumed to exist on the host
-RDEPENDS_${PN}_class-native = "libxml-parser-perl-native"
-RRECOMMENDS_${PN} = "perl-modules"
-RRECOMMENDS_${PN}_class-native = ""
+RDEPENDS:${PN}:class-native = "libxml-parser-perl-native"
+RRECOMMENDS:${PN} = "perl-modules"
+RRECOMMENDS:${PN}:class-native = ""
 
-FILES_${PN}-dev = ""
-FILES_${PN} += "${datadir}/aclocal"
+FILES:${PN}-dev = ""
+FILES:${PN} += "${datadir}/aclocal"
 
-INSANE_SKIP_${PN} += "dev-deps"
+INSANE_SKIP:${PN} += "dev-deps"
 
 BBCLASSEXTEND = "native nativesdk"

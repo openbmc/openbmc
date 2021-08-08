@@ -36,7 +36,7 @@ EXTRA_OESCONS = " \
                   "
 
 # scons creates non-reproducible archives
-do_install_append() {
+do_install:append() {
 	rm ${D}/${libdir}/*.a
 }
 

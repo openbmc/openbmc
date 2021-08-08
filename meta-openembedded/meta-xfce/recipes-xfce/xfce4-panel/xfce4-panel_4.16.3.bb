@@ -14,7 +14,7 @@ SRC_URI += " \
     file://0002-use-lxdm-to-replace-dm-tool.patch \
 "
 
-python populate_packages_prepend() {
+python populate_packages:prepend() {
     plugin_dir = d.expand('${libdir}/xfce4/panel/plugins/')
     plugin_name = d.expand('${PN}-plugin-%s')
     do_split_packages(d, plugin_dir, '^lib(.*).so$', plugin_name,
@@ -29,12 +29,12 @@ PACKAGES_DYNAMIC += "^${PN}-plugin-.*"
 
 PACKAGES =+ "${PN}-gtk3"
 
-FILES_${PN} += "${libdir}/xfce4/panel/migrate \
+FILES:${PN} += "${libdir}/xfce4/panel/migrate \
                 ${libdir}/xfce4/panel/wrapper-1.0"
 
-FILES_${PN}-dev += "${libdir}/xfce4/panel/plugins/*.la"
+FILES:${PN}-dev += "${libdir}/xfce4/panel/plugins/*.la"
 
-FILES_${PN}-gtk3 = " \
+FILES:${PN}-gtk3 = " \
     ${libdir}/libxfce4panel-2.0${SOLIBS} \
     ${libdir}/xfce4/panel/wrapper-2.0 \
 "

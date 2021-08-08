@@ -20,11 +20,11 @@ inherit autotools pkgconfig
 
 EXTRA_OECONF = "--disable-static"
 
-do_install_append () {
+do_install:append () {
     rm -rf ${D}${docdir}/${BPN}
 }
 
-FILES_${PN} += "${libdir}/engines*/pkcs11.so"
-FILES_${PN}-dev += "${libdir}/engines*/libpkcs11${SOLIBSDEV}"
+FILES:${PN} += "${libdir}/engines*/pkcs11.so"
+FILES:${PN}-dev += "${libdir}/engines*/libpkcs11${SOLIBSDEV}"
 
 BBCLASSEXTEND = "native"

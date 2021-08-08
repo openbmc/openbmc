@@ -11,7 +11,7 @@ PYPI_PACKAGE = "WTForms"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-netserver \
     ${PYTHON_PN}-numbers \
     "

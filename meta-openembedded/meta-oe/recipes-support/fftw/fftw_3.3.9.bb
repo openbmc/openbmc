@@ -23,8 +23,8 @@ CFLAGS += "-D_GNU_SOURCE"
 # neon is optional for arm version < 8 -> check tune features
 FFTW_NEON = "${@bb.utils.contains('TUNE_FEATURES', 'neon', '--enable-neon', '', d)}"
 # neon is suppored for arm version = 8 -> enable
-FFTW_NEON_aarch64 = "--enable-neon"
-FFTW_NEON_class-native = ""
+FFTW_NEON:aarch64 = "--enable-neon"
+FFTW_NEON:class-native = ""
 
 do_configure() {
     # configure fftw
@@ -84,19 +84,19 @@ do_install_ptest() {
 }
 
 PACKAGES =+ "libfftw libfftwl libfftwf"
-FILES_libfftw = "${libdir}/libfftw3.so.* ${libdir}/libfftw3_*.so.*"
-FILES_libfftwl = "${libdir}/libfftw3l.so.* ${libdir}/libfftw3l_*.so.*"
-FILES_libfftwf = "${libdir}/libfftw3f.so.* ${libdir}/libfftw3f_*.so.*"
+FILES:libfftw = "${libdir}/libfftw3.so.* ${libdir}/libfftw3_*.so.*"
+FILES:libfftwl = "${libdir}/libfftw3l.so.* ${libdir}/libfftw3l_*.so.*"
+FILES:libfftwf = "${libdir}/libfftw3f.so.* ${libdir}/libfftw3f_*.so.*"
 
 PACKAGES =+ "fftw-wisdom fftwl-wisdom fftwf-wisdom fftw-wisdom-to-conf"
-FILES_fftw-wisdom = "${bindir}/fftw-wisdom"
-FILES_fftwl-wisdom = "${bindir}/fftwl-wisdom"
-FILES_fftwf-wisdom = "${bindir}/fftwf-wisdom"
-FILES_fftw-wisdom-to-conf = "${bindir}/fftw-wisdom-to-conf"
+FILES:fftw-wisdom = "${bindir}/fftw-wisdom"
+FILES:fftwl-wisdom = "${bindir}/fftwl-wisdom"
+FILES:fftwf-wisdom = "${bindir}/fftwf-wisdom"
+FILES:fftw-wisdom-to-conf = "${bindir}/fftw-wisdom-to-conf"
 
-FILES_${PN}-dev += "${libdir}/cmake"
-RDEPENDS_${PN}-dev = "libfftw libfftwl libfftwf"
-RDEPENDS_${PN}-ptest += "perl"
-RDEPENDS_${PN}-ptest_remove = "fftw"
+FILES:${PN}-dev += "${libdir}/cmake"
+RDEPENDS:${PN}-dev = "libfftw libfftwl libfftwf"
+RDEPENDS:${PN}-ptest += "perl"
+RDEPENDS:${PN}-ptest:remove = "fftw"
 
 BBCLASSEXTEND = "native"

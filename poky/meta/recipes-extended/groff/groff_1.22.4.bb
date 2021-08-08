@@ -22,7 +22,7 @@ SRC_URI[sha256sum] = "e78e7b4cb7dec310849004fa88847c44701e8d133b5d4c13057d876c1b
 PR = "r1"
 
 DEPENDS = "bison-native"
-RDEPENDS_${PN} += "perl sed"
+RDEPENDS:${PN} += "perl sed"
 
 inherit autotools-brokensep texinfo multilib_script pkgconfig
 
@@ -35,12 +35,12 @@ CACHED_CONFIGUREVARS += "ac_cv_path_PERL='/usr/bin/env perl' ac_cv_path_BASH_PRO
 
 # Delete these generated files since we depend on bison-native
 # and regenerate them. Do it deterministically (always).
-do_configure_prepend() {
+do_configure:prepend() {
 	rm -f ${S}/src/preproc/eqn/eqn.cpp
 	rm -f ${S}/src/preproc/eqn/eqn.hpp
 }
 
-do_install_append() {
+do_install:append() {
 	# Some distros have both /bin/perl and /usr/bin/perl, but we set perl location
 	# for target as /usr/bin/perl, so fix it to /usr/bin/perl.
 	for i in afmtodit mmroff gropdf pdfmom grog; do
@@ -68,13 +68,13 @@ do_install_append() {
 	rm -rf ${D}${mandir}/man1/grap2graph*
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
 	create_cmdline_wrapper ${D}/${bindir}/groff \
 		-F${STAGING_DIR_NATIVE}${datadir_native}/groff/${PV}/font \
 		-M${STAGING_DIR_NATIVE}${datadir_native}/groff/${PV}/tmac
 }
 
-FILES_${PN} += "${libdir}/${BPN}/site-tmac \
+FILES:${PN} += "${libdir}/${BPN}/site-tmac \
                 ${libdir}/${BPN}/groffer/"
 
 BBCLASSEXTEND = "native"

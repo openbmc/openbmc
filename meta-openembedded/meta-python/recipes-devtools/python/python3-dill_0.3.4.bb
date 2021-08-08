@@ -9,6 +9,6 @@ inherit pypi setuptools3
 
 PYPI_PACKAGE_EXT = "zip"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-multiprocessing \
 "

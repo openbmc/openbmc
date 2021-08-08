@@ -1,6 +1,6 @@
 ROOTFS_BOOTSTRAP_INSTALL = ""
 IMAGE_TYPES_MASKED += "container"
-IMAGE_TYPEDEP_container = "tar.bz2"
+IMAGE_TYPEDEP:container = "tar.bz2"
 
 python __anonymous() {
     if "container" in d.getVar("IMAGE_FSTYPES") and \

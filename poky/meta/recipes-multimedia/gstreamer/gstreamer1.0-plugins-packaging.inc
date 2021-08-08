@@ -9,8 +9,8 @@
 # Dynamically generate packages for all enabled plugins
 PACKAGES_DYNAMIC = "^${PN}-.* ^libgst.*"
 
-PACKAGESPLITFUNCS_prepend = " split_gstreamer10_packages "
-PACKAGESPLITFUNCS_append = " set_gstreamer10_metapkg_rdepends "
+PACKAGESPLITFUNCS:prepend = " split_gstreamer10_packages "
+PACKAGESPLITFUNCS:append = " set_gstreamer10_metapkg_rdepends "
 
 python split_gstreamer10_packages () {
     gst_libdir = d.expand('${libdir}/gstreamer-1.0')
@@ -36,8 +36,8 @@ python set_gstreamer10_metapkg_rdepends () {
 
     pn = d.getVar('PN')
     metapkg =  pn + '-meta'
-    d.setVar('ALLOW_EMPTY_' + metapkg, "1")
-    d.setVar('FILES_' + metapkg, "")
+    d.setVar('ALLOW_EMPTY:' + metapkg, "1")
+    d.setVar('FILES:' + metapkg, "")
     blacklist = [ pn, pn + '-meta' ]
     metapkg_rdepends = []
     pkgdest = d.getVar('PKGDEST')
@@ -54,20 +54,20 @@ python set_gstreamer10_metapkg_rdepends () {
             is_empty = len(dir_contents) == 0
             if not is_empty:
                 metapkg_rdepends.append(pkg)
-    d.setVar('RDEPENDS_' + metapkg, ' '.join(metapkg_rdepends))
-    d.setVar('DESCRIPTION_' + metapkg, pn + ' meta package')
+    d.setVar('RDEPENDS:' + metapkg, ' '.join(metapkg_rdepends))
+    d.setVar('DESCRIPTION:' + metapkg, pn + ' meta package')
 }
 
 # each plugin-dev depends on PN-dev, plugin-staticdev on PN-staticdev
 # so we need them even when empty (like in gst-plugins-good case)
-ALLOW_EMPTY_${PN} = "1"
-ALLOW_EMPTY_${PN}-dev = "1"
-ALLOW_EMPTY_${PN}-staticdev = "1"
+ALLOW_EMPTY:${PN} = "1"
+ALLOW_EMPTY:${PN}-dev = "1"
+ALLOW_EMPTY:${PN}-staticdev = "1"
 
 PACKAGES += "${PN}-apps ${PN}-meta ${PN}-glib"
 
-FILES_${PN} = ""
-FILES_${PN}-apps = "${bindir}"
-FILES_${PN}-glib = "${datadir}/glib-2.0"
+FILES:${PN} = ""
+FILES:${PN}-apps = "${bindir}"
+FILES:${PN}-glib = "${datadir}/glib-2.0"
 
-RRECOMMENDS_${PN} += "${PN}-meta"
+RRECOMMENDS:${PN} += "${PN}-meta"

@@ -37,7 +37,7 @@ PACKAGECONFIG ??= " \
     luks-adjust-xts-keysize \
     openssl \
 "
-PACKAGECONFIG_append_class-target = " \
+PACKAGECONFIG:append:class-target = " \
     udev \
 "
 
@@ -75,13 +75,13 @@ EXTRA_OECONF += "--disable-static-cryptsetup"
 # There's no recipe for libargon2 yet
 EXTRA_OECONF += "--disable-libargon2"
 
-FILES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES','systemd','${exec_prefix}/lib/tmpfiles.d/cryptsetup.conf', '', d)}"
+FILES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES','systemd','${exec_prefix}/lib/tmpfiles.d/cryptsetup.conf', '', d)}"
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     libdevmapper \
 "
 
-RRECOMMENDS_${PN}_class-target = " \
+RRECOMMENDS:${PN}:class-target = " \
     kernel-module-aes-generic \
     kernel-module-dm-crypt \
     kernel-module-md5 \

@@ -1,4 +1,4 @@
-do_configure_prepend() {
+do_configure:prepend() {
        cd ${S}
        NOCONFIGURE=yes ./autogen.sh
        cd ${B}

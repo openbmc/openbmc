@@ -17,7 +17,7 @@ EXTRA_OECMAKE += " \
 "
 
 # Don't include so files in dev package
-FILES_${PN} = "${libdir}"
-FILES_${PN}-dev = "${includedir} ${libdir}/cmake"
+FILES:${PN} = "${libdir}"
+FILES:${PN}-dev = "${includedir} ${libdir}/cmake"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -13,13 +13,13 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/expat/expat-${PV}.tar.bz2 \
 
 SRC_URI[sha256sum] = "2f9b6a580b94577b150a7d5617ad4643a4301a6616ff459307df3e225bcfbf40"
 
-EXTRA_OECMAKE_class-native += "-DEXPAT_BUILD_DOCS=OFF"
+EXTRA_OECMAKE:class-native += "-DEXPAT_BUILD_DOCS=OFF"
 
-RDEPENDS_${PN}-ptest += "bash"
+RDEPENDS:${PN}-ptest += "bash"
 
 inherit cmake lib_package ptest
 
-do_install_ptest_class-target() {
+do_install_ptest:class-target() {
 	install -m 755 ${B}/tests/* ${D}${PTEST_PATH}
 }
 

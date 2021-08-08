@@ -29,13 +29,13 @@ do_install () {
 	install -m 0755 ${WORKDIR}/nfsroot ${D}${sysconfdir}/network/if-pre-up.d
 }
 
-do_install_append_qemuall () {
+do_install:append:qemuall () {
 	# Disable network manager on machines that commonly do NFS booting
 	touch ${D}${sysconfdir}/network/nm-disabled-eth0
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-RDEPENDS_${PN} = "netbase"
-RCONFLICTS_${PN} = "netbase (< 1:5.0)"
+RDEPENDS:${PN} = "netbase"
+RCONFLICTS:${PN} = "netbase (< 1:5.0)"
 
-CONFFILES_${PN} = "${sysconfdir}/network/interfaces"
+CONFFILES:${PN} = "${sysconfdir}/network/interfaces"

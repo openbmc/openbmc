@@ -15,11 +15,11 @@ PACKAGECONFIG[polkit] = "--enable-polkit, --disable-polkit, polkit"
 SRC_URI += "file://0001-configure.in-hard-code-path-to-iceauth.patch"
 SRC_URI[sha256sum] = "22f273f212481d71e0b5618c62710cd85f69aea74f5ea5c0093f7918b07d17b7"
 
-ALTERNATIVE_${PN} = "x-session-manager"
+ALTERNATIVE:${PN} = "x-session-manager"
 ALTERNATIVE_TARGET[x-session-manager] = "${bindir}/xfce4-session"
 ALTERNATIVE_PRIORITY_${PN} = "150"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/xfce4/*/*/*.so \
     ${libdir}/xfce4/session/*-*-* \
     ${datadir}/xsessions \
@@ -27,7 +27,7 @@ FILES_${PN} += " \
     ${datadir}/polkit-1 \
 "
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     dbus-x11 \
     iceauth \
     netbase \

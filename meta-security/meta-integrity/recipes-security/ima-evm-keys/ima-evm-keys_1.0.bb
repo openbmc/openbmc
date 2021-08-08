@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "ima"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 do_install () {
     if [ -e "${IMA_EVM_X509}" ]; then

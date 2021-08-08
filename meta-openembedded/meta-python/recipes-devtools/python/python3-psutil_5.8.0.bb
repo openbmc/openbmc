@@ -8,13 +8,13 @@ inherit pypi setuptools3
 
 PACKAGES =+ "${PN}-tests"
 
-FILES_${PN}-tests += " \
+FILES:${PN}-tests += " \
     ${PYTHON_SITEPACKAGES_DIR}/psutil/test* \
     ${PYTHON_SITEPACKAGES_DIR}/psutil/__pycache__/test* \
 "
 
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-shell \
     ${PYTHON_PN}-threading \
     ${PYTHON_PN}-xml \

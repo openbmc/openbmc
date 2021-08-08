@@ -14,7 +14,7 @@ inherit gnomebase upstream-version-is-even
 
 PACKAGES =+ "${PN}-gnome ${PN}-gtk2"
 
-FILES_${PN}-gnome = "${libdir}/gnome-settings-daemon-3.0/gtk-modules"
-FILES_${PN}-gtk2 = "${libdir}/gtk-2.0/modules/libatk-bridge.*"
+FILES:${PN}-gnome = "${libdir}/gnome-settings-daemon-3.0/gtk-modules"
+FILES:${PN}-gtk2 = "${libdir}/gtk-2.0/modules/libatk-bridge.*"
 
 BBCLASSEXTEND = "native nativesdk"

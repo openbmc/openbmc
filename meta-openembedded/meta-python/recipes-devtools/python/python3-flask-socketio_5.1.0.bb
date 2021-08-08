@@ -11,7 +11,7 @@ PYPI_PACKAGE = "Flask-SocketIO"
 
 SRC_URI[sha256sum] = "b41b9f6fb0d7f3fcadd54c44653307a9b96e985c7da73f92779480248b5b6874"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-flask \
     ${PYTHON_PN}-socketio \
     "

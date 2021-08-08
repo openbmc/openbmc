@@ -33,46 +33,46 @@ inherit ${@bb.utils.contains('PACKAGECONFIG', 'python3-probes', 'distutils3-base
 
 # exporter comes with python3-probes
 PACKAGES =+ "${PN}-exporter"
-FILES_${PN}-exporter = "${sysconfdir}/stap-exporter/* \
+FILES:${PN}-exporter = "${sysconfdir}/stap-exporter/* \
                         ${sysconfdir}/sysconfig/stap-exporter \
                         ${systemd_unitdir}/system/stap-exporter.service \
                         ${sbindir}/stap-exporter"
-RDEPENDS_${PN}-exporter = "${PN} python3-core python3-netclient"
-SYSTEMD_SERVICE_${PN}-exporter = "stap-exporter.service"
+RDEPENDS:${PN}-exporter = "${PN} python3-core python3-netclient"
+SYSTEMD_SERVICE:${PN}-exporter = "stap-exporter.service"
 
 PACKAGES =+ "${PN}-runtime"
-FILES_${PN}-runtime = "\
+FILES:${PN}-runtime = "\
  ${bindir}/staprun \
  ${bindir}/stap-merge \
  ${bindir}/stapsh \
  ${libexecdir}/${BPN}/stapio \
 "
-RDEPENDS_${PN}_class-target += "${PN}-runtime"
+RDEPENDS:${PN}:class-target += "${PN}-runtime"
 
 PACKAGES =+ "${PN}-examples"
-FILES_${PN}-examples = "${datadir}/${BPN}/examples/"
-RDEPENDS_${PN}-examples += "${PN}"
+FILES:${PN}-examples = "${datadir}/${BPN}/examples/"
+RDEPENDS:${PN}-examples += "${PN}"
 
 # don't complain that some examples involve bash, perl, php...
-INSANE_SKIP_${PN}-examples += "file-rdeps"
+INSANE_SKIP:${PN}-examples += "file-rdeps"
 
 PACKAGES =+ "${PN}-python"
-FILES_${PN}-python += "\
+FILES:${PN}-python += "\
  ${bindir}/dtrace \
  ${libdir}/python*/ \
  ${libexecdir}/${BPN}/python/ \
 "
 # python material requires sdt headers
-RDEPENDS_${PN}-python += "${PN}-dev python3-core"
-INSANE_SKIP_${PN}-python += "dev-deps"
+RDEPENDS:${PN}-python += "${PN}-dev python3-core"
+INSANE_SKIP:${PN}-python += "dev-deps"
 
-do_configure_prepend () {
+do_configure:prepend () {
     # Improve reproducibility for c++ object files
     reltivepath="${@os.path.relpath(d.getVar('STAGING_INCDIR'), d.getVar('S'))}"
     sed -i "s:@RELATIVE_STAGING_INCDIR@:$reltivepath:g" ${S}/stringtable.h
 }
 
-do_install_append () {
+do_install:append () {
    if [ ! -f ${D}${bindir}/stap ]; then
       # translator disabled case, need to leave only minimal runtime
       rm -rf ${D}${datadir}/${PN}

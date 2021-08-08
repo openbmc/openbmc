@@ -16,7 +16,7 @@ S = "${WORKDIR}/git"
 
 EXTRA_OEMAKE = "CROSS_COMPILE=${TARGET_PREFIX} CC="${CC}" CFLAGS="${CFLAGS}""
 
-CFLAGS_append_mipsarchn64 = " -D__SANE_USERSPACE_TYPES__ -D_GNU_SOURCE"
+CFLAGS:append:mipsarchn64 = " -D__SANE_USERSPACE_TYPES__ -D_GNU_SOURCE"
 
 do_configure() {
 	sed -i -e "s|-static$||g" ${S}/Makefile
@@ -28,5 +28,5 @@ do_install() {
 
 PROVIDES += "ufs-tool"
 
-RPROVIDES_${PN} += "ufs-tool"
+RPROVIDES:${PN} += "ufs-tool"
 

@@ -10,4 +10,4 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI[sha256sum] = "bfe3e9bd92695014ee74a2fbb7f5fd1b4c29cf043c4a11598b8958324c81e7ec"
 
-FILES_${PN} += "${datadir}/metainfo"
+FILES:${PN} += "${datadir}/metainfo"

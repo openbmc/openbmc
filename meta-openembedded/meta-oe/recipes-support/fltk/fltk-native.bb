@@ -18,7 +18,7 @@ EXTRA_OECMAKE += " \
 # lib/libfltk.a(Fl_Native_File_Chooser.cxx.o): undefined reference to symbol 'dlsym@@GLIBC_2.2.5'
 LDFLAGS += "-ldl"
 
-do_install_append() {
+do_install:append() {
     # make sure native fltk-config is not used accidentaly
     rm -f ${D}${bindir}/fltk-config
 }

@@ -27,6 +27,6 @@ PACKAGECONFIG[zstd] = "--with-zstd,--without-zstd,zstd"
 PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux"
 
 PACKAGES =+ "libsquashfs"
-FILES_libsquashfs = "${libdir}/libsquashfs*${SOLIBS}"
+FILES:libsquashfs = "${libdir}/libsquashfs*${SOLIBS}"
 
 BBCLASSEXTEND = "native nativesdk"

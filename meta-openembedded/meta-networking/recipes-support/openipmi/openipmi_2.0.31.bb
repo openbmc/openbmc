@@ -50,16 +50,16 @@ PACKAGECONFIG ??= "gdbm"
 PACKAGECONFIG[gdbm] = "ac_cv_header_gdbm_h=yes,ac_cv_header_gdbm_h=no,gdbm,"
 
 PACKAGES += "${PN}-perl ${PN}-python"
-PRIVATE_LIBS_${PN}-perl = "libOpenIPMI.so.0"
+PRIVATE_LIBS:${PN}-perl = "libOpenIPMI.so.0"
 
-FILES_${PN}-perl = " \
+FILES:${PN}-perl = " \
     ${libdir}/perl/vendor_perl/*/OpenIPMI.pm \
     ${libdir}/perl/vendor_perl/*/auto/OpenIPMI/OpenIPMI.so \
     "
 
-FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
 
-FILES_${PN}-dbg += " \
+FILES:${PN}-dbg += " \
     ${libdir}/perl/vendor_perl/*/auto/OpenIPMI/.debug \
     ${PYTHON_SITEPACKAGES_DIR}/.debug \
     "
@@ -84,7 +84,7 @@ do_configure () {
     done
 }
 
-do_install_append () {
+do_install:append () {
     echo "SAL: D = $D"
     echo "SAL: libdir = $libdir"
     install -m 0755 -d ${D}${sysconfdir}/sysconfig ${D}${sysconfdir}/init.d
@@ -108,5 +108,5 @@ do_install_append () {
 INITSCRIPT_NAME = "ipmi"
 INITSCRIPT_PARAMS = "start 30 . stop 70 0 1 2 3 4 5 6 ."
 
-SYSTEMD_SERVICE_${PN} = "ipmi.service"
+SYSTEMD_SERVICE:${PN} = "ipmi.service"
 SYSTEMD_AUTO_ENABLE = "disable"

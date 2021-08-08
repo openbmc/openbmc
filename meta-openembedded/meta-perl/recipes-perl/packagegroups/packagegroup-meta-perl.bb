@@ -9,7 +9,7 @@ PACKAGES = "\
     ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-meta-perl-ptest-packages", "", d)} \
 "
 
-RDEPENDS_packagegroup-meta-perl = "\
+RDEPENDS:packagegroup-meta-perl = "\
     adduser \
     libalgorithm-diff-perl \
     libauthen-sasl-perl \
@@ -78,12 +78,12 @@ RDEPENDS_packagegroup-meta-perl = "\
     po4a \
 "
 
-RDEPENDS_packagegroup-meta-perl-extended = "\
+RDEPENDS:packagegroup-meta-perl-extended = "\
     logcheck \
     mime-construct \
 "
 
-RDEPENDS_packagegroup-meta-perl-ptest-packages = "\
+RDEPENDS:packagegroup-meta-perl-ptest-packages = "\
     libmime-types-perl-ptest \
     libio-socket-ssl-perl-ptest \
     libdata-hexdump-perl-ptest \

@@ -17,4 +17,4 @@ S = "${WORKDIR}/git"
 
 inherit autotools allarch
 
-FILES_${PN} = "${datadir}/icons/xcursor-transparent/cursors/*"
+FILES:${PN} = "${datadir}/icons/xcursor-transparent/cursors/*"

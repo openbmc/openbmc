@@ -31,17 +31,17 @@ PACKAGES = "opencl-icd-loader opencl-icd-loader-dev"
 PACKAGES += "libicdlog libicdlog-dbg"
 PACKAGE_DEBUG_SPLIT_STYLE = "debug-without-src"
 
-FILES_${PN} = " \
+FILES:${PN} = " \
 	${bindir}/icd_loader_test \
 	${libdir}/libOpenCLDriverStub.so \
 	${libdir}/libOpenCL.so.1.2 \
 "
-FILES_${PN}-dev = " \
+FILES:${PN}-dev = " \
 	${libdir}/libOpenCL.so \
 	${libdir}/libOpenCL.so.1 \
 "
 
-FILES_libicdlog = "${libdir}/libIcdLog.so"
-FILES_libicdlog-dbg = "${libdir}/.debug/libIcdLog.so"
+FILES:libicdlog = "${libdir}/libIcdLog.so"
+FILES:libicdlog-dbg = "${libdir}/.debug/libIcdLog.so"
 
-RDEPENDS_${PN} = "libicdlog"
+RDEPENDS:${PN} = "libicdlog"

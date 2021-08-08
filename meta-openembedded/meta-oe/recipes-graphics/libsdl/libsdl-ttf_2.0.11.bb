@@ -16,7 +16,7 @@ inherit autotools pkgconfig
 
 LDFLAGS += "-lm"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # make autoreconf happy
     touch ${S}/NEWS ${S}/AUTHORS ${S}/ChangeLog
 

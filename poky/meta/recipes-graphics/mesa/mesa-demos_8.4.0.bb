@@ -49,7 +49,7 @@ PACKAGECONFIG[glew] = "--enable-glew,--disable-glew,glew"
 PACKAGECONFIG[glu] = "--enable-glu,--disable-glu,virtual/libgl"
 PACKAGECONFIG[glx] = "--enable-glx-demos,--disable-glx-demos"
 
-do_install_append() {
+do_install:append() {
 	# it can be completely empty when all PACKAGECONFIG options are disabled
 	rmdir --ignore-fail-on-non-empty ${D}${bindir}
 

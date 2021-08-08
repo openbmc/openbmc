@@ -9,7 +9,7 @@ SRC_URI[sha256sum] = "603a46e5c358ce20ac4807a0eeafac7505d1125a4c1bd8378757ada06f
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "${PYTHON_PN}-prettytable \
+RDEPENDS:${PN} += "${PYTHON_PN}-prettytable \
             ${PYTHON_PN}-cmd2 \
             ${PYTHON_PN}-pyparsing"
 

@@ -13,4 +13,4 @@ SRC_URI[sha256sum] = "934ba5affecff21e62d9fac1dd50c50cd94b3a807fefa5f5bff59f3d6f
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[notify] = "--enable-notifications,--disable-notifications,libnotify"
 
-FILES_${PN} += "${datadir}/backgrounds"
+FILES:${PN} += "${datadir}/backgrounds"

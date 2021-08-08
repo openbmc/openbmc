@@ -14,9 +14,9 @@ inherit gnomebase bash-completion vala
 # I/O error : Attempt to load network entity http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl
 EXTRA_OEMESON = "-Dman=false"
 # no bash-completion for native
-EXTRA_OEMESON_append_class-native = " -Dbash_completion=false"
+EXTRA_OEMESON:append:class-native = " -Dbash_completion=false"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${systemd_user_unitdir} \
     ${libdir}/gio/modules/*.so \

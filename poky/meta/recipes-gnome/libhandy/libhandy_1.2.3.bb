@@ -24,4 +24,4 @@ ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 DEPENDS += "gtk+3"
 
 PACKAGES =+ "${PN}-examples"
-FILES_${PN}-examples = "${bindir}"
+FILES:${PN}-examples = "${bindir}"

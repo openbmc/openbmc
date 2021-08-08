@@ -5,7 +5,7 @@ The bbappend files for some recipes (e.g. linux-yocto) in this layer need
 to have 'security' in DISTRO_FEATURES to have effect.
 To enable them, add in configuration file the following line.
 
-  DISTRO_FEATURES_append = " security"
+  DISTRO_FEATURES:append = " security"
 
 If meta-security is included, but security  is not enabled as a
 distro feature a warning is printed at parse time:

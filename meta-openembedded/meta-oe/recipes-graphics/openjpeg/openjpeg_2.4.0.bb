@@ -18,6 +18,6 @@ inherit cmake
 # for multilib
 EXTRA_OECMAKE += "-DOPENJPEG_INSTALL_LIB_DIR=${@d.getVar('baselib').replace('/', '')}"
 
-FILES_${PN} += "${libdir}/openjpeg*"
+FILES:${PN} += "${libdir}/openjpeg*"
 
 BBCLASSEXTEND = "native nativesdk"

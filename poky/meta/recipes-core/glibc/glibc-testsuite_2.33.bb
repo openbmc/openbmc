@@ -3,7 +3,7 @@ require glibc_${PV}.bb
 EXCLUDE_FROM_WORLD = "1"
 
 # handle PN differences
-FILESEXTRAPATHS_prepend := "${THISDIR}/glibc:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/glibc:"
 
 # strip provides
 PROVIDES = ""
@@ -20,7 +20,7 @@ python () {
 DEPENDS += "glibc-locale libgcc gcc-runtime"
 
 # remove the initial depends
-DEPENDS_remove = "libgcc-initial"
+DEPENDS:remove = "libgcc-initial"
 
 inherit qemu
 

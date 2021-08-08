@@ -13,8 +13,8 @@ inherit cmake
 EXTRA_OECMAKE="-DBUILD_SHARED_LIBS=ON -DREGISTER_INSTALL_PREFIX=OFF -DLIB_INSTALL_DIR=${baselib}"
 
 PACKAGES =+ "${PN}-bash-completion"
-FILES_${PN}-bash-completion += "${bindir}/gflags_completions.sh"
+FILES:${PN}-bash-completion += "${bindir}/gflags_completions.sh"
 
-RDEPENDS_${PN}-bash-completion = "bash bash-completion"
+RDEPENDS:${PN}-bash-completion = "bash bash-completion"
 
 BBCLASSEXTEND = "native nativesdk"

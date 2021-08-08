@@ -9,7 +9,7 @@ LICENSE = "GPLv2"
 inherit kernelsrc
 
 COMPATIBLE_HOST = '(x86_64|i.86).*-linux'
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'
 
 do_populate_lic[depends] += "virtual/kernel:do_patch"
 

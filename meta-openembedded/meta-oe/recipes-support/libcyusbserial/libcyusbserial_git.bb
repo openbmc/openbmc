@@ -15,4 +15,4 @@ S = "${WORKDIR}/git"
 inherit cmake
 
 PACKAGES =+ "${PN}-utils"
-FILES_${PN}-utils = "${bindir}/*"
+FILES:${PN}-utils = "${bindir}/*"

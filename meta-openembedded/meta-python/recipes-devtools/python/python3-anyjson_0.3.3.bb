@@ -11,7 +11,7 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 	${PYTHON_PN}-nose \
 "
@@ -24,4 +24,4 @@ do_install_ptest() {
 SRC_URI[md5sum] = "2ea28d6ec311aeeebaf993cb3008b27c"
 SRC_URI[sha256sum] = "37812d863c9ad3e35c0734c42e0bf0320ce8c3bed82cd20ad54cb34d158157ba"
 
-RDEPENDS_${PN} += "${PYTHON_PN}-simplejson"
+RDEPENDS:${PN} += "${PYTHON_PN}-simplejson"

@@ -51,7 +51,7 @@ This code unpacks the downloaded files to the specified by ``WORKDIR``.
    examine the OpenEmbedded class file ``base.bbclass``
    .
 
-The ``SRC_URI`` and ``WORKDIR`` variables are not hardcoded into the
+The :term:`SRC_URI` and ``WORKDIR`` variables are not hardcoded into the
 fetcher, since those fetcher methods can be (and are) called with
 different variable names. In OpenEmbedded for example, the shared state
 (sstate) code uses the fetch module to fetch the sstate files.
@@ -64,14 +64,14 @@ URLs by looking for source files in a specific search order:
    :term:`PREMIRRORS` variable.
 
 -  *Source URI:* If pre-mirrors fail, BitBake uses the original URL (e.g
-   from ``SRC_URI``).
+   from :term:`SRC_URI`).
 
 -  *Mirror Sites:* If fetch failures occur, BitBake next uses mirror
    locations as defined by the :term:`MIRRORS` variable.
 
 For each URL passed to the fetcher, the fetcher calls the submodule that
 handles that particular URL type. This behavior can be the source of
-some confusion when you are providing URLs for the ``SRC_URI`` variable.
+some confusion when you are providing URLs for the :term:`SRC_URI` variable.
 Consider the following two URLs::
 
    http://git.yoctoproject.org/git/poky;protocol=git
@@ -110,14 +110,14 @@ which is specified by the :term:`DL_DIR` variable.
 File integrity is of key importance for reproducing builds. For
 non-local archive downloads, the fetcher code can verify SHA-256 and MD5
 checksums to ensure the archives have been downloaded correctly. You can
-specify these checksums by using the ``SRC_URI`` variable with the
+specify these checksums by using the :term:`SRC_URI` variable with the
 appropriate varflags as follows::
 
    SRC_URI[md5sum] = "value"
    SRC_URI[sha256sum] = "value"
 
 You can also specify the checksums as
-parameters on the ``SRC_URI`` as shown below::
+parameters on the :term:`SRC_URI` as shown below::
 
   SRC_URI = "http://example.com/foobar.tar.bz2;md5sum=4a8e0f237e961fd7785d19d07fdb994d"
 
@@ -129,7 +129,7 @@ shows how you name the URIs::
    SRC_URI[foo.md5sum] = 4a8e0f237e961fd7785d19d07fdb994d
 
 After a file has been downloaded and
-has had its checksum checked, a ".done" stamp is placed in ``DL_DIR``.
+has had its checksum checked, a ".done" stamp is placed in :term:`DL_DIR`.
 BitBake uses this stamp during subsequent builds to avoid downloading or
 comparing a checksum for the file again.
 
@@ -438,7 +438,7 @@ Here are some example URLs::
 .. note::
 
    Specifying passwords directly in ``git://`` urls is not supported.
-   There are several reasons: ``SRC_URI`` is often written out to logs and
+   There are several reasons: :term:`SRC_URI` is often written out to logs and
    other places, and that could easily leak passwords; it is also all too
    easy to share metadata without removing passwords. SSH keys, ``~/.netrc``
    and ``~/.ssh/config`` files can be used as alternatives.
@@ -487,7 +487,7 @@ To use this fetcher, make sure your recipe has proper
 The fetcher uses the ``rcleartool`` or
 ``cleartool`` remote client, depending on which one is available.
 
-Following are options for the ``SRC_URI`` statement:
+Following are options for the :term:`SRC_URI` statement:
 
 -  *vob*: The name, which must include the prepending "/" character,
    of the ClearCase VOB. This option is required.
@@ -549,7 +549,7 @@ password if you do not wish to keep those values in a recipe itself. If
 you choose not to use ``P4CONFIG``, or to explicitly set variables that
 ``P4CONFIG`` can contain, you can specify the ``P4PORT`` value, which is
 the server's URL and port number, and you can specify a username and
-password directly in your recipe within ``SRC_URI``.
+password directly in your recipe within :term:`SRC_URI`.
 
 Here is an example that relies on ``P4CONFIG`` to specify the server URL
 and port, username, and password, and fetches the Head Revision::
@@ -680,4 +680,4 @@ submodules. However, you might find the code helpful and readable.
 Auto Revisions
 ==============
 
-We need to document ``AUTOREV`` and ``SRCREV_FORMAT`` here.
+We need to document ``AUTOREV`` and :term:`SRCREV_FORMAT` here.

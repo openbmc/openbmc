@@ -26,6 +26,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/daemons/autofs/v5/autofs-${PV}.tar.gz \
            file://0001-Do-not-hardcode-path-for-pkg.m4.patch \
            file://0001-Bug-fix-for-pid_t-not-found-on-musl.patch \
            file://0001-Define-__SWORD_TYPE-if-undefined.patch \
+           file://autofs-5.1.7-use-default-stack-size-for-threads.patch \
            "
 SRC_URI[sha256sum] = "a18619e5ad18960fe382354eef33f070e57e4e5711d484b010acde080a003312"
 
@@ -59,14 +60,14 @@ CACHED_CONFIGUREVARS = "ac_cv_path_RANLIB=${RANLIB} \
                         piddir=/run \
 "
 
-do_configure_prepend () {
+do_configure:prepend () {
     if [ ! -e ${S}/acinclude.m4 ]; then
         cp ${S}/aclocal.m4 ${S}/acinclude.m4
     fi
     cp ${STAGING_DATADIR_NATIVE}/aclocal/pkg.m4 .
 }
 
-do_install_append () {
+do_install:append () {
     # samples have been removed from SUBDIRS from 5.1.5, need to install separately
     oe_runmake 'DESTDIR=${D}' install_samples
 
@@ -89,9 +90,9 @@ SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 # Some symlinks are created in plugins dir e.g.
 # mount_nfs4.so -> mount_nfs.so
-INSANE_SKIP_${PN} = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "autofs.service"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
+SYSTEMD_SERVICE:${PN} = "autofs.service"

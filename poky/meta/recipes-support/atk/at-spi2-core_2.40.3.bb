@@ -31,7 +31,7 @@ GIR_MESON_OPTION = 'introspection'
 GIR_MESON_ENABLE_FLAG = 'yes'
 GIR_MESON_DISABLE_FLAG = 'no'
 
-FILES_${PN} += "${datadir}/dbus-1/services/*.service \
+FILES:${PN} += "${datadir}/dbus-1/services/*.service \
                 ${datadir}/dbus-1/accessibility-services/*.service \
                 ${datadir}/defaults/at-spi2 \
                 ${systemd_user_unitdir}/at-spi-dbus-bus.service \

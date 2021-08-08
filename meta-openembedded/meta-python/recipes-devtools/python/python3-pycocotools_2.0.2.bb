@@ -9,4 +9,4 @@ SRC_URI[md5sum] = "33858f23c8b99ce8116b70c32f6b6dd9"
 SRC_URI[sha256sum] = "24717a12799b4471c2e54aa210d642e6cd4028826a1d49fcc2b0e3497e041f1a"
 
 DEPENDS = "python3-cython-native python3-numpy-native virtual/crypt"
-RDEPENDS_${PN} = "python3-matplotlib python3-pillow python3-profile"
+RDEPENDS:${PN} = "python3-matplotlib python3-pillow python3-profile"

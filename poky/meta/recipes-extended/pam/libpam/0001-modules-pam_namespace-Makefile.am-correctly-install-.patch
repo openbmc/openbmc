@@ -1,0 +1,28 @@
+From e2db4082f6b988f1d5803028e9e47aee5f3519ac Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 27 Dec 2020 00:30:45 +0100
+Subject: [PATCH] modules/pam_namespace/Makefile.am: correctly install systemd
+ unit file
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ modules/pam_namespace/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/modules/pam_namespace/Makefile.am b/modules/pam_namespace/Makefile.am
+index 21e1b33..ddd5fc0 100644
+--- a/modules/pam_namespace/Makefile.am
++++ b/modules/pam_namespace/Makefile.am
+@@ -18,7 +18,7 @@ TESTS = $(dist_check_SCRIPTS)
+ securelibdir = $(SECUREDIR)
+ secureconfdir = $(SCONFIGDIR)
+ namespaceddir = $(SCONFIGDIR)/namespace.d
+-servicedir = $(prefix)/lib/systemd/system
++servicedir = /lib/systemd/system
+ 
+ AM_CFLAGS = -I$(top_srcdir)/libpam/include -I$(top_srcdir)/libpamc/include \
+         -DSECURECONF_DIR=\"$(SCONFIGDIR)/\" $(WARN_CFLAGS)
+-- 
+2.24.0
+

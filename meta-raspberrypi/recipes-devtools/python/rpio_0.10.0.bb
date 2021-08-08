@@ -14,7 +14,7 @@ inherit setuptools3
 
 COMPATIBLE_MACHINE = "^rpi$"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     python3-logging \
     python3-threading \
 "

@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c31c73c1d8f5d06784b2ccd22e42d641 \
 SECTION = "base"
 
 DEPENDS = "expat glib-2.0 virtual/libintl dbus-glib-native dbus"
-DEPENDS_class-native = "glib-2.0-native dbus-native"
+DEPENDS:class-native = "glib-2.0-native dbus-native"
 
 SRC_URI = "https://dbus.freedesktop.org/releases/dbus-glib/dbus-glib-${PV}.tar.gz \
            file://no-examples.patch \
@@ -24,16 +24,16 @@ inherit autotools pkgconfig gettext bash-completion gtk-doc
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[tests] = "--enable-tests,,,"
 
-EXTRA_OECONF_class-target = "--with-dbus-binding-tool=${STAGING_BINDIR_NATIVE}/dbus-binding-tool"
+EXTRA_OECONF:class-target = "--with-dbus-binding-tool=${STAGING_BINDIR_NATIVE}/dbus-binding-tool"
 
 PACKAGES += "${PN}-tests"
 
-FILES_${PN} = "${libdir}/lib*${SOLIBS}"
-FILES_${PN}-bash-completion += "${libexecdir}/dbus-bash-completion-helper"
-FILES_${PN}-dev += "${libdir}/dbus-1.0/include ${bindir}/dbus-glib-tool"
-FILES_${PN}-dev += "${bindir}/dbus-binding-tool"
+FILES:${PN} = "${libdir}/lib*${SOLIBS}"
+FILES:${PN}-bash-completion += "${libexecdir}/dbus-bash-completion-helper"
+FILES:${PN}-dev += "${libdir}/dbus-1.0/include ${bindir}/dbus-glib-tool"
+FILES:${PN}-dev += "${bindir}/dbus-binding-tool"
 
-RDEPENDS_${PN}-tests += "dbus-x11"
-FILES_${PN}-tests = "${datadir}/${BPN}/tests"
+RDEPENDS:${PN}-tests += "dbus-x11"
+FILES:${PN}-tests = "${datadir}/${BPN}/tests"
 
 BBCLASSEXTEND = "native"

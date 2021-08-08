@@ -13,7 +13,7 @@ SRC_URI[sha256sum] = "038ca228d220cd0ba1b7b76465d8a51f2433ad1f74648d1d291daa0a24
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[pcre] = "--enable-pcre,--disable-pcre,libpcre"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/thunarx-3/* \
     ${libdir}/xfce4/panel/plugins/* \
     ${libdir}/Thunar/[Tt]hunar* \
@@ -25,4 +25,4 @@ FILES_${PN} += " \
     ${datadir}/xfce4/panel/plugins/* \
 "
 
-RRECOMMENDS_${PN} = "gvfs gvfsd-trash"
+RRECOMMENDS:${PN} = "gvfs gvfsd-trash"

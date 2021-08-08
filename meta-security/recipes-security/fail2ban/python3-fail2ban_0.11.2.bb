@@ -20,34 +20,34 @@ inherit update-rc.d ptest setuptools3
 
 S = "${WORKDIR}/git"
 
-do_compile_prepend () {
+do_compile:prepend () {
     cp ${WORKDIR}/fail2ban_setup.py ${S}/setup.py
     cd ${S}
     ./fail2ban-2to3
 }
 
-do_install_append () {
+do_install:append () {
     install -d ${D}/${sysconfdir}/fail2ban
     install -d ${D}/${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/initd ${D}${sysconfdir}/init.d/fail2ban-server
     chown -R root:root ${D}/${bindir}
 }
 
-do_install_ptest_append () {
+do_install_ptest:append () {
     install -d ${D}${PTEST_PATH}
     install -d ${D}${PTEST_PATH}/bin
     sed -i -e 's/##PYTHON##/${PYTHON_PN}/g' ${D}${PTEST_PATH}/run-ptest
     install -D ${S}/bin/* ${D}${PTEST_PATH}/bin
 }
 
-FILES_${PN} += "/run"
+FILES:${PN} += "/run"
 
 INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME = "fail2ban-server"
 INITSCRIPT_PARAMS = "defaults 25"
 
-INSANE_SKIP_${PN}_append = "already-stripped"
+INSANE_SKIP:${PN}:append = "already-stripped"
 
-RDEPENDS_${PN} = "${VIRTUAL-RUNTIME_base-utils-syslog} iptables sqlite3 python3-core python3-pyinotify"
-RDEPENDS_${PN} += " python3-logging python3-fcntl python3-json"
-RDEPENDS_${PN}-ptest = "python3-core python3-io python3-modules python3-fail2ban"
+RDEPENDS:${PN} = "${VIRTUAL-RUNTIME_base-utils-syslog} iptables sqlite3 python3-core python3-pyinotify"
+RDEPENDS:${PN} += " python3-logging python3-fcntl python3-json"
+RDEPENDS:${PN}-ptest = "python3-core python3-io python3-modules python3-fail2ban"

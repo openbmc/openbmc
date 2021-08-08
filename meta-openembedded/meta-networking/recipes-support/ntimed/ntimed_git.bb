@@ -17,7 +17,7 @@ SRCREV = "db0abbb4c80f2ecef6bc5d9639bca5bea28532a2"
 S = "${WORKDIR}/git"
 
 # use adjtimex on musl
-CFLAGS_append_libc-musl = " -Dntp_adjtime=adjtimex"
+CFLAGS:append:libc-musl = " -Dntp_adjtime=adjtimex"
 
 EXTRA_OEMAKE = "\
     'CC=${CC}' \
@@ -33,8 +33,8 @@ do_install () {
     install -D -m 0755 ntimed-client ${D}${sbindir}/ntimed-client
 }
 
-ALLOW_EMPTY_${PN} = "1"
-RDEPENDS_${PN} += "ntimed-client"
+ALLOW_EMPTY:${PN} = "1"
+RDEPENDS:${PN} += "ntimed-client"
 
 PACKAGE_BEFORE_PN += "ntimed-client"
-FILES_ntimed-client = "${sbindir}/ntimed-client"
+FILES:ntimed-client = "${sbindir}/ntimed-client"

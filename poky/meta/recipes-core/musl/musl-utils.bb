@@ -21,7 +21,7 @@ S = "${WORKDIR}/git"
 
 PACKAGES =+ "${PN}-iconv"
 
-FILES_${PN}-iconv = "${bindir}/iconv"
+FILES:${PN}-iconv = "${bindir}/iconv"
 
 COMPATIBLE_HOST = ".*-musl.*"
 

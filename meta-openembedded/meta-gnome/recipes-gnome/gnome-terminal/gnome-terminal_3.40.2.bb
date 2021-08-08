@@ -28,10 +28,10 @@ EXTRA_OECONF += " \
     --without-nautilus-extension \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/metainfo \
     ${datadir}/dbus-1 \
     ${systemd_user_unitdir} \
 "
 
-RRECOMMENDS_${PN} += "vte-prompt gsettings-desktop-schemas"
+RRECOMMENDS:${PN} += "vte-prompt gsettings-desktop-schemas"

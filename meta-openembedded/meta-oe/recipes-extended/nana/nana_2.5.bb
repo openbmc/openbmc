@@ -19,14 +19,14 @@ inherit autotools-brokensep pkgconfig texinfo
 
 EXTRA_OEMAKE = "DESTDIR=${D}"
 
-do_configure_prepend_class-nativesdk() {
+do_configure:prepend:class-nativesdk() {
     sed -i -e 's:@CPP@:\$\{CXX\} \$\{CXXFLAGS\} \-E:g' ${S}/src/nana.in
     sed -i -e 's:@CC@:\$\{CC\} \$\{CFLAGS\} \-E:g' ${S}/src/nana-clg.in
     sed -i -e 's:@CXX@::g' ${S}/src/nana-c++lg.in
     sed -i -e 's:@GDB@:\$\{GDB\}:g' ${S}/src/nana-run.in
 }
 
-do_install_prepend() {
+do_install:prepend() {
     install -d ${D}${mandir}/man1
     install -d ${D}${mandir}/man3
     install -d ${D}${datadir}/info

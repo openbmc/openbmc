@@ -13,8 +13,8 @@ SRC_URI[sha256sum] = "84914927a2c1fda167f67af26a6640630a744a22940df508aa6c752cdb
 
 EXTRA_OECONF = "--disable-gtk-doc"
 
-do_compile_prepend() {
+do_compile:prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/garcon/.libs"
 }
 
-FILES_${PN} += "${datadir}/desktop-directories"
+FILES:${PN} += "${datadir}/desktop-directories"

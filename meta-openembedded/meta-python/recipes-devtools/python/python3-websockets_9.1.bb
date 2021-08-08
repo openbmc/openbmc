@@ -10,6 +10,6 @@ SRC_URI[sha256sum] = "276d2339ebf0df4f45df453923ebd2270b87900eda5dfd4a6b0cfa15f8
 
 BBCLASSEXTEND = "native nativesdk"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-asyncio \
 "

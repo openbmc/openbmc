@@ -19,22 +19,22 @@ python () {
 }
 
 DEPENDS += "xz-native bc-native"
-DEPENDS_append_aarch64 = " libgcc"
-KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
-KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
+DEPENDS:append:aarch64 = " libgcc"
+KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
-DEPENDS_append_nios2 = " libgcc"
-KERNEL_CC_append_nios2 = " ${TOOLCHAIN_OPTIONS}"
-KERNEL_LD_append_nios2 = " ${TOOLCHAIN_OPTIONS}"
+DEPENDS:append:nios2 = " libgcc"
+KERNEL_CC:append:nios2 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_LD:append:nios2 = " ${TOOLCHAIN_OPTIONS}"
 
-DEPENDS_append_arc = " libgcc"
-KERNEL_CC_append_arc = " ${TOOLCHAIN_OPTIONS}"
-KERNEL_LD_append_arc = " ${TOOLCHAIN_OPTIONS}"
+DEPENDS:append:arc = " libgcc"
+KERNEL_CC:append:arc = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_LD:append:arc = " ${TOOLCHAIN_OPTIONS}"
 
-KERNEL_FEATURES_append_qemuall=" features/debug/printk.scc"
+KERNEL_FEATURES:append:qemuall=" features/debug/printk.scc"
 
-KERNEL_FEATURES_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'numa', 'features/numa/numa.scc', '', d)}"
-KERNEL_FEATURES_append = " ${@bb.utils.contains('MACHINE_FEATURES', 'vfat', 'cfg/fs/vfat.scc', '', d)}"
+KERNEL_FEATURES:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'numa', 'features/numa/numa.scc', '', d)}"
+KERNEL_FEATURES:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'vfat', 'cfg/fs/vfat.scc', '', d)}"
 
 # A KMACHINE is the mapping of a yocto $MACHINE to what is built
 # by the kernel. This is typically the branch that should be built,
@@ -49,11 +49,11 @@ inherit kernel-yocto
 
 B = "${WORKDIR}/linux-${PACKAGE_ARCH}-${LINUX_KERNEL_TYPE}-build"
 
-do_install_append(){
+do_install:append(){
 	if [ -n "${KMETA}" ]; then
 		rm -rf ${STAGING_KERNEL_DIR}/${KMETA}
 	fi
 }
 
 # enable kernel-sample for oeqa/runtime/cases's ksample.py test
-KERNEL_FEATURES_append_qemuall=" features/kernel-sample/kernel-sample.scc"
+KERNEL_FEATURES:append:qemuall=" features/kernel-sample/kernel-sample.scc"

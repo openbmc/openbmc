@@ -33,8 +33,8 @@
 
 # If you want to get an image based on directfb without x11 alter
 # DISTRO_FEATURES:
-DISTRO_FEATURES_append = " directfb"
-DISTRO_FEATURES_remove = "x11"
+DISTRO_FEATURES:append = " directfb"
+DISTRO_FEATURES:remove = "x11"
 
 # ENABLE_BINARY_LOCALE_GENERATION controls the generation of binary locale
 # packages at build time using qemu-native. Disabling it (by setting it to 0)
@@ -380,7 +380,7 @@ DISTRO_FEATURES_remove = "x11"
 # Enable LTO system-wide
 #
 #require conf/distro/include/lto.inc
-#DISTRO_FEATURES_append = " lto"
+#DISTRO_FEATURES:append = " lto"
 
 #
 # Set PS1 for SDK

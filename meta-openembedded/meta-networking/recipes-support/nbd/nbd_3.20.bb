@@ -14,6 +14,6 @@ inherit autotools pkgconfig
 
 PACKAGES = "${PN}-client ${PN}-server ${PN}-dbg ${PN}-trdump ${PN}-doc"
 
-FILES_${PN}-client = "${sbindir}/${BPN}-client"
-FILES_${PN}-server = "${bindir}/${BPN}-server"
-FILES_${PN}-trdump = "${bindir}/${BPN}-trdump"
+FILES:${PN}-client = "${sbindir}/${BPN}-client"
+FILES:${PN}-server = "${bindir}/${BPN}-server"
+FILES:${PN}-trdump = "${bindir}/${BPN}-trdump"

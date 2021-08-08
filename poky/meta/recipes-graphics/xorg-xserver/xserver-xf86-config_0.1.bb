@@ -9,10 +9,10 @@ SRC_URI = "file://xorg.conf"
 
 S = "${WORKDIR}"
 
-CONFFILES_${PN} = "${sysconfdir}/X11/xorg.conf"
+CONFFILES:${PN} = "${sysconfdir}/X11/xorg.conf"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 do_install () {
 	if test -s ${WORKDIR}/xorg.conf; then

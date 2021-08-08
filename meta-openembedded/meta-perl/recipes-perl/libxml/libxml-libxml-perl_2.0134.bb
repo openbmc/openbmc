@@ -13,7 +13,7 @@ DEPENDS += "libxml2 \
         libxml-sax-perl-native \
         zlib \
 "
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     libxml2 \
     libxml-sax-perl \
     libxml-sax-base-perl \
@@ -44,9 +44,9 @@ BBCLASSEXTEND = "native"
 CFLAGS += " -D_GNU_SOURCE "
 BUILD_CFLAGS += " -D_GNU_SOURCE "
 
-FILES_${PN}-dbg =+ "${libdir}/perl/vendor_perl/*/auto/XML/LibXML/.debug/"
+FILES:${PN}-dbg =+ "${libdir}/perl/vendor_perl/*/auto/XML/LibXML/.debug/"
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     liburi-perl \
     perl-module-encode-byte \
     perl-module-encode-unicode \
@@ -55,7 +55,7 @@ RDEPENDS_${PN}-ptest += " \
     perl-module-test-more \
 "
 
-do_install_prepend() {
+do_install:prepend() {
 	# test requires "-T" (taint) command line option
 	rm -rf ${B}/t/pod.t
 	# this only applies to author build

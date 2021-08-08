@@ -12,21 +12,21 @@ SRC_URI = "https://www.ibr.cs.tu-bs.de/projects/${BPN}/download/${BP}.tar.gz \
 SRC_URI[md5sum] = "4bf47483c06c9f07d1b10fbc74eddf11"
 SRC_URI[sha256sum] = "f21accdadb1bb328ea3f8a13fc34d715baac6e2db66065898346322c725754d3"
 
-RDEPENDS_${PN} += "wget"
+RDEPENDS:${PN} += "wget"
 
 inherit autotools
 
 EXTRA_OECONF = "ac_cv_path_SH=/bin/sh ac_cv_path_WGET=${bindir}/wget ac_cv_path_AWK=${bindir}/awk"
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${sysconfdir}
     install -m 0644 ${WORKDIR}/smi.conf ${D}${sysconfdir}/smi.conf
 }
 
 PACKAGES += "${PN}-mibs ${PN}-pibs ${PN}-yang"
 
-FILES_${PN}-mibs += "${datadir}/mibs"
-FILES_${PN}-pibs += "${datadir}/pibs"
-FILES_${PN}-yang += "${datadir}/yang"
+FILES:${PN}-mibs += "${datadir}/mibs"
+FILES:${PN}-pibs += "${datadir}/pibs"
+FILES:${PN}-yang += "${datadir}/yang"
 
-RRECOMMENDS_${PN} = "${BPN}-mibs"
+RRECOMMENDS:${PN} = "${BPN}-mibs"

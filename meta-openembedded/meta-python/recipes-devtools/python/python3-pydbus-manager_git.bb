@@ -12,4 +12,4 @@ PV = "git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-RDEPENDS_${PN} += "python3-pydbus"
+RDEPENDS:${PN} += "python3-pydbus"

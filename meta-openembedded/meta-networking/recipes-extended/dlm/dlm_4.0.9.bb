@@ -30,14 +30,14 @@ PACKAGECONFIG ??= ""
 
 PACKAGECONFIG[pacemaker] = ",,pacemaker"
 
-SYSTEMD_SERVICE_${PN} = "dlm.service"
+SYSTEMD_SERVICE:${PN} = "dlm.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
 export EXTRA_OEMAKE = ""
 
 DONTBUILD = "${@bb.utils.contains('PACKAGECONFIG', 'pacemaker', '', 'fence', d)}"
 
-do_compile_prepend_toolchain-clang() {
+do_compile:prepend:toolchain-clang() {
     sed -i -e "s/-fstack-clash-protection//g" ${S}/*/Makefile
 }
 

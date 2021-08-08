@@ -16,7 +16,7 @@ S = "${WORKDIR}/git"
 
 # hciuart.service replaces what was brcm43438.service 
 inherit systemd
-SYSTEMD_SERVICE_${PN} = "\
+SYSTEMD_SERVICE:${PN} = "\
     hciuart.service \
     bthelper@.service \
 "
@@ -36,12 +36,12 @@ do_install() {
     fi
 }
 
-FILES_${PN} = "\
+FILES:${PN} = "\
     ${bindir} \
     ${sysconfdir} \
     ${systemd_unitdir}/system \
 "
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     udev-rules-rpi \
 "

@@ -23,33 +23,33 @@ EXTRA_OECONF = " \
     --with-pam-mod-dir=${base_libdir}/security \
 "
 
-do_install_append() {
+do_install:append() {
     rm -rf ${D}/run ${D}${localstatedir}/run
 }
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --no-create-home --home ${localstatedir}/lib/gdm --user-group gdm"
+USERADD_PARAM:${PN} = "--system --no-create-home --home ${localstatedir}/lib/gdm --user-group gdm"
 
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
 # Some gnome components - as gnome-panel and gnome-shell (!!) - require gdm
 # components. To allow gnome-images using different display-manager, split them
 # out into a seperate package.
 PACKAGE_BEFORE_PN = "${PN}-base"
-FILES_${PN}-base = " \
+FILES:${PN}-base = " \
     ${datadir}/glib-2.0 \
     ${datadir}/gnome-session \
     ${libdir}/lib*${SOLIBS} \
     ${libdir}/girepository-1.0 \
 "
 
-CONFFILES_${PN} += "${sysconfdir}/gdm/custom.conf"
-FILES_${PN} += " \
+CONFFILES:${PN} += "${sysconfdir}/gdm/custom.conf"
+FILES:${PN} += " \
     ${datadir}/dconf \
     ${base_libdir}/security/pam_gdm.so \
     ${localstatedir} \
     ${systemd_unitdir} \
 "
 
-RDEPENDS_${PN} += "${PN}-base"
+RDEPENDS:${PN} += "${PN}-base"
 

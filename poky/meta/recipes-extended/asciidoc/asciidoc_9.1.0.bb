@@ -24,8 +24,8 @@ inherit autotools-brokensep
 CLEANBROKEN = "1"
 
 # target and nativesdk needs python3, but for native we can use the host.
-RDEPENDS_${PN} += "python3"
-RDEPENDS_remove_class-native = "python3"
+RDEPENDS:${PN} += "python3"
+RDEPENDS:remove:class-native = "python3"
 
 BBCLASSEXTEND = "native nativesdk"
 

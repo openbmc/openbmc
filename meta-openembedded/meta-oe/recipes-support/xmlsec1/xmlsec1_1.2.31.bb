@@ -39,14 +39,14 @@ PACKAGECONFIG[des] = ",--disable-des,,"
 
 # these can be dynamically loaded with xmlSecCryptoDLLoadLibrary()
 FILES_SOLIBSDEV = "${libdir}/libxmlsec1.so"
-FILES_${PN} += "${libdir}/libxmlsec1-*.so"
-INSANE_SKIP_${PN} = "dev-so"
+FILES:${PN} += "${libdir}/libxmlsec1-*.so"
+INSANE_SKIP:${PN} = "dev-so"
 
-FILES_${PN}-dev += "${libdir}/xmlsec1Conf.sh"
-FILES_${PN}-dbg += "${PTEST_PATH}/.debug/*"
+FILES:${PN}-dev += "${libdir}/xmlsec1Conf.sh"
+FILES:${PN}-dbg += "${PTEST_PATH}/.debug/*"
 
-RDEPENDS_${PN}-ptest += "${PN}-dev"
-INSANE_SKIP_${PN}-ptest += "dev-deps"
+RDEPENDS:${PN}-ptest += "${PN}-dev"
+INSANE_SKIP:${PN}-ptest += "dev-deps"
 
 PTEST_EXTRA_ARGS = "top_srcdir=${S} top_builddir=${B}"
 
@@ -54,7 +54,7 @@ do_compile_ptest () {
     oe_runmake -C ${S}/examples ${PTEST_EXTRA_ARGS} all
 }
 
-do_install_append() {
+do_install:append() {
     for i in ${bindir}/xmlsec1-config ${libdir}/xmlsec1Conf.sh \
         ${libdir}/pkgconfig/xmlsec1-openssl.pc; do
         sed -i -e "s@${RECIPE_SYSROOT}@@g" ${D}$i

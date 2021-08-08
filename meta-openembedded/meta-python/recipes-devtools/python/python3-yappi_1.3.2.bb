@@ -13,13 +13,13 @@ SRC_URI += " \
 
 inherit pypi setuptools3 ptest
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-datetime \
     ${PYTHON_PN}-pickle \
     ${PYTHON_PN}-threading \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     ${PYTHON_PN}-gevent \
     ${PYTHON_PN}-multiprocessing \
     ${PYTHON_PN}-pytest \

@@ -18,16 +18,16 @@ S = "${WORKDIR}/git"
 inherit cmake
 
 PACKAGECONFIG ?= "shared unwind"
-PACKAGECONFIG_remove_riscv64 = "unwind"
-PACKAGECONFIG_remove_riscv32 = "unwind"
-PACKAGECONFIG_append_libc-musl_riscv64 = " execinfo"
-PACKAGECONFIG_append_libc-musl_riscv32 = " execinfo"
+PACKAGECONFIG:remove:riscv64 = "unwind"
+PACKAGECONFIG:remove:riscv32 = "unwind"
+PACKAGECONFIG:append:libc-musl:riscv64 = " execinfo"
+PACKAGECONFIG:append:libc-musl:riscv32 = " execinfo"
 
 PACKAGECONFIG[unwind] = "-DWITH_UNWIND=ON,-DWITH_UNWIND=OFF,libunwind,libunwind"
 PACKAGECONFIG[execinfo] = ",,libexecinfo"
 PACKAGECONFIG[shared] = "-DBUILD_SHARED_LIBS=ON,-DBUILD_SHARED_LIBS=OFF,,"
 
-do_configure_append() {
+do_configure:append() {
     # remove WORKDIR info to improve reproducibility
     if [ -f  "${B}/config.h" ] ; then
         sed -i 's/'$(echo ${WORKDIR} | sed 's_/_\\/_g')'/../g' ${B}/config.h

@@ -26,12 +26,12 @@ PACKAGECONFIG[systemd] = "--enable-init=service.fedora --enable-initdir=${system
 
 INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME = "haveged"
-INITSCRIPT_PARAMS_${PN} = "defaults 9"
+INITSCRIPT_PARAMS:${PN} = "defaults 9"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "haveged.service"
+SYSTEMD_SERVICE:${PN} = "haveged.service"
 
-do_install_append() {
+do_install:append() {
     # The exit status is 143 when the service is stopped
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         sed -i '/ExecStart/a SuccessExitStatus=143' ${D}${systemd_system_unitdir}/haveged.service

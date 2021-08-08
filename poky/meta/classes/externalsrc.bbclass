@@ -13,7 +13,7 @@
 # called "myrecipe" you would do:
 #
 # INHERIT += "externalsrc"
-# EXTERNALSRC_pn-myrecipe = "/path/to/my/source/tree"
+# EXTERNALSRC:pn-myrecipe = "/path/to/my/source/tree"
 #
 # In order to make this class work for both target and native versions (or with
 # multilibs/cross or other BBCLASSEXTEND variants), B is set to point to a separate
@@ -21,7 +21,7 @@
 # the default, but the build directory can be set to the source directory if
 # circumstances dictate by setting EXTERNALSRC_BUILD to the same value, e.g.:
 #
-# EXTERNALSRC_BUILD_pn-myrecipe = "/path/to/my/source/tree"
+# EXTERNALSRC_BUILD:pn-myrecipe = "/path/to/my/source/tree"
 #
 
 SRCTREECOVEREDTASKS ?= "do_patch do_unpack do_fetch"
@@ -45,11 +45,11 @@ python () {
     if bpn == d.getVar('PN') or not classextend:
         if (externalsrc or
                 ('native' in classextend and
-                 d.getVar('EXTERNALSRC_pn-%s-native' % bpn)) or
+                 d.getVar('EXTERNALSRC:pn-%s-native' % bpn)) or
                 ('nativesdk' in classextend and
-                 d.getVar('EXTERNALSRC_pn-nativesdk-%s' % bpn)) or
+                 d.getVar('EXTERNALSRC:pn-nativesdk-%s' % bpn)) or
                 ('cross' in classextend and
-                 d.getVar('EXTERNALSRC_pn-%s-cross' % bpn))):
+                 d.getVar('EXTERNALSRC:pn-%s-cross' % bpn))):
             d.setVar('BB_DONT_CACHE', '1')
 
     if externalsrc:

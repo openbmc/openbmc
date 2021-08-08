@@ -20,7 +20,7 @@ PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'packagekit', 
 PACKAGECONFIG[nautilus] = "-Dnautilus-actions=enabled,-Dnautilus-actions=disabled,nautilus"
 PACKAGECONFIG[packagekit] = "-Dpackagekit=true,-Dpackagekit=false,"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/metainfo \
     ${libdir}/nautilus \

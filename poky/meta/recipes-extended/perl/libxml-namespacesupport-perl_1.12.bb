@@ -21,7 +21,7 @@ S = "${WORKDIR}/${SRCNAME}-${PV}"
 
 inherit cpan ptest-perl
 
-RDEPENDS_${PN}-ptest += "perl-module-test-more"
+RDEPENDS:${PN}-ptest += "perl-module-test-more"
 
 BBCLASSEXTEND="native nativesdk"
 

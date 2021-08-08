@@ -22,7 +22,7 @@ S = "${WORKDIR}/git"
 
 UPSTREAM_CHECK_URI = "https://github.com/LINBIT/drbd-utils/releases"
 
-SYSTEMD_SERVICE_${PN} = "drbd.service"
+SYSTEMD_SERVICE:${PN} = "drbd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 DEPENDS = "flex-native"
@@ -43,20 +43,20 @@ EXTRA_OECONF = " \
 # If we have inherited reproducible_build, we want to use it.
 export WANT_DRBD_REPRODUCIBLE_BUILD = "yes"
 
-do_install_append() {
+do_install:append() {
     # don't install empty /var/lock and /var/run to avoid conflict with base-files
     rm -rf ${D}${localstatedir}/lock
     rm -rf ${D}${localstatedir}/run
 }
 
-RDEPENDS_${PN} += "bash perl-module-getopt-long perl-module-exporter perl-module-constant perl-module-overloading perl-module-exporter-heavy"
+RDEPENDS:${PN} += "bash perl-module-getopt-long perl-module-exporter perl-module-constant perl-module-overloading perl-module-exporter-heavy"
 
 # The drbd items are explicitly put under /lib when installed.
 #
-FILES_${PN} += "/run"
-FILES_${PN} += "${nonarch_base_libdir}/drbd \
+FILES:${PN} += "/run"
+FILES:${PN} += "${nonarch_base_libdir}/drbd \
                 ${nonarch_libdir}/drbd \
                 ${nonarch_libdir}/tmpfiles.d"
-FILES_${PN}-dbg += "${nonarch_base_libdir}/drbd/.debug"
+FILES:${PN}-dbg += "${nonarch_base_libdir}/drbd/.debug"
 
 CLEANBROKEN = "1"

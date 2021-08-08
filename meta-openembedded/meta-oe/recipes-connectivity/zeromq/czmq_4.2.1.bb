@@ -15,12 +15,12 @@ inherit cmake pkgconfig
 
 PACKAGES = "lib${BPN} lib${BPN}-dev lib${BPN}-staticdev ${PN} ${PN}-dbg"
 
-FILES_${PN} = "${bindir}/*"
-FILES_lib${BPN} = "${libdir}/*.so.*"
-FILES_lib${BPN}-dev = "${libdir}/*.so ${libdir}/pkgconfig ${includedir} ${datadir}/cmake"
-FILES_lib${BPN}-staticdev = "${libdir}/lib*.a"
+FILES:${PN} = "${bindir}/*"
+FILES:lib${BPN} = "${libdir}/*.so.*"
+FILES:lib${BPN}-dev = "${libdir}/*.so ${libdir}/pkgconfig ${includedir} ${datadir}/cmake"
+FILES:lib${BPN}-staticdev = "${libdir}/lib*.a"
 
-RDEPENDS_lib${BPN}-dev = "zeromq-dev"
+RDEPENDS:lib${BPN}-dev = "zeromq-dev"
 
 PACKAGECONFIG ??= "lz4 uuid curl ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[curl] = "-DCZMQ_WITH_LIBCURL=ON,-DCZMQ_WITH_LIBCURL=OFF,curl"
@@ -32,7 +32,7 @@ PACKAGECONFIG[uuid] = "-DCZMQ_WITH_UUID=ON,-DCZMQ_WITH_UUID=OFF,util-linux"
 
 BBCLASSEXTEND = "nativesdk"
 
-do_install_append() {
+do_install:append() {
         mkdir -p ${D}/${includedir}/${BPN}
         mv ${D}/${includedir}/sha1.h ${D}/${includedir}/${BPN}/.
 }

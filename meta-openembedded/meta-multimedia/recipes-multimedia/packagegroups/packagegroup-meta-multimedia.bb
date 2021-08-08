@@ -11,7 +11,7 @@ PACKAGES = ' \
     packagegroup-meta-multimedia-support \
 '
 
-RDEPENDS_packagegroup-meta-multimedia = "\
+RDEPENDS:packagegroup-meta-multimedia = "\
     packagegroup-meta-multimedia \
     packagegroup-meta-multimedia-connectivity \
     packagegroup-meta-multimedia-dvb \
@@ -19,7 +19,7 @@ RDEPENDS_packagegroup-meta-multimedia = "\
     packagegroup-meta-multimedia-support \
 "
 
-RDEPENDS_packagegroup-meta-multimedia = "\
+RDEPENDS:packagegroup-meta-multimedia = "\
     alsa-equal \
     aom \
     caps \
@@ -74,10 +74,10 @@ RDEPENDS_packagegroup-meta-multimedia = "\
     webrtc-audio-processing \
     ${@bb.utils.contains_any("TRANSLATED_TARGET_ARCH", "i586 x86-64", "x265", "", d)} \
 "
-RDEPENDS_packagegroup-meta-multimedia_remove_libc-musl = "projucer"
-RDEPENDS_packagegroup-meta-multimedia_remove_powerpc64le = "openh264"
+RDEPENDS:packagegroup-meta-multimedia:remove:libc-musl = "projucer"
+RDEPENDS:packagegroup-meta-multimedia:remove:powerpc64le = "openh264"
 
-RDEPENDS_packagegroup-meta-multimedia-connectivity = "\
+RDEPENDS:packagegroup-meta-multimedia-connectivity = "\
     gssdp \
     gupnp-av \
     gupnp-dlna \
@@ -87,17 +87,17 @@ RDEPENDS_packagegroup-meta-multimedia-connectivity = "\
     libupnp \
     ${@bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data", "rygel", "", d)} \
 "
-RDEPENDS_packagegroup-meta-multimedia-dvb = "\
+RDEPENDS:packagegroup-meta-multimedia-dvb = "\
     oscam \
     tvheadend \
 "
 
-RDEPENDS_packagegroup-meta-multimedia-mkv = "\
+RDEPENDS:packagegroup-meta-multimedia-mkv = "\
     libebml \
     libmatroska \
 "
 
-RDEPENDS_packagegroup-meta-multimedia-support = "\
+RDEPENDS:packagegroup-meta-multimedia-support = "\
     crossguid \
     ${@bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data", "libmediaart-2.0", "", d)} \
     gst-instruments \

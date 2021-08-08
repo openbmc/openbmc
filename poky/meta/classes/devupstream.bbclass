@@ -4,8 +4,8 @@
 #
 # Usage:
 # BBCLASSEXTEND = "devupstream:target"
-# SRC_URI_class-devupstream = "git://git.example.com/example"
-# SRCREV_class-devupstream = "abcdef"
+# SRC_URI:class-devupstream = "git://git.example.com/example"
+# SRCREV:class-devupstream = "abcdef"
 #
 # If the first entry in SRC_URI is a git: URL then S is rewritten to
 # WORKDIR/git.
@@ -16,8 +16,6 @@
 # - If the fetcher requires native tools (such as subversion-native) then
 #   bitbake won't be able to add them automatically.
 
-CLASSOVERRIDE .= ":class-devupstream"
-
 python devupstream_virtclass_handler () {
     # Do nothing if this is inherited, as it's for BBCLASSEXTEND
     if "devupstream" not in (d.getVar('BBCLASSEXTEND') or ""):
@@ -25,8 +23,8 @@ python devupstream_virtclass_handler () {
         return
 
     variant = d.getVar("BBEXTENDVARIANT")
-    if variant not in ("target"):
-        bb.error("Pass the variant when using devupstream, for example devupstream:target")
+    if variant not in ("target", "native"):
+        bb.error("Unsupported variant %s. Pass the variant when using devupstream, for example devupstream:target" % variant)
         return
 
     # Develpment releases are never preferred by default
@@ -34,14 +32,22 @@ python devupstream_virtclass_handler () {
 
     uri = bb.fetch2.URI(d.getVar("SRC_URI").split()[0])
 
-    if uri.scheme == "git":
-        d.setVar("S", "${WORKDIR}/git")
+    if uri.scheme == "git" and not d.getVar("S:class-devupstream"):
+        d.setVar("S:class-devupstream", "${WORKDIR}/git")
 
     # Modify the PV if the recipe hasn't already overridden it
     pv = d.getVar("PV")
     proto_marker = "+" + uri.scheme
-    if proto_marker not in pv:
+    if proto_marker not in pv and not d.getVar("PV:class-devupstream"):
         d.setVar("PV", pv + proto_marker + "${SRCPV}")
+
+    if variant == "native":
+        pn = d.getVar("PN")
+        d.setVar("PN", "%s-native" % (pn))
+        fn = d.getVar("FILE")
+        bb.parse.BBHandler.inherit("native", fn, 0, d)
+
+    d.appendVar("CLASSOVERRIDE", ":class-devupstream")
 }
 
 addhandler devupstream_virtclass_handler

@@ -9,9 +9,9 @@ inherit autotools gettext pkgconfig
 
 DEPENDS += "flex-native"
 
-RREPLACES_${PN} = "console-tools"
-RPROVIDES_${PN} = "console-tools"
-RCONFLICTS_${PN} = "console-tools"
+RREPLACES:${PN} = "console-tools"
+RPROVIDES:${PN} = "console-tools"
+RCONFLICTS:${PN} = "console-tools"
 
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/${BPN}/${BP}.tar.xz \
            "
@@ -25,12 +25,12 @@ PACKAGECONFIG[pam] = "--enable-vlock, --disable-vlock, libpam,"
 
 PACKAGES += "${PN}-consolefonts ${PN}-keymaps ${PN}-unimaps ${PN}-consoletrans"
 
-FILES_${PN}-consolefonts = "${datadir}/consolefonts"
-FILES_${PN}-consoletrans = "${datadir}/consoletrans"
-FILES_${PN}-keymaps = "${datadir}/keymaps"
-FILES_${PN}-unimaps = "${datadir}/unimaps"
+FILES:${PN}-consolefonts = "${datadir}/consolefonts"
+FILES:${PN}-consoletrans = "${datadir}/consoletrans"
+FILES:${PN}-keymaps = "${datadir}/keymaps"
+FILES:${PN}-unimaps = "${datadir}/unimaps"
 
-do_install_append () {
+do_install:append () {
     if [ ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'yes', '', d)} = yes ] \
     && [ -f ${D}${sysconfdir}/pam.d/vlock ]; then
         mv -f ${D}${sysconfdir}/pam.d/vlock ${D}${sysconfdir}/pam.d/vlock.kbd
@@ -39,7 +39,7 @@ do_install_append () {
 
 inherit update-alternatives
 
-ALTERNATIVE_${PN} = "chvt deallocvt fgconsole openvt showkey \
+ALTERNATIVE:${PN} = "chvt deallocvt fgconsole openvt showkey \
                      ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'vlock','', d)}"
 ALTERNATIVE_PRIORITY = "100"
 

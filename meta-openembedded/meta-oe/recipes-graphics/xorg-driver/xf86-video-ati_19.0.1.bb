@@ -19,7 +19,7 @@ SRC_URI[sha256sum] = "5cb6015d8664546ad1311bc9c363d7bc41ebf60e7046ceb44dd38e5b70
 
 EXTRA_OECONF += "--disable-glamor"
 
-RDEPENDS_${PN} += "xserver-xorg-module-exa"
-RRECOMMENDS_${PN} += "linux-firmware-radeon"
+RDEPENDS:${PN} += "xserver-xorg-module-exa"
+RRECOMMENDS:${PN} += "linux-firmware-radeon"
 
-FILES_${PN} += "${datadir}/X11"
+FILES:${PN} += "${datadir}/X11"

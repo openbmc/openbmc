@@ -12,7 +12,7 @@ inherit pypi setuptools3
 
 CLEANBROKEN = "1"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
         ${PYTHON_PN}-dateutil \
         ${PYTHON_PN}-tzlocal \
         ${PYTHON_PN}-ruamel-yaml \

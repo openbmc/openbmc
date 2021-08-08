@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=84dcc94da3adb52b53ae4fa38fe49e5d"
 
 inherit features_check systemd
 
-RDEPENDS_${PN} = "python3-pygobject python3-dbus"
+RDEPENDS:${PN} = "python3-pygobject python3-dbus"
 REQUIRED_DISTRO_FEATURES = "systemd"
 
 SRCREV = "30e278e50749a60a930ceaa0971207c6436b8a0c"
@@ -18,7 +18,7 @@ SRC_URI = "git://gitlab.com/craftyguy/networkd-dispatcher;protocol=https;nobranc
 S = "${WORKDIR}/git"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "networkd-dispatcher.service"
+SYSTEMD_SERVICE:${PN} = "networkd-dispatcher.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 # Nothing to build, just a python script to install

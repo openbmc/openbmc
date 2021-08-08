@@ -13,9 +13,9 @@ S = "${WORKDIR}/git"
 
 inherit autotools lib_package pkgconfig
 
-do_install_append() {
+do_install:append() {
     sed -i -e s://:/:g -e 's:=${libdir}/libudev.la:-ludev:g' ${D}${libdir}/libatasmart.la
 }
 
 PACKAGES =+ "${PN}-dev-vala"
-FILES_${PN}-dev-vala = "${datadir}/vala"
+FILES:${PN}-dev-vala = "${datadir}/vala"

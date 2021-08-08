@@ -14,7 +14,7 @@ X86ARCH64 - This is the 64-bit architecture GNU canonical arch, TUNE_ARCH.
 
 The TUNE_PKGARCH is defined as follows:
 
-TUNE_PKGARCH = ${TUNE_PKGARCH_tune-${DEFAULTTUNE}}
+TUNE_PKGARCH = ${TUNE_PKGARCH:tune-${DEFAULTTUNE}}
 
 The package architecture for 32-bit targets is historical and generally
 set to to match the core compatible processor type, i.e. i386.

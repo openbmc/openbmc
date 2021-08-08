@@ -19,21 +19,21 @@ DEPENDS += "zlib util-linux libuv"
 
 inherit pkgconfig autotools-brokensep useradd systemd
 
-LIBS_toolchain-clang_x86 = "-latomic"
-LIBS_riscv64 = "-latomic"
-LIBS_riscv32 = "-latomic"
+LIBS:toolchain-clang:x86 = "-latomic"
+LIBS:riscv64 = "-latomic"
+LIBS:riscv32 = "-latomic"
 export LIBS
 
 #systemd
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "netdata.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+SYSTEMD_SERVICE:${PN} = "netdata.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 #User specific
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system netdata"
+GROUPADD_PARAM:${PN} = "--system netdata"
 
-do_install_append() {
+do_install:append() {
     #set S UID for plugins
     chmod 4755 ${D}${libexecdir}/netdata/plugins.d/apps.plugin
 
@@ -52,4 +52,4 @@ do_install_append() {
     sed -i -e 's,@@datadir,${datadir},g' ${D}${sysconfdir}/netdata/netdata.conf
 }
 
-RDEPENDS_${PN} = "bash zlib"
+RDEPENDS:${PN} = "bash zlib"

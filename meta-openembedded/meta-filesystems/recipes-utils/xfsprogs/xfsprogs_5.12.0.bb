@@ -2,7 +2,7 @@ SUMMARY = "XFS Filesystem Utilities"
 HOMEPAGE = "http://oss.sgi.com/projects/xfs"
 SECTION = "base"
 LICENSE = "GPLv2 & LGPLv2.1"
-LICENSE_libhandle = "LGPLv2.1"
+LICENSE:libhandle = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://LICENSES/GPL-2.0;md5=e6a75371ba4d16749254a51215d13f97 \
                     file://LICENSES/LGPL-2.1;md5=b370887980db5dd40659b50909238dbd"
 DEPENDS = "util-linux util-linux-native"
@@ -19,13 +19,13 @@ PACKAGES =+ "${PN}-fsck ${PN}-mkfs ${PN}-repair libhandle"
 
 DEPENDS += "util-linux libinih"
 
-RDEPENDS_${PN} = "${PN}-fsck ${PN}-mkfs ${PN}-repair"
+RDEPENDS:${PN} = "${PN}-fsck ${PN}-mkfs ${PN}-repair"
 
-FILES_${PN}-fsck = "${base_sbindir}/fsck.xfs"
-FILES_${PN}-mkfs = "${base_sbindir}/mkfs.xfs"
-FILES_${PN}-repair = "${base_sbindir}/xfs_repair"
+FILES:${PN}-fsck = "${base_sbindir}/fsck.xfs"
+FILES:${PN}-mkfs = "${base_sbindir}/mkfs.xfs"
+FILES:${PN}-repair = "${base_sbindir}/xfs_repair"
 
-FILES_libhandle = "${base_libdir}/libhandle${SOLIBS}"
+FILES:libhandle = "${base_libdir}/libhandle${SOLIBS}"
 
 EXTRA_OECONF = "--enable-gettext=no \
                 --enable-scrub=no \
@@ -61,7 +61,7 @@ do_configure () {
     oe_runconf
 }
 
-do_install_append() {
+do_install:append() {
         oe_runmake 'DESTDIR=${D}' install-dev
         rm ${D}${libdir}/*.la
         rmdir --ignore-fail-on-non-empty ${D}${libdir}

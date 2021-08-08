@@ -17,7 +17,7 @@ DEPENDS = "libev libx11 libxi libxfixes"
 
 S = "${WORKDIR}/git"
 
-do_install_append() {
+do_install:append() {
     # LICENSE is installed to /usr/share/licenses but we don't want it in the package
     rm -rf ${D}${datadir}
 }

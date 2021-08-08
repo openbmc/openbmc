@@ -17,6 +17,6 @@ export GO111MODULE="off"
 inherit go
 
 # This is just to make clear where this example is
-do_install_append() {
+do_install:append() {
     mv ${D}${bindir}/hello ${D}${bindir}/${BPN}
 }

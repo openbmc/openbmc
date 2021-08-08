@@ -23,20 +23,20 @@ PACKAGECONFIG[polkit] = "--enable-polkit, --disable-polkit, polkit"
 
 PACKAGES += "xfce4-powermanager-plugin"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/polkit-1 \
     ${datadir}/metainfo \
 "
 
-FILES_xfce4-powermanager-plugin = " \
+FILES:xfce4-powermanager-plugin = " \
     ${libdir}/xfce4 \
     ${datadir}/xfce4 \
 "
 
-RDEPENDS_xfce4-powermanager-plugin = "${PN}"
-RDEPENDS_${PN} = "networkmanager ${@bb.utils.contains('DISTRO_FEATURES','systemd','','consolekit',d)}"
+RDEPENDS:xfce4-powermanager-plugin = "${PN}"
+RDEPENDS:${PN} = "networkmanager ${@bb.utils.contains('DISTRO_FEATURES','systemd','','consolekit',d)}"
 
 # xfce4-brightness-plugin was replaced by xfce4-powermanager-plugin
-RPROVIDES_xfce4-powermanager-plugin += "xfce4-brightness-plugin"
-RREPLACES_xfce4-powermanager-plugin += "xfce4-brightness-plugin"
-RCONFLICTS_xfce4-powermanager-plugin += "xfce4-brightness-plugin"
+RPROVIDES:xfce4-powermanager-plugin += "xfce4-brightness-plugin"
+RREPLACES:xfce4-powermanager-plugin += "xfce4-brightness-plugin"
+RCONFLICTS:xfce4-powermanager-plugin += "xfce4-brightness-plugin"

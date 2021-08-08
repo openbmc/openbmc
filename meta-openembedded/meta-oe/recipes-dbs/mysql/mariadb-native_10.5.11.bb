@@ -4,7 +4,7 @@ inherit native
 PROVIDES += "mysql5-native"
 DEPENDS = "ncurses-native zlib-native bison-native libpcre2-native"
 
-RDEPENDS_${PN} = ""
+RDEPENDS:${PN} = ""
 PACKAGES = ""
 EXTRA_OEMAKE = ""
 

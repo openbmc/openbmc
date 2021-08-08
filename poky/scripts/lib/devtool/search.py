@@ -65,7 +65,7 @@ def search(args, config, basepath, workspace):
                                         splitline = line.split(':', 1)
                                         key = splitline[0]
                                         value = splitline[1].strip()
-                                    if key in ['PKG_%s' % pkg, 'DESCRIPTION', 'FILES_INFO'] or key.startswith('FILERPROVIDES_'):
+                                    if key in ['PKG:%s' % pkg, 'DESCRIPTION', 'FILES_INFO'] or key.startswith('FILERPROVIDES_'):
                                         if keyword_rc.search(value):
                                             match = True
                                             break

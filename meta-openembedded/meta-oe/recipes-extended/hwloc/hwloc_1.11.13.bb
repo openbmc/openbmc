@@ -26,6 +26,6 @@ PACKAGECONFIG[x11] = "--with-x,--without-x,virtual/libx11 cairo,cairo"
 PACKAGECONFIG[pci] = "--enable-pci,--disable-pci,libpciaccess,libpciaccess"
 
 # Split hwloc library into separate subpackage
-PACKAGES_prepend = " libhwloc "
-FILES_libhwloc += "${libdir}/libhwloc.so.*"
-RDEPENDS_${PN} += "libhwloc (= ${EXTENDPKGV})"
+PACKAGES:prepend = " libhwloc "
+FILES:libhwloc += "${libdir}/libhwloc.so.*"
+RDEPENDS:${PN} += "libhwloc (= ${EXTENDPKGV})"

@@ -7,7 +7,7 @@ HOMEPAGE = "https://software.intel.com/en-us/tbb"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=86d3f3a95c324c9479bd8986968f4327"
 
-DEPENDS_append_libc-musl = " libucontext"
+DEPENDS:append:libc-musl = " libucontext"
 
 PE = "1"
 
@@ -43,10 +43,10 @@ ARM_INSTRUCTION_SET = "arm"
 
 ASNEEDED = ""
 
-LDFLAGS_append_mips = " -latomic"
-LDFLAGS_append_mipsel = " -latomic"
+LDFLAGS:append:mips = " -latomic"
+LDFLAGS:append:mipsel = " -latomic"
 
-LDFLAGS_append_libc-musl = " -lucontext"
+LDFLAGS:append:libc-musl = " -lucontext"
 
 # The latest version of oneTBB does not support PPC
-COMPATIBLE_MACHINE_powerpc = "(!.*ppc).*"
+COMPATIBLE_MACHINE:powerpc = "(!.*ppc).*"

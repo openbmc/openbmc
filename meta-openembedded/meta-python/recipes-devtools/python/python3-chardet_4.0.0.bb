@@ -10,13 +10,13 @@ DEPENDS += "${PYTHON_PN}-pytest-runner-native"
 inherit pypi setuptools3
 
 PACKAGES =+ "${PN}-cli"
-FILES_${PN}-cli += " \
+FILES:${PN}-cli += " \
     ${PYTHON_SITEPACKAGES_DIR}/chardet/cli \
 "
 
-RDEPENDS_${PN}-cli = "${PN} "
+RDEPENDS:${PN}-cli = "${PN} "
 
-RDEPENDS_${PN}_class-target += " \
+RDEPENDS:${PN}:class-target += " \
     ${PYTHON_PN}-logging \
 "
 

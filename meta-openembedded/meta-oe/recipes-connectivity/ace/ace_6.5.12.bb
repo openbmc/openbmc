@@ -14,7 +14,7 @@ SRC_URI = "https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-6_5_1
 
 SRC_URI[sha256sum] = "ccd94fa45df1e8bb1c901d02c0a64c1626497e5eeda2f057fcf0a1578dae2148"
 
-COMPATIBLE_HOST_libc-musl = "null"
+COMPATIBLE_HOST:libc-musl = "null"
 
 S = "${WORKDIR}/ACE_wrappers"
 B = "${WORKDIR}/ACE_wrappers/ace"
@@ -22,8 +22,8 @@ export ACE_ROOT="${WORKDIR}/ACE_wrappers"
 
 inherit pkgconfig
 
-CXXFLAGS_append = " -fpermissive -Wnodeprecated-declarations"
-CXX_append = " -ffile-prefix-map=${WORKDIR}= -fdebug-prefix-map=${WORKDIR}= "
+CXXFLAGS:append = " -fpermissive -Wnodeprecated-declarations"
+CXX:append = " -ffile-prefix-map=${WORKDIR}= -fdebug-prefix-map=${WORKDIR}= "
 EXTRA_OEMAKE += "INSTALL_LIB=${baselib}"
 
 do_install() {

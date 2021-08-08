@@ -5,7 +5,7 @@ The bbappend files for some recipes (e.g. linux-yocto) in this layer need
 to have 'tpm' in DISTRO_FEATURES to have effect.
 To enable them, add in configuration file the following line.
 
-  DISTRO_FEATURES_append = " tmp"
+  DISTRO_FEATURES:append = " tmp"
 
 If meta-tpm is included, but tpm is not enabled as a
 distro feature a warning is printed at parse time:

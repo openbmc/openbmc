@@ -10,4 +10,4 @@ BBCLASSEXTEND = "native nativesdk"
 
 SRC_URI += "file://somefile"
 
-SRC_URI_append = " file://anotherfile"
+SRC_URI:append = " file://anotherfile"

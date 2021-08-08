@@ -58,5 +58,5 @@ do_install() {
 }
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "ptpd.service"
+SYSTEMD_SERVICE:${PN} = "ptpd.service"
 SYSTEMD_AUTO_ENABLE = "disable"

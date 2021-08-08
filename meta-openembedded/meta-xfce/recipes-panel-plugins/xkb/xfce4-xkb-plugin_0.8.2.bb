@@ -10,6 +10,6 @@ SRC_URI[sha256sum] = "bb4be13f6f73cd86a6d939e1a6b125841cf266415bc4fd134a511e4f0c
 
 DEPENDS += "libxklavier libwnck3 librsvg garcon"
 
-FILES_${PN} += "${datadir}/xfce4/xkb"
+FILES:${PN} += "${datadir}/xfce4/xkb"
 
-RDEPENDS_${PN} = "xfce4-settings"
+RDEPENDS:${PN} = "xfce4-settings"

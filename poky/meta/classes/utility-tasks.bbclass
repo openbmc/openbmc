@@ -19,7 +19,7 @@ python do_listtasks() {
 
 CLEANFUNCS ?= ""
 
-T_task-clean = "${LOG_DIR}/cleanlogs/${PN}"
+T:task-clean = "${LOG_DIR}/cleanlogs/${PN}"
 addtask clean
 do_clean[nostamp] = "1"
 python do_clean() {

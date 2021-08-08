@@ -38,5 +38,5 @@ do_install () {
         oe_runmake 'bindir=${D}${bindir}' 'mandir=${D}${mandir}' install
 }
 
-ALTERNATIVE_${PN} = "less"
+ALTERNATIVE:${PN} = "less"
 ALTERNATIVE_PRIORITY = "100"

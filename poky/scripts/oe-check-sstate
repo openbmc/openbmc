@@ -47,8 +47,8 @@ def check(args):
     try:
         env = os.environ.copy()
         if not args.same_tmpdir:
-            env['BB_ENV_EXTRAWHITE'] = env.get('BB_ENV_EXTRAWHITE', '') + ' TMPDIR_forcevariable'
-            env['TMPDIR_forcevariable'] = tmpdir
+            env['BB_ENV_EXTRAWHITE'] = env.get('BB_ENV_EXTRAWHITE', '') + ' TMPDIR:forcevariable'
+            env['TMPDIR:forcevariable'] = tmpdir
 
         try:
             output = subprocess.check_output(

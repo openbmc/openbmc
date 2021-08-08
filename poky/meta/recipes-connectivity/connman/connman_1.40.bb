@@ -7,9 +7,9 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/network/${BPN}/${BP}.tar.xz \
            file://no-version-scripts.patch \
            "
 
-SRC_URI_append_libc-musl = " file://0002-resolve-musl-does-not-implement-res_ninit.patch"
+SRC_URI:append:libc-musl = " file://0002-resolve-musl-does-not-implement-res_ninit.patch"
 
 SRC_URI[sha256sum] = "1a57ae7ce234aa3a1744aac3be5c2121d98dce999440ef8ab9cc4edfd5edcb12"
 
-RRECOMMENDS_${PN} = "connman-conf"
-RCONFLICTS_${PN} = "networkmanager"
+RRECOMMENDS:${PN} = "connman-conf"
+RCONFLICTS:${PN} = "networkmanager"

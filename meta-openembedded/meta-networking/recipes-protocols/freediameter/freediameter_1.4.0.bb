@@ -68,7 +68,7 @@ FD_DH_PEM ?= "${BPN}-dh.pem"
 FD_HOSTNAME ?= "${MACHINE}"
 FD_REALM ?= "openembedded.org"
 
-do_install_append() {
+do_install:append() {
     # install the sample configuration files
     install -d -m 0755 ${D}${sysconfdir}/${fd_pkgname}
     for i in ${S}/doc/*.conf.sample; do
@@ -116,23 +116,23 @@ do_install_ptest() {
     install -m 0644 ${B}/tests/CTestTestfile.cmake ${D}${PTEST_PATH}/
 }
 
-FILES_${PN}-dbg += "${libdir}/${fd_pkgname}/.debug/*"
+FILES:${PN}-dbg += "${libdir}/${fd_pkgname}/.debug/*"
 
 # include the extensions in main package
-FILES_${PN} += "${libdir}/${fd_pkgname}/*"
+FILES:${PN} += "${libdir}/${fd_pkgname}/*"
 
-RDEPENDS_${PN}  = "glib-2.0 gnutls libidn"
-RDEPENDS_${PN} += "openssl openssl-conf openssl-engines"
-RRECOMMENDS_${PN} += "kernel-module-tipc kernel-module-sctp" 
-RRECOMMENDS_${PN} += "kernel-module-udp-tunnel kernel-module-ipip"
-RDEPENDS_${PN}-ptest = "cmake"
+RDEPENDS:${PN}  = "glib-2.0 gnutls libidn"
+RDEPENDS:${PN} += "openssl openssl-conf openssl-engines"
+RRECOMMENDS:${PN} += "kernel-module-tipc kernel-module-sctp" 
+RRECOMMENDS:${PN} += "kernel-module-udp-tunnel kernel-module-ipip"
+RDEPENDS:${PN}-ptest = "cmake"
 
 INITSCRIPT_PACKAGES = "${PN}"
-INITSCRIPT_NAME_${PN} = "${BPN}"
+INITSCRIPT_NAME:${PN} = "${BPN}"
 INITSCRIPT_PARAMS$_${PN} = "start 30 . stop 70 0 1 2 3 4 5 6 ."
 
-SYSTEMD_SERVICE_${PN} = "freediameter.service"
+SYSTEMD_SERVICE:${PN} = "freediameter.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-CONFFILES_${PN} = "${sysconfdir}/freediameter.conf"
+CONFFILES:${PN} = "${sysconfdir}/freediameter.conf"
 

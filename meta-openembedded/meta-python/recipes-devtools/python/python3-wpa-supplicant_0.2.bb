@@ -13,4 +13,4 @@ PYPI_PACKAGE = "wpa_supplicant"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "python3-twisted python3-click python3-txdbus"
+RDEPENDS:${PN} += "python3-twisted python3-click python3-txdbus"

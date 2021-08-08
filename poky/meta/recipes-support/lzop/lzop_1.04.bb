@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "7e72b62a8a60aff5200a047eea0773a8fb205caf7acbe1774d95147f30
 
 inherit autotools
 
-do_configure_prepend () {
+do_configure:prepend () {
     install -Dm 0644 ${WORKDIR}/acinclude.m4 ${S}/acinclude.m4
 }
 

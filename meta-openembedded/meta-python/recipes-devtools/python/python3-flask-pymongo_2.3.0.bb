@@ -14,4 +14,4 @@ inherit pypi setuptools3
 
 DEPENDS = "${PYTHON_PN}-vcversioner ${PYTHON_PN}-vcversioner-native"
 
-RDEPENDS_${PN} = "${PYTHON_PN}-pymongo ${PYTHON_PN}-flask"
+RDEPENDS:${PN} = "${PYTHON_PN}-pymongo ${PYTHON_PN}-flask"

@@ -8,9 +8,9 @@ SECTION = "libs"
 
 # helper program gcryptrnd and getrandom are under GPL, rest LGPL
 LICENSE = "GPLv2+ & LGPLv2.1+ & GPLv3+"
-LICENSE_${PN} = "LGPLv2.1+"
-LICENSE_${PN}-dev = "GPLv2+ & LGPLv2.1+"
-LICENSE_dumpsexp-dev = "GPLv3+"
+LICENSE:${PN} = "LGPLv2.1+"
+LICENSE:${PN}-dev = "GPLv2+ & LGPLv2.1+"
+LICENSE:dumpsexp-dev = "GPLv3+"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
                     file://COPYING.LIB;md5=bbb461211a33b134d42ed5ee802b37ff \
@@ -37,25 +37,25 @@ BINCONFIG = "${bindir}/libgcrypt-config"
 inherit autotools texinfo binconfig-disabled pkgconfig
 
 EXTRA_OECONF = "--disable-asm"
-EXTRA_OEMAKE_class-target = "LIBTOOLFLAGS='--tag=CC'"
+EXTRA_OEMAKE:class-target = "LIBTOOLFLAGS='--tag=CC'"
 
 PACKAGECONFIG ??= "capabilities"
 PACKAGECONFIG[capabilities] = "--with-capabilities,--without-capabilities,libcap"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	# Else this could be used in preference to the one in aclocal-copy
 	rm -f ${S}/m4/gpg-error.m4
 }
 
 # libgcrypt.pc is added locally and thus installed here
-do_install_append() {
+do_install:append() {
 	install -d ${D}/${libdir}/pkgconfig
 	install -m 0644 ${B}/src/libgcrypt.pc ${D}/${libdir}/pkgconfig/
 }
 
 PACKAGES =+ "dumpsexp-dev"
 
-FILES_${PN}-dev += "${bindir}/hmac256"
-FILES_dumpsexp-dev += "${bindir}/dumpsexp"
+FILES:${PN}-dev += "${bindir}/hmac256"
+FILES:dumpsexp-dev += "${bindir}/dumpsexp"
 
 BBCLASSEXTEND = "native nativesdk"

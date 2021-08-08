@@ -116,9 +116,9 @@ class PackageTests(OESelftestTestCase):
 
     # Verify gdb to read symbols from separated debug hardlink file correctly
     def test_gdb_hardlink_debug(self):
-        features = 'IMAGE_INSTALL_append = " selftest-hardlink"\n'
-        features += 'IMAGE_INSTALL_append = " selftest-hardlink-dbg"\n'
-        features += 'IMAGE_INSTALL_append = " selftest-hardlink-gdb"\n'
+        features = 'IMAGE_INSTALL:append = " selftest-hardlink"\n'
+        features += 'IMAGE_INSTALL:append = " selftest-hardlink-dbg"\n'
+        features += 'IMAGE_INSTALL:append = " selftest-hardlink-gdb"\n'
         self.write_config(features)
         bitbake("core-image-minimal")
 
@@ -151,7 +151,7 @@ class PackageTests(OESelftestTestCase):
 
     def test_preserve_ownership(self):
         import os, stat, oe.cachedpath
-        features = 'IMAGE_INSTALL_append = " selftest-chown"\n'
+        features = 'IMAGE_INSTALL:append = " selftest-chown"\n'
         self.write_config(features)
         bitbake("core-image-minimal")
 

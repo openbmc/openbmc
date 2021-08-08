@@ -17,7 +17,7 @@ DEPENDS += "ethtool \
             flex-native \
             "
 
-RDEPENDS_${PN} += "bash ethtool libgcc"
+RDEPENDS:${PN} += "bash ethtool libgcc"
 
 SRC_URI = "gitsm://github.com/Ettercap/ettercap"
 
@@ -36,7 +36,7 @@ EXTRA_OECMAKE = " \
 # configuration file installed by the package.
 # It ensures that all characters are properly decoded and avoids
 # any fatal errors while running in text mode (-T).
-do_install_append() {
+do_install:append() {
         sed -i 's@utf8_encoding.*@utf8_encoding = "UTF-8"@g' \
 		${D}/etc/ettercap/etter.conf
 }

@@ -2,7 +2,7 @@ SUMMARY = "Free and Open On-Chip Debugging, In-System Programming and Boundary-S
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 DEPENDS = "libusb-compat libftdi"
-RDEPENDS_${PN} = "libusb1"
+RDEPENDS:${PN} = "libusb1"
 
 SRC_URI = " \
     git://repo.or.cz/openocd.git;protocol=http;name=openocd \
@@ -46,7 +46,7 @@ do_install() {
     fi
 }
 
-FILES_${PN} = " \
+FILES:${PN} = " \
   ${datadir}/openocd/* \
   ${bindir}/openocd \
   "

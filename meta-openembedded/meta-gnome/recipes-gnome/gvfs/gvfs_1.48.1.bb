@@ -8,7 +8,7 @@ inherit gnomebase gsettings bash-completion gettext upstream-version-is-even fea
 DEPENDS += "libsecret glib-2.0 glib-2.0-native libgudev shadow-native \
             gsettings-desktop-schemas dbus"
 
-RDEPENDS_${PN} += "gsettings-desktop-schemas"
+RDEPENDS:${PN} += "gsettings-desktop-schemas"
 
 SRC_URI = "https://download.gnome.org/sources/${BPN}/${@gnome_verdir("${PV}")}/${BPN}-${PV}.tar.xz;name=archive"
 SRC_URI[archive.sha256sum] = "b2ea4f271aad2711f16b43c03151e2ec5a9874ff1a21142ef6d6406486a19dc2"
@@ -25,7 +25,7 @@ EXTRA_OEMESON = " \
 
 PACKAGES =+ "gvfsd-ftp gvfsd-sftp gvfsd-trash"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/glib-2.0 \
     ${datadir}/GConf \
     ${datadir}/dbus-1/services \
@@ -34,14 +34,14 @@ FILES_${PN} += " \
     ${systemd_user_unitdir} \
 "
 
-FILES_${PN}-dbg += "${libdir}/gio/modules/.debug/*"
-FILES_${PN}-dev += "${libdir}/gio/modules/*.la"
+FILES:${PN}-dbg += "${libdir}/gio/modules/.debug/*"
+FILES:${PN}-dev += "${libdir}/gio/modules/*.la"
 
-FILES_gvfsd-ftp = "${libexecdir}/gvfsd-ftp ${datadir}/gvfs/mounts/ftp.mount"
-FILES_gvfsd-sftp = "${libexecdir}/gvfsd-sftp ${datadir}/gvfs/mounts/sftp.mount"
-FILES_gvfsd-trash = "${libexecdir}/gvfsd-trash ${datadir}/gvfs/mounts/trash.mount"
+FILES:gvfsd-ftp = "${libexecdir}/gvfsd-ftp ${datadir}/gvfs/mounts/ftp.mount"
+FILES:gvfsd-sftp = "${libexecdir}/gvfsd-sftp ${datadir}/gvfs/mounts/sftp.mount"
+FILES:gvfsd-trash = "${libexecdir}/gvfsd-trash ${datadir}/gvfs/mounts/trash.mount"
 
-RRECOMMENDS_gvfsd-ftp += "openssh-sftp openssh-ssh"
+RRECOMMENDS:gvfsd-ftp += "openssh-sftp openssh-ssh"
 
 PACKAGECONFIG ?= "libgphoto2 \
                   ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
@@ -69,9 +69,9 @@ PACKAGECONFIG[fuse] = "-Dfuse=true, -Dfuse=false, fuse3"
 PACKAGECONFIG[cdda] = "-Dcdda=true, -Dcdda=false, libcdio-paranoia"
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 polkitd"
+USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 polkitd"
 
-do_install_append() {
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'polkit', 'true', 'false', d)}; then
         # Fix up permissions on polkit rules.d to work with rpm4 constraints
         chmod 700 ${D}/${datadir}/polkit-1/rules.d

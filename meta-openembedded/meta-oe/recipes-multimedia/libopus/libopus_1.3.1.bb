@@ -29,9 +29,9 @@ EXTRA_OECONF = " \
 "
 
 # ne10 is available only for armv7a, armv7ve and aarch64
-DEPENDS_append_aarch64 = " ne10"
-DEPENDS_append_armv7a = " ne10"
-DEPENDS_append_armv7ve = " ne10"
+DEPENDS:append:aarch64 = " ne10"
+DEPENDS:append:armv7a = " ne10"
+DEPENDS:append:armv7ve = " ne10"
 
 python () {
     if d.getVar('TARGET_FPU') in [ 'soft' ]:
@@ -50,6 +50,6 @@ python () {
 #| {standard input}:761: Error: selected processor does not support Thumb mode `smull fp,r2,r3,r9'
 #| {standard input}:773: Error: selected processor does not support Thumb mode `smull fp,r3,r5,r8'
 #| make[2]: *** [celt/celt.lo] Error 1
-ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
 
 BBCLASSEXTEND = "native nativesdk"

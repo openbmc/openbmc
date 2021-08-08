@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;m
 
 inherit systemd
 
-SRC_URI_append_qemuall = " file://wired.config \
+SRC_URI:append:qemuall = " file://wired.config \
                            file://wired-setup \
                            file://wired-connection.service \
 "
@@ -16,7 +16,7 @@ S = "${WORKDIR}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} = "${localstatedir}/* ${datadir}/*"
+FILES:${PN} = "${localstatedir}/* ${datadir}/*"
 
 do_install() {
     #Configure Wired network interface in case of qemu* machines
@@ -33,4 +33,4 @@ do_install() {
     fi
 }
 
-SYSTEMD_SERVICE_${PN}_qemuall = "wired-connection.service"
+SYSTEMD_SERVICE:${PN}:qemuall = "wired-connection.service"

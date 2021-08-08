@@ -12,12 +12,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "libaio zlib coreutils-native"
 DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'pmem', 'pmdk', '', d)}"
-RDEPENDS_${PN} = "python3-core bash"
+RDEPENDS:${PN} = "python3-core bash"
 
 PACKAGECONFIG_NUMA = "numa"
 # ARM does not currently support NUMA
-PACKAGECONFIG_NUMA_arm = ""
-PACKAGECONFIG_NUMA_armeb = ""
+PACKAGECONFIG_NUMA:arm = ""
+PACKAGECONFIG_NUMA:armeb = ""
 
 PACKAGECONFIG ??= "${PACKAGECONFIG_NUMA}"
 PACKAGECONFIG[numa] = ",--disable-numa,numactl"

@@ -9,12 +9,12 @@ inherit xfce-app
 
 SRC_URI[sha256sum] = "33c8aeb53fbdb82dbd7d40bca77a8affbb4116ba0993cd59474b554558e5daa4"
 
-do_compile_prepend() {
+do_compile:prepend() {
     mkdir -p lib
     mkdir -p src panel-plugin
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/metainfo \
     ${datadir}/xfce4/panel/plugins \
     ${libdir}/xfce4/panel/plugins \

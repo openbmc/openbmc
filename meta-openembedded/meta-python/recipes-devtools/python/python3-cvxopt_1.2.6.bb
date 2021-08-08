@@ -9,7 +9,7 @@ SRCREV = "60fdb838e0bb2d8f32ba51129552c83b55acd2a7"
 
 S = "${WORKDIR}/git"
 
-RDEPENDS_${PN} += "lapack suitesparse"
+RDEPENDS:${PN} += "lapack suitesparse"
 DEPENDS += "lapack suitesparse"
 
 inherit setuptools3

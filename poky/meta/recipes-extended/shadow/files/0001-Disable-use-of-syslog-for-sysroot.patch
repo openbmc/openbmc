@@ -1,4 +1,4 @@
-From fa2d9453656641002802d8165e80adb9e6a729d2 Mon Sep 17 00:00:00 2001
+From 30a3906a0a21120fa6bbc918b6258ab9303fbeaa Mon Sep 17 00:00:00 2001
 From: Scott Garman <scott.a.garman@intel.com>
 Date: Thu, 14 Apr 2016 12:28:57 +0200
 Subject: [PATCH] Disable use of syslog for sysroot
@@ -19,12 +19,12 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  src/groupmems.c | 3 +++
  src/groupmod.c  | 3 +++
  src/useradd.c   | 3 +++
- src/userdel.c   | 3 +++
+ src/userdel.c   | 4 ++++
  src/usermod.c   | 3 +++
- 7 files changed, 21 insertions(+)
+ 7 files changed, 22 insertions(+)
 
 diff --git a/src/groupadd.c b/src/groupadd.c
-index 2dd8eec..e9c4bb7 100644
+index d7f68b1..5fe5f43 100644
 --- a/src/groupadd.c
 +++ b/src/groupadd.c
 @@ -34,6 +34,9 @@
@@ -38,7 +38,7 @@ index 2dd8eec..e9c4bb7 100644
  #include <fcntl.h>
  #include <getopt.h>
 diff --git a/src/groupdel.c b/src/groupdel.c
-index f941a84..5a70056 100644
+index 5c89312..2aefc5a 100644
 --- a/src/groupdel.c
 +++ b/src/groupdel.c
 @@ -34,6 +34,9 @@
@@ -52,7 +52,7 @@ index f941a84..5a70056 100644
  #include <fcntl.h>
  #include <grp.h>
 diff --git a/src/groupmems.c b/src/groupmems.c
-index fc91c8b..2842514 100644
+index 654a8f3..6b2026b 100644
 --- a/src/groupmems.c
 +++ b/src/groupmems.c
 @@ -32,6 +32,9 @@
@@ -66,7 +66,7 @@ index fc91c8b..2842514 100644
  #include <getopt.h>
  #include <grp.h>
 diff --git a/src/groupmod.c b/src/groupmod.c
-index 1dca5fc..bc14438 100644
+index acd6f35..a2c5247 100644
 --- a/src/groupmod.c
 +++ b/src/groupmod.c
 @@ -34,6 +34,9 @@
@@ -80,7 +80,7 @@ index 1dca5fc..bc14438 100644
  #include <fcntl.h>
  #include <getopt.h>
 diff --git a/src/useradd.c b/src/useradd.c
-index 4af0f7c..1b7bf06 100644
+index 127177e..b80e505 100644
 --- a/src/useradd.c
 +++ b/src/useradd.c
 @@ -34,6 +34,9 @@
@@ -94,21 +94,22 @@ index 4af0f7c..1b7bf06 100644
  #include <ctype.h>
  #include <errno.h>
 diff --git a/src/userdel.c b/src/userdel.c
-index cc951e5..153e0be 100644
+index 79a7c89..c1e010a 100644
 --- a/src/userdel.c
 +++ b/src/userdel.c
-@@ -34,6 +34,9 @@
+@@ -31,6 +31,10 @@
+  */
  
- #ident "$Id$"
- 
+ #include <config.h>
++
 +/* Disable use of syslog since we're running this command against a sysroot */
 +#undef USE_SYSLOG
 +
  #include <assert.h>
+ #include <dirent.h>
  #include <errno.h>
- #include <fcntl.h>
 diff --git a/src/usermod.c b/src/usermod.c
-index 05b9871..21c6da9 100644
+index 03bb9b9..e15fdd4 100644
 --- a/src/usermod.c
 +++ b/src/usermod.c
 @@ -34,6 +34,9 @@

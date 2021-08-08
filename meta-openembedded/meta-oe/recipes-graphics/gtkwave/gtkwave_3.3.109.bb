@@ -39,6 +39,6 @@ EXTRA_OECONF = " \
     --disable-mime-update \
 "
 
-FILES_${PN} = "${bindir} ${datadir}"
+FILES:${PN} = "${bindir} ${datadir}"
 
-RDEPENDS_${PN} += "tk-lib"
+RDEPENDS:${PN} += "tk-lib"

@@ -11,9 +11,9 @@ DEPENDS = "openssl libpcap zlib boost curl python3 \
 
 inherit scons dos2unix siteinfo python3native systemd useradd
 
-PV = "4.4.6"
-#v4.4.6
-SRCREV = "72e66213c2c3eab37d9358d5e78ad7f5c1d0d0d7"
+PV = "4.4.7"
+#v4.4.7
+SRCREV = "abb6b9c2bf675e9e2aeaecba05f0f8359d99e203"
 SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.4 \
            file://0001-Tell-scons-to-use-build-settings-from-environment-va.patch \
            file://0001-Use-long-long-instead-of-int64_t.patch \
@@ -31,14 +31,15 @@ SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.4 \
            file://ppc64_ARCH_BITS.patch \
            file://0001-Do-not-use-MINSIGSTKSZ.patch \
            file://0001-Use-explicit-typecast-to-size_t.patch \
+           file://PTHREAD_STACK_MIN.patch \
            "
-SRC_URI_append_libc-musl ="\
+SRC_URI:append:libc-musl ="\
            file://0001-Mark-one-of-strerror_r-implementation-glibc-specific.patch \
            file://0002-Fix-default-stack-size-to-256K.patch \
            file://0004-wiredtiger-Disable-strtouq-on-musl.patch \
            "
 
-SRC_URI_append_toolchain-clang = "\
+SRC_URI:append:toolchain-clang = "\
            file://0001-asio-Dont-use-experimental-with-clang.patch \
            "
 
@@ -50,20 +51,20 @@ COMPATIBLE_HOST ?= '(x86_64|i.86|powerpc64|arm|aarch64).*-linux'
 PACKAGECONFIG ??= "tcmalloc system-pcre"
 # gperftools compilation fails for arm below v7 because of missing support of
 # dmb operation. So we use system-allocator instead of tcmalloc
-PACKAGECONFIG_remove_armv6 = "tcmalloc"
-PACKAGECONFIG_remove_libc-musl = "tcmalloc"
-PACKAGECONFIG_remove_riscv64 = "tcmalloc"
-PACKAGECONFIG_remove_riscv32 = "tcmalloc"
+PACKAGECONFIG:remove:armv6 = "tcmalloc"
+PACKAGECONFIG:remove:libc-musl = "tcmalloc"
+PACKAGECONFIG:remove:riscv64 = "tcmalloc"
+PACKAGECONFIG:remove:riscv32 = "tcmalloc"
 
 PACKAGECONFIG[tcmalloc] = "--use-system-tcmalloc,--allocator=system,gperftools,"
 PACKAGECONFIG[shell] = ",--js-engine=none,,"
 PACKAGECONFIG[system-pcre] = "--use-system-pcre,,libpcre,"
 
 MONGO_ARCH ?= "${HOST_ARCH}"
-MONGO_ARCH_powerpc64le = "ppc64le"
+MONGO_ARCH:powerpc64le = "ppc64le"
 WIREDTIGER ?= "off"
-WIREDTIGER_x86-64 = "on"
-WIREDTIGER_aarch64 = "on"
+WIREDTIGER:x86-64 = "on"
+WIREDTIGER:aarch64 = "on"
 
 EXTRA_OESCONS = "PREFIX=${prefix} \
                  DESTDIR=${D} \
@@ -84,7 +85,7 @@ EXTRA_OESCONS = "PREFIX=${prefix} \
 
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --no-create-home --home-dir /var/run/${BPN} --shell /bin/false --user-group ${BPN}"
+USERADD_PARAM:${PN} = "--system --no-create-home --home-dir /var/run/${BPN} --shell /bin/false --user-group ${BPN}"
 
 
 scons_do_compile() {
@@ -122,6 +123,6 @@ scons_do_install() {
         chown ${PN}:${PN} ${D}${localstatedir}/log/${BPN}
 }
 
-CONFFILES_${PN} = "${sysconfdir}/mongod.conf"
+CONFFILES:${PN} = "${sysconfdir}/mongod.conf"
 
-SYSTEMD_SERVICE_${PN} = "mongod.service"
+SYSTEMD_SERVICE:${PN} = "mongod.service"

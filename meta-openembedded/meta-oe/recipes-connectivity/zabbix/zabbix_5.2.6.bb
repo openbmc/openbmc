@@ -34,12 +34,12 @@ SRC_URI[sha256sum] = "76cb704f2a04fbc87bb3eff44fa71339c355d467f7bbd8fb53f8927c76
 inherit autotools-brokensep linux-kernel-base pkgconfig systemd useradd
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "zabbix-agent.service"
+SYSTEMD_SERVICE:${PN} = "zabbix-agent.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "-r zabbix"
-USERADD_PARAM_${PN} = "-r -g zabbix -d /var/lib/zabbix \
+GROUPADD_PARAM:${PN} = "-r zabbix"
+USERADD_PARAM:${PN} = "-r -g zabbix -d /var/lib/zabbix \
     -s /sbin/nologin -c \"Zabbix Monitoring System\" zabbix \
 "
 
@@ -60,13 +60,13 @@ EXTRA_OECONF = " \
     --with-libpcre=${STAGING_EXECPREFIXDIR} \
     --with-iconv=${STAGING_EXECPREFIXDIR} \
 "
-CFLAGS_append = " -lldap -llber -pthread"
+CFLAGS:append = " -lldap -llber -pthread"
 
-do_configure_prepend() {
+do_configure:prepend() {
     export KERNEL_VERSION="${KERNEL_VERSION}"
 }
 
-do_install_append() {
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -d ${D}${systemd_unitdir}/system
         install -m 0644 ${WORKDIR}/zabbix-agent.service ${D}${systemd_unitdir}/system/
@@ -74,6 +74,6 @@ do_install_append() {
     fi
 }
 
-FILES_${PN} += "${libdir}"
+FILES:${PN} += "${libdir}"
 
-RDEPENDS_${PN} = "logrotate"
+RDEPENDS:${PN} = "logrotate"

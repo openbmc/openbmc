@@ -422,7 +422,7 @@ class DpkgPM(OpkgDpkgPM):
         multilib_variants = self.d.getVar("MULTILIB_VARIANTS");
         for variant in multilib_variants.split():
             localdata = bb.data.createCopy(self.d)
-            variant_tune = localdata.getVar("DEFAULTTUNE_virtclass-multilib-" + variant, False)
+            variant_tune = localdata.getVar("DEFAULTTUNE:virtclass-multilib-" + variant, False)
             orig_arch = localdata.getVar("DPKG_ARCH")
             localdata.setVar("DEFAULTTUNE", variant_tune)
             variant_arch = localdata.getVar("DPKG_ARCH")

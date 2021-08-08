@@ -18,7 +18,7 @@ SRC_URI[sha256sum] = "528dac256315ffc2a4a53b3b421979327962121989886e3cf920aeff99
 
 # Note: python bindings did not work in oe-dev and are about to be moved to
 # pyxfce see http://comments.gmane.org/gmane.comp.desktop.xfce.devel.version4/19560
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/xfce4/ \
     ${libdir}/xfce4/exo* \
 "

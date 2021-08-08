@@ -9,7 +9,7 @@ inherit autotools texinfo ptest gettext
 SRC_URI = "${GNU_MIRROR}/m4/m4-${PV}.tar.gz \
            file://ac_config_links.patch \
            "
-SRC_URI_append_class-target = " file://run-ptest \
+SRC_URI:append:class-target = " file://run-ptest \
                                 file://serial-tests-config.patch \
                               "
 
@@ -51,11 +51,11 @@ do_install_ptest() {
 }
 
 
-RDEPENDS_${PN}-ptest += "make coreutils diffutils"
-RDEPENDS_${PN}-ptest_append_libc-glibc = "\
+RDEPENDS:${PN}-ptest += "make coreutils diffutils"
+RDEPENDS:${PN}-ptest:append:libc-glibc = "\
      locale-base-fr-fr.iso-8859-1 \
 "
 
-INSANE_SKIP_${PN}-ptest += "ldflags"
-INSANE_SKIP_${PN}-ptest += "rpaths"
+INSANE_SKIP:${PN}-ptest += "ldflags"
+INSANE_SKIP:${PN}-ptest += "rpaths"
 

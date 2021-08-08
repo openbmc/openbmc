@@ -38,7 +38,7 @@ do_populate_sdk[stamp-extra-info] = "${PACKAGE_ARCH}"
 
 REAL_MULTIMACH_TARGET_SYS = "none"
 
-create_sdk_files_append () {
+create_sdk_files:append () {
 	rm -f ${SDK_OUTPUT}/${SDKPATH}/site-config-*
 	rm -f ${SDK_OUTPUT}/${SDKPATH}/environment-setup-*
 	rm -f ${SDK_OUTPUT}/${SDKPATH}/version-*

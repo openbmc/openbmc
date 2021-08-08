@@ -103,14 +103,14 @@ def _write_append(rc, srctree, same_dir, no_same_dir, rev, copied, workspace, d)
     pn = d.getVar('PN')
     af = os.path.join(appendpath, '%s.bbappend' % brf)
     with open(af, 'w') as f:
-        f.write('FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n\n')
+        f.write('FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"\n\n')
         f.write('inherit externalsrc\n')
         f.write(('# NOTE: We use pn- overrides here to avoid affecting'
                  'multiple variants in the case where the recipe uses BBCLASSEXTEND\n'))
-        f.write('EXTERNALSRC_pn-%s = "%s"\n' % (pn, srctree))
+        f.write('EXTERNALSRC:pn-%s = "%s"\n' % (pn, srctree))
         b_is_s = use_external_build(same_dir, no_same_dir, d)
         if b_is_s:
-            f.write('EXTERNALSRC_BUILD_pn-%s = "%s"\n' % (pn, srctree))
+            f.write('EXTERNALSRC_BUILD:pn-%s = "%s"\n' % (pn, srctree))
         f.write('\n')
         if rev:
             f.write('# initial_rev: %s\n' % rev)
@@ -583,6 +583,9 @@ def upgrade(args, config, basepath, workspace):
         logger.info('New recipe is %s' % rf)
         if license_diff:
             logger.info('License checksums have been updated in the new recipe; please refer to it for the difference between the old and the new license texts.')
+        preferred_version = rd.getVar('PREFERRED_VERSION_%s' % rd.getVar('PN'))
+        if preferred_version:
+            logger.warning('Version is pinned to %s via PREFERRED_VERSION; it may need adjustment to match the new version before any further steps are taken' % preferred_version)
     finally:
         tinfoil.shutdown()
     return 0

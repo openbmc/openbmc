@@ -33,7 +33,7 @@ LDFLAGS += "-pthread"
 
 PACKAGES =+ "${PN}-requestor ${PN}-client ${PN}-relay ${PN}-server"
 
-FILES_${PN}-client = "${sbindir}/${PN}-client"
-FILES_${PN}-relay = "${sbindir}/${PN}-relay"
-FILES_${PN}-requestor = "${sbindir}/${PN}-requestor"
-FILES_${PN}-server = "${sbindir}/${PN}-server"
+FILES:${PN}-client = "${sbindir}/${PN}-client"
+FILES:${PN}-relay = "${sbindir}/${PN}-relay"
+FILES:${PN}-requestor = "${sbindir}/${PN}-requestor"
+FILES:${PN}-server = "${sbindir}/${PN}-server"

@@ -9,7 +9,7 @@ PYPI_PACKAGE = "pamela"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} = "libpam"
+RDEPENDS:${PN} = "libpam"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "pam"

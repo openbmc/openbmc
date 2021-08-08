@@ -10,4 +10,5 @@ PYPI_PACKAGE = "gmpy2"
 PYPI_PACKAGE_EXT = "zip"
 SRC_URI[sha256sum] = "dd233e3288b90f21b0bb384bcc7a7e73557bb112ccf0032ad52aa614eb373d3f"
 
-inherit pypi setuptools3
+inherit pypi setuptools3 python3native
+BBCLASSEXTEND = "native nativesdk"

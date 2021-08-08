@@ -19,6 +19,6 @@ SRC_URI = "https://mirrors.edge.kernel.org/pub/linux/libs/${BPN}/${BPN}-${PV}.ta
            "
 SRC_URI[sha256sum] = "4e8dba6c53cf152dbd0fd1dc3d4c7b04abf79e20a948895f85943e586870505c"
 
-do_configure_prepend () {
+do_configure:prepend () {
     mkdir -p ${S}/build-aux
 }

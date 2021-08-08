@@ -16,7 +16,7 @@ inherit allarch systemd update-rc.d
 INITSCRIPT_NAME = "run-postinsts"
 INITSCRIPT_PARAMS = "start 99 S ."
 
-SYSTEMD_SERVICE_${PN} = "run-postinsts.service"
+SYSTEMD_SERVICE:${PN} = "run-postinsts.service"
 
 do_configure() {
 	:

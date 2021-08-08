@@ -365,13 +365,13 @@ IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
 USER_CLASSES += "image-combined-dbg"
 
 # enables kernel debug symbols
-KERNEL_EXTRA_FEATURES_append = " features/debug/debug-kernel.scc"
+KERNEL_EXTRA_FEATURES:append = " features/debug/debug-kernel.scc"
 
 # minimal, just run-time systemtap configuration in target image
-PACKAGECONFIG_pn-systemtap = "monitor"
+PACKAGECONFIG:pn-systemtap = "monitor"
 
 # add systemtap run-time into target image if it is not there yet
-IMAGE_INSTALL_append = " systemtap"
+IMAGE_INSTALL:append = " systemtap"
 """
     option_parser = optparse.OptionParser(usage=usage)
 

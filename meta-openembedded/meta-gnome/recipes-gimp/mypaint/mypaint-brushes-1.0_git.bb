@@ -9,4 +9,4 @@ SRCREV = "8a0124ac0675103eae8fa41fad533851768ae1ce"
 PV = "1.3.1"
 S = "${WORKDIR}/git"
 
-FILES_${PN} += "${datadir}/mypaint-data"
+FILES:${PN} += "${datadir}/mypaint-data"

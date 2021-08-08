@@ -30,7 +30,7 @@ do_install () {
     sed -i "s/@@FORCE_IMA@@/${IMA_FORCE}/g" ${D}/init.d/20-ima
 }
 
-FILES_${PN} = "/init.d ${sysconfdir}"
+FILES:${PN} = "/init.d ${sysconfdir}"
 
-RDEPENDS_${PN} = "keyutils ima-evm-keys ${IMA_POLICY}"
-RDEPENDS_${PN} += "initramfs-framework-base"
+RDEPENDS:${PN} = "keyutils ima-evm-keys ${IMA_POLICY}"
+RDEPENDS:${PN} += "initramfs-framework-base"

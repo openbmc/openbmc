@@ -12,4 +12,4 @@ inherit pypi setuptools3
 
 PYPI_PACKAGE = "Flask-RESTful"
 
-RDEPENDS_${PN} = "${PYTHON_PN}-flask"
+RDEPENDS:${PN} = "${PYTHON_PN}-flask"

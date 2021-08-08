@@ -4,7 +4,7 @@ LICENSE = "LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 DEPENDS = "virtual/libusb0 pcsc-lite"
-RDEPENDS_${PN} = "pcsc-lite"
+RDEPENDS:${PN} = "pcsc-lite"
 
 SRC_URI = "https://ccid.apdu.fr/files/ccid-${PV}.tar.bz2 \
     file://no-dep-on-libfl.patch \
@@ -16,5 +16,5 @@ SRC_URI[sha256sum] = "5256da939711deb42b74d05d2bd6bd0c73c4d564feb0c1a50212609eb6
 
 inherit autotools pkgconfig
 
-FILES_${PN} += "${libdir}/pcsc/"
-FILES_${PN}-dbg += "${libdir}/pcsc/drivers/*/*/*/.debug"
+FILES:${PN} += "${libdir}/pcsc/"
+FILES:${PN}-dbg += "${libdir}/pcsc/drivers/*/*/*/.debug"

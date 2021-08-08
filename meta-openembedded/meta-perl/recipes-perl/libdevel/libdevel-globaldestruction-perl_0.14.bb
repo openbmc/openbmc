@@ -17,7 +17,7 @@ S = "${WORKDIR}/Devel-GlobalDestruction-${PV}"
 
 inherit cpan
 
-RDEPENDS_${PN} = " libsub-exporter-progressive-perl \
+RDEPENDS:${PN} = " libsub-exporter-progressive-perl \
 "
 
 BBCLASSEXTEND = "native"

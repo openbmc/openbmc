@@ -14,7 +14,7 @@ S = "${WORKDIR}/${BPN}"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://LICENSE_GPL;md5=393a5ca445f6965873eca0259a17f833"
 
-do_compile_prepend() {
+do_compile:prepend() {
     oe_runmake clean
 }
 

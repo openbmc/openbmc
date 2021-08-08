@@ -21,9 +21,9 @@ S = "${WORKDIR}/${BPN}"
 inherit useradd
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "-m -g ${BPN} -G adm -r -d ${localstatedir}/lib/${BPN} \
+USERADD_PARAM:${PN} = "-m -g ${BPN} -G adm -r -d ${localstatedir}/lib/${BPN} \
                        -s /bin/false -c 'logcheck account' ${BPN}"
-GROUPADD_PARAM_${PN} = "-r ${BPN}"
+GROUPADD_PARAM:${PN} = "-r ${BPN}"
 
 do_install() {
     # Fix QA Issue
@@ -62,7 +62,7 @@ do_install() {
 
 VIRTUAL-RUNTIME_syslog ??= "rsyslog"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     bash \
     cronie \
     debianutils-run-parts \
@@ -76,4 +76,4 @@ RDEPENDS_${PN} = "\
     ${VIRTUAL-RUNTIME_syslog} \
 "
 
-FILES_${PN} += "${datadir}/logtail"
+FILES:${PN} += "${datadir}/logtail"

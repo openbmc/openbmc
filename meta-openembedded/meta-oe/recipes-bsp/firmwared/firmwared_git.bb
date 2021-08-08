@@ -21,13 +21,13 @@ inherit pkgconfig autotools systemd features_check
 
 REQUIRED_DISTRO_FEATURES = "systemd"
 
-SYSTEMD_SERVICE_${PN} = "firmwared.service"
+SYSTEMD_SERVICE:${PN} = "firmwared.service"
 
-do_configure_prepend() {
+do_configure:prepend() {
     ${S}/autogen.sh
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/firmwared.service ${D}${systemd_system_unitdir}
     sed -i -e 's,@BINDIR@,${bindir},g' ${D}${systemd_system_unitdir}/firmwared.service

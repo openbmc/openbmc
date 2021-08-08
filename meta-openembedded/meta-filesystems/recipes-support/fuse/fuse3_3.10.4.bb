@@ -28,7 +28,7 @@ SRC_URI += " \
         file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
         ${PYTHON_PN}-pytest \
 	bash \
 "
@@ -42,22 +42,22 @@ DEPENDS = "udev"
 
 PACKAGES =+ "fuse3-utils"
 
-RPROVIDES_${PN}-dbg += "fuse3-utils-dbg"
+RPROVIDES:${PN}-dbg += "fuse3-utils-dbg"
 
-RRECOMMENDS_${PN}_class-target = "kernel-module-fuse fuse3-utils"
+RRECOMMENDS:${PN}:class-target = "kernel-module-fuse fuse3-utils"
 
-FILES_${PN} += "${libdir}/libfuse3.so.*"
-FILES_${PN}-dev += "${libdir}/libfuse3*.la"
+FILES:${PN} += "${libdir}/libfuse3.so.*"
+FILES:${PN}-dev += "${libdir}/libfuse3*.la"
 
 EXTRA_OEMESON += " \
      -Dexamples=false \
 "
 
 # Forbid auto-renaming to libfuse3-utils
-FILES_fuse3-utils = "${bindir} ${base_sbindir}"
-DEBIAN_NOAUTONAME_fuse3-utils = "1"
-DEBIAN_NOAUTONAME_${PN}-dbg = "1"
+FILES:fuse3-utils = "${bindir} ${base_sbindir}"
+DEBIAN_NOAUTONAME:fuse3-utils = "1"
+DEBIAN_NOAUTONAME:${PN}-dbg = "1"
 
-do_install_append() {
+do_install:append() {
     rm -rf ${D}${base_prefix}/dev
 }

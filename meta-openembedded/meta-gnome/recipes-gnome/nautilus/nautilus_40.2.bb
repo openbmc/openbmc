@@ -33,7 +33,7 @@ EXTRA_OEMESON += " \
 PACKAGECONFIG = "extensions"
 PACKAGECONFIG[extensions] = "-Dextensions=true,-Dextensions=false, gexiv2 gstreamer1.0-plugins-base"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/metainfo \
     ${datadir}/gnome-shell \
@@ -42,4 +42,4 @@ FILES_${PN} += " \
 
 # mandatory - not checked during configuration:
 # | (org.gnome.Nautilus:863): GLib-GIO-ERROR **: 21:03:52.326: Settings schema 'org.freedesktop.Tracker.Miner.Files' is not installed
-RDEPENDS_${PN} += "tracker-miners"
+RDEPENDS:${PN} += "tracker-miners"

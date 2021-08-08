@@ -22,13 +22,13 @@ DEPENDS += " \
     yelp-xsl \
 "
 
-do_configure_prepend() {
+do_configure:prepend() {
     export ITSTOOL=${STAGING_BINDIR_NATIVE}/itstool
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/metainfo \
     ${datadir}/yelp-xsl \
 "
 
-RDEPENDS_${PN} += "yelp-xsl"
+RDEPENDS:${PN} += "yelp-xsl"

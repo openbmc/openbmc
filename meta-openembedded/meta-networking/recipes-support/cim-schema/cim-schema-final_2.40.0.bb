@@ -2,7 +2,7 @@ require cim-schema.inc
 
 LICENSE = "DMTF"
 
-RCONFLICTS_${PN} = "cim-schema-exper"
+RCONFLICTS:${PN} = "cim-schema-exper"
 
 SRC_URI = "http://dmtf.org/sites/default/files/cim/cim_schema_v2400/cim_schema_${PV}Final-MOFs.zip;subdir=${BP} \
     file://LICENSE \
@@ -25,5 +25,5 @@ do_install() {
     ln -s cim_schema_${PV}.mof ${D}${datadir}/mof/cim-current/CIM_Schema.mof
 }
 
-FILES_${PN} = "${datadir}/mof/* ${datadir}/doc/*"
-FILES_${PN}-doc = ""
+FILES:${PN} = "${datadir}/mof/* ${datadir}/doc/*"
+FILES:${PN}-doc = ""

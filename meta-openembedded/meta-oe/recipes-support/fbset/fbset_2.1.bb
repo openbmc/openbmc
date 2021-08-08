@@ -9,7 +9,7 @@ SUMMARY = "The fbset console tool"
 HOMEPAGE = "http://users.telenet.be/geertu/Linux/fbdev/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://fbset.c;endline=19;md5=bf326f82cdfcac391af208f019c5603f"
-RRECOMMENDS_${PN} = "fbset-modes"
+RRECOMMENDS:${PN} = "fbset-modes"
 DEPENDS = "bison-native flex-native"
 
 PR = "r4"
@@ -29,7 +29,7 @@ do_install() {
     install -m 0644 ${B}/*.8 ${D}${datadir}/man/man8
 }
 
-ALTERNATIVE_fbset = "fbset"
+ALTERNATIVE:fbset = "fbset"
 ALTERNATIVE_LINK_NAME[fbset] = "${sbindir}/fbset"
 ALTERNATIVE_TARGET[fbset] = "${sbindir}/fbset.real"
 ALTERNATIVE_PRIORITY[fbset] = "55"

@@ -25,8 +25,8 @@ REQUIRED_DISTRO_FEATURES = "x11"
 S = "${WORKDIR}/misc"
 
 PACKAGES = "${PN}"
-FILES_${PN} = "${libdir}/X11/ ${datadir}/fonts/X11/"
-RDEPENDS_${PN} += "font-alias"
+FILES:${PN} = "${libdir}/X11/ ${datadir}/fonts/X11/"
+RDEPENDS:${PN} += "font-alias"
 
 do_install() {
 	install -d ${D}/${datadir}/fonts/X11/misc

@@ -5,7 +5,7 @@ SECTION = "console/utils"
 LICENSE = "GPLv2"
 DEPENDS = "openssl curl zlib expat"
 
-PROVIDES_append_class-native = " git-replacement-native"
+PROVIDES:append:class-native = " git-replacement-native"
 
 SRC_URI = "${KERNELORG_MIRROR}/software/scm/git/git-${PV}.tar.gz;name=tarball \
            ${KERNELORG_MIRROR}/software/scm/git/git-manpages-${PV}.tar.gz;name=manpages \
@@ -26,16 +26,16 @@ EXTRA_OECONF = "--with-perl=${STAGING_BINDIR_NATIVE}/perl-native/perl \
 		--without-tcltk \
 		--without-iconv \
 "
-EXTRA_OECONF_append_class-nativesdk = " --with-gitconfig=/etc/gitconfig "
+EXTRA_OECONF:append:class-nativesdk = " --with-gitconfig=/etc/gitconfig "
 
 # Needs brokensep as this doesn't use automake
 inherit autotools-brokensep perlnative bash-completion
 
 EXTRA_OEMAKE = "NO_PYTHON=1 CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}'"
 EXTRA_OEMAKE += "'PERL_PATH=/usr/bin/env perl'"
-EXTRA_OEMAKE_append_class-native = " NO_CROSS_DIRECTORY_HARDLINKS=1"
+EXTRA_OEMAKE:append:class-native = " NO_CROSS_DIRECTORY_HARDLINKS=1"
 
-do_compile_prepend () {
+do_compile:prepend () {
 	# Remove perl/perl.mak to fix the out-of-date perl.mak error
 	# during rebuild
 	rm -f perl/perl.mak
@@ -79,24 +79,24 @@ perl_native_fixup () {
 REL_GIT_EXEC_PATH = "${@os.path.relpath(libexecdir, bindir)}/git-core"
 REL_GIT_TEMPLATE_DIR = "${@os.path.relpath(datadir, bindir)}/git-core/templates"
 
-do_install_append_class-target () {
+do_install:append:class-target () {
 	perl_native_fixup
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
 	create_wrapper ${D}${bindir}/git \
 		GIT_EXEC_PATH='`dirname $''realpath`'/${REL_GIT_EXEC_PATH} \
 		GIT_TEMPLATE_DIR='`dirname $''realpath`'/${REL_GIT_TEMPLATE_DIR}
 }
 
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
 	create_wrapper ${D}${bindir}/git \
 		GIT_EXEC_PATH='`dirname $''realpath`'/${REL_GIT_EXEC_PATH} \
 		GIT_TEMPLATE_DIR='`dirname $''realpath`'/${REL_GIT_TEMPLATE_DIR}
 	perl_native_fixup
 }
 
-FILES_${PN} += "${datadir}/git-core ${libexecdir}/git-core/"
+FILES:${PN} += "${datadir}/git-core ${libexecdir}/git-core/"
 
 PERLTOOLS = " \
     ${bindir}/git-cvsserver \
@@ -116,25 +116,25 @@ PERLTOOLS = " \
 
 # Git tools requiring perl
 PACKAGES =+ "${PN}-perltools"
-FILES_${PN}-perltools += " \
+FILES:${PN}-perltools += " \
     ${PERLTOOLS} \
     ${libdir}/perl \
     ${datadir}/perl5 \
 "
 
-RDEPENDS_${PN}-perltools = "${PN} perl perl-module-file-path findutils"
+RDEPENDS:${PN}-perltools = "${PN} perl perl-module-file-path findutils"
 
 # git-tk package with gitk and git-gui
 PACKAGES =+ "${PN}-tk"
 #RDEPENDS_${PN}-tk = "${PN} tk tcl"
 #EXTRA_OEMAKE = "TCL_PATH=${STAGING_BINDIR_CROSS}/tclsh"
-FILES_${PN}-tk = " \
+FILES:${PN}-tk = " \
     ${bindir}/gitk \
     ${datadir}/gitk \
 "
 
 PACKAGES =+ "gitweb"
-FILES_gitweb = "${datadir}/gitweb/"
-RDEPENDS_gitweb = "perl"
+FILES:gitweb = "${datadir}/gitweb/"
+RDEPENDS:gitweb = "perl"
 
 BBCLASSEXTEND = "native nativesdk"

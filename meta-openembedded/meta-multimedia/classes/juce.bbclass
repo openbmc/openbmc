@@ -9,14 +9,14 @@ JUCE_MODULES ??= " \
 "
 JUCE_X11_DEPS = "libx11 libxext libxinerama libxrandr libxcursor"
 
-PACKAGECONFIG_prepend= "${JUCE_MODULES} "
+PACKAGECONFIG:prepend= "${JUCE_MODULES} "
 PACKAGECONFIG[juce_core] = ",,curl,"
 PACKAGECONFIG[juce_audio_devices] = ",,alsa-lib,"
 PACKAGECONFIG[juce_graphics] = ",,${JUCE_X11_DEPS} freetype,"
 PACKAGECONFIG[juce_gui_basics] = ",,${JUCE_X11_DEPS},"
 PACKAGECONFIG[juce_opengl] = ",,virtual/libgl,"
 
-DEPENDS_prepend = "projucer-native "
+DEPENDS:prepend = "projucer-native "
 
 export OE_JUCE_PROJUCER = "${STAGING_BINDIR_NATIVE}/Projucer"
 

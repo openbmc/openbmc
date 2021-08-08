@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/libimobiledevice/libplist;protocol=https"
 
 S = "${WORKDIR}/git"
 
-do_install_append () {
+do_install:append () {
     if [ -e ${D}${libdir}/python*/site-packages/plist/_plist.so ]; then
         chrpath -d ${D}${libdir}/python*/site-packages/plist/_plist.so
     fi
@@ -23,7 +23,7 @@ PACKAGES =+ "${PN}-utils \
              ${PN}++ \
              ${PN}-python"
 
-FILES_${PN} = "${libdir}/libplist-2.0${SOLIBS}"
-FILES_${PN}++ = "${libdir}/libplist++-2.0${SOLIBS}"
-FILES_${PN}-utils = "${bindir}/*"
-FILES_${PN}-python = "${libdir}/python*/site-packages/*"
+FILES:${PN} = "${libdir}/libplist-2.0${SOLIBS}"
+FILES:${PN}++ = "${libdir}/libplist++-2.0${SOLIBS}"
+FILES:${PN}-utils = "${bindir}/*"
+FILES:${PN}-python = "${libdir}/python*/site-packages/*"

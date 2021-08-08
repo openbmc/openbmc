@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "0378cec15fb11b2ed27ba54dad9fd987d48e6f62f49fcff138f5f7a8b3
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-javaobj-py3 \
     ${PYTHON_PN}-pyasn1 \
     ${PYTHON_PN}-pyasn1-modules \

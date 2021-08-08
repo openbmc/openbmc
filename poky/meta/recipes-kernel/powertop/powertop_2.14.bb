@@ -13,12 +13,12 @@ SRCREV = "52f022f9bbe6e060fba11701d657a8d9762702ba"
 
 S = "${WORKDIR}/git"
 
-LDFLAGS_append = " -pthread"
+LDFLAGS:append = " -pthread"
 
 inherit autotools gettext pkgconfig bash-completion
 
 inherit update-alternatives
-ALTERNATIVE_${PN} = "powertop"
+ALTERNATIVE:${PN} = "powertop"
 ALTERNATIVE_TARGET[powertop] = "${sbindir}/powertop"
 ALTERNATIVE_LINK_NAME[powertop] = "${sbindir}/powertop"
 ALTERNATIVE_PRIORITY = "100"

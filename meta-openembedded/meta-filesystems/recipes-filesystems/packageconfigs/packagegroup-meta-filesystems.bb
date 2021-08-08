@@ -9,13 +9,13 @@ PACKAGES = ' \
     packagegroup-meta-filesystems-utls \
 '
 
-RDEPENDS_packagegroup-meta-filesystems = "\
+RDEPENDS:packagegroup-meta-filesystems = "\
     packagegroup-meta-filesystems \
     packagegroup-meta-filesystems-support \
     packagegroup-meta-filesystems-utls \
 "
 
-RDEPENDS_packagegroup-meta-filesystems = "\
+RDEPENDS:packagegroup-meta-filesystems = "\
     ifuse \
     logfsprogs \
     fuse-exfat \
@@ -29,13 +29,13 @@ RDEPENDS_packagegroup-meta-filesystems = "\
     sshfs-fuse \
 "
 
-RDEPENDS_packagegroup-meta-filesystems-support = "\
+RDEPENDS:packagegroup-meta-filesystems-support = "\
     fuse3 \
     fuse \
     physfs \
 "
 
-RDEPENDS_packagegroup-meta-filesystems-utils = "\
+RDEPENDS:packagegroup-meta-filesystems-utils = "\
     aufs-util \
     exfat-utils \
     fatcat \

@@ -17,7 +17,7 @@ UPSTREAM_CHECK_REGEX = "protobuf/(?P<pver>\d+(\.\d+)+)/"
 
 DEPENDS += "protobuf"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-datetime \
     ${PYTHON_PN}-json \
     ${PYTHON_PN}-logging \
@@ -34,6 +34,6 @@ BBCLASSEXTEND = "native nativesdk"
 DISTUTILS_BUILD_ARGS += "--cpp_implementation"
 DISTUTILS_INSTALL_ARGS += "--cpp_implementation"
 
-do_compile_prepend_class-native () {
+do_compile:prepend:class-native () {
     export KOKORO_BUILD_NUMBER="1"
 }

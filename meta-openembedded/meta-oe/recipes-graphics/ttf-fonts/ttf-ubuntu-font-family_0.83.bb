@@ -19,5 +19,5 @@ S = "${WORKDIR}/ubuntu-font-family-${PV}"
 PACKAGES = "ttf-ubuntu-mono ttf-ubuntu-sans"
 FONT_PACKAGES = "ttf-ubuntu-mono ttf-ubuntu-sans"
 
-FILES_ttf-ubuntu-mono  = "${datadir}/fonts/truetype/*Mono*"
-FILES_ttf-ubuntu-sans  = "${datadir}/fonts/truetype/Ubuntu-*"
+FILES:ttf-ubuntu-mono  = "${datadir}/fonts/truetype/*Mono*"
+FILES:ttf-ubuntu-sans  = "${datadir}/fonts/truetype/Ubuntu-*"

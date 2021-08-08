@@ -9,7 +9,7 @@ inherit pypi setuptools3
 
 PYPI_PACKAGE = "prompt_toolkit"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-core \
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-terminal \

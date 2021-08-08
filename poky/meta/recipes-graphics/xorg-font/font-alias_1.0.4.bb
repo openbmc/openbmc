@@ -13,8 +13,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=bf0158b89be493d523d69d9f29265038 \
 SRC_URI += "file://nocompiler.patch"
 
 DEPENDS = "util-macros-native font-util-native"
-RDEPENDS_${PN} = "encodings font-util"
-RDEPENDS_${PN}_class-native = "font-util-native"
+RDEPENDS:${PN} = "encodings font-util"
+RDEPENDS:${PN}:class-native = "font-util-native"
 
 inherit allarch
 

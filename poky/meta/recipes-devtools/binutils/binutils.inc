@@ -15,7 +15,7 @@ DEPENDS = "flex-native bison-native zlib-native gnu-config-native autoconf-nativ
 
 inherit autotools gettext multilib_header texinfo
 
-FILES_${PN} = " \
+FILES:${PN} = " \
 	${bindir}/${TARGET_PREFIX}* \
 	${libdir}/lib*.so.* \
 	${libdir}/bfd-plugins/lib*.so \
@@ -23,9 +23,9 @@ FILES_${PN} = " \
 	${prefix}/${TARGET_SYS}/bin/* \
         ${bindir}/embedspu"
 
-RPROVIDES_${PN} += "${PN}-symlinks"
+RPROVIDES:${PN} += "${PN}-symlinks"
 
-FILES_${PN}-dev = " \
+FILES:${PN}-dev = " \
 	${includedir} \
 	${libdir}/*.la \
 	${libdir}/libbfd.so \
@@ -37,9 +37,9 @@ FILES_${PN}-dev = " \
 # list and reuse it.
 
 LDGOLD_ALTS ?= "ld.gold dwp"
-LDGOLD_ALTS_riscv64 = ""
-LDGOLD_ALTS_riscv32 = ""
-LDGOLD_ALTS_libc-glibc_mipsarch = ""
+LDGOLD_ALTS:riscv64 = ""
+LDGOLD_ALTS:riscv32 = ""
+LDGOLD_ALTS:libc-glibc:mipsarch = ""
 
 USE_ALTERNATIVES_FOR = " \
 	addr2line \
@@ -61,7 +61,7 @@ USE_ALTERNATIVES_FOR = " \
 	strip \
 "
 
-python do_package_prepend() {
+python do_package:prepend() {
     make_alts = d.getVar("USE_ALTERNATIVES_FOR") or ""
     prefix = d.getVar("TARGET_PREFIX")
     bindir = d.getVar("bindir")
@@ -86,12 +86,12 @@ EXTRA_OECONF = "--program-prefix=${TARGET_PREFIX} \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'multiarch', '--enable-64-bit-bfd', '', d)}"
 
 EXTRA_TARGETS = ""
-EXTRA_TARGETS_x86-64 = " --enable-targets=x86_64-pe,x86_64-pep "
-EXTRA_TARGETS_class-native = ""
+EXTRA_TARGETS:x86-64 = " --enable-targets=x86_64-pe,x86_64-pep "
+EXTRA_TARGETS:class-native = ""
 
-LDGOLD_class-native = ""
-LDGOLD_class-crosssdk = ""
-LDGOLD_libc-glibc_mipsarch = ""
+LDGOLD:class-native = ""
+LDGOLD:class-crosssdk = ""
+LDGOLD:libc-glibc:mipsarch = ""
 LDGOLD ?= "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', '--enable-gold=default --enable-threads', '--enable-gold --enable-ld=default --enable-threads', d)}"
 
 
@@ -170,15 +170,13 @@ do_install () {
 	done
 
 	oe_multilib_header bfd.h
-        # bfd_stdint.h encodes the compiler name in the header
-        sed -i ${D}${includedir}/bfd_stdint.h -e "s,${TARGET_PREFIX},,"
 }
 
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
 
-ALTERNATIVE_${PN}_class-target = "${USE_ALTERNATIVES_FOR}"
+ALTERNATIVE:${PN}:class-target = "${USE_ALTERNATIVES_FOR}"
 
 python () {
     if bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', True, False, d) and bb.utils.contains_any('TARGET_ARCH', 'riscv32 riscv64', True, False, d):

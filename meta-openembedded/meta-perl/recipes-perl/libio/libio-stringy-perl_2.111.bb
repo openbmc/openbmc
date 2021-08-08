@@ -17,7 +17,7 @@ S = "${WORKDIR}/IO-stringy-${PV}"
 
 inherit cpan
 
-RPROVIDES_${PN} += " libio-atomicfile-perl \
+RPROVIDES:${PN} += " libio-atomicfile-perl \
     libio-innerfile-perl \
     libio-lines-perl \
     libio-scalar-perl \

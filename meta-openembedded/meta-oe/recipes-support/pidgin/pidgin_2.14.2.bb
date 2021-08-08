@@ -55,30 +55,30 @@ OE_LT_RPATH_ALLOW[export]="1"
 
 PACKAGES =+ "libpurple-dev libpurple finch finch-dev ${PN}-data"
 
-RPROVIDES_${PN}-dbg += "libpurple-dbg finch-dbg"
+RPROVIDES:${PN}-dbg += "libpurple-dbg finch-dbg"
 
 LEAD_SONAME = "libpurple.so.0"
-FILES_libpurple     = "${libdir}/libpurple*.so.* ${libdir}/purple-2 ${bindir}/purple-* ${sysconfdir}/gconf/schemas/purple* ${datadir}/purple/ca-certs"
-FILES_libpurple-dev = "${libdir}/libpurple*.la \
+FILES:libpurple     = "${libdir}/libpurple*.so.* ${libdir}/purple-2 ${bindir}/purple-* ${sysconfdir}/gconf/schemas/purple* ${datadir}/purple/ca-certs"
+FILES:libpurple-dev = "${libdir}/libpurple*.la \
                        ${libdir}/libpurple*.so \
                        ${libdir}/purple-2/*.la \
                        ${libdir}/purple-2/libjabber.so \
                        ${libdir}/purple-2/liboscar.so \
                        ${libdir}/purple-2/libymsg.so \
                        ${datadir}/aclocal"
-FILES_finch          = "${bindir}/finch"
-FILES_finch-dev      = "${libdir}/finch/*.la"
+FILES:finch          = "${bindir}/finch"
+FILES:finch-dev      = "${libdir}/finch/*.la"
 
-FILES_${PN} = "${bindir} ${datadir}/${PN} ${libdir}/${PN}/*.so \
+FILES:${PN} = "${bindir} ${datadir}/${PN} ${libdir}/${PN}/*.so \
            ${datadir}/applications"
-RRECOMMENDS_${PN} = "${PN}-data libpurple-protocol-irc libpurple-protocol-xmpp"
+RRECOMMENDS:${PN} = "${PN}-data libpurple-protocol-irc libpurple-protocol-xmpp"
 
-FILES_${PN}-data = "${datadir}/pixmaps ${datadir}/sounds ${datadir}/icons ${datadir}/appdata"
-FILES_${PN}-dev += "${libdir}/${PN}/*.la"
+FILES:${PN}-data = "${datadir}/pixmaps ${datadir}/sounds ${datadir}/icons ${datadir}/appdata"
+FILES:${PN}-dev += "${libdir}/${PN}/*.la"
 
 PACKAGES_DYNAMIC += "^libpurple-protocol-.* ^libpurple-plugin-.* ^pidgin-plugin-.* ^finch-plugin-.*"
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     pidgroot = d.expand('${libdir}/pidgin')
     purple   = d.expand('${libdir}/purple-2')
     finch    = d.expand('${libdir}/finch')

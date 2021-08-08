@@ -7,7 +7,7 @@ LICENSE = "Apache-2.0"
 inherit autotools-brokensep pkgconfig
 
 DEPENDS = "apache2 apache2-native pbzip2-native"
-RDEPENDS_${PN} += "apache2"
+RDEPENDS:${PN} += "apache2"
 
 # Original (github.com/disconnect/apache-websocket) is dead since 2012, the
 # fork contains patches from the modules ML and fixes CVE compliance issues
@@ -29,5 +29,5 @@ do_install() {
     install -m 755 ${B}/.libs/mod_websocket.so ${D}${libexecdir}/apache2/modules
 }
 
-FILES_${PN} += " ${libexecdir}/apache2/modules/* "
-FILES_${PN}-dbg += " ${libexecdir}/apache2/modules/.debug/* "
+FILES:${PN} += " ${libexecdir}/apache2/modules/* "
+FILES:${PN}-dbg += " ${libexecdir}/apache2/modules/.debug/* "

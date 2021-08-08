@@ -13,7 +13,7 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "expat fmt spdlog pugixml libebml libmatroska zlib curl libupnp e2fsprogs sqlite3 libnsl2"
 
-SYSTEMD_SERVICE_${PN} = "gerbera.service"
+SYSTEMD_SERVICE:${PN} = "gerbera.service"
 
 inherit cmake systemd
 
@@ -22,10 +22,10 @@ PACKAGECONFIG[systemd] = "-DWITH_SYSTEMD=TRUE,-DWITH_SYSTEMD=FALSE,systemd"
 PACKAGECONFIG[taglib] = "-DWITH_TAGLIB=TRUE,-DWITH_TAGLIB=FALSE,taglib"
 EXTRA_OECMAKE = "-DWITH_JS=FALSE -DWITH_MAGIC=FALSE -DWITH_EXIF=FALSE -DLIBUUID_INCLUDE_DIRS=${STAGING_INCDIR} -DLIBUUID_LIBRARIES=-luuid"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/root/.config/
 }
 
-FILES_${PN} += "/root/.config/"
+FILES:${PN} += "/root/.config/"
 
-SECURITY_CFLAGS_riscv64 = "${SECURITY_NOPIE_CFLAGS}"
+SECURITY_CFLAGS:riscv64 = "${SECURITY_NOPIE_CFLAGS}"

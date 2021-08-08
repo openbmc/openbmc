@@ -21,12 +21,12 @@ EXTRA_OECONF += "--disable-rpath \
                  --with-libunistring-prefix=${STAGING_EXECPREFIXDIR} \
                  "
 
-do_install_append() {
+do_install:append() {
 	# Need to remove any duplicate whitespace too for reproducibility
 	sed -i -e 's|-L${STAGING_LIBDIR}||' -e 's/  */ /g' ${D}${libdir}/pkgconfig/libidn2.pc
 }
 
-LICENSE_${PN} = "(GPLv2+ | LGPLv3)"
-LICENSE_${PN}-bin = "GPLv3+"
+LICENSE:${PN} = "(GPLv2+ | LGPLv3)"
+LICENSE:${PN}-bin = "GPLv3+"
 
 BBCLASSEXTEND = "native nativesdk"

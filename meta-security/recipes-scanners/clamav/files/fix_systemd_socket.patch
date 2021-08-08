@@ -12,9 +12,9 @@ Index: git/clamd/CMakeLists.txt
 ===================================================================
 --- git.orig/clamd/CMakeLists.txt
 +++ git/clamd/CMakeLists.txt
-@@ -54,4 +54,10 @@ if(SYSTEMD_FOUND)
+@@ -60,4 +60,10 @@ if(SYSTEMD_FOUND)
      install(
-         FILES ${CMAKE_CURRENT_BINARY_DIR}/clamav-daemon.service
+         FILES ${CMAKE_CURRENT_BINARY_DIR}/clamav-daemon.socket
          DESTINATION ${SYSTEMD_UNIT_DIR})
 +    configure_file(
 +        ${CMAKE_CURRENT_SOURCE_DIR}/clamav-daemon.socket.in

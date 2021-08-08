@@ -43,7 +43,7 @@
 #                    a custom one, but that may cause conflicts when multiple qemus are
 #                    running on the same host.
 #                    Note: If more than one interface of type -device virtio-net-device gets added,
-#                          QB_NETWORK_DEVICE_prepend might be used, since Qemu enumerates the eth*
+#                          QB_NETWORK_DEVICE:prepend might be used, since Qemu enumerates the eth*
 #                          devices in reverse order to -device arguments.
 #
 # QB_TAP_OPT: network option for 'tap' mode, e.g.,
@@ -122,6 +122,8 @@ python do_write_qemuboot_conf() {
     cf = configparser.ConfigParser()
     cf.add_section('config_bsp')
     for k in sorted(qemuboot_vars(d)):
+        if ":" in k:
+            continue
         # qemu-helper-native sysroot is not removed by rm_work and
         # contains all tools required by runqemu
         if k == 'STAGING_BINDIR_NATIVE':

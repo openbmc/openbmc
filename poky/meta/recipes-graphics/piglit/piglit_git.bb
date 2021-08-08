@@ -46,7 +46,7 @@ PACKAGECONFIG[x11] = "-DPIGLIT_BUILD_GL_TESTS=ON,-DPIGLIT_BUILD_GL_TESTS=OFF,${X
 
 export PIGLIT_BUILD_DIR = "../../../../git"
 
-do_configure_prepend() {
+do_configure:prepend() {
    if [ "${@bb.utils.contains('PACKAGECONFIG', 'freeglut', 'yes', 'no', d)}" = "no" ]; then
         sed -i -e "/^#.*include <GL\/freeglut_ext.h>$/d" ${S}/src/piglit/glut_wrap.h
         sed -i -e "/^#.*include.*<GL\/glut.h>$/d" ${S}/src/piglit/glut_wrap.h
@@ -56,18 +56,18 @@ do_configure_prepend() {
 # Forcibly strip because Piglit is *huge*
 OECMAKE_TARGET_INSTALL = "install/strip"
 
-RDEPENDS_${PN} = "waffle waffle-bin python3 python3-mako python3-json \
+RDEPENDS:${PN} = "waffle waffle-bin python3 python3-mako python3-json \
 	python3-misc \
 	python3-unixadmin python3-xml python3-multiprocessing \
 	python3-six python3-shell python3-io \
 	python3-netserver bash \
 	"
 
-INSANE_SKIP_${PN} += "dev-so already-stripped"
+INSANE_SKIP:${PN} += "dev-so already-stripped"
 
 # As nothing builds against Piglit we don't need to have anything in the
 # sysroot, especially when this is ~2GB of test suite
-SYSROOT_DIRS_remove = "${libdir}"
+SYSROOT_DIRS:remove = "${libdir}"
 
 # Can't be built with ccache
 CCACHE_DISABLE = "1"

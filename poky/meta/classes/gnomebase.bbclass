@@ -7,7 +7,7 @@ SECTION ?= "x11/gnome"
 GNOMEBN ?= "${BPN}"
 SRC_URI = "${GNOME_MIRROR}/${GNOMEBN}/${@gnome_verdir("${PV}")}/${GNOMEBN}-${PV}.tar.${GNOME_COMPRESS_TYPE};name=archive"
 
-FILES_${PN} += "${datadir}/application-registry  \
+FILES:${PN} += "${datadir}/application-registry  \
                 ${datadir}/mime-info \
                 ${datadir}/mime/packages \
                 ${datadir}/mime/application \
@@ -19,12 +19,12 @@ FILES_${PN} += "${datadir}/application-registry  \
                 ${datadir}/icons \
 "
 
-FILES_${PN}-doc += "${datadir}/devhelp"
+FILES:${PN}-doc += "${datadir}/devhelp"
 
 GNOMEBASEBUILDCLASS ??= "autotools"
 inherit ${GNOMEBASEBUILDCLASS} pkgconfig
 
-do_install_append() {
+do_install:append() {
 	rm -rf ${D}${localstatedir}/lib/scrollkeeper/*
 	rm -rf ${D}${localstatedir}/scrollkeeper/*
 	rm -f ${D}${datadir}/applications/*.cache

@@ -22,7 +22,7 @@ do_install () {
         cpan_do_install
 }
 
-RDEPENDS_${PN} = " libcapture-tiny-perl \
+RDEPENDS:${PN} = " libcapture-tiny-perl \
                    perl-module-scalar-util \
                    perl-module-io-file \
                    perl-module-extutils-makemaker \

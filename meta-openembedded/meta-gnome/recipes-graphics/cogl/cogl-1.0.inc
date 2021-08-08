@@ -35,7 +35,7 @@ EXTRA_OECONF += "--enable-examples-install	\
 	       	 --disable-gles1		\
 	         --disable-cairo                \
 	    	"
-DEBUG_OPTIMIZATION_append = " -Wno-error=maybe-uninitialized"
+DEBUG_OPTIMIZATION:append = " -Wno-error=maybe-uninitialized"
 
 # OpenGL/GLX
 PACKAGECONFIG[glx] = "--enable-gl --enable-glx,--disable-gl --disable-glx,${EDEPENDS_GL} ${EDEPENDS_X11},${ERDEPENDS_GL}"
@@ -62,23 +62,23 @@ PACKAGECONFIG ??= "cogl-pango gles2 \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'glx egl-x11', '', d)} \
                    "
 
-do_compile_prepend() {
+do_compile:prepend() {
         export GIR_EXTRA_LIBS_PATH="${B}/cogl/.libs"
 }
 
-FILES_${PN} = ""
-FILES_${PN}-examples = "${bindir}/* ${datadir}/cogl/examples-data/*"
-FILES_libcogl = "${libdir}/libcogl${SOLIBS} ${libdir}/girepository-1.0/Cogl-*.typelib"
-FILES_libcogl-gles2 = "${libdir}/libcogl-gles2${SOLIBS}"
-FILES_libcogl-pango = "${libdir}/libcogl-pango${SOLIBS} ${libdir}/girepository-1.0/CoglPango*.typelib"
+FILES:${PN} = ""
+FILES:${PN}-examples = "${bindir}/* ${datadir}/cogl/examples-data/*"
+FILES:libcogl = "${libdir}/libcogl${SOLIBS} ${libdir}/girepository-1.0/Cogl-*.typelib"
+FILES:libcogl-gles2 = "${libdir}/libcogl-gles2${SOLIBS}"
+FILES:libcogl-pango = "${libdir}/libcogl-pango${SOLIBS} ${libdir}/girepository-1.0/CoglPango*.typelib"
 
-FILES_libcogl-path = "${libdir}/libcogl-path${SOLIBS}"
+FILES:libcogl-path = "${libdir}/libcogl-path${SOLIBS}"
 
 # For backwards compatibility after Debian-renaming
-RPROVIDES_libcogl = "cogl-1.0"
-RCONFLICTS_libcogl = "cogl-1.0"
-RREPLACES_libcogl = "cogl-1.0"
+RPROVIDES:libcogl = "cogl-1.0"
+RCONFLICTS:libcogl = "cogl-1.0"
+RREPLACES:libcogl = "cogl-1.0"
 
-RDEPENDS_${PN}-dev = "libcogl"
+RDEPENDS:${PN}-dev = "libcogl"
 
-COMPATIBLE_HOST_armv4 = 'null'
+COMPATIBLE_HOST:armv4 = 'null'

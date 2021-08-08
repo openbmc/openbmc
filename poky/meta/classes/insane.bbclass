@@ -40,7 +40,7 @@ ERROR_QA ?= "dev-so debug-deps dev-deps debug-files arch pkgconfig la \
             useless-rpaths rpaths staticdev \
             "
 # Add usrmerge QA check based on distro feature
-ERROR_QA_append = "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', ' usrmerge', '', d)}"
+ERROR_QA:append = "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', ' usrmerge', '', d)}"
 
 FAKEROOT_QA = "host-user-contaminated"
 FAKEROOT_QA[doc] = "QA tests which need to run under fakeroot. If any \
@@ -246,7 +246,7 @@ def package_qa_check_mime_xdg(path, name, d, elf, messages):
             pkgname = name
             if name == d.getVar('PN'):
                 pkgname = '${PN}'
-            wstr += "If yes: add \'inhert mime-xdg\' and \'MIME_XDG_PACKAGES += \"%s\"\' / if no add \'INSANE_SKIP_%s += \"mime-xdg\"\' to recipe." % (pkgname, pkgname)
+            wstr += "If yes: add \'inhert mime-xdg\' and \'MIME_XDG_PACKAGES += \"%s\"\' / if no add \'INSANE_SKIP:%s += \"mime-xdg\"\' to recipe." % (pkgname, pkgname)
             package_qa_add_message(messages, "mime-xdg", wstr)
         if mime_type_found:
             package_qa_add_message(messages, "mime-xdg", "package contains desktop file with key 'MimeType' but does not inhert mime-xdg: %s path '%s'" % \
@@ -279,7 +279,7 @@ def package_qa_check_libdir(d):
             # Skip subdirectories for any packages with libdir in INSANE_SKIP
             skippackages = []
             for package in dirs:
-                if 'libdir' in (d.getVar('INSANE_SKIP_' + package) or "").split():
+                if 'libdir' in (d.getVar('INSANE_SKIP:' + package) or "").split():
                     bb.note("Package %s skipping libdir QA test" % (package))
                     skippackages.append(package)
                 elif d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-file-directory' and package.endswith("-dbg"):
@@ -483,7 +483,7 @@ def package_qa_check_xorg_driver_abi(path, name, d, elf, messages):
     driverdir = d.expand("${libdir}/xorg/modules/drivers/")
     if driverdir in path and path.endswith(".so"):
         mlprefix = d.getVar('MLPREFIX') or ''
-        for rdep in bb.utils.explode_deps(d.getVar('RDEPENDS_' + name) or ""):
+        for rdep in bb.utils.explode_deps(d.getVar('RDEPENDS:' + name) or ""):
             if rdep.startswith("%sxorg-abi-" % mlprefix):
                 return
         package_qa_add_message(messages, "xorg-driver-abi", "Package %s contains Xorg driver (%s) but no xorg-abi- dependencies" % (name, os.path.basename(path)))
@@ -795,7 +795,7 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
 
                 # The python is not a package, but python-core provides it, so
                 # skip checking /usr/bin/python if python is in the rdeps, in
-                # case there is a RDEPENDS_pkg = "python" in the recipe.
+                # case there is a RDEPENDS:pkg = "python" in the recipe.
                 for py in [ d.getVar('MLPREFIX') + "python", "python" ]:
                     if py in done:
                         filerdepends.pop("/usr/bin/python",None)
@@ -808,7 +808,7 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
                     # For Saving the FILERPROVIDES, RPROVIDES and FILES_INFO
                     rdep_data = oe.packagedata.read_subpkgdata(rdep, d)
                     for key in rdep_data:
-                        if key.startswith("FILERPROVIDES_") or key.startswith("RPROVIDES_"):
+                        if key.startswith("FILERPROVIDES_") or key.startswith("RPROVIDES:"):
                             for subkey in bb.utils.explode_deps(rdep_data[key]):
                                 filerdepends.pop(subkey,None)
                         # Add the files list to the rprovides
@@ -821,8 +821,8 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
                         break
             if filerdepends:
                 for key in filerdepends:
-                    error_msg = "%s contained in package %s requires %s, but no providers found in RDEPENDS_%s?" % \
-                            (filerdepends[key].replace("_%s" % pkg, "").replace("@underscore@", "_"), pkg, key, pkg)
+                    error_msg = "%s contained in package %s requires %s, but no providers found in RDEPENDS:%s?" % \
+                            (filerdepends[key].replace(":%s" % pkg, "").replace("@underscore@", "_"), pkg, key, pkg)
                     package_qa_handle_error("file-rdeps", error_msg, d)
 package_qa_check_rdepends[vardepsexclude] = "OVERRIDES"
 
@@ -903,7 +903,7 @@ def package_qa_check_unlisted_pkg_lics(package, d, messages):
     """
     Check that all licenses for a package are among the licenses for the recipe.
     """
-    pkg_lics = d.getVar('LICENSE_' + package)
+    pkg_lics = d.getVar('LICENSE:' + package)
     if not pkg_lics:
         return True
 
@@ -913,7 +913,7 @@ def package_qa_check_unlisted_pkg_lics(package, d, messages):
         return True
 
     package_qa_add_message(messages, "unlisted-pkg-lics",
-                           "LICENSE_%s includes licenses (%s) that are not "
+                           "LICENSE:%s includes licenses (%s) that are not "
                            "listed in LICENSE" % (package, ' '.join(unlisted)))
     return False
 
@@ -996,8 +996,8 @@ def package_qa_check_missing_update_alternatives(pn, d, messages):
     # Look at all packages and find out if any of those sets ALTERNATIVE variable
     # without inheriting update-alternatives class
     for pkg in (d.getVar('PACKAGES') or '').split():
-        if d.getVar('ALTERNATIVE_%s' % pkg) and not bb.data.inherits_class('update-alternatives', d):
-            package_qa_handle_error("missing-update-alternatives", "%s: recipe defines ALTERNATIVE_%s but doesn't inherit update-alternatives. This might fail during do_rootfs later!" % (pn, pkg), d)
+        if d.getVar('ALTERNATIVE:%s' % pkg) and not bb.data.inherits_class('update-alternatives', d):
+            package_qa_handle_error("missing-update-alternatives", "%s: recipe defines ALTERNATIVE:%s but doesn't inherit update-alternatives. This might fail during do_rootfs later!" % (pn, pkg), d)
 
 # The PACKAGE FUNC to scan each package
 python do_package_qa () {
@@ -1066,7 +1066,7 @@ python do_package_qa () {
 
     for package in packages:
         skip = set((d.getVar('INSANE_SKIP') or "").split() +
-                   (d.getVar('INSANE_SKIP_' + package) or "").split())
+                   (d.getVar('INSANE_SKIP:' + package) or "").split())
         if skip:
             bb.note("Package %s skipping QA tests: %s" % (package, str(skip)))
 
@@ -1108,7 +1108,7 @@ addtask do_package_qa after do_packagedata do_package before do_build
 python() {
     pkgs = (d.getVar('PACKAGES') or '').split()
     for pkg in pkgs:
-        d.appendVarFlag("do_package_qa", "vardeps", " INSANE_SKIP_{}".format(pkg))
+        d.appendVarFlag("do_package_qa", "vardeps", " INSANE_SKIP:{}".format(pkg))
 }
 
 SSTATETASKS += "do_package_qa"
@@ -1306,11 +1306,11 @@ python () {
     # Checking ${FILESEXTRAPATHS}
     extrapaths = (d.getVar("FILESEXTRAPATHS") or "")
     if '__default' not in extrapaths.split(":"):
-        msg = "FILESEXTRAPATHS-variable, must always use _prepend (or _append)\n"
+        msg = "FILESEXTRAPATHS-variable, must always use :prepend (or :append)\n"
         msg += "type of assignment, and don't forget the colon.\n"
         msg += "Please assign it with the format of:\n"
-        msg += "  FILESEXTRAPATHS_append := \":${THISDIR}/Your_Files_Path\" or\n"
-        msg += "  FILESEXTRAPATHS_prepend := \"${THISDIR}/Your_Files_Path:\"\n"
+        msg += "  FILESEXTRAPATHS:append := \":${THISDIR}/Your_Files_Path\" or\n"
+        msg += "  FILESEXTRAPATHS:prepend := \"${THISDIR}/Your_Files_Path:\"\n"
         msg += "in your bbappend file\n\n"
         msg += "Your incorrect assignment is:\n"
         msg += "%s\n" % extrapaths

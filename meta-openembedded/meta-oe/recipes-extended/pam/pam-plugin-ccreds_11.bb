@@ -19,4 +19,4 @@ inherit autotools
 
 EXTRA_OECONF += "--libdir=${base_libdir} "
 
-FILES_${PN} += "${base_libdir}/security/pam*"
+FILES:${PN} += "${base_libdir}/security/pam*"

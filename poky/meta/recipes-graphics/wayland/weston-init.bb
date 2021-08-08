@@ -19,13 +19,13 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[no-idle-timeout] = ",,"
 
 DEFAULTBACKEND ??= ""
-DEFAULTBACKEND_qemuall ?= "fbdev"
-DEFAULTBACKEND_qemuarm64 = "drm"
-DEFAULTBACKEND_qemux86 = "drm"
-DEFAULTBACKEND_qemux86-64 = "drm"
+DEFAULTBACKEND:qemuall ?= "fbdev"
+DEFAULTBACKEND:qemuarm64 = "drm"
+DEFAULTBACKEND:qemux86 = "drm"
+DEFAULTBACKEND:qemux86-64 = "drm"
 # gallium swrast was found to crash weston on startup in x32 qemu
-DEFAULTBACKEND_qemux86-64_x86-x32 = "fbdev"
-DEFAULTBACKEND_x86-x32 = "fbdev"
+DEFAULTBACKEND:qemux86-64:x86-x32 = "fbdev"
+DEFAULTBACKEND:x86-x32 = "fbdev"
 
 do_install() {
         if [ "${VIRTUAL-RUNTIME_init_manager}" != "systemd" ]; then
@@ -70,12 +70,12 @@ USERADD_PACKAGES = "${PN}"
 # requires pam enabled if started via systemd
 REQUIRED_DISTRO_FEATURES = "opengl ${@oe.utils.conditional('VIRTUAL-RUNTIME_init_manager', 'systemd', 'pam', '', d)}"
 
-RDEPENDS_${PN} = "weston kbd"
+RDEPENDS:${PN} = "weston kbd"
 
 INITSCRIPT_NAME = "weston"
 INITSCRIPT_PARAMS = "start 9 5 2 . stop 20 0 1 6 ."
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${sysconfdir}/xdg/weston/weston.ini \
     ${systemd_system_unitdir}/weston.service \
     ${systemd_system_unitdir}/weston.socket \
@@ -84,9 +84,9 @@ FILES_${PN} += "\
     /home/weston \
     "
 
-CONFFILES_${PN} += "${sysconfdir}/xdg/weston/weston.ini ${sysconfdir}/default/weston"
+CONFFILES:${PN} += "${sysconfdir}/xdg/weston/weston.ini ${sysconfdir}/default/weston"
 
-SYSTEMD_SERVICE_${PN} = "weston.service weston.socket"
-USERADD_PARAM_${PN} = "--home /home/weston --shell /bin/sh --user-group -G video,input weston"
-GROUPADD_PARAM_${PN} = "-r wayland"
+SYSTEMD_SERVICE:${PN} = "weston.service weston.socket"
+USERADD_PARAM:${PN} = "--home /home/weston --shell /bin/sh --user-group -G video,input weston"
+GROUPADD_PARAM:${PN} = "-r wayland"
 

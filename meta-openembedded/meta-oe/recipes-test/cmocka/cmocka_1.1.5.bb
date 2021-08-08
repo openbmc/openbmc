@@ -20,7 +20,7 @@ EXTRA_OECMAKE += "${@bb.utils.contains('PTEST_ENABLED', '1', '-DCMAKE_BUILD_TYPE
 # Use -Wl,wrap linker flag, which does not work with LTO
 LTO = ""
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${datadir}/${BPN}/example
     install -d ${D}${datadir}/${BPN}/example/mock/chef_wrap
     install -d ${D}${datadir}/${BPN}/example/mock/uptime
@@ -39,5 +39,5 @@ do_install_ptest () {
 
 PACKAGE_BEFORE_PN += "${PN}-examples"
 
-FILES_${PN}-examples = "${datadir}/${BPN}/example"
-INSANE_SKIP_${PN}-examples = "libdir"
+FILES:${PN}-examples = "${datadir}/${BPN}/example"
+INSANE_SKIP:${PN}-examples = "libdir"

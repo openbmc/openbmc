@@ -5,13 +5,13 @@ require systemtap_git.inc
 DEPENDS = "systemtap virtual/kernel"
 
 # On systems without CONFIG_UTRACE, this package is empty.
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 inherit module-base gettext
 
 FILESEXTRAPATHS =. "${FILE_DIRNAME}/systemtap:"
 
-FILES_${PN} += "${datadir}/systemtap/runtime/uprobes"
+FILES:${PN} += "${datadir}/systemtap/runtime/uprobes"
 
 # Compile and install the uprobes kernel module on machines with utrace
 # support.  Note that staprun expects it in the systemtap/runtime directory,

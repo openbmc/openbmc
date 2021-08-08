@@ -22,7 +22,11 @@ uboot_prep_kimage() {
 	[ -n "${vmlinux_path}" ] && ${OBJCOPY} -O binary -R .note -R .comment -S "${vmlinux_path}" linux.bin
 
 	if [ "${linux_comp}" != "none" ] ; then
-		gzip -9 linux.bin
+		if [ "${linux_comp}" = "gzip" ] ; then
+			gzip -9 linux.bin
+		elif [ "${linux_comp}" = "lzo" ] ; then
+			lzop -9 linux.bin
+		fi
 		mv -f "linux.bin${linux_suffix}" linux.bin
 	fi
 

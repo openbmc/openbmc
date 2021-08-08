@@ -17,10 +17,10 @@ S = "${WORKDIR}/git"
 
 inherit cmake
 
-FILES_${PN}-dev += "${datadir}/eigen3/cmake"
+FILES:${PN}-dev += "${datadir}/eigen3/cmake"
 
 # ${PN} is empty so we need to tweak -dev and -dbg package dependencies
-RDEPENDS_${PN}-dev = ""
-RRECOMMENDS_${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
+RDEPENDS:${PN}-dev = ""
+RRECOMMENDS:${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
 
 BBCLASSEXTEND = "native nativesdk"

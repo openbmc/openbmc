@@ -25,11 +25,11 @@ PACKAGECONFIG ??= "readline"
 PACKAGECONFIG[readline] = "--with-readline,--without-readline,readline"
 PACKAGECONFIG[libedit] = "--with-libedit,--without-libedit,libedit"
 
-do_compile_prepend() {
+do_compile:prepend() {
     cp -f ${WORKDIR}/libmath.h ${B}/bc/libmath.h
 }
 
-ALTERNATIVE_${PN} = "bc dc"
+ALTERNATIVE:${PN} = "bc dc"
 ALTERNATIVE_PRIORITY = "100"
 
 BBCLASSEXTEND = "native"

@@ -27,11 +27,11 @@ do_install() {
 # continual target reboots if they encounter network problems.
 #
 SYSTEMD_AUTO_ENABLE = "disable"
-SYSTEMD_SERVICE_${PN} = "phoromatic-client.service phoromatic-server.service"
+SYSTEMD_SERVICE:${PN} = "phoromatic-client.service phoromatic-server.service"
 
-RDEPENDS_${PN} += "bash python3-core php-cli util-linux-lscpu os-release lsb-release"
+RDEPENDS:${PN} += "bash python3-core php-cli util-linux-lscpu os-release lsb-release"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/phoronix-test-suite \
     ${datadir}/appdata/phoronix-test-suite.appdata.xml \
     ${datadir}/icons/hicolor/48x48/apps/phoronix-test-suite.png \

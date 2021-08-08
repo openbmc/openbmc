@@ -19,10 +19,10 @@ do_install_ptest() {
     cp -rf ${S}/testing/* ${D}${PTEST_PATH}/tests/
 }
 
-RDEPENDS_${PN}-ptest += "\
+RDEPENDS:${PN}-ptest += "\
     python3-pytest \
 "
 
-RDEPENDS_${PN} += "python3-core python3-crypt python3-ctypes python3-fcntl python3-io python3-shell python3-threading"
+RDEPENDS:${PN} += "python3-core python3-crypt python3-ctypes python3-fcntl python3-io python3-shell python3-threading"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -12,7 +12,7 @@ SRC_URI[archive.sha256sum] = "ee1201a8fc25c14e940d3b26db49a34947c8aebf67dee01ee6
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
-UNKNOWN_CONFIGURE_WHITELIST_append = " introspection"
+UNKNOWN_CONFIGURE_WHITELIST:append = " introspection"
 
 GTKDOC_MESON_OPTION = "gtk_doc"
 

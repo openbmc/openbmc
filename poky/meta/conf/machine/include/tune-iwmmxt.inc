@@ -10,6 +10,6 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'iwmmxt', ' -mcpu=iwmmxt',
 MACHINEOVERRIDES =. "${@bb.utils.contains('TUNE_FEATURES', 'iwmmxt', 'armv5:', '', d)}"
 
 AVAILTUNES += "iwmmxt"
-ARMPKGARCH_tune-iwmmxt = "iwmmxt"
-TUNE_FEATURES_tune-iwmmxt = "thumb iwmmxt"
-PACKAGE_EXTRA_ARCHS_tune-iwmmxt = "${PACKAGE_EXTRA_ARCHS_tune-armv5te} iwmmxt iwmmxtt"
+ARMPKGARCH:tune-iwmmxt = "iwmmxt"
+TUNE_FEATURES:tune-iwmmxt = "thumb iwmmxt"
+PACKAGE_EXTRA_ARCHS:tune-iwmmxt = "${PACKAGE_EXTRA_ARCHS:tune-armv5te} iwmmxt iwmmxtt"

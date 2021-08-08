@@ -19,11 +19,11 @@ UPSTREAM_CHECK_REGEX = "iotop-(?P<pver>\d+(\.\d+)+)"
 
 inherit distutils3
 
-do_install_append() {
+do_install:append() {
     rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/site.pyo || true
     rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/site.py  || true
 }
 
-RDEPENDS_${PN} = "python3-curses \
+RDEPENDS:${PN} = "python3-curses \
                   python3-codecs python3-ctypes python3-pprint \
                   python3-shell python3-core"

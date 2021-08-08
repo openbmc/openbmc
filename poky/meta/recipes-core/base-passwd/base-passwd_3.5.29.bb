@@ -73,7 +73,7 @@ base_passwd_tweaksysroot () {
 	chmod 0755 $dest
 }
 
-python populate_packages_prepend() {
+python populate_packages:prepend() {
     # Add in the preinst function for ${PN}
     # We have to do this here as prior to this, passwd/group.master
     # would be unavailable. We need to create these files at preinst
@@ -98,17 +98,17 @@ if [ ! -e $D${sysconfdir}/group ]; then
 """ + group + """EOF
 fi
 """
-    d.setVar(d.expand('pkg_preinst_${PN}'), preinst)
+    d.setVar(d.expand('pkg_preinst:${PN}'), preinst)
 }
 
 addtask do_package after do_populate_sysroot
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 PACKAGES =+ "${PN}-update"
-FILES_${PN}-update = "${sbindir}/* ${datadir}/${PN}"
+FILES:${PN}-update = "${sbindir}/* ${datadir}/${PN}"
 
-pkg_postinst_${PN}-update () {
+pkg_postinst:${PN}-update () {
 #!/bin/sh
 if [ -n "$D" ]; then
 	exit 0

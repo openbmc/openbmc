@@ -31,7 +31,7 @@ do_install_ptest() {
 	install -m 0755 ${S}${TESTBIN} ${D}${PTEST_PATH}/tests/
 }
 
-FILES_${PN}-dev += "${datadir}/CUnit"
-FILES_${PN}-doc += "${docdir}"
+FILES:${PN}-dev += "${datadir}/CUnit"
+FILES:${PN}-doc += "${docdir}"
 
 BBCLASSEXTEND = "native"

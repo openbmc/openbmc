@@ -1719,7 +1719,7 @@ class CustomImageRecipe(Recipe):
         """Generate the contents for the recipe file."""
         # If we have no excluded packages we only need to _append
         if self.excludes_set.count() == 0:
-            packages_conf = "IMAGE_INSTALL_append = \" "
+            packages_conf = "IMAGE_INSTALL:append = \" "
 
             for pkg in self.appends_set.all():
                 packages_conf += pkg.name+' '

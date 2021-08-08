@@ -9,7 +9,7 @@ PYPI_PACKAGE = "PyChromecast"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-logging \
     ${PYTHON_PN}-zeroconf \
     ${PYTHON_PN}-json \

@@ -14,7 +14,7 @@ inherit cmake
 inherit ptest
 
 # Installs some data to incorrect top-level /usr directory
-do_install_append() {
+do_install:append() {
 	mkdir -p ${D}/${datadir}/function2
 	mv ${D}/${prefix}/Readme.md ${D}/${datadir}/function2/
 	mv ${D}/${prefix}/LICENSE.txt ${D}/${datadir}/function2/

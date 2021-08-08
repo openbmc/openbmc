@@ -25,14 +25,14 @@ inherit gnomebase gettext upstream-version-is-even gio-module-cache ptest-gnome
 
 SRC_URI += "file://run-ptest"
 
-FILES_${PN} += "\
+FILES:${PN} += "\
                 ${libdir}/gio/modules/libgio*.so \
                 ${datadir}/dbus-1/services/ \
                 ${systemd_user_unitdir} \
                 "
-FILES_${PN}-dev += "${libdir}/gio/modules/libgio*.la"
-FILES_${PN}-staticdev += "${libdir}/gio/modules/libgio*.a"
+FILES:${PN}-dev += "${libdir}/gio/modules/libgio*.la"
+FILES:${PN}-staticdev += "${libdir}/gio/modules/libgio*.a"
 
-RDEPENDS_${PN}-ptest += "bash"
+RDEPENDS:${PN}-ptest += "bash"
 
 BBCLASSEXTEND = "native nativesdk"

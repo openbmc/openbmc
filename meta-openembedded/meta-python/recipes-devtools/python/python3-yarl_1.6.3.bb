@@ -14,12 +14,12 @@ PYPI_PACKAGE = "yarl"
 
 inherit pypi ptest setuptools3
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-multidict \
     ${PYTHON_PN}-idna \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     ${PYTHON_PN}-pytest \
 "
 

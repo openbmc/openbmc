@@ -18,5 +18,5 @@ CFLAGS += "-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H"
 
 # package plugins for SQLite3
 PACKAGES += "${PN}-plugin"
-INSANE_SKIP_${PN}-plugin = "dev-so"
-FILES_${PN}-plugin += "${libdir}/mod_*"
+INSANE_SKIP:${PN}-plugin = "dev-so"
+FILES:${PN}-plugin += "${libdir}/mod_*"

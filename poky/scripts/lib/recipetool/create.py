@@ -710,7 +710,7 @@ def create_recipe(args):
         lines_after.append('')
 
     if args.binary:
-        lines_after.append('INSANE_SKIP_${PN} += "already-stripped"')
+        lines_after.append('INSANE_SKIP:${PN} += "already-stripped"')
         lines_after.append('')
 
     if args.npm_dev:
@@ -1177,7 +1177,7 @@ def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=None, pn
         license = ' '.join(list(set(pkglicenses.get(pkgname, ['Unknown'])))) or 'Unknown'
         if license == 'Unknown' and pkgname in fallback_licenses:
             license = fallback_licenses[pkgname]
-        outlines.append('LICENSE_%s = "%s"' % (pkgname, license))
+        outlines.append('LICENSE:%s = "%s"' % (pkgname, license))
         outlicenses[pkgname] = license.split()
     return outlicenses
 

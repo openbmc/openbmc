@@ -12,9 +12,9 @@ DEPENDS += "libtalloc"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[cap] = "--with-libcap,--without-libcap,libcap"
-# when enabled, it creates ${bindir}/cifscreds and --ignore-fail-on-non-empty in do_install_append is needed
+# when enabled, it creates ${bindir}/cifscreds and --ignore-fail-on-non-empty in do_install:append is needed
 PACKAGECONFIG[cifscreds] = "--enable-cifscreds,--disable-cifscreds,keyutils"
-# when enabled, it creates ${sbindir}/cifs.upcall and --ignore-fail-on-non-empty in do_install_append is needed
+# when enabled, it creates ${sbindir}/cifs.upcall and --ignore-fail-on-non-empty in do_install:append is needed
 PACKAGECONFIG[cifsupcall] = "--enable-cifsupcall,--disable-cifsupcall,krb5 libtalloc keyutils"
 PACKAGECONFIG[cifsidmap] = "--enable-cifsidmap,--disable-cifsidmap,keyutils samba"
 PACKAGECONFIG[cifsacl] = "--enable-cifsacl,--disable-cifsacl,samba"
@@ -22,7 +22,7 @@ PACKAGECONFIG[pam] = "--enable-pam --with-pamdir=${base_libdir}/security,--disab
 
 inherit autotools pkgconfig
 
-do_configure_prepend() {
+do_configure:prepend() {
     # want installed to /usr/sbin rather than /sbin to be DISTRO_FEATURES usrmerge compliant
     # must override ROOTSBINDIR (default '/sbin'),
     # setting --exec-prefix or --prefix in EXTRA_OECONF does not work
@@ -31,7 +31,7 @@ do_configure_prepend() {
     fi
 }
 
-do_install_append() {
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','false','true',d)}; then
         # Remove empty /usr/bin and /usr/sbin directories since the mount helper
         # is installed to /sbin
@@ -39,6 +39,6 @@ do_install_append() {
     fi
 }
 
-FILES_${PN} += "${base_libdir}/security"
-FILES_${PN}-dbg += "${base_libdir}/security/.debug"
-RRECOMMENDS_${PN} = "kernel-module-cifs"
+FILES:${PN} += "${base_libdir}/security"
+FILES:${PN}-dbg += "${base_libdir}/security/.debug"
+RRECOMMENDS:${PN} = "kernel-module-cifs"

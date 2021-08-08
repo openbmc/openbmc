@@ -27,7 +27,7 @@ Linux software stacks using a task-oriented approach.
 Conceptually, BitBake is similar to GNU Make in some regards but has
 significant differences:
 
--  BitBake executes tasks according to provided metadata that builds up
+-  BitBake executes tasks according to the provided metadata that builds up
    the tasks. Metadata is stored in recipe (``.bb``) and related recipe
    "append" (``.bbappend``) files, configuration (``.conf``) and
    underlying include (``.inc``) files, and in class (``.bbclass``)
@@ -417,8 +417,8 @@ Following is the usage and syntax for BitBake::
      -l DEBUG_DOMAINS, --log-domains=DEBUG_DOMAINS
                            Show debug logging for the specified logging domains
      -P, --profile         Profile the command and save reports.
-     -u UI, --ui=UI        The user interface to use (knotty, ncurses or taskexp
-                           - default knotty).
+     -u UI, --ui=UI        The user interface to use (knotty, ncurses, taskexp or
+                           teamcity - default knotty).
      --token=XMLRPCTOKEN   Specify the connection token to be used when
                            connecting to a remote server.
      --revisions-changed   Set the exit code depending on whether upstream
@@ -433,6 +433,9 @@ Following is the usage and syntax for BitBake::
                            Environment variable BB_SERVER_TIMEOUT.
      --no-setscene         Do not run any setscene tasks. sstate will be ignored
                            and everything needed, built.
+     --skip-setscene       Skip setscene tasks if they would be executed. Tasks
+                           previously restored from sstate will be kept, unlike
+                           --no-setscene
      --setscene-only       Only run setscene tasks, don't run any real tasks.
      --remote-server=REMOTE_SERVER
                            Connect to the specified server.
@@ -537,7 +540,7 @@ current working directory:
 To stop depending on common depends, use the "-I" depend option and
 BitBake omits them from the graph. Leaving this information out can
 produce more readable graphs. This way, you can remove from the graph
-``DEPENDS`` from inherited classes such as ``base.bbclass``.
+:term:`DEPENDS` from inherited classes such as ``base.bbclass``.
 
 Here are two examples that create dependency graphs. The second example
 omits depends common in OpenEmbedded from the graph::
@@ -564,7 +567,7 @@ for two separate targets:
 .. image:: figures/bb_multiconfig_files.png
    :align: center
 
-The reason for this required file hierarchy is because the ``BBPATH``
+The reason for this required file hierarchy is because the :term:`BBPATH`
 variable is not constructed until the layers are parsed. Consequently,
 using the configuration file as a pre-configuration file is not possible
 unless it is located in the current working directory.

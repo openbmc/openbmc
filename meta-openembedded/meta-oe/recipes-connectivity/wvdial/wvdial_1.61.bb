@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=55ca817ccb7d5b5b66355690e9abc605"
 inherit pkgconfig
 
 DEPENDS = "wvstreams"
-RDEPENDS_${PN} = "ppp"
+RDEPENDS:${PN} = "ppp"
 
 SRC_URI = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/${BPN}/${BP}.tar.bz2 \
            file://typo_pon.wvdial.1.patch \
@@ -16,7 +16,7 @@ SRC_URI = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.
 SRC_URI[md5sum] = "37e9a2d664effe4efd44c0e1a20136de"
 SRC_URI[sha256sum] = "99906d9560cbdbc97e1855e7b0a7169f1e11983be3ac539140423f09debced82"
 
-COMPATIBLE_HOST_libc-musl = "null"
+COMPATIBLE_HOST:libc-musl = "null"
 EXTRA_OEMAKE = ""
 export WVLINK="${LD}"
 

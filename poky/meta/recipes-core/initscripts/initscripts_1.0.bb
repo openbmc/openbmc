@@ -39,25 +39,25 @@ SRC_URI = "file://functions \
 
 S = "${WORKDIR}"
 
-SRC_URI_append_arm = " file://alignment.sh"
-SRC_URI_append_armeb = " file://alignment.sh"
+SRC_URI:append:arm = " file://alignment.sh"
+SRC_URI:append:armeb = " file://alignment.sh"
 
 KERNEL_VERSION = ""
 
-DEPENDS_append = " update-rc.d-native"
-PACKAGE_WRITE_DEPS_append = " ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd-systemctl-native','',d)}"
+DEPENDS:append = " update-rc.d-native"
+PACKAGE_WRITE_DEPS:append = " ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd-systemctl-native','',d)}"
 
 PACKAGES =+ "${PN}-functions ${PN}-sushell"
-RDEPENDS_${PN} = "initd-functions \
+RDEPENDS:${PN} = "initd-functions \
                   ${@bb.utils.contains('DISTRO_FEATURES','selinux','${PN}-sushell','',d)} \
                   init-system-helpers-service \
 		 "
 # Recommend pn-functions so that it will be a preferred default provider for initd-functions
-RRECOMMENDS_${PN} = "${PN}-functions"
-RPROVIDES_${PN}-functions = "initd-functions"
-RCONFLICTS_${PN}-functions = "lsbinitscripts"
-FILES_${PN}-functions = "${sysconfdir}/init.d/functions*"
-FILES_${PN}-sushell = "${base_sbindir}/sushell"
+RRECOMMENDS:${PN} = "${PN}-functions"
+RPROVIDES:${PN}-functions = "initd-functions"
+RCONFLICTS:${PN}-functions = "lsbinitscripts"
+FILES:${PN}-functions = "${sysconfdir}/init.d/functions*"
+FILES:${PN}-sushell = "${base_sbindir}/sushell"
 
 HALTARGS ?= "-d -f"
 
@@ -106,7 +106,8 @@ do_install () {
 	install -m 0755    ${WORKDIR}/save-rtc.sh	${D}${sysconfdir}/init.d
 	install -m 0644    ${WORKDIR}/volatiles		${D}${sysconfdir}/default/volatiles/00_core
 	if [ ${@ oe.types.boolean('${VOLATILE_LOG_DIR}') } = True ]; then
-		echo "l root root 0755 /var/log /var/volatile/log" >> ${D}${sysconfdir}/default/volatiles/00_core
+		sed -i -e '\@^d root root 0755 /var/volatile/log none$@ a\l root root 0755 /var/log /var/volatile/log' \
+			${D}${sysconfdir}/default/volatiles/00_core
 	fi
 	install -m 0755    ${WORKDIR}/dmesg.sh		${D}${sysconfdir}/init.d
 	install -m 0644    ${WORKDIR}/logrotate-dmesg.conf ${D}${sysconfdir}/
@@ -169,7 +170,7 @@ MASKED_SCRIPTS = " \
   sysfs \
   urandom"
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 	if type systemctl >/dev/null 2>/dev/null; then
 		if [ -n "$D" ]; then
 			OPTS="--root=$D"
@@ -185,4 +186,4 @@ pkg_postinst_${PN} () {
     fi
 }
 
-CONFFILES_${PN} += "${sysconfdir}/init.d/checkroot.sh"
+CONFFILES:${PN} += "${sysconfdir}/init.d/checkroot.sh"

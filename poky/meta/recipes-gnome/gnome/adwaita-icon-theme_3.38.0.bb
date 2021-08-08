@@ -24,21 +24,21 @@ DEPENDS += "librsvg-native"
 
 PACKAGES = "${PN}-cursors ${PN}-symbolic-hires ${PN}-symbolic ${PN}-hires ${PN}"
 
-RREPLACES_${PN} = "gnome-icon-theme"
-RCONFLICTS_${PN} = "gnome-icon-theme"
-RPROVIDES_${PN} = "gnome-icon-theme"
+RREPLACES:${PN} = "gnome-icon-theme"
+RCONFLICTS:${PN} = "gnome-icon-theme"
+RPROVIDES:${PN} = "gnome-icon-theme"
 
-FILES_${PN}-cursors = "${prefix}/share/icons/Adwaita/cursors/"
-FILES_${PN}-symbolic-hires = "${prefix}/share/icons/Adwaita/96x96/*/*.symbolic.png \
+FILES:${PN}-cursors = "${prefix}/share/icons/Adwaita/cursors/"
+FILES:${PN}-symbolic-hires = "${prefix}/share/icons/Adwaita/96x96/*/*.symbolic.png \
                               ${prefix}/share/icons/Adwaita/64x64/*/*.symbolic.png \
                               ${prefix}/share/icons/Adwaita/48x48/*/*.symbolic.png \
                               ${prefix}/share/icons/Adwaita/32x32/*/*.symbolic.png"
-FILES_${PN}-symbolic = "${prefix}/share/icons/Adwaita/16x16/*/*.symbolic.png \
+FILES:${PN}-symbolic = "${prefix}/share/icons/Adwaita/16x16/*/*.symbolic.png \
                         ${prefix}/share/icons/Adwaita/24x24/*/*.symbolic.png \
                         ${prefix}/share/icons/Adwaita/scalable/*/*-symbolic*.svg"
-FILES_${PN}-hires = "${prefix}/share/icons/Adwaita/256x256/ \
+FILES:${PN}-hires = "${prefix}/share/icons/Adwaita/256x256/ \
                      ${prefix}/share/icons/Adwaita/512x512/"
-FILES_${PN} = "${prefix}/share/icons/Adwaita/ \
+FILES:${PN} = "${prefix}/share/icons/Adwaita/ \
                ${prefix}/share/pkgconfig/adwaita-icon-theme.pc"
 
 BBCLASSEXTEND = "native nativesdk"

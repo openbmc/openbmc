@@ -19,11 +19,11 @@ SRC_URI[sha256sum] = "eb16356243218c32f39e07258d72bf8b21e62ce94bb0e8a95e318b1513
 EXTRA_OEMAKE += "CC_FOR_GETHOST='${BUILD_CC}'"
 inherit autotools
 
-do_compile_prepend() {
+do_compile:prepend() {
     oe_runmake CC_FOR_GETHOST='${BUILD_CC}' CFLAGS='${BUILD_CFLAGS}' gethost
 }
 
-do_install_append () {
+do_install:append () {
     oe_runmake install.man DESTDIR=${D}
 
     install -d ${D}${base_bindir}
@@ -34,10 +34,10 @@ do_install_append () {
     install -D -m 0644 ${S}/csh-mode.el ${D}${datadir}/emacs/site-lisp/csh-mode.el
 }
 
-FILES_${PN} += "${datadir}/emacs/site-lisp/csh-mode.el"
+FILES:${PN} += "${datadir}/emacs/site-lisp/csh-mode.el"
 
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 #!/bin/sh -e
 echo /usr/bin/tcsh >> $D/etc/shells
 echo /usr/bin/csh >> $D/etc/shells

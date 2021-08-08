@@ -29,5 +29,5 @@ do_install() {
 	sed -i -e 's%#!/bin/bash%#!/bin/sh%g' ${D}${datadir}/arno-iptables-firewall/plugins/dyndns-host-open-helper
 }
 
-SYSTEMD_SERVICE_${PN} = "arno-iptables-firewall.service"
-FILES_${PN} += "${systemd_unitdir}/system/arno-iptables-firewall.service"
+SYSTEMD_SERVICE:${PN} = "arno-iptables-firewall.service"
+FILES:${PN} += "${systemd_unitdir}/system/arno-iptables-firewall.service"

@@ -8,13 +8,13 @@ SRC_URI[sha256sum] = "a502aee54917cd394217b31c977a1ba3d9541a0120e0a045c49fd77b32
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     python3-pako \
     python3-monotonic \
     python3-appdirs \
 "
 
-do_install_append() {
+do_install:append() {
     # Stop this from being installed
     rm -rf ${D}/usr/share
 }

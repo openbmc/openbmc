@@ -104,7 +104,7 @@ STAGING_DIR_HOST = "${RECIPE_SYSROOT}"
 
 TOOLCHAIN_OPTIONS = " --sysroot=${RECIPE_SYSROOT}"
 
-PATH_append = ":${TMPDIR}/sysroots/${HOST_ARCH}/${bindir_cross}"
+PATH:append = ":${TMPDIR}/sysroots/${HOST_ARCH}/${bindir_cross}"
 PKGHIST_DIR = "${TMPDIR}/pkghistory/${HOST_ARCH}-${SDKPKGSUFFIX}${HOST_VENDOR}-${HOST_OS}/"
 
 HOST_ARCH = "${SDK_ARCH}"
@@ -129,7 +129,7 @@ LDFLAGS = "${BUILDSDK_LDFLAGS} \
 # We need chrpath >= 0.14 to ensure we can deal with 32 and 64 bit
 # binaries
 #
-DEPENDS_append = " chrpath-replacement-native"
+DEPENDS:append = " chrpath-replacement-native"
 EXTRANATIVEPATH += "chrpath-native"
 
 # Path mangling needed by the cross packaging
@@ -153,7 +153,7 @@ base_sbindir = "${bindir}"
 libdir = "${exec_prefix}/lib/${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS}"
 libexecdir = "${exec_prefix}/libexec/${TARGET_ARCH}${TARGET_VENDOR}-${TARGET_OS}"
 
-FILES_${PN} = "${prefix}"
+FILES:${PN} = "${prefix}"
 
 export PKG_CONFIG_DIR = "${STAGING_DIR_HOST}${exec_prefix}/lib/pkgconfig"
 export PKG_CONFIG_SYSROOT_DIR = "${STAGING_DIR_HOST}"

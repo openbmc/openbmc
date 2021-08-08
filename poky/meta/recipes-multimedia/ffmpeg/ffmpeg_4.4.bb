@@ -6,16 +6,16 @@ HOMEPAGE = "https://www.ffmpeg.org/"
 SECTION = "libs"
 
 LICENSE = "BSD & GPLv2+ & LGPLv2.1+ & MIT"
-LICENSE_${PN} = "GPLv2+"
-LICENSE_libavcodec = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
-LICENSE_libavdevice = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
-LICENSE_libavfilter = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
-LICENSE_libavformat = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
-LICENSE_libavresample = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
-LICENSE_libavutil = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
-LICENSE_libpostproc = "GPLv2+"
-LICENSE_libswresample = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
-LICENSE_libswscale = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
+LICENSE:${PN} = "GPLv2+"
+LICENSE:libavcodec = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
+LICENSE:libavdevice = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
+LICENSE:libavfilter = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
+LICENSE:libavformat = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
+LICENSE:libavresample = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
+LICENSE:libavutil = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
+LICENSE:libpostproc = "GPLv2+"
+LICENSE:libswresample = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
+LICENSE:libswscale = "${@bb.utils.contains('PACKAGECONFIG', 'gpl', 'GPLv2+', 'LGPLv2.1+', d)}"
 LICENSE_FLAGS = "commercial"
 
 LIC_FILES_CHKSUM = "file://COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
@@ -25,13 +25,19 @@ LIC_FILES_CHKSUM = "file://COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 
 SRC_URI = "https://www.ffmpeg.org/releases/${BP}.tar.xz \
            file://0001-libavutil-include-assembly-with-full-path-from-sourc.patch \
+           file://fix-CVE-2020-20446.patch \
+           file://fix-CVE-2020-20453.patch \
+           file://fix-CVE-2020-22015.patch \
+           file://fix-CVE-2020-22021.patch \
+           file://fix-CVE-2020-22033-CVE-2020-22019.patch \
+           file://fix-CVE-2021-33815.patch \
            "
 SRC_URI[sha256sum] = "06b10a183ce5371f915c6bb15b7b1fffbe046e8275099c96affc29e17645d909"
 
 # Build fails when thumb is enabled: https://bugzilla.yoctoproject.org/show_bug.cgi?id=7717
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
-ARM_INSTRUCTION_SET_armv6 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
+ARM_INSTRUCTION_SET:armv6 = "arm"
 
 # Should be API compatible with libav (which was a fork of ffmpeg)
 # libpostproc was previously packaged from a separate recipe
@@ -121,20 +127,21 @@ EXTRA_OECONF = " \
     --pkg-config=pkg-config \
 "
 
-EXTRA_OECONF_append_linux-gnux32 = " --disable-asm"
+EXTRA_OECONF:append:linux-gnux32 = " --disable-asm"
 
 EXTRA_OECONF += "${@bb.utils.contains('TUNE_FEATURES', 'mipsisa64r6', '--disable-mips64r2 --disable-mips32r2', '', d)}"
 EXTRA_OECONF += "${@bb.utils.contains('TUNE_FEATURES', 'mipsisa64r2', '--disable-mips64r6 --disable-mips32r6', '', d)}"
 EXTRA_OECONF += "${@bb.utils.contains('TUNE_FEATURES', 'mips32r2', '--disable-mips64r6 --disable-mips32r6', '', d)}"
 EXTRA_OECONF += "${@bb.utils.contains('TUNE_FEATURES', 'mips32r6', '--disable-mips64r2 --disable-mips32r2', '', d)}"
-EXTRA_OECONF_append_mips = " --extra-libs=-latomic --disable-mips32r5 --disable-mipsdsp --disable-mipsdspr2 \
+EXTRA_OECONF:append:mips = " --extra-libs=-latomic --disable-mips32r5 --disable-mipsdsp --disable-mipsdspr2 \
                              --disable-loongson2 --disable-loongson3 --disable-mmi --disable-msa --disable-msa2"
-EXTRA_OECONF_append_riscv32 = " --extra-libs=-latomic"
+EXTRA_OECONF:append:riscv32 = " --extra-libs=-latomic"
+EXTRA_OECONF:append:armv5 = " --extra-libs=-latomic"
 
 # gold crashes on x86, another solution is to --disable-asm but thats more hacky
 # ld.gold: internal error in relocate_section, at ../../gold/i386.cc:3684
 
-LDFLAGS_append_x86 = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
+LDFLAGS:append:x86 = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
 
 EXTRA_OEMAKE = "V=1"
 
@@ -143,7 +150,7 @@ do_configure() {
 }
 
 # patch out build host paths for reproducibility
-do_compile_prepend_class-target() {
+do_compile:prepend:class-target() {
         sed -i -e "s,${WORKDIR},,g" ${B}/config.h
 }
 
@@ -157,23 +164,23 @@ PACKAGES =+ "libavcodec \
              libswresample \
              libswscale"
 
-FILES_libavcodec = "${libdir}/libavcodec${SOLIBS}"
-FILES_libavdevice = "${libdir}/libavdevice${SOLIBS}"
-FILES_libavfilter = "${libdir}/libavfilter${SOLIBS}"
-FILES_libavformat = "${libdir}/libavformat${SOLIBS}"
-FILES_libavresample = "${libdir}/libavresample${SOLIBS}"
-FILES_libavutil = "${libdir}/libavutil${SOLIBS}"
-FILES_libpostproc = "${libdir}/libpostproc${SOLIBS}"
-FILES_libswresample = "${libdir}/libswresample${SOLIBS}"
-FILES_libswscale = "${libdir}/libswscale${SOLIBS}"
+FILES:libavcodec = "${libdir}/libavcodec${SOLIBS}"
+FILES:libavdevice = "${libdir}/libavdevice${SOLIBS}"
+FILES:libavfilter = "${libdir}/libavfilter${SOLIBS}"
+FILES:libavformat = "${libdir}/libavformat${SOLIBS}"
+FILES:libavresample = "${libdir}/libavresample${SOLIBS}"
+FILES:libavutil = "${libdir}/libavutil${SOLIBS}"
+FILES:libpostproc = "${libdir}/libpostproc${SOLIBS}"
+FILES:libswresample = "${libdir}/libswresample${SOLIBS}"
+FILES:libswscale = "${libdir}/libswscale${SOLIBS}"
 
 # ffmpeg disables PIC on some platforms (e.g. x86-32)
-INSANE_SKIP_${MLPREFIX}libavcodec = "textrel"
-INSANE_SKIP_${MLPREFIX}libavdevice = "textrel"
-INSANE_SKIP_${MLPREFIX}libavfilter = "textrel"
-INSANE_SKIP_${MLPREFIX}libavformat = "textrel"
-INSANE_SKIP_${MLPREFIX}libavutil = "textrel"
-INSANE_SKIP_${MLPREFIX}libavresample = "textrel"
-INSANE_SKIP_${MLPREFIX}libswscale = "textrel"
-INSANE_SKIP_${MLPREFIX}libswresample = "textrel"
-INSANE_SKIP_${MLPREFIX}libpostproc = "textrel"
+INSANE_SKIP:${MLPREFIX}libavcodec = "textrel"
+INSANE_SKIP:${MLPREFIX}libavdevice = "textrel"
+INSANE_SKIP:${MLPREFIX}libavfilter = "textrel"
+INSANE_SKIP:${MLPREFIX}libavformat = "textrel"
+INSANE_SKIP:${MLPREFIX}libavutil = "textrel"
+INSANE_SKIP:${MLPREFIX}libavresample = "textrel"
+INSANE_SKIP:${MLPREFIX}libswscale = "textrel"
+INSANE_SKIP:${MLPREFIX}libswresample = "textrel"
+INSANE_SKIP:${MLPREFIX}libpostproc = "textrel"

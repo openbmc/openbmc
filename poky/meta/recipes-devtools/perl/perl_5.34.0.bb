@@ -18,10 +18,10 @@ SRC_URI = "https://www.cpan.org/src/5.0/perl-${PV}.tar.gz;name=perl \
            file://0002-Constant-Fix-up-shebang.patch \
            file://determinism.patch \
            "
-SRC_URI_append_class-native = " \
+SRC_URI:append:class-native = " \
            file://perl-configpm-switch.patch \
 "
-SRC_URI_append_class-target = " \
+SRC_URI:append:class-target = " \
            file://encodefix.patch \
 "
 
@@ -42,11 +42,11 @@ PACKAGECONFIG[gdbm] = ",-Ui_gdbm,gdbm"
 # Don't generate comments in enc2xs output files. They are not reproducible
 export ENC2XS_NO_COMMENTS = "1"
 
-do_configure_prepend() {
+do_configure:prepend() {
     cp -rfp ${STAGING_DATADIR_NATIVE}/perl-cross/* ${S}
 }
 
-do_configure_class-target() {
+do_configure:class-target() {
     ./configure --prefix=${prefix} --libdir=${libdir} \
     --target=${TARGET_SYS} \
     -Duseshrplib \
@@ -72,7 +72,7 @@ do_configure_class-target() {
     sed -i -e "s,${STAGING_LIBDIR},${libdir},g" config.h
 }
 
-do_configure_class-nativesdk() {
+do_configure:class-nativesdk() {
     ./configure --prefix=${prefix} \
     --target=${TARGET_SYS} \
     -Duseshrplib \
@@ -85,7 +85,7 @@ do_configure_class-nativesdk() {
     sed -i -e "s,${STAGING_LIBDIR},${libdir},g" config.h
 }
 
-do_configure_class-native() {
+do_configure:class-native() {
     ./configure --prefix=${prefix} \
     -Dbin=${bindir}/perl-native \
     -Duseshrplib \
@@ -95,7 +95,7 @@ do_configure_class-native() {
     ${PACKAGECONFIG_CONFARGS}
 }
 
-do_configure_append() {
+do_configure:append() {
     if [ -n "$SOURCE_DATE_EPOCH" ]; then
         PERL_BUILD_DATE="$(${PYTHON} -c "\
 from datetime import datetime, timezone; \
@@ -140,7 +140,7 @@ do_install() {
     fi
 }
 
-do_install_append_class-target() {
+do_install:append:class-target() {
     # This is used to substitute target configuration when running native perl via perl-configpm-switch.patch
     ln -s Config_heavy.pl ${D}${libdir}/perl5/${PV}/${TARGET_ARCH}-linux/Config_heavy-target.pl
 
@@ -149,7 +149,7 @@ do_install_append_class-target() {
     rm ${D}${libdir}/perl5/${PV}/${TARGET_ARCH}-linux/CORE/xconfig.h
 }
 
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
     # This is used to substitute target configuration when running native perl via perl-configpm-switch.patch
     ln -s Config_heavy.pl ${D}${libdir}/perl5/${PV}/${TARGET_ARCH}-linux/Config_heavy-target.pl
 
@@ -157,7 +157,7 @@ do_install_append_class-nativesdk() {
         PERL5LIB='$PERL5LIB:${SDKPATHNATIVE}/${libdir_nativesdk}/perl5/site_perl/${PV}:${SDKPATHNATIVE}/${libdir_nativesdk}/perl5/vendor_perl/${PV}:${SDKPATHNATIVE}/${libdir_nativesdk}/perl5/${PV}'
 }
 
-do_install_append_class-native () {
+do_install:append:class-native () {
     # Those wrappers mean that perl installed from sstate (which may change
     # path location) works and that in the nativesdk case, the SDK can be
     # installed to a different location from the one it was built for.
@@ -208,7 +208,7 @@ inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
 
-ALTERNATIVE_${PN}-misc = "corelist cpan enc2xs encguess h2ph h2xs instmodsh json_pp libnetcfg \
+ALTERNATIVE:${PN}-misc = "corelist cpan enc2xs encguess h2ph h2xs instmodsh json_pp libnetcfg \
                      piconv pl2pm pod2html pod2man pod2text pod2usage podchecker \
                      prove ptar ptardiff ptargrep shasum splain xsubpp zipdetails"
 ALTERNATIVE_LINK_NAME[corelist] = "${bindir}/corelist"
@@ -238,7 +238,7 @@ ALTERNATIVE_LINK_NAME[zipdetails] = "${bindir}/zipdetails"
 
 require perl-ptest.inc
 
-FILES_${PN} = "${bindir}/perl ${bindir}/perl.real ${bindir}/perl${PV} ${libdir}/libperl.so* \
+FILES:${PN} = "${bindir}/perl ${bindir}/perl.real ${bindir}/perl${PV} ${libdir}/libperl.so* \
                ${libdir}/perl5/site_perl \
                ${libdir}/perl5/${PV}/Config.pm \
                ${libdir}/perl5/${PV}/${TARGET_ARCH}-linux/Config.pm \
@@ -254,24 +254,24 @@ FILES_${PN} = "${bindir}/perl ${bindir}/perl.real ${bindir}/perl${PV} ${libdir}/
                ${libdir}/perl5/${PV}/ExtUtils/xsubpp \
                ${libdir}/perl5/${PV}/ExtUtils/typemap \
                "
-RPROVIDES_${PN} += "perl-module-strict perl-module-vars perl-module-config perl-module-warnings \
+RPROVIDES:${PN} += "perl-module-strict perl-module-vars perl-module-config perl-module-warnings \
                     perl-module-warnings-register"
 
-FILES_${PN}-staticdev_append = " ${libdir}/perl5/${PV}/*/CORE/libperl.a"
+FILES:${PN}-staticdev:append = " ${libdir}/perl5/${PV}/*/CORE/libperl.a"
 
-FILES_${PN}-dev_append = " ${libdir}/perl5/${PV}/*/CORE"
+FILES:${PN}-dev:append = " ${libdir}/perl5/${PV}/*/CORE"
 
-FILES_${PN}-doc_append = " ${libdir}/perl5/${PV}/Unicode/Collate/*.txt \
+FILES:${PN}-doc:append = " ${libdir}/perl5/${PV}/Unicode/Collate/*.txt \
                            ${libdir}/perl5/${PV}/*/.packlist \
                            ${libdir}/perl5/${PV}/Encode/encode.h \
                          "
 PACKAGES += "${PN}-misc"
 
-FILES_${PN}-misc = "${bindir}/*"
+FILES:${PN}-misc = "${bindir}/*"
 
 PACKAGES += "${PN}-pod"
 
-FILES_${PN}-pod = "${libdir}/perl5/${PV}/pod \
+FILES:${PN}-pod = "${libdir}/perl5/${PV}/pod \
                    ${libdir}/perl5/${PV}/*.pod \
                    ${libdir}/perl5/${PV}/*/*.pod \
                    ${libdir}/perl5/${PV}/*/*/*.pod \ 
@@ -280,20 +280,20 @@ FILES_${PN}-pod = "${libdir}/perl5/${PV}/pod \
 
 PACKAGES += "${PN}-module-cpan ${PN}-module-unicore"
 
-FILES_${PN}-module-cpan += "${libdir}/perl5/${PV}/CPAN \
+FILES:${PN}-module-cpan += "${libdir}/perl5/${PV}/CPAN \
                           "
-FILES_${PN}-module-unicore += "${libdir}/perl5/${PV}/unicore"
+FILES:${PN}-module-unicore += "${libdir}/perl5/${PV}/unicore"
 
 ALTERNATIVE_PRIORITY = "40"
-ALTERNATIVE_${PN}-doc = "Thread.3"
+ALTERNATIVE:${PN}-doc = "Thread.3"
 ALTERNATIVE_LINK_NAME[Thread.3] = "${mandir}/man3/Thread.3"
 
 # Create a perl-modules package recommending all the other perl
 # packages (actually the non modules packages and not created too)
-ALLOW_EMPTY_${PN}-modules = "1"
+ALLOW_EMPTY:${PN}-modules = "1"
 PACKAGES += "${PN}-modules "
 
-PACKAGESPLITFUNCS_prepend = "split_perl_packages "
+PACKAGESPLITFUNCS:prepend = "split_perl_packages "
 
 python split_perl_packages () {
     libdir = d.expand('${libdir}/perl5/${PV}')
@@ -308,7 +308,7 @@ python split_perl_packages () {
     # modules. Don't attempt to use the result of do_split_packages() as some
     # modules are manually split (eg. perl-module-unicore).
     packages = filter(lambda p: 'perl-module-' in p, d.getVar('PACKAGES').split())
-    d.setVar(d.expand("RRECOMMENDS_${PN}-modules"), ' '.join(packages))
+    d.setVar(d.expand("RRECOMMENDS:${PN}-modules"), ' '.join(packages))
 
     # Read the pre-generated dependency file, and use it to set module dependecies
     for line in open(d.expand("${WORKDIR}") + '/perl-rdepends.txt').readlines():
@@ -320,7 +320,7 @@ python split_perl_packages () {
             module = splitline[0] + '-native'
             depends = "perl-native"
         else:
-            module = splitline[0].replace("RDEPENDS_perl", "RDEPENDS_${PN}")
+            module = splitline[0].replace("RDEPENDS:perl", "RDEPENDS:${PN}")
             depends = splitline[2].strip('"').replace("perl-module", "${PN}-module")
         d.appendVar(d.expand(module), " " + depends)
 }
@@ -334,8 +334,8 @@ python() {
         d.setVar("PACKAGES_DYNAMIC", "^nativesdk-perl-module-.*")
 }
 
-RDEPENDS_${PN}-misc += "perl perl-modules"
-RDEPENDS_${PN}-pod += "perl"
+RDEPENDS:${PN}-misc += "perl perl-modules"
+RDEPENDS:${PN}-pod += "perl"
 
 BBCLASSEXTEND = "native nativesdk"
 
@@ -346,10 +346,10 @@ do_create_rdepends_inc() {
     cat <<'EOPREAMBLE' > ${WORKDIR}/perl-rdepends.inc
 
 # Some additional dependencies that the above doesn't manage to figure out
-RDEPENDS_${PN}-module-file-spec += "${PN}-module-file-spec-unix"
-RDEPENDS_${PN}-module-math-bigint += "${PN}-module-math-bigint-calc"
-RDEPENDS_${PN}-module-thread-queue += "${PN}-module-attributes"
-RDEPENDS_${PN}-module-overload += "${PN}-module-overloading"
+RDEPENDS:${PN}-module-file-spec += "${PN}-module-file-spec-unix"
+RDEPENDS:${PN}-module-math-bigint += "${PN}-module-math-bigint-calc"
+RDEPENDS:${PN}-module-thread-queue += "${PN}-module-attributes"
+RDEPENDS:${PN}-module-overload += "${PN}-module-overloading"
 
 # Generated depends list beyond this line
 EOPREAMBLE

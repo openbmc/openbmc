@@ -23,6 +23,6 @@ PACKAGECONFIG[mysql] = "--with-mysql \
                         --with-mysql-libs=${STAGING_LIBDIR}, \
                         --without-mysql,mysql5"
 
-do_configure_prepend() {
+do_configure:prepend() {
     touch ${S}/NEWS ${S}/AUTHORS
 }

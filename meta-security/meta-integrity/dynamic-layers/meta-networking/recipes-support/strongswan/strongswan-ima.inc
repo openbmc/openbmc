@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 DEPENDS = "libtspi"
 
-SRC_URI_append = " file://0001-xfrmi-Only-build-if-libcharon-is-built.patch"
+SRC_URI:append = " file://0001-xfrmi-Only-build-if-libcharon-is-built.patch"
 
 PACKAGECONFIG += " \
     aikgen \

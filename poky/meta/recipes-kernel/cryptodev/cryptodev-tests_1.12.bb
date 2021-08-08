@@ -18,4 +18,4 @@ do_install() {
 	oe_runmake install_tests
 }
 
-FILES_${PN} = "${bindir}/*"
+FILES:${PN} = "${bindir}/*"

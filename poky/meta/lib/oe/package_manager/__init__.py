@@ -90,7 +90,7 @@ def opkg_query(cmd_output):
 
 def failed_postinsts_abort(pkgs, log_path):
     bb.fatal("""Postinstall scriptlets of %s have failed. If the intention is to defer them to first boot,
-then please place them into pkg_postinst_ontarget_${PN} ().
+then please place them into pkg_postinst_ontarget:${PN} ().
 Deferring to first boot via 'exit 1' is no longer supported.
 Details of the failure are in %s.""" %(pkgs, log_path))
 

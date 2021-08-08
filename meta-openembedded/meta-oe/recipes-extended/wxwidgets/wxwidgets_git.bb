@@ -38,7 +38,7 @@ EXTRA_OECMAKE += " \
     -DwxUSE_LIBTIFF=sys \
     -DwxUSE_REGEX=builtin \
 "
-EXTRA_OECMAKE_append_libc-musl = " \
+EXTRA_OECMAKE:append:libc-musl = " \
     -DHAVE_LOCALE_T=OFF \
 "
 
@@ -70,7 +70,7 @@ PACKAGECONFIG[opengl] = ",,libglu"
 PACKAGECONFIG[sdl_audio] = "-DwxUSE_LIBSDL=ON,-DwxUSE_LIBSDL=OFF,libsdl2"
 PACKAGECONFIG[webkit] = "-DwxUSE_WEBVIEW_WEBKIT=ON,-DwxUSE_WEBVIEW_WEBKIT=OFF,webkitgtk,,,no_gui"
 
-do_compile_append() {
+do_compile:append() {
     # if not at re-compile
     if [ -L ${B}/wx-config ]; then
         # ${B}/wx-config is a symlink for build and not needed after compile
@@ -88,7 +88,7 @@ do_compile_append() {
         ${B}/wx-config
 }
 
-do_install_append() {
+do_install:append() {
     # do not ship bindir if empty
     rmdir --ignore-fail-on-non-empty ${D}${bindir}
 }
@@ -96,9 +96,9 @@ do_install_append() {
 # lib names are not canonical
 FILES_SOLIBSDEV = ""
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/libwx_*.so \
     ${libdir}/wx/ \
 "
 
-FILES_${PN}-dev += "${libdir}/wx/include/"
+FILES:${PN}-dev += "${libdir}/wx/include/"

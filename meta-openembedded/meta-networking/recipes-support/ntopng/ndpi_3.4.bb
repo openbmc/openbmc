@@ -4,7 +4,7 @@ inspection. Based on OpenDPI it includes ntop extensions"
 
 SECTION = "libdevel"
 DEPENDS = "libpcap"
-RDEPENDS_${PN} += " libpcap"
+RDEPENDS:${PN} += " libpcap"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b52f2d57d10c4f7ee67a7eb9615d5d24"
 
@@ -19,7 +19,7 @@ inherit autotools-brokensep pkgconfig
 
 CPPFLAGS += "${SELECTED_OPTIMIZATION}"
 
-do_configure_prepend() {
+do_configure:prepend() {
     ${S}/autogen.sh
 }
 

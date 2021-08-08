@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "b838a895977b45ab6f0cc926a9045c8d1c44e2b653c1fcc39fe91f42c6
 
 DEPENDS += " ${PYTHON_PN}-gitdb"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
                    ${PYTHON_PN}-datetime \
                    ${PYTHON_PN}-gitdb \
                    ${PYTHON_PN}-io \

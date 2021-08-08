@@ -19,7 +19,7 @@ SRCREV = "1667b850a1ce38151dae17156276f981be6fb557"
 
 inherit update-rc.d systemd
 
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
 PACKAGECONFIG ??= "sensord"
 PACKAGECONFIG[sensord] = "sensord,,rrdtool"
@@ -28,19 +28,19 @@ INITSCRIPT_PACKAGES = "\
     ${PN}-fancontrol \
     ${@bb.utils.contains('PACKAGECONFIG', 'sensord', '${PN}-sensord', '', d)} \
     "
-INITSCRIPT_NAME_${PN}-fancontrol = "fancontrol"
-INITSCRIPT_NAME_${PN}-sensord = "sensord"
-INITSCRIPT_PARAMS_${PN}-fancontrol = "defaults 66"
-INITSCRIPT_PARAMS_${PN}-sensord = "defaults 67"
+INITSCRIPT_NAME:${PN}-fancontrol = "fancontrol"
+INITSCRIPT_NAME:${PN}-sensord = "sensord"
+INITSCRIPT_PARAMS:${PN}-fancontrol = "defaults 66"
+INITSCRIPT_PARAMS:${PN}-sensord = "defaults 67"
 
 SYSTEMD_PACKAGES = "\
     ${PN} \
     ${PN}-fancontrol \
     ${@bb.utils.contains('PACKAGECONFIG', 'sensord', '${PN}-sensord', '', d)} \
     "
-SYSTEMD_SERVICE_${PN} = "lm_sensors.service"
-SYSTEMD_SERVICE_${PN}-fancontrol = "fancontrol.service"
-SYSTEMD_SERVICE_${PN}-sensord = "sensord.service"
+SYSTEMD_SERVICE:${PN} = "lm_sensors.service"
+SYSTEMD_SERVICE:${PN}-fancontrol = "fancontrol.service"
+SYSTEMD_SERVICE:${PN}-sensord = "sensord.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 S = "${WORKDIR}/git"
@@ -85,10 +85,10 @@ do_install() {
     fi
 }
 
-RPROVIDES_${PN}-dbg += "${PN}-libsensors-dbg ${PN}-sensors-dbg ${PN}-sensord-dbg ${PN}-isatools-dbg"
+RPROVIDES:${PN}-dbg += "${PN}-libsensors-dbg ${PN}-sensors-dbg ${PN}-sensord-dbg ${PN}-isatools-dbg"
 
-ALLOW_EMPTY_${PN} = "1"
-RDEPENDS_${PN} += " \
+ALLOW_EMPTY:${PN} = "1"
+RDEPENDS:${PN} += " \
     ${PN}-libsensors \
     ${PN}-sensors \
     ${@bb.utils.contains('PACKAGECONFIG', 'sensord', '${PN}-sensord', '', d)} \
@@ -125,44 +125,44 @@ PACKAGES =+ "${PN}-isatools ${PN}-isatools-doc"
 
 
 # libsensors files
-FILES_${PN}-libsensors = "${libdir}/libsensors.so.* ${sysconfdir}/sensors3.conf ${sysconfdir}/sensors.d"
-FILES_${PN}-libsensors-dev = "${libdir}/libsensors.so ${includedir}"
-FILES_${PN}-libsensors-staticdev = "${libdir}/libsensors.a"
-FILES_${PN}-libsensors-doc = "${mandir}/man3"
-RRECOMMENDS_${PN}-libsensors = "lmsensors-config-libsensors"
+FILES:${PN}-libsensors = "${libdir}/libsensors.so.* ${sysconfdir}/sensors3.conf ${sysconfdir}/sensors.d"
+FILES:${PN}-libsensors-dev = "${libdir}/libsensors.so ${includedir}"
+FILES:${PN}-libsensors-staticdev = "${libdir}/libsensors.a"
+FILES:${PN}-libsensors-doc = "${mandir}/man3"
+RRECOMMENDS:${PN}-libsensors = "lmsensors-config-libsensors"
 
 # sensors command files
-FILES_${PN}-sensors = "${bindir}/sensors"
-FILES_${PN}-sensors-doc = "${mandir}/man1 ${mandir}/man5"
-RDEPENDS_${PN}-sensors = "${PN}-libsensors"
+FILES:${PN}-sensors = "${bindir}/sensors"
+FILES:${PN}-sensors-doc = "${mandir}/man1 ${mandir}/man5"
+RDEPENDS:${PN}-sensors = "${PN}-libsensors"
 
 # sensord logging daemon
-FILES_${PN}-sensord = "${sbindir}/sensord ${INIT_D_DIR}/sensord ${systemd_system_unitdir}/sensord.service"
-FILES_${PN}-sensord-doc = "${mandir}/man8/sensord.8"
-RDEPENDS_${PN}-sensord = "${PN}-sensors rrdtool"
-RRECOMMENDS_${PN}-sensord = "lmsensors-config-sensord"
+FILES:${PN}-sensord = "${sbindir}/sensord ${INIT_D_DIR}/sensord ${systemd_system_unitdir}/sensord.service"
+FILES:${PN}-sensord-doc = "${mandir}/man8/sensord.8"
+RDEPENDS:${PN}-sensord = "${PN}-sensors rrdtool"
+RRECOMMENDS:${PN}-sensord = "lmsensors-config-sensord"
 
 # fancontrol script files
-FILES_${PN}-fancontrol = "${sbindir}/fancontrol ${INIT_D_DIR}/fancontrol"
-FILES_${PN}-fancontrol-doc = "${mandir}/man8/fancontrol.8"
-RDEPENDS_${PN}-fancontrol = "bash"
-RRECOMMENDS_${PN}-fancontrol = "lmsensors-config-fancontrol"
+FILES:${PN}-fancontrol = "${sbindir}/fancontrol ${INIT_D_DIR}/fancontrol"
+FILES:${PN}-fancontrol-doc = "${mandir}/man8/fancontrol.8"
+RDEPENDS:${PN}-fancontrol = "bash"
+RRECOMMENDS:${PN}-fancontrol = "lmsensors-config-fancontrol"
 
 # sensors-detect script files
-FILES_${PN}-sensorsdetect = "${sbindir}/sensors-detect"
-FILES_${PN}-sensorsdetect-doc = "${mandir}/man8/sensors-detect.8"
-RDEPENDS_${PN}-sensorsdetect = "${PN}-sensors perl perl-modules"
+FILES:${PN}-sensorsdetect = "${sbindir}/sensors-detect"
+FILES:${PN}-sensorsdetect-doc = "${mandir}/man8/sensors-detect.8"
+RDEPENDS:${PN}-sensorsdetect = "${PN}-sensors perl perl-modules"
 
 # sensors-conf-convert script files
-FILES_${PN}-sensorsconfconvert = "${bindir}/sensors-conf-convert"
-FILES_${PN}-sensorsconfconvert-doc = "${mandir}/man8/sensors-conf-convert.8"
-RDEPENDS_${PN}-sensorsconfconvert = "${PN}-sensors perl perl-modules"
+FILES:${PN}-sensorsconfconvert = "${bindir}/sensors-conf-convert"
+FILES:${PN}-sensorsconfconvert-doc = "${mandir}/man8/sensors-conf-convert.8"
+RDEPENDS:${PN}-sensorsconfconvert = "${PN}-sensors perl perl-modules"
 
 # pwmconfig script files
-FILES_${PN}-pwmconfig = "${sbindir}/pwmconfig"
-FILES_${PN}-pwmconfig-doc = "${mandir}/man8/pwmconfig.8"
-RDEPENDS_${PN}-pwmconfig = "${PN}-fancontrol bash"
+FILES:${PN}-pwmconfig = "${sbindir}/pwmconfig"
+FILES:${PN}-pwmconfig-doc = "${mandir}/man8/pwmconfig.8"
+RDEPENDS:${PN}-pwmconfig = "${PN}-fancontrol bash"
 
 # isadump and isaset helper program files
-FILES_${PN}-isatools = "${sbindir}/isa*"
-FILES_${PN}-isatools-doc = "${mandir}/man8/isa*"
+FILES:${PN}-isatools = "${sbindir}/isa*"
+FILES:${PN}-isatools-doc = "${mandir}/man8/isa*"

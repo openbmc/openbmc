@@ -15,7 +15,7 @@ inherit autotools gettext texinfo pkgconfig
 # Fix "Argument list too long" error when len(TMPDIR) = 410
 acpaths = "-I ./m4"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	sed -i -e '1s,#!@SHELL@,#!/bin/sh,' ${S}/src/egrep.sh
 	rm -f ${S}/m4/init.m4
 }
@@ -38,7 +38,7 @@ PACKAGECONFIG[pcre] = "--enable-perl-regexp,--disable-perl-regexp,libpcre"
 
 ALTERNATIVE_PRIORITY = "100"
 
-ALTERNATIVE_${PN} = "grep egrep fgrep"
+ALTERNATIVE:${PN} = "grep egrep fgrep"
 ALTERNATIVE_LINK_NAME[grep] = "${base_bindir}/grep"
 ALTERNATIVE_LINK_NAME[egrep] = "${base_bindir}/egrep"
 ALTERNATIVE_LINK_NAME[fgrep] = "${base_bindir}/fgrep"

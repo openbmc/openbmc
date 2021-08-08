@@ -7,6 +7,6 @@ PACKAGEGROUP_DISABLE_COMPLEMENTARY = "1"
 
 GO = "go-cross-canadian-${TRANSLATED_TARGET_ARCH}"
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     ${@all_multilib_tune_values(d, 'GO')} \
 "

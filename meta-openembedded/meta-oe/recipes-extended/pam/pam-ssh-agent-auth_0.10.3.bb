@@ -21,7 +21,7 @@ REQUIRED_DISTRO_FEATURES = "pam"
 
 # This gets us ssh-agent, which we are almost certain to want.
 #
-RDEPENDS_${PN} += "openssh-misc"
+RDEPENDS:${PN} += "openssh-misc"
 
 # Kind of unfortunate to have underscores in the name.
 #
@@ -50,5 +50,5 @@ do_compile () {
 
 # This stuff is not any place looked at by default.
 #
-FILES_${PN} += "${base_libdir}/security/pam*"
-FILES_${PN}-dbg += "${base_libdir}/security/.debug"
+FILES:${PN} += "${base_libdir}/security/pam*"
+FILES:${PN}-dbg += "${base_libdir}/security/.debug"

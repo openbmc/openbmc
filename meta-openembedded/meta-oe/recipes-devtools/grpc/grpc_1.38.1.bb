@@ -7,13 +7,13 @@ LICENSE = "Apache-2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 DEPENDS = "c-ares protobuf protobuf-native protobuf-c protobuf-c-native openssl libnsl2 abseil-cpp re2"
-DEPENDS_append_class-target = " googletest grpc-native "
-DEPENDS_append_class-nativesdk = " grpc-native "
+DEPENDS:append:class-target = " googletest grpc-native "
+DEPENDS:append:class-nativesdk = " grpc-native "
 
 PACKAGE_BEFORE_PN = "${PN}-compiler"
 
-RDEPENDS_${PN}-compiler = "${PN}"
-RDEPENDS_${PN}-dev += "${PN}-compiler"
+RDEPENDS:${PN}-compiler = "${PN}"
+RDEPENDS:${PN}-dev += "${PN}-compiler"
 
 S = "${WORKDIR}/git"
 SRCREV_grpc = "96b73272eadc01afb5fb45b92b408c47e4387274"
@@ -21,7 +21,7 @@ BRANCH = "v1.38.x"
 SRC_URI = "git://github.com/grpc/grpc.git;protocol=https;name=grpc;branch=${BRANCH} \
            "
 # Fixes build with older compilers 4.8 especially on ubuntu 14.04
-CXXFLAGS_append_class-native = " -Wl,--no-as-needed"
+CXXFLAGS:append:class-native = " -Wl,--no-as-needed"
 
 inherit cmake pkgconfig
 
@@ -49,32 +49,32 @@ PACKAGECONFIG[python] = "-DgRPC_BUILD_GRPC_PYTHON_PLUGIN=ON,-DgRPC_BUILD_GRPC_PY
 PACKAGECONFIG[ruby] = "-DgRPC_BUILD_GRPC_RUBY_PLUGIN=ON,-DgRPC_BUILD_GRPC_RUBY_PLUGIN=OFF"
 PACKAGECONFIG[protobuf-lite] = "-DgRPC_USE_PROTO_LITE=ON,-DgRPC_USE_PROTO_LITE=OFF,protobuf-lite"
 
-do_configure_prepend() {
+do_configure:prepend() {
     sed -i -e "s#lib/pkgconfig/#${baselib}/pkgconfig/#g" ${S}/CMakeLists.txt
 }
 
-do_configure_prepend_mipsarch() {
+do_configure:prepend:mipsarch() {
     sed -i -e "s/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} rt m pthread)/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} atomic rt m pthread)/g" ${S}/CMakeLists.txt
 }
 
-do_configure_prepend_powerpc() {
+do_configure:prepend:powerpc() {
     sed -i -e "s/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} rt m pthread)/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} atomic rt m pthread)/g" ${S}/CMakeLists.txt
 }
 
-do_configure_prepend_riscv64() {
+do_configure:prepend:riscv64() {
     sed -i -e "s/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} rt m pthread)/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} atomic rt m pthread)/g" ${S}/CMakeLists.txt
 }
 
-do_configure_prepend_riscv32() {
+do_configure:prepend:riscv32() {
     sed -i -e "s/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} rt m pthread)/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} atomic rt m pthread)/g" ${S}/CMakeLists.txt
 }
 
-do_configure_prepend_toolchain-clang_x86() {
+do_configure:prepend:toolchain-clang:x86() {
     sed -i -e "s/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} rt m pthread)/set(_gRPC_ALLTARGETS_LIBRARIES \${CMAKE_DL_LIBS} atomic rt m pthread)/g" ${S}/CMakeLists.txt
 }
 
 BBCLASSEXTEND = "native nativesdk"
 
-SYSROOT_DIRS_BLACKLIST_append_class-target = " ${baselib}/cmake/grpc"
+SYSROOT_DIRS_BLACKLIST:append:class-target = " ${baselib}/cmake/grpc"
 
-FILES_${PN}-compiler += "${bindir}"
+FILES:${PN}-compiler += "${bindir}"

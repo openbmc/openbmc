@@ -14,9 +14,9 @@ inherit pypi setuptools3 python3native
 DISTUTILS_INSTALL_ARGS += " \
     --install-data=${datadir}/langtable"
 
-FILES_${PN} += "${datadir}/*"
+FILES:${PN} += "${datadir}/*"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-compression \
     ${PYTHON_PN}-doctest \
     ${PYTHON_PN}-logging \

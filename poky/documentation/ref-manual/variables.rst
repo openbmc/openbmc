@@ -256,7 +256,7 @@ system and gives an overview of their function and contents.
       To add a tune to the list, be sure to append it with spaces using the
       "+=" BitBake operator. Do not simply replace the list by using the
       "=" operator. See the
-      ":ref:`Basic Syntax <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:basic syntax>`" section in the BitBake
+      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:basic syntax`" section in the BitBake
       User Manual for more information.
 
    :term:`AZ_SAS`
@@ -762,8 +762,7 @@ system and gives an overview of their function and contents.
 
          export BBSERVER=localhost:$port
 
-      By default, :term:`BBSERVER` also appears in
-      :term:`bitbake:BB_HASHBASE_WHITELIST`.
+      By default, :term:`BBSERVER` also appears in :term:`BB_HASHBASE_WHITELIST`.
       Consequently, :term:`BBSERVER` is excluded from checksum and dependency
       data.
 
@@ -1472,6 +1471,18 @@ system and gives an overview of their function and contents.
          variable only in certain contexts (e.g. when building for kernel
          and kernel module recipes).
 
+   :term:`CVE_PRODUCT`
+      In a recipe, defines the name used to match the recipe name
+      against the name in the upstream `NIST CVE database <https://nvd.nist.gov/>`__.
+
+      The default is ${:term:`BPN`}. If it does not match the name in NIST CVE
+      database or matches with multiple entries in the database, the default
+      value needs to be changed.
+
+      Here is an example from the :oe_layerindex:`Berkeley DB recipe </layerindex/recipe/544>`::
+
+         CVE_PRODUCT = "oracle_berkeley_db berkeley_db"
+
    :term:`CVSDIR`
       The directory in which files checked out under the CVS system are
       stored.
@@ -1638,8 +1649,8 @@ system and gives an overview of their function and contents.
 
       For information on runtime dependencies, see the
       :term:`RDEPENDS` variable. You can also see the
-      ":ref:`Tasks <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:tasks>`" and
-      ":ref:`Dependencies <bitbake:bitbake-user-manual/bitbake-user-manual-execution:dependencies>`" sections in the
+      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:tasks`" and
+      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:dependencies`" sections in the
       BitBake User Manual for additional information on tasks and
       dependencies.
 
@@ -6105,8 +6116,8 @@ system and gives an overview of their function and contents.
 
       For information on build-time dependencies, see the
       :term:`DEPENDS` variable. You can also see the
-      ":ref:`Tasks <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:tasks>`" and
-      ":ref:`Dependencies <bitbake:bitbake-user-manual/bitbake-user-manual-execution:dependencies>`" sections in the
+      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:tasks`" and
+      ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:dependencies`" sections in the
       BitBake User Manual for additional information on tasks and
       dependencies.
 
@@ -6500,7 +6511,7 @@ system and gives an overview of their function and contents.
 
       - :term:`CONF_VERSION`
       - :term:`BB_NUMBER_THREADS`
-      - :term:`bitbake:BB_NUMBER_PARSE_THREADS`
+      - :term:`BB_NUMBER_PARSE_THREADS`
       - :term:`PARALLEL_MAKE`
       - :term:`PRSERV_HOST`
       - :term:`SSTATE_MIRRORS` :term:`DL_DIR`
@@ -6951,7 +6962,7 @@ system and gives an overview of their function and contents.
       protocols are highly dependent on particular BitBake Fetcher
       submodules. Depending on the fetcher BitBake uses, various URL
       parameters are employed. For specifics on the supported Fetchers, see
-      the ":ref:`Fetchers <bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`" section in the
+      the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers`" section in the
       BitBake User Manual.
 
       -  ``file://`` - Fetches files, which are usually files shipped

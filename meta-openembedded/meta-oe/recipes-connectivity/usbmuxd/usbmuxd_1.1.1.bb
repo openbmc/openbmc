@@ -17,6 +17,6 @@ S = "${WORKDIR}/git"
 
 EXTRA_OECONF += "--without-preflight"
 
-FILES_${PN} += "${base_libdir}/udev/rules.d/"
+FILES:${PN} += "${base_libdir}/udev/rules.d/"
 
-SYSTEMD_SERVICE_${PN} = "usbmuxd.service"
+SYSTEMD_SERVICE:${PN} = "usbmuxd.service"

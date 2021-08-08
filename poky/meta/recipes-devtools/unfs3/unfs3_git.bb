@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=9475885294e17c0cc0067820d042792e"
 
 DEPENDS = "flex-native bison-native flex"
 DEPENDS += "libtirpc"
-DEPENDS_append_class-nativesdk = " flex-nativesdk"
+DEPENDS:append:class-nativesdk = " flex-nativesdk"
 
 ASNEEDED = ""
 
@@ -35,9 +35,9 @@ PV = "0.9.22+${SRCPV}"
 BBCLASSEXTEND = "native nativesdk"
 
 inherit autotools
-EXTRA_OECONF_append_class-native = " --sbindir=${bindir}"
-CFLAGS_append = " -I${STAGING_INCDIR}/tirpc"
-EXTRA_OECONF_append = " LIBS=-ltirpc"
+EXTRA_OECONF:append:class-native = " --sbindir=${bindir}"
+CFLAGS:append = " -I${STAGING_INCDIR}/tirpc"
+EXTRA_OECONF:append = " LIBS=-ltirpc"
 
 # Turn off these header detects else the inode search
 # will walk entire file systems and this is a real problem

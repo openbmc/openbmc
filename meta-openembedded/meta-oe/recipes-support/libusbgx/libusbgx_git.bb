@@ -20,14 +20,14 @@ SRC_URI = " \
 S = "${WORKDIR}/git"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "usbgx.service"
+SYSTEMD_SERVICE:${PN} = "usbgx.service"
 
 INITSCRIPT_NAME = "usbgx"
 INITSCRIPT_PARAMS = "defaults"
 
 EXTRA_OECONF = "--includedir=${includedir}/usbgx"
 
-do_install_append() {
+do_install:append() {
     install -Dm 0755 ${WORKDIR}/gadget-start ${D}/${bindir}/gadget-start
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -Dm 0644 ${WORKDIR}/usbgx.service ${D}${systemd_system_unitdir}/usbgx.service
@@ -37,9 +37,9 @@ do_install_append() {
 	fi
 }
 
-RDEPENDS_${PN} += "libusbgx-config"
+RDEPENDS:${PN} += "libusbgx-config"
 
 ALTERNATIVE_PRIORITY = "90"
-ALTERNATIVE_${PN} = "gadget-acm-ecm show-gadgets"
+ALTERNATIVE:${PN} = "gadget-acm-ecm show-gadgets"
 ALTERNATIVE_LINK_NAME[gadget-acm-ecm] = "${bindir}/gadget-acm-ecm"
 ALTERNATIVE_LINK_NAME[show-gadgets] = "${bindir}/show-gadgets"

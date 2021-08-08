@@ -28,13 +28,13 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 EXTRA_OECONF = "--with-gtk=3"
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}/${datadir}
 	install -d ${D}/${datadir}/pixmaps/
 
 	install -m 0644 ${WORKDIR}/*.png ${D}/${datadir}/pixmaps
 }
 
-FILES_${PN} += "${libdir}/pcmanfm"
+FILES:${PN} += "${libdir}/pcmanfm"
 
-RRECOMMENDS_${PN} += "adwaita-icon-theme"
+RRECOMMENDS:${PN} += "adwaita-icon-theme"

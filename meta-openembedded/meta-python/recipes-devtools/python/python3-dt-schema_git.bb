@@ -12,4 +12,4 @@ PV = "0.1+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-RDEPENDS_${PN} = "python3-jsonschema python3-ruamel-yaml"
+RDEPENDS:${PN} = "python3-jsonschema python3-ruamel-yaml"

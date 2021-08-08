@@ -140,15 +140,15 @@ PACKAGECONFIG[dyngroup] = "--enable-dyngroup=mod,--enable-dyngroup=no,"
 
 #--enable-proxycache   Proxy Cache overlay no|yes|mod no
 PACKAGECONFIG[proxycache] = "--enable-proxycache=mod,--enable-proxycache=no,"
-FILES_${PN}-overlay-proxycache = "${md}/pcache-*.so.*"
+FILES:${PN}-overlay-proxycache = "${md}/pcache-*.so.*"
 PACKAGES += "${PN}-overlay-proxycache"
 
 # Append URANDOM_DEVICE='/dev/urandom' to CPPFLAGS:
 # This allows tls to obtain random bits from /dev/urandom, by default
 # it was disabled for cross-compiling.
-CPPFLAGS_append = " -D_GNU_SOURCE -DURANDOM_DEVICE=\'/dev/urandom\' -fPIC"
+CPPFLAGS:append = " -D_GNU_SOURCE -DURANDOM_DEVICE=\'/dev/urandom\' -fPIC"
 
-LDFLAGS_append = " -pthread"
+LDFLAGS:append = " -pthread"
 
 do_configure() {
     rm -f ${S}/libtool
@@ -170,16 +170,16 @@ LEAD_SONAME = "libldap-${LDAP_VER}.so.*"
 PACKAGES += "${PN}-slapd ${PN}-slurpd ${PN}-bin"
 
 # Package contents - shift most standard contents to -bin
-FILES_${PN} = "${libdir}/lib*.so.* ${sysconfdir}/openldap/ldap.* ${localstatedir}/${BPN}/data"
-FILES_${PN}-slapd = "${sysconfdir}/init.d ${libexecdir}/slapd ${sbindir} ${localstatedir}/run ${localstatedir}/volatile/run \
+FILES:${PN} = "${libdir}/lib*.so.* ${sysconfdir}/openldap/ldap.* ${localstatedir}/${BPN}/data"
+FILES:${PN}-slapd = "${sysconfdir}/init.d ${libexecdir}/slapd ${sbindir} ${localstatedir}/run ${localstatedir}/volatile/run \
     ${sysconfdir}/openldap/slapd.* ${sysconfdir}/openldap/schema \
     ${sysconfdir}/openldap/DB_CONFIG.example ${systemd_unitdir}/system/*"
-FILES_${PN}-slurpd = "${libexecdir}/slurpd ${localstatedir}/openldap-slurp"
-FILES_${PN}-bin = "${bindir}"
-FILES_${PN}-dev = "${includedir} ${libdir}/lib*.so ${libdir}/*.la ${libexecdir}/openldap/*.a ${libexecdir}/openldap/*.la ${libexecdir}/openldap/*.so"
-FILES_${PN}-dbg += "${libexecdir}/openldap/.debug"
+FILES:${PN}-slurpd = "${libexecdir}/slurpd ${localstatedir}/openldap-slurp"
+FILES:${PN}-bin = "${bindir}"
+FILES:${PN}-dev = "${includedir} ${libdir}/lib*.so ${libdir}/*.la ${libexecdir}/openldap/*.a ${libexecdir}/openldap/*.la ${libexecdir}/openldap/*.so"
+FILES:${PN}-dbg += "${libexecdir}/openldap/.debug"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}/init.d
     cat ${WORKDIR}/initscript > ${D}${sysconfdir}/init.d/openldap
     chmod 755 ${D}${sysconfdir}/init.d/openldap
@@ -215,40 +215,40 @@ do_install_append() {
 }
 
 INITSCRIPT_PACKAGES = "${PN}-slapd"
-INITSCRIPT_NAME_${PN}-slapd = "openldap"
-INITSCRIPT_PARAMS_${PN}-slapd = "defaults"
-SYSTEMD_SERVICE_${PN}-slapd = "hostapd.service"
-SYSTEMD_AUTO_ENABLE_${PN}-slapd ?= "disable"
+INITSCRIPT_NAME:${PN}-slapd = "openldap"
+INITSCRIPT_PARAMS:${PN}-slapd = "defaults"
+SYSTEMD_SERVICE:${PN}-slapd = "hostapd.service"
+SYSTEMD_AUTO_ENABLE:${PN}-slapd ?= "disable"
 
 
 PACKAGES_DYNAMIC += "^${PN}-backends.* ^${PN}-backend-.*"
 
 # The modules require their .so to be dynamicaly loaded
-INSANE_SKIP_${PN}-backend-dnssrv  += "dev-so"
-INSANE_SKIP_${PN}-backend-ldap    += "dev-so"
-INSANE_SKIP_${PN}-backend-meta    += "dev-so"
-INSANE_SKIP_${PN}-backend-mdb     += "dev-so"
-INSANE_SKIP_${PN}-backend-monitor += "dev-so"
-INSANE_SKIP_${PN}-backend-null    += "dev-so"
-INSANE_SKIP_${PN}-backend-passwd  += "dev-so"
-INSANE_SKIP_${PN}-backend-shell   += "dev-so"
+INSANE_SKIP:${PN}-backend-dnssrv  += "dev-so"
+INSANE_SKIP:${PN}-backend-ldap    += "dev-so"
+INSANE_SKIP:${PN}-backend-meta    += "dev-so"
+INSANE_SKIP:${PN}-backend-mdb     += "dev-so"
+INSANE_SKIP:${PN}-backend-monitor += "dev-so"
+INSANE_SKIP:${PN}-backend-null    += "dev-so"
+INSANE_SKIP:${PN}-backend-passwd  += "dev-so"
+INSANE_SKIP:${PN}-backend-shell   += "dev-so"
 
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     backend_dir    = d.expand('${libexecdir}/openldap')
     do_split_packages(d, backend_dir, 'back_([a-z]*)\.so$', 'openldap-backend-%s', 'OpenLDAP %s backend', prepend=True, extra_depends='', allow_links=True)
     do_split_packages(d, backend_dir, 'back_([a-z]*)\-.*\.so\..*$', 'openldap-backend-%s', 'OpenLDAP %s backend', extra_depends='', allow_links=True)
 
     metapkg = "${PN}-backends"
-    d.setVar('ALLOW_EMPTY_' + metapkg, "1")
-    d.setVar('FILES_' + metapkg, "")
+    d.setVar('ALLOW_EMPTY:' + metapkg, "1")
+    d.setVar('FILES:' + metapkg, "")
     metapkg_rdepends = []
     packages = d.getVar('PACKAGES').split()
     for pkg in packages[1:]:
         if pkg.count("openldap-backend-") and not pkg in metapkg_rdepends and not pkg.count("-dev") and not pkg.count("-dbg") and not pkg.count("static") and not pkg.count("locale"):
             metapkg_rdepends.append(pkg)
-    d.setVar('RDEPENDS_' + metapkg, ' '.join(metapkg_rdepends))
-    d.setVar('DESCRIPTION_' + metapkg, 'OpenLDAP backends meta package')
+    d.setVar('RDEPENDS:' + metapkg, ' '.join(metapkg_rdepends))
+    d.setVar('DESCRIPTION:' + metapkg, 'OpenLDAP backends meta package')
     packages.append(metapkg)
     d.setVar('PACKAGES', ' '.join(packages))
 }

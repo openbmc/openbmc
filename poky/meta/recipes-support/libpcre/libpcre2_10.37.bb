@@ -33,20 +33,20 @@ EXTRA_OECONF = "\
     --enable-pcre2-32 \
 "
 CFLAGS += "-D_REENTRANT"
-CXXFLAGS_append_powerpc = " -lstdc++"
+CXXFLAGS:append:powerpc = " -lstdc++"
 
 PACKAGES =+ "libpcre2-16 libpcre2-32 pcre2grep pcre2grep-doc pcre2test pcre2test-doc"
 
-SUMMARY_pcre2grep = "grep utility that uses perl 5 compatible regexes"
-SUMMARY_pcre2grep-doc = "grep utility that uses perl 5 compatible regexes - docs"
-SUMMARY_pcre2test = "program for testing Perl-comatible regular expressions"
-SUMMARY_pcre2test-doc = "program for testing Perl-comatible regular expressions - docs"
+SUMMARY:pcre2grep = "grep utility that uses perl 5 compatible regexes"
+SUMMARY:pcre2grep-doc = "grep utility that uses perl 5 compatible regexes - docs"
+SUMMARY:pcre2test = "program for testing Perl-comatible regular expressions"
+SUMMARY:pcre2test-doc = "program for testing Perl-comatible regular expressions - docs"
 
-FILES_libpcre2-16 = "${libdir}/libpcre2-16.so.*"
-FILES_libpcre2-32 = "${libdir}/libpcre2-32.so.*"
-FILES_pcre2grep = "${bindir}/pcre2grep"
-FILES_pcre2grep-doc = "${mandir}/man1/pcre2grep.1"
-FILES_pcre2test = "${bindir}/pcre2test"
-FILES_pcre2test-doc = "${mandir}/man1/pcre2test.1"
+FILES:libpcre2-16 = "${libdir}/libpcre2-16.so.*"
+FILES:libpcre2-32 = "${libdir}/libpcre2-32.so.*"
+FILES:pcre2grep = "${bindir}/pcre2grep"
+FILES:pcre2grep-doc = "${mandir}/man1/pcre2grep.1"
+FILES:pcre2test = "${bindir}/pcre2test"
+FILES:pcre2test-doc = "${mandir}/man1/pcre2test.1"
 
 BBCLASSEXTEND = "native nativesdk"

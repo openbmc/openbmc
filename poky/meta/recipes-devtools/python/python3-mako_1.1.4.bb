@@ -10,7 +10,7 @@ inherit pypi setuptools3
 
 SRC_URI[sha256sum] = "17831f0b7087c313c0ffae2bcbbd3c1d5ba9eeac9c38f2eb7b50e8c99fe9d5ab"
 
-RDEPENDS_${PN} = "${PYTHON_PN}-html \
+RDEPENDS:${PN} = "${PYTHON_PN}-html \
                   ${PYTHON_PN}-netclient \
                   ${PYTHON_PN}-threading \
 "

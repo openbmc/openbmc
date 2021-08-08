@@ -9,4 +9,4 @@ SRC_URI[sha256sum] = "a70dfc9d52de9fc1a886128b9148c89dd9e76b67d55f46516ca94d2d73
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += " python3-dateutil python3-natsort"
+RDEPENDS:${PN} += " python3-dateutil python3-natsort"

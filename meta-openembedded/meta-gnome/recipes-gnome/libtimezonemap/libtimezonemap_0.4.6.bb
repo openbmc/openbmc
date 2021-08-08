@@ -16,6 +16,6 @@ inherit features_check autotools pkgconfig gobject-introspection
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	(cd ${S}; NOCONFIGURE="yes" . ${S}/autogen.sh)
 }

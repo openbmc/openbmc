@@ -15,7 +15,7 @@ do_install() {
     install -m 0644 ${WORKDIR}/classic-light.xml ${D}${datadir}/gtksourceview-4/styles/
 }
 
-FILES_${PN} = " \
+FILES:${PN} = " \
     ${datadir}/gtksourceview-3.0/styles \
     ${datadir}/gtksourceview-4/styles \
 "

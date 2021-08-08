@@ -9,7 +9,7 @@ PYPI_PACKAGE = "MarkupSafe"
 inherit pypi setuptools3
 inherit ${@bb.utils.filter('DISTRO_FEATURES', 'ptest', d)}
 
-RDEPENDS_${PN} += "${PYTHON_PN}-stringold"
+RDEPENDS:${PN} += "${PYTHON_PN}-stringold"
 
 BBCLASSEXTEND = "native nativesdk"
 
@@ -17,7 +17,7 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 "
 

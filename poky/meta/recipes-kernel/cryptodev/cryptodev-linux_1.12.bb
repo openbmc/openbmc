@@ -9,5 +9,5 @@ do_install() {
 	install -D ${S}/crypto/cryptodev.h ${D}${includedir}/crypto/cryptodev.h
 }
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 BBCLASSEXTEND = "native nativesdk"

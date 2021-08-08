@@ -9,7 +9,7 @@ DEPENDS = "flex-native bison-native"
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.src.tar.gz \
            file://0001-build-don-t-look-for-Iconv.patch \
 "
-SRC_URI_append_class-native = " file://doxygen-native-only-check-python3.patch"
+SRC_URI:append:class-native = " file://doxygen-native-only-check-python3.patch"
 SRC_URI[sha256sum] = "67aeae1be4e1565519898f46f1f7092f1973cce8a767e93101ee0111717091d1"
 
 inherit cmake python3native

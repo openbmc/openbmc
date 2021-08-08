@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c9a6829fcd174d9535b46211917c7671"
 
 SRC_URI[sha256sum] = "5882ed9092b391bb8f6e91f59bcdbd748924ff556bb7c634089d5519be87baa0"
 
-do_install_append() {
+do_install:append() {
     perm_files=`find "${D}${PYTHON_SITEPACKAGES_DIR}/" -name "*.txt" -o -name "PKG-INFO"`
     for f in $perm_files; do
         chmod 644 "${f}"
@@ -24,13 +24,13 @@ SRC_URI += " \
 
 DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
 	${PYTHON_PN}-math \
 	${PYTHON_PN}-html \
 	${PYTHON_PN}-wcwidth \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     ${PYTHON_PN}-pytest \
     ${PYTHON_PN}-sqlite3 \
 "

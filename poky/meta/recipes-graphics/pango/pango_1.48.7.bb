@@ -33,22 +33,22 @@ PACKAGECONFIG[thai] = ",,libthai"
 
 GIR_MESON_OPTION = 'introspection'
 
-do_configure_prepend() {
+do_configure:prepend() {
     chmod +x ${S}/tests/*.py
 }
 
-do_configure_prepend_toolchain-clang() {
+do_configure:prepend:toolchain-clang() {
     sed -i -e "/Werror=implicit-fallthrough/d" ${S}/meson.build
 }
 
 LEAD_SONAME = "libpango-1.0*"
 
-FILES_${PN} = "${bindir}/* ${libdir}/libpango*${SOLIBS}"
+FILES:${PN} = "${bindir}/* ${libdir}/libpango*${SOLIBS}"
 
-RDEPENDS_${PN}-ptest += "cantarell-fonts"
-RDEPENDS_${PN}-ptest_append_libc-glibc = " locale-base-en-us"
+RDEPENDS:${PN}-ptest += "cantarell-fonts"
+RDEPENDS:${PN}-ptest:append:libc-glibc = " locale-base-en-us"
 
-RPROVIDES_${PN} += "pango-modules pango-module-indic-lang \
+RPROVIDES:${PN} += "pango-modules pango-module-indic-lang \
                     pango-module-basic-fc pango-module-arabic-lang"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -1,0 +1,26 @@
+From ef5a8b9eda402e4e96c4e3ce01e7ff95d3e10470 Mon Sep 17 00:00:00 2001
+From: Du Zhe <duzhe0211+sourceware@gmail.com>
+Date: Tue, 13 Jul 2021 19:11:55 -0400
+Subject: [PATCH] runtime: fix unintended compile error with
+ autoconf-x86-uniregs.c
+
+Adding a #include <linux/sched.h> restores this test on the gentoo
+linux-5.10.47-gentoo kernel.
+
+Upstream-Status: Backport
+---
+ runtime/linux/autoconf-x86-uniregs.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/runtime/linux/autoconf-x86-uniregs.c b/runtime/linux/autoconf-x86-uniregs.c
+index 25729c220..232c18670 100644
+--- a/runtime/linux/autoconf-x86-uniregs.c
++++ b/runtime/linux/autoconf-x86-uniregs.c
+@@ -1,3 +1,4 @@
++#include <linux/sched.h>
+ #include <asm/ptrace.h>
+ 
+ #if defined (__i386__) || defined (__x86_64__)
+-- 
+2.27.0
+

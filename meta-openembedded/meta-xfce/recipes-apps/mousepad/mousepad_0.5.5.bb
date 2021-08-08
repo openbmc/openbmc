@@ -14,7 +14,7 @@ SRC_URI[sha256sum] = "40c35f00e0e10df50a59bd0dbba9007d2fb5574ed8a2aa73b0fc5ef40e
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[spell] = "--enable-plugin-gspell,--disable-plugin-gspell,gspell"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/glib-2.0/schemas \
     ${datadir}/metainfo \
     ${datadir}/polkit-1 \

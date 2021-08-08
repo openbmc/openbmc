@@ -13,7 +13,7 @@ SRC_URI[sha256sum] = "c8f04d2e78951eaa9de486b4d49381704e8943d0a6e6e58f55fcd7b858
 PYPI_PACKAGE = "PyBluez"
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     bluez5 \
     ${PYTHON_PN}-fcntl \
 "

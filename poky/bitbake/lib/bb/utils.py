@@ -1178,7 +1178,7 @@ def edit_metadata(meta_lines, variables, varfunc, match_overrides=False):
         variables: a list of variable names to look for. Functions
             may also be specified, but must be specified with '()' at
             the end of the name. Note that the function doesn't have
-            any intrinsic understanding of _append, _prepend, _remove,
+            any intrinsic understanding of :append, :prepend, :remove,
             or overrides, so these are considered as part of the name.
             These values go into a regular expression, so regular
             expression syntax is allowed.

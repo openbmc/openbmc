@@ -14,9 +14,9 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[jpeg] = "-DJAS_ENABLE_LIBJPEG=true, -DJAS_ENABLE_LIBJPEG=false, jpeg"
 PACKAGECONFIG[opengl] = "-DJAS_ENABLE_OPENGL=true, -DJAS_ENABLE_OPENGL=false, freeglut"
 
-EXTRA_OECMAKE_append = " -DJAS_ENABLE_SHARED=true"
+EXTRA_OECMAKE:append = " -DJAS_ENABLE_SHARED=true"
 
-do_install_append() {
+do_install:append() {
     chrpath -d ${D}${bindir}/jasper
     chrpath -d ${D}${bindir}/imginfo
     chrpath -d ${D}${bindir}/imgcmp

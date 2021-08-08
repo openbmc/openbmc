@@ -34,18 +34,18 @@ PACKAGECONFIG[x11] = "--with-x,--without-x,virtual/libx11 libxext libxv"
 
 PACKAGES = "mpeg2dec-dbg mpeg2dec mpeg2dec-doc libmpeg2 libmpeg2-dev libmpeg2convert libmpeg2convert-dev libmpeg2-staticdev libmpeg2convert-staticdev"
 
-FILES_${PN} = "${bindir}/*"
-FILES_libmpeg2 = "${libdir}/libmpeg2.so.*"
-FILES_libmpeg2convert = "${libdir}/libmpeg2convert.so.*"
-FILES_libmpeg2-dev = "${libdir}/libmpeg2.so \
+FILES:${PN} = "${bindir}/*"
+FILES:libmpeg2 = "${libdir}/libmpeg2.so.*"
+FILES:libmpeg2convert = "${libdir}/libmpeg2convert.so.*"
+FILES:libmpeg2-dev = "${libdir}/libmpeg2.so \
                       ${libdir}/libmpeg2.la \
                       ${libdir}/libmpeg2arch.la \
                       ${libdir}/pkgconfig/libmpeg2.pc \
                       ${includedir}/mpeg2dec/mpeg2.h"
-FILES_libmpeg2-staticdev = "${libdir}/libmpeg2.a"
-FILES_libmpeg2convert-dev = "${libdir}/libmpeg2convert.so \
+FILES:libmpeg2-staticdev = "${libdir}/libmpeg2.a"
+FILES:libmpeg2convert-dev = "${libdir}/libmpeg2convert.so \
                              ${libdir}/libmpeg2convert.la \
                              ${libdir}/libmpeg2convertarch.la \
                              ${libdir}/pkgconfig/libmpeg2convert.pc \
                              ${includedir}/mpeg2dec/mpeg2convert.h"
-FILES_libmpeg2convert-staticdev = "${libdir}/libmpeg2convert.a"
+FILES:libmpeg2convert-staticdev = "${libdir}/libmpeg2convert.a"

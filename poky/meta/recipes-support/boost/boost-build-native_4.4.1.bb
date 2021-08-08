@@ -24,4 +24,4 @@ do_install() {
 }
 
 # The build is either release mode (pre-stripped) or debug (-O0).
-INSANE_SKIP_${PN} = "already-stripped"
+INSANE_SKIP:${PN} = "already-stripped"

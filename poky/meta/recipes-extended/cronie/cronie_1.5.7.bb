@@ -39,11 +39,11 @@ INITSCRIPT_NAME = "crond"
 INITSCRIPT_PARAMS = "start 90 2 3 4 5 . stop 60 0 1 6 ."
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system crontab"
+GROUPADD_PARAM:${PN} = "--system crontab"
 
-SYSTEMD_SERVICE_${PN} = "crond.service"
+SYSTEMD_SERVICE:${PN} = "crond.service"
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}${sysconfdir}/sysconfig/
 	install -d ${D}${sysconfdir}/init.d/
 	install -m 0644 ${S}/crond.sysconfig ${D}${sysconfdir}/sysconfig/crond
@@ -79,5 +79,5 @@ do_install_append () {
 	chmod 600 ${D}${sysconfdir}/crontab
 }
 
-FILES_${PN} += "${sysconfdir}/cron*"
-CONFFILES_${PN} += "${sysconfdir}/crontab"
+FILES:${PN} += "${sysconfdir}/cron*"
+CONFFILES:${PN} += "${sysconfdir}/crontab"

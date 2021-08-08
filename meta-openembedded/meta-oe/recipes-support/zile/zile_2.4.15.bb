@@ -14,12 +14,12 @@ SRC_URI[sha256sum] = "39c300a34f78c37ba67793cf74685935a15568e14237a3a66fda8fcf40
 
 inherit autotools pkgconfig
 
-do_install_append() {
+do_install:append() {
     rm -rf ${D}${libdir}/charset.alias
     rmdir --ignore-fail-on-non-empty ${D}${libdir} || true
 }
 
 PACKAGECONFIG ??= ""
-PACKAGECONFIG_append = " ${@bb.utils.filter('DISTRO_FEATURES', 'acl', d)}"
+PACKAGECONFIG:append = " ${@bb.utils.filter('DISTRO_FEATURES', 'acl', d)}"
 
 PACKAGECONFIG[acl] = "--enable-acl,--disable-acl,acl,"

@@ -9,7 +9,7 @@ PYPI_PACKAGE = "argcomplete"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-core \
     ${PYTHON_PN}-io \
 "

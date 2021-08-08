@@ -45,27 +45,27 @@ EXTRA_OECONF = "\
 
 # glibc version is a minimum controlling whether features are enabled. 
 # Doesn't need to track glibc exactly
-EXTRA_OECONF_append_libc-glibc = " --with-glibc-version=2.28 "
+EXTRA_OECONF:append:libc-glibc = " --with-glibc-version=2.28 "
 
 # Set this here since GCC configure won't auto-detect and enable
 # initfini-arry when cross compiling.
-EXTRA_OECONF_append = " --enable-initfini-array"
+EXTRA_OECONF:append = " --enable-initfini-array"
 
 export gcc_cv_collect2_libs = 'none required'
 # We need to set gcc_cv_collect2_libs else there is cross-compilation badness
 # in the config.log files (which might not get generated until do_compile
 # hence being missed by the insane do_configure check).
 
-EXTRA_OECONF_append_linux = " --enable-__cxa_atexit"
+EXTRA_OECONF:append:linux = " --enable-__cxa_atexit"
 
-EXTRA_OECONF_append_mips64 = " --with-abi=64 --with-arch-64=mips64 --with-tune-64=mips64"
-EXTRA_OECONF_append_mips64el = " --with-abi=64 --with-arch-64=mips64 --with-tune-64=mips64"
-EXTRA_OECONF_append_mips64n32 = " --with-abi=64 --with-arch-64=mips64 --with-tune-64=mips64"
-EXTRA_OECONF_append_mips64eln32 = " --with-abi=64 --with-arch-64=mips64 --with-tune-64=mips64"
-EXTRA_OECONF_append_mipsisa32r6el = " --with-abi=32 --with-arch=mips32r6"
-EXTRA_OECONF_append_mipsisa32r6 = " --with-abi=32 --with-arch=mips32r6"
-EXTRA_OECONF_append_mipsisa64r6el = " --with-abi=64 --with-arch-64=mips64r6"
-EXTRA_OECONF_append_mipsisa64r6 = " --with-abi=64 --with-arch-64=mips64r6"
+EXTRA_OECONF:append:mips64 = " --with-abi=64 --with-arch-64=mips64 --with-tune-64=mips64"
+EXTRA_OECONF:append:mips64el = " --with-abi=64 --with-arch-64=mips64 --with-tune-64=mips64"
+EXTRA_OECONF:append:mips64n32 = " --with-abi=64 --with-arch-64=mips64 --with-tune-64=mips64"
+EXTRA_OECONF:append:mips64eln32 = " --with-abi=64 --with-arch-64=mips64 --with-tune-64=mips64"
+EXTRA_OECONF:append:mipsisa32r6el = " --with-abi=32 --with-arch=mips32r6"
+EXTRA_OECONF:append:mipsisa32r6 = " --with-abi=32 --with-arch=mips32r6"
+EXTRA_OECONF:append:mipsisa64r6el = " --with-abi=64 --with-arch-64=mips64r6"
+EXTRA_OECONF:append:mipsisa64r6 = " --with-abi=64 --with-arch-64=mips64r6"
 
 EXTRA_OECONF_GCC_FLOAT ??= ""
 CPPFLAGS = ""
@@ -74,7 +74,7 @@ SYSTEMHEADERS = "${target_includedir}"
 SYSTEMLIBS = "${target_base_libdir}/"
 SYSTEMLIBS1 = "${target_libdir}/"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	# teach gcc to find correct target includedir when checking libc ssp support
 	mkdir -p ${B}/gcc
 	echo "NATIVE_SYSTEM_HEADER_DIR = ${SYSTEMHEADERS}" > ${B}/gcc/t-oe

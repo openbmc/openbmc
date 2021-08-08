@@ -7,9 +7,9 @@ inherit python3-dir
 
 PACKAGE_BEFORE_PN = "${PN}-compiler ${PN}-${PYTHON_PN}"
 
-RDEPENDS_${PN}-compiler = "${PN}"
-RDEPENDS_${PN}-${PYTHON_PN} = "${PN}"
-RDEPENDS_${PN}-dev += "${PN}-compiler"
+RDEPENDS:${PN}-compiler = "${PN}"
+RDEPENDS:${PN}-${PYTHON_PN} = "${PN}"
+RDEPENDS:${PN}-dev += "${PN}-compiler"
 
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
@@ -31,13 +31,13 @@ EXTRA_OECMAKE += "\
 
 inherit cmake
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${PYTHON_SITEPACKAGES_DIR}
     cp -rf ${S}/python/flatbuffers ${D}${PYTHON_SITEPACKAGES_DIR}
 }
 
-FILES_${PN}-compiler = "${bindir}"
+FILES:${PN}-compiler = "${bindir}"
 
-FILES_${PN}-${PYTHON_PN} = "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN}-${PYTHON_PN} = "${PYTHON_SITEPACKAGES_DIR}"
 
 BBCLASSEXTEND = "native nativesdk"

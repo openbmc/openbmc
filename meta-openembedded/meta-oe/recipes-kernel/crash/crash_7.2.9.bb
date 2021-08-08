@@ -38,13 +38,13 @@ UPSTREAM_CHECK_URI = "https://github.com/crash-utility/crash/releases"
 inherit gettext
 
 BBCLASSEXTEND = "native cross"
-TARGET_CC_ARCH_append = " ${SELECTED_OPTIMIZATION}"
+TARGET_CC_ARCH:append = " ${SELECTED_OPTIMIZATION}"
 
 # crash 7.1.3 and before don't support mips64/riscv64
-COMPATIBLE_HOST_riscv64 = "null"
-COMPATIBLE_HOST_riscv32 = "null"
-COMPATIBLE_HOST_mipsarchn64 = "null"
-COMPATIBLE_HOST_mipsarchn32 = "null"
+COMPATIBLE_HOST:riscv64 = "null"
+COMPATIBLE_HOST:riscv32 = "null"
+COMPATIBLE_HOST:mipsarchn64 = "null"
+COMPATIBLE_HOST:mipsarchn32 = "null"
 
 
 EXTRA_OEMAKE = 'RPMPKG="${PV}" \
@@ -54,20 +54,20 @@ EXTRA_OEMAKE = 'RPMPKG="${PV}" \
                 LDFLAGS="${LDFLAGS}" \
                 '
 
-EXTRA_OEMAKE_class-cross = 'RPMPKG="${PV}" \
+EXTRA_OEMAKE:class-cross = 'RPMPKG="${PV}" \
                             GDB_TARGET="${BUILD_SYS} --target=${TARGET_SYS}" \
                             GDB_HOST="${BUILD_SYS}" \
                             GDB_MAKE_JOBS="${PARALLEL_MAKE}" \
                             '
 
-EXTRA_OEMAKE_append_class-native = " LDFLAGS='${BUILD_LDFLAGS}'"
-EXTRA_OEMAKE_append_class-cross = " LDFLAGS='${BUILD_LDFLAGS}'"
+EXTRA_OEMAKE:append:class-native = " LDFLAGS='${BUILD_LDFLAGS}'"
+EXTRA_OEMAKE:append:class-cross = " LDFLAGS='${BUILD_LDFLAGS}'"
 
 do_configure() {
     :
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
     case ${TARGET_ARCH} in
         aarch64*)    ARCH=ARM64 ;;
         arm*)        ARCH=ARM ;;
@@ -87,7 +87,7 @@ do_compile() {
     oe_runmake ${EXTRA_OEMAKE} RECIPE_SYSROOT=${RECIPE_SYSROOT}
 }
 
-do_install_prepend () {
+do_install:prepend () {
     install -d ${D}${bindir}
     install -d ${D}/${mandir}/man8
     install -d ${D}${includedir}/crash
@@ -96,25 +96,25 @@ do_install_prepend () {
     install -m 0644 ${S}/defs.h ${D}${includedir}/crash
 }
 
-do_install_class-target () {
+do_install:class-target () {
     oe_runmake DESTDIR=${D} install
 }
 
-do_install_class-native () {
+do_install:class-native () {
     oe_runmake DESTDIR=${D}${STAGING_DIR_NATIVE} install
 }
 
-do_install_class-cross () {
+do_install:class-cross () {
     install -m 0755 ${S}/crash ${D}/${bindir}
 }
 
-RDEPENDS_${PN} += "liblzma"
-RDEPENDS_${PN}_class-native = ""
-RDEPENDS_${PN}_class-cross = ""
+RDEPENDS:${PN} += "liblzma"
+RDEPENDS:${PN}:class-native = ""
+RDEPENDS:${PN}:class-cross = ""
 
 # Causes gcc to get stuck and eat all available memory in qemuarm builds
 # jenkins  15161  100 12.5 10389596 10321284 ?   R    11:40  28:17 /home/jenkins/oe/world/shr-core/tmp-glibc/sysroots/x86_64-linux/usr/libexec/arm-oe-linux-gnueabi/gcc/arm-oe-linux-gnueabi/4.9.2/cc1 -quiet -I . -I . -I ./common -I ./config -I ./../include/opcode -I ./../opcodes/.. -I ./../readline/.. -I ../bfd -I ./../bfd -I ./../include -I ../libdecnumber -I ./../libdecnumber -I ./gnulib/import -I build-gnulib/import -isysroot /home/jenkins/oe/world/shr-core/tmp-glibc/sysroots/qemuarm -MMD eval.d -MF .deps/eval.Tpo -MP -MT eval.o -D LOCALEDIR="/usr/local/share/locale" -D CRASH_MERGE -D HAVE_CONFIG_H -D TUI=1 eval.c -quiet -dumpbase eval.c -march=armv5te -mthumb -mthumb-interwork -mtls-dialect=gnu -auxbase-strip eval.o -g -O2 -Wall -Wpointer-arith -Wformat-nonliteral -Wno-pointer-sign -Wno-unused -Wunused-value -Wunused-function -Wno-switch -Wno-char-subscripts -Wmissing-prototypes -Wdeclaration-after-statement -Wempty-body -feliminate-unused-debug-types -o -
 ARM_INSTRUCTION_SET = "arm"
 
 # http://errors.yoctoproject.org/Errors/Details/186964/
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'

@@ -11,7 +11,7 @@ PACKAGES = "${PN}  \
     packagegroup-${PN} \
 "
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     init-ifupdown \
     ${VIRTUAL-RUNTIME_base-utils-syslog} \
     sudo \

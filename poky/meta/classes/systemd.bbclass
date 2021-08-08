@@ -1,9 +1,9 @@
 # The list of packages that should have systemd packaging scripts added.  For
-# each entry, optionally have a SYSTEMD_SERVICE_[package] that lists the service
+# each entry, optionally have a SYSTEMD_SERVICE:[package] that lists the service
 # files in this package.  If this variable isn't set, [package].service is used.
 SYSTEMD_PACKAGES ?= "${PN}"
-SYSTEMD_PACKAGES_class-native ?= ""
-SYSTEMD_PACKAGES_class-nativesdk ?= ""
+SYSTEMD_PACKAGES:class-native ?= ""
+SYSTEMD_PACKAGES:class-nativesdk ?= ""
 
 # Whether to enable or disable the services on installation.
 SYSTEMD_AUTO_ENABLE ??= "enable"
@@ -70,7 +70,7 @@ python systemd_populate_packages() {
         return
 
     def get_package_var(d, var, pkg):
-        val = (d.getVar('%s_%s' % (var, pkg)) or "").strip()
+        val = (d.getVar('%s:%s' % (var, pkg)) or "").strip()
         if val == "":
             val = (d.getVar(var) or "").strip()
         return val
@@ -85,39 +85,39 @@ python systemd_populate_packages() {
     def systemd_generate_package_scripts(pkg):
         bb.debug(1, 'adding systemd calls to postinst/postrm for %s' % pkg)
 
-        paths_escaped = ' '.join(shlex.quote(s) for s in d.getVar('SYSTEMD_SERVICE_' + pkg).split())
-        d.setVar('SYSTEMD_SERVICE_ESCAPED_' + pkg, paths_escaped)
+        paths_escaped = ' '.join(shlex.quote(s) for s in d.getVar('SYSTEMD_SERVICE:' + pkg).split())
+        d.setVar('SYSTEMD_SERVICE_ESCAPED:' + pkg, paths_escaped)
 
-        # Add pkg to the overrides so that it finds the SYSTEMD_SERVICE_pkg
+        # Add pkg to the overrides so that it finds the SYSTEMD_SERVICE:pkg
         # variable.
         localdata = d.createCopy()
         localdata.prependVar("OVERRIDES", pkg + ":")
 
-        postinst = d.getVar('pkg_postinst_%s' % pkg)
+        postinst = d.getVar('pkg_postinst:%s' % pkg)
         if not postinst:
             postinst = '#!/bin/sh\n'
         postinst += localdata.getVar('systemd_postinst')
-        d.setVar('pkg_postinst_%s' % pkg, postinst)
+        d.setVar('pkg_postinst:%s' % pkg, postinst)
 
-        prerm = d.getVar('pkg_prerm_%s' % pkg)
+        prerm = d.getVar('pkg_prerm:%s' % pkg)
         if not prerm:
             prerm = '#!/bin/sh\n'
         prerm += localdata.getVar('systemd_prerm')
-        d.setVar('pkg_prerm_%s' % pkg, prerm)
+        d.setVar('pkg_prerm:%s' % pkg, prerm)
 
 
-    # Add files to FILES_*-systemd if existent and not already done
+    # Add files to FILES:*-systemd if existent and not already done
     def systemd_append_file(pkg_systemd, file_append):
         appended = False
         if os.path.exists(oe.path.join(d.getVar("D"), file_append)):
-            var_name = "FILES_" + pkg_systemd
+            var_name = "FILES:" + pkg_systemd
             files = d.getVar(var_name, False) or ""
             if file_append not in files.split():
                 d.appendVar(var_name, " " + file_append)
                 appended = True
         return appended
 
-    # Add systemd files to FILES_*-systemd, parse for Also= and follow recursive
+    # Add systemd files to FILES:*-systemd, parse for Also= and follow recursive
     def systemd_add_files_and_parse(pkg_systemd, path, service, keys):
         # avoid infinite recursion
         if systemd_append_file(pkg_systemd, oe.path.join(path, service)):
@@ -174,32 +174,32 @@ python systemd_populate_packages() {
                 if path_found != '':
                     systemd_add_files_and_parse(pkg_systemd, path_found, service, keys)
                 else:
-                    bb.fatal("Didn't find service unit '{0}', specified in SYSTEMD_SERVICE_{1}. {2}".format(
+                    bb.fatal("Didn't find service unit '{0}', specified in SYSTEMD_SERVICE:{1}. {2}".format(
                         service, pkg_systemd, "Also looked for service unit '{0}'.".format(base) if base is not None else ""))
 
     def systemd_create_presets(pkg, action):
         presetf = oe.path.join(d.getVar("PKGD"), d.getVar("systemd_unitdir"), "system-preset/98-%s.preset" % pkg)
         bb.utils.mkdirhier(os.path.dirname(presetf))
         with open(presetf, 'a') as fd:
-            for service in d.getVar('SYSTEMD_SERVICE_%s' % pkg).split():
+            for service in d.getVar('SYSTEMD_SERVICE:%s' % pkg).split():
                 fd.write("%s %s\n" % (action,service))
-        d.appendVar("FILES_%s" % pkg, ' ' + oe.path.join(d.getVar("systemd_unitdir"), "system-preset/98-%s.preset" % pkg))
+        d.appendVar("FILES:%s" % pkg, ' ' + oe.path.join(d.getVar("systemd_unitdir"), "system-preset/98-%s.preset" % pkg))
 
     # Run all modifications once when creating package
     if os.path.exists(d.getVar("D")):
         for pkg in d.getVar('SYSTEMD_PACKAGES').split():
             systemd_check_package(pkg)
-            if d.getVar('SYSTEMD_SERVICE_' + pkg):
+            if d.getVar('SYSTEMD_SERVICE:' + pkg):
                 systemd_generate_package_scripts(pkg)
                 action = get_package_var(d, 'SYSTEMD_AUTO_ENABLE', pkg)
                 if action in ("enable", "disable"):
                     systemd_create_presets(pkg, action)
                 elif action not in ("mask", "preset"):
-                    bb.fatal("SYSTEMD_AUTO_ENABLE_%s '%s' is not 'enable', 'disable', 'mask' or 'preset'" % (pkg, action))
+                    bb.fatal("SYSTEMD_AUTO_ENABLE:%s '%s' is not 'enable', 'disable', 'mask' or 'preset'" % (pkg, action))
         systemd_check_services()
 }
 
-PACKAGESPLITFUNCS_prepend = "systemd_populate_packages "
+PACKAGESPLITFUNCS:prepend = "systemd_populate_packages "
 
 python rm_systemd_unitdir (){
     import shutil
@@ -227,7 +227,7 @@ python rm_sysvinit_initddir (){
 }
 
 do_install[postfuncs] += "${RMINITDIR} "
-RMINITDIR_class-target = " rm_sysvinit_initddir rm_systemd_unitdir "
-RMINITDIR_class-nativesdk = " rm_sysvinit_initddir rm_systemd_unitdir "
+RMINITDIR:class-target = " rm_sysvinit_initddir rm_systemd_unitdir "
+RMINITDIR:class-nativesdk = " rm_sysvinit_initddir rm_systemd_unitdir "
 RMINITDIR = ""
 

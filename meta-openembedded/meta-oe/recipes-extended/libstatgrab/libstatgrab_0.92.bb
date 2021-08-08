@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "ncurses"
 
-PACKAGES_prepend = "statgrab statgrab-dbg saidar saidar-dbg ${PN}-mrtg "
+PACKAGES:prepend = "statgrab statgrab-dbg saidar saidar-dbg ${PN}-mrtg "
 
 # don't use the git tag unless docbooc2x is available to build the manpages
 SRC_URI = "https://github.com/libstatgrab/libstatgrab/releases/download/LIBSTATGRAB_0_92/libstatgrab-0.92.tar.gz \
@@ -27,9 +27,9 @@ PACKAGECONFIG[logging] = "--enable-logging,--disable-logging,"
 
 inherit autotools pkgconfig
 
-FILES_statgrab = "${bindir}/statgrab"
-FILES_statgrab-dbg = "${bindir}/.debug/statgrab"
-FILES_saidar = "${bindir}/saidar"
-FILES_saidar-dbg = "${bindir}/.debug/saidar"
-FILES_${PN}-mrtg = "${bindir}/statgrab-make-mrtg-config ${bindir}/statgrab-make-mrtg-index"
-RDEPENDS_${PN}-mrtg_append = " perl statgrab"
+FILES:statgrab = "${bindir}/statgrab"
+FILES:statgrab-dbg = "${bindir}/.debug/statgrab"
+FILES:saidar = "${bindir}/saidar"
+FILES:saidar-dbg = "${bindir}/.debug/saidar"
+FILES:${PN}-mrtg = "${bindir}/statgrab-make-mrtg-config ${bindir}/statgrab-make-mrtg-index"
+RDEPENDS:${PN}-mrtg:append = " perl statgrab"

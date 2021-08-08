@@ -17,6 +17,6 @@ S = "${WORKDIR}/git"
 
 inherit cpan
 
-RDEPENDS_${PN} += "perl"
+RDEPENDS:${PN} += "perl"
 
 BBCLASSEXTEND = "native nativesdk"

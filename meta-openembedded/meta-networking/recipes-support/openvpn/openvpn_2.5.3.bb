@@ -20,12 +20,12 @@ SRC_URI[sha256sum] = "75f0044df449430555ca7b995a2b77ab24f2946fdc3668301b8edc2398
 # CVE-2020-7224 and CVE-2020-27569 are for Aviatrix OpenVPN client, not for openvpn.
 CVE_CHECK_WHITELIST += "CVE-2020-7224 CVE-2020-27569"
 
-SYSTEMD_SERVICE_${PN} += "openvpn@loopback-server.service openvpn@loopback-client.service"
+SYSTEMD_SERVICE:${PN} += "openvpn@loopback-server.service openvpn@loopback-client.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 INITSCRIPT_PACKAGES = "${PN}"
-INITSCRIPT_NAME_${PN} = "openvpn"
-INITSCRIPT_PARAMS_${PN} = "start 10 2 3 4 5 . stop 70 0 1 6 ."
+INITSCRIPT_NAME:${PN} = "openvpn"
+INITSCRIPT_PARAMS:${PN} = "start 10 2 3 4 5 . stop 70 0 1 6 ."
 
 CFLAGS += "-fno-inline"
 
@@ -36,7 +36,7 @@ EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '', '--disable-p
 # Explicitly specify IPROUTE to bypass the configure-time check for /sbin/ip on the host.
 EXTRA_OECONF += "IPROUTE=${base_sbindir}/ip"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/${sysconfdir}/init.d
     install -m 755 ${WORKDIR}/openvpn ${D}/${sysconfdir}/init.d
 
@@ -65,12 +65,12 @@ do_install_append() {
 
 PACKAGES =+ " ${PN}-sample "
 
-RRECOMMENDS_${PN} = "kernel-module-tun"
+RRECOMMENDS:${PN} = "kernel-module-tun"
 
-FILES_${PN}-dbg += "${libdir}/openvpn/plugins/.debug"
-FILES_${PN} += "${systemd_unitdir}/system/openvpn@.service \
+FILES:${PN}-dbg += "${libdir}/openvpn/plugins/.debug"
+FILES:${PN} += "${systemd_unitdir}/system/openvpn@.service \
                 ${sysconfdir}/tmpfiles.d \
                "
-FILES_${PN}-sample += "${systemd_unitdir}/system/openvpn@loopback-server.service \
+FILES:${PN}-sample += "${systemd_unitdir}/system/openvpn@loopback-server.service \
                        ${systemd_unitdir}/system/openvpn@loopback-client.service \
                        ${sysconfdir}/openvpn/sample/"

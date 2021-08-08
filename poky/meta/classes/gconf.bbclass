@@ -41,7 +41,7 @@ for SCHEMA in ${SCHEMA_FILES}; do
 done
 }
 
-python populate_packages_append () {
+python populate_packages:append () {
     import re
     packages = d.getVar('PACKAGES').split()
     pkgdest =  d.getVar('PKGDEST')
@@ -57,15 +57,15 @@ python populate_packages_append () {
         if schemas != []:
             bb.note("adding gconf postinst and prerm scripts to %s" % pkg)
             d.setVar('SCHEMA_FILES', " ".join(schemas))
-            postinst = d.getVar('pkg_postinst_%s' % pkg)
+            postinst = d.getVar('pkg_postinst:%s' % pkg)
             if not postinst:
                 postinst = '#!/bin/sh\n'
             postinst += d.getVar('gconf_postinst')
-            d.setVar('pkg_postinst_%s' % pkg, postinst)
-            prerm = d.getVar('pkg_prerm_%s' % pkg)
+            d.setVar('pkg_postinst:%s' % pkg, postinst)
+            prerm = d.getVar('pkg_prerm:%s' % pkg)
             if not prerm:
                 prerm = '#!/bin/sh\n'
             prerm += d.getVar('gconf_prerm')
-            d.setVar('pkg_prerm_%s' % pkg, prerm)
-            d.appendVar("RDEPENDS_%s" % pkg, ' ' + d.getVar('MLPREFIX', False) + 'gconf')
+            d.setVar('pkg_prerm:%s' % pkg, prerm)
+            d.appendVar("RDEPENDS:%s" % pkg, ' ' + d.getVar('MLPREFIX', False) + 'gconf')
 }

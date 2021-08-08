@@ -8,7 +8,7 @@ HOMEPAGE = "http://sourceforge.net/projects/${BPN}"
 SECTION = "admin"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
-RRECOMMENDS_${PN} = "kernel-module-aoe"
+RRECOMMENDS:${PN} = "kernel-module-aoe"
 
 SRC_URI = "http://sourceforge.net/projects/${BPN}/files/${BPN}/${BPN}-${PV}.tar.gz \
            file://aoe-stat-no-bashism.patch \

@@ -22,4 +22,4 @@ S = "${WORKDIR}/Net-Telnet-${PV}"
 
 inherit cpan
 
-RDEPENDS_${PN} = "perl"
+RDEPENDS:${PN} = "perl"

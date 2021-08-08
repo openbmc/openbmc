@@ -29,7 +29,7 @@ PACKAGECONFIG[systemd] = "--with-init=systemd --with-systemdsystemunitdir=${syst
 
 EXTRA_OEMAKE = "initdir=${sysconfdir}/init.d"
 
-do_install_append() {
+do_install:append() {
     if [ -f ${D}${sysconfdir}/init.d/${BPN} ]; then
         chmod 0755 ${D}${sysconfdir}/init.d/${BPN}
         sed -i 's#rc.d/##' ${D}${sysconfdir}/init.d/${BPN}
@@ -40,7 +40,7 @@ do_install_append() {
     fi
 }
 
-FILES_${PN} += "${datadir}/snmp/mibs/KEEPALIVED-MIB.txt"
+FILES:${PN} += "${datadir}/snmp/mibs/KEEPALIVED-MIB.txt"
 
-SYSTEMD_SERVICE_${PN} = "keepalived.service"
+SYSTEMD_SERVICE:${PN} = "keepalived.service"
 SYSTEMD_AUTO_ENABLE ?= "disable"

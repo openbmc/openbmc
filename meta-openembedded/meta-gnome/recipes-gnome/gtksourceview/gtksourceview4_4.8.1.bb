@@ -22,4 +22,16 @@ SRC_URI[sha256sum] = "d163d71b5fcafbc5b1eec6dd841edbdbcddd3a7511cd5fdcffd86b8bbf
 GIR_MESON_OPTION = 'gir'
 GTKDOC_MESON_OPTION = "gtk_doc"
 
-FILES_${PN} += "${datadir}/gtksourceview-4"
+# Override the definition in meson.bbclass.  The dependencies in mason.build are incomplete
+# and the recipe will not build with "-j 1".  This fix is benign but should be reviewed when
+# updating versions.
+#
+meson_do_compile() {
+    bbnote "========== generating gtksourceview-gresources.h ========"
+    bbnote "PARALLEL_MAKE is ${PARALLEL_MAKE}"
+    ninja ${PARALLEL_MAKE} gtksourceview/gtksourceview-gresources.h
+    bbnote "========== compiling target all ========"
+    ninja ${PARALLEL_MAKE}
+}
+
+FILES:${PN} += "${datadir}/gtksourceview-4"

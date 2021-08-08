@@ -77,7 +77,7 @@ def update_useradd_static_config(d):
             try:
                 uaargs = parser.parse_args(oe.useradd.split_args(param))
             except Exception as e:
-                bb.fatal("%s: Unable to parse arguments for USERADD_PARAM_%s '%s': %s" % (d.getVar('PN'), pkg, param, e))
+                bb.fatal("%s: Unable to parse arguments for USERADD_PARAM:%s '%s': %s" % (d.getVar('PN'), pkg, param, e))
 
             # Read all passwd files specified in USERADD_UID_TABLES or files/passwd
             # Use the standard passwd layout:
@@ -140,13 +140,13 @@ def update_useradd_static_config(d):
                 uaargs.gid = uaargs.groupid
                 uaargs.user_group = None
                 if newgroup and is_pkg:
-                    groupadd = d.getVar("GROUPADD_PARAM_%s" % pkg)
+                    groupadd = d.getVar("GROUPADD_PARAM:%s" % pkg)
                     if groupadd:
                         # Only add the group if not already specified
                         if not uaargs.groupname in groupadd:
-                            d.setVar("GROUPADD_PARAM_%s" % pkg, "%s; %s" % (groupadd, newgroup))
+                            d.setVar("GROUPADD_PARAM:%s" % pkg, "%s; %s" % (groupadd, newgroup))
                     else:
-                        d.setVar("GROUPADD_PARAM_%s" % pkg, newgroup)
+                        d.setVar("GROUPADD_PARAM:%s" % pkg, newgroup)
 
             uaargs.comment = "'%s'" % field[4] if field[4] else uaargs.comment
             uaargs.home_dir = field[5] or uaargs.home_dir
@@ -198,7 +198,7 @@ def update_useradd_static_config(d):
                 # If we're processing multiple lines, we could have left over values here...
                 gaargs = parser.parse_args(oe.useradd.split_args(param))
             except Exception as e:
-                bb.fatal("%s: Unable to parse arguments for GROUPADD_PARAM_%s '%s': %s" % (d.getVar('PN'), pkg, param, e))
+                bb.fatal("%s: Unable to parse arguments for GROUPADD_PARAM:%s '%s': %s" % (d.getVar('PN'), pkg, param, e))
 
             # Read all group files specified in USERADD_GID_TABLES or files/group
             # Use the standard group layout:
@@ -265,17 +265,17 @@ def update_useradd_static_config(d):
     for pkg in useradd_packages.split():
         # Groupmems doesn't have anything we might want to change, so simply validating
         # is a bit of a waste -- only process useradd/groupadd
-        useradd_param = d.getVar('USERADD_PARAM_%s' % pkg)
+        useradd_param = d.getVar('USERADD_PARAM:%s' % pkg)
         if useradd_param:
-            #bb.warn("Before: 'USERADD_PARAM_%s' - '%s'" % (pkg, useradd_param))
-            d.setVar('USERADD_PARAM_%s' % pkg, rewrite_useradd(useradd_param, True))
-            #bb.warn("After:  'USERADD_PARAM_%s' - '%s'" % (pkg, d.getVar('USERADD_PARAM_%s' % pkg)))
+            #bb.warn("Before: 'USERADD_PARAM:%s' - '%s'" % (pkg, useradd_param))
+            d.setVar('USERADD_PARAM:%s' % pkg, rewrite_useradd(useradd_param, True))
+            #bb.warn("After:  'USERADD_PARAM:%s' - '%s'" % (pkg, d.getVar('USERADD_PARAM:%s' % pkg)))
 
-        groupadd_param = d.getVar('GROUPADD_PARAM_%s' % pkg)
+        groupadd_param = d.getVar('GROUPADD_PARAM:%s' % pkg)
         if groupadd_param:
-            #bb.warn("Before: 'GROUPADD_PARAM_%s' - '%s'" % (pkg, groupadd_param))
-            d.setVar('GROUPADD_PARAM_%s' % pkg, rewrite_groupadd(groupadd_param, True))
-            #bb.warn("After:  'GROUPADD_PARAM_%s' - '%s'" % (pkg, d.getVar('GROUPADD_PARAM_%s' % pkg)))
+            #bb.warn("Before: 'GROUPADD_PARAM:%s' - '%s'" % (pkg, groupadd_param))
+            d.setVar('GROUPADD_PARAM:%s' % pkg, rewrite_groupadd(groupadd_param, True))
+            #bb.warn("After:  'GROUPADD_PARAM:%s' - '%s'" % (pkg, d.getVar('GROUPADD_PARAM:%s' % pkg)))
 
     # Load and process extra users and groups, rewriting only adduser/addgroup params
     pkg = d.getVar('PN')

@@ -12,7 +12,7 @@ SECTION = "libs"
 LICENSE = "Artistic-1.0|GPLv1+"
 LIC_FILES_CHKSUM = "file://META.yml;beginline=12;endline=12;md5=963ce28228347875ace682de56eef8e8"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     libnet-ssleay-perl \
     perl-module-autoloader \
     perl-module-scalar-util \
@@ -28,7 +28,7 @@ S = "${WORKDIR}/IO-Socket-SSL-${PV}"
 
 inherit cpan ptest
 
-do_install_append () {
+do_install:append () {
     mkdir -p ${D}${docdir}/${PN}/
     cp ${S}/BUGS ${D}${docdir}/${PN}/
     cp ${S}/Changes ${D}${docdir}/${PN}/

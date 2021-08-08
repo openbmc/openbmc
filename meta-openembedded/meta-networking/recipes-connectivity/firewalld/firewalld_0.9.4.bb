@@ -39,9 +39,9 @@ EXTRA_OECONF = "\
 "
 
 INITSCRIPT_NAME = "firewalld"
-SYSTEMD_SERVICE_${PN} = "firewalld.service"
+SYSTEMD_SERVICE:${PN} = "firewalld.service"
 
-do_install_append() {
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         :
     else
@@ -65,16 +65,16 @@ do_install_append() {
     rm -f ${D}${sysconfdir}/modprobe.d/firewalld-sysctls.conf
 }
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${PYTHON_SITEPACKAGES_DIR}/firewall \
     ${nonarch_libdir}/firewalld \
     ${datadir}/dbus-1 \
     ${datadir}/polkit-1 \
     ${datadir}/metainfo \
 "
-FILES_${PN}-zsh-completion = "${datadir}/zsh/site-functions"
+FILES:${PN}-zsh-completion = "${datadir}/zsh/site-functions"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     nftables-python \
     iptables \
     python3-core \

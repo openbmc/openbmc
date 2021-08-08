@@ -16,7 +16,7 @@ export HOST_SYS
 
 inherit pypi ptest setuptools3
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     ${PYTHON_PN}-pytest \
     ${PYTHON_PN}-unixadmin \
 "

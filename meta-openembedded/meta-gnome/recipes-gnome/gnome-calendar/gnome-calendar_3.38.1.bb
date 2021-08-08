@@ -25,7 +25,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 SRC_URI += "file://8be361b6ce8f0f8053e1609decbdbdc164ec8448.patch"
 SRC_URI[archive.sha256sum] = "7280880a082d631624d02a102dd547ceb59498da368311f3e49a06cff897f512"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/gnome-shell \
     ${datadir}/metainfo \
     ${datadir}/dbus-1 \

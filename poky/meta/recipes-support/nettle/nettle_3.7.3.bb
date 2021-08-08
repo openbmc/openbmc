@@ -20,7 +20,7 @@ SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
            file://check-header-files-of-openssl-only-if-enable_.patch \
            "
 
-SRC_URI_append_class-target = "\
+SRC_URI:append:class-target = "\
             file://dlopen-test.patch \
             "
 
@@ -38,7 +38,7 @@ do_compile_ptest() {
         oe_runmake buildtest
 }
 
-do_install_append() {
+do_install:append() {
     oe_multilib_header nettle/version.h
 }
 
@@ -51,7 +51,7 @@ do_install_ptest() {
         install ${B}/testsuite/*-test ${D}${PTEST_PATH}/testsuite/
 }
 
-RDEPENDS_${PN}-ptest += "${PN}-dev"
-INSANE_SKIP_${PN}-ptest += "dev-deps"
+RDEPENDS:${PN}-ptest += "${PN}-dev"
+INSANE_SKIP:${PN}-ptest += "dev-deps"
 
 BBCLASSEXTEND = "native nativesdk"

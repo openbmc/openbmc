@@ -13,7 +13,7 @@ DEPENDS = "gd "
 
 inherit autotools gettext
 
-do_configure_prepend() {
+do_configure:prepend() {
 	sed -i "s#AC_PATH_PROG(GDLIB_CONFIG,gdlib-config)#AC_PATH_PROG([GDLIB_CONFIG],[gdlib-config], ,[${STAGING_BINDIR_CROSS}])#" ${S}/configure.ac
 }
 

@@ -7,9 +7,9 @@ PROVIDES = "libv4l media-ctl"
 DEPENDS = "jpeg \
            ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'virtual/libx11', '', d)} \
            ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
-DEPENDS_append_libc-musl = " argp-standalone"
-DEPENDS_append_class-target = " udev"
-LDFLAGS_append = " -pthread"
+DEPENDS:append:libc-musl = " argp-standalone"
+DEPENDS:append:class-target = " udev"
+LDFLAGS:append = " -pthread"
 
 inherit autotools gettext pkgconfig
 
@@ -35,24 +35,24 @@ VIRTUAL-RUNTIME_ir-keytable-keymaps ?= "rc-keymaps"
 
 PACKAGES =+ "media-ctl ir-keytable rc-keymaps libv4l libv4l-dev"
 
-RPROVIDES_${PN}-dbg += "libv4l-dbg"
+RPROVIDES:${PN}-dbg += "libv4l-dbg"
 
-FILES_media-ctl = "${bindir}/media-ctl ${libdir}/libmediactl.so.*"
+FILES:media-ctl = "${bindir}/media-ctl ${libdir}/libmediactl.so.*"
 
-FILES_ir-keytable = "${bindir}/ir-keytable ${base_libdir}/udev/rules.d/*-infrared.rules"
-RDEPENDS_ir-keytable += "${VIRTUAL-RUNTIME_ir-keytable-keymaps}"
+FILES:ir-keytable = "${bindir}/ir-keytable ${base_libdir}/udev/rules.d/*-infrared.rules"
+RDEPENDS:ir-keytable += "${VIRTUAL-RUNTIME_ir-keytable-keymaps}"
 
-FILES_rc-keymaps = "${sysconfdir}/rc* ${base_libdir}/udev/rc*"
+FILES:rc-keymaps = "${sysconfdir}/rc* ${base_libdir}/udev/rc*"
 
-FILES_${PN} = "${bindir} ${sbindir}"
+FILES:${PN} = "${bindir} ${sbindir}"
 
-FILES_libv4l += "${libdir}/libv4l*${SOLIBS} ${libdir}/libv4l/*.so ${libdir}/libv4l/plugins/*.so \
+FILES:libv4l += "${libdir}/libv4l*${SOLIBS} ${libdir}/libv4l/*.so ${libdir}/libv4l/plugins/*.so \
                  ${libdir}/libdvbv5*${SOLIBS} \
                  ${libdir}/libv4l/*-decomp"
 
-FILES_libv4l-dev += "${includedir} ${libdir}/pkgconfig \
+FILES:libv4l-dev += "${includedir} ${libdir}/pkgconfig \
                      ${libdir}/libv4l*${SOLIBSDEV} ${libdir}/*.la \
                      ${libdir}/v4l*${SOLIBSDEV} ${libdir}/libv4l/*.la ${libdir}/libv4l/plugins/*.la"
 
-PARALLEL_MAKE_class-native = ""
+PARALLEL_MAKE:class-native = ""
 BBCLASSEXTEND = "native"

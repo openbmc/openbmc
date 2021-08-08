@@ -57,12 +57,12 @@ EXTRA_OECMAKE = "-DCMAKE_BUILD_TYPE=RelWithDebInfo -DPOCO_UNBUNDLED=ON \
                  ${@bb.utils.contains('PTEST_ENABLED', '1', '-DENABLE_TESTS=ON ', '', d)}"
 
 # For the native build we want to use the bundled version
-EXTRA_OECMAKE_append_class-native = " -DPOCO_UNBUNDLED=OFF"
+EXTRA_OECMAKE:append:class-native = " -DPOCO_UNBUNDLED=OFF"
 
 # do not use rpath
-EXTRA_OECMAKE_append = " -DCMAKE_SKIP_RPATH=ON"
+EXTRA_OECMAKE:append = " -DCMAKE_SKIP_RPATH=ON"
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     poco_libdir = d.expand('${libdir}')
     pn = d.getVar("PN")
     packages = []
@@ -75,7 +75,7 @@ python populate_packages_prepend () {
     do_split_packages(d, poco_libdir, '^libPoco(.*)\.so\..*$',
                     'poco-%s', 'Poco %s component', extra_depends='', prepend=True, hook=hook)
 
-    d.setVar("RRECOMMENDS_%s" % pn, " ".join(packages))
+    d.setVar("RRECOMMENDS:%s" % pn, " ".join(packages))
     d.setVar("POCO_TESTRUNNERS", "\n".join(testrunners))
 }
 
@@ -90,13 +90,13 @@ do_install_ptest () {
 PACKAGES_DYNAMIC = "poco-.*"
 
 # "poco" is a metapackage which pulls in all Poco components
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 # cppunit is only built if tests are enabled
 PACKAGES =+ "${PN}-cppunit"
-FILES_${PN}-cppunit += "${libdir}/libCppUnit.so*"
-ALLOW_EMPTY_${PN}-cppunit = "1"
+FILES:${PN}-cppunit += "${libdir}/libCppUnit.so*"
+ALLOW_EMPTY:${PN}-cppunit = "1"
 
-RDEPENDS_${PN}-ptest += "${PN}-cppunit"
+RDEPENDS:${PN}-ptest += "${PN}-cppunit"
 
 BBCLASSEXTEND = "native"

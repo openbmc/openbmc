@@ -21,7 +21,7 @@ inherit autotools gettext texinfo
 CACHED_CONFIGUREVARS = "ac_cv_path_M4=m4"
 
 PACKAGECONFIG ??= "readline ${@ 'textstyle' if d.getVar('USE_NLS') == 'yes' else ''}"
-PACKAGECONFIG_class-native ??= ""
+PACKAGECONFIG:class-native ??= ""
 
 # Make readline and textstyle optional. There are recipie for these, but leave them
 # disabled for the native recipe. This prevents host contamination of the native tool.
@@ -38,15 +38,15 @@ CACHED_CONFIGUREVARS += "${@bb.utils.contains('PACKAGECONFIG', 'readline', '', '
 # The automatic m4 path detection gets confused, so force the right value
 acpaths = "-I ./m4"
 
-do_compile_prepend() {
+do_compile:prepend() {
 	for i in mfcalc calc++ rpcalc; do mkdir -p ${B}/examples/$i; done
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
 	create_wrapper ${D}/${bindir}/bison \
 		BISON_PKGDATADIR=${STAGING_DATADIR_NATIVE}/bison
 }
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
 	create_wrapper ${D}/${bindir}/bison \
 		BISON_PKGDATADIR=${datadir}/bison
 }

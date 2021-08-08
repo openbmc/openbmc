@@ -27,7 +27,7 @@ SRC_URI = "http://www.rsyslog.com/download/files/download/rsyslog/${BPN}-${PV}.t
            file://0001-tests-disable-the-check-for-inotify.patch \
 "
 
-SRC_URI_append_libc-musl = " \
+SRC_URI:append:libc-musl = " \
     file://0001-Include-sys-time-h.patch \
 "
 
@@ -41,9 +41,9 @@ inherit autotools pkgconfig systemd update-rc.d ptest
 
 EXTRA_OECONF += "--disable-generate-man-pages ap_cv_atomic_builtins=yes"
 EXTRA_OECONF += "--enable-imfile-tests"
-EXTRA_OECONF_remove_mipsarch = "ap_cv_atomic_builtins=yes"
-EXTRA_OECONF_remove_powerpc = "ap_cv_atomic_builtins=yes"
-EXTRA_OECONF_remove_riscv32 = "ap_cv_atomic_builtins=yes"
+EXTRA_OECONF:remove:mipsarch = "ap_cv_atomic_builtins=yes"
+EXTRA_OECONF:remove:powerpc = "ap_cv_atomic_builtins=yes"
+EXTRA_OECONF:remove:riscv32 = "ap_cv_atomic_builtins=yes"
 
 # first line is default yes in configure
 PACKAGECONFIG ??= " \
@@ -132,7 +132,7 @@ do_install_ptest() {
     sed -i -e s:${HOSTTOOLS_DIR}:${bindir}:g ${D}${PTEST_PATH}/tests/set-envvars
 }
 
-do_install_append() {
+do_install:append() {
     install -d "${D}${sysconfdir}/init.d"
     install -d "${D}${sysconfdir}/logrotate.d"
     install -m 755 ${WORKDIR}/initscript ${D}${sysconfdir}/init.d/syslog
@@ -155,51 +155,51 @@ do_install_append() {
     fi
 }
 
-FILES_${PN} += "${bindir}"
+FILES:${PN} += "${bindir}"
 
 INITSCRIPT_NAME = "syslog"
 INITSCRIPT_PARAMS = "defaults"
 
-CONFFILES_${PN} = "${sysconfdir}/rsyslog.conf"
+CONFFILES:${PN} = "${sysconfdir}/rsyslog.conf"
 
-RCONFLICTS_${PN} = "busybox-syslog sysklogd syslog-ng"
+RCONFLICTS:${PN} = "busybox-syslog sysklogd syslog-ng"
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
+SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
-RDEPENDS_${PN} += "logrotate"
+RDEPENDS:${PN} += "logrotate"
 
 # for rsyslog-ptest
 VALGRIND = "valgrind"
 
 # valgrind supports armv7 and above
-VALGRIND_armv4 = ''
-VALGRIND_armv5 = ''
-VALGRIND_armv6 = ''
+VALGRIND:armv4 = ''
+VALGRIND:armv5 = ''
+VALGRIND:armv6 = ''
 
 # X32 isn't supported by valgrind at this time
-VALGRIND_linux-gnux32 = ''
-VALGRIND_linux-muslx32 = ''
+VALGRIND:linux-gnux32 = ''
+VALGRIND:linux-muslx32 = ''
 
 # Disable for some MIPS variants
-VALGRIND_mipsarchr6 = ''
-VALGRIND_linux-gnun32 = ''
+VALGRIND:mipsarchr6 = ''
+VALGRIND:linux-gnun32 = ''
 
 # Disable for powerpc64 with musl
-VALGRIND_libc-musl_powerpc64 = ''
-VALGRIND_libc-musl_powerpc64le = ''
+VALGRIND:libc-musl:powerpc64 = ''
+VALGRIND:libc-musl:powerpc64le = ''
 
 # RISC-V support for valgrind is not there yet
-VALGRIND_riscv64 = ""
-VALGRIND_riscv32 = ""
+VALGRIND:riscv64 = ""
+VALGRIND:riscv32 = ""
 
 # util-linux: logger needs the -d option
-RDEPENDS_${PN}-ptest += "\
+RDEPENDS:${PN}-ptest += "\
   make diffutils gzip bash gawk coreutils procps \
   libgcc python3-core python3-io python3-json \
   curl util-linux shadow \
   "
 
-RRECOMMENDS_${PN}-ptest += "${TCLIBC}-dbg ${VALGRIND}"
+RRECOMMENDS:${PN}-ptest += "${TCLIBC}-dbg ${VALGRIND}"

@@ -13,10 +13,10 @@ def gettext_oeconf(d):
         return '--disable-nls'
     return "--enable-nls"
 
-BASEDEPENDS_append = " ${@gettext_dependencies(d)}"
-EXTRA_OECONF_append = " ${@gettext_oeconf(d)}"
+BASEDEPENDS:append = " ${@gettext_dependencies(d)}"
+EXTRA_OECONF:append = " ${@gettext_oeconf(d)}"
 
 # Without this, msgfmt from gettext-native will not find ITS files
 # provided by target recipes (for example, polkit.its).
-GETTEXTDATADIRS_append_class-target = ":${STAGING_DATADIR}/gettext"
+GETTEXTDATADIRS:append:class-target = ":${STAGING_DATADIR}/gettext"
 export GETTEXTDATADIRS

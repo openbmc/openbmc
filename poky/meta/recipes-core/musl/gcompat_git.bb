@@ -41,11 +41,11 @@ do_install () {
 	fi
 }
 
-FILES_${PN} += "/lib64"
+FILES:${PN} += "/lib64"
 
-INSANE_SKIP_${PN} = "libdir"
+INSANE_SKIP:${PN} = "libdir"
 
-RPROVIDES_${PN} += "musl-glibc-compat"
+RPROVIDES:${PN} += "musl-glibc-compat"
 #
 # We will skip parsing for non-musl systems
 #

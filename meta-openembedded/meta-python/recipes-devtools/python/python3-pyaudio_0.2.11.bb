@@ -12,4 +12,4 @@ inherit pypi setuptools3
 
 DEPENDS += "portaudio-v19"
 
-RDEPENDS_${PN} += "portaudio-v19"
+RDEPENDS:${PN} += "portaudio-v19"

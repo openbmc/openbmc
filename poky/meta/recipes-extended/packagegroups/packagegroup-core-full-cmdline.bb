@@ -49,13 +49,13 @@ python __anonymous () {
         if mapped:
             oldtaskname = mapped.replace("packagegroup-core", "task-core")
             mapstr = " %s%s %s%s" % (mlprefix, mapped, mlprefix, oldtaskname)
-            d.appendVar("RPROVIDES_%s" % pkg, mapstr)
-            d.appendVar("RREPLACES_%s" % pkg, mapstr)
-            d.appendVar("RCONFLICTS_%s" % pkg, mapstr)
+            d.appendVar("RPROVIDES:%s" % pkg, mapstr)
+            d.appendVar("RREPLACES:%s" % pkg, mapstr)
+            d.appendVar("RCONFLICTS:%s" % pkg, mapstr)
 }
 
 
-RDEPENDS_packagegroup-core-full-cmdline = "\
+RDEPENDS:packagegroup-core-full-cmdline = "\
     packagegroup-core-full-cmdline-libs \
     packagegroup-core-full-cmdline-utils \
     packagegroup-core-full-cmdline-extended \
@@ -65,11 +65,11 @@ RDEPENDS_packagegroup-core-full-cmdline = "\
     packagegroup-core-full-cmdline-sys-services \
     "
 
-RDEPENDS_packagegroup-core-full-cmdline-libs = "\
+RDEPENDS:packagegroup-core-full-cmdline-libs = "\
     glib-2.0 \
     "
 
-RDEPENDS_packagegroup-core-full-cmdline-utils = "\
+RDEPENDS:packagegroup-core-full-cmdline-utils = "\
     bash \
     acl \
     attr \
@@ -99,7 +99,7 @@ RDEPENDS_packagegroup-core-full-cmdline-utils = "\
     util-linux \
     "
 
-RDEPENDS_packagegroup-core-full-cmdline-extended = "\
+RDEPENDS:packagegroup-core-full-cmdline-extended = "\
     iproute2 \
     iputils \
     iptables \
@@ -107,7 +107,7 @@ RDEPENDS_packagegroup-core-full-cmdline-extended = "\
     openssl \
     "
 
-RDEPENDS_packagegroup-core-full-cmdline-dev-utils = "\
+RDEPENDS:packagegroup-core-full-cmdline-dev-utils = "\
     diffutils \
     m4 \
     make \
@@ -115,7 +115,7 @@ RDEPENDS_packagegroup-core-full-cmdline-dev-utils = "\
     "
 
 VIRTUAL-RUNTIME_syslog ?= "sysklogd"
-RDEPENDS_packagegroup-core-full-cmdline-initscripts = "\
+RDEPENDS:packagegroup-core-full-cmdline-initscripts = "\
     ${VIRTUAL-RUNTIME_initscripts} \
     ${VIRTUAL-RUNTIME_init_manager} \
     ethtool \
@@ -123,7 +123,7 @@ RDEPENDS_packagegroup-core-full-cmdline-initscripts = "\
     ${VIRTUAL-RUNTIME_syslog} \
     "
 
-RDEPENDS_packagegroup-core-full-cmdline-multiuser = "\
+RDEPENDS:packagegroup-core-full-cmdline-multiuser = "\
     bzip2 \
     cracklib \
     gzip \
@@ -131,7 +131,7 @@ RDEPENDS_packagegroup-core-full-cmdline-multiuser = "\
     sudo \
     "
 
-RDEPENDS_packagegroup-core-full-cmdline-sys-services = "\
+RDEPENDS:packagegroup-core-full-cmdline-sys-services = "\
     at \
     cronie \
     logrotate \

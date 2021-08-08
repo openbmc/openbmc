@@ -10,7 +10,7 @@ PYPI_PACKAGE = "pykwalify"
 
 inherit setuptools3 pypi
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-docopt \
     ${PYTHON_PN}-dateutil \
     ${PYTHON_PN}-ruamel-yaml \

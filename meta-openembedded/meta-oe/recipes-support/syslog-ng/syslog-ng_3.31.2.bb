@@ -63,7 +63,7 @@ PACKAGECONFIG[tcp-wrapper] = "--enable-tcp-wrapper,--disable-tcp-wrapper,tcp-wra
 PACKAGECONFIG[geoip] = "--enable-geoip,--disable-geoip,geoip,"
 PACKAGECONFIG[native] = "--enable-native,--disable-native,,"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	olddir=$(pwd)
 	cd ${AUTOTOOLS_SCRIPT_PATH}
 
@@ -72,7 +72,7 @@ do_configure_prepend() {
 	cd $olddir
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}/${BPN}
     install -d ${D}${sysconfdir}/init.d
     install -m 755 ${WORKDIR}/initscript ${D}${sysconfdir}/init.d/syslog
@@ -107,10 +107,10 @@ do_install_append() {
     oe_multilib_header syslog-ng/syslog-ng-config.h
 }
 
-FILES_${PN} += "${datadir}/include/scl/ ${datadir}/xsd ${datadir}/tools ${systemd_unitdir}/system/multi-user.target.wants/*"
-RDEPENDS_${PN} += "gawk ${@bb.utils.contains('PACKAGECONFIG','json','${PN}-jconf','',d)}"
+FILES:${PN} += "${datadir}/include/scl/ ${datadir}/xsd ${datadir}/tools ${systemd_unitdir}/system/multi-user.target.wants/*"
+RDEPENDS:${PN} += "gawk ${@bb.utils.contains('PACKAGECONFIG','json','${PN}-jconf','',d)}"
 
-FILES_${PN}-jconf += " \
+FILES:${PN}-jconf += " \
 ${datadir}/${BPN}/include/scl/cim \
 ${datadir}/${BPN}/include/scl/elasticsearch \
 ${datadir}/${BPN}/include/scl/ewmm \
@@ -121,23 +121,23 @@ ${datadir}/${BPN}/include/scl/logmatic \
 
 # This overcomes the syslog-ng rdepends on syslog-ng-dev QA Error
 PACKAGES =+ "${PN}-jconf ${PN}-libs ${PN}-libs-dev"
-RPROVIDES_${PN}-dbg += "${PN}-libs-dbg"
-FILES_${PN}-libs = "${libdir}/${BPN}/*.so ${libdir}/libsyslog-ng-*.so*"
-FILES_${PN}-libs-dev = "${libdir}/${BPN}/lib*.la"
-FILES_${PN}-staticdev += "${libdir}/${BPN}/libtest/*.a"
-FILES_${PN} += "${systemd_unitdir}/system/*.service"
-INSANE_SKIP_${PN}-libs = "dev-so"
-RDEPENDS_${PN} += "${PN}-libs"
+RPROVIDES:${PN}-dbg += "${PN}-libs-dbg"
+FILES:${PN}-libs = "${libdir}/${BPN}/*.so ${libdir}/libsyslog-ng-*.so*"
+FILES:${PN}-libs-dev = "${libdir}/${BPN}/lib*.la"
+FILES:${PN}-staticdev += "${libdir}/${BPN}/libtest/*.a"
+FILES:${PN} += "${systemd_unitdir}/system/*.service"
+INSANE_SKIP:${PN}-libs = "dev-so"
+RDEPENDS:${PN} += "${PN}-libs"
 
-CONFFILES_${PN} = "${sysconfdir}/${BPN}.conf ${sysconfdir}/scl.conf"
+CONFFILES:${PN} = "${sysconfdir}/${BPN}.conf ${sysconfdir}/scl.conf"
 
-RCONFLICTS_${PN} = "busybox-syslog sysklogd rsyslog"
-RCONFLICTS_${PN}-libs = "busybox-syslog sysklogd rsyslog"
+RCONFLICTS:${PN} = "busybox-syslog sysklogd rsyslog"
+RCONFLICTS:${PN}-libs = "busybox-syslog sysklogd rsyslog"
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "${BPN}@.service"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
+SYSTEMD_SERVICE:${PN} = "${BPN}@.service"
 
 INITSCRIPT_NAME = "syslog"
 INITSCRIPT_PARAMS = "start 20 2 3 4 5 . stop 90 0 1 6 ."

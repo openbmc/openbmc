@@ -13,6 +13,6 @@ DEPENDS += "\
     ${PYTHON_PN}-pip-native \
 "
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-pytest \
 "

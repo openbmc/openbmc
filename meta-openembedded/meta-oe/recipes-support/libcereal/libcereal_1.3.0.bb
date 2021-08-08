@@ -24,8 +24,8 @@ inherit cmake pkgconfig
 
 EXTRA_OECMAKE = "-DJUST_INSTALL_CEREAL=ON"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
 BBCLASSEXTEND = "native nativesdk"

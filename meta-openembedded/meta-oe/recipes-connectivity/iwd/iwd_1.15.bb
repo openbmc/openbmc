@@ -26,29 +26,29 @@ PACKAGECONFIG[systemd] = "--with-systemd-unitdir=${systemd_system_unitdir},--dis
 
 EXTRA_OECONF = "--enable-external-ell"
 
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
     iwd.service \
     ${@bb.utils.contains('PACKAGECONFIG', 'wired', 'ead.service', '', d)} \
 "
 
-do_configure_prepend() {
+do_configure:prepend() {
     install -d ${S}/build-aux
 }
 
-do_install_append() {
+do_install:append() {
     # If client and monitor are disabled, bindir is empty, causing a QA error
     rmdir --ignore-fail-on-non-empty ${D}/${bindir}
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${nonarch_libdir}/modules-load.d \
     ${systemd_unitdir}/network \
 "
 
-RDEPENDS_${PN} = "dbus"
+RDEPENDS:${PN} = "dbus"
 
-RRECOMMENDS_${PN} = "\
+RRECOMMENDS:${PN} = "\
     kernel-module-pkcs7-message \
     kernel-module-pkcs8-key-parser \
     kernel-module-x509-key-parser \

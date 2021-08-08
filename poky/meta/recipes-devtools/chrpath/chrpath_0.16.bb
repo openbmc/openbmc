@@ -16,9 +16,9 @@ inherit autotools
 
 # We don't have a staged chrpath-native for ensuring our binary is
 # relocatable, so use the one we've just built
-CHRPATH_BIN_class-native = "${B}/chrpath"
+CHRPATH_BIN:class-native = "${B}/chrpath"
 
-PROVIDES_append_class-native = " chrpath-replacement-native"
+PROVIDES:append:class-native = " chrpath-replacement-native"
 NATIVE_PACKAGE_PATH_SUFFIX = "/${PN}"
 
 BBCLASSEXTEND = "native nativesdk"

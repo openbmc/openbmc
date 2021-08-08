@@ -11,7 +11,7 @@ LICENSE = "Artistic-1.0 | GPL-1.0+ | LGPL-2.1+"
 DEPENDS += "libcapture-tiny-perl-native"
 DEPENDS += "libconfig-autoconf-perl-native"
 DEPENDS += "libstatgrab"
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     libstatgrab \
     perl-module-autoloader \
     perl-module-carp \

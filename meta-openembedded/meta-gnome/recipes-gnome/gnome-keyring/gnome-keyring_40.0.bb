@@ -35,7 +35,7 @@ EXTRA_OECONF = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '--enable-pam --with-pam-dir=${base_libdir}/security', '--disable-pam', d)} \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1/services \
     ${datadir}/p11-kit \
     ${datadir}/xdg-desktop-portal \
@@ -43,7 +43,7 @@ FILES_${PN} += " \
     ${libdir}/pkcs11/gnome-keyring-pkcs11.so \
 "
 # fix | gnome-keyring-daemon: insufficient process capabilities, unsecure memory might get used
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     setcap cap_ipc_lock+ep $D/${bindir}/gnome-keyring-daemon
 }
 PACKAGE_WRITE_DEPS += "libcap-native"

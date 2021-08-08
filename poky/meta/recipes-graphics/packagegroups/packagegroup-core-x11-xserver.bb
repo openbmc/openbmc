@@ -14,7 +14,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 XSERVER ?= "xserver-xorg xf86-video-fbdev"
 XSERVERCODECS ?= ""
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${XSERVER} \
     ${XSERVERCODECS} \
     "

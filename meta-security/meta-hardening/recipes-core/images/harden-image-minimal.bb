@@ -1,7 +1,7 @@
 SUMMARY = "A small image for an example hardening OE."
 
 IMAGE_INSTALL = "packagegroup-core-boot packagegroup-hardening"
-IMAGE_INSTALL_append = " os-release"
+IMAGE_INSTALL:append = " os-release"
 
 IMAGE_FEATURES = ""
 IMAGE_LINGUAS = " "

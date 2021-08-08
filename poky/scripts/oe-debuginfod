@@ -23,4 +23,4 @@ if __name__ == "__main__":
     subprocess.call(['bitbake', '-c', 'addto_recipe_sysroot', 'elfutils-native'])
 
     subprocess.call(['oe-run-native', 'elfutils-native', 'debuginfod', '--verbose', '-R', '-U', feed_dir])
-    print("\nTo use the debuginfod server please ensure that this variable PACKAGECONFIG_pn-elfutils-native = \"debuginfod libdebuginfod\" is set in the local.conf")
+    print("\nTo use the debuginfod server please ensure that this variable PACKAGECONFIG:pn-elfutils-native = \"debuginfod libdebuginfod\" is set in the local.conf")

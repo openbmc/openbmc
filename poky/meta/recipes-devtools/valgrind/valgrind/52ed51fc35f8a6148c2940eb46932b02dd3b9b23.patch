@@ -1,0 +1,171 @@
+From 52ed51fc35f8a6148c2940eb46932b02dd3b9b23 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Wed, 21 Jul 2021 19:53:13 +0200
+Subject: [PATCH] Generate a ENOSYS (sys_ni_syscall) for clone3 on all linux
+ arches
+
+glibc 2.34 will try to use clone3 first before falling back to
+the clone syscall. So implement clone3 as sys_ni_syscall which
+simply return ENOSYS without producing a warning.
+
+https://bugs.kde.org/show_bug.cgi?id=439590
+
+Upstream-Status: Backport
+---
+ coregrind/m_syswrap/syswrap-amd64-linux.c    | 2 ++
+ coregrind/m_syswrap/syswrap-arm-linux.c      | 2 ++
+ coregrind/m_syswrap/syswrap-arm64-linux.c    | 2 ++
+ coregrind/m_syswrap/syswrap-mips32-linux.c   | 2 ++
+ coregrind/m_syswrap/syswrap-mips64-linux.c   | 1 +
+ coregrind/m_syswrap/syswrap-nanomips-linux.c | 1 +
+ coregrind/m_syswrap/syswrap-ppc32-linux.c    | 2 ++
+ coregrind/m_syswrap/syswrap-ppc64-linux.c    | 2 ++
+ coregrind/m_syswrap/syswrap-s390x-linux.c    | 2 ++
+ coregrind/m_syswrap/syswrap-x86-linux.c      | 2 ++
+ include/vki/vki-scnums-shared-linux.h        | 2 ++
+ 11 files changed, 20 insertions(+)
+
+diff --git a/coregrind/m_syswrap/syswrap-amd64-linux.c b/coregrind/m_syswrap/syswrap-amd64-linux.c
+index 45e1f3d1bb..3b2dcb8e30 100644
+--- a/coregrind/m_syswrap/syswrap-amd64-linux.c
++++ b/coregrind/m_syswrap/syswrap-amd64-linux.c
+@@ -874,6 +874,8 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register), // 427
+ 
++   GENX_(__NR_clone3,            sys_ni_syscall),        // 435
++
+    LINX_(__NR_faccessat2,	 sys_faccessat2),        // 439
+ };
+ 
+diff --git a/coregrind/m_syswrap/syswrap-arm-linux.c b/coregrind/m_syswrap/syswrap-arm-linux.c
+index 428cb7c6fc..7f41b07491 100644
+--- a/coregrind/m_syswrap/syswrap-arm-linux.c
++++ b/coregrind/m_syswrap/syswrap-arm-linux.c
+@@ -1051,6 +1051,8 @@ static SyscallTableEntry syscall_main_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register), // 427
+ 
++   GENX_(__NR_clone3,            sys_ni_syscall),        // 435
++
+    LINX_(__NR_faccessat2,    sys_faccessat2),           // 439
+ };
+ 
+diff --git a/coregrind/m_syswrap/syswrap-arm64-linux.c b/coregrind/m_syswrap/syswrap-arm64-linux.c
+index 024ece27f5..0d717f44be 100644
+--- a/coregrind/m_syswrap/syswrap-arm64-linux.c
++++ b/coregrind/m_syswrap/syswrap-arm64-linux.c
+@@ -830,6 +830,8 @@ static SyscallTableEntry syscall_main_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register), // 427
+ 
++   GENX_(__NR_clone3,            sys_ni_syscall),        // 435
++
+    LINX_(__NR_faccessat2,        sys_faccessat2),        // 439
+ };
+ 
+diff --git a/coregrind/m_syswrap/syswrap-mips32-linux.c b/coregrind/m_syswrap/syswrap-mips32-linux.c
+index 62b085ea21..b62129111b 100644
+--- a/coregrind/m_syswrap/syswrap-mips32-linux.c
++++ b/coregrind/m_syswrap/syswrap-mips32-linux.c
+@@ -1136,6 +1136,8 @@ static SyscallTableEntry syscall_main_table[] = {
+    LINXY(__NR_io_uring_enter,          sys_io_uring_enter),          // 426
+    LINXY(__NR_io_uring_register,       sys_io_uring_register),       // 427
+ 
++   GENX_(__NR_clone3,                  sys_ni_syscall),              // 435
++
+    LINX_ (__NR_faccessat2,             sys_faccessat2),              // 439
+ };
+ 
+diff --git a/coregrind/m_syswrap/syswrap-mips64-linux.c b/coregrind/m_syswrap/syswrap-mips64-linux.c
+index b73c03da16..94f38366f0 100644
+--- a/coregrind/m_syswrap/syswrap-mips64-linux.c
++++ b/coregrind/m_syswrap/syswrap-mips64-linux.c
+@@ -815,6 +815,7 @@ static SyscallTableEntry syscall_main_table[] = {
+    LINXY (__NR_io_uring_setup, sys_io_uring_setup),
+    LINXY (__NR_io_uring_enter, sys_io_uring_enter),
+    LINXY (__NR_io_uring_register, sys_io_uring_register),
++   GENX_ (__NR_clone3, sys_ni_syscall),
+    LINX_ (__NR_faccessat2, sys_faccessat2),
+ };
+ 
+diff --git a/coregrind/m_syswrap/syswrap-nanomips-linux.c b/coregrind/m_syswrap/syswrap-nanomips-linux.c
+index 14127b181a..102c155507 100644
+--- a/coregrind/m_syswrap/syswrap-nanomips-linux.c
++++ b/coregrind/m_syswrap/syswrap-nanomips-linux.c
+@@ -824,6 +824,7 @@ static SyscallTableEntry syscall_main_table[] = {
+    LINXY (__NR_io_uring_setup,         sys_io_uring_setup),
+    LINXY (__NR_io_uring_enter,         sys_io_uring_enter),
+    LINXY (__NR_io_uring_register,      sys_io_uring_register),
++   GENX_ (__NR_clone3,                 sys_ni_syscall),
+    LINX_ (__NR_faccessat2,             sys_faccessat2),
+ };
+ 
+diff --git a/coregrind/m_syswrap/syswrap-ppc32-linux.c b/coregrind/m_syswrap/syswrap-ppc32-linux.c
+index aad14f8ba4..1e2efc6777 100644
+--- a/coregrind/m_syswrap/syswrap-ppc32-linux.c
++++ b/coregrind/m_syswrap/syswrap-ppc32-linux.c
+@@ -1054,6 +1054,8 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register), // 427
+ 
++   GENX_(__NR_clone3,            sys_ni_syscall),        // 435
++
+    LINX_(__NR_faccessat2,        sys_faccessat2),       // 439
+ };
+ 
+diff --git a/coregrind/m_syswrap/syswrap-ppc64-linux.c b/coregrind/m_syswrap/syswrap-ppc64-linux.c
+index c0e3f55491..76610e1423 100644
+--- a/coregrind/m_syswrap/syswrap-ppc64-linux.c
++++ b/coregrind/m_syswrap/syswrap-ppc64-linux.c
+@@ -1023,6 +1023,8 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register), // 427
+ 
++   GENX_(__NR_clone3,            sys_ni_syscall),        // 435
++
+    LINX_(__NR_faccessat2,        sys_faccessat2),       // 439
+ };
+ 
+diff --git a/coregrind/m_syswrap/syswrap-s390x-linux.c b/coregrind/m_syswrap/syswrap-s390x-linux.c
+index af6c4eb210..5283c19fe4 100644
+--- a/coregrind/m_syswrap/syswrap-s390x-linux.c
++++ b/coregrind/m_syswrap/syswrap-s390x-linux.c
+@@ -864,6 +864,8 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_io_uring_enter, sys_io_uring_enter),                    // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register),              // 427
+ 
++   GENX_(__NR_clone3, sys_ni_syscall),                                // 435
++
+    LINX_(__NR_faccessat2,  sys_faccessat2),                           // 439
+ };
+ 
+diff --git a/coregrind/m_syswrap/syswrap-x86-linux.c b/coregrind/m_syswrap/syswrap-x86-linux.c
+index 67d866497d..418c769750 100644
+--- a/coregrind/m_syswrap/syswrap-x86-linux.c
++++ b/coregrind/m_syswrap/syswrap-x86-linux.c
+@@ -1645,6 +1645,8 @@ static SyscallTableEntry syscall_table[] = {
+    LINXY(__NR_io_uring_enter,    sys_io_uring_enter),   // 426
+    LINXY(__NR_io_uring_register, sys_io_uring_register),// 427
+ 
++   GENX_(__NR_clone3,            sys_ni_syscall),       // 435
++
+    LINX_(__NR_faccessat2,	 sys_faccessat2),       // 439
+ };
+ 
+diff --git a/include/vki/vki-scnums-shared-linux.h b/include/vki/vki-scnums-shared-linux.h
+index c8bc31b4b3..6c70c9981d 100644
+--- a/include/vki/vki-scnums-shared-linux.h
++++ b/include/vki/vki-scnums-shared-linux.h
+@@ -39,6 +39,8 @@
+ #define __NR_fsmount		432
+ #define __NR_fspick		433
+ 
++#define __NR_clone3		435
++
+ #define __NR_faccessat2		439
+ 
+ #endif
+-- 
+2.27.0
+

@@ -8,7 +8,7 @@ SRC_URI[md5sum] = "228675376012fb27dd7f70ab685e7766"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-datetime \
     ${PYTHON_PN}-numbers \
     ${PYTHON_PN}-urllib3 \

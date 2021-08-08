@@ -19,4 +19,4 @@ do_install() {
     install -m 0755 -D ${S}/debian/ifenslave.if-up ${D}${sysconfdir}/network/if-up.d/ifenslave
 }
 
-FILES_${PN}-doc_remove = "${mandir}"
+FILES:${PN}-doc:remove = "${mandir}"

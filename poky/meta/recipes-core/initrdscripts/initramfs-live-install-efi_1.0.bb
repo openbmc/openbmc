@@ -5,8 +5,8 @@ SRC_URI = "file://init-install-efi.sh"
 
 PR = "r1"
 
-RDEPENDS_${PN} = "parted e2fsprogs-mke2fs dosfstools util-linux-blkid ${VIRTUAL-RUNTIME_base-utils}"
-RRECOMMENDS_${PN} = "${VIRTUAL-RUNTIME_base-utils-syslog}"
+RDEPENDS:${PN} = "parted e2fsprogs-mke2fs dosfstools util-linux-blkid ${VIRTUAL-RUNTIME_base-utils}"
+RRECOMMENDS:${PN} = "${VIRTUAL-RUNTIME_base-utils-syslog}"
 
 S = "${WORKDIR}"
 
@@ -20,6 +20,6 @@ do_install() {
 #inherit allarch
 INHIBIT_DEFAULT_DEPS = "1"
 
-FILES_${PN} = " /install-efi.sh "
+FILES:${PN} = " /install-efi.sh "
 
 COMPATIBLE_HOST = "(i.86.*|x86_64.*|aarch64.*)-linux"

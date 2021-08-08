@@ -2443,6 +2443,11 @@ class RunQueueExecute:
 
         if update_tasks:
             self.sqdone = False
+            for tid in [t[0] for t in update_tasks]:
+                h = pending_hash_index(tid, self.rqdata)
+                if h in self.sqdata.hashes and tid != self.sqdata.hashes[h]:
+                    self.sq_deferred[tid] = self.sqdata.hashes[h]
+                    bb.note("Deferring %s after %s" % (tid, self.sqdata.hashes[h]))
             update_scenequeue_data([t[0] for t in update_tasks], self.sqdata, self.rqdata, self.rq, self.cooker, self.stampcache, self, summary=False)
 
         for (tid, harddepfail, origvalid) in update_tasks:
@@ -2786,6 +2791,19 @@ def build_scenequeue_data(sqdata, rqdata, rq, cooker, stampcache, sqrq):
     sqdata.stamppresent = set()
     sqdata.valid = set()
 
+    sqdata.hashes = {}
+    sqrq.sq_deferred = {}
+    for mc in sorted(sqdata.multiconfigs):
+        for tid in sorted(sqdata.sq_revdeps):
+            if mc_from_tid(tid) != mc:
+                continue
+            h = pending_hash_index(tid, rqdata)
+            if h not in sqdata.hashes:
+                sqdata.hashes[h] = tid
+            else:
+                sqrq.sq_deferred[tid] = sqdata.hashes[h]
+                bb.note("Deferring %s after %s" % (tid, sqdata.hashes[h]))
+
     update_scenequeue_data(sqdata.sq_revdeps, sqdata, rqdata, rq, cooker, stampcache, sqrq, summary=True)
 
     # Compute a list of 'stale' sstate tasks where the current hash does not match the one
@@ -2850,32 +2868,20 @@ def update_scenequeue_data(tids, sqdata, rqdata, rq, cooker, stampcache, sqrq, s
 
     sqdata.valid |= rq.validate_hashes(tocheck, cooker.data, len(sqdata.stamppresent), False, summary=summary)
 
-    sqdata.hashes = {}
-    sqrq.sq_deferred = {}
-    for mc in sorted(sqdata.multiconfigs):
-        for tid in sorted(sqdata.sq_revdeps):
-            if mc_from_tid(tid) != mc:
-                continue
-            if tid in sqdata.stamppresent:
-                continue
-            if tid in sqdata.valid:
-                continue
-            if tid in sqdata.noexec:
-                continue
-            if tid in sqrq.scenequeue_notcovered:
-                continue
-            if tid in sqrq.scenequeue_covered:
-                continue
-
-            h = pending_hash_index(tid, rqdata)
-            if h not in sqdata.hashes:
-                if tid in tids:
-                    sqdata.outrightfail.add(tid)
-                sqdata.hashes[h] = tid
-            else:
-                sqrq.sq_deferred[tid] = sqdata.hashes[h]
-                bb.note("Deferring %s after %s" % (tid, sqdata.hashes[h]))
-
+    for tid in tids:
+        if tid in sqdata.stamppresent:
+            continue
+        if tid in sqdata.valid:
+            continue
+        if tid in sqdata.noexec:
+            continue
+        if tid in sqrq.scenequeue_covered:
+            continue
+        if tid in sqrq.scenequeue_notcovered:
+            continue
+        if tid in sqrq.sq_deferred:
+            continue
+        sqdata.outrightfail.add(tid)
 
 class TaskFailure(Exception):
     """

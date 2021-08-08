@@ -12,7 +12,7 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 	${PYTHON_PN}-unixadmin \
 "
@@ -22,4 +22,4 @@ do_install_ptest() {
 	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
 }
 
-RDEPENDS_${PN} = "${PYTHON_PN}-misc"
+RDEPENDS:${PN} = "${PYTHON_PN}-misc"

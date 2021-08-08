@@ -14,12 +14,12 @@ SRC_URI += " \
 
 DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-datetime \
     ${PYTHON_PN}-numbers \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     ${PYTHON_PN}-json \
     ${PYTHON_PN}-pytest \
     ${PYTHON_PN}-pytz \

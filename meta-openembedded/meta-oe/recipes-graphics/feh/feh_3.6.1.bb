@@ -26,6 +26,6 @@ do_install () {
      oe_runmake install app=1 'DESTDIR=${D}' 'ICON_PREFIX=${D}${datadir}/icons'
 }
 
-RDEPENDS_${PN} += "imlib2-loaders"
+RDEPENDS:${PN} += "imlib2-loaders"
 
-FILES_${PN} += "${datadir}/icons"
+FILES:${PN} += "${datadir}/icons"

@@ -29,4 +29,7 @@ EXTRA_OECMAKE += "\
     -DENABLE_STATIC_SNAPPY=ON \
 "
 
-SECURITY_CFLAGS_toolchain-clang = ""
+SECURITY_CFLAGS:toolchain-clang = ""
+
+# see https://github.com/apitrace/apitrace/issues/756
+PNBLACKLIST[apitrace] ?= "Needs porting to glibc 2.34+"

@@ -28,6 +28,6 @@ inherit rm_work
 
 # Instead go up one level and remove ourself.
 DL_DIR = "${BASE_WORKDIR}/${MULTIMACH_TARGET_SYS}/${PN}/downloads"
-do_rm_work_append () {
+do_rm_work:append () {
     rm -rf ${DL_DIR}
 }

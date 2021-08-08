@@ -13,7 +13,7 @@ PYPI_PACKAGE = "Flask-User"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} = "${PYTHON_PN}-flask \
+RDEPENDS:${PN} = "${PYTHON_PN}-flask \
     ${PYTHON_PN}-flask-login \
     ${PYTHON_PN}-flask-mail \
     ${PYTHON_PN}-babel"

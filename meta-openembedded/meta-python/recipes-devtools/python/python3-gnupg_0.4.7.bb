@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "2061f56b1942c29b92727bf9aecbd3cea3893acc9cccbdc7eb4604285e
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} +=  " \
+RDEPENDS:${PN} +=  " \
 	gnupg-gpg \
 	python3-logging \
 "

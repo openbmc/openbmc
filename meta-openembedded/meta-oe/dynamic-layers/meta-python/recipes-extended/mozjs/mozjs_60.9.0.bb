@@ -20,11 +20,11 @@ SRC_URI = " \
     file://0013-riscv-Disable-atomic-operations.patch \
     file://0014-remove-JS_VOLATIME_ARM.patch \
 "
-SRC_URI_append_libc-musl = " \
+SRC_URI:append:libc-musl = " \
     file://musl/0001-support-musl.patch \
     file://musl/0002-js-Fix-build-with-musl.patch \
 "
-SRC_URI_append_mipsarchn32 = " \
+SRC_URI:append:mipsarchn32 = " \
     file://mipsarchn32/0001-fix-compiling-failure-on-mips64-n32-bsp.patch \
 "
 SRC_URI[md5sum] = "69a0be9ce695e5dc4941ed0c78ef00c2"
@@ -35,7 +35,7 @@ S = "${WORKDIR}/firefox-${@d.getVar("PV").replace("esr", "")}"
 inherit autotools pkgconfig perlnative python3native
 
 inherit features_check
-CONFLICT_DISTRO_FEATURES_mipsarchn32 = "ld-is-gold"
+CONFLICT_DISTRO_FEATURES:mipsarchn32 = "ld-is-gold"
 
 DEPENDS += " \
     nspr zlib autoconf-2.13-native \
@@ -62,18 +62,18 @@ EXTRA_OECONF = " \
 "
 
 # Without this, JS_Init() will fail for mips64.
-EXTRA_OECONF_append_mipsarch = " --with-intl-api=build"
-EXTRA_OECONF_append_powerpc = " --with-intl-api=build"
+EXTRA_OECONF:append:mipsarch = " --with-intl-api=build"
+EXTRA_OECONF:append:powerpc = " --with-intl-api=build"
 
-EXTRA_OECONF_append_mipsarch = " --disable-ion"
-EXTRA_OECONF_append_riscv64 = " --disable-ion"
-EXTRA_OECONF_append_riscv32 = " --disable-ion"
+EXTRA_OECONF:append:mipsarch = " --disable-ion"
+EXTRA_OECONF:append:riscv64 = " --disable-ion"
+EXTRA_OECONF:append:riscv32 = " --disable-ion"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 PACKAGECONFIG[x11] = "--x-includes=${STAGING_INCDIR} --x-libraries=${STAGING_LIBDIR},--x-includes=no --x-libraries=no,virtual/libx11"
 
-EXTRA_OEMAKE_task-compile += "BUILD_OPT=1 OS_LDFLAGS='-Wl,-latomic ${LDFLAGS}'"
-EXTRA_OEMAKE_task-install += "STATIC_LIBRARY_NAME=js_static"
+EXTRA_OEMAKE:task-compile += "BUILD_OPT=1 OS_LDFLAGS='-Wl,-latomic ${LDFLAGS}'"
+EXTRA_OEMAKE:task-install += "STATIC_LIBRARY_NAME=js_static"
 
 export HOST_CC = "${BUILD_CC}"
 export HOST_CXX = "${BUILD_CXX}"
@@ -110,12 +110,12 @@ do_configure() {
     touch ${B}/config.status
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
     export SHELL="/bin/sh"
     export PYTHONPATH=`cat ${B}/PYTHONPATH`
 }
 
-do_install_prepend() {
+do_install:prepend() {
     export SHELL="/bin/sh"
     export PYTHONPATH=`cat ${B}/PYTHONPATH`
 }
@@ -124,15 +124,15 @@ inherit multilib_script multilib_header
 
 MULTILIB_SCRIPTS += " ${PN}-dev:${bindir}/js60-config"
 
-do_install_append() {
+do_install:append() {
        oe_multilib_header mozjs-60/js-config.h
        sed -e 's@${STAGING_DIR_HOST}@@g' \
            -i ${D}${bindir}/js60-config
 }
 
 PACKAGES =+ "lib${BPN}"
-FILES_lib${BPN} += "${libdir}/lib*.so"
-FILES_${PN}-dev += "${bindir}/js60-config"
+FILES:lib${BPN} += "${libdir}/lib*.so"
+FILES:${PN}-dev += "${bindir}/js60-config"
 
 # Fails to build with thumb-1 (qemuarm)
 #| {standard input}: Assembler messages:
@@ -141,7 +141,7 @@ FILES_${PN}-dev += "${bindir}/js60-config"
 #| {standard input}:2174: Error: unshifted register required -- `orr r1,r1,#(1<<20)'
 #| {standard input}:2176: Error: instruction not supported in Thumb16 mode -- `subs r2,r2,#0x300'
 #| {standard input}:2178: Error: instruction not supported in Thumb16 mode -- `subs r5,r2,#52'
-ARM_INSTRUCTION_SET_armv5 = "arm"
-ARM_INSTRUCTION_SET_armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
 
 DISABLE_STATIC = ""

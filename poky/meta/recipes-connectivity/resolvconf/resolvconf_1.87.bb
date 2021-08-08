@@ -9,7 +9,7 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b"
 AUTHOR = "Thomas Hood"
 HOMEPAGE = "http://packages.debian.org/resolvconf"
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 SRC_URI = "git://salsa.debian.org/debian/resolvconf.git;protocol=https;branch=unstable \
            file://fix-path-for-busybox.patch \
@@ -55,7 +55,7 @@ do_install () {
 	install -m 0644 man/resolvconf.8 ${D}${mandir}/man8/
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 	if [ -z "$D" ]; then
 		if command -v systemd-tmpfiles >/dev/null; then
 			systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/resolvconf.conf
@@ -65,4 +65,4 @@ pkg_postinst_${PN} () {
 	fi
 }
 
-FILES_${PN} += "${base_libdir}/${BPN}"
+FILES:${PN} += "${base_libdir}/${BPN}"

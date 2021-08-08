@@ -22,7 +22,7 @@ require gcc-configure-common.inc
 LINKER_HASH_STYLE ?= "sysv"
 
 EXTRA_OECONF += "--enable-poison-system-directories=error"
-EXTRA_OECONF_append_sh4 = " \
+EXTRA_OECONF:append:sh4 = " \
     --with-multilib-list= \
     --enable-incomplete-targets \
 "
@@ -31,9 +31,9 @@ EXTRA_OECONF += "\
     --with-system-zlib \
 "
 
-EXTRA_OECONF_append_libc-baremetal = " --without-headers"
-EXTRA_OECONF_remove_libc-baremetal = "--enable-threads=posix"
-EXTRA_OECONF_remove_libc-newlib = "--enable-threads=posix"
+EXTRA_OECONF:append:libc-baremetal = " --without-headers"
+EXTRA_OECONF:remove:libc-baremetal = "--enable-threads=posix"
+EXTRA_OECONF:remove:libc-newlib = "--enable-threads=posix"
 
 EXTRA_OECONF_PATHS = "\
     --with-gxx-include-dir=/not/exist${target_includedir}/c++/${BINV} \
@@ -44,7 +44,7 @@ EXTRA_OECONF_PATHS = "\
 ARCH_FLAGS_FOR_TARGET += "-isystem${STAGING_DIR_TARGET}${target_includedir}"
 
 
-do_configure_prepend () {
+do_configure:prepend () {
 	install -d ${RECIPE_SYSROOT}${target_includedir}
 	touch ${RECIPE_SYSROOT}${target_includedir}/limits.h
 }

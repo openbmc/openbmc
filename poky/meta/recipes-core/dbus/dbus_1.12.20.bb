@@ -7,10 +7,10 @@ require dbus.inc
 
 DEPENDS = "expat virtual/libintl autoconf-archive"
 PACKAGES += "${@bb.utils.contains('DISTRO_FEATURES', 'ptest', '${PN}-ptest', '', d)}"
-ALLOW_EMPTY_dbus-ptest = "1"
-RDEPENDS_dbus-ptest_class-target = "dbus-test-ptest"
-RDEPENDS_${PN} += "${PN}-common ${PN}-tools"
-RDEPENDS_${PN}_class-native = ""
+ALLOW_EMPTY:dbus-ptest = "1"
+RDEPENDS:dbus-ptest:class-target = "dbus-test-ptest"
+RDEPENDS:${PN} += "${PN}-common ${PN}-tools"
+RDEPENDS:${PN}:class-native = ""
 
 inherit useradd update-rc.d
 
@@ -25,22 +25,22 @@ python __anonymous() {
 PACKAGES =+ "${PN}-lib ${PN}-common ${PN}-tools"
 
 USERADD_PACKAGES = "dbus-common"
-USERADD_PARAM_dbus-common = "--system --home ${localstatedir}/lib/dbus \
+USERADD_PARAM:dbus-common = "--system --home ${localstatedir}/lib/dbus \
                              --no-create-home --shell /bin/false \
                              --user-group messagebus"
 
-CONFFILES_${PN} = "${sysconfdir}/dbus-1/system.conf ${sysconfdir}/dbus-1/session.conf"
+CONFFILES:${PN} = "${sysconfdir}/dbus-1/system.conf ${sysconfdir}/dbus-1/session.conf"
 
-DEBIANNAME_${PN} = "dbus-1"
+DEBIANNAME:${PN} = "dbus-1"
 
 OLDPKGNAME = "dbus-x11"
-OLDPKGNAME_class-nativesdk = ""
+OLDPKGNAME:class-nativesdk = ""
 
 # for compatibility
-RPROVIDES_${PN} = "${OLDPKGNAME}"
-RREPLACES_${PN} += "${OLDPKGNAME}"
+RPROVIDES:${PN} = "${OLDPKGNAME}"
+RREPLACES:${PN} += "${OLDPKGNAME}"
 
-FILES_${PN} = "${bindir}/dbus-daemon* \
+FILES:${PN} = "${bindir}/dbus-daemon* \
                ${bindir}/dbus-cleanup-sockets \
                ${bindir}/dbus-launch \
                ${bindir}/dbus-run-session \
@@ -51,7 +51,7 @@ FILES_${PN} = "${bindir}/dbus-daemon* \
                ${systemd_user_unitdir} \
                ${nonarch_libdir}/tmpfiles.d/dbus.conf \
 "
-FILES_${PN}-common = "${sysconfdir}/dbus-1 \
+FILES:${PN}-common = "${sysconfdir}/dbus-1 \
                       ${datadir}/dbus-1/services \
                       ${datadir}/dbus-1/system-services \
                       ${datadir}/dbus-1/session.d \
@@ -64,17 +64,17 @@ FILES_${PN}-common = "${sysconfdir}/dbus-1 \
                       ${systemd_user_unitdir}/sockets.target.wants \
                       ${nonarch_libdir}/sysusers.d/dbus.conf \
 "
-FILES_${PN}-tools = "${bindir}/dbus-uuidgen \
+FILES:${PN}-tools = "${bindir}/dbus-uuidgen \
                      ${bindir}/dbus-send \
                      ${bindir}/dbus-monitor \
                      ${bindir}/dbus-update-activation-environment \
 "
-FILES_${PN}-lib = "${libdir}/lib*.so.*"
-RRECOMMENDS_${PN}-lib = "${PN}"
-FILES_${PN}-dev += "${libdir}/dbus-1.0/include ${bindir}/dbus-test-tool ${datadir}/xml/dbus-1"
+FILES:${PN}-lib = "${libdir}/lib*.so.*"
+RRECOMMENDS:${PN}-lib = "${PN}"
+FILES:${PN}-dev += "${libdir}/dbus-1.0/include ${bindir}/dbus-test-tool ${datadir}/xml/dbus-1"
 
 PACKAGE_WRITE_DEPS += "${@bb.utils.contains('DISTRO_FEATURES','systemd sysvinit','systemd-systemctl-native','',d)}"
-pkg_postinst_dbus() {
+pkg_postinst:dbus() {
 	# If both systemd and sysvinit are enabled, mask the dbus-1 init script
         if ${@bb.utils.contains('DISTRO_FEATURES','systemd sysvinit','true','false',d)}; then
 		if [ -n "$D" ]; then
@@ -130,7 +130,7 @@ do_install() {
 	rm -rf ${D}${localstatedir}/run
 }
 
-do_install_class-native() {
+do_install:class-native() {
 	autotools_do_install
 
 	# dbus-launch has no X support so lets not install it in case the host
@@ -138,7 +138,7 @@ do_install_class-native() {
 	rm -f ${D}${bindir}/dbus-launch
 }
 
-do_install_class-nativesdk() {
+do_install:class-nativesdk() {
 	autotools_do_install
 
 	# dbus-launch has no X support so lets not install it in case the host
@@ -150,4 +150,4 @@ do_install_class-nativesdk() {
 }
 BBCLASSEXTEND = "native nativesdk"
 
-INSANE_SKIP_${PN}-ptest += "build-deps"
+INSANE_SKIP:${PN}-ptest += "build-deps"

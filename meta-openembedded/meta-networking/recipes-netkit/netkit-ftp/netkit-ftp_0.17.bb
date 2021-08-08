@@ -41,13 +41,13 @@ do_install () {
 }
 
 PACKAGES = "${PN} ${PN}-doc ${BPN}-dbg"
-FILES_${PN} = "${bindir}/*"
-FILES_${PN}-doc = "${mandir}"
-FILES_${PN}-dbg = "${prefix}/src/debug \
+FILES:${PN} = "${bindir}/*"
+FILES:${PN}-doc = "${mandir}"
+FILES:${PN}-dbg = "${prefix}/src/debug \
             ${bindir}/.debug"
 
-RDEPENDS_${PN} = "readline"
+RDEPENDS:${PN} = "readline"
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN} = "ftp"
+ALTERNATIVE:${PN} = "ftp"
 ALTERNATIVE_LINK_NAME[ftp] = "${bindir}/ftp"

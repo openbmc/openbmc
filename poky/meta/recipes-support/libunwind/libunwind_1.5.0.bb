@@ -8,21 +8,21 @@ SRC_URI = "http://download.savannah.nongnu.org/releases/libunwind/libunwind-${PV
            file://0006-Fix-for-X32.patch \
            file://0001-configure-Do-not-enforce-libdir-for-ppc64.patch \
            "
-SRC_URI_append_libc-musl = " file://musl-header-conflict.patch"
+SRC_URI:append:libc-musl = " file://musl-header-conflict.patch"
 
 SRC_URI[md5sum] = "c6923dda0675f6a4ef21426164dc8b6a"
 SRC_URI[sha256sum] = "90337653d92d4a13de590781371c604f9031cdb50520366aa1e3a91e1efb1017"
 
-EXTRA_OECONF_append_libc-musl = " --disable-documentation --disable-tests --enable-static"
+EXTRA_OECONF:append:libc-musl = " --disable-documentation --disable-tests --enable-static"
 
 # http://errors.yoctoproject.org/Errors/Details/20487/
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
 
-COMPATIBLE_HOST_riscv64 = "null"
-COMPATIBLE_HOST_riscv32 = "null"
+COMPATIBLE_HOST:riscv64 = "null"
+COMPATIBLE_HOST:riscv32 = "null"
 
 LDFLAGS += "-Wl,-z,relro,-z,now ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
 
-SECURITY_LDFLAGS_append_libc-musl = " -lssp_nonshared"
-CACHED_CONFIGUREVARS_append_libc-musl = " LDFLAGS='${LDFLAGS} -lucontext'"
+SECURITY_LDFLAGS:append:libc-musl = " -lssp_nonshared"
+CACHED_CONFIGUREVARS:append:libc-musl = " LDFLAGS='${LDFLAGS} -lucontext'"

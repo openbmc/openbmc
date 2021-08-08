@@ -35,7 +35,7 @@ do_install() {
     rm -f ${D}${datadir}/phpmyadmin/libraries/transformations/*.sh
 }
 
-FILES_${PN} = "${datadir}/${BPN} \
+FILES:${PN} = "${datadir}/${BPN} \
                ${sysconfdir}/apache2/conf.d"
 
-RDEPENDS_${PN} += "bash php-cli"
+RDEPENDS:${PN} += "bash php-cli"

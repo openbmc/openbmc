@@ -16,7 +16,7 @@ B_chgrp
 B_chgrp_link
 B_userdel
 B_groupdel
-B_remove_user_from_group
+B:remove_user_from_group
 B_check_owner_group
 B_is_unowned_file
 B_is_ungrouped_file
@@ -28,7 +28,7 @@ B_is_suid
 B_is_sgid
 B_get_user_list
 B_get_group_list
-B_remove_suid
+B:remove_suid
 );
 our @EXPORT = @EXPORT_OK;
 
@@ -74,7 +74,7 @@ sub B_chmod($$) {
    if ($new_perm =~ /([ugo]+)([+-]{1})([rwxst]+)/) {
        $symbolic = 1;
        $chmod_noun = $1;
-       $add_remove = $2;
+       $add:remove = $2;
        $capability = $3;
    }
 
@@ -466,7 +466,7 @@ sub B_chgrp_link($$) {
 #
 # In the future, we may also choose to make a B_lock_account routine.
 #
-# This routine depends on B_remove_user_from_group.
+# This routine depends on B:remove_user_from_group.
 ###########################################################################
 
 sub B_userdel($) {
@@ -506,7 +506,7 @@ sub B_userdel($) {
 
     #
     # Next find out what groups the user is in, so we can call
-    # B_remove_user_from_group($user,$group)
+    # B:remove_user_from_group($user,$group)
     #
     # TODO: add this to the helper functions for the test suite.
     #
@@ -586,7 +586,7 @@ sub B_groupdel($) {
 
 
 ###########################################################################
-# B_remove_user_from_group($user,$group) removes $user from $group,
+# B:remove_user_from_group($user,$group) removes $user from $group,
 # by modifying $group's /etc/group line, pulling the user out.  This
 # uses B_chunk_replace thrice to replace these patterns:
 #
@@ -595,7 +595,7 @@ sub B_groupdel($) {
 #
 ###########################################################################
 
-sub B_remove_user_from_group($$) {
+sub B:remove_user_from_group($$) {
 
     my ($user_to_remove,$group) = @_;
 
@@ -1022,7 +1022,7 @@ sub B_get_group_list()
 #
 ###########################################################################
 
-sub B_remove_suid($) {
+sub B:remove_suid($) {
    my $file_expr = $_[0];
 
    &B_log("ACTION","Removing SUID bit from \"$file_expr\".");

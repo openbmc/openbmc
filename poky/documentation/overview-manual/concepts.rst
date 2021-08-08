@@ -74,7 +74,7 @@ versions of ``matchbox-desktop`` might exist. BitBake chooses the one
 selected by the distribution configuration. You can get more details
 about how BitBake chooses between different target versions and
 providers in the
-":ref:`Preferences <bitbake:bitbake-user-manual/bitbake-user-manual-execution:preferences>`" section
+":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:preferences`" section
 of the BitBake User Manual.
 
 BitBake also tries to execute any dependent tasks first. So for example,
@@ -584,7 +584,7 @@ Source Control Managers (Optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Another place from which the build system can get source files is with
-:ref:`fetchers <bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers>` employing various Source
+:ref:`bitbake:bitbake-user-manual/bitbake-user-manual-fetching:fetchers` employing various Source
 Control Managers (SCMs) such as Git or Subversion. In such cases, a
 repository is cloned or checked out. The
 :ref:`ref-tasks-fetch` task inside
@@ -1250,11 +1250,9 @@ download or setscene task fails, the build system then tries to install
 dependencies, such as the compiler, from the cache.
 
 The availability of objects in the sstate cache is handled by the
-function specified by the
-:term:`bitbake:BB_HASHCHECK_FUNCTION`
+function specified by the :term:`BB_HASHCHECK_FUNCTION`
 variable and returns a list of available objects. The function specified
-by the
-:term:`bitbake:BB_SETSCENE_DEPVALID`
+by the :term:`BB_SETSCENE_DEPVALID`
 variable is the function that determines whether a given dependency
 needs to be followed, and whether for any given relationship the
 function needs to be passed. The function returns a True or False value.
@@ -1863,7 +1861,7 @@ The following list explains the previous example:
   through the shared state cache if possible. If the task was
   accelerated, ``sstate_setscene()`` returns True. Otherwise, it
   returns False, and the normal ``do_deploy`` task runs. For more
-  information, see the ":ref:`setscene <bitbake:bitbake-user-manual/bitbake-user-manual-execution:setscene>`"
+  information, see the ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-execution:setscene`"
   section in the BitBake User Manual.
 
 -  The ``do_deploy[dirs] = "${DEPLOYDIR} ${B}"`` line creates

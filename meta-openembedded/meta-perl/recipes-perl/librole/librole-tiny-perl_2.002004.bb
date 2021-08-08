@@ -16,13 +16,13 @@ S = "${WORKDIR}/Role-Tiny-${PV}"
 
 inherit cpan
 
-RDEPENDS_${PN} = " perl-module-exporter \
+RDEPENDS:${PN} = " perl-module-exporter \
                    perl-module-strict \
                    perl-module-test-more \
                    perl-module-warnings \
 "
 
-RPROVIDES_${PN} = " librole-tiny-perl \
+RPROVIDES:${PN} = " librole-tiny-perl \
                     librole-tiny-with-perl \
 "
 

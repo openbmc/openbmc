@@ -47,23 +47,23 @@ else
 fi
 }
 
-python populate_packages_append () {
+python populate_packages:append () {
     gtkimmodules_pkgs = d.getVar('GTKIMMODULES_PACKAGES').split()
 
     for pkg in gtkimmodules_pkgs:
             bb.note("adding gtk-immodule-cache postinst and postrm scripts to %s" % pkg)
 
-            postinst = d.getVar('pkg_postinst_%s' % pkg)
+            postinst = d.getVar('pkg_postinst:%s' % pkg)
             if not postinst:
                 postinst = '#!/bin/sh\n'
             postinst += d.getVar('gtk_immodule_cache_postinst')
-            d.setVar('pkg_postinst_%s' % pkg, postinst)
+            d.setVar('pkg_postinst:%s' % pkg, postinst)
 
-            postrm = d.getVar('pkg_postrm_%s' % pkg)
+            postrm = d.getVar('pkg_postrm:%s' % pkg)
             if not postrm:
                 postrm = '#!/bin/sh\n'
             postrm += d.getVar('gtk_immodule_cache_postrm')
-            d.setVar('pkg_postrm_%s' % pkg, postrm)
+            d.setVar('pkg_postrm:%s' % pkg, postrm)
 }
 
 python __anonymous() {

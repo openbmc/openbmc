@@ -16,5 +16,5 @@ inherit autotools pkgconfig gettext gobject-introspection vala
 # configure: error: GObject-Introspection must be enabled for Vala bindings
 EXTRA_OECONF = "${@bb.utils.contains('GI_DATA_ENABLED', 'True', '--enable-vala-bindings', '--disable-vala-bindings', d)}"
 
-FILES_${PN} += "${datadir}/telepathy \
+FILES:${PN} += "${datadir}/telepathy \
                 ${datadir}/dbus-1"

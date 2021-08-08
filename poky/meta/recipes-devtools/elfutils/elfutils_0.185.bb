@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://debuginfod/debuginfod-client.c;endline=27;md5=f8e9d171c401c493ec45a0b2992ea2ed \
                     "
 DEPENDS = "zlib virtual/libintl"
-DEPENDS_append_libc-musl = " argp-standalone fts musl-obstack "
+DEPENDS:append:libc-musl = " argp-standalone fts musl-obstack "
 # The Debian patches below are from:
 # http://ftp.de.debian.org/debian/pool/main/e/elfutils/elfutils_0.176-1.debian.tar.xz
 SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
@@ -22,8 +22,9 @@ SRC_URI = "https://sourceware.org/elfutils/ftp/${PV}/${BP}.tar.bz2 \
            file://ptest.patch \
            file://0001-tests-Makefile.am-compile-test_nlist-with-standard-C.patch \
            file://0001-debuginfod-debuginfod-client.c-correct-string-format.patch \
+           file://glibc-2.34-fix.patch \
            "
-SRC_URI_append_libc-musl = " \
+SRC_URI:append:libc-musl = " \
            file://0002-musl-libs.patch \
            file://0003-musl-utils.patch \
            file://0004-Fix-error-on-musl.patch \
@@ -36,7 +37,7 @@ inherit autotools gettext ptest pkgconfig
 EXTRA_OECONF = "--program-prefix=eu-"
 
 DEPENDS_BZIP2 = "bzip2-replacement-native"
-DEPENDS_BZIP2_class-target = "bzip2"
+DEPENDS_BZIP2:class-target = "bzip2"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'debuginfod', 'debuginfod libdebuginfod', '', d)}"
 PACKAGECONFIG[bzip2] = "--with-bzlib,--without-bzlib,${DEPENDS_BZIP2}"
@@ -44,11 +45,11 @@ PACKAGECONFIG[xz] = "--with-lzma,--without-lzma,xz"
 PACKAGECONFIG[libdebuginfod] = "--enable-libdebuginfod,--disable-libdebuginfod,curl"
 PACKAGECONFIG[debuginfod] = "--enable-debuginfod,--disable-debuginfod,libarchive sqlite3 libmicrohttpd"
 
-RDEPENDS_${PN}-ptest += "libasm libelf bash make coreutils ${PN}-binutils iproute2-ss bsdtar"
+RDEPENDS:${PN}-ptest += "libasm libelf bash make coreutils ${PN}-binutils iproute2-ss bsdtar"
 
-EXTRA_OECONF_append_class-target = " --disable-tests-rpath"
+EXTRA_OECONF:append:class-target = " --disable-tests-rpath"
 
-RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-utils"
+RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-utils"
 
 do_compile_ptest() {
 	cd ${B}/tests
@@ -92,8 +93,8 @@ do_install_ptest() {
 	fi
 }
 
-EXTRA_OEMAKE_class-native = ""
-EXTRA_OEMAKE_class-nativesdk = ""
+EXTRA_OEMAKE:class-native = ""
+EXTRA_OEMAKE:class-nativesdk = ""
 
 BBCLASSEXTEND = "native nativesdk"
 
@@ -105,14 +106,14 @@ PACKAGES =+ "${PN}-binutils libelf libasm libdw libdebuginfod"
 # "The license is now GPLv2/LGPLv3+ for the libraries and GPLv3+ for stand-alone
 # programs. There is now also a formal CONTRIBUTING document describing how to
 # submit patches."
-LICENSE_${PN}-binutils = "GPLv3+"
-LICENSE_${PN} = "GPLv3+"
-LICENSE_libelf = "GPLv2 | LGPLv3+"
-LICENSE_libasm = "GPLv2 | LGPLv3+"
-LICENSE_libdw = "GPLv2 | LGPLv3+"
-LICENSE_libdebuginfod = "GPLv2+ | LGPLv3+"
+LICENSE:${PN}-binutils = "GPLv3+"
+LICENSE:${PN} = "GPLv3+"
+LICENSE:libelf = "GPLv2 | LGPLv3+"
+LICENSE:libasm = "GPLv2 | LGPLv3+"
+LICENSE:libdw = "GPLv2 | LGPLv3+"
+LICENSE:libdebuginfod = "GPLv2+ | LGPLv3+"
 
-FILES_${PN}-binutils = "\
+FILES:${PN}-binutils = "\
     ${bindir}/eu-addr2line \
     ${bindir}/eu-ld \
     ${bindir}/eu-nm \
@@ -120,19 +121,19 @@ FILES_${PN}-binutils = "\
     ${bindir}/eu-size \
     ${bindir}/eu-strip"
 
-FILES_libelf = "${libdir}/libelf-${PV}.so ${libdir}/libelf.so.*"
-FILES_libasm = "${libdir}/libasm-${PV}.so ${libdir}/libasm.so.*"
-FILES_libdw  = "${libdir}/libdw-${PV}.so ${libdir}/libdw.so.* ${libdir}/elfutils/lib*"
-FILES_libdebuginfod = "${libdir}/libdebuginfod-${PV}.so ${libdir}/libdebuginfod.so.*"
+FILES:libelf = "${libdir}/libelf-${PV}.so ${libdir}/libelf.so.*"
+FILES:libasm = "${libdir}/libasm-${PV}.so ${libdir}/libasm.so.*"
+FILES:libdw  = "${libdir}/libdw-${PV}.so ${libdir}/libdw.so.* ${libdir}/elfutils/lib*"
+FILES:libdebuginfod = "${libdir}/libdebuginfod-${PV}.so ${libdir}/libdebuginfod.so.*"
 # Some packages have the version preceeding the .so instead properly
 # versioned .so.<version>, so we need to reorder and repackage.
 #FILES_${PN} += "${libdir}/*-${PV}.so ${base_libdir}/*-${PV}.so"
 #FILES_SOLIBSDEV = "${libdir}/libasm.so ${libdir}/libdw.so ${libdir}/libelf.so"
 
 # The package contains symlinks that trip up insane
-INSANE_SKIP_${MLPREFIX}libdw = "dev-so"
+INSANE_SKIP:${MLPREFIX}libdw = "dev-so"
 # The nlist binary in the tests uses explicitly minimal compiler flags
-INSANE_SKIP_${PN}-ptest += "ldflags"
+INSANE_SKIP:${PN}-ptest += "ldflags"
 
 # avoid stripping some generated binaries otherwise some of the tests such as test-nlist,
 # run-strip-reloc.sh, run-strip-strmerge.sh and so on will fail
@@ -161,4 +162,4 @@ INHIBIT_PACKAGE_STRIP_FILES = "\
     ${PKGD}${PTEST_PATH}/backends/libebl_x86_64.so \
 "
 
-PRIVATE_LIBS_${PN}-ptest = "libdw.so.1 libelf.so.1 libasm.so.1 libdebuginfod.so.1"
+PRIVATE_LIBS:${PN}-ptest = "libdw.so.1 libelf.so.1 libasm.so.1 libdebuginfod.so.1"

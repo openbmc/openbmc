@@ -47,10 +47,10 @@ PACKAGECONFIG[check-ycbcr-subsampling] = "--enable-check-ycbcr-subsampling,--dis
 PACKAGECONFIG[chunky-strip-read] = "--enable-chunky-strip-read,--disable-chunky-strip-read,,"
 
 PACKAGES =+ "tiffxx tiff-utils"
-FILES_tiffxx = "${libdir}/libtiffxx.so.*"
-FILES_tiff-utils = "${bindir}/*"
+FILES:tiffxx = "${libdir}/libtiffxx.so.*"
+FILES:tiff-utils = "${bindir}/*"
 
-do_install_append() {
+do_install:append() {
     oe_multilib_header tiffconf.h
 }
 

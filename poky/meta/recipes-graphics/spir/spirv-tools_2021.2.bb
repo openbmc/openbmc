@@ -25,7 +25,7 @@ EXTRA_OECMAKE += "\
     -DSPIRV_SKIP_TESTS=ON \
 "
 
-do_install_append_class-target() {
+do_install:append:class-target() {
     # reproducibility: remove build host path
     sed -i ${D}${libdir}/cmake/SPIRV-Tools/SPIRV-ToolsTarget.cmake \
         -e 's:${STAGING_DIR_HOST}::g'
@@ -36,7 +36,7 @@ SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
 
 PACKAGES =+ "${PN}-lesspipe"
-FILES_${PN}-lesspipe = "${base_bindir}/spirv-lesspipe.sh"
-RDEPENDS_${PN}-lesspipe += "${PN} bash"
+FILES:${PN}-lesspipe = "${base_bindir}/spirv-lesspipe.sh"
+RDEPENDS:${PN}-lesspipe += "${PN} bash"
 
 BBCLASSEXTEND = "native nativesdk"

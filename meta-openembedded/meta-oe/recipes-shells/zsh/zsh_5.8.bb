@@ -34,7 +34,7 @@ export bindir="${base_bindir}"
 
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
-ALTERNATIVE_${PN} = "sh"
+ALTERNATIVE:${PN} = "sh"
 ALTERNATIVE_LINK_NAME[sh] = "${base_bindir}/sh"
 ALTERNATIVE_TARGET[sh] = "${base_bindir}/${BPN}"
 ALTERNATIVE_PRIORITY = "90"
@@ -46,13 +46,13 @@ do_configure () {
     oe_runconf
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     touch $D${sysconfdir}/shells
     grep -q "bin/zsh" $D${sysconfdir}/shells || echo /bin/zsh >> $D${sysconfdir}/shells
     grep -q "bin/sh" $D${sysconfdir}/shells || echo /bin/sh >> $D${sysconfdir}/shells
 }
 
 # work around QA failures with usrmerge installing zsh in /usr/bin/zsh instead of /bin/zsh
-# ERROR: QA Issue: /usr/share/zsh/5.8/functions/zed contained in package zsh requires /bin/zsh, but no providers found in RDEPENDS_zsh? [file-rdeps]
+# ERROR: QA Issue: /usr/share/zsh/5.8/functions/zed contained in package zsh requires /bin/zsh, but no providers found in RDEPENDS:zsh? [file-rdeps]
 # like bash does since https://git.openembedded.org/openembedded-core/commit/?id=4759408677a4e60c5fa7131afcb5bc184cf2f90a
-RPROVIDES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/zsh', '', d)}"
+RPROVIDES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/zsh', '', d)}"

@@ -9,4 +9,4 @@ To start via command line add:
 To initialize:
 /usr/lib/ccs/init_policy
 
-DISTRO_FEATURES_append = " tomoyo"
+DISTRO_FEATURES:append = " tomoyo"

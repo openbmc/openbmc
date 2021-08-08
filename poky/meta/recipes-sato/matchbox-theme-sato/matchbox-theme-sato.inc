@@ -10,7 +10,7 @@ SECTION = "x11/wm"
 
 inherit autotools pkgconfig features_check
 
-FILES_${PN} += "${datadir}/themes"
+FILES:${PN} += "${datadir}/themes"
 
 # The matchbox-wm requires x11 in DISTRO_FEATURES
 REQUIRED_DISTRO_FEATURES = "x11"

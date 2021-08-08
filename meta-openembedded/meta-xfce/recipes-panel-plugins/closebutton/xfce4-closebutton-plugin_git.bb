@@ -15,4 +15,4 @@ S = "${WORKDIR}/git"
 
 EXTRA_OECONF += "--enable-maintainer-mode"
 
-FILES_${PN} += "${datadir}/xfce4/closebutton/themes"
+FILES:${PN} += "${datadir}/xfce4/closebutton/themes"

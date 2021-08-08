@@ -8,7 +8,7 @@
 #
 # 3. It is easy to add a new type compression by editing
 # local.conf, such as:
-# DOC_COMPRESS_LIST_append = ' abc'
+# DOC_COMPRESS_LIST:append = ' abc'
 # DOC_COMPRESS = 'abc'
 # DOC_COMPRESS_CMD[abc] = 'abc compress cmd ***'
 # DOC_DECOMPRESS_CMD[abc] = 'abc decompress cmd ***'
@@ -225,7 +225,7 @@ python compress_doc_updatealternatives () {
     infodir = d.getVar("infodir")
     compress_mode = d.getVar('DOC_COMPRESS')
     for pkg in (d.getVar('PACKAGES') or "").split():
-        old_names = (d.getVar('ALTERNATIVE_%s' % pkg) or "").split()
+        old_names = (d.getVar('ALTERNATIVE:%s' % pkg) or "").split()
         new_names = []
         for old_name in old_names:
             old_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', old_name)
@@ -258,6 +258,6 @@ python compress_doc_updatealternatives () {
                 new_names.append(new_name)
 
         if new_names:
-            d.setVar('ALTERNATIVE_%s' % pkg, ' '.join(new_names))
+            d.setVar('ALTERNATIVE:%s' % pkg, ' '.join(new_names))
 }
 

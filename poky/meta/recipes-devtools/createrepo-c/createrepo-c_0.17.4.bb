@@ -13,7 +13,7 @@ SRCREV = "cb74969736bdea86465e85feeceb895ff7a42610"
 S = "${WORKDIR}/git"
 
 DEPENDS = "expat curl glib-2.0 libxml2 openssl bzip2 zlib file sqlite3 xz rpm"
-DEPENDS_append_class-native = " file-replacement-native"
+DEPENDS:append:class-native = " file-replacement-native"
 
 inherit cmake pkgconfig bash-completion distutils3-base
 
@@ -22,7 +22,7 @@ EXTRA_OECMAKE = " -DPYTHON_INSTALL_DIR=${PYTHON_SITEPACKAGES_DIR} -DPYTHON_DESIR
 BBCLASSEXTEND = "native nativesdk"
 
 # Direct createrepo to read rpm configuration from our sysroot, not the one it was compiled in
-do_install_append_class-native() {
+do_install:append:class-native() {
         create_wrapper ${D}/${bindir}/createrepo_c \
                 RPM_CONFIGDIR=${STAGING_LIBDIR_NATIVE}/rpm \
                 MAGIC=${STAGING_DIR_NATIVE}${datadir_native}/misc/magic.mgc
@@ -30,11 +30,11 @@ do_install_append_class-native() {
                 MAGIC=${STAGING_DIR_NATIVE}${datadir_native}/misc/magic.mgc
 }
 
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
         create_wrapper ${D}/${bindir}/createrepo_c \
                 RPM_CONFIGDIR=${SDKPATHNATIVE}${libdir_nativesdk}/rpm \
-                MAGIC=${SDKPATHNATIVE}${datadir}/misc/magic.mgc
+                MAGIC=${datadir}/misc/magic.mgc
         create_wrapper ${D}/${bindir}/modifyrepo_c \
-                MAGIC=${SDKPATHNATIVE}${datadir}/misc/magic.mgc
+                MAGIC=${datadir}/misc/magic.mgc
         rm -rf ${D}/etc
 }

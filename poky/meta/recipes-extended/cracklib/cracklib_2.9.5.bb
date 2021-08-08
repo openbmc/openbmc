@@ -22,7 +22,7 @@ UPSTREAM_CHECK_REGEX = "/cracklib/(?P<pver>(\d+[\.\-_]*)+)/"
 
 inherit autotools gettext
 
-do_install_append_class-target() {
+do_install:append:class-target() {
 	create-cracklib-dict -o ${D}${datadir}/cracklib/pw_dict ${D}${datadir}/cracklib/cracklib-small
 }
 

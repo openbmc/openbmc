@@ -29,9 +29,9 @@ PARALLEL_MAKE = ""
 
 PACKAGE_BEFORE_PN = "${PN}-compiler"
 
-FILES_${PN}-compiler = "${bindir}"
+FILES:${PN}-compiler = "${bindir}"
 
-RDEPENDS_${PN}-compiler = "protobuf-compiler"
-RDEPENDS_${PN}-dev += "${PN}-compiler"
+RDEPENDS:${PN}-compiler = "protobuf-compiler"
+RDEPENDS:${PN}-dev += "${PN}-compiler"
 
 BBCLASSEXTEND = "native nativesdk"

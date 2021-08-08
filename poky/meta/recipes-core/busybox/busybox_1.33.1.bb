@@ -50,6 +50,6 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://0001-gen_build_files-Use-C-locale-when-calling-sed-on-glo.patch \
            file://0001-mktemp-add-tmpdir-option.patch \
            "
-SRC_URI_append_libc-musl = " file://musl.cfg "
+SRC_URI:append:libc-musl = " file://musl.cfg "
 
 SRC_URI[tarball.sha256sum] = "12cec6bd2b16d8a9446dd16130f2b92982f1819f6e1c5f5887b6db03f5660d28"

@@ -20,4 +20,4 @@ DEPENDS += "${PYTHON_PN}-six-native"
 PYPI_PACKAGE = "pyperf"
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "${PYTHON_PN}-misc"
+RDEPENDS:${PN} += "${PYTHON_PN}-misc"

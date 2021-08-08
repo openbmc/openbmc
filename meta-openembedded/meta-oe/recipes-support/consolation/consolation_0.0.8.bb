@@ -21,9 +21,9 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig systemd
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 644 ${B}/consolation.service ${D}${systemd_system_unitdir}
 }
 
-SYSTEMD_SERVICE_${PN} = "consolation.service"
+SYSTEMD_SERVICE:${PN} = "consolation.service"

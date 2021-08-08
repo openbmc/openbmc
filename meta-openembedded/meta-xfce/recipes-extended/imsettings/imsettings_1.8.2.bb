@@ -29,6 +29,6 @@ PACKAGECONFIG ??= "xfce"
 PACKAGECONFIG[xfce] = ",,xfconf"
 PACKAGECONFIG[xim] = ",,libgxim"
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
-FILES_${PN} += "${datadir}/dbus-1/*"
+FILES:${PN} += "${datadir}/dbus-1/*"

@@ -20,7 +20,7 @@ SRC_URI += "file://0001-meson.build-Just-warn-if-we-build-without-libseccomp.pat
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
-UNKNOWN_CONFIGURE_WHITELIST_append = " introspection"
+UNKNOWN_CONFIGURE_WHITELIST:append = " introspection"
 
 PACKAGECONFIG ??= " \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "ffmpeg", "", d)} \
@@ -65,7 +65,7 @@ EXTRA_OEMESON += " \
     -Dsystemd_user_services_dir=${systemd_user_unitdir} \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/tracker3-miners \
     ${libdir}/tracker-miners-3.0 \

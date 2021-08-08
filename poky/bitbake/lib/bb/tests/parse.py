@@ -98,8 +98,8 @@ exportD = "d"
 
 
     overridetest = """
-RRECOMMENDS_${PN} = "a"
-RRECOMMENDS_${PN}_libc = "b"
+RRECOMMENDS:${PN} = "a"
+RRECOMMENDS:${PN}:libc = "b"
 OVERRIDES = "libc:${PN}"
 PN = "gtk+"
 """
@@ -110,13 +110,13 @@ PN = "gtk+"
         self.assertEqual(d.getVar("RRECOMMENDS"), "b")
         bb.data.expandKeys(d)
         self.assertEqual(d.getVar("RRECOMMENDS"), "b")
-        d.setVar("RRECOMMENDS_gtk+", "c")
+        d.setVar("RRECOMMENDS:gtk+", "c")
         self.assertEqual(d.getVar("RRECOMMENDS"), "c")
 
     overridetest2 = """
 EXTRA_OECONF = ""
-EXTRA_OECONF_class-target = "b"
-EXTRA_OECONF_append = " c"
+EXTRA_OECONF:class-target = "b"
+EXTRA_OECONF:append = " c"
 """
 
     def test_parse_overrides(self):
@@ -128,7 +128,7 @@ EXTRA_OECONF_append = " c"
 
     overridetest3 = """
 DESCRIPTION = "A"
-DESCRIPTION_${PN}-dev = "${DESCRIPTION} B"
+DESCRIPTION:${PN}-dev = "${DESCRIPTION} B"
 PN = "bc"
 """
 
@@ -136,15 +136,15 @@ PN = "bc"
         f = self.parsehelper(self.overridetest3)
         d = bb.parse.handle(f.name, self.d)['']
         bb.data.expandKeys(d)
-        self.assertEqual(d.getVar("DESCRIPTION_bc-dev"), "A B")
+        self.assertEqual(d.getVar("DESCRIPTION:bc-dev"), "A B")
         d.setVar("DESCRIPTION", "E")
-        d.setVar("DESCRIPTION_bc-dev", "C D")
+        d.setVar("DESCRIPTION:bc-dev", "C D")
         d.setVar("OVERRIDES", "bc-dev")
         self.assertEqual(d.getVar("DESCRIPTION"), "C D")
 
 
     classextend = """
-VAR_var_override1 = "B"
+VAR_var:override1 = "B"
 EXTRA = ":override1"
 OVERRIDES = "nothing${EXTRA}"
 

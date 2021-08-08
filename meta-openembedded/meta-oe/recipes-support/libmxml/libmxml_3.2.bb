@@ -19,7 +19,7 @@ B = "${S}"
 # MXML uses autotools but it explicitly states it does not support autoheader.
 EXTRA_AUTORECONF = "--exclude=autopoint,autoheader"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # Respect optimization CFLAGS specified by OE.
     sed -e 's/-Os -g//' -i ${S}/configure.ac
 

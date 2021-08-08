@@ -261,7 +261,7 @@ do_deploy() {
     fi
 }
 
-do_deploy_append_raspberrypi3-64() {
+do_deploy:append:raspberrypi3-64() {
     echo "# have a properly sized image" >> $CONFIG
     echo "disable_overscan=1" >> $CONFIG
 

@@ -36,7 +36,7 @@ help for each package.
 
         1) vim local.conf:
         ...
-        IMAGE_INSTALL_append = " libdbd-sqlite-perl"
+        IMAGE_INSTALL:append = " libdbd-sqlite-perl"
         PERL_DBM_TEST = "1"
         ...
         2) build core-image-sato and boot the target

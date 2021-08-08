@@ -28,15 +28,15 @@ REQUIRED_DISTRO_FEATURES = "smack"
 S = "${WORKDIR}/git"
 
 PACKAGECONFIG ??= ""
-PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
+PACKAGECONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}, --without-systemdsystemunitdir, systemd"
 
-do_compile_append () {
+do_compile:append () {
 	oe_runmake -C ${S}/tests generator
 }
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}${sysconfdir}/init.d
 	install -d ${D}${sysconfdir}/smack
 	install -d ${D}${sysconfdir}/smack/accesses.d
@@ -55,10 +55,10 @@ INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME = "smack"
 INITSCRIPT_PARAMS = "start 16 2 3 4 5 . stop 35 0 1 6 ."
 
-FILES_${PN} += "${sysconfdir}/init.d/smack"
-FILES_${PN}-ptest += "generator"
+FILES:${PN} += "${sysconfdir}/init.d/smack"
+FILES:${PN}-ptest += "generator"
 
-RDEPENDS_${PN} += "coreutils python3-core"
-RDEPENDS_${PN}-ptest += "make bash bc"
+RDEPENDS:${PN} += "coreutils python3-core"
+RDEPENDS:${PN}-ptest += "make bash bc"
 
 BBCLASSEXTEND = "native"

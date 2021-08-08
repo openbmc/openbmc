@@ -10,7 +10,7 @@ PAM_SRC_URI = "file://sudo.pam"
 SRC_URI[sha256sum] = "391431f454e55121b60c6ded0fcf30ddb80d623d7d16a6d1907cfa6a0b91d8cf"
 
 DEPENDS += " virtual/crypt ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
-RDEPENDS_${PN} += " ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-limits pam-plugin-keyinit', '', d)}"
+RDEPENDS:${PN} += " ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-limits pam-plugin-keyinit', '', d)}"
 
 CACHED_CONFIGUREVARS = " \
         ac_cv_type_rsize_t=no \
@@ -28,7 +28,7 @@ EXTRA_OECONF += " \
              --libexecdir=${libdir} \
              "
 
-do_install_append () {
+do_install:append () {
 	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}" ]; then
 		install -D -m 644 ${WORKDIR}/sudo.pam ${D}/${sysconfdir}/pam.d/sudo
 		if ${@bb.utils.contains('PACKAGECONFIG', 'pam-wheel', 'true', 'false', d)} ; then
@@ -44,7 +44,7 @@ do_install_append () {
 	rmdir -p --ignore-fail-on-non-empty ${D}/run/sudo
 }
 
-FILES_${PN}-dev += "${libdir}/${BPN}/lib*${SOLIBSDEV} ${libdir}/${BPN}/*.la \
+FILES:${PN}-dev += "${libdir}/${BPN}/lib*${SOLIBSDEV} ${libdir}/${BPN}/*.la \
                     ${libdir}/lib*${SOLIBSDEV} ${libdir}/*.la"
 
 SUDO_PACKAGES = "${PN}-sudo\
@@ -52,8 +52,8 @@ SUDO_PACKAGES = "${PN}-sudo\
 
 PACKAGE_BEFORE_PN = "${SUDO_PACKAGES}"
 
-RDEPENDS_${PN}-sudo = "${PN}-lib"
-RDEPENDS_${PN} += "${SUDO_PACKAGES}"
+RDEPENDS:${PN}-sudo = "${PN}-lib"
+RDEPENDS:${PN} += "${SUDO_PACKAGES}"
 
-FILES_${PN}-sudo = "${bindir}/sudo ${bindir}/sudoedit"
-FILES_${PN}-lib = "${localstatedir} ${libexecdir} ${sysconfdir} ${libdir} ${nonarch_libdir}"
+FILES:${PN}-sudo = "${bindir}/sudo ${bindir}/sudoedit"
+FILES:${PN}-lib = "${localstatedir} ${libexecdir} ${sysconfdir} ${libdir} ${nonarch_libdir}"

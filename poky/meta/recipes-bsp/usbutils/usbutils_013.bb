@@ -16,15 +16,15 @@ SRC_URI[sha256sum] = "efdfd5403dbdd7412de6bb897d5fbaae65ef3eb4332032c0e1f2162166
 
 inherit autotools pkgconfig update-alternatives
 
-ALTERNATIVE_${PN} = "lsusb"
+ALTERNATIVE:${PN} = "lsusb"
 ALTERNATIVE_PRIORITY = "100"
 
 # The binaries are mostly GPLv2+ apart from lsusb.py which is GPLv2 or v3.
-LICENSE_${PN} = "GPLv2+"
-LICENSE_${PN}-python = "GPLv2 | GPLv3"
+LICENSE:${PN} = "GPLv2+"
+LICENSE:${PN}-python = "GPLv2 | GPLv3"
 
-RRECOMMENDS_${PN} = "udev-hwdb"
+RRECOMMENDS:${PN} = "udev-hwdb"
 
 PACKAGE_BEFORE_PN =+ "${PN}-python"
-FILES_${PN}-python += "${bindir}/lsusb.py"
-RDEPENDS_${PN}-python = "python3-core"
+FILES:${PN}-python += "${bindir}/lsusb.py"
+RDEPENDS:${PN}-python = "python3-core"

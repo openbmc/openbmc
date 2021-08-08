@@ -18,4 +18,4 @@ PACKAGECONFIG[paste] = ",,,python3-paste"
 PACKAGECONFIG[docs] = ",,,python3-sphinx python3-pylons-sphinx-themes"
 
 DEPENDS= "python3 python3-setuptools-scm-native python3-pytest-runner-native"
-RDEPENDS_${PN} += "python3-core  python3-misc python3-netclient python3-pkgutil python3-setuptools python3-threading python3-core"
+RDEPENDS:${PN} += "python3-core  python3-misc python3-netclient python3-pkgutil python3-setuptools python3-threading python3-core"

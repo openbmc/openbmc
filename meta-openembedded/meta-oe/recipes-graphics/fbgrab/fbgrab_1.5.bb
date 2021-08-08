@@ -11,6 +11,6 @@ S = "${WORKDIR}/git"
 
 inherit autotools-brokensep
 
-do_configure_prepend() {
+do_configure:prepend() {
     sed -i 's|$(DESTDIR)/usr/man/|$(DESTDIR)${mandir}/|g' ${S}/Makefile
 }

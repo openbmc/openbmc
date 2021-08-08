@@ -8,8 +8,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=930f8aa500a47c7dab0f8efb5a1c9a40"
 # Note this is not officially supported and is just illustrated here to
 # show an example of how it can be done
 # You'll also need your fortran recipe to depend on libgfortran
-#FORTRAN_forcevariable = ",fortran"
-#RUNTIMETARGET_append_pn-gcc-runtime = " libquadmath"
+#FORTRAN:forcevariable = ",fortran"
+#RUNTIMETARGET:append:pn-gcc-runtime = " libquadmath"
 
 DEPENDS = "libgfortran"
 

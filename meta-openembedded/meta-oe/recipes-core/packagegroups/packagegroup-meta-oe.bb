@@ -32,7 +32,7 @@ PACKAGES = "\
 "
 #PACKAGES += "packagegroup-meta-oe-fortran-packages"
 
-RDEPENDS_packagegroup-meta-oe = "\
+RDEPENDS:packagegroup-meta-oe = "\
     packagegroup-meta-oe-benchmarks \
     packagegroup-meta-oe-bsp \
     packagegroup-meta-oe-connectivity \
@@ -58,7 +58,7 @@ RDEPENDS_packagegroup-meta-oe = "\
     ${@bb.utils.contains("DISTRO_FEATURES", "ptest", "packagegroup-meta-oe-ptest-packages", "", d)} \
 "
 
-RDEPENDS_packagegroup-meta-oe-benchmarks = "\
+RDEPENDS:packagegroup-meta-oe-benchmarks = "\
     bonnie++ \
     dbench \
     dhrystone \
@@ -68,9 +68,9 @@ RDEPENDS_packagegroup-meta-oe-benchmarks = "\
     iperf2 \
     iperf3 \
     libc-bench \
-    libhugetlbfs \
     linpack \
     lmbench \
+    mbw \
     memtester \
     nbench-byte \
     phoronix-test-suite \
@@ -82,17 +82,17 @@ RDEPENDS_packagegroup-meta-oe-benchmarks = "\
     tiobench \
     whetstone \
 "
-RDEPENDS_packagegroup-meta-oe-benchmarks_append_armv7a = " cpuburn-arm"
-RDEPENDS_packagegroup-meta-oe-benchmarks_append_armv7ve = " cpuburn-arm"
-RDEPENDS_packagegroup-meta-oe-benchmarks_append_aarch64 = " cpuburn-arm"
+RDEPENDS:packagegroup-meta-oe-benchmarks:append:armv7a = " cpuburn-arm"
+RDEPENDS:packagegroup-meta-oe-benchmarks:append:armv7ve = " cpuburn-arm"
+RDEPENDS:packagegroup-meta-oe-benchmarks:append:aarch64 = " cpuburn-arm"
 
-RDEPENDS_packagegroup-meta-oe-benchmarks_remove_mipsarch = "libhugetlbfs"
-RDEPENDS_packagegroup-meta-oe-benchmarks_remove_mips64 = "tinymembench"
-RDEPENDS_packagegroup-meta-oe-benchmarks_remove_mips64el = "tinymembench"
-RDEPENDS_packagegroup-meta-oe-benchmarks_remove_riscv64 = "libhugetlbfs"
-RDEPENDS_packagegroup-meta-oe-benchmarks_remove_riscv32 = "libhugetlbfs"
+RDEPENDS:packagegroup-meta-oe-benchmarks:remove:mipsarch = "libhugetlbfs"
+RDEPENDS:packagegroup-meta-oe-benchmarks:remove:mips64 = "tinymembench"
+RDEPENDS:packagegroup-meta-oe-benchmarks:remove:mips64el = "tinymembench"
+RDEPENDS:packagegroup-meta-oe-benchmarks:remove:riscv64 = "libhugetlbfs"
+RDEPENDS:packagegroup-meta-oe-benchmarks:remove:riscv32 = "libhugetlbfs"
 
-RDEPENDS_packagegroup-meta-oe-bsp ="\
+RDEPENDS:packagegroup-meta-oe-bsp ="\
     acpitool \
     cpufrequtils \
     edac-utils \
@@ -108,18 +108,18 @@ RDEPENDS_packagegroup-meta-oe-bsp ="\
     pcmciautils \
     pointercal \
 "
-RDEPENDS_packagegroup-meta-oe-bsp_append_x86 = " ledmon"
-RDEPENDS_packagegroup-meta-oe-bsp_append_x86-64 = " ledmon"
+RDEPENDS:packagegroup-meta-oe-bsp:append:x86 = " ledmon"
+RDEPENDS:packagegroup-meta-oe-bsp:append:x86-64 = " ledmon"
 
-RDEPENDS_packagegroup-meta-oe-bsp_remove_libc-musl = "ledmon"
-RDEPENDS_packagegroup-meta-oe-bsp_remove_mipsarch = "efivar efibootmgr"
-RDEPENDS_packagegroup-meta-oe-bsp_remove_powerpc = "efivar efibootmgr"
-RDEPENDS_packagegroup-meta-oe-bsp_remove_powerpc64 = "efivar efibootmgr"
-RDEPENDS_packagegroup-meta-oe-bsp_remove_powerpc64le = "efivar efibootmgr"
-RDEPENDS_packagegroup-meta-oe-bsp_remove_riscv64 = "efivar efibootmgr"
-RDEPENDS_packagegroup-meta-oe-bsp_remove_riscv32 = "efivar efibootmgr"
+RDEPENDS:packagegroup-meta-oe-bsp:remove:libc-musl = "ledmon"
+RDEPENDS:packagegroup-meta-oe-bsp:remove:mipsarch = "efivar efibootmgr"
+RDEPENDS:packagegroup-meta-oe-bsp:remove:powerpc = "efivar efibootmgr"
+RDEPENDS:packagegroup-meta-oe-bsp:remove:powerpc64 = "efivar efibootmgr"
+RDEPENDS:packagegroup-meta-oe-bsp:remove:powerpc64le = "efivar efibootmgr"
+RDEPENDS:packagegroup-meta-oe-bsp:remove:riscv64 = "efivar efibootmgr"
+RDEPENDS:packagegroup-meta-oe-bsp:remove:riscv32 = "efivar efibootmgr"
 
-RDEPENDS_packagegroup-meta-oe-connectivity ="\
+RDEPENDS:packagegroup-meta-oe-connectivity ="\
     gammu \
     gattlib \
     gensio \
@@ -161,14 +161,14 @@ RDEPENDS_packagegroup-meta-oe-connectivity ="\
     zeromq \
 "
 
-RDEPENDS_packagegroup-meta-oe-connectivity_append_libc-glibc = " wvstreams wvdial"
+RDEPENDS:packagegroup-meta-oe-connectivity:append:libc-glibc = " wvstreams wvdial"
 
-RDEPENDS_packagegroup-meta-oe-connectivity-python2 = "\
+RDEPENDS:packagegroup-meta-oe-connectivity-python2 = "\
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "telepathy-idle", "", d)} \
 "
 
 # dracut needs dracut
-RDEPENDS_packagegroup-meta-oe-core = "\
+RDEPENDS:packagegroup-meta-oe-core = "\
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "dbus-broker", "", d)} \
     dbus-daemon-proxy \
     libdbus-c++ \
@@ -192,11 +192,11 @@ RDEPENDS_packagegroup-meta-oe-core = "\
     usleep \
     dbus-cxx \
 "
-RDEPENDS_packagegroup-meta-oe-core_append_libc-glibc = " ${@bb.utils.contains("DISTRO_FEATURES", "x11 opengl", "glfw", "", d)}"
-RDEPENDS_packagegroup-meta-oe-core_remove_riscv64 = "safec"
-RDEPENDS_packagegroup-meta-oe-core_remove_riscv32 = "safec"
+RDEPENDS:packagegroup-meta-oe-core:append:libc-glibc = " ${@bb.utils.contains("DISTRO_FEATURES", "x11 opengl", "glfw", "", d)}"
+RDEPENDS:packagegroup-meta-oe-core:remove:riscv64 = "safec"
+RDEPENDS:packagegroup-meta-oe-core:remove:riscv32 = "safec"
 
-RDEPENDS_packagegroup-meta-oe-crypto ="\
+RDEPENDS:packagegroup-meta-oe-crypto ="\
     botan \
     cryptsetup \
     fsverity-utils \
@@ -205,12 +205,13 @@ RDEPENDS_packagegroup-meta-oe-crypto ="\
     libsodium \
     pkcs11-helper \
 "
-RDEPENDS_packagegroup-meta-oe-crypto_remove_riscv32 = "botan"
+RDEPENDS:packagegroup-meta-oe-crypto:remove:riscv32 = "botan"
 
-RDEPENDS_packagegroup-meta-oe-dbs ="\
+RDEPENDS:packagegroup-meta-oe-dbs ="\
     influxdb \
     leveldb \
     libdbi \
+    lmdb \
     mariadb \
     postgresql \
     psqlodbc \
@@ -219,13 +220,12 @@ RDEPENDS_packagegroup-meta-oe-dbs ="\
     sqlite \
 "
 
-RDEPENDS_packagegroup-meta-oe-dbs-python2 ="\
+RDEPENDS:packagegroup-meta-oe-dbs-python2 ="\
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", bb.utils.contains('I_SWEAR_TO_MIGRATE_TO_PYTHON3', 'yes', 'mysql-python', '', d), "", d)} \
 "
 
-RDEPENDS_packagegroup-meta-oe-devtools ="\
+RDEPENDS:packagegroup-meta-oe-devtools ="\
     abseil-cpp \
-    apitrace \
     breakpad \
     bootchart \
     android-tools-conf \
@@ -242,6 +242,7 @@ RDEPENDS_packagegroup-meta-oe-devtools ="\
     ${@bb.utils.contains("PACKAGE_CLASSES", "package_rpm", "dnf-plugin-tui", "", d)} \
     doxygen \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "geany-plugins geany", "", d)} \
+    jemalloc \
     lemon \
     flatbuffers \
     heaptrack \
@@ -304,26 +305,26 @@ RDEPENDS_packagegroup-meta-oe-devtools ="\
     json-schema-validator \
     poke \
 "
-RDEPENDS_packagegroup-meta-oe-devtools_append_x86 = " cpuid msr-tools pmtools"
-RDEPENDS_packagegroup-meta-oe-devtools_append_x86-64 = " cpuid msr-tools pcimem pmtools"
-RDEPENDS_packagegroup-meta-oe-devtools_append_arm = " pcimem"
-RDEPENDS_packagegroup-meta-oe-devtools_append_aarch64 = " pcimem"
-RDEPENDS_packagegroup-meta-oe-devtools_append_libc-musl = " musl-nscd"
+RDEPENDS:packagegroup-meta-oe-devtools:append:x86 = " cpuid msr-tools pmtools"
+RDEPENDS:packagegroup-meta-oe-devtools:append:x86-64 = " cpuid msr-tools pcimem pmtools"
+RDEPENDS:packagegroup-meta-oe-devtools:append:arm = " pcimem"
+RDEPENDS:packagegroup-meta-oe-devtools:append:aarch64 = " pcimem"
+RDEPENDS:packagegroup-meta-oe-devtools:append:libc-musl = " musl-nscd"
 
-RDEPENDS_packagegroup-meta-oe-devtools_remove_arm = "concurrencykit"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_armv5 = "uftrace nodejs"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_mipsarch = "concurrencykit lshw ply uftrace"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_mips64 = "luajit nodejs"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_mips64el = "luajit nodejs"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_powerpc = "android-tools breakpad lshw luajit uftrace"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_powerpc64 = "android-tools breakpad lshw luajit ply uftrace"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_powerpc64le = "android-tools breakpad lshw luajit ply uftrace"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv64 = "breakpad concurrencykit heaptrack lshw ltrace luajit nodejs ply uftrace"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_riscv32 = "breakpad concurrencykit heaptrack lshw ltrace luajit nodejs ply uftrace"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_aarch64 = "concurrencykit"
-RDEPENDS_packagegroup-meta-oe-devtools_remove_x86 = "ply"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:arm = "concurrencykit"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:armv5 = "uftrace nodejs"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:mipsarch = "concurrencykit lshw ply uftrace"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:mips64 = "luajit nodejs"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:mips64el = "luajit nodejs"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:powerpc = "android-tools breakpad lshw luajit uftrace"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:powerpc64 = "android-tools breakpad lshw luajit ply uftrace"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:powerpc64le = "android-tools breakpad lshw luajit ply uftrace"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:riscv64 = "breakpad concurrencykit heaptrack lshw ltrace luajit nodejs ply uftrace"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:riscv32 = "breakpad concurrencykit heaptrack lshw ltrace luajit nodejs ply uftrace"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:aarch64 = "concurrencykit"
+RDEPENDS:packagegroup-meta-oe-devtools:remove:x86 = "ply"
 
-RDEPENDS_packagegroup-meta-oe-extended ="\
+RDEPENDS:packagegroup-meta-oe-extended ="\
     bitwise \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 wayland opengl", "boinc-client", "", d)} \
     brotli \
@@ -430,24 +431,24 @@ RDEPENDS_packagegroup-meta-oe-extended ="\
     zsync-curl \
     redis-plus-plus \
 "
-RDEPENDS_packagegroup-meta-oe-extended_append_libc-musl = " libexecinfo"
-RDEPENDS_packagegroup-meta-oe-extended_append_x86-64 = " pmdk libx86-1"
-RDEPENDS_packagegroup-meta-oe-extended_append_x86 = " libx86-1"
+RDEPENDS:packagegroup-meta-oe-extended:append:libc-musl = " libexecinfo"
+RDEPENDS:packagegroup-meta-oe-extended:append:x86-64 = " pmdk libx86-1"
+RDEPENDS:packagegroup-meta-oe-extended:append:x86 = " libx86-1"
 
-RDEPENDS_packagegroup-meta-oe-extended_remove_libc-musl = "libnss-nisplus sysdig"
-RDEPENDS_packagegroup-meta-oe-extended_remove_mipsarch = "upm mraa minifi-cpp tiptop"
-RDEPENDS_packagegroup-meta-oe-extended_remove_mips = "sysdig"
-RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc = "upm mraa minifi-cpp"
-RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc64 = "upm mraa minifi-cpp"
-RDEPENDS_packagegroup-meta-oe-extended_remove_powerpc64le = "upm mraa"
-RDEPENDS_packagegroup-meta-oe-extended_remove_riscv64 = "upm libleak libyang mraa sysdig tiptop"
-RDEPENDS_packagegroup-meta-oe-extended_remove_riscv32 = "upm libleak libyang mraa sysdig tiptop"
+RDEPENDS:packagegroup-meta-oe-extended:remove:libc-musl = "libnss-nisplus sysdig"
+RDEPENDS:packagegroup-meta-oe-extended:remove:mipsarch = "upm mraa minifi-cpp tiptop"
+RDEPENDS:packagegroup-meta-oe-extended:remove:mips = "sysdig"
+RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc = "upm mraa minifi-cpp"
+RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc64 = "upm mraa minifi-cpp"
+RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc64le = "upm mraa"
+RDEPENDS:packagegroup-meta-oe-extended:remove:riscv64 = "upm libleak libyang mraa sysdig tiptop"
+RDEPENDS:packagegroup-meta-oe-extended:remove:riscv32 = "upm libleak libyang mraa sysdig tiptop"
 
-RDEPENDS_packagegroup-meta-oe-extended-python2 ="\
+RDEPENDS:packagegroup-meta-oe-extended-python2 ="\
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", bb.utils.contains('I_SWEAR_TO_MIGRATE_TO_PYTHON3', 'yes', 'openlmi-tools', '', d), "", d)} \
 "
 
-RDEPENDS_packagegroup-meta-oe-gnome ="\
+RDEPENDS:packagegroup-meta-oe-gnome ="\
     atkmm \
     gcab \
     gnome-common \
@@ -463,7 +464,7 @@ RDEPENDS_packagegroup-meta-oe-gnome ="\
     libxmlb \
 "
 
-RDEPENDS_packagegroup-meta-oe-graphics ="\
+RDEPENDS:packagegroup-meta-oe-graphics ="\
     cairomm \
     directfb-examples \
     directfb \
@@ -610,14 +611,14 @@ RDEPENDS_packagegroup-meta-oe-graphics ="\
     ${@bb.utils.contains("DISTRO_FEATURES", "opengl", "opengl-es-cts", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "opengl vulkan", "vulkan-cts", "", d)} \
 "
-RDEPENDS_packagegroup-meta-oe-graphics_append_x86 = " renderdoc xf86-video-nouveau xf86-video-mga"
-RDEPENDS_packagegroup-meta-oe-graphics_append_x86-64 = " renderdoc xf86-video-nouveau xf86-video-mga"
-RDEPENDS_packagegroup-meta-oe-graphics_append_arm = " renderdoc"
-RDEPENDS_packagegroup-meta-oe-graphics_append_aarch64 = " renderdoc"
+RDEPENDS:packagegroup-meta-oe-graphics:append:x86 = " renderdoc xf86-video-nouveau xf86-video-mga"
+RDEPENDS:packagegroup-meta-oe-graphics:append:x86-64 = " renderdoc xf86-video-nouveau xf86-video-mga"
+RDEPENDS:packagegroup-meta-oe-graphics:append:arm = " renderdoc"
+RDEPENDS:packagegroup-meta-oe-graphics:append:aarch64 = " renderdoc"
 
-RDEPENDS_packagegroup-meta-oe-graphics_remove_libc-musl = "renderdoc"
+RDEPENDS:packagegroup-meta-oe-graphics:remove:libc-musl = "renderdoc"
 
-RDEPENDS_packagegroup-meta-oe-kernel ="\
+RDEPENDS:packagegroup-meta-oe-kernel ="\
     agent-proxy \
     crash \
     cpupower \
@@ -629,22 +630,22 @@ RDEPENDS_packagegroup-meta-oe-kernel ="\
     spidev-test \
     trace-cmd \
 "
-RDEPENDS_packagegroup-meta-oe-kernel_append_x86 = " intel-speed-select ipmiutil pm-graph turbostat"
-RDEPENDS_packagegroup-meta-oe-kernel_append_x86-64 = " intel-speed-select ipmiutil kpatch pm-graph turbostat bpftool"
-RDEPENDS_packagegroup-meta-oe-kernel_append_poerpc64 = " libpfm4"
+RDEPENDS:packagegroup-meta-oe-kernel:append:x86 = " intel-speed-select ipmiutil pm-graph turbostat"
+RDEPENDS:packagegroup-meta-oe-kernel:append:x86-64 = " intel-speed-select ipmiutil kpatch pm-graph turbostat bpftool"
+RDEPENDS:packagegroup-meta-oe-kernel:append:powerpc64 = " libpfm4"
 
 # Kernel-selftest does not build with 5.8 and its exluded from build too so until its fixed remove it
-RDEPENDS_packagegroup-meta-oe-kernel_remove = "kernel-selftest"
-RDEPENDS_packagegroup-meta-oe-kernel_remove_libc-musl = "bpftool crash intel-speed-select kernel-selftest minicoredumper turbostat"
+RDEPENDS:packagegroup-meta-oe-kernel:remove = "kernel-selftest"
+RDEPENDS:packagegroup-meta-oe-kernel:remove:libc-musl = "bpftool crash intel-speed-select kernel-selftest minicoredumper turbostat"
 
-RDEPENDS_packagegroup-meta-oe-kernel_remove_mipsarch = "makedumpfile"
-RDEPENDS_packagegroup-meta-oe-kernel_remove_mips64 = "crash"
-RDEPENDS_packagegroup-meta-oe-kernel_remove_mips64el = "crash"
+RDEPENDS:packagegroup-meta-oe-kernel:remove:mipsarch = "makedumpfile"
+RDEPENDS:packagegroup-meta-oe-kernel:remove:mips64 = "crash"
+RDEPENDS:packagegroup-meta-oe-kernel:remove:mips64el = "crash"
 
-RDEPENDS_packagegroup-meta-oe-kernel_remove_riscv64 = "crash makedumpfile oprofile"
-RDEPENDS_packagegroup-meta-oe-kernel_remove_riscv32 = "crash makedumpfile oprofile"
+RDEPENDS:packagegroup-meta-oe-kernel:remove:riscv64 = "crash makedumpfile oprofile"
+RDEPENDS:packagegroup-meta-oe-kernel:remove:riscv32 = "crash makedumpfile oprofile"
 
-RDEPENDS_packagegroup-meta-oe-multimedia ="\
+RDEPENDS:packagegroup-meta-oe-multimedia ="\
     alsa-oss \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "faad2", "", d)} \
     dirsplit \
@@ -680,9 +681,9 @@ RDEPENDS_packagegroup-meta-oe-multimedia ="\
     libopusenc \
 "
 
-RDEPENDS_packagegroup-meta-oe-multimedia_remove_libc-musl = "alsa-oss"
+RDEPENDS:packagegroup-meta-oe-multimedia:remove:libc-musl = "alsa-oss"
 
-RDEPENDS_packagegroup-meta-oe-navigation ="\
+RDEPENDS:packagegroup-meta-oe-navigation ="\
     geos \
     ${@bb.utils.contains("DISTRO_FEATURES", "bluz4", "gpsd-machine-conf gpsd", "", d)} \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "orrery", "", d)} \
@@ -691,12 +692,12 @@ RDEPENDS_packagegroup-meta-oe-navigation ="\
     proj \
 "
 
-RDEPENDS_packagegroup-meta-oe-printing ="\
+RDEPENDS:packagegroup-meta-oe-printing ="\
     cups-filters \
     qpdf \
 "
 
-RDEPENDS_packagegroup-meta-oe-security ="\
+RDEPENDS:packagegroup-meta-oe-security ="\
     keyutils \
     nmap \
     ${@bb.utils.contains("DISTRO_FEATURES", "pam", "passwdqc", "", d)} \
@@ -705,14 +706,14 @@ RDEPENDS_packagegroup-meta-oe-security ="\
     auditd \
 "
 
-RDEPENDS_packagegroup-meta-oe-shells ="\
+RDEPENDS:packagegroup-meta-oe-shells ="\
     dash \
     mksh \
     tcsh \
     zsh \
 "
 
-RDEPENDS_packagegroup-meta-oe-support ="\
+RDEPENDS:packagegroup-meta-oe-support ="\
     anthy \
     atop \
     ace-cloud-editor \
@@ -915,24 +916,24 @@ RDEPENDS_packagegroup-meta-oe-support ="\
     libmicrohttpd \
     yaml-cpp \
 "
-RDEPENDS_packagegroup-meta-oe-support_append_armv7a = " ne10"
-RDEPENDS_packagegroup-meta-oe-support_append_armv7ve = " ne10"
-RDEPENDS_packagegroup-meta-oe-support_append_aarch64 = " ne10"
-RDEPENDS_packagegroup-meta-oe-support_append_x86 = " mcelog mce-inject mce-test vboxguestdrivers"
-RDEPENDS_packagegroup-meta-oe-support_append_x86-64 = " mcelog mce-inject mce-test vboxguestdrivers"
+RDEPENDS:packagegroup-meta-oe-support:append:armv7a = " ne10"
+RDEPENDS:packagegroup-meta-oe-support:append:armv7ve = " ne10"
+RDEPENDS:packagegroup-meta-oe-support:append:aarch64 = " ne10"
+RDEPENDS:packagegroup-meta-oe-support:append:x86 = " mcelog mce-inject mce-test vboxguestdrivers"
+RDEPENDS:packagegroup-meta-oe-support:append:x86-64 = " mcelog mce-inject mce-test vboxguestdrivers"
 
-RDEPENDS_packagegroup-meta-oe-support-python2 ="\
+RDEPENDS:packagegroup-meta-oe-support-python2 ="\
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", bb.utils.contains('I_SWEAR_TO_MIGRATE_TO_PYTHON3', 'yes', 'lio-utils', '', d), "", d)} \
 "
 
-RDEPENDS_packagegroup-meta-oe-support_remove_arm ="numactl"
-RDEPENDS_packagegroup-meta-oe-support_remove_mipsarch = "gperftools"
-RDEPENDS_packagegroup-meta-oe-support_remove_riscv64 = "gperftools uim"
-RDEPENDS_packagegroup-meta-oe-support_remove_riscv32 = "gperftools uim"
-RDEPENDS_packagegroup-meta-oe-support_remove_powerpc = "ssiapi tbb"
-RDEPENDS_packagegroup-meta-oe-support_remove_powerpc64le = "ssiapi"
+RDEPENDS:packagegroup-meta-oe-support:remove:arm ="numactl"
+RDEPENDS:packagegroup-meta-oe-support:remove:mipsarch = "gperftools"
+RDEPENDS:packagegroup-meta-oe-support:remove:riscv64 = "gperftools uim"
+RDEPENDS:packagegroup-meta-oe-support:remove:riscv32 = "gperftools uim"
+RDEPENDS:packagegroup-meta-oe-support:remove:powerpc = "ssiapi tbb"
+RDEPENDS:packagegroup-meta-oe-support:remove:powerpc64le = "ssiapi"
 
-RDEPENDS_packagegroup-meta-oe-test ="\
+RDEPENDS:packagegroup-meta-oe-test ="\
     bats \
     cmocka \
     cppunit \
@@ -947,14 +948,14 @@ RDEPENDS_packagegroup-meta-oe-test ="\
     pm-qa \
     testfloat \
 "
-RDEPENDS_packagegroup-meta-oe-test_remove_libc-musl = "pm-qa"
-RDEPENDS_packagegroup-meta-oe-test_remove_arm = "fwts"
-RDEPENDS_packagegroup-meta-oe-test_remove_mipsarch = "fwts"
-RDEPENDS_packagegroup-meta-oe-test_remove_powerpc = "fwts"
-RDEPENDS_packagegroup-meta-oe-test_remove_riscv64 = "fwts"
-RDEPENDS_packagegroup-meta-oe-test_remove_riscv32 = "fwts"
+RDEPENDS:packagegroup-meta-oe-test:remove:libc-musl = "pm-qa"
+RDEPENDS:packagegroup-meta-oe-test:remove:arm = "fwts"
+RDEPENDS:packagegroup-meta-oe-test:remove:mipsarch = "fwts"
+RDEPENDS:packagegroup-meta-oe-test:remove:powerpc = "fwts"
+RDEPENDS:packagegroup-meta-oe-test:remove:riscv64 = "fwts"
+RDEPENDS:packagegroup-meta-oe-test:remove:riscv32 = "fwts"
 
-RDEPENDS_packagegroup-meta-oe-ptest-packages = "\
+RDEPENDS:packagegroup-meta-oe-ptest-packages = "\
     zeromq-ptest \
     leveldb-ptest \
     psqlodbc-ptest \
@@ -968,15 +969,15 @@ RDEPENDS_packagegroup-meta-oe-ptest-packages = "\
     poco-ptest \
     cmocka-ptest \
 "
-RDEPENDS_packagegroup-meta-oe-ptest-packages_append_x86 = " mcelog-ptest"
-RDEPENDS_packagegroup-meta-oe-ptest-packages_append_x86-64 = " mcelog-ptest"
+RDEPENDS:packagegroup-meta-oe-ptest-packages:append:x86 = " mcelog-ptest"
+RDEPENDS:packagegroup-meta-oe-ptest-packages:append:x86-64 = " mcelog-ptest"
 
-RDEPENDS_packagegroup-meta-oe-ptest-packages_remove_riscv64 = "oprofile-ptest"
-RDEPENDS_packagegroup-meta-oe-ptest-packages_remove_riscv32 = "oprofile-ptest"
-RDEPENDS_packagegroup-meta-oe-ptest-packages_remove_arm = "numactl-ptest"
+RDEPENDS:packagegroup-meta-oe-ptest-packages:remove:riscv64 = "oprofile-ptest"
+RDEPENDS:packagegroup-meta-oe-ptest-packages:remove:riscv32 = "oprofile-ptest"
+RDEPENDS:packagegroup-meta-oe-ptest-packages:remove:arm = "numactl-ptest"
 
 
-RDEPENDS_packagegroup-meta-oe-fortran-packages = "\
+RDEPENDS:packagegroup-meta-oe-fortran-packages = "\
     lapack \
     octave \
     suitesparse \

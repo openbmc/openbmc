@@ -87,10 +87,10 @@ RRECOMMENDS:${PN}_class-native = ""
 python populate_packages:prepend () {
     def pam_plugin_append_file(pn, dir, file):
         nf = os.path.join(dir, file)
-        of = d.getVar('FILES_' + pn)
+        of = d.getVar('FILES:' + pn)
         if of:
             nf = of + " " + nf
-        d.setVar('FILES_' + pn, nf)
+        d.setVar('FILES:' + pn, nf)
 
     def pam_plugin_hook(file, pkg, pattern, format, basename):
         pn = d.getVar('PN')

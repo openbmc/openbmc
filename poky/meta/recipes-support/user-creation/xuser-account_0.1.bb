@@ -18,11 +18,11 @@ do_install() {
     install -D -m 0644 ${WORKDIR}/system-xuser.conf ${D}${sysconfdir}/dbus-1/system.d/system-xuser.conf
 }
 
-FILES_${PN} = "${sysconfdir}/dbus-1/system.d/system-xuser.conf"
+FILES:${PN} = "${sysconfdir}/dbus-1/system.d/system-xuser.conf"
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--create-home \
+USERADD_PARAM:${PN} = "--create-home \
                        --groups video,tty,audio,input,shutdown,disk \
                        --user-group xuser"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"

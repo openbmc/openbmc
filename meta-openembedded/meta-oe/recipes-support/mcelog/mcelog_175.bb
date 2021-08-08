@@ -21,7 +21,7 @@ inherit autotools-brokensep ptest
 
 COMPATIBLE_HOST = '(x86_64.*|i.86.*)-linux'
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}/cron.hourly
     install -m 0755 ${S}/mcelog.cron ${D}${sysconfdir}/cron.hourly/
     sed -i 's/bash/sh/' ${D}${sysconfdir}/cron.hourly/mcelog.cron
@@ -33,4 +33,4 @@ do_install_ptest() {
     sed -i 's#../../mcelog#mcelog#' ${D}${PTEST_PATH}/tests/test
 }
 
-RDEPENDS_${PN}-ptest += "make bash mce-inject"
+RDEPENDS:${PN}-ptest += "make bash mce-inject"

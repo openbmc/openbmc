@@ -17,7 +17,7 @@ inherit gnomebase pkgconfig gettext gtk-doc vala gobject-introspection manpages 
 # gcr
 REQUIRED_DISTRO_FEATURES = "x11"
 
-do_compile_prepend() {
+do_compile:prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/gdata/.libs"
 }
 

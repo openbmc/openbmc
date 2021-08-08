@@ -31,7 +31,7 @@ EXTRA_OECONF = " \
     --with-udev-base-dir=${nonarch_base_libdir}/udev \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/icons \
     ${datadir}/polkit-1 \
     ${datadir}/dbus-1 \
@@ -40,14 +40,14 @@ FILES_${PN} += " \
     ${systemd_unitdir}/system \
 "
 
-FILES_${PN}-dev += " \
+FILES:${PN}-dev += " \
     ${libdir}/ModemManager/*.la \
 "
 
-FILES_${PN}-staticdev += " \
+FILES:${PN}-staticdev += " \
     ${libdir}/ModemManager/*.a \
 "
 
-FILES_${PN}-dbg += "${libdir}/ModemManager/.debug"
+FILES:${PN}-dbg += "${libdir}/ModemManager/.debug"
 
-SYSTEMD_SERVICE_${PN} = "ModemManager.service"
+SYSTEMD_SERVICE:${PN} = "ModemManager.service"

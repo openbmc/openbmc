@@ -19,9 +19,9 @@ SYSROOT_DIRS_NATIVE = " \
     ${sysconfdir} \
     ${localstatedir} \
 "
-SYSROOT_DIRS_append_class-native = " ${SYSROOT_DIRS_NATIVE}"
-SYSROOT_DIRS_append_class-cross = " ${SYSROOT_DIRS_NATIVE}"
-SYSROOT_DIRS_append_class-crosssdk = " ${SYSROOT_DIRS_NATIVE}"
+SYSROOT_DIRS:append:class-native = " ${SYSROOT_DIRS_NATIVE}"
+SYSROOT_DIRS:append:class-cross = " ${SYSROOT_DIRS_NATIVE}"
+SYSROOT_DIRS:append:class-crosssdk = " ${SYSROOT_DIRS_NATIVE}"
 
 # These directories will not be staged in the sysroot
 SYSROOT_DIRS_BLACKLIST = " \
@@ -82,7 +82,7 @@ python sysroot_strip () {
     pn = d.getVar('PN')
     libdir = d.getVar("libdir")
     base_libdir = d.getVar("base_libdir")
-    qa_already_stripped = 'already-stripped' in (d.getVar('INSANE_SKIP_' + pn) or "").split()
+    qa_already_stripped = 'already-stripped' in (d.getVar('INSANE_SKIP:' + pn) or "").split()
     strip_cmd = d.getVar("STRIP")
 
     oe.package.strip_execs(pn, dstdir, strip_cmd, libdir, base_libdir, d,
@@ -118,8 +118,8 @@ do_populate_sysroot[vardeps] += "${SYSROOT_PREPROCESS_FUNCS}"
 do_populate_sysroot[vardepsexclude] += "MULTI_PROVIDER_WHITELIST"
 
 POPULATESYSROOTDEPS = ""
-POPULATESYSROOTDEPS_class-target = "virtual/${MLPREFIX}${TARGET_PREFIX}binutils:do_populate_sysroot"
-POPULATESYSROOTDEPS_class-nativesdk = "virtual/${TARGET_PREFIX}binutils-crosssdk:do_populate_sysroot"
+POPULATESYSROOTDEPS:class-target = "virtual/${MLPREFIX}${TARGET_PREFIX}binutils:do_populate_sysroot"
+POPULATESYSROOTDEPS:class-nativesdk = "virtual/${TARGET_PREFIX}binutils-crosssdk:do_populate_sysroot"
 do_populate_sysroot[depends] += "${POPULATESYSROOTDEPS}"
 
 SSTATETASKS += "do_populate_sysroot"

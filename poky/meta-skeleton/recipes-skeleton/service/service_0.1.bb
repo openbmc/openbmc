@@ -27,6 +27,6 @@ do_install () {
 	install -m 0755 ${WORKDIR}/skeleton-test ${D}${sbindir}/
 }
 
-RDEPENDS_${PN} = "initscripts"
+RDEPENDS:${PN} = "initscripts"
 
-CONFFILES_${PN} += "${sysconfdir}/init.d/skeleton"
+CONFFILES:${PN} += "${sysconfdir}/init.d/skeleton"

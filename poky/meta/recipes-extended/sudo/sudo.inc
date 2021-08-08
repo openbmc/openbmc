@@ -24,14 +24,14 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[zlib] = "--enable-zlib,--disable-zlib,zlib"
 PACKAGECONFIG[pam-wheel] = ",,,pam-plugin-wheel"
 
-CONFFILES_${PN} = "${sysconfdir}/sudoers"
+CONFFILES:${PN} = "${sysconfdir}/sudoers"
 
 EXTRA_OECONF = "--with-editor=${base_bindir}/vi --with-env-editor"
 
-EXTRA_OECONF_append_libc-musl = " --disable-hardening "
+EXTRA_OECONF:append:libc-musl = " --disable-hardening "
 
 # mksigname/mksiglist are used on build host to generate source files
-do_compile_prepend () {
+do_compile:prepend () {
 	# Remove build host references from sudo_usage.h
 	sed -i  \
 	    -e 's,--with-libtool-sysroot=${STAGING_DIR_TARGET},,g' \
@@ -46,7 +46,7 @@ do_compile_prepend () {
 # script (from sudo) will recursively create ${localstatedir}/lib/sudo
 # and then chmod each directory with 0700 permissions, which isn't what
 # we want (i.e, users would not be able to access /var/lib).
-do_install_prepend (){
+do_install:prepend (){
 	mkdir -p ${D}/${localstatedir}/lib
 }
 

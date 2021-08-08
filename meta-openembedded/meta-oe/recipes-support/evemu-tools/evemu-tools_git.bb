@@ -16,6 +16,6 @@ PV = "gitr${SRCPV}"
 inherit autotools pkgconfig
 
 PACKAGES =+ "${PN}-python"
-FILES_${PN}-python = "${libdir}/python*/site-packages/*"
-RDEPENDS_${PN}-python = "python3"
+FILES:${PN}-python = "${libdir}/python*/site-packages/*"
+RDEPENDS:${PN}-python = "python3"
 

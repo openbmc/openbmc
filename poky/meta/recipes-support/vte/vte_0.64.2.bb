@@ -3,7 +3,7 @@ DESCRIPTION = "VTE provides a virtual terminal widget for GTK applications."
 HOMEPAGE = "https://wiki.gnome.org/Apps/Terminal/VTE"
 BUGTRACKER = "https://bugzilla.gnome.org/buglist.cgi?product=vte"
 LICENSE = "GPLv3 & LGPLv3+ & MIT-X"
-LICENSE_libvte = "LGPLv3+"
+LICENSE:libvte = "LGPLv3+"
 
 LIC_FILES_CHKSUM = " \
     file://COPYING.GPL3;md5=cc702cf3444d1f19680c794cc61948f9 \
@@ -33,29 +33,29 @@ export STAGING_DATADIR
 export XDG_DATA_DIRS = "${STAGING_DATADIR}"
 
 # Help g-ir-scanner find the .so for linking
-do_compile_prepend() {
+do_compile:prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/src/.libs"
 }
 
 # Package additional files
-FILES_${PN}-dev += "${datadir}/vala/vapi/*"
+FILES:${PN}-dev += "${datadir}/vala/vapi/*"
 
 PACKAGECONFIG ??= "gnutls"
 PACKAGECONFIG[vala] = "-Dvapi=true,-Dvapi=false,vala-native vala"
 PACKAGECONFIG[gnutls] = "-Dgnutls=true,-Dgnutls=false,gnutls"
 PACKAGECONFIG[systemd] = "-D_systemd=true,-D_systemd=false,systemd"
 # vala requires gir
-PACKAGECONFIG_remove_class-native = "vala"
+PACKAGECONFIG:remove:class-native = "vala"
 
 CFLAGS += "-D_GNU_SOURCE"
 
 PACKAGES =+ "libvte ${PN}-prompt"
-FILES_libvte = "${libdir}/*.so.* ${libdir}/girepository-1.0/*"
-FILES_${PN}-prompt = " \
+FILES:libvte = "${libdir}/*.so.* ${libdir}/girepository-1.0/*"
+FILES:${PN}-prompt = " \
     ${sysconfdir}/profile.d \
     ${libexecdir}/vte-urlencode-cwd \
 "
 
-FILES_${PN}-dev += "${datadir}/glade/"
+FILES:${PN}-dev += "${datadir}/glade/"
 
 BBCLASSEXTEND = "native nativesdk"

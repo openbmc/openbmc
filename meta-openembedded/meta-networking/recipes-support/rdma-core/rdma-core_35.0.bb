@@ -3,7 +3,7 @@ DESCRIPTION = "This is the userspace components for the Linux Kernel's drivers I
 SECTION = "libs"
 
 DEPENDS = "libnl"
-RDEPENDS_${PN} = "bash perl"
+RDEPENDS:${PN} = "bash perl"
 
 SRC_URI = "git://github.com/linux-rdma/rdma-core.git"
 SRCREV = "e29a698e99028e9a092bb00c03ee4bfa31ae0cf3"
@@ -23,12 +23,12 @@ EXTRA_OECMAKE = " \
 LTO = ""
 
 FILES_SOLIBSDEV = ""
-FILES_${PN} += "${libdir}/*"
-INSANE_SKIP_${PN} += "dev-so"
+FILES:${PN} += "${libdir}/*"
+INSANE_SKIP:${PN} += "dev-so"
 
 inherit cmake cpan-base python3native systemd
 
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
     srp_daemon.service \
     iwpmd.service \
     ibacm.socket \

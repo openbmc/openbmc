@@ -18,7 +18,7 @@ S = "${WORKDIR}/git"
 inherit cmake
 DEPENDS += "libpng zlib"
 
-do_install_append() {
+do_install:append() {
      mkdir -p ${D}/${datadir}/libharu
      mv ${D}/libharu ${D}/${datadir}
 }

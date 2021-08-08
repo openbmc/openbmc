@@ -16,7 +16,7 @@ inherit update-alternatives
 
 S = "${WORKDIR}/${BPN}"
 
-ALTERNATIVE_${PN} = "sh"
+ALTERNATIVE:${PN} = "sh"
 ALTERNATIVE_LINK_NAME[sh] = "${base_bindir}/sh"
 ALTERNATIVE_TARGET[sh] = "${base_bindir}/${BPN}"
 ALTERNATIVE_PRIORITY = "100"
@@ -33,4 +33,4 @@ do_install() {
     install -m 0644 ${S}/dot.mkshrc ${D}${sysconfdir}/skel/.mkshrc
 }
 
-RPROVIDES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sh', '', d)}"
+RPROVIDES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sh', '', d)}"

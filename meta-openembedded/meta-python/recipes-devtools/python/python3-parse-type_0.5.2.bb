@@ -9,13 +9,13 @@ SRC_URI[sha256sum] = "7f690b18d35048c15438d6d0571f9045cffbec5907e0b1ccf006f889e3
 PYPI_PACKAGE = "parse_type"
 inherit pypi ptest setuptools3
 
-RDEPENDS_${PN} += "${PYTHON_PN}-parse ${PYTHON_PN}-six"
+RDEPENDS:${PN} += "${PYTHON_PN}-parse ${PYTHON_PN}-six"
 
 SRC_URI += " \
 	file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 "
 

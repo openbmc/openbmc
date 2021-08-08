@@ -21,7 +21,7 @@ LIBV = "2.10.0"
 
 PACKAGES_DYNAMIC += "^gtk-immodule-.* ^gtk-printbackend-.*"
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     gtk_libdir = d.expand('${libdir}/gtk-2.0/${LIBV}')
     immodules_root = os.path.join(gtk_libdir, 'immodules')
     printmodules_root = os.path.join(gtk_libdir, 'printbackends');
@@ -30,5 +30,5 @@ python populate_packages_prepend () {
     do_split_packages(d, printmodules_root, r'^libprintbackend-(.*)\.so$', 'gtk-printbackend-%s', 'GTK printbackend module for %s')
 
     if (d.getVar('DEBIAN_NAMES')):
-        d.setVar(d.expand('PKG_${PN}'), '${MLPREFIX}libgtk-2.0')
+        d.setVar(d.expand('PKG:${PN}'), '${MLPREFIX}libgtk-2.0')
 }

@@ -10,5 +10,5 @@ S = "${WORKDIR}/patch-${PV}"
 
 inherit autotools update-alternatives
 
-ALTERNATIVE_${PN} = "patch"
+ALTERNATIVE:${PN} = "patch"
 ALTERNATIVE_PRIORITY = "100"

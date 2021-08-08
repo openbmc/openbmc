@@ -26,14 +26,14 @@ inherit autotools systemd useradd
 
 #User specific
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --home /dev/null \
+USERADD_PARAM:${PN} = "--system --home /dev/null \
                        --no-user-group --gid nogroup tinyproxy"
 
 SYSTEMD_PACKAGES += "${BPN}"
-SYSTEMD_SERVICE_${PN} = "tinyproxy.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+SYSTEMD_SERVICE:${PN} = "tinyproxy.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
-do_install_append() {
+do_install:append() {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
 		install -d ${D}${systemd_system_unitdir}
 		install -m 0644 ${WORKDIR}/tinyproxy.service ${D}${systemd_system_unitdir}

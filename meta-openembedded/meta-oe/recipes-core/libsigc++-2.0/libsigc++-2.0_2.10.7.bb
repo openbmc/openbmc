@@ -12,8 +12,8 @@ S = "${WORKDIR}/libsigc++-${PV}"
 
 inherit meson
 
-FILES_${PN}-dev += "${libdir}/sigc++-*/"
-FILES_${PN}-doc += "${datadir}/devhelp"
+FILES:${PN}-dev += "${libdir}/sigc++-*/"
+FILES:${PN}-doc += "${datadir}/devhelp"
 
 BBCLASSEXTEND = "native"
 SECURITY_CFLAGS = "${SECURITY_NO_PIE_CFLAGS}"

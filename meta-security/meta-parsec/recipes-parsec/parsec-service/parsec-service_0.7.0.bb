@@ -15,7 +15,7 @@ DEPENDS = "tpm2-tss clang-native"
 CARGO_BUILD_FLAGS += " --features all-providers,cryptoki/generate-bindings,tss-esapi/generate-bindings"
 
 inherit systemd
-SYSTEMD_SERVICE_${PN} = "parsec.service"
+SYSTEMD_SERVICE:${PN} = "parsec.service"
 
 inherit update-rc.d
 INITSCRIPT_NAME = "parsec"
@@ -24,7 +24,7 @@ INITSCRIPT_NAME = "parsec"
 # The file should also be included into SRC_URI then
 PARSEC_CONFIG ?= "${S}/config.toml"
 
-do_install_append () {
+do_install:append () {
     # Binaries
     install -d -m 700 -o parsec -g parsec "${D}${libexecdir}/parsec"
     install -m 700 -o parsec -g parsec "${WORKDIR}/build/target/${CARGO_TARGET_SUBDIR}/parsec" ${D}${libexecdir}/parsec/parsec
@@ -52,10 +52,10 @@ do_install_append () {
 
 inherit useradd
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "-r -g parsec -s /bin/false -d ${localstatedir}/lib/parsec parsec"
-GROUPADD_PARAM_${PN} = "-r parsec"
+USERADD_PARAM:${PN} = "-r -g parsec -s /bin/false -d ${localstatedir}/lib/parsec parsec"
+GROUPADD_PARAM:${PN} = "-r parsec"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${sysconfdir}/parsec/config.toml \
     ${libexecdir}/parsec/parsec \
     ${systemd_unitdir}/system/parsec.service \

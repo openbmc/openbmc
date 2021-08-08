@@ -18,4 +18,4 @@ GTKDOC_MESON_OPTION = "gtk_doc"
 
 EXTRA_OEMESON = "-Dinstalled_tests=false"
 
-FILES_${PN} += "${libdir}/graphene-1.0"
+FILES:${PN} += "${libdir}/graphene-1.0"

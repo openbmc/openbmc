@@ -32,15 +32,15 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI[archive.sha256sum] = "e02d73e138af8b2868b5cad7faa1bdd278aeade3b6c3c92836511a4e6f3af1af"
 
-do_install_append() {
+do_install:append() {
     # make gnome-photos available on all desktops
     sed -i 's:OnlyShowIn=:#OnlyShowIn=:g' ${D}${datadir}/applications/org.gnome.Photos.desktop
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/metainfo \
     ${datadir}/gnome-shell \
 "
 
-RRECOMMENDS_${PN} = "grilo-plugins"
+RRECOMMENDS:${PN} = "grilo-plugins"

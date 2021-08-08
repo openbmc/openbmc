@@ -10,6 +10,6 @@ inherit pypi setuptools3
 
 PYPI_PACKAGE = "python-snappy"
 
-RDEPENDS_${PN} += "snappy"
+RDEPENDS:${PN} += "snappy"
 
 BBCLASSEXTEND = "native nativesdk"

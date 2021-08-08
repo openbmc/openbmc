@@ -18,28 +18,28 @@ inherit autotools pkgconfig
 
 EFIDIR ?= "/EFI/BOOT"
 
-EFI_ARCH_x86 = "ia32"
-EFI_ARCH_x86-64 = "x86_64"
+EFI_ARCH:x86 = "ia32"
+EFI_ARCH:x86-64 = "x86_64"
 
-CFLAGS_append = " -I${STAGING_INCDIR}/efi -I${STAGING_INCDIR}/efi/${EFI_ARCH}"
+CFLAGS:append = " -I${STAGING_INCDIR}/efi -I${STAGING_INCDIR}/efi/${EFI_ARCH}"
 
-EXTRA_OECONF_append = " \
+EXTRA_OECONF:append = " \
     --with-efi-includedir=${STAGING_INCDIR} \
     --with-efi-crt0=${STAGING_LIBDIR}/crt0-efi-${EFI_ARCH}.o \
     --with-efi-lds=${STAGING_LIBDIR}/elf_${EFI_ARCH}_efi.lds \
 "
 
-do_compile_append() {
+do_compile:append() {
 	oe_runmake example
 }
 
-do_install_append() {
+do_install:append() {
 	install -d "${D}${EFIDIR}"
 	install -m 0755 "${B}"/example/*.efi "${D}${EFIDIR}"
 }
 
 COMPATIBLE_HOST = "(i.86|x86_64).*-linux"
 
-FILES_${PN} += "${EFIDIR}"
+FILES:${PN} += "${EFIDIR}"
 
-RDEPENDS_${PN} = "gnu-efi libtss2-mu"
+RDEPENDS:${PN} = "gnu-efi libtss2-mu"

@@ -25,14 +25,14 @@ SRC_URI[sha256sum] = "14b67108344d81ba844631640df77c9071d9fb0659b080326ff5424e86
 # command tool is under GPLv3+, while libidn itself is under LGPLv2.1+ or LGPLv3
 # so package command into a separate package
 PACKAGES =+ "idn"
-FILES_idn = "${bindir}/*"
+FILES:idn = "${bindir}/*"
 
-LICENSE_${PN} = "LGPLv2.1+ | LGPLv3"
-LICENSE_idn = "GPLv3+"
+LICENSE:${PN} = "LGPLv2.1+ | LGPLv3"
+LICENSE:idn = "GPLv3+"
 
 EXTRA_OECONF = "--disable-csharp"
 
-do_install_append() {
+do_install:append() {
 	rm -rf ${D}${datadir}/emacs
 }
 

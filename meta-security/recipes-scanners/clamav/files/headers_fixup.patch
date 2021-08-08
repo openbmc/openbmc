@@ -7,7 +7,7 @@ Index: git/CMakeLists.txt
 ===================================================================
 --- git.orig/CMakeLists.txt
 +++ git/CMakeLists.txt
-@@ -374,8 +373,6 @@ check_include_file("stdlib.h"
+@@ -443,8 +443,6 @@ check_include_file("stdlib.h"
  check_include_file("string.h"           HAVE_STRING_H)
  check_include_file("strings.h"          HAVE_STRINGS_H)
  check_include_file("sys/cdefs.h"        HAVE_SYS_CDEFS_H)
@@ -16,7 +16,7 @@ Index: git/CMakeLists.txt
  check_include_file("sys/mman.h"         HAVE_SYS_MMAN_H)
  check_include_file("sys/param.h"        HAVE_SYS_PARAM_H)
  check_include_file("sys/queue.h"        HAVE_SYS_QUEUE_H)
-@@ -410,8 +407,6 @@ endif()
+@@ -479,8 +477,6 @@ endif()
  
  # int-types variants
  check_include_file("inttypes.h"         HAVE_INTTYPES_H)
@@ -25,7 +25,7 @@ Index: git/CMakeLists.txt
  check_include_file("stdint.h"           HAVE_STDINT_H)
  
  # this hack required to silence warnings on systems with inttypes.h
-@@ -539,17 +528,11 @@ check_type_size("time_t"  SIZEOF_TIME_T)
+@@ -608,17 +604,11 @@ check_type_size("time_t"  SIZEOF_TIME_T)
  # Checks for library functions.
  include(CheckSymbolExists)
  check_symbol_exists(_Exit           "stdlib.h"      HAVE__EXIT)
@@ -44,7 +44,7 @@ Index: git/CMakeLists.txt
  check_symbol_exists(timegm          "time.h"        HAVE_TIMEGM)
  check_symbol_exists(vsnprintf       "stdio.h"       HAVE_VSNPRINTF)
  
-@@ -563,10 +546,9 @@ else()
+@@ -632,10 +622,9 @@ else()
      check_symbol_exists(fseeko          "stdio.h"       HAVE_FSEEKO)
      check_symbol_exists(getaddrinfo     "netdb.h"       HAVE_GETADDRINFO)
      check_symbol_exists(getpagesize     "unistd.h"      HAVE_GETPAGESIZE)

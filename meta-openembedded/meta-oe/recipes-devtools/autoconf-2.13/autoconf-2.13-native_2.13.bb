@@ -22,7 +22,7 @@ SRC_URI[sha256sum] = "f0611136bee505811e9ca11ca7ac188ef5323a8e2ef19cffd3edb3cf08
 inherit texinfo native
 
 DEPENDS += "m4-native gnu-config-native"
-RDEPENDS_${PN} = "m4-native gnu-config-native"
+RDEPENDS:${PN} = "m4-native gnu-config-native"
 
 PERL = "${USRBINPATH}/perl"
 

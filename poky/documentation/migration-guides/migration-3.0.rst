@@ -194,7 +194,7 @@ The following BitBake changes have occurred.
    scripts that handles these two events need to be updated.
 
 -  The arguments passed to functions used with
-   :term:`bitbake:BB_HASHCHECK_FUNCTION`
+   :term:`BB_HASHCHECK_FUNCTION`
    have changed. If you are using your own custom hash check function,
    see :yocto_git:`/poky/commit/?id=40a5e193c4ba45c928fccd899415ea56b5417725`
    for details.

@@ -13,7 +13,7 @@ inherit pypi setuptools3
 
 SRC_URI[sha256sum] = "de800df9fb50f8ec5974761054a708af6e4246b03b4bdaee993f948947b0ebcf"
 
-RDEPENDS_${PN} += "file \
+RDEPENDS:${PN} += "file \
                    ${PYTHON_PN}-ctypes \
                    ${PYTHON_PN}-io \
                    ${PYTHON_PN}-logging \

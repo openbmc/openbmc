@@ -34,13 +34,13 @@ EXTRA_OECONF = "--with-os-type=moblin \
                 --disable-libelogind \
                "
 
-do_compile_prepend () {
+do_compile:prepend () {
     export GIR_EXTRA_LIBS_PATH="${B}/src/polkit/.libs"
 }
 
 PACKAGES =+ "${PN}-examples"
 
-FILES_${PN}_append = " \
+FILES:${PN}:append = " \
     ${libdir}/${BPN}-1 \
     ${nonarch_libdir}/${BPN}-1 \
     ${datadir}/dbus-1 \
@@ -48,10 +48,10 @@ FILES_${PN}_append = " \
     ${datadir}/gettext \
 "
 
-FILES_${PN}-examples = "${bindir}/*example*"
+FILES:${PN}-examples = "${bindir}/*example*"
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 polkitd"
+USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 polkitd"
 
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 SYSTEMD_AUTO_ENABLE = "disable"

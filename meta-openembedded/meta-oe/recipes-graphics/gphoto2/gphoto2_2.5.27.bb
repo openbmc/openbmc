@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
 DEPENDS = "libgphoto2 popt readline"
-RDEPENDS_gphoto2 = "libgphoto2"
+RDEPENDS:gphoto2 = "libgphoto2"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/gphoto/gphoto2-${PV}.tar.bz2;name=gphoto2 \
            file://0001-configure.ac-remove-AM_PO_SUBDIRS.patch \

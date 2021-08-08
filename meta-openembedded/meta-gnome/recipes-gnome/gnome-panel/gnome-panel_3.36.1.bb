@@ -22,4 +22,4 @@ SRC_URI[archive.sha256sum] = "1e21b726dd397523ae79d29eb538bcae09e3427e23ccd63f28
 
 PACKAGECONFIG[eds] = "--enable-eds,--disable-eds,evolution-data-server"
 
-RDEPENDS_${PN} += "gdm-base"
+RDEPENDS:${PN} += "gdm-base"

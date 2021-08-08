@@ -21,21 +21,21 @@ SRC_URI[sha256sum] = "ba32c406a10fc2c09426e2be2787d74ff204eb3a2e496d87cff76a476b
 
 inherit autotools-brokensep update-rc.d systemd useradd
 
-FINAL_LIBS_x86_toolchain-clang = "-latomic"
-FINAL_LIBS_riscv32_toolchain-clang = "-latomic"
-FINAL_LIBS_mips = "-latomic"
-FINAL_LIBS_arm = "-latomic"
-FINAL_LIBS_powerpc = "-latomic"
+FINAL_LIBS:x86:toolchain-clang = "-latomic"
+FINAL_LIBS:riscv32:toolchain-clang = "-latomic"
+FINAL_LIBS:mips = "-latomic"
+FINAL_LIBS:arm = "-latomic"
+FINAL_LIBS:powerpc = "-latomic"
 
 export FINAL_LIBS
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN}  = "--system --home-dir /var/lib/redis -g redis --shell /bin/false redis"
-GROUPADD_PARAM_${PN} = "--system redis"
+USERADD_PARAM:${PN}  = "--system --home-dir /var/lib/redis -g redis --shell /bin/false redis"
+GROUPADD_PARAM:${PN} = "--system redis"
 
 REDIS_ON_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}"
 
-do_compile_prepend() {
+do_compile:prepend() {
     (cd deps && oe_runmake hiredis lua linenoise)
 }
 
@@ -58,9 +58,9 @@ do_install() {
     fi
 }
 
-CONFFILES_${PN} = "${sysconfdir}/redis/redis.conf"
+CONFFILES:${PN} = "${sysconfdir}/redis/redis.conf"
 
 INITSCRIPT_NAME = "redis-server"
 INITSCRIPT_PARAMS = "defaults 87"
 
-SYSTEMD_SERVICE_${PN} = "redis.service"
+SYSTEMD_SERVICE:${PN} = "redis.service"

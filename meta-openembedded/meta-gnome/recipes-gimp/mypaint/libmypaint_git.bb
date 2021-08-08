@@ -19,7 +19,7 @@ SRCREV = "2768251dacce3939136c839aeca413f4aa4241d0"
 PV = "1.6.1"
 S = "${WORKDIR}/git"
 
-do_configure_append() {
+do_configure:append() {
     # autogen uses python2 so generate headers ourselves
     cd ${S}
     python3 generate.py mypaint-brush-settings-gen.h brushsettings-gen.h

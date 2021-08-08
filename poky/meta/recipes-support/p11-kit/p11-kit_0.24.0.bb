@@ -8,7 +8,7 @@ inherit meson gettext pkgconfig gtk-doc bash-completion manpages
 
 DEPENDS = "libtasn1 libtasn1-native libffi"
 
-DEPENDS_append = "${@' glib-2.0' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
+DEPENDS:append = "${@' glib-2.0' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
 
 SRC_URI = "git://github.com/p11-glue/p11-kit"
 SRCREV = "34826623f58399b24c21f1788e2cdaea34521b7b"
@@ -20,13 +20,13 @@ PACKAGECONFIG[trust-paths] = "-Dtrust_paths=/etc/ssl/certs/ca-certificates.crt,,
 
 GTKDOC_MESON_OPTION = 'gtk_doc'
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/p11-kit-proxy.so \
     ${libdir}/pkcs11/*.so \
     ${libdir}/pkcs11/*.la \
     ${systemd_user_unitdir}/*"
 
 # PN contains p11-kit-proxy.so, a symlink to a loadable module
-INSANE_SKIP_${PN} = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"
 
 BBCLASSEXTEND = "nativesdk"

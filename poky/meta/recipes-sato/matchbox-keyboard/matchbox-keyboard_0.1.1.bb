@@ -33,19 +33,19 @@ PACKAGECONFIG[gtk3-im] = "--enable-gtk3-im,--disable-gtk3-im,gtk+3"
 
 PACKAGES += "${PN}-im ${PN}-applet"
 
-FILES_${PN} = "${bindir}/ \
+FILES:${PN} = "${bindir}/ \
 	       ${sysconfdir} \
 	       ${datadir}/applications \
 	       ${datadir}/pixmaps \
 	       ${datadir}/matchbox-keyboard"
 
-FILES_${PN}-im = "${libdir}/gtk-2.0/*/immodules/*.so \
+FILES:${PN}-im = "${libdir}/gtk-2.0/*/immodules/*.so \
                   ${libdir}/gtk-3.0/*/immodules/*.so"
 
-FILES_${PN}-applet = "${libdir}/matchbox-panel/*.so"
+FILES:${PN}-applet = "${libdir}/matchbox-panel/*.so"
 
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}/${sysconfdir}/X11/Xsession.d/
 	install -m 755 ${WORKDIR}/80matchboxkeyboard.sh ${D}/${sysconfdir}/X11/Xsession.d/
 
@@ -56,5 +56,5 @@ do_install_append () {
 
 GTKIMMODULES_PACKAGES = "${PN}-im"
 
-RDEPENDS_${PN} = "formfactor dbus-wait"
-RRECOMMENDS_${PN} = "${PN}-applet"
+RDEPENDS:${PN} = "formfactor dbus-wait"
+RRECOMMENDS:${PN} = "${PN}-applet"

@@ -13,7 +13,7 @@ DEPENDS += "\
     ${PYTHON_PN}-wheel-native \
 "
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-booleanpy \
 "
 
@@ -23,7 +23,7 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 "
 

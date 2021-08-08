@@ -19,7 +19,7 @@ EXTRA_OECONF += "ac_cv_prog_EMACS=no"
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_install_append() {
+do_install:append() {
         rm -rf ${D}${datadir}/emacs
 }
 

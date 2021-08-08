@@ -32,8 +32,8 @@ inherit autotools pkgconfig
 
 EXTRA_OECONF += "--enable-cpluscplus"
 
-CFLAGS_append_libc-musl = " -D_GNU_SOURCE -DNO_GETCONTEXT -DSEARCH_FOR_DATA_START -DUSE_MMAP -DHAVE_DL_ITERATE_PHDR"
+CFLAGS:append:libc-musl = " -D_GNU_SOURCE -DNO_GETCONTEXT -DSEARCH_FOR_DATA_START -DUSE_MMAP -DHAVE_DL_ITERATE_PHDR"
 
-FILES_${PN}-doc = "${datadir}"
+FILES:${PN}-doc = "${datadir}"
 
 BBCLASSEXTEND = "native nativesdk"

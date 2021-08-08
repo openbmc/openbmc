@@ -8,11 +8,11 @@ SRC_URI[sha256sum] = "467fbad99067910785144ce333826c71fb0e63a425657295239737f7ec
 inherit pypi setuptools3
 
 # Remove bundled egg-info
-do_compile_prepend() {
+do_compile:prepend() {
     rm -rf ${S}/idna.egg-info
 }
 
-RDEPENDS_${PN}_class-target = "\
+RDEPENDS:${PN}:class-target = "\
     ${PYTHON_PN}-codecs \
 "
 

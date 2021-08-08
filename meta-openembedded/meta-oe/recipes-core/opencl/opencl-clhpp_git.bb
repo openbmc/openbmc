@@ -20,4 +20,4 @@ EXTRA_OECMAKE = " \
                   "
 
 # Headers only so PN is empty
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""

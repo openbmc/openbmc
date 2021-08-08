@@ -13,4 +13,4 @@ SRC_URI[sha256sum] = "d2c0e719b242b7fd3db70bc6678a2df1abf2cfaa899b775a1591a5efa0
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[notify] = "--enable-notifications,--disable-notifications,libnotify"
 
-RDEPENDS_${PN} = "eject"
+RDEPENDS:${PN} = "eject"

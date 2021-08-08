@@ -18,4 +18,4 @@ do_install() {
 # to disable "all" behavior (found when comparing qemuarm and qemux86 signatures)
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-CONFFILES_${PN} = "${sysconfdir}/fb.modes"
+CONFFILES:${PN} = "${sysconfdir}/fb.modes"

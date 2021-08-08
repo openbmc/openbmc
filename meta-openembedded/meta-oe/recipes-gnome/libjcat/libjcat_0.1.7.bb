@@ -29,6 +29,6 @@ PACKAGECONFIG[tests] = "-Dtests=true,-Dtests=false"
 EXTRA_OEMESON = "-Dman=false"
 GTKDOC_MESON_OPTION = "gtkdoc"
 
-RDEPENDS_${PN}_class-target = "\
+RDEPENDS:${PN}:class-target = "\
     ${@bb.utils.contains('PACKAGECONFIG', 'gpg', 'gnupg', '', d)} \
 "

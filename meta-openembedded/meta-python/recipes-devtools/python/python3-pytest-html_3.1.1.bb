@@ -11,7 +11,7 @@ PYPI_PACKAGE = "pytest-html"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-pytest \
 "
 

@@ -69,16 +69,16 @@ EXTRA_OECONF = "--with-avahi-priv-access-group=adm \
 EXTRA_OECONF_SYSVINIT = "${@bb.utils.contains('DISTRO_FEATURES','sysvinit','--with-distro=debian','--with-distro=none',d)}"
 EXTRA_OECONF_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES','systemd','--with-systemdsystemunitdir=${systemd_unitdir}/system/','--without-systemdsystemunitdir',d)}"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # This m4 file will get in the way of our introspection.m4 with special cross-compilation fixes
     rm "${S}/common/introspection.m4" || true
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/avahi-gobject/.libs:${B}/avahi-common/.libs:${B}/avahi-client/.libs:${B}/avahi-glib/.libs"
 }
 
-RRECOMMENDS_${PN}_append_libc-glibc = " libnss-mdns"
+RRECOMMENDS:${PN}:append:libc-glibc = " libnss-mdns"
 
 do_install() {
 	autotools_do_install
@@ -95,41 +95,41 @@ do_install() {
 
 PACKAGES =+ "${@bb.utils.contains("PACKAGECONFIG", "libdns_sd", "libavahi-compat-libdnssd", "", d)}"
 
-FILES_libavahi-compat-libdnssd = "${libdir}/libdns_sd.so.*"
+FILES:libavahi-compat-libdnssd = "${libdir}/libdns_sd.so.*"
 
-RPROVIDES_libavahi-compat-libdnssd = "libdns-sd"
+RPROVIDES:libavahi-compat-libdnssd = "libdns-sd"
 
 inherit update-rc.d systemd useradd
 
 PACKAGES =+ "libavahi-gobject avahi-daemon libavahi-common libavahi-core libavahi-client avahi-dnsconfd libavahi-glib avahi-autoipd avahi-utils avahi-discover avahi-ui"
 
-FILES_avahi-ui = "${libdir}/libavahi-ui*.so.*"
-FILES_avahi-discover = "${datadir}/applications/avahi-discover.desktop \
+FILES:avahi-ui = "${libdir}/libavahi-ui*.so.*"
+FILES:avahi-discover = "${datadir}/applications/avahi-discover.desktop \
                         ${datadir}/avahi/interfaces/avahi-discover.ui \
                         ${bindir}/avahi-discover-standalone \
                         "
 
-LICENSE_libavahi-gobject = "LGPLv2.1+"
-LICENSE_avahi-daemon = "LGPLv2.1+"
-LICENSE_libavahi-common = "LGPLv2.1+"
-LICENSE_libavahi-core = "LGPLv2.1+"
-LICENSE_libavahi-client = "LGPLv2.1+"
-LICENSE_avahi-dnsconfd = "LGPLv2.1+"
-LICENSE_libavahi-glib = "LGPLv2.1+"
-LICENSE_avahi-autoipd = "LGPLv2.1+"
-LICENSE_avahi-utils = "LGPLv2.1+"
+LICENSE:libavahi-gobject = "LGPLv2.1+"
+LICENSE:avahi-daemon = "LGPLv2.1+"
+LICENSE:libavahi-common = "LGPLv2.1+"
+LICENSE:libavahi-core = "LGPLv2.1+"
+LICENSE:libavahi-client = "LGPLv2.1+"
+LICENSE:avahi-dnsconfd = "LGPLv2.1+"
+LICENSE:libavahi-glib = "LGPLv2.1+"
+LICENSE:avahi-autoipd = "LGPLv2.1+"
+LICENSE:avahi-utils = "LGPLv2.1+"
 
 # As avahi doesn't put any files into PN, clear the files list to avoid problems
 # if extra libraries appear.
-FILES_${PN} = ""
-FILES_avahi-autoipd = "${sbindir}/avahi-autoipd \
+FILES:${PN} = ""
+FILES:avahi-autoipd = "${sbindir}/avahi-autoipd \
                        ${sysconfdir}/avahi/avahi-autoipd.action \
                        ${sysconfdir}/dhcp/*/avahi-autoipd \
                        ${sysconfdir}/udhcpc.d/00avahi-autoipd \
                        ${sysconfdir}/udhcpc.d/99avahi-autoipd"
-FILES_libavahi-common = "${libdir}/libavahi-common.so.*"
-FILES_libavahi-core = "${libdir}/libavahi-core.so.* ${libdir}/girepository-1.0/AvahiCore*.typelib"
-FILES_avahi-daemon = "${sbindir}/avahi-daemon \
+FILES:libavahi-common = "${libdir}/libavahi-common.so.*"
+FILES:libavahi-core = "${libdir}/libavahi-core.so.* ${libdir}/girepository-1.0/AvahiCore*.typelib"
+FILES:avahi-daemon = "${sbindir}/avahi-daemon \
                       ${sysconfdir}/avahi/avahi-daemon.conf \
                       ${sysconfdir}/avahi/hosts \
                       ${sysconfdir}/avahi/services \
@@ -139,44 +139,44 @@ FILES_avahi-daemon = "${sbindir}/avahi-daemon \
                       ${datadir}/avahi/avahi-service.dtd \
                       ${datadir}/avahi/service-types \
                       ${datadir}/dbus-1/system-services"
-FILES_libavahi-client = "${libdir}/libavahi-client.so.*"
-FILES_avahi-dnsconfd = "${sbindir}/avahi-dnsconfd \
+FILES:libavahi-client = "${libdir}/libavahi-client.so.*"
+FILES:avahi-dnsconfd = "${sbindir}/avahi-dnsconfd \
                         ${sysconfdir}/avahi/avahi-dnsconfd.action \
                         ${sysconfdir}/init.d/avahi-dnsconfd"
-FILES_libavahi-glib = "${libdir}/libavahi-glib.so.*"
-FILES_libavahi-gobject = "${libdir}/libavahi-gobject.so.*  ${libdir}/girepository-1.0/Avahi*.typelib"
-FILES_avahi-utils = "${bindir}/avahi-* ${bindir}/b* ${datadir}/applications/b*"
+FILES:libavahi-glib = "${libdir}/libavahi-glib.so.*"
+FILES:libavahi-gobject = "${libdir}/libavahi-gobject.so.*  ${libdir}/girepository-1.0/Avahi*.typelib"
+FILES:avahi-utils = "${bindir}/avahi-* ${bindir}/b* ${datadir}/applications/b*"
 
-RDEPENDS_${PN}-dev = "avahi-daemon (= ${EXTENDPKGV}) libavahi-core (= ${EXTENDPKGV})"
-RDEPENDS_${PN}-dev += "${@["", " libavahi-client (= ${EXTENDPKGV})"][bb.utils.contains('PACKAGECONFIG', 'dbus', 1, 0, d)]}"
-RDEPENDS_${PN}-dnsconfd = "${PN}-daemon"
+RDEPENDS:${PN}-dev = "avahi-daemon (= ${EXTENDPKGV}) libavahi-core (= ${EXTENDPKGV})"
+RDEPENDS:${PN}-dev += "${@["", " libavahi-client (= ${EXTENDPKGV})"][bb.utils.contains('PACKAGECONFIG', 'dbus', 1, 0, d)]}"
+RDEPENDS:${PN}-dnsconfd = "${PN}-daemon"
 
-RRECOMMENDS_avahi-daemon_append_libc-glibc = " libnss-mdns"
+RRECOMMENDS:avahi-daemon:append:libc-glibc = " libnss-mdns"
 
-CONFFILES_avahi-daemon = "${sysconfdir}/avahi/avahi-daemon.conf"
+CONFFILES:avahi-daemon = "${sysconfdir}/avahi/avahi-daemon.conf"
 
 USERADD_PACKAGES = "avahi-daemon avahi-autoipd"
-USERADD_PARAM_avahi-daemon = "--system --home /run/avahi-daemon \
+USERADD_PARAM:avahi-daemon = "--system --home /run/avahi-daemon \
                               --no-create-home --shell /bin/false \
                               --user-group avahi"
 
-USERADD_PARAM_avahi-autoipd = "--system --home /run/avahi-autoipd \
+USERADD_PARAM:avahi-autoipd = "--system --home /run/avahi-autoipd \
                               --no-create-home --shell /bin/false \
                               --user-group \
                               -c \"Avahi autoip daemon\" \
                               avahi-autoipd"
 
 INITSCRIPT_PACKAGES = "avahi-daemon avahi-dnsconfd"
-INITSCRIPT_NAME_avahi-daemon = "avahi-daemon"
-INITSCRIPT_PARAMS_avahi-daemon = "defaults 21 19"
-INITSCRIPT_NAME_avahi-dnsconfd = "avahi-dnsconfd"
-INITSCRIPT_PARAMS_avahi-dnsconfd = "defaults 22 19"
+INITSCRIPT_NAME:avahi-daemon = "avahi-daemon"
+INITSCRIPT_PARAMS:avahi-daemon = "defaults 21 19"
+INITSCRIPT_NAME:avahi-dnsconfd = "avahi-dnsconfd"
+INITSCRIPT_PARAMS:avahi-dnsconfd = "defaults 22 19"
 
 SYSTEMD_PACKAGES = "${PN}-daemon ${PN}-dnsconfd"
-SYSTEMD_SERVICE_${PN}-daemon = "avahi-daemon.service"
-SYSTEMD_SERVICE_${PN}-dnsconfd = "avahi-dnsconfd.service"
+SYSTEMD_SERVICE:${PN}-daemon = "avahi-daemon.service"
+SYSTEMD_SERVICE:${PN}-dnsconfd = "avahi-dnsconfd.service"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${sysconfdir}/udhcpc.d
 	install ${WORKDIR}/00avahi-autoipd ${D}${sysconfdir}/udhcpc.d
 	install ${WORKDIR}/99avahi-autoipd ${D}${sysconfdir}/udhcpc.d
@@ -184,7 +184,7 @@ do_install_append() {
 
 # At the time the postinst runs, dbus might not be setup so only restart if running 
 # Don't exit early, because update-rc.d needs to run subsequently.
-pkg_postinst_avahi-daemon () {
+pkg_postinst:avahi-daemon () {
 if [ -z "$D" ]; then
 	killall -q -HUP dbus-daemon || true
 fi

@@ -20,9 +20,9 @@ SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH} \
            file://arm.patch \
           "
 
-SRC_URI_append_riscv32 = " file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
-SRC_URI_append_mips = " file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
-SRC_URI_remove_toolchain-clang_riscv32 = "file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
+SRC_URI:append:riscv32 = " file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
+SRC_URI:append:mips = " file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
+SRC_URI:remove:toolchain-clang:riscv32 = "file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
 
 S = "${WORKDIR}/git"
 
@@ -45,9 +45,9 @@ EXTRA_OECMAKE = "\
     -DFAIL_ON_WARNINGS=OFF \
 "
 
-do_install_append() {
+do_install:append() {
     # fix for qa check buildpaths
     sed -i "s#${RECIPE_SYSROOT}##g" ${D}${libdir}/cmake/rocksdb/RocksDBTargets.cmake
 }
 
-LDFLAGS_append_riscv64 = " -pthread"
+LDFLAGS:append:riscv64 = " -pthread"

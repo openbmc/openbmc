@@ -3,7 +3,7 @@ SUMMARY = "klibc utils for initramfs statically compiled"
 FILESPATH =. "${FILE_DIRNAME}/klibc-${PV}:"
 
 PACKAGES = "${PN}"
-FILES_${PN} = ""
+FILES:${PN} = ""
 
 KLIBC_UTILS_VARIANT = "static"
 KLIBC_UTILS_PKGNAME = "klibc-static-utils"

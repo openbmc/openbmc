@@ -20,9 +20,9 @@ SRC_URI = "${GNUPG_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0004-autogen.sh-fix-find-version-for-beta-checking.patch \
            file://0001-Woverride-init-is-not-needed-with-gcc-9.patch \
            "
-SRC_URI_append_class-native = " file://0001-configure.ac-use-a-custom-value-for-the-location-of-.patch \
+SRC_URI:append:class-native = " file://0001-configure.ac-use-a-custom-value-for-the-location-of-.patch \
                                 file://relocate.patch"
-SRC_URI_append_class-nativesdk = " file://relocate.patch"
+SRC_URI:append:class-nativesdk = " file://relocate.patch"
 
 SRC_URI[sha256sum] = "c498db346a9b9a4b399e514c8f56dfc0a888ce8f327f10376ff984452cd154ec"
 
@@ -36,7 +36,7 @@ EXTRA_OECONF = "--disable-ldap \
 
 # A minimal package containing just enough to run gpg+gpgagent (E.g. use gpgme in opkg)
 PACKAGES =+ "${PN}-gpg"
-FILES_${PN}-gpg = " \
+FILES:${PN}-gpg = " \
 	${bindir}/gpg \
 	${bindir}/gpg2 \
 	${bindir}/gpg-agent \
@@ -46,11 +46,11 @@ FILES_${PN}-gpg = " \
 # to ensure all tools are included. This is done only in non-native
 # builds. Native builds don't have sub-packages, so appending RDEPENDS
 # in this case breaks recipe parsing.
-RDEPENDS_${PN} += "${@ "" if ("native" in d.getVar("PN")) else (d.getVar("PN") + "-gpg")}"
+RDEPENDS:${PN} += "${@ "" if ("native" in d.getVar("PN")) else (d.getVar("PN") + "-gpg")}"
 
-RRECOMMENDS_${PN} = "pinentry"
+RRECOMMENDS:${PN} = "pinentry"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	# Else these could be used in prefernce to those in aclocal-copy
 	rm -f ${S}/m4/gpg-error.m4
 	rm -f ${S}/m4/libassuan.m4
@@ -58,16 +58,16 @@ do_configure_prepend () {
 	rm -f ${S}/m4/libgcrypt.m4
 }
 
-do_install_append() {
+do_install:append() {
 	ln -sf gpg2 ${D}${bindir}/gpg
 	ln -sf gpgv2 ${D}${bindir}/gpgv
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
 	create_wrappers ${STAGING_BINDIR_NATIVE}
 }
 
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
 	create_wrappers ${SDKPATHNATIVE}${bindir_nativesdk}
 }
 

@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "3c05e05aebcbfcc044d9e8c2d4646cd8359be39a3f0ba8ce4e72a9094b
 
 inherit autotools pkgconfig
 
-do_install_append() {
+do_install:append() {
     # The GLib dependency was removed in libmms 0.6.3, but the
     # "Requires" was not removed from the pkg-config file.  Since we
     # don't have (and don't want) the RDEPENDS on GLib, we should

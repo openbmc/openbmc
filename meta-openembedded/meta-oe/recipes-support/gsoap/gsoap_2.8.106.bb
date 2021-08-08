@@ -18,12 +18,12 @@ S = "${WORKDIR}/${BPN}-2.8"
 
 PARALLEL_MAKE = ""
 
-EXTRA_OEMAKE_class-target = "SOAP=${STAGING_BINDIR_NATIVE}/soapcpp2"
+EXTRA_OEMAKE:class-target = "SOAP=${STAGING_BINDIR_NATIVE}/soapcpp2"
 
 DEPENDS = "openssl zlib flex bison bison-native"
-DEPENDS_append_class-target = " gsoap-native"
+DEPENDS:append:class-target = " gsoap-native"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${libdir}
     for lib in libgsoapssl libgsoapssl++ libgsoap libgsoapck++ libgsoap++ libgsoapck
     do
@@ -31,12 +31,12 @@ do_install_append() {
     done
 }
 
-do_install_class-native() {
+do_install:class-native() {
     oe_runmake DESTDIR=${D} BINDIR=${D}${bindir} install
 }
 
-FILES_${PN} = "${bindir}/wsdl2h ${bindir}/soapcpp2"
-FILES_${PN} += "${datadir}"
-FILES_${PN}-staticdev = "${libdir}"
-FILES_${PN}-dev = "${includedir}"
-RRECOMMENDS_${PN}-dev = "${PN}-staticdev"
+FILES:${PN} = "${bindir}/wsdl2h ${bindir}/soapcpp2"
+FILES:${PN} += "${datadir}"
+FILES:${PN}-staticdev = "${libdir}"
+FILES:${PN}-dev = "${includedir}"
+RRECOMMENDS:${PN}-dev = "${PN}-staticdev"

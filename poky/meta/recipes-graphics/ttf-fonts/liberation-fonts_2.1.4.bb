@@ -33,6 +33,6 @@ do_install () {
 }
 
 PACKAGES = "${PN}"
-FILES_${PN} += "${sysconfdir} ${datadir}"
+FILES:${PN} += "${sysconfdir} ${datadir}"
 
 BBCLASSEXTEND = "native nativesdk"

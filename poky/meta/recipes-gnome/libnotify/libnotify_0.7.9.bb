@@ -30,9 +30,9 @@ EXTRA_OEMESON = "-Dman=false"
 # there were times, we had two versions of libnotify (oe-core libnotify:0.6.x /
 # meta-gnome libnotify3: 0.7.x)
 PROVIDES += "libnotify3"
-RPROVIDES_${PN} += "libnotify3"
-RCONFLICTS_${PN} += "libnotify3"
-RREPLACES_${PN} += "libnotify3"
+RPROVIDES:${PN} += "libnotify3"
+RCONFLICTS:${PN} += "libnotify3"
+RREPLACES:${PN} += "libnotify3"
 
 # -7381 is specific to the NodeJS bindings
 CVE_CHECK_WHITELIST += "CVE-2013-7381"

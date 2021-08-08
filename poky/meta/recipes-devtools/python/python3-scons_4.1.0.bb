@@ -11,7 +11,7 @@ PYPI_PACKAGE = "SCons"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN}_class-target = "\
+RDEPENDS:${PN}:class-target = "\
   python3-core \
   python3-compression \
   python3-fcntl \
@@ -24,4 +24,4 @@ RDEPENDS_${PN}_class-target = "\
   python3-pprint \
   "
 
-FILES_${PN}-doc += "${datadir}/scons*.1"
+FILES:${PN}-doc += "${datadir}/scons*.1"

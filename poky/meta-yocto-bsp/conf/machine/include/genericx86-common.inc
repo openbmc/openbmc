@@ -18,7 +18,7 @@ MACHINE_EXTRA_RRECOMMENDS += "kernel-modules linux-firmware"
 
 GLIBC_ADDONS = "nptl"
 
-EXTRA_OECONF_append_pn-matchbox-panel-2 = " --with-battery=acpi"
+EXTRA_OECONF:append:pn-matchbox-panel-2 = " --with-battery=acpi"
 
 IMAGE_FSTYPES += "wic wic.bmap"
 WKS_FILE ?= "genericx86.wks.in"

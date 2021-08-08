@@ -22,7 +22,7 @@ S = "${WORKDIR}/unixODBC-${PV}"
 
 EXTRA_OEMAKE += "LIBS=-lltdl"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # old m4 files will cause libtool version don't match
     rm -rf m4/*
     rm -fr libltdl

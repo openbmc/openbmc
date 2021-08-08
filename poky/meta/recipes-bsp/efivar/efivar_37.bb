@@ -22,7 +22,7 @@ export CCLD_FOR_BUILD = "${BUILD_CCLD}"
 # enforce BFD.
 LDFLAGS += "-fuse-ld=bfd"
 
-do_compile_prepend() {
+do_compile:prepend() {
     # Remove when https://github.com/rhboot/efivar/issues/130 is fixed
     oe_runmake \
         CFLAGS="${BUILD_CFLAGS}" \
@@ -36,6 +36,6 @@ do_install() {
 
 BBCLASSEXTEND = "native"
 
-RRECOMMENDS_${PN}_class-target = "kernel-module-efivarfs"
+RRECOMMENDS:${PN}:class-target = "kernel-module-efivarfs"
 
 CLEANBROKEN = "1"

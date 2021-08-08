@@ -18,9 +18,9 @@ EXTRA_OECONF = "--with-libesmtp=${STAGING_EXECPREFIXDIR}"
 
 inherit autotools update-alternatives
 
-ALTERNATIVE_${PN} = "sendmail mailq newaliases"
+ALTERNATIVE:${PN} = "sendmail mailq newaliases"
 # /usr/lib/sendmial is required by LSB core test
-ALTERNATIVE_${PN}_linuxstdbase = "sendmail mailq newaliases usr-lib-sendmail"
+ALTERNATIVE:${PN}:linuxstdbase = "sendmail mailq newaliases usr-lib-sendmail"
 ALTERNATIVE_TARGET[mailq] = "${bindir}/mailq"
 ALTERNATIVE_TARGET[newaliases] = "${bindir}/newaliases"
 ALTERNATIVE_LINK_NAME[sendmail] = "${sbindir}/sendmail"
@@ -30,7 +30,7 @@ ALTERNATIVE_TARGET[usr-lib-sendmail] = "${bindir}/esmtp"
 
 ALTERNATIVE_PRIORITY = "10"
 
-ALTERNATIVE_${PN}-doc += "mailq.1 newaliases.1 sendmail.1"
+ALTERNATIVE:${PN}-doc += "mailq.1 newaliases.1 sendmail.1"
 ALTERNATIVE_LINK_NAME[mailq.1] = "${mandir}/man1/mailq.1"
 ALTERNATIVE_LINK_NAME[newaliases.1] = "${mandir}/man1/newaliases.1"
 ALTERNATIVE_LINK_NAME[sendmail.1] = "${mandir}/man1/sendmail.1"
@@ -38,9 +38,9 @@ ALTERNATIVE_LINK_NAME[sendmail.1] = "${mandir}/man1/sendmail.1"
 SRC_URI[md5sum] = "79a9c1f9023d53f35bb82bf446150a72"
 SRC_URI[sha256sum] = "a0d26931bf731f97514da266d079d8bc7d73c65b3499ed080576ab606b21c0ce"
 
-do_install_append() {
+do_install:append() {
     # only one file /usr/lib/sendmail in ${D}${libdir}
     rm -rf ${D}${libdir}
 }
 
-FILES_${PN} += "${libdir}/"
+FILES:${PN} += "${libdir}/"

@@ -101,7 +101,7 @@ def main():
                 if name:
                     print('SRCREV_%s_pn-%s%s = "%s"' % (name, pn, forcevariable, srcrev))
                 else:
-                    print('SRCREV_pn-%s%s = "%s"' % (pn, forcevariable, srcrev))
+                    print('SRCREV:pn-%s%s = "%s"' % (pn, forcevariable, srcrev))
 
 
 if __name__ == "__main__":

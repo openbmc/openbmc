@@ -12,9 +12,9 @@ PACKAGECONFIG[wayland] = "-Dwith_wayland=yes,-Dwith_wayland=no,wayland-native wa
 
 PACKAGES =+ "${PN}-x11 ${PN}-glx ${PN}-wayland"
 
-RDEPENDS_${PN}-x11 =+ "${PN}"
-RDEPENDS_${PN}-glx =+ "${PN}-x11"
+RDEPENDS:${PN}-x11 =+ "${PN}"
+RDEPENDS:${PN}-glx =+ "${PN}-x11"
 
-FILES_${PN}-x11 =+ "${libdir}/libva-x11*${SOLIBS}"
-FILES_${PN}-glx =+ "${libdir}/libva-glx*${SOLIBS}"
-FILES_${PN}-wayland =+ "${libdir}/libva-wayland*${SOLIBS}"
+FILES:${PN}-x11 =+ "${libdir}/libva-x11*${SOLIBS}"
+FILES:${PN}-glx =+ "${libdir}/libva-glx*${SOLIBS}"
+FILES:${PN}-wayland =+ "${libdir}/libva-wayland*${SOLIBS}"

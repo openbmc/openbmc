@@ -12,5 +12,5 @@ S = "${WORKDIR}/IO-Tty-${PV}"
 
 inherit cpan
 
-FILES_${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/IO/Tty/.debug/"
+FILES:${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/IO/Tty/.debug/"
 

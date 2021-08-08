@@ -85,4 +85,4 @@ python do_install() {
         pass
 }
 
-FILES_${PN} += "${datadir}"
+FILES:${PN} += "${datadir}"

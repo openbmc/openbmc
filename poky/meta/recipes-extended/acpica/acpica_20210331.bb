@@ -26,7 +26,7 @@ S = "${WORKDIR}/acpica-unix-${PV}"
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN} = "acpixtract acpidump"
+ALTERNATIVE:${PN} = "acpixtract acpidump"
 
 EXTRA_OEMAKE = "CC='${CC}' \
                 OPT_CFLAGS=-Wall \
@@ -44,8 +44,8 @@ do_install() {
 
 # iasl*.bb is a subset of this recipe, so RREPLACE it
 PROVIDES = "iasl"
-RPROVIDES_${PN} += "iasl"
-RREPLACES_${PN} += "iasl"
-RCONFLICTS_${PN} += "iasl"
+RPROVIDES:${PN} += "iasl"
+RREPLACES:${PN} += "iasl"
+RCONFLICTS:${PN} += "iasl"
 
 BBCLASSEXTEND = "native"

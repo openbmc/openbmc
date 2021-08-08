@@ -12,11 +12,11 @@ S = "${WORKDIR}/git"
 
 inherit cmake python3native
 
-do_install_append() {
+do_install:append() {
     rm ${D}${datadir}/Catch2/lldbinit
     rm ${D}${datadir}/Catch2/gdbinit
     rmdir ${D}${datadir}/Catch2/
 }
 # Header-only library
-RDEPENDS_${PN}-dev = ""
-RRECOMMENDS_${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
+RDEPENDS:${PN}-dev = ""
+RRECOMMENDS:${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"

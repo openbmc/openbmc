@@ -14,7 +14,7 @@ SRC_URI += " \
 
 DEPENDS = "intltool-native libx11 libxext libxt libxft libxi glib-2.0-native bc-native libpam"
 # These are only needed as part of the stopgap screensaver implementation:
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     liberation-fonts \
     xuser-account \
 "
@@ -28,7 +28,7 @@ EXTRA_OECONF += "--with-app-defaults=${datadir}/X11/app-defaults --libdir=${STAG
 EXTRA_OEMAKE += "install_prefix=${D}"
 REQUIRED_DISTRO_FEATURES = "x11 pam"
 
-do_install_append() {
+do_install:append() {
     install -D ${WORKDIR}/xscreensaver.service ${D}${systemd_unitdir}/system/xscreensaver.service
     for f in xscreensaver-getimage-file xscreensaver-getimage-video webcollage xscreensaver-text vidwhacker
     do
@@ -38,16 +38,16 @@ do_install_append() {
 
 PACKAGES =+ "${PN}-perl"
 
-FILES_${PN}-perl = "\
+FILES:${PN}-perl = "\
     ${libexecdir}/${PN}/xscreensaver-getimage-file \
     ${libexecdir}/${PN}/xscreensaver-getimage-video \
     ${libexecdir}/${PN}/webcollage \
     ${libexecdir}/${PN}/xscreensaver-text \
     ${libexecdir}/${PN}/vidwhacker \
     "
-FILES_${PN} += "${datadir}/X11/app-defaults/XScreenSaver ${datadir}/fonts"
-SYSTEMD_SERVICE_${PN} = "xscreensaver.service"
+FILES:${PN} += "${datadir}/X11/app-defaults/XScreenSaver ${datadir}/fonts"
+SYSTEMD_SERVICE:${PN} = "xscreensaver.service"
 
-RDEPENDS_${PN}-perl = "perl"
+RDEPENDS:${PN}-perl = "perl"
 
 CLEANBROKEN = "1"

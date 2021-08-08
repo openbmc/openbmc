@@ -27,7 +27,7 @@ SRC_URI[md5sum] = "c2d5a7aa0246627da490be4e399c87cb"
 SRC_URI[sha256sum] = "fc9e3b0fc4f67c3c1f6d43c90c16a5c42d117b8e28457c5b46831b8b5d3ae31a"
 
 UPSTREAM_CHECK_URI = "http://www.jedsoft.org/releases/slang/"
-PREMIRRORS_append = "\n http://www.jedsoft.org/releases/slang/.* http://www.jedsoft.org/releases/slang/old/ \n"
+PREMIRRORS:append = "\n http://www.jedsoft.org/releases/slang/.* http://www.jedsoft.org/releases/slang/old/ \n"
 
 inherit autotools-brokensep ptest
 CLEANBROKEN = "1"
@@ -42,7 +42,7 @@ PACKAGECONFIG[pcre] = "--with-pcre=${STAGING_DIR_HOST}${prefix},--without-pcre,p
 PACKAGECONFIG[png] = "--with-png=${STAGING_DIR_HOST}${prefix},--without-png,libpng"
 PACKAGECONFIG[zlib] = "--with-z=${STAGING_DIR_HOST}${prefix},--without-z,zlib"
 
-do_configure_prepend() {
+do_configure:prepend() {
     cd ${S}/autoconf
     # slang keeps configure.ac and rest of autoconf files in autoconf/ directory
     # we have to go there to be able to run gnu-configize cause it expects configure.{in,ac}
@@ -74,9 +74,9 @@ do_install_ptest() {
 	sed -i 's/\.\.\/\.\.\/doc\/text\/slangfun\.txt/slangfun\.txt/' ${D}${PTEST_PATH}/test/docfun.sl
 }
 
-FILES_${PN} += "${libdir}/${BPN}/v2/modules/ ${datadir}/slsh/"
+FILES:${PN} += "${libdir}/${BPN}/v2/modules/ ${datadir}/slsh/"
 
-RDEPENDS_${PN}-ptest += "make"
+RDEPENDS:${PN}-ptest += "make"
 
 PARALLEL_MAKE = ""
 PARALLEL_MAKEINST = ""

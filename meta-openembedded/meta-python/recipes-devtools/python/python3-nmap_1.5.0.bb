@@ -13,7 +13,7 @@ SRC_URI[sha256sum] = "b52744e0c9944c567733b8deb60d6363e17233ee40466edfb1b09a5780
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "nmap \
+RDEPENDS:${PN} += "nmap \
 	${PYTHON_PN}-requests \
 	${PYTHON_PN}-simplejson \
 "

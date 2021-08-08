@@ -27,7 +27,7 @@ DEPENDS += " \
     ${PYTHON_PN}-wheel-native \
 "
 
-RDEPENDS_${PN}_class-target += "\
+RDEPENDS:${PN}:class-target += "\
     ${PYTHON_PN}-datetime \
     ${PYTHON_PN}-io \
     ${PYTHON_PN}-netclient \
@@ -43,7 +43,7 @@ RDEPENDS_${PN}_class-target += "\
     ${PYTHON_PN}-yamlloader \
 "
 
-ALTERNATIVE_${PN} = "mof_compiler"
+ALTERNATIVE:${PN} = "mof_compiler"
 ALTERNATIVE_TARGET[mof_compiler] = "${bindir}/mof_compiler"
 
 ALTERNATIVE_PRIORITY = "60"

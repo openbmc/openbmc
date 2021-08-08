@@ -47,17 +47,17 @@ PACKAGECONFIG[systemd-charon] = "--enable-systemd,--disable-systemd,systemd,"
 
 inherit autotools systemd pkgconfig
 
-RRECOMMENDS_${PN} = "kernel-module-ipsec"
+RRECOMMENDS:${PN} = "kernel-module-ipsec"
 
-FILES_${PN} += "${libdir}/ipsec/lib*${SOLIBS}"
-FILES_${PN}-dbg += "${bindir}/.debug ${sbindir}/.debug ${libdir}/ipsec/.debug ${libexecdir}/ipsec/.debug"
-FILES_${PN}-dev += "${libdir}/ipsec/lib*${SOLIBSDEV} ${libdir}/ipsec/*.la ${libdir}/ipsec/include/config.h"
-FILES_${PN}-staticdev += "${libdir}/ipsec/*.a"
+FILES:${PN} += "${libdir}/ipsec/lib*${SOLIBS}"
+FILES:${PN}-dbg += "${bindir}/.debug ${sbindir}/.debug ${libdir}/ipsec/.debug ${libexecdir}/ipsec/.debug"
+FILES:${PN}-dev += "${libdir}/ipsec/lib*${SOLIBSDEV} ${libdir}/ipsec/*.la ${libdir}/ipsec/include/config.h"
+FILES:${PN}-staticdev += "${libdir}/ipsec/*.a"
 
-CONFFILES_${PN} = "${sysconfdir}/*.conf ${sysconfdir}/ipsec.d/*.conf ${sysconfdir}/strongswan.d/*.conf"
+CONFFILES:${PN} = "${sysconfdir}/*.conf ${sysconfdir}/ipsec.d/*.conf ${sysconfdir}/strongswan.d/*.conf"
 
 PACKAGES += "${PN}-plugins"
-ALLOW_EMPTY_${PN}-plugins = "1"
+ALLOW_EMPTY:${PN}-plugins = "1"
 
 PACKAGES_DYNAMIC += "^${PN}-plugin-.*$"
 NOAUTOPACKAGEDEBUG = "1"
@@ -69,13 +69,13 @@ python split_strongswan_plugins () {
 
     def add_plugin_conf(f, pkg, file_regex, output_pattern, modulename):
         dvar = d.getVar('PKGD')
-        oldfiles = d.getVar('CONFFILES_' + pkg)
+        oldfiles = d.getVar('CONFFILES:' + pkg)
         newfile = '/' + os.path.relpath(f, dvar)
 
         if not oldfiles:
-            d.setVar('CONFFILES_' + pkg, newfile)
+            d.setVar('CONFFILES:' + pkg, newfile)
         else:
-            d.setVar('CONFFILES_' + pkg, oldfiles + " " + newfile)
+            d.setVar('CONFFILES:' + pkg, oldfiles + " " + newfile)
 
     split_packages = do_split_packages(d, libdir, 'libstrongswan-(.*)\.so', '${PN}-plugin-%s', 'strongSwan %s plugin', prepend=True)
     do_split_packages(d, sysconfdir, '(.*)\.conf', '${PN}-plugin-%s', 'strongSwan %s plugin', prepend=True, hook=add_plugin_conf)
@@ -86,17 +86,17 @@ python split_strongswan_plugins () {
 
     if split_packages:
         pn = d.getVar('PN')
-        d.setVar('RRECOMMENDS_' + pn + '-plugins', ' '.join(split_packages))
-        d.appendVar('RRECOMMENDS_' + pn + '-dbg', ' ' + ' '.join(split_dbg_packages))
-        d.appendVar('RRECOMMENDS_' + pn + '-dev', ' ' + ' '.join(split_dev_packages))
-        d.appendVar('RRECOMMENDS_' + pn + '-staticdev', ' ' + ' '.join(split_staticdev_packages))
+        d.setVar('RRECOMMENDS:' + pn + '-plugins', ' '.join(split_packages))
+        d.appendVar('RRECOMMENDS:' + pn + '-dbg', ' ' + ' '.join(split_dbg_packages))
+        d.appendVar('RRECOMMENDS:' + pn + '-dev', ' ' + ' '.join(split_dev_packages))
+        d.appendVar('RRECOMMENDS:' + pn + '-staticdev', ' ' + ' '.join(split_staticdev_packages))
 }
 
-PACKAGESPLITFUNCS_prepend = "split_strongswan_plugins "
+PACKAGESPLITFUNCS:prepend = "split_strongswan_plugins "
 
 # Install some default plugins based on default strongSwan ./configure options
 # See https://wiki.strongswan.org/projects/strongswan/wiki/Pluginlist
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PN}-plugin-aes \
     ${PN}-plugin-attr \
     ${PN}-plugin-cmac \
@@ -130,14 +130,14 @@ RDEPENDS_${PN} += "\
     ${PN}-plugin-curve25519 \
     "
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
 
 # The deprecated legacy 'strongswan-starter' service should only be used when charon and
 # stroke are enabled. When swanctl is in use, 'strongswan.service' is needed.
 # See: https://wiki.strongswan.org/projects/strongswan/wiki/Charon-systemd
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
     ${@bb.utils.contains('PACKAGECONFIG', 'swanctl', '${BPN}.service', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'charon', '${BPN}-starter.service', '', d)} \
 "

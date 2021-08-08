@@ -40,7 +40,7 @@ class BitbakePrTests(OESelftestTestCase):
         return str(stamps[0])
 
     def increment_package_pr(self, package_name):
-        inc_data = "do_package_append() {\n    bb.build.exec_func('do_test_prserv', d)\n}\ndo_test_prserv() {\necho \"The current date is: %s\" > ${PKGDESTWORK}/${PN}.datestamp\n}" % datetime.datetime.now()
+        inc_data = "do_package:append() {\n    bb.build.exec_func('do_test_prserv', d)\n}\ndo_test_prserv() {\necho \"The current date is: %s\" > ${PKGDESTWORK}/${PN}.datestamp\n}" % datetime.datetime.now()
         self.write_recipeinc(package_name, inc_data)
         res = bitbake(package_name, ignore_status=True)
         self.delete_recipeinc(package_name)

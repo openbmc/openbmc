@@ -32,14 +32,14 @@ PACKAGECONFIG ??= "pcsc"
 PACKAGECONFIG[openct] = "--enable-openct,--disable-openct,openct"
 PACKAGECONFIG[pcsc] = "--enable-pcsc,--disable-pcsc,pcsc-lite,pcsc-lite pcsc-lite-lib"
 
-RDEPENDS_${PN} = "readline"
+RDEPENDS:${PN} = "readline"
 
-FILES_${PN} += "\
+FILES:${PN} += "\
     ${libdir}/opensc-pkcs11.so \
     ${libdir}/onepin-opensc-pkcs11.so \
     ${libdir}/pkcs11-spy.so \
 "
-FILES_${PN}-dev += "\
+FILES:${PN}-dev += "\
     ${libdir}/pkcs11/opensc-pkcs11.so \
     ${libdir}/pkcs11/onepin-opensc-pkcs11.so \
     ${libdir}/pkcs11/pkcs11-spy.so \

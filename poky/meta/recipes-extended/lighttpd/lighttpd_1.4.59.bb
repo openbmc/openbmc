@@ -7,10 +7,10 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e4dac5c6ab169aa212feb5028853a579"
 
 SECTION = "net"
-RDEPENDS_${PN} = "lighttpd-module-dirlisting \
+RDEPENDS:${PN} = "lighttpd-module-dirlisting \
                   lighttpd-module-indexfile \
                   lighttpd-module-staticfile"
-RRECOMMENDS_${PN} = "lighttpd-module-access \
+RRECOMMENDS:${PN} = "lighttpd-module-access \
                      lighttpd-module-accesslog"
 
 SRC_URI = "http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${PV}.tar.xz \
@@ -52,9 +52,9 @@ inherit autotools pkgconfig update-rc.d gettext systemd
 INITSCRIPT_NAME = "lighttpd"
 INITSCRIPT_PARAMS = "defaults 70"
 
-SYSTEMD_SERVICE_${PN} = "lighttpd.service"
+SYSTEMD_SERVICE:${PN} = "lighttpd.service"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${sysconfdir}/init.d ${D}${sysconfdir}/lighttpd ${D}${sysconfdir}/lighttpd.d ${D}/www/pages/dav
 	install -m 0755 ${WORKDIR}/lighttpd ${D}${sysconfdir}/init.d
 	install -m 0644 ${WORKDIR}/lighttpd.conf ${D}${sysconfdir}/lighttpd
@@ -71,13 +71,13 @@ do_install_append() {
 	ln -sf ${localstatedir}/tmp ${D}/www/var
 }
 
-FILES_${PN} += "${sysconfdir} /www"
+FILES:${PN} += "${sysconfdir} /www"
 
-CONFFILES_${PN} = "${sysconfdir}/lighttpd/lighttpd.conf"
+CONFFILES:${PN} = "${sysconfdir}/lighttpd/lighttpd.conf"
 
 PACKAGES_DYNAMIC += "^lighttpd-module-.*"
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     lighttpd_libdir = d.expand('${libdir}')
     do_split_packages(d, lighttpd_libdir, r'^mod_(.*)\.so$', 'lighttpd-module-%s', 'Lighttpd module for %s', extra_depends='')
 }

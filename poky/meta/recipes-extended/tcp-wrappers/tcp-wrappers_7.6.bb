@@ -11,12 +11,12 @@ PR ="r10"
 DEPENDS += "libnsl2"
 
 PACKAGES = "${PN}-dbg libwrap libwrap-doc libwrap-dev libwrap-staticdev ${PN} ${PN}-doc"
-FILES_libwrap = "${base_libdir}/lib*${SOLIBS}"
-FILES_libwrap-doc = "${mandir}/man3 ${mandir}/man5"
-FILES_libwrap-dev = "${libdir}/lib*${SOLIBSDEV} ${includedir}"
-FILES_libwrap-staticdev = "${libdir}/lib*.a"
-FILES_${PN} = "${sbindir}"
-FILES_${PN}-doc = "${mandir}/man8"
+FILES:libwrap = "${base_libdir}/lib*${SOLIBS}"
+FILES:libwrap-doc = "${mandir}/man3 ${mandir}/man5"
+FILES:libwrap-dev = "${libdir}/lib*${SOLIBSDEV} ${includedir}"
+FILES:libwrap-staticdev = "${libdir}/lib*.a"
+FILES:${PN} = "${sbindir}"
+FILES:${PN}-doc = "${mandir}/man8"
 
 SRC_URI = "http://ftp.porcupine.org/pub/security/tcp_wrappers_${PV}.tar.gz \
            file://00_man_quoting.diff \
@@ -78,9 +78,9 @@ EXTRA_OEMAKE = "'CC=${CC}' \
                 'EXTRA_CFLAGS=${CFLAGS} -DSYS_ERRLIST_DEFINED -DHAVE_STRERROR -DHAVE_WEAKSYMS -D_REENTRANT -DINET6=1 -Dss_family=__ss_family -Dss_len=__ss_len'"
 
 EXTRA_OEMAKE_NETGROUP = "-DNETGROUP -DUSE_GETDOMAIN"
-EXTRA_OEMAKE_NETGROUP_libc-musl = "-DUSE_GETDOMAIN"
+EXTRA_OEMAKE_NETGROUP:libc-musl = "-DUSE_GETDOMAIN"
 
-EXTRA_OEMAKE_append_libc-musl = " 'LIBS='"
+EXTRA_OEMAKE:append:libc-musl = " 'LIBS='"
 
 do_compile () {
 	oe_runmake 'TABLES=-DHOSTS_DENY=\"${sysconfdir}/hosts.deny\" -DHOSTS_ALLOW=\"${sysconfdir}/hosts.allow\"' \
@@ -133,4 +133,4 @@ do_install () {
 	touch ${D}${sysconfdir}/hosts.deny
 }
 
-FILES_${PN} += "${sysconfdir}/hosts.allow ${sysconfdir}/hosts.deny"
+FILES:${PN} += "${sysconfdir}/hosts.allow ${sysconfdir}/hosts.deny"

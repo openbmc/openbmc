@@ -6,9 +6,9 @@
 # To use this class a number of variables should be defined:
 #
 # List all of the alternatives needed by a package:
-# ALTERNATIVE_<pkg> = "name1 name2 name3 ..."
+# ALTERNATIVE:<pkg> = "name1 name2 name3 ..."
 #
-#   i.e. ALTERNATIVE_busybox = "sh sed test bracket"
+#   i.e. ALTERNATIVE:busybox = "sh sed test bracket"
 #
 # The pathname of the link
 # ALTERNATIVE_LINK_NAME[name] = "target"
@@ -123,7 +123,7 @@ def gen_updatealternativesvars(d):
 
     for p in pkgs:
         for v in vars:
-            ret.append(v + "_" + p)
+            ret.append(v + ":" + p)
             ret.append(v + "_VARDEPS_" + p)
     return " ".join(ret)
 
@@ -141,10 +141,10 @@ python apply_update_alternative_renames () {
     import re
 
     def update_files(alt_target, alt_target_rename, pkg, d):
-        f = d.getVar('FILES_' + pkg)
+        f = d.getVar('FILES:' + pkg)
         if f:
             f = re.sub(r'(^|\s)%s(\s|$)' % re.escape (alt_target), r'\1%s\2' % alt_target_rename, f)
-            d.setVar('FILES_' + pkg, f)
+            d.setVar('FILES:' + pkg, f)
 
     # Check for deprecated usage...
     pn = d.getVar('BPN')
@@ -156,7 +156,7 @@ python apply_update_alternative_renames () {
     for pkg in (d.getVar('PACKAGES') or "").split():
         # If the src == dest, we know we need to rename the dest by appending ${BPN}
         link_rename = []
-        for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg) or "").split():
+        for alt_name in (d.getVar('ALTERNATIVE:%s' % pkg) or "").split():
             alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name)
             if not alt_link:
                 alt_link = "%s/%s" % (d.getVar('bindir'), alt_name)
@@ -233,7 +233,7 @@ def update_alternatives_alt_targets(d, pkg):
     pn = d.getVar('BPN')
     pkgdest = d.getVar('PKGD')
     updates = list()
-    for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg) or "").split():
+    for alt_name in (d.getVar('ALTERNATIVE:%s' % pkg) or "").split():
         alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name)
         alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name) or \
                        d.getVarFlag('ALTERNATIVE_TARGET', alt_name) or \
@@ -259,7 +259,7 @@ def update_alternatives_alt_targets(d, pkg):
 
     return updates
 
-PACKAGESPLITFUNCS_prepend = "populate_packages_updatealternatives "
+PACKAGESPLITFUNCS:prepend = "populate_packages_updatealternatives "
 
 python populate_packages_updatealternatives () {
     if not update_alternatives_enabled(d):
@@ -280,24 +280,24 @@ python populate_packages_updatealternatives () {
             provider = d.getVar('VIRTUAL-RUNTIME_update-alternatives')
             if provider:
                 #bb.note('adding runtime requirement for update-alternatives for %s' % pkg)
-                d.appendVar('RDEPENDS_%s' % pkg, ' ' + d.getVar('MLPREFIX', False) + provider)
+                d.appendVar('RDEPENDS:%s' % pkg, ' ' + d.getVar('MLPREFIX', False) + provider)
 
             bb.note('adding update-alternatives calls to postinst/prerm for %s' % pkg)
             bb.note('%s' % alt_setup_links)
-            postinst = d.getVar('pkg_postinst_%s' % pkg)
+            postinst = d.getVar('pkg_postinst:%s' % pkg)
             if postinst:
                 postinst = alt_setup_links + postinst
             else:
                 postinst = '#!/bin/sh\n' + alt_setup_links
-            d.setVar('pkg_postinst_%s' % pkg, postinst)
+            d.setVar('pkg_postinst:%s' % pkg, postinst)
 
             bb.note('%s' % alt_remove_links)
-            prerm = d.getVar('pkg_prerm_%s' % pkg) or '#!/bin/sh\n'
+            prerm = d.getVar('pkg_prerm:%s' % pkg) or '#!/bin/sh\n'
             prerm += alt_remove_links
-            d.setVar('pkg_prerm_%s' % pkg, prerm)
+            d.setVar('pkg_prerm:%s' % pkg, prerm)
 }
 
-python package_do_filedeps_append () {
+python package_do_filedeps:append () {
     if update_alternatives_enabled(d):
         apply_update_alternative_provides(d)
 }
@@ -307,7 +307,7 @@ def apply_update_alternative_provides(d):
     pkgdest = d.getVar('PKGDEST')
 
     for pkg in d.getVar('PACKAGES').split():
-        for alt_name in (d.getVar('ALTERNATIVE_%s' % pkg) or "").split():
+        for alt_name in (d.getVar('ALTERNATIVE:%s' % pkg) or "").split():
             alt_link     = d.getVarFlag('ALTERNATIVE_LINK_NAME', alt_name)
             alt_target   = d.getVarFlag('ALTERNATIVE_TARGET_%s' % pkg, alt_name) or d.getVarFlag('ALTERNATIVE_TARGET', alt_name)
             alt_target   = alt_target or d.getVar('ALTERNATIVE_TARGET_%s' % pkg) or d.getVar('ALTERNATIVE_TARGET') or alt_link

@@ -12,7 +12,7 @@ CLEANBROKEN = "1"
 
 PYPI_PACKAGE = "smbus2"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
         ${PYTHON_PN}-ctypes \
         ${PYTHON_PN}-fcntl \
 "

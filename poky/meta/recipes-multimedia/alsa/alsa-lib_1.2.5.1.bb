@@ -21,24 +21,24 @@ EXTRA_OECONF += " \
 
 PACKAGES =+ "alsa-server alsa-conf libatopology"
 
-FILES_alsa-server = "${bindir}/*"
-FILES_alsa-conf = "${datadir}/alsa/"
-FILES_libatopology = "${libdir}/libatopology.so.*"
+FILES:alsa-server = "${bindir}/*"
+FILES:alsa-conf = "${datadir}/alsa/"
+FILES:libatopology = "${libdir}/libatopology.so.*"
 
-RDEPENDS_${PN}_class-target = "alsa-conf alsa-ucm-conf"
-RDEPENDS_libatopology_class-target = "alsa-topology-conf"
+RDEPENDS:${PN}:class-target = "alsa-conf alsa-ucm-conf"
+RDEPENDS:libatopology:class-target = "alsa-topology-conf"
 
 # upgrade path
-RPROVIDES_${PN} = "libasound"
-RREPLACES_${PN} = "libasound"
-RCONFLICTS_${PN} = "libasound"
+RPROVIDES:${PN} = "libasound"
+RREPLACES:${PN} = "libasound"
+RCONFLICTS:${PN} = "libasound"
 
-RPROVIDES_${PN}-dev = "alsa-dev"
-RREPLACES_${PN}-dev = "alsa-dev"
-RCONFLICTS_${PN}-dev = "alsa-dev"
+RPROVIDES:${PN}-dev = "alsa-dev"
+RREPLACES:${PN}-dev = "alsa-dev"
+RCONFLICTS:${PN}-dev = "alsa-dev"
 
-RPROVIDES_alsa-conf = "alsa-conf-base"
-RREPLACES_alsa-conf = "alsa-conf-base"
-RCONFLICTS_alsa-conf = "alsa-conf-base"
+RPROVIDES:alsa-conf = "alsa-conf-base"
+RREPLACES:alsa-conf = "alsa-conf-base"
+RCONFLICTS:alsa-conf = "alsa-conf-base"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -15,13 +15,13 @@ SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"
 
 SRC_URI[archive.sha256sum] = "69bd6b5327716ca2f511ab580a969fd7bf0cd2c24ce15e1d0e530592d3ff209c"
 
-do_install_append() {
+do_install:append() {
     for i in generate_wrap_init.pl gmmproc; do
         sed -i -e '1s,.*,#!${bindir}/env perl,' ${D}${libdir}/glibmm-2.4/proc/$i
     done
 }
 
-FILES_${PN} = "${libdir}/lib*.so.*"
-FILES_${PN}-dev += "${datadir}/glibmm-* ${libdir}/glibmm-2.4/include/ ${libdir}/glibmm-2.4/proc/ ${libdir}/giomm-2.4/include/"
+FILES:${PN} = "${libdir}/lib*.so.*"
+FILES:${PN}-dev += "${datadir}/glibmm-* ${libdir}/glibmm-2.4/include/ ${libdir}/glibmm-2.4/proc/ ${libdir}/giomm-2.4/include/"
 
-RDEPENDS_${PN}-dev = "perl"
+RDEPENDS:${PN}-dev = "perl"

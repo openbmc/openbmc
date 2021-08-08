@@ -10,4 +10,4 @@ do_install () {
 	install -m 644 ${WORKDIR}/80-udisks-rpi.rules ${D}${base_libdir}/udev/rules.d
 }
 
-FILES_${PN} = "${base_libdir}/udev/rules.d"
+FILES:${PN} = "${base_libdir}/udev/rules.d"

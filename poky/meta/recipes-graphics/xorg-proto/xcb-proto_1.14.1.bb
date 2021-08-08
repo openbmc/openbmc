@@ -18,11 +18,11 @@ inherit autotools pkgconfig python3native
 
 PACKAGES += "python-xcbgen"
 
-FILES_${PN} = ""
-FILES_${PN}-dev += "${datadir}/xcb/*.xml ${datadir}/xcb/*.xsd"
-FILES_python-xcbgen = "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN} = ""
+FILES:${PN}-dev += "${datadir}/xcb/*.xml ${datadir}/xcb/*.xsd"
+FILES:python-xcbgen = "${PYTHON_SITEPACKAGES_DIR}"
 
-RDEPENDS_${PN}-dev = ""
-RRECOMMENDS_${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
+RDEPENDS:${PN}-dev = ""
+RRECOMMENDS:${PN}-dbg = "${PN}-dev (= ${EXTENDPKGV})"
 
 BBCLASSEXTEND = "native nativesdk"

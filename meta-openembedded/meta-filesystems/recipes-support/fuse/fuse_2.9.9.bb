@@ -14,6 +14,7 @@ SRC_URI = "https://github.com/libfuse/libfuse/releases/download/${BP}/${BP}.tar.
            file://gold-unversioned-symbol.patch \
            file://aarch64.patch \
            file://0001-fuse-fix-the-return-value-of-help-option.patch \
+           file://fuse2-0007-util-ulockmgr_server.c-conditionally-define-closefro.patch \
            file://fuse.conf \
 "
 SRC_URI[md5sum] = "8000410aadc9231fd48495f7642f3312"
@@ -29,33 +30,33 @@ inherit autotools pkgconfig update-rc.d systemd
 INITSCRIPT_NAME = "fuse"
 INITSCRIPT_PARAMS = "start 3 S . stop 20 0 6 ."
 
-SYSTEMD_SERVICE_${PN} = ""
+SYSTEMD_SERVICE:${PN} = ""
 
 DEPENDS = "gettext-native"
 
 PACKAGES =+ "fuse-utils libulockmgr libulockmgr-dev"
 
-RPROVIDES_${PN}-dbg += "fuse-utils-dbg libulockmgr-dbg"
+RPROVIDES:${PN}-dbg += "fuse-utils-dbg libulockmgr-dbg"
 
-RRECOMMENDS_${PN}_class-target = "kernel-module-fuse libulockmgr fuse-utils"
+RRECOMMENDS:${PN}:class-target = "kernel-module-fuse libulockmgr fuse-utils"
 
-FILES_${PN} += "${libdir}/libfuse.so.*"
-FILES_${PN}-dev += "${libdir}/libfuse*.la"
+FILES:${PN} += "${libdir}/libfuse.so.*"
+FILES:${PN}-dev += "${libdir}/libfuse*.la"
 
-FILES_libulockmgr = "${libdir}/libulockmgr.so.*"
-FILES_libulockmgr-dev += "${libdir}/libulock*.la"
+FILES:libulockmgr = "${libdir}/libulockmgr.so.*"
+FILES:libulockmgr-dev += "${libdir}/libulock*.la"
 
 # Forbid auto-renaming to libfuse-utils
-FILES_fuse-utils = "${bindir} ${base_sbindir}"
-DEBIAN_NOAUTONAME_fuse-utils = "1"
-DEBIAN_NOAUTONAME_${PN}-dbg = "1"
+FILES:fuse-utils = "${bindir} ${base_sbindir}"
+DEBIAN_NOAUTONAME:fuse-utils = "1"
+DEBIAN_NOAUTONAME:${PN}-dbg = "1"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # Make this explicit so overriding base_sbindir propagates properly.
     export MOUNT_FUSE_PATH="${base_sbindir}"
 }
 
-do_install_append() {
+do_install:append() {
     rm -rf ${D}/dev
 
     # systemd class remove the sysv_initddir only if systemd_system_unitdir
@@ -71,7 +72,7 @@ do_install_append() {
     fi
 }
 
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
     install -d ${D}${sysconfdir}
     mv ${D}/etc/* ${D}${sysconfdir}/
     rmdir ${D}/etc

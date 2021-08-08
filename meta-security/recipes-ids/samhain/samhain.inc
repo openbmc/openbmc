@@ -37,7 +37,7 @@ INITSCRIPT_NAME = "${BPN}"
 INITSCRIPT_PARAMS ?= "defaults"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "${INITSCRIPT_NAME}.service"
+SYSTEMD_SERVICE:${PN} = "${INITSCRIPT_NAME}.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 # mode mapping:
@@ -67,23 +67,23 @@ PACKAGECONFIG[acl] = " --enable-posix-acl , --disable-posix-acl, acl"
 PACKAGECONFIG[audit] = "ac_cv_header_auparse_h=yes,ac_cv_header_auparse_h=no,audit"
 PACKAGECONFIG[ps] = "--with-ps-path=${base_bindir}/ps,,,procps"
 
-EXTRA_OEMAKE_append_aarch64 = " CPPFLAGS+=-DCONFIG_ARCH_AARCH64=1"
-EXTRA_OEMAKE_append_mips64 = " CPPFLAGS+=-DCONFIG_ARCH_MIPS64=1"
+EXTRA_OEMAKE:append:aarch64 = " CPPFLAGS+=-DCONFIG_ARCH_AARCH64=1"
+EXTRA_OEMAKE:append:mips64 = " CPPFLAGS+=-DCONFIG_ARCH_MIPS64=1"
 
 do_unpack_samhain() {
     cd ${WORKDIR}
     tar -xzvf samhain-${PV}.tar.gz
 }
 
-python do_unpack_append() {
+python do_unpack:append() {
     bb.build.exec_func('do_unpack_samhain', d)
 }
 
-do_configure_prepend_arm() {
+do_configure:prepend:arm() {
     export sh_cv___va_copy=yes
 }
 
-do_configure_prepend_aarch64() {
+do_configure:prepend:aarch64() {
     export sh_cv___va_copy=yes
 }
 
@@ -91,7 +91,7 @@ do_configure_prepend_aarch64() {
 # use the prefix --oldincludedir=/usr/include which is not
 # recognized by Samhain's configure script and would invariably
 # throw back the error "unrecognized option: --oldincludedir=/usr/include"
-do_configure_prepend () {
+do_configure:prepend () {
     cat << EOF > ${S}/config-site.${BP}
 ssp_cv_lib=no
 sh_cv_va_copy=yes
@@ -124,13 +124,13 @@ do_configure () {
 	${EXTRA_OECONF}
 }
 
-do_compile_prepend_libc-musl () {
+do_compile:prepend:libc-musl () {
 	sed -i 's/^#define HAVE_MALLOC_H.*//' ${B}/config.h
 }
 
 # Install the init script, it's default file, and the extraneous
 # documentation.
-do_install_append () {
+do_install:append () {
 	oe_runmake install DESTDIR='${D}' INSTALL=install-boot
 
 	install -D -m 755 ${WORKDIR}/${INITSCRIPT_NAME}.init \
@@ -165,4 +165,4 @@ do_install_append () {
 	rm -rf ${D}${localstatedir}/log
 }
 
-FILES_${PN} += "${systemd_system_unitdir}"
+FILES:${PN} += "${systemd_system_unitdir}"

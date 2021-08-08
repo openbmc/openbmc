@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e64a29fcd3c3dd356a24e235dfcb3905"
 
 DEPENDS += "libusb1 ${PYTHON_PN}-setuptools-scm-native"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
 	python3-logging \
 "
 
@@ -13,6 +13,6 @@ SRC_URI[sha256sum] = "a4cc7404a203144754164b8b40994e2849fde1cfff06b08492f12fff9d
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "libusb1"
+RDEPENDS:${PN} += "libusb1"
 
 BBCLASSEXTEND = "native nativesdk"

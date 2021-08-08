@@ -16,10 +16,10 @@ inherit pypi distutils3
 
 DEPENDS += "parted"
 
-RDEPENDS_${PN}_class-target += " \
+RDEPENDS:${PN}:class-target += " \
     parted (>= 2.3) \
     python3-stringold python3-codecs python3-math \
 "
-RDEPENDS_${PN}_class-native = ""
+RDEPENDS:${PN}:class-native = ""
 
 BBCLASSEXTEND = "native"

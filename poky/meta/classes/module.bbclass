@@ -14,7 +14,7 @@ python __anonymous () {
     d.setVar('KBUILD_EXTRA_SYMBOLS', " ".join(extra_symbols))
 }
 
-python do_devshell_prepend () {
+python do_devshell:prepend () {
     os.environ['CFLAGS'] = ''
     os.environ['CPPFLAGS'] = ''
     os.environ['CXXFLAGS'] = ''
@@ -70,5 +70,5 @@ EXPORT_FUNCTIONS do_compile do_install
 
 # add all splitted modules to PN RDEPENDS, PN can be empty now
 KERNEL_MODULES_META_PACKAGE = "${PN}"
-FILES_${PN} = ""
-ALLOW_EMPTY_${PN} = "1"
+FILES:${PN} = ""
+ALLOW_EMPTY:${PN} = "1"

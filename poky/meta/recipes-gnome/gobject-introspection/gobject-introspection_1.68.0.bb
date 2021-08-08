@@ -19,7 +19,7 @@ SRC_URI = "${GNOME_MIRROR}/${BPN}/${@oe.utils.trim_version("${PV}", 2)}/${BPN}-$
 
 SRC_URI[sha256sum] = "d229242481a201b84a0c66716de1752bca41db4133672cfcfb37c93eb6e54a27"
 
-SRC_URI_append_class-native = " file://0001-Relocate-the-repository-directory-for-native-builds.patch"
+SRC_URI:append:class-native = " file://0001-Relocate-the-repository-directory-for-native-builds.patch"
 
 inherit meson pkgconfig gtk-doc python3native qemu gobject-introspection-data upstream-version-is-even multilib_script
 
@@ -34,7 +34,7 @@ DEPENDS += " libffi zlib glib-2.0 python3 flex-native bison-native autoconf-arch
 # native versions of its own tools during build.
 # Also prelink-rtld is used to find out library dependencies of introspection binaries
 # (standard ldd doesn't work when cross-compiling).
-DEPENDS_append_class-target = " gobject-introspection-native qemu-native prelink-native"
+DEPENDS:append:class-target = " gobject-introspection-native qemu-native prelink-native"
 
 # needed for writing out the qemu wrapper script
 export STAGING_DIR_HOST
@@ -45,7 +45,7 @@ PACKAGECONFIG[doctool] = "-Ddoctool=enabled,-Ddoctool=disabled,python3-mako,"
 
 # Configure target build to use native tools of itself and to use a qemu wrapper
 # and optionally to generate introspection data
-EXTRA_OEMESON_class-target = " \
+EXTRA_OEMESON:class-target = " \
     -Dgi_cross_use_prebuilt_gi=true \
     -Dgi_cross_binary_wrapper=${B}/g-ir-scanner-qemuwrapper \
     -Dgi_cross_ldd_wrapper=${B}/g-ir-scanner-lddwrapper \
@@ -61,14 +61,14 @@ python gobject_introspection_preconfigure () {
     oe.utils.write_ld_so_conf(d)
 }
 
-do_configure_prepend_class-native() {
+do_configure:prepend:class-native() {
         # Tweak the native python scripts so that they don't refer to the
         # full path of native python binary (the solution is taken from glib-2.0 recipe)
         # This removes the risk of exceeding Linux kernel's shebang line limit (128 bytes)
         sed -i -e '1s,#!.*,#!${USRBINPATH}/env python3,' ${S}/tools/g-ir-tool-template.in
 }
 
-do_configure_prepend_class-target() {
+do_configure:prepend:class-target() {
         # Write out a qemu wrapper that will be given to gi-scanner so that it
         # can run target helper binaries through that.
         qemu_binary="${@qemu_wrapper_cmdline(d, '$STAGING_DIR_HOST', ['\\$GIR_EXTRA_LIBS_PATH','.libs','$STAGING_DIR_HOST/${libdir}','$STAGING_DIR_HOST/${base_libdir}'])}"
@@ -121,7 +121,7 @@ EOF
         sed -i -e '1s,#!.*,#!${USRBINPATH}/env python3,' ${S}/tools/g-ir-tool-template.in
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
         # This prevents g-ir-scanner from writing cache data to $HOME
         export GI_SCANNER_DISABLE_CACHE=1
 
@@ -129,14 +129,14 @@ do_compile_prepend() {
         export GIR_EXTRA_LIBS_PATH=$B/.libs
 }
 
-do_install_prepend() {
+do_install:prepend() {
         # This prevents g-ir-scanner from writing cache data to $HOME
         export GI_SCANNER_DISABLE_CACHE=1
 }
 
 # Our wrappers need to be available system-wide, because they will be used
 # to build introspection files for all other gobject-based packages
-do_install_append_class-target() {
+do_install:append:class-target() {
         install -d ${D}${bindir}/
         install ${B}/g-ir-scanner-qemuwrapper ${D}${bindir}/
         install ${B}/g-ir-scanner-wrapper ${D}${bindir}/
@@ -146,9 +146,9 @@ do_install_append_class-target() {
 
 # we need target versions of introspection tools in sysroot so that they can be run via qemu
 # when building introspection files in other packages
-SYSROOT_DIRS_append_class-target = " ${bindir}"
+SYSROOT_DIRS:append:class-target = " ${bindir}"
 
-SYSROOT_PREPROCESS_FUNCS_append_class-target = " gi_binaries_sysroot_preprocess"
+SYSROOT_PREPROCESS_FUNCS:append:class-target = " gi_binaries_sysroot_preprocess"
 gi_binaries_sysroot_preprocess() {
         # Tweak the binary names in the introspection pkgconfig file, so that it
         # picks up our wrappers which do the cross-compile and qemu magic.
@@ -158,7 +158,7 @@ gi_binaries_sysroot_preprocess() {
            ${SYSROOT_DESTDIR}${libdir}/pkgconfig/gobject-introspection-1.0.pc
 }
 
-SYSROOT_PREPROCESS_FUNCS_append = " gi_ldsoconf_sysroot_preprocess"
+SYSROOT_PREPROCESS_FUNCS:append = " gi_ldsoconf_sysroot_preprocess"
 gi_ldsoconf_sysroot_preprocess () {
 	mkdir -p ${SYSROOT_DESTDIR}${bindir}
 	dest=${SYSROOT_DESTDIR}${bindir}/postinst-ldsoconf-${PN}
@@ -181,26 +181,26 @@ gi_package_preprocess() {
 SSTATE_SCAN_FILES += "g-ir-scanner-qemuwrapper g-ir-scanner-wrapper g-ir-compiler-wrapper g-ir-scanner-lddwrapper Gio-2.0.gir postinst-ldsoconf-${PN}"
 
 # .typelib files are needed at runtime and so they go to the main package
-FILES_${PN}_append = " ${libdir}/girepository-*/*.typelib"
+FILES:${PN}:append = " ${libdir}/girepository-*/*.typelib"
 
 # .gir files go to dev package, as they're needed for developing (but not for running)
 # things that depends on introspection.
-FILES_${PN}-dev_append = " ${datadir}/gir-*/*.gir ${libdir}/gir-*/*.gir"
-FILES_${PN}-dev_append = " ${datadir}/gir-*/*.rnc"
+FILES:${PN}-dev:append = " ${datadir}/gir-*/*.gir ${libdir}/gir-*/*.gir"
+FILES:${PN}-dev:append = " ${datadir}/gir-*/*.rnc"
 
 # These are used by gobject-based packages
 # to generate transient introspection binaries
-FILES_${PN}-dev_append = " ${datadir}/gobject-introspection-1.0/gdump.c \
+FILES:${PN}-dev:append = " ${datadir}/gobject-introspection-1.0/gdump.c \
                            ${datadir}/gobject-introspection-1.0/Makefile.introspection"
 
 # These are used by dependent packages (e.g. pygobject) to build their
 # testsuites.
-FILES_${PN}-dev_append = " ${datadir}/gobject-introspection-1.0/tests/*.c \
+FILES:${PN}-dev:append = " ${datadir}/gobject-introspection-1.0/tests/*.c \
                            ${datadir}/gobject-introspection-1.0/tests/*.h"
 
-FILES_${PN}-dbg += "${libdir}/gobject-introspection/giscanner/.debug/"
-FILES_${PN}-staticdev += "${libdir}/gobject-introspection/giscanner/*.a"
+FILES:${PN}-dbg += "${libdir}/gobject-introspection/giscanner/.debug/"
+FILES:${PN}-staticdev += "${libdir}/gobject-introspection/giscanner/*.a"
 
-RDEPENDS_${PN} = "python3-pickle python3-xml"
+RDEPENDS:${PN} = "python3-pickle python3-xml"
 
 BBCLASSEXTEND = "native"

@@ -20,12 +20,12 @@ DEPENDS += " \
 
 SRC_URI[archive.sha256sum] = "e03f33100f1982019c2e59bbdcd664549ec5caa0ef2d99e2c0e1272cea08bb3b"
 
-do_install_append() {
+do_install:append() {
     # no oe-layer has compiz -> remove dead session
     rm -f ${D}${datadir}/xsessions/gnome-flashback-compiz.desktop
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/desktop-directories \
     ${datadir}/gnome-panel \
     ${datadir}/gnome-session \
@@ -34,4 +34,4 @@ FILES_${PN} += " \
     ${systemd_user_unitdir} \
 "
 
-RDEPENDS_${PN} += "metacity"
+RDEPENDS:${PN} += "metacity"

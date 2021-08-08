@@ -131,15 +131,15 @@ INITSCRIPT_NAME = "proftpd"
 INITSCRIPT_PARAM = "defaults 85 15"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "proftpd.service"
+SYSTEMD_SERVICE:${PN} = "proftpd.service"
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system ${FTPGROUP}"
-USERADD_PARAM_${PN} = "--system -g ${FTPGROUP} --home-dir /var/lib/${FTPUSER} --no-create-home \
+GROUPADD_PARAM:${PN} = "--system ${FTPGROUP}"
+USERADD_PARAM:${PN} = "--system -g ${FTPGROUP} --home-dir /var/lib/${FTPUSER} --no-create-home \
                        --shell /bin/false ${FTPUSER}"
 
 MULTILIB_SCRIPTS = "${PN}:${bindir}/prxs"
 
-FILES_${PN} += "/home/${FTPUSER}"
+FILES:${PN} += "/home/${FTPUSER}"
 
-RDEPENDS_${PN} += "perl"
+RDEPENDS:${PN} += "perl"

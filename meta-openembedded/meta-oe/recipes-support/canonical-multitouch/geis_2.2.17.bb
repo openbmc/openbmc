@@ -31,8 +31,8 @@ SRC_URI[sha256sum] = "8a60f5683852094038904e690d23cc5a90a980fc52da67f0f28890baa2
 
 EXTRA_OECONF = "--disable-integration-tests"
 
-FILES_${PN}-bin = "${bindir}"
-RDEPENDS_${PN}-bin = " \
+FILES:${PN}-bin = "${bindir}"
+RDEPENDS:${PN}-bin = " \
     python3-compression \
     python3-core \
     python3-crypt \
@@ -45,14 +45,14 @@ RDEPENDS_${PN}-bin = " \
     python3-threading \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/geisview \
     ${libdir}/${PYTHON_DIR}/site-packages/geis* \
     ${libdir}/${PYTHON_DIR}/site-packages/_*.so \
 "
 
-FILES_${PN}-dbg += "${libdir}/${PYTHON_DIR}/site-packages/.debug"
+FILES:${PN}-dbg += "${libdir}/${PYTHON_DIR}/site-packages/.debug"
 
-FILES_${PN}-dev += "${libdir}/${PYTHON_DIR}/site-packages/_*.la"
+FILES:${PN}-dev += "${libdir}/${PYTHON_DIR}/site-packages/_*.la"
 
-FILES_${PN}-staticdev += "${libdir}/${PYTHON_DIR}/site-packages/_*.a"
+FILES:${PN}-staticdev += "${libdir}/${PYTHON_DIR}/site-packages/_*.a"

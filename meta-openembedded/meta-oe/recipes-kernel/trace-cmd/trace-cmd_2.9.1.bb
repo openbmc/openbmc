@@ -16,4 +16,4 @@ do_install() {
        mv ${D}/${libdir}/traceevent/plugins/*.so ${D}${libdir}/traceevent/plugins/${BPN}/
 }
 
-FILES_${PN} += "${libdir}/traceevent/plugins"
+FILES:${PN} += "${libdir}/traceevent/plugins"

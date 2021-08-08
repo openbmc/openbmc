@@ -1,0 +1,24 @@
+Index: clamav-0.103.0/Makefile.am
+===================================================================
+--- clamav-0.103.0.orig/Makefile.am
++++ clamav-0.103.0/Makefile.am
+@@ -28,7 +28,6 @@ else
+ SUBDIRS = libltdl libclamav shared libfreshclam clamscan clamd clamdscan freshclam sigtool clamconf database docs etc clamav-milter test clamdtop clambc unit_tests
+ EXTRA_DIST = examples shared libclamav.pc.in COPYING.bzip2 COPYING.lzma COPYING.unrar COPYING.LGPL COPYING.llvm COPYING.file COPYING.zlib COPYING.getopt COPYING.regex COPYING.YARA COPYING.pcre platform.h.in libclamunrar libclamunrar_iface libclammspack clamdscan/clamdscan.map win32 ChangeLog.md INSTALL.cmake.md INSTALL.autotools.md NEWS.md README.md cmake CMakeLists.txt CMakeOptions.cmake $(top_srcdir)/**/CMakeLists.txt libclammspack/config.h.in.cmake clamav-config.h.cmake.in target.h.cmake.in autogen.sh
+ 
+-bin_SCRIPTS=clamav-config
+ 
+ if BUILD_CLAMONACC
+ SUBDIRS += clamonacc
+Index: clamav-0.103.0/Makefile.in
+===================================================================
+--- clamav-0.103.0.orig/Makefile.in
++++ clamav-0.103.0/Makefile.in
+@@ -641,7 +641,6 @@ ACLOCAL_AMFLAGS = -I m4
+ @BUILD_LIBCLAMAV_ONLY_TRUE@SUBDIRS = libclamav $(am__append_1) \
+ @BUILD_LIBCLAMAV_ONLY_TRUE@	$(am__append_2) $(am__append_3)
+ @BUILD_LIBCLAMAV_ONLY_FALSE@bin_SCRIPTS = clamav-config
+-@BUILD_LIBCLAMAV_ONLY_TRUE@bin_SCRIPTS = clamav-config
+ @BUILD_LIBCLAMAV_ONLY_FALSE@EXTRA_DIST = examples shared libclamav.pc.in COPYING.bzip2 COPYING.lzma COPYING.unrar COPYING.LGPL COPYING.llvm COPYING.file COPYING.zlib COPYING.getopt COPYING.regex COPYING.YARA COPYING.pcre platform.h.in libclamunrar libclamunrar_iface libclammspack clamdscan/clamdscan.map win32 ChangeLog.md INSTALL.cmake.md INSTALL.autotools.md NEWS.md README.md cmake CMakeLists.txt CMakeOptions.cmake $(top_srcdir)/**/CMakeLists.txt libclammspack/config.h.in.cmake clamav-config.h.cmake.in target.h.cmake.in autogen.sh
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = libclamav.pc

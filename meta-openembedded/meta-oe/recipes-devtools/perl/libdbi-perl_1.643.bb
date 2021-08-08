@@ -17,7 +17,7 @@ S = "${WORKDIR}/DBI-${PV}"
 
 inherit cpan ptest-perl
 
-do_install_prepend() {
+do_install:prepend() {
 	# test requires "-T" (taint) command line option
 	rm -rf ${B}/t/pod-coverage.t
 	rm -rf ${B}/t/13taint.t
@@ -27,7 +27,7 @@ do_install_prepend() {
 	rm -rf ${B}/t/z*.t
 }
 
-RDEPENDS_${PN}_class-target = " \
+RDEPENDS:${PN}:class-target = " \
     perl \
     perl-module-carp \
     perl-module-exporter \
@@ -38,7 +38,7 @@ RDEPENDS_${PN}_class-target = " \
     perl-module-universal \
 "
 
-RDEPENDS_${PN}-ptest = " \
+RDEPENDS:${PN}-ptest = " \
     ${PN} \
     perl-module-b \
     perl-module-benchmark \

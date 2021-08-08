@@ -14,7 +14,7 @@ SRC_URI[sha256sum] = "ad5925c814bfe79497b43df096e3bb52c166d1577f7aff160137301676
 
 inherit pypi setuptools3 ptest
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 	${PYTHON_PN}-mock \
 "
@@ -26,4 +26,4 @@ do_install_ptest() {
 
 DEPENDS += "python3-nose-native"
 
-RDEPENDS_${PN} += "python3-six"
+RDEPENDS:${PN} += "python3-six"

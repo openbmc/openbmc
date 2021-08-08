@@ -19,8 +19,8 @@ SRC_URI = "git://github.com/abseil/abseil-cpp;branch=${BRANCH}         \
 
 S = "${WORKDIR}/git"
 
-ASNEEDED_class-native = ""
-ASNEEDED_class-nativesdk = ""
+ASNEEDED:class-native = ""
+ASNEEDED:class-nativesdk = ""
 
 inherit cmake
 
@@ -31,4 +31,4 @@ EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON \
 
 BBCLASSEXTEND = "native nativesdk"
 
-FILES_${PN}-dev += "${includedir} ${libdir}/cmake ${libdir}/pkgconfig"
+FILES:${PN}-dev += "${includedir} ${libdir}/cmake ${libdir}/pkgconfig"

@@ -70,8 +70,8 @@ class BitbakeTests(OESelftestTestCase):
 
     def test_invalid_patch(self):
         # This patch should fail to apply.
-        self.write_recipeinc('man-db', 'FILESEXTRAPATHS_prepend := "${THISDIR}/files:"\nSRC_URI += "file://0001-Test-patch-here.patch"')
-        self.write_config("INHERIT_remove = \"report-error\"")
+        self.write_recipeinc('man-db', 'FILESEXTRAPATHS:prepend := "${THISDIR}/files:"\nSRC_URI += "file://0001-Test-patch-here.patch"')
+        self.write_config("INHERIT:remove = \"report-error\"")
         result = bitbake('man-db -c patch', ignore_status=True)
         self.delete_recipeinc('man-db')
         bitbake('-cclean man-db')
@@ -139,7 +139,7 @@ class BitbakeTests(OESelftestTestCase):
         self.write_recipeinc('man-db', data)
         self.write_config("""DL_DIR = \"${TOPDIR}/download-selftest\"
 SSTATE_DIR = \"${TOPDIR}/download-selftest\"
-INHERIT_remove = \"report-error\"
+INHERIT:remove = \"report-error\"
 """)
         self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
 
@@ -213,7 +213,7 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
     def test_continue(self):
         self.write_config("""DL_DIR = \"${TOPDIR}/download-selftest\"
 SSTATE_DIR = \"${TOPDIR}/download-selftest\"
-INHERIT_remove = \"report-error\"
+INHERIT:remove = \"report-error\"
 """)
         self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
         self.write_recipeinc('man-db',"\ndo_fail_task () {\nexit 1 \n}\n\naddtask do_fail_task before do_fetch\n" )

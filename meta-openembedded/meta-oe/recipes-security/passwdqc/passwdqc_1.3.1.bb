@@ -35,7 +35,7 @@ SRC_URI[sha256sum] = "d1fedeaf759e8a0f32d28b5811ef11b5a5365154849190f4b7fab670a7
 
 # explicitly define LINUX_PAM in case DISTRO_FEATURES no pam
 # this package's pam_passwdqc.so needs pam
-CFLAGS_append = " -Wall -fPIC -DHAVE_SHADOW -DLINUX_PAM"
+CFLAGS:append = " -Wall -fPIC -DHAVE_SHADOW -DLINUX_PAM"
 
 # -e is no longer default setting in bitbake.conf
 EXTRA_OEMAKE = "-e"
@@ -58,9 +58,9 @@ do_install() {
 PROVIDES += "pam-${BPN}"
 PACKAGES =+ "lib${BPN} pam-${BPN}"
 
-FILES_lib${BPN} = "${base_libdir}/libpasswdqc.so.0"
-FILES_pam-${BPN} = "${base_libdir}/security/pam_passwdqc.so"
-FILES_${PN}-dbg += "${base_libdir}/security/.debug"
+FILES:lib${BPN} = "${base_libdir}/libpasswdqc.so.0"
+FILES:pam-${BPN} = "${base_libdir}/security/pam_passwdqc.so"
+FILES:${PN}-dbg += "${base_libdir}/security/.debug"
 
-RDEPENDS_${PN} = "lib${BPN} pam-${BPN}"
-RDEPENDS_pam-${BPN} = "lib${BPN}"
+RDEPENDS:${PN} = "lib${BPN} pam-${BPN}"
+RDEPENDS:pam-${BPN} = "lib${BPN}"

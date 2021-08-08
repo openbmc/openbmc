@@ -22,12 +22,12 @@ SRC_URI[archive.sha256sum] = "0513aad38e5d3cedd4ae3c551634e3be1b9baaa79775e53b2d
 # [1] https://gitlab.gnome.org/GNOME/librest/commit/8f904a8e2bb38a7bf72245cdf2f1ecad17e9a720
 EXTRA_OECONF = "--without-gnome"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # rest expects introspection.m4 at custom location (see aclocal.m4).
     cp -f ${STAGING_DIR_TARGET}/${datadir}/aclocal/introspection.m4 ${S}/build
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
     export GIR_EXTRA_LIBS_PATH="${B}/rest/.libs"
 }
 

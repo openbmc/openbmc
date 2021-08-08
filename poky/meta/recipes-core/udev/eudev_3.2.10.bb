@@ -2,7 +2,7 @@ SUMMARY = "eudev is a fork of systemd's udev"
 HOMEPAGE = "https://wiki.gentoo.org/wiki/Eudev"
 DESCRIPTION = "eudev is Gentoo's fork of udev, systemd's device file manager for the Linux kernel. It manages device nodes in /dev and handles all user space actions when adding or removing devices."
 LICENSE = "GPLv2.0+ & LGPL-2.1+"
-LICENSE_libudev = "LGPL-2.1+"
+LICENSE:libudev = "LGPL-2.1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 DEPENDS = "glib-2.0 glib-2.0-native gperf-native kmod libxslt-native util-linux"
@@ -38,7 +38,7 @@ EXTRA_OECONF = " \
 PACKAGECONFIG ??= "hwdb"
 PACKAGECONFIG[hwdb] = "--enable-hwdb,--disable-hwdb"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${sysconfdir}/init.d
 	install -m 0755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/udev
 	sed -i s%@UDEVD@%${base_sbindir}/udevd% ${D}${sysconfdir}/init.d/udev
@@ -57,7 +57,7 @@ do_install_append() {
 	ln ${D}${bindir}/udevadm ${D}${libexecdir}/${MLPREFIX}udevadm
 }
 
-do_install_prepend_class-target () {
+do_install:prepend:class-target () {
 	# Remove references to buildmachine
 	sed -i -e 's:${RECIPE_SYSROOT_NATIVE}::g' \
 		${B}/src/udev/keyboard-keys-from-name.h
@@ -70,21 +70,21 @@ PACKAGES =+ "libudev"
 PACKAGES =+ "eudev-hwdb"
 
 
-FILES_${PN} += "${libexecdir} ${nonarch_base_libdir}/udev ${bindir}/udevadm"
-FILES_${PN}-dev = "${datadir}/pkgconfig/udev.pc \
+FILES:${PN} += "${libexecdir} ${nonarch_base_libdir}/udev ${bindir}/udevadm"
+FILES:${PN}-dev = "${datadir}/pkgconfig/udev.pc \
                    ${includedir}/libudev.h ${libdir}/libudev.so \
                    ${includedir}/udev.h ${libdir}/libudev.la \
                    ${libdir}/libudev.a ${libdir}/pkgconfig/libudev.pc"
-FILES_libudev = "${base_libdir}/libudev.so.*"
-FILES_eudev-hwdb = "${sysconfdir}/udev/hwdb.d"
+FILES:libudev = "${base_libdir}/libudev.so.*"
+FILES:eudev-hwdb = "${sysconfdir}/udev/hwdb.d"
 
-RDEPENDS_eudev-hwdb += "eudev"
+RDEPENDS:eudev-hwdb += "eudev"
 
-RPROVIDES_${PN} = "hotplug udev"
-RPROVIDES_eudev-hwdb += "udev-hwdb"
+RPROVIDES:${PN} = "hotplug udev"
+RPROVIDES:eudev-hwdb += "udev-hwdb"
 
 PACKAGE_WRITE_DEPS += "qemu-native"
-pkg_postinst_eudev-hwdb () {
+pkg_postinst:eudev-hwdb () {
     if test -n "$D"; then
         $INTERCEPT_DIR/postinst_intercept update_udev_hwdb ${PKG} mlprefix=${MLPREFIX} binprefix=${MLPREFIX}
     else
@@ -92,6 +92,6 @@ pkg_postinst_eudev-hwdb () {
     fi
 }
 
-pkg_prerm_eudev-hwdb () {
+pkg_prerm:eudev-hwdb () {
         rm -f $D${sysconfdir}/udev/hwdb.bin
 }

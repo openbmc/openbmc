@@ -32,7 +32,7 @@ EXTRA_OEMAKE = "\
     LIBDIR='${libdir}' \
 "
 
-do_configure_append () {
+do_configure:append () {
     sh configure ${STAGING_INCDIR}
     # Explicitly disable ATM support
     sed -i -e '/TC_CONFIG_ATM/d' config.mk
@@ -47,7 +47,7 @@ do_install () {
 }
 
 # The .so files in iproute2-tc are modules, not traditional libraries
-INSANE_SKIP_${PN}-tc = "dev-so"
+INSANE_SKIP:${PN}-tc = "dev-so"
 
 IPROUTE2_PACKAGES =+ "\
     ${PN}-devlink \
@@ -64,28 +64,28 @@ IPROUTE2_PACKAGES =+ "\
 "
 
 PACKAGE_BEFORE_PN = "${IPROUTE2_PACKAGES}"
-RDEPENDS_${PN} += "${PN}-ip"
+RDEPENDS:${PN} += "${PN}-ip"
 
-FILES_${PN}-tc = "${base_sbindir}/tc* \
+FILES:${PN}-tc = "${base_sbindir}/tc* \
                   ${libdir}/tc/*.so"
-FILES_${PN}-lnstat = "${base_sbindir}/lnstat \
+FILES:${PN}-lnstat = "${base_sbindir}/lnstat \
                       ${base_sbindir}/ctstat \
                       ${base_sbindir}/rtstat"
-FILES_${PN}-ifstat = "${base_sbindir}/ifstat"
-FILES_${PN}-ip = "${base_sbindir}/ip.${PN} ${sysconfdir}/iproute2"
-FILES_${PN}-genl = "${base_sbindir}/genl"
-FILES_${PN}-rtacct = "${base_sbindir}/rtacct"
-FILES_${PN}-nstat = "${base_sbindir}/nstat"
-FILES_${PN}-ss = "${base_sbindir}/ss"
-FILES_${PN}-tipc = "${base_sbindir}/tipc"
-FILES_${PN}-devlink = "${base_sbindir}/devlink"
-FILES_${PN}-rdma = "${base_sbindir}/rdma"
+FILES:${PN}-ifstat = "${base_sbindir}/ifstat"
+FILES:${PN}-ip = "${base_sbindir}/ip.${PN} ${sysconfdir}/iproute2"
+FILES:${PN}-genl = "${base_sbindir}/genl"
+FILES:${PN}-rtacct = "${base_sbindir}/rtacct"
+FILES:${PN}-nstat = "${base_sbindir}/nstat"
+FILES:${PN}-ss = "${base_sbindir}/ss"
+FILES:${PN}-tipc = "${base_sbindir}/tipc"
+FILES:${PN}-devlink = "${base_sbindir}/devlink"
+FILES:${PN}-rdma = "${base_sbindir}/rdma"
 
-ALTERNATIVE_${PN}-ip = "ip"
+ALTERNATIVE:${PN}-ip = "ip"
 ALTERNATIVE_TARGET[ip] = "${base_sbindir}/ip.${BPN}"
 ALTERNATIVE_LINK_NAME[ip] = "${base_sbindir}/ip"
 ALTERNATIVE_PRIORITY = "100"
 
-ALTERNATIVE_${PN}-tc = "tc"
+ALTERNATIVE:${PN}-tc = "tc"
 ALTERNATIVE_LINK_NAME[tc] = "${base_sbindir}/tc"
 ALTERNATIVE_PRIORITY_${PN}-tc = "100"

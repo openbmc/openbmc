@@ -21,7 +21,7 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[ccdv] = "--enable-ccdv,--disable-ccdv,,"
 
 EXTRA_OECONF = "--disable-precomp"
-TARGET_CC_ARCH_append = " ${SELECTED_OPTIMIZATION}"
+TARGET_CC_ARCH:append = " ${SELECTED_OPTIMIZATION}"
 
 do_configure() {
     install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}

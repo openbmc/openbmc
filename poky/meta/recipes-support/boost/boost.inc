@@ -8,8 +8,8 @@ DEPENDS = "boost-build-native zlib bzip2"
 
 CVE_PRODUCT = "boost:boost"
 
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
 
 B = "${WORKDIR}/build"
 do_configure[cleandirs] = "${B}"
@@ -71,35 +71,35 @@ python __anonymous () {
         if "-native" in pn:
             pkg = pkg + "-native"
         packages.append(mlprefix + pkg)
-        if not d.getVar("FILES_%s" % pkg):
-                d.setVar("FILES_%s%s" % (mlprefix, pkg), "${libdir}/libboost_%s*.so.*" % lib)
+        if not d.getVar("FILES:%s" % pkg):
+                d.setVar("FILES:%s%s" % (mlprefix, pkg), "${libdir}/libboost_%s*.so.*" % lib)
         else:
-                d.setVar("FILES_%s%s" % (mlprefix, pkg), d.getVar("FILES_%s" % pkg))
+                d.setVar("FILES:%s%s" % (mlprefix, pkg), d.getVar("FILES:%s" % pkg))
 
     d.setVar("BOOST_PACKAGES", " ".join(packages))
     d.setVar("BJAM_EXTRA", " ".join(extras))
 }
 
 # Override the contents of specific packages
-FILES_${PN}-graph_parallel = "${libdir}/libboost_graph_parallel.so.*"
-FILES_${PN}-locale = "${libdir}/libboost_locale.so.*"
-FILES_${PN}-mpi = "${libdir}/mpi.so ${libdir}/libboost_mpi*.so.*"
-FILES_boost-serialization = "${libdir}/libboost_serialization*.so.* \
+FILES:${PN}-graph_parallel = "${libdir}/libboost_graph_parallel.so.*"
+FILES:${PN}-locale = "${libdir}/libboost_locale.so.*"
+FILES:${PN}-mpi = "${libdir}/mpi.so ${libdir}/libboost_mpi*.so.*"
+FILES:boost-serialization = "${libdir}/libboost_serialization*.so.* \
 	${libdir}/libboost_wserialization*.so.*"
-FILES_boost-test = "${libdir}/libboost_prg_exec_monitor*.so.* \
+FILES:boost-test = "${libdir}/libboost_prg_exec_monitor*.so.* \
 	${libdir}/libboost_unit_test_framework*.so.*"
 
 # -dev last to pick up the remaining stuff
 PACKAGES += "${PN}-dev ${PN}-staticdev"
-FILES_${PN}-dev = "${includedir} ${libdir}/libboost_*.so ${libdir}/cmake"
-FILES_${PN}-staticdev = "${libdir}/libboost_*.a"
+FILES:${PN}-dev = "${includedir} ${libdir}/libboost_*.so ${libdir}/cmake"
+FILES:${PN}-staticdev = "${libdir}/libboost_*.a"
 
 # "boost" is a metapackage which pulls in all boost librabries
 PACKAGES += "${PN}"
-FILES_${PN} = ""
-ALLOW_EMPTY_${PN} = "1"
-RRECOMMENDS_${PN} += "${BOOST_PACKAGES}"
-RRECOMMENDS_${PN}_class-native = ""
+FILES:${PN} = ""
+ALLOW_EMPTY:${PN} = "1"
+RRECOMMENDS:${PN} += "${BOOST_PACKAGES}"
+RRECOMMENDS:${PN}:class-native = ""
 
 # to avoid GNU_HASH QA errors added LDFLAGS to ARCH; a little bit dirty but at least it works
 TARGET_CC_ARCH += "${LDFLAGS}"
@@ -155,14 +155,14 @@ BJAM_OPTS    = '${BOOST_PARALLEL_MAKE} -d+2 -q \
 		${BJAM_EXTRA}'
 
 # Native compilation of bzip2 isn't working
-BJAM_OPTS_append_class-native = ' -sNO_BZIP2=1'
+BJAM_OPTS:append:class-native = ' -sNO_BZIP2=1'
 
 # Adjust the build for x32
-BJAM_OPTS_append_x86-x32 = " abi=x32 address-model=64"
+BJAM_OPTS:append:x86-x32 = " abi=x32 address-model=64"
 
 # cross compiling for arm fails to detect abi, so provide some help
-BJAM_OPTS_append_arm = " abi=aapcs architecture=arm"
-BJAM_OPTS_append_aarch64 = " abi=aapcs address-model=64 architecture=arm"
+BJAM_OPTS:append:arm = " abi=aapcs architecture=arm"
+BJAM_OPTS:append:aarch64 = " abi=aapcs address-model=64 architecture=arm"
 
 do_configure() {
 	cd ${S}

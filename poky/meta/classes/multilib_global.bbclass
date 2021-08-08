@@ -164,8 +164,8 @@ def preferred_ml_updates(d):
 python multilib_virtclass_handler_vendor () {
     if isinstance(e, bb.event.ConfigParsed):
         for v in e.data.getVar("MULTILIB_VARIANTS").split():
-            if e.data.getVar("TARGET_VENDOR_virtclass-multilib-" + v, False) is None:
-                e.data.setVar("TARGET_VENDOR_virtclass-multilib-" + v, e.data.getVar("TARGET_VENDOR", False) + "ml" + v)
+            if e.data.getVar("TARGET_VENDOR:virtclass-multilib-" + v, False) is None:
+                e.data.setVar("TARGET_VENDOR:virtclass-multilib-" + v, e.data.getVar("TARGET_VENDOR", False) + "ml" + v)
         preferred_ml_updates(e.data)
 }
 addhandler multilib_virtclass_handler_vendor
@@ -207,13 +207,13 @@ python multilib_virtclass_handler_global () {
             if rprovs.strip():
                 e.data.setVar("RPROVIDES", rprovs)
 
-            # Process RPROVIDES_${PN}...
+            # Process RPROVIDES:${PN}...
             for pkg in (e.data.getVar("PACKAGES") or "").split():
-                origrprovs = rprovs = localdata.getVar("RPROVIDES_%s" % pkg) or ""
+                origrprovs = rprovs = localdata.getVar("RPROVIDES:%s" % pkg) or ""
                 for clsextend in clsextends:
-                    rprovs = rprovs + " " + clsextend.map_variable("RPROVIDES_%s" % pkg, setvar=False)
+                    rprovs = rprovs + " " + clsextend.map_variable("RPROVIDES:%s" % pkg, setvar=False)
                     rprovs = rprovs + " " + clsextend.extname + "-" + pkg
-                e.data.setVar("RPROVIDES_%s" % pkg, rprovs)
+                e.data.setVar("RPROVIDES:%s" % pkg, rprovs)
 }
 
 addhandler multilib_virtclass_handler_global

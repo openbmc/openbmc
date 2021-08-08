@@ -33,16 +33,16 @@ do_configure() {
     oe_runconf
 }
 
-do_install_append() {
+do_install:append() {
     oe_runmake install-desktop DESTDIR="${D}" DESKTOP_FLAGS="--dir=${D}${DESKTOPDIR}"
 }
 
-RPROVIDES_${PN} = "virtual/x-terminal-emulator"
+RPROVIDES:${PN} = "virtual/x-terminal-emulator"
 
 # busybox can supply resize too
 inherit update-alternatives
 
-ALTERNATIVE_${PN} = "resize x-terminal-emulator"
+ALTERNATIVE:${PN} = "resize x-terminal-emulator"
 ALTERNATIVE_TARGET[x-terminal-emulator] = "${bindir}/xterm"
 # rxvt-unicode defaults to priority 10. Let's be one point lower to let it override xterm.
 ALTERNATIVE_PRIORITY[x-terminal-emulator] = "9"

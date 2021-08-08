@@ -15,9 +15,9 @@ export GST_PLUGIN_SCANNER_1_0="${S}/gst-plugin-scanner-dummy"
 SRC_URI += "file://0001-Install-example-binary-needed-for-core-image-clutter.patch"
 
 DEPENDS = "gstreamer1.0-plugins-base gstreamer1.0-plugins-bad clutter-1.0 libgudev"
-RDEPENDS_${PN} += "gstreamer1.0-meta-base"
+RDEPENDS:${PN} += "gstreamer1.0-meta-base"
 PACKAGES  =+ "${PN}-examples"
 
-FILES_${PN}          += "${libdir}/gstreamer-1.0/lib*.so"
-FILES_${PN}-dev      += "${libdir}/gstreamer-1.0/*.la"
-FILES_${PN}-examples  = "${bindir}/video-player ${bindir}/video-sink"
+FILES:${PN}          += "${libdir}/gstreamer-1.0/lib*.so"
+FILES:${PN}-dev      += "${libdir}/gstreamer-1.0/*.la"
+FILES:${PN}-examples  = "${bindir}/video-player ${bindir}/video-sink"

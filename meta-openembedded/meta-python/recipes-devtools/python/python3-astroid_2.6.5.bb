@@ -12,12 +12,12 @@ DEPENDS += "${PYTHON_PN}-pytest-runner-native"
 
 PACKAGES =+ "${PN}-tests"
 
-FILES_${PN}-tests += " \
+FILES:${PN}-tests += " \
     ${PYTHON_SITEPACKAGES_DIR}/astroid/test* \
     ${PYTHON_SITEPACKAGES_DIR}/astroid/__pycache__/test* \
 "
 
-RDEPENDS_${PN}_class-target += "\
+RDEPENDS:${PN}:class-target += "\
     ${PYTHON_PN}-distutils \
     ${PYTHON_PN}-lazy-object-proxy \
     ${PYTHON_PN}-logging \
@@ -26,7 +26,7 @@ RDEPENDS_${PN}_class-target += "\
     ${PYTHON_PN}-setuptools \
 "
 
-RDEPENDS_${PN}-tests_class-target += "\
+RDEPENDS:${PN}-tests:class-target += "\
     ${PYTHON_PN}-unittest \
     ${PYTHON_PN}-xml \
 "

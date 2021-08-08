@@ -120,7 +120,7 @@ class TestImage(OESelftestTestCase):
             self.skipTest('core-image-full-cmdline not buildable for poky-tiny')
 
         features = 'INHERIT += "testimage"\n'
-        features += 'IMAGE_INSTALL_append = " libssl"\n'
+        features += 'IMAGE_INSTALL:append = " libssl"\n'
         features += 'TEST_SUITES = "ping ssh selftest"\n'
         self.write_config(features)
 
@@ -186,14 +186,14 @@ class TestImage(OESelftestTestCase):
         qemu_distrofeatures = get_bb_var('DISTRO_FEATURES', 'qemu-system-native')
         features = 'INHERIT += "testimage"\n'
         if 'gtk+' not in qemu_packageconfig:
-            features += 'PACKAGECONFIG_append_pn-qemu-system-native = " gtk+"\n'
+            features += 'PACKAGECONFIG:append:pn-qemu-system-native = " gtk+"\n'
         if 'sdl' not in qemu_packageconfig:
-            features += 'PACKAGECONFIG_append_pn-qemu-system-native = " sdl"\n'
+            features += 'PACKAGECONFIG:append:pn-qemu-system-native = " sdl"\n'
         if 'opengl' not in qemu_distrofeatures:
-            features += 'DISTRO_FEATURES_append = " opengl"\n'
+            features += 'DISTRO_FEATURES:append = " opengl"\n'
         features += 'TEST_SUITES = "ping ssh virgl"\n'
-        features += 'IMAGE_FEATURES_append = " ssh-server-dropbear"\n'
-        features += 'IMAGE_INSTALL_append = " kmscube"\n'
+        features += 'IMAGE_FEATURES:append = " ssh-server-dropbear"\n'
+        features += 'IMAGE_INSTALL:append = " kmscube"\n'
         features_gtk = features + 'TEST_RUNQEMUPARAMS = "gtk gl"\n'
         self.write_config(features_gtk)
         bitbake('core-image-minimal')
@@ -225,10 +225,10 @@ class TestImage(OESelftestTestCase):
         qemu_distrofeatures = get_bb_var('DISTRO_FEATURES', 'qemu-system-native')
         features = 'INHERIT += "testimage"\n'
         if 'opengl' not in qemu_distrofeatures:
-            features += 'DISTRO_FEATURES_append = " opengl"\n'
+            features += 'DISTRO_FEATURES:append = " opengl"\n'
         features += 'TEST_SUITES = "ping ssh virgl"\n'
-        features += 'IMAGE_FEATURES_append = " ssh-server-dropbear"\n'
-        features += 'IMAGE_INSTALL_append = " kmscube"\n'
+        features += 'IMAGE_FEATURES:append = " ssh-server-dropbear"\n'
+        features += 'IMAGE_INSTALL:append = " kmscube"\n'
         features += 'TEST_RUNQEMUPARAMS = "egl-headless"\n'
         self.write_config(features)
         bitbake('core-image-minimal')
@@ -254,7 +254,7 @@ class Postinst(OESelftestTestCase):
                 features += 'IMAGE_FEATURES += "package-management empty-root-password"\n'
                 features += 'PACKAGE_CLASSES = "%s"\n' % classes
                 if init_manager == "systemd":
-                    features += 'DISTRO_FEATURES_append = " systemd"\n'
+                    features += 'DISTRO_FEATURES:append = " systemd"\n'
                     features += 'VIRTUAL-RUNTIME_init_manager = "systemd"\n'
                     features += 'DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit"\n'
                     features += 'VIRTUAL-RUNTIME_initscripts = ""\n'
@@ -371,14 +371,14 @@ TEST_SERVER_IP = "192.168.7.1"
 TEST_TARGET_IP = "192.168.7.2"
 
 EXTRA_IMAGE_FEATURES += "tools-profile dbg-pkgs"
-IMAGE_FEATURES_append = " ssh-server-dropbear"
+IMAGE_FEATURES:append = " ssh-server-dropbear"
 
 # enables kernel debug symbols
-KERNEL_EXTRA_FEATURES_append = " features/debug/debug-kernel.scc"
-KERNEL_EXTRA_FEATURES_append = " features/systemtap/systemtap.scc"
+KERNEL_EXTRA_FEATURES:append = " features/debug/debug-kernel.scc"
+KERNEL_EXTRA_FEATURES:append = " features/systemtap/systemtap.scc"
 
 # add systemtap run-time into target image if it is not there yet
-IMAGE_INSTALL_append = " systemtap-runtime"
+IMAGE_INSTALL:append = " systemtap-runtime"
 """
 
         def test_crosstap_helloworld(self):

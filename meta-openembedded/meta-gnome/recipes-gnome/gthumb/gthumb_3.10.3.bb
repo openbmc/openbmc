@@ -28,4 +28,4 @@ inherit features_check gnomebase gnome-help gsettings itstool mime-xdg
 
 SRC_URI[archive.sha256sum] = "dab73f77cc2963ebe90112972c301441d228af3003cfef3f8b7300a6d5d3c212"
 
-FILES_${PN} += "${datadir}/metainfo"
+FILES:${PN} += "${datadir}/metainfo"

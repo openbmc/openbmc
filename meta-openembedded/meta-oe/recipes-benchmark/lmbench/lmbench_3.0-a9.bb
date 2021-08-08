@@ -83,7 +83,7 @@ do_install () {
     install -m 0644 ${S}/src/webpage-lm.tar ${D}${datadir}/lmbench
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     if [ -z "$D" ]; then
         if command -v systemd-tmpfiles >/dev/null; then
             systemd-tmpfiles --create ${sysconfdir}/tmpfiles.d/lmbench.conf
@@ -93,9 +93,9 @@ pkg_postinst_${PN} () {
     fi
 }
 
-RDEPENDS_${PN} = "perl"
-FILES_${PN} += "${datadir}/lmbench"
+RDEPENDS:${PN} = "perl"
+FILES:${PN} += "${datadir}/lmbench"
 
-ALTERNATIVE_${PN} = "stream"
+ALTERNATIVE:${PN} = "stream"
 ALTERNATIVE_LINK_NAME[stream] = "${bindir}/stream"
 

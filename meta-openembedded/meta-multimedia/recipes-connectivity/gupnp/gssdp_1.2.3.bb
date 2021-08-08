@@ -17,4 +17,4 @@ PACKAGECONFIG[sniffer] = "-Dsniffer=true,-Dsniffer=false,gtk+3,"
 
 PACKAGES =+ "gssdp-tools"
 
-FILES_gssdp-tools = "${bindir}/gssdp* ${datadir}/gssdp/*.glade"
+FILES:gssdp-tools = "${bindir}/gssdp* ${datadir}/gssdp/*.glade"

@@ -14,8 +14,8 @@ DEPENDS = "\
     zstd \
     "
 
-DEPENDS_append_libc-musl = " argp-standalone"
-LDFLAGS_append_libc-musl = " -largp"
+DEPENDS:append:libc-musl = " argp-standalone"
+LDFLAGS:append:libc-musl = " -largp"
 
 inherit meson
 

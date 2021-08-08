@@ -16,4 +16,4 @@ EXTRA_OECMAKE = "-DBUILD_EXAMPLES=OFF -DBUILD_TOOLS=ON -DBUILD_TOOLS_DOCS=OFF -D
 inherit cmake pkgconfig
 
 PACKAGE_BEFORE_PN += "${PN}-tools"
-FILES_${PN}-tools = "${bindir}"
+FILES:${PN}-tools = "${bindir}"

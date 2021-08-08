@@ -27,17 +27,17 @@ SRC_URI += "file://0001-Workaround-for-GCC-11-uninit-variable-warnings-946.patch
             file://0001-vulkancts.patch \
 "
 
-SRC_URI_append_libc-musl = "\
+SRC_URI:append:libc-musl = "\
 	file://fix-musl.patch \
 "
-DEPENDS_append_libc-musl = " libexecinfo"
+DEPENDS:append:libc-musl = " libexecinfo"
 
-SRC_URI_append_toolchain-clang = "\
+SRC_URI:append:toolchain-clang = "\
 	file://fix-clang-private-operator.patch \
 "
 
-EXTRA_OECMAKE_append = " -DDEQP_TARGET=surfaceless"
+EXTRA_OECMAKE:append = " -DDEQP_TARGET=surfaceless"
 
 CTSDIR = "/usr/lib/${BPN}"
 
-FILES_${PN} += "${CTSDIR}"
+FILES:${PN} += "${CTSDIR}"

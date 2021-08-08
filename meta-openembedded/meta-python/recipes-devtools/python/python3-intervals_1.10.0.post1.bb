@@ -13,7 +13,7 @@ SRC_URI += " \
 
 inherit pypi setuptools3 ptest
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 "
 

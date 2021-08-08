@@ -18,6 +18,6 @@ inherit cmake
 
 S = "${WORKDIR}/git"
 
-FILES_${PN} += "${datadir}"
+FILES:${PN} += "${datadir}"
 
 EXTRA_OECMAKE += "-DRDKAFKA_BUILD_EXAMPLES=OFF -DRDKAFKA_BUILD_TESTS=OFF"

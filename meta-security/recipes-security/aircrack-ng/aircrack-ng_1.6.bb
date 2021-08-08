@@ -29,8 +29,8 @@ do_install () {
     make DESTDIR=${D} ${OEMAKE_EXTRA} ext_scripts=true install
 }
 
-FILES_${PN} += "${libdir}/*.so"
+FILES:${PN} += "${libdir}/*.so"
 FILES_SOLIBSDEV = ""
-INSANE_SKIP_${PN} += "dev-so"
+INSANE_SKIP:${PN} += "dev-so"
 
-RDEPENDS_${PN} = "libpcap"
+RDEPENDS:${PN} = "libpcap"

@@ -8,7 +8,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f9534eb5f4ab800b573a37bffc62f3a7"
 
 DEPENDS = "virtual/crypt expat flex python3 bison-native libxml2 nettle lz4"
-RDEPENDS_${PN} = "python3-core"
+RDEPENDS:${PN} = "python3-core"
 
 SRCREV = "aa42957a2e227df41510047cece3cd606dc1cb6a"
 SRC_URI = "git://github.com/apache/nifi-minifi-cpp.git \
@@ -47,7 +47,7 @@ S = "${WORKDIR}/git"
 inherit pkgconfig cmake systemd
 
 SYSTEMD_PACKAGES = "minifi-cpp"
-SYSTEMD_SERVICE_${PN} = "minifi.service"
+SYSTEMD_SERVICE:${PN} = "minifi.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 OECMAKE_FIND_ROOT_PATH_MODE_PROGRAM = "BOTH"
@@ -58,23 +58,23 @@ EXTRA_OECMAKE += " \
     -DGCC_AR=${STAGING_BINDIR_TOOLCHAIN}/${AR} \
     -DGCC_RANLIB=${STAGING_BINDIR_TOOLCHAIN}/${RANLIB} \
     "
-EXTRA_OECMAKE_append_toolchain-clang = " -DCMAKE_RANLIB=${STAGING_BINDIR_TOOLCHAIN}/${TARGET_PREFIX}llvm-ranlib"
-LDFLAGS_append_toolchain-clang = " -fuse-ld=lld"
+EXTRA_OECMAKE:append:toolchain-clang = " -DCMAKE_RANLIB=${STAGING_BINDIR_TOOLCHAIN}/${TARGET_PREFIX}llvm-ranlib"
+LDFLAGS:append:toolchain-clang = " -fuse-ld=lld"
 
 # RV lld errors out:
 # riscv64-yoe-linux-ld.lld: error: init.c:(.text+0x0): relocation R_RISCV_ALIGN requires unimplemented linker relaxation; recompile with -mno-relax
-LDFLAGS_remove_riscv32 = "-fuse-ld=lld"
-LDFLAGS_remove_riscv64 = "-fuse-ld=lld"
+LDFLAGS:remove:riscv32 = "-fuse-ld=lld"
+LDFLAGS:remove:riscv64 = "-fuse-ld=lld"
 
 # There are endian issues when communicating with the x86 nifi on the the mips and the ppc machines.
-COMPATIBLE_MACHINE_mips = "(!.*mips).*"
-COMPATIBLE_MACHINE_mips64 = "(!.*mips64).*"
-COMPATIBLE_MACHINE_powerpc = "(!.*ppc).*"
+COMPATIBLE_MACHINE:mips = "(!.*mips).*"
+COMPATIBLE_MACHINE:mips64 = "(!.*mips64).*"
+COMPATIBLE_MACHINE:powerpc = "(!.*ppc).*"
 
-TARGET_CFLAGS_append_riscv32 = " -fpic"
-TARGET_CXXFLAGS_append_riscv32 = " -fpic"
-TARGET_CFLAGS_append_riscv64 = " -fpic"
-TARGET_CXXFLAGS_append_riscv64 = " -fpic"
+TARGET_CFLAGS:append:riscv32 = " -fpic"
+TARGET_CXXFLAGS:append:riscv32 = " -fpic"
+TARGET_CFLAGS:append:riscv64 = " -fpic"
+TARGET_CXXFLAGS:append:riscv64 = " -fpic"
 
 do_install[cleandirs] += "${WORKDIR}/minifi-install"
 PSEUDO_CONSIDER_PATHS .= ",${WORKDIR}/minifi-install"
@@ -130,7 +130,7 @@ do_install() {
     fi
 }
 
-pkg_postinst_${PN}() {
+pkg_postinst:${PN}() {
     if [ -z "$D" ]; then
         if type systemd-tmpfiles >/dev/null; then
             systemd-tmpfiles --create

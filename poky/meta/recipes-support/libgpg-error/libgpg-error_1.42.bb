@@ -31,13 +31,13 @@ MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/gpgrt-config"
 
 CPPFLAGS += "-P"
 
-do_install_append() {
+do_install:append() {
 	# we don't have common lisp in OE
 	rm -rf "${D}${datadir}/common-lisp/"
 	oe_multilib_header gpg-error.h gpgrt.h
 }
 
-FILES_${PN}-dev += "${bindir}/gpg-error"
-FILES_${PN}-doc += "${datadir}/libgpg-error/errorref.txt"
+FILES:${PN}-dev += "${bindir}/gpg-error"
+FILES:${PN}-doc += "${datadir}/libgpg-error/errorref.txt"
 
 BBCLASSEXTEND = "native nativesdk"

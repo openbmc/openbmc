@@ -14,7 +14,7 @@ SRC_URI = "git://github.com/emagii/cpufrequtils.git \
            file://0001-dont-unset-cflags.patch \
 "
 
-EXTRA_OEMAKE_append = " ${@['', 'NLS=false']['${USE_NLS}' == 'no']} "
+EXTRA_OEMAKE:append = " ${@['', 'NLS=false']['${USE_NLS}' == 'no']} "
 
 PR = "r5"
 

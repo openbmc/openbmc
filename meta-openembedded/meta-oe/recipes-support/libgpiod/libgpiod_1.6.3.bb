@@ -28,7 +28,7 @@ EXTRA_OECONF = "--enable-tools"
 DEPENDS += "autoconf-archive-native"
 
 PACKAGES =+ "${PN}-tools libgpiodcxx ${PN}-python"
-FILES_${PN}-tools = " \
+FILES:${PN}-tools = " \
     ${bindir}/gpiodetect \
     ${bindir}/gpioinfo \
     ${bindir}/gpioget \
@@ -36,7 +36,7 @@ FILES_${PN}-tools = " \
     ${bindir}/gpiofind \
     ${bindir}/gpiomon \
 "
-FILES_${PN}-ptest += " \
+FILES:${PN}-ptest += " \
     ${bindir}/gpiod-test \
     ${bindir}/gpio-tools-test \
     ${bindir}/gpio-tools-test.bats \
@@ -44,14 +44,14 @@ FILES_${PN}-ptest += " \
     ${bindir}/gpiod_py_test.py \
     ${libdir}/libgpiomockup.so.* \
 "
-FILES_libgpiodcxx = "${libdir}/libgpiodcxx.so.*"
-FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*.so"
-FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
+FILES:libgpiodcxx = "${libdir}/libgpiodcxx.so.*"
+FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*.so"
+FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
 
-RRECOMMENDS_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'python3', '${PN}-python', '', d)}"
-RRECOMMENDS_${PN}-ptest += "kernel-module-gpio-mockup"
+RRECOMMENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'python3', '${PN}-python', '', d)}"
+RRECOMMENDS:${PN}-ptest += "kernel-module-gpio-mockup"
 
-PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'tests', '', d)}"
+PACKAGECONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'tests', '', d)}"
 
 do_install_ptest() {
     install -d ${D}${PTEST_PATH}/tests
@@ -63,7 +63,7 @@ do_install_ptest() {
     # we're not selecting libgpiod-tools.
     install -m 0755 ${S}/tools/gpio-tools-test ${D}${PTEST_PATH}/tests/
     install -m 0755 ${S}/tools/gpio-tools-test.bats ${D}${PTEST_PATH}/tests/
-    for tool in ${FILES_${PN}-tools}; do
+    for tool in ${FILES:${PN}-tools}; do
         install ${B}/tools/.libs/$(basename $tool) ${D}${PTEST_PATH}/tests/
     done
 

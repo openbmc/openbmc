@@ -5,7 +5,7 @@ PACKAGE_ARCH = "${TUNE_PKGARCH}"
 
 inherit packagegroup
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     libgcc \
     libgcc-dev \
     libatomic \
@@ -15,7 +15,7 @@ RDEPENDS_${PN} = "\
     ${LIBC_DEPENDENCIES} \
     "
 
-RRECOMMENDS_${PN}_mingw32 = "\
+RRECOMMENDS:${PN}:mingw32 = "\
     libssp \
     libssp-dev \
     "

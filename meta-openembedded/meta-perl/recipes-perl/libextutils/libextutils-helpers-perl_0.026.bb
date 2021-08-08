@@ -15,7 +15,7 @@ S = "${WORKDIR}/ExtUtils-Helpers-${PV}"
 
 inherit cpan
 
-RDEPENDS_${PN} = " perl-module-file-copy \
+RDEPENDS:${PN} = " perl-module-file-copy \
                    perl-module-extutils-makemaker \
                    perl-module-exporter \
                    perl-module-carp \

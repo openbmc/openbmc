@@ -13,7 +13,7 @@ inherit meson gobject-introspection gtk-doc features_check systemd
 REQUIRED_DISTRO_FEATURES = "polkit"
 
 SRC_URI = "https://www.freedesktop.org/software/${BPN}/${BPN}-${PV}.tar.xz"
-SRC_URI_append_libc-musl = " \
+SRC_URI:append:libc-musl = " \
     file://0001-musl-Hack-to-fix-build.patch \
     file://0002-musl-add-missing-fgetspent_r.patch \
 "
@@ -25,9 +25,9 @@ GTKDOC_MESON_OPTION = "gtk_doc"
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "-Dsystemd=true, -Dsystemd=false -Dsystemdsystemunitdir='no', systemd"
 
-SYSTEMD_SERVICE_${PN} = "accounts-daemon.service"
+SYSTEMD_SERVICE:${PN} = "accounts-daemon.service"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/polkit-1 \
 "

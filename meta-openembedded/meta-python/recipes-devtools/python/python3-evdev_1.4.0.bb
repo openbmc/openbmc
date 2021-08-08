@@ -7,13 +7,13 @@ SRC_URI[sha256sum] = "8782740eb1a86b187334c07feb5127d3faa0b236e113206dfe3ae8f77f
 
 inherit pypi setuptools3
 
-do_compile_prepend() {
+do_compile:prepend() {
     rm -rf ${S}/evdev/ecodes.c
 }
 
 DISTUTILS_BUILD_ARGS = "build_ecodes --evdev-headers ${STAGING_DIR_TARGET}/usr/include/linux/input.h:${STAGING_DIR_TARGET}/usr/include/linux/input-event-codes.h"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-ctypes \
     ${PYTHON_PN}-fcntl \
     ${PYTHON_PN}-io \

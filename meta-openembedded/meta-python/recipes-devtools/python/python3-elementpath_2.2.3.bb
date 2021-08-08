@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "60139b91ef9646e27381fd62b8c38f1fc8ebc78dc4bc231c08c5124006
 PYPI_PACKAGE = "elementpath"
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-xml \
 "
 

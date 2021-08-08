@@ -21,6 +21,6 @@ do_install() {
         sed -i -e '1s,#!.*python.*,#!${bindir}/python3,' ${D}${libdir}/python${PYTHON_BASEVERSION}/dist-packages/hwlatdetect.py
 }
 
-FILES_${PN} += "${libdir}/python${PYTHON_BASEVERSION}/dist-packages/hwlatdetect.py"
-RDEPENDS_${PN} = "python3-core "
-RRECOMMENDS_${PN} = "kernel-module-hwlat-detector"
+FILES:${PN} += "${libdir}/python${PYTHON_BASEVERSION}/dist-packages/hwlatdetect.py"
+RDEPENDS:${PN} = "python3-core "
+RRECOMMENDS:${PN} = "kernel-module-hwlat-detector"

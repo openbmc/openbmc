@@ -3,7 +3,7 @@ HOMEPAGE = "https://snowballstem.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=19139aaf3c8c8fa1ca6edd59c072fb9f"
 
-DEPENDS_class-target = "${BPN}-native"
+DEPENDS:class-target = "${BPN}-native"
 
 SRC_URI = "\
     git://github.com/snowballstem/snowball.git \
@@ -18,7 +18,7 @@ inherit lib_package
 
 BBCLASSEXTEND = "native"
 
-do_compile_prepend_class-target() {
+do_compile:prepend:class-target() {
     # use native tools
     sed -i 's:./snowball :snowball :g' ${S}/GNUmakefile
 }

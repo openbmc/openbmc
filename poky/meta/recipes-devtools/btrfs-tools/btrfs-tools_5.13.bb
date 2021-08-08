@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = " \
 "
 SECTION = "base"
 DEPENDS = "lzo util-linux zlib"
-DEPENDS_append_class-target = " udev"
+DEPENDS:append:class-target = " udev"
 
 SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/kdave/btrfs-progs.git \
            file://0001-Add-a-possibility-to-specify-where-python-modules-ar.patch \
@@ -49,25 +49,25 @@ inherit ${@bb.utils.contains('PACKAGECONFIG', 'python', 'distutils3-base', '', d
 CLEANBROKEN = "1"
 
 EXTRA_OECONF = "--enable-largefile"
-EXTRA_OECONF_append_libc-musl = " --disable-backtrace "
+EXTRA_OECONF:append:libc-musl = " --disable-backtrace "
 EXTRA_PYTHON_CFLAGS = "${DEBUG_PREFIX_MAP}"
-EXTRA_PYTHON_CFLAGS_class-native = ""
+EXTRA_PYTHON_CFLAGS:class-native = ""
 EXTRA_PYTHON_LDFLAGS = "${LDFLAGS}"
 EXTRA_OEMAKE = "V=1 'EXTRA_PYTHON_CFLAGS=${EXTRA_PYTHON_CFLAGS}' 'EXTRA_PYTHON_LDFLAGS=${EXTRA_PYTHON_LDFLAGS}'"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	# Upstream doesn't ship this and autoreconf won't install it as automake isn't used.
 	mkdir -p ${S}/config
 	cp -f $(automake --print-libdir)/install-sh ${S}/config/
 }
 
 
-do_install_append() {
+do_install:append() {
     if [ "${@bb.utils.filter('PACKAGECONFIG', 'python', d)}" ]; then
         oe_runmake 'DESTDIR=${D}' 'PYTHON_SITEPACKAGES_DIR=${PYTHON_SITEPACKAGES_DIR}' install_python
     fi
 }
 
-RDEPENDS_${PN} = "libgcc"
+RDEPENDS:${PN} = "libgcc"
 
 BBCLASSEXTEND = "native nativesdk"

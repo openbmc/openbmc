@@ -25,7 +25,7 @@ do_install () {
 
 PACKAGES =+ "bonnie-scripts"
 
-FILES_${PN} = "${sbindir}"
-FILES_bonnie-scripts = "${bindir}"
+FILES:${PN} = "${sbindir}"
+FILES:bonnie-scripts = "${bindir}"
 
-RDEPENDS_bonnie-scripts += "perl"
+RDEPENDS:bonnie-scripts += "perl"

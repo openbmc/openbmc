@@ -9,6 +9,7 @@ import os
 import signal
 import socket
 import sys
+import multiprocessing
 from . import chunkify, DEFAULT_MAX_CHUNK
 
 
@@ -201,12 +202,14 @@ class AsyncServer(object):
             pass
 
     def signal_handler(self):
+        self.logger.debug("Got exit signal")
         self.loop.stop()
 
     def serve_forever(self):
         asyncio.set_event_loop(self.loop)
         try:
             self.loop.add_signal_handler(signal.SIGTERM, self.signal_handler)
+            signal.pthread_sigmask(signal.SIG_UNBLOCK, [signal.SIGTERM])
 
             self.run_loop_forever()
             self.server.close()
@@ -221,3 +224,21 @@ class AsyncServer(object):
 
             if self._cleanup_socket is not None:
                 self._cleanup_socket()
+
+    def serve_as_process(self, *, prefunc=None, args=()):
+        def run():
+            if prefunc is not None:
+                prefunc(self, *args)
+            self.serve_forever()
+
+        # Temporarily block SIGTERM. The server process will inherit this
+        # block which will ensure it doesn't receive the SIGTERM until the
+        # handler is ready for it
+        mask = signal.pthread_sigmask(signal.SIG_BLOCK, [signal.SIGTERM])
+        try:
+            self.process = multiprocessing.Process(target=run)
+            self.process.start()
+
+            return self.process
+        finally:
+            signal.pthread_sigmask(signal.SIG_SETMASK, mask)

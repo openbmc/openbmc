@@ -3,7 +3,7 @@ HOMEPAGE = "http://www.tigervnc.com/"
 LICENSE = "GPLv2+"
 SECTION = "x11/utils"
 DEPENDS = "xserver-xorg gnutls jpeg libxtst gettext-native fltk libpam"
-RDEPENDS_${PN} = "coreutils hicolor-icon-theme perl bash"
+RDEPENDS:${PN} = "coreutils hicolor-icon-theme perl bash"
 
 LIC_FILES_CHKSUM = "file://LICENCE.TXT;md5=75b02c2872421380bbd47781d2bd75d3"
 
@@ -85,7 +85,7 @@ EXTRA_OECONF = "--disable-xorg --disable-xnest --disable-xvfb --disable-dmx \
 
 EXTRA_OECMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '-DCMAKE_INSTALL_UNITDIR=${systemd_unitdir}', '-DINSTALL_SYSTEMD_UNITS=OFF', d)}"
 
-do_configure_append () {
+do_configure:append () {
     olddir=`pwd`
     cd ${XSERVER_SOURCE_DIR}
 
@@ -106,7 +106,7 @@ do_configure_append () {
     cd $olddir
 }
 
-do_compile_append () {
+do_compile:append () {
     olddir=`pwd`
     cd ${XSERVER_SOURCE_DIR}
 
@@ -115,7 +115,7 @@ do_compile_append () {
     cd $olddir
 }
 
-do_install_append() {
+do_install:append() {
     olddir=`pwd`
     cd ${XSERVER_SOURCE_DIR}/hw/vnc
 
@@ -124,10 +124,10 @@ do_install_append() {
     cd $olddir
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/xorg/modules/extensions \
     ${datadir}/icons \
     ${systemd_unitdir} \
 "
 
-FILES_${PN}-dbg += "${libdir}/xorg/modules/extensions/.debug"
+FILES:${PN}-dbg += "${libdir}/xorg/modules/extensions/.debug"

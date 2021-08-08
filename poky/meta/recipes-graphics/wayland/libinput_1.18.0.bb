@@ -23,7 +23,7 @@ UPSTREAM_CHECK_REGEX = "libinput-(?P<pver>\d+\.\d+\.(?!9\d+)\d+)"
 inherit meson pkgconfig lib_package ptest
 
 # Patch out build directory, otherwise it leaks into ptest binary
-do_configure_append() {
+do_configure:append() {
     sed -i -e "s,${WORKDIR},,g" config.h
     if [ -e "litest-config.h" ]; then
         sed -i -e "s,${WORKDIR},,g" litest-config.h
@@ -42,8 +42,8 @@ EXTRA_OEMESON += "-Dudev-dir=${UDEVDIR} \
                   -Dzshcompletiondir=no"
 
 # package name changed in 1.8.1 upgrade: make sure package upgrades work
-RPROVIDES_${PN} = "libinput"
-RREPLACES_${PN} = "libinput"
-RCONFLICTS_${PN} = "libinput"
+RPROVIDES:${PN} = "libinput"
+RREPLACES:${PN} = "libinput"
+RCONFLICTS:${PN} = "libinput"
 
-FILES_${PN}-ptest += "${libexecdir}/libinput/libinput-test-suite"
+FILES:${PN}-ptest += "${libexecdir}/libinput/libinput-test-suite"

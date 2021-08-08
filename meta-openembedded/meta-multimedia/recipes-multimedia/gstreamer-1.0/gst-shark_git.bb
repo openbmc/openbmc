@@ -27,7 +27,7 @@ EXTRA_OECONF += " \
        --enable-gtk-doc=no \
 "
 
-FILES_${PN} += "\
+FILES:${PN} += "\
        ${libdir}/gstreamer-1.0/libgstsharktracers.so  \
        ${libdir}/gstreamer-1.0/libgstsharktracers.la \
 "

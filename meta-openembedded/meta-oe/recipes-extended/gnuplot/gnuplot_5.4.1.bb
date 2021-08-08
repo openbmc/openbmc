@@ -17,7 +17,7 @@ SRC_URI = " \
     file://gnuplot.desktop \
     file://gnuplot.png \
 "
-SRC_URI_append_class-target = " \
+SRC_URI:append:class-target = " \
     file://0002-do-not-build-demos.patch \
     file://0003-Use-native-tools-to-build-docs.patch \
     file://0004-Add-configure-option-to-find-qt5-native-tools.patch \
@@ -28,12 +28,12 @@ SRC_URI[qtplot.sha256sum] = "6df317183ff62cc82f3dcf88207a267cd6478cb5147f55d7530
 
 # for building docs (they deserve it) we need *doc2* tools native
 BBCLASSEXTEND = "native"
-DEPENDS_class-native = "readline-native"
-PACKAGECONFIG_class-native = ""
+DEPENDS:class-native = "readline-native"
+PACKAGECONFIG:class-native = ""
 
-SRC_URI_append_class-native = " file://0001-reduce-build-to-conversion-tools-for-native-build.patch"
+SRC_URI:append:class-native = " file://0001-reduce-build-to-conversion-tools-for-native-build.patch"
 
-do_install_class-native() {
+do_install:class-native() {
     install -d ${D}${bindir}
 	install ${B}/docs/*doc* ${D}${bindir}
     rm ${D}${bindir}/*.o
@@ -49,11 +49,11 @@ EXTRA_OECONF = " \
     -disable-wxwidgets \
 "
 
-do_compile_prepend() {
+do_compile:prepend() {
     install -m 0644 ${WORKDIR}/qtplot-0.2/qtopia.trm ${S}/term/
 }
 
-do_install_append_class-target() {
+do_install:append:class-target() {
     install -d ${D}${datadir}/applications/
     install -m 0644 ${WORKDIR}/gnuplot.desktop ${D}${datadir}/applications/
     install -d ${D}${datadir}/pixmaps/
@@ -62,10 +62,10 @@ do_install_append_class-target() {
 
 PACKAGES =+ "${PN}-x11"
 
-RPROVIDES_${PN}-dbg += "${PN}-x11-dbg"
+RPROVIDES:${PN}-dbg += "${PN}-x11-dbg"
 
-DESCRIPTION_${PN}-x11 = "X11 display terminal for Gnuplot."
-SECTION_${PN}-x11 = "x11/scientific"
-FILES_${PN}-x11 = "${libexecdir} ${datadir}/applications ${datadir}/pixmaps ${libdir}/X11 "
+DESCRIPTION:${PN}-x11 = "X11 display terminal for Gnuplot."
+SECTION:${PN}-x11 = "x11/scientific"
+FILES:${PN}-x11 = "${libexecdir} ${datadir}/applications ${datadir}/pixmaps ${libdir}/X11 "
 
-FILES_${PN} += "${datadir}/texmf"
+FILES:${PN} += "${datadir}/texmf"

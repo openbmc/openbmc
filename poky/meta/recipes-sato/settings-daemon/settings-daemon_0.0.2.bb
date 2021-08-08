@@ -19,12 +19,12 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig gconf features_check
 
-FILES_${PN} = 	"${bindir}/* ${sysconfdir}"
+FILES:${PN} = 	"${bindir}/* ${sysconfdir}"
 
 # Requires gdk-x11-2.0 which is provided by gtk when x11 in DISTRO_FEATURES
 REQUIRED_DISTRO_FEATURES = "x11"
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}/${sysconfdir}/X11/Xsession.d
 	install -m 755 ${WORKDIR}/70settings-daemon.sh ${D}/${sysconfdir}/X11/Xsession.d/
 }

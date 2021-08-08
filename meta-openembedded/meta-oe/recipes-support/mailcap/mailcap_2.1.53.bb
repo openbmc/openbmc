@@ -27,5 +27,5 @@ do_install() {
     oe_runmake install DESTDIR=${D} sysconfdir=${sysconfdir} mandir=${mandir}
 }
 
-ALTERNATIVE_${PN} = "mime.types"
+ALTERNATIVE:${PN} = "mime.types"
 ALTERNATIVE_LINK_NAME[mime.types] = "${sysconfdir}/mime.types"

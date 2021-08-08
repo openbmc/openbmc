@@ -11,4 +11,4 @@ do_install() {
 }
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system datetime"
+GROUPADD_PARAM:${PN} = "--system datetime"

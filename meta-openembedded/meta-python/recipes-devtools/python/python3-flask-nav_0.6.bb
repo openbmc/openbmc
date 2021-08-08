@@ -9,7 +9,7 @@ PYPI_PACKAGE = "flask-nav"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-blinker \
     ${PYTHON_PN}-flask \
     "

@@ -12,6 +12,6 @@ inherit autotools allarch texinfo
 
 PACKAGES = "${PN} ${PN}-doc"
 
-FILES_${PN} += "${datadir}/aclocal"
+FILES:${PN} += "${datadir}/aclocal"
 
 BBCLASSEXTEND = "native nativesdk"

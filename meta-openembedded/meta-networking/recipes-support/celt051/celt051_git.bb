@@ -25,7 +25,7 @@ S = "${WORKDIR}/git"
 
 inherit pkgconfig autotools-brokensep
 
-PACKAGECONFIG_class-native = ""
+PACKAGECONFIG:class-native = ""
 PACKAGECONFIG ??= ""
 
 PACKAGECONFIG[ogg] = "--enable-tools,--disable-tools,libogg,"

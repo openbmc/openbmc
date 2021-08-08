@@ -46,14 +46,14 @@ do_install () {
 }
 
 PACKAGES = "${PN}-client ${PN}-server ${PN}-doc ${BPN}-dbg"
-FILES_${PN}-client = "${bindir}/*"
-FILES_${PN}-server = "${sbindir}/* ${sysconfdir}/xinetd.d/*"
-FILES_${PN}-doc = "${mandir}"
-FILES_${PN}-dbg = "${prefix}/src/debug \
+FILES:${PN}-client = "${bindir}/*"
+FILES:${PN}-server = "${sbindir}/* ${sysconfdir}/xinetd.d/*"
+FILES:${PN}-doc = "${mandir}"
+FILES:${PN}-dbg = "${prefix}/src/debug \
     ${bindir}/.debug ${sbindir}/.debug"
 
-RDEPENDS_${PN}-server = "tcp-wrappers xinetd"
+RDEPENDS:${PN}-server = "tcp-wrappers xinetd"
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN}-client = "tftp"
+ALTERNATIVE:${PN}-client = "tftp"
 ALTERNATIVE_LINK_NAME[tftp] = "${bindir}/tftp"

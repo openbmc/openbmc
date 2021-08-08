@@ -74,14 +74,14 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
 
 --- a/meson.build
 +++ b/meson.build
-@@ -550,6 +550,7 @@ foreach ident : [
-         ['execveat',          '''#include <unistd.h>'''],
-         ['close_range',       '''#include <unistd.h>'''],
-         ['epoll_pwait2',      '''#include <sys/epoll.h>'''],
+@@ -480,6 +480,7 @@ foreach ident : ['secure_getenv', '__sec
+ endforeach
+
+ foreach ident : [
 +        ['strndupa' ,         '''#include <string.h>'''],
- ]
- 
-         have = cc.has_function(ident[0], prefix : ident[1], args : '-D_GNU_SOURCE')
+         ['memfd_create',      '''#include <sys/mman.h>'''],
+         ['gettid',            '''#include <sys/types.h>
+                                  #include <unistd.h>'''],
 --- a/src/backlight/backlight.c
 +++ b/src/backlight/backlight.c
 @@ -19,6 +19,7 @@
@@ -89,7 +89,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "strv.h"
  #include "util.h"
 +#include "missing_stdlib.h"
- 
+
  static int help(void) {
          _cleanup_free_ char *link = NULL;
 --- a/src/basic/cgroup-util.c
@@ -99,7 +99,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "user-util.h"
  #include "xattr-util.h"
 +#include "missing_stdlib.h"
- 
+
  static int cg_enumerate_items(const char *controller, const char *path, FILE **_f, const char *item) {
          _cleanup_free_ char *fs = NULL;
 --- a/src/basic/env-util.c
@@ -109,7 +109,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "strv.h"
  #include "utf8.h"
 +#include "missing_stdlib.h"
- 
+
  /* We follow bash for the character set. Different shells have different rules. */
  #define VALID_BASH_ENV_NAME_CHARS               \
 --- a/src/basic/log.c
@@ -119,9 +119,9 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "time-util.h"
  #include "utf8.h"
 +#include "missing_stdlib.h"
- 
+
  #define SNDBUF_SIZE (8*1024*1024)
- 
+
 --- a/src/basic/missing_stdlib.h
 +++ b/src/basic/missing_stdlib.h
 @@ -11,3 +11,15 @@
@@ -147,12 +147,12 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "stdio-util.h"
  #include "user-util.h"
 +#include "missing_stdlib.h"
- 
+
  int mkdir_safe_internal(
                  const char *path,
 --- a/src/basic/mountpoint-util.c
 +++ b/src/basic/mountpoint-util.c
-@@ -12,6 +12,7 @@
+@@ -11,6 +11,7 @@
  #include "missing_stat.h"
  #include "missing_syscall.h"
  #include "mkdir.h"
@@ -167,7 +167,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "string-util.h"
  #include "strv.h"
 +#include "missing_stdlib.h"
- 
+
  int parse_boolean(const char *v) {
          if (!v)
 --- a/src/basic/path-lookup.c
@@ -177,7 +177,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "tmpfile-util.h"
  #include "user-util.h"
 +#include "missing_stdlib.h"
- 
+
  int xdg_user_runtime_dir(char **ret, const char *suffix) {
          const char *e;
 --- a/src/basic/proc-cmdline.c
@@ -187,7 +187,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "util.h"
  #include "virt.h"
 +#include "missing_stdlib.h"
- 
+
  int proc_cmdline(char **ret) {
          const char *e;
 --- a/src/basic/procfs-util.c
@@ -197,29 +197,19 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "stdio-util.h"
  #include "string-util.h"
 +#include "missing_stdlib.h"
- 
+
  int procfs_tasks_get_limit(uint64_t *ret) {
          _cleanup_free_ char *value = NULL;
---- a/src/basic/selinux-util.c
-+++ b/src/basic/selinux-util.c
-@@ -27,6 +27,7 @@
- #include "selinux-util.h"
- #include "stdio-util.h"
- #include "time-util.h"
-+#include "missing_stdlib.h"
- 
- #if HAVE_SELINUX
- DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(context_t, context_free, NULL);
 --- a/src/basic/time-util.c
 +++ b/src/basic/time-util.c
-@@ -27,6 +27,7 @@
+@@ -26,6 +26,7 @@
  #include "string-util.h"
  #include "strv.h"
  #include "time-util.h"
 +#include "missing_stdlib.h"
- 
+
  static clockid_t map_clock_id(clockid_t c) {
- 
+
 --- a/src/boot/bless-boot.c
 +++ b/src/boot/bless-boot.c
 @@ -18,6 +18,7 @@
@@ -227,27 +217,27 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "verbs.h"
  #include "virt.h"
 +#include "missing_stdlib.h"
- 
+
  static char **arg_path = NULL;
- 
+
 --- a/src/core/dbus-cgroup.c
 +++ b/src/core/dbus-cgroup.c
-@@ -17,6 +17,7 @@
- #include "limits-util.h"
+@@ -20,6 +20,7 @@
+ #include "parse-util.h"
  #include "path-util.h"
  #include "percent-util.h"
 +#include "missing_stdlib.h"
- 
+
  BUS_DEFINE_PROPERTY_GET(bus_property_get_tasks_max, "t", TasksMax, tasks_max_resolve);
- 
+
 --- a/src/core/dbus-execute.c
 +++ b/src/core/dbus-execute.c
-@@ -41,6 +41,7 @@
+@@ -42,6 +42,7 @@
  #include "unit-printf.h"
  #include "user-util.h"
  #include "utf8.h"
 +#include "missing_stdlib.h"
- 
+
  BUS_DEFINE_PROPERTY_GET_ENUM(bus_property_get_exec_output, exec_output, ExecOutput);
  static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_exec_input, exec_input, ExecInput);
 --- a/src/core/dbus-util.c
@@ -257,17 +247,17 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "user-util.h"
  #include "unit.h"
 +#include "missing_stdlib.h"
- 
+
  int bus_property_get_triggered_unit(
                  sd_bus *bus,
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
-@@ -96,6 +96,7 @@
+@@ -98,6 +98,7 @@
  #include "unit-serialize.h"
  #include "user-util.h"
  #include "utmp-wtmp.h"
 +#include "missing_stdlib.h"
- 
+
  #define IDLE_TIMEOUT_USEC (5*USEC_PER_SEC)
  #define IDLE_TIMEOUT2_USEC (1*USEC_PER_SEC)
 --- a/src/core/kmod-setup.c
@@ -277,7 +267,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "string-util.h"
  #include "missing_type.h"
 +#include "missing_stdlib.h"
- 
+
  #if HAVE_KMOD
  #include "module-util.h"
 --- a/src/core/service.c
@@ -287,7 +277,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "utf8.h"
  #include "util.h"
 +#include "missing_stdlib.h"
- 
+
  static const UnitActiveState state_translation_table[_SERVICE_STATE_MAX] = {
          [SERVICE_DEAD] = UNIT_INACTIVE,
 --- a/src/coredump/coredump-vacuum.c
@@ -297,7 +287,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "time-util.h"
  #include "user-util.h"
 +#include "missing_stdlib.h"
- 
+
  #define DEFAULT_MAX_USE_LOWER (uint64_t) (1ULL*1024ULL*1024ULL)           /* 1 MiB */
  #define DEFAULT_MAX_USE_UPPER (uint64_t) (4ULL*1024ULL*1024ULL*1024ULL)   /* 4 GiB */
 --- a/src/journal-remote/journal-remote-main.c
@@ -307,7 +297,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "string-table.h"
  #include "strv.h"
 +#include "missing_stdlib.h"
- 
+
  #define PRIV_KEY_FILE CERTIFICATE_ROOT "/private/journal-remote.pem"
  #define CERT_FILE     CERTIFICATE_ROOT "/certs/journal-remote.pem"
 --- a/src/journal/journalctl.c
@@ -317,7 +307,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "user-util.h"
  #include "varlink.h"
 +#include "missing_stdlib.h"
- 
+
  #define DEFAULT_FSS_INTERVAL_USEC (15*USEC_PER_MINUTE)
  #define PROCESS_INOTIFY_INTERVAL 1024   /* Every 1,024 messages processed */
 --- a/src/libsystemd/sd-bus/bus-message.c
@@ -327,9 +317,9 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "time-util.h"
  #include "utf8.h"
 +#include "missing_stdlib.h"
- 
+
  static int message_append_basic(sd_bus_message *m, char type, const void *p, const void **stored);
- 
+
 --- a/src/libsystemd/sd-bus/bus-objects.c
 +++ b/src/libsystemd/sd-bus/bus-objects.c
 @@ -12,6 +12,7 @@
@@ -337,27 +327,27 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "string-util.h"
  #include "strv.h"
 +#include "missing_stdlib.h"
- 
+
  static int node_vtable_get_userdata(
                  sd_bus *bus,
 --- a/src/libsystemd/sd-bus/bus-socket.c
 +++ b/src/libsystemd/sd-bus/bus-socket.c
-@@ -28,6 +28,7 @@
+@@ -27,6 +27,7 @@
  #include "string-util.h"
  #include "user-util.h"
  #include "utf8.h"
 +#include "missing_stdlib.h"
- 
+
  #define SNDBUF_SIZE (8*1024*1024)
- 
+
 --- a/src/libsystemd/sd-bus/sd-bus.c
 +++ b/src/libsystemd/sd-bus/sd-bus.c
-@@ -41,6 +41,7 @@
+@@ -42,6 +42,7 @@
  #include "string-util.h"
  #include "strv.h"
  #include "user-util.h"
 +#include "missing_stdlib.h"
- 
+
  #define log_debug_bus_message(m)                                         \
          do {                                                             \
 --- a/src/libsystemd/sd-bus/test-bus-benchmark.c
@@ -367,9 +357,9 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "time-util.h"
  #include "util.h"
 +#include "missing_stdlib.h"
- 
+
  #define MAX_SIZE (2*1024*1024)
- 
+
 --- a/src/libsystemd/sd-journal/sd-journal.c
 +++ b/src/libsystemd/sd-journal/sd-journal.c
 @@ -40,6 +40,7 @@
@@ -377,9 +367,9 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "strv.h"
  #include "syslog-util.h"
 +#include "missing_stdlib.h"
- 
+
  #define JOURNAL_FILES_MAX 7168
- 
+
 --- a/src/locale/keymap-util.c
 +++ b/src/locale/keymap-util.c
 @@ -24,6 +24,7 @@
@@ -387,7 +377,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "strv.h"
  #include "tmpfile-util.h"
 +#include "missing_stdlib.h"
- 
+
  static bool startswith_comma(const char *s, const char *prefix) {
          s = startswith(s, prefix);
 --- a/src/login/pam_systemd.c
@@ -407,17 +397,17 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "string-util.h"
  #include "strv.h"
 +#include "missing_stdlib.h"
- 
+
  /*
    # .network
 --- a/src/nspawn/nspawn-settings.c
 +++ b/src/nspawn/nspawn-settings.c
-@@ -16,6 +16,7 @@
+@@ -17,6 +17,7 @@
  #include "strv.h"
  #include "user-util.h"
  #include "util.h"
 +#include "missing_stdlib.h"
- 
+
  Settings *settings_new(void) {
          Settings *s;
 --- a/src/nss-mymachines/nss-mymachines.c
@@ -427,19 +417,19 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "signal-util.h"
  #include "string-util.h"
 +#include "missing_stdlib.h"
- 
+
  static void setup_logging(void) {
          /* We need a dummy function because log_parse_environment is a macro. */
 --- a/src/portable/portable.c
 +++ b/src/portable/portable.c
-@@ -32,6 +32,7 @@
+@@ -34,6 +34,7 @@
  #include "strv.h"
  #include "tmpfile-util.h"
  #include "user-util.h"
 +#include "missing_stdlib.h"
- 
+
  static const char profile_dirs[] = CONF_PATHS_NULSTR("systemd/portable/profile");
- 
+
 --- a/src/resolve/resolvectl.c
 +++ b/src/resolve/resolvectl.c
 @@ -41,6 +41,7 @@
@@ -447,7 +437,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "utf8.h"
  #include "verbs.h"
 +#include "missing_stdlib.h"
- 
+
  static int arg_family = AF_UNSPEC;
  static int arg_ifindex = 0;
 --- a/src/shared/bus-get-properties.c
@@ -457,7 +447,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "stdio-util.h"
  #include "string-util.h"
 +#include "missing_stdlib.h"
- 
+
  int bus_property_get_bool(
                  sd_bus *bus,
 --- a/src/shared/bus-unit-procs.c
@@ -467,17 +457,17 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "string-util.h"
  #include "terminal-util.h"
 +#include "missing_stdlib.h"
- 
+
  struct CGroupInfo {
          char *cgroup_path;
 --- a/src/shared/bus-unit-util.c
 +++ b/src/shared/bus-unit-util.c
-@@ -45,6 +45,7 @@
+@@ -47,6 +47,7 @@
  #include "unit-def.h"
  #include "user-util.h"
  #include "utf8.h"
 +#include "missing_stdlib.h"
- 
+
  int bus_parse_unit_info(sd_bus_message *message, UnitInfo *u) {
          assert(message);
 --- a/src/shared/bus-util.c
@@ -487,7 +477,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "socket-util.h"
  #include "stdio-util.h"
 +#include "missing_stdlib.h"
- 
+
  static int name_owner_change_callback(sd_bus_message *m, void *userdata, sd_bus_error *ret_error) {
          sd_event *e = userdata;
 --- a/src/shared/dns-domain.c
@@ -497,17 +487,17 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "strv.h"
  #include "utf8.h"
 +#include "missing_stdlib.h"
- 
+
  int dns_label_unescape(const char **name, char *dest, size_t sz, DNSLabelFlags flags) {
          const char *n;
 --- a/src/shared/journal-importer.c
 +++ b/src/shared/journal-importer.c
-@@ -14,6 +14,7 @@
+@@ -15,6 +15,7 @@
  #include "parse-util.h"
  #include "string-util.h"
  #include "unaligned.h"
 +#include "missing_stdlib.h"
- 
+
  enum {
          IMPORTER_STATE_LINE = 0,    /* waiting to read, or reading line */
 --- a/src/shared/logs-show.c
@@ -517,7 +507,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "util.h"
  #include "web-util.h"
 +#include "missing_stdlib.h"
- 
+
  /* up to three lines (each up to 100 characters) or 300 characters, whichever is less */
  #define PRINT_LINE_THRESHOLD 3
 --- a/src/shared/pager.c
@@ -527,9 +517,9 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "terminal-util.h"
  #include "util.h"
 +#include "missing_stdlib.h"
- 
+
  static pid_t pager_pid = 0;
- 
+
 --- a/src/shared/uid-range.c
 +++ b/src/shared/uid-range.c
 @@ -9,6 +9,7 @@
@@ -537,7 +527,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "uid-range.h"
  #include "user-util.h"
 +#include "missing_stdlib.h"
- 
+
  static bool uid_range_intersect(UidRange *range, uid_t start, uid_t nr) {
          assert(range);
 --- a/src/socket-proxy/socket-proxyd.c
@@ -547,9 +537,9 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "string-util.h"
  #include "util.h"
 +#include "missing_stdlib.h"
- 
+
  #define BUFFER_SIZE (256 * 1024)
- 
+
 --- a/src/test/test-hexdecoct.c
 +++ b/src/test/test-hexdecoct.c
 @@ -6,6 +6,7 @@
@@ -557,7 +547,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "macro.h"
  #include "string-util.h"
 +#include "missing_stdlib.h"
- 
+
  static void test_hexchar(void) {
          assert_se(hexchar(0xa) == 'a');
 --- a/src/udev/udev-builtin-path_id.c
@@ -567,29 +557,29 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "udev-builtin.h"
  #include "udev-util.h"
 +#include "missing_stdlib.h"
- 
+
  _printf_(2,3)
  static void path_prepend(char **path, const char *fmt, ...) {
 --- a/src/udev/udev-event.c
 +++ b/src/udev/udev-event.c
-@@ -33,6 +33,7 @@
+@@ -34,6 +34,7 @@
  #include "udev-util.h"
  #include "udev-watch.h"
  #include "user-util.h"
 +#include "missing_stdlib.h"
- 
+
  typedef struct Spawn {
          sd_device *device;
 --- a/src/udev/udev-rules.c
 +++ b/src/udev/udev-rules.c
-@@ -31,6 +31,7 @@
- #include "udev-rules.h"
+@@ -33,6 +33,7 @@
+ #include "udev-util.h"
  #include "user-util.h"
  #include "virt.h"
 +#include "missing_stdlib.h"
- 
+
  #define RULES_DIRS (const char* const*) CONF_PATHS_STRV("udev/rules.d")
- 
+
 --- a/src/basic/percent-util.c
 +++ b/src/basic/percent-util.c
 @@ -3,6 +3,7 @@
@@ -597,6 +587,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  #include "string-util.h"
  #include "parse-util.h"
 +#include "missing_stdlib.h"
- 
+
  static int parse_parts_value_whole(const char *p, const char *symbol) {
          const char *pc, *n;
+

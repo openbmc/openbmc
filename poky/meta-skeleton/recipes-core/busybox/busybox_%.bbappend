@@ -6,8 +6,8 @@
 #
 # More details can be found in the Kernel Dev Manual
 # http://www.yoctoproject.org/docs/current/kernel-dev/kernel-dev.html#changing-the-configuration
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI_append_mydistro += " \
+SRC_URI:append:mydistro += " \
 	    file://no_rfkill.cfg \
            "

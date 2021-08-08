@@ -15,7 +15,7 @@ SRCREV = "73ec5ec96cca32f2e2461d3964fc3d4ab80248f9"
 
 inherit setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-click \
     ${PYTHON_PN}-core \
     ${PYTHON_PN}-io \

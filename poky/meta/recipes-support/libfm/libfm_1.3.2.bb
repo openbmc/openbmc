@@ -29,7 +29,7 @@ do_configure[dirs] =+ "${S}/m4"
 
 PACKAGES =+ "libfm-gtk"
 PACKAGES += "${PN}-mime"
-FILES_libfm-gtk = " \
+FILES:libfm-gtk = " \
     ${libdir}/libfm-gtk*so.* \
     ${libdir}/libfm/modules/gtk* \
     ${bindir}/libfm-pref-apps \
@@ -40,9 +40,9 @@ FILES_libfm-gtk = " \
     ${datadir}/libfm/images/unknown.png \
     ${datadir}/libfm/ui/*.ui \
 "
-FILES_${PN}-mime = "${datadir}/mime/"
+FILES:${PN}-mime = "${datadir}/mime/"
 
-do_install_append () {
+do_install:append () {
     # remove files which are part of libfm-extra
     rm -f ${D}${includedir}/libfm-1.0/fm-xml-file.h
     rm -f ${D}${includedir}/libfm-1.0/fm-version.h

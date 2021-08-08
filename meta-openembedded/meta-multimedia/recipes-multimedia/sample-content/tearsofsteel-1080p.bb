@@ -13,4 +13,4 @@ do_install() {
     install -m 0644 ${WORKDIR}/ToS-4k-1920.mov ${D}${datadir}/movies/
 }
 
-FILES_${PN} += "${datadir}/movies"
+FILES:${PN} += "${datadir}/movies"

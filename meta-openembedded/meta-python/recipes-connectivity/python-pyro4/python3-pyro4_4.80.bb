@@ -9,7 +9,7 @@ PYPI_PACKAGE = "Pyro4"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-logging \
     ${PYTHON_PN}-serpent \
     ${PYTHON_PN}-threading \

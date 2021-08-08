@@ -20,6 +20,6 @@ do_install() {
 
 inherit update-alternatives
 
-ALTERNATIVE_${PN} = "rfkill"
+ALTERNATIVE:${PN} = "rfkill"
 ALTERNATIVE_PRIORITY = "60"
 ALTERNATIVE_LINK_NAME[rfkill] = "${sbindir}/rfkill"

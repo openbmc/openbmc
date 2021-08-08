@@ -13,7 +13,7 @@ DEPENDS = "fontforge-native"
 
 S = "${WORKDIR}"
 FONT_PACKAGES = "${PN}"
-FILES_${PN} = "${datadir}"
+FILES:${PN} = "${datadir}"
 
 do_compile() {
     fontforge ${S}/convert.ff lklug

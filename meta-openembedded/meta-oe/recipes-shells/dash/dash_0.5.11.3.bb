@@ -13,15 +13,15 @@ SRC_URI[sha256sum] = "62b9f1676ba6a7e8eaec541a39ea037b325253240d1f378c72360baa1c
 
 EXTRA_OECONF += "--bindir=${base_bindir}"
 
-ALTERNATIVE_${PN} = "sh"
+ALTERNATIVE:${PN} = "sh"
 ALTERNATIVE_LINK_NAME[sh] = "${base_bindir}/sh"
 ALTERNATIVE_TARGET[sh] = "${base_bindir}/dash"
 ALTERNATIVE_PRIORITY = "10"
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     grep -q "^${base_bindir}/dash$" $D${sysconfdir}/shells || echo ${base_bindir}/dash >> $D${sysconfdir}/shells
 }
 
-pkg_postrm_${PN} () {
+pkg_postrm:${PN} () {
     printf "$(grep -v "^${base_bindir}/dash$" $D${sysconfdir}/shells)\n" > $D${sysconfdir}/shells
 }

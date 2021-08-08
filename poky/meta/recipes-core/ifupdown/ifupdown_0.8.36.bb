@@ -51,7 +51,7 @@ do_install_ptest () {
 }
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN} = "ifup ifdown"
+ALTERNATIVE:${PN} = "ifup ifdown"
 
 ALTERNATIVE_LINK_NAME[ifup] = "${base_sbindir}/ifup"
 ALTERNATIVE_LINK_NAME[ifdown] = "${base_sbindir}/ifdown"

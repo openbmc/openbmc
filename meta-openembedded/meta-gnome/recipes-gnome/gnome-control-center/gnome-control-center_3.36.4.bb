@@ -44,12 +44,12 @@ EXTRA_OEMESON = " \
     -Dcheese=false \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/gnome-shell \
     ${datadir}/metainfo \
 "
 
-FILES_${PN}-dev += "${datadir}/gettext"
+FILES:${PN}-dev += "${datadir}/gettext"
 
-RDEPENDS_${PN} += "gsettings-desktop-schemas"
+RDEPENDS:${PN} += "gsettings-desktop-schemas"

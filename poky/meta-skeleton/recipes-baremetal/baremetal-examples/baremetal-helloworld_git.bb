@@ -31,12 +31,12 @@ inherit baremetal-image
 COMPATIBLE_MACHINE = "qemuarmv5|qemuarm|qemuarm64|qemuriscv64"
 
 BAREMETAL_QEMUARCH ?= ""
-BAREMETAL_QEMUARCH_qemuarmv5 = "versatile"
-BAREMETAL_QEMUARCH_qemuarm = "arm"
-BAREMETAL_QEMUARCH_qemuarm64 = "aarch64"
-BAREMETAL_QEMUARCH_qemuriscv64 = "riscv64"
+BAREMETAL_QEMUARCH:qemuarmv5 = "versatile"
+BAREMETAL_QEMUARCH:qemuarm = "arm"
+BAREMETAL_QEMUARCH:qemuarm64 = "aarch64"
+BAREMETAL_QEMUARCH:qemuriscv64 = "riscv64"
 
-EXTRA_OEMAKE_append = " QEMUARCH=${BAREMETAL_QEMUARCH} V=1"
+EXTRA_OEMAKE:append = " QEMUARCH=${BAREMETAL_QEMUARCH} V=1"
 
 
 # Install binaries on the proper location for baremetal-image to fetch and deploy
@@ -46,7 +46,7 @@ do_install(){
     install -m 755 ${B}/build/hello_baremetal_${BAREMETAL_QEMUARCH}.elf ${D}/${base_libdir}/firmware/${BAREMETAL_BINNAME}.elf
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${base_libdir}/firmware/${BAREMETAL_BINNAME}.bin \
     ${base_libdir}/firmware/${BAREMETAL_BINNAME}.elf \
 "

@@ -12,7 +12,7 @@ S = "${WORKDIR}/git"
 
 # uhubctl gets its program version from "git describe". As we use the source
 # archive do reduce download size replace the call with our hardcoded version.
-do_configure_append() {
+do_configure:append() {
     sed -i "s/^\(GIT_VERSION :=\).*$/\1 ${PV}/g" ${S}/Makefile
 }
 

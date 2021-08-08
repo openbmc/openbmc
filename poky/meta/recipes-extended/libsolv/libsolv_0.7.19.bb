@@ -26,7 +26,7 @@ EXTRA_OECMAKE = "-DMULTI_SEMANTICS=ON -DENABLE_COMPLEX_DEPS=ON"
 
 PACKAGES =+ "${PN}-tools ${PN}ext"
 
-FILES_${PN}-tools = "${bindir}/*"
-FILES_${PN}ext = "${libdir}/${PN}ext.so.*"
+FILES:${PN}-tools = "${bindir}/*"
+FILES:${PN}ext = "${libdir}/${PN}ext.so.*"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -3,8 +3,8 @@ decoding. It is suitable for use in real time applications such as WebRTC."
 HOMEPAGE = "http://www.openh264.org/"
 SECTION = "libs/multimedia"
 
-DEPENDS_append_x86 = " nasm-native"
-DEPENDS_append_x86-64 = " nasm-native"
+DEPENDS:append:x86 = " nasm-native"
+DEPENDS:append:x86-64 = " nasm-native"
 
 LICENSE = "BSD-2-Clause"
 LICENSE_FLAGS = "commercial"
@@ -17,24 +17,24 @@ SRC_URI = "git://github.com/cisco/openh264.git;protocol=https;branch=${BRANCH} \
            file://0001-Makefile-Use-cp-options-to-preserve-file-mode.patch \
            "
 
-COMPATIBLE_MACHINE_armv7a = "(.*)"
-COMPATIBLE_MACHINE_aarch64 = "(.*)"
-COMPATIBLE_MACHINE_x86 = "(.*)"
-COMPATIBLE_MACHINE_x86-64 = "(.*)"
-COMPATIBLE_MACHINE_mips = "(.*)"
-COMPATIBLE_MACHINE_mips64 = "(.*)"
-COMPATIBLE_MACHINE_powerpc64le = "null"
+COMPATIBLE_MACHINE:armv7a = "(.*)"
+COMPATIBLE_MACHINE:aarch64 = "(.*)"
+COMPATIBLE_MACHINE:x86 = "(.*)"
+COMPATIBLE_MACHINE:x86-64 = "(.*)"
+COMPATIBLE_MACHINE:mips = "(.*)"
+COMPATIBLE_MACHINE:mips64 = "(.*)"
+COMPATIBLE_MACHINE:powerpc64le = "null"
 
-EXTRA_OEMAKE_armv7a = "ARCH=arm"
-EXTRA_OEMAKE_armv7ve = "ARCH=arm"
-EXTRA_OEMAKE_aarch64 = "ARCH=arm64"
-EXTRA_OEMAKE_x86 = "ARCH=i386"
-EXTRA_OEMAKE_x86-64 = "ARCH=x86_64"
-EXTRA_OEMAKE_mips = "ARCH=mips"
-EXTRA_OEMAKE_mips64 = "ARCH=mips64"
-EXTRA_OEMAKE_riscv64 = "ARCH=riscv64"
+EXTRA_OEMAKE:armv7a = "ARCH=arm"
+EXTRA_OEMAKE:armv7ve = "ARCH=arm"
+EXTRA_OEMAKE:aarch64 = "ARCH=arm64"
+EXTRA_OEMAKE:x86 = "ARCH=i386"
+EXTRA_OEMAKE:x86-64 = "ARCH=x86_64"
+EXTRA_OEMAKE:mips = "ARCH=mips"
+EXTRA_OEMAKE:mips64 = "ARCH=mips64"
+EXTRA_OEMAKE:riscv64 = "ARCH=riscv64"
 
-EXTRA_OEMAKE_append = " ENABLEPIC=Yes"
+EXTRA_OEMAKE:append = " ENABLEPIC=Yes"
 do_configure() {
     :
 }

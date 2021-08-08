@@ -49,19 +49,19 @@ EXTRA_OECMAKE += "-DWITH_EXTENDED_FILTERING=ON -DSYSTEMD_UNITDIR=${systemd_syste
 
 PACKAGES += "${PN}-systemd"
 SYSTEMD_PACKAGES = "${PN} ${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = " ${@bb.utils.contains('PACKAGECONFIG', 'systemd', 'dlt.service', '', d)} \
+SYSTEMD_SERVICE:${PN} = " ${@bb.utils.contains('PACKAGECONFIG', 'systemd', 'dlt.service', '', d)} \
                           ${@bb.utils.contains('PACKAGECONFIG', 'dlt-system', 'dlt-system.service', '', d)} \
                           ${@bb.utils.contains('PACKAGECONFIG', 'dlt-dbus', 'dlt-dbus.service', '', d)}"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
-SYSTEMD_SERVICE_${PN}-systemd = " \
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
+SYSTEMD_SERVICE:${PN}-systemd = " \
     ${@bb.utils.contains('PACKAGECONFIG', 'dlt-adaptor', 'dlt-adaptor-udp.service', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'dlt-examples', 'dlt-example-user.service', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'dlt-examples dlt-console', 'dlt-receive.service', '', d)} \
 "
-SYSTEMD_AUTO_ENABLE_${PN}-systemd = "disable"
+SYSTEMD_AUTO_ENABLE:${PN}-systemd = "disable"
 
-FILES_${PN}-doc += "${datadir}/dlt-filetransfer"
+FILES:${PN}-doc += "${datadir}/dlt-filetransfer"
 
-do_install_append() {
+do_install:append() {
     rm -f ${D}${bindir}/dlt-test-*
 }

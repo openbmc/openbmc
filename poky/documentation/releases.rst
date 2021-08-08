@@ -10,6 +10,7 @@ Release Series 3.3 (hardknott)
 
 - :yocto_docs:`3.3 Documentation </3.3>`
 - :yocto_docs:`3.3.1 Documentation </3.3.1>`
+- :yocto_docs:`3.3.2 Documentation </3.3.2>`
 
 *******************************
 Release Series 3.2 (gatesgarth)

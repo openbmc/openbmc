@@ -14,14 +14,14 @@ SRC_URI = "git://github.com/google/googletest.git"
 
 inherit cmake
 
-ALLOW_EMPTY_${PN} = "1"
-ALLOW_EMPTY_${PN}-dbg = "1"
+ALLOW_EMPTY:${PN} = "1"
+ALLOW_EMPTY:${PN}-dbg = "1"
 
-RDEPENDS_${PN}-dev += "${PN}-staticdev"
+RDEPENDS:${PN}-dev += "${PN}-staticdev"
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # explicitly use python3
     # the scripts are already python3 compatible since https://github.com/google/googletest/commit/d404af0d987a9c38cafce82a7e26ec8468c88361 and other fixes like this
     # but since this oe-core change http://git.openembedded.org/openembedded-core/commit/?id=5f8f16b17f66966ae91aeabc23e97de5ecd17447

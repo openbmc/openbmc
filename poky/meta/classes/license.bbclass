@@ -6,7 +6,7 @@
 LICENSE_DIRECTORY ??= "${DEPLOY_DIR}/licenses"
 LICSSTATEDIR = "${WORKDIR}/license-destdir/"
 
-# Create extra package with license texts and add it to RRECOMMENDS_${PN}
+# Create extra package with license texts and add it to RRECOMMENDS:${PN}
 LICENSE_CREATE_PACKAGE[type] = "boolean"
 LICENSE_CREATE_PACKAGE ??= "0"
 LICENSE_PACKAGE_SUFFIX ??= "-lic"
@@ -31,9 +31,9 @@ python do_populate_lic() {
             f.write("%s: %s\n" % (key, info[key]))
 }
 
-PSEUDO_IGNORE_PATHS .= ",${@','.join(((d.getVar('COMMON_LICENSE_DIR') or '') + ' ' + (d.getVar('LICENSE_PATH') or '')).split())}"
-# it would be better to copy them in do_install_append, but find_license_filesa is python
-python perform_packagecopy_prepend () {
+PSEUDO_IGNORE_PATHS .= ",${@','.join(((d.getVar('COMMON_LICENSE_DIR') or '') + ' ' + (d.getVar('LICENSE_PATH') or '') + ' ' + d.getVar('COREBASE') + '/meta/COPYING').split())}"
+# it would be better to copy them in do_install:append, but find_license_filesa is python
+python perform_packagecopy:prepend () {
     enabled = oe.data.typed_value('LICENSE_CREATE_PACKAGE', d)
     if d.getVar('CLASSOVERRIDE') == 'class-target' and enabled:
         lic_files_paths = find_license_files(d)
@@ -62,7 +62,7 @@ def add_package_and_files(d):
     else:
         # first in PACKAGES to be sure that nothing else gets LICENSE_FILES_DIRECTORY
         d.setVar('PACKAGES', "%s %s" % (pn_lic, packages))
-        d.setVar('FILES_' + pn_lic, files)
+        d.setVar('FILES:' + pn_lic, files)
 
 def copy_license_files(lic_files_paths, destdir):
     import shutil
@@ -324,7 +324,7 @@ def incompatible_license(d, dont_want_licenses, package=None):
     as canonical (SPDX) names.
     """
     import oe.license
-    license = d.getVar("LICENSE_%s" % package) if package else None
+    license = d.getVar("LICENSE:%s" % package) if package else None
     if not license:
         license = d.getVar('LICENSE')
 
@@ -419,7 +419,7 @@ SSTATETASKS += "do_populate_lic"
 do_populate_lic[sstate-inputdirs] = "${LICSSTATEDIR}"
 do_populate_lic[sstate-outputdirs] = "${LICENSE_DIRECTORY}/"
 
-IMAGE_CLASSES_append = " license_image"
+IMAGE_CLASSES:append = " license_image"
 
 python do_populate_lic_setscene () {
     sstate_setscene(d)

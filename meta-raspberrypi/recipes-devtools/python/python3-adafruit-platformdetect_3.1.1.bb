@@ -12,4 +12,4 @@ inherit setuptools3
 
 DEPENDS += "python3-setuptools-scm-native"
 
-RDEPENDS_${PN} += "python3-core"
+RDEPENDS:${PN} += "python3-core"

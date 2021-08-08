@@ -17,7 +17,7 @@ SRC_URI[sha256sum] = "b9fd10f7a80aadaed28a77168709b7c519568a63b6e98d0a50e9c5fe31
 
 inherit autotools
 
-do_compile_append() {
+do_compile:append() {
     # Now compiling the examples provided by the package
     mkdir -p ${B}/examples
     for file in `ls ${S}/examples`; do
@@ -25,7 +25,7 @@ do_compile_append() {
     done
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/${libdir}/${BPN}
     for file in ${B}/examples/*
     do
@@ -35,8 +35,8 @@ do_install_append() {
 
 PACKAGES += "${PN}-tests"
 
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
-FILES_${PN} = ""
-FILES_${PN}-tests = "${libdir}/${BPN}"
-FILES_${PN}-dbg += "${libdir}/${BPN}/.debug"
+FILES:${PN} = ""
+FILES:${PN}-tests = "${libdir}/${BPN}"
+FILES:${PN}-dbg += "${libdir}/${BPN}/.debug"

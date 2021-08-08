@@ -7,7 +7,7 @@ inherit pypi setuptools3
 
 SRC_URI[sha256sum] = "8394e266005f2d8c6f0bc6780001f7afa3ef81a7a2111fa35058ded6fce79e4d"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
 	python3-stringold \
 "
 

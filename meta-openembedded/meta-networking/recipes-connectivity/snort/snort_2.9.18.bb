@@ -50,7 +50,7 @@ PACKAGECONFIG[appid] = "--enable-open-appid, --disable-open-appid, luajit, bash"
 CFLAGS += "-I${STAGING_INCDIR}/tirpc"
 LDFLAGS += " -ltirpc"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}/snort/rules
     install -d ${D}${sysconfdir}/snort/preproc_rules
     install -d ${D}${sysconfdir}/init.d
@@ -77,30 +77,30 @@ do_install_append() {
     sed -i -e 's|-ffile-prefix-map[^ ]*||g; s|-fdebug-prefix-map[^ ]*||g; s|-fmacro-prefix-map[^ ]*||g; s|${STAGING_DIR_TARGET}||g' ${D}${libdir}/pkgconfig/*.pc
 }
 
-pkg_postinst_${PN}() {
+pkg_postinst:${PN}() {
     if [ -z "$D" ] && [ -e ${sysconfdir}/init.d/populate-volatile.sh ]; then
         ${sysconfdir}/init.d/populate-volatile.sh update
     fi
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/snort_dynamicengine/*.so.* \
     ${libdir}/snort_dynamicpreprocessor/*.so.* \
     ${libdir}/snort_dynamicrules/*.so.* \
 "
-FILES_${PN}-dbg += " \
+FILES:${PN}-dbg += " \
     ${libdir}/snort_dynamicengine/.debug \
     ${libdir}/snort_dynamicpreprocessor/.debug \
     ${libdir}/snort_dynamicrules/.debug \
 "
-FILES_${PN}-staticdev += " \
+FILES:${PN}-staticdev += " \
     ${libdir}/snort_dynamicengine/*.a \
     ${libdir}/snort_dynamicpreprocessor/*.a \
     ${libdir}/snort_dynamicrules/*.a \
     ${libdir}/snort/dynamic_preproc/*.a \
     ${libdir}/snort/dynamic_output/*.a \
 "
-FILES_${PN}-dev += " \
+FILES:${PN}-dev += " \
     ${libdir}/snort_dynamicengine/*.la \
     ${libdir}/snort_dynamicpreprocessor/*.la \
     ${libdir}/snort_dynamicrules/*.la \

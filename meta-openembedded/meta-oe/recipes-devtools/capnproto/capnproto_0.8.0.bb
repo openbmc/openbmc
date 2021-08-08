@@ -18,9 +18,9 @@ EXTRA_OECMAKE += "\
     -DBUILD_TESTING=OFF \
 "
 
-FILES_${PN}-compiler = "${bindir}"
+FILES:${PN}-compiler = "${bindir}"
 
 PACKAGE_BEFORE_PN = "${PN}-compiler"
-RDEPENDS_${PN}-dev += "${PN}-compiler"
+RDEPENDS:${PN}-dev += "${PN}-compiler"
 
 BBCLASSEXTEND = "native nativesdk"

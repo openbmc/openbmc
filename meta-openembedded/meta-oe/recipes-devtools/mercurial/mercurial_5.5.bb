@@ -5,7 +5,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "python3 python3-native"
-RDEPENDS_${PN} = "python3 python3-modules"
+RDEPENDS:${PN} = "python3 python3-modules"
 
 inherit python3native
 
@@ -22,7 +22,7 @@ export LDSHARED="${CCLD} -shared"
 EXTRA_OEMAKE = "STAGING_LIBDIR=${STAGING_LIBDIR} STAGING_INCDIR=${STAGING_INCDIR} \
     PREFIX=${prefix}"
 
-do_configure_append () {
+do_configure:append () {
     sed -i -e 's:PYTHON?=python:PYTHON=python3:g' ${S}/Makefile
 }
 
@@ -32,7 +32,7 @@ do_install () {
 }
 PACKAGES =+ "${PN}-python"
 
-FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}"
 
-FILES_${PN}-python = "${nonarch_libdir}/${PYTHON_DIR}"
+FILES:${PN}-python = "${nonarch_libdir}/${PYTHON_DIR}"
 

@@ -12,6 +12,6 @@ SRC_URI = " \
 	git://github.com/klange/nyancat;protocol=https;branch=master \
 "
 
-do_install_append() {
+do_install:append() {
 	install -Dm 0755 ${S}/src/${BPN} ${D}${bindir}/${BPN}
 }

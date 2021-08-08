@@ -17,7 +17,7 @@ inherit autotools
 EXTRA_OECONF = "CFLAGS="$CFLAGS -I${STAGING_INCDIR}/libxml2""
 COMPATIBLE_HOST = "(i.86|x86_64|arm|powerpc|aarch64).*-linux"
 
-do_configure_prepend () {
+do_configure:prepend () {
     # Two bugs in configure.ac when cross-compiling.
     # 1. The path of libxml2. Specify it in EXTRA_OECONF.
     # 2. hw's value on other platforms. Replace it if the target is

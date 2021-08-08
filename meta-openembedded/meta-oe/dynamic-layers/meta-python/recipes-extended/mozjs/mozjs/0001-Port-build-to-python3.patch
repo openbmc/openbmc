@@ -17,15 +17,15 @@ Content-Transfer-Encoding: 8bit
   python/mozbuild/mozbuild/configure/__init__.py / Line 310 onwards
 * major changes upstream on build are not to expect so upgrading should cause
   little trouble and changes can be tracked by [3]
-* some solutions are workarounds/hacks so this patch will not be accepeted
-  upstream. This should not be a probelme for us: once mozjs >= 68 will arrive
+* some solutions are workarounds/hacks so this patch will not be accepted
+  upstream. This should not be a problem for us: once mozjs >= 68 will arrive
   we have to go to rust/cargo based build anyway.
 
 [1] https://code.foxkit.us/adelie/packages/blob/f2b5773da19ab397fbe64fd32dacc383cfe4cd77/user/mozjs/python3.patch
 [2] https://github.com/mozilla/gecko-dev
 [3] https://github.com/mozilla/gecko-dev/tree/esr60
 
-Upstream-Status: Inaproppriate [Some Hacks]
+Upstream-Status: Inappropriate [Some Hacks]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
 ---

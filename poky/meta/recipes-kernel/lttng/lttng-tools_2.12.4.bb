@@ -13,13 +13,13 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=40ef17463fbd6f377db3c47b1cbaded8 \
 include lttng-platforms.inc
 
 DEPENDS = "liburcu popt libxml2 util-linux"
-RDEPENDS_${PN} = "libgcc"
-RRECOMMENDS_${PN} += "${LTTNGMODULES}"
-RDEPENDS_${PN}-ptest += "make perl bash gawk babeltrace procps perl-module-overloading coreutils util-linux kmod ${LTTNGMODULES} sed python3-core grep"
-RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-utils"
-RDEPENDS_${PN}-ptest_append_libc-musl = " musl-utils"
+RDEPENDS:${PN} = "libgcc"
+RRECOMMENDS:${PN} += "${LTTNGMODULES}"
+RDEPENDS:${PN}-ptest += "make perl bash gawk babeltrace procps perl-module-overloading coreutils util-linux kmod ${LTTNGMODULES} sed python3-core grep"
+RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-utils"
+RDEPENDS:${PN}-ptest:append:libc-musl = " musl-utils"
 # babelstats.pl wants getopt-long
-RDEPENDS_${PN}-ptest += "perl-module-getopt-long"
+RDEPENDS:${PN}-ptest += "perl-module-getopt-long"
 
 PYTHON_OPTION = "am_cv_python_pyexecdir='${PYTHON_SITEPACKAGES_DIR}' \
                  am_cv_python_pythondir='${PYTHON_SITEPACKAGES_DIR}' \
@@ -43,26 +43,26 @@ SRC_URI[sha256sum] = "d729f8c2373a41194f171aeb0da0a9bb35ac181f31afa7e260786d19a5
 
 inherit autotools ptest pkgconfig useradd python3-dir manpages systemd
 
-SYSTEMD_SERVICE_${PN} = "lttng-sessiond.service"
+SYSTEMD_SERVICE:${PN} = "lttng-sessiond.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "tracing"
+GROUPADD_PARAM:${PN} = "tracing"
 
-FILES_${PN} += "${libdir}/lttng/libexec/* ${datadir}/xml/lttng \
+FILES:${PN} += "${libdir}/lttng/libexec/* ${datadir}/xml/lttng \
                 ${PYTHON_SITEPACKAGES_DIR}/*"
-FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
-FILES_${PN}-dev += "${PYTHON_SITEPACKAGES_DIR}/*.la"
+FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
+FILES:${PN}-dev += "${PYTHON_SITEPACKAGES_DIR}/*.la"
 
 # Since files are installed into ${libdir}/lttng/libexec we match 
 # the libexec insane test so skip it.
 # Python module needs to keep _lttng.so
-INSANE_SKIP_${PN} = "libexec dev-so"
-INSANE_SKIP_${PN}-dbg = "libexec"
+INSANE_SKIP:${PN} = "libexec dev-so"
+INSANE_SKIP:${PN}-dbg = "libexec"
 
-PRIVATE_LIBS_${PN}-ptest = "libfoo.so"
+PRIVATE_LIBS:${PN}-ptest = "libfoo.so"
 
-do_install_append () {
+do_install:append () {
     # install systemd unit file
     install -d ${D}${systemd_unitdir}/system
     install -m 0644 ${WORKDIR}/lttng-sessiond.service ${D}${systemd_unitdir}/system

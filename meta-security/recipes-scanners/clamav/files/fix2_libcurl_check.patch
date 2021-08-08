@@ -1,0 +1,122 @@
+clamav .102.2 tries to find clamav using culf_config. Use EO pkg_config instead
+
+Upstream-Status: OE specific
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/configure
+===================================================================
+--- git.orig/configure
++++ git/configure
+@@ -28850,39 +28850,14 @@ $as_echo_n "checking for libcurl install
+ if test "${with_libcurl+set}" = set; then :
+   withval=$with_libcurl;
+ find_curl="no"
+-if test "X$withval" = "Xyes"; then
+-    find_curl="yes"
+-else
+-    if test "X$withval" != "Xno"; then
+-        if test -f "${withval}/bin/curl-config"; then
+-            LIBCURL_HOME="$withval"
+-            have_curl="yes"
+-        fi
+-    fi
+-fi
+-
+-else
+-  find_curl="yes"
+-fi
+-
+-
+-if test "X$find_curl" = "Xyes"; then
+-    for p in /usr/local /usr ; do
+-        if test -f "${p}/bin/curl-config"; then
+-           LIBCURL_HOME=$p
+-           have_curl="yes"
+-        fi
+-    done
+-fi
+-
+-if test "X$have_curl" = "Xyes"; then
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LIBCURL_HOME" >&5
+-$as_echo "$LIBCURL_HOME" >&6; }
+-    if test -f "$LIBCURL_HOME/bin/curl-config"; then
++  #save_LDFLAGS="$LDFLAGS"
++  if test "X$withval" != "Xno"; then
++     LIBCURL_HOME="$withval"
++     if test  "${PKG_CONFIG} libcurl --exists"; then
+         CURL_LDFLAGS="$LDFLAGS"
+-        CURL_LIBS=$($LIBCURL_HOME/bin/curl-config --libs)
+-        CURL_CPPFLAGS=$($LIBCURL_HOME/bin/curl-config --cflags)
+-    else
++        CURL_LIBS=$($PKG_CONFIG libcurl --libs)
++        CURL_CPPFLAGS=$($PKG_CONFIG libcurl --cflags)
++     else
+         if test "$LIBCURL_HOME" != "/usr"; then
+             CURL_LDFLAGS="-L$LIBCURL_HOME/lib"
+             CURL_CPPFLAGS="-I$LIBCURL_HOME/include"
+@@ -28891,60 +28866,12 @@ $as_echo "$LIBCURL_HOME" >&6; }
+             CURL_CPPFLAGS=""
+         fi
+         CURL_LIBS="-lcurl"
+-    fi
+-    save_LDFLAGS="$LDFLAGS"
+-    LDFLAGS="$CURL_LDFLAGS $CURL_LIBS"
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for curl_easy_init in -lcurl" >&5
+-$as_echo_n "checking for curl_easy_init in -lcurl... " >&6; }
+-if ${ac_cv_lib_curl_curl_easy_init+:} false; then :
+-  $as_echo_n "(cached) " >&6
+-else
+-  ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lcurl $CURL_LIBS
+-     $LIBS"
+-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+-/* end confdefs.h.  */
+-
+-/* Override any GCC internal prototype to avoid an error.
+-   Use char because int might match the return type of a GCC
+-   builtin and then its argument prototype would still apply.  */
+-#ifdef __cplusplus
+-extern "C"
+-#endif
+-char curl_easy_init ();
+-int
+-main ()
+-{
+-return curl_easy_init ();
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-if ac_fn_c_try_link "$LINENO"; then :
+-  ac_cv_lib_curl_curl_easy_init=yes
+-else
+-  ac_cv_lib_curl_curl_easy_init=no
+-fi
+-rm -f core conftest.err conftest.$ac_objext \
+-    conftest$ac_exeext conftest.$ac_ext
+-LIBS=$ac_check_lib_save_LIBS
+-fi
+-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_curl_curl_easy_init" >&5
+-$as_echo "$ac_cv_lib_curl_curl_easy_init" >&6; }
+-if test "x$ac_cv_lib_curl_curl_easy_init" = xyes; then :
+-
+-            curl_msg="";
+-            have_curl="yes";
+-            CLAMSUBMIT_LIBS="$CLAMSUBMIT_LIBS $CURL_LDFLAGS $CURL_LIBS";
+-            CLAMSUBMIT_CFLAGS="$CLAMSUBMIT_CFLAGS $CURL_CPPFLAGS";
+-            FRESHCLAM_LIBS="$FRESHCLAM_LIBS $CURL_LDFLAGS $CURL_LIBS";
+-            FRESHCLAM_CPPFLAGS="$FRESHCLAM_CPPFLAGS $CURL_CPPFLAGS"
+-
+-else
+-
+-            as_fn_error $? "Your libcurl is misconfigured. libcurl (e.g. libcurl-devel) is required in order to build freshclam and clamsubmit." "$LINENO" 5
++     fi
+ 
+-fi
++     have_curl="yes"
++     LDFLAGS="$save_LDFLAGS"
++     LDFLAGS="$CURL_LDFLAGS $CURL_LIBS"
++ fi
+ 
+     LDFLAGS="$save_LDFLAGS"
+ else

@@ -65,9 +65,17 @@ class Command:
 
         # Ensure cooker is ready for commands
         if command != "updateConfig" and command != "setFeatures":
-            self.cooker.init_configdata()
-            if not self.remotedatastores:
-                self.remotedatastores = bb.remotedata.RemoteDatastores(self.cooker)
+            try:
+                self.cooker.init_configdata()
+                if not self.remotedatastores:
+                    self.remotedatastores = bb.remotedata.RemoteDatastores(self.cooker)
+            except (Exception, SystemExit) as exc:
+                import traceback
+                if isinstance(exc, bb.BBHandledException):
+                    # We need to start returning real exceptions here. Until we do, we can't
+                    # tell if an exception is an instance of bb.BBHandledException
+                    return None, "bb.BBHandledException()\n" + traceback.format_exc()
+                return None, traceback.format_exc()
 
         if hasattr(CommandsSync, command):
             # Can run synchronous commands straight away

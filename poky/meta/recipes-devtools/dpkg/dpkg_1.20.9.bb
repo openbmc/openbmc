@@ -18,7 +18,7 @@ SRC_URI = "git://salsa.debian.org/dpkg-team/dpkg.git;protocol=https;branch=1.20.
            file://0014-arch-Add-support-for-ARCv2-CPU.patch \
            "
 
-SRC_URI_append_class-native = " file://0001-build.c-ignore-return-of-1-from-tar-cf.patch"
+SRC_URI:append:class-native = " file://0001-build.c-ignore-return-of-1-from-tar-cf.patch"
 
 SRCREV = "2177b782b16e77e97c9643961a5ae3c639bcc4a3"
 

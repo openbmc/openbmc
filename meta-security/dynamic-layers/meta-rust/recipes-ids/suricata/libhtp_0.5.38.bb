@@ -23,5 +23,5 @@ do_configure () {
     oe_runconf
 }
 
-RDEPENDS_${PN} += "zlib"
+RDEPENDS:${PN} += "zlib"
 

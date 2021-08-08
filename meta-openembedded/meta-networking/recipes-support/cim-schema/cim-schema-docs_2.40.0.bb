@@ -16,5 +16,5 @@ do_install() {
         cp -R --no-dereference --preserve=mode,links -v ${S}/* ${D}${datadir}/doc/cim-schema-${PV}-docs
 }
 
-FILES_${PN} = "${datadir}/doc/*"
-FILES_${PN}-doc = ""
+FILES:${PN} = "${datadir}/doc/*"
+FILES:${PN}-doc = ""

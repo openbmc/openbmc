@@ -30,6 +30,6 @@ do_install() {
 # We will skip parsing for non-musl systems
 #
 COMPATIBLE_HOST = ".*-musl.*"
-RDEPENDS_${PN}-staticdev = ""
-RDEPENDS_${PN}-dev = ""
-RRECOMMENDS_${PN}-dbg = "${PN}-staticdev (= ${EXTENDPKGV})"
+RDEPENDS:${PN}-staticdev = ""
+RDEPENDS:${PN}-dev = ""
+RRECOMMENDS:${PN}-dbg = "${PN}-staticdev (= ${EXTENDPKGV})"

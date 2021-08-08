@@ -22,7 +22,7 @@ inherit autotools pkgconfig features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
-FILES_${PN} = "${bindir}/* \
+FILES:${PN} = "${bindir}/* \
                ${datadir}/matchbox \
                ${sysconfdir}/matchbox \
                ${datadir}/themes/blondie/matchbox \
@@ -35,6 +35,6 @@ EXTRA_OECONF = " --enable-startup-notification \
                  --with-expat-lib=${STAGING_LIBDIR} \
                  --with-expat-includes=${STAGING_INCDIR}"
 
-do_install_prepend() {
+do_install:prepend() {
 	install ${WORKDIR}/kbdconfig ${S}/data/kbdconfig
 }

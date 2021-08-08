@@ -24,5 +24,5 @@ CFLAGS += "-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 BBCLASSEXTEND = "native nativesdk"
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN} = "mkfs.vfat"
+ALTERNATIVE:${PN} = "mkfs.vfat"
 ALTERNATIVE_LINK_NAME[mkfs.vfat] = "${sbindir}/mkfs.vfat"

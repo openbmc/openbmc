@@ -17,8 +17,8 @@ SRC_URI[sha256sum] = "98d200e76e30f6262c4a4493148c1840827898329146a57a34f8f0f928
 inherit autotools update-rc.d useradd systemd pkgconfig bash-completion
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system -g lldpd --shell /bin/false lldpd"
-GROUPADD_PARAM_${PN} = "--system lldpd"
+USERADD_PARAM:${PN} = "--system -g lldpd --shell /bin/false lldpd"
+GROUPADD_PARAM:${PN} = "--system lldpd"
 
 EXTRA_OECONF += "--without-embedded-libevent \
                  --disable-oldies \
@@ -45,9 +45,9 @@ PACKAGECONFIG[custom] = "--enable-custom,--disable-custom"
 INITSCRIPT_NAME = "lldpd"
 INITSCRIPT_PARAMS = "defaults"
 
-SYSTEMD_SERVICE_${PN} = "lldpd.service"
+SYSTEMD_SERVICE:${PN} = "lldpd.service"
 
-do_install_append() {
+do_install:append() {
     install -Dm 0755 ${WORKDIR}/lldpd.init.d ${D}${sysconfdir}/init.d/lldpd
     install -Dm 0644 ${WORKDIR}/lldpd.default ${D}${sysconfdir}/default/lldpd
     # Make an empty configuration file
@@ -56,9 +56,9 @@ do_install_append() {
 
 PACKAGES =+ "${PN}-zsh-completion"
 
-FILES_${PN} += "${libdir}/sysusers.d"
-RDEPENDS_${PN} += "os-release"
+FILES:${PN} += "${libdir}/sysusers.d"
+RDEPENDS:${PN} += "os-release"
 
-FILES_${PN}-zsh-completion += "${datadir}/zsh/"
+FILES:${PN}-zsh-completion += "${datadir}/zsh/"
 # FIXME: zsh is broken in meta-oe so this cannot be enabled for now
 #RDEPENDS_${PN}-zsh-completion += "zsh"

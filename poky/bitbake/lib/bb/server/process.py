@@ -26,6 +26,7 @@ import errno
 import re
 import datetime
 import pickle
+import traceback
 import bb.server.xmlrpcserver
 from bb import daemonize
 from multiprocessing import queues
@@ -217,8 +218,9 @@ class ProcessServer():
                     self.command_channel_reply.send(self.cooker.command.runCommand(command))
                     serverlog("Command Completed")
                 except Exception as e:
-                   serverlog('Exception in server main event loop running command %s (%s)' % (command, str(e)))
-                   logger.exception('Exception in server main event loop running command %s (%s)' % (command, str(e)))
+                   stack = traceback.format_exc()
+                   serverlog('Exception in server main event loop running command %s (%s)' % (command, stack))
+                   logger.exception('Exception in server main event loop running command %s (%s)' % (command, stack))
 
             if self.xmlrpc in ready:
                 self.xmlrpc.handle_requests()

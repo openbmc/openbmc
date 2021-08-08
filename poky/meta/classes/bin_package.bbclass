@@ -34,6 +34,6 @@ bin_package_do_install () {
         | tar --no-same-owner -xpf - -C ${D}
 }
 
-FILES_${PN} = "/"
+FILES:${PN} = "/"
 
 EXPORT_FUNCTIONS do_install

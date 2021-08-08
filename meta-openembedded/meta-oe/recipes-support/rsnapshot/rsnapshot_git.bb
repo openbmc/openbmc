@@ -6,7 +6,7 @@ SECTION = "console/network"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a"
 
-RDEPENDS_${PN} = "rsync \
+RDEPENDS:${PN} = "rsync \
                   perl \
                   perl-module-dirhandle \
                   perl-module-cwd \
@@ -48,7 +48,7 @@ EXTRA_OECONF += "--without-cp \
 
 # Create 't/include.ac' before starting the autoreconf to fix configure
 # error: configure.ac:302: file 't/include.ac' does not exist
-do_configure_prepend(){
+do_configure:prepend(){
 	saved_dir=`pwd`
 	cd ${S}; ./autogen.sh
 	cd ${saved_dir}

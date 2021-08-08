@@ -20,7 +20,7 @@ inherit cpan autotools-brokensep gettext python3native python3-dir systemd
 BBCLASSEXTEND = "native"
 
 SYSTEMD_PACKAGES = "rrdcached"
-SYSTEMD_SERVICE_rrdcached = "rrdcached.socket rrdcached.service"
+SYSTEMD_SERVICE:rrdcached = "rrdcached.socket rrdcached.service"
 
 EXTRA_AUTORECONF = "-I m4 --exclude=autopoint"
 
@@ -104,26 +104,26 @@ do_configure() {
 PACKAGES =+ "${PN}-perl ${PN}-python"
 PACKAGES =+ "rrdcached"
 
-DESCRIPTION_rrdcached = \
+DESCRIPTION:rrdcached = \
 "The rrdcached package contains the data caching daemon for RRDtool."
 
-FILES_rrdcached = "${bindir}/rrdcached \
+FILES:rrdcached = "${bindir}/rrdcached \
     ${systemd_unitdir}/system/rrdcached.service \
     ${systemd_unitdir}/system/rrdcached.socket"
 
-FILES_${PN}-doc += "${datadir}/rrdtool/examples"
+FILES:${PN}-doc += "${datadir}/rrdtool/examples"
 
-DESCRIPTION_${PN}-perl = \
+DESCRIPTION:${PN}-perl = \
 "The ${PN}-perl package includes RRDtool bindings for perl."
-FILES_${PN}-perl = "${libdir}/perl/vendor_perl/*/*.pm \
+FILES:${PN}-perl = "${libdir}/perl/vendor_perl/*/*.pm \
     ${libdir}/perl/vendor_perl/*/auto/RRDs/RRDs.*"
-RDEPENDS_${PN}-perl = "perl perl-module-lib perl-module-getopt-long perl-module-time-hires \
+RDEPENDS:${PN}-perl = "perl perl-module-lib perl-module-getopt-long perl-module-time-hires \
     perl-module-io-file perl-module-ipc-open2 perl-module-io-socket"
 
-DESCRIPTION_${PN}-python = \
+DESCRIPTION:${PN}-python = \
 "The ${PN}-python package includes RRDtool bindings for python."
-FILES_${PN}-python = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"
-RDEPENDS_${PN}-python = "python3"
+FILES:${PN}-python = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"
+RDEPENDS:${PN}-python = "python3"
 
-FILES_${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/RRDs/.debug \
+FILES:${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/RRDs/.debug \
     ${libdir}/python${PYTHON_BASEVERSION}/site-packages/.debug"

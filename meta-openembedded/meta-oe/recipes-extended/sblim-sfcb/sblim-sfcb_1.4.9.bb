@@ -36,10 +36,10 @@ inherit autotools
 inherit systemd
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "sblim-sfcb.service"
+SYSTEMD_SERVICE:${PN} = "sblim-sfcb.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
-LDFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
+LDFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
 
 EXTRA_OECONF = '--enable-debug \
                 --enable-ssl \
@@ -50,7 +50,7 @@ EXTRA_OECONF = '--enable-debug \
 # make all with -j option is unsafe.
 PARALLEL_MAKE = ""
 
-INSANE_SKIP_${PN} = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"
 CONFIG_SITE = "${WORKDIR}/config-site.${P}"
 
 do_install() {
@@ -68,16 +68,16 @@ do_install() {
     rm -rf ${D}${libdir}/sfcb/*.la
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     $INTERCEPT_DIR/postinst_intercept delay_to_first_boot ${PKG} mlprefix=${MLPREFIX}
 }
 
-pkg_postinst_ontarget_${PN} () {
+pkg_postinst_ontarget:${PN} () {
     ${datadir}/sfcb/genSslCert.sh ${sysconfdir}/sfcb
     ${bindir}/sfcbrepos -f
 }
 
-FILES_${PN} += "${libdir}/sfcb ${datadir}/sfcb"
-FILES_${PN}-dbg += "${libdir}/sfcb/.debug"
+FILES:${PN} += "${libdir}/sfcb ${datadir}/sfcb"
+FILES:${PN}-dbg += "${libdir}/sfcb/.debug"
 
-RDEPENDS_${PN} = "perl bash"
+RDEPENDS:${PN} = "perl bash"

@@ -6,7 +6,7 @@ inherit packagegroup features_check
 
 REQUIRED_DISTRO_FEATURES = "x11 polkit gobject-introspection-data"
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     evolution-data-server \
     evince \
     file-roller \

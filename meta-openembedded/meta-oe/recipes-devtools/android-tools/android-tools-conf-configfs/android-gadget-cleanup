@@ -6,7 +6,7 @@ cd /sys/kernel/config/usb_gadget
 
 cd adb
 
-echo "" > UDC || true
+echo -n "" > UDC || true
 
 killall adbd || true
 

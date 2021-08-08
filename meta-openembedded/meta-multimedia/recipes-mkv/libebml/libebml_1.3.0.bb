@@ -14,8 +14,8 @@ inherit dos2unix
 
 LIBEBML_OS = "Unknown"
 LIBEBML_OS_linux = "Linux"
-LIBEBML_OS_darwin = "Darwin"
-LIBEBML_OS_mingw32 = "Windows"
+LIBEBML_OS:darwin = "Darwin"
+LIBEBML_OS:mingw32 = "Windows"
 
 EXTRA_OEMAKE = "\
     'TARGET_OS=${LIBEBML_OS}' \

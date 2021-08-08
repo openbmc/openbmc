@@ -21,13 +21,13 @@ SRC_URI[sha256sum] = "754b22ae5edff0273460ac9f57509c3938187e0cf4fb9692c6a02833ff
 
 inherit setuptools3 features_check systemd update-rc.d
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
                   iptables \
                   python3 \
                   python3-modules \
                  "
 
-RRECOMMENDS_${PN} = " \
+RRECOMMENDS:${PN} = " \
                      kernel-module-ipv6 \
                      kernel-module-nf-conntrack-ipv6 \
                      kernel-module-nf-log-common \
@@ -39,7 +39,7 @@ RRECOMMENDS_${PN} = " \
                      kernel-module-nf-recent \
 "
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${S}/doc/systemd.example ${D}${systemd_unitdir}/system/ufw.service
 
@@ -47,14 +47,14 @@ do_install_append() {
     install -m 0755 ${S}/doc/initscript.example ${D}${sysconfdir}/init.d/ufw
 }
 
-SYSTEMD_SERVICE_${PN} = "ufw.service"
+SYSTEMD_SERVICE:${PN} = "ufw.service"
 
 INITSCRIPT_NAME = "ufw"
 INITSCRIPT_PARAMS = "defaults"
 
 # Certain items are explicitly put under /lib, not base_libdir when installed.
 #
-FILES_${PN} += " \
+FILES:${PN} += " \
                 ${sbindir}/* \
                 ${datadir}/ufw/* \
                 /lib/ufw/* \
@@ -64,5 +64,5 @@ FILES_${PN} += " \
 
 REQUIRED_DISTRO_FEATURES = "ipv6"
 
-DISTUTILS_BUILD_ARGS_append = " --iptables-dir /usr/sbin"
-DISTUTILS_INSTALL_ARGS_append = " --iptables-dir /usr/sbin"
+DISTUTILS_BUILD_ARGS:append = " --iptables-dir /usr/sbin"
+DISTUTILS_INSTALL_ARGS:append = " --iptables-dir /usr/sbin"

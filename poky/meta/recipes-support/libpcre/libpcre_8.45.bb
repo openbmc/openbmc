@@ -38,19 +38,19 @@ EXTRA_OECONF = "--enable-utf"
 
 PACKAGES =+ "libpcrecpp libpcreposix pcregrep pcregrep-doc pcretest pcretest-doc"
 
-SUMMARY_libpcrecpp = "${SUMMARY} - C++ wrapper functions"
-SUMMARY_libpcreposix = "${SUMMARY} - C wrapper functions based on the POSIX regex API"
-SUMMARY_pcregrep = "grep utility that uses perl 5 compatible regexes"
-SUMMARY_pcregrep-doc = "grep utility that uses perl 5 compatible regexes - docs"
-SUMMARY_pcretest = "program for testing Perl-comatible regular expressions"
-SUMMARY_pcretest-doc = "program for testing Perl-comatible regular expressions - docs"
+SUMMARY:libpcrecpp = "${SUMMARY} - C++ wrapper functions"
+SUMMARY:libpcreposix = "${SUMMARY} - C wrapper functions based on the POSIX regex API"
+SUMMARY:pcregrep = "grep utility that uses perl 5 compatible regexes"
+SUMMARY:pcregrep-doc = "grep utility that uses perl 5 compatible regexes - docs"
+SUMMARY:pcretest = "program for testing Perl-comatible regular expressions"
+SUMMARY:pcretest-doc = "program for testing Perl-comatible regular expressions - docs"
 
-FILES_libpcrecpp = "${libdir}/libpcrecpp.so.*"
-FILES_libpcreposix = "${libdir}/libpcreposix.so.*"
-FILES_pcregrep = "${bindir}/pcregrep"
-FILES_pcregrep-doc = "${mandir}/man1/pcregrep.1"
-FILES_pcretest = "${bindir}/pcretest"
-FILES_pcretest-doc = "${mandir}/man1/pcretest.1"
+FILES:libpcrecpp = "${libdir}/libpcrecpp.so.*"
+FILES:libpcreposix = "${libdir}/libpcreposix.so.*"
+FILES:pcregrep = "${bindir}/pcregrep"
+FILES:pcregrep-doc = "${mandir}/man1/pcregrep.1"
+FILES:pcretest = "${bindir}/pcretest"
+FILES:pcretest-doc = "${mandir}/man1/pcretest.1"
 
 BBCLASSEXTEND = "native nativesdk"
 
@@ -70,4 +70,4 @@ do_install_ptest() {
 	sed -i -e 's:do3=yes:do3=no:g' ${D}${PTEST_PATH}/RunTest 
 }
 
-RDEPENDS_${PN}-ptest += "make"
+RDEPENDS:${PN}-ptest += "make"

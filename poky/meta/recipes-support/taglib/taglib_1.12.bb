@@ -21,7 +21,7 @@ BINCONFIG = "${bindir}/taglib-config"
 inherit cmake pkgconfig binconfig-disabled
 
 PACKAGES =+ "${PN}-c"
-FILES_${PN}-c = "${libdir}/libtag_c.so.*"
+FILES:${PN}-c = "${libdir}/libtag_c.so.*"
 
 EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON \
                  -DCMAKE_DISABLE_FIND_PACKAGE_Boost=TRUE \
@@ -32,7 +32,7 @@ EXTRA_OECMAKE = "-DBUILD_SHARED_LIBS=ON \
 "
 CXXFLAGS += "-std=c++11"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	rm -f ${S}/admin/ltmain.sh
 	rm -f ${S}/admin/libtool.m4.in
 }

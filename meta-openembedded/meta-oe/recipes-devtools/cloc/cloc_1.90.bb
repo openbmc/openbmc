@@ -18,4 +18,4 @@ do_install() {
     install -D -m 0755 ${S}/cloc ${D}${bindir}/cloc
 }
 
-RDEPENDS_${PN} = "perl perl-modules"
+RDEPENDS:${PN} = "perl perl-modules"

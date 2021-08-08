@@ -19,7 +19,7 @@ UPSTREAM_CHECK_URI = "https://github.com/libical/libical/releases"
 
 inherit cmake pkgconfig
 
-DEPENDS_append_class-target = "libical-native"
+DEPENDS:append:class-target = "libical-native"
 
 PACKAGECONFIG ??= "icu glib"
 PACKAGECONFIG[bdb] = ",-DCMAKE_DISABLE_FIND_PACKAGE_BDB=True,db"
@@ -32,9 +32,9 @@ EXTRA_OECMAKE += "-DPERL_EXECUTABLE=${HOSTTOOLS_DIR}/perl"
 # doc build fails with linker error (??) for libical-glib so disable it
 EXTRA_OECMAKE += "-DICAL_BUILD_DOCS=false"
 
-EXTRA_OECMAKE_append_class-target = " -DIMPORT_ICAL_GLIB_SRC_GENERATOR=${STAGING_LIBDIR_NATIVE}/cmake/LibIcal/IcalGlibSrcGenerator.cmake"
+EXTRA_OECMAKE:append:class-target = " -DIMPORT_ICAL_GLIB_SRC_GENERATOR=${STAGING_LIBDIR_NATIVE}/cmake/LibIcal/IcalGlibSrcGenerator.cmake"
 
-do_install_append () {
+do_install:append () {
     # Remove build host references
     sed -i \
        -e 's,${STAGING_LIBDIR},${libdir},g' \

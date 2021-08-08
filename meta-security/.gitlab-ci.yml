@@ -17,7 +17,6 @@
 stages:
   - base 
   - parsec
-  - multi
   - musl
   - test
 
@@ -32,14 +31,6 @@ stages:
   before_script:
     - *before-my-script
   stage: parsec 
-  after_script:
-    - *after-my-script
-
-
-.multi:
-  before_script:
-    - *before-my-script
-  stage: multi
   after_script:
     - *after-my-script
 
@@ -97,12 +88,6 @@ qemux86-64-parsec:
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
-qemux86-64-multi:
-  extends: .multi
-  needs: ['qemux86-64']
-  script:
-  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
-
 qemuarm:
   extends: .base
   script:
@@ -120,12 +105,6 @@ qemuarm64:
   - kas shell kas/$CI_JOB_NAME.yml  -c "bitbake -k security-build-image security-tpm2-image integrity-image-minimal"
   - kas build --target security-build-image kas/$CI_JOB_NAME-alt.yml
 
-qemuarm64-multi:
-  extends: .multi
-  needs: ['qemuarm64']
-  script:
-  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
-
 qemuarm64-musl:
   extends: .musl
   needs: ['qemuarm64']
@@ -138,25 +117,8 @@ qemuarm64-parsec:
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 
-qemuppc:
-  extends: .base
-  script:
-  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
-
-qemuppc-parsec:
-  extends: .parsec
-  needs: ['qemuppc']
-  script:
-  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
-
 qemumips64:
   extends: .base
-  script:
-  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
-
-qemumips64-multi:
-  extends: .multi
-  needs: ['qemumips64']
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml
 

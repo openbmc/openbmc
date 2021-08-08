@@ -5,16 +5,16 @@ verifying, querying, and updating software packages. Each software \
 package consists of an archive of files along with information about \
 the package like its version, a description, etc."
 
-SUMMARY_${PN}-dev = "Development files for manipulating RPM packages"
-DESCRIPTION_${PN}-dev = "This package contains the RPM C library and header files. These \
+SUMMARY:${PN}-dev = "Development files for manipulating RPM packages"
+DESCRIPTION:${PN}-dev = "This package contains the RPM C library and header files. These \
 development files will simplify the process of writing programs that \
 manipulate RPM packages and databases. These files are intended to \
 simplify the process of creating graphical package managers or any \
 other tools that need an intimate knowledge of RPM packages in order \
 to function."
 
-SUMMARY_python3-rpm = "Python bindings for apps which will manupulate RPM packages"
-DESCRIPTION_python3-rpm = "The python3-rpm package contains a module that permits applications \
+SUMMARY:python3-rpm = "Python bindings for apps which will manupulate RPM packages"
+DESCRIPTION:python3-rpm = "The python3-rpm package contains a module that permits applications \
 written in the Python programming language to use the interface \
 supplied by the RPM Package Manager libraries."
 
@@ -48,7 +48,7 @@ SRCREV = "3659b8a04f5b8bacf6535e0124e7fe23f15286bd"
 S = "${WORKDIR}/git"
 
 DEPENDS = "libgcrypt file popt xz bzip2 elfutils python3"
-DEPENDS_append_class-native = " file-replacement-native bzip2-replacement-native"
+DEPENDS:append:class-native = " file-replacement-native bzip2-replacement-native"
 
 inherit autotools gettext pkgconfig python3native
 export PYTHON_ABI
@@ -56,24 +56,24 @@ export PYTHON_ABI
 AUTOTOOLS_AUXDIR = "${S}/build-aux"
 
 # OE-core patches autoreconf to additionally run gnu-configize, which fails with this recipe
-EXTRA_AUTORECONF_append = " --exclude=gnu-configize"
+EXTRA_AUTORECONF:append = " --exclude=gnu-configize"
 
-EXTRA_OECONF_append = " --without-lua --enable-python --with-crypto=libgcrypt"
-EXTRA_OECONF_append_libc-musl = " --disable-nls --disable-openmp"
+EXTRA_OECONF:append = " --without-lua --enable-python --with-crypto=libgcrypt"
+EXTRA_OECONF:append:libc-musl = " --disable-nls --disable-openmp"
 
 # --sysconfdir prevents rpm from attempting to access machine-specific configuration in sysroot/etc; we need to have it in rootfs
 # --localstatedir prevents rpm from writing its database to native sysroot when building images
 # Forcibly disable plugins for native/nativesdk, as the inhibit and prioreset
 # plugins both behave badly inside builds.
-EXTRA_OECONF_append_class-native = " --sysconfdir=/etc --localstatedir=/var --disable-plugins"
-EXTRA_OECONF_append_class-nativesdk = " --sysconfdir=/etc --disable-plugins"
+EXTRA_OECONF:append:class-native = " --sysconfdir=/etc --localstatedir=/var --disable-plugins"
+EXTRA_OECONF:append:class-nativesdk = " --sysconfdir=/etc --disable-plugins"
 
 BBCLASSEXTEND = "native nativesdk"
 
 PACKAGECONFIG ??= "bdb ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'inhibit', '', d)}"
 # The inhibit plugin serves no purpose outside of the target
-PACKAGECONFIG_remove_class-native = "inhibit"
-PACKAGECONFIG_remove_class-nativesdk = "inhibit"
+PACKAGECONFIG:remove:class-native = "inhibit"
+PACKAGECONFIG:remove:class-nativesdk = "inhibit"
 
 PACKAGECONFIG[bdb] = "--enable-bdb,--disable-bdb,db"
 PACKAGECONFIG[imaevm] = "--with-imaevm,,ima-evm-utils"
@@ -98,11 +98,11 @@ WRAPPER_TOOLS = " \
    ${libdir}/rpm/rpmdeps \
 "
 
-do_configure_prepend() {
+do_configure:prepend() {
         mkdir -p ${S}/build-aux
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
         for tool in ${WRAPPER_TOOLS}; do
                 test -x ${D}$tool && create_wrapper ${D}$tool \
                         RPM_CONFIGDIR=${STAGING_LIBDIR_NATIVE}/rpm \
@@ -112,7 +112,7 @@ do_install_append_class-native() {
         done
 }
 
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
         for tool in ${WRAPPER_TOOLS}; do
                 test -x ${D}$tool && create_wrapper ${D}$tool \
                         RPM_CONFIGDIR='`dirname $''realpath`'/${@os.path.relpath(d.getVar('libdir'), d.getVar('bindir'))}/rpm \
@@ -128,11 +128,11 @@ do_install_append_class-nativesdk() {
 }
 
 # Rpm's make install creates var/tmp which clashes with base-files packaging
-do_install_append_class-target() {
+do_install:append:class-target() {
     rm -rf ${D}/var
 }
 
-do_install_append () {
+do_install:append () {
 	sed -i -e 's:${HOSTTOOLS_DIR}/::g' \
 	    ${D}/${libdir}/rpm/macros
 
@@ -140,17 +140,17 @@ do_install_append () {
 	    ${D}${libdir}/rpm/pythondistdeps.py
 }
 
-FILES_${PN} += "${libdir}/rpm-plugins/*.so \
+FILES:${PN} += "${libdir}/rpm-plugins/*.so \
                "
-FILES_${PN}_append_class-nativesdk = " ${SDKPATHNATIVE}/environment-setup.d/rpm.sh"
+FILES:${PN}:append:class-nativesdk = " ${SDKPATHNATIVE}/environment-setup.d/rpm.sh"
 
-FILES_${PN}-dev += "${libdir}/rpm-plugins/*.la \
+FILES:${PN}-dev += "${libdir}/rpm-plugins/*.la \
                     "
 PACKAGE_BEFORE_PN += "${PN}-build ${PN}-sign ${PN}-archive"
 
-RRECOMMENDS_${PN} += "rpm-build rpm-sign rpm-archive"
+RRECOMMENDS:${PN} += "rpm-sign rpm-archive"
 
-FILES_${PN}-build = "\
+FILES:${PN}-build = "\
     ${bindir}/rpmbuild \
     ${bindir}/gendiff \
     ${bindir}/rpmspec \
@@ -172,20 +172,20 @@ FILES_${PN}-build = "\
     ${libdir}/rpm/fileattrs/* \
 "
 
-FILES_${PN}-sign = "\
+FILES:${PN}-sign = "\
     ${bindir}/rpmsign \
     ${libdir}/librpmsign.so.* \
 "
 
-FILES_${PN}-archive = "\
+FILES:${PN}-archive = "\
     ${bindir}/rpm2archive \
 "
 
 PACKAGES += "python3-rpm"
 PROVIDES += "python3-rpm"
-FILES_python3-rpm = "${PYTHON_SITEPACKAGES_DIR}/rpm/*"
+FILES:python3-rpm = "${PYTHON_SITEPACKAGES_DIR}/rpm/*"
 
-RDEPENDS_${PN}-build = "bash perl python3-core"
+RDEPENDS:${PN}-build = "bash perl python3-core"
 
 PACKAGE_PREPROCESS_FUNCS += "rpm_package_preprocess"
 

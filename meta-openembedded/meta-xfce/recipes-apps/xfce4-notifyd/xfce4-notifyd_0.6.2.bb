@@ -20,11 +20,11 @@ SRC_URI[sha256sum] = "19ab84c6665c7819998f2269322d53f462c30963ce26042df23ae525e7
 # org.freedesktop.Notifications
 EXTRA_OECONF = "--disable-dbus-start-daemon"
 
-do_compile_prepend() {
+do_compile:prepend() {
     mkdir -p xfce4-notifyd xfce4-notifyd-config
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${systemd_user_unitdir} \
     ${datadir}/xfce4 \
     ${datadir}/themes \

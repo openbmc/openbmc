@@ -14,7 +14,7 @@ inherit pypi setuptools3
 
 PYPI_PACKAGE = "pika"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-logging \
     ${PYTHON_PN}-tornado \
     ${PYTHON_PN}-twisted \

@@ -18,4 +18,4 @@ SRC_URI[sha256sum] = "268946e1a13e9d80e4f724a0740df9e6e8c8bad37697fcbf456924e9fd
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'dri', '', d)}"
 PACKAGECONFIG[dri] = "--enable-dri,--disable-dri,drm xorgproto,xserver-xorg-extension-dri"
 
-RDEPENDS_${PN} = "xserver-xorg-module-exa"
+RDEPENDS:${PN} = "xserver-xorg-module-exa"

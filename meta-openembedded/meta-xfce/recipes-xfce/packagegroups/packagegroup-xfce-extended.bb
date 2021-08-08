@@ -8,12 +8,12 @@ inherit packagegroup features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 # mandatory
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     packagegroup-xfce-base \
 "
 
 # nice to have
-RRECOMMENDS_${PN} = " \
+RRECOMMENDS:${PN} = " \
     xfwm4-theme-daloa \
     xfwm4-theme-kokodi \
     xfwm4-theme-moheli \

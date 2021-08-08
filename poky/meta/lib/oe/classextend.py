@@ -87,7 +87,7 @@ class ClassExtender(object):
     def map_depends_variable(self, varname, suffix = ""):
         # We need to preserve EXTENDPKGV so it can be expanded correctly later
         if suffix:
-            varname = varname + "_" + suffix
+            varname = varname + ":" + suffix
         orig = self.d.getVar("EXTENDPKGV", False)
         self.d.setVar("EXTENDPKGV", "EXTENDPKGV")
         deps = self.d.getVar(varname)
@@ -142,7 +142,7 @@ class ClassExtender(object):
             if pkg_mapping[0].startswith("${") and pkg_mapping[0].endswith("}"):
                 continue
             for subs in variables:
-                self.d.renameVar("%s_%s" % (subs, pkg_mapping[0]), "%s_%s" % (subs, pkg_mapping[1]))
+                self.d.renameVar("%s:%s" % (subs, pkg_mapping[0]), "%s:%s" % (subs, pkg_mapping[1]))
 
 class NativesdkClassExtender(ClassExtender):
     def map_depends(self, dep):

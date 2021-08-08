@@ -78,9 +78,9 @@ class SanityOptionsTest(OESelftestTestCase):
 
     def test_options_warnqa_errorqa_switch(self):
 
-        self.write_config("INHERIT_remove = \"report-error\"")
+        self.write_config("INHERIT:remove = \"report-error\"")
         if "packages-list" not in get_bb_var("ERROR_QA"):
-            self.append_config("ERROR_QA_append = \" packages-list\"")
+            self.append_config("ERROR_QA:append = \" packages-list\"")
 
         self.write_recipeinc('xcursor-transparent-theme', 'PACKAGES += \"${PN}-dbg\"')
         self.add_command_to_tearDown('bitbake -c clean xcursor-transparent-theme')
@@ -90,8 +90,8 @@ class SanityOptionsTest(OESelftestTestCase):
         self.assertTrue(line and line.startswith("ERROR:"), msg=res.output)
         self.assertEqual(res.status, 1, msg = "bitbake reported exit code %s. It should have been 1. Bitbake output: %s" % (str(res.status), res.output))
         self.write_recipeinc('xcursor-transparent-theme', 'PACKAGES += \"${PN}-dbg\"')
-        self.append_config('ERROR_QA_remove = "packages-list"')
-        self.append_config('WARN_QA_append = " packages-list"')
+        self.append_config('ERROR_QA:remove = "packages-list"')
+        self.append_config('WARN_QA:append = " packages-list"')
         res = bitbake("xcursor-transparent-theme -f -c package")
         self.delete_recipeinc('xcursor-transparent-theme')
         line = self.getline(res, "QA Issue: xcursor-transparent-theme-dbg is listed in PACKAGES multiple times, this leads to packaging errors.")
@@ -168,7 +168,7 @@ class ToolchainOptions(OESelftestTestCase):
         Test that Fortran works by building a Hello, World binary.
         """
 
-        features = 'FORTRAN_forcevariable = ",fortran"\n'
+        features = 'FORTRAN:forcevariable = ",fortran"\n'
         self.write_config(features)
         bitbake('fortran-helloworld')
 

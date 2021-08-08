@@ -13,8 +13,8 @@ inherit autotools pkgconfig
 
 EXTRA_OEMAKE += "shared_library"
 
-do_configure_prepend() {
+do_configure:prepend() {
     cp ${STAGING_DATADIR_NATIVE}/automake-*/ar-lib ${S}
 }
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"

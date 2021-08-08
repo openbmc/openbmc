@@ -91,9 +91,10 @@ level changes:
       Variables that are exported to the environment are preceded by the
       string "export" in the command's output.
 
--  For recipe changes, use the following::
+-  To find changes to a given variable in a specific recipe, use the
+   following::
 
-      $ bitbake recipe -e \| grep VARIABLE="
+      $ bitbake recipename -e | grep VARIABLENAME=\"
 
    This command checks to see if the variable actually makes
    it into a specific recipe.
@@ -225,7 +226,7 @@ immediately, rather than when the variable is actually used::
    C := "${C}append"
 
 In this example, ``A`` contains "test 123", even though the final value
-of ``T`` is "456". The variable ``B`` will end up containing "456
+of :term:`T` is "456". The variable :term:`B` will end up containing "456
 cvalappend". This is because references to undefined variables are
 preserved as is during (immediate)expansion. This is in contrast to GNU
 Make, where undefined variables expand to nothing. The variable ``C``
@@ -248,7 +249,7 @@ examples::
    C = "cval"
    C =+ "test"
 
-The variable ``B`` contains "bval additionaldata" and ``C`` contains "test
+The variable :term:`B` contains "bval additionaldata" and ``C`` contains "test
 cval".
 
 .. _appending-and-prepending-without-spaces:
@@ -267,7 +268,7 @@ examples::
    C = "cval"
    C =. "test"
 
-The variable ``B`` contains "bvaladditionaldata" and ``C`` contains
+The variable :term:`B` contains "bvaladditionaldata" and ``C`` contains
 "testcval".
 
 Appending and Prepending (Override Style Syntax)
@@ -281,13 +282,13 @@ operators in that their effects are applied at variable expansion time
 rather than being immediately applied. Here are some examples::
 
    B = "bval"
-   B_append = " additional data"
+   B:append = " additional data"
    C = "cval"
-   C_prepend = "additional data "
+   C:prepend = "additional data "
    D = "dval"
-   D_append = "additional data"
+   D:append = "additional data"
 
-The variable ``B``
+The variable :term:`B`
 becomes "bval additional data" and ``C`` becomes "additional data cval".
 The variable ``D`` becomes "dvaladditional data".
 
@@ -312,10 +313,10 @@ When you use this syntax, BitBake expects one or more strings.
 Surrounding spaces and spacing are preserved. Here is an example::
 
    FOO = "123 456 789 123456 123 456 123 456"
-   FOO_remove = "123"
-   FOO_remove = "456"
+   FOO:remove = "123"
+   FOO:remove = "456"
    FOO2 = " abc def ghi abcdef abc def abc def def"
-   FOO2_remove = "\
+   FOO2:remove = "\
        def \
        abc \
        ghi \
@@ -324,14 +325,14 @@ Surrounding spaces and spacing are preserved. Here is an example::
 The variable ``FOO`` becomes
 "  789 123456    " and ``FOO2`` becomes "    abcdef     ".
 
-Like "_append" and "_prepend", "_remove" is applied at variable
+Like ":append" and ":prepend", ":remove" is applied at variable
 expansion time.
 
 Override Style Operation Advantages
 -----------------------------------
 
-An advantage of the override style operations "_append", "_prepend", and
-"_remove" as compared to the "+=" and "=+" operators is that the
+An advantage of the override style operations ":append", ":prepend", and
+":remove" as compared to the "+=" and "=+" operators is that the
 override style operators provide guaranteed operations. For example,
 consider a class ``foo.bbclass`` that needs to add the value "val" to
 the variable ``FOO``, and a recipe that uses ``foo.bbclass`` as follows::
@@ -346,18 +347,18 @@ not what is desired::
    FOO += "val"
 
 If, on the other hand, ``foo.bbclass``
-uses the "_append" operator, then the final value of ``FOO`` will be
+uses the ":append" operator, then the final value of ``FOO`` will be
 "initial val", as intended::
 
-   FOO_append = " val"
+   FOO:append = " val"
 
 .. note::
 
-   It is never necessary to use "+=" together with "_append". The following
+   It is never necessary to use "+=" together with ":append". The following
    sequence of assignments appends "barbaz" to FOO::
 
-       FOO_append = "bar"
-       FOO_append = "baz"
+       FOO:append = "bar"
+       FOO:append = "baz"
 
 
    The only effect of changing the second assignment in the previous
@@ -378,8 +379,8 @@ You can find more out about variable flags in general in the
 
 You can define, append, and prepend values to variable flags. All the
 standard syntax operations previously mentioned work for variable flags
-except for override style syntax (i.e. "_prepend", "_append", and
-"_remove").
+except for override style syntax (i.e. ":prepend", ":append", and
+":remove").
 
 Here are some examples showing how to set variable flags::
 
@@ -496,14 +497,14 @@ Conditional Syntax (Overrides)
 
 BitBake uses :term:`OVERRIDES` to control what
 variables are overridden after BitBake parses recipes and configuration
-files. This section describes how you can use ``OVERRIDES`` as
+files. This section describes how you can use :term:`OVERRIDES` as
 conditional metadata, talks about key expansion in relationship to
-``OVERRIDES``, and provides some examples to help with understanding.
+:term:`OVERRIDES`, and provides some examples to help with understanding.
 
 Conditional Metadata
 --------------------
 
-You can use ``OVERRIDES`` to conditionally select a specific version of
+You can use :term:`OVERRIDES` to conditionally select a specific version of
 a variable and to conditionally append or prepend the value of a
 variable.
 
@@ -513,10 +514,10 @@ variable.
    underscores are not permitted in override names as they are used to
    separate overrides from each other and from the variable name.
 
--  *Selecting a Variable:* The ``OVERRIDES`` variable is a
+-  *Selecting a Variable:* The :term:`OVERRIDES` variable is a
    colon-character-separated list that contains items for which you want
    to satisfy conditions. Thus, if you have a variable that is
-   conditional on "arm", and "arm" is in ``OVERRIDES``, then the
+   conditional on "arm", and "arm" is in :term:`OVERRIDES`, then the
    "arm"-specific version of the variable is used rather than the
    non-conditional version. Here is an example::
 
@@ -525,7 +526,7 @@ variable.
       TEST_os = "osspecific"
       TEST_nooverride = "othercondvalue"
 
-   In this example, the ``OVERRIDES``
+   In this example, the :term:`OVERRIDES`
    variable lists three overrides: "architecture", "os", and "machine".
    The variable ``TEST`` by itself has a default value of "default". You
    select the os-specific version of the ``TEST`` variable by appending
@@ -538,36 +539,36 @@ variable.
    that value based on the architecture of the build::
 
       KBRANCH = "standard/base"
-      KBRANCH_qemuarm = "standard/arm-versatile-926ejs"
-      KBRANCH_qemumips = "standard/mti-malta32"
-      KBRANCH_qemuppc = "standard/qemuppc"
-      KBRANCH_qemux86 = "standard/common-pc/base"
-      KBRANCH_qemux86-64 = "standard/common-pc-64/base"
-      KBRANCH_qemumips64 = "standard/mti-malta64"
+      KBRANCH:qemuarm = "standard/arm-versatile-926ejs"
+      KBRANCH:qemumips = "standard/mti-malta32"
+      KBRANCH:qemuppc = "standard/qemuppc"
+      KBRANCH:qemux86 = "standard/common-pc/base"
+      KBRANCH:qemux86-64 = "standard/common-pc-64/base"
+      KBRANCH:qemumips64 = "standard/mti-malta64"
 
 -  *Appending and Prepending:* BitBake also supports append and prepend
    operations to variable values based on whether a specific item is
-   listed in ``OVERRIDES``. Here is an example::
+   listed in :term:`OVERRIDES`. Here is an example::
 
       DEPENDS = "glibc ncurses"
       OVERRIDES = "machine:local"
-      DEPENDS_append_machine = "libmad"
+      DEPENDS:append:machine = "libmad"
 
-   In this example, ``DEPENDS`` becomes "glibc ncurses libmad".
+   In this example, :term:`DEPENDS` becomes "glibc ncurses libmad".
 
    Again, using an OpenEmbedded metadata-based kernel recipe file as an
    example, the following lines will conditionally append to the
    ``KERNEL_FEATURES`` variable based on the architecture::
 
-      KERNEL_FEATURES_append = " ${KERNEL_EXTRA_FEATURES}"
-      KERNEL_FEATURES_append_qemux86=" cfg/sound.scc cfg/paravirt_kvm.scc"
-      KERNEL_FEATURES_append_qemux86-64=" cfg/sound.scc cfg/paravirt_kvm.scc"
+      KERNEL_FEATURES:append = " ${KERNEL_EXTRA_FEATURES}"
+      KERNEL_FEATURES:append:qemux86=" cfg/sound.scc cfg/paravirt_kvm.scc"
+      KERNEL_FEATURES:append:qemux86-64=" cfg/sound.scc cfg/paravirt_kvm.scc"
 
 -  *Setting a Variable for a Single Task:* BitBake supports setting a
    variable just for the duration of a single task. Here is an example::
 
       FOO_task-configure = "val 1"
-      FOO_task-compile = "val 2"
+      FOO:task-compile = "val 2"
 
    In the
    previous example, ``FOO`` has the value "val 1" while the
@@ -580,9 +581,9 @@ variable.
    ``do_compile`` task.
 
    You can also use this syntax with other combinations (e.g.
-   "``_prepend``") as shown in the following example::
+   "``:prepend``") as shown in the following example::
 
-      EXTRA_OEMAKE_prepend_task-compile = "${PARALLEL_MAKE} "
+      EXTRA_OEMAKE:prepend:task-compile = "${PARALLEL_MAKE} "
 
 Key Expansion
 -------------
@@ -612,33 +613,33 @@ users.
 
 There is often confusion concerning the order in which overrides and
 various "append" operators take effect. Recall that an append or prepend
-operation using "_append" and "_prepend" does not result in an immediate
+operation using ":append" and ":prepend" does not result in an immediate
 assignment as would "+=", ".=", "=+", or "=.". Consider the following
 example::
 
    OVERRIDES = "foo"
    A = "Z"
-   A_foo_append = "X"
+   A:foo:append = "X"
 
 For this case,
 ``A`` is unconditionally set to "Z" and "X" is unconditionally and
-immediately appended to the variable ``A_foo``. Because overrides have
-not been applied yet, ``A_foo`` is set to "X" due to the append and
+immediately appended to the variable ``A:foo``. Because overrides have
+not been applied yet, ``A:foo`` is set to "X" due to the append and
 ``A`` simply equals "Z".
 
 Applying overrides, however, changes things. Since "foo" is listed in
-``OVERRIDES``, the conditional variable ``A`` is replaced with the "foo"
-version, which is equal to "X". So effectively, ``A_foo`` replaces
+:term:`OVERRIDES`, the conditional variable ``A`` is replaced with the "foo"
+version, which is equal to "X". So effectively, ``A:foo`` replaces
 ``A``.
 
 This next example changes the order of the override and the append::
 
    OVERRIDES = "foo"
    A = "Z"
-   A_append_foo = "X"
+   A:append:foo = "X"
 
 For this case, before
-overrides are handled, ``A`` is set to "Z" and ``A_append_foo`` is set
+overrides are handled, ``A`` is set to "Z" and ``A:append:foo`` is set
 to "X". Once the override for "foo" is applied, however, ``A`` gets
 appended with "X". Consequently, ``A`` becomes "ZX". Notice that spaces
 are not appended.
@@ -648,21 +649,21 @@ back as in the first example::
 
    OVERRIDES = "foo"
    A = "Y"
-   A_foo_append = "Z"
-   A_foo_append = "X"
+   A:foo:append = "Z"
+   A:foo:append = "X"
 
 For this case, before any overrides are resolved,
 ``A`` is set to "Y" using an immediate assignment. After this immediate
-assignment, ``A_foo`` is set to "Z", and then further appended with "X"
+assignment, ``A:foo`` is set to "Z", and then further appended with "X"
 leaving the variable set to "ZX". Finally, applying the override for
 "foo" results in the conditional variable ``A`` becoming "ZX" (i.e.
-``A`` is replaced with ``A_foo``).
+``A`` is replaced with ``A:foo``).
 
 This final example mixes in some varying operators::
 
    A = "1"
-   A_append = "2"
-   A_append = "3"
+   A:append = "2"
+   A:append = "3"
    A += "4"
    A .= "5"
 
@@ -670,7 +671,7 @@ For this case, the type of append
 operators are affecting the order of assignments as BitBake passes
 through the code multiple times. Initially, ``A`` is set to "1 45"
 because of the three statements that use immediate operators. After
-these assignments are made, BitBake applies the "_append" operations.
+these assignments are made, BitBake applies the ":append" operations.
 Those operations result in ``A`` becoming "1 4523".
 
 Sharing Functionality
@@ -686,7 +687,7 @@ share the task.
 
 This section presents the mechanisms BitBake provides to allow you to
 share functionality between recipes. Specifically, the mechanisms
-include ``include``, ``inherit``, ``INHERIT``, and ``require``
+include ``include``, ``inherit``, :term:`INHERIT`, and ``require``
 directives.
 
 Locating Include and Class Files
@@ -702,7 +703,7 @@ current directory for ``include`` and ``require`` directives.
 
 In order for include and class files to be found by BitBake, they need
 to be located in a "classes" subdirectory that can be found in
-``BBPATH``.
+:term:`BBPATH`.
 
 ``inherit`` Directive
 ---------------------
@@ -725,7 +726,7 @@ functionality for using Autotools that could be shared across recipes::
    inherit autotools
 
 In this case, BitBake would search for the directory
-``classes/autotools.bbclass`` in ``BBPATH``.
+``classes/autotools.bbclass`` in :term:`BBPATH`.
 
 .. note::
 
@@ -752,7 +753,7 @@ parsed. One way to achieve a conditional inherit in this case is to use
 overrides::
 
    VARIABLE = ""
-   VARIABLE_someoverride = "myclass"
+   VARIABLE:someoverride = "myclass"
 
 Another method is by using anonymous Python. Here is an example::
 
@@ -780,7 +781,7 @@ BitBake understands the ``include`` directive. This directive causes
 BitBake to parse whatever file you specify, and to insert that file at
 that location. The directive is much like its equivalent in Make except
 that if the path specified on the include line is a relative path,
-BitBake locates the first file it can find within ``BBPATH``.
+BitBake locates the first file it can find within :term:`BBPATH`.
 
 The include directive is a more generic method of including
 functionality as compared to the :ref:`inherit <bitbake-user-manual/bitbake-user-manual-metadata:\`\`inherit\`\` directive>`
@@ -822,7 +823,7 @@ does not suit a ``.bbclass`` file.
 
 Similar to how BitBake handles :ref:`include <bitbake-user-manual/bitbake-user-manual-metadata:\`\`include\`\` directive>`, if
 the path specified on the require line is a relative path, BitBake
-locates the first file it can find within ``BBPATH``.
+locates the first file it can find within :term:`BBPATH`.
 
 As an example, suppose you have two versions of a recipe (e.g.
 ``foo_1.2.2.bb`` and ``foo_2.0.0.bb``) where each version contains some
@@ -851,7 +852,7 @@ As an example, suppose you needed to inherit a class file called
 This configuration directive causes the named class to be inherited at
 the point of the directive during parsing. As with the ``inherit``
 directive, the ``.bbclass`` file must be located in a "classes"
-subdirectory in one of the directories specified in ``BBPATH``.
+subdirectory in one of the directories specified in :term:`BBPATH`.
 
 .. note::
 
@@ -907,7 +908,7 @@ rules. The scripts are executed by ``/bin/sh``, which may not be a bash
 shell but might be something such as ``dash``. You should not use
 Bash-specific script (bashisms).
 
-Overrides and override-style operators like ``_append`` and ``_prepend``
+Overrides and override-style operators like ``:append`` and ``:prepend``
 can also be applied to shell functions. Most commonly, this application
 would be used in a ``.bbappend`` file to modify functions in the main
 recipe. It can also be used to modify functions inherited from classes.
@@ -919,7 +920,7 @@ As an example, consider the following::
        fn
    }
 
-   fn_prepend() {
+   fn:prepend() {
        bbplain second
    }
 
@@ -927,7 +928,7 @@ As an example, consider the following::
        bbplain third
    }
 
-   do_foo_append() {
+   do_foo:append() {
        bbplain fourth
    }
 
@@ -977,7 +978,7 @@ override-style operators to BitBake-style Python functions.
 
 As an example, consider the following::
 
-   python do_foo_prepend() {
+   python do_foo:prepend() {
        bb.plain("first")
    }
 
@@ -985,7 +986,7 @@ As an example, consider the following::
        bb.plain("second")
    }
 
-   python do_foo_append() {
+   python do_foo:append() {
        bb.plain("third")
    }
 
@@ -1015,7 +1016,7 @@ is an example::
    SOMECONDITION = "1"
    DEPENDS = "${@get_depends(d)}"
 
-This would result in ``DEPENDS`` containing ``dependencywithcond``.
+This would result in :term:`DEPENDS` containing ``dependencywithcond``.
 
 Here are some things to know about Python functions:
 
@@ -1134,12 +1135,12 @@ equivalent to the following snippet::
 values set for the variables within the anonymous functions become
 available to tasks, which always run after parsing.
 
-Overrides and override-style operators such as "``_append``" are applied
+Overrides and override-style operators such as "``:append``" are applied
 before anonymous functions run. In the following example, ``FOO`` ends
 up with the value "foo from anonymous"::
 
    FOO = "foo"
-   FOO_append = " from outside"
+   FOO:append = " from outside"
 
    python () {
        d.setVar("FOO", "foo from anonymous")
@@ -1164,7 +1165,7 @@ To understand the benefits of this feature, consider the basic scenario
 where a class defines a task function and your recipe inherits the
 class. In this basic scenario, your recipe inherits the task function as
 defined in the class. If desired, your recipe can add to the start and
-end of the function by using the "_prepend" or "_append" operations
+end of the function by using the ":prepend" or ":append" operations
 respectively, or it can redefine the function completely. However, if it
 redefines the function, there is no means for it to call the class
 version of the function. ``EXPORT_FUNCTIONS`` provides a mechanism that
@@ -1382,7 +1383,7 @@ Sometimes, it is useful to be able to obtain information from the
 original execution environment. BitBake saves a copy of the original
 environment into a special variable named :term:`BB_ORIGENV`.
 
-The ``BB_ORIGENV`` variable returns a datastore object that can be
+The :term:`BB_ORIGENV` variable returns a datastore object that can be
 queried using the standard datastore operators such as
 ``getVar(, False)``. The datastore object is useful, for example, to
 find the original ``DISPLAY`` variable. Here is an example::
@@ -1467,7 +1468,7 @@ functionality of the task:
          can result in unpredictable behavior.
 
       -  Setting the varflag to a value greater than the value used in
-         the ``BB_NUMBER_THREADS`` variable causes ``number_threads`` to
+         the :term:`BB_NUMBER_THREADS` variable causes ``number_threads`` to
          have no effect.
 
 -  ``[postfuncs]``: List of functions to call after the completion of
@@ -1537,7 +1538,7 @@ intent is to make it easy to do things like email notification on build
 failures.
 
 Following is an example event handler that prints the name of the event
-and the content of the ``FILE`` variable::
+and the content of the :term:`FILE` variable::
 
    addhandler myclass_eventhandler
    python myclass_eventhandler() {
@@ -1576,7 +1577,7 @@ might have an interest in viewing:
 
 -  ``bb.event.ConfigParsed()``: Fired when the base configuration; which
    consists of ``bitbake.conf``, ``base.bbclass`` and any global
-   ``INHERIT`` statements; has been parsed. You can see multiple such
+   :term:`INHERIT` statements; has been parsed. You can see multiple such
    events when each of the workers parse the base configuration or if
    the server changes configuration and reparses. Any given datastore
    only has one such event executed against it, however. If
@@ -1733,13 +1734,13 @@ Build Dependencies
 
 BitBake uses the :term:`DEPENDS` variable to manage
 build time dependencies. The ``[deptask]`` varflag for tasks signifies
-the task of each item listed in ``DEPENDS`` that must complete before
+the task of each item listed in :term:`DEPENDS` that must complete before
 that task can be executed. Here is an example::
 
    do_configure[deptask] = "do_populate_sysroot"
 
 In this example, the ``do_populate_sysroot`` task
-of each item in ``DEPENDS`` must complete before ``do_configure`` can
+of each item in :term:`DEPENDS` must complete before ``do_configure`` can
 execute.
 
 Runtime Dependencies
@@ -1748,8 +1749,8 @@ Runtime Dependencies
 BitBake uses the :term:`PACKAGES`, :term:`RDEPENDS`, and :term:`RRECOMMENDS`
 variables to manage runtime dependencies.
 
-The ``PACKAGES`` variable lists runtime packages. Each of those packages
-can have ``RDEPENDS`` and ``RRECOMMENDS`` runtime dependencies. The
+The :term:`PACKAGES` variable lists runtime packages. Each of those packages
+can have :term:`RDEPENDS` and :term:`RRECOMMENDS` runtime dependencies. The
 ``[rdeptask]`` flag for tasks is used to signify the task of each item
 runtime dependency which must have completed before that task can be
 executed. ::
@@ -1757,9 +1758,9 @@ executed. ::
    do_package_qa[rdeptask] = "do_packagedata"
 
 In the previous
-example, the ``do_packagedata`` task of each item in ``RDEPENDS`` must
+example, the ``do_packagedata`` task of each item in :term:`RDEPENDS` must
 have completed before ``do_package_qa`` can execute.
-Although ``RDEPENDS`` contains entries from the
+Although :term:`RDEPENDS` contains entries from the
 runtime dependency namespace, BitBake knows how to map them back
 to the build-time dependency namespace, in which the tasks are defined.
 
@@ -1802,7 +1803,7 @@ Inter-Task Dependencies
 BitBake uses the ``[depends]`` flag in a more generic form to manage
 inter-task dependencies. This more generic form allows for
 inter-dependency checks for specific tasks rather than checks for the
-data in ``DEPENDS``. Here is an example::
+data in :term:`DEPENDS`. Here is an example::
 
    do_patch[depends] = "quilt-native:do_populate_sysroot"
 

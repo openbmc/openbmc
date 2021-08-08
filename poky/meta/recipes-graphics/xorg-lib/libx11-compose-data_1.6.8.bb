@@ -23,7 +23,7 @@ EXTRA_OECONF += "--disable-xkb"
 
 PACKAGES = "${PN}"
 
-FILES_${PN} = "${datadir}/X11/locale ${libdir}/X11/locale"
+FILES:${PN} = "${datadir}/X11/locale ${libdir}/X11/locale"
 
 do_compile() {
     oe_runmake -C nls

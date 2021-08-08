@@ -20,7 +20,7 @@ S = "${WORKDIR}/git"
 
 EXTRA_OECONF = "--with-systemd=${systemd_system_unitdir} --without-logger"
 
-do_install_append () {
+do_install:append () {
        install -d ${D}${sysconfdir}
        install -m 644 ${S}/syslog.conf ${D}${sysconfdir}/syslog.conf
        install -d ${D}${sysconfdir}/init.d
@@ -28,21 +28,21 @@ do_install_append () {
 }
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "syslogd.service"
+SYSTEMD_SERVICE:${PN} = "syslogd.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
 INITSCRIPT_NAME = "syslog"
-CONFFILES_${PN} = "${sysconfdir}/syslog.conf"
-RCONFLICTS_${PN} = "rsyslog busybox-syslog syslog-ng"
+CONFFILES:${PN} = "${sysconfdir}/syslog.conf"
+RCONFLICTS:${PN} = "rsyslog busybox-syslog syslog-ng"
 
-FILES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES','systemd','${exec_prefix}/lib/tmpfiles.d/sysklogd.conf', '', d)}"
+FILES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES','systemd','${exec_prefix}/lib/tmpfiles.d/sysklogd.conf', '', d)}"
 
 ALTERNATIVE_PRIORITY = "100"
 
-ALTERNATIVE_${PN}-doc = "syslogd.8"
+ALTERNATIVE:${PN}-doc = "syslogd.8"
 ALTERNATIVE_LINK_NAME[syslogd.8] = "${mandir}/man8/syslogd.8"
 
-pkg_prerm_${PN} () {
+pkg_prerm:${PN} () {
 	if test "x$D" = "x"; then
 	if test "$1" = "upgrade" -o "$1" = "remove"; then
 		/etc/init.d/syslog stop || :

@@ -29,17 +29,17 @@ do_install(){
 
 PACKAGE="${PN} ${PN}-dbg ${PN}-doc"
 
-FILES_${PN} = "\
+FILES:${PN} = "\
     ${sbindir}/* \
     ${base_sbindir}/* \
     ${libdir}/* \
 "
 
-FILES_${PN}-doc = "\
+FILES:${PN}-doc = "\
     ${mandir}/man8/* \
 "
 
-FILES_${PN}-dbg = "\
+FILES:${PN}-dbg = "\
     ${base_sbindir}/.debug/* \
     ${sbindir}/.debug/* \
     ${libdir}/.debug/* \

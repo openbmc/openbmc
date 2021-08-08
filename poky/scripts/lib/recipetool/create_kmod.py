@@ -113,7 +113,7 @@ class KernelModuleRecipeHandler(RecipeHandler):
                 kdirpath, _ = check_target(compile_lines, install=False)
 
             if manual_install or not install_lines:
-                lines_after.append('EXTRA_OEMAKE_append_task-install = " -C ${STAGING_KERNEL_DIR} M=${S}"')
+                lines_after.append('EXTRA_OEMAKE:append:task-install = " -C ${STAGING_KERNEL_DIR} M=${S}"')
             elif install_target and install_target != 'modules_install':
                 lines_after.append('MODULES_INSTALL_TARGET = "install"')
 

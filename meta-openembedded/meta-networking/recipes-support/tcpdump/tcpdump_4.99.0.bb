@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=5eb289217c160e2920d2e35bddc36453"
 
 DEPENDS = "libpcap"
 
-RDEPENDS_${PN}-ptest += " make perl \
+RDEPENDS:${PN}-ptest += " make perl \
 	perl-module-file-basename \
 	perl-module-file-spec \
 	perl-module-file-spec-unix \
@@ -44,14 +44,14 @@ PACKAGECONFIG[smb] = "--enable-smb,--disable-smb"
 
 EXTRA_AUTORECONF += "-I m4"
 
-do_configure_prepend() {
+do_configure:prepend() {
     mkdir -p ${S}/m4
     if [ -f aclocal.m4 ]; then
         mv aclocal.m4 ${S}/m4
     fi
 }
 
-do_install_append() {
+do_install:append() {
     # make install installs an unneeded extra copy of the tcpdump binary
     rm ${D}${bindir}/tcpdump.${PV}
 }

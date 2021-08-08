@@ -39,16 +39,16 @@ PACKAGECONFIG ??= "tcp-wrappers"
 PACKAGECONFIG[tcp-wrappers] = ",,tcp-wrappers"
 
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
-RDEPENDS_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-listfile', '', d)}"
+RDEPENDS:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-listfile', '', d)}"
 PAMLIB = "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '-L${STAGING_BASELIBDIR} -lpam', '', d)}"
 WRAPLIB = "${@bb.utils.contains('PACKAGECONFIG', 'tcp-wrappers', '-lwrap', '', d)}"
 NOPAM_SRC ="${@bb.utils.contains('PACKAGECONFIG', 'tcp-wrappers', 'file://nopam-with-tcp_wrappers.patch', 'file://nopam.patch', d)}"
 
 inherit update-rc.d useradd systemd
 
-CONFFILES_${PN} = "${sysconfdir}/vsftpd.conf"
-LDFLAGS_append =" -lcrypt -lcap"
-CFLAGS_append_libc-musl = " -D_GNU_SOURCE -include fcntl.h"
+CONFFILES:${PN} = "${sysconfdir}/vsftpd.conf"
+LDFLAGS:append =" -lcrypt -lcap"
+CFLAGS:append:libc-musl = " -D_GNU_SOURCE -include fcntl.h"
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
 do_configure() {
@@ -95,17 +95,17 @@ do_install() {
 }
 
 INITSCRIPT_PACKAGES = "${PN}"
-INITSCRIPT_NAME_${PN} = "vsftpd"
-INITSCRIPT_PARAMS_${PN} = "defaults 80"
+INITSCRIPT_NAME:${PN} = "vsftpd"
+INITSCRIPT_PARAMS:${PN} = "defaults 80"
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --home-dir /var/lib/ftp --no-create-home -g ftp \
+USERADD_PARAM:${PN} = "--system --home-dir /var/lib/ftp --no-create-home -g ftp \
                        --shell /bin/false ftp "
-GROUPADD_PARAM_${PN} = "-r ftp"
+GROUPADD_PARAM:${PN} = "-r ftp"
 
-SYSTEMD_SERVICE_${PN} = "vsftpd.service"
+SYSTEMD_SERVICE:${PN} = "vsftpd.service"
 
-pkg_postinst_${PN}() {
+pkg_postinst:${PN}() {
     if [ -z "$D" ]; then
         if type systemd-tmpfiles >/dev/null; then
             systemd-tmpfiles --create

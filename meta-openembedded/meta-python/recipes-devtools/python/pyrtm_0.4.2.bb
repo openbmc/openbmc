@@ -12,25 +12,25 @@ inherit pypi setuptools3
 
 PACKAGES =+ "${PN}-tests ${PN}-samples"
 
-FILES_${PN}-samples += " \
+FILES:${PN}-samples += " \
     ${PYTHON_SITEPACKAGES_DIR}/rtm/samples \
 "
 
-FILES_${PN}-tests += " \
+FILES:${PN}-tests += " \
     ${PYTHON_SITEPACKAGES_DIR}/rtm/tests \
 "
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-json \
     ${PYTHON_PN}-logging \
     ${PYTHON_PN}-netclient \
 "
 
-RDEPENDS_${PN}-samples += " \
+RDEPENDS:${PN}-samples += " \
     ${PN} \
 "
 
-RDEPENDS_${PN}-tests += " \
+RDEPENDS:${PN}-tests += " \
     ${PN} \
     ${PYTHON_PN}-unittest \
 "

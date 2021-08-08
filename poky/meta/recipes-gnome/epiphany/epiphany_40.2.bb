@@ -25,5 +25,5 @@ SRC_URI[archive.sha256sum] = "75119e22065657cf70ef2b603d4f73835573bd034f1e618c0f
 # Developer mode enables debugging
 PACKAGECONFIG[developer-mode] = "-Ddeveloper_mode=true,-Ddeveloper_mode=false"
 
-FILES_${PN} += "${datadir}/dbus-1 ${datadir}/gnome-shell/search-providers ${datadir}/metainfo"
-RDEPENDS_${PN} = "iso-codes adwaita-icon-theme gsettings-desktop-schemas"
+FILES:${PN} += "${datadir}/dbus-1 ${datadir}/gnome-shell/search-providers ${datadir}/metainfo"
+RDEPENDS:${PN} = "iso-codes adwaita-icon-theme gsettings-desktop-schemas"

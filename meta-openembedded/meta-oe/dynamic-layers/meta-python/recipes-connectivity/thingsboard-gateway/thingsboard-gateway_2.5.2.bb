@@ -14,7 +14,7 @@ inherit pypi setuptools3
 
 PYPI_PACKAGE = "thingsboard-gateway"
 
-RDEPENDS_${PN} += " python3-jsonpath-rw \
+RDEPENDS:${PN} += " python3-jsonpath-rw \
                     python3-regex \
                     python3-paho-mqtt \
                     python3-pyyaml \
@@ -45,14 +45,14 @@ SRC_URI += "file://bacnet.json \
 inherit systemd
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "thingsboard-gateway.service"
+SYSTEMD_SERVICE:${PN} = "thingsboard-gateway.service"
 
-FILES_${PN} += "/etc \
+FILES:${PN} += "/etc \
                 /lib \
                 /usr \
 "
 
-do_install_append(){
+do_install:append(){
 
     install -d ${D}${sysconfdir}/thingsboard-gateway/config
 

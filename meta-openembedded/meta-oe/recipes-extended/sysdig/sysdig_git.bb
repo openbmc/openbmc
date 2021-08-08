@@ -10,16 +10,16 @@ inherit cmake pkgconfig
 
 #OECMAKE_GENERATOR = "Unix Makefiles"
 JIT ?= "jit"
-JIT_mipsarchn32 = ""
-JIT_mipsarchn64 = ""
-JIT_riscv64 = ""
-JIT_riscv32 = ""
-JIT_powerpc = ""
-JIT_powerpc64le = ""
-JIT_powerpc64 = ""
+JIT:mipsarchn32 = ""
+JIT:mipsarchn64 = ""
+JIT:riscv64 = ""
+JIT:riscv32 = ""
+JIT:powerpc = ""
+JIT:powerpc64le = ""
+JIT:powerpc64 = ""
 
 DEPENDS += "libb64 lua${JIT} zlib c-ares grpc-native grpc curl ncurses jsoncpp tbb jq openssl elfutils protobuf protobuf-native jq-native"
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 SRC_URI = "git://github.com/draios/sysdig.git;branch=dev \
            file://0001-fix-build-with-LuaJIT-2.1-betas.patch \
@@ -39,7 +39,7 @@ EXTRA_OECMAKE = "\
                 -DLUA_LIBRARY=libluajit-5.1.so \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${DIR_ETC}/* \
     ${datadir}/zsh/* \
     ${prefix}/src/*  \
@@ -48,8 +48,8 @@ FILES_${PN} += " \
 # It should be fixed in sysdig, until then disable
 # on musl
 # Something like this https://code.videolan.org/ePirat/vlc/-/commit/01fd9fe4c7f6c5558f7345f38abf0152e17853ab  is needed to fix it
-COMPATIBLE_HOST_libc-musl = "null"
-COMPATIBLE_HOST_mips = "null"
-COMPATIBLE_HOST_riscv64 = "null"
-COMPATIBLE_HOST_riscv32 = "null"
-COMPATIBLE_HOST_powerpc = "null"
+COMPATIBLE_HOST:libc-musl = "null"
+COMPATIBLE_HOST:mips = "null"
+COMPATIBLE_HOST:riscv64 = "null"
+COMPATIBLE_HOST:riscv32 = "null"
+COMPATIBLE_HOST:powerpc = "null"

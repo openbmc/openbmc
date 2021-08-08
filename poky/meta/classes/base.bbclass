@@ -66,7 +66,7 @@ oe_runmake() {
 }
 
 
-def base_dep_prepend(d):
+def get_base_dep(d):
     if d.getVar('INHIBIT_DEFAULT_DEPS', False):
         return ""
     return "${BASE_DEFAULT_DEPS}"
@@ -74,10 +74,10 @@ def base_dep_prepend(d):
 BASE_DEFAULT_DEPS = "virtual/${TARGET_PREFIX}gcc virtual/${TARGET_PREFIX}compilerlibs virtual/libc"
 
 BASEDEPENDS = ""
-BASEDEPENDS_class-target = "${@base_dep_prepend(d)}"
-BASEDEPENDS_class-nativesdk = "${@base_dep_prepend(d)}"
+BASEDEPENDS:class-target = "${@get_base_dep(d)}"
+BASEDEPENDS:class-nativesdk = "${@get_base_dep(d)}"
 
-DEPENDS_prepend="${BASEDEPENDS} "
+DEPENDS:prepend="${BASEDEPENDS} "
 
 FILESPATH = "${@base_set_filespath(["${FILE_DIRNAME}/${BP}", "${FILE_DIRNAME}/${BPN}", "${FILE_DIRNAME}/files"], d)}"
 # THISDIR only works properly with imediate expansion as it has to run
@@ -91,7 +91,7 @@ def extra_path_elements(d):
         path = path + "${STAGING_BINDIR_NATIVE}/" + e + ":"
     return path
 
-PATH_prepend = "${@extra_path_elements(d)}"
+PATH:prepend = "${@extra_path_elements(d)}"
 
 def get_lic_checksum_file_list(d):
     filelist = []
@@ -481,8 +481,8 @@ python () {
                             % (d.getVar('PN'), flag, 's' if len(intersec) > 1 else '', ' '.join(intersec)))
 
         appendVar('DEPENDS', extradeps)
-        appendVar('RDEPENDS_${PN}', extrardeps)
-        appendVar('RRECOMMENDS_${PN}', extrarrecs)
+        appendVar('RDEPENDS:${PN}', extrardeps)
+        appendVar('RRECOMMENDS:${PN}', extrarrecs)
         appendVar('PACKAGECONFIG_CONFARGS', extraconf)
 
     pn = d.getVar('PN')

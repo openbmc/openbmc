@@ -25,10 +25,10 @@ PACKAGECONFIG[other] = " \
     --disable-facebook --disable-foursquare --disable-exchange --disable-flickr --disable-google --disable-imap-smtp --disable-owncloud --disable-windows-live, \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${libdir}/goa-1.0/web-extensions/*.so \
 "
 
 # looked into pkg-config file: it is not a bug - they mean it
-FILES_${PN}-dev += "${libdir}/goa-1.0/include"
+FILES:${PN}-dev += "${libdir}/goa-1.0/include"

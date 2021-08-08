@@ -51,9 +51,9 @@ syn region bbString             matchgroup=bbQuote start=+'+ skip=+\\$+ end=+'+ 
 syn match bbExport            "^export" nextgroup=bbIdentifier skipwhite
 syn keyword bbExportFlag        export contained nextgroup=bbIdentifier skipwhite
 syn match bbIdentifier          "[a-zA-Z0-9\-_\.\/\+]\+" display contained
-syn match bbVarDeref            "${[a-zA-Z0-9\-_\.\/\+]\+}" contained
+syn match bbVarDeref            "${[a-zA-Z0-9\-_:\.\/\+]\+}" contained
 syn match bbVarEq               "\(:=\|+=\|=+\|\.=\|=\.\|?=\|??=\|=\)" contained nextgroup=bbVarValue
-syn match bbVarDef              "^\(export\s*\)\?\([a-zA-Z0-9\-_\.\/\+]\+\(_[${}a-zA-Z0-9\-_\.\/\+]\+\)\?\)\s*\(:=\|+=\|=+\|\.=\|=\.\|?=\|??=\|=\)\@=" contains=bbExportFlag,bbIdentifier,bbVarDeref nextgroup=bbVarEq
+syn match bbVarDef              "^\(export\s*\)\?\([a-zA-Z0-9\-_\.\/\+][${}a-zA-Z0-9\-_:\.\/\+]*\)\s*\(:=\|+=\|=+\|\.=\|=\.\|?=\|??=\|=\)\@=" contains=bbExportFlag,bbIdentifier,bbOverrideOperator,bbVarDeref nextgroup=bbVarEq
 syn match bbVarValue            ".*$" contained contains=bbString,bbVarDeref,bbVarPyValue
 syn region bbVarPyValue         start=+${@+ skip=+\\$+ end=+}+ contained contains=@python
 
@@ -77,13 +77,15 @@ syn keyword bbOEFunctions       do_fetch do_unpack do_patch do_configure do_comp
 " Generic Functions
 syn match bbFunction            "\h[0-9A-Za-z_\-\.]*" display contained contains=bbOEFunctions
 
+syn keyword bbOverrideOperator  append prepend contained
+
 " BitBake shell metadata
 syn include @shell syntax/sh.vim
 if exists("b:current_syntax")
   unlet b:current_syntax
 endif
 syn keyword bbShFakeRootFlag    fakeroot contained
-syn match bbShFuncDef           "^\(fakeroot\s*\)\?\([\.0-9A-Za-z_${}\-\.]\+\)\(python\)\@<!\(\s*()\s*\)\({\)\@=" contains=bbShFakeRootFlag,bbFunction,bbVarDeref,bbDelimiter nextgroup=bbShFuncRegion skipwhite
+syn match bbShFuncDef           "^\(fakeroot\s*\)\?\([\.0-9A-Za-z_:${}\-\.]\+\)\(python\)\@<!\(\s*()\s*\)\({\)\@=" contains=bbShFakeRootFlag,bbFunction,bbOverrideOperator,bbVarDeref,bbDelimiter nextgroup=bbShFuncRegion skipwhite
 syn region bbShFuncRegion       matchgroup=bbDelimiter start="{\s*$" end="^}\s*$" contained contains=@shell
 
 " Python value inside shell functions
@@ -91,7 +93,7 @@ syn region shDeref         start=+${@+ skip=+\\$+ excludenl end=+}+ contained co
 
 " BitBake python metadata
 syn keyword bbPyFlag            python contained
-syn match bbPyFuncDef           "^\(fakeroot\s*\)\?\(python\)\(\s\+[0-9A-Za-z_${}\-\.]\+\)\?\(\s*()\s*\)\({\)\@=" contains=bbShFakeRootFlag,bbPyFlag,bbFunction,bbVarDeref,bbDelimiter nextgroup=bbPyFuncRegion skipwhite
+syn match bbPyFuncDef           "^\(fakeroot\s*\)\?\(python\)\(\s\+[0-9A-Za-z_:${}\-\.]\+\)\?\(\s*()\s*\)\({\)\@=" contains=bbShFakeRootFlag,bbPyFlag,bbFunction,bbOverrideOperator,bbVarDeref,bbDelimiter nextgroup=bbPyFuncRegion skipwhite
 syn region bbPyFuncRegion       matchgroup=bbDelimiter start="{\s*$" end="^}\s*$" contained contains=@python
 
 " BitBake 'def'd python functions
@@ -122,5 +124,6 @@ hi def link bbStatement         Statement
 hi def link bbStatementRest     Identifier
 hi def link bbOEFunctions       Special
 hi def link bbVarPyValue        PreProc
+hi def link bbOverrideOperator  Operator
 
 let b:current_syntax = "bb"

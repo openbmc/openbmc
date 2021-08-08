@@ -7,8 +7,8 @@ SECTION = "libs"
 DEPENDS = "virtual/libintl"
 
 LICENSE = "LGPLv2.1+ & GPLv2+"
-LICENSE_${PN} = "GPLv2+"
-LICENSE_lib${BPN} = "LGPLv2.1+"
+LICENSE:${PN} = "GPLv2+"
+LICENSE:lib${BPN} = "LGPLv2.1+"
 LIC_FILES_CHKSUM = "file://doc/COPYING;md5=2d0aa14b3fce4694e4f615e30186335f \
                     file://doc/COPYING.LGPL;md5=b8d31f339300bc239d73461d68e77b9c \
                     file://tools/attr.c;endline=17;md5=be0403261f0847e5f43ed5b08d19593c \
@@ -22,10 +22,10 @@ inherit ptest update-alternatives autotools gettext
 
 PACKAGES =+ "lib${BPN}"
 
-FILES_lib${BPN} = "${libdir}/lib*${SOLIBS}"
+FILES:lib${BPN} = "${libdir}/lib*${SOLIBS}"
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN} = "setfattr"
+ALTERNATIVE:${PN} = "setfattr"
 ALTERNATIVE_TARGET[setfattr] = "${bindir}/setfattr"
 
 PTEST_BUILD_HOST_FILES = "builddefs"
@@ -48,7 +48,7 @@ do_install_ptest() {
 	cp -rf ${S}/test/ ${D}${PTEST_PATH}
 }
 
-RDEPENDS_${PN}-ptest = "attr \
+RDEPENDS:${PN}-ptest = "attr \
                         coreutils \
                         perl-module-filehandle \
                         perl-module-getopt-std \

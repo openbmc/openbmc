@@ -24,9 +24,9 @@ inherit autotools pkgconfig update-rc.d
 
 LCD_DRIVERS ?= "all,!irman,!svga${SERIALVFD}"
 SERIALVFD ?= ""
-SERIALVFD_libc-musl = ",!serialVFD"
-SERIALVFD_libc-musl_x86 = ""
-SERIALVFD_libc-musl_x86-64 = ""
+SERIALVFD:libc-musl = ",!serialVFD"
+SERIALVFD:libc-musl:x86 = ""
+SERIALVFD:libc-musl:x86-64 = ""
 
 LCD_DEFAULT_DRIVER ?= "curses"
 
@@ -37,7 +37,7 @@ PACKAGECONFIG[g15] = ",,libg15 g15daemon libg15render,"
 PACKAGECONFIG[hid] = "--enable-libhid,--disable-libhid,libhid"
 PACKAGECONFIG[png] = "--enable-libpng,--disable-libpng,libpng"
 
-LCD_DRIVERS_append = "${@bb.utils.contains('PACKAGECONFIG', 'g15', '', ',!g15', d)}"
+LCD_DRIVERS:append = "${@bb.utils.contains('PACKAGECONFIG', 'g15', '', ',!g15', d)}"
 
 EXTRA_OECONF = "--enable-drivers='${LCD_DRIVERS}'"
 
@@ -74,31 +74,31 @@ do_install () {
 
 PACKAGES =+ "lcdd lcdvc"
 
-RRECOMMENDS_${PN} = "lcdd"
+RRECOMMENDS:${PN} = "lcdd"
 
-FILES_lcdd = "${sysconfdir}/LCDd.conf \
+FILES:lcdd = "${sysconfdir}/LCDd.conf \
     ${sbindir}/LCDd \
     ${sysconfdir}/init.d/lcdd"
 
-CONFFILES_lcdd = "${sysconfdir}/LCDd.conf"
-CONFFILES_${PN} = "${sysconfdir}/lcdproc.conf"
-CONFFILES_lcdvc = "${sysconfdir}/lcdvc.conf"
-FILES_lcdvc = "${sysconfdir}/lcdvc.conf ${sbindir}/lcdvc"
+CONFFILES:lcdd = "${sysconfdir}/LCDd.conf"
+CONFFILES:${PN} = "${sysconfdir}/lcdproc.conf"
+CONFFILES:lcdvc = "${sysconfdir}/lcdvc.conf"
+FILES:lcdvc = "${sysconfdir}/lcdvc.conf ${sbindir}/lcdvc"
 
 # Driver packages
 
 # USB / no USB trickery
 
-RCONFLICTS_lcdd-driver-hd47780nousb = "lcdd-driver-hd44780"
-RCONFLICTS_lcdd-driver-hd47780 = "lcdd-driver-hd44780nousb"
+RCONFLICTS:lcdd-driver-hd47780nousb = "lcdd-driver-hd44780"
+RCONFLICTS:lcdd-driver-hd47780 = "lcdd-driver-hd44780nousb"
 
 INITSCRIPT_PACKAGES = "lcdd lcdproc"
-INITSCRIPT_NAME_lcdd = "lcdd"
-INITSCRIPT_NAME_lcdproc = "lcdproc"
-INITSCRIPT_PARAMS_lcdd = "defaults 70 21"
-INITSCRIPT_PARAMS_lcdproc = "defaults 71 20"
+INITSCRIPT_NAME:lcdd = "lcdd"
+INITSCRIPT_NAME:lcdproc = "lcdproc"
+INITSCRIPT_PARAMS:lcdd = "defaults 70 21"
+INITSCRIPT_PARAMS:lcdproc = "defaults 71 20"
 
-python populate_packages_prepend() {
+python populate_packages:prepend() {
     plugindir = d.expand('${libdir}/lcdproc')
     do_split_packages(d, plugindir, '(.*)\.so$', 'lcdd-driver-%s', 'LCDd driver for %s', prepend=True)
 }

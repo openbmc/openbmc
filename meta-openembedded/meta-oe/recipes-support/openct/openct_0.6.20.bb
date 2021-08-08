@@ -26,7 +26,7 @@ LICENSE = "LGPLv2+"
 LIC_FILES_CHKSUM = "file://LGPL-2.1;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 inherit systemd
-SYSTEMD_SERVICE_${PN} += "openct.service "
+SYSTEMD_SERVICE:${PN} += "openct.service "
 SYSTEMD_AUTO_ENABLE = "enable"
 
 EXTRA_OECONF=" \
@@ -41,19 +41,19 @@ EXTRA_OECONF=" \
 
 inherit autotools pkgconfig
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/ctapi \
     ${nonarch_libdir}/udev \
     ${libdir}/openct-ifd.so \
     ${libdir}/pcsc \
 "
 
-FILES_${PN}-dbg += " \
+FILES:${PN}-dbg += " \
     ${libdir}/ctapi/.debug \
     ${libdir}/pcsc/drivers/openct-ifd.bundle/Contents/Linux/.debug \
 "
 
-INSANE_SKIP_${PN} += "dev-deps"
+INSANE_SKIP:${PN} += "dev-deps"
 
 do_install[cleandirs] += "${D}"
 

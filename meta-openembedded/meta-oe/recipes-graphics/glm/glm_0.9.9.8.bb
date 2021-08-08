@@ -34,6 +34,6 @@ do_install() {
 
 }
 
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
 BBCLASSEXTEND = "native"

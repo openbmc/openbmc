@@ -17,4 +17,4 @@ SRC_URI[archive.sha256sum] = "0680a53b7bf90b4e4bf444d1d89e6df41c777e0bacc96e9c09
 
 EXTRA_OECONF = " --disable-documentation "
 
-FILES_${PN}-dev += "${libdir}/*/include ${libdir}/*/proc/m4"
+FILES:${PN}-dev += "${libdir}/*/include ${libdir}/*/proc/m4"

@@ -13,10 +13,10 @@ SRC_URI = "git://github.com/lib-cpp/${BPN}.git"
 
 S = "${WORKDIR}/git"
 
-do_configure_prepend() {
+do_configure:prepend() {
     echo " " > ${S}/tests/CMakeLists.txt
 }
 
 inherit cmake pkgconfig
 
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""

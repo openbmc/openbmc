@@ -5,7 +5,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://ncurses/base/version.c;beginline=1;endline=27;md5=5526f2f3a29edc95538b368a4771edda"
 SECTION = "libs"
 DEPENDS = "ncurses-native"
-DEPENDS_class-native = ""
+DEPENDS:class-native = ""
 
 BINCONFIG = "${bindir}/ncurses5-config ${bindir}/ncursesw5-config \
 	${bindir}/ncurses6-config ${bindir}/ncursesw6-config"
@@ -32,17 +32,17 @@ ENABLE_WIDEC ?= "true"
 BUILD_CPPFLAGS += "-D_GNU_SOURCE"
 
 # natives don't generally look in base_libdir
-base_libdir_class-native = "${libdir}"
+base_libdir:class-native = "${libdir}"
 
 # Display corruption occurs on 64 bit hosts without these settings
 # This was derrived from the upstream debian ncurses which uses
 # these settings for 32 and 64 bit hosts.
 EXCONFIG_ARGS = ""
-EXCONFIG_ARGS_class-native = " \
+EXCONFIG_ARGS:class-native = " \
 		--disable-lp64 \
 		--with-chtype='long' \
 		--with-mmask-t='long'"
-EXCONFIG_ARGS_class-nativesdk = " \
+EXCONFIG_ARGS:class-nativesdk = " \
 		--disable-lp64 \
 		--with-chtype='long' \
 		--with-mmask-t='long'"
@@ -55,11 +55,11 @@ PACKAGES_DYNAMIC = "^${PN}-lib.*"
 # because the sstate had a hard coded search path.  Until this is fixed
 # another way this is deemed good enough.
 EX_TERMCAP = ""
-EX_TERMCAP_class-native = ":/etc/termcap:/usr/share/misc/termcap"
-EX_TERMCAP_class-nativesdk = ":/etc/termcap:/usr/share/misc/termcap"
+EX_TERMCAP:class-native = ":/etc/termcap:/usr/share/misc/termcap"
+EX_TERMCAP:class-nativesdk = ":/etc/termcap:/usr/share/misc/termcap"
 EX_TERMINFO = ""
-EX_TERMINFO_class-native = ":/etc/terminfo:/usr/share/terminfo:/usr/share/misc/terminfo:/lib/terminfo"
-EX_TERMINFO_class-nativesdk = ":/etc/terminfo:/usr/share/terminfo:/usr/share/misc/terminfo:/lib/terminfo"
+EX_TERMINFO:class-native = ":/etc/terminfo:/usr/share/terminfo:/usr/share/misc/terminfo:/lib/terminfo"
+EX_TERMINFO:class-nativesdk = ":/etc/terminfo:/usr/share/terminfo:/usr/share/misc/terminfo:/lib/terminfo"
 EX_TERMLIB ?= "tinfo"
 
 # Helper function for do_configure to allow multiple configurations
@@ -258,7 +258,7 @@ do_install() {
         oe_multilib_header curses.h
 }
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     libdir = d.expand("${libdir}")
     base_libdir = d.expand("${base_libdir}")
     pnbase = d.expand("${PN}-lib%s")
@@ -272,8 +272,8 @@ inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "100"
 
-ALTERNATIVE_ncurses-tools_class-target = "clear reset"
-ALTERNATIVE_ncurses-terminfo_class-target = "st st-256color"
+ALTERNATIVE:ncurses-tools:class-target = "clear reset"
+ALTERNATIVE:ncurses-terminfo:class-target = "st st-256color"
 
 ALTERNATIVE_LINK_NAME[st] = "${datadir}/terminfo/s/st"
 
@@ -287,7 +287,7 @@ PACKAGES += " \
   ${PN}-terminfo \
 "
 
-FILES_${PN} = "\
+FILES:${PN} = "\
   ${bindir}/tput \
   ${bindir}/tset \
   ${bindir}/ncurses5-config \
@@ -299,7 +299,7 @@ FILES_${PN} = "\
 
 # This keeps only tput/tset in ncurses
 # clear/reset are in already busybox
-FILES_${PN}-tools = "\
+FILES:${PN}-tools = "\
   ${bindir}/tic \
   ${bindir}/toe \
   ${bindir}/infotocap \
@@ -312,20 +312,20 @@ FILES_${PN}-tools = "\
 "
 
 # 'reset' is a symlink to 'tset' which is in the 'ncurses' package
-RDEPENDS_${PN}-tools = "${PN} ${PN}-terminfo-base"
+RDEPENDS:${PN}-tools = "${PN} ${PN}-terminfo-base"
 
-FILES_${PN}-terminfo = "\
+FILES:${PN}-terminfo = "\
   ${datadir}/terminfo \
 "
 
-FILES_${PN}-terminfo-base = "\
+FILES:${PN}-terminfo-base = "\
   ${sysconfdir}/terminfo \
 "
 
-RSUGGESTS_${PN}-libtinfo = "${PN}-terminfo"
-RRECOMMENDS_${PN}-libtinfo = "${PN}-terminfo-base"
+RSUGGESTS:${PN}-libtinfo = "${PN}-terminfo"
+RRECOMMENDS:${PN}-libtinfo = "${PN}-terminfo-base"
 
 # Putting terminfo into the sysroot adds around 2800 files to
 # each recipe specific sysroot. We can live without this, particularly
 # as many recipes may have native and target copies.
-SYSROOT_DIRS_remove = "${datadir}"
+SYSROOT_DIRS:remove = "${datadir}"

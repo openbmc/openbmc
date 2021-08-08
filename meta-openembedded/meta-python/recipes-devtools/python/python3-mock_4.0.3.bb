@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=de9dfbf780446b18aab11f00baaf5b7e"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "${PYTHON_PN}-prettytable \
+RDEPENDS:${PN} += "${PYTHON_PN}-prettytable \
             ${PYTHON_PN}-cmd2 \
             ${PYTHON_PN}-pyparsing \
             ${PYTHON_PN}-mccabe \

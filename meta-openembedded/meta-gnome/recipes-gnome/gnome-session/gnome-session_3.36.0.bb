@@ -30,10 +30,10 @@ PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd',
 PACKAGECONFIG[consolekit] = "-Dconsolekit=true, -Dconsolekit=false, consolekit"
 PACKAGECONFIG[systemd] = "-Dsystemd=true -Dsystemd_journal=true, -Dsystemd=false -Dsystemd_journal=false, systemd"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/xsessions \
     ${datadir}/wayland-sessions \
     ${systemd_user_unitdir} \
 "
 
-RDEPENDS_${PN} += "gnome-shell gnome-settings-daemon gsettings-desktop-schemas"
+RDEPENDS:${PN} += "gnome-shell gnome-settings-daemon gsettings-desktop-schemas"

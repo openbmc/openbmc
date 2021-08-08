@@ -30,10 +30,10 @@ PACKAGECONFIG[xinerama] = "--enable-xinerama,--disable-xinerama,libxinerama"
 # enable as neccessary until new warnings are dealt with
 PACKAGECONFIG[werror] = "--enable-Werror,--disable-Werror,,"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/themes \
     ${datadir}/gnome-control-center \
     ${datadir}/gnome\
 "
 
-RDEPENDS_${PN} += "gsettings-desktop-schemas"
+RDEPENDS:${PN} += "gsettings-desktop-schemas"

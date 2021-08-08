@@ -26,12 +26,12 @@ inherit distutils3 useradd
 
 do_configure[noexec] = "1"
 
-do_compile_prepend () {
+do_compile:prepend () {
     oe_runmake -C ${S}/../wdmd CMD_LDFLAGS="${LDFLAGS}" LIB_LDFLAGS="${LDFLAGS}"
     oe_runmake -C ${S}/../src CMD_LDFLAGS="${LDFLAGS}" LIB_ENTIRE_LDFLAGS="${LDFLAGS}" LIB_CLIENT_LDFLAGS="${LDFLAGS}"
 }
 
-do_install_prepend () {
+do_install:prepend () {
     oe_runmake -C ${S}/../wdmd DESTDIR=${D} LIBDIR=${libdir} install
     oe_runmake -C ${S}/../src DESTDIR=${D} LIBDIR=${libdir} install
 }
@@ -39,7 +39,7 @@ do_install_prepend () {
 SANLOCKGROUP ?= "sanlock"
 SANLOCKUSER ?= "sanlock"
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system ${SANLOCKGROUP}"
-USERADD_PARAM_${PN} = "--system -g ${SANLOCKGROUP} -G disk \
+GROUPADD_PARAM:${PN} = "--system ${SANLOCKGROUP}"
+USERADD_PARAM:${PN} = "--system -g ${SANLOCKGROUP} -G disk \
                        --home-dir /run/${SANLOCKUSER} --no-create-home \
                        --shell /sbin/nologin ${SANLOCKUSER}"

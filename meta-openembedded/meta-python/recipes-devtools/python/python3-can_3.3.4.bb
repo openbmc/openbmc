@@ -10,7 +10,7 @@ PYPI_PACKAGE="python-can"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN}_class-target += "\
+RDEPENDS:${PN}:class-target += "\
     ${PYTHON_PN}-aenum \
     ${PYTHON_PN}-ctypes \
     ${PYTHON_PN}-codecs \

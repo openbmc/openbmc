@@ -16,7 +16,7 @@ REQUIRED_DISTRO_FEATURES = "x11 polkit systemd pam"
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES += "gobject-introspection-data"
-UNKNOWN_CONFIGURE_WHITELIST_append = " introspection"
+UNKNOWN_CONFIGURE_WHITELIST:append = " introspection"
 
 SRC_URI[archive.md5sum] = "a625d8b167c5549c68e1c6ac7a87d369"
 SRC_URI[archive.sha256sum] = "003326fab46e6faad9485924bca503f0c583e3b4553d6f673406eda396205250"
@@ -24,9 +24,9 @@ SRC_URI += "file://0001-Make-python-path-configurable.patch"
 
 EXTRA_OEMESON = "-Dpython_site_dir=${PYTHON_SITEPACKAGES_DIR}"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/metainfo \
     ${PYTHON_SITEPACKAGES_DIR} \
 "
 
-RDEPENDS_${PN} += "gnome-shell python3-core python3-logging libhandy"
+RDEPENDS:${PN} += "gnome-shell python3-core python3-logging libhandy"

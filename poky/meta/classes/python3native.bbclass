@@ -2,7 +2,7 @@ inherit python3-dir
 
 PYTHON="${STAGING_BINDIR_NATIVE}/python3-native/python3"
 EXTRANATIVEPATH += "python3-native"
-DEPENDS_append = " python3-native "
+DEPENDS:append = " python3-native "
 
 # python-config and other scripts are using distutils modules
 # which we patch to access these variables

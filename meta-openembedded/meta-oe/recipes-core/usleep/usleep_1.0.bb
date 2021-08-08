@@ -25,9 +25,9 @@ do_install() {
 
 inherit update-alternatives
 
-ALTERNATIVE_${PN} = "usleep"
+ALTERNATIVE:${PN} = "usleep"
 ALTERNATIVE_PRIORITY = "80"
 ALTERNATIVE_LINK_NAME[usleep] = "${base_bindir}/usleep"
 
-ALTERNATIVE_${PN}-doc = "usleep.1"
+ALTERNATIVE:${PN}-doc = "usleep.1"
 ALTERNATIVE_LINK_NAME[usleep.1] = "${mandir}/man1/usleep.1"

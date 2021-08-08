@@ -45,6 +45,10 @@ SRC_URI = "https://sourceware.org/pub/valgrind/valgrind-${PV}.tar.bz2 \
            file://0001-memcheck-tests-Fix-timerfd-syscall-test.patch \
            file://0001-Add-missing-musl.supp.patch \
            file://0001-drd-tests-swapcontext-Add-SIGALRM-handler-to-avoid-s.patch \
+           file://6da22a4d246519cd1a638cfc7eff00cdd74413c4.patch \
+           file://200b6a5a0ea3e1e154663b0fc575bfe2becf177d.patch \
+           file://a1364805fc74b5690f763033c0c9b43f27613572.patch \
+           file://52ed51fc35f8a6148c2940eb46932b02dd3b9b23.patch \
            "
 SRC_URI[md5sum] = "afe11b5572c3121a781433b7c0ab741b"
 SRC_URI[sha256sum] = "ad3aec668e813e40f238995f60796d9590eee64a16dff88421430630e69285a2"
@@ -54,7 +58,7 @@ COMPATIBLE_HOST = '(i.86|x86_64|arm|aarch64|mips|powerpc|powerpc64).*-linux'
 
 # patch 0001-memcheck-vgtests-remove-fullpath-after-flags.patch removes relative path
 # argument. Change expected stderr files accordingly.
-do_patch_append() {
+do_patch:append() {
     bb.build.exec_func('do_sed_paths', d)
 }
 
@@ -64,23 +68,23 @@ do_sed_paths() {
 }
 
 # valgrind supports armv7 and above
-COMPATIBLE_HOST_armv4 = 'null'
-COMPATIBLE_HOST_armv5 = 'null'
-COMPATIBLE_HOST_armv6 = 'null'
+COMPATIBLE_HOST:armv4 = 'null'
+COMPATIBLE_HOST:armv5 = 'null'
+COMPATIBLE_HOST:armv6 = 'null'
 
 # valgrind fails with powerpc soft-float
-COMPATIBLE_HOST_powerpc = "${@bb.utils.contains('TARGET_FPU', 'soft', 'null', '.*-linux', d)}"
+COMPATIBLE_HOST:powerpc = "${@bb.utils.contains('TARGET_FPU', 'soft', 'null', '.*-linux', d)}"
 
 # X32 isn't supported by valgrind at this time
-COMPATIBLE_HOST_linux-gnux32 = 'null'
-COMPATIBLE_HOST_linux-muslx32 = 'null'
+COMPATIBLE_HOST:linux-gnux32 = 'null'
+COMPATIBLE_HOST:linux-muslx32 = 'null'
 
 # Disable for some MIPS variants
-COMPATIBLE_HOST_mipsarchr6 = 'null'
-COMPATIBLE_HOST_linux-gnun32 = 'null'
+COMPATIBLE_HOST:mipsarchr6 = 'null'
+COMPATIBLE_HOST:linux-gnun32 = 'null'
 
 # Disable for powerpc64 with musl
-COMPATIBLE_HOST_libc-musl_powerpc64 = 'null'
+COMPATIBLE_HOST:libc-musl:powerpc64 = 'null'
 
 # brokenseip is unfortunately required by ptests to pass
 inherit autotools-brokensep ptest multilib_header
@@ -89,7 +93,7 @@ EXTRA_OECONF = "--enable-tls --without-mpicc"
 EXTRA_OECONF += "${@['--enable-only32bit','--enable-only64bit'][d.getVar('SITEINFO_BITS') != '32']}"
 
 # valgrind checks host_cpu "armv7*)", so we need to over-ride the autotools.bbclass default --host option
-EXTRA_OECONF_append_arm = " --host=armv7${HOST_VENDOR}-${HOST_OS}"
+EXTRA_OECONF:append:arm = " --host=armv7${HOST_VENDOR}-${HOST_OS}"
 
 EXTRA_OEMAKE = "-w"
 
@@ -101,49 +105,49 @@ CACHED_CONFIGUREVARS += "ac_cv_path_PERL='/usr/bin/env perl'"
 # which fixes build path issue in DWARF.
 SELECTED_OPTIMIZATION = "${DEBUG_FLAGS}"
 
-do_configure_prepend () {
+do_configure:prepend () {
     rm -rf ${S}/config.h
     sed -i -e 's:$(abs_top_builddir):$(pkglibdir)/ptest:g' ${S}/none/tests/Makefile.am
     sed -i -e 's:$(top_builddir):$(pkglibdir)/ptest:g' ${S}/memcheck/tests/Makefile.am
 }
 
-do_install_append () {
+do_install:append () {
     install -m 644 ${B}/default.supp ${D}/${libexecdir}/valgrind/
     oe_multilib_header valgrind/config.h
 }
 
 VALGRINDARCH ?= "${TARGET_ARCH}"
-VALGRINDARCH_aarch64 = "arm64"
-VALGRINDARCH_x86-64 = "amd64"
-VALGRINDARCH_x86 = "x86"
-VALGRINDARCH_mips = "mips32"
-VALGRINDARCH_mipsel = "mips32"
-VALGRINDARCH_mips64el = "mips64"
-VALGRINDARCH_powerpc = "ppc"
-VALGRINDARCH_powerpc64 = "ppc64"
-VALGRINDARCH_powerpc64le = "ppc64le"
+VALGRINDARCH:aarch64 = "arm64"
+VALGRINDARCH:x86-64 = "amd64"
+VALGRINDARCH:x86 = "x86"
+VALGRINDARCH:mips = "mips32"
+VALGRINDARCH:mipsel = "mips32"
+VALGRINDARCH:mips64el = "mips64"
+VALGRINDARCH:powerpc = "ppc"
+VALGRINDARCH:powerpc64 = "ppc64"
+VALGRINDARCH:powerpc64le = "ppc64le"
 
 INHIBIT_PACKAGE_STRIP_FILES = "${PKGD}${libexecdir}/valgrind/vgpreload_memcheck-${VALGRINDARCH}-linux.so"
 
-RDEPENDS_${PN} += "perl"
+RDEPENDS:${PN} += "perl"
 
 # valgrind needs debug information for ld.so at runtime in order to
 # redirect functions like strlen.
-RRECOMMENDS_${PN} += "${TCLIBC}-dbg"
+RRECOMMENDS:${PN} += "${TCLIBC}-dbg"
 
-RDEPENDS_${PN}-ptest += " bash coreutils curl file \
+RDEPENDS:${PN}-ptest += " bash coreutils curl file \
    gdb libgomp \
    perl \
    perl-module-file-basename perl-module-file-glob perl-module-getopt-long \
    perl-module-overloading perl-module-cwd perl-module-ipc-open3 \
    perl-module-carp perl-module-symbol \
    procps sed ${PN}-dbg ${PN}-src ${TCLIBC}-src gcc-runtime-dbg"
-RDEPENDS_${PN}-ptest_append_libc-glibc = " glibc-utils"
+RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-utils"
 
 # One of the tests contains a bogus interpreter path on purpose.
 # Skip file dependency check
-SKIP_FILEDEPS_${PN}-ptest = '1'
-INSANE_SKIP_${PN}-ptest = "debug-deps"
+SKIP_FILEDEPS:${PN}-ptest = '1'
+INSANE_SKIP:${PN}-ptest = "debug-deps"
 
 do_compile_ptest() {
     oe_runmake check

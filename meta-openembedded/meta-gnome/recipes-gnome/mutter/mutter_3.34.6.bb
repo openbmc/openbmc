@@ -63,7 +63,7 @@ PACKAGECONFIG[wayland-eglstream] = "-Dwayland_eglstream=true,-Dwayland_eglstream
 # yes they changed from mutter-4 -> mutter-5 recently so be perpared
 MUTTER_API_NAME = "mutter-5"
 
-do_install_append() {
+do_install:append() {
     # Add gir links in standard paths. That makes dependents life much easier
     # to find them
     install -d ${D}${datadir}/gir-1.0
@@ -75,23 +75,23 @@ do_install_append() {
 
 PACKAGES =+ "${PN}-tests"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/gnome-control-center \
     ${libdir}/${MUTTER_API_NAME}/lib*${SOLIBS} \
     ${libdir}/${MUTTER_API_NAME}/*.typelib \
     ${libdir}/${MUTTER_API_NAME}/plugins \
 "
 
-FILES_${PN}-tests += " \
+FILES:${PN}-tests += " \
     ${datadir}/installed-tests \
     ${datadir}/${MUTTER_API_NAME}/tests \
     ${libexecdir}/installed-tests/${MUTTER_API_NAME} \
 "
 
-FILES_${PN}-dev += " \
+FILES:${PN}-dev += " \
     ${libdir}/${MUTTER_API_NAME}/*.gir \
     ${libdir}/${MUTTER_API_NAME}/lib*.so \
 "
 
-RDEPENDS_${PN} += "zenity"
+RDEPENDS:${PN} += "zenity"
 

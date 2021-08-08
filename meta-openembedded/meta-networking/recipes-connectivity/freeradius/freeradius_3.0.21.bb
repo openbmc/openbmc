@@ -40,9 +40,9 @@ PARALLEL_MAKE = ""
 
 S = "${WORKDIR}/git"
 
-LDFLAGS_append_powerpc = " -latomic"
-LDFLAGS_append_mipsarch = " -latomic"
-LDFLAGS_append_armv5 = " -latomic"
+LDFLAGS:append:powerpc = " -latomic"
+LDFLAGS:append:mipsarch = " -latomic"
+LDFLAGS:append:armv5 = " -latomic"
 
 EXTRA_OECONF = " --enable-strict-dependencies \
         --with-docdir=${docdir}/freeradius-${PV} \
@@ -124,10 +124,10 @@ do_configure () {
 
 INITSCRIPT_NAME = "radiusd"
 
-SYSTEMD_SERVICE_${PN} = "radiusd.service"
+SYSTEMD_SERVICE:${PN} = "radiusd.service"
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --no-create-home --shell /bin/false --user-group radiusd"
+USERADD_PARAM:${PN} = "--system --no-create-home --shell /bin/false --user-group radiusd"
 
 do_install() {
     rm -rf ${D}
@@ -173,7 +173,7 @@ do_install() {
 
 # This is only needed when we install/update on a running target.
 #
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     if [ -z "$D" ]; then
         if command -v systemd-tmpfiles >/dev/null; then
             # create /var/log/radius, /var/run/radiusd
@@ -189,52 +189,52 @@ pkg_postinst_${PN} () {
 }
 
 # We really need the symlink :(
-INSANE_SKIP_${PN} = "dev-so"
-INSANE_SKIP_${PN}-krb5 = "dev-so"
-INSANE_SKIP_${PN}-ldap = "dev-so"
-INSANE_SKIP_${PN}-mysql = "dev-so"
-INSANE_SKIP_${PN}-perl = "dev-so"
-INSANE_SKIP_${PN}-postgresql = "dev-so"
-INSANE_SKIP_${PN}-python = "dev-so"
-INSANE_SKIP_${PN}-unixodbc = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"
+INSANE_SKIP:${PN}-krb5 = "dev-so"
+INSANE_SKIP:${PN}-ldap = "dev-so"
+INSANE_SKIP:${PN}-mysql = "dev-so"
+INSANE_SKIP:${PN}-perl = "dev-so"
+INSANE_SKIP:${PN}-postgresql = "dev-so"
+INSANE_SKIP:${PN}-python = "dev-so"
+INSANE_SKIP:${PN}-unixodbc = "dev-so"
 
 PACKAGES =+ "${PN}-utils ${PN}-ldap ${PN}-krb5 ${PN}-perl \
     ${PN}-python ${PN}-mysql ${PN}-postgresql ${PN}-unixodbc"
 
-FILES_${PN}-utils = "${bindir}/*"
+FILES:${PN}-utils = "${bindir}/*"
 
-FILES_${PN}-ldap = "${libdir}/rlm_ldap.so* \
+FILES:${PN}-ldap = "${libdir}/rlm_ldap.so* \
     ${sysconfdir}/raddb/mods-available/ldap \
 "
 
-FILES_${PN}-krb5 = "${libdir}/rlm_krb5.so* \
+FILES:${PN}-krb5 = "${libdir}/rlm_krb5.so* \
     ${sysconfdir}/raddb/mods-available/krb5 \
 "
 
-FILES_${PN}-perl = "${libdir}/rlm_perl.so* \
+FILES:${PN}-perl = "${libdir}/rlm_perl.so* \
     ${sysconfdir}/raddb/mods-config/perl \
     ${sysconfdir}/raddb/mods-available/perl \
 "
 
-FILES_${PN}-python = "${libdir}/rlm_python3.so* \
+FILES:${PN}-python = "${libdir}/rlm_python3.so* \
     ${sysconfdir}/raddb/mods-config/python3 \
     ${sysconfdir}/raddb/mods-available/python3 \
 "
 
-FILES_${PN}-mysql = "${libdir}/rlm_sql_mysql.so* \
+FILES:${PN}-mysql = "${libdir}/rlm_sql_mysql.so* \
     ${sysconfdir}/raddb/mods-config/sql/*/mysql \
     ${sysconfdir}/raddb/mods-available/sql \
 "
 
-FILES_${PN}-postgresql = "${libdir}/rlm_sql_postgresql.so* \
+FILES:${PN}-postgresql = "${libdir}/rlm_sql_postgresql.so* \
     ${sysconfdir}/raddb/mods-config/sql/*/postgresql \
 "
 
-FILES_${PN}-unixodbc = "${libdir}/rlm_sql_unixodbc.so*"
+FILES:${PN}-unixodbc = "${libdir}/rlm_sql_unixodbc.so*"
 
-FILES_${PN} =+ "${libdir}/rlm_*.so* ${libdir}/proto_*so*"
+FILES:${PN} =+ "${libdir}/rlm_*.so* ${libdir}/proto_*so*"
 
-RDEPENDS_${PN} += "perl"
-RDEPENDS_${PN}-utils = "${PN} perl"
+RDEPENDS:${PN} += "perl"
+RDEPENDS:${PN}-utils = "${PN} perl"
 
 CLEANBROKEN = "1"

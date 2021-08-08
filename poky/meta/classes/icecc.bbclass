@@ -47,7 +47,7 @@ HOSTTOOLS_NONFATAL += "icecc patchelf"
 #
 # A useful thing to do for testing Icecream changes locally is to add a
 # subversion in local.conf:
-#  ICECC_ENV_VERSION_append = "-my-ver-1"
+#  ICECC_ENV_VERSION:append = "-my-ver-1"
 ICECC_ENV_VERSION = "2"
 
 # Default to disabling the caret workaround, If set to "1" in local.conf, icecc
@@ -97,7 +97,7 @@ ICECC_SYSTEM_CLASS_BL += "\
     image \
     "
 
-def icecc_dep_prepend(d):
+def get_icecc_dep(d):
     # INHIBIT_DEFAULT_DEPS doesn't apply to the patch command.  Whether or  not
     # we need that built is the responsibility of the patch function / class, not
     # the application.
@@ -105,7 +105,7 @@ def icecc_dep_prepend(d):
         return "icecc-create-env-native"
     return ""
 
-DEPENDS_prepend = "${@icecc_dep_prepend(d)} "
+DEPENDS:prepend = "${@get_icecc_dep(d)} "
 
 get_cross_kernel_cc[vardepsexclude] += "KERNEL_CC"
 def get_cross_kernel_cc(bb,d):
@@ -428,28 +428,28 @@ set_icecc_env() {
     bbnote "Using icecc tarball: $ICECC_VERSION"
 }
 
-do_configure_prepend() {
+do_configure:prepend() {
     set_icecc_env
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
     set_icecc_env
 }
 
-do_compile_kernelmodules_prepend() {
+do_compile_kernelmodules:prepend() {
     set_icecc_env
 }
 
-do_install_prepend() {
+do_install:prepend() {
     set_icecc_env
 }
 
 # IceCream is not (currently) supported in the extensible SDK
 ICECC_SDK_HOST_TASK = "nativesdk-icecc-toolchain"
-ICECC_SDK_HOST_TASK_task-populate-sdk-ext = ""
+ICECC_SDK_HOST_TASK:task-populate-sdk-ext = ""
 
 # Don't include IceCream in uninative tarball
-ICECC_SDK_HOST_TASK_pn-uninative-tarball = ""
+ICECC_SDK_HOST_TASK:pn-uninative-tarball = ""
 
 # Add the toolchain scripts to the SDK
-TOOLCHAIN_HOST_TASK_append = " ${ICECC_SDK_HOST_TASK}"
+TOOLCHAIN_HOST_TASK:append = " ${ICECC_SDK_HOST_TASK}"

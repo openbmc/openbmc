@@ -27,9 +27,9 @@ SRC_URI[archive.sha256sum] = "fdb30f4367907aab86d7c2bb76a7b773ba850b765c9666a39f
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "-Dsystemd=true, -Dsystemd=false, systemd"
 
-RRECOMMENDS_${PN} = "adwaita-icon-theme"
+RRECOMMENDS:${PN} = "adwaita-icon-theme"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/metainfo \
 "

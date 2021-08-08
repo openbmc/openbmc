@@ -17,19 +17,19 @@ EXTRA_OECONF = "--without-random \
                 --disable-check-autofiles \
                 "
 
-EXTRA_OEMAKE_class-target = "LIBTOOL=${HOST_SYS}-libtool"
+EXTRA_OEMAKE:class-target = "LIBTOOL=${HOST_SYS}-libtool"
 
-LDFLAGS_append_mipsarch = " -latomic"
-LDFLAGS_append_riscv32 = " -latomic"
+LDFLAGS:append:mipsarch = " -latomic"
+LDFLAGS:append:riscv32 = " -latomic"
 
 S="${WORKDIR}/${BPN}-${PV}"
 
 # avoid Makefile returning error on 'make clean' before configure was run
 CLEANBROKEN = "1"
 
-DEBIAN_NOAUTONAME_libqpdf = "1"
+DEBIAN_NOAUTONAME:libqpdf = "1"
 
 PACKAGES =+ "libqpdf"
-FILES_libqpdf = "${libdir}/libqpdf.so.*"
+FILES:libqpdf = "${libdir}/libqpdf.so.*"
 
-RDEPENDS_${PN} = "libqpdf"
+RDEPENDS:${PN} = "libqpdf"

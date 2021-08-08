@@ -15,7 +15,7 @@ DEPENDS += " \
     ${PYTHON_PN}-click-native \
 "
 
-RDEPENDS_${PN}_class-target += "\
+RDEPENDS:${PN}:class-target += "\
     ${PYTHON_PN}-ply \
     ${PYTHON_PN}-pyyaml \
     ${PYTHON_PN}-six \

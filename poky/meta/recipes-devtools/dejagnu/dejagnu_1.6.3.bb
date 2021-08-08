@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 SECTION = "devel"
 
 DEPENDS += "expect-native"
-RDEPENDS_${PN} = "expect"
+RDEPENDS:${PN} = "expect"
 
 inherit autotools
 

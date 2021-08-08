@@ -20,6 +20,6 @@ do_install() {
     sed -i 's/\r//' ${D}${bindir}/checksec.sh
 }
 
-RDEPENDS_${PN} = "bash binutils"
+RDEPENDS:${PN} = "bash binutils"
 
 BBCLASSEXTEND = "native"

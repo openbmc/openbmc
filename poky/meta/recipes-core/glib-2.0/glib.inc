@@ -30,7 +30,7 @@ LEAD_SONAME = "libglib-2.0.*"
 
 inherit meson gettext gtk-doc pkgconfig ptest-gnome upstream-version-is-even bash-completion gio-module-cache manpages
 
-DEPENDS_append_class-target = "${@' gtk-doc' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
+DEPENDS:append:class-target = "${@' gtk-doc' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
 
 GTKDOC_MESON_OPTION = "gtk_doc"
 
@@ -48,55 +48,55 @@ PACKAGECONFIG[tests] = "-Dinstalled_tests=true,-Dinstalled_tests=false,dbus"
 
 EXTRA_OEMESON = "-Ddtrace=false -Dfam=false -Dsystemtap=false -Dselinux=disabled"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	sed -i -e '1s,#!.*,#!${USRBINPATH}/env python3,' ${S}/gio/gdbus-2.0/codegen/gdbus-codegen.in
 }
 
-FILES_${PN} = "${libdir}/lib*${SOLIBS} \
+FILES:${PN} = "${libdir}/lib*${SOLIBS} \
                ${libdir}/gio \
                ${libexecdir}/*gio-querymodules \
                ${datadir}/glib-2.0/schemas"
 
-FILES_${PN}-utils += "${bindir}/glib-genmarshal \
+FILES:${PN}-utils += "${bindir}/glib-genmarshal \
                       ${bindir}/glib-gettextize \
                       ${bindir}/glib-mkenums \
                       ${bindir}/glib-compile-resources"
 
-FILES_${PN}-dev += "${libdir}/glib-2.0/include \
+FILES:${PN}-dev += "${libdir}/glib-2.0/include \
                     ${libdir}/gio/modules/lib*${SOLIBSDEV} \
                     ${libdir}/gio/modules/*.la \
                     ${datadir}/glib-2.0/gettext/po/Makefile.in.in \
                     ${datadir}/glib-2.0/schemas/gschema.dtd \
                     ${datadir}/glib-2.0/valgrind/glib.supp \
                     ${datadir}/gettext/its"
-FILES_${PN}-dbg += "${datadir}/glib-2.0/gdb ${datadir}/gdb"
-FILES_${PN}-codegen = "${datadir}/glib-2.0/codegen/*.py \
+FILES:${PN}-dbg += "${datadir}/glib-2.0/gdb ${datadir}/gdb"
+FILES:${PN}-codegen = "${datadir}/glib-2.0/codegen/*.py \
                        ${bindir}/gdbus-codegen"
-FILES_${PN}-utils = "${bindir}/*"
+FILES:${PN}-utils = "${bindir}/*"
 
 SHAREDMIMEDEP = "shared-mime-info"
-SHAREDMIMEDEP_class-native = ""
+SHAREDMIMEDEP:class-native = ""
 # When cross compiling for Windows we don't want to include this
-SHAREDMIMEDEP_mingw32 = ""
+SHAREDMIMEDEP:mingw32 = ""
 
-RRECOMMENDS_${PN} += "${SHAREDMIMEDEP}"
+RRECOMMENDS:${PN} += "${SHAREDMIMEDEP}"
 
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
 # Valgrind runtime detection works using hand-written assembly, which
 # doesn't support mips16e
-CPPFLAGS_append_class-target_mips16e = " -DNVALGRIND=1"
+CPPFLAGS:append:class-target:mips16e = " -DNVALGRIND=1"
 
 # GLib generally requires gettext to be present so for USE_NLS to yes.  For
 # native builds as i18n is disabled globally we have to add a gettext-native dependency.
-USE_NLS_class-target = "yes"
-USE_NLS_class-nativesdk = "yes"
-DEPENDS_append_class-native = " gettext-native"
+USE_NLS:class-target = "yes"
+USE_NLS:class-nativesdk = "yes"
+DEPENDS:append:class-native = " gettext-native"
 
 EXEEXT = ""
-EXEEXT_mingw32 = ".exe"
+EXEEXT:mingw32 = ".exe"
 
-do_install_append () {
+do_install:append () {
 	if [ -f ${D}${bindir}/gtester-report ]; then
 		sed ${D}${bindir}/gtester-report -i -e '1s|^#!.*|#!/usr/bin/env python3|'
 	fi
@@ -118,7 +118,7 @@ do_install_append () {
         mkdir -p ${D}${libdir}/gio/modules
 }
 
-do_install_append_class-target () {
+do_install:append:class-target () {
 	# Tests are only installed on targets, not native builds.  Separating this out
 	# keeps glib-2.0-native from depending on DISTRO_FEATURES
 	if [ -f ${D}${datadir}/installed-tests/glib/gdbus-serialization.test ]; then
@@ -134,18 +134,18 @@ do_install_append_class-target () {
 }
 
 # As we do not build python3 for windows, makes no sense to ship the script that's using it
-do_install_append_mingw32() {
+do_install:append:mingw32() {
         rm -f ${D}${bindir}/gtester-report
 }
 
 CODEGEN_PYTHON_RDEPENDS = "python3 python3-distutils python3-xml"
-CODEGEN_PYTHON_RDEPENDS_mingw32 = ""
+CODEGEN_PYTHON_RDEPENDS:mingw32 = ""
 
-RDEPENDS_${PN}-codegen += "${CODEGEN_PYTHON_RDEPENDS}"
+RDEPENDS:${PN}-codegen += "${CODEGEN_PYTHON_RDEPENDS}"
 
-RDEPENDS_${PN}-ptest += "${PN}-utils"
+RDEPENDS:${PN}-ptest += "${PN}-utils"
 
-RDEPENDS_${PN}-ptest += "\
+RDEPENDS:${PN}-ptest += "\
             coreutils \
             libgcc \
             dbus \
@@ -170,7 +170,7 @@ RDEPENDS_${PN}-ptest += "\
             ${PN}-codegen \
            "
 
-RDEPENDS_${PN}-ptest_append_libc-glibc = "\
+RDEPENDS:${PN}-ptest:append:libc-glibc = "\
             glibc-gconv-utf-16 \
             glibc-charmap-utf-8 \
             glibc-gconv-cp1255 \

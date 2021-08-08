@@ -18,21 +18,21 @@ SRC_URI += "file://0001-Disable-tests-on-host.patch \
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
-UNKNOWN_CONFIGURE_WHITELIST_append = " --enable-introspection --disable-introspection"
+UNKNOWN_CONFIGURE_WHITELIST:append = " --enable-introspection --disable-introspection"
 
 EXTRA_OECONF = " \
     --without-dbus-tests \
     --disable-installed-tests \
 "
 
-do_configure_prepend() {
+do_configure:prepend() {
     # make configure find gobject-introspection test code. Although we set
     # --disable-installed-tests gjs builds them
     sed -i 's|:$GI_DATADIR|:${STAGING_DIR_NATIVE}$GI_DATADIR|g' ${S}/configure.ac
 }
 
-FILES_${PN} += "${datadir}/gjs-1.0/lsan"
+FILES:${PN} += "${datadir}/gjs-1.0/lsan"
 
 PACKAGES =+ "${PN}-valgrind"
-FILES_${PN}-valgrind = "${datadir}/gjs-1.0/valgrind"
+FILES:${PN}-valgrind = "${datadir}/gjs-1.0/valgrind"
 RSEPENDS_${PN}-valgrind += "valgrind"

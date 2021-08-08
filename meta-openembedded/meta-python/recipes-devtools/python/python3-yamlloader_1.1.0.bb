@@ -7,6 +7,6 @@ SRC_URI[sha256sum] = "8a297c7a197683ba02e5e2b882ffd6c6180d01bdefb534b69cd3962df0
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN}_class-target += "\
+RDEPENDS:${PN}:class-target += "\
     ${PYTHON_PN}-pyyaml \
 "

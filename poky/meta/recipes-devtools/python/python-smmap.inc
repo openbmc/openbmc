@@ -13,7 +13,7 @@ PYPI_PACKAGE = "smmap"
 
 SRC_URI[sha256sum] = "7e65386bd122d45405ddf795637b7f7d2b532e7e401d46bbe3fb49b9986d5182"
 
-RDEPENDS_${PN} += "${PYTHON_PN}-codecs \
+RDEPENDS:${PN} += "${PYTHON_PN}-codecs \
                    ${PYTHON_PN}-mmap \
 "
 BBCLASSEXTEND = "native nativesdk"

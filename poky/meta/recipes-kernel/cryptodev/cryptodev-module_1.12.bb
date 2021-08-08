@@ -12,5 +12,5 @@ SRC_URI += "file://0001-Disable-installing-header-file-provided-by-another-p.pat
 
 EXTRA_OEMAKE='KERNEL_DIR="${STAGING_KERNEL_DIR}" PREFIX="${D}"'
 
-RCONFLICTS_${PN} = "ocf-linux"
-RREPLACES_${PN} = "ocf-linux"
+RCONFLICTS:${PN} = "ocf-linux"
+RREPLACES:${PN} = "ocf-linux"

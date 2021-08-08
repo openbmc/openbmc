@@ -36,9 +36,9 @@ do_install() {
     install -Dm 0644 libasound_module_pcm_equal.so ${D}${libdir}/alsa-lib/libasound_module_pcm_equal.so
 }
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     alsa-utils \
     caps \
 "
 
-FILES_${PN} = "${libdir}/alsa-lib/"
+FILES:${PN} = "${libdir}/alsa-lib/"

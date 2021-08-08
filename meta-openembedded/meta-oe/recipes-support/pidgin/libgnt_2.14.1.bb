@@ -17,4 +17,4 @@ SRC_URI[sha256sum] = "5ec3e68e18f956e9998d79088b299fa3bca689bcc95c86001bc5da17c1
 
 EXTRA_OEMESON = "-Dintrospection=false -Ddoc=false"
 
-FILES_${PN} += "${libdir}/gnt/s.so ${libdir}/gnt/irssi.so"
+FILES:${PN} += "${libdir}/gnt/s.so ${libdir}/gnt/irssi.so"

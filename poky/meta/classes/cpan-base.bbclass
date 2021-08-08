@@ -2,10 +2,10 @@
 # cpan-base providers various perl related information needed for building
 # cpan modules
 #
-FILES_${PN} += "${libdir}/perl5 ${datadir}/perl5"
+FILES:${PN} += "${libdir}/perl5 ${datadir}/perl5"
 
 DEPENDS  += "${@["perl", "perl-native"][(bb.data.inherits_class('native', d))]}"
-RDEPENDS_${PN} += "${@["perl", ""][(bb.data.inherits_class('native', d))]}"
+RDEPENDS:${PN} += "${@["perl", ""][(bb.data.inherits_class('native', d))]}"
 
 inherit perl-version
 
@@ -15,7 +15,7 @@ def is_target(d):
     return "no"
 
 PERLLIBDIRS = "${libdir}/perl5"
-PERLLIBDIRS_class-native = "${libdir}/perl5"
+PERLLIBDIRS:class-native = "${libdir}/perl5"
 
 def cpan_upstream_check_pattern(d):
     for x in (d.getVar('SRC_URI') or '').split(' '):

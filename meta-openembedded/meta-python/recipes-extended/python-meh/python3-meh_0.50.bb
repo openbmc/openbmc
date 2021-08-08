@@ -13,5 +13,5 @@ SRC_URI = "git://github.com/rhinstaller/python-meh.git;protocol=https;branch=mas
 "
 SRCREV = "11980776c5ad757401ea1d12fd1f331d96428105"
 
-FILES_${PN} += "${datadir}/*"
+FILES:${PN} += "${datadir}/*"
 

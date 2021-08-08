@@ -21,7 +21,7 @@ SRC_URI[sha256sum] = "61980551e46b2eaa9e17ad31cbc1a638074611fc33bff34163d10c7a67
 
 inherit update-rc.d
 
-RRECOMMENDS_${PN} = "\
+RRECOMMENDS:${PN} = "\
     kernel-module-pxaficp-ir \
     kernel-module-irda \
     kernel-module-ircomm \

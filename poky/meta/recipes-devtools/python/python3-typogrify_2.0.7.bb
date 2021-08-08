@@ -10,5 +10,5 @@ SRC_URI[sha256sum] = "8be4668cda434163ce229d87ca273a11922cb1614cb359970b7dc96eed
 
 BBCLASSEXTEND = "native"
 
-RDEPENDS_${PN} += "${PYTHON_PN}-smartypants"
+RDEPENDS:${PN} += "${PYTHON_PN}-smartypants"
 

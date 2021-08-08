@@ -14,12 +14,12 @@ Adding the wireshark to your build
 ========================================
 
 via local.conf
-IMAGE_INSTALL_append = " wireshark"
+IMAGE_INSTALL:append = " wireshark"
 
 Adding the wireshark to your graphical build
 ========================================
 via local.conf
-IMAGE_INSTALL_append = " wireshark"
+IMAGE_INSTALL:append = " wireshark"
 
 and one of:
 

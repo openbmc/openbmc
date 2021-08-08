@@ -17,7 +17,7 @@ DEPENDS = "virtual/kernel"
 #
 # minimal set of packages - needed to boot
 #
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     base-files \
     base-passwd \
     busybox \
@@ -26,7 +26,7 @@ RDEPENDS_${PN} = "\
     ${MACHINE_ESSENTIAL_EXTRA_RDEPENDS} \
 "
 
-RRECOMMENDS_${PN} = "\
+RRECOMMENDS:${PN} = "\
     kernel \
     ${MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS} \
 "

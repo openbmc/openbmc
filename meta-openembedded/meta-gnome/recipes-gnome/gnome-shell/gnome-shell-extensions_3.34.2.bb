@@ -20,9 +20,9 @@ EXTRA_OEMESON += " \
     -Dclassic_mode=true \
 "
 
-RDEPENDS_${PN} += "gnome-shell"
+RDEPENDS:${PN} += "gnome-shell"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/gnome-shell \
     ${datadir}/gnome-session \
     ${datadir}/xsessions \

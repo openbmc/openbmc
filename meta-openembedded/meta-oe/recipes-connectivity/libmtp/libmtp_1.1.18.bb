@@ -16,10 +16,10 @@ LIC_FILES_CHKSUM = "\
 BBCLASSEXTEND = "native"
 
 DEPENDS = "libusb1 gettext-native"
-DEPENDS_append_class-target = " ${BPN}-native"
+DEPENDS:append:class-target = " ${BPN}-native"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz"
-SRC_URI_append_class-target = " file://0001-Use-native-mtp-hotplug.patch"
+SRC_URI:append:class-target = " file://0001-Use-native-mtp-hotplug.patch"
 
 SRC_URI[md5sum] = "7915496daa3f4ea3e095f0161f83d4d4"
 SRC_URI[sha256sum] = "7280fe50c044c818a06667f45eabca884deab3193caa8682e0b581e847a281f0"
@@ -38,13 +38,13 @@ PACKAGECONFIG[mtpz] = "--enable-mtpz,--disable-mtpz,libgcrypt"
 
 PACKAGES =+ "${BPN}-common ${BPN}-runtime"
 
-RDEPENDS_${BPN} += "libmtp-common"
-RRECOMMENDS_${BPN} += "libmtp-runtime ${PN}-bin"
+RDEPENDS:${BPN} += "libmtp-common"
+RRECOMMENDS:${BPN} += "libmtp-runtime ${PN}-bin"
 
-FILES_${BPN}-common = "${nonarch_base_libdir}/udev/rules.d/*"
-SUMMARY_${BPN}-common = "The udev rules file for MTP devices"
+FILES:${BPN}-common = "${nonarch_base_libdir}/udev/rules.d/*"
+SUMMARY:${BPN}-common = "The udev rules file for MTP devices"
 
-FILES_${BPN}-runtime = "${nonarch_base_libdir}/udev/mtp-probe"
-RDEPENDS_${BPN}-runtime = "libmtp-common"
-SUMMARY_${BPN}-runtime = "mtp-probe, used for the MTP udev rules"
-DESCRIPTION_${BPN}-runtime = "This package provides mtp-probe, a program to probe newly connected device interfaces from userspace to determine if they are MTP devices, used for udev rules."
+FILES:${BPN}-runtime = "${nonarch_base_libdir}/udev/mtp-probe"
+RDEPENDS:${BPN}-runtime = "libmtp-common"
+SUMMARY:${BPN}-runtime = "mtp-probe, used for the MTP udev rules"
+DESCRIPTION:${BPN}-runtime = "This package provides mtp-probe, a program to probe newly connected device interfaces from userspace to determine if they are MTP devices, used for udev rules."

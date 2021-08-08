@@ -19,7 +19,7 @@ inherit siteinfo qemu
 CXXFLAGS += "-DUSE_PORTAUDIO"
 TARGET_CC_ARCH += "${LDFLAGS}"
 
-FILES_${PN} += "${datadir}/espeak-data"
+FILES:${PN} += "${datadir}/espeak-data"
 
 do_configure() {
     #  "speak" binary, a TTS engine, uses portaudio in either APIs V18 or V19, use V19
@@ -64,4 +64,4 @@ do_install() {
     cp -R --no-dereference --preserve=mode,links ${S}/espeak-data/* ${D}${datadir}/espeak-data
 }
 
-RDEPENDS_${PN} = "portaudio-v19"
+RDEPENDS:${PN} = "portaudio-v19"

@@ -28,24 +28,24 @@ inherit autotools systemd update-rc.d upstream-version-is-even
 INITSCRIPT_NAME = "kea-dhcp4-server"
 INITSCRIPT_PARAMS = "defaults 30"
 
-SYSTEMD_SERVICE_${PN} = "kea-dhcp4.service kea-dhcp6.service kea-dhcp-ddns.service"
+SYSTEMD_SERVICE:${PN} = "kea-dhcp4.service kea-dhcp6.service kea-dhcp-ddns.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-DEBUG_OPTIMIZATION_remove_mips = " -Og"
-DEBUG_OPTIMIZATION_append_mips = " -O"
-BUILD_OPTIMIZATION_remove_mips = " -Og"
-BUILD_OPTIMIZATION_append_mips = " -O"
+DEBUG_OPTIMIZATION:remove:mips = " -Og"
+DEBUG_OPTIMIZATION:append:mips = " -O"
+BUILD_OPTIMIZATION:remove:mips = " -Og"
+BUILD_OPTIMIZATION:append:mips = " -O"
 
-DEBUG_OPTIMIZATION_remove_mipsel = " -Og"
-DEBUG_OPTIMIZATION_append_mipsel = " -O"
-BUILD_OPTIMIZATION_remove_mipsel = " -Og"
-BUILD_OPTIMIZATION_append_mipsel = " -O"
+DEBUG_OPTIMIZATION:remove:mipsel = " -Og"
+DEBUG_OPTIMIZATION:append:mipsel = " -O"
+BUILD_OPTIMIZATION:remove:mipsel = " -Og"
+BUILD_OPTIMIZATION:append:mipsel = " -O"
 
 EXTRA_OECONF = "--with-boost-libs=-lboost_system \
                 --with-log4cplus=${STAGING_DIR_TARGET}${prefix} \
                 --with-openssl=${STAGING_DIR_TARGET}${prefix}"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # replace abs_top_builddir to avoid introducing the build path
     # don't expand the abs_top_builddir on the target as the abs_top_builddir is meanlingless on the target
     find ${S} -type f -name *.sh.in | xargs sed -i  "s:@abs_top_builddir@:@abs_top_builddir_placeholder@:g"
@@ -53,11 +53,11 @@ do_configure_prepend() {
 }
 
 # patch out build host paths for reproducibility
-do_compile_prepend_class-target() {
+do_compile:prepend:class-target() {
         sed -i -e "s,${WORKDIR},,g" ${B}/config.report
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}/init.d
     install -d ${D}${systemd_system_unitdir}
 
@@ -68,13 +68,13 @@ do_install_append() {
            ${D}${systemd_system_unitdir}/kea-dhcp*service ${D}${sbindir}/keactrl
 }
 
-do_install_append() {
+do_install:append() {
     rm -rf "${D}${localstatedir}"
 }
 
-CONFFILES_${PN} = "${sysconfdir}/kea/keactrl.conf"
+CONFFILES:${PN} = "${sysconfdir}/kea/keactrl.conf"
 
-FILES_${PN}-staticdev += "${libdir}/kea/hooks/*.a ${libdir}/hooks/*.a"
-FILES_${PN} += "${libdir}/hooks/*.so"
+FILES:${PN}-staticdev += "${libdir}/kea/hooks/*.a ${libdir}/hooks/*.a"
+FILES:${PN} += "${libdir}/hooks/*.so"
 
 PARALLEL_MAKEINST = ""

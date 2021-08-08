@@ -9,6 +9,6 @@ DEPENDS = "python3-pbr-native python3-git python3-pbr python3-pyyaml python3-six
 
 inherit setuptools3 pypi
 
-RDEPENDS_${PN} += "python3-modules python3-git python3-pbr python3-pyyaml python3-six python3-stevedore"
+RDEPENDS:${PN} += "python3-modules python3-git python3-pbr python3-pyyaml python3-six python3-stevedore"
 
 BBCLASSEXTEND = "native"

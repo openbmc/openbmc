@@ -1,2 +1,2 @@
 PACKAGECONFIG[raspberrypi] = "-Dpipelines=raspberrypi"
-PACKAGECONFIG_append_rpi = " raspberrypi"
+PACKAGECONFIG:append:rpi = " raspberrypi"

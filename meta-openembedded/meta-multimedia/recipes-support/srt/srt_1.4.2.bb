@@ -24,5 +24,5 @@ PACKAGECONFIG[crypt] = "-DENABLE_ENCRYPTION=ON,-DENABLE_ENCRYPTION=OFF,openssl"
 PACKAGECONFIG[utils] = "-DENABLE_APPS=ON,-DENABLE_APPS=OFF,"
 
 PACKAGES += "${@bb.utils.contains('PACKAGECONFIG', 'utils', '${PN}-utils', '', d)}"
-FILES_${PN}-utils += "${bindir}"
-RDEPENDS_${PN}-utils += "${PN}"
+FILES:${PN}-utils += "${bindir}"
+RDEPENDS:${PN}-utils += "${PN}"

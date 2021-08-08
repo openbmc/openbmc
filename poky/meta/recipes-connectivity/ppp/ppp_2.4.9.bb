@@ -43,7 +43,7 @@ do_configure () {
 	oe_runconf
 }
 
-do_install_append () {
+do_install:append () {
 	make install-etcppp ETCDIR=${D}/${sysconfdir}/ppp
 	mkdir -p ${D}${bindir}/ ${D}${sysconfdir}/init.d
 	mkdir -p ${D}${sysconfdir}/ppp/ip-up.d/
@@ -68,29 +68,29 @@ do_install_append () {
 	chmod u+s ${D}${sbindir}/pppd
 }
 
-do_install_append_libc-musl () {
+do_install:append:libc-musl () {
 	install -Dm 0644 ${S}/include/net/ppp_defs.h ${D}${includedir}/net/ppp_defs.h
 }
 
-CONFFILES_${PN} = "${sysconfdir}/ppp/pap-secrets ${sysconfdir}/ppp/chap-secrets ${sysconfdir}/ppp/options"
+CONFFILES:${PN} = "${sysconfdir}/ppp/pap-secrets ${sysconfdir}/ppp/chap-secrets ${sysconfdir}/ppp/options"
 PACKAGES =+ "${PN}-oa ${PN}-oe ${PN}-radius ${PN}-winbind ${PN}-minconn ${PN}-password ${PN}-l2tp ${PN}-tools"
-FILES_${PN}        = "${sysconfdir} ${bindir} ${sbindir}/chat ${sbindir}/pppd ${systemd_unitdir}/system/ppp@.service"
-FILES_${PN}-oa       = "${libdir}/pppd/${PV}/pppoatm.so"
-FILES_${PN}-oe       = "${sbindir}/pppoe-discovery ${libdir}/pppd/${PV}/*pppoe.so"
-FILES_${PN}-radius   = "${libdir}/pppd/${PV}/radius.so ${libdir}/pppd/${PV}/radattr.so ${libdir}/pppd/${PV}/radrealms.so"
-FILES_${PN}-winbind  = "${libdir}/pppd/${PV}/winbind.so"
-FILES_${PN}-minconn  = "${libdir}/pppd/${PV}/minconn.so"
-FILES_${PN}-password = "${libdir}/pppd/${PV}/pass*.so"
-FILES_${PN}-l2tp     = "${libdir}/pppd/${PV}/*l2tp.so"
-FILES_${PN}-tools    = "${sbindir}/pppstats ${sbindir}/pppdump"
-SUMMARY_${PN}-oa       = "Plugin for PPP for PPP-over-ATM support"
-SUMMARY_${PN}-oe       = "Plugin for PPP for PPP-over-Ethernet support"
-SUMMARY_${PN}-radius   = "Plugin for PPP for RADIUS support"
-SUMMARY_${PN}-winbind  = "Plugin for PPP to authenticate against Samba or Windows"
-SUMMARY_${PN}-minconn  = "Plugin for PPP to set a delay before the idle timeout applies"
-SUMMARY_${PN}-password = "Plugin for PPP to get passwords via a pipe"
-SUMMARY_${PN}-l2tp     = "Plugin for PPP for l2tp support"
-SUMMARY_${PN}-tools    = "Additional tools for the PPP package"
+FILES:${PN}        = "${sysconfdir} ${bindir} ${sbindir}/chat ${sbindir}/pppd ${systemd_unitdir}/system/ppp@.service"
+FILES:${PN}-oa       = "${libdir}/pppd/${PV}/pppoatm.so"
+FILES:${PN}-oe       = "${sbindir}/pppoe-discovery ${libdir}/pppd/${PV}/*pppoe.so"
+FILES:${PN}-radius   = "${libdir}/pppd/${PV}/radius.so ${libdir}/pppd/${PV}/radattr.so ${libdir}/pppd/${PV}/radrealms.so"
+FILES:${PN}-winbind  = "${libdir}/pppd/${PV}/winbind.so"
+FILES:${PN}-minconn  = "${libdir}/pppd/${PV}/minconn.so"
+FILES:${PN}-password = "${libdir}/pppd/${PV}/pass*.so"
+FILES:${PN}-l2tp     = "${libdir}/pppd/${PV}/*l2tp.so"
+FILES:${PN}-tools    = "${sbindir}/pppstats ${sbindir}/pppdump"
+SUMMARY:${PN}-oa       = "Plugin for PPP for PPP-over-ATM support"
+SUMMARY:${PN}-oe       = "Plugin for PPP for PPP-over-Ethernet support"
+SUMMARY:${PN}-radius   = "Plugin for PPP for RADIUS support"
+SUMMARY:${PN}-winbind  = "Plugin for PPP to authenticate against Samba or Windows"
+SUMMARY:${PN}-minconn  = "Plugin for PPP to set a delay before the idle timeout applies"
+SUMMARY:${PN}-password = "Plugin for PPP to get passwords via a pipe"
+SUMMARY:${PN}-l2tp     = "Plugin for PPP for l2tp support"
+SUMMARY:${PN}-tools    = "Additional tools for the PPP package"
 
 # Ignore compatibility symlink rp-pppoe.so->pppoe.so
-INSANE_SKIP_${PN}-oe += "dev-so"
+INSANE_SKIP:${PN}-oe += "dev-so"

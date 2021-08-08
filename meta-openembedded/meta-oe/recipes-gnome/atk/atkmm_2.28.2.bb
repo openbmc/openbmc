@@ -17,4 +17,4 @@ SRC_URI[archive.sha256sum] = "a0bb49765ceccc293ab2c6735ba100431807d384ffa14c2ebd
 
 EXTRA_OEMESON = "-Dbuild-documentation=false"
 
-FILES_${PN}-dev += "${libdir}/*/include ${libdir}/*/proc/m4"
+FILES:${PN}-dev += "${libdir}/*/include ${libdir}/*/proc/m4"

@@ -9,4 +9,4 @@ DEPENDS += "libsoup-2.4 dbus-glib upower"
 
 SRC_URI[sha256sum] = "e3242ea951d51bc0fded1d02a4f1f662bec16a1fb10c855f71bda6541a1153fc"
 
-FILES_${PN} += "${datadir}/xfce4/weather"
+FILES:${PN} += "${datadir}/xfce4/weather"

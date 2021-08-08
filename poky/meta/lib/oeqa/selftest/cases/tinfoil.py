@@ -173,8 +173,8 @@ class TinfoilTests(OESelftestTestCase):
             self.assertEqual(value, 'origvalue', 'Variable renamed using config_data.renameVar() does not appear with new name')
             # Test overrides
             tinfoil.config_data.setVar('TESTVAR', 'original')
-            tinfoil.config_data.setVar('TESTVAR_overrideone', 'one')
-            tinfoil.config_data.setVar('TESTVAR_overridetwo', 'two')
+            tinfoil.config_data.setVar('TESTVAR:overrideone', 'one')
+            tinfoil.config_data.setVar('TESTVAR:overridetwo', 'two')
             tinfoil.config_data.appendVar('OVERRIDES', ':overrideone')
             value = tinfoil.config_data.getVar('TESTVAR')
             self.assertEqual(value, 'one', 'Variable overrides not functioning correctly')

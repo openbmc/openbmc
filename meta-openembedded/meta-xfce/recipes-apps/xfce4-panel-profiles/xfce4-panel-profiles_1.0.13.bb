@@ -24,6 +24,6 @@ do_install() {
     sed -i 's:${PYTHON}:python3:g' ${D}${bindir}/xfce4-panel-profiles
 }
 
-FILES_${PN} += "${datadir}/metainfo"
+FILES:${PN} += "${datadir}/metainfo"
 
-RDEPENDS_${PN} += "python3-pygobject python3-pexpect"
+RDEPENDS:${PN} += "python3-pygobject python3-pexpect"

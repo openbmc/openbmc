@@ -8,7 +8,7 @@ SRC_URI = " \
 SRCREV = "9d287e40c57233190a51b6434ba7345370e36f38"
 
 DEPENDS = "vpnc libxml2 krb5 gettext-native"
-RDEPENDS_${PN} = "bash python3-core vpnc-script"
+RDEPENDS:${PN} = "bash python3-core vpnc-script"
 
 PACKAGECONFIG ??= "gnutls lz4 libproxy"
 
@@ -27,6 +27,6 @@ inherit autotools pkgconfig bash-completion
 EXTRA_OECONF += "--with-vpnc-script=${sysconfdir}/vpnc/vpnc-script \
                  --disable-static"
 
-do_install_append() {
+do_install:append() {
     rm ${D}/usr/libexec/openconnect/hipreport-android.sh
 }

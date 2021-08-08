@@ -10,7 +10,7 @@ require conf/machine/include/arm/arch-armv8-2a.inc
 
 # Little Endian base configs
 AVAILTUNES                                         += "cortexa77"
-ARMPKGARCH_tune-cortexa77                           = "cortexa77"
-TUNE_FEATURES_tune-cortexa77                        = "${TUNE_FEATURES_tune-armv8-2a-crypto} cortexa77"
-PACKAGE_EXTRA_ARCHS_tune-cortexa77                  = "${PACKAGE_EXTRA_ARCHS_tune-armv8-2a-crypto} cortexa77"
-BASE_LIB_tune-cortexa77                             = "lib64"
+ARMPKGARCH:tune-cortexa77                           = "cortexa77"
+TUNE_FEATURES:tune-cortexa77                        = "${TUNE_FEATURES:tune-armv8-2a-crypto} cortexa77"
+PACKAGE_EXTRA_ARCHS:tune-cortexa77                  = "${PACKAGE_EXTRA_ARCHS:tune-armv8-2a-crypto} cortexa77"
+BASE_LIB:tune-cortexa77                             = "lib64"

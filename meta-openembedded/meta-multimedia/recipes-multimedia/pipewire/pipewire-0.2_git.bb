@@ -35,31 +35,31 @@ PACKAGES =+ "\
     lib${PN}-modules \
 "
 
-RDEPENDS_lib${PN} += "lib${PN}-modules ${PN}-spa-plugins"
+RDEPENDS:lib${PN} += "lib${PN}-modules ${PN}-spa-plugins"
 
-FILES_${PN} = "\
+FILES:${PN} = "\
     ${sysconfdir}/pipewire/pipewire.conf \
     ${bindir}/pipewire* \
     ${systemd_user_unitdir}/* \
 "
-FILES_lib${PN} = "\
+FILES:lib${PN} = "\
     ${libdir}/libpipewire-*.so.* \
 "
-FILES_lib${PN}-modules = "\
+FILES:lib${PN}-modules = "\
     ${libdir}/pipewire-*/* \
 "
-FILES_${PN}-spa-plugins = "\
+FILES:${PN}-spa-plugins = "\
     ${bindir}/spa-* \
     ${libdir}/spa/* \
 "
-FILES_${PN}-alsa = "\
+FILES:${PN}-alsa = "\
     ${libdir}/alsa-lib/* \
     ${datadir}/alsa/alsa.conf.d/50-pipewire.conf \
 "
-FILES_gstreamer1.0-${PN} = "\
+FILES:gstreamer1.0-${PN} = "\
     ${libdir}/gstreamer-1.0/* \
 "
 
-CONFFILES_${PN} = "\
+CONFFILES:${PN} = "\
     ${sysconfdir}/pipewire/pipewire.conf \
 "

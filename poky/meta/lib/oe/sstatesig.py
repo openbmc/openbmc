@@ -59,7 +59,7 @@ def sstate_rundepfilter(siggen, fn, recipename, task, dep, depname, dataCaches):
         return False
 
     # Kernel modules are well namespaced. We don't want to depend on the kernel's checksum
-    # if we're just doing an RRECOMMENDS_xxx = "kernel-module-*", not least because the checksum
+    # if we're just doing an RRECOMMENDS:xxx = "kernel-module-*", not least because the checksum
     # is machine specific.
     # Therefore if we're not a kernel or a module recipe (inheriting the kernel classes)
     # and we reccomend a kernel-module, we exclude the dependency.
@@ -246,7 +246,7 @@ class SignatureGeneratorOEBasicHashMixIn(object):
                         continue
                     f.write("    " + self.lockedpnmap[fn] + ":" + task + ":" + self.get_unihash(tid) + " \\\n")
                 f.write('    "\n')
-            f.write('SIGGEN_LOCKEDSIGS_TYPES_%s = "%s"' % (self.machine, " ".join(l)))
+            f.write('SIGGEN_LOCKEDSIGS_TYPES:%s = "%s"' % (self.machine, " ".join(l)))
 
     def dump_siglist(self, sigfile, path_prefix_strip=None):
         def strip_fn(fn):

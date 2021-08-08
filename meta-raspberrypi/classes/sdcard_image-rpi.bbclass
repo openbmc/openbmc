@@ -23,12 +23,12 @@ inherit image_types
 # 0                      4MiB     4MiB + 48MiB       4MiB + 48Mib + SDIMG_ROOTFS
 
 # This image depends on the rootfs image
-IMAGE_TYPEDEP_rpi-sdimg = "${SDIMG_ROOTFS_TYPE}"
+IMAGE_TYPEDEP:rpi-sdimg = "${SDIMG_ROOTFS_TYPE}"
 
 # Kernel image name
-SDIMG_KERNELIMAGE_raspberrypi  ?= "kernel.img"
-SDIMG_KERNELIMAGE_raspberrypi2 ?= "kernel7.img"
-SDIMG_KERNELIMAGE_raspberrypi3-64 ?= "kernel8.img"
+SDIMG_KERNELIMAGE:raspberrypi  ?= "kernel.img"
+SDIMG_KERNELIMAGE:raspberrypi2 ?= "kernel7.img"
+SDIMG_KERNELIMAGE:raspberrypi3-64 ?= "kernel8.img"
 
 # Boot partition volume id
 # Shorten raspberrypi to just rpi to keep it under 11 characters
@@ -87,7 +87,7 @@ def split_overlays(d, out, ver=None):
 
     return overlays
 
-IMAGE_CMD_rpi-sdimg () {
+IMAGE_CMD:rpi-sdimg () {
 
     # Align partitions
     BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE} + ${IMAGE_ROOTFS_ALIGNMENT} - 1)

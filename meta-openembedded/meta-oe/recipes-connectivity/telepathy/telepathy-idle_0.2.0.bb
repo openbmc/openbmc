@@ -13,7 +13,7 @@ SRC_URI[sha256sum] = "3013ad4b38d14ee630b8cc8ada5e95ccaa849b9a6fe15d2eaf6d0717d7
 
 inherit autotools pkgconfig ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "pythonnative", "", d)}
 
-FILES_${PN} += "${datadir}/telepathy \
+FILES:${PN} += "${datadir}/telepathy \
                 ${datadir}/dbus-1"
 
 python() {

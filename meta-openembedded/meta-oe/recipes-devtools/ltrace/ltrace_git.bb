@@ -31,7 +31,7 @@ SRC_URI = "git://github.com/sparkleholic/ltrace.git;branch=master;protocol=http 
            file://0001-ppc-Remove-unused-host_powerpc64-function.patch \
            file://0001-mips-Use-hardcodes-values-for-ABI-syscall-bases.patch \
            "
-SRC_URI_append_libc-musl = " file://add_ppc64le.patch"
+SRC_URI:append:libc-musl = " file://add_ppc64le.patch"
 
 S = "${WORKDIR}/git"
 
@@ -41,9 +41,9 @@ PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
 PACKAGECONFIG[unwind] = "--with-libunwind,--without-libunwind,libunwind"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux,libselinux"
 
-COMPATIBLE_HOST_riscv64 = "null"
-COMPATIBLE_HOST_riscv32 = "null"
+COMPATIBLE_HOST:riscv64 = "null"
+COMPATIBLE_HOST:riscv32 = "null"
 
-do_configure_prepend () {
+do_configure:prepend () {
     ( cd ${S}; ./autogen.sh )
 }

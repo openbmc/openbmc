@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=516215fd57564996d70327db19b368ff"
 SECTION = "console/utils"
 
 DEPENDS = "cups glib-2.0 glib-2.0-native dbus dbus-glib lcms ghostscript poppler qpdf libpng"
-DEPENDS_class-native = "poppler-native glib-2.0-native dbus-native pkgconfig-native gettext-native libpng-native"
+DEPENDS:class-native = "poppler-native glib-2.0-native dbus-native pkgconfig-native gettext-native libpng-native"
 
 SRC_URI = "http://openprinting.org/download/cups-filters/cups-filters-${PV}.tar.gz"
 
@@ -23,7 +23,7 @@ EXTRA_OECONF += " --enable-ghostscript --disable-ldap \
                        --with-rcdir=no \
                        --without-php"
 
-EXTRA_OECONF_class-native += " --with-pdftops=pdftops \
+EXTRA_OECONF:class-native += " --with-pdftops=pdftops \
                                     --disable-avahi --disable-ghostscript \
                                     --disable-ldap \
                                     --with-png --without-jpeg --without-tiff"
@@ -46,21 +46,21 @@ PACKAGES =+ "\
         ${PN}-data \
         "
 
-FILES_${PN}-gst = "\
+FILES:${PN}-gst = "\
 	${libexecdir}/cups/filter/gsto* \
 	"
 
-FILES_${PN}-data = "\
+FILES:${PN}-data = "\
 	${datadir}/cups/data \
 	"
 
-FILES_${PN}-dbg += "\
+FILES:${PN}-dbg += "\
 	${libexecdir}/cups/backend/.debug \
 	${libexecdir}/cups/driver/.debug \
 	${libexecdir}/cups/filter/.debug \
 	"
 
-FILES_${PN} += "\
+FILES:${PN} += "\
         ${libexecdir}/cups \
         ${datadir}/ppd/ \
         ${datadir}/cups/charsets \
@@ -70,7 +70,7 @@ FILES_${PN} += "\
         ${datadir}/cups/banners \
 "
 
-do_install_append() {
+do_install:append() {
 	# remove braille dir
 	rm -rf ${D}${datadir}/cups/braille
 
@@ -78,4 +78,4 @@ do_install_append() {
 	sed -i -e 's:${STAGING_DIR_TARGET}::' ${D}/${libdir}/pkgconfig/libcupsfilters.pc
 }
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"

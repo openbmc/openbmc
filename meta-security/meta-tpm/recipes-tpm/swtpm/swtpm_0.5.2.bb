@@ -7,7 +7,7 @@ DEPENDS = "libtasn1 coreutils-native expect socat glib-2.0 net-tools-native libt
 
 # configure checks for the tools already during compilation and
 # then swtpm_setup needs them at runtime
-DEPENDS_append = " tpm-tools-native expect-native socat-native python3-pip-native python3-cryptography-native"
+DEPENDS:append = " tpm-tools-native expect-native socat-native python3-pip-native python3-cryptography-native"
 
 SRCREV = "e59c0c1a7b4c8d652dbb280fd6126895a7057464"
 SRC_URI = "git://github.com/stefanberger/swtpm.git;branch=stable-0.5 \
@@ -36,19 +36,19 @@ PACKAGECONFIG[seccomp] = "--with-seccomp, --without-seccomp, libseccomp"
 EXTRA_OECONF += "--with-tss-user=${TSS_USER} --with-tss-group=${TSS_GROUP}"
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system ${TSS_USER}"
-USERADD_PARAM_${PN} = "--system -g ${TSS_GROUP} --home-dir  \
+GROUPADD_PARAM:${PN} = "--system ${TSS_USER}"
+USERADD_PARAM:${PN} = "--system -g ${TSS_GROUP} --home-dir  \
     --no-create-home  --shell /bin/false ${BPN}"
 
 
 PACKAGES =+ "${PN}-python"
-FILES_${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
 
 PACKAGE_BEFORE_PN = "${PN}-cuse"
-FILES_${PN}-cuse = "${bindir}/swtpm_cuse"
+FILES:${PN}-cuse = "${bindir}/swtpm_cuse"
 
-INSANE_SKIP_${PN}   += "dev-so"
+INSANE_SKIP:${PN}   += "dev-so"
 
-RDEPENDS_${PN} = "libtpm expect socat bash tpm-tools python3 python3-cryptography python3-twisted"
+RDEPENDS:${PN} = "libtpm expect socat bash tpm-tools python3 python3-cryptography python3-twisted"
 
 BBCLASSEXTEND = "native nativesdk"

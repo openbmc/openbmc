@@ -18,7 +18,7 @@ inherit autotools pkgconfig
 
 EXTRA_OECONF = "--disable-gssapi"
 
-do_install_append() {
+do_install:append() {
 	chown root:root ${D}${sysconfdir}/netconfig
 }
 

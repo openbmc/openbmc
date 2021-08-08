@@ -23,6 +23,6 @@ SRC_URI[sha256sum] = "e77d68c0211515459b8812118d606812e300097cfac0b4e9fb34726642
 
 inherit autotools gettext texinfo
 
-CFLAGS_append_class-native = " -Wno-error=unused-value"
+CFLAGS:append:class-native = " -Wno-error=unused-value"
 
 BBCLASSEXTEND = "native"

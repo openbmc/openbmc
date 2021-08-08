@@ -100,7 +100,7 @@ do_install () {
     fi
 }
 
-pkg_postinst_${PN}() {
+pkg_postinst:${PN}() {
     if [ "x$D" = "x" ]; then
         if [ -e /etc/init.d/populate-volatile.sh ]; then
             /etc/init.d/populate-volatile.sh update
@@ -114,4 +114,4 @@ SYSTEMD_SERVICE = " iscsi-initiator.service iscsi-initiator-targets.service "
 INITSCRIPT_NAME = "iscsid"
 INITSCRIPT_PARAMS = "start 30 1 2 3 4 5 . stop 70 0 1 2 3 4 5 6 ."
 
-FILES_${PN} += "${nonarch_libdir}/iscsi"
+FILES:${PN} += "${nonarch_libdir}/iscsi"

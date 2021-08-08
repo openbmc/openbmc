@@ -17,6 +17,6 @@ do_install() {
 }
 
 # exprtk is a header only C++ library, so the main package will be empty.
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
 BBCLASSEXTEND = "native nativesdk"

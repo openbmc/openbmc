@@ -26,11 +26,11 @@ PACKAGECONFIG[telepathy] = "--enable-telepathy=yes,--enable-telepathy=no,telepat
 #PACKAGECONFIG[gssapi_only] = "--enable-gssapi-only=yes,--enable-gssapi-only=no,krb5"
 PACKAGECONFIG[debug] = "--enable-debug=yes,--enable-debug=no,valgrind"
 
-FILES_${PN}-dev += " \
+FILES:${PN}-dev += " \
     ${libdir}/purple-2/*.la \
 "
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/purple-2/libsipe.so \
     ${datadir}/appdata \
     ${datadir}/metainfo \

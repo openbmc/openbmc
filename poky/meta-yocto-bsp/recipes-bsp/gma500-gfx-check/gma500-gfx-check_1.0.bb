@@ -12,7 +12,7 @@ do_install(){
     install -m 644 ${WORKDIR}/gma500-gfx-check.conf ${D}${sysconfdir}/modprobe.d/gma500-gfx-check.conf
 }
 
-FILES_${PN}="${sysconfdir}/modprobe.d/gma500-gfx-check.conf \
+FILES:${PN}="${sysconfdir}/modprobe.d/gma500-gfx-check.conf \
              ${sysconfdir}/modprobe.d/gma500-gfx-check.sh"
 
 COMPATIBLE_MACHINE = "genericx86"

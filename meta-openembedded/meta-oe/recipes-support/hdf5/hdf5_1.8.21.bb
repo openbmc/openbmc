@@ -16,11 +16,12 @@ SRC_URI = " \
     file://H5Tinit-32.c \
     file://0001-cross-compiling-support.patch \
     file://0002-Remove-suffix-shared-from-shared-library-name.patch \
+    file://0001-cmake-remove-build-flags.patch \
 "
 SRC_URI[md5sum] = "2d2408f2a9dfb5c7b79998002e9a90e9"
 SRC_URI[sha256sum] = "e5b1b1dee44a64b795a91c3321ab7196d9e0871fe50d42969761794e3899f40d"
 
-FILES_${PN} += "${libdir}/libhdf5.settings ${datadir}/*"
+FILES:${PN} += "${libdir}/libhdf5.settings ${datadir}/*"
 
 EXTRA_OECMAKE = " \
     -DTEST_LFS_WORKS_RUN=0 \
@@ -47,7 +48,7 @@ gen_hd5file() {
     install -m 544 ${WORKDIR}/H5Tinit-${SITEINFO_BITS}.c ${S}/H5Tinit.c
 }
 
-do_install_append() {
+do_install:append() {
     # Used for generating config files on target
     install -m 755 ${B}/bin/H5detect ${D}${bindir}
     install -m 755 ${B}/bin/H5make_libsettings ${D}${bindir}

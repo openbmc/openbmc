@@ -4,8 +4,8 @@ require conf/image-uefi.conf
 
 GRUBPLATFORM = "efi"
 
-DEPENDS_append = " grub-native"
-RDEPENDS_${PN} = "grub-common virtual/grub-bootconf"
+DEPENDS:append = " grub-native"
+RDEPENDS:${PN} = "grub-common virtual/grub-bootconf"
 
 SRC_URI += " \
            file://cfg \
@@ -79,13 +79,13 @@ do_deploy() {
 
 addtask deploy after do_install before do_build
 
-FILES_${PN} = "${libdir}/grub/${GRUB_TARGET}-efi \
+FILES:${PN} = "${libdir}/grub/${GRUB_TARGET}-efi \
                ${datadir}/grub \
                ${EFI_FILES_PATH}/${GRUB_IMAGE} \
                "
 
 # 64-bit binaries are expected for the bootloader with an x32 userland
-INSANE_SKIP_${PN}_append_linux-gnux32 = " arch"
-INSANE_SKIP_${PN}-dbg_append_linux-gnux32 = " arch"
-INSANE_SKIP_${PN}_append_linux-muslx32 = " arch"
-INSANE_SKIP_${PN}-dbg_append_linux-muslx32 = " arch"
+INSANE_SKIP:${PN}:append:linux-gnux32 = " arch"
+INSANE_SKIP:${PN}-dbg:append:linux-gnux32 = " arch"
+INSANE_SKIP:${PN}:append:linux-muslx32 = " arch"
+INSANE_SKIP:${PN}-dbg:append:linux-muslx32 = " arch"

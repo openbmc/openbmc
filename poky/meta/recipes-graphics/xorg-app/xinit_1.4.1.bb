@@ -22,4 +22,4 @@ EXTRA_OECONF = "ac_cv_path_MCOOKIE=${bindir}/mcookie"
 PACKAGECONFIG ??= "rxvt"
 PACKAGECONFIG[rxvt] = "--with-xterm=rxvt,,,rxvt-unicode"
 
-RDEPENDS_${PN} += "util-linux-mcookie"
+RDEPENDS:${PN} += "util-linux-mcookie"

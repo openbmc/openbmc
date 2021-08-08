@@ -30,7 +30,7 @@ EXTRA_OECONF = " \
     --disable-python2 \
 "
 
-do_configure_prepend() {
+do_configure:prepend() {
     touch ${S}/ChangeLog
     touch ${S}/ABOUT-NLS
 }

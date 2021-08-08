@@ -30,6 +30,6 @@ do_install() {
         install -Dm 0755 ${S}/analyze_suspend.py ${D}${bindir}/analyze_suspend.py
 }
 
-RDEPENDS_${PN} += "python3-core python3-threading python3-datetime python3-compression"
-RPROVIDES_${PN} = "analyze-suspend"
+RDEPENDS:${PN} += "python3-core python3-threading python3-datetime python3-compression"
+RPROVIDES:${PN} = "analyze-suspend"
 BBCLASSEXTEND = "native nativesdk"

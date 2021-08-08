@@ -15,15 +15,15 @@ inherit autotools pkgconfig
 
 PACKAGES =+ "${PN}-lenses lib${BPN}"
 
-FILES_${PN}-lenses = "${datadir}/augeas/lenses"
-FILES_lib${BPN} = "${libdir}/lib*${SOLIBS}"
+FILES:${PN}-lenses = "${datadir}/augeas/lenses"
+FILES:lib${BPN} = "${libdir}/lib*${SOLIBS}"
 
-RDEPENDS_lib${BPN} += "${PN}-lenses"
-RRECOMMENDS_lib${BPN} += "${PN}"
+RDEPENDS:lib${BPN} += "${PN}-lenses"
+RRECOMMENDS:lib${BPN} += "${PN}"
 
 LEAD_SONAME = "libaugeas.so"
 
-do_install_append() {
+do_install:append() {
     rm -fr ${D}${datadir}/vim
 }
 

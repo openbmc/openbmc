@@ -7,7 +7,7 @@ SRC_URI[sha256sum] = "b2e5b40261e20f354d198eae92afc10d750afb487ed5e50f9c4eaf07c1
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-lxml \
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-webencodings \

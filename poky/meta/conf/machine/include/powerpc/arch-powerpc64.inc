@@ -12,12 +12,12 @@ TUNE_CCARGS .= "${@['', ' -mabi=elfv2']['libc-musl' in d.getVar('OVERRIDES').spl
 
 AVAILTUNES += "powerpc64 powerpc64le"
 
-TUNE_FEATURES_tune-powerpc64 = "m64 fpu-hard bigendian"
-BASE_LIB_tune-powerpc64 = "lib64"
-TUNE_PKGARCH_tune-powerpc64 = "powerpc64"
-PACKAGE_EXTRA_ARCHS_tune-powerpc64 = "powerpc64"
+TUNE_FEATURES:tune-powerpc64 = "m64 fpu-hard bigendian"
+BASE_LIB:tune-powerpc64 = "lib64"
+TUNE_PKGARCH:tune-powerpc64 = "powerpc64"
+PACKAGE_EXTRA_ARCHS:tune-powerpc64 = "powerpc64"
 
-TUNE_FEATURES_tune-powerpc64le = "m64 fpu-hard"
-BASE_LIB_tune-powerpc64le = "lib64"
-TUNE_PKGARCH_tune-powerpc64le = "powerpc64le"
-PACKAGE_EXTRA_ARCHS_tune-powerpc64le = "powerpc64le"
+TUNE_FEATURES:tune-powerpc64le = "m64 fpu-hard"
+BASE_LIB:tune-powerpc64le = "lib64"
+TUNE_PKGARCH:tune-powerpc64le = "powerpc64le"
+PACKAGE_EXTRA_ARCHS:tune-powerpc64le = "powerpc64le"

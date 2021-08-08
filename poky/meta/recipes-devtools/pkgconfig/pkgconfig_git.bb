@@ -30,8 +30,8 @@ inherit autotools
 EXTRA_OECONF += "--disable-indirect-deps"
 
 PACKAGECONFIG ??= "glib"
-PACKAGECONFIG_class-native = ""
-PACKAGECONFIG_class-nativesdk = ""
+PACKAGECONFIG:class-native = ""
+PACKAGECONFIG:class-nativesdk = ""
 
 PACKAGECONFIG[glib] = "--without-internal-glib,--with-internal-glib,glib-2.0 pkgconfig-native"
 
@@ -42,17 +42,17 @@ BBCLASSEXTEND = "native nativesdk"
 # Set an empty dev package to ensure the base PN package gets
 # the pkg.m4 macros, pkgconfig does not deliver any other -dev
 # files.
-FILES_${PN}-dev = ""
-FILES_${PN} += "${datadir}/aclocal/pkg.m4"
+FILES:${PN}-dev = ""
+FILES:${PN} += "${datadir}/aclocal/pkg.m4"
 
 # When using the RPM generated automatic package dependencies, some packages
 # will end up requiring 'pkgconfig(pkg-config)'.  Allow this behavior by
 # specifying an appropriate provide.
-RPROVIDES_${PN} += "pkgconfig(pkg-config)"
+RPROVIDES:${PN} += "pkgconfig(pkg-config)"
 
 # Install a pkg-config-native wrapper that will use the native sysroot instead
 # of the MACHINE sysroot, for using pkg-config when building native tools.
-do_install_append_class-native () {
+do_install:append:class-native () {
     sed -e "s|@PATH_NATIVE@|${PKG_CONFIG_PATH}|" \
         -e "s|@LIBDIR_NATIVE@|${PKG_CONFIG_LIBDIR}|" \
         < ${WORKDIR}/pkg-config-native.in > ${B}/pkg-config-native
@@ -72,4 +72,4 @@ pkgconfig_sstate_fixup_esdk () {
 	fi
 }
 
-SSTATEPOSTUNPACKFUNCS_append_class-native = " pkgconfig_sstate_fixup_esdk"
+SSTATEPOSTUNPACKFUNCS:append:class-native = " pkgconfig_sstate_fixup_esdk"

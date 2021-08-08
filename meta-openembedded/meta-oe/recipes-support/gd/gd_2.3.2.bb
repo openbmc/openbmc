@@ -34,21 +34,21 @@ EXTRA_OECONF += " --disable-rpath \
 
 EXTRA_OEMAKE = 'LDFLAGS="${LDFLAGS}"'
 
-DEBUG_OPTIMIZATION_append = " -Wno-error=maybe-uninitialized"
+DEBUG_OPTIMIZATION:append = " -Wno-error=maybe-uninitialized"
 
-do_install_append_class-target() {
+do_install:append:class-target() {
     # cleanup buildpaths from gdlib.pc
     sed -i -e 's#${STAGING_DIR_HOST}##g' ${D}${libdir}/pkgconfig/gdlib.pc
 }
 
 PACKAGES += "${PN}-tools"
 
-FILES_${PN} = "${libdir}/lib*${SOLIBS}"
-FILES_${PN}-tools = "${bindir}/*"
+FILES:${PN} = "${libdir}/lib*${SOLIBS}"
+FILES:${PN}-tools = "${bindir}/*"
 
 PROVIDES += "${PN}-tools"
-RPROVIDES_${PN}-tools = "${PN}-tools"
-RDEPENDS_${PN}-tools = "perl perl-module-strict"
+RPROVIDES:${PN}-tools = "${PN}-tools"
+RDEPENDS:${PN}-tools = "perl perl-module-strict"
 
 CVE_PRODUCT = "libgd"
 

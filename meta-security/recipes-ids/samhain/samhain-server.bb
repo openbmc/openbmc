@@ -10,7 +10,7 @@ SRC_URI += "file://samhain-server-volatiles \
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
-do_install_append() {
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/tmpfiles.d
         install -m 0644 ${WORKDIR}/samhain-server-volatiles.conf \
@@ -25,5 +25,5 @@ do_install_append() {
         init/samhain.startLSB ${D}/var/lib/samhain
 }
 
-RDEPENDS_${PN} += "gmp bash perl"
-RCONFLICTS_${PN} = "samhain-standalone"
+RDEPENDS:${PN} += "gmp bash perl"
+RCONFLICTS:${PN} = "samhain-standalone"

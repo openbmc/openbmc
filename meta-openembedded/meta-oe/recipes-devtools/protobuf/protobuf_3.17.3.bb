@@ -8,7 +8,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=37b5762e07f0af8c74ce80a8bda4266b"
 
 DEPENDS = "zlib"
-DEPENDS_append_class-target = " protobuf-native"
+DEPENDS:append:class-target = " protobuf-native"
 
 SRCREV = "909a0f36a10075c4b4bc70fdee2c7e32dd612a72"
 
@@ -73,18 +73,18 @@ do_install_ptest() {
 
 PACKAGE_BEFORE_PN = "${PN}-compiler ${PN}-lite"
 
-FILES_${PN}-compiler = "${bindir} ${libdir}/libprotoc${SOLIBS}"
-FILES_${PN}-lite = "${libdir}/libprotobuf-lite${SOLIBS}"
+FILES:${PN}-compiler = "${bindir} ${libdir}/libprotoc${SOLIBS}"
+FILES:${PN}-lite = "${libdir}/libprotobuf-lite${SOLIBS}"
 
-RDEPENDS_${PN}-compiler = "${PN}"
-RDEPENDS_${PN}-dev += "${PN}-compiler"
-RDEPENDS_${PN}-ptest = "bash ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python-protobuf', '', d)}"
+RDEPENDS:${PN}-compiler = "${PN}"
+RDEPENDS:${PN}-dev += "${PN}-compiler"
+RDEPENDS:${PN}-ptest = "bash ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python-protobuf', '', d)}"
 
 MIPS_INSTRUCTION_SET = "mips"
 
 BBCLASSEXTEND = "native nativesdk"
 
-LDFLAGS_append_arm = " -latomic"
-LDFLAGS_append_mips = " -latomic"
-LDFLAGS_append_powerpc = " -latomic"
-LDFLAGS_append_mipsel = " -latomic"
+LDFLAGS:append:arm = " -latomic"
+LDFLAGS:append:mips = " -latomic"
+LDFLAGS:append:powerpc = " -latomic"
+LDFLAGS:append:mipsel = " -latomic"

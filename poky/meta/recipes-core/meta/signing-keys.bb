@@ -14,9 +14,9 @@ SYSROOT_DIRS += "${sysconfdir}/pki"
 
 PACKAGES =+ "${PN}-ipk ${PN}-rpm ${PN}-packagefeed"
 
-FILES_${PN}-rpm = "${sysconfdir}/pki/rpm-gpg"
-FILES_${PN}-ipk = "${sysconfdir}/pki/ipk-gpg"
-FILES_${PN}-packagefeed = "${sysconfdir}/pki/packagefeed-gpg"
+FILES:${PN}-rpm = "${sysconfdir}/pki/rpm-gpg"
+FILES:${PN}-ipk = "${sysconfdir}/pki/ipk-gpg"
+FILES:${PN}-packagefeed = "${sysconfdir}/pki/packagefeed-gpg"
 
 python do_get_public_keys () {
     from oe.gpg_sign import get_signer

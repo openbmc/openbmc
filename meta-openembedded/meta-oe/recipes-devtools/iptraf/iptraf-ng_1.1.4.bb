@@ -36,7 +36,7 @@ inherit autotools-brokensep pkgconfig
 CFLAGS += "-D_GNU_SOURCE"
 
 PROVIDES = "iptraf"
-RPROVIDES_${PN} += "iptraf"
-RREPLACES_${PN} += "iptraf"
-RCONFLICTS_${PN} += "iptraf"
+RPROVIDES:${PN} += "iptraf"
+RREPLACES:${PN} += "iptraf"
+RCONFLICTS:${PN} += "iptraf"
 

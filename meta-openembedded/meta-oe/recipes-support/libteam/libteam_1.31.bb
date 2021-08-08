@@ -20,20 +20,20 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig ptest
 
-FILES_${PN} = "${libdir}/libteam${SOLIBS} \
+FILES:${PN} = "${libdir}/libteam${SOLIBS} \
 "
 
 PACKAGES += "${PN}-dctl ${PN}-utils"
-FILES_${PN}-dctl = "${libdir}/libteamdctl${SOLIBS} \
+FILES:${PN}-dctl = "${libdir}/libteamdctl${SOLIBS} \
 "
-FILES_${PN}-utils = "${bindir}/bond2team \
+FILES:${PN}-utils = "${bindir}/bond2team \
                      ${bindir}/teamd \
                      ${bindir}/teamdctl \
                      ${bindir}/teamnl \
 "
 
-RDEPENDS_${PN}-utils = "bash"
-RDEPENDS_${PN}-ptest = "python3-core"
+RDEPENDS:${PN}-utils = "bash"
+RDEPENDS:${PN}-ptest = "python3-core"
 
 do_install_ptest() {
 	install ${S}/scripts/team_basic_test.py ${D}${PTEST_PATH}/

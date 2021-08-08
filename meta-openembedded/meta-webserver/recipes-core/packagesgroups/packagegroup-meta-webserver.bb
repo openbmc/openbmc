@@ -11,14 +11,14 @@ PACKAGES = ' \
     packagegroup-meta-webserver-webadmin \
 '
 
-RDEPENDS_packagegroup-meta-webserver = "\
+RDEPENDS:packagegroup-meta-webserver = "\
     packagegroup-meta-webserver-http \
     packagegroup-meta-webserver-php \
     packagegroup-meta-webserver-support \
     packagegroup-meta-webserver-webadmin \
 "
 
-RDEPENDS_packagegroup-meta-webserver-http = "\
+RDEPENDS:packagegroup-meta-webserver-http = "\
     apache-websocket \
     apache2 \
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-python2", "cherokee", "", d)} \
@@ -29,18 +29,18 @@ RDEPENDS_packagegroup-meta-webserver-http = "\
     sthttpd \
 "
 
-RDEPENDS_packagegroup-meta-webserver-php = "\
+RDEPENDS:packagegroup-meta-webserver-php = "\
     phpmyadmin \
     xdebug \
 "
 
-RDEPENDS_packagegroup-meta-webserver-support = "\
+RDEPENDS:packagegroup-meta-webserver-support = "\
     spawn-fcgi \
     fcgi \
     fcgiwrap \
 "
 
-RDEPENDS_packagegroup-meta-webserver-webadmin = "\
+RDEPENDS:packagegroup-meta-webserver-webadmin = "\
     cockpit \
     webmin \
     netdata \

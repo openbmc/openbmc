@@ -10,4 +10,4 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3 python3native
 
-RDEPENDS_${PN} += "${PYTHON_PN}-datetime ${PYTHON_PN}-io"
+RDEPENDS:${PN} += "${PYTHON_PN}-datetime ${PYTHON_PN}-io"

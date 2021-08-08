@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "9d689e6ca1b3038bc82bf8d23e944b6b6037bc02301a574935b2dd946e
 
 inherit pypi setuptools3 update-alternatives
 
-ALTERNATIVE_${PN} = "\
+ALTERNATIVE:${PN} = "\
     pyrsa-decrypt \
     pyrsa-encrypt \
     pyrsa-keygen \
@@ -26,7 +26,7 @@ ALTERNATIVE_LINK_NAME[pyrsa-verify] = "${bindir}/pyrsa-verify"
 ALTERNATIVE_PRIORITY = "30"
 
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-compression \
     ${PYTHON_PN}-crypt \
     ${PYTHON_PN}-doctest \
@@ -37,4 +37,4 @@ RDEPENDS_${PN} += "\
     ${PYTHON_PN}-pickle \
 "
 
-RDEPENDS_${PN} += "${PYTHON_PN}-pyasn1"
+RDEPENDS:${PN} += "${PYTHON_PN}-pyasn1"

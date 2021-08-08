@@ -35,11 +35,11 @@ S = "${WORKDIR}/Test-Harness-${PV}"
 
 inherit cpan ptest-perl
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     perl-module-benchmark \
 "
 
-RPROVIDES_${PN} += "libapp-prove-perl \
+RPROVIDES:${PN} += "libapp-prove-perl \
                     libapp-prove-state-perl \
                     libapp-prove-state-result-perl \
                     libapp-prove-state-result-test-perl \
@@ -88,7 +88,7 @@ RPROVIDES_${PN} += "libapp-prove-perl \
                     libtap-parser-yamlish-writer-perl \
                     "
 
-do_install_prepend() {
+do_install:prepend() {
 	# these tests are inappropriate on target
 	rm -rf ${B}/t/000-load.t
 	rm -rf ${B}/t/state.t
@@ -107,7 +107,7 @@ do_install_prepend() {
 	rm -rf ${B}/t/compat/version.t
 }
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}/usr/local/bin
 	# do not clobber perl-misc /usr/bin/prove
 	install -m 0755 ${B}/bin/prove ${D}/usr/local/bin/
@@ -115,6 +115,6 @@ do_install_append() {
 	rm -rf ${D}${bindir}
 }
 
-FILES_${PN} += "/usr/local/bin/prove"
+FILES:${PN} += "/usr/local/bin/prove"
 
 BBCLASSEXTEND = "native"

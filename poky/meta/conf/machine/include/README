@@ -31,10 +31,10 @@ TUNECONFLICTS[feature] - A list of features which conflict with <feature>.
 New sanity checks will try to reject combinations in which a single
 tuning ends up with features which conflict with each other.
 
-TUNE_FEATURES - This is automatically defined as TUNE_FEATURES_tune-<tune>.
-See TUNE_FEATURES_tune-<tune> for more information.
+TUNE_FEATURES - This is automatically defined as TUNE_FEATURES:tune-<tune>.
+See TUNE_FEATURES:tune-<tune> for more information.
 
-TUNE_FEATURES_tune-<tune> - Specify the features used to describe a
+TUNE_FEATURES:tune-<tune> - Specify the features used to describe a
 specific tune.  This is a list of features that a tune support, each
 feature must be in the TUNEVALID list.  Note: the tune and a given
 feature name may be the same, but they have different purposes.  Only
@@ -66,10 +66,10 @@ CPU family.
 
 PACKAGE_EXTRA_ARCHS - Lists all runtime compatible package
 architectures.  By default this is equal to
-PACKAGE_EXTRA_ARCHS_tune-<tune>.  If an architecture deviates from the
+PACKAGE_EXTRA_ARCHS:tune-<tune>.  If an architecture deviates from the
 default it will be listed in the architecture README.
 
-PACKAGE_EXTRA_ARCHS_tune-<tune> - List all of the package architectures
+PACKAGE_EXTRA_ARCHS:tune-<tune> - List all of the package architectures
 that are compatible with this specific tune.  The package arch of this
 tune must be in the list.
 
@@ -79,7 +79,7 @@ architecture specific floating point.  This is synchronized with the
 compiler and other toolchain items.  This should be dynamically
 configured in the same way that TUNE_CCARGS is.
 
-BASE_LIB_tune-<tune> - The "/lib" location for a specific ABI.  This is
+BASE_LIB:tune-<tune> - The "/lib" location for a specific ABI.  This is
 used in a multilib configuration to place the libraries in the correct,
 non-conflicting locations.
 

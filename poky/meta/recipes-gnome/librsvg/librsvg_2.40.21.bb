@@ -36,17 +36,17 @@ PACKAGECONFIG[gdkpixbuf] = "--enable-pixbuf-loader,--disable-pixbuf-loader,gdk-p
 # GTK+ test application (rsvg-view)
 PACKAGECONFIG[gtk] = "--with-gtk3,--without-gtk3,gtk+3"
 
-do_install_append() {
+do_install:append() {
 	# Loadable modules don't need .a or .la on Linux
 	rm -f ${D}${libdir}/gdk-pixbuf-2.0/*/loaders/*.a ${D}${libdir}/gdk-pixbuf-2.0/*/loaders/*.la
 }
 
 PACKAGES =+ "librsvg-gtk rsvg"
-FILES_rsvg = "${bindir}/rsvg* \
+FILES:rsvg = "${bindir}/rsvg* \
 	      ${datadir}/pixmaps/svg-viewer.svg \
 	      ${datadir}/themes"
-FILES_librsvg-gtk = "${libdir}/gdk-pixbuf-2.0/*/*/*.so \
+FILES:librsvg-gtk = "${libdir}/gdk-pixbuf-2.0/*/*/*.so \
                      ${datadir}/thumbnailers/librsvg.thumbnailer"
-RRECOMMENDS_librsvg-gtk = "gdk-pixbuf-bin"
+RRECOMMENDS:librsvg-gtk = "gdk-pixbuf-bin"
 
 PIXBUF_PACKAGES = "librsvg-gtk"

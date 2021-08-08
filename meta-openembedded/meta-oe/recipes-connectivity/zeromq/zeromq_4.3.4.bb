@@ -26,4 +26,4 @@ do_install_ptest () {
     install -m 0755 ${B}/bin/test_* ${D}${PTEST_PATH}/tests
 }
 
-FILES_${PN}-doc += "${datadir}/zmq/*.txt"
+FILES:${PN}-doc += "${datadir}/zmq/*.txt"

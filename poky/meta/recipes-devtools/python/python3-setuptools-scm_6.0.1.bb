@@ -11,14 +11,14 @@ inherit pypi setuptools3
 
 UPSTREAM_CHECK_REGEX = "setuptools_scm-(?P<pver>.*)\.tar"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-debugger \
     ${PYTHON_PN}-json \
     ${PYTHON_PN}-py \
     ${PYTHON_PN}-setuptools \
     ${PYTHON_PN}-toml \
 "
-RDEPENDS_${PN}_class-native = "\
+RDEPENDS:${PN}:class-native = "\
     ${PYTHON_PN}-setuptools-native \
     ${PYTHON_PN}-toml-native \
 "

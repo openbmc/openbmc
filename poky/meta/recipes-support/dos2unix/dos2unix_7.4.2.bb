@@ -25,7 +25,7 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[nls] = "ENABLE_NLS=1,ENABLE_NLS=,po4a-native"
 
 EXTRA_OEMAKE = "${PACKAGECONFIG_CONFARGS} LDFLAGS_USER='${LDFLAGS}'"
-EXTRA_OEMAKE_class-native = "ENABLE_NLS="
+EXTRA_OEMAKE:class-native = "ENABLE_NLS="
 
 do_install () {
 	oe_runmake DESTDIR="${D}${base_prefix}" install

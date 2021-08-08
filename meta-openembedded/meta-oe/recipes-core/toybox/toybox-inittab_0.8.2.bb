@@ -12,7 +12,7 @@ SRC_URI = "\
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-RCONFLICTS_${PN} = "\
+RCONFLICTS:${PN} = "\
     busybox-inittab \
     sysvinit-inittab \
 "
@@ -56,7 +56,7 @@ do_install() {
 	install -D -m 0744 ${S}/rcS ${D}${sysconfdir}/init.d/rcS
 }
 
-FILES_${PN} = "\
+FILES:${PN} = "\
     ${sysconfdir}/inittab \
     ${sysconfdir}/init.d/rcK \
     ${sysconfdir}/init.d/rcS \

@@ -13,4 +13,4 @@ PYPI_PACKAGE = "Flask-Login"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN}_class-target = "${PYTHON_PN}-flask"
+RDEPENDS:${PN}:class-target = "${PYTHON_PN}-flask"

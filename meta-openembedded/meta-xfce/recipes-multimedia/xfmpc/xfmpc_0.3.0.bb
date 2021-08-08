@@ -8,7 +8,7 @@ DEPENDS = "libxfce4util libxfce4ui libmpd vala-native"
 LICENSE_FLAGS = "commercial"
 
 # for now we recommend our own mpd-server
-RRECOMMENDS_${PN} = "mpd"
+RRECOMMENDS:${PN} = "mpd"
 
 inherit xfce-app
 

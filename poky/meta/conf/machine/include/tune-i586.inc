@@ -8,7 +8,7 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'i586', ' -march=i586', ''
 
 # Extra tune selections
 AVAILTUNES += "i586"
-TUNE_FEATURES_tune-i586 = "${TUNE_FEATURES_tune-x86} i586"
-BASE_LIB_tune-i586 = "lib"
-TUNE_PKGARCH_tune-i586 = "i586"
-PACKAGE_EXTRA_ARCHS_tune-i586 = "${PACKAGE_EXTRA_ARCHS_tune-x86} i586"
+TUNE_FEATURES:tune-i586 = "${TUNE_FEATURES:tune-x86} i586"
+BASE_LIB:tune-i586 = "lib"
+TUNE_PKGARCH:tune-i586 = "i586"
+PACKAGE_EXTRA_ARCHS:tune-i586 = "${PACKAGE_EXTRA_ARCHS:tune-x86} i586"

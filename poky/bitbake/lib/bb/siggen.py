@@ -228,7 +228,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
         #    self.dump_sigtask(fn, task, d.getVar("STAMP"), False)
 
         for task in taskdeps:
-            d.setVar("BB_BASEHASH_task-%s" % task, self.basehash[fn + ":" + task])
+            d.setVar("BB_BASEHASH:task-%s" % task, self.basehash[fn + ":" + task])
 
     def postparsing_clean_cache(self):
         #
@@ -325,7 +325,7 @@ class SignatureGeneratorBasic(SignatureGenerator):
 
         h = hashlib.sha256(data.encode("utf-8")).hexdigest()
         self.taskhash[tid] = h
-        #d.setVar("BB_TASKHASH_task-%s" % task, taskhash[task])
+        #d.setVar("BB_TASKHASH:task-%s" % task, taskhash[task])
         return h
 
     def writeout_file_checksum_cache(self):

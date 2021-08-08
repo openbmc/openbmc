@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
                     file://src/main.c;endline=21;md5=0a994e09769780220163255d8f9071c3"
 
 DEPENDS = "glib-2.0 glib-2.0-native dbus dbus-glib virtual/libx11"
-RDEPENDS_${PN} += "base-files"
+RDEPENDS:${PN} += "base-files"
 
 inherit autotools pkgconfig features_check
 # depends on virtual/libx11
@@ -31,15 +31,15 @@ PACKAGECONFIG[pam] = "--enable-pam-module --with-pam-module-dir=${base_libdir}/s
 PACKAGECONFIG[polkit] = "--with-polkit,--without-polkit,polkit"
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_unitdir}/system/,--with-systemdsystemunitdir="
 
-FILES_${PN} += "${exec_prefix}/lib/ConsoleKit \
+FILES:${PN} += "${exec_prefix}/lib/ConsoleKit \
                 ${libdir}/ConsoleKit  ${systemd_unitdir} ${base_libdir} \
                 ${datadir}/dbus-1 ${datadir}/PolicyKit ${datadir}/polkit*"
 
 PACKAGES =+ "pam-plugin-ck-connector"
-FILES_pam-plugin-ck-connector += "${base_libdir}/security/*.so"
-RDEPENDS_pam-plugin-ck-connector += "${PN}"
+FILES:pam-plugin-ck-connector += "${base_libdir}/security/*.so"
+RDEPENDS:pam-plugin-ck-connector += "${PN}"
 
-do_install_append() {
+do_install:append() {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
 		install -d ${D}${sysconfdir}/tmpfiles.d
 		echo "d ${localstatedir}/log/ConsoleKit - - - -" \

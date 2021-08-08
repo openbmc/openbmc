@@ -20,5 +20,5 @@ BBCLASSEXTEND = "native nativesdk"
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "90"
-ALTERNATIVE_${PN}-doc = "history.3"
+ALTERNATIVE:${PN}-doc = "history.3"
 ALTERNATIVE_LINK_NAME[history.3] = "${mandir}/man3/history.3"

@@ -18,7 +18,7 @@ S = "${WORKDIR}/NetworkManager-openvpn-${PV}"
 # meta-gnome in layers is required using gnome:
 PACKAGECONFIG[gnome] = "--with-gnome,--without-gnome,gtk+3 libnma libsecret"
 
-do_configure_append() {
+do_configure:append() {
     # network-manager-openvpn.metainfo.xml is created in source folder but
     # compile expects it in build folder. As long as nobody comes up with a
     # better solution just support build:
@@ -28,26 +28,26 @@ do_configure_append() {
     fi
 }
 
-do_install_append () {
+do_install:append () {
     rm -rf ${D}${libdir}/NetworkManager/*.la
 }
 
 # Create user and group nm-openvpn that are needed since version 1.0.6
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system nm-openvpn"
+USERADD_PARAM:${PN} = "--system nm-openvpn"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/metainfo \
     ${libdir}/NetworkManager/*.so \
     ${nonarch_libdir}/NetworkManager/VPN/nm-openvpn-service.name \
 "
 
-FILES_${PN}-staticdev += " \
+FILES:${PN}-staticdev += " \
     ${libdir}/NetworkManager/*.a \
 "
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     networkmanager \
     openvpn \
 "

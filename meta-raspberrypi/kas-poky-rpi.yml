@@ -42,10 +42,10 @@ local_conf_header:
   reduce_diskspace: |
     INHERIT += "rm_work_and_downloads"
   standard: |
-    CONF_VERSION = "1"
+    CONF_VERSION = "2"
     PACKAGE_CLASSES = "package_rpm"
     SDKMACHINE = "x86_64"
-    USER_CLASSES = "buildstats image-prelink"
+    USER_CLASSES = "buildstats"
     PATCHRESOLVE = "noop"
   debug-tweaks: |
     EXTRA_IMAGE_FEATURES = "debug-tweaks"

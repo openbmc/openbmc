@@ -10,6 +10,6 @@ inherit pypi setuptools3
 
 PYPI_PACKAGE = "python-periphery"
 
-RDEPENDS_${PN} += "${PYTHON_PN}-mmap \
+RDEPENDS:${PN} += "${PYTHON_PN}-mmap \
 		${PYTHON_PN}-ctypes \
 		${PYTHON_PN}-fcntl"

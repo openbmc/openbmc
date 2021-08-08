@@ -20,8 +20,8 @@ PACKAGECONFIG[mobile_broadband_provider_info] = "-Dmobile_broadband_provider_inf
 
 # go introspection is not supported for mipsn32/riscv32, but vapi needs it
 #
-EXTRA_OEMESON_append_mipsarchn32 = " -Dvapi=false"
-EXTRA_OEMESON_append_riscv32 = " -Dvapi=false"
-EXTRA_OEMESON_append_powerpc64le = " -Dvapi=false"
+EXTRA_OEMESON:append:mipsarchn32 = " -Dvapi=false"
+EXTRA_OEMESON:append:riscv32 = " -Dvapi=false"
+EXTRA_OEMESON:append:powerpc64le = " -Dvapi=false"
 
 GTKDOC_MESON_OPTION = "gtk_doc"

@@ -14,6 +14,6 @@ SRC_URI = "git://github.com/libusbg/libusbg.git \
 
 S = "${WORKDIR}/git"
 
-ALTERNATIVE_${PN} = "gadget-acm-ecm show-gadgets"
+ALTERNATIVE:${PN} = "gadget-acm-ecm show-gadgets"
 ALTERNATIVE_LINK_NAME[gadget-acm-ecm] = "${bindir}/gadget-acm-ecm"
 ALTERNATIVE_LINK_NAME[show-gadgets] = "${bindir}/show-gadgets"

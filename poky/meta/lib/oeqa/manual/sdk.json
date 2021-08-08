@@ -26,7 +26,7 @@
                     "expected_results": "Expect both qemu to boot up successfully."
                 }
             },
-            "summary": "test_install_cross_toolchain_can_run_multiple_qemu_for_x86"
+            "summary": "test_install_cross_toolchain_can_run_multiple_qemu_for:x86"
         }
     }
 ]

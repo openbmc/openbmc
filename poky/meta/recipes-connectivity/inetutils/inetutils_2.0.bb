@@ -47,10 +47,10 @@ EXTRA_OECONF = "--with-ncurses-include-dir=${STAGING_INCDIR} \
 "
 
 # These are horrible for security, disable them
-EXTRA_OECONF_append = " --disable-rsh --disable-rshd --disable-rcp \
+EXTRA_OECONF:append = " --disable-rsh --disable-rshd --disable-rcp \
         --disable-rlogin --disable-rlogind --disable-rexec --disable-rexecd"
 
-do_configure_prepend () {
+do_configure:prepend () {
     export HELP2MAN='true'
     cp ${STAGING_DATADIR_NATIVE}/gettext/config.rpath ${S}/build-aux/config.rpath
     install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}
@@ -58,7 +58,7 @@ do_configure_prepend () {
     rm -f ${S}/glob/configure*
 }
 
-do_install_append () {
+do_install:append () {
     install -m 0755 -d ${D}${base_sbindir}
     install -m 0755 -d ${D}${sbindir}
     install -m 0755 -d ${D}${sysconfdir}/xinetd.d
@@ -114,34 +114,34 @@ PACKAGES =+ "${PN}-tftpd-dbg ${PN}-telnetd-dbg ${PN}-rshd-dbg"
 NOAUTOPACKAGEDEBUG = "1"
 
 ALTERNATIVE_PRIORITY = "79"
-ALTERNATIVE_${PN} = "whois dnsdomainname"
+ALTERNATIVE:${PN} = "whois dnsdomainname"
 ALTERNATIVE_LINK_NAME[uucpd]  = "${sbindir}/in.uucpd"
 ALTERNATIVE_LINK_NAME[dnsdomainname]  = "${base_bindir}/dnsdomainname"
 
 ALTERNATIVE_PRIORITY_${PN}-logger = "60"
-ALTERNATIVE_${PN}-logger = "logger"
-ALTERNATIVE_${PN}-syslogd = "syslogd"
+ALTERNATIVE:${PN}-logger = "logger"
+ALTERNATIVE:${PN}-syslogd = "syslogd"
 ALTERNATIVE_LINK_NAME[syslogd]  = "${base_sbindir}/syslogd"
 
-ALTERNATIVE_${PN}-ftp = "ftp"
-ALTERNATIVE_${PN}-ftpd = "ftpd"
-ALTERNATIVE_${PN}-tftp = "tftp"
-ALTERNATIVE_${PN}-tftpd = "tftpd"
+ALTERNATIVE:${PN}-ftp = "ftp"
+ALTERNATIVE:${PN}-ftpd = "ftpd"
+ALTERNATIVE:${PN}-tftp = "tftp"
+ALTERNATIVE:${PN}-tftpd = "tftpd"
 ALTERNATIVE_LINK_NAME[tftpd] = "${sbindir}/tftpd"
 ALTERNATIVE_TARGET[tftpd]  = "${sbindir}/in.tftpd"
 
-ALTERNATIVE_${PN}-telnet = "telnet"
-ALTERNATIVE_${PN}-telnetd = "telnetd"
+ALTERNATIVE:${PN}-telnet = "telnet"
+ALTERNATIVE:${PN}-telnetd = "telnetd"
 ALTERNATIVE_LINK_NAME[telnetd] = "${sbindir}/telnetd"
 ALTERNATIVE_TARGET[telnetd] = "${sbindir}/in.telnetd"
 
-ALTERNATIVE_${PN}-inetd= "inetd"
-ALTERNATIVE_${PN}-traceroute = "traceroute"
+ALTERNATIVE:${PN}-inetd= "inetd"
+ALTERNATIVE:${PN}-traceroute = "traceroute"
 
-ALTERNATIVE_${PN}-hostname = "hostname"
+ALTERNATIVE:${PN}-hostname = "hostname"
 ALTERNATIVE_LINK_NAME[hostname]  = "${base_bindir}/hostname"
 
-ALTERNATIVE_${PN}-doc = "hostname.1 dnsdomainname.1 logger.1 syslogd.8 \
+ALTERNATIVE:${PN}-doc = "hostname.1 dnsdomainname.1 logger.1 syslogd.8 \
                          tftpd.8 tftp.1 telnetd.8"
 ALTERNATIVE_LINK_NAME[hostname.1] = "${mandir}/man1/hostname.1"
 ALTERNATIVE_LINK_NAME[dnsdomainname.1] = "${mandir}/man1/dnsdomainname.1"
@@ -151,62 +151,62 @@ ALTERNATIVE_LINK_NAME[telnetd.8] = "${mandir}/man8/telnetd.8"
 ALTERNATIVE_LINK_NAME[tftpd.8] = "${mandir}/man8/tftpd.8"
 ALTERNATIVE_LINK_NAME[tftp.1] = "${mandir}/man1/tftp.1"
 
-ALTERNATIVE_${PN}-ifconfig = "ifconfig"
+ALTERNATIVE:${PN}-ifconfig = "ifconfig"
 ALTERNATIVE_LINK_NAME[ifconfig]  = "${base_sbindir}/ifconfig"
 
-ALTERNATIVE_${PN}-ping = "ping"
+ALTERNATIVE:${PN}-ping = "ping"
 ALTERNATIVE_LINK_NAME[ping]   = "${base_bindir}/ping"
 
-ALTERNATIVE_${PN}-ping6 = "${@bb.utils.filter('PACKAGECONFIG', 'ping6', d)}"
+ALTERNATIVE:${PN}-ping6 = "${@bb.utils.filter('PACKAGECONFIG', 'ping6', d)}"
 ALTERNATIVE_LINK_NAME[ping6]  = "${base_bindir}/ping6"
 
 
-FILES_${PN}-dbg += "${base_bindir}/.debug ${base_sbindir}/.debug ${bindir}/.debug ${sbindir}/.debug"
-FILES_${PN}-ping = "${base_bindir}/ping.${BPN}"
-FILES_${PN}-ping6 = "${base_bindir}/ping6.${BPN}"
-FILES_${PN}-hostname = "${base_bindir}/hostname.${BPN}"
-FILES_${PN}-ifconfig = "${base_sbindir}/ifconfig.${BPN}"
-FILES_${PN}-traceroute = "${bindir}/traceroute.${BPN}"
-FILES_${PN}-logger = "${bindir}/logger.${BPN}"
+FILES:${PN}-dbg += "${base_bindir}/.debug ${base_sbindir}/.debug ${bindir}/.debug ${sbindir}/.debug"
+FILES:${PN}-ping = "${base_bindir}/ping.${BPN}"
+FILES:${PN}-ping6 = "${base_bindir}/ping6.${BPN}"
+FILES:${PN}-hostname = "${base_bindir}/hostname.${BPN}"
+FILES:${PN}-ifconfig = "${base_sbindir}/ifconfig.${BPN}"
+FILES:${PN}-traceroute = "${bindir}/traceroute.${BPN}"
+FILES:${PN}-logger = "${bindir}/logger.${BPN}"
 
-FILES_${PN}-syslogd = "${base_sbindir}/syslogd.${BPN}"
-RCONFLICTS_${PN}-syslogd = "rsyslog busybox-syslog sysklogd syslog-ng"
+FILES:${PN}-syslogd = "${base_sbindir}/syslogd.${BPN}"
+RCONFLICTS:${PN}-syslogd = "rsyslog busybox-syslog sysklogd syslog-ng"
 
-FILES_${PN}-ftp = "${bindir}/ftp.${BPN}"
+FILES:${PN}-ftp = "${bindir}/ftp.${BPN}"
 
-FILES_${PN}-tftp = "${bindir}/tftp.${BPN}"
-FILES_${PN}-telnet = "${bindir}/telnet.${BPN}"
+FILES:${PN}-tftp = "${bindir}/tftp.${BPN}"
+FILES:${PN}-telnet = "${bindir}/telnet.${BPN}"
 
 # We make us of RCONFLICTS / RPROVIDES here rather than using the normal
 # alternatives method as this leads to packaging QA issues when using
 # musl as that library does not provide what these applications need to
 # build.
-FILES_${PN}-rsh = "${bindir}/rsh ${bindir}/rlogin ${bindir}/rexec ${bindir}/rcp"
-RCONFLICTS_${PN}-rsh += "netkit-rsh-client"
-RPROVIDES_${PN}-rsh = "rsh"
+FILES:${PN}-rsh = "${bindir}/rsh ${bindir}/rlogin ${bindir}/rexec ${bindir}/rcp"
+RCONFLICTS:${PN}-rsh += "netkit-rsh-client"
+RPROVIDES:${PN}-rsh = "rsh"
 
-FILES_${PN}-rshd = "${sbindir}/in.rshd ${sbindir}/in.rlogind ${sbindir}/in.rexecd \
+FILES:${PN}-rshd = "${sbindir}/in.rshd ${sbindir}/in.rlogind ${sbindir}/in.rexecd \
                     ${sysconfdir}/xinetd.d/rsh ${sysconfdir}/xinetd.d/rlogin ${sysconfdir}/xinetd.d/rexec"
-FILES_${PN}-rshd-dbg = "${sbindir}/.debug/in.rshd ${sbindir}/.debug/in.rlogind ${sbindir}/.debug/in.rexecd"
-RDEPENDS_${PN}-rshd += "xinetd tcp-wrappers"
-RCONFLICTS_${PN}-rshd += "netkit-rshd-server"
-RPROVIDES_${PN}-rshd = "rshd"
+FILES:${PN}-rshd-dbg = "${sbindir}/.debug/in.rshd ${sbindir}/.debug/in.rlogind ${sbindir}/.debug/in.rexecd"
+RDEPENDS:${PN}-rshd += "xinetd tcp-wrappers"
+RCONFLICTS:${PN}-rshd += "netkit-rshd-server"
+RPROVIDES:${PN}-rshd = "rshd"
 
-FILES_${PN}-ftpd = "${bindir}/ftpd.${BPN}"
-FILES_${PN}-ftpd-dbg = "${bindir}/.debug/ftpd.${BPN}"
-RDEPENDS_${PN}-ftpd += "xinetd"
+FILES:${PN}-ftpd = "${bindir}/ftpd.${BPN}"
+FILES:${PN}-ftpd-dbg = "${bindir}/.debug/ftpd.${BPN}"
+RDEPENDS:${PN}-ftpd += "xinetd"
 
-FILES_${PN}-tftpd = "${sbindir}/in.tftpd ${sysconfdir}/xinetd.d/tftpd"
-FILES_${PN}-tftpd-dbg = "${sbindir}/.debug/in.tftpd"
-RCONFLICTS_${PN}-tftpd += "netkit-tftpd"
-RDEPENDS_${PN}-tftpd += "xinetd"
+FILES:${PN}-tftpd = "${sbindir}/in.tftpd ${sysconfdir}/xinetd.d/tftpd"
+FILES:${PN}-tftpd-dbg = "${sbindir}/.debug/in.tftpd"
+RCONFLICTS:${PN}-tftpd += "netkit-tftpd"
+RDEPENDS:${PN}-tftpd += "xinetd"
 
-FILES_${PN}-telnetd = "${sbindir}/in.telnetd ${sysconfdir}/xinetd.d/telnet"
-FILES_${PN}-telnetd-dbg = "${sbindir}/.debug/in.telnetd"
-RCONFLICTS_${PN}-telnetd += "netkit-telnet"
-RPROVIDES_${PN}-telnetd = "telnetd"
-RDEPENDS_${PN}-telnetd += "xinetd"
+FILES:${PN}-telnetd = "${sbindir}/in.telnetd ${sysconfdir}/xinetd.d/telnet"
+FILES:${PN}-telnetd-dbg = "${sbindir}/.debug/in.telnetd"
+RCONFLICTS:${PN}-telnetd += "netkit-telnet"
+RPROVIDES:${PN}-telnetd = "telnetd"
+RDEPENDS:${PN}-telnetd += "xinetd"
 
-FILES_${PN}-inetd = "${bindir}/inetd.${BPN}"
+FILES:${PN}-inetd = "${bindir}/inetd.${BPN}"
 
-RDEPENDS_${PN} = "xinetd"
+RDEPENDS:${PN} = "xinetd"

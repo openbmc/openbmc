@@ -27,7 +27,7 @@ BINCONFIG = "${bindir}/xslt-config"
 
 inherit autotools pkgconfig binconfig-disabled lib_package multilib_header
 
-do_configure_prepend () {
+do_configure:prepend () {
 	# We don't DEPEND on binutils for ansidecl.h so ensure we don't use the header.
 	# This can be removed when upgrading to 1.1.34.
 	sed -i -e 's/ansidecl.h//' ${S}/configure.ac
@@ -39,20 +39,20 @@ do_configure_prepend () {
 
 EXTRA_OECONF = "--without-python --without-debug --without-mem-debug --without-crypto --with-html-subdir=${BPN}"
 # older versions of this recipe had ${PN}-utils
-RPROVIDES_${PN}-bin += "${PN}-utils"
-RCONFLICTS_${PN}-bin += "${PN}-utils"
-RREPLACES_${PN}-bin += "${PN}-utils"
+RPROVIDES:${PN}-bin += "${PN}-utils"
+RCONFLICTS:${PN}-bin += "${PN}-utils"
+RREPLACES:${PN}-bin += "${PN}-utils"
 
 # This is only needed until libxml can load the relocated catalog itself
-do_install_append_class-native () {
+do_install:append:class-native () {
     create_wrapper ${D}/${bindir}/xsltproc XML_CATALOG_FILES=${sysconfdir}/xml/catalog
 }
 
-do_install_append () {
+do_install:append () {
    oe_multilib_header libxslt/xsltconfig.h
 }
 
-FILES_${PN} += "${libdir}/libxslt-plugins"
-FILES_${PN}-dev += "${libdir}/xsltConf.sh"
+FILES:${PN} += "${libdir}/libxslt-plugins"
+FILES:${PN}-dev += "${libdir}/xsltConf.sh"
 
 BBCLASSEXTEND = "native nativesdk"

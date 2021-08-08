@@ -13,7 +13,7 @@ SUMMARY = "Berkeley Database v5"
 DESCRIPTION = "Provides the foundational storage services for your application, no matter how demanding and unique your requirements may seem to be"
 HOMEPAGE = "https://www.oracle.com/database/technologies/related/berkeleydb.html"
 LICENSE = "Sleepycat"
-RCONFLICTS_${PN} = "db3"
+RCONFLICTS:${PN} = "db3"
 
 CVE_PRODUCT = "oracle_berkeley_db berkeley_db"
 CVE_VERSION = "11.2.${PV}"
@@ -47,7 +47,7 @@ inherit autotools
 inherit lib_package
 
 PACKAGES =+ "${PN}-cxx"
-FILES_${PN}-cxx = "${libdir}/*cxx*so"
+FILES:${PN}-cxx = "${libdir}/*cxx*so"
 
 # The dev package has the .so link (as in db3) and the .a's -
 # it is therefore incompatible (cannot be installed at the
@@ -75,7 +75,7 @@ AUTOTOOLS_SCRIPT_PATH = "${S}/dist"
 # configure.
 CONFIG_SITE = ""
 
-oe_runconf_prepend() {
+oe_runconf:prepend() {
 	. ${S}/dist/RELEASE
 	# Edit version information we couldn't pre-compute.
 	sed -i -e "s/__EDIT_DB_VERSION_FAMILY__/$DB_VERSION_FAMILY/g" \
@@ -89,12 +89,12 @@ oe_runconf_prepend() {
 	    -e "s/__EDIT_DB_VERSION__/$DB_VERSION/g" ${S}/dist/configure
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
     # Stop libtool adding RPATHs
     sed -i -e 's|hardcode_into_libs=yes|hardcode_into_libs=no|' ${B}/${HOST_SYS}-libtool
 }
 
-do_install_append() {
+do_install:append() {
 	mkdir -p ${D}/${includedir}/db51
 	mv ${D}/${includedir}/db.h ${D}/${includedir}/db51/.
 	mv ${D}/${includedir}/db_cxx.h ${D}/${includedir}/db51/.
@@ -115,7 +115,7 @@ do_install_append() {
 	fi
 }
 
-INSANE_SKIP_${PN} = "dev-so"
-INSANE_SKIP_${PN}-cxx = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"
+INSANE_SKIP:${PN}-cxx = "dev-so"
 
 BBCLASSEXTEND = "native nativesdk"

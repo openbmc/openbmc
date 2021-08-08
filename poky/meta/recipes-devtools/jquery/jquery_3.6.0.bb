@@ -34,6 +34,6 @@ do_install() {
 }
 
 PACKAGES = "${PN}"
-FILES_${PN} = "${datadir}"
+FILES:${PN} = "${datadir}"
 
 BBCLASSEXTEND += "native nativesdk"

@@ -1,11 +1,11 @@
 require automake.inc
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
-DEPENDS_class-native = "autoconf-native"
+DEPENDS:class-native = "autoconf-native"
 
 NAMEVER = "${@oe.utils.trim_version("${PV}", 2)}"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     autoconf \
     perl \
     perl-module-bytes \
@@ -16,7 +16,7 @@ RDEPENDS_${PN} += "\
     perl-module-threads \
     perl-module-vars "
 
-RDEPENDS_${PN}_class-native = "autoconf-native hostperl-runtime-native"
+RDEPENDS:${PN}:class-native = "autoconf-native hostperl-runtime-native"
 
 SRC_URI += "file://python-libdir.patch \
            file://buildtest.patch \
@@ -29,12 +29,12 @@ SRC_URI += "file://python-libdir.patch \
 SRC_URI[sha256sum] = "ce010788b51f64511a1e9bb2a1ec626037c6d0e7ede32c1c103611b9d3cba65f"
 
 PERL = "${USRBINPATH}/perl"
-PERL_class-native = "${USRBINPATH}/env perl"
-PERL_class-nativesdk = "${USRBINPATH}/env perl"
+PERL:class-native = "${USRBINPATH}/env perl"
+PERL:class-nativesdk = "${USRBINPATH}/env perl"
 
 CACHED_CONFIGUREVARS += "ac_cv_path_PERL='${PERL}'"
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${datadir}
 }
 

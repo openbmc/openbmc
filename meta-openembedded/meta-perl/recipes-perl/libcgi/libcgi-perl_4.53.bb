@@ -16,14 +16,14 @@ S = "${WORKDIR}/CGI-${PV}"
 
 inherit cpan ptest-perl
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     libhtml-parser-perl \
     perl-module-base \
     perl-module-deprecate \
     perl-module-if \
 "
 
-do_install_prepend() {
+do_install:prepend() {
     # requires "-T" (taint) command line option
     rm -rf ${B}/t/push.t
     rm -rf ${B}/t/utf8.t
@@ -31,7 +31,7 @@ do_install_prepend() {
     rm -rf ${B}/t/compiles_pod.t
 }
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     libtest-deep-perl \
     libtest-warn-perl \
     perl-module-bytes \
@@ -45,6 +45,6 @@ RDEPENDS_${PN}-ptest += " \
     perl-module-utf8 \
 "
 
-RPROVIDES_${PN} += "perl-module-cgi"
+RPROVIDES:${PN} += "perl-module-cgi"
 
 BBCLASSEXTEND = "native"

@@ -6,7 +6,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "elfutils"
-DEPENDS_append_libc-musl = " argp-standalone"
+DEPENDS:append:libc-musl = " argp-standalone"
 
 inherit autotools
 
@@ -16,7 +16,7 @@ SRC_URI = "git://github.com/namhyung/${BPN} \
            "
 S = "${WORKDIR}/git"
 
-LDFLAGS_append_libc-musl = " -largp"
+LDFLAGS:append:libc-musl = " -largp"
 
 def set_target_arch(d):
     import re
@@ -36,10 +36,10 @@ do_configure() {
 }
 
 FILES_SOLIBSDEV = ""
-FILES_${PN} += "${libdir}/*.so"
+FILES:${PN} += "${libdir}/*.so"
 
 COMPATIBLE_HOST = "(i.86|x86_64|aarch64|arm)"
 
 # uftrace supports armv6 and above
-COMPATIBLE_HOST_armv4 = 'null'
-COMPATIBLE_HOST_armv5 = 'null'
+COMPATIBLE_HOST:armv4 = 'null'
+COMPATIBLE_HOST:armv5 = 'null'

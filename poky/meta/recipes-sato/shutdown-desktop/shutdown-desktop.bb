@@ -15,7 +15,7 @@ do_install() {
 	sed -i ${D}${datadir}/applications/shutdown.desktop -e 's#^Exec=\(.*\)#Exec=${base_sbindir}/\1#'
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     grep -q qemuarm $D${sysconfdir}/hostname && \
         sed -i $D${datadir}/applications/shutdown.desktop -e 's#^Exec=\(.*\)/halt#Exec=\1/reboot#' \
         || true

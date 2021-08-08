@@ -19,15 +19,15 @@ do_install() {
         UDEVDIR=${nonarch_base_libdir}/udev SYSTEMDDIR=${systemd_unitdir}
 }
 
-pkg_postinst_ontarget_${PN}() {
+pkg_postinst_ontarget:${PN}() {
     ${sbindir}/nvme gen-hostnqn > ${sysconfdir}/nvme/hostnqn
     ${bindir}/uuidgen > ${sysconfdir}/nvme/hostid
 }
 
 PACKAGES =+ "${PN}-dracut ${PN}-zsh-completion"
 
-FILES_${PN} += "${systemd_system_unitdir}"
-FILES_${PN}-dracut = "${nonarch_libdir}/dracut/dracut.conf.d"
-FILES_${PN}-zsh-completion = "${datadir}/zsh/site-functions"
+FILES:${PN} += "${systemd_system_unitdir}"
+FILES:${PN}-dracut = "${nonarch_libdir}/dracut/dracut.conf.d"
+FILES:${PN}-zsh-completion = "${datadir}/zsh/site-functions"
 
-RDEPENDS_${PN} = "util-linux-uuidgen"
+RDEPENDS:${PN} = "util-linux-uuidgen"

@@ -39,25 +39,25 @@ SOLIBMAJORVERSION="1"
 
 PACKAGES =+ "${PN}-withsctp ${PN}-utils"
 
-FILES_${PN} = " \
+FILES:${PN} = " \
     ${libdir}/libsctp.so.${SOLIBVERSION} \
     ${libdir}/libsctp.so.${SOLIBMAJORVERSION} \
 "
 
-FILES_${PN}-withsctp = " \
+FILES:${PN}-withsctp = " \
     ${libdir}/lksctp-tools/libwithsctp.so.${SOLIBVERSION} \
     ${libdir}/lksctp-tools/libwithsctp.so.${SOLIBMAJORVERSION} \
 "
 
-FILES_${PN}-dev += " \
+FILES:${PN}-dev += " \
     ${libdir}/libsctp.so \
     ${libdir}/lksctp-tools/libwithsctp.so \
     ${datadir}/lksctp-tools/*.c \
     ${datadir}/lksctp-tools/*.h \
 "
 
-FILES_${PN}-utils = "${bindir}/*"
+FILES:${PN}-utils = "${bindir}/*"
 
-RRECOMMENDS_${PN} += "kernel-module-sctp"
-RRECOMMENDS_${PN}-utils += "kernel-module-sctp"
-RRECOMMENDS_${PN}-ptest += "kernel-module-sctp"
+RRECOMMENDS:${PN} += "kernel-module-sctp"
+RRECOMMENDS:${PN}-utils += "kernel-module-sctp"
+RRECOMMENDS:${PN}-ptest += "kernel-module-sctp"

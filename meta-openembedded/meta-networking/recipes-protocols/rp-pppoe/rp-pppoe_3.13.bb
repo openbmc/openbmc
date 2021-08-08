@@ -26,7 +26,7 @@ SRC_URI[sha256sum] = "8cd6bc71ba46bd5f6eb4daf60220ccdcd991a8525111dee466501b1b97
 
 inherit autotools-brokensep update-rc.d systemd
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${systemd_unitdir}/system
     install -m 0644 ${WORKDIR}/pppoe-server.service ${D}${systemd_unitdir}/system
     sed -i -e 's#@SYSCONFDIR@#${sysconfdir}#g' ${D}${systemd_unitdir}/system/pppoe-server.service
@@ -48,29 +48,29 @@ do_install() {
 }
 
 SYSTEMD_PACKAGES = "${PN}-server"
-SYSTEMD_SERVICE_${PN}-server = "pppoe-server.service"
+SYSTEMD_SERVICE:${PN}-server = "pppoe-server.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 # Insert server package before main package
 PACKAGES = "${PN}-dbg ${PN}-server ${PN}-relay ${PN}-sniff ${PN} ${PN}-doc"
 
-FILES_${PN}-server = "${sysconfdir}/default/pppoe-server \
+FILES:${PN}-server = "${sysconfdir}/default/pppoe-server \
                       ${sysconfdir}/init.d/pppoe-server \
                       ${sbindir}/pppoe-server \
                       ${sysconfdir}/ppp/pppoe-server-options"
-FILES_${PN}-relay = "${sbindir}/pppoe-relay"
-FILES_${PN}-sniff = "${sbindir}/pppoe-sniff"
+FILES:${PN}-relay = "${sbindir}/pppoe-relay"
+FILES:${PN}-sniff = "${sbindir}/pppoe-sniff"
 
-CONFFILES_${PN} = "${sysconfdir}/ppp/pppoe.conf \
+CONFFILES:${PN} = "${sysconfdir}/ppp/pppoe.conf \
                    ${sysconfdir}/ppp/firewall-standalone \
                    ${sysconfdir}/ppp/firewall-masq"
-CONFFILES_${PN}-server = "${sysconfdir}/ppp/pppoe-server-options \
+CONFFILES:${PN}-server = "${sysconfdir}/ppp/pppoe-server-options \
                           ${sysconfdir}/default/pppoe-server"
 
 INITSCRIPT_PACKAGES            = "${PN}-server"
-INITSCRIPT_NAME_${PN}-server   = "pppoe-server"
-INITSCRIPT_PARAMS_${PN}-server = "defaults 92 8"
+INITSCRIPT_NAME:${PN}-server   = "pppoe-server"
+INITSCRIPT_PARAMS:${PN}-server = "defaults 92 8"
 
-RDEPENDS_${PN} = "ppp"
-RDEPENDS_${PN}-server = "${PN}"
-RRECOMMENDS_${PN} = "ppp-oe"
+RDEPENDS:${PN} = "ppp"
+RDEPENDS:${PN}-server = "${PN}"
+RRECOMMENDS:${PN} = "ppp-oe"
 

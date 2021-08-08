@@ -45,7 +45,7 @@ EXTRA_OECONF = "\
     --libdir=${libdir} \
 "
 export TK_LIBRARY='${libdir}/tk${VER}'
-do_install_append() {
+do_install:append() {
     ln -sf libtk${VER}.so ${D}${libdir}/libtk${VER}.so.0
     oe_libinstall -so libtk${VER} ${D}${libdir}
     ln -sf wish${VER} ${D}${bindir}/wish
@@ -62,12 +62,12 @@ PACKAGECONFIG[xss] = "--enable-xss,--disable-xss,libxscrnsaver libxext"
 
 PACKAGES =+ "${PN}-lib"
 
-FILES_${PN}-lib = "${libdir}/libtk${VER}.so*"
-FILES_${PN} += "${libdir}/tk*"
+FILES:${PN}-lib = "${libdir}/libtk${VER}.so*"
+FILES:${PN} += "${libdir}/tk*"
 
 # isn't getting picked up by shlibs code
-RDEPENDS_${PN} += "tk-lib"
-RDEPENDS_${PN}_class-native = ""
+RDEPENDS:${PN} += "tk-lib"
+RDEPENDS:${PN}:class-native = ""
 
 BBCLASSEXTEND = "native nativesdk"
 

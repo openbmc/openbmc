@@ -26,7 +26,7 @@ UPSTREAM_CHECK_COMMITS = "1"
 
 inherit setuptools3 ptest
 
-do_install_append() {
+do_install:append() {
         mv ${D}${bindir}/scapy ${D}${bindir}/scapy3
         mv ${D}${bindir}/UTscapy ${D}${bindir}/UTscapy3
 }
@@ -36,6 +36,6 @@ do_install_ptest() {
     sed -i 's,@PTEST_PATH@,${PTEST_PATH},' ${D}${PTEST_PATH}/run-ptest
 }
 
-RDEPENDS_${PN} = "tcpdump ${PYTHON_PN}-compression ${PYTHON_PN}-cryptography ${PYTHON_PN}-netclient  \
+RDEPENDS:${PN} = "tcpdump ${PYTHON_PN}-compression ${PYTHON_PN}-cryptography ${PYTHON_PN}-netclient  \
                   ${PYTHON_PN}-netserver ${PYTHON_PN}-pydoc ${PYTHON_PN}-pkgutil ${PYTHON_PN}-shell \
                   ${PYTHON_PN}-threading ${PYTHON_PN}-numbers ${PYTHON_PN}-pycrypto"

@@ -18,7 +18,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI[archive.sha256sum] = "d2cc7686946690dc274a5d0c72841d358d0ccd42d3f34993c698bdf13588fe42"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/metainfo \
     ${datadir}/thumbnailers \

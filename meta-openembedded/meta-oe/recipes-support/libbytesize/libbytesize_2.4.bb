@@ -21,7 +21,7 @@ DEPENDS += " \
     gettext-native \
 "
 
-FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}/bytesize"
+FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}/bytesize"
 
 PACKAGECONFIG ??= "python3"
 PACKAGECONFIG[python3] = "--with-python3, --without-python3,,python3-core"

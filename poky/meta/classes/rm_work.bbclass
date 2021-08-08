@@ -13,7 +13,7 @@
 # Recipes can also configure which entries in their ${WORKDIR}
 # are preserved besides temp, which already gets excluded by default
 # because it contains logs:
-# do_install_append () {
+# do_install:append () {
 #     echo "bar" >${WORKDIR}/foo
 # }
 # RM_WORK_EXCLUDE_ITEMS += "foo"
@@ -24,7 +24,7 @@ RM_WORK_EXCLUDE_ITEMS = "temp"
 BB_SCHEDULER ?= "completion"
 
 # Run the rm_work task in the idle scheduling class
-BB_TASK_IONICE_LEVEL_task-rm_work = "3.0"
+BB_TASK_IONICE_LEVEL:task-rm_work = "3.0"
 
 do_rm_work () {
     # If the recipe name is in the RM_WORK_EXCLUDE, skip the recipe.

@@ -15,9 +15,9 @@ SRC_URI = "https://gstreamer.freedesktop.org/src/gst-devtools/gst-devtools-${PV}
 SRC_URI[sha256sum] = "ffbd194c40912cb5e7fca2863648bf9dd8257b7af97d3a60c4fcd4efd8526ccf"
 
 DEPENDS = "json-glib glib-2.0 glib-2.0-native gstreamer1.0 gstreamer1.0-plugins-base"
-RRECOMMENDS_${PN} = "git"
+RRECOMMENDS:${PN} = "git"
 
-FILES_${PN} += "${datadir}/gstreamer-1.0/* ${libdir}/gst-validate-launcher/* ${libdir}/gstreamer-1.0/*"
+FILES:${PN} += "${datadir}/gstreamer-1.0/* ${libdir}/gst-validate-launcher/* ${libdir}/gstreamer-1.0/*"
 
 inherit meson pkgconfig gettext upstream-version-is-even gobject-introspection
 
@@ -38,7 +38,7 @@ EXTRA_OEMESON += " \
     ${@gettext_oemeson(d)} \
 "
 
-do_install_append () {
+do_install:append () {
      for fn in ${bindir}/gst-validate-launcher \
          ${libdir}/gst-validate-launcher/python/launcher/config.py; do
              sed -i -e 's,${B},/usr/src/debug/${PN},g' -e 's,${S},/usr/src/debug/${PN},g' ${D}$fn

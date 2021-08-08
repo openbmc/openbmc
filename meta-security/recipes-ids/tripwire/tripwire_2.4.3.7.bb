@@ -60,18 +60,18 @@ do_install () {
     install -m 0644 ${WORKDIR}/tripwire.txt ${D}${docdir}/${BPN}
 }
 
-do_install_ptest_append () {
+do_install_ptest:append () {
 	install -d ${D}${PTEST_PATH}/tests
 	cp -a ${S}/src/test-harness/* ${D}${PTEST_PATH}
 	sed -i -e 's@../../../../bin@${sbindir}@'  ${D}${PTEST_PATH}/twtools.pm
 }
 
-FILES_${PN} += "${libdir} ${docdir}/${PN}/*"
-FILES_${PN}-dbg += "${sysconfdir}/${PN}/.debug"
-FILES_${PN}-staticdev += "${localstatedir}/lib/${PN}/lib*.a"
-FILES_${PN}-ptest += "${PTEST_PATH}/tests "
+FILES:${PN} += "${libdir} ${docdir}/${PN}/*"
+FILES:${PN}-dbg += "${sysconfdir}/${PN}/.debug"
+FILES:${PN}-staticdev += "${localstatedir}/lib/${PN}/lib*.a"
+FILES:${PN}-ptest += "${PTEST_PATH}/tests "
 
-RDEPENDS_${PN} += " perl nano msmtp cronie"
-RDEPENDS_${PN}-ptest = " perl lib-perl perl-modules "
+RDEPENDS:${PN} += " perl nano msmtp cronie"
+RDEPENDS:${PN}-ptest = " perl lib-perl perl-modules "
 
 PNBLACKLIST[tripwire] ?= "Upsteram project appears to be abondoned, fails to build with gcc11"

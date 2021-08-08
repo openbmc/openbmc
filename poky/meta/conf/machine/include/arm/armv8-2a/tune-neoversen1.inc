@@ -11,7 +11,7 @@ require conf/machine/include/arm/arch-armv8-2a.inc
 
 # Little Endian base configs
 AVAILTUNES                                         += "neoversen1"
-ARMPKGARCH_tune-neoversen1                          = "neoversen1"
-TUNE_FEATURES_tune-neoversen1                       = "${TUNE_FEATURES_tune-armv8-2a-crypto} neoversen1"
-PACKAGE_EXTRA_ARCHS_tune-neoversen1                 = "${PACKAGE_EXTRA_ARCHS_tune-armv8-2a-crypto} neoversen1"
-BASE_LIB_tune-neoversen1                            = "lib64"
+ARMPKGARCH:tune-neoversen1                          = "neoversen1"
+TUNE_FEATURES:tune-neoversen1                       = "${TUNE_FEATURES:tune-armv8-2a-crypto} neoversen1"
+PACKAGE_EXTRA_ARCHS:tune-neoversen1                 = "${PACKAGE_EXTRA_ARCHS:tune-armv8-2a-crypto} neoversen1"
+BASE_LIB:tune-neoversen1                            = "lib64"

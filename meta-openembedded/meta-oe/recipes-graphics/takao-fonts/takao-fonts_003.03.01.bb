@@ -16,4 +16,4 @@ do_install() {
     install -m 0644 -p ${S}/*.ttf ${D}/${datadir}/fonts/
 }
 
-FILES_${PN} += "${datadir}/fonts/*.ttf"
+FILES:${PN} += "${datadir}/fonts/*.ttf"

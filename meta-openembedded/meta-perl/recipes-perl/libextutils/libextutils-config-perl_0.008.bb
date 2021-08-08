@@ -15,7 +15,7 @@ S = "${WORKDIR}/ExtUtils-Config-${PV}"
 
 inherit cpan ptest-perl
 
-RDEPENDS_${PN} = " perl-module-extutils-makemaker \
+RDEPENDS:${PN} = " perl-module-extutils-makemaker \
                    perl-module-data-dumper \
 		   perl-module-ipc-open3 \
                    perl-module-test-more \

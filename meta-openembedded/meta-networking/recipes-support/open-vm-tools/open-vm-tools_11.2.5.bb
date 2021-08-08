@@ -19,11 +19,11 @@ SECTION = "vmware-tools"
 
 LICENSE = "LGPL-2.0 & GPL-2.0 & BSD & CDDL-1.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=559317809c5444fb39ceaf6ac45c43ac"
-LICENSE_modules/freebsd/vmblock = "BSD"
-LICENSE_modules/freebsd/vmmemctl = "GPL-2.0"
-LICENSE_modules/freebsd/vmxnet = "GPL-2.0"
-LICENSE_modules/linux = "GPL-2.0"
-LICENSE_modules/solaris = "CDDL-1.0"
+LICENSE:modules/freebsd/vmblock = "BSD"
+LICENSE:modules/freebsd/vmmemctl = "GPL-2.0"
+LICENSE:modules/freebsd/vmxnet = "GPL-2.0"
+LICENSE:modules/linux = "GPL-2.0"
+LICENSE:modules/solaris = "CDDL-1.0"
 
 SRC_URI = "git://github.com/vmware/open-vm-tools.git;protocol=https \
     file://tools.conf \
@@ -47,7 +47,7 @@ SRC_URI = "git://github.com/vmware/open-vm-tools.git;protocol=https \
     file://0001-pollGtk-Fix-volatile-qualifier-exposed-incorrectly.patch;patchdir=.. \
 "
 
-SRC_URI_append_libc-musl = " file://0001-Add-resolv_compat.h-for-musl-builds.patch;patchdir=.. \
+SRC_URI:append:libc-musl = " file://0001-Add-resolv_compat.h-for-musl-builds.patch;patchdir=.. \
 "
 
 SRCREV = "7ae57c3c7c1f68c74637ad009673dae94ee52570"
@@ -61,7 +61,7 @@ COMPATIBLE_HOST = '(x86_64.*|i.86.*)-linux'
 
 inherit autotools pkgconfig systemd update-rc.d
 
-SYSTEMD_SERVICE_${PN} = "vmtoolsd.service"
+SYSTEMD_SERVICE:${PN} = "vmtoolsd.service"
 
 EXTRA_OECONF = "--without-icu --disable-multimon --disable-docs \
          --disable-tests --without-gtkmm --without-xerces --without-pam \
@@ -76,20 +76,20 @@ PACKAGECONFIG[x11] = ",${NO_X11_FLAGS},${X11_DEPENDS}"
 # fuse gets implicitly detected; there is no --without-fuse option.
 PACKAGECONFIG[fuse] = ",,fuse"
 
-CFLAGS_append_toolchain-clang = " -Wno-address-of-packed-member"
-FILES_${PN} += "\
+CFLAGS:append:toolchain-clang = " -Wno-address-of-packed-member"
+FILES:${PN} += "\
     ${libdir}/open-vm-tools/plugins/vmsvc/lib*.so \
     ${libdir}/open-vm-tools/plugins/common/lib*.so \
     ${sysconfdir}/vmware-tools/tools.conf \
 "
-FILES_${PN}-locale += "${datadir}/open-vm-tools/messages"
-FILES_${PN}-dev += "${libdir}/open-vm-tools/plugins/common/lib*.la"
+FILES:${PN}-locale += "${datadir}/open-vm-tools/messages"
+FILES:${PN}-dev += "${libdir}/open-vm-tools/plugins/common/lib*.la"
 
-CONFFILES_${PN} += "${sysconfdir}/vmware-tools/tools.conf"
+CONFFILES:${PN} += "${sysconfdir}/vmware-tools/tools.conf"
 
-RDEPENDS_${PN} = "util-linux libdnet fuse"
+RDEPENDS:${PN} = "util-linux libdnet fuse"
 
-do_install_append() {
+do_install:append() {
     if ! ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','false',d)}; then
         install -d ${D}/sbin
         ln -sf ${sbindir}/mount.vmhgfs ${D}/sbin/mount.vmhgfs
@@ -105,14 +105,14 @@ do_install_append() {
     install -m 0644 ${WORKDIR}/tools.conf ${D}${sysconfdir}/vmware-tools/tools.conf
 }
 
-do_configure_prepend() {
+do_configure:prepend() {
     export CUSTOM_DNET_NAME=dnet
     export CUSTOM_DNET_LIBS=-L${STAGING_LIBDIR}/libdnet.so
 }
 
 INITSCRIPT_PACKAGES = "${PN}"
-INITSCRIPT_NAME_${PN} = "vmtoolsd"
-INITSCRIPT_PARAMS_${PN} = "start 90 2 3 4 5 . stop 60 0 1 6 ."
+INITSCRIPT_NAME:${PN} = "vmtoolsd"
+INITSCRIPT_PARAMS:${PN} = "start 90 2 3 4 5 . stop 60 0 1 6 ."
 
 python() {
     if 'filesystems-layer' not in d.getVar('BBFILE_COLLECTIONS').split():

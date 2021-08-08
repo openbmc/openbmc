@@ -8,8 +8,8 @@ DEPENDS = "exo libexif libxfce4ui libxfce4util xfconf cairo file"
 
 inherit xfce-app mime-xdg
 
-RRECOMMENDS_${PN} += "tumbler"
+RRECOMMENDS:${PN} += "tumbler"
 
 SRC_URI[sha256sum] = "877e30d412c8cbfa9706f4ac0cab1a478f5829beafb773addc7722ca0cb78823"
 
-FILES_${PN} += "${datadir}/metainfo"
+FILES:${PN} += "${datadir}/metainfo"

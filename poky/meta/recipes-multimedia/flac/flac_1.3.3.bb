@@ -38,9 +38,9 @@ EXTRA_OECONF += "${@bb.utils.contains("TUNE_FEATURES", "core2", " --enable-sse",
 EXTRA_OECONF += "${@bb.utils.contains("TUNE_FEATURES", "corei7", " --enable-sse", "", d)}"
 
 PACKAGES += "libflac libflac++ liboggflac liboggflac++"
-FILES_${PN} = "${bindir}/*"
-FILES_libflac = "${libdir}/libFLAC.so.*"
-FILES_libflac++ = "${libdir}/libFLAC++.so.*"
-FILES_liboggflac = "${libdir}/libOggFLAC.so.*"
-FILES_liboggflac++ = "${libdir}/libOggFLAC++.so.*"
+FILES:${PN} = "${bindir}/*"
+FILES:libflac = "${libdir}/libFLAC.so.*"
+FILES:libflac++ = "${libdir}/libFLAC++.so.*"
+FILES:liboggflac = "${libdir}/libOggFLAC.so.*"
+FILES:liboggflac++ = "${libdir}/libOggFLAC++.so.*"
 

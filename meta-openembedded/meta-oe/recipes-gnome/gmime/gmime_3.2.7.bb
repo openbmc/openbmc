@@ -13,6 +13,6 @@ SRC_URI[archive.sha256sum] = "2aea96647a468ba2160a64e17c6dc6afe674ed9ac86070624a
 
 export ac_cv_have_iconv_detect_h="yes"
 
-do_configure_append () {
+do_configure:append () {
     cp ${WORKDIR}/iconv-detect.h ${S}
 }

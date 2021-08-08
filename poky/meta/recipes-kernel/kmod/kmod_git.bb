@@ -5,17 +5,17 @@ require kmod.inc
 
 DEPENDS += "zlib"
 PROVIDES += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"
-RPROVIDES_${PN} += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"
-RCONFLICTS_${PN} += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"
-RREPLACES_${PN} += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"
+RPROVIDES:${PN} += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"
+RCONFLICTS:${PN} += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"
+RREPLACES:${PN} += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"
 
 # to force user to remove old module-init-tools and replace them with kmod variants
-RCONFLICTS_libkmod2 += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"
+RCONFLICTS:libkmod2 += "module-init-tools-insmod-static module-init-tools-depmod module-init-tools"
 
 # autotools set prefix to /usr, however we want them in /bin and /sbin
 EXTRA_OECONF += " --bindir=${base_bindir} --sbindir=${base_sbindir}"
 
-do_install_append () {
+do_install:append () {
         install -dm755 ${D}${base_bindir}
         install -dm755 ${D}${base_sbindir}
         # add symlinks to kmod
@@ -33,7 +33,7 @@ do_install_append () {
         install -Dm644 "${WORKDIR}/depmod-search.conf" "${D}${base_libdir}/depmod.d/search.conf"
 }
 
-do_compile_prepend() {
+do_compile:prepend() {
             sed -i 's/ac_pwd=/#ac_pwd=/' config.status ; sed -i "/#ac_pwd=/a\ac_pwd='.'" config.status
 }
 
@@ -41,7 +41,7 @@ inherit update-alternatives bash-completion
 
 ALTERNATIVE_PRIORITY = "70"
 
-ALTERNATIVE_kmod = "insmod modprobe rmmod modinfo bin-lsmod lsmod depmod"
+ALTERNATIVE:kmod = "insmod modprobe rmmod modinfo bin-lsmod lsmod depmod"
 
 ALTERNATIVE_LINK_NAME[insmod] = "${base_sbindir}/insmod"
 ALTERNATIVE_LINK_NAME[modprobe] = "${base_sbindir}/modprobe"
@@ -56,7 +56,7 @@ ALTERNATIVE_LINK_NAME[depmod] = "${base_sbindir}/depmod"
 
 PACKAGES =+ "libkmod"
 
-FILES_libkmod = "${base_libdir}/libkmod*${SOLIBS} ${libdir}/libkmod*${SOLIBS}"
-FILES_${PN} += "${base_libdir}/depmod.d ${base_libdir}/modprobe.d"
+FILES:libkmod = "${base_libdir}/libkmod*${SOLIBS} ${libdir}/libkmod*${SOLIBS}"
+FILES:${PN} += "${base_libdir}/depmod.d ${base_libdir}/modprobe.d"
 
 BBCLASSEXTEND = "nativesdk"

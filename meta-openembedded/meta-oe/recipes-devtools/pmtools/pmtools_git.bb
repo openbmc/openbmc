@@ -18,7 +18,7 @@ S = "${WORKDIR}/git"
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "90"
-ALTERNATIVE_${PN} = "acpixtract acpidump"
+ALTERNATIVE:${PN} = "acpixtract acpidump"
 
 do_configure[noexec] = "1"
 do_compile() {

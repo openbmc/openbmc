@@ -24,8 +24,8 @@ class Fetch(OESelftestTestCase):
         # No mirrors, should use git to fetch successfully
         features = """
 DL_DIR = "%s"
-MIRRORS_forcevariable = ""
-PREMIRRORS_forcevariable = ""
+MIRRORS:forcevariable = ""
+PREMIRRORS:forcevariable = ""
 """ % dldir
         self.write_config(features)
         oe.path.remove(dldir, recurse=True)
@@ -35,8 +35,8 @@ PREMIRRORS_forcevariable = ""
         features = """
 DL_DIR = "%s"
 GIT_PROXY_COMMAND = "false"
-MIRRORS_forcevariable = ""
-PREMIRRORS_forcevariable = ""
+MIRRORS:forcevariable = ""
+PREMIRRORS:forcevariable = ""
 """ % dldir
         self.write_config(features)
         oe.path.remove(dldir, recurse=True)
@@ -47,7 +47,7 @@ PREMIRRORS_forcevariable = ""
         features = """
 DL_DIR = "%s"
 GIT_PROXY_COMMAND = "false"
-MIRRORS_forcevariable = "git://.*/.* http://downloads.yoctoproject.org/mirror/sources/"
+MIRRORS:forcevariable = "git://.*/.* http://downloads.yoctoproject.org/mirror/sources/"
 """ % dldir
         self.write_config(features)
         oe.path.remove(dldir, recurse=True)

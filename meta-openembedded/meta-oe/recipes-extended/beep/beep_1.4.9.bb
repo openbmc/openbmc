@@ -20,7 +20,7 @@ EXTRA_OEMAKE = " \
     LINKER_clang=no \
 "
 
-EXTRA_OEMAKE_toolchain-clang = " \
+EXTRA_OEMAKE:toolchain-clang = " \
     COMPILER_clang='${CC}' \
     LINKER_clang='${CC}' \
     COMPILER_gcc=no \

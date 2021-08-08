@@ -41,9 +41,9 @@ PACKAGECONFIG ??= "egl gdk \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'wayland', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'glx x11', '', d)}"
 
-FILES_${PN}-examples = "${libdir}/clutter/examples"
+FILES:${PN}-examples = "${libdir}/clutter/examples"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	# see https://bugzilla.gnome.org/show_bug.cgi?id=661128 for this
 	touch -t 200001010000 ${S}/po/clutter-1.0.pot
 }

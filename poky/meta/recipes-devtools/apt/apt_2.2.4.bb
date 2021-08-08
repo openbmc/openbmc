@@ -16,12 +16,12 @@ SRC_URI = "${DEBIAN_MIRROR}/main/a/apt/${BPN}_${PV}.tar.xz \
            file://0001-aptwebserver.cc-Include-array.patch \
            "
 
-SRC_URI_append_class-native = " \
+SRC_URI:append:class-native = " \
            file://0001-Do-not-init-tables-from-dpkg-configuration.patch \
            file://0001-Revert-always-run-dpkg-configure-a-at-the-end-of-our.patch \
            "
 
-SRC_URI_append_class-nativesdk = " \
+SRC_URI:append:class-nativesdk = " \
            file://0001-Do-not-init-tables-from-dpkg-configuration.patch \
            file://0001-Revert-always-run-dpkg-configure-a-at-the-end-of-our.patch \
            "
@@ -37,13 +37,13 @@ inherit cmake perlnative bash-completion upstream-version-is-even useradd
 
 # User is added to allow apt to drop privs, will runtime warn without
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --home /nonexistent --no-create-home _apt"
+USERADD_PARAM:${PN} = "--system --home /nonexistent --no-create-home _apt"
 
 BBCLASSEXTEND = "native nativesdk"
 
 DEPENDS += "db gnutls lz4 zlib bzip2 xz libgcrypt xxhash"
 
-EXTRA_OECMAKE_append = " -DCURRENT_VENDOR=debian -DWITH_DOC=False \
+EXTRA_OECMAKE:append = " -DCURRENT_VENDOR=debian -DWITH_DOC=False \
     -DDPKG_DATADIR=${datadir}/dpkg \
     -DTRIEHASH_EXECUTABLE=${WORKDIR}/triehash \
     -DCMAKE_DISABLE_FIND_PACKAGE_ZSTD=True \
@@ -51,14 +51,14 @@ EXTRA_OECMAKE_append = " -DCURRENT_VENDOR=debian -DWITH_DOC=False \
     -DWITH_TESTS=False \
 "
 
-do_configure_prepend () {
+do_configure:prepend () {
     echo "set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH )" >>  ${WORKDIR}/toolchain.cmake
 
 }
 
 # Unfortunately apt hardcodes this all over the place
-FILES_${PN} += "${prefix}/lib/dpkg ${prefix}/lib/apt"
-RDEPENDS_${PN} += "bash perl dpkg"
+FILES:${PN} += "${prefix}/lib/dpkg ${prefix}/lib/apt"
+RDEPENDS:${PN} += "bash perl dpkg"
 
 customize_apt_conf_sample() {
     cat > ${D}${sysconfdir}/apt/apt.conf.sample << EOF
@@ -113,23 +113,23 @@ DPkg::Path "";
 EOF
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
     customize_apt_conf_sample
 }
 
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
     customize_apt_conf_sample
 }
 
 
-do_install_append_class-target() {
+do_install:append:class-target() {
     #Write the correct apt-architecture to apt.conf
     APT_CONF=${D}/etc/apt/apt.conf
     echo 'APT::Architecture "${DPKG_ARCH}";' > ${APT_CONF}
 }
 
 # Avoid non-reproducible -src package
-do_install_append () {
+do_install:append () {
         sed -i -e "s,${B},,g" \
             ${B}/apt-pkg/tagfile-keys.cc
 }

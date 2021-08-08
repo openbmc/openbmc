@@ -17,7 +17,7 @@ S = "${WORKDIR}/git"
 
 PACKAGES += "${PN}-engines ${PN}-engines-staticdev ${PN}-bash-completion"
 
-FILES_${PN}-dev = "${libdir}/engines-1.1/tpm2tss.so ${includedir}/*"
-FILES_${PN}-engines = "${libdir}/engines-1.1/lib*.so*"
-FILES_${PN}-engines-staticdev = "${libdir}/engines-1.1/libtpm2tss.a"
-FILES_${PN}-bash-completion += "${datadir}/bash-completion/completions"
+FILES:${PN}-dev = "${libdir}/engines-1.1/tpm2tss.so ${includedir}/*"
+FILES:${PN}-engines = "${libdir}/engines-1.1/lib*.so*"
+FILES:${PN}-engines-staticdev = "${libdir}/engines-1.1/libtpm2tss.a"
+FILES:${PN}-bash-completion += "${datadir}/bash-completion/completions"

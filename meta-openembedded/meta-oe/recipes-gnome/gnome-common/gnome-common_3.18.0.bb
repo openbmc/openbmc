@@ -18,7 +18,7 @@ DEPENDS = ""
 PACKAGECONFIG ??= "autoconf-archive"
 PACKAGECONFIG[autoconf-archive] = "--with-autoconf-archive, --without-autoconf-archive, autoconf-archive"
 
-FILES_${PN} += "${datadir}/aclocal"
-FILES_${PN}-dev = ""
+FILES:${PN} += "${datadir}/aclocal"
+FILES:${PN}-dev = ""
 
 BBCLASSEXTEND = "native"

@@ -19,11 +19,11 @@ do_install_ptest() {
     cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
 }
 
-RDEPENDS_${PN}-ptest += "\
+RDEPENDS:${PN}-ptest += "\
     python3-tornado \
     python3-process-tests \
 "
 
-RDEPENDS_${PN} += "python3-core python3-fields"
+RDEPENDS:${PN} += "python3-core python3-fields"
 
 BBCLASSEXTEND = "native nativesdk"

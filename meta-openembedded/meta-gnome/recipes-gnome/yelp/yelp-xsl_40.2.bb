@@ -12,9 +12,9 @@ DEPENDS += "libxml2"
 
 SRC_URI[archive.sha256sum] = "919c552f846aaec741fe51d5af416b469bcdb25c77effc3b5a15a4b4b7ff814e"
 
-RDEPENDS_${PN}_append_class-target = " libxml2 itstool"
+RDEPENDS:${PN}:append:class-target = " libxml2 itstool"
 
 # ensure our native consumers are forced to inherit itstool
-RDEPENDS_${PN}_append_class-native = " libxml2-native"
+RDEPENDS:${PN}:append:class-native = " libxml2-native"
 
 BBCLASSEXTEND = "native"

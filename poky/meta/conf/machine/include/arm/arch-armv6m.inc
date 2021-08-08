@@ -14,6 +14,6 @@ require conf/machine/include/arm/arch-armv5.inc
 
 # Little Endian
 AVAILTUNES += "armv6m"
-ARMPKGARCH_tune-armv6m             = "armv6m"
-TUNE_FEATURES_tune-armv6m          = "armv6m"
-PACKAGE_EXTRA_ARCHS_tune-armv6m    = "armv6m"
+ARMPKGARCH:tune-armv6m             = "armv6m"
+TUNE_FEATURES:tune-armv6m          = "armv6m"
+PACKAGE_EXTRA_ARCHS:tune-armv6m    = "armv6m"

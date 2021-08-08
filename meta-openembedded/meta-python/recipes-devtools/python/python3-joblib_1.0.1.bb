@@ -7,7 +7,7 @@ inherit setuptools3 pypi
 SRC_URI[md5sum] = "9914b330916395c0a1feca54949867a3"
 SRC_URI[sha256sum] = "9c17567692206d2f3fb9ecf5e991084254fe631665c450b443761c4186a613f7"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     python3-asyncio \
     python3-distutils \
     python3-json \

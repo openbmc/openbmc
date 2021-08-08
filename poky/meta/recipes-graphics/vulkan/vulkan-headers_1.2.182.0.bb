@@ -17,6 +17,6 @@ S = "${WORKDIR}/git"
 
 inherit cmake
 
-FILES_${PN} += "${datadir}/vulkan"
+FILES:${PN} += "${datadir}/vulkan"
 
 UPSTREAM_CHECK_GITTAGREGEX = "sdk-(?P<pver>\d+(\.\d+)+)"

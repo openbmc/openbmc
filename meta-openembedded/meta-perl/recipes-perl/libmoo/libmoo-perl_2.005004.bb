@@ -16,7 +16,7 @@ S = "${WORKDIR}/Moo-${PV}"
 
 inherit cpan
 
-RDEPENDS_${PN} = " libclass-method-modifiers-perl \
+RDEPENDS:${PN} = " libclass-method-modifiers-perl \
                    libdevel-globaldestruction-perl \
                    libmodule-runtime-perl \
                    librole-tiny-perl \
@@ -26,7 +26,7 @@ RDEPENDS_${PN} = " libclass-method-modifiers-perl \
                    perl-module-scalar-util \
 "
 
-RPROVIDES_${PN} = " libmethod-inliner-perl \
+RPROVIDES:${PN} = " libmethod-inliner-perl \
                     libmethod-generate-accessor-perl \
                     libmethod-generate-buildall-perl \
                     libmethod-generate-constructor-perl \

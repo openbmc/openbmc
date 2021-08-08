@@ -13,13 +13,13 @@ CVE_PRODUCT = "glibc"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
-ARM_INSTRUCTION_SET_armv6 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
+ARM_INSTRUCTION_SET:armv6 = "arm"
 #
 # We will skip parsing glibc when target system C library selection is not glibc
 # this helps in easing out parsing for non-glibc system libraries
 #
-COMPATIBLE_HOST_libc-musl_class-target = "null"
+COMPATIBLE_HOST:libc-musl:class-target = "null"
 
 PV = "2.33"

@@ -16,7 +16,7 @@ SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
 SRC_URI[md5sum] = "32a51b23e25ad5e6af4b89f228be1800"
 SRC_URI[sha256sum] = "ee336e68549664e7a19b117adf02edfdeac6307f22e5ba78baca457116914637"
 
-do_install_append() {
+do_install:append() {
     if [ -e ${D}${libdir}/charset.alias ]
     then
         rm -rf ${D}${libdir}/charset.alias
@@ -26,6 +26,6 @@ do_install_append() {
 
 BBCLASSEXTEND = "native nativesdk"
 
-ALTERNATIVE_${PN} = "uudecode uuencode"
+ALTERNATIVE:${PN} = "uudecode uuencode"
 ALTERNATIVE_LINK_NAME[uudecode] = "${bindir}/uudecode"
 ALTERNATIVE_LINK_NAME[uuencode] = "${bindir}/uuencode"

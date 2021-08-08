@@ -30,6 +30,12 @@ repos:
       meta-networking:
       meta-filesystems:
 
+  meta-rust:
+    url: https://github.com/meta-rust/meta-rust.git
+    refspec: master
+
+
+
 local_conf_header:
   base: |
     CONF_VERSION = "1"
@@ -51,8 +57,8 @@ local_conf_header:
     EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
     PACKAGE_CLASSES = "package_ipk"
 
-    DISTRO_FEATURES_append = " pam apparmor smack ima"
-    MACHINE_FEATURES_append = " tpm tpm2"
+    DISTRO_FEATURES:append = " pam apparmor smack ima"
+    MACHINE_FEATURES:append = " tpm tpm2"
 
   diskmon: |
     BB_DISKMON_DIRS = "\

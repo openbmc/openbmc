@@ -5,7 +5,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=52962875ab02c36df6cde47b1f463024"
 
 COMPATIBLE_HOST = "null"
-COMPATIBLE_HOST_rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', 'null', '(.*)', d)}"
+COMPATIBLE_HOST:rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', 'null', '(.*)', d)}"
 
 SRC_URI = "git://github.com/AndrewFromMelbourne/raspidmx;protocol=https \
            file://0001-gitignore-add-archives-from-lib-directory.patch \

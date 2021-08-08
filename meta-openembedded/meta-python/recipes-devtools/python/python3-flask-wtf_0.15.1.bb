@@ -8,7 +8,7 @@ PYPI_PACKAGE = "Flask-WTF"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-flask \
     ${PYTHON_PN}-itsdangerous \
     ${PYTHON_PN}-json \

@@ -10,7 +10,7 @@ PATCHDEPENDENCY = "${PATCHTOOL}-native:do_populate_sysroot"
 # http://git.savannah.gnu.org/cgit/patch.git/patch/?id=82b800c9552a088a241457948219d25ce0a407a4
 # This leaks into debug sources in particular. Add the dependency
 # to target recipes to avoid this problem until we can rely on 2.7.4 or later.
-PATCHDEPENDENCY_append_class-target = " patch-replacement-native:do_populate_sysroot"
+PATCHDEPENDENCY:append:class-target = " patch-replacement-native:do_populate_sysroot"
 
 PATCH_GIT_USER_NAME ?= "OpenEmbedded"
 PATCH_GIT_USER_EMAIL ?= "oe.patch@oe"

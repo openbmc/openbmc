@@ -19,11 +19,11 @@ PACKAGECONFIG[readline] = "--enable-libreadline,--disable-libreadline,readline,"
 
 inherit autotools-brokensep pkgconfig features_check
 
-do_configure_prepend () {
+do_configure:prepend () {
     touch NEWS
 }
 
-RDEPENDS_${PN} = "tk"
+RDEPENDS:${PN} = "tk"
 REQUIRED_DISTRO_FEATURES = "x11"
 
 BBCLASSEXTEND = "native"

@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 LICENSE = "LGPL-2.1"
 
 DEPENDS = "dbus acl bzip2 pkgconfig gconf procps curl libxml2 libxslt libcap swig"
-DEPENDS_class-native = "pkgconfig-native swig-native curl-native libxml2-native libxslt-native libcap-native"
+DEPENDS:class-native = "pkgconfig-native swig-native curl-native libxml2-native libxslt-native libcap-native"
 
 S = "${WORKDIR}/git"
 
@@ -34,22 +34,22 @@ EXTRA_OECMAKE += "-DENABLE_PROBES_LINUX=ON -DENABLE_PROBES_UNIX=ON \
 STAGING_OSCAP_DIR = "${TMPDIR}/work-shared/${MACHINE}/oscap-source"
 STAGING_OSCAP_BUILDDIR = "${TMPDIR}/work-shared/openscap/oscap-build-artifacts"
 
-do_configure_append_class-native () {
+do_configure:append:class-native () {
     sed -i 's:OSCAP_DEFAULT_CPE_PATH.*$:OSCAP_DEFAULT_CPE_PATH "${STAGING_OSCAP_BUILDDIR}${datadir_native}/openscap/cpe":' ${B}/config.h
     sed -i 's:OSCAP_DEFAULT_SCHEMA_PATH.*$:OSCAP_DEFAULT_SCHEMA_PATH "${STAGING_OSCAP_BUILDDIR}${datadir_native}/openscap/schemas":' ${B}/config.h
     sed -i 's:OSCAP_DEFAULT_XSLT_PATH.*$:OSCAP_DEFAULT_XSLT_PATH "${STAGING_OSCAP_BUILDDIR}${datadir_native}/openscap/xsl":' ${B}/config.h
 }
 
-do_install_class-native[cleandirs] += " ${STAGING_OSCAP_BUILDDIR}"
-do_install_append_class-native () {
+do_install:class-native[cleandirs] += " ${STAGING_OSCAP_BUILDDIR}"
+do_install:append:class-native () {
     oscapdir=${STAGING_OSCAP_BUILDDIR}/${datadir_native}
     install -d $oscapdir
     cp -a ${D}/${STAGING_DATADIR_NATIVE}/openscap $oscapdir
 }
 
 
-FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}"
 
-RDEPENDS_${PN} += "libxml2 python3-core libgcc bash"
+RDEPENDS:${PN} += "libxml2 python3-core libgcc bash"
 
 BBCLASSEXTEND = "native"

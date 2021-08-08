@@ -12,7 +12,7 @@ SRC_URI[sha256sum] = "8ad7d7c090eb1cac6110b3bfc1fd2d334ac62f415aac09350ebb8d241b
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-cython \
     ${PYTHON_PN}-geomet \
     ${PYTHON_PN}-json \

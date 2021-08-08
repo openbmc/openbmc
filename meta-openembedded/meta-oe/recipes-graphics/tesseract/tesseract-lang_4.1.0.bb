@@ -15,12 +15,12 @@ do_install() {
     cp -R --no-dereference --preserve=mode,links -v ${S}/*.traineddata ${D}${datadir}/tessdata
 }
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     tessdata_dir= d.expand('${datadir}/tessdata')
     pkgs = do_split_packages(d, tessdata_dir, '^([a-z_]*)\.*', '${BPN}-%s', 'tesseract-ocr language files for %s', extra_depends='')
     pn = d.getVar('PN')
-    d.appendVar('RDEPENDS_' + pn, ' '+' '.join(pkgs))
+    d.appendVar('RDEPENDS:' + pn, ' '+' '.join(pkgs))
 }
 
 PACKAGES_DYNAMIC += "^${BPN}-.*"
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"

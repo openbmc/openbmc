@@ -75,38 +75,38 @@ PACKAGES = "\
     ${PN}-bcm43456 \
 "
 
-LICENSE_${PN}-bcm43430 = "Firmware-broadcom_bcm43xx-rpidistro"
-LICENSE_${PN}-bcm43455 = "Firmware-broadcom_bcm43xx-rpidistro"
-LICENSE_${PN}-bcm43456 = "Firmware-broadcom_bcm43xx-rpidistro"
-LICENSE_${PN}-broadcom-license = "Firmware-broadcom_bcm43xx-rpidistro"
-FILES_${PN}-broadcom-license = "${nonarch_base_libdir}/firmware/LICENCE.broadcom_bcm43xx-rpidistro"
-FILES_${PN}-bcm43430 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43430*"
-FILES_${PN}-bcm43455 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43455*"
-FILES_${PN}-bcm43456 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43456*"
-RDEPENDS_${PN}-bcm43430 += "${PN}-broadcom-license"
-RDEPENDS_${PN}-bcm43455 += "${PN}-broadcom-license"
-RDEPENDS_${PN}-bcm43456 += "${PN}-broadcom-license"
-RCONFLICTS_${PN}-bcm43430 = "\
+LICENSE:${PN}-bcm43430 = "Firmware-broadcom_bcm43xx-rpidistro"
+LICENSE:${PN}-bcm43455 = "Firmware-broadcom_bcm43xx-rpidistro"
+LICENSE:${PN}-bcm43456 = "Firmware-broadcom_bcm43xx-rpidistro"
+LICENSE:${PN}-broadcom-license = "Firmware-broadcom_bcm43xx-rpidistro"
+FILES:${PN}-broadcom-license = "${nonarch_base_libdir}/firmware/LICENCE.broadcom_bcm43xx-rpidistro"
+FILES:${PN}-bcm43430 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43430*"
+FILES:${PN}-bcm43455 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43455*"
+FILES:${PN}-bcm43456 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43456*"
+RDEPENDS:${PN}-bcm43430 += "${PN}-broadcom-license"
+RDEPENDS:${PN}-bcm43455 += "${PN}-broadcom-license"
+RDEPENDS:${PN}-bcm43456 += "${PN}-broadcom-license"
+RCONFLICTS:${PN}-bcm43430 = "\
     linux-firmware-bcm43430 \
     linux-firmware-raspbian-bcm43430 \
 "
-RREPLACES_${PN}-bcm43430 = "\
+RREPLACES:${PN}-bcm43430 = "\
     linux-firmware-bcm43430 \
     linux-firmware-raspbian-bcm43430 \
 "
-RCONFLICTS_${PN}-bcm43455 = "\
+RCONFLICTS:${PN}-bcm43455 = "\
     linux-firmware-bcm43455 \
     linux-firmware-raspbian-bcm43455 \
 "
-RREPLACES_${PN}-bcm43455 = "\
+RREPLACES:${PN}-bcm43455 = "\
     linux-firmware-bcm43455 \
     linux-firmware-raspbian-bcm43455 \
 "
-RCONFLICTS_${PN}-bcm43456 = "\
+RCONFLICTS:${PN}-bcm43456 = "\
     linux-firmware-bcm43456 \
     linux-firmware-raspbian-bcm43456 \
 "
-RREPLACES_${PN}-bcm43456 = "\
+RREPLACES:${PN}-bcm43456 = "\
     linux-firmware-bcm43456 \
     linux-firmware-raspbian-bcm43456 \
 "

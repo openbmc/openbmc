@@ -10,11 +10,11 @@ PYPI_PACKAGE = "python-dateutil"
 inherit pypi setuptools3
 
 PACKAGES =+ "${PN}-zoneinfo"
-FILES_${PN}-zoneinfo = "${libdir}/${PYTHON_DIR}/site-packages/dateutil/zoneinfo"
+FILES:${PN}-zoneinfo = "${libdir}/${PYTHON_DIR}/site-packages/dateutil/zoneinfo"
 
 DEPENDS += "${PYTHON_PN}-setuptools-scm-native"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-datetime \
     ${PYTHON_PN}-numbers \
     ${PYTHON_PN}-six \

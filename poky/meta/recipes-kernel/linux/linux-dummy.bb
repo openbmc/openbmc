@@ -16,12 +16,12 @@ PACKAGES_DYNAMIC += "^kernel-image-.*"
 PACKAGES_DYNAMIC += "^kernel-firmware-.*"
 
 PACKAGES += "kernel-modules kernel-vmlinux"
-FILES_kernel-modules = ""
-ALLOW_EMPTY_kernel-modules = "1"
-DESCRIPTION_kernel-modules = "Kernel modules meta package"
-FILES_kernel-vmlinux = ""
-ALLOW_EMPTY_kernel-vmlinux = "1"
-DESCRIPTION_kernel-vmlinux = "Kernel vmlinux meta package"
+FILES:kernel-modules = ""
+ALLOW_EMPTY:kernel-modules = "1"
+DESCRIPTION:kernel-modules = "Kernel modules meta package"
+FILES:kernel-vmlinux = ""
+ALLOW_EMPTY:kernel-vmlinux = "1"
+DESCRIPTION:kernel-vmlinux = "Kernel vmlinux meta package"
 
 
 INHIBIT_DEFAULT_DEPS = "1"

@@ -85,8 +85,8 @@ class IncompatibleLicenseTests(OESelftestTestCase):
 class IncompatibleLicensePerImageTests(OESelftestTestCase):
     def default_config(self):
         return """
-IMAGE_INSTALL_append = " bash"
-INCOMPATIBLE_LICENSE_pn-core-image-minimal = "GPL-3.0 LGPL-3.0"
+IMAGE_INSTALL:append = " bash"
+INCOMPATIBLE_LICENSE:pn-core-image-minimal = "GPL-3.0 LGPL-3.0"
 """
 
     def test_bash_default(self):
@@ -98,7 +98,7 @@ INCOMPATIBLE_LICENSE_pn-core-image-minimal = "GPL-3.0 LGPL-3.0"
             raise AssertionError(result.output)
 
     def test_bash_and_license(self):
-        self.write_config(self.default_config() + '\nLICENSE_append_pn-bash = " & SomeLicense"')
+        self.write_config(self.default_config() + '\nLICENSE:append:pn-bash = " & SomeLicense"')
         error_msg = "ERROR: core-image-minimal-1.0-r0 do_rootfs: Package bash cannot be installed into the image because it has incompatible license(s): GPL-3.0-or-later"
 
         result = bitbake('core-image-minimal', ignore_status=True)
@@ -106,30 +106,42 @@ INCOMPATIBLE_LICENSE_pn-core-image-minimal = "GPL-3.0 LGPL-3.0"
             raise AssertionError(result.output)
 
     def test_bash_or_license(self):
-        self.write_config(self.default_config() + '\nLICENSE_append_pn-bash = " | SomeLicense"')
+        self.write_config(self.default_config() + '\nLICENSE:append:pn-bash = " | SomeLicense"')
 
         bitbake('core-image-minimal')
 
     def test_bash_whitelist(self):
-        self.write_config(self.default_config() + '\nWHITELIST_GPL-3.0_pn-core-image-minimal = "bash"')
+        self.write_config(self.default_config() + '\nWHITELIST_GPL-3.0:pn-core-image-minimal = "bash"')
 
         bitbake('core-image-minimal')
 
 class NoGPL3InImagesTests(OESelftestTestCase):
     def test_core_image_minimal(self):
         self.write_config("""
-INCOMPATIBLE_LICENSE_pn-core-image-minimal = "GPL-3.0 LGPL-3.0"
+INCOMPATIBLE_LICENSE:pn-core-image-minimal = "GPL-3.0 LGPL-3.0"
 """)
         bitbake('core-image-minimal')
 
-    def test_core_image_full_cmdline(self):
+    def test_core_image_full_cmdline_weston(self):
         self.write_config("""
-INHERIT += "testimage"\n
-INCOMPATIBLE_LICENSE_pn-core-image-full-cmdline = "GPL-3.0 LGPL-3.0"\n
-RDEPENDS_packagegroup-core-full-cmdline-utils_remove = "bash bc coreutils cpio ed findutils gawk grep mc mc-fish mc-helpers mc-helpers-perl sed tar time"\n
-RDEPENDS_packagegroup-core-full-cmdline-dev-utils_remove = "diffutils m4 make patch"\n
-RDEPENDS_packagegroup-core-full-cmdline-multiuser_remove = "gzip"\n
+INHERIT += "testimage"
+INCOMPATIBLE_LICENSE:pn-core-image-full-cmdline = "GPL-3.0 LGPL-3.0"
+INCOMPATIBLE_LICENSE:pn-core-image-weston = "GPL-3.0 LGPL-3.0"
+# Settings for full-cmdline
+RDEPENDS:packagegroup-core-full-cmdline-utils:remove = "bash bc coreutils cpio ed findutils gawk grep mc mc-fish mc-helpers mc-helpers-perl sed tar time"
+RDEPENDS:packagegroup-core-full-cmdline-dev-utils:remove = "diffutils m4 make patch"
+RDEPENDS:packagegroup-core-full-cmdline-multiuser:remove = "gzip"
+# Settings for weston
+# direct gpl3 dependencies
+RRECOMMENDS:packagegroup-base-vfat:remove = "dosfstools"
+PACKAGECONFIG:remove:pn-bluez5 = "readline"
+# dnf pulls in gpg which is gpl3; it also pulls in python3-rpm which pulls in rpm-build which pulls in bash
+# so install rpm but not dnf
+IMAGE_FEATURES:remove:pn-core-image-weston = "package-management"
+CORE_IMAGE_EXTRA_INSTALL:pn-core-image-weston += "rpm"
+# matchbox-terminal depends on vte, which is gpl3
+CORE_IMAGE_BASE_INSTALL:remove:pn-core-image-weston = "matchbox-terminal"
 """)
-        bitbake('core-image-full-cmdline')
-        bitbake('-c testimage core-image-full-cmdline')
+        bitbake('core-image-full-cmdline core-image-weston')
+        bitbake('-c testimage core-image-full-cmdline core-image-weston')
 

@@ -101,14 +101,14 @@ SRCREV = "868a2afab9da34f32c007d773b77253c93104636"
 
 inherit systemd update-rc.d python3native update-alternatives
 
-ALTERNATIVE_${PN} = "bootchartd"
+ALTERNATIVE:${PN} = "bootchartd"
 ALTERNATIVE_LINK_NAME[bootchartd] = "${base_sbindir}/bootchartd"
 ALTERNATIVE_PRIORITY = "100"
 
 # The only reason to build bootchart2-native is for a native pybootchartgui.
 BBCLASSEXTEND = "native"
 
-SYSTEMD_SERVICE_${PN} = "bootchart2.service bootchart2-done.service bootchart2-done.timer"
+SYSTEMD_SERVICE:${PN} = "bootchart2.service bootchart2-done.service bootchart2-done.timer"
 
 UPDATERCPN = "bootchartd-stop-initscript"
 INITSCRIPT_NAME = "bootchartd_stop.sh"
@@ -116,7 +116,7 @@ INITSCRIPT_PARAMS = "start 99 2 3 4 5 ."
 
 EXTRA_OEMAKE = 'BASE_SBINDIR="${base_sbindir}"'
 
-do_compile_prepend () {
+do_compile:prepend () {
     export PY_LIBDIR="${libdir}/${PYTHON_DIR}"
     export BINDIR="${bindir}"
     export LIBDIR="${base_libdir}"
@@ -145,19 +145,19 @@ do_install () {
 }
 
 PACKAGES =+ "pybootchartgui"
-FILES_pybootchartgui += "${PYTHON_SITEPACKAGES_DIR}/pybootchartgui ${bindir}/pybootchartgui"
-RDEPENDS_pybootchartgui = "python3-pycairo python3-compression python3-image python3-shell python3-compression python3-codecs"
-RDEPENDS_${PN}_class-target += "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'sysvinit-pidof', 'procps', d)}"
-RDEPENDS_${PN}_class-target += "lsb-release"
-DEPENDS_append_class-native = " python3-pycairo-native"
+FILES:pybootchartgui += "${PYTHON_SITEPACKAGES_DIR}/pybootchartgui ${bindir}/pybootchartgui"
+RDEPENDS:pybootchartgui = "python3-pycairo python3-compression python3-image python3-shell python3-compression python3-codecs"
+RDEPENDS:${PN}:class-target += "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'sysvinit-pidof', 'procps', d)}"
+RDEPENDS:${PN}:class-target += "lsb-release"
+DEPENDS:append:class-native = " python3-pycairo-native"
 
 PACKAGES =+ "bootchartd-stop-initscript"
-FILES_bootchartd-stop-initscript += "${sysconfdir}/init.d ${sysconfdir}/rc*.d"
-RDEPENDS_bootchartd-stop-initscript = "${PN}"
+FILES:bootchartd-stop-initscript += "${sysconfdir}/init.d ${sysconfdir}/rc*.d"
+RDEPENDS:bootchartd-stop-initscript = "${PN}"
 
-FILES_${PN} += "${base_libdir}/bootchart/bootchart-collector"
-FILES_${PN} += "${base_libdir}/bootchart/tmpfs"
-FILES_${PN} += "${libdir}"
-FILES_${PN}-doc += "${datadir}/docs"
+FILES:${PN} += "${base_libdir}/bootchart/bootchart-collector"
+FILES:${PN} += "${base_libdir}/bootchart/tmpfs"
+FILES:${PN} += "${libdir}"
+FILES:${PN}-doc += "${datadir}/docs"
 
-RCONFLICTS_${PN} = "bootchart"
+RCONFLICTS:${PN} = "bootchart"

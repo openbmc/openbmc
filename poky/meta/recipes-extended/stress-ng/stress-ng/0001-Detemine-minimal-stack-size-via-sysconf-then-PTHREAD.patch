@@ -1,0 +1,103 @@
+From f839de283c44ffe46a2d14bfdf854c145abd8ed6 Mon Sep 17 00:00:00 2001
+From: Colin Ian King <colin.king@canonical.com>
+Date: Mon, 19 Jul 2021 20:49:34 +0100
+Subject: [PATCH] Detemine minimal stack size via sysconf, then PTHREAD_STACK_MIN then guess
+
+Don't rely on PTHREAD_STACK_MIN being defined, use sysconf, then
+PTHREAD_STACK_MIN if it is defined, then 8K default.
+
+Upstream-Status: Backport [https://kernel.ubuntu.com/git/cking/stress-ng.git/commit/?id=f839de283c44ffe46a2d14bfdf854c145abd8ed6]
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ core-helper.c    | 31 +++++++++++++++++++++++++++++++
+ stress-ng.h      |  1 +
+ stress-pthread.c | 13 ++-----------
+ 3 files changed, 34 insertions(+), 11 deletions(-)
+
+diff --git a/core-helper.c b/core-helper.c
+index 508627f2..97a3b869 100644
+--- a/core-helper.c
++++ b/core-helper.c
+@@ -2494,6 +2494,37 @@ size_t stress_min_sig_stack_size(void)
+ 	return (size_t)sz;
+ }
+
++size_t stress_min_pthread_stack_size(void)
++{
++	static long sz = -1, min;
++
++	/* return cached copy */
++	if (sz > 0)
++		return sz;
++
++	min = stress_min_aux_sig_stack_size();
++#if defined(__SC_THREAD_STACK_MIN_VALUE)
++	sz = sysconf(__SC_THREAD_STACK_MIN_VALUE);
++	if (sz > min)
++		min = sz;
++#endif
++#if defined(_SC_THREAD_STACK_MIN_VALUE)
++	sz = sysconf(_SC_THREAD_STACK_MIN_VALUE);
++	if (sz > min)
++		min = sz;
++#endif
++#if defined(PTHREAD_STACK_MIN)
++	if (PTHREAD_STACK_MIN > min)
++		min = PTHREAD_STACK_MIN;
++#endif
++	if (8192 > min)
++		min = 8192;
++
++	sz = min;
++
++	return (size_t)sz;
++}
++
+ /*
+  *  stress_sig_handler_exit()
+  *	signal handler that exits a process via _exit(0) for
+diff --git a/stress-ng.h b/stress-ng.h
+index 8a8b17ae..cd744756 100644
+--- a/stress-ng.h
++++ b/stress-ng.h
+@@ -4056,6 +4056,7 @@ extern WARN_UNUSED int32_t  stress_get_opt_ionice_class(const char *const str);
+ /* Misc helper funcs */
+ extern WARN_UNUSED size_t stress_sig_stack_size(void);
+ extern WARN_UNUSED size_t stress_min_sig_stack_size(void);
++extern WARN_UNUSED size_t stress_min_pthread_stack_size(void);
+
+ #define STRESS_SIGSTKSZ		(stress_sig_stack_size())
+ #define STRESS_MINSIGSTKSZ	(stress_min_sig_stack_size())
+diff --git a/stress-pthread.c b/stress-pthread.c
+index 0da3aeec..27777af8 100644
+--- a/stress-pthread.c
++++ b/stress-pthread.c
+@@ -69,12 +69,7 @@ static const stress_opt_set_func_t opt_set_funcs[] = {
+
+ #if defined(HAVE_LIB_PTHREAD)
+
+-/* Some systems such as GNU/HURD don't define PTHREAD_STACK_MIN */
+-#if !defined(PTHREAD_STACK_MIN)
+-#define PTHREAD_STACK_MIN		(16 * KB)
+-#endif
+-
+-#define DEFAULT_STACK_MIN		(16 * KB)
++#define DEFAULT_STACK_MIN		(8 * KB)
+
+ #if defined(HAVE_GET_ROBUST_LIST) &&	\
+     defined(HAVE_LINUX_FUTEX_H)
+@@ -404,11 +399,7 @@ static int stress_pthread(const stress_args_t *args)
+ 	stress_pthread_args_t pargs = { args, NULL, 0 };
+ 	sigset_t set;
+ #if defined(HAVE_PTHREAD_ATTR_SETSTACK)
+-#if DEFAULT_STACK_MIN == PTHREAD_STACK_MIN
+-	const size_t stack_size = PTHREAD_STACK_MIN;
+-#else
+-	const size_t stack_size = STRESS_MAXIMUM(DEFAULT_STACK_MIN, PTHREAD_STACK_MIN);
+-#endif
++	const size_t stack_size = STRESS_MAXIMUM(DEFAULT_STACK_MIN, stress_min_pthread_stack_size());
+ #endif
+
+ 	keep_running_flag = true;
+--
+2.32.0

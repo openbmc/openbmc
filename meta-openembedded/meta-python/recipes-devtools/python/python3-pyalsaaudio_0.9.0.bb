@@ -10,4 +10,4 @@ SRC_URI[sha256sum] = "3ca069c736c8ad2a3047b5033468d983a2480f94fad4feb0169c056060
 
 DEPENDS += "alsa-lib"
 
-RDEPENDS_${PN} += "libasound"
+RDEPENDS:${PN} += "libasound"

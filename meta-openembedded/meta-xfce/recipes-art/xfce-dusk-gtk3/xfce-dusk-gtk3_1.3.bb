@@ -16,4 +16,4 @@ do_install() {
     cp -r Xfce-dusk-gtk3 ${D}${datadir}/themes/Xfce-dusk-gtk3
 }
 
-FILES_${PN} = "${datadir}/themes"
+FILES:${PN} = "${datadir}/themes"

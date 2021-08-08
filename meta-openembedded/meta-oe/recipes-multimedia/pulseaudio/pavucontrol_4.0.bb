@@ -21,4 +21,4 @@ SRC_URI[sha256sum] = "8fc45bac9722aefa6f022999cbb76242d143c31b314e2dbb38f034f406
 
 EXTRA_OECONF = "--disable-lynx "
 
-RDEPENDS_${PN} += "pulseaudio-server"
+RDEPENDS:${PN} += "pulseaudio-server"

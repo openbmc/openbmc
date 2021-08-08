@@ -13,4 +13,4 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3
 
-RDEPENDS_${PN} += "python3-modules python3-fcntl python3-six"
+RDEPENDS:${PN} += "python3-modules python3-fcntl python3-six"

@@ -35,7 +35,7 @@ EXTRA_OECONF += "--with-python-rev=${PYTHON_BASEVERSION} \
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)}"
 PACKAGECONFIG[pam] = "--enable-pam, --disable-pam, libpam"
 
-FILES_${PN} += "${libdir}/security/pam_pwquality.so"
-FILES_${PN}-dbg += "${libdir}/security/.debug"
-FILES_${PN}-staticdev += "${libdir}/security/pam_pwquality.a"
-FILES_${PN}-dev += "${libdir}/security/pam_pwquality.la"
+FILES:${PN} += "${libdir}/security/pam_pwquality.so"
+FILES:${PN}-dbg += "${libdir}/security/.debug"
+FILES:${PN}-staticdev += "${libdir}/security/pam_pwquality.a"
+FILES:${PN}-dev += "${libdir}/security/pam_pwquality.la"

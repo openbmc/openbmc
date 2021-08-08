@@ -1,24 +1,24 @@
 require grub2.inc
 
-RDEPENDS_${PN}-common += "${PN}-editenv"
-RDEPENDS_${PN} += "${PN}-common"
-RDEPENDS_${PN}_class-native = ""
+RDEPENDS:${PN}-common += "${PN}-editenv"
+RDEPENDS:${PN} += "${PN}-common"
+RDEPENDS:${PN}:class-native = ""
 
-RPROVIDES_${PN}-editenv += "${PN}-efi-editenv"
+RPROVIDES:${PN}-editenv += "${PN}-efi-editenv"
 
-PROVIDES_append_class-native = " grub-efi-native"
+PROVIDES:append:class-native = " grub-efi-native"
 
 PACKAGES =+ "${PN}-editenv ${PN}-common"
-FILES_${PN}-editenv = "${bindir}/grub-editenv"
-FILES_${PN}-common = " \
+FILES:${PN}-editenv = "${bindir}/grub-editenv"
+FILES:${PN}-common = " \
     ${bindir} \
     ${sysconfdir} \
     ${sbindir} \
     ${datadir}/grub \
 "
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-do_install_append () {
+do_install:append () {
     # Avoid conflicts with the EFI package for systems such as arm64 where we
     # need to build grub and grub-efi but only EFI is supported by removing EFI
     # from this package.
@@ -35,7 +35,7 @@ do_install_append () {
         {} +
 }
 
-INSANE_SKIP_${PN} = "arch"
-INSANE_SKIP_${PN}-dbg = "arch"
+INSANE_SKIP:${PN} = "arch"
+INSANE_SKIP:${PN}-dbg = "arch"
 
 BBCLASSEXTEND = "native nativesdk"

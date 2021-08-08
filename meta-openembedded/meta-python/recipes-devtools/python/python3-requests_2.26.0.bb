@@ -7,7 +7,7 @@ SRC_URI[sha256sum] = "b8aa58f8cf793ffd8782d3d8cb19e66ef36f7aba4353eec859e74678b0
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-email \
     ${PYTHON_PN}-json \
     ${PYTHON_PN}-ndg-httpsclient \

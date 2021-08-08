@@ -22,14 +22,14 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.(\d*[02468])+(\.\d+)+)"
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
-do_install_append() {
+do_install:append() {
 	install -m 0644 -D ${WORKDIR}/gst-player.desktop ${D}${datadir}/applications/gst-player.desktop
 }
 
-RDEPENDS_${PN} = "gstreamer1.0-plugins-base-playback"
-RRECOMMENDS_${PN} = "gstreamer1.0-plugins-base-meta \
+RDEPENDS:${PN} = "gstreamer1.0-plugins-base-playback"
+RRECOMMENDS:${PN} = "gstreamer1.0-plugins-base-meta \
                      gstreamer1.0-plugins-good-meta \
                      gstreamer1.0-plugins-bad-meta \
                       ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "gstreamer1.0-libav", "", d)} \
                      ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "gstreamer1.0-plugins-ugly-meta", "", d)}"
-RPROVIDES_${PN} += "gst-player gst-player-bin"
+RPROVIDES:${PN} += "gst-player gst-player-bin"

@@ -18,7 +18,7 @@ inherit autotools pkgconfig features_check
 # links to libGL.so
 REQUIRED_DISTRO_FEATURES += "x11 opengl"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # Removing these files fixes a libtool version mismatch.
     MACROS="libtool.m4 lt~obsolete.m4 ltoptions.m4 ltsugar.m4 ltversion.m4"
 

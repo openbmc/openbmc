@@ -5,8 +5,8 @@ SECTION = "libs"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
 
 DEPENDS = "libtool swig-native bzip2 zlib glib-2.0 libwebp"
 
@@ -53,7 +53,7 @@ SRC_URI = "git://github.com/opencv/opencv.git;name=opencv \
            file://0001-Make-ts-module-external.patch \
            file://0001-sfm-link-with-Glog_LIBS.patch;patchdir=../contrib \
            "
-SRC_URI_append_riscv64 = " file://0001-Use-Os-to-compile-tinyxml2.cpp.patch;patchdir=../contrib"
+SRC_URI:append:riscv64 = " file://0001-Use-Os-to-compile-tinyxml2.cpp.patch;patchdir=../contrib"
 
 S = "${WORKDIR}/git"
 
@@ -100,17 +100,17 @@ EXTRA_OECMAKE = "-DOPENCV_EXTRA_MODULES_PATH=${WORKDIR}/contrib/modules \
     ${@bb.utils.contains("TARGET_CC_ARCH", "-msse4.1", "-DENABLE_SSE=1 -DENABLE_SSE2=1 -DENABLE_SSE3=1 -DENABLE_SSSE3=1 -DENABLE_SSE41=1", "", d)} \
     ${@bb.utils.contains("TARGET_CC_ARCH", "-msse4.2", "-DENABLE_SSE=1 -DENABLE_SSE2=1 -DENABLE_SSE3=1 -DENABLE_SSSE3=1 -DENABLE_SSE41=1 -DENABLE_SSE42=1", "", d)} \
 "
-EXTRA_OECMAKE_append_x86 = " -DX86=ON"
+EXTRA_OECMAKE:append:x86 = " -DX86=ON"
 
 PACKAGECONFIG ??= "gapi python3 eigen jpeg png tiff v4l libv4l gstreamer samples tbb gphoto2 \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "gtk", "", d)} \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "libav", "", d)}"
 
 # TBB does not build for powerpc so disable that package config
-PACKAGECONFIG_remove_powerpc = "tbb"
+PACKAGECONFIG:remove:powerpc = "tbb"
 # tbb now needs getcontect/setcontext which is not there for all arches on musl
-PACKAGECONFIG_remove_libc-musl_riscv64 = "tbb"
-PACKAGECONFIG_remove_libc-musl_riscv32 = "tbb"
+PACKAGECONFIG:remove:libc-musl:riscv64 = "tbb"
+PACKAGECONFIG:remove:libc-musl:riscv32 = "tbb"
 
 PACKAGECONFIG[gapi] = "-DWITH_ADE=ON -Dade_DIR=${STAGING_LIBDIR},-DWITH_ADE=OFF,ade"
 PACKAGECONFIG[amdblas] = "-DWITH_OPENCLAMDBLAS=ON,-DWITH_OPENCLAMDBLAS=OFF,libclamdblas,"
@@ -158,7 +158,7 @@ PACKAGES += "${@bb.utils.contains('PACKAGECONFIG', 'samples', '${PN}-samples', '
     ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'python3-${BPN}', '', d)} \
     ${PN}-apps"
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     cv_libdir = d.expand('${libdir}')
     do_split_packages(d, cv_libdir, '^lib(.*)\.so$', 'lib%s-dev', 'OpenCV %s development package', extra_depends='${PN}-dev', allow_links=True)
     do_split_packages(d, cv_libdir, '^lib(.*)\.la$', 'lib%s-dev', 'OpenCV %s development package', extra_depends='${PN}-dev')
@@ -167,58 +167,58 @@ python populate_packages_prepend () {
 
     pn = d.getVar('PN')
     metapkg =  pn + '-dev'
-    d.setVar('ALLOW_EMPTY_' + metapkg, "1")
+    d.setVar('ALLOW_EMPTY:' + metapkg, "1")
     blacklist = [ metapkg ]
     metapkg_rdepends = [ ]
     packages = d.getVar('PACKAGES').split()
     for pkg in packages[1:]:
         if not pkg in blacklist and not pkg in metapkg_rdepends and pkg.endswith('-dev'):
             metapkg_rdepends.append(pkg)
-    d.setVar('RRECOMMENDS_' + metapkg, ' '.join(metapkg_rdepends))
+    d.setVar('RRECOMMENDS:' + metapkg, ' '.join(metapkg_rdepends))
 
     metapkg =  pn
-    d.setVar('ALLOW_EMPTY_' + metapkg, "1")
+    d.setVar('ALLOW_EMPTY:' + metapkg, "1")
     blacklist = [ metapkg, "libopencv-ts" ]
     metapkg_rdepends = [ ]
     for pkg in packages[1:]:
         if not pkg in blacklist and not pkg in metapkg_rdepends and not pkg.endswith('-dev') and not pkg.endswith('-dbg') and not pkg.endswith('-doc') and not pkg.endswith('-locale') and not pkg.endswith('-staticdev'):
             metapkg_rdepends.append(pkg)
-    d.setVar('RDEPENDS_' + metapkg, ' '.join(metapkg_rdepends))
+    d.setVar('RDEPENDS:' + metapkg, ' '.join(metapkg_rdepends))
 }
 
 PACKAGES_DYNAMIC += "^libopencv-.*"
 
-FILES_${PN} = ""
-FILES_${PN}-dbg += "${datadir}/OpenCV/java/.debug/* ${datadir}/OpenCV/samples/bin/.debug/*"
-FILES_${PN}-dev = "${includedir} ${libdir}/pkgconfig  ${libdir}/cmake/opencv4/*.cmake"
-FILES_${PN}-staticdev += "${libdir}/opencv4/3rdparty/*.a"
-FILES_${PN}-apps = "${bindir}/* ${datadir}/opencv4 ${datadir}/licenses"
-FILES_${PN}-java = "${datadir}/OpenCV/java"
-FILES_${PN}-samples = "${datadir}/opencv4/samples/"
+FILES:${PN} = ""
+FILES:${PN}-dbg += "${datadir}/OpenCV/java/.debug/* ${datadir}/OpenCV/samples/bin/.debug/*"
+FILES:${PN}-dev = "${includedir} ${libdir}/pkgconfig  ${libdir}/cmake/opencv4/*.cmake"
+FILES:${PN}-staticdev += "${libdir}/opencv4/3rdparty/*.a"
+FILES:${PN}-apps = "${bindir}/* ${datadir}/opencv4 ${datadir}/licenses"
+FILES:${PN}-java = "${datadir}/OpenCV/java"
+FILES:${PN}-samples = "${datadir}/opencv4/samples/"
 
-INSANE_SKIP_${PN}-java = "libdir"
-INSANE_SKIP_${PN}-dbg = "libdir"
+INSANE_SKIP:${PN}-java = "libdir"
+INSANE_SKIP:${PN}-dbg = "libdir"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
-SUMMARY_python-opencv = "Python bindings to opencv"
-FILES_python-opencv = "${PYTHON_SITEPACKAGES_DIR}/*"
-RDEPENDS_python-opencv = "python-core python-numpy"
+SUMMARY:python-opencv = "Python bindings to opencv"
+FILES:python-opencv = "${PYTHON_SITEPACKAGES_DIR}/*"
+RDEPENDS:python-opencv = "python-core python-numpy"
 
-SUMMARY_python3-opencv = "Python bindings to opencv"
-FILES_python3-opencv = "${PYTHON_SITEPACKAGES_DIR}/*"
-RDEPENDS_python3-opencv = "python3-core python3-numpy"
+SUMMARY:python3-opencv = "Python bindings to opencv"
+FILES:python3-opencv = "${PYTHON_SITEPACKAGES_DIR}/*"
+RDEPENDS:python3-opencv = "python3-core python3-numpy"
 
-RDEPENDS_${PN}-apps  = "bash"
+RDEPENDS:${PN}-apps  = "bash"
 
-do_compile_prepend() {
+do_compile:prepend() {
     # remove the build host info to improve reproducibility
     if [ -f ${WORKDIR}/build/modules/core/version_string.inc ]; then
         sed -i "s#${WORKDIR}#/workdir#g" ${WORKDIR}/build/modules/core/version_string.inc
     fi
 }
 
-do_install_append() {
+do_install:append() {
     # Move Python files into correct library folder (for multilib build)
     if [ "$libdir" != "/usr/lib" -a -d ${D}/usr/lib ]; then
         mv ${D}/usr/lib/* ${D}/${libdir}/

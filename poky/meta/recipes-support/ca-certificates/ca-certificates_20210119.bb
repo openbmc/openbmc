@@ -9,8 +9,8 @@ LIC_FILES_CHKSUM = "file://debian/copyright;md5=ae5b36b514e3f12ce1aa8e2ee67f3d7e
 
 # This is needed to ensure we can run the postinst at image creation time
 DEPENDS = ""
-DEPENDS_class-native = "openssl-native"
-DEPENDS_class-nativesdk = "openssl-native"
+DEPENDS:class-native = "openssl-native"
+DEPENDS:class-nativesdk = "openssl-native"
 # Need rehash from openssl and run-parts from debianutils
 PACKAGE_WRITE_DEPS += "openssl-native debianutils-native"
 
@@ -35,7 +35,7 @@ EXTRA_OEMAKE = "\
     'SBINDIR=${sbindir}' \
 "
 
-do_compile_prepend() {
+do_compile:prepend() {
     oe_runmake clean
 }
 
@@ -58,7 +58,7 @@ do_install () {
     } >${D}${sysconfdir}/ca-certificates.conf
 }
 
-do_install_append_class-target () {
+do_install:append:class-target () {
     sed -i -e 's,/etc/,${sysconfdir}/,' \
            -e 's,/usr/share/,${datadir}/,' \
            -e 's,/usr/local,${prefix}/local,' \
@@ -66,25 +66,25 @@ do_install_append_class-target () {
         ${D}${mandir}/man8/update-ca-certificates.8
 }
 
-pkg_postinst_${PN}_class-target () {
+pkg_postinst:${PN}:class-target () {
     SYSROOT="$D" $D${sbindir}/update-ca-certificates
 }
 
-CONFFILES_${PN} += "${sysconfdir}/ca-certificates.conf"
+CONFFILES:${PN} += "${sysconfdir}/ca-certificates.conf"
 
 # Rather than make a postinst script that works for both target and nativesdk,
 # we just run update-ca-certificate from do_install() for nativesdk.
-CONFFILES_${PN}_append_class-nativesdk = " ${sysconfdir}/ssl/certs/ca-certificates.crt"
-do_install_append_class-nativesdk () {
+CONFFILES:${PN}:append:class-nativesdk = " ${sysconfdir}/ssl/certs/ca-certificates.crt"
+do_install:append:class-nativesdk () {
     SYSROOT="${D}${SDKPATHNATIVE}" ${D}${sbindir}/update-ca-certificates
 }
 
-do_install_append_class-native () {
+do_install:append:class-native () {
     SYSROOT="${D}${base_prefix}" ${D}${sbindir}/update-ca-certificates
 }
 
-RDEPENDS_${PN}_append_class-target = " openssl-bin openssl"
-RDEPENDS_${PN}_append_class-native = " openssl-native"
-RDEPENDS_${PN}_append_class-nativesdk = " nativesdk-openssl-bin nativesdk-openssl"
+RDEPENDS:${PN}:append:class-target = " openssl-bin openssl"
+RDEPENDS:${PN}:append:class-native = " openssl-native"
+RDEPENDS:${PN}:append:class-nativesdk = " nativesdk-openssl-bin nativesdk-openssl"
 
 BBCLASSEXTEND = "native nativesdk"

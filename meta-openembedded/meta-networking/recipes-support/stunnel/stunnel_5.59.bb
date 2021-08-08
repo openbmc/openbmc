@@ -32,5 +32,5 @@ EXTRA_OEMAKE += "DEFAULT_GROUP='nogroup'"
 # stunnel3 is a Perl wrapper to allow use of the legacy stunnel 3.x commandline
 # syntax with stunnel >= 4.05
 PACKAGES =+ "stunnel3"
-FILES_stunnel3 = "${bindir}/stunnel3"
-RDEPENDS_stunnel3 += "${PN} perl"
+FILES:stunnel3 = "${bindir}/stunnel3"
+RDEPENDS:stunnel3 += "${PN} perl"

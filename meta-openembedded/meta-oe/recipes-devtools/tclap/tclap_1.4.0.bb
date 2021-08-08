@@ -18,6 +18,6 @@ SRC_URI = "git://git.code.sf.net/p/tclap/code;branch=1.4 \
 S = "${WORKDIR}/git"
 inherit cmake
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 BBCLASSEXTEND = "native nativesdk"

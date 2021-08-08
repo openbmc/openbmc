@@ -11,7 +11,7 @@ inherit pypi setuptools3
 
 CLEANBROKEN = "1"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-codecs \
     ${PYTHON_PN}-difflib \
     ${PYTHON_PN}-distutils \

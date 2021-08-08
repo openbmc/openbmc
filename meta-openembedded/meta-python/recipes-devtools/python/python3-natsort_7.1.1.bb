@@ -8,4 +8,4 @@ SRC_URI[sha256sum] = "00c603a42365830c4722a2eb7663a25919551217ec09a243d3399fa8dd
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} = "python3-fastnumbers python3-icu"
+RDEPENDS:${PN} = "python3-fastnumbers python3-icu"

@@ -3,7 +3,7 @@ inherit setuptools3
 
 SRC_URI[sha256sum] = "3da05fea54fdec2315b54a563d5b59f3b4e2b1e69c3a5841dda35019c01855cd"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-sqlparse \
 "
 

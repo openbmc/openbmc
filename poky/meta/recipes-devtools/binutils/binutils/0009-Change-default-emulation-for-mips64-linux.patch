@@ -1,4 +1,4 @@
-From 5bd94030de598d3a13091dafaed3b956e0ab708f Mon Sep 17 00:00:00 2001
+From fb6d52dda9c230baf869ed5f981581a7b5094b70 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:44:14 +0000
 Subject: [PATCH] Change default emulation for mips64*-*-linux
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/bfd/config.bfd b/bfd/config.bfd
-index e7b55b0dd78..2caf492e172 100644
+index 30087e3b8f8..1896e11790c 100644
 --- a/bfd/config.bfd
 +++ b/bfd/config.bfd
-@@ -896,12 +896,12 @@ case "${targ}" in
+@@ -891,12 +891,12 @@ case "${targ}" in
      targ_selvecs="mips_elf32_le_vec mips_elf64_be_vec mips_elf64_le_vec mips_ecoff_be_vec mips_ecoff_le_vec"
      ;;
    mips64*el-*-linux*)
@@ -35,10 +35,10 @@ index e7b55b0dd78..2caf492e172 100644
    mips*el-*-linux*)
      targ_defvec=mips_elf32_trad_le_vec
 diff --git a/ld/configure.tgt b/ld/configure.tgt
-index 0c780b24d57..47431770a17 100644
+index 6205d7c9872..c08533658e5 100644
 --- a/ld/configure.tgt
 +++ b/ld/configure.tgt
-@@ -531,12 +531,12 @@ mips*-*-vxworks*)	targ_emul=elf32ebmipvxworks
+@@ -530,12 +530,12 @@ mips*-*-vxworks*)	targ_emul=elf32ebmipvxworks
  			;;
  mips*-*-windiss)	targ_emul=elf32mipswindiss
  			;;

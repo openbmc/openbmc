@@ -37,4 +37,4 @@ do_install() {
 	install -m 0755 ${WORKDIR}/selinux-ls-unconfined.sh    ${D}${bindir}
 }
 
-RDEPENDS_${PN} = "file libcap-ng procps findutils"
+RDEPENDS:${PN} = "file libcap-ng procps findutils"

@@ -37,9 +37,9 @@ PACKAGECONFIG[werror] = "-DMBEDTLS_FATAL_WARNINGS=ON,-DMBEDTLS_FATAL_WARNINGS=OF
 EXTRA_OECMAKE = "-DENABLE_TESTING=OFF -DLIB_INSTALL_DIR:STRING=${libdir}"
 
 PROVIDES += "polarssl"
-RPROVIDES_${PN} = "polarssl"
+RPROVIDES:${PN} = "polarssl"
 
 PACKAGES =+ "${PN}-programs"
-FILES_${PN}-programs = "${bindir}/"
+FILES:${PN}-programs = "${bindir}/"
 
 BBCLASSEXTEND = "native nativesdk"

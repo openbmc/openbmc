@@ -19,4 +19,4 @@ S = "${WORKDIR}/git"
 
 inherit allarch autotools
 
-FILES_${PN} += "${datadir}/xml/"
+FILES:${PN} += "${datadir}/xml/"

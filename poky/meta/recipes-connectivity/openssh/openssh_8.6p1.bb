@@ -42,13 +42,13 @@ PAM_SRC_URI = "file://sshd"
 inherit manpages useradd update-rc.d update-alternatives systemd
 
 USERADD_PACKAGES = "${PN}-sshd"
-USERADD_PARAM_${PN}-sshd = "--system --no-create-home --home-dir /var/run/sshd --shell /bin/false --user-group sshd"
+USERADD_PARAM:${PN}-sshd = "--system --no-create-home --home-dir /var/run/sshd --shell /bin/false --user-group sshd"
 INITSCRIPT_PACKAGES = "${PN}-sshd"
-INITSCRIPT_NAME_${PN}-sshd = "sshd"
-INITSCRIPT_PARAMS_${PN}-sshd = "defaults 9"
+INITSCRIPT_NAME:${PN}-sshd = "sshd"
+INITSCRIPT_PARAMS:${PN}-sshd = "defaults 9"
 
 SYSTEMD_PACKAGES = "${PN}-sshd"
-SYSTEMD_SERVICE_${PN}-sshd = "sshd.socket"
+SYSTEMD_SERVICE:${PN}-sshd = "sshd.socket"
 
 inherit autotools-brokensep ptest
 
@@ -74,7 +74,7 @@ EXTRA_OECONF = "'LOGIN_PROGRAM=${base_bindir}/login' \
                 "
 
 # musl doesn't implement wtmp/utmp and logwtmp
-EXTRA_OECONF_append_libc-musl = " --disable-wtmp --disable-lastlog"
+EXTRA_OECONF:append:libc-musl = " --disable-wtmp --disable-lastlog"
 
 # Since we do not depend on libbsd, we do not want configure to use it
 # just because it finds libutil.h.  But, specifying --disable-libutil
@@ -87,7 +87,7 @@ CACHED_CONFIGUREVARS += "ac_cv_path_PATH_PASSWD_PROG=${bindir}/passwd"
 # We don't want to depend on libblockfile
 CACHED_CONFIGUREVARS += "ac_cv_header_maillock_h=no"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	export LD="${CC}"
 	install -m 0644 ${WORKDIR}/sshd_config ${B}/
 	install -m 0644 ${WORKDIR}/ssh_config ${B}/
@@ -100,7 +100,7 @@ do_compile_ptest() {
                    regress/check-perm regress/mkdtemp
 }
 
-do_install_append () {
+do_install:append () {
 	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}" ]; then
 		install -D -m 0644 ${WORKDIR}/sshd ${D}${sysconfdir}/pam.d/sshd
 		sed -i -e 's:#UsePAM no:UsePAM yes:' ${D}${sysconfdir}/ssh/sshd_config
@@ -147,39 +147,39 @@ do_install_ptest () {
 	cp -r regress ${D}${PTEST_PATH}
 }
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 PACKAGES =+ "${PN}-keygen ${PN}-scp ${PN}-ssh ${PN}-sshd ${PN}-sftp ${PN}-misc ${PN}-sftp-server"
-FILES_${PN}-scp = "${bindir}/scp.${BPN}"
-FILES_${PN}-ssh = "${bindir}/ssh.${BPN} ${sysconfdir}/ssh/ssh_config"
-FILES_${PN}-sshd = "${sbindir}/sshd ${sysconfdir}/init.d/sshd ${systemd_unitdir}/system"
-FILES_${PN}-sshd += "${sysconfdir}/ssh/moduli ${sysconfdir}/ssh/sshd_config ${sysconfdir}/ssh/sshd_config_readonly ${sysconfdir}/default/volatiles/99_sshd ${sysconfdir}/pam.d/sshd"
-FILES_${PN}-sshd += "${libexecdir}/${BPN}/sshd_check_keys"
-FILES_${PN}-sftp = "${bindir}/sftp"
-FILES_${PN}-sftp-server = "${libexecdir}/sftp-server"
-FILES_${PN}-misc = "${bindir}/ssh* ${libexecdir}/ssh*"
-FILES_${PN}-keygen = "${bindir}/ssh-keygen"
+FILES:${PN}-scp = "${bindir}/scp.${BPN}"
+FILES:${PN}-ssh = "${bindir}/ssh.${BPN} ${sysconfdir}/ssh/ssh_config"
+FILES:${PN}-sshd = "${sbindir}/sshd ${sysconfdir}/init.d/sshd ${systemd_unitdir}/system"
+FILES:${PN}-sshd += "${sysconfdir}/ssh/moduli ${sysconfdir}/ssh/sshd_config ${sysconfdir}/ssh/sshd_config_readonly ${sysconfdir}/default/volatiles/99_sshd ${sysconfdir}/pam.d/sshd"
+FILES:${PN}-sshd += "${libexecdir}/${BPN}/sshd_check_keys"
+FILES:${PN}-sftp = "${bindir}/sftp"
+FILES:${PN}-sftp-server = "${libexecdir}/sftp-server"
+FILES:${PN}-misc = "${bindir}/ssh* ${libexecdir}/ssh*"
+FILES:${PN}-keygen = "${bindir}/ssh-keygen"
 
-RDEPENDS_${PN} += "${PN}-scp ${PN}-ssh ${PN}-sshd ${PN}-keygen"
-RDEPENDS_${PN}-sshd += "${PN}-keygen ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-keyinit pam-plugin-loginuid', '', d)}"
-RRECOMMENDS_${PN}-sshd_append_class-target = "\
+RDEPENDS:${PN} += "${PN}-scp ${PN}-ssh ${PN}-sshd ${PN}-keygen"
+RDEPENDS:${PN}-sshd += "${PN}-keygen ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-keyinit pam-plugin-loginuid', '', d)}"
+RRECOMMENDS:${PN}-sshd:append:class-target = "\
     ${@bb.utils.filter('PACKAGECONFIG', 'rng-tools', d)} \
 "
 
 # gdb would make attach-ptrace test pass rather than skip but not worth the build dependencies
-RDEPENDS_${PN}-ptest += "${PN}-sftp ${PN}-misc ${PN}-sftp-server make sed sudo coreutils"
+RDEPENDS:${PN}-ptest += "${PN}-sftp ${PN}-misc ${PN}-sftp-server make sed sudo coreutils"
 
-RPROVIDES_${PN}-ssh = "ssh"
-RPROVIDES_${PN}-sshd = "sshd"
+RPROVIDES:${PN}-ssh = "ssh"
+RPROVIDES:${PN}-sshd = "sshd"
 
-RCONFLICTS_${PN} = "dropbear"
-RCONFLICTS_${PN}-sshd = "dropbear"
+RCONFLICTS:${PN} = "dropbear"
+RCONFLICTS:${PN}-sshd = "dropbear"
 
-CONFFILES_${PN}-sshd = "${sysconfdir}/ssh/sshd_config"
-CONFFILES_${PN}-ssh = "${sysconfdir}/ssh/ssh_config"
+CONFFILES:${PN}-sshd = "${sysconfdir}/ssh/sshd_config"
+CONFFILES:${PN}-ssh = "${sysconfdir}/ssh/ssh_config"
 
 ALTERNATIVE_PRIORITY = "90"
-ALTERNATIVE_${PN}-scp = "scp"
-ALTERNATIVE_${PN}-ssh = "ssh"
+ALTERNATIVE:${PN}-scp = "scp"
+ALTERNATIVE:${PN}-ssh = "ssh"
 
 BBCLASSEXTEND += "nativesdk"

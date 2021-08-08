@@ -4,7 +4,7 @@ SECTION = "libs"
 LICENSE = "LGPL-3.0+ & LGPL-2.1+ & GPL-3.0+"
 
 DEPENDS += "libtdb libtalloc libtevent popt"
-RDEPENDS_pyldb += "python3"
+RDEPENDS:pyldb += "python3"
 
 SRC_URI = "http://samba.org/ftp/ldb/ldb-${PV}.tar.gz \
            file://0001-do-not-import-target-module-while-cross-compile.patch \
@@ -55,15 +55,15 @@ PACKAGES =+ "pyldb pyldb-dbg pyldb-dev"
 
 NOAUTOPACKAGEDEBUG = "1"
 
-FILES_${PN} += "${libdir}/ldb/*"
-FILES_${PN}-dbg += "${bindir}/.debug/* \
+FILES:${PN} += "${libdir}/ldb/*"
+FILES:${PN}-dbg += "${bindir}/.debug/* \
                     ${libdir}/.debug/* \
                     ${libdir}/ldb/.debug/* \
                     ${libdir}/ldb/modules/ldb/.debug/*"
 
-FILES_pyldb = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/* \
+FILES:pyldb = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/* \
                ${libdir}/libpyldb-util.*.so.* \
               "
-FILES_pyldb-dbg = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/.debug \
+FILES:pyldb-dbg = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/.debug \
                    ${libdir}/.debug/libpyldb-util.*.so.*"
-FILES_pyldb-dev = "${libdir}/libpyldb-util.*.so"
+FILES:pyldb-dev = "${libdir}/libpyldb-util.*.so"

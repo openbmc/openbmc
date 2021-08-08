@@ -12,7 +12,7 @@ SRC_URI[sha256sum] = "96bf5c08b157a666fec41129e6d327235284cca4c81e92109260f353ba
 
 DEPENDS = "${PYTHON_PN}-async ${PYTHON_PN}-setuptools-native ${PYTHON_PN}-smmap"
 
-RDEPENDS_${PN} += "${PYTHON_PN}-async \
+RDEPENDS:${PN} += "${PYTHON_PN}-async \
                    ${PYTHON_PN}-compression \
                    ${PYTHON_PN}-crypt \
                    ${PYTHON_PN}-io \

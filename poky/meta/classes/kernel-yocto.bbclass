@@ -358,6 +358,21 @@ do_kernel_checkout() {
 			fi
 		fi
 		cd ${S}
+
+		# convert any remote branches to local tracking ones
+		for i in `git branch -a --no-color | grep remotes | grep -v HEAD`; do
+			b=`echo $i | cut -d' ' -f2 | sed 's%remotes/origin/%%'`;
+			git show-ref --quiet --verify -- "refs/heads/$b"
+			if [ $? -ne 0 ]; then
+				git branch $b $i > /dev/null
+			fi
+		done
+
+		# Create a working tree copy of the kernel by checking out a branch
+		machine_branch="${@ get_machine_branch(d, "${KBRANCH}" )}"
+
+		# checkout and clobber any unimportant files
+		git checkout -f ${machine_branch}
 	else
 		# case: we have no git repository at all. 
 		# To support low bandwidth options for building the kernel, we'll just 
@@ -379,21 +394,6 @@ do_kernel_checkout() {
 		git commit -q -m "baseline commit: creating repo for ${PN}-${PV}"
 		git clean -d -f
 	fi
-
-	# convert any remote branches to local tracking ones
-	for i in `git branch -a --no-color | grep remotes | grep -v HEAD`; do
-		b=`echo $i | cut -d' ' -f2 | sed 's%remotes/origin/%%'`;
-		git show-ref --quiet --verify -- "refs/heads/$b"
-		if [ $? -ne 0 ]; then
-			git branch $b $i > /dev/null
-		fi
-	done
-
-	# Create a working tree copy of the kernel by checking out a branch
-	machine_branch="${@ get_machine_branch(d, "${KBRANCH}" )}"
-
-	# checkout and clobber any unimportant files
-	git checkout -f ${machine_branch}
 }
 do_kernel_checkout[dirs] = "${S} ${WORKDIR}"
 
@@ -474,7 +474,7 @@ python do_config_analysis() {
     env['srctree'] = s
 
     # read specific symbols from the kernel recipe or from local.conf
-    # i.e.: CONFIG_ANALYSIS_pn-linux-yocto-dev = 'NF_CONNTRACK LOCALVERSION'
+    # i.e.: CONFIG_ANALYSIS:pn-linux-yocto-dev = 'NF_CONNTRACK LOCALVERSION'
     config = d.getVar( 'CONFIG_ANALYSIS' )
     if not config:
        config = [ "" ]

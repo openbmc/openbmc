@@ -81,7 +81,7 @@ def deb_write_pkg(pkg, d):
 
         localdata.setVar('ROOT', '')
         localdata.setVar('ROOT_%s' % pkg, root)
-        pkgname = localdata.getVar('PKG_%s' % pkg)
+        pkgname = localdata.getVar('PKG:%s' % pkg)
         if not pkgname:
             pkgname = pkg
         localdata.setVar('PKG', pkgname)

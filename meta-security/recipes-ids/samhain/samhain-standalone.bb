@@ -6,7 +6,7 @@ SRC_URI += "file://samhain-not-run-ptest-on-host.patch \
 
 PROVIDES += "samhain"
 
-SYSTEMD_SERVICE_${PN} = "samhain.service"
+SYSTEMD_SERVICE:${PN} = "samhain.service"
 
 inherit ptest
 
@@ -18,7 +18,7 @@ do_compile() {
 	oe_runmake "$@"
 }
 
-do_install_append() {
+do_install:append() {
     ln -sf ${INITSCRIPT_NAME} ${D}${sysconfdir}/init.d/samhain
 }
 
@@ -27,5 +27,5 @@ do_install_ptest() {
 	install ${S}/cutest ${D}${PTEST_PATH}
 }
 
-RPROVIDES_${PN} += "samhain"
-RCONFLICTS_${PN} = "samhain-client samhain-server"
+RPROVIDES:${PN} += "samhain"
+RCONFLICTS:${PN} = "samhain-client samhain-server"

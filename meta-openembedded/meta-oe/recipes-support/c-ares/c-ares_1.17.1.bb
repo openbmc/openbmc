@@ -22,6 +22,6 @@ inherit cmake pkgconfig
 
 PACKAGES =+ "${PN}-utils"
 
-FILES_${PN}-utils = "${bindir}"
+FILES:${PN}-utils = "${bindir}"
 
 BBCLASSEXTEND = "native nativesdk"

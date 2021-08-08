@@ -21,13 +21,13 @@ PACKAGECONFIG[tcp-wrappers] = "--enable-libwrap,--disable-libwrap,tcp-wrappers"
 PACKAGECONFIG[readline] = "--enable-libreadline,--disable-libreadline,readline"
 
 INITSCRIPT_PACKAGES = "${PN}d"
-INITSCRIPT_NAME_${PN}d = "atftpd"
-INITSCRIPT_PARAMS_${PN}d = "defaults 80"
+INITSCRIPT_NAME:${PN}d = "atftpd"
+INITSCRIPT_PARAMS:${PN}d = "defaults 80"
 
 
 EXTRA_OEMAKE = "CFLAGS='${CFLAGS} -std=gnu89'"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/atftpd.init ${D}${sysconfdir}/init.d/atftpd
 
@@ -41,16 +41,16 @@ do_install_append() {
 
 PACKAGES =+ "${PN}d"
 
-FILES_${PN} = "${bindir}/*"
+FILES:${PN} = "${bindir}/*"
 
-FILES_${PN}d = "${sbindir}/* \
+FILES:${PN}d = "${sbindir}/* \
     ${sysconfdir} \
     /srv/tftp \
     ${systemd_unitdir}/system/atftpd.service \
 "
 
 SYSTEMD_PACKAGES = "${PN}d"
-SYSTEMD_SERVICE_${PN}d = "atftpd.service"
-RPROVIDES_${PN}d += "${PN}d-systemd"
-RREPLACES_${PN}d += "${PN}d-systemd"
-RCONFLICTS_${PN}d += "${PN}d-systemd"
+SYSTEMD_SERVICE:${PN}d = "atftpd.service"
+RPROVIDES:${PN}d += "${PN}d-systemd"
+RREPLACES:${PN}d += "${PN}d-systemd"
+RCONFLICTS:${PN}d += "${PN}d-systemd"

@@ -17,10 +17,10 @@ SRC_URI[archive.sha256sum] = "0bf5562e9bfc0382a9dcb81f64340787542568762a3a367d9d
 PACKAGECONFIG[python3] = "-Dpython3=true,-Dpython3=false,python3-pygobject"
 
 PACKAGES =+ "${PN}-demo ${PN}-python3"
-FILES_${PN}-demo = " \
+FILES:${PN}-demo = " \
     ${bindir}/peas-demo \
     ${libdir}/peas-demo \
 "
 
-RDEPENDS_${PN}-python3 = "python3-pygobject"
-FILES_${PN}-python3 = "${libdir}/libpeas-1.0/loaders/libpython3loader.so"
+RDEPENDS:${PN}-python3 = "python3-pygobject"
+FILES:${PN}-python3 = "${libdir}/libpeas-1.0/loaders/libpython3loader.so"

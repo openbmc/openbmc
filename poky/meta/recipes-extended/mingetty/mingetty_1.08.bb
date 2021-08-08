@@ -24,7 +24,7 @@ do_install(){
 
 inherit update-alternatives
 
-ALTERNATIVE_${PN} = "getty"
+ALTERNATIVE:${PN} = "getty"
 ALTERNATIVE_LINK_NAME[getty] = "${base_sbindir}/getty"
 ALTERNATIVE_TARGET[getty] = "${base_sbindir}/mingetty"
 ALTERNATIVE_PRIORITY = "10"

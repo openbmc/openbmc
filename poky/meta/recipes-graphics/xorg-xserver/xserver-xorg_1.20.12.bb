@@ -13,19 +13,19 @@ SRC_URI[sha256sum] = "336dc093431d81ecc03fa36af771f1181334f2746b7de7796f3cc6a8fa
 # These extensions are now integrated into the server, so declare the migration
 # path for in-place upgrades.
 
-RREPLACES_${PN} =  "${PN}-extension-dri \
+RREPLACES:${PN} =  "${PN}-extension-dri \
                     ${PN}-extension-dri2 \
                     ${PN}-extension-record \
                     ${PN}-extension-extmod \
                     ${PN}-extension-dbe \
                    "
-RPROVIDES_${PN} =  "${PN}-extension-dri \
+RPROVIDES:${PN} =  "${PN}-extension-dri \
                     ${PN}-extension-dri2 \
                     ${PN}-extension-record \
                     ${PN}-extension-extmod \
                     ${PN}-extension-dbe \
                    "
-RCONFLICTS_${PN} = "${PN}-extension-dri \
+RCONFLICTS:${PN} = "${PN}-extension-dri \
                     ${PN}-extension-dri2 \
                     ${PN}-extension-record \
                     ${PN}-extension-extmod \

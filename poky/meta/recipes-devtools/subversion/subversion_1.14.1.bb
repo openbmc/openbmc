@@ -6,7 +6,7 @@ LICENSE = "Apache-2 & MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=6487ae7094d359fa90fb9c4096e52e2b"
 
 DEPENDS = "apr-util serf sqlite3 file lz4"
-DEPENDS_append_class-native = " file-replacement-native"
+DEPENDS:append:class-native = " file-replacement-native"
 
 SRC_URI = "${APACHE_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://disable_macos.patch \
@@ -44,7 +44,7 @@ acpaths = "-I build/ -I build/ac-macros/"
 CPPFLAGS += "-P"
 BUILD_CPPFLAGS += "-P"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	rm -f ${S}/libtool
 	rm -f ${S}/build/libtool.m4 ${S}/build/ltmain.sh ${S}/build/ltoptions.m4 ${S}/build/ltsugar.m4 ${S}/build/ltversion.m4 ${S}/build/lt~obsolete.m4
 	rm -f ${S}/aclocal.m4
@@ -58,6 +58,6 @@ do_configure_prepend () {
 #| make: *** [install-serf-lib] Error 1
 PARALLEL_MAKEINST = ""
 
-RDEPENDS_${PN} = "serf"
+RDEPENDS:${PN} = "serf"
 
 BBCLASSEXTEND = "native nativesdk"

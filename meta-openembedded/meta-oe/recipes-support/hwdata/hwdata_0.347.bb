@@ -17,5 +17,5 @@ do_install() {
     oe_runmake install DESTDIR=${D}
 }
 
-FILES_${PN} = "${libdir}/* \
+FILES:${PN} = "${libdir}/* \
                ${datadir}/* "

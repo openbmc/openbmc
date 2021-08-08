@@ -26,7 +26,7 @@ PACKAGES = ""
 DEPENDS += "${@' '.join(["%s-qemuwrapper-cross" % m for m in d.getVar("MULTILIB_VARIANTS").split()])} qemuwrapper-cross depmodwrapper-cross cross-localedef-native"
 RDEPENDS += "${PACKAGE_INSTALL} ${LINGUAS_INSTALL} ${IMAGE_INSTALL_DEBUGFS}"
 RRECOMMENDS += "${PACKAGE_INSTALL_ATTEMPTONLY}"
-PATH_prepend = "${@":".join(all_multilib_tune_values(d, 'STAGING_BINDIR_CROSS').split())}:"
+PATH:prepend = "${@":".join(all_multilib_tune_values(d, 'STAGING_BINDIR_CROSS').split())}:"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -92,7 +92,7 @@ PID = "${@os.getpid()}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 LDCONFIGDEPEND ?= "ldconfig-native:do_populate_sysroot"
-LDCONFIGDEPEND_libc-musl = ""
+LDCONFIGDEPEND:libc-musl = ""
 
 # This is needed to have depmod data in PKGDATA_DIR,
 # but if you're building small initramfs image
@@ -273,7 +273,7 @@ fakeroot python do_image_complete () {
 }
 do_image_complete[dirs] = "${TOPDIR}"
 SSTATETASKS += "do_image_complete"
-SSTATE_SKIP_CREATION_task-image-complete = '1'
+SSTATE_SKIP_CREATION:task-image-complete = '1'
 do_image_complete[sstate-inputdirs] = "${IMGDEPLOYDIR}"
 do_image_complete[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
 do_image_complete[stamp-extra-info] = "${MACHINE_ARCH}"
@@ -314,7 +314,7 @@ fakeroot python do_image_qa () {
 addtask do_image_qa after do_rootfs before do_image
 
 SSTATETASKS += "do_image_qa"
-SSTATE_SKIP_CREATION_task-image-qa = '1'
+SSTATE_SKIP_CREATION:task-image-qa = '1'
 do_image_qa[sstate-inputdirs] = ""
 do_image_qa[sstate-outputdirs] = ""
 python do_image_qa_setscene () {
@@ -382,8 +382,8 @@ python () {
         if t.startswith("debugfs_"):
             t = t[8:]
             debug = "debugfs_"
-        deps = (d.getVar('IMAGE_TYPEDEP_' + t) or "").split()
-        vardeps.add('IMAGE_TYPEDEP_' + t)
+        deps = (d.getVar('IMAGE_TYPEDEP:' + t) or "").split()
+        vardeps.add('IMAGE_TYPEDEP:' + t)
         if baset not in typedeps:
             typedeps[baset] = set()
         deps = [debug + dep for dep in deps]
@@ -431,21 +431,21 @@ python () {
         localdata.delVar('DATETIME')
         localdata.delVar('DATE')
         localdata.delVar('TMPDIR')
-        vardepsexclude = (d.getVarFlag('IMAGE_CMD_' + realt, 'vardepsexclude', True) or '').split()
+        vardepsexclude = (d.getVarFlag('IMAGE_CMD:' + realt, 'vardepsexclude', True) or '').split()
         for dep in vardepsexclude:
             localdata.delVar(dep)
 
         image_cmd = localdata.getVar("IMAGE_CMD")
-        vardeps.add('IMAGE_CMD_' + realt)
+        vardeps.add('IMAGE_CMD:' + realt)
         if image_cmd:
             cmds.append("\t" + image_cmd)
         else:
             bb.fatal("No IMAGE_CMD defined for IMAGE_FSTYPES entry '%s' - possibly invalid type name or missing support class" % t)
         cmds.append(localdata.expand("\tcd ${IMGDEPLOYDIR}"))
 
-        # Since a copy of IMAGE_CMD_xxx will be inlined within do_image_xxx,
-        # prevent a redundant copy of IMAGE_CMD_xxx being emitted as a function.
-        d.delVarFlag('IMAGE_CMD_' + realt, 'func')
+        # Since a copy of IMAGE_CMD:xxx will be inlined within do_image_xxx,
+        # prevent a redundant copy of IMAGE_CMD:xxx being emitted as a function.
+        d.delVarFlag('IMAGE_CMD:' + realt, 'func')
 
         rm_tmp_images = set()
         def gen_conversion_cmds(bt):
@@ -457,11 +457,10 @@ python () {
                     # Create input image first.
                     gen_conversion_cmds(type)
                     localdata.setVar('type', type)
-                    cmd = "\t" + (localdata.getVar("CONVERSION_CMD_" + ctype) or localdata.getVar("COMPRESS_CMD_" + ctype))
+                    cmd = "\t" + localdata.getVar("CONVERSION_CMD:" + ctype)
                     if cmd not in cmds:
                         cmds.append(cmd)
-                    vardeps.add('CONVERSION_CMD_' + ctype)
-                    vardeps.add('COMPRESS_CMD_' + ctype)
+                    vardeps.add('CONVERSION_CMD:' + ctype)
                     subimage = type + "." + ctype
                     if subimage not in subimages:
                         subimages.append(subimage)
@@ -667,6 +666,6 @@ systemd_preset_all () {
     fi
 }
 
-IMAGE_PREPROCESS_COMMAND_append = " ${@ 'systemd_preset_all;' if bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d) and not bb.utils.contains('IMAGE_FEATURES', 'stateless-rootfs', True, False, d) else ''} reproducible_final_image_task; "
+IMAGE_PREPROCESS_COMMAND:append = " ${@ 'systemd_preset_all;' if bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d) and not bb.utils.contains('IMAGE_FEATURES', 'stateless-rootfs', True, False, d) else ''} reproducible_final_image_task; "
 
 CVE_PRODUCT = ""

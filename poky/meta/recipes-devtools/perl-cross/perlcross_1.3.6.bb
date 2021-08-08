@@ -31,7 +31,7 @@ do_configure () {
 do_compile () {
 }
 
-do_install_class-native() {
+do_install:class-native() {
     mkdir -p ${D}/${datadir}/perl-cross/
     cp -rf ${S}/* ${D}/${datadir}/perl-cross/
 }

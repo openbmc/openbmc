@@ -27,6 +27,7 @@ SRC_URI = "git://github.com/intel/openlldp.git;protocol=https;branch=master \
            file://0007-lldp_8021qaz-extern-config-object.patch \
            file://0008-stringops-fix-some-string-copy-errors.patch \
            file://0009-8021qaz-mark-prio-map-functions-static.patch \
+           file://lldp_head-remove-all-references.patch \
            "
 
 # Makefile.am adds -Werror to AM_CFLAGS. There are warnings so disable it.
@@ -35,9 +36,9 @@ TARGET_CFLAGS += "-Wno-error"
 # Enable install of systemd conf files.
 EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '--with-systemdsystemunitdir=${systemd_system_unitdir}', '', d)}"
 
-SYSTEMD_SERVICE_${PN} = "lldpad.service lldpad.socket"
+SYSTEMD_SERVICE:${PN} = "lldpad.service lldpad.socket"
 
 # To enable service at boot set to enable in local.conf.
 SYSTEMD_AUTO_ENABLE ?= "disable"
 
-RRECOMMENDS_${PN} = "iproute2-tc"
+RRECOMMENDS:${PN} = "iproute2-tc"

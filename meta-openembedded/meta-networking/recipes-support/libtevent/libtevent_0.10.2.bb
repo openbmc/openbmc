@@ -4,7 +4,7 @@ SECTION = "libs"
 LICENSE = "LGPLv3+"
 
 DEPENDS += "libtalloc libtirpc"
-RDEPENDS_python3-tevent = "python3"
+RDEPENDS:python3-tevent = "python3"
 
 SRC_URI = "https://samba.org/ftp/tevent/tevent-${PV}.tar.gz \
            file://options-0.10.0.patch \
@@ -42,7 +42,7 @@ EXTRA_OECONF += "--disable-rpath \
                  --with-libiconv=${STAGING_DIR_HOST}${prefix}\
                  --without-gettext \
                 "
-do_install_append() {
+do_install:append() {
      # add this link for cross check python module existence. eg: on x86-64 host, check python module
      # under recipe-sysroot which is mips64. 
      cd ${D}${PYTHON_SITEPACKAGES_DIR}; ln -s _tevent.*.so _tevent.so
@@ -50,8 +50,8 @@ do_install_append() {
 
 PACKAGES += "python3-tevent"
 
-RPROVIDES_${PN}-dbg += "python3-tevent-dbg"
+RPROVIDES:${PN}-dbg += "python3-tevent-dbg"
 
-FILES_python3-tevent = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"
+FILES:python3-tevent = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"
 
-INSANE_SKIP_${MLPREFIX}python3-tevent = "dev-so"
+INSANE_SKIP:${MLPREFIX}python3-tevent = "dev-so"

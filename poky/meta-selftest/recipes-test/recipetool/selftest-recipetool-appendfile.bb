@@ -34,9 +34,9 @@ do_install() {
 	install_extrafunc
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 	echo "Test file installed by postinst" > $D${datadir}/selftest-replaceme-postinst
 }
 
-FILES_${PN} += "${datadir}"
+FILES:${PN} += "${datadir}"
 

@@ -15,7 +15,7 @@ SRC_URI = "git://git.yoctoproject.org/ptest-runner2 \
 
 S = "${WORKDIR}/git"
 
-FILES_${PN} = "${bindir}/ptest-runner"
+FILES:${PN} = "${bindir}/ptest-runner"
 
 EXTRA_OEMAKE = "-e MAKEFLAGS= CFLAGS="${CFLAGS} -DDEFAULT_DIRECTORY=\\\"${libdir}\\\"""
 
@@ -27,4 +27,4 @@ do_install () {
 	install -D -m 0755 ${S}/ptest-runner ${D}${bindir}/ptest-runner
 }
 
-RDEPENDS_${PN}_append_libc-glibc = " libgcc"
+RDEPENDS:${PN}:append:libc-glibc = " libgcc"

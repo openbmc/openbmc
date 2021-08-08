@@ -26,7 +26,7 @@ PACKAGECONFIG[nongpl] = ",,,\
     ${PYTHON_PN}-rfc3339-validator \
 "
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-attrs \
     ${PYTHON_PN}-core \
     ${PYTHON_PN}-datetime \

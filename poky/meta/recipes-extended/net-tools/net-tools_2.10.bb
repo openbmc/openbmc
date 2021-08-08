@@ -90,8 +90,8 @@ base_bindir_progs  = "ifconfig netstat route \
     ${@bb.utils.contains('PACKAGECONFIG', 'hostname', 'dnsdomainname domainname hostname nisdomainname ypdomainname', '', d)} \
 "
 
-ALTERNATIVE_${PN} = "${base_sbindir_progs} ${base_bindir_progs}"
-ALTERNATIVE_${PN}-doc += "${@bb.utils.contains('PACKAGECONFIG', 'hostname', 'hostname.1 dnsdomainname.1', '', d)}"
+ALTERNATIVE:${PN} = "${base_sbindir_progs} ${base_bindir_progs}"
+ALTERNATIVE:${PN}-doc += "${@bb.utils.contains('PACKAGECONFIG', 'hostname', 'hostname.1 dnsdomainname.1', '', d)}"
 ALTERNATIVE_LINK_NAME[hostname.1] = "${mandir}/man1/hostname.1"
 ALTERNATIVE_LINK_NAME[dnsdomainname.1] = "${mandir}/man1/dnsdomainname.1"
 ALTERNATIVE_PRIORITY[hostname.1] = "10"
@@ -105,16 +105,16 @@ python __anonymous() {
 ALTERNATIVE_PRIORITY = "100"
 
 NETTOOLS_PACKAGES = "${PN}-mii-tool"
-NETTOOLS_PACKAGES_class-native = ""
+NETTOOLS_PACKAGES:class-native = ""
 
 PACKAGE_BEFORE_PN = "${NETTOOLS_PACKAGES}"
-RDEPENDS_${PN} += "${NETTOOLS_PACKAGES}"
+RDEPENDS:${PN} += "${NETTOOLS_PACKAGES}"
 
-FILES_${PN}-mii-tool = "${base_sbindir}/mii-tool"
+FILES:${PN}-mii-tool = "${base_sbindir}/mii-tool"
 
-ALTERNATIVE_${PN}_remove = "mii-tool"
+ALTERNATIVE:${PN}:remove = "mii-tool"
 
-ALTERNATIVE_${PN}-mii-tool = "mii-tool"
+ALTERNATIVE:${PN}-mii-tool = "mii-tool"
 ALTERNATIVE_TARGET[mii-tool] = "${base_sbindir}/mii-tool"
 ALTERNATIVE_LINK_NAME[mii-tool] = "${base_sbindir}/mii-tool"
 

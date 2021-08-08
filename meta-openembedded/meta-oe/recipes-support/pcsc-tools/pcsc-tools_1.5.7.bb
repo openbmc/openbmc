@@ -13,4 +13,4 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "pcsc-lite"
 
-FILES_${PN} += "${datadir}/pcsc/smartcard_list.txt"
+FILES:${PN} += "${datadir}/pcsc/smartcard_list.txt"

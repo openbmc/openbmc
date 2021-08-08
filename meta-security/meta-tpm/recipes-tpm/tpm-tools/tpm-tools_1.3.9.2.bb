@@ -10,7 +10,7 @@ LICENSE = "CPL-1.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=059e8cd6165cb4c31e351f2b69388fd9"
 
 DEPENDS = "libtspi openssl perl"
-DEPENDS_class-native = "trousers-native"
+DEPENDS:class-native = "trousers-native"
 
 SRCREV = "bf43837575c5f7d31865562dce7778eae970052e"
 SRC_URI = " \
@@ -24,7 +24,7 @@ inherit autotools-brokensep gettext
 
 S = "${WORKDIR}/git"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	mkdir -p po
 	mkdir -p m4
 	cp -R po_/* po/

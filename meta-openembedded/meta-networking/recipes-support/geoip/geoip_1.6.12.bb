@@ -54,12 +54,12 @@ do_install() {
 }
 
 PACKAGES =+ "${PN}-database"
-FILES_${PN}-database = ""
-FILES_${PN}-database += "${datadir}/GeoIP/*"
+FILES:${PN}-database = ""
+FILES:${PN}-database += "${datadir}/GeoIP/*"
 
 # We cannot do much looking up without databases.
 #
-RDEPENDS_${PN} += "${PN}-database"
+RDEPENDS:${PN} += "${PN}-database"
 
 inherit ptest
 

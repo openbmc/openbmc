@@ -35,10 +35,10 @@ PACKAGECONFIG[openssl] = "-Dsha1=libcrypto,,openssl"
 PACKAGECONFIG[nettle] = "-Dsha1=libnettle,,nettle"
 PACKAGECONFIG[gcrypt] = "-Dsha1=libgcrypt,,libgcrypt"
 
-do_install_append() {
+do_install:append() {
     # remove files not needed and clashing with xserver-xorg
     rm -rf ${D}/${libdir}/xorg/
 }
 
-FILES_${PN} += "${libdir}/xorg/protocol.txt"
+FILES:${PN} += "${libdir}/xorg/protocol.txt"
 

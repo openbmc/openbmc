@@ -47,7 +47,7 @@ VIRTUAL-RUNTIME_keymaps ?= "keymaps"
 #
 # packagegroup-base contain stuff needed for base system (machine related)
 #
-RDEPENDS_packagegroup-base = "\
+RDEPENDS:packagegroup-base = "\
     packagegroup-distro-base \
     packagegroup-machine-base \
     \
@@ -79,7 +79,7 @@ RDEPENDS_packagegroup-base = "\
     "
 
 
-RRECOMMENDS_packagegroup-base = "\
+RRECOMMENDS:packagegroup-base = "\
     kernel-module-nls-utf8 \
     kernel-module-input \
     kernel-module-uinput \
@@ -88,7 +88,7 @@ RRECOMMENDS_packagegroup-base = "\
     kernel-module-rtc-sysfs \
     kernel-module-unix"
 
-RDEPENDS_packagegroup-base-extended = "\
+RDEPENDS:packagegroup-base-extended = "\
     packagegroup-base \
     ${ADD_WIFI} \
     ${ADD_BT} \
@@ -124,69 +124,69 @@ python __anonymous () {
 #
 # packages added by distribution
 #
-SUMMARY_packagegroup-distro-base = "${DISTRO} extras"
+SUMMARY:packagegroup-distro-base = "${DISTRO} extras"
 DEPENDS_packagegroup-distro-base = "${DISTRO_EXTRA_DEPENDS}"
-RDEPENDS_packagegroup-distro-base = "${DISTRO_EXTRA_RDEPENDS}"
-RRECOMMENDS_packagegroup-distro-base = "${DISTRO_EXTRA_RRECOMMENDS}"
+RDEPENDS:packagegroup-distro-base = "${DISTRO_EXTRA_RDEPENDS}"
+RRECOMMENDS:packagegroup-distro-base = "${DISTRO_EXTRA_RRECOMMENDS}"
 
 #
 # packages added by machine config
 #
-SUMMARY_packagegroup-machine-base = "${MACHINE} extras"
-SUMMARY_packagegroup-machine-base = "Extra packages required to fully support ${MACHINE} hardware"
-RDEPENDS_packagegroup-machine-base = "${MACHINE_EXTRA_RDEPENDS}"
-RRECOMMENDS_packagegroup-machine-base = "${MACHINE_EXTRA_RRECOMMENDS}"
+SUMMARY:packagegroup-machine-base = "${MACHINE} extras"
+SUMMARY:packagegroup-machine-base = "Extra packages required to fully support ${MACHINE} hardware"
+RDEPENDS:packagegroup-machine-base = "${MACHINE_EXTRA_RDEPENDS}"
+RRECOMMENDS:packagegroup-machine-base = "${MACHINE_EXTRA_RRECOMMENDS}"
 
-SUMMARY_packagegroup-base-keyboard = "Keyboard support"
-RDEPENDS_packagegroup-base-keyboard = "\
+SUMMARY:packagegroup-base-keyboard = "Keyboard support"
+RDEPENDS:packagegroup-base-keyboard = "\
     ${VIRTUAL-RUNTIME_keymaps}"
 
-SUMMARY_packagegroup-base-pci = "PCI bus support"
-RDEPENDS_packagegroup-base-pci = "\
+SUMMARY:packagegroup-base-pci = "PCI bus support"
+RDEPENDS:packagegroup-base-pci = "\
     pciutils"
 
-SUMMARY_packagegroup-base-acpi = "ACPI support"
-RDEPENDS_packagegroup-base-acpi = "\
+SUMMARY:packagegroup-base-acpi = "ACPI support"
+RDEPENDS:packagegroup-base-acpi = "\
     acpid"
 
-SUMMARY_packagegroup-base-apm = "APM support"
-RDEPENDS_packagegroup-base-apm = "\
+SUMMARY:packagegroup-base-apm = "APM support"
+RDEPENDS:packagegroup-base-apm = "\
     ${VIRTUAL-RUNTIME_apm} \
     apmd"
 
-SUMMARY_packagegroup-base-ext2 = "ext2 filesystem support"
-RDEPENDS_packagegroup-base-ext2 = "\
+SUMMARY:packagegroup-base-ext2 = "ext2 filesystem support"
+RDEPENDS:packagegroup-base-ext2 = "\
     e2fsprogs-e2fsck \
     e2fsprogs-mke2fs"
 
-RRECOMMENDS_packagegroup-base-ext2 = "\
+RRECOMMENDS:packagegroup-base-ext2 = "\
     hdparm \
     e2fsprogs"
 
-SUMMARY_packagegroup-base-vfat = "FAT filesystem support"
-RRECOMMENDS_packagegroup-base-vfat = "\
+SUMMARY:packagegroup-base-vfat = "FAT filesystem support"
+RRECOMMENDS:packagegroup-base-vfat = "\
     kernel-module-msdos \
     kernel-module-vfat \
     kernel-module-nls-iso8859-1 \
     kernel-module-nls-cp437 \
     dosfstools"
 
-SUMMARY_packagegroup-base-alsa = "ALSA sound support"
-RDEPENDS_packagegroup-base-alsa = "\
+SUMMARY:packagegroup-base-alsa = "ALSA sound support"
+RDEPENDS:packagegroup-base-alsa = "\
     alsa-utils-alsactl \
     alsa-utils-amixer \
     ${VIRTUAL-RUNTIME_alsa-state}"
 
-RRECOMMENDS_packagegroup-base-alsa = "\
+RRECOMMENDS:packagegroup-base-alsa = "\
     kernel-module-snd-mixer-oss \
     kernel-module-snd-pcm-oss"
 
-SUMMARY_packagegroup-base-pcmcia = "PC card slot support"
-RDEPENDS_packagegroup-base-pcmcia = "\
+SUMMARY:packagegroup-base-pcmcia = "PC card slot support"
+RDEPENDS:packagegroup-base-pcmcia = "\
     pcmciautils \
     "
 
-RRECOMMENDS_packagegroup-base-pcmcia = "\
+RRECOMMENDS:packagegroup-base-pcmcia = "\
     kernel-module-pcmcia \
     kernel-module-airo-cs \
     kernel-module-pcnet-cs \
@@ -197,12 +197,12 @@ RRECOMMENDS_packagegroup-base-pcmcia = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'kernel-module-orinoco-cs', '',d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'kernel-module-spectrum-cs', '',d)}"
 
-SUMMARY_packagegroup-base-bluetooth = "Bluetooth support"
-RDEPENDS_packagegroup-base-bluetooth = "\
+SUMMARY:packagegroup-base-bluetooth = "Bluetooth support"
+RDEPENDS:packagegroup-base-bluetooth = "\
     bluez5 \
     "
 
-RRECOMMENDS_packagegroup-base-bluetooth = "\
+RRECOMMENDS:packagegroup-base-bluetooth = "\
     kernel-module-bluetooth \
     kernel-module-l2cap \
     kernel-module-rfcomm \
@@ -218,19 +218,19 @@ RRECOMMENDS_packagegroup-base-bluetooth = "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'pcmcia', 'kernel-module-dtl1-cs', '',d)} \
     "
 
-SUMMARY_packagegroup-base-usbgadget = "USB gadget support"
-RRECOMMENDS_packagegroup-base-usbgadget = "\
+SUMMARY:packagegroup-base-usbgadget = "USB gadget support"
+RRECOMMENDS:packagegroup-base-usbgadget = "\
     kernel-module-pxa27x_udc \
     kernel-module-gadgetfs \
     kernel-module-g-file-storage \
     kernel-module-g-serial \
     kernel-module-g-ether"
 
-SUMMARY_packagegroup-base-usbhost = "USB host support"
-RDEPENDS_packagegroup-base-usbhost = "\
+SUMMARY:packagegroup-base-usbhost = "USB host support"
+RDEPENDS:packagegroup-base-usbhost = "\
     usbutils "
 
-RRECOMMENDS_packagegroup-base-usbhost = "\
+RRECOMMENDS:packagegroup-base-usbhost = "\
     kernel-module-uhci-hcd \
     kernel-module-ohci-hcd \
     kernel-module-ehci-hcd \
@@ -244,36 +244,36 @@ RRECOMMENDS_packagegroup-base-usbhost = "\
     kernel-module-usbserial \
     kernel-module-usb-storage "
 
-SUMMARY_packagegroup-base-ppp = "PPP dial-up protocol support"
-RDEPENDS_packagegroup-base-ppp = "\
+SUMMARY:packagegroup-base-ppp = "PPP dial-up protocol support"
+RDEPENDS:packagegroup-base-ppp = "\
     ppp \
     ppp-dialin"
 
-RRECOMMENDS_packagegroup-base-ppp = "\
+RRECOMMENDS:packagegroup-base-ppp = "\
     kernel-module-ppp-async \
     kernel-module-ppp-deflate \
     kernel-module-ppp-generic \
     kernel-module-ppp-mppe \
     kernel-module-slhc"
 
-SUMMARY_packagegroup-base-ipsec = "IPSEC support"
-RDEPENDS_packagegroup-base-ipsec = "\
+SUMMARY:packagegroup-base-ipsec = "IPSEC support"
+RDEPENDS:packagegroup-base-ipsec = "\
     "
 
-RRECOMMENDS_packagegroup-base-ipsec = "\
+RRECOMMENDS:packagegroup-base-ipsec = "\
     kernel-module-ipsec"
 
 #
 # packagegroup-base-wifi contain everything needed to get WiFi working
 # WEP/WPA connection needs to be supported out-of-box
 #
-SUMMARY_packagegroup-base-wifi = "WiFi support"
-RDEPENDS_packagegroup-base-wifi = "\
+SUMMARY:packagegroup-base-wifi = "WiFi support"
+RDEPENDS:packagegroup-base-wifi = "\
     iw \
     wireless-regdb-static \
     wpa-supplicant"
 
-RRECOMMENDS_packagegroup-base-wifi = "\
+RRECOMMENDS:packagegroup-base-wifi = "\
     ${@bb.utils.contains('COMBINED_FEATURES', 'usbhost', 'kernel-module-zd1211rw', '',d)} \
     kernel-module-ieee80211-crypt \
     kernel-module-ieee80211-crypt-ccmp \
@@ -287,59 +287,59 @@ RRECOMMENDS_packagegroup-base-wifi = "\
     kernel-module-aes-generic \
     kernel-module-aes"
 
-SUMMARY_packagegroup-base-nfc = "Near Field Communication support"
-RDEPENDS_packagegroup-base-nfc = "\
+SUMMARY:packagegroup-base-nfc = "Near Field Communication support"
+RDEPENDS:packagegroup-base-nfc = "\
     neard"
 
-RRECOMMENDS_packagegroup-base-nfc = "\
+RRECOMMENDS:packagegroup-base-nfc = "\
     kernel-module-nfc"
 
-SUMMARY_packagegroup-base-3g = "Cellular data support"
-RDEPENDS_packagegroup-base-3g = "\
+SUMMARY:packagegroup-base-3g = "Cellular data support"
+RDEPENDS:packagegroup-base-3g = "\
     ofono"
 
-RRECOMMENDS_packagegroup-base-3g = "\
+RRECOMMENDS:packagegroup-base-3g = "\
     kernel-module-cdc-acm \
     kernel-module-cdc-wdm"
 
-SUMMARY_packagegroup-base-smbfs = "SMB network filesystem support"
-RRECOMMENDS_packagegroup-base-smbfs = "\
+SUMMARY:packagegroup-base-smbfs = "SMB network filesystem support"
+RRECOMMENDS:packagegroup-base-smbfs = "\
     kernel-module-cifs \
     kernel-module-smbfs"
 
-SUMMARY_packagegroup-base-cramfs = "cramfs filesystem support"
-RRECOMMENDS_packagegroup-base-cramfs = "\
+SUMMARY:packagegroup-base-cramfs = "cramfs filesystem support"
+RRECOMMENDS:packagegroup-base-cramfs = "\
     kernel-module-cramfs"
 
 #
 # packagegroup-base-nfs provides ONLY client support - server is in nfs-utils package
 #
-SUMMARY_packagegroup-base-nfs = "NFS network filesystem support"
-RDEPENDS_packagegroup-base-nfs = "\
+SUMMARY:packagegroup-base-nfs = "NFS network filesystem support"
+RDEPENDS:packagegroup-base-nfs = "\
     rpcbind"
 
-RRECOMMENDS_packagegroup-base-nfs = "\
+RRECOMMENDS:packagegroup-base-nfs = "\
     kernel-module-nfs "
 
-SUMMARY_packagegroup-base-zeroconf = "Zeroconf support"
-RDEPENDS_packagegroup-base-zeroconf = "\
+SUMMARY:packagegroup-base-zeroconf = "Zeroconf support"
+RDEPENDS:packagegroup-base-zeroconf = "\
     avahi-daemon"
-RDEPENDS_packagegroup-base-zeroconf_append_libc-glibc = "\
+RDEPENDS:packagegroup-base-zeroconf:append:libc-glibc = "\
     libnss-mdns \
     "
 
-SUMMARY_packagegroup-base-ipv6 = "IPv6 support"
-RDEPENDS_packagegroup-base-ipv6 = "\
+SUMMARY:packagegroup-base-ipv6 = "IPv6 support"
+RDEPENDS:packagegroup-base-ipv6 = "\
     "
 
-RRECOMMENDS_packagegroup-base-ipv6 = "\
+RRECOMMENDS:packagegroup-base-ipv6 = "\
     kernel-module-ipv6 "
 
-SUMMARY_packagegroup-base-serial = "Serial port support"
-RDEPENDS_packagegroup-base-serial = "\
+SUMMARY:packagegroup-base-serial = "Serial port support"
+RDEPENDS:packagegroup-base-serial = "\
     setserial \
     lrzsz "
 
-SUMMARY_packagegroup-base-phone = "Cellular telephony (voice) support"
-RDEPENDS_packagegroup-base-phone = "\
+SUMMARY:packagegroup-base-phone = "Cellular telephony (voice) support"
+RDEPENDS:packagegroup-base-phone = "\
     ofono"

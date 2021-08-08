@@ -53,12 +53,12 @@ class RecipeInfoCommon(object):
 
     @classmethod
     def pkgvar(cls, var, packages, metadata):
-        return dict((pkg, cls.depvar("%s_%s" % (var, pkg), metadata))
+        return dict((pkg, cls.depvar("%s:%s" % (var, pkg), metadata))
                     for pkg in packages)
 
     @classmethod
     def taskvar(cls, var, tasks, metadata):
-        return dict((task, cls.getvar("%s_task-%s" % (var, task), metadata))
+        return dict((task, cls.getvar("%s:task-%s" % (var, task), metadata))
                     for task in tasks)
 
     @classmethod

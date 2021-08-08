@@ -11,7 +11,7 @@ inherit pypi setuptools3
 
 DEPENDS += "${PYTHON_PN}-pytest-runner-native"
 
-RDEPENDS_${PN} += "${PYTHON_PN}-prettytable \
+RDEPENDS:${PN} += "${PYTHON_PN}-prettytable \
             ${PYTHON_PN}-cmd2 \
             ${PYTHON_PN}-pyparsing \
            "

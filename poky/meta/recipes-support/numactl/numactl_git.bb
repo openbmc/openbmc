@@ -22,8 +22,8 @@ SRC_URI = "git://github.com/numactl/numactl \
 
 S = "${WORKDIR}/git"
 
-LDFLAGS_append_riscv64 = " -latomic"
-LDFLAGS_append_riscv32 = " -latomic"
+LDFLAGS:append:riscv64 = " -latomic"
+LDFLAGS:append:riscv32 = " -latomic"
 
 do_install() {
     oe_runmake DESTDIR=${D} prefix=${D}/usr install
@@ -56,4 +56,4 @@ do_install_ptest() {
     install -m 0755 ${B}/.libs/numactl ${D}${PTEST_PATH}/
 }
 
-RDEPENDS_${PN}-ptest = "bash"
+RDEPENDS:${PN}-ptest = "bash"

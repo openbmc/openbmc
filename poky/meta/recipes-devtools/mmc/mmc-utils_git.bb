@@ -14,9 +14,9 @@ UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${WORKDIR}/git"
 
-CFLAGS_append_powerpc64 = " -D__SANE_USERSPACE_TYPES__"
-CFLAGS_append_mipsarchn64 = " -D__SANE_USERSPACE_TYPES__"
-CFLAGS_append_mipsarchn32 = " -D__SANE_USERSPACE_TYPES__"
+CFLAGS:append:powerpc64 = " -D__SANE_USERSPACE_TYPES__"
+CFLAGS:append:mipsarchn64 = " -D__SANE_USERSPACE_TYPES__"
+CFLAGS:append:mipsarchn32 = " -D__SANE_USERSPACE_TYPES__"
 
 do_install() {
     install -d ${D}${bindir}

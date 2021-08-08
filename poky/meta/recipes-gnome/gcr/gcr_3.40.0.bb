@@ -24,18 +24,18 @@ SRC_URI[archive.sha256sum] = "b9d3645a5fd953a54285cc64d4fc046736463dbd4dcc25caf5
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtk', '', d)}"
 PACKAGECONFIG[gtk] = "-Dgtk=true,-Dgtk=false,gtk+3"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/gcr-3 \
 "
 
 # http://errors.yoctoproject.org/Errors/Details/20229/
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
-ARM_INSTRUCTION_SET_armv6 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
+ARM_INSTRUCTION_SET:armv6 = "arm"
 
 EXTRA_OEMESON += "--cross-file ${WORKDIR}/meson-${PN}.cross"
-do_write_config_append() {
+do_write_config:append() {
     cat >${WORKDIR}/meson-${PN}.cross <<EOF
 [binaries]
 gpg2 = '${bindir}/gpg2'

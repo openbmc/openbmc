@@ -11,16 +11,16 @@ S = "${WORKDIR}/git"
 
 inherit cmake python3native
 
-do_install_append() {
+do_install:append() {
     install -Dm 0755 ${S}/generator/nanopb_generator.py ${D}${bindir}/nanopb_generator.py
     install -Dm 0755 ${S}/generator/protoc-gen-nanopb ${D}${bindir}/protoc-gen-nanopb
     install -Dm 0755 ${S}/generator/proto/__init__.py ${D}${PYTHON_SITEPACKAGES_DIR}/proto/__init__.py
 }
 
-FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}"
-FILES_${PN}-dev += "${libdir}/cmake/${BPN}"
+FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PN}-dev += "${libdir}/cmake/${BPN}"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
    ${PYTHON_PN}-protobuf \
    protobuf-compiler \
 "

@@ -8,6 +8,6 @@ PYPI_PACKAGE = "jedi"
 
 SRC_URI[sha256sum] = "92550a404bad8afed881a137ec9a461fed49eca661414be45059329614ed0707"
 
-RDEPENDS_${PN} = "${PYTHON_PN}-parso"
+RDEPENDS:${PN} = "${PYTHON_PN}-parso"
 
 inherit setuptools3 pypi

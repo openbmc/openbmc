@@ -7,7 +7,7 @@ SRC_URI[sha256sum] = "2564ceb9612bbd560d19ca4b41347b54e7835c2f792c504f698e05395e
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-pytest \
 "
 

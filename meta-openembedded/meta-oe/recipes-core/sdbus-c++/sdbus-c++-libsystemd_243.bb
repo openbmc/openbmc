@@ -18,7 +18,7 @@ SRC_URI = "git://github.com/systemd/systemd-stable.git;protocol=git;branch=${SRC
            "
 
 # patches needed by musl
-SRC_URI_append_libc-musl = " ${SRC_URI_MUSL}"
+SRC_URI:append:libc-musl = " ${SRC_URI_MUSL}"
 SRC_URI_MUSL = "\
                file://0002-don-t-use-glibc-specific-qsort_r.patch \
                file://0003-missing_type.h-add-__compare_fn_t-and-comparison_fn_.patch \
@@ -46,7 +46,7 @@ SRC_URI_MUSL = "\
                "
 
 PACKAGECONFIG ??= "gshadow idn"
-PACKAGECONFIG_remove_libc-musl = " gshadow idn"
+PACKAGECONFIG:remove:libc-musl = " gshadow idn"
 PACKAGECONFIG[gshadow] = "-Dgshadow=true,-Dgshadow=false"
 PACKAGECONFIG[idn] = "-Didn=true,-Didn=false"
 

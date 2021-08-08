@@ -19,17 +19,17 @@ PACKAGECONFIG[systemd] = "--with-systemdutildir=${systemd_unitdir} --with-system
 
 EXTRA_OECONF = " --with-backend=linux"
 
-SYSTEMD_SERVICE_${PN} = "upower.service"
+SYSTEMD_SERVICE:${PN} = "upower.service"
 # don't start on boot by default - dbus does that on demand
 SYSTEMD_AUTO_ENABLE = "disable"
 
-do_configure_prepend() {
+do_configure:prepend() {
     sed -i -e s:-nonet:\:g ${S}/doc/man/Makefile.am
     sed -i -e 's: doc : :g' ${S}/Makefile.am
 }
 
-RDEPENDS_${PN} += "dbus"
-RRECOMMENDS_${PN} += "pm-utils"
-FILES_${PN} += "${datadir}/dbus-1/ \
+RDEPENDS:${PN} += "dbus"
+RRECOMMENDS:${PN} += "pm-utils"
+FILES:${PN} += "${datadir}/dbus-1/ \
                 ${base_libdir}/udev/* \
 "

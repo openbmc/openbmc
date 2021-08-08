@@ -22,15 +22,15 @@ EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=RELWITHDEBINFO -DWERROR=OFF"
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_install_append () {
+do_install:append () {
         if [ "${libdir}" = "${base_prefix}/usr/lib" ] && [ -d ${D}/usr/lib64 ]; then
             mv ${D}/usr/lib64 ${D}/usr/lib
         fi
 }
 
-do_install_append_class-nativesdk () {
+do_install:append:class-nativesdk () {
         mkdir -p ${D}/${base_prefix}
         mv ${D}/usr ${D}/${base_prefix}
 }
 
-FILES_${PN}-dev = "${libdir}/* ${includedir}/yui*"
+FILES:${PN}-dev = "${libdir}/* ${includedir}/yui*"

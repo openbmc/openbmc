@@ -22,10 +22,10 @@ EXTRA_OECONF += "--with-libdir=${datadir}/icewm \
 DEPENDS = "asciidoc-native fontconfig fribidi gdk-pixbuf imlib2	libxft libxpm libxrandr \
     libxinerama libice libsm libx11 libxext libxrender libxcomposite libxdamage \
     libxfixes"
-DEPENDS_append = " qemu-native"
-RDEPENDS_${PN} = "perl fribidi"
+DEPENDS:append = " qemu-native"
+RDEPENDS:${PN} = "perl fribidi"
 
-do_compile_prepend_class-target() {
+do_compile:prepend:class-target() {
 
     cd ${B}
     oe_runmake -C src genpref
@@ -39,8 +39,8 @@ EOF
     ./qemuwrapper > src/preferences
 }
 
-ALTERNATIVE_${PN} = "x-session-manager"
+ALTERNATIVE:${PN} = "x-session-manager"
 ALTERNATIVE_TARGET[x-session-manager] = "${bindir}/icewm-session"
 ALTERNATIVE_PRIORITY_${PN} = "100"
 
-FILES_${PN} += "${datadir}/xsessions"
+FILES:${PN} += "${datadir}/xsessions"

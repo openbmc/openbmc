@@ -19,10 +19,10 @@ BINCONFIG = "${bindir}/npth-config"
 
 inherit autotools binconfig-disabled multilib_header
 
-FILES_${PN} = "${libdir}/libnpth.so.*"
-FILES_${PN}-dev += "${bindir}/npth-config"
+FILES:${PN} = "${libdir}/libnpth.so.*"
+FILES:${PN}-dev += "${bindir}/npth-config"
 
-do_install_append() {
+do_install:append() {
     oe_multilib_header npth.h
 }
 

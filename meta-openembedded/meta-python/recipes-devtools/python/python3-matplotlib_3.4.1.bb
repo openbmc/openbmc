@@ -24,10 +24,10 @@ SRC_URI[sha256sum] = "84d4c4f650f356678a5d658a43ca21a41fca13f9b8b00169c0b76e6a6a
 inherit pypi setuptools3 pkgconfig
 
 # LTO with clang needs lld
-LDFLAGS_append_toolchain-clang = " -fuse-ld=lld"
-LDFLAGS_remove_toolchain-clang_mips = "-fuse-ld=lld"
+LDFLAGS:append:toolchain-clang = " -fuse-ld=lld"
+LDFLAGS:remove:toolchain-clang:mips = "-fuse-ld=lld"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     freetype \
     libpng \
     python3-numpy \
@@ -38,10 +38,10 @@ RDEPENDS_${PN} = "\
     python3-pytz \
 "
 
-ENABLELTO_toolchain-clang_riscv64 = "echo enable_lto = False >> ${S}/setup.cfg"
-ENABLELTO_toolchain-clang_riscv32 = "echo enable_lto = False >> ${S}/setup.cfg"
-ENABLELTO_toolchain-clang_mips = "echo enable_lto = False >> ${S}/setup.cfg"
-do_compile_prepend() {
+ENABLELTO:toolchain-clang:riscv64 = "echo enable_lto = False >> ${S}/setup.cfg"
+ENABLELTO:toolchain-clang:riscv32 = "echo enable_lto = False >> ${S}/setup.cfg"
+ENABLELTO:toolchain-clang:mips = "echo enable_lto = False >> ${S}/setup.cfg"
+do_compile:prepend() {
     echo [libs] > ${S}/setup.cfg
     echo system_freetype = true >> ${S}/setup.cfg
     ${ENABLELTO}

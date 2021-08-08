@@ -10,4 +10,4 @@ repos:
 
 local_conf_header:
   alt: |
-      DISTRO_FEATURES_append = " systemd"
+      DISTRO_FEATURES:append = " systemd"

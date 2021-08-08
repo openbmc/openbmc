@@ -16,7 +16,7 @@ EXTRA_AUTORECONF += "--exclude=aclocal"
 
 EXTRA_OECONF = "--disable-nls"
 
-do_install_append () {
+do_install:append () {
 	# Make sure we use /usr/bin/env perl
 	sed -i -e "1s:#!.*:#! /usr/bin/env perl:" ${D}${bindir}/help2man
 }

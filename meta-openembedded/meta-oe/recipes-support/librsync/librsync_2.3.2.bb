@@ -13,6 +13,6 @@ DEPENDS = "popt"
 inherit cmake
 
 PACKAGES =+ "rdiff"
-FILES_rdiff = "${bindir}/rdiff"
+FILES:rdiff = "${bindir}/rdiff"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -3,7 +3,7 @@ require gdb-${PV}.inc
 
 inherit python3-dir
 
-EXTRA_OEMAKE_append_libc-musl = "\
+EXTRA_OEMAKE:append:libc-musl = "\
                                  gt_cv_func_gnugettext1_libc=yes \
                                  gt_cv_func_gnugettext2_libc=yes \
                                  gl_cv_func_working_strerror=yes \
@@ -11,7 +11,7 @@ EXTRA_OEMAKE_append_libc-musl = "\
                                  gl_cv_func_gettimeofday_clobber=no \
                                 "
 
-do_configure_prepend() {
+do_configure:prepend() {
 	if [ "${@bb.utils.filter('PACKAGECONFIG', 'python', d)}" ]; then
 		cat > ${WORKDIR}/python << EOF
 #!/bin/sh

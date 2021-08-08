@@ -36,7 +36,7 @@ S = "${WORKDIR}/heirloom-mailx-12.5"
 
 inherit autotools-brokensep
 
-CFLAGS_append = " -D_BSD_SOURCE -DDEBIAN -I${S}/EXT"
+CFLAGS:append = " -D_BSD_SOURCE -DDEBIAN -I${S}/EXT"
 
 # "STRIP=true" means that 'true' command will be used to 'strip' files which will achieve the effect of not stripping them
 # mailx's Makefile doesn't allow a more straightforward way to avoid stripping
@@ -50,5 +50,5 @@ PARALLEL_MAKE = ""
 
 # Causes gcc to get stuck and eat all available memory in qemuarm builds
 # http://errors.yoctoproject.org/Errors/Details/20488/
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"

@@ -9,7 +9,7 @@ SECTION = "devel"
 HOMEPAGE = "http://www.logwatch.org/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=ad199c8aca74e70f296f731ad9a1521c"
-RDEPENDS_${PN} = "perl"
+RDEPENDS:${PN} = "perl"
 
 SRC_URI = "http://jaist.dl.sourceforge.net/project/${BPN}/${BP}/${BP}.tar.gz"
 SRC_URI[md5sum] = "8bcf3edc5a4687c8aad1b9c01e2be54b"

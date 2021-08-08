@@ -8,7 +8,7 @@ SRC_URI = "file://makedevs.c \
 
 S = "${WORKDIR}"
 
-FILES_${PN}_append_class-nativesdk = " ${datadir}"
+FILES:${PN}:append:class-nativesdk = " ${datadir}"
 
 do_compile() {
 	${CC} ${CFLAGS} ${LDFLAGS} -o ${S}/makedevs ${S}/makedevs.c
@@ -19,7 +19,7 @@ do_install() {
 	install -m 0755 ${S}/makedevs ${D}${base_sbindir}/makedevs
 }
 
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
 	install -d ${D}${datadir}
 	install -m 644 ${COREBASE}/meta/files/device_table-minimal.txt ${D}${datadir}/
 }

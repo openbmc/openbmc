@@ -13,8 +13,8 @@ S = "${WORKDIR}/git"
 
 inherit autotools
 
-DEPENDS_append_libc-musl = " argp-standalone"
-EXTRA_OEMAKE_append_libc-musl = " LIBS='-largp'"
+DEPENDS:append:libc-musl = " argp-standalone"
+EXTRA_OEMAKE:append:libc-musl = " LIBS='-largp'"
 
 PACKAGE_BEFORE_PN += "${PN}-stats"
 
@@ -26,6 +26,6 @@ do_install() {
     install ${S}/README ${D}${docdir}/${BP}
 }
 
-FILES_${PN}-stats = "${bindir}/serialstats"
+FILES:${PN}-stats = "${bindir}/serialstats"
 
 BBCLASSEXTEND = "nativesdk"

@@ -10,7 +10,7 @@ EXCLUDE_FROM_WORLD = "1"
 
 API = "--enable-obsolete-api"
 
-do_install_append () {
+do_install:append () {
 	rm -rf ${D}${includedir}
 	rm -rf ${D}${libdir}/pkgconfig
 	rm -rf ${D}${datadir}

@@ -28,8 +28,8 @@ EXTRA_OEMAKE = "DESTDIR=${D} PREFIX=${prefix} -C utils"
 EXTRA_OEMAKE += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'SYSTEMD_SUPPORT=1', '', d)}"
 
 SYSTEMD_PACKAGES += "inputattach"
-SYSTEMD_SERVICE_inputattach = "inputattach.service"
-SYSTEMD_AUTO_ENABLE_inputattach = "enable"
+SYSTEMD_SERVICE:inputattach = "inputattach.service"
+SYSTEMD_AUTO_ENABLE:inputattach = "enable"
 
 PROVIDES += "joystick"
 
@@ -60,15 +60,15 @@ PACKAGES += "inputattach joystick-jscal joystick"
 
 # We won't package any file here as we are following the same packaging schema
 # Debian does and we are splitting it in 'inputattach' and 'joystick' packages.
-FILES_${PN} = ""
+FILES:${PN} = ""
 
-FILES_inputattach += "\
+FILES:inputattach += "\
     ${bindir}/inputattach \
     ${bindir}/inputattachctl \
     ${systemd_system_unitdir}/inputattach.service \
 "
 
-FILES_joystick += "\
+FILES:joystick += "\
     ${bindir}/evdev-joystick \
     ${bindir}/ffcfstress \
     ${bindir}/ffmvforce \
@@ -81,16 +81,16 @@ FILES_joystick += "\
     ${nonarch_base_libdir}/udev/rules.d/80-stelladaptor-joystick.rules \
 "
 
-FILES_joystick-jscal = " \
+FILES:joystick-jscal = " \
     ${datadir}/joystick \
     ${bindir}/jscal \
     ${bindir}/jscal-restore \
     ${bindir}/jscal-store \
 "
 
-RDEPENDS_inputattach += "inputattach-config"
+RDEPENDS:inputattach += "inputattach-config"
 
-RDEPENDS_joystick-jscal += "\
+RDEPENDS:joystick-jscal += "\
     bash \
     gawk \
 "

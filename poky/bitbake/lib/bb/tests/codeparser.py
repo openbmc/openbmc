@@ -111,9 +111,9 @@ ${D}${libdir}/pkgconfig/*.pc
         self.assertExecs(set(["sed"]))
 
     def test_parameter_expansion_modifiers(self):
-        # - and + are also valid modifiers for parameter expansion, but are
+        # -,+ and : are also valid modifiers for parameter expansion, but are
         # valid characters in bitbake variable names, so are not included here
-        for i in ('=', ':-', ':=', '?', ':?', ':+', '#', '%', '##', '%%'):
+        for i in ('=', '?', '#', '%', '##', '%%'):
             name = "foo%sbar" % i
             self.parseExpression("${%s}" % name)
             self.assertNotIn(name, self.references)

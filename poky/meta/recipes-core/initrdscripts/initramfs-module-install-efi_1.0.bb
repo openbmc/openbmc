@@ -1,8 +1,8 @@
 SUMMARY = "initramfs-framework module for EFI installation option"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
-RDEPENDS_${PN} = "initramfs-framework-base parted e2fsprogs-mke2fs dosfstools util-linux-blkid ${VIRTUAL-RUNTIME_base-utils}"
-RRECOMMENDS_${PN} = "${VIRTUAL-RUNTIME_base-utils-syslog}"
+RDEPENDS:${PN} = "initramfs-framework-base parted e2fsprogs-mke2fs dosfstools util-linux-blkid ${VIRTUAL-RUNTIME_base-utils}"
+RRECOMMENDS:${PN} = "${VIRTUAL-RUNTIME_base-utils-syslog}"
 
 PR = "r4"
 
@@ -15,4 +15,4 @@ do_install() {
     install -m 0755 ${WORKDIR}/init-install-efi.sh ${D}/init.d/install-efi.sh
 }
 
-FILES_${PN} = "/init.d/install-efi.sh"
+FILES:${PN} = "/init.d/install-efi.sh"

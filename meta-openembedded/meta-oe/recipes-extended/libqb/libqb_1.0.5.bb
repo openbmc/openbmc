@@ -23,13 +23,13 @@ S = "${WORKDIR}/git"
 # WORKDIR/libqb/1.0.3+gitAUTOINC+c235284b5f-r0/recipe-sysroot-native/usr/bin/i586-oe-linux/../../libexec/i586-oe-linux/gcc/i586-oe-linux/8.1.0/ld: internal error in write_sections, at ../../gold/reloc.cc:791
 # collect2: error: ld returned 1 exit status
 NOSECTION_FALLBACK = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', '--enable-nosection-fallback', '', d)}"
-NOSECTION_FALLBACK_toolchain-clang_mips64 = "--enable-nosection-fallback"
+NOSECTION_FALLBACK:toolchain-clang:mips64 = "--enable-nosection-fallback"
 
 EXTRA_OECONF += "${NOSECTION_FALLBACK}"
 
 CFLAGS += "-pthread -D_REENTRANT"
 
-do_configure_prepend() {
+do_configure:prepend() {
     ( cd ${S}
     ${S}/autogen.sh )
 }

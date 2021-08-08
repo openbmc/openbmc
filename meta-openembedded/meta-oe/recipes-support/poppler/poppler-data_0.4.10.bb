@@ -34,4 +34,4 @@ do_install() {
     install -m644 ${WORKDIR}/Identity-* ${D}${datadir}/poppler/cMap/
 }
 
-FILES_${PN} += "${datadir}"
+FILES:${PN} += "${datadir}"

@@ -30,8 +30,8 @@ do_configure () {
 
 PACKAGES =+ "${PN}-client ${PN}-daemon"
 
-FILES_${PN}-client = "${bindir}/fwknop"
-FILES_${PN}-daemon = "${sbindir}/fwknopd \
+FILES:${PN}-client = "${bindir}/fwknop"
+FILES:${PN}-daemon = "${sbindir}/fwknopd \
                       ${sysconfdir}/fwknop/access.conf \
                       ${sysconfdir}/fwknop/fwknopd.conf"
 

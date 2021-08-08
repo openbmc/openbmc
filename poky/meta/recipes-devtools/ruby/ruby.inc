@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5b8c87559868796979806100db3f3805 \
                     "
 
 DEPENDS = "ruby-native zlib openssl libyaml gdbm readline libffi"
-DEPENDS_class-native = "openssl-native libyaml-native readline-native zlib-native"
+DEPENDS:class-native = "openssl-native libyaml-native readline-native zlib-native"
 
 SHRT_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 SRC_URI = "http://cache.ruby-lang.org/pub/ruby/${SHRT_VER}/ruby-${PV}.tar.gz \
@@ -33,7 +33,7 @@ inherit autotools ptest
 # that the libraries aren't available and hence that the extension can't be
 # built.
 
-do_configure_prepend() {
+do_configure:prepend() {
     sed -i "s#%%TARGET_CFLAGS%%#$CFLAGS#; s#%%TARGET_LDFLAGS%%#$LDFLAGS#" ${S}/common.mk
     rm -rf ${S}/ruby/
 }

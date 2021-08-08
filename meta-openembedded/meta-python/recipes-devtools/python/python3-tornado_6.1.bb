@@ -12,17 +12,17 @@ SRC_URI[sha256sum] = "33c6e81d7bd55b468d2e793517c909b139960b6c790a60b7991b9b6b76
 inherit pypi setuptools3
 
 # Requires _compression which is currently located in misc
-RDEPENDS_${PN} += "${PYTHON_PN}-compression ${PYTHON_PN}-numbers ${PYTHON_PN}-email \
+RDEPENDS:${PN} += "${PYTHON_PN}-compression ${PYTHON_PN}-numbers ${PYTHON_PN}-email \
                    ${PYTHON_PN}-pkgutil ${PYTHON_PN}-html ${PYTHON_PN}-json ${PYTHON_PN}-certifi ${PYTHON_PN}-threading \
                    ${PYTHON_PN}-ctypes ${PYTHON_PN}-misc"
 
-RDEPENDS_${PN}-test += "${PN} ${PYTHON_PN}-unittest"
+RDEPENDS:${PN}-test += "${PN} ${PYTHON_PN}-unittest"
 
 PACKAGES =+ "\
     ${PN}-test \
 "
 
-FILES_${PN}-test = " \
+FILES:${PN}-test = " \
     ${libdir}/${PYTHON_DIR}/site-packages/*/test \
     ${libdir}/${PYTHON_DIR}/site-packages/*/testing.py* \
 "

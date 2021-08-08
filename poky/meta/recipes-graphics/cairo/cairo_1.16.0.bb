@@ -11,12 +11,12 @@ BUGTRACKER = "http://bugs.freedesktop.org"
 SECTION = "libs"
 
 LICENSE = "(MPL-1.1 | LGPLv2.1) & GPLv3+"
-LICENSE_${PN} = "MPL-1.1 | LGPLv2.1"
-LICENSE_${PN}-dev = "MPL-1.1 | LGPLv2.1"
-LICENSE_${PN}-doc = "MPL-1.1 | LGPLv2.1"
-LICENSE_${PN}-gobject = "MPL-1.1 | LGPLv2.1"
-LICENSE_${PN}-script-interpreter = "MPL-1.1 | LGPLv2.1"
-LICENSE_${PN}-perf-utils = "GPLv3+"
+LICENSE:${PN} = "MPL-1.1 | LGPLv2.1"
+LICENSE:${PN}-dev = "MPL-1.1 | LGPLv2.1"
+LICENSE:${PN}-doc = "MPL-1.1 | LGPLv2.1"
+LICENSE:${PN}-gobject = "MPL-1.1 | LGPLv2.1"
+LICENSE:${PN}-script-interpreter = "MPL-1.1 | LGPLv2.1"
+LICENSE:${PN}-perf-utils = "GPLv3+"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=e73e999e0c72b5ac9012424fa157ad77"
 
@@ -43,8 +43,8 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'directfb', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11 xcb', '', d)} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'opengl', '', d)} \
                    trace"
-PACKAGECONFIG_class-native = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11 xcb', '', d)}"
-PACKAGECONFIG_class-nativesdk = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11 xcb', '', d)}"
+PACKAGECONFIG:class-native = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11 xcb', '', d)}"
+PACKAGECONFIG:class-nativesdk = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11 xcb', '', d)}"
 
 PACKAGECONFIG[x11] = "--with-x=yes -enable-xlib,--with-x=no --disable-xlib,${X11DEPENDS}"
 PACKAGECONFIG[xcb] = "--enable-xcb,--disable-xcb,libxcb"
@@ -65,7 +65,7 @@ export ac_cv_lib_bfd_bfd_openr="no"
 # Ensure we don't depend on LZO
 export ac_cv_lib_lzo2_lzo2a_decompress="no"
 
-do_install_append () {
+do_install:append () {
 	rm -rf ${D}${bindir}/cairo-sphinx
 	rm -rf ${D}${libdir}/cairo/cairo-fdr*
 	rm -rf ${D}${libdir}/cairo/cairo-sphinx*
@@ -79,20 +79,20 @@ do_install_append () {
 
 PACKAGES =+ "cairo-gobject cairo-script-interpreter cairo-perf-utils"
 
-SUMMARY_cairo-gobject = "The Cairo library GObject wrapper library"
-DESCRIPTION_cairo-gobject = "A GObject wrapper library for the Cairo API."
+SUMMARY:cairo-gobject = "The Cairo library GObject wrapper library"
+DESCRIPTION:cairo-gobject = "A GObject wrapper library for the Cairo API."
 
-SUMMARY_cairo-script-interpreter = "The Cairo library script interpreter"
-DESCRIPTION_cairo-script-interpreter = "The Cairo script interpreter implements \
+SUMMARY:cairo-script-interpreter = "The Cairo library script interpreter"
+DESCRIPTION:cairo-script-interpreter = "The Cairo script interpreter implements \
 CairoScript.  CairoScript is used by tracing utilities to enable the ability \
 to replay rendering."
 
-DESCRIPTION_cairo-perf-utils = "The Cairo library performance utilities"
+DESCRIPTION:cairo-perf-utils = "The Cairo library performance utilities"
 
-FILES_${PN} = "${libdir}/libcairo.so.*"
-FILES_${PN}-gobject = "${libdir}/libcairo-gobject.so.*"
-FILES_${PN}-script-interpreter = "${libdir}/libcairo-script-interpreter.so.*"
-FILES_${PN}-perf-utils = "${bindir}/cairo-trace* ${libdir}/cairo/*.la ${libdir}/cairo/libcairo-trace.so"
+FILES:${PN} = "${libdir}/libcairo.so.*"
+FILES:${PN}-gobject = "${libdir}/libcairo-gobject.so.*"
+FILES:${PN}-script-interpreter = "${libdir}/libcairo-script-interpreter.so.*"
+FILES:${PN}-perf-utils = "${bindir}/cairo-trace* ${libdir}/cairo/*.la ${libdir}/cairo/libcairo-trace.so"
 
 BBCLASSEXTEND = "native nativesdk"
 

@@ -7,7 +7,7 @@ DEPENDS += "zlib-native"
 
 inherit native
 
-do_install_append (){
+do_install:append (){
 	for tool in depmod insmod lsmod modinfo modprobe rmmod
 	do
 		ln -s kmod ${D}${bindir}/$tool

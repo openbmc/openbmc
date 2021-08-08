@@ -4,7 +4,7 @@ lexical patterns in text."
 HOMEPAGE = "http://sourceforge.net/projects/flex/"
 SECTION = "devel"
 LICENSE = "BSD-3-Clause & LGPL-2.0+"
-LICENSE_${PN}-libfl = "BSD-3-Clause"
+LICENSE:${PN}-libfl = "BSD-3-Clause"
 
 DEPENDS = "${@bb.utils.contains('PTEST_ENABLED', '1', 'bison-native flex-native', '', d)}"
 BBCLASSEXTEND = "native nativesdk"
@@ -31,26 +31,26 @@ UPSTREAM_CHECK_REGEX = "flex-(?P<pver>\d+(\.\d+)+)\.tar"
 inherit autotools gettext texinfo ptest
 
 M4 = "${bindir}/m4"
-M4_class-native = "${STAGING_BINDIR_NATIVE}/m4"
+M4:class-native = "${STAGING_BINDIR_NATIVE}/m4"
 EXTRA_OECONF += "ac_cv_path_M4=${M4} ac_cv_func_reallocarray=no"
 EXTRA_OEMAKE += "m4=${STAGING_BINDIR_NATIVE}/m4"
 
 EXTRA_OEMAKE += "${@bb.utils.contains('PTEST_ENABLED', '1', 'FLEX=${STAGING_BINDIR_NATIVE}/flex', '', d)}"
 
-do_install_append_class-native() {
+do_install:append:class-native() {
 	create_wrapper ${D}/${bindir}/flex M4=${M4}
 }
 
-do_install_append_class-nativesdk() {
+do_install:append:class-nativesdk() {
 	create_wrapper ${D}/${bindir}/flex M4=${M4}
 }
 
 PACKAGES =+ "${PN}-libfl"
 
-FILES_${PN}-libfl = "${libdir}/libfl.so.* ${libdir}/libfl_pic.so.*"
+FILES:${PN}-libfl = "${libdir}/libfl.so.* ${libdir}/libfl_pic.so.*"
 
-RDEPENDS_${PN} += "m4"
-RDEPENDS_${PN}-ptest += "bash gawk make"
+RDEPENDS:${PN} += "m4"
+RDEPENDS:${PN}-ptest += "bash gawk make"
 
 do_compile_ptest() {
 	oe_runmake -C ${B}/tests -f ${B}/tests/Makefile top_builddir=${B} INCLUDES=-I${S}/src buildtests

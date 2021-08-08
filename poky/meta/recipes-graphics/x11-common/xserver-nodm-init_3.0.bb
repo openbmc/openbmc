@@ -63,10 +63,10 @@ do_install() {
     fi
 }
 
-RDEPENDS_${PN} = "xinit ${@oe.utils.conditional('ROOTLESS_X', '1', 'xuser-account libcap libcap-bin', '', d)}"
+RDEPENDS:${PN} = "xinit ${@oe.utils.conditional('ROOTLESS_X', '1', 'xuser-account libcap libcap-bin', '', d)}"
 
 INITSCRIPT_NAME = "xserver-nodm"
 INITSCRIPT_PARAMS = "start 9 5 . stop 20 0 1 2 3 6 ."
-SYSTEMD_SERVICE_${PN} = "xserver-nodm.service"
+SYSTEMD_SERVICE:${PN} = "xserver-nodm.service"
 
-RCONFLICTS_${PN} = "xserver-common (< 1.34-r9) x11-common"
+RCONFLICTS:${PN} = "xserver-common (< 1.34-r9) x11-common"

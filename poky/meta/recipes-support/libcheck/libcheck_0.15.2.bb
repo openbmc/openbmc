@@ -21,13 +21,13 @@ inherit autotools pkgconfig texinfo
 
 CACHED_CONFIGUREVARS += "ac_cv_path_AWK_PATH=${bindir}/gawk"
 
-RREPLACES_${PN} = "check (<= 0.9.5)"
+RREPLACES:${PN} = "check (<= 0.9.5)"
 
 BBCLASSEXTEND = "native nativesdk"
 
 PACKAGES =+ "checkmk"
 
-FILES_checkmk = "${bindir}/checkmk"
+FILES:checkmk = "${bindir}/checkmk"
 
-RDEPENDS_checkmk = "gawk"
+RDEPENDS:checkmk = "gawk"
 

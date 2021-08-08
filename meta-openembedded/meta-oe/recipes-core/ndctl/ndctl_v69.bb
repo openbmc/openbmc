@@ -22,11 +22,11 @@ EXTRA_OECONF += "--enable-test --enable-destructive --disable-docs"
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd','',d)}"
 PACKAGECONFIG[systemd] = "--with-systemd, --without-systemd, systemd"
 
-do_configure_prepend() {
+do_configure:prepend() {
     ${S}/autogen.sh
 }
 
-SYSTEMD_SERVICE_${PN} = "ndctl-monitor.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "disable"
+SYSTEMD_SERVICE:${PN} = "ndctl-monitor.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
-FILES_${PN} += "${datadir}/daxctl/daxctl.conf"
+FILES:${PN} += "${datadir}/daxctl/daxctl.conf"

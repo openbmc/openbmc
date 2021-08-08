@@ -24,15 +24,15 @@ BBCLASSEXTEND = "native"
 # you need to install the multilib development package (e.g.
 # libc6-dev-i386 on Debian/Ubuntu) and build a 32 bit host part
 # (HOST_CC="gcc -m32").
-BUILD_CC_ARCH_append = " ${@['-m32',''][d.getVar('SITEINFO_BITS') != '32']}"
+BUILD_CC_ARCH:append = " ${@['-m32',''][d.getVar('SITEINFO_BITS') != '32']}"
 
 # The lua makefiles expect the TARGET_SYS to be from uname -s
 # Values: Windows, Linux, Darwin, iOS, SunOS, PS3, GNU/kFreeBSD
 LUA_TARGET_OS = "Unknown"
-LUA_TARGET_OS_darwin = "Darwin"
-LUA_TARGET_OS_linux = "Linux"
-LUA_TARGET_OS_linux-gnueabi = "Linux"
-LUA_TARGET_OS_mingw32 = "Windows"
+LUA_TARGET_OS:darwin = "Darwin"
+LUA_TARGET_OS:linux = "Linux"
+LUA_TARGET_OS:linux-gnueabi = "Linux"
+LUA_TARGET_OS:mingw32 = "Windows"
 
 # We don't want the lua buildsystem's compiler optimizations, or its
 # stripping, and we don't want it to pick up CFLAGS or LDFLAGS, as those apply
@@ -82,21 +82,21 @@ PACKAGES += 'luajit-common'
 
 # See the comment for EXTRA_OEMAKEINST. This is needed to ensure the hardcoded
 # paths are packaged regardless of what the libdir and datadir paths are.
-FILES_${PN} += "${prefix}/${baselib} ${prefix}/share"
-FILES_${PN} += "${libdir}/libluajit-5.1.so.2 \
+FILES:${PN} += "${prefix}/${baselib} ${prefix}/share"
+FILES:${PN} += "${libdir}/libluajit-5.1.so.2 \
     ${libdir}/libluajit-5.1.so.${PV} \
 "
-FILES_${PN}-dev += "${libdir}/libluajit-5.1.a \
+FILES:${PN}-dev += "${libdir}/libluajit-5.1.a \
     ${libdir}/libluajit-5.1.so \
     ${libdir}/pkgconfig/luajit.pc \
 "
-FILES_luajit-common = "${datadir}/${BPN}-${PV}"
+FILES:luajit-common = "${datadir}/${BPN}-${PV}"
 
 # mips64/ppc/ppc64/riscv64 is not supported in this release
-COMPATIBLE_HOST_mipsarchn32 = "null"
-COMPATIBLE_HOST_mipsarchn64 = "null"
-COMPATIBLE_HOST_powerpc = "null"
-COMPATIBLE_HOST_powerpc64 = "null"
-COMPATIBLE_HOST_powerpc64le = "null"
-COMPATIBLE_HOST_riscv64 = "null"
-COMPATIBLE_HOST_riscv32 = "null"
+COMPATIBLE_HOST:mipsarchn32 = "null"
+COMPATIBLE_HOST:mipsarchn64 = "null"
+COMPATIBLE_HOST:powerpc = "null"
+COMPATIBLE_HOST:powerpc64 = "null"
+COMPATIBLE_HOST:powerpc64le = "null"
+COMPATIBLE_HOST:riscv64 = "null"
+COMPATIBLE_HOST:riscv32 = "null"

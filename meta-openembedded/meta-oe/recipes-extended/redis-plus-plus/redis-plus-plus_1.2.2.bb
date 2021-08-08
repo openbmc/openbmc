@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/sewenew/redis-plus-plus"
 SECTION = "libs"
 
 DEPENDS += "hiredis"
-RDEPENDS_${PN} += "hiredis"
+RDEPENDS:${PN} += "hiredis"
 
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
@@ -15,4 +15,4 @@ S = "${WORKDIR}/git"
 inherit cmake
 
 FILES_SOLIBSDEV = ""
-FILES_${PN} += " ${libdir}/libredis++.so"
+FILES:${PN} += " ${libdir}/libredis++.so"

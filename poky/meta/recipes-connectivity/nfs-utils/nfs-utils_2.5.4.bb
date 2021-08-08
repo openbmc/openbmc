@@ -9,13 +9,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=95f3a93a5c3c7888de623b46ea085a84"
 
 # util-linux for libblkid
 DEPENDS = "libcap libevent util-linux sqlite3 libtirpc"
-RDEPENDS_${PN} = "${PN}-client"
-RRECOMMENDS_${PN} = "kernel-module-nfsd"
+RDEPENDS:${PN} = "${PN}-client"
+RRECOMMENDS:${PN} = "kernel-module-nfsd"
 
 inherit useradd
 
 USERADD_PACKAGES = "${PN}-client"
-USERADD_PARAM_${PN}-client = "--system  --home-dir /var/lib/nfs \
+USERADD_PARAM:${PN}-client = "--system  --home-dir /var/lib/nfs \
 			      --shell /bin/false --user-group rpcuser"
 
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/nfs-utils/${PV}/nfs-utils-${PV}.tar.xz \
@@ -39,14 +39,14 @@ SRC_URI[sha256sum] = "51997d94e4c8bcef5456dd36a9ccc38e231207c4e9b6a9a2c108841e6a
 INITSCRIPT_PACKAGES = "${PN} ${PN}-client"
 INITSCRIPT_NAME = "nfsserver"
 INITSCRIPT_PARAMS = "defaults"
-INITSCRIPT_NAME_${PN}-client = "nfscommon"
-INITSCRIPT_PARAMS_${PN}-client = "defaults 19 21"
+INITSCRIPT_NAME:${PN}-client = "nfscommon"
+INITSCRIPT_PARAMS:${PN}-client = "defaults 19 21"
 
 inherit autotools-brokensep update-rc.d systemd pkgconfig
 
 SYSTEMD_PACKAGES = "${PN} ${PN}-client"
-SYSTEMD_SERVICE_${PN} = "nfs-server.service nfs-mountd.service"
-SYSTEMD_SERVICE_${PN}-client = "nfs-statd.service"
+SYSTEMD_SERVICE:${PN} = "nfs-server.service nfs-mountd.service"
+SYSTEMD_SERVICE:${PN}-client = "nfs-statd.service"
 
 # --enable-uuid is need for cross-compiling
 EXTRA_OECONF = "--with-statduser=rpcuser \
@@ -62,7 +62,7 @@ EXTRA_OECONF = "--with-statduser=rpcuser \
 PACKAGECONFIG ??= "tcp-wrappers \
     ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)} \
 "
-PACKAGECONFIG_remove_libc-musl = "tcp-wrappers"
+PACKAGECONFIG:remove:libc-musl = "tcp-wrappers"
 PACKAGECONFIG[tcp-wrappers] = "--with-tcp-wrappers,--without-tcp-wrappers,tcp-wrappers"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 # libdevmapper is available in meta-oe
@@ -72,13 +72,13 @@ PACKAGECONFIG[nfsv4] = "--enable-nfsv4,--disable-nfsv4,keyutils,python3-core"
 
 PACKAGES =+ "${PN}-client ${PN}-mount ${PN}-stats"
 
-CONFFILES_${PN}-client += "${localstatedir}/lib/nfs/etab \
+CONFFILES:${PN}-client += "${localstatedir}/lib/nfs/etab \
 			   ${localstatedir}/lib/nfs/rmtab \
 			   ${localstatedir}/lib/nfs/xtab \
 			   ${localstatedir}/lib/nfs/statd/state \
 			   ${sysconfdir}/nfsmount.conf"
 
-FILES_${PN}-client = "${sbindir}/*statd \
+FILES:${PN}-client = "${sbindir}/*statd \
 		      ${sbindir}/rpc.idmapd ${sbindir}/sm-notify \
 		      ${sbindir}/showmount ${sbindir}/nfsstat \
 		      ${localstatedir}/lib/nfs \
@@ -86,32 +86,32 @@ FILES_${PN}-client = "${sbindir}/*statd \
 		      ${sysconfdir}/nfsmount.conf \
 		      ${sysconfdir}/init.d/nfscommon \
 		      ${systemd_unitdir}/system/nfs-statd.service"
-RDEPENDS_${PN}-client = "${PN}-mount rpcbind"
+RDEPENDS:${PN}-client = "${PN}-mount rpcbind"
 
-FILES_${PN}-mount = "${base_sbindir}/*mount.nfs*"
+FILES:${PN}-mount = "${base_sbindir}/*mount.nfs*"
 
-FILES_${PN}-stats = "${sbindir}/mountstats ${sbindir}/nfsiostat ${sbindir}/nfsdclnts"
-RDEPENDS_${PN}-stats = "python3-core"
+FILES:${PN}-stats = "${sbindir}/mountstats ${sbindir}/nfsiostat ${sbindir}/nfsdclnts"
+RDEPENDS:${PN}-stats = "python3-core"
 
-FILES_${PN}-staticdev += "${libdir}/libnfsidmap/*.a"
+FILES:${PN}-staticdev += "${libdir}/libnfsidmap/*.a"
 
-FILES_${PN} += "${systemd_unitdir} ${libdir}/libnfsidmap/"
+FILES:${PN} += "${systemd_unitdir} ${libdir}/libnfsidmap/"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	sed -i -e 's,sbindir = /sbin,sbindir = ${base_sbindir},g' \
 		${S}/utils/mount/Makefile.am
 }
 
 # Make clean needed because the package comes with
 # precompiled 64-bit objects that break the build
-do_compile_prepend() {
+do_compile:prepend() {
 	make clean
 }
 
 # Works on systemd only
 HIGH_RLIMIT_NOFILE ??= "4096"
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}${sysconfdir}/init.d
 	install -m 0755 ${WORKDIR}/nfsserver ${D}${sysconfdir}/init.d/nfsserver
 	install -m 0755 ${WORKDIR}/nfscommon ${D}${sysconfdir}/init.d/nfscommon

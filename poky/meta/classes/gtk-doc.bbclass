@@ -7,7 +7,7 @@
 #
 # It should be used in recipes to determine whether gtk-doc based documentation should be built,
 # so that qemu use can be avoided when necessary.
-GTKDOC_ENABLED_class-native = "False"
+GTKDOC_ENABLED:class-native = "False"
 GTKDOC_ENABLED ?= "${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', \
                       bb.utils.contains('MACHINE_FEATURES', 'qemu-usermode', 'True', 'False', d), 'False', d)}"
 
@@ -19,20 +19,20 @@ GTKDOC_MESON_ENABLE_FLAG ?= 'true'
 GTKDOC_MESON_DISABLE_FLAG ?= 'false'
 
 # Auto enable/disable based on GTKDOC_ENABLED
-EXTRA_OECONF_prepend_class-target = "${@bb.utils.contains('GTKDOC_ENABLED', 'True', '--enable-gtk-doc --enable-gtk-doc-html --disable-gtk-doc-pdf', \
+EXTRA_OECONF:prepend:class-target = "${@bb.utils.contains('GTKDOC_ENABLED', 'True', '--enable-gtk-doc --enable-gtk-doc-html --disable-gtk-doc-pdf', \
                                                                                     '--disable-gtk-doc', d)} "
-EXTRA_OEMESON_prepend_class-target = "-D${GTKDOC_MESON_OPTION}=${@bb.utils.contains('GTKDOC_ENABLED', 'True', '${GTKDOC_MESON_ENABLE_FLAG}', '${GTKDOC_MESON_DISABLE_FLAG}', d)} "
+EXTRA_OEMESON:prepend:class-target = "-D${GTKDOC_MESON_OPTION}=${@bb.utils.contains('GTKDOC_ENABLED', 'True', '${GTKDOC_MESON_ENABLE_FLAG}', '${GTKDOC_MESON_DISABLE_FLAG}', d)} "
 
 # When building native recipes, disable gtkdoc, as it is not necessary,
 # pulls in additional dependencies, and makes build times longer
-EXTRA_OECONF_prepend_class-native = "--disable-gtk-doc "
-EXTRA_OECONF_prepend_class-nativesdk = "--disable-gtk-doc "
-EXTRA_OEMESON_prepend_class-native = "-D${GTKDOC_MESON_OPTION}=${GTKDOC_MESON_DISABLE_FLAG} "
-EXTRA_OEMESON_prepend_class-nativesdk = "-D${GTKDOC_MESON_OPTION}=${GTKDOC_MESON_DISABLE_FLAG} "
+EXTRA_OECONF:prepend:class-native = "--disable-gtk-doc "
+EXTRA_OECONF:prepend:class-nativesdk = "--disable-gtk-doc "
+EXTRA_OEMESON:prepend:class-native = "-D${GTKDOC_MESON_OPTION}=${GTKDOC_MESON_DISABLE_FLAG} "
+EXTRA_OEMESON:prepend:class-nativesdk = "-D${GTKDOC_MESON_OPTION}=${GTKDOC_MESON_DISABLE_FLAG} "
 
 # Even though gtkdoc is disabled on -native, gtk-doc package is still
 # needed for m4 macros.
-DEPENDS_append = " gtk-doc-native"
+DEPENDS:append = " gtk-doc-native"
 
 # The documentation directory, where the infrastructure will be copied.
 # gtkdocize has a default of "." so to handle out-of-tree builds set this to $S.
@@ -41,15 +41,15 @@ GTKDOC_DOCDIR ?= "${S}"
 export STAGING_DIR_HOST
 
 inherit python3native pkgconfig qemu
-DEPENDS_append = "${@' qemu-native' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
+DEPENDS:append = "${@' qemu-native' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	# Need to use ||true as this is only needed if configure.ac both exists
 	# and uses GTK_DOC_CHECK.
 	gtkdocize --srcdir ${S} --docdir ${GTKDOC_DOCDIR} || true
 }
 
-do_compile_prepend_class-target () {
+do_compile:prepend:class-target () {
     if [ ${GTKDOC_ENABLED} = True ]; then
         # Write out a qemu wrapper that will be given to gtkdoc-scangobj so that it
         # can run target helper binaries through that.

@@ -5,10 +5,10 @@ SECTION = "devel"
 DEPENDS = "expat zlib ncurses virtual/libiconv ${LTTNGUST} bison-native"
 
 LTTNGUST = "lttng-ust"
-LTTNGUST_arc = ""
-LTTNGUST_aarch64 = ""
-LTTNGUST_mipsarch = ""
-LTTNGUST_sh4 = ""
+LTTNGUST:arc = ""
+LTTNGUST:aarch64 = ""
+LTTNGUST:mipsarch = ""
+LTTNGUST:sh4 = ""
 
 inherit autotools texinfo
 
@@ -52,14 +52,14 @@ do_configure () {
 
 # we don't want gdb to provide bfd/iberty/opcodes, which instead will override the
 # right bits installed by binutils.  Same for bfd.info -- also from binutils.
-do_install_append() {
+do_install:append() {
 	rm -rf ${D}${libdir}
 	rm -rf ${D}${includedir}
 	rm -rf ${D}${datadir}/locale
 	rm -f ${D}${infodir}/bfd.info
 }
 
-RRECOMMENDS_gdb_append_linux = " glibc-thread-db "
-RRECOMMENDS_gdb_append_linux-gnueabi = " glibc-thread-db "
-RRECOMMENDS_gdbserver_append_linux = " glibc-thread-db "
-RRECOMMENDS_gdbserver_append_linux-gnueabi = " glibc-thread-db "
+RRECOMMENDS:gdb:append:linux = " glibc-thread-db "
+RRECOMMENDS:gdb:append:linux-gnueabi = " glibc-thread-db "
+RRECOMMENDS:gdbserver:append:linux = " glibc-thread-db "
+RRECOMMENDS:gdbserver:append:linux-gnueabi = " glibc-thread-db "

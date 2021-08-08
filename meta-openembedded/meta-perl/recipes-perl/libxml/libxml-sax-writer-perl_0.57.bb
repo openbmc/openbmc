@@ -10,7 +10,7 @@ SECTION = "libs"
 LICENSE = "Artistic-1.0 | GPLv1+"
 HOMEPAGE = "http://search.cpan.org/dist/XML-SAX-Writer/"
 DEPENDS += "libxml-filter-buffertext-perl-native"
-RDEPENDS_${PN} += "libxml-filter-buffertext-perl"
+RDEPENDS:${PN} += "libxml-filter-buffertext-perl"
 
 SRC_URI = "http://search.cpan.org/CPAN/authors/id/P/PE/PERIGRIN/XML-SAX-Writer-${PV}.tar.gz"
 SRC_URI[md5sum] = "3e3023c648e3003c04de2fb04435f8bd"

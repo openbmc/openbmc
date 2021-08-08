@@ -8,14 +8,14 @@ inherit pypi setuptools3
 
 SRC_URI[sha256sum] = "0724d354d394b3d763bc10dfee05807813c5210f0bd9b8e2ddf6b6925603411c"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-asyncio \
     ${PYTHON_PN}-datetime \
     ${PYTHON_PN}-logging \
     ${PYTHON_PN}-math \
 "
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-googleapis-common-protos \
     ${PYTHON_PN}-google-auth \
     ${PYTHON_PN}-grpcio \

@@ -26,9 +26,9 @@ inherit autotools pkgconfig features_check
 # The startup-notification requires x11 in DISTRO_FEATURES
 REQUIRED_DISTRO_FEATURES = "x11"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${datadir}/matchbox/vfolders/
     install -m 0644 ${WORKDIR}/vfolders/* ${D}${datadir}/matchbox/vfolders/
 }
 
-FILES_${PN} += "${datadir}/matchbox/vfolders/"
+FILES:${PN} += "${datadir}/matchbox/vfolders/"

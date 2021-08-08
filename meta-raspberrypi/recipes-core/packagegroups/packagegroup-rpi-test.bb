@@ -10,7 +10,7 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 OMXPLAYER  = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '', 'omxplayer', d)}"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${OMXPLAYER} \
     bcm2835-tests \
     rpio \
@@ -23,7 +23,7 @@ RDEPENDS_${PN} = "\
     bluez5 \
 "
 
-RRECOMMENDS_${PN} = "\
+RRECOMMENDS:${PN} = "\
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-multimedia", "bigbuckbunny-1080p bigbuckbunny-480p bigbuckbunny-720p", "", d)} \
     ${MACHINE_EXTRA_RRECOMMENDS} \
 "

@@ -15,5 +15,5 @@ S = "${WORKDIR}/git"
 
 inherit setuptools3
 
-RDEPENDS_${PN} = "python3 python3-core \
+RDEPENDS:${PN} = "python3 python3-core \
         python3-ctypes python3-shell python3-json"

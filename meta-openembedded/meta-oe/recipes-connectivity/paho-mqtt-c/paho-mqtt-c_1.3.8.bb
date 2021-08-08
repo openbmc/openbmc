@@ -21,11 +21,11 @@ S = "${WORKDIR}/git"
 
 inherit cmake
 
-do_configure_prepend() {
+do_configure:prepend() {
     sed -i s:\ lib/cmake:\ ${baselib}/cmake:g ${S}/src/CMakeLists.txt
 }
 
-do_install_append() {
+do_install:append() {
     # paho-mqtt installes some thing that we don't want.
     rm -rf ${D}${prefix}/samples
     find ${D}${prefix} -maxdepth 1 -type f -delete

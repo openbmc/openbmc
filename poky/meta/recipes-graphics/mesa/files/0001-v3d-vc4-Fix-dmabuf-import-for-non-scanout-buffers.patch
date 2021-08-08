@@ -1,0 +1,72 @@
+From 303c02a31df4e2b8f6090e75982922a9cba33e4c Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Tue, 27 Jul 2021 11:41:53 -0500
+Subject: [PATCH] v3d, vc4: Fix dmabuf import for non-scanout buffers
+
+Failure to create a buffer for scanout should not be fatal when
+importing a buffer. Buffers allocated from a render-only device may not
+be able to scanned out directly but can still be used for other
+rendering purposes (e.g. as a texture).
+
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/12081]
+---
+ src/gallium/drivers/v3d/v3d_resource.c | 13 +++++--------
+ src/gallium/drivers/vc4/vc4_resource.c |  3 ---
+ 2 files changed, 5 insertions(+), 11 deletions(-)
+
+diff --git a/src/gallium/drivers/v3d/v3d_resource.c b/src/gallium/drivers/v3d/v3d_resource.c
+index 602ba6d8447..02dc29ae6a0 100644
+--- a/src/gallium/drivers/v3d/v3d_resource.c
++++ b/src/gallium/drivers/v3d/v3d_resource.c
+@@ -433,10 +433,11 @@ v3d_resource_get_handle(struct pipe_screen *pscreen,
+                 return v3d_bo_flink(bo, &whandle->handle);
+         case WINSYS_HANDLE_TYPE_KMS:
+                 if (screen->ro) {
+-                        assert(rsc->scanout);
+-                        bool ok = renderonly_get_handle(rsc->scanout, whandle);
+-                        whandle->stride = rsc->slices[0].stride;
+-                        return ok;
++                        if (renderonly_get_handle(rsc->scanout, whandle)) {
++                                whandle->stride = rsc->slices[0].stride;
++                                return true;
++                        }
++                        return false;
+                 }
+                 whandle->handle = bo->handle;
+                 return true;
+@@ -929,10 +930,6 @@ v3d_resource_from_handle(struct pipe_screen *pscreen,
+                         renderonly_create_gpu_import_for_resource(prsc,
+                                                                   screen->ro,
+                                                                   NULL);
+-                if (!rsc->scanout) {
+-                        fprintf(stderr, "Failed to create scanout resource.\n");
+-                        goto fail;
+-                }
+         }
+ 
+         if (rsc->tiled && whandle->stride != slice->stride) {
+diff --git a/src/gallium/drivers/vc4/vc4_resource.c b/src/gallium/drivers/vc4/vc4_resource.c
+index 61e5fd7e5a6..bf3f7656ff8 100644
+--- a/src/gallium/drivers/vc4/vc4_resource.c
++++ b/src/gallium/drivers/vc4/vc4_resource.c
+@@ -320,7 +320,6 @@ vc4_resource_get_handle(struct pipe_screen *pscreen,
+                 return vc4_bo_flink(rsc->bo, &whandle->handle);
+         case WINSYS_HANDLE_TYPE_KMS:
+                 if (screen->ro) {
+-                        assert(rsc->scanout);
+                         return renderonly_get_handle(rsc->scanout, whandle);
+                 }
+                 whandle->handle = rsc->bo->handle;
+@@ -689,8 +688,6 @@ vc4_resource_from_handle(struct pipe_screen *pscreen,
+                         renderonly_create_gpu_import_for_resource(prsc,
+                                                                   screen->ro,
+                                                                   NULL);
+-                if (!rsc->scanout)
+-                        goto fail;
+         }
+ 
+         if (rsc->tiled && whandle->stride != slice->stride) {
+-- 
+2.32.0
+

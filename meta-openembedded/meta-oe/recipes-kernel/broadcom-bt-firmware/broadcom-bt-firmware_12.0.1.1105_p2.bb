@@ -47,30 +47,30 @@ PACKAGES =+ " \
     ${PN}-license \
 "
 
-RDEPENDS_${PN}-bcm20702a1 = "${PN}-license"
-RDEPENDS_${PN}-bcm20702b0 = "${PN}-license"
-RDEPENDS_${PN}-bcm20703a1 = "${PN}-license"
-RDEPENDS_${PN}-bcm43142a0 = "${PN}-license"
-RDEPENDS_${PN}-bcm4335c0 = "${PN}-license"
-RDEPENDS_${PN}-bcm4350c5 = "${PN}-license"
-RDEPENDS_${PN}-bcm4356a2 = "${PN}-license"
-RDEPENDS_${PN}-bcm4371c2 = "${PN}-license"
+RDEPENDS:${PN}-bcm20702a1 = "${PN}-license"
+RDEPENDS:${PN}-bcm20702b0 = "${PN}-license"
+RDEPENDS:${PN}-bcm20703a1 = "${PN}-license"
+RDEPENDS:${PN}-bcm43142a0 = "${PN}-license"
+RDEPENDS:${PN}-bcm4335c0 = "${PN}-license"
+RDEPENDS:${PN}-bcm4350c5 = "${PN}-license"
+RDEPENDS:${PN}-bcm4356a2 = "${PN}-license"
+RDEPENDS:${PN}-bcm4371c2 = "${PN}-license"
 
-FILES_${PN}-bcm20702a1 = "${nonarch_base_libdir}/firmware/brcm/BCM20702A1*hcd"
-FILES_${PN}-bcm20702b0 = "${nonarch_base_libdir}/firmware/brcm/BCM20702B0*hcd"
-FILES_${PN}-bcm20703a1 = "${nonarch_base_libdir}/firmware/brcm/BCM20703A1*hcd"
-FILES_${PN}-bcm43142a0 = "${nonarch_base_libdir}/firmware/brcm/BCM43142A0*hcd"
-FILES_${PN}-bcm4335c0 = "${nonarch_base_libdir}/firmware/brcm/BCM4335C0*hcd"
-FILES_${PN}-bcm4350c5 = "${nonarch_base_libdir}/firmware/brcm/BCM4350C5*hcd"
-FILES_${PN}-bcm4356a2 = "${nonarch_base_libdir}/firmware/brcm/BCM4356A2*hcd"
-FILES_${PN}-bcm4371c2 = "${nonarch_base_libdir}/firmware/brcm/BCM4371C2*hcd"
-FILES_${PN}-license += "${nonarch_base_libdir}/firmware/brcm/LICENSE.broadcom_bcm20702"
+FILES:${PN}-bcm20702a1 = "${nonarch_base_libdir}/firmware/brcm/BCM20702A1*hcd"
+FILES:${PN}-bcm20702b0 = "${nonarch_base_libdir}/firmware/brcm/BCM20702B0*hcd"
+FILES:${PN}-bcm20703a1 = "${nonarch_base_libdir}/firmware/brcm/BCM20703A1*hcd"
+FILES:${PN}-bcm43142a0 = "${nonarch_base_libdir}/firmware/brcm/BCM43142A0*hcd"
+FILES:${PN}-bcm4335c0 = "${nonarch_base_libdir}/firmware/brcm/BCM4335C0*hcd"
+FILES:${PN}-bcm4350c5 = "${nonarch_base_libdir}/firmware/brcm/BCM4350C5*hcd"
+FILES:${PN}-bcm4356a2 = "${nonarch_base_libdir}/firmware/brcm/BCM4356A2*hcd"
+FILES:${PN}-bcm4371c2 = "${nonarch_base_libdir}/firmware/brcm/BCM4371C2*hcd"
+FILES:${PN}-license += "${nonarch_base_libdir}/firmware/brcm/LICENSE.broadcom_bcm20702"
 
-FILES_${PN} += "${nonarch_base_libdir}/firmware/brcm/*"
-RDEPENDS_${PN} += "${PN}-license"
+FILES:${PN} += "${nonarch_base_libdir}/firmware/brcm/*"
+RDEPENDS:${PN} += "${PN}-license"
 
 # Make broadcom-bt-firmware depend on all of the split-out packages.
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     firmware_pkgs = oe.utils.packages_filter_out_system(d)
-    d.appendVar('RDEPENDS_broadcom-bt-firmware', ' ' + ' '.join(firmware_pkgs))
+    d.appendVar('RDEPENDS:broadcom-bt-firmware', ' ' + ' '.join(firmware_pkgs))
 }

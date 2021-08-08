@@ -19,14 +19,14 @@ EXTRA_OECONF = "--disable-xml-docs \
                 --enable-largefile \
                 --with-system-socket=/run/dbus/system_bus_socket \
                 "
-EXTRA_OECONF_append_class-target = " SYSTEMCTL=${base_bindir}/systemctl"
-EXTRA_OECONF_append_class-native = " --disable-selinux"
+EXTRA_OECONF:append:class-target = " SYSTEMCTL=${base_bindir}/systemctl"
+EXTRA_OECONF:append:class-native = " --disable-selinux"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd x11', d)} \
                    user-session \
                   "
-PACKAGECONFIG_class-native = ""
-PACKAGECONFIG_class-nativesdk = ""
+PACKAGECONFIG:class-native = ""
+PACKAGECONFIG:class-nativesdk = ""
 
 PACKAGECONFIG[systemd] = "--enable-systemd --with-systemdsystemunitdir=${systemd_system_unitdir},--disable-systemd --without-systemdsystemunitdir,systemd"
 PACKAGECONFIG[x11] = "--with-x --enable-x11-autolaunch,--without-x --disable-x11-autolaunch, virtual/libx11 libsm"

@@ -6,7 +6,7 @@ python __anonymous () {
 
         # set an empty package of kernel-devicetree
         d.appendVar('PACKAGES', ' %s-devicetree' % kname)
-        d.setVar('ALLOW_EMPTY_%s-devicetree' % kname, '1')
+        d.setVar('ALLOW_EMPTY:%s-devicetree' % kname, '1')
 
         # Merge KERNEL_IMAGETYPE and KERNEL_ALT_IMAGETYPE into KERNEL_IMAGETYPES
         type = d.getVar('KERNEL_IMAGETYPE') or ""
@@ -21,6 +21,6 @@ python __anonymous () {
         for type in types.split():
             typelower = type.lower()
             d.appendVar('PACKAGES', ' %s-image-%s' % (kname, typelower))
-            d.setVar('ALLOW_EMPTY_%s-image-%s' % (kname, typelower), '1')
+            d.setVar('ALLOW_EMPTY:%s-image-%s' % (kname, typelower), '1')
 }
 

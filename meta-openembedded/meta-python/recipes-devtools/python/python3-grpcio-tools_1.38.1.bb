@@ -13,10 +13,10 @@ SRC_URI += "file://0001-setup.py-Do-not-mix-C-and-C-compiler-options.patch"
 
 SRC_URI[sha256sum] = "cd85f58038b92e1961f8127d79691e84e151390d35cae73c4c0cbe2042f76b77"
 
-RDEPENDS_${PN} = "${PYTHON_PN}-grpcio"
+RDEPENDS:${PN} = "${PYTHON_PN}-grpcio"
 
 BBCLASSEXTEND = "native nativesdk"
 
 # Needs abseil-cpp which does not build for ppc64le/musl
-COMPATIBLE_HOST_libc-musl_powerpc64le = "null"
+COMPATIBLE_HOST:libc-musl:powerpc64le = "null"
 

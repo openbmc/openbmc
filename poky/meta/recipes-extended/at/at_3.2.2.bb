@@ -14,13 +14,13 @@ PACKAGECONFIG ?= "\
 
 PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux,"
 
-RDEPENDS_${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_DEPS}', '', d)} \
+RDEPENDS:${PN} = "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_DEPS}', '', d)} \
 "
 
 PAM_DEPS = "libpam libpam-runtime pam-plugin-env pam-plugin-limits"
 
-RCONFLICTS_${PN} = "atd"
-RREPLACES_${PN} = "atd"
+RCONFLICTS:${PN} = "atd"
+RREPLACES:${PN} = "atd"
 
 SRC_URI = "http://software.calhariz.com/at/${BPN}_${PV}.orig.tar.gz \
     file://fix_parallel_build_error.patch \
@@ -51,7 +51,7 @@ inherit autotools-brokensep systemd update-rc.d
 INITSCRIPT_NAME = "atd"
 INITSCRIPT_PARAMS = "defaults"
 
-SYSTEMD_SERVICE_${PN} = "atd.service"
+SYSTEMD_SERVICE:${PN} = "atd.service"
 
 copy_sources() {
 	cp -f ${WORKDIR}/posixtm.[ch] ${S}

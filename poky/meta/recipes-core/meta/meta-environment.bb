@@ -9,7 +9,7 @@ MODIFYTOS = "0"
 REAL_MULTIMACH_TARGET_SYS = "${TUNE_PKGARCH}${TARGET_VENDOR}-${TARGET_OS}"
 
 inherit toolchain-scripts
-TOOLCHAIN_NEED_CONFIGSITE_CACHE_append = " zlib"
+TOOLCHAIN_NEED_CONFIGSITE_CACHE:append = " zlib"
 # Need to expand here before cross-candian changes HOST_ARCH -> SDK_ARCH
 TOOLCHAIN_CONFIGSITE_NOCACHE := "${TOOLCHAIN_CONFIGSITE_NOCACHE}"
 
@@ -66,7 +66,7 @@ do_install() {
 
 PN = "meta-environment-${MACHINE}"
 PACKAGES = "${PN}"
-FILES_${PN}= " \
+FILES:${PN}= " \
     ${SDKPATH}/* \
     "
 

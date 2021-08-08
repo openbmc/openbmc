@@ -41,5 +41,5 @@ do_install() {
 }
 
 ALTERNATIVE_PRIORITY = "100"
-ALTERNATIVE_${PN} = "traceroute"
+ALTERNATIVE:${PN} = "traceroute"
 ALTERNATIVE_LINK_NAME[traceroute] = "${bindir}/traceroute"

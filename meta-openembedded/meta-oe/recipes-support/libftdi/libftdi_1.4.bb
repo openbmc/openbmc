@@ -30,4 +30,4 @@ BBCLASSEXTEND = "native nativesdk"
 
 PACKAGES += "${PN}-python"
 
-FILES_${PN}-python = "${libdir}/${PYTHON_DIR}/site-packages/"
+FILES:${PN}-python = "${libdir}/${PYTHON_DIR}/site-packages/"

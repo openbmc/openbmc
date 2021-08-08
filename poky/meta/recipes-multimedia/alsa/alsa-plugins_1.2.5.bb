@@ -49,10 +49,10 @@ PACKAGES_DYNAMIC = "^libasound-module-.*"
 
 # The alsa-plugins package doesn't itself contain anything, it just depends on
 # all built plugins.
-FILES_${PN} = ""
-ALLOW_EMPTY_${PN} = "1"
+FILES:${PN} = ""
+ALLOW_EMPTY:${PN} = "1"
 
-do_install_append() {
+do_install:append() {
 	rm -f ${D}${libdir}/alsa-lib/*.la
 
 	if [ "${@bb.utils.contains('PACKAGECONFIG', 'pulseaudio', 'yes', 'no', d)}" = "yes" ]; then
@@ -65,10 +65,10 @@ do_install_append() {
 	fi
 }
 
-python populate_packages_prepend() {
+python populate_packages:prepend() {
     plugindir = d.expand('${libdir}/alsa-lib/')
     packages = " ".join(do_split_packages(d, plugindir, r'^libasound_module_(.*)\.so$', 'libasound-module-%s', 'Alsa plugin for %s', extra_depends=''))
-    d.setVar("RDEPENDS_alsa-plugins", packages)
+    d.setVar("RDEPENDS:alsa-plugins", packages)
 }
 
 # Many plugins have a configuration file (plus a symlink in /etc) associated
@@ -84,51 +84,51 @@ python populate_packages_prepend() {
 # cause big problems, but some kind of improvement to the packaging could
 # probably be done here (at least it would be good to handle the different
 # plugins in a consistent way).
-FILES_${MLPREFIX}libasound-module-ctl-arcam-av += "\
+FILES:${MLPREFIX}libasound-module-ctl-arcam-av += "\
         ${datadir}/alsa/alsa.conf.d/50-arcam-av-ctl.conf \
         ${sysconfdir}/alsa/conf.d/50-arcam-av-ctl.conf \
 "
-FILES_${MLPREFIX}libasound-module-pcm-a52 += "\
+FILES:${MLPREFIX}libasound-module-pcm-a52 += "\
         ${datadir}/alsa/alsa.conf.d/60-a52-encoder.conf \
         ${sysconfdir}/alsa/conf.d/60-a52-encoder.conf \
 "
-FILES_${MLPREFIX}libasound-module-pcm-alsa-dsp += "\
+FILES:${MLPREFIX}libasound-module-pcm-alsa-dsp += "\
         ${datadir}/alsa/alsa.conf.d/98-maemo.conf \
         ${sysconfdir}/alsa/conf.d/98-maemo.conf \
 "
-FILES_${MLPREFIX}libasound-module-pcm-jack += "\
+FILES:${MLPREFIX}libasound-module-pcm-jack += "\
         ${datadir}/alsa/alsa.conf.d/50-jack.conf \
         ${sysconfdir}/alsa/conf.d/50-jack.conf \
 "
-FILES_${MLPREFIX}libasound-module-pcm-oss += "\
+FILES:${MLPREFIX}libasound-module-pcm-oss += "\
         ${datadir}/alsa/alsa.conf.d/50-oss.conf \
         ${sysconfdir}/alsa/conf.d/50-oss.conf \
 "
-FILES_${MLPREFIX}libasound-module-pcm-speex += "\
+FILES:${MLPREFIX}libasound-module-pcm-speex += "\
         ${datadir}/alsa/alsa.conf.d/60-speex.conf \
         ${sysconfdir}/alsa/conf.d/60-speex.conf \
 "
-FILES_${MLPREFIX}libasound-module-pcm-upmix += "\
+FILES:${MLPREFIX}libasound-module-pcm-upmix += "\
         ${datadir}/alsa/alsa.conf.d/60-upmix.conf \
         ${sysconfdir}/alsa/conf.d/60-upmix.conf \
 "
-FILES_${MLPREFIX}libasound-module-pcm-usb-stream += "\
+FILES:${MLPREFIX}libasound-module-pcm-usb-stream += "\
         ${datadir}/alsa/alsa.conf.d/98-usb-stream.conf \
         ${sysconfdir}/alsa/conf.d/98-usb-stream.conf \
 "
-FILES_${MLPREFIX}libasound-module-pcm-vdownmix += "\
+FILES:${MLPREFIX}libasound-module-pcm-vdownmix += "\
         ${datadir}/alsa/alsa.conf.d/60-vdownmix.conf \
         ${sysconfdir}/alsa/conf.d/60-vdownmix.conf \
 "
-FILES_${MLPREFIX}libasound-module-rate-lavrate += "\
+FILES:${MLPREFIX}libasound-module-rate-lavrate += "\
         ${datadir}/alsa/alsa.conf.d/10-rate-lav.conf \
         ${sysconfdir}/alsa/conf.d/10-rate-lav.conf \
 "
-FILES_${MLPREFIX}libasound-module-rate-samplerate += "\
+FILES:${MLPREFIX}libasound-module-rate-samplerate += "\
         ${datadir}/alsa/alsa.conf.d/10-samplerate.conf \
         ${sysconfdir}/alsa/conf.d/10-samplerate.conf \
 "
-FILES_${MLPREFIX}libasound-module-rate-speexrate += "\
+FILES:${MLPREFIX}libasound-module-rate-speexrate += "\
         ${datadir}/alsa/alsa.conf.d/10-speexrate.conf \
         ${sysconfdir}/alsa/conf.d/10-speexrate.conf \
 "
@@ -149,25 +149,25 @@ FILES_${MLPREFIX}libasound-module-rate-speexrate += "\
 # The symlinks cause QA errors, because usually it's a bug if a non
 # -dev/-dbg/-nativesdk package contains links to .so files, but in this case
 # the errors are false positives, so we disable the QA checks.
-FILES_${MLPREFIX}libasound-module-rate-lavrate += "${libdir}/alsa-lib/*rate_lavrate_*.so"
-FILES_${MLPREFIX}libasound-module-rate-samplerate += "${libdir}/alsa-lib/*rate_samplerate_*.so"
-FILES_${MLPREFIX}libasound-module-rate-speexrate += "${libdir}/alsa-lib/*rate_speexrate_*.so"
-INSANE_SKIP_${MLPREFIX}libasound-module-rate-lavrate = "dev-so"
-INSANE_SKIP_${MLPREFIX}libasound-module-rate-samplerate = "dev-so"
-INSANE_SKIP_${MLPREFIX}libasound-module-rate-speexrate = "dev-so"
+FILES:${MLPREFIX}libasound-module-rate-lavrate += "${libdir}/alsa-lib/*rate_lavrate_*.so"
+FILES:${MLPREFIX}libasound-module-rate-samplerate += "${libdir}/alsa-lib/*rate_samplerate_*.so"
+FILES:${MLPREFIX}libasound-module-rate-speexrate += "${libdir}/alsa-lib/*rate_speexrate_*.so"
+INSANE_SKIP:${MLPREFIX}libasound-module-rate-lavrate = "dev-so"
+INSANE_SKIP:${MLPREFIX}libasound-module-rate-samplerate = "dev-so"
+INSANE_SKIP:${MLPREFIX}libasound-module-rate-speexrate = "dev-so"
 
 # 50-pulseaudio.conf defines a device named "pulse" that applications can use
 # if they explicitly want to use the PulseAudio plugin.
 # 99-pulseaudio-default.conf configures the "default" device to use the
 # PulseAudio plugin.
-FILES_${PN}-pulseaudio-conf += "\
+FILES:${PN}-pulseaudio-conf += "\
         ${datadir}/alsa/alsa.conf.d/50-pulseaudio.conf \
         ${datadir}/alsa/alsa.conf.d/99-pulseaudio-default.conf \
         ${sysconfdir}/alsa/conf.d/50-pulseaudio.conf \
         ${sysconfdir}/alsa/conf.d/99-pulseaudio-default.conf \
 "
 
-RDEPENDS_${PN}-pulseaudio-conf += "\
+RDEPENDS:${PN}-pulseaudio-conf += "\
         ${MLPREFIX}libasound-module-conf-pulse \
         ${MLPREFIX}libasound-module-ctl-pulse \
         ${MLPREFIX}libasound-module-pcm-pulse \

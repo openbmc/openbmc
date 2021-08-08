@@ -20,11 +20,11 @@ SRC_URI[sha256sum] = "645166a5e05b2064ab630534a514697fc47b681951e7fe1d635c259cbd
 
 S = "${WORKDIR}/${BPN}"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # fix DSO issue with binutils-2.22
     sed -i 's/ -lrt/ -lrt -lm/g' ${S}/Makefile.am
 }
-do_install_append() {
+do_install:append() {
     install -d ${D}${datadir}/orrery
     cp -R --no-dereference --preserve=mode,links -v ${S}/data/* ${D}${datadir}/orrery
     chown -R root:root ${D}${datadir}/orrery
@@ -32,4 +32,4 @@ do_install_append() {
     install -m 0755 ${WORKDIR}/orrery.png ${D}${datadir}/icons
 }
 
-FILES_${PN} += "${datadir}/icons/orrery.png"
+FILES:${PN} += "${datadir}/icons/orrery.png"

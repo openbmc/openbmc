@@ -14,6 +14,6 @@ SRC_URI[archive.sha256sum] = "c885013fe61a4c5117fda395770d507563411c63e49f4a3ace
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
-FILES_${PN} = "${libdir}/lib*.so.*"
-FILES_${PN}-dev += "${libdir}/*/include/ ${libdir}/pangomm-*/"
+FILES:${PN} = "${libdir}/lib*.so.*"
+FILES:${PN}-dev += "${libdir}/*/include/ ${libdir}/pangomm-*/"
 

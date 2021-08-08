@@ -12,14 +12,14 @@ DEPENDS = "virtual/kernel libmnl"
 # configuration options. For exact kernel requirements visit:
 # https://www.wireguard.io/install/#kernel-requirements
 
-EXTRA_OEMAKE_append = " \
+EXTRA_OEMAKE:append = " \
     KERNELDIR=${STAGING_KERNEL_DIR} \
     "
 
 MAKE_TARGETS = "module"
 MODULES_INSTALL_TARGET = "module-install"
 
-RRECOMMENDS_${PN} = "kernel-module-xt-hashlimit"
+RRECOMMENDS:${PN} = "kernel-module-xt-hashlimit"
 MODULE_NAME = "wireguard"
 
 

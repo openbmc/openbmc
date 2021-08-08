@@ -17,11 +17,11 @@ inherit pkgconfig autotools manpages
 
 PACKAGECONFIG[manpages] = "--enable-doc, --disable-doc, libxslt-native xmlto-native"
 
-RDEPENDS_${PN} = "grep bash"
+RDEPENDS:${PN} = "grep bash"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	( cd ${S}; autoreconf -f -i -s )
 }
 
-FILES_${PN} += "${libdir}/${BPN}/*"
-FILES_${PN}-dbg += "${datadir}/doc/pm-utils/README.debugging"
+FILES:${PN} += "${libdir}/${BPN}/*"
+FILES:${PN}-dbg += "${datadir}/doc/pm-utils/README.debugging"

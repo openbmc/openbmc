@@ -13,4 +13,4 @@ SRC_URI = "git://github.com/libimobiledevice/libusbmuxd;protocol=https"
 
 S = "${WORKDIR}/git"
 
-FILES_${PN} += "${base_libdir}/udev/rules.d/"
+FILES:${PN} += "${base_libdir}/udev/rules.d/"

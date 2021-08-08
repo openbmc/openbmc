@@ -19,6 +19,6 @@ EXTRA_OECONF += "LIBLEPT_HEADERSDIR=${STAGING_INCDIR}/leptonica"
 
 inherit autotools pkgconfig
 
-FILES_${PN} += "${datadir}/tessdata"
+FILES:${PN} += "${datadir}/tessdata"
 
-RRECOMMENDS_${PN} += "tesseract-lang-eng"
+RRECOMMENDS:${PN} += "tesseract-lang-eng"

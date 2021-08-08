@@ -7,7 +7,7 @@ SRC_URI[sha256sum] = "45460d12ed2a5caf272a357a3360b36d1e346f17afe1425b66fc21d70f
 
 inherit setuptools3 pypi ptest
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-ctypes \
     ${PYTHON_PN}-distutils \
     ${PYTHON_PN}-io \
@@ -25,7 +25,7 @@ SRC_URI += " \
 	file://run-ptest \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 	${PYTHON_PN}-fcntl \
 "

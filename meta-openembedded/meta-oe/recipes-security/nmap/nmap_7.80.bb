@@ -49,7 +49,7 @@ do_configure() {
     oe_runconf
 }
 
-do_install_append() {
+do_install:append() {
     for f in ndiff uninstall_ndiff; do
         if [ -f ${D}${bindir}/$f ]; then
             sed -i 's@^#!.*$@#!/usr/bin/env python3@g' ${D}${bindir}/$f
@@ -57,6 +57,6 @@ do_install_append() {
     done
 }
 
-FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR} ${datadir}/ncat"
+FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR} ${datadir}/ncat"
 
-RDEPENDS_${PN} += "python3-core"
+RDEPENDS:${PN} += "python3-core"

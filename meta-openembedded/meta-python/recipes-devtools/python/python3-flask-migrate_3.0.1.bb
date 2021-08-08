@@ -8,7 +8,7 @@ PYPI_PACKAGE = "Flask-Migrate"
 
 inherit pypi setuptools3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-flask-sqlalchemy \
     ${PYTHON_PN}-alembic \
     ${PYTHON_PN}-flask \

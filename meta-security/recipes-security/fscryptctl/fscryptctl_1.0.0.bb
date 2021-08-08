@@ -18,7 +18,7 @@ do_install() {
     oe_runmake DESTDIR=${D} PREFIX=/usr install
 }
 
-RRECOMMENDS_${PN} += "\
+RRECOMMENDS:${PN} += "\
     keyutils \
     kernel-module-cbc \
     kernel-module-cts \
