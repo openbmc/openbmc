@@ -1,5 +1,5 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-PACKAGES_remove_fb-nohost = "\
+PACKAGES:remove:fb-nohost = "\
         ${PN}-console \
         "

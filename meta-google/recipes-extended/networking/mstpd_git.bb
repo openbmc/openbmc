@@ -13,12 +13,12 @@ SRC_URI += "file://mstpd.service"
 inherit autotools pkgconfig systemd
 
 PACKAGES =+ "${PN}-mstpd"
-FILES_${PN}-mstpd = "${sbindir}/mstpd ${sbindir}/mstpctl /sbin/bridge-stp"
+FILES:${PN}-mstpd = "${sbindir}/mstpd ${sbindir}/mstpctl /sbin/bridge-stp"
 
 SYSTEMD_PACKAGES = "${PN}-mstpd"
-SYSTEMD_SERVICE_${PN}-mstpd = "mstpd.service"
+SYSTEMD_SERVICE:${PN}-mstpd = "mstpd.service"
 
-do_install_append() {
+do_install:append() {
   rm -r ${D}${libexecdir}
 
   install -d -m 0755 ${D}/sbin

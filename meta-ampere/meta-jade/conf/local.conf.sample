@@ -93,7 +93,7 @@ PACKAGE_CLASSES ?= "package_rpm"
 # Supported values are i686 and x86_64
 #SDKMACHINE ?= "i686"
 
-SANITY_TESTED_DISTROS_append ?= " *"
+SANITY_TESTED_DISTROS:append ?= " *"
 
 #
 # Extra image configuration defaults

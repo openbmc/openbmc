@@ -6,16 +6,16 @@ PV = "0.2"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-FILESEXTRAPATHS_prepend = "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend = "${THISDIR}/${PN}:"
 
 inherit systemd
 
 DEPENDS += "m4-native"
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "usb_network.service"
+SYSTEMD_SERVICE:${PN} = "usb_network.service"
 
 BMC_IP_ADDR ??= "169.254.95.118/16"
 BMC_USB_ECM_PRODUCT_ID ??= ""
@@ -30,8 +30,8 @@ SRC_URI += "file://00-bmc-usb0.network.m4"
 SRC_URI += "file://usb_network.service.m4"
 SRC_URI += "file://usb_network.sh"
 
-FILES_${PN} = "${bindir}/usb_network.sh"
-FILES_${PN}_append = " ${systemd_unitdir}/network/${BMC_USB_CONFIG_FILENAME}"
+FILES:${PN} = "${bindir}/usb_network.sh"
+FILES:${PN}:append = " ${systemd_unitdir}/network/${BMC_USB_CONFIG_FILENAME}"
 
 do_compile() {
     test "X${BMC_IP_ADDR}" != "X" || bberror "Please define BMC_IP_ADDR"

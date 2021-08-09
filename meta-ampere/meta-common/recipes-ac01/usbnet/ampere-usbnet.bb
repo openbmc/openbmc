@@ -11,17 +11,17 @@ inherit systemd
 inherit obmc-phosphor-systemd
 
 DEPENDS = "systemd"
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
         ampere_add_usbnet_gadget.service \
         "
 
 SRC_URI += "file://00-bmc-usb0.network"
 SRC_URI += "file://ampere_add_usbnet_gadget.sh"
 
-do_install_append() {
+do_install:append() {
         install -d ${D}${sbindir}
         install -d ${D}/etc/systemd/network
         install -m 744 ${WORKDIR}/ampere_add_usbnet_gadget.sh ${D}${sbindir}/

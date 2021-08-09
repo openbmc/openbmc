@@ -65,7 +65,7 @@ MACHINE ??= "tiogapass"
 #
 DISTRO ?= "openbmc-phosphor"
 # As an example of a subclass there is a "bleeding" edge policy configuration
-# where many versions are set to the absolute latest code from the upstream 
+# where many versions are set to the absolute latest code from the upstream
 # source control systems. This is just mentioned here as an example, its not
 # useful to most new users.
 # DISTRO ?= "poky-bleeding"
@@ -93,7 +93,7 @@ PACKAGE_CLASSES ?= "package_rpm"
 # Supported values are i686 and x86_64
 #SDKMACHINE ?= "i686"
 
-SANITY_TESTED_DISTROS_append ?= " *"
+SANITY_TESTED_DISTROS:append ?= " *"
 
 #
 # Extra image configuration defaults
@@ -204,8 +204,8 @@ BB_DISKMON_DIRS = "\
 # By default qemu will build with a builtin VNC server where graphical output can be
 # seen. The two lines below enable the SDL backend too. This assumes there is a
 # libsdl library available on your build system.
-#PACKAGECONFIG_append_pn-qemu-native = " sdl"
-#PACKAGECONFIG_append_pn-nativesdk-qemu = " sdl"
+#PACKAGECONFIG:append:pn-qemu-native = " sdl"
+#PACKAGECONFIG:append:pn-nativesdk-qemu = " sdl"
 #ASSUME_PROVIDED += "libsdl-native"
 
 

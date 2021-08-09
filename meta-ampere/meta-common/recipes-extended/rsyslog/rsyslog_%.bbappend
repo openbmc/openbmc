@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://rsyslog.conf \
             file://rsyslog.logrotate \
@@ -7,11 +7,11 @@ SRC_URI += "file://rsyslog.conf \
             file://rsyslog-override.conf \
            "
 
-FILES_${PN} += "${systemd_system_unitdir}/rsyslog.service.d/rsyslog-override.conf"
+FILES:${PN} += "${systemd_system_unitdir}/rsyslog.service.d/rsyslog-override.conf"
 
-PACKAGECONFIG_append = " imjournal"
+PACKAGECONFIG:append = " imjournal"
 
-do_install_append() {
+do_install:append() {
         install -m 0644 ${WORKDIR}/rotate-event-logs.service ${D}${systemd_system_unitdir}
         install -d ${D}${systemd_system_unitdir}/rsyslog.service.d
         install -m 0644 ${WORKDIR}/rsyslog-override.conf \
@@ -21,4 +21,4 @@ do_install_append() {
         rm ${D}${sysconfdir}/rsyslog.d/imjournal.conf
 }
 
-SYSTEMD_SERVICE_${PN} += " rotate-event-logs.service"
+SYSTEMD_SERVICE:${PN} += " rotate-event-logs.service"

@@ -8,10 +8,10 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit obmc-phosphor-systemd
 
 PROVIDES += "virtual/bmc-update"
-RPROVIDES_${PN} += "virtual/bmc-update"
+RPROVIDES:${PN} += "virtual/bmc-update"
 
-RDEPENDS_${PN} += "google-key"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "google-key"
+RDEPENDS:${PN} += "bash"
 
 SRC_URI += " \
  file://config-bmc.json \
@@ -21,10 +21,10 @@ SRC_URI += " \
  file://inplace-gbmc-version.sh \
 "
 
-SYSTEMD_SERVICE_${PN} += "inplace-gbmc-verify.service"
-SYSTEMD_SERVICE_${PN} += "inplace-gbmc-version.service"
+SYSTEMD_SERVICE:${PN} += "inplace-gbmc-verify.service"
+SYSTEMD_SERVICE:${PN} += "inplace-gbmc-version.service"
 
-FILES_${PN} += "${datadir}/phosphor-ipmi-flash"
+FILES:${PN} += "${datadir}/phosphor-ipmi-flash"
 
 do_install() {
     sed -i 's,@ALLOW_DEV@,,' ${WORKDIR}/inplace-gbmc-verify.sh
@@ -39,6 +39,6 @@ do_install() {
     install -m 0644 ${WORKDIR}/config-bmc.json ${D}${datadir}/phosphor-ipmi-flash
 }
 
-do_install_prepend_dev() {
+do_install:prepend:dev() {
     sed -i 's,@ALLOW_DEV@,--allow-dev,' ${WORKDIR}/inplace-gbmc-verify.sh
 }

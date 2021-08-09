@@ -1,12 +1,12 @@
-FILESEXTRAPATHS_prepend_gbmc := "${THISDIR}/${PN}:"
-SRC_URI_append_gbmc  = " file://dropbear.default"
-SYSTEMD_AUTO_ENABLE_${PN}_prod = "disable"
+FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${PN}:"
+SRC_URI:append:gbmc  = " file://dropbear.default"
+SYSTEMD_AUTO_ENABLE:${PN}:prod = "disable"
 
-FILESEXTRAPATHS_remove_gbmc_bandaid := "${THISDIR}/${PN}:"
-SYSTEMD_AUTO_ENABLE_${PN}_bandaid_prod = "enable"
+FILESEXTRAPATHS:remove:gbmc:bandaid := "${THISDIR}/${PN}:"
+SYSTEMD_AUTO_ENABLE:${PN}:bandaid:prod = "enable"
 
 # Allow SSH to the gbmc-bridge node on DEV builds
-do_install_append_gbmc_dev() {
+do_install:append:gbmc:dev() {
   nftables_dir=${D}${sysconfdir}/nftables
   rules=$nftables_dir/50-dropbear-dev.rules
   install -d -m0755 $nftables_dir

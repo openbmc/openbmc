@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append := "${THISDIR}/files:"
+FILESEXTRAPATHS:append := "${THISDIR}/files:"
 
 inherit obmc-phosphor-systemd
 LICENSE = "Apache-2.0"
@@ -14,10 +14,10 @@ SRC_URI = "file://setup_gpio.sh \
            file://LICENSE"
 
 DEPENDS = "systemd"
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "host-gpio.service host-poweron.service host-poweroff.service"
+SYSTEMD_SERVICE:${PN} = "host-gpio.service host-poweron.service host-poweroff.service"
 
 do_install() {
     install -d ${D}/usr/sbin

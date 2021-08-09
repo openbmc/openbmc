@@ -27,8 +27,12 @@ do_configure() {
 }
 
 do_compile() {
+  # Workaround for a non-installed and broken echosrv
+  sed -i 's,^\(all:.*\) echosrv,\1,' ${S}/Makefile
+
   # Workaround for the broken dependencies in the Makefile
   oe_runmake sslh-conf.h
+
   oe_runmake
 }
 

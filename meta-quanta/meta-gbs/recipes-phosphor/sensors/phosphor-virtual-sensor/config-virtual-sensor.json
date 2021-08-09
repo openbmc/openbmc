@@ -47,7 +47,7 @@
             "MinValue": -128.0
         },
         "Threshold": {
-            "CriticalHigh": 70,
+            "CriticalHigh": 75,
             "CriticalLow": 0,
             "WarningHigh": 70,
             "WarningLow": 0

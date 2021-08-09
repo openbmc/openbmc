@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit systemd
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += " \
   file://-bmc-gbmcbr.netdev \
   file://-bmc-gbmcbr.network.in \
@@ -22,14 +22,14 @@ SRC_URI += " \
   file://gbmc-br-nft.sh \
   "
 
-FILES_${PN}_append = " \
+FILES:${PN}:append = " \
   ${datadir}/gbmc-ip-monitor \
   ${systemd_unitdir}/network \
   ${sysconfdir}/nftables \
   ${sysconfdir}/avahi/services \
   "
 
-RDEPENDS_${PN}_append = " \
+RDEPENDS:${PN}:append = " \
   bash \
   gbmc-ip-monitor \
   mstpd-mstpd \
@@ -37,7 +37,7 @@ RDEPENDS_${PN}_append = " \
   ndisc6-rdisc6 \
   "
 
-SYSTEMD_SERVICE_${PN} += "gbmc-br-ensure-ra.service"
+SYSTEMD_SERVICE:${PN} += "gbmc-br-ensure-ra.service"
 
 GBMC_BR_MAC_ADDR ?= ""
 
@@ -98,7 +98,7 @@ do_install() {
   install -m0755 ${WORKDIR}/gbmc-br-ensure-ra.service ${D}${systemd_system_unitdir}/
 }
 
-do_rm_work_prepend() {
+do_rm_work:prepend() {
   # HACK: Work around broken do_rm_work not properly calling rm with `--`
   # It doesn't like filenames that start with `-`
   rm -rf -- ${WORKDIR}/-*

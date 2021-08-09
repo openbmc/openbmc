@@ -10,9 +10,9 @@ inherit systemd
 SRC_URI += "file://config-dummy.json"
 SRC_URI += "file://dummy-verify.service"
 
-FILES_${PN} += "${datadir}/phosphor-ipmi-flash"
+FILES:${PN} += "${datadir}/phosphor-ipmi-flash"
 
-SYSTEMD_SERVICE_${PN} += "dummy-verify.service"
+SYSTEMD_SERVICE:${PN} += "dummy-verify.service"
 
 do_install() {
     install -d ${D}${datadir}/phosphor-ipmi-flash

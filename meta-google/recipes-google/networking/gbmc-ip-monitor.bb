@@ -15,18 +15,18 @@ S = "${WORKDIR}"
 
 DEPENDS += "test-sh"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
   bash \
   iproute2 \
   "
 
-SYSTEMD_SERVICE_${PN} += "gbmc-ip-monitor.service"
+SYSTEMD_SERVICE:${PN} += "gbmc-ip-monitor.service"
 
 do_compile() {
   SYSROOT="$PKG_CONFIG_SYSROOT_DIR" bash gbmc-ip-monitor-test.sh || exit
 }
 
-do_install_append() {
+do_install:append() {
   install -d -m0755 ${D}${libexecdir}
   install -m0755 gbmc-ip-monitor.sh ${D}${libexecdir}/
 

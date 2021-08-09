@@ -1,20 +1,20 @@
 # This is needed to guarantee that our whitelist takes
 # precendence over the OpenBMC one
-FILESEXTRAPATHS_prepend_gbmc := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${PN}:"
 
-SRC_URI_append_gbmc_dev = " file://whitelist.dev"
+SRC_URI:append:gbmc:dev = " file://whitelist.dev"
 
-do_install_append_gbmc_dev() {
+do_install:append:gbmc:dev() {
     cat ${WORKDIR}/whitelist.dev >>${D}/whitelist
 }
 
-SRC_URI_append_gbmc_dev = " file://rwfs-clean-dev.patch"
+SRC_URI:append:gbmc:dev = " file://rwfs-clean-dev.patch"
 # Required for the clean-dev patch to detect version changes
-RDEPENDS_${PN}_append_gbmc_dev = " os-release"
+RDEPENDS:${PN}:append:gbmc:dev = " os-release"
 
-do_install_append_gbmc_prod() {
+do_install:append:gbmc:prod() {
     echo "clean-rwfs-filesystem" > ${D}/init-options-base
     chmod 0644 ${D}/init-options-base
 }
 
-FILES_${PN}_append_gbmc_prod = " /init-options-base"
+FILES:${PN}:append:gbmc:prod = " /init-options-base"

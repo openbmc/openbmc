@@ -7,4 +7,4 @@ python() {
         d.setVar("BUILD_MEMO", memo)
 }
 
-OS_RELEASE_FIELDS_append = " BUILD_MEMO"
+OS_RELEASE_FIELDS:append = " BUILD_MEMO"

@@ -24,7 +24,7 @@ inherit meson systemd
 SYSTEMD_SERVICE_${PN} = "attn_handler.service"
 
 DEPENDS = "boost libgpiod pdbg phosphor-logging sdbusplus openpower-libhei \
-           nlohmann-json"
+           nlohmann-json valijson"
 
 # This is required so that libhei is installed with the chip data files.
 RDEPENDS_${PN} += "openpower-libhei"

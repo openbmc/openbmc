@@ -1,13 +1,13 @@
-FILESEXTRAPATHS_prepend_gbmc := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbmc := "${THISDIR}/${PN}:"
 
-SRC_URI_append_gbmc = " file://gbmc_bridge.json"
+SRC_URI:append:gbmc = " file://gbmc_bridge.json"
 
-DEPENDS_append_gbmc = " jq-native"
+DEPENDS:append:gbmc = " jq-native"
 
 GBMCBR_IPMI_CHANNEL ?= "11"
 
 # Replace a channel in config.json to add gbmcbr reporting
-do_install_append_gbmc() {
+do_install:append:gbmc() {
   chjson=${D}${datadir}/ipmi-providers/channel_config.json
   overlapping="$(jq '."${GBMCBR_IPMI_CHANNEL}" | .is_valid and .name != "gbmcbr"' $chjson)"
   if [ "$overlapping" != "false" ]; then

@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_append_mtjade := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:append:mtjade := "${THISDIR}/${PN}:"
 
-EXTRA_OEMESON_append_mtjade = " -Dnegative-errno-on-fail=true"
+EXTRA_OEMESON:append:mtjade = " -Dnegative-errno-on-fail=true"
 
-CHIPS_mtjade = " \
+CHIPS:mtjade = " \
         bus@1e78a000/i2c-bus@100/tmp175@28 \
         bus@1e78a000/i2c-bus@100/tmp175@29 \
         bus@1e78a000/i2c-bus@100/tmp175@2a \
@@ -21,9 +21,9 @@ ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_${MACHINE}')}"
 ITEMS += "iio-hwmon.conf iio-hwmon-adc14.conf iio-hwmon-battery.conf"
 
 ENVS = "obmc/${MACHINE}/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_mtjade = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:mtjade = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
 
-do_install_append_mtjade() {
+do_install:append:mtjade() {
   SOURCEDIR="${WORKDIR}/obmc/${MACHINE}/hwmon"
   DESTDIR="${D}${sysconfdir}/default/obmc"
   install -d ${DESTDIR}

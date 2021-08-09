@@ -1,12 +1,12 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://ttyS2.conf"
 
-SRC_URI_append_yosemitev2 += "file://ttyS0.conf"
-SRC_URI_append_yosemitev2 += "file://ttyS1.conf"
-SRC_URI_append_yosemitev2 += "file://ttyS3.conf"
+SRC_URI:append:yosemitev2 += "file://ttyS0.conf"
+SRC_URI:append:yosemitev2 += "file://ttyS1.conf"
+SRC_URI:append:yosemitev2 += "file://ttyS3.conf"
 
-do_install_append() {
+do_install:append() {
 
           # Install the configurations
           install -m 0755 -d ${D}${sysconfdir}/${BPN}

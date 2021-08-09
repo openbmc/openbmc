@@ -1,2 +1,2 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI_append_yosemitev2 = " file://settings-manager.override.yml"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+SRC_URI:append:yosemitev2 = " file://settings-manager.override.yml"

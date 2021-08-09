@@ -12,15 +12,15 @@ SRC_URI += " \
 
 S = "${WORKDIR}"
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
-SYSTEMD_SERVICE_${PN} += "authorized-keys-comp.service"
+SYSTEMD_SERVICE:${PN} += "authorized-keys-comp.service"
 
-FILES_${PN} += "/home"
+FILES:${PN} += "/home"
 
 AUTHORIZED_KEYS_COMP_USERS ?= "root"
 
-do_install_append() {
+do_install:append() {
   install -d -m0755 ${D}${libexecdir}
   install -m0755 authorized-keys-comp.sh ${D}${libexecdir}/
 
