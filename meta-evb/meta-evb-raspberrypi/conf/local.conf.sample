@@ -14,7 +14,7 @@ BB_DISKMON_DIRS ??= "\
     ABORT,${DL_DIR},100M,1K \
     ABORT,${SSTATE_DIR},100M,1K \
     ABORT,/tmp,10M,1K"
-CONF_VERSION = "1"
+CONF_VERSION = "2"
 
 # Set the root password to '0penBmc'
 # Defaults from meta-phosphor/conf/distro/include/phosphor-defaults.inc
