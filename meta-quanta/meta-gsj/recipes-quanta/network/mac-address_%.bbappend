@@ -1,9 +1,9 @@
-FILESEXTRAPATHS_prepend_gsj := "${THISDIR}/${PN}:"
-SRC_URI_append_gsj = " file://config.txt"
+FILESEXTRAPATHS:prepend:gsj := "${THISDIR}/${PN}:"
+SRC_URI:append:gsj = " file://config.txt"
 
-FILES_${PN}_append_gsj = " ${datadir}/mac-address/config.txt"
+FILES:${PN}:append:gsj = " ${datadir}/mac-address/config.txt"
 
-do_install_append_gsj() {
+do_install:append:gsj() {
     install -d ${D}${datadir}/mac-address
     install -m 0644 -D ${WORKDIR}/config.txt \
         ${D}${datadir}/mac-address/config.txt

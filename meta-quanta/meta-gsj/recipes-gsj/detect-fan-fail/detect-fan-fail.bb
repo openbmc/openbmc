@@ -7,14 +7,14 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit systemd
 
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
-FILESEXTRAPATHS_append_gsj := "${THISDIR}/files:"
-SRC_URI_append_gsj =  " file://detect-fan-fail.sh \
+FILESEXTRAPATHS:append:gsj := "${THISDIR}/files:"
+SRC_URI:append:gsj =  " file://detect-fan-fail.sh \
                         file://detect-fan-fail.service \
                       "
 
-do_install_append_gsj() {
+do_install:append:gsj() {
     install -d ${D}${bindir}
     install -m 0755 ${WORKDIR}/detect-fan-fail.sh ${D}${bindir}/
 
@@ -23,4 +23,4 @@ do_install_append_gsj() {
 }
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "detect-fan-fail.service"
+SYSTEMD_SERVICE:${PN} = "detect-fan-fail.service"

@@ -1,10 +1,10 @@
-FILESEXTRAPATHS_append := "${THISDIR}/files:"
+FILESEXTRAPATHS:append := "${THISDIR}/files:"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "libsystemd"
+RDEPENDS:${PN} += "bash"
 
 SRC_URI += "file://usb_network.sh \
            file://usb_network.service \
@@ -23,7 +23,7 @@ do_install() {
 
 NATIVE_SYSTEMD_SUPPORT = "1"
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "usb_network.service"
-FILES_${PN} += "${sysconfdir_native}/systemd/network/00-bmc-usb0.network"
+SYSTEMD_SERVICE:${PN} = "usb_network.service"
+FILES:${PN} += "${sysconfdir_native}/systemd/network/00-bmc-usb0.network"
 
 inherit allarch systemd

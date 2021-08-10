@@ -7,10 +7,10 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit systemd
 
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-SRC_URI_append =  " file://gsj-hotswap-change-setting.sh \
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+SRC_URI:append =  " file://gsj-hotswap-change-setting.sh \
                     file://gsj-hotswap-change-setting.service \
                   "
 
@@ -23,4 +23,4 @@ do_install() {
 }
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "gsj-hotswap-change-setting.service"
+SYSTEMD_SERVICE:${PN} = "gsj-hotswap-change-setting.service"

@@ -1,1 +1,1 @@
-FILESEXTRAPATHS_prepend_gsj := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gsj := "${THISDIR}/${PN}:"
