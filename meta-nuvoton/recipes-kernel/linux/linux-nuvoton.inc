@@ -8,7 +8,7 @@ KCONFIG_MODE="--alldefconfig"
 
 KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
-SRC_URI_append_npcm7xx = " file://defconfig"
+SRC_URI:append:npcm7xx = " file://defconfig"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
