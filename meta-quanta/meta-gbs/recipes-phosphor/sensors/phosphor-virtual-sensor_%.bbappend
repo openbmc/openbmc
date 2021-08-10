@@ -1,12 +1,12 @@
-FILESEXTRAPATHS_prepend_gbs := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
 
-SRC_URI_append_gbs = " file://config-virtual-sensor.json \
+SRC_URI:append:gbs = " file://config-virtual-sensor.json \
                        file://phosphor-virtual-sensor.service.replace \
                      "
 
-RDEPENDS_${PN}_append_gbs = "bash"
+RDEPENDS:${PN}:append:gbs = "bash"
 
-do_install_append_gbs() {
+do_install:append:gbs() {
     install -d ${D}${datadir}/${PN}
     install -m 0644 -D ${WORKDIR}/config-virtual-sensor.json \
         ${D}${datadir}/${PN}/virtual_sensor_config.json

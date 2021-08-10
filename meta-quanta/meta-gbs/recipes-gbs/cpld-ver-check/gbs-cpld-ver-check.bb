@@ -12,9 +12,9 @@ SRC_URI = " file://cpld_version.sh \
 S = "${WORKDIR}"
 
 DEPENDS = "systemd"
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
-SYSTEMD_SERVICE_${PN} = "cpld-version.service"
+SYSTEMD_SERVICE:${PN} = "cpld-version.service"
 
 do_install() {
     install -d ${D}${bindir}

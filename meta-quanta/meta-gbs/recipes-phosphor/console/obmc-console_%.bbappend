@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend_gbs := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/files:"
 
-OBMC_CONSOLE_FRONT_TTY_gbs = "ttyS3"
-OBMC_CONSOLE_HOST_TTY_gbs = "ttyS1"
+OBMC_CONSOLE_FRONT_TTY:gbs = "ttyS3"
+OBMC_CONSOLE_HOST_TTY:gbs = "ttyS1"

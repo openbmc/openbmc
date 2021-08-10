@@ -1,9 +1,9 @@
-FILESEXTRAPATHS_prepend_gbs := "${THISDIR}/${PN}:"
-SRC_URI_append_gbs = " file://service-override.conf"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+SRC_URI:append:gbs = " file://service-override.conf"
 
-FILES_${PN}_append_gbs = " ${systemd_system_unitdir}/xyz.openbmc_project.LED.GroupManager.service.d/service-override.conf"
+FILES:${PN}:append:gbs = " ${systemd_system_unitdir}/xyz.openbmc_project.LED.GroupManager.service.d/service-override.conf"
 
-do_install_append_gbs() {
+do_install:append:gbs() {
     rm -rf ${D}${datadir}/${PN}/*
 
     install -d ${D}${systemd_system_unitdir}/xyz.openbmc_project.LED.GroupManager.service.d

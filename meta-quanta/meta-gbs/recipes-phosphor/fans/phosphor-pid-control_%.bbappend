@@ -1,17 +1,17 @@
-FILESEXTRAPATHS_prepend_gbs := "${THISDIR}/${PN}:"
-SRC_URI_append_gbs = " file://config.json.in \
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+SRC_URI:append:gbs = " file://config.json.in \
                        file://fan-table-init.sh \
                        file://phosphor-pid-control.service \
                      "
 
-FILES_${PN}_append_gbs = " ${datadir}/swampd/config.json.in"
-FILES_${PN}_append_gbs = " ${bindir}/fan-table-init.sh"
+FILES:${PN}:append:gbs = " ${datadir}/swampd/config.json.in"
+FILES:${PN}:append:gbs = " ${bindir}/fan-table-init.sh"
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
-SYSTEMD_SERVICE_${PN}_append_gbs = " phosphor-pid-control.service"
+SYSTEMD_SERVICE:${PN}:append:gbs = " phosphor-pid-control.service"
 
-do_install_append_gbs() {
+do_install:append:gbs() {
     install -d ${D}/${bindir}
     install -m 0755 ${WORKDIR}/fan-table-init.sh ${D}/${bindir}
 

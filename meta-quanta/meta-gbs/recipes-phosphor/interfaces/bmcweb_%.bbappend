@@ -1,8 +1,8 @@
-EXTRA_OEMESON_append_gbs = " \
+EXTRA_OEMESON:append:gbs = " \
     -Dredfish-dbus-log=enabled \
     -Dhttp-body-limit=40 \
     "
 
-do_install_append_gbs(){
+do_install:append:gbs(){
     install -d ${D}${localstatedir}/lib/bmcweb
 }

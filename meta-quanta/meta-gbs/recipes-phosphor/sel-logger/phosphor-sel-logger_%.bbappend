@@ -1,1 +1,1 @@
-PACKAGECONFIG_append_gbs = " send-to-logger log-alarm"
+PACKAGECONFIG:append:gbs = " send-to-logger log-alarm"

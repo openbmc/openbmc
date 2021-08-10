@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit systemd
 
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
 SRC_URI = " file://detect-gpio-present.sh \
             file://detect-gpio-present.service \
@@ -22,4 +22,4 @@ do_install() {
 }
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "detect-gpio-present.service"
+SYSTEMD_SERVICE:${PN} = "detect-gpio-present.service"

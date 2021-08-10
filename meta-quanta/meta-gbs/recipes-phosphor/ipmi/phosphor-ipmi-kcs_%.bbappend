@@ -1,1 +1,1 @@
-KCS_DEVICE_gbs = "ipmi-kcs1"
+KCS_DEVICE:gbs = "ipmi-kcs1"

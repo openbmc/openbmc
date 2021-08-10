@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend_gbs := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
 
-SRC_URI_append_gbs = " \
+SRC_URI:append:gbs = " \
     file://gbs-host-s0-set-failsafe.service \
     file://gbs-host-s5-set-failsafe.service \
     file://gbs-host-set-boot-failsafe@.service \
@@ -11,11 +11,11 @@ SRC_URI_append_gbs = " \
     file://gbs-host-ready.target \
     "
 
-RDEPENDS_${PN}_append_gbs = "bash"
+RDEPENDS:${PN}:append:gbs = "bash"
 
 CHASSIS_INSTANCE="0"
 
-SYSTEMD_SERVICE_${PN}_append_gbs = " \
+SYSTEMD_SERVICE:${PN}:append:gbs = " \
     gbs-host-s0-set-failsafe.service \
     gbs-host-s5-set-failsafe.service \
     gbs-host-set-boot-failsafe@${CHASSIS_INSTANCE}.service \
@@ -23,11 +23,11 @@ SYSTEMD_SERVICE_${PN}_append_gbs = " \
     gbs-host-ready.target \
     "
 
-FILES_${PN}_append_gbs = " \
+FILES:${PN}:append:gbs = " \
     ${systemd_system_unitdir}/gbs-host-set-boot-failsafe@.service \
     "
 
-do_install_append_gbs() {
+do_install:append:gbs() {
     install -d ${D}${bindir}
 
     install -m 0755 ${WORKDIR}/gbs-set-failsafe.sh ${D}${bindir}/.

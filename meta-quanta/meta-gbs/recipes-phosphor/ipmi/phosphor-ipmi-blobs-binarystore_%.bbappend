@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend_gbs := "${THISDIR}/${PN}:"
-SRC_URI_append_gbs = " file://config.json"
-FILES_${PN}_append_gbs = " ${datadir}/binaryblob/config.json"
+FILESEXTRAPATHS:prepend:gbs := "${THISDIR}/${PN}:"
+SRC_URI:append:gbs = " file://config.json"
+FILES:${PN}:append:gbs = " ${datadir}/binaryblob/config.json"
 
-do_install_append_gbs() {
+do_install:append:gbs() {
     install -d ${D}${datadir}/binaryblob/
     install ${WORKDIR}/config.json ${D}${datadir}/binaryblob/config.json
 }
