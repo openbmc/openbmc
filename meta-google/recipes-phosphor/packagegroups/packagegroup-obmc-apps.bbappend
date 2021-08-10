@@ -11,7 +11,7 @@ RDEPENDS:${PN}-extrasdev:remove:gbmc = "rest-dbus"
 RDEPENDS:${PN}-extras:remove:gbmc = '${@bb.utils.contains:any("MACHINE_FEATURES", ['redfish'], "", "bmcweb phosphor-bmcweb-cert-config", d)}'
 
 # Disable remote logging.
-# FEATURE_PACKAGES:obmc-remote-logging-mgmt ?= "packagegroup-obmc-apps-remote-logging"
+# FEATURE_PACKAGES_obmc-remote-logging-mgmt ?= "packagegroup-obmc-apps-remote-logging"
 RDEPENDS:${PN}-remote-logging:remove:gbmc = "rsyslog"
 RDEPENDS:${PN}-remote-logging:remove:gbmc = "rsyslog-policy"
 RDEPENDS:${PN}-remote-logging:remove:gbmc = "phosphor-rsyslog-config"
