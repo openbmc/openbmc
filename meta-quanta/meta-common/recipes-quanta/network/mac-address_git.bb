@@ -11,10 +11,10 @@ SRCREV = "08b87370c56ff69df852eca87391ae46c05d437a"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
 
-FILES_${PN} += "${bindir}/mac-address"
+FILES:${PN} += "${bindir}/mac-address"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "mac-address.service"
+SYSTEMD_SERVICE:${PN} = "mac-address.service"
 
 EXTRA_OECONF = " \
     SYSTEMD_TARGET="multi-user.target" \

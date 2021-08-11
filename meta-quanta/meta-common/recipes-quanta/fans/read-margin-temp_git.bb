@@ -14,9 +14,9 @@ DEPENDS += " nlohmann-json"
 DEPENDS += " sdbusplus"
 DEPENDS += " sdeventplus"
 DEPENDS += " phosphor-dbus-interfaces"
-RDEPENDS_${PN} += " bash"
+RDEPENDS:${PN} += " bash"
 
-FILES_${PN} = "${bindir}/read-margin-temp"
+FILES:${PN} = "${bindir}/read-margin-temp"
 
 do_install() {
     install -d ${D}${bindir}
