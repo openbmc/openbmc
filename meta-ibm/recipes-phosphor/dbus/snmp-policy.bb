@@ -14,4 +14,4 @@ do_install() {
         install -D ${WORKDIR}/snmp-config.yaml ${D}${config_dir}/snmp-config.yaml
 }
 
-FILES_${PN} += "${config_dir}/snmp-config.yaml"
+FILES:${PN} += "${config_dir}/snmp-config.yaml"
