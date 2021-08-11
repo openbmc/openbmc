@@ -19,7 +19,7 @@ do_install:append() {
             ${D}${bindir}/occ-active.sh
 }
 
-DBUS_SERVICE_${PN} += "org.open_power.OCC.Control.service"
+DBUS_SERVICE:${PN} += "org.open_power.OCC.Control.service"
 SYSTEMD_SERVICE:${PN} += "op-occ-enable@.service"
 SYSTEMD_SERVICE:${PN} += "op-occ-disable@.service"
 

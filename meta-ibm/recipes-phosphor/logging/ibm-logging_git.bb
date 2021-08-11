@@ -35,7 +35,7 @@ PACKAGECONFIG:ibm-ac-server = "policy-interface"
 PACKAGECONFIG:mihawk = "policy-interface"
 
 SERVICE = "com.ibm.Logging.service"
-DBUS_SERVICE_${PN} += "${SERVICE}"
+DBUS_SERVICE:${PN} += "${SERVICE}"
 
 #The link is so that this service will restart if phosphor-logging restarts.
 #The BindsTo in the service will not do the restart, it will only do the

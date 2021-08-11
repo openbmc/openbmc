@@ -63,7 +63,7 @@ SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
 
 SRCREV = "5dc5d6cc6796ef038c59e41297349a982c8dd296"
 
-DBUS_SERVICE_${PN} += "org.open_power.Software.Host.Updater.service"
+DBUS_SERVICE:${PN} += "org.open_power.Software.Host.Updater.service"
 
 SYSTEMD_SERVICE:${PN} += " \
         op-pnor-msl.service \
