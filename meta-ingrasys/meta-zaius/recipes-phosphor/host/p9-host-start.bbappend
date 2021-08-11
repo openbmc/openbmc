@@ -1,1 +1,1 @@
-RDEPENDS_${PN}_append_zaius = ' avsbus-control vcs-control'
+RDEPENDS:${PN}:append:zaius = ' avsbus-control vcs-control'
