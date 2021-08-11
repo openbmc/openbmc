@@ -15,6 +15,7 @@ require ${BPN}-systemd-links.inc
 DEPENDS += " \
         phosphor-logging \
         ${PYTHON_PN}-sdbus++-native \
+        cli11 \
         "
 S = "${WORKDIR}/git"
 
