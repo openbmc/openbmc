@@ -16,7 +16,7 @@ do_install() {
             ${D}${bindir}/toggle_identify_led.sh
 }
 
-SYSTEMD_ENVIRONMENT_FILE:${PN} +="obmc/gpio/id_button"
+SYSTEMD_ENVIRONMENT_FILE_${PN} +="obmc/gpio/id_button"
 
 ID_BUTTON_SERVICE = "id_button"
 
@@ -26,4 +26,4 @@ TGT = "multi-user.target"
 FMT = "../${TMPL}:${TGT}.requires/${INSTFMT}"
 
 SYSTEMD_SERVICE:${PN} += "id-button-pressed.service"
-SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT', 'ID_BUTTON_SERVICE')}"
+SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'ID_BUTTON_SERVICE')}"
