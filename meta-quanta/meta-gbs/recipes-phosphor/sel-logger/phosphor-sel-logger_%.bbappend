@@ -1,1 +1,1 @@
-PACKAGECONFIG:append:gbs = " send-to-logger log-alarm"
+PACKAGECONFIG:append:gbs = " send-to-logger log-alarm log-watchdog"
