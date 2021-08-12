@@ -5,6 +5,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append:mihawk = " mboxd liberation-fonts uart-render-co
 
 # remove so things fit in available flash space
 IMAGE_FEATURES:remove:witherspoon = "obmc-user-mgmt-ldap"
+IMAGE_FEATURES:remove:witherspoon = "obmc-telemetry"
 
 # Optionally configure IBM service accounts
 #
