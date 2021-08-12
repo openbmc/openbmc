@@ -2,6 +2,7 @@
 Description=Start Power%i
 Wants=obmc-power-start@%i.target
 Before=obmc-power-start@%i.target
+Wants=obmc-power-start-pre@%i.target
 After=obmc-power-start-pre@%i.target
 After=obmc-fan-control.target
 Wants=mapper-wait@-org-openbmc-control-power%i.service
