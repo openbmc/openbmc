@@ -4,7 +4,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "libsystemd"
+RDEPENDS:${PN} += "libsystemd"
 
 inherit allarch systemd
 
@@ -21,4 +21,4 @@ do_install() {
 
 NATIVE_SYSTEMD_SUPPORT = "1"
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "usb_network.service"
+SYSTEMD_SERVICE:${PN} = "usb_network.service"

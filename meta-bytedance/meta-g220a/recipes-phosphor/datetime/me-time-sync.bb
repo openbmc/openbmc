@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit allarch
 inherit obmc-phosphor-systemd
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
 S = "${WORKDIR}"
 
@@ -17,4 +17,4 @@ do_install() {
     install -m 0755 ${S}/me-time-sync.sh ${D}${bindir}/me-time-sync.sh
 }
 
-SYSTEMD_SERVICE_${PN} += "me-time-sync.service"
+SYSTEMD_SERVICE:${PN} += "me-time-sync.service"
