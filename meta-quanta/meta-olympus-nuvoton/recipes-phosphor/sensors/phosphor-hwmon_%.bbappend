@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
 
 
 ITEMS = " \
@@ -24,7 +24,7 @@ ITEMS = " \
         "
 
 ENVS = "obmc/hwmon/ahb/apb/{0}.conf"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_olympus-nuvoton = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:olympus-nuvoton = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
 
 # PECI
 PECINAMES = " \
@@ -35,6 +35,6 @@ PECINAMES = " \
 PECIITEMSFMT = "devices/platform/ahb/ahb--apb/f0100000.peci-bus/{0}.conf"
 PECIITEMS = "${@compose_list(d, 'PECIITEMSFMT', 'PECINAMES')}"
 PECIENVS = "obmc/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_olympus-nuvoton = " ${@compose_list(d, 'PECIENVS', 'PECIITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:olympus-nuvoton = " ${@compose_list(d, 'PECIENVS', 'PECIITEMS')}"
 
-EXTRA_OEMESON_append_olympus-nuvoton  = " -Dupdate-functional-on-fail=true"
+EXTRA_OEMESON:append:olympus-nuvoton  = " -Dupdate-functional-on-fail=true"

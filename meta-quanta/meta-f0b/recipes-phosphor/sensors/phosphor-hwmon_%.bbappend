@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-EXTRA_OEMESON_append_f0b = " -Dnegative-errno-on-fail=true"
+EXTRA_OEMESON:append:f0b = " -Dnegative-errno-on-fail=true"
 
 NAME = " \
         bus@1e78a000/i2c-bus@80/tmp421@4c \
@@ -19,4 +19,4 @@ ITEMSFMT = "ahb/apb/{0}.conf"
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'NAME')}"
 
 ENVS = "obmc/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN} += "${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN} += "${@compose_list(d, 'ENVS', 'ITEMS')}"

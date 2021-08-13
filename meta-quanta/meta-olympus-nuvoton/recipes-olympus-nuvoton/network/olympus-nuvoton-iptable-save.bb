@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit allarch systemd
 
 SRC_URI = "file://phosphor-save-iptable-rules.service"
-SYSTEMD_SERVICE_${PN} = "phosphor-save-iptable-rules.service"
+SYSTEMD_SERVICE:${PN} = "phosphor-save-iptable-rules.service"
 
 S = "${WORKDIR}"
 do_install() {

@@ -16,18 +16,18 @@ PROVIDES += "virtual/obmc-fan-mgmt"
 PROVIDES += "virtual/obmc-flash-mgmt"
 PROVIDES += "virtual/obmc-system-mgmt"
 
-RPROVIDES_${PN}-chassis += "virtual-obmc-chassis-mgmt"
-RPROVIDES_${PN}-fans += "virtual-obmc-fan-mgmt"
-RPROVIDES_${PN}-flash += "virtual-obmc-flash-mgmt"
-RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
+RPROVIDES:${PN}-chassis += "virtual-obmc-chassis-mgmt"
+RPROVIDES:${PN}-fans += "virtual-obmc-fan-mgmt"
+RPROVIDES:${PN}-flash += "virtual-obmc-flash-mgmt"
+RPROVIDES:${PN}-system += "virtual-obmc-system-mgmt"
 
-SUMMARY_${PN}-fans = "OLYMPUS NUVOTON Fans"
-RDEPENDS_${PN}-fans = " \
+SUMMARY:${PN}-fans = "OLYMPUS NUVOTON Fans"
+RDEPENDS:${PN}-fans = " \
         phosphor-pid-control \
         "
 
-SUMMARY_${PN}-system = "OLYMPUS NUVOTON System"
-RDEPENDS_${PN}-system = " \
+SUMMARY:${PN}-system = "OLYMPUS NUVOTON System"
+RDEPENDS:${PN}-system = " \
         phosphor-webui \
         obmc-ikvm \
         obmc-console \

@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
 
-SRC_URI_append_olympus-nuvoton = " file://80-olympus-nuvoton-sol.rules"
+SRC_URI:append:olympus-nuvoton = " file://80-olympus-nuvoton-sol.rules"
 
-do_install_append_olympus-nuvoton() {
+do_install:append:olympus-nuvoton() {
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
         rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
         install -m 0644 ${WORKDIR}/${BPN}.conf ${D}${sysconfdir}/

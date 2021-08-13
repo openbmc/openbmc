@@ -8,10 +8,10 @@ inherit phosphor-inventory-manager
 
 S = "${WORKDIR}"
 
-SRC_URI_olympus-nuvoton = "file://inventory-cleanup.yaml"
+SRC_URI:olympus-nuvoton = "file://inventory-cleanup.yaml"
 
-do_install_olympus-nuvoton() {
+do_install:olympus-nuvoton() {
         install -D inventory-cleanup.yaml ${D}${base_datadir}/events.d/inventory-cleanup.yaml
 }
 
-FILES_${PN}_olympus-nuvoton += "${base_datadir}/events.d/inventory-cleanup.yaml"
+FILES:${PN}:olympus-nuvoton += "${base_datadir}/events.d/inventory-cleanup.yaml"

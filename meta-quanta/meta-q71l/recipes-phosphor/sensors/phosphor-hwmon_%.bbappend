@@ -1,6 +1,6 @@
 inherit obmc-phosphor-utils
 
-FILESEXTRAPATHS_prepend_quanta-q71l := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:quanta-q71l := "${THISDIR}/${PN}:"
 
 # More conf files can be added as sensors are added.
 
@@ -21,6 +21,6 @@ Q71L_PSUBASE = "ahb/apb/bus@1e78a000/i2c-bus@300/i2c-switch@70/i2c@{0}.conf"
 Q71L_ITEMS += "${@compose_list(d, 'Q71L_PSUBASE', 'Q71L_PSUS')}"
 
 ENVS = "obmc/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_quanta-q71l := " ${@compose_list(d, 'ENVS', 'Q71L_ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:quanta-q71l := " ${@compose_list(d, 'ENVS', 'Q71L_ITEMS')}"
 
-EXTRA_OEMESON_append_quanta-q71l = " -Dnegative-errno-on-fail=true"
+EXTRA_OEMESON:append:quanta-q71l = " -Dnegative-errno-on-fail=true"
