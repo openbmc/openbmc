@@ -42,5 +42,5 @@ SUMMARY:${PN}-system = "Inspur System"
 RDEPENDS:${PN}-system = " \
         bmcweb \
         entity-manager \
-        phosphor-webui \
+        webui-vue \
         "
