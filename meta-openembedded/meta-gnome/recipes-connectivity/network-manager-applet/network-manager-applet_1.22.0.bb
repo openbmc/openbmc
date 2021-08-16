@@ -16,7 +16,7 @@ EXTRA_OEMESON = "-Dappindicator=no"
 # We currently don't build NetworkManager with libteamdctl support
 EXTRA_OEMESON += "-Dteam=false"
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
 PACKAGECONFIG[modemmanager] = "-Dwwan=true, -Dwwan=false, modemmanager"
 PACKAGECONFIG[selinux] = "-Dselinux=true, -Dselinux=false, libselinux"
 

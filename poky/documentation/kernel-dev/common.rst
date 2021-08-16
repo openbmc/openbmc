@@ -416,16 +416,16 @@ home directory:
    kernel. Thus, the name of the append file is
    ``linux-yocto_4.12.bbappend``::
 
-      FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+      FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-      SRC_URI_append = " file://patch-file-one.patch"
-      SRC_URI_append = " file://patch-file-two.patch"
-      SRC_URI_append = " file://patch-file-three.patch"
+      SRC_URI:append = " file://patch-file-one.patch"
+      SRC_URI:append = " file://patch-file-two.patch"
+      SRC_URI:append = " file://patch-file-three.patch"
 
    The :term:`FILESEXTRAPATHS` and :term:`SRC_URI` statements
    enable the OpenEmbedded build system to find patch files. For more
    information on using append files, see the
-   ":ref:`dev-manual/common-tasks:using .bbappend files in your layer`"
+   ":ref:`dev-manual/common-tasks:appending other layers metadata with your layer`"
    section in the Yocto Project Development Tasks Manual.
 
 Modifying an Existing Recipe
@@ -469,7 +469,7 @@ prepending the directory that contains your files to the
 :term:`FILESEXTRAPATHS`
 variable as follows::
 
-   FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+   FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 The path ``${``\ :term:`THISDIR`\ ``}/${``\ :term:`PN`\ ``}``
 expands to "linux-yocto" in the current directory for this example. If
@@ -496,29 +496,29 @@ strings in this example listing might be different than the actual
 strings in the file from the ``meta-yocto-bsp`` layer upstream.
 ::
 
-   KBRANCH_genericx86  = "standard/base"
-   KBRANCH_genericx86-64  = "standard/base"
+   KBRANCH:genericx86  = "standard/base"
+   KBRANCH:genericx86-64  = "standard/base"
 
-   KMACHINE_genericx86 ?= "common-pc"
-   KMACHINE_genericx86-64 ?= "common-pc-64"
-   KBRANCH_edgerouter = "standard/edgerouter"
-   KBRANCH_beaglebone = "standard/beaglebone"
+   KMACHINE:genericx86 ?= "common-pc"
+   KMACHINE:genericx86-64 ?= "common-pc-64"
+   KBRANCH:edgerouter = "standard/edgerouter"
+   KBRANCH:beaglebone = "standard/beaglebone"
 
-   SRCREV_machine_genericx86    ?= "d09f2ce584d60ecb7890550c22a80c48b83c2e19"
-   SRCREV_machine_genericx86-64 ?= "d09f2ce584d60ecb7890550c22a80c48b83c2e19"
-   SRCREV_machine_edgerouter ?= "b5c8cfda2dfe296410d51e131289fb09c69e1e7d"
-   SRCREV_machine_beaglebone ?= "b5c8cfda2dfe296410d51e131289fb09c69e1e7d"
+   SRCREV_machine:genericx86    ?= "d09f2ce584d60ecb7890550c22a80c48b83c2e19"
+   SRCREV_machine:genericx86-64 ?= "d09f2ce584d60ecb7890550c22a80c48b83c2e19"
+   SRCREV_machine:edgerouter ?= "b5c8cfda2dfe296410d51e131289fb09c69e1e7d"
+   SRCREV_machine:beaglebone ?= "b5c8cfda2dfe296410d51e131289fb09c69e1e7d"
 
 
-   COMPATIBLE_MACHINE_genericx86 = "genericx86"
-   COMPATIBLE_MACHINE_genericx86-64 = "genericx86-64"
-   COMPATIBLE_MACHINE_edgerouter = "edgerouter"
-   COMPATIBLE_MACHINE_beaglebone = "beaglebone"
+   COMPATIBLE_MACHINE:genericx86 = "genericx86"
+   COMPATIBLE_MACHINE:genericx86-64 = "genericx86-64"
+   COMPATIBLE_MACHINE:edgerouter = "edgerouter"
+   COMPATIBLE_MACHINE:beaglebone = "beaglebone"
 
-   LINUX_VERSION_genericx86 = "4.12.7"
-   LINUX_VERSION_genericx86-64 = "4.12.7"
-   LINUX_VERSION_edgerouter = "4.12.10"
-   LINUX_VERSION_beaglebone = "4.12.10"
+   LINUX_VERSION:genericx86 = "4.12.7"
+   LINUX_VERSION:genericx86-64 = "4.12.7"
+   LINUX_VERSION:edgerouter = "4.12.10"
+   LINUX_VERSION:beaglebone = "4.12.10"
 
 This append file
 contains statements used to support several BSPs that ship with the
@@ -640,7 +640,7 @@ appropriate ``${PN}`` directory in your layer's ``recipes-kernel/linux``
 directory, and rename the copied file to "defconfig". Then, add the
 following lines to the linux-yocto ``.bbappend`` file in your layer::
 
-   FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+   FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
    SRC_URI += "file://defconfig"
 
 The :term:`SRC_URI` tells the build system how to search
@@ -687,7 +687,7 @@ Next, include this
 configuration fragment and extend the :term:`FILESPATH` variable in your
 ``.bbappend`` file::
 
-   FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+   FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
    SRC_URI += "file://8250.cfg"
 
 The next time you run BitBake to build the
@@ -726,7 +726,7 @@ that assigns the :term:`KBUILD_DEFCONFIG` variable based on "raspberrypi2"
 and provides the path to the "in-tree" ``defconfig`` file to be used for
 a Raspberry Pi 2, which is based on the Broadcom 2708/2709 chipset::
 
-   KBUILD_DEFCONFIG_raspberrypi2 ?= "bcm2709_defconfig"
+   KBUILD_DEFCONFIG:raspberrypi2 ?= "bcm2709_defconfig"
 
 Aside from modifying your kernel recipe and providing your own
 ``defconfig`` file, you need to be sure no files or statements set
@@ -988,10 +988,10 @@ Section.
 
    Add the following to the ``local.conf``::
 
-      SRC_URI_pn-linux-yocto = "git:///path-to/linux-yocto-4.12;protocol=file;name=machine;branch=standard/base; \
+      SRC_URI:pn-linux-yocto = "git:///path-to/linux-yocto-4.12;protocol=file;name=machine;branch=standard/base; \
                                 git:///path-to/yocto-kernel-cache;protocol=file;type=kmeta;name=meta;branch=yocto-4.12;destsuffix=${KMETA}"
-      SRCREV_meta_qemux86 = "${AUTOREV}"
-      SRCREV_machine_qemux86 = "${AUTOREV}"
+      SRCREV_meta:qemux86 = "${AUTOREV}"
+      SRCREV_machine:qemux86 = "${AUTOREV}"
 
    .. note::
 
@@ -1061,8 +1061,8 @@ Section.
    must be named ``linux-yocto_4.12.bbappend`` and have the following
    contents::
 
-      FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-      SRC_URI_append = "file://0001-calibrate.c-Added-some-printk-statements.patch"
+      FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+      SRC_URI:append = "file://0001-calibrate.c-Added-some-printk-statements.patch"
 
    The :term:`FILESEXTRAPATHS` and :term:`SRC_URI` statements
    enable the OpenEmbedded build system to find the patch file.
@@ -1070,7 +1070,7 @@ Section.
    For more information on append files and patches, see the
    ":ref:`kernel-dev/common:creating the append file`" and
    ":ref:`kernel-dev/common:applying patches`" sections. You can also see the
-   ":ref:`dev-manual/common-tasks:using .bbappend files in your layer`"
+   ":ref:`dev-manual/common-tasks:appending other layers metadata with your layer`"
    section in the Yocto Project Development Tasks Manual.
 
    .. note::
@@ -1237,7 +1237,7 @@ file to "defconfig" (e.g.
 add the following lines to the linux-yocto ``.bbappend`` file in your
 layer::
 
-   FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+   FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
    SRC_URI += "file://defconfig"
 
 The :term:`SRC_URI` tells the build system how to search for the file, while the
@@ -1345,7 +1345,7 @@ the kernel's append file within your layer and then add the following
 statements to the kernel's append file, those configuration options will
 be picked up and applied when the kernel is built::
 
-   FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+   FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
    SRC_URI += "file://myconfig.cfg"
 
 As mentioned earlier, you can group related configurations into multiple
@@ -1939,7 +1939,7 @@ build.
 2. *Add the Feature File to SRC_URI:* Add the ``.scc`` file to the
    recipe's :term:`SRC_URI` statement::
 
-      SRC_URI_append = " file://test.scc"
+      SRC_URI:append = " file://test.scc"
 
    The leading space before the path is important as the path is
    appended to the existing path.
@@ -1948,7 +1948,7 @@ build.
    :term:`KERNEL_FEATURES` statement to specify the feature as a kernel
    feature::
 
-      KERNEL_FEATURES_append = " test.scc"
+      KERNEL_FEATURES:append = " test.scc"
 
    The OpenEmbedded build
    system processes the kernel feature when it builds the kernel.

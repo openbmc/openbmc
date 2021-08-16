@@ -73,7 +73,7 @@ adjustments:
       SDK_INHERIT_BLACKLIST
       is set using the "?=" operator. Consequently, you will need to
       either define the entire list by using the "=" operator, or you
-      will need to append a value using either "_append" or the "+="
+      will need to append a value using either ":append" or the "+="
       operator. You can learn more about these operators in the
       ":ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:basic syntax`"
       section of the BitBake User Manual.
@@ -250,7 +250,7 @@ source, you need to do a number of things:
       recipes that depend on lists of other recipes.
 
    -  Build the "world" target and set
-      ``EXCLUDE_FROM_WORLD_pn-``\ recipename for the recipes you do not
+      ``EXCLUDE_FROM_WORLD:pn-``\ recipename for the recipes you do not
       want built. See the
       :term:`EXCLUDE_FROM_WORLD`
       variable for additional information.
@@ -334,7 +334,7 @@ within it are available. Having these recipes available increases build
 time significantly and increases the size of the SDK installer by 30-80
 Mbytes depending on how many recipes are included in your configuration.
 
-You can use ``EXCLUDE_FROM_WORLD_pn-``\ recipename for recipes you want
+You can use ``EXCLUDE_FROM_WORLD:pn-``\ recipename for recipes you want
 to exclude. However, it is assumed that you would need to be building
 the "world" target if you want to provide additional items to the SDK.
 Consequently, building for "world" should not represent undue overhead

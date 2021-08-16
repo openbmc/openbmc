@@ -87,4 +87,7 @@ RDEPENDS:${PN} += "mimic"
 # pgrep is used by stop-mycroft.sh
 RDEPENDS:${PN} += "procps"
 
+# More tools needed by scripts
+RDEPENDS:${PN} += "bash jq libnotify"
+
 SYSTEMD_SERVICE:${PN} = "mycroft-setup.service mycroft.service"

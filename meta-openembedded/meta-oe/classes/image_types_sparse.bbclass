@@ -1,16 +1,16 @@
 inherit image_types
 
 CONVERSIONTYPES += "sparse"
-CONVERSION_CMD:sparse() {
-    in="${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}"
-    out="${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.sparse"
-    case "${type}" in
-        ext*)
-            ext2simg "$in" "$out"
-            ;;
-        *)
-            img2simg "$in" "$out"
-            ;;
-    esac
-}
+CONVERSION_CMD:sparse = " \
+    case "${type}" in \
+        ext*) \
+            ext2simg "${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}" \
+                     "${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.sparse" \
+            ;; \
+        *) \
+            img2simg "${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}" \
+                     "${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.sparse" \
+            ;; \
+    esac \
+"
 CONVERSION_DEPENDS_sparse = "android-tools-native"

@@ -83,7 +83,7 @@ create an append file for the ``init-ifupdown`` recipe instead, which
 you can find in the :term:`Source Directory` at
 ``meta/recipes-core/init-ifupdown``. For information on how to use
 append files, see the
-":ref:`dev-manual/common-tasks:using .bbappend files in your layer`"
+":ref:`dev-manual/common-tasks:appending other layers metadata with your layer`"
 section in the Yocto Project Development Tasks Manual.
 
 .. _migration-1.4-remote-debugging:

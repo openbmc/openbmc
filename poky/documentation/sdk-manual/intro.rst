@@ -12,16 +12,6 @@ Software Development Kit (eSDK) manual. This manual
 explains how to use both the Yocto Project extensible and standard
 SDKs to develop applications and images.
 
-.. note::
-
-   Prior to the 2.0 Release of the Yocto Project, application
-   development was primarily accomplished through the use of the
-   Application Development Toolkit (ADT) and the availability of
-   stand-alone cross-development toolchains and other tools. With the
-   2.1 Release of the Yocto Project, application development has
-   transitioned to within a tool-rich extensible SDK and the more
-   traditional standard SDK.
-
 All SDKs consist of the following:
 
 -  *Cross-Development Toolchain*: This toolchain contains a compiler,

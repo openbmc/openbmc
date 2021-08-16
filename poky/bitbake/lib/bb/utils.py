@@ -1681,3 +1681,19 @@ def rename(src, dst):
             shutil.move(src, dst)
         else:
             raise err
+
+@contextmanager
+def environment(**envvars):
+    """
+    Context manager to selectively update the environment with the specified mapping.
+    """
+    backup = dict(os.environ)
+    try:
+        os.environ.update(envvars)
+        yield
+    finally:
+        for var in envvars:
+            if var in backup:
+                os.environ[var] = backup[var]
+            else:
+                del os.environ[var]

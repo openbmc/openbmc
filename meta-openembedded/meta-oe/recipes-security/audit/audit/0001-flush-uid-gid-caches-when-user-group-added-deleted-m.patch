@@ -1,0 +1,132 @@
+From 759318f11352d01b45bbab62c7bf0a53fb781083 Mon Sep 17 00:00:00 2001
+From: Steve Grubb <sgrubb@redhat.com>
+Date: Tue, 10 Aug 2021 11:27:16 -0400
+Subject: [PATCH] flush uid/gid caches when user/group added/deleted/modified
+
+It was reported in issue #209 that in the enriched format that auditd
+is creating the wrong account associations. This is due to caching
+previous lookups. The fix is to monitor for account lifecycle changes
+and flush the LRUs if any are seen.
+
+Upstream-Status: Backport
+[https://github.com/linux-audit/audit-userspace/commit/8662f61108f8b9365f96ef49ca8ca331a7880f24]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ auparse/auparse-idata.h |  3 ++-
+ auparse/interpret.c     | 12 ++++++++++++
+ src/auditd-event.c      | 27 +++++++++++++++++++++++++--
+ 3 files changed, 39 insertions(+), 3 deletions(-)
+
+diff --git a/auparse/auparse-idata.h b/auparse/auparse-idata.h
+index 660901a..eaca86a 100644
+--- a/auparse/auparse-idata.h
++++ b/auparse/auparse-idata.h
+@@ -1,6 +1,6 @@
+ /*
+ * idata.h - Header file for ausearch-lookup.c
+-* Copyright (c) 2013,2016-17 Red Hat Inc., Durham, North Carolina.
++* Copyright (c) 2013,2016-17,2021 Red Hat Inc.
+ * All Rights Reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+@@ -45,6 +45,7 @@ char *auparse_do_interpretation(int type, const idata *id,
+ void _auparse_load_interpretations(const char *buf);
+ void _auparse_free_interpretations(void);
+ const char *_auparse_lookup_interpretation(const char *name);
++void _auparse_flush_caches(void);
+ 
+ #endif
+ 
+diff --git a/auparse/interpret.c b/auparse/interpret.c
+index 046867b..eef377a 100644
+--- a/auparse/interpret.c
++++ b/auparse/interpret.c
+@@ -653,6 +653,18 @@ void aulookup_destroy_gid_list(void)
+ 	gid_cache_created = 0;
+ }
+ 
++void _auparse_flush_caches(void)
++{
++	if (uid_cache_created) {
++		destroy_lru(uid_cache);
++		uid_cache_created = 0;
++	}
++	if (gid_cache_created) {
++		destroy_lru(gid_cache);
++		gid_cache_created = 0;
++	}
++}
++
+ static const char *print_uid(const char *val, unsigned int base)
+ {
+         int uid;
+diff --git a/src/auditd-event.c b/src/auditd-event.c
+index cb29fee..3655726 100644
+--- a/src/auditd-event.c
++++ b/src/auditd-event.c
+@@ -42,6 +42,7 @@
+ #include "libaudit.h"
+ #include "private.h"
+ #include "auparse.h"
++#include "auparse-idata.h"
+ 
+ /* This is defined in auditd.c */
+ extern volatile int stop;
+@@ -56,7 +57,7 @@ static void do_space_left_action(int admin);
+ static void do_disk_full_action(void);
+ static void do_disk_error_action(const char *func, int err);
+ static void fix_disk_permissions(void);
+-static void check_excess_logs(void); 
++static void check_excess_logs(void);
+ static void rotate_logs_now(void);
+ static void rotate_logs(unsigned int num_logs, unsigned int keep_logs);
+ static void shift_logs(void);
+@@ -394,7 +395,7 @@ static const char *format_enrich(const struct audit_reply *rep)
+ 	        	snprintf(format_buf, MAX_AUDIT_MESSAGE_LENGTH,
+ 		    "type=DAEMON_ERR op=format-enriched msg=NULL res=failed");
+ 	} else {
+-		int rc;
++		int rc, rtype;
+ 		size_t mlen, len;
+ 		char *message;
+ 		// Do raw format to get event started
+@@ -427,6 +428,17 @@ static const char *format_enrich(const struct audit_reply *rep)
+ 
+ 		// Loop over all fields while possible to add field
+ 		rc = auparse_first_record(au);
++		rtype = auparse_get_type(au);
++		switch (rtype)
++		{	// Flush before adding to pickup new associations
++			case AUDIT_ADD_USER:
++			case AUDIT_ADD_GROUP:
++				_auparse_flush_caches();
++				break;
++			default:
++				break;
++		}
++
+ 		while (rc > 0 && len > MIN_SPACE_LEFT) {
+ 			// See what kind of field we have
+ 			size_t vlen;
+@@ -454,6 +466,17 @@ static const char *format_enrich(const struct audit_reply *rep)
+ 			rc = auparse_next_field(au);
+ 		}
+ 
++		switch(rtype)
++		{	// Flush after modification to remove stale entries
++			case AUDIT_USER_MGMT:
++			case AUDIT_DEL_USER:
++			case AUDIT_DEL_GROUP:
++			case AUDIT_GRP_MGMT:
++				_auparse_flush_caches();
++				break;
++			default:
++				break;
++		}
+ 		free(message);
+ 	}
+         return format_buf;
+-- 
+2.17.1
+

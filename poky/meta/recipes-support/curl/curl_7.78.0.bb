@@ -73,6 +73,7 @@ do_install:append:class-target() {
 	    -e 's,--sysroot=${STAGING_DIR_TARGET},,g' \
 	    -e 's,--with-libtool-sysroot=${STAGING_DIR_TARGET},,g' \
 	    -e 's|${DEBUG_PREFIX_MAP}||g' \
+	    -e 's|${@" ".join(d.getVar("DEBUG_PREFIX_MAP").split())}||g' \
 	    ${D}${bindir}/curl-config
 }
 

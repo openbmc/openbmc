@@ -1,7 +1,7 @@
 Add checks for both mkfs.vfat and the vfat file system in the kernel before
 running tests.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://alioth-lists.debian.net/pipermail/parted-devel/2021-August/005653.html]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 
 diff --git a/tests/t-lib-helpers.sh b/tests/t-lib-helpers.sh

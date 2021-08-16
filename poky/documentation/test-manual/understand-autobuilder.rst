@@ -27,7 +27,7 @@ which looks like::
          "TEMPLATE" : "arch-qemu",
          "step1" : {
                "extravars" : [
-                     "IMAGE_FSTYPES_append = ' wic wic.bmap'"
+                     "IMAGE_FSTYPES:append = ' wic wic.bmap'"
                     ]
         }
    },

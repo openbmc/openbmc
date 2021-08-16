@@ -114,7 +114,8 @@ KERNEL_CLASSES = " kernel-fitimage test-mkimage-wrapper "
 UBOOT_SIGN_ENABLE = "1"
 FIT_GENERATE_KEYS = "1"
 UBOOT_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
-UBOOT_SIGN_KEYNAME = "oe-selftest"
+UBOOT_SIGN_IMG_KEYNAME = "img-oe-selftest"
+UBOOT_SIGN_KEYNAME = "cfg-oe-selftest"
 FIT_SIGN_INDIVIDUAL = "1"
 UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
 """
@@ -173,11 +174,11 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
 
         reqsigvalues_image = {
             'algo': '"sha256,rsa2048"',
-            'key-name-hint': '"oe-selftest"',
+            'key-name-hint': '"img-oe-selftest"',
         }
         reqsigvalues_config = {
             'algo': '"sha256,rsa2048"',
-            'key-name-hint': '"oe-selftest"',
+            'key-name-hint': '"cfg-oe-selftest"',
             'sign-images': '"kernel", "fdt"',
         }
 
@@ -215,7 +216,10 @@ UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart comment'"
         self.assertIn('conf-am335x-boneblack.dtb', signed_sections)
         for signed_section, values in signed_sections.items():
             value = values.get('Sign algo', None)
-            self.assertEqual(value, 'sha256,rsa2048:oe-selftest', 'Signature algorithm for %s not expected value' % signed_section)
+            if signed_section.startswith("conf"):
+                self.assertEqual(value, 'sha256,rsa2048:cfg-oe-selftest', 'Signature algorithm for %s not expected value' % signed_section)
+            else:
+                self.assertEqual(value, 'sha256,rsa2048:img-oe-selftest', 'Signature algorithm for %s not expected value' % signed_section)
             value = values.get('Sign value', None)
             self.assertEqual(len(value), 512, 'Signature value for section %s not expected length' % signed_section)
 
@@ -266,7 +270,8 @@ KERNEL_CLASSES = " kernel-fitimage"
 UBOOT_SIGN_ENABLE = "1"
 FIT_GENERATE_KEYS = "1"
 UBOOT_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
-UBOOT_SIGN_KEYNAME = "oe-selftest"
+UBOOT_SIGN_IMG_KEYNAME = "img-oe-selftest"
+UBOOT_SIGN_KEYNAME = "cfg-oe-selftest"
 FIT_SIGN_INDIVIDUAL = "1"
 """
         self.write_config(config)
@@ -348,7 +353,8 @@ KERNEL_CLASSES = " kernel-fitimage test-mkimage-wrapper "
 UBOOT_SIGN_ENABLE = "1"
 FIT_GENERATE_KEYS = "1"
 UBOOT_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
-UBOOT_SIGN_KEYNAME = "oe-selftest"
+UBOOT_SIGN_IMG_KEYNAME = "img-oe-selftest"
+UBOOT_SIGN_KEYNAME = "cfg-oe-selftest"
 FIT_SIGN_INDIVIDUAL = "1"
 UBOOT_MKIMAGE_SIGN_ARGS = "-c 'a smart U-Boot comment'"
 """
@@ -592,7 +598,8 @@ KERNEL_CLASSES = " kernel-fitimage test-mkimage-wrapper "
 UBOOT_SIGN_ENABLE = "1"
 FIT_GENERATE_KEYS = "1"
 UBOOT_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
-UBOOT_SIGN_KEYNAME = "kernel-oe-selftest"
+UBOOT_SIGN_IMG_KEYNAME = "img-oe-selftest"
+UBOOT_SIGN_KEYNAME = "cfg-oe-selftest"
 FIT_SIGN_INDIVIDUAL = "1"
 """
         self.write_config(config)

@@ -808,6 +808,29 @@ def localpath(url, d):
     fetcher = bb.fetch2.Fetch([url], d)
     return fetcher.localpath(url)
 
+# Need to export PATH as binary could be in metadata paths
+# rather than host provided
+# Also include some other variables.
+FETCH_EXPORT_VARS = ['HOME', 'PATH',
+                     'HTTP_PROXY', 'http_proxy',
+                     'HTTPS_PROXY', 'https_proxy',
+                     'FTP_PROXY', 'ftp_proxy',
+                     'FTPS_PROXY', 'ftps_proxy',
+                     'NO_PROXY', 'no_proxy',
+                     'ALL_PROXY', 'all_proxy',
+                     'GIT_PROXY_COMMAND',
+                     'GIT_SSH',
+                     'GIT_SSL_CAINFO',
+                     'GIT_SMART_HTTP',
+                     'SSH_AUTH_SOCK', 'SSH_AGENT_PID',
+                     'SOCKS5_USER', 'SOCKS5_PASSWD',
+                     'DBUS_SESSION_BUS_ADDRESS',
+                     'P4CONFIG',
+                     'SSL_CERT_FILE',
+                     'AWS_ACCESS_KEY_ID',
+                     'AWS_SECRET_ACCESS_KEY',
+                     'AWS_DEFAULT_REGION']
+
 def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None):
     """
     Run cmd returning the command output
@@ -816,28 +839,7 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None):
     Optionally remove the files/directories listed in cleanup upon failure
     """
 
-    # Need to export PATH as binary could be in metadata paths
-    # rather than host provided
-    # Also include some other variables.
-    # FIXME: Should really include all export varaiables?
-    exportvars = ['HOME', 'PATH',
-                  'HTTP_PROXY', 'http_proxy',
-                  'HTTPS_PROXY', 'https_proxy',
-                  'FTP_PROXY', 'ftp_proxy',
-                  'FTPS_PROXY', 'ftps_proxy',
-                  'NO_PROXY', 'no_proxy',
-                  'ALL_PROXY', 'all_proxy',
-                  'GIT_PROXY_COMMAND',
-                  'GIT_SSH',
-                  'GIT_SSL_CAINFO',
-                  'GIT_SMART_HTTP',
-                  'SSH_AUTH_SOCK', 'SSH_AGENT_PID',
-                  'SOCKS5_USER', 'SOCKS5_PASSWD',
-                  'DBUS_SESSION_BUS_ADDRESS',
-                  'P4CONFIG',
-                  'AWS_ACCESS_KEY_ID',
-                  'AWS_SECRET_ACCESS_KEY',
-                  'AWS_DEFAULT_REGION']
+    exportvars = FETCH_EXPORT_VARS
 
     if not cleanup:
         cleanup = []

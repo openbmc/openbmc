@@ -144,7 +144,7 @@ Shortened Git ``SRCREV`` Values
 
 BitBake will now shorten revisions from Git repositories from the normal
 40 characters down to 10 characters within :term:`SRCPV`
-for improved usability in path and file names. This change should be
+for improved usability in path and filenames. This change should be
 safe within contexts where these revisions are used because the chances
 of spatially close collisions is very low. Distant collisions are not a
 major issue in the way the values are used.

@@ -144,6 +144,10 @@ download without a checksum triggers an error message. The
 make any attempted network access a fatal error, which is useful for
 checking that mirrors are complete as well as other things.
 
+If :term:`BB_CHECK_SSL_CERTS` is set to ``0`` then SSL certificate checking will
+be disabled. This variable defaults to ``1`` so SSL certificates are normally
+checked.
+
 .. _bb-the-unpack:
 
 The Unpack

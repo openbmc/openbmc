@@ -207,37 +207,37 @@ following list:
       To make sure your changes apply only when building machine "one",
       use a machine override with the :term:`DEPENDS` statement::
 
-         DEPENDS_one = "foo"
+         DEPENDS:one = "foo"
 
-      You should follow the same strategy when using ``_append``
-      and ``_prepend`` operations::
+      You should follow the same strategy when using ``:append``
+      and ``:prepend`` operations::
 
-         DEPENDS_append_one = " foo"
-         DEPENDS_prepend_one = "foo "
+         DEPENDS:append:one = " foo"
+         DEPENDS:prepend:one = "foo "
 
       As an actual example, here's a
       snippet from the generic kernel include file ``linux-yocto.inc``,
       wherein the kernel compile and link options are adjusted in the
       case of a subset of the supported architectures::
 
-         DEPENDS_append_aarch64 = " libgcc"
-         KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
-         KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
+         DEPENDS:append:aarch64 = " libgcc"
+         KERNEL_CC:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
+         KERNEL_LD:append:aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
-         DEPENDS_append_nios2 = " libgcc"
-         KERNEL_CC_append_nios2 = " ${TOOLCHAIN_OPTIONS}"
-         KERNEL_LD_append_nios2 = " ${TOOLCHAIN_OPTIONS}"
+         DEPENDS:append:nios2 = " libgcc"
+         KERNEL_CC:append:nios2 = " ${TOOLCHAIN_OPTIONS}"
+         KERNEL_LD:append:nios2 = " ${TOOLCHAIN_OPTIONS}"
 
-         DEPENDS_append_arc = " libgcc"
-         KERNEL_CC_append_arc = " ${TOOLCHAIN_OPTIONS}"
-         KERNEL_LD_append_arc = " ${TOOLCHAIN_OPTIONS}"
+         DEPENDS:append:arc = " libgcc"
+         KERNEL_CC:append:arc = " ${TOOLCHAIN_OPTIONS}"
+         KERNEL_LD:append:arc = " ${TOOLCHAIN_OPTIONS}"
 
-         KERNEL_FEATURES_append_qemuall=" features/debug/printk.scc"
+         KERNEL_FEATURES:append:qemuall=" features/debug/printk.scc"
 
       .. note::
 
-         Avoiding "+=" and "=+" and using machine-specific ``_append``
-         and ``_prepend`` operations is recommended as well.
+         Avoiding "+=" and "=+" and using machine-specific ``:append``
+         and ``:prepend`` operations is recommended as well.
 
    -  *Place Machine-Specific Files in Machine-Specific Locations:* When
       you have a base recipe, such as ``base-files.bb``, that contains a
@@ -247,7 +247,7 @@ following list:
       at ``meta-one/recipes-core/base-files/base-files.bbappend`` could
       extend :term:`FILESPATH` using :term:`FILESEXTRAPATHS` as follows::
 
-         FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+         FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
       The build for machine "one" will pick up your machine-specific file as
       long as you have the file in
@@ -443,8 +443,8 @@ file. During the processing of each ``conf/layer.conf`` file, BitBake
 adds the recipes, classes and configurations contained within the
 particular layer to the source directory.
 
-Using .bbappend Files in Your Layer
------------------------------------
+Appending Other Layers Metadata With Your Layer
+-----------------------------------------------
 
 A recipe that appends Metadata to another recipe is called a BitBake
 append file. A BitBake append file uses the ``.bbappend`` file type
@@ -465,7 +465,7 @@ have to manually merge changes as they occur.
 When you create an append file, you must use the same root name as the
 corresponding recipe file. For example, the append file
 ``someapp_3.1.bbappend`` must apply to ``someapp_3.1.bb``. This
-means the original recipe and append file names are version
+means the original recipe and append filenames are version
 number-specific. If the corresponding recipe is renamed to update to a
 newer version, you must also rename and possibly update the
 corresponding ``.bbappend`` as well. During the build process, BitBake
@@ -473,6 +473,9 @@ displays an error on starting if it detects a ``.bbappend`` file that
 does not have a corresponding recipe with a matching name. See the
 :term:`BB_DANGLINGAPPENDS_WARNONLY`
 variable for information on how to handle this error.
+
+Overlaying a File Using Your Layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As an example, consider the main formfactor recipe and a corresponding
 formfactor append file both from the :term:`Source Directory`.
@@ -512,7 +515,7 @@ Following is the append file, which is named ``formfactor_0.0.bbappend``
 and is from the Raspberry Pi BSP Layer named ``meta-raspberrypi``. The
 file is in the layer at ``recipes-bsp/formfactor``::
 
-   FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+   FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 By default, the build system uses the
 :term:`FILESPATH` variable to
@@ -537,13 +540,19 @@ important as it ensures that items in the list remain colon-separated.
 .. note::
 
    BitBake automatically defines the :term:`THISDIR` variable. You should
-   never set this variable yourself. Using "_prepend" as part of the
+   never set this variable yourself. Using ":prepend" as part of the
    :term:`FILESEXTRAPATHS` ensures your path will be searched prior to other
    paths in the final list.
 
    Also, not all append files add extra files. Many append files simply
    allow to add build options (e.g. ``systemd``). For these cases, your
    append file would not even use the :term:`FILESEXTRAPATHS` statement.
+
+The end result of this ``.bbappend`` file is that on a Raspberry Pi, where
+``rpi`` will exist in the list of :term:`OVERRIDES`, the file
+``meta-raspberrypi/recipes-bsp/formfactor/formfactor/rpi/machconfig`` will be
+used during :ref:`ref-tasks-fetch` and the test for a non-zero file size in
+:ref:`ref-tasks-install` will return true, and the file will be installed.
 
 Prioritizing Your Layer
 -----------------------
@@ -830,27 +839,27 @@ variable changes are in effect for every build and consequently affect
 all images, which might not be what you require.
 
 To add a package to your image using the local configuration file, use
-the :term:`IMAGE_INSTALL` variable with the ``_append`` operator::
+the :term:`IMAGE_INSTALL` variable with the ``:append`` operator::
 
-   IMAGE_INSTALL_append = " strace"
+   IMAGE_INSTALL:append = " strace"
 
 Use of the syntax is important -
 specifically, the space between the quote and the package name, which is
-``strace`` in this example. This space is required since the ``_append``
+``strace`` in this example. This space is required since the ``:append``
 operator does not add the space.
 
-Furthermore, you must use ``_append`` instead of the ``+=`` operator if
+Furthermore, you must use ``:append`` instead of the ``+=`` operator if
 you want to avoid ordering issues. The reason for this is because doing
 so unconditionally appends to the variable and avoids ordering problems
 due to the variable being set in image recipes and ``.bbclass`` files
-with operators like ``?=``. Using ``_append`` ensures the operation
+with operators like ``?=``. Using ``:append`` ensures the operation
 takes effect.
 
-As shown in its simplest use, ``IMAGE_INSTALL_append`` affects all
+As shown in its simplest use, ``IMAGE_INSTALL:append`` affects all
 images. It is possible to extend the syntax so that the variable applies
 to a specific image only. Here is an example::
 
-   IMAGE_INSTALL_append_pn-core-image-minimal = " strace"
+   IMAGE_INSTALL:append:pn-core-image-minimal = " strace"
 
 This example adds ``strace`` to the ``core-image-minimal`` image only.
 
@@ -976,17 +985,17 @@ the full packagegroup name ``packagegroup-custom``::
        ${PN}-tools \
        "
 
-   RDEPENDS_${PN}-apps = "\
+   RDEPENDS:${PN}-apps = "\
        dropbear \
        portmap \
        psplash"
 
-   RDEPENDS_${PN}-tools = "\
+   RDEPENDS:${PN}-tools = "\
        oprofile \
        oprofileui-server \
        lttng-tools"
 
-   RRECOMMENDS_${PN}-tools = "\
+   RRECOMMENDS:${PN}-tools = "\
        kernel-module-oprofile"
 
 In the previous example, two package group packages are created with
@@ -1013,7 +1022,7 @@ configuration file. Use the following in an append file::
 
 Use the following in a configuration file::
 
-   hostname_pn-base-files = "myhostname"
+   hostname:pn-base-files = "myhostname"
 
 Changing the default value of the variable "hostname" can be useful in
 certain situations. For example, suppose you need to do extensive
@@ -1028,7 +1037,7 @@ Another point of interest is that if you unset the variable, the image
 will have no default hostname in the filesystem. Here is an example that
 unsets the variable in a configuration file::
 
-  hostname_pn-base-files = ""
+  hostname:pn-base-files = ""
 
 Having no default hostname in the filesystem is suitable for
 environments that use dynamic hostnames such as virtual machines.
@@ -1544,8 +1553,8 @@ package for a recipe has the same name as the recipe, and the recipe's
 name can be found through the
 ``${``\ :term:`PN`\ ``}`` variable, then
 you specify the dependencies for the main package by setting
-``RDEPENDS_${PN}``. If the package were named ``${PN}-tools``, then you
-would set ``RDEPENDS_${PN}-tools``, and so forth.
+``RDEPENDS:${PN}``. If the package were named ``${PN}-tools``, then you
+would set ``RDEPENDS:${PN}-tools``, and so forth.
 
 Some runtime dependencies will be set automatically at packaging time.
 These dependencies include any shared library dependencies (i.e. if a
@@ -1796,7 +1805,7 @@ the software being built:
    sure the install portion of the build completes with no issues.
    However, if you wish to install additional files not already being
    installed by ``make install``, you should do this using a
-   ``do_install_append`` function using the install command as described
+   ``do_install:append`` function using the install command as described
    in the "Manual" bulleted item later in this list.
 
 -  *Other (using* ``make install``\ *)*: You need to define a ``do_install``
@@ -1865,9 +1874,9 @@ additional definitions in your recipe.
 
 If you are adding services and the service initialization script or the
 service file itself is not installed, you must provide for that
-installation in your recipe using a ``do_install_append`` function. If
+installation in your recipe using a ``do_install:append`` function. If
 your recipe already has a ``do_install`` function, update the function
-near its end rather than adding an additional ``do_install_append``
+near its end rather than adding an additional ``do_install:append``
 function.
 
 When you create the installation for your services, you need to
@@ -1938,7 +1947,7 @@ take. The following list describes the process:
    discover problems, you can set
    :term:`PACKAGES`,
    :term:`FILES`,
-   ``do_install(_append)``, and so forth as needed.
+   ``do_install(:append)``, and so forth as needed.
 
 -  *Splitting an Application into Multiple Packages*: If you need to
    split an application into several packages, see the
@@ -2137,7 +2146,7 @@ Post-Installation Scripts
 Post-installation scripts run immediately after installing a package on
 the target or during image creation when a package is included in an
 image. To add a post-installation script to a package, add a
-``pkg_postinst_``\ `PACKAGENAME`\ ``()`` function to the recipe file
+``pkg_postinst:``\ `PACKAGENAME`\ ``()`` function to the recipe file
 (``.bb``) and replace `PACKAGENAME` with the name of the package you want
 to attach to the ``postinst`` script. To apply the post-installation
 script to the main package for the recipe, which is usually what is
@@ -2147,7 +2156,7 @@ PACKAGENAME.
 
 A post-installation function has the following structure::
 
-   pkg_postinst_PACKAGENAME() {
+   pkg_postinst:PACKAGENAME() {
        # Commands to carry out
    }
 
@@ -2300,7 +2309,7 @@ compiler. For example, the application might need an additional header
 path. You can accomplish this by adding to the :term:`CFLAGS` variable. The
 following example shows this::
 
-   CFLAGS_prepend = "-I ${S}/include "
+   CFLAGS:prepend = "-I ${S}/include "
 
 In the following example, ``mtd-utils`` is a makefile-based package::
 
@@ -2330,9 +2339,9 @@ In the following example, ``mtd-utils`` is a makefile-based package::
 
    PACKAGES =+ "mtd-utils-jffs2 mtd-utils-ubifs mtd-utils-misc"
 
-   FILES_mtd-utils-jffs2 = "${sbindir}/mkfs.jffs2 ${sbindir}/jffs2dump ${sbindir}/jffs2reader ${sbindir}/sumtool"
-   FILES_mtd-utils-ubifs = "${sbindir}/mkfs.ubifs ${sbindir}/ubi*"
-   FILES_mtd-utils-misc = "${sbindir}/nftl* ${sbindir}/ftl* ${sbindir}/rfd* ${sbindir}/doc* ${sbindir}/serve_image ${sbindir}/recv_image"
+   FILES:mtd-utils-jffs2 = "${sbindir}/mkfs.jffs2 ${sbindir}/jffs2dump ${sbindir}/jffs2reader ${sbindir}/sumtool"
+   FILES:mtd-utils-ubifs = "${sbindir}/mkfs.ubifs ${sbindir}/ubi*"
+   FILES:mtd-utils-misc = "${sbindir}/nftl* ${sbindir}/ftl* ${sbindir}/rfd* ${sbindir}/doc* ${sbindir}/serve_image ${sbindir}/recv_image"
 
    PARALLEL_MAKE = ""
 
@@ -2360,14 +2369,14 @@ into separate packages::
    XORG_PN = "libXpm"
 
    PACKAGES =+ "sxpm cxpm"
-   FILES_cxpm = "${bindir}/cxpm"
-   FILES_sxpm = "${bindir}/sxpm"
+   FILES:cxpm = "${bindir}/cxpm"
+   FILES:sxpm = "${bindir}/sxpm"
 
 In the previous example, we want to ship the ``sxpm`` and ``cxpm``
 binaries in separate packages. Since ``bindir`` would be packaged into
 the main :term:`PN` package by default, we prepend the :term:`PACKAGES` variable
 so additional package names are added to the start of list. This results
-in the extra ``FILES_*`` variables then containing information that
+in the extra ``FILES:*`` variables then containing information that
 define which files and directories go into which packages. Files
 included by earlier packages are skipped by latter packages. Thus, the
 main :term:`PN` package does not include the above listed files.
@@ -2398,7 +2407,7 @@ configure and compile steps as well as sets things up to grab packages
 from the appropriate area. In particular, this class sets ``noexec`` on
 both the :ref:`ref-tasks-configure`
 and :ref:`ref-tasks-compile` tasks,
-sets ``FILES_${PN}`` to "/" so that it picks up all files, and sets up a
+sets ``FILES:${PN}`` to "/" so that it picks up all files, and sets up a
 :ref:`ref-tasks-install` task, which
 effectively copies all files from ``${S}`` to ``${D}``. The
 ``bin_package`` class works well when the files extracted into ``${S}``
@@ -2459,7 +2468,7 @@ doing the following:
 
 -  Ensure that you set up :term:`FILES`
    (usually
-   ``FILES_${``\ :term:`PN`\ ``}``) to
+   ``FILES:${``\ :term:`PN`\ ``}``) to
    point to the files you have installed, which of course depends on
    where you have installed them and whether those files are in
    different locations than the defaults.
@@ -2504,7 +2513,7 @@ chapter of the BitBake User Manual.
 
       S = "${WORKDIR}/postfix-${PV}"
       CFLAGS += "-DNO_ASM"
-      SRC_URI_append = " file://fixup.patch"
+      SRC_URI:append = " file://fixup.patch"
 
 -  *Functions:* Functions provide a series of actions to be performed.
    You usually use functions to override the default implementation of a
@@ -2631,7 +2640,7 @@ in the BitBake User Manual.
 
       VAR =+ "Starts"
 
--  *Appending (_append):* Use the ``_append`` operator to append values
+-  *Appending (:append):* Use the ``:append`` operator to append values
    to existing variables. This operator does not add any additional
    space. Also, the operator is applied after all the ``+=``, and ``=+``
    operators have been applied and after all ``=`` assignments have
@@ -2641,15 +2650,15 @@ in the BitBake User Manual.
    start to ensure the appended value is not merged with the existing
    value::
 
-      SRC_URI_append = " file://fix-makefile.patch"
+      SRC_URI:append = " file://fix-makefile.patch"
 
    You can also use
-   the ``_append`` operator with overrides, which results in the actions
+   the ``:append`` operator with overrides, which results in the actions
    only being performed for the specified target or machine::
 
-      SRC_URI_append_sh4 = " file://fix-makefile.patch"
+      SRC_URI:append:sh4 = " file://fix-makefile.patch"
 
--  *Prepending (_prepend):* Use the ``_prepend`` operator to prepend
+-  *Prepending (:prepend):* Use the ``:prepend`` operator to prepend
    values to existing variables. This operator does not add any
    additional space. Also, the operator is applied after all the ``+=``,
    and ``=+`` operators have been applied and after all ``=``
@@ -2659,13 +2668,13 @@ in the BitBake User Manual.
    end to ensure the prepended value is not merged with the existing
    value::
 
-      CFLAGS_prepend = "-I${S}/myincludes "
+      CFLAGS:prepend = "-I${S}/myincludes "
 
    You can also use the
-   ``_prepend`` operator with overrides, which results in the actions
+   ``:prepend`` operator with overrides, which results in the actions
    only being performed for the specified target or machine::
 
-      CFLAGS_prepend_sh4 = "-I${S}/myincludes "
+      CFLAGS:prepend:sh4 = "-I${S}/myincludes "
 
 -  *Overrides:* You can use overrides to set a value conditionally,
    typically based on how the recipe is being built. For example, to set
@@ -2676,7 +2685,7 @@ in the BitBake User Manual.
    you would do the following::
 
       KBRANCH = "standard/base"
-      KBRANCH_qemuarm = "standard/arm-versatile-926ejs"
+      KBRANCH:qemuarm = "standard/arm-versatile-926ejs"
 
    Overrides are also used to separate
    alternate values of a variable in other situations. For example, when
@@ -2951,7 +2960,7 @@ The following steps describe how to set up the AUH utility:
          If your distro does not enable by default ptest, which Poky
          does, you need the following in your ``local.conf`` file::
 
-                 DISTRO_FEATURES_append = " ptest"
+                 DISTRO_FEATURES:append = " ptest"
 
 
 6. *Optionally Start a vncserver:* If you are running in a server
@@ -4301,7 +4310,7 @@ point to your external source code. Here are the statements to put in
 your ``local.conf`` file::
 
    INHERIT += "externalsrc"
-   EXTERNALSRC_pn-myrecipe = "path-to-your-source-tree"
+   EXTERNALSRC:pn-myrecipe = "path-to-your-source-tree"
 
 This next example shows how to accomplish the same thing by setting
 :term:`EXTERNALSRC` in the recipe itself or in the recipe's append file::
@@ -4323,7 +4332,7 @@ some other nominated directory, you can set
 :term:`EXTERNALSRC_BUILD`
 to point to that directory::
 
-   EXTERNALSRC_BUILD_pn-myrecipe = "path-to-your-source-tree"
+   EXTERNALSRC_BUILD:pn-myrecipe = "path-to-your-source-tree"
 
 Replicating a Build Offline
 ---------------------------
@@ -4538,7 +4547,7 @@ that can help you speed up the build:
    exceptions::
 
       STATICLIBCONF = "--disable-static"
-      STATICLIBCONF_sqlite3-native = ""
+      STATICLIBCONF:sqlite3-native = ""
       EXTRA_OECONF += "${STATICLIBCONF}"
 
    .. note::
@@ -4578,7 +4587,7 @@ can control which static library files (``*.a`` files) get included in
 the built library.
 
 The :term:`PACKAGES` and
-:term:`FILES_* <FILES>` variables in the
+:term:`FILES:* <FILES>` variables in the
 ``meta/conf/bitbake.conf`` configuration file define how files installed
 by the ``do_install`` task are packaged. By default, the :term:`PACKAGES`
 variable includes ``${PN}-staticdev``, which represents all static
@@ -4597,7 +4606,7 @@ how the static library files are defined::
    PACKAGES_DYNAMIC = "^${PN}-locale-.*"
    FILES = ""
 
-   FILES_${PN} = "${bindir}/* ${sbindir}/* ${libexecdir}/* ${libdir}/lib*${SOLIBS} \
+   FILES:${PN} = "${bindir}/* ${sbindir}/* ${libexecdir}/* ${libdir}/lib*${SOLIBS} \
                ${sysconfdir} ${sharedstatedir} ${localstatedir} \
                ${base_bindir}/* ${base_sbindir}/* \
                ${base_libdir}/*${SOLIBS} \
@@ -4607,24 +4616,24 @@ how the static library files are defined::
                ${datadir}/idl ${datadir}/omf ${datadir}/sounds \
                ${libdir}/bonobo/servers"
 
-   FILES_${PN}-bin = "${bindir}/* ${sbindir}/*"
+   FILES:${PN}-bin = "${bindir}/* ${sbindir}/*"
 
-   FILES_${PN}-doc = "${docdir} ${mandir} ${infodir} ${datadir}/gtk-doc \
+   FILES:${PN}-doc = "${docdir} ${mandir} ${infodir} ${datadir}/gtk-doc \
                ${datadir}/gnome/help"
-   SECTION_${PN}-doc = "doc"
+   SECTION:${PN}-doc = "doc"
 
    FILES_SOLIBSDEV ?= "${base_libdir}/lib*${SOLIBSDEV} ${libdir}/lib*${SOLIBSDEV}"
-   FILES_${PN}-dev = "${includedir} ${FILES_SOLIBSDEV} ${libdir}/*.la \
+   FILES:${PN}-dev = "${includedir} ${FILES_SOLIBSDEV} ${libdir}/*.la \
                    ${libdir}/*.o ${libdir}/pkgconfig ${datadir}/pkgconfig \
                    ${datadir}/aclocal ${base_libdir}/*.o \
                    ${libdir}/${BPN}/*.la ${base_libdir}/*.la"
-   SECTION_${PN}-dev = "devel"
-   ALLOW_EMPTY_${PN}-dev = "1"
-   RDEPENDS_${PN}-dev = "${PN} (= ${EXTENDPKGV})"
+   SECTION:${PN}-dev = "devel"
+   ALLOW_EMPTY:${PN}-dev = "1"
+   RDEPENDS:${PN}-dev = "${PN} (= ${EXTENDPKGV})"
 
-   FILES_${PN}-staticdev = "${libdir}/*.a ${base_libdir}/*.a ${libdir}/${BPN}/*.a"
-   SECTION_${PN}-staticdev = "devel"
-   RDEPENDS_${PN}-staticdev = "${PN}-dev (= ${EXTENDPKGV})"
+   FILES:${PN}-staticdev = "${libdir}/*.a ${base_libdir}/*.a ${libdir}/${BPN}/*.a"
+   SECTION:${PN}-staticdev = "devel"
+   RDEPENDS:${PN}-staticdev = "${PN}-dev (= ${EXTENDPKGV})"
 
 Combining Multiple Versions of Library Files into One Image
 -----------------------------------------------------------
@@ -4701,8 +4710,8 @@ configuration would be as follows::
    MACHINE = "qemux86-64"
    require conf/multilib.conf
    MULTILIBS = "multilib:lib32"
-   DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
-   IMAGE_INSTALL_append = "lib32-glib-2.0"
+   DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
+   IMAGE_INSTALL:append = "lib32-glib-2.0"
 
 This example enables an additional library named
 ``lib32`` alongside the normal target packages. When combining these
@@ -4749,7 +4758,7 @@ Here are the implementation details for the RPM Package Management System:
    :term:`Build Directory`. For
    example, consider ``lib32`` in a ``qemux86-64`` image. The possible
    architectures in the system are "all", "qemux86_64",
-   "lib32_qemux86_64", and "lib32_x86".
+   "lib32:qemux86_64", and "lib32:x86".
 
 -  The ``${MLPREFIX}`` variable is stripped from ``${PN}`` during RPM
    packaging. The naming for a normal RPM package and a Multilib RPM
@@ -4768,7 +4777,7 @@ Here are the implementation details for the IPK Package Management System:
 -  The ``${MLPREFIX}`` is not stripped from ``${PN}`` during IPK
    packaging. The naming for a normal RPM package and a Multilib IPK
    package in a ``qemux86-64`` system resolves to something like
-   ``bash_4.1-r2.x86_64.ipk`` and ``lib32-bash_4.1-rw_x86.ipk``,
+   ``bash_4.1-r2.x86_64.ipk`` and ``lib32-bash_4.1-rw:x86.ipk``,
    respectively.
 
 -  The IPK deploy folder is not modified with ``${MLPREFIX}`` because
@@ -4857,7 +4866,7 @@ configuration file as follows::
 
    MACHINE = "qemux86-64"
    DEFAULTTUNE = "x86-64-x32"
-   baselib = "${@d.getVar('BASE_LIB_tune-' + (d.getVar('DEFAULTTUNE') \
+   baselib = "${@d.getVar('BASE_LIB:tune-' + (d.getVar('DEFAULTTUNE') \
        or 'INVALID')) or 'lib'}"
 
 Once you have set
@@ -6085,7 +6094,7 @@ layer. The following steps provide some more detail:
 
    -  Add a ``psplash`` append file for a branded splash screen. For
       information on append files, see the
-      ":ref:`dev-manual/common-tasks:using .bbappend files in your layer`"
+      ":ref:`dev-manual/common-tasks:appending other layers metadata with your layer`"
       section.
 
    -  Add any other append files to make custom changes that are
@@ -6510,11 +6519,11 @@ function in your recipe. The ``do_split_packages`` function searches for
 a pattern of files or directories under a specified path and creates a
 package for each one it finds by appending to the
 :term:`PACKAGES` variable and
-setting the appropriate values for ``FILES_packagename``,
-``RDEPENDS_packagename``, ``DESCRIPTION_packagename``, and so forth.
+setting the appropriate values for ``FILES:packagename``,
+``RDEPENDS:packagename``, ``DESCRIPTION:packagename``, and so forth.
 Here is an example from the ``lighttpd`` recipe::
 
-   python populate_packages_prepend () {
+   python populate_packages:prepend () {
        lighttpd_libdir = d.expand('${libdir}')
        do_split_packages(d, lighttpd_libdir, '^mod_(.*).so$',
                         'lighttpd-module-%s', 'Lighttpd module for %s',
@@ -6618,7 +6627,7 @@ optional arguments::
       instead of the default False which appends them
    match_path
       match file_regex on the whole relative path to
-      the root rather than just the file name
+      the root rather than just the filename
    aux_files_pattern_verbatim
       Extra item(s) to be added to FILES for each
       package, using the actual derived module name
@@ -7101,7 +7110,7 @@ To add package testing to your build, add the
 variables to your ``local.conf`` file, which is found in the
 :term:`Build Directory`::
 
-   DISTRO_FEATURES_append = " ptest"
+   DISTRO_FEATURES:append = " ptest"
    EXTRA_IMAGE_FEATURES += "ptest-pkgs"
 
 Once your build is complete, the ptest files are installed into the
@@ -7145,7 +7154,7 @@ test. Here is what you have to do for each recipe:
    your recipe in order for the package to meet the dependencies. Here
    is an example where the package has a runtime dependency on "make"::
 
-      RDEPENDS_${PN}-ptest += "make"
+      RDEPENDS:${PN}-ptest += "make"
 
 -  *Add a function to build the test suite:* Not many packages support
    cross-compilation of their test suites. Consequently, you usually
@@ -7289,11 +7298,11 @@ The ``devtool edit-recipe`` command lets you take a look at the recipe::
        "
    S = "${WORKDIR}/npm"
    inherit npm
-   LICENSE_${PN} = "MIT"
-   LICENSE_${PN}-accepts = "MIT"
-   LICENSE_${PN}-array-flatten = "MIT"
+   LICENSE:${PN} = "MIT"
+   LICENSE:${PN}-accepts = "MIT"
+   LICENSE:${PN}-array-flatten = "MIT"
    ...
-   LICENSE_${PN}-vary = "MIT"
+   LICENSE:${PN}-vary = "MIT"
 
 Here are three key points in the previous example:
 
@@ -7389,11 +7398,11 @@ The variable can be used in multiple ways, including using suffixes to
 set it for a specific package type and/or package. Note that the order
 of precedence is the same as this list:
 
--  ``PACKAGE_ADD_METADATA_<PKGTYPE>_<PN>``
+-  ``PACKAGE_ADD_METADATA_<PKGTYPE>:<PN>``
 
 -  ``PACKAGE_ADD_METADATA_<PKGTYPE>``
 
--  ``PACKAGE_ADD_METADATA_<PN>``
+-  ``PACKAGE_ADD_METADATA:<PN>``
 
 -  :term:`PACKAGE_ADD_METADATA`
 
@@ -7523,7 +7532,7 @@ Using systemd Exclusively
 
 Set these variables in your distribution configuration file as follows::
 
-   DISTRO_FEATURES_append = " systemd"
+   DISTRO_FEATURES:append = " systemd"
    VIRTUAL-RUNTIME_init_manager = "systemd"
 
 You can also prevent the SysVinit distribution feature from
@@ -7547,7 +7556,7 @@ Using systemd for the Main Image and Using SysVinit for the Rescue Image
 
 Set these variables in your distribution configuration file as follows::
 
-   DISTRO_FEATURES_append = " systemd"
+   DISTRO_FEATURES:append = " systemd"
    VIRTUAL-RUNTIME_init_manager = "systemd"
 
 Doing so causes your main image to use the
@@ -7646,7 +7655,7 @@ the recipe needs to reference
 Then, you can add the following to your
 ``local.conf``::
 
-   SRCREV_pn-PN = "${AUTOREV}"
+   SRCREV:pn-PN = "${AUTOREV}"
 
 :term:`PN` is the name of the recipe for
 which you want to enable automatic source revision updating.
@@ -7664,22 +7673,22 @@ configuration file contains the line::
 This line pulls in the
 listed include file that contains numerous lines of exactly that form::
 
-   #SRCREV_pn-opkg-native ?= "${AUTOREV}"
-   #SRCREV_pn-opkg-sdk ?= "${AUTOREV}"
-   #SRCREV_pn-opkg ?= "${AUTOREV}"
-   #SRCREV_pn-opkg-utils-native ?= "${AUTOREV}"
-   #SRCREV_pn-opkg-utils ?= "${AUTOREV}"
-   SRCREV_pn-gconf-dbus ?= "${AUTOREV}"
-   SRCREV_pn-matchbox-common ?= "${AUTOREV}"
-   SRCREV_pn-matchbox-config-gtk ?= "${AUTOREV}"
-   SRCREV_pn-matchbox-desktop ?= "${AUTOREV}"
-   SRCREV_pn-matchbox-keyboard ?= "${AUTOREV}"
-   SRCREV_pn-matchbox-panel-2 ?= "${AUTOREV}"
-   SRCREV_pn-matchbox-themes-extra ?= "${AUTOREV}"
-   SRCREV_pn-matchbox-terminal ?= "${AUTOREV}"
-   SRCREV_pn-matchbox-wm ?= "${AUTOREV}"
-   SRCREV_pn-settings-daemon ?= "${AUTOREV}"
-   SRCREV_pn-screenshot ?= "${AUTOREV}"
+   #SRCREV:pn-opkg-native ?= "${AUTOREV}"
+   #SRCREV:pn-opkg-sdk ?= "${AUTOREV}"
+   #SRCREV:pn-opkg ?= "${AUTOREV}"
+   #SRCREV:pn-opkg-utils-native ?= "${AUTOREV}"
+   #SRCREV:pn-opkg-utils ?= "${AUTOREV}"
+   SRCREV:pn-gconf-dbus ?= "${AUTOREV}"
+   SRCREV:pn-matchbox-common ?= "${AUTOREV}"
+   SRCREV:pn-matchbox-config-gtk ?= "${AUTOREV}"
+   SRCREV:pn-matchbox-desktop ?= "${AUTOREV}"
+   SRCREV:pn-matchbox-keyboard ?= "${AUTOREV}"
+   SRCREV:pn-matchbox-panel-2 ?= "${AUTOREV}"
+   SRCREV:pn-matchbox-themes-extra ?= "${AUTOREV}"
+   SRCREV:pn-matchbox-terminal ?= "${AUTOREV}"
+   SRCREV:pn-matchbox-wm ?= "${AUTOREV}"
+   SRCREV:pn-settings-daemon ?= "${AUTOREV}"
+   SRCREV:pn-screenshot ?= "${AUTOREV}"
    . . .
 
 These lines allow you to
@@ -7737,9 +7746,9 @@ It is very important that you make sure all post-Installation
 (``pkg_postinst``) scripts for packages that are installed into the
 image can be run at the time when the root filesystem is created during
 the build on the host system. These scripts cannot attempt to run during
-first-boot on the target device. With the "read-only-rootfs" feature
-enabled, the build system checks during root filesystem creation to make
-sure all post-installation scripts succeed. If any of these scripts
+the first boot on the target device. With the "read-only-rootfs" feature
+enabled, the build system makes sure that all post-installation scripts
+succeed at file system creation time. If any of these scripts
 still need to be run after the root filesystem is created, the build
 immediately fails. These build-time checks ensure that the build fails
 rather than the target device fails later during its initial boot
@@ -7922,25 +7931,25 @@ output from this command::
 
    $ buildhistory-collect-srcrevs -a
    # i586-poky-linux
-   SRCREV_pn-glibc = "b8079dd0d360648e4e8de48656c5c38972621072"
-   SRCREV_pn-glibc-initial = "b8079dd0d360648e4e8de48656c5c38972621072"
-   SRCREV_pn-opkg-utils = "53274f087565fd45d8452c5367997ba6a682a37a"
-   SRCREV_pn-kmod = "fd56638aed3fe147015bfa10ed4a5f7491303cb4"
+   SRCREV:pn-glibc = "b8079dd0d360648e4e8de48656c5c38972621072"
+   SRCREV:pn-glibc-initial = "b8079dd0d360648e4e8de48656c5c38972621072"
+   SRCREV:pn-opkg-utils = "53274f087565fd45d8452c5367997ba6a682a37a"
+   SRCREV:pn-kmod = "fd56638aed3fe147015bfa10ed4a5f7491303cb4"
    # x86_64-linux
-   SRCREV_pn-gtk-doc-stub-native = "1dea266593edb766d6d898c79451ef193eb17cfa"
-   SRCREV_pn-dtc-native = "65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf"
-   SRCREV_pn-update-rc.d-native = "eca680ddf28d024954895f59a241a622dd575c11"
-   SRCREV_glibc_pn-cross-localedef-native = "b8079dd0d360648e4e8de48656c5c38972621072"
-   SRCREV_localedef_pn-cross-localedef-native = "c833367348d39dad7ba018990bfdaffaec8e9ed3"
-   SRCREV_pn-prelink-native = "faa069deec99bf61418d0bab831c83d7c1b797ca"
-   SRCREV_pn-opkg-utils-native = "53274f087565fd45d8452c5367997ba6a682a37a"
-   SRCREV_pn-kern-tools-native = "23345b8846fe4bd167efdf1bd8a1224b2ba9a5ff"
-   SRCREV_pn-kmod-native = "fd56638aed3fe147015bfa10ed4a5f7491303cb4"
+   SRCREV:pn-gtk-doc-stub-native = "1dea266593edb766d6d898c79451ef193eb17cfa"
+   SRCREV:pn-dtc-native = "65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf"
+   SRCREV:pn-update-rc.d-native = "eca680ddf28d024954895f59a241a622dd575c11"
+   SRCREV_glibc:pn-cross-localedef-native = "b8079dd0d360648e4e8de48656c5c38972621072"
+   SRCREV_localedef:pn-cross-localedef-native = "c833367348d39dad7ba018990bfdaffaec8e9ed3"
+   SRCREV:pn-prelink-native = "faa069deec99bf61418d0bab831c83d7c1b797ca"
+   SRCREV:pn-opkg-utils-native = "53274f087565fd45d8452c5367997ba6a682a37a"
+   SRCREV:pn-kern-tools-native = "23345b8846fe4bd167efdf1bd8a1224b2ba9a5ff"
+   SRCREV:pn-kmod-native = "fd56638aed3fe147015bfa10ed4a5f7491303cb4"
    # qemux86-poky-linux
-   SRCREV_machine_pn-linux-yocto = "38cd560d5022ed2dbd1ab0dca9642e47c98a0aa1"
-   SRCREV_meta_pn-linux-yocto = "a227f20eff056e511d504b2e490f3774ab260d6f"
+   SRCREV_machine:pn-linux-yocto = "38cd560d5022ed2dbd1ab0dca9642e47c98a0aa1"
+   SRCREV_meta:pn-linux-yocto = "a227f20eff056e511d504b2e490f3774ab260d6f"
    # all-poky-linux
-   SRCREV_pn-update-rc.d = "eca680ddf28d024954895f59a241a622dd575c11"
+   SRCREV:pn-update-rc.d = "eca680ddf28d024954895f59a241a622dd575c11"
 
 .. note::
 
@@ -8564,11 +8573,11 @@ Here are some things to keep in mind when running tests:
 
 -  The default tests for the image are defined as::
 
-      DEFAULT_TEST_SUITES_pn-image = "ping ssh df connman syslog xorg scp vnc date rpm dnf dmesg"
+      DEFAULT_TEST_SUITES:pn-image = "ping ssh df connman syslog xorg scp vnc date rpm dnf dmesg"
 
 -  Add your own test to the list of the by using the following::
 
-      TEST_SUITES_append = " mytest"
+      TEST_SUITES:append = " mytest"
 
 -  Run a specific list of tests as follows::
 
@@ -8941,7 +8950,7 @@ In addition to variable values, the output of the ``bitbake -e`` and
 -  After the variable values, all functions appear in the output. For
    shell functions, variables referenced within the function body are
    expanded. If a function has been modified using overrides or using
-   override-style operators like ``_append`` and ``_prepend``, then the
+   override-style operators like ``:append`` and ``:prepend``, then the
    final assembled function body appears in the output.
 
 Viewing Package Information with ``oe-pkgdata-util``
@@ -9715,7 +9724,7 @@ To run a ``debuginfod`` server, you need to do the following:
    (it already is in ``OpenEmbedded-core`` defaults and ``poky`` reference distribution).
    If not, set in your distro config file or in ``local.conf``::
 
-      DISTRO_FEATURES_append = " debuginfod"
+      DISTRO_FEATURES:append = " debuginfod"
 
    This distro feature enables the server and client library in ``elfutils``,
    and enables ``debuginfod`` support in clients (at the moment, ``gdb`` and ``binutils``).
@@ -9802,7 +9811,7 @@ debugger.
    Make the following addition in either your ``local.conf`` file or in
    an image recipe::
 
-      IMAGE_INSTALL_append = " gdbserver"
+      IMAGE_INSTALL:append = " gdbserver"
 
    The change makes
    sure the ``gdbserver`` package is included.
@@ -9938,21 +9947,21 @@ To support this kind of debugging, you need do the following:
 -  Ensure that GDB is on the target. You can do this by adding "gdb" to
    :term:`IMAGE_INSTALL`::
 
-      IMAGE_INSTALL_append = " gdb"
+      IMAGE_INSTALL:append = " gdb"
 
    Alternatively, you can add "tools-debug" to :term:`IMAGE_FEATURES`::
 
-      IMAGE_FEATURES_append = " tools-debug"
+      IMAGE_FEATURES:append = " tools-debug"
 
 -  Ensure that debug symbols are present. You can make sure these
    symbols are present by installing ``-dbg``::
 
-      IMAGE_INSTALL_append = "packagename-dbg"
+      IMAGE_INSTALL:append = "packagename-dbg"
 
    Alternatively, you can do the following to include
    all the debug symbols::
 
-      IMAGE_FEATURES_append = " dbg-pkgs"
+      IMAGE_FEATURES:append = " dbg-pkgs"
 
 .. note::
 
@@ -11131,6 +11140,75 @@ Enabling vulnerabily tracking in recipes
 The :term:`CVE_PRODUCT` variable defines the name used to match the recipe name
 against the name in the upstream `NIST CVE database <https://nvd.nist.gov/>`__.
 
+Editing recipes to fix vulnerabilities
+--------------------------------------
+
+To fix a given known vulnerability, you need to add a patch file to your recipe. Here's
+an example from the :oe_layerindex:`ffmpeg recipe</layerindex/recipe/47350>`::
+
+   SRC_URI = "https://www.ffmpeg.org/releases/${BP}.tar.xz \
+              file://0001-libavutil-include-assembly-with-full-path-from-sourc.patch \
+              file://fix-CVE-2020-20446.patch \
+              file://fix-CVE-2020-20453.patch \
+              file://fix-CVE-2020-22015.patch \
+              file://fix-CVE-2020-22021.patch \
+              file://fix-CVE-2020-22033-CVE-2020-22019.patch \
+              file://fix-CVE-2021-33815.patch \
+
+The :ref:`cve-check <ref-classes-cve-check>` class defines two ways of
+supplying a patch for a given CVE. The first
+way is to use a patch filename that matches the below pattern::
+
+   cve_file_name_match = re.compile(".*([Cc][Vv][Ee]\-\d{4}\-\d+)")
+
+As shown in the example above, multiple CVE IDs can appear in a patch filename,
+but the :ref:`cve-check <ref-classes-cve-check>` class will only consider
+the last CVE ID in the filename as patched.
+
+The second way to recognize a patched CVE ID is when a line matching the
+below pattern is found in any patch file provided by the recipe::
+
+  cve_match = re.compile("CVE:( CVE\-\d{4}\-\d+)+")
+
+This allows a single patch file to address multiple CVE IDs at the same time.
+
+Of course, another way to fix vulnerabilities is to upgrade to a version
+of the package which is not impacted, typically a more recent one.
+The NIST database knows which versions are vulnerable and which ones
+are not.
+
+Last but not least, you can choose to ignore vulnerabilities through
+the :term:`CVE_CHECK_PN_WHITELIST` and :term:`CVE_CHECK_WHITELIST`
+variables.
+
+Implementation details
+----------------------
+
+Here's what the :ref:`cve-check <ref-classes-cve-check>` class does to
+find unpatched CVE IDs.
+
+First the code goes through each patch file provided by a recipe. If a valid CVE ID
+is found in the name of the file, the corresponding CVE is considered as patched.
+Don't forget that if multiple CVE IDs are found in the filename, only the last
+one is considered. Then, the code looks for ``CVE: CVE-ID`` lines in the patch
+file. The found CVE IDs are also considered as patched.
+
+Then, the code looks up all the CVE IDs in the NIST database for all the
+products defined in :term:`CVE_PRODUCT`. Then, for each found CVE:
+
+ - If the package name (:term:`PN`) is part of
+   :term:`CVE_CHECK_PN_WHITELIST`, it is considered as patched.
+
+ - If the CVE ID is part of :term:`CVE_CHECK_WHITELIST`, it is
+   considered as patched too.
+
+ - If the CVE ID is part of the patched CVE for the recipe, it is
+   already considered as patched.
+
+ - Otherwise, the code checks whether the recipe version (:term:`PV`)
+   is within the range of versions impacted by the CVE. If so, the CVE
+   is considered as unpatched.
+
 The CVE database is stored in :term:`DL_DIR` and can be inspected using
 ``sqlite3`` command as follows::
 
@@ -11274,7 +11352,7 @@ support, include the "wayland" flag in the
 :term:`DISTRO_FEATURES`
 statement in your ``local.conf`` file::
 
-   DISTRO_FEATURES_append = " wayland"
+   DISTRO_FEATURES:append = " wayland"
 
 .. note::
 

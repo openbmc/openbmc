@@ -82,12 +82,15 @@ QB_OPT_APPEND:append = " -nographic"
 # RISC-V tunes set the BIOS, unset, and instruct QEMU to
 # ignore the BIOS and boot from -kernel
 QB_DEFAULT_BIOS:qemuriscv64 = ""
+QB_DEFAULT_BIOS:qemuriscv32 = ""
 QB_OPT_APPEND:append:qemuriscv64 = " -bios none"
+QB_OPT_APPEND:append:qemuriscv32 = " -bios none"
 
 
 # Use the medium-any code model for the RISC-V 64 bit implementation,
 # since medlow can only access addresses below 0x80000000 and RAM
 # starts at 0x80000000 on RISC-V 64
+# Keep RISC-V 32 using -mcmodel=medlow (symbols lie between -2GB:2GB)
 CFLAGS:append:qemuriscv64 = " -mcmodel=medany"
 
 

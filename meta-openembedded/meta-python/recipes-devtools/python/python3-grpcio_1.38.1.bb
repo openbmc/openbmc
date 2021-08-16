@@ -34,6 +34,7 @@ BORING_SSL:arm = "1"
 BORING_SSL ?= "0"
 export GRPC_BUILD_WITH_BORING_SSL_ASM = "${BORING_SSL}"
 
+GRPC_CFLAGS ?= ""
 GRPC_CFLAGS:append:toolchain-clang = " -fvisibility=hidden -fno-wrapv -fno-exceptions"
 export GRPC_PYTHON_CFLAGS = "${GRPC_CFLAGS}"
 

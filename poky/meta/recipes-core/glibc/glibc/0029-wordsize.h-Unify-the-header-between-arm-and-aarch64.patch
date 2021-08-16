@@ -1,4 +1,4 @@
-From 2ae3ff3ae28abb1d0d100b4722da7ff188de9a30 Mon Sep 17 00:00:00 2001
+From baba3c6021340a9070b734f931a15cea4cfe6c31 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 May 2020 17:05:45 -0700
 Subject: [PATCH] wordsize.h: Unify the header between arm and aarch64
@@ -50,7 +50,7 @@ index 91da566b74..34fcdef1f1 100644
  /* Determine the wordsize from the preprocessor defines.
  
 -   Copyright (C) 2016-2021 Free Software Foundation, Inc.
-+   Copyright (C) 2016-2021 Free Software Foundation, Inc.
++   Copyright (C) 2016-2020 Free Software Foundation, Inc.
     This file is part of the GNU C Library.
  
     The GNU C Library is free software; you can redistribute it and/or

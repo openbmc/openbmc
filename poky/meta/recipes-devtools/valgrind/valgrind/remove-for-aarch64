@@ -236,3 +236,5 @@ memcheck/tests/wrapmallocstatic
 memcheck/tests/writev1
 memcheck/tests/xml1
 memcheck/tests/linux/stack_changes
+gdbserver_tests/hginfo
+memcheck/tests/linux/timerfd-syscall

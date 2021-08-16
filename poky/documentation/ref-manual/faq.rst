@@ -301,7 +301,7 @@ As an example, you could add a specific server for the build system to
 attempt before any others by adding something like the following to the
 ``local.conf`` configuration file::
 
-   PREMIRRORS_prepend = "\
+   PREMIRRORS:prepend = "\
        git://.*/.* http://www.yoctoproject.org/sources/ \n \
        ftp://.*/.* http://www.yoctoproject.org/sources/ \n \
        http://.*/.* http://www.yoctoproject.org/sources/ \n \
@@ -341,7 +341,7 @@ Finally, consider an example where you are behind an HTTP-only firewall.
 You could make the following changes to the ``local.conf`` configuration
 file as long as the :term:`PREMIRRORS` server is current::
 
-   PREMIRRORS_prepend = "\
+   PREMIRRORS:prepend = "\
        ftp://.*/.* http://www.yoctoproject.org/sources/ \n \
        http://.*/.* http://www.yoctoproject.org/sources/ \n \
        https://.*/.* http://www.yoctoproject.org/sources/ \n"

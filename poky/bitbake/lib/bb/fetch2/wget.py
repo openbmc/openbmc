@@ -52,13 +52,19 @@ class WgetProgressHandler(bb.progress.LineFilterProgressHandler):
 
 
 class Wget(FetchMethod):
+    """Class to fetch urls via 'wget'"""
 
     # CDNs like CloudFlare may do a 'browser integrity test' which can fail
     # with the standard wget/urllib User-Agent, so pretend to be a modern
     # browser.
     user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0"
 
-    """Class to fetch urls via 'wget'"""
+    def check_certs(self, d):
+        """
+        Should certificates be checked?
+        """
+        return (d.getVar("BB_CHECK_SSL_CERTS") or "1") != "0"
+
     def supports(self, ud, d):
         """
         Check to see if a given url can be fetched with wget.
@@ -82,7 +88,10 @@ class Wget(FetchMethod):
         if not ud.localfile:
             ud.localfile = d.expand(urllib.parse.unquote(ud.host + ud.path).replace("/", "."))
 
-        self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate"
+        self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget -t 2 -T 30 --passive-ftp"
+
+        if not self.check_certs(d):
+            self.basecmd += " --no-check-certificate"
 
     def _runwget(self, ud, d, command, quiet, workdir=None):
 
@@ -282,19 +291,44 @@ class Wget(FetchMethod):
                 newreq = urllib.request.HTTPRedirectHandler.redirect_request(self, req, fp, code, msg, headers, newurl)
                 newreq.get_method = req.get_method
                 return newreq
-        exported_proxies = export_proxies(d)
 
-        handlers = [FixedHTTPRedirectHandler, HTTPMethodFallback]
-        if exported_proxies:
-            handlers.append(urllib.request.ProxyHandler())
-        handlers.append(CacheHTTPHandler())
-        # Since Python 2.7.9 ssl cert validation is enabled by default
-        # see PEP-0476, this causes verification errors on some https servers
-        # so disable by default.
-        import ssl
-        if hasattr(ssl, '_create_unverified_context'):
-            handlers.append(urllib.request.HTTPSHandler(context=ssl._create_unverified_context()))
-        opener = urllib.request.build_opener(*handlers)
+        # We need to update the environment here as both the proxy and HTTPS
+        # handlers need variables set. The proxy needs http_proxy and friends to
+        # be set, and HTTPSHandler ends up calling into openssl to load the
+        # certificates. In buildtools configurations this will be looking at the
+        # wrong place for certificates by default: we set SSL_CERT_FILE to the
+        # right location in the buildtools environment script but as BitBake
+        # prunes prunes the environment this is lost. When binaries are executed
+        # runfetchcmd ensures these values are in the environment, but this is
+        # pure Python so we need to update the environment.
+        #
+        # Avoid tramping the environment too much by using bb.utils.environment
+        # to scope the changes to the build_opener request, which is when the
+        # environment lookups happen.
+        newenv = {}
+        for name in bb.fetch2.FETCH_EXPORT_VARS:
+            value = d.getVar(name)
+            if not value:
+                origenv = d.getVar("BB_ORIGENV")
+                if origenv:
+                    value = origenv.getVar(name)
+            if value:
+                newenv[name] = value
+
+        with bb.utils.environment(**newenv):
+            import ssl
+
+            if self.check_certs(d):
+                context = ssl.create_default_context()
+            else:
+                context = ssl._create_unverified_context()
+
+            handlers = [FixedHTTPRedirectHandler,
+                        HTTPMethodFallback,
+                        urllib.request.ProxyHandler(),
+                        CacheHTTPHandler(),
+                        urllib.request.HTTPSHandler(context=context)]
+            opener = urllib.request.build_opener(*handlers)
 
         try:
             uri = ud.url.split(";")[0]

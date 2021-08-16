@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "7d550dccdfcd286e33895501829ed971eeb65c614e73aadb4a08aeef71
 inherit autotools pkgconfig gettext bash-completion gtk-doc
 
 #default disable regression tests, some unit test code in non testing code
-#PACKAGECONFIG_pn-${PN} = "tests" enable regression tests local.conf
+#PACKAGECONFIG:pn-${PN} = "tests" enable regression tests local.conf
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[tests] = "--enable-tests,,,"
 

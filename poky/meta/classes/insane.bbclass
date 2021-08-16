@@ -835,11 +835,11 @@ def package_qa_check_deps(pkg, pkgdest, d):
         try:
             rvar = bb.utils.explode_dep_versions2(localdata.getVar(var) or "")
         except ValueError as e:
-            bb.fatal("%s_%s: %s" % (var, pkg, e))
+            bb.fatal("%s:%s: %s" % (var, pkg, e))
         for dep in rvar:
             for v in rvar[dep]:
                 if v and not v.startswith(('< ', '= ', '> ', '<= ', '>=')):
-                    error_msg = "%s_%s is invalid: %s (%s)   only comparisons <, =, >, <=, and >= are allowed" % (var, pkg, dep, v)
+                    error_msg = "%s:%s is invalid: %s (%s)   only comparisons <, =, >, <=, and >= are allowed" % (var, pkg, dep, v)
                     package_qa_handle_error("dep-cmp", error_msg, d)
 
     check_valid_deps('RDEPENDS')
@@ -888,7 +888,7 @@ def package_qa_check_expanded_d(package, d, messages):
     expanded_d = d.getVar('D')
 
     for var in 'FILES','pkg_preinst', 'pkg_postinst', 'pkg_prerm', 'pkg_postrm':
-        bbvar = d.getVar(var + "_" + package) or ""
+        bbvar = d.getVar(var + ":" + package) or ""
         if expanded_d in bbvar:
             if var == 'FILES':
                 package_qa_add_message(messages, "expanded-d", "FILES in %s recipe should not contain the ${D} variable as it references the local build directory not the target filesystem, best solution is to remove the ${D} reference" % package)
@@ -1325,10 +1325,10 @@ python () {
     if prog.search(pn):
         package_qa_handle_error("uppercase-pn", 'PN: %s is upper case, this can result in unexpected behavior.' % pn, d)
 
-    # Some people mistakenly use DEPENDS_${PN} instead of DEPENDS and wonder
+    # Some people mistakenly use DEPENDS:${PN} instead of DEPENDS and wonder
     # why it doesn't work.
-    if (d.getVar(d.expand('DEPENDS_${PN}'))):
-        package_qa_handle_error("pkgvarcheck", "recipe uses DEPENDS_${PN}, should use DEPENDS", d)
+    if (d.getVar(d.expand('DEPENDS:${PN}'))):
+        package_qa_handle_error("pkgvarcheck", "recipe uses DEPENDS:${PN}, should use DEPENDS", d)
 
     issues = []
     if (d.getVar('PACKAGES') or "").split():

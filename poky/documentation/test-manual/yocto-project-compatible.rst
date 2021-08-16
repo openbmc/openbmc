@@ -115,6 +115,11 @@ Here are key best practices the program tries to encourage:
    user changes a configuration setting to activate the layer, by selecting
    a :term:`MACHINE`, a :term:`DISTRO` or a :term:`DISTRO_FEATURES` setting.
 
+-  Layers should be documenting where they don’t support normal "core"
+   functionality such as where debug symbols are disabled or missing, where
+   development headers and on-target library usage may not work or where
+   functionality like the SDK/eSDK would not be expected to work.
+
 The project does test the compatibility status of the core project layers on
 its :doc:`Autobuilder </test-manual/understand-autobuilder>`.
 

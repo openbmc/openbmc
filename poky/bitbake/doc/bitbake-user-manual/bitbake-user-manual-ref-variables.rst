@@ -93,6 +93,10 @@ overview of their function and contents.
       fetcher does not attempt to use the host listed in :term:`SRC_URI` after
       a successful fetch from the :term:`PREMIRRORS` occurs.
 
+   :term:`BB_CHECK_SSL_CERTS`
+      Specifies if SSL certificates should be checked when fetching. The default
+      value is ``1`` and certificates are not checked if the value is set to ``0``.
+
    :term:`BB_CONSOLELOG`
       Specifies the path to a log file into which BitBake's user interface
       writes output during the build.

@@ -29,7 +29,7 @@ RDEPENDS:${PN} = "\
 "
 
 RDEPENDS:${PN}-ptest = "perl-module-lib perl-module-test-more"
-#RSUGGESTS_${PN}-ptest = "libmojo-base-perl"
+#RSUGGESTS:${PN}-ptest = "libmojo-base-perl"
 
 do_install () {
     cpan_do_install

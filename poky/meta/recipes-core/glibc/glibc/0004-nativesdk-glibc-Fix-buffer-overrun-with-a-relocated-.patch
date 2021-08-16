@@ -1,4 +1,4 @@
-From aa8393bff257e4badfd208b88473ead175c69362 Mon Sep 17 00:00:00 2001
+From df18bae1eeee55ecb9db36d13fe67c58355682eb Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:50:00 +0000
 Subject: [PATCH] nativesdk-glibc: Fix buffer overrun with a relocated SDK
@@ -21,10 +21,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 12 insertions(+)
 
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index ad01674027..f455207e79 100644
+index d09daf9e41..2c6270e2a7 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -1871,7 +1871,19 @@ open_path (const char *name, size_t namelen, int mode,
+@@ -1892,7 +1892,19 @@ open_path (const char *name, size_t namelen, int mode,
         given on the command line when rtld is run directly.  */
      return -1;
  

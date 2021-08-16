@@ -1,0 +1,34 @@
+From 2731fa0c7463cd160361a8ac92f3bd7f984d953d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 18 Mar 2015 00:33:03 +0000
+Subject: [PATCH] timezone: re-written tzselect as posix sh
+
+To avoid the bash dependency.
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ timezone/tzselect.ksh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/timezone/tzselect.ksh b/timezone/tzselect.ksh
+index 18fce27e24..7705df83d7 100755
+--- a/timezone/tzselect.ksh
++++ b/timezone/tzselect.ksh
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ # Ask the user about the time zone, and output the resulting TZ value to stdout.
+ # Interact with the user via stderr and stdin.
+ 
+@@ -34,7 +34,7 @@ REPORT_BUGS_TO=tz@iana.org
+ 
+ # Specify default values for environment variables if they are unset.
+ : ${AWK=awk}
+-: ${TZDIR=`pwd`}
++: ${TZDIR=$(pwd)}
+ 
+ # Output one argument as-is to standard output.
+ # Safer than 'echo', which can mishandle '\' or leading '-'.

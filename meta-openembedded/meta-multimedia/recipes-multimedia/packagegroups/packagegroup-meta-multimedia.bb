@@ -66,6 +66,7 @@ RDEPENDS:packagegroup-meta-multimedia = "\
     mycroft \
     openal-soft \
     opusfile \
+    opus-tools \
     libdvdcss \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", bb.utils.contains("DISTRO_FEATURES", "x11", "vlc", "", d), "", d)} \
     ${@bb.utils.contains("LICENSE_FLAGS_WHITELIST", "commercial", "sox streamripper", "", d)} \

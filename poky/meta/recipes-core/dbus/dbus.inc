@@ -8,6 +8,7 @@ SRC_URI = "https://dbus.freedesktop.org/releases/dbus/dbus-${PV}.tar.gz \
            file://tmpdir.patch \
            file://dbus-1.init \
            file://clear-guid_from_server-if-send_negotiate_unix_f.patch \
+           file://stop_using_selinux_set_mapping.patch \
 "
 
 SRC_URI[md5sum] = "dfe8a71f412e0b53be26ed4fbfdc91c4"
@@ -15,12 +16,10 @@ SRC_URI[sha256sum] = "f77620140ecb4cdc67f37fb444f8a6bea70b5b6461f12f1cbe2cec60fa
 
 EXTRA_OECONF = "--disable-xml-docs \
                 --disable-doxygen-docs \
-                --disable-libaudit \
                 --enable-largefile \
                 --with-system-socket=/run/dbus/system_bus_socket \
                 "
 EXTRA_OECONF:append:class-target = " SYSTEMCTL=${base_bindir}/systemctl"
-EXTRA_OECONF:append:class-native = " --disable-selinux"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd x11', d)} \
                    user-session \
@@ -32,3 +31,5 @@ PACKAGECONFIG[systemd] = "--enable-systemd --with-systemdsystemunitdir=${systemd
 PACKAGECONFIG[x11] = "--with-x --enable-x11-autolaunch,--without-x --disable-x11-autolaunch, virtual/libx11 libsm"
 PACKAGECONFIG[user-session] = "--enable-user-session --with-systemduserunitdir=${systemd_user_unitdir},--disable-user-session"
 PACKAGECONFIG[verbose-mode] = "--enable-verbose-mode,,,"
+PACKAGECONFIG[audit] = "--enable-libaudit,--disable-libaudit,audit"
+PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"

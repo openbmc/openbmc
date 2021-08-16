@@ -65,13 +65,17 @@ Here is an example that uses "/" as the mountpoint. The command uses
 Here is a list that describes other supported options you can use with
 the ``part`` and ``partition`` commands:
 
--  ``--size``: The minimum partition size in MBytes. Specify an
-   integer value such as 500. Do not append the number with "MB". You do
-   not need this option if you use ``--source``.
+-  ``--size``: The minimum partition size. Specify as an integer value
+   optionally followed by one of the units "k" / "K" for kibibyte,
+   "M" for mebibyte and "G" for gibibyte. The default unit if none is
+   given is "M". You do not need this option if you use ``--source``.
 
--  ``--fixed-size``: The exact partition size in MBytes. You cannot
-   specify with ``--size``. An error occurs when assembling the disk
-   image if the partition data is larger than ``--fixed-size``.
+-  ``--fixed-size``: The exact partition size. Specify as an integer
+   value optionally followed by one of the units "k" / "K" for kibibyte,
+   "M" for mebibyte and "G" for gibibyte. The default unit if none is
+   given is "M".  Cannot be specify together with ``--size``. An error
+   occurs when assembling the disk image if the partition data is larger
+   than ``--fixed-size``.
 
 -  ``--source``: This option is a Wic-specific option that names the
    source of the data that populates the partition. The most common
@@ -134,10 +138,13 @@ the ``part`` and ``partition`` commands:
 -  ``--align (in KBytes)``: This option is a Wic-specific option that
    says to start partitions on boundaries given x KBytes.
 
--  ``--offset (in KBytes)``: This option is a Wic-specific option that
+-  ``--offset``: This option is a Wic-specific option that
    says to place a partition at exactly the specified offset. If the
    partition cannot be placed at the specified offset, the image build
-   will fail.
+   will fail. Specify as an integer value optionally followed by one of
+   the units "s" / "S" for 512 byte sector, "k" / "K" for kibibyte, "M"
+   for mebibyte and "G" for gibibyte. The default unit if none is given
+   is "k".
 
 -  ``--no-table``: This option is a Wic-specific option. Using the
    option reserves space for the partition and causes it to become
@@ -151,7 +158,10 @@ the ``part`` and ``partition`` commands:
 -  ``--extra-space``: This option is a Wic-specific option that adds
    extra space after the space filled by the content of the partition.
    The final size can exceed the size specified by the ``--size``
-   option. The default value is 10 Mbytes.
+   option. The default value is 10M. Specify as an integer value
+   optionally followed by one of the units "k" / "K" for kibibyte, "M"
+   for mebibyte and "G" for gibibyte. The default unit if none is given
+   is "M".
 
 -  ``--overhead-factor``: This option is a Wic-specific option that
    multiplies the size of the partition by the option's value. You must

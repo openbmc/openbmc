@@ -705,6 +705,7 @@ def sstate_package(ss, d):
             pass
         except OSError as e:
             # Handle read-only file systems gracefully
+            import errno
             if e.errno != errno.EROFS:
                 raise e
 
@@ -1152,6 +1153,7 @@ python sstate_eventhandler() {
                 pass
             except OSError as e:
                 # Handle read-only file systems gracefully
+                import errno
                 if e.errno != errno.EROFS:
                     raise e
 

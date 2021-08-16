@@ -8,12 +8,12 @@ def pypi_package(d):
 
 PYPI_PACKAGE ?= "${@pypi_package(d)}"
 PYPI_PACKAGE_EXT ?= "tar.gz"
+PYPI_ARCHIVE_NAME ?= "${PYPI_PACKAGE}-${PV}.${PYPI_PACKAGE_EXT}"
 
 def pypi_src_uri(d):
     package = d.getVar('PYPI_PACKAGE')
-    package_ext = d.getVar('PYPI_PACKAGE_EXT')
-    pv = d.getVar('PV')
-    return 'https://files.pythonhosted.org/packages/source/%s/%s/%s-%s.%s' % (package[0], package, package, pv, package_ext)
+    archive_name = d.getVar('PYPI_ARCHIVE_NAME')
+    return 'https://files.pythonhosted.org/packages/source/%s/%s/%s' % (package[0], package, archive_name)
 
 PYPI_SRC_URI ?= "${@pypi_src_uri(d)}"
 

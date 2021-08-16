@@ -93,7 +93,7 @@ PACKAGECONFIG ??= " \
     userdb \
     utmp \
     vconsole \
-    xz \
+    zstd \
 "
 
 PACKAGECONFIG:remove:libc-musl = " \
@@ -199,6 +199,7 @@ PACKAGECONFIG[xdg-autostart] = "-Dxdg-autostart=true,-Dxdg-autostart=false"
 PACKAGECONFIG[xkbcommon] = "-Dxkbcommon=true,-Dxkbcommon=false,libxkbcommon"
 PACKAGECONFIG[xz] = "-Dxz=true,-Dxz=false,xz"
 PACKAGECONFIG[zlib] = "-Dzlib=true,-Dzlib=false,zlib"
+PACKAGECONFIG[zstd] = "-Dzstd=true,-Dzstd=false,zstd"
 
 # Helper variables to clarify locations.  This mirrors the logic in systemd's
 # build system.

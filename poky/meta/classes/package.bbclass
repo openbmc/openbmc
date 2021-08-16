@@ -1663,12 +1663,12 @@ fi
                 val = write_if_exists(sf, pkg, var)
 
             write_if_exists(sf, pkg, 'FILERPROVIDESFLIST')
-            for dfile in (d.getVar('FILERPROVIDESFLIST_' + pkg) or "").split():
-                write_if_exists(sf, pkg, 'FILERPROVIDES_' + dfile)
+            for dfile in (d.getVar('FILERPROVIDESFLIST:' + pkg) or "").split():
+                write_if_exists(sf, pkg, 'FILERPROVIDES:' + dfile)
 
             write_if_exists(sf, pkg, 'FILERDEPENDSFLIST')
-            for dfile in (d.getVar('FILERDEPENDSFLIST_' + pkg) or "").split():
-                write_if_exists(sf, pkg, 'FILERDEPENDS_' + dfile)
+            for dfile in (d.getVar('FILERDEPENDSFLIST:' + pkg) or "").split():
+                write_if_exists(sf, pkg, 'FILERDEPENDS:' + dfile)
 
             sf.write('%s_%s: %d\n' % ('PKGSIZE', pkg, total_size))
 
@@ -1714,11 +1714,11 @@ RPMDEPS = "${STAGING_LIBDIR_NATIVE}/rpm/rpmdeps --alldeps --define '__font_provi
 
 # Collect perfile run-time dependency metadata
 # Output:
-#  FILERPROVIDESFLIST_pkg - list of all files w/ deps
-#  FILERPROVIDES_filepath_pkg - per file dep
+#  FILERPROVIDESFLIST:pkg - list of all files w/ deps
+#  FILERPROVIDES:filepath:pkg - per file dep
 #
-#  FILERDEPENDSFLIST_pkg - list of all files w/ deps
-#  FILERDEPENDS_filepath_pkg - per file dep
+#  FILERDEPENDSFLIST:pkg - list of all files w/ deps
+#  FILERDEPENDS:filepath:pkg - per file dep
 
 python package_do_filedeps() {
     if d.getVar('SKIP_FILEDEPS') == '1':
@@ -1755,18 +1755,18 @@ python package_do_filedeps() {
 
         for file in sorted(provides):
             provides_files[pkg].append(file)
-            key = "FILERPROVIDES_" + file + "_" + pkg
+            key = "FILERPROVIDES:" + file + ":" + pkg
             d.appendVar(key, " " + " ".join(provides[file]))
 
         for file in sorted(requires):
             requires_files[pkg].append(file)
-            key = "FILERDEPENDS_" + file + "_" + pkg
+            key = "FILERDEPENDS:" + file + ":" + pkg
             d.appendVar(key, " " + " ".join(requires[file]))
 
     for pkg in requires_files:
-        d.setVar("FILERDEPENDSFLIST_" + pkg, " ".join(requires_files[pkg]))
+        d.setVar("FILERDEPENDSFLIST:" + pkg, " ".join(requires_files[pkg]))
     for pkg in provides_files:
-        d.setVar("FILERPROVIDESFLIST_" + pkg, " ".join(provides_files[pkg]))
+        d.setVar("FILERPROVIDESFLIST:" + pkg, " ".join(provides_files[pkg]))
 }
 
 SHLIBSDIRS = "${WORKDIR_PKGDATA}/${MLPREFIX}shlibs2"

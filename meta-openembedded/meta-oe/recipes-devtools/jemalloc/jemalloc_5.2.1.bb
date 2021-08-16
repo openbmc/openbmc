@@ -13,14 +13,31 @@ SECTION = "libs"
 
 LIC_FILES_CHKSUM = "file://README;md5=6900e4a158982e4c4715bf16aa54fa10"
 
-SRC_URI = "git://github.com/jemalloc/jemalloc.git"
+SRC_URI = "git://github.com/jemalloc/jemalloc.git \
+           file://0001-Makefile.in-make-sure-doc-generated-before-install.patch \
+           file://run-ptest \
+"
 
 SRCREV = "ea6b3e973b477b8061e0076bb257dbd7f3faa756"
 
 S = "${WORKDIR}/git"
 
-inherit autotools
+inherit autotools ptest
 
 EXTRA_AUTORECONF += "--exclude=autoheader"
 
 EXTRA_OECONF:append:libc-musl = " --with-jemalloc-prefix=je_"
+
+do_compile_ptest() {
+	oe_runmake tests
+}
+
+do_install_ptest() {
+	install -d ${D}${PTEST_PATH}/tests
+	subdirs="test/unit test/integration test/stress "
+	for tooltest in ${subdirs}
+	do
+		cp -r ${B}/${tooltest} ${D}${PTEST_PATH}/tests
+	done
+	find ${D}${PTEST_PATH}/tests \( -name "*.d" -o -name "*.o" \) -exec rm -f {} \;
+}

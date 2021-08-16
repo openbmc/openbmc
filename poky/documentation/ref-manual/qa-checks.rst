@@ -223,7 +223,7 @@ Errors and Warnings
    software that reads :term:`CFLAGS` when you build it,
    you could add the following to your recipe::
 
-      CFLAGS_append = " -fPIC "
+      CFLAGS:append = " -fPIC "
 
    For more information on text relocations at runtime, see
    https://www.akkadia.org/drepper/textrelocs.html.
@@ -263,7 +263,7 @@ Errors and Warnings
 
    The ``/usr/share/info/dir`` should not be packaged. Add the following
    line to your :ref:`ref-tasks-install` task or to your
-   ``do_install_append`` within the recipe as follows::
+   ``do_install:append`` within the recipe as follows::
 
       rm ${D}${infodir}/dir
    
@@ -347,7 +347,7 @@ Errors and Warnings
     
 .. _qa-check-dep-cmp:
 
--  ``<var>_<packagename> is invalid: <comparison> (<value>)   only comparisons <, =, >, <=, and >= are allowed [dep-cmp]``
+-  ``<var>:<packagename> is invalid: <comparison> (<value>)   only comparisons <, =, >, <=, and >= are allowed [dep-cmp]``
 
    If you are adding a versioned dependency relationship to one of the
    dependency variables (:term:`RDEPENDS`,
@@ -454,14 +454,14 @@ Errors and Warnings
    ``pkg_preinst``, ``pkg_postinst``, ``pkg_prerm``, ``pkg_postrm``, and
    :term:`ALLOW_EMPTY`) should always be set specific
    to a package (i.e. they should be set with a package name override
-   such as ``RDEPENDS_${PN} = "value"`` rather than
+   such as ``RDEPENDS:${PN} = "value"`` rather than
    ``RDEPENDS = "value"``). If you receive this error, correct any
    assignments to these variables within your recipe.
 
 
-- ``recipe uses DEPENDS_${PN}, should use DEPENDS [pkgvarcheck]``
+- ``recipe uses DEPENDS:${PN}, should use DEPENDS [pkgvarcheck]``
 
-   This check looks for instances of setting ``DEPENDS_${PN}``
+   This check looks for instances of setting ``DEPENDS:${PN}``
    which is erroneous (:term:`DEPENDS` is a recipe-wide variable and thus
    it is not correct to specify it for a particular package, nor will such
    an assignment actually work.) Set :term:`DEPENDS` instead.
@@ -524,7 +524,7 @@ Errors and Warnings
    following:
 
    -  Add the files to :term:`FILES` for the package you want them to appear
-      in (e.g. ``FILES_${``\ :term:`PN`\ ``}`` for the main
+      in (e.g. ``FILES:${``\ :term:`PN`\ ``}`` for the main
       package).
 
    -  Delete the files at the end of the ``do_install`` task if the
@@ -539,18 +539,18 @@ Errors and Warnings
    when a recipe has been renamed. However, if that is not the case, the
    message might indicate that a private version of a library is being
    erroneously picked up as the provider for a common library. If that
-   is the case, you should add the library's ``.so`` file name to
+   is the case, you should add the library's ``.so`` filename to
    :term:`PRIVATE_LIBS` in the recipe that provides
    the private version of the library.
 
 
 .. _qa-check-unlisted-pkg-lics:
 
--  ``LICENSE_<packagename> includes licenses (<licenses>) that are not listed in LICENSE [unlisted-pkg-lics]``
+-  ``LICENSE:<packagename> includes licenses (<licenses>) that are not listed in LICENSE [unlisted-pkg-lics]``
 
    The :term:`LICENSE` of the recipe should be a superset
    of all the licenses of all packages produced by this recipe. In other
-   words, any license in ``LICENSE_*`` should also appear in
+   words, any license in ``LICENSE:*`` should also appear in
    :term:`LICENSE`.
 
 
@@ -620,7 +620,7 @@ Errors and Warnings
 
 .. _qa-check-missing-update-alternatives:
 
-- ``<recipename>: recipe defines ALTERNATIVE_<packagename> but doesn't inherit update-alternatives. This might fail during do_rootfs later! [missing-update-alternatives]``
+- ``<recipename>: recipe defines ALTERNATIVE:<packagename> but doesn't inherit update-alternatives. This might fail during do_rootfs later! [missing-update-alternatives]``
 
     This check ensures that if a recipe sets the :term:`ALTERNATIVE` variable that the
     recipe also inherits :ref:`update-alternatives <ref-classes-update-alternatives>` such

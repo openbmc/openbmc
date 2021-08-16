@@ -29,6 +29,6 @@ You can include API documentation as well as any other documentation
 provided by recipes with the standard SDK by adding "api-documentation"
 to the
 :term:`DISTRO_FEATURES`
-variable: DISTRO_FEATURES_append = " api-documentation" Setting this
+variable: DISTRO_FEATURES:append = " api-documentation" Setting this
 variable as shown here causes the OpenEmbedded build system to build the
 documentation and then include it in the standard SDK.

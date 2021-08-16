@@ -1,4 +1,4 @@
-From 3ea08e491a8494ff03e598b5e0fc2d8131e75da9 Mon Sep 17 00:00:00 2001
+From 6af8ce8eceed86addbc188f773a2d36d83ee4042 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
 Subject: [PATCH] nativesdk-glibc: Raise the size of arrays containing dl paths
@@ -26,10 +26,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  8 files changed, 16 insertions(+), 10 deletions(-)
 
 diff --git a/elf/dl-cache.c b/elf/dl-cache.c
-index 32f3bef5ea..71f3a82dc0 100644
+index 2b8da8650d..3d9787bda4 100644
 --- a/elf/dl-cache.c
 +++ b/elf/dl-cache.c
-@@ -359,6 +359,10 @@ search_cache (const char *string_table, uint32_t string_table_size,
+@@ -355,6 +355,10 @@ search_cache (const char *string_table, uint32_t string_table_size,
    return best;
  }
  
@@ -41,7 +41,7 @@ index 32f3bef5ea..71f3a82dc0 100644
  _dl_cache_libcmp (const char *p1, const char *p2)
  {
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index f455207e79..a144e24fcf 100644
+index 2c6270e2a7..23018d2f7e 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
 @@ -115,8 +115,8 @@ enum { ncapstr = 1, max_capstrlen = 0 };
@@ -56,7 +56,7 @@ index f455207e79..a144e24fcf 100644
    SYSTEM_DIRS_LEN
  };
 diff --git a/elf/dl-usage.c b/elf/dl-usage.c
-index 6e26818bd7..f09e8b93e5 100644
+index 5ad3a72559..88f26d3692 100644
 --- a/elf/dl-usage.c
 +++ b/elf/dl-usage.c
 @@ -25,6 +25,8 @@
@@ -77,7 +77,7 @@ index 6e26818bd7..f09e8b93e5 100644
    --library-path PATH   use given PATH instead of content of the environment\n\
                          variable LD_LIBRARY_PATH\n\
    --glibc-hwcaps-prepend LIST\n\
-@@ -266,7 +268,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
+@@ -267,7 +269,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
  \n\
  This program interpreter self-identifies as: " RTLD "\n\
  ",
@@ -98,10 +98,10 @@ index 91966702ca..dc86c20e83 100644
 +const char __invoke_dynamic_linker__[4096] __attribute__ ((section (".interp")))
    = RUNTIME_LINKER;
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index 28ed637a29..5d38a60c5d 100644
+index 1037e8d0cf..ffdac84952 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
-@@ -176,6 +176,9 @@ static struct argp argp =
+@@ -177,6 +177,9 @@ static struct argp argp =
    options, parse_opt, NULL, doc, NULL, more_help, NULL
  };
  
@@ -112,7 +112,7 @@ index 28ed637a29..5d38a60c5d 100644
     a platform.  */
  static int
 diff --git a/elf/rtld.c b/elf/rtld.c
-index 596b6ac3d9..1ccd33f668 100644
+index fbbd60b446..fce9940f80 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
 @@ -185,6 +185,7 @@ dso_name_valid_for_suid (const char *p)
@@ -124,11 +124,11 @@ index 596b6ac3d9..1ccd33f668 100644
  static void
  audit_list_init (struct audit_list *list)
 diff --git a/iconv/gconv_conf.c b/iconv/gconv_conf.c
-index 682f949834..7eed87bc9d 100644
+index 62bee28769..67b60dc88c 100644
 --- a/iconv/gconv_conf.c
 +++ b/iconv/gconv_conf.c
 @@ -36,7 +36,7 @@
- 
+ #include <gconv_parseconfdir.h>
  
  /* This is the default path where we look for module lists.  */
 -static const char default_gconv_path[] = GCONV_PATH;

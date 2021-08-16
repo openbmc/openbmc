@@ -46,9 +46,7 @@ inherit autotools gettext
 
 export CONFIG_SHELL="/bin/sh"
 
-EXTRA_OECONF += "--without-audit \
-                 --without-libcrack \
-                 --without-selinux \
+EXTRA_OECONF += "--without-libcrack \
                  --with-group-name-max-length=24 \
                  --enable-subordinate-ids=yes \
                  --without-sssd \
@@ -81,6 +79,8 @@ PACKAGECONFIG:class-nativesdk = ""
 PACKAGECONFIG[pam] = "--with-libpam,--without-libpam,libpam,${PAM_PLUGINS}"
 PACKAGECONFIG[attr] = "--with-attr,--without-attr,attr"
 PACKAGECONFIG[acl] = "--with-acl,--without-acl,acl"
+PACKAGECONFIG[audit] = "--with-audit,--without-audit,audit"
+PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux libsemanage"
 
 RDEPENDS:${PN} = "shadow-securetty \
                   base-passwd \

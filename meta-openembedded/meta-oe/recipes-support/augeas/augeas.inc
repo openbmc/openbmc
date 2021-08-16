@@ -27,7 +27,7 @@ do_install:append() {
     rm -fr ${D}${datadir}/vim
 }
 
-PACKAGECONFIG ??= ""
-PACKAGECONFIG[libselinux] = "--with-selinux,--without-selinux,libselinux"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
+PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux"
 
 EXTRA_AUTORECONF += "-I ${S}/gnulib/m4"

@@ -404,6 +404,22 @@ cross-compilation tools used for building SDKs. See the
 section in the Yocto Project Overview and Concepts Manual for more
 discussion on these cross-compilation tools.
 
+.. _ref-classes-cve-check:
+
+``cve-check.bbclass``
+=====================
+
+The ``cve-check`` class looks for known CVEs (Common Vulnerabilities
+and Exposures) while building an image. This class is meant to be
+inherited globally from a configuration file::
+
+   INHERIT += "cve-check"
+
+You can also look for vulnerabilities in specific packages by passing
+``-c cve_check`` to BitBake. You will find details in the
+":ref:`dev-manual/common-tasks:checking for vulnerabilities`"
+section in the Development Tasks Manual.
+
 .. _ref-classes-debian:
 
 ``debian.bbclass``
@@ -456,8 +472,8 @@ recipe that fetches from an alternative URI (e.g. Git) instead of a
 tarball. Following is an example::
 
    BBCLASSEXTEND = "devupstream:target"
-   SRC_URI_class-devupstream = "git://git.example.com/example"
-   SRCREV_class-devupstream = "abcd1234"
+   SRC_URI:class-devupstream = "git://git.example.com/example"
+   SRCREV:class-devupstream = "abcd1234"
 
 Adding the above statements to your recipe creates a variant that has
 :term:`DEFAULT_PREFERENCE` set to "-1".
@@ -465,8 +481,8 @@ Consequently, you need to select the variant of the recipe to use it.
 Any development-specific adjustments can be done by using the
 ``class-devupstream`` override. Here is an example::
 
-   DEPENDS_append_class-devupstream = " gperf-native"
-   do_configure_prepend_class-devupstream() {
+   DEPENDS:append:class-devupstream = " gperf-native"
+   do_configure:prepend:class-devupstream() {
        touch ${S}/README
    }
 
@@ -846,7 +862,7 @@ sure that all builders start with the same sstate signatures. After
 inheriting the class, you can then disable the feature by setting the
 :term:`ICECC_DISABLED` variable to "1" as follows::
 
-   INHERIT_DISTRO_append = " icecc"
+   INHERIT_DISTRO:append = " icecc"
    ICECC_DISABLED ??= "1"
 
 This practice
@@ -974,7 +990,7 @@ the check for symbolic link ``.so`` files in the main package of a
 recipe, add the following to the recipe. You need to realize that the
 package name override, in this example ``${PN}``, must be used::
 
-   INSANE_SKIP_${PN} += "dev-so"
+   INSANE_SKIP:${PN} += "dev-so"
 
 Please keep in mind that the QA checks
 are meant to detect real or potential problems in the packaged
@@ -1182,7 +1198,7 @@ Here are the tests you can list with the :term:`WARN_QA` and
    its :term:`PN` value matches something already in :term:`OVERRIDES` (e.g.
    :term:`PN` happens to be the same as :term:`MACHINE` or
    :term:`DISTRO`), it can have unexpected consequences.
-   For example, assignments such as ``FILES_${PN} = "xyz"`` effectively
+   For example, assignments such as ``FILES:${PN} = "xyz"`` effectively
    turn into ``FILES = "xyz"``.
 
 -  ``rpaths:`` Checks for rpaths in the binaries that contain build
@@ -1208,7 +1224,7 @@ Here are the tests you can list with the :term:`WARN_QA` and
 
 -  ``unlisted-pkg-lics:`` Checks that all declared licenses applying
    for a package are also declared on the recipe level (i.e. any license
-   in ``LICENSE_*`` should appear in :term:`LICENSE`).
+   in ``LICENSE:*`` should appear in :term:`LICENSE`).
 
 -  ``useless-rpaths:`` Checks for dynamic library load paths (rpaths)
    in the binaries that by default on a standard system are searched by
@@ -1605,7 +1621,7 @@ a couple different ways:
       BBCLASSEXTEND = "native"
 
    Inside the
-   recipe, use ``_class-native`` and ``_class-target`` overrides to
+   recipe, use ``:class-native`` and ``:class-target`` overrides to
    specify any functionality specific to the respective native or target
    case.
 
@@ -1636,7 +1652,7 @@ couple different ways:
        BBCLASSEXTEND = "nativesdk"
 
    Inside the
-   recipe, use ``_class-nativesdk`` and ``_class-target`` overrides to
+   recipe, use ``:class-nativesdk`` and ``:class-target`` overrides to
    specify any functionality specific to the respective SDK machine or
    target case.
 
@@ -2481,7 +2497,7 @@ indicate the package to which the value applies. If the value applies to
 the recipe's main package, use ``${``\ :term:`PN`\ ``}``. Here
 is an example from the connman recipe::
 
-   SYSTEMD_SERVICE_${PN} = "connman.service"
+   SYSTEMD_SERVICE:${PN} = "connman.service"
 
 Services are set up to start on boot automatically
 unless you have set

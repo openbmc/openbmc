@@ -1,4 +1,4 @@
-From 82be2b7b9758a2f62ee11931da674cd541076041 Mon Sep 17 00:00:00 2001
+From 8b482e618047e94833545dce3a26924ef4f075db Mon Sep 17 00:00:00 2001
 From: Tim Orling <ticotimo@gmail.com>
 Date: Sat, 22 May 2021 11:20:46 -0700
 Subject: [PATCH] Fix man page installation
@@ -9,10 +9,10 @@ Fixes:
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Tim Orling <ticotimo@gmail.com>
+
 ---
  MANIFEST.in | 2 +-
- setup.cfg   | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/MANIFEST.in b/MANIFEST.in
 index 04ec000..937f6f3 100644
@@ -27,20 +27,3 @@ index 04ec000..937f6f3 100644
  
  
  
-diff --git a/setup.cfg b/setup.cfg
-index 37e5204..677c00a 100644
---- a/setup.cfg
-+++ b/setup.cfg
-@@ -56,9 +56,9 @@ console_scripts =
- scons.tool.docbook = *.*
- 
- [options.data_files]
--. = build/doc/man/scons.1
--	build/doc/man/scons-time.1
--	build/doc/man/sconsign.1
-+. = scons.1
-+	scons-time.1
-+	sconsign.1
- 
- [sdist]
- dist-dir = build/dist

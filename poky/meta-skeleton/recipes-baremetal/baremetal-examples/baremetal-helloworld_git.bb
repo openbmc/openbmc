@@ -4,7 +4,7 @@ DESCRIPTION = "These are introductory examples to showcase the use of QEMU to ru
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=39346640a23c701e4f459e05f56f4449"
 
-SRCREV = "0bf9ea216e6f76be50726a3a74e527b7bbb0ad93"
+SRCREV = "31b4e5a337018b4a00a7426b0e5ed83b81df30c7"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://github.com/aehs29/baremetal-helloqemu.git;protocol=https;branch=master"
@@ -28,13 +28,14 @@ inherit baremetal-image
 # machine that QEMU uses on OE, e.g. -machine virt -cpu cortex-a57
 # but the examples can also be run on other architectures/machines
 # such as vexpress-a15 by overriding the setting on the machine.conf
-COMPATIBLE_MACHINE = "qemuarmv5|qemuarm|qemuarm64|qemuriscv64"
+COMPATIBLE_MACHINE = "qemuarmv5|qemuarm|qemuarm64|qemuriscv64|qemuriscv32"
 
 BAREMETAL_QEMUARCH ?= ""
 BAREMETAL_QEMUARCH:qemuarmv5 = "versatile"
 BAREMETAL_QEMUARCH:qemuarm = "arm"
 BAREMETAL_QEMUARCH:qemuarm64 = "aarch64"
 BAREMETAL_QEMUARCH:qemuriscv64 = "riscv64"
+BAREMETAL_QEMUARCH:qemuriscv32 = "riscv32"
 
 EXTRA_OEMAKE:append = " QEMUARCH=${BAREMETAL_QEMUARCH} V=1"
 

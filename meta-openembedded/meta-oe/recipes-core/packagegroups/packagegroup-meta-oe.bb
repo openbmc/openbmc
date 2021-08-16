@@ -525,6 +525,7 @@ RDEPENDS:packagegroup-meta-oe-graphics ="\
     ttf-gentium \
     ttf-hunky-sans \
     ttf-hunky-serif \
+    ttf-ipa \
     ttf-lohit \
     ttf-inconsolata \
     ttf-liberation-sans-narrow \
@@ -668,7 +669,6 @@ RDEPENDS:packagegroup-meta-oe-multimedia ="\
     live555-examples \
     live555-mediaserver \
     libmikmod \
-    opus-tools \
     libmodplug \
     sound-theme-freedesktop \
     yavta \

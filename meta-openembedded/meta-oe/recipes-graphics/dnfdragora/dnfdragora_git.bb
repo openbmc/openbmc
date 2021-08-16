@@ -17,7 +17,7 @@ S = "${WORKDIR}/git"
 inherit cmake gettext pkgconfig python3-dir python3native distutils3-base mime-xdg
 
 DEPENDS += "dnf python3 "
-#DEPENDS_class-nativesdk += "nativesdk-python3"
+#DEPENDS:class-nativesdk += "nativesdk-python3"
 
 RDEPENDS:${PN}:class-target = " python3-core libyui libyui-ncurses "
 

@@ -210,7 +210,7 @@ do_install () {
     fi
 }
 
-PACKAGE_BEFORE_PN += "${PN}-env"
+PACKAGE_BEFORE_PN += "${PN}-env ${PN}-extlinux"
 
 RPROVIDES:${PN}-env += "u-boot-default-env"
 ALLOW_EMPTY:${PN}-env = "1"
@@ -218,6 +218,9 @@ FILES:${PN}-env = " \
     ${@ '${sysconfdir}/${UBOOT_INITIAL_ENV}*' if d.getVar('UBOOT_INITIAL_ENV') else ''} \
     ${sysconfdir}/fw_env.config \
 "
+
+FILES:${PN}-extlinux = "${UBOOT_EXTLINUX_INSTALL_DIR}/${UBOOT_EXTLINUX_CONF_NAME}"
+RDEPENDS:${PN} += "${@bb.utils.contains('UBOOT_EXTLINUX', '1', '${PN}-extlinux', '', d)}"
 
 FILES:${PN} = "/boot ${datadir}"
 RDEPENDS:${PN} += "${PN}-env"

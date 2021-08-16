@@ -99,7 +99,7 @@ selected according to the connected monitor's EDID information and the composite
 mode is defaulted to NTSC using a 4:3 aspect ratio. Check the config.txt for a
 detailed description of options and modes. The following variables are supported in
 local.conf: `HDMI_FORCE_HOTPLUG`, `HDMI_DRIVE`, `HDMI_GROUP`, `HDMI_MODE`,
-`CONFIG_HDMI_BOOST`, `SDTV_MODE`, `SDTV_ASPECT` and `DISPLAY_ROTATE`.
+`HDMI_CVT`, `CONFIG_HDMI_BOOST`, `SDTV_MODE`, `SDTV_ASPECT` and `DISPLAY_ROTATE`.
 
 Example to force HDMI output to 720p in CEA mode:
 

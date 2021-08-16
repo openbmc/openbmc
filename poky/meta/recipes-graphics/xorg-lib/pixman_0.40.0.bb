@@ -34,4 +34,8 @@ EXTRA_OEMESON += "-Dloongson-mmi=disabled"
 # disable iwmmxt due to compile fails on most arm platforms.
 EXTRA_OEMESON += "-Diwmmxt=disabled"
 
+EXTRA_OEMESON:append:class-target:powerpc = " ${@bb.utils.contains("TUNE_FEATURES", "altivec", "-Dvmx=enabled", "-Dvmx=disabled", d)}"
+EXTRA_OEMESON:append:class-target:powerpc64 = " ${@bb.utils.contains("TUNE_FEATURES", "altivec", "-Dvmx=enabled", "-Dvmx=disabled", d)}"
+EXTRA_OEMESON:append:class-target:powerpc64le = " ${@bb.utils.contains("TUNE_FEATURES", "altivec", "-Dvmx=enabled", "-Dvmx=disabled", d)}"
+
 BBCLASSEXTEND = "native nativesdk"

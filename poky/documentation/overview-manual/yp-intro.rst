@@ -738,7 +738,7 @@ other build process, in which case the basic functionality can be
 defined by the classes it inherits from the OE-Core layer's class
 definitions in ``./meta/classes``. Within a recipe you can also define
 additional tasks as well as task prerequisites. Recipe syntax through
-BitBake also supports both ``_prepend`` and ``_append`` operators as a
+BitBake also supports both ``:prepend`` and ``:append`` operators as a
 method of extending task functionality. These operators inject code into
 the beginning or end of a task. For information on these BitBake
 operators, see the

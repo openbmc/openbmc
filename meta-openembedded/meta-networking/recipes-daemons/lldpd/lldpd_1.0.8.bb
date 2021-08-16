@@ -61,4 +61,4 @@ RDEPENDS:${PN} += "os-release"
 
 FILES:${PN}-zsh-completion += "${datadir}/zsh/"
 # FIXME: zsh is broken in meta-oe so this cannot be enabled for now
-#RDEPENDS_${PN}-zsh-completion += "zsh"
+#RDEPENDS:${PN}-zsh-completion += "zsh"

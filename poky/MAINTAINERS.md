@@ -40,6 +40,7 @@ Component/Subsystem Maintainers
 * opkg: Alex Stewart
 * devtool: Saul Wold
 * eSDK: Saul Wold
+* overlayfs: Vyacheslav Yurkov
 
 Maintainers needed
 ------------------

@@ -69,7 +69,7 @@ to indicate the branch.
    You can use the :term:`KBRANCH` value to define an alternate branch typically
    with a machine override as shown here from the ``meta-yocto-bsp`` layer::
 
-           KBRANCH_edgerouter = "standard/edgerouter"
+           KBRANCH:edgerouter = "standard/edgerouter"
 
 
 The linux-yocto style recipes can optionally define the following
@@ -113,7 +113,7 @@ To include a
 feature called "cfg/sound.scc" just for the ``qemux86`` machine,
 specify::
 
-   KERNEL_FEATURES_append_qemux86 = " cfg/sound.scc"
+   KERNEL_FEATURES:append:qemux86 = " cfg/sound.scc"
 
 The value of
 the entries in :term:`KERNEL_FEATURES` are dependent on their location
@@ -724,7 +724,7 @@ If the BSP description is in recipe space, you cannot simply list the
 ``*.scc`` in the :term:`SRC_URI` statement. You need to use the following
 form from your kernel append file::
 
-   SRC_URI_append_myplatform = " \
+   SRC_URI:append:myplatform = " \
        file://myplatform;type=kmeta;destsuffix=myplatform \
        "
 

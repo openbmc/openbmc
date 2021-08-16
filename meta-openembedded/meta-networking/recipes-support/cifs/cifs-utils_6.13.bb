@@ -26,7 +26,7 @@ do_configure:prepend() {
     # want installed to /usr/sbin rather than /sbin to be DISTRO_FEATURES usrmerge compliant
     # must override ROOTSBINDIR (default '/sbin'),
     # setting --exec-prefix or --prefix in EXTRA_OECONF does not work
-    if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','fakse',d)}; then
+    if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','false',d)}; then
         export ROOTSBINDIR=${sbindir}
     fi
 }

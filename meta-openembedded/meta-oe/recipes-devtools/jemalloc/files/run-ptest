@@ -1,0 +1,21 @@
+#!/bin/sh
+
+saved_dir=$PWD
+for dir in tests/* ; do
+	cd $dir
+	for atest in * ; do
+		if [ \( -x $atest \) -a \( -f $atest \) ] ; then
+			rm -rf tests.log
+			./$atest > tests.log 2>&1
+			sed -e '/: pass/ s/^/PASS: /g' \
+			    -e '/: skip/ s/^/SKIP: /g' \
+			    -e '/: fail/ s/^/FAIL: /g' \
+			    -e 's/: pass//g' \
+			    -e 's/: skip//g' \
+			    -e 's/: fail//g' \
+			    -e '/^--- pass:/d' tests.log
+		fi
+	done
+	cd $saved_dir
+done
+

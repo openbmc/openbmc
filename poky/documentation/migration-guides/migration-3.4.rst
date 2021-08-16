@@ -56,6 +56,13 @@ context being specific tasks in that case. Tune overrides are another special
 case where some code does use them as overrides but some does not. We plan to try
 and make the tune code use overrides more consistently in the future.
 
+There are some variables which do not use override syntax which include the
+suffix to variables in ``layer.conf`` files such as :term:`BBFILE_PATTERN`,
+:term:`SRCREV`\ ``_xxx`` where ``xxx`` is a name from :term:`SRC_URI` and
+:term:`PREFERRED_VERSION`\ ``_xxx``. In particular, ``layer.conf`` suffixes
+may be the same as a :term:`DISTRO` override causing some confusion. We do
+plan to try and improve consistency as these issues are identified.
+
 To help with migration of layers there is a script in OE-Core. Once configured
 with the overrides used by a layer, this can be run as::
 

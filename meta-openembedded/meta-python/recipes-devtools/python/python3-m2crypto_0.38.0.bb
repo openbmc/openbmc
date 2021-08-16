@@ -31,14 +31,14 @@ DISTUTILS_BUILD_ARGS += "build_ext --openssl=${STAGING_EXECPREFIXDIR} -I${STAGIN
 DISTUTILS_INSTALL_ARGS += "build_ext --openssl=${STAGING_EXECPREFIXDIR}"
 
 SWIG_FEATURES:x86 = "-D__i386__"
-SWIG_FEATURES_x32 = "-D__ILP32__"
+SWIG_FEATURES:x32 = "-D__ILP32__"
 
 SWIG_FEATURES ?= "-D__${HOST_ARCH}__ ${@['-D__ILP32__','-D__LP64__'][d.getVar('SITEINFO_BITS') != '32']}"
 
 SWIG_FEATURES:append:riscv64 = " -D__SIZEOF_POINTER__=${SITEINFO_BITS}/8 -D__riscv_xlen=${SITEINFO_BITS}"
 SWIG_FEATURES:append:riscv32 = " -D__SIZEOF_POINTER__=${SITEINFO_BITS}/8 -D__riscv_xlen=${SITEINFO_BITS}"
 SWIG_FEATURES:append:mipsarch = " -D_MIPS_SZPTR=${SITEINFO_BITS}"
-SWIG_FEATURES:append:powerpc64le = " -D_:powerpc64__"
+SWIG_FEATURES:append:powerpc64le = " -D__powerpc64__"
 export SWIG_FEATURES
 
 export STAGING_DIR

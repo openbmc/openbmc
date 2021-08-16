@@ -838,7 +838,7 @@ recipe.
 If you need to add runtime dependencies, you can do so by adding the
 following to your recipe::
 
-   RDEPENDS_${PN} += "dependency1 dependency2 ..."
+   RDEPENDS:${PN} += "dependency1 dependency2 ..."
 
 .. note::
 
@@ -1154,7 +1154,7 @@ subdirectory for each package. Apart from some advanced cases, the
 splitting. The :term:`PACKAGES` variable lists all of the packages to be
 produced, while the :term:`FILES` variable specifies which files to include
 in each package by using an override to specify the package. For
-example, ``FILES_${PN}`` specifies the files to go into the main package
+example, ``FILES:${PN}`` specifies the files to go into the main package
 (i.e. the main package has the same name as the recipe and
 ``${``\ :term:`PN`\ ``}`` evaluates to the
 recipe name). The order of the :term:`PACKAGES` value is significant. For

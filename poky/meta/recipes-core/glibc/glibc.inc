@@ -42,7 +42,7 @@ PARALLEL_MAKE = ""
 EXTRA_OEMAKE += "SHELL=/bin/bash"
 
 do_configure:prepend() {
-	sed -e "s#@BASH@#/bin/sh#" -i ${S}/elf/ldd.bash.in
+	sed -e "s#/bin/bash#/bin/sh#" -i ${S}/elf/ldd.bash.in
 }
 
 # Enable backtrace from abort()

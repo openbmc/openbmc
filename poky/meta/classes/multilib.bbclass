@@ -35,7 +35,7 @@ python multilib_virtclass_handler () {
         e.data.setVar('SDKTARGETSYSROOT', e.data.getVar('SDKTARGETSYSROOT'))
         override = ":virtclass-multilib-" + variant
         e.data.setVar("OVERRIDES", e.data.getVar("OVERRIDES", False) + override)
-        target_vendor = e.data.getVar("TARGET_VENDOR_" + "virtclass-multilib-" + variant, False)
+        target_vendor = e.data.getVar("TARGET_VENDOR:" + "virtclass-multilib-" + variant, False)
         if target_vendor:
             e.data.setVar("TARGET_VENDOR", target_vendor)
         return
@@ -82,7 +82,7 @@ python multilib_virtclass_handler () {
     e.data.setVar("WHITELIST_GPL-3.0", pkgs)
 
     # DEFAULTTUNE can change TARGET_ARCH override so expand this now before update_data
-    newtune = e.data.getVar("DEFAULTTUNE_" + "virtclass-multilib-" + variant, False)
+    newtune = e.data.getVar("DEFAULTTUNE:" + "virtclass-multilib-" + variant, False)
     if newtune:
         e.data.setVar("DEFAULTTUNE", newtune)
 }
