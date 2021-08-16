@@ -22,7 +22,7 @@ DEPENDS += " \
   "
 
 SRC_URI = "git://github.com/openbmc/phosphor-sel-logger.git;protocol=git"
-SRCREV = "f0243dc62fc4979d46e42276cd98fb41d2c3e2a1"
+SRCREV = "9f476e82f72e78d2be6cdeb95f7d5552c19d97a7"
 
 PV = "0.1+git${SRCPV}"
 
