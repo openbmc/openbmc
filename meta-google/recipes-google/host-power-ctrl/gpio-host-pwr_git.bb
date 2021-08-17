@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit systemd
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
   bash \
   gpio-ctrl \
   "
@@ -32,7 +32,7 @@ SRC_URI += " \
   "
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} += " \
+SYSTEMD_SERVICE:${PN} += " \
   host-reset-cold.service \
   host-reset-cold-watchdog.service \
   host-reset-warm.service \
