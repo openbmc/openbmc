@@ -14,7 +14,7 @@ PACKAGECONFIG = "\
         sysvinit \
         timedated \
         timesyncd \
-        xz \
+        zstd \
         "
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"

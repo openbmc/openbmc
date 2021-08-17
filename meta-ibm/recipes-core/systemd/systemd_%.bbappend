@@ -25,3 +25,9 @@ do_install:append:p10bmc() {
         install -m 644 -D ${WORKDIR}/systemd-journald-override.conf ${D}${systemd_system_unitdir}/systemd-journald.service.d/systemd-journald-override.conf
         install -m 644 -D ${WORKDIR}/journald-size-policy-16MB.conf ${D}${systemd_unitdir}/journald.conf.d/journald-size-policy.conf
 }
+
+# Witherspoon doesn't have the space for the both zstd and xz compression
+# libraries and currently phosphor-debug-collector is using xz.  Switch systemd
+# to use xz so only one of the two is added into the image.
+PACKAGECONFIG:remove:witherspoon = "zstd"
+PACKAGECONFIG:append:witherspoon = " xz"
