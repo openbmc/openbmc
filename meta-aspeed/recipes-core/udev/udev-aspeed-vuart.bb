@@ -10,6 +10,6 @@ SRC_URI += "file://61-aspeed-vuart.rules"
 RDEPENDS:${PN} += "udev"
 
 do_install() {
-    install -d ${D}/lib/udev/rules.d
-    install -m 0644 ${WORKDIR}/61-aspeed-vuart.rules ${D}/lib/udev/rules.d
+    install -d ${D}/${nonarch_base_libdir}/udev/rules.d
+    install -m 0644 ${WORKDIR}/61-aspeed-vuart.rules ${D}/${nonarch_base_libdir}/udev/rules.d
 }

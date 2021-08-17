@@ -120,8 +120,8 @@ SYSTEMD_LINK_max31785-msl:append:ibm-ac-server = " ../phosphor-max31785-msl@.ser
 SYSTEMD_SERVICE:${PN}:append:ibm-ac-server = " max31785-hwmon-helper@.service"
 
 do_install:append:ibm-ac-server() {
-    install -d ${D}/${base_libdir}/udev/rules.d/
-    install -m 0644 ${WORKDIR}/70-max31785-hwmon.rules ${D}/${base_libdir}/udev/rules.d/
+    install -d ${D}/${nonarch_base_libdir}/udev/rules.d/
+    install -m 0644 ${WORKDIR}/70-max31785-hwmon.rules ${D}/${nonarch_base_libdir}/udev/rules.d/
 
     install -d ${D}${bindir}
     install -m 0755 ${WORKDIR}/start_max31785_hwmon.sh ${D}${bindir}

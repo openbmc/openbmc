@@ -10,6 +10,6 @@ SRC_URI += "file://76-gxp-mtd-partitions.rules"
 RDEPENDS_${PN} += "udev"
 
 do_install() {
-    install -d ${D}/${base_libdir}/udev/rules.d
-    install -m 0644 ${WORKDIR}/76-gxp-mtd-partitions.rules ${D}/${base_libdir}/udev/rules.d
+    install -d ${D}/${nonarch_base_libdir}/udev/rules.d
+    install -m 0644 ${WORKDIR}/76-gxp-mtd-partitions.rules ${D}/${nonarch_base_libdir}/udev/rules.d
 }

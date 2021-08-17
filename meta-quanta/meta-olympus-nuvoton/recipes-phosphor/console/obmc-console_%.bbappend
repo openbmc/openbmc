@@ -8,7 +8,7 @@ do_install:append:olympus-nuvoton() {
         install -m 0644 ${WORKDIR}/${BPN}.conf ${D}${sysconfdir}/
         ln -sr ${D}${sysconfdir}/${BPN}.conf ${D}${sysconfdir}/${BPN}/server.ttyS2.conf
 
-        install -d ${D}/lib/udev/rules.d
-        rm -f ${D}/lib/udev/rules.d/80-obmc-console-uart.rules
-        install -m 0644 ${WORKDIR}/80-olympus-nuvoton-sol.rules ${D}/lib/udev/rules.d
+        install -d ${D}/${nonarch_base_libdir}/udev/rules.d
+        rm -f ${D}/${nonarch_base_libdir}/udev/rules.d/80-obmc-console-uart.rules
+        install -m 0644 ${WORKDIR}/80-olympus-nuvoton-sol.rules ${D}/${nonarch_base_libdir}/udev/rules.d
 }

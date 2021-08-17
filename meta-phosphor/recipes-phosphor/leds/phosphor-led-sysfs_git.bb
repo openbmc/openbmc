@@ -24,6 +24,6 @@ SRCREV = "5ee5f3b7162cb5d8e6780a9571e0b0ca3daf7c6e"
 S = "${WORKDIR}/git"
 
 do_install:append() {
-        install -d ${D}/${base_libdir}/udev/rules.d/
-        install -m 0644 ${WORKDIR}/70-leds.rules ${D}/${base_libdir}/udev/rules.d/
+        install -d ${D}/${nonarch_base_libdir}/udev/rules.d/
+        install -m 0644 ${WORKDIR}/70-leds.rules ${D}/${nonarch_base_libdir}/udev/rules.d/
 }

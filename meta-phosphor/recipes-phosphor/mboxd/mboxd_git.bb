@@ -26,8 +26,8 @@ MBOXD_FLASH_SIZE ??= "32M"
 SYSTEMD_SUBSTITUTIONS += "FLASH_SIZE:${MBOXD_FLASH_SIZE}:${PN}.service"
 
 do_install:append() {
-    install -d ${D}/lib/udev/rules.d
-    install -m 0644 ${WORKDIR}/99-aspeed-lpc-ctrl.rules ${D}/lib/udev/rules.d
+    install -d ${D}/${nonarch_base_libdir}/udev/rules.d
+    install -m 0644 ${WORKDIR}/99-aspeed-lpc-ctrl.rules ${D}/${nonarch_base_libdir}/udev/rules.d
 }
 
 TMPL = "mboxd-reload@.service"
