@@ -15,7 +15,7 @@
 
 source /usr/share/gpio-host-pwr/lib.sh || exit
 
-gpio_build_cache 10 "$HOST_GPIO_PGOOD" || return 255
-pgood="$(gpio_get_value "$HOST_GPIO_PGOOD")" || return 255
+gpio_build_cache 10 "$HOST_GPIO_PGOOD" || exit 255
+pgood="$(gpio_get_value "$HOST_GPIO_PGOOD")" || exit 255
 echo "HOST_PGOOD=$pgood" >&2
 (( pgood == 0 ))
