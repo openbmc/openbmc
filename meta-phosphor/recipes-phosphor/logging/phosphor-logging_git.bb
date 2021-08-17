@@ -54,7 +54,7 @@ FILES:phosphor-rsyslog-config += " \
 "
 
 SRC_URI += "git://github.com/openbmc/phosphor-logging"
-SRCREV = "2ccdcef99732e8f1f6bccd36f30c175c98db27d8"
+SRCREV = "6741692137d87744778495bc6f5f982368912bff"
 
 S = "${WORKDIR}/git"
 
