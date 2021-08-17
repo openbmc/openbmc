@@ -7,10 +7,10 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit systemd
 
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-SRC_URI_append_kudo = " file://hotswap-power-cycle.service"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+SRC_URI:append:kudo = " file://hotswap-power-cycle.service"
 
 do_install() {
     install -d ${D}${systemd_unitdir}/system/
@@ -18,4 +18,4 @@ do_install() {
 }
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = " hotswap-power-cycle.service"
+SYSTEMD_SERVICE:${PN} = " hotswap-power-cycle.service"

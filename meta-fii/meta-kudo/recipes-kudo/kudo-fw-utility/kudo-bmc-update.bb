@@ -6,11 +6,11 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 DEPENDS += "phosphor-ipmi-flash"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
-FILES_${PN} += "${datadir}/phosphor-ipmi-flash/config-bmc.json"
+FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-bmc.json"
 
-SRC_URI_append_kudo = " \
+SRC_URI:append:kudo = " \
     file://config-bmc.json \
     "
 

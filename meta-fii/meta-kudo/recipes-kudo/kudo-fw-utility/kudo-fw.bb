@@ -10,8 +10,8 @@ inherit obmc-phosphor-systemd
 
 DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-flash"
-RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "libsystemd"
+RDEPENDS:${PN} += "bash"
 
 
 SRC_URI = " \
@@ -22,7 +22,7 @@ SRC_URI = " \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
     kudo-fw-ver.service \
     "
 

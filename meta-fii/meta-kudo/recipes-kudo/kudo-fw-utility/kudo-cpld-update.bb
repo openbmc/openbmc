@@ -10,13 +10,13 @@ inherit obmc-phosphor-systemd
 
 DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-flash"
-RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "libsystemd"
+RDEPENDS:${PN} += "bash"
 
-FILES_${PN} += "${datadir}/phosphor-ipmi-flash/config-bmccpld.json"
-FILES_${PN} += "${datadir}/phosphor-ipmi-flash/config-mbcpld.json"
+FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-bmccpld.json"
+FILES:${PN} += "${datadir}/phosphor-ipmi-flash/config-mbcpld.json"
 
-SRC_URI_append_kudo = " \
+SRC_URI:append:kudo = " \
     file://phosphor-ipmi-flash-bmccpld-update.service \
     file://phosphor-ipmi-flash-mbcpld-update.service \
     file://config-bmccpld.json \
@@ -24,7 +24,7 @@ SRC_URI_append_kudo = " \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN}_append_kudo = " \
+SYSTEMD_SERVICE:${PN}:append:kudo = " \
     phosphor-ipmi-flash-bmccpld-update.service \
     phosphor-ipmi-flash-mbcpld-update.service \
     "

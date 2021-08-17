@@ -20,10 +20,10 @@ SRC_URI = "file://ampere-host-shutdown.service \
           "
 
 DEPENDS = "systemd"
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
         ampere-host-shutdown.service \
         ampere-host-reset.service \
         ampere-chassis-poweroff.service \

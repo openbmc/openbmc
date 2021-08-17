@@ -1,3 +1,3 @@
-PACKAGECONFIG_append_kudo = " nuvoton-p2a-mbox net-bridge"
+PACKAGECONFIG:append:kudo = " nuvoton-p2a-mbox net-bridge"
 
-IPMI_FLASH_BMC_ADDRESS_kudo = "0xF0848000"
+IPMI_FLASH_BMC_ADDRESS:kudo = "0xF0848000"

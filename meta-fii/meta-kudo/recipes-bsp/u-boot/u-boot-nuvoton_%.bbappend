@@ -1,3 +1,3 @@
-FILESEXTRAPATHS_prepend_kudo := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:kudo := "${THISDIR}/${PN}:"
 
-SRC_URI_append_kudo = " file://kudo.cfg"
+SRC_URI:append:kudo = " file://kudo.cfg"

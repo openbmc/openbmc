@@ -14,20 +14,20 @@ PACKAGES = " \
 PROVIDES += "virtual/obmc-system-mgmt"
 PROVIDES += "virtual/obmc-fan-mgmt"
 
-RPROVIDES_${PN}-kudo-system += "virtual-obmc-system-mgmt"
-RPROVIDES_${PN}-kudo-fw += "virtual-obmc-flash-mgmt"
-RPROVIDES_${PN}-fan-mgmt += "virtual-obmc-fan-mgmt"
+RPROVIDES:${PN}-kudo-system += "virtual-obmc-system-mgmt"
+RPROVIDES:${PN}-kudo-fw += "virtual-obmc-flash-mgmt"
+RPROVIDES:${PN}-fan-mgmt += "virtual-obmc-fan-mgmt"
 
-SUMMARY_${PN}-kudo-chassis = "kudo chassis"
-RDEPENDS_${PN}-kudo-chassis = " \
+SUMMARY:${PN}-kudo-chassis = "kudo chassis"
+RDEPENDS:${PN}-kudo-chassis = " \
     phosphor-hostlogger \
     obmc-op-control-power \
     obmc-phosphor-buttons-signals \
     obmc-phosphor-buttons-handler \
     "
 
-SUMMARY_${PN}-kudo-system = "kudo System"
-RDEPENDS_${PN}-kudo-system = " \
+SUMMARY:${PN}-kudo-system = "kudo System"
+RDEPENDS:${PN}-kudo-system = " \
     ipmitool \
     ethtool \
     memtester \
@@ -44,8 +44,8 @@ RDEPENDS_${PN}-kudo-system = " \
     phosphor-state-manager \
     "
 
-SUMMARY_${PN}-kudo-fw = "kudo Firmware"
-RDEPENDS_${PN}-kudo-fw = " \
+SUMMARY:${PN}-kudo-fw = "kudo Firmware"
+RDEPENDS:${PN}-kudo-fw = " \
     kudo-fw \
     kudo-bios-update \
     kudo-bmc-update \
@@ -53,8 +53,8 @@ RDEPENDS_${PN}-kudo-fw = " \
     kudo-scp-update \
     "
 
-SUMMARY_${PN}-fan-mgmt = "kudo fan mgmt"
-RDEPENDS_${PN}-fan-mgmt = " \
+SUMMARY:${PN}-fan-mgmt = "kudo fan mgmt"
+RDEPENDS:${PN}-fan-mgmt = " \
     pwm-init \
     phosphor-pid-control \
     "

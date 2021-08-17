@@ -4,18 +4,18 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit allarch systemd
 
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "libsystemd"
+RDEPENDS:${PN} += "bash"
 
-SRC_URI_append += " \
+SRC_URI:append += " \
     file://usb_network.sh \
     file://usb_network.service \
     file://00-bmc-usb0.network \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN}_append = " usb_network.service"
-FILES_${PN} += "${sysconfdir_native}/systemd/network/00-bmc-usb0.network"
+SYSTEMD_SERVICE:${PN}:append = " usb_network.service"
+FILES:${PN} += "${sysconfdir_native}/systemd/network/00-bmc-usb0.network"
 
 do_install() {
     install -d ${D}/${sbindir}

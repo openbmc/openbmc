@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_prepend_kudo := "${THISDIR}/${PN}:"
-SRC_URI_append_kudo = " file://phosphor-pid-control.service"
+FILESEXTRAPATHS:prepend:kudo := "${THISDIR}/${PN}:"
+SRC_URI:append:kudo = " file://phosphor-pid-control.service"
 
 inherit systemd
 
-SYSTEMD_SERVICE_${PN}_append_kudo = " phosphor-pid-control.service"
+SYSTEMD_SERVICE:${PN}:append:kudo = " phosphor-pid-control.service"

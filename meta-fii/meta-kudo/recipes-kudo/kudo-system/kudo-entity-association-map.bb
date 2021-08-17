@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 SRC_URI += "file://kudo_entity_association_map.json"
 
-FILES_${PN} = " \
+FILES:${PN} = " \
     ${datadir}/ipmi-entity-association/entity_association_map.json \
     "
 

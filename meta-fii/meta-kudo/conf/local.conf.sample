@@ -1,7 +1,7 @@
 MACHINE ??= "kudo"
 DISTRO ?= "openbmc-kudo"
 PACKAGE_CLASSES ?= "package_rpm"
-SANITY_TESTED_DISTROS_append ?= " *"
+SANITY_TESTED_DISTROS:append ?= " *"
 EXTRA_IMAGE_FEATURES = "debug-tweaks"
 USER_CLASSES ?= "buildstats image-prelink"
 PATCHRESOLVE = "noop"
@@ -14,5 +14,5 @@ BB_DISKMON_DIRS = "\
     ABORT,${DL_DIR},100M,1K \
     ABORT,${SSTATE_DIR},100M,1K \
     ABORT,/tmp,10M,1K"
-CONF_VERSION = "1"
+CONF_VERSION = "2"
 

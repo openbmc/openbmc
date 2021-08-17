@@ -9,8 +9,8 @@ inherit systemd
 inherit obmc-phosphor-systemd
 
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "libsystemd"
+RDEPENDS:${PN} += "bash"
 
 SRC_URI = " \
     file://init_once.sh \
@@ -18,7 +18,7 @@ SRC_URI = " \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = " \
+SYSTEMD_SERVICE:${PN} = " \
     host-powerctrl.service \
     "
 
