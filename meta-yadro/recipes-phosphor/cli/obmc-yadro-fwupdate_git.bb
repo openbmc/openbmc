@@ -19,7 +19,7 @@ PACKAGECONFIG[reboot-guard-support] = "-Dreboot-guard-support=true,-Dreboot-guar
 PACKAGECONFIG[openpower-support] = "-Dopenpower-support=true,-Dopenpower-support=false"
 
 PACKAGECONFIG ??= " obmc-phosphor-image reboot-guard-support "
-PACKAGECONFIG_append_df-openpower = "openpower-support"
+PACKAGECONFIG:append_df-openpower = "openpower-support"
 
 SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-fwupdate"
 SRCREV = "0e3c0714f344a2f7f289c851434955360e6f075b"

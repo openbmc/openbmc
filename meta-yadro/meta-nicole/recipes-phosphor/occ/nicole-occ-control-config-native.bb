@@ -8,7 +8,7 @@ inherit native
 
 PROVIDES += "virtual/openpower-occ-control-config-native"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "file://occ_sensor.yaml"
 
 S = "${WORKDIR}"

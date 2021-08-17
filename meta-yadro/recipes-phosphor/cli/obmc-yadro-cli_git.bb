@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 # Dependencies
 DEPENDS = "phosphor-user-manager"
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     ${VIRTUAL-RUNTIME_base-utils} \
     bash \
     obmc-yadro-fwupdate \
@@ -26,7 +26,7 @@ RDEPENDS_${PN} = " \
 # They should be appended by bbappend file in their layers
 
 # Directory with command handlers
-FILES_${PN} += "${datadir}/cli"
+FILES:${PN} += "${datadir}/cli"
 
 MACHINE_NAME ?= "${MACHINE}"
 # Custom installation procedure

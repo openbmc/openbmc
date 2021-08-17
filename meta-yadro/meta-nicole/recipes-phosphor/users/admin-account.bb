@@ -23,14 +23,14 @@ GROUP_IPMI = "ipmi"
 ADMIN_LOGIN = "admin"
 ADMIN_PASSW = "\$1\$Fze0kFe8\$sylEANC01t.osF8OewyB/1"
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--groups ${GROUP_ADMIN},${GROUP_IPMI} \
+USERADD_PARAM:${PN} = "--groups ${GROUP_ADMIN},${GROUP_IPMI} \
                        --password '${ADMIN_PASSW}' \
                        ${ADMIN_LOGIN}"
 
 # We don't have package body
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 # Workaround for meta-phosphor/classes/phosphor-rootfs-postcommands.bbclass.
 # The bb-script cannot add root to non-empty groups (invalid sed command).
-GROUPMEMS_PARAM_${PN} = "-a root -g ${GROUP_ADMIN}; \
+GROUPMEMS_PARAM:${PN} = "-a root -g ${GROUP_ADMIN}; \
                          -a root -g ${GROUP_IPMI}"

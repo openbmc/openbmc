@@ -13,7 +13,7 @@
 # as well as any non-release branches produce 'Unofficial' builds.
 # So do the release branches with -rc or -dev suffix in the latest tag.
 
-python do_compile_prepend() {
+python do_compile:prepend() {
     print ("Preparing YADRO-specific version information")
     version_id = d.getVar('VERSION_ID')
 
@@ -115,16 +115,16 @@ python do_compile_prepend() {
     print ('%s PATCH_LEVEL = %s' % (u_product, patch_level))
 }
 
-python do_compile_append () {
+python do_compile:append () {
     with open(d.expand('${B}/issue'), 'w') as f:
         f.write('%s %s @ \\l\n' % (name % u_product, release))
 }
 
-do_install_append () {
+do_install:append () {
     install -m 0644 issue ${D}${sysconfdir}/issue
     install -m 0644 issue ${D}${sysconfdir}/issue.net
 }
 
-CONFFILES_${PN} += " ${sysconfdir}/issue ${sysconfdir}/issue.net"
-OS_RELEASE_FIELDS_append = " RELEASE PATCH_LEVEL"
+CONFFILES:${PN} += " ${sysconfdir}/issue ${sysconfdir}/issue.net"
+OS_RELEASE_FIELDS:append = " RELEASE PATCH_LEVEL"
 BB_DONT_CACHE = "1"

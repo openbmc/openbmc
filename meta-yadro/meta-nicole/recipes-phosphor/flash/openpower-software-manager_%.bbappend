@@ -1,1 +1,1 @@
-PACKAGECONFIG_append = " verify_pnor_signature"
+PACKAGECONFIG:append = " verify_pnor_signature"

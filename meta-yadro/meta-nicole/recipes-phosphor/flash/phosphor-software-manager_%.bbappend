@@ -1,1 +1,1 @@
-PACKAGECONFIG_append = " verify_signature"
+PACKAGECONFIG:append = " verify_signature"

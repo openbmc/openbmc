@@ -1,4 +1,4 @@
-RDEPENDS_${PN}_append = " \
+RDEPENDS:${PN}:append = " \
     obmc-yadro-backup \
     obmc-yadro-lsinventory \
     op-proc-control \
