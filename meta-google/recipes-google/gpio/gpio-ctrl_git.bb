@@ -6,7 +6,7 @@ PR = "r1"
 
 SRC_URI += "file://lib.sh"
 
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 do_install() {
     install -d ${D}${datadir}/gpio-ctrl
