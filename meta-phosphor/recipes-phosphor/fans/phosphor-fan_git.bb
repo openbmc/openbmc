@@ -113,7 +113,8 @@ SYSTEMD_LINK_${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
 # --------------------------------------
 # ${PN}-monitor specific configuration
 PACKAGECONFIG[monitor] = "--enable-monitor \
-     FAN_MONITOR_YAML_FILE=${STAGING_DIR_HOST}${monitor_datadir}/monitor.yaml, \
+    MACHINE=${PKG_DEFAULT_MACHINE} \
+    FAN_MONITOR_YAML_FILE=${STAGING_DIR_HOST}${monitor_datadir}/monitor.yaml, \
     --disable-monitor, \
     phosphor-fan-monitor-config \
     , \
@@ -141,6 +142,10 @@ SYSTEMD_LINK_${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
 SYSTEMD_LINK_${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
                                 compose_list(d, 'FMT_MONITOR_MUSR', 'OBMC_CHASSIS_INSTANCES'), \
                                 compose_list(d, 'FMT_MONITOR_INIT', 'OBMC_CHASSIS_INSTANCES'), d)}"
+
+# Package the JSON config files installed from the repo
+FILES:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+    '${datadir}/phosphor-fan-presence/monitor/*', '', d)}"
 
 # --------------------------------------
 # phosphor-cooling-type specific configuration
