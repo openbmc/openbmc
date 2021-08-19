@@ -221,7 +221,7 @@ parse_pe_fru() {
 }
 
 check_power_status() {
-    res0="$(busctl get-property -j xyz.openbmc_project.State.Chassis0 \
+    res0="$(busctl get-property -j xyz.openbmc_project.State.Chassis \
         /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis \
         CurrentPowerState | jq -r '.["data"]')"
     echo $res0
@@ -260,7 +260,7 @@ main() {
     set_gpio_persistence
 
     echo "Starting host power!" >&2
-    busctl set-property xyz.openbmc_project.State.Host0 \
+    busctl set-property xyz.openbmc_project.State.Host \
         /xyz/openbmc_project/state/host0 \
         xyz.openbmc_project.State.Host \
         RequestedHostTransition s \
