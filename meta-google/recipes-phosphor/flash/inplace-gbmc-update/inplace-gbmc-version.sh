@@ -13,4 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-grep '^VERSION_ID=' /etc/os-release | sed 's,.*-\([^-]*\),\1,g' | tr -d '\n'#!/bin/bash
+grep '^VERSION_ID=' /etc/os-release | sed 's,.*-\([^-]*\),\1,g' | tr -d '\n'
