@@ -59,12 +59,10 @@ SYSTEMD_LINK:${PN}-control:witherspoon += "${@compose_list(d, 'FMT_CONTROL_PWRON
 # Enable the use of JSON on the fan applications that support it
 PACKAGECONFIG:append:witherspoon = " json"
 EXTRA_OECONF:append:witherspoon = " --disable-json-control"
-RDEPENDS:${PN}-presence-tach:append:witherspoon = " phosphor-fan-presence-config"
 RDEPENDS:${PN}-monitor:append:witherspoon = " phosphor-fan-monitor-config"
 
 PACKAGECONFIG:append:p10bmc = " json sensor-monitor"
 FAN_PACKAGES:append:p10bmc = " sensor-monitor"
-RDEPENDS:${PN}-presence-tach:append:p10bmc = " phosphor-fan-presence-config"
 RDEPENDS:${PN}-monitor:append:p10bmc = " phosphor-fan-monitor-config"
 
 # Install fan control JSON config files
