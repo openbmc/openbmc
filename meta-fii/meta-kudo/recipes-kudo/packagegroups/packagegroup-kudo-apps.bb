@@ -11,9 +11,11 @@ PACKAGES = " \
     ${PN}-fan-mgmt \
     "
 
+PROVIDES += "virtual/obmc-chassis-mgmt"
 PROVIDES += "virtual/obmc-system-mgmt"
 PROVIDES += "virtual/obmc-fan-mgmt"
 
+RPROVIDES:${PN}-kudo-chassis += "virtual-obmc-chassis-mgmt"
 RPROVIDES:${PN}-kudo-system += "virtual-obmc-system-mgmt"
 RPROVIDES:${PN}-kudo-fw += "virtual-obmc-flash-mgmt"
 RPROVIDES:${PN}-fan-mgmt += "virtual-obmc-fan-mgmt"
@@ -22,8 +24,6 @@ SUMMARY:${PN}-kudo-chassis = "kudo chassis"
 RDEPENDS:${PN}-kudo-chassis = " \
     phosphor-hostlogger \
     obmc-op-control-power \
-    obmc-phosphor-buttons-signals \
-    obmc-phosphor-buttons-handler \
     "
 
 SUMMARY:${PN}-kudo-system = "kudo System"
