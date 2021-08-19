@@ -54,4 +54,4 @@ echo "running" > ${STATUS_FILE}
 verify-bmc-image.sh @ALLOW_DEV@ "$IMAGE_FILE" "$SIGNATURE_FILE" || exit
 
 # Rename the staged file for initramfs updates.
-mv ${IMAGE_FILE} ${VERIFIED_FILE}#!/bin/bash
+mv ${IMAGE_FILE} ${VERIFIED_FILE}
