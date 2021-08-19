@@ -73,10 +73,11 @@ FILES:${PN}-presence-tach += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
 # --------------------------------------
 # ${PN}-control specific configuration
 PACKAGECONFIG[control] = "--enable-control \
-     FAN_DEF_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/fans.yaml \
-     FAN_ZONE_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zones.yaml \
-     ZONE_EVENTS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/events.yaml \
-     ZONE_CONDITIONS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zone_conditions.yaml, \
+    MACHINE=${PKG_DEFAULT_MACHINE} \
+    FAN_DEF_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/fans.yaml \
+    FAN_ZONE_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zones.yaml \
+    ZONE_EVENTS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/events.yaml \
+    ZONE_CONDITIONS_YAML_FILE=${STAGING_DIR_HOST}${control_datadir}/zone_conditions.yaml, \
     --disable-control, \
     virtual/phosphor-fan-control-fan-config \
     phosphor-fan-control-zone-config \
@@ -109,6 +110,10 @@ SYSTEMD_LINK_${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
 SYSTEMD_LINK_${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
         compose_list(d, 'FMT_CONTROL_PWRON', 'OBMC_CHASSIS_INSTANCES'), \
         compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHASSIS_INSTANCES'), d)}"
+
+# Package the JSON config files installed from the repo
+FILES:${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+    '${datadir}/phosphor-fan-presence/control/*', '', d)}"
 
 # --------------------------------------
 # ${PN}-monitor specific configuration
