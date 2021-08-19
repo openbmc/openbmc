@@ -35,18 +35,20 @@ ALLOW_EMPTY:${PN} = "1"
 PACKAGE_BEFORE_PN += "${FAN_PACKAGES}"
 PACKAGECONFIG ?= "presence control monitor"
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
+PKG_DEFAULT_MACHINE ??= "${MACHINE}"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # The control, monitor, and presence apps can either be JSON or YAML driven.
 PACKAGECONFIG[json] = "--enable-json, --disable-json"
 
 # --------------------------------------
 # ${PN}-presence-tach specific configuration
-PACKAGECONFIG[presence] = " \
-        --enable-presence \
-        PRESENCE_CONFIG=${STAGING_DIR_HOST}${presence_datadir}/config.yaml, \
-        --disable-presence, \
-        virtual/phosphor-fan-presence-config \
-        , \
+PACKAGECONFIG[presence] = "--enable-presence \
+    MACHINE=${PKG_DEFAULT_MACHINE} \
+    PRESENCE_CONFIG=${STAGING_DIR_HOST}${presence_datadir}/config.yaml, \
+    --disable-presence, \
+    virtual/phosphor-fan-presence-config \
+    , \
 "
 
 MULTI_USR_TGT = "multi-user.target"
@@ -63,6 +65,10 @@ SYSTEMD_LINK_${PN}-presence-tach += "${@compose_list(d, 'FMT_TACH', 'OBMC_CHASSI
 # JSON mode also gets linked into multi-user
 SYSTEMD_LINK_${PN}-presence-tach += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
         compose_list(d, 'FMT_TACH_MUSR', 'OBMC_CHASSIS_INSTANCES'), '', d)}"
+
+# Package the JSON config files installed from the repo
+FILES:${PN}-presence-tach += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+    '${datadir}/phosphor-fan-presence/presence/*', '', d)}"
 
 # --------------------------------------
 # ${PN}-control specific configuration
