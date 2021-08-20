@@ -43,5 +43,5 @@ RDEPENDS:${PN}-system = " \
         entity-manager \
         intel-ipmi-oem \
         dbus-sensors \
-        phosphor-webui \
+        webui-vue \
         "
