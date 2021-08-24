@@ -99,6 +99,7 @@ DISTRO_FEATURES_DEFAULT = " \
         ipv4 \
         ipv6 \
         pam \
+        security \
         slp \
         systemd \
         "
