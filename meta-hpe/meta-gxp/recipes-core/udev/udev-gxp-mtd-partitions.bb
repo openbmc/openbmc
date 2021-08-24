@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 S = "${WORKDIR}"
 SRC_URI += "file://76-gxp-mtd-partitions.rules"
 
-RDEPENDS_${PN} += "udev"
+RDEPENDS:${PN} += "udev"
 
 do_install() {
     install -d ${D}/${nonarch_base_libdir}/udev/rules.d

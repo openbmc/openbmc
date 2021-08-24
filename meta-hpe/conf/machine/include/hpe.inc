@@ -16,4 +16,4 @@ PREFERRED_PROVIDER_virtual/obmc-system-mgmt = "packagegroup-hpe-apps"
 PREFERRED_PROVIDER_virtual/obmc-host-ctl ?= ""
 #PREFERRED_PROVIDER_virtual/phosphor-ipmi-fru-hostfw-config ?= "hostboot-inventory-config-native"
 
-IMAGE_FEATURES_remove = "obmc-fan-control"
+IMAGE_FEATURES:remove = "obmc-fan-control"

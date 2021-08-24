@@ -10,7 +10,7 @@ KSRC ?= "git://github.com/HewlettPackard/gxp-linux.git;branch=${KBRANCH}"
 SRC_URI = "${KSRC}"
 SRC_URI += " file://defconfig"
 
-FILESEXTRAPATHS_prepend_linux-obmc := "${THISDIR}/linux-obmc:"
+FILESEXTRAPATHS:prepend_linux-obmc := "${THISDIR}/linux-obmc:"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 

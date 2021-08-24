@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/linux-obmc:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/linux-obmc:"
 SRC_URI += "file://gxp.dts \
             "
 
-do_patch_append() {
+do_patch:append() {
   for DTB in "${KERNEL_DEVICETREE}"; do
       DT=`basename ${DTB} .dtb`
       if [ -r "${WORKDIR}/${DT}.dts" ]; then
