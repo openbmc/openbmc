@@ -6,7 +6,6 @@
             "power_up_outs": [
             ],
             "reset_outs": [
-                {"name": "BMC_S0_SYSRESET_N", "polarity": false}
             ]
         }
     },
@@ -16,11 +15,6 @@
             "name": "PGOOD",
             "num": 200,
             "direction": "in"
-        },
-        {
-            "name": "BMC_S0_SYSRESET_N",
-            "num": 65,
-            "direction": "out"
         }
     ]
 }

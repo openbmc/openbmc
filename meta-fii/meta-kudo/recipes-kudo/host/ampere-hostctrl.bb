@@ -14,7 +14,7 @@ SRC_URI = "file://ampere-host-shutdown.service \
           file://ampere_power_util.sh \
           file://ampere-chassis-poweroff.service \
           file://ampere-chassis-poweron.service \
-          file://ampere-host-reset-ack.service \
+          file://ampere-host-shutdown-ack.service \
           file://ampere-host-force-reset.service \
           file://ampere-host-power-cycle.service \
           "
@@ -28,7 +28,7 @@ SYSTEMD_SERVICE:${PN} = " \
         ampere-host-reset.service \
         ampere-chassis-poweroff.service \
         ampere-chassis-poweron.service \
-        ampere-host-reset-ack.service \
+        ampere-host-shutdown-ack.service \
         ampere-host-force-reset.service \
         ampere-host-power-cycle.service \
         "
