@@ -16,7 +16,7 @@ pkg_postinst:${PN}:append() {
 	ln -s $TARGET $LINK
 
 	LINK="$D$systemd_system_unitdir/obmc-host-timeout@0.target.wants/openpower-debug-collector-watchdog-timeout@0.service"
-	TARGET="../openpower-debug-collector-watchdog-timeout.service"
+	TARGET="../openpower-debug-collector-watchdog-timeout@.service"
 	ln -s $TARGET $LINK
 }
 

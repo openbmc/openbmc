@@ -19,13 +19,12 @@ DEPENDS += " \
         "
 S = "${WORKDIR}/git"
 
-# This provides below 2 applications that are called into in case
-# of host checkstop and host watchdog timeout respectively.
-APPS = "checkstop watchdog"
+# This provides below applications that are called into in case
+# of host checkstop, host watchdog and host watchdog-timeout respectively.
+APPS = "checkstop watchdog watchdog-timeout"
 
 DEBUG_TMPL = "openpower-debug-collector-{0}@.service"
 SYSTEMD_SERVICE:${PN} += "${@compose_list(d, 'DEBUG_TMPL', 'APPS')}"
-
 
 # Do not depend on phosphor-logging for native build
 DEPENDS:remove:class-native = "phosphor-logging"
