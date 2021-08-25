@@ -91,8 +91,24 @@ function fw_rev() {
   cmd=$(cat $MB_CPLD_VER_FILE)
   echo " MB_CPLD: " $cmd
 
-  cmd=$(cat /etc/os-release | grep VERSION -w | cut -d '=' -f 2)
-  echo " BMC        : " ${cmd}
+  # BMC Version
+
+  # Save VERSION_ID line in string "VERSION_ID=vXX.XX-XX-kudo"
+  StringVersion=$(cat /etc/os-release | awk '/VERSION_ID/')
+
+  #Save Major Version value between v and . "vXX." then convert Hex to Decimal
+  MajorVersion=${StringVersion#*v}
+  MajorVersion=$(( 16#${MajorVersion%.*}))
+
+  #Save SubMajor Version valeu between . and - ".XX-" then convert  Hex to Decimal
+  SubMajorVersion=${StringVersion#*.}
+  SubMajorVersion=$(( 16#${SubMajorVersion%-*}))
+
+  #Save Minor Version value between - and - "-XX-" then convert  Hex to Decimal
+  MinorVersion=${StringVersion#*-}
+  MinorVersion=$(( 16#${MinorVersion%-*}))
+
+  echo " BMC: " ${MajorVersion}.${SubMajorVersion}.${MinorVersion}
 
   #BMC PWR Sequencer
   i2cset -y -f -a 14 0x59 0xfe 0x0000 w
