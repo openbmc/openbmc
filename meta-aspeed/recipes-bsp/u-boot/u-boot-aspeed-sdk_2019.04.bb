@@ -3,7 +3,6 @@ require u-boot-common-aspeed-sdk_${PV}.inc
 UBOOT_MAKE_TARGET ?= "DEVICE_TREE=${UBOOT_DEVICETREE}"
 
 require u-boot-aspeed.inc
-inherit socsec-sign
 
 PROVIDES += "u-boot"
 DEPENDS += "bc-native dtc-native"
@@ -17,6 +16,8 @@ SRC_URI += " \
 SOCSEC_SIGN_KEY ?= "${WORKDIR}/rsa_oem_dss_key.pem"
 SOCSEC_SIGN_ALGO ?= "RSA4096_SHA512"
 SOCSEC_SIGN_EXTRA_OPTS ?= "--stack_intersects_verification_region=false"
+
+inherit socsec-sign
 
 UBOOT_ENV_SIZE:df-phosphor-mmc = "0x10000"
 UBOOT_ENV:df-phosphor-mmc = "u-boot-env"
