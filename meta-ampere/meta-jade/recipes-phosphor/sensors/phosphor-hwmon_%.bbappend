@@ -16,7 +16,7 @@ CHIPS:mtjade = " \
 
 ITEMSFMT = "ahb/apb/{0}.conf"
 
-ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_${MACHINE}')}"
+ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS:${MACHINE}')}"
 
 ITEMS += "iio-hwmon.conf iio-hwmon-adc14.conf iio-hwmon-battery.conf"
 
