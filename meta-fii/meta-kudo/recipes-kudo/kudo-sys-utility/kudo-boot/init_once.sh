@@ -1,15 +1,23 @@
 #!/bin/bash
 
 source /usr/sbin/kudo-lib.sh
+# 0 for EVT. DVT will have a non-zero board version
+boardver=$(printf '%d' `cat /sys/bus/i2c/drivers/fiicpld/34-0076/CMD00 | awk '{print $6}'`)
 # sleep so that FRU and all ipmitool Devices are ready before HOST OS
 # gpio 143 for HPM_STBY_RST_N do to DC-SCM spec
 set_gpio_ctrl 143 out 1
-sleep 5 # for the MUX to get ready 
+sleep 5 # for the MUX to get ready
 # set all mux route to CPU before power on host
 # BMC_CPU_RTC_I2C_SEL #120
 set_gpio_ctrl 120 out 1
 # BMC_CPU_DDR_I2C_SEL #84
 set_gpio_ctrl 84 out 1
+# On EVT machines, the secondary SCP EEPROM is used.
+# Set BMC_I2C_BACKUP_SEL to secondary.
+if [[ $boardver == 0 ]]; then
+    echo "EVT system. Choosing secondary SCP EEPROM."
+    set_gpio_ctrl 168 out 0
+fi
 # BMC_CPU_EEPROM_I2C_SEL #85
 set_gpio_ctrl 85 out 1
 # BMC_CPU_PMBUS_SEL #86

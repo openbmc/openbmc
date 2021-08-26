@@ -23,14 +23,14 @@ function fwbios() {
 
   if [ ! -f $1 ]; then
     echo " Cannot find the" $1 "image file"
-    exit 1
+    return 1
 
   fi
   echo "Flashing BIOS @/dev/$BIOS_MTD"
   flashcp -v $1 /dev/$BIOS_MTD
   if [ $? -ne  0 ]; then
     echo "Flashing the bios failed " >&2
-    exit 1
+    return 1
   fi
   wait
 
@@ -47,17 +47,19 @@ function fwbios() {
   # nvparm -s 0x1 -o 0x5F0638
   if [ $? -ne  0 ]; then
     echo "Setting default nvparms failed " >&2
-    exit 1
+    return 1
   fi
 
   if [[ $(find ${1} -type f -size +17156k 2>/dev/null) ]]; then
     echo "Extracting the SCP from the image"
     dd if=$1 bs=1024 skip=17156 count=256 of=/run/initramfs/myscp.img
+    # Update both primary and backup EEPROM
     fwscp /run/initramfs/myscp.img
+    fwscpback /run/initramfs/myscp.img
   fi
 
-  rm -f $1
-  exit 0
+
+  return 0
 }
 
 function fwbmccpld() {
@@ -66,12 +68,12 @@ function fwbmccpld() {
   loadsvf -d /dev/jtag0 -s $1 -m 0
   if [ $? -ne  0 ]; then
     echo "BMC CPLD update failed" >&2
-    exit 1
+    return 1
   fi
   wait
   set_gpio_ctrl 218 out 1
-  rm -f $1
-  exit 0
+
+  return 0
 }
 
 function fwmbcpld() {
@@ -82,47 +84,49 @@ function fwmbcpld() {
   loadsvf -d /dev/jtag0 -s $1 -m 0
   if [ $? -ne  0 ]; then
     echo "Mobo CPLD update failed" >&2
-    exit 1
+    return 1
   fi
   wait
-  rm -f $1
-  exit 0
+
+  return 0
 }
 
 function fwscp() {
   # BMC_I2C_BACKUP_SEL #168 0:failover, 1:main
   # BMC_CPU_EEPROM_I2C_SEL #85 0:BMC, 1:CPU
+  scp_eeprom_sel=`get_gpio_ctrl 168`
   set_gpio_ctrl 168 out 1
   set_gpio_ctrl 85 out 0
   I2C_BUS_DEV=$(ls -l $devpath/"13-0077/" | grep channel-0 | awk '{ print $11}' | cut -c 8-)
   ampere_eeprom_prog -b $I2C_BUS_DEV -s 0x50 -p -f $1
   if [ $? -ne  0 ]; then
     echo "SCP eeprom update failed" >&2
-    exit 1
+    return 1
   fi
   wait
   set_gpio_ctrl 85 out 1
-  set_gpio_ctrl 168 out 1
-  rm -f $1
-  exit 0
+  set_gpio_ctrl 168 out $scp_eeprom_sel
+
+  return 0
 }
 
 function fwscpback() {
   # BMC_I2C_BACKUP_SEL #168 0:failover, 1:main
   # BMC_CPU_EEPROM_I2C_SEL #85 0:BMC, 1:CPU
+  scp_eeprom_sel=`get_gpio_ctrl 168`
   set_gpio_ctrl 168 out 0
   set_gpio_ctrl 85 out 0
   I2C_BUS_DEV=$(ls -l $devpath/"13-0077/" | grep channel-0 | awk '{ print $11}' | cut -c 8-)
   ampere_eeprom_prog -b $I2C_BUS_DEV -s 0x50 -p -f $1
   if [ $? -ne  0 ]; then
     echo "SCP BACKUP eeprom update failed" >&2
-    exit 1
+    return 1
   fi
   wait
   set_gpio_ctrl 85 out 1
-  set_gpio_ctrl 168 out 1
-  rm -f $1
-  exit 0
+  set_gpio_ctrl 168 out $scp_eeprom_sel
+
+  return 0
 }
 
 function fwmb_pwr_seq(){
@@ -130,24 +134,23 @@ function fwmb_pwr_seq(){
   #$2 0x41 seq config file
   if [[ ! -e $1 ]]; then
     echo "$1 file does not exist"
-    exit 1
+    return 1
   fi
   if [[ ! -e $2 ]]; then
     echo "$2 file does not exist"
-    exit 1
+    return 1
   fi
   echo 32-0040 > /sys/bus/i2c/drivers/adm1266/unbind
   echo 32-0041 > /sys/bus/i2c/drivers/adm1266/unbind
   adm1266_fw_fx $1 $2
   if [ $? -ne  0 ]; then
     echo "The power seq flash failed" >&2
-    exit 1
+    return 1
   fi
   echo 32-0040 > /sys/bus/i2c/drivers/adm1266/bind
   echo 32-0041 > /sys/bus/i2c/drivers/adm1266/bind
-  rm -f $1
-  rm -f $2
-  exit 0
+
+  return 0
 }
 
 if [[ ! $(which flashcp) ]]; then
@@ -189,3 +192,8 @@ case $1 in
   *)
     ;;
 esac
+ret=$?
+
+rm -f $2 $3
+
+exit $ret
