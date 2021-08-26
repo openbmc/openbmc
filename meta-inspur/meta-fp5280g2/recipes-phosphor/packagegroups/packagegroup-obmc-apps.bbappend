@@ -20,6 +20,7 @@ RDEPENDS:${PN}-extras:append:fp5280g2 = " \
                                           mctp \
                                           phosphor-fp5280g2-psu-update \
                                           phosphor-psu-software-manager \
+                                          biosconfig-manager \
                                           webui-vue \
                                          "
 
