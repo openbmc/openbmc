@@ -99,6 +99,7 @@ INSTFMT_CONTROL_INIT = "phosphor-fan-control-init@{0}.service"
 FMT_CONTROL_INIT = "../${TMPL_CONTROL_INIT}:${POWERON_TGT}.wants/${INSTFMT_CONTROL_INIT}"
 
 FILES:${PN}-control = "${bindir}/phosphor-fan-control"
+FILES:${PN}-control += "${bindir}/fanctl"
 SYSTEMD_SERVICE:${PN}-control += "${TMPL_CONTROL}"
 SYSTEMD_SERVICE:${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', '', '${TMPL_CONTROL_INIT}', d)}"
 
