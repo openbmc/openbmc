@@ -4,15 +4,14 @@ LIC_FILES_CHKSUM = ""
 
 BBRANCH = "master"
 SRC_URI = "git://github.com/HewlettPackard/gxp-bootblock.git;branch=${BBRANCH}"
-SRCREV = "1d4b424934ab3a2f22cf1b9a459a38e45971509f"
+SRCREV = "bab416f8ca8c8465d308cfeb7f8d5abc21ba343b"
 S = "${WORKDIR}/git"
 
 inherit deploy
 
 do_deploy () {
   install -d ${DEPLOYDIR}
-
-  install -m 644 gxp-bootblock-dl360poc.bin ${DEPLOYDIR}/gxp-bootblock.bin
+  install -m 644 gxp-bootblock.bin ${DEPLOYDIR}/gxp-bootblock.bin
 
 }
 
