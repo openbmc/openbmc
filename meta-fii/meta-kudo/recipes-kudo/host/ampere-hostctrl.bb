@@ -14,6 +14,7 @@ SRC_URI = "file://ampere-host-shutdown.service \
           file://ampere_power_util.sh \
           file://ampere-chassis-poweroff.service \
           file://ampere-chassis-poweron.service \
+          file://ampere-chassis-powercycle.service \
           file://ampere-host-shutdown-ack.service \
           file://ampere-host-force-reset.service \
           file://ampere-host-power-cycle.service \
@@ -28,6 +29,7 @@ SYSTEMD_SERVICE:${PN} = " \
         ampere-host-reset.service \
         ampere-chassis-poweroff.service \
         ampere-chassis-poweron.service \
+        ampere-chassis-powercycle.service \
         ampere-host-shutdown-ack.service \
         ampere-host-force-reset.service \
         ampere-host-power-cycle.service \
@@ -67,6 +69,11 @@ CHASSIS_POWEROFF_SVC = "ampere-chassis-poweroff.service"
 CHASSIS_POWEROFF_TGTFMT = "obmc-chassis-poweroff@{0}.target"
 CHASSIS_POWEROFF_FMT = "../${CHASSIS_POWEROFF_SVC}:${CHASSIS_POWEROFF_TGTFMT}.requires/${CHASSIS_POWEROFF_SVC}"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'CHASSIS_POWEROFF_FMT', 'OBMC_CHASSIS_INSTANCES')}"
+
+CHASSIS_POWERCYCLE_SVC = "ampere-chassis-powercycle.service"
+CHASSIS_POWERCYCLE_TGTFMT = "obmc-chassis-powercycle@{0}.target"
+CHASSIS_POWERCYCLE_FMT = "../${CHASSIS_POWERCYCLE_SVC}:${CHASSIS_POWERCYCLE_TGTFMT}.requires/${CHASSIS_POWERCYCLE_SVC}"
+SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'CHASSIS_POWERCYCLE_FMT', 'OBMC_CHASSIS_INSTANCES')}"
 
 TMPL = "phosphor-gpio-monitor@.service"
 INSTFMT = "phosphor-gpio-monitor@{0}.service"

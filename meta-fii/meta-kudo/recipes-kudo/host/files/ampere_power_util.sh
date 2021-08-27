@@ -4,7 +4,11 @@ source /usr/sbin/kudo-lib.sh
 
 # Usage of this utility
 function usage() {
-  echo "usage: power-util mb [on|off|graceful_shutdown|force_reset|shutdown_ack]";
+  echo "usage: power-util mb [on|off|graceful_shutdown|force_reset|shutdown_ack|hotswap]";
+}
+
+hotswap() {
+  kudo.sh rst hotswap
 }
 
 force_off() {
@@ -113,6 +117,8 @@ elif [ $2 = "off" ]; then
       force_off
     fi
   fi
+elif [[ $2 == "hotswap" ]]; then
+  hotswap
 elif [[ $2 == "graceful_shutdown" ]]; then
   graceful_shutdown
 elif [ $2 == "force_reset" ]; then

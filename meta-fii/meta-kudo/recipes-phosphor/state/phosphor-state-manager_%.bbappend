@@ -1,5 +1,7 @@
 FILESEXTRAPATHS:prepend:kudo := "${THISDIR}/${PN}:"
 
+CHASSIS_ACTION_TARGETS:append:kudo = " powercycle"
+
 SRC_URI:append:kudo = " \
     file://xyz.openbmc_project.State.Chassis.service \
     "
