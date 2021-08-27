@@ -45,6 +45,6 @@ START OF MAINTAINERS LIST
 # THIS REPOSITORY HAS A DIFFERENT SUBMISSION PROCESS: this is a subtree in
 # @openbmc and is synced by the maintainer using git-subtree. Please submit
 # changes against @openbmc.
-M:  Gilbert Chen <gilbert.chen@hpe.com>
 M:  Jorge Cisneros <jorge.cisneros@hpe.com>
 M:  Mike Garrett <mike.garrett@hpe.com>
+M:  Jean-Marie Verdun <jean-marie.verdun@hpe.com>
