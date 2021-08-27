@@ -15,8 +15,8 @@ MACHINEOVERRIDES .= ":gxp"
 DEFAULTTUNE ?= "armv6-novfp"
 require conf/machine/include/arm/arch-armv6.inc
 
-UBOOT_MACHINE = "gxp_defconfig"
-UBOOT_ENTRYPOINT = "0x40100000"
-UBOOT_LOADADDRESS = "0x40100000"
+UBOOT_MACHINE ?= "gxp_defconfig"
+UBOOT_ENTRYPOINT ?= "0x40100000"
+UBOOT_LOADADDRESS ?= "0x40100000"
 
 
