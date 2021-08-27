@@ -15,3 +15,9 @@
       Properties:
           PowerMode:
               Default: Mode::PowerMode::MaximumPerformance
+
+/xyz/openbmc_project/hardware_isolation/allow_hw_isolation:
+    - Interface: xyz.openbmc_project.Object.Enable
+      Properties:
+          Enabled:
+              Default: 'true'
