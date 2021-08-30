@@ -31,7 +31,7 @@ do_install() {
     install -m 0755 ${WORKDIR}/rootfs ${D}/init.d/90-rootfs
     install -m 0755 ${WORKDIR}/finish ${D}/init.d/99-finish
 
-	# exec
+    # exec
     install -m 0755 ${WORKDIR}/exec ${D}/init.d/89-exec
 
     # mdev

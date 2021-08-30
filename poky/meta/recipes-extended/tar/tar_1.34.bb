@@ -61,3 +61,6 @@ PROVIDES_append_class-native = " tar-replacement-native"
 NATIVE_PACKAGE_PATH_SUFFIX = "/${PN}"
 
 BBCLASSEXTEND = "native nativesdk"
+
+# These are both specific to the NPM package node-tar
+CVE_CHECK_WHITELIST += "CVE-2021-32803 CVE-2021-32804"

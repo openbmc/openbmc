@@ -24,13 +24,13 @@ do_install_append () {
                 lnr ${D}${base_bindir}/kmod ${D}${base_sbindir}/${tool}
         done
         # configuration directories
-        install -dm755 ${D}${base_libdir}/depmod.d
-        install -dm755 ${D}${base_libdir}/modprobe.d
+        install -dm755 ${D}${nonarch_base_libdir}/depmod.d
+        install -dm755 ${D}${nonarch_base_libdir}/modprobe.d
         install -dm755 ${D}${sysconfdir}/depmod.d
         install -dm755 ${D}${sysconfdir}/modprobe.d
 
         # install depmod.d file for search/ dir
-        install -Dm644 "${WORKDIR}/depmod-search.conf" "${D}${base_libdir}/depmod.d/search.conf"
+        install -Dm644 "${WORKDIR}/depmod-search.conf" "${D}${nonarch_base_libdir}/depmod.d/search.conf"
 }
 
 do_compile_prepend() {
@@ -57,6 +57,6 @@ ALTERNATIVE_LINK_NAME[depmod] = "${base_sbindir}/depmod"
 PACKAGES =+ "libkmod"
 
 FILES_libkmod = "${base_libdir}/libkmod*${SOLIBS} ${libdir}/libkmod*${SOLIBS}"
-FILES_${PN} += "${base_libdir}/depmod.d ${base_libdir}/modprobe.d"
+FILES_${PN} += "${nonarch_base_libdir}/depmod.d ${nonarch_base_libdir}/modprobe.d"
 
 BBCLASSEXTEND = "nativesdk"

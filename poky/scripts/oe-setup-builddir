@@ -113,10 +113,10 @@ if [ ! -z "$SHOWYPDOC" ]; then
     cat <<EOM
 The Yocto Project has extensive documentation about OE including a reference
 manual which can be found at:
-    http://yoctoproject.org/documentation
+    https://docs.yoctoproject.org
 
 For more information about OpenEmbedded see their website:
-    http://www.openembedded.org/
+    https://www.openembedded.org/
 
 EOM
 #    unset SHOWYPDOC

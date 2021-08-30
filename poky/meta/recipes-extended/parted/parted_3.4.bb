@@ -11,6 +11,7 @@ SRC_URI = "${GNU_MIRROR}/parted/parted-${PV}.tar.xz \
            file://fix-doc-mandir.patch \
            file://0002-libparted_fs_resize-link-against-libuuid-explicitly-.patch \
            file://run-ptest \
+           file://check-vfat.patch \
            "
 
 SRC_URI[md5sum] = "357d19387c6e7bc4a8a90fe2d015fe80"
@@ -35,10 +36,13 @@ do_install_ptest() {
 	cp ${S}/build-aux/test-driver $t/build-aux/
 	cp -r ${S}/tests $t
 	cp ${B}/tests/Makefile $t/tests/
+	mkdir $t/lib
+	cp ${B}/lib/config.h $t/lib
 	sed -i "s|^VERSION.*|VERSION = ${PV}|g" $t/tests/Makefile
 	sed -i "s|^srcdir =.*|srcdir = \.|g" $t/tests/Makefile
 	sed -i "s|^abs_srcdir =.*|abs_srcdir = \.|g" $t/tests/Makefile
-	sed -i "s|^abs_top_srcdir =.*|abs_top_srcdir = \.\.|g" $t/tests/Makefile
+	sed -i "s|^abs_top_srcdir =.*|abs_top_srcdir = "${PTEST_PATH}"|g" $t/tests/Makefile
+	sed -i "s|^abs_top_builddir =.*|abs_top_builddir = "${PTEST_PATH}"|g" $t/tests/Makefile
 	sed -i "s|^Makefile:.*|Makefile:|g" $t/tests/Makefile
 	sed -i "/^BUILDINFO.*$/d" $t/tests/Makefile
 	for i in print-align print-max print-flags dup-clobber duplicate fs-resize; \
@@ -47,8 +51,8 @@ do_install_ptest() {
 	sed -e 's| ../parted||' -i $t/tests/*.sh
 }
 
-RDEPENDS_${PN}-ptest = "bash coreutils perl util-linux-losetup python3 make gawk e2fsprogs-mke2fs python3-core"
-RRECOMMENDS_${PN}-ptest = "kernel-module-scsi-debug"
+RDEPENDS_${PN}-ptest = "bash coreutils perl util-linux-losetup util-linux-mkswap python3 make gawk e2fsprogs-mke2fs e2fsprogs-tune2fs python3-core dosfstools"
+RRECOMMENDS_${PN}-ptest += "kernel-module-scsi-debug kernel-module-loop kernel-module-vfat"
 RDEPENDS_${PN}-ptest_append_libc-glibc = "\
         glibc-utils \
         locale-base-en-us \

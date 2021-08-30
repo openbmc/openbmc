@@ -24,7 +24,7 @@ import scriptpath
 scriptpath.add_oe_lib_path()
 scriptpath.add_bitbake_lib_path()
 
-from checklayer import LayerType, detect_layers, add_layers, add_layer_dependencies, get_signatures, check_bblayers
+from checklayer import LayerType, detect_layers, add_layers, add_layer_dependencies, get_layer_dependencies, get_signatures, check_bblayers
 from oeqa.utils.commands import get_bb_vars
 
 PROGNAME = 'yocto-check-layer'
@@ -51,6 +51,8 @@ def main():
             help='File to output log (optional)', action='store')
     parser.add_argument('--dependency', nargs="+",
             help='Layers to process for dependencies', action='store')
+    parser.add_argument('--no-auto-dependency', help='Disable automatic testing of dependencies',
+            action='store_true')
     parser.add_argument('--machines', nargs="+",
             help='List of MACHINEs to be used during testing', action='store')
     parser.add_argument('--additional-layers', nargs="+",
@@ -121,6 +123,21 @@ def main():
     if not layers:
         return 1
 
+    # Find all dependencies, and get them checked too
+    if not args.no_auto_dependency:
+        depends = []
+        for layer in layers:
+            layer_depends = get_layer_dependencies(layer, dep_layers, logger)
+            if layer_depends:
+                for d in layer_depends:
+                    if d not in depends:
+                        depends.append(d)
+
+        for d in depends:
+            if d not in layers:
+                logger.info("Adding %s to the list of layers to test, as a dependency", d['name'])
+                layers.append(d)
+
     shutil.copyfile(bblayersconf, bblayersconf + '.backup')
     def cleanup_bblayers(signum, frame):
         shutil.copyfile(bblayersconf + '.backup', bblayersconf)
@@ -160,9 +177,7 @@ def main():
                 if not add_layer_dependencies(bblayersconf, additional_layer, dep_layers, logger):
                     missing_dependencies = True
                     break
-        if not add_layer_dependencies(bblayersconf, layer, dep_layers, logger) or \
-           any(map(lambda additional_layer: not add_layer_dependencies(bblayersconf, additional_layer, dep_layers, logger),
-                   additional_layers)):
+        if missing_dependencies:
             logger.info('Skipping %s due to missing dependencies.' % layer['name'])
             results[layer['name']] = None
             results_status[layer['name']] = 'SKIPPED (Missing dependencies)'

@@ -13,11 +13,11 @@ VBOX_NAME = "VirtualBox-${PV}"
 
 SRC_URI = "http://download.virtualbox.org/virtualbox/${PV}/${VBOX_NAME}.tar.bz2 \
     file://Makefile.utils \
-    file://40-linux-5.13-support.patch \
     file://add__divmoddi4.patch \
 "
-SRC_URI[md5sum] = "abb1a20021e5915fe38c666e8c11cf80"
-SRC_URI[sha256sum] = "99816d2a15205d49362a31e8ffeb8262d2fa0678c751dfd0a7c43b2faca8be49"
+
+SRC_URI[md5sum] = "fce04bbef244b4df1a50e53d132d3e6f"
+SRC_URI[sha256sum] = "0212602eea878d6c9fd7f4a3e0182da3e4505f31d25f5539fb8f7b1fbe366195"
 
 S ?= "${WORKDIR}/vbox_module"
 S_task-patch = "${WORKDIR}/${VBOX_NAME}"

@@ -131,6 +131,11 @@ do_install_append() {
         -e 's@[^ ]*PKG_CONFIG_LIBDIR=[^ "]*@@g' \
         -i ${D}${bindir}/net-snmp-config
 
+    sed -e 's@[^ ]*-ffile-prefix-map=[^ "]*@@g' \
+        -e 's@[^ ]*-fdebug-prefix-map=[^ "]*@@g' \
+        -e 's@[^ ]*-fmacro-prefix-map=[^ "]*@@g' \
+        -i ${D}${libdir}/pkgconfig/netsnmp*.pc
+
     # ${STAGING_DIR_HOST} is empty for native builds, and the sed command below
     # will result in errors if run for native.
     if [ "${STAGING_DIR_HOST}" ]; then

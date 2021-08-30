@@ -27,6 +27,7 @@ SRC_URI = "git://github.com/intel/openlldp.git;protocol=https;branch=master \
            file://0007-lldp_8021qaz-extern-config-object.patch \
            file://0008-stringops-fix-some-string-copy-errors.patch \
            file://0009-8021qaz-mark-prio-map-functions-static.patch \
+           file://lldp_head-remove-all-references.patch \
            "
 
 # Makefile.am adds -Werror to AM_CFLAGS. There are warnings so disable it.

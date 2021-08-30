@@ -16,6 +16,8 @@ SRC_URI = "git://github.com/facebook/zstd.git;branch=release \
 SRCREV = "e4558ffd1dc49399faf4ee5d85abed4386b4dcf5"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 
+CVE_PRODUCT = "zstandard"
+
 S = "${WORKDIR}/git"
 
 PACKAGECONFIG ??= ""

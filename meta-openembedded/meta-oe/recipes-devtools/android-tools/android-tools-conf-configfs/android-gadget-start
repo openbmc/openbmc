@@ -4,4 +4,4 @@ set -e
 
 sleep 3
 
-ls /sys/class/udc/ > /sys/kernel/config/usb_gadget/adb/UDC
+ls /sys/class/udc/ | xargs echo -n > /sys/kernel/config/usb_gadget/adb/UDC

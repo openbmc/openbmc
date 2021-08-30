@@ -1,2 +1,3 @@
 drd/tests/bar_bad
 drd/tests/bar_bad_xml
+none/tests/amd64/fb_test_amd64

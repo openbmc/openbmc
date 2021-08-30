@@ -27,6 +27,10 @@ SRC_URI += "file://touchscreen.rules \
            file://0001-logind-Restore-chvt-as-non-root-user-without-polkit.patch \
            file://0027-proc-dont-trigger-mount-error-with-invalid-options-o.patch \
            file://0001-analyze-resolve-executable-path-if-it-is-relative.patch \
+           file://0001-sd-dhcp-client-check-error-earlier-and-reduce-indent.patch \
+           file://0002-sd-dhcp-client-shorten-code-a-bit.patch \
+           file://0003-sd-dhcp-client-logs-when-dhcp-client-unexpectedly-ga.patch \
+           file://0004-sd-dhcp-client-tentatively-ignore-FORCERENEW-command.patch \
            "
 
 # patches needed by musl

@@ -31,3 +31,5 @@ PACKAGECONFIG[delayacct] = "--enable-delayacct,--disable-delayacct,libnl"
 PACKAGECONFIG[sensors] = "--with-sensors,--without-sensors,lmsensors,lmsensors-libsensors"
 
 FILES_${PN} += "${datadir}/icons/hicolor/scalable/apps/htop.svg"
+
+RDEPENDS_${PN} += "ncurses-terminfo-base"

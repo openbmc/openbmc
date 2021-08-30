@@ -57,6 +57,18 @@ SRC_URI = "https://download.qemu.org/${BPN}-${PV}.tar.xz \
            file://CVE-2020-27821.patch \
            file://CVE-2021-20263.patch \
            file://CVE-2021-3392.patch \
+           file://0001-vhost-user-gpu-fix-memory-disclosure-in-virgl_cmd_ge.patch \
+           file://0002-vhost-user-gpu-fix-resource-leak-in-vg_resource_crea.patch \
+           file://0003-vhost-user-gpu-fix-memory-leak-in-vg_resource_attach.patch \
+           file://0004-vhost-user-gpu-fix-memory-leak-while-calling-vg_reso.patch \
+           file://0005-vhost-user-gpu-fix-memory-leak-in-virgl_cmd_resource.patch \
+           file://0006-vhost-user-gpu-fix-memory-leak-in-virgl_resource_att.patch \
+           file://0007-vhost-user-gpu-fix-OOB-write-in-virgl_cmd_get_capset.patch \
+           file://CVE-2021-3527-1.patch \
+           file://CVE-2021-3527-2.patch \
+           file://CVE-2021-3582.patch \
+           file://CVE-2021-3607.patch \
+           file://CVE-2021-3608.patch \
            "
 UPSTREAM_CHECK_REGEX = "qemu-(?P<pver>\d+(\.\d+)+)\.tar"
 

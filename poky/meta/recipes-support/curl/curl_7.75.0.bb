@@ -17,6 +17,10 @@ SRC_URI = "https://curl.haxx.se/download/curl-${PV}.tar.bz2 \
            file://vtls-fix-warning.patch \
            file://CVE-2021-22898.patch \
            file://CVE-2021-22897.patch \
+           file://CVE-2021-22925.patch \
+           file://CVE-2021-22901.patch \
+           file://CVE-2021-22924.patch \
+           file://CVE-2021-22926.patch \
 "
 
 SRC_URI[sha256sum] = "50552d4501c178e4cc68baaecc487f466a3d6d19bbf4e50a01869effb316d026"

@@ -23,8 +23,8 @@ mkdir configs/c.1
 mkdir functions/ffs.usb0
 mkdir strings/0x409
 mkdir configs/c.1/strings/0x409
-echo 0x18d1 > idVendor
-echo 0xd002 > idProduct
+echo -n 0x18d1 > idVendor
+echo -n 0xd002 > idProduct
 echo "$serial" > strings/0x409/serialnumber
 echo "$manufacturer" > strings/0x409/manufacturer
 echo "$model" > strings/0x409/product

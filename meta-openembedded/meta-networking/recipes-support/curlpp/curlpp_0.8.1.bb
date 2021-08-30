@@ -16,3 +16,10 @@ S = "${WORKDIR}/git"
 inherit cmake pkgconfig binconfig
 
 BBCLASSEXTEND = "native nativesdk"
+
+do_install_append() {
+    sed -e 's@[^ ]*-ffile-prefix-map=[^ "]*@@g' \
+        -e 's@[^ ]*-fdebug-prefix-map=[^ "]*@@g' \
+        -e 's@[^ ]*-fmacro-prefix-map=[^ "]*@@g' \
+        -i ${D}${libdir}/pkgconfig/*.pc
+}

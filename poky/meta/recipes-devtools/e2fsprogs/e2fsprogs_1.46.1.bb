@@ -8,6 +8,7 @@ SRC_URI += "file://remove.ldconfig.call.patch \
 
 SRC_URI_append_class-native = " file://e2fsprogs-fix-missing-check-for-permission-denied.patch \
                                 file://quiet-debugfs.patch \
+                                file://big-inodes-for-small-fs.patch \
 "
 
 

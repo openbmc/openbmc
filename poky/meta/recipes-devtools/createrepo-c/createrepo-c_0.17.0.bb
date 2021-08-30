@@ -33,8 +33,8 @@ do_install_append_class-native() {
 do_install_append_class-nativesdk() {
         create_wrapper ${D}/${bindir}/createrepo_c \
                 RPM_CONFIGDIR=${SDKPATHNATIVE}${libdir_nativesdk}/rpm \
-                MAGIC=${SDKPATHNATIVE}${datadir}/misc/magic.mgc
+                MAGIC=${datadir}/misc/magic.mgc
         create_wrapper ${D}/${bindir}/modifyrepo_c \
-                MAGIC=${SDKPATHNATIVE}${datadir}/misc/magic.mgc
+                MAGIC=${datadir}/misc/magic.mgc
         rm -rf ${D}/etc
 }
