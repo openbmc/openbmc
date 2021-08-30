@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=62272bd11c97396d4aaf1c41bc11f7d8"
 DEPENDS = "expat zlib"
 
 SRC_URI = "git://github.com/openSUSE/libsolv.git \
+           file://CVE-2021-3200.patch \
 "
 
 SRCREV = "605dd2645ef899e2b7c95709476fb51e28d7e378"

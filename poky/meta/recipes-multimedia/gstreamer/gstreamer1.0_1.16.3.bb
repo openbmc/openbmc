@@ -74,4 +74,13 @@ FILES_${PN}-dbg += "${datadir}/gdb ${datadir}/gstreamer-1.0/gdb"
 
 CVE_PRODUCT = "gstreamer"
 
+# CPE entries for gst-plugins-base are listed as gstreamer issues
+# so we need to ignore the false hits
+CVE_CHECK_WHITELIST += "CVE-2021-3522"
+
+# CPE entries for gst-plugins-good are listed as gstreamer issues
+# so we need to ignore the false hits
+CVE_CHECK_WHITELIST += "CVE-2021-3497"
+CVE_CHECK_WHITELIST += "CVE-2021-3498"
+
 require gstreamer1.0-ptest.inc

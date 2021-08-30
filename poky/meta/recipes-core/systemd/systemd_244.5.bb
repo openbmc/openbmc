@@ -20,6 +20,8 @@ SRC_URI += "file://touchscreen.rules \
            file://99-default.preset \
            file://0001-binfmt-Don-t-install-dependency-links-at-install-tim.patch \
            file://0003-implment-systemd-sysv-install-for-OE.patch \
+           file://CVE-2021-33910.patch \
+           file://CVE-2020-13529.patch \
            "
 
 # patches needed by musl

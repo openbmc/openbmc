@@ -33,7 +33,7 @@ class GlibcSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
 
         ptestsuite = "glibc-user" if ssh is None else "glibc"
         self.ptest_section(ptestsuite)
-        with open(os.path.join(builddir, "tests.sum"), "r") as f:
+        with open(os.path.join(builddir, "tests.sum"), "r",  errors='replace') as f:
             for test, result in parse_values(f):
                 self.ptest_result(ptestsuite, test, result)
 

@@ -20,10 +20,6 @@ SRC_URI = " \
 SRC_URI[md5sum] = "e3ddb1bae9fb510b49a295f212f1e6e4"
 SRC_URI[sha256sum] = "9f02678b0bbbcc9eff107d3bd89d83ce92fec2154cd607c7c8bd34dc7fee491c"
 
-# CPE entries for gst-plugins-base are listed as gstreamer issues
-# so we need to ignore the false hit
-CVE_CHECK_WHITELIST += "CVE-2021-3522"
-
 S = "${WORKDIR}/gst-plugins-base-${PV}"
 
 DEPENDS += "iso-codes util-linux zlib"

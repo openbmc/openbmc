@@ -1,0 +1,22 @@
+Ensure "small" file systems also have the default inode size (256 bytes) so that
+can store 64-bit timestamps and work past 2038.
+
+The "small" type is any size >3MB and <512MB, which covers a lot of relatively
+small filesystems built by OE, especially when they're sized to fit the contents
+and expand to the storage on boot.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/misc/mke2fs.conf.in b/misc/mke2fs.conf.in
+index 01e35cf8..29f41dc0 100644
+--- a/misc/mke2fs.conf.in
++++ b/misc/mke2fs.conf.in
+@@ -16,7 +16,6 @@
+ 	}
+ 	small = {
+ 		blocksize = 1024
+-		inode_size = 128
+ 		inode_ratio = 4096
+ 	}
+ 	floppy = {

@@ -1,7 +1,7 @@
 Add code to detect openembedded python interpreter
 
-OE does not use /usr/bin/env as part of the interpreter, so it does not
-update ufw with the interpreter name.
+OE does not use /usr/bin/env as part of the interpreter, Instead, it's a
+full path in sys.executable.
 
 Upstream-Status: Inappropriate (Embedded)
 Signed-off-by: Jate Sujjavanich <jatedev@gmail.com>
@@ -17,9 +17,9 @@ index 75c1105..3f9a5e0 100644
                               "-i.jjm",
                               "1s%^#.*python.*%#! " + sys.executable + "%g",
                               'staging/ufw'])
-+        elif '-native/python' in sys.executable and \
++        elif '/python' in sys.executable and \
 +            os.path.basename(sys.executable) in ['python', 'python3']:
-+            print("Detected oe native python " + os.path.basename(sys.executable))
++            print("Detected full path " + sys.executable + ". substituting " + os.path.basename(sys.executable))
 +            subprocess.call(["sed",
 +                             "-i.jjm",
 +                            "1s%python$%"

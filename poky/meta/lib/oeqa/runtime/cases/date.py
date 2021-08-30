@@ -13,12 +13,12 @@ class DateTest(OERuntimeTestCase):
     def setUp(self):
         if self.tc.td.get('VIRTUAL-RUNTIME_init_manager') == 'systemd':
             self.logger.debug('Stopping systemd-timesyncd daemon')
-            self.target.run('systemctl disable --now systemd-timesyncd')
+            self.target.run('systemctl disable --now --runtime systemd-timesyncd')
 
     def tearDown(self):
         if self.tc.td.get('VIRTUAL-RUNTIME_init_manager') == 'systemd':
             self.logger.debug('Starting systemd-timesyncd daemon')
-            self.target.run('systemctl enable --now systemd-timesyncd')
+            self.target.run('systemctl enable --now --runtime systemd-timesyncd')
 
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['coreutils', 'busybox'])
@@ -28,14 +28,13 @@ class DateTest(OERuntimeTestCase):
         self.assertEqual(status, 0, msg=msg)
         oldDate = output
 
-        sampleDate = '"2016-08-09 10:00:00"'
-        (status, output) = self.target.run("date -s %s" % sampleDate)
+        sampleTimestamp = 1488800000
+        (status, output) = self.target.run("date -s @%d" % sampleTimestamp)
         self.assertEqual(status, 0, msg='Date set failed, output: %s' % output)
 
-        (status, output) = self.target.run("date -R")
-        p = re.match('Tue, 09 Aug 2016 10:00:.. \+0000', output)
+        (status, output) = self.target.run('date +"%s"')
         msg = 'The date was not set correctly, output: %s' % output
-        self.assertTrue(p, msg=msg)
+        self.assertTrue(int(output) - sampleTimestamp < 300, msg=msg)
 
         (status, output) = self.target.run('date -s "%s"' % oldDate)
         msg = 'Failed to reset date, output: %s' % output

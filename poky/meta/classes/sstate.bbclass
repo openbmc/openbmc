@@ -705,6 +705,7 @@ def sstate_package(ss, d):
             pass
         except OSError as e:
             # Handle read-only file systems gracefully
+            import errno
             if e.errno != errno.EROFS:
                 raise e
 
@@ -1014,6 +1015,7 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
         bb.parse.siggen.checkhashes(sq_data, missed, found, d)
 
     return found
+setscene_depvalid[vardepsexclude] = "SSTATE_EXCLUDEDEPS_SYSROOT"
 
 BB_SETSCENE_DEPVALID = "setscene_depvalid"
 
@@ -1147,6 +1149,7 @@ python sstate_eventhandler() {
                 pass
             except OSError as e:
                 # Handle read-only file systems gracefully
+                import errno
                 if e.errno != errno.EROFS:
                     raise e
 

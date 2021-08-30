@@ -1,0 +1,65 @@
+From e2263b58d7733835355d7b46c3caa96d911a4717 Mon Sep 17 00:00:00 2001
+From: Simon Schwarz <simon.schwarz@infoteam.de>
+Date: Fri, 6 Nov 2020 08:53:20 +0100
+Subject: [PATCH] inet6.defn: Added -1 option to dhclient on upping an
+ interface
+
+This prevents hangs on startup when no server is available and dhcpv6 is used
+
+Upstream-Status: Pending
+
+Signed-off-by: Simon Schwarz <simon.schwarz@infoteam.de>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ inet6.defn | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/inet6.defn b/inet6.defn
+index 73dce24..25022e3 100644
+--- a/inet6.defn
++++ b/inet6.defn
+@@ -29,9 +29,9 @@ method auto
+         if (var_set("accept_ra", ifd) && !var_true("accept_ra", ifd))
+     /sbin/ip link set dev %iface% up
+     /lib/ifupdown/wait-for-ll6.sh if (var_true("dhcp", ifd) && execable("/lib/ifupdown/wait-for-ll6.sh"))
+-    /sbin/dhclient -6 -v -P -pf /run/dhclient6.%iface%.pid -lf /var/lib/dhcp/dhclient6.%iface%.leases -I -df /var/lib/dhcp/dhclient.%iface%.leases %iface% \
++    /sbin/dhclient -6 -1 -v -P -pf /run/dhclient6.%iface%.pid -lf /var/lib/dhcp/dhclient6.%iface%.leases -I -df /var/lib/dhcp/dhclient.%iface%.leases %iface% \
+         if (var_true("dhcp", ifd) && execable("/sbin/dhclient") && var_true("request_prefix", ifd))
+-    /sbin/dhclient -6 -v -S -pf /run/dhclient6.%iface%.pid -lf /var/lib/dhcp/dhclient6.%iface%.leases -I -df /var/lib/dhcp/dhclient.%iface%.leases %iface% \
++    /sbin/dhclient -6 -1 -v -S -pf /run/dhclient6.%iface%.pid -lf /var/lib/dhcp/dhclient6.%iface%.leases -I -df /var/lib/dhcp/dhclient.%iface%.leases %iface% \
+         elsif (var_true("dhcp", ifd) && execable("/sbin/dhclient"))
+     echo 'No DHCPv6 client software found!' >&2; false \
+         elsif (var_true("dhcp", ifd))
+@@ -154,9 +154,9 @@ method dhcp
+         if (var_set("accept_ra", ifd) && !var_true("accept_ra", ifd))
+     /sbin/ip link set dev %iface% [[address %hwaddress%]] up
+     /lib/ifupdown/wait-for-ll6.sh if (execable("/lib/ifupdown/wait-for-ll6.sh"))
+-    /sbin/dhclient -6 -v -pf /run/dhclient6.%iface%.pid -lf /var/lib/dhcp/dhclient6.%iface%.leases -I -P -N -df /var/lib/dhcp/dhclient.%iface%.leases %iface% \
++    /sbin/dhclient -6 -1 -v -pf /run/dhclient6.%iface%.pid -lf /var/lib/dhcp/dhclient6.%iface%.leases -I -P -N -df /var/lib/dhcp/dhclient.%iface%.leases %iface% \
+         if (execable("/sbin/dhclient") && var_true("request_prefix", ifd))
+-    /sbin/dhclient -6 -v -pf /run/dhclient6.%iface%.pid -lf /var/lib/dhcp/dhclient6.%iface%.leases -I -df /var/lib/dhcp/dhclient.%iface%.leases %iface% \
++    /sbin/dhclient -6 -1 -v -pf /run/dhclient6.%iface%.pid -lf /var/lib/dhcp/dhclient6.%iface%.leases -I -df /var/lib/dhcp/dhclient.%iface%.leases %iface% \
+         elsif (execable("/sbin/dhclient"))
+     echo 'No DHCPv6 client software found!' >&2; false \
+         elsif (1)
+@@ -325,7 +325,7 @@ method dhcp
+ 
+   up
+     /sbin/ifconfig %iface% [[link %hwaddress%]] up
+-    /sbin/dhclient -6 -pf /run/dhclient6.%iface%.pid -lf /var/lib/dhcp/dhclient6.%iface%.leases -I -df /var/lib/dhcp/dhclient.%iface%.leases %iface% \
++    /sbin/dhclient -6 -1 -pf /run/dhclient6.%iface%.pid -lf /var/lib/dhcp/dhclient6.%iface%.leases -I -df /var/lib/dhcp/dhclient.%iface%.leases %iface% \
+         if (execable("/sbin/dhclient"))
+     echo 'No DHCPv6 client software found!' >&2; false \
+         elsif (1)
+@@ -397,7 +397,7 @@ method dhcp
+   up
+     [[Warning: Option hwaddress: %hwaddress% not yet supported]]
+     inetutils-ifconfig --interface %iface% --up
+-    /sbin/dhclient -6 -pf /run/dhclient6.%iface///.%.pid -lf /var/lib/dhcp/dhclient6.%iface///.%.leases -I -df /var/lib/dhcp/dhclient.%iface///.%.leases %iface% \
++    /sbin/dhclient -6 -1 -pf /run/dhclient6.%iface///.%.pid -lf /var/lib/dhcp/dhclient6.%iface///.%.leases -I -df /var/lib/dhcp/dhclient.%iface///.%.leases %iface% \
+         if (execable("/sbin/dhclient"))
+     echo 'No DHCPv6 client software found!' >&2; false \
+         elsif (1)
+-- 
+2.17.1
+

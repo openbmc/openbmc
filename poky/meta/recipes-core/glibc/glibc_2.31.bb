@@ -18,6 +18,16 @@ CVE_CHECK_WHITELIST += "CVE-2019-1010022 CVE-2019-1010023 CVE-2019-1010024"
 # Potential patch at https://sourceware.org/bugzilla/show_bug.cgi?id=22853
 CVE_CHECK_WHITELIST += "CVE-2019-1010025"
 
+# glibc https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2021-35942
+# The wordexp function in the GNU C Library (aka glibc) through 2.33 may crash
+# or read arbitrary memory in parse_param (in posix/wordexp.c) when called with
+# an untrusted, crafted pattern, potentially resulting in a denial of service
+# or disclosure of information. Patch was backported to 2.31 branch already:
+# https://sourceware.org/git/?p=glibc.git;a=commit;h=4f0a61f75385c9a5879cbe7202042e88f692a3c8
+# which is already included in the dunfell branch of poky:
+# https://git.yoctoproject.org/cgit/cgit.cgi/poky/commit/?h=dunfell&id=e1e89ff7d75c3d2223f9e3bd875b9b0c5e15836b
+CVE_CHECK_WHITELIST += "CVE-2021-35942"
+
 DEPENDS += "gperf-native bison-native make-native"
 
 NATIVESDKFIXES ?= ""

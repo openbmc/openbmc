@@ -14,10 +14,6 @@ detected or specified on the build line.
 Upstream-Status: Inappropriate [ embedded specific ]
 
 Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
-
-Added conditional to handle sys.executable without env on python3
-
-Signed-off-by Jate Sujjavanich <jatedev@gmail.com>
 ---
  setup.py | 34 ++++++++++++++++++++++++++++------
  1 file changed, 28 insertions(+), 6 deletions(-)
@@ -47,7 +43,7 @@ index b13d11c..73acdef 100644
          # Now byte-compile everything
          super(Install, self).run()
  
-@@ -107,12 +112,29 @@ class Install(_install, object):
+@@ -107,12 +112,23 @@ class Install(_install, object):
          for f in [ script, manpage, manpage_f ]:
              self.mkpath(os.path.dirname(f))
  
@@ -66,13 +62,7 @@ index b13d11c..73acdef 100644
 -                         'staging/ufw'])
 +        print("Updating staging/ufw to use (%s)" % (sys.executable))
 +
-+        if not re.search("(/usr/bin/env)", sys.executable):
-+            print("Did not find 'env' in sys.executable (%s)" % (sys.executable))
-+            subprocess.call(["sed",
-+                             "-i",
-+                             "1s%^#.*python.*%#! /usr/bin/env " + sys.executable + "%g",
-+                             'staging/ufw'])
-+        elif re.search("(/usr/bin/env)", sys.executable):
++        if re.search("(/usr/bin/env)", sys.executable):
 +            print("found 'env' in sys.executable (%s)" % (sys.executable))
 +            subprocess.call(["sed",
 +                             "-i.jjm",
