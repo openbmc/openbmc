@@ -52,7 +52,7 @@ SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'FMT', 'CHASSIS_TARGETS', 'STATES'
 # Install the override to set up a Conflicts relation
 SYSTEMD_OVERRIDE_${PN} += "bmc_booted.conf:obmc-led-group-start@bmc_booted.service.d/bmc_booted.conf"
 
-EXTRA_OEMESON += "-Dtests=disabled"
+EXTRA_OEMESON:append = " -Dtests=disabled"
 
 do_compile:prepend() {
     if [ -f "${LED_YAML_PATH}/led.yaml" ]; then

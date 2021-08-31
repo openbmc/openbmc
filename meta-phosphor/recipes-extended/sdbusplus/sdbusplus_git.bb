@@ -18,7 +18,7 @@ DEPENDS += " \
         systemd \
         "
 
-EXTRA_OEMESON += " \
+EXTRA_OEMESON:append = " \
         -Dtests=disabled \
         -Dexamples=disabled \
         "

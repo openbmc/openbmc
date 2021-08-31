@@ -7,8 +7,10 @@ RDEPENDS:phosphor-software-manager-updater-ubi += " \
 "
 
 # Add ubi-fs configs
-EXTRA_OEMESON += "-Dactive-bmc-max-allowed=2"
-EXTRA_OEMESON += "-Dmedia-dir='/media'"
+EXTRA_OEMESON:append = " \
+    -Dactive-bmc-max-allowed=2 \
+    -Dmedia-dir='/media' \
+"
 
 SYSTEMD_SERVICE:phosphor-software-manager-updater-ubi += " \
     obmc-flash-bmc-ubirw.service \

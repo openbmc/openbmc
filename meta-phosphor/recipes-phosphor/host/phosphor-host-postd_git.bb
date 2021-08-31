@@ -29,9 +29,11 @@ SERVICE_FILE = "lpcsnoop.service"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} += "${SERVICE_FILE}"
 
-EXTRA_OEMESON += "-Dsnoop-device=${SNOOP_DEVICE}"
-EXTRA_OEMESON += "-Dpost-code-bytes=${POST_CODE_BYTES}"
-EXTRA_OEMESON += "-Dsystemd-target=multi-user.target"
+EXTRA_OEMESON:append = " \
+    -Dsnoop-device=${SNOOP_DEVICE} \
+    -Dpost-code-bytes=${POST_CODE_BYTES} \
+    -Dsystemd-target=multi-user.target \
+"
 
 POSTCODE_SEVENSEG_DEVICE ?= "seven_seg_disp_val"
 SERVICE_FILE_7SEG = " \

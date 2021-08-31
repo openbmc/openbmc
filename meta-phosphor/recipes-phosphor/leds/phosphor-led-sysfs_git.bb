@@ -16,7 +16,7 @@ DEPENDS += "boost"
 
 DBUS_SERVICE:${PN} += "xyz.openbmc_project.led.controller@.service"
 
-EXTRA_OEMESON += "-Dtests=disabled"
+EXTRA_OEMESON:append = " -Dtests=disabled"
 
 SRC_URI += "git://github.com/openbmc/phosphor-led-sysfs"
 SRC_URI += "file://70-leds.rules"

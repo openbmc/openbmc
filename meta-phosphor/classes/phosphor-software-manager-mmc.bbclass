@@ -2,9 +2,11 @@
 
 PACKAGECONFIG:append = " mmc_layout"
 
-EXTRA_OEMESON += "-Dactive-bmc-max-allowed=2"
-EXTRA_OEMESON += "-Dmedia-dir='/media'"
-EXTRA_OEMESON += "-Doptional-images='image-hostfw'"
+EXTRA_OEMESON:append = " \
+    -Dactive-bmc-max-allowed=2 \
+    -Dmedia-dir='/media' \
+    -Doptional-images='image-hostfw' \
+"
 
 RDEPENDS:phosphor-software-manager-updater-mmc += " \
     gptfdisk \

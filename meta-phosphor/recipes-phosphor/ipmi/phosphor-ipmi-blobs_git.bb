@@ -20,7 +20,7 @@ SRCREV = "f39e668c2b87c9453e0e28d5a8886b81ed80c50e"
 
 FILES:${PN} += "${libdir}/ipmid-providers"
 
-EXTRA_OEMESON += " \
+EXTRA_OEMESON:append = " \
   -Dtests=disabled \
   -Dexamples=false \
   "

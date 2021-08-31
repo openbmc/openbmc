@@ -21,7 +21,7 @@ PACKAGECONFIG = "\
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://0001-sd-bus-Don-t-automatically-add-ObjectManager.patch"
 
-EXTRA_OEMESON += "-Ddns-servers=''"
+EXTRA_OEMESON:append = " -Ddns-servers=''"
 
 ALTERNATIVE:${PN} += "init"
 ALTERNATIVE_TARGET[init] = "${rootlibexecdir}/systemd/systemd"
