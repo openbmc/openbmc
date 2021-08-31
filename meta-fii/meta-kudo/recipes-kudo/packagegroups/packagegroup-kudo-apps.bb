@@ -42,6 +42,7 @@ RDEPENDS:${PN}-kudo-system = " \
     kudo-boot \
     kudo-cmd \
     phosphor-state-manager \
+    smbios-mdr \
     "
 
 SUMMARY:${PN}-kudo-fw = "kudo Firmware"
