@@ -21,7 +21,11 @@ S = "${WORKDIR}/git"
 
 # This provides below applications that are called into in case
 # of host checkstop, host watchdog and host watchdog-timeout respectively.
-APPS = "checkstop watchdog watchdog-timeout"
+APPS =  " \
+        checkstop \
+        watchdog \
+        ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', '', 'watchdog-timeout', d)} \
+        "
 
 DEBUG_TMPL = "openpower-debug-collector-{0}@.service"
 SYSTEMD_SERVICE:${PN} += "${@compose_list(d, 'DEBUG_TMPL', 'APPS')}"
