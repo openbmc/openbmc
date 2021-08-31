@@ -102,6 +102,7 @@ DISTRO_FEATURES_DEFAULT = " \
         security \
         slp \
         systemd \
+        seccomp \
         "
 
 DISTRO_FEATURES += " \
