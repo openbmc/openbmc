@@ -70,4 +70,4 @@ inherit meson systemd
 
 S = "${WORKDIR}/git"
 
-OEMESON_EXTRA:append = "-Dtests=disabled"
+EXTRA_OEMESON:append = " -Dtests=disabled"
