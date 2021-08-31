@@ -65,7 +65,14 @@ SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'external', \
                                                'xyz.openbmc_project.externalsensor.service', \
                                                '', d)}"
 
-DEPENDS = "boost nlohmann-json sdbusplus i2c-tools libgpiod"
+DEPENDS = " \
+    boost \
+    i2c-tools \
+    libgpiod \
+    nlohmann-json \
+    phosphor-logging \
+    sdbusplus \
+    "
 inherit meson systemd
 
 S = "${WORKDIR}/git"
