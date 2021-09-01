@@ -970,6 +970,7 @@
   entityID: 208
   entityInstance: 1
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1001,6 +1002,7 @@
   entityID: 208
   entityInstance: 2
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1032,6 +1034,7 @@
   entityID: 208
   entityInstance: 3
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1063,6 +1066,7 @@
   entityID: 208
   entityInstance: 4
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1094,6 +1098,7 @@
   entityID: 208
   entityInstance: 5
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1125,6 +1130,7 @@
   entityID: 208
   entityInstance: 6
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1156,6 +1162,7 @@
   entityID: 208
   entityInstance: 7
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1187,6 +1194,7 @@
   entityID: 208
   entityInstance: 8
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1218,6 +1226,7 @@
   entityID: 208
   entityInstance: 9
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1249,6 +1258,7 @@
   entityID: 208
   entityInstance: 10
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1280,6 +1290,7 @@
   entityID: 208
   entityInstance: 11
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1311,6 +1322,7 @@
   entityID: 208
   entityInstance: 12
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1342,6 +1354,7 @@
   entityID: 208
   entityInstance: 13
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1373,6 +1386,7 @@
   entityID: 208
   entityInstance: 14
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1404,6 +1418,7 @@
   entityID: 208
   entityInstance: 15
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1435,6 +1450,7 @@
   entityID: 208
   entityInstance: 16
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1466,6 +1482,7 @@
   entityID: 208
   entityInstance: 17
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1497,6 +1514,7 @@
   entityID: 208
   entityInstance: 18
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1528,6 +1546,7 @@
   entityID: 208
   entityInstance: 19
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1559,6 +1578,7 @@
   entityID: 208
   entityInstance: 20
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1590,6 +1610,7 @@
   entityID: 208
   entityInstance: 21
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1621,6 +1642,7 @@
   entityID: 208
   entityInstance: 22
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1652,6 +1674,7 @@
   entityID: 208
   entityInstance: 23
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1683,6 +1706,7 @@
   entityID: 208
   entityInstance: 24
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1714,6 +1738,7 @@
   entityID: 208
   entityInstance: 25
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1745,6 +1770,7 @@
   entityID: 208
   entityInstance: 26
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1776,6 +1802,7 @@
   entityID: 208
   entityInstance: 27
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1807,6 +1834,7 @@
   entityID: 208
   entityInstance: 28
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1838,6 +1866,7 @@
   entityID: 208
   entityInstance: 29
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1869,6 +1898,7 @@
   entityID: 208
   entityInstance: 30
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1900,6 +1930,7 @@
   entityID: 208
   entityInstance: 31
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1931,6 +1962,7 @@
   entityID: 208
   entityInstance: 32
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1962,6 +1994,7 @@
   entityID: 208
   entityInstance: 33
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1993,6 +2026,7 @@
   entityID: 208
   entityInstance: 34
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2024,6 +2058,7 @@
   entityID: 208
   entityInstance: 35
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2055,6 +2090,7 @@
   entityID: 208
   entityInstance: 36
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2086,6 +2122,7 @@
   entityID: 208
   entityInstance: 37
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2117,6 +2154,7 @@
   entityID: 208
   entityInstance: 38
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2148,6 +2186,7 @@
   entityID: 208
   entityInstance: 39
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2179,6 +2218,7 @@
   entityID: 208
   entityInstance: 40
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2210,6 +2250,7 @@
   entityID: 208
   entityInstance: 41
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2241,6 +2282,7 @@
   entityID: 208
   entityInstance: 42
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2272,6 +2314,7 @@
   entityID: 208
   entityInstance: 43
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2303,6 +2346,7 @@
   entityID: 208
   entityInstance: 44
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2334,6 +2378,7 @@
   entityID: 208
   entityInstance: 45
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2365,6 +2410,7 @@
   entityID: 208
   entityInstance: 46
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2396,6 +2442,7 @@
   entityID: 208
   entityInstance: 47
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2427,6 +2474,7 @@
   entityID: 208
   entityInstance: 48
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
