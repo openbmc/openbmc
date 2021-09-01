@@ -26,4 +26,4 @@ do_install() {
 }
 
 SYSTEMD_SERVICE:${PN} += "fbterm.service"
-SYSTEMD_ENVIRONMENT_FILE_${PN} += "fbterm"
+SYSTEMD_ENVIRONMENT_FILE:${PN} += "fbterm"

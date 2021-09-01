@@ -22,12 +22,12 @@ GBS_ITEMS += "${@compose_list(d, 'GBS_ITEMSFMT', 'GBS_NAMES')}"
 GBS_ITEMS:append:gbs += " iio-hwmon-battery.conf"
 
 ENVS = "obmc/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}:append:gbs = " ${@compose_list(d, 'ENVS', 'GBS_ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:gbs = " ${@compose_list(d, 'ENVS', 'GBS_ITEMS')}"
 
 # Fan sensors
 FITEMS = "pwm-fan-controller@103000.conf"
 FENVS = "obmc/hwmon/ahb/apb/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}:append:gbs = " ${@compose_list(d, 'FENVS', 'FITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:gbs = " ${@compose_list(d, 'FENVS', 'FITEMS')}"
 
 
 EXTRA_OEMESON:append:gbs = " -Dupdate-functional-on-fail=true -Dnegative-errno-on-fail=false"

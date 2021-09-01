@@ -37,6 +37,6 @@ FMT_ON_IRUNBIND = "../${TMPL_ON_IRUNBIND}:${TGTFMT_ON}.requires/${INSTFMT_ON_IRU
 
 SYSTEMD_SERVICE:${PN} += "${TMPL_ON_IRUNBIND} ${TMPL_ON_IRBIND}"
 SYSTEMD_SERVICE:${PN}:append:ibm-ac-server = " ${TMPL}"
-SYSTEMD_LINK_${PN}:append:ibm-ac-server = " ${@compose_list(d, 'FMT_ON', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ON_IRBIND', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ON_IRUNBIND', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN}:append:ibm-ac-server = " ${@compose_list(d, 'FMT_ON', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_ON_IRBIND', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_ON_IRUNBIND', 'OBMC_CHASSIS_INSTANCES')}"

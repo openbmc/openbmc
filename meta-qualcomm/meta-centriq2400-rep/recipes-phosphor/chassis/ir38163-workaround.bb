@@ -19,9 +19,9 @@ FMT_REMOVE = "../${IR_REMOVE}:${TGTFMT_OFF}.wants/${INSTIR_REMOVE}"
 FMT_ADD = "../${IR_ADD}:${TGTFMT_ON}.requires/${INSTIR_ADD}"
 
 SYSTEMD_SERVICE_${PN} += "${IR_REMOVE}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_REMOVE', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_REMOVE', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_SERVICE_${PN} += "${IR_ADD}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_ADD', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_ADD', 'OBMC_CHASSIS_INSTANCES')}"
 
 SRC_URI += "file://ir38163_workaround.sh"
 

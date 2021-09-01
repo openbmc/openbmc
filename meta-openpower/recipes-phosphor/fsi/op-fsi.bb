@@ -18,5 +18,5 @@ FMT_SCAN_HOST = "../${TMPL_SCAN}:${TGTFMT_HOST}.wants/${INSTFMT_SCAN}"
 
 SYSTEMD_SERVICE:${PN} += "${TMPL_SCAN} fsi-enable.service fsi-disable.service"
 
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_SCAN_CHASSIS', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_SCAN_HOST', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_SCAN_CHASSIS', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_SCAN_HOST', 'OBMC_HOST_INSTANCES')}"

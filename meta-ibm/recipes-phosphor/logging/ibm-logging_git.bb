@@ -41,7 +41,7 @@ DBUS_SERVICE:${PN} += "${SERVICE}"
 #The BindsTo in the service will not do the restart, it will only do the
 #original start and a stop.
 LOG_FMT = "../${SERVICE}:xyz.openbmc_project.Logging.service.wants/${SERVICE}"
-SYSTEMD_LINK_${PN} += "${LOG_FMT}"
+SYSTEMD_LINK:${PN} += "${LOG_FMT}"
 
 do_install:append(){
 

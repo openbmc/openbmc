@@ -33,5 +33,5 @@ ZAIUS_OCCITEMS = "${@compose_list(d, 'ZAIUS_OCCSFMT', 'ZAIUS_OCCS')}"
 
 ENVS = "obmc/hwmon/{0}"
 # compose_list is not defined immediately so don't use :=
-SYSTEMD_ENVIRONMENT_FILE_${PN}:append:zaius = " ${@compose_list(d, 'ENVS', 'ZAIUS_ITEMS')}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}:append:zaius = " ${@compose_list(d, 'ENVS', 'ZAIUS_OCCITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:zaius = " ${@compose_list(d, 'ENVS', 'ZAIUS_ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:zaius = " ${@compose_list(d, 'ENVS', 'ZAIUS_OCCITEMS')}"

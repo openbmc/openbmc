@@ -13,4 +13,4 @@ TGTFMT = "obmc-chassis-poweron@0.target"
 SYNC_FMT = "../${SYNC_SERVICE}:${TGTFMT}.wants/${SYNC_SERVICE}"
 
 SYSTEMD_SERVICE:${PN} += "${SYNC_SERVICE}"
-SYSTEMD_LINK_${PN} += "${SYNC_FMT}"
+SYSTEMD_LINK:${PN} += "${SYNC_FMT}"

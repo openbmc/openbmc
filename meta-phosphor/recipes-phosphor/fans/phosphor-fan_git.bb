@@ -60,10 +60,10 @@ FMT_TACH_MUSR = "../${TMPL_TACH}:${MULTI_USR_TGT}.wants/${INSTFMT_TACH}"
 
 FILES:${PN}-presence-tach = "${bindir}/phosphor-fan-presence-tach"
 SYSTEMD_SERVICE:${PN}-presence-tach += "${TMPL_TACH}"
-SYSTEMD_LINK_${PN}-presence-tach += "${@compose_list(d, 'FMT_TACH', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN}-presence-tach += "${@compose_list(d, 'FMT_TACH', 'OBMC_CHASSIS_INSTANCES')}"
 
 # JSON mode also gets linked into multi-user
-SYSTEMD_LINK_${PN}-presence-tach += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+SYSTEMD_LINK:${PN}-presence-tach += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
         compose_list(d, 'FMT_TACH_MUSR', 'OBMC_CHASSIS_INSTANCES'), '', d)}"
 
 # Package the JSON config files installed from the repo
@@ -105,10 +105,10 @@ SYSTEMD_SERVICE:${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', 
 
 # JSON: Linked to multi-user and poweron
 # YAML: Linked to fans-ready and fan control-init poweron
-SYSTEMD_LINK_${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+SYSTEMD_LINK:${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
         compose_list(d, 'FMT_CONTROL_MUSR', 'OBMC_CHASSIS_INSTANCES'), \
         compose_list(d, 'FMT_CONTROL', 'OBMC_CHASSIS_INSTANCES'), d)}"
-SYSTEMD_LINK_${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+SYSTEMD_LINK:${PN}-control += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
         compose_list(d, 'FMT_CONTROL_PWRON', 'OBMC_CHASSIS_INSTANCES'), \
         compose_list(d, 'FMT_CONTROL_INIT', 'OBMC_CHASSIS_INSTANCES'), d)}"
 
@@ -141,11 +141,11 @@ SYSTEMD_SERVICE:${PN}-monitor += "${TMPL_MONITOR}"
 SYSTEMD_SERVICE:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', '', '${TMPL_MONITOR_INIT}', d)}"
 
 # JSON: power on and multi-user links.  YAML: fans-ready and fan monitor init links
-SYSTEMD_LINK_${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+SYSTEMD_LINK:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
                                 compose_list(d, 'FMT_MONITOR_PWRON', 'OBMC_CHASSIS_INSTANCES'), \
                                 compose_list(d, 'FMT_MONITOR_FANSREADY', 'OBMC_CHASSIS_INSTANCES'), d)}"
 
-SYSTEMD_LINK_${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
+SYSTEMD_LINK:${PN}-monitor += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
                                 compose_list(d, 'FMT_MONITOR_MUSR', 'OBMC_CHASSIS_INSTANCES'), \
                                 compose_list(d, 'FMT_MONITOR_INIT', 'OBMC_CHASSIS_INSTANCES'), d)}"
 
@@ -163,4 +163,4 @@ PACKAGECONFIG[sensor-monitor] = "--enable-sensor-monitor, --disable-sensor-monit
 
 FILES:sensor-monitor += " ${bindir}/sensor-monitor"
 SYSTEMD_SERVICE:sensor-monitor += "sensor-monitor.service"
-SYSTEMD_LINK_sensor-monitor += "../sensor-monitor.service:${MULTI_USR_TGT}.wants/sensor-monitor.service"
+SYSTEMD_LINK:sensor-monitor += "../sensor-monitor.service:${MULTI_USR_TGT}.wants/sensor-monitor.service"

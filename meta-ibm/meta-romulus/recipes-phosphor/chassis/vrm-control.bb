@@ -24,4 +24,4 @@ TGTFMT = "obmc-chassis-poweron@{0}.target"
 FMT = "../${TMPL}:${TGTFMT}.requires/${INSTFMT}"
 
 SYSTEMD_SERVICE:${PN} += "${TMPL}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"

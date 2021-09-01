@@ -28,10 +28,10 @@ EXTRA_OEMESON = " \
         "
 
 # Copies config file having arguments for host watchdog
-SYSTEMD_ENVIRONMENT_FILE_${PN} +="obmc/watchdog/poweron"
+SYSTEMD_ENVIRONMENT_FILE:${PN} +="obmc/watchdog/poweron"
 
 # Install the override to set up a Conflicts relation
-SYSTEMD_OVERRIDE_${PN} += "poweron.conf:phosphor-watchdog@poweron.service.d/poweron.conf"
+SYSTEMD_OVERRIDE:${PN} += "poweron.conf:phosphor-watchdog@poweron.service.d/poweron.conf"
 
 # For now, watching PowerOn is the only usecase
 OBMC_HOST_WATCHDOG_INSTANCES = "poweron"
@@ -51,5 +51,5 @@ ENABLE_WATCHDOG_TGTFMT = "obmc-enable-host-watchdog@{0}.service"
 WATCHDOG_FMT = "../${WATCHDOG_TMPL}:obmc-host-startmin@{1}.target.wants/${WATCHDOG_TGTFMT}"
 ENABLE_WATCHDOG_FMT = "../${ENABLE_WATCHDOG_TMPL}:obmc-host-startmin@{0}.target.wants/${ENABLE_WATCHDOG_TGTFMT}"
 
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'WATCHDOG_FMT', 'OBMC_HOST_WATCHDOG_INSTANCES', 'OBMC_HOST_INSTANCES')}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'ENABLE_WATCHDOG_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'WATCHDOG_FMT', 'OBMC_HOST_WATCHDOG_INSTANCES', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'ENABLE_WATCHDOG_FMT', 'OBMC_HOST_INSTANCES')}"

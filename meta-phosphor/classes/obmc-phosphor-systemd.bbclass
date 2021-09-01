@@ -25,16 +25,16 @@
 # SYSTEMD_USER_${unit}.service = "foo"
 #    The user for the unit/package.
 #
-# SYSTEMD_ENVIRONMENT_FILE_${PN} = "foo"
+# SYSTEMD_ENVIRONMENT_FILE:${PN} = "foo"
 #    One or more environment files to be installed.
 #
-# SYSTEMD_LINK_${PN} = "tgt:name"
+# SYSTEMD_LINK:${PN} = "tgt:name"
 #    A specification for installing arbitrary links in
 #    the ${systemd_system_unitdir} namespace, where:
 #      tgt: the link target
 #      name: the link name, relative to ${systemd_system_unitdir}
 #
-# SYSTEMD_OVERRIDE_${PN} = "src:dest"
+# SYSTEMD_OVERRIDE:${PN} = "src:dest"
 #    A specification for installing unit overrides where:
 #      src: the override file template
 #      dest: the override install location, relative to ${systemd_system_unitdir}
@@ -230,11 +230,11 @@ python() {
             unit_exist = check_sd_unit(d, unit)
             add_sd_unit(d, unit, pkg, unit_exist)
             add_sd_user(d, unit.name, pkg)
-        for name in listvar_to_list(d, 'SYSTEMD_ENVIRONMENT_FILE_%s' % pkg):
+        for name in listvar_to_list(d, 'SYSTEMD_ENVIRONMENT_FILE:%s' % pkg):
             add_env_file(d, name, pkg)
-        for spec in listvar_to_list(d, 'SYSTEMD_LINK_%s' % pkg):
+        for spec in listvar_to_list(d, 'SYSTEMD_LINK:%s' % pkg):
             install_link(d, spec, pkg)
-        for spec in listvar_to_list(d, 'SYSTEMD_OVERRIDE_%s' % pkg):
+        for spec in listvar_to_list(d, 'SYSTEMD_OVERRIDE:%s' % pkg):
             add_override(d, spec, pkg)
 }
 

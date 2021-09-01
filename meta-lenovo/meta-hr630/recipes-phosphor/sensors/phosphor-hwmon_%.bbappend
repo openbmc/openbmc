@@ -15,4 +15,4 @@ ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
 ITEMS += "iio-hwmon.conf"
 
 ENVS = "obmc/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_hr630 := "${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}_append_hr630 := "${@compose_list(d, 'ENVS', 'ITEMS')}"
