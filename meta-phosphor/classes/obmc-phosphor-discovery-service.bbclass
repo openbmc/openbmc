@@ -24,7 +24,7 @@ python() {
 
 
     for pkg in listvar_to_list(d, 'DISCOVERY_SVC_PACKAGES'):
-        for service in listvar_to_list(d, 'REGISTERED_SERVICES_%s' % pkg):
+        for service in listvar_to_list(d, 'REGISTERED_SERVICES:%s' % pkg):
             if avahi_enabled:
                 set_doappend(d, 'RRECOMMENDS:%s' % pkg, 'avahi-daemon')
                 svc_name, svc_type, svc_port, svc_txt_data = service.split(':')
@@ -95,7 +95,7 @@ python discovery_services_postinstall() {
             fd.write('%s %s %s' % (service_name, service_type, service_port))
 
     def register_services(d,pkg):
-        for service in listvar_to_list(d, 'REGISTERED_SERVICES_%s' % pkg):
+        for service in listvar_to_list(d, 'REGISTERED_SERVICES:%s' % pkg):
             svc_info = service.split(":")
             try:
                 svc_name, svc_type, svc_port, svc_txt_data = svc_info
