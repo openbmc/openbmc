@@ -1,3 +1,3 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-EXTRA_OECONF_append = " --enable-configure-dbus=yes"
+EXTRA_OECONF:append = " --enable-configure-dbus=yes"

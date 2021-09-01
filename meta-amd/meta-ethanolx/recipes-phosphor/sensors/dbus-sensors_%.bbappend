@@ -1,4 +1,4 @@
-PACKAGECONFIG_ethanolx = "\
+PACKAGECONFIG:ethanolx = "\
     hwmontempsensor \
     fansensor \
     psusensor \

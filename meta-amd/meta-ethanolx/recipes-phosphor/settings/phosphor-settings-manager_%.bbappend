@@ -1,1 +1,1 @@
-PACKAGECONFIG_append_ethanolx = " boot_type"
+PACKAGECONFIG:append:ethanolx = " boot_type"
