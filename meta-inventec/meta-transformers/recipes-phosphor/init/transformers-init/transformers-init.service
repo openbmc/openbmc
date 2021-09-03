@@ -1,0 +1,10 @@
+[Unit]
+Description=Essential init commands for transformers
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/sbin/transformers-init.sh
+
+[Install]
+WantedBy=multi-user.target
