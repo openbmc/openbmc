@@ -16,6 +16,7 @@ inherit autotools
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[testapp] = "--enable-kcapi-test,,,bash"
 PACKAGECONFIG[apps] = "--enable-kcapi-speed --enable-kcapi-hasher --enable-kcapi-rngapp --enable-kcapi-encapp --enable-kcapi-dgstapp,,,"
+PACKAGECONFIG[hasher_only] = "--enable-kcapi-hasher --disable-lib-kdf --disable-lib-sym --disable-lib-aead --disable-lib-rng,,,"
 
 do_install:append() {
     # bindir contains testapp and apps.  However it is always created, even
@@ -28,3 +29,5 @@ do_install:append() {
 }
 
 CPPFLAGS:append:libc-musl:toolchain-clang = " -Wno-error=sign-compare"
+
+BBCLASSEXTEND = "native"

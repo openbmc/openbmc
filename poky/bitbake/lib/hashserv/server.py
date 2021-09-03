@@ -410,11 +410,11 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
 
 
 class Server(bb.asyncrpc.AsyncServer):
-    def __init__(self, db, loop=None, upstream=None, read_only=False):
+    def __init__(self, db, upstream=None, read_only=False):
         if upstream and read_only:
             raise bb.asyncrpc.ServerError("Read-only hashserv cannot pull from an upstream server")
 
-        super().__init__(logger, loop)
+        super().__init__(logger)
 
         self.request_stats = Stats()
         self.db = db

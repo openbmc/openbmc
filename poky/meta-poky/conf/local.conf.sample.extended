@@ -135,7 +135,7 @@ DISTRO_FEATURES:remove = "x11"
 # Uncomment the following lines to enable multilib builds
 #require conf/multilib.conf
 #MULTILIBS = "multilib:lib32"
-#DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
+#DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
 
 # Set RPM_PREFER_ELF_ARCH to configure preferred ABI when using rpm packaging
 # backend to generate a rootfs, choices are:
@@ -313,7 +313,7 @@ DISTRO_FEATURES:remove = "x11"
 # Note this is not officially supported and is just illustrated here to
 # show an example of how it can be done
 # You'll also need your fortran recipe to depend on libgfortran
-#FORTRAN_forcevariable = ",fortran"
+#FORTRAN:forcevariable = ",fortran"
 
 #
 # Kernel image features

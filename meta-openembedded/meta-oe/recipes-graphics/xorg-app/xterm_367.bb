@@ -37,7 +37,7 @@ do_install:append() {
     oe_runmake install-desktop DESTDIR="${D}" DESKTOP_FLAGS="--dir=${D}${DESKTOPDIR}"
 }
 
-RPROVIDES:${PN} = "virtual/x-terminal-emulator"
+RPROVIDES:${PN} = "virtual-x-terminal-emulator"
 
 # busybox can supply resize too
 inherit update-alternatives

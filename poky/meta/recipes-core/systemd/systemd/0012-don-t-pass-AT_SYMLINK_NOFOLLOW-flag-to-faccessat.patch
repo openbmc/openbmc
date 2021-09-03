@@ -1,4 +1,4 @@
-From 06915b70735caa66987af758ebdc4207757ae758 Mon Sep 17 00:00:00 2001
+From 88c8922f9e4d221402d9cb2e04b9c82e89125827 Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Tue, 10 Oct 2017 14:33:30 -0700
 Subject: [PATCH] don't pass AT_SYMLINK_NOFOLLOW flag to faccessat()
@@ -31,9 +31,11 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
  src/shared/base-filesystem.c |  6 +++---
  2 files changed, 24 insertions(+), 5 deletions(-)
 
+diff --git a/src/basic/fs-util.h b/src/basic/fs-util.h
+index 7f15b558ca..4263298cad 100644
 --- a/src/basic/fs-util.h
 +++ b/src/basic/fs-util.h
-@@ -47,8 +47,27 @@ int futimens_opath(int fd, const struct
+@@ -47,8 +47,27 @@ int futimens_opath(int fd, const struct timespec ts[2]);
  int fd_warn_permissions(const char *path, int fd);
  int stat_warn_permissions(const char *path, const struct stat *st);
  
@@ -63,9 +65,11 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
  
  int touch_file(const char *path, bool parents, usec_t stamp, uid_t uid, gid_t gid, mode_t mode);
  int touch(const char *path);
+diff --git a/src/shared/base-filesystem.c b/src/shared/base-filesystem.c
+index 016eb7b82a..b1967f9f2f 100644
 --- a/src/shared/base-filesystem.c
 +++ b/src/shared/base-filesystem.c
-@@ -53,7 +53,7 @@ int base_filesystem_create(const char *r
+@@ -53,7 +53,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
                  return log_error_errno(errno, "Failed to open root file system: %m");
  
          for (size_t i = 0; i < ELEMENTSOF(table); i++) {
@@ -74,7 +78,7 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
                          continue;
  
                  if (table[i].target) {
-@@ -61,7 +61,7 @@ int base_filesystem_create(const char *r
+@@ -61,7 +61,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
  
                          /* check if one of the targets exists */
                          NULSTR_FOREACH(s, table[i].target) {
@@ -83,7 +87,7 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
                                          continue;
  
                                  /* check if a specific file exists at the target path */
-@@ -72,7 +72,7 @@ int base_filesystem_create(const char *r
+@@ -72,7 +72,7 @@ int base_filesystem_create(const char *root, uid_t uid, gid_t gid) {
                                          if (!p)
                                                  return log_oom();
  

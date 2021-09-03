@@ -1,6 +1,6 @@
 # Allow checking of required and conflicting features
 #
-# xxx = [DISTRO,MACHINE,COMBINED]
+# xxx = [DISTRO,MACHINE,COMBINED,IMAGE]
 #
 # ANY_OF_xxx_FEATURES:        ensure at least one item on this list is included
 #                             in xxx_FEATURES.
@@ -18,7 +18,7 @@ python () {
 
     unused = True
 
-    for kind in ['DISTRO', 'MACHINE', 'COMBINED']:
+    for kind in ['DISTRO', 'MACHINE', 'COMBINED', 'IMAGE']:
         if d.getVar('ANY_OF_' + kind + '_FEATURES') is None and \
            d.overridedata.get('ANY_OF_' + kind + '_FEATURES') is None and \
            d.getVar('REQUIRED_' + kind + '_FEATURES') is None and \

@@ -1,4 +1,4 @@
-From c30ab62d18ce88187f5eb6c236e0977c9337f68d Mon Sep 17 00:00:00 2001
+From 45148529792c0cda32fdd61610c8d5a700d541fa Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Tue, 10 Jul 2018 15:40:17 +0800
 Subject: [PATCH] distinguish XSI-compliant strerror_r from GNU-specifi
@@ -25,10 +25,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  2 files changed, 10 insertions(+)
 
 diff --git a/src/libsystemd/sd-bus/bus-error.c b/src/libsystemd/sd-bus/bus-error.c
-index 8da2024a50..9605a9b869 100644
+index 7483b46a11..c49be29e46 100644
 --- a/src/libsystemd/sd-bus/bus-error.c
 +++ b/src/libsystemd/sd-bus/bus-error.c
-@@ -392,7 +392,12 @@ static void bus_error_strerror(sd_bus_error *e, int error) {
+@@ -404,7 +404,12 @@ static void bus_error_strerror(sd_bus_error *e, int error) {
                          return;
  
                  errno = 0;

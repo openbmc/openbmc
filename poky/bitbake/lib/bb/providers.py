@@ -94,7 +94,7 @@ def versionVariableMatch(cfgData, keyword, pn):
 
     # pn can contain '_', e.g. gcc-cross-x86_64 and an override cannot
     # hence we do this manually rather than use OVERRIDES
-    ver = cfgData.getVar("%s_VERSION_pn-%s" % (keyword, pn))
+    ver = cfgData.getVar("%s_VERSION:pn-%s" % (keyword, pn))
     if not ver:
         ver = cfgData.getVar("%s_VERSION_%s" % (keyword, pn))
     if not ver:

@@ -28,6 +28,12 @@ EXTRA_AUTORECONF += "--exclude=autoheader"
 
 EXTRA_OECONF:append:libc-musl = " --with-jemalloc-prefix=je_"
 
+do_install:append() {
+	sed -i -e 's@${STAGING_DIR_HOST}@@g' \
+               -e 's@${STAGING_DIR_NATIVE}@@g' \
+               -e 's@${WORKDIR}@@g' ${D}${bindir}/jemalloc-config
+}
+
 do_compile_ptest() {
 	oe_runmake tests
 }

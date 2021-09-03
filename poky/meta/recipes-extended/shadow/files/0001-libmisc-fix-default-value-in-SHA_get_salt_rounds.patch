@@ -1,0 +1,64 @@
+From 234e8fa7b134d1ebabfdad980a3ae5b63c046c62 Mon Sep 17 00:00:00 2001
+From: Mike Gilbert <floppym@gentoo.org>
+Date: Sat, 14 Aug 2021 13:24:34 -0400
+Subject: [PATCH] libmisc: fix default value in SHA_get_salt_rounds()
+
+If SHA_CRYPT_MIN_ROUNDS and SHA_CRYPT_MAX_ROUNDS are both unspecified,
+use SHA_ROUNDS_DEFAULT.
+
+Previously, the code fell through, calling shadow_random(-1, -1). This
+ultimately set rounds = (unsigned long) -1, which ends up being a very
+large number! This then got capped to SHA_ROUNDS_MAX later in the
+function.
+
+The new behavior matches BCRYPT_get_salt_rounds().
+
+Bug: https://bugs.gentoo.org/808195
+Fixes: https://github.com/shadow-maint/shadow/issues/393
+
+Upstream-Status: Backport [https://github.com/shadow-maint/shadow/commit/234e8fa7b134d1ebabfdad980a3ae5b63c046c62]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ libmisc/salt.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/libmisc/salt.c b/libmisc/salt.c
+index 91d528fd..30eefb9c 100644
+--- a/libmisc/salt.c
++++ b/libmisc/salt.c
+@@ -223,20 +223,21 @@ static /*@observer@*/const unsigned long SHA_get_salt_rounds (/*@null@*/int *pre
+ 		if ((-1 == min_rounds) && (-1 == max_rounds)) {
+ 			rounds = SHA_ROUNDS_DEFAULT;
+ 		}
++		else {
++			if (-1 == min_rounds) {
++				min_rounds = max_rounds;
++			}
+ 
+-		if (-1 == min_rounds) {
+-			min_rounds = max_rounds;
+-		}
++			if (-1 == max_rounds) {
++				max_rounds = min_rounds;
++			}
+ 
+-		if (-1 == max_rounds) {
+-			max_rounds = min_rounds;
+-		}
++			if (min_rounds > max_rounds) {
++				max_rounds = min_rounds;
++			}
+ 
+-		if (min_rounds > max_rounds) {
+-			max_rounds = min_rounds;
++			rounds = (unsigned long) shadow_random (min_rounds, max_rounds);
+ 		}
+-
+-		rounds = (unsigned long) shadow_random (min_rounds, max_rounds);
+ 	} else if (0 == *prefered_rounds) {
+ 		rounds = SHA_ROUNDS_DEFAULT;
+ 	} else {
+-- 
+2.17.1
+

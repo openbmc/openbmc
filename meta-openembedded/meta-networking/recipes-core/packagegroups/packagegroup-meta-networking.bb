@@ -177,6 +177,7 @@ RDEPENDS:packagegroup-meta-networking-protocols:remove:libc-musl = "mdns"
 RDEPENDS:packagegroup-meta-networking-support = "\
     aoetools \
     arptables \
+    bmon \
     bridge-utils \
     celt051 \
     cim-schema-docs \

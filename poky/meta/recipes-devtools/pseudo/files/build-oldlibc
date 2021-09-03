@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# Script to re-generate pseudo-prebuilt-2.33.tar.xz
+#
+# Copyright (C) 2021 Richard Purdie
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+for i in x86_64 aarch64 i686; do
+    if [ ! -e $i-nativesdk-libc.tar.xz ]; then
+        wget http://downloads.yoctoproject.org/releases/uninative/3.2/$i-nativesdk-libc.tar.xz
+    fi
+    tar -xf $i-nativesdk-libc.tar.xz --wildcards \*/lib/libpthread\* \*/lib/libdl\*
+    cd $i-linux/lib
+    ln -s libdl.so.2 libdl.so
+    ln -s libpthread.so.0 libpthread.so
+    cd ../..
+done
+tar -cJf pseudo-prebuilt-2.33.tar.xz *-linux

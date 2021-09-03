@@ -48,9 +48,11 @@ inherit autotools
 
 BBCLASSEXTEND = "native"
 
-EXTRA_OECONF = "--disable-selinux --with-pkgversion=${PV}-${PR} \
+EXTRA_OECONF = "--with-pkgversion=${PV}-${PR} \
 	--with-bugurl=http://bugzilla.yoctoproject.org/"
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
 
 #
 # For target prelink we need to ensure paths match the lib path layout

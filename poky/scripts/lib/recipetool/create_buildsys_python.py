@@ -545,7 +545,7 @@ class PythonRecipeHandler(RecipeHandler):
             with open(pkgdatafile, 'r') as f:
                 for line in f.readlines():
                     field, value = line.split(': ', 1)
-                    if field == 'FILES_INFO':
+                    if field.startswith('FILES_INFO'):
                         files_info = ast.literal_eval(value)
                         break
                 else:

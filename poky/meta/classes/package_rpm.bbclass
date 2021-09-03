@@ -40,10 +40,10 @@ def write_rpm_perfiledata(srcname, d):
         outfile.write("# Dependency table\n")
         outfile.write('deps = {\n')
         for pkg in packages.split():
-            dependsflist_key = 'FILE' + varname + 'FLIST' + "_" + pkg
+            dependsflist_key = 'FILE' + varname + 'FLIST' + ":" + pkg
             dependsflist = (d.getVar(dependsflist_key) or "")
             for dfile in dependsflist.split():
-                key = "FILE" + varname + "_" + dfile + "_" + pkg
+                key = "FILE" + varname + ":" + dfile + ":" + pkg
                 deps = filter_nativesdk_deps(srcname, d.getVar(key) or "")
                 depends_dict = bb.utils.explode_dep_versions(deps)
                 file = dfile.replace("@underscore@", "_")
@@ -249,10 +249,10 @@ python write_specfile () {
 
     def get_perfile(varname, pkg, d):
         deps = []
-        dependsflist_key = 'FILE' + varname + 'FLIST' + "_" + pkg
+        dependsflist_key = 'FILE' + varname + 'FLIST' + ":" + pkg
         dependsflist = (d.getVar(dependsflist_key) or "")
         for dfile in dependsflist.split():
-            key = "FILE" + varname + "_" + dfile + "_" + pkg
+            key = "FILE" + varname + ":" + dfile + ":" + pkg
             depends = d.getVar(key)
             if depends:
                 deps.append(depends)

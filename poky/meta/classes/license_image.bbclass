@@ -87,7 +87,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                 # If the package doesn't contain any file, that is, its size is 0, the license
                 # isn't relevant as far as the final image is concerned. So doing license check
                 # doesn't make much sense, skip it.
-                if pkg_dic[pkg]["PKGSIZE_%s" % pkg] == "0":
+                if pkg_dic[pkg]["PKGSIZE:%s" % pkg] == "0":
                     continue
             else:
                 # Image manifest

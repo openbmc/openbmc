@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Upstream "fast" tests take about 5 minutes and currently do not run cleanly
+# (tests/cover and tests/pytest)
+# https://github.com/HypothesisWorks/hypothesis/tree/master/hypothesis-python/tests
+# https://github.com/HypothesisWorks/hypothesis/blob/master/hypothesis-python/scripts/basic-test.sh#L18
+#
+# Instead we run two test suites imported from examples/
+
+pytest -o log_cli=true -o log_cli_level=INFO | sed -e 's/\[...%\]//g'| sed -e 's/PASSED/PASS/g'| sed -e 's/FAILED/FAIL/g'|sed -e 's/SKIPPED/SKIP/g'| awk '{if ($NF=="PASS" || $NF=="FAIL" || $NF=="SKIP" || $NF=="XFAIL" || $NF=="XPASS"){printf "%s: %s\n", $NF, $0}else{print}}'| awk '{if ($NF=="PASS" || $NF=="FAIL" || $NF=="SKIP" || $NF=="XFAIL" || $NF=="XPASS") {$NF="";print $0}else{print}}'

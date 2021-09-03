@@ -2064,7 +2064,7 @@ Now comes the time to actually build an image and you need a kernel
 recipe, but which one? You can configure your build to call out the
 kernel recipe you want by using the :term:`PREFERRED_PROVIDER` variable. As
 an example, consider the :yocto_git:`x86-base.inc
-</poky/tree/meta/conf/machine/include/x86-base.inc>` include file, which is a
+</poky/tree/meta/conf/machine/include/x86/x86-base.inc>` include file, which is a
 machine (i.e. :term:`MACHINE`) configuration file. This include file is the
 reason all x86-based machines use the ``linux-yocto`` kernel. Here are the
 relevant lines from the include file::

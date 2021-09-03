@@ -185,6 +185,7 @@ class KickStart():
         part.add_argument('--use-uuid', action='store_true')
         part.add_argument('--uuid')
         part.add_argument('--fsuuid')
+        part.add_argument('--no-fstab-update', action='store_true')
 
         bootloader = subparsers.add_parser('bootloader')
         bootloader.add_argument('--append')

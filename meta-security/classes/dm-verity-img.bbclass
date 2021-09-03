@@ -63,8 +63,8 @@ verity_setup() {
 VERITY_TYPES = "ext2.verity ext3.verity ext4.verity btrfs.verity"
 IMAGE_TYPES += "${VERITY_TYPES}"
 CONVERSIONTYPES += "verity"
-CONVERSION_CMD_verity = "verity_setup ${type}"
-CONVERSION_DEPENDS_verity = "cryptsetup-native"
+CONVERSION_CMD:verity = "verity_setup ${type}"
+CONVERSION_DEPENDS:verity = "cryptsetup-native"
 
 python __anonymous() {
     verity_image = d.getVar('DM_VERITY_IMAGE')

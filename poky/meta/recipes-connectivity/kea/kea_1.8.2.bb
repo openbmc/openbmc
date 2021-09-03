@@ -20,6 +20,7 @@ SRC_URI = "http://ftp.isc.org/isc/kea/${PV}/${BP}.tar.gz \
            file://0001-src-lib-log-logger_unittest_support.cc-do-not-write-.patch \
            file://0001-ax_cpp11.m4-Include-memory-header.patch \
            file://0001-include-limits.h.patch \
+           file://0001-add-missing-headers-in-timer_mgr.cc.patch \
            "
 SRC_URI[sha256sum] = "486ca7abedb9d6fdf8e4344ad8688d1171f2ef0f5506d118988aadeae80a1d39"
 

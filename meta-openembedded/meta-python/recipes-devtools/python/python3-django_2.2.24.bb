@@ -1,4 +1,8 @@
 require python-django.inc
+
+# Pin to 2.2.x LTS releases ONLY for this recipe
+UPSTREAM_CHECK_REGEX = "/${PYPI_PACKAGE}/(?P<pver>(2\.2\.\d*)+)/"
+
 inherit setuptools3
 
 SRC_URI[md5sum] = "ebf3bbb7716a7b11029e860475b9a122"

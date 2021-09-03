@@ -21,8 +21,8 @@ universal, the list includes them just in case:
 
       Information in append files extends or overrides the information in the
       similarly-named recipe file. For an example of an append file in use, see
-      the ":ref:`dev-manual/common-tasks:Using .bbappend Files in
-      Your Layer`" section in the Yocto Project Development Tasks Manual.
+      the    ":ref:`dev-manual/common-tasks:appending other layers metadata with your layer`"
+      section in the Yocto Project Development Tasks Manual.
 
       When you name an append file, you can use the "``%``" wildcard character
       to allow for matching recipe names. For example, suppose you have an

@@ -1,3 +1,4 @@
+# Can't use feature-arm-dsp.inc, since that will add "+dsp", which isn't supported in GCC for ARMv5
 ARMPKGSFX_DSP = "${@bb.utils.contains('TUNE_FEATURES', [ 'dsp' ], 'e', '', d)}"
 TUNEVALID[dsp] = "ARM DSP functionality"
 

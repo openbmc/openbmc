@@ -17,10 +17,10 @@ SRC_URI[sha256sum] = "34599bbcc4e5ab87832370763e38be5100984a64237555e9234a1ea225
 UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
 
 DEPENDS = "anthy fontconfig libxft libxt glib-2.0 ncurses intltool libedit"
-DEPENDS:append:class-target = " intltool-native gtk+ gtk+3 uim-native takao-fonts"
+DEPENDS:append:class-target = " intltool-native gtk+ gtk+3 uim-native"
 
 RDEPENDS:uim = "libuim0 libedit"
-RDEPENDS:uim-anthy = "takao-fonts anthy libanthy0"
+RDEPENDS:uim-anthy = "anthy libanthy0"
 RDEPENDS:uim-anthy:append:libc-glibc = " glibc-utils glibc-gconv-euc-jp"
 
 LEAD_SONAME = "libuim.so.1"

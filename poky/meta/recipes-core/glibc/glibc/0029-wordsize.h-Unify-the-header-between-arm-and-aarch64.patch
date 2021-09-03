@@ -46,14 +46,6 @@ copy to sysdeps/arm/bits/wordsize.h
 index 91da566b74..34fcdef1f1 100644
 --- a/sysdeps/aarch64/bits/wordsize.h
 +++ b/sysdeps/arm/bits/wordsize.h
-@@ -1,6 +1,6 @@
- /* Determine the wordsize from the preprocessor defines.
- 
--   Copyright (C) 2016-2021 Free Software Foundation, Inc.
-+   Copyright (C) 2016-2020 Free Software Foundation, Inc.
-    This file is part of the GNU C Library.
- 
-    The GNU C Library is free software; you can redistribute it and/or
 @@ -17,12 +17,16 @@
     License along with the GNU C Library; if not, see
     <https://www.gnu.org/licenses/>.  */

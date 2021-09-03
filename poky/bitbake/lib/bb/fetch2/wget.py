@@ -330,50 +330,51 @@ class Wget(FetchMethod):
                         urllib.request.HTTPSHandler(context=context)]
             opener = urllib.request.build_opener(*handlers)
 
-        try:
-            uri = ud.url.split(";")[0]
-            r = urllib.request.Request(uri)
-            r.get_method = lambda: "HEAD"
-            # Some servers (FusionForge, as used on Alioth) require that the
-            # optional Accept header is set.
-            r.add_header("Accept", "*/*")
-            r.add_header("User-Agent", self.user_agent)
-            def add_basic_auth(login_str, request):
-                '''Adds Basic auth to http request, pass in login:password as string'''
-                import base64
-                encodeuser = base64.b64encode(login_str.encode('utf-8')).decode("utf-8")
-                authheader = "Basic %s" % encodeuser
-                r.add_header("Authorization", authheader)
-
-            if ud.user and ud.pswd:
-                add_basic_auth(ud.user + ':' + ud.pswd, r)
-
             try:
-                import netrc
-                n = netrc.netrc()
-                login, unused, password = n.authenticators(urllib.parse.urlparse(uri).hostname)
-                add_basic_auth("%s:%s" % (login, password), r)
-            except (TypeError, ImportError, IOError, netrc.NetrcParseError):
-                pass
+                uri = ud.url.split(";")[0]
+                r = urllib.request.Request(uri)
+                r.get_method = lambda: "HEAD"
+                # Some servers (FusionForge, as used on Alioth) require that the
+                # optional Accept header is set.
+                r.add_header("Accept", "*/*")
+                r.add_header("User-Agent", self.user_agent)
+                def add_basic_auth(login_str, request):
+                    '''Adds Basic auth to http request, pass in login:password as string'''
+                    import base64
+                    encodeuser = base64.b64encode(login_str.encode('utf-8')).decode("utf-8")
+                    authheader = "Basic %s" % encodeuser
+                    r.add_header("Authorization", authheader)
 
-            with opener.open(r) as response:
-                pass
-        except urllib.error.URLError as e:
-            if try_again:
-                logger.debug2("checkstatus: trying again")
-                return self.checkstatus(fetch, ud, d, False)
-            else:
-                # debug for now to avoid spamming the logs in e.g. remote sstate searches
-                logger.debug2("checkstatus() urlopen failed: %s" % e)
-                return False
-        except ConnectionResetError as e:
-            if try_again:
-                logger.debug2("checkstatus: trying again")
-                return self.checkstatus(fetch, ud, d, False)
-            else:
-                # debug for now to avoid spamming the logs in e.g. remote sstate searches
-                logger.debug2("checkstatus() urlopen failed: %s" % e)
-                return False
+                if ud.user and ud.pswd:
+                    add_basic_auth(ud.user + ':' + ud.pswd, r)
+
+                try:
+                    import netrc
+                    n = netrc.netrc()
+                    login, unused, password = n.authenticators(urllib.parse.urlparse(uri).hostname)
+                    add_basic_auth("%s:%s" % (login, password), r)
+                except (TypeError, ImportError, IOError, netrc.NetrcParseError):
+                    pass
+
+                with opener.open(r) as response:
+                    pass
+            except urllib.error.URLError as e:
+                if try_again:
+                    logger.debug2("checkstatus: trying again")
+                    return self.checkstatus(fetch, ud, d, False)
+                else:
+                    # debug for now to avoid spamming the logs in e.g. remote sstate searches
+                    logger.debug2("checkstatus() urlopen failed: %s" % e)
+                    return False
+            except ConnectionResetError as e:
+                if try_again:
+                    logger.debug2("checkstatus: trying again")
+                    return self.checkstatus(fetch, ud, d, False)
+                else:
+                    # debug for now to avoid spamming the logs in e.g. remote sstate searches
+                    logger.debug2("checkstatus() urlopen failed: %s" % e)
+                    return False
+
         return True
 
     def _parse_path(self, regex, s):

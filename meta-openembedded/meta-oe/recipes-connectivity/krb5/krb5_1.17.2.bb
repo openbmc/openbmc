@@ -95,6 +95,11 @@ do_install:append() {
         install -m 0644 ${WORKDIR}/krb5-admin-server.service ${D}${systemd_system_unitdir}
         install -m 0644 ${WORKDIR}/krb5-kdc.service ${D}${systemd_system_unitdir}
     fi
+
+    sed -e 's@[^ ]*-ffile-prefix-map=[^ "]*@@g' \
+        -e 's@[^ ]*-fdebug-prefix-map=[^ "]*@@g' \
+        -e 's@[^ ]*-fmacro-prefix-map=[^ "]*@@g' \
+        -i ${D}${bindir}/krb5-config
 }
 
 PACKAGES =+ "${PN}-admin-server \

@@ -218,7 +218,7 @@ class RootfsPlugin(SourcePlugin):
             # Update part.has_fstab here as fstab may have been added or
             # removed by the above modifications.
             part.has_fstab = os.path.exists(os.path.join(new_rootfs, "etc/fstab"))
-            if part.update_fstab_in_rootfs and part.has_fstab:
+            if part.update_fstab_in_rootfs and part.has_fstab and not part.no_fstab_update:
                 fstab_path = os.path.join(new_rootfs, "etc/fstab")
                 # Assume that fstab should always be owned by root with fixed permissions
                 install_cmd = "install -m 0644 %s %s" % (part.updated_fstab_path, fstab_path)

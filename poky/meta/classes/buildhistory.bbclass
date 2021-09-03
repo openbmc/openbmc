@@ -446,7 +446,7 @@ def buildhistory_list_installed(d, rootfs_type="image"):
         output_file_full = os.path.join(d.getVar('WORKDIR'), output_file)
 
         with open(output_file_full, 'w') as output:
-            output.write(format_pkg_list(pkgs, output_type))
+            output.write(format_pkg_list(pkgs, output_type, d.getVar('PKGDATA_DIR')))
 
 python buildhistory_list_installed_image() {
     buildhistory_list_installed(d)
@@ -487,6 +487,8 @@ buildhistory_get_installed() {
 	       -e 's:|: -> :' \
 	       -e 's:"\[REC\]":[style=dotted]:' \
 	       -e 's:"\([<>=]\+\)" "\([^"]*\)":[label="\1 \2"]:' \
+	       -e 's:"\([*]\+\)" "\([^"]*\)":[label="\2"]:' \
+	       -e 's:"\[RPROVIDES\]":[style=dashed]:' \
 		$1/depends.tmp
 	# Add header, sorted and de-duped contents and footer and then delete the temp file
 	printf "digraph depends {\n    node [shape=plaintext]\n" > $1/depends.dot
@@ -498,6 +500,11 @@ buildhistory_get_installed() {
 	oe-pkgdata-util -p ${PKGDATA_DIR} read-value "PKGSIZE" -n -f $pkgcache > $1/installed-package-sizes.tmp
 	cat $1/installed-package-sizes.tmp | awk '{print $2 "\tKiB\t" $1}' | sort -n -r > $1/installed-package-sizes.txt
 	rm $1/installed-package-sizes.tmp
+
+	# Produce package info: runtime_name, buildtime_name, recipe, version, size
+	oe-pkgdata-util -p ${PKGDATA_DIR} read-value "PACKAGE,PN,PV,PKGSIZE" -n -f $pkgcache > $1/installed-package-info.tmp
+	cat $1/installed-package-info.tmp | sort -n -r -k 5 > $1/installed-package-info.txt
+	rm $1/installed-package-info.tmp
 
 	# We're now done with the cache, delete it
 	rm $pkgcache

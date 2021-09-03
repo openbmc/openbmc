@@ -2,11 +2,11 @@
 # Package Versions for cutting edge testing:
 #
 
-#SRCREV_pn-opkg-native ?= "${AUTOREV}"
-#SRCREV_pn-opkg-sdk ?= "${AUTOREV}"
-#SRCREV_pn-opkg ?= "${AUTOREV}"
-#SRCREV_pn-opkg-utils-native ?= "${AUTOREV}"
-#SRCREV_pn-opkg-utils ?= "${AUTOREV}"
+#SRCREV:pn-opkg-native ?= "${AUTOREV}"
+#SRCREV:pn-opkg-sdk ?= "${AUTOREV}"
+#SRCREV:pn-opkg ?= "${AUTOREV}"
+#SRCREV:pn-opkg-utils-native ?= "${AUTOREV}"
+#SRCREV:pn-opkg-utils ?= "${AUTOREV}"
 SRCREV:pn-gconf-dbus ?= "${AUTOREV}"
 SRCREV:pn-matchbox-common ?= "${AUTOREV}"
 SRCREV:pn-matchbox-config-gtk ?= "${AUTOREV}"

@@ -473,7 +473,7 @@ class BitBakeServer(object):
             try:
                 r = ready.get()
             except EOFError:
-                # Trap the child exitting/closing the pipe and error out
+                # Trap the child exiting/closing the pipe and error out
                 r = None
         if not r or r[0] != "r":
             ready.close()

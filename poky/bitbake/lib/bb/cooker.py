@@ -382,7 +382,7 @@ class BBCooker:
         try:
             self.prhost = prserv.serv.auto_start(self.data)
         except prserv.serv.PRServiceConfigError as e:
-            bb.fatal("Unable to start PR Server, exitting")
+            bb.fatal("Unable to start PR Server, exiting, check the bitbake-cookerdaemon.log")
 
         if self.data.getVar("BB_HASHSERVE") == "auto":
             # Create a new hash server bound to a unix domain socket

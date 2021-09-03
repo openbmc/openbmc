@@ -23,8 +23,10 @@ RDEPENDS:${PN}-ptest += " \
 "
 
 do_install_ptest() {
-	install -d ${D}${PTEST_PATH}/tests
-	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+    install -d ${D}${PTEST_PATH}/tests
+    cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+    cp -rf ${S}/setup.cfg ${D}${PTEST_PATH}/
+    cp -rf ${S}/docs ${D}${PTEST_PATH}/
 }
 
 UPSTREAM_CHECK_REGEX = "click/(?P<pver>\d+(\.\d+)+)/"

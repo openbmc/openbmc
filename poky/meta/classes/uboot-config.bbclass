@@ -11,13 +11,18 @@
 #
 # Copyright 2013, 2014 (C) O.S. Systems Software LTDA.
 
+def removesuffix(s, suffix):
+    if suffix and s.endswith(suffix):
+        return s[:-len(suffix)]
+    return s
+
 # Some versions of u-boot use .bin and others use .img.  By default use .bin
 # but enable individual recipes to change this value.
 UBOOT_SUFFIX ??= "bin"
 UBOOT_BINARY ?= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_BINARYNAME ?= "${@os.path.splitext(d.getVar("UBOOT_BINARY"))[0]}"
-UBOOT_IMAGE ?= "u-boot-${MACHINE}-${PV}-${PR}.${UBOOT_SUFFIX}"
-UBOOT_SYMLINK ?= "u-boot-${MACHINE}.${UBOOT_SUFFIX}"
+UBOOT_IMAGE ?= "${UBOOT_BINARYNAME}-${MACHINE}-${PV}-${PR}.${UBOOT_SUFFIX}"
+UBOOT_SYMLINK ?= "${UBOOT_BINARYNAME}-${MACHINE}.${UBOOT_SUFFIX}"
 UBOOT_MAKE_TARGET ?= "all"
 
 # Output the ELF generated. Some platforms can use the ELF file and directly
@@ -33,10 +38,13 @@ UBOOT_ELF_SYMLINK ?= "u-boot-${MACHINE}.${UBOOT_ELF_SUFFIX}"
 # should be packaged along with the u-boot binary as well as placed in the
 # deploy directory.  For those versions they can set the following variables
 # to allow packaging the SPL.
+SPL_SUFFIX ?= ""
 SPL_BINARY ?= ""
-SPL_BINARYNAME ?= "${@os.path.basename(d.getVar("SPL_BINARY"))}"
-SPL_IMAGE ?= "${SPL_BINARYNAME}-${MACHINE}-${PV}-${PR}"
-SPL_SYMLINK ?= "${SPL_BINARYNAME}-${MACHINE}"
+SPL_DELIMITER  ?= "${@'.' if d.getVar("SPL_SUFFIX") else ''}"
+SPL_BINARYFILE ?= "${@os.path.basename(d.getVar("SPL_BINARY"))}"
+SPL_BINARYNAME ?= "${@removesuffix(d.getVar("SPL_BINARYFILE"), "." + d.getVar("SPL_SUFFIX"))}"
+SPL_IMAGE ?= "${SPL_BINARYNAME}-${MACHINE}-${PV}-${PR}${SPL_DELIMITER}${SPL_SUFFIX}"
+SPL_SYMLINK ?= "${SPL_BINARYNAME}-${MACHINE}${SPL_DELIMITER}${SPL_SUFFIX}"
 
 # Additional environment variables or a script can be installed alongside
 # u-boot to be used automatically on boot.  This file, typically 'uEnv.txt'

@@ -1,5 +1,5 @@
 header:
-  version: 8
+  version: 9
 
 distro: poky
 
@@ -30,15 +30,9 @@ repos:
       meta-networking:
       meta-filesystems:
 
-  meta-rust:
-    url: https://github.com/meta-rust/meta-rust.git
-    refspec: master
-
-
-
 local_conf_header:
   base: |
-    CONF_VERSION = "1"
+    CONF_VERSION = "2"
     SOURCE_MIRROR_URL = "http://downloads.yoctoproject.org/mirror/sources/"
     SSTATE_MIRRORS = "file://.* http://sstate.yoctoproject.org/dev/PATH;downloadfilename=PATH \n"
     BB_HASHSERVE = "auto"
@@ -57,7 +51,7 @@ local_conf_header:
     EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
     PACKAGE_CLASSES = "package_ipk"
 
-    DISTRO_FEATURES:append = " pam apparmor smack ima"
+    DISTRO_FEATURES:append = " security pam apparmor smack ima tpm tpm2"
     MACHINE_FEATURES:append = " tpm tpm2"
 
   diskmon: |
@@ -73,7 +67,6 @@ local_conf_header:
 
 bblayers_conf_header:
   base: |
-    POKY_BBLAYERS_CONF_VERSION = "2"
     BBPATH = "${TOPDIR}"
     BBFILES ?= ""
 

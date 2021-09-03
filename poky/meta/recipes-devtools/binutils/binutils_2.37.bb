@@ -1,7 +1,7 @@
 require binutils.inc
 require binutils-${PV}.inc
 
-DEPENDS += "flex bison zlib"
+DEPENDS += "zlib"
 
 EXTRA_OECONF += "--with-sysroot=/ \
                 --enable-install-libbfd \

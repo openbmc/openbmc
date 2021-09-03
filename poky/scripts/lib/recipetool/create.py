@@ -115,8 +115,8 @@ class RecipeHandler(object):
                 for line in f:
                     if line.startswith('PN:'):
                         pn = line.split(':', 1)[-1].strip()
-                    elif line.startswith('FILES_INFO:'):
-                        val = line.split(':', 1)[1].strip()
+                    elif line.startswith('FILES_INFO:%s:' % pkg):
+                        val = line.split(': ', 1)[1].strip()
                         dictval = json.loads(val)
                         for fullpth in sorted(dictval):
                             if fullpth.startswith(includedir) and fullpth.endswith('.h'):

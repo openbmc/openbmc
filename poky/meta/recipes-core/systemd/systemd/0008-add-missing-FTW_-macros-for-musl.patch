@@ -1,4 +1,4 @@
-From e0d1912f0246c97e5e7b4177691363d2d077e11d Mon Sep 17 00:00:00 2001
+From 3410d82c9d07aee3e951fc6ae0b41fc1a594e00d Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:00:06 +0800
 Subject: [PATCH] add missing FTW_ macros for musl

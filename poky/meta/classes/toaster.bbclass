@@ -106,7 +106,7 @@ def _toaster_load_pkgdatafile(dirpath, filepath):
                     pkgdata['OPKGN'] = m.group(1)
                 kn = "_".join([x for x in kn.split("_") if x.isupper()])
                 pkgdata[kn] = kv.strip()
-                if kn == 'FILES_INFO':
+                if kn.startswith('FILES_INFO'):
                     pkgdata[kn] = json.loads(kv)
 
             except ValueError:

@@ -154,7 +154,7 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
         def print_item(f, pn, ver, layer, ispref):
             if not selected_layer or layer == selected_layer:
                 if not bare and f in skiplist:
-                    skipped = ' (skipped)'
+                    skipped = ' (skipped: %s)' % self.tinfoil.cooker.skiplist[f].skipreason
                 else:
                     skipped = ''
                 if show_filenames:

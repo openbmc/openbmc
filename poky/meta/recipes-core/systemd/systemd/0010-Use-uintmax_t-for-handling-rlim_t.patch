@@ -1,4 +1,4 @@
-From dc40487e0ac26e3ca317429b9c3e8f01772de60a Mon Sep 17 00:00:00 2001
+From eeacb75025d8f537d54c35256c5730c9aab15cde Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:12:41 +0800
 Subject: [PATCH] Use uintmax_t for handling rlim_t
@@ -23,9 +23,9 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 
 ---
  src/basic/format-util.h |  8 +-------
- src/basic/rlimit-util.c | 10 +++++-----
+ src/basic/rlimit-util.c | 12 ++++++------
  src/core/execute.c      |  4 ++--
- 3 files changed, 8 insertions(+), 14 deletions(-)
+ 3 files changed, 9 insertions(+), 15 deletions(-)
 
 diff --git a/src/basic/format-util.h b/src/basic/format-util.h
 index b7e18768e3..3195ab205d 100644
@@ -47,7 +47,7 @@ index b7e18768e3..3195ab205d 100644
  #if SIZEOF_DEV_T == 8
  #  define DEV_FMT "%" PRIu64
 diff --git a/src/basic/rlimit-util.c b/src/basic/rlimit-util.c
-index 23d108d5df..b037734ee3 100644
+index 23d108d5df..3e6fb438d7 100644
 --- a/src/basic/rlimit-util.c
 +++ b/src/basic/rlimit-util.c
 @@ -43,7 +43,7 @@ int setrlimit_closest(int resource, const struct rlimit *rlim) {
@@ -87,10 +87,10 @@ index 23d108d5df..b037734ee3 100644
          return 1;
  }
 diff --git a/src/core/execute.c b/src/core/execute.c
-index f82fc294c0..4696d055a8 100644
+index 2a64675c5f..dca1e0e3b6 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
-@@ -5370,9 +5370,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
+@@ -5391,9 +5391,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
          for (unsigned i = 0; i < RLIM_NLIMITS; i++)
                  if (c->rlimit[i]) {
                          fprintf(f, "%sLimit%s: " RLIM_FMT "\n",

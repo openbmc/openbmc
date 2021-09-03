@@ -31,8 +31,9 @@ PACKAGECONFIG += " \
 "
 PACKAGECONFIG[x11] = "--with-x --x-includes=${STAGING_INCDIR} --x-libraries=${STAGING_LIBDIR},--without-x,virtual/libx11"
 
-LDFLAGS:append:libc-glibc:x86-64 = " -lgcc"
-LDFLAGS:append:libc-glibc:x86 = " -lgcc"
+# libmpi.so needs symbols like __multf3 and somehow it does not respect --rtlib option passed by clang
+LDFLAGS:append:x86-64 = " -lgcc"
+LDFLAGS:append:x86 = " -lgcc"
 
 inherit autotools gettext pkgconfig
 

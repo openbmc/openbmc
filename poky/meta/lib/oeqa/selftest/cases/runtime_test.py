@@ -212,12 +212,14 @@ class TestImage(OESelftestTestCase):
         Author: Alexander Kanavin <alex.kanavin@gmail.com>
         """
         import subprocess, os
+
+        render_hint = """If /dev/dri/renderD* is absent due to lack of suitable GPU, 'modprobe vgem' will create one sutable for mesa llvmpipe sofware renderer."""
         try:
             content = os.listdir("/dev/dri")
             if len([i for i in content if i.startswith('render')]) == 0:
-                self.skipTest("No render nodes found in /dev/dri: %s" %(content))
+                self.skipTest("No render nodes found in /dev/dri: %s. %s" %(content, render_hint))
         except FileNotFoundError:
-            self.skipTest("/dev/dri directory does not exist; no render nodes available on this machine.")
+            self.skipTest("/dev/dri directory does not exist; no render nodes available on this machine. %s" %(render_hint))
         try:
             dripath = subprocess.check_output("pkg-config --variable=dridriverdir dri", shell=True)
         except subprocess.CalledProcessError as e:

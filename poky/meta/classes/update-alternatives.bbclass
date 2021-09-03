@@ -321,7 +321,7 @@ def apply_update_alternative_provides(d):
 
             # Add file provide
             trans_target = oe.package.file_translate(alt_target)
-            d.appendVar('FILERPROVIDES_%s_%s' % (trans_target, pkg), " " + alt_link)
-            if not trans_target in (d.getVar('FILERPROVIDESFLIST_%s' % pkg) or ""):
-                d.appendVar('FILERPROVIDESFLIST_%s' % pkg, " " + trans_target)
+            d.appendVar('FILERPROVIDES:%s:%s' % (trans_target, pkg), " " + alt_link)
+            if not trans_target in (d.getVar('FILERPROVIDESFLIST:%s' % pkg) or ""):
+                d.appendVar('FILERPROVIDESFLIST:%s' % pkg, " " + trans_target)
 

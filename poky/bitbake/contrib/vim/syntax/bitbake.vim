@@ -77,7 +77,7 @@ syn keyword bbOEFunctions       do_fetch do_unpack do_patch do_configure do_comp
 " Generic Functions
 syn match bbFunction            "\h[0-9A-Za-z_\-\.]*" display contained contains=bbOEFunctions
 
-syn keyword bbOverrideOperator  append prepend contained
+syn keyword bbOverrideOperator  append prepend remove contained
 
 " BitBake shell metadata
 syn include @shell syntax/sh.vim

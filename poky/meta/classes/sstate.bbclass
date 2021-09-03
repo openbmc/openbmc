@@ -971,12 +971,11 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
             tasklist.append((tid, sstatefile))
 
         if tasklist:
+            nproc = min(int(d.getVar("BB_NUMBER_THREADS")), len(tasklist))
+
             if len(tasklist) >= min_tasks:
                 msg = "Checking sstate mirror object availability"
                 bb.event.fire(bb.event.ProcessStarted(msg, len(tasklist)), d)
-
-            import multiprocessing
-            nproc = min(multiprocessing.cpu_count(), len(tasklist))
 
             bb.event.enable_threadlock()
             pool = oe.utils.ThreadedPool(nproc, len(tasklist),

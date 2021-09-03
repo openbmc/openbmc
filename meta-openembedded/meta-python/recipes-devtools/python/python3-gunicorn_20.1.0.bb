@@ -12,6 +12,8 @@ SRC_URI += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
+    ${PYTHON_PN}-eventlet \
+    ${PYTHON_PN}-gevent \
 	${PYTHON_PN}-pytest \
 "
 

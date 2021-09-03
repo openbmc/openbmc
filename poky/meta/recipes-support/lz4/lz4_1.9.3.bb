@@ -13,7 +13,7 @@ PE = "1"
 SRCREV = "d44371841a2f1728a3f36839fd4b7e872d0927d3"
 
 SRC_URI = "git://github.com/lz4/lz4.git;branch=release \
-           file://run-ptest \
+           file://CVE-2021-3520.patch \
            "
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>.*)"
 

@@ -118,13 +118,15 @@ python () {
     if not(d.getVar('PTEST_ENABLED') == "1"):
         for i in ['do_configure_ptest_base', 'do_compile_ptest_base', 'do_install_ptest_base']:
             bb.build.deltask(i, d)
+}
 
+QARECIPETEST[missing-ptest] = "package_qa_check_missing_ptest"
+def package_qa_check_missing_ptest(pn, d, messages):
     # This checks that ptest package is actually included
     # in standard oe-core ptest images - only for oe-core recipes
     if not 'meta/recipes' in d.getVar('FILE') or not(d.getVar('PTEST_ENABLED') == "1"):
         return
 
-    enabled_ptests = " ".join([d.getVar('PTESTS_FAST'),d.getVar('PTESTS_SLOW'), d.getVar('PTESTS_PROBLEMS')]).split()
-    if (d.getVar('PN') + "-ptest").replace(d.getVar('MLPREFIX'), '') not in enabled_ptests:
-         bb.error("Recipe %s supports ptests but is not included in oe-core's conf/distro/include/ptest-packagelists.inc" % d.getVar("PN"))
-}
+    enabled_ptests = " ".join([d.getVar('PTESTS_FAST'), d.getVar('PTESTS_SLOW'), d.getVar('PTESTS_PROBLEMS')]).split()
+    if (pn + "-ptest").replace(d.getVar('MLPREFIX'), '') not in enabled_ptests:
+        package_qa_handle_error("missing-ptest", "supports ptests but is not included in oe-core's ptest-packagelists.inc", d)

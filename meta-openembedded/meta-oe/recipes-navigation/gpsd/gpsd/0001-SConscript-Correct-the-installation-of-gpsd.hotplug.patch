@@ -1,0 +1,29 @@
+From c7183b2cc4a42f6ca7c2dc687ee7881efe9aeb73 Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+Date: Sat, 28 Aug 2021 14:22:02 +0200
+Subject: [PATCH] SConscript: Correct the installation of gpsd.hotplug
+
+Without this, `scons systemd=false && scons udev-install` fails with:
+
+  cp .../gpsd/gpsd-3.23.1~dev/gpsd.hotplug /home/pkj/gpsd/foobar/lib/udev
+  cp: cannot stat '.../gpsd/gpsd-3.23.1~dev/gpsd.hotplug': No such file or directory
+
+Upstream-Status: Submitted [https://gitlab.com/gpsd/gpsd/-/merge_requests/277]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ SConscript | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/SConscript b/SConscript
+index 1cd3354e1..e578012f5 100644
+--- a/SConscript
++++ b/SConscript
+@@ -3060,7 +3060,7 @@ if env['systemd']:
+     hotplug_wrapper_install = []
+ else:
+     hotplug_wrapper_install = [
+-        'cp $SRCDIR/gpsd.hotplug ' + DESTDIR + env['udevdir'],
++        'cp $SRCDIR/../gpsd.hotplug ' + DESTDIR + env['udevdir'],
+         'chmod a+x ' + DESTDIR + env['udevdir'] + '/gpsd.hotplug'
+     ]
+ 

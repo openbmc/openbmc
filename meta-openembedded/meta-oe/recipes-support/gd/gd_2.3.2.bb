@@ -15,6 +15,7 @@ DEPENDS = "freetype libpng jpeg zlib tiff"
 
 SRC_URI = "git://github.com/libgd/libgd.git;branch=master \
            file://0001-replace-uint32-with-uint32_t-and-uint16-with-uint16_.patch \
+           file://0001-fix-read-out-of-bands-in-reading-tga-header-file.patch \
            "
 
 SRCREV = "2e40f55bfb460fc9d8cbcd290a0c9eb908d5af7e"

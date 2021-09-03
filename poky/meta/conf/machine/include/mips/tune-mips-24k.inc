@@ -2,7 +2,7 @@ DEFAULTTUNE ?= "mips32r2-24kc"
 
 MIPSPKGSFX_MIPS16E ??= ""
 
-require conf/machine/include/tune-mips32r2.inc
+require conf/machine/include/mips/tune-mips32r2.inc
 require conf/machine/include/mips/feature-mips-mips16e.inc
 
 

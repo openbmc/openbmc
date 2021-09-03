@@ -226,8 +226,8 @@ RDEPENDS:packagegroup-meta-oe-dbs-python2 ="\
 
 RDEPENDS:packagegroup-meta-oe-devtools ="\
     abseil-cpp \
+    apitrace \
     breakpad \
-    bootchart \
     android-tools-conf \
     android-tools \
     concurrencykit \
@@ -396,7 +396,6 @@ RDEPENDS:packagegroup-meta-oe-extended ="\
     libusbmuxd \
     liblockfile \
     liblogging \
-    libnss-nisplus \
     libpwquality \
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "libreport", "", d)} \
     libserialport \
@@ -435,7 +434,7 @@ RDEPENDS:packagegroup-meta-oe-extended:append:libc-musl = " libexecinfo"
 RDEPENDS:packagegroup-meta-oe-extended:append:x86-64 = " pmdk libx86-1"
 RDEPENDS:packagegroup-meta-oe-extended:append:x86 = " libx86-1"
 
-RDEPENDS:packagegroup-meta-oe-extended:remove:libc-musl = "libnss-nisplus sysdig"
+RDEPENDS:packagegroup-meta-oe-extended:remove:libc-musl = "sysdig"
 RDEPENDS:packagegroup-meta-oe-extended:remove:mipsarch = "upm mraa minifi-cpp tiptop"
 RDEPENDS:packagegroup-meta-oe-extended:remove:mips = "sysdig"
 RDEPENDS:packagegroup-meta-oe-extended:remove:powerpc = "upm mraa minifi-cpp"
@@ -493,7 +492,6 @@ RDEPENDS:packagegroup-meta-oe-graphics ="\
     packagegroup-fonts-truetype \
     qrencode \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "st", "", d)} \
-    takao-fonts \
     leptonica \
     libvncserver \
     libmng \
@@ -525,7 +523,7 @@ RDEPENDS:packagegroup-meta-oe-graphics ="\
     ttf-gentium \
     ttf-hunky-sans \
     ttf-hunky-serif \
-    ttf-ipa \
+    ttf-ipag ttf-ipagp ttf-ipamp ttf-ipam \
     ttf-lohit \
     ttf-inconsolata \
     ttf-liberation-sans-narrow \
@@ -537,6 +535,7 @@ RDEPENDS:packagegroup-meta-oe-graphics ="\
     ttf-noto-emoji-regular \
     ttf-sazanami-gothic \
     ttf-sazanami-mincho \
+    ttf-takao-pgothic ttf-takao-gothic ttf-takao-pmincho ttf-takao-mincho \
     ttf-tlwg \
     ttf-roboto \
     ttf-wqy-zenhei \

@@ -637,7 +637,7 @@ DESCRIPTION
     oe-core: directdisk.bbclass and mkefidisk.sh.  The difference
     between wic and those examples is that with wic the functionality
     of those scripts is implemented by a general-purpose partitioning
-    'language' based on Redhat kickstart syntax).
+    'language' based on Red Hat kickstart syntax).
 
     The initial motivation and design considerations that lead to the
     current tool are described exhaustively in Yocto Bug #3847
@@ -990,6 +990,9 @@ DESCRIPTION
                              option is useful when we want to split a rootfs in
                              multiple partitions and we want to keep the right
                              permissions and usernames in all the partitions.
+
+         --no-fstab-update: This option is specific to wic. It does not update the
+                            '/etc/fstab' stock file for the given partition.
 
          --extra-space: This option is specific to wic. It adds extra
                         space after the space filled by the content

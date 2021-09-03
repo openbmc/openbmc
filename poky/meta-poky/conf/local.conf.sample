@@ -158,7 +158,7 @@ USER_CLASSES ?= "buildstats"
 # run tests against any SDK that are built. To enable this uncomment these lines.
 # See classes/test{image,sdk}.bbclass for further details.
 #IMAGE_CLASSES += "testimage testsdk"
-#TESTIMAGE_AUTO_qemuall = "1"
+#TESTIMAGE_AUTO:qemuall = "1"
 
 #
 # Interactive shell configuration

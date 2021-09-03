@@ -11,7 +11,6 @@ def prserv_make_conn(d, check = False):
         if check:
             if not conn.ping():
                 raise Exception('service not available')
-        d.setVar("__PRSERV_CONN",conn)
     except Exception as exc:
         bb.fatal("Connecting to PR service %s:%s failed: %s" % (host_params[0], host_params[1], str(exc)))
 
@@ -22,31 +21,29 @@ def prserv_dump_db(d):
         bb.error("Not using network based PR service")
         return None
 
-    conn = d.getVar("__PRSERV_CONN")
+    conn = prserv_make_conn(d)
     if conn is None:
-        conn = prserv_make_conn(d)
-        if conn is None:
-            bb.error("Making connection failed to remote PR service")
-            return None
+        bb.error("Making connection failed to remote PR service")
+        return None
 
     #dump db
     opt_version = d.getVar('PRSERV_DUMPOPT_VERSION')
     opt_pkgarch = d.getVar('PRSERV_DUMPOPT_PKGARCH')
     opt_checksum = d.getVar('PRSERV_DUMPOPT_CHECKSUM')
     opt_col = ("1" == d.getVar('PRSERV_DUMPOPT_COL'))
-    return conn.export(opt_version, opt_pkgarch, opt_checksum, opt_col)
+    d = conn.export(opt_version, opt_pkgarch, opt_checksum, opt_col)
+    conn.close()
+    return d
 
 def prserv_import_db(d, filter_version=None, filter_pkgarch=None, filter_checksum=None):
     if not d.getVar('PRSERV_HOST'):
         bb.error("Not using network based PR service")
         return None
 
-    conn = d.getVar("__PRSERV_CONN")
+    conn = prserv_make_conn(d)
     if conn is None:
-        conn = prserv_make_conn(d)
-        if conn is None:
-            bb.error("Making connection failed to remote PR service")
-            return None
+        bb.error("Making connection failed to remote PR service")
+        return None
     #get the entry values
     imported = []
     prefix = "PRAUTO$"
@@ -70,6 +67,7 @@ def prserv_import_db(d, filter_version=None, filter_pkgarch=None, filter_checksu
                 bb.error("importing(%s,%s,%s,%d) failed. DB may have larger value %d" % (version,pkgarch,checksum,value,ret))
             else:
                imported.append((version,pkgarch,checksum,value))
+    conn.close()
     return imported
 
 def prserv_export_tofile(d, metainfo, datainfo, lockdown, nomax=False):
@@ -125,4 +123,5 @@ def prserv_check_avail(d):
     except TypeError:
         bb.fatal('Undefined/incorrect PRSERV_HOST value. Format: "host:port"')
     else:
-        prserv_make_conn(d, True)
+        conn = prserv_make_conn(d, True)
+        conn.close()

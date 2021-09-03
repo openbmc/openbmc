@@ -4,7 +4,9 @@ SECTION = "libs"
 LICENSE = "BSL-1.0"
 LIC_FILES_CHKSUM = "file://LICENSE_1_0.txt;md5=e4224ccaecb14d942c71d31bef20d78c"
 
-SRC_URI = "git://github.com/CPPAlliance/url.git;branch=develop"
+SRC_URI = "git://github.com/CPPAlliance/url.git;branch=develop \
+           file://0001-Use-GNUInstallDirs-instead-of-hard-wiring-install-di.patch \
+           "
 
 SRCREV = "2c867fbe284ae532f1329b87a86ad3f8cd382867"
 

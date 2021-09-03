@@ -33,3 +33,11 @@ Mailing list:
 Source code:
 
     http://git.openembedded.org/bitbake/
+
+Testing:
+
+Bitbake has a testsuite located in lib/bb/tests/ whichs aim to try and prevent regressions.
+You can run this with "bitbake-selftest". In particular the fetcher is well covered since
+it has so many corner cases. The datastore has many tests too. Testing with the testsuite is
+recommended before submitting patches, particularly to the fetcher and datastore. We also
+appreciate new test cases and may require them for more obscure issues.

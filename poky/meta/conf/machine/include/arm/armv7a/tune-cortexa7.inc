@@ -1,0 +1,51 @@
+DEFAULTTUNE ?= "cortexa7thf-neon"
+
+require conf/machine/include/arm/arch-armv7ve.inc
+
+TUNEVALID[cortexa7] = "Enable Cortex-A7 specific processor optimizations"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexa7', ' -mcpu=cortex-a7', '', d)}"
+MACHINEOVERRIDES =. "${@bb.utils.contains('TUNE_FEATURES', 'cortexa7', 'armv7ve:', '', d)}"
+
+# Little Endian base configs
+AVAILTUNES += "cortexa7 cortexa7t cortexa7-neon cortexa7t-neon cortexa7-neon-vfpv4 cortexa7t-neon-vfpv4"
+ARMPKGARCH:tune-cortexa7             = "cortexa7"
+ARMPKGARCH:tune-cortexa7t            = "cortexa7"
+ARMPKGARCH:tune-cortexa7-neon        = "cortexa7"
+ARMPKGARCH:tune-cortexa7t-neon       = "cortexa7"
+ARMPKGARCH:tune-cortexa7-neon-vfpv4  = "cortexa7"
+ARMPKGARCH:tune-cortexa7t-neon-vfpv4 = "cortexa7"
+# mcpu is used so don't use armv7ve as we don't want march
+TUNE_FEATURES:tune-cortexa7             = "arm vfp cortexa7"
+TUNE_FEATURES:tune-cortexa7t            = "${TUNE_FEATURES:tune-cortexa7} thumb"
+TUNE_FEATURES:tune-cortexa7-neon        = "${TUNE_FEATURES:tune-cortexa7} neon"
+TUNE_FEATURES:tune-cortexa7t-neon       = "${TUNE_FEATURES:tune-cortexa7-neon} thumb"
+TUNE_FEATURES:tune-cortexa7-neon-vfpv4  = "${TUNE_FEATURES:tune-cortexa7-neon} vfpv4"
+TUNE_FEATURES:tune-cortexa7t-neon-vfpv4 = "${TUNE_FEATURES:tune-cortexa7-neon-vfpv4} thumb"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7             = "${PACKAGE_EXTRA_ARCHS:tune-armv7ve} cortexa7-vfp"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7t            = "${PACKAGE_EXTRA_ARCHS:tune-armv7vet} cortexa7-vfp cortexa7t2-vfp"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7-neon        = "${PACKAGE_EXTRA_ARCHS:tune-armv7ve-neon} cortexa7-vfp cortexa7-neon"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7t-neon       = "${PACKAGE_EXTRA_ARCHS:tune-armv7vet-neon} cortexa7-vfp cortexa7-neon cortexa7t2-vfp cortexa7t2-neon"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7-neon-vfpv4  = "${PACKAGE_EXTRA_ARCHS:tune-armv7ve-neon-vfpv4} cortexa7-vfp cortexa7-neon cortexa7-neon-vfpv4"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7t-neon-vfpv4 = "${PACKAGE_EXTRA_ARCHS:tune-armv7vet-neon-vfpv4} cortexa7-vfp cortexa7-neon cortexa7-neon-vfpv4 cortexa7t2-vfp cortexa7t2-neon cortexa7t2-neon-vfpv4"
+
+# HF Tunes
+AVAILTUNES += "cortexa7hf cortexa7thf cortexa7hf-neon cortexa7thf-neon cortexa7hf-neon-vfpv4 cortexa7thf-neon-vfpv4"
+ARMPKGARCH:tune-cortexa7hf             = "cortexa7"
+ARMPKGARCH:tune-cortexa7thf            = "cortexa7"
+ARMPKGARCH:tune-cortexa7hf-neon        = "cortexa7"
+ARMPKGARCH:tune-cortexa7thf-neon       = "cortexa7"
+ARMPKGARCH:tune-cortexa7hf-neon-vfpv4  = "cortexa7"
+ARMPKGARCH:tune-cortexa7thf-neon-vfpv4 = "cortexa7"
+# mcpu is used so don't use armv7ve as we don't want march
+TUNE_FEATURES:tune-cortexa7hf             = "${TUNE_FEATURES:tune-cortexa7} callconvention-hard"
+TUNE_FEATURES:tune-cortexa7thf            = "${TUNE_FEATURES:tune-cortexa7t} callconvention-hard"
+TUNE_FEATURES:tune-cortexa7hf-neon        = "${TUNE_FEATURES:tune-cortexa7-neon} callconvention-hard"
+TUNE_FEATURES:tune-cortexa7thf-neon       = "${TUNE_FEATURES:tune-cortexa7t-neon} callconvention-hard"
+TUNE_FEATURES:tune-cortexa7hf-neon-vfpv4  = "${TUNE_FEATURES:tune-cortexa7-neon-vfpv4} callconvention-hard"
+TUNE_FEATURES:tune-cortexa7thf-neon-vfpv4 = "${TUNE_FEATURES:tune-cortexa7t-neon-vfpv4} callconvention-hard"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7hf             = "${PACKAGE_EXTRA_ARCHS:tune-armv7vehf} cortexa7hf-vfp"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7thf            = "${PACKAGE_EXTRA_ARCHS:tune-armv7vethf} cortexa7hf-vfp cortexa7t2hf-vfp"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7hf-neon        = "${PACKAGE_EXTRA_ARCHS:tune-armv7vehf-neon} cortexa7hf-vfp cortexa7hf-neon"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7thf-neon       = "${PACKAGE_EXTRA_ARCHS:tune-armv7vethf-neon} cortexa7hf-vfp cortexa7hf-neon cortexa7t2hf-vfp cortexa7t2hf-neon"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7hf-neon-vfpv4  = "${PACKAGE_EXTRA_ARCHS:tune-armv7vehf-neon-vfpv4} cortexa7hf-vfp cortexa7hf-neon cortexa7hf-neon-vfpv4"
+PACKAGE_EXTRA_ARCHS:tune-cortexa7thf-neon-vfpv4 = "${PACKAGE_EXTRA_ARCHS:tune-armv7vethf-neon-vfpv4} cortexa7hf-vfp cortexa7hf-neon cortexa7hf-neon-vfpv4 cortexa7t2hf-vfp cortexa7t2hf-neon cortexa7t2hf-neon-vfpv4"

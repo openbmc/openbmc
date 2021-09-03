@@ -517,5 +517,5 @@ except BaseException as e:
 worker_thread_exit = True
 worker_thread.join()
 
-workerlog_write("exitting")
+workerlog_write("exiting")
 sys.exit(0)

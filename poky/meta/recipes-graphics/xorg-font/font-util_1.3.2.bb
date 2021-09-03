@@ -3,7 +3,7 @@ SUMMARY = "X.Org font package creation/installation utilities"
 require xorg-font-common.inc
 
 #Unicode is MIT
-LICENSE = "BSD & MIT"
+LICENSE = "MIT & MIT-style & BSD-4-Clause & BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5df208ec65eb84ce5bb8d82d8f3b9675 \
                     file://ucs2any.c;endline=28;md5=8357dc567fc628bd12696f15b2a33bcb \
                     file://bdftruncate.c;endline=26;md5=4f82ffc101a1b165eae9c6998abff937 \

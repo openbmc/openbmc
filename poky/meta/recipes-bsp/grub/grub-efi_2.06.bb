@@ -5,7 +5,7 @@ require conf/image-uefi.conf
 GRUBPLATFORM = "efi"
 
 DEPENDS:append = " grub-native"
-RDEPENDS:${PN} = "grub-common virtual/grub-bootconf"
+RDEPENDS:${PN} = "grub-common virtual-grub-bootconf"
 
 SRC_URI += " \
            file://cfg \

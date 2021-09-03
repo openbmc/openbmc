@@ -1,4 +1,4 @@
-From 159c53612444ec1df492bae528a5a88a275b93bf Mon Sep 17 00:00:00 2001
+From 40acdb90031cfeb7140cee5205bce24f8c91d857 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 13:41:41 +0800
 Subject: [PATCH] don't use glibc-specific qsort_r
@@ -14,14 +14,16 @@ Signed-off-by: Andrej Valek <andrej.valek@siemens.com>
 Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
 
 ---
- src/basic/sort-util.h              | 14 ------------
- src/libsystemd/sd-hwdb/hwdb-util.c | 19 +++++++++++-----
- src/shared/format-table.c          | 36 ++++++++++++++++++++----------
+ src/basic/sort-util.h     | 14 --------------
+ src/shared/format-table.c | 36 ++++++++++++++++++++++++------------
+ src/shared/hwdb-util.c    | 19 ++++++++++++++-----
  3 files changed, 38 insertions(+), 31 deletions(-)
 
+diff --git a/src/basic/sort-util.h b/src/basic/sort-util.h
+index 49586a4a24..d92a5ab0ed 100644
 --- a/src/basic/sort-util.h
 +++ b/src/basic/sort-util.h
-@@ -56,18 +56,4 @@ static inline void _qsort_safe(void *bas
+@@ -55,18 +55,4 @@ static inline void _qsort_safe(void *base, size_t nmemb, size_t size, __compar_f
                  _qsort_safe((p), (n), sizeof((p)[0]), (__compar_fn_t) _func_); \
          })
  
@@ -40,51 +42,11 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
 -        })
 -
  int cmp_int(const int *a, const int *b);
---- a/src/shared/hwdb-util.c
-+++ b/src/shared/hwdb-util.c
-@@ -127,9 +127,13 @@ static struct trie* trie_free(struct tri
- 
- DEFINE_TRIVIAL_CLEANUP_FUNC(struct trie*, trie_free);
- 
--static int trie_values_cmp(const struct trie_value_entry *a, const struct trie_value_entry *b, struct trie *trie) {
--        return strcmp(trie->strings->buf + a->key_off,
--                      trie->strings->buf + b->key_off);
-+static struct trie *trie_node_add_value_trie;
-+static int trie_values_cmp(const void *v1, const void *v2) {
-+        const struct trie_value_entry *a = v1;
-+        const struct trie_value_entry *b = v2;
-+
-+        return strcmp(trie_node_add_value_trie->strings->buf + a->key_off,
-+                      trie_node_add_value_trie->strings->buf + b->key_off);
- }
- 
- static int trie_node_add_value(struct trie *trie, struct trie_node *node,
-@@ -157,7 +161,10 @@ static int trie_node_add_value(struct tr
-                         .value_off = v,
-                 };
- 
--                val = typesafe_bsearch_r(&search, node->values, node->values_count, trie_values_cmp, trie);
-+                trie_node_add_value_trie = trie;
-+                val = bsearch(&search, node->values, node->values_count, sizeof(struct trie_value_entry), trie_values_cmp);
-+                trie_node_add_value_trie = NULL;
-+
-                 if (val) {
-                         /* At this point we have 2 identical properties on the same match-string.
-                          * Since we process files in order, we just replace the previous value. */
-@@ -183,7 +190,9 @@ static int trie_node_add_value(struct tr
-                 .line_number = line_number,
-         };
-         node->values_count++;
--        typesafe_qsort_r(node->values, node->values_count, trie_values_cmp, trie);
-+        trie_node_add_value_trie = trie;
-+        qsort(node->values, node->values_count, sizeof(struct trie_value_entry), trie_values_cmp);
-+        trie_node_add_value_trie = NULL;
-         return 0;
- }
- 
+diff --git a/src/shared/format-table.c b/src/shared/format-table.c
+index 4c4e4593d8..17b329f315 100644
 --- a/src/shared/format-table.c
 +++ b/src/shared/format-table.c
-@@ -1282,30 +1282,32 @@ static int cell_data_compare(TableData *
+@@ -1282,30 +1282,32 @@ static int cell_data_compare(TableData *a, size_t index_a, TableData *b, size_t
          return CMP(index_a, index_b);
  }
  
@@ -141,7 +103,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
          }
  
          if (t->display_map)
-@@ -2572,7 +2579,12 @@ int table_to_json(Table *t, JsonVariant
+@@ -2572,7 +2579,12 @@ int table_to_json(Table *t, JsonVariant **ret) {
                  for (size_t i = 0; i < n_rows; i++)
                          sorted[i] = i * t->n_columns;
  
@@ -155,3 +117,47 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
          }
  
          if (t->display_map)
+diff --git a/src/shared/hwdb-util.c b/src/shared/hwdb-util.c
+index d7626aed95..2003fac7c3 100644
+--- a/src/shared/hwdb-util.c
++++ b/src/shared/hwdb-util.c
+@@ -127,9 +127,13 @@ static struct trie* trie_free(struct trie *trie) {
+ 
+ DEFINE_TRIVIAL_CLEANUP_FUNC(struct trie*, trie_free);
+ 
+-static int trie_values_cmp(const struct trie_value_entry *a, const struct trie_value_entry *b, struct trie *trie) {
+-        return strcmp(trie->strings->buf + a->key_off,
+-                      trie->strings->buf + b->key_off);
++static struct trie *trie_node_add_value_trie;
++static int trie_values_cmp(const void *v1, const void *v2) {
++        const struct trie_value_entry *a = v1;
++        const struct trie_value_entry *b = v2;
++
++        return strcmp(trie_node_add_value_trie->strings->buf + a->key_off,
++                      trie_node_add_value_trie->strings->buf + b->key_off);
+ }
+ 
+ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
+@@ -157,7 +161,10 @@ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
+                         .value_off = v,
+                 };
+ 
+-                val = typesafe_bsearch_r(&search, node->values, node->values_count, trie_values_cmp, trie);
++                trie_node_add_value_trie = trie;
++                val = bsearch(&search, node->values, node->values_count, sizeof(struct trie_value_entry), trie_values_cmp);
++                trie_node_add_value_trie = NULL;
++
+                 if (val) {
+                         /* At this point we have 2 identical properties on the same match-string.
+                          * Since we process files in order, we just replace the previous value. */
+@@ -183,7 +190,9 @@ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
+                 .line_number = line_number,
+         };
+         node->values_count++;
+-        typesafe_qsort_r(node->values, node->values_count, trie_values_cmp, trie);
++        trie_node_add_value_trie = trie;
++        qsort(node->values, node->values_count, sizeof(struct trie_value_entry), trie_values_cmp);
++        trie_node_add_value_trie = NULL;
+         return 0;
+ }
+ 

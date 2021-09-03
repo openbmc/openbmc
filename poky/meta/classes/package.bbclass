@@ -714,9 +714,7 @@ python package_get_auto_pr() {
         return
 
     try:
-        conn = d.getVar("__PRSERV_CONN")
-        if conn is None:
-            conn = oe.prservice.prserv_make_conn(d)
+        conn = oe.prservice.prserv_make_conn(d)
         if conn is not None:
             if "AUTOINC" in pkgv:
                 srcpv = bb.fetch2.get_srcrev(d)
@@ -725,6 +723,7 @@ python package_get_auto_pr() {
                 d.setVar("PRSERV_PV_AUTOINC", str(value))
 
             auto_pr = conn.getPR(version, pkgarch, checksum)
+            conn.close()
     except Exception as e:
         bb.fatal("Can NOT get PRAUTO, exception %s" %  str(e))
     if auto_pr is None:
@@ -1652,7 +1651,7 @@ fi
             if fstat.st_ino not in seen:
                 seen.add(fstat.st_ino)
                 total_size += fstat.st_size
-        d.setVar('FILES_INFO', json.dumps(files, sort_keys=True))
+        d.setVar('FILES_INFO:' + pkg , json.dumps(files, sort_keys=True))
 
         process_postinst_on_target(pkg, d.getVar("MLPREFIX"))
         add_set_e_to_scriptlets(pkg)
@@ -1670,7 +1669,7 @@ fi
             for dfile in (d.getVar('FILERDEPENDSFLIST:' + pkg) or "").split():
                 write_if_exists(sf, pkg, 'FILERDEPENDS:' + dfile)
 
-            sf.write('%s_%s: %d\n' % ('PKGSIZE', pkg, total_size))
+            sf.write('%s:%s: %d\n' % ('PKGSIZE', pkg, total_size))
 
         # Symlinks needed for rprovides lookup
         rprov = d.getVar('RPROVIDES:%s' % pkg) or d.getVar('RPROVIDES')

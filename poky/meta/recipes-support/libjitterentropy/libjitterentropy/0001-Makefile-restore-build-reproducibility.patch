@@ -1,0 +1,27 @@
+From 905333229103510e9dee2fec29b261ccedb031d0 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 20 Aug 2021 19:37:04 +0000
+Subject: [PATCH] Makefile: restore build reproducibility
+
+wildcards result in an unpredictable order, and thus different binary outputs
+in otherwise identical builds.
+
+Upstream-Status: Submitted [https://github.com/smuellerDD/jitterentropy-library/pull/67]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 42932d8..dfb96a8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -36,7 +36,7 @@ LIBMINOR=$(shell cat $(SRCDIR)/jitterentropy-base.c | grep define | grep MINVERS
+ LIBPATCH=$(shell cat $(SRCDIR)/jitterentropy-base.c | grep define | grep PATCHLEVEL | awk '{print $$3}')
+ LIBVERSION := $(LIBMAJOR).$(LIBMINOR).$(LIBPATCH)
+ 
+-C_SRCS := $(wildcard $(SRCDIR)/*.c) 
++C_SRCS := $(sort $(wildcard $(SRCDIR)/*.c))
+ C_OBJS := ${C_SRCS:.c=.o}
+ OBJS := $(C_OBJS)
+ 

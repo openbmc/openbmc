@@ -1,0 +1,33 @@
+From 4a11d4d03ef66729d302cc122fa0c693299a7776 Mon Sep 17 00:00:00 2001
+From: Sakib Sajal <sakib.sajal@windriver.com>
+Date: Wed, 18 Aug 2021 10:49:38 -0400
+Subject: [PATCH] Makefile: use libprefix instead of libdir
+
+libdir expands to "$(exec_prefix)/lib" where "lib" is hardcoded.
+This is a problem for builds that enable MULTILIB since libraries
+are to be installed in "lib64" directory. Hence allow the directory
+to be configurable.
+
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
+---
+ libraries/liblmdb/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index f254511..1ec74e6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -46,11 +46,11 @@ all:	$(ILIBS) $(PROGS)
+ 
+ install: $(ILIBS) $(IPROGS) $(IHDRS)
+ 	mkdir -p $(DESTDIR)$(bindir)
+-	mkdir -p $(DESTDIR)$(libdir)
++	mkdir -p $(DESTDIR)$(libprefix)
+ 	mkdir -p $(DESTDIR)$(includedir)
+ 	mkdir -p $(DESTDIR)$(mandir)/man1
+ 	for f in $(IPROGS); do cp $$f $(DESTDIR)$(bindir); done
+-	for f in $(ILIBS); do cp $$f $(DESTDIR)$(libdir); done
++	for f in $(ILIBS); do cp $$f $(DESTDIR)$(libprefix); done
+ 	for f in $(IHDRS); do cp $$f $(DESTDIR)$(includedir); done
+ 	for f in $(IDOCS); do cp $$f $(DESTDIR)$(mandir)/man1; done
+ 

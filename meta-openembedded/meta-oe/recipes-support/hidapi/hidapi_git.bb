@@ -7,6 +7,7 @@ LICENSE = "BSD-3-Clause | GPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=7c3949a631240cb6c31c50f3eb696077"
 
 DEPENDS = "libusb udev"
+RDEPENDS:${PN}:append:libc-glibc = " glibc-gconv-utf-16"
 
 inherit autotools pkgconfig
 

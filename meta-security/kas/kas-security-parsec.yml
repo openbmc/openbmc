@@ -8,10 +8,6 @@ repos:
     layers:
       meta-parsec:
 
-  meta-rust:
-    url: https://github.com/meta-rust/meta-rust.git
-    refspec: master
-
   meta-clang:
     url: https://github.com/kraj/meta-clang.git
     refspec: master

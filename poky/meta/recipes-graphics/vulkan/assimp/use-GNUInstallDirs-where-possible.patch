@@ -1,0 +1,257 @@
+From cbf94fd62ff831879d10f99aa7766d391ae8a9b7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Victor=20Matar=C3=A9?= <matare@fh-aachen.de>
+Date: Tue, 31 Mar 2020 21:30:07 +0200
+Subject: [PATCH] use GNUInstallDirs where possible
+
+Emulate the CMAKE_INSTALL_FULL_* variables on non-Unix systems and
+disable redefining FHS-mandated install locations via user-editable
+ASSIMP_*_INSTALL_DIR variables. Instead, if it REALLY proves necessary,
+Unix users can edit the advanced, canonical CMAKE_INSTALL_* variables.
+---
+ CMakeLists.txt                 | 36 ++++++++++++++++++++++------------
+ assimp.pc.in                   |  6 ++----
+ assimpTargets-debug.cmake.in   | 20 +++++++++----------
+ assimpTargets-release.cmake.in | 18 ++++++++---------
+ assimpTargets.cmake.in         | 15 +-------------
+ 5 files changed, 45 insertions(+), 50 deletions(-)
+
+Upstream-Status: Backport
+Comment: Additionally remove setting of ASSIMP_LIBRARY_DIRS, ASSIMP_INCLUDE_DIRS
+         and INTERFACE_INCLUDE_DIRECTORIES as default cross compile paths are enough
+         and setting them manually adds non-existing paths to CMake modules
+
+Signed-off-by: Ranjitsinh Rathod <ranjitsinh.rathod@kpit.com>
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index dcafb649f5..c23c0df33e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -230,11 +230,6 @@ SET(LIBASSIMP-DEV_COMPONENT "libassimp${ASSIMP_VERSION_MAJOR}.${ASSIMP_VERSION_M
+ SET(CPACK_COMPONENTS_ALL assimp-bin ${LIBASSIMP_COMPONENT} ${LIBASSIMP-DEV_COMPONENT} assimp-dev)
+ SET(ASSIMP_LIBRARY_SUFFIX "" CACHE STRING "Suffix to append to library names")
+ 
+-IF( UNIX )
+-  # Use GNUInstallDirs for Unix predefined directories
+-  INCLUDE(GNUInstallDirs)
+-ENDIF( UNIX )
+-
+ # Grouped compiler settings
+ IF ((CMAKE_C_COMPILER_ID MATCHES "GNU") AND NOT CMAKE_COMPILER_IS_MINGW)
+   IF(NOT HUNTER_ENABLED)
+@@ -329,14 +324,6 @@ IF ( CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR )
+   SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_HOME_DIRECTORY}/bin" )
+ ENDIF ( CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR )
+ 
+-# Cache these to allow the user to override them manually.
+-SET( ASSIMP_LIB_INSTALL_DIR "lib" CACHE STRING
+-  "Path the built library files are installed to." )
+-SET( ASSIMP_INCLUDE_INSTALL_DIR "include" CACHE STRING
+-  "Path the header files are installed to." )
+-SET( ASSIMP_BIN_INSTALL_DIR "bin" CACHE STRING
+-  "Path the tool executables are installed to." )
+-
+ get_cmake_property(is_multi_config GENERATOR_IS_MULTI_CONFIG)
+ 
+ IF (INJECT_DEBUG_POSTFIX AND (is_multi_config OR CMAKE_BUILD_TYPE STREQUAL "Debug"))
+@@ -391,6 +378,29 @@ IF(HUNTER_ENABLED)
+   )
+ ELSE(HUNTER_ENABLED)
+   # cmake configuration files
++
++  IF( UNIX )
++    # Use GNUInstallDirs for Unix predefined directories
++    INCLUDE(GNUInstallDirs)
++
++    SET( ASSIMP_LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
++    SET( ASSIMP_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
++    SET( ASSIMP_BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
++  ELSE( UNIX )
++    # Cache these to allow the user to override them on non-Unix platforms
++    SET( ASSIMP_LIB_INSTALL_DIR "lib" CACHE STRING
++      "Path the built library files are installed to." )
++    SET( ASSIMP_INCLUDE_INSTALL_DIR "include" CACHE STRING
++      "Path the header files are installed to." )
++    SET( ASSIMP_BIN_INSTALL_DIR "bin" CACHE STRING
++      "Path the tool executables are installed to." )
++
++    SET(CMAKE_INSTALL_FULL_INCLUDEDIR ${CMAKE_INSTALL_PREFIX}/${ASSIMP_INCLUDE_INSTALL_DIR})
++    SET(CMAKE_INSTALL_FULL_LIBDIR ${CMAKE_INSTALL_PREFIX}/${ASSIMP_LIB_INSTALL_DIR})
++    SET(CMAKE_INSTALL_FULL_BINDIR ${CMAKE_INSTALL_PREFIX}/${ASSIMP_BIN_INSTALL_DIR})
++  ENDIF( UNIX )
++
++
+   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/assimp-config.cmake.in"         "${CMAKE_CURRENT_BINARY_DIR}/assimp-config.cmake" @ONLY IMMEDIATE)
+   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/assimpTargets.cmake.in"         "${CMAKE_CURRENT_BINARY_DIR}/assimpTargets.cmake" @ONLY IMMEDIATE)
+   IF (is_multi_config)
+diff --git a/assimp.pc.in b/assimp.pc.in
+index c659e19f2c..555a3a1d3b 100644
+--- a/assimp.pc.in
++++ b/assimp.pc.in
+@@ -1,7 +1,5 @@
+-prefix=@CMAKE_INSTALL_PREFIX@
+-exec_prefix=@CMAKE_INSTALL_PREFIX@/
+-libdir=@CMAKE_INSTALL_PREFIX@/@ASSIMP_LIB_INSTALL_DIR@
+-includedir=@CMAKE_INSTALL_PREFIX@/../include/@ASSIMP_INCLUDE_INSTALL_DIR@
++libdir=@CMAKE_INSTALL_FULL_LIBDIR@
++includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+ 
+ Name: @CMAKE_PROJECT_NAME@
+ Description: Import various well-known 3D model formats in an uniform manner.
+diff --git a/assimpTargets-debug.cmake.in b/assimpTargets-debug.cmake.in
+index 1ebe2a6081..f5034c9349 100644
+--- a/assimpTargets-debug.cmake.in
++++ b/assimpTargets-debug.cmake.in
+@@ -42,22 +42,22 @@ if(MSVC)
+     # Import target "assimp::assimp" for configuration "Debug"
+     set_property(TARGET assimp::assimp APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
+     set_target_properties(assimp::assimp PROPERTIES
+-      IMPORTED_IMPLIB_DEBUG "${_IMPORT_PREFIX}/lib/${importLibraryName}"
+-      IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/bin/${sharedLibraryName}"
++      IMPORTED_IMPLIB_DEBUG "@CMAKE_INSTALL_FULL_LIBDIR@/${importLibraryName}"
++      IMPORTED_LOCATION_DEBUG "@CMAKE_INSTALL_FULL_BINDIR@/${sharedLibraryName}"
+     )
+     list(APPEND _IMPORT_CHECK_TARGETS assimp::assimp )
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "${_IMPORT_PREFIX}/lib/${importLibraryName}")
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "${_IMPORT_PREFIX}/bin/${sharedLibraryName}" )
++    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_LIBDIR@/${importLibraryName}")
++    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_BINDIR@/${sharedLibraryName}" )
+   else()
+     set(staticLibraryName "assimp${ASSIMP_LIBRARY_SUFFIX}@CMAKE_DEBUG_POSTFIX@@CMAKE_STATIC_LIBRARY_SUFFIX@")
+ 
+     # Import target "assimp::assimp" for configuration "Debug"
+     set_property(TARGET assimp::assimp APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
+     set_target_properties(assimp::assimp PROPERTIES
+-      IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/lib/${staticLibraryName}"
++      IMPORTED_LOCATION_DEBUG "@CMAKE_INSTALL_FULL_LIBDIR@/${staticLibraryName}"
+     )
+     list(APPEND _IMPORT_CHECK_TARGETS assimp::assimp )
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "${_IMPORT_PREFIX}/lib/${staticLibraryName}")
++    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_LIBDIR@/${staticLibraryName}")
+   endif()
+ 
+ else()
+@@ -66,17 +66,17 @@ else()
+     set(sharedLibraryName "libassimp${ASSIMP_LIBRARY_SUFFIX}@CMAKE_DEBUG_POSTFIX@@CMAKE_SHARED_LIBRARY_SUFFIX@.@ASSIMP_VERSION_MAJOR@")
+     set_target_properties(assimp::assimp PROPERTIES
+       IMPORTED_SONAME_DEBUG "${sharedLibraryName}"
+-      IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/lib/${sharedLibraryName}"
++      IMPORTED_LOCATION_DEBUG "@CMAKE_INSTALL_FULL_LIBDIR@/${sharedLibraryName}"
+     )
+     list(APPEND _IMPORT_CHECK_TARGETS assimp::assimp )
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "${_IMPORT_PREFIX}/lib/${sharedLibraryName}" )
++    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_LIBDIR@/${sharedLibraryName}" )
+   else()
+     set(staticLibraryName "libassimp${ASSIMP_LIBRARY_SUFFIX}@CMAKE_DEBUG_POSTFIX@@CMAKE_STATIC_LIBRARY_SUFFIX@")
+     set_target_properties(assimp::assimp PROPERTIES
+-      IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/lib/${staticLibraryName}"
++      IMPORTED_LOCATION_DEBUG "@CMAKE_INSTALL_FULL_LIBDIR@/${staticLibraryName}"
+     )
+     list(APPEND _IMPORT_CHECK_TARGETS assimp::assimp )
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "${_IMPORT_PREFIX}/lib/${staticLibraryName}" )
++    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_LIBDIR@/${staticLibraryName}" )
+   endif()
+ endif()
+ 
+diff --git a/assimpTargets-release.cmake.in b/assimpTargets-release.cmake.in
+index f3db8f12cd..a416e8899b 100644
+--- a/assimpTargets-release.cmake.in
++++ b/assimpTargets-release.cmake.in
+@@ -42,12 +42,12 @@ if(MSVC)
+     # Import target "assimp::assimp" for configuration "Release"
+     set_property(TARGET assimp::assimp APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+     set_target_properties(assimp::assimp PROPERTIES
+-      IMPORTED_IMPLIB_RELEASE "${_IMPORT_PREFIX}/lib/${importLibraryName}"
+-      IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/bin/${sharedLibraryName}"
++      IMPORTED_IMPLIB_RELEASE "@CMAKE_INSTALL_FULL_LIBDIR@/${importLibraryName}"
++      IMPORTED_LOCATION_RELEASE "@CMAKE_INSTALL_FULL_BINDIR@/${sharedLibraryName}"
+     )
+     list(APPEND _IMPORT_CHECK_TARGETS assimp::assimp )
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "${_IMPORT_PREFIX}/lib/${importLibraryName}")
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "${_IMPORT_PREFIX}/bin/${sharedLibraryName}" )
++    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_LIBDIR@/${importLibraryName}")
++    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_BINDIR@/${sharedLibraryName}" )
+   else()
+     set(staticLibraryName "assimp${ASSIMP_LIBRARY_SUFFIX}@CMAKE_STATIC_LIBRARY_SUFFIX@")
+ 
+@@ -57,7 +57,7 @@ if(MSVC)
+       IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/${staticLibraryName}"
+     )
+     list(APPEND _IMPORT_CHECK_TARGETS assimp::assimp )
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "${_IMPORT_PREFIX}/lib/${staticLibraryName}")
++    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_LIBDIR@/${staticLibraryName}")
+   endif()
+ 
+ else()
+@@ -70,17 +70,17 @@ else()
+     endif()
+     set_target_properties(assimp::assimp PROPERTIES
+       IMPORTED_SONAME_RELEASE "${sharedLibraryName}"
+-      IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/${sharedLibraryName}"
++      IMPORTED_LOCATION_RELEASE "@CMAKE_INSTALL_FULL_LIBDIR@/${sharedLibraryName}"
+     )
+     list(APPEND _IMPORT_CHECK_TARGETS assimp::assimp )
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "${_IMPORT_PREFIX}/lib/${sharedLibraryName}" )
++    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_LIBDIR@/${sharedLibraryName}" )
+   else()
+     set(staticLibraryName "libassimp${ASSIMP_LIBRARY_SUFFIX}@CMAKE_STATIC_LIBRARY_SUFFIX@")
+     set_target_properties(assimp::assimp PROPERTIES
+-      IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/lib/${staticLibraryName}"
++      IMPORTED_LOCATION_RELEASE "@CMAKE_INSTALL_FULL_LIBDIR@/${staticLibraryName}"
+     )
+     list(APPEND _IMPORT_CHECK_TARGETS assimp::assimp )
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "${_IMPORT_PREFIX}/lib/${staticLibraryName}" )
++    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_LIBDIR@/${staticLibraryName}" )
+   endif()
+ endif()
+
+@@ -91,8 +91,6 @@ get_filename_component(ASSIMP_ROOT_DIR "@CMAKE_INSTALL_PREFIX@" REALPATH)
+ 
+ set( ASSIMP_CXX_FLAGS ) # dynamically linked library
+ set( ASSIMP_LINK_FLAGS "" )
+-set( ASSIMP_LIBRARY_DIRS "${ASSIMP_ROOT_DIR}/@ASSIMP_LIB_INSTALL_DIR@")
+-set( ASSIMP_INCLUDE_DIRS "${ASSIMP_ROOT_DIR}/@ASSIMP_INCLUDE_INSTALL_DIR@")
+ if(ASSIMP_BUILD_SHARED_LIBS)
+   set( ASSIMP_LIBRARIES ${sharedLibraryName})
+ else()
+ 
+diff --git a/assimpTargets.cmake.in b/assimpTargets.cmake.in
+index ab1a8d2c7b..ef90c834a6 100644
+--- a/assimpTargets.cmake.in
++++ b/assimpTargets.cmake.in
+@@ -40,16 +40,6 @@ unset(_targetsDefined)
+ unset(_targetsNotDefined)
+ unset(_expectedTargets)
+ 
+-
+-# Compute the installation prefix relative to this file.
+-get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
+-get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
+-get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
+-get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
+-if(_IMPORT_PREFIX STREQUAL "/")
+-  set(_IMPORT_PREFIX "")
+-endif()
+-
+ # Create imported target assimp::assimp
+ if(@BUILD_SHARED_LIBS@)
+   add_library(assimp::assimp SHARED IMPORTED)
+@@ -60,7 +50,7 @@ endif()
+ set_target_properties(assimp::assimp PROPERTIES
+   COMPATIBLE_INTERFACE_STRING "assimp_MAJOR_VERSION"
+   INTERFACE_assimp_MAJOR_VERSION "1"
+-  INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include;${_IMPORT_PREFIX}/include"
++  #INTERFACE_INCLUDE_DIRECTORIES "@CMAKE_INSTALL_FULL_INCLUDEDIR@"
+   #INTERFACE_LINK_LIBRARIES "TxtUtils::TxtUtils;MealyMachine::MealyMachine"
+ )
+ 
+@@ -75,9 +65,6 @@ foreach(f ${CONFIG_FILES})
+   include(${f})
+ endforeach()
+ 
+-# Cleanup temporary variables.
+-set(_IMPORT_PREFIX)
+-
+ # Loop over all imported files and verify that they actually exist
+ foreach(target ${_IMPORT_CHECK_TARGETS} )
+   foreach(file ${_IMPORT_CHECK_FILES_FOR_${target}} )
+

@@ -53,7 +53,7 @@ def main():
         sys.exit(1)
 
     if options.forcevariable:
-        forcevariable = '_forcevariable'
+        forcevariable = ':forcevariable'
     else:
         forcevariable = ''
 
@@ -99,7 +99,7 @@ def main():
             print('# %s' % curdir)
             for pn, name, srcrev in srcrevs:
                 if name:
-                    print('SRCREV_%s_pn-%s%s = "%s"' % (name, pn, forcevariable, srcrev))
+                    print('SRCREV_%s:pn-%s%s = "%s"' % (name, pn, forcevariable, srcrev))
                 else:
                     print('SRCREV:pn-%s%s = "%s"' % (pn, forcevariable, srcrev))
 

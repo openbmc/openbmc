@@ -3,6 +3,7 @@
 #
 
 import os, tempfile
+import time
 from oeqa.sdk.case import OESDKTestCase
 from oeqa.utils.subprocesstweak import errors_have_output
 errors_have_output()
@@ -20,4 +21,10 @@ class BuildTests(OESDKTestCase):
                 conf.write('\n')
                 conf.write('DL_DIR = "%s"\n' % self.td['DL_DIR'])
 
-            self._run('. %s/oe-init-build-env %s && bitbake virtual/libc' % (corebase, testdir))
+            try:
+                self._run('. %s/oe-init-build-env %s && bitbake virtual/libc' % (corebase, testdir))
+            finally:
+                delay = 10
+                while delay and os.path.exists(testdir + "/bitbake.lock"):
+                    time.sleep(1)
+                    delay = delay - 1

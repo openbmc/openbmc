@@ -1,7 +1,7 @@
-From 6c18e5f9373da3e3b38f2c5727e2aefe07fcbbd9 Mon Sep 17 00:00:00 2001
+From b19f800e178516d4f4d344457647e4a018bd6855 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Sat, 22 May 2021 20:26:24 +0200
-Subject: [PATCH] [PATCH] add fallback parse_printf_format implementation
+Subject: [PATCH] add fallback parse_printf_format implementation
 
 Upstream-Status: Inappropriate [musl specific]
 
@@ -10,6 +10,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 [rebased for systemd 243]
 Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+
 ---
  meson.build                              |   1 +
  src/basic/meson.build                    |   5 +
@@ -22,10 +23,10 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  create mode 100644 src/basic/parse-printf-format.h
 
 diff --git a/meson.build b/meson.build
-index 27186d63a3..2abb7b3188 100644
+index 738879eb21..1aa20b8246 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -675,6 +675,7 @@ endif
+@@ -656,6 +656,7 @@ endif
  foreach header : ['crypt.h',
                    'linux/memfd.h',
                    'linux/vm_sockets.h',
@@ -34,10 +35,10 @@ index 27186d63a3..2abb7b3188 100644
                    'valgrind/memcheck.h',
                    'valgrind/valgrind.h',
 diff --git a/src/basic/meson.build b/src/basic/meson.build
-index 60ef801a25..aba2172edd 100644
+index 9b016ce5e8..a9ce21b02e 100644
 --- a/src/basic/meson.build
 +++ b/src/basic/meson.build
-@@ -341,6 +341,11 @@ endforeach
+@@ -322,6 +322,11 @@ endforeach
  
  basic_sources += generated_gperf_headers
  
@@ -430,6 +431,3 @@ index fd3fd7ef9c..e8e6ad555b 100644
  
  #define SNDBUF_SIZE (8*1024*1024)
  
--- 
-2.24.0
-

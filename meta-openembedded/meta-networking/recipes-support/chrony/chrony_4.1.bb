@@ -47,6 +47,11 @@ DEPENDS = "pps-tools"
 #       chrony does not use GNU Autotools.
 inherit update-rc.d systemd
 
+# Add chronyd user if privdrop packageconfig is selected
+inherit ${@bb.utils.contains('PACKAGECONFIG', 'privdrop', 'useradd', '', d)}
+USERADD_PACKAGES = "${@bb.utils.contains('PACKAGECONFIG', 'privdrop', '${PN}', '', d)}"
+USERADD_PARAM:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'privdrop', '--system -d / -M --shell /bin/nologin chronyd;', '', d)}"
+
 # Configuration options:
 # - For command line editing support in chronyc, you may specify either
 #   'editline' or 'readline' but not both.  editline is smaller, but
@@ -68,7 +73,7 @@ PACKAGECONFIG ??= "editline \
 PACKAGECONFIG[readline] = "--without-editline,--without-readline,readline"
 PACKAGECONFIG[editline] = ",--without-editline,libedit"
 PACKAGECONFIG[sechash] = "--without-tomcrypt,--disable-sechash,nss"
-PACKAGECONFIG[privdrop] = ",--disable-privdrop,libcap"
+PACKAGECONFIG[privdrop] = "--with-libcap,--disable-privdrop --without-libcap,libcap"
 PACKAGECONFIG[scfilter] = "--enable-scfilter,--without-seccomp,libseccomp"
 PACKAGECONFIG[ipv6] = ",--disable-ipv6,"
 PACKAGECONFIG[nss] = "--with-nss,--without-nss,nss"
@@ -97,6 +102,10 @@ do_install() {
     # Config file
     install -d ${D}${sysconfdir}
     install -m 644 ${WORKDIR}/chrony.conf ${D}${sysconfdir}
+    if ${@bb.utils.contains('PACKAGECONFIG', 'privdrop', 'true', 'false', d)}; then
+        echo "# Define user to drop to after dropping root privileges" >> ${D}${sysconfdir}/chrony.conf
+        echo "user chronyd" >> ${D}${sysconfdir}/chrony.conf
+    fi
 
     # System V init script
     install -d ${D}${sysconfdir}/init.d

@@ -1,0 +1,32 @@
+From: Ranjitsinh Rathod <ranjitsinh.rathod@kpit.com>
+Date: Fri, 13 Aug 2021 16:42:48 +0530
+Subject: [PATCH] assimp: remove shared lib from _IMPORT_CHECK_TARGETS
+
+In the target assimp::assimp shared library verification removed
+as it is giving configuration error when used by 3rd part component to
+configure itself using assimp::assimp target
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Ranjitsinh Rathod <ranjitsinh.rathod@kpit.com>
+---
+ assimpTargets-release.cmake.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/assimpTargets-release.cmake.in b/assimpTargets-release.cmake.in
+index cd2fac7e0..52edc7990 100644
+--- a/assimpTargets-release.cmake.in
++++ b/assimpTargets-release.cmake.in
+@@ -72,8 +72,8 @@ else()
+       IMPORTED_SONAME_RELEASE "${sharedLibraryName}"
+       IMPORTED_LOCATION_RELEASE "@CMAKE_INSTALL_FULL_LIBDIR@/${sharedLibraryName}"
+     )
+-    list(APPEND _IMPORT_CHECK_TARGETS assimp::assimp )
+-    list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_LIBDIR@/${sharedLibraryName}" )
++    #list(APPEND _IMPORT_CHECK_TARGETS assimp::assimp )
++    #list(APPEND _IMPORT_CHECK_FILES_FOR_assimp::assimp "@CMAKE_INSTALL_FULL_LIBDIR@/${sharedLibraryName}" )
+   else()
+     set(staticLibraryName "libassimp${ASSIMP_LIBRARY_SUFFIX}@CMAKE_STATIC_LIBRARY_SUFFIX@")
+     set_target_properties(assimp::assimp PROPERTIES
+--
+2.17.1

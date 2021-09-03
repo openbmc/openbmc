@@ -11,6 +11,7 @@
 import os
 import sys
 import unittest
+import hashlib
 
 from glob import glob
 from shutil import rmtree, copy
@@ -682,6 +683,63 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
         # Argument pointing to parent directory.
         with open(wks_file, 'w') as wks:
             wks.write("part / --source rootfs --fstype=ext4 --change-directory ././..")
+        self.assertNotEqual(0, runCmd("wic create %s -e core-image-minimal -o %s" \
+                                      % (wks_file, self.resultdir), ignore_status=True).status)
+        os.remove(wks_file)
+
+    def test_no_fstab_update(self):
+        """Test --no-fstab-update wks option."""
+
+        oldpath = os.environ['PATH']
+        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
+
+        # Get stock fstab from base-files recipe
+        self.assertEqual(0, bitbake('base-files -c do_install').status)
+        bf_fstab = os.path.join(get_bb_var('D', 'base-files'), 'etc/fstab')
+        self.assertEqual(True, os.path.exists(bf_fstab))
+        bf_fstab_md5sum = runCmd('md5sum %s 2>/dev/null' % bf_fstab).output.split(" ")[0]
+
+        try:
+            no_fstab_update_path = os.path.join(self.resultdir, 'test-no-fstab-update')
+            os.makedirs(no_fstab_update_path)
+            wks_file = os.path.join(no_fstab_update_path, 'temp.wks')
+            with open(wks_file, 'w') as wks:
+                wks.writelines(['part / --source rootfs --fstype=ext4 --label rootfs\n',
+                                'part /mnt/p2 --source rootfs --rootfs-dir=core-image-minimal ',
+                                '--fstype=ext4 --label p2 --no-fstab-update\n'])
+            runCmd("wic create %s -e core-image-minimal -o %s" \
+                                       % (wks_file, self.resultdir))
+
+            part_fstab_md5sum = []
+            for i in range(1, 3):
+                part = glob(os.path.join(self.resultdir, 'temp-*.direct.p') + str(i))[0]
+                part_fstab = runCmd("debugfs -R 'cat etc/fstab' %s 2>/dev/null" % (part))
+                part_fstab_md5sum.append(hashlib.md5((part_fstab.output + "\n\n").encode('utf-8')).hexdigest())
+
+            # '/etc/fstab' in partition 2 should contain the same stock fstab file
+            # as the one installed by the base-file recipe.
+            self.assertEqual(bf_fstab_md5sum, part_fstab_md5sum[1])
+
+            # '/etc/fstab' in partition 1 should contain an updated fstab file.
+            self.assertNotEqual(bf_fstab_md5sum, part_fstab_md5sum[0])
+
+        finally:
+            os.environ['PATH'] = oldpath
+
+    def test_no_fstab_update_errors(self):
+        """Test --no-fstab-update wks option error handling."""
+        wks_file = 'temp.wks'
+
+        # Absolute argument.
+        with open(wks_file, 'w') as wks:
+            wks.write("part / --source rootfs --fstype=ext4 --no-fstab-update /etc")
+        self.assertNotEqual(0, runCmd("wic create %s -e core-image-minimal -o %s" \
+                                      % (wks_file, self.resultdir), ignore_status=True).status)
+        os.remove(wks_file)
+
+        # Argument pointing to parent directory.
+        with open(wks_file, 'w') as wks:
+            wks.write("part / --source rootfs --fstype=ext4 --no-fstab-update ././..")
         self.assertNotEqual(0, runCmd("wic create %s -e core-image-minimal -o %s" \
                                       % (wks_file, self.resultdir), ignore_status=True).status)
         os.remove(wks_file)

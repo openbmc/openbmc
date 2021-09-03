@@ -21,7 +21,7 @@ PACKAGECONFIG[curl] = "-DENABLE_LIBCURL=ON,-DENABLE_LIBCURL=OFF,curl"
 PACKAGECONFIG[openjpeg] = "-DENABLE_LIBOPENJPEG=openjpeg2,-DENABLE_LIBOPENJPEG=none,openjpeg"
 PACKAGECONFIG[qt5] = "-DENABLE_QT5=ON,-DENABLE_QT5=OFF,qtbase qttools-native"
 PACKAGECONFIG[nss] = "-DWITH_NSS3=ON,-DWITH_NSS3=OFF,nss"
-PACKAGECONFIG[splash] = "-DENABLE_SPLASH=ON,-DENABLE_SPLASH=OFF,boost"
+PACKAGECONFIG[splash] = "-DENABLE_SPLASH=ON -DENABLE_BOOST=ON,-DENABLE_SPLASH=OFF -DENABLE_BOOST=OFF,boost"
 
 # surprise - did not expect this to work :)
 inherit ${@bb.utils.contains('PACKAGECONFIG', 'qt5', 'cmake_qt5', '', d)}

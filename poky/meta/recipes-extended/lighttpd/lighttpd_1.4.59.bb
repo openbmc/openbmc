@@ -14,40 +14,38 @@ RRECOMMENDS:${PN} = "lighttpd-module-access \
                      lighttpd-module-accesslog"
 
 SRC_URI = "http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${PV}.tar.xz \
-        file://index.html.lighttpd \
-        file://lighttpd.conf \
-        file://lighttpd \
-        file://0001-Use-pkg-config-for-pcre-dependency-instead-of-config.patch \
-        "
+           file://index.html.lighttpd \
+           file://lighttpd.conf \
+           file://lighttpd \
+           file://0001-Use-pkg-config-for-pcre-dependency-instead-of-config.patch \
+           file://0001-meson-add-with_zstd-to-meson_options.txt.patch \
+           "
 
 SRC_URI[sha256sum] = "fb953db273daef08edb6e202556cae8a3d07eed6081c96bd9903db957d1084d5"
 
+DEPENDS = "virtual/crypt"
+
 PACKAGECONFIG ??= "openssl pcre zlib \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xattr', 'attr', '', d)} \
 "
 
-PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6"
-PACKAGECONFIG[mmap] = "--enable-mmap,--disable-mmap"
-PACKAGECONFIG[libev] = "--with-libev,--without-libev,libev"
-PACKAGECONFIG[mysql] = "--with-mysql,--without-mysql,mariadb"
-PACKAGECONFIG[ldap] = "--with-ldap,--without-ldap,openldap"
-PACKAGECONFIG[attr] = "--with-attr,--without-attr,attr"
-PACKAGECONFIG[valgrind] = "--with-valgrind,--without-valgrind,valgrind"
-PACKAGECONFIG[openssl] = "--with-openssl,--without-openssl,openssl"
-PACKAGECONFIG[krb5] = "--with-krb5,--without-krb5,krb5"
-PACKAGECONFIG[pcre] = "--with-pcre,--without-pcre,libpcre"
-PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib"
-PACKAGECONFIG[bzip2] = "--with-bzip2,--without-bzip2,bzip2"
-PACKAGECONFIG[webdav-props] = "--with-webdav-props,--without-webdav-props,libxml2 sqlite3"
-PACKAGECONFIG[webdav-locks] = "--with-webdav-locks,--without-webdav-locks,util-linux"
-PACKAGECONFIG[gdbm] = "--with-gdbm,--without-gdbm,gdbm"
-PACKAGECONFIG[memcache] = "--with-memcached,--without-memcached,libmemcached"
-PACKAGECONFIG[lua] = "--with-lua,--without-lua,lua"
+PACKAGECONFIG[libev] = "-Dwith_libev=true,-Dwith_libev=false,libev"
+PACKAGECONFIG[mysql] = "-Dwith_mysql=true,-Dwith_mysql=false,mariadb"
+PACKAGECONFIG[ldap] = "-Dwith_ldap=true,-Dwith_ldap=false,openldap"
+PACKAGECONFIG[attr] = "-Dwith_xattr=true,-Dwith_xattr=false,attr"
+PACKAGECONFIG[openssl] = "-Dwith_openssl=true,-Dwith_openssl=false,openssl"
+PACKAGECONFIG[krb5] = "-Dwith_krb5=true,-Dwith_krb5=false,krb5"
+PACKAGECONFIG[pcre] = "-Dwith_pcre=true,-Dwith_pcre=false,libpcre"
+PACKAGECONFIG[zlib] = "-Dwith_zlib=true,-Dwith_zlib=false,zlib"
+PACKAGECONFIG[bzip2] = "-Dwith_bzip=true,-Dwith_bzip=false,bzip2"
+PACKAGECONFIG[webdav-props] = "-Dwith_webdav_props=true,-Dwith_webdav_props=false,libxml2 sqlite3"
+PACKAGECONFIG[webdav-locks] = "-Dwith_webdav_locks=true,-Dwith_webdav_locks=false,util-linux"
+PACKAGECONFIG[gdbm] = "-Dwith_gdbm=true,-Dwith_gdbm=false,gdbm"
+PACKAGECONFIG[memcache] = "-Dwith_memcached=true,-Dwith_memcached=false,libmemcached"
+PACKAGECONFIG[lua] = "-Dwith_lua=true,-Dwith_lua=false,lua"
+PACKAGECONFIG[zstd] = "-Dwith_zstd=true,-Dwith_zstd=false,zstd"
 
-EXTRA_OECONF += "--enable-lfs --without-fam"
-
-inherit autotools pkgconfig update-rc.d gettext systemd
+inherit meson pkgconfig update-rc.d gettext systemd
 
 INITSCRIPT_NAME = "lighttpd"
 INITSCRIPT_PARAMS = "defaults 70"
@@ -71,13 +69,15 @@ do_install:append() {
 	ln -sf ${localstatedir}/tmp ${D}/www/var
 }
 
-FILES:${PN} += "${sysconfdir} /www"
+# bitbake.conf sets ${libdir}/${BPN}/* in FILES, which messes up the module split.
+# So we re-do the variable.
+FILES:${PN} = "${sysconfdir} /www ${sbindir}"
 
 CONFFILES:${PN} = "${sysconfdir}/lighttpd/lighttpd.conf"
 
 PACKAGES_DYNAMIC += "^lighttpd-module-.*"
 
 python populate_packages:prepend () {
-    lighttpd_libdir = d.expand('${libdir}')
+    lighttpd_libdir = d.expand('${prefix}/lib/lighttpd')
     do_split_packages(d, lighttpd_libdir, r'^mod_(.*)\.so$', 'lighttpd-module-%s', 'Lighttpd module for %s', extra_depends='')
 }

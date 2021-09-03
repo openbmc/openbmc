@@ -180,3 +180,9 @@ FILES:${PN}-fstools = "\
 "
 
 BBCLASSEXTEND = "native"
+
+android_tools_enable_devmode() {
+    touch ${IMAGE_ROOTFS}/var/usb-debugging-enabled
+}
+
+ROOTFS_POSTPROCESS_COMMAND_${PN}-adbd += "${@bb.utils.contains("USB_DEBUGGING_ENABLED", "1", "android_tools_enable_devmode;", "", d)}"

@@ -4,157 +4,135 @@
 
 import os,sys,logging
 import signal, time
-from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 import socket
 import io
 import sqlite3
-import bb.server.xmlrpcclient
 import prserv
 import prserv.db
 import errno
-import multiprocessing
+import bb.asyncrpc
 
 logger = logging.getLogger("BitBake.PRserv")
-
-class Handler(SimpleXMLRPCRequestHandler):
-    def _dispatch(self,method,params):
-        try:
-            value=self.server.funcs[method](*params)
-        except:
-            import traceback
-            traceback.print_exc()
-            raise
-        return value
 
 PIDPREFIX = "/tmp/PRServer_%s_%s.pid"
 singleton = None
 
+class PRServerClient(bb.asyncrpc.AsyncServerConnection):
+    def __init__(self, reader, writer, table, read_only):
+        super().__init__(reader, writer, 'PRSERVICE', logger)
+        self.handlers.update({
+            'get-pr': self.handle_get_pr,
+            'import-one': self.handle_import_one,
+            'export': self.handle_export,
+            'is-readonly': self.handle_is_readonly,
+        })
+        self.table = table
+        self.read_only = read_only
 
-class PRServer(SimpleXMLRPCServer):
-    def __init__(self, dbfile, logfile, interface):
-        ''' constructor '''
+    def validate_proto_version(self):
+        return (self.proto_version == (1, 0))
+
+    async def dispatch_message(self, msg):
         try:
-            SimpleXMLRPCServer.__init__(self, interface,
-                                        logRequests=False, allow_none=True)
-        except socket.error:
-            ip=socket.gethostbyname(interface[0])
-            port=interface[1]
-            msg="PR Server unable to bind to %s:%s\n" % (ip, port)
-            sys.stderr.write(msg)
-            raise PRServiceConfigError
-
-        self.dbfile=dbfile
-        self.logfile=logfile
-        self.host, self.port = self.socket.getsockname()
-
-        self.register_function(self.getPR, "getPR")
-        self.register_function(self.ping, "ping")
-        self.register_function(self.export, "export")
-        self.register_function(self.importone, "importone")
-        self.register_introspection_functions()
-
-        self.iter_count = 0
-        # 60 iterations between syncs or sync if dirty every ~30 seconds
-        self.iterations_between_sync = 60
-
-    def sigint_handler(self, signum, stack):
-        if self.table:
-            self.table.sync()
-
-    def sigterm_handler(self, signum, stack):
-        if self.table:
-            self.table.sync()
-        raise(SystemExit)
-
-    def process_request(self, request, client_address):
-        if request is None:
-            return
-        try:
-            self.finish_request(request, client_address)
-            self.shutdown_request(request)
-            self.iter_count = (self.iter_count + 1) % self.iterations_between_sync
-            if self.iter_count == 0:
-                self.table.sync_if_dirty()
+            await super().dispatch_message(msg)
         except:
-            self.handle_error(request, client_address)
-            self.shutdown_request(request)
             self.table.sync()
+            raise
+
         self.table.sync_if_dirty()
 
-    def serve_forever(self, poll_interval=0.5):
-        signal.signal(signal.SIGINT, self.sigint_handler)
-        signal.signal(signal.SIGTERM, self.sigterm_handler)
+    async def handle_get_pr(self, request):
+        version = request['version']
+        pkgarch = request['pkgarch']
+        checksum = request['checksum']
 
-        self.db = prserv.db.PRData(self.dbfile)
-        self.table = self.db["PRMAIN"]
-        return super().serve_forever(poll_interval)
-
-    def export(self, version=None, pkgarch=None, checksum=None, colinfo=True):
+        response = None
         try:
-            return self.table.export(version, pkgarch, checksum, colinfo)
-        except sqlite3.Error as exc:
-            logger.error(str(exc))
-            return None
-
-    def importone(self, version, pkgarch, checksum, value):
-        return self.table.importone(version, pkgarch, checksum, value)
-
-    def ping(self):
-        return True
-
-    def getinfo(self):
-        return (self.host, self.port)
-
-    def getPR(self, version, pkgarch, checksum):
-        try:
-            return self.table.getValue(version, pkgarch, checksum)
+            value = self.table.getValue(version, pkgarch, checksum)
+            response = {'value': value}
         except prserv.NotFoundError:
             logger.error("can not find value for (%s, %s)",version, checksum)
-            return None
         except sqlite3.Error as exc:
             logger.error(str(exc))
-            return None
+
+        self.write_message(response)
+
+    async def handle_import_one(self, request):
+        response = None
+        if not self.read_only:
+            version = request['version']
+            pkgarch = request['pkgarch']
+            checksum = request['checksum']
+            value = request['value']
+
+            value = self.table.importone(version, pkgarch, checksum, value)
+            if value is not None:
+                response = {'value': value}
+
+        self.write_message(response)
+
+    async def handle_export(self, request):
+        version = request['version']
+        pkgarch = request['pkgarch']
+        checksum = request['checksum']
+        colinfo = request['colinfo']
+
+        try:
+            (metainfo, datainfo) = self.table.export(version, pkgarch, checksum, colinfo)
+        except sqlite3.Error as exc:
+            logger.error(str(exc))
+            metainfo = datainfo = None
+
+        response = {'metainfo': metainfo, 'datainfo': datainfo}
+        self.write_message(response)
+
+    async def handle_is_readonly(self, request):
+        response = {'readonly': self.read_only}
+        self.write_message(response)
+
+class PRServer(bb.asyncrpc.AsyncServer):
+    def __init__(self, dbfile, read_only=False):
+        super().__init__(logger)
+        self.dbfile = dbfile
+        self.table = None
+        self.read_only = read_only
+
+    def accept_client(self, reader, writer):
+        return PRServerClient(reader, writer, self.table, self.read_only)
+
+    def _serve_forever(self):
+        self.db = prserv.db.PRData(self.dbfile, read_only=self.read_only)
+        self.table = self.db["PRMAIN"]
+
+        logger.info("Started PRServer with DBfile: %s, Address: %s, PID: %s" %
+                     (self.dbfile, self.address, str(os.getpid())))
+
+        super()._serve_forever()
+
+        self.table.sync_if_dirty()
+        self.db.disconnect()
+
+    def signal_handler(self):
+        super().signal_handler()
+        if self.table:
+            self.table.sync()
 
 class PRServSingleton(object):
-    def __init__(self, dbfile, logfile, interface):
+    def __init__(self, dbfile, logfile, host, port):
         self.dbfile = dbfile
         self.logfile = logfile
-        self.interface = interface
-        self.host = None
-        self.port = None
-
-    def start(self):
-        self.prserv = PRServer(self.dbfile, self.logfile, self.interface)
-        self.process = multiprocessing.Process(target=self.prserv.serve_forever)
-        self.process.start()
-
-        self.host, self.port = self.prserv.getinfo()
-
-    def getinfo(self):
-        return (self.host, self.port)
-
-class PRServerConnection(object):
-    def __init__(self, host, port):
-        if is_local_special(host, port):
-            host, port = singleton.getinfo()
         self.host = host
         self.port = port
-        self.connection, self.transport = bb.server.xmlrpcclient._create_server(self.host, self.port)
 
-    def getPR(self, version, pkgarch, checksum):
-        return self.connection.getPR(version, pkgarch, checksum)
+    def start(self):
+        self.prserv = PRServer(self.dbfile)
+        self.prserv.start_tcp_server(socket.gethostbyname(self.host), self.port)
+        self.process = self.prserv.serve_as_process()
 
-    def ping(self):
-        return self.connection.ping()
-
-    def export(self,version=None, pkgarch=None, checksum=None, colinfo=True):
-        return self.connection.export(version, pkgarch, checksum, colinfo)
-
-    def importone(self, version, pkgarch, checksum, value):
-        return self.connection.importone(version, pkgarch, checksum, value)
-
-    def getinfo(self):
-        return self.host, self.port
+        if not self.prserv.address:
+            raise PRServiceConfigError
+        if not self.port:
+            self.port = int(self.prserv.address.rsplit(':', 1)[1])
 
 def run_as_daemon(func, pidfile, logfile):
     """
@@ -226,7 +204,7 @@ def run_as_daemon(func, pidfile, logfile):
     os.remove(pidfile)
     os._exit(0)
 
-def start_daemon(dbfile, host, port, logfile):
+def start_daemon(dbfile, host, port, logfile, read_only=False):
     ip = socket.gethostbyname(host)
     pidfile = PIDPREFIX % (ip, port)
     try:
@@ -240,15 +218,13 @@ def start_daemon(dbfile, host, port, logfile):
                             % pidfile)
         return 1
 
-    server = PRServer(os.path.abspath(dbfile), os.path.abspath(logfile), (ip,port))
-    run_as_daemon(server.serve_forever, pidfile, os.path.abspath(logfile))
+    dbfile = os.path.abspath(dbfile)
+    def daemon_main():
+        server = PRServer(dbfile, read_only=read_only)
+        server.start_tcp_server(ip, port)
+        server.serve_forever()
 
-    # Sometimes, the port (i.e. localhost:0) indicated by the user does not match with
-    # the one the server actually is listening, so at least warn the user about it
-    _,rport = server.getinfo()
-    if port != rport:
-        sys.stdout.write("Server is listening at port %s instead of %s\n"
-                         % (rport,port))
+    run_as_daemon(daemon_main, pidfile, os.path.abspath(logfile))
     return 0
 
 def stop_daemon(host, port):
@@ -302,7 +278,7 @@ def is_running(pid):
     return True
 
 def is_local_special(host, port):
-    if host.strip().upper() == 'localhost'.upper() and (not port):
+    if (host == 'localhost' or host == '127.0.0.1') and not port:
         return True
     else:
         return False
@@ -326,7 +302,9 @@ def auto_start(d):
                 'Usage: PRSERV_HOST = "<hostname>:<port>"']))
         raise PRServiceConfigError
 
-    if is_local_special(host_params[0], int(host_params[1])):
+    host = host_params[0].strip().lower()
+    port = int(host_params[1])
+    if is_local_special(host, port):
         import bb.utils
         cachedir = (d.getVar("PERSISTENT_DIR") or d.getVar("CACHE"))
         if not cachedir:
@@ -340,20 +318,16 @@ def auto_start(d):
                auto_shutdown()
         if not singleton:
             bb.utils.mkdirhier(cachedir)
-            singleton = PRServSingleton(os.path.abspath(dbfile), os.path.abspath(logfile), ("localhost",0))
+            singleton = PRServSingleton(os.path.abspath(dbfile), os.path.abspath(logfile), host, port)
             singleton.start()
     if singleton:
-        host, port = singleton.getinfo()
-    else:
-        host = host_params[0]
-        port = int(host_params[1])
+        host = singleton.host
+        port = singleton.port
 
     try:
-        connection = PRServerConnection(host,port)
-        connection.ping()
-        realhost, realport = connection.getinfo()
-        return str(realhost) + ":" + str(realport)
-        
+        ping(host, port)
+        return str(host) + ":" + str(port)
+
     except Exception:
         logger.critical("PRservice %s:%d not available" % (host, port))
         raise PRServiceConfigError
@@ -366,8 +340,21 @@ def auto_shutdown():
         singleton = None
 
 def ping(host, port):
-    conn=PRServerConnection(host, port)
+    from . import client
+
+    conn = client.PRClient()
+    conn.connect_tcp(host, port)
     return conn.ping()
 
 def connect(host, port):
-    return PRServerConnection(host, port)
+    from . import client
+
+    global singleton
+
+    if host.strip().lower() == 'localhost' and not port:
+        host = 'localhost'
+        port = singleton.port
+
+    conn = client.PRClient()
+    conn.connect_tcp(host, port)
+    return conn

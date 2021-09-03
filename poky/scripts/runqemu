@@ -72,6 +72,8 @@ of the following environment variables (in any order):
     gl - enable virgl-based GL acceleration (also needs gtk or sdl options)
     gl-es - enable virgl-based GL acceleration, using OpenGL ES (also needs gtk or sdl options)
     egl-headless - enable headless EGL output; use vnc (via publicvnc option) or spice to see it
+    (hint: if /dev/dri/renderD* is absent due to lack of suitable GPU, 'modprobe vgem' will create
+    one sutable for mesa llvmpipe sofware renderer)
     serial - enable a serial console on /dev/ttyS0
     serialstdio - enable a serial console on the console (regardless of graphics mode)
     slirp - enable user networking, no root privileges is required

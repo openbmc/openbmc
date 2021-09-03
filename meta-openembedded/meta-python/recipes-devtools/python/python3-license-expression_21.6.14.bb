@@ -28,6 +28,8 @@ RDEPENDS:${PN}-ptest += " \
 "
 
 do_install_ptest() {
-	install -d ${D}${PTEST_PATH}/tests
-	cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+    install -d ${D}${PTEST_PATH}/tests
+    install -d ${D}${PTEST_PATH}/src
+    cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+    cp -rf ${S}/src/* ${D}${PTEST_PATH}/src/
 }

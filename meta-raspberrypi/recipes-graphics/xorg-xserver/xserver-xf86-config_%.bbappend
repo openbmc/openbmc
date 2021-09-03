@@ -13,4 +13,4 @@ do_install:append:rpi () {
     fi
 }
 
-FILES:${PN}:rpi += "${sysconfdir}/X11/xorg.conf ${sysconfdir}/X11/xorg.conf.d/*"
+FILES:${PN}:append:rpi = " ${sysconfdir}/X11/xorg.conf.d/*"

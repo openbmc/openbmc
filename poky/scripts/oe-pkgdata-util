@@ -171,7 +171,7 @@ def read_value(args):
                     val = line.split(': ', 1)[1].rstrip()
         return val
 
-    logger.debug("read-value('%s', '%s' '%s')" % (args.pkgdata_dir, args.valuename, packages))
+    logger.debug("read-value('%s', '%s' '%s')" % (args.pkgdata_dir, args.valuenames, packages))
     for package in packages:
         pkg_split = package.split('_')
         pkg_name = pkg_split[0]
@@ -180,20 +180,29 @@ def read_value(args):
         logger.debug(revlink)
         if os.path.exists(revlink):
             mappedpkg = os.path.basename(os.readlink(revlink))
-            qvar = args.valuename
-            value = readvar(revlink, qvar, mappedpkg)
-            if qvar == "PKGSIZE":
-                # PKGSIZE is now in bytes, but we we want it in KB
-                pkgsize = (int(value) + 1024 // 2) // 1024
-                value = "%d" % pkgsize
-            if args.unescape:
-                import codecs
-                # escape_decode() unescapes backslash encodings in byte streams
-                value = codecs.escape_decode(bytes(value, "utf-8"))[0].decode("utf-8")
+            qvars = args.valuenames
+            val_names = qvars.split(',')
+            values = []
+            for qvar in val_names:
+                if qvar == "PACKAGE":
+                    value = mappedpkg
+                else:
+                    value = readvar(revlink, qvar, mappedpkg)
+                if qvar == "PKGSIZE":
+                    # PKGSIZE is now in bytes, but we we want it in KB
+                    pkgsize = (int(value) + 1024 // 2) // 1024
+                    value = "%d" % pkgsize
+                if args.unescape:
+                    import codecs
+                    # escape_decode() unescapes backslash encodings in byte streams
+                    value = codecs.escape_decode(bytes(value, "utf-8"))[0].decode("utf-8")
+                values.append(value)
+
+            values_str = ' '.join(values)
             if args.prefix_name:
-                print('%s %s' % (pkg_name, value))
+                print('%s %s' % (pkg_name, values_str))
             else:
-                print(value)
+                print(values_str)
         else:
             logger.debug("revlink %s does not exist", revlink)
 
@@ -431,7 +440,7 @@ def list_pkg_files(args):
             for line in f:
                 if line.startswith('FILES_INFO:'):
                     found = True
-                    val = line.split(':', 1)[1].strip()
+                    val = line.split(': ', 1)[1].strip()
                     dictval = json.loads(val)
                     if long:
                         width = max(map(len, dictval), default=0)
@@ -500,7 +509,7 @@ def find_path(args):
             with open(os.path.join(root,fn)) as f:
                 for line in f:
                     if line.startswith('FILES_INFO:'):
-                        val = line.split(':', 1)[1].strip()
+                        val = line.split(': ', 1)[1].strip()
                         dictval = json.loads(val)
                         for fullpth in dictval.keys():
                             if fnmatch.fnmatchcase(fullpth, args.targetpath):
@@ -570,7 +579,7 @@ def main():
     parser_read_value = subparsers.add_parser('read-value',
                                           help='Read any pkgdata value for one or more packages',
                                           description='Reads the named value from the pkgdata files for the specified packages')
-    parser_read_value.add_argument('valuename', help='Name of the value to look up')
+    parser_read_value.add_argument('valuenames', help='Name of the value/s to look up (separated by commas, no spaces)')
     parser_read_value.add_argument('pkg', nargs='*', help='Runtime package name to look up')
     parser_read_value.add_argument('-f', '--file', help='Read package names from the specified file (one per line, first field only)')
     parser_read_value.add_argument('-n', '--prefix-name', help='Prefix output with package name', action='store_true')

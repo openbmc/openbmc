@@ -3,11 +3,13 @@ Remove glibc specific function dependencies
 Sourced from: https://git.alpinelinux.org/aports/tree/main/mariadb/ppc-remove-glibc-dep.patch
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
+diff --git a/include/my_cpu.h b/include/my_cpu.h
+index f2e26fca..94599b74 100644
 --- a/include/my_cpu.h
 +++ b/include/my_cpu.h
 @@ -24,17 +24,16 @@
  */
- 
+
  #ifdef _ARCH_PWR8
 -#include <sys/platform/ppc.h>
  /* Very low priority */
@@ -28,7 +30,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  /* High priority */
  #define HMT_high() asm volatile("or 3,3,3")
  #else
-@@ -81,7 +80,7 @@ static inline void MY_RELAX_CPU(void)
+@@ -72,7 +71,7 @@ static inline void MY_RELAX_CPU(void)
    __asm__ __volatile__ ("pause");
  #endif
  #elif defined(_ARCH_PWR8)
@@ -36,15 +38,4 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +  __builtin_ppc_get_timebase();
  #elif defined __GNUC__ && (defined __arm__ || defined __aarch64__)
    /* Mainly, prevent the compiler from optimizing away delay loops */
- #ifdef _aarch64_
---- a/storage/tokudb/PerconaFT/portability/toku_time.h
-+++ b/storage/tokudb/PerconaFT/portability/toku_time.h
-@@ -124,7 +124,7 @@ static inline tokutime_t toku_time_now(v
-     __asm __volatile__ ("mrs %[rt], cntvct_el0" : [rt] "=r" (result));
-     return result;
- #elif defined(__powerpc__)
--    return __ppc_get_timebase();
-+    return __builtin_ppc_get_timebase();
- #else
- #error No timer implementation for this platform
- #endif
+   __asm__ __volatile__ ("":::"memory");

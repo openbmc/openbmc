@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=aeb969185a143c3c25130bc2c3ef9a50 \
 SRCREV = "9d42f667e2a36a6624d92b9bd697de097cc4e619"
 PV .= "+10.0.1+git${SRCPV}"
 SRC_URI = "gitsm://github.com/${BPN}/${BPN}.git \
+           file://0001-Workaround-glibc-2.34-build-failure-by-disabling-dls.patch \
           "
 
 S = "${WORKDIR}/git"
@@ -30,6 +31,3 @@ EXTRA_OECMAKE += "\
 "
 
 SECURITY_CFLAGS:toolchain-clang = ""
-
-# see https://github.com/apitrace/apitrace/issues/756
-PNBLACKLIST[apitrace] ?= "Needs porting to glibc 2.34+"

@@ -3,7 +3,7 @@ DESCRIPTION = "FLAC stands for Free Lossless Audio Codec, a lossless audio compr
 HOMEPAGE = "https://xiph.org/flac/"
 BUGTRACKER = "http://sourceforge.net/p/flac/bugs/"
 SECTION = "libs"
-LICENSE = "GFDL-1.2 & GPLv2+ & LGPLv2.1+ & BSD"
+LICENSE = "GFDL-1.2 & GPLv2+ & LGPLv2.1+ & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING.FDL;md5=ad1419ecc56e060eccf8184a87c4285f \
                     file://src/Makefile.am;beginline=1;endline=17;md5=09501c864f89dfc7ead65553129817ca \
                     file://COPYING.GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263 \

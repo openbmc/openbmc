@@ -5,7 +5,7 @@
 DEFAULTTUNE ?= "armv8-1m-main"
 
 TUNEVALID[armv8-1m-main] = "Enable instructions for ARMv8.1-m.main"
-TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'armv8-1m-main', ' -march=armv8.1-m.main', '', d)}"
+TUNE_CCARGS_MARCH .= "${@bb.utils.contains('TUNE_FEATURES', 'armv8-1m-main', ' -march=armv8.1-m.main', '', d)}"
 MACHINEOVERRIDES =. "${@bb.utils.contains('TUNE_FEATURES', 'armv8-1m-main', 'armv8-1m-main:', '', d)}"
 
 TUNECONFLICTS[armv8-1m-main] = "armv4 armv5 armv6 armv7a"

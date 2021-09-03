@@ -1,0 +1,65 @@
+From 632670273cc880917e78a152a3ae39e209b57864 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zolt=C3=A1n=20B=C3=B6sz=C3=B6rm=C3=A9nyi?=
+ <zboszor@gmail.com>
+Date: Sat, 28 Aug 2021 05:58:25 +0200
+Subject: [PATCH] fix build with --disable-dependency-tracking
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+With split build and source directories AND --disable-dependency-tracking
+(like the way Yocto builds are done) there's a reproducible make
+failure on my Fedora 33 build host:
+
+| Making all in src
+| make[2]: Entering directory '.../metacity/1_3.40.0-r0/build/src'
+| .../metacity/1_3.40.0-r0/recipe-sysroot-native/usr/bin/glib-mkenums --template ../../metacity-3.40.0/src/core/meta-enum-types.c.in ../../metacity-3.40.0/src/core/window-private.h ../../metacity-3.40.0/src/include/meta-compositor.h  > \
+| 	meta-enum-types.c.tmp && mv meta-enum-types.c.tmp core/meta-enum-types.c
+| .../metacity/1_3.40.0-r0/recipe-sysroot-native/usr/bin/glib-mkenums --template ../../metacity-3.40.0/src/core/meta-enum-types.h.in ../../metacity-3.40.0/src/core/window-private.h ../../metacity-3.40.0/src/include/meta-compositor.h  > \
+| 	meta-enum-types.h.tmp && mv meta-enum-types.h.tmp core/meta-enum-types.h
+| mv: cannot move 'meta-enum-types.c.tmp' to 'core/meta-enum-types.c'mv: cannot move 'meta-enum-types.h.tmp' to 'core/meta-enum-types.h': No such file or directory
+| : No such file or directory
+| make[2]: *** [Makefile:2240: core/meta-enum-types.c] Error 1
+
+https://gitlab.gnome.org/GNOME/metacity/-/merge_requests/24
+
+Upstream-Status: Pending
+
+Signed-off-by: Zoltán Böszörményi <zboszor@gmail.com>
+---
+ configure.ac    | 1 +
+ src/Makefile.am | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index ebb00b85..04aafb94 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -139,6 +139,7 @@ dnl **************************************************************************
+ AC_SUBST(ACLOCAL_AMFLAGS, "\${ACLOCAL_FLAGS}")
+ 
+ AC_PROG_CC
++AC_PROG_MKDIR_P
+ AC_ISC_POSIX
+ AC_HEADER_STDC
+ 
+diff --git a/src/Makefile.am b/src/Makefile.am
+index f86af600..4aa3fdae 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -204,10 +204,12 @@ ENUM_TYPES = \
+ 	$(NULL)
+ 
+ core/meta-enum-types.c: core/meta-enum-types.c.in $(ENUM_TYPES) Makefile.am
++	$(MKDIR_P) core
+ 	$(AM_V_GEN) $(GLIB_MKENUMS) --template $(srcdir)/core/meta-enum-types.c.in $(ENUM_TYPES) > \
+ 		meta-enum-types.c.tmp && mv meta-enum-types.c.tmp core/meta-enum-types.c
+ 
+ core/meta-enum-types.h: core/meta-enum-types.h.in $(ENUM_TYPES) Makefile.am
++	$(MKDIR_P) core
+ 	$(AM_V_GEN) $(GLIB_MKENUMS) --template $(srcdir)/core/meta-enum-types.h.in $(ENUM_TYPES) > \
+ 		meta-enum-types.h.tmp && mv meta-enum-types.h.tmp core/meta-enum-types.h
+ 
+-- 
+2.31.1
+

@@ -48,6 +48,7 @@ PTESTS_FAST = "\
     pango-ptest \
     parted-ptest \
     python3-atomicwrites-ptest \
+    python3-hypothesis-ptest \
     python3-jinja2-ptest \
     python3-markupsafe-ptest \
     python3-more-itertools-ptest \

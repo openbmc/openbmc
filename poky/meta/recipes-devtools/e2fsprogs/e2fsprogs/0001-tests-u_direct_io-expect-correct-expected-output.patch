@@ -1,0 +1,69 @@
+From ea5adf259e01c790f9ba69d6fe88d691de410b6f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sun, 22 Aug 2021 14:37:32 +0200
+Subject: [PATCH] tests/u_direct_io/expect: correct expected output
+
+This is likely the right fix, but upstream needs to confirm.
+
+Upstream-Status: Inappropriate [issue reported https://github.com/tytso/e2fsprogs/issues/80]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/u_direct_io/expect | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/tests/u_direct_io/expect b/tests/u_direct_io/expect
+index b0cdc730..830cbd75 100644
+--- a/tests/u_direct_io/expect
++++ b/tests/u_direct_io/expect
+@@ -19,8 +19,8 @@ Filesystem OS type:       Linux
+ Inode count:              32768
+ Block count:              32768
+ Reserved block count:     1638
+-Overhead clusters:        5131
+-Free blocks:              27631
++Overhead clusters:        6155
++Free blocks:              26607
+ Free inodes:              32757
+ First block:              0
+ Block size:               4096
+@@ -29,27 +29,29 @@ Reserved GDT blocks:      7
+ Blocks per group:         32768
+ Fragments per group:      32768
+ Inodes per group:         32768
+-Inode blocks per group:   1024
++Inode blocks per group:   2048
+ Flex block group size:    16
+ Mount count:              0
+ Check interval:           15552000 (6 months)
+ Reserved blocks uid:      0
+ Reserved blocks gid:      0
+ First inode:              11
+-Inode size:	          128
++Inode size:	          256
++Required extra isize:     32
++Desired extra isize:      32
+ Journal inode:            8
+ Default directory hash:   half_md4
+ Journal backup:           inode blocks
+ Directories:              2
+  Group  0: block bitmap at 9, inode bitmap at 25, inode table at 41
+-           27631 free blocks, 32757 free inodes, 2 used directories
++           26607 free blocks, 32757 free inodes, 2 used directories
+ e2fsck -fn -N test_filesys $LOOP
+ Pass 1: Checking inodes, blocks, and sizes
+ Pass 2: Checking directory structure
+ Pass 3: Checking directory connectivity
+ Pass 4: Checking reference counts
+ Pass 5: Checking group summary information
+-test_filesys: 11/32768 files (9.1% non-contiguous), 5137/32768 blocks
++test_filesys: 11/32768 files (9.1% non-contiguous), 6161/32768 blocks
+ Exit status is 0
+ e2fsck -fn -N test_filesys $TMPFILE
+ Pass 1: Checking inodes, blocks, and sizes
+@@ -57,5 +59,5 @@ Pass 2: Checking directory structure
+ Pass 3: Checking directory connectivity
+ Pass 4: Checking reference counts
+ Pass 5: Checking group summary information
+-test_filesys: 11/32768 files (9.1% non-contiguous), 5137/32768 blocks
++test_filesys: 11/32768 files (9.1% non-contiguous), 6161/32768 blocks
+ Exit status is 0

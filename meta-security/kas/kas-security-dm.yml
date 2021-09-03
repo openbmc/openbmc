@@ -5,6 +5,7 @@ header:
 
 local_conf_header:
     dm-verify: |
+        DISTRO_FEATURES:append = " integrity"
         DM_VERITY_IMAGE = "core-image-minimal"
         DM_VERITY_IMAGE_TYPE = "ext4"
         IMAGE_CLASSES += "dm-verity-img"

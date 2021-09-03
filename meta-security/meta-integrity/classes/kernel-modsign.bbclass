@@ -2,7 +2,7 @@
 # set explicitly in a local.conf before activating kernel-modsign.
 # To use the insecure (because public) example keys, use
 # MODSIGN_KEY_DIR = "${INTEGRITY_BASE}/data/debug-keys"
-MODSIGN_KEY_DIR ?= "MODSIGN_KEY_DIR_NOT_SET"
+MODSIGN_KEY_DIR ??= "MODSIGN_KEY_DIR_NOT_SET"
 
 # Private key for modules signing. The default is okay when
 # using the example key directory.

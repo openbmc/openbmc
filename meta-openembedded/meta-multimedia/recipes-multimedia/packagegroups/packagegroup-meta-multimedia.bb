@@ -22,6 +22,7 @@ RDEPENDS:packagegroup-meta-multimedia = "\
 RDEPENDS:packagegroup-meta-multimedia = "\
     alsa-equal \
     aom \
+    bluealsa \
     caps \
     cdparanoia \
     dcadec \
