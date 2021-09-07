@@ -10,6 +10,9 @@ get_root() {
 
 fslist="proc sys dev run"
 rodir=/mnt/rofs
+mmcdev="/dev/mmcblk0"
+rwfsdev="/dev/disk/by-partlabel/rwfs"
+
 cd /
 mkdir -p $fslist
 mount dev dev -tdevtmpfs
@@ -19,7 +22,6 @@ mount tmpfs run -t tmpfs -o mode=755,nodev
 
 # Wait up to 5s for the mmc device to appear. Continue even if the count is
 # exceeded. A failure will be caught later like in the mount command.
-mmcdev="/dev/mmcblk0"
 count=0
 while [ $count -lt 5 ]; do
     if [ -e "${mmcdev}" ]; then
@@ -48,16 +50,29 @@ if ! mount /dev/disk/by-partlabel/"$(get_root)" $rodir -t ext4 -o ro; then
     /bin/sh
 fi
 
-rwfsdev="/dev/disk/by-partlabel/rwfs"
+# Determine if a factory reset has been requested
 mkdir -p /var/lock
-if test $(fw_printenv -n rwreset) = "true"; then
+resetval=$(fw_printenv -n rwreset 2>/dev/null)
+gpiopresent=$(gpiofind factory-reset-toggle)
+if [ $? -eq 0 ]; then
+    gpioval=$(gpioget $gpiopresent)
+else
+    gpioval=""
+fi
+# Prevent unnecessary resets on first boot
+if [ -n "$gpioval" -a -z "$resetval" ]; then
+    fw_setenv rwreset $gpioval
+    resetval=$gpioval
+fi
+if [ "$resetval" = "true" -o -n "$gpioval" -a "$resetval" != "$gpioval" ]; then
     echo "Factory reset requested."
     if ! mkfs.ext4 -F "${rwfsdev}"; then
         echo "Reformat for factory reset failed."
         /bin/sh
     else
-        fw_setenv rwreset
-        echo "Formatting of rwfs is complete."
+        # gpioval will be an empty string if factory-reset-toggle was not found
+        fw_setenv rwreset $gpioval
+        echo "rwfs has been formatted."
     fi
 fi
 
