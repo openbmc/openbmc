@@ -16,10 +16,18 @@ table inet filter {
     jump gbmc_br_pub_input
     reject
   }
+  set gbmc_br_int_addrs {
+    type ipv6_addr;
+    flags interval
+    elements = {
+      ff00::/8,
+      fe80::/64,
+      fdb5:0481:10ce::/64,
+    }
+  }
   chain gbmc_br_int_input {
-    ip6 daddr ff00::/8 accept
-    ip6 daddr fe80::/64 accept
-    ip6 daddr fdb5:0481:10ce::/64 accept
+    ip6 daddr @gbmc_br_int_addrs accept
+    ip6 saddr @gbmc_br_int_addrs accept
   }
   chain gbmc_br_pub_input {
     ip6 nexthdr icmpv6 accept
