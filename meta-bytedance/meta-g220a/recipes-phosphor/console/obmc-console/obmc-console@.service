@@ -4,15 +4,15 @@ BindsTo=dev-%i.device
 After=dev-%i.device
 
 [Service]
-ExecStartPre=/bin/sh -c 'echo -n "uart3" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart_routing/uart1'
-ExecStartPre=/bin/sh -c 'echo -n "uart1" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart_routing/uart3'
-ExecStartPre=/bin/sh -c 'echo -n "io1" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart_routing/uart4'
-ExecStartPre=/bin/sh -c 'echo -n "uart4" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart_routing/io1'
+ExecStartPre=/bin/sh -c 'echo -n "uart3" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart-routing/uart1'
+ExecStartPre=/bin/sh -c 'echo -n "uart1" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart-routing/uart3'
+ExecStartPre=/bin/sh -c 'echo -n "io1" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart-routing/uart4'
+ExecStartPre=/bin/sh -c 'echo -n "uart4" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart-routing/io1'
 ExecStart=/usr/bin/env obmc-console-server --config {sysconfdir}/obmc-console.conf %i
-ExecStopPost=/bin/sh -c 'echo -n "io1" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart_routing/uart1'
-ExecStopPost=/bin/sh -c 'echo -n "io3" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart_routing/uart3'
-ExecStopPost=/bin/sh -c 'echo -n "io4" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart_routing/uart4'
-ExecStopPost=/bin/sh -c 'echo -n "uart1" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart_routing/io1'
+ExecStopPost=/bin/sh -c 'echo -n "io1" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart-routing/uart1'
+ExecStopPost=/bin/sh -c 'echo -n "io3" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart-routing/uart3'
+ExecStopPost=/bin/sh -c 'echo -n "io4" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart-routing/uart4'
+ExecStopPost=/bin/sh -c 'echo -n "uart1" > /sys/bus/platform/drivers/aspeed-uart-routing/1e78909c.uart-routing/io1'
 SyslogIdentifier=obmc-console-server
 Restart=always
 
