@@ -28,4 +28,4 @@ BBCLASSEXTEND += "native nativesdk"
 #
 # We will skip parsing this packagegeoup for non-glibc systems
 #
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'

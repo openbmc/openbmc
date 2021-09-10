@@ -11,6 +11,9 @@ SRC_URI = "http://sources.openembedded.org/${BPN}-${PV}.tar.gz \
            "
 SRC_URI[md5sum] = "67212720482ea1aea9182a98653a9642"
 SRC_URI[sha256sum] = "421d63b414162237a72867061f1bd3e3752a0d962cd5d30b5e933ddad8a14d3b"
+
+inherit update-alternatives
+
 CFLAGS += "-I${STAGING_INCDIR}/tirpc"
 LIBS += "-ltirpc"
 
@@ -42,3 +45,7 @@ do_install () {
     'BINDIR=${bindir}' 'SBINDIR=${sbindir}' \
     'MANDIR=${mandir}' install
 }
+ALTERNATIVE_PRIORITY = "100"
+
+ALTERNATIVE:${PN} = "rpcinfo"
+ALTERNATIVE_LINK_NAME[rpcinfo] = "${bindir}/rpcinfo"

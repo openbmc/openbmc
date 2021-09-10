@@ -1,0 +1,79 @@
+From 5af65ce9674a69054c9a8405e51794c6f3ca41df Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 4 Jun 2021 12:34:18 -0700
+Subject: [PATCH] Remove dead paren_level code
+
+Local variable `paren_level' in src/output.c:dump_line_code() is
+initialized to 0, then incremented with count_parens() return
+value, and then the variable is never used. Also count_parens()
+has no side effect. Thus this patch removes this useless code.
+
+Upstream-Status: Submitted [https://mail.gnu.org/archive/html/bug-indent/2011-04/msg00000.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/output.c | 35 -----------------------------------
+ 1 file changed, 35 deletions(-)
+
+diff --git a/src/output.c b/src/output.c
+index ee01bcc..5b92167 100644
+--- a/src/output.c
++++ b/src/output.c
+@@ -798,37 +798,6 @@ static int dump_line_label(void)
+    return cur_col;
+ }
+ 
+-/**
+- *
+- */
+-
+-static int count_parens(
+-    const char * string)
+-{
+-    int paren_level = 0;
+-
+-    while (*string)
+-    {
+-        switch (*string)
+-        {
+-        case '(':
+-        case '[':
+-            paren_level++;
+-            break;
+-        case ')':
+-        case ']':
+-            paren_level--;
+-            break;
+-        default:
+-            break;
+-        }
+-
+-        string++;
+-    }
+-
+-    return paren_level;
+-}
+-
+ /**
+  *
+  */
+@@ -840,8 +809,6 @@ static void dump_line_code(
+     BOOLEAN * pbreak_line,
+     int       target_col_break)
+ {
+-   int paren_level   = 0;
+-
+    if (s_code != e_code)
+    {                       /* print code section, if any */
+       int i;
+@@ -928,8 +895,6 @@ static void dump_line_code(
+ 
+          *pcur_col = count_columns (*pcur_col, s_code, NULL_CHAR);
+ 
+-         paren_level += count_parens(s_code);
+-
+          s_code[buf_break->offset] = c;
+ 
+          *pnot_truncated = 0;
+-- 
+2.31.1
+

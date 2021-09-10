@@ -1,0 +1,32 @@
+#! /bin/sh
+
+cd tests
+
+export srcdir=.
+
+failed=0
+all=0
+for f in tst-*; do
+    "./$f" > /dev/null 2>&1
+    case "$?" in
+        0)
+            echo "PASS: $f"
+            all=$((all + 1))
+            ;;
+        77)
+            echo "SKIP: $f"
+            ;;
+        *)
+            echo "FAIL: $f"
+            failed=$((failed + 1))
+            all=$((all + 1))
+            ;;
+    esac
+done
+
+if [ "$failed" -eq 0 ] ; then
+  echo "All $all tests passed"
+else
+  echo "$failed of $all tests failed"
+fi
+unset srcdir

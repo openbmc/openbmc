@@ -18,14 +18,15 @@ SRC_URI = "http://v6web.litech.org/radvd/dist/radvd-${PV}.tar.gz \
            file://radvd.init \
            file://radvd.service \
            file://volatiles.03_radvd \
-           file://radvd.default"
+           file://radvd.default \
+           file://radvd.conf"
 
 inherit autotools useradd pkgconfig systemd
 
-SYSTEMD_SERVICE_${PN} = "radvd.service"
+SYSTEMD_SERVICE:${PN} = "radvd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-do_install_append () {
+do_install:append () {
     install -m 0755 -d ${D}${sysconfdir}/init.d \
                        ${D}${sysconfdir}/default/volatiles \
                        ${D}${docdir}/radvd
@@ -52,12 +53,14 @@ do_install_append () {
     for i in radvd.conf.example README; do \
         install -m 0644 ${S}/$i ${D}${docdir}/radvd; \
     done
+
+    install -m 0644 ${WORKDIR}/radvd.conf ${D}${sysconfdir}/radvd.conf
 }
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --home ${localstatedir}/run/radvd/ -M -g nogroup radvd"
+USERADD_PARAM:${PN} = "--system --home ${localstatedir}/run/radvd/ -M -g nogroup radvd"
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     if [ -z "$D" -a -x /etc/init.d/populate-volatile.sh ]; then
         /etc/init.d/populate-volatile.sh update
     fi

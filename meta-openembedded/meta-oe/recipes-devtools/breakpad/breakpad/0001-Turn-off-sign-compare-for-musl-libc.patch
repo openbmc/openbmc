@@ -13,11 +13,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/client/linux/crash_generation/crash_generation_server.cc | 10 ++++++++++
  1 file changed, 10 insertions(+)
 
-diff --git a/src/client/linux/crash_generation/crash_generation_server.cc b/src/client/linux/crash_generation/crash_generation_server.cc
-index 2596afde..2faeb9e5 100644
 --- a/src/client/linux/crash_generation/crash_generation_server.cc
 +++ b/src/client/linux/crash_generation/crash_generation_server.cc
-@@ -230,8 +230,18 @@ CrashGenerationServer::ClientEvent(short revents)
+@@ -230,8 +230,18 @@ CrashGenerationServer::ClientEvent(short
    // Walk the control payload and extract the file descriptor and validated pid.
    pid_t crashing_pid = -1;
    int signal_fd = -1;
@@ -28,7 +26,7 @@ index 2596afde..2faeb9e5 100644
 +  #pragma clang diagnostic push
 +  #pragma clang diagnostic ignored "-Wsign-compare"
 +#endif
-   for (struct cmsghdr *hdr = CMSG_FIRSTHDR(&msg); hdr;
+   for (struct cmsghdr* hdr = CMSG_FIRSTHDR(&msg); hdr;
         hdr = CMSG_NXTHDR(&msg, hdr)) {
 +#ifndef __GLIBC__
 +  #pragma clang diagnostic pop
@@ -36,6 +34,3 @@ index 2596afde..2faeb9e5 100644
      if (hdr->cmsg_level != SOL_SOCKET)
        continue;
      if (hdr->cmsg_type == SCM_RIGHTS) {
--- 
-2.14.1
-

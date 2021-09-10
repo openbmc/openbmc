@@ -1,0 +1,15 @@
+{
+  "CPU" : {
+    "Frequency" : 1,
+    "Window_size": 120
+  },
+  "Memory" : {
+    "Frequency" : 1,
+    "Window_size": 120
+  },
+  "Storage_RW" : {
+    "Path" : "/run/initramfs/rw",
+    "Frequency" : 1,
+    "Window_size": 120
+  }
+}

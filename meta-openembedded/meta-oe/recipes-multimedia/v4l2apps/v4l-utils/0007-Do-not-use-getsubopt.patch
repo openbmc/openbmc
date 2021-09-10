@@ -20,7 +20,7 @@ diff --git a/utils/v4l2-ctl/v4l2-ctl-common.cpp b/utils/v4l2-ctl/v4l2-ctl-common
 index 651917e..cea57b7 100644
 --- a/utils/v4l2-ctl/v4l2-ctl-common.cpp
 +++ b/utils/v4l2-ctl/v4l2-ctl-common.cpp
-@@ -782,15 +782,17 @@ static bool parse_subset(char *optarg)
+@@ -785,15 +785,17 @@ static bool parse_subset(char *optarg)
  
  static bool parse_next_subopt(char **subs, char **value)
  {

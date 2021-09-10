@@ -16,8 +16,6 @@ Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
  src/ncursesw.h       | 4 ++--
  6 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/src/NCApplication.cc b/src/NCApplication.cc
-index 5bcf969..510f034 100644
 --- a/src/NCApplication.cc
 +++ b/src/NCApplication.cc
 @@ -23,7 +23,7 @@
@@ -29,8 +27,6 @@ index 5bcf969..510f034 100644
  
  #define  YUILogComponent "ncurses"
  #include <yui/YUILog.h>
-diff --git a/src/NCstyle.h b/src/NCstyle.h
-index a40d5a8..3657917 100644
 --- a/src/NCstyle.h
 +++ b/src/NCstyle.h
 @@ -25,7 +25,7 @@
@@ -42,8 +38,6 @@ index a40d5a8..3657917 100644
  
  #include <iosfwd>
  #include <string>
-diff --git a/src/NCurses.h b/src/NCurses.h
-index a07c6bf..d17d3c3 100644
 --- a/src/NCurses.h
 +++ b/src/NCurses.h
 @@ -34,7 +34,7 @@
@@ -55,8 +49,6 @@ index a07c6bf..d17d3c3 100644
  #include <wchar.h>
  
  #include "ncursesw.h"
-diff --git a/src/ncursesp.h b/src/ncursesp.h
-index d478347..2fcfea5 100644
 --- a/src/ncursesp.h
 +++ b/src/ncursesp.h
 @@ -28,7 +28,7 @@
@@ -68,8 +60,6 @@ index d478347..2fcfea5 100644
  
  class NCursesPanel : public NCursesWindow
  {
-diff --git a/src/ncursesw.cc b/src/ncursesw.cc
-index 3c771af..bb83210 100644
 --- a/src/ncursesw.cc
 +++ b/src/ncursesw.cc
 @@ -47,7 +47,7 @@
@@ -81,21 +71,19 @@ index 3c771af..bb83210 100644
  #undef line
  #undef columns
  
-diff --git a/src/ncursesw.h b/src/ncursesw.h
-index d25923a..c140d37 100644
 --- a/src/ncursesw.h
 +++ b/src/ncursesw.h
-@@ -27,8 +27,8 @@
+@@ -27,11 +27,11 @@
  
  #include <iosfwd>
  
 -#include <ncursesw/curses.h>
--#include <ncursesw/etip.h>
 +#include <curses.h>
+ #ifndef NCURSES_CXX_IMPEXP
+ #define NCURSES_CXX_IMPEXP NCURSES_EXPORT_GENERAL_IMPORT
+ #endif
+-#include <ncursesw/etip.h>
 +#include <etip.h>
  #include <cstdio>
  #include <cstdarg>
  #include <climits>
--- 
-2.7.4
-

@@ -11,5 +11,5 @@ TMPL = "host-failure-reboots@.service"
 INSTFMT = "host-failure-reboots@{0}.service"
 LINK_FMT = "${TMPL}:${INSTFMT}"
 
-SYSTEMD_SERVICE_${PN} += "${TMPL}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'LINK_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_SERVICE:${PN} += "${TMPL}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'LINK_FMT', 'OBMC_HOST_INSTANCES')}"

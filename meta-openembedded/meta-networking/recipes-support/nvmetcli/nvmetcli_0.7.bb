@@ -13,18 +13,18 @@ inherit systemd setuptools3
 # file. This file is not installed by default since the configuration will vary
 # on real systems. Example configuration files are provided by including the
 # nvmetcli-examples package.
-SYSTEMD_SERVICE_${PN} = "nvmet.service"
+SYSTEMD_SERVICE:${PN} = "nvmet.service"
 
 SYSTEMD_AUTO_ENABLE ?= "disable"
 
-RDEPENDS_${PN} += "python3 python3-six python3-pyparsing python3-configshell-fb"
+RDEPENDS:${PN} += "python3 python3-six python3-pyparsing python3-configshell-fb"
 
 SRCREV = "0a6b088db2dc2e5de11e6f23f1e890e4b54fee64"
 SRC_URI = "git://git.infradead.org/users/hch/nvmetcli.git;branch=master"
 
 S = "${WORKDIR}/git"
 
-do_install_append() {
+do_install:append() {
     # Install example configuration scripts.
     install -d ${D}${datadir}/nvmet
     cp -fr ${S}/examples ${D}${datadir}/nvmet/
@@ -36,4 +36,4 @@ do_install_append() {
 
 # Examples package contains example json files used to configure nvmet.
 PACKAGES += "${PN}-examples"
-FILES_${PN}-examples = "${datadir}/nvmet/examples/*"
+FILES:${PN}-examples = "${datadir}/nvmet/examples/*"

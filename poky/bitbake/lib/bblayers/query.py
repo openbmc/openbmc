@@ -21,6 +21,10 @@ def plugin_init(plugins):
 
 
 class QueryPlugin(LayerPlugin):
+    def __init__(self):
+        super(QueryPlugin, self).__init__()
+        self.collection_res = {}
+
     def do_show_layers(self, args):
         """show current configured layers."""
         logger.plain("%s  %s  %s" % ("layer".ljust(20), "path".ljust(40), "priority"))
@@ -124,7 +128,7 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
                     sys.exit(1)
 
         pkg_pn = self.tinfoil.cooker.recipecaches[mc].pkg_pn
-        (latest_versions, preferred_versions) = self.tinfoil.find_providers(mc)
+        (latest_versions, preferred_versions, required_versions) = self.tinfoil.find_providers(mc)
         allproviders = self.tinfoil.get_all_providers(mc)
 
         # Ensure we list skipped recipes
@@ -150,7 +154,7 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
         def print_item(f, pn, ver, layer, ispref):
             if not selected_layer or layer == selected_layer:
                 if not bare and f in skiplist:
-                    skipped = ' (skipped)'
+                    skipped = ' (skipped: %s)' % self.tinfoil.cooker.skiplist[f].skipreason
                 else:
                     skipped = ''
                 if show_filenames:
@@ -222,7 +226,6 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
                             multilayer = True
                         if prov[0] != pref[0]:
                             same_ver = False
-
                     if (multilayer or not show_overlayed_only) and (same_ver or not show_same_ver_only):
                         if not items_listed:
                             logger.plain('=== %s ===' % title)
@@ -243,8 +246,13 @@ skipped recipes will also be listed, with a " (skipped)" suffix.
         else:
             return '?'
 
+    def get_collection_res(self):
+        if not self.collection_res:
+            self.collection_res = bb.utils.get_collection_res(self.tinfoil.config_data)
+        return self.collection_res
+
     def get_file_layerdir(self, filename):
-        layer = bb.utils.get_file_layer(filename, self.tinfoil.config_data)
+        layer = bb.utils.get_file_layer(filename, self.tinfoil.config_data, self.get_collection_res())
         return self.bbfile_collections.get(layer, None)
 
     def remove_layer_prefix(self, f):
@@ -320,12 +328,12 @@ Lists recipes with the bbappends that apply to them as subitems.
     def get_appends_for_files(self, filenames):
         appended, notappended = [], []
         for filename in filenames:
-            _, cls, _ = bb.cache.virtualfn2realfn(filename)
+            _, cls, mc = bb.cache.virtualfn2realfn(filename)
             if cls:
                 continue
 
             basename = os.path.basename(filename)
-            appends = self.tinfoil.cooker.collection.get_file_appends(basename)
+            appends = self.tinfoil.cooker.collections[mc].get_file_appends(basename)
             if appends:
                 appended.append((basename, list(appends)))
             else:

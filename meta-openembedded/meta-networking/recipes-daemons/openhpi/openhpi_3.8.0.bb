@@ -55,10 +55,10 @@ inherit autotools pkgconfig ptest update-rc.d systemd
 
 PACKAGES =+ "${PN}-libs"
 
-FILES_${PN}-libs = "${libdir}/${BPN}/*.so /usr/lib/${BPN}/*.so"
+FILES:${PN}-libs = "${libdir}/${BPN}/*.so /usr/lib/${BPN}/*.so"
 
-INSANE_SKIP_${PN}-libs = "dev-so"
-RDEPENDS_${PN} += "${PN}-libs"
+INSANE_SKIP:${PN}-libs = "dev-so"
+RDEPENDS:${PN} += "${PN}-libs"
 
 PACKAGECONFIG ??= "libgcrypt non32bit snmp-bc"
 PACKAGECONFIG[sysfs] = "--enable-sysfs,--disable-sysfs,sysfsutils,"
@@ -68,7 +68,7 @@ PACKAGECONFIG[snmp-bc] = "--enable-snmp_bc,--disable-snmp_bc"
 
 export DISTRO
 
-do_install_append () {
+do_install:append () {
     install -m 0755 -d ${D}${sysconfdir}/${BPN}
     install -m 0644 ${S}/openhpiclient.conf.example ${D}${sysconfdir}/${BPN}/openhpiclient.conf
     install -m 0600 ${S}/openhpi.conf.example ${D}${sysconfdir}/${BPN}/openhpi.conf
@@ -134,5 +134,5 @@ do_install_ptest () {
 INITSCRIPT_NAME = "openhpid"
 INITSCRIPT_PARAMS = "start 30 . stop 70 0 1 2 3 4 5 6 ."
 
-SYSTEMD_SERVICE_${PN} = "openhpid.service"
+SYSTEMD_SERVICE:${PN} = "openhpid.service"
 SYSTEMD_AUTO_ENABLE = "disable"

@@ -53,6 +53,18 @@ class WgetProgressHandler(bb.progress.LineFilterProgressHandler):
 
 class Wget(FetchMethod):
     """Class to fetch urls via 'wget'"""
+
+    # CDNs like CloudFlare may do a 'browser integrity test' which can fail
+    # with the standard wget/urllib User-Agent, so pretend to be a modern
+    # browser.
+    user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0"
+
+    def check_certs(self, d):
+        """
+        Should certificates be checked?
+        """
+        return (d.getVar("BB_CHECK_SSL_CERTS") or "1") != "0"
+
     def supports(self, ud, d):
         """
         Check to see if a given url can be fetched with wget.
@@ -76,13 +88,16 @@ class Wget(FetchMethod):
         if not ud.localfile:
             ud.localfile = d.expand(urllib.parse.unquote(ud.host + ud.path).replace("/", "."))
 
-        self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget -t 2 -T 30 --passive-ftp --no-check-certificate"
+        self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget -t 2 -T 30 --passive-ftp"
+
+        if not self.check_certs(d):
+            self.basecmd += " --no-check-certificate"
 
     def _runwget(self, ud, d, command, quiet, workdir=None):
 
         progresshandler = WgetProgressHandler(d)
 
-        logger.debug(2, "Fetching %s using command '%s'" % (ud.url, command))
+        logger.debug2("Fetching %s using command '%s'" % (ud.url, command))
         bb.fetch2.check_network_access(d, command, ud.url)
         runfetchcmd(command + ' --progress=dot -v', d, quiet, log=progresshandler, workdir=workdir)
 
@@ -208,10 +223,7 @@ class Wget(FetchMethod):
                         fetch.connection_cache.remove_connection(h.host, h.port)
                     raise urllib.error.URLError(err)
                 else:
-                    try:
-                        r = h.getresponse(buffering=True)
-                    except TypeError: # buffering kw not supported
-                        r = h.getresponse()
+                    r = h.getresponse()
 
                 # Pick apart the HTTPResponse object to get the addinfourl
                 # object initialized properly.
@@ -279,56 +291,90 @@ class Wget(FetchMethod):
                 newreq = urllib.request.HTTPRedirectHandler.redirect_request(self, req, fp, code, msg, headers, newurl)
                 newreq.get_method = req.get_method
                 return newreq
-        exported_proxies = export_proxies(d)
 
-        handlers = [FixedHTTPRedirectHandler, HTTPMethodFallback]
-        if exported_proxies:
-            handlers.append(urllib.request.ProxyHandler())
-        handlers.append(CacheHTTPHandler())
-        # Since Python 2.7.9 ssl cert validation is enabled by default
-        # see PEP-0476, this causes verification errors on some https servers
-        # so disable by default.
-        import ssl
-        if hasattr(ssl, '_create_unverified_context'):
-            handlers.append(urllib.request.HTTPSHandler(context=ssl._create_unverified_context()))
-        opener = urllib.request.build_opener(*handlers)
+        # We need to update the environment here as both the proxy and HTTPS
+        # handlers need variables set. The proxy needs http_proxy and friends to
+        # be set, and HTTPSHandler ends up calling into openssl to load the
+        # certificates. In buildtools configurations this will be looking at the
+        # wrong place for certificates by default: we set SSL_CERT_FILE to the
+        # right location in the buildtools environment script but as BitBake
+        # prunes prunes the environment this is lost. When binaries are executed
+        # runfetchcmd ensures these values are in the environment, but this is
+        # pure Python so we need to update the environment.
+        #
+        # Avoid tramping the environment too much by using bb.utils.environment
+        # to scope the changes to the build_opener request, which is when the
+        # environment lookups happen.
+        newenv = {}
+        for name in bb.fetch2.FETCH_EXPORT_VARS:
+            value = d.getVar(name)
+            if not value:
+                origenv = d.getVar("BB_ORIGENV")
+                if origenv:
+                    value = origenv.getVar(name)
+            if value:
+                newenv[name] = value
 
-        try:
-            uri = ud.url.split(";")[0]
-            r = urllib.request.Request(uri)
-            r.get_method = lambda: "HEAD"
-            # Some servers (FusionForge, as used on Alioth) require that the
-            # optional Accept header is set.
-            r.add_header("Accept", "*/*")
-            r.add_header("User-Agent", "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.12) Gecko/20101027 Ubuntu/9.10 (karmic) Firefox/3.6.12")
-            def add_basic_auth(login_str, request):
-                '''Adds Basic auth to http request, pass in login:password as string'''
-                import base64
-                encodeuser = base64.b64encode(login_str.encode('utf-8')).decode("utf-8")
-                authheader = "Basic %s" % encodeuser
-                r.add_header("Authorization", authheader)
+        with bb.utils.environment(**newenv):
+            import ssl
 
-            if ud.user and ud.pswd:
-                add_basic_auth(ud.user + ':' + ud.pswd, r)
+            if self.check_certs(d):
+                context = ssl.create_default_context()
+            else:
+                context = ssl._create_unverified_context()
+
+            handlers = [FixedHTTPRedirectHandler,
+                        HTTPMethodFallback,
+                        urllib.request.ProxyHandler(),
+                        CacheHTTPHandler(),
+                        urllib.request.HTTPSHandler(context=context)]
+            opener = urllib.request.build_opener(*handlers)
 
             try:
-                import netrc
-                n = netrc.netrc()
-                login, unused, password = n.authenticators(urllib.parse.urlparse(uri).hostname)
-                add_basic_auth("%s:%s" % (login, password), r)
-            except (TypeError, ImportError, IOError, netrc.NetrcParseError):
-                pass
+                uri = ud.url.split(";")[0]
+                r = urllib.request.Request(uri)
+                r.get_method = lambda: "HEAD"
+                # Some servers (FusionForge, as used on Alioth) require that the
+                # optional Accept header is set.
+                r.add_header("Accept", "*/*")
+                r.add_header("User-Agent", self.user_agent)
+                def add_basic_auth(login_str, request):
+                    '''Adds Basic auth to http request, pass in login:password as string'''
+                    import base64
+                    encodeuser = base64.b64encode(login_str.encode('utf-8')).decode("utf-8")
+                    authheader = "Basic %s" % encodeuser
+                    r.add_header("Authorization", authheader)
 
-            with opener.open(r) as response:
-                pass
-        except urllib.error.URLError as e:
-            if try_again:
-                logger.debug(2, "checkstatus: trying again")
-                return self.checkstatus(fetch, ud, d, False)
-            else:
-                # debug for now to avoid spamming the logs in e.g. remote sstate searches
-                logger.debug(2, "checkstatus() urlopen failed: %s" % e)
-                return False
+                if ud.user and ud.pswd:
+                    add_basic_auth(ud.user + ':' + ud.pswd, r)
+
+                try:
+                    import netrc
+                    n = netrc.netrc()
+                    login, unused, password = n.authenticators(urllib.parse.urlparse(uri).hostname)
+                    add_basic_auth("%s:%s" % (login, password), r)
+                except (TypeError, ImportError, IOError, netrc.NetrcParseError):
+                    pass
+
+                with opener.open(r) as response:
+                    pass
+            except urllib.error.URLError as e:
+                if try_again:
+                    logger.debug2("checkstatus: trying again")
+                    return self.checkstatus(fetch, ud, d, False)
+                else:
+                    # debug for now to avoid spamming the logs in e.g. remote sstate searches
+                    logger.debug2("checkstatus() urlopen failed: %s" % e)
+                    return False
+            except ConnectionResetError as e:
+                if try_again:
+                    logger.debug2("checkstatus: trying again")
+                    return self.checkstatus(fetch, ud, d, False)
+                else:
+                    # debug for now to avoid spamming the logs in e.g. remote sstate searches
+                    logger.debug2("checkstatus() urlopen failed: %s" % e)
+                    return False
+
         return True
 
     def _parse_path(self, regex, s):
@@ -404,9 +450,8 @@ class Wget(FetchMethod):
         """
         f = tempfile.NamedTemporaryFile()
         with tempfile.TemporaryDirectory(prefix="wget-index-") as workdir, tempfile.NamedTemporaryFile(dir=workdir, prefix="wget-listing-") as f:
-            agent = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.12) Gecko/20101027 Ubuntu/9.10 (karmic) Firefox/3.6.12"
             fetchcmd = self.basecmd
-            fetchcmd += " -O " + f.name + " --user-agent='" + agent + "' '" + uri + "'"
+            fetchcmd += " -O " + f.name + " --user-agent='" + self.user_agent + "' '" + uri + "'"
             try:
                 self._runwget(ud, d, fetchcmd, True, workdir=workdir)
                 fetchresult = f.read()
@@ -462,7 +507,7 @@ class Wget(FetchMethod):
         version_dir = ['', '', '']
         version = ['', '', '']
 
-        dirver_regex = re.compile(r"(?P<pfx>\D*)(?P<ver>(\d+[\.\-_])+(\d+))")
+        dirver_regex = re.compile(r"(?P<pfx>\D*)(?P<ver>(\d+[\.\-_])*(\d+))")
         s = dirver_regex.search(dirver)
         if s:
             version_dir[1] = s.group('ver')

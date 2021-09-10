@@ -23,7 +23,7 @@ LEAD_SONAME = "libXmu"
 
 PACKAGES =+ "libxmuu"
 
-FILES_libxmuu = "${libdir}/libXmuu.so.*"
+FILES:libxmuu = "${libdir}/libXmuu.so.*"
 
 BBCLASSEXTEND = "native"
 

@@ -3,10 +3,12 @@ inherit toolchain-scripts-base siteinfo kernel-arch
 # We want to be able to change the value of MULTIMACH_TARGET_SYS, because it
 # doesn't always match our expectations... but we default to the stock value
 REAL_MULTIMACH_TARGET_SYS ?= "${MULTIMACH_TARGET_SYS}"
-TARGET_CC_ARCH_append_libc-musl = " -mmusl"
+TARGET_CC_ARCH:append:libc-musl = " -mmusl"
 
 # default debug prefix map isn't valid in the SDK
 DEBUG_PREFIX_MAP = ""
+
+EXPORT_SDK_PS1 = "${@ 'export PS1=\'%s\'' % d.getVar('SDK_PS1') if d.getVar('SDK_PS1') else ''}"
 
 # This function creates an environment-setup-script for use in a deployable SDK
 toolchain_create_sdk_env_script () {
@@ -39,6 +41,7 @@ toolchain_create_sdk_env_script () {
 	echo '    return 1' >> $script
 	echo 'fi' >> $script
 
+	echo "${EXPORT_SDK_PS1}" >> $script
 	echo 'export SDKTARGETSYSROOT='"$sysroot" >> $script
 	EXTRAPATH=""
 	for i in ${CANADIANEXTRAOS}; do

@@ -1,0 +1,27 @@
+From f629d1c3fcfb560ed24efc3e73d4e4999b1eab33 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 10 May 2019 14:16:47 +0200
+Subject: [PATCH] Disable documentation directory altogether
+
+Even when WITH_DOC=False, the build requires po4a to generate manpages.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9745c13..7cfc9ee 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -239,7 +239,7 @@ add_subdirectory(apt-pkg)
+ add_subdirectory(apt-private)
+ add_subdirectory(cmdline)
+ add_subdirectory(completions)
+-add_subdirectory(doc)
++#add_subdirectory(doc)
+ add_subdirectory(dselect)
+ add_subdirectory(ftparchive)
+ add_subdirectory(methods)

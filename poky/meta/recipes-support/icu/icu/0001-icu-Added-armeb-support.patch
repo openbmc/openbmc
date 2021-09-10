@@ -13,7 +13,7 @@ Signed-off-by: Lei Maohui <leimaohui@cn.fujitsu.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/i18n/double-conversion-utils.h b/i18n/double-conversion-utils.h
-index 8c6a0e1..cf89907 100644
+index c937463..feaad0f 100644
 --- a/i18n/double-conversion-utils.h
 +++ b/i18n/double-conversion-utils.h
 @@ -115,7 +115,7 @@ int main(int argc, char** argv) {
@@ -24,7 +24,7 @@ index 8c6a0e1..cf89907 100644
 +    defined(__arm__) || defined(__avr32__) || defined(_M_ARM) || defined(_M_ARM64) || \
      defined(__hppa__) || defined(__ia64__) || \
      defined(__mips__) || \
-     defined(__nios2__) || \
+     defined(__nios2__) || defined(__ghs) || \
 -- 
-2.7.4
+2.25.1
 

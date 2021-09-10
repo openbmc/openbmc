@@ -1,0 +1,34 @@
+From c3d7321d59e959b357a7d3d69782d9105f3d04aa Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 1 Mar 2021 21:04:57 -0800
+Subject: [PATCH] ssl_tls: Increase size of padbuf to 64
+
+This fixes warnings with gcc11
+
+git/library/ssl_tls.c: In function 'ssl_calc_finished_tls_sha384':
+git/library/ssl_tls.c:3267:5: error: 'mbedtls_sha512_finish_ret' accessing 64 bytes in a region of size 48 [-Werror=stringop-overflow=]
+ 3267 |     finish( &sha512, padbuf );
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+git/library/ssl_tls.c:3267:5: note: referencing argument 2 of type 'unsigned char *'
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ library/ssl_tls.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/library/ssl_tls.c b/library/ssl_tls.c
+index a1a5859f0..4c98a4104 100644
+--- a/library/ssl_tls.c
++++ b/library/ssl_tls.c
+@@ -3205,7 +3205,7 @@ static void ssl_calc_finished_tls_sha384(
+ {
+     int len = 12;
+     const char *sender;
+-    unsigned char padbuf[48];
++    unsigned char padbuf[64];
+ #if defined(MBEDTLS_USE_PSA_CRYPTO)
+     size_t hash_size;
+     psa_hash_operation_t sha384_psa = PSA_HASH_OPERATION_INIT;
+-- 
+2.30.1
+

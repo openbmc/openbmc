@@ -25,6 +25,6 @@ LDFLAGS += "-pthread"
 
 PACKAGE_BEFORE_PN = "${PN}-tools"
 
-FILES_${PN}-tools = "${bindir}"
+FILES:${PN}-tools = "${bindir}"
 
 BBCLASSEXTEND = "native"

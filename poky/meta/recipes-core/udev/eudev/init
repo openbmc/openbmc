@@ -52,7 +52,7 @@ case "$1" in
     kill_udevd > "/dev/null" 2>&1
 
     # trigger the sorted events
-    [ -e /proc/sys/kernel/hotplug ] && echo -e '\000' >/proc/sys/kernel/hotplug
+    [ -e /proc/sys/kernel/hotplug ] && printf '\0\n' >/proc/sys/kernel/hotplug
     @UDEVD@ -d
 
     udevadm control --env=STARTUP=1

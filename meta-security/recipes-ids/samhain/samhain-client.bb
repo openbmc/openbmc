@@ -8,5 +8,5 @@ EXTRA_OECONF += " \
         --with-port=${SAMHAIN_PORT} \
         "
 
-RDEPENDS_${PN} = "acl zlib attr bash"
-RCONFLICTS_${PN} = "samhain-standalone"
+RDEPENDS:${PN} = "acl zlib attr bash"
+RCONFLICTS:${PN} = "samhain-standalone"

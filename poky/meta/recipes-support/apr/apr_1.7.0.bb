@@ -1,4 +1,8 @@
 SUMMARY = "Apache Portable Runtime (APR) library"
+
+DESCRIPTION = "Create and maintain software libraries that provide a predictable \
+and consistent interface to underlying platform-specific implementations."
+
 HOMEPAGE = "http://apr.apache.org/"
 SECTION = "libs"
 DEPENDS = "util-linux"
@@ -19,6 +23,7 @@ SRC_URI = "${APACHE_MIRROR}/apr/${BPN}-${PV}.tar.bz2 \
            file://0007-explicitly-link-libapr-against-phtread-to-make-gold-.patch \
            file://libtoolize_check.patch \
            file://0001-Add-option-to-disable-timed-dependant-tests.patch \
+           file://autoconf270.patch \
            "
 
 SRC_URI[md5sum] = "7a14a83d664e87599ea25ff4432e48a7"
@@ -42,7 +47,7 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 PACKAGECONFIG[timed-tests] = "--enable-timed-tests,--disable-timed-tests,"
 
-do_configure_prepend() {
+do_configure:prepend() {
 	# Avoid absolute paths for grep since it causes failures
 	# when using sstate between different hosts with different
 	# install paths for grep.
@@ -56,24 +61,24 @@ do_configure_prepend() {
 MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/apr-1-config \
                     ${PN}-dev:${datadir}/build-1/apr_rules.mk"
 
-FILES_${PN}-dev += "${libdir}/apr.exp ${datadir}/build-1/*"
-RDEPENDS_${PN}-dev += "bash"
+FILES:${PN}-dev += "${libdir}/apr.exp ${datadir}/build-1/*"
+RDEPENDS:${PN}-dev += "bash"
 
-RDEPENDS_${PN}-ptest += "libgcc"
+RDEPENDS:${PN}-ptest += "libgcc"
 
 #for some reason, build/libtool.m4 handled by buildconf still be overwritten
 #when autoconf, so handle it again.
-do_configure_append() {
+do_configure:append() {
 	sed -i -e 's/LIBTOOL=\(.*\)top_build/LIBTOOL=\1apr_build/' ${S}/build/libtool.m4
 	sed -i -e 's/LIBTOOL=\(.*\)top_build/LIBTOOL=\1apr_build/' ${S}/build/apr_rules.mk
 }
 
-do_install_append() {
+do_install:append() {
 	oe_multilib_header apr.h
 	install -d ${D}${datadir}/apr
 }
 
-do_install_append_class-target() {
+do_install:append:class-target() {
 	sed -i -e 's,${DEBUG_PREFIX_MAP},,g' \
 	       -e 's,${STAGING_DIR_HOST},,g' ${D}${datadir}/build-1/apr_rules.mk
 	sed -i -e 's,${STAGING_DIR_HOST},,g' \

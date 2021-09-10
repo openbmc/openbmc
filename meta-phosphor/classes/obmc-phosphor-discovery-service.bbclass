@@ -13,31 +13,31 @@ python() {
     syscnfdir = d.getVar('sysconfdir', True)
     dest_dir = d.getVar('D', True)
 
-    set_append(d, 'AVAHI_SERVICES_DIR', os.path.join(
+    set_doappend(d, 'AVAHI_SERVICES_DIR', os.path.join(
         dest_dir+syscnfdir,
         'avahi',
         'services'))
-    set_append(d, 'SLP_SERVICES_DIR', os.path.join(
+    set_doappend(d, 'SLP_SERVICES_DIR', os.path.join(
         dest_dir+syscnfdir,
         'slp',
         'services'))
 
 
     for pkg in listvar_to_list(d, 'DISCOVERY_SVC_PACKAGES'):
-        for service in listvar_to_list(d, 'REGISTERED_SERVICES_%s' % pkg):
+        for service in listvar_to_list(d, 'REGISTERED_SERVICES:%s' % pkg):
             if avahi_enabled:
-                set_append(d, 'RRECOMMENDS_%s' % pkg, 'avahi-daemon')
+                set_doappend(d, 'RRECOMMENDS:%s' % pkg, 'avahi-daemon')
                 svc_name, svc_type, svc_port, svc_txt_data = service.split(':')
-                set_append(d, 'FILES_%s' % pkg, os.path.join(
+                set_doappend(d, 'FILES:%s' % pkg, os.path.join(
                     syscnfdir,
                     'avahi',
                     'services',
                     '%s.service' % svc_name))
 
             if slp_enabled:
-                set_append(d, 'RRECOMMENDS_%s' % pkg, 'slpd-lite')
+                set_doappend(d, 'RRECOMMENDS:%s' % pkg, 'slpd-lite')
                 svc_name, svc_type, svc_port, svc_txt_data = service.split(':')
-                set_append(d, 'FILES_%s' % pkg, os.path.join(
+                set_doappend(d, 'FILES:%s' % pkg, os.path.join(
                     syscnfdir,
                     'slp',
                     'services',
@@ -72,7 +72,8 @@ python discovery_services_postinstall() {
             fd.write('<?xml version="1.0" ?>\n')
             fd.write('<!DOCTYPE service-group SYSTEM "avahi-service.dtd">\n')
             fd.write('<service-group>\n')
-            fd.write('        <name>%s</name>\n' % service_name)
+            fd.write('        <name replace-wildcards="yes">%s on %%h</name>\n'
+                % service_name)
             fd.write('        <service>\n')
             fd.write('                <type>%s</type>\n' % service_type)
             fd.write('                <port>%s</port>\n' % service_port)
@@ -94,7 +95,7 @@ python discovery_services_postinstall() {
             fd.write('%s %s %s' % (service_name, service_type, service_port))
 
     def register_services(d,pkg):
-        for service in listvar_to_list(d, 'REGISTERED_SERVICES_%s' % pkg):
+        for service in listvar_to_list(d, 'REGISTERED_SERVICES:%s' % pkg):
             svc_info = service.split(":")
             try:
                 svc_name, svc_type, svc_port, svc_txt_data = svc_info

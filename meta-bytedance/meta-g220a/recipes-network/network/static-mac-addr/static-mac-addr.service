@@ -1,0 +1,11 @@
+[Unit]
+Description=Enforce Static MAC addr mapping
+
+[Service]
+Type=oneshot
+Restart=no
+ExecStart=/usr/bin/mac-check
+
+[Install]
+WantedBy=network.target
+

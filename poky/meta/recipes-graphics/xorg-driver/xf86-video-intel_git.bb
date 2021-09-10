@@ -15,6 +15,7 @@ S = "${WORKDIR}/git"
 
 SRC_URI = "git://anongit.freedesktop.org/xorg/driver/xf86-video-intel \
            file://0001-Sync-i915_pciids-upto-8717c6b7414f.patch \
+           file://0001-i810-Avoid-duplicate-definition-of-I810PatternROP.patch \
 "
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
@@ -38,4 +39,4 @@ EXTRA_OECONF += '${@oe.utils.conditional( "ROOTLESS_X", "1", " --enable-kms-only
 
 COMPATIBLE_HOST = '(i.86|x86_64).*-linux'
 
-FILES_${PN} += "${datadir}/polkit-1"
+FILES:${PN} += "${datadir}/polkit-1"

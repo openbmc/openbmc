@@ -1,0 +1,42 @@
+From 3d78d4cffcdc1242892b6c21c26d1c96938c48d1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 Feb 2021 10:02:43 -0800
+Subject: [PATCH] map: Fix stringop-overflow warning
+
+Fixes
+
+../git/map.c: In function 'new_game_desc':
+../git/map.c:1663:23: error: writing 1 byte into a region of size 0 [-Werror=stringop-overflow=]
+ 1663 |         ret[retlen++] = ',';
+      |         ~~~~~~~~~~~~~~^~~~~
+../git/./map.c: In function 'new_game_desc':
+../git/./map.c:1663:23: error: writing 1 byte into a region of size 0 [-Werror=stringop-overflow=]
+ 1663 |         ret[retlen++] = ',';
+      |         ~~~~~~~~~~~~~~^~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ map.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/map.c b/map.c
+index 412305c..fa0c493 100644
+--- a/map.c
++++ b/map.c
+@@ -1659,8 +1659,10 @@ static char *new_game_desc(const game_params *params, random_state *rs,
+ 	    }
+ 	}
+ 
+-	ret[retlen++] = 'a'-1 + run;
+-	ret[retlen++] = ',';
++	if(ret != NULL) {
++		ret[retlen++] = 'a'-1 + run;
++		ret[retlen++] = ',';
++	}
+ 
+ 	run = 0;
+ 	for (i = 0; i < n; i++) {
+-- 
+2.30.1
+

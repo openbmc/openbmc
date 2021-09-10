@@ -1,5 +1,5 @@
 {
-    "runtime_core-image-minimal_qemuarm_20181225195701": {
+    "runtime_core-image-minimal:qemuarm_20181225195701": {
         "configuration": {
             "DISTRO": "poky",
             "HOST_DISTRO": "ubuntu-16.04",

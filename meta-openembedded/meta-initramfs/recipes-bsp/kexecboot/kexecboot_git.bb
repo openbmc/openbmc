@@ -6,12 +6,16 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 PV = "0.6+git${SRCPV}"
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/kexecboot/kexecboot.git"
-SRC_URI_append_libc-klibc = " file://0001-kexecboot-Use-new-reboot-API-with-klibc.patch "
-
+SRC_URI:append:libc-klibc = "\
+    file://0001-kexecboot-Use-new-reboot-API-with-klibc.patch \
+    file://0001-make-Add-compiler-includes-in-cflags.patch \
+"
 SRCREV = "5a5e04be206140059f42ac786d424da1afaa04b6"
 inherit autotools
 
 EXTRA_OECONF = "--enable-textui --enable-delay=2 --enable-evdev-rate=1000,250"
+
+CFLAGS += "-fcommon"
 
 do_install () {
     install -D -m 0755 ${B}/src/kexecboot ${D}${bindir}/kexecboot
@@ -23,9 +27,9 @@ do_install () {
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} += " ${bindir}/kexecboot /init /proc /mnt /dev /sys"
+FILES:${PN} += " ${bindir}/kexecboot /init /proc /mnt /dev /sys"
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     ln -sf ${bindir}/kexecboot $D/init
 }
 

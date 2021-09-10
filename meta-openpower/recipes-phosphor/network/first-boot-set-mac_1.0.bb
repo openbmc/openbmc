@@ -6,9 +6,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit allarch systemd
 
-RDEPENDS_${PN} = "${VIRTUAL-RUNTIME_base-utils}"
+RDEPENDS:${PN} = "${VIRTUAL-RUNTIME_base-utils}"
 
-SYSTEMD_SERVICE_${PN} = "first-boot-set-mac@.service"
+SYSTEMD_SERVICE:${PN} = "first-boot-set-mac@.service"
 
 SRC_URI = "file://${BPN}.sh file://${BPN}@.service"
 

@@ -21,4 +21,4 @@ do_install() {
     oe_runmake 'DESTDIR=${D}' install
 }
 
-RDEPENDS_${PN} += "python3-core python3-misc python3-resource python3-shell python3-unixadmin"
+RDEPENDS:${PN} += "python3-core python3-misc python3-resource python3-shell python3-unixadmin"

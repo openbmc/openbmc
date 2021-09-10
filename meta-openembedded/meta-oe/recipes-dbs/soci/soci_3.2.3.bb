@@ -42,8 +42,8 @@ inherit dos2unix cmake
 
 PACKAGES += "${PN}-sqlite3 ${PN}-mysql ${PN}-postgresql ${PN}-odbc ${PN}-oracle"
 
-FILES_${PN}-sqlite3 = "${libdir}/lib${BPN}_sqlite3.so.*"
-FILES_${PN}-mysql = "${libdir}/lib${BPN}_mysql.so.*"
-FILES_${PN}-postgresql = "${libdir}/lib${BPN}_postgresql.so.*"
-FILES_${PN}-odbc = "${libdir}/lib${BPN}_odbc.so.*"
-FILES_${PN}-oracle = "${libdir}/lib${BPN}_oracle.so.*"
+FILES:${PN}-sqlite3 = "${libdir}/lib${BPN}_sqlite3.so.*"
+FILES:${PN}-mysql = "${libdir}/lib${BPN}_mysql.so.*"
+FILES:${PN}-postgresql = "${libdir}/lib${BPN}_postgresql.so.*"
+FILES:${PN}-odbc = "${libdir}/lib${BPN}_odbc.so.*"
+FILES:${PN}-oracle = "${libdir}/lib${BPN}_oracle.so.*"

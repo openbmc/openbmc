@@ -12,7 +12,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/t/ttf-gentium/ttf-gentium_${PV}.orig.tar.gz "
 
 S = "${WORKDIR}/ttf-sil-gentium-${PV}"
 
-do_install_append() {
+do_install:append() {
 
     install -d ${D}${datadir}/doc/ttf-gentium/
     install -d ${D}${datadir}/doc/ttf-gentium-alt/
@@ -25,11 +25,11 @@ do_install_append() {
 PACKAGES = "${PN} ${PN}-alt"
 FONT_PACKAGES = "${PN} ${PN}-alt"
 
-FILES_${PN}-alt = "${datadir}/fonts/truetype/GenAI*.ttf \
+FILES:${PN}-alt = "${datadir}/fonts/truetype/GenAI*.ttf \
                    ${datadir}/fonts/truetype/GenAR*.ttf \
                    ${datadir}/doc/ttf-gentium-alt/*"
 
-FILES_${PN} = "${datadir}/fonts/truetype/GenI*.ttf \
+FILES:${PN} = "${datadir}/fonts/truetype/GenI*.ttf \
                ${datadir}/fonts/truetype/GenR*.ttf \
                ${datadir}/doc/ttf-gentium/*"
 

@@ -4,6 +4,6 @@ inherit setuptools3
 
 S = "${WORKDIR}/python-distutils-extra-${PV}"
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     python3-setuptools \
 "

@@ -126,26 +126,26 @@ do_install() {
 INITSCRIPT_NAME = "webmin"
 INITSCRIPT_PARAMS = "start 99 5 3 2 . stop 10 0 1 6 ."
 
-SYSTEMD_SERVICE_${PN} = "webmin.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "disable"
+SYSTEMD_SERVICE:${PN} = "webmin.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
 # FIXME: some of this should be figured out automatically
-RDEPENDS_${PN} += "perl perl-module-socket perl-module-exporter perl-module-exporter-heavy perl-module-carp perl-module-strict"
-RDEPENDS_${PN} += "perl-module-warnings perl-module-xsloader perl-module-posix perl-module-autoloader"
-RDEPENDS_${PN} += "perl-module-fcntl perl-module-tie-hash perl-module-vars perl-module-time-local perl-module-config perl-module-constant"
-RDEPENDS_${PN} += "perl-module-file-glob perl-module-file-copy perl-module-sdbm-file perl-module-feature"
+RDEPENDS:${PN} += "perl perl-module-socket perl-module-exporter perl-module-exporter-heavy perl-module-carp perl-module-strict"
+RDEPENDS:${PN} += "perl-module-warnings perl-module-xsloader perl-module-posix perl-module-autoloader"
+RDEPENDS:${PN} += "perl-module-fcntl perl-module-tie-hash perl-module-vars perl-module-time-local perl-module-config perl-module-constant"
+RDEPENDS:${PN} += "perl-module-file-glob perl-module-file-copy perl-module-sdbm-file perl-module-feature"
 
 PACKAGES_DYNAMIC += "webmin-module-* webmin-theme-*"
-RRECOMMENDS_${PN} += "webmin-module-system-status"
+RRECOMMENDS:${PN} += "webmin-module-system-status"
 
 PACKAGES += "${PN}-module-proc ${PN}-module-raid ${PN}-module-exports ${PN}-module-fdisk ${PN}-module-lvm"
-RDEPENDS_${PN}-module-proc = "procps"
-RDEPENDS_${PN}-module-raid = "mdadm"
-RDEPENDS_${PN}-module-exports = "perl-module-file-basename perl-module-file-path perl-module-cwd perl-module-file-spec perl-module-file-spec-unix"
-RRECOMMENDS_${PN}-module-fdisk = "parted"
-RRECOMMENDS_${PN}-module-lvm = "lvm2"
+RDEPENDS:${PN}-module-proc = "procps"
+RDEPENDS:${PN}-module-raid = "mdadm"
+RDEPENDS:${PN}-module-exports = "perl-module-file-basename perl-module-file-path perl-module-cwd perl-module-file-spec perl-module-file-spec-unix"
+RRECOMMENDS:${PN}-module-fdisk = "parted"
+RRECOMMENDS:${PN}-module-lvm = "lvm2"
 
-python populate_packages_prepend() {
+python populate_packages:prepend() {
     import os, os.path
 
     wadir = bb.data.expand('${libexecdir}/webmin', d)

@@ -17,6 +17,7 @@
 
 . /etc/default/rcS
 export VERBOSE
+export PSPLASH_FIFO_DIR
 
 startup_progress() {
     step=$(($step + $step_change))
@@ -26,11 +27,8 @@ startup_progress() {
         progress=$progress_size
     fi
     #echo "PROGRESS is $progress $runlevel $first_step + ($step of $num_steps) $step_change $progress_size"
-    #if type psplash-write >/dev/null 2>&1; then
-    #    TMPDIR=/mnt/.psplash psplash-write "PROGRESS $progress" || true
-    #fi
-    if [ -e /mnt/.psplash/psplash_fifo ]; then
-        echo "PROGRESS $progress" > /mnt/.psplash/psplash_fifo
+    if type psplash-write >/dev/null 2>&1; then
+        psplash-write "PROGRESS $progress" || true
     fi
 }
 
@@ -66,7 +64,7 @@ startup() {
   stty onlcr 0>&1
 
   # Limit stack size for startup scripts
-  [ "$STACK_SIZE" == "" ] || ulimit -S -s $STACK_SIZE
+  [ "$STACK_SIZE" = "" ] || ulimit -S -s $STACK_SIZE
 
   # Now find out what the current and what the previous runlevel are.
 
@@ -162,6 +160,9 @@ startup() {
 			#
 			[ -f $previous_start ] && [ ! -f $stop ] && continue
 		fi
+		if [ x"${PSPLASH_TEXT_UPDATES}" = x"yes" ]; then
+			psplash-write "MSG $(basename $i .sh | cut -c 4-)" || true
+		fi
 		case "$runlevel" in
 			0|6)
 				startup $i stop
@@ -176,7 +177,6 @@ startup() {
 #Uncomment to cause psplash to exit manually, otherwise it exits when it sees a VC switch
 if [ "x$runlevel" != "xS" ] && [ ! -x /etc/rc${runlevel}.d/S??xserver-nodm ]; then
     if type psplash-write >/dev/null 2>&1; then
-        TMPDIR=/mnt/.psplash psplash-write "QUIT" || true
-    	umount -l /mnt/.psplash
+        psplash-write "QUIT" || true
     fi
 fi

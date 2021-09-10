@@ -1,0 +1,39 @@
+/xyz/openbmc_project/control/host1/boot:
+    - Interface: xyz.openbmc_project.Control.Boot.Source
+      Properties:
+          BootSource:
+              Default: Source::Sources::Default
+    - Interface: xyz.openbmc_project.Control.Boot.Mode
+      Properties:
+          BootMode:
+              Default: Mode::Modes::Regular
+
+/xyz/openbmc_project/control/host2/boot:
+    - Interface: xyz.openbmc_project.Control.Boot.Source
+      Properties:
+          BootSource:
+              Default: Source::Sources::Default
+    - Interface: xyz.openbmc_project.Control.Boot.Mode
+      Properties:
+          BootMode:
+              Default: Mode::Modes::Regular
+
+/xyz/openbmc_project/control/host3/boot:
+    - Interface: xyz.openbmc_project.Control.Boot.Source
+      Properties:
+          BootSource:
+              Default: Source::Sources::Default
+    - Interface: xyz.openbmc_project.Control.Boot.Mode
+      Properties:
+          BootMode:
+              Default: Mode::Modes::Regular
+
+/xyz/openbmc_project/control/host4/boot:
+    - Interface: xyz.openbmc_project.Control.Boot.Source
+      Properties:
+          BootSource:
+              Default: Source::Sources::Default
+    - Interface: xyz.openbmc_project.Control.Boot.Mode
+      Properties:
+          BootMode:
+              Default: Mode::Modes::Regular

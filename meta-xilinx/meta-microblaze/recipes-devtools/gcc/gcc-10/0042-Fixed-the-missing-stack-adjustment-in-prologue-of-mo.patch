@@ -1,0 +1,25 @@
+From e0820fe8c8d9b7504595794fe6e65151d22e2acf Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Fri, 19 Oct 2018 14:26:25 +0530
+Subject: [PATCH 42/54] Fixed the missing stack adjustment in prologue of
+ modsi3 function
+
+---
+ libgcc/config/microblaze/modsi3.S | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libgcc/config/microblaze/modsi3.S b/libgcc/config/microblaze/modsi3.S
+index 9500d64bdc0..4dbb25900d9 100644
+--- a/libgcc/config/microblaze/modsi3.S
++++ b/libgcc/config/microblaze/modsi3.S
+@@ -119,6 +119,7 @@ $LaRETURN_HERE:
+ 	lwi	r30,r1,8
+ 	lwi	r31,r1,12
+ 	rtsd	r15,8
++	addik	r1,r1,16
+ #endif
+         .end __modsi3
+ 	.size	__modsi3, . - __modsi3
+-- 
+2.17.1
+

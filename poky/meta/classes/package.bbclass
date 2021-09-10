@@ -7,7 +7,7 @@
 #
 # There are the following default steps but PACKAGEFUNCS can be extended:
 #
-# a) package_get_auto_pr - get PRAUTO from remote PR service
+# a) package_convert_pr_autoinc - convert AUTOINC in PKGV to ${PRSERV_PV_AUTOINC}
 #
 # b) perform_packagecopy - Copy D into PKGD
 #
@@ -199,7 +199,7 @@ def do_split_packages(d, root, file_regex, output_pattern, description, postinst
                 packages = [pkg] + packages
             else:
                 packages.append(pkg)
-        oldfiles = d.getVar('FILES_' + pkg)
+        oldfiles = d.getVar('FILES:' + pkg)
         newfile = os.path.join(root, o)
         # These names will be passed through glob() so if the filename actually
         # contains * or ? (rare, but possible) we need to handle that specially
@@ -219,19 +219,19 @@ def do_split_packages(d, root, file_regex, output_pattern, description, postinst
                         the_files.append(fp % m.group(1))
                 else:
                     the_files.append(aux_files_pattern_verbatim % m.group(1))
-            d.setVar('FILES_' + pkg, " ".join(the_files))
+            d.setVar('FILES:' + pkg, " ".join(the_files))
         else:
-            d.setVar('FILES_' + pkg, oldfiles + " " + newfile)
+            d.setVar('FILES:' + pkg, oldfiles + " " + newfile)
         if extra_depends != '':
-            d.appendVar('RDEPENDS_' + pkg, ' ' + extra_depends)
-        if not d.getVar('DESCRIPTION_' + pkg):
-            d.setVar('DESCRIPTION_' + pkg, description % on)
-        if not d.getVar('SUMMARY_' + pkg):
-            d.setVar('SUMMARY_' + pkg, summary % on)
+            d.appendVar('RDEPENDS:' + pkg, ' ' + extra_depends)
+        if not d.getVar('DESCRIPTION:' + pkg):
+            d.setVar('DESCRIPTION:' + pkg, description % on)
+        if not d.getVar('SUMMARY:' + pkg):
+            d.setVar('SUMMARY:' + pkg, summary % on)
         if postinst:
-            d.setVar('pkg_postinst_' + pkg, postinst)
+            d.setVar('pkg_postinst:' + pkg, postinst)
         if postrm:
-            d.setVar('pkg_postrm_' + pkg, postrm)
+            d.setVar('pkg_postrm:' + pkg, postrm)
         if callable(hook):
             hook(f, pkg, file_regex, output_pattern, m.group(1))
 
@@ -303,7 +303,7 @@ def get_conffiles(pkg, d):
     cwd = os.getcwd()
     os.chdir(root)
 
-    conffiles = d.getVar('CONFFILES_%s' % pkg);
+    conffiles = d.getVar('CONFFILES:%s' % pkg);
     if conffiles == None:
         conffiles = d.getVar('CONFFILES')
     if conffiles == None:
@@ -618,7 +618,7 @@ def get_package_mapping (pkg, basepkg, d, depversions=None):
     import oe.packagedata
 
     data = oe.packagedata.read_subpkgdata(pkg, d)
-    key = "PKG_%s" % pkg
+    key = "PKG:%s" % pkg
 
     if key in data:
         # Have to avoid undoing the write_extra_pkgs(global_variants...)
@@ -627,7 +627,7 @@ def get_package_mapping (pkg, basepkg, d, depversions=None):
             return pkg
         if depversions == []:
             # Avoid returning a mapping if the renamed package rprovides its original name
-            rprovkey = "RPROVIDES_%s" % pkg
+            rprovkey = "RPROVIDES:%s" % pkg
             if rprovkey in data:
                 if pkg in bb.utils.explode_dep_versions2(data[rprovkey]):
                     bb.note("%s rprovides %s, not replacing the latter" % (data[key], pkg))
@@ -664,12 +664,20 @@ def runtime_mapping_rename (varname, pkg, d):
     #bb.note("%s after: %s" % (varname, d.getVar(varname)))
 
 #
-# Package functions suitable for inclusion in PACKAGEFUNCS
+# Used by do_packagedata (and possibly other routines post do_package)
 #
 
+package_get_auto_pr[vardepsexclude] = "BB_TASKDEPDATA"
 python package_get_auto_pr() {
     import oe.prservice
-    import re
+
+    def get_do_package_hash(pn):
+        if d.getVar("BB_RUNTASK") != "do_package":
+            taskdepdata = d.getVar("BB_TASKDEPDATA", False)
+            for dep in taskdepdata:
+                if taskdepdata[dep][1] == "do_package" and taskdepdata[dep][0] == pn:
+                    return taskdepdata[dep][6]
+        return None
 
     # Support per recipe PRSERV_HOST
     pn = d.getVar('PN')
@@ -681,15 +689,22 @@ python package_get_auto_pr() {
 
     # PR Server not active, handle AUTOINC
     if not d.getVar('PRSERV_HOST'):
-        if 'AUTOINC' in pkgv:
-            d.setVar("PKGV", pkgv.replace("AUTOINC", "0"))
+        d.setVar("PRSERV_PV_AUTOINC", "0")
         return
 
     auto_pr = None
     pv = d.getVar("PV")
     version = d.getVar("PRAUTOINX")
     pkgarch = d.getVar("PACKAGE_ARCH")
-    checksum = d.getVar("BB_TASKHASH")
+    checksum = get_do_package_hash(pn)
+
+    # If do_package isn't in the dependencies, we can't get the checksum...
+    if not checksum:
+        bb.warn('Task %s requested do_package unihash, but it was not available.' % d.getVar('BB_RUNTASK'))
+        #taskdepdata = d.getVar("BB_TASKDEPDATA", False)
+        #for dep in taskdepdata:
+        #    bb.warn('%s:%s = %s' % (taskdepdata[dep][0], taskdepdata[dep][1], taskdepdata[dep][6]))
+        return
 
     if d.getVar('PRSERV_LOCKDOWN'):
         auto_pr = d.getVar('PRAUTO_' + version + '_' + pkgarch) or d.getVar('PRAUTO_' + version) or None
@@ -699,22 +714,37 @@ python package_get_auto_pr() {
         return
 
     try:
-        conn = d.getVar("__PRSERV_CONN")
-        if conn is None:
-            conn = oe.prservice.prserv_make_conn(d)
+        conn = oe.prservice.prserv_make_conn(d)
         if conn is not None:
             if "AUTOINC" in pkgv:
                 srcpv = bb.fetch2.get_srcrev(d)
                 base_ver = "AUTOINC-%s" % version[:version.find(srcpv)]
                 value = conn.getPR(base_ver, pkgarch, srcpv)
-                d.setVar("PKGV", pkgv.replace("AUTOINC", str(value)))
+                d.setVar("PRSERV_PV_AUTOINC", str(value))
 
             auto_pr = conn.getPR(version, pkgarch, checksum)
+            conn.close()
     except Exception as e:
         bb.fatal("Can NOT get PRAUTO, exception %s" %  str(e))
     if auto_pr is None:
         bb.fatal("Can NOT get PRAUTO from remote PR service")
     d.setVar('PRAUTO',str(auto_pr))
+}
+
+#
+# Package functions suitable for inclusion in PACKAGEFUNCS
+#
+
+python package_convert_pr_autoinc() {
+    pkgv = d.getVar("PKGV")
+
+    # Adjust pkgv as necessary...
+    if 'AUTOINC' in pkgv:
+        d.setVar("PKGV", pkgv.replace("AUTOINC", "${PRSERV_PV_AUTOINC}"))
+
+    # Change PRSERV_PV_AUTOINC and EXTENDPRAUTO usage to special values
+    d.setVar('PRSERV_PV_AUTOINC', '@PRSERV_PV_AUTOINC@')
+    d.setVar('EXTENDPRAUTO', '@EXTENDPRAUTO@')
 }
 
 LOCALEBASEPN ??= "${PN}"
@@ -753,13 +783,13 @@ python package_do_split_locales() {
         ln = legitimize_package_name(l)
         pkg = pn + '-locale-' + ln
         packages.append(pkg)
-        d.setVar('FILES_' + pkg, os.path.join(datadir, 'locale', l))
-        d.setVar('RRECOMMENDS_' + pkg, '%svirtual-locale-%s' % (mlprefix, ln))
-        d.setVar('RPROVIDES_' + pkg, '%s-locale %s%s-translation' % (pn, mlprefix, ln))
-        d.setVar('SUMMARY_' + pkg, '%s - %s translations' % (summary, l))
-        d.setVar('DESCRIPTION_' + pkg, '%s  This package contains language translation files for the %s locale.' % (description, l))
+        d.setVar('FILES:' + pkg, os.path.join(datadir, 'locale', l))
+        d.setVar('RRECOMMENDS:' + pkg, '%svirtual-locale-%s' % (mlprefix, ln))
+        d.setVar('RPROVIDES:' + pkg, '%s-locale %s%s-translation' % (pn, mlprefix, ln))
+        d.setVar('SUMMARY:' + pkg, '%s - %s translations' % (summary, l))
+        d.setVar('DESCRIPTION:' + pkg, '%s  This package contains language translation files for the %s locale.' % (description, l))
         if locale_section:
-            d.setVar('SECTION_' + pkg, locale_section)
+            d.setVar('SECTION:' + pkg, locale_section)
 
     d.setVar('PACKAGES', ' '.join(packages))
 
@@ -769,16 +799,22 @@ python package_do_split_locales() {
     # glibc-localedata-translit* won't install as a dependency
     # for some other package which breaks meta-toolchain
     # Probably breaks since virtual-locale- isn't provided anywhere
-    #rdep = (d.getVar('RDEPENDS_%s' % pn) or "").split()
+    #rdep = (d.getVar('RDEPENDS:%s' % pn) or "").split()
     #rdep.append('%s-locale*' % pn)
-    #d.setVar('RDEPENDS_%s' % pn, ' '.join(rdep))
+    #d.setVar('RDEPENDS:%s' % pn, ' '.join(rdep))
 }
 
 python perform_packagecopy () {
     import subprocess
+    import shutil
 
     dest = d.getVar('D')
     dvar = d.getVar('PKGD')
+
+    # Remove ${D}/sysroot-only if present
+    sysroot_only = os.path.join(dest, 'sysroot-only')
+    if cpath.exists(sysroot_only) and cpath.isdir(sysroot_only):
+        shutil.rmtree(sysroot_only)
 
     # Start by package population by taking a copy of the installed
     # files to operate on
@@ -1012,7 +1048,7 @@ python fixup_perms () {
         # Create path to move directory to, move it, and then setup the symlink
         bb.utils.mkdirhier(os.path.dirname(target))
         #bb.note("Fixup Perms: Rename %s -> %s" % (dir, ptarget))
-        os.rename(origin, target)
+        bb.utils.rename(origin, target)
         #bb.note("Fixup Perms: Link %s -> %s" % (dir, link))
         os.symlink(link, origin)
 
@@ -1039,7 +1075,7 @@ python split_and_strip_files () {
 
     dvar = d.getVar('PKGD')
     pn = d.getVar('PN')
-    targetos = d.getVar('TARGET_OS')
+    hostos = d.getVar('HOST_OS')
 
     oldcwd = os.getcwd()
     os.chdir(dvar)
@@ -1162,7 +1198,7 @@ python split_and_strip_files () {
             # ...but is it ELF, and is it already stripped?
             if elf_file & 1:
                 if elf_file & 2:
-                    if 'already-stripped' in (d.getVar('INSANE_SKIP_' + pn) or "").split():
+                    if 'already-stripped' in (d.getVar('INSANE_SKIP:' + pn) or "").split():
                         bb.note("Skipping file %s from %s for already-stripped QA test" % (file[len(dvar):], pn))
                     else:
                         msg = "File '%s' from %s was already stripped, this will prevent future debugging!" % (file[len(dvar):], pn)
@@ -1194,7 +1230,7 @@ python split_and_strip_files () {
     if (d.getVar('INHIBIT_PACKAGE_DEBUG_SPLIT') != '1'):
         results = oe.utils.multiprocess_launch(splitdebuginfo, list(elffiles), d, extraargs=(dvar, debugdir, debuglibdir, debugappend, debugsrcdir, d))
 
-        if debugsrcdir and not targetos.startswith("mingw"):
+        if debugsrcdir and not hostos.startswith("mingw"):
             if (d.getVar('PACKAGE_DEBUG_STATIC_SPLIT') == '1'):
                 results = oe.utils.multiprocess_launch(splitstaticdebuginfo, staticlibs, d, extraargs=(dvar, debugstaticdir, debugstaticlibdir, debugstaticappend, debugsrcdir, d))
             else:
@@ -1307,7 +1343,7 @@ python populate_packages () {
         src_package_name = ('%s-src' % d.getVar('PN'))
         if not src_package_name in packages:
             packages.append(src_package_name)
-        d.setVar('FILES_%s' % src_package_name, '/usr/src/debug')
+        d.setVar('FILES:%s' % src_package_name, '/usr/src/debug')
 
     # Sanity check PACKAGES for duplicates
     # Sanity should be moved to sanity.bbclass once we have the infrastructure
@@ -1350,7 +1386,7 @@ python populate_packages () {
         root = os.path.join(pkgdest, pkg)
         bb.utils.mkdirhier(root)
 
-        filesvar = d.getVar('FILES_%s' % pkg) or ""
+        filesvar = d.getVar('FILES:%s' % pkg) or ""
         if "//" in filesvar:
             msg = "FILES variable for package %s contains '//' which is invalid. Attempting to fix this but you should correct the metadata.\n" % pkg
             package_qa_handle_error("files-invalid", msg, d)
@@ -1439,7 +1475,7 @@ python populate_packages () {
 
     if unshipped != []:
         msg = pn + ": Files/directories were installed but not shipped in any package:"
-        if "installed-vs-shipped" in (d.getVar('INSANE_SKIP_' + pn) or "").split():
+        if "installed-vs-shipped" in (d.getVar('INSANE_SKIP:' + pn) or "").split():
             bb.note("Package %s skipping QA tests: installed-vs-shipped" % pn)
         else:
             for f in unshipped:
@@ -1487,11 +1523,11 @@ python package_fixsymlinks () {
                 bb.note("%s contains dangling symlink to %s" % (pkg, l))
 
     for pkg in newrdepends:
-        rdepends = bb.utils.explode_dep_versions2(d.getVar('RDEPENDS_' + pkg) or "")
+        rdepends = bb.utils.explode_dep_versions2(d.getVar('RDEPENDS:' + pkg) or "")
         for p in newrdepends[pkg]:
             if p not in rdepends:
                 rdepends[p] = []
-        d.setVar('RDEPENDS_' + pkg, bb.utils.join_deps(rdepends, commasep=False))
+        d.setVar('RDEPENDS:' + pkg, bb.utils.join_deps(rdepends, commasep=False))
 }
 
 
@@ -1515,7 +1551,7 @@ python emit_pkgdata() {
     import json
 
     def process_postinst_on_target(pkg, mlprefix):
-        pkgval = d.getVar('PKG_%s' % pkg)
+        pkgval = d.getVar('PKG:%s' % pkg)
         if pkgval is None:
             pkgval = pkg
 
@@ -1526,8 +1562,8 @@ if [ -n "$D" ]; then
 fi
 """ % (pkgval, mlprefix)
 
-        postinst = d.getVar('pkg_postinst_%s' % pkg)
-        postinst_ontarget = d.getVar('pkg_postinst_ontarget_%s' % pkg)
+        postinst = d.getVar('pkg_postinst:%s' % pkg)
+        postinst_ontarget = d.getVar('pkg_postinst_ontarget:%s' % pkg)
 
         if postinst_ontarget:
             bb.debug(1, 'adding deferred pkg_postinst_ontarget() to pkg_postinst() for %s' % pkg)
@@ -1535,18 +1571,18 @@ fi
                 postinst = '#!/bin/sh\n'
             postinst += defer_fragment
             postinst += postinst_ontarget
-            d.setVar('pkg_postinst_%s' % pkg, postinst)
+            d.setVar('pkg_postinst:%s' % pkg, postinst)
 
     def add_set_e_to_scriptlets(pkg):
         for scriptlet_name in ('pkg_preinst', 'pkg_postinst', 'pkg_prerm', 'pkg_postrm'):
-            scriptlet = d.getVar('%s_%s' % (scriptlet_name, pkg))
+            scriptlet = d.getVar('%s:%s' % (scriptlet_name, pkg))
             if scriptlet:
                 scriptlet_split = scriptlet.split('\n')
                 if scriptlet_split[0].startswith("#!"):
                     scriptlet = scriptlet_split[0] + "\nset -e\n" + "\n".join(scriptlet_split[1:])
                 else:
                     scriptlet = "set -e\n" + "\n".join(scriptlet_split[0:])
-            d.setVar('%s_%s' % (scriptlet_name, pkg), scriptlet)
+            d.setVar('%s:%s' % (scriptlet_name, pkg), scriptlet)
 
     def write_if_exists(f, pkg, var):
         def encode(str):
@@ -1554,9 +1590,9 @@ fi
             c = codecs.getencoder("unicode_escape")
             return c(str)[0].decode("latin1")
 
-        val = d.getVar('%s_%s' % (var, pkg))
+        val = d.getVar('%s:%s' % (var, pkg))
         if val:
-            f.write('%s_%s: %s\n' % (var, pkg, encode(val)))
+            f.write('%s:%s: %s\n' % (var, pkg, encode(val)))
             return val
         val = d.getVar('%s' % (var))
         if val:
@@ -1575,7 +1611,7 @@ fi
                 ml_pkg = "%s-%s" % (variant, pkg)
                 subdata_file = "%s/runtime/%s" % (pkgdatadir, ml_pkg)
                 with open(subdata_file, 'w') as fd:
-                    fd.write("PKG_%s: %s" % (ml_pkg, pkg))
+                    fd.write("PKG:%s: %s" % (ml_pkg, pkg))
 
     packages = d.getVar('PACKAGES')
     pkgdest = d.getVar('PKGDEST')
@@ -1599,10 +1635,10 @@ fi
     workdir = d.getVar('WORKDIR')
 
     for pkg in packages.split():
-        pkgval = d.getVar('PKG_%s' % pkg)
+        pkgval = d.getVar('PKG:%s' % pkg)
         if pkgval is None:
             pkgval = pkg
-            d.setVar('PKG_%s' % pkg, pkg)
+            d.setVar('PKG:%s' % pkg, pkg)
 
         pkgdestpkg = os.path.join(pkgdest, pkg)
         files = {}
@@ -1615,7 +1651,7 @@ fi
             if fstat.st_ino not in seen:
                 seen.add(fstat.st_ino)
                 total_size += fstat.st_size
-        d.setVar('FILES_INFO', json.dumps(files, sort_keys=True))
+        d.setVar('FILES_INFO:' + pkg , json.dumps(files, sort_keys=True))
 
         process_postinst_on_target(pkg, d.getVar("MLPREFIX"))
         add_set_e_to_scriptlets(pkg)
@@ -1626,24 +1662,24 @@ fi
                 val = write_if_exists(sf, pkg, var)
 
             write_if_exists(sf, pkg, 'FILERPROVIDESFLIST')
-            for dfile in (d.getVar('FILERPROVIDESFLIST_' + pkg) or "").split():
-                write_if_exists(sf, pkg, 'FILERPROVIDES_' + dfile)
+            for dfile in (d.getVar('FILERPROVIDESFLIST:' + pkg) or "").split():
+                write_if_exists(sf, pkg, 'FILERPROVIDES:' + dfile)
 
             write_if_exists(sf, pkg, 'FILERDEPENDSFLIST')
-            for dfile in (d.getVar('FILERDEPENDSFLIST_' + pkg) or "").split():
-                write_if_exists(sf, pkg, 'FILERDEPENDS_' + dfile)
+            for dfile in (d.getVar('FILERDEPENDSFLIST:' + pkg) or "").split():
+                write_if_exists(sf, pkg, 'FILERDEPENDS:' + dfile)
 
-            sf.write('%s_%s: %d\n' % ('PKGSIZE', pkg, total_size))
+            sf.write('%s:%s: %d\n' % ('PKGSIZE', pkg, total_size))
 
         # Symlinks needed for rprovides lookup
-        rprov = d.getVar('RPROVIDES_%s' % pkg) or d.getVar('RPROVIDES')
+        rprov = d.getVar('RPROVIDES:%s' % pkg) or d.getVar('RPROVIDES')
         if rprov:
-            for p in rprov.strip().split():
+            for p in bb.utils.explode_deps(rprov):
                 subdata_sym = pkgdatadir + "/runtime-rprovides/%s/%s" % (p, pkg)
                 bb.utils.mkdirhier(os.path.dirname(subdata_sym))
                 oe.path.symlink("../../runtime/%s" % pkg, subdata_sym, True)
 
-        allow_empty = d.getVar('ALLOW_EMPTY_%s' % pkg)
+        allow_empty = d.getVar('ALLOW_EMPTY:%s' % pkg)
         if not allow_empty:
             allow_empty = d.getVar('ALLOW_EMPTY')
         root = "%s/%s" % (pkgdest, pkg)
@@ -1673,15 +1709,15 @@ if [ x"$D" = "x" ]; then
 fi
 }
 
-RPMDEPS = "${STAGING_LIBDIR_NATIVE}/rpm/rpmdeps --alldeps"
+RPMDEPS = "${STAGING_LIBDIR_NATIVE}/rpm/rpmdeps --alldeps --define '__font_provides %{nil}'"
 
 # Collect perfile run-time dependency metadata
 # Output:
-#  FILERPROVIDESFLIST_pkg - list of all files w/ deps
-#  FILERPROVIDES_filepath_pkg - per file dep
+#  FILERPROVIDESFLIST:pkg - list of all files w/ deps
+#  FILERPROVIDES:filepath:pkg - per file dep
 #
-#  FILERDEPENDSFLIST_pkg - list of all files w/ deps
-#  FILERDEPENDS_filepath_pkg - per file dep
+#  FILERDEPENDSFLIST:pkg - list of all files w/ deps
+#  FILERDEPENDS:filepath:pkg - per file dep
 
 python package_do_filedeps() {
     if d.getVar('SKIP_FILEDEPS') == '1':
@@ -1696,7 +1732,7 @@ python package_do_filedeps() {
 
     pkglist = []
     for pkg in packages.split():
-        if d.getVar('SKIP_FILEDEPS_' + pkg) == '1':
+        if d.getVar('SKIP_FILEDEPS:' + pkg) == '1':
             continue
         if pkg.endswith('-dbg') or pkg.endswith('-doc') or pkg.find('-locale-') != -1 or pkg.find('-localedata-') != -1 or pkg.find('-gconv-') != -1 or pkg.find('-charmap-') != -1 or pkg.startswith('kernel-module-') or pkg.endswith('-src'):
             continue
@@ -1718,18 +1754,18 @@ python package_do_filedeps() {
 
         for file in sorted(provides):
             provides_files[pkg].append(file)
-            key = "FILERPROVIDES_" + file + "_" + pkg
+            key = "FILERPROVIDES:" + file + ":" + pkg
             d.appendVar(key, " " + " ".join(provides[file]))
 
         for file in sorted(requires):
             requires_files[pkg].append(file)
-            key = "FILERDEPENDS_" + file + "_" + pkg
+            key = "FILERDEPENDS:" + file + ":" + pkg
             d.appendVar(key, " " + " ".join(requires[file]))
 
     for pkg in requires_files:
-        d.setVar("FILERDEPENDSFLIST_" + pkg, " ".join(requires_files[pkg]))
+        d.setVar("FILERDEPENDSFLIST:" + pkg, " ".join(requires_files[pkg]))
     for pkg in provides_files:
-        d.setVar("FILERPROVIDESFLIST_" + pkg, " ".join(provides_files[pkg]))
+        d.setVar("FILERPROVIDESFLIST:" + pkg, " ".join(provides_files[pkg]))
 }
 
 SHLIBSDIRS = "${WORKDIR_PKGDATA}/${MLPREFIX}shlibs2"
@@ -1761,7 +1797,7 @@ python package_do_shlibs() {
     else:
         shlib_pkgs = packages.split()
 
-    targetos = d.getVar('TARGET_OS')
+    hostos = d.getVar('HOST_OS')
 
     workdir = d.getVar('WORKDIR')
 
@@ -1893,12 +1929,12 @@ python package_do_shlibs() {
     shlib_provider = oe.package.read_shlib_providers(d)
 
     for pkg in shlib_pkgs:
-        private_libs = d.getVar('PRIVATE_LIBS_' + pkg) or d.getVar('PRIVATE_LIBS') or ""
+        private_libs = d.getVar('PRIVATE_LIBS:' + pkg) or d.getVar('PRIVATE_LIBS') or ""
         private_libs = private_libs.split()
         needs_ldconfig = False
         bb.debug(2, "calculating shlib provides for %s" % pkg)
 
-        pkgver = d.getVar('PKGV_' + pkg)
+        pkgver = d.getVar('PKGV:' + pkg)
         if not pkgver:
             pkgver = d.getVar('PV_' + pkg)
         if not pkgver:
@@ -1912,9 +1948,9 @@ python package_do_shlibs() {
                 soname = None
                 if cpath.islink(file):
                     continue
-                if targetos == "darwin" or targetos == "darwin8":
+                if hostos == "darwin" or hostos == "darwin8":
                     darwin_so(file, needed, sonames, renames, pkgver)
-                elif targetos.startswith("mingw"):
+                elif hostos.startswith("mingw"):
                     mingw_dll(file, needed, sonames, renames, pkgver)
                 elif os.access(file, os.X_OK) or lib_re.match(file):
                     linuxlist.append(file)
@@ -1930,13 +1966,13 @@ python package_do_shlibs() {
 
         for (old, new) in renames:
             bb.note("Renaming %s to %s" % (old, new))
-            os.rename(old, new)
+            bb.utils.rename(old, new)
             pkgfiles[pkg].remove(old)
 
         shlibs_file = os.path.join(shlibswork_dir, pkg + ".list")
         if len(sonames):
             with open(shlibs_file, 'w') as fd:
-                for s in sonames:
+                for s in sorted(sonames):
                     if s[0] in shlib_provider and s[1] in shlib_provider[s[0]]:
                         (old_pkg, old_pkgver) = shlib_provider[s[0]][s[1]]
                         if old_pkg != pkg:
@@ -1948,11 +1984,11 @@ python package_do_shlibs() {
                     shlib_provider[s[0]][s[1]] = (pkg, pkgver)
         if needs_ldconfig:
             bb.debug(1, 'adding ldconfig call to postinst for %s' % pkg)
-            postinst = d.getVar('pkg_postinst_%s' % pkg)
+            postinst = d.getVar('pkg_postinst:%s' % pkg)
             if not postinst:
                 postinst = '#!/bin/sh\n'
             postinst += d.getVar('ldconfig_postinst_fragment')
-            d.setVar('pkg_postinst_%s' % pkg, postinst)
+            d.setVar('pkg_postinst:%s' % pkg, postinst)
         bb.debug(1, 'LIBNAMES: pkg %s sonames %s' % (pkg, sonames))
 
     assumed_libs = d.getVar('ASSUME_SHLIBS')
@@ -1974,7 +2010,7 @@ python package_do_shlibs() {
     for pkg in shlib_pkgs:
         bb.debug(2, "calculating shlib requirements for %s" % pkg)
 
-        private_libs = d.getVar('PRIVATE_LIBS_' + pkg) or d.getVar('PRIVATE_LIBS') or ""
+        private_libs = d.getVar('PRIVATE_LIBS:' + pkg) or d.getVar('PRIVATE_LIBS') or ""
         private_libs = private_libs.split()
 
         deps = list()
@@ -2128,7 +2164,7 @@ python read_shlibdeps () {
 
     packages = d.getVar('PACKAGES').split()
     for pkg in packages:
-        rdepends = bb.utils.explode_dep_versions2(d.getVar('RDEPENDS_' + pkg) or "")
+        rdepends = bb.utils.explode_dep_versions2(d.getVar('RDEPENDS:' + pkg) or "")
         for dep in sorted(pkglibdeps[pkg]):
             # Add the dep if it's not already there, or if no comparison is set
             if dep not in rdepends:
@@ -2136,7 +2172,7 @@ python read_shlibdeps () {
             for v in pkglibdeps[pkg][dep]:
                 if v not in rdepends[dep]:
                     rdepends[dep].append(v)
-        d.setVar('RDEPENDS_' + pkg, bb.utils.join_deps(rdepends, commasep=False))
+        d.setVar('RDEPENDS:' + pkg, bb.utils.join_deps(rdepends, commasep=False))
 }
 
 python package_depchains() {
@@ -2160,7 +2196,7 @@ python package_depchains() {
     def pkg_adddeprrecs(pkg, base, suffix, getname, depends, d):
 
         #bb.note('depends for %s is %s' % (base, depends))
-        rreclist = bb.utils.explode_dep_versions2(d.getVar('RRECOMMENDS_' + pkg) or "")
+        rreclist = bb.utils.explode_dep_versions2(d.getVar('RRECOMMENDS:' + pkg) or "")
 
         for depend in sorted(depends):
             if depend.find('-native') != -1 or depend.find('-cross') != -1 or depend.startswith('virtual/'):
@@ -2175,13 +2211,13 @@ python package_depchains() {
             if pkgname not in rreclist and pkgname != pkg:
                 rreclist[pkgname] = []
 
-        #bb.note('setting: RRECOMMENDS_%s=%s' % (pkg, ' '.join(rreclist)))
-        d.setVar('RRECOMMENDS_%s' % pkg, bb.utils.join_deps(rreclist, commasep=False))
+        #bb.note('setting: RRECOMMENDS:%s=%s' % (pkg, ' '.join(rreclist)))
+        d.setVar('RRECOMMENDS:%s' % pkg, bb.utils.join_deps(rreclist, commasep=False))
 
     def pkg_addrrecs(pkg, base, suffix, getname, rdepends, d):
 
         #bb.note('rdepends for %s is %s' % (base, rdepends))
-        rreclist = bb.utils.explode_dep_versions2(d.getVar('RRECOMMENDS_' + pkg) or "")
+        rreclist = bb.utils.explode_dep_versions2(d.getVar('RRECOMMENDS:' + pkg) or "")
 
         for depend in sorted(rdepends):
             if depend.find('virtual-locale-') != -1:
@@ -2196,8 +2232,8 @@ python package_depchains() {
             if pkgname not in rreclist and pkgname != pkg:
                 rreclist[pkgname] = []
 
-        #bb.note('setting: RRECOMMENDS_%s=%s' % (pkg, ' '.join(rreclist)))
-        d.setVar('RRECOMMENDS_%s' % pkg, bb.utils.join_deps(rreclist, commasep=False))
+        #bb.note('setting: RRECOMMENDS:%s=%s' % (pkg, ' '.join(rreclist)))
+        d.setVar('RRECOMMENDS:%s' % pkg, bb.utils.join_deps(rreclist, commasep=False))
 
     def add_dep(list, dep):
         if dep not in list:
@@ -2209,7 +2245,7 @@ python package_depchains() {
 
     rdepends = []
     for pkg in packages.split():
-        for dep in bb.utils.explode_deps(d.getVar('RDEPENDS_' + pkg) or ""):
+        for dep in bb.utils.explode_deps(d.getVar('RDEPENDS:' + pkg) or ""):
             add_dep(rdepends, dep)
 
     #bb.note('rdepends is %s' % rdepends)
@@ -2243,7 +2279,7 @@ python package_depchains() {
 
     for suffix in pkgs:
         for pkg in pkgs[suffix]:
-            if d.getVarFlag('RRECOMMENDS_' + pkg, 'nodeprrecs'):
+            if d.getVarFlag('RRECOMMENDS:' + pkg, 'nodeprrecs'):
                 continue
             (base, func) = pkgs[suffix][pkg]
             if suffix == "-dev":
@@ -2256,7 +2292,7 @@ python package_depchains() {
                 pkg_addrrecs(pkg, base, suffix, func, rdepends, d)
             else:
                 rdeps = []
-                for dep in bb.utils.explode_deps(d.getVar('RDEPENDS_' + base) or ""):
+                for dep in bb.utils.explode_deps(d.getVar('RDEPENDS:' + base) or ""):
                     add_dep(rdeps, dep)
                 pkg_addrrecs(pkg, base, suffix, func, rdeps, d)
 }
@@ -2273,7 +2309,7 @@ def gen_packagevar(d, pkgvars="PACKAGEVARS"):
         ret.append(v)
     for p in pkgs:
         for v in vars:
-            ret.append(v + "_" + p)
+            ret.append(v + ":" + p)
 
         # Ensure that changes to INCOMPATIBLE_LICENSE re-run do_package for
         # affected recipes.
@@ -2309,7 +2345,7 @@ python do_package () {
     # cache.  This is useful if an item this class depends on changes in a
     # way that the output of this class changes.  rpmdeps is a good example
     # as any change to rpmdeps requires this to be rerun.
-    # PACKAGE_BBCLASS_VERSION = "2"
+    # PACKAGE_BBCLASS_VERSION = "4"
 
     # Init cachedpath
     global cpath
@@ -2335,7 +2371,7 @@ python do_package () {
         package_qa_handle_error("var-undefined", msg, d)
         return
 
-    bb.build.exec_func("package_get_auto_pr", d)
+    bb.build.exec_func("package_convert_pr_autoinc", d)
 
     ###########################################################################
     # Optimisations
@@ -2407,9 +2443,21 @@ addtask do_package_setscene
 # Copy from PKGDESTWORK to tempdirectory as tempdirectory can be cleaned at both
 # do_package_setscene and do_packagedata_setscene leading to races
 python do_packagedata () {
+    bb.build.exec_func("package_get_auto_pr", d)
+
     src = d.expand("${PKGDESTWORK}")
     dest = d.expand("${WORKDIR}/pkgdata-pdata-input")
     oe.path.copyhardlinktree(src, dest)
+
+    bb.build.exec_func("packagedata_translate_pr_autoinc", d)
+}
+do_packagedata[cleandirs] += "${WORKDIR}/pkgdata-pdata-input"
+
+# Translate the EXTENDPRAUTO and AUTOINC to the final values
+packagedata_translate_pr_autoinc() {
+    find ${WORKDIR}/pkgdata-pdata-input -type f | xargs --no-run-if-empty \
+        sed -e 's,@PRSERV_PV_AUTOINC@,${PRSERV_PV_AUTOINC},g' \
+            -e 's,@EXTENDPRAUTO@,${EXTENDPRAUTO},g' -i
 }
 
 addtask packagedata before do_build after do_package

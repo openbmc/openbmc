@@ -6,7 +6,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "udev sysfsutils flex-native bison-native"
-RDEPENDS_${PN} = "udev module-init-tools"
+RDEPENDS:${PN} = "udev module-init-tools"
 
 PR = "r1"
 
@@ -38,4 +38,4 @@ do_install () {
 	oe_runmake 'DESTDIR=${D}' install
 }
 
-CONFFILES_${PN} += "${sysconfdir}/pcmcia/config.opts"
+CONFFILES:${PN} += "${sysconfdir}/pcmcia/config.opts"

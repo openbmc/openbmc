@@ -12,11 +12,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  configure.ac | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/configure.ac b/configure.ac
-index 8154c5c..063b260 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -69,6 +69,11 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM(, [return __PPC64__])],
+@@ -76,6 +76,11 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM(, [re
                    [default_enable_libunwind=yes
                     default_tcmalloc_pagesize=8])
  

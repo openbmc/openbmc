@@ -11,4 +11,4 @@ SRC_URI = "git://anongit.freedesktop.org/xorg/driver/xf86-video-armsoc"
 
 S = "${WORKDIR}/git"
 
-RDEPENDS_${PN} += "xserver-xorg-module-exa"
+RDEPENDS:${PN} += "xserver-xorg-module-exa"

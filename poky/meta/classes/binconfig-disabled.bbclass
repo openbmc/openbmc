@@ -5,9 +5,9 @@
 # The list of scripts which should be disabled.
 BINCONFIG ?= ""
 
-FILES_${PN}-dev += "${bindir}/*-config"
+FILES:${PN}-dev += "${bindir}/*-config"
 
-do_install_append () {
+do_install:append () {
 	for x in ${BINCONFIG}; do
 		# Make the disabled script emit invalid parameters for those configure
 		# scripts which call it without checking the return code.

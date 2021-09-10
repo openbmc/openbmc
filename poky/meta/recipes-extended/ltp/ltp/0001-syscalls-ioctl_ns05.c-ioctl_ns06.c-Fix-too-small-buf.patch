@@ -1,0 +1,59 @@
+From af2b6f5ee6b171078b18246dd73f71cf6e350859 Mon Sep 17 00:00:00 2001
+From: Marius Hillenbrand <mhillen@linux.ibm.com>
+Date: Mon, 19 Jul 2021 13:58:35 +0800
+Subject: [PATCH] syscalls/ioctl_ns05.c, ioctl_ns06.c: Fix too small buffer for
+ path
+
+commit af2b6f5ee6b171078b18246dd73f71cf6e350859 upstream.
+
+Resize the buffer used for paths into /proc/ to grant enough space
+for long PIDs. While at it, replace sprintf with snprintf to avoid
+buffer overflows if we ever ran out of space again.
+
+Fixes: #847
+Signed-off-by: Marius Hillenbrand <mhillen@linux.ibm.com>
+Reviewed-by: Yang Xu <xuyang2018.jy@fujitsu.com>
+Upstream-Status: Backport
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+
+diff --git a/testcases/kernel/syscalls/ioctl/ioctl_ns05.c b/testcases/kernel/syscalls/ioctl/ioctl_ns05.c
+index a67ddbe2c66f..52613810c7ce 100644
+--- a/testcases/kernel/syscalls/ioctl/ioctl_ns05.c
++++ b/testcases/kernel/syscalls/ioctl/ioctl_ns05.c
+@@ -59,10 +59,10 @@ static void run(void)
+ 	if (pid == -1)
+ 		tst_brk(TBROK | TERRNO, "ltp_clone failed");
+ 
+-	char child_namespace[20];
++	char child_namespace[30];
+ 	int my_fd, child_fd, parent_fd;
+ 
+-	sprintf(child_namespace, "/proc/%i/ns/pid", pid);
++	snprintf(child_namespace, sizeof(child_namespace), "/proc/%i/ns/pid", pid);
+ 	my_fd = SAFE_OPEN("/proc/self/ns/pid", O_RDONLY);
+ 	child_fd = SAFE_OPEN(child_namespace, O_RDONLY);
+ 	parent_fd = ioctl(child_fd, NS_GET_PARENT);
+diff --git a/testcases/kernel/syscalls/ioctl/ioctl_ns06.c b/testcases/kernel/syscalls/ioctl/ioctl_ns06.c
+index b6ac80208d02..c30f7de91e09 100644
+--- a/testcases/kernel/syscalls/ioctl/ioctl_ns06.c
++++ b/testcases/kernel/syscalls/ioctl/ioctl_ns06.c
+@@ -51,14 +51,14 @@ static int child(void *arg LTP_ATTRIBUTE_UNUSED)
+ 
+ static void run(void)
+ {
+-	char child_namespace[20];
++	char child_namespace[30];
+ 
+ 	pid_t pid = ltp_clone(CLONE_NEWUSER | SIGCHLD, &child, 0,
+ 		STACK_SIZE, child_stack);
+ 	if (pid == -1)
+ 		tst_brk(TBROK | TERRNO, "ltp_clone failed");
+ 
+-	sprintf(child_namespace, "/proc/%i/ns/user", pid);
++	snprintf(child_namespace, sizeof(child_namespace), "/proc/%i/ns/user", pid);
+ 	int my_fd, child_fd, parent_fd;
+ 
+ 	my_fd = SAFE_OPEN("/proc/self/ns/user", O_RDONLY);
+-- 
+2.32.0
+

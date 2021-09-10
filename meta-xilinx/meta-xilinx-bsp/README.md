@@ -46,7 +46,6 @@ the [meta-xilinx mailing list](https://lists.yoctoproject.org/listinfo/meta-xili
 
 Maintainers:
 
-	Manjukumar Harthikote Matha <manjukumar.harthikote-matha@xilinx.com>
 	Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
 	Mark Hatle <mark.hatle@xilinx.com>
 

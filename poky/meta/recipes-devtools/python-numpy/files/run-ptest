@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+
+import numpy
+numpy.test(label='full', verbose=2)
+

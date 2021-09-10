@@ -1,0 +1,171 @@
+From ba73bb0f3d2023839bc3b681c49b7ec1192cceb4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Sat, 8 May 2021 21:58:54 +0200
+Subject: [PATCH] Add use_prebuilt_tools option
+
+This allows using the gdk-pixbuf tools from the host to
+build and install tests in a cross-compile scenarion.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/merge_requests/119]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+---
+ gdk-pixbuf/meson.build  | 11 +++++++++--
+ meson.build             |  6 +++---
+ meson_options.txt       |  4 ++++
+ tests/meson.build       | 16 ++++++++--------
+ thumbnailer/meson.build | 24 ++++++++++++++++++------
+ 5 files changed, 42 insertions(+), 19 deletions(-)
+
+diff --git a/gdk-pixbuf/meson.build b/gdk-pixbuf/meson.build
+index 8b0590b..7331491 100644
+--- a/gdk-pixbuf/meson.build
++++ b/gdk-pixbuf/meson.build
+@@ -342,13 +342,20 @@ foreach bin: gdkpixbuf_bin
+                    include_directories: [ root_inc, gdk_pixbuf_inc ],
+                    c_args: common_cflags + gdk_pixbuf_cflags,
+                    install: true)
+-  meson.override_find_program(bin_name, bin)
++  if not get_option('use_prebuilt_tools')
++      meson.override_find_program(bin_name, bin)
++  endif
+ 
+   # Used in tests
+   set_variable(bin_name.underscorify(), bin)
+ endforeach
+ 
+-if not meson.is_cross_build()
++if get_option('use_prebuilt_tools')
++    gdk_pixbuf_query_loaders = find_program('gdk-pixbuf-query-loaders', required: true)
++    gdk_pixbuf_pixdata = find_program('gdk-pixbuf-pixdata', required: true)
++endif
++
++if not meson.is_cross_build() or get_option('use_prebuilt_tools')
+   # The 'loaders.cache' used for testing, so we don't accidentally
+   # load the installed cache; we always build it by default
+   loaders_cache = custom_target('loaders.cache',
+diff --git a/meson.build b/meson.build
+index 7a1409b..0bc73eb 100644
+--- a/meson.build
++++ b/meson.build
+@@ -403,16 +403,16 @@ subdir('gdk-pixbuf')
+ # i18n
+ subdir('po')
+ 
+-if not meson.is_cross_build()
++if not meson.is_cross_build() or get_option('use_prebuilt_tools')
+   subdir('tests')
+-  subdir('thumbnailer')
+ endif
++subdir('thumbnailer')
+ 
+ # Documentation
+ build_docs = get_option('gtk_doc') or get_option('docs')
+ subdir('docs')
+ 
+-if not meson.is_cross_build()
++if not meson.is_cross_build() or get_option('use_prebuilt_tools')
+   meson.add_install_script('build-aux/post-install.py',
+     gdk_pixbuf_bindir,
+     gdk_pixbuf_libdir,
+diff --git a/meson_options.txt b/meson_options.txt
+index 0ee6718..cc29855 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -49,4 +49,8 @@ option('gio_sniffing',
+        description: 'Perform file type detection using GIO (Unused on MacOS and Windows)',
+        type: 'boolean',
+        value: true)
++option('use_prebuilt_tools',
++       description: 'Use prebuilt gdk-pixbuf tools from the host for cross-compilation',
++       type: 'boolean',
++       value: false)
+ 
+diff --git a/tests/meson.build b/tests/meson.build
+index 7c6cb11..1029e6a 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -5,6 +5,12 @@
+ # $PATH. Ideally we should use gnome.compile_resources() and let Meson deal with
+ # this problem: See https://github.com/mesonbuild/meson/issues/8266.
+ if enabled_loaders.contains('png') and host_system != 'windows'
++
++  resources_deps = [loaders_cache,]
++  if not get_option('use_prebuilt_tools')
++    resources_deps += [gdk_pixbuf_pixdata,]
++  endif
++
+   # Resources; we cannot use gnome.compile_resources() here, because we need to
+   # override the environment in order to use the utilities we just built instead
+   # of the system ones
+@@ -21,10 +27,7 @@ if enabled_loaders.contains('png') and host_system != 'windows'
+       '@INPUT@',
+       '@OUTPUT@',
+     ],
+-    depends: [
+-      gdk_pixbuf_pixdata,
+-      loaders_cache,
+-    ],
++    depends: resources_deps,
+   )
+ 
+   resources_h = custom_target('resources.h',
+@@ -40,10 +43,7 @@ if enabled_loaders.contains('png') and host_system != 'windows'
+       '@INPUT@',
+       '@OUTPUT@',
+     ],
+-    depends: [
+-      gdk_pixbuf_pixdata,
+-      loaders_cache,
+-    ],
++    depends: resources_deps,
+   )
+   no_resources = false
+ else
+diff --git a/thumbnailer/meson.build b/thumbnailer/meson.build
+index b6a206d..9336c21 100644
+--- a/thumbnailer/meson.build
++++ b/thumbnailer/meson.build
+@@ -6,13 +6,29 @@ bin = executable('gdk-pixbuf-thumbnailer',
+            ],
+            dependencies: gdk_pixbuf_deps + [ gdkpixbuf_dep ],
+            install: true)
+-meson.override_find_program('gdk-pixbuf-thumbnailer', bin)
++if not get_option('use_prebuilt_tools')
++    meson.override_find_program('gdk-pixbuf-thumbnailer', bin)
++endif
+ 
+ gdk_pixbuf_print_mime_types = executable('gdk-pixbuf-print-mime-types',
+                                          'gdk-pixbuf-print-mime-types.c',
++                                         install: true,
+                                          c_args: common_cflags,
+                                          dependencies: gdk_pixbuf_deps + [ gdkpixbuf_dep ])
+ 
++if get_option('use_prebuilt_tools')
++    gdk_pixbuf_print_mime_types = find_program('gdk-pixbuf-print-mime-types', required: true)
++endif
++
++thumbnailer_deps = [loaders_cache,]
++
++if not get_option('use_prebuilt_tools')
++    thumbnailer_deps += [
++        gdk_pixbuf_print_mime_types,
++        gdk_pixbuf_pixdata,
++    ]
++endif
++
+ custom_target('thumbnailer',
+               input: 'gdk-pixbuf-thumbnailer.thumbnailer.in',
+               output: 'gdk-pixbuf-thumbnailer.thumbnailer',
+@@ -25,10 +41,6 @@ custom_target('thumbnailer',
+                 '@INPUT@',
+                 '@OUTPUT@',
+               ],
+-              depends: [
+-                gdk_pixbuf_print_mime_types,
+-                gdk_pixbuf_pixdata,
+-                loaders_cache,
+-              ],
++              depends: thumbnailer_deps,
+               install: true,
+               install_dir: join_paths(gdk_pixbuf_datadir, 'thumbnailers'))

@@ -28,7 +28,7 @@ efi_populate() {
         done
 }
 
-efi_iso_populate_append() {
+efi_iso_populate:append() {
         cp -r $iso_dir/loader ${EFIIMGDIR}
 }
 

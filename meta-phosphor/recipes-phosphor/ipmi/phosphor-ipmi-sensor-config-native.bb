@@ -7,4 +7,4 @@ inherit native
 
 OBMC_IPMI_SENSORS_PROVIDERS = "phosphor-ipmi-sensor-inventory-mrw-config-native"
 
-DEPENDS_append = " ${OBMC_IPMI_SENSORS_PROVIDERS} "
+DEPENDS:append = " ${OBMC_IPMI_SENSORS_PROVIDERS} "

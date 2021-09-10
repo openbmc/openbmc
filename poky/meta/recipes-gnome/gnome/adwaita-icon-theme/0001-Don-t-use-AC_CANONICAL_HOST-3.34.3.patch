@@ -1,0 +1,27 @@
+From 8b3b153b6b95662316528ef083365b46cf5f7841 Mon Sep 17 00:00:00 2001
+From: Jussi Kukkonen <jussi.kukkonen@intel.com>
+Date: Tue, 30 May 2017 14:55:49 +0300
+Subject: [PATCH] Don't use AC_CANONICAL_HOST
+
+This won't work when building allarch (and is only used to find out if
+target is windows).
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+---
+ configure.ac | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 449865d..888649e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,7 +3,6 @@ AC_PREREQ(2.53)
+ 
+ AC_INIT([adwaita-icon-theme], [3.34.3],
+         [http://bugzilla.gnome.org/enter_bug.cgi?product=adwaita-icon-theme])
+-AC_CANONICAL_HOST
+ AC_CONFIG_MACRO_DIR([m4])
+ AC_CONFIG_SRCDIR([index.theme.in])
+ 

@@ -1,0 +1,58 @@
+{
+    "general": {
+      "objectName": "TB_gateway",
+      "address": "192.168.188.181:1052",
+      "objectIdentifier": 599,
+      "maxApduLengthAccepted": 1024,
+      "segmentationSupported": "segmentedBoth",
+      "vendorIdentifier": 15
+    },
+    "devices": [
+      {
+        "deviceName": "BACnet Device ${objectName}",
+        "deviceType": "default",
+        "address": "192.168.188.181:10520",
+        "pollPeriod": 10000,
+        "attributes": [
+          {
+            "key": "temperature",
+            "type": "string",
+            "objectId": "analogOutput:1",
+            "propertyId": "presentValue"
+          }
+        ],
+        "timeseries": [
+          {
+            "key": "state",
+            "type": "bool",
+            "objectId": "binaryValue:1",
+            "propertyId": "presentValue"
+          }
+        ],
+        "attributeUpdates": [
+          {
+            "key": "brightness",
+            "requestType": "writeProperty",
+            "objectId": "analogOutput:1",
+            "propertyId": "presentValue"
+          }
+        ],
+        "serverSideRpc": [
+          {
+            "method": "set_state",
+            "requestType": "writeProperty",
+            "requestTimeout": 10000,
+            "objectId": "binaryOutput:1",
+            "propertyId": "presentValue"
+          },
+          {
+            "method": "get_state",
+            "requestType": "readProperty",
+            "requestTimeout": 10000,
+            "objectId": "binaryOutput:1",
+            "propertyId": "presentValue"
+          }
+        ]
+      }
+    ]
+  }

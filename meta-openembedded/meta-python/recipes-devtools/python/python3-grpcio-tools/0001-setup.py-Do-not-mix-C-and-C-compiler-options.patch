@@ -1,0 +1,58 @@
+From 9b2f1d400db8b8d0045f5a58a748a2dc52b5c9ef Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 17 Feb 2021 13:38:55 -0800
+Subject: [PATCH] setup.py: Do not mix C and C++ compiler options
+
+EXTRA_ENV_COMPILE_ARGS is used both with CC and CXX
+so using -std=c++11 or -std=gnu99 together will cause
+build time errors espcially with clang
+
+Keep '-std=c++11' to fix native build error
+with old gcc (such as gcc 5.4.0 on ubuntu 16.04), for clang
+we will remove them through GRPC_PYTHON_CFLAGS at do_compile
+in bb recipe.
+
+While export CC="gcc ", cc_args is None, it will
+cause subprocess.Popen always return 1. On centos 8, if you don't
+install package libatomic, there will be a native build error
+`cannot find /usr/lib64/libatomic.so.1.2.0'.
+
+Add no harm '-g' to cc_args if cc_args is empty.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ setup.py | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index a316038..70aa174 100644
+--- a/setup.py
++++ b/setup.py
+@@ -76,8 +76,11 @@ def check_linker_need_libatomic():
+     """Test if linker on system needs libatomic."""
+     code_test = (b'#include <atomic>\n' +
+                  b'int main() { return std::atomic<int64_t>{}; }')
+-    cxx = os.environ.get('CXX', 'c++')
+-    cpp_test = subprocess.Popen([cxx, '-x', 'c++', '-std=c++11', '-'],
++    cxx, cxx_args = os.environ.get('CXX').split(' ', 1) or 'c++'
++    if not cxx_args:
++      cxx_args = "-g"
++
++    cpp_test = subprocess.Popen([cxx, cxx_args, '-x', 'c++', '-std=c++11', '-'],
+                                 stdin=PIPE,
+                                 stdout=PIPE,
+                                 stderr=PIPE)
+@@ -87,7 +90,7 @@ def check_linker_need_libatomic():
+     # Double-check to see if -latomic actually can solve the problem.
+     # https://github.com/grpc/grpc/issues/22491
+     cpp_test = subprocess.Popen(
+-        [cxx, '-x', 'c++', '-std=c++11', '-latomic', '-'],
++        [cxx, cxx_args, '-x', 'c++', '-std=c++11', '-latomic', '-'],
+         stdin=PIPE,
+         stdout=PIPE,
+         stderr=PIPE)
+-- 
+2.30.1
+

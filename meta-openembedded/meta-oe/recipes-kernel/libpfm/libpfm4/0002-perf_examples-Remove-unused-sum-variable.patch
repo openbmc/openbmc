@@ -1,0 +1,44 @@
+From 0b2f611a95f3c93454453892bbe021ad2815925d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 15 Jun 2021 17:35:26 -0700
+Subject: [PATCH] perf_examples: Remove unused 'sum' variable
+
+Fixes
+self_smpl_multi.c:144:19: error: variable 'sum' set but not used [-Werror,-Wunused-but-set-variable]
+        unsigned long x, sum;
+                         ^
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ perf_examples/self_smpl_multi.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/perf_examples/self_smpl_multi.c b/perf_examples/self_smpl_multi.c
+index 391fa61..75b45e0 100644
+--- a/perf_examples/self_smpl_multi.c
++++ b/perf_examples/self_smpl_multi.c
+@@ -141,7 +141,7 @@ void
+ do_cycles(void)
+ {
+ 	struct timeval start, last, now;
+-	unsigned long x, sum;
++	unsigned long x;
+ 
+ 	gettimeofday(&start, NULL);
+ 	last = start;
+@@ -150,15 +150,12 @@ do_cycles(void)
+ 	iter[myid] = 0;
+ 
+ 	do {
+-
+-		sum = 1;
+ 		for (x = 1; x < 250000; x++) {
+ 			/* signal pending to private queue because of
+ 			 * pthread_kill(), i.e., tkill()
+ 			 */
+ 			if ((x % 5000) == 0)
+ 				pthread_kill(pthread_self(), SIGUSR1);
+-			sum += x;
+ 		}
+ 		iter[myid]++;
+ 

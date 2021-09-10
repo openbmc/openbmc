@@ -2,20 +2,15 @@ SUMMARY = "IMA sample simple appraise policy "
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
-# This policy file will get installed as /etc/ima/ima-policy.
-# It is located via the normal file search path, so a .bbappend
-# to this recipe can just point towards one of its own files.
-IMA_POLICY ?= "ima_policy_appraise_all"
-
-SRC_URI = " file://${IMA_POLICY}"
+SRC_URI = " file://ima_policy_appraise_all"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "ima"
 
 do_install () {
     install -d ${D}/${sysconfdir}/ima
-    install ${WORKDIR}/${IMA_POLICY}  ${D}/${sysconfdir}/ima/ima-policy
+    install ${WORKDIR}/ima_policy_appraise_all ${D}/${sysconfdir}/ima/ima-policy
 }
 
-FILES_${PN} = "${sysconfdir}/ima"
-RDEPENDS_${PN} = "ima-evm-utils"
+FILES:${PN} = "${sysconfdir}/ima"
+RDEPENDS:${PN} = "ima-evm-utils"

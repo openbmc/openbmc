@@ -1,6 +1,25 @@
 meta-tpm layer
 ==============
 
+The bbappend files for some recipes (e.g. linux-yocto) in this layer need
+to have 'tpm' in DISTRO_FEATURES to have effect.
+To enable them, add in configuration file the following line.
+
+  DISTRO_FEATURES:append = " tpm"
+
+If meta-tpm is included, but tpm is not enabled as a
+distro feature a warning is printed at parse time:
+
+    You have included the meta-tpm layer, but
+    'tpm' has not been enabled in your DISTRO_FEATURES. Some bbappend files
+    and preferred version setting may not take effect.
+
+If you know what you are doing, this warning can be disabled by setting the following
+variable in your configuration:
+
+  SKIP_META_TPM_SANITY_CHECK = 1
+
+
 This layer contains base TPM recipes.
 
 Dependencies
@@ -38,14 +57,14 @@ other layers needed. e.g.:
 Maintenance
 -----------
 
-Send pull requests, patches, comments or questions to yocto@yoctoproject.org
+Send pull requests, patches, comments or questions to yocto@lists.yoctoproject.org
 
 When sending single patches, please using something like:
-'git send-email -1 --to yocto@yoctoproject.org --subject-prefix=meta-security][PATCH'
+'git send-email -1 --to yocto@lists.yoctoproject.org --subject-prefix=meta-security][PATCH'
 
 These values can be set as defaults for this repository:
 
-$ git config sendemail.to yocto@yoctoproject.org
+$ git config sendemail.to yocto@lists.yoctoproject.org
 $ git config format.subjectPrefix meta-security][PATCH
 
 Now you can just do 'git send-email origin/master' to send all local patches.

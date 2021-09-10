@@ -1,15 +1,24 @@
+From 684e45b34a33186bb17bcee0b01814c549a60bf6 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Wed, 6 Mar 2019 09:36:11 -0500
+Subject: [PATCH] inetutils: Import version 1.9.4
+
 Only check security/pam_appl.h which is provided by package libpam when pam is
 enabled.
 
 Upstream-Status: Pending
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 ---
+ configure.ac | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
 diff --git a/configure.ac b/configure.ac
-index b35e672..e78a751 100644
+index 86136fb..b220319 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -195,6 +195,19 @@ fi
+@@ -183,6 +183,19 @@ AC_SUBST(LIBUTIL)
  
  # See if we have libpam.a.  Investigate PAM versus Linux-PAM.
  if test "$with_pam" = yes ; then
@@ -29,8 +38,8 @@ index b35e672..e78a751 100644
    AC_CHECK_LIB(dl, dlopen, LIBDL=-ldl)
    AC_CHECK_LIB(pam, pam_authenticate, LIBPAM=-lpam)
    if test "$ac_cv_lib_pam_pam_authenticate" = yes ; then
-@@ -587,7 +600,7 @@ AC_HEADER_DIRENT
- AC_CHECK_HEADERS([arpa/nameser.h errno.h fcntl.h features.h \
+@@ -620,7 +633,7 @@ AC_HEADER_DIRENT
+ AC_CHECK_HEADERS([arpa/nameser.h arpa/tftp.h errno.h fcntl.h features.h \
  		  glob.h memory.h netinet/ether.h netinet/in_systm.h \
  		  netinet/ip.h netinet/ip_icmp.h netinet/ip_var.h \
 -		  security/pam_appl.h shadow.h \

@@ -3,6 +3,6 @@
 # Class users should define DBUS_SERVICES prior to including.
 
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "libsystemd"
+RDEPENDS:${PN} += "libsystemd"
 
 inherit obmc-phosphor-dbus-service

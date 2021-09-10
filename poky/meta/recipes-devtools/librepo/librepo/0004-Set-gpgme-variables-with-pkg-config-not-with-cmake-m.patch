@@ -1,4 +1,4 @@
-From f5a1dfe4c87c228165bc25e7fe464120d8139a3d Mon Sep 17 00:00:00 2001
+From 25113b34bc1aae377d7bf447e69528783e2c177e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:23:27 +0200
 Subject: [PATCH] Set gpgme variables with pkg-config, not with cmake module
@@ -12,13 +12,13 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index e949dbe..c954b2e 100644
+index a45d5c4..40249e6 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -31,7 +31,8 @@ PKG_CHECK_MODULES(GLIB2 glib-2.0 REQUIRED)
+@@ -32,7 +32,8 @@ PKG_CHECK_MODULES(GLIB2 glib-2.0 REQUIRED)
  PKG_SEARCH_MODULE(LIBCRYPTO REQUIRED libcrypto openssl)
  PKG_CHECK_MODULES(LIBXML2 libxml-2.0 REQUIRED)
- FIND_PACKAGE(CURL REQUIRED)
+ FIND_PACKAGE(CURL 7.52.0 REQUIRED)
 -FIND_PACKAGE(Gpgme REQUIRED)
 +PKG_CHECK_MODULES(GPGME gpgme REQUIRED)
 +set(GPGME_VANILLA_LIBRARIES ${GPGME_LIBRARIES})

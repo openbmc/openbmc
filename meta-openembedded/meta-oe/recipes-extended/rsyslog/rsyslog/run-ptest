@@ -5,4 +5,8 @@ set -o pipefail
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 cd ${SCRIPTPATH}
-make -C tests -k check-TESTS
+useradd tester  || echo "user already exists"
+ln -sf /usr/sbin/logrotate /usr/bin/logrotate
+su tester -c "make -C tests -k check-TESTS"
+userdel tester
+rm -f /usr/bin/logrotate

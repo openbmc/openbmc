@@ -1,0 +1,42 @@
+From 11bbf909e08594628bd757d989ae34cf1bfe200b Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Thu, 18 Jun 2020 05:51:38 +0000
+Subject: [PATCH] Make ts module external
+
+Make ts module external
+
+Reference: https://github.com/qbonnard/opencv/commit/6b229c5834cb9a0930425e762a6c7b03244d7abb
+
+Upstream-Status: Submitted [https://github.com/opencv/opencv/issues/8408]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ modules/ts/CMakeLists.txt | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/modules/ts/CMakeLists.txt b/modules/ts/CMakeLists.txt
+index f95bed0793..66f315bcca 100644
+--- a/modules/ts/CMakeLists.txt
++++ b/modules/ts/CMakeLists.txt
+@@ -4,9 +4,6 @@ if(NOT BUILD_opencv_ts AND NOT BUILD_TESTS AND NOT BUILD_PERF_TESTS)
+   ocv_module_disable(ts)
+ endif()
+ 
+-set(OPENCV_MODULE_TYPE STATIC)
+-set(OPENCV_MODULE_IS_PART_OF_WORLD FALSE)
+-
+ if(WINRT)
+   # WINRT doesn't have access to environment variables
+   # so adding corresponding macros during CMake run
+@@ -16,7 +13,7 @@ endif()
+ 
+ ocv_warnings_disable(CMAKE_CXX_FLAGS -Wundef)
+ 
+-ocv_add_module(ts INTERNAL opencv_core opencv_imgproc opencv_imgcodecs opencv_videoio opencv_highgui)
++ocv_add_module(ts opencv_core opencv_imgproc opencv_imgcodecs opencv_videoio opencv_highgui)
+ 
+ ocv_glob_module_sources()
+ ocv_module_include_directories()
+-- 
+2.24.1
+

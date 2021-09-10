@@ -1,0 +1,87 @@
+From 07e7b727b7df7fc5bf0e1f296ba136e0653202ea Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Fri, 4 Dec 2020 03:25:08 -0500
+Subject: [PATCH] change library linking order
+
+Since -lraspidmxPng requires the png library (libpng), re-arrange the order of
+linking so that it succeeds. Otherwise I get errors like the following:
+
+	undefined reference to `png_create_write_struct'
+
+...as well as undefined references to various other libpng objects.
+
+Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ game/Makefile       | 2 +-
+ mandelbrot/Makefile | 2 +-
+ offscreen/Makefile  | 2 +-
+ pngview/Makefile    | 2 +-
+ spriteview/Makefile | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/game/Makefile b/game/Makefile
+index b756fa2..f33916d 100644
+--- a/game/Makefile
++++ b/game/Makefile
+@@ -2,7 +2,7 @@ OBJS=main.o
+ BIN=game
+ 
+ CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+-LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx -lraspidmxPng $(shell pkg-config --libs libpng)
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/mandelbrot/Makefile b/mandelbrot/Makefile
+index 31097f2..08d1113 100644
+--- a/mandelbrot/Makefile
++++ b/mandelbrot/Makefile
+@@ -2,7 +2,7 @@ OBJS=main.o mandelbrot.o info.o
+ BIN=mandelbrot
+ 
+ CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+-LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx -lraspidmxPng $(shell pkg-config --libs libpng)
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/offscreen/Makefile b/offscreen/Makefile
+index 4f13fd0..49fc744 100644
+--- a/offscreen/Makefile
++++ b/offscreen/Makefile
+@@ -2,7 +2,7 @@ OBJS=pngresize.o resizeDispmanX.o
+ BIN=pngresize
+ 
+ CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+-LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx -lraspidmxPng $(shell pkg-config --libs libpng)
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/pngview/Makefile b/pngview/Makefile
+index cce8d63..bd6c154 100644
+--- a/pngview/Makefile
++++ b/pngview/Makefile
+@@ -2,7 +2,7 @@ OBJS=pngview.o
+ BIN=pngview
+ 
+ CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+-LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx -lraspidmxPng $(shell pkg-config --libs libpng)
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/spriteview/Makefile b/spriteview/Makefile
+index d2fb3c8..89d9e01 100644
+--- a/spriteview/Makefile
++++ b/spriteview/Makefile
+@@ -2,7 +2,7 @@ OBJS=spriteview.o
+ BIN=spriteview
+ 
+ CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+-LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
++LDFLAGS+=-L/opt/vc/lib/ -lvchostif -lbcm_host -lm -L../lib -lraspidmx -lraspidmxPng $(shell pkg-config --libs libpng)
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 

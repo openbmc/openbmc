@@ -23,21 +23,9 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
  modules/Makefile | 3 ++-
  2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/lib/Makefile b/lib/Makefile
-index 4798a4b..c40cf86 100644
 --- a/lib/Makefile
 +++ b/lib/Makefile
-@@ -57,7 +57,8 @@ mount_xdr.o: mount_xdr.c
- master_tok.c: master_tok.l
- 	$(LEX) -o$@ -Pmaster_ $?
- 
--master_parse.tab.c master_parse.tab.h: master_parse.y
-+master_parse.tab.h: master_parse.tab.c
-+master_parse.tab.c: master_parse.y
- 	$(YACC) -v -d -p master_ -b master_parse $?
- 
- master_tok.o: master_tok.c master_parse.tab.h
-@@ -67,7 +68,8 @@ master_parse.tab.o: master_parse.tab.c master_parse.tab.h
+@@ -53,7 +53,8 @@ mount_xdr.o: mount_xdr.c
  nss_tok.c: nss_tok.l
  	$(LEX) -o$@ -Pnss_ $?
  
@@ -47,8 +35,6 @@ index 4798a4b..c40cf86 100644
  	$(YACC) -v -d -p nss_ -b nss_parse $?
  
  nss_tok.o: nss_tok.c nss_parse.tab.h
-diff --git a/modules/Makefile b/modules/Makefile
-index d9ab06c..abc7698 100644
 --- a/modules/Makefile
 +++ b/modules/Makefile
 @@ -103,7 +103,8 @@ amd_tok.c: amd_tok.l
@@ -61,3 +47,30 @@ index d9ab06c..abc7698 100644
  	$(YACC) -v -d -p amd_ -b amd_parse $?
  
  amd_parse.tab.o: amd_parse.tab.c amd_parse.tab.h
+--- a/daemon/Makefile
++++ b/daemon/Makefile
+@@ -16,7 +16,7 @@ YACCSRC = master_tok.c master_parse.tab.
+ version := $(shell cat ../.version)
+ 
+ CFLAGS += -rdynamic $(DAEMON_CFLAGS) -D_GNU_SOURCE -I../include
+-CFLAGS += -DAUTOFS_LIB_DIR=\"$(autofslibdir)\" 
++CFLAGS += -DAUTOFS_LIB_DIR=\"$(autofslibdir)\"
+ CFLAGS += -DAUTOFS_MAP_DIR=\"$(autofsmapdir)\"
+ CFLAGS += -DAUTOFS_CONF_DIR=\"$(autofsconfdir)\"
+ CFLAGS += -DAUTOFS_FIFO_DIR=\"$(autofsfifodir)\"
+@@ -44,7 +44,8 @@ automount: $(OBJS) $(AUTOFS_LIB)
+ master_tok.c: master_tok.l
+ 	$(LEX) -o$@ -Pmaster_ $?
+ 
+-master_parse.tab.c master_parse.tab.h: master_parse.y
++master_parse.tab.h: master_parse.tab.c
++master_parse.tab.c: master_parse.y
+ 	$(YACC) -v -d -p master_ -b master_parse $?
+ 
+ master_tok.o: master_tok.c master_parse.tab.h
+@@ -57,5 +58,3 @@ clean:
+ install: all
+ 	install -d -m 755 $(INSTALLROOT)$(sbindir)
+ 	install -c automount -m 755 $(INSTALLROOT)$(sbindir)
+-
+-

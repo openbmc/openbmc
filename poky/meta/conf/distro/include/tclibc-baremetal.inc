@@ -18,22 +18,22 @@ USE_NLS ?= "no"
 IMAGE_LINGUAS = ""
 LIBC_DEPENDENCIES = ""
 
-EXTRA_OECONF_pn-gcc-cross-${TARGET_ARCH}_append = " --without-headers"
-DEPENDS_remove_pn-meta-toolchain = "virtual/libc virtual/${TARGET_PREFIX}compilerlibs"
+EXTRA_OECONF:pn-gcc-cross-${TARGET_ARCH}:append = " --without-headers"
+DEPENDS:remove:pn-meta-toolchain = "virtual/libc virtual/${TARGET_PREFIX}compilerlibs"
 
 # certain compiler libs cannot be used without libc, avoid the dependence on compilerlibs
-BASEDEPENDS_remove_class-target = "virtual/${TARGET_PREFIX}compilerlibs"
+BASEDEPENDS:remove:class-target = "virtual/${TARGET_PREFIX}compilerlibs"
 
 TARGET_OS = "elf"
-TARGET_OS_arm = "eabi"
+TARGET_OS:arm = "eabi"
 
 TOOLCHAIN_HOST_TASK ?= "packagegroup-cross-canadian-${MACHINE} nativesdk-qemu"
 TOOLCHAIN_HOST_TASK_ATTEMPTONLY ?= ""
 TOOLCHAIN_TARGET_TASK ?= "libgcc-dev"
-TOOLCHAIN_NEED_CONFIGSITE_CACHE_remove = "virtual/${MLPREFIX}libc zlib ncurses"
+TOOLCHAIN_NEED_CONFIGSITE_CACHE:remove = "virtual/${MLPREFIX}libc zlib ncurses"
 
 # disable stack protector by default (no-libc, no protector implementation)
-SECURITY_STACK_PROTECTOR_libc-baremetal = ""
+SECURITY_STACK_PROTECTOR:libc-baremetal = ""
 # disable pie security flags by default
-SECURITY_CFLAGS_libc-baremetal = "${SECURITY_NOPIE_CFLAGS}"
-SECURITY_LDFLAGS_libc-baremetal = ""
+SECURITY_CFLAGS:libc-baremetal = "${SECURITY_NOPIE_CFLAGS}"
+SECURITY_LDFLAGS:libc-baremetal = ""

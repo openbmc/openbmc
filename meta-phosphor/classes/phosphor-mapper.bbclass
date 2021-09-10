@@ -13,13 +13,13 @@
 # or interfaces to the mapper watchlist.
 
 # Add service namespaces to be monitored:
-# PHOSPHOR_MAPPER_SERVICE_append = " foo.bar"
+# PHOSPHOR_MAPPER_SERVICE:append = " foo.bar"
 
 # Add interfaces to be monitored:
-# PHOSPHOR_MAPPER_INTERFACE_append = " foo.bar"
+# PHOSPHOR_MAPPER_INTERFACE:append = " foo.bar"
 
 # Blacklist services from being monitored:
-# PHOSPHOR_MAPPER_SERVICE_BLACKLIST_append = " foo.bar"
+# PHOSPHOR_MAPPER_SERVICE_BLACKLIST:append = " foo.bar"
 
 inherit phosphor-mapperdir
 inherit obmc-phosphor-utils

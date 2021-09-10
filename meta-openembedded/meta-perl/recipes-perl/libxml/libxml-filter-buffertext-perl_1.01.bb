@@ -10,7 +10,7 @@ SECTION = "libs"
 LICENSE = "Artistic-1.0 | GPLv1+"
 HOMEPAGE = "http://search.cpan.org/dist/XML-Filter-BufferText/"
 DEPENDS += "libxml-sax-perl-native"
-RDEPENDS_${PN} += "libxml-sax-perl"
+RDEPENDS:${PN} += "libxml-sax-perl"
 
 SRC_URI = "http://search.cpan.org/CPAN/authors/id/R/RB/RBERJON/XML-Filter-BufferText-${PV}.tar.gz"
 SRC_URI[md5sum] = "2992c0387632583b966ab9c965b25512"

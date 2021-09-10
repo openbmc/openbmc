@@ -2,11 +2,12 @@
 # mechanism as the linux-yocto kernel recipe.
 #
 # The entries here will override any entries in the base busybox recipe
+# when DISTRO = "mydistro" is defined in your conf/local.conf file.
 #
 # More details can be found in the Kernel Dev Manual
 # http://www.yoctoproject.org/docs/current/kernel-dev/kernel-dev.html#changing-the-configuration
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += " \
+SRC_URI:append:mydistro += " \
 	    file://no_rfkill.cfg \
            "

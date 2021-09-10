@@ -1,0 +1,54 @@
+From d6f7b6064dc91d1d5fa18554b40b14822ab7a32b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Oct 2020 11:13:22 -0700
+Subject: [PATCH] fiber,libs: Define SYS_futex if it does not exist
+
+__NR_futex is not defines by newer architectures e.g. arc, riscv32 as
+they only have 64bit variant of time_t. Glibc defines SYS_futex interface based on
+__NR_futex, since this is used in applications, such applications start
+to fail to build for these newer architectures. This patch defines a
+fallback to alias __NR_futex to __NR_futex_tim64 so SYS_futex keeps
+working
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ boost/fiber/detail/futex.hpp | 5 +++++
+ libs/log/src/event.cpp       | 4 ++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/boost/fiber/detail/futex.hpp b/boost/fiber/detail/futex.hpp
+index e64bd5990..16bee64f1 100644
+--- a/boost/fiber/detail/futex.hpp
++++ b/boost/fiber/detail/futex.hpp
+@@ -17,6 +17,11 @@ extern "C" {
+ #include <linux/futex.h>
+ #include <sys/syscall.h>
+ }
++
++#if !defined(SYS_futex) && defined(SYS_futex_time64)
++#define SYS_futex SYS_futex_time64
++#endif
++
+ #elif BOOST_OS_WINDOWS
+ #include <windows.h>
+ #endif
+diff --git a/libs/log/src/event.cpp b/libs/log/src/event.cpp
+index 5485154d7..2c7c0381f 100644
+--- a/libs/log/src/event.cpp
++++ b/libs/log/src/event.cpp
+@@ -31,6 +31,10 @@
+ #include <linux/futex.h>
+ #include <boost/memory_order.hpp>
+ 
++#if !defined(SYS_futex) && defined(SYS_futex_time64)
++#define SYS_futex SYS_futex_time64
++#endif
++
+ // Some Android NDKs (Google NDK and older Crystax.NET NDK versions) don't define SYS_futex
+ #if defined(SYS_futex)
+ #define BOOST_LOG_SYS_FUTEX SYS_futex
+-- 
+2.28.0
+

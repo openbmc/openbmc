@@ -14,11 +14,11 @@ Signed-off-by: He Zhe <zhe.he@windriver.com>
  configure | 48 ++++++++++++++++++++++++++++++++++++++++--------
  1 file changed, 40 insertions(+), 8 deletions(-)
 
-diff --git a/configure b/configure
-index 72f11aca..cac271ce 100755
---- a/configure
-+++ b/configure
-@@ -2875,6 +2875,30 @@ has_libgcrypt() {
+Index: qemu-6.0.0/configure
+===================================================================
+--- qemu-6.0.0.orig/configure
++++ qemu-6.0.0/configure
+@@ -2847,6 +2847,30 @@ has_libgcrypt() {
      return 0
  }
  
@@ -49,7 +49,7 @@ index 72f11aca..cac271ce 100755
  
  if test "$nettle" != "no"; then
      pass="no"
-@@ -2915,7 +2939,14 @@ fi
+@@ -2885,7 +2909,14 @@ fi
  
  if test "$gcrypt" != "no"; then
      pass="no"
@@ -65,7 +65,7 @@ index 72f11aca..cac271ce 100755
          gcrypt_cflags=$(libgcrypt-config --cflags)
          gcrypt_libs=$(libgcrypt-config --libs)
          # Debian has removed -lgpg-error from libgcrypt-config
-@@ -2925,15 +2956,16 @@ if test "$gcrypt" != "no"; then
+@@ -2895,12 +2926,12 @@ if test "$gcrypt" != "no"; then
          then
              gcrypt_libs="$gcrypt_libs -lgpg-error"
          fi
@@ -74,18 +74,11 @@ index 72f11aca..cac271ce 100755
 -        # Link test to make sure the given libraries work (e.g for static).
 -        write_c_skeleton
 -        if compile_prog "" "$gcrypt_libs" ; then
--            LIBS="$gcrypt_libs $LIBS"
--            QEMU_CFLAGS="$QEMU_CFLAGS $gcrypt_cflags"
--            pass="yes"
--        fi
 +    # Link test to make sure the given libraries work (e.g for static).
 +    write_c_skeleton
 +    if compile_prog "" "$gcrypt_libs" ; then
-+	    LIBS="$gcrypt_libs $LIBS"
-+	    QEMU_CFLAGS="$QEMU_CFLAGS $gcrypt_cflags"
-+	    pass="yes"
+             pass="yes"
+-        fi
      fi
-+
      if test "$pass" = "yes"; then
          gcrypt="yes"
-         cat > $TMPC << EOF

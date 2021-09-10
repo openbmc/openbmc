@@ -1,0 +1,28 @@
+From 5bf89c6a314952313b2b762fff0d5501fe57ac53 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Wed, 2 Dec 2020 21:21:52 +0000
+Subject: [PATCH] tests/shader.py: sort the file list before working on it
+
+This allows later xml output to be reproducible.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/shader.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tests/shader.py b/tests/shader.py
+index 849273660..e6e65d1ba 100644
+--- a/tests/shader.py
++++ b/tests/shader.py
+@@ -52,7 +52,9 @@ for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
+ for group, files in shader_tests.items():
+     assert group not in profile.test_list, 'duplicate group: {}'.format(group)
+ 
+-    # We'll end up with a list of tuples, split that into two lists
++    # This makes the xml output reproducible, as os.walk() order is random
++    files.sort()
++    # We'll end up with a list of tuples, split that into two list
+     files, installedfiles = list(zip(*files))
+     files = list(files)
+     installedfiles = list(installedfiles)

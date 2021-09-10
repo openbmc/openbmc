@@ -11,11 +11,11 @@ SRC_URI = "https://dev.gentoo.org/~vapier/dist/pax-utils-${PV}.tar.xz"
 SRC_URI[md5sum] = "a580468318f0ff42edf4a8cd314cc942"
 SRC_URI[sha256sum] = "7f4a7f8db6b4743adde7582fa48992ad01776796fcde030683732f56221337d9"
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
 export GNULIB_OVERRIDES_WINT_T = "0"
 
-do_configure_prepend() {
+do_configure:prepend() {
     touch ${S}/NEWS ${S}/AUTHORS ${S}/ChangeLog ${S}/README
 }
 

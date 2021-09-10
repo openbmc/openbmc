@@ -29,9 +29,9 @@ class RawCopyPlugin(SourcePlugin):
             cmd = 'btrfs filesystem label %s %s' % (dst, label)
         elif fstype == 'swap':
             cmd = 'mkswap -L %s %s' % (label, dst)
-        elif fstype == 'squashfs':
-            raise WicError("It's not possible to update a squashfs "
-                           "filesystem label '%s'" % (label))
+        elif fstype in ('squashfs', 'erofs'):
+            raise WicError("It's not possible to update a %s "
+                           "filesystem label '%s'" % (fstype, label))
         else:
             raise WicError("Cannot update filesystem label: "
                            "Unknown fstype: '%s'" % (fstype))

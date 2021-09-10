@@ -19,10 +19,13 @@ class SStateTests(SStateBase):
         # Test that a git repository which changes is correctly handled by SRCREV = ${AUTOREV}
         # when PV does not contain SRCPV
 
-        tempdir = tempfile.mkdtemp(prefix='oeqa')
+        tempdir = tempfile.mkdtemp(prefix='sstate_autorev')
+        tempdldir = tempfile.mkdtemp(prefix='sstate_autorev_dldir')
         self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(tempdldir)
         create_temp_layer(tempdir, 'selftestrecipetool')
         self.add_command_to_tearDown('bitbake-layers remove-layer %s' % tempdir)
+        self.append_config("DL_DIR = \"%s\"" % tempdldir)
         runCmd('bitbake-layers add-layer %s' % tempdir)
 
         # Use dbus-wait as a local git repo we can add a commit between two builds in
@@ -171,7 +174,7 @@ class SStateTests(SStateBase):
 
         # If buildhistory is enabled, we need to disable version-going-backwards
         # QA checks for this test. It may report errors otherwise.
-        self.append_config('ERROR_QA_remove = "version-going-backwards"')
+        self.append_config('ERROR_QA:remove = "version-going-backwards"')
 
         # For not this only checks if random sstate tasks are handled correctly as a group.
         # In the future we should add control over what tasks we check for.
@@ -258,7 +261,7 @@ PACKAGE_CLASSES = "package_rpm package_ipk package_deb"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash")
-        bitbake("core-image-sato -S none")
+        bitbake("core-image-weston -S none")
         self.write_config("""
 MACHINE = "qemux86"
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
@@ -270,12 +273,12 @@ PACKAGE_CLASSES = "package_rpm package_ipk package_deb"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash2")
-        bitbake("core-image-sato -S none")
+        bitbake("core-image-weston -S none")
 
         def get_files(d):
             f = []
             for root, dirs, files in os.walk(d):
-                if "core-image-sato" in root:
+                if "core-image-weston" in root:
                     # SDKMACHINE changing will change
                     # do_rootfs/do_testimage/do_build stamps of images which
                     # is safe to ignore.
@@ -303,7 +306,7 @@ NATIVELSBSTRING = \"DistroA\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash")
-        bitbake("core-image-sato -S none")
+        bitbake("core-image-weston -S none")
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
 TCLIBCAPPEND = \"\"
@@ -311,7 +314,7 @@ NATIVELSBSTRING = \"DistroB\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash2")
-        bitbake("core-image-sato -S none")
+        bitbake("core-image-weston -S none")
 
         def get_files(d):
             f = []
@@ -357,7 +360,7 @@ TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86-64\"
 require conf/multilib.conf
 MULTILIBS = \"multilib:lib32\"
-DEFAULTTUNE_virtclass-multilib-lib32 = \"x86\"
+DEFAULTTUNE:virtclass-multilib-lib32 = \"x86\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """
         configB = """
@@ -411,7 +414,7 @@ TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
-DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
+DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash")
@@ -422,7 +425,7 @@ TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86copy\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
-DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
+DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash2")
@@ -459,7 +462,7 @@ TCLIBCAPPEND = \"\"
 MACHINE = \"qemux86\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
-DEFAULTTUNE_virtclass-multilib-lib32 = "x86"
+DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash")
@@ -500,7 +503,7 @@ PARALLEL_MAKE = "-j 1"
 DL_DIR = "${TOPDIR}/download1"
 TIME = "111111"
 DATE = "20161111"
-INHERIT_remove = "buildstats-summary buildhistory uninative"
+INHERIT:remove = "buildstats-summary buildhistory uninative"
 http_proxy = ""
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
@@ -516,7 +519,7 @@ DL_DIR = "${TOPDIR}/download2"
 TIME = "222222"
 DATE = "20161212"
 # Always remove uninative as we're changing proxies
-INHERIT_remove = "uninative"
+INHERIT:remove = "uninative"
 INHERIT += "buildstats-summary buildhistory"
 http_proxy = "http://example.com/"
 BB_SIGNATURE_HANDLER = "OEBasicHash"

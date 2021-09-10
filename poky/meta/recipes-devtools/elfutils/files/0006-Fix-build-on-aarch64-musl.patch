@@ -1,4 +1,4 @@
-From 578f370c7e7a9f056aefa062b34590b0aa13bce5 Mon Sep 17 00:00:00 2001
+From 2396fd67d81e54e18fbad67a5ff67d5684a01013 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:27:30 +0800
 Subject: [PATCH] Fix build on aarch64/musl

@@ -1,0 +1,33 @@
+The creation of the LINGUAS file is duplicated for each desktop file
+which can lead the commands to race against each other. Rework
+the makefile to avoid this as the expense of leaving the file on disk.
+
+Upstream-Status: Pending
+RP 2021/2/15
+
+Index: git/src/po/Makefile
+===================================================================
+--- git.orig/src/po/Makefile
++++ git/src/po/Makefile
+@@ -165,17 +165,16 @@ $(PACKAGE).pot: ../*.c ../if_perl.xs ../
+ 		po/gvim.desktop.in po/vim.desktop.in
+ 	mv -f ../$(PACKAGE).po $(PACKAGE).pot
+ 
+-vim.desktop: vim.desktop.in $(POFILES)
++LINGUAS:
+ 	echo $(LANGUAGES) | tr " " "\n" |sed -e '/\./d' | sort > LINGUAS
++
++vim.desktop: vim.desktop.in $(POFILES) LINGUAS
+ 	$(MSGFMT) --desktop -d . --template vim.desktop.in -o tmp_vim.desktop
+-	rm -f LINGUAS
+ 	if command -v desktop-file-validate; then desktop-file-validate tmp_vim.desktop; fi
+ 	mv tmp_vim.desktop vim.desktop
+ 
+-gvim.desktop: gvim.desktop.in $(POFILES)
+-	echo $(LANGUAGES) | tr " " "\n" |sed -e '/\./d' | sort > LINGUAS
++gvim.desktop: gvim.desktop.in $(POFILES) LINGUAS
+ 	$(MSGFMT) --desktop -d . --template gvim.desktop.in -o tmp_gvim.desktop
+-	rm -f LINGUAS
+ 	if command -v desktop-file-validate; then desktop-file-validate tmp_gvim.desktop; fi
+ 	mv tmp_gvim.desktop gvim.desktop
+ 

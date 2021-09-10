@@ -5,7 +5,7 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
-RRECOMMENDS_${PN} += "packagegroup-obmc-ipmid-providers-libs"
+RRECOMMENDS:${PN} += "packagegroup-obmc-ipmid-providers-libs"
 
 inherit autotools pkgconfig
 inherit obmc-phosphor-ipmiprovider-symlink
@@ -20,6 +20,9 @@ def ipmi_whitelists(d):
     whitelists = whitelists.split()
     whitelists = [ '{}-whitelist-native'.format(x) for x in whitelists ]
     return ' '.join(whitelists)
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[dynamic-sensors] = "--enable-dynamic-sensors,--disable-dynamic-sensors"
 
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "nlohmann-json"
@@ -41,26 +44,26 @@ DEPENDS += "${PYTHON_PN}-mako-native"
 
 VIRTUAL-RUNTIME_ipmi-config ?= "phosphor-ipmi-config"
 
-RDEPENDS_${PN}-dev += "phosphor-logging"
-RDEPENDS_${PN}-dev += "phosphor-mapper-dev"
-RDEPENDS_${PN} += "clear-once"
-RDEPENDS_${PN} += "phosphor-network"
-RDEPENDS_${PN} += "phosphor-time-manager"
-RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_ipmi-config}"
-RDEPENDS_${PN} += "virtual/obmc-watchdog"
-RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-bmc-state-manager}"
-RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-bmc-version}"
-RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_obmc-bmc-updater}"
+RDEPENDS:${PN}-dev += "phosphor-logging"
+RDEPENDS:${PN}-dev += "phosphor-mapper-dev"
+RDEPENDS:${PN} += "clear-once"
+RDEPENDS:${PN} += "phosphor-network"
+RDEPENDS:${PN} += "phosphor-time-manager"
+RDEPENDS:${PN} += "${VIRTUAL-RUNTIME_ipmi-config}"
+RDEPENDS:${PN} += "virtual/obmc-watchdog"
+RDEPENDS:${PN} += "${VIRTUAL-RUNTIME_obmc-bmc-state-manager}"
+RDEPENDS:${PN} += "${VIRTUAL-RUNTIME_obmc-bmc-version}"
+RDEPENDS:${PN} += "${VIRTUAL-RUNTIME_obmc-bmc-updater}"
 
 inherit useradd
 
 USERADD_PACKAGES = "${PN}"
 # add ipmi group
-GROUPADD_PARAM_${PN} = "ipmi"
+GROUPADD_PARAM:${PN} = "ipmi"
 
-SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
+SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service phosphor-ipmi-host.service"
 
-RRECOMMENDS_${PN} += "phosphor-settings-manager"
+RRECOMMENDS:${PN} += "phosphor-settings-manager"
 
 
 require ${BPN}.inc
@@ -75,7 +78,7 @@ EXTRA_OECONF = " \
         INVSENSOR_YAML_GEN=${STAGING_DIR_NATIVE}${sensor_datadir}/invsensor.yaml \
         FRU_YAML_GEN=${STAGING_DIR_NATIVE}${config_datadir}/fru_config.yaml \
         "
-EXTRA_OECONF_append = " \
+EXTRA_OECONF:append = " \
         WHITELIST_CONF="${WHITELIST_CONF}" \
         "
 
@@ -90,17 +93,17 @@ HOSTIPMI_PROVIDER_LIBRARY += "libusercmds.so"
 NETIPMI_PROVIDER_LIBRARY += "libipmi20.so"
 NETIPMI_PROVIDER_LIBRARY += "libusercmds.so"
 
-FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
-FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
-FILES_${PN}_append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
-FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
+FILES:${PN}:append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
+FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
+FILES:${PN}:append = " ${libdir}/net-ipmid/lib*${SOLIBS}"
+FILES:${PN}-dev:append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
 
 # Soft Power Off
 # install the soft power off service in the host shutdown target
 SOFT_SVC = "xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service"
 SOFT_TGTFMT = "obmc-host-shutdown@{0}.target"
 SOFT_FMT = "../${SOFT_SVC}:${SOFT_TGTFMT}.requires/${SOFT_SVC}"
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'SOFT_FMT', 'OBMC_HOST_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'SOFT_FMT', 'OBMC_HOST_INSTANCES')}"
 
 #Collect all hardcoded sensor yamls from different recipes and
 #merge all of them with sensor.yaml.

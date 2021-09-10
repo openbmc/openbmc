@@ -1,2 +1,0 @@
-SUBSYSTEM=="iio", ACTION=="add", RUN="/usr/bin/start_hwmon.sh start %p %E{OF_FULLNAME}"
-SUBSYSTEM=="iio", ACTION=="remove", RUN="/usr/bin/start_hwmon.sh stop %p %E{OF_FULLNAME}"

@@ -11,4 +11,4 @@ SRC_URI[sha256sum] = "c825453253f590cfe62557733e7173f9a421fff103b00f57d33c4ad28a
 
 S = "${WORKDIR}"
 
-FILES_${PN} = "${datadir}/fonts/truetype/*.ttf"
+FILES:${PN} = "${datadir}/fonts/truetype/*.ttf"

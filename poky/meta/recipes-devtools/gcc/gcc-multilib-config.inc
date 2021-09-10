@@ -31,7 +31,9 @@ python gcc_multilib_setup() {
                 '%s/*/linux64.h' % src_conf_dir,
                 '%s/aarch64/t-aarch64' % src_conf_dir,
                 '%s/aarch64/aarch64.h' % src_conf_dir,
+                '%s/aarch64/aarch64-linux.h' % src_conf_dir,
                 '%s/aarch64/aarch64-cores.def' % src_conf_dir,
+                '%s/arm/linux-eabi.h' % src_conf_dir,
                 '%s/*/linux.h' % src_conf_dir,
                 '%s/linux.h' % src_conf_dir)
 
@@ -102,6 +104,8 @@ python gcc_multilib_setup() {
                         r'\1' + wrap_libdir(libdir64) + r'\3'),
                     (r'^(#define\s*GLIBC_DYNAMIC_LINKER64\s*\"\S+\"\s*)(\S+)(\s*\"\S+\"\s*)(\S+)(\s*\".*\")$',
                         r'\1' + wrap_libdir(libdir64) + r'\3' + wrap_libdir(libdir64) + r'\5'),
+                    (r'^(#define\s*GLIBC_DYNAMIC_LINKER\b\s*)(\S+)(\s*\".*\")$',
+                        r'\1' + wrap_libdir(libdir32) + r'\3'),
                     (r'^(#define\s*GLIBC_DYNAMIC_LINKERX32\s*)(\S+)(\s*\".*\")$',
                         r'\1' + wrap_libdir(libdirx32) + r'\3'),
                     (r'^(#define\s*GLIBC_DYNAMIC_LINKERN32\s*)(\S+)(\s*\".*\")$',
@@ -112,7 +116,17 @@ python gcc_multilib_setup() {
                         r'\1' + wrap_libdir(libdir64) + r'\3'),
                     (r'^(#define\s*UCLIBC_DYNAMIC_LINKERN32\s*)(\S+)(\s*\".*\")$',
                         r'\1' + wrap_libdir(libdirn32) + r'\3'),
+                    (r'^(#define\s*UCLIBC_DYNAMIC_LINKERX32\s*)(\S+)(\s*\".*\")$',
+                        r'\1' + wrap_libdir(libdirx32) + r'\3'),
                     (r'^(#define\s*UCLIBC_DYNAMIC_LINKER\b\s*)(\S+)(\s*\".*\")$',
+                        r'\1' + wrap_libdir(libdir32) + r'\3'),
+                    (r'^(#define\s*MUSL_DYNAMIC_LINKER32\s*)(\S+)(\s*\".*\")$',
+                        r'\1' + wrap_libdir(libdir32) + r'\3'),
+                    (r'^(#define\s*MUSL_DYNAMIC_LINKER64\s*)(\S+)(\s*\".*\")$',
+                        r'\1' + wrap_libdir(libdir64) + r'\3'),
+                    (r'^(#define\s*MUSL_DYNAMIC_LINKERX32\s*)(\S+)(\s*\".*\")$',
+                        r'\1' + wrap_libdir(libdirx32) + r'\3'),
+                    (r'^(#define\s*MUSL_DYNAMIC_LINKER\b\s*)(\S+)(\s*\".*\")$',
                         r'\1' + wrap_libdir(libdir32) + r'\3'),
                 ]
 
@@ -138,15 +152,15 @@ python gcc_multilib_setup() {
     }
 
     gcc_header_config_files = {
-        'x86_64'    : ['gcc/config/i386/linux64.h'],
-        'i586'      : ['gcc/config/i386/linux64.h'],
-        'i686'      : ['gcc/config/i386/linux64.h'],
-        'mips'      : ['gcc/config/mips/linux.h', 'gcc/config/mips/linux64.h'],
-        'mips64'    : ['gcc/config/mips/linux.h', 'gcc/config/mips/linux64.h'],
-        'powerpc'   : ['gcc/config/rs6000/linux64.h'],
-        'powerpc64' : ['gcc/config/rs6000/linux64.h'],
-        'aarch64'   : ['gcc/config/aarch64/aarch64.h'],
-        'arm'       : ['gcc/config/aarch64/aarch64.h'],
+        'x86_64'    : ['gcc/config/linux.h', 'gcc/config/i386/linux.h', 'gcc/config/i386/linux64.h'],
+        'i586'      : ['gcc/config/linux.h', 'gcc/config/i386/linux.h', 'gcc/config/i386/linux64.h'],
+        'i686'      : ['gcc/config/linux.h', 'gcc/config/i386/linux64.h'],
+        'mips'      : ['gcc/config/linux.h', 'gcc/config/mips/linux.h', 'gcc/config/mips/linux64.h'],
+        'mips64'    : ['gcc/config/linux.h', 'gcc/config/mips/linux.h', 'gcc/config/mips/linux64.h'],
+        'powerpc'   : ['gcc/config/linux.h', 'gcc/config/rs6000/linux64.h'],
+        'powerpc64' : ['gcc/config/linux.h', 'gcc/config/rs6000/linux64.h'],
+        'aarch64'   : ['gcc/config/linux.h', 'gcc/config/aarch64/aarch64-linux.h', 'gcc/config/arm/linux-eabi.h'],
+        'arm'       : ['gcc/config/linux.h', 'gcc/config/aarch64/aarch64-linux.h', 'gcc/config/arm/linux-eabi.h'],
     }
 
     libdir32 = 'SYSTEMLIBS_DIR'
@@ -170,7 +184,7 @@ python gcc_multilib_setup() {
     header_config_files = gcc_header_config_files[target_arch]
 
     ml_list = ['DEFAULTTUNE_MULTILIB_ORIGINAL' if mlprefix else 'DEFAULTTUNE']
-    mltunes = [('DEFAULTTUNE_virtclass-multilib-%s' % ml) for ml in multilibs]
+    mltunes = [('DEFAULTTUNE:virtclass-multilib-%s' % ml) for ml in multilibs]
     if mlprefix:
         mlindex = 0
         for ml in multilibs:

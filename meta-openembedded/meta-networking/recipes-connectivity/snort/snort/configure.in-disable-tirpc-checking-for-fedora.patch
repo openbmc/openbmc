@@ -52,9 +52,9 @@ index 8662cdd..0ff7e27 100644
 -    fi
 -fi
 -
- Z_LIB=""
- AC_CHECK_HEADERS(zlib.h,, Z_LIB="no")
- if test "x$Z_LIB" = "xno"; then
+ ##################################################
+ # Centos 8+ does not have inbuilt SunRPC support  #
+ # in glibc and is separately availble in tirpc   #
 -- 
 2.7.4
 

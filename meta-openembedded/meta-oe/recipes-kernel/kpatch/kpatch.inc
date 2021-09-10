@@ -32,22 +32,22 @@ PACKAGES =+ "kpatch-build"
 PROVIDES += "kpatch-build"
 
 COMPATIBLE_HOST = "(x86_64).*-linux"
-COMPATIBLE_HOST_libc-musl = "null"
+COMPATIBLE_HOST:libc-musl = "null"
 
-RDEPENDS_${PN} = "bash binutils"
-RDEPENDS_kpatch-build = "bash glibc-utils"
+RDEPENDS:${PN} = "bash binutils"
+RDEPENDS:kpatch-build = "bash glibc-utils"
 
-FILES_${PN} = " \
+FILES:${PN} = " \
 	${sbindir}/kpatch \
 	${systemd_system_unitdir}/kpatch.service \
 	${mandir}/man1/kpatch.1.gz \
 	${sysconfdir}/init/kpatch.conf \
 	"
-FILES_kpatch-build = " \
+FILES:kpatch-build = " \
 	${bindir}/kpatch-build \
 	${libexecdir}/* \
 	${datadir}/kpatch \
 	${mandir}/man1/kpatch-build.1.gz \
 	"
 
-SYSTEMD_SERVICE_${PN} = "kpatch.service"
+SYSTEMD_SERVICE:${PN} = "kpatch.service"

@@ -1,5 +1,6 @@
 SUMMARY = "Compressor/archiver for creating and modifying .zip files"
 HOMEPAGE = "http://www.info-zip.org"
+DESCRIPTION = "Info-ZIP's purpose is to provide free, portable, high-quality versions of the Zip and UnZip compressor-archiver utilities that are compatible with the DOS-based PKZIP by PKWARE, Inc."
 SECTION = "console/utils"
 
 LICENSE = "BSD-3-Clause"
@@ -18,6 +19,12 @@ UPSTREAM_VERSION_UNKNOWN = "1"
 
 SRC_URI[md5sum] = "7b74551e63f8ee6aab6fbc86676c0d37"
 SRC_URI[sha256sum] = "f0e8bb1f9b7eb0b01285495a2699df3a4b766784c1765a8f1aeedf63c0806369"
+
+# Disputed and also Debian doesn't consider a vulnerability
+CVE_CHECK_WHITELIST += "CVE-2018-13410"
+
+# Not for zip but for smart contract implementation for it
+CVE_CHECK_WHITELIST += "CVE-2018-13684"
 
 # zip.inc sets CFLAGS, but what Makefile actually uses is
 # CFLAGS_NOOPT.  It will also force -O3 optimization, overriding

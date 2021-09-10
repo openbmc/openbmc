@@ -1,0 +1,35 @@
+From 207b94e37c84007b294e57878c913271aad544ef Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 11 Nov 2020 23:13:23 -0800
+Subject: [PATCH] Use cross AR during compile
+
+If AR is specifcied then it should be used instead of defaulting to 'ar'
+from host
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 31364ab..4804f7b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -92,6 +92,13 @@ GAWK_CANONICAL_HOST
+ AC_USE_SYSTEM_EXTENSIONS
+ 
+ dnl checks for programs
++m4_ifndef([AC_PROG_AR],[dnl
++  AN_MAKEVAR([AR], [AC_PROG_AR])
++  AN_PROGRAM([ar], [AC_PROG_AR])
++  AC_DEFUN([AC_PROG_AR],
++  [AC_CHECK_TOOL(AR, ar, :)])
++])
++AC_PROG_AR
+ AC_PROG_EGREP
+ AC_PROG_YACC
+ AC_PROG_LN_S
+-- 
+2.29.2
+

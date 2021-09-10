@@ -14,4 +14,4 @@ SRC_URI[sha256sum] = "5a518237e2137341d8ca6584938950525e20c28a0177e30ecaea3ba8e7
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[libnotify] = "--enable-libnotify,--disable-libnotify,libnotify"
 
-RRECOMMENDS_${PN} = "pavucontrol"
+RRECOMMENDS:${PN} = "pavucontrol"

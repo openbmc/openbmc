@@ -1,0 +1,46 @@
+From 3e571e24c730f747d18ed02ba7451e9e00480fc7 Mon Sep 17 00:00:00 2001
+From: Oleksiy Obitotskyy <oobitots@cisco.com>
+Date: Thu, 26 Nov 2020 12:00:43 -0800
+Subject: [PATCH] flex: Remove #line directives
+
+Append --noline option to flex to not
+generate #line directives with absolute file patch.
+
+Upstream-Status: Pending
+Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
+---
+ cmake/modules/FindLEX.cmake | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/cmake/modules/FindLEX.cmake b/cmake/modules/FindLEX.cmake
+index 0008bc4..ec68f84 100644
+--- a/cmake/modules/FindLEX.cmake
++++ b/cmake/modules/FindLEX.cmake
+@@ -32,11 +32,19 @@ MACRO(ADD_LEX_FILES _source _generated)
+       SET(_outc ${CMAKE_CURRENT_BINARY_DIR}/${_basename}.c)
+       SET(_outh ${CMAKE_CURRENT_BINARY_DIR}/${_basename}_lex.h)
+ 
+-      ADD_CUSTOM_COMMAND(
+-        OUTPUT ${_outc} ${_outh}
+-        COMMAND ${LEX_EXECUTABLE} -o${_outc} --header-file=${_outh} ${_in}
+-        DEPENDS ${_in}
+-      )
++      IF (DEFINED ENV{SOURCE_DATE_EPOCH})
++        ADD_CUSTOM_COMMAND(
++          OUTPUT ${_outc} ${_outh}
++          COMMAND ${LEX_EXECUTABLE} --noline -o${_outc} --header-file=${_outh} ${_in}
++          DEPENDS ${_in}
++        )
++      ELSE ()
++        ADD_CUSTOM_COMMAND(
++          OUTPUT ${_outc} ${_outh}
++          COMMAND ${LEX_EXECUTABLE} -o${_outc} --header-file=${_outh} ${_in}
++          DEPENDS ${_in}
++        )
++      ENDIF ()
+       LIST(APPEND ${_source} ${_in})
+       LIST(APPEND ${_generated} ${_outc})
+       INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+-- 
+2.26.2.Cisco
+

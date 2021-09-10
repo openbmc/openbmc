@@ -1,0 +1,9 @@
+[Unit]
+Description=Phosphor-ipmi-flash update BIOS service
+
+[Service]
+ExecStart=/usr/bin/bios-update.sh
+Type=oneshot
+
+[Install]
+WantedBy=phosphor-ipmi-flash-bios-update.target

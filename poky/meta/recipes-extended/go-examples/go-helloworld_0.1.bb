@@ -11,10 +11,12 @@ UPSTREAM_CHECK_COMMITS = "1"
 
 GO_IMPORT = "github.com/golang/example"
 GO_INSTALL = "${GO_IMPORT}/hello"
+GO_WORKDIR = "${GO_INSTALL}"
+export GO111MODULE="off"
 
 inherit go
 
 # This is just to make clear where this example is
-do_install_append() {
+do_install:append() {
     mv ${D}${bindir}/hello ${D}${bindir}/${BPN}
 }

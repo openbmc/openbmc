@@ -1,5 +1,6 @@
 SUMMARY = "Vendor Package Management for Golang"
-HOMEPAGE = "https://glide.sh"
+HOMEPAGE = "https://github.com/Masterminds/glide"
+DESCRIPTION = "Glide is a Vendor Package Management for Golang"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/LICENSE;md5=54905cf894f8cc416a92f4fc350c35b2"
 
@@ -13,15 +14,15 @@ inherit go
 # tool build to fail.
 export GO111MODULE = "off"
 
-RDEPENDS_${PN}-dev += "bash"
-RDEPENDS_${PN}-ptest += "bash"
+RDEPENDS:${PN}-dev += "bash"
+RDEPENDS:${PN}-ptest += "bash"
 
 BBCLASSEXTEND = "native nativesdk"
 
 # for x86 ends with textrel in ${PN}
 # http://errors.yoctoproject.org/Errors/Details/185631/
 # ERROR: QA Issue: ELF binary '/work/i586-oe-linux/glide/0.13.1-r0/packages-split/glide/usr/bin/glide' has relocations in .text [textrel]
-INSANE_SKIP_${PN} += "textrel"
+INSANE_SKIP:${PN} += "textrel"
 
 # for aarch64 ends with textrel in ${PN}-ptest
 # http://errors.yoctoproject.org/Errors/Details/185633/
@@ -36,7 +37,7 @@ INSANE_SKIP_${PN} += "textrel"
 # ELF binary '/work/aarch64-oe-linux/glide/0.13.1-r0/packages-split/glide-ptest/usr/lib/glide/ptest/github.com/Masterminds/glide/util/util.test' has relocations in .text
 # ELF binary '/work/aarch64-oe-linux/glide/0.13.1-r0/packages-split/glide-ptest/usr/lib/glide/ptest/github.com/Masterminds/glide/action/action.test' has relocations in .text
 # ELF binary '/work/aarch64-oe-linux/glide/0.13.1-r0/packages-split/glide-ptest/usr/lib/glide/ptest/github.com/Masterminds/glide/cache/cache.test' has relocations in .text [textrel]
-INSANE_SKIP_${PN}-ptest += "textrel"
+INSANE_SKIP:${PN}-ptest += "textrel"
 
 # fails to run task compile_ptest_base on mips
-PTEST_ENABLED_mipsarch = "0"
+PTEST_ENABLED:mipsarch = "0"

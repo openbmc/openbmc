@@ -21,4 +21,4 @@ do_install() {
         install -D fans.yaml ${D}${control_datadir}/fans.yaml
 }
 
-FILES_${PN} += "${control_datadir}/fans.yaml"
+FILES:${PN} += "${control_datadir}/fans.yaml"

@@ -14,17 +14,17 @@ PROVIDES += "virtual/obmc-chassis-mgmt"
 PROVIDES += "virtual/obmc-fan-mgmt"
 PROVIDES += "virtual/obmc-flash-mgmt"
 
-RPROVIDES_${PN}-chassis += "virtual-obmc-chassis-mgmt"
-RPROVIDES_${PN}-fans += "virtual-obmc-fan-mgmt"
-RPROVIDES_${PN}-flash += "virtual-obmc-flash-mgmt"
+RPROVIDES:${PN}-chassis += "virtual-obmc-chassis-mgmt"
+RPROVIDES:${PN}-fans += "virtual-obmc-fan-mgmt"
+RPROVIDES:${PN}-flash += "virtual-obmc-flash-mgmt"
 
-SUMMARY_${PN}-chassis = "GSJ Chassis"
-RDEPENDS_${PN}-chassis = ""
+SUMMARY:${PN}-chassis = "GSJ Chassis"
+RDEPENDS:${PN}-chassis = ""
 
-SUMMARY_${PN}-fans = "GSJ Fans"
-RDEPENDS_${PN}-fans = ""
+SUMMARY:${PN}-fans = "GSJ Fans"
+RDEPENDS:${PN}-fans = ""
 
-SUMMARY_${PN}-flash = "GSJ Flash"
-RDEPENDS_${PN}-flash = " \
+SUMMARY:${PN}-flash = "GSJ Flash"
+RDEPENDS:${PN}-flash = " \
         phosphor-ipmi-flash \
         "

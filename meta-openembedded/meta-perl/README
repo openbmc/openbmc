@@ -36,7 +36,7 @@ help for each package.
 
         1) vim local.conf:
         ...
-        IMAGE_INSTALL_append = " libdbd-sqlite-perl"
+        IMAGE_INSTALL:append = " libdbd-sqlite-perl"
         PERL_DBM_TEST = "1"
         ...
         2) build core-image-sato and boot the target
@@ -78,7 +78,7 @@ Send patches / pull requests to openembedded-devel@lists.openembedded.org with
 '[meta-perl]' in the subject.
 
 When sending single patches, please using something like:
-'git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix=meta-perl][PATCH'
+git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix='meta-perl][PATCH'
 
 Layer maintainers:
     Hongxu Jia <hongxu.jia@windriver.com>
@@ -90,4 +90,3 @@ License
 All metadata is MIT licensed unless otherwise stated. Source code included
 in tree for individual recipes is under the LICENSE stated in each recipe
 (.bb file) unless otherwise stated.
-

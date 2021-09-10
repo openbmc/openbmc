@@ -1,0 +1,5 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:${THISDIR}/../../../../recipes-kernel/linux/files:"
+SRC_URI:append:gbmc = " file://gbmc.cfg"
+SRC_URI:append:gbmc = " file://gbmc-nuvoton.cfg"
+SRC_URI:append:gbmc:dev = " file://gbmc-dev.cfg"
+SRC_URI:append:gbmc:prod = " file://gbmc-prod.cfg"

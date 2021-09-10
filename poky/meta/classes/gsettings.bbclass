@@ -13,30 +13,30 @@ python __anonymous() {
     pkg = d.getVar("GSETTINGS_PACKAGE")
     if pkg:
         d.appendVar("PACKAGE_WRITE_DEPS", " glib-2.0-native")
-        d.appendVar("RDEPENDS_" + pkg, " ${MLPREFIX}glib-2.0-utils")
-        d.appendVar("FILES_" + pkg, " ${datadir}/glib-2.0/schemas")
+        d.appendVar("RDEPENDS:" + pkg, " ${MLPREFIX}glib-2.0-utils")
+        d.appendVar("FILES:" + pkg, " ${datadir}/glib-2.0/schemas")
 }
 
 gsettings_postinstrm () {
 	glib-compile-schemas $D${datadir}/glib-2.0/schemas
 }
 
-python populate_packages_append () {
+python populate_packages:append () {
     pkg = d.getVar('GSETTINGS_PACKAGE')
     if pkg:
         bb.note("adding gsettings postinst scripts to %s" % pkg)
 
-        postinst = d.getVar('pkg_postinst_%s' % pkg) or d.getVar('pkg_postinst')
+        postinst = d.getVar('pkg_postinst:%s' % pkg) or d.getVar('pkg_postinst')
         if not postinst:
             postinst = '#!/bin/sh\n'
         postinst += d.getVar('gsettings_postinstrm')
-        d.setVar('pkg_postinst_%s' % pkg, postinst)
+        d.setVar('pkg_postinst:%s' % pkg, postinst)
 
         bb.note("adding gsettings postrm scripts to %s" % pkg)
 
-        postrm = d.getVar('pkg_postrm_%s' % pkg) or d.getVar('pkg_postrm')
+        postrm = d.getVar('pkg_postrm:%s' % pkg) or d.getVar('pkg_postrm')
         if not postrm:
             postrm = '#!/bin/sh\n'
         postrm += d.getVar('gsettings_postinstrm')
-        d.setVar('pkg_postrm_%s' % pkg, postrm)
+        d.setVar('pkg_postrm:%s' % pkg, postrm)
 }

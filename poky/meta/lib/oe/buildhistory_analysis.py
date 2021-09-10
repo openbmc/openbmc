@@ -213,6 +213,7 @@ class FileChange:
     changetype_perms = 'P'
     changetype_ownergroup = 'O'
     changetype_link = 'L'
+    changetype_move = 'M'
 
     def __init__(self, path, changetype, oldvalue = None, newvalue = None):
         self.path = path
@@ -251,9 +252,10 @@ class FileChange:
             return '%s changed owner/group from %s to %s' % (self.path, self.oldvalue, self.newvalue)
         elif self.changetype == self.changetype_link:
             return '%s changed symlink target from %s to %s' % (self.path, self.oldvalue, self.newvalue)
+        elif self.changetype == self.changetype_move:
+            return '%s moved to %s' % (self.path, self.oldvalue)
         else:
             return '%s changed (unknown)' % self.path
-
 
 def blob_to_dict(blob):
     alines = [line for line in blob.data_stream.read().decode('utf-8').splitlines()]
@@ -281,11 +283,14 @@ def file_list_to_dict(lines):
             adict[path] = splitv[0:3]
     return adict
 
+numeric_removal = str.maketrans('0123456789', 'XXXXXXXXXX')
 
 def compare_file_lists(alines, blines, compare_ownership=True):
     adict = file_list_to_dict(alines)
     bdict = file_list_to_dict(blines)
     filechanges = []
+    additions = []
+    removals = []
     for path, splitv in adict.items():
         newsplitv = bdict.pop(path, None)
         if newsplitv:
@@ -318,11 +323,67 @@ def compare_file_lists(alines, blines, compare_ownership=True):
                 if oldvalue != newvalue:
                     filechanges.append(FileChange(path, FileChange.changetype_link, oldvalue, newvalue))
         else:
-            filechanges.append(FileChange(path, FileChange.changetype_remove))
+            removals.append(path)
 
     # Whatever is left over has been added
     for path in bdict:
-        filechanges.append(FileChange(path, FileChange.changetype_add))
+        additions.append(path)
+
+    # Rather than print additions and removals, its nicer to print file 'moves'
+    # where names or paths are similar.
+    revmap_remove = {}
+    for removal in removals:
+        translated = removal.translate(numeric_removal)
+        if translated not in revmap_remove:
+            revmap_remove[translated] = []
+        revmap_remove[translated].append(removal)
+
+    #
+    # We want to detect renames of large trees of files like
+    # /lib/modules/5.4.40-yocto-standard to /lib/modules/5.4.43-yocto-standard
+    #
+    renames = {}
+    for addition in additions.copy():
+        if addition not in additions:
+            continue
+        translated = addition.translate(numeric_removal)
+        if translated in revmap_remove:
+            if len(revmap_remove[translated]) != 1:
+                continue
+            removal = revmap_remove[translated][0]
+            commondir = addition.split("/")
+            commondir2 = removal.split("/")
+            idx = None
+            for i in range(len(commondir)):
+                if commondir[i] != commondir2[i]:
+                    idx = i
+                    break
+            commondir = "/".join(commondir[:i+1])
+            commondir2 = "/".join(commondir2[:i+1])
+            # If the common parent is in one dict and not the other its likely a rename
+            # so iterate through those files and process as such
+            if commondir2 not in bdict and commondir not in adict:
+                if commondir not in renames:
+                    renames[commondir] = commondir2
+                    for addition2 in additions.copy():
+                        if addition2.startswith(commondir):
+                            removal2 = addition2.replace(commondir, commondir2)
+                            if removal2 in removals:
+                                additions.remove(addition2)
+                                removals.remove(removal2)
+                    continue
+            filechanges.append(FileChange(removal, FileChange.changetype_move, addition))
+            if addition in additions:
+                additions.remove(addition)
+            if removal in removals:
+                removals.remove(removal)
+    for rename in renames:
+        filechanges.append(FileChange(renames[rename], FileChange.changetype_move, rename))
+
+    for addition in additions:
+        filechanges.append(FileChange(addition, FileChange.changetype_add))
+    for removal in removals:
+        filechanges.append(FileChange(removal, FileChange.changetype_remove))
 
     return filechanges
 

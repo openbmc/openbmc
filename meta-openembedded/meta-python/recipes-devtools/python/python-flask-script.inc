@@ -7,6 +7,6 @@ SRC_URI[sha256sum] = "6425963d91054cfcc185807141c7314a9c5ad46325911bd24dcb489bd0
 
 PYPI_PACKAGE = "Flask-Script"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     ${PYTHON_PN}-flask \
     "

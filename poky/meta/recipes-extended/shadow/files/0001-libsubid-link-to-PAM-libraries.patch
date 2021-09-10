@@ -1,0 +1,31 @@
+From 4f44617af3a0c59be267ac5fcc33586e3783f5e6 Mon Sep 17 00:00:00 2001
+From: Xi Ruoyao <xry111@mengyan1223.wang>
+Date: Fri, 23 Jul 2021 14:38:08 +0800
+Subject: [PATCH] libsubid: link to PAM libraries
+
+libsubid.so links to libmisc.a, which contains several routines referring to
+PAM functions.
+
+Upstream-Status: Backport [https://github.com/shadow-maint/shadow/commit/f4a84efb468b8be21be124700ce35159c444e9d6]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ libsubid/Makefile.am | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libsubid/Makefile.am b/libsubid/Makefile.am
+index cdc41fe6..99308c1f 100644
+--- a/libsubid/Makefile.am
++++ b/libsubid/Makefile.am
+@@ -16,7 +16,8 @@ MISCLIBS = \
+ 	$(LIBCRYPT) \
+ 	$(LIBACL) \
+ 	$(LIBATTR) \
+-	$(LIBTCB)
++	$(LIBTCB) \
++	$(LIBPAM)
+ 
+ libsubid_la_LIBADD = \
+ 	$(top_builddir)/lib/libshadow.la \
+-- 
+2.31.1
+

@@ -30,20 +30,20 @@ python do_build() {
 addtask build
 """
     append = """
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI_append = " file://appendtest.txt"
+SRC_URI:append = " file://appendtest.txt"
 
-sysroot_stage_all_append() {
+sysroot_stage_all:append() {
 	install -m 644 ${WORKDIR}/appendtest.txt ${SYSROOT_DESTDIR}/
 }
 
 """
 
     append2 = """
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI_append = " file://appendtest.txt"
+SRC_URI:append = " file://appendtest.txt"
 """
     layerappend = ''
 

@@ -1,4 +1,4 @@
-FILES_${PN}-dev += "${bindir}/*-config"
+FILES:${PN}-dev += "${bindir}/*-config"
  
 # The namespaces can clash here hence the two step replace
 def get_binconfig_mangle(d):

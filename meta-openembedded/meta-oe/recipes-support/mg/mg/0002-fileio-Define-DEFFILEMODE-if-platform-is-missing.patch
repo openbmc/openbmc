@@ -8,13 +8,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  fileio.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/fileio.c b/fileio.c
-index 9b69665..a852fd2 100644
 --- a/fileio.c
 +++ b/fileio.c
-@@ -28,6 +28,10 @@
- #include "kbd.h"
- #include "pathnames.h"
+@@ -36,6 +36,10 @@
+ #define DEFFILEMODE 0666
+ #endif
  
 +#if !defined(DEFFILEMODE)
 +# define DEFFILEMODE (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)/* 0666*/
@@ -23,6 +21,3 @@ index 9b69665..a852fd2 100644
  static char *bkuplocation(const char *);
  static int   bkupleavetmp(const char *);
  
--- 
-2.12.2
-

@@ -29,7 +29,7 @@ PACKAGE_FEED_GPG_BACKEND ?= 'local'
 PACKAGE_FEED_GPG_SIGNATURE_TYPE ?= 'ASC'
 
 # Make feed signing key to be present in rootfs
-FEATURE_PACKAGES_package-management_append = " signing-keys-packagefeed"
+FEATURE_PACKAGES_package-management:append = " signing-keys-packagefeed"
 
 python () {
     # Check sanity of configuration

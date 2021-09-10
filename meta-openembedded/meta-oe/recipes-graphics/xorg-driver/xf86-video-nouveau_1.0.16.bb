@@ -8,7 +8,7 @@ DESCRIPTION = "Open-source X.org graphics driver for NVIDIA graphics"
 
 DEPENDS += "virtual/libx11 libxvmc drm xorgproto \
             virtual/libgl libpciaccess"
-RDEPENDS_${PN} += "xserver-xorg-module-exa"
+RDEPENDS:${PN} += "xserver-xorg-module-exa"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES += "opengl"

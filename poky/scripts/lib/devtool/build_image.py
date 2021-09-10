@@ -113,7 +113,7 @@ def build_image_task(config, basepath, workspace, image, add_packages=None, task
                 with open(appendfile, 'w') as afile:
                     if packages:
                         # include packages from workspace recipes into the image
-                        afile.write('IMAGE_INSTALL_append = " %s"\n' % ' '.join(packages))
+                        afile.write('IMAGE_INSTALL:append = " %s"\n' % ' '.join(packages))
                         if not task:
                             logger.info('Building image %s with the following '
                                         'additional packages: %s', image, ' '.join(packages))

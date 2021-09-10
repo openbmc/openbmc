@@ -1,0 +1,31 @@
+From cc4499cd4cfcb655fc44c3f3571eee20663dafde Mon Sep 17 00:00:00 2001
+From: Andrey Zhizhikin <andrey.z@gmail.com>
+Date: Wed, 3 Feb 2021 20:44:34 +0000
+Subject: [PATCH] configure.ac: check for CPP prog
+
+Absence of check for CPP_PROG causes following build errors:
+| checking TCP_CONGESTION socket option... ../git/configure: line 14427: CPP: command not found
+| ../git/configure: line 14553: ac_fn_c_try_cpp: command not found
+| ../git/configure: line 14553: ac_fn_c_try_cpp: command not found
+
+Upstream-Status: Pending
+Signed-off-by: Andrey Zhizhikin <andrey.z@gmail.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 939cf0a..f75b398 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -47,6 +47,7 @@ AC_CANONICAL_HOST
+ # Checks for tools: c compiler, ranlib (used for creating static libraries),
+ # symlinks and libtool
+ AC_PROG_CC
++AC_PROG_CPP
+ AC_PROG_RANLIB
+ AC_PROG_LN_S
+ AC_PROG_LIBTOOL
+-- 
+2.17.1
+

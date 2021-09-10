@@ -9,6 +9,7 @@
 
 #include <argp.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <dwarf.h>
 #include <elfutils/libdw.h>
@@ -83,13 +84,15 @@ process_cu (Dwarf_Die *cu_die)
 int
 main (int argc, char **argv)
 {
-  char* args[3];
+  char* args[5];
   int res = 0;
   Dwfl *dwfl;
   Dwarf_Addr bias;
   
-  if (argc != 2)
+  if (argc != 2) {
     fprintf(stderr, "Usage %s <file>", argv[0]);
+    exit(EXIT_FAILURE);
+  }
   
   // Pretend "dwarfsrcfiles -e <file>" was given, so we can use standard
   // dwfl argp parser to open the file for us and get our Dwfl. Useful
@@ -98,8 +101,12 @@ main (int argc, char **argv)
   args[0] = argv[0];
   args[1] = "-e";
   args[2] = argv[1];
+  // We don't want to follow debug linked files due to the way OE processes
+  // files, could race against changes in the linked binary (e.g. objcopy on it)
+  args[3] = "--debuginfo-path";
+  args[4] = "/not/exist";
   
-  argp_parse (dwfl_standard_argp (), 3, args, 0, NULL, &dwfl);
+  argp_parse (dwfl_standard_argp (), 5, args, 0, NULL, &dwfl);
   
   Dwarf_Die *cu = NULL;
   while ((cu = dwfl_nextcu (dwfl, cu, &bias)) != NULL)

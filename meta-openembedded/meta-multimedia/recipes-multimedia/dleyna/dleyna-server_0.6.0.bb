@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
                     file://libdleyna/server/server.c;endline=22;md5=437455d8aeff69ebd0996a76c67397bb"
 
 DEPENDS = "glib-2.0 gssdp gupnp gupnp-av gupnp-dlna libsoup-2.4 libxml2 dleyna-core"
-RDEPENDS_${PN} = "dleyna-connector-dbus"
+RDEPENDS:${PN} = "dleyna-connector-dbus"
 
 PV .= "+git${SRCPV}"
 SRC_URI = "git://github.com/01org/${BPN}.git"
@@ -18,5 +18,5 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
 
-FILES_${PN} += "${datadir}/dbus-1"
-FILES_${PN}-dev += "${libdir}/${PN}/*.so"
+FILES:${PN} += "${datadir}/dbus-1"
+FILES:${PN}-dev += "${libdir}/${PN}/*.so"

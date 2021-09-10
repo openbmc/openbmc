@@ -1,4 +1,4 @@
-From ec9a7742734aae5417c0ebbffce66ac353e6cae7 Mon Sep 17 00:00:00 2001
+From c5fb59ac0819b5b6d8244c613cbcf92cb09840c1 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:10:57 +0800
 Subject: [PATCH] dso link change
@@ -23,7 +23,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/Makefile.am b/src/Makefile.am
-index e462e7d..ea1215b 100644
+index 88d0ac8..c28d81f 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -45,7 +45,7 @@ libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) -ldl -lpthread
@@ -36,10 +36,10 @@ index e462e7d..ea1215b 100644
  endif
  libebl = ../libebl/libebl.a ../backends/libebl_backends.a ../libcpu/libcpu.a
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index eab4ae6..f59a01f 100644
+index c145720..72afd0e 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -516,7 +516,7 @@ libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl -lpthread
+@@ -554,7 +554,7 @@ libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl -lpthread
  libelf = ../libelf/libelf.a -lz
  libasm = ../libasm/libasm.a
  else

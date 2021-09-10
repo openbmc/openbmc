@@ -1,0 +1,32 @@
+From 153f3b83a3fed77785bd1420bed8bbafa2d791b3 Mon Sep 17 00:00:00 2001
+From: Carlos Rafael Giani <crg7475@mailbox.org>
+Date: Tue, 21 May 2019 14:01:11 +0200
+Subject: [PATCH 3/4] viv-fb: Make sure config.h is included
+
+This prevents build errors due to missing GST_API_* symbols
+
+Upstream-Status: Pending
+
+Signed-off-by: Carlos Rafael Giani <crg7475@mailbox.org>
+---
+ gst-libs/gst/gl/gl-prelude.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gst-libs/gst/gl/gl-prelude.h b/gst-libs/gst/gl/gl-prelude.h
+index 05e1f62..96ce5e6 100644
+--- a/gst-libs/gst/gl/gl-prelude.h
++++ b/gst-libs/gst/gl/gl-prelude.h
+@@ -22,6 +22,10 @@
+ #ifndef __GST_GL_PRELUDE_H__
+ #define __GST_GL_PRELUDE_H__
+ 
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
+ #include <gst/gst.h>
+ 
+ #ifdef BUILDING_GST_GL
+-- 
+2.28.0
+

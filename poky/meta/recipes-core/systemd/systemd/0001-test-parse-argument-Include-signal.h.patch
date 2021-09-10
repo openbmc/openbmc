@@ -1,0 +1,29 @@
+From 1adde6721ead386ccee6efe48038d6944b96319a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 24 May 2021 18:26:27 -0700
+Subject: [PATCH] test-parse-argument: Include signal.h
+
+Fixes
+src/test/test-parse-argument.c:49:29: error: use of undeclared identifier 'SIGABRT'
+
+Upstream-Status: Submitted [https://github.com/systemd/systemd/pull/19718]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/test/test-parse-argument.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/test/test-parse-argument.c b/src/test/test-parse-argument.c
+index 4081a9f25a..820d69f092 100644
+--- a/src/test/test-parse-argument.c
++++ b/src/test/test-parse-argument.c
+@@ -3,6 +3,7 @@
+ #include "parse-argument.h"
+ #include "stdio-util.h"
+ #include "tests.h"
++#include <signal.h>
+ 
+ static void test_parse_json_argument(void) {
+         log_info("/* %s */", __func__);
+-- 
+2.31.1
+

@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "982040db2f9cb73d7c6ab7d9d163f2ed46d1180f330c9ba2fae303649b
 
 S = "${WORKDIR}/VLGothic"
 
-do_install_append () {
+do_install:append () {
     install -D -m644 ${S}/LICENSE_E.mplus ${D}${datadir}/licenses/${PN}/COPYING_MPLUS.txt
     install -D -m644 ${S}/README.sazanami ${D}${datadir}/licenses/${PN}/COPYING_SAZANAMI.txt
     install -D -m644 ${S}/LICENSE.en ${D}${datadir}/licenses/${PN}/COPYING_VLGOTHIC.txt
@@ -25,4 +25,4 @@ do_install_append () {
 PACKAGES = "${PN}"
 FONT_PACKAGES = "${PN}"
 
-FILES_${PN} = "${datadir}/fonts/truetype ${datadir}/licenses"
+FILES:${PN} = "${datadir}/fonts/truetype ${datadir}/licenses"

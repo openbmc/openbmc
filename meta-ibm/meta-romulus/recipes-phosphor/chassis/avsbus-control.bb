@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit obmc-phosphor-systemd
 
-RDEPENDS_${PN} += "i2c-tools bash"
+RDEPENDS:${PN} += "i2c-tools bash"
 
 S = "${WORKDIR}"
 SRC_URI += "file://avsbus-enable.sh \
@@ -27,7 +27,7 @@ TGTFMT = "obmc-chassis-poweron@{0}.target"
 FMT_EN = "../${TMPL_EN}:${TGTFMT}.requires/${INSTFMT_EN}"
 FMT_DIS = "../${TMPL_DIS}:${TGTFMT}.requires/${INSTFMT_DIS}"
 
-SYSTEMD_SERVICE_${PN} += "${TMPL_EN}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_EN', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_SERVICE_${PN} += "${TMPL_DIS}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT_DIS', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE:${PN} += "${TMPL_EN}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_EN', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE:${PN} += "${TMPL_DIS}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_DIS', 'OBMC_CHASSIS_INSTANCES')}"

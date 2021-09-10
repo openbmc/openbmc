@@ -39,7 +39,7 @@ EXTRA_OECONF += "--disable-rpath \
                  --with-libiconv=${STAGING_DIR_HOST}${prefix}\
                 "
 
-do_install_append() {
+do_install:append() {
      # add this link for cross check python module existence. eg: on x86-64 host, check python module
      # under recipe-sysroot which is mips64.
      cd ${D}${PYTHON_SITEPACKAGES_DIR}; ln -s tdb.*.so tdb.so
@@ -47,10 +47,10 @@ do_install_append() {
 
 PACKAGES += "tdb-tools python3-tdb"
 
-RPROVIDES_${PN}-dbg += "python3-tdb-dbg"
+RPROVIDES:${PN}-dbg += "python3-tdb-dbg"
 
-FILES_${PN} = "${libdir}/*.so.*"
-FILES_tdb-tools = "${bindir}/*"
-FILES_python3-tdb = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"
-RDEPENDS_python3-tdb = "python3"
-INSANE_SKIP_${MLPREFIX}python3-tdb = "dev-so"
+FILES:${PN} = "${libdir}/*.so.*"
+FILES:tdb-tools = "${bindir}/*"
+FILES:python3-tdb = "${libdir}/python${PYTHON_BASEVERSION}/site-packages/*"
+RDEPENDS:python3-tdb = "python3"
+INSANE_SKIP:${MLPREFIX}python3-tdb = "dev-so"

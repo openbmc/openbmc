@@ -1,0 +1,27 @@
+{
+    "gpio_configs": {
+
+        "power_config": {
+            "power_good_in": "PGOOD",
+            "power_up_outs": [
+            ],
+            "reset_outs": [
+                {"name": "BMC_S0_SYSRESET_N", "polarity": false}
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "PGOOD",
+            "num": 200,
+            "direction": "in"
+        },
+        {
+            "name": "BMC_S0_SYSRESET_N",
+            "num": 65,
+            "direction": "out"
+        }
+    ]
+}
+

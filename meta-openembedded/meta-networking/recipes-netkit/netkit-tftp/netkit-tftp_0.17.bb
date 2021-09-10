@@ -16,7 +16,7 @@ SRC_URI[archive.sha256sum] = "3a43c0010d4e61f412563fd83769d4667d8b8e82903526d21c
 SRC_URI[patch18.md5sum] = "cb29e7a33dd85105ba6e6ec4f971e42c"
 SRC_URI[patch18.sha256sum] = "092437d27b4fa88c044ef6290372fee5ce06d223607f0e22a6e527065c8930e7"
 
-inherit autotools-brokensep
+inherit autotools-brokensep update-alternatives
 
 do_configure () {
     ./configure --prefix=${prefix}
@@ -46,10 +46,14 @@ do_install () {
 }
 
 PACKAGES = "${PN}-client ${PN}-server ${PN}-doc ${BPN}-dbg"
-FILES_${PN}-client = "${bindir}/*"
-FILES_${PN}-server = "${sbindir}/* ${sysconfdir}/xinetd.d/*"
-FILES_${PN}-doc = "${mandir}"
-FILES_${PN}-dbg = "${prefix}/src/debug \
+FILES:${PN}-client = "${bindir}/*"
+FILES:${PN}-server = "${sbindir}/* ${sysconfdir}/xinetd.d/*"
+FILES:${PN}-doc = "${mandir}"
+FILES:${PN}-dbg = "${prefix}/src/debug \
     ${bindir}/.debug ${sbindir}/.debug"
 
-RDEPENDS_${PN}-server = "tcp-wrappers xinetd"
+RDEPENDS:${PN}-server = "tcp-wrappers xinetd"
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE:${PN}-client = "tftp"
+ALTERNATIVE_LINK_NAME[tftp] = "${bindir}/tftp"

@@ -5,7 +5,7 @@
 
 DEFAULTTUNE ?= "powerpc"
 
-TUNE_PKGARCH = "${TUNE_PKGARCH_tune-${DEFAULTTUNE}}"
+TUNE_PKGARCH = "${TUNE_PKGARCH:tune-${DEFAULTTUNE}}"
 ABIEXTENSION ?= ""
 
 # Endian
@@ -30,22 +30,22 @@ TUNEVALID[altivec] = "Altivec"
 # Basic tune definitions
 AVAILTUNES += "powerpc powerpc-nf powerpcle powerpcle-nf" 
 
-TUNE_FEATURES_tune-powerpc-nf = "m32 fpu-soft bigendian"
-BASE_LIB_tune-powerpc-nf = "lib"
-TUNE_PKGARCH_tune-powerpc-nf = "powerpc-nf"
-PACKAGE_EXTRA_ARCHS_tune-powerpc-nf = "powerpc-nf"
+TUNE_FEATURES:tune-powerpc-nf = "m32 fpu-soft bigendian"
+BASE_LIB:tune-powerpc-nf = "lib"
+TUNE_PKGARCH:tune-powerpc-nf = "powerpc-nf"
+PACKAGE_EXTRA_ARCHS:tune-powerpc-nf = "powerpc-nf"
 
-TUNE_FEATURES_tune-powerpc = "m32 fpu-hard bigendian"
-BASE_LIB_tune-powerpc = "lib"
-TUNE_PKGARCH_tune-powerpc = "powerpc"
-PACKAGE_EXTRA_ARCHS_tune-powerpc = "powerpc"
+TUNE_FEATURES:tune-powerpc = "m32 fpu-hard bigendian"
+BASE_LIB:tune-powerpc = "lib"
+TUNE_PKGARCH:tune-powerpc = "powerpc"
+PACKAGE_EXTRA_ARCHS:tune-powerpc = "powerpc"
 
-TUNE_FEATURES_tune-powerpcle-nf = "m32 fpu-soft"
-BASE_LIB_tune-powerpcle-nf = "lib"
-TUNE_PKGARCH_tune-powerpcle-nf = "powerpcle-nf"
-PACKAGE_EXTRA_ARCHS_tune-powerpcle-nf = "powerpcle-nf"
+TUNE_FEATURES:tune-powerpcle-nf = "m32 fpu-soft"
+BASE_LIB:tune-powerpcle-nf = "lib"
+TUNE_PKGARCH:tune-powerpcle-nf = "powerpcle-nf"
+PACKAGE_EXTRA_ARCHS:tune-powerpcle-nf = "powerpcle-nf"
 
-TUNE_FEATURES_tune-powerpcle = "m32 fpu-hard"
-BASE_LIB_tune-powerpcle = "lib"
-TUNE_PKGARCH_tune-powerpcle = "powerpcle"
-PACKAGE_EXTRA_ARCHS_tune-powerpcle = "powerpcle"
+TUNE_FEATURES:tune-powerpcle = "m32 fpu-hard"
+BASE_LIB:tune-powerpcle = "lib"
+TUNE_PKGARCH:tune-powerpcle = "powerpcle"
+PACKAGE_EXTRA_ARCHS:tune-powerpcle = "powerpcle"

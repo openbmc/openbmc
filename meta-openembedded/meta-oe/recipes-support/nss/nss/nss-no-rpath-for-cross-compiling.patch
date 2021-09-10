@@ -1,12 +1,17 @@
-nss:no rpath for cross compiling
+From dc51214895bcd63fc8eb8d1fe7941cd3e5500620 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 7 Mar 2020 08:34:02 -0800
+Subject: [PATCH] nss:no rpath for cross compiling
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Upstream-Status: Inappropriate [configuration]
+
 ---
  nss/cmd/platlibs.mk | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/nss/cmd/platlibs.mk b/nss/cmd/platlibs.mk
+index 6401778..e5c4e16 100644
 --- a/nss/cmd/platlibs.mk
 +++ b/nss/cmd/platlibs.mk
 @@ -18,9 +18,9 @@ endif
@@ -21,6 +26,3 @@ diff --git a/nss/cmd/platlibs.mk b/nss/cmd/platlibs.mk
  endif
  endif
  
--- 
-1.8.1.2
-

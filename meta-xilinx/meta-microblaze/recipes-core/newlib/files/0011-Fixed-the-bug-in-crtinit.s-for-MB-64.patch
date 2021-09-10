@@ -1,0 +1,25 @@
+From e0e6f5367eede4292d31c3dd901425bcd251595a Mon Sep 17 00:00:00 2001
+From: Nagaraju <nmekala@xilinx.com>
+Date: Tue, 14 Jan 2020 22:32:30 +0530
+Subject: [PATCH 11/11] Fixed the bug in crtinit.s for MB-64
+
+---
+ libgloss/microblaze/crtinit.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libgloss/microblaze/crtinit.S b/libgloss/microblaze/crtinit.S
+index 854117536..f79140734 100644
+--- a/libgloss/microblaze/crtinit.S
++++ b/libgloss/microblaze/crtinit.S
+@@ -48,7 +48,7 @@ _crtinit:
+ 
+ .Lloopsbss:	
+ 	sli	r0, r6, 0
+-	addli	r6, r6, 4
++	addli	r6, r6, 8
+ 	rsubl	r18, r6, r7
+ 	beagti	r18, .Lloopsbss
+ .Lendsbss:
+-- 
+2.17.1
+

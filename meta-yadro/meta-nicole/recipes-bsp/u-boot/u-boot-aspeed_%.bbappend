@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_append := "${THISDIR}/files:"
+FILESEXTRAPATHS:append := "${THISDIR}/files:"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
     file://0001-Add-system-reset-status-support.patch \
     file://0002-config-ast-common-set-fieldmode-to-true.patch \
     file://0003-aspeed-add-gpio-support.patch \

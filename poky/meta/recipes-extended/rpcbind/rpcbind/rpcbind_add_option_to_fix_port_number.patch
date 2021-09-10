@@ -15,7 +15,7 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  3 files changed, 26 insertions(+), 3 deletions(-)
 
 diff --git a/man/rpcbind.8 b/man/rpcbind.8
-index af6200f..2e6146b 100644
+index fbf0ace..66f7c08 100644
 --- a/man/rpcbind.8
 +++ b/man/rpcbind.8
 @@ -11,7 +11,7 @@
@@ -27,17 +27,17 @@ index af6200f..2e6146b 100644
  .Sh DESCRIPTION
  The
  .Nm
-@@ -107,6 +107,8 @@ will automatically add
+@@ -96,6 +96,8 @@ will automatically add
  and if IPv6 is enabled,
  .Li ::1
  to the list.
 +.It Fl p
 +Bind for fixed UDP port number
- .It Fl i
- .Dq Insecure
- mode.
+ If no
+ .Fl h
+ option is specified,
 diff --git a/src/rpcb_svc_com.c b/src/rpcb_svc_com.c
-index 8aef9e5..c2632a4 100644
+index 1743dad..07a1c75 100644
 --- a/src/rpcb_svc_com.c
 +++ b/src/rpcb_svc_com.c
 @@ -48,6 +48,7 @@
@@ -60,8 +60,8 @@ index 8aef9e5..c2632a4 100644
  	int fd;
  	struct rmtcallfd_list *rmt;
  	SVCXPRT *xprt;
-+	struct __rpc_sockinfo si;
-+	struct t_bind taddr;
++        struct __rpc_sockinfo si;
++        struct t_bind taddr;
  
  	if ((fd = __rpc_nconf2fd(nconf)) == -1) {
  		if (debugging)
@@ -70,23 +70,23 @@ index 8aef9e5..c2632a4 100644
  		return (-1);
  	}
 +
-+	if (fixed_port) {
-+		__rpc_fd2sockinfo(fd, &si);
-+		memset(&taddr, 0, sizeof(taddr));
-+		taddr.addr.maxlen = taddr.addr.len = si.si_alen;
-+		taddr.addr.buf = malloc(si.si_alen);
-+		if (taddr.addr.buf == NULL) {
-+			return -1;
-+		}
-+		*(unsigned short *)(&(taddr.addr.buf[0])) = si.si_af;
-+		*(unsigned short *)(&(taddr.addr.buf[2])) = htons(fixed_port);
-+		xprt = svc_tli_create(fd, nconf, &taddr, RPC_MAXDATASIZE, RPC_MAXDATASIZE);
-+	} else
++        if (fixed_port) {
++                __rpc_fd2sockinfo(fd, &si);
++                memset(&taddr, 0, sizeof(taddr));
++                taddr.addr.maxlen = taddr.addr.len = si.si_alen;
++                taddr.addr.buf = malloc(si.si_alen);
++                if (taddr.addr.buf == NULL) {
++                        return -1;
++                }
++                *(unsigned short *)(&(taddr.addr.buf[0])) = si.si_af;
++                *(unsigned short *)(&(taddr.addr.buf[2])) = htons(fixed_port);
++                xprt = svc_tli_create(fd, nconf, &taddr, RPC_MAXDATASIZE, RPC_MAXDATASIZE);
++        } else
  	xprt = svc_tli_create(fd, 0, (struct t_bind *) 0, 0, 0);
  	if (xprt == NULL) {
  		if (debugging)
 diff --git a/src/rpcbind.c b/src/rpcbind.c
-index 137011b..dc3d2d6 100644
+index 25d8a90..36a95b9 100644
 --- a/src/rpcbind.c
 +++ b/src/rpcbind.c
 @@ -111,6 +111,7 @@ int runasdaemon = 0;
@@ -97,7 +97,7 @@ index 137011b..dc3d2d6 100644
  
  char **hosts = NULL;
  int nhosts = 0;
-@@ -869,7 +870,7 @@ parseargs(int argc, char *argv[])
+@@ -884,7 +885,7 @@ parseargs(int argc, char *argv[])
  {
  	int c;
  	oldstyle_local = 1;
@@ -106,25 +106,25 @@ index 137011b..dc3d2d6 100644
  		switch (c) {
  		case 'a':
  			doabort = 1;	/* when debugging, do an abort on */
-@@ -887,6 +888,9 @@ parseargs(int argc, char *argv[])
+@@ -902,6 +903,9 @@ parseargs(int argc, char *argv[])
  			if (hosts[nhosts - 1] == NULL)
  				errx(1, "Out of memory");
  			break;
-+		case 'p':
-+			fixed_port = atoi(optarg);
-+			break;
++                case 'p':
++                        fixed_port = atoi(optarg);
++                        break;
  		case 'i':
  			insecure = 1;
  			break;
-@@ -905,7 +909,7 @@ parseargs(int argc, char *argv[])
+@@ -920,7 +924,7 @@ parseargs(int argc, char *argv[])
  			break;
  #endif
  		default:	/* error */
 -			fprintf(stderr,	"usage: rpcbind [-adhilswf]\n");
-+			fprintf(stderr,	"usage: rpcbind [-adhpilswf]\n");
++			fprintf(stderr, "usage: rpcbind [-adhpilswf]\n");
  			exit (1);
  		}
  	}
 -- 
-1.9.1
+2.25.1
 

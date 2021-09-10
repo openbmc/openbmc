@@ -1,0 +1,65 @@
+From 39572baac462f16b39dc385751d5c642646718d3 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 4 Aug 2021 17:05:10 +0800
+Subject: [PATCH] cmake: remove build flags
+
+Remove the build flags to improve reproducibility.
+
+Upstream-Status: Inappropriate[oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ config/cmake/libh5cc.in                |  2 +-
+ config/cmake/libhdf5.settings.cmake.in | 12 ++++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/config/cmake/libh5cc.in b/config/cmake/libh5cc.in
+index f462d56..93c7137 100644
+--- a/config/cmake/libh5cc.in
++++ b/config/cmake/libh5cc.in
+@@ -29,4 +29,4 @@ printf 'dir is %s\n' "$dir"
+ 
+ export PKG_CONFIG_PATH=$dir/lib/pkgconfig
+ 
+-@_PKG_CONFIG_COMPILER@ `pkg-config --define-variable=prefix=$dir --cflags --libs @_PKG_CONFIG_LIBNAME@-@_PKG_CONFIG_VERSION@` $@
++`pkg-config --define-variable=prefix=$dir --cflags --libs @_PKG_CONFIG_LIBNAME@-@_PKG_CONFIG_VERSION@` $@
+diff --git a/config/cmake/libhdf5.settings.cmake.in b/config/cmake/libhdf5.settings.cmake.in
+index c337dea..0ab9066 100644
+--- a/config/cmake/libhdf5.settings.cmake.in
++++ b/config/cmake/libhdf5.settings.cmake.in
+@@ -16,8 +16,8 @@ General Information:
+ Compiling Options:
+ ------------------
+                Compilation Mode: @CMAKE_BUILD_TYPE@ @CMAKE_C_COMPILER_VERSION@
+-                     C Compiler: @CMAKE_C_COMPILER@
+-                         CFLAGS: @CMAKE_C_FLAGS@
++                     C Compiler:
++                         CFLAGS:
+                       H5_CFLAGS: @H5_CFLAGS@
+                       AM_CFLAGS: @AM_CFLAGS@
+                        CPPFLAGS: @CPPFLAGS@
+@@ -29,8 +29,8 @@ Compiling Options:
+                         LDFLAGS: @CMAKE_SHARED_LINKER_FLAGS@
+                      AM_LDFLAGS: @AM_LDFLAGS@
+                 Extra libraries: @LINK_LIBS@
+-                       Archiver: @CMAKE_AR@
+-                         Ranlib: @CMAKE_RANLIB@
++                       Archiver:
++                         Ranlib:
+               Debugged Packages: @DEBUG_PKG@
+                     API Tracing: @HDF5_ENABLE_TRACE@
+ 
+@@ -46,8 +46,8 @@ Languages:
+ @BUILD_FORTRAN_CONDITIONAL_TRUE@         Static Fortran Library: YES
+ 
+                             C++: @HDF5_BUILD_CPP_LIB@
+-@BUILD_CXX_CONDITIONAL_TRUE@                   C++ Compiler: @CMAKE_CXX_COMPILER@ @CMAKE_CXX_COMPILER_VERSION@
+-@BUILD_CXX_CONDITIONAL_TRUE@                      C++ Flags: @CMAKE_CXX_FLAGS@
++@BUILD_CXX_CONDITIONAL_TRUE@                   C++ Compiler:
++@BUILD_CXX_CONDITIONAL_TRUE@                      C++ Flags:
+ @BUILD_CXX_CONDITIONAL_TRUE@                   H5 C++ Flags: @H5_CXXFLAGS@
+ @BUILD_CXX_CONDITIONAL_TRUE@                   AM C++ Flags: @AM_CXXFLAGS@
+ @BUILD_CXX_CONDITIONAL_TRUE@             Shared C++ Library: @H5_ENABLE_SHARED_LIB@
+-- 
+2.17.1
+

@@ -18,4 +18,4 @@ export IMAGE_BASENAME = "integrity-image-minimal"
 
 INHERIT += "ima-evm-rootfs"
 
-QB_KERNEL_CMDLINE_APPEND_append = " ima_appraise=fix ima_policy=tcb ima_policy=appraise_tcb"
+QB_KERNEL_CMDLINE_APPEND:append = " ima_appraise=fix ima_policy=tcb ima_policy=appraise_tcb"

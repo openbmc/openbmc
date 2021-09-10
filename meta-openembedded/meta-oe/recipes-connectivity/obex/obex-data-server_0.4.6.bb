@@ -14,4 +14,4 @@ inherit features_check autotools-brokensep pkgconfig
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
-FILES_${PN} += "${datadir}/dbus-1/"
+FILES:${PN} += "${datadir}/dbus-1/"

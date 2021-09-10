@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 inherit autotools pkgconfig
 inherit obmc-phosphor-systemd
 
-SYSTEMD_SERVICE_${PN} += "slpd-lite.service"
+SYSTEMD_SERVICE:${PN} += "slpd-lite.service"
 
 DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"

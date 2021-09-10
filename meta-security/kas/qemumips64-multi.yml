@@ -1,0 +1,14 @@
+header:
+  version: 8
+  includes:
+    - kas-security-base.yml
+
+local_conf_header:
+  multi: |
+    require conf/multilib.conf
+    MULTILIBS = "multilib:lib64 multilib:lib32"
+    DEFAULTTUNE = "mips64-n32"
+    DEFAULTTUNE:virtclass-multilib-lib64 = "mips64"
+    DEFAULTTUNE:virtclass-multilib-lib32 = "mips32r2"
+
+machine: qemumips64

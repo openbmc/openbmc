@@ -1,3 +1,15 @@
+ROOTFS_LICENSE_DIR = "${IMAGE_ROOTFS}/usr/share/common-licenses"
+
+# This requires LICENSE_CREATE_PACKAGE=1 to work too
+COMPLEMENTARY_GLOB[lic-pkgs] = "*-lic"
+
+python() {
+    if not oe.data.typed_value('LICENSE_CREATE_PACKAGE', d):
+        features = set(oe.data.typed_value('IMAGE_FEATURES', d))
+        if 'lic-pkgs' in features:
+            bb.error("'lic-pkgs' in IMAGE_FEATURES but LICENSE_CREATE_PACKAGE not enabled to generate -lic packages")
+}
+
 python write_package_manifest() {
     # Get list of installed packages
     license_image_dir = d.expand('${LICENSE_DIRECTORY}/${IMAGE_NAME}')
@@ -27,7 +39,7 @@ python license_create_manifest() {
 
         pkg_dic[pkg_name] = oe.packagedata.read_pkgdatafile(pkg_info)
         if not "LICENSE" in pkg_dic[pkg_name].keys():
-            pkg_lic_name = "LICENSE_" + pkg_name
+            pkg_lic_name = "LICENSE:" + pkg_name
             pkg_dic[pkg_name]["LICENSE"] = pkg_dic[pkg_name][pkg_lic_name]
 
     rootfs_license_manifest = os.path.join(d.getVar('LICENSE_DIRECTORY'),
@@ -40,7 +52,6 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
     import stat
 
     bad_licenses = (d.getVar("INCOMPATIBLE_LICENSE") or "").split()
-    bad_licenses = [canonical_license(d, l) for l in bad_licenses]
     bad_licenses = expand_wildcard_licenses(d, bad_licenses)
 
     whitelist = []
@@ -76,7 +87,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                 # If the package doesn't contain any file, that is, its size is 0, the license
                 # isn't relevant as far as the final image is concerned. So doing license check
                 # doesn't make much sense, skip it.
-                if pkg_dic[pkg]["PKGSIZE_%s" % pkg] == "0":
+                if pkg_dic[pkg]["PKGSIZE:%s" % pkg] == "0":
                     continue
             else:
                 # Image manifest
@@ -105,8 +116,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
     copy_lic_manifest = d.getVar('COPY_LIC_MANIFEST')
     copy_lic_dirs = d.getVar('COPY_LIC_DIRS')
     if rootfs and copy_lic_manifest == "1":
-        rootfs_license_dir = os.path.join(d.getVar('IMAGE_ROOTFS'), 
-                                'usr', 'share', 'common-licenses')
+        rootfs_license_dir = d.getVar('ROOTFS_LICENSE_DIR')
         bb.utils.mkdirhier(rootfs_license_dir)
         rootfs_license_manifest = os.path.join(rootfs_license_dir,
                 os.path.split(license_manifest)[1])
@@ -125,7 +135,6 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
 
                 licenses = os.listdir(pkg_license_dir)
                 for lic in licenses:
-                    rootfs_license = os.path.join(rootfs_license_dir, lic)
                     pkg_license = os.path.join(pkg_license_dir, lic)
                     pkg_rootfs_license = os.path.join(pkg_rootfs_license_dir, lic)
 
@@ -144,11 +153,14 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                                 bad_licenses) == False:
                             continue
 
+                        # Make sure we use only canonical name for the license file
+                        generic_lic_file = "generic_%s" % generic_lic
+                        rootfs_license = os.path.join(rootfs_license_dir, generic_lic_file)
                         if not os.path.exists(rootfs_license):
                             oe.path.copyhardlink(pkg_license, rootfs_license)
 
                         if not os.path.exists(pkg_rootfs_license):
-                            os.symlink(os.path.join('..', lic), pkg_rootfs_license)
+                            os.symlink(os.path.join('..', generic_lic_file), pkg_rootfs_license)
                     else:
                         if (oe.license.license_ok(canonical_license(d,
                                 lic), bad_licenses) == False or
@@ -200,6 +212,18 @@ def license_deployed_manifest(d):
     image_license_manifest = os.path.join(lic_manifest_dir, 'image_license.manifest')
     write_license_files(d, image_license_manifest, man_dic, rootfs=False)
 
+    link_name = d.getVar('IMAGE_LINK_NAME')
+    if link_name:
+        lic_manifest_symlink_dir = os.path.join(d.getVar('LICENSE_DIRECTORY'),
+                                    link_name)
+        # remove old symlink
+        if os.path.islink(lic_manifest_symlink_dir):
+            os.unlink(lic_manifest_symlink_dir)
+
+        # create the image dir symlink
+        if lic_manifest_dir != lic_manifest_symlink_dir:
+            os.symlink(lic_manifest_dir, lic_manifest_symlink_dir)
+
 def get_deployed_dependencies(d):
     """
     Get all the deployed dependencies of an image
@@ -208,9 +232,10 @@ def get_deployed_dependencies(d):
     deploy = {}
     # Get all the dependencies for the current task (rootfs).
     taskdata = d.getVar("BB_TASKDEPDATA", False)
+    pn = d.getVar("PN", True)
     depends = list(set([dep[0] for dep
                     in list(taskdata.values())
-                    if not dep[0].endswith("-native")]))
+                    if not dep[0].endswith("-native") and not dep[0] == pn]))
 
     # To verify what was deployed it checks the rootfs dependencies against
     # the SSTATE_MANIFESTS for "deploy" task.
@@ -244,7 +269,7 @@ def get_deployed_files(man_file):
             dep_files.append(os.path.basename(f))
     return dep_files
 
-ROOTFS_POSTPROCESS_COMMAND_prepend = "write_package_manifest; license_create_manifest; "
+ROOTFS_POSTPROCESS_COMMAND:prepend = "write_package_manifest; license_create_manifest; "
 do_rootfs[recrdeptask] += "do_populate_lic"
 
 python do_populate_lic_deploy() {
@@ -254,3 +279,13 @@ python do_populate_lic_deploy() {
 addtask populate_lic_deploy before do_build after do_image_complete
 do_populate_lic_deploy[recrdeptask] += "do_populate_lic do_deploy"
 
+python license_qa_dead_symlink() {
+    import os
+
+    for root, dirs, files in os.walk(d.getVar('ROOTFS_LICENSE_DIR')):
+        for file in files:
+            full_path = root + "/" + file
+            if os.path.islink(full_path) and not os.path.exists(full_path):
+                bb.error("broken symlink: " + full_path)
+}
+IMAGE_QA_COMMANDS += "license_qa_dead_symlink"

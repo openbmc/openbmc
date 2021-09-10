@@ -10,7 +10,7 @@ HOMEPAGE = "http://search.cpan.org/dist/Net-LibIDN/"
 DEPENDS += "libidn"
 # We must need glibc-gconvs to enable charset related functions,
 # such as Net::LibIDN::idn_to_ascii().
-RDEPENDS_${PN}_append_libc-glibc = " glibc-gconvs"
+RDEPENDS:${PN}:append:libc-glibc = " glibc-gconvs"
 
 SRC_URI = "http://search.cpan.org/CPAN/authors/id/T/TH/THOR/Net-LibIDN-${PV}.tar.gz"
 SRC_URI[md5sum] = "c3e4de2065009d67bcb1df0afb473e12"
@@ -27,8 +27,8 @@ EXTRA_CPANFLAGS += "--disable-tld"
 
 inherit cpan
 
-FILES_${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/Net/LibIDN/.debug/"
+FILES:${PN}-dbg += "${libdir}/perl/vendor_perl/*/auto/Net/LibIDN/.debug/"
 
-do_configure_prepend() {
+do_configure:prepend() {
     rm -rf ${S}/.pc/
 }

@@ -112,7 +112,7 @@ PACKAGE_CLASSES ?= "package_rpm"
 # This variable specifies the architecture to build SDK items for and means
 # you can build the SDK packages for architectures other than the machine you are
 # running the build on (i.e. building i686 packages on an x86_64 host).
-# Supported values are i686 and x86_64
+# Supported values are i686, x86_64, aarch64
 #SDKMACHINE ?= "i686"
 
 #
@@ -148,11 +148,7 @@ EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
 # enable extra features. Some available options which can be included in this variable
 # are:
 #   - 'buildstats' collect build statistics
-#   - 'image-mklibs' to reduce shared library files size for an image
-#   - 'image-prelink' in order to prelink the filesystem image
-# NOTE: if listing mklibs & prelink both, then make sure mklibs is before prelink
-# NOTE: mklibs also needs to be explicitly enabled for a given image, see local.conf.extended
-USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+USER_CLASSES ?= "buildstats"
 
 #
 # Runtime testing of images
@@ -162,7 +158,7 @@ USER_CLASSES ?= "buildstats image-mklibs image-prelink"
 # run tests against any SDK that are built. To enable this uncomment these lines.
 # See classes/test{image,sdk}.bbclass for further details.
 #IMAGE_CLASSES += "testimage testsdk"
-#TESTIMAGE_AUTO_qemuall = "1"
+#TESTIMAGE_AUTO:qemuall = "1"
 
 #
 # Interactive shell configuration
@@ -188,10 +184,10 @@ PATCHRESOLVE = "noop"
 #
 # Monitor the disk space during the build. If there is less that 1GB of space or less
 # than 100K inodes in any key build location (TMPDIR, DL_DIR, SSTATE_DIR), gracefully
-# shutdown the build. If there is less that 100MB or 1K inodes, perform a hard abort
+# shutdown the build. If there is less than 100MB or 1K inodes, perform a hard abort
 # of the build. The reason for this is that running completely out of space can corrupt
 # files and damages the build in ways which may not be easily recoverable.
-# It's necesary to monitor /tmp, if there is no space left the build will fail
+# It's necessary to monitor /tmp, if there is no space left the build will fail
 # with very exotic errors.
 BB_DISKMON_DIRS ??= "\
     STOPTASKS,${TMPDIR},1G,100K \
@@ -206,7 +202,7 @@ BB_DISKMON_DIRS ??= "\
 #
 # Shared-state files from other locations
 #
-# As mentioned above, shared state files are prebuilt cache data objects which can
+# As mentioned above, shared state files are prebuilt cache data objects which can be
 # used to accelerate build time. This variable can be used to configure the system
 # to search other mirror locations for these objects before it builds the data itself.
 #
@@ -238,14 +234,14 @@ BB_DISKMON_DIRS ??= "\
 #
 # By default native qemu will build with a builtin VNC server where graphical output can be
 # seen. The line below enables the SDL UI frontend too.
-PACKAGECONFIG_append_pn-qemu-system-native = " sdl"
+PACKAGECONFIG:append:pn-qemu-system-native = " sdl"
 # By default libsdl2-native will be built, if you want to use your host's libSDL instead of 
 # the minimal libsdl built by libsdl2-native then uncomment the ASSUME_PROVIDED line below.
 #ASSUME_PROVIDED += "libsdl2-native"
 
 # You can also enable the Gtk UI frontend, which takes somewhat longer to build, but adds
 # a handy set of menus for controlling the emulator.
-#PACKAGECONFIG_append_pn-qemu-system-native = " gtk+"
+#PACKAGECONFIG:append:pn-qemu-system-native = " gtk+"
 
 #
 # Hash Equivalence
@@ -261,7 +257,17 @@ PACKAGECONFIG_append_pn-qemu-system-native = " sdl"
 #BB_HASHSERVE = "auto"
 #BB_SIGNATURE_HANDLER = "OEEquivHash"
 
+#
+# Memory Resident Bitbake
+#
+# Bitbake's server component can stay in memory after the UI for the current command
+# has completed. This means subsequent commands can run faster since there is no need
+# for bitbake to reload cache files and so on. Number is in seconds, after which the
+# server will shut down.
+#
+#BB_SERVER_TIMEOUT = "60"
+
 # CONF_VERSION is increased each time build/conf/ changes incompatibly and is used to
 # track the version of this file when it was generated. This can safely be ignored if
 # this doesn't mean anything to you.
-CONF_VERSION = "1"
+CONF_VERSION = "2"

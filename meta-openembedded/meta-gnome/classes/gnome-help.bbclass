@@ -9,14 +9,12 @@
 #   else
 #       pack all help files to ${PN}-help-<lingua>
 
-FILES_${PN}-help = "${datadir}/*/translations"
-
 # Dummy to get yelp build & PACKAGE_NO_HELP_SPLIT set 1
-PACKAGES_append = " ${PN}-help"
-FILES_${PN}-help = "${datadir}/help"
-RRECOMMENDS_${PN}-help = "${@bb.utils.contains('DISTRO_FEATURES','helpfiles','yelp','',d)}"
+PACKAGES:append = " ${PN}-help"
+FILES:${PN}-help = "${datadir}/help"
+RRECOMMENDS:${PN}-help = "${@bb.utils.contains('DISTRO_FEATURES','helpfiles','yelp','',d)}"
 
-do_install_append() {
+do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES','helpfiles','false','true',d)}; then
         rm -rf ${D}${datadir}/help/*
     fi
@@ -55,15 +53,15 @@ python gnome_do_split_help() {
         ln = legitimize_package_name(l)
         pkg = pn + '-help-' + ln
         packages.append(pkg)
-        d.setVar('FILES_' + pkg, os.path.join(datadir, 'help', l))
-        d.setVar('RRECOMMENDS_' + pkg, '%syelp' % mlprefix)
-        d.setVar('SUMMARY_' + pkg, '%s - %s help' % (summary, l))
-        d.setVar('DESCRIPTION_' + pkg, '%s  This package contains language help files for the %s locale.' % (description, l))
+        d.setVar('FILES:' + pkg, os.path.join(datadir, 'help', l))
+        d.setVar('RRECOMMENDS:' + pkg, '%syelp' % mlprefix)
+        d.setVar('SUMMARY:' + pkg, '%s - %s help' % (summary, l))
+        d.setVar('DESCRIPTION:' + pkg, '%s  This package contains language help files for the %s locale.' % (description, l))
         if locale_section:
-            d.setVar('SECTION_' + pkg, locale_section)
+            d.setVar('SECTION:' + pkg, locale_section)
 
     d.setVar('PACKAGES', ' '.join(packages))
 }
 
-PACKAGESPLITFUNCS_prepend = "gnome_do_split_help "
+PACKAGESPLITFUNCS:prepend = "gnome_do_split_help "
 

@@ -25,5 +25,5 @@ do_install() {
     install -m 0644 ${WORKDIR}/fb.modes ${D}${sysconfdir}/
 }
 
-SYSTEMD_SERVICE_${PN} += "fbterm.service"
-SYSTEMD_ENVIRONMENT_FILE_${PN} += "fbterm"
+SYSTEMD_SERVICE:${PN} += "fbterm.service"
+SYSTEMD_ENVIRONMENT_FILE:${PN} += "fbterm"

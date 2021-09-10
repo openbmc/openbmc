@@ -1,6 +1,6 @@
-From 72c30928d3d461e0e2d20c5ff33bd96b6991d585 Mon Sep 17 00:00:00 2001
-From: Robert Yang <liezhi.yang@windriver.com>
-Date: Sat, 25 Jan 2014 23:49:44 -0500
+From 8790aa8bea736f52341a0430ff3e317d3be0f99b Mon Sep 17 00:00:00 2001
+From: Naveen Saini <naveen.kumar.saini@intel.com>
+Date: Mon, 15 Mar 2021 14:44:15 +0800
 Subject: [PATCH] autogen.sh: exclude .pc from po/POTFILES.in
 
 Exclude the .pc from po/POTFILES.in since quilt uses "patch --backup",
@@ -13,23 +13,24 @@ Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
 ---
  autogen.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/autogen.sh b/autogen.sh
-index ef43270..a7067a7 100755
+index 31b0ced7e..c63ae766c 100755
 --- a/autogen.sh
 +++ b/autogen.sh
 @@ -13,7 +13,7 @@ fi
  export LC_COLLATE=C
  unset LC_ALL
  
--find . -iname '*.[ch]' ! -ipath './grub-core/lib/libgcrypt-grub/*' ! -ipath './build-aux/*' ! -ipath './grub-core/lib/libgcrypt/src/misc.c' ! -ipath './grub-core/lib/libgcrypt/src/global.c' ! -ipath './grub-core/lib/libgcrypt/src/secmem.c'  ! -ipath './util/grub-gen-widthspec.c' ! -ipath './util/grub-gen-asciih.c' ! -ipath './gnulib/*' ! -iname './grub-core/lib/gnulib/*' |sort > po/POTFILES.in
-+find . -iname '*.[ch]' ! -ipath './grub-core/lib/libgcrypt-grub/*' ! -ipath './build-aux/*' ! -ipath './grub-core/lib/libgcrypt/src/misc.c' ! -ipath './grub-core/lib/libgcrypt/src/global.c' ! -ipath './grub-core/lib/libgcrypt/src/secmem.c'  ! -ipath './util/grub-gen-widthspec.c' ! -ipath './util/grub-gen-asciih.c' ! -ipath './gnulib/*' ! -iname './grub-core/lib/gnulib/*' ! -path './.pc/*' |sort > po/POTFILES.in
+-find . -iname '*.[ch]' ! -ipath './grub-core/lib/libgcrypt-grub/*' ! -ipath './build-aux/*' ! -ipath './grub-core/lib/libgcrypt/src/misc.c' ! -ipath './grub-core/lib/libgcrypt/src/global.c' ! -ipath './grub-core/lib/libgcrypt/src/secmem.c'  ! -ipath './util/grub-gen-widthspec.c' ! -ipath './util/grub-gen-asciih.c' ! -ipath './gnulib/*' ! -ipath './grub-core/lib/gnulib/*' |sort > po/POTFILES.in
++find . -iname '*.[ch]' ! -ipath './grub-core/lib/libgcrypt-grub/*' ! -ipath './build-aux/*' ! -ipath './grub-core/lib/libgcrypt/src/misc.c' ! -ipath './grub-core/lib/libgcrypt/src/global.c' ! -ipath './grub-core/lib/libgcrypt/src/secmem.c'  ! -ipath './util/grub-gen-widthspec.c' ! -ipath './util/grub-gen-asciih.c' ! -ipath './gnulib/*' ! -ipath './grub-core/lib/gnulib/*' ! -path './.pc/*' |sort > po/POTFILES.in
  find util -iname '*.in' ! -name Makefile.in  |sort > po/POTFILES-shell.in
  
  echo "Importing unicode..."
 -- 
-2.7.4
+2.17.1
 

@@ -1,0 +1,228 @@
+0x00:
+  /system/chassis/motherboard:
+    entityID: 7
+    entityInstance: 0x00
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: FRU File ID
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item.System:
+
+0x01:
+  /system/chassis/hsbp:
+    entityID: 7
+    entityInstance: 0x01
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: FRU File ID
+          IPMIFruSection: Board
+
+0x02:
+  /system/chassis/fan:
+    entityID: 7
+    entityInstance: 0x02
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: FRU File ID
+          IPMIFruSection: Board
+
+0x03:
+  /system/chassis/PE0: &ADD_IN_CARD_BOARD_DEFAULTS
+    entityID: 11
+    entityInstance: 0x00
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Board
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Board
+        PartNumber:
+          IPMIFruProperty: Part Number
+          IPMIFruSection: Board
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Board
+      xyz.openbmc_project.Inventory.Decorator.Revision:
+        Version:
+          IPMIFruProperty: FRU File ID
+          IPMIFruSection: Board
+  /system/chassis/PE0/PE0: &ADD_IN_CARD_PRODUCT_DEFAULTS
+    entityID: 11
+    entityInstance: 0x00
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        BuildDate:
+          IPMIFruProperty: Mfg Date
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        Model:
+          IPMIFruProperty: Model Number
+          IPMIFruSection: Product
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item:
+        PrettyName:
+          IPMIFruProperty: Name
+          IPMIFruSection: Product
+
+0x04:
+  /system/chassis/PE1:
+    entityInstance: 0x01
+    <<: *ADD_IN_CARD_BOARD_DEFAULTS
+  /system/chassis/PE1/PE1:
+    entityInstance: 0x01
+    <<: *ADD_IN_CARD_PRODUCT_DEFAULTS
+
+0x05:
+  /system/chassis/motherboard/nvme0: &NVME_BOARD_DEFAULTS
+    entityID: 4
+    entityInstance: 0x60
+    interfaces:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+        Manufacturer:
+          IPMIFruProperty: Manufacturer
+          IPMIFruSection: Product
+        SerialNumber:
+          IPMIFruProperty: Serial Number
+          IPMIFruSection: Product
+        Model:
+          IPMIFruProperty: Model Number
+          IPMIFruSection: Product
+
+0x06:
+  /system/chassis/motherboard/nvme1:
+    entityInstance: 0x61
+    <<: *NVME_BOARD_DEFAULTS
+
+0x07:
+  /system/chassis/motherboard/nvme2:
+    entityInstance: 0x62
+    <<: *NVME_BOARD_DEFAULTS
+
+0x08:
+  /system/chassis/motherboard/nvme3:
+    entityInstance: 0x63
+    <<: *NVME_BOARD_DEFAULTS
+
+0x09:
+  /system/chassis/motherboard/nvme4:
+    entityInstance: 0x64
+    <<: *NVME_BOARD_DEFAULTS
+
+0x0A:
+  /system/chassis/motherboard/nvme5:
+    entityInstance: 0x65
+    <<: *NVME_BOARD_DEFAULTS
+
+0x0B:
+  /system/chassis/motherboard/nvme6:
+    entityInstance: 0x66
+    <<: *NVME_BOARD_DEFAULTS
+
+0x0C:
+  /system/chassis/motherboard/nvme7:
+    entityInstance: 0x67
+    <<: *NVME_BOARD_DEFAULTS
+
+0x0D:
+  /system/chassis/motherboard/nvme8:
+    entityInstance: 0x68
+    <<: *NVME_BOARD_DEFAULTS
+
+0x0E:
+  /system/chassis/motherboard/nvme9:
+    entityInstance: 0x69
+    <<: *NVME_BOARD_DEFAULTS
+
+0x0F:
+  /system/chassis/motherboard/nvme10:
+    entityInstance: 0x6A
+    <<: *NVME_BOARD_DEFAULTS
+
+0x10:
+  /system/chassis/motherboard/nvme11:
+    entityInstance: 0x6B
+    <<: *NVME_BOARD_DEFAULTS
+
+0x11:
+  /system/chassis/motherboard/nvme12:
+    entityInstance: 0x6C
+    <<: *NVME_BOARD_DEFAULTS
+
+0x12:
+  /system/chassis/motherboard/nvme13:
+    entityInstance: 0x6D
+    <<: *NVME_BOARD_DEFAULTS
+
+0x13:
+  /system/chassis/motherboard/nvme14:
+    entityInstance: 0x6E
+    <<: *NVME_BOARD_DEFAULTS
+
+0x14:
+  /system/chassis/motherboard/nvme15:
+    entityInstance: 0x6F
+    <<: *NVME_BOARD_DEFAULTS

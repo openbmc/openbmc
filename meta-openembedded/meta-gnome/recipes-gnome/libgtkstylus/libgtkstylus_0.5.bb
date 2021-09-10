@@ -14,7 +14,7 @@ SRC_URI = "http://burtonini.com/temp/${BP}.tar.gz \
 SRC_URI[md5sum] = "fa1c82cd9fd2fafd7ff10d78eb5781c5"
 SRC_URI[sha256sum] = "383e0a22a537f653b8d41688277560f95678a042967198085ec7caa1a5cc2f4c"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/${sysconfdir}/X11/Xsession.d
     install -m 755 ${WORKDIR}/gtkstylus.sh ${D}/${sysconfdir}/X11/Xsession.d/45gtkstylus
 }
@@ -22,8 +22,8 @@ do_install_append() {
 # Horrible but rpm falls over if you use '*'
 GTKVER = "2.10.0"
 
-FILES_${PN} = "${sysconfdir} \
+FILES:${PN} = "${sysconfdir} \
                ${libdir}/gtk-2.0/${GTKVER}/modules/libgtkstylus.so.*"
-FILES_${PN}-dbg += "${libdir}/gtk-2.0/${GTKVER}/modules/.debug"
-FILES_${PN}-dev += "${libdir}/gtk-2.0/${GTKVER}/modules/libgtkstylus.so"
-FILES_${PN}-staticdev += "${libdir}/gtk-2.0/${GTKVER}/modules/libgtkstylus.*a"
+FILES:${PN}-dbg += "${libdir}/gtk-2.0/${GTKVER}/modules/.debug"
+FILES:${PN}-dev += "${libdir}/gtk-2.0/${GTKVER}/modules/libgtkstylus.so"
+FILES:${PN}-staticdev += "${libdir}/gtk-2.0/${GTKVER}/modules/libgtkstylus.*a"

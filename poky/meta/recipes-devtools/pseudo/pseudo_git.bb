@@ -1,23 +1,21 @@
 require pseudo.inc
 
-SRC_URI = "git://git.yoctoproject.org/pseudo \
+SRC_URI = "git://git.yoctoproject.org/pseudo;branch=oe-core \
            file://0001-configure-Prune-PIE-flags.patch \
            file://fallback-passwd \
            file://fallback-group \
-           file://moreretries.patch \
-           file://toomanyfiles.patch \
-           file://0001-maketables-wrappers-use-Python-3.patch \
-           file://0001-Add-statx.patch \
-           file://0001-realpath.c-Remove-trailing-slashes.patch \
-           file://0006-xattr-adjust-for-attr-2.4.48-release.patch \
-           file://seccomp.patch \
-           file://0001-pseudo-On-a-DB-fixup-remove-files-that-do-not-exist-.patch \
-           file://0001-pseudo_ipc.h-Fix-enum-typedef.patch \
            "
+SRC_URI:append:class-native = " \
+    http://downloads.yoctoproject.org/mirror/sources/pseudo-prebuilt-2.33.tar.xz;subdir=git/prebuilt;name=prebuilt \
+    file://older-glibc-symbols.patch"
+SRC_URI:append:class-nativesdk = " \
+    http://downloads.yoctoproject.org/mirror/sources/pseudo-prebuilt-2.33.tar.xz;subdir=git/prebuilt;name=prebuilt \
+    file://older-glibc-symbols.patch"
+SRC_URI[prebuilt.sha256sum] = "ed9f456856e9d86359f169f46a70ad7be4190d6040282b84c8d97b99072485aa"
 
-SRCREV = "060058bb29f70b244e685b3c704eb0641b736f73"
+SRCREV = "b988b0a6b8afd8d459bc9a2528e834f63a3d59b2"
 S = "${WORKDIR}/git"
 PV = "1.9.0+git${SRCPV}"
 
 # error: use of undeclared identifier '_STAT_VER'
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'

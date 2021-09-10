@@ -1,0 +1,6 @@
+---
+/xyz/openbmc_project/time/sync_method:
+    - Interface: xyz.openbmc_project.Time.Synchronization
+      Properties:
+          TimeSyncMethod:
+              Default: Synchronization::Method::Manual

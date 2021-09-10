@@ -32,7 +32,7 @@ PACKAGECONFIG[gstreamer] = "--enable-gstreamer, --disable-gstreamer, gstreamer1.
 PACKAGECONFIG[gtk] = "--enable-gtk, --disable-gtk, gtk+"
 PACKAGECONFIG[gtk3] = "--enable-gtk3, --disable-gtk3, gtk+3"
 
-python populate_packages_prepend() {
+python populate_packages:prepend() {
     plugindir = d.expand('${libdir}/${BPN}-${PV}/')
     do_split_packages(d, plugindir, '^libcanberra-(.*)\.so$', 'libcanberra-%s', '%s support library', extra_depends='' )
     do_split_packages(d, plugindir, '^libcanberra-(.*)\.la$', 'libcanberra-%s', '%s support library', extra_depends='' )
@@ -41,23 +41,23 @@ python populate_packages_prepend() {
 PACKAGES =+ "${PN}-gnome ${PN}-gtk2 ${PN}-gtk3 ${PN}-systemd"
 PACKAGES_DYNAMIC += "^libcanberra-.*"
 
-FILES_${PN} = "${bindir}/ ${libdir}/${BPN}.so.*"
+FILES:${PN} = "${bindir}/ ${libdir}/${BPN}.so.*"
 
-FILES_${PN}-dev += "${datadir}/vala/vapi ${libdir}/*/modules/*.la ${libdir}/*/*.la"
+FILES:${PN}-dev += "${datadir}/vala/vapi ${libdir}/*/modules/*.la ${libdir}/*/*.la"
 
-FILES_${PN}-dbg += "${libdir}/${BPN}-${PV}/.debug ${libdir}/gtk-*/modules/.debug"
+FILES:${PN}-dbg += "${libdir}/${BPN}-${PV}/.debug ${libdir}/gtk-*/modules/.debug"
 
-FILES_${PN}-gtk2 = "${libdir}/${BPN}-gtk.so.* \
+FILES:${PN}-gtk2 = "${libdir}/${BPN}-gtk.so.* \
                     ${libdir}/gtk-2.0/modules/*.so \
                     ${bindir}/canberra-gtk-play"
 
 # -gtk3 ships a symlink to a .so
-INSANE_SKIP_${PN}-gtk3 = "dev-so"
-FILES_${PN}-gtk3 = "${libdir}/${BPN}-gtk3.so.* \
+INSANE_SKIP:${PN}-gtk3 = "dev-so"
+FILES:${PN}-gtk3 = "${libdir}/${BPN}-gtk3.so.* \
                     ${libdir}/gtk-3.0/modules/*.so \
                     ${bindir}/canberra-gtk3-play"
 
-FILES_${PN}-gnome = "${libdir}/gnome-settings-daemon-3.0/ \
+FILES:${PN}-gnome = "${libdir}/gnome-settings-daemon-3.0/ \
                      ${datadir}/gdm/ ${datadir}/gnome/"
 
-FILES_${PN}-systemd = "${systemd_unitdir}/system/*.service"
+FILES:${PN}-systemd = "${systemd_unitdir}/system/*.service"

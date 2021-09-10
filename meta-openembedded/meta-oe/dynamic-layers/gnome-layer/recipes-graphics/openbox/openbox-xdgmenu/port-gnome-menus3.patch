@@ -1,0 +1,184 @@
+Index: openbox-xdgmenu-0.3/openbox-xdgmenu.c
+===================================================================
+--- openbox-xdgmenu-0.3.orig/openbox-xdgmenu.c
++++ openbox-xdgmenu-0.3/openbox-xdgmenu.c
+@@ -32,7 +32,7 @@
+ #include <string.h>
+ #include <glib.h>
+ #include <glib/gprintf.h>
+-#include <gnome-menus/gmenu-tree.h>
++#include <gnome-menus-3.0/gmenu-tree.h>
+ 
+ /*=============================================================================
+  * Declarations
+@@ -42,7 +42,6 @@ static void process_directory(GMenuTreeD
+ static void process_entry(GMenuTreeEntry *entry);
+ static void process_separator(GMenuTreeSeparator *entry);
+ 
+-gboolean option_show_amount_of_entries = 0;
+ gboolean option_do_not_use_categories = 0;
+ 
+ /*=============================================================================
+@@ -61,11 +60,6 @@ int main (int argc, char **argv)
+           g_free (xdgfile);
+           return 0;
+         }
+-        else if ((strcmp (argv[i], "--show-amount") == 0) ||
+-        (strcmp (argv[i], "-a") == 0))
+-        {
+-            option_show_amount_of_entries = 1;
+-        }
+         else if ((strcmp (argv[i], "--plain") == 0) ||
+         (strcmp (argv[i], "-p") == 0))
+         {
+@@ -93,16 +87,15 @@ int main (int argc, char **argv)
+         return 1;
+     }
+     
+-    FILE * file;
+-    if (!(file = fopen(xdgfile, "r")))
++    GMenuTree *menuTree = gmenu_tree_new (xdgfile,  GMENU_TREE_FLAGS_NONE );
++
++    GError *error = NULL;
++    if (!gmenu_tree_load_sync(menuTree, &error))
+     {
+-        g_printf ("Could not read file \"%s\".\n", xdgfile);
+-        g_free (xdgfile);
+-        return 2;
++        g_printerr ("Failed to load tree: %s\n", error->message);
++        g_clear_error (&error);
++        return 3;
+     }
+-    fclose(file);
+-    
+-    GMenuTree *menuTree = gmenu_tree_lookup (xdgfile,  GMENU_TREE_FLAGS_NONE );
+     
+     GMenuTreeDirectory *rootDirectory = gmenu_tree_get_root_directory(menuTree);
+     
+@@ -129,11 +122,10 @@ void show_help()
+     g_printf ("  openbox-xdgmenu [options] <Xdg menu file>\n");
+     g_printf ("\n");
+     g_printf ("Options:\n");
+-    g_printf ("  -a: Show the amount of items in each category next to its name.\n");
+     g_printf ("  -p: Do not use categories.\n");
+     g_printf ("\n");
+     g_printf ("For example:\n");
+-    g_printf ("  openbox-xdgmenu \"/etc/xdg/menus/applications.menu\"\n\n");
++    g_printf ("  openbox-xdgmenu \"gnome-applications.menu\"\n\n");
+ }
+ 
+ /*=============================================================================
+@@ -141,72 +133,61 @@ void show_help()
+  */
+ void process_directory(GMenuTreeDirectory *directory, gboolean isRoot)
+ {
+-    int hasSeparator = 0;
++    GMenuTreeSeparator *separator = NULL;
+     int hasMenu = 0;
+     GMenuTreeItemType entryType;
+-    GSList *entryList = gmenu_tree_directory_get_contents (directory);
+-    GSList *l;
+-    
+-    if (option_do_not_use_categories == 00 && isRoot == 0 &&
+-    g_slist_length(entryList) > 0)
++    GMenuTreeIter *iter = gmenu_tree_directory_iter (directory);
++    GMenuTreeItemType next_type;
++
++    while ((next_type = gmenu_tree_iter_next (iter)) != GMENU_TREE_ITEM_INVALID)
+     {
+-        hasMenu = 1;
+-        
+-        if (option_show_amount_of_entries == 1)
++        if (option_do_not_use_categories == 00 && isRoot == 0 && hasMenu == 0)
+         {
++            hasMenu = 1;
++ 
+             g_printf(
+-              "<menu id=\"xdg-menu-%s\" label=\"%s (%d)\">\n",
+-              g_strjoinv("&amp;", g_strsplit(gmenu_tree_directory_get_name(directory),"&",0)),
+-              g_strjoinv("&amp;", g_strsplit(gmenu_tree_directory_get_name(directory),"&",0)),
+-              g_slist_length(entryList));
++                  "<menu id=\"xdg-menu-%s\" label=\"%s\">\n",
++                  g_strjoinv("&amp;", g_strsplit(gmenu_tree_directory_get_name(directory),"&",0)),
++                  g_strjoinv("&amp;", g_strsplit(gmenu_tree_directory_get_name(directory),"&",0)));
+         }
+-        else
+-        {
+-            g_printf(
+-              "<menu id=\"xdg-menu-%s\" label=\"%s\">\n",
+-              g_strjoinv("&amp;", g_strsplit(gmenu_tree_directory_get_name(directory),"&",0)),
+-              g_strjoinv("&amp;", g_strsplit(gmenu_tree_directory_get_name(directory),"&",0)));
+-        }
+-    }
+ 
+-    for (l = entryList; l; l = l->next)
+-    {
+-        GMenuTreeItem *item = l->data;
+-        
+-        entryType = gmenu_tree_item_get_type (GMENU_TREE_ITEM(item));
+-        
+-        switch (entryType)
++        switch (next_type)
+         {
++            case GMENU_TREE_ITEM_INVALID:
++                break;
+             case GMENU_TREE_ITEM_DIRECTORY:
+-                if (hasSeparator)
++                if (separator != NULL)
+                 {
+-                    process_separator(GMENU_TREE_SEPARATOR(item));
+-                    hasSeparator = 0;
++                    process_separator(separator);
++                    gmenu_tree_item_unref (separator);
++                    separator = NULL;
+                 }
+-                process_directory(GMENU_TREE_DIRECTORY(item), 0);
++                process_directory(gmenu_tree_iter_get_directory(iter), 0);
+                 break;
+             case GMENU_TREE_ITEM_ENTRY:
+-                if (hasSeparator)
++                if (separator != NULL)
+                 {
+-                    process_separator(GMENU_TREE_SEPARATOR(item));
+-                    hasSeparator = 0;
++                    process_separator(separator);
++                    gmenu_tree_item_unref (separator);
++                    separator = NULL;
+                 }
+-                process_entry(GMENU_TREE_ENTRY(item));
++                process_entry(gmenu_tree_iter_get_entry(iter));
+                 break;
+             case GMENU_TREE_ITEM_SEPARATOR:
+-                hasSeparator = 1;
++                separator = gmenu_tree_iter_get_separator(iter);
+                 break;
+         }
+-        
+-        gmenu_tree_item_unref (item);
+     }
+     
+     if (hasMenu == 1)
+     {
+         g_printf("</menu>\n");
+     }
++
++    if (separator != NULL)
++        gmenu_tree_item_unref (separator);
+     
+-    g_slist_free (entryList);
++    gmenu_tree_iter_unref (iter);
+ }
+ 
+ /*=============================================================================
+@@ -214,8 +195,9 @@ void process_directory(GMenuTreeDirector
+  */
+ void process_entry(GMenuTreeEntry *entry)
+ {
+-    char *name = g_strdup (gmenu_tree_entry_get_name(entry));
+-    char *exec = g_strdup (gmenu_tree_entry_get_exec(entry));
++    GDesktopAppInfo *appinfo = gmenu_tree_entry_get_app_info (entry);
++    char *name = g_strdup (g_app_info_get_name(G_APP_INFO(appinfo)));
++    char *exec = g_strdup (g_app_info_get_executable(G_APP_INFO(appinfo)));
+     int i;
+     
+     for (i = 0; i < strlen(exec) - 1; i++) {

@@ -1,6 +1,9 @@
 # gettext - these add sleep delays otherwise
 gl_cv_func_sleep_works=${gl_cv_func_sleep_works=yes}
 gl_cv_header_working_fcntl_h=${gl_cv_header_working_fcntl_h=yes}
+# the euc-jp tests in iconv.m4 break elfutils and libunistring depending on the
+# host locales installed. Avoid this by skipping the tests, we're not on HP-UX!
+am_cv_func_iconv_works=${am_cv_func_iconv_works=yes}
 
 # apr
 ac_cv_file__dev_zero=${ac_cv_file__dev_zero=yes}

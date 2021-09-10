@@ -1,6 +1,6 @@
-inherit siteinfo python3native
+inherit python3native meson-routines
 
-DEPENDS_append = " meson-native ninja-native"
+DEPENDS:append = " meson-native ninja-native"
 
 # As Meson enforces out-of-tree builds we can just use cleandirs
 B = "${WORKDIR}/build"
@@ -12,7 +12,8 @@ MESON_SOURCEPATH = "${S}"
 def noprefix(var, d):
     return d.getVar(var).replace(d.getVar('prefix') + '/', '', 1)
 
-MESON_BUILDTYPE ?= "plain"
+MESON_BUILDTYPE ?= "${@oe.utils.vartrue('DEBUG_BUILD', 'debug', 'plain', d)}"
+MESON_BUILDTYPE[vardeps] += "DEBUG_BUILD"
 MESONOPTS = " --prefix ${prefix} \
               --buildtype ${MESON_BUILDTYPE} \
               --bindir ${@noprefix('bindir', d)} \
@@ -26,60 +27,14 @@ MESONOPTS = " --prefix ${prefix} \
               --sysconfdir ${sysconfdir} \
               --localstatedir ${localstatedir} \
               --sharedstatedir ${sharedstatedir} \
-              --wrap-mode nodownload"
+              --wrap-mode nodownload \
+              --native-file ${WORKDIR}/meson.native"
 
-EXTRA_OEMESON_append = " ${PACKAGECONFIG_CONFARGS}"
+EXTRA_OEMESON:append = " ${PACKAGECONFIG_CONFARGS}"
 
 MESON_CROSS_FILE = ""
-MESON_CROSS_FILE_class-target = "--cross-file ${WORKDIR}/meson.cross"
-MESON_CROSS_FILE_class-nativesdk = "--cross-file ${WORKDIR}/meson.cross"
-
-def meson_array(var, d):
-    items = d.getVar(var).split()
-    return repr(items[0] if len(items) == 1 else items)
-
-# Map our ARCH values to what Meson expects:
-# http://mesonbuild.com/Reference-tables.html#cpu-families
-def meson_cpu_family(var, d):
-    import re
-    arch = d.getVar(var)
-    if arch == 'powerpc':
-        return 'ppc'
-    elif arch == 'powerpc64' or arch == 'powerpc64le':
-        return 'ppc64'
-    elif arch == 'armeb':
-        return 'arm'
-    elif arch == 'aarch64_be':
-        return 'aarch64'
-    elif arch == 'mipsel':
-        return 'mips'
-    elif arch == 'mips64el':
-        return 'mips64'
-    elif re.match(r"i[3-6]86", arch):
-        return "x86"
-    elif arch == "microblazeel":
-        return "microblaze"
-    else:
-        return arch
-
-# Map our OS values to what Meson expects:
-# https://mesonbuild.com/Reference-tables.html#operating-system-names
-def meson_operating_system(var, d):
-    os = d.getVar(var)
-    if "mingw" in os:
-        return "windows"
-    else:
-        return os
-
-def meson_endian(prefix, d):
-    arch, os = d.getVar(prefix + "_ARCH"), d.getVar(prefix + "_OS")
-    sitedata = siteinfo_data_for_machine(arch, os, d)
-    if "endian-little" in sitedata:
-        return "little"
-    elif "endian-big" in sitedata:
-        return "big"
-    else:
-        bb.fatal("Cannot determine endianism for %s-%s" % (arch, os))
+MESON_CROSS_FILE:class-target = "--cross-file ${WORKDIR}/meson.cross"
+MESON_CROSS_FILE:class-nativesdk = "--cross-file ${WORKDIR}/meson.cross"
 
 addtask write_config before do_configure
 do_write_config[vardeps] += "CC CXX LD AR NM STRIP READELF CFLAGS CXXFLAGS LDFLAGS"
@@ -95,13 +50,18 @@ strip = ${@meson_array('STRIP', d)}
 readelf = ${@meson_array('READELF', d)}
 pkgconfig = 'pkg-config'
 llvm-config = 'llvm-config${LLVMVERSION}'
+cups-config = 'cups-config'
+g-ir-scanner = '${STAGING_BINDIR}/g-ir-scanner-wrapper'
+g-ir-compiler = '${STAGING_BINDIR}/g-ir-compiler-wrapper'
 
-[properties]
-needs_exe_wrapper = true
+[built-in options]
 c_args = ${@meson_array('CFLAGS', d)}
 c_link_args = ${@meson_array('LDFLAGS', d)}
 cpp_args = ${@meson_array('CXXFLAGS', d)}
 cpp_link_args = ${@meson_array('LDFLAGS', d)}
+
+[properties]
+needs_exe_wrapper = true
 gtkdoc_exe_wrapper = '${B}/gtkdoc-qemuwrapper'
 
 [host_machine]
@@ -116,8 +76,26 @@ cpu_family = '${@meson_cpu_family('TARGET_ARCH', d)}'
 cpu = '${TARGET_ARCH}'
 endian = '${@meson_endian('TARGET', d)}'
 EOF
+
+    cat >${WORKDIR}/meson.native <<EOF
+[binaries]
+c = ${@meson_array('BUILD_CC', d)}
+cpp = ${@meson_array('BUILD_CXX', d)}
+ar = ${@meson_array('BUILD_AR', d)}
+nm = ${@meson_array('BUILD_NM', d)}
+strip = ${@meson_array('BUILD_STRIP', d)}
+readelf = ${@meson_array('BUILD_READELF', d)}
+pkgconfig = 'pkg-config-native'
+
+[built-in options]
+c_args = ${@meson_array('BUILD_CFLAGS', d)}
+c_link_args = ${@meson_array('BUILD_LDFLAGS', d)}
+cpp_args = ${@meson_array('BUILD_CXXFLAGS', d)}
+cpp_link_args = ${@meson_array('BUILD_LDFLAGS', d)}
+EOF
 }
 
+# Tell externalsrc that changes to this file require a reconfigure
 CONFIGURE_FILES = "meson.build"
 
 meson_do_configure() {
@@ -132,33 +110,6 @@ meson_do_configure() {
     if ! meson ${MESONOPTS} "${MESON_SOURCEPATH}" "${B}" ${MESON_CROSS_FILE} ${EXTRA_OEMESON}; then
         bbfatal_log meson failed
     fi
-}
-
-override_native_tools() {
-    # Set these so that meson uses the native tools for its build sanity tests,
-    # which require executables to be runnable. The cross file will still
-    # override these for the target build.
-    export CC="${BUILD_CC}"
-    export CXX="${BUILD_CXX}"
-    export LD="${BUILD_LD}"
-    export AR="${BUILD_AR}"
-    export STRIP="${BUILD_STRIP}"
-    # These contain *target* flags but will be used as *native* flags.  The
-    # correct native flags will be passed via -Dc_args and so on, unset them so
-    # they don't interfere with tools invoked by Meson (such as g-ir-scanner)
-    unset CPPFLAGS CFLAGS CXXFLAGS LDFLAGS
-}
-
-meson_do_configure_prepend_class-target() {
-    override_native_tools
-}
-
-meson_do_configure_prepend_class-nativesdk() {
-    override_native_tools
-}
-
-meson_do_configure_prepend_class-native() {
-    export PKG_CONFIG="pkg-config-native"
 }
 
 python meson_do_qa_configure() {

@@ -11,7 +11,7 @@ inherit autotools
 
 S = "${WORKDIR}/git"
 
-SYSTEMD_SERVICE_${PN} += "pnorboot.service"
+SYSTEMD_SERVICE:${PN} += "pnorboot.service"
 
 SRC_URI += "git://github.com/shenki/aspeed-lpc-control"
 SRCREV = "af42b7ff01e71c0dd4c60214dd46ed487611f36d"

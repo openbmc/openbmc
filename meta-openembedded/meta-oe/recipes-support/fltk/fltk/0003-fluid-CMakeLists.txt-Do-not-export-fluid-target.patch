@@ -1,0 +1,42 @@
+From b6985abcb03fb09685da4044963e8f085035b208 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Thu, 19 Aug 2021 08:06:45 +0200
+Subject: [PATCH] fluid/CMakeLists.txt: Do not export fluid target
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It does not work for us: The executable 'fluid' is not installed in
+receipe-sysroot. So fltk cmake config contains an invalid reference.
+Consumers of fltk using cmake will fail during configure for this invalid
+reference with something like:
+
+| CMake Error at <...>/recipe-sysroot/usr/share/fltk/FLTK-Targets.cmake:129 (message):
+|   The imported target "fluid" references the file
+| 
+|      "<...>/recipe-sysroot/usr/bin/fluid"
+| 
+|   but this file does not exist.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ fluid/CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/fluid/CMakeLists.txt b/fluid/CMakeLists.txt
+index 472c84c..f971121 100644
+--- a/fluid/CMakeLists.txt
++++ b/fluid/CMakeLists.txt
+@@ -86,7 +86,6 @@ if (APPLE AND (NOT OPTION_APPLE_X11))
+   install (TARGETS fluid DESTINATION ${FLTK_BINDIR})
+ else()
+   install (TARGETS fluid
+-    EXPORT FLTK-Targets
+     RUNTIME DESTINATION ${FLTK_BINDIR}
+     LIBRARY DESTINATION ${FLTK_LIBDIR}
+     ARCHIVE DESTINATION ${FLTK_LIBDIR}
+-- 
+2.31.1
+

@@ -10,11 +10,15 @@ SRC_URI = "ftp://ftp.troglobit.com/pimd/${BP}.tar.gz \
 SRC_URI[md5sum] = "a3c03e40540980b2c06e265a17988e60"
 SRC_URI[sha256sum] = "c77a9812751f114490a28a6839b16aac8b020c8d9fd6aa22bf3880c054e19f1d"
 
-EXTRA_OECONF_append_libc-musl = " --embedded-libc"
+EXTRA_OECONF:append:libc-musl = " --embedded-libc"
 
-inherit autotools-brokensep
+inherit autotools-brokensep update-alternatives
 
 do_configure() {
     oe_runconf
 }
 
+ALTERNATIVE_PRIORITY = "100"
+
+ALTERNATIVE:${PN} = "pimd"
+ALTERNATIVE_LINK_NAME[pimd] = "${sbindir}/pimd"

@@ -20,32 +20,23 @@ https://github.com/blueman-project/blueman/pull/1121
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- blueman/Functions.py                   | 12 +++++++++++-
+ blueman/Functions.py                   | 10 ++++++++++
  blueman/plugins/applet/PowerManager.py |  4 ++++
- 2 files changed, 15 insertions(+), 1 deletion(-)
+ 2 files changed, 14 insertions(+)
 
 diff --git a/blueman/Functions.py b/blueman/Functions.py
-index 3b76271..c5eeb27 100644
+index 3917f42..b4d5eae 100644
 --- a/blueman/Functions.py
 +++ b/blueman/Functions.py
-@@ -17,7 +17,7 @@
- # You should have received a copy of the GNU General Public License
- # along with this program.  If not, see <http://www.gnu.org/licenses/>.
- #
--from time import sleep
-+from time import sleep, time
- import re
- import os
- import signal
-@@ -86,6 +86,16 @@ def check_bluetooth_status(message, exitfunc):
+@@ -80,6 +80,16 @@ def check_bluetooth_status(message: str, exitfunc: Callable[[], Any]) -> None:
              return
  
      applet.SetBluetoothStatus('(b)', True)
 +
-+    timeout = time() + 10
++    timeout = time.time() + 10
 +    while applet.GetRequestStatus():
-+        sleep(0.1)
-+        if time() > timeout:
++        time.sleep(0.1)
++        if time.time() > timeout:
 +            # timeout 5s has been set in applet/PowerManager.py
 +            # so it should NOT reach timeout here
 +            logging.warning('Should NOT reach timeout.')
@@ -55,27 +46,27 @@ index 3b76271..c5eeb27 100644
          print('Failed to enable bluetooth')
          exitfunc()
 diff --git a/blueman/plugins/applet/PowerManager.py b/blueman/plugins/applet/PowerManager.py
-index 8ec9fc4..29a0fb0 100644
+index c2f7bc3..bf6c99f 100644
 --- a/blueman/plugins/applet/PowerManager.py
 +++ b/blueman/plugins/applet/PowerManager.py
-@@ -48,6 +48,7 @@ class PowerManager(AppletPlugin):
+@@ -63,6 +63,7 @@ class PowerManager(AppletPlugin, StatusIconProvider):
          self._add_dbus_signal("BluetoothStatusChanged", "b")
          self._add_dbus_method("SetBluetoothStatus", ("b",), "", self.request_power_state)
          self._add_dbus_method("GetBluetoothStatus", (), "b", self.get_bluetooth_status)
 +        self._add_dbus_method("GetRequestStatus", (), "b", self.get_request_status)
  
-     def on_unload(self):
+     def on_unload(self) -> None:
          self.parent.Plugins.Menu.unregister(self)
-@@ -182,6 +183,9 @@ class PowerManager(AppletPlugin):
-     def get_bluetooth_status(self):
+@@ -196,6 +197,9 @@ class PowerManager(AppletPlugin, StatusIconProvider):
+     def get_bluetooth_status(self) -> bool:
          return self.current_state
  
 +    def get_request_status(self):
 +        return self.request_in_progress
 +
-     def on_adapter_property_changed(self, _path, key, value):
+     def on_adapter_property_changed(self, _path: str, key: str, value: Any) -> None:
          if key == "Powered":
              if value and not self.current_state:
 -- 
-2.20.1
+2.31.1
 

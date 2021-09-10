@@ -23,7 +23,7 @@ scheme.  The scheme is: <mips variant>[-nf][-n32]
 
 TUNE_PKGARCH is defined as:
 
-${MIPSPKGSFX_VARIANT_tune-${DEFAULTTUNE}}${MIPSPKGSFX_FPU}${MIPSPKGSFX_ABI}
+${MIPSPKGSFX_VARIANT:tune-${DEFAULTTUNE}}${MIPSPKGSFX_FPU}${MIPSPKGSFX_ABI}
 
 The following is a list of MIPS specific variables:
 
@@ -35,7 +35,7 @@ defined as "el".
 MIPSPKGSFX_ENDIAN2 - For bigendian hardware this is "eb", otherwise it's
 defined as "el".
 
-MIPSPKGSFX_VARIANT_tune-<tune> - In the default tunings it is set to the
+MIPSPKGSFX_VARIANT:tune-<tune> - In the default tunings it is set to the
 same value as TUNE_ARCH.  In custom, optimized tunings, the value should
 be modified to more precisely describe the tuning.
 

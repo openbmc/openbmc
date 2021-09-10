@@ -1,4 +1,4 @@
-From 8f32b772d869481f88d9b7e14feb43c39b3fc33d Mon Sep 17 00:00:00 2001
+From 528a439539a77e67bf136d425eac3240ca6f1cd7 Mon Sep 17 00:00:00 2001
 From: Andrea Galbusera <gizero@gmail.com>
 Date: Fri, 14 Jul 2017 09:52:54 +0200
 Subject: [PATCH] EGL/glplatform.h: define EGL_CAST

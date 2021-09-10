@@ -1,0 +1,9 @@
+[Unit]
+Description=Rotate the event logs
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/rotate-event-logs.sh
+
+[Install]
+WantedBy=multi-user.target

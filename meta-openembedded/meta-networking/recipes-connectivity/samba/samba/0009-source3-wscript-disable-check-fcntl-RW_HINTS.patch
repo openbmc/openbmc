@@ -1,0 +1,92 @@
+From 9942bca2e276c7b4c7696a08594258430c4c5bb5 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 3 Jun 2021 09:39:56 +0800
+Subject: [PATCH] source3/wscript: disable check fcntl RW_HINTS
+
+It fails on cross-compilation for musl.
+
+Fixes configure error:
+  Checking whether fcntl supports setting/geting hints: UNKNOWN
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ source3/wscript | 61 -------------------------------------------------
+ 1 file changed, 61 deletions(-)
+
+diff --git a/source3/wscript b/source3/wscript
+index f6de0a6..3e260c1 100644
+--- a/source3/wscript
++++ b/source3/wscript
+@@ -1164,67 +1164,6 @@ err:
+             execute=True,
+             msg="Checking whether fcntl lock supports open file description locks")
+ 
+-    conf.CHECK_CODE('''
+-#include <fcntl.h>
+-#include <unistd.h>
+-#include <stdlib.h>
+-#include <stdint.h>
+-
+-#define DATA "hinttest.fcntl"
+-
+-int main(void)
+-{
+-        uint64_t hint, get_hint;
+-        int fd;
+-
+-        fd = open(DATA, O_RDONLY | O_CREAT | O_EXCL);
+-        if (fd == -1) {
+-            goto err;
+-        }
+-
+-        hint = RWH_WRITE_LIFE_SHORT;
+-        int ret = fcntl(fd, F_SET_RW_HINT, &hint);
+-        if (ret == -1) {
+-            goto err;
+-        }
+-
+-        ret = fcntl(fd, F_GET_RW_HINT, &get_hint);
+-        if (ret == -1) {
+-            goto err;
+-        }
+-
+-        if (get_hint != RWH_WRITE_LIFE_SHORT) {
+-            goto err;
+-        }
+-
+-        hint = RWH_WRITE_LIFE_EXTREME;
+-        ret = fcntl(fd, F_SET_FILE_RW_HINT, &hint);
+-        if (ret == -1) {
+-            goto err;
+-        }
+-
+-        ret = fcntl(fd, F_GET_FILE_RW_HINT, &get_hint);
+-        if (ret == -1) {
+-            goto err;
+-        }
+-
+-        if (get_hint != RWH_WRITE_LIFE_EXTREME) {
+-            goto err;
+-        }
+-
+-        close(fd);
+-        unlink(DATA);
+-        exit(0);
+-err:
+-        close(fd);
+-        unlink(DATA);
+-        exit(1);
+-}''',
+-            'HAVE_RW_HINTS',
+-            addmain=False,
+-            execute=True,
+-            msg="Checking whether fcntl supports setting/geting hints")
+-
+     conf.CHECK_STRUCTURE_MEMBER('struct stat', 'st_mtim.tv_nsec',
+                                 define='HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC') # Linux, Solaris
+     conf.CHECK_STRUCTURE_MEMBER('struct stat', 'st_mtimensec',
+-- 
+2.17.1
+

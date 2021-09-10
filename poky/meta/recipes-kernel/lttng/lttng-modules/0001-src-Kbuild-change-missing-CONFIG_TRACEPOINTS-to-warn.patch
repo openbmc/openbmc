@@ -1,0 +1,46 @@
+From 878f89b6136ff7b870a19e04901cc6f316bbe10a Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@gmail.com>
+Date: Sat, 15 May 2021 10:26:38 -0400
+Subject: [PATCH] src/Kbuild: change missing CONFIG_TRACEPOINTS to warning
+
+Taken from a previous patch to the main lttng-modules Makefile, by
+Otavio Salvador:
+
+  The lttng-modules are being pulled by the tools-profile image feature,
+  however, not every kernel has the CONFIG_TRACEPOINTS feature enabled.
+
+  This change makes the build do not fail when CONFIG_TRACEPOINTS is not
+  available, allowing it to be kept being pulled by default.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ src/Kbuild | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/Kbuild b/src/Kbuild
+index 7137874..04eb5c9 100644
+--- a/src/Kbuild
++++ b/src/Kbuild
+@@ -2,10 +2,13 @@
+ 
+ ifdef CONFIG_LOCALVERSION	# Check if dot-config is included.
+   ifeq ($(CONFIG_TRACEPOINTS),)
+-    $(error The option CONFIG_TRACEPOINTS needs to be enabled in your kernel configuration)
++    $(warning The option CONFIG_TRACEPOINTS needs to be enabled in your kernel configuration)
++    DISABLE_MODULE = y
+   endif # CONFIG_TRACEPOINTS
+ endif # ifdef CONFIG_LOCALVERSION
+ 
++ifneq ($(DISABLE_MODULE),y)
++
+ TOP_LTTNG_MODULES_DIR := $(shell dirname $(lastword $(MAKEFILE_LIST)))/..
+ 
+ lttng_check_linux_version = $(shell pwd)/include/linux/version.h
+@@ -150,3 +153,5 @@ lttng-statedump-objs := lttng-statedump-impl.o
+ obj-$(CONFIG_LTTNG) += probes/
+ obj-$(CONFIG_LTTNG) += lib/
+ obj-$(CONFIG_LTTNG) += tests/
++
++endif # DISABLE_MODULE

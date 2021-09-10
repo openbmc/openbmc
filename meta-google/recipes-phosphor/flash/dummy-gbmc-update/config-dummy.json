@@ -1,0 +1,19 @@
+[{
+	"blob": "/flash/dummy",
+	"handler": {
+		"type": "file",
+		"path": "/run/initramfs/bmc-image"
+	},
+	"actions": {
+		"preparation": {
+			"type": "skip"
+		},
+		"verification": {
+			"type": "systemd",
+			"unit": "dummy-verify.service"
+		},
+		"update": {
+			"type": "skip"
+		}
+	}
+}]

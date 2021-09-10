@@ -1,0 +1,30 @@
+From 1919bb7f4072d73dcbb64d0e06eff5b04529c3db Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 16 Nov 2020 18:01:02 +0000
+Subject: [PATCH] serializer.py: make .gz files reproducible
+
+.gz format contains mtime of the compressed data, and
+SOURCE_DATE_EPOCH is the standard way to make it reproducuble.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/serializer.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tests/serializer.py b/tests/serializer.py
+index bd14bc3db..bc5b45d7f 100644
+--- a/tests/serializer.py
++++ b/tests/serializer.py
+@@ -138,7 +138,10 @@ def serializer(name, profile, outfile):
+                 et.SubElement(env, 'env', name=k, value=v)
+ 
+     tree = et.ElementTree(root)
+-    with gzip.open(outfile, 'wb') as f:
++    reproducible_mtime = None
++    if 'SOURCE_DATE_EPOCH' in os.environ:
++        reproducible_mtime=os.environ['SOURCE_DATE_EPOCH']
++    with gzip.GzipFile(outfile, 'wb', mtime=reproducible_mtime) as f:
+         tree.write(f, encoding='utf-8', xml_declaration=True)
+ 
+ 

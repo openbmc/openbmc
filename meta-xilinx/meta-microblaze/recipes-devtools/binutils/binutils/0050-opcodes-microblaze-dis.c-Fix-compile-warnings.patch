@@ -1,0 +1,37 @@
+From de38a354e40a9dcc486c93faf02bee4b059fa34a Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@xilinx.com>
+Date: Thu, 3 Dec 2020 12:30:09 -0800
+Subject: [PATCH 50/52] opcodes/microblaze-dis.c: Fix compile warnings
+
+Two compiler warnings were evident, it appears both are likely real bugs.
+
+Missing type declaration for a function, and a case statement without a break.
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ opcodes/microblaze-dis.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index 90d2328659..f1c33dca14 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
+@@ -130,6 +130,7 @@ get_field_imm15 (struct string_buf *buf, long instr)
+   return p;
+ }
+ 
++static char *
+ get_field_imm16 (struct string_buf *buf, long instr)
+ {
+   char *p = strbuf (buf);
+@@ -329,6 +330,7 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+ 	  print_func (stream, "\t%s, %s, %s", get_field_rd (&buf, inst),
+ 		      get_field_r1 (&buf, inst), get_field_imm (&buf, inst));
+           /* TODO: Also print symbol */
++          break;
+ 	case INST_TYPE_RD_R1_IMMS:
+ 	  print_func (stream, "\t%s, %s, %s", get_field_rd (&buf, inst),
+ 	           get_field_r1(&buf, inst), get_field_imms (&buf, inst));
+-- 
+2.17.1
+

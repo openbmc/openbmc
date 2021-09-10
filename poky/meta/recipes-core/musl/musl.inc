@@ -9,21 +9,21 @@ standards-conformance and safety."
 HOMEPAGE = "http://www.musl-libc.org/"
 LICENSE = "MIT"
 SECTION = "libs"
-LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=f95ee848a08ad253c04723da00cedb01"
+LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=b03f1cc25363d094011f8f4fd8bcfb68"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
 FILES_SOLIBSDEV = ""
-FILES_${PN} += "${libdir}/lib*${SOLIBSDEV}"
-INSANE_SKIP_${PN} = "dev-so"
+FILES:${PN} += "${libdir}/lib*${SOLIBSDEV}"
+INSANE_SKIP:${PN} = "dev-so"
 
 # Doesn't compile in MIPS16e mode due to use of hand-written
 # assembly
 MIPS_INSTRUCTION_SET = "mips"
 
 # thumb1 is unsupported
-ARM_INSTRUCTION_SET_armv5 = "arm"
-ARM_INSTRUCTION_SET_armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
 
 # Enable out of tree build
 B = "${WORKDIR}/build"

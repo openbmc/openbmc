@@ -48,11 +48,11 @@ do_install() {
     fi
 }
 
-FILES_${PN} += "${libdir}/mycroft"
+FILES:${PN} += "${libdir}/mycroft"
 
-RDEPENDS_${PN} = "python3"
+RDEPENDS:${PN} = "python3"
 
-RDEPENDS_${PN} += "python3-requests python3-pillow \
+RDEPENDS:${PN} += "python3-requests python3-pillow \
                    python3-tornado python3-pyyaml \
                    python3-pyalsaaudio python3-inflection \
                    python3-pyserial python3-psutil \
@@ -77,11 +77,17 @@ RDEPENDS_${PN} += "python3-requests python3-pillow \
 # python3-python-dateutil python3-adapt-parser python3-lazy
 
 # Mycroft uses Alsa, PulseAudio and Flac
-RDEPENDS_${PN} += "alsa-utils alsa-plugins alsa-tools"
-RDEPENDS_${PN} += "pulseaudio pulseaudio-misc pulseaudio-server"
-RDEPENDS_${PN} += "flac mpg123"
+RDEPENDS:${PN} += "alsa-utils alsa-plugins alsa-tools"
+RDEPENDS:${PN} += "pulseaudio pulseaudio-misc pulseaudio-server"
+RDEPENDS:${PN} += "flac mpg123"
 
 # Mycroft can do this itself on the target, but it's quicker to do it here
-RDEPENDS_${PN} += "mimic"
+RDEPENDS:${PN} += "mimic"
 
-SYSTEMD_SERVICE_${PN} = "mycroft-setup.service mycroft.service"
+# pgrep is used by stop-mycroft.sh
+RDEPENDS:${PN} += "procps"
+
+# More tools needed by scripts
+RDEPENDS:${PN} += "bash jq libnotify"
+
+SYSTEMD_SERVICE:${PN} = "mycroft-setup.service mycroft.service"

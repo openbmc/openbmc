@@ -194,7 +194,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x73: &current
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/vr0_p1v2_03_iout
@@ -212,7 +212,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x74: &power
   sensorType: 0x08
   path: /xyz/openbmc_project/sensors/power/vr0_p1v2_03_pout
@@ -230,7 +230,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x75: &temperature
   sensorType: 0x01
   path: /xyz/openbmc_project/sensors/temperature/vr0_p1v2_03
@@ -248,7 +248,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x76:
   <<: *voltage
   path: /xyz/openbmc_project/sensors/voltage/vr0_p1v2_47_vout
@@ -483,7 +483,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0xB1:
   <<: *fan_tach
   path: /xyz/openbmc_project/sensors/fan_tach/fan1
@@ -535,7 +535,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0xC1:
   <<: *temperature
   path: /xyz/openbmc_project/sensors/temperature/w1_exhaust_left
@@ -589,7 +589,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0xD1:
   <<: *voltage
   path: /xyz/openbmc_project/sensors/voltage/p2v5_aux

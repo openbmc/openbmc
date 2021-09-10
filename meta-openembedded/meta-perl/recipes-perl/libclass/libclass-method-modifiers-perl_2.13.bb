@@ -17,7 +17,7 @@ S = "${WORKDIR}/Class-Method-Modifiers-${PV}"
 
 inherit cpan
 
-RDEPENDS_${PN} = " perl-module-b \
+RDEPENDS:${PN} = " perl-module-b \
                    perl-module-base \
                    perl-module-carp \
                    perl-module-exporter \

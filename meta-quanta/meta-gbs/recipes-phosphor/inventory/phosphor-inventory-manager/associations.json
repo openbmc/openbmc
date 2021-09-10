@@ -1,0 +1,491 @@
+[
+    {
+        "path": "system/chassis/motherboard/nvme0",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme0"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme1",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme1"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme2",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme2"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme3",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme3"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme4",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme4"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme5",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme5"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme6",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme6"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme7",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme7"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme8",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme8"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme9",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme9"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme10",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme10"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme11",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme11"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme12",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme12"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme13",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme13"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme14",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme14"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard/nvme15",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/nvme15"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/fan",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/fan_tach/fan0",
+                    "/xyz/openbmc_project/sensors/fan_tach/fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/fb_fan0",
+                    "/xyz/openbmc_project/sensors/fan_tach/fb_fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/fb_fan2"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis/motherboard",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/i2cool_0",
+                    "/xyz/openbmc_project/sensors/temperature/i2cool_1",
+                    "/xyz/openbmc_project/sensors/temperature/i2cool_2",
+                    "/xyz/openbmc_project/sensors/temperature/powerseq_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cputemp",
+                    "/xyz/openbmc_project/sensors/temperature/nvme0",
+                    "/xyz/openbmc_project/sensors/temperature/nvme1",
+                    "/xyz/openbmc_project/sensors/temperature/nvme2",
+                    "/xyz/openbmc_project/sensors/temperature/nvme3",
+                    "/xyz/openbmc_project/sensors/temperature/nvme4",
+                    "/xyz/openbmc_project/sensors/temperature/nvme5",
+                    "/xyz/openbmc_project/sensors/temperature/nvme6",
+                    "/xyz/openbmc_project/sensors/temperature/nvme7",
+                    "/xyz/openbmc_project/sensors/temperature/nvme8",
+                    "/xyz/openbmc_project/sensors/temperature/nvme9",
+                    "/xyz/openbmc_project/sensors/temperature/nvme10",
+                    "/xyz/openbmc_project/sensors/temperature/nvme11",
+                    "/xyz/openbmc_project/sensors/temperature/nvme12",
+                    "/xyz/openbmc_project/sensors/temperature/nvme13",
+                    "/xyz/openbmc_project/sensors/temperature/nvme14",
+                    "/xyz/openbmc_project/sensors/temperature/nvme15",
+
+                    "/xyz/openbmc_project/sensors/voltage/p1v8_stby",
+                    "/xyz/openbmc_project/sensors/voltage/vddcr_soc_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p2v5_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p1v2_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p1v175_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p1v8",
+                    "/xyz/openbmc_project/sensors/voltage/p3v3",
+                    "/xyz/openbmc_project/sensors/voltage/pwrgd_pvpp",
+                    "/xyz/openbmc_project/sensors/voltage/pwrgd_pvddio",
+                    "/xyz/openbmc_project/sensors/voltage/pwrgd_cpuvr",
+                    "/xyz/openbmc_project/sensors/voltage/p3v3_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p5v_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p3v_bat_adc",
+
+                    "/xyz/openbmc_project/sensors/voltage/vddcr_cpu_in",
+                    "/xyz/openbmc_project/sensors/voltage/vddcr_cpu_out",
+                    "/xyz/openbmc_project/sensors/current/vddcr_cpu_in",
+                    "/xyz/openbmc_project/sensors/current/vddcr_cpu_out",
+                    "/xyz/openbmc_project/sensors/temperature/vddcr_cpu",
+
+                    "/xyz/openbmc_project/sensors/voltage/vddcr_soc_in",
+                    "/xyz/openbmc_project/sensors/voltage/vddcr_soc_out",
+                    "/xyz/openbmc_project/sensors/current/vddcr_soc_in",
+                    "/xyz/openbmc_project/sensors/current/vddcr_soc_out",
+                    "/xyz/openbmc_project/sensors/temperature/vddcr_soc",
+
+                    "/xyz/openbmc_project/sensors/voltage/vddio_abcd_out",
+                    "/xyz/openbmc_project/sensors/voltage/vddio_abcd_in",
+                    "/xyz/openbmc_project/sensors/current/vddio_abcd_in",
+                    "/xyz/openbmc_project/sensors/current/vddio_abcd_out",
+                    "/xyz/openbmc_project/sensors/temperature/vddio_abcd",
+
+                    "/xyz/openbmc_project/sensors/voltage/vddio_efgh_out",
+                    "/xyz/openbmc_project/sensors/voltage/vddio_efgh_in",
+                    "/xyz/openbmc_project/sensors/current/vddio_efgh_in",
+                    "/xyz/openbmc_project/sensors/current/vddio_efgh_out",
+                    "/xyz/openbmc_project/sensors/temperature/vddio_efgh",
+
+                    "/xyz/openbmc_project/sensors/voltage/p12v_mobo_out",
+                    "/xyz/openbmc_project/sensors/voltage/p12v_mobo_in",
+                    "/xyz/openbmc_project/sensors/current/p12v_mobo_in",
+                    "/xyz/openbmc_project/sensors/current/p12v_mobo_out",
+                    "/xyz/openbmc_project/sensors/temperature/p12v_mobo",
+
+                    "/xyz/openbmc_project/sensors/voltage/p12v_fan_out",
+                    "/xyz/openbmc_project/sensors/voltage/p12v_fan_in",
+                    "/xyz/openbmc_project/sensors/current/p12v_fan_in",
+                    "/xyz/openbmc_project/sensors/current/p12v_fan_out",
+                    "/xyz/openbmc_project/sensors/temperature/p12v_fan",
+
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vin",
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vout",
+                    "/xyz/openbmc_project/sensors/current/hotswap_iout",
+                    "/xyz/openbmc_project/sensors/power/hotswap_pout",
+                    "/xyz/openbmc_project/sensors/temperature/hotswap"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "chassis",
+                    "fType": "all_sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/i2cool_0",
+                    "/xyz/openbmc_project/sensors/temperature/i2cool_1",
+                    "/xyz/openbmc_project/sensors/temperature/i2cool_2",
+                    "/xyz/openbmc_project/sensors/temperature/powerseq_temp",
+                    "/xyz/openbmc_project/sensors/temperature/cputemp",
+                    "/xyz/openbmc_project/sensors/temperature/nvme0",
+                    "/xyz/openbmc_project/sensors/temperature/nvme1",
+                    "/xyz/openbmc_project/sensors/temperature/nvme2",
+                    "/xyz/openbmc_project/sensors/temperature/nvme3",
+                    "/xyz/openbmc_project/sensors/temperature/nvme4",
+                    "/xyz/openbmc_project/sensors/temperature/nvme5",
+                    "/xyz/openbmc_project/sensors/temperature/nvme6",
+                    "/xyz/openbmc_project/sensors/temperature/nvme7",
+                    "/xyz/openbmc_project/sensors/temperature/nvme8",
+                    "/xyz/openbmc_project/sensors/temperature/nvme9",
+                    "/xyz/openbmc_project/sensors/temperature/nvme10",
+                    "/xyz/openbmc_project/sensors/temperature/nvme11",
+                    "/xyz/openbmc_project/sensors/temperature/nvme12",
+                    "/xyz/openbmc_project/sensors/temperature/nvme13",
+                    "/xyz/openbmc_project/sensors/temperature/nvme14",
+                    "/xyz/openbmc_project/sensors/temperature/nvme15",
+
+                    "/xyz/openbmc_project/sensors/voltage/p1v8_stby",
+                    "/xyz/openbmc_project/sensors/voltage/vddcr_soc_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p2v5_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p1v2_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p1v175_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p1v8",
+                    "/xyz/openbmc_project/sensors/voltage/p3v3",
+                    "/xyz/openbmc_project/sensors/voltage/pwrgd_pvpp",
+                    "/xyz/openbmc_project/sensors/voltage/pwrgd_pvddio",
+                    "/xyz/openbmc_project/sensors/voltage/pwrgd_cpuvr",
+                    "/xyz/openbmc_project/sensors/voltage/p3v3_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p5v_stby",
+                    "/xyz/openbmc_project/sensors/voltage/p3v_bat_adc",
+
+                    "/xyz/openbmc_project/sensors/voltage/vddcr_cpu_in",
+                    "/xyz/openbmc_project/sensors/voltage/vddcr_cpu_out",
+                    "/xyz/openbmc_project/sensors/current/vddcr_cpu_in",
+                    "/xyz/openbmc_project/sensors/current/vddcr_cpu_out",
+                    "/xyz/openbmc_project/sensors/temperature/vddcr_cpu",
+
+                    "/xyz/openbmc_project/sensors/voltage/vddcr_soc_in",
+                    "/xyz/openbmc_project/sensors/voltage/vddcr_soc_out",
+                    "/xyz/openbmc_project/sensors/current/vddcr_soc_in",
+                    "/xyz/openbmc_project/sensors/current/vddcr_soc_out",
+                    "/xyz/openbmc_project/sensors/temperature/vddcr_soc",
+
+                    "/xyz/openbmc_project/sensors/voltage/vddio_abcd_out",
+                    "/xyz/openbmc_project/sensors/voltage/vddio_abcd_in",
+                    "/xyz/openbmc_project/sensors/current/vddio_abcd_in",
+                    "/xyz/openbmc_project/sensors/current/vddio_abcd_out",
+                    "/xyz/openbmc_project/sensors/temperature/vddio_abcd",
+
+                    "/xyz/openbmc_project/sensors/voltage/vddio_efgh_out",
+                    "/xyz/openbmc_project/sensors/voltage/vddio_efgh_in",
+                    "/xyz/openbmc_project/sensors/current/vddio_efgh_in",
+                    "/xyz/openbmc_project/sensors/current/vddio_efgh_out",
+                    "/xyz/openbmc_project/sensors/temperature/vddio_efgh",
+
+                    "/xyz/openbmc_project/sensors/voltage/p12v_mobo_out",
+                    "/xyz/openbmc_project/sensors/voltage/p12v_mobo_in",
+                    "/xyz/openbmc_project/sensors/current/p12v_mobo_in",
+                    "/xyz/openbmc_project/sensors/current/p12v_mobo_out",
+                    "/xyz/openbmc_project/sensors/temperature/p12v_mobo",
+
+                    "/xyz/openbmc_project/sensors/voltage/p12v_fan_out",
+                    "/xyz/openbmc_project/sensors/voltage/p12v_fan_in",
+                    "/xyz/openbmc_project/sensors/current/p12v_fan_in",
+                    "/xyz/openbmc_project/sensors/current/p12v_fan_out",
+                    "/xyz/openbmc_project/sensors/temperature/p12v_fan",
+
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vin",
+                    "/xyz/openbmc_project/sensors/voltage/hotswap_vout",
+                    "/xyz/openbmc_project/sensors/current/hotswap_iout",
+                    "/xyz/openbmc_project/sensors/power/hotswap_pout",
+                    "/xyz/openbmc_project/sensors/temperature/hotswap",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/fan0",
+                    "/xyz/openbmc_project/sensors/fan_tach/fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/fb_fan0",
+                    "/xyz/openbmc_project/sensors/fan_tach/fb_fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/fb_fan2",
+
+                    "/xyz/openbmc_project/sensors/utilization/CPU",
+                    "/xyz/openbmc_project/sensors/utilization/Memory",
+                    "/xyz/openbmc_project/sensors/utilization/Storage_RW"
+                ]
+            }
+        ]
+    }
+]

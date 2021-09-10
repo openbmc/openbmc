@@ -35,7 +35,7 @@ do_patch[postfuncs] += "do_patch_module_build"
 
 EXTRA_CPAN_BUILD_FLAGS = "--create_packlist=0"
 
-do_install_append () {
+do_install:append () {
         rm -rf ${D}${docdir}/perl/html
 }
 
@@ -55,7 +55,7 @@ do_install_ptest() {
         rm -rf ${D}${PTEST_PATH}/_build/magicnum
 }
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     perl-module-carp \
     perl-module-cpan \
     perl-module-config \
@@ -87,7 +87,7 @@ RDEPENDS_${PN} += " \
     perl-module-utf8 \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     packagegroup-core-buildessential \
     perl-dev \
     perl-module-blib \
@@ -104,7 +104,7 @@ RDEPENDS_${PN}-ptest += " \
     perl-module-test-more \
 "
 
-RPROVIDES_${PN} += "\
+RPROVIDES:${PN} += "\
     libmodule-build-base-perl \
     libmodule-build-compat-perl \
     libmodule-build-config-perl \
@@ -118,6 +118,6 @@ RPROVIDES_${PN} += "\
 "
 
 # t/xs.t RDEPENDS on "EXTERN.h" provided by perl-dev
-INSANE_SKIP_${PN}-ptest = "dev-deps"
+INSANE_SKIP:${PN}-ptest = "dev-deps"
 
 BBCLASSEXTEND = "native"

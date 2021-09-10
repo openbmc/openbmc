@@ -12,7 +12,9 @@ def get_package_manager(d, root_path):
     """
     Returns an OE package manager that can install packages in root_path.
     """
-    from oe.package_manager import RpmPM, OpkgPM, DpkgPM
+    from oe.package_manager.rpm import RpmPM
+    from oe.package_manager.ipk import OpkgPM
+    from oe.package_manager.deb import DpkgPM
 
     pkg_class = d.getVar("IMAGE_PKGTYPE")
     if pkg_class == "rpm":
@@ -115,7 +117,7 @@ def extract_packages(d, needed_packages):
             extract = package.get('extract', True)
 
             if extract:
-                #logger.debug(1, 'Extracting %s' % pkg)
+                #logger.debug('Extracting %s' % pkg)
                 dst_dir = os.path.join(extracted_path, pkg)
                 # Same package used for more than one test,
                 # don't need to extract again.
@@ -128,7 +130,7 @@ def extract_packages(d, needed_packages):
                 shutil.rmtree(pkg_dir)
 
             else:
-                #logger.debug(1, 'Copying %s' % pkg)
+                #logger.debug('Copying %s' % pkg)
                 _copy_package(d, pkg)
 
 def _extract_in_tmpdir(d, pkg):

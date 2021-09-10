@@ -19,4 +19,4 @@ do_install() {
     mkdir -p ${D}${config_dir}
 }
 
-FILES_${PN} += "${config_dir}"
+FILES:${PN} += "${config_dir}"

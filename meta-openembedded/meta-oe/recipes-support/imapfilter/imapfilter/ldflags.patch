@@ -1,0 +1,16 @@
+Append to LDFLAGS so it can respect the LDFLAGS passed from environment. This helps
+with using propert GNU_HASH settings during link on mips/arm
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -24,7 +24,7 @@ CFLAGS = -Wall -Wextra -O \
+ 	 -DCONFIG_SSL_CAPATH='"$(SSLCAPATH)"' \
+ 	 -DCONFIG_SSL_CAFILE='"$(SSLCAFILE)"' \
+ 	 $(INCDIRS) $(MYCFLAGS)
+-LDFLAGS = $(LIBDIRS) $(MYLDFLAGS)
++LDFLAGS += $(LIBDIRS) $(MYLDFLAGS)
+ LIBS = -lm -ldl $(LIBLUA) $(LIBPCRE) $(LIBSSL) $(LIBCRYPTO) $(MYLIBS)
+ 
+ MAN1 = imapfilter.1

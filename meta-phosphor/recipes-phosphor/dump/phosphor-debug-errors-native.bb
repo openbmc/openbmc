@@ -11,7 +11,7 @@ PROVIDES += "virtual/phosphor-debug-errors"
 
 S = "${WORKDIR}"
 
-do_install_append() {
+do_install:append() {
     DEST=${D}${datadir}/dump
     install -d ${DEST}
     install errors_watch.yaml ${DEST}/

@@ -37,6 +37,6 @@ do_install() {
     rm -f ${D}${libdir}/*.a
 }
 
-FILES_${PN} = "${libdir}/*.so.*"
-FILES_${PN} += "${libexecdir}/utempter/utempter"
-FILES_${PN}-dbg += "${libexecdir}/utempter/.debug/utempter"
+FILES:${PN} = "${libdir}/*.so.*"
+FILES:${PN} += "${libexecdir}/utempter/utempter"
+FILES:${PN}-dbg += "${libexecdir}/utempter/.debug/utempter"

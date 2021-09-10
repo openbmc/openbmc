@@ -168,7 +168,7 @@ def deploy(args, config, basepath, workspace):
         if args.strip and not args.dry_run:
             # Fakeroot copy to new destination
             srcdir = recipe_outdir
-            recipe_outdir = os.path.join(rd.getVar('WORKDIR'), 'deploy-target-stripped')
+            recipe_outdir = os.path.join(rd.getVar('WORKDIR'), 'devtool-deploy-target-stripped')
             if os.path.isdir(recipe_outdir):
                 bb.utils.remove(recipe_outdir, True)
             exec_fakeroot(rd, "cp -af %s %s" % (os.path.join(srcdir, '.'), recipe_outdir), shell=True)
@@ -177,13 +177,19 @@ def deploy(args, config, basepath, workspace):
                         rd.getVar('base_libdir'), rd)
 
         filelist = []
+        inodes = set({})
         ftotalsize = 0
         for root, _, files in os.walk(recipe_outdir):
             for fn in files:
+                fstat = os.lstat(os.path.join(root, fn))
                 # Get the size in kiB (since we'll be comparing it to the output of du -k)
                 # MUST use lstat() here not stat() or getfilesize() since we don't want to
                 # dereference symlinks
-                fsize = int(math.ceil(float(os.lstat(os.path.join(root, fn)).st_size)/1024))
+                if fstat.st_ino in inodes:
+                    fsize = 0
+                else:
+                    fsize = int(math.ceil(float(fstat.st_size)/1024))
+                inodes.add(fstat.st_ino)
                 ftotalsize += fsize
                 # The path as it would appear on the target
                 fpath = os.path.join(destdir, os.path.relpath(root, recipe_outdir), fn)
@@ -330,7 +336,7 @@ def register_commands(subparsers, context):
     parser_deploy.add_argument('-e', '--ssh-exec', help='Executable to use in place of ssh')
     parser_deploy.add_argument('-P', '--port', help='Specify port to use for connection to the target')
     parser_deploy.add_argument('-I', '--key',
-                               help='Specifiy ssh private key for connection to the target')
+                               help='Specify ssh private key for connection to the target')
 
     strip_opts = parser_deploy.add_mutually_exclusive_group(required=False)
     strip_opts.add_argument('-S', '--strip',
@@ -355,6 +361,6 @@ def register_commands(subparsers, context):
     parser_undeploy.add_argument('-e', '--ssh-exec', help='Executable to use in place of ssh')
     parser_undeploy.add_argument('-P', '--port', help='Specify port to use for connection to the target')
     parser_undeploy.add_argument('-I', '--key',
-                               help='Specifiy ssh private key for connection to the target')
+                               help='Specify ssh private key for connection to the target')
 
     parser_undeploy.set_defaults(func=undeploy)

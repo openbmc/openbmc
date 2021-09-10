@@ -1,0 +1,91 @@
+From 3be7340059deb6fd74873978ee4e435c84a15b8b Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 23 Jan 2017 15:27:25 +0530
+Subject: [PATCH 01/11] [Patch, microblaze]: Add config/microblaze.mt for
+ target_makefile_frag Mirror MIPS method of creating copy of default.mt which
+ drops the compilation of generic sbrk.c to instead continue using the
+ microblaze provided version.
+
+[Libgloss]
+
+Changelog
+
+2013-07-15  David Holsgrove <david.holsgrove@xilinx.com>
+
+  * config/microblaze.mt: New file.
+  * microblaze/configure.in: Switch default.mt to microblaze.mt.
+  * microblaze/configure: Likewise.
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+---
+ libgloss/config/microblaze.mt    | 30 ++++++++++++++++++++++++++++++
+ libgloss/microblaze/configure    |  2 +-
+ libgloss/microblaze/configure.in |  2 +-
+ 3 files changed, 32 insertions(+), 2 deletions(-)
+ create mode 100644 libgloss/config/microblaze.mt
+
+diff --git a/libgloss/config/microblaze.mt b/libgloss/config/microblaze.mt
+new file mode 100644
+index 000000000..e8fb922dd
+--- /dev/null
++++ b/libgloss/config/microblaze.mt
+@@ -0,0 +1,30 @@
++#
++# Match default.mt to compile generic objects but continue building
++# MicroBlaze specific sbrk.c
++#
++close.o: ${srcdir}/../close.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++fstat.o: ${srcdir}/../fstat.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++getpid.o: ${srcdir}/../getpid.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++isatty.o: ${srcdir}/../isatty.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++kill.o: ${srcdir}/../kill.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++lseek.o: ${srcdir}/../lseek.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++open.o: ${srcdir}/../open.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++print.o: ${srcdir}/../print.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++putnum.o: ${srcdir}/../putnum.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++read.o: ${srcdir}/../read.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++stat.o: ${srcdir}/../stat.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++unlink.o: ${srcdir}/../unlink.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
++write.o: ${srcdir}/../write.c
++	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
+diff --git a/libgloss/microblaze/configure b/libgloss/microblaze/configure
+index 9b2bc7ab4..01f0fb29d 100644
+--- a/libgloss/microblaze/configure
++++ b/libgloss/microblaze/configure
+@@ -2020,7 +2020,7 @@ LIB_AM_PROG_AS
+ 
+ 
+ host_makefile_frag=${srcdir}/../config/default.mh
+-target_makefile_frag=${srcdir}/../config/default.mt
++target_makefile_frag=${srcdir}/../config/microblaze.mt
+ 
+ host_makefile_frag_path=$host_makefile_frag
+ 
+diff --git a/libgloss/microblaze/configure.in b/libgloss/microblaze/configure.in
+index 77aa769d4..5d179fdfc 100644
+--- a/libgloss/microblaze/configure.in
++++ b/libgloss/microblaze/configure.in
+@@ -35,7 +35,7 @@ LIB_AM_PROG_AS
+ AC_SUBST(bsp_prefix)
+ 
+ host_makefile_frag=${srcdir}/../config/default.mh
+-target_makefile_frag=${srcdir}/../config/default.mt
++target_makefile_frag=${srcdir}/../config/microblaze.mt
+ 
+ dnl We have to assign the same value to other variables because autoconf
+ dnl doesn't provide a mechanism to substitute a replacement keyword with
+-- 
+2.17.1
+

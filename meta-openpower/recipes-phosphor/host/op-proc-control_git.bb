@@ -7,18 +7,19 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 S = "${WORKDIR}/git"
 
-inherit autotools obmc-phosphor-utils pkgconfig
+inherit meson obmc-phosphor-utils pkgconfig
 inherit systemd
 
 SRC_URI += "git://github.com/openbmc/openpower-proc-control"
-SRCREV = "883a59d45f1b3e2277c3d77c7f853059b104aba4"
+SRCREV = "2b2117010209b28ae7e4505f4d8275ce342bcd5d"
 
 DEPENDS += " \
-        autoconf-archive-native \
         phosphor-logging \
         phosphor-dbus-interfaces \
         libgpiod \
         "
+
+EXTRA_OEMESON += "-Dtests=disabled"
 
 # For libpdbg, provided by the pdbg package
 DEPENDS += "pdbg"
@@ -27,13 +28,19 @@ TEMPLATE = "pcie-poweroff@.service"
 INSTANCE_FORMAT = "pcie-poweroff@{}.service"
 INSTANCES = "${@compose_list(d, 'INSTANCE_FORMAT', 'OBMC_CHASSIS_INSTANCES')}"
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "${TEMPLATE} ${INSTANCES}"
+SYSTEMD_SERVICE:${PN} = "${TEMPLATE} ${INSTANCES}"
 
-SYSTEMD_SERVICE_${PN} +=  " \
+SYSTEMD_SERVICE:${PN} +=  " \
                          xyz.openbmc_project.Control.Host.NMI.service \
                          op-stop-instructions@.service \
                          op-cfam-reset.service \
                          ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'set-spi-mux.service', '', d)} \
                          op-continue-mpreboot@.service \
                          op-enter-mpreboot@.service \
+                         ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'phal-reinit-devtree.service', '', d)} \
+                         ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'proc-pre-poweroff@.service', '', d)} \
+                         ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'op-reset-host-check@.service', '', d)} \
+                         ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'op-reset-host-clear.service', '', d)} \
+                         ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'phal-import-devtree@.service', '', d)} \
+                         ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', 'phal-export-devtree@.service', '', d)} \
                          "

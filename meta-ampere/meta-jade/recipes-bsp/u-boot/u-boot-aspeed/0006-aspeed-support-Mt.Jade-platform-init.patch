@@ -1,0 +1,175 @@
+From 2c9ab641f2a7ea146a468ec4301c416010badff7 Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chanh@os.amperecomputing.com>
+Date: Wed, 17 Mar 2021 14:11:18 +0700
+Subject: [PATCH] aspeed: support Mt.Jade platform init
+
+This commit adds platform init for Mt.Jade platform.
+
+Signed-off-by: Thang Q. Nguyen <thang@os.amperecomputing.com>
+Signed-off-by: Chanh Nguyen <chanh@os.amperecomputing.com>
+---
+ arch/arm/include/asm/arch-aspeed/ast_scu.h  |  1 +
+ arch/arm/include/asm/arch-aspeed/regs-scu.h |  4 ++
+ arch/arm/mach-aspeed/ast-scu.c              | 18 +++++
+ board/aspeed/ast-g5/ast-g5.c                | 76 +++++++++++++++++++++
+ include/configs/ast-g5-phy.h                |  3 +
+ 5 files changed, 102 insertions(+)
+
+diff --git a/arch/arm/include/asm/arch-aspeed/ast_scu.h b/arch/arm/include/asm/arch-aspeed/ast_scu.h
+index f5c9126ec0..e2d06ccc1f 100644
+--- a/arch/arm/include/asm/arch-aspeed/ast_scu.h
++++ b/arch/arm/include/asm/arch-aspeed/ast_scu.h
+@@ -46,5 +46,6 @@ extern void ast_scu_init_eth(u8 num);
+ extern void ast_scu_multi_func_eth(u8 num);
+ extern void ast_scu_multi_func_romcs(u8 num);
+ extern void ast_scu_switch_pwm_to_gpio_mode(void);
++extern void ast_scu_switch_espi_to_gpio_mode(void);
+ 
+ #endif
+diff --git a/arch/arm/include/asm/arch-aspeed/regs-scu.h b/arch/arm/include/asm/arch-aspeed/regs-scu.h
+index b714fa9234..704ad75b4e 100644
+--- a/arch/arm/include/asm/arch-aspeed/regs-scu.h
++++ b/arch/arm/include/asm/arch-aspeed/regs-scu.h
+@@ -76,6 +76,7 @@
+ #define AST_SCU_FUN_PIN_CTRL7	0xA0	/* Multi-function Pin Control#7*/
+ #define AST_SCU_FUN_PIN_CTRL8	0xA4	/* Multi-function Pin Control#8*/
+ #define AST_SCU_FUN_PIN_CTRL9	0xA8	/* Multi-function Pin Control#9*/
++#define AST_SCU_FUN_PIN_CTRL10	0xAC	/* Multi-function Pin Control#10*/
+ #define AST_SCU_MAC_CLK_DELAY_100M	0xB8	/* MAC interface clock delay 100M setting*/
+ #define AST_SCU_MAC_CLK_DELAY_10M	0xBC	/* MAC interface clock delay 10M setting*/
+ #define AST_SCU_PWR_SAVING_EN	0xC0	/* Power Saving Wakeup Enable*/
+@@ -921,6 +922,9 @@
+ #define SCU_FUN_PIN_ROMA19		(0x1 << 1)
+ #define SCU_FUN_PIN_ROMA18		(0x1)
+ 
++/* AST_SCU_FUN_PIN_CTRL10		0xAC - Multi-function Pin Control#10 */
++#define SCU_FUN_PIN_ESPI(x)             (0x1 << (x))
++
+ /* AST_SCU_PWR_SAVING_EN		0xC0 - Power Saving Wakeup Enable */
+ /* AST_SCU_PWR_SAVING_CTRL		0xC4 - Power Saving Wakeup Control */
+ /* AST_SCU_HW_STRAP2			0xD0 - Haardware strapping register set 2 */
+diff --git a/arch/arm/mach-aspeed/ast-scu.c b/arch/arm/mach-aspeed/ast-scu.c
+index c7ab66415f..71c043d3e8 100644
+--- a/arch/arm/mach-aspeed/ast-scu.c
++++ b/arch/arm/mach-aspeed/ast-scu.c
+@@ -554,3 +554,21 @@ void ast_scu_get_who_init_dram(void)
+ 		break;
+ 	}
+ }
++
++void ast_scu_switch_espi_to_gpio_mode(void)
++{
++	/*
++	* This Function to set the ESPI pin to GPIO mode
++	* This allow to setting AC5_READY
++	*/
++	ast_scu_write(ast_scu_read(AST_SCU_FUN_PIN_CTRL10) &
++					 ~SCU_FUN_PIN_ESPI(0) &
++					 ~SCU_FUN_PIN_ESPI(1) &
++					 ~SCU_FUN_PIN_ESPI(2) &
++					 ~SCU_FUN_PIN_ESPI(3) &
++					 ~SCU_FUN_PIN_ESPI(4) &
++					 ~SCU_FUN_PIN_ESPI(5) &
++					 ~SCU_FUN_PIN_ESPI(6) &
++					 ~SCU_FUN_PIN_ESPI(7),
++					  AST_SCU_FUN_PIN_CTRL10);
++}
+diff --git a/board/aspeed/ast-g5/ast-g5.c b/board/aspeed/ast-g5/ast-g5.c
+index ed83d65136..edf7f050a8 100644
+--- a/board/aspeed/ast-g5/ast-g5.c
++++ b/board/aspeed/ast-g5/ast-g5.c
+@@ -163,3 +163,79 @@ void hw_watchdog_reset(void)
+ 	writel(0x4755, AST_WDT2_BASE + 0x08);
+ }
+ #endif /* CONFIG_WATCHDOG */
++
++#ifdef CONFIG_BOARD_EARLY_INIT_F
++int board_gpio_init(void)
++{
++	int pgood = 0;
++
++	/* GPIO_BMC_PSU_PG */
++	pgood = gpio_get_value(44);
++	/* GPIO_BMC_OCP_AUX_PWREN */
++	gpio_direction_output(139, 1);
++
++	if (pgood)
++	{
++		/* GPIO_BMC_SYS_ATX_PSON_L */
++		gpio_direction_output(42, 0);
++		/* GPIO_BMC_OCP_MAIN_PWREN */
++		gpio_direction_output(140, 1);
++	}
++	else
++	{
++		/* GPIO_BMC_SYS_ATX_PSON_L */
++		gpio_direction_output(42, 1);
++		/* GPIO_BMC_OCP_MAIN_PWREN */
++		gpio_direction_output(140, 0);
++	}
++
++	/* GPIOH7 GPIO_BMC_I2C6_RESET_L */
++	gpio_direction_output(63, 1);
++
++	/* GPIOM4 S0_I2C9_ALERT_L */
++	gpio_direction_input(100);
++
++	/* GPIOM5 S1_I2C9_ALERT_L */
++	gpio_direction_input(101);
++
++	/* GPIOQ7 GPIO_BMC_VGA_FRONT_PRES_L */
++	gpio_direction_input(135);
++
++	/* GPIOR1 GPIO_BMC_JTAG_SRST_L */
++	gpio_direction_output(137, 1);
++
++	/* BMC_GPIOR2_EXT_HIGHTEMP_L */
++	gpio_direction_output(138, 1);
++
++	/* GPIOS0 GPIO_S0_VRHOT_L */
++	gpio_direction_input(144);
++
++	/* GPIOS1 GPIO_S1_VRHOT_L */
++	gpio_direction_input(145);
++
++	/* GPIOS5 GPIO_BMC_VR_PMBUS_SEL_L */
++	gpio_direction_output(149, 1);
++
++	/* GPIOY3 BMC_VGA_SEL */
++	gpio_direction_output(195, 1);
++
++	/* GPIOAC1 GPIO_BMC_PCA9554_INT_L */
++	gpio_direction_input(225);
++
++	/* GPIO_BMC_READY */
++	gpio_direction_output(229, 1);
++
++	/* Enable I2C4 device access */
++	gpio_direction_output(194, 1);
++
++	return 0;
++}
++
++int board_early_init_f(void)
++{
++	ast_scu_switch_espi_to_gpio_mode();
++	board_gpio_init();
++
++	return 0;
++}
++#endif /* CONFIG_BOARD_EARLY_INIT_F */
+diff --git a/include/configs/ast-g5-phy.h b/include/configs/ast-g5-phy.h
+index ea7c66716a..a5e389616b 100644
+--- a/include/configs/ast-g5-phy.h
++++ b/include/configs/ast-g5-phy.h
+@@ -34,4 +34,7 @@
+ #define CONFIG_BOARD_LATE_INIT		1
+ #define CONFIG_CMD_GPIO                1        /* Enable gpio command in shell */
+ 
++/* Call board_early_init_f */
++#define CONFIG_BOARD_EARLY_INIT_F	1
++
+ #endif	/* __AST_G5_PHY_CONFIG_H */
+-- 
+2.17.1
+

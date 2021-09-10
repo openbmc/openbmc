@@ -31,10 +31,10 @@ Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
  networking/udhcp/dhcpc.c                       | 29 ++++++++++++++++------
  1 file changed, 21 insertions(+), 8 deletions(-)
 
-Index: busybox-1.31.0/networking/udhcp/dhcpc.c
+Index: busybox-1.34.0/networking/udhcp/dhcpc.c
 ===================================================================
---- busybox-1.31.0.orig/networking/udhcp/dhcpc.c
-+++ busybox-1.31.0/networking/udhcp/dhcpc.c
+--- busybox-1.34.0.orig/networking/udhcp/dhcpc.c
++++ busybox-1.34.0/networking/udhcp/dhcpc.c
 @@ -48,6 +48,8 @@
  };
  #endif
@@ -44,47 +44,37 @@ Index: busybox-1.31.0/networking/udhcp/dhcpc.c
  
  /* "struct client_data_t client_data" is in bb_common_bufsiz1 */
  
-@@ -103,8 +105,10 @@
- 	OPT_x = 1 << 18,
- 	OPT_f = 1 << 19,
- 	OPT_B = 1 << 20,
-+	OPT_D = 1 << 21,
+@@ -100,8 +102,10 @@
+ 	OPT_x = 1 << 16,
+ 	OPT_f = 1 << 17,
+ 	OPT_B = 1 << 18,
++	OPT_D = 1 << 19,
  /* The rest has variable bit positions, need to be clever */
- 	OPTBIT_B = 20,
-+	OPTBIT_D = 21,
+ 	OPTBIT_B = 18,
++	OPTBIT_D = 19,
  	USE_FOR_MMU(             OPTBIT_b,)
  	IF_FEATURE_UDHCPC_ARPING(OPTBIT_a,)
  	IF_FEATURE_UDHCP_PORT(   OPTBIT_P,)
-@@ -1124,7 +1128,8 @@
- 		client_data.state = RENEW_REQUESTED;
- 		break;
- 	case RENEW_REQUESTED: /* impatient are we? fine, square 1 */
--		udhcp_run_script(NULL, "deconfig");
-+		if (allow_deconfig)
-+			udhcp_run_script(NULL, "deconfig");
- 	case REQUESTING:
- 	case RELEASED:
- 		change_listen_mode(LISTEN_RAW);
-@@ -1160,7 +1165,8 @@
-  * Users requested to be notified in all cases, even if not in one
-  * of the states above.
-  */
--	udhcp_run_script(NULL, "deconfig");
-+	if (allow_deconfig)
-+		udhcp_run_script(NULL, "deconfig");
+@@ -587,7 +591,8 @@
  
- 	change_listen_mode(LISTEN_NONE);
- 	client_data.state = RELEASED;
-@@ -1278,7 +1284,7 @@
+ static void d4_run_script_deconfig(void)
+ {
+-	d4_run_script(NULL, "deconfig");
++	if (allow_deconfig)
++		d4_run_script(NULL, "deconfig");
+ }
+ 
+ /*** Sending/receiving packets ***/
+@@ -1244,7 +1249,7 @@
  	/* Parse command line */
  	opt = getopt32long(argv, "^"
  		/* O,x: list; -T,-t,-A take numeric param */
--		"CV:H:h:F:i:np:qRr:s:T:+t:+SA:+O:*ox:*fB"
-+		"CV:H:h:F:i:np:qRr:s:T:+t:+SA:+O:*ox:*fBD"
+-		"CV:F:i:np:qRr:s:T:+t:+SA:+O:*ox:*fB"
++		"CV:F:i:np:qRr:s:T:+t:+SA:+O:*ox:*fBD"
  		USE_FOR_MMU("b")
  		IF_FEATURE_UDHCPC_ARPING("a::")
  		IF_FEATURE_UDHCP_PORT("P:")
-@@ -1389,6 +1395,10 @@
+@@ -1361,6 +1366,10 @@
  		logmode |= LOGMODE_SYSLOG;
  	}
  
@@ -95,49 +85,3 @@ Index: busybox-1.31.0/networking/udhcp/dhcpc.c
  	/* Create pidfile */
  	write_pidfile(client_data.pidfile);
  	/* Goes to stdout (unless NOMMU) and possibly syslog */
-@@ -1397,7 +1407,8 @@
- 	srand(monotonic_us());
- 
- 	client_data.state = INIT_SELECTING;
--	udhcp_run_script(NULL, "deconfig");
-+	if (allow_deconfig)
-+		udhcp_run_script(NULL, "deconfig");
- 	change_listen_mode(LISTEN_RAW);
- 	packet_num = 0;
- 	timeout = 0;
-@@ -1570,7 +1581,8 @@
- 				}
- 				/* Timed out, enter init state */
- 				bb_info_msg("lease lost, entering init state");
--				udhcp_run_script(NULL, "deconfig");
-+				if (allow_deconfig)
-+					udhcp_run_script(NULL, "deconfig");
- 				client_data.state = INIT_SELECTING;
- 				client_data.first_secs = 0; /* make secs field count from 0 */
- 				/*timeout = 0; - already is */
-@@ -1762,8 +1774,10 @@
- 							"(got ARP reply), declining");
- 						send_decline(/*xid,*/ server_addr, packet.yiaddr);
- 
--						if (client_data.state != REQUESTING)
--							udhcp_run_script(NULL, "deconfig");
-+						if (client_data.state != REQUESTING) {
-+							if (allow_deconfig)
-+								udhcp_run_script(NULL, "deconfig");
-+						}
- 						change_listen_mode(LISTEN_RAW);
- 						client_data.state = INIT_SELECTING;
- 						client_data.first_secs = 0; /* make secs field count from 0 */
-@@ -1832,8 +1846,10 @@
- 				/* return to init state */
- 				bb_info_msg("received %s", "DHCP NAK");
- 				udhcp_run_script(&packet, "nak");
--				if (client_data.state != REQUESTING)
--					udhcp_run_script(NULL, "deconfig");
-+				if (client_data.state != REQUESTING) {
-+					if (allow_deconfig)
-+						udhcp_run_script(NULL, "deconfig");
-+				}
- 				change_listen_mode(LISTEN_RAW);
- 				sleep(3); /* avoid excessive network traffic */
- 				client_data.state = INIT_SELECTING;

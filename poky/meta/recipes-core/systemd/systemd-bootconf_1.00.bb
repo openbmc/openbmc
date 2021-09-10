@@ -2,7 +2,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 SUMMARY = "Basic systemd-boot configuration files"
 
-RPROVIDES_${PN} += "virtual/systemd-bootconf"
+RPROVIDES:${PN} += "virtual-systemd-bootconf"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit systemd-boot-cfg
@@ -12,7 +12,7 @@ S = "${WORKDIR}"
 LABELS = "boot"
 
 ROOT ?= "root=/dev/sda2"
-APPEND_append = " ${ROOT}"
+APPEND:append = " ${ROOT}"
 
 python do_configure() {
     bb.build.exec_func('build_efi_cfg', d)
@@ -29,4 +29,4 @@ do_install() {
 	install *.conf ${D}/boot/loader/entries/
 }
 
-FILES_${PN} = "/boot/loader/* /boot/loader/entries/*"
+FILES:${PN} = "/boot/loader/* /boot/loader/entries/*"

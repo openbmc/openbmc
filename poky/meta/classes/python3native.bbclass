@@ -2,7 +2,7 @@ inherit python3-dir
 
 PYTHON="${STAGING_BINDIR_NATIVE}/python3-native/python3"
 EXTRANATIVEPATH += "python3-native"
-DEPENDS_append = " python3-native "
+DEPENDS:append = " python3-native "
 
 # python-config and other scripts are using distutils modules
 # which we patch to access these variables
@@ -16,8 +16,6 @@ export STAGING_LIBDIR
 # Therefore pre-empt that effort
 export PYTHON_LIBRARY="${STAGING_LIBDIR}/lib${PYTHON_DIR}${PYTHON_ABI}.so"
 export PYTHON_INCLUDE_DIR="${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}"
-
-export _PYTHON_SYSCONFIGDATA_NAME="_sysconfigdata"
 
 # suppress host user's site-packages dirs.
 export PYTHONNOUSERSITE = "1"

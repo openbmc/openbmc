@@ -1,0 +1,40 @@
+From 3886219c5c1fdca114dd480b46ce211762e30742 Mon Sep 17 00:00:00 2001
+From: Li Zhou <li.zhou@windriver.com>
+Date: Tue, 30 Jun 2020 13:50:11 +0800
+Subject: [PATCH] ptpd: Solve memory leak for function NTPDCrequest
+
+Solve the memory leak in function NTPDCrequest detected by valgrind tool.
+
+Memory leak log example:
+==619== 21 bytes in 1 blocks are still reachable in loss record 1 of 3
+==619==    at 0x4A09DB0: calloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+==619==    by 0x43512E: NTPDCrequest (ntpdcontrol.c:255)
+==619==    by 0x43512E: NTPDCquery.isra.1 (ntpdcontrol.c:683)
+==619==    by 0x4359EE: ntpdInControl (ntpdcontrol.c:807)
+==619==    by 0x4364F5: ntpServiceUpdate (timingdomain.c:622)
+==619==    by 0x436935: timingDomainUpdate (timingdomain.c:756)
+==619==    by 0x4334A7: protocol (protocol.c:263)
+==619==    by 0x402BAE: main (ptpd.c:131)
+
+Upstream-Status: Pending
+
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ src/dep/ntpengine/ntpdcontrol.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/dep/ntpengine/ntpdcontrol.c b/src/dep/ntpengine/ntpdcontrol.c
+index bfe0b5e..b1973cb 100644
+--- a/src/dep/ntpengine/ntpdcontrol.c
++++ b/src/dep/ntpengine/ntpdcontrol.c
+@@ -271,6 +271,7 @@ NTPDCrequest(
+ 
+ 	if (!auth) {
+ 		qpkt.auth_seq = AUTH_SEQ(0, 0);
++		free(key);
+ 		return ntpSend(control, (Octet *)&qpkt, req_pkt_size);
+ 	}
+ 
+-- 
+1.9.1
+

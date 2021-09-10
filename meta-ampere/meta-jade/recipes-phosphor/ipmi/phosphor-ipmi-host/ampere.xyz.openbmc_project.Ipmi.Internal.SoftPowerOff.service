@@ -1,0 +1,13 @@
+[Unit]
+Description=Ampere Soft power off of the host
+Wants=obmc-host-stop-pre@0.target
+Before=obmc-host-stop-pre@0.target
+Conflicts=obmc-host-start@0.target
+ConditionPathExists=!/run/openbmc/host@0-request
+ConditionPathExists=!/lib/systemd/system/pldmSoftPowerOff.service
+
+[Service]
+Restart=no
+ExecStart=/usr/bin/env phosphor-softpoweroff
+SyslogIdentifier=phosphor-softpoweroff
+Type=oneshot

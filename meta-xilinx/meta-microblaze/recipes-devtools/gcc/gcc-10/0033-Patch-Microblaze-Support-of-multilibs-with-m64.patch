@@ -1,0 +1,73 @@
+From 802c136f1a41ebfed3b25419e48331038f284e2b Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 11 Sep 2018 13:43:48 +0530
+Subject: [PATCH 33/54] [Patch, Microblaze] : Support of multilibs with m64 ...
+
+---
+ gcc/config/microblaze/microblaze-c.c  |  1 +
+ gcc/config/microblaze/t-microblaze    | 15 ++++++---------
+ libgcc/config/microblaze/t-microblaze | 11 +++--------
+ 3 files changed, 10 insertions(+), 17 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze-c.c b/gcc/config/microblaze/microblaze-c.c
+index dbcd21fc6ee..db543edcbe5 100644
+--- a/gcc/config/microblaze/microblaze-c.c
++++ b/gcc/config/microblaze/microblaze-c.c
+@@ -102,6 +102,7 @@ microblaze_cpp_define (cpp_reader *pfile)
+     }
+   if (TARGET_MB_64)
+     {
++      builtin_define ("__microblaze64");
+       builtin_define ("__arch64__");
+       builtin_define ("__microblaze64__");
+       builtin_define ("__MICROBLAZE64__");
+diff --git a/gcc/config/microblaze/t-microblaze b/gcc/config/microblaze/t-microblaze
+index 9fc80b142ce..35ab9654052 100644
+--- a/gcc/config/microblaze/t-microblaze
++++ b/gcc/config/microblaze/t-microblaze
+@@ -1,12 +1,9 @@
+-MULTILIB_OPTIONS = mxl-barrel-shift mno-xl-soft-mul mxl-multiply-high mlittle-endian m64
+-MULTILIB_DIRNAMES = bs m mh le m64
+-MULTILIB_EXCEPTIONS = *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
+-MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/mlittle-endian
+-MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/mlittle-endian/m64
+-MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/m64 mxl-multiply-high
+-MULTILIB_EXCEPTIONS += mxl-multiply-high/mlittle-endian
+-MULTILIB_EXCEPTIONS += mxl-multiply-high/m64
+-MULTILIB_EXCEPTIONS += *mxl-multiply-high/mlittle-endian/m64
++MULTILIB_OPTIONS = m64 mxl-barrel-shift mlittle-endian mno-xl-soft-mul mxl-multiply-high
++MULTILIB_DIRNAMES = m64 bs le m mh
++MULTILIB_EXCEPTIONS = *m64/mxl-multiply-high mxl-multiply-high
++MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
++MULTILIB_EXCEPTIONS += *mlittle-endian/mxl-multiply-high mxl-multiply-high
++MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift/mlittle-endian/mxl-multiply-high
+ 
+ # Extra files
+ microblaze-c.o: $(srcdir)/config/microblaze/microblaze-c.c \
+diff --git a/libgcc/config/microblaze/t-microblaze b/libgcc/config/microblaze/t-microblaze
+index 35021b24b7d..8d954a49575 100644
+--- a/libgcc/config/microblaze/t-microblaze
++++ b/libgcc/config/microblaze/t-microblaze
+@@ -1,16 +1,11 @@
+-LIB2FUNCS_EXCLUDE += _divsi3 _modsi3 _mulsi3 _udivsi3 _umodsi3 \
+-			_divdi3 _moddi3 _muldi3 _udivdi3 _umoddi3 
++LIB2FUNCS_EXCLUDE += _divsi3 _modsi3 _mulsi3 _udivsi3 _umodsi3
+ 
+ LIB2ADD += \
+         $(srcdir)/config/microblaze/divsi3.S \
+-        $(srcdir)/config/microblaze/divdi3.S \
+         $(srcdir)/config/microblaze/modsi3.S \
+-        $(srcdir)/config/microblaze/moddi3.S \
++        $(srcdir)/config/microblaze/muldi3_hard.S \
+         $(srcdir)/config/microblaze/mulsi3.S \
+-        $(srcdir)/config/microblaze/muldi3.S \
+         $(srcdir)/config/microblaze/stack_overflow_exit.S \
+         $(srcdir)/config/microblaze/udivsi3.S \
+-        $(srcdir)/config/microblaze/udivdi3.S \
+         $(srcdir)/config/microblaze/umodsi3.S \
+-        $(srcdir)/config/microblaze/umoddi3.S \
+-        $(srcdir)/config/microblaze/divsi3_table.c \
++        $(srcdir)/config/microblaze/divsi3_table.c
+-- 
+2.17.1
+

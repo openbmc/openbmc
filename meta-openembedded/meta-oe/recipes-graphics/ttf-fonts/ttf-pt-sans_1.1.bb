@@ -24,9 +24,9 @@ do_install () {
     done
 }
 
-FILES_${PN} += "${datadir}"
+FILES:${PN} += "${datadir}"
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     set -x
     for fontdir in `find $D/usr/lib/X11/fonts -type d`; do
         mkfontdir $fontdir

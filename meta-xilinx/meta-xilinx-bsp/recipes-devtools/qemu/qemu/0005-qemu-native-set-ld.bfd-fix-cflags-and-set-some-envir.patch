@@ -1,0 +1,28 @@
+From 230fe5804099bdca0c9e4cae7280c9fc513cb7f5 Mon Sep 17 00:00:00 2001
+From: Stephen Arnold <sarnold@vctlabs.com>
+Date: Sun, 12 Jun 2016 18:09:56 -0700
+Subject: [PATCH] qemu-native: set ld.bfd, fix cflags, and set some environment
+
+Upstream-Status: Pending
+
+[update patch context]
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
+---
+ configure | 4 ----
+ 1 file changed, 4 deletions(-)
+
+Index: qemu-5.1.0/configure
+===================================================================
+--- qemu-5.1.0.orig/configure
++++ qemu-5.1.0/configure
+@@ -6515,10 +6515,6 @@ write_c_skeleton
+ if test "$gcov" = "yes" ; then
+   QEMU_CFLAGS="-fprofile-arcs -ftest-coverage -g $QEMU_CFLAGS"
+   QEMU_LDFLAGS="-fprofile-arcs -ftest-coverage $QEMU_LDFLAGS"
+-elif test "$fortify_source" = "yes" ; then
+-  CFLAGS="-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $CFLAGS"
+-elif test "$debug" = "no"; then
+-  CFLAGS="-O2 $CFLAGS"
+ fi
+ 
+ if test "$have_asan" = "yes"; then

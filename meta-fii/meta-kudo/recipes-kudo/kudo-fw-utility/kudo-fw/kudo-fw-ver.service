@@ -1,0 +1,10 @@
+[Unit]
+Description=Firmware Version Daemon
+
+[Service]
+RemainAfterExit=yes
+Type=oneshot
+ExecStart=/usr/sbin/kudo-fw-ver.sh
+
+[Install]
+WantedBy=multi-user.target

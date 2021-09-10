@@ -3,7 +3,7 @@ DESCRIPTION = "OVMF is an EDK II based project to enable UEFI support for \
 Virtual Machines. OVMF contains sample UEFI firmware for QEMU and KVM"
 HOMEPAGE = "https://github.com/tianocore/tianocore.github.io/wiki/OVMF"
 LICENSE = "BSD-2-Clause"
-LICENSE_class-target = "${@bb.utils.contains('PACKAGECONFIG', 'secureboot', 'BSD & OpenSSL', 'BSD', d)}"
+LICENSE:class-target = "${@bb.utils.contains('PACKAGECONFIG', 'secureboot', 'BSD & OpenSSL', 'BSD', d)}"
 LIC_FILES_CHKSUM = "file://OvmfPkg/License.txt;md5=06357ddc23f46577c2aeaeaf7b776d65"
 
 # Enabling Secure Boot adds a dependency on OpenSSL and implies
@@ -15,12 +15,15 @@ PACKAGECONFIG[secureboot] = ",,,"
 SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https \
            file://0001-ovmf-update-path-to-native-BaseTools.patch \
            file://0002-BaseTools-makefile-adjust-to-build-in-under-bitbake.patch \
-           file://0003-ovmf-enable-long-path-file.patch \
-           file://0001-ovmf-Update-to-latest.patch \
-        "
+           file://0003-ovmf-Update-to-latest.patch \
+           file://0004-Strip-build-paths.patch \
+           file://0005-debug-prefix-map.patch \
+           file://0006-reproducible.patch \
+           file://0001-Fix-VLA-parameter-warning.patch \
+           "
 
-PV = "edk2-stable202002"
-SRCREV = "4c0f6e349d32cf27a7104ddd3e729d6ebc88ea70"
+PV = "edk2-stable202105"
+SRCREV = "e1999b264f1f9d7230edf2448f757c73da567832"
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>edk2-stable.*)"
 
 inherit deploy
@@ -37,7 +40,7 @@ EDK_TOOLS_DIR="edk2_basetools"
 BUILD_OPTIMIZATION="-pipe"
 
 # OVMF supports IA only, although it could conceivably support ARM someday.
-COMPATIBLE_HOST='(i.86|x86_64).*'
+COMPATIBLE_HOST:class-target='(i.86|x86_64).*'
 
 # Additional build flags for OVMF with Secure Boot.
 # Fedora also uses "-D SMM_REQUIRE -D EXCLUDE_SHELL_FROM_FD".
@@ -49,7 +52,7 @@ export PYTHON_COMMAND = "${HOSTTOOLS_DIR}/python3"
 do_patch[postfuncs] += "fix_basetools_location"
 fix_basetools_location () {
 }
-fix_basetools_location_class-target() {
+fix_basetools_location:class-target() {
     # Replaces the fake path inserted by 0002-ovmf-update-path-to-native-BaseTools.patch.
     # Necessary for finding the actual BaseTools from ovmf-native.
     sed -i -e 's#BBAKE_EDK_TOOLS_PATH#${STAGING_BINDIR_NATIVE}/${EDK_TOOLS_DIR}#' ${S}/OvmfPkg/build.sh
@@ -58,7 +61,7 @@ fix_basetools_location_class-target() {
 do_patch[postfuncs] += "fix_iasl"
 fix_iasl() {
 }
-fix_iasl_class-native() {
+fix_iasl:class-native() {
     # iasl is not installed under /usr/bin when building with OE.
     sed -i -e 's#/usr/bin/iasl#${STAGING_BINDIR_NATIVE}/iasl#' ${S}/BaseTools/Conf/tools_def.template
 }
@@ -77,14 +80,14 @@ fix_toolchain() {
         -e '/^VFR_CPPFLAGS/a CC = ${CC}\nCXX = ${CXX}\nAS = ${AS}\nAR = ${AR}\nLD = ${LD}' \
         ${S}/BaseTools/Source/C/VfrCompile/GNUmakefile
 }
-fix_toolchain_append_class-native() {
+fix_toolchain:append:class-native() {
     # This tools_def.template is going to be used by the target ovmf and
     # defines which compilers to use. For the GCC toolchain definitions,
     # that will be ${HOST_PREFIX}gcc. However, "make" doesn't need that
     # prefix.
     #
     # Injecting ENV(HOST_PREFIX) matches exporting that value as env
-    # variable in do_compile_class-target.
+    # variable in do_compile:class-target.
     sed -i \
         -e 's#\(ENV\|DEF\)(GCC.*_PREFIX)#ENV(HOST_PREFIX)#' \
         -e 's#ENV(HOST_PREFIX)make#make#' \
@@ -101,8 +104,22 @@ fix_toolchain_append_class-native() {
     # to make ovmf-native reusable across distros.
     sed -i \
         -e 's#^\(DEFINE GCC.*DLINK.*FLAGS  *=\)#\1 -fuse-ld=bfd#' \
+        -e 's#-flto#-fno-lto#g' \
+        -e 's#-DUSING_LTO##g' \
         ${S}/BaseTools/Conf/tools_def.template
 }
+
+# We disable lto above since the results are not reproducible and make it hard to compare
+# binary build aretfacts to debug reproducibility problems.
+# Surprisingly, if you disable lto, you see compiler warnings which are fatal. We therefore
+# have to hack warnings overrides into GCC_PREFIX_MAP to allow it to build.
+
+# We want to pass ${DEBUG_PREFIX_MAP} to gcc commands and also pass in
+# --debug-prefix-map to nasm (we carry a patch to nasm for this). The
+# tools definitions are built by ovmf-native so we need to pass this in
+# at target build time when we know the right values.
+export NASM_PREFIX_MAP = "--debug-prefix-map=${WORKDIR}=/usr/src/debug/ovmf/${EXTENDPE}${PV}-${PR}"
+export GCC_PREFIX_MAP = "${DEBUG_PREFIX_MAP} -Wno-stringop-overflow -Wno-maybe-uninitialized"
 
 GCC_VER="$(${CC} -v 2>&1 | tail -n1 | awk '{print $3}')"
 
@@ -133,11 +150,11 @@ fixup_target_tools() {
     echo ${FIXED_GCCVER}
 }
 
-do_compile_class-native() {
+do_compile:class-native() {
     oe_runmake -C ${S}/BaseTools
 }
 
-do_compile_class-target() {
+do_compile:class-target() {
     export LFLAGS="${LDFLAGS}"
     PARALLEL_JOBS="${@oe.utils.parallel_make_argument(d, '-n %d')}"
     OVMF_ARCH="X64"
@@ -186,12 +203,12 @@ do_compile_class-target() {
     fi
 }
 
-do_install_class-native() {
+do_install:class-native() {
     install -d ${D}/${bindir}/edk2_basetools
     cp -r ${S}/BaseTools ${D}/${bindir}/${EDK_TOOLS_DIR}
 }
 
-do_install_class-target() {
+do_install:class-target() {
     # Content for UEFI shell iso. We install the EFI shell as
     # bootx64/ia32.efi because then it can be started even when the
     # firmware itself does not contain it.
@@ -208,20 +225,19 @@ do_install_class-target() {
 #
 # However, EnrollDefaultKeys.efi is only included when Secure Boot is enabled.
 PACKAGES =+ "ovmf-shell-efi"
-FILES_ovmf-shell-efi = " \
+FILES:ovmf-shell-efi = " \
     EnrollDefaultKeys.efi \
     efi/ \
 "
 
 DEPLOYDEP = ""
-DEPLOYDEP_class-target = "qemu-system-native:do_populate_sysroot"
-DEPLOYDEP_class-target += " ${@bb.utils.contains('PACKAGECONFIG', 'secureboot', 'openssl-native:do_populate_sysroot', '', d)}"
+DEPLOYDEP:class-target = "qemu-system-native:do_populate_sysroot"
+DEPLOYDEP:class-target += " ${@bb.utils.contains('PACKAGECONFIG', 'secureboot', 'openssl-native:do_populate_sysroot', '', d)}"
 do_deploy[depends] += "${DEPLOYDEP}"
 
 do_deploy() {
 }
-do_deploy[cleandirs] = "${DEPLOYDIR}"
-do_deploy_class-target() {
+do_deploy:class-target() {
     # For use with "runqemu ovmf".
     for i in \
         ovmf \

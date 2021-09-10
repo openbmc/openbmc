@@ -1,0 +1,35 @@
+From a071243763f4b06fc7e71f541c49cecf380b6f27 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Sun, 11 Oct 2020 22:16:55 +0200
+Subject: [PATCH] wx-config.in: Disable cross magic - it does not work for us
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+E.g 'wx-config --libs' appends a '-Linux' to all libraries (e.g
+-lwx_gtk3u_xrc-3.1 is reported as -lwx_gtk3u_xrc-3.1-Linux) which is wrong and
+make projects depending on wxwidgets fail.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ wx-config.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wx-config.in b/wx-config.in
+index d132e3182f..d0d162e8a3 100755
+--- a/wx-config.in
++++ b/wx-config.in
+@@ -396,7 +396,7 @@ get_mask()
+ }
+ 
+ # Returns true if this script is for a cross compiled config.
+-is_cross()  { [ "x@cross_compiling@" = "xyes" ]; }
++is_cross()  { [ "xno" = "xyes" ]; }
+ 
+ 
+ # Determine the base directories we require.
+-- 
+2.26.2
+

@@ -1,0 +1,28 @@
+From a45b43a2acd4c29bc8a204f51a3fa5e7b9815613 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sat, 14 Nov 2020 12:29:56 +0000
+Subject: [PATCH] don't install srt-ffplay
+
+srt-ffplay is a simple bash scripts that pipes the output of srt-live-transmit to ffplay.
+It need ffmpeg as dependencie and requeire that libsrt is builded with -DENABLE_APPS=ON.
+So remove it because there are no option to disable the instalation.
+
+Upstream-Status: Pending
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ed6e603..ef53dc5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1224,7 +1224,6 @@ if (ENABLE_UNITTESTS AND ENABLE_CXX11)
+ endif()
+ 
+ 
+-install(PROGRAMS scripts/srt-ffplay DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+ 
+ if (DEFINED SRT_EXTRA_APPS_INC)

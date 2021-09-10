@@ -1,0 +1,44 @@
+From fb7bd8511d55cf0d24f6f93768f51773cf434a59 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Fri, 8 Jan 2021 21:59:45 +0100
+Subject: [PATCH] Remove GTK2 leftovers
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It seems that these cause install performed twice causing natsy races -
+see [1] and search for 'TOPDIR/build/tmpfs/hosttools/install -c -m 644
+../../libxfce4ui-4.16.0/libxfce4ui/libxfce4ui.h'
+
+[1] https://errors.yoctoproject.org/Errors/Details/540832/
+
+Upstream-Status: Submitted [https://gitlab.xfce.org/xfce/libxfce4ui/-/merge_requests/29]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ libxfce4ui/Makefile.am | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/libxfce4ui/Makefile.am b/libxfce4ui/Makefile.am
+index 935eece..bc5afac 100644
+--- a/libxfce4ui/Makefile.am
++++ b/libxfce4ui/Makefile.am
+@@ -51,15 +51,6 @@ libxfce4ui_sources = \
+ 	xfce-filename-input.c \
+ 	xfce-titled-dialog.c
+ 
+-libxfce4ui_includedir = \
+-	$(includedir)/xfce4/libxfce4ui-$(LIBXFCE4UI_VERSION_API)/libxfce4ui
+-
+-libxfce4ui_include_HEADERS = \
+-	$(libxfce4ui_headers)
+-
+-
+-
+-
+ ##
+ ## GTK+ 3 support library
+ ##
+-- 
+2.26.2
+

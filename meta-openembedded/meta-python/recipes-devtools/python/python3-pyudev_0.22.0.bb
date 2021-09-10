@@ -7,12 +7,12 @@ SRC_URI[sha256sum] = "69bb1beb7ac52855b6d1b9fe909eefb0017f38d917cba9939602c68800
 
 inherit pypi setuptools3
 
-do_configure_prepend() {
+do_configure:prepend() {
     sed -i "/import pyudev/d" ${S}/setup.py
     sed -i "s/str(pyudev.__version__)/'${PV}'/g" ${S}/setup.py
 }
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${PYTHON_PN}-ctypes \
     ${PYTHON_PN}-misc \
     ${PYTHON_PN}-six \

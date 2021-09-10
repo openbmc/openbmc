@@ -6,29 +6,14 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 SRC_URI = "git://github.com/openbmc/phosphor-webui.git"
-SRCREV = "4a16a026b60a3bf54161ed4e4bc34885b4e3e6c3"
+SRCREV = "51229f8005cb20a12e8d0f057d4565f31d84fa29"
 S = "${WORKDIR}/git"
 
-DEPENDS_prepend = "nodejs-native "
-
-# allarch is required because the files this recipe produces (html and
-# javascript) are valid for any target, regardless of architecture.  The allarch
-# class removes your compiler definitions, as it assumes that anything that
-# requires a compiler is platform specific.  Unfortunately, one of the build
-# tools uses libsass for compiling the css templates, and it needs a compiler to
-# build the library that it then uses to compress the scss into normal css.
-# Enabling allarch, then re-adding the compiler flags was the best of the bad
-# options
+DEPENDS:prepend = "nodejs-native "
 
 inherit allarch
 
-export CXX = "${BUILD_CXX}"
-export CC = "${BUILD_CC}"
-export CFLAGS = "${BUILD_CFLAGS}"
-export CPPFLAGS = "${BUILD_CPPFLAGS}"
-export CXXFLAGS = "${BUILD_CXXFLAGS}"
-
-FILES_${PN} += "${datadir}/www/*"
+FILES:${PN} += "${datadir}/www/*"
 
 do_compile () {
     cd ${S}

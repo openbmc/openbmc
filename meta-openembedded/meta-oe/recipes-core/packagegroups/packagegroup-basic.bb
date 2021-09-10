@@ -26,7 +26,7 @@ TASK_BASIC_SSHDAEMON ?= "dropbear openssh-sftp openssh-sftp-server"
 #
 # Util-linux (u)mount is included because the busybox one can't handle /etc/mtab being symlinked to /proc/mounts
 #
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     ${TASK_BASIC_SSHDAEMON} \
     avahi-daemon avahi-utils \
 "
@@ -37,7 +37,7 @@ RDEPENDS_${PN} = "\
 #   2) Distro features: packages associated with those
 #   3) Nice to have: packages that are nice to have, but aren't strictly needed
 #
-RRECOMMENDS_${PN} = "\
+RRECOMMENDS:${PN} = "\
     ${MACHINE_EXTRA_RRECOMMENDS} \
     ${@bb.utils.contains("MACHINE_FEATURES", "usbhost", "usbutils", "", d)} \
     ${@bb.utils.contains("MACHINE_FEATURES", "alsa", "alsa-utils-alsamixer", "", d)} \

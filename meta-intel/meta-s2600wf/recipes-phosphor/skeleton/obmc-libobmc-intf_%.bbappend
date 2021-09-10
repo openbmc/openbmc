@@ -1,1 +1,0 @@
-FILESEXTRAPATHS_prepend_s2600wf := "${THISDIR}/${PN}:"

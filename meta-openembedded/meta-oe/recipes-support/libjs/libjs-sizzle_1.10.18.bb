@@ -16,4 +16,4 @@ do_install() {
     install -m 0644 ${SIZZLEDIR}/*.js ${D}/${datadir}/javascript/sizzle/
 }
 
-FILES_${PN} = "${datadir}/javascript/sizzle/"
+FILES:${PN} = "${datadir}/javascript/sizzle/"

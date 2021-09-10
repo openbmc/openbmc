@@ -1,14 +1,14 @@
-From 933e887fe2d9a0924a8e05efa6bc3b530b40976d Mon Sep 17 00:00:00 2001
+From 1a0c89e6cd3fec862718d48e9b94275a0dc6e52f Mon Sep 17 00:00:00 2001
 From: Sergey Solomin <sergey.solomin@us.ibm.com>
 Date: Tue, 6 Sep 2016 15:36:43 -0500
-Subject: [PATCH 1/1] 4 byte read support 466
+Subject: [PATCH] 4 byte read support 466
 
 ---
  tools/i2cdump.c | 34 ++++++++++++++++++++++++++++++++++
  1 file changed, 34 insertions(+)
 
 diff --git a/tools/i2cdump.c b/tools/i2cdump.c
-index a7bba72..99c79be 100644
+index b638c3d..6af44a8 100644
 --- a/tools/i2cdump.c
 +++ b/tools/i2cdump.c
 @@ -25,6 +25,7 @@
@@ -29,14 +29,14 @@ index a7bba72..99c79be 100644
  {
  	fprintf(stderr,
 @@ -46,6 +49,7 @@ static void help(void)
- 		"    s (SMBus block)\n"
+ 		"    s (SMBus block, deprecated)\n"
  		"    i (I2C block)\n"
  		"    c (consecutive byte)\n"
 +		"    d (double word)\n"
  		"    Append p for SMBus PEC\n");
  }
  
-@@ -184,6 +188,9 @@ int main(int argc, char *argv[])
+@@ -187,6 +191,9 @@ int main(int argc, char *argv[])
  	} else if (!strncmp(argv[flags+3], "c", 1)) {
  		size = I2C_SMBUS_BYTE;
  		pec = argv[flags+3][1] == 'p';
@@ -46,7 +46,7 @@ index a7bba72..99c79be 100644
  	} else if (!strcmp(argv[flags+3], "i"))
  		size = I2C_SMBUS_I2C_BLOCK_DATA;
  	else {
-@@ -285,6 +292,7 @@ int main(int argc, char *argv[])
+@@ -289,6 +296,7 @@ int main(int argc, char *argv[])
  			size == I2C_SMBUS_BLOCK_DATA ? "smbus block" :
  			size == I2C_SMBUS_I2C_BLOCK_DATA ? "i2c block" :
  			size == I2C_SMBUS_BYTE ? "byte consecutive read" :
@@ -54,7 +54,7 @@ index a7bba72..99c79be 100644
  			size == I2C_SMBUS_BYTE_DATA ? "byte" : "word");
  		if (pec)
  			fprintf(stderr, "PEC checking enabled.\n");
-@@ -313,6 +321,32 @@ int main(int argc, char *argv[])
+@@ -317,6 +325,32 @@ int main(int argc, char *argv[])
  		}
  	}
  
@@ -88,5 +88,5 @@ index a7bba72..99c79be 100644
  	if (bank && size != I2C_SMBUS_BLOCK_DATA) {
  		res = i2c_smbus_read_byte_data(file, bankreg);
 -- 
-1.8.2.2
+2.31.1
 

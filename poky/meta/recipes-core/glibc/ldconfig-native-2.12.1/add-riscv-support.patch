@@ -1,0 +1,79 @@
+From fd50228cc213d2d87f5e3cf1f123acb3fda9b04e Mon Sep 17 00:00:00 2001
+From: Christoph Muellner <cmuellner@linux.com>
+Date: Mon, 28 Jun 2021 00:34:12 +0200
+Subject: [PATCH] ldconfig: Add RISC-V support
+
+ldconfig-native does not support RISC-V at the moment.
+Let's pull the reqired constants from upstream and add
+the required parsing code.
+
+Upstream-Status: Backport
+
+Signed-off-by: Christoph Muellner <cmuellner@linux.com>
+---
+ cache.c      |  6 ++++++
+ ldconfig.h   |  2 ++
+ readelflib.c | 10 ++++++++++
+ 3 files changed, 18 insertions(+)
+
+diff --git a/cache.c b/cache.c
+index c4f5411..a3b9e70 100644
+--- a/cache.c
++++ b/cache.c
+@@ -125,6 +125,12 @@ print_entry (const char *lib, int flag, unsigned int osversion,
+     case FLAG_AARCH64_LIB64:
+       fputs (",AArch64", stdout);
+       break;
++    case FLAG_RISCV_FLOAT_ABI_SOFT:
++      fputs (",soft-float", stdout);
++      break;
++    case FLAG_RISCV_FLOAT_ABI_DOUBLE:
++      fputs (",double-float", stdout);
++      break;
+     case 0:
+       break;
+     default:
+diff --git a/ldconfig.h b/ldconfig.h
+index 6a8a750..2e5e379 100644
+--- a/ldconfig.h
++++ b/ldconfig.h
+@@ -38,6 +38,8 @@
+ #define FLAG_ARM_LIBHF			0x0900
+ #define FLAG_AARCH64_LIB64		0x0a00
+ #define FLAG_ARM_LIBSF			0x0b00
++#define FLAG_RISCV_FLOAT_ABI_SOFT	0x0f00
++#define FLAG_RISCV_FLOAT_ABI_DOUBLE	0x1000
+ 
+ /* Name of auxiliary cache.  */
+ #define _PATH_LDCONFIG_AUX_CACHE "/var/cache/ldconfig/aux-cache"
+diff --git a/readelflib.c b/readelflib.c
+index 9ec0a54..a01e1ce 100644
+--- a/readelflib.c
++++ b/readelflib.c
+@@ -33,6 +33,10 @@
+ #define EM_AARCH64	183		/* ARM AARCH64 */
+ #endif
+ 
++#ifndef EM_RISCV
++#define EM_RISCV	243		/* RISC-V */
++#endif
++
+ #undef check_ptr
+ #define check_ptr(ptr)						\
+ do								\
+@@ -331,6 +335,12 @@ process_elf_file64 (const char *file_name, const char *lib, int *flag,
+       /* see sysdeps/unix/sysv/linux/arm/readelflib.c */
+       *flag |= FLAG_AARCH64_LIB64|FLAG_ELF_LIBC6;
+       break;
++    case EM_RISCV:
++      /* RISC-V libraries are always libc.so.6+. */
++      /* NOTE: This does not correctly handle soft-float binaries */
++      /* see sysdeps/unix/sysv/linux/riscv/readelflib.c */
++      *flag |= FLAG_RISCV_FLOAT_ABI_DOUBLE|FLAG_ELF_LIBC6;
++      break;
+     default:
+       error(0, 0, "%s is a 64-bit ELF for unknown machine %lx\n",
+             file_name, (long)elf_header->e_machine);
+-- 
+2.25.1
+

@@ -1,0 +1,6 @@
+[Unit]
+Description=Dummy flash file verification
+
+[Service]
+Type=oneshot
+ExecStart=/bin/mv /run/initramfs/bmc-image /run/initramfs/dummy

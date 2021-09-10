@@ -11,6 +11,8 @@ LIC_FILES_CHKSUM = " \
 
 inherit devicetree
 
+DEPENDS += "python3-dtc-native"
+
 PROVIDES = "virtual/dtb"
 
 # common zynq include

@@ -1,0 +1,1163 @@
+{
+    "Exposes": [
+        {
+            "Name": "P0 Fan connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "P1 Fan connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN1 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN2 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN3 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN4 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN5 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Name": "SYS FAN6 connector",
+            "Status": "disabled",
+            "Type": "FanConnector"
+        },
+        {
+            "Index": 0,
+            "Name": "5_DUAL",
+            "ScaleFactor": 0.272,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 5.5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 4.5
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 1,
+            "Name": "33_DUAL",
+            "ScaleFactor": 0.411,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 3.63
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 2.97
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 2,
+            "Name": "12_RUN",
+            "PowerState": "On",
+            "ScaleFactor": 0.113,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 13.2
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 10.8
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 3,
+            "Name": "5_RUN",
+            "PowerState": "On",
+            "ScaleFactor": 0.272,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 5.5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 4.5
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Index": 4,
+            "Name": "33_RUN",
+            "PowerState": "On",
+            "ScaleFactor": 0.411,
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 3.63
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 2.97
+                }
+            ],
+            "Type": "ADC"
+        },
+        {
+            "Address": "0x61",
+            "Bus": 4,
+            "Labels": [
+                "iin",
+                "iout1",
+                "vin",
+                "vout1",
+                "temp1"
+            ],
+            "PowerState": "On",
+            "Name": "P0_VDD_CORE",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "iin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 50
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 216
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vin",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 8.0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 14.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.875
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "temp1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 125
+                }
+            ],
+            "Type": "ISL68137"
+        },
+        {
+            "Address": "0x63",
+            "Bus": 4,
+            "Labels": [
+                "iin",
+                "iout1",
+                "vin",
+                "vout1",
+                "temp1"
+            ],
+            "PowerState": "On",
+            "Name": "P0_VDD_SOC",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "iin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 50
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vin",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 8.0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 14.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.875
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "temp1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 125
+                }
+            ],
+            "Type": "ISL68137"
+        },
+        {
+            "Address": "0x64",
+            "Bus": 4,
+            "Labels": [
+                "iin",
+                "iout1",
+                "iout2",
+                "vin",
+                "vout1",
+                "vout2",
+                "temp1"
+            ],
+            "PowerState": "On",
+            "Name": "P0_VDD_MEM_ABCD",
+            "Name1": "P0_VDD_VPP_ABCD",
+            "iin_Name" : "P0_VDD_MEM_VPP_ABCD_Input_Current",
+            "vin_Name" : "P0_VDD_MEM_VPP_ABCD_Input_Voltage",
+            "temp1_Name" : "P0_VDD_MEM_VPP_ABCD_Temperature",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "iin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 50
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 120
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vin",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 4.5
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 14.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.9
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout2",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.8
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "temp1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 125
+                }
+            ],
+            "Type": "ISL68137"
+        },
+        {
+            "Address": "0x65",
+            "Bus": 4,
+            "Labels": [
+                "iin",
+                "iout1",
+                "iout2",
+                "vin",
+                "vout1",
+                "vout2",
+                "temp1"
+            ],
+            "PowerState": "On",
+            "Name": "P0_VDD_MEM_EFGH",
+            "Name1": "P0_VDD_VPP_EFGH",
+            "iin_Name" : "P0_VDD_MEM_VPP_EFGH_Input_Current",
+            "vin_Name" : "P0_VDD_MEM_VPP_EFGH_Input_Voltage",
+            "temp1_Name" : "P0_VDD_MEM_VPP_EFGH_Temperature",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "iin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 50
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 120
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vin",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 4.5
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 14.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.9
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout2",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.8
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "temp1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 125
+                }
+            ],
+            "Type": "ISL68137"
+        },
+        {
+            "Address": "0x61",
+            "Bus": 5,
+            "Labels": [
+                "iin",
+                "iout1",
+                "vin",
+                "vout1",
+                "temp1"
+            ],
+            "PowerState": "On",
+            "Name": "P1_VDD_CORE",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "iin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 50
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 216
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vin",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 8.0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 14.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.875
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "temp1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 125
+                }
+            ],
+            "Type": "ISL68137"
+        },
+        {
+            "Address": "0x63",
+            "Bus": 5,
+            "Labels": [
+                "iin",
+                "iout1",
+                "vin",
+                "vout1",
+                "temp1"
+            ],
+            "PowerState": "On",
+            "Name": "P1_VDD_SOC",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "iin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 50
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 85
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vin",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 8.0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 14.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.875
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "temp1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 125
+                }
+            ],
+            "Type": "ISL68137"
+        },
+        {
+            "Address": "0x64",
+            "Bus": 5,
+            "Labels": [
+                "iin",
+                "iout1",
+                "iout2",
+                "vin",
+                "vout1",
+                "vout2",
+                "temp1"
+            ],
+            "PowerState": "On",
+            "Name": "P1_VDD_MEM_ABCD",
+            "Name1": "P1_VDD_VPP_ABCD",
+            "iin_Name" : "P1_VDD_MEM_VPP_ABCD_Input_Current",
+            "vin_Name" : "P1_VDD_MEM_VPP_ABCD_Input_Voltage",
+            "temp1_Name" : "P1_VDD_MEM_VPP_ABCD_Temperature",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "iin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 50
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 120
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vin",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 4.5
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 14.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.9
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout2",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.8
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "temp1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 125
+                }
+            ],
+            "Type": "ISL68137"
+        },
+        {
+            "Address": "0x65",
+            "Bus": 5,
+            "Labels": [
+                "iin",
+                "iout1",
+                "iout2",
+                "vin",
+                "vout1",
+                "vout2",
+                "temp1"
+            ],
+            "PowerState": "On",
+            "Name": "P1_VDD_MEM_EFGH",
+            "Name1": "P1_VDD_VPP_EFGH",
+            "iin_Name" : "P1_VDD_MEM_VPP_EFGH_Input_Current",
+            "vin_Name" : "P1_VDD_MEM_VPP_EFGH_Input_Voltage",
+            "temp1_Name" : "P1_VDD_MEM_VPP_EFGH_Temperature",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Label": "iin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 50
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 120
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "iout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vin",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 4.5
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vin",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 14.0
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 1.9
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "vout2",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "vout2",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 2.8
+                },
+                {
+                    "Direction": "less than",
+                    "Label": "temp1",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                },
+                {
+                    "Direction": "greater than",
+                    "Label": "temp1",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 125
+                }
+            ],
+            "Type": "ISL68137"
+        },
+        {
+            "Address": "0x48",
+            "Bus": 7,
+            "Name": "BMC",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 38
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "LM75A"
+        },
+        {
+            "Address": "0x49",
+            "Bus": 7,
+            "Name": "DIMM_P0_ABCD_P1_EFGH",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 38
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "LM75A"
+        },
+        {
+            "Address": "0x4A",
+            "Bus": 7,
+            "Name": "DIMM_P1_EFGH",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 38
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "LM75A"
+        },
+        {
+            "Address": "0x4B",
+            "Bus": 7,
+            "Name": "PCIe_Slots",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 38
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "LM75A"
+        },
+        {
+            "Address": "0x4C",
+            "Bus": 7,
+            "Name": "DIMM_P0_EFGH_P1_ABCD",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 38
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "LM75A"
+        },
+        {
+            "Address": "0x4D",
+            "Bus": 7,
+            "Name": "DIMM_P1_ABCD",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 38
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "LM75A"
+        },
+        {
+            "Address": "0x4E",
+            "Bus": 7,
+            "Name": "DIMM_P0_EFGH",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 38
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "LM75A"
+        },
+        {
+            "Address": "0x4F",
+            "Bus": 7,
+            "Name": "DIMM_P0_ABCD",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 40
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 38
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "LM75A"
+        },
+        {
+            "Address": "0x4C",
+            "Bus": 0,
+            "Name": "CPU0",
+            "PowerState": "On",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 75
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 70
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "SBTSI"
+        },
+        {
+            "Address": "0x48",
+            "Bus": 1,
+            "Name": "CPU1",
+            "PowerState": "On",
+            "Thresholds": [
+                {
+                    "Direction": "greater than",
+                    "Name": "upper critical",
+                    "Severity": 1,
+                    "Value": 75
+                },
+                {
+                    "Direction": "greater than",
+                    "Name": "upper non critical",
+                    "Severity": 0,
+                    "Value": 70
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower non critical",
+                    "Severity": 0,
+                    "Value": 5
+                },
+                {
+                    "Direction": "less than",
+                    "Name": "lower critical",
+                    "Severity": 1,
+                    "Value": 0
+                }
+            ],
+            "Type": "SBTSI"
+        }
+    ],
+    "Name": "AMD EthanolX Baseboard",
+    "Probe": "TRUE",
+    "Type": "Board",
+    "ProductId": "1",
+    "xyz.openbmc_project.Inventory.Decorator.Asset": {
+        "Manufacturer": "AMD",
+        "Model": "EthanolX",
+        "PartNumber": "109-H43111-00A_02",
+        "SerialNumber": "EX782B"
+    }
+}

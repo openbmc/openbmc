@@ -1,7 +1,7 @@
-DEPENDS_prepend = "virtual/libintl intltool-native "
+DEPENDS:prepend = "virtual/libintl intltool-native "
 GPE_TARBALL_SUFFIX ?= "gz"
 SRC_URI = "${GPE_MIRROR}/${BP}.tar.${GPE_TARBALL_SUFFIX}"
-FILES_${PN} += "${datadir}/gpe ${datadir}/application-registry"
+FILES:${PN} += "${datadir}/gpe ${datadir}/application-registry"
 SECTION ?= "gpe"
 
 inherit gettext

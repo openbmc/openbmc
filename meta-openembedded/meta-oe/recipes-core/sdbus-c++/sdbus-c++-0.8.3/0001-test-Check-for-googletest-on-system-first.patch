@@ -1,0 +1,41 @@
+From dc5fa7a4b342ef80cda533cdb821841d8183287c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 23 May 2021 09:01:09 -0700
+Subject: [PATCH] test: Check for googletest on system first
+
+This ensures if googletest is instslled already then use that version
+before downloading and building own copy
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/CMakeLists.txt | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 97f7c1a..3dfdd1c 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -2,6 +2,10 @@
+ # DOWNLOAD AND BUILD OF GOOGLETEST
+ #-------------------------------
+ 
++find_package(GTest)
++
++if(NOT GTest_FOUND)
++
+ include(FetchContent)
+ 
+ message("Fetching googletest...")
+@@ -23,7 +27,7 @@ if(NOT googletest_POPULATED)
+     add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+     set(BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS_BAK})
+ endif()
+-
++endif()
+ #-------------------------------
+ # SOURCE FILES CONFIGURATION
+ #-------------------------------
+-- 
+2.31.1
+

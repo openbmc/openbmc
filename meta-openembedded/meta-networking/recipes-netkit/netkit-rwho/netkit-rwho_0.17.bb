@@ -82,12 +82,11 @@ do_install () {
     mkdir -p -m 755 ${D}${localstatedir}/spool/rwho
     chown -R rwhod ${D}${localstatedir}/spool/rwho
 }
-
-pkg_postinst_${PN}-server() {
+pkg_postinst_ontarget:${PN}-server() {
     ${sysconfdir}/init.d/rwhod start
 }
 
-pkg_postrm_${PN}-server() {
+pkg_postrm:${PN}-server() {
     ${sysconfdir}/init.d/rwhod stop
 }
 
@@ -95,15 +94,15 @@ INITSCRIPT_NAME = "rwhod"
 INITSCRIPT_PARAM = "defaults 85 15"
 
 USERADD_PACKAGES = "${PN}-server"
-GROUPADD_PARAM_${PN}-server = "--system rwhod"
-USERADD_PARAM_${PN}-server = "--system -g rwhod --home-dir  ${localstatedir}/spool/rwho \
+GROUPADD_PARAM:${PN}-server = "--system rwhod"
+USERADD_PARAM:${PN}-server = "--system -g rwhod --home-dir  ${localstatedir}/spool/rwho \
         --no-create-home  --shell /bin/false rwhod"
 
-INSANE_SKIP_${PN} = "already-stripped"
+INSANE_SKIP:${PN} = "already-stripped"
 
 PACKAGES = "${PN}-client ${PN}-server ${PN}-doc ${BPN}-dbg"
-FILES_${PN}-client = "${bindir}/*"
-FILES_${PN}-server = "${sbindir}/* ${localstatedir} ${sysconfdir}/default/* ${sysconfdir}/init.d/*"
-FILES_${PN}-doc = "${mandir}"
-FILES_${PN}-dbg = "${prefix}/src/debug \
+FILES:${PN}-client = "${bindir}/*"
+FILES:${PN}-server = "${sbindir}/* ${localstatedir} ${sysconfdir}/default/* ${sysconfdir}/init.d/*"
+FILES:${PN}-doc = "${mandir}"
+FILES:${PN}-dbg = "${prefix}/src/debug \
             ${bindir}/.debug ${sbindir}/.debug"

@@ -1,0 +1,33 @@
+From dff8fd27edb23bc1486809186c6a4fe1f75f2179 Mon Sep 17 00:00:00 2001
+From: Yi Fan Yu <yifan.yu@windriver.com>
+Date: Thu, 22 Apr 2021 22:35:59 -0400
+Subject: [PATCH] test/regress.h: Increase default timeval tolerance 50 ms ->
+ 100 ms
+
+The default timeout tolerance is 50 ms,
+which causes intermittent failure in many the
+related tests in arm64 QEMU.
+
+See: https://bugzilla.yoctoproject.org/show_bug.cgi?id=14163
+(The root cause seems to be a heavy load)
+
+Upstream-Status: Submitted [https://github.com/libevent/libevent/pull/1157]
+
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
+---
+ test/regress.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/regress.h b/test/regress.h
+index f06a7669..829af4a7 100644
+--- a/test/regress.h
++++ b/test/regress.h
+@@ -127,7 +127,7 @@ int test_ai_eq_(const struct evutil_addrinfo *ai, const char *sockaddr_port,
+ 	tt_int_op(labs(timeval_msec_diff((tv1), (tv2)) - diff), <=, tolerance)
+ 
+ #define test_timeval_diff_eq(tv1, tv2, diff)				\
+-	test_timeval_diff_leq((tv1), (tv2), (diff), 50)
++	test_timeval_diff_leq((tv1), (tv2), (diff), 100)
+ 
+ long timeval_msec_diff(const struct timeval *start, const struct timeval *end);
+

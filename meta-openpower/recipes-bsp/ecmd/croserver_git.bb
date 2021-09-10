@@ -4,7 +4,7 @@ LICENSE= "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/NOTICE;md5=fee220301a2af3faf8f211524b4248ea"
 
 SRC_URI = "git://github.com/open-power/eCMD.git"
-SRCREV = "79cadcd0d299cc044791da9b5e3746108290558a"
+SRCREV = "57b40102a54dac8b4b9cdc91beefd709d222867e"
 DEPENDS += "zlib"
 
 SRC_URI += "file://croserver.service"
@@ -33,4 +33,4 @@ do_install() {
     install -m 0644 ${WORKDIR}/croserver.service ${D}${systemd_system_unitdir}/
 }
 
-FILES_${PN} += "${systemd_system_unitdir}/croserver.service"
+FILES:${PN} += "${systemd_system_unitdir}/croserver.service"

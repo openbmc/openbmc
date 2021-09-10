@@ -1,0 +1,29 @@
+From 7d38a72f9ae14a2416f7a78e28152aa33685aec7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 12 Aug 2020 16:47:27 -0700
+Subject: [PATCH] cmu_indic_lang: Make cst_rx_not_indic as extern declaration
+
+Fixes build with gcc-10 which has -fno-common turned on by default
+
+Upstream-Status: Submitted [https://github.com/MycroftAI/mimic1/pull/211]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lang/cmu_indic_lang/cmu_indic_lang.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lang/cmu_indic_lang/cmu_indic_lang.h b/lang/cmu_indic_lang/cmu_indic_lang.h
+index 75ee46c..83e2afa 100644
+--- a/lang/cmu_indic_lang/cmu_indic_lang.h
++++ b/lang/cmu_indic_lang/cmu_indic_lang.h
+@@ -51,7 +51,7 @@ void cmu_indic_lang_init(cst_voice *v);
+ extern const cst_phoneset cmu_indic_phoneset;
+ extern const cst_cart cmu_indic_phrasing_cart; 
+ 
+-const cst_regex * const cst_rx_not_indic;
++extern const cst_regex * const cst_rx_not_indic;
+ 
+ #ifdef __cplusplus
+ } /* extern "C" */
+-- 
+2.28.0
+

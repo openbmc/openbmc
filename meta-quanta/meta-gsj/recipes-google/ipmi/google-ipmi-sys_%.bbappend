@@ -1,6 +1,8 @@
-NETIPMI_PROVIDER_LIBRARY_gsj += "libsyscmds.so"
-SYSTEMD_SERVICE_${PN}_remove_gsj = "gbmc-psu-hardreset.target"
+SYSTEMD_SERVICE:${PN}:remove:gsj = " \
+  gbmc-host-poweroff.target \
+  gbmc-psu-hardreset.target \
+  "
 
-do_install_append_gsj() {
-   rm -rf ${D}/lib
+do_install:append:gsj() {
+   rm -r ${D}/lib
 }

@@ -1,0 +1,38 @@
+[
+    {
+        "name": "fan0",
+        "zone": "0",
+        "sensors": ["fan0_0"],
+        "target_interface": "xyz.openbmc_project.Control.FanSpeed"
+    },
+    {
+        "name": "fan1",
+        "zone": "0",
+        "sensors": ["fan1_0"],
+        "target_interface": "xyz.openbmc_project.Control.FanSpeed"
+    },
+    {
+        "name": "fan2",
+        "zone": "0",
+        "sensors": ["fan2_0"],
+        "target_interface": "xyz.openbmc_project.Control.FanSpeed"
+    },
+    {
+        "name": "fan3",
+        "zone": "0",
+        "sensors": ["fan3_0"],
+        "target_interface": "xyz.openbmc_project.Control.FanSpeed"
+    },
+    {
+        "name": "fan4",
+        "zone": "0",
+        "sensors": ["fan4_0"],
+        "target_interface": "xyz.openbmc_project.Control.FanSpeed"
+    },
+    {
+        "name": "fan5",
+        "zone": "0",
+        "sensors": ["fan5_0"],
+        "target_interface": "xyz.openbmc_project.Control.FanSpeed"
+    }
+]

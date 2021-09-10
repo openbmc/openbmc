@@ -45,6 +45,6 @@ do_install() {
     rm -rf ${D}/dev
 }
 
-pkg_postinst_ontarget_${PN}() {
+pkg_postinst_ontarget:${PN}() {
     /bin/mknod -m 0622 /dev/grsec c 1 13
 }

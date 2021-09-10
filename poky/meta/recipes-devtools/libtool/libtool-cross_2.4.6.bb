@@ -6,7 +6,9 @@ SRC_URI += "file://fixinstall.patch"
 
 datadir = "${STAGING_DIR_TARGET}${target_datadir}"
 
-do_configure_prepend () {
+inherit nopackages
+
+do_configure:prepend () {
 	# Remove any existing libtool m4 since old stale versions would break
 	# any upgrade
 	rm -f ${STAGING_DATADIR}/aclocal/libtool.m4

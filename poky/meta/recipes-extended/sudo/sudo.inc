@@ -3,8 +3,8 @@ DESCRIPTION = "Sudo (superuser do) allows a system administrator to give certain
 HOMEPAGE = "http://www.sudo.ws"
 BUGTRACKER = "http://www.sudo.ws/bugs/"
 SECTION = "admin"
-LICENSE = "ISC & BSD & Zlib"
-LIC_FILES_CHKSUM = "file://doc/LICENSE;md5=4d1b44b1576eea036d78b8cc961aa93d \
+LICENSE = "ISC & BSD-3-Clause & BSD-2-Clause & Zlib"
+LIC_FILES_CHKSUM = "file://doc/LICENSE;md5=fdff64d4fd19126330aa81b94d167173 \
                     file://plugins/sudoers/redblack.c;beginline=1;endline=46;md5=03e35317699ba00b496251e0dfe9f109 \
                     file://lib/util/reallocarray.c;beginline=3;endline=15;md5=397dd45c7683e90b9f8bf24638cf03bf \
                     file://lib/util/fnmatch.c;beginline=3;endline=27;md5=004d7d2866ba1f5b41174906849d2e0f \
@@ -24,14 +24,14 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[zlib] = "--enable-zlib,--disable-zlib,zlib"
 PACKAGECONFIG[pam-wheel] = ",,,pam-plugin-wheel"
 
-CONFFILES_${PN} = "${sysconfdir}/sudoers"
+CONFFILES:${PN} = "${sysconfdir}/sudoers"
 
 EXTRA_OECONF = "--with-editor=${base_bindir}/vi --with-env-editor"
 
-EXTRA_OECONF_append_libc-musl = " --disable-hardening "
+EXTRA_OECONF:append:libc-musl = " --disable-hardening "
 
 # mksigname/mksiglist are used on build host to generate source files
-do_compile_prepend () {
+do_compile:prepend () {
 	# Remove build host references from sudo_usage.h
 	sed -i  \
 	    -e 's,--with-libtool-sysroot=${STAGING_DIR_TARGET},,g' \
@@ -46,6 +46,8 @@ do_compile_prepend () {
 # script (from sudo) will recursively create ${localstatedir}/lib/sudo
 # and then chmod each directory with 0700 permissions, which isn't what
 # we want (i.e, users would not be able to access /var/lib).
-do_install_prepend (){
+do_install:prepend (){
 	mkdir -p ${D}/${localstatedir}/lib
 }
+
+CVE_VERSION_SUFFIX = "patch"

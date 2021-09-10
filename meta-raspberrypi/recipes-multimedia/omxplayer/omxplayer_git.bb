@@ -36,12 +36,12 @@ SRC_URI = "git://github.com/popcornmix/omxplayer.git;protocol=git;branch=master 
            file://0007-Remove-Makefile-hardcoded-arch-tune.patch \
            "
 
-SRC_URI_append = "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", " file://0001-Fix-build-with-vc4-driver.patch ", "", d)}"
+SRC_URI:append = "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", " file://0001-Fix-build-with-vc4-driver.patch ", "", d)}"
 
 S = "${WORKDIR}/git"
 
 COMPATIBLE_MACHINE = "^rpi$"
-COMPATIBLE_HOST_aarch64 = "null"
+COMPATIBLE_HOST:aarch64 = "null"
 
 def cpu(d):
     for arg in (d.getVar('TUNE_CCARGS') or '').split():
@@ -99,10 +99,10 @@ do_install() {
     install ${S}/fonts/* ${D}${datadir}/fonts/truetype/freefont/
 }
 
-FILES_${PN} = "${bindir}/omxplayer* \
+FILES:${PN} = "${bindir}/omxplayer* \
                ${libdir}/omxplayer/lib*${SOLIBS} \
                ${datadir}/fonts"
 
-FILES_${PN}-dev += "${libdir}/omxplayer/*.so"
+FILES:${PN}-dev += "${libdir}/omxplayer/*.so"
 
-RDEPENDS_${PN} += "bash procps userland"
+RDEPENDS:${PN} += "bash procps userland"

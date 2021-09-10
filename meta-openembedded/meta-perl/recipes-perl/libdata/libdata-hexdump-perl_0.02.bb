@@ -23,7 +23,7 @@ SRC_URI[sha256sum] = "1a9d843e7f667c1c6f77c67af5d77e7462ff23b41937cb17454d03535c
 
 S = "${WORKDIR}/Data-HexDump-${PV}"
 
-inherit cpan ptest
+inherit cpan ptest update-alternatives
 
 do_install_ptest () {
     install -d ${D}${PTEST_PATH}/t
@@ -31,3 +31,8 @@ do_install_ptest () {
 }
 
 BBCLASSEXTEND = "native"
+
+ALTERNATIVES_PRIORITY = "100"
+ALTERNATIVE:${PN} = "hexdump"
+ALTERNATIVE_LINK_NAME[hexdump] = "${bindir}/hexdump"
+

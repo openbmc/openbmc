@@ -1,5 +1,6 @@
 SUMMARY = "The canonical example of init scripts"
 SECTION = "base"
+DESCRIPTION = "This recipe is a canonical example of init scripts"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/COPYRIGHT;md5=349c872e0066155e1818b786938876a4"
 
@@ -26,6 +27,6 @@ do_install () {
 	install -m 0755 ${WORKDIR}/skeleton-test ${D}${sbindir}/
 }
 
-RDEPENDS_${PN} = "initscripts"
+RDEPENDS:${PN} = "initscripts"
 
-CONFFILES_${PN} += "${sysconfdir}/init.d/skeleton"
+CONFFILES:${PN} += "${sysconfdir}/init.d/skeleton"

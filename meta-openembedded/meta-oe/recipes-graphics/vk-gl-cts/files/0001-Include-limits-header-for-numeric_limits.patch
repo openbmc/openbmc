@@ -1,0 +1,88 @@
+From aec0be857ed3faef8802c7fd61f3d7798a565108 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 29 Apr 2021 16:03:42 -0700
+Subject: [PATCH] Include <limits> header for numeric_limits
+
+Fixes
+vulkancts/framework/vulkan/vkRayTracingUtil.hpp:116:32: error: 'numeric_limits' is not a member of 'std'
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ framework/vulkan/vkRayTracingUtil.hpp                           | 1 +
+ modules/vulkan/api/vktApiBufferTests.cpp                        | 1 +
+ modules/vulkan/spirv_assembly/vktSpvAsmNonSemanticInfoTests.cpp | 2 ++
+ 3 files changed, 4 insertions(+)
+
+--- a/framework/vulkan/vkRayTracingUtil.hpp
++++ b/framework/vulkan/vkRayTracingUtil.hpp
+@@ -33,6 +33,7 @@
+ #include "tcuVector.hpp"
+ #include "tcuVectorType.hpp"
+ 
++#include <limits>
+ #include <vector>
+ 
+ namespace vk
+--- a/modules/vulkan/api/vktApiBufferTests.cpp
++++ b/modules/vulkan/api/vktApiBufferTests.cpp
+@@ -35,6 +35,7 @@
+ #include "tcuPlatform.hpp"
+ 
+ #include <algorithm>
++#include <limits>
+ 
+ namespace vkt
+ {
+--- a/modules/vulkan/spirv_assembly/vktSpvAsmNonSemanticInfoTests.cpp
++++ b/modules/vulkan/spirv_assembly/vktSpvAsmNonSemanticInfoTests.cpp
+@@ -28,6 +28,8 @@
+ #include "vktSpvAsmComputeShaderCase.hpp"
+ #include "vktSpvAsmGraphicsShaderTestUtil.hpp"
+ 
++#include <limits>
++
+ namespace vkt
+ {
+ namespace SpirVAssembly
+--- a/modules/vulkan/memory/vktMemoryDeviceMemoryReportTests.cpp
++++ b/modules/vulkan/memory/vktMemoryDeviceMemoryReportTests.cpp
+@@ -40,6 +40,7 @@
+ 
+ #include "deSharedPtr.hpp"
+ 
++#include <limits>
+ #include <set>
+ #include <vector>
+ 
+--- a/modules/vulkan/draw/vktDrawDepthClampTests.cpp
++++ b/modules/vulkan/draw/vktDrawDepthClampTests.cpp
+@@ -38,6 +38,7 @@
+ #include "vkQueryUtil.hpp"
+ #include "tcuTextureUtil.hpp"
+ 
++#include <limits>
+ #include <cmath>
+ 
+ namespace vkt
+--- a/modules/vulkan/wsi/vktWsiFullScreenExclusiveTests.cpp
++++ b/modules/vulkan/wsi/vktWsiFullScreenExclusiveTests.cpp
+@@ -39,6 +39,8 @@
+ #include "tcuPlatform.hpp"
+ #include "tcuCommandLine.hpp"
+ 
++#include <limits>
++
+ #if ( DE_OS == DE_OS_WIN32 )
+ 	#define NOMINMAX
+ 	#define WIN32_LEAN_AND_MEAN
+--- a/modules/vulkan/synchronization/vktSynchronizationUtil.cpp
++++ b/modules/vulkan/synchronization/vktSynchronizationUtil.cpp
+@@ -21,6 +21,7 @@
+  * \brief Synchronization tests utilities
+  *//*--------------------------------------------------------------------*/
+ 
++#include <limits>
+ #include "vktSynchronizationUtil.hpp"
+ #include "vkTypeUtil.hpp"
+ #include "vkCmdUtil.hpp"

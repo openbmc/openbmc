@@ -1,0 +1,51 @@
+DEFAULTTUNE ?= "cortexa17thf-neon"
+
+require conf/machine/include/arm/arch-armv7ve.inc
+
+TUNEVALID[cortexa17] = "Enable Cortex-A17 specific processor optimizations"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexa17', ' -mcpu=cortex-a17', '', d)}"
+MACHINEOVERRIDES =. "${@bb.utils.contains('TUNE_FEATURES', 'cortexa17', 'armv7ve:', '', d)}"
+
+# Little Endian base configs
+AVAILTUNES += "cortexa17 cortexa17t cortexa17-neon cortexa17t-neon cortexa17-neon-vfpv4 cortexa17t-neon-vfpv4"
+ARMPKGARCH:tune-cortexa17             = "cortexa17"
+ARMPKGARCH:tune-cortexa17t            = "cortexa17"
+ARMPKGARCH:tune-cortexa17-neon        = "cortexa17"
+ARMPKGARCH:tune-cortexa17t-neon       = "cortexa17"
+ARMPKGARCH:tune-cortexa17-neon-vfpv4  = "cortexa17"
+ARMPKGARCH:tune-cortexa17t-neon-vfpv4 = "cortexa17"
+# mcpu is used so don't use armv7ve as we don't want march
+TUNE_FEATURES:tune-cortexa17             = "arm vfp cortexa17"
+TUNE_FEATURES:tune-cortexa17t            = "${TUNE_FEATURES:tune-cortexa17} thumb"
+TUNE_FEATURES:tune-cortexa17-neon        = "${TUNE_FEATURES:tune-cortexa17} neon"
+TUNE_FEATURES:tune-cortexa17t-neon       = "${TUNE_FEATURES:tune-cortexa17-neon} thumb"
+TUNE_FEATURES:tune-cortexa17-neon-vfpv4  = "${TUNE_FEATURES:tune-cortexa17-neon} vfpv4"
+TUNE_FEATURES:tune-cortexa17t-neon-vfpv4 = "${TUNE_FEATURES:tune-cortexa17-neon-vfpv4} thumb"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17             = "${PACKAGE_EXTRA_ARCHS:tune-armv7ve} cortexa17-vfp"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17t            = "${PACKAGE_EXTRA_ARCHS:tune-armv7vet} cortexa17-vfp cortexa17t2-vfp"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17-neon        = "${PACKAGE_EXTRA_ARCHS:tune-armv7ve-neon} cortexa17-vfp cortexa17-neon"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17t-neon       = "${PACKAGE_EXTRA_ARCHS:tune-armv7vet-neon} cortexa17-vfp cortexa17-neon cortexa17t2-vfp cortexa17t2-neon"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17-neon-vfpv4  = "${PACKAGE_EXTRA_ARCHS:tune-armv7ve-neon-vfpv4} cortexa17-vfp cortexa17-neon cortexa17-neon-vfpv4"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17t-neon-vfpv4 = "${PACKAGE_EXTRA_ARCHS:tune-armv7vet-neon-vfpv4} cortexa17-vfp cortexa17-neon cortexa17-neon-vfpv4 cortexa17t2-vfp cortexa17t2-neon cortexa17t2-neon-vfpv4"
+
+# HF Tunes
+AVAILTUNES += "cortexa17hf cortexa17thf cortexa17hf-neon cortexa17thf-neon cortexa17hf-neon-vfpv4 cortexa17thf-neon-vfpv4"
+ARMPKGARCH:tune-cortexa17hf             = "cortexa17"
+ARMPKGARCH:tune-cortexa17thf            = "cortexa17"
+ARMPKGARCH:tune-cortexa17hf-neon        = "cortexa17"
+ARMPKGARCH:tune-cortexa17thf-neon       = "cortexa17"
+ARMPKGARCH:tune-cortexa17hf-neon-vfpv4  = "cortexa17"
+ARMPKGARCH:tune-cortexa17thf-neon-vfpv4 = "cortexa17"
+# mcpu is used so don't use armv7ve as we don't want march
+TUNE_FEATURES:tune-cortexa17hf             = "${TUNE_FEATURES:tune-cortexa17} callconvention-hard"
+TUNE_FEATURES:tune-cortexa17thf            = "${TUNE_FEATURES:tune-cortexa17t} callconvention-hard"
+TUNE_FEATURES:tune-cortexa17hf-neon        = "${TUNE_FEATURES:tune-cortexa17-neon} callconvention-hard"
+TUNE_FEATURES:tune-cortexa17thf-neon       = "${TUNE_FEATURES:tune-cortexa17t-neon} callconvention-hard"
+TUNE_FEATURES:tune-cortexa17hf-neon-vfpv4  = "${TUNE_FEATURES:tune-cortexa17-neon-vfpv4} callconvention-hard"
+TUNE_FEATURES:tune-cortexa17thf-neon-vfpv4 = "${TUNE_FEATURES:tune-cortexa17t-neon-vfpv4} callconvention-hard"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17hf             = "${PACKAGE_EXTRA_ARCHS:tune-armv7vehf} cortexa17hf-vfp"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17thf            = "${PACKAGE_EXTRA_ARCHS:tune-armv7vethf} cortexa17hf-vfp cortexa17t2hf-vfp"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17hf-neon        = "${PACKAGE_EXTRA_ARCHS:tune-armv7vehf-neon} cortexa17hf-vfp cortexa17hf-neon"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17thf-neon       = "${PACKAGE_EXTRA_ARCHS:tune-armv7vethf-neon} cortexa17hf-vfp cortexa17hf-neon cortexa17t2hf-vfp cortexa17t2hf-neon"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17hf-neon-vfpv4  = "${PACKAGE_EXTRA_ARCHS:tune-armv7vehf-neon-vfpv4} cortexa17hf-vfp cortexa17hf-neon cortexa17hf-neon-vfpv4"
+PACKAGE_EXTRA_ARCHS:tune-cortexa17thf-neon-vfpv4 = "${PACKAGE_EXTRA_ARCHS:tune-armv7vethf-neon-vfpv4} cortexa17hf-vfp cortexa17hf-neon cortexa17hf-neon-vfpv4 cortexa17t2hf-vfp cortexa17t2hf-neon cortexa17t2hf-neon-vfpv4"

@@ -1,0 +1,48 @@
+From e82dedec1803922656e92285fc1bb75b2cdc0aad Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sat, 24 Apr 2021 10:34:47 +0100
+Subject: [PATCH 3/4] tests: use a dictionaries for environment
+
+meson environment() can't be passed to configure_file and it is needed for installed_tests,
+use a dictionary as this is simplest solution to install the environment.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/789]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+---
+ tests/check/meson.build | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/tests/check/meson.build b/tests/check/meson.build
+index a697a7b06..f64524904 100644
+--- a/tests/check/meson.build
++++ b/tests/check/meson.build
+@@ -161,14 +161,17 @@ foreach t : core_tests
+       install: installed_tests_enabled,
+     )
+ 
+-    env = environment()
+-    env.set('GST_PLUGIN_PATH_1_0', meson.build_root())
+-    env.set('GST_PLUGIN_SYSTEM_PATH_1_0', '')
+-    env.set('GST_STATE_IGNORE_ELEMENTS', '')
+-    env.set('CK_DEFAULT_TIMEOUT', '20')
+-    env.set('GST_REGISTRY', '@0@/@1@.registry'.format(meson.current_build_dir(), test_name))
+-    env.set('GST_PLUGIN_SCANNER_1_0', gst_scanner_dir + '/gst-plugin-scanner')
+-    env.set('GST_PLUGIN_LOADING_WHITELIST', 'gstreamer')
++    # environment() can't be passed to configure_file and it is needed for installed_tests
++    # use a dictionary as this is simplest solution to install the environment
++    env = {
++      'GST_PLUGIN_PATH_1_0': meson.build_root(),
++      'GST_PLUGIN_SYSTEM_PATH_1_0': '',
++      'GST_STATE_IGNORE_ELEMENTS': '',
++      'CK_DEFAULT_TIMEOUT': '20',
++      'GST_REGISTRY': '@0@/@1@.registry'.format(meson.current_build_dir(), test_name),
++      'GST_PLUGIN_SCANNER_1_0': gst_scanner_dir + '/gst-plugin-scanner',
++      'GST_PLUGIN_LOADING_WHITELIST': 'gstreamer',
++    }
+ 
+     if installed_tests_enabled
+       test_conf = configuration_data()
+-- 
+2.31.1
+

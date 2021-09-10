@@ -17,7 +17,7 @@ inherit setuptools3
 
 S = "${WORKDIR}/git"
 
-RDEPENDS_${PN} = "openscap scap-security-guide \
+RDEPENDS:${PN} = "openscap scap-security-guide \
                   python3-core python3-dbus \
                   python3-pygobject \
                  "

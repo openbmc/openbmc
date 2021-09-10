@@ -1,16 +1,17 @@
 SUMMARY = "lsb_release support for OpenEmbedded"
 SECTION = "console/utils"
-HOMEPAGE = "http://prdownloads.sourceforge.net/lsb"
+HOMEPAGE = "https://sourceforge.net/projects/lsb/files"
 LICENSE = "GPLv2+"
 
 # lsb_release needs getopt
-RDEPENDS_${PN} += "${VIRTUAL-RUNTIME_getopt}"
+RDEPENDS:${PN} += "${VIRTUAL-RUNTIME_getopt}"
 
 LIC_FILES_CHKSUM = "file://README;md5=12da544b1a3a5a1795a21160b49471cf"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/lsb/lsb_release/1.4/lsb-release-1.4.tar.gz \
            file://0001-fix-lsb_release-to-work-with-busybox-head-and-find.patch \
            file://0001-Remove-timestamp-from-manpage.patch \
+           file://help2man-reproducibility.patch \
            "
 
 SRC_URI[md5sum] = "30537ef5a01e0ca94b7b8eb6a36bb1e4"
@@ -34,4 +35,4 @@ do_install() {
 	echo "DISTRIB_DESCRIPTION=\"${DISTRO_NAME} ${DISTRO_VERSION}\"" >> ${D}${sysconfdir}/lsb-release
 }
 
-FILES_${PN} += "${base_libdir}"
+FILES:${PN} += "${base_libdir}"

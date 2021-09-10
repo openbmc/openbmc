@@ -1,0 +1,15 @@
+[Unit]
+Description=Increase GBS fan failsafe speed on host kernel entrance
+PartOf=host-s0-state.target
+Requires=phosphor-pid-control.service
+After=phosphor-pid-control.service
+Wants=mapper-wait@-xyz-openbmc_project-settings-fanctrl.service
+After=mapper-wait@-xyz-openbmc_project-settings-fanctrl.service
+
+[Service]
+Type=oneshot
+# 255: 100% duty cycle
+ExecStart=/usr/bin/gbs-set-failsafe.sh 255
+
+[Install]
+WantedBy=host-s0-state.target

@@ -1,0 +1,51 @@
+Add checks for both mkfs.vfat and the vfat file system in the kernel before
+running tests.
+
+Upstream-Status: Submitted [https://alioth-lists.debian.net/pipermail/parted-devel/2021-August/005653.html]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/tests/t-lib-helpers.sh b/tests/t-lib-helpers.sh
+index 4c6c75f..2cc7577 100644
+--- a/tests/t-lib-helpers.sh
++++ b/tests/t-lib-helpers.sh
+@@ -418,3 +418,13 @@ require_64bit_()
+           ;;
+   esac
+ }
++
++# Check if the specified filesystem is either built into the kernel, or can be loaded
++# as a module
++# Usage: has_filesystem vfat
++# Ruturns 0 if the filesystem is available, otherwise skips the test
++require_filesystem_()
++{
++  grep -q $1 /proc/filesystems && return 0
++  modprobe --quiet --dry-run $1 || skip_ "this test requires kernel support for $1"
++}
+diff --git a/tests/t1100-busy-label.sh b/tests/t1100-busy-label.sh
+index f1a13df..0f47b08 100755
+--- a/tests/t1100-busy-label.sh
++++ b/tests/t1100-busy-label.sh
+@@ -19,6 +19,9 @@
+ . "${srcdir=.}/init.sh"; path_prepend_ ../parted
+ require_root_
+ require_scsi_debug_module_
++require_fat_
++require_filesystem_ vfat
++
+ ss=$sector_size_
+ 
+ scsi_debug_setup_ sector_size=$ss dev_size_mb=90 > dev-name ||
+diff --git a/tests/t1101-busy-partition.sh b/tests/t1101-busy-partition.sh
+index e35e6f0..c813848 100755
+--- a/tests/t1101-busy-partition.sh
++++ b/tests/t1101-busy-partition.sh
+@@ -22,6 +22,8 @@ test "$VERBOSE" = yes && parted --version
+ 
+ require_root_
+ require_scsi_debug_module_
++require_fat_
++require_filesystem_ vfat
+ 
+ # create memory-backed device
+ scsi_debug_setup_ dev_size_mb=80 > dev-name ||

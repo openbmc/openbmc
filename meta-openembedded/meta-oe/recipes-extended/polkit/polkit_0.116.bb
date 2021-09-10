@@ -25,6 +25,7 @@ PAM_SRC_URI = "file://polkit-1_pam.patch"
 SRC_URI = "http://www.freedesktop.org/software/polkit/releases/polkit-${PV}.tar.gz \
            ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_SRC_URI}', '', d)} \
            file://0003-make-netgroup-support-optional.patch \
+           file://CVE-2021-3560.patch \
            "
 SRC_URI[md5sum] = "4b37258583393e83069a0e2e89c0162a"
 SRC_URI[sha256sum] = "88170c9e711e8db305a12fdb8234fac5706c61969b94e084d0f117d8ec5d34b1"
@@ -34,13 +35,13 @@ EXTRA_OECONF = "--with-os-type=moblin \
                 --disable-libelogind \
                "
 
-do_compile_prepend () {
+do_compile:prepend () {
     export GIR_EXTRA_LIBS_PATH="${B}/src/polkit/.libs"
 }
 
 PACKAGES =+ "${PN}-examples"
 
-FILES_${PN}_append = " \
+FILES:${PN}:append = " \
     ${libdir}/${BPN}-1 \
     ${nonarch_libdir}/${BPN}-1 \
     ${datadir}/dbus-1 \
@@ -48,10 +49,10 @@ FILES_${PN}_append = " \
     ${datadir}/gettext \
 "
 
-FILES_${PN}-examples = "${bindir}/*example*"
+FILES:${PN}-examples = "${bindir}/*example*"
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 polkitd"
+USERADD_PARAM:${PN} = "--system --no-create-home --user-group --home-dir ${sysconfdir}/${BPN}-1 polkitd"
 
-SYSTEMD_SERVICE_${PN} = "${BPN}.service"
+SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 SYSTEMD_AUTO_ENABLE = "disable"

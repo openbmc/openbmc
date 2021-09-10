@@ -41,12 +41,12 @@ cpan_do_configure () {
 	fi
 }
 
-do_configure_append_class-target() {
+do_configure:append:class-target() {
        find . -name Makefile | xargs sed -E -i \
            -e 's:LD_RUN_PATH ?= ?"?[^"]*"?::g'
 }
 
-do_configure_append_class-nativesdk() {
+do_configure:append:class-nativesdk() {
        find . -name Makefile | xargs sed -E -i \
            -e 's:LD_RUN_PATH ?= ?"?[^"]*"?::g'
 }

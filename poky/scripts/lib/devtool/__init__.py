@@ -196,7 +196,7 @@ def setup_git_repo(repodir, version, devbranch, basetag='devtool-base', d=None):
     if not os.path.exists(os.path.join(repodir, '.git')):
         bb.process.run('git init', cwd=repodir)
         bb.process.run('git config --local gc.autodetach 0', cwd=repodir)
-        bb.process.run('git add .', cwd=repodir)
+        bb.process.run('git add -f -A .', cwd=repodir)
         commit_cmd = ['git']
         oe.patch.GitApplyTree.gitCommandUserOptions(commit_cmd, d=d)
         commit_cmd += ['commit', '-q']
@@ -212,8 +212,13 @@ def setup_git_repo(repodir, version, devbranch, basetag='devtool-base', d=None):
         bb.process.run(commit_cmd, cwd=repodir)
 
     # Ensure singletask.lock (as used by externalsrc.bbclass) is ignored by git
+    gitinfodir = os.path.join(repodir, '.git', 'info')
+    try:
+        os.mkdir(gitinfodir)
+    except FileExistsError:
+        pass
     excludes = []
-    excludefile = os.path.join(repodir, '.git', 'info', 'exclude')
+    excludefile = os.path.join(gitinfodir, 'exclude')
     try:
         with open(excludefile, 'r') as f:
             excludes = f.readlines()

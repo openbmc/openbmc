@@ -1,12 +1,13 @@
 SUMMARY = "User support binary for the uvesafb kernel module"
-HOMEPAGE = "http://dev.gentoo.org/~spock/projects/uvesafb/"
+HOMEPAGE = "https://tracker.debian.org/pkg/v86d"
+DESCRIPTION = "v86d provides a backend for kernel drivers that need to execute x86 BIOS code. The code is executed in a controlled environment and the results are passed back to the kernel via the netlink interface."
 
 # the copyright info is at the bottom of README, expect break
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://README;md5=94ac1971e4f2309dc322d598e7b1f7dd"
 
 DEPENDS = "virtual/kernel"
-RRECOMMENDS_${PN} = "kernel-module-uvesafb"
+RRECOMMENDS:${PN} = "kernel-module-uvesafb"
 PR = "r2"
 
 SRC_URI = "http://snapshot.debian.org/archive/debian/20110427T035506Z/pool/main/v/${BPN}/${BPN}_${PV}.orig.tar.gz \

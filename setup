@@ -21,20 +21,41 @@ if [ -z "$ZSH_NAME" ] && [ "$(basename -- "$0")" = "setup" ]; then
 fi
 
 # Check if 'column' command is present
-COLUMN=`which column`
+COLUMN=$(which column || true)
 if [ -z "$COLUMN" ]; then
     # If it is not, use 'cat'
-	COLUMN=`which cat`
+    COLUMN=$(which cat)
 fi
 
 machine() {
 	local target=$1
 	local build_dir=$2
 	local cfg name tmpl
-	for cfg in meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf; do
+	local configs
+
+	# zsh requires wordsplit so that variable expansion behaves like bash
+	if [ -n "$ZSH_NAME" ]; then
+		setopt local_options shwordsplit
+	fi
+	if which find > /dev/null 2>&1; then
+		configs=$(find meta-* -path "*/conf/machine/*.conf")
+	else
+		configs=$(ls -1 meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf)
+	fi
+
+	for cfg in $configs; do
 		name=${cfg##*/}
 		name=${name%.conf}
 		tmpl=${cfg%/machine/*.conf}
+
+        # Skip any machines that don't support meta-phosphor.
+        if [ ! -e $tmpl/bblayers.conf.sample ]; then
+            continue
+        fi
+        if ! grep -q "##OEROOT##/meta-phosphor" $tmpl/bblayers.conf.sample; then
+            continue
+        fi
+
 		# If a target is specified, then check for a match,
 		# otherwise just list what we've discovered
 		if [ -n "$target" ]; then
@@ -50,9 +71,7 @@ machine() {
 				fi
 				return
 			fi
-		elif test -e $tmpl/bblayers.conf.sample && \
-			grep -q "##OEROOT##/meta-phosphor" $tmpl/bblayers.conf.sample;
-		then
+        else
 			echo "${name}"
 		fi
 	done

@@ -64,7 +64,7 @@ class TestMultiprocessLaunch(TestCase):
         import bb
 
         def testfunction(item, d):
-            if item == "2" or item == "1":
+            if item == "2":
                 raise KeyError("Invalid number %s" % item)
             return "Found %s" % item
 
@@ -99,5 +99,4 @@ class TestMultiprocessLaunch(TestCase):
         # Assert the function prints exceptions
         with captured_output() as (out, err):
             self.assertRaises(bb.BBHandledException, multiprocess_launch, testfunction, ["1", "2", "3", "4", "5", "6"], d, extraargs=(d,))
-        self.assertIn("KeyError: 'Invalid number 1'", out.getvalue())
         self.assertIn("KeyError: 'Invalid number 2'", out.getvalue())

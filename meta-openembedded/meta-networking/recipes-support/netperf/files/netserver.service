@@ -1,0 +1,9 @@
+[Unit]
+Description=Netperf Benchmark Server
+After=network.target
+
+[Service]
+ExecStart=/usr/sbin/netserver -D
+
+[Install]
+WantedBy=multi-user.target

@@ -11,7 +11,7 @@ diff --git a/src/common.h b/src/common.h
 index f7d38b0..bf485af 100644
 --- a/src/common.h
 +++ b/src/common.h
-@@ -471,7 +471,9 @@ extern char *sys_errlist[];
+@@ -478,7 +478,9 @@ extern char *sys_errlist[];
  #ifndef OPENSSL_NO_MD4
  #include <openssl/md4.h>
  #endif /* !defined(OPENSSL_NO_MD4) */
@@ -25,8 +25,8 @@ diff --git a/src/protocol.c b/src/protocol.c
 index 587df09..8198eb6 100644
 --- a/src/protocol.c
 +++ b/src/protocol.c
-@@ -66,7 +66,7 @@ NOEXPORT char *imap_server(CLI *, SERVICE_OPTIONS *, const PHASE);
- NOEXPORT char *nntp_client(CLI *, SERVICE_OPTIONS *, const PHASE);
+@@ -67,7 +67,7 @@ NOEXPORT char *imap_server(CLI *, SERVICE_OPTIONS *, const PHASE);
+ NOEXPORT char *ldap_client(CLI *, SERVICE_OPTIONS *, const PHASE);
  NOEXPORT char *connect_server(CLI *, SERVICE_OPTIONS *, const PHASE);
  NOEXPORT char *connect_client(CLI *, SERVICE_OPTIONS *, const PHASE);
 -#ifndef OPENSSL_NO_MD4
@@ -34,7 +34,7 @@ index 587df09..8198eb6 100644
  NOEXPORT void ntlm(CLI *, SERVICE_OPTIONS *);
  NOEXPORT char *ntlm1();
  NOEXPORT char *ntlm3(char *, char *, char *, char *);
-@@ -1175,7 +1175,7 @@ NOEXPORT char *connect_client(CLI *c, SERVICE_OPTIONS *opt, const PHASE phase) {
+@@ -1332,7 +1332,7 @@ NOEXPORT char *connect_client(CLI *c, SERVICE_OPTIONS *opt, const PHASE phase) {
      fd_printf(c, c->remote_fd.fd, "Host: %s", opt->protocol_host);
      if(opt->protocol_username && opt->protocol_password) {
          if(!strcasecmp(opt->protocol_authentication, "ntlm")) {
@@ -43,7 +43,7 @@ index 587df09..8198eb6 100644
              ntlm(c, opt);
  #else
              s_log(LOG_ERR, "NTLM authentication is not available");
-@@ -1216,7 +1216,7 @@ NOEXPORT char *connect_client(CLI *c, SERVICE_OPTIONS *opt, const PHASE phase) {
+@@ -1376,7 +1376,7 @@ NOEXPORT char *connect_client(CLI *c, SERVICE_OPTIONS *opt, const PHASE phase) {
      return NULL;
  }
  

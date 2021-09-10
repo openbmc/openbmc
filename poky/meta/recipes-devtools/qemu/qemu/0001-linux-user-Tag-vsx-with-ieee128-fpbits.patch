@@ -1,0 +1,35 @@
+From c5844a4cdee37268c9b65a65e6968ee129bb742d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 14 Jun 2021 10:27:17 -0700
+Subject: [PATCH] linux-user: Tag vsx with ieee128 fpbits
+
+In OE we need this for ppc64le usermode to work since we generate 128bit
+long doubles and glibc 2.34 is now checking for this in hwcaps at
+runtime and failing to run the binary if machine does not support 128bit
+IEEE fp
+
+Fixes
+Fatal glibc error: CPU lacks float128 support (POWER 9 or later required)
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ linux-user/elfload.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 17ab06f612..e7dd18fd40 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -830,7 +830,7 @@ static uint32_t get_elf_hwcap2(void)
+                   PPC2_ISA207S), QEMU_PPC_FEATURE2_ARCH_2_07 |
+                   QEMU_PPC_FEATURE2_VEC_CRYPTO);
+     GET_FEATURE2(PPC2_ISA300, QEMU_PPC_FEATURE2_ARCH_3_00 |
+-                 QEMU_PPC_FEATURE2_DARN);
++                 QEMU_PPC_FEATURE2_DARN | QEMU_PPC_FEATURE2_HAS_IEEE128);
+ 
+ #undef GET_FEATURE
+ #undef GET_FEATURE2
+-- 
+2.32.0
+

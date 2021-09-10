@@ -1,53 +1,38 @@
-From b08a3b71e716dd0485ef51036d32e4c304fb4e67 Mon Sep 17 00:00:00 2001
+From 82bd6d196a0453657cbacaaedd75b2d2fe0bf9ba Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:05:36 +0200
 Subject: [PATCH] Do not try to obtain PYTHON_INSTALL_DIR by running python.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
- librepo/python/python2/CMakeLists.txt | 12 ++++++------
- librepo/python/python3/CMakeLists.txt | 12 ++++++------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ librepo/python/CMakeLists.txt | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/librepo/python/python2/CMakeLists.txt b/librepo/python/python2/CMakeLists.txt
-index a0f1f9a..1665079 100644
---- a/librepo/python/python2/CMakeLists.txt
-+++ b/librepo/python/python2/CMakeLists.txt
-@@ -1,9 +1,9 @@
--EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
--from sys import stdout
--from distutils import sysconfig
--path=sysconfig.get_python_lib(True, prefix='${CMAKE_INSTALL_PREFIX}')
--stdout.write(path)"
--OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
-+#EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
-+#from sys import stdout
-+#from distutils import sysconfig
-+#path=sysconfig.get_python_lib(True, prefix='${CMAKE_INSTALL_PREFIX}')
-+#stdout.write(path)"
-+#OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
- INCLUDE_DIRECTORIES (${PYTHON_INCLUDE_PATH})
+diff --git a/librepo/python/CMakeLists.txt b/librepo/python/CMakeLists.txt
+index 8523ca7..06e5f7b 100644
+--- a/librepo/python/CMakeLists.txt
++++ b/librepo/python/CMakeLists.txt
+@@ -16,12 +16,12 @@ SET (librepomodule_SRCS
  
- MESSAGE(STATUS "Python install dir is ${PYTHON_INSTALL_DIR}")
-diff --git a/librepo/python/python3/CMakeLists.txt b/librepo/python/python3/CMakeLists.txt
-index 52ba44e..da51e10 100644
---- a/librepo/python/python3/CMakeLists.txt
-+++ b/librepo/python/python3/CMakeLists.txt
-@@ -1,9 +1,9 @@
+ MESSAGE("Building python bindings")
+ 
 -EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
 -from sys import stdout
--from distutils import sysconfig
--path=sysconfig.get_python_lib(True, prefix='${CMAKE_INSTALL_PREFIX}')
+-from sysconfig import get_path
+-path=get_path(name='platlib', vars={'platbase':'${CMAKE_INSTALL_PREFIX}'})
 -stdout.write(path)"
 -OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
 +#EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
 +#from sys import stdout
-+#from distutils import sysconfig
-+#path=sysconfig.get_python_lib(True, prefix='${CMAKE_INSTALL_PREFIX}')
++#from sysconfig import get_path
++#path=get_path(name='platlib', vars={'platbase':'${CMAKE_INSTALL_PREFIX}'})
 +#stdout.write(path)"
 +#OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
  INCLUDE_DIRECTORIES (${PYTHON_INCLUDE_PATH})
  
  MESSAGE(STATUS "Python3 install dir is ${PYTHON_INSTALL_DIR}")
+-- 
+2.25.1
+

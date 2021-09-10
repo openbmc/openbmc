@@ -1,0 +1,72 @@
+header:
+  version: 9
+
+distro: poky
+
+repos:
+  meta-security:
+    layers:
+      ../meta-security:
+      meta-tpm:
+      meta-integrity:
+      meta-security-compliance:
+      meta-hardening:
+
+  poky:
+    url: https://git.yoctoproject.org/git/poky
+    refspec: master
+    layers:
+      meta:
+      meta-poky:
+      meta-yocto-bsp:
+
+  meta-openembedded:
+    url: http://git.openembedded.org/meta-openembedded
+    refspec: master
+    layers:
+      meta-oe:
+      meta-perl:
+      meta-python:
+      meta-networking:
+      meta-filesystems:
+
+local_conf_header:
+  base: |
+    CONF_VERSION = "2"
+    SOURCE_MIRROR_URL = "http://downloads.yoctoproject.org/mirror/sources/"
+    SSTATE_MIRRORS = "file://.* http://sstate.yoctoproject.org/dev/PATH;downloadfilename=PATH \n"
+    BB_HASHSERVE = "auto"
+    BB_SIGNATURE_HANDLER = "OEEquivHash"
+    INHERIT += "buildstats buildstats-summary buildhistory"
+    INHERIT += "report-error"
+    INHERIT += "testimage"
+    INHERIT += "rm_work"
+    BB_NUMBER_THREADS="24"
+    BB_NUMBER_PARSE_THREADS="12"
+    BB_TASK_NICE_LEVEL = '5'
+    BB_TASK_NICE_LEVEL_task-testimage = '0'
+    BB_TASK_IONICE_LEVEL = '2.7'
+    BB_TASK_IONICE_LEVEL_task-testimage = '2.1'
+    TEST_QEMUBOOT_TIMEOUT = "1500"
+    EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
+    PACKAGE_CLASSES = "package_ipk"
+
+    DISTRO_FEATURES:append = " security pam apparmor smack ima tpm tpm2"
+    MACHINE_FEATURES:append = " tpm tpm2"
+
+  diskmon: |
+    BB_DISKMON_DIRS = "\
+    STOPTASKS,${TMPDIR},1G,100K \
+    STOPTASKS,${DL_DIR},1G,100K \
+    STOPTASKS,${SSTATE_DIR},1G,100K \
+    STOPTASKS,/tmp,100M,100K \
+    ABORT,${TMPDIR},100M,1K \
+    ABORT,${DL_DIR},100M,1K \
+    ABORT,${SSTATE_DIR},100M,1K \
+    ABORT,/tmp,10M,1K"
+
+bblayers_conf_header:
+  base: |
+    BBPATH = "${TOPDIR}"
+    BBFILES ?= ""
+

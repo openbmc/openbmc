@@ -17,6 +17,7 @@ DEPENDS += "sdbusplus"
 DEPENDS += "systemd"
 DEPENDS += "ipmi-blob-tool"
 DEPENDS += "pciutils"
+DEPENDS += "function2"
 
 PACKAGECONFIG ?= "cleanup-delete"
 PACKAGECONFIG[cleanup-delete] = "--enable-cleanup-delete, --disable-cleanup-delete"
@@ -35,20 +36,22 @@ PACKAGECONFIG[host-bios] = "--enable-host-bios, --disable-host-bios"
 PACKAGECONFIG[aspeed-p2a] = "--enable-aspeed-p2a, --disable-aspeed-p2a"
 PACKAGECONFIG[aspeed-lpc] = "--enable-aspeed-lpc, --disable-aspeed-lpc"
 PACKAGECONFIG[nuvoton-lpc] = "--enable-nuvoton-lpc, --disable-nuvoton-lpc"
+PACKAGECONFIG[nuvoton-p2a-vga] = "--enable-nuvoton-p2a-vga, --disable-nuvoton-p2a-vga"
+PACKAGECONFIG[nuvoton-p2a-mbox] = "--enable-nuvoton-p2a-mbox, --disable-nuvoton-p2a-mbox"
 PACKAGECONFIG[net-bridge] = "--enable-net-bridge, --disable-net-bridge"
 
 EXTRA_OECONF = "--disable-tests --disable-build-host-tool"
 
 # Set this variable in your recipe to set it instead of using MAPPED_ADDRESS directly.
 IPMI_FLASH_BMC_ADDRESS ?= "0"
-EXTRA_OECONF_append = " MAPPED_ADDRESS=${IPMI_FLASH_BMC_ADDRESS}"
+EXTRA_OECONF:append = " MAPPED_ADDRESS=${IPMI_FLASH_BMC_ADDRESS}"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-flash"
-SRCREV = "6f61af8fd125400d064715559cfffba92afaecf6"
+SRCREV = "1c0fe134311f3715de8760f63b3dd4d0d2ee092c"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} += "phosphor-ipmi-flash-bmc-prepare.target \
+SYSTEMD_SERVICE:${PN} += "phosphor-ipmi-flash-bmc-prepare.target \
  phosphor-ipmi-flash-bmc-verify.target \
  phosphor-ipmi-flash-bmc-update.target"
 
@@ -57,13 +60,15 @@ HOST_BIOS_TARGETS = "phosphor-ipmi-flash-bios-prepare.target \
  phosphor-ipmi-flash-bios-verify.target \
  phosphor-ipmi-flash-bios-update.target"
 
-SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'host-bios', '${HOST_BIOS_TARGETS}', '', d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'host-bios', '${HOST_BIOS_TARGETS}', '', d)}"
 
-FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
-FILES_${PN}_append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
-FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
+FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
+FILES:${PN}:append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
+FILES:${PN}-dev:append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
+FILES:${PN}:append = " ${libdir}/tmpfiles.d"
 
 BLOBIPMI_PROVIDER_LIBRARY += "libfirmwareblob.so"
+BLOBIPMI_PROVIDER_LIBRARY += "libversionblob.so"
 BLOBIPMI_PROVIDER_LIBRARY += "${@bb.utils.contains('PACKAGECONFIG', 'cleanup-delete', 'libfirmwarecleanupblob.so', '', d)}"
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"

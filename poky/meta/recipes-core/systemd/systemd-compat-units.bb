@@ -12,7 +12,7 @@ inherit features_check
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 REQUIRED_DISTRO_FEATURES = "systemd"
 
@@ -25,7 +25,7 @@ SYSTEMD_DISABLED_SYSV_SERVICES = " \
   syslog.busybox \
 "
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 
 	cd $D${sysconfdir}/init.d  ||  exit 0
 
@@ -46,4 +46,4 @@ pkg_postinst_${PN} () {
 	echo
 }
 
-RDEPENDS_${PN} = "systemd"
+RDEPENDS:${PN} = "systemd"

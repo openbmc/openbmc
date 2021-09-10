@@ -1,0 +1,87 @@
+From 03dcf584823b8b7db7d437257dbb45bd4b7f95b4 Mon Sep 17 00:00:00 2001
+From: Chanh Nguyen <chnguyen@amperecomputing.com>
+Date: Mon, 21 Dec 2020 07:01:14 +0000
+Subject: [PATCH] aspeed/scu : Switch PWM pin to GPIO input mode
+
+In hardware design, the PWM pins will be at a high level if they are
+configured in GPIO Input mode. This commit configures all PWM function
+pins to input GPIO mode. This will allow fans to run at full speed when BMC resets or in U-boot.
+
+Signed-off-by: Chanh Nguyen <chnguyen@amperecomputing.com>
+---
+ arch/arm/include/asm/arch-aspeed/ast_scu.h |  1 +
+ arch/arm/mach-aspeed/ast-scu.c             | 12 ++++++++++++
+ board/aspeed/ast-g5/ast-g5.c               | 10 ++++++++++
+ include/configs/ast-g5-phy.h               |  3 +++
+ 4 files changed, 26 insertions(+)
+
+diff --git a/arch/arm/include/asm/arch-aspeed/ast_scu.h b/arch/arm/include/asm/arch-aspeed/ast_scu.h
+index dcbc6730d4..d2c010a0dc 100644
+--- a/arch/arm/include/asm/arch-aspeed/ast_scu.h
++++ b/arch/arm/include/asm/arch-aspeed/ast_scu.h
+@@ -45,5 +45,6 @@ extern u32 ast_scu_get_vga_memsize(void);
+ extern void ast_scu_init_eth(u8 num);
+ extern void ast_scu_multi_func_eth(u8 num);
+ extern void ast_scu_multi_func_romcs(u8 num);
++extern void ast_scu_switch_pwm_to_gpio_mode(void);
+ 
+ #endif
+diff --git a/arch/arm/mach-aspeed/ast-scu.c b/arch/arm/mach-aspeed/ast-scu.c
+index 12de9b8036..ef90ef3805 100644
+--- a/arch/arm/mach-aspeed/ast-scu.c
++++ b/arch/arm/mach-aspeed/ast-scu.c
+@@ -443,6 +443,18 @@ void ast_scu_multi_func_eth(u8 num)
+ 	}
+ }
+ 
++void ast_scu_switch_pwm_to_gpio_mode(void)
++{
++	ast_scu_write(ast_scu_read(AST_SCU_FUN_PIN_CTRL3) &
++			~SCU_FUN_PIN_VPIG2 &
++			~SCU_FUN_PIN_VPIG3 &
++			~SCU_FUN_PIN_VPIG4 &
++			~SCU_FUN_PIN_VPIG5 &
++			~SCU_FUN_PIN_VPIG6 &
++			~SCU_FUN_PIN_VPIG7,
++			AST_SCU_FUN_PIN_CTRL3);
++}
++
+ void ast_scu_multi_func_romcs(u8 num)
+ {
+ 	ast_scu_write(ast_scu_read(AST_SCU_FUN_PIN_CTRL3) |
+diff --git a/board/aspeed/ast-g5/ast-g5.c b/board/aspeed/ast-g5/ast-g5.c
+index e67a4bf8b2..fba22a728e 100644
+--- a/board/aspeed/ast-g5/ast-g5.c
++++ b/board/aspeed/ast-g5/ast-g5.c
+@@ -24,6 +24,16 @@ int board_init(void)
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_BOARD_LATE_INIT
++int board_late_init(void)
++{
++	/* Switch PWM to GPIO mode to make FAN run in max speed */
++	ast_scu_switch_pwm_to_gpio_mode();
++
++	return 0;
++}
++#endif
++
+ int dram_init(void)
+ {
+ 	u32 vga = ast_scu_get_vga_memsize();
+diff --git a/include/configs/ast-g5-phy.h b/include/configs/ast-g5-phy.h
+index 62ddb841e5..5443a26cab 100644
+--- a/include/configs/ast-g5-phy.h
++++ b/include/configs/ast-g5-phy.h
+@@ -30,4 +30,7 @@
+ /* platform.S */
+ #define	CONFIG_DRAM_ECC_SIZE		0x10000000
+ 
++/* Call board_late_init */
++#define CONFIG_BOARD_LATE_INIT		1
++
+ #endif	/* __AST_G5_PHY_CONFIG_H */
+-- 
+2.25.1
+

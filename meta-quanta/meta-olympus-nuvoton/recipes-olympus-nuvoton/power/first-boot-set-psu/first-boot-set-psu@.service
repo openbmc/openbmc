@@ -1,0 +1,14 @@
+[Unit]
+Description=Init PSU Inventory for PSU %I
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
+
+[Service]
+ExecStart=/usr/bin/first-boot-set-psu.sh %i
+RemainAfterExit=yes
+SyslogIdentifier=first-boot-set-psu
+Restart=on-failure
+RestartSec=20
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,141 @@
+From 32c17dd886a5b506781b86c6227bb059ce33420b Mon Sep 17 00:00:00 2001
+From: Tung Nguyen <tung.nguyen@amperecomputing.com>
+Date: Sun, 5 Sep 2021 09:22:08 +0000
+Subject: [PATCH] flashcp support offset option
+
+The flashcp command from mtd-utils just support to flash from offset 0.
+Add offset option to specify the start offset so that firmware can be
+flashed correctly
+
+Signed-off-by: Tung Nguyen <tung.nguyen@amperecomputing.com>
+---
+ misc-utils/flashcp.c | 50 +++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 47 insertions(+), 3 deletions(-)
+
+diff --git a/misc-utils/flashcp.c b/misc-utils/flashcp.c
+index 341c210..0a0e75b 100644
+--- a/misc-utils/flashcp.c
++++ b/misc-utils/flashcp.c
+@@ -91,7 +91,7 @@ static NORETURN void showusage(bool error)
+ 			"\n"
+ 			"Flash Copy - Written by Abraham van der Merwe <abraham@2d3d.co.za>\n"
+ 			"\n"
+-			"usage: %1$s [ -v | --verbose | -A | --erase-all ] <filename> <device>\n"
++			"usage: %1$s [ -v | --verbose | -A | --erase-all ] <filename> <device> <offset>\n"
+ 			"       %1$s -h | --help\n"
+ 			"       %1$s -V | --version\n"
+ 			"\n"
+@@ -102,6 +102,7 @@ static NORETURN void showusage(bool error)
+ 			"   -V | --version   Show version information and exit\n"
+ 			"   <filename>       File which you want to copy to flash\n"
+ 			"   <device>         Flash device to write to (e.g. /dev/mtd0, /dev/mtd1, etc.)\n"
++			"   <offset>         The start offset. Optional, default: 0\n"
+ 			"\n",
+ 			PROGRAM_NAME);
+ 
+@@ -156,6 +157,16 @@ static void safe_rewind (int fd,const char *filename)
+ 	}
+ }
+ 
++static int safe_rewind_offset(int fd, const char *filename, off_t offset)
++{
++	if (lseek(fd, offset, SEEK_SET) < 0) {
++		log_printf(LOG_ERROR, "While seeking to start of %s: %m\n", filename);
++		return EXIT_FAILURE;
++	}
++
++	return EXIT_SUCCESS;
++}
++
+ /******************************************************************************/
+ 
+ static int dev_fd = -1,fil_fd = -1;
+@@ -169,6 +180,8 @@ static void cleanup (void)
+ int main (int argc,char *argv[])
+ {
+ 	const char *filename = NULL,*device = NULL;
++	off_t offset;
++
+ 	int i,flags = FLAG_NONE;
+ 	ssize_t result;
+ 	size_t size,written;
+@@ -225,6 +238,20 @@ int main (int argc,char *argv[])
+ 				showusage(true);
+ 		}
+ 	}
++
++	if (optind + 3 == argc) {
++		flags |= FLAG_FILENAME;
++		filename = argv[optind];
++		DEBUG("Got filename: %s\n", filename);
++
++		flags |= FLAG_DEVICE;
++		device = argv[optind + 1];
++		DEBUG("Got device: %s\n", device);
++
++		offset = strtoul(argv[optind + 2], NULL, 16);
++		DEBUG("Got offset: 0x%x\n", offset);
++	}
++
+ 	if (optind+2 == argc) {
+ 		flags |= FLAG_FILENAME;
+ 		filename = argv[optind];
+@@ -233,6 +260,8 @@ int main (int argc,char *argv[])
+ 		flags |= FLAG_DEVICE;
+ 		device = argv[optind+1];
+ 		DEBUG("Got device: %s\n",device);
++
++		offset = 0;
+ 	}
+ 
+ 	if (flags & FLAG_HELP || device == NULL)
+@@ -264,6 +293,12 @@ int main (int argc,char *argv[])
+ 		exit (EXIT_FAILURE);
+ 	}
+ 
++	/* does offset is out of the mtd */
++	if (offset > mtd.size) {
++		log_printf(LOG_ERROR, "%s offset won't fit into %s!\n", offset, device);
++		exit(EXIT_FAILURE);
++	}
++
+ 	/* diff block flashcp */
+ 	if (flags & FLAG_PARTITION)
+ 	{
+@@ -284,6 +319,8 @@ int main (int argc,char *argv[])
+ 	}
+ 	else
+ 	{
++		/* Erase from the offset */
++		erase.start = offset;
+ 		erase.length = (filestat.st_size + mtd.erasesize - 1) / mtd.erasesize;
+ 		erase.length *= mtd.erasesize;
+ 	}
+@@ -330,6 +367,12 @@ int main (int argc,char *argv[])
+ 	size = filestat.st_size;
+ 	i = BUFSIZE;
+ 	written = 0;
++
++	/* if offset is greater than 0 */
++	if (offset)
++		if (safe_rewind_offset(dev_fd, device, offset) != EXIT_SUCCESS)
++			return EXIT_FAILURE;
++
+ 	while (size)
+ 	{
+ 		if (size < BUFSIZE) i = size;
+@@ -374,8 +417,9 @@ int main (int argc,char *argv[])
+ 	 * verify that flash == file data *
+ 	 **********************************/
+ 
+-	safe_rewind (fil_fd,filename);
+-	safe_rewind (dev_fd,device);
++	safe_rewind(fil_fd, filename);
++	safe_rewind_offset(dev_fd, device, offset);
++
+ 	size = filestat.st_size;
+ 	i = BUFSIZE;
+ 	written = 0;
+-- 
+2.25.1
+

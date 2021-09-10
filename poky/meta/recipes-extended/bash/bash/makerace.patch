@@ -1,0 +1,52 @@
+We're seeing pipesize.h being created in parallel:
+
+/bin/sh ../../bash-5.1/builtins/psize.sh > pipesize.h
+/bin/sh ../../bash-5.1/builtins/psize.sh > pipesize.h
+
+./mkbuiltins -D ../../bash-5.1/builtins ../../bash-5.1/builtins/ulimit.def
+x86_64-pokysdk-linux-gcc  --sysroot=/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0/recipe-sysroot -c   -DHAVE_CONFIG_H -DSHELL  -I. -I..  -I../../bash-5.1 -I../../bash-5.1/include -I../../bash-5.1/lib -I../../bash-5.1/builtins    -O2 -pipe -fmacro-prefix-map=/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0=/usr/src/debug/nativesdk-bash/5.1-r0                      -fdebug-prefix-map=/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0=/usr/src/debug/nativesdk-bash/5.1-r0                      -fdebug-prefix-map=/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0/recipe-sysroot=                      -fdebug-prefix-map=/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0/recipe-sysroot-native=   ulimit.c || ( rm -f ulimit.c ; exit 1 )
+make[1]: Leaving directory '/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0/build/builtins'
+rm -f redir.o
+x86_64-pokysdk-linux-gcc  --sysroot=/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0/recipe-sysroot  -DPROGRAM='"bash"' -DCONF_HOSTTYPE='"x86_64"' -DCONF_OSTYPE='"linux-gnu"' -DCONF_MACHTYPE='"x86_64-pokysdk-linux-gnu"' -DCONF_VENDOR='"pokysdk"' -DLOCALEDIR='"/opt/poky/3.2+snapshot/sysroots/x86_64-pokysdk-linux/usr/share/locale"' -DPACKAGE='"bash"' -DSHELL -DHAVE_CONFIG_H   -I.  -I../bash-5.1 -I../bash-5.1/include -I../bash-5.1/lib    -O2 -pipe -fmacro-prefix-map=/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0=/usr/src/debug/nativesdk-bash/5.1-r0                      -fdebug-prefix-map=/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0=/usr/src/debug/nativesdk-bash/5.1-r0                      -fdebug-prefix-map=/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0/recipe-sysroot=                      -fdebug-prefix-map=/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0/recipe-sysroot-native=   -c ../bash-5.1/redir.c
+In file included from ../../bash-5.1/builtins/../../bash-5.1/builtins/ulimit.def:95:
+pipesize.h:9:5: error: expected '=', ',', ';', 'asm' or '__attribute__' before '-' token
+    9 | bash-5.1/builtins/psize.sh: 37: ../../bash-5.1/builtins/psize.sh: ./psize.aux: Text file busy
+      |     ^
+make[1]: *** [Makefile:119: ulimit.o] Error 1
+make[1]: Leaving directory '/home/pokybuild/yocto-worker/multilib/build/build/tmp/work/x86_64-nativesdk-pokysdk-linux/nativesdk-bash/5.1-r0/build/builtins'
+make: *** [Makefile:737: builtins/libbuiltins.a] Error 1
+make: *** Waiting for unfinished jobs....
+In file included from ../bash-5.1/redir.c:61:
+./builtins/pipesize.h:9:5: error: expected '=', ',', ';', 'asm' or '__attribute__' before '-' token
+    9 | bash-5.1/builtins/psize.sh: 37: ../../bash-5.1/builtins/psize.sh: ./psize.aux: Text file busy
+      |     ^
+make: *** [Makefile:101: redir.o] Error 1
+WARNING: exit code 1 from a shell command.
+
+which happens since builtins/ulimit.o depends on pipesize.h as well as a top 
+level dependency. This means:
+
+    @(cd $(DEFDIR) && $(MAKE) $(MFLAGS) pipesize.h ) || exit 1
+
+races with:
+
+    @(cd $(DEFDIR) && $(MAKE) $(MFLAGS) DEBUG=${DEBUG} targets ) || exit 1
+
+Hack around this by forcing BUILTINS_LIBRARY onto pipesize.h as a dependency.
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/bug-bash/2021-01/msg00152.html]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: bash-5.1/Makefile.in
+===================================================================
+--- bash-5.1.orig/Makefile.in
++++ bash-5.1/Makefile.in
+@@ -746,7 +746,7 @@ ${DEFDIR}/bashgetopt.o:	$(BUILTIN_SRCDIR
+ ${DEFDIR}/builtext.h: $(BUILTIN_DEFS)
+ 	@(cd $(DEFDIR) && $(MAKE) $(MFLAGS) builtext.h ) || exit 1
+ 
+-${DEFDIR}/pipesize.h:
++${DEFDIR}/pipesize.h: $(BUILTINS_LIBRARY)
+ 	@(cd $(DEFDIR) && $(MAKE) $(MFLAGS) pipesize.h ) || exit 1
+ 
+ $(SDIR)/man2html$(EXEEXT):	${SUPPORT_SRC}/man2html.c

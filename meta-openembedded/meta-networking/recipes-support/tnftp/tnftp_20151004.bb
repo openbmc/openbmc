@@ -22,11 +22,11 @@ inherit autotools update-alternatives pkgconfig
 
 ALTERNATIVE_PRIORITY = "100"
 
-ALTERNATIVE_${PN} = "ftp"
+ALTERNATIVE:${PN} = "ftp"
 ALTERNATIVE_LINK_NAME_${PN} = "${bindir}/ftp"
 ALTERNATIVE_TARGET_${PN}  = "${bindir}/tnftp"
 
-FILES_${PN} = "${bindir}/tnftp"
+FILES:${PN} = "${bindir}/tnftp"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6d6796cb166a9bb050958241dad9479e"
 SRC_URI[md5sum] = "a49fbe752318d5a7893f900046ea00d5"

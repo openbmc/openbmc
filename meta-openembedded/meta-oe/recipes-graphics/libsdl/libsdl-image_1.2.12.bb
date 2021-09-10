@@ -20,7 +20,7 @@ export SDL_CONFIG = "${STAGING_BINDIR_CROSS}/sdl-config"
 # Disable the run-time loading of the libs and bring back the soname dependencies.
 EXTRA_OECONF += "--disable-jpg-shared --disable-png-shared -disable-tif-shared"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # Removing these files fixes a libtool version mismatch.
     rm -f ${S}/acinclude/libtool.m4
     rm -f ${S}/acinclude/sdl.m4

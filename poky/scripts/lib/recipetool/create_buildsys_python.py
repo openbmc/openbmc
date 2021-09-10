@@ -45,9 +45,9 @@ class PythonRecipeHandler(RecipeHandler):
         'Summary': 'SUMMARY',
         'Description': 'DESCRIPTION',
         'License': 'LICENSE',
-        'Requires': 'RDEPENDS_${PN}',
-        'Provides': 'RPROVIDES_${PN}',
-        'Obsoletes': 'RREPLACES_${PN}',
+        'Requires': 'RDEPENDS:${PN}',
+        'Provides': 'RPROVIDES:${PN}',
+        'Obsoletes': 'RREPLACES:${PN}',
     }
     # PN/PV are already set by recipetool core & desc can be extremely long
     excluded_fields = [
@@ -301,7 +301,7 @@ class PythonRecipeHandler(RecipeHandler):
                 inst_req_deps = ('python3-' + r.replace('.', '-').lower() for r in sorted(inst_reqs))
                 lines_after.append('# WARNING: the following rdepends are from setuptools install_requires. These')
                 lines_after.append('# upstream names may not correspond exactly to bitbake package names.')
-                lines_after.append('RDEPENDS_${{PN}} += "{}"'.format(' '.join(inst_req_deps)))
+                lines_after.append('RDEPENDS:${{PN}} += "{}"'.format(' '.join(inst_req_deps)))
 
         if mapped_deps:
             name = info.get('Name')
@@ -313,7 +313,7 @@ class PythonRecipeHandler(RecipeHandler):
                 lines_after.append('')
             lines_after.append('# WARNING: the following rdepends are determined through basic analysis of the')
             lines_after.append('# python sources, and might not be 100% accurate.')
-            lines_after.append('RDEPENDS_${{PN}} += "{}"'.format(' '.join(sorted(mapped_deps))))
+            lines_after.append('RDEPENDS:${{PN}} += "{}"'.format(' '.join(sorted(mapped_deps))))
 
         unmapped_deps -= set(extensions)
         unmapped_deps -= set(self.assume_provided)
@@ -545,7 +545,7 @@ class PythonRecipeHandler(RecipeHandler):
             with open(pkgdatafile, 'r') as f:
                 for line in f.readlines():
                     field, value = line.split(': ', 1)
-                    if field == 'FILES_INFO':
+                    if field.startswith('FILES_INFO'):
                         files_info = ast.literal_eval(value)
                         break
                 else:

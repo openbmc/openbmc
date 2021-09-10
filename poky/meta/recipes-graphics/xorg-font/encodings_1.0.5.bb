@@ -10,7 +10,7 @@ PE = "1"
 PR = "r3"
 
 DEPENDS = "mkfontscale-native mkfontdir-native font-util-native"
-RDEPENDS_${PN} = ""
+RDEPENDS:${PN} = ""
 
 SRC_URI += "file://nocompiler.patch"
 SRC_URI[md5sum] = "bbae4f247b88ccde0e85ed6a403da22a"
@@ -19,3 +19,7 @@ SRC_URI[sha256sum] = "bd96e16143a044b19e87f217cf6a3763a70c561d1076aad6f6d862ec41
 inherit allarch
 
 EXTRA_OECONF += "--with-encodingsdir=${datadir}/fonts/X11/encodings"
+
+# postinst from .inc doesn't apply to this recipe
+pkg_postinst:${PN} () {
+}

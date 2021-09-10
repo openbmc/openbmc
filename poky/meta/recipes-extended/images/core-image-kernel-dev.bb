@@ -15,7 +15,7 @@ CORE_IMAGE_EXTRA_INSTALL += "${KERNEL_DEV_MODULE} \
                             "
 
 # We need extra space for things like kernel builds, etc.
-IMAGE_ROOTFS_EXTRA_SPACE_append = " + 3000000"
+IMAGE_ROOTFS_EXTRA_SPACE:append = " + 3000000"
 
 # Let's define our own subset to test, we can later add a on-target kernel build even!
 DEFAULT_TEST_SUITES = "ping ssh df connman syslog scp date parselogs"

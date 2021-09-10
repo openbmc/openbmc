@@ -16,4 +16,4 @@ inherit autotools pkgconfig gobject-introspection vala
 PACKAGECONFIG ?= "gstreamer"
 PACKAGECONFIG[gstreamer] = "--enable-gstreamer-metadata-backend,--disable-gstreamer-metadata-backend,gstreamer1.0 gstreamer1.0-plugins-base"
 
-FILES_${PN} += "${datadir}/gupnp-dlna-2.0/dlna-profiles"
+FILES:${PN} += "${datadir}/gupnp-dlna-2.0/dlna-profiles"

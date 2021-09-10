@@ -1,0 +1,73 @@
+From e9e4d4837cfea27e67fa656ede535f250205eb2c Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Wed, 24 Oct 2018 12:34:37 +0530
+Subject: [PATCH 22/52] fixing the .bss relocation issue
+
+---
+ bfd/elf64-microblaze.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+Index: gdb-9.2/bfd/elf64-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf64-microblaze.c
++++ gdb-9.2/bfd/elf64-microblaze.c
+@@ -1492,7 +1492,7 @@ microblaze_elf_relocate_section (bfd *ou
+ 					 + input_section->output_offset
+ 					 + offset + INST_WORD_SIZE);
+ 			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
+-    			if (insn == 0xb2000000 || insn == 0xb2ffffff)
++			if ((insn & 0xff000000) == 0xb2000000)
+ 			  {
+         		    insn &= ~0x00ffffff;
+ 			    insn |= (relocation >> 16) & 0xffffff;
+@@ -1606,7 +1606,7 @@ microblaze_elf_relocate_section (bfd *ou
+ 					     + offset + INST_WORD_SIZE);
+ 			  }
+ 			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
+-    			if (insn == 0xb2000000 || insn == 0xb2ffffff)
++			if ((insn & 0xff000000) == 0xb2000000)
+ 			  {
+         		    insn &= ~0x00ffffff;
+ 			    insn |= (relocation >> 16) & 0xffffff;
+@@ -1735,7 +1735,7 @@ microblaze_bfd_write_imm_value_32 (bfd *
+ {
+     unsigned long instr = bfd_get_32 (abfd, bfd_addr);
+ 
+-    if (instr == 0xb2000000 || instr == 0xb2ffffff)
++    if ((instr & 0xff000000) == 0xb2000000)
+       {
+         instr &= ~0x00ffffff;
+         instr |= (val & 0xffffff);
+@@ -1758,7 +1758,7 @@ microblaze_bfd_write_imm_value_64 (bfd *
+     unsigned long instr_lo;
+ 
+     instr_hi = bfd_get_32 (abfd, bfd_addr);
+-    if (instr_hi == 0xb2000000 || instr_hi == 0xb2ffffff)
++    if ((instr_hi & 0xff000000) == 0xb2000000)
+       {
+         instr_hi &= ~0x00ffffff;
+         instr_hi |= (val >> 16) & 0xffffff;
+@@ -2251,7 +2251,10 @@ microblaze_elf_relax_section (bfd *abfd,
+           unsigned long instr_lo =  bfd_get_32 (abfd, ocontents
+                                                 + irelscan->r_offset
+                                                 + INST_WORD_SIZE);
+-          immediate = (instr_hi & 0x0000ffff) << 16;
++          if ((instr_hi & 0xff000000) == 0xb2000000)
++            immediate = (instr_hi & 0x00ffffff) << 24;
++	  else
++            immediate = (instr_hi & 0x0000ffff) << 16;
+           immediate |= (instr_lo & 0x0000ffff);
+ 		      offset = calc_fixup (irelscan->r_addend, 0, sec);
+ 		      immediate -= offset;
+@@ -2295,7 +2298,10 @@ microblaze_elf_relax_section (bfd *abfd,
+           unsigned long instr_lo =  bfd_get_32 (abfd, ocontents
+                                                 + irelscan->r_offset
+                                                 + INST_WORD_SIZE);
+-          immediate = (instr_hi & 0x0000ffff) << 16;
++          if ((instr_hi & 0xff000000) == 0xb2000000)
++            immediate = (instr_hi & 0x00ffffff) << 24;
++	  else
++            immediate = (instr_hi & 0x0000ffff) << 16;
+           immediate |= (instr_lo & 0x0000ffff);
+ 		      target_address = immediate;
+ 		      offset = calc_fixup (target_address, 0, sec);

@@ -1,4 +1,4 @@
-From 4ffe3e0bc856ce1d2c52e84be6ea9337a5ce5410 Mon Sep 17 00:00:00 2001
+From 8a734f44beea9b10548ba696eaea1f5a76148fd5 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <dc4@broadcom.com>
 Date: Tue, 9 Jul 2013 09:26:26 -0400
 Subject: [PATCH] Allow applications to set next resource handle

@@ -28,6 +28,7 @@ SRC_URI = "http://kernel.org/pub/software/network/tftp/tftp-hpa/tftp-hpa-${PV}.t
            file://tftp-hpa-bug-fix-on-separated-CR-and-LF.patch \
            file://fix-writing-emtpy-file.patch \
            file://0001-__progname-is-provided-by-libc.patch \
+           file://0001-tftp-Mark-toplevel-definition-as-external.patch \
            file://tftpd-hpa.socket \
            file://tftpd-hpa.service \
 "
@@ -71,26 +72,26 @@ do_install() {
     sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/tftpd-hpa.service
 }
 
-FILES_${PN} = "${bindir}"
+FILES:${PN} = "${bindir}"
 
 PACKAGES += "tftp-hpa-server"
-SUMMARY_tftp-hpa-server = "Server for the Trivial File Transfer Protocol"
-FILES_tftp-hpa-server = "${sbindir} ${sysconfdir} ${localstatedir}"
-CONFFILES_tftp-hpa-server = "${sysconfdir}/default/tftpd-hpa"
+SUMMARY:tftp-hpa-server = "Server for the Trivial File Transfer Protocol"
+FILES:tftp-hpa-server = "${sbindir} ${sysconfdir} ${localstatedir}"
+CONFFILES:tftp-hpa-server = "${sysconfdir}/default/tftpd-hpa"
 
 INITSCRIPT_PACKAGES = "tftp-hpa-server"
 INITSCRIPT_NAME = "tftpd-hpa"
 INITSCRIPT_PARAMS = "start 20 2 3 4 5 . stop 20 1 ."
 
-ALTERNATIVE_${PN}-doc = "tftpd.8 tftp.1"
+ALTERNATIVE:${PN}-doc = "tftpd.8 tftp.1"
 ALTERNATIVE_LINK_NAME[tftpd.8] = "${mandir}/man8/tftpd.8"
 ALTERNATIVE_LINK_NAME[tftp.1] = "${mandir}/man1/tftp.1"
 
-ALTERNATIVE_${PN} = "tftp"
+ALTERNATIVE:${PN} = "tftp"
 ALTERNATIVE_TARGET[tftp] = "${bindir}/tftp-hpa"
-ALTERNATIVE_PRIORITY = "60"
+ALTERNATIVE_PRIORITY = "100"
 
 
 SYSTEMD_PACKAGES = "tftp-hpa-server"
-SYSTEMD_SERVICE_tftp-hpa-server = "tftpd-hpa.socket tftpd-hpa.service"
-SYSTEMD_AUTO_ENABLE_tftp-hpa-server = "enable"
+SYSTEMD_SERVICE:tftp-hpa-server = "tftpd-hpa.socket tftpd-hpa.service"
+SYSTEMD_AUTO_ENABLE:tftp-hpa-server = "enable"

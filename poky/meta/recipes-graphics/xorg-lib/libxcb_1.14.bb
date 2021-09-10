@@ -19,9 +19,9 @@ BBCLASSEXTEND = "native nativesdk"
 
 DEPENDS = "xcb-proto xorgproto libxau libpthread-stubs libxdmcp"
 
-PACKAGES_DYNAMIC = "^libxcb-.*"
+PACKAGES_DYNAMIC = "^${PN}-.*"
 
-FILES_${PN} = "${libdir}/libxcb.so.*"
+FILES:${PN} = "${libdir}/libxcb.so.*"
 
 inherit autotools pkgconfig features_check
 
@@ -30,6 +30,10 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 export PYTHON = "python3"
 
-python populate_packages_prepend () {
-    do_split_packages(d, '${libdir}', r'^libxcb-(.*)\.so\..*$', 'libxcb-%s', 'XCB library module for %s', allow_links=True)
+do_install:append () {
+	chown root.root ${D}${datadir}/doc/${BPN}/tutorial -R
+}
+
+python populate_packages:prepend () {
+    do_split_packages(d, '${libdir}', r'^libxcb-(.*)\.so\..*$', '${PN}-%s', 'XCB library module for %s', allow_links=True)
 }

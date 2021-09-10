@@ -1,6 +1,14 @@
+From f02010965af21db018c4e108b2193c872406a314 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 4 Feb 2020 18:12:15 +0000
+Subject: [PATCH] mc: Fix manpage date indeterminism
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
 The man page date can vary depending upon the host perl, e.g. in Russian
 some versions print 'июня', others 'Июнь' or Polish 'czerwca' or 'czerwiec'.
-Rather than depend upon perl-native to fix this, just remove the date from 
+Rather than depend upon perl-native to fix this, just remove the date from
 the manpages.
 
 RP 2020/2/4
@@ -8,14 +16,18 @@ RP 2020/2/4
 Upstream-Status: Inappropriate [OE specficic reproducibility workaround]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 
-Index: mc-4.8.23/doc/man/date-of-man-include.am
-===================================================================
---- mc-4.8.23.orig/doc/man/date-of-man-include.am
-+++ mc-4.8.23/doc/man/date-of-man-include.am
+---
+ doc/man/date-of-man-include.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/man/date-of-man-include.am b/doc/man/date-of-man-include.am
+index 3a4e599..f11e9b3 100644
+--- a/doc/man/date-of-man-include.am
++++ b/doc/man/date-of-man-include.am
 @@ -1,5 +1,5 @@
  SED_PARAMETERS = \
 -	-e "s/%DATE_OF_MAN_PAGE%/$${MAN_DATE}/g" \
 +	-e "s/%DATE_OF_MAN_PAGE%//g" \
- 	-e "s/%DISTR_VERSION%/@DISTR_VERSION@/g" \
+ 	-e "s/%MAN_VERSION%/@MAN_VERSION@/g" \
  	-e "s{%prefix%{@prefix@{g" \
  	-e "s{%sysconfdir%{@sysconfdir@{g" \

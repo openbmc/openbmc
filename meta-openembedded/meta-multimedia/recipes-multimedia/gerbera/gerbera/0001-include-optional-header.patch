@@ -1,0 +1,32 @@
+From 5719ed8ce9ba60beb9c1670b49296b1c66430dc2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 2 Mar 2021 12:57:37 -0800
+Subject: [PATCH] include <optional> header
+
+Fixes build with gcc11
+/src/util/tools.h:165:6: error: 'optional' in na
+mespace 'std' does not name a template type
+|   165 | std::optional<std::vector<std::byte>> readBinaryFile(const fs::path& path);
+|       |      ^~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/gerbera/gerbera/pull/1273]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/util/tools.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/util/tools.h b/src/util/tools.h
+index 3a4064e9..e5142966 100644
+--- a/src/util/tools.h
++++ b/src/util/tools.h
+@@ -37,6 +37,7 @@
+ #include <sstream>
+ #include <string>
+ #include <unordered_set>
++#include <optional>
+ #include <vector>
+ namespace fs = std::filesystem;
+ 
+-- 
+2.30.1
+

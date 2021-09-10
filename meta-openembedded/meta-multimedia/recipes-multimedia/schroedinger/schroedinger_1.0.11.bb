@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d91a46405fc074b88c963cc4f2a0aae9 \
 
 DEPENDS = "orc-native orc"
 
-SRC_URI = "http://www.diracvideo.org/download/schroedinger/${BP}.tar.gz \
+SRC_URI = "https://download.videolan.org/contrib/${BPN}/${BP}.tar.gz \
            file://configure.ac.patch"
 
 SRC_URI[md5sum] = "da6af08e564ca1157348fb8d92efc891"

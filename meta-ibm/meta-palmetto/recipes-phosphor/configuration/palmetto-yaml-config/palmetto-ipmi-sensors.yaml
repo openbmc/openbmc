@@ -631,7 +631,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -653,7 +653,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -675,7 +675,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -697,7 +697,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -719,7 +719,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -741,7 +741,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -763,7 +763,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -785,7 +785,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -807,7 +807,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -829,7 +829,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -851,7 +851,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -873,7 +873,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -895,7 +895,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -917,7 +917,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -939,7 +939,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -961,7 +961,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -983,7 +983,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 1
     mutability: Mutability::Write|Mutability::Read
     offsetB: -127
@@ -1005,7 +1005,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/p0_power
@@ -1026,7 +1026,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/p0_pcie_power
@@ -1047,7 +1047,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/p0_io_power
@@ -1068,7 +1068,7 @@
             Value:
                 Offsets:
                     255:
-                        type: int64_t
+                        type: double
     multiplierM: 2
     offsetB: 0
     path: /xyz/openbmc_project/sensors/power/centaur0_power

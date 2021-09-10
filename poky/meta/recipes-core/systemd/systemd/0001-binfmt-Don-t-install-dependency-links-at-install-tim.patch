@@ -1,4 +1,4 @@
-From e9c993816077c1ae67d25d464f2ece2a090f30b8 Mon Sep 17 00:00:00 2001
+From 08cd165f5db0e68a499b80c4b1744a4206948259 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Thu, 21 Feb 2019 16:23:24 +0800
 Subject: [PATCH] binfmt: Don't install dependency links at install time for
@@ -26,22 +26,22 @@ Signed-off-by: Scott Murray <scott.murray@konsulko.com>
  3 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/units/meson.build b/units/meson.build
-index ea91f0cc9ea7..25186f88dfeb 100644
+index 17e9ead9c1..e5502be620 100644
 --- a/units/meson.build
 +++ b/units/meson.build
-@@ -52,8 +52,7 @@ units = [
+@@ -59,8 +59,7 @@ units = [
          ['poweroff.target',                     '',
-          'runlevel0.target'],
+          (with_runlevels ? 'runlevel0.target' : '')],
          ['printer.target',                      ''],
 -        ['proc-sys-fs-binfmt_misc.automount',   'ENABLE_BINFMT',
 -         'sysinit.target.wants/'],
 +        ['proc-sys-fs-binfmt_misc.automount',   'ENABLE_BINFMT'],
          ['proc-sys-fs-binfmt_misc.mount',       'ENABLE_BINFMT'],
          ['reboot.target',                       '',
-          'runlevel6.target ctrl-alt-del.target'],
-@@ -161,8 +160,7 @@ in_units = [
-         ['rc-local.service',                     'HAVE_SYSV_COMPAT'],
+          'ctrl-alt-del.target' + (with_runlevels ? ' runlevel6.target' : '')],
+@@ -178,8 +177,7 @@ in_units = [
          ['rescue.service',                       ''],
+         ['serial-getty@.service',                ''],
          ['systemd-backlight@.service',           'ENABLE_BACKLIGHT'],
 -        ['systemd-binfmt.service',               'ENABLE_BINFMT',
 -         'sysinit.target.wants/'],
@@ -50,10 +50,10 @@ index ea91f0cc9ea7..25186f88dfeb 100644
          ['systemd-boot-check-no-failures.service', ''],
          ['systemd-coredump@.service',            'ENABLE_COREDUMP'],
 diff --git a/units/proc-sys-fs-binfmt_misc.automount b/units/proc-sys-fs-binfmt_misc.automount
-index 30a6bc991844..4231f3b70fe9 100644
+index 172c8757ab..f65d8930c6 100644
 --- a/units/proc-sys-fs-binfmt_misc.automount
 +++ b/units/proc-sys-fs-binfmt_misc.automount
-@@ -18,3 +18,6 @@ ConditionPathIsReadWrite=/proc/sys/
+@@ -19,3 +19,6 @@ ConditionPathIsReadWrite=/proc/sys/
  
  [Automount]
  Where=/proc/sys/fs/binfmt_misc
@@ -61,7 +61,7 @@ index 30a6bc991844..4231f3b70fe9 100644
 +[Install]
 +WantedBy=sysinit.target
 diff --git a/units/systemd-binfmt.service.in b/units/systemd-binfmt.service.in
-index 0c0f26451b67..763c4c466c16 100644
+index fdafce7ff7..4efc05e495 100644
 --- a/units/systemd-binfmt.service.in
 +++ b/units/systemd-binfmt.service.in
 @@ -14,6 +14,7 @@ Documentation=https://www.kernel.org/doc/html/latest/admin-guide/binfmt-misc.htm
@@ -72,9 +72,9 @@ index 0c0f26451b67..763c4c466c16 100644
  After=proc-sys-fs-binfmt_misc.automount
  After=proc-sys-fs-binfmt_misc.mount
  Before=sysinit.target shutdown.target
-@@ -29,3 +30,6 @@ Type=oneshot
- RemainAfterExit=yes
- ExecStart=@rootlibexecdir@/systemd-binfmt
+@@ -30,3 +31,6 @@ RemainAfterExit=yes
+ ExecStart={{ROOTLIBEXECDIR}}/systemd-binfmt
+ ExecStop={{ROOTLIBEXECDIR}}/systemd-binfmt --unregister
  TimeoutSec=90s
 +
 +[Install]

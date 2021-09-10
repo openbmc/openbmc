@@ -13,6 +13,7 @@ SRC_URI = "git://git.code.sf.net/p/minidlna/git;branch=master;module=git \
            file://minidlna.service \
            file://0001-Update-Gettext-version.patch \
            file://0001-configure-Check-for-clock_gettime-seprately-from-__N.patch \
+           file://0001-Mark-setjmp_buffer-extern-declaration.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -21,7 +22,7 @@ S = "${WORKDIR}/git"
 # configure.ac:30: error: required file './ABOUT-NLS' not found
 EXTRA_AUTORECONF = ""
 
-do_install_append(){
+do_install:append(){
     install -d ${D}${sysconfdir}
     install -m 0755 minidlna.conf ${D}${sysconfdir}
 
@@ -35,7 +36,7 @@ do_install_append(){
 
 }
 
-SYSTEMD_SERVICE_${PN} = "minidlna.service"
+SYSTEMD_SERVICE:${PN} = "minidlna.service"
 
 INITSCRIPT_NAME = "minidlna"
 INITSCRIPT_PARAMS = "defaults 90"

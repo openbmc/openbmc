@@ -16,5 +16,5 @@ def glibc_dl_info(d):
 
 EGLIBC_KNOWN_INTERPRETER_NAMES = "${@glibc_dl_info(d)['ldconfig']}"
 RTLDLIST = "${@glibc_dl_info(d)['lddrewrite']}"
-RTLDLIST_class-nativesdk = "${base_libdir}/${@bb.utils.contains('SDK_ARCH', 'x86_64', 'ld-linux-x86-64.so.2', 'ld-linux.so.2', d)}"
+RTLDLIST:class-nativesdk = "${base_libdir}/${@bb.utils.contains('SDK_ARCH', 'x86_64', 'ld-linux-x86-64.so.2', 'ld-linux.so.2', d)}"
 glibc_dl_info[vardepsexclude] = "OVERRIDES"

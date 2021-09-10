@@ -11,7 +11,7 @@ S = "${WORKDIR}/git"
 
 inherit distutils3
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     python3-asyncio \
     python3-core \
     python3-ctypes \

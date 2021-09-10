@@ -1,0 +1,96 @@
+From 5abf3c2efa1cd4e16878b6b26068ff153973ebd3 Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Tue, 28 Apr 2020 02:05:33 +0200
+Subject: [PATCH] Add options to configure the use of libbsd
+
+Upstream-Status: Inappropriate [oe deterministic build specific]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+
+Rebase to 4.14.4
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ buildtools/wafsamba/wscript |  7 +++++++
+ lib/replace/wscript         | 29 +++++++++++++++--------------
+ lib/texpect/wscript         |  8 +++++++-
+ 3 files changed, 29 insertions(+), 15 deletions(-)
+
+diff --git a/buildtools/wafsamba/wscript b/buildtools/wafsamba/wscript
+index 1aadb95..e7b47c0 100644
+--- a/buildtools/wafsamba/wscript
++++ b/buildtools/wafsamba/wscript
+@@ -88,6 +88,13 @@ def options(opt):
+                    help=("Disable use of gettext"),
+                    action="store_true", dest='disable_gettext', default=False)
+ 
++    opt.add_option('--with-libbsd',
++                   help=("Enable use of libbsd"),
++                   action="store_true", dest='enable_libbsd')
++    opt.add_option('--without-libbsd',
++                   help=("Disable use of libbsd"),
++                   action="store_false", dest='enable_libbsd', default=False)
++
+     gr = opt.option_group('developer options')
+ 
+     gr.add_option('-C',
+diff --git a/lib/replace/wscript b/lib/replace/wscript
+index bc726f7..44ad0d6 100644
+--- a/lib/replace/wscript
++++ b/lib/replace/wscript
+@@ -419,20 +419,21 @@ def configure(conf):
+ 
+     strlcpy_in_bsd = False
+ 
+-    # libbsd on some platforms provides strlcpy and strlcat
+-    if not conf.CHECK_FUNCS('strlcpy strlcat'):
+-        if conf.CHECK_FUNCS_IN('strlcpy strlcat', 'bsd', headers='bsd/string.h',
+-                               checklibc=True):
+-            strlcpy_in_bsd = True
+-    if not conf.CHECK_FUNCS('getpeereid'):
+-        conf.CHECK_FUNCS_IN('getpeereid', 'bsd', headers='sys/types.h bsd/unistd.h')
+-    if not conf.CHECK_FUNCS_IN('setproctitle', 'setproctitle', headers='setproctitle.h'):
+-        conf.CHECK_FUNCS_IN('setproctitle', 'bsd', headers='sys/types.h bsd/unistd.h')
+-    if not conf.CHECK_FUNCS('setproctitle_init'):
+-        conf.CHECK_FUNCS_IN('setproctitle_init', 'bsd', headers='sys/types.h bsd/unistd.h')
+-
+-    if not conf.CHECK_FUNCS('closefrom'):
+-        conf.CHECK_FUNCS_IN('closefrom', 'bsd', headers='bsd/unistd.h')
++    if Options.options.enable_libbsd:
++        # libbsd on some platforms provides strlcpy and strlcat
++        if not conf.CHECK_FUNCS('strlcpy strlcat'):
++            if conf.CHECK_FUNCS_IN('strlcpy strlcat', 'bsd', headers='bsd/string.h',
++                                   checklibc=True):
++                strlcpy_in_bsd = True
++        if not conf.CHECK_FUNCS('getpeereid'):
++            conf.CHECK_FUNCS_IN('getpeereid', 'bsd', headers='sys/types.h bsd/unistd.h')
++        if not conf.CHECK_FUNCS_IN('setproctitle', 'setproctitle', headers='setproctitle.h'):
++            conf.CHECK_FUNCS_IN('setproctitle', 'bsd', headers='sys/types.h bsd/unistd.h')
++        if not conf.CHECK_FUNCS('setproctitle_init'):
++            conf.CHECK_FUNCS_IN('setproctitle_init', 'bsd', headers='sys/types.h bsd/unistd.h')
++
++        if not conf.CHECK_FUNCS('closefrom'):
++            conf.CHECK_FUNCS_IN('closefrom', 'bsd', headers='bsd/unistd.h')
+ 
+     conf.CHECK_CODE('''
+                 struct ucred cred;
+diff --git a/lib/texpect/wscript b/lib/texpect/wscript
+index 82f6b25..33eea64 100644
+--- a/lib/texpect/wscript
++++ b/lib/texpect/wscript
+@@ -1,7 +1,13 @@
+ #!/usr/bin/env python
+ 
++from waflib import Options
++
+ def configure(conf):
+-    conf.CHECK_FUNCS_IN('openpty', 'util', checklibc=True, headers='pty.h util.h bsd/libutil.h libutil.h')
++    hdrs = 'pty.h util.h'
++    if Options.options.enable_libbsd:
++        hdrs += ' bsd/libutil.h'
++    hdrs += ' libutil.h'
++    conf.CHECK_FUNCS_IN('openpty', 'util', checklibc=True, headers=hdrs)
+ 
+ def build(bld):
+     bld.SAMBA_BINARY('texpect',
+-- 
+2.17.1
+

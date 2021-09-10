@@ -4,13 +4,13 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://LGPL-2.1;md5=2d5025d4aa3495befef8f17206a5b0a1"
 
 DEPENDS = "sysfsutils"
-RDEPENDS_${PN} += "bash python3-core"
-RDEPENDS_${PN}-tests += "bash python3-core"
+RDEPENDS:${PN} += "bash python3-core"
+RDEPENDS:${PN}-tests += "bash python3-core"
 
-PV = "2.22"
+PV = "2.23"
 PE = "1"
 
-SRCREV = "e6499ff92b4a7dcffbd131d1f5d24933e48c3f20"
+SRCREV = "6b126a4d7da9490fa40fe7e1b962edcb939feddc"
 SRC_URI = " \
     git://github.com/libhugetlbfs/libhugetlbfs.git;protocol=https \
     file://skip-checking-LIB32-and-LIB64-if-they-point-to-the-s.patch \
@@ -24,8 +24,9 @@ SRC_URI = " \
     file://0004-shm.c-Mark-glibc-specific-changes-so.patch \
     file://0005-Include-dirent.h-for-ino_t.patch \
     file://0006-include-limits.h-for-PATH_MAX.patch \
-    file://0001-tests-add-explicit-permissions-to-open-call.patch \
     file://0001-huge_page_setup_helper-use-python3-interpreter.patch \
+    file://0001-Revert-ld.hugetlbfs-fix-Ttext-segment-argument-on-AA.patch \
+    file://0001-tests-makefile-Append-CPPFLAGS-rather-then-override.patch \
 "
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
@@ -36,9 +37,9 @@ COMPATIBLE_HOST = "(i.86|x86_64|powerpc|powerpc64|aarch64|arm).*-linux*"
 
 LIBARGS = "LIB32=${baselib} LIB64=${baselib}"
 LIBHUGETLBFS_ARCH = "${TARGET_ARCH}"
-LIBHUGETLBFS_ARCH_powerpc = "ppc"
-LIBHUGETLBFS_ARCH_powerpc64 = "ppc64"
-LIBHUGETLBFS_ARCH_powerpc64le = "ppc64"
+LIBHUGETLBFS_ARCH:powerpc = "ppc"
+LIBHUGETLBFS_ARCH:powerpc64 = "ppc64"
+LIBHUGETLBFS_ARCH:powerpc64le = "ppc64le"
 EXTRA_OEMAKE = "'ARCH=${LIBHUGETLBFS_ARCH}' 'OPT=${CFLAGS}' 'CC=${CC}' ${LIBARGS} BUILDTYPE=NATIVEONLY V=2"
 PARALLEL_MAKE = ""
 CFLAGS += "-fexpensive-optimizations -frename-registers -fomit-frame-pointer -g0"
@@ -64,12 +65,15 @@ do_install() {
 
 
 PACKAGES =+ "${PN}-tests "
-FILES_${PN} += "${libdir}/*.so"
-FILES_${PN}-dev = "${includedir}"
-FILES_${PN}-dbg += "${libdir}/libhugetlbfs/tests/obj32/.debug ${libdir}/libhugetlbfs/tests/obj64/.debug"
-FILES_${PN}-tests += "${libdir}/libhugetlbfs/tests"
+FILES:${PN} += "${libdir}/*.so"
+FILES:${PN}-dev = "${includedir}"
+FILES:${PN}-dbg += "${libdir}/libhugetlbfs/tests/obj32/.debug ${libdir}/libhugetlbfs/tests/obj64/.debug"
+FILES:${PN}-tests += "${libdir}/libhugetlbfs/tests"
 
-INSANE_SKIP_${PN} = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"
 
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+
+# see https://github.com/libhugetlbfs/libhugetlbfs/issues/52
+PNBLACKLIST[libhugetlbfs] ?= "Needs porting to glibc 2.34+"

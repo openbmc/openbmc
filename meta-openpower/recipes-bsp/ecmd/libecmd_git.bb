@@ -51,11 +51,11 @@ do_install() {
 PARALLEL_MAKE = ""
 
 # ecmd doesn't have proper library versioning
-FILES_${PN}-dev_remove = "${libdir}/lib*.so"
-FILES_${PN} += "${libdir}/lib*.so"
+FILES:${PN}-dev:remove = "${libdir}/lib*.so"
+FILES:${PN} += "${libdir}/lib*.so"
 
-RDEPENDS_${PN}-bin = "libecmd"
+RDEPENDS:${PN}-bin = "libecmd"
 
 # This allows someone to easily use ecmd bins, even if you don’t want them.
 PACKAGE_BEFORE_PN = "libecmd-bin"
-FILES_${PN}-bin += "${bindir}"
+FILES:${PN}-bin += "${bindir}"

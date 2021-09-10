@@ -8,7 +8,7 @@ inherit native
 
 EXTRA_OECONF = " --with-libtool-sysroot=${STAGING_DIR_NATIVE}"
 
-do_configure_prepend () {
+do_configure:prepend () {
 	# Remove any existing libtool m4 since old stale versions would break
 	# any upgrade
 	rm -f ${STAGING_DATADIR}/aclocal/libtool.m4

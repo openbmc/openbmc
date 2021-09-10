@@ -11,7 +11,12 @@ IMAGE_FEATURES = ""
 export IMAGE_BASENAME = "initramfs-debug-image"
 IMAGE_LINGUAS = ""
 
-IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
+# Some BSPs use IMAGE_FSTYPES_<machine override> which would override
+# an assignment to IMAGE_FSTYPES so we need anon python
+python () {
+    d.setVar("IMAGE_FSTYPES", d.getVar("INITRAMFS_FSTYPES"))
+}
+
 inherit core-image
 
 IMAGE_ROOTFS_SIZE = "8192"

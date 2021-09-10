@@ -1,4 +1,4 @@
-From 339af0cea0dc29b33773a3d851ea17c42610de7b Mon Sep 17 00:00:00 2001
+From bcdc525b2e4403f9e878e93cbd0d146ce9e37bb8 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 25 Jul 2019 23:30:27 -0700
 Subject: [PATCH] libfdt: Undefine __wordsize if already defined

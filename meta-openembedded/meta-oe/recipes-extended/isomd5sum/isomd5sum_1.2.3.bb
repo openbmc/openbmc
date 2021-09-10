@@ -2,7 +2,7 @@ SUMMARY = "Tools for taking the MD5 sum of ISO images"
 DESCRIPTION = "Tools for taking the MD5 sum of ISO images"
 
 DEPENDS = "popt python3 openssl curl popt-native"
-RDEPENDS_${BPN} = "openssl curl"
+RDEPENDS:${BPN} = "openssl curl"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
@@ -27,9 +27,9 @@ do_install () {
 
 PACKAGES += "${PYTHON_PN}-${BPN}"
 
-RPROVIDES_${BPN}-dbg += "${PYTHON_PN}-${BPN}-dbg"
+RPROVIDES:${BPN}-dbg += "${PYTHON_PN}-${BPN}-dbg"
 
-FILES_${PYTHON_PN}-${BPN} = "${PYTHON_SITEPACKAGES_DIR}/pyisomd5sum.so"
+FILES:${PYTHON_PN}-${BPN} = "${PYTHON_SITEPACKAGES_DIR}/pyisomd5sum.so"
 
 SRCREV = "7860901f726f5d92689cb67243cc7f981f21f74b"
 

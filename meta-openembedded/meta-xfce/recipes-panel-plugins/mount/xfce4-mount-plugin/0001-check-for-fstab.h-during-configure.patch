@@ -14,38 +14,38 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Patch Reworked for xfce4-mount-plugin 0.6.4->1.1.2
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 ---
- configure.ac           |  1 +
+ configure.ac           |  2 +
  panel-plugin/devices.c | 22 +++++++++++++++++++---
- 2 files changed, 20 insertions(+), 3 deletions(-)
+ 2 files changed, 21 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index b131117..c633fef 100644
+index 375e64a..590b7ad 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -69,6 +69,7 @@ AC_CHECK_HEADERS([sys/socket.h])
- AC_CHECK_HEADERS([sys/time.h])
- AC_CHECK_HEADERS([unistd.h])
- AC_CHECK_HEADERS([sys/sockio.h])
+@@ -65,6 +65,9 @@ dnl param.h is part of libc6 on Linux, but important for old-style Unix and espe
+ AC_CHECK_HEADERS([sys/param.h])
+ AC_CHECK_HEADERS([sys/mount.h])
+ 
++dnl make musl happy
 +AC_CHECK_HEADERS([fstab.h])
- AC_HEADER_SYS_WAIT
- AC_PROG_GCC_TRADITIONAL
- AC_TYPE_SIZE_T
++
+ dnl Add -traditional to output variable CC if using the GNU C compiler and ioctl does not work properly without -traditional. That usually happens when the fixed header files have not been installed on an old system. Leave here commented out to comment in if some older *NIX systems might require it as was recently written on the ML.
+ dnl AC_PROG_GCC_TRADITIONAL
+ 
 diff --git a/panel-plugin/devices.c b/panel-plugin/devices.c
 index 797b079..d29df56 100644
 --- a/panel-plugin/devices.c
 +++ b/panel-plugin/devices.c
-@@ -24,8 +24,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- #ifdef HAVE_CONFIG_H
+@@ -25,7 +25,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  #include <config.h>
  #endif
--
+ 
 +#if HAVE_FSTAB_H
  #include <fstab.h>
 +#endif
-+
  #include <glib.h>
  #include <stdio.h>
- #include <string.h>
+ #include <stdlib.h>
 @@ -468,11 +470,12 @@ disks_new (gboolean include_NFSs, gboolean *showed_fstab_dialog, gint length)
  {
      GPtrArray * pdisks; /* to be returned */

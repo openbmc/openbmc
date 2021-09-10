@@ -10,8 +10,8 @@ B_blank_file
 B_insert_line_after
 B_insert_line_before
 B_insert_line
-B_append_line
-B_prepend_line
+B:append_line
+B:prepend_line
 B_replace_line
 B_replace_lines
 B_replace_pattern
@@ -262,7 +262,7 @@ sub B_insert_line($$$$) {
 #
 # Additionally, if $pattern is set equal to "", the line is always appended.
 #
-# B_append_line uses B_open_plus and B_close_plus, so that the file
+# B:append_line uses B_open_plus and B_close_plus, so that the file
 # modified is backed up...
 #
 # Here's examples of where you might use this:
@@ -273,7 +273,7 @@ sub B_insert_line($$$$) {
 #
 ###########################################################################
 
-sub B_append_line($$$) {
+sub B:append_line($$$) {
 
     my ($filename,$pattern,$line_to_append) = @_;
 
@@ -308,11 +308,11 @@ sub B_append_line($$$) {
 
 ###########################################################################
 # &B_prepend_line ($filename,$pattern,$line_to_prepend)  modifies $filename,
-# pre-pending $line_to_prepend unless one or more lines in the file matches
+# pre-pending $line_to:prepend unless one or more lines in the file matches
 # $pattern.  This is an enhancement to the prepend_line_if_no_such_line_exists
 # idea.
 #
-# B_prepend_line uses B_open_plus and B_close_plus, so that the file
+# B:prepend_line uses B_open_plus and B_close_plus, so that the file
 # modified is backed up...
 #
 # Here's examples of where you might use this:
@@ -322,7 +322,7 @@ sub B_append_line($$$) {
 #
 ###########################################################################
 
-sub B_prepend_line($$$) {
+sub B:prepend_line($$$) {
 
     my ($filename,$pattern,$line_to_prepend) = @_;
 
@@ -348,7 +348,7 @@ sub B_prepend_line($$$) {
 
         # Log the action
         &B_log("ACTION","Pre-pended the following line to $filename:\n");
-        &B_log("ACTION","$line_to_prepend");
+        &B_log("ACTION","$line_to:prepend");
     }
     else {
         $retval=0;

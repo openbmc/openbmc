@@ -26,48 +26,6 @@ index 32e2e0b..f1478d4 100644
  
  
  #
-@@ -205,9 +205,9 @@ ppdc-static:		ppdc.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) foo.drv foo-fr.po
- 	$(LD_CXX) $(ARCHFLAGS) $(ALL_LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a \
- 		$(LINKCUPSSTATIC)
- 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
--	echo Testing PPD compiler...
--	./ppdc-static -l en,fr -I ../data foo.drv
--	./ppdc-static -l en,fr -z -I ../data foo.drv
-+#	echo Testing PPD compiler...
-+#	./ppdc-static -l en,fr -I ../data foo.drv
-+#	./ppdc-static -l en,fr -z -I ../data foo.drv
- 
- 
- #
-@@ -235,17 +235,17 @@ ppdi-static:		ppdc-static ppdi.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC)
- 	$(LD_CXX) $(ARCHFLAGS) $(ALL_LDFLAGS) -o ppdi-static ppdi.o libcupsppdc.a \
- 		$(LINKCUPSSTATIC)
- 	$(CODE_SIGN) -s "$(CODE_SIGN_IDENTITY)" $@
--	echo Testing PPD importer...
--	$(RM) -r ppd ppd2 sample-import.drv
--	./ppdc-static -l en -I ../data sample.drv
--	./ppdi-static -I ../data -o sample-import.drv ppd/*
--	./ppdc-static -l en -I ../data -d ppd2 sample-import.drv
--	if diff -r ppd ppd2 >/dev/null; then \
--		echo PPD import OK; \
--	else \
--		echo PPD import FAILED; \
--		exit 1; \
--	fi
-+#	echo Testing PPD importer...
-+#	$(RM) -r ppd ppd2 sample-import.drv
-+#	./ppdc-static -l en -I ../data sample.drv
-+#	./ppdi-static -I ../data -o sample-import.drv ppd/*
-+#	./ppdc-static -l en -I ../data -d ppd2 sample-import.drv
-+#	if diff -r ppd ppd2 >/dev/null; then \
-+#		echo PPD import OK; \
-+#	else \
-+#		echo PPD import FAILED; \
-+#		exit 1; \
-+#	fi
- 
- 
- #
 -- 
 2.17.1
 

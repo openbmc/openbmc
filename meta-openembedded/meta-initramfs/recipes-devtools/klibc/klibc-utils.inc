@@ -50,7 +50,7 @@ EXTRA_KLIBC_DEPS = "${@oe.utils.conditional('KLIBC_UTILS_VARIANT', 'shared', '${
 
 PACKAGES_DYNAMIC += "^${KLIBC_UTILS_PKGNAME}-.*"
 
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     base_bin_dir = d.expand('${base_bindir}')
     do_split_packages(d, base_bin_dir, '(.*)', '${KLIBC_UTILS_PKGNAME}-%s', 'Klibc util for %s', extra_depends='${EXTRA_KLIBC_DEPS}', allow_links=True, allow_dirs=True)
     base_sbin_dir = d.expand('${base_sbindir}')

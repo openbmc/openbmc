@@ -17,7 +17,6 @@ require phosphor-inventory-manager.inc
 DEPENDS += " \
         phosphor-inventory-manager-assettag \
         phosphor-dbus-interfaces \
-        phosphor-dbus-interfaces-native \
         phosphor-logging \
         sdbusplus \
         ${PYTHON_PN}-sdbus++-native \
@@ -31,7 +30,7 @@ DEPENDS += " \
 OBMC_INVENTORY_PATH="${OBMC_DBUS_PATH_ROOT}/inventory"
 OBMC_INVENTORY_MGR_IFACE="${OBMC_DBUS_IFACE_ROOT}.Inventory.Manager"
 
-DBUS_SERVICE_${PN} = "${OBMC_INVENTORY_MGR_IFACE}.service"
+DBUS_SERVICE:${PN} = "${OBMC_INVENTORY_MGR_IFACE}.service"
 
 S = "${WORKDIR}/git"
 
@@ -40,7 +39,7 @@ EXTRA_OECONF = " \
         BUSNAME=${OBMC_INVENTORY_MGR_IFACE} \
         INVENTORY_ROOT=${OBMC_INVENTORY_PATH} \
         IFACE=${OBMC_INVENTORY_MGR_IFACE} \
-        IFACES_PATH=${STAGING_DIR_HOST}${yaml_dir} \
+        IFACES_PATH=${STAGING_DIR_TARGET}${yaml_dir} \
         "
 
 PACKAGECONFIG ??= ""

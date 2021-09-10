@@ -1,0 +1,57 @@
+From f195ffffb133c9cda88d5eac41c0f584fd4540c9 Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Fri, 4 Dec 2020 03:48:36 -0500
+Subject: [PATCH] Makefile: reorganize
+
+Reorganize the main Makefile in order to:
+1. be able to build in parallel
+2. have build failures in subdirectories stop the build
+
+Now the "-j <#threads>" option can be used with 'make'.
+
+Also, if a build failure occurs in a subdirectory, this new arrangement will
+cause the build to stop and fail instead of silently ignoring it.
+
+To build simply invoke 'make' with or without a -j option.
+To install simply invoke: make TARGET=install
+To clean simply invoke: make TARGET=clean
+
+Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ Makefile | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 4a06de9..1f9f7c4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,5 +1,4 @@
+-TARGETS=lib \
+-	life \
++TARGETS=life \
+ 	mandelbrot \
+ 	offscreen \
+ 	pngview \
+@@ -10,15 +9,11 @@ TARGETS=lib \
+ 	spriteview \
+ 	test_pattern \
+ 	worms
++.PHONY: all lib install clean $(TARGETS)
+ 
+-default :all
+-
+-all:
+-	for target in $(TARGETS); do ($(MAKE) -C $$target); done
+-
+-install:
+-	for target in $(TARGETS); do ($(MAKE) -C $$target install); done
+-
+-clean:
+-	for target in $(TARGETS); do ($(MAKE) -C $$target clean); done
++all: $(TARGETS)
+ 
++$(TARGETS): lib
++	$(MAKE) -C $@ $(TARGET)
++lib:
++	$(MAKE) -C $@ $(TARGET)

@@ -1,4 +1,5 @@
 SUMMARY = "A library for atomic integer operations"
+DESCRIPTION = "Package provides semi-portable access to hardware-provided atomic memory update operations on a number of architectures."
 HOMEPAGE = "https://github.com/ivmai/libatomic_ops/"
 SECTION = "optional"
 PROVIDES += "libatomics-ops"
@@ -15,7 +16,7 @@ SRC_URI[sha256sum] = "587edf60817f56daf1e1ab38a4b3c729b8e846ff67b4f62a6157183708
 
 S = "${WORKDIR}/libatomic_ops-${PV}"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 inherit autotools pkgconfig
 

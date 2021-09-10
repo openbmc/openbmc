@@ -5,8 +5,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit obmc-phosphor-systemd
 
-RDEPENDS_${PN} += "virtual/obmc-gpio-monitor"
-RDEPENDS_${PN} += "busybox"
+RDEPENDS:${PN} += "virtual/obmc-gpio-monitor"
+RDEPENDS:${PN} += "busybox"
 
 RESET_SERVICE = "reset-fan-watchdog.service"
 TGTFMT = "obmc-chassis-poweron@0.target"
@@ -17,7 +17,7 @@ MONITOR_SERVICE = "fan-watchdog-monitor@.service"
 WATCHDOG_SERVICE = "fan-watchdog.service"
 WATCHDOG_FMT = "../${WATCHDOG_SERVICE}:${TGTFMT}.requires/${WATCHDOG_SERVICE}"
 
-SYSTEMD_SERVICE_${PN} += "${RESET_SERVICE} ${MONITOR_SERVICE} ${WATCHDOG_SERVICE}"
-SYSTEMD_LINK_${PN} += "${RESET_FMT} ${WATCHDOG_FMT}"
-SYSTEMD_ENVIRONMENT_FILE_${PN} += "obmc/fan-watchdog/reset-fan-watchdog.conf"
-SYSTEMD_ENVIRONMENT_FILE_${PN} += "obmc/fan-watchdog/fan-watchdog.conf"
+SYSTEMD_SERVICE:${PN} += "${RESET_SERVICE} ${MONITOR_SERVICE} ${WATCHDOG_SERVICE}"
+SYSTEMD_LINK:${PN} += "${RESET_FMT} ${WATCHDOG_FMT}"
+SYSTEMD_ENVIRONMENT_FILE:${PN} += "obmc/fan-watchdog/reset-fan-watchdog.conf"
+SYSTEMD_ENVIRONMENT_FILE:${PN} += "obmc/fan-watchdog/fan-watchdog.conf"

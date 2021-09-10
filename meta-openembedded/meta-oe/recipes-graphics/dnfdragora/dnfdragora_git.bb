@@ -17,16 +17,16 @@ S = "${WORKDIR}/git"
 inherit cmake gettext pkgconfig python3-dir python3native distutils3-base mime-xdg
 
 DEPENDS += "dnf python3 "
-#DEPENDS_class-nativesdk += "nativesdk-python3"
+#DEPENDS:class-nativesdk += "nativesdk-python3"
 
-RDEPENDS_${PN}_class-target = " python3-core libyui libyui-ncurses "
+RDEPENDS:${PN}:class-target = " python3-core libyui libyui-ncurses "
 
 # manpages generation requires http://www.sphinx-doc.org/
 EXTRA_OECMAKE = " -DWITH_MAN=OFF -DPYTHON_INSTALL_DIR=${PYTHON_SITEPACKAGES_DIR} -DPYTHON_DESIRED=3"
 
 BBCLASSEXTEND = "nativesdk"
 
-FILES_${PN} = "${PYTHON_SITEPACKAGES_DIR}/ ${datadir}/ ${bindir}/ ${sysconfdir}/dnfdragora ${sysconfdir}/xdg"
+FILES:${PN} = "${PYTHON_SITEPACKAGES_DIR}/ ${datadir}/ ${bindir}/ ${sysconfdir}/dnfdragora ${sysconfdir}/xdg"
 
 PNBLACKLIST[dnfdragora] ?= "${@bb.utils.contains('PACKAGE_CLASSES', 'package_rpm', '', 'does not build correctly without package_rpm in PACKAGE_CLASSES', d)}"
 

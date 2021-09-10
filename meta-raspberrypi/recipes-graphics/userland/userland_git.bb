@@ -8,16 +8,16 @@ LIC_FILES_CHKSUM = "file://LICENCE;md5=0448d6488ef8cc380632b1569ee6d196"
 PROVIDES += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "", "virtual/libgles2 virtual/egl", d)}"
 PROVIDES += "virtual/libomxil"
 
-RPROVIDES_${PN} += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "", "libgles2 egl libegl libegl1 libglesv2-2", d)}"
+RPROVIDES:${PN} += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "", "libgles2 egl libegl libegl1 libglesv2-2", d)}"
 COMPATIBLE_MACHINE = "^rpi$"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"
-SRCREV = "6fb59736b1ae80fc62cddfe3309c800f72e1c07e"
+SRCREV = "97bc8180ad682b004ea224d1db7b8e108eda4397"
 
 # Use the date of the above commit as the package version. Update this when
 # SRCREV is changed.
-PV = "20200316"
+PV = "20210623"
 
 SRC_URI = "\
     git://github.com/${SRCFORK}/userland.git;protocol=git;branch=${SRCBRANCH} \
@@ -42,7 +42,13 @@ SRC_URI = "\
     file://0019-libfdt-Undefine-__wordsize-if-already-defined.patch \
     file://0020-openmaxil-add-pkg-config-file.patch \
     file://0021-cmake-Disable-format-overflow-warning-as-error.patch \
+    file://0022-all-host_applications-remove-non-existent-projects.patch \
+    file://0023-hello_pi-optionally-build-wayland-specific-app.patch \
+    file://0024-userland-Sync-needed-defines-for-weston-build.patch \
 "
+
+SRC_URI:remove:toolchain-clang = "file://0021-cmake-Disable-format-overflow-warning-as-error.patch"
+
 S = "${WORKDIR}/git"
 
 inherit cmake pkgconfig
@@ -53,16 +59,17 @@ EXTRA_OECMAKE = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS='-Wl,--no-a
                  -DVMCS_INSTALL_PREFIX=${exec_prefix} \
 "
 
-EXTRA_OECMAKE_append_aarch64 = " -DARM64=ON "
+EXTRA_OECMAKE:append:aarch64 = " -DARM64=ON "
 
 
 PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)}"
 
 PACKAGECONFIG[wayland] = "-DBUILD_WAYLAND=TRUE -DWAYLAND_SCANNER_EXECUTABLE:FILEPATH=${STAGING_BINDIR_NATIVE}/wayland-scanner,,wayland-native wayland"
+PACKAGECONFIG[allapps] = "-DALL_APPS=true,,,"
 
-CFLAGS_append = " -fPIC"
+CFLAGS:append = " -fPIC"
 
-do_install_append () {
+do_install:append () {
 	for f in `find ${D}${includedir}/interface/vcos/ -name "*.h"`; do
 		sed -i 's/include "vcos_platform.h"/include "pthreads\/vcos_platform.h"/g' ${f}
 		sed -i 's/include "vcos_futex_mutex.h"/include "pthreads\/vcos_futex_mutex.h"/g' ${f}
@@ -81,21 +88,25 @@ do_install_append () {
                 ln -sf brcmegl.pc ${D}${libdir}/pkgconfig/egl.pc
                 ln -sf brcmvg.pc ${D}${libdir}/pkgconfig/vg.pc
 	fi
+	# Currently man files are installed in /usr/man instead of /usr/share/man, see comments in:
+	# https://github.com/raspberrypi/userland/commit/45a0022ac64b4d0788def3c5230c972430f6fc23
+	mkdir -pv ${D}${datadir}
+	mv -v ${D}${prefix}/man ${D}${mandir}
 }
 
 # Shared libs from userland package  build aren't versioned, so we need
 # to force the .so files into the runtime package (and keep them
 # out of -dev package).
 FILES_SOLIBSDEV = ""
-INSANE_SKIP_${PN} += "dev-so"
+INSANE_SKIP:${PN} += "dev-so"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${libdir}/*.so \
     ${libdir}/plugins"
-FILES_${PN}-dev += "${includedir} \
+FILES:${PN}-dev += "${includedir} \
                    ${prefix}/src"
-FILES_${PN}-doc += "${datadir}/install"
-FILES_${PN}-dbg += "${libdir}/plugins/.debug"
+FILES:${PN}-doc += "${datadir}/install"
+FILES:${PN}-dbg += "${libdir}/plugins/.debug"
 
-RDEPENDS_${PN} += "bash"
-RDEPENDS_${PN} += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "libegl-mesa", "", d)}"
+RDEPENDS:${PN} += "bash"
+RDEPENDS:${PN} += "${@bb.utils.contains("MACHINE_FEATURES", "vc4graphics", "libegl-mesa", "", d)}"

@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend_zaius := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:zaius := "${THISDIR}/${PN}:"
 
 ZAIUS_CHIPS = "bus@1e78a000/i2c-bus@40/ucd90160@64"
 ZAIUS_CHIPS += " bus@1e78a000/i2c-bus@300/pca9541a@70/i2c-arb/hotswap@54"
@@ -33,5 +33,5 @@ ZAIUS_OCCITEMS = "${@compose_list(d, 'ZAIUS_OCCSFMT', 'ZAIUS_OCCS')}"
 
 ENVS = "obmc/hwmon/{0}"
 # compose_list is not defined immediately so don't use :=
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_zaius = " ${@compose_list(d, 'ENVS', 'ZAIUS_ITEMS')}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_zaius = " ${@compose_list(d, 'ENVS', 'ZAIUS_OCCITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:zaius = " ${@compose_list(d, 'ENVS', 'ZAIUS_ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:zaius = " ${@compose_list(d, 'ENVS', 'ZAIUS_OCCITEMS')}"

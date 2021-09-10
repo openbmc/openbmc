@@ -1,32 +1,36 @@
 SUMMARY = "OpenGL (ES) 2.0 benchmark"
 DESCRIPTION = "glmark2 is a benchmark for OpenGL (ES) 2.0. \
 It uses only the subset of the OpenGL 2.0 API that is compatible with OpenGL ES 2.0."
-HOMEPAGE = "https://launchpad.net/glmark2"
-BUGTRACKER = "https://bugs.launchpad.net/glmark2"
+HOMEPAGE = "https://github.com/glmark2/glmark2"
+BUGTRACKER = "https://github.com/glmark2/glmark2/issues"
 
 LICENSE = "GPLv3+ & SGIv1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://COPYING.SGI;beginline=5;md5=269cdab4af6748677acce51d9aa13552"
 
 DEPENDS = "libpng jpeg udev"
+DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland-native wayland-protocols', '', d)}"
 
-PV = "20191226+${SRCPV}"
+PV = "2021.02+${SRCPV}"
 
-COMPATIBLE_HOST_rpi  = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '.*-linux*', 'null', d)}"
-
-SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https \
-           file://python3.patch"
-SRCREV = "72dabc5d72b49c6d45badeb8a941ba4d829b0bd6"
+SRC_URI = " \
+    git://github.com/glmark2/glmark2.git;protocol=https \
+    file://0001-fix-dispmanx-build.patch \
+    file://0002-run-dispmanx-fullscreen.patch \
+    "
+SRCREV = "4b2bbe803576d48f08367aa5441740f9319c21e7"
 
 S = "${WORKDIR}/git"
 
 inherit waf pkgconfig features_check
 
-REQUIRED_DISTRO_FEATURES += "opengl"
+ANY_OF_DISTRO_FEATURES = "opengl dispmanx"
 
-PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'x11-gl x11-gles2', '', d)} \
-                  ${@bb.utils.contains('DISTRO_FEATURES', 'wayland opengl', 'wayland-gl wayland-gles2', '', d)} \
-                  drm-gl drm-gles2"
+PACKAGECONFIG ?= "${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', 'x11-gles2', '', d)} \
+                  ${@bb.utils.contains('DISTRO_FEATURES', 'wayland opengl', 'wayland-gles2', '', d)} \
+                  ${@bb.utils.contains('DISTRO_FEATURES', 'dispmanx', 'dispmanx', '', d)} \
+                  drm-gles2 \
+                 "
 
 PACKAGECONFIG[x11-gl] = ",,virtual/libgl virtual/libx11"
 PACKAGECONFIG[x11-gles2] = ",,virtual/libgles2 virtual/libx11"
@@ -34,6 +38,7 @@ PACKAGECONFIG[drm-gl] = ",,virtual/libgl libdrm virtual/libgbm"
 PACKAGECONFIG[drm-gles2] = ",,virtual/libgles2 libdrm virtual/libgbm"
 PACKAGECONFIG[wayland-gl] = ",,virtual/libgl wayland"
 PACKAGECONFIG[wayland-gles2] = ",,virtual/libgles2 wayland"
+PACKAGECONFIG[dispmanx] = ",,virtual/libgles2 virtual/libx11"
 
 python __anonymous() {
     packageconfig = (d.getVar("PACKAGECONFIG") or "").split()
@@ -50,6 +55,8 @@ python __anonymous() {
         flavors.append("drm-glesv2")
     if "drm-gl" in packageconfig:
         flavors.append("drm-gl")
+    if "dispmanx" in packageconfig:
+        flavors = ["dispmanx-glesv2"]
     if flavors:
         d.appendVar("EXTRA_OECONF", " --with-flavors=%s" % ",".join(flavors))
 }

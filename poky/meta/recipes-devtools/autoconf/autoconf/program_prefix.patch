@@ -1,20 +1,26 @@
-Upstream-Status: Pending
+From f4f19a5c03e8ae3b9cc93d24b76694f4b7b2eb76 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Thu, 12 Mar 2020 17:28:38 +0000
+Subject: [PATCH 3/7] program_prefix.patch
 
-#
-# Patch managed by http://www.mn-logistik.de/unsupported/pxa250/patcher
-#
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+---
+ lib/autoconf/general.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- autoconf-2.57/lib/autoconf/general.m4~program_prefix
-+++ autoconf-2.57/lib/autoconf/general.m4
-@@ -1676,8 +1676,9 @@
+diff --git a/lib/autoconf/general.m4 b/lib/autoconf/general.m4
+index 16f0d074..4c5e0b36 100644
+--- a/lib/autoconf/general.m4
++++ b/lib/autoconf/general.m4
+@@ -2070,7 +2070,7 @@ _AC_CANONICAL_SPLIT([target])
+ 
  # The aliases save the names the user supplied, while $host etc.
  # will get canonicalized.
- test -n "$target_alias" &&
--  test "$program_prefix$program_suffix$program_transform_name" = \
--    NONENONEs,x,x, &&
-+  test "$target_alias" != "$host_alias" &&
-+    test "$program_prefix$program_suffix$program_transform_name" = \
-+      NONENONEs,x,x, &&
+-test -n "$target_alias" &&
++test -n "$target_alias" && test "$target_alias" != "$host_alias" &&
+   test "$program_prefix$program_suffix$program_transform_name" = \
+     NONENONEs,x,x, &&
    program_prefix=${target_alias}-[]dnl
- ])# AC_CANONICAL_TARGET
- 
+-- 
+2.25.1
+

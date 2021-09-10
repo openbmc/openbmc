@@ -1,0 +1,79 @@
+From ba6bc5459cf148dd617fd9cd38dd50c3a9b5d706 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 31 May 2021 15:50:48 +0800
+Subject: [PATCH] source3/wscript: disable check fcntl F_OWNER_EX
+
+It fails on cross-compilation.
+
+Fixes configure error:
+  Checking whether fcntl supports flags to send direct I/O availability signals: UNKNOWN
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ source3/wscript | 48 ------------------------------------------------
+ 1 file changed, 48 deletions(-)
+
+diff --git a/source3/wscript b/source3/wscript
+index adc31ce..f6de0a6 100644
+--- a/source3/wscript
++++ b/source3/wscript
+@@ -1168,54 +1168,6 @@ err:
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+-#include <sys/socket.h>
+-
+-int main(void)
+-{
+-        int sockfd, ret;
+-        struct f_owner_ex owner, get_owner;
+-
+-        sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
+-        if (sockfd == -1) {
+-            goto err;
+-        }
+-
+-        owner.type = F_OWNER_PID;
+-        owner.pid = getpid();
+-
+-        ret = fcntl(sockfd, F_SETOWN_EX, &owner);
+-        if (ret == -1) {
+-            goto err;
+-        }
+-
+-        ret = fcntl(sockfd, F_GETOWN_EX, &get_owner);
+-        if (ret == -1) {
+-            goto err;
+-        }
+-
+-        if (get_owner.type != F_OWNER_PID) {
+-            goto err;
+-        }
+-
+-        if (get_owner.pid != getpid()) {
+-            goto err;
+-        }
+-
+-        close(sockfd);
+-        exit(0);
+-err:
+-        close(sockfd);
+-        exit(1);
+-}''',
+-            'HAVE_F_OWNER_EX',
+-            addmain=False,
+-            execute=True,
+-            msg="Checking whether fcntl supports flags to send direct I/O availability signals")
+-
+-    conf.CHECK_CODE('''
+-#include <fcntl.h>
+-#include <unistd.h>
+-#include <stdlib.h>
+ #include <stdint.h>
+ 
+ #define DATA "hinttest.fcntl"
+-- 
+2.17.1
+

@@ -26,4 +26,4 @@ do_install() {
     oe_runmake PREFIX="${prefix}" DESTDIR="${D}" install
 }
 
-RDEPENDS_${PN}_append_libc-glibc = " glibc-gconv-ibm437"
+RDEPENDS:${PN}:append:libc-glibc = " glibc-gconv-ibm437"

@@ -1,0 +1,21 @@
+For native builds we don't care about the documentation, and this would
+otherwise pull in a dependency on help2man.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/Makefile.in b/Makefile.in
+index 146e8e3..a1827c1 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -763,10 +762,0 @@ dist_buildaux_SCRIPTS = \
+-dist_man_MANS = \
+-  man/autoconf.1 \
+-  man/autoheader.1 \
+-  man/autom4te.1 \
+-  man/autoreconf.1 \
+-  man/autoscan.1 \
+-  man/autoupdate.1 \
+-  man/ifnames.1
+-
+-

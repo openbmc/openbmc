@@ -34,7 +34,7 @@ class AptRepoTest(AptTest):
     def setup_source_config_for_package_install(self):
         apt_get_source_server = 'http://%s:%s/' % (self.tc.target.server_ip, self.repo_server.port)
         apt_get_sourceslist_dir = '/etc/apt/'
-        self.target.run('cd %s; echo deb %s ./ > sources.list' % (apt_get_sourceslist_dir, apt_get_source_server))
+        self.target.run('cd %s; echo deb [ allow-insecure=yes ] %s ./ > sources.list' % (apt_get_sourceslist_dir, apt_get_source_server))
 
     def cleanup_source_config_for_package_install(self):
         apt_get_sourceslist_dir = '/etc/apt/'

@@ -18,4 +18,4 @@ do_install() {
     oe_runmake 'DESTDIR=${D}' 'luadir=${datadir}/lua/${LUA_VERSION}' 'luaexecdir=${libdir}/lua/${LUA_VERSION}' install
 }
 
-FILES_${PN} = "${datadir}/lua/${LUA_VERSION} ${libdir}/lua/${LUA_VERSION}"
+FILES:${PN} = "${datadir}/lua/${LUA_VERSION} ${libdir}/lua/${LUA_VERSION}"

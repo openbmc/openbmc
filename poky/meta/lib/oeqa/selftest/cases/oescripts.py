@@ -133,7 +133,7 @@ class OEListPackageconfigTests(OEScriptTests):
     def check_endlines(self, results,  expected_endlines): 
         for line in results.output.splitlines():
             for el in expected_endlines:
-                if line == el:
+                if line.split() == el.split():
                     expected_endlines.remove(el)
                     break
 
@@ -167,7 +167,7 @@ class OEListPackageconfigTests(OEScriptTests):
     def test_packageconfig_flags_option_all(self):
         results = runCmd('%s/contrib/list-packageconfig-flags.py -a' % self.scripts_dir)
         expected_endlines = []
-        expected_endlines.append("pinentry-1.1.0")
+        expected_endlines.append("pinentry-1.1.1")
         expected_endlines.append("PACKAGECONFIG ncurses libcap")
         expected_endlines.append("PACKAGECONFIG[qt] --enable-pinentry-qt, --disable-pinentry-qt, qtbase-native qtbase")
         expected_endlines.append("PACKAGECONFIG[gtk2] --enable-pinentry-gtk2, --disable-pinentry-gtk2, gtk+ glib-2.0")
@@ -177,7 +177,7 @@ class OEListPackageconfigTests(OEScriptTests):
 
         self.check_endlines(results, expected_endlines)
 
-    def test_packageconfig_flags_optiins_preferred_only(self):
+    def test_packageconfig_flags_options_preferred_only(self):
         results = runCmd('%s/contrib/list-packageconfig-flags.py -p' % self.scripts_dir)
         expected_endlines = []
         expected_endlines.append("RECIPE NAME                  PACKAGECONFIG FLAGS")

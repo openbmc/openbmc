@@ -28,6 +28,6 @@ do_install () {
 	cp ${S}/* ${D}/${datadir}/oe-scap/.
 }
 
-FILES_${PN} += "${datadir}/oe-scap"
+FILES:${PN} += "${datadir}/oe-scap"
 
-RDEPENDS_${PN} = "openscap bash"
+RDEPENDS:${PN} = "openscap bash"

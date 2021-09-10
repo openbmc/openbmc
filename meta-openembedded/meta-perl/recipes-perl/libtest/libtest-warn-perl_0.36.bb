@@ -29,7 +29,7 @@ do_install_ptest() {
     chown -R root:root ${D}${PTEST_PATH}
 }
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     libsub-uplevel-perl \
     perl-module-blib \
     perl-module-carp \
@@ -38,7 +38,7 @@ RDEPENDS_${PN} += " \
     perl-module-test-tester \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     perl-module-file-spec \
     perl-module-test-more \
 "

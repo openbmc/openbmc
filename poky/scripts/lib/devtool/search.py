@@ -62,10 +62,11 @@ def search(args, config, basepath, workspace):
                             with open(os.path.join(pkgdata_dir, 'runtime', pkg), 'r') as f:
                                 for line in f:
                                     if ': ' in line:
-                                        splitline = line.split(':', 1)
+                                        splitline = line.split(': ', 1)
                                         key = splitline[0]
                                         value = splitline[1].strip()
-                                    if key in ['PKG_%s' % pkg, 'DESCRIPTION', 'FILES_INFO'] or key.startswith('FILERPROVIDES_'):
+                                    key = key.replace(":" + pkg, "")
+                                    if key in ['PKG', 'DESCRIPTION', 'FILES_INFO', 'FILERPROVIDES']:
                                         if keyword_rc.search(value):
                                             match = True
                                             break

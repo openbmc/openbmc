@@ -14,4 +14,4 @@ inherit gnomebase gsettings gtk-icon-cache gnome-help gettext upstream-version-i
 SRC_URI[archive.md5sum] = "7e6ed808766bc18285bdc6999bdf0f15"
 SRC_URI[archive.sha256sum] = "c2d9c191ff5bce836618779865bee4059db81a3a0dff38bda3cc7a9e729637c0"
 
-FILES_${PN} += "${datadir}/metainfo"
+FILES:${PN} += "${datadir}/metainfo"

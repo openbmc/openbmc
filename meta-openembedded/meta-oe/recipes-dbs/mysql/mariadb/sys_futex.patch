@@ -1,0 +1,23 @@
+Use SYS_futex for syscall
+
+glibc defines SYS_futex and on newer 32bit CPUs like RISCV-32, arc there
+is no 32bit time_t therefore define SYS_futex in terms of SYS_futex_time64
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/storage/innobase/sync/srw_lock.cc
++++ b/storage/innobase/sync/srw_lock.cc
+@@ -210,6 +210,12 @@ void ssux_lock_low::wake() { WakeByAddre
+ #  ifdef __linux__
+ #   include <linux/futex.h>
+ #   include <sys/syscall.h>
++/** Newer 32bit CPUs eg. RISCV-32 are defaulting to 64bit time_t from get go and
++ therefore do not define __NR_futex */
++#   if !defined(SYS_futex) && defined(SYS_futex_time64)
++#    define SYS_futex SYS_futex_time64
++#   endif
++
+ #   define SRW_FUTEX(a,op,n) \
+     syscall(SYS_futex, a, FUTEX_ ## op ## _PRIVATE, n, nullptr, nullptr, 0)
+ #  elif defined __OpenBSD__

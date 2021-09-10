@@ -14,14 +14,13 @@ DEBUG_COLLECTOR_PKGS = " \
     ${PN}-scripts \
 "
 PACKAGE_BEFORE_PN += "${DEBUG_COLLECTOR_PKGS}"
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 DBUS_PACKAGES = "${PN}-manager"
 
 SYSTEMD_PACKAGES = "${PN}-monitor"
 
-inherit autotools \
-        pkgconfig \
+inherit meson \
         obmc-phosphor-dbus-service \
         python3native \
         phosphor-debug-collector
@@ -30,7 +29,6 @@ require phosphor-debug-collector.inc
 
 DEPENDS += " \
         phosphor-dbus-interfaces \
-        phosphor-dbus-interfaces-native \
         phosphor-logging \
         sdbusplus \
         ${PYTHON_PN}-sdbus++-native \
@@ -40,18 +38,19 @@ DEPENDS += " \
         ${PYTHON_PN}-pyyaml-native \
         ${PYTHON_PN}-setuptools-native \
         ${PYTHON_PN}-mako-native \
+        fmt \
 "
 
-RDEPENDS_${PN}-manager += " \
+RDEPENDS:${PN}-manager += " \
         ${PN}-dreport \
 "
-RDEPENDS_${PN}-dreport += " \
+RDEPENDS:${PN}-dreport += " \
         systemd \
         ${VIRTUAL-RUNTIME_base-utils} \
         bash \
         xz \
 "
-RDEPENDS_${PN}-scripts += " \
+RDEPENDS:${PN}-scripts += " \
         bash \
 "
 
@@ -59,27 +58,29 @@ MGR_SVC ?= "xyz.openbmc_project.Dump.Manager.service"
 
 SYSTEMD_SUBSTITUTIONS += "BMC_DUMP_PATH:${bmc_dump_path}:${MGR_SVC}"
 
-FILES_${PN}-manager +=  " \
+FILES:${PN}-manager +=  " \
     ${bindir}/phosphor-dump-manager \
     ${exec_prefix}/lib/tmpfiles.d/coretemp.conf \
     ${datadir}/dump/ \
     "
-FILES_${PN}-monitor += "${bindir}/phosphor-dump-monitor"
-FILES_${PN}-dreport += "${bindir}/dreport"
-FILES_${PN}-scripts += "${dreport_dir}"
+FILES:${PN}-monitor += "${bindir}/phosphor-dump-monitor"
+FILES:${PN}-monitor += "${bindir}/phosphor-ramoops-monitor"
+FILES:${PN}-dreport += "${bindir}/dreport"
+FILES:${PN}-scripts += "${dreport_dir}"
 
-DBUS_SERVICE_${PN}-manager += "${MGR_SVC}"
-SYSTEMD_SERVICE_${PN}-monitor += "obmc-dump-monitor.service"
+DBUS_SERVICE:${PN}-manager += "${MGR_SVC}"
+SYSTEMD_SERVICE:${PN}-monitor += "obmc-dump-monitor.service"
+SYSTEMD_SERVICE:${PN}-monitor += "ramoops-monitor.service"
 
-EXTRA_OECONF = " \
-    BMC_DUMP_PATH=${bmc_dump_path} \
-    ERROR_MAP_YAML=${STAGING_DIR_NATIVE}/${datadir}/dump/errors_watch.yaml \
+EXTRA_OEMESON = " \
+    -DBMC_DUMP_PATH=${bmc_dump_path} \
+    -DERROR_MAP_YAML=${STAGING_DIR_NATIVE}/${datadir}/dump/errors_watch.yaml \
     "
 
 S = "${WORKDIR}/git"
 SRC_URI += "file://coretemp.conf"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${exec_prefix}/lib/tmpfiles.d
     install -m 644 ${WORKDIR}/coretemp.conf ${D}${exec_prefix}/lib/tmpfiles.d/
 }
@@ -163,6 +164,7 @@ def install_dreport_user_script(script_path, d):
             linkname = "E" + priority + script
             destlink = os.path.join(destdir, linkname)
             os.symlink(srclink, destlink)
+    file.close()
 
 #Make the links for all the plugins
 python install_dreport_user_scripts() {
@@ -176,17 +178,20 @@ python install_dreport_user_scripts() {
         install_dreport_user_script(srcname, d)
 }
 
-#Enable ubifs-workaround by DISTRO_FEATURE obmc-ubi-fs.
-PACKAGECONFIG_append_df-obmc-ubi-fs = " ubifs-workaround"
-PACKAGECONFIG[ubifs-workaround] = " \
-       --enable-ubifs-workaround, \
-       --disable-ubifs-workaround \
-"
+PACKAGECONFIG ??= "${@bb.utils.contains_any('DISTRO_FEATURES', \
+         'obmc-ubi-fs phosphor-mmc', '', 'jffs-workaround', d)}"
+PACKAGECONFIG[jffs-workaround] = "-Djffs-workaround=enabled, \
+        -Djffs-workaround=disabled"
 
-PACKAGECONFIG[host-dump-offload-pldm] = " \
-        --with-host-dump-offload-transport=pldm,, \
+PACKAGECONFIG[host-dump-transport-pldm] = " \
+        -Dhost-transport=pldm,, \
         pldm \
         "
+
+PACKAGECONFIG[openpower-dumps-extension] = " \
+       -Dopenpower-dumps-extension=enabled, \
+       -Dopenpower-dumps-extension=disabled  \
+"
 
 do_install[postfuncs] += "install_dreport"
 do_install[postfuncs] += "install_dreport_conf_file"

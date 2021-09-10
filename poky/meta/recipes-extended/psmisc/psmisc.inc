@@ -19,7 +19,7 @@ inherit autotools gettext
 # Upstream has a custom autogen.sh which invokes po/update-potfiles as they 
 # don't ship a po/POTFILES.in (which is silly).  Without that file gettext 
 # doesn't believe po/ is a gettext directory and won't generate po/Makefile.
-do_configure_prepend() {
+do_configure:prepend() {
     ( cd ${S} && po/update-potfiles )
 }
 
@@ -27,30 +27,30 @@ do_configure_prepend() {
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6,"
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 
 PACKAGES =+ "fuser fuser-doc killall killall-doc pstree pstree-doc"
 PACKAGES += "psmisc-extras"
 
-FILES_${PN} = ""
-RDEPENDS_${PN} = "fuser killall pstree"
+FILES:${PN} = ""
+RDEPENDS:${PN} = "fuser killall pstree"
 
-FILES_fuser = "${bindir}/fuser.${BPN}"
-FILES_fuser-doc = "${mandir}/man1/fuser*"
+FILES:fuser = "${bindir}/fuser.${BPN}"
+FILES:fuser-doc = "${mandir}/man1/fuser*"
 
-FILES_killall = "${bindir}/killall.${BPN}"
-FILES_killall-doc = "${mandir}/man1/killall*"
+FILES:killall = "${bindir}/killall.${BPN}"
+FILES:killall-doc = "${mandir}/man1/killall*"
 
-FILES_pstree = "${bindir}/pstree"
-FILES_pstree-doc = "${mandir}/man1/pstree*"
+FILES:pstree = "${bindir}/pstree"
+FILES:pstree-doc = "${mandir}/man1/pstree*"
 
-FILES_psmisc-extras = "${bindir}"
-FILES_psmisc-extras-doc = "${mandir}"
+FILES:psmisc-extras = "${bindir}"
+FILES:psmisc-extras-doc = "${mandir}"
 
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "90"
 
-ALTERNATIVE_killall = "killall"
+ALTERNATIVE:killall = "killall"
 
-ALTERNATIVE_fuser = "fuser"
+ALTERNATIVE:fuser = "fuser"

@@ -1,25 +1,36 @@
-This value is used to determine CONFIG_SHELL and SHELL which may get exported into
-scripts shared via sstate onto other systems.
+From 0aac3047cd7681d610b22d79501c297fa3433148 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Thu, 12 Mar 2020 17:25:41 +0000
+Subject: [PATCH 2/7] m4sh: prefer bash over sh
 
-Some systems have /bin/sh -> dash and others /bin/sh -> bash. Bash is preferred 
-but sometimes we can sometimes end up exporting /bin/sh yet use bashisms.
+_AS_DETECT_BETTER_SHELL looks for a good shell to use, and tries to look for
+'sh' before 'bash'.  Whilst for many systems sh is a symlink to bash,
+there are many where sh is a symlink to a more minimal sh implementation.
 
-This patch puts bash first in the search results which avoids the bash/dash confusion.
+For example, Debian by default has /bin/sh -> /bin/dash: dash is a faster
+shell to start (which makes a notable difference to boot speed) but is not
+as fast as bash at executing long scripts (and configure scripts are not
+known for their conciseness).
 
-RP 2012/9/23
+Change the search order to bash then sh, so that a known-good shell (bash)
+is used if available over something which is merely POSIX compliant.
+---
+ lib/m4sugar/m4sh.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Upstream-Status: Inappropriate [OE specific configuration]
-
-Index: autoconf-2.69/lib/m4sugar/m4sh.m4
-===================================================================
---- autoconf-2.69.orig/lib/m4sugar/m4sh.m4	2012-03-07 17:35:26.000000000 +0000
-+++ autoconf-2.69/lib/m4sugar/m4sh.m4	2013-09-23 16:12:38.853597515 +0000
-@@ -229,7 +229,7 @@
+diff --git a/lib/m4sugar/m4sh.m4 b/lib/m4sugar/m4sh.m4
+index 9d543952..84ef84a9 100644
+--- a/lib/m4sugar/m4sh.m4
++++ b/lib/m4sugar/m4sh.m4
+@@ -230,7 +230,7 @@ dnl Remove any tests from suggested that are also required
      [_AS_PATH_WALK([/bin$PATH_SEPARATOR/usr/bin$PATH_SEPARATOR$PATH],
        [case $as_dir in @%:@(
  	 /*)
 -	   for as_base in sh bash ksh sh5; do
 +	   for as_base in bash sh ksh sh5; do
  	     # Try only shells that exist, to save several forks.
- 	     as_shell=$as_dir/$as_base
+ 	     as_shell=$as_dir$as_base
  	     AS_IF([{ test -f "$as_shell" || test -f "$as_shell.exe"; } &&
+-- 
+2.25.1
+

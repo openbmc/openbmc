@@ -1,0 +1,63 @@
+From c3055ce9eb32d0d24abc5cea5e1d231c499312a7 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 19 Apr 2021 23:29:10 +0200
+Subject: [PATCH] debuginfod/debuginfod-client.c: correct string format on
+ 32bit arches with 64bit time_t
+
+Use intmax_t to print time_t
+
+time_t is platform dependent and some of architectures e.g.
+x32, riscv32, arc use 64bit time_t even while they are 32bit
+architectures, therefore directly using integer printf formats will not
+work portably, use intmax_t to typecast time_t into printf family of
+functions
+
+Upstream-Status: Pending
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ debuginfod/debuginfod-client.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/debuginfod/debuginfod-client.c b/debuginfod/debuginfod-client.c
+index ee7eda2..083ec2c 100644
+--- a/debuginfod/debuginfod-client.c
++++ b/debuginfod/debuginfod-client.c
+@@ -226,7 +226,7 @@ debuginfod_config_cache(char *config_path,
+       if (fd < 0)
+         return -errno;
+ 
+-      if (dprintf(fd, "%ld", cache_config_default_s) < 0)
++      if (dprintf(fd, "%jd", (intmax_t)cache_config_default_s) < 0)
+         return -errno;
+     }
+ 
+@@ -234,7 +234,7 @@ debuginfod_config_cache(char *config_path,
+   FILE *config_file = fopen(config_path, "r");
+   if (config_file)
+     {
+-      if (fscanf(config_file, "%ld", &cache_config) != 1)
++      if (fscanf(config_file, "%jd", (intmax_t*)(&cache_config)) != 1)
+         cache_config = cache_config_default_s;
+       fclose(config_file);
+     }
+@@ -267,7 +267,7 @@ debuginfod_init_cache (char *cache_path, char *interval_path, char *maxage_path)
+   if (fd < 0)
+     return -errno;
+ 
+-  if (dprintf(fd, "%ld", cache_clean_default_interval_s) < 0)
++  if (dprintf(fd, "%jd", (intmax_t)cache_clean_default_interval_s) < 0)
+     return -errno;
+ 
+   /* init max age config file.  */
+@@ -275,7 +275,7 @@ debuginfod_init_cache (char *cache_path, char *interval_path, char *maxage_path)
+       && (fd = open(maxage_path, O_CREAT | O_RDWR, DEFFILEMODE)) < 0)
+     return -errno;
+ 
+-  if (dprintf(fd, "%ld", cache_default_max_unused_age_s) < 0)
++  if (dprintf(fd, "%jd", (intmax_t)cache_default_max_unused_age_s) < 0)
+     return -errno;
+ 
+   return 0;

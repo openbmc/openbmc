@@ -9,7 +9,7 @@ inherit mrw-xml
 DEPENDS = "mrw-native mrw-perl-tools-native"
 PROVIDES += "virtual/phosphor-fan-presence-config"
 
-FILES_${PN} += "${presence_datadir}/config.yaml"
+FILES:${PN} += "${presence_datadir}/config.yaml"
 
 S = "${WORKDIR}"
 

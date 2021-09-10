@@ -1,0 +1,128 @@
+.before-my-script: &before-my-script
+    - echo "$ERR_REPORT_USERNAME" > ~/.oe-send-error
+    - echo "$ERR_REPORT_EMAIL" >> ~/.oe-send-error
+    - export PATH=~/.local/bin:$PATH
+    - wget https://bootstrap.pypa.io/get-pip.py
+    - python3 get-pip.py
+    - python3 -m pip install kas
+
+.after-my-script: &after-my-script
+    - cd $CI_PROJECT_DIR/poky
+    - . ./oe-init-build-env $CI_PROJECT_DIR/build
+    - for x in `ls $CI_PROJECT_DIR/build/tmp/log/error-report/ | grep error_report_`; do
+    - send-error-report -y tmp/log/error-report/$x
+    - done
+    - rm -fr $CI_PROJECT_DIR/build
+
+stages:
+  - base 
+  - parsec
+  - musl
+  - test
+
+.base:
+  before_script:
+    - *before-my-script
+  stage: base 
+  after_script:
+    - *after-my-script
+
+.parsec:
+  before_script:
+    - *before-my-script
+  stage: parsec 
+  after_script:
+    - *after-my-script
+
+.musl:
+  before_script:
+    - *before-my-script
+  stage: musl
+  after_script:
+    - *after-my-script
+
+.test:
+  before_script:
+    - *before-my-script
+  stage: test 
+  after_script:
+    - *after-my-script
+
+qemux86:
+  extends: .base
+  script:
+  - kas shell kas/$CI_JOB_NAME.yml  -c "bitbake -k security-build-image integrity-image-minimal"
+  - kas build --target security-build-image kas/$CI_JOB_NAME-comp.yml
+  - kas build --target harden-image-minimal kas/$CI_JOB_NAME-harden.yml
+
+qemux86-musl:
+  extends: .musl
+  needs: ['qemux86']
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
+
+qemux86-parsec:
+  extends: .parsec
+  needs: ['qemux86']
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
+
+qemux86-test:
+  extends: .test
+  needs: ['qemux86']
+  allow_failure: true
+  script:
+  - kas build --target security-test-image kas/$CI_JOB_NAME.yml
+  - kas build -c testimage --target security-test-image kas/$CI_JOB_NAME.yml
+
+qemux86-64:
+  extends: .base
+  script:
+  - kas shell kas/$CI_JOB_NAME.yml  -c "bitbake -k security-build-image security-tpm-image security-tpm2-image integrity-image-minimal"
+  - kas build --target dm-verity-image-initramfs kas/$CI_JOB_NAME-dm-verify.yml
+  - kas build --target security-build-image kas/$CI_JOB_NAME-alt.yml
+
+qemux86-64-parsec:
+  extends: .parsec
+  needs: ['qemux86-64']
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
+
+qemuarm:
+  extends: .base
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
+
+qemuarm-parsec:
+  extends: .parsec
+  needs: ['qemuarm']
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
+
+qemuarm64:
+  extends: .base
+  script:
+  - kas shell kas/$CI_JOB_NAME.yml  -c "bitbake -k security-build-image security-tpm2-image integrity-image-minimal"
+  - kas build --target security-build-image kas/$CI_JOB_NAME-alt.yml
+
+qemuarm64-musl:
+  extends: .musl
+  needs: ['qemuarm64']
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
+
+qemuarm64-parsec:
+  extends: .parsec
+  needs: ['qemuarm64']
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
+
+qemumips64:
+  extends: .base
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml
+
+qemuriscv64:
+  extends: .base
+  script:
+  - kas build --target security-build-image kas/$CI_JOB_NAME.yml

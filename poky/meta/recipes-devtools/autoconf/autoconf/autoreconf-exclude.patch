@@ -1,18 +1,25 @@
-Upstream-Status: Pending
+From 0071d28e304745a16871561f23117fdb00dd2559 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Thu, 12 Mar 2020 17:25:23 +0000
+Subject: [PATCH 4/7] autoreconf-exclude.patch
 
-Index: autoconf-2.63/bin/autoreconf.in
-===================================================================
---- autoconf-2.63.orig/bin/autoreconf.in	2008-12-31 17:39:01.000000000 +0000
-+++ autoconf-2.63/bin/autoreconf.in	2008-12-31 17:43:38.000000000 +0000
-@@ -76,6 +76,7 @@
-   -i, --install            copy missing auxiliary files
+---
+ bin/autoreconf.in | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/bin/autoreconf.in b/bin/autoreconf.in
+index bb9f316d..7da3005b 100644
+--- a/bin/autoreconf.in
++++ b/bin/autoreconf.in
+@@ -82,6 +82,7 @@ Operation modes:
+   -i, --install            copy missing standard auxiliary files
        --no-recursive       don't rebuild sub-packages
    -s, --symlink            with -i, install symbolic links instead of copies
 +  -x, --exclude=STEPS      steps we should not run
    -m, --make               when applicable, re-run ./configure && make
    -W, --warnings=CATEGORY  report the warnings falling in CATEGORY [syntax]
  
-@@ -136,6 +137,13 @@
+@@ -141,6 +142,10 @@ my $run_make = 0;
  # Recurse into subpackages
  my $recursive = 1;
  
@@ -20,13 +27,10 @@ Index: autoconf-2.63/bin/autoreconf.in
 +my @exclude;
 +my @ex;
 +
-+my $uses_gettext;
-+my $configure_ac;
-+
  ## ---------- ##
  ## Routines.  ##
  ## ---------- ##
-@@ -153,6 +161,7 @@
+@@ -161,6 +166,7 @@ sub parse_args ()
  	  'B|prepend-include=s'	 => \@prepend_include,
  	  'i|install'            => \$install,
  	  's|symlink'            => \$symlink,
@@ -34,106 +38,85 @@ Index: autoconf-2.63/bin/autoreconf.in
  	  'm|make'               => \$run_make,
  	  'recursive!'           => \$recursive);
  
-@@ -162,6 +171,8 @@
+@@ -170,6 +176,8 @@ sub parse_args ()
    parse_WARNINGS;
-   parse_warnings '--warnings', @warning;
+   parse_warnings @warning;
  
 +  @exclude = map { split /,/ } @exclude;
 +
    # Even if the user specified a configure.ac, trim to get the
    # directory, and look for configure.ac again.  Because (i) the code
    # is simpler, and (ii) we are still able to diagnose simultaneous
-@@ -255,6 +266,11 @@
- {
-   my ($aclocal, $flags) = @_;
- 
-+  @ex = grep (/^aclocal$/, @exclude);
-+  if ($#ex != -1) {
-+    return;
-+  }
-+
-   # aclocal 1.8+ does all this for free.  It can be recognized by its
-   # --force support.
-   if ($aclocal_supports_force)
-@@ -368,7 +384,10 @@
+@@ -493,8 +501,11 @@ sub autoreconf_current_directory ($)
      }
    else
      {
--      xsystem_hint ("autopoint is needed because this package uses Gettext", "$autopoint");
 +      @ex = grep (/^autopoint$/, @exclude);
 +      if ($#ex == -1) {
-+        xsystem_hint ("autopoint is needed because this package uses Gettext", "$autopoint");
+       xsystem_hint ("autopoint is needed because this package uses Gettext",
+                     $autopoint);
 +      }
      }
  
  
-@@ -532,16 +551,17 @@
+@@ -687,9 +698,12 @@ sub autoreconf_current_directory ($)
  	{
  	  $libtoolize .= " --ltdl";
  	}
--      xsystem_hint ("libtoolize is needed because this package uses Libtool", $libtoolize);
--      $rerun_aclocal = 1;
 +      @ex = grep (/^libtoolize$/, @exclude);
 +      if ($#ex == -1) {
-+        xsystem_hint ("libtoolize is needed because this package uses Libtool", $libtoolize);
-+        $rerun_aclocal = 1;
+       xsystem_hint ("libtoolize is needed because this package uses Libtool",
+ 		    $libtoolize);
+       $rerun_aclocal = 1;
 +      }
      }
    else
      {
-       verb "$configure_ac: not running libtoolize: --install not given";
+@@ -726,8 +740,11 @@ sub autoreconf_current_directory ($)
      }
- 
--
--
-   # ------------------- #
-   # Rerunning aclocal.  #
-   # ------------------- #
-@@ -572,7 +592,10 @@
+   elsif ($install)
+     {
++      @ex = grep (/^gtkdocize$/, @exclude);
++      if ($#ex == -1) {
+       xsystem_hint ("gtkdocize is needed because this package uses Gtkdoc",
+ 		    $gtkdocize);
++      }
+     }
+   else
+     {
+@@ -765,7 +782,10 @@ sub autoreconf_current_directory ($)
    # latter runs the former, and (ii) autoconf is stricter than
    # autoheader.  So all in all, autoconf should give better error
    # messages.
--  xsystem ($autoconf);
 +  @ex = grep (/^autoconf$/, @exclude);
 +  if ($#ex == -1) {
-+    xsystem ("$autoconf");
+   xsystem ($autoconf);
 +  }
  
  
    # -------------------- #
-@@ -593,7 +616,10 @@
+@@ -786,7 +806,10 @@ sub autoreconf_current_directory ($)
      }
    else
      {
--      xsystem ($autoheader);
 +      @ex = grep (/^autoheader$/, @exclude);
 +      if ($#ex == -1) {
-+        xsystem ("$autoheader");
+       xsystem ($autoheader);
 +      }
      }
  
  
-@@ -610,7 +636,10 @@
+@@ -803,7 +826,10 @@ sub autoreconf_current_directory ($)
        # We should always run automake, and let it decide whether it shall
-       # update the file or not.  In fact, the effect of `$force' is already
-       # included in `$automake' via `--no-force'.
--      xsystem ($automake);
+       # update the file or not.  In fact, the effect of '$force' is already
+       # included in '$automake' via '--no-force'.
 +      @ex = grep (/^automake$/, @exclude);
 +      if ($#ex == -1) {
-+        xsystem ("$automake");
+       xsystem ($automake);
 +      }
      }
  
- 
-@@ -634,7 +663,10 @@
- 	    }
- 	  else
- 	    {
--	      xsystem ("$make");
-+              @ex = grep (/^make$/, @exclude);
-+              if ($#ex == -1) {
-+	        xsystem ("$make");
-+              }
- 	    }
- 	}
-     }
+   # ---------------------------------------------------- #
+-- 
+2.25.1
+

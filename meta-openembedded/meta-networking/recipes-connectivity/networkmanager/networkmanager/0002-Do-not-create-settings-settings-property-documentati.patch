@@ -1,74 +1,60 @@
-From 9eab96351a726e9ce6a15d158f743e35d73a8900 Mon Sep 17 00:00:00 2001
+From d0dead0478a070b96f37bd3b310443eaa8c93a25 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
-Date: Thu, 22 Mar 2018 11:08:30 +0100
+Date: Mon, 5 Jul 2021 00:42:23 +0200
 Subject: [PATCH] Do not create settings settings/property documentation
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-It was tried to get this work but gi / GirRepository could not be found by
-python. Anyway it is not necessary for us to have the settings/property docs.
+It was tried to get this work by adding python3-pygobject-native to DEPENDS but
+compile could not find (configure passed) python module gi.
+Anyway it is not necessary for us to have the settings/property docs.
 
 Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
-
+Signed-off-by: Vinicius Aquino <voa.aquino@gmail.com>
 ---
- Makefile.am  | 11 -----------
- configure.ac |  5 -----
- 2 files changed, 16 deletions(-)
+ Makefile.am  | 5 -----
+ configure.ac | 5 -----
+ 2 files changed, 10 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index d5cbcf5..2a1819a 100644
+index 5a62070..3d0ebcd 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -1473,9 +1473,7 @@ libnm/libnm.typelib: libnm/libnm.gir
- INTROSPECTION_GIRS += libnm/NM-1.0.gir
+@@ -1860,15 +1860,10 @@ src/libnm-client-impl/libnm.typelib: src/libnm-client-impl/libnm.gir
+ INTROSPECTION_GIRS += src/libnm-client-impl/NM-1.0.gir
  
  libnm_noinst_data = \
--	libnm/nm-property-docs.xml \
- 	libnm/nm-settings-docs-overrides.xml \
--	libnm/nm-settings-docs.xml \
- 	libnm/nm-settings-keyfile-docs.xml \
- 	libnm/nm-settings-ifcfg-rh-docs.xml
+-	src/nmcli/generate-docs-nm-settings-nmcli.xml \
+-	man/nm-settings-docs-dbus.xml \
+-	man/nm-settings-docs-nmcli.xml \
+ 	src/libnm-client-impl/nm-property-infos-dbus.xml \
+ 	src/libnm-client-impl/nm-property-infos-ifcfg-rh.xml \
+ 	src/libnm-client-impl/nm-property-infos-keyfile.xml \
+ 	src/libnm-client-impl/nm-property-infos-nmcli.xml \
+-	src/libnm-client-impl/nm-settings-docs-gir.xml \
+-	src/libnmc-setting/settings-docs-input.xml \
+ 	$(NULL)
  
-@@ -4236,18 +4234,9 @@ $(clients_common_libnmc_base_la_OBJECTS): $(libnm_lib_h_pub_mkenums)
- $(clients_common_libnmc_base_la_OBJECTS): clients/common/.dirstamp
- 
- clients_common_settings_doc_h = clients/common/settings-docs.h
--if HAVE_INTROSPECTION
--$(clients_common_settings_doc_h): clients/common/settings-docs.xsl libnm/nm-property-docs.xml clients/common/.dirstamp
--	$(AM_V_GEN) $(XSLTPROC) --output $@ $< $(word 2,$^)
--DISTCLEANFILES += $(clients_common_settings_doc_h)
--check-local-settings-docs: $(clients_common_settings_doc_h)
--	$(srcdir)/tools/check-settings-docs.sh "$(srcdir)" "$(builddir)" "$(clients_common_settings_doc_h)"
--check_local += check-local-settings-docs
--else
- $(clients_common_settings_doc_h): $(clients_common_settings_doc_h).in clients/common/.dirstamp
- 	$(AM_V_GEN) cp "$(srcdir)/$(clients_common_settings_doc_h).in" "$(builddir)/$(clients_common_settings_doc_h)"
- check-local-settings-docs:
--endif
- EXTRA_DIST += \
- 	$(clients_common_settings_doc_h) \
- 	$(clients_common_settings_doc_h).in
+ noinst_DATA += $(libnm_noinst_data)
 diff --git a/configure.ac b/configure.ac
-index ad4b0fc..0092092 100644
+index 8fe23de..dc24850 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1201,11 +1201,6 @@ GTK_DOC_CHECK(1.0)
+@@ -1258,11 +1258,6 @@ GTK_DOC_CHECK(1.0)
  # check if we can build setting property documentation
  build_docs=no
  if test -n "$INTROSPECTION_MAKEFILE"; then
 -	# If g-i is installed we know we have python, but we might not have pygobject
--	if ! "$PYTHON" -c 'from gi.repository import GObject' >& /dev/null; then
+-	if ! "$PYTHON" -c 'from gi.repository import GObject' > /dev/null 2>&1; then
 -		AC_MSG_ERROR(["--enable-introspection aims to build the settings documentation. This requires GObject introspection for python (pygobject)])
 -	fi
 -
  	AC_PATH_PROG(PERL, perl)
  	if test -z "$PERL"; then
  		AC_MSG_ERROR([--enable-introspection requires perl])
+-- 
+2.31.1
+

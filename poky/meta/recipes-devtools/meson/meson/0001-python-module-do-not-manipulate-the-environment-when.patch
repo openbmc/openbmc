@@ -1,4 +1,4 @@
-From 689e28c49b85311f93f39df70cbee702fc44afb6 Mon Sep 17 00:00:00 2001
+From 2264e67d7c2c22ca634fd26ea8ada6f0344ab280 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 19 Nov 2018 14:24:26 +0100
 Subject: [PATCH] python module: do not manipulate the environment when calling
@@ -12,10 +12,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 12 deletions(-)
 
 diff --git a/mesonbuild/modules/python.py b/mesonbuild/modules/python.py
-index 07be318..b770603 100644
+index 422155b..aaf5844 100644
 --- a/mesonbuild/modules/python.py
 +++ b/mesonbuild/modules/python.py
-@@ -71,11 +71,6 @@ class PythonDependency(ExternalDependency):
+@@ -70,11 +70,6 @@ class PythonDependency(ExternalDependency):
                  old_pkg_libdir = os.environ.get('PKG_CONFIG_LIBDIR')
                  old_pkg_path = os.environ.get('PKG_CONFIG_PATH')
  
@@ -26,9 +26,9 @@ index 07be318..b770603 100644
 -
                  try:
                      self.pkgdep = PkgConfigDependency(pkg_name, environment, kwargs)
-                     mlog.debug('Found "{}" via pkgconfig lookup in LIBPC ({})'.format(pkg_name, pkg_libdir))
-@@ -84,13 +79,6 @@ class PythonDependency(ExternalDependency):
-                     mlog.debug('"{}" could not be found in LIBPC ({})'.format(pkg_name, pkg_libdir))
+                     mlog.debug(f'Found "{pkg_name}" via pkgconfig lookup in LIBPC ({pkg_libdir})')
+@@ -83,13 +78,6 @@ class PythonDependency(ExternalDependency):
+                     mlog.debug(f'"{pkg_name}" could not be found in LIBPC ({pkg_libdir})')
                      mlog.debug(e)
  
 -                if old_pkg_path is not None:
@@ -39,5 +39,5 @@ index 07be318..b770603 100644
 -                else:
 -                    os.environ.pop('PKG_CONFIG_LIBDIR', None)
              else:
-                 mlog.debug('"{}" could not be found in LIBPC ({}), this is likely due to a relocated python installation'.format(pkg_name, pkg_libdir))
+                 mlog.debug(f'"{pkg_name}" could not be found in LIBPC ({pkg_libdir}), this is likely due to a relocated python installation')
  

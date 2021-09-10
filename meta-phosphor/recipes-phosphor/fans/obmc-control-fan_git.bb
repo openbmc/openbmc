@@ -11,5 +11,5 @@ DEPENDS = "systemd"
 
 SKELETON_DIR = "fanctl"
 
-DBUS_SERVICE_${PN} += "org.openbmc.control.Fans.service"
-SYSTEMD_SERVICE_${PN} += "obmc-max-fans.service"
+DBUS_SERVICE:${PN} += "org.openbmc.control.Fans.service"
+SYSTEMD_SERVICE:${PN} += "obmc-max-fans.service"

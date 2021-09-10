@@ -8,20 +8,33 @@ Signed-off-by: Peter A. Bigot <pab@pabigot.com>
 Signed-off-by: Andrei Gherzan <andrei@gherzan.ro>
 
 ---
- usr/bin/bthelper | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ usr/bin/bthelper | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/usr/bin/bthelper b/usr/bin/bthelper
-index af597e5..5de84f6 100755
+index 2133fbc..1fc9245 100755
 --- a/usr/bin/bthelper
 +++ b/usr/bin/bthelper
-@@ -10,7 +10,7 @@ fi
+@@ -12,8 +12,8 @@ fi
+ dev=$1
  
- dev="$1"
  # Need to bring hci up before looking at MAC as it can be all zeros during init
--/bin/hciconfig "$dev" up
--/bin/hciconfig "$dev" | grep -qE "BD Address: (B8:27:EB|DC:A6:32):" || exit 0
-+/usr/bin/hciconfig "$dev" up
-+/usr/bin/hciconfig "$dev" | grep -qE "BD Address: (B8:27:EB|DC:A6:32):" || exit 0
- /usr/bin/hcitool -i "$dev" cmd 0x3f 0x1c 0x01 0x02 0x00 0x01 0x01 > /dev/null
+-/bin/hciconfig $dev up
+-if ! /bin/hciconfig $dev | grep -q "Bus: UART"; then
++/usr/bin/hciconfig $dev up
++if ! /usr/bin/hciconfig $dev | grep -q "Bus: UART"; then
+     echo Not a UART-attached BT Modem
+     exit 0
+ fi
+@@ -26,7 +26,7 @@ if ( /usr/bin/hcitool -i $dev dev | grep -q -E '\s43:4[35]:' ); then
+     BDADDR=`printf '0x%02x 0x%02x 0x%02x 0xeb 0x27 0xb8' $((0x$B3 ^ 0xaa)) $((0x$B2 ^ 0xaa)) $((0x$B1 ^ 0xaa))`
  
+     /usr/bin/hcitool -i $dev cmd 0x3f 0x001 $BDADDR
+-    /bin/hciconfig $dev reset
++    /usr/bin/hciconfig $dev reset
+ else
+     echo Raspberry Pi BDADDR already set
+ fi
+-- 
+2.31.1
+

@@ -1,0 +1,32 @@
+From 2761400989bcbf11e10bc85f90c3a2ba1305c4ae Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 6 Mar 2021 14:48:56 -0800
+Subject: [PATCH] nativesdk-glibc: Fall back to faccessat on faccess2 returns
+ EPERM
+
+Fedora-specific workaround for systemd-nspawn
+
+Upstream-Status: Inappropriate [Distro Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sysdeps/unix/sysv/linux/faccessat.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/sysdeps/unix/sysv/linux/faccessat.c b/sysdeps/unix/sysv/linux/faccessat.c
+index 13160d3249..ee3ddc9b79 100644
+--- a/sysdeps/unix/sysv/linux/faccessat.c
++++ b/sysdeps/unix/sysv/linux/faccessat.c
+@@ -30,7 +30,11 @@ __faccessat (int fd, const char *file, int mode, int flag)
+ #if __ASSUME_FACCESSAT2
+   return ret;
+ #else
+-  if (ret == 0 || errno != ENOSYS)
++  /* Fedora-specific workaround:
++     As a workround for a broken systemd-nspawn that returns
++     EPERM when a syscall is not allowed instead of ENOSYS
++     we must check for EPERM here and fall back to faccessat.  */
++  if (ret == 0 || !(errno == ENOSYS || errno == EPERM))
+     return ret;
+ 
+   if (flag & ~(AT_SYMLINK_NOFOLLOW | AT_EACCESS))

@@ -48,6 +48,8 @@ import bb
 import xmlrpc.client
 from bb.ui import uihelper
 
+logger = logging.getLogger(__name__)
+
 parsespin = itertools.cycle( r'|/-\\' )
 
 X = 0

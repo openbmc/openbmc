@@ -1,0 +1,12 @@
+[Unit]
+Description=Stop the ethernet link failover
+After=network.service
+
+[Service]
+Restart=no
+ExecStart=/usr/bin/env ncsi-netlink --set -x 2 -p 0 -c 0
+SyslogIdentifier=ncsi-netlink
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

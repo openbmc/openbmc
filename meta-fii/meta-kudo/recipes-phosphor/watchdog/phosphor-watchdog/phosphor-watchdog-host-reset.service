@@ -1,0 +1,8 @@
+[Unit]
+Description=Watchdog power state reset system
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/bin/env kudo.sh rst system
+SyslogIdentifier=phosphor-watchdog

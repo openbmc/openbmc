@@ -1,0 +1,50 @@
+From 82e51fb8ba2640b318826ef4e17b0f5c09c8dded Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 8 Mar 2021 20:10:18 -0800
+Subject: [PATCH] nsswitch.y: Replace %empty bison extension
+
+POSIX compliant yacc do not understand %empty therefore replace it with
+/* empty */
+
+https://github.com/pikhq/musl-nscd/issues/13
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/nsswitch.y | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/nsswitch.y b/src/nsswitch.y
+index 107073b..0b7c71e 100644
+--- a/src/nsswitch.y
++++ b/src/nsswitch.y
+@@ -38,7 +38,7 @@ top:
+ 	;
+ 
+ file:
+-	%empty {
++	/* empty */ {
+ 		list_init(&$$);
+ 	}
+ 	| file line {
+@@ -88,7 +88,7 @@ modifier:
+ 	;
+ 
+ modifiers:
+-	%empty {
++	/* empty */ {
+ 		memcpy($$, default_actions, sizeof($$));
+ 	}
+ 	| modifiers modifier {
+@@ -112,7 +112,7 @@ item:
+ 	;
+ 
+ list:
+-	%empty {
++	/* empty */ {
+ 		list_init(&$$);
+ 	}
+ 	| list item {
+-- 
+2.30.1
+

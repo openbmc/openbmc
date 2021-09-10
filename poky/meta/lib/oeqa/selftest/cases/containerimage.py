@@ -22,7 +22,7 @@ from oeqa.utils.commands import bitbake, get_bb_vars, runCmd
 #
 class ContainerImageTests(OESelftestTestCase):
 
-    # Verify that when specifying a IMAGE_TYPEDEP_ of the form "foo.bar" that
+    # Verify that when specifying a IMAGE_TYPEDEP: of the form "foo.bar" that
     # the conversion type bar gets added as a dep as well
     def test_expected_files(self):
 
@@ -42,6 +42,9 @@ IMAGE_FSTYPES = "container"
 PACKAGE_CLASSES = "package_ipk"
 IMAGE_FEATURES = ""
 IMAGE_BUILDINFO_FILE = ""
+INIT_MANAGER = "sysvinit"
+IMAGE_INSTALL:remove = "ssh-pregen-hostkeys"
+
 """)
 
         bbvars = get_bb_vars(['bindir', 'sysconfdir', 'localstatedir',
@@ -57,11 +60,7 @@ IMAGE_BUILDINFO_FILE = ""
                     '.{sysconfdir}/version',
                     './run/',
                     '.{localstatedir}/cache/',
-                    '.{localstatedir}/cache/ldconfig/',
-                    '.{localstatedir}/cache/ldconfig/aux-cache',
-                    '.{localstatedir}/cache/opkg/',
-                    '.{localstatedir}/lib/',
-                    '.{localstatedir}/lib/opkg/'
+                    '.{localstatedir}/lib/'
                 ]
 
         expected_files = [ x.format(bindir=bbvars['bindir'],

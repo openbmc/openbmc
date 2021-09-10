@@ -1,4 +1,4 @@
-From 394108035d350ae662a431c80131f812b5f72dff Mon Sep 17 00:00:00 2001
+From 097a2b259cb266c2c861dc74fa6f80712d6138c5 Mon Sep 17 00:00:00 2001
 From: Venture Research <tech@ventureresearch.com>
 Date: Fri, 8 Feb 2013 20:22:19 -0600
 Subject: [PATCH] lua: update Makefile to use environment build settings
@@ -12,14 +12,42 @@ Updated to work with 3.0.x
 
 Signed-off-by: Armin Kuster <akust808@gmail.com>
 
+updated to work wtih 6.2.1
+Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
 ---
- deps/lua/src/Makefile | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+ deps/Makefile         |  1 -
+ deps/lua/Makefile     |  1 -
+ deps/lua/src/Makefile | 16 ++++++----------
+ 3 files changed, 6 insertions(+), 12 deletions(-)
 
-Index: redis-3.0.2/deps/lua/src/Makefile
-===================================================================
---- redis-3.0.2.orig/deps/lua/src/Makefile
-+++ redis-3.0.2/deps/lua/src/Makefile
+diff --git a/deps/Makefile b/deps/Makefile
+index ff16ee9..d8d64aa 100644
+--- a/deps/Makefile
++++ b/deps/Makefile
+@@ -74,7 +74,6 @@ LUA_LDFLAGS+= $(LDFLAGS)
+ # lua's Makefile defines AR="ar rcu", which is unusual, and makes it more
+ # challenging to cross-compile lua (and redis).  These defines make it easier
+ # to fit redis into cross-compilation environments, which typically set AR.
+-AR=ar
+ ARFLAGS=rc
+ 
+ lua: .make-prerequisites
+diff --git a/deps/lua/Makefile b/deps/lua/Makefile
+index 209a132..72f4b2b 100644
+--- a/deps/lua/Makefile
++++ b/deps/lua/Makefile
+@@ -33,7 +33,6 @@ INSTALL_DATA= $(INSTALL) -m 0644
+ 
+ # Utilities.
+ MKDIR= mkdir -p
+-RANLIB= ranlib
+ 
+ # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
+ 
+diff --git a/deps/lua/src/Makefile b/deps/lua/src/Makefile
+index f3bba2f..1555ec0 100644
+--- a/deps/lua/src/Makefile
++++ b/deps/lua/src/Makefile
 @@ -5,18 +5,14 @@
  # == CHANGE THE SETTINGS BELOW TO SUIT YOUR ENVIRONMENT =======================
  
@@ -42,30 +70,6 @@ Index: redis-3.0.2/deps/lua/src/Makefile
 +
 +CFLAGS += $(MYCFLAGS)
 +LIBS += -lm $(MYLIBS)
- 
- # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
- 
-Index: redis-3.0.2/deps/Makefile
-===================================================================
---- redis-3.0.2.orig/deps/Makefile
-+++ redis-3.0.2/deps/Makefile
-@@ -63,7 +63,6 @@ LUA_LDFLAGS+= $(LDFLAGS)
- # lua's Makefile defines AR="ar rcu", which is unusual, and makes it more
- # challenging to cross-compile lua (and redis).  These defines make it easier
- # to fit redis into cross-compilation environments, which typically set AR.
--AR=ar
- ARFLAGS=rcu
- 
- lua: .make-prerequisites
-Index: redis-3.0.2/deps/lua/Makefile
-===================================================================
---- redis-3.0.2.orig/deps/lua/Makefile
-+++ redis-3.0.2/deps/lua/Makefile
-@@ -33,7 +33,6 @@ INSTALL_DATA= $(INSTALL) -m 0644
- 
- # Utilities.
- MKDIR= mkdir -p
--RANLIB= ranlib
  
  # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
  

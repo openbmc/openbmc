@@ -1,7 +1,6 @@
---- enca-1.9/Makefile.am.orig	2006-06-29 15:34:55.000000000 +0100
-+++ enca-1.9/Makefile.am	2006-06-29 15:35:20.000000000 +0100
-@@ -1,8 +1,8 @@
- # @(#) $Id: Makefile.am,v 1.35 2005/11/24 10:21:32 yeti Exp $
+--- enca-1.19/Makefile.am.orig	2006-06-29 15:34:55.000000000 +0100
++++ enca-1.19/Makefile.am	2006-06-29 15:35:20.000000000 +0100
+@@ -1,7 +1,7 @@
  if MAINTAINER_MODE
 -SUBDIRS = tools data script lib src devel-docs test
 +SUBDIRS = data script lib src devel-docs test

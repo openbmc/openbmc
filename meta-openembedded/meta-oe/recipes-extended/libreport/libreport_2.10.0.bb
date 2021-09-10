@@ -33,7 +33,7 @@ PACKAGECONFIG[gtk] = "--with-gtk, --without-gtk, gtk+3,"
 
 EXTRA_OECONF += "--without-python2 --with-python3"
 
-RDEPENDS_python3-libreport += "${PN}"
+RDEPENDS:python3-libreport += "${PN}"
 
 do_patch[prefuncs] += "do_gen_version"
 do_gen_version() {
@@ -43,7 +43,7 @@ do_gen_version() {
 
 PACKAGES += "python3-libreport"
 
-FILES_${PN} += "${datadir}/*"
-FILES_${PN}-dbg += "${PYTHON_SITEPACKAGES_DIR}/*/.debug"
-FILES_python3-libreport = "${PYTHON_SITEPACKAGES_DIR}/*"
+FILES:${PN} += "${datadir}/*"
+FILES:${PN}-dbg += "${PYTHON_SITEPACKAGES_DIR}/*/.debug"
+FILES:python3-libreport = "${PYTHON_SITEPACKAGES_DIR}/*"
 

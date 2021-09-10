@@ -8,8 +8,11 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 inherit meson pkgconfig
 
-DEPENDS += "fmt"
-DEPENDS += "span-lite"
+DEPENDS += " \
+  fmt \
+  liburing \
+  span-lite \
+  "
 
 EXTRA_OEMESON = " \
         -Dexamples=false \
@@ -17,6 +20,6 @@ EXTRA_OEMESON = " \
         "
 
 SRC_URI += "git://github.com/openbmc/stdplus"
-SRCREV = "da284aa9e9e4ad8a805745351fc8d9915e323099"
+SRCREV = "5e3b13f0224afb09bae9f32e7ab4464d34afcb1f"
 
 S = "${WORKDIR}/git"

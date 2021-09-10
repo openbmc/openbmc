@@ -1,4 +1,4 @@
-PREMIRRORS_prepend = " \
+PREMIRRORS:prepend = " \
 cvs://.*/.*     ${SOURCE_MIRROR_URL} \n \
 svn://.*/.*     ${SOURCE_MIRROR_URL} \n \
 git://.*/.*     ${SOURCE_MIRROR_URL} \n \
@@ -10,4 +10,5 @@ osc://.*/.*     ${SOURCE_MIRROR_URL} \n \
 https?$://.*/.* ${SOURCE_MIRROR_URL} \n \
 ftp://.*/.*     ${SOURCE_MIRROR_URL} \n \
 npm://.*/?.*    ${SOURCE_MIRROR_URL} \n \
+s3://.*/.*      ${SOURCE_MIRROR_URL} \n \
 "

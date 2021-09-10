@@ -13,6 +13,6 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
 
-FILES_${PN} += "${libdir}/dleyna-1.0/connectors/*.so"
-FILES_${PN}-dev += "${libdir}/dleyna-1.0/connectors/*.la"
-FILES_${PN}-dbg += "${libdir}/dleyna-1.0/connectors/.debug/*.so"
+FILES:${PN} += "${libdir}/dleyna-1.0/connectors/*.so"
+FILES:${PN}-dev += "${libdir}/dleyna-1.0/connectors/*.la"
+FILES:${PN}-dbg += "${libdir}/dleyna-1.0/connectors/.debug/*.so"

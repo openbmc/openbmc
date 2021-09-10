@@ -4,9 +4,9 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 inherit update-rc.d systemd
 
-RDEPENDS_${PN} = "kmod \
+RDEPENDS:${PN} = "kmod \
     ${@bb.utils.contains('DISTRO_FEATURES','systemd','util-linux','util-linux-swaponoff',d)}"
-RRECOMMENDS_${PN} = "kernel-module-zram"
+RRECOMMENDS:${PN} = "kernel-module-zram"
 
 PR = "r3"
 
@@ -36,7 +36,7 @@ do_install () {
     fi
 }
 
-FILES_${PN} = " \
+FILES:${PN} = " \
     ${sysconfdir} \
     ${systemd_unitdir} \
     ${libexecdir} \
@@ -44,7 +44,7 @@ FILES_${PN} = " \
 INITSCRIPT_NAME = "zram"
 INITSCRIPT_PARAMS = "start 05 2 3 4 5 . stop 22 0 1 6 ."
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "dev-zram0.swap"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
+SYSTEMD_SERVICE:${PN} = "dev-zram0.swap"

@@ -26,7 +26,7 @@ tweakpath /sbin
 INST_ARCH=$(uname -m | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
 SDK_ARCH=$(echo @SDK_ARCH@ | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
 
-INST_GCC_VER=$(gcc --version | sed -ne 's/.* \([0-9]\+\.[0-9]\+\)\.[0-9]\+.*/\1/p')
+INST_GCC_VER=$(gcc --version 2>/dev/null | sed -ne 's/.* \([0-9]\+\.[0-9]\+\)\.[0-9]\+.*/\1/p')
 SDK_GCC_VER='@SDK_GCC_VER@'
 
 verlte () {
@@ -56,7 +56,8 @@ if ! xz -V > /dev/null 2>&1; then
 	exit 1
 fi
 
-DEFAULT_INSTALL_DIR="@SDKPATH@"
+SDK_BUILD_PATH="@SDKPATH@"
+DEFAULT_INSTALL_DIR="@SDKPATHINSTALL@"
 SUDO_EXEC=""
 EXTRA_TAR_OPTIONS=""
 target_sdk_dir=""
@@ -95,7 +96,7 @@ while getopts ":yd:npDRSl" OPT; do
 		listcontents=1
 		;;
 	*)
-		echo "Usage: $(basename $0) [-y] [-d <dir>]"
+		echo "Usage: $(basename "$0") [-y] [-d <dir>]"
 		echo "  -y         Automatic yes to all prompts"
 		echo "  -d <dir>   Install the SDK to <dir>"
 		echo "======== Extensible SDK only options ============"
@@ -111,17 +112,17 @@ while getopts ":yd:npDRSl" OPT; do
 	esac
 done
 
-payload_offset=$(($(grep -na -m1 "^MARKER:$" $0|cut -d':' -f1) + 1))
+payload_offset=$(($(grep -na -m1 "^MARKER:$" "$0"|cut -d':' -f1) + 1))
 if [ "$listcontents" = "1" ] ; then
     if [ @SDK_ARCHIVE_TYPE@ = "zip" ]; then
-        tail -n +$payload_offset $0 > sdk.zip
+        tail -n +$payload_offset "$0" > sdk.zip
         if unzip -l sdk.zip;then
             rm sdk.zip
         else
             rm sdk.zip && exit 1
         fi
     else
-        tail -n +$payload_offset $0| tar tvJ || exit 1
+        tail -n +$payload_offset "$0"| tar tvJ || exit 1
     fi
     exit
 fi
@@ -242,14 +243,14 @@ fi
 
 printf "Extracting SDK..."
 if [ @SDK_ARCHIVE_TYPE@ = "zip" ]; then
-    tail -n +$payload_offset $0 > sdk.zip
+    tail -n +$payload_offset "$0" > sdk.zip
     if $SUDO_EXEC unzip $EXTRA_TAR_OPTIONS sdk.zip -d $target_sdk_dir;then
         rm sdk.zip
     else
         rm sdk.zip && exit 1
     fi
 else
-    tail -n +$payload_offset $0| $SUDO_EXEC tar mxJ -C $target_sdk_dir --checkpoint=.2500 $EXTRA_TAR_OPTIONS || exit 1
+    tail -n +$payload_offset "$0"| $SUDO_EXEC tar mxJ -C $target_sdk_dir --checkpoint=.2500 $EXTRA_TAR_OPTIONS || exit 1
 fi
 echo "done"
 

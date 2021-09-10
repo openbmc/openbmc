@@ -2,27 +2,26 @@ DESCRIPTION = "Google's framework for writing C++ tests"
 HOMEPAGE = "https://github.com/google/googletest"
 SECTION = "libs"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://googlemock/LICENSE;md5=cbbd27594afd089daa160d3a16dd515a \
-                    file://googletest/LICENSE;md5=cbbd27594afd089daa160d3a16dd515a"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=cbbd27594afd089daa160d3a16dd515a"
 
-PV = "1.10.0"
+PV = "1.11.0+git${SRCPV}"
 
 PROVIDES += "gmock gtest"
 
 S = "${WORKDIR}/git"
-SRCREV = "703bd9caab50b139428cea1aaff9974ebee5742e"
+SRCREV = "e2239ee6043f73722e7aa812a459f54a28552929"
 SRC_URI = "git://github.com/google/googletest.git"
 
 inherit cmake
 
-ALLOW_EMPTY_${PN} = "1"
-ALLOW_EMPTY_${PN}-dbg = "1"
+ALLOW_EMPTY:${PN} = "1"
+ALLOW_EMPTY:${PN}-dbg = "1"
 
-RDEPENDS_${PN}-dev += "${PN}-staticdev"
+RDEPENDS:${PN}-dev += "${PN}-staticdev"
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # explicitly use python3
     # the scripts are already python3 compatible since https://github.com/google/googletest/commit/d404af0d987a9c38cafce82a7e26ec8468c88361 and other fixes like this
     # but since this oe-core change http://git.openembedded.org/openembedded-core/commit/?id=5f8f16b17f66966ae91aeabc23e97de5ecd17447

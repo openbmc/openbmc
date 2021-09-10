@@ -1,0 +1,133 @@
+- name:  occpath group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /org/open_power/control/occ0
+
+- name:  occproctemp property
+  class: group
+  group: property
+  type:  boolean
+  members:
+    - interface: org.open_power.OCC.Status
+      meta: PROPERTY
+      property: ThrottleProcTemp
+
+- name:  occprocpower property
+  class: group
+  group: property
+  type:  boolean
+  members:
+    - interface: org.open_power.OCC.Status
+      meta: PROPERTY
+      property: ThrottleProcPower
+
+- name:  occmemtemp property
+  class: group
+  group: property
+  type:  boolean
+  members:
+    - interface: org.open_power.OCC.Status
+      meta: PROPERTY
+      property: ThrottleMemTemp
+
+- name: watch occproctemp
+  class: watch
+  watch: property
+  paths: occpath group
+  properties: occproctemp property
+  callback: check occproctemp
+
+- name: watch occprocpower
+  class: watch
+  watch: property
+  paths: occpath group
+  properties: occprocpower property
+  callback: check occprocpower
+
+- name: watch occmemtemp
+  class: watch
+  watch: property
+  paths: occpath group
+  properties: occmemtemp property
+  callback: check occmemtemp
+
+- name: check occproctemp
+  class: condition
+  condition: count
+  paths: occpath group
+  properties: occproctemp property
+  defer: 1000us
+  callback: create occproctemp event
+  countop: '=='
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check occprocpower
+  class: condition
+  condition: count
+  paths: occpath group
+  properties: occprocpower property
+  defer: 1000us
+  callback: create occprocpower event
+  countop: '=='
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: check occmemtemp
+  class: condition
+  condition: count
+  paths: occpath group
+  properties: occmemtemp property
+  defer: 1000us
+  callback: create occmemtemp event
+  countop: '=='
+  countbound: 1
+  op: '=='
+  bound: true
+
+- name: create occproctemp event
+  class: callback
+  callback: event
+  paths: occpath group
+  properties: occproctemp property
+  eventName: occ
+  eventMessage: "Processor throttled due to an over temperature condition."
+
+- name: create occprocpower event
+  class: callback
+  callback: event
+  paths: occpath group
+  properties: occprocpower property
+  eventName: occ
+  eventMessage: "Processor throttled due to reaching the power cap limit."
+
+- name: create occmemtemp event
+  class: callback
+  callback: event
+  paths: occpath group
+  properties: occmemtemp property
+  eventName: occ
+  eventMessage: "Memory throttled due to an over temperature condition."
+
+- name: errorlog path group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/logging
+
+- name: pathwatch errorlog
+  class: pathwatch
+  pathwatch: path
+  paths: errorlog path group
+  pathcallback: create errorlog trap
+
+- name: create errorlog trap
+  class: pathcallback
+  pathcallback: eventpath
+  paths: errorlog path group
+  eventType: ErrorTrap

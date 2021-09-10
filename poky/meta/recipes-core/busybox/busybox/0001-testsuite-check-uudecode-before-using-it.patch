@@ -18,13 +18,13 @@ diff --git a/testsuite/tar.tests b/testsuite/tar.tests
 index d71a349..8c88567 100755
 --- a/testsuite/tar.tests
 +++ b/testsuite/tar.tests
-@@ -336,7 +336,7 @@ SKIP=
- cd .. || exit 1; rm -rf tar.tempdir 2>/dev/null
+@@ -339,7 +339,7 @@ cd .. || exit 1; rm -rf tar.tempdir 2>/d
+ fi
  
  mkdir tar.tempdir && cd tar.tempdir || exit 1
 -optional FEATURE_SEAMLESS_BZ2 FEATURE_TAR_AUTODETECT LS
 +optional FEATURE_SEAMLESS_BZ2 FEATURE_TAR_AUTODETECT LS UUDECODE
- testing "Symlink attack: create symlink and then write through it" '\
+ testing "tar Symlink attack: create symlink and then write through it" '\
  exec 2>&1
  uudecode -o input && tar xvf input; echo $?
 diff --git a/testsuite/unzip.tests b/testsuite/unzip.tests

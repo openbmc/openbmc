@@ -1,0 +1,114 @@
+From 314fbde187e9187b1b3e18e50dd937c070e93633 Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Fri, 4 Dec 2020 01:58:59 -0500
+Subject: [PATCH] switch to "pkg-config"
+
+I get a build error saying:
+
+	ERROR: /usr/bin/libpng16-config should not be used, use an alternative such as pkg-config
+
+Therefore switch to the more common and more generic "pkg-config" instead of
+using a libpng-specific tool for flags and libraries.
+
+Upstream-status: submitted [https://github.com/AndrewFromMelbourne/raspidmx/pull/29]
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+ game/Makefile       | 4 ++--
+ lib/Makefile        | 4 ++--
+ mandelbrot/Makefile | 4 ++--
+ offscreen/Makefile  | 4 ++--
+ pngview/Makefile    | 4 ++--
+ spriteview/Makefile | 4 ++--
+ 6 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/game/Makefile b/game/Makefile
+index 6da6a6d..0a90a38 100644
+--- a/game/Makefile
++++ b/game/Makefile
+@@ -1,8 +1,8 @@
+ OBJS=main.o
+ BIN=game
+ 
+-CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags) -L../lib -lraspidmx -lraspidmxPng
++CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
++LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/lib/Makefile b/lib/Makefile
+index 2765c91..1e8c759 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -11,9 +11,9 @@ OBJS=../common/backgroundLayer.o ../common/imageGraphics.o ../common/key.o \
+ 
+ OBJSPNG=../common/spriteLayer.o ../common/loadpng.o ../common/savepng.o ../common/scrollingLayer.o
+ 
+-CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
++CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
+ LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm
+-LDFLAGSPNG=${LDFLAGS} $(shell libpng-config --ldflags)
++LDFLAGSPNG=${LDFLAGS} $(shell pkg-config --libs libpng)
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/mandelbrot/Makefile b/mandelbrot/Makefile
+index a6e6735..82910bb 100644
+--- a/mandelbrot/Makefile
++++ b/mandelbrot/Makefile
+@@ -1,8 +1,8 @@
+ OBJS=main.o mandelbrot.o info.o
+ BIN=mandelbrot
+ 
+-CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags) -L../lib -lraspidmx -lraspidmxPng
++CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
++LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/offscreen/Makefile b/offscreen/Makefile
+index 8d23354..0120796 100644
+--- a/offscreen/Makefile
++++ b/offscreen/Makefile
+@@ -1,8 +1,8 @@
+ OBJS=pngresize.o resizeDispmanX.o
+ BIN=pngresize
+ 
+-CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags) -L../lib -lraspidmx -lraspidmxPng
++CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
++LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/pngview/Makefile b/pngview/Makefile
+index 8c037ec..71a5d76 100644
+--- a/pngview/Makefile
++++ b/pngview/Makefile
+@@ -1,8 +1,8 @@
+ OBJS=pngview.o
+ BIN=pngview
+ 
+-CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags) -L../lib -lraspidmx -lraspidmxPng
++CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
++LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 
+diff --git a/spriteview/Makefile b/spriteview/Makefile
+index ada9277..904c1e8 100644
+--- a/spriteview/Makefile
++++ b/spriteview/Makefile
+@@ -1,8 +1,8 @@
+ OBJS=spriteview.o
+ BIN=spriteview
+ 
+-CFLAGS+=-Wall -g -O3 -I../common $(shell libpng-config --cflags)
+-LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell libpng-config --ldflags) -L../lib -lraspidmx -lraspidmxPng
++CFLAGS+=-Wall -g -O3 -I../common $(shell pkg-config --cflags libpng)
++LDFLAGS+=-L/opt/vc/lib/ -lbcm_host -lm $(shell pkg-config --libs libpng) -L../lib -lraspidmx -lraspidmxPng
+ 
+ INCLUDES+=-I/opt/vc/include/ -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux
+ 

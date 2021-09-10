@@ -1,7 +1,7 @@
-From ea908c7009de5a208383abf4bec4c6b3d9519ca3 Mon Sep 17 00:00:00 2001
+From 0f4667f0bb4b000d74ade07e90bd690b7217a19d Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:18:47 +0800
-Subject: [PATCH 2/4] musl-libs
+Subject: [PATCH] musl-libs
 
 Collection of fixes needed to compile libelf and other libraries
 provided by elfutils for musl targets
@@ -19,10 +19,9 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  lib/error.h                    | 27 +++++++++++++++++++++++++++
  lib/fixedsizehash.h            |  1 -
  lib/libeu.h                    |  1 +
- libdwfl/dwfl_error.c           |  9 +++++++++
  libdwfl/linux-kernel-modules.c |  1 +
- libelf/elf.h                   |  9 ++++++---
- 6 files changed, 44 insertions(+), 4 deletions(-)
+ libelf/elf.h                   |  7 +++++++
+ 5 files changed, 36 insertions(+), 1 deletion(-)
  create mode 100644 lib/error.h
 
 diff --git a/lib/error.h b/lib/error.h
@@ -82,29 +81,8 @@ index ecb4d01..edc85e3 100644
  #include <stddef.h>
  #include <stdint.h>
  
-diff --git a/libdwfl/dwfl_error.c b/libdwfl/dwfl_error.c
-index 7bcf61c..11dcc8b 100644
---- a/libdwfl/dwfl_error.c
-+++ b/libdwfl/dwfl_error.c
-@@ -154,7 +154,16 @@ dwfl_errmsg (int error)
-   switch (error &~ 0xffff)
-     {
-     case OTHER_ERROR (ERRNO):
-+#if defined(__GLIBC__)
-       return strerror_r (error & 0xffff, "bad", 0);
-+#else
-+      {
-+        static __thread char buf[128] = "";
-+        if (strerror_r (error & 0xffff, buf, sizeof(buf)) == 0)
-+          return buf;
-+      }
-+      return "strerror_r() failed";
-+#endif
-     case OTHER_ERROR (LIBELF):
-       return elf_errmsg (error & 0xffff);
-     case OTHER_ERROR (LIBDW):
 diff --git a/libdwfl/linux-kernel-modules.c b/libdwfl/linux-kernel-modules.c
-index d46ab5a..1c3faee 100644
+index c0f8dfa..aa78033 100644
 --- a/libdwfl/linux-kernel-modules.c
 +++ b/libdwfl/linux-kernel-modules.c
 @@ -50,6 +50,7 @@
@@ -116,30 +94,25 @@ index d46ab5a..1c3faee 100644
  /* If fts.h is included before config.h, its indirect inclusions may not
     give us the right LFS aliases of these functions, so map them manually.  */
 diff --git a/libelf/elf.h b/libelf/elf.h
-index bed273d..be228e6 100644
+index 8e3e618..1353890 100644
 --- a/libelf/elf.h
 +++ b/libelf/elf.h
-@@ -21,7 +21,9 @@
+@@ -19,6 +19,10 @@
+ #ifndef _ELF_H
+ #define	_ELF_H 1
  
- #include <features.h>
- 
--__BEGIN_DECLS
 +#ifdef __cplusplus
 +extern "C" {
 +#endif
- 
++
  /* Standard ELF types.  */
  
-@@ -4029,6 +4031,7 @@ enum
- #define R_NDS32_TLS_TPOFF	102
- #define R_NDS32_TLS_DESC	119
+ #include <stdint.h>
+@@ -4102,4 +4106,7 @@ enum
+ #define R_ARC_TLS_LE_S9		0x4a
+ #define R_ARC_TLS_LE_32		0x4b
  
--__END_DECLS
--
 +#ifdef __cplusplus
 +}
 +#endif
  #endif	/* elf.h */
--- 
-2.17.1
-

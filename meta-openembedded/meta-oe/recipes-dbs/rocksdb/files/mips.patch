@@ -1,0 +1,19 @@
+implement timer implementation for mips platform
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
++++ b/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
+@@ -155,7 +155,12 @@ static inline tokutime_t toku_time_now(v
+   __asm __volatile__("rdcycle %0" : "=r"(result));
+   return result;
+ #endif
+-
++#elif defined(__mips__)
++  // mips apparently only allows rdtsc for superusers, so we fall
++  // back to gettimeofday.  It's possible clock_gettime would be better.
++  struct timeval tv;
++  gettimeofday(&tv, nullptr);
++  return (uint64_t)tv.tv_sec * 1000000 + tv.tv_usec;
+ #else
+ #error No timer implementation for this platform
+ #endif

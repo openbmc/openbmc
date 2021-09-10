@@ -4,19 +4,9 @@ Wants=obmc-mapper.target
 After=obmc-mapper.target
 
 [Service]
-# We are using a Type=simple service instead of the normal Type=oneshot
-# since Type=oneshot can't have Restart= lines
-# https://github.com/systemd/systemd/issues/2582
-# Unfortunately Type=oneshot services halt any services which order after
-# the oneshot on the completion of ExecStart= lines. For Type=simple, the
-# halting is only until ExecStartPre lines have completed and ExecStart has
-# begun executing. Since we want to wait for the `mapper wait` process to
-# finish, it must be an ExecStartPre. All Type=simple services require an
-# ExecStart so we use `true` as a placeholder to satisfy the requirement.
-Type=simple
+Type=oneshot
 RemainAfterExit=yes
 Restart=on-failure
 TimeoutStartSec=infinity
-ExecStartPre=/usr/bin/env mapper wait %I
-ExecStart=/usr/bin/env true
+ExecStart=/usr/bin/env mapper wait %I
 SyslogIdentifier=mapper

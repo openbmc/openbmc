@@ -13,7 +13,7 @@
 #
 
 import re, bb, os
-import bb.build, bb.utils
+import bb.build, bb.utils, bb.data_smart
 
 from . import ConfHandler
 from .. import resolve_file, ast, logger, ParseError
@@ -22,11 +22,11 @@ from .ConfHandler import include, init
 # For compatibility
 bb.deprecate_import(__name__, "bb.parse", ["vars_from_file"])
 
-__func_start_regexp__    = re.compile(r"(((?P<py>python)|(?P<fr>fakeroot))\s*)*(?P<func>[\w\.\-\+\{\}\$]+)?\s*\(\s*\)\s*{$" )
+__func_start_regexp__    = re.compile(r"(((?P<py>python(?=(\s|\()))|(?P<fr>fakeroot(?=\s)))\s*)*(?P<func>[\w\.\-\+\{\}\$:]+)?\s*\(\s*\)\s*{$" )
 __inherit_regexp__       = re.compile(r"inherit\s+(.+)" )
 __export_func_regexp__   = re.compile(r"EXPORT_FUNCTIONS\s+(.+)" )
 __addtask_regexp__       = re.compile(r"addtask\s+(?P<func>\w+)\s*((before\s*(?P<before>((.*(?=after))|(.*))))|(after\s*(?P<after>((.*(?=before))|(.*)))))*")
-__deltask_regexp__       = re.compile(r"deltask\s+(?P<func>\w+)(?P<ignores>.*)")
+__deltask_regexp__       = re.compile(r"deltask\s+(.+)")
 __addhandler_regexp__    = re.compile(r"addhandler\s+(.+)" )
 __def_regexp__           = re.compile(r"def\s+(\w+).*:" )
 __python_func_regexp__   = re.compile(r"(\s+.*)|(^$)|(^#)" )
@@ -60,7 +60,7 @@ def inherit(files, fn, lineno, d):
                 file = abs_fn
 
         if not file in __inherit_cache:
-            logger.debug(1, "Inheriting %s (from %s:%d)" % (file, fn, lineno))
+            logger.debug("Inheriting %s (from %s:%d)" % (file, fn, lineno))
             __inherit_cache.append( file )
             d.setVar('__inherit_cache', __inherit_cache)
             include(fn, file, lineno, d, "inherit")
@@ -233,14 +233,15 @@ def feeder(lineno, s, fn, root, statements, eof=False):
             if taskexpression.count(word) > 1:
                 logger.warning("addtask contained multiple '%s' keywords, only one is supported" % word)
 
+        # Check and warn for having task with exprssion as part of task name
+        for te in taskexpression:
+            if any( ( "%s_" % keyword ) in te for keyword in bb.data_smart.__setvar_keyword__ ):
+                raise ParseError("Task name '%s' contains a keyword which is not recommended/supported.\nPlease rename the task not to include the keyword.\n%s" % (te, ("\n".join(map(str, bb.data_smart.__setvar_keyword__)))), fn)
         ast.handleAddTask(statements, fn, lineno, m)
         return
 
     m = __deltask_regexp__.match(s)
     if m:
-        # Check and warn "for deltask task1 task2"
-        if m.group('ignores'):
-            logger.warning('deltask ignored: "%s"' % m.group('ignores'))
         ast.handleDelTask(statements, fn, lineno, m)
         return
 

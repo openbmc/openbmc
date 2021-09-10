@@ -1,0 +1,9 @@
+[Unit]
+Description=Commit image for update and reboot
+
+[Service]
+Type=oneshot
+ExecStart=/bin/mv /run/initramfs/bmc-image-verified /run/initramfs/image-bmc
+# This command is intentionally blocking to ensure this unit doesn't complete
+# before the BMC reboots.
+ExecStart=/usr/bin/systemctl start --job-mode=replace-irreversibly reboot.target

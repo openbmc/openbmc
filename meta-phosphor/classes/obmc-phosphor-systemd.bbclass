@@ -2,7 +2,7 @@
 #
 # Prior to inheriting this class, recipes can define services like this:
 #
-# SYSTEMD_SERVICE_${PN} = "foo.service bar.socket baz@.service"
+# SYSTEMD_SERVICE:${PN} = "foo.service bar.socket baz@.service"
 #
 # and these files will be added to the main package if they exist.
 #
@@ -25,16 +25,16 @@
 # SYSTEMD_USER_${unit}.service = "foo"
 #    The user for the unit/package.
 #
-# SYSTEMD_ENVIRONMENT_FILE_${PN} = "foo"
+# SYSTEMD_ENVIRONMENT_FILE:${PN} = "foo"
 #    One or more environment files to be installed.
 #
-# SYSTEMD_LINK_${PN} = "tgt:name"
+# SYSTEMD_LINK:${PN} = "tgt:name"
 #    A specification for installing arbitrary links in
 #    the ${systemd_system_unitdir} namespace, where:
 #      tgt: the link target
 #      name: the link name, relative to ${systemd_system_unitdir}
 #
-# SYSTEMD_OVERRIDE_${PN} = "src:dest"
+# SYSTEMD_OVERRIDE:${PN} = "src:dest"
 #    A specification for installing unit overrides where:
 #      src: the override file template
 #      dest: the override install location, relative to ${systemd_system_unitdir}
@@ -56,7 +56,7 @@ envfiledir ?= "${sysconfdir}/default"
 # If there are users to be added, we'll add them in our post-parse.
 # If not...there don't seem to be any ill effects...
 USERADD_PACKAGES ?= " "
-USERADD_PARAM_${PN} ?= ";"
+USERADD_PARAM:${PN} ?= ";"
 
 
 def SystemdUnit(unit):
@@ -65,17 +65,17 @@ def SystemdUnit(unit):
             self.unit = unit
 
         def __getattr__(self, item):
-            if item is 'name':
+            if item == 'name':
                 return self.unit
-            if item is 'is_activated':
+            if item == 'is_activated':
                 return self.unit.startswith('dbus-')
-            if item is 'is_template':
+            if item == 'is_template':
                 return '@.' in self.unit
-            if item is 'is_instance':
+            if item == 'is_instance':
                 return '@' in self.unit and not self.is_template
             if item in ['is_service', 'is_target']:
                 return self.unit.split('.')[-1] == item
-            if item is 'base':
+            if item == 'base':
                 cls = self.unit.split('.')[-1]
                 base = self.unit.replace('dbus-', '')
                 base = base.replace('.%s' % cls, '')
@@ -84,13 +84,13 @@ def SystemdUnit(unit):
                 if self.is_template:
                     base = base.rstrip('@')
                 return base
-            if item is 'instance' and self.is_instance:
+            if item == 'instance' and self.is_instance:
                 inst = self.unit.rsplit('@')[-1]
                 return inst.rsplit('.')[0]
-            if item is 'template' and self.is_instance:
+            if item == 'template' and self.is_instance:
                 cls = self.unit.split('.')[-1]
                 return '%s@.%s' % (self.base, cls)
-            if item is 'template' and self.is_template:
+            if item == 'template' and self.is_template:
                 return '.'.join(self.base.split('@')[:-1])
 
             raise AttributeError(item)
@@ -136,7 +136,7 @@ python() {
                 'localstatedir',
                 'datadir',
                 'SYSTEMD_DEFAULT_TARGET' ]:
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS',
+            set_doappend(d, 'SYSTEMD_SUBSTITUTIONS',
                 '%s:%s:%s' % (x, d.getVar(x, True), file))
 
 
@@ -148,9 +148,9 @@ python() {
 
         name = unit.name
         unit_dir = d.getVar('systemd_system_unitdir', True)
-        set_append(d, 'SRC_URI', 'file://%s' % name)
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, name))
-        set_append(d, '_INSTALL_SD_UNITS', name)
+        set_doappend(d, 'SRC_URI', 'file://%s' % name)
+        set_doappend(d, 'FILES:%s' % pkg, '%s/%s' % (unit_dir, name))
+        set_doappend(d, '_INSTALL_SD_UNITS', name)
         add_default_subs(d, name)
 
 
@@ -165,46 +165,46 @@ python() {
 
         var = 'SYSTEMD_USER_%s' % file
         user = listvar_to_list(d, var)
-        if len(user) is 0:
+        if len(user) == 0:
             var = 'SYSTEMD_USER_%s' % pkg
             user = listvar_to_list(d, var)
-        if len(user) is not 0:
-            if len(user) is not 1:
+        if len(user) != 0:
+            if len(user) != 1:
                 bb.fatal('Too many users assigned to %s: \'%s\'' % (var, ' '.join(user)))
 
             user = user[0]
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS',
+            set_doappend(d, 'SYSTEMD_SUBSTITUTIONS',
                 'USER:%s:%s' % (user, file))
-            if user not in d.getVar('USERADD_PARAM_%s' % pkg, True):
-                set_append(
+            if user not in d.getVar('USERADD_PARAM:%s' % pkg, True):
+                set_doappend(
                     d,
-                    'USERADD_PARAM_%s' % pkg,
+                    'USERADD_PARAM:%s' % pkg,
                     '%s' % (' '.join(opts + [user])),
                     ';')
             if pkg not in d.getVar('USERADD_PACKAGES', True):
-                set_append(d, 'USERADD_PACKAGES', pkg)
+                set_doappend(d, 'USERADD_PACKAGES', pkg)
 
 
     def add_env_file(d, name, pkg):
-        set_append(d, 'SRC_URI', 'file://%s' % name)
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' \
+        set_doappend(d, 'SRC_URI', 'file://%s' % name)
+        set_doappend(d, 'FILES:%s' % pkg, '%s/%s' \
             % (d.getVar('envfiledir', True), name))
-        set_append(d, '_INSTALL_ENV_FILES', name)
+        set_doappend(d, '_INSTALL_ENV_FILES', name)
 
 
     def install_link(d, spec, pkg):
         tgt, dest = spec.split(':')
 
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' \
+        set_doappend(d, 'FILES:%s' % pkg, '%s/%s' \
             % (d.getVar('systemd_system_unitdir', True), dest))
-        set_append(d, '_INSTALL_LINKS', spec)
+        set_doappend(d, '_INSTALL_LINKS', spec)
 
 
     def add_override(d, spec, pkg):
         tmpl, dest = spec.split(':')
-        set_append(d, '_INSTALL_OVERRIDES', '%s' % spec)
+        set_doappend(d, '_INSTALL_OVERRIDES', '%s' % spec)
         unit_dir = d.getVar('systemd_system_unitdir', True)
-        set_append(d, 'FILES_%s' % pkg, '%s/%s' % (unit_dir, dest))
+        set_doappend(d, 'FILES:%s' % pkg, '%s/%s' % (unit_dir, dest))
         add_default_subs(d, '%s' % dest)
         add_sd_user(d, '%s' % dest, pkg)
 
@@ -215,11 +215,11 @@ python() {
     d.appendVarFlag('do_install', 'postfuncs', ' systemd_do_postinst')
 
     pn = d.getVar('PN', True)
-    if d.getVar('SYSTEMD_SERVICE_%s' % pn, True) is None:
-        d.setVar('SYSTEMD_SERVICE_%s' % pn, '%s.service' % pn)
+    if d.getVar('SYSTEMD_SERVICE:%s' % pn, True) is None:
+        d.setVar('SYSTEMD_SERVICE:%s' % pn, '%s.service' % pn)
 
     for pkg in listvar_to_list(d, 'SYSTEMD_PACKAGES'):
-        svc = listvar_to_list(d, 'SYSTEMD_SERVICE_%s' % pkg)
+        svc = listvar_to_list(d, 'SYSTEMD_SERVICE:%s' % pkg)
         svc = [SystemdUnit(x) for x in svc]
         tmpl = [x.template for x in svc if x.is_instance]
         tmpl = list(set(tmpl))
@@ -230,11 +230,11 @@ python() {
             unit_exist = check_sd_unit(d, unit)
             add_sd_unit(d, unit, pkg, unit_exist)
             add_sd_user(d, unit.name, pkg)
-        for name in listvar_to_list(d, 'SYSTEMD_ENVIRONMENT_FILE_%s' % pkg):
+        for name in listvar_to_list(d, 'SYSTEMD_ENVIRONMENT_FILE:%s' % pkg):
             add_env_file(d, name, pkg)
-        for spec in listvar_to_list(d, 'SYSTEMD_LINK_%s' % pkg):
+        for spec in listvar_to_list(d, 'SYSTEMD_LINK:%s' % pkg):
             install_link(d, spec, pkg)
-        for spec in listvar_to_list(d, 'SYSTEMD_OVERRIDE_%s' % pkg):
+        for spec in listvar_to_list(d, 'SYSTEMD_OVERRIDE:%s' % pkg):
             add_override(d, spec, pkg)
 }
 
@@ -329,7 +329,7 @@ python systemd_do_postinst() {
 }
 
 
-do_install_append() {
+do_install:append() {
         # install systemd service/socket/template files
         [ -z "${_INSTALL_SD_UNITS}" ] || \
                 install -d ${D}${systemd_system_unitdir}

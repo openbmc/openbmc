@@ -1,0 +1,31 @@
+From 24a3e0c48f9ebe473b5f1078663e275c27d0537f Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 2 Jul 2021 09:08:21 +0000
+Subject: [PATCH] Makefile: check the file if patched or not
+
+Check the file if patched or not to avoid patched more than
+one time.
+
+Upstream-Status: Inappropriate (OE-specific)
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index f4a26f5..7bc748e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -61,7 +61,7 @@ miniperlmain$O: $(CROSSPATCHED)
+ # Original versions are not saved anymore; patch generally takes care of this,
+ # and if that fails, reaching for the source tarball is the safest option.
+ $(CROSSPATCHED): %.applied: %.patch
+-	patch -p1 -i $< && touch $@
++	test ! -f $@ && (patch -p1 -i $< && touch $@) || echo "$@ exist"
+ 
+ # ---[ common ]-----------------------------------------------------------------
+ 
+-- 
+2.29.2
+

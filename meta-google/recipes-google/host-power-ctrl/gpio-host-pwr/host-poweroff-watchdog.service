@@ -1,0 +1,7 @@
+[Unit]
+Description=Power off host
+
+[Service]
+Type=oneshot
+Environment=DONT_STOP_WATCHDOG=1
+ExecStart=/usr/bin/host_poweroff.sh

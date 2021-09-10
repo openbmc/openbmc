@@ -1,4 +1,4 @@
-From ba0a0e54d9544babbd3963891f4e3200dd5583f5 Mon Sep 17 00:00:00 2001
+From cf168ae0b7bceab8432d096719b331f18428fe39 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2020 15:10:37 -0700
 Subject: [PATCH] cmake: Add check for atomic support
@@ -20,27 +20,26 @@ Fixes
 Upstream-Status: Submitted [https://github.com/facebook/rocksdb/pull/6555]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- CMakeLists.txt                  |  6 +++
+ CMakeLists.txt                  |  5 +++
  cmake/modules/CheckAtomic.cmake | 69 +++++++++++++++++++++++++++++++++
- 2 files changed, 75 insertions(+)
+ 2 files changed, 74 insertions(+)
  create mode 100644 cmake/modules/CheckAtomic.cmake
 
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -780,7 +780,13 @@ if(WIN32)
+@@ -935,7 +935,12 @@ endif()
+ if(WIN32)
    set(SYSTEM_LIBS ${SYSTEM_LIBS} shlwapi.lib rpcrt4.lib)
-   set(LIBS ${ROCKSDB_STATIC_LIB} ${THIRDPARTY_LIBS} ${SYSTEM_LIBS})
  else()
 +  # check if linking against libatomic is necessary
 +  include(CheckAtomic)
-+
    set(SYSTEM_LIBS ${CMAKE_THREAD_LIBS_INIT})
 +  if(HAVE_CXX_ATOMIC_WITH_LIB OR HAVE_CXX_ATOMICS64_WITH_LIB)
 +    set(SYSTEM_LIBS ${SYSTEM_LIBS} atomic)
 +  endif()
-   set(LIBS ${ROCKSDB_SHARED_LIB} ${THIRDPARTY_LIBS} ${SYSTEM_LIBS})
+ endif()
  
-   add_library(${ROCKSDB_SHARED_LIB} SHARED ${SOURCES})
+ add_library(${ROCKSDB_STATIC_LIB} STATIC ${SOURCES} ${BUILD_VERSION_CC})
 --- /dev/null
 +++ b/cmake/modules/CheckAtomic.cmake
 @@ -0,0 +1,69 @@

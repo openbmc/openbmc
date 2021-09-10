@@ -42,11 +42,11 @@ oe_multilib_header() {
 
 # Dependencies on arch variables like MIPSPKGSFX_ABI can be problematic.
 # We don't need multilib headers for native builds so brute force things.
-oe_multilib_header_class-native () {
+oe_multilib_header:class-native () {
 	return
 }
 
 # Nor do we need multilib headers for nativesdk builds.
-oe_multilib_header_class-nativesdk () {
+oe_multilib_header:class-nativesdk () {
 	return
 }

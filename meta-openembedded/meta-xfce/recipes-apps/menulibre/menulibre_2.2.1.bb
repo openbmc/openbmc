@@ -20,18 +20,18 @@ SRC_URI[sha256sum] = "5b3ef8e6073d584f6accf282fa1eb649185ee42eb22fab70231491c737
 do_compile() {
 }
 
-do_install_append() {
+do_install:append() {
     sed -i 's:${D}::g' ${D}${datadir}/applications/menulibre.desktop
     sed -i 's:share/share:share:g' ${D}${PYTHON_SITEPACKAGES_DIR}/menulibre_lib/menulibreconfig.py
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/applications \
     ${datadir}/menulibre \
     ${datadir}/icons \
 "
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     gtk+3 \
     gtksourceview3 \
     python3-pygobject \

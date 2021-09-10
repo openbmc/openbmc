@@ -9,6 +9,10 @@ Yocto BSP layer for the Raspberry Pi boards - <http://www.raspberrypi.org/>.
 [![Documentation Status](https://readthedocs.org/projects/meta-raspberrypi/badge/?version=latest)](https://meta-raspberrypi.readthedocs.io/en/latest/?badge=latest)
 [![Matrix](https://img.shields.io/matrix/meta-raspberrypi:cub.icu.svg?server_fqdn=matrix.cub.icu)](https://matrix.to/#/#meta-raspberrypi:cub.icu)
 
+|                           |                                                           |
+|:-:                        | :-:                                                       |
+| Build server sponsored by | [![balena.io](./img/balena.png)](https://www.balena.io/). |
+
 ## Quick links
 
 * Git repository web frontend:
@@ -28,7 +32,7 @@ The core BSP part of meta-raspberrypi should work with different
 OpenEmbedded/Yocto distributions and layer stacks, such as:
 
 * Distro-less (only with OE-Core).
-* Angstrom.
+* Yoe Disto (Video and Camera Products).
 * Yocto/Poky (main focus of testing).
 
 ## Dependencies

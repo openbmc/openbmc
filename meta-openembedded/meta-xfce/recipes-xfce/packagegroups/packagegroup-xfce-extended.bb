@@ -8,12 +8,12 @@ inherit packagegroup features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 # mandatory
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     packagegroup-xfce-base \
 "
 
 # nice to have
-RRECOMMENDS_${PN} = " \
+RRECOMMENDS:${PN} = " \
     xfwm4-theme-daloa \
     xfwm4-theme-kokodi \
     xfwm4-theme-moheli \
@@ -34,19 +34,16 @@ RRECOMMENDS_${PN} = " \
     xfce4-systemload-plugin \
     xfce4-time-out-plugin \
     xfce4-timer-plugin \
-    xfce4-embed-plugin \
     xfce4-weather-plugin \
     xfce4-fsguard-plugin \
     xfce4-battery-plugin \
     xfce4-mount-plugin \
     xfce4-powermanager-plugin \
     xfce4-closebutton-plugin \
-    xfce4-equake-plugin \
     xfce4-notes-plugin \
     xfce4-whiskermenu-plugin \
     xfce4-mailwatch-plugin \
     xfce4-smartbookmark-plugin \
-    xfce4-hotcorner-plugin \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pulseaudio', 'xfce4-pulseaudio-plugin', '', d)} \
     xfce4-sensors-plugin \
     xfce4-calculator-plugin \

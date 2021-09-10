@@ -1,0 +1,65 @@
+From 637d4400d2bab0457688f950ea18cc4a04147c11 Mon Sep 17 00:00:00 2001
+From: Bruno Oliveira <nicoddemus@gmail.com>
+Date: Thu, 26 Aug 2021 09:26:51 -0300
+Subject: [PATCH] Allow pluggy >=1.0
+
+Now that pluggy 1.0 has been released, we can allow pluggy 1.0 with new pytest versions.
+
+Upstream-Status: Backport [commit: fbba504]
+
+Modify to use toml and not tomli. We will create a
+python3-tomli recipe when we do an python3-pytest
+upgrade.
+
+Signed-off-by: Tim Orling <timothy.t.orling@intel.com>
+---
+ setup.cfg | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/setup.cfg b/setup.cfg
+index f919a9491..a8aeab813 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -32,24 +32,24 @@ project_urls =
+ 	Tracker=https://github.com/pytest-dev/pytest/issues
+ 
+ [options]
+-packages = 
+-	_pytest
+-	_pytest._code
+-	_pytest._io
+-	_pytest.assertion
+-	_pytest.config
+-	_pytest.mark
+-	pytest
+-install_requires = 
+-	attrs>=19.2.0
+-	iniconfig
+-	packaging
+-	pluggy>=0.12,<1.0.0a1
+-	py>=1.8.2
+-	toml
+-	atomicwrites>=1.0;sys_platform=="win32"
+-	colorama;sys_platform=="win32"
+-	importlib-metadata>=0.12;python_version<"3.8"
++packages =
++    _pytest
++    _pytest._code
++    _pytest._io
++    _pytest.assertion
++    _pytest.config
++    _pytest.mark
++    pytest
++install_requires =
++    attrs>=19.2.0
++    iniconfig
++    packaging
++    pluggy>=0.12,<2.0
++    py>=1.8.2
++    toml
++    atomicwrites>=1.0;sys_platform=="win32"
++    colorama;sys_platform=="win32"
++    importlib-metadata>=0.12;python_version<"3.8"
+ python_requires = >=3.6
+ package_dir = 
+ 	=src

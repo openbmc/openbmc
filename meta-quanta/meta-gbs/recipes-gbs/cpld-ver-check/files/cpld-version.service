@@ -1,0 +1,10 @@
+[Unit]
+Description=Report CPLD Version
+
+[Service]
+RemainAfterExit=yes
+Type=oneshot
+ExecStart=/usr/bin/cpld_version.sh
+
+[Install]
+WantedBy=multi-user.target

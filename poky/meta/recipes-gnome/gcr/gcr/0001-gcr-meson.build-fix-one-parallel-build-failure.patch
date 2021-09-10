@@ -1,0 +1,37 @@
+From cb3708bad88e713e4ccf705cb8c14c5996cd9d06 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 23 Apr 2021 16:32:38 +0800
+Subject: [PATCH] gcr/meson.build: fix one parallel build failure
+
+ui/gcr-live-search.c includes gcr/gcr-marshal.h. Because missing
+dependency, following error occurred intermittently during doing parallel
+build:
+
+ -o ui/libgcr-ui-3.so.1.0.0.p/gcr-live-search.c.o -c ../gcr-3.38.1/ui/gcr-live-search.c
+../gcr-3.38.1/ui/gcr-live-search.c:32:10: fatal error: gcr/gcr-marshal.h: No such file or directory
+   32 | #include "gcr/gcr-marshal.h"
+      |          ^~~~~~~~~~~~~~~~~~~
+compilation terminated.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gcr/-/merge_requests/68/diffs]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ gcr/meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gcr/meson.build b/gcr/meson.build
+index 06c3a63..d9d4b8f 100644
+--- a/gcr/meson.build
++++ b/gcr/meson.build
+@@ -181,6 +181,7 @@ gcr_base_dep = declare_dependency(
+   sources: [
+     gcr_enums_gen[1],
+     gcr_oids[1],
++    gcr_marshal_gen[1],
+   ],
+ )
+ 
+-- 
+2.17.1
+

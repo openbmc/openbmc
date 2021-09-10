@@ -11,7 +11,7 @@ is used by the mkfontdir program."
 DEPENDS = "util-macros-native zlib libfontenc freetype xorgproto"
 
 PROVIDES += "mkfontdir"
-RPROVIDES_${PN} += "mkfontdir"
+RPROVIDES:${PN} += "mkfontdir"
 
 BBCLASSEXTEND = "native"
 

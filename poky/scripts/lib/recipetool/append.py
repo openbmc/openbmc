@@ -49,7 +49,7 @@ def find_target_file(targetpath, d, pkglist=None):
                       '/etc/group': '/etc/group should be managed through the useradd and extrausers classes',
                       '/etc/shadow': '/etc/shadow should be managed through the useradd and extrausers classes',
                       '/etc/gshadow': '/etc/gshadow should be managed through the useradd and extrausers classes',
-                      '${sysconfdir}/hostname': '${sysconfdir}/hostname contents should be set by setting hostname_pn-base-files = "value" in configuration',}
+                      '${sysconfdir}/hostname': '${sysconfdir}/hostname contents should be set by setting hostname:pn-base-files = "value" in configuration',}
 
     for pthspec, message in invalidtargets.items():
         if fnmatch.fnmatchcase(targetpath, d.expand(pthspec)):
@@ -72,15 +72,15 @@ def find_target_file(targetpath, d, pkglist=None):
                 # This does assume that PN comes before other values, but that's a fairly safe assumption
                 for line in f:
                     if line.startswith('PN:'):
-                        pn = line.split(':', 1)[1].strip()
-                    elif line.startswith('FILES_INFO:'):
-                        val = line.split(':', 1)[1].strip()
+                        pn = line.split(': ', 1)[1].strip()
+                    elif line.startswith('FILES_INFO'):
+                        val = line.split(': ', 1)[1].strip()
                         dictval = json.loads(val)
                         for fullpth in dictval.keys():
                             if fnmatch.fnmatchcase(fullpth, targetpath):
                                 recipes[targetpath].append(pn)
-                    elif line.startswith('pkg_preinst_') or line.startswith('pkg_postinst_'):
-                        scriptval = line.split(':', 1)[1].strip().encode('utf-8').decode('unicode_escape')
+                    elif line.startswith('pkg_preinst:') or line.startswith('pkg_postinst:'):
+                        scriptval = line.split(': ', 1)[1].strip().encode('utf-8').decode('unicode_escape')
                         if 'update-alternatives --install %s ' % targetpath in scriptval:
                             recipes[targetpath].append('?%s' % pn)
                         elif targetpath_re.search(scriptval):

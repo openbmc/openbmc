@@ -7,6 +7,6 @@ inherit skeleton-gdbus
 inherit pkgconfig
 
 DEPENDS += "pflash"
-RDEPENDS_${PN} += "pflash"
+RDEPENDS:${PN} += "pflash"
 
 SKELETON_DIR = "op-flasher"

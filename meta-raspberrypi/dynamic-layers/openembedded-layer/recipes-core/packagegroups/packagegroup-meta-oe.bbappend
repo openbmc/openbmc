@@ -1,1 +1,1 @@
-RDEPENDS_packagegroup-meta-oe-kernel_remove_rpi = "bpftool"
+RDEPENDS:packagegroup-meta-oe-kernel:remove:rpi = "bpftool"

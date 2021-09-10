@@ -11,7 +11,7 @@ S = "${WORKDIR}"
 
 CFLAGS += "-DFORCE_STRICT_ALIGNMENT"
 
-python do_unpack_append() {
+python do_unpack:append() {
     os.rename("devmem2-new.c", "devmem2.c")
 }
 

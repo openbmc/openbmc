@@ -1,4 +1,4 @@
-From 8f8c22bc8aad6eb0f7c1b68f9f9a89f99adff996 Mon Sep 17 00:00:00 2001
+From 8091dac73f792fb000e7ec97de6be23cd84b7cb7 Mon Sep 17 00:00:00 2001
 From: Hugo Hromic <hhromic@gmail.com>
 Date: Sun, 13 May 2018 10:49:04 +0100
 Subject: [PATCH] khronos: backport typedef for EGL_EXT_image_dma_buf_import

@@ -1,0 +1,34 @@
+From 027044a692b588ef586d495f65eb58b07cc711a3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 11 May 2021 10:15:51 -0700
+Subject: [PATCH] Do not use MINSIGSTKSZ
+
+Since glibc 2.34+ MINSIGSTKSZ is no more a constant.  So,
+let's hardwire this for now until better fix is found.
+64Kb should be good anyway
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/mongo/stdx/thread.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/src/mongo/stdx/thread.h b/src/mongo/stdx/thread.h
+index f8058279e3..f31f309959 100644
+--- a/src/mongo/stdx/thread.h
++++ b/src/mongo/stdx/thread.h
+@@ -104,10 +104,7 @@ private:
+     //   .                     N   Y :      4,344 |  13,048 |     7,352
+     //   .                     Y   Y :      4,424 |  13,672 |     8,392
+     //   ( https://jira.mongodb.org/secure/attachment/233569/233569_stacktrace-writeup.txt )
+-    static constexpr std::size_t kMongoMinSignalStackSize = std::size_t{64} << 10;
+-
+-    static constexpr std::size_t kStackSize =
+-        std::max(kMongoMinSignalStackSize, std::size_t{MINSIGSTKSZ});
++    static constexpr std::size_t kStackSize = std::size_t{64} << 10;
+     std::unique_ptr<std::byte[]> _stackStorage = std::make_unique<std::byte[]>(kStackSize);
+ 
+ #else   // !MONGO_HAS_SIGALTSTACK
+-- 
+2.31.1
+

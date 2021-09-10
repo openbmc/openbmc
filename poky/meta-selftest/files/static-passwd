@@ -9,3 +9,11 @@ avahi-autoipd:x:510:510::/:/bin/nologin
 rpc:x:511:511::/:/bin/nologin
 distcc:x:512:nogroup::/:/bin/nologin
 rpcuser:x:513:513::/var/lib/nfs:/bin/nologin
+dhcpcd:x:514:514::/:/bin/nologin
+tester:x:515:515::/:/bin/nologin
+sshd:x:516:516::/:/bin/nologin
+pulse:x:520:520::/:/bin/nologin
+bind:x:521:521::/:/bin/nologin
+builder:x:522:522::/:/bin/nologin
+_apt:x:523:523::/:/bin/nologin
+weston:x:525:525::/:/bin/nologin

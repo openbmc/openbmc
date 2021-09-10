@@ -12,7 +12,7 @@ inherit autotools
 
 EXTRA_OECONF += "--with-pic"
 
-do_install_append() {
+do_install:append() {
     # Avoid conflicting with libevent. The provided compatibility layer is
     # still basic so drop it for now.
     rm ${D}${includedir}/event.h

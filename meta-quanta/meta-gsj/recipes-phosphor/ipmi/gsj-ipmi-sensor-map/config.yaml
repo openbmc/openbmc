@@ -6,7 +6,6 @@
   sensorReadingType: 0x01
   bExp: 0
   rExp: 0
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -17,7 +16,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x31:
   entityID: 0x0D
@@ -27,7 +26,6 @@
   sensorReadingType: 0x01
   bExp: 0
   rExp: 0
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -38,7 +36,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x32:
   entityID: 0x0E
@@ -48,7 +46,6 @@
   sensorReadingType: 0x01
   bExp: 0
   rExp: 0
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -59,7 +56,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x33:
   entityID: 0x0E
@@ -69,7 +66,6 @@
   sensorReadingType: 0x01
   bExp: 0
   rExp: 0
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -80,7 +76,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x3C:
   entityID: 0x0A
@@ -90,7 +86,6 @@
   sensorReadingType: 0x01
   bExp: 0
   rExp: 0
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -101,7 +96,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x70:
   entityID: 0x0A
   entityInstance: 5
@@ -112,7 +107,6 @@
   offsetB: 0
   bExp: 0
   rExp: -2
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -123,7 +117,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x60:
   entityID: 0x0A
@@ -135,7 +129,6 @@
   offsetB: 0
   bExp: 0
   rExp: -3
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -146,7 +139,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x90:
   entityID: 0x0A
@@ -158,7 +151,6 @@
   offsetB: 4
   bExp: 2
   rExp: -2
-  scale: -6
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -169,7 +161,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x3D:
   entityID: 0x0A
@@ -179,7 +171,6 @@
   sensorReadingType: 0x01
   bExp: 0
   rExp: 0
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -190,7 +181,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x71:
   entityID: 0x0A
   entityInstance: 7
@@ -201,7 +192,6 @@
   offsetB: 0
   bExp: 0
   rExp: -3
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -212,7 +202,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x61:
   entityID: 0x0A
@@ -224,7 +214,6 @@
   offsetB: 0
   bExp: 0
   rExp: -4
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -235,7 +224,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 
 0x80:
@@ -249,7 +238,6 @@
   bExp: 0
   rExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
   sensorNamePattern: nameLeaf
@@ -258,7 +246,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x81:
   entityID: 0x1D
   entityInstance: 2
@@ -270,7 +258,6 @@
   bExp: 0
   rExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
   sensorNamePattern: nameLeaf
@@ -279,7 +266,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x82:
   entityID: 0x1D
   entityInstance: 3
@@ -291,7 +278,6 @@
   bExp: 0
   rExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
   sensorNamePattern: nameLeaf
@@ -300,7 +286,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x83:
   entityID: 0x1D
   entityInstance: 4
@@ -312,7 +298,6 @@
   bExp: 0
   rExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
   sensorNamePattern: nameLeaf
@@ -321,7 +306,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x84:
   entityID: 0x1D
   entityInstance: 5
@@ -333,7 +318,6 @@
   bExp: 0
   rExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
   sensorNamePattern: nameLeaf
@@ -342,7 +326,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x85:
   entityID: 0x1D
   entityInstance: 6
@@ -354,7 +338,6 @@
   bExp: 0
   rExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
   sensorNamePattern: nameLeaf
@@ -363,7 +346,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0xC0: &fan_pwm
   sensorType: 0x04
@@ -406,7 +389,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x35:
   entityID: 0x07
   entityInstance: 2
@@ -423,7 +406,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x36:
   entityID: 0x07
   entityInstance: 3
@@ -440,7 +423,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x37:
   entityID: 0x07
   entityInstance: 4
@@ -457,7 +440,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x38:
   entityID: 0x07
   entityInstance: 5
@@ -474,7 +457,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x39:
   entityID: 0x07
   entityInstance: 6
@@ -491,7 +474,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x3A:
   entityID: 0x07
   entityInstance: 7
@@ -508,7 +491,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 0x3B:
   entityID: 0x07
   entityInstance: 8
@@ -525,7 +508,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x40:
   entityID: 0x07
@@ -849,7 +832,6 @@
   offsetB: 0
   bExp: 0
   rExp: -4
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -860,7 +842,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x64:
   entityID: 0x0A
@@ -872,7 +854,6 @@
   offsetB: 0
   bExp: 0
   rExp: -4
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -883,7 +864,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x65:
   entityID: 0x0A
@@ -895,7 +876,6 @@
   offsetB: 0
   bExp: 0
   rExp: -4
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -906,7 +886,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x66:
   entityID: 0x0A
@@ -918,7 +898,6 @@
   offsetB: 0
   bExp: 0
   rExp: -4
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -929,7 +908,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x67:
   entityID: 0x0A
@@ -941,7 +920,6 @@
   offsetB: 0
   bExp: 0
   rExp: -5
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -952,7 +930,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x68:
   entityID: 0x0A
@@ -964,7 +942,6 @@
   offsetB: 0
   bExp: 0
   rExp: -4
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -975,7 +952,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
 
 0x69:
   entityID: 0x0A
@@ -987,7 +964,6 @@
   offsetB: 0
   bExp: 0
   rExp: -4
-  scale: -3
   mutability: Mutability::Write|Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -998,4 +974,4 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double

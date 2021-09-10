@@ -17,7 +17,7 @@ inherit autotools pkgconfig
 # Disable the run-time loading of the libs and bring back the soname dependencies.
 EXTRA_OECONF += "--disable-jpg-shared --disable-png-shared -disable-tif-shared"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # make autoreconf happy
     touch ${S}/NEWS ${S}/README ${S}/AUTHORS ${S}/ChangeLog
     # Removing these files fixes a libtool version mismatch.

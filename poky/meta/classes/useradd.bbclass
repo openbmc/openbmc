@@ -3,7 +3,7 @@ inherit useradd_base
 # base-passwd-cross provides the default passwd and group files in the
 # target sysroot, and shadow -native and -sysroot provide the utilities
 # and support files needed to add and modify user and group accounts
-DEPENDS_append_class-target = " base-files shadow-native shadow-sysroot shadow base-passwd"
+DEPENDS:append:class-target = " base-files shadow-native shadow-sysroot shadow base-passwd"
 PACKAGE_WRITE_DEPS += "shadow-native"
 
 # This preinstall function can be run in four different contexts:
@@ -164,16 +164,16 @@ python useradd_sysroot_sstate () {
 }
 
 do_prepare_recipe_sysroot[postfuncs] += "${SYSROOTFUNC}"
-SYSROOTFUNC_class-target = "useradd_sysroot_sstate"
+SYSROOTFUNC:class-target = "useradd_sysroot_sstate"
 SYSROOTFUNC = ""
 
 SYSROOT_PREPROCESS_FUNCS += "${SYSROOTFUNC}"
 
-SSTATEPREINSTFUNCS_append_class-target = " useradd_sysroot_sstate"
+SSTATEPREINSTFUNCS:append:class-target = " useradd_sysroot_sstate"
 
 do_package_setscene[depends] += "${USERADDSETSCENEDEPS}"
 do_populate_sysroot_setscene[depends] += "${USERADDSETSCENEDEPS}"
-USERADDSETSCENEDEPS_class-target = "${MLPREFIX}base-passwd:do_populate_sysroot_setscene pseudo-native:do_populate_sysroot_setscene shadow-native:do_populate_sysroot_setscene ${MLPREFIX}shadow-sysroot:do_populate_sysroot_setscene"
+USERADDSETSCENEDEPS:class-target = "${MLPREFIX}base-passwd:do_populate_sysroot_setscene pseudo-native:do_populate_sysroot_setscene shadow-native:do_populate_sysroot_setscene ${MLPREFIX}shadow-sysroot:do_populate_sysroot_setscene"
 USERADDSETSCENEDEPS = ""
 
 # Recipe parse-time sanity checks
@@ -184,8 +184,8 @@ def update_useradd_after_parse(d):
         bb.fatal("%s inherits useradd but doesn't set USERADD_PACKAGES" % d.getVar('FILE', False))
 
     for pkg in useradd_packages.split():
-        d.appendVarFlag("do_populate_sysroot", "vardeps", "USERADD_PARAM_%s GROUPADD_PARAM_%s GROUPMEMS_PARAM_%s" % (pkg, pkg, pkg))
-        if not d.getVar('USERADD_PARAM_%s' % pkg) and not d.getVar('GROUPADD_PARAM_%s' % pkg) and not d.getVar('GROUPMEMS_PARAM_%s' % pkg):
+        d.appendVarFlag("do_populate_sysroot", "vardeps", "USERADD_PARAM:%s GROUPADD_PARAM:%s GROUPMEMS_PARAM:%s" % (pkg, pkg, pkg))
+        if not d.getVar('USERADD_PARAM:%s' % pkg) and not d.getVar('GROUPADD_PARAM:%s' % pkg) and not d.getVar('GROUPMEMS_PARAM:%s' % pkg):
             bb.fatal("%s inherits useradd but doesn't set USERADD_PARAM, GROUPADD_PARAM or GROUPMEMS_PARAM for package %s" % (d.getVar('FILE', False), pkg))
 
 python __anonymous() {
@@ -199,7 +199,7 @@ python __anonymous() {
 def get_all_cmd_params(d, cmd_type):
     import string
     
-    param_type = cmd_type.upper() + "_PARAM_%s"
+    param_type = cmd_type.upper() + "_PARAM:%s"
     params = []
 
     useradd_packages = d.getVar('USERADD_PACKAGES') or ""
@@ -211,7 +211,7 @@ def get_all_cmd_params(d, cmd_type):
     return "; ".join(params)
 
 # Adds the preinst script into generated packages
-fakeroot python populate_packages_prepend () {
+fakeroot python populate_packages:prepend () {
     def update_useradd_package(pkg):
         bb.debug(1, 'adding user/group calls to preinst for %s' % pkg)
 
@@ -220,7 +220,7 @@ fakeroot python populate_packages_prepend () {
         required to execute on the target. Not doing so may cause
         useradd preinst to be invoked twice, causing unwanted warnings.
         """
-        preinst = d.getVar('pkg_preinst_%s' % pkg) or d.getVar('pkg_preinst')
+        preinst = d.getVar('pkg_preinst:%s' % pkg) or d.getVar('pkg_preinst')
         if not preinst:
             preinst = '#!/bin/sh\n'
         preinst += 'bbnote () {\n\techo "NOTE: $*"\n}\n'
@@ -230,15 +230,15 @@ fakeroot python populate_packages_prepend () {
         preinst += 'perform_useradd () {\n%s}\n' % d.getVar('perform_useradd')
         preinst += 'perform_groupmems () {\n%s}\n' % d.getVar('perform_groupmems')
         preinst += d.getVar('useradd_preinst')
-        d.setVar('pkg_preinst_%s' % pkg, preinst)
+        d.setVar('pkg_preinst:%s' % pkg, preinst)
 
         # RDEPENDS setup
-        rdepends = d.getVar("RDEPENDS_%s" % pkg) or ""
+        rdepends = d.getVar("RDEPENDS:%s" % pkg) or ""
         rdepends += ' ' + d.getVar('MLPREFIX', False) + 'base-passwd'
         rdepends += ' ' + d.getVar('MLPREFIX', False) + 'shadow'
         # base-files is where the default /etc/skel is packaged
         rdepends += ' ' + d.getVar('MLPREFIX', False) + 'base-files'
-        d.setVar("RDEPENDS_%s" % pkg, rdepends)
+        d.setVar("RDEPENDS:%s" % pkg, rdepends)
 
     # Add the user/group preinstall scripts and RDEPENDS requirements
     # to packages specified by USERADD_PACKAGES

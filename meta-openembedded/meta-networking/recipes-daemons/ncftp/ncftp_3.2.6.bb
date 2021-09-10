@@ -8,6 +8,7 @@ DEPENDS = "ncurses"
 SRC_URI = "ftp://ftp.ncftp.com/${BPN}/${BP}-src.tar.xz \
            file://ncftp-configure-use-BUILD_CC-for-ccdv.patch \
            file://unistd.patch \
+           file://ncftp-3.2.5-gcc10.patch \
 "
 SRC_URI[md5sum] = "42d0f896d69a4d603ec097546444245f"
 SRC_URI[sha256sum] = "5f200687c05d0807690d9fb770327b226f02dd86155b49e750853fce4e31098d"
@@ -20,7 +21,7 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[ccdv] = "--enable-ccdv,--disable-ccdv,,"
 
 EXTRA_OECONF = "--disable-precomp"
-TARGET_CC_ARCH_append = " ${SELECTED_OPTIMIZATION}"
+TARGET_CC_ARCH:append = " ${SELECTED_OPTIMIZATION}"
 
 do_configure() {
     install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}

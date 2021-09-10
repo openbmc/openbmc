@@ -25,7 +25,7 @@ PACKAGECONFIG[libibm_dbus] = " \
         libsystemd \
         "
 
-PACKAGECONFIG_remove_class-native = "libibm_dbus"
-PACKAGECONFIG_remove_class-nativesdk = "libibm_dbus"
+PACKAGECONFIG:remove:class-native = "libibm_dbus"
+PACKAGECONFIG:remove:class-nativesdk = "libibm_dbus"
 
 BBCLASSEXTEND += "native nativesdk"

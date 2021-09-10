@@ -30,9 +30,11 @@ def main():
                                                "--bind [::1]:8686"'''
                                      )
 
-    parser.add_argument('--bind', default=DEFAULT_BIND, help='Bind address (default "%(default)s")')
-    parser.add_argument('--database', default='./hashserv.db', help='Database file (default "%(default)s")')
-    parser.add_argument('--log', default='WARNING', help='Set logging level')
+    parser.add_argument('-b', '--bind', default=DEFAULT_BIND, help='Bind address (default "%(default)s")')
+    parser.add_argument('-d', '--database', default='./hashserv.db', help='Database file (default "%(default)s")')
+    parser.add_argument('-l', '--log', default='WARNING', help='Set logging level')
+    parser.add_argument('-u', '--upstream', help='Upstream hashserv to pull hashes from')
+    parser.add_argument('-r', '--read-only', action='store_true', help='Disallow write operations from clients')
 
     args = parser.parse_args()
 
@@ -47,7 +49,7 @@ def main():
     console.setLevel(level)
     logger.addHandler(console)
 
-    server = hashserv.create_server(args.bind, args.database)
+    server = hashserv.create_server(args.bind, args.database, upstream=args.upstream, read_only=args.read_only)
     server.serve_forever()
     return 0
 

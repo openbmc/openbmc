@@ -1,0 +1,24 @@
+Don't use the target perl when regenerating the man pages.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/man/local.mk b/man/local.mk
+index e69858b1..78c68ab5 100644
+--- a/man/local.mk
++++ b/man/local.mk
+@@ -67,13 +67,12 @@ SUFFIXES += .w .1
+ 	@echo "Updating man page $@"
+ 	$(MKDIR_P) $(@D)
+ 	PATH="$(top_srcdir)/man$(PATH_SEPARATOR)$$PATH"; \
+-	PERL="$(PERL)"; \
+ 	PACKAGE_NAME="$(PACKAGE_NAME)"; \
+ 	VERSION="$(VERSION)"; \
+ 	RELEASE_YEAR="$(RELEASE_YEAR)"; \
+ 	top_srcdir="$(top_srcdir)"; \
+ 	channeldefs_pm="$(channeldefs_pm)"; \
+-	export PATH PERL PACKAGE_NAME VERSION RELEASE_YEAR; \
++	export PATH PACKAGE_NAME VERSION RELEASE_YEAR; \
+ 	export top_srcdir channeldefs_pm; \
+ 	$(HELP2MAN) \
+ 	    --include=$(srcdir)/$*.x \

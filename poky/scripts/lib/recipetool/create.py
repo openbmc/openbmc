@@ -66,7 +66,7 @@ class RecipeHandler(object):
         libdir = d.getVar('libdir')
         base_libdir = d.getVar('base_libdir')
         libpaths = list(set([base_libdir, libdir]))
-        libname_re = re.compile('^lib(.+)\.so.*$')
+        libname_re = re.compile(r'^lib(.+)\.so.*$')
         pkglibmap = {}
         for lib, item in shlib_providers.items():
             for path, pkg in item.items():
@@ -115,8 +115,8 @@ class RecipeHandler(object):
                 for line in f:
                     if line.startswith('PN:'):
                         pn = line.split(':', 1)[-1].strip()
-                    elif line.startswith('FILES_INFO:'):
-                        val = line.split(':', 1)[1].strip()
+                    elif line.startswith('FILES_INFO:%s:' % pkg):
+                        val = line.split(': ', 1)[1].strip()
                         dictval = json.loads(val)
                         for fullpth in sorted(dictval):
                             if fullpth.startswith(includedir) and fullpth.endswith('.h'):
@@ -428,7 +428,7 @@ def create_recipe(args):
 
     if scriptutils.is_src_url(source):
         # Warn about github archive URLs
-        if re.match('https?://github.com/[^/]+/[^/]+/archive/.+(\.tar\..*|\.zip)$', source):
+        if re.match(r'https?://github.com/[^/]+/[^/]+/archive/.+(\.tar\..*|\.zip)$', source):
             logger.warning('github archive files are not guaranteed to be stable and may be re-generated over time. If the latter occurs, the checksums will likely change and the recipe will fail at do_fetch. It is recommended that you point to an actual commit or tag in the repository instead (using the repository URL in conjunction with the -S/--srcrev option).')
         # Fetch a URL
         fetchuri = reformat_git_uri(urldefrag(source)[0])
@@ -460,6 +460,7 @@ def create_recipe(args):
                 logger.error('branch= parameter and -B/--srcbranch option cannot both be specified - use one or the other')
                 sys.exit(1)
             srcbranch = args.srcbranch
+            params['branch'] = srcbranch
         nobranch = params.get('nobranch')
         if nobranch and srcbranch:
             logger.error('nobranch= cannot be used if you specify a branch')
@@ -709,7 +710,7 @@ def create_recipe(args):
         lines_after.append('')
 
     if args.binary:
-        lines_after.append('INSANE_SKIP_${PN} += "already-stripped"')
+        lines_after.append('INSANE_SKIP:${PN} += "already-stripped"')
         lines_after.append('')
 
     if args.npm_dev:
@@ -829,7 +830,7 @@ def create_recipe(args):
         elif line.startswith('PV = '):
             if realpv:
                 # Replace the first part of the PV value
-                line = re.sub('"[^+]*\+', '"%s+' % realpv, line)
+                line = re.sub(r'"[^+]*\+', '"%s+' % realpv, line)
         lines_before.append(line)
 
     if args.also_native:
@@ -1065,8 +1066,8 @@ def crunch_license(licfile):
     import oe.utils
 
     # Note: these are carefully constructed!
-    license_title_re = re.compile('^\(?(#+ *)?(The )?.{1,10} [Ll]icen[sc]e( \(.{1,10}\))?\)?:?$')
-    license_statement_re = re.compile('^(This (project|software) is( free software)? (released|licen[sc]ed)|(Released|Licen[cs]ed)) under the .{1,10} [Ll]icen[sc]e:?$')
+    license_title_re = re.compile(r'^\(?(#+ *)?(The )?.{1,10} [Ll]icen[sc]e( \(.{1,10}\))?\)?:?$')
+    license_statement_re = re.compile(r'^(This (project|software) is( free software)? (released|licen[sc]ed)|(Released|Licen[cs]ed)) under the .{1,10} [Ll]icen[sc]e:?$')
     copyright_re = re.compile('^(#+)? *Copyright .*$')
 
     crunched_md5sums = {}
@@ -1176,7 +1177,7 @@ def split_pkg_licenses(licvalues, packages, outlines, fallback_licenses=None, pn
         license = ' '.join(list(set(pkglicenses.get(pkgname, ['Unknown'])))) or 'Unknown'
         if license == 'Unknown' and pkgname in fallback_licenses:
             license = fallback_licenses[pkgname]
-        outlines.append('LICENSE_%s = "%s"' % (pkgname, license))
+        outlines.append('LICENSE:%s = "%s"' % (pkgname, license))
         outlicenses[pkgname] = license.split()
     return outlicenses
 

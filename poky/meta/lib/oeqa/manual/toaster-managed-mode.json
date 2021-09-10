@@ -136,7 +136,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Check that default values are as follows: \n\tDISTRO - poky \n\tIMAGE_FSTYPES - ext3 jffs2 tar.bz2 \n\tIMAGE_INSTALL_append - \"Not set\" \n\tPACKAGE_CLASES - package_rpm \n        SSTATE_DIR  - /homeDirectory/poky/sstate-cache \n\n",
+          "action": "Check that default values are as follows: \n\tDISTRO - poky \n\tIMAGE_FSTYPES - ext3 jffs2 tar.bz2 \n\tIMAGE_INSTALL:append - \"Not set\" \n\tPACKAGE_CLASSES - package_rpm \n        SSTATE_DIR  - /homeDirectory/poky/sstate-cache \n\n",
           "expected_results": ""
         },
         "4": {
@@ -186,7 +186,7 @@
           "expected_results": ""
         },
         "7": {
-          "action": "IMAGE_INSTALL_append: \n\t- check that the \"change\" icon is present (represented by a pen icon) \n\t- click on the \"change\" icon and check that the variable becomes a text field, populated with the current value of the variable.  \n\n\t- check that the save button is disabled when the text field is empty \n\t- insert test in the text field (for example \"package1\") and hit save; be aware that there is no input validation for this variable \n\t- check that a new \"delete\" icon(a trashcan) has appeared next to the pen icon \n\t- check that clicking on the trashcan icon resets the value to \"Not set\" and makes the trashcan icon dissapear  \n\n",
+          "action": "IMAGE_INSTALL:append: \n\t- check that the \"change\" icon is present (represented by a pen icon) \n\t- click on the \"change\" icon and check that the variable becomes a text field, populated with the current value of the variable.  \n\n\t- check that the save button is disabled when the text field is empty \n\t- insert test in the text field (for example \"package1\") and hit save; be aware that there is no input validation for this variable \n\t- check that a new \"delete\" icon(a trashcan) has appeared next to the pen icon \n\t- check that clicking on the trashcan icon resets the value to \"Not set\" and makes the trashcan icon dissapear  \n\n",
           "expected_results": ""
         },
         "8": {
@@ -1574,7 +1574,7 @@
           "expected_results": "Open bitbake variables page. \n\n\t"
         },
         "5": {
-          "action": "Click on change button for IMAGE_INSTALL_append and add a variable (ex: acpid). \n\n",
+          "action": "Click on change button for IMAGE_INSTALL:append and add a variable (ex: acpid). \n\n",
           "expected_results": "Variable added. \n\n\t"
         },
         "6": {
@@ -1590,7 +1590,7 @@
           "expected_results": "You should get results for ssh packages."
         }
       },
-      "summary": "Test_IMAGE_INSTALL_append_variable"
+      "summary": "Test_IMAGE_INSTALL:append_variable"
     }
   },
   {
@@ -2348,7 +2348,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-clutter) to name a few. ",
+          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base) to name a few. ",
           "expected_results": " All recipes are built correctly \n\n"
         },
         "4": {
@@ -2382,7 +2382,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-clutter) to name a few. \n\n",
+          "action": "Build 6 recipes example (core-image-sato, core-image-minimal, core-image-base) to name a few. \n\n",
           "expected_results": "All recipes are built correctly \n\n"
         },
         "4": {
@@ -2420,7 +2420,7 @@
           "expected_results": ""
         },
         "3": {
-          "action": "Build 4 recipes example (core-image-sato, core-image-minimal, core-image-base, core-image-clutter) to name a few. \n\n",
+          "action": "Build 4 recipes example (core-image-sato, core-image-minimal, core-image-base) to name a few. \n\n",
           "expected_results": " All recipes are built correctly \n\n"
         },
         "4": {

@@ -24,10 +24,10 @@ python read_subpackage_metadata () {
                 continue
             #
             # If we set unsuffixed variables here there is a chance they could clobber override versions
-            # of that variable, e.g. DESCRIPTION could clobber DESCRIPTION_<pkgname>
+            # of that variable, e.g. DESCRIPTION could clobber DESCRIPTION:<pkgname>
             # We therefore don't clobber for the unsuffixed variable versions
             #
-            if key.endswith("_" + pkg):
+            if key.endswith(":" + pkg):
                 d.setVar(key, sdata[key])
             else:
                 d.setVar(key, sdata[key], parsing=True)

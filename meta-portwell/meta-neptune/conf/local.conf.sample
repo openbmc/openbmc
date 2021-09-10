@@ -126,12 +126,11 @@ EXTRA_IMAGE_FEATURES = "debug-tweaks"
 # enable extra features. Some available options which can be included in this variable
 # are:
 #   - 'buildstats' collect build statistics
-#   - 'image-mklibs' to reduce shared library files size for an image
 #   - 'image-prelink' in order to prelink the filesystem image
 #   - 'image-swab' to perform host system intrusion detection
 # NOTE: if listing mklibs & prelink both, then make sure mklibs is before prelink
 # NOTE: mklibs also needs to be explicitly enabled for a given image, see local.conf.extended
-USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+USER_CLASSES ?= "buildstats image-prelink"
 
 #
 # Runtime testing of images
@@ -216,8 +215,4 @@ BB_DISKMON_DIRS = "\
 CONF_VERSION = "1"
 
 # Set the root password to '0penBmc'
-INHERIT += "extrausers"
-
-EXTRA_USERS_PARAMS = " \
-  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
-  "
+# Defaults from meta-phosphor/conf/distro/include/phosphor-defaults.inc

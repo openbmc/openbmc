@@ -218,3 +218,9 @@ class OePkgdataUtilTests(OESelftestTestCase):
     def test_specify_pkgdatadir(self):
         result = runCmd('oe-pkgdata-util -p %s lookup-pkg zlib' % get_bb_var('PKGDATA_DIR'))
         self.assertEqual(result.output, 'libz1')
+
+    def test_no_param(self):
+        result = runCmd('oe-pkgdata-util', ignore_status=True)
+        self.assertEqual(result.status, 2, "Status different than 2. output: %s" % result.output)
+        currpos = result.output.find('usage: oe-pkgdata-util')
+        self.assertTrue(currpos != -1, msg = "Test is Failed. Help is not Displayed in %s" % result.output)

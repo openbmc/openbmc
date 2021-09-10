@@ -9,7 +9,7 @@ UPSTREAM_CHECK_REGEX = "pyparsing-(?P<pver>.*)\.tar"
 
 inherit pypi
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${PYTHON_PN}-datetime \
     ${PYTHON_PN}-debugger \
     ${PYTHON_PN}-json \

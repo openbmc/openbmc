@@ -12,7 +12,7 @@ SRC_URI = "git://github.com/android/platform_frameworks_base.git;branch=master"
 
 S = "${WORKDIR}/git/data/fonts"
 
-do_install_append() {
+do_install:append() {
     for f in Ahem.ttf MTLc3m.ttf DroidSansArabic.ttf DroidSansThai.ttf \
              Clockopia.ttf MTLmr3m.ttf DroidSansHebrew.ttf \
              DroidSansFallbackLegacy.ttf; do
@@ -24,8 +24,8 @@ PACKAGES = "ttf-droid-sans ttf-droid-sans-mono \
             ttf-droid-sans-fallback ttf-droid-sans-japanese ttf-droid-serif"
 FONT_PACKAGES = "ttf-droid-sans ttf-droid-sans-mono ttf-droid-sans-fallback ttf-droid-sans-japanese ttf-droid-serif"
 
-FILES_ttf-droid-sans = "${datadir}/fonts/truetype/DroidSans.ttf ${datadir}/fonts/truetype/DroidSans-Bold.ttf"
-FILES_ttf-droid-sans-mono = "${datadir}/fonts/truetype/DroidSansMono.ttf"
-FILES_ttf-droid-sans-fallback = "${datadir}/fonts/truetype/DroidSansFallback.ttf"
-FILES_ttf-droid-sans-japanese = "${datadir}/fonts/truetype/DroidSansJapanese.ttf"
-FILES_ttf-droid-serif = "${datadir}/fonts/truetype/DroidSerif*.ttf"
+FILES:ttf-droid-sans = "${datadir}/fonts/truetype/DroidSans.ttf ${datadir}/fonts/truetype/DroidSans-Bold.ttf"
+FILES:ttf-droid-sans-mono = "${datadir}/fonts/truetype/DroidSansMono.ttf"
+FILES:ttf-droid-sans-fallback = "${datadir}/fonts/truetype/DroidSansFallback.ttf"
+FILES:ttf-droid-sans-japanese = "${datadir}/fonts/truetype/DroidSansJapanese.ttf"
+FILES:ttf-droid-serif = "${datadir}/fonts/truetype/DroidSerif*.ttf"

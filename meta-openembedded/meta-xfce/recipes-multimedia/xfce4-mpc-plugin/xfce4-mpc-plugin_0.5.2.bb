@@ -12,7 +12,7 @@ DEPENDS += "libmpd"
 LICENSE_FLAGS = "commercial"
 
 # for now we recommend our own mpd-server
-RRECOMMENDS_${PN} = "mpd"
+RRECOMMENDS:${PN} = "mpd"
 
 SRC_URI[md5sum] = "26a1e8658df2b51967dc2250e23f467d"
 SRC_URI[sha256sum] = "eefe78b7b6b95312b3a52814b7f632dc92970c1b3e9535de616315749bf67760"

@@ -1,6 +1,6 @@
 
 # Zap the root password if debug-tweaks feature is not enabled
-ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'debug-tweaks', 'empty-root-password' ], "", "zap_empty_root_password ; ",d)}'
+ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'debug-tweaks', 'empty-root-password' ], "", "zap_empty_root_password; ",d)}'
 
 # Allow dropbear/openssh to accept logins from accounts with an empty password string if debug-tweaks or allow-empty-password is enabled
 ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'debug-tweaks', 'allow-empty-password' ], "ssh_allow_empty_password; ", "",d)}'
@@ -12,7 +12,7 @@ ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'deb
 ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains_any("IMAGE_FEATURES", [ 'debug-tweaks', 'post-install-logging' ], "postinst_enable_logging; ", "",d)}'
 
 # Create /etc/timestamp during image construction to give a reasonably sane default time setting
-ROOTFS_POSTPROCESS_COMMAND += "rootfs_update_timestamp ; "
+ROOTFS_POSTPROCESS_COMMAND += "rootfs_update_timestamp; "
 
 # Tweak the mount options for rootfs in /etc/fstab if read-only-rootfs is enabled
 ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("IMAGE_FEATURES", "read-only-rootfs", "read_only_rootfs_hook; ", "",d)}'
@@ -23,10 +23,10 @@ ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("IMAGE_FEATURES", "read-only
 #
 # We do this with _append because the default value might get set later with ?=
 # and we don't want to disable such a default that by setting a value here.
-APPEND_append = '${@bb.utils.contains("IMAGE_FEATURES", "read-only-rootfs", " ro", "", d)}'
+APPEND:append = '${@bb.utils.contains("IMAGE_FEATURES", "read-only-rootfs", " ro", "", d)}'
 
 # Generates test data file with data store variables expanded in json format
-ROOTFS_POSTPROCESS_COMMAND += "write_image_test_data ; "
+ROOTFS_POSTPROCESS_COMMAND += "write_image_test_data; "
 
 # Write manifest
 IMAGE_MANIFEST = "${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.manifest"
@@ -34,10 +34,14 @@ ROOTFS_POSTUNINSTALL_COMMAND =+ "write_image_manifest ; "
 # Set default postinst log file
 POSTINST_LOGFILE ?= "${localstatedir}/log/postinstall.log"
 # Set default target for systemd images
-SYSTEMD_DEFAULT_TARGET ?= '${@bb.utils.contains("IMAGE_FEATURES", "x11-base", "graphical.target", "multi-user.target", d)}'
+SYSTEMD_DEFAULT_TARGET ?= '${@bb.utils.contains_any("IMAGE_FEATURES", [ "x11-base", "weston" ], "graphical.target", "multi-user.target", d)}'
 ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("DISTRO_FEATURES", "systemd", "set_systemd_default_target; systemd_create_users;", "", d)}'
 
 ROOTFS_POSTPROCESS_COMMAND += 'empty_var_volatile;'
+
+ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("DISTRO_FEATURES", "overlayfs", "overlayfs_qa_check;", "", d)}'
+
+inherit image-artifact-names
 
 # Sort the user and group entries in /etc by ID in order to make the content
 # deterministic. Package installs are not deterministic, causing the ordering
@@ -308,12 +312,16 @@ rootfs_check_host_user_contaminated () {
 	HOST_USER_UID="$(PSEUDO_UNLOAD=1 id -u)"
 	HOST_USER_GID="$(PSEUDO_UNLOAD=1 id -g)"
 
-	find "${IMAGE_ROOTFS}" -wholename "${IMAGE_ROOTFS}/home" -prune \
-	    -user "$HOST_USER_UID" -o -group "$HOST_USER_GID" >"$contaminated"
+	find "${IMAGE_ROOTFS}" -path "${IMAGE_ROOTFS}/home" -prune -o \
+	    -user "$HOST_USER_UID" -print -o -group "$HOST_USER_GID" -print >"$contaminated"
+
+	sed -e "s,${IMAGE_ROOTFS},," $contaminated | while read line; do
+		bbwarn "Path in the rootfs is owned by the same user or group as the user running bitbake:" $line `ls -lan ${IMAGE_ROOTFS}/$line`
+	done
 
 	if [ -s "$contaminated" ]; then
-		echo "WARNING: Paths in the rootfs are owned by the same user or group as the user running bitbake. See the logfile for the specific paths."
-		cat "$contaminated" | sed "s,^,  ,"
+		bbwarn "/etc/passwd:" `cat ${IMAGE_ROOTFS}/etc/passwd`
+		bbwarn "/etc/group:" `cat ${IMAGE_ROOTFS}/etc/group`
 	fi
 }
 
@@ -366,4 +374,27 @@ rootfs_reproducible () {
 			sed -i -e 's@\bmtime="[0-9][0-9]*"@mtime="'${REPRODUCIBLE_TIMESTAMP_ROOTFS}'"@g'
 		fi
 	fi
+}
+
+python overlayfs_qa_check() {
+    from oe.overlayfs import mountUnitName
+
+    # this is a dumb check for unit existence, not its validity
+    overlayMountPoints = d.getVarFlags("OVERLAYFS_MOUNT_POINT")
+    imagepath = d.getVar("IMAGE_ROOTFS")
+    searchpaths = [oe.path.join(imagepath, d.getVar("sysconfdir"), "systemd", "system"),
+                   oe.path.join(imagepath, d.getVar("systemd_system_unitdir"))]
+
+    allUnitExist = True;
+    for mountPoint in overlayMountPoints:
+        path = d.getVarFlag('OVERLAYFS_MOUNT_POINT', mountPoint)
+        unit = mountUnitName(path)
+
+        if not any(os.path.isfile(oe.path.join(dirpath, unit))
+                   for dirpath in searchpaths):
+            bb.warn('Unit name %s not found in systemd unit directories' % unit)
+            allUnitExist = False;
+
+    if not allUnitExist:
+        bb.fatal('Not all mount units are installed by the BSP')
 }

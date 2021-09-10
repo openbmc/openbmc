@@ -1,4 +1,4 @@
-From a3fdf3dbdd6ecc0f2550a765dcb9bb274bce8ea8 Mon Sep 17 00:00:00 2001
+From 16c1833ade4c036b30b8761d2c4a5bd85cc65c44 Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Tue, 8 Jan 2019 06:27:06 +0000
 Subject: [PATCH] Disable the check for different filesystems
@@ -15,10 +15,10 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  1 file changed, 9 deletions(-)
 
 diff --git a/config.c b/config.c
-index f027c7e..026136c 100644
+index d2488f1..1de3745 100644
 --- a/config.c
 +++ b/config.c
-@@ -1873,15 +1873,6 @@ duperror:
+@@ -1902,15 +1902,6 @@ duperror:
                              }
  
                              free(ld);
@@ -28,7 +28,7 @@ index f027c7e..026136c 100644
 -                                message(MESS_ERROR,
 -                                        "%s:%d olddir %s and log file %s "
 -                                        "are on different devices\n", configFile,
--                                        lineNum, newlog->oldDir, newlog->files[i]);
+-                                        lineNum, newlog->oldDir, newlog->files[j]);
 -                                goto error;
 -                            }
                          }

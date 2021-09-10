@@ -72,7 +72,7 @@ class LayerIndexCookerTest(LayersTest):
 
     def test_find_collection(self):
         def _check(collection, expected):
-            self.logger.debug(1, "Looking for collection %s..." % collection)
+            self.logger.debug("Looking for collection %s..." % collection)
             result = self.layerindex.find_collection(collection)
             if expected:
                 self.assertIsNotNone(result, msg="Did not find %s when it shouldn't be there" % collection)
@@ -91,7 +91,7 @@ class LayerIndexCookerTest(LayersTest):
 
     def test_find_layerbranch(self):
         def _check(name, expected):
-            self.logger.debug(1, "Looking for layerbranch %s..." % name)
+            self.logger.debug("Looking for layerbranch %s..." % name)
             result = self.layerindex.find_layerbranch(name)
             if expected:
                 self.assertIsNotNone(result, msg="Did not find %s when it shouldn't be there" % collection)

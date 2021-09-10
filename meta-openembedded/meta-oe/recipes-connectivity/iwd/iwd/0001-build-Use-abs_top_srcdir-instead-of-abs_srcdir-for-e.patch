@@ -1,0 +1,37 @@
+From b0b51d762f45ff9d320b96bd0acb89313148a446 Mon Sep 17 00:00:00 2001
+From: Zang Ruochen <zangrc.fnst@fujitsu.com>
+Date: Wed, 12 May 2021 14:28:24 +0900
+Subject: [PATCH] build: Use abs_top_srcdir instead of abs_srcdir for ell sources
+
+this makes it build when build dir is outside of sources dir
+
+Upstream-Status: Submitted [https://lists.01.org/hyperkitty/list/iwd@lists.01.org/message/SYX6Z7SUQHU7UWM6ECZTTJ6SPODIS6KB/]
+---
+ Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 68035e4..e3f7990 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -628,7 +628,7 @@ ell/shared: Makefile
+ 	$(AM_V_at)$(MKDIR_P) ell
+ 	$(AM_V_GEN)for f in $(ell_shared) ; do \
+ 		if [ ! -f $$f ] ; then \
+-			$(LN_S) -t ell -f $(abs_srcdir)/../ell/$$f ; \
++			$(LN_S) -t ell -f $(abs_top_srcdir)/ell/$$f ; \
+ 		fi \
+ 	done > $@
+ 
+@@ -636,7 +636,7 @@ ell/internal: Makefile
+ 	$(AM_V_at)$(MKDIR_P) ell
+ 	$(AM_V_GEN)for f in $(ell_headers) $(ell_sources) ; do \
+ 		if [ ! -f $$f ] ; then \
+-			$(LN_S) -t ell -f $(abs_srcdir)/../ell/$$f ; \
++			$(LN_S) -t ell -f $(abs_top_srcdir)/ell/$$f ; \
+ 		fi \
+ 	done > $@
+ 
+-- 
+2.25.1
+

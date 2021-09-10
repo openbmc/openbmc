@@ -24,7 +24,7 @@ class GlibcSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
             features.append('TOOLCHAIN_TEST_HOST_USER = "root"')
             features.append('TOOLCHAIN_TEST_HOST_PORT = "22"')
             # force single threaded test execution
-            features.append('EGLIBCPARALLELISM_task-check_pn-glibc-testsuite = "PARALLELMFLAGS="-j1""')
+            features.append('EGLIBCPARALLELISM_task-check:pn-glibc-testsuite = "PARALLELMFLAGS="-j1""')
         self.write_config("\n".join(features))
 
         bitbake("glibc-testsuite -c check")
@@ -33,7 +33,7 @@ class GlibcSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
 
         ptestsuite = "glibc-user" if ssh is None else "glibc"
         self.ptest_section(ptestsuite)
-        with open(os.path.join(builddir, "tests.sum"), "r") as f:
+        with open(os.path.join(builddir, "tests.sum"), "r",  errors='replace') as f:
             for test, result in parse_values(f):
                 self.ptest_result(ptestsuite, test, result)
 

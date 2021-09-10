@@ -3,7 +3,7 @@
 # packages.
 #
 
-DEPENDS_append_class-target = " qemu-native"
+DEPENDS:append:class-target = " qemu-native"
 inherit qemu
 
 PIXBUF_PACKAGES ??= "${PN}"
@@ -29,30 +29,30 @@ else
 fi
 }
 
-python populate_packages_append() {
+python populate_packages:append() {
     pixbuf_pkgs = d.getVar('PIXBUF_PACKAGES').split()
 
     for pkg in pixbuf_pkgs:
         bb.note("adding pixbuf postinst and postrm scripts to %s" % pkg)
-        postinst = d.getVar('pkg_postinst_%s' % pkg) or d.getVar('pkg_postinst')
+        postinst = d.getVar('pkg_postinst:%s' % pkg) or d.getVar('pkg_postinst')
         if not postinst:
             postinst = '#!/bin/sh\n'
         postinst += d.getVar('pixbufcache_common')
-        d.setVar('pkg_postinst_%s' % pkg, postinst)
+        d.setVar('pkg_postinst:%s' % pkg, postinst)
 
-        postrm = d.getVar('pkg_postrm_%s' % pkg) or d.getVar('pkg_postrm')
+        postrm = d.getVar('pkg_postrm:%s' % pkg) or d.getVar('pkg_postrm')
         if not postrm:
             postrm = '#!/bin/sh\n'
         postrm += d.getVar('pixbufcache_common')
-        d.setVar('pkg_postrm_%s' % pkg, postrm)
+        d.setVar('pkg_postrm:%s' % pkg, postrm)
 }
 
 gdkpixbuf_complete() {
 GDK_PIXBUF_FATAL_LOADER=1 ${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders --update-cache || exit 1
 }
 
-DEPENDS_append_class-native = " gdk-pixbuf-native"
-SYSROOT_PREPROCESS_FUNCS_append_class-native = " pixbufcache_sstate_postinst"
+DEPENDS:append:class-native = " gdk-pixbuf-native"
+SYSROOT_PREPROCESS_FUNCS:append:class-native = " pixbufcache_sstate_postinst"
 
 pixbufcache_sstate_postinst() {
 	mkdir -p ${SYSROOT_DESTDIR}${bindir}

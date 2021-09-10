@@ -1,7 +1,7 @@
-From 27956d4c5fb615098231cebfb8eef11057639d3c Mon Sep 17 00:00:00 2001
-From: Fabrice Fontaine <fontaine.fabrice@gmail.com>
-Date: Sun, 8 Dec 2019 18:14:38 +0100
-Subject: [PATCH] src/tbbmalloc/proxy.cpp: __GLIBC_PREREQ is not defined on
+From 5cac8b5fffa4ebf5f0090456c9e0cbf43827242a Mon Sep 17 00:00:00 2001
+From: Naveen Saini <naveen.kumar.saini@intel.com>
+Date: Wed, 7 Apr 2021 11:32:52 +0800
+Subject: [PATCH] src/tbbmalloc/proxy.cpp: __GLIBC_PREREQ is not defined on 
  musl
 
 Do not call __GLIBC_PREREQ if it is not defined otherwise build will
@@ -12,14 +12,15 @@ Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
 Upstream-Status: Submitted [https://github.com/oneapi-src/oneTBB/pull/203]
 
 Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
+Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
 ---
- src/tbbmalloc/proxy.cpp | 6 ++++--
+ src/tbbmalloc_proxy/proxy.cpp | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/src/tbbmalloc/proxy.cpp b/src/tbbmalloc/proxy.cpp
-index d96ae7a0..709ae839 100644
---- a/src/tbbmalloc/proxy.cpp
-+++ b/src/tbbmalloc/proxy.cpp
+diff --git a/src/tbbmalloc_proxy/proxy.cpp b/src/tbbmalloc_proxy/proxy.cpp
+index fe0dad89..93e68049 100644
+--- a/src/tbbmalloc_proxy/proxy.cpp
++++ b/src/tbbmalloc_proxy/proxy.cpp
 @@ -24,7 +24,8 @@
  // of aligned_alloc as required by new C++ standard, this makes it hard to
  // redefine aligned_alloc here. However, running on systems with new libc
@@ -40,3 +41,6 @@ index d96ae7a0..709ae839 100644
  #endif // __linux__ && !__ANDROID__
  
  #include "proxy.h"
+-- 
+2.17.1
+

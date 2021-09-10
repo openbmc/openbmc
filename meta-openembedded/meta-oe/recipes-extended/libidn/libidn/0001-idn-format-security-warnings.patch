@@ -1,6 +1,3 @@
-From 82f98dcbc429bbe89a9837c533cbcbc02e77c790 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <adraszik@tycoint.com>
-Date: Tue, 28 Jun 2016 12:43:31 +0100
 Subject: [PATCH] idn: fix printf() format security warnings
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -48,35 +45,37 @@ Content-Transfer-Encoding: 8bit
 |      ^
 
 Signed-off-by: André Draszik <adraszik@tycoint.com>
----
+Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+
 Upstream-Status: Pending
 
+---
  src/idn.c | 27 ++++++++++++++-------------
  1 file changed, 14 insertions(+), 13 deletions(-)
 
 diff --git a/src/idn.c b/src/idn.c
-index be1c7d1..68e4291 100644
+index f2fee11..c6e5caa 100644
 --- a/src/idn.c
 +++ b/src/idn.c
-@@ -170,7 +170,7 @@ main (int argc, char *argv[])
+@@ -169,7 +169,7 @@ main (int argc, char *argv[])
        (args_info.idna_to_unicode_given ? 1 : 0) +
        (args_info.nfkc_given ? 1 : 0) != 1)
      {
--      error (0, 0, _("only one of -s, -e, -d, -a, -u or -n can be specified"));
-+      error (0, 0, "%s", _("only one of -s, -e, -d, -a, -u or -n can be specified"));
+-      error (0, 0,
++      error (0, 0, "%s",
+ 	     _("only one of -s, -e, -d, -a, -u or -n can be specified"));
        usage (EXIT_FAILURE);
      }
+@@ -183,7 +183,7 @@ main (int argc, char *argv[])
  
-@@ -185,7 +185,7 @@ main (int argc, char *argv[])
    if (!args_info.quiet_given
-       && args_info.inputs_num == 0
-       && isatty (fileno (stdin)))
+       && args_info.inputs_num == 0 && isatty (fileno (stdin)))
 -    fprintf (stderr, _("Type each input string on a line by itself, "
 +    fprintf (stderr, "%s", _("Type each input string on a line by itself, "
  		       "terminated by a newline character.\n"));
  
    do
-@@ -197,7 +197,7 @@ main (int argc, char *argv[])
+@@ -195,7 +195,7 @@ main (int argc, char *argv[])
  	  if (feof (stdin))
  	    break;
  
@@ -85,7 +84,7 @@ index be1c7d1..68e4291 100644
  	}
  
        if (strlen (line) > 0)
-@@ -215,7 +215,7 @@ main (int argc, char *argv[])
+@@ -213,7 +213,7 @@ main (int argc, char *argv[])
  	  if (!q)
  	    {
  	      free (p);
@@ -94,7 +93,7 @@ index be1c7d1..68e4291 100644
  		     _("could not convert from UTF-8 to UCS-4"));
  	    }
  
-@@ -240,7 +240,7 @@ main (int argc, char *argv[])
+@@ -238,7 +238,7 @@ main (int argc, char *argv[])
  	  if (!q)
  	    {
  	      free (r);
@@ -103,7 +102,7 @@ index be1c7d1..68e4291 100644
  		     _("could not convert from UTF-8 to UCS-4"));
  	    }
  
-@@ -277,7 +277,7 @@ main (int argc, char *argv[])
+@@ -275,7 +275,7 @@ main (int argc, char *argv[])
  	  q = stringprep_utf8_to_ucs4 (p, -1, &len);
  	  free (p);
  	  if (!q)
@@ -112,7 +111,7 @@ index be1c7d1..68e4291 100644
  		   _("could not convert from UTF-8 to UCS-4"));
  
  	  if (args_info.debug_given)
-@@ -336,7 +336,7 @@ main (int argc, char *argv[])
+@@ -334,7 +334,7 @@ main (int argc, char *argv[])
  	  r = stringprep_ucs4_to_utf8 (q, -1, NULL, NULL);
  	  free (q);
  	  if (!r)
@@ -121,7 +120,7 @@ index be1c7d1..68e4291 100644
  		   _("could not convert from UCS-4 to UTF-8"));
  
  	  p = stringprep_utf8_to_locale (r);
-@@ -360,7 +360,7 @@ main (int argc, char *argv[])
+@@ -358,7 +358,7 @@ main (int argc, char *argv[])
  	  q = stringprep_utf8_to_ucs4 (p, -1, NULL);
  	  free (p);
  	  if (!q)
@@ -130,7 +129,7 @@ index be1c7d1..68e4291 100644
  		   _("could not convert from UCS-4 to UTF-8"));
  
  	  if (args_info.debug_given)
-@@ -438,7 +438,7 @@ main (int argc, char *argv[])
+@@ -436,7 +436,7 @@ main (int argc, char *argv[])
  	  if (!q)
  	    {
  	      free (p);
@@ -139,7 +138,7 @@ index be1c7d1..68e4291 100644
  		     _("could not convert from UCS-4 to UTF-8"));
  	    }
  
-@@ -494,7 +494,7 @@ main (int argc, char *argv[])
+@@ -492,7 +492,7 @@ main (int argc, char *argv[])
  	  r = stringprep_ucs4_to_utf8 (q, -1, NULL, NULL);
  	  free (q);
  	  if (!r)
@@ -148,7 +147,7 @@ index be1c7d1..68e4291 100644
  		   _("could not convert from UTF-8 to UCS-4"));
  
  	  p = stringprep_utf8_to_locale (r);
-@@ -523,7 +523,7 @@ main (int argc, char *argv[])
+@@ -521,7 +521,7 @@ main (int argc, char *argv[])
  	      if (!q)
  		{
  		  free (p);
@@ -157,7 +156,7 @@ index be1c7d1..68e4291 100644
  			 _("could not convert from UTF-8 to UCS-4"));
  		}
  
-@@ -537,7 +537,8 @@ main (int argc, char *argv[])
+@@ -535,7 +535,8 @@ main (int argc, char *argv[])
  	  r = stringprep_utf8_nfkc_normalize (p, -1);
  	  free (p);
  	  if (!r)
@@ -167,7 +166,7 @@ index be1c7d1..68e4291 100644
  
  	  if (args_info.debug_given)
  	    {
-@@ -547,7 +548,7 @@ main (int argc, char *argv[])
+@@ -545,7 +546,7 @@ main (int argc, char *argv[])
  	      if (!q)
  		{
  		  free (r);
@@ -177,5 +176,5 @@ index be1c7d1..68e4291 100644
  		}
  
 -- 
-2.8.1
+2.25.1
 

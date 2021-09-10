@@ -1,5 +1,6 @@
 SUMMARY = "Target Communication Framework for the Eclipse IDE"
 HOMEPAGE = "http://wiki.eclipse.org/TCF"
+DESCRIPTION = "TCF is a vendor-neutral, lightweight, extensible network protocol mainly for communicating with embedded systems (targets)."
 BUGTRACKER = "https://bugs.eclipse.org/bugs/"
 
 LICENSE = "EPL-1.0 | EDL-1.0"
@@ -9,21 +10,22 @@ SRCREV = "a022ef2f1acfd9209a1bf792dda14ae4b0d1b60f"
 PV = "1.7.0+git${SRCPV}"
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
-SRC_URI = "git://git.eclipse.org/gitroot/tcf/org.eclipse.tcf.agent \
+SRC_URI = "git://git.eclipse.org/r/tcf/org.eclipse.tcf.agent.git;protocol=https \
            file://fix_ranlib.patch \
            file://ldflags.patch \
            file://tcf-agent.init \
            file://tcf-agent.service \
+           file://0001-Fixed-copyright-messages.patch \
           "
 
 DEPENDS = "util-linux openssl"
-RDEPENDS_${PN} = "bash"
+RDEPENDS:${PN} = "bash"
 
 S = "${WORKDIR}/git/agent"
 
 inherit update-rc.d systemd
 
-SYSTEMD_SERVICE_${PN} = "tcf-agent.service"
+SYSTEMD_SERVICE:${PN} = "tcf-agent.service"
 
 INITSCRIPT_NAME = "tcf-agent"
 INITSCRIPT_PARAMS = "start 99 3 5 . stop 20 0 1 2 6 ."
@@ -41,13 +43,14 @@ LCL_STOP_SERVICES = "-DSERVICE_RunControl=0 -DSERVICE_Breakpoints=0 \
 
 # These features don't compile for several cases.
 #
-CFLAGS_append_arc = " ${LCL_STOP_SERVICES}"
-CFLAGS_append_mips = " ${LCL_STOP_SERVICES}"
-CFLAGS_append_mips64 = " ${LCL_STOP_SERVICES}"
-CFLAGS_append_libc-musl = " ${LCL_STOP_SERVICES}"
-CFLAGS_append_powerpc64 = " ${LCL_STOP_SERVICES}"
-CFLAGS_append_powerpc64le = " ${LCL_STOP_SERVICES}"
-CFLAGS_append_riscv64 = " ${LCL_STOP_SERVICES}"
+CFLAGS:append:arc = " ${LCL_STOP_SERVICES}"
+CFLAGS:append:mips = " ${LCL_STOP_SERVICES}"
+CFLAGS:append:mips64 = " ${LCL_STOP_SERVICES}"
+CFLAGS:append:libc-musl = " ${LCL_STOP_SERVICES}"
+CFLAGS:append:powerpc64 = " ${LCL_STOP_SERVICES}"
+CFLAGS:append:powerpc64le = " ${LCL_STOP_SERVICES}"
+CFLAGS:append:riscv64 = " ${LCL_STOP_SERVICES}"
+CFLAGS:append:riscv32 = " ${LCL_STOP_SERVICES}"
 
 do_install() {
 	oe_runmake install INSTALLROOT=${D}

@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: MIT
 #
 
+import tempfile
+import textwrap
+import bb.tinfoil
 import oe.path
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake
@@ -21,8 +24,8 @@ class Fetch(OESelftestTestCase):
         # No mirrors, should use git to fetch successfully
         features = """
 DL_DIR = "%s"
-MIRRORS_forcevariable = ""
-PREMIRRORS_forcevariable = ""
+MIRRORS:forcevariable = ""
+PREMIRRORS:forcevariable = ""
 """ % dldir
         self.write_config(features)
         oe.path.remove(dldir, recurse=True)
@@ -32,8 +35,8 @@ PREMIRRORS_forcevariable = ""
         features = """
 DL_DIR = "%s"
 GIT_PROXY_COMMAND = "false"
-MIRRORS_forcevariable = ""
-PREMIRRORS_forcevariable = ""
+MIRRORS:forcevariable = ""
+PREMIRRORS:forcevariable = ""
 """ % dldir
         self.write_config(features)
         oe.path.remove(dldir, recurse=True)
@@ -44,8 +47,60 @@ PREMIRRORS_forcevariable = ""
         features = """
 DL_DIR = "%s"
 GIT_PROXY_COMMAND = "false"
-MIRRORS_forcevariable = "git://.*/.* http://downloads.yoctoproject.org/mirror/sources/"
+MIRRORS:forcevariable = "git://.*/.* http://downloads.yoctoproject.org/mirror/sources/"
 """ % dldir
         self.write_config(features)
         oe.path.remove(dldir, recurse=True)
         bitbake("dbus-wait -c fetch -f")
+
+
+class Dependencies(OESelftestTestCase):
+    def write_recipe(self, content, tempdir):
+        f = os.path.join(tempdir, "test.bb")
+        with open(f, "w") as fd:
+            fd.write(content)
+        return f
+
+    def test_dependencies(self):
+        """
+        Verify that the correct dependencies are generated for specific SRC_URI entries.
+        """
+
+        with bb.tinfoil.Tinfoil() as tinfoil, tempfile.TemporaryDirectory(prefix="selftest-fetch") as tempdir:
+            tinfoil.prepare(config_only=False, quiet=2)
+
+            r = """
+            LICENSE="CLOSED"
+            SRC_URI="http://example.com/tarball.zip"
+            """
+            f = self.write_recipe(textwrap.dedent(r), tempdir)
+            d = tinfoil.parse_recipe_file(f)
+            self.assertIn("wget-native", d.getVarFlag("do_fetch", "depends"))
+            self.assertIn("unzip-native", d.getVarFlag("do_unpack", "depends"))
+
+            # Verify that the downloadfilename overrides the URI
+            r = """
+            LICENSE="CLOSED"
+            SRC_URI="https://example.com/tarball;downloadfilename=something.zip"
+            """
+            f = self.write_recipe(textwrap.dedent(r), tempdir)
+            d = tinfoil.parse_recipe_file(f)
+            self.assertIn("wget-native", d.getVarFlag("do_fetch", "depends"))
+            self.assertIn("unzip-native", d.getVarFlag("do_unpack", "depends") or "")
+
+            r = """
+            LICENSE="CLOSED"
+            SRC_URI="ftp://example.com/tarball.lz"
+            """
+            f = self.write_recipe(textwrap.dedent(r), tempdir)
+            d = tinfoil.parse_recipe_file(f)
+            self.assertIn("wget-native", d.getVarFlag("do_fetch", "depends"))
+            self.assertIn("lzip-native", d.getVarFlag("do_unpack", "depends"))
+
+            r = """
+            LICENSE="CLOSED"
+            SRC_URI="git://example.com/repo"
+            """
+            f = self.write_recipe(textwrap.dedent(r), tempdir)
+            d = tinfoil.parse_recipe_file(f)
+            self.assertIn("git-native", d.getVarFlag("do_fetch", "depends"))

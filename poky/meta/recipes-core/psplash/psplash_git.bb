@@ -44,7 +44,7 @@ python __anonymous() {
             pkgs.append(outname)
         localpaths.append(flocal)
 
-    # Set these so that we have less work to do in do_compile and do_install_append
+    # Set these so that we have less work to do in do_compile and do_install:append
     d.setVar("SPLASH_INSTALL", " ".join(pkgs))
     d.setVar("SPLASH_LOCALPATHS", " ".join(localpaths))
     for p in pkgs:
@@ -54,12 +54,12 @@ python __anonymous() {
     for p in pkgs:
         ep = '%s%s' % (mlprefix, p)
         epsplash = '%s%s' % (mlprefix, 'psplash')
-        d.setVar("FILES_%s" % ep, "${bindir}/%s" % p)
-        d.setVar("ALTERNATIVE_%s" % ep, 'psplash')
+        d.setVar("FILES:%s" % ep, "${bindir}/%s" % p)
+        d.setVar("ALTERNATIVE:%s" % ep, 'psplash')
         d.setVarFlag("ALTERNATIVE_TARGET_%s" % ep, 'psplash', '${bindir}/%s' % p)
-        d.appendVar("RDEPENDS_%s" % ep, " %s" % pn)
+        d.appendVar("RDEPENDS:%s" % ep, " %s" % pn)
         if p == "psplash-default":
-            d.appendVar("RRECOMMENDS_%s" % pn, " %s" % ep)
+            d.appendVar("RRECOMMENDS:%s" % pn, " %s" % ep)
 }
 
 S = "${WORKDIR}/git"
@@ -98,10 +98,14 @@ python do_compile () {
         shutil.copyfile("psplash", outputfile)
 }
 
-do_install_append() {
+do_install:append() {
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
 		install -d ${D}${sysconfdir}/init.d/
 		install -m 0755 ${WORKDIR}/psplash-init ${D}${sysconfdir}/init.d/psplash.sh
+
+		# make fifo for psplash
+		install -d ${D}/mnt
+		mkfifo ${D}/mnt/psplash_fifo
 	fi
 
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
@@ -118,7 +122,9 @@ do_install_append() {
 }
 
 SYSTEMD_PACKAGES = "${@bb.utils.contains('DISTRO_FEATURES','systemd','${PN}','',d)}"
-SYSTEMD_SERVICE_${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'systemd', 'psplash-start.service psplash-systemd.service', '', d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'systemd', 'psplash-start.service psplash-systemd.service', '', d)}"
 
 INITSCRIPT_NAME = "psplash.sh"
 INITSCRIPT_PARAMS = "start 0 S . stop 20 0 1 6 ."
+
+FILES:${PN} += "/mnt"

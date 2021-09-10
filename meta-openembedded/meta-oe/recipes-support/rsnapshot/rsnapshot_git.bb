@@ -6,22 +6,24 @@ SECTION = "console/network"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a"
 
-RDEPENDS_${PN} = "rsync \
+RDEPENDS:${PN} = "rsync \
                   perl \
                   perl-module-dirhandle \
                   perl-module-cwd \
                   perl-module-getopt-std \
                   perl-module-file-path \
                   perl-module-file-stat \
+                  perl-module-file-spec \
                   perl-module-posix \
                   perl-module-fcntl \
                   perl-module-io-file \
                   perl-module-constant \
                   perl-module-overloading \
+                  perl-module-ipc-open3 \
                  "
 
-SRCREV = "27209563f924a22f510698ea225f53ea52f07cb4"
-PV = "1.4.2+git${SRCPV}"
+SRCREV = "4dc82bfe6be3f83fcfa94946dcf6accfd6a18031"
+PV = "1.4.4+git${SRCPV}"
 
 SRC_URI = "git://github.com/DrHyde/${BPN};branch=master;protocol=git \
            file://configure-fix-cmd_rsync.patch \
@@ -46,7 +48,7 @@ EXTRA_OECONF += "--without-cp \
 
 # Create 't/include.ac' before starting the autoreconf to fix configure
 # error: configure.ac:302: file 't/include.ac' does not exist
-do_configure_prepend(){
+do_configure:prepend(){
 	saved_dir=`pwd`
 	cd ${S}; ./autogen.sh
 	cd ${saved_dir}

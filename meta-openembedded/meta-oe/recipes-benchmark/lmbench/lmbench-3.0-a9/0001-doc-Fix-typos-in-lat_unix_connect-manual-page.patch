@@ -1,0 +1,30 @@
+From 9bf2b363c5173c03adecf366f116415dbc559017 Mon Sep 17 00:00:00 2001
+From: Yanfei Xu <yanfei.xu@windriver.com>
+Date: Tue, 23 Feb 2021 10:54:26 +0800
+Subject: [PATCH 1/2] doc: Fix typos in lat_unix_connect manual page
+
+Signed-off-by: Yanfei Xu <yanfei.xu@windriver.com>
+---
+ doc/lat_unix_connect.8 | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/doc/lat_unix_connect.8 b/doc/lat_unix_connect.8
+index b42e9a4..5ab1a51 100644
+--- a/doc/lat_unix_connect.8
++++ b/doc/lat_unix_connect.8
+@@ -25,9 +25,9 @@ is a client/server program that measures interprocess
+ connection latencies.   The benchmark times the creation and connection of
+ an AF_UNIX socket to a local server.  
+ .LP
+-.B lat_connect
+-has three forms of usage: as a server (-s), as a client (lat_connect),
+-and as a shutdown (lat_connect -S).
++.B lat_unix_connect
++has three forms of usage: as a server (-s), as a client (lat_unix_connect),
++and as a shutdown (lat_unix_connect -S).
+ .SH OUTPUT
+ The reported time is in microseconds per connection.
+ Output format is like so
+-- 
+2.27.0
+

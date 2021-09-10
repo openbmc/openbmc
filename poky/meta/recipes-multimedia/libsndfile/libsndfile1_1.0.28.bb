@@ -1,4 +1,7 @@
 SUMMARY = "Audio format Conversion library"
+DESCRIPTION = "Library for reading and writing files containing sampled \
+sound (such as MS Windows WAV and the Apple/SGI AIFF format) through \
+one standard library interface."
 HOMEPAGE = "http://www.mega-nerd.com/libsndfile"
 AUTHOR = "Erik de Castro Lopo"
 DEPENDS = "flac libogg libvorbis"
@@ -34,7 +37,7 @@ PACKAGECONFIG[regtest] = "--enable-sqlite,--disable-sqlite,sqlite3"
 
 inherit autotools lib_package pkgconfig multilib_header
 
-do_install_append() {
+do_install:append() {
     oe_multilib_header sndfile.h
 }
 

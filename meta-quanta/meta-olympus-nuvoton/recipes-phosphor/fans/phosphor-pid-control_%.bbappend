@@ -1,19 +1,19 @@
-FILESEXTRAPATHS_prepend_olympus-nuvoton := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:olympus-nuvoton := "${THISDIR}/${PN}:"
 
-SRC_URI_append_olympus-nuvoton = " file://config-olympus-nuvoton.json"
-SRC_URI_append_olympus-nuvoton = " file://fan-full-speed.sh"
-SRC_URI_append_olympus-nuvoton = " file://phosphor-pid-control.service"
-SRC_URI_append_olympus-nuvoton = " file://fan-reboot-control.service"
+SRC_URI:append:olympus-nuvoton = " file://config-olympus-nuvoton.json"
+SRC_URI:append:olympus-nuvoton = " file://fan-full-speed.sh"
+SRC_URI:append:olympus-nuvoton = " file://phosphor-pid-control.service"
+SRC_URI:append:olympus-nuvoton = " file://fan-reboot-control.service"
 
-FILES_${PN}_append_olympus-nuvoton = " ${bindir}/fan-full-speed.sh"
-FILES_${PN}_append_olympus-nuvoton = " ${datadir}/swampd/config.json"
+FILES:${PN}:append:olympus-nuvoton = " ${bindir}/fan-full-speed.sh"
+FILES:${PN}:append:olympus-nuvoton = " ${datadir}/swampd/config.json"
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
-SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " phosphor-pid-control.service"
-SYSTEMD_SERVICE_${PN}_append_olympus-nuvoton = " fan-reboot-control.service"
+SYSTEMD_SERVICE:${PN}:append:olympus-nuvoton = " phosphor-pid-control.service"
+SYSTEMD_SERVICE:${PN}:append:olympus-nuvoton = " fan-reboot-control.service"
 
-do_install_append_olympus-nuvoton() {
+do_install:append:olympus-nuvoton() {
     install -d ${D}/${bindir}
     install -m 0755 ${WORKDIR}/fan-full-speed.sh ${D}/${bindir}
 

@@ -23,7 +23,7 @@ SRC_URI[sha256sum] = "da600573dfa827d88ce114e0fed30210689381bbdcff543c931e4d6a2e
 inherit autotools pkgconfig
 
 PACKAGE_BEFORE_PN += "${PN}-server"
-FILES_${PN}-server = "${bindir}/mosh-server"
+FILES:${PN}-server = "${bindir}/mosh-server"
 
 NEEDED_PERL_MODULES = "\
     perl-module-socket \
@@ -34,9 +34,9 @@ NEEDED_PERL_MODULES = "\
 "
 
 # mosh uses SSH to authenticate and the client uses OpenSSH-specific features
-RDEPENDS_${PN} += "openssh-ssh ${NEEDED_PERL_MODULES}"
+RDEPENDS:${PN} += "openssh-ssh ${NEEDED_PERL_MODULES}"
 # The server seemed not to work with dropbear either
-RDEPENDS_${PN}-server += "openssh-sshd ${NEEDED_PERL_MODULES}"
+RDEPENDS:${PN}-server += "openssh-sshd ${NEEDED_PERL_MODULES}"
 
 # Fails to build with thumb-1 (qemuarm)
 #| {standard input}: Assembler messages:

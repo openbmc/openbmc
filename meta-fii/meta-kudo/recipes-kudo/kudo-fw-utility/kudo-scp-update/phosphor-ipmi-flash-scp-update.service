@@ -1,0 +1,9 @@
+[Unit]
+Description=Phosphor-ipmi-flash update main EEPROM SCP firmware service
+
+[Service]
+ExecStart=/usr/sbin/kudo-fw.sh scp /run/initramfs/scp-fw.slim
+Type=oneshot
+
+[Install]
+WantedBy=phosphor-ipmi-flash-scp-update.target

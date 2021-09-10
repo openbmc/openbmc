@@ -70,7 +70,7 @@ class ClearCase(FetchMethod):
         return ud.type in ['ccrc']
 
     def debug(self, msg):
-        logger.debug(1, "ClearCase: %s", msg)
+        logger.debug("ClearCase: %s", msg)
 
     def urldata_init(self, ud, d):
         """

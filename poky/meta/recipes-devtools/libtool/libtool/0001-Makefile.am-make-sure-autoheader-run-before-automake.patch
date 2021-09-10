@@ -1,0 +1,35 @@
+From e82c06584f02e3e4487aa73aa05981e2a35dc6d1 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Tue, 13 Apr 2021 07:17:29 +0000
+Subject: [PATCH] Makefile.am: make sure autoheader run before automake
+
+When use automake to generate Makefile.in from Makefile.am, there
+comes below race:
+ | configure.ac:45: error: required file 'config-h.in' not found
+
+It is because the file config-h.in in updating process by autoheader,
+so make automake run after autoheader to avoid the above race.
+
+Upstream-Status: Submitted [libtool-patches@gnu.org maillist]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 2752ecc..29950db 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -328,7 +328,7 @@ EXTRA_DIST     += $(lt_aclocal_m4) \
+ 		  $(lt_obsolete_m4) \
+ 		  $(stamp_mk)
+ 
+-$(lt_Makefile_in): $(lt_Makefile_am) $(lt_aclocal_m4)
++$(lt_Makefile_in): $(lt_Makefile_am) $(lt_aclocal_m4) $(lt_config_h_in)
+ 	$(AM_V_GEN)cd '$(srcdir)/$(ltdl_dir)' && $(AUTOMAKE) Makefile
+ 
+ # Don't let unused scripts leak into the libltdl Makefile
+-- 
+2.29.2
+

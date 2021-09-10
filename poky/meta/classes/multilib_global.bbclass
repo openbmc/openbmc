@@ -1,6 +1,7 @@
 def preferred_ml_updates(d):
-    # If any PREFERRED_PROVIDER or PREFERRED_VERSION are set,
-    # we need to mirror these variables in the multilib case;
+    # If any of PREFERRED_PROVIDER, PREFERRED_RPROVIDER, REQUIRED_VERSION
+    # or PREFERRED_VERSION are set, we need to mirror these variables in
+    # the multilib case;
     multilibs = d.getVar('MULTILIBS') or ""
     if not multilibs:
         return
@@ -11,43 +12,51 @@ def preferred_ml_updates(d):
         if len(eext) > 1 and eext[0] == 'multilib':
             prefixes.append(eext[1])
 
-    versions = []
+    required_versions = []
+    preferred_versions = []
     providers = []
     rproviders = []
     for v in d.keys():
+        if v.startswith("REQUIRED_VERSION_"):
+            required_versions.append(v)
         if v.startswith("PREFERRED_VERSION_"):
-            versions.append(v)
+            preferred_versions.append(v)
         if v.startswith("PREFERRED_PROVIDER_"):
             providers.append(v)
         if v.startswith("PREFERRED_RPROVIDER_"):
             rproviders.append(v)
 
-    for v in versions:
-        val = d.getVar(v, False)
-        pkg = v.replace("PREFERRED_VERSION_", "")
-        if pkg.endswith("-native") or "-crosssdk-" in pkg or pkg.startswith(("nativesdk-", "virtual/nativesdk-")):
-            continue
-        if '-cross-' in pkg and '${' in pkg:
+    def sort_versions(versions, keyword):
+        version_str = "_".join([keyword, "VERSION", ""])
+        for v in versions:
+            val = d.getVar(v, False)
+            pkg = v.replace(version_str, "")
+            if pkg.endswith("-native") or "-crosssdk-" in pkg or pkg.startswith(("nativesdk-", "virtual/nativesdk-")):
+                continue
+            if '-cross-' in pkg and '${' in pkg:
+                for p in prefixes:
+                    localdata = bb.data.createCopy(d)
+                    override = ":virtclass-multilib-" + p
+                    localdata.setVar("OVERRIDES", localdata.getVar("OVERRIDES", False) + override)
+                    if "-canadian-" in pkg:
+                        newname = localdata.expand(v)
+                    else:
+                        newname = localdata.expand(v).replace(version_str, version_str + p + '-')
+                    if newname != v:
+                        newval = localdata.expand(val)
+                        d.setVar(newname, newval)
+                # Avoid future variable key expansion
+                vexp = d.expand(v)
+                if v != vexp and d.getVar(v, False):
+                    d.renameVar(v, vexp)
+                continue
             for p in prefixes:
-                localdata = bb.data.createCopy(d)
-                override = ":virtclass-multilib-" + p
-                localdata.setVar("OVERRIDES", localdata.getVar("OVERRIDES", False) + override)
-                if "-canadian-" in pkg:
-                    newname = localdata.expand(v)
-                else:
-                    newname = localdata.expand(v).replace("PREFERRED_VERSION_", "PREFERRED_VERSION_" + p + '-')
-                if newname != v:
-                    newval = localdata.expand(val)
-                    d.setVar(newname, newval)
-            # Avoid future variable key expansion
-            vexp = d.expand(v)
-            if v != vexp and d.getVar(v, False):
-                d.renameVar(v, vexp)
-            continue
-        for p in prefixes:
-            newname = "PREFERRED_VERSION_" + p + "-" + pkg
-            if not d.getVar(newname, False):
-                d.setVar(newname, val)
+                newname = version_str + p + "-" + pkg
+                if not d.getVar(newname, False):
+                    d.setVar(newname, val)
+
+    sort_versions(required_versions, "REQUIRED")
+    sort_versions(preferred_versions, "PREFERRED")
 
     for prov in providers:
         val = d.getVar(prov, False)
@@ -155,8 +164,8 @@ def preferred_ml_updates(d):
 python multilib_virtclass_handler_vendor () {
     if isinstance(e, bb.event.ConfigParsed):
         for v in e.data.getVar("MULTILIB_VARIANTS").split():
-            if e.data.getVar("TARGET_VENDOR_virtclass-multilib-" + v, False) is None:
-                e.data.setVar("TARGET_VENDOR_virtclass-multilib-" + v, e.data.getVar("TARGET_VENDOR", False) + "ml" + v)
+            if e.data.getVar("TARGET_VENDOR:virtclass-multilib-" + v, False) is None:
+                e.data.setVar("TARGET_VENDOR:virtclass-multilib-" + v, e.data.getVar("TARGET_VENDOR", False) + "ml" + v)
         preferred_ml_updates(e.data)
 }
 addhandler multilib_virtclass_handler_vendor
@@ -198,13 +207,13 @@ python multilib_virtclass_handler_global () {
             if rprovs.strip():
                 e.data.setVar("RPROVIDES", rprovs)
 
-            # Process RPROVIDES_${PN}...
+            # Process RPROVIDES:${PN}...
             for pkg in (e.data.getVar("PACKAGES") or "").split():
-                origrprovs = rprovs = localdata.getVar("RPROVIDES_%s" % pkg) or ""
+                origrprovs = rprovs = localdata.getVar("RPROVIDES:%s" % pkg) or ""
                 for clsextend in clsextends:
-                    rprovs = rprovs + " " + clsextend.map_variable("RPROVIDES_%s" % pkg, setvar=False)
+                    rprovs = rprovs + " " + clsextend.map_variable("RPROVIDES:%s" % pkg, setvar=False)
                     rprovs = rprovs + " " + clsextend.extname + "-" + pkg
-                e.data.setVar("RPROVIDES_%s" % pkg, rprovs)
+                e.data.setVar("RPROVIDES:%s" % pkg, rprovs)
 }
 
 addhandler multilib_virtclass_handler_global

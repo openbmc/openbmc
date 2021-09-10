@@ -13,4 +13,4 @@ PE = "1"
 SRC_URI[md5sum] = "eab5bbd7642e5c784429307ec210d198"
 SRC_URI[sha256sum] = "bbca7c6aa59939b9f6a0fb9fff15dfd62176420ffd4ae30c8d92a6a125fbe6b0"
 
-FILES_${PN} += "${datadir}/X11"
+FILES:${PN} += "${datadir}/X11"

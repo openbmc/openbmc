@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit obmc-phosphor-systemd
 
-RDEPENDS_${PN} += "i2c-tools bash"
+RDEPENDS:${PN} += "i2c-tools bash"
 
 S = "${WORKDIR}"
 SRC_URI += "file://vrm-control.sh \
@@ -23,5 +23,5 @@ INSTFMT = "vrm-control@{0}.service"
 TGTFMT = "obmc-chassis-poweron@{0}.target"
 FMT = "../${TMPL}:${TGTFMT}.requires/${INSTFMT}"
 
-SYSTEMD_SERVICE_${PN} += "${TMPL}"
-SYSTEMD_LINK_${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_SERVICE:${PN} += "${TMPL}"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT', 'OBMC_CHASSIS_INSTANCES')}"

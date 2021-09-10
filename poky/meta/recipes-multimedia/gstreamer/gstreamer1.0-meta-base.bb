@@ -18,13 +18,13 @@ PACKAGES = "\
     gstreamer1.0-meta-debug \
     gstreamer1.0-meta-video"
 
-ALLOW_EMPTY_gstreamer1.0-meta-base = "1"
-ALLOW_EMPTY_gstreamer1.0-meta-x11-base = "1"
-ALLOW_EMPTY_gstreamer1.0-meta-audio = "1"
-ALLOW_EMPTY_gstreamer1.0-meta-debug = "1"
-ALLOW_EMPTY_gstreamer1.0-meta-video = "1"
+ALLOW_EMPTY:gstreamer1.0-meta-base = "1"
+ALLOW_EMPTY:gstreamer1.0-meta-x11-base = "1"
+ALLOW_EMPTY:gstreamer1.0-meta-audio = "1"
+ALLOW_EMPTY:gstreamer1.0-meta-debug = "1"
+ALLOW_EMPTY:gstreamer1.0-meta-video = "1"
 
-RDEPENDS_gstreamer1.0-meta-base = "\
+RDEPENDS:gstreamer1.0-meta-base = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gstreamer1.0-meta-x11-base', '', d)} \
     gstreamer1.0 \
     gstreamer1.0-plugins-base-playback \
@@ -39,11 +39,11 @@ RDEPENDS_gstreamer1.0-meta-base = "\
     gstreamer1.0-plugins-good-autodetect \
     gstreamer1.0-plugins-good-soup"
 
-RRECOMMENDS_gstreamer1.0-meta-x11-base = "\
+RRECOMMENDS:gstreamer1.0-meta-x11-base = "\
     gstreamer1.0-plugins-base-ximagesink \
     gstreamer1.0-plugins-base-xvimagesink"
 
-RDEPENDS_gstreamer1.0-meta-audio = "\
+RDEPENDS:gstreamer1.0-meta-audio = "\
     gstreamer1.0-meta-base \
     gstreamer1.0-plugins-base-vorbis \
     gstreamer1.0-plugins-base-ogg \
@@ -51,18 +51,18 @@ RDEPENDS_gstreamer1.0-meta-audio = "\
     gstreamer1.0-plugins-good-flac \
     ${COMMERCIAL_AUDIO_PLUGINS}"
 
-RDEPENDS_gstreamer1.0-meta-debug = "\
+RDEPENDS:gstreamer1.0-meta-debug = "\
     gstreamer1.0-meta-base \
     gstreamer1.0-plugins-good-debug \
     gstreamer1.0-plugins-base-audiotestsrc \
     gstreamer1.0-plugins-base-videotestsrc"
 
-RDEPENDS_gstreamer1.0-meta-video = "\
+RDEPENDS:gstreamer1.0-meta-video = "\
     gstreamer1.0-meta-base \
     gstreamer1.0-plugins-good-avi \
     gstreamer1.0-plugins-good-matroska \
     gstreamer1.0-plugins-base-theora \
     ${COMMERCIAL_VIDEO_PLUGINS}"
 
-RRECOMMENDS_gstreamer1.0-meta-video = "\
+RRECOMMENDS:gstreamer1.0-meta-video = "\
     gstreamer1.0-meta-audio"

@@ -1,0 +1,32 @@
+From 712a101c9aa2eb8548e4d0100a4a2eaf76fad164 Mon Sep 17 00:00:00 2001
+From: Jesper Lloyd <jpl.lloyd@gmail.com>
+Date: Wed, 20 Jan 2021 20:21:53 +0100
+Subject: [PATCH] make build compatible w. autoconf 2.7
+
+Workaround for stricter behaviour (due to a bugfix) in 2.7,
+which makes a failing intltoolize macro check fail the build.
+
+Fix provided by hosiet.
+
+Upstream-Status: Backport [https://github.com/mypaint/libmypaint/commit/a6bac154db018e1f1cc4dbddc34f6c8422c891fb]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 416d9fe..48b9d02 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -248,7 +248,7 @@ if test "x$enable_i18n" != "xno"; then
+   AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
+                      [The prefix for our gettext translation domains.])
+   AC_SUBST(GETTEXT_PACKAGE)
+-  IT_PROG_INTLTOOL
++IT_PROG_INTLTOOL
+   AM_GLIB_GNU_GETTEXT
+ 
+   dnl Debian: stdlib
+-- 
+2.30.0
+

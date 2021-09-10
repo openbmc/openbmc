@@ -9,12 +9,11 @@ LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=8;endline=8;md5=e910b35b0ef4e1f665
 
 inherit pypi
 
-PYPI_PACKAGE = "smmap2"
+PYPI_PACKAGE = "smmap"
 
-SRC_URI[md5sum] = "1c59a985be5aa645c4c5a4e063a40dd5"
-SRC_URI[sha256sum] = "29a9ffa0497e7f2be94ca0ed1ca1aa3cd4cf25a1f6b4f5f87f74b46ed91d609a"
+SRC_URI[sha256sum] = "7e65386bd122d45405ddf795637b7f7d2b532e7e401d46bbe3fb49b9986d5182"
 
-RDEPENDS_${PN} += "${PYTHON_PN}-codecs \
+RDEPENDS:${PN} += "${PYTHON_PN}-codecs \
                    ${PYTHON_PN}-mmap \
 "
 BBCLASSEXTEND = "native nativesdk"

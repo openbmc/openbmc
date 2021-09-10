@@ -1,4 +1,4 @@
-From ee47e205255928679701a5b769bd7ae0f815119d Mon Sep 17 00:00:00 2001
+From 1f50e0a09d828be8f5b1f28db9af0b12492a1553 Mon Sep 17 00:00:00 2001
 From: Gabriel Barbu <gabriel.barbu@enea.com>
 Date: Thu, 25 Jul 2013 15:28:33 +0200
 Subject: [PATCH] strace: Add ptest
@@ -10,31 +10,32 @@ Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
 Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
 
 ---
- tests/Makefile.am | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ tests/Makefile.am | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index 8cf4c36..66162eb 100644
+index 55566ee..a7ae6f9 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -15,6 +15,7 @@ SIZEOF_LONG = @SIZEOF_LONG@
+@@ -16,6 +16,7 @@ SIZEOF_LONG = @SIZEOF_LONG@
  MPERS_NAME =
  MPERS_CC_FLAGS =
  ARCH_MFLAGS =
 +TEST_SUITE_LOG = test-suite.log
  AM_CFLAGS = $(WARN_CFLAGS)
- AM_CPPFLAGS = $(ARCH_MFLAGS) \
- 	      -I$(builddir) \
-@@ -538,3 +539,21 @@ BUILT_SOURCES = ksysent.h
+ bundled_CPPFLAGS =
+ if USE_BUNDLED_HEADERS
+@@ -703,3 +704,22 @@ BUILT_SOURCES = ksysent.h
  CLEANFILES = ksysent.h
  
- include ../scno.am
+ include ../src/scno.am
 +
 +buildtest-TESTS: $(check_PROGRAMS) $(TESTS)
 +
 +install-ptest:
-+	install $(BUILDDIR)/strace $(DESTDIR)
-+	install $(srcdir)/../strace-log-merge $(DESTDIR)
++	install -d $(DESTDIR)/src
++	install $(BUILDDIR)/src/strace $(DESTDIR)/src
++	install $(srcdir)/../src/strace-log-merge $(DESTDIR)/src
 +	install -d $(DESTDIR)/$(TESTDIR)
 +	cp $(BUILDDIR)/$(TESTDIR)/Makefile $(DESTDIR)/$(TESTDIR)
 +	sed -i -e 's/^Makefile:/_Makefile:/' $(DESTDIR)/$(TESTDIR)/Makefile

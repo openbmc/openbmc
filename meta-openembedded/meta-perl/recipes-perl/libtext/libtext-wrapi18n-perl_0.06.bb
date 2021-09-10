@@ -25,7 +25,7 @@ S = "${WORKDIR}/Text-WrapI18N-${PV}"
 
 DEPENDS = "libtext-charwidth-perl"
 
-RDEPENDS_${PN} = "libtext-charwidth-perl"
+RDEPENDS:${PN} = "libtext-charwidth-perl"
 
 inherit cpan
 

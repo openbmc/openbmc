@@ -1,5 +1,6 @@
 SUMMARY = "Stream EDitor (text filtering utility)"
 HOMEPAGE = "http://www.gnu.org/software/sed/"
+DESCRIPTION = "sed (stream editor) is a non-interactive command-line text editor."
 LICENSE = "GPLv3+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e \
                     file://sed/sed.h;beginline=1;endline=15;md5=fb3c7e6fbca6f66943859153d4be8efe \
@@ -17,8 +18,8 @@ inherit autotools texinfo update-alternatives gettext ptest
 
 PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux"
 
-RDEPENDS_${PN}-ptest += "make gawk perl perl-module-filehandle perl-module-file-compare perl-module-file-find perl-module-file-temp perl-module-file-stat"
-RRECOMMENDS_${PN}-ptest_append_libc-glibc = " locale-base-ru-ru locale-base-en-us locale-base-el-gr.iso-8859-7"
+RDEPENDS:${PN}-ptest += "make gawk perl perl-module-filehandle perl-module-file-compare perl-module-file-find perl-module-file-temp perl-module-file-stat"
+RRECOMMENDS:${PN}-ptest:append:libc-glibc = " locale-base-ru-ru locale-base-en-us locale-base-el-gr.iso-8859-7"
 
 EXTRA_OECONF = "--disable-acl \
                "
@@ -32,7 +33,7 @@ do_install () {
 	fi
 }
 
-ALTERNATIVE_${PN} = "sed"
+ALTERNATIVE:${PN} = "sed"
 ALTERNATIVE_LINK_NAME[sed] = "${base_bindir}/sed"
 ALTERNATIVE_PRIORITY = "100"
 
@@ -62,4 +63,6 @@ do_install_ptest() {
 	    -i ${D}${PTEST_PATH}/Makefile
 }
 
-RPROVIDES_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sed', '', d)}"
+RPROVIDES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', '/bin/sed', '', d)}"
+
+BBCLASSEXTEND = "nativesdk"

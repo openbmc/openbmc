@@ -33,7 +33,7 @@ inherit autotools pkgconfig binconfig-disabled lib_package
 
 EXTRA_OECONF = "--libdir=${base_libdir}"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${libdir}
 	if [ ! ${D}${libdir} -ef ${D}${base_libdir} ]; then
 		mv ${D}${base_libdir}/pkgconfig ${D}${libdir}

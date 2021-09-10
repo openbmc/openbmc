@@ -15,47 +15,62 @@ XSERVER = " \
     "
 
 RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
+    overlays/overlay_map.dtb \
     overlays/at86rf233.dtbo \
     overlays/disable-bt.dtbo \
     overlays/dwc2.dtbo \
+    overlays/gpio-ir.dtbo \
+    overlays/gpio-ir-tx.dtbo \
     overlays/gpio-key.dtbo \
     overlays/hifiberry-amp.dtbo \
     overlays/hifiberry-dac.dtbo \
     overlays/hifiberry-dacplus.dtbo \
     overlays/hifiberry-digi.dtbo \
+    overlays/justboom-both.dtbo \
+    overlays/justboom-dac.dtbo \
+    overlays/justboom-digi.dtbo \
     overlays/i2c-rtc.dtbo \
+    overlays/imx219.dtbo \
+    overlays/imx477.dtbo \
     overlays/iqaudio-dac.dtbo \
     overlays/iqaudio-dacplus.dtbo \
-    overlays/miniuart-bt.dtbo \
     overlays/mcp2515-can0.dtbo \
+    overlays/mcp2515-can1.dtbo \
+    overlays/miniuart-bt.dtbo \
     overlays/pitft22.dtbo \
-    overlays/pitft28-resistive.dtbo \
     overlays/pitft28-capacitive.dtbo \
+    overlays/pitft28-resistive.dtbo \
     overlays/pitft35-resistive.dtbo \
     overlays/pps-gpio.dtbo \
     overlays/rpi-ft5406.dtbo \
     overlays/rpi-poe.dtbo \
-    overlays/vc4-kms-v3d.dtbo \
     overlays/vc4-fkms-v3d.dtbo \
-    overlays/w1-gpio-pullup.dtbo \
+    overlays/vc4-kms-v3d.dtbo \
+    overlays/vc4-kms-v3d-pi4.dtbo \
+    overlays/vc4-kms-dsi-7inch.dtbo \
     overlays/w1-gpio.dtbo \
-    overlays/gpio-ir.dtbo \
-    overlays/gpio-ir-tx.dtbo \
+    overlays/w1-gpio-pullup.dtbo \
+    overlays/wm8960-soundcard.dtbo \
     "
 
 RPI_KERNEL_DEVICETREE ?= " \
+    bcm2708-rpi-zero.dtb \
     bcm2708-rpi-zero-w.dtb \
     bcm2708-rpi-b.dtb \
+    bcm2708-rpi-b-rev1.dtb \
     bcm2708-rpi-b-plus.dtb \
     bcm2709-rpi-2-b.dtb \
+    bcm2710-rpi-2-b.dtb \
     bcm2710-rpi-3-b.dtb \
     bcm2710-rpi-3-b-plus.dtb \
     bcm2711-rpi-4-b.dtb \
+    bcm2711-rpi-400.dtb \
     bcm2708-rpi-cm.dtb \
     bcm2710-rpi-cm3.dtb \
+    bcm2711-rpi-cm4.dtb \
     "
 
-KERNEL_DEVICETREE ?= " \
+KERNEL_DEVICETREE ??= " \
     ${RPI_KERNEL_DEVICETREE} \
     ${RPI_KERNEL_DEVICETREE_OVERLAYS} \
     "
@@ -80,10 +95,16 @@ MACHINE_FEATURES_BACKFILL_CONSIDERED = "rtc"
 
 MACHINE_EXTRA_RRECOMMENDS += "kernel-modules udev-rules-rpi"
 MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "${@oe.utils.conditional('ENABLE_I2C', '1', 'kernel-module-i2c-dev kernel-module-i2c-bcm2708', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += "${@oe.utils.conditional('ENABLE_IR', '1', 'kernel-module-gpio-ir kernel-module-gpio-ir-tx', '', d)}"
 
+SERIAL_CONSOLES_CHECK ??= "${SERIAL_CONSOLES}"
+
+# The name of the deploy directory for raspberry pi boot files.
+# This variable is referred to by recipes fetching / generating the files.
+BOOTFILES_DIR_NAME ?= "bootfiles"
 
 # Set Raspberrypi splash image
-SPLASH = "psplash-raspberrypi"
+SPLASH ?= "psplash-raspberrypi"
 
 def make_dtb_boot_files(d):
     # Generate IMAGE_BOOT_FILES entries for device tree files listed in
@@ -93,29 +114,29 @@ def make_dtb_boot_files(d):
 
     def transform(dtb):
         base = os.path.basename(dtb)
-        if dtb.endswith('dtb'):
-            # eg: whatever/bcm2708-rpi-b.dtb has:
-            #     DEPLOYDIR file: bcm2708-rpi-b.dtb
-            #     destination: bcm2708-rpi-b.dtb
-            return base
-        elif dtb.endswith('dtbo'):
+        if dtb.endswith('dtbo') or base == 'overlay_map.dtb':
             # overlay dtb:
             # eg: overlays/hifiberry-amp.dtbo has:
             #     DEPLOYDIR file: hifiberry-amp.dtbo
             #     destination: overlays/hifiberry-amp.dtbo
             return '{};{}'.format(base, dtb)
+        elif dtb.endswith('dtb'):
+            # eg: whatever/bcm2708-rpi-b.dtb has:
+            #     DEPLOYDIR file: bcm2708-rpi-b.dtb
+            #     destination: bcm2708-rpi-b.dtb
+            return base
 
     return ' '.join([transform(dtb) for dtb in alldtbs.split(' ') if dtb])
 
 
-IMAGE_BOOT_FILES ?= "bcm2835-bootfiles/* \
+IMAGE_BOOT_FILES ?= "${BOOTFILES_DIR_NAME}/* \
                  ${@make_dtb_boot_files(d)} \
                  ${@bb.utils.contains('RPI_USE_U_BOOT', '1', \
                     '${KERNEL_IMAGETYPE} u-boot.bin;${SDIMG_KERNELIMAGE} boot.scr', \
                     '${KERNEL_IMAGETYPE};${SDIMG_KERNELIMAGE}', d)} \
                  "
 do_image_wic[depends] += " \
-    bcm2835-bootfiles:do_deploy \
+    rpi-bootfiles:do_deploy \
     ${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'u-boot:do_deploy', '',d)} \
     "
 
@@ -123,4 +144,4 @@ do_image_wic[recrdeps] = "do_build"
 
 # The kernel image is installed into the FAT32 boot partition and does not need
 # to also be installed into the rootfs.
-RDEPENDS_${KERNEL_PACKAGE_NAME}-base = ""
+RDEPENDS:${KERNEL_PACKAGE_NAME}-base = ""

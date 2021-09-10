@@ -1,4 +1,4 @@
-From 392d474a72d37b669f53ab9f0fa913b958af93f6 Mon Sep 17 00:00:00 2001
+From 4b612f902c596838ab260194f840a466f8291618 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Mon, 6 Mar 2017 23:33:27 -0800
 Subject: [PATCH] sync with OE libtool changes
@@ -26,7 +26,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 28 insertions(+), 6 deletions(-)
 
 diff --git a/ltmain.sh b/ltmain.sh
-index 11ee684ccc..3b19ac1532 100644
+index 11ee684cccf..3b19ac15328 100644
 --- a/ltmain.sh
 +++ b/ltmain.sh
 @@ -8053,8 +8053,16 @@ EOF

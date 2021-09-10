@@ -24,10 +24,11 @@ class BuildCpioTest(OESDKTestCase):
             dirs["build"] = os.path.join(testdir, "build")
             dirs["install"] = os.path.join(testdir, "install")
 
-            subprocess.check_output(["tar", "xf", tarball, "-C", testdir])
+            subprocess.check_output(["tar", "xf", tarball, "-C", testdir], stderr=subprocess.STDOUT)
             self.assertTrue(os.path.isdir(dirs["source"]))
             os.makedirs(dirs["build"])
 
+            self._run("sed -i -e '/char.*program_name/d' {source}/src/global.c".format(**dirs))
             self._run("cd {build} && {source}/configure --disable-maintainer-mode $CONFIGURE_FLAGS".format(**dirs))
             self._run("cd {build} && make -j".format(**dirs))
             self._run("cd {build} && make install DESTDIR={install}".format(**dirs))

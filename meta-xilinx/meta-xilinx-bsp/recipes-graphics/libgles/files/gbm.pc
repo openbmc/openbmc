@@ -6,7 +6,7 @@ includedir=/usr/include
 Name: gbm
 Description: MALI gbm library
 Requires.private:
-Version: r8p0
+Version: 17.3
 Libs: -L${libdir} -lgbm
 Libs.private: -lm -lpthread -ldl
 Cflags: -I${includedir}

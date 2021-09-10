@@ -18,9 +18,9 @@ SRC_URI[sha256sum] = "d45f209d837c49dae6deebcdd87b8cc3b04ea290880358faecf5e77377
 
 PACKAGES =+ "lib${BPN} lib${BPN}-dev"
 
-FILES_${PN} = " ${bindir}/faac "
-FILES_lib${BPN} = " ${libdir}/*.so.*"
-FILES_lib${BPN}-dev = " \
+FILES:${PN} = " ${bindir}/faac "
+FILES:lib${BPN} = " ${libdir}/*.so.*"
+FILES:lib${BPN}-dev = " \
     ${includedir} \
     ${libdir}/*.so \
     ${libdir}/*.la \

@@ -1,0 +1,28 @@
+From 073d622fbf8564271cd9be87c2f619ea00498578 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 1 May 2021 08:25:24 -0700
+Subject: [PATCH] Fix build with OpenEXR 3
+
+Add a header that is no longer transitively included
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gegl/-/merge_requests/96]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ operations/external/exr-save.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/operations/external/exr-save.cc b/operations/external/exr-save.cc
+index 1e8c09d..87abed5 100644
+--- a/operations/external/exr-save.cc
++++ b/operations/external/exr-save.cc
+@@ -45,6 +45,7 @@ extern "C" {
+ #include <ImfChromaticities.h>
+ #include <ImfStandardAttributes.h>
+ #include <ImfArray.h>
++#include <ImfFrameBuffer.h>
+ #include "ImathRandom.h"
+ 
+ 
+-- 
+2.31.1
+

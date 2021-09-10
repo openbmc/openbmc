@@ -11,7 +11,7 @@ IMAGE_INSTALL += " \
         xkeyboard-config \
 "
 
-IMAGE_INSTALL_append = "\
+IMAGE_INSTALL:append = "\
    libcamera \
    gstreamer1.0-plugins-good \
    gstreamer1.0-plugins-base \

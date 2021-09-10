@@ -1,6 +1,6 @@
-From 862a981ce462cd83a99e3db9faeeda1f8c64983f Mon Sep 17 00:00:00 2001
-From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 18 Mar 2019 23:23:55 -0400
+From 27bfa4028453dc79a72569823e97da8fd1994ffc Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Tue, 1 Sep 2020 11:53:53 +0000
 Subject: [PATCH] explicitly set compile options
 
 OE does not support to install egg package, so
@@ -10,19 +10,19 @@ explicitly set build_ext options for oe-core's
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
-
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
  setup.cfg | 12 ++++++++++++
  1 file changed, 12 insertions(+)
 
 diff --git a/setup.cfg b/setup.cfg
-index 1c6ebc84..1ccc3d69 100644
+index 19979cf7..ed27dfe1 100644
 --- a/setup.cfg
 +++ b/setup.cfg
-@@ -13,3 +13,15 @@ multi_line_output = 3
- 
+@@ -11,3 +11,15 @@ multi_line_output = 3
  [tool:pytest]
- addopts = -rs
+ addopts = -ra --color=yes
+ testpaths = Tests
 +
 +[build_ext]
 +disable-platform-guessing = 1
@@ -35,3 +35,6 @@ index 1c6ebc84..1ccc3d69 100644
 +disable-webp = 1
 +disable-webpmux = 1
 +disable-imagequant = 1
+-- 
+2.17.1
+

@@ -1,2 +1,2 @@
-DEPENDS_prepend = "pkgconfig-native "
+DEPENDS:prepend = "pkgconfig-native "
 

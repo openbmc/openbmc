@@ -1,0 +1,33 @@
+From cf8c9aac5243f506a1a3e8e284414f311cde04f5 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 17 Jan 2018 10:51:49 -0800
+Subject: [PATCH] linux-user: Fix webkitgtk hangs on 32-bit x86 target
+
+Since commit "linux-user: Tidy and enforce reserved_va initialization"
+(18e80c55bb6ec17c05ec0ba717ec83933c2bfc07) the Yocto webkitgtk build
+hangs when cross compiling for 32-bit x86 on a 64-bit x86 machine using
+musl.
+
+To fix the issue reduce the MAX_RESERVED_VA macro to be a closer match
+to what it was before the problematic commit.
+
+Upstream-Status: Submitted http://lists.gnu.org/archive/html/qemu-devel/2018-01/msg04185.html
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+
+---
+ linux-user/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: qemu-5.1.0/linux-user/main.c
+===================================================================
+--- qemu-5.1.0.orig/linux-user/main.c
++++ qemu-5.1.0/linux-user/main.c
+@@ -92,7 +92,7 @@ static int last_log_mask;
+       (TARGET_LONG_BITS == 32 || defined(TARGET_ABI32))
+ /* There are a number of places where we assign reserved_va to a variable
+    of type abi_ulong and expect it to fit.  Avoid the last page.  */
+-#   define MAX_RESERVED_VA(CPU)  (0xfffffffful & TARGET_PAGE_MASK)
++#   define MAX_RESERVED_VA(CPU)  (0x7ffffffful & TARGET_PAGE_MASK)
+ #  else
+ #   define MAX_RESERVED_VA(CPU)  (1ul << TARGET_VIRT_ADDR_SPACE_BITS)
+ #  endif

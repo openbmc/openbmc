@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "218fad7af31f3c22fb4c9db28a55a2a8b5067d41f5b38f52008a057a00
 
 IPV6 = "${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', '--ipv6', '', d)}"
 
-do_configure_prepend() {
+do_configure:prepend() {
    echo "${@d.getVar('DISTRO_VERSION')}" > ${S}/os.openembedded
 }
 
@@ -47,4 +47,4 @@ do_install() {
     install -m 0644 ${WORKDIR}/miniupnpd.service ${D}${systemd_unitdir}/system/
 }
 
-SYSTEMD_SERVICE_${PN} = "miniupnpd.service"
+SYSTEMD_SERVICE:${PN} = "miniupnpd.service"

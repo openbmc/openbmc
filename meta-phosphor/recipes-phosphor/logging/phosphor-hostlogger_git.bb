@@ -4,9 +4,7 @@ HOMEPAGE = "https://github.com/openbmc/phosphor-hostlogger"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit autotools
-inherit pkgconfig
-inherit python3native
+inherit meson
 inherit systemd
 
 # License info
@@ -14,27 +12,58 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
 # Dependencies
-DEPENDS += "\
-            autoconf-archive-native \
-            sdbusplus \
-            ${PYTHON_PN}-sdbus++-native \
-            phosphor-dbus-interfaces \
+DEPENDS += " \
+            phosphor-logging \
+            zlib \
            "
-RDEPENDS_${PN} += "obmc-console"
-RRECOMMENDS_${PN} += "phosphor-debug-collector"
-
-# systemd service setup
-SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "hostlogger.service"
-
-# Host TTY setup
-OBMC_CONSOLE_HOST_TTY ?= "ttyVUART0"
-
-# Extra parameters for 'configure' script
-EXTRA_OECONF = "HOST_TTY=${OBMC_CONSOLE_HOST_TTY} \
-                SYSTEMD_TARGET=multi-user.target"
+RDEPENDS:${PN} += "obmc-console"
+RRECOMMENDS:${PN} += "phosphor-debug-collector"
 
 # Source code repository
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-hostlogger"
-SRCREV = "ea31658b6df1c51b28ed28e3e459a64fb8d13da8"
+SRCREV = "042b5ba8438d1423f807feb5ef739cda063ea8d2"
+
+# Disable unit tests
+EXTRA_OEMESON:append = " -Dtests=disabled"
+
+# Systemd service template
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE:${PN} = "hostlogger@.service"
+
+# Default service instance to install (single-host mode)
+DEFAULT_INSTANCE = "ttyVUART0"
+DEFAULT_SERVICE = "hostlogger@${DEFAULT_INSTANCE}.service"
+
+# Multi-host mode setup - list of configuration files to install, can be added
+# via SRC_URI in a bbappend. The file name is the name of the service instance,
+# which should match the corresponding instance of the obmc-console service.
+CUSTOM_CONFIGS = "${@custom_configs('${WORKDIR}')}"
+CUSTOM_SERVICES = "${@custom_services('${CUSTOM_CONFIGS}')}"
+
+# Preset systemd units
+SYSTEMD_SERVICE:${PN} += "${@'${CUSTOM_SERVICES}' if len('${CUSTOM_SERVICES}') \
+                                                  else '${DEFAULT_SERVICE}'}"
+
+# Gets list of custom config files in a directory
+def custom_configs(workdir):
+    if os.path.exists(workdir):
+        return ' '.join([f for f in os.listdir(workdir) if f.endswith('.conf')])
+
+# Get list of custom service instances
+def custom_services(configs):
+    return ' '.join(['hostlogger@' + i.replace('.conf', '.service') \
+                     for i in configs.split()])
+
+do_install:append() {
+  # Install config files
+  if [ -n "${CUSTOM_CONFIGS}" ]; then
+    for CONFIG_FILE in ${CUSTOM_CONFIGS}; do
+        install -Dm 0644 ${WORKDIR}/${CONFIG_FILE} \
+                     ${D}${sysconfdir}/hostlogger/${CONFIG_FILE}
+    done
+  else
+    install -Dm 0644 ${S}/default.conf \
+                     ${D}${sysconfdir}/hostlogger/${DEFAULT_INSTANCE}.conf
+  fi
+}

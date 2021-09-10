@@ -1,0 +1,63 @@
+From a8c6c13cc322ecc300bb2cdf22e3d6f1680e56be Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 17 Jan 2017 18:07:24 +0530
+Subject: [PATCH 18/54] [PATCH] microblaze.md: Improve 'adddi3' and 'subdi3'
+ insn definitions Change adddi3 to handle DI immediates as the second operand,
+ this requires modification to the output template however reduces the need to
+ specify seperate templates for 16-bit positive/negative immediate operands.
+ The use of 32-bit immediates for the addi and addic instructions is handled
+ by the assembler, which will emit the imm instructions when required. This
+ conveniently handles the optimizable cases where the immediate constant value
+ does not need the higher half words of the operands upper/lower words.
+
+Change the constraints of the subdi3 instruction definition such that it
+does not match the second operand as an immediate value. This is because
+there is no definition to handle this case nor is it possible to
+implement purely with instructions as microblaze does not provide an
+instruction to perform a forward arithmetic subtraction (it only
+provides reverse 'rD = IMM - rA').
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+---
+ gcc/config/microblaze/microblaze.md | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 986d9c3aa25..efd2c34e0b7 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -502,17 +502,16 @@
+ ;; Adding 2 DI operands in register or reg/imm
+ 
+ (define_insn "adddi3"
+-  [(set (match_operand:DI 0 "register_operand" "=d,d,d")
+-	(plus:DI (match_operand:DI 1 "register_operand" "%d,d,d")
+-		 (match_operand:DI 2 "arith_operand32" "d,P,N")))]
++  [(set (match_operand:DI 0 "register_operand" "=d,d")
++	(plus:DI (match_operand:DI 1 "register_operand" "%d,d")
++		 (match_operand:DI 2 "arith_operand" "d,i")))]
+   ""
+   "@
+   add\t%L0,%L1,%L2\;addc\t%M0,%M1,%M2
+-  addi\t%L0,%L1,%2\;addc\t%M0,%M1,r0
+-  addi\t%L0,%L1,%2\;addc\t%M0,%M1,r0\;addi\t%M0,%M0,-1"
++  addi\t%L0,%L1,%j2\;addic\t%M0,%M1,%h2"
+   [(set_attr "type"	"darith")
+   (set_attr "mode"	"DI")
+-  (set_attr "length"	"8,8,12")])
++  (set_attr "length"	"8,8")])
+ 
+ ;;----------------------------------------------------------------
+ ;; Subtraction
+@@ -549,7 +548,7 @@
+ (define_insn "subdi3"
+   [(set (match_operand:DI 0 "register_operand" "=&d")
+ 	(minus:DI (match_operand:DI 1 "register_operand" "d")
+-		  (match_operand:DI 2 "arith_operand32" "d")))]
++		  (match_operand:DI 2 "register_operand" "d")))]
+   ""
+   "rsub\t%L0,%L2,%L1\;rsubc\t%M0,%M2,%M1"
+   [(set_attr "type"	"darith")
+-- 
+2.17.1
+

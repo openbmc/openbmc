@@ -1,0 +1,8 @@
+DEVPATH=/xyz/openbmc_project/watchdog/host0
+SERVICE=xyz.openbmc_project.Watchdog
+UNIT_HARD_RESET=phosphor-host-watchdog-reset.service
+UNIT_POWER_OFF=phosphor-host-watchdog-poweroff.service
+UNIT_POWER_CYCLE=phosphor-host-watchdog-powercycle.service
+FALLBACK_ACTION=xyz.openbmc_project.State.Watchdog.Action.PowerCycle
+FALLBACK_INTERVAL=180000
+MIN_INTERVAL=60000

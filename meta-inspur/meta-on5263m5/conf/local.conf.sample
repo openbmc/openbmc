@@ -114,7 +114,7 @@ PACKAGE_CLASSES ?= "package_rpm"
 # running the build on (i.e. building i686 packages on an x86_64 host).
 # Supported values are i686 and x86_64
 #SDKMACHINE ?= "i686"
-SANITY_TESTED_DISTROS_append ?= " RedHatEnterpriseWorkstation-6.*"
+SANITY_TESTED_DISTROS:append ?= " RedHatEnterpriseWorkstation-6.*"
 
 #
 # Extra image configuration defaults
@@ -138,7 +138,7 @@ SANITY_TESTED_DISTROS_append ?= " RedHatEnterpriseWorkstation-6.*"
 # There are other application targets that can be used here too, see
 # meta/classes/image.bbclass and meta/classes/core-image.bbclass for more details.
 # We default to enabling the debugging tweaks.
-EXTRA_IMAGE_FEATURES = "debug-tweaks"
+EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
 
 #
 # Additional image features
@@ -147,12 +147,11 @@ EXTRA_IMAGE_FEATURES = "debug-tweaks"
 # enable extra features. Some available options which can be included in this variable
 # are:
 #   - 'buildstats' collect build statistics
-#   - 'image-mklibs' to reduce shared library files size for an image
 #   - 'image-prelink' in order to prelink the filesystem image
 #   - 'image-swab' to perform host system intrusion detection
 # NOTE: if listing mklibs & prelink both, then make sure mklibs is before prelink
 # NOTE: mklibs also needs to be explicitly enabled for a given image, see local.conf.extended
-USER_CLASSES ?= "buildstats image-mklibs image-prelink"
+USER_CLASSES ?= "buildstats image-prelink"
 
 #
 # Runtime testing of images
@@ -191,7 +190,7 @@ PATCHRESOLVE = "noop"
 # files and damages the build in ways which may not be easily recoverable.
 # It's necessary to monitor /tmp, if there is no space left the build will fail
 # with very exotic errors.
-BB_DISKMON_DIRS = "\
+BB_DISKMON_DIRS ??= "\
     STOPTASKS,${TMPDIR},1G,100K \
     STOPTASKS,${DL_DIR},1G,100K \
     STOPTASKS,${SSTATE_DIR},1G,100K \
@@ -225,17 +224,14 @@ BB_DISKMON_DIRS = "\
 # By default qemu will build with a builtin VNC server where graphical output can be
 # seen. The two lines below enable the SDL backend too. This assumes there is a
 # libsdl library available on your build system.
-PACKAGECONFIG_append_pn-qemu-native = " sdl"
-PACKAGECONFIG_append_pn-nativesdk-qemu = " sdl"
+PACKAGECONFIG:append:pn-qemu-native = " sdl"
+PACKAGECONFIG:append:pn-nativesdk-qemu = " sdl"
 #ASSUME_PROVIDED += "libsdl-native"
 
 # CONF_VERSION is increased each time build/conf/ changes incompatibly and is used to
 # track the version of this file when it was generated. This can safely be ignored if
 # this doesn't mean anything to you.
-CONF_VERSION = "1"
+CONF_VERSION = "2"
 
 # Set the root password to '0penBmc'
-INHERIT += "extrausers"
-EXTRA_USERS_PARAMS = " \
-  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
-  "
+# Defaults from meta-phosphor/conf/distro/include/phosphor-defaults.inc

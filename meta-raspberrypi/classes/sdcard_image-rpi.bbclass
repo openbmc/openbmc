@@ -13,31 +13,30 @@ inherit image_types
 #                                                     Default Free space = 1.3x
 #                                                     Use IMAGE_OVERHEAD_FACTOR to add more space
 #                                                     <--------->
-#            4MiB              40MiB           SDIMG_ROOTFS
+#            4MiB              48MiB           SDIMG_ROOTFS
 # <-----------------------> <----------> <---------------------->
 #  ------------------------ ------------ ------------------------
 # | IMAGE_ROOTFS_ALIGNMENT | BOOT_SPACE | ROOTFS_SIZE            |
 #  ------------------------ ------------ ------------------------
 # ^                        ^            ^                        ^
 # |                        |            |                        |
-# 0                      4MiB     4MiB + 40MiB       4MiB + 40Mib + SDIMG_ROOTFS
+# 0                      4MiB     4MiB + 48MiB       4MiB + 48Mib + SDIMG_ROOTFS
 
 # This image depends on the rootfs image
-IMAGE_TYPEDEP_rpi-sdimg = "${SDIMG_ROOTFS_TYPE}"
-
-# Set kernel and boot loader
-IMAGE_BOOTLOADER ?= "bcm2835-bootfiles"
+IMAGE_TYPEDEP:rpi-sdimg = "${SDIMG_ROOTFS_TYPE}"
 
 # Kernel image name
-SDIMG_KERNELIMAGE_raspberrypi  ?= "kernel.img"
-SDIMG_KERNELIMAGE_raspberrypi2 ?= "kernel7.img"
-SDIMG_KERNELIMAGE_raspberrypi3-64 ?= "kernel8.img"
+SDIMG_KERNELIMAGE:raspberrypi  ?= "kernel.img"
+SDIMG_KERNELIMAGE:raspberrypi2 ?= "kernel7.img"
+SDIMG_KERNELIMAGE:raspberrypi3-64 ?= "kernel8.img"
 
 # Boot partition volume id
-BOOTDD_VOLUME_ID ?= "${MACHINE}"
+# Shorten raspberrypi to just rpi to keep it under 11 characters
+# now enforced by mkfs.vfat from dosfstools-4.2
+BOOTDD_VOLUME_ID ?= "${@d.getVar('MACHINE').replace('raspberrypi', 'rpi')}"
 
 # Boot partition size [in KiB] (will be rounded up to IMAGE_ROOTFS_ALIGNMENT)
-BOOT_SPACE ?= "40960"
+BOOT_SPACE ?= "49152"
 
 # Set alignment to 4MB [in KiB]
 IMAGE_ROOTFS_ALIGNMENT = "4096"
@@ -49,16 +48,18 @@ SDIMG_ROOTFS = "${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${SDIMG_ROOTFS_TYPE}"
 # For the names of kernel artifacts
 inherit kernel-artifact-names
 
+RPI_SDIMG_EXTRA_DEPENDS ?= ""
+
 do_image_rpi_sdimg[depends] = " \
     parted-native:do_populate_sysroot \
     mtools-native:do_populate_sysroot \
     dosfstools-native:do_populate_sysroot \
     virtual/kernel:do_deploy \
-    ${IMAGE_BOOTLOADER}:do_deploy \
-    rpi-config:do_deploy \
+    rpi-bootfiles:do_deploy \
     ${@bb.utils.contains('MACHINE_FEATURES', 'armstub', 'armstubs:do_deploy', '' ,d)} \
     ${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'u-boot:do_deploy', '',d)} \
     ${@bb.utils.contains('RPI_USE_U_BOOT', '1', 'u-boot-default-script:do_deploy', '',d)} \
+    ${RPI_SDIMG_EXTRA_DEPENDS} \
 "
 
 do_image_rpi_sdimg[recrdeps] = "do_build"
@@ -86,7 +87,7 @@ def split_overlays(d, out, ver=None):
 
     return overlays
 
-IMAGE_CMD_rpi-sdimg () {
+IMAGE_CMD:rpi-sdimg () {
 
     # Align partitions
     BOOT_SPACE_ALIGNED=$(expr ${BOOT_SPACE} + ${IMAGE_ROOTFS_ALIGNMENT} - 1)
@@ -114,7 +115,7 @@ IMAGE_CMD_rpi-sdimg () {
     BOOT_BLOCKS=$(LC_ALL=C parted -s ${SDIMG} unit b print | awk '/ 1 / { print substr($4, 1, length($4 -1)) / 512 /2 }')
     rm -f ${WORKDIR}/boot.img
     mkfs.vfat -F32 -n "${BOOTDD_VOLUME_ID}" -S 512 -C ${WORKDIR}/boot.img $BOOT_BLOCKS
-    mcopy -v -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/bcm2835-bootfiles/* ::/ || bbfatal "mcopy cannot copy ${DEPLOY_DIR_IMAGE}/bcm2835-bootfiles/* into boot.img"
+    mcopy -v -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${BOOTFILES_DIR_NAME}/* ::/ || bbfatal "mcopy cannot copy ${DEPLOY_DIR_IMAGE}/${BOOTFILES_DIR_NAME}/* into boot.img"
     if [ "${@bb.utils.contains("MACHINE_FEATURES", "armstub", "1", "0", d)}" = "1" ]; then
         mcopy -v -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/armstubs/${ARMSTUB} ::/ || bbfatal "mcopy cannot copy ${DEPLOY_DIR_IMAGE}/armstubs/${ARMSTUB} into boot.img"
     fi
@@ -146,6 +147,22 @@ IMAGE_CMD_rpi-sdimg () {
         else
             mcopy -v -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} ::${SDIMG_KERNELIMAGE} || bbfatal "mcopy cannot copy ${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE} into boot.img"
         fi
+    fi
+
+    # Add files (eg. hypervisor binaries) from the deploy dir
+    if [ -n "${DEPLOYPAYLOAD}" ] ; then
+        echo "Copying deploy file payload into VFAT"
+        for entry in ${DEPLOYPAYLOAD} ; do
+            # Split entry at optional ':' to enable file renaming for the destination
+            if [ $(echo "$entry" | grep -c :) = "0" ] ; then
+                DEPLOY_FILE="$entry"
+                DEST_FILENAME="$entry"
+            else
+                DEPLOY_FILE="$(echo "$entry" | cut -f1 -d:)"
+                DEST_FILENAME="$(echo "$entry" | cut -f2- -d:)"
+            fi
+            mcopy -v -i ${WORKDIR}/boot.img -s ${DEPLOY_DIR_IMAGE}/${DEPLOY_FILE} ::${DEST_FILENAME} || bbfatal "mcopy cannot copy ${DEPLOY_DIR_IMAGE}/${DEPLOY_FILE} into boot.img"
+        done
     fi
 
     if [ -n "${FATPAYLOAD}" ] ; then

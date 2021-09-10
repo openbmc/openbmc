@@ -2,8 +2,8 @@ Upstream-Status: Pending
 
 Index: unix/Makefile.in
 ===================================================================
---- unix.orig/Makefile.in	2013-11-10 23:37:34.243424934 -0800
-+++ unix/Makefile.in	2013-11-10 23:37:34.243424934 -0800
+--- a/unix.orig/Makefile.in	2013-11-10 23:37:34.243424934 -0800
++++ b/unix/Makefile.in	2013-11-10 23:37:34.243424934 -0800
 @@ -709,23 +709,23 @@
  test: test-tcl test-packages
  

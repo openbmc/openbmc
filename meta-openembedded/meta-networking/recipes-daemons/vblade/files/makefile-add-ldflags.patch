@@ -9,7 +9,7 @@ index 98008da..c328ba7 100644
 --- a/makefile
 +++ b/makefile
 @@ -11,7 +11,7 @@ mandir = ${sharedir}/man
- O=aoe.o bpf.o ${PLATFORM}.o ata.o
+ O=aoe.o bpf.o ${PLATFORM}.o ata.o dat.o
  
  vblade: $O
 -	${CC} -o vblade $O

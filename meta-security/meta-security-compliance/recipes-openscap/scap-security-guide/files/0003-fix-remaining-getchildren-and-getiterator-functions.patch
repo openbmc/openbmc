@@ -1,0 +1,57 @@
+From a0da16c5eeb9a7414f7f2a37a6b270c8d04b2ddf Mon Sep 17 00:00:00 2001
+From: Vojtech Polasek <vpolasek@redhat.com>
+Date: Mon, 8 Jun 2020 14:01:55 +0200
+Subject: [PATCH] fix remaining getchildren and getiterator functions
+
+Upstream-Status: Backport
+[https://github.com/ComplianceAsCode/content/commit/a0da16c5eeb9a7414f7f2a37a6b270c8d04b2ddf]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ build-scripts/sds_move_ocil_to_checks.py                  | 2 +-
+ build-scripts/verify_references.py                        | 2 +-
+ shared/transforms/pcidss/transform_benchmark_to_pcidss.py | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/build-scripts/sds_move_ocil_to_checks.py b/build-scripts/sds_move_ocil_to_checks.py
+index 5f5139659..64dc19084 100755
+--- a/build-scripts/sds_move_ocil_to_checks.py
++++ b/build-scripts/sds_move_ocil_to_checks.py
+@@ -106,7 +106,7 @@ def move_ocil_content_from_ds_extended_component_to_ds_component(datastreamtree,
+     timestamp = extendedcomp.get('timestamp')
+ 
+     # Get children elements of <ds:extended-component> containing OCIL content
+-    extchildren = extendedcomp.getchildren()
++    extchildren = list(extendedcomp)
+     # There should be just one OCIL subcomponent in <ds:extended-component>
+     if len(extchildren) != 1:
+         sys.stderr.write("ds:extended-component contains more than one element!"
+diff --git a/build-scripts/verify_references.py b/build-scripts/verify_references.py
+index 69b3e2d1f..95d387f46 100755
+--- a/build-scripts/verify_references.py
++++ b/build-scripts/verify_references.py
+@@ -179,7 +179,7 @@ def main():
+     check_content_refs = xccdftree.findall(".//{%s}check-content-ref"
+                                            % xccdf_ns)
+ 
+-    xccdf_parent_map = dict((c, p) for p in xccdftree.getiterator() for c in p)
++    xccdf_parent_map = dict((c, p) for p in xccdftree.iter() for c in p)
+     # now we can actually do the verification work here
+     if options.rules_with_invalid_checks or options.all_checks:
+         for check_content_ref in check_content_refs:
+diff --git a/shared/transforms/pcidss/transform_benchmark_to_pcidss.py b/shared/transforms/pcidss/transform_benchmark_to_pcidss.py
+index 0ceaf727d..c94b12c45 100755
+--- a/shared/transforms/pcidss/transform_benchmark_to_pcidss.py
++++ b/shared/transforms/pcidss/transform_benchmark_to_pcidss.py
+@@ -111,7 +111,7 @@ def main():
+             benchmark.findall(".//{%s}Value" % (XCCDF_NAMESPACE)):
+         values.append(value)
+ 
+-    parent_map = dict((c, p) for p in benchmark.getiterator() for c in p)
++    parent_map = dict((c, p) for p in benchmark.iter() for c in p)
+     for rule in \
+             benchmark.findall(".//{%s}Rule" % (XCCDF_NAMESPACE)):
+         parent_map[rule].remove(rule)
+-- 
+2.17.1
+

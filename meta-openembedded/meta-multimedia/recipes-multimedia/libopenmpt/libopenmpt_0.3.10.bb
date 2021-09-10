@@ -86,17 +86,17 @@ python __anonymous() {
 }
 
 PACKAGES =+ "${PN}-modplug ${PN}-openmpt123 ${PN}-openmpt123-doc"
-FILES_${PN}-modplug = "${libdir}/libopenmpt_modplug.so.*"
-FILES_${PN}-openmpt123 = "${bindir}/openmpt123"
-FILES_${PN}-openmpt123-doc = "${mandir}/man1/openmpt123*"
+FILES:${PN}-modplug = "${libdir}/libopenmpt_modplug.so.*"
+FILES:${PN}-openmpt123 = "${bindir}/openmpt123"
+FILES:${PN}-openmpt123-doc = "${mandir}/man1/openmpt123*"
 
 # Since version 0.3, libopenmpt uses SemVer 2.0.0 versioning.
 # The SemVer versioning scheme is incompatible with Debian/Ubuntu
 # package version names.
-DEBIAN_NOAUTONAME_${PN} = "1"
-DEBIAN_NOAUTONAME_${PN}-modplug = "1"
+DEBIAN_NOAUTONAME:${PN} = "1"
+DEBIAN_NOAUTONAME:${PN}-modplug = "1"
 
-RDEPENDS_${PN}_libc-glibc = " \
+RDEPENDS:${PN}:libc-glibc = " \
     glibc-gconv-cp1252 \
     glibc-gconv-ibm437 \
     glibc-gconv-iso8859-1 \

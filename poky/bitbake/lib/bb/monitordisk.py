@@ -59,7 +59,7 @@ def getMountedDev(path):
         pass
     return None
 
-def getDiskData(BBDirs, configuration):
+def getDiskData(BBDirs):
 
     """Prepare disk data for disk space monitor"""
 
@@ -168,7 +168,7 @@ class diskMonitor:
 
         BBDirs = configuration.getVar("BB_DISKMON_DIRS") or None
         if BBDirs:
-            self.devDict = getDiskData(BBDirs, configuration)
+            self.devDict = getDiskData(BBDirs)
             if self.devDict:
                 self.spaceInterval, self.inodeInterval = getInterval(configuration)
                 if self.spaceInterval and self.inodeInterval:

@@ -1,16 +1,18 @@
-From a7783676c60dd90a6f4c26bcb9be03dc5703b74e Mon Sep 17 00:00:00 2001
+From 754e3030788702c1f013a88a4fc8546742d84e27 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
-Date: Mon, 13 Apr 2020 11:25:32 -0700
-Subject: [PATCH 1/2] Revert "selftests/bpf: Skip perf hw events test if the
- setup disabled it"
+Date: Thu, 18 Jun 2020 13:45:04 -0700
+Subject: [PATCH] Revert "selftests/bpf: Skip perf hw events test if the setup
+ disabled it"
 
 This reverts commit da43712a7262891317883d4b3a909fb18dac4b1d.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  .../selftests/bpf/prog_tests/stacktrace_build_id_nmi.c    | 8 ++------
  1 file changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/tools/testing/selftests/bpf/prog_tests/stacktrace_build_id_nmi.c b/tools/testing/selftests/bpf/prog_tests/stacktrace_build_id_nmi.c
-index 1735faf17536..f62aa0eb959b 100644
+index 437cb93e72ac..f62aa0eb959b 100644
 --- a/tools/testing/selftests/bpf/prog_tests/stacktrace_build_id_nmi.c
 +++ b/tools/testing/selftests/bpf/prog_tests/stacktrace_build_id_nmi.c
 @@ -49,12 +49,8 @@ void test_stacktrace_build_id_nmi(void)
@@ -20,7 +22,7 @@ index 1735faf17536..f62aa0eb959b 100644
 -	if (pmu_fd < 0 && errno == ENOENT) {
 -		printf("%s:SKIP:no PERF_COUNT_HW_CPU_CYCLES\n", __func__);
 -		test__skip();
--		goto cleanup;
+-		goto close_prog;
 -	}
 -	if (CHECK(pmu_fd < 0, "perf_event_open", "err %d errno %d\n",
 +	if (CHECK(pmu_fd < 0, "perf_event_open",
@@ -29,5 +31,5 @@ index 1735faf17536..f62aa0eb959b 100644
  		goto close_prog;
  
 -- 
-2.26.0
+2.27.0
 

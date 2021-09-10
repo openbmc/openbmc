@@ -9,14 +9,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=18810669f13b87348459e611d31ab760"
 
 PV = "1.99.7+git${SRCREV}"
 PR = "r2"
-SRCREV = "1fd19417b8a4dd9945347e98dfa97e4cfd798d77"
+SRCREV = "e82d1a653ca94aa4ed12441424da6ce780b1e530"
 
 DEPENDS = "ncurses bison-native"
 
 SRC_URI = "git://github.com/telmich/gpm;protocol=git \
            file://init \
            file://gpm.service.in \
-           file://0001-Use-sigemptyset-API-instead-of-__sigemptyset.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -26,15 +25,15 @@ inherit autotools-brokensep update-rc.d systemd texinfo
 INITSCRIPT_NAME = "gpm"
 INITSCRIPT_PARAMS = "defaults"
 
-do_configure_prepend() {
+do_configure:prepend() {
     (cd ${S};./autogen.sh;cd -)
 }
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${systemd_system_unitdir}
     sed 's:@bindir@:${sbindir}:' < ${WORKDIR}/gpm.service.in >${D}${systemd_system_unitdir}/gpm.service
     install -D -m 0755 ${WORKDIR}/init ${D}${INIT_D_DIR}/gpm
     ln -s libgpm.so.2 ${D}${libdir}/libgpm.so
 }
 
-SYSTEMD_SERVICE_${PN} = "gpm.service"
+SYSTEMD_SERVICE:${PN} = "gpm.service"

@@ -6,19 +6,26 @@ document types."
 HOMEPAGE = "https://www.cups.org/"
 SECTION = "console/utils"
 LICENSE = "Apache-2.0"
-DEPENDS = "gnutls libpng jpeg dbus zlib libusb1"
+DEPENDS = "libpng jpeg dbus zlib libusb1"
 
-SRC_URI = "https://github.com/apple/cups/releases/download/v${PV}/${BP}-source.tar.gz \
+SRC_URI = "https://github.com/OpenPrinting/cups/releases/download/v${PV}/cups-${PV}-source.tar.gz \
            file://0001-use-echo-only-in-init.patch \
            file://0002-don-t-try-to-run-generated-binaries.patch \
-           file://0003-cups_1.4.6.bb-Fix-build-on-ppc64.patch \
+           file://libexecdir.patch \
            file://0004-cups-fix-multilib-install-file-conflicts.patch \
            file://volatiles.99_cups \
            file://cups-volatiles.conf \
            "
 
-UPSTREAM_CHECK_URI = "https://github.com/apple/cups/releases"
-UPSTREAM_CHECK_REGEX = "cups-(?P<pver>\d+\.\d+(\.\d+)?)-source.tar"
+UPSTREAM_CHECK_URI = "https://github.com/OpenPrinting/cups/releases"
+UPSTREAM_CHECK_REGEX = "cups-(?P<pver>.+)-source.tar"
+
+# Issue only applies to MacOS
+CVE_CHECK_WHITELIST += "CVE-2008-1033"
+# Issue affects pdfdistiller plugin used with but not part of cups
+CVE_CHECK_WHITELIST += "CVE-2009-0032"
+# This is an Ubuntu only issue.
+CVE_CHECK_WHITELIST += "CVE-2018-6553"
 
 LEAD_SONAME = "libcupsdriver.so"
 
@@ -27,45 +34,36 @@ CLEANBROKEN = "1"
 inherit autotools-brokensep binconfig useradd systemd pkgconfig multilib_script
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system lpadmin"
+GROUPADD_PARAM:${PN} = "--system lpadmin"
 
-SYSTEMD_SERVICE_${PN} = "org.cups.cupsd.socket org.cups.cupsd.path org.cups.cupsd.service org.cups.cups-lpd.socket org.cups.cups-lpd@.service"
+SYSTEMD_SERVICE:${PN} = "cups.socket cups.path cups.service cups-lpd.socket"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'pam systemd', d)}"
 PACKAGECONFIG[avahi] = "--enable-avahi,--disable-avahi,avahi"
 PACKAGECONFIG[acl] = "--enable-acl,--disable-acl,acl"
+PACKAGECONFIG[gnutls] = "--enable-gnutls,--disable-gnutls,gnutls"
 PACKAGECONFIG[pam] = "--enable-pam --with-pam-module=unix, --disable-pam, libpam"
 PACKAGECONFIG[systemd] = "--with-systemd=${systemd_system_unitdir},--without-systemd,systemd"
 PACKAGECONFIG[xinetd] = "--with-xinetd=${sysconfdir}/xinetd.d,--without-xinetd,xinetd"
 
 EXTRA_OECONF = " \
-               --enable-gnutls \
                --enable-dbus \
                --enable-browsing \
                --disable-gssapi \
                --enable-debug \
                --disable-relro \
                --enable-libusb \
+               --with-system-groups=lpadmin \
+               --with-cups-group=lp \
+               --with-domainsocket=/run/cups/cups.sock \
                DSOFLAGS='${LDFLAGS}' \
                "
 
 EXTRA_AUTORECONF += "--exclude=autoheader"
 
-do_compile () {
-	echo "all:"    >  man/Makefile
-	echo "libs:" >> man/Makefile
-	echo "install:" >> man/Makefile
-	echo "install-data:" >> man/Makefile
-	echo "install-exec:" >> man/Makefile
-	echo "install-headers:" >> man/Makefile
-	echo "install-libs:" >> man/Makefile
-
-	oe_runmake
-}
-
 do_install () {
-	oe_runmake "DSTROOT=${D}" install
+	oe_runmake "DESTDIR=${D}" install
 
 	# Remove /var/run from package as cupsd will populate it on startup
 	rm -fr ${D}/${localstatedir}/run
@@ -93,22 +91,21 @@ do_install () {
 
 PACKAGES =+ "${PN}-lib ${PN}-libimage"
 
-RDEPENDS_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'procps', '', d)}"
-FILES_${PN} += "${libexecdir}/cups/ \
-	       "
+RDEPENDS:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'procps', '', d)}"
+FILES:${PN} += "${libexecdir}/cups/"
 
-FILES_${PN}-lib = "${libdir}/libcups.so.*"
+FILES:${PN}-lib = "${libdir}/libcups.so.*"
 
-FILES_${PN}-libimage = "${libdir}/libcupsimage.so.*"
+FILES:${PN}-libimage = "${libdir}/libcupsimage.so.*"
 
 #package the html for the webgui inside the main packages (~1MB uncompressed)
 
-FILES_${PN} += "${datadir}/doc/cups/images \
+FILES:${PN} += "${datadir}/doc/cups/images \
                 ${datadir}/doc/cups/*html \
                 ${datadir}/doc/cups/*.css \
                 ${datadir}/icons/ \
                "
-CONFFILES_${PN} += "${sysconfdir}/cups/cupsd.conf"
+CONFFILES:${PN} += "${sysconfdir}/cups/cupsd.conf"
 
 MULTILIB_SCRIPTS = "${PN}-dev:${bindir}/cups-config"
 
@@ -116,3 +113,7 @@ SYSROOT_PREPROCESS_FUNCS += "cups_sysroot_preprocess"
 cups_sysroot_preprocess () {
 	sed -i ${SYSROOT_DESTDIR}${bindir_crossscripts}/cups-config -e 's:cups_datadir=.*:cups_datadir=${datadir}/cups:' -e 's:cups_serverbin=.*:cups_serverbin=${libexecdir}/cups:'
 }
+
+# -25317 concerns /var/log/cups having lp ownership.  Our /var/log/cups is
+# root:root, so this doesn't apply.
+CVE_CHECK_WHITELIST += "CVE-2021-25317"

@@ -16,7 +16,7 @@ inherit breakpad
 
 PACKAGE_PREPROCESS_FUNCS += "symbol_file_preprocess"
 PACKAGES =+ "${PN}-socorro-syms"
-FILES_${PN}-socorro-syms = "/usr/share/socorro-syms"
+FILES:${PN}-socorro-syms = "/usr/share/socorro-syms"
 
 
 python symbol_file_preprocess() {

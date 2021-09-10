@@ -18,4 +18,4 @@ do_configure() {
 
 export AUTOMAKE = "${@bb.utils.which('automake', d.getVar('PATH'))}"
 
-FILES_${PN} += "${datadir}/automake* ${datadir}/aclocal*"
+FILES:${PN} += "${datadir}/automake* ${datadir}/aclocal*"

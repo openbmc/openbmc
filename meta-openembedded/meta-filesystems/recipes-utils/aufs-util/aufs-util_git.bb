@@ -5,7 +5,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=892f569a555ba9c07a568a7c0c4fa63a"
 
 DEPENDS = "coreutils-native aufs-util-native"
-DEPENDS_class-native = ""
+DEPENDS:class-native = ""
 
 SRCREV = "8f35db59ef83078f87879ec2828e0bb45719e0ef"
 SRC_URI = "git://git.code.sf.net/p/aufs/aufs-util;protocol=git;branch=aufs4.9 \
@@ -23,20 +23,20 @@ PV = "4.9+git${SRCPV}"
 S = "${WORKDIR}/git"
 
 export HOSTCC = "${BUILD_CC}"
-do_configure_prepend() {
+do_configure:prepend() {
    # Replace sbin,bin paths with bitbake environment
    sed -i -e 's;install_sbin: Tgt = ${DESTDIR}/sbin;install_sbin: Tgt = ${DESTDIR}/${base_sbindir};' \
           -e 's;install_ubin: Tgt = ${DESTDIR}/usr/sbin;install_sbin: Tgt = ${DESTDIR}/${bindir};' \
 	  ${S}/Makefile
 }
 
-do_configure_append () {
+do_configure:append () {
     install -d ${S}/include/linux/
     cp ${WORKDIR}/aufs_type.h ${S}/include/linux/
     sed -i -e 's;__user;;' ${S}/include/linux/aufs_type.h
 }
 
-do_configure_append_class-target () {
+do_configure:append:class-target () {
     for i in ver c2sh c2tmac; do
         cp ${STAGING_BINDIR_NATIVE}/aufs-util-${PV}/$i ${B}
     done
@@ -46,7 +46,7 @@ do_compile () {
     oe_runmake CPPFLAGS="-I${S}/include -I${S}/libau"
 }
 
-do_compile_class-native () {
+do_compile:class-native () {
     oe_runmake tools CPPFLAGS="-I${S}/include -I${S}/libau" CC="${BUILD_CC}"
 }
 
@@ -54,13 +54,13 @@ do_install () {
     oe_runmake 'DESTDIR=${D}' install_sbin install_ubin install_etc
 }
 
-do_install_class-native () {
+do_install:class-native () {
     install -d ${D}${bindir}/aufs-util-${PV}
     for i in ver c2sh c2tmac; do
         install -m 755 $i ${D}${bindir}/aufs-util-${PV}/$i
     done
 }
 
-RRECOMMENDS_${PN}_class-target += "kernel-module-aufs"
+RRECOMMENDS:${PN}:class-target += "kernel-module-aufs"
 
 BBCLASSEXTEND = "native"

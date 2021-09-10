@@ -14,6 +14,6 @@ EXTRA_OEMESON = " \
         "
 
 SRC_URI += "git://github.com/openbmc/gpioplus"
-SRCREV = "2f8444ce2dfb265bc6dcd45cae0484d68f08dd91"
+SRCREV = "71e795a279f1d30b6aca2509dd80c9b072f15efa"
 
 S = "${WORKDIR}/git"

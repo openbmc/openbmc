@@ -32,7 +32,7 @@ python () {
                     for suffix in types]
         d.setVar('PACKAGES', ' '.join(packages))
     for pkg in packages:
-        d.setVar('ALLOW_EMPTY_%s' % pkg, '1')
+        d.setVar('ALLOW_EMPTY:%s' % pkg, '1')
 }
 
 # We don't want to look at shared library dependencies for the

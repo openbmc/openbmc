@@ -12,11 +12,11 @@ diff --git a/Makefile.in.in b/Makefile.in.in
 index c0ce866..c2f26fe 100644
 --- a/Makefile.in.in
 +++ b/Makefile.in.in
-@@ -61,7 +61,6 @@ install: all xfce4-panel-profiles.1.gz
+@@ -70,7 +70,6 @@ install: all xfce4-panel-profiles.1
  	install data/metainfo/*.xml $(DESTDIR)/$(PREFIX)/share/metainfo
  
  	cp -rf locale $(DESTDIR)/$(PREFIX)/share
 -	ln -sf $(PREFIX)/share/locale $(DESTDIR)/$(PREFIX)/share/$(APPNAME)/locale
  
- 	install -d $(DESTDIR)/$(PREFIX)/share/man/man1
- 	install xfce4-panel-profiles.1.gz $(DESTDIR)/$(PREFIX)/share/man/man1
+ 	install -d $(DESTDIR)/$(MANDIR)/man1
+ 	install xfce4-panel-profiles.1 $(DESTDIR)/$(MANDIR)/man1

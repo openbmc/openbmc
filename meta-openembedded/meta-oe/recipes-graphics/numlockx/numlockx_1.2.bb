@@ -17,7 +17,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 EXTRA_OECONF = "--x-includes=${STAGING_INCDIR} \
                 --x-libraries=${STAGING_LIBDIR}"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # remove this from acinclude.m4 or build fails
     sed -i '/_AC_PATH_X_XMKMF/d' ${S}/acinclude.m4
 }

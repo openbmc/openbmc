@@ -1,0 +1,43 @@
+From 1068c7451855c3f9acde9af265b5a790073b1641 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 2 Mar 2021 14:28:27 -0800
+Subject: [PATCH] include <limits> header
+
+Fixes
+SegmentInformation.cpp:397:49: error: '::max' has not been declared; d
+id you mean 'std::max'?
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ modules/demux/adaptive/playlist/SegmentInformation.cpp | 1 +
+ modules/demux/hls/playlist/Parser.cpp                  | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/modules/demux/adaptive/playlist/SegmentInformation.cpp b/modules/demux/adaptive/playlist/SegmentInformation.cpp
+index 344e155..8eeb054 100644
+--- a/modules/demux/adaptive/playlist/SegmentInformation.cpp
++++ b/modules/demux/adaptive/playlist/SegmentInformation.cpp
+@@ -34,6 +34,7 @@
+ 
+ #include <algorithm>
+ #include <cassert>
++#include <limits>
+ 
+ using namespace adaptive::playlist;
+ 
+diff --git a/modules/demux/hls/playlist/Parser.cpp b/modules/demux/hls/playlist/Parser.cpp
+index 67110e4..7439699 100644
+--- a/modules/demux/hls/playlist/Parser.cpp
++++ b/modules/demux/hls/playlist/Parser.cpp
+@@ -42,6 +42,7 @@
+ #include <map>
+ #include <cctype>
+ #include <algorithm>
++#include <limits>
+ 
+ using namespace adaptive;
+ using namespace adaptive::playlist;
+-- 
+2.30.1
+

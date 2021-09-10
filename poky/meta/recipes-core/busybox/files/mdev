@@ -1,21 +1,43 @@
 #!/bin/sh
-mount -t proc proc /proc
-mount -t sysfs sysfs /sys
-mount -t tmpfs tmpfs /dev  -o size=64k,mode=0755
-mkdir /dev/pts /dev/shm
-chmod 777 /dev/shm
-mount -t devpts devpts /dev/pts
-touch /dev/mdev.seq
-#sysctl -w kernel.hotplug=/sbin/mdev
-echo "/sbin/mdev" > /proc/sys/kernel/hotplug
-mdev -s
+#
+# Run the mdev daemon
+#
 
-#
-# We might have mounted something over /dev, see if /dev/initctl is there.
-#
-if test ! -p /dev/initctl
-then
-        rm -f /dev/initctl
-        mknod -m 600 /dev/initctl p
-fi
+DAEMON="mdev"
+PIDFILE="/var/run/$DAEMON.pid"
+
+
+start() {
+  echo -n "Starting $DAEMON... "
+  start-stop-daemon -S -b -m -p $PIDFILE -x /sbin/mdev -- -df
+  [ $? -eq 0 ] && echo "OK" || echo "ERROR"
+
+  # coldplug modules
+  find /sys/ -name modalias -print0 | \
+    xargs -0 sort -u | \
+    tr '\n' '\0' | \
+    xargs -0 modprobe -abq
+}
+
+stop() {
+  echo -n "Stopping $DAEMON... "
+  start-stop-daemon -K -p $PIDFILE
+  [ $? -eq 0 ] && echo "OK" || echo "ERROR"
+}
+
+restart() {
+  stop
+  start
+}
+
+case "$1" in
+  start|stop|restart)
+  "$1"
+  ;;
+  *)
+  echo "Usage: $0 {start|stop|restart}"
+  exit 1
+esac
+
+exit $?
 

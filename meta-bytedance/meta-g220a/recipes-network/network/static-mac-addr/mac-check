@@ -1,0 +1,130 @@
+#!/bin/sh
+# Copyright 2018 Intel Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#	http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+SOFS_MNT=/var/sofs
+SOFS_MACDIR=${SOFS_MNT}/factory-settings/network/mac
+
+read_hw_mac() {
+	local iface="$1"
+	cat /sys/class/net/"$iface"/address 2>/dev/null
+}
+
+set_hw_mac() {
+	local iface="$1"
+	local mac="$2"
+	ip link show dev "$iface" | grep -q "${iface}:.*\<UP\>" 2>/dev/null
+	local up=$?
+	[[ $up -eq 0 ]] && ip link set dev "$iface" down
+	ip link set dev "$iface" address "$mac"
+	[[ $up -eq 0 ]] && ip link set dev "$iface" up
+}
+
+read_sofs_mac() {
+	local iface="$1"
+	cat "${SOFS_MACDIR}/${iface}" 2>/dev/null
+}
+
+read_fw_env_mac() {
+	local envname="$1"
+	fw_printenv "$envname" 2>/dev/null | sed "s/^$envname=//"
+}
+
+set_fw_env_mac() {
+	local envname="$1"
+	local mac="$2"
+	fw_setenv "$envname" "$mac"
+}
+read_eeprom_mac() {
+	local iface="$1"
+	a=0
+	if [ $iface = "eth1" ];then
+		a=8
+	fi
+	for  ((i=a;i <= ((7+a));i++));do
+		i2cset -y 1 0x50 0x00 $i
+		tmp=`i2cget -y 1 0x50`
+		local mac[$i]=${tmp:2}
+		local mac_str=$mac_str:${mac[$i]}
+	done
+	mac_str=${mac_str:1:17}
+	echo $mac_str 2>/dev/null
+}
+
+create_macdir() {
+if [ -a ${SOFS_MACDIR} ]; then
+	if [ ! -d ${SOFS_MACDIR} ]; then
+		rm -rf ${SOFS_MACDIR}
+		mkdir -p ${SOFS_MACDIR}
+	fi
+else
+	mkdir -p ${SOFS_MACDIR}
+fi
+return 0
+}
+
+mac_check() {
+	local iface="$1"
+	local envname="$2"
+
+	# Read the MAC address in use by the NIC
+	local hw_mac=$(read_hw_mac "$iface")
+
+	# Read the MAC address stored in the non-volatile file provisioned in
+	# manufacturing.
+	local sofs_mac=$(read_sofs_mac "$iface")
+
+	local eeprom_mac=$(read_eeprom_mac "$iface")
+	if [ -n "$eeprom_mac" ] && [ -z "$sofs_mac"]; then
+		set_hw_mac "$iface" "$eeprom_mac"
+		set_fw_env_mac "$envname" "$eeprom_mac"
+		return $?
+	elif [ -n "$sofs_mac" ] && [ "$hw_mac" != "$sofs_mac" ]; then
+		# A factory assigned address was found, and it is newly assigned.
+		# Update the active interface and save the new value to the u-boot
+		# environment.
+		set_hw_mac "$iface" "$sofs_mac"
+		set_fw_env_mac "$envname" "$sofs_mac"
+		return $?
+	elif [ -n "$hw_mac" ]; then
+		# Read the MAC address stored by U-Boot
+		local fw_env_mac=$(read_fw_env_mac "$envname")
+		if [ -z "$fw_env_mac" ] || [ "$fw_env_mac" != "$hw_mac" ]; then
+			set_fw_env_mac "$envname" "$hw_mac"
+			return $?
+		fi
+	else
+	    # Could not identify a MAC address
+	    return 255
+	fi
+
+	return 0
+}
+
+create_macdir
+
+error=0
+first_error_seen=0
+
+while read IFACE UBDEV; do
+	mac_check "$IFACE" "$UBDEV"
+	error=$?
+	if [ $error -ne 0 ] && [ $first_error_seen -eq 0 ]; then
+		first_error_seen=$error
+	fi
+done <<-END_CONF
+	eth0 eth1addr
+	eth1 ethaddr
+END_CONF
+exit $first_error_seen

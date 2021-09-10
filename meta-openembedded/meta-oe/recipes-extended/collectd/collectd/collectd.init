@@ -47,11 +47,11 @@ if [ -r /etc/default/$NAME ]; then
 	. /etc/default/$NAME
 fi
 
-if test "$ENABLE_COREFILES" == 1; then
+if test "$ENABLE_COREFILES" = 1; then
 	ulimit -c unlimited
 fi
 
-if test "$USE_COLLECTDMON" == 1; then
+if test "$USE_COLLECTDMON" = 1; then
 	_PIDFILE="$COLLECTDMON_PIDFILE"
 else
 	_PIDFILE="$PIDFILE"
@@ -96,7 +96,7 @@ d_start() {
 		return 2
 	fi
 
-	if test "$USE_COLLECTDMON" == 1; then
+	if test "$USE_COLLECTDMON" = 1; then
 		start-stop-daemon --start --quiet --oknodo --pidfile "$_PIDFILE" \
 			--exec $COLLECTDMON_DAEMON -- -P "$_PIDFILE" -- -C "$CONFIGFILE" \
 			|| return 2
@@ -150,7 +150,7 @@ d_stop() {
 #   0 if the daemon is running
 #   3 if the daemon is stopped
 d_status(){
-	if test "$USE_COLLECTDMON" == 1; then
+	if test "$USE_COLLECTDMON" = 1; then
 		status $COLLECTDMON_DAEMON
 	else
 		status $DAEMON

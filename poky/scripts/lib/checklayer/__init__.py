@@ -59,9 +59,14 @@ def _get_layer_collections(layer_path, lconf=None, data=None):
         pattern = ldata.getVar('BBFILE_PATTERN_%s' % name)
         depends = ldata.getVar('LAYERDEPENDS_%s' % name)
         compat = ldata.getVar('LAYERSERIES_COMPAT_%s' % name)
+        try:
+            depDict = bb.utils.explode_dep_versions2(depends or "")
+        except bb.utils.VersionStringException as vse:
+            bb.fatal('Error parsing LAYERDEPENDS_%s: %s' % (name, str(vse)))
+
         collections[name]['priority'] = priority
         collections[name]['pattern'] = pattern
-        collections[name]['depends'] = depends
+        collections[name]['depends'] = ' '.join(depDict.keys())
         collections[name]['compat'] = compat
 
     return collections
@@ -141,7 +146,7 @@ def detect_layers(layer_directories, no_auto):
 
     return layers
 
-def _find_layer_depends(depend, layers):
+def _find_layer(depend, layers):
     for layer in layers:
         if 'collections' not in layer:
             continue
@@ -151,7 +156,7 @@ def _find_layer_depends(depend, layers):
                 return layer
     return None
 
-def add_layer_dependencies(bblayersconf, layer, layers, logger):
+def get_layer_dependencies(layer, layers, logger):
     def recurse_dependencies(depends, layer, layers, logger, ret = []):
         logger.debug('Processing dependencies %s for layer %s.' % \
                     (depends, layer['name']))
@@ -161,7 +166,7 @@ def add_layer_dependencies(bblayersconf, layer, layers, logger):
             if depend == 'core':
                 continue
 
-            layer_depend = _find_layer_depends(depend, layers)
+            layer_depend = _find_layer(depend, layers)
             if not layer_depend:
                 logger.error('Layer %s depends on %s and isn\'t found.' % \
                         (layer['name'], depend))
@@ -198,6 +203,11 @@ def add_layer_dependencies(bblayersconf, layer, layers, logger):
         layer_depends = recurse_dependencies(depends, layer, layers, logger, layer_depends)
 
     # Note: [] (empty) is allowed, None is not!
+    return layer_depends
+
+def add_layer_dependencies(bblayersconf, layer, layers, logger):
+
+    layer_depends = get_layer_dependencies(layer, layers, logger)
     if layer_depends is None:
         return False
     else:
@@ -223,6 +233,20 @@ def add_layers(bblayersconf, layers, logger):
                 added.add(path)
                 f.write("\nBBLAYERS += \"%s\"\n" % path)
     return True
+
+def check_bblayers(bblayersconf, layer_path, logger):
+    '''
+    If layer_path found in BBLAYERS return True
+    '''
+    import bb.parse
+    import bb.data
+
+    ldata = bb.parse.handle(bblayersconf, bb.data.init(), include=True)
+    for bblayer in (ldata.getVar('BBLAYERS') or '').split():
+        if os.path.normpath(bblayer) == os.path.normpath(layer_path):
+            return True
+
+    return False
 
 def check_command(error_msg, cmd, cwd=None):
     '''

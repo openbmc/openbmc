@@ -12,8 +12,7 @@ DEPENDS += "phosphor-ipmi-host"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
-DEPENDS += "phosphor-dbus-interfaces phosphor-dbus-interfaces-native"
-DEPENDS += "openpower-dbus-interfaces openpower-dbus-interfaces-native"
+DEPENDS += "phosphor-dbus-interfaces"
 
 TARGET_CFLAGS += "-fpic"
 
@@ -22,8 +21,8 @@ HOSTIPMI_PROVIDER_LIBRARY += "libhiomap.so"
 S = "${WORKDIR}/git"
 
 SRC_URI += "git://github.com/openbmc/openpower-host-ipmi-flash"
-SRCREV = "80d5bcaf032606a2e4593969d036cc6108b16003"
+SRCREV = "955103869df04cba4357ad0d5f45a868eb100399"
 
-FILES_${PN}_append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
-FILES_${PN}_append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
-FILES_${PN}-dev_append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
+FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
+FILES:${PN}:append = " ${libdir}/host-ipmid/lib*${SOLIBS}"
+FILES:${PN}-dev:append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"

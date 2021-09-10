@@ -7,7 +7,7 @@ SUMMARY = "Essential build dependencies"
 
 inherit packagegroup
 
-RDEPENDS_packagegroup-core-buildessential = "\
+RDEPENDS:packagegroup-core-buildessential = "\
     autoconf \
     automake \
     binutils \

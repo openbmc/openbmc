@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 DEPENDS += "systemd"
 
@@ -19,8 +19,8 @@ SRC_URI += " \
     "
 
 # make sure that the enterprise-numbers file gets installed in the root FS
-FILES_${PN} += "/usr/share/misc/enterprise-numbers"
-do_compile_prepend() {
+FILES:${PN} += "/usr/share/misc/enterprise-numbers"
+do_compile:prepend() {
     # copy the SRC_URI version of enterprise-numbers
     # to the build dir to prevent a fetch
     mkdir -p "${WORKDIR}/build"
@@ -30,6 +30,6 @@ do_compile_prepend() {
 S = "${WORKDIR}/git"
 LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=9aa91e13d644326bf281924212862184"
 
-EXTRA_OECONF_append = " --disable-ipmishell --enable-intf-dbus DEFAULT_INTF=dbus "
+EXTRA_OECONF:append = " --disable-ipmishell --enable-intf-dbus DEFAULT_INTF=dbus "
 
 PV = "1.8.18+git${SRCPV}"

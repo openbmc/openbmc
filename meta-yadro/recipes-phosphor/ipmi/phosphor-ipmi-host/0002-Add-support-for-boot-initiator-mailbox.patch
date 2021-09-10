@@ -1,0 +1,417 @@
+From a193c5ce59758ed5971b5bd7494f1aaf3489ed9d Mon Sep 17 00:00:00 2001
+From: Alexander Amelkin <a.amelkin@yadro.com>
+Date: Mon, 8 Apr 2019 17:58:42 +0300
+Subject: [PATCH] Add support for boot initiator mailbox
+
+Add handlers to process the chassis system option 7
+(boot initiator mailbox). The format of mailbox is
+specific to the machine/bootloader. This commit only
+adds generic handlers to process getting and setting
+of the mailbox data regardless of the content.
+
+Only the IANA Enterprise number is checked in the data
+block 0. Also checked are the data boundaries.
+
+It is expected that a machine-specific override for
+phosphor-settingsd sets the supported state and
+the IANA number according to the used bootloader.
+
+Resolves openbmc/openbmc#3391
+
+Change-Id: Iccbf74c0775f20c70e8deaa7b0a8bd995ebbffea
+Signed-off-by: Alexander Amelkin <a.amelkin@yadro.com>
+Signed-off-by: Ivan Mikhaylov <i.mikhaylov@yadro.com>
+
+---
+ chassishandler.cpp | 329 ++++++++++++++++++++++++++++++++++++++++++++-
+ chassishandler.hpp |   1 +
+ 2 files changed, 326 insertions(+), 4 deletions(-)
+
+diff --git a/chassishandler.cpp b/chassishandler.cpp
+index fb3d644..7f92b85 100644
+--- a/chassishandler.cpp
++++ b/chassishandler.cpp
+@@ -131,6 +131,7 @@ namespace internal
+ {
+ 
+ constexpr auto bootModeIntf = "xyz.openbmc_project.Control.Boot.Mode";
++constexpr auto bootMboxIntf = "xyz.openbmc_project.Control.Boot.Mailbox";
+ constexpr auto bootTypeIntf = "xyz.openbmc_project.Control.Boot.Type";
+ constexpr auto bootSourceIntf = "xyz.openbmc_project.Control.Boot.Source";
+ constexpr auto powerRestoreIntf =
+@@ -147,8 +148,9 @@ settings::Objects& getObjects()
+     if (objectsPtr == nullptr)
+     {
+         objectsPtr = std::make_unique<settings::Objects>(
+-            dbus, std::vector<std::string>{bootModeIntf, bootTypeIntf,
+-                                           bootSourceIntf, powerRestoreIntf});
++            dbus,
++            std::vector<std::string>{bootMboxIntf, bootModeIntf, bootTypeIntf,
++                                     bootSourceIntf, powerRestoreIntf});
+     }
+     return *objectsPtr;
+ }
+@@ -1708,6 +1710,127 @@ static ipmi::Cc setBootType(ipmi::Context::ptr& ctx, const Type::Types& type)
+     return ipmi::ccSuccess;
+ }
+ 
++using MboxVec = std::vector<uint8_t>;
++
++// Check if Boot Mailbox is supported.
++static std::optional<bool> isBootMboxSupported()
++{
++    using namespace chassis::internal;
++    using namespace chassis::internal::cache;
++
++    try
++    {
++        settings::Objects& objects = getObjects();
++        auto bootMbox = settings::boot::setting(objects, bootMboxIntf);
++        const auto& bootMboxSetting = std::get<settings::Path>(bootMbox);
++        auto method = dbus.new_method_call(
++            objects.service(bootMboxSetting, bootMboxIntf).c_str(),
++            bootMboxSetting.c_str(), ipmi::PROP_INTF, "Get");
++
++        method.append(bootMboxIntf, "Supported");
++        auto reply = dbus.call(method);
++        std::variant<bool> result;
++        reply.read(result);
++        return std::get<bool>(result);
++    }
++    catch (const std::exception& e)
++    {
++        log<level::ERR>("Error getting Boot/Mailbox/Supported",
++                        entry("ERROR=%s", e.what()));
++        report<InternalFailure>();
++        return std::nullopt;
++    }
++}
++
++static std::optional<uint24_t> getBootMboxIANA()
++{
++    using namespace chassis::internal;
++    using namespace chassis::internal::cache;
++
++    try
++    {
++        settings::Objects& objects = getObjects();
++        auto bootMbox = settings::boot::setting(objects, bootMboxIntf);
++        const auto& bootMboxSetting = std::get<settings::Path>(bootMbox);
++        auto method = dbus.new_method_call(
++            objects.service(bootMboxSetting, bootMboxIntf).c_str(),
++            bootMboxSetting.c_str(), ipmi::PROP_INTF, "Get");
++
++        method.append(bootMboxIntf, "IANAEnterpriseNumber");
++        auto reply = dbus.call(method);
++        std::variant<uint32_t> result;
++        reply.read(result);
++        return std::get<uint32_t>(result);
++    }
++    catch (const std::exception& e)
++    {
++        log<level::ERR>("Error getting Boot/Mailbox/IANAEnterpriseNumber",
++                        entry("ERROR=%s", e.what()));
++        report<InternalFailure>();
++        return std::nullopt;
++    }
++}
++
++static std::optional<MboxVec> getBootMbox()
++{
++    using namespace chassis::internal;
++    using namespace chassis::internal::cache;
++
++    try
++    {
++        settings::Objects& objects = getObjects();
++        auto bootMbox = settings::boot::setting(objects, bootMboxIntf);
++        const auto& bootMboxSetting = std::get<settings::Path>(bootMbox);
++        auto method = dbus.new_method_call(
++            objects.service(bootMboxSetting, bootMboxIntf).c_str(),
++            bootMboxSetting.c_str(), ipmi::PROP_INTF, "Get");
++
++        method.append(bootMboxIntf, "Data");
++        auto reply = dbus.call(method);
++        std::variant<MboxVec> result;
++        reply.read(result);
++        return std::get<MboxVec>(result);
++    }
++    catch (const std::exception& e)
++    {
++        log<level::ERR>("Error getting Boot/Mailbox/Data",
++                        entry("ERROR=%s", e.what()));
++        report<InternalFailure>();
++        return std::nullopt;
++    }
++}
++
++static bool setBootMbox(MboxVec data)
++{
++    using namespace chassis::internal;
++    using namespace chassis::internal::cache;
++
++    try
++    {
++        settings::Objects& objects = getObjects();
++        std::variant<MboxVec> property(data);
++        auto bootMbox = settings::boot::setting(objects, bootMboxIntf);
++        const auto& bootMboxSetting = std::get<settings::Path>(bootMbox);
++        auto method = dbus.new_method_call(
++            objects.service(bootMboxSetting, bootMboxIntf).c_str(),
++            bootMboxSetting.c_str(), ipmi::PROP_INTF, "Set");
++
++        method.append(bootMboxIntf, "Data", property);
++        dbus.call(method);
++        return true;
++    }
++    catch (const std::exception& e)
++    {
++        log<level::ERR>("Error setting Boot/Mailbox/Data",
++                        entry("ERROR=%s", e.what()));
++        report<InternalFailure>();
++        return false;
++    }
++}
++
++static constexpr size_t normalBlockSize = 16;
++static constexpr size_t IANAEnterpriseLength = 3;
++
+ static constexpr uint8_t setComplete = 0x0;
+ static constexpr uint8_t setInProgress = 0x1;
+ static uint8_t transferStatus = setComplete;
+@@ -1882,6 +2005,87 @@ ipmi::RspType<ipmi::message::Payload>
+             return ipmi::responseUnspecifiedError();
+         }
+     }
++    else if (types::enum_cast<BootOptionParameter>(bootOptionParameter) ==
++             BootOptionParameter::bootInitiatorMbox)
++    {
++        // Only allow reading the boot initiator mailbox if Mailbox is supported
++        //
++        // Algorithm:
++        // 1. Get 'Supported' property from the Control.Boot.Mailbox interface
++        // 2. If {1} is 'false', report Parameter not supported (0x80)
++        // 3. Get Block Selector from request
++        // 4. Get 'Data' vector from Control.Boot.Mailbox
++        // 5. If requested block {3} exceeds total vector size {4},
++        //    report Out of space (0xC4)
++        // 6. Return the selected block (16 bytes) from the vector
++        try
++        {
++            // Check whether this option is supported
++            std::optional<bool> isSupported = isBootMboxSupported();
++            if (!isSupported)
++            {
++                return ipmi::responseUnspecifiedError();
++            }
++
++            if (!*isSupported)
++            {
++                log<level::INFO>("Attempt to read unsupported Boot/Mailbox");
++                return ipmi::responseParmNotSupported();
++            }
++
++            // Initially assume it's block 1+
++            std::optional<uint24_t> IANAEnterprise;
++            size_t blockDataSize = normalBlockSize;
++            size_t dataVecStartOffset =
++                setSelector * normalBlockSize - IANAEnterpriseLength;
++
++            response.pack(bootOptionParameter, reserved1, setSelector);
++
++            // Adjust pointers and sizes for block 0, and fill in the IANA PEN
++            if (0 == setSelector)
++            {
++                IANAEnterprise = getBootMboxIANA();
++                if (!IANAEnterprise)
++                {
++                    return ipmi::responseInvalidCommand();
++                }
++
++                blockDataSize = normalBlockSize - IANAEnterpriseLength;
++                dataVecStartOffset = 0;
++
++                response.pack(*IANAEnterprise);
++            }
++
++            // Get the total data size
++            std::optional<MboxVec> dataVec = getBootMbox();
++            if (!dataVec)
++            {
++                return ipmi::responseInvalidCommand();
++            }
++
++            if ((*dataVec).size() < dataVecStartOffset + blockDataSize)
++            {
++                size_t totalSize = (*dataVec).size() + IANAEnterpriseLength;
++                log<level::ERR>(
++                    "Attempt to read unsupported block",
++                    entry("REQUESTED_BLOCK=%d", setSelector),
++                    entry("MAX_BLOCK=%d", totalSize / normalBlockSize));
++                return ipmi::responseParmOutOfRange();
++            }
++
++            // Copy the data to response from specified offset in d-bus vector
++            response.append((*dataVec).data() + dataVecStartOffset,
++                            (*dataVec).data() + dataVecStartOffset +
++                                blockDataSize);
++
++            return ipmi::responseSuccess(std::move(response));
++        }
++        catch (InternalFailure& e)
++        {
++            report<InternalFailure>();
++            return ipmi::responseUnspecifiedError();
++        }
++    }
+     else
+     {
+         if ((bootOptionParameter >= oemParmStart) &&
+@@ -1946,9 +2150,8 @@ ipmi::RspType<> ipmiChassisSetSysBootOptions(ipmi::Context::ptr ctx,
+         return ipmi::responseSuccess();
+     }
+ 
+-    /*  000101
++    /*
+      * Parameter #5 means boot flags. Please refer to 28.13 of ipmi doc.
+-     * This is the only parameter used by petitboot.
+      */
+ 
+     if (types::enum_cast<BootOptionParameter>(parameterSelector) ==
+@@ -2084,6 +2287,124 @@ ipmi::RspType<> ipmiChassisSetSysBootOptions(ipmi::Context::ptr ctx,
+             return ipmi::responseUnspecifiedError();
+         }
+     }
++    else if (types::enum_cast<BootOptionParameter>(parameterSelector) ==
++             BootOptionParameter::bootInitiatorMbox)
++    {
++        // Only allow writing to boot initiator mailbox if:
++        // 1. Mailbox is supported
++        // 2. IANA PEN matches.
++        //
++        // Algorithm:
++        // 1. Get 'Supported' property from Control.Boot.Mailbox interface
++        // 2. If {1} is 'false', report Parameter not supported (0x80)
++        // 3. Get Block Selector from request
++        // 4. Get 'Data' array from Control.Boot.Mailbox
++        // 5. If requested block {3} exceeds total vector size {4},
++        //    report Out of range (0xC9)
++        // 6. If requsted block {3} is 0:
++        //    4.1. Get IANA PEN from request
++        //    4.2. Get 'IANAEnterpriseNumber' property from Control.Boot.Mailbox
++        //    4.3. If {4.1} doesn't match {4.2}, report 0xCC error (Invalid
++        //         data field in request)
++        // 7. Overwrite the 16 bytes at offset {3}*16 with the data from request
++        // 8. Update the 'Data' array in Control.Boot.Mailbox
++
++        try
++        {
++            std::optional<bool> isSupported = isBootMboxSupported();
++            if (!isSupported)
++            {
++                return ipmi::responseUnspecifiedError();
++            }
++
++            if (!*isSupported)
++            {
++                log<level::INFO>("Attempt to read unsupported Boot/Mailbox");
++                return ipmi::responseParmNotSupported();
++            }
++
++            // Requested block
++            uint8_t reqBlock;
++            if (data.unpack(reqBlock) != 0)
++            {
++                return ipmi::responseReqDataLenInvalid();
++            }
++
++            // Initially assume it's blcok 1+
++            uint24_t reqIANAEnterprise;
++            std::vector<uint8_t> blockData(normalBlockSize);
++            size_t dataVecStartOffset =
++                reqBlock * normalBlockSize - IANAEnterpriseLength;
++
++            // Adjust pointers and sizes for block 0, and fill in the IANA PEN
++            if (0 == reqBlock)
++            {
++                if (data.unpack(reqIANAEnterprise) != 0)
++                {
++                    return ipmi::responseReqDataLenInvalid();
++                }
++
++                std::optional<uint24_t> IANAEnterprise = getBootMboxIANA();
++                if (!IANAEnterprise)
++                {
++                    return ipmi::responseInvalidCommand();
++                }
++
++                if (*IANAEnterprise != reqIANAEnterprise)
++                {
++                    log<level::ERR>(
++                        "Unsupported IANA Enterprise number",
++                        entry("REQUESTED_IANA=%d",
++                              static_cast<uint32_t>(reqIANAEnterprise)),
++                        entry("SUPPORTED_IANA=%d",
++                              static_cast<uint32_t>(*IANAEnterprise)));
++                    return ipmi::responseInvalidFieldRequest();
++                }
++
++                // For block 0 operate on data after IANA PEN
++                blockData.resize(normalBlockSize - IANAEnterpriseLength);
++                dataVecStartOffset = 0;
++            }
++
++            // Get the data vector from d-bus
++            std::optional<MboxVec> dataVec = getBootMbox();
++            if (!dataVec)
++            {
++                return ipmi::responseInvalidCommand();
++            }
++
++            // Does the requested block exist?
++            if ((*dataVec).size() < dataVecStartOffset + blockData.size())
++            {
++                size_t totalSize = (*dataVec).size() + IANAEnterpriseLength;
++                log<level::ERR>(
++                    "Attempt to read unsupported block",
++                    entry("REQUESTED_BLOCK=%d", reqBlock),
++                    entry("MAX_BLOCK=%d", totalSize / normalBlockSize));
++                return ipmi::responseParmOutOfRange();
++            }
++
++            if (data.unpack(blockData) != 0 || !data.fullyUnpacked())
++            {
++                return ipmi::responseReqDataLenInvalid();
++            }
++
++            // Copy the data from request to specified offset in d-bus vector
++            for (size_t i = 0; i < blockData.size(); ++i)
++            {
++                (*dataVec)[dataVecStartOffset + i] = blockData[i];
++            }
++            if (!setBootMbox(*dataVec))
++            {
++                return ipmi::responseUnspecifiedError();
++            }
++        }
++        catch (InternalFailure& e)
++        {
++            report<InternalFailure>();
++            return ipmi::responseUnspecifiedError();
++        }
++    }
+     else if (types::enum_cast<BootOptionParameter>(parameterSelector) ==
+              BootOptionParameter::bootInfo)
+     {
+diff --git a/chassishandler.hpp b/chassishandler.hpp
+index 2957127..a783bff 100644
+--- a/chassishandler.hpp
++++ b/chassishandler.hpp
+@@ -51,6 +51,7 @@ enum class BootOptionParameter : size_t
+     bootFlagValidClr = 0x3,
+     bootInfo = 0x4,
+     bootFlags = 0x5,
++    bootInitiatorMbox = 0x07,
+     opalNetworkSettings = 0x61
+ };
+ 

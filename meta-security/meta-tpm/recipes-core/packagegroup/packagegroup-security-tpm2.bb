@@ -7,8 +7,8 @@ inherit packagegroup
 
 PACKAGES = "${PN}"
 
-SUMMARY_packagegroup-security-tpm2 = "Security TPM 2.0 support"
-RDEPENDS_packagegroup-security-tpm2 = " \
+SUMMARY:packagegroup-security-tpm2 = "Security TPM 2.0 support"
+RDEPENDS:packagegroup-security-tpm2 = " \
     tpm2-tools \
     trousers \
     tpm2-tss \
@@ -19,5 +19,4 @@ RDEPENDS_packagegroup-security-tpm2 = " \
     tpm2-abrmd \
     tpm2-pkcs11 \
     ibmswtpm2 \
-    cryptsetup-tpm-incubator \
     "

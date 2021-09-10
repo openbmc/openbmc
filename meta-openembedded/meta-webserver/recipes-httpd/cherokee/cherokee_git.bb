@@ -1,5 +1,5 @@
 SUMMARY = "Cherokee Web Server fast and secure"
-SUMMARY_cget = "Small downloader based in the Cherokee client library"
+SUMMARY:cget = "Small downloader based in the Cherokee client library"
 HOMEPAGE = "http://www.cherokee-project.com/"
 SECTION = "network"
 LICENSE = "GPLv2"
@@ -34,7 +34,7 @@ EXTRA_OECONF = "--disable-static \
                --with-wwwroot=${localstatedir}/www/cherokee \
 "
 
-do_install_append () {
+do_install:append () {
     install -m 0755 -d ${D}${sysconfdir}/init.d
     install -m 755 ${WORKDIR}/cherokee.init ${D}${sysconfdir}/init.d/cherokee
 
@@ -50,15 +50,15 @@ do_install_append () {
 # Put -dev near the front so we can move the .la files into it with a wildcard
 PACKAGES =+ "libcherokee-server libcherokee-client libcherokee-base cget"
 
-FILES_cget = "${bindir}/cget"
-FILES_libcherokee-server = "${libdir}/libcherokee-server${SOLIBS}"
-FILES_libcherokee-client = "${libdir}/libcherokee-client${SOLIBS}"
-FILES_libcherokee-base = "${libdir}/libcherokee-base${SOLIBS}"
+FILES:cget = "${bindir}/cget"
+FILES:libcherokee-server = "${libdir}/libcherokee-server${SOLIBS}"
+FILES:libcherokee-client = "${libdir}/libcherokee-client${SOLIBS}"
+FILES:libcherokee-base = "${libdir}/libcherokee-base${SOLIBS}"
 
 # Pack the htdocs
-FILES_${PN} += "${localstatedir}/www/cherokee"
+FILES:${PN} += "${localstatedir}/www/cherokee"
 
-CONFFILES_${PN} = " \
+CONFFILES:${PN} = " \
                    ${sysconfdir}/cherokee/cherokee.conf \
                    ${sysconfdir}/init.d/cherokee \
 "
@@ -66,10 +66,10 @@ CONFFILES_${PN} = " \
 INITSCRIPT_NAME = "cherokee"
 INITSCRIPT_PARAMS = "defaults 91 91"
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
-SYSTEMD_SERVICE_${PN} = "cherokee.service"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
+SYSTEMD_SERVICE:${PN} = "cherokee.service"
 
 python() {
     if 'meta-python2' not in d.getVar('BBFILE_COLLECTIONS').split():

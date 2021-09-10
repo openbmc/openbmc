@@ -1,0 +1,42 @@
+From c0a465ccae395871ab10932975e37894220bc6a1 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 1 Jun 2021 10:23:59 +0800
+Subject: [PATCH] drop FindPythonInstDir.cmake
+
+Since commit [1] applied, PYTHON_INSTALL_DIR is not right
+on nativesdk build
+...
+|Building for python3
+|-- Python install dir is
+|tmp-glibc/work/x86_64-nativesdk-wrlinuxsdk-linux/nativesdk-libdnf/0.63.0-r0/
+recipe-sysroot-native/usr/lib/python3.9/site-packages
+...
+
+Yocto manually set PYTHON_INSTALL_DIR from recipe, it is not
+necessary to call FindPythonInstDir.cmake which will override
+Yocto setting
+
+[1] https://github.com/rpm-software-management/libdnf/commit/f1cffbfb9f338da827e233c2d8ac3a25a6a59a69
+
+Upstream-Status: Inappropriate [Yocto specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ cmake/modules/FindPythonInstDir.cmake | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/cmake/modules/FindPythonInstDir.cmake b/cmake/modules/FindPythonInstDir.cmake
+index ed098ded..8b137891 100644
+--- a/cmake/modules/FindPythonInstDir.cmake
++++ b/cmake/modules/FindPythonInstDir.cmake
+@@ -1,6 +1 @@
+-EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "
+-from sys import stdout
+-from sysconfig import get_path
+-path=get_path(name='platlib', vars={'platbase':'${CMAKE_INSTALL_PREFIX}'})
+-stdout.write(path)"
+-OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
++
+-- 
+2.18.1
+

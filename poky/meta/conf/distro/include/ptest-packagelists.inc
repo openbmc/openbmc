@@ -14,18 +14,21 @@ PTESTS_FAST = "\
     diffutils-ptest \
     elfutils-ptest \
     ethtool-ptest \
+    expat-ptest \
     flex-ptest \
     gawk-ptest \
     gdbm-ptest \
     gdk-pixbuf-ptest \
     gettext-ptest \
+    glib-networking-ptest \
     gzip-ptest \
     json-glib-ptest \
-    kbd-ptest \
     libconvert-asn1-perl-ptest \
     liberror-perl-ptest \
+    libnl-ptest \
     libmodule-build-perl-ptest \
     libpcre-ptest \
+    libssh2-ptest \
     libtimedate-perl-ptest \
     libtest-needs-perl-ptest \
     liburi-perl-ptest \
@@ -44,23 +47,22 @@ PTESTS_FAST = "\
     opkg-ptest \
     pango-ptest \
     parted-ptest \
+    python3-atomicwrites-ptest \
+    python3-hypothesis-ptest \
+    python3-jinja2-ptest \
+    python3-markupsafe-ptest \
+    python3-more-itertools-ptest \
+    python3-pluggy-ptest \
+    python3-wcwidth-ptest \
+    qemu-ptest \
     quilt-ptest \
     sed-ptest \
     slang-ptest \
     wayland-ptest \
     zlib-ptest \
 "
-
-#PTESTS_PROBLEMS = "\
-#    qemu-ptest \ # Doesn't run any tests?
-#    ruby-ptest \ # Timeout
-#    clutter-1.0-ptest \ # Doesn't build due to depends on cogl-1.0
-#    lz4-ptest \ # Needs a rewrite
-#    rt-tests-ptest \ # Needs to be checked whether it runs at all
-#    bash-ptest \ # Test outcomes are non-deterministic by design
-#    ifupdown-ptest \ # Tested separately in lib/oeqa/selftest/cases/imagefeatures.py
-#    mdadm-ptest \ # Tests rely on non-deterministic sleep() amounts
-#"
+PTESTS_FAST:remove:mips64 = "qemu-ptest"
+PTESTS_PROBLEMS:append:mips64 = "qemu-ptest"
 
 PTESTS_SLOW = "\
     babeltrace-ptest \
@@ -72,7 +74,6 @@ PTESTS_SLOW = "\
     glib-2.0-ptest \
     gstreamer1.0-ptest \
     libevent-ptest \
-    libinput-ptest \
     lttng-tools-ptest \
     openssh-ptest \
     openssl-ptest \
@@ -84,4 +85,31 @@ PTESTS_SLOW = "\
     valgrind-ptest \
 "
 
-PTESTS_SLOW_remove_riscv64 = "valgrind-ptest"
+PTESTS_SLOW:remove:riscv64 = "valgrind-ptest"
+PTESTS_PROBLEMS:append:riscv64 = "valgrind-ptest"
+
+#    ruby-ptest \ # Timeout
+#    lz4-ptest \ # Needs a rewrite
+#    rt-tests-ptest \ # Needs to be checked whether it runs at all
+#    bash-ptest \ # Test outcomes are non-deterministic by design
+#    ifupdown-ptest \ # Tested separately in lib/oeqa/selftest/cases/imagefeatures.py
+#    mdadm-ptest \ # Tests rely on non-deterministic sleep() amounts
+#    libinput-ptest \ # Tests need an unloaded system to be reliable
+#    libpam-ptest \ # Needs pam DISTRO_FEATURE
+#    numactl-ptest \ # qemu not (yet) configured for numa; all tests are skipped
+#    libseccomp-ptest \ #  tests failed: 38; add to slow tests once addressed
+#    python3-numpy-ptest \ # requires even more RAM and (possibly) disk space; multiple failures
+
+PTESTS_PROBLEMS = "\
+    ruby-ptest \
+    lz4-ptest \
+    rt-tests-ptest \
+    bash-ptest \
+    ifupdown-ptest \
+    mdadm-ptest \
+    libinput-ptest \
+    libpam-ptest \
+    libseccomp-ptest \
+    numactl-ptest \
+    python3-numpy-ptest \
+"

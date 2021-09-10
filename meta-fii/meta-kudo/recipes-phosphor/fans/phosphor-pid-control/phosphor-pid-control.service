@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenBMC Fan Control Daemon
+After=xyz.openbmc_project.EntityManager.service
+After=xyz.openbmc_project.ObjectMapper.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/swampd -t
+Restart=always
+RestartSec=5
+StartLimitInterval=0
+
+[Install]
+WantedBy=basic.target

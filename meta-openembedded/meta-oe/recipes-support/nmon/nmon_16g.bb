@@ -4,7 +4,7 @@ SECTION = "console/utils"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/Documentation.txt;md5=dbb13658cf55d687c4f2ff771a696d4a"
 DEPENDS = "ncurses"
-DEPENDS_append_libc-musl = " bsd-headers"
+DEPENDS:append:libc-musl = " bsd-headers"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/nmon/lmon${PV}.c;name=lmon \
            ${SOURCEFORGE_MIRROR}/nmon/Documentation.txt;name=doc \
@@ -17,7 +17,7 @@ SRC_URI[doc.sha256sum] = "1f7f83afe62a7210be5e83cd24157adb854c14599efe0b377a7ecc
 
 CFLAGS += "-D JFS -D GETUSER -Wall -D LARGEMEM"
 LDFLAGS += "-ltinfo -lncursesw -lm"
-ASNEEDED_pn-nmon = ""
+ASNEEDED:pn-nmon = ""
 
 S = "${WORKDIR}"
 

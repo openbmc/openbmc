@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -e
+
+manufacturer=RPB
+model="Android device"
+serial=0123456789ABCDEF
+
+if [ -r /etc/android-gadget-setup.machine ] ; then
+	. /etc/android-gadget-setup.machine
+fi
+
+[ -d /sys/kernel/config/usb_gadget ] || modprobe libcomposite
+
+cd /sys/kernel/config/usb_gadget
+
+[ -d adb ] && /usr/bin/android-gadget-cleanup || true
+
+mkdir adb
+cd adb
+
+mkdir configs/c.1
+mkdir functions/ffs.usb0
+mkdir strings/0x409
+mkdir configs/c.1/strings/0x409
+echo -n 0x18d1 > idVendor
+echo -n 0xd002 > idProduct
+echo "$serial" > strings/0x409/serialnumber
+echo "$manufacturer" > strings/0x409/manufacturer
+echo "$model" > strings/0x409/product
+echo "Conf 1" > configs/c.1/strings/0x409/configuration
+ln -s functions/ffs.usb0 configs/c.1
+
+mkdir -p /dev/usb-ffs/adb
+mount -t functionfs usb0 /dev/usb-ffs/adb

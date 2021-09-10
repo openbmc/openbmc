@@ -10,7 +10,7 @@ inherit pypi setuptools3 python3-dir
 
 DEPENDS += "${PYTHON_PN}-pytest-runner-native"
 
-do_install_append(){
+do_install:append(){
     rm ${D}${bindir}/pylint
     cat >> ${D}${bindir}/pylint <<EOF
 #!/usr/bin/env ${PYTHON_PN}
@@ -22,12 +22,12 @@ EOF
 }
 
 PACKAGES =+ "${PN}-tests"
-FILES_${PN}-tests+= " \
+FILES:${PN}-tests+= " \
     ${PYTHON_SITEPACKAGES_DIR}/pylint/test/ \
     ${PYTHON_SITEPACKAGES_DIR}/pylint/testutils.py \
 "
 
-RDEPENDS_${PN} += "${PYTHON_PN}-astroid \
+RDEPENDS:${PN} += "${PYTHON_PN}-astroid \
                    ${PYTHON_PN}-isort \
                    ${PYTHON_PN}-numbers \
                    ${PYTHON_PN}-shell \

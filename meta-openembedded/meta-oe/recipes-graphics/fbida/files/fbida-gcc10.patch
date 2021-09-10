@@ -1,0 +1,61 @@
+Fix build with gcc10
+
+Patch from https://src.fedoraproject.org/rpms/fbida/raw/master/f/fbida.gcc10.patch
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- fbida-2.14/fbi.c.org	2020-03-15 17:02:17.944189632 +0100
++++ fbida-2.14/fbi.c	2020-03-15 17:02:21.880223224 +0100
+@@ -100,7 +100,6 @@
+ 
+ /* graphics interface */
+ gfxstate                   *gfx;
+-int                        debug;
+ 
+ /* framebuffer */
+ char                       *fbdev = NULL;
+--- fbida-2.14/filter.c	2020-03-15 16:44:17.159855150 +0100
++++ fbida-2.14/filter.c	2020-03-15 16:44:27.017941447 +0100
+@@ -6,8 +6,6 @@
+ #include "readers.h"
+ #include "filter.h"
+ 
+-int debug = 0;
+-
+ /* ----------------------------------------------------------------------- */
+ 
+ static void
+--- fbida-2.14/readers.c.org	2020-03-15 17:01:18.692683597 +0100
++++ fbida-2.14/readers.c	2020-03-15 16:57:19.141632384 +0100
+@@ -6,6 +6,8 @@
+ 
+ #include "readers.h"
+ 
++int debug=0;
++
+ /* ----------------------------------------------------------------------- */
+ 
+ void load_bits_lsb(unsigned char *dst, unsigned char *src, int width,
+
+--- fbida-2.14/viewer.c.org	2020-03-15 17:05:02.991595832 +0100
++++ fbida-2.14/viewer.c	2020-03-15 17:04:55.424531467 +0100
+@@ -40,7 +40,6 @@
+ #define PROCESS_LINES    16
+ 
+-int debug;
+ Cursor ptrs[POINTER_COUNT];
+ 
+ /* ----------------------------------------------------------------------- */
+ 
+--- fbida-2.14/idaconfig.h.org	2020-03-15 17:07:09.239668196 +0100
++++ fbida-2.14/idaconfig.h	2020-03-15 17:07:21.248770061 +0100
+@@ -17,7 +17,7 @@
+ 
+ /* -------------------------------------------------------------------------- */
+ 
+-char *ida_lists;
++extern char *ida_lists;
+ 
+ void ida_init_config(void);
+ void ida_read_config(void);

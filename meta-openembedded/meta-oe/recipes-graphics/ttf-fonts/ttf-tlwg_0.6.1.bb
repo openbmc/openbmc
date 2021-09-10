@@ -13,7 +13,7 @@ SRC_URI[source.sha256sum] = "77fb9832221fde60c9f683ac3fdce7d45ab6e9c0d83df83da96
 SRC_URI[ttf.md5sum] = "1bc51f45a7b661404a944fab6911261c"
 SRC_URI[ttf.sha256sum] = "aa9cd68969b6f704df3e5b1a2e11204c47f118c8ab052f04c111bd5f299f77c8"
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${sysconfdir}/fonts/conf.d
 
     for x in ${S}/etc/fonts/conf.avail/*.conf; do
@@ -24,4 +24,4 @@ do_install_append () {
 PACKAGES = "${PN}"
 FONT_PACKAGES = "${PN}"
 
-FILES_${PN} = "${datadir}/fonts ${sysconfdir}"
+FILES:${PN} = "${datadir}/fonts ${sysconfdir}"

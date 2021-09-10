@@ -1,0 +1,35 @@
+From 154c7465de2aeb9a8ba3416bbed6e6e07f58c583 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 11 Mar 2021 21:52:28 -0800
+Subject: [PATCH] configure: Do not enforce libdir for ppc64
+
+OE has its own multilib configuration, therefore hardcoding libdir
+breaks that, instead respect the settings coming from build environment
+via configure options.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index c8d68f7..254440f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -206,12 +206,6 @@ fi
+ AM_CONDITIONAL(USE_DWARF, [test x$use_dwarf = xyes])
+ AC_MSG_RESULT([$use_dwarf])
+ 
+-if test x$target_arch = xppc64; then
+-        libdir='${exec_prefix}/lib64'
+-        AC_MSG_NOTICE([PowerPC64 detected, lib will be installed ${libdir}]);
+-        AC_SUBST([libdir])
+-fi
+-
+ AC_MSG_CHECKING([whether to restrict build to remote support])
+ if test x$target_arch != x$host_arch; then
+   CPPFLAGS="${CPPFLAGS} -DUNW_REMOTE_ONLY"
+-- 
+2.30.2
+

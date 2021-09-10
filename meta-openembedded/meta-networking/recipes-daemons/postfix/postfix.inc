@@ -25,11 +25,11 @@ inherit update-rc.d useradd update-alternatives systemd lib_package
 INITSCRIPT_NAME = "postfix"
 INITSCRIPT_PARAMS = "start 58 3 4 5 . stop 13 0 1 6 ."
 USERADD_PACKAGES = "${PN}-bin"
-USERADD_PARAM_${PN}-bin = \
+USERADD_PARAM:${PN}-bin = \
 "-d /var/spool/postfix -r -g postfix --shell /bin/false postfix; \
  -d /var/spool/vmail -r -g vmail --shell /bin/false vmail \
 "
-GROUPADD_PARAM_${PN}-bin = "--system postfix;--system postdrop;--system vmail"
+GROUPADD_PARAM:${PN}-bin = "--system postfix;--system postdrop;--system vmail"
 
 export SYSLIBS = "${LDFLAGS}"
 
@@ -45,10 +45,10 @@ export AUXLIBS-ldap = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', '-lldap -llber', '', d)}"
 
 # no native openldap
-export CCARGS-ldap_class-native = ""
-export AUXLIBS-ldap_class-native = ""
+export CCARGS-ldap:class-native = ""
+export AUXLIBS-ldap:class-native = ""
 
-export CCARGS-nonis_libc-musl = "-DNO_NIS"
+export CCARGS-nonis:libc-musl = "-DNO_NIS"
 export CCARGS-nonis = ""
 
 # SASL support -DUSE_LDAP_SASL -DUSE_SASL_AUTH
@@ -57,8 +57,8 @@ export CCARGS-sasl  = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'sasl', '-DUSE_SASL_AUTH -DUSE_CYRUS_SASL -I${STAGING_INCDIR}/sasl', '', d)}"
 export AUXLIBS-sasl = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'sasl', '-lsasl2', '', d)}"
-export CCARGS-sasl_class-native = ""
-export AUXLIBS-sasl_class-native = ""
+export CCARGS-sasl:class-native = ""
+export AUXLIBS-sasl:class-native = ""
 
 # PCRE, TLS support default
 export CCARGS  = "${CFLAGS} -DHAS_PCRE -DUSE_TLS -I${STAGING_INCDIR}/openssl ${CCARGS-ldap} ${CCARGS-sasl} ${CCARGS-nonis}"
@@ -95,11 +95,11 @@ do_compile () {
     oe_runmake
 }
 
-do_install_prepend_class-native() {
+do_install:prepend:class-native() {
     export POSTCONF="bin/postconf"
 }
 
-SYSTEMD_SERVICE_${PN} = "postfix.service"
+SYSTEMD_SERVICE:${PN} = "postfix.service"
 
 do_install () {
     sh ./postfix-install 'install_root=${D}' \
@@ -180,14 +180,14 @@ do_install () {
     rm -rf ${D}/etc/postfix/makedefs.out
 }
 
-do_install_append_class-native() {
+do_install:append:class-native() {
     ln -sf ../sbin/sendmail.postfix ${D}${bindir}/newaliases
     ln -sf ../sbin/sendmail.postfix ${D}${bindir}/mailq
 }
 
-ALTERNATIVE_${PN}-bin = "sendmail mailq newaliases"
+ALTERNATIVE:${PN}-bin = "sendmail mailq newaliases"
 # /usr/lib/sendmial is required by LSB core test
-ALTERNATIVE_${PN}-bin_linuxstdbase = "sendmail mailq newaliases usr-lib-sendmail"
+ALTERNATIVE:${PN}-bin:linuxstdbase = "sendmail mailq newaliases usr-lib-sendmail"
 ALTERNATIVE_TARGET[mailq] = "${bindir}/mailq"
 ALTERNATIVE_TARGET[newaliases] = "${bindir}/newaliases"
 ALTERNATIVE_TARGET[sendmail] = "${sbindir}/sendmail.postfix"
@@ -197,12 +197,12 @@ ALTERNATIVE_LINK_NAME[usr-lib-sendmail] = "/usr/lib/sendmail"
 
 ALTERNATIVE_PRIORITY = "120"
 
-ALTERNATIVE_${PN}-doc += "mailq.1 newaliases.1 sendmail.1"
+ALTERNATIVE:${PN}-doc += "mailq.1 newaliases.1 sendmail.1"
 ALTERNATIVE_LINK_NAME[mailq.1] = "${mandir}/man1/mailq.1"
 ALTERNATIVE_LINK_NAME[newaliases.1] = "${mandir}/man1/newaliases.1"
 ALTERNATIVE_LINK_NAME[sendmail.1] = "${mandir}/man1/sendmail.1"
 
-pkg_postinst_ontarget_${PN}-cfg () {
+pkg_postinst_ontarget:${PN}-cfg () {
     touch /etc/aliases
     newaliases
 
@@ -212,11 +212,11 @@ pkg_postinst_ontarget_${PN}-cfg () {
 }
 
 PACKAGES =+ "${PN}-cfg"
-RDEPENDS_${PN}-cfg_class-target += "${PN}-bin"
-RDEPENDS_${PN}_class-target += "${PN}-cfg"
+RDEPENDS:${PN}-cfg:class-target += "${PN}-bin"
+RDEPENDS:${PN}:class-target += "${PN}-cfg"
 # Exclude .debug directories from the main package
-FILES_${PN}-bin += "${localstatedir} ${bindir}/* ${sbindir}/* \
+FILES:${PN}-bin += "${localstatedir} ${bindir}/* ${sbindir}/* \
                ${libexecdir}/* ${systemd_unitdir}/*"
-FILES_${PN}-cfg = "${sysconfdir}"
-FILES_${PN}-dbg += "${libexecdir}/postfix/.debug"
-ALLOW_EMPTY_${PN} = "1"
+FILES:${PN}-cfg = "${sysconfdir}"
+FILES:${PN}-dbg += "${libexecdir}/postfix/.debug"
+ALLOW_EMPTY:${PN} = "1"

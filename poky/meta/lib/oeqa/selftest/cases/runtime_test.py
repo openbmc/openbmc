@@ -14,11 +14,6 @@ from oeqa.core.decorator.data import skipIfNotQemu
 
 class TestExport(OESelftestTestCase):
 
-    @classmethod
-    def tearDownClass(cls):
-        runCmd("rm -rf /tmp/sdk")
-        super(TestExport, cls).tearDownClass()
-
     def test_testexport_basic(self):
         """
         Summary: Check basic testexport functionality with only ping test enabled.
@@ -95,19 +90,20 @@ class TestExport(OESelftestTestCase):
         msg = "Couldn't find SDK tarball: %s" % tarball_path
         self.assertEqual(os.path.isfile(tarball_path), True, msg)
 
-        # Extract SDK and run tar from SDK
-        result = runCmd("%s -y -d /tmp/sdk" % tarball_path)
-        self.assertEqual(0, result.status, "Couldn't extract SDK")
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            # Extract SDK and run tar from SDK
+            result = runCmd("%s -y -d %s" % (tarball_path, tmpdirname))
+            self.assertEqual(0, result.status, "Couldn't extract SDK")
 
-        env_script = result.output.split()[-1]
-        result = runCmd(". %s; which tar" % env_script, shell=True)
-        self.assertEqual(0, result.status, "Couldn't setup SDK environment")
-        is_sdk_tar = True if "/tmp/sdk" in result.output else False
-        self.assertTrue(is_sdk_tar, "Couldn't setup SDK environment")
+            env_script = result.output.split()[-1]
+            result = runCmd(". %s; which tar" % env_script, shell=True)
+            self.assertEqual(0, result.status, "Couldn't setup SDK environment")
+            is_sdk_tar = True if tmpdirname in result.output else False
+            self.assertTrue(is_sdk_tar, "Couldn't setup SDK environment")
 
-        tar_sdk = result.output
-        result = runCmd("%s --version" % tar_sdk)
-        self.assertEqual(0, result.status, "Couldn't run tar from SDK")
+            tar_sdk = result.output
+            result = runCmd("%s --version" % tar_sdk)
+            self.assertEqual(0, result.status, "Couldn't run tar from SDK")
 
 
 class TestImage(OESelftestTestCase):
@@ -124,11 +120,10 @@ class TestImage(OESelftestTestCase):
             self.skipTest('core-image-full-cmdline not buildable for poky-tiny')
 
         features = 'INHERIT += "testimage"\n'
-        features += 'IMAGE_INSTALL_append = " libssl"\n'
+        features += 'IMAGE_INSTALL:append = " libssl"\n'
         features += 'TEST_SUITES = "ping ssh selftest"\n'
         self.write_config(features)
 
-        # Build core-image-sato and testimage
         bitbake('core-image-full-cmdline socat')
         bitbake('-c testimage core-image-full-cmdline')
 
@@ -156,14 +151,14 @@ class TestImage(OESelftestTestCase):
         self.gpg_home = tempfile.mkdtemp(prefix="oeqa-feed-sign-")
         self.track_for_cleanup(self.gpg_home)
         signing_key_dir = os.path.join(self.testlayer_path, 'files', 'signing')
-        runCmd('gpg --batch --homedir %s --import %s' % (self.gpg_home, os.path.join(signing_key_dir, 'key.secret')), native_sysroot=get_bb_var("RECIPE_SYSROOT_NATIVE", "gnupg-native"))
+        runCmd('gpgconf --list-dirs --homedir %s; gpg -v --batch --homedir %s --import %s' % (self.gpg_home, self.gpg_home, os.path.join(signing_key_dir, 'key.secret')), native_sysroot=get_bb_var("RECIPE_SYSROOT_NATIVE", "gnupg-native"), shell=True)
         features += 'INHERIT += "sign_package_feed"\n'
         features += 'PACKAGE_FEED_GPG_NAME = "testuser"\n'
         features += 'PACKAGE_FEED_GPG_PASSPHRASE_FILE = "%s"\n' % os.path.join(signing_key_dir, 'key.passphrase')
         features += 'GPG_PATH = "%s"\n' % self.gpg_home
+        features += 'PSEUDO_IGNORE_PATHS .= ",%s"\n' % self.gpg_home
         self.write_config(features)
 
-        # Build core-image-sato and testimage
         bitbake('core-image-full-cmdline socat')
         bitbake('-c testimage core-image-full-cmdline')
 
@@ -191,14 +186,14 @@ class TestImage(OESelftestTestCase):
         qemu_distrofeatures = get_bb_var('DISTRO_FEATURES', 'qemu-system-native')
         features = 'INHERIT += "testimage"\n'
         if 'gtk+' not in qemu_packageconfig:
-            features += 'PACKAGECONFIG_append_pn-qemu-system-native = " gtk+"\n'
+            features += 'PACKAGECONFIG:append:pn-qemu-system-native = " gtk+"\n'
         if 'sdl' not in qemu_packageconfig:
-            features += 'PACKAGECONFIG_append_pn-qemu-system-native = " sdl"\n'
+            features += 'PACKAGECONFIG:append:pn-qemu-system-native = " sdl"\n'
         if 'opengl' not in qemu_distrofeatures:
-            features += 'DISTRO_FEATURES_append = " opengl"\n'
+            features += 'DISTRO_FEATURES:append = " opengl"\n'
         features += 'TEST_SUITES = "ping ssh virgl"\n'
-        features += 'IMAGE_FEATURES_append = " ssh-server-dropbear"\n'
-        features += 'IMAGE_INSTALL_append = " kmscube"\n'
+        features += 'IMAGE_FEATURES:append = " ssh-server-dropbear"\n'
+        features += 'IMAGE_INSTALL:append = " kmscube"\n'
         features_gtk = features + 'TEST_RUNQEMUPARAMS = "gtk gl"\n'
         self.write_config(features_gtk)
         bitbake('core-image-minimal')
@@ -217,12 +212,14 @@ class TestImage(OESelftestTestCase):
         Author: Alexander Kanavin <alex.kanavin@gmail.com>
         """
         import subprocess, os
+
+        render_hint = """If /dev/dri/renderD* is absent due to lack of suitable GPU, 'modprobe vgem' will create one sutable for mesa llvmpipe sofware renderer."""
         try:
             content = os.listdir("/dev/dri")
             if len([i for i in content if i.startswith('render')]) == 0:
-                self.skipTest("No render nodes found in /dev/dri: %s" %(content))
+                self.skipTest("No render nodes found in /dev/dri: %s. %s" %(content, render_hint))
         except FileNotFoundError:
-            self.skipTest("/dev/dri directory does not exist; no render nodes available on this machine.")
+            self.skipTest("/dev/dri directory does not exist; no render nodes available on this machine. %s" %(render_hint))
         try:
             dripath = subprocess.check_output("pkg-config --variable=dridriverdir dri", shell=True)
         except subprocess.CalledProcessError as e:
@@ -230,10 +227,10 @@ class TestImage(OESelftestTestCase):
         qemu_distrofeatures = get_bb_var('DISTRO_FEATURES', 'qemu-system-native')
         features = 'INHERIT += "testimage"\n'
         if 'opengl' not in qemu_distrofeatures:
-            features += 'DISTRO_FEATURES_append = " opengl"\n'
+            features += 'DISTRO_FEATURES:append = " opengl"\n'
         features += 'TEST_SUITES = "ping ssh virgl"\n'
-        features += 'IMAGE_FEATURES_append = " ssh-server-dropbear"\n'
-        features += 'IMAGE_INSTALL_append = " kmscube"\n'
+        features += 'IMAGE_FEATURES:append = " ssh-server-dropbear"\n'
+        features += 'IMAGE_INSTALL:append = " kmscube"\n'
         features += 'TEST_RUNQEMUPARAMS = "egl-headless"\n'
         self.write_config(features)
         bitbake('core-image-minimal')
@@ -259,7 +256,7 @@ class Postinst(OESelftestTestCase):
                 features += 'IMAGE_FEATURES += "package-management empty-root-password"\n'
                 features += 'PACKAGE_CLASSES = "%s"\n' % classes
                 if init_manager == "systemd":
-                    features += 'DISTRO_FEATURES_append = " systemd"\n'
+                    features += 'DISTRO_FEATURES:append = " systemd"\n'
                     features += 'VIRTUAL-RUNTIME_init_manager = "systemd"\n'
                     features += 'DISTRO_FEATURES_BACKFILL_CONSIDERED = "sysvinit"\n'
                     features += 'VIRTUAL-RUNTIME_initscripts = ""\n'
@@ -275,7 +272,7 @@ class Postinst(OESelftestTestCase):
                     # run_serial()'s status code is useless.'
                     for filename in ("rootfs", "delayed-a", "delayed-b"):
                         status, output = qemu.run_serial("test -f %s && echo found" % os.path.join(targettestdir, filename))
-                        self.assertEqual(output, "found", "%s was not present on boot" % filename)
+                        self.assertIn("found", output, "%s was not present on boot" % filename)
 
 
 
@@ -376,14 +373,14 @@ TEST_SERVER_IP = "192.168.7.1"
 TEST_TARGET_IP = "192.168.7.2"
 
 EXTRA_IMAGE_FEATURES += "tools-profile dbg-pkgs"
-IMAGE_FEATURES_append = " ssh-server-dropbear"
+IMAGE_FEATURES:append = " ssh-server-dropbear"
 
 # enables kernel debug symbols
-KERNEL_EXTRA_FEATURES_append = " features/debug/debug-kernel.scc"
-KERNEL_EXTRA_FEATURES_append = " features/systemtap/systemtap.scc"
+KERNEL_EXTRA_FEATURES:append = " features/debug/debug-kernel.scc"
+KERNEL_EXTRA_FEATURES:append = " features/systemtap/systemtap.scc"
 
 # add systemtap run-time into target image if it is not there yet
-IMAGE_INSTALL_append = " systemtap"
+IMAGE_INSTALL:append = " systemtap-runtime"
 """
 
         def test_crosstap_helloworld(self):

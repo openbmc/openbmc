@@ -10,6 +10,6 @@ S = "${WORKDIR}/git"
 
 inherit cmake
 
-FILES_${PN}-dev += "${libdir}/cmake/cJSON/*"
+FILES:${PN}-dev += "${libdir}/cmake/cJSON/*"
 
 EXTRA_OECMAKE = "-DENABLE_CUSTOM_COMPILER_FLAGS=OFF -DENABLE_TARGET_EXPORT=OFF"

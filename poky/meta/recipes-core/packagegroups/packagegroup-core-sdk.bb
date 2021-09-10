@@ -11,7 +11,7 @@ inherit packagegroup
 
 #PACKAGEFUNCS =+ 'generate_sdk_pkgs'
 
-RDEPENDS_packagegroup-core-sdk = "\
+RDEPENDS:packagegroup-core-sdk = "\
     packagegroup-core-buildessential \
     coreutils \
     ccache \
@@ -26,15 +26,15 @@ RDEPENDS_packagegroup-core-sdk = "\
     tcl"
 
 SANITIZERS = "libasan-dev libubsan-dev"
-SANITIZERS_arc = ""
-SANITIZERS_microblaze = ""
-SANITIZERS_mipsarch = ""
-SANITIZERS_nios2 = ""
-SANITIZERS_riscv64 = ""
-SANITIZERS_riscv32 = ""
-SANITIZERS_libc-musl = ""
+SANITIZERS:arc = ""
+SANITIZERS:microblaze = ""
+SANITIZERS:mipsarch = ""
+SANITIZERS:nios2 = ""
+SANITIZERS:riscv64 = ""
+SANITIZERS:riscv32 = ""
+SANITIZERS:libc-musl = ""
 
-RRECOMMENDS_packagegroup-core-sdk = "\
+RRECOMMENDS:packagegroup-core-sdk = "\
     libgomp \
     libgomp-dev \
     ${SANITIZERS}"
@@ -53,7 +53,7 @@ RRECOMMENDS_packagegroup-core-sdk = "\
 #        # the package depchain code
 #        spkgdata = read_subpkgdata(pkg, d)
 #
-#        rdepends = explode_deps(spkgdata.get('RDEPENDS_%s' % pkg) or '')
+#        rdepends = explode_deps(spkgdata.get('RDEPENDS:%s' % pkg) or '')
 #        rreclist = []
 #
 #        for depend in rdepends:
@@ -63,16 +63,16 @@ RRECOMMENDS_packagegroup-core-sdk = "\
 #                rreclist.append('%s-dev' % name)
 #            else:
 #                deppkgdata = read_subpkgdata(name, d)
-#                rdepends2 = explode_deps(deppkgdata.get('RDEPENDS_%s' % name) or '')
+#                rdepends2 = explode_deps(deppkgdata.get('RDEPENDS:%s' % name) or '')
 #                for depend in rdepends2:
 #                    split_depend = depend.split(' (')
 #                    name = split_depend[0].strip()
 #                    if packaged('%s-dev' % name, d):
 #                        rreclist.append('%s-dev' % name)
 #
-#            oldrrec = d.getVar('RRECOMMENDS_%s' % newpkg, False) or ''
-#            d.setVar('RRECOMMENDS_%s' % newpkg, oldrrec + ' ' + ' '.join(rreclist))
-#            # bb.note('RRECOMMENDS_%s = "%s"' % (newpkg, d.getVar('RRECOMMENDS_%s' % newpkg, False)))
+#            oldrrec = d.getVar('RRECOMMENDS:%s' % newpkg, False) or ''
+#            d.setVar('RRECOMMENDS:%s' % newpkg, oldrrec + ' ' + ' '.join(rreclist))
+#            # bb.note('RRECOMMENDS:%s = "%s"' % (newpkg, d.getVar('RRECOMMENDS:%s' % newpkg, False)))
 #
 #    # bb.note('pkgs is %s' % pkgs)
 #    d.setVar('PACKAGES', ' '.join(pkgs))

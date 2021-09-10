@@ -6,7 +6,7 @@ inherit packagegroup features_check
 
 REQUIRED_DISTRO_FEATURES = "x11 polkit systemd pam gobject-introspection-data"
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     adwaita-icon-theme \
     adwaita-icon-theme-cursors \
     evolution-data-server \

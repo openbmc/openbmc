@@ -1,0 +1,25 @@
+From f64c95b119637880e8898b459e7665f0d92cef20 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Thu, 29 Nov 2018 17:59:25 +0530
+Subject: [PATCH 25/52] fixing the long & long long mingw toolchain issue
+
+---
+ gas/config/tc-microblaze.c | 10 +++++-----
+ opcodes/microblaze-opc.h   |  4 ++--
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+Index: gdb-9.2/opcodes/microblaze-opc.h
+===================================================================
+--- gdb-9.2.orig/opcodes/microblaze-opc.h
++++ gdb-9.2/opcodes/microblaze-opc.h
+@@ -585,8 +585,8 @@ char pvr_register_prefix[] = "rpvr";
+ #define MIN_IMM6_WIDTH  ((int) 0x00000001)
+ #define MAX_IMM6_WIDTH  ((int) 0x00000040)
+ 
+-#define MIN_IMML  ((long) 0xffffff8000000000L)
+-#define MAX_IMML  ((long) 0x0000007fffffffffL)
++#define MIN_IMML  ((long long) 0xffffff8000000000L)
++#define MAX_IMML  ((long long) 0x0000007fffffffffL)
+ 
+ #endif /* MICROBLAZE_OPC */
+ 

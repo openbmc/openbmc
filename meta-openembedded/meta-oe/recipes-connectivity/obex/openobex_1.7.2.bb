@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a \
 "
 
 DEPENDS = "virtual/libusb0"
-DEPENDS_append_class-target = " bluez5"
+DEPENDS:append:class-target = " bluez5"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}/${PV}/${BP}-Source.tar.gz \
 "
@@ -24,14 +24,14 @@ EXTRA_OECMAKE += "-DBUILD_DOCUMENTATION=OFF"
 
 ASNEEDED = ""
 
-do_install_append () {
+do_install:append () {
     rmdir ${D}${bindir}
 }
 
 PACKAGES =+ "openobex-apps"
-FILES_${PN}-apps = "${bindir}/*"
-FILES_${PN} += "${libdir}/lib*.so.*"
-FILES_${PN}-dev += "${bindir}/openobex-config"
-DEBIAN_NOAUTONAME_${PN}-apps = "1"
+FILES:${PN}-apps = "${bindir}/*"
+FILES:${PN} += "${libdir}/lib*.so.*"
+FILES:${PN}-dev += "${bindir}/openobex-config"
+DEBIAN_NOAUTONAME:${PN}-apps = "1"
 
 BBCLASSEXTEND = "native"

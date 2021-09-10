@@ -94,7 +94,10 @@ def publish(args):
             logger.error('Failed to unpack %s to %s' % (dest_sdk, destination))
             return ret
     else:
-        cmd = "ssh %s 'sh %s -p -y -d %s && rm -f %s'" % (host, dest_sdk, destdir, dest_sdk)
+        rm_or_not = " && rm -f %s" % dest_sdk
+        if args.keep_orig:
+            rm_or_not = ""
+        cmd = "ssh %s 'sh %s -p -y -d %s%s'" % (host, dest_sdk, destdir, rm_or_not)
         ret = subprocess.call(cmd, shell=True)
         if ret == 0:
             logger.info('Successfully unpacked %s to %s' % (dest_sdk, destdir))
@@ -106,7 +109,7 @@ def publish(args):
     if not is_remote:
         cmd = 'set -e; mkdir -p %s/layers; cd %s/layers; if [ ! -e .git ]; then git init .; cp .git/hooks/post-update.sample .git/hooks/post-commit; echo "*.pyc\n*.pyo\npyshtables.py" > .gitignore; fi; git add -A .; git config user.email "oe@oe.oe" && git config user.name "OE" && git commit -q -m "init repo" || true' % (destination, destination)
     else:
-        cmd = "ssh %s 'set -e; mkdir -p %s/layers; cd %s/layers; if [ ! -e .git ]; then git init .; cp .git/hooks/post-update.sample .git/hooks/post-commit; echo '*.pyc\n*.pyo\npyshtables.py' > .gitignore; fi; git add -A .; git config user.email 'oe@oe.oe' && git config user.name 'OE' && git commit -q -m \"init repo\" || true'" % (host, destdir, destdir)
+        cmd = "ssh %s 'set -e; mkdir -p %s/layers; cd %s/layers; if [ ! -e .git ]; then git init .; cp .git/hooks/post-update.sample .git/hooks/post-commit; echo '*.pyc' > .gitignore; echo '*.pyo' >> .gitignore; echo 'pyshtables.py' >> .gitignore; fi; git add -A .; git config user.email 'oe@oe.oe' && git config user.name 'OE' && git commit -q -m \"init repo\" || true'" % (host, destdir, destdir)
     ret = subprocess.call(cmd, shell=True)
     if ret == 0:
         logger.info('SDK published successfully')
@@ -119,6 +122,7 @@ def main():
     parser = argparse_oe.ArgumentParser(description="OpenEmbedded extensible SDK publishing tool - writes server-side data to support the extensible SDK update process to a specified location")
     parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
     parser.add_argument('-q', '--quiet', help='Print only errors', action='store_true')
+    parser.add_argument('-k', '--keep-orig', help='When published to a remote host, the eSDK installer gets deleted by default.', action='store_true')
 
     parser.add_argument('sdk', help='Extensible SDK to publish (path to .sh installer file)')
     parser.add_argument('dest', help='Destination to publish SDK to; can be local path or remote in the form of user@host:/path (in the latter case ssh/scp will be used).')

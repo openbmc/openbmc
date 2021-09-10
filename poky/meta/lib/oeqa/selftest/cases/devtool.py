@@ -56,7 +56,8 @@ def setUpModule():
                     if pth.startswith(canonical_layerpath):
                         if relpth.endswith('/'):
                             destdir = os.path.join(corecopydir, relpth)
-                            shutil.copytree(pth, destdir)
+                            # avoid race condition by not copying .pyc files YPBZ#13421,13803
+                            shutil.copytree(pth, destdir, ignore=shutil.ignore_patterns('*.pyc', '__pycache__'))
                         else:
                             destdir = os.path.join(corecopydir, os.path.dirname(relpth))
                             bb.utils.mkdirhier(destdir)
@@ -268,7 +269,7 @@ class DevtoolAddTests(DevtoolBase):
         self.track_for_cleanup(tempdir)
         pn = 'pv'
         pv = '1.5.3'
-        url = 'http://www.ivarch.com/programs/sources/pv-1.5.3.tar.bz2'
+        url = 'http://downloads.yoctoproject.org/mirror/sources/pv-1.5.3.tar.bz2'
         result = runCmd('wget %s' % url, cwd=tempdir)
         result = runCmd('tar xfv %s' % os.path.basename(url), cwd=tempdir)
         srcdir = os.path.join(tempdir, '%s-%s' % (pn, pv))
@@ -372,7 +373,7 @@ class DevtoolAddTests(DevtoolBase):
         recipefile = '%s/recipes/libftdi/libftdi_%s.bb' % (self.workspacedir, version)
         result = runCmd('recipetool setvar %s EXTRA_OECMAKE -- \'-DPYTHON_BINDINGS=OFF -DLIBFTDI_CMAKE_CONFIG_DIR=${datadir}/cmake/Modules\'' % recipefile)
         with open(recipefile, 'a') as f:
-            f.write('\nFILES_${PN}-dev += "${datadir}/cmake/Modules"\n')
+            f.write('\nFILES:${PN}-dev += "${datadir}/cmake/Modules"\n')
             # We don't have the ability to pick up this dependency automatically yet...
             f.write('\nDEPENDS += "libusb1"\n')
             f.write('\nTESTLIBOUTPUT = "${COMPONENTS_DIR}/${TUNE_PKGARCH}/${PN}/${libdir}"\n')
@@ -512,6 +513,10 @@ class DevtoolAddTests(DevtoolBase):
         self._test_recipe_contents(recipefile, checkvars, [])
 
     def test_devtool_add_npm(self):
+        collections = get_bb_var('BBFILE_COLLECTIONS').split()
+        if "openembedded-layer" not in collections:
+            self.skipTest("Test needs meta-oe for nodejs")
+
         pn = 'savoirfairelinux-node-server-example'
         pv = '1.0.0'
         url = 'npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=' + pv
@@ -676,7 +681,7 @@ class DevtoolModifyTests(DevtoolBase):
 
         bbclassextended = False
         inheritnative = False
-        testrecipes = 'mtools-native apt-native desktop-file-utils-native'.split()
+        testrecipes = 'cdrtools-native mtools-native apt-native desktop-file-utils-native'.split()
         for testrecipe in testrecipes:
             checkextend = 'native' in (get_bb_var('BBCLASSEXTEND', testrecipe) or '').split()
             if not bbclassextended:
@@ -692,7 +697,44 @@ class DevtoolModifyTests(DevtoolBase):
 
         self.assertTrue(bbclassextended, 'None of these recipes are BBCLASSEXTENDed to native - need to adjust testrecipes list: %s' % ', '.join(testrecipes))
         self.assertTrue(inheritnative, 'None of these recipes do "inherit native" - need to adjust testrecipes list: %s' % ', '.join(testrecipes))
+    def test_devtool_modify_localfiles_only(self):
+        # Check preconditions
+        testrecipe = 'base-files'
+        src_uri = (get_bb_var('SRC_URI', testrecipe) or '').split()
+        foundlocalonly = False
+        correct_symlink = False
+        for item in src_uri:
+            if item.startswith('file://'):
+                if '.patch' not in item:
+                    foundlocalonly = True
+            else:
+                foundlocalonly = False
+                break
+        self.assertTrue(foundlocalonly, 'This test expects the %s recipe to fetch local files only and it seems that it no longer does' % testrecipe)
+        # Clean up anything in the workdir/sysroot/sstate cache
+        bitbake('%s -c cleansstate' % testrecipe)
+        # Try modifying a recipe
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake -c clean %s' % testrecipe)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
+        srcfile = os.path.join(tempdir, 'oe-local-files/share/dot.bashrc')
+        srclink = os.path.join(tempdir, 'share/dot.bashrc')
+        self.assertExists(srcfile, 'Extracted source could not be found')
+        if os.path.islink(srclink) and os.path.exists(srclink) and os.path.samefile(srcfile, srclink):
+            correct_symlink = True
+        self.assertTrue(correct_symlink, 'Source symlink to oe-local-files is broken')
 
+        matches = glob.glob(os.path.join(self.workspacedir, 'appends', '%s_*.bbappend' % testrecipe))
+        self.assertTrue(matches, 'bbappend not created')
+        # Test devtool status
+        result = runCmd('devtool status')
+        self.assertIn(testrecipe, result.output)
+        self.assertIn(tempdir, result.output)
+        # Try building
+        bitbake(testrecipe)
 
     def test_devtool_modify_git(self):
         # Check preconditions
@@ -771,6 +813,26 @@ class DevtoolModifyTests(DevtoolBase):
         # Check git repo
         self._check_src_repo(tempdir)
         # This is probably sufficient
+
+    def test_devtool_modify_overrides(self):
+        # Try modifying a recipe with patches in overrides
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        result = runCmd('devtool modify devtool-patch-overrides -x %s' % (tempdir))
+
+        self._check_src_repo(tempdir)
+        source = os.path.join(tempdir, "source")
+        def check(branch, expected):
+            runCmd('git -C %s checkout %s' % (tempdir, branch))
+            with open(source, "rt") as f:
+                content = f.read()
+            self.assertEquals(content, expected)
+        check('devtool', 'This is a test for something\n')
+        check('devtool-no-overrides', 'This is a test for something\n')
+        check('devtool-override-qemuarm', 'This is a test for qemuarm\n')
+        check('devtool-override-qemux86', 'This is a test for qemux86\n')
 
 class DevtoolUpdateTests(DevtoolBase):
 
@@ -913,7 +975,7 @@ class DevtoolUpdateTests(DevtoolBase):
         self.assertExists(patchfile, 'Patch file not created')
 
         # Check bbappend contents
-        expectedlines = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
+        expectedlines = ['FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"\n',
                          '\n',
                          'SRC_URI += "file://0001-Add-our-custom-version.patch"\n',
                          '\n']
@@ -928,7 +990,7 @@ class DevtoolUpdateTests(DevtoolBase):
         result = runCmd('git reset HEAD^', cwd=tempsrcdir)
         result = runCmd('devtool update-recipe %s -a %s' % (testrecipe, templayerdir))
         self.assertNotExists(patchfile, 'Patch file not deleted')
-        expectedlines2 = ['FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n',
+        expectedlines2 = ['FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"\n',
                          '\n']
         with open(bbappendfile, 'r') as f:
             self.assertEqual(expectedlines2, f.readlines())
@@ -1107,6 +1169,59 @@ class DevtoolUpdateTests(DevtoolBase):
                            ('??', '.*/new-local$'),
                            ('??', '.*/0001-Add-new-file.patch$')]
         self._check_repo_status(os.path.dirname(recipefile), expected_status)
+
+    def test_devtool_update_recipe_with_gitignore(self):
+        # First, modify the recipe
+        testrecipe = 'devtool-test-ignored'
+        bb_vars = get_bb_vars(['FILE'], testrecipe)
+        recipefile = bb_vars['FILE']
+        patchfile = os.path.join(os.path.dirname(recipefile), testrecipe, testrecipe + '.patch')
+        newpatchfile = os.path.join(os.path.dirname(recipefile), testrecipe, testrecipe + '.patch.expected')
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        # (don't bother with cleaning the recipe on teardown, we won't be building it)
+        result = runCmd('devtool modify %s' % testrecipe)
+        self.add_command_to_tearDown('cd %s; rm %s/*; git checkout %s %s' % (os.path.dirname(recipefile), testrecipe, testrecipe, os.path.basename(recipefile)))
+        result = runCmd('devtool finish --force-patch-refresh %s meta-selftest' % testrecipe)
+        # Check recipe got changed as expected
+        with open(newpatchfile, 'r') as f:
+            desiredlines = f.readlines()
+        with open(patchfile, 'r') as f:
+            newlines = f.readlines()
+        # Ignore the initial lines, because oe-selftest creates own meta-selftest repo
+        # which changes the metadata subject which is added into the patch, but keep
+        # .patch.expected as it is in case someone runs devtool finish --force-patch-refresh
+        # devtool-test-ignored manually, then it should generate exactly the same .patch file
+        self.assertEqual(desiredlines[5:], newlines[5:])
+
+    def test_devtool_update_recipe_long_filename(self):
+        # First, modify the recipe
+        testrecipe = 'devtool-test-long-filename'
+        bb_vars = get_bb_vars(['FILE'], testrecipe)
+        recipefile = bb_vars['FILE']
+        patchfilename = '0001-I-ll-patch-you-only-if-devtool-lets-me-to-do-it-corr.patch'
+        patchfile = os.path.join(os.path.dirname(recipefile), testrecipe, patchfilename)
+        newpatchfile = os.path.join(os.path.dirname(recipefile), testrecipe, patchfilename + '.expected')
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        # (don't bother with cleaning the recipe on teardown, we won't be building it)
+        result = runCmd('devtool modify %s' % testrecipe)
+        self.add_command_to_tearDown('cd %s; rm %s/*; git checkout %s %s' % (os.path.dirname(recipefile), testrecipe, testrecipe, os.path.basename(recipefile)))
+        result = runCmd('devtool finish --force-patch-refresh %s meta-selftest' % testrecipe)
+        # Check recipe got changed as expected
+        with open(newpatchfile, 'r') as f:
+            desiredlines = f.readlines()
+        with open(patchfile, 'r') as f:
+            newlines = f.readlines()
+        # Ignore the initial lines, because oe-selftest creates own meta-selftest repo
+        # which changes the metadata subject which is added into the patch, but keep
+        # .patch.expected as it is in case someone runs devtool finish --force-patch-refresh
+        # devtool-test-ignored manually, then it should generate exactly the same .patch file
+        self.assertEqual(desiredlines[5:], newlines[5:])
 
     def test_devtool_update_recipe_local_files_3(self):
         # First, modify the recipe
@@ -1447,7 +1562,11 @@ class DevtoolUpgradeTests(DevtoolBase):
             dstdir = os.path.join(dstdir, p)
             if not os.path.exists(dstdir):
                 os.makedirs(dstdir)
-                self.track_for_cleanup(dstdir)
+                if p == "lib":
+                    # Can race with other tests
+                    self.add_command_to_tearDown('rmdir --ignore-fail-on-non-empty %s' % dstdir)
+                else:
+                    self.track_for_cleanup(dstdir)
         dstfile = os.path.join(dstdir, os.path.basename(srcfile))
         if srcfile != dstfile:
             shutil.copy(srcfile, dstfile)

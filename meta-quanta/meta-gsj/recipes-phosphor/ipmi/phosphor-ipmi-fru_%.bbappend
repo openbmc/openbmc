@@ -1,6 +1,6 @@
 inherit obmc-phosphor-systemd
 
-FILESEXTRAPATHS_prepend_gsj := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend:gsj := "${THISDIR}/${PN}:"
 
 EEPROM_NAMES = "hsbp bmc"
 
@@ -10,11 +10,11 @@ EEPROMS = "${@compose_list(d, 'EEPROMFMT', 'EEPROM_NAMES')}"
 EEPROMS_ESCAPED = "${@compose_list(d, 'EEPROM_ESCAPEDFMT', 'EEPROM_NAMES')}"
 
 ENVFMT = "obmc/eeproms/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_gsj := " ${@compose_list(d, 'ENVFMT', 'EEPROMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:gsj := " ${@compose_list(d, 'ENVFMT', 'EEPROMS')}"
 
 TMPL = "obmc-read-eeprom@.service"
 TGT = "multi-user.target"
 INSTFMT = "obmc-read-eeprom@{0}.service"
 FMT = "../${TMPL}:${TGT}.wants/${INSTFMT}"
 
-SYSTEMD_LINK_${PN}_append_gsj := " ${@compose_list(d, 'FMT', 'EEPROMS_ESCAPED')}"
+SYSTEMD_LINK:${PN}:append:gsj := " ${@compose_list(d, 'FMT', 'EEPROMS_ESCAPED')}"

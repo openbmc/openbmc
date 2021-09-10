@@ -14,8 +14,8 @@ S = "${WORKDIR}/${BPN}"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING.tomoyo;md5=751419260aa954499f7abaabaa882bbe"
 
-FILES_${PN}     += "${libdir}/tomoyo"
-FILES_${PN}-dbg += "${libdir}/tomoyo/.debug"
+FILES:${PN}     += "${libdir}/tomoyo"
+FILES:${PN}-dbg += "${libdir}/tomoyo/.debug"
 
 DEPENDS = "linux-libc-headers ncurses"
 

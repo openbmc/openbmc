@@ -27,7 +27,7 @@ do_install() {
     find ./ -name '*.otf' -exec install -m 0644 {} ${D}${datadir}/fonts/truetype/ \;
 }
 
-FILES_${PN} = " \
+FILES:${PN} = " \
     ${sysconfdir}/fonts \
     ${datadir}/fonts \
 "

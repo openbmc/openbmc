@@ -1,0 +1,63 @@
+#! /bin/sh -e
+
+# ------------------------------------------------------------------------------
+# Copyright (c) 2021, Arm Limited, All Rights Reserved
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#          http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ------------------------------------------------------------------------------
+
+# Parsec Service SysV init script
+
+test -x /usr/libexec/parsec/parsec || exit 0
+
+case "$1" in
+  start)
+    echo -n "Starting Parsec daemon: "
+    if [ ! -f /etc/parsec/config.toml ]; then
+        echo "There is no Parsec service configuration file."
+    else
+        if [ ! -d /run/parsec ]; then
+            mkdir /run/parsec
+            chown parsec:parsec /run/parsec
+            chmod 755 /run/parsec
+        fi
+        # start-stop-daemon used in poky busybox doesn't support
+        # '--chdir' parameter. So, let's do it manually
+        cd /var/lib/parsec
+        RUST_LOG=info start-stop-daemon --oknodo --start --background \
+                --chuid parsec:parsec --exec /usr/libexec/parsec/parsec \
+                -- --config /etc/parsec/config.toml
+        echo "parsec."
+    fi
+    ;;
+  stop)
+    echo -n "Stopping Parsec daemon: "
+    start-stop-daemon --oknodo --stop --exec /usr/libexec/parsec/parsec
+    echo "parsec."
+    ;;
+  reload)
+    echo -n "Reloading Parsec daemon: "
+    start-stop-daemon --stop --signal SIGHUP --exec /usr/libexec/parsec/parsec
+    echo "parsec."
+    ;;
+  restart|force-reload)
+    $0 stop
+    $0 start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/parsec {start|stop|restart|reload|force-reload}"
+    exit 1
+esac
+
+exit 0

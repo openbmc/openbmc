@@ -23,25 +23,25 @@ S = "${WORKDIR}/git"
 DEPENDS = "libtirpc libnsl2 virtual/crypt"
 
 inherit autotools systemd
-SYSTEMD_SERVICE_${PN} = "domainname.service"
+SYSTEMD_SERVICE:${PN} = "domainname.service"
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"
 
 CACHED_CONFIGUREVARS += "ac_cv_prog_STRIP=/bin/true"
 
 EXTRA_OECONF = " \
                 --disable-rpath --disable-domainname \
                "
-CFLAGS_append_libc-musl = " -Wno-error=cpp"
+CFLAGS:append:libc-musl = " -Wno-error=cpp"
 
-FILES_${PN} += " ${libdir}/yp-nis/*.so.*.* ${libdir}/yp-nis/pkgconfig/"
-FILES_${PN}-dbg += " ${libdir}/yp-nis/.debug"
-FILES_${PN}-dev += " ${libdir}/yp-nis/*.so ${libdir}/yp-nis/*.so.[12] ${libdir}/yp-nis/*.la"
-FILES_${PN}-staticdev += " ${libdir}/yp-nis/*.a"
+FILES:${PN} += " ${libdir}/yp-nis/*.so.*.* ${libdir}/yp-nis/pkgconfig/"
+FILES:${PN}-dbg += " ${libdir}/yp-nis/.debug"
+FILES:${PN}-dev += " ${libdir}/yp-nis/*.so ${libdir}/yp-nis/*.so.[12] ${libdir}/yp-nis/*.la"
+FILES:${PN}-staticdev += " ${libdir}/yp-nis/*.a"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}${systemd_unitdir}/system
     install -m 0644 ${WORKDIR}/domainname.service ${D}${systemd_unitdir}/system
 }

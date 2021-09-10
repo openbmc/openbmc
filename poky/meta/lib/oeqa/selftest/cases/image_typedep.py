@@ -9,7 +9,7 @@ from oeqa.utils.commands import bitbake
 
 class ImageTypeDepTests(OESelftestTestCase):
 
-    # Verify that when specifying a IMAGE_TYPEDEP_ of the form "foo.bar" that
+    # Verify that when specifying a IMAGE_TYPEDEP: of the form "foo.bar" that
     # the conversion type bar gets added as a dep as well
     def test_conversion_typedep_added(self):
 
@@ -22,7 +22,7 @@ LICENSE = "MIT"
 IMAGE_FSTYPES = "testfstype"
 
 IMAGE_TYPES_MASKED += "testfstype"
-IMAGE_TYPEDEP_testfstype = "tar.bz2"
+IMAGE_TYPEDEP:testfstype = "tar.bz2"
 
 inherit image
 

@@ -8,6 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6626bb1e20189cfa95f2c508ba286393"
 COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"
 
 SRC_URI = "git://github.com/rhinstaller/efivar.git \
+           file://determinism.patch \
            file://no-werror.patch"
 SRCREV = "c1d6b10e1ed4ba2be07f385eae5bceb694478a10"
 
@@ -21,7 +22,7 @@ export CCLD_FOR_BUILD = "${BUILD_CCLD}"
 # enforce BFD.
 LDFLAGS += "-fuse-ld=bfd"
 
-do_compile_prepend() {
+do_compile:prepend() {
     # Remove when https://github.com/rhboot/efivar/issues/130 is fixed
     oe_runmake \
         CFLAGS="${BUILD_CFLAGS}" \
@@ -35,6 +36,6 @@ do_install() {
 
 BBCLASSEXTEND = "native"
 
-RRECOMMENDS_${PN}_class-target = "kernel-module-efivarfs"
+RRECOMMENDS:${PN}:class-target = "kernel-module-efivarfs"
 
 CLEANBROKEN = "1"

@@ -32,5 +32,5 @@ breakpad_package_preprocess () {
 
 PACKAGES =+ "${PN}-breakpad"
 
-FILES_${PN}-breakpad = "/usr/share/breakpad-syms"
+FILES:${PN}-breakpad = "/usr/share/breakpad-syms"
 

@@ -17,4 +17,4 @@ ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
 inherit pkgconfig autotools python3native
 
-FILES_${PN} += "${PYTHON_SITEPACKAGES_DIR}/pyatspi/*"
+FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}/pyatspi/*"

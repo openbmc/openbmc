@@ -25,4 +25,4 @@ do_install() {
 	install -m 0644 ${S}/dist-bin/cf-fsi-fw.bin ${D}${firmware_dir}
 }
 
-FILES_${PN} = "${firmware_dir}"
+FILES:${PN} = "${firmware_dir}"

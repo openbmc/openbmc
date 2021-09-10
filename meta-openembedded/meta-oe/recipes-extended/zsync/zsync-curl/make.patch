@@ -1,0 +1,50 @@
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From 3b9d64cf3c33ad235ed444f8715732e509ab023f Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Wed, 9 Jun 2021 16:11:25 +0100
+Subject: [PATCH] Build zsyncmake
+
+No point having the zsync client without the server-side tool.
+
+Closes #42
+---
+ .gitignore      | 1 +
+ src/Makefile.am | 5 ++++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/.gitignore b/.gitignore
+index 36f7bd8..728658e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -22,3 +22,4 @@ src/librcksum/md4test
+ src/libzsync/sha1test
+ stamp-h1
+ zsync_curl
++zsyncmake_curl
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 5f8ff73..ffa2280 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -4,13 +4,16 @@ ACLOCAL_AMFLAGS = -I autotools
+ 
+ SUBDIRS = librcksum zlib libzsync doc
+ 
+-bin_PROGRAMS = zsync_curl
++bin_PROGRAMS = zsync_curl zsyncmake_curl
+ 
+ zsync_curl_SOURCES = client.c http.c http.h url.c url.h progress.c progress.h base64.c format_string.h zsglobal.h
+ zsync_curl_LDADD = libzsync/libzsync.a librcksum/librcksum.a zlib/libinflate.a $(LIBOBJS)
+ 
+ EXTRA_zsync_curl_SOURCES = getaddrinfo.h
+ 
++zsyncmake_curl_SOURCES = make.c makegz.c makegz.h format_string.h
++zsyncmake_curl_LDADD = libzsync/libzsync.a librcksum/librcksum.a zlib/libinflate.a zlib/libdeflate.a -lm
++
+ # From "GNU autoconf, automake and libtool" Vaughan, Elliston, 
+ # #  Tromey and Taylor, publisher New Riders, p.134
+ # # They made me do it! :-)
+-- 
+2.25.1
+

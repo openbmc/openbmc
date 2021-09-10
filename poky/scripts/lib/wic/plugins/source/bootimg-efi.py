@@ -13,6 +13,9 @@
 import logging
 import os
 import shutil
+import re
+
+from glob import glob
 
 from wic import WicError
 from wic.engine import get_custom_config
@@ -209,6 +212,57 @@ class BootimgEFIPlugin(SourcePlugin):
         except KeyError:
             raise WicError("bootimg-efi requires a loader, none specified")
 
+        if get_bitbake_var("IMAGE_EFI_BOOT_FILES") is None:
+            logger.debug('No boot files defined in IMAGE_EFI_BOOT_FILES')
+        else:
+            boot_files = None
+            for (fmt, id) in (("_uuid-%s", part.uuid), ("_label-%s", part.label), (None, None)):
+                if fmt:
+                    var = fmt % id
+                else:
+                    var = ""
+
+                boot_files = get_bitbake_var("IMAGE_EFI_BOOT_FILES" + var)
+                if boot_files:
+                    break
+
+            logger.debug('Boot files: %s', boot_files)
+
+            # list of tuples (src_name, dst_name)
+            deploy_files = []
+            for src_entry in re.findall(r'[\w;\-\./\*]+', boot_files):
+                if ';' in src_entry:
+                    dst_entry = tuple(src_entry.split(';'))
+                    if not dst_entry[0] or not dst_entry[1]:
+                        raise WicError('Malformed boot file entry: %s' % src_entry)
+                else:
+                    dst_entry = (src_entry, src_entry)
+
+                logger.debug('Destination entry: %r', dst_entry)
+                deploy_files.append(dst_entry)
+
+            cls.install_task = [];
+            for deploy_entry in deploy_files:
+                src, dst = deploy_entry
+                if '*' in src:
+                    # by default install files under their basename
+                    entry_name_fn = os.path.basename
+                    if dst != src:
+                        # unless a target name was given, then treat name
+                        # as a directory and append a basename
+                        entry_name_fn = lambda name: \
+                                        os.path.join(dst,
+                                                     os.path.basename(name))
+
+                    srcs = glob(os.path.join(kernel_dir, src))
+
+                    logger.debug('Globbed sources: %s', ', '.join(srcs))
+                    for entry in srcs:
+                        src = os.path.relpath(entry, kernel_dir)
+                        entry_dst_name = entry_name_fn(entry)
+                        cls.install_task.append((src, entry_dst_name))
+                else:
+                    cls.install_task.append((src, dst))
 
     @classmethod
     def do_prepare_partition(cls, part, source_params, creator, cr_workdir,
@@ -238,6 +292,12 @@ class BootimgEFIPlugin(SourcePlugin):
             (staging_kernel_dir, kernel, hdddir, kernel)
         exec_cmd(install_cmd)
 
+        if get_bitbake_var("IMAGE_EFI_BOOT_FILES"):
+            for src_path, dst_path in cls.install_task:
+                install_cmd = "install -m 0644 -D %s %s" \
+                              % (os.path.join(kernel_dir, src_path),
+                                 os.path.join(hdddir, dst_path))
+                exec_cmd(install_cmd)
 
         try:
             if source_params['loader'] == 'grub-efi':

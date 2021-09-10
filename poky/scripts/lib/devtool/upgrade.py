@@ -71,7 +71,8 @@ def _rename_recipe_dirs(oldpv, newpv, path):
                 if oldfile.find(oldpv) != -1:
                     newfile = oldfile.replace(oldpv, newpv)
                     if oldfile != newfile:
-                        os.rename(os.path.join(path, oldfile), os.path.join(path, newfile))
+                        bb.utils.rename(os.path.join(path, oldfile),
+                              os.path.join(path, newfile))
 
 def _rename_recipe_file(oldrecipe, bpn, oldpv, newpv, path):
     oldrecipe = os.path.basename(oldrecipe)
@@ -102,14 +103,14 @@ def _write_append(rc, srctree, same_dir, no_same_dir, rev, copied, workspace, d)
     pn = d.getVar('PN')
     af = os.path.join(appendpath, '%s.bbappend' % brf)
     with open(af, 'w') as f:
-        f.write('FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"\n\n')
+        f.write('FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"\n\n')
         f.write('inherit externalsrc\n')
         f.write(('# NOTE: We use pn- overrides here to avoid affecting'
                  'multiple variants in the case where the recipe uses BBCLASSEXTEND\n'))
-        f.write('EXTERNALSRC_pn-%s = "%s"\n' % (pn, srctree))
+        f.write('EXTERNALSRC:pn-%s = "%s"\n' % (pn, srctree))
         b_is_s = use_external_build(same_dir, no_same_dir, d)
         if b_is_s:
-            f.write('EXTERNALSRC_BUILD_pn-%s = "%s"\n' % (pn, srctree))
+            f.write('EXTERNALSRC_BUILD:pn-%s = "%s"\n' % (pn, srctree))
         f.write('\n')
         if rev:
             f.write('# initial_rev: %s\n' % rev)
@@ -178,7 +179,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
     uri, rev = _get_uri(crd)
     if srcrev:
         rev = srcrev
-    if uri.startswith('git://'):
+    if uri.startswith('git://') or uri.startswith('gitsm://'):
         __run('git fetch')
         __run('git checkout %s' % rev)
         __run('git tag -f devtool-base-new')
@@ -235,14 +236,14 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
         # Copy in new ones
         _copy_source_code(tmpsrctree, srctree)
 
-        (stdout,_) = __run('git ls-files --modified --others --exclude-standard')
+        (stdout,_) = __run('git ls-files --modified --others')
         filelist = stdout.splitlines()
         pbar = bb.ui.knotty.BBProgress('Adding changed files', len(filelist))
         pbar.start()
         batchsize = 100
         for i in range(0, len(filelist), batchsize):
             batch = filelist[i:i+batchsize]
-            __run('git add -A %s' % ' '.join(['"%s"' % item for item in batch]))
+            __run('git add -f -A %s' % ' '.join(['"%s"' % item for item in batch]))
             pbar.update(i)
         pbar.finish()
 
@@ -260,21 +261,20 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
             logger.warning('By user choice, the following patches will NOT be applied to the new source tree:\n  %s' % '\n  '.join([os.path.basename(patch) for patch in patches]))
     else:
         __run('git checkout devtool-patched -b %s' % branch)
-        skiptag = False
-        try:
-            __run('git rebase %s' % rev)
-        except bb.process.ExecutionError as e:
-            skiptag = True
-            if 'conflict' in e.stdout:
-                logger.warning('Command \'%s\' failed:\n%s\n\nYou will need to resolve conflicts in order to complete the upgrade.' % (e.command, e.stdout.rstrip()))
-            else:
-                logger.warning('Command \'%s\' failed:\n%s' % (e.command, e.stdout))
-        if not skiptag:
-            if uri.startswith('git://'):
-                suffix = 'new'
-            else:
-                suffix = newpv
-            __run('git tag -f devtool-patched-%s' % suffix)
+        (stdout, _) = __run('git branch --list devtool-override-*')
+        branches_to_rebase = [branch] + stdout.split()
+        for b in branches_to_rebase:
+            logger.info("Rebasing {} onto {}".format(b, rev))
+            __run('git checkout %s' % b)
+            try:
+                __run('git rebase %s' % rev)
+            except bb.process.ExecutionError as e:
+                if 'conflict' in e.stdout:
+                    logger.warning('Command \'%s\' failed:\n%s\n\nYou will need to resolve conflicts in order to complete the upgrade.' % (e.command, e.stdout.rstrip()))
+                    __run('git rebase --abort')
+                else:
+                    logger.warning('Command \'%s\' failed:\n%s' % (e.command, e.stdout))
+        __run('git checkout %s' % branch)
 
     if tmpsrctree:
         if keep_temp:
@@ -521,6 +521,15 @@ def upgrade(args, config, basepath, workspace):
         else:
             srctree = standard.get_default_srctree(config, pn)
 
+        # Check that recipe isn't using a shared workdir
+        s = os.path.abspath(rd.getVar('S'))
+        workdir = os.path.abspath(rd.getVar('WORKDIR'))
+        srctree_s = srctree
+        if s.startswith(workdir) and s != workdir and os.path.dirname(s) != workdir:
+            # Handle if S is set to a subdirectory of the source
+            srcsubdir = os.path.relpath(s, workdir).split(os.sep, 1)[1]
+            srctree_s = os.path.join(srctree, srcsubdir)
+
         # try to automatically discover latest version and revision if not provided on command line
         if not args.version and not args.srcrev:
             version_info = oe.recipeutils.get_recipe_upstream_version(rd)
@@ -550,12 +559,12 @@ def upgrade(args, config, basepath, workspace):
         try:
             logger.info('Extracting current version source...')
             rev1, srcsubdir1 = standard._extract_source(srctree, False, 'devtool-orig', False, config, basepath, workspace, args.fixed_setup, rd, tinfoil, no_overrides=args.no_overrides)
-            old_licenses = _extract_licenses(srctree, rd.getVar('LIC_FILES_CHKSUM'))
+            old_licenses = _extract_licenses(srctree_s, (rd.getVar('LIC_FILES_CHKSUM') or ""))
             logger.info('Extracting upgraded version source...')
             rev2, md5, sha256, srcbranch, srcsubdir2 = _extract_new_source(args.version, srctree, args.no_patch,
                                                     args.srcrev, args.srcbranch, args.branch, args.keep_temp,
                                                     tinfoil, rd)
-            new_licenses = _extract_licenses(srctree, rd.getVar('LIC_FILES_CHKSUM'))
+            new_licenses = _extract_licenses(srctree_s, (rd.getVar('LIC_FILES_CHKSUM') or ""))
             license_diff = _generate_license_diff(old_licenses, new_licenses)
             rf, copied = _create_new_recipe(args.version, md5, sha256, args.srcrev, srcbranch, srcsubdir1, srcsubdir2, config.workspace_path, tinfoil, rd, license_diff, new_licenses, srctree, args.keep_failure)
         except bb.process.CmdError as e:
@@ -564,7 +573,7 @@ def upgrade(args, config, basepath, workspace):
             _upgrade_error(e, rf, srctree, args.keep_failure)
         standard._add_md5(config, pn, os.path.dirname(rf))
 
-        af = _write_append(rf, srctree, args.same_dir, args.no_same_dir, rev2,
+        af = _write_append(rf, srctree_s, args.same_dir, args.no_same_dir, rev2,
                         copied, config.workspace_path, rd)
         standard._add_md5(config, pn, af)
 
@@ -574,6 +583,9 @@ def upgrade(args, config, basepath, workspace):
         logger.info('New recipe is %s' % rf)
         if license_diff:
             logger.info('License checksums have been updated in the new recipe; please refer to it for the difference between the old and the new license texts.')
+        preferred_version = rd.getVar('PREFERRED_VERSION_%s' % rd.getVar('PN'))
+        if preferred_version:
+            logger.warning('Version is pinned to %s via PREFERRED_VERSION; it may need adjustment to match the new version before any further steps are taken' % preferred_version)
     finally:
         tinfoil.shutdown()
     return 0

@@ -11,7 +11,7 @@ Signed-off-by: Joe Slater <jslater@windriver.com>
 
 --- a/configure.in
 +++ b/configure.in
-@@ -2142,8 +2142,8 @@ fi
+@@ -2153,8 +2153,8 @@ fi
  
  dnl ----------------------------------------------------------------
  dnl Check for entropy sources
@@ -21,7 +21,7 @@ Signed-off-by: Joe Slater <jslater@windriver.com>
  	if test -r /dev/urandom ; then
  		dev="/dev/urandom";
  	elif test -r /idev/urandom ; then
-@@ -2156,9 +2156,11 @@ if test $cross_compiling != yes && test 
+@@ -2167,9 +2167,11 @@ if test $cross_compiling != yes && test
  		dev="/idev/random";
  	fi
  

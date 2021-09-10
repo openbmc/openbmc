@@ -36,7 +36,7 @@ inherit perlnative pkgconfig
 
 #EXTRA_OEMAKE = "-e MAKEFLAGS="
 
-do_configure_append () {
+do_configure:append () {
     # Make sure we use our nativeperl wrapper
     sed -i "1s:#!.*:#!/usr/bin/env nativeperl:" ${S}/*.pl
     cp ${WORKDIR}/long-help ${S}
@@ -56,8 +56,8 @@ vpnc_sysroot_preprocess () {
     install -m 755 ${D}${sysconfdir}/vpnc/vpnc-script ${SYSROOT_DESTDIR}${sysconfdir}/vpnc
 }
 
-FILES_${PN}-script = "${sysconfdir}/vpnc/vpnc-script"
+FILES:${PN}-script = "${sysconfdir}/vpnc/vpnc-script"
 
-CONFFILES_${PN} = "${sysconfdir}/vpnc/default.conf"
-RDEPENDS_${PN} = "perl-module-io-file ${PN}-script"
-RRECOMMENDS_${PN} = "kernel-module-tun"
+CONFFILES:${PN} = "${sysconfdir}/vpnc/default.conf"
+RDEPENDS:${PN} = "perl-module-io-file ${PN}-script"
+RRECOMMENDS:${PN} = "kernel-module-tun"

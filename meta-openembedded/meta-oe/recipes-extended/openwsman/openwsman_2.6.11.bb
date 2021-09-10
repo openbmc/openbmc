@@ -30,10 +30,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d4f53d4c6cf73b9d43186ce3be6dd0ba"
 
 inherit systemd cmake pkgconfig python3native perlnative
 
-SYSTEMD_SERVICE_${PN} = "openwsmand.service"
+SYSTEMD_SERVICE:${PN} = "openwsmand.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-LDFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', " -fuse-ld=bfd ", '', d)}"
+LDFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', " -fuse-ld=bfd ", '', d)}"
 
 EXTRA_OECMAKE = "-DBUILD_BINDINGS=NO \
                  -DBUILD_LIBCIM=NO \
@@ -44,12 +44,12 @@ EXTRA_OECMAKE = "-DBUILD_BINDINGS=NO \
                  -DLIB=${baselib} \
                 "
 
-do_configure_prepend() {
+do_configure:prepend() {
     export STAGING_INCDIR=${STAGING_INCDIR}
     export STAGING_LIBDIR=${STAGING_LIBDIR}
 }
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/${sysconfdir}/init.d
     install -m 755 ${B}/etc/init/openwsmand.sh ${D}/${sysconfdir}/init.d/openwsmand
     ln -sf ${sysconfdir}/init.d/openwsmand ${D}/${sbindir}/rcopenwsmand
@@ -64,9 +64,9 @@ do_install_append() {
     fi
 }
 
-FILES_${PN}-dbg += "${libdir}/openwsman/plugins/.debug/ \
+FILES:${PN}-dbg += "${libdir}/openwsman/plugins/.debug/ \
                     ${libdir}/openwsman/authenticators/.debug/ \
                    "
 
-INSANE_SKIP_${PN} = "dev-so"
-RDEPENDS_${PN} = "ruby"
+INSANE_SKIP:${PN} = "dev-so"
+RDEPENDS:${PN} = "ruby"

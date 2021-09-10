@@ -30,19 +30,19 @@ USERADD_PACKAGES = "${PN} ${PN}-user3"
 # useradd command. Multiple users can be created by separating
 # the commands with a semicolon. Here we'll create two users,
 # user1 and user2:
-USERADD_PARAM_${PN} = "-u 1200 -d /home/user1 -r -s /bin/bash user1; -u 1201 -d /home/user2 -r -s /bin/bash user2"
+USERADD_PARAM:${PN} = "-u 1200 -d /home/user1 -r -s /bin/bash user1; -u 1201 -d /home/user2 -r -s /bin/bash user2"
 
 # user3 will be managed in the useradd-example-user3 pacakge:
 # As an example, we use the -P option to set clear text password for user3
-USERADD_PARAM_${PN}-user3 = "-u 1202 -d /home/user3 -r -s /bin/bash -P 'user3' user3"
+USERADD_PARAM:${PN}-user3 = "-u 1202 -d /home/user3 -r -s /bin/bash -P 'user3' user3"
 
 # GROUPADD_PARAM works the same way, which you set to the options
 # you'd normally pass to the groupadd command. This will create
 # groups group1 and group2:
-GROUPADD_PARAM_${PN} = "-g 880 group1; -g 890 group2"
+GROUPADD_PARAM:${PN} = "-g 880 group1; -g 890 group2"
 
 # Likewise, we'll manage group3 in the useradd-example-user3 package:
-GROUPADD_PARAM_${PN}-user3 = "-g 900 group3"
+GROUPADD_PARAM:${PN}-user3 = "-g 900 group3"
 
 do_install () {
 	install -d -m 755 ${D}${datadir}/user1
@@ -69,8 +69,8 @@ do_install () {
 	chgrp -R group3 ${D}${datadir}/user3
 }
 
-FILES_${PN} = "${datadir}/user1/* ${datadir}/user2/*"
-FILES_${PN}-user3 = "${datadir}/user3/*"
+FILES:${PN} = "${datadir}/user1/* ${datadir}/user2/*"
+FILES:${PN}-user3 = "${datadir}/user3/*"
 
 # Prevents do_package failures with:
 # debugsources.list: No such file or directory:

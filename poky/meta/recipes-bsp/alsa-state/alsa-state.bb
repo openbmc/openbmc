@@ -49,15 +49,15 @@ do_install() {
 
 PACKAGES += "alsa-states"
 
-RRECOMMENDS_alsa-state = "alsa-states"
+RRECOMMENDS:alsa-state = "alsa-states"
 
-RDEPENDS_${PN} = "alsa-utils-alsactl"
-FILES_${PN} = "${sysconfdir}/init.d ${sysconfdir}/asound.conf"
-CONFFILES_${PN} = "${sysconfdir}/asound.conf"
+RDEPENDS:${PN} = "alsa-utils-alsactl"
+FILES:${PN} = "${sysconfdir}/init.d ${sysconfdir}/asound.conf"
+CONFFILES:${PN} = "${sysconfdir}/asound.conf"
 
-FILES_alsa-states = "${localstatedir}/lib/alsa/*.state"
+FILES:alsa-states = "${localstatedir}/lib/alsa/*.state"
 
-pkg_postinst_${PN}() {
+pkg_postinst:${PN}() {
 	if test -z "$D"
 	then
 		if test -x ${sbindir}/alsactl

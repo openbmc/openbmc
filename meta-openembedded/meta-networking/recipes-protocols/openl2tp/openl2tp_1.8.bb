@@ -41,7 +41,7 @@ SRC_URI[sha256sum] = "1c97704d4b963a87fbc0e741668d4530933991515ae9ab0dffd11b5444
 
 inherit autotools-brokensep pkgconfig systemd ptest
 
-SYSTEMD_SERVICE_${PN} = "openl2tpd.service"
+SYSTEMD_SERVICE:${PN} = "openl2tpd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 DEPENDS += "libtirpc"
@@ -52,7 +52,7 @@ LDFLAGS += "-ltirpc"
 PARALLEL_MAKE = ""
 EXTRA_OEMAKE = 'CFLAGS="${CFLAGS} -Wno-unused-but-set-variable" CPPFLAGS="${CPPFLAGS}" OPT_CFLAGS="${CFLAGS}"'
 
-do_compile_prepend() {
+do_compile:prepend() {
     sed -i -e "s:SYS_LIBDIR=.*:SYS_LIBDIR=${libdir}:g" \
         -e 's:$(CROSS_COMPILE)as:${AS}:g' \
         -e 's:$(CROSS_COMPILE)ld:${LD}:g' \
@@ -65,7 +65,7 @@ do_compile_prepend() {
         ${S}/Makefile
 }
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${sysconfdir}/init.d
     install -d ${D}${sysconfdir}/default
     install -m 0755 ${S}/etc/rc.d/init.d/openl2tpd ${D}${sysconfdir}/init.d/openl2tpd
@@ -91,4 +91,4 @@ do_install_ptest () {
     done
 }
 
-RDEPENDS_${PN} = "ppp ppp-l2tp bash"
+RDEPENDS:${PN} = "ppp ppp-l2tp bash"

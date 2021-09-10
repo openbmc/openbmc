@@ -5,6 +5,7 @@
 import os
 from oeqa.selftest.case import OESelftestTestCase
 import tempfile
+import operator
 from oeqa.utils.commands import get_bb_var
 
 class TestBlobParsing(OESelftestTestCase):
@@ -97,3 +98,48 @@ class TestBlobParsing(OESelftestTestCase):
             var_changes[x.fieldname] = (oldvalue, x.newvalue)
 
         self.assertEqual(defaultmap, var_changes, "Defaults not set properly")
+
+class TestFileListCompare(OESelftestTestCase):
+
+    def test_compare_file_lists(self):
+        # Test that a directory tree that moves location such as /lib/modules/5.4.40-yocto-standard -> /lib/modules/5.4.43-yocto-standard
+        # is correctly identified as a move
+        from oe.buildhistory_analysis import compare_file_lists, FileChange
+
+        with open(self.tc.files_dir + "/buildhistory_filelist1.txt", "r") as f:
+            filelist1 = f.readlines()
+        with open(self.tc.files_dir + "/buildhistory_filelist2.txt", "r") as f:
+            filelist2 = f.readlines()
+
+        expectedResult = [
+            '/lib/libcap.so.2 changed symlink target from libcap.so.2.33 to libcap.so.2.34',
+            '/lib/libcap.so.2.33 moved to /lib/libcap.so.2.34',
+            '/lib/modules/5.4.40-yocto-standard moved to /lib/modules/5.4.43-yocto-standard',
+            '/lib/modules/5.4.43-yocto-standard/modules.builtin.alias.bin was added',
+            '/usr/bin/gawk-5.0.1 moved to /usr/bin/gawk-5.1.0',
+            '/usr/lib/libbtrfsutil.so changed symlink target from libbtrfsutil.so.1.1.1 to libbtrfsutil.so.1.2.0',
+            '/usr/lib/libbtrfsutil.so.1 changed symlink target from libbtrfsutil.so.1.1.1 to libbtrfsutil.so.1.2.0',
+            '/usr/lib/libbtrfsutil.so.1.1.1 moved to /usr/lib/libbtrfsutil.so.1.2.0',
+            '/usr/lib/libkmod.so changed symlink target from libkmod.so.2.3.4 to libkmod.so.2.3.5',
+            '/usr/lib/libkmod.so.2 changed symlink target from libkmod.so.2.3.4 to libkmod.so.2.3.5',
+            '/usr/lib/libkmod.so.2.3.4 moved to /usr/lib/libkmod.so.2.3.5',
+            '/usr/lib/libpixman-1.so.0 changed symlink target from libpixman-1.so.0.38.4 to libpixman-1.so.0.40.0',
+            '/usr/lib/libpixman-1.so.0.38.4 moved to /usr/lib/libpixman-1.so.0.40.0',
+            '/usr/lib/opkg/alternatives/rtcwake was added',
+            '/usr/lib/python3.8/site-packages/PyGObject-3.34.0.egg-info moved to /usr/lib/python3.8/site-packages/PyGObject-3.36.1.egg-info',
+            '/usr/lib/python3.8/site-packages/btrfsutil-1.1.1-py3.8.egg-info moved to /usr/lib/python3.8/site-packages/btrfsutil-1.2.0-py3.8.egg-info',
+            '/usr/lib/python3.8/site-packages/pycairo-1.19.0.egg-info moved to /usr/lib/python3.8/site-packages/pycairo-1.19.1.egg-info',
+            '/usr/sbin/rtcwake changed type from file to symlink',
+            '/usr/sbin/rtcwake changed permissions from rwxr-xr-x to rwxrwxrwx',
+            '/usr/sbin/rtcwake changed symlink target from None to /usr/sbin/rtcwake.util-linux',
+            '/usr/sbin/rtcwake.util-linux was added'
+        ]
+
+        result = compare_file_lists(filelist1, filelist2)
+        rendered = []
+        for entry in sorted(result, key=operator.attrgetter("path")):
+            rendered.append(str(entry))
+
+        self.maxDiff = None
+        self.assertCountEqual(rendered, expectedResult)
+

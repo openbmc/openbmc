@@ -1,7 +1,7 @@
-From e20dbdb0b8f0af840ef90b299c4e2277c52ddf87 Mon Sep 17 00:00:00 2001
+From cb06d218ee36e303a64f27c690f30040d5d87960 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sun, 12 Jun 2016 04:44:29 -0400
-Subject: [PATCH 4/4] tests/Makefile.am: fix undefined reference to
+Subject: [PATCH] tests/Makefile.am: fix undefined reference to
  `pthread_create'
 
 Add missing '-lpthread' to CFLAGS
@@ -9,20 +9,21 @@ Add missing '-lpthread' to CFLAGS
 Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  tests/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/Makefile.am b/tests/Makefile.am
-index 1744ea7..04cf425 100644
+index ab201f0..1cf82d0 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -64,4 +64,4 @@ EXTRA_DIST = README rsa-16k.key cavs_tests.sh cavs_driver.pl \
- 
- LDADD = $(standard_ldadd) $(GPG_ERROR_LIBS)
- t_lock_LDADD = $(standard_ldadd) $(GPG_ERROR_MT_LIBS)
+@@ -75,7 +75,7 @@ t_mpi_bit_LDADD = $(standard_ldadd) @LDADD_FOR_TESTS_KLUDGE@
+ t_secmem_LDADD = $(standard_ldadd) @LDADD_FOR_TESTS_KLUDGE@
+ testapi_LDADD = $(standard_ldadd) @LDADD_FOR_TESTS_KLUDGE@
+ t_lock_LDADD = $(standard_ldadd) $(GPG_ERROR_MT_LIBS) @LDADD_FOR_TESTS_KLUDGE@
 -t_lock_CFLAGS = $(GPG_ERROR_MT_CFLAGS)
 +t_lock_CFLAGS = $(GPG_ERROR_MT_CFLAGS) -lpthread
--- 
-1.8.3.1
-
+ testdrv_LDADD = $(LDADD_FOR_TESTS_KLUDGE)
+ 
+ # Build a version of the test driver for the build platform.

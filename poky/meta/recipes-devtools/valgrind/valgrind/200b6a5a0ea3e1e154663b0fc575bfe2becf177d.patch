@@ -1,0 +1,34 @@
+From 200b6a5a0ea3e1e154663b0fc575bfe2becf177d Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Wed, 21 Jul 2021 17:55:40 +0200
+Subject: [PATCH] m_debuginfo/debuginfo.c VG_(get_fnname_kind) _start is below
+ main
+
+With glibc 2.34 we might see the _start symbol as the frame that
+called main instead of directly after __libc_start_main or
+generic_start_main.
+
+Fixes memcheck/tests/badjump[2], memcheck/tests/origin4-many,
+helgrind/tests/tc04_free_lock, helgrind/tests/tc09_bad_unlock
+and helgrind/tests/tc20_verifywrap.
+
+Upstream-Status: Backport
+---
+ coregrind/m_debuginfo/debuginfo.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/coregrind/m_debuginfo/debuginfo.c b/coregrind/m_debuginfo/debuginfo.c
+index bc2578b377..e2218f2668 100644
+--- a/coregrind/m_debuginfo/debuginfo.c
++++ b/coregrind/m_debuginfo/debuginfo.c
+@@ -2289,6 +2289,7 @@ Vg_FnNameKind VG_(get_fnname_kind) ( const HChar* name )
+        VG_STREQN(18, "__libc_start_main.", name) || // gcc optimization
+        VG_STREQ("generic_start_main", name) ||  // Yellow Dog doggedness
+        VG_STREQN(19, "generic_start_main.", name) || // gcc optimization
++       VG_STREQ("_start", name) ||
+ #      elif defined(VGO_darwin)
+        // See readmacho.c for an explanation of this.
+        VG_STREQ("start_according_to_valgrind", name) ||  // Darwin, darling
+-- 
+2.27.0
+

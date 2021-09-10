@@ -3,7 +3,7 @@ require xorg-data-common.inc
 SUMMARY = "Common X11 Bitmaps"
 LICENSE = "MIT"
 DEPENDS += "libxmu"
-RDEPENDS_${PN}-dev = ""
+RDEPENDS:${PN}-dev = ""
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=dbd075aaffa4a60a8d00696f2e4b9a8f"
 

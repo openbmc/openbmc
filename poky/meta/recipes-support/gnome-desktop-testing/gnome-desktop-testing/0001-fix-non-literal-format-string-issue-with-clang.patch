@@ -1,0 +1,31 @@
+From df625a36be8e0c7afa68b3dd23907dc7d658c59a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 8 Jul 2021 23:13:30 -0700
+Subject: [PATCH] fix non-literal format string issue with clang
+
+clang errors out when using -Werror=format-nonliteral
+since the definition of g_strdup_vprintf() from glib-2.0
+is using va_list and clang seems to still warn where as
+gcc doesn't do that for va_list arguments
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gnome-desktop-testing/-/merge_requests/9]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/gnome-desktop-testing-runner.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gnome-desktop-testing-runner.c b/src/gnome-desktop-testing-runner.c
+index d75b71c..da49e14 100644
+--- a/src/gnome-desktop-testing-runner.c
++++ b/src/gnome-desktop-testing-runner.c
+@@ -74,7 +74,7 @@ static const char * const test_log_message_ids[] = {
+ static gboolean opt_quiet = FALSE;
+ static gboolean opt_tap = FALSE;
+
+-static void
++static void G_GNUC_PRINTF (3, 0)
+ test_log (TestLog what,
+           const char *test_name,
+           const char *format,
+--
+2.32.0

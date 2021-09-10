@@ -9,6 +9,8 @@ SRCREV = "cf59527dc24fdd2f314ae4dcaeb3d68a117988f6"
 SRC_URI = "git://github.com/intel/pm-graph.git \
            file://0001-Makefile-fix-multilib-build-failure.patch \
            file://0001-sleepgraph.py-use-python3.patch \
+           file://0001-sleepgraph-add-support-for-RT-kernel-ftrace-flags.patch \
+           file://0001-sleepgraph.py-parse-unfished-cpu-exec-line.patch \
 "
 S = "${WORKDIR}/git"
 
@@ -28,6 +30,6 @@ do_install() {
         install -Dm 0755 ${S}/analyze_suspend.py ${D}${bindir}/analyze_suspend.py
 }
 
-RDEPENDS_${PN} += "python3-core python3-threading python3-datetime python3-compression"
-RPROVIDES_${PN} = "analyze-suspend"
+RDEPENDS:${PN} += "python3-core python3-threading python3-datetime python3-compression"
+RPROVIDES:${PN} = "analyze-suspend"
 BBCLASSEXTEND = "native nativesdk"

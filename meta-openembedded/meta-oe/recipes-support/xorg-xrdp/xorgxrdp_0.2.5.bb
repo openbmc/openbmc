@@ -18,6 +18,6 @@ PV = "0.2.5"
 
 S = "${WORKDIR}/git"
 
-FILES_${PN} += "${libdir}/xorg/modules/*"
+FILES:${PN} += "${libdir}/xorg/modules/*"
 
-INSANE_SKIP_${PN} += "xorg-driver-abi"
+INSANE_SKIP:${PN} += "xorg-driver-abi"

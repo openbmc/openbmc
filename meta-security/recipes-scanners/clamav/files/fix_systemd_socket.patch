@@ -1,0 +1,25 @@
+clamd not installing clamav-daemon.socket
+
+Fixes:
+__main__.SystemdUnitNotFoundError: (PosixPath('../security-build-image/1.0-r0/rootfs'), 'clamav-daemon.socket')
+%post(clamav-daemon-0.104.0-r0.core2_64): waitpid(3587571) rc 3587571 status 100
+warning: %post(clamav-daemon-0.104.0-r0.core2_64) scriptlet failed, exit status 1
+
+Upstream-Status: Pending
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/clamd/CMakeLists.txt
+===================================================================
+--- git.orig/clamd/CMakeLists.txt
++++ git/clamd/CMakeLists.txt
+@@ -60,4 +60,10 @@ if(SYSTEMD_FOUND)
+     install(
+         FILES ${CMAKE_CURRENT_BINARY_DIR}/clamav-daemon.socket
+         DESTINATION ${SYSTEMD_UNIT_DIR})
++    configure_file(
++        ${CMAKE_CURRENT_SOURCE_DIR}/clamav-daemon.socket.in
++        ${CMAKE_CURRENT_BINARY_DIR}/clamav-daemon.socket @ONLY)
++    install(
++        FILES ${CMAKE_CURRENT_BINARY_DIR}/clamav-daemon.socket
++        DESTINATION ${SYSTEMD_UNIT_DIR})
+ endif()

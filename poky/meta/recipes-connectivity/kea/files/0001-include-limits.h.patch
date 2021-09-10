@@ -1,0 +1,35 @@
+From 7bca122e15bbe98c7b8da851ef3e1cf9a714afd9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 Feb 2021 23:31:15 -0800
+Subject: [PATCH] include limits.h
+
+Fixes build with gcc11
+backend_selector.cc:61:35: error: 'numeric_limits' is not a member of 'std'
+
+Upstream-Status: Submitted [https://github.com/isc-projects/kea/pull/120]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib/exceptions/exceptions.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/src/lib/database/backend_selector.cc
++++ b/src/lib/database/backend_selector.cc
+@@ -6,7 +6,7 @@
+ 
+ #include <database/backend_selector.h>
+ #include <exceptions/exceptions.h>
+-#include <climits>
++#include <limits>
+ #include <sstream>
+ 
+ using namespace isc::data;
+--- a/src/lib/dhcpsrv/subnet_id.h
++++ b/src/lib/dhcpsrv/subnet_id.h
+@@ -10,6 +10,7 @@
+ #include <exceptions/exceptions.h>
+ #include <stdint.h>
+ #include <typeinfo>
++#include <limits>
+ 
+ namespace isc {
+ namespace dhcp {

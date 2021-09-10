@@ -1,0 +1,14 @@
+[Unit]
+Description=Power Cycle by Hotswap Controller
+
+[Service]
+EnvironmentFile=/run/psu_timedelay
+ExecStartPre=sleep $PSU_HARDRESET_DELAY
+ExecStart= i2cset -f -y 8 0x11 0xd9
+Restart=no
+Type=oneshot
+RemainAfterExit=true
+StandardOutput=syslog
+
+[Install]
+WantedBy=gbmc-psu-hardreset.target

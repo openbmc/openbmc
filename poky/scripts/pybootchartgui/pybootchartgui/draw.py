@@ -271,7 +271,7 @@ def draw_chart(ctx, color, fill, chart_bounds, data, proc_tree, data_range):
     # If data_range is given, scale the chart so that the value range in
     # data_range matches the chart bounds exactly.
     # Otherwise, scale so that the actual data matches the chart bounds.
-    if data_range:
+    if data_range and (data_range[1] - data_range[0]):
         yscale = float(chart_bounds[3]) / (data_range[1] - data_range[0])
         ybase = data_range[0]
     else:

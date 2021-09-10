@@ -13,7 +13,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/libcomps/src/python/src/CMakeLists.txt b/libcomps/src/python/src/CMakeLists.txt
-index adabb31..b9b96ab 100644
+index 89b9c91..08cd6b5 100644
 --- a/libcomps/src/python/src/CMakeLists.txt
 +++ b/libcomps/src/python/src/CMakeLists.txt
 @@ -9,13 +9,13 @@ set (pycomps_SRCDIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -23,7 +23,7 @@ index adabb31..b9b96ab 100644
 -     pycomps_hash.c pycomps_exc.c pycomps_lbw.c)
 +     pycomps_hash.c pycomps_exc.c pycomps_lbw.c crc32.c)
  
- set (pycomps_HEADERS pycomps_23macros.h pycomps_sequence.h
+ set (pycomps_HEADERS pycomps_macros.h pycomps_sequence.h
       pycomps_envs.h pycomps_categories.h pycomps_groups.h
       pycomps_gids.h pycomps_utils.h pycomps_dict.h pycomps_mdict.h
       pycomps_hash.h pycomps_exc.h pycomps_lbw.h
@@ -46,5 +46,5 @@ index d8f5e34..f266067 100644
  static uint32_t crc32_tab[] = {
  	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
 -- 
-2.26.2
+2.25.1
 

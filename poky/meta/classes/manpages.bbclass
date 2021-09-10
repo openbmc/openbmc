@@ -2,7 +2,7 @@
 # depending on whether 'api-documentation' is in DISTRO_FEATURES. Such building
 # tends to pull in the entire XML stack and other tools, so it's not enabled
 # by default.
-PACKAGECONFIG_append_class-target = " ${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', 'manpages', '', d)}"
+PACKAGECONFIG:append:class-target = " ${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', 'manpages', '', d)}"
 
 inherit qemu
 
@@ -10,9 +10,9 @@ inherit qemu
 MAN_PKG ?= "${PN}-doc"
 
 # only add man-db to RDEPENDS when manual files are built and installed
-RDEPENDS_${MAN_PKG} += "${@bb.utils.contains('PACKAGECONFIG', 'manpages', 'man-db', '', d)}"
+RDEPENDS:${MAN_PKG} += "${@bb.utils.contains('PACKAGECONFIG', 'manpages', 'man-db', '', d)}"
 
-pkg_postinst_append_${MAN_PKG} () {
+pkg_postinst:append:${MAN_PKG} () {
 	# only update manual page index caches when manual files are built and installed
 	if ${@bb.utils.contains('PACKAGECONFIG', 'manpages', 'true', 'false', d)}; then
 		if test -n "$D"; then
@@ -36,7 +36,7 @@ pkg_postinst_append_${MAN_PKG} () {
 	fi
 }
 
-pkg_postrm_append_${MAN_PKG} () {
+pkg_postrm:append:${MAN_PKG} () {
 	# only update manual page index caches when manual files are built and installed
 	if ${@bb.utils.contains('PACKAGECONFIG', 'manpages', 'true', 'false', d)}; then
 		mandb -q

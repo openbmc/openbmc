@@ -33,5 +33,5 @@ EXTRA_OECONF = "--enable-shared \
 # at https://github.com/miquels/liblockfile.git
 EXTRA_OEMAKE += "DESTDIR=${D}"
 
-FILES_${PN} += "${libdir}/nfslock.so.*"
-FILES_${PN}-dev += "${libdir}/nfslock.so"
+FILES:${PN} += "${libdir}/nfslock.so.*"
+FILES:${PN}-dev += "${libdir}/nfslock.so"

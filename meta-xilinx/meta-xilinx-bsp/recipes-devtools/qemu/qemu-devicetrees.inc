@@ -9,6 +9,9 @@ LIC_FILES_CHKSUM = "file://Makefile;beginline=1;endline=27;md5=7348b6cbcae69912c
 
 PV = "xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+SRC_URI_append = " file://0001-Makefile-Use-python3-instead-of-python.patch"
+
 BRANCH ?= ""
 REPO ?= "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https"
 

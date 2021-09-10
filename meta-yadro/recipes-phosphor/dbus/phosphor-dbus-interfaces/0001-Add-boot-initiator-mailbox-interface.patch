@@ -1,0 +1,138 @@
+From 104027fff5db49d60d2ff7256580b8efb6429a27 Mon Sep 17 00:00:00 2001
+From: Alexander Amelkin <a.amelkin@yadro.com>
+Date: Wed, 20 Mar 2019 19:33:00 +0300
+Subject: [PATCH] Add boot initiator mailbox interface
+
+Add the xyz.openbmc_project.Control.Boot.Mailbox interface to allow
+for provision of the boot initiator (such as Petitboot or UEFI) with
+its specific parameters. This is based on IPMI 2.0 Table 28-14 'Boot
+Option Parameters' parameter 7 'Boot initiator mailbox'.
+
+Partially resolves openbmc/openbmc#3391
+
+Change-Id: If2a7dce6fae812fc3f1f325cd07c77f31900cf42
+Signed-off-by: Alexander Amelkin <a.amelkin@yadro.com>
+---
+ .../Control/Boot/Mailbox/meson.build          | 14 +++++
+ .../openbmc_project/Control/Boot/meson.build  | 15 +++++
+ .../Control/Boot/Mailbox.interface.yaml       | 63 +++++++++++++++++++
+ 3 files changed, 92 insertions(+)
+ create mode 100644 gen/xyz/openbmc_project/Control/Boot/Mailbox/meson.build
+ create mode 100644 xyz/openbmc_project/Control/Boot/Mailbox.interface.yaml
+
+diff --git a/gen/xyz/openbmc_project/Control/Boot/Mailbox/meson.build b/gen/xyz/openbmc_project/Control/Boot/Mailbox/meson.build
+new file mode 100644
+index 0000000..149e68a
+--- /dev/null
++++ b/gen/xyz/openbmc_project/Control/Boot/Mailbox/meson.build
+@@ -0,0 +1,14 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/Control/Boot/Mailbox__cpp'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/Control/Boot/Mailbox.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/Control/Boot/Mailbox',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/Control/Boot/meson.build b/gen/xyz/openbmc_project/Control/Boot/meson.build
+index ba8a19f..6901fc0 100644
+--- a/gen/xyz/openbmc_project/Control/Boot/meson.build
++++ b/gen/xyz/openbmc_project/Control/Boot/meson.build
+@@ -1,4 +1,19 @@
+ # Generated file; do not modify.
++subdir('Mailbox')
++generated_others += custom_target(
++    'xyz/openbmc_project/Control/Boot/Mailbox__markdown'.underscorify(),
++    input: [ meson.source_root() / 'xyz/openbmc_project/Control/Boot/Mailbox.interface.yaml',  ],
++    output: [ 'Mailbox.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.source_root(),
++        'xyz/openbmc_project/Control/Boot/Mailbox',
++    ],
++    build_by_default: true,
++)
++
+ subdir('Mode')
+ generated_others += custom_target(
+     'xyz/openbmc_project/Control/Boot/Mode__markdown'.underscorify(),
+diff --git a/xyz/openbmc_project/Control/Boot/Mailbox.interface.yaml b/xyz/openbmc_project/Control/Boot/Mailbox.interface.yaml
+new file mode 100644
+index 0000000..839e8be
+--- /dev/null
++++ b/xyz/openbmc_project/Control/Boot/Mailbox.interface.yaml
+@@ -0,0 +1,63 @@
++description: >
++    Implement to provide the boot initiator (such as Petitboot or UEFI)
++    with its specific parameters. This is based on IPMI 2.0 Table 28-14
++    'Boot Option Parameters' parameter 7 'Boot initiator mailbox'.
++
++properties:
++    - name: Supported
++      type: boolean
++      flags:
++        - const
++      default: false
++      description: >
++          Specifies whether or not the mailbox is supported by the
++          boot initiator on this machine.
++
++          The property is constant and is only set by the implementation
++          on startup.
++
++    - name: IANAEnterpriseNumber
++      type: uint32
++      flags:
++        - const
++      default: 0
++      description: >
++          The 24-bit IANA Private Enterprise Number for the company or organization
++          that has specified the boot initiator. This is a machine-specific
++          constant. The implementing application is responsible for setting
++          this to the proper machine-specific value (0x000000..0xFFFFFF)
++          according to https://www.iana.org/assignments/enterprise-numbers/enterprise-numbers.
++
++          The property is constant and is only set by the implementation
++          on startup.
++
++    - name: Data
++      type: array[byte]
++      description: >
++          The array of data bytes for the boot initiator to treat
++          in its specific way. This interface doesn't impose any
++          limitiations on the format or make any assumptions regarding
++          it. The boot initiator is responsible for parsing this array.
++
++          The size of the array is a constant depending on the requirements
++          set by the boot initiator used for a particular architecture or
++          a machine. The implementing application is responsible for setting
++          the size of this array to the proper value.
++
++          For conformance to the IPMI 2.0 specification, the size of the array
++          plus 3 (the size of IPMI 2.0 representation of IANA Enterprise Number)
++          must be a multiple of 16 with the minimum allowed size being 77
++          (5 x 16-byte blocks, minus 3) if mailbox is at all Supported.
++
++          For IPMI 2.0 this array is supposed to be split into 16-byte
++          blocks by the implementing service (block 0 being made of IANA PEN
++          plus first 13 bytes of this array). Please pay special attention
++          that this array does NOT include the IANA PEN needed for IPMI 2.0.
++          Only the actual PEN-specific data is stored here.
++
++          When partially written to, the remaining parts of this array
++          must not be automatically cleared. This is per IPMI 2.0
++          specification.
++
++          Other interfaces to the boot initiator (such as MCTP) may process
++          this array differently.
+-- 
+2.26.2
+

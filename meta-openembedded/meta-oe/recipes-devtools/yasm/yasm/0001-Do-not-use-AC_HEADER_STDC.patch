@@ -1,0 +1,39 @@
+From 6b1cbe8b4dcc45103d69bc7337e5eb33d1fd21f3 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 3 Feb 2021 14:22:51 -0800
+Subject: [PATCH] Do not use AC_HEADER_STDC
+
+This macro is removed in autotools 2.70+ and it can be expected that C90
+headers are always available [1]
+
+Upstream-Status: Pending
+
+[1] https://www.gnu.org/software/autoconf/manual/autoconf-2.70/autoconf.html#index-AC_005fHEADER_005fSTDC
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 01b61097..2823ecd7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -101,14 +101,8 @@ AM_WITH_DMALLOC
+ #
+ # Checks for header files.
+ #
+-AC_HEADER_STDC
+ AC_CHECK_HEADERS([strings.h libgen.h unistd.h direct.h sys/stat.h])
+ 
+-# REQUIRE standard C headers
+-if test "$ac_cv_header_stdc" != yes; then
+-	AC_MSG_ERROR([Standard (ANSI/ISO C89) header files are required.])
+-fi
+-
+ #
+ # Checks for typedefs, structures, and compiler characteristics.
+ #
+-- 
+2.30.0
+

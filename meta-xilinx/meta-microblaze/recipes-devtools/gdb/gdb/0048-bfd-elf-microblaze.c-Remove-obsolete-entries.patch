@@ -1,0 +1,72 @@
+From 359ee1650d98372a2f2cd360a7ea9877077f6ece Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@xilinx.com>
+Date: Thu, 3 Dec 2020 11:23:26 -0800
+Subject: [PATCH 48/52] bfd/elf*-microblaze.c: Remove obsolete entries
+
+Replace microblaze_elf_merge_private_bfd_data with a direct call to
+_bfd_generic_verify_endian_match, this simplifies the implementation.
+
+Remove microblaze_elf_gc_sweep_hook, removed in 2017.
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ bfd/elf64-microblaze.c | 29 +----------------------------
+ 1 file changed, 1 insertion(+), 28 deletions(-)
+
+Index: gdb-9.2/bfd/elf64-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf64-microblaze.c
++++ gdb-9.2/bfd/elf64-microblaze.c
+@@ -1690,21 +1690,6 @@ microblaze_elf_relocate_section (bfd *ou
+   return ret;
+ }
+ 
+-/* Merge backend specific data from an object file to the output
+-   object file when linking.
+-
+-   Note: We only use this hook to catch endian mismatches.  */
+-static bfd_boolean
+-microblaze_elf_merge_private_bfd_data (bfd * ibfd, bfd * obfd)
+-{
+-  /* Check if we have the same endianess.  */
+-  if (! _bfd_generic_verify_endian_match (ibfd, obfd))
+-    return FALSE;
+-
+-  return TRUE;
+-}
+-
+-
+ /* Calculate fixup value for reference.  */
+ 
+ static int
+@@ -2427,17 +2412,6 @@ microblaze_elf_gc_mark_hook (asection *s
+   return _bfd_elf_gc_mark_hook (sec, info, rel, h, sym);
+ }
+ 
+-/* Update the got entry reference counts for the section being removed.  */
+-
+-static bfd_boolean
+-microblaze_elf_gc_sweep_hook (bfd * abfd ATTRIBUTE_UNUSED,
+-     			      struct bfd_link_info * info ATTRIBUTE_UNUSED,
+-     			      asection * sec ATTRIBUTE_UNUSED,
+-     			      const Elf_Internal_Rela * relocs ATTRIBUTE_UNUSED)
+-{
+-  return TRUE;
+-}
+-
+ /* PIC support.  */
+ 
+ #define PLT_ENTRY_SIZE 16
+@@ -3704,11 +3678,10 @@ microblaze_elf_add_symbol_hook (bfd *abf
+ #define bfd_elf64_bfd_is_local_label_name       microblaze_elf_is_local_label_name
+ #define elf_backend_relocate_section		microblaze_elf_relocate_section
+ #define bfd_elf64_bfd_relax_section             microblaze_elf_relax_section
+-#define bfd_elf64_bfd_merge_private_bfd_data    microblaze_elf_merge_private_bfd_data
++#define bfd_elf64_bfd_merge_private_bfd_data    _bfd_generic_verify_endian_match
+ #define bfd_elf64_bfd_reloc_name_lookup		microblaze_elf_reloc_name_lookup
+ 
+ #define elf_backend_gc_mark_hook		microblaze_elf_gc_mark_hook
+-#define elf_backend_gc_sweep_hook		microblaze_elf_gc_sweep_hook
+ #define elf_backend_check_relocs                microblaze_elf_check_relocs
+ #define elf_backend_copy_indirect_symbol        microblaze_elf_copy_indirect_symbol
+ #define bfd_elf64_bfd_link_hash_table_create    microblaze_elf_link_hash_table_create

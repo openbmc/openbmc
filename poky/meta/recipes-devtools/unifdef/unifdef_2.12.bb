@@ -2,6 +2,7 @@ SUMMARY = "Selectively remove #ifdef statements from sources"
 SECTION = "devel"
 LICENSE = "BSD-2-Clause"
 HOMEPAGE = "http://dotat.at/prog/unifdef/"
+DESCRIPTION = "The unifdef utility selectively processes conditional C preprocessor #if and #ifdef directives. It removes from a file both the directives and the additional text that they delimit, while otherwise leaving the file alone."
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=3498caf346f6b77934882101749ada23 \
                     file://unifdef.c;endline=32;md5=6f4ee8085d6e6ab0f7cb4390e1a9c497 \

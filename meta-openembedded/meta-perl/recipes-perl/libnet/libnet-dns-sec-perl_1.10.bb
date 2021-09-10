@@ -19,7 +19,7 @@ EXTRA_CPANFLAGS = "INC='-I${STAGING_INCDIR}' LIBS='-L${STAGING_LIBDIR} -lssl -L$
 
 inherit cpan ptest-perl
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     libnet-dns-perl \
     libcrypto \
     perl-module-dynaloader \

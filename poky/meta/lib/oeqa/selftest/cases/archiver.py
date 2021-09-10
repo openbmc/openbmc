@@ -19,8 +19,8 @@ class Archiver(OESelftestTestCase):
         AutomatedBy: Daniel Istrate <daniel.alexandrux.istrate@intel.com>
         """
 
-        include_recipe = 'busybox'
-        exclude_recipe = 'zlib'
+        include_recipe = 'selftest-ed'
+        exclude_recipe = 'initscripts'
 
         features = 'INHERIT += "archiver"\n'
         features += 'ARCHIVER_MODE[src] = "original"\n'
@@ -35,11 +35,11 @@ class Archiver(OESelftestTestCase):
         src_path = os.path.join(bb_vars['DEPLOY_DIR_SRC'], bb_vars['TARGET_SYS'])
 
         # Check that include_recipe was included
-        included_present = len(glob.glob(src_path + '/%s-*' % include_recipe))
+        included_present = len(glob.glob(src_path + '/%s-*/*' % include_recipe))
         self.assertTrue(included_present, 'Recipe %s was not included.' % include_recipe)
 
         # Check that exclude_recipe was excluded
-        excluded_present = len(glob.glob(src_path + '/%s-*' % exclude_recipe))
+        excluded_present = len(glob.glob(src_path + '/%s-*/*' % exclude_recipe))
         self.assertFalse(excluded_present, 'Recipe %s was not excluded.' % exclude_recipe)
 
     def test_archiver_filters_by_type(self):
@@ -51,8 +51,8 @@ class Archiver(OESelftestTestCase):
         Author:      André Draszik <adraszik@tycoint.com>
         """
 
-        target_recipe = 'initscripts'
-        native_recipe = 'zlib-native'
+        target_recipe = 'selftest-ed'
+        native_recipe = 'selftest-ed-native'
 
         features = 'INHERIT += "archiver"\n'
         features += 'ARCHIVER_MODE[src] = "original"\n'
@@ -67,11 +67,11 @@ class Archiver(OESelftestTestCase):
         src_path_native = os.path.join(bb_vars['DEPLOY_DIR_SRC'], bb_vars['BUILD_SYS'])
 
         # Check that target_recipe was included
-        included_present = len(glob.glob(src_path_target + '/%s-*' % target_recipe))
+        included_present = len(glob.glob(src_path_target + '/%s-*/*' % target_recipe))
         self.assertTrue(included_present, 'Recipe %s was not included.' % target_recipe)
 
         # Check that native_recipe was excluded
-        excluded_present = len(glob.glob(src_path_native + '/%s-*' % native_recipe))
+        excluded_present = len(glob.glob(src_path_native + '/%s-*/*' % native_recipe))
         self.assertFalse(excluded_present, 'Recipe %s was not excluded.' % native_recipe)
 
     def test_archiver_filters_by_type_and_name(self):
@@ -86,8 +86,8 @@ class Archiver(OESelftestTestCase):
         Author:      André Draszik <adraszik@tycoint.com>
         """
 
-        target_recipes = [ 'initscripts', 'zlib' ]
-        native_recipes = [ 'update-rc.d-native', 'zlib-native' ]
+        target_recipes = [ 'initscripts', 'selftest-ed' ]
+        native_recipes = [ 'update-rc.d-native', 'selftest-ed-native' ]
 
         features = 'INHERIT += "archiver"\n'
         features += 'ARCHIVER_MODE[src] = "original"\n'
@@ -104,17 +104,17 @@ class Archiver(OESelftestTestCase):
         src_path_native = os.path.join(bb_vars['DEPLOY_DIR_SRC'], bb_vars['BUILD_SYS'])
 
         # Check that target_recipe[0] and native_recipes[1] were included
-        included_present = len(glob.glob(src_path_target + '/%s-*' % target_recipes[0]))
+        included_present = len(glob.glob(src_path_target + '/%s-*/*' % target_recipes[0]))
         self.assertTrue(included_present, 'Recipe %s was not included.' % target_recipes[0])
 
-        included_present = len(glob.glob(src_path_native + '/%s-*' % native_recipes[1]))
+        included_present = len(glob.glob(src_path_native + '/%s-*/*' % native_recipes[1]))
         self.assertTrue(included_present, 'Recipe %s was not included.' % native_recipes[1])
 
         # Check that native_recipes[0] and target_recipes[1] were excluded
-        excluded_present = len(glob.glob(src_path_native + '/%s-*' % native_recipes[0]))
+        excluded_present = len(glob.glob(src_path_native + '/%s-*/*' % native_recipes[0]))
         self.assertFalse(excluded_present, 'Recipe %s was not excluded.' % native_recipes[0])
 
-        excluded_present = len(glob.glob(src_path_target + '/%s-*' % target_recipes[1]))
+        excluded_present = len(glob.glob(src_path_target + '/%s-*/*' % target_recipes[1]))
         self.assertFalse(excluded_present, 'Recipe %s was not excluded.' % target_recipes[1])
 
 
@@ -126,12 +126,13 @@ class Archiver(OESelftestTestCase):
 
         features = 'INHERIT += "archiver"\n'
         features += 'ARCHIVER_MODE[srpm] = "1"\n'
+        features += 'PACKAGE_CLASSES = "package_rpm"\n'
         self.write_config(features)
 
-        bitbake('-n core-image-sato')
+        bitbake('-n selftest-nopackages selftest-ed')
 
     def _test_archiver_mode(self, mode, target_file_name, extra_config=None):
-        target = "selftest-ed"
+        target = 'selftest-ed-native'
 
         features = 'INHERIT += "archiver"\n'
         features +=  'ARCHIVER_MODE[src] = "%s"\n' % (mode)
@@ -142,8 +143,8 @@ class Archiver(OESelftestTestCase):
         bitbake('-c clean %s' % (target))
         bitbake('-c deploy_archives %s' % (target))
 
-        bb_vars = get_bb_vars(['DEPLOY_DIR_SRC', 'TARGET_SYS'])
-        glob_str = os.path.join(bb_vars['DEPLOY_DIR_SRC'], bb_vars['TARGET_SYS'], '%s-*' % (target))
+        bb_vars = get_bb_vars(['DEPLOY_DIR_SRC', 'BUILD_SYS'])
+        glob_str = os.path.join(bb_vars['DEPLOY_DIR_SRC'], bb_vars['BUILD_SYS'], '%s-*' % (target))
         glob_result = glob.glob(glob_str)
         self.assertTrue(glob_result, 'Missing archiver directory for %s' % (target))
 
@@ -162,21 +163,21 @@ class Archiver(OESelftestTestCase):
         Test that the archiver works with `ARCHIVER_MODE[src] = "patched"`.
         """
 
-        self._test_archiver_mode('patched', 'selftest-ed-1.14.1-r0-patched.tar.gz')
+        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-patched.tar.gz')
 
     def test_archiver_mode_configured(self):
         """
         Test that the archiver works with `ARCHIVER_MODE[src] = "configured"`.
         """
 
-        self._test_archiver_mode('configured', 'selftest-ed-1.14.1-r0-configured.tar.gz')
+        self._test_archiver_mode('configured', 'selftest-ed-native-1.14.1-r0-configured.tar.gz')
 
     def test_archiver_mode_recipe(self):
         """
         Test that the archiver works with `ARCHIVER_MODE[recipe] = "1"`.
         """
 
-        self._test_archiver_mode('patched', 'selftest-ed-1.14.1-r0-recipe.tar.gz',
+        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-recipe.tar.gz',
                                  'ARCHIVER_MODE[recipe] = "1"\n')
 
     def test_archiver_mode_diff(self):
@@ -185,7 +186,7 @@ class Archiver(OESelftestTestCase):
         Exclusions controlled by `ARCHIVER_MODE[diff-exclude]` are not yet tested.
         """
 
-        self._test_archiver_mode('patched', 'selftest-ed-1.14.1-r0-diff.gz',
+        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-diff.gz',
                                  'ARCHIVER_MODE[diff] = "1"\n')
 
     def test_archiver_mode_dumpdata(self):
@@ -193,7 +194,7 @@ class Archiver(OESelftestTestCase):
         Test that the archiver works with `ARCHIVER_MODE[dumpdata] = "1"`.
         """
 
-        self._test_archiver_mode('patched', 'selftest-ed-1.14.1-r0-showdata.dump',
+        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-showdata.dump',
                                  'ARCHIVER_MODE[dumpdata] = "1"\n')
 
     def test_archiver_mode_mirror(self):
@@ -254,3 +255,57 @@ class Archiver(OESelftestTestCase):
             glob_str = os.path.join(bb_vars['DEPLOY_DIR_SRC'], 'mirror', target_file_name)
             glob_result = glob.glob(glob_str)
             self.assertTrue(glob_result, 'Missing archive file %s' % (target_file_name))
+
+    def test_archiver_mode_mirror_gitsm(self):
+        """
+        Test that the archiver correctly handles git submodules with
+        `ARCHIVER_MODE[src] = "mirror"`.
+        """
+        features = 'INHERIT += "archiver"\n'
+        features += 'ARCHIVER_MODE[src] = "mirror"\n'
+        features += 'ARCHIVER_MODE[mirror] = "combined"\n'
+        features += 'BB_GENERATE_MIRROR_TARBALLS = "1"\n'
+        features += 'COPYLEFT_LICENSE_INCLUDE = "*"\n'
+        self.write_config(features)
+
+        bitbake('-c clean git-submodule-test')
+        bitbake('-c deploy_archives -f git-submodule-test')
+
+        bb_vars = get_bb_vars(['DEPLOY_DIR_SRC'])
+        for target_file_name in [
+            'git2_git.yoctoproject.org.git-submodule-test.tar.gz',
+            'git2_git.yoctoproject.org.bitbake-gitsm-test1.tar.gz',
+            'git2_git.yoctoproject.org.bitbake-gitsm-test2.tar.gz',
+            'git2_git.openembedded.org.bitbake.tar.gz'
+        ]:
+            target_path = os.path.join(bb_vars['DEPLOY_DIR_SRC'], 'mirror', target_file_name)
+            self.assertTrue(os.path.exists(target_path))
+
+    def test_archiver_mode_mirror_gitsm_shallow(self):
+        """
+        Test that the archiver correctly handles git submodules with
+        `ARCHIVER_MODE[src] = "mirror"`.
+        """
+        features = 'INHERIT += "archiver"\n'
+        features += 'ARCHIVER_MODE[src] = "mirror"\n'
+        features += 'ARCHIVER_MODE[mirror] = "combined"\n'
+        features += 'BB_GENERATE_MIRROR_TARBALLS = "1"\n'
+        features += 'COPYLEFT_LICENSE_INCLUDE = "*"\n'
+        features += 'BB_GIT_SHALLOW = "1"\n'
+        features += 'BB_GENERATE_SHALLOW_TARBALLS = "1"\n'
+        features += 'DL_DIR = "${TOPDIR}/downloads-shallow"\n'
+        self.write_config(features)
+
+        bitbake('-c clean git-submodule-test')
+        bitbake('-c deploy_archives -f git-submodule-test')
+
+        bb_vars = get_bb_vars(['DEPLOY_DIR_SRC'])
+        for target_file_name in [
+            'gitsmshallow_git.yoctoproject.org.git-submodule-test_a2885dd-1_master.tar.gz',
+            'gitsmshallow_git.yoctoproject.org.bitbake-gitsm-test1_bare_120f4c7-1.tar.gz',
+            'gitsmshallow_git.yoctoproject.org.bitbake-gitsm-test2_bare_f66699e-1.tar.gz',
+            'gitsmshallow_git.openembedded.org.bitbake_bare_52a144a-1.tar.gz',
+            'gitsmshallow_git.openembedded.org.bitbake_bare_c39b997-1.tar.gz'
+        ]:
+            target_path = os.path.join(bb_vars['DEPLOY_DIR_SRC'], 'mirror', target_file_name)
+            self.assertTrue(os.path.exists(target_path))

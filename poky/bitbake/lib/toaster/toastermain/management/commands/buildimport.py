@@ -451,7 +451,7 @@ class Command(BaseCommand):
             # Catch vars relevant to Toaster (in case no Toaster section)
             self.update_project_vars(project,'DISTRO')
             self.update_project_vars(project,'MACHINE')
-            self.update_project_vars(project,'IMAGE_INSTALL_append')
+            self.update_project_vars(project,'IMAGE_INSTALL:append')
             self.update_project_vars(project,'IMAGE_FSTYPES')
             self.update_project_vars(project,'PACKAGE_CLASSES')
             # These vars are typically only assigned by Toaster

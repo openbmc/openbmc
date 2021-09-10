@@ -1,0 +1,11 @@
+[Unit]
+Description=Attach serial input devices to kernel input subsystem
+After=syslog.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/inputattachctl start
+ExecStop=/usr/bin/inputattachctl stop
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,114 @@
+From eced8077b57946fe0b723e7c6c510e8f344ce89b Mon Sep 17 00:00:00 2001
+From: Serge Hallyn <serge@hallyn.com>
+Date: Fri, 23 Jul 2021 17:51:13 -0500
+Subject: [PATCH] Fix out of tree builds with respect to libsubid includes
+
+There's a better way to do this, and I hope to clean that up,
+but this fixes out of tree builds for me right now.
+
+Closes #386
+
+Signed-off-by: Serge Hallyn <serge@hallyn.com>
+Upstream-Status: Backport [https://github.com/shadow-maint/shadow/commit/537b8cd90be7b47b45c45cfd27765ef85eb0ebf1]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ lib/Makefile.am      | 2 ++
+ libmisc/Makefile.am  | 2 +-
+ libsubid/Makefile.am | 4 ++--
+ src/Makefile.am      | 6 ++++++
+ 4 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index ecf3ee25..5ac2e111 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -10,6 +10,8 @@ if HAVE_VENDORDIR
+ libshadow_la_CPPFLAGS += -DVENDORDIR=\"$(VENDORDIR)\"
+ endif
+ 
++libshadow_la_CPPFLAGS += -I$(top_srcdir)
++
+ libshadow_la_SOURCES = \
+ 	commonio.c \
+ 	commonio.h \
+diff --git a/libmisc/Makefile.am b/libmisc/Makefile.am
+index 9766a7ec..9f237e0d 100644
+--- a/libmisc/Makefile.am
++++ b/libmisc/Makefile.am
+@@ -1,7 +1,7 @@
+ 
+ EXTRA_DIST = .indent.pro xgetXXbyYY.c
+ 
+-AM_CPPFLAGS = -I$(top_srcdir)/lib $(ECONF_CPPFLAGS)
++AM_CPPFLAGS = -I$(top_srcdir)/lib -I$(top_srcdir) $(ECONF_CPPFLAGS)
+ 
+ noinst_LTLIBRARIES = libmisc.la
+ 
+diff --git a/libsubid/Makefile.am b/libsubid/Makefile.am
+index 189165b0..cdc41fe6 100644
+--- a/libsubid/Makefile.am
++++ b/libsubid/Makefile.am
+@@ -19,8 +19,8 @@ MISCLIBS = \
+ 	$(LIBTCB)
+ 
+ libsubid_la_LIBADD = \
+-	$(top_srcdir)/lib/libshadow.la \
+-	$(top_srcdir)/libmisc/libmisc.la \
++	$(top_builddir)/lib/libshadow.la \
++	$(top_builddir)/libmisc/libmisc.la \
+ 	$(MISCLIBS) -ldl
+ 
+ AM_CPPFLAGS = \
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 35027013..7c1a3491 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -10,6 +10,7 @@ sgidperms = 2755
+ AM_CPPFLAGS = \
+ 	-I${top_srcdir}/lib \
+ 	-I$(top_srcdir)/libmisc \
++	-I$(top_srcdir) \
+ 	-DLOCALEDIR=\"$(datadir)/locale\"
+ 
+ # XXX why are login and su in /bin anyway (other than for
+@@ -183,6 +184,7 @@ list_subid_ranges_LDADD = \
+ list_subid_ranges_CPPFLAGS = \
+ 	-I$(top_srcdir)/lib \
+ 	-I$(top_srcdir)/libmisc \
++	-I$(top_srcdir) \
+ 	-I$(top_srcdir)/libsubid
+ 
+ get_subid_owners_LDADD = \
+@@ -194,11 +196,13 @@ get_subid_owners_LDADD = \
+ get_subid_owners_CPPFLAGS = \
+ 	-I$(top_srcdir)/lib \
+ 	-I$(top_srcdir)/libmisc \
++	-I$(top_srcdir) \
+ 	-I$(top_srcdir)/libsubid
+ 
+ new_subid_range_CPPFLAGS = \
+ 	-I$(top_srcdir)/lib \
+ 	-I$(top_srcdir)/libmisc \
++	-I$(top_srcdir) \
+ 	-I$(top_srcdir)/libsubid
+ 
+ new_subid_range_LDADD = \
+@@ -210,6 +214,7 @@ new_subid_range_LDADD = \
+ free_subid_range_CPPFLAGS = \
+ 	-I$(top_srcdir)/lib \
+ 	-I$(top_srcdir)/libmisc \
++	-I$(top_srcdir) \
+ 	-I$(top_srcdir)/libsubid
+ 
+ free_subid_range_LDADD = \
+@@ -220,6 +225,7 @@ free_subid_range_LDADD = \
+ 
+ check_subid_range_CPPFLAGS = \
+ 	-I$(top_srcdir)/lib \
++	-I$(top_srcdir) \
+ 	-I$(top_srcdir)/libmisc
+ 
+ check_subid_range_LDADD = \
+-- 
+2.31.1
+

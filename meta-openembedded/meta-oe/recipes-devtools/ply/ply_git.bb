@@ -5,11 +5,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS += "bison-native"
 
+PV = "2.1.1+git${SRCPV}"
+
 SRC_URI = "git://github.com/iovisor/ply"
-SRCREV = "aa5b9ac31307ec1acece818be334ef801c802a12"
+SRCREV = "e25c9134b856cc7ffe9f562ff95caf9487d16b59"
 
 S = "${WORKDIR}/git"
 
 inherit autotools-brokensep
 
-COMPATIBLE_HOST = "(x86_64.*|aarch64.*|arm.*|powerpc.*)-linux"
+COMPATIBLE_HOST = "(x86_64.*|aarch64.*|arm.*|powerpc)-linux"

@@ -6,7 +6,7 @@ SECTION = "libs"
 LICENSE = "Artistic-1.0|GPLv1+"
 LIC_FILES_CHKSUM = "file://README;beginline=13;endline=17;md5=da980cdc026faa065e5d5004115334e6"
 
-RDEPENDS_${PN} = "libdigest-sha1-perl perl-module-extutils-makemaker perl-module-digest-md5"
+RDEPENDS:${PN} = "libdigest-sha1-perl perl-module-extutils-makemaker perl-module-digest-md5"
 
 SRC_URI = "http://search.cpan.org/CPAN/authors/id/G/GA/GAAS/Digest-HMAC-${PV}.tar.gz \
            file://run-ptest \

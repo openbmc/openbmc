@@ -1,15 +1,16 @@
 SUMMARY = "A lightweight SSH and SCP implementation"
 HOMEPAGE = "http://matt.ucc.asn.au/dropbear/dropbear.html"
+DESCRIPTION = "Dropbear is a relatively small SSH server and client. It runs on a variety of POSIX-based platforms. Dropbear is open source software, distributed under a MIT-style license. Dropbear is particularly useful for "embedded"-type Linux (or other Unix) systems, such as wireless routers."
 SECTION = "console/network"
 
 # some files are from other projects and have others license terms:
 #   public domain, OpenSSH 3.5p1, OpenSSH3.6.1p2, PuTTY
 LICENSE = "MIT & BSD-3-Clause & BSD-2-Clause & PD"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=a5ec40cafba26fc4396d0b550f824e01"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=25cf44512b7bc8966a48b6b1a9b7605f"
 
 DEPENDS = "zlib virtual/crypt"
-RPROVIDES_${PN} = "ssh sshd"
-RCONFLICTS_${PN} = "openssh-sshd openssh"
+RPROVIDES:${PN} = "ssh sshd"
+RCONFLICTS:${PN} = "openssh-sshd openssh"
 
 DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
 
@@ -32,7 +33,7 @@ PAM_PLUGINS = "libpam-runtime \
 	pam-plugin-permit \
 	pam-plugin-unix \
 	"
-RDEPENDS_${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_PLUGINS}', '', d)}"
+RDEPENDS:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '${PAM_PLUGINS}', '', d)}"
 
 inherit autotools update-rc.d systemd
 
@@ -41,7 +42,7 @@ CVE_PRODUCT = "dropbear_ssh"
 INITSCRIPT_NAME = "dropbear"
 INITSCRIPT_PARAMS = "defaults 10"
 
-SYSTEMD_SERVICE_${PN} = "dropbear.socket"
+SYSTEMD_SERVICE:${PN} = "dropbear.socket"
 
 SBINCOMMANDS = "dropbear dropbearkey dropbearconvert"
 BINCOMMANDS = "dbclient ssh scp"
@@ -57,6 +58,9 @@ EXTRA_OECONF += "\
 # This option appends to CFLAGS and LDFLAGS from OE
 # This is causing [textrel] QA warning
 EXTRA_OECONF += "--disable-harden"
+
+# musl does not implement wtmp/logwtmp APIs
+EXTRA_OECONF:append:libc-musl = " --disable-wtmp --disable-lastlog"
 
 do_install() {
 	install -d ${D}${sysconfdir} \
@@ -106,11 +110,11 @@ do_install() {
 inherit update-alternatives
 
 ALTERNATIVE_PRIORITY = "20"
-ALTERNATIVE_${PN} = "${@bb.utils.filter('BINCOMMANDS', 'scp ssh', d)}"
+ALTERNATIVE:${PN} = "${@bb.utils.filter('BINCOMMANDS', 'scp ssh', d)}"
 
 ALTERNATIVE_TARGET = "${sbindir}/dropbearmulti"
 
-pkg_postrm_append_${PN} () {
+pkg_postrm:${PN} () {
   if [ -f "${sysconfdir}/dropbear/dropbear_rsa_host_key" ]; then
         rm ${sysconfdir}/dropbear/dropbear_rsa_host_key
   fi
@@ -119,4 +123,4 @@ pkg_postrm_append_${PN} () {
   fi
 }
 
-FILES_${PN} += "${bindir}"
+FILES:${PN} += "${bindir}"

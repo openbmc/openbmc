@@ -1,0 +1,21 @@
+[Unit]
+Description=IPERF3 Server
+
+[Service]
+ExecStart=/usr/bin/iperf3 -s
+#Hardening
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+MountFlags=private
+NoNewPrivileges=true
+PrivateDevices=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryDenyWriteExecute=true
+DynamicUser=true
+
+[Install]
+WantedBy=multi-user.target

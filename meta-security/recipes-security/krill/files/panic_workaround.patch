@@ -1,0 +1,16 @@
+Upstream-Status: OE specific
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+
+Index: git/Cargo.toml
+===================================================================
+--- git.orig/Cargo.toml
++++ git/Cargo.toml
+@@ -71,7 +71,7 @@ static-openssl = [ "openssl/vendored" ]
+ # Make sure that Krill crashes on panics, rather than losing threads and
+ # limping on in a bad state.
+ [profile.release]
+-panic = "abort"
++#panic = "abort"
+ 
+ [dev-dependencies]
+ # for user management

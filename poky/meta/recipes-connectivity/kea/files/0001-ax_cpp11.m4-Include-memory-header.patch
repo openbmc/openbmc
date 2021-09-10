@@ -1,0 +1,24 @@
+From 5314a4815006e3a42f3ce265d1597db700cdb784 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 26 Feb 2021 23:14:20 -0800
+Subject: [PATCH] ax_cpp11.m4: Include <memory> header
+
+This is needed for std::shared_ptr
+GCC-11 throws errors if header is not included
+
+Upstream-Status: Submitted [https://github.com/isc-projects/kea/pull/120]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ m4macros/ax_cpp11.m4 | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/m4macros/ax_cpp11.m4
++++ b/m4macros/ax_cpp11.m4
+@@ -182,6 +182,7 @@ for retry in "none" "--std=c++11" "--std
+ 	AC_COMPILE_IFELSE(
+ 		[AC_LANG_PROGRAM(
+ 			[#include <thread>
++			 #include <memory>
+ 			 std::shared_ptr<std::thread> th;],
+ 			[th.reset(new std::thread([[]]() { return; }));
+ 			 th->join();])],

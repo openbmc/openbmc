@@ -8,10 +8,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=34400b68072d710fecd0a2940a0d1658"
 
 inherit autotools pkgconfig
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"
 PACKAGE_BEFORE_PN += "${PN}-ecc ${PN}-deprecated"
 
-FILES_${PN}-ecc = "${bindir}/ecc"
-FILES_${PN}-deprecated = "${bindir}"
+FILES:${PN}-ecc = "${bindir}/ecc"
+FILES:${PN}-deprecated = "${bindir}"
 
 BBCLASSEXTEND = "native nativesdk"

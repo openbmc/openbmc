@@ -11,11 +11,14 @@ inherit packagegroup
 PR = "r3"
 
 MTRACE = ""
-MTRACE_libc-glibc = "libc-mtrace"
+MTRACE:libc-glibc = "libc-mtrace"
 
-RDEPENDS_${PN} = "\
+STRACE = "strace"
+STRACE:riscv32 = ""
+
+RDEPENDS:${PN} = "\
     gdb \
     gdbserver \
-    strace \
     ${MTRACE} \
+    ${STRACE} \
     "

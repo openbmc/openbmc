@@ -3,15 +3,9 @@ SUMMARY = "Real-time performance monitoring"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fc9b848046ef54b5eaee6071947abd24"
 
-SRC_URI = "git://github.com/firehol/netdata.git;protocol=https \
-           file://0002-Makefiles-does-not-build-contrib-dir.patch \
-"
-SRCREV = "588ce5a7b18999dfa66698cd3a2f005f7a3c31cf"
-PV = "1.17.0"
-
-# patch to disable timeout because timeout are not available with actual version
-# of core-utils
-SRC_URI += "file://0001-Correct-timeout-issue.patch"
+SRC_URI = "git://github.com/firehol/netdata.git;protocol=https"
+SRCREV = "1be9200ba8e11dc81a2101d85a2725137d43f766"
+PV = "1.22.1"
 
 # default netdata.conf for netdata configuration
 SRC_URI += "file://netdata.conf"
@@ -21,25 +15,25 @@ SRC_URI += "file://netdata.service"
 
 S = "${WORKDIR}/git"
 
-DEPENDS += "zlib util-linux"
+DEPENDS += "zlib util-linux libuv"
 
 inherit pkgconfig autotools-brokensep useradd systemd
 
-LIBS_toolchain-clang_x86 = "-latomic"
-LIBS_riscv64 = "-latomic"
-LIBS_riscv32 = "-latomic"
+LIBS:toolchain-clang:x86 = "-latomic"
+LIBS:riscv64 = "-latomic"
+LIBS:riscv32 = "-latomic"
 export LIBS
 
 #systemd
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "netdata.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "enable"
+SYSTEMD_SERVICE:${PN} = "netdata.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 #User specific
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system netdata"
+GROUPADD_PARAM:${PN} = "--system netdata"
 
-do_install_append() {
+do_install:append() {
     #set S UID for plugins
     chmod 4755 ${D}${libexecdir}/netdata/plugins.d/apps.plugin
 
@@ -58,5 +52,4 @@ do_install_append() {
     sed -i -e 's,@@datadir,${datadir},g' ${D}${sysconfdir}/netdata/netdata.conf
 }
 
-FILES_${PN}-dbg += "${libexecdir}/netdata/plugins.d/.debug"
-RDEPENDS_${PN} = "bash zlib"
+RDEPENDS:${PN} = "bash zlib"

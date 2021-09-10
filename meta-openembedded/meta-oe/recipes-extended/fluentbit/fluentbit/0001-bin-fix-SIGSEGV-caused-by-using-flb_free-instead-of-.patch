@@ -1,0 +1,43 @@
+From 3d7390c89c2205d1eed0384be0bb65adb675e60d Mon Sep 17 00:00:00 2001
+From: Ramon Fried <ramon@neureality.ai>
+Date: Tue, 9 Feb 2021 18:59:59 +0200
+Subject: [PATCH] bin: fix SIGSEGV caused by using flb_free instead of
+ mk_mem_free
+
+Upstream-Status: Accepted
+Signed-off-by: Ramon Fried <ramon@neureality.ai>
+---
+ src/fluent-bit.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/fluent-bit.c b/src/fluent-bit.c
+index c0c73b4..989cfde 100644
+--- a/src/fluent-bit.c
++++ b/src/fluent-bit.c
+@@ -289,7 +289,7 @@ static int input_set_property(struct flb_input_instance *in, char *kv)
+                 in->p->name, key);
+     }
+ 
+-    flb_free(key);
++    mk_mem_free(key);
+     return ret;
+ }
+ 
+@@ -314,7 +314,7 @@ static int output_set_property(struct flb_output_instance *out, char *kv)
+     }
+ 
+     ret = flb_output_set_property(out, key, value);
+-    flb_free(key);
++    mk_mem_free(key);
+     return ret;
+ }
+ 
+@@ -340,7 +340,7 @@ static int filter_set_property(struct flb_filter_instance *filter, char *kv)
+     }
+ 
+     ret = flb_filter_set_property(filter, key, value);
+-    flb_free(key);
++    mk_mem_free(key);
+     return ret;
+ }
+ 

@@ -1,0 +1,11 @@
+bootargs=console=ttyS4,115200n8
+boota=setenv bootpart 2; setenv rootfs rofs-a; run bootmmc
+bootb=setenv bootpart 3; setenv rootfs rofs-b; run bootmmc
+bootcmd=setenv origbootargs ${bootargs}; run bootconfcmd; run bootsidecmd
+bootconfcmd=if test ${fitconfig} -n; then setenv bootmconf "#${fitconfig}"; fi
+bootdelay=2
+bootmmc=run setmmcargs; ext4load mmc 0:${bootpart} ${loadaddr} fitImage && bootm ${loadaddr}${bootmconf}; echo Error loading kernel FIT image with fitconfig ${fitconfig}; bootm ${loadaddr}; echo Error loading kernel FIT image
+bootside=a
+bootsidecmd=if test ${bootside} = b; then run bootb; run boota; else run boota; run bootb; fi
+loadaddr=0x83000000
+setmmcargs=setenv bootargs ${origbootargs} rootwait root=PARTLABEL=${rootfs}

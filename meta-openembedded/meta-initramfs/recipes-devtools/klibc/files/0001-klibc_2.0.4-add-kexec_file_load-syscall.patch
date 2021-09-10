@@ -10,11 +10,9 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  usr/klibc/SYSCALLS.def | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/usr/klibc/SYSCALLS.def b/usr/klibc/SYSCALLS.def
-index c56e8f9..6b3bf4c 100644
 --- a/usr/klibc/SYSCALLS.def
 +++ b/usr/klibc/SYSCALLS.def
-@@ -273,6 +273,7 @@ int reboot::__reboot(int, int, int, void *);
+@@ -274,6 +274,7 @@ int reboot::__reboot(int, int, int, void
  int syslog::klogctl(int, char *, int);
  int sysinfo(struct sysinfo *);
  long kexec_load(void *, unsigned long, struct kexec_segment *, unsigned long);
@@ -22,6 +20,3 @@ index c56e8f9..6b3bf4c 100644
  
  /*
   * Low-level I/O (generally architecture-specific);
--- 
-2.7.4
-

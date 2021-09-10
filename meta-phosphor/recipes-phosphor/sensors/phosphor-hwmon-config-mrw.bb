@@ -9,7 +9,7 @@ inherit mrw-xml
 
 DEPENDS += "mrw-perl-tools-native mrw-native"
 
-do_compile_append() {
+do_compile:append() {
     ${STAGING_BINDIR_NATIVE}/perl-native/perl \
         ${STAGING_BINDIR_NATIVE}/hwmon.pl \
         -x ${mrw_datadir}/${MRW_XML} \

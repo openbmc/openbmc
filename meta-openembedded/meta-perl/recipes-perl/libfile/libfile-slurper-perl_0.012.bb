@@ -9,13 +9,13 @@ LICENSE = "Artistic-1.0 | GPL-1.0+"
 HOMEPAGE=       "https://metacpan.org/release/File-Slurper"
 
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Artistic-1.0;md5=cda03bbdc3c1951996392b872397b798 \
-file://${COMMON_LICENSE_DIR}/GPL-1.0;md5=e9e36a9de734199567a4d769498f743d"
+file://${COMMON_LICENSE_DIR}/GPL-1.0-or-later;md5=30c0b8a5048cc2f4be5ff15ef0d8cf61"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/L/LE/LEONT/File-Slurper-${PV}.tar.gz"
 
 SRC_URI[md5sum] = "5742c63096392dfee50b8db314bcca18"
 SRC_URI[sha256sum] = "4efb2ea416b110a1bda6f8133549cc6ea3676402e3caf7529fce0313250aa578"
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     perl-module-carp \
     perl-module-encode \
     perl-module-exporter \
@@ -25,7 +25,7 @@ RDEPENDS_${PN} = " \
     perl-module-warnings \
 "
 
-RDEPENDS_${PN}-ptest += "libtest-warnings-perl \
+RDEPENDS:${PN}-ptest += "libtest-warnings-perl \
     perl-module-test-more \
     "
 

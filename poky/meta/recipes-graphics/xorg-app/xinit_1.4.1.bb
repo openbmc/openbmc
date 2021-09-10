@@ -19,4 +19,7 @@ SRC_URI[sha256sum] = "de9b8f617b68a70f6caf87da01fcf0ebd2b75690cdcba9c921d0ef54fa
 
 EXTRA_OECONF = "ac_cv_path_MCOOKIE=${bindir}/mcookie"
 
-RDEPENDS_${PN} += "util-linux-mcookie"
+PACKAGECONFIG ??= "rxvt"
+PACKAGECONFIG[rxvt] = "--with-xterm=rxvt,,,rxvt-unicode"
+
+RDEPENDS:${PN} += "util-linux-mcookie"

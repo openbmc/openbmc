@@ -21,13 +21,13 @@ EXTRA_PERLFLAGS = "-I ${PERLHOSTLIB}"
 
 inherit cpan ptest-perl
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     libxml-namespacesupport-perl \
     libxml-parser-perl \
     libxml-sax-perl \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     perl-module-file-temp \
     perl-module-test-more \
 "

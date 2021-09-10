@@ -623,7 +623,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -645,7 +645,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -667,7 +667,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -689,7 +689,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -711,7 +711,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -733,7 +733,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -755,7 +755,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -777,7 +777,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -799,7 +799,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -821,7 +821,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -843,7 +843,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -865,7 +865,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -887,7 +887,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -909,7 +909,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -931,7 +931,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -953,7 +953,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -970,6 +970,7 @@
   entityID: 208
   entityInstance: 1
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1001,6 +1002,7 @@
   entityID: 208
   entityInstance: 2
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1032,6 +1034,7 @@
   entityID: 208
   entityInstance: 3
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1063,6 +1066,7 @@
   entityID: 208
   entityInstance: 4
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1094,6 +1098,7 @@
   entityID: 208
   entityInstance: 5
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1125,6 +1130,7 @@
   entityID: 208
   entityInstance: 6
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1156,6 +1162,7 @@
   entityID: 208
   entityInstance: 7
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1187,6 +1194,7 @@
   entityID: 208
   entityInstance: 8
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1218,6 +1226,7 @@
   entityID: 208
   entityInstance: 9
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1249,6 +1258,7 @@
   entityID: 208
   entityInstance: 10
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1280,6 +1290,7 @@
   entityID: 208
   entityInstance: 11
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1311,6 +1322,7 @@
   entityID: 208
   entityInstance: 12
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1342,6 +1354,7 @@
   entityID: 208
   entityInstance: 13
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1373,6 +1386,7 @@
   entityID: 208
   entityInstance: 14
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1404,6 +1418,7 @@
   entityID: 208
   entityInstance: 15
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1435,6 +1450,7 @@
   entityID: 208
   entityInstance: 16
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1466,6 +1482,7 @@
   entityID: 208
   entityInstance: 17
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1497,6 +1514,7 @@
   entityID: 208
   entityInstance: 18
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1528,6 +1546,7 @@
   entityID: 208
   entityInstance: 19
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1559,6 +1578,7 @@
   entityID: 208
   entityInstance: 20
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1590,6 +1610,7 @@
   entityID: 208
   entityInstance: 21
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1621,6 +1642,7 @@
   entityID: 208
   entityInstance: 22
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1652,6 +1674,7 @@
   entityID: 208
   entityInstance: 23
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1683,6 +1706,7 @@
   entityID: 208
   entityInstance: 24
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1714,6 +1738,7 @@
   entityID: 208
   entityInstance: 25
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1745,6 +1770,7 @@
   entityID: 208
   entityInstance: 26
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1776,6 +1802,7 @@
   entityID: 208
   entityInstance: 27
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1807,6 +1834,7 @@
   entityID: 208
   entityInstance: 28
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1838,6 +1866,7 @@
   entityID: 208
   entityInstance: 29
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1869,6 +1898,7 @@
   entityID: 208
   entityInstance: 30
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1900,6 +1930,7 @@
   entityID: 208
   entityInstance: 31
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1931,6 +1962,7 @@
   entityID: 208
   entityInstance: 32
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1962,6 +1994,7 @@
   entityID: 208
   entityInstance: 33
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -1993,6 +2026,7 @@
   entityID: 208
   entityInstance: 34
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2024,6 +2058,7 @@
   entityID: 208
   entityInstance: 35
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2055,6 +2090,7 @@
   entityID: 208
   entityInstance: 36
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2086,6 +2122,7 @@
   entityID: 208
   entityInstance: 37
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2117,6 +2154,7 @@
   entityID: 208
   entityInstance: 38
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2148,6 +2186,7 @@
   entityID: 208
   entityInstance: 39
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2179,6 +2218,7 @@
   entityID: 208
   entityInstance: 40
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2210,6 +2250,7 @@
   entityID: 208
   entityInstance: 41
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2241,6 +2282,7 @@
   entityID: 208
   entityInstance: 42
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2272,6 +2314,7 @@
   entityID: 208
   entityInstance: 43
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2303,6 +2346,7 @@
   entityID: 208
   entityInstance: 44
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2334,6 +2378,7 @@
   entityID: 208
   entityInstance: 45
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2365,6 +2410,7 @@
   entityID: 208
   entityInstance: 46
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2396,6 +2442,7 @@
   entityID: 208
   entityInstance: 47
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2427,6 +2474,7 @@
   entityID: 208
   entityInstance: 48
   interfaces:
+    xyz.openbmc_project.Inventory.Item.CpuCore:
     xyz.openbmc_project.Inventory.Item:
       Present:
         Offsets:
@@ -2463,7 +2511,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2485,7 +2533,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2507,7 +2555,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2529,7 +2577,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2551,7 +2599,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2573,7 +2621,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2595,7 +2643,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2617,7 +2665,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2639,7 +2687,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2661,7 +2709,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2683,7 +2731,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2705,7 +2753,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2727,7 +2775,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2749,7 +2797,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2771,7 +2819,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2793,7 +2841,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2815,7 +2863,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2837,7 +2885,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2859,7 +2907,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2881,7 +2929,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2903,7 +2951,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2925,7 +2973,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2947,7 +2995,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2969,7 +3017,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -2991,7 +3039,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3013,7 +3061,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3035,7 +3083,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3057,7 +3105,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3079,7 +3127,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3101,7 +3149,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3123,7 +3171,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3145,7 +3193,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3167,7 +3215,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3189,7 +3237,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3211,7 +3259,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3233,7 +3281,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3255,7 +3303,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3277,7 +3325,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3299,7 +3347,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3321,7 +3369,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3343,7 +3391,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3365,7 +3413,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3387,7 +3435,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3409,7 +3457,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3431,7 +3479,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3453,7 +3501,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3475,7 +3523,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3497,7 +3545,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: -127
@@ -3567,7 +3615,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Read
   path: /xyz/openbmc_project/sensors/temperature/inlet
@@ -3589,7 +3637,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: 0
@@ -3611,7 +3659,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 2
   path: /xyz/openbmc_project/sensors/voltage/P3V3
@@ -3632,7 +3680,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 2
   offsetB: 200
@@ -3654,7 +3702,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/sensors/voltage/P12V
   multiplierM: 6
@@ -3675,7 +3723,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVDD_CPU0
@@ -3696,7 +3744,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVDD_CPU1
@@ -3717,7 +3765,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVCS_CPU0
@@ -3738,7 +3786,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/sensors/voltage/PVCS_CPU1
   multiplierM: 6
@@ -3759,7 +3807,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVDN_CPU0
@@ -3780,7 +3828,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVDN_CPU1
@@ -3801,7 +3849,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVIO_CPU0
@@ -3822,7 +3870,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVIO_CPU1
@@ -3843,7 +3891,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVDDQ_CPU0_CH01
@@ -3864,7 +3912,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVDDQ_CPU0_CH67
@@ -3885,7 +3933,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVDDQ_CPU1_CH01
@@ -3906,7 +3954,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 6
   path: /xyz/openbmc_project/sensors/voltage/PVDDQ_CPU1_CH67
@@ -3927,7 +3975,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 1
   path: /xyz/openbmc_project/sensors/power/psu0_pin
@@ -3948,7 +3996,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 1
   path: /xyz/openbmc_project/sensors/power/psu1_pin
@@ -3969,7 +4017,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 1
   path: /xyz/openbmc_project/sensors/power/psu0_pout
@@ -3990,7 +4038,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 1
   path: /xyz/openbmc_project/sensors/power/psu1_pout
@@ -4011,7 +4059,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 1
   path: /xyz/openbmc_project/sensors/voltage/psu0_vin
@@ -4032,7 +4080,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 1
   path: /xyz/openbmc_project/sensors/voltage/psu1_vin
@@ -4053,7 +4101,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 1
   path: /xyz/openbmc_project/sensors/voltage/psu0_vout
@@ -4074,7 +4122,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 1
   path: /xyz/openbmc_project/sensors/voltage/psu1_vout
@@ -4095,7 +4143,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   mutability: Mutability::Write|Mutability::Read
   multiplierM: 2
   path: /xyz/openbmc_project/sensors/voltage/p3v_bat
@@ -4116,7 +4164,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Read
   path: /xyz/openbmc_project/sensors/temperature/psu_inlet
@@ -4138,7 +4186,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: 0
@@ -4160,7 +4208,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 1
   mutability: Mutability::Write|Mutability::Read
   offsetB: 0
@@ -4182,7 +4230,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/sensors/fan_tach/fan0_0
@@ -4203,7 +4251,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/sensors/fan_tach/fan0_1
@@ -4224,7 +4272,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/sensors/fan_tach/fan1_0
@@ -4245,7 +4293,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/sensors/fan_tach/fan1_1
@@ -4266,7 +4314,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/sensors/fan_tach/fan2_0
@@ -4287,7 +4335,7 @@
       Value:
         Offsets:
           0xFF:
-            type: int64_t
+            type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/sensors/fan_tach/fan2_1
@@ -4308,7 +4356,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/sensors/fan_tach/fan3_0
@@ -4329,7 +4377,7 @@
       Value:
         Offsets:
           255:
-            type: int64_t
+            type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
   path: /xyz/openbmc_project/sensors/fan_tach/fan3_1

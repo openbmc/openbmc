@@ -8,8 +8,8 @@ diff -urN vblade-19.old//makefile vblade-19//makefile
 @@ -9,8 +9,6 @@
  mandir = ${sharedir}/man
  
- O=aoe.o bpf.o ${PLATFORM}.o ata.o
--CFLAGS += -Wall -g -O2
+ O=aoe.o bpf.o ${PLATFORM}.o ata.o dat.o
+-CFLAGS += -Wall -g -O2 -fno-common
 -CC = gcc
  
  vblade: $O

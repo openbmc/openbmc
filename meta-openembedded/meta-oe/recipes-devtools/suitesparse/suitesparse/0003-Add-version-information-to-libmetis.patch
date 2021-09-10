@@ -1,0 +1,49 @@
+From 11ab355fdda93b762fcc07ac3f7c6ab1be0a5f5a Mon Sep 17 00:00:00 2001
+From: Gregory Anders <greg@gpanders.com>
+Date: Wed, 21 Oct 2020 15:27:07 -0600
+Subject: [PATCH] Add version information to libmetis
+
+---
+ metis-5.1.0/Makefile                | 8 ++++----
+ metis-5.1.0/libmetis/CMakeLists.txt | 1 +
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/metis-5.1.0/Makefile b/metis-5.1.0/Makefile
+index 9cc03b9..c445d85 100644
+--- a/metis-5.1.0/Makefile
++++ b/metis-5.1.0/Makefile
+@@ -18,8 +18,11 @@ systype = $(shell uname -s)
+ 
+ BUILDDIR = build/$(systype)-$(cputype)
+ 
++VERNUM=5.1.0
++PKGNAME=metis-$(VERNUM)
++
+ # Process configuration options.
+-CONFIG_FLAGS = 
++CONFIG_FLAGS = -DMETIS_VERSION=$(VERNUM)
+ ifeq ($(gklib_path), not-set)
+     gklib_path = GKlib
+ endif
+@@ -52,9 +55,6 @@ ifneq ($(cc), not-set)
+     CONFIG_FLAGS += -DCMAKE_C_COMPILER=$(cc)
+ endif
+ 
+-VERNUM=5.1.0
+-PKGNAME=metis-$(VERNUM)
+-
+ JOBS ?= 1
+ 
+ define run-config
+diff --git a/metis-5.1.0/libmetis/CMakeLists.txt b/metis-5.1.0/libmetis/CMakeLists.txt
+index 120e94d..11bde87 100644
+--- a/metis-5.1.0/libmetis/CMakeLists.txt
++++ b/metis-5.1.0/libmetis/CMakeLists.txt
+@@ -4,6 +4,7 @@ include_directories(.)
+ file(GLOB metis_sources *.c)
+ # Build libmetis.
+ add_library(metis ${METIS_LIBRARY_TYPE} ${GKlib_sources} ${metis_sources})
++set_target_properties(metis PROPERTIES VERSION ${METIS_VERSION})
+ if(UNIX)
+   target_link_libraries(metis m)
+ endif()

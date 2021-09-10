@@ -1,14 +1,14 @@
-From b71eb384522b5ce4629dee6e8be257fb4880fef3 Mon Sep 17 00:00:00 2001
-From: Benjamin Gaignard <benjamin.gaignard@linaro.org>
+From b71eb384522b5ce4629dee6e8be257fb4880fef3 Mon Sep 17 00:00:00 2001 
+From: Benjamin Gaignard <benjamin.gaignard@linaro.org> 
 Date: Thu, 20 Apr 2017 14:25:18 +0200
 
 ---
- Makefile.am  | 1 -
- configure.ac | 9 ---------
- 2 files changed, 10 deletions(-)
+ Makefile.am  |  1 -
+ configure.ac | 17 -----------------
+ 2 files changed, 18 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index e9113c2..2fe3d54 100644
+index 4a3ead6..a12cb98 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -2,7 +2,6 @@ SUBDIRS = \
@@ -17,24 +17,32 @@ index e9113c2..2fe3d54 100644
  	etc \
 -	docs \
  	m4macros \
- 	tests
- 
+ 	tests \
+ 	scripts
 diff --git a/configure.ac b/configure.ac
-index 48ee0b2..a1a5fa1 100644
+index 3849383..9f3a633 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -194,10 +194,6 @@ AC_SUBST(ADDITIONAL_OBJECTS)
- AC_PATH_PROG(XSLTPROC, xsltproc, no)
- AM_CONDITIONAL(HAVE_XSLTPROC, test "x$XSLTPROC" != "xno")
+@@ -190,18 +190,6 @@ AC_SUBST(CPPFLAGS)
+ AC_SUBST(LIBS)
+ AC_SUBST(ADDITIONAL_OBJECTS)
  
--# Check for asciidoc
--AC_PATH_PROG(A2X, a2x, no)
--AM_CONDITIONAL(HAVE_A2X, test "x$A2X" != "xno")
+-if test x"$manpage_support_enabled" = x"yes"; then
+-AC_PATH_PROG(POD2MAN, pod2man, no)
 -
- # checking xmllint
- AC_PATH_PROG(XMLLINT, xmllint, no)
- if test "x$XMLLINT" != "xno"; then
-@@ -219,11 +215,6 @@ src/Makefile
+-if test "x$POD2MAN" = "xno" && \
+- ! test -e docs/man5/tinyproxy.conf.5 -a -e docs/man8/tinyproxy.8 ; then
+-AC_MSG_ERROR([
+-  manpage generation requested, but neither pod2man
+-  nor pre-generated manpages found.
+-  Use --disable-manpage-support if you want to compile anyway.])
+-fi
+-fi #manpage_support_enabled
+-
+ AM_CONDITIONAL(HAVE_POD2MAN, test "x$POD2MAN" != "x" -a "x$POD2MAN" != "xno")
+ 
+ AC_PATH_PROG(GPERF, gperf, no)
+@@ -226,11 +214,6 @@ src/Makefile
  data/Makefile
  data/templates/Makefile
  etc/Makefile
@@ -46,3 +54,6 @@ index 48ee0b2..a1a5fa1 100644
  m4macros/Makefile
  tests/Makefile
  tests/scripts/Makefile
+-- 
+2.25.1
+

@@ -1,0 +1,36 @@
+From c6a6b39cea3fdfd91cae7f2a4ef6f36d2c55fdd6 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Tue, 25 Feb 2020 15:17:17 -0800
+Subject: [LINUX][rel-v2020.1][PATCH v1] "get_monotonic_boottime(&ts)"
+ deprecated from kernel 4.20 onwards
+
+As "get_monotonic_boottime(&ts)" is deprecated, replace the same with
+"ktime_get_boottime_ts64(&ts)". Refer kernel commit ID
+976516404ff3fab2a8caa8bd6f5efc1437fed0b8
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+---
+ driver/src/devicedrv/mali/linux/mali_osk_time.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/driver/src/devicedrv/mali/linux/mali_osk_time.c b/driver/src/devicedrv/mali/linux/mali_osk_time.c
+index 03046a5..bfcbf7f 100644
+--- linux/mali_osk_time.c
++++ b/linux/mali_osk_time.c
+@@ -53,7 +53,13 @@ u64 _mali_osk_time_get_ns(void)
+ 
+ u64 _mali_osk_boot_time_get_ns(void)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
++	struct timespec64 tsval;
++	ktime_get_boottime_ts64(&tsval);
++	return (u64)timespec64_to_ns(&tsval);
++#else
+ 	struct timespec tsval;
+ 	get_monotonic_boottime(&tsval);
+ 	return (u64)timespec_to_ns(&tsval);
++#endif
+ }
+-- 
+2.7.4
+

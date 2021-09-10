@@ -1,69 +1,45 @@
-From 8a236330f2af56bde21e9f69208ea3e59f529f0c Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Sun, 15 Mar 2020 17:02:30 -0700
-Subject: [PATCH] typecast enum conversions explicitly
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
 
-clang complains like below
+From 3a0c1966e4c66f91e6e8551e906b6db38002acb4 Mon Sep 17 00:00:00 2001
+From: Angel Pons <th3fanbus@gmail.com>
+Date: Wed, 27 May 2020 12:15:51 +0200
+Subject: [PATCH] libflashrom.c: Use casts on enum conversions
 
-libflashrom.c:191:43: error: implicit conversion from enumeration type 'const enum test_state' to different enumeration type 'enum flashrom_test_state' [-Werror,-Wenum-conversion]
-                        supported_boards[i].working = binfo[i].working;
-                                                    ~ ~~~~~~~~~^~~~~~~
-libflashrom.c:229:46: error: implicit conversion from enumeration type 'const enum test_state' to different enumeration type 'enum flashrom_test_state' [-Werror,-Wenum-conversion]
-                        supported_chipsets[i].status = chipset[i].status;
-                                                     ~ ~~~~~~~~~~~^~~~~~
+This allows flashrom to build with GCC 10.
 
-However these enums are exactly same so they can be typecasted
-
-libflashrom.h
-
-/** @ingroup flashrom-query */
-enum flashrom_test_state {
-        FLASHROM_TESTED_OK  = 0,
-        FLASHROM_TESTED_NT  = 1,
-        FLASHROM_TESTED_BAD = 2,
-        FLASHROM_TESTED_DEP = 3,
-        FLASHROM_TESTED_NA  = 4,
-};
-
-flash.h
-
-enum test_state {
-          OK = 0,
-          NT = 1, /* Not tested */
-          BAD,    /* Known to not work */
-          DEP,    /* Support depends on configuration (e.g. Intel flash descriptor) */
-          NA,     /* Not applicable (e.g. write support on ROM chips) */
-  };
-
-Upstream-Status: Pending
-
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Change-Id: I2166cdf3681452631ef8e980face2924e9a6c81a
+Signed-off-by: Angel Pons <th3fanbus@gmail.com>
+Reviewed-on: https://review.coreboot.org/c/flashrom/+/41775
+Tested-by: build bot (Jenkins) <no-reply@coreboot.org>
+Reviewed-by: HAOUAS Elyes <ehaouas@noos.fr>
 ---
- libflashrom.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ libflashrom.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/libflashrom.c b/libflashrom.c
-index 0dec22e..7956685 100644
+index ab7e364..c20d9c7 100644
 --- a/libflashrom.c
 +++ b/libflashrom.c
-@@ -188,7 +188,7 @@ struct flashrom_board_info *flashrom_supported_boards(void)
+@@ -188,7 +188,8 @@ struct flashrom_board_info *flashrom_supported_boards(void)
  		for (; i < boards_known_size; ++i) {
  			supported_boards[i].vendor = binfo[i].vendor;
  			supported_boards[i].name = binfo[i].name;
 -			supported_boards[i].working = binfo[i].working;
-+			supported_boards[i].working = (enum flashrom_test_state)binfo[i].working;
++			supported_boards[i].working =
++				(enum flashrom_test_state) binfo[i].working;
  		}
  	} else {
  		msg_gerr("Memory allocation error!\n");
-@@ -226,7 +226,7 @@ struct flashrom_chipset_info *flashrom_supported_chipsets(void)
+@@ -226,7 +227,8 @@ struct flashrom_chipset_info *flashrom_supported_chipsets(void)
  			supported_chipsets[i].chipset = chipset[i].device_name;
  			supported_chipsets[i].vendor_id = chipset[i].vendor_id;
  			supported_chipsets[i].chipset_id = chipset[i].device_id;
 -			supported_chipsets[i].status = chipset[i].status;
-+			supported_chipsets[i].status = (enum flashrom_test_state)chipset[i].status;
++			supported_chipsets[i].status =
++				(enum flashrom_test_state) chipset[i].status;
  	  }
  	} else {
  		msg_gerr("Memory allocation error!\n");
 -- 
 2.25.1
-

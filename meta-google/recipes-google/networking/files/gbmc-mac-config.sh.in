@@ -1,0 +1,82 @@
+#!/bin/bash
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+source /usr/share/ipmi-fru/lib.sh || exit
+
+eeprom="$(of_name_to_eeprom '@EEPROM@')" || exit
+
+header=()
+read_header "$eeprom" header || exit
+internal_offset=${header[$IPMI_FRU_COMMON_HEADER_INTERNAL_OFFSET_IDX]}
+if (( internal_offset == 0 )); then
+  echo "Internal offset invalid for eeprom" >&2
+  exit 1
+fi
+
+# Our MAC Address configuration lives in the internal area with a format
+#   Offset Data
+#        0 Version (Always 1)
+#        1 Type (Always 1 for MAC Address)
+#        2 Area Length in bytes (Always 32 bytes or 4 IPMI FRU sectors)
+#      3-8 MAC Address Base Octets
+#        9 Num Allocate MACs from Base
+#    10-30 Padding (Always 0xFF)
+#       31 IPMI FRU Checksum
+internal=()
+read_area "$eeprom" "$internal_offset" internal 4 || exit
+if (( internal[1] != 1 || internal[2] != 32 )); then
+  echo "Not a MAC internal region" >&2
+  exit 1
+fi
+mac=("${internal[@]:3:6}")
+num="${internal[@]:9:1}"
+macstr=$(printf '%02x:%02x:%02x:%02x:%02x:%02x' "${mac[@]}")
+echo "Base MAC $macstr num $num" >&2
+
+rc=0
+
+# Pre-Determine if we will miss an allocation due to the number of
+# addresses the FRU actually supports.
+declare -A num_to_if=(@NUM_TO_IF@)
+for key in "${!num_to_if[@]}"; do
+  if (( key >= num )); then
+    echo "${num_to_if[$key]} at $key is out of range" >&2
+    rc=1
+  fi
+done
+
+# Write out each MAC override to the runtime networkd configuration
+for (( i=0; i<num; i++ )); do
+  intf="${num_to_if[$i]}"
+  if [ -n "$intf" ]; then
+    macstr=$(printf '%02x:%02x:%02x:%02x:%02x:%02x' "${mac[@]}")
+    echo "Setting $intf to $macstr" >&2
+    for override in /run/systemd/network/{00,}-bmc-$intf.network.d; do
+      mkdir -p "$override"
+      printf '[Link]\nMACAddress=%s\n' "$macstr" >"$override"/50-mac.conf
+    done
+    for override in /run/systemd/network/{00,}-bmc-$intf.netdev.d; do
+      mkdir -p "$override"
+      printf '[NetDev]\nMACAddress=%s\n' "$macstr" >"$override"/50-mac.conf
+    done
+  fi
+  if (( ++mac[5] > 0xff )); then
+    echo "MAC assignment too large: ${mac[@]}" >&2
+    rc=2
+    break
+  fi
+done
+
+exit $rc

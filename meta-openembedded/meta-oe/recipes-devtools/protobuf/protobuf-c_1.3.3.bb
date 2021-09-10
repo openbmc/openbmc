@@ -22,11 +22,16 @@ S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
 
+# After several fix attempts there is still a race between generating
+# t.test-full.pb.h and compiling cxx_generate_packed_data.c despite
+# BUILT_SOURCES and explicit dependencies.
+PARALLEL_MAKE = ""
+
 PACKAGE_BEFORE_PN = "${PN}-compiler"
 
-FILES_${PN}-compiler = "${bindir}"
+FILES:${PN}-compiler = "${bindir}"
 
-RDEPENDS_${PN}-compiler = "protobuf-compiler"
-RDEPENDS_${PN}-dev += "${PN}-compiler"
+RDEPENDS:${PN}-compiler = "protobuf-compiler"
+RDEPENDS:${PN}-dev += "${PN}-compiler"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -1,0 +1,58 @@
+CVE: CVE-2021-3544
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From f6091d86ba9ea05f4e111b9b42ee0005c37a6779 Mon Sep 17 00:00:00 2001
+From: Li Qiang <liq3ea@163.com>
+Date: Sat, 15 May 2021 20:04:00 -0700
+Subject: [PATCH 5/7] vhost-user-gpu: fix memory leak in
+ 'virgl_cmd_resource_unref' (CVE-2021-3544)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The 'res->iov' will be leaked if the guest trigger following sequences:
+
+	virgl_cmd_create_resource_2d
+	virgl_resource_attach_backing
+	virgl_cmd_resource_unref
+
+This patch fixes this.
+
+Fixes: CVE-2021-3544
+Reported-by: Li Qiang <liq3ea@163.com>
+virtio-gpu fix: 5e8e3c4c75 ("virtio-gpu: fix resource leak
+in virgl_cmd_resource_unref"
+
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20210516030403.107723-6-liq3ea@163.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ contrib/vhost-user-gpu/virgl.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/contrib/vhost-user-gpu/virgl.c b/contrib/vhost-user-gpu/virgl.c
+index 6a332d601f..c669d73a1d 100644
+--- a/contrib/vhost-user-gpu/virgl.c
++++ b/contrib/vhost-user-gpu/virgl.c
+@@ -108,9 +108,16 @@ virgl_cmd_resource_unref(VuGpu *g,
+                          struct virtio_gpu_ctrl_command *cmd)
+ {
+     struct virtio_gpu_resource_unref unref;
++    struct iovec *res_iovs = NULL;
++    int num_iovs = 0;
+ 
+     VUGPU_FILL_CMD(unref);
+ 
++    virgl_renderer_resource_detach_iov(unref.resource_id,
++                                       &res_iovs,
++                                       &num_iovs);
++    g_free(res_iovs);
++
+     virgl_renderer_resource_unref(unref.resource_id);
+ }
+ 
+-- 
+2.25.1
+

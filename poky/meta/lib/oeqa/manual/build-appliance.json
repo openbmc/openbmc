@@ -48,7 +48,7 @@
                     "expected_results": ""
                 },
                 "3": {
-                    "action": "Install a new package to the image, for example, acpid. Set the following line in conf/local.conf: IMAGE_INSTALL_append = \" acpid\"",
+                    "action": "Install a new package to the image, for example, acpid. Set the following line in conf/local.conf: IMAGE_INSTALL:append = \" acpid\"",
                     "expected_results": ""
                 },
                 "4": {

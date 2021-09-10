@@ -1,0 +1,57 @@
+From a737c95ac0f887c365fe8f16583ea95da79de1e9 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 21 Jun 2021 16:53:39 +0800
+Subject: [PATCH] rc.apparmor.debian: add missing functions
+
+Add missing functions:
+  aa_log_action_start
+  aa_log_action_end
+  aa_log_daemon_msg
+  aa_log_end_msg
+
+Fixes:
+$ /etc/init.d/apparmor start
+/lib/apparmor/rc.apparmor.functions: line 294: aa_log_daemon_msg: command not found
+/lib/apparmor/rc.apparmor.functions: line 214: aa_log_action_start: command not found
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ parser/rc.apparmor.debian | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/parser/rc.apparmor.debian b/parser/rc.apparmor.debian
+index 8efd4400..f35124e8 100644
+--- a/parser/rc.apparmor.debian
++++ b/parser/rc.apparmor.debian
+@@ -70,6 +70,26 @@ aa_log_skipped_msg() {
+         echo ": Skipped."
+ }
+ 
++aa_log_action_start()
++{
++    echo "$@"
++}
++
++aa_log_action_end()
++{
++    printf ""
++}
++
++aa_log_daemon_msg()
++{
++    echo "$@"
++}
++
++aa_log_end_msg()
++{
++    printf ""
++}
++
+ usage() {
+     echo "Usage: $0 {start|stop|restart|try-restart|reload|force-reload|status|kill}"
+ }
+-- 
+2.17.1
+

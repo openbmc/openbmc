@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "3214d5f00e9703b5e8c9e7c3287d606dedec7285ceb4d5db332e93ada6
 
 # using xfwm4-theme as in xfwm4 might cause warnings of packages supplied by
 # multiple providers. So we use xfwm4-old-theme here.
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     themedir = d.expand('${datadir}/themes')
     do_split_packages(d, themedir, '^(.*)', 'xfwm4-old-theme-%s', 'XFWM4 theme %s', allow_dirs=True)
 }

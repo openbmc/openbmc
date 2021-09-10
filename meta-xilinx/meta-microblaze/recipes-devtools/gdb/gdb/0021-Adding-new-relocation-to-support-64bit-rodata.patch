@@ -1,0 +1,67 @@
+From 14a54cced8062343b83d7ff0e68f00bca562a509 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Sat, 13 Oct 2018 21:17:01 +0530
+Subject: [PATCH 21/52] Adding new relocation to support 64bit rodata
+
+---
+ bfd/elf64-microblaze.c     | 11 +++++++--
+ gas/config/tc-microblaze.c | 49 ++++++++++++++++++++++++++++++++++----
+ 2 files changed, 54 insertions(+), 6 deletions(-)
+
+Index: gdb-9.2/bfd/elf64-microblaze.c
+===================================================================
+--- gdb-9.2.orig/bfd/elf64-microblaze.c
++++ gdb-9.2/bfd/elf64-microblaze.c
+@@ -1473,6 +1473,7 @@ microblaze_elf_relocate_section (bfd *ou
+ 	    case (int) R_MICROBLAZE_64_PCREL :
+ 	    case (int) R_MICROBLAZE_64:
+ 	    case (int) R_MICROBLAZE_32:
++	    case (int) R_MICROBLAZE_IMML_64:
+ 	      {
+ 		/* r_symndx will be STN_UNDEF (zero) only for relocs against symbols
+ 		   from removed linkonce sections, or sections discarded by
+@@ -1482,6 +1483,8 @@ microblaze_elf_relocate_section (bfd *ou
+ 		    relocation += addend;
+ 		    if (r_type == R_MICROBLAZE_32)// || r_type == R_MICROBLAZE_IMML_64)
+ 		      bfd_put_32 (input_bfd, relocation, contents + offset);
++		    else if (r_type == R_MICROBLAZE_IMML_64)
++		      bfd_put_64 (input_bfd, relocation, contents + offset);
+ 		    else
+ 		      {
+ 			if (r_type == R_MICROBLAZE_64_PCREL)
+@@ -1560,7 +1563,7 @@ microblaze_elf_relocate_section (bfd *ou
+ 		      }
+ 		    else
+ 		      {
+-			if (r_type == R_MICROBLAZE_32)
++			if (r_type == R_MICROBLAZE_32 || r_type == R_MICROBLAZE_IMML_64)
+ 			  {
+ 			    outrel.r_info = ELF64_R_INFO (0, R_MICROBLAZE_REL);
+ 			    outrel.r_addend = relocation + addend;
+@@ -1586,6 +1589,8 @@ microblaze_elf_relocate_section (bfd *ou
+ 		    relocation += addend;
+ 		    if (r_type == R_MICROBLAZE_32)
+ 		      bfd_put_32 (input_bfd, relocation, contents + offset);
++		    else if (r_type == R_MICROBLAZE_IMML_64)
++		      bfd_put_64 (input_bfd, relocation, contents + offset + endian);
+ 		    else
+ 		      {
+ 			if (r_type == R_MICROBLAZE_64_PCREL)
+@@ -2098,7 +2103,8 @@ microblaze_elf_relax_section (bfd *abfd,
+                   microblaze_bfd_write_imm_value_32 (abfd, ocontents + irelscan->r_offset,
+                                                      irelscan->r_addend);
+               }
+-              if (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32)
++              if (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32 
++		   || ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_IMML_64)
+                 {
+ 	          isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
+ 
+@@ -2606,6 +2612,7 @@ microblaze_elf_check_relocs (bfd * abfd,
+         case R_MICROBLAZE_64:
+         case R_MICROBLAZE_64_PCREL:
+         case R_MICROBLAZE_32:
++        case R_MICROBLAZE_IMML_64:
+           {
+             if (h != NULL && !bfd_link_pic (info))
+ 	      {

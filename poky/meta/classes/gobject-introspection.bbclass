@@ -15,29 +15,29 @@ GIR_MESON_ENABLE_FLAG ?= 'true'
 GIR_MESON_DISABLE_FLAG ?= 'false'
 
 # Auto enable/disable based on GI_DATA_ENABLED
-EXTRA_OECONF_prepend_class-target = "${@bb.utils.contains('GI_DATA_ENABLED', 'True', '--enable-introspection', '--disable-introspection', d)} "
-EXTRA_OEMESON_prepend_class-target = "-D${GIR_MESON_OPTION}=${@bb.utils.contains('GI_DATA_ENABLED', 'True', '${GIR_MESON_ENABLE_FLAG}', '${GIR_MESON_DISABLE_FLAG}', d)} "
+EXTRA_OECONF:prepend:class-target = "${@bb.utils.contains('GI_DATA_ENABLED', 'True', '--enable-introspection', '--disable-introspection', d)} "
+EXTRA_OEMESON:prepend:class-target = "-D${GIR_MESON_OPTION}=${@bb.utils.contains('GI_DATA_ENABLED', 'True', '${GIR_MESON_ENABLE_FLAG}', '${GIR_MESON_DISABLE_FLAG}', d)} "
 
 # When building native recipes, disable introspection, as it is not necessary,
 # pulls in additional dependencies, and makes build times longer
-EXTRA_OECONF_prepend_class-native = "--disable-introspection "
-EXTRA_OECONF_prepend_class-nativesdk = "--disable-introspection "
-EXTRA_OEMESON_prepend_class-native = "-D${GIR_MESON_OPTION}=${GIR_MESON_DISABLE_FLAG} "
-EXTRA_OEMESON_prepend_class-nativesdk = "-D${GIR_MESON_OPTION}=${GIR_MESON_DISABLE_FLAG} "
+EXTRA_OECONF:prepend:class-native = "--disable-introspection "
+EXTRA_OECONF:prepend:class-nativesdk = "--disable-introspection "
+EXTRA_OEMESON:prepend:class-native = "-D${GIR_MESON_OPTION}=${GIR_MESON_DISABLE_FLAG} "
+EXTRA_OEMESON:prepend:class-nativesdk = "-D${GIR_MESON_OPTION}=${GIR_MESON_DISABLE_FLAG} "
 
 # Generating introspection data depends on a combination of native and target
 # introspection tools, and qemu to run the target tools.
-DEPENDS_append_class-target = " gobject-introspection gobject-introspection-native qemu-native prelink-native"
+DEPENDS:append:class-target = " gobject-introspection gobject-introspection-native qemu-native prelink-native"
 
 # Even though introspection is disabled on -native, gobject-introspection package is still
 # needed for m4 macros.
-DEPENDS_append_class-native = " gobject-introspection-native"
-DEPENDS_append_class-nativesdk = " gobject-introspection-native"
+DEPENDS:append:class-native = " gobject-introspection-native"
+DEPENDS:append:class-nativesdk = " gobject-introspection-native"
 
 # This is used by introspection tools to find .gir includes
 export XDG_DATA_DIRS = "${STAGING_DATADIR}:${STAGING_LIBDIR}"
 
-do_configure_prepend_class-target () {
+do_configure:prepend:class-target () {
     # introspection.m4 pre-packaged with upstream tarballs does not yet
     # have our fixes
     mkdir -p ${S}/m4
@@ -46,8 +46,8 @@ do_configure_prepend_class-target () {
 
 # .typelib files are needed at runtime and so they go to the main package (so
 # they'll be together with libraries they support).
-FILES_${PN}_append = " ${libdir}/girepository-*/*.typelib" 
+FILES:${PN}:append = " ${libdir}/girepository-*/*.typelib" 
     
 # .gir files go to dev package, as they're needed for developing (but not for
 # running) things that depends on introspection.
-FILES_${PN}-dev_append = " ${datadir}/gir-*/*.gir ${libdir}/gir-*/*.gir"
+FILES:${PN}-dev:append = " ${datadir}/gir-*/*.gir ${libdir}/gir-*/*.gir"

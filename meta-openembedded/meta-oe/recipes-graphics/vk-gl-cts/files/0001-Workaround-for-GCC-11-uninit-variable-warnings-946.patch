@@ -1,0 +1,73 @@
+From 9cd614dd5481a4fdf552effac4820f51a10092c7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mika=20V=C3=A4in=C3=B6l=C3=A4?=
+ <33728696+mvainola@users.noreply.github.com>
+Date: Wed, 7 Apr 2021 13:12:17 +0300
+Subject: [PATCH] Workaround for GCC 11 uninit variable warnings (#946)
+
+Building Amber with GCC 11.0.1 produces some uninitialized variable
+warnings. This commit works around them by replacing
+reinterpret_cast with memcpy when type punning unsigned integers to
+floats.
+
+Upstream-Status: Backport [https://github.com/google/amber/commit/aa69a0ac23ea7f68dd32bbef210546a5d84c1734]
+---
+ src/float16_helper.cc | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/src/float16_helper.cc b/src/float16_helper.cc
+index 617bd72..5cb35e7 100644
+--- a/src/float16_helper.cc
++++ b/src/float16_helper.cc
+@@ -15,6 +15,7 @@
+ #include "src/float16_helper.h"
+ 
+ #include <cassert>
++#include <cstring>
+ 
+ // Float10
+ // | 9 8 7 6 5 | 4 3 2 1 0 |
+@@ -75,8 +76,11 @@ float HexFloat16ToFloat(const uint8_t* value) {
+   }
+ 
+   uint32_t hex = sign | exponent | mantissa;
+-  float* hex_float = reinterpret_cast<float*>(&hex);
+-  return *hex_float;
++  float hex_float;
++  static_assert((sizeof(uint32_t) == sizeof(float)),
++                "sizeof(uint32_t) != sizeof(float)");
++  memcpy(&hex_float, &hex, sizeof(float));
++  return hex_float;
+ }
+ 
+ // Convert float |value| whose size is 11 bits to 32 bits float
+@@ -89,8 +93,11 @@ float HexFloat11ToFloat(const uint8_t* value) {
+   uint32_t mantissa = (static_cast<uint32_t>(value[0]) & 0x3f) << 17U;
+ 
+   uint32_t hex = exponent | mantissa;
+-  float* hex_float = reinterpret_cast<float*>(&hex);
+-  return *hex_float;
++  float hex_float;
++  static_assert((sizeof(uint32_t) == sizeof(float)),
++                "sizeof(uint32_t) != sizeof(float)");
++  memcpy(&hex_float, &hex, sizeof(float));
++  return hex_float;
+ }
+ 
+ // Convert float |value| whose size is 10 bits to 32 bits float
+@@ -103,8 +110,11 @@ float HexFloat10ToFloat(const uint8_t* value) {
+   uint32_t mantissa = (static_cast<uint32_t>(value[0]) & 0x1f) << 18U;
+ 
+   uint32_t hex = exponent | mantissa;
+-  float* hex_float = reinterpret_cast<float*>(&hex);
+-  return *hex_float;
++  float hex_float;
++  static_assert((sizeof(uint32_t) == sizeof(float)),
++                "sizeof(uint32_t) != sizeof(float)");
++  memcpy(&hex_float, &hex, sizeof(float));
++  return hex_float;
+ }
+ 
+ }  // namespace
+-- 
+2.31.1
+

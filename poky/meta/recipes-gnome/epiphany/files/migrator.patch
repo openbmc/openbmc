@@ -1,0 +1,24 @@
+We don't want to encide BUILD_ROOT into target packages. This is used
+for build time tests but in our case those would be on target anyway
+do use the target paths.
+
+Upstream-Status: Pending
+RP 2021/2/25
+
+Index: epiphany-3.38.2/lib/ephy-profile-utils.c
+===================================================================
+--- epiphany-3.38.2.orig/lib/ephy-profile-utils.c
++++ epiphany-3.38.2/lib/ephy-profile-utils.c
+@@ -130,10 +130,10 @@ ephy_profile_utils_do_migration (const c
+   argv[i++] = NULL;
+ 
+ #if DEVELOPER_MODE
+-  argv[0] = BUILD_ROOT "/src/" EPHY_PROFILE_MIGRATOR;
++  argv[0] = PKGLIBEXECDIR "/" EPHY_PROFILE_MIGRATOR;
+ #else
+   if (debug)
+-    argv[0] = BUILD_ROOT "/src/" EPHY_PROFILE_MIGRATOR;
++    argv[0] = PKGLIBEXECDIR "/" EPHY_PROFILE_MIGRATOR;
+ #endif
+ 
+   g_spawn_sync (NULL, (char **)argv, envp, G_SPAWN_SEARCH_PATH,

@@ -11,6 +11,8 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-openembedded/meta-networking \
   ##OEROOT##/meta-openembedded/meta-perl \
   ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-security/meta-tpm \
+  ##OEROOT##/meta-security \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-openpower \
@@ -22,6 +24,8 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-openembedded/meta-networking \
   ##OEROOT##/meta-openembedded/meta-perl \
   ##OEROOT##/meta-openembedded/meta-python \
+  ##OEROOT##/meta-security/meta-tpm \
+  ##OEROOT##/meta-security \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-openpower \

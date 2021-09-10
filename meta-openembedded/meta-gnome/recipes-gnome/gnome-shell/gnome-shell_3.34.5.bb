@@ -28,7 +28,7 @@ GTKDOC_MESON_OPTION = "gtk_doc"
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES += "gobject-introspection-data"
-UNKNOWN_CONFIGURE_WHITELIST_append = " introspection"
+UNKNOWN_CONFIGURE_WHITELIST:append = " introspection"
 
 SRC_URI[archive.md5sum] = "4bd27c8a91d30fde78cb69b94677cf1f"
 SRC_URI[archive.sha256sum] = "d296f318a74a6d7883358a6ce1c4d8808b7903dbbb4f9c61ab4230f18e6d7550"
@@ -42,23 +42,25 @@ EXTRA_OEMESON = " \
     -Dman=false \
 "
 
-do_install_append() {
+do_install:append() {
     # fix shebangs
     for tool in `find ${D}${bindir} -name '*-tool'`; do
         sed -i 's:#!${PYTHON}:#!${bindir}/${PYTHON_PN}:' $tool
     done
 }
 
-FILES_${PN} += " \
+GSETTINGS_PACKAGE = "${PN}-gsettings"
+
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/gnome-control-center \
     ${datadir}/xdg-desktop-portal \
     ${systemd_user_unitdir} \
 "
 
-RDEPENDS_${PN} += "gsettings-desktop-schemas gdm-base librsvg-gtk"
+RDEPENDS:${PN} += "gsettings-desktop-schemas gdm-base librsvg-gtk ${PN}-gsettings"
 
-PACKAGES =+ "${PN}-tools"
-FILES_${PN}-tools = "${bindir}/*-tool"
-RDEPENDS_${PN}-tools = "python3-core"
+PACKAGES =+ "${PN}-tools ${PN}-gsettings"
+FILES:${PN}-tools = "${bindir}/*-tool"
+RDEPENDS:${PN}-tools = "python3-core"
 

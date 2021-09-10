@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 # Calculate the auxiliary firmware revision to be updated in the dev_id.json
 # file. It is calculated from the VERSION_ID field which currently has two
@@ -16,20 +16,24 @@ inherit image_version
 unset do_patch[noexec]
 do_patch[depends] = "os-release:do_populate_sysroot"
 
-python do_patch_ibm-ac-server() {
+python do_patch:ibm-ac-server() {
     import json
     import re
     from shutil import copyfile
     version_id = do_get_version(d)
 
-    # count from the commit version
+    # count from the commit version, minimum of one digit
     count = re.findall("-(\d{1,4})-", version_id)
+    if count:
+        commit = count[0]
+    else:
+        commit = "0"
 
     release = re.findall("-r(\d{1,4})", version_id)
     if release:
-        auxVer = count[0] + "{0:0>4}".format(release[0])
+        auxVer = commit + "{0:0>4}".format(release[0])
     else:
-        auxVer = count[0] + "0000"
+        auxVer = commit + "0000"
 
     workdir = d.getVar('WORKDIR', True)
     file = os.path.join(workdir, 'dev_id.json')

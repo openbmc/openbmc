@@ -1,6 +1,3 @@
-METADATA_BRANCH ?= "${@base_detect_branch(d)}"
-METADATA_REVISION ?= "${@base_detect_revision(d)}"
-
 def base_detect_revision(d):
     path = base_get_scmbasepath(d)
     return base_get_metadata_git_revision(path, d)
@@ -40,3 +37,8 @@ def base_get_metadata_git_revision(path, d):
     except bb.process.ExecutionError:
         rev = '<unknown>'
     return rev.strip()
+
+METADATA_BRANCH := "${@base_detect_branch(d)}"
+METADATA_BRANCH[vardepvalue] = "${METADATA_BRANCH}"
+METADATA_REVISION := "${@base_detect_revision(d)}"
+METADATA_REVISION[vardepvalue] = "${METADATA_REVISION}"

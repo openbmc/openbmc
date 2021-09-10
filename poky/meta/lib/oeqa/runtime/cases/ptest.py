@@ -42,6 +42,10 @@ class PtestRunnerTest(OERuntimeTestCase):
         # testdata.json is generated.
         if not test_log_dir:
             test_log_dir = os.path.join(self.td.get('WORKDIR', ''), 'testimage')
+        # Make the test output path absolute, otherwise the output content will be
+        # created relative to current directory
+        if not os.path.isabs(test_log_dir):
+            test_log_dir = os.path.join(self.td.get('TOPDIR', ''), test_log_dir)
         # Don't use self.td.get('DATETIME'), it's from testdata.json, not
         # up-to-date, and may cause "File exists" when re-reun.
         timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -53,7 +57,7 @@ class PtestRunnerTest(OERuntimeTestCase):
         ptest_dirs = [ '/usr/lib' ]
         if not libdir in ptest_dirs:
             ptest_dirs.append(libdir)
-        status, output = self.target.run('ptest-runner -d \"{}\"'.format(' '.join(ptest_dirs)), 0)
+        status, output = self.target.run('ptest-runner -t 450 -d \"{}\"'.format(' '.join(ptest_dirs)), 0)
         os.makedirs(ptest_log_dir)
         with open(ptest_runner_log, 'w') as f:
             f.write(output)
@@ -104,4 +108,5 @@ class PtestRunnerTest(OERuntimeTestCase):
             failmsg = failmsg + "Failed ptests:\n%s" % pprint.pformat(failed_tests)
 
         if failmsg:
+            self.logger.warning("There were failing ptests.")
             self.fail(failmsg)

@@ -2,7 +2,7 @@ SUMMARY = "A collection of cpuburn programs tuned for different ARM hardware"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://cpuburn-a53.S;beginline=1;endline=22;md5=3b7ccd70144c16d3fe14ac491c2d4a87"
 
-RPROVIDES_${PN} = "cpuburn-neon"
+RPROVIDES:${PN} = "cpuburn-neon"
 PROVIDES += "cpuburn-neon"
 
 SRCREV = "ad7e646700d14b81413297bda02fb7fe96613c3f"
@@ -47,6 +47,6 @@ do_install() {
 }
 
 COMPATIBLE_MACHINE ?= "(^$)"
-COMPATIBLE_MACHINE_armv7a = "(.*)"
-COMPATIBLE_MACHINE_armv7ve = "(.*)"
-COMPATIBLE_MACHINE_aarch64 = "(.*)"
+COMPATIBLE_MACHINE:armv7a = "(.*)"
+COMPATIBLE_MACHINE:armv7ve = "(.*)"
+COMPATIBLE_MACHINE:aarch64 = "(.*)"

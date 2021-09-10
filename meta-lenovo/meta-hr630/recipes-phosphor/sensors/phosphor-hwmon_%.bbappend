@@ -2,7 +2,7 @@
 #Licensed under BSD-3, see COPYING.BSD file for details."
 
 FILESEXTRAPATHS_prepend_hr630 := "${THISDIR}/${PN}:"
-EXTRA_OECONF_append_hr630 = " --enable-negative-errno-on-fail"
+EXTRA_OEMESON_append_hr630 = " -Dnegative-errno-on-fail=true"
 
 CHIPS = " \
         bus@1e78a000/i2c-bus@40/tmp75@4e \
@@ -15,4 +15,4 @@ ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
 ITEMS += "iio-hwmon.conf"
 
 ENVS = "obmc/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_hr630 := "${@compose_list(d, 'ENVS', 'ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}_append_hr630 := "${@compose_list(d, 'ENVS', 'ITEMS')}"

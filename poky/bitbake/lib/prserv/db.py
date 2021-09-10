@@ -30,21 +30,29 @@ if sqlversion[0] < 3 or (sqlversion[0] == 3 and sqlversion[1] < 3):
 #
 
 class PRTable(object):
-    def __init__(self, conn, table, nohist):
+    def __init__(self, conn, table, nohist, read_only):
         self.conn = conn
         self.nohist = nohist
+        self.read_only = read_only
         self.dirty = False
         if nohist:
             self.table = "%s_nohist" % table 
         else:
             self.table = "%s_hist" % table 
 
-        self._execute("CREATE TABLE IF NOT EXISTS %s \
-                    (version TEXT NOT NULL, \
-                    pkgarch TEXT NOT NULL,  \
-                    checksum TEXT NOT NULL, \
-                    value INTEGER, \
-                    PRIMARY KEY (version, pkgarch, checksum));" % self.table)
+        if self.read_only:
+            table_exists = self._execute(
+                        "SELECT count(*) FROM sqlite_master \
+                        WHERE type='table' AND name='%s'" % (self.table))
+            if not table_exists:
+                raise prserv.NotFoundError
+        else:
+            self._execute("CREATE TABLE IF NOT EXISTS %s \
+                        (version TEXT NOT NULL, \
+                        pkgarch TEXT NOT NULL,  \
+                        checksum TEXT NOT NULL, \
+                        value INTEGER, \
+                        PRIMARY KEY (version, pkgarch, checksum));" % self.table)
 
     def _execute(self, *query):
         """Execute a query, waiting to acquire a lock if necessary"""
@@ -59,8 +67,9 @@ class PRTable(object):
                 raise exc
 
     def sync(self):
-        self.conn.commit()
-        self._execute("BEGIN EXCLUSIVE TRANSACTION")
+        if not self.read_only:
+            self.conn.commit()
+            self._execute("BEGIN EXCLUSIVE TRANSACTION")
 
     def sync_if_dirty(self):
         if self.dirty:
@@ -75,6 +84,15 @@ class PRTable(object):
             return row[0]
         else:
             #no value found, try to insert
+            if self.read_only:
+                data = self._execute("SELECT ifnull(max(value)+1,0) FROM %s where version=? AND pkgarch=?;" % (self.table),
+                                   (version, pkgarch))
+                row = data.fetchone()
+                if row is not None:
+                    return row[0]
+                else:
+                    return 0
+
             try:
                 self._execute("INSERT INTO %s VALUES (?, ?, ?, (select ifnull(max(value)+1,0) from %s where version=? AND pkgarch=?));"
                            % (self.table,self.table),
@@ -103,6 +121,15 @@ class PRTable(object):
             return row[0]
         else:
             #no value found, try to insert
+            if self.read_only:
+                data = self._execute("SELECT ifnull(max(value)+1,0) FROM %s where version=? AND pkgarch=?;" % (self.table),
+                                   (version, pkgarch))
+                row = data.fetchone()
+                if row is not None:
+                    return row[0]
+                else:
+                    return 0
+
             try:
                 self._execute("INSERT OR REPLACE INTO %s VALUES (?, ?, ?, (select ifnull(max(value)+1,0) from %s where version=? AND pkgarch=?));"
                                % (self.table,self.table),
@@ -128,6 +155,9 @@ class PRTable(object):
             return self._getValueHist(version, pkgarch, checksum)
 
     def _importHist(self, version, pkgarch, checksum, value):
+        if self.read_only:
+            return None
+
         val = None 
         data = self._execute("SELECT value FROM %s WHERE version=? AND pkgarch=? AND checksum=?;" % self.table,
                            (version, pkgarch, checksum))
@@ -152,6 +182,9 @@ class PRTable(object):
         return val
 
     def _importNohist(self, version, pkgarch, checksum, value):
+        if self.read_only:
+            return None
+
         try:
             #try to insert
             self._execute("INSERT INTO %s VALUES (?, ?, ?, ?);"  % (self.table),
@@ -245,19 +278,23 @@ class PRTable(object):
 
 class PRData(object):
     """Object representing the PR database"""
-    def __init__(self, filename, nohist=True):
+    def __init__(self, filename, nohist=True, read_only=False):
         self.filename=os.path.abspath(filename)
         self.nohist=nohist
+        self.read_only = read_only
         #build directory hierarchy
         try:
             os.makedirs(os.path.dirname(self.filename))
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise e
-        self.connection=sqlite3.connect(self.filename, isolation_level="EXCLUSIVE", check_same_thread = False)
+        uri = "file:%s%s" % (self.filename, "?mode=ro" if self.read_only else "")
+        logger.debug("Opening PRServ database '%s'" % (uri))
+        self.connection=sqlite3.connect(uri, uri=True, isolation_level="EXCLUSIVE", check_same_thread = False)
         self.connection.row_factory=sqlite3.Row
-        self.connection.execute("pragma synchronous = off;")
-        self.connection.execute("PRAGMA journal_mode = MEMORY;")
+        if not self.read_only:
+            self.connection.execute("pragma synchronous = off;")
+            self.connection.execute("PRAGMA journal_mode = MEMORY;")
         self._tables={}
 
     def disconnect(self):
@@ -270,7 +307,7 @@ class PRData(object):
         if tblname in self._tables:
             return self._tables[tblname]
         else:
-            tableobj = self._tables[tblname] = PRTable(self.connection, tblname, self.nohist)
+            tableobj = self._tables[tblname] = PRTable(self.connection, tblname, self.nohist, self.read_only)
             return tableobj
 
     def __delitem__(self, tblname):

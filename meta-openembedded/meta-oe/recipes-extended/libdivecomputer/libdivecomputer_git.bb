@@ -8,9 +8,9 @@ DEPENDS = "libusb1"
 
 inherit autotools pkgconfig
 
-PV = "0.6.0"
+PV = "0.7.0"
 
-SRCREV = "1195abc2f4acc7b10175d570ec73549d0938c83e"
+SRCREV = "47cbed5355ffda7b952193a770a9a9fa9f89b25b"
 SRC_URI = "git://github.com/libdivecomputer/libdivecomputer.git;protocol=https \
           "
 

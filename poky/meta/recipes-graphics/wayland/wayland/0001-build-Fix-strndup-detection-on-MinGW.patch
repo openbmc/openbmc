@@ -1,4 +1,4 @@
-From e6783c99f051c6d8252db5f388d805cef0e16357 Mon Sep 17 00:00:00 2001
+From 6a6223a8e217664a348835e92d5a602f50e18b2c Mon Sep 17 00:00:00 2001
 From: Joshua Watt <JPEWhacker@gmail.com>
 Date: Thu, 20 Feb 2020 15:20:45 -0600
 Subject: [PATCH] build: Fix strndup detection on MinGW
@@ -13,10 +13,13 @@ See: https://github.com/mesonbuild/meson/issues/3672
 
 Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
 Upstream-Status: Submitted [https://gitlab.freedesktop.org/wayland/wayland/merge_requests/63]
+
 ---
  meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/meson.build b/meson.build
+index 11c35fa..80729d0 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -36,11 +36,11 @@ have_funcs = [

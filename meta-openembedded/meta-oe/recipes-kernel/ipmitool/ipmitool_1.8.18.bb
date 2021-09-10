@@ -30,6 +30,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/ipmitool/ipmitool-${PV}.tar.bz2 \
            file://0003-channel-Fix-buffer-overflow.patch \
            file://0004-lanp-Fix-buffer-overflows-in-get_lan_param_select.patch \
            file://0005-fru-sdr-Fix-id_string-buffer-overflows.patch \
+           file://0001-hpmfwupg-move-variable-definition-to-.c-file.patch \
            "
 SRC_URI[md5sum] = "bab7ea104c7b85529c3ef65c54427aa3"
 SRC_URI[sha256sum] = "0c1ba3b1555edefb7c32ae8cd6a3e04322056bc087918f07189eeedfc8b81e01"

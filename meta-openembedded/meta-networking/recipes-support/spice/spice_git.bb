@@ -25,6 +25,7 @@ SRC_URI = " \
     git://anongit.freedesktop.org/spice/spice-common;destsuffix=git/subprojects/spice-common;name=spice-common \
     file://0001-Convert-pthread_t-to-be-numeric.patch \
     file://0001-Fix-compile-errors-on-Linux-32bit-system.patch \
+    file://0001-configure.ac-explicitly-link-to-jpeg-lib.patch \
 "
 
 S = "${WORKDIR}/git"
@@ -32,14 +33,14 @@ S = "${WORKDIR}/git"
 inherit autotools gettext python3native python3-dir pkgconfig
 
 DEPENDS += "spice-protocol jpeg pixman alsa-lib glib-2.0 python3-pyparsing-native python3-six-native glib-2.0-native"
-DEPENDS_append_class-nativesdk = "nativesdk-openssl"
+DEPENDS:append:class-nativesdk = " nativesdk-openssl"
 
 export PYTHON="${STAGING_BINDIR_NATIVE}/python3-native/python3"
 
-CFLAGS_append = " -Wno-error"
+CFLAGS:append = " -Wno-error"
 
-PACKAGECONFIG_class-native = ""
-PACKAGECONFIG_class-nativesdk = ""
+PACKAGECONFIG:class-native = ""
+PACKAGECONFIG:class-nativesdk = ""
 PACKAGECONFIG ?= "sasl"
 
 PACKAGECONFIG[celt051] = "--enable-celt051,--disable-celt051,celt051"
@@ -55,4 +56,4 @@ COMPATIBLE_HOST = '(x86_64|i.86).*-linux'
 
 BBCLASSEXTEND = "native nativesdk"
 
-EXTRA_OECONF_append_toolchain-clang = " --disable-werror"
+EXTRA_OECONF:append:toolchain-clang = " --disable-werror"

@@ -9,7 +9,7 @@ LICENSE = "Artistic-1.0|GPL-1.0+"
 LIC_FILES_CHKSUM = "file://lib/Authen/SASL/Perl.pm;beginline=1;endline=3;md5=17123315bbcda19f484c07227594a609"
 
 DEPENDS = "perl"
-RDEPENDS_${PN} = "libdigest-hmac-perl"
+RDEPENDS:${PN} = "libdigest-hmac-perl"
 
 SRC_URI = "http://www.cpan.org/authors/id/G/GB/GBARR/Authen-SASL-${PV}.tar.gz \
            file://run-ptest \
@@ -20,6 +20,8 @@ SRC_URI[sha256sum] = "6614fa7518f094f853741b63c73f3627168c5d3aca89b1d02b1016dc32
 S = "${WORKDIR}/Authen-SASL-${PV}"
 
 inherit cpan ptest
+
+export PERL_USE_UNSAFE_INC = "1"
 
 do_install_ptest () {
     cp -r ${B}/t ${D}${PTEST_PATH}

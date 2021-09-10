@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "f1bffef9cbc82628f6e7d7b40d7e255aefaa1adb6a1b1d26c69a8b79e6
 
 inherit pypi
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
   ${PYTHON_PN}-unittest \
   "
 

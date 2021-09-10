@@ -1,0 +1,22 @@
+glibc >= 2.32 has removed sys/sysctl.h see
+
+https://sourceware.org/git/?p=glibc.git;a=commit;h=076f09afbac1aa57756faa7a8feadb7936a724e4
+
+This check therefore ensures that its only used on linux when glibc has support for it
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/ace/config-linux.h
++++ b/ace/config-linux.h
+@@ -20,6 +20,10 @@
+ 
+ #include "ace/config-linux-common.h"
+ 
++#if (__GLIBC__  > 2)  || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 32)
++#  define ACE_LACKS_SYS_SYSCTL_H
++#endif
++
+ #define ACE_HAS_BYTESEX_H
+ 
+ #if (defined _XOPEN_SOURCE && (_XOPEN_SOURCE - 0) >= 500)

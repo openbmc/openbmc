@@ -16,23 +16,21 @@ PREFERRED_PROVIDER_virtual/${SDK_PREFIX}compilerlibs = "nativesdk-gcc-runtime"
 # Default libc config
 PREFERRED_PROVIDER_virtual/gettext ??= "gettext"
 
-GCCVERSION ?= "10.%"
+GCCVERSION ?= "11.%"
 SDKGCCVERSION ?= "${GCCVERSION}"
-BINUVERSION ?= "2.34%"
-GDBVERSION ?= "9.%"
-GLIBCVERSION ?= "2.31%"
-LINUXLIBCVERSION ?= "5.4%"
-QEMUVERSION ?= "4.2%"
-GOVERSION ?= "1.14%"
+BINUVERSION ?= "2.37%"
+GDBVERSION ?= "10.%"
+GLIBCVERSION ?= "2.34"
+LINUXLIBCVERSION ?= "5.13%"
+QEMUVERSION ?= "6.0%"
+GOVERSION ?= "1.16%"
 # This can not use wildcards like 8.0.% since it is also used in mesa to denote
 # llvm version being used, so always bump it with llvm recipe version bump
-LLVMVERSION ?= "9.0.1"
+LLVMVERSION ?= "12.0.1"
 
 PREFERRED_VERSION_gcc ?= "${GCCVERSION}"
 PREFERRED_VERSION_gcc-cross-${TARGET_ARCH} ?= "${GCCVERSION}"
-PREFERRED_VERSION_gcc-cross-initial-${TARGET_ARCH} ?= "${GCCVERSION}"
 PREFERRED_VERSION_gcc-crosssdk-${SDK_SYS} ?= "${SDKGCCVERSION}"
-PREFERRED_VERSION_gcc-crosssdk-initial-${SDK_SYS} ?= "${SDKGCCVERSION}"
 PREFERRED_VERSION_gcc-cross-canadian-${TRANSLATED_TARGET_ARCH} ?= "${GCCVERSION}"
 PREFERRED_VERSION_gcc-runtime ?= "${GCCVERSION}"
 PREFERRED_VERSION_gcc-sanitizers ?= "${GCCVERSION}"
@@ -66,6 +64,10 @@ PREFERRED_VERSION_qemu ?= "${QEMUVERSION}"
 PREFERRED_VERSION_qemu-native ?= "${QEMUVERSION}"
 PREFERRED_VERSION_nativesdk-qemu ?= "${QEMUVERSION}"
 
+# Bootstrap Go using a binary release from golang.org.  If you want to bootstrap
+# from source using the C-implemented Go 1.4 (only supports x86-64 hosts) then use
+# go-native.
+PREFERRED_PROVIDER_go-native ?= "go-binary-native"
 PREFERRED_VERSION_virtual/${TARGET_PREFIX}go ?= "${GOVERSION}"
 PREFERRED_VERSION_go-cross-${TUNE_PKGARCH} ?= "${GOVERSION}"
 PREFERRED_VERSION_go-crosssdk-${SDK_ARCH} ?= "${GOVERSION}"

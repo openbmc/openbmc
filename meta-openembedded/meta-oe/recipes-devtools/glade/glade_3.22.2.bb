@@ -21,7 +21,7 @@ SRC_URI[sha256sum] = "edefa6eb24b4d15bd52589121dc109bc08c286157c41288deb74dd9cc3
 
 EXTRA_OECONF += "--disable-man-pages"
 
-FILES_${PN} += "${datadir}/* ${libdir}/glade/modules/libgladegtk.so"
-FILES_${PN}-dev += "${libdir}/glade/modules/libgladegtk.la"
-FILES_${PN}-dbg += "${libdir}/glade/modules/.debug/libgladegtk.so"
+FILES:${PN} += "${datadir}/* ${libdir}/glade/modules/libgladegtk.so"
+FILES:${PN}-dev += "${libdir}/glade/modules/libgladegtk.la"
+FILES:${PN}-dbg += "${libdir}/glade/modules/.debug/libgladegtk.so"
 

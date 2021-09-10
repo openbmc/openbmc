@@ -10,7 +10,7 @@ SRC_URI += " \
 
 EXTRA_OECMAKE = "-Denable-floats=ON -DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')}"
 
-do_configure_append() {
+do_configure:append() {
     make_tables.exe ${B}/
 }
 

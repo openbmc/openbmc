@@ -4,7 +4,7 @@ DEPENDS = "tzcode-native"
 
 inherit allarch
 
-RCONFLICTS_${PN} = "timezones timezone-africa timezone-america timezone-antarctica \
+RCONFLICTS:${PN} = "timezones timezone-africa timezone-america timezone-antarctica \
              timezone-arctic timezone-asia timezone-atlantic \
              timezone-australia timezone-europe timezone-indian \
              timezone-iso3166.tab timezone-pacific timezone-zone.tab"
@@ -15,18 +15,22 @@ DEFAULT_TIMEZONE ?= "Universal"
 INSTALL_TIMEZONE_FILE ?= "1"
 
 TZONES= "africa antarctica asia australasia europe northamerica southamerica  \
-         factory etcetera backward systemv \
+         factory etcetera backward \
         "
 # pacificnew 
 
+# "slim" is the default since 2020b
+# "fat" is needed by e.g. MariaDB's mysql_tzinfo_to_sql
+ZIC_FMT ?= "slim"
+
 do_compile () {
         for zone in ${TZONES}; do \
-            ${STAGING_BINDIR_NATIVE}/zic -d ${WORKDIR}${datadir}/zoneinfo -L /dev/null \
-                -y ${S}/yearistype.sh ${S}/${zone} ; \
-            ${STAGING_BINDIR_NATIVE}/zic -d ${WORKDIR}${datadir}/zoneinfo/posix -L /dev/null \
-                -y ${S}/yearistype.sh ${S}/${zone} ; \
-            ${STAGING_BINDIR_NATIVE}/zic -d ${WORKDIR}${datadir}/zoneinfo/right -L ${S}/leapseconds \
-                -y ${S}/yearistype.sh ${S}/${zone} ; \
+            ${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${WORKDIR}${datadir}/zoneinfo -L /dev/null \
+                ${S}/${zone} ; \
+            ${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${WORKDIR}${datadir}/zoneinfo/posix -L /dev/null \
+                ${S}/${zone} ; \
+            ${STAGING_BINDIR_NATIVE}/zic -b ${ZIC_FMT} -d ${WORKDIR}${datadir}/zoneinfo/right -L ${S}/leapseconds \
+                ${S}/${zone} ; \
         done
 }
 
@@ -37,6 +41,8 @@ do_install () {
         cp -pP "${S}/zone.tab" ${D}${datadir}/zoneinfo
         cp -pP "${S}/zone1970.tab" ${D}${datadir}/zoneinfo
         cp -pP "${S}/iso3166.tab" ${D}${datadir}/zoneinfo
+        cp -pP "${S}/leapseconds" ${D}${datadir}/zoneinfo
+        cp -pP "${S}/leap-seconds.list" ${D}${datadir}/zoneinfo
 
         # Install default timezone
         if [ -e ${D}${datadir}/zoneinfo/${DEFAULT_TIMEZONE} ]; then
@@ -53,7 +59,7 @@ do_install () {
         chown -R root:root ${D}
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 	etc_lt="$D${sysconfdir}/localtime"
 	src="$D${sysconfdir}/timezone"
 
@@ -82,47 +88,47 @@ TZ_PACKAGES = " \
     tzdata-atlantic tzdata-australia tzdata-europe tzdata-pacific"
 PACKAGES = "${TZ_PACKAGES} ${PN}"
 
-FILES_tzdata-africa += "${datadir}/zoneinfo/Africa/*"
-RPROVIDES_tzdata-africa = "tzdata-africa"
+FILES:tzdata-africa += "${datadir}/zoneinfo/Africa/*"
+RPROVIDES:tzdata-africa = "tzdata-africa"
 
-FILES_tzdata-americas += "${datadir}/zoneinfo/America/*  \
+FILES:tzdata-americas += "${datadir}/zoneinfo/America/*  \
                 ${datadir}/zoneinfo/US/*                \
                 ${datadir}/zoneinfo/Brazil/*            \
                 ${datadir}/zoneinfo/Canada/*            \
                 ${datadir}/zoneinfo/Mexico/*            \
                 ${datadir}/zoneinfo/Chile/*"
-RPROVIDES_tzdata-americas = "tzdata-americas"
+RPROVIDES:tzdata-americas = "tzdata-americas"
 
-FILES_tzdata-antarctica += "${datadir}/zoneinfo/Antarctica/*"
-RPROVIDES_tzdata-antarctica = "tzdata-antarctica"
+FILES:tzdata-antarctica += "${datadir}/zoneinfo/Antarctica/*"
+RPROVIDES:tzdata-antarctica = "tzdata-antarctica"
 
-FILES_tzdata-arctic += "${datadir}/zoneinfo/Arctic/*"
-RPROVIDES_tzdata-arctic = "tzdata-arctic"
+FILES:tzdata-arctic += "${datadir}/zoneinfo/Arctic/*"
+RPROVIDES:tzdata-arctic = "tzdata-arctic"
 
-FILES_tzdata-asia += "${datadir}/zoneinfo/Asia/*        \
+FILES:tzdata-asia += "${datadir}/zoneinfo/Asia/*        \
                 ${datadir}/zoneinfo/Indian/*            \
                 ${datadir}/zoneinfo/Mideast/*"
-RPROVIDES_tzdata-asia = "tzdata-asia"
+RPROVIDES:tzdata-asia = "tzdata-asia"
 
-FILES_tzdata-atlantic += "${datadir}/zoneinfo/Atlantic/*"
-RPROVIDES_tzdata-atlantic = "tzdata-atlantic"
+FILES:tzdata-atlantic += "${datadir}/zoneinfo/Atlantic/*"
+RPROVIDES:tzdata-atlantic = "tzdata-atlantic"
 
-FILES_tzdata-australia += "${datadir}/zoneinfo/Australia/*"
-RPROVIDES_tzdata-australia = "tzdata-australia"
+FILES:tzdata-australia += "${datadir}/zoneinfo/Australia/*"
+RPROVIDES:tzdata-australia = "tzdata-australia"
 
-FILES_tzdata-europe += "${datadir}/zoneinfo/Europe/*"
-RPROVIDES_tzdata-europe = "tzdata-europe"
+FILES:tzdata-europe += "${datadir}/zoneinfo/Europe/*"
+RPROVIDES:tzdata-europe = "tzdata-europe"
 
-FILES_tzdata-pacific += "${datadir}/zoneinfo/Pacific/*"
-RPROVIDES_tzdata-pacific = "tzdata-pacific"
+FILES:tzdata-pacific += "${datadir}/zoneinfo/Pacific/*"
+RPROVIDES:tzdata-pacific = "tzdata-pacific"
 
-FILES_tzdata-posix += "${datadir}/zoneinfo/posix/*"
-RPROVIDES_tzdata-posix = "tzdata-posix"
+FILES:tzdata-posix += "${datadir}/zoneinfo/posix/*"
+RPROVIDES:tzdata-posix = "tzdata-posix"
 
-FILES_tzdata-right += "${datadir}/zoneinfo/right/*"
-RPROVIDES_tzdata-right = "tzdata-right"
+FILES:tzdata-right += "${datadir}/zoneinfo/right/*"
+RPROVIDES:tzdata-right = "tzdata-right"
 
-FILES_tzdata-misc += "${datadir}/zoneinfo/Cuba           \
+FILES:tzdata-misc += "${datadir}/zoneinfo/Cuba           \
                 ${datadir}/zoneinfo/Egypt                \
                 ${datadir}/zoneinfo/Eire                 \
                 ${datadir}/zoneinfo/Factory              \
@@ -140,11 +146,13 @@ FILES_tzdata-misc += "${datadir}/zoneinfo/Cuba           \
                 ${datadir}/zoneinfo/Portugal             \
                 ${datadir}/zoneinfo/Singapore            \
                 ${datadir}/zoneinfo/Turkey"
-RPROVIDES_tzdata-misc = "tzdata-misc"
+RPROVIDES:tzdata-misc = "tzdata-misc"
 
-FILES_tzdata-core += " \
+FILES:tzdata-core += " \
                 ${sysconfdir}/localtime                  \
                 ${sysconfdir}/timezone                   \
+                ${datadir}/zoneinfo/leapseconds          \
+                ${datadir}/zoneinfo/leap-seconds.list    \
                 ${datadir}/zoneinfo/Pacific/Honolulu     \
                 ${datadir}/zoneinfo/America/Anchorage    \
                 ${datadir}/zoneinfo/America/Los_Angeles  \
@@ -200,7 +208,7 @@ FILES_tzdata-core += " \
                 ${datadir}/zoneinfo/iso3166.tab          \
                 ${datadir}/zoneinfo/Etc/*"
 
-CONFFILES_tzdata-core = "${sysconfdir}/localtime ${sysconfdir}/timezone"
+CONFFILES:tzdata-core = "${sysconfdir}/localtime ${sysconfdir}/timezone"
 
-ALLOW_EMPTY_${PN} = "1"
-RDEPENDS_${PN} = "${TZ_PACKAGES}"
+ALLOW_EMPTY:${PN} = "1"
+RDEPENDS:${PN} = "${TZ_PACKAGES}"

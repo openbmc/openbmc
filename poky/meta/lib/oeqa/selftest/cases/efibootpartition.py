@@ -26,11 +26,11 @@ class GenericEFITest(OESelftestTestCase):
         self.write_config(self,
 """
 EFI_PROVIDER = "%s"
-IMAGE_FSTYPES_pn-%s_append = " wic"
+IMAGE_FSTYPES:pn-%s:append = " wic"
 MACHINE = "%s"
-MACHINE_FEATURES_append = " efi"
+MACHINE_FEATURES:append = " efi"
 WKS_FILE = "efi-bootdisk.wks.in"
-IMAGE_INSTALL_append = " grub-efi systemd-boot kernel-image-bzimage"
+IMAGE_INSTALL:append = " grub-efi systemd-boot kernel-image-bzimage"
 """
 % (self.efi_provider, self.image, self.machine))
         if not self.recipes_built:

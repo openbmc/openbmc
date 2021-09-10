@@ -12,4 +12,4 @@ SRC_URI = "${XORG_MIRROR}/individual/app/${BPN}-${PV}.tar.bz2"
 
 inherit autotools pkgconfig features_check
 
-FILES_${PN} += " ${libdir}/X11/${BPN} ${datadir}/X11/app-defaults/"
+FILES:${PN} += " ${libdir}/X11/${BPN} ${datadir}/X11/app-defaults/"

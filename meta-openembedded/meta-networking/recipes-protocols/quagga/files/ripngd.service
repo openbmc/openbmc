@@ -7,7 +7,6 @@ ConditionPathExists=@SYSCONFDIR@/quagga/ripngd.conf
 [Service]
 Type=forking
 EnvironmentFile=-@SYSCONFDIR@/default/quagga
-PIDFile=/run/quagga/ripngd.pid
 ExecStart=@SBINDIR@/ripngd -d $ripngd_options -f @SYSCONFDIR@/quagga/ripngd.conf
 ExecStopPost=@base_bindir@/rm -rf /run/quagga/ripngd.pid
 Restart=on-abort

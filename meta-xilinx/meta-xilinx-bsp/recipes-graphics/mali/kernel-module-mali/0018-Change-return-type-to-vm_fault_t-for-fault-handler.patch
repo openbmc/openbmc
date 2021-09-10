@@ -1,0 +1,32 @@
+From ad5c569f0cc40698699fc2f2c1db3ceb9f8b8f35 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Tue, 25 Feb 2020 11:36:01 -0800
+Subject: [LINUX][rel-v2020.1][PATCH v1 3/3] Change return type to vm_fault_t
+ for fault handler
+
+From kernel 4.17 onwards the return type of fault handler for
+vm_operations is of type 'vm_fault_t'.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+---
+ driver/src/devicedrv/mali/linux/mali_memory.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/driver/src/devicedrv/mali/linux/mali_memory.c b/driver/src/devicedrv/mali/linux/mali_memory.c
+index c0f0982..2b2b209 100644
+--- linux/mali_memory.c
++++ b/linux/mali_memory.c
+@@ -70,7 +70,9 @@ static void mali_mem_vma_close(struct vm_area_struct *vma)
+ 	}
+ }
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 17, 0)
++static vm_fault_t  mali_mem_vma_fault(struct vm_fault *vmf)
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
+ static int mali_mem_vma_fault(struct vm_fault *vmf)
+ #else
+ static int mali_mem_vma_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
+-- 
+2.7.4
+

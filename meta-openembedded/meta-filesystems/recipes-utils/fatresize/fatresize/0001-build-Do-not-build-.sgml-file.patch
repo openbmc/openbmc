@@ -1,0 +1,27 @@
+From b16373da7e5a45cf92df83b39e2fdee939439c84 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 17 Jul 2021 08:55:42 -0700
+Subject: [PATCH] build: Do not build .sgml file
+
+It needs docbook-to-man tool which we do not have recipe for
+
+Upstream-Status: OE-Specific [needs native docbook-to-man tool]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 2becb84..858df00 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -14,4 +14,4 @@ SUFFIXES = .1
+ CLEANFILES = $(man_MANS)
+ 
+ .sgml.1:
+-	docbook-to-man $< > $@
++	@echo "Needs docbook-to-man"
+-- 
+2.32.0
+

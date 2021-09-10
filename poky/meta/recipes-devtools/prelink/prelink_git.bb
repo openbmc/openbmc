@@ -19,11 +19,11 @@ PV = "1.0+git${SRCPV}"
 #
 # Default is prelinking is enabled.
 #
-SUMMARY_${PN}-cron = "Cron scripts to control automatic prelinking"
-DESCRIPTION_${PN}-cron = "Cron scripts to control automatic prelinking.  \
+SUMMARY:${PN}-cron = "Cron scripts to control automatic prelinking"
+DESCRIPTION:${PN}-cron = "Cron scripts to control automatic prelinking.  \
 See: ${sysconfdir}/cron.daily/prelink for configuration information."
 
-FILES_${PN}-cron = "${sysconfdir}/cron.daily ${sysconfdir}/default"
+FILES:${PN}-cron = "${sysconfdir}/cron.daily ${sysconfdir}/default"
 
 PACKAGES =+ "${PN}-cron"
 
@@ -37,10 +37,10 @@ SRC_URI = "git://git.yoctoproject.org/prelink-cross.git;branch=cross_prelink_sta
 UPSTREAM_CHECK_COMMITS = "1"
 
 # error: error.h: No such file or directory
-COMPATIBLE_HOST_libc-musl = 'null'
+COMPATIBLE_HOST:libc-musl = 'null'
 
 TARGET_OS_ORIG := "${TARGET_OS}"
-OVERRIDES_append = ":${TARGET_OS_ORIG}"
+OVERRIDES:append = ":${TARGET_OS_ORIG}"
 
 S = "${WORKDIR}/git"
 
@@ -48,9 +48,11 @@ inherit autotools
 
 BBCLASSEXTEND = "native"
 
-EXTRA_OECONF = "--disable-selinux --with-pkgversion=${PV}-${PR} \
+EXTRA_OECONF = "--with-pkgversion=${PV}-${PR} \
 	--with-bugurl=http://bugzilla.yoctoproject.org/"
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
 
 #
 # For target prelink we need to ensure paths match the lib path layout
@@ -144,12 +146,12 @@ python () {
         bb.build.addtask('do_linkerpaths', 'do_configure', 'do_patch', d)
 }
 
-do_configure_prepend () {
+do_configure:prepend () {
         # Disable documentation!
         echo "all:" > ${S}/doc/Makefile.am
 }
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}${sysconfdir}/cron.daily ${D}${sysconfdir}/default ${D}${sysconfdir}/rpm
 	install -m 0644 ${WORKDIR}/prelink.conf ${D}${sysconfdir}/prelink.conf
 	install -m 0644 ${WORKDIR}/prelink.cron.daily ${D}${sysconfdir}/cron.daily/prelink
@@ -161,7 +163,7 @@ do_install_append () {
 # Prelinking during a cross install should be handled by the image-prelink
 # bbclass.  If the user desires this to run on the target at first boot
 # they will need to create a custom boot script.
-pkg_postinst_prelink() {
+pkg_postinst:prelink() {
 #!/bin/sh
 
 if [ "x$D" != "x" ]; then
@@ -171,7 +173,7 @@ fi
 prelink -a
 }
 
-pkg_prerm_prelink() {
+pkg_prerm:prelink() {
 #!/bin/sh
 
 if [ "x$D" != "x" ]; then

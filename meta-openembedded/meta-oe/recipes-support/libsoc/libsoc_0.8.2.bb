@@ -26,7 +26,7 @@ PACKAGECONFIG[python] = "--enable-python=${STAGING_BINDIR_NATIVE}/${PYTHON_PN}-n
 PACKAGES =+ "${@bb.utils.contains('PACKAGECONFIG', 'python', \
     '${PYTHON_PN}-libsoc-staticdev ${PYTHON_PN}-libsoc', '', d)}"
 
-RDEPENDS_${PN} = "libgcc"
+RDEPENDS:${PN} = "libgcc"
 
-FILES_${PYTHON_PN}-libsoc-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*/*.a"
-FILES_${PYTHON_PN}-libsoc += "${PYTHON_SITEPACKAGES_DIR}"
+FILES:${PYTHON_PN}-libsoc-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*/*.a"
+FILES:${PYTHON_PN}-libsoc += "${PYTHON_SITEPACKAGES_DIR}"

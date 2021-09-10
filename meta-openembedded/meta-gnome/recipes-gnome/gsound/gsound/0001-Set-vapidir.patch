@@ -1,0 +1,28 @@
+From 0a790273aca3ba07dfa6d2f61e3aaa7157c1a3bb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 20 Mar 2021 09:22:18 -0700
+Subject: [PATCH] Set vapidir
+
+Use parentheses instead of braces, it makes automake and perl happy
+newer perl does not like ${} for VALAFLAGS
+
+Unescaped left brace in regex is deprecated here (and will be fatal in Perl 5.30), passed through in regex; marked by <-- HERE in m/^${ <-- HERE abs_top_builddir}/gsound$/ at TOPDIR/build/tmp/work/mips32r2-yoe-linux/gsound/1.0.2-r0/recipe-sysroot-native/usr/bin/automake line 5759.
+autoreconf: error: automake failed with exit status: 255
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/Makefile.am | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- a/tools/Makefile.am
++++ b/tools/Makefile.am
+@@ -8,7 +8,7 @@ bin_PROGRAMS = gsound-play
+ gsound_play_SOURCES = gsound-play.vala
+ 
+ gsound_play_VALAFLAGS = \
+-    --vapidir ${abs_top_builddir}/gsound \
++    --vapidir $(abs_top_builddir)/gsound \
+     --pkg gsound \
+     ${NULL}
+ 

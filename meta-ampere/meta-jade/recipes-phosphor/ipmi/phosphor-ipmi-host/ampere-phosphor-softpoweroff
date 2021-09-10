@@ -1,0 +1,5 @@
+#!/bin/bash
+# Usage of this utility
+echo "Trigger soft off the host."
+/usr/sbin/ampere_power_util.sh mb soft_off
+exit $?;

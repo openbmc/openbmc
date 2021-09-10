@@ -6,6 +6,10 @@ Subject: [PATCH 08/11] use oe variable to replace hardcoded dir
 Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for python3-blivet 3.4.0.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  setup.py | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
@@ -19,11 +23,11 @@ index b745a79..b5b4258 100644
  
  data_files = [
 -    ('/etc/dbus-1/system.d', ['dbus/blivet.conf']),
--    ('/usr/share/dbus-1/system-services', ['dbus/com.redhat.Blivet1.service']),
+-    ('/usr/share/dbus-1/system-services', ['dbus/com.redhat.Blivet0.service']),
 -    ('/usr/libexec', ['dbus/blivetd']),
 -    ('/usr/lib/systemd/system', ['dbus/blivet.service'])
 +    (os.environ.get('sysconfdir')+'/dbus-1/system.d', ['dbus/blivet.conf']),
-+    (os.environ.get('datadir')+'/dbus-1/system-services', ['dbus/com.redhat.Blivet1.service']),
++    (os.environ.get('datadir')+'/dbus-1/system-services', ['dbus/com.redhat.Blivet0.service']),
 +    (os.environ.get('libexecdir'), ['dbus/blivetd']),
 +    (os.environ.get('systemd_system_unitdir'), ['dbus/blivet.service'])
  ]

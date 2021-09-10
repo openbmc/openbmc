@@ -6,8 +6,8 @@ implementations for many of the provider operations."
 HOMEPAGE = "https://github.com/rnovacek/konkretcmpi"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f673270bfc350d9ce1efc8724c6c1873"
-DEPENDS_append_class-target = " swig-native sblim-cmpi-devel python3"
-DEPENDS_append_class-native = " cmpi-bindings-native"
+DEPENDS:append:class-target = " swig-native sblim-cmpi-devel python3"
+DEPENDS:append:class-native = " cmpi-bindings-native"
 
 SRC_URI = "git://github.com/rnovacek/konkretcmpi.git \
            file://0001-CMakeLists.txt-fix-lib64-can-not-be-shiped-in-64bit-.patch \
@@ -24,16 +24,16 @@ EXTRA_OECMAKE = "-DWITH_PYTHON=ON \
                  ${@oe.utils.conditional("libdir", "/usr/lib32", "-DLIB_SUFFIX=32", "", d)} \
                 "
 
-LDFLAGS_append = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
+LDFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
 
-do_install_append() {
+do_install:append() {
     rm -rf ${D}${datadir}
 }
 
 PACKAGES =+ "${PN}-python"
 
-RPROVIDES_${PN}-dbg += "${PN}-python-dbg"
+RPROVIDES:${PN}-dbg += "${PN}-python-dbg"
 
-FILES_${PN}-python = "${libdir}/python*/site-packages/konkretmof.py* ${libdir}/python*/site-packages/_konkretmof.so"
+FILES:${PN}-python = "${libdir}/python*/site-packages/konkretmof.py* ${libdir}/python*/site-packages/_konkretmof.so"
 
 BBCLASSEXTEND = "native"

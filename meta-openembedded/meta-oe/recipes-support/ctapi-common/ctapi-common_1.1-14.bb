@@ -20,4 +20,4 @@ do_install() {
     install -dm 755 ${D}${libdir}/ctapi
 }
 
-FILES_${PN} += "${libdir}/ctapi"
+FILES:${PN} += "${libdir}/ctapi"

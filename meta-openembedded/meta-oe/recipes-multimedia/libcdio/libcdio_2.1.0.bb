@@ -18,8 +18,8 @@ PACKAGECONFIG[vcd-info] = "--enable-vcd-info,--disable-vcd-info,vcdimager"
 
 PACKAGES += "${PN}-utils"
 
-FILES_${PN} = "${libdir}/${BPN}${SOLIB}"
-FILES_${PN}-utils = "${bindir}/*"
+FILES:${PN} = "${libdir}/${BPN}${SOLIB}"
+FILES:${PN}-utils = "${bindir}/*"
 
 python libcdio_split_packages() {
     libdir = d.expand('${libdir}')

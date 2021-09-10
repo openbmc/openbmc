@@ -1,0 +1,34 @@
+From d95f46e149226f634830e76cc1f4f8e3ee04ff5a Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Fri, 6 Nov 2020 04:38:13 +0100
+Subject: [PATCH] webkitgtk: fix build with x11 enabled
+
+Since
+https://github.com/WebKit/webkit/commit/acd3f32cd43c363be032f93ede3aa10c4ee97fa4
+it uses XVisualInfo which is defined in Xutil.h
+
+Without this the build fails with:
+webkitgtk-2.30.2/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp:132:5: error: 'XVisualInfo' was not declared in this scope; did you mean 'VisualID'?
+  132 |     XVisualInfo visualTemplate;
+      |     ^~~~~~~~~~~
+      |     VisualID
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
+---
+ Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp b/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
+index 2d66b9cd..424fb5a1 100644
+--- a/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
++++ b/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
+@@ -30,6 +30,7 @@
+ 
+ #if PLATFORM(X11)
+ #include <X11/Xlib.h>
++#include <X11/Xutil.h>
+ #include <X11/extensions/Xcomposite.h>
+ #if PLATFORM(GTK)
+ #include <X11/Xutil.h>

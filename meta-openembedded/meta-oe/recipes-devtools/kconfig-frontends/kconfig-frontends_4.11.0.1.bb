@@ -12,7 +12,7 @@ LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9b8cf60ff39767ff04b671fca8302408"
 SECTION = "devel"
 DEPENDS += "ncurses flex-native gperf-native bison-native"
-RDEPENDS_${PN} += "python3 bash"
+RDEPENDS:${PN} += "python3 bash"
 SRC_URI = "git://gitlab.com/ymorin/kconfig-frontends.git;protocol=https;branch=4.11.x \
 	   file://0001-Makefile-ensure-frontends-exits-before-writing-into-.patch \
            file://0001-Switch-utils-kconfig-diff-to-use-Python-3.patch"
@@ -22,11 +22,11 @@ SRCREV = "f22fce3a308be1c7790ebefc6bbedb33c5f7c86a"
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
-do_configure_prepend () {
+do_configure:prepend () {
 	mkdir -p ${S}/scripts/.autostuff/m4
 }
 
-do_install_append() {
+do_install:append() {
 	ln -s kconfig-conf ${D}${bindir}/conf
 	ln -s kconfig-mconf ${D}${bindir}/mconf
 }

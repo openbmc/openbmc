@@ -7,6 +7,6 @@ SRC_URI[md5sum] = "15c84c1f7fb49502b3efaaa668cfd25e"
 SRC_URI[sha256sum] = "d7d9fa94a16edb094e5fdf5d87ae17a0dc3f3e3d687fead81835d9572cf87c16"
 
 # this file has been created one minute after the configure file, so it doesn't get recreated during configure step
-do_configure_prepend() {
+do_configure:prepend() {
 	rm -rf ${S}/tests/unit-test.h
 }

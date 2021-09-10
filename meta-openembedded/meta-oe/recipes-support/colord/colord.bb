@@ -4,7 +4,7 @@ inherit meson gobject-introspection gsettings gettext bash-completion systemd fe
 
 # polkit and gobject-introspection are mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "polkit gobject-introspection-data"
-UNKNOWN_CONFIGURE_WHITELIST_append = " introspection"
+UNKNOWN_CONFIGURE_WHITELIST:append = " introspection"
 
 DEPENDS += " \
     ${BPN}-native \
@@ -28,18 +28,18 @@ EXTRA_OEMESON = " \
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "-Dsystemd=true, -Dsystemd=false, systemd"
 
-SYSTEMD_SERVICE_${PN} = "colord.service"
+SYSTEMD_SERVICE:${PN} = "colord.service"
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${datadir}/dbus-1 \
     ${datadir}/polkit-1 \
     ${datadir}/glib-2.0 \
     ${datadir}/color \
     ${systemd_user_unitdir} \
-    ${libdir}/tmpfiles.d \
+    ${nonarch_libdir}/tmpfiles.d \
     ${libdir}/colord-plugins \
     ${libdir}/colord-sensors \
 "
 
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--system --user-group -d /var/lib/colord -s /bin/false colord"
+USERADD_PARAM:${PN} = "--system --user-group -d /var/lib/colord -s /bin/false colord"

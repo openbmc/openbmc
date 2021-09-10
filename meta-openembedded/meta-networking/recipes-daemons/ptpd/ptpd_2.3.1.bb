@@ -24,6 +24,7 @@ def get_sub(d):
 SRC_URI = "http://downloads.sourceforge.net/project/ptpd/ptpd/${@get_sub(d)}/ptpd-${PV}.tar.gz \
            file://ptpd-use-pkgconfig.patch \
            file://Fixed-100-CPU-using-issue-by-adding-minimum-POSIX-ti.patch \
+           file://0001-ptpd-Solve-memory-leak-for-function-NTPDCrequest.patch \
            file://ptpd.service \
            file://ptpd.conf \
 "
@@ -57,5 +58,5 @@ do_install() {
 }
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "ptpd.service"
+SYSTEMD_SERVICE:${PN} = "ptpd.service"
 SYSTEMD_AUTO_ENABLE = "disable"

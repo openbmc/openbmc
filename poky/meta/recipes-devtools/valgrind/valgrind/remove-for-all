@@ -1,0 +1,8 @@
+none/tests/amd64/fb_test_amd64
+gdbserver_tests/hginfo
+memcheck/tests/supp_unknown
+helgrind/tests/tls_threads
+drd/tests/bar_bad_xml
+drd/tests/pth_barrier_thr_cr
+drd/tests/thread_name_xml
+massif/tests/deep-D

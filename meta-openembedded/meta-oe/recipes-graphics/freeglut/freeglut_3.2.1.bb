@@ -12,6 +12,9 @@ inherit cmake features_check
 # depends on virtual/libx11, virtual/libgl
 REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
+# Do not use -fno-common, check back when upgrading to new version it might not be needed
+CFLAGS += "-fcommon"
+
 PROVIDES += "mesa-glut"
 
 DEPENDS = "virtual/libx11 libxmu libxi virtual/libgl libglu libxrandr"

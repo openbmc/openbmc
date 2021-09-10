@@ -11,7 +11,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: -3
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -21,7 +20,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x02:
   entityID: 0x40
@@ -32,7 +31,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: -3
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -42,14 +40,13 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x03:
   sensorType: 0x01
   entityID: 0x03
   path: /xyz/openbmc_project/sensors/temperature/Die_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -70,7 +67,6 @@
   path: /xyz/openbmc_project/sensors/temperature/Die_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -91,7 +87,6 @@
   path: /xyz/openbmc_project/sensors/temperature/Die_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -112,7 +107,6 @@
   path: /xyz/openbmc_project/sensors/temperature/Die_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -132,7 +126,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_A1_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -153,7 +146,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_A2_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -174,7 +166,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_B1_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -195,7 +186,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_B2_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -216,7 +206,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_C1_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -237,7 +226,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_C2_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -258,7 +246,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_D1_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -279,7 +266,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_D2_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -300,7 +286,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_E1_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -321,7 +306,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_E2_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -342,7 +326,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_F1_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -363,7 +346,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_F2_CPU1
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -384,7 +366,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_A1_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -405,7 +386,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_A2_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -426,7 +406,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_B1_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -447,7 +426,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_B2_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -468,7 +446,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_C1_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -489,7 +466,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_C2_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -510,7 +486,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_D1_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -531,7 +506,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_D2_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -552,7 +526,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_E1_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -573,7 +546,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_E2_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -594,7 +566,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_F1_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -615,7 +586,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_F2_CPU2
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -636,7 +606,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_A1_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -657,7 +626,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_A2_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -678,7 +646,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_B1_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -699,7 +666,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_B2_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -720,7 +686,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_C1_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -741,7 +706,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_C2_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -762,7 +726,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_D1_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -783,7 +746,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_D2_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -804,7 +766,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_E1_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -825,7 +786,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_E2_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -846,7 +806,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_F1_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -867,7 +826,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_F2_CPU3
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -888,7 +846,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_A1_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -909,7 +866,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_A2_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -930,7 +886,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_B1_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -951,7 +906,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_B2_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -972,7 +926,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_C1_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -993,7 +946,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_C2_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -1014,7 +966,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_D1_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -1035,7 +986,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_D2_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -1056,7 +1006,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_E1_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -1077,7 +1026,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_E2_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -1098,7 +1046,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_F1_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -1119,7 +1066,6 @@
   path: /xyz/openbmc_project/sensors/temperature/DIMM_F2_CPU4
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
   multiplierM: 1
   offsetB: 0
   bExp: 0
@@ -1143,7 +1089,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1153,7 +1098,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x22:
   entityID: 0x07
@@ -1164,7 +1109,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -2
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1174,7 +1118,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x23:
   entityID: 0x07
@@ -1185,7 +1129,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1195,7 +1138,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x24:
   entityID: 0x07
@@ -1206,7 +1149,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -4
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1216,7 +1158,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x25:
   entityID: 0x07
@@ -1227,7 +1169,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -4
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1237,7 +1178,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 
 0x26:
@@ -1249,7 +1190,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -4
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1259,7 +1199,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x27:
   entityID: 0x07
@@ -1270,7 +1210,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -2
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1280,7 +1219,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x28:
   entityID: 0x07
@@ -1291,7 +1230,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -2
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1301,7 +1239,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2C:
   entityID: 0x07
@@ -1312,7 +1250,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -2
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1322,7 +1259,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2A:
   entityID: 0x07
@@ -1333,7 +1270,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -2
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1343,7 +1279,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x29:
   entityID: 0x07
   sensorType: 0x02
@@ -1353,7 +1289,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1363,7 +1298,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2D:
   entityID: 0x07
@@ -1374,7 +1309,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1384,7 +1318,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2E:
   entityID: 0x07
@@ -1395,7 +1329,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -2
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1405,7 +1338,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2F:
   entityID: 0x07
@@ -1416,7 +1349,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1426,7 +1358,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x2B:
   entityID: 0x07
@@ -1437,7 +1369,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -3
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1447,7 +1378,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x30:
   entityID: 0x07
@@ -1458,7 +1389,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
-  scale: -3
   rExp: -4
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1468,7 +1398,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x40:
   entityID: 0x1D
@@ -1479,7 +1409,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1489,7 +1418,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 
 0x41:
@@ -1501,7 +1430,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1511,7 +1439,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 
 0x42:
@@ -1523,7 +1451,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1533,7 +1460,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 
 0x43:
@@ -1545,7 +1472,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1555,7 +1481,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x44:
   entityID: 0x1D
@@ -1566,7 +1492,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1576,7 +1501,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x45:
   entityID: 0x1D
@@ -1587,7 +1512,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
   readingType: readingData
@@ -1596,7 +1520,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x46:
   entityID: 0x1D
@@ -1607,7 +1531,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1617,7 +1540,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x47:
   entityID: 0x1D
   sensorType: 0x04
@@ -1627,7 +1550,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1637,7 +1559,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x48:
   entityID: 0x1D
@@ -1648,7 +1570,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1658,7 +1579,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x49:
   entityID: 0x1D
   sensorType: 0x04
@@ -1668,7 +1589,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1678,7 +1598,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x4A:
   entityID: 0x1D
   sensorType: 0x04
@@ -1688,7 +1608,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1698,7 +1617,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x4B:
   entityID: 0x1D
@@ -1709,7 +1628,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1719,7 +1637,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x4C:
   entityID: 0x1D
@@ -1730,7 +1648,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1740,7 +1657,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 0x4D:
   entityID: 0x1D
   sensorType: 0x04
@@ -1750,7 +1667,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1760,7 +1676,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x4E:
   entityID: 0x1D
@@ -1771,7 +1687,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1781,7 +1696,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x4F:
   entityID: 0x1D
@@ -1792,7 +1707,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1802,7 +1716,7 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double
 
 0x50:
   entityID: 0x1D
@@ -1813,7 +1727,6 @@
   offsetB: 0
   bExp: 0
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
-  scale: 0
   rExp: 0
   mutability: Mutability::Read
   serviceInterface: org.freedesktop.DBus.Properties
@@ -1823,4 +1736,4 @@
       Value:
         Offsets:
           0x0:
-            type: int64_t
+            type: double

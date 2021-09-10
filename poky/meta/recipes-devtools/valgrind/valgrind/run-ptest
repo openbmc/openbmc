@@ -7,15 +7,22 @@
 # Randy MacLeod <Randy.MacLeod@windriver.com>
 ###############################################################
 VALGRIND_LIB=@libdir@/valgrind
+VALGRIND_LIBEXECDIR=@libexecdir@/valgrind
 VALGRIND_BIN=@bindir@/valgrind
 
 LOG="${VALGRIND_LIB}/ptest/valgrind_ptest_$(date +%Y%m%d-%H%M%S).log"
 
 TOOLS="memcheck cachegrind callgrind helgrind drd massif dhat lackey none"
-EXP_TOOLS="exp-bbv exp-dhat exp-sgcheck"
+EXP_TOOLS="exp-bbv"
 
 GDB_BIN=@bindir@/gdb
 cd ${VALGRIND_LIB}/ptest && ./gdbserver_tests/make_local_links ${GDB_BIN}
+
+echo "Hide valgrind tests that are non-deterministic"
+echo "Reported at https://bugs.kde.org/show_bug.cgi?id=430321"
+for i in `cat remove-for-all`; do
+   mv $i.vgtest $i.IGNORE;
+done
 
 arch=`arch`
 if [ "$arch" = "aarch64" ]; then
@@ -25,12 +32,19 @@ if [ "$arch" = "aarch64" ]; then
    done
 fi
 
+echo "Run flaky tests using taskset to limit them to a single core."
+for i in `cat taskset_nondeterministic_tests`; do
+   taskset 0x00000001 perl tests/vg_regtest --valgrind=${VALGRIND_BIN} --valgrind-lib=${VALGRIND_LIBEXECDIR} --yocto-ptest $i 2>&1|tee -a ${LOG}
+   mv $i.vgtest $i.IGNORE
+done
+
+
 cd ${VALGRIND_LIB}/ptest && ./tests/vg_regtest \
     --valgrind=${VALGRIND_BIN} \
-    --valgrind-lib=${VALGRIND_LIB} \
+    --valgrind-lib=${VALGRIND_LIBEXECDIR} \
     --yocto-ptest \
     gdbserver_tests ${TOOLS} ${EXP_TOOLS} \
-    2>&1|tee ${LOG}  
+    2>&1|tee -a ${LOG}  
 
 cd ${VALGRIND_LIB}/ptest && \
     ./tests/post_regtest_checks $(pwd) \
@@ -44,6 +58,25 @@ if [ "$arch" = "aarch64" ]; then
    done
 fi
 
+echo "Restore valgrind tests that are non-deterministc"
+for i in `cat remove-for-all`; do
+   mv $i.IGNORE $i.vgtest;
+done
+
+echo "Restore flaky and other non-deterministic tests"
+for i in `cat taskset_nondeterministic_tests`; do
+   mv $i.IGNORE $i.vgtest;
+done
+
+echo "Failed test details..."
+failed_tests=`grep FAIL: ${LOG} | awk '{print $2}'`
+for test in $failed_tests; do
+    for diff_results in `ls $test*.diff`; do
+        echo $diff_results
+        echo '************'
+        cat  $diff_results
+    done
+done
 
 passed=`grep PASS: ${LOG}|wc -l`
 failed=`grep FAIL: ${LOG}|wc -l`

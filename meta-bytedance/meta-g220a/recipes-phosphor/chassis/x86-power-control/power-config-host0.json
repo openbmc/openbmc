@@ -1,0 +1,11 @@
+{
+  "gpio_configs": {
+    "NMIButton": "NMI_BUTTON",
+    "NMIOut": "NMI_OUT",
+    "PostComplete": "POST_COMPLETE",
+    "PwrButton": "POWER_BUTTON",
+    "PwrOK": "PS_PWROK",
+    "PwrOut": "POWER_OUT",
+    "RstOut": "RESET_OUT"
+  }
+}

@@ -17,6 +17,7 @@ from oeqa.utils.sshcontrol import SSHControl
 from oeqa.utils.qemurunner import QemuRunner
 from oeqa.utils.qemutinyrunner import QemuTinyRunner
 from oeqa.utils.dump import TargetDumper
+from oeqa.utils.dump import MonitorDumper
 from oeqa.controllers.testtargetloader import TestTargetLoader
 from abc import ABCMeta, abstractmethod
 
@@ -108,6 +109,7 @@ class QemuTarget(BaseTarget):
         self.qemulog = os.path.join(self.testdir, "qemu_boot_log.%s" % self.datetime)
         dump_target_cmds = d.getVar("testimage_dump_target")
         dump_host_cmds = d.getVar("testimage_dump_host")
+        dump_monitor_cmds = d.getVar("testimage_dump_monitor")
         dump_dir = d.getVar("TESTIMAGE_DUMP_DIR")
         if not dump_dir:
             dump_dir = os.path.join(d.getVar('LOG_DIR'), 'runtime-hostdump')
@@ -131,6 +133,7 @@ class QemuTarget(BaseTarget):
                             logfile = self.qemulog,
                             kernel = self.kernel,
                             boottime = int(d.getVar("TEST_QEMUBOOT_TIMEOUT")),
+                            tmpfsdir = d.getVar("RUNQEMU_TMPFS_DIR"),
                             logger = logger)
         else:
             self.runner = QemuRunner(machine=d.getVar("MACHINE"),
@@ -144,9 +147,13 @@ class QemuTarget(BaseTarget):
                             dump_dir = dump_dir,
                             dump_host_cmds = d.getVar("testimage_dump_host"),
                             logger = logger,
+                            tmpfsdir = d.getVar("RUNQEMU_TMPFS_DIR"),
                             serial_ports = len(d.getVar("SERIAL_CONSOLES").split()))
 
         self.target_dumper = TargetDumper(dump_target_cmds, dump_dir, self.runner)
+        self.monitor_dumper = MonitorDumper(dump_monitor_cmds, dump_dir, self.runner)
+        if (self.monitor_dumper):
+            self.monitor_dumper.create_dir("qmp")
 
     def deploy(self):
         bb.utils.mkdirhier(self.testdir)
@@ -182,8 +189,12 @@ class QemuTarget(BaseTarget):
         return self.runner.is_alive()
 
     def stop(self):
-        self.runner.stop()
+        try:
+            self.runner.stop()
+        except:
+            pass
         self.logger.removeHandler(self.loggerhandler)
+        self.loggerhandler.close()
         self.connection = None
         self.ip = None
         self.server_ip = None

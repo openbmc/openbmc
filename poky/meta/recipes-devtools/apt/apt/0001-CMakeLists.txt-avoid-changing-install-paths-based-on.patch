@@ -1,0 +1,29 @@
+From 9023589317843df4e57f8ebef1d9a8398ddb929d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Thu, 28 May 2020 15:34:05 +0000
+Subject: [PATCH] CMakeLists.txt: avoid changing install paths based on host
+ distro
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2cd4f8e..4759812 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -21,9 +21,9 @@ set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "-lgcov")
+ set(CMAKE_SHARED_LINKER_FLAGS_COVERAGE "-lgcov")
+ 
+ # Work around bug in GNUInstallDirs
+-if (EXISTS "/etc/debian_version")
+-  set(CMAKE_INSTALL_LIBEXECDIR "lib")
+-endif()
++#if (EXISTS "/etc/debian_version")
++set(CMAKE_INSTALL_LIBEXECDIR "lib")
++#endif()
+ 
+ # Include stuff
+ include(Misc)

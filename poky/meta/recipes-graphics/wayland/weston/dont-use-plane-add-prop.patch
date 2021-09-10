@@ -1,0 +1,23 @@
+Fix atomic modesetting with musl
+
+atomic modesetting seems to fail with drm weston backend and this patch fixes
+it, below errors are seen before weston exits
+
+atomic: couldn't commit new state: Invalid argument
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/wayland/weston/-/issues/158]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/libweston/backend-drm/kms.c
++++ b/libweston/backend-drm/kms.c
+@@ -1168,8 +1168,8 @@ drm_pending_state_apply_atomic(struct dr
+ 		wl_list_for_each(plane, &b->plane_list, link) {
+ 			drm_debug(b, "\t\t[atomic] starting with plane %lu disabled\n",
+ 				  (unsigned long) plane->plane_id);
+-			plane_add_prop(req, plane, WDRM_PLANE_CRTC_ID, 0);
+-			plane_add_prop(req, plane, WDRM_PLANE_FB_ID, 0);
++			//plane_add_prop(req, plane, WDRM_PLANE_CRTC_ID, 0);
++			//plane_add_prop(req, plane, WDRM_PLANE_FB_ID, 0);
+ 		}
+ 
+ 		flags |= DRM_MODE_ATOMIC_ALLOW_MODESET;

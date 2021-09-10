@@ -21,6 +21,7 @@ import fcntl
 import struct
 import copy
 import atexit
+from itertools import groupby
 
 from bb.ui import uihelper
 
@@ -144,7 +145,7 @@ class TerminalFilter(object):
                 pass
         if not cr:
             try:
-                cr = (env['LINES'], env['COLUMNS'])
+                cr = (os.environ['LINES'], os.environ['COLUMNS'])
             except:
                 cr = (25, 80)
         return cr
@@ -380,14 +381,27 @@ _evt_list = [ "bb.runqueue.runQueueExitWait", "bb.event.LogExecTTY", "logging.Lo
               "bb.event.BuildBase", "bb.build.TaskStarted", "bb.build.TaskSucceeded", "bb.build.TaskFailedSilent",
               "bb.build.TaskProgress", "bb.event.ProcessStarted", "bb.event.ProcessProgress", "bb.event.ProcessFinished"]
 
+def drain_events_errorhandling(eventHandler):
+    # We don't have logging setup, we do need to show any events we see before exiting
+    event = True
+    logger = bb.msg.logger_create('bitbake', sys.stdout)
+    while event:
+        event = eventHandler.waitEvent(0)
+        if isinstance(event, logging.LogRecord):
+            logger.handle(event)
+
 def main(server, eventHandler, params, tf = TerminalFilter):
 
-    if not params.observe_only:
-        params.updateToServer(server, os.environ.copy())
+    try:
+        if not params.observe_only:
+            params.updateToServer(server, os.environ.copy())
 
-    includelogs, loglines, consolelogfile, logconfigfile = _log_settings_from_server(server, params.observe_only)
+        includelogs, loglines, consolelogfile, logconfigfile = _log_settings_from_server(server, params.observe_only)
 
-    loglevel, _ = bb.msg.constructLogOptions()
+        loglevel, _ = bb.msg.constructLogOptions()
+    except bb.BBHandledException:
+        drain_events_errorhandling(eventHandler)
+        return 1
 
     if params.options.quiet == 0:
         console_loglevel = loglevel
@@ -525,6 +539,13 @@ def main(server, eventHandler, params, tf = TerminalFilter):
            os.symlink(os.path.basename(consolelogfile), loglink)
         except OSError:
            pass
+
+    # Add the logging domains specified by the user on the command line
+    for (domainarg, iterator) in groupby(params.debug_domains):
+        dlevel = len(tuple(iterator))
+        l = logconfig["loggers"].setdefault("BitBake.%s" % domainarg, {})
+        l["level"] = logging.DEBUG - dlevel + 1
+        l.setdefault("handlers", []).extend(["BitBake.verbconsole"])
 
     conf = bb.msg.setLoggingConfig(logconfig, logconfigfile)
 
@@ -679,7 +700,7 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                 if not parseprogress:
                     continue
                 parseprogress.finish()
-                pasreprogress = None
+                parseprogress = None
                 if params.options.quiet == 0:
                     print(("Parsing of %d .bb files complete (%d cached, %d parsed). %d targets, %d skipped, %d masked, %d errors."
                         % ( event.total, event.cached, event.parsed, event.virtuals, event.skipped, event.masked, event.errors)))

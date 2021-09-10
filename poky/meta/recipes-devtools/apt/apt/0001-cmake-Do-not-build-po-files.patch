@@ -1,0 +1,37 @@
+From 33347f9f8301633b01af4e208b7be5fdfcb0df0c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 20 Mar 2021 14:45:18 -0700
+Subject: [PATCH] cmake: Do not build po files
+
+Fixes
+| CMake Error at CMakeLists.txt:252 (add_dependencies):
+|   The dependency target "update-po4a" of target "update-po" does not exist.
+|
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3c8ec3f..821a24f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -245,13 +245,6 @@ add_subdirectory(ftparchive)
+ add_subdirectory(methods)
+ add_subdirectory(test)
+ 
+-if (USE_NLS)
+-add_subdirectory(po)
+-
+-# Link update-po4a into the update-po target
+-add_dependencies(update-po update-po4a)
+-endif()
+-
+ # Create our directories.
+ install_empty_directories(
+   ${CONF_DIR}/apt.conf.d
+-- 
+2.31.0
+

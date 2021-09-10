@@ -7,7 +7,6 @@ ConditionPathExists=@SYSCONFDIR@/quagga/zebra.conf
 [Service]
 Type=forking
 EnvironmentFile=-@SYSCONFDIR@/default/quagga
-PIDFile=/run/quagga/zebra.pid
 ExecStartPre=@BASE_SBINDIR@/ip route flush proto zebra
 ExecStart=@SBINDIR@/zebra -d $zebra_options -f @SYSCONFDIR@/quagga/zebra.conf
 ExecStopPost=@base_bindir@/rm -rf /run/quagga/zebra.pid

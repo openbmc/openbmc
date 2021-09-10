@@ -1,0 +1,26 @@
+diff --git a/dbus-cxx/timeout.cpp b/dbus-cxx/timeout.cpp
+index 16e9f7e..aa0b99f 100644
+--- a/dbus-cxx/timeout.cpp
++++ b/dbus-cxx/timeout.cpp
+@@ -132,7 +132,7 @@ namespace DBus
+     return m_cobj;
+   }
+ 
+-  void Timeout::timer_callback_proxy( sigval_t sv ) {
++  void Timeout::timer_callback_proxy( union sigval sv ) {
+     SIMPLELOGGER_DEBUG( "dbus.Timeout","Timeout::timer_callback_proxy" );
+     Timeout* t;
+     t = ( Timeout* ) sv.sival_ptr;
+diff --git a/dbus-cxx/timeout.h b/dbus-cxx/timeout.h
+index 1e469b5..5b69fbb 100644
+--- a/dbus-cxx/timeout.h
++++ b/dbus-cxx/timeout.h
+@@ -83,7 +83,7 @@ namespace DBus
+ 
+       std::mutex m_arming_mutex;
+ 
+-      static void timer_callback_proxy( sigval_t sv );
++      static void timer_callback_proxy( union sigval sv );
+ 
+   };
+ 

@@ -5,7 +5,7 @@ Both big endian and little endian are defined for SH.
 
 Experimental -- SH tunings have not been validated.
 
-The TUNE_ARCH is defined as ${TUNE_ARCH_tune-${DEFAULTTUNE}}.
+The TUNE_ARCH is defined as ${TUNE_ARCH:tune-${DEFAULTTUNE}}.
 
-The TUNE_PKGARCH is defind as ${TUNE_PKGARCH_tune-${DEFAULTTUNE}}.
+The TUNE_PKGARCH is defind as ${TUNE_PKGARCH:tune-${DEFAULTTUNE}}.
 

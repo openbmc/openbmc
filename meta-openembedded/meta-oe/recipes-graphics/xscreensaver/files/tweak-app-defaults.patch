@@ -1,5 +1,5 @@
---- xscreensaver-5.39.orig/driver/XScreenSaver.ad.in
-+++ xscreensaver-5.39/driver/XScreenSaver.ad.in
+--- a/driver/XScreenSaver.ad.in
++++ b/driver/XScreenSaver.ad.in
 @@ -29,7 +29,7 @@
  ! /* (xrdb prevention kludge: whole file)
  
@@ -18,23 +18,23 @@
  *grabVideoFrames:	False
  *chooseRandomImages:	@DEFAULT_IMAGES_P@
  ! This can be a local directory name, or the URL of an RSS or Atom feed.
-@@ -48,11 +48,11 @@
+@@ -47,11 +47,11 @@
+ *memoryLimit:		0
  *lock:			False
  *verbose:		False
- *timestamp:		True
 -*fade:			True
 +*fade:			False
- *unfade:		False
+ *unfade:		True
  *fadeSeconds:		0:00:03
  *fadeTicks:		20
 -*splash:		True
 +*splash:		False
  *splashDuration:	0:00:05
  *visualID:		default
- *captureStderr: 	True
-@@ -158,236 +158,8 @@
- ! screen savers interactively.
- !
+ *installColormap:	True
+@@ -324,250 +324,8 @@ XScreenSaver.bourneShell:		/bin/sh
+ !=============================================================================
+ 
  *programs:								      \
 -				maze -root				    \n\
 -@GL_KLUDGE@ GL: 				superquadrics -root			    \n\
@@ -138,6 +138,7 @@
 -@GL_KLUDGE@ GL: 				menger -root				    \n\
 -@GL_KLUDGE@ GL: 				molecule -root				    \n\
 -				rotzoomer -root				    \n\
+-				scooter -root				    \n\
 -				speedmine -root				    \n\
 -@GL_KLUDGE@ GL: 				starwars -root				    \n\
 -@GL_KLUDGE@ GL: 				stonerview -root			    \n\
@@ -262,12 +263,25 @@
 -@GL_KLUDGE@ GL: 				esper -root				    \n\
 -@GL_KLUDGE@ GL: 				vigilance -root				    \n\
 -@GL_KLUDGE@ GL: 				crumbler -root				    \n\
+-				filmleader -root			    \n\
+-				glitchpeg -root				    \n\
+-@GL_KLUDGE@ GL: 				handsy -root				    \n\
 -@GL_KLUDGE@ GL: 				maze3d -root				    \n\
 -@GL_KLUDGE@ GL: 				peepers -root				    \n\
--@GL_KLUDGE@ GL: 				razzledazzle -root			    \n
+-@GL_KLUDGE@ GL: 				razzledazzle -root			    \n\
+-				vfeedback -root				    \n\
+-@GL_KLUDGE@ GL: 				deepstars -root				    \n\
+-@GL_KLUDGE@ GL: 				gravitywell -root			    \n\
+-@GL_KLUDGE@ GL: 				beats -root				    \n\
+-@GL_KLUDGE@ GL: 				covid19 -root				    \n\
+-@GL_KLUDGE@ GL: 				etruscanvenus -root			    \n\
+-@GL_KLUDGE@ GL: 				gibson -root				    \n\
+-@GL_KLUDGE@ GL: 				headroom -root				    \n\
+-@GL_KLUDGE@ GL: 				sphereeversion -root			    \n
 -
-+-				fontglide -root -program "date +'%F %H:%M %z'"				    \n\
-+				gifview --window $XSCREENSAVER_WINDOW /usr/share/logo/bosch-black.gif			    \n
- 
+-
++-				fontglide -root -program "date +'%F %H:%M %z'"
++				gifview --window $XSCREENSAVER_WINDOW /usr/share/logo/bosch-black.gif
  
  !=============================================================================
+ !

@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 
 DEPENDS = "libconfig"
 
-inherit autotools pkgconfig systemd update-rc.d
+inherit autotools pkgconfig systemd update-rc.d update-alternatives
 
 PV = "0.2.0+git${SRCPV}"
 SRCREV = "45c14ef4d5d7ced0fbf984208de44ced6d5ed898"
@@ -20,14 +20,14 @@ SRC_URI = " \
 S = "${WORKDIR}/git"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "usbgx.service"
+SYSTEMD_SERVICE:${PN} = "usbgx.service"
 
 INITSCRIPT_NAME = "usbgx"
 INITSCRIPT_PARAMS = "defaults"
 
 EXTRA_OECONF = "--includedir=${includedir}/usbgx"
 
-do_install_append() {
+do_install:append() {
     install -Dm 0755 ${WORKDIR}/gadget-start ${D}/${bindir}/gadget-start
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -Dm 0644 ${WORKDIR}/usbgx.service ${D}${systemd_system_unitdir}/usbgx.service
@@ -37,4 +37,9 @@ do_install_append() {
 	fi
 }
 
-RDEPENDS_${PN} += "libusbgx-config"
+RDEPENDS:${PN} += "libusbgx-config"
+
+ALTERNATIVE_PRIORITY = "90"
+ALTERNATIVE:${PN} = "gadget-acm-ecm show-gadgets"
+ALTERNATIVE_LINK_NAME[gadget-acm-ecm] = "${bindir}/gadget-acm-ecm"
+ALTERNATIVE_LINK_NAME[show-gadgets] = "${bindir}/show-gadgets"

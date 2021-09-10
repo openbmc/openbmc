@@ -160,7 +160,9 @@ def add_link(path, target):
 
 
 class SystemdUnitNotFoundError(Exception):
-    pass
+    def __init__(self, path, unit):
+        self.path = path
+        self.unit = unit
 
 
 class SystemdUnit():
@@ -224,7 +226,10 @@ class SystemdUnit():
 
         try:
             for also in config.get('Install', 'Also'):
-                SystemdUnit(self.root, also).enable()
+                try:
+                    SystemdUnit(self.root, also).enable()
+                except SystemdUnitNotFoundError as e:
+                    sys.exit("Error: Systemctl also enable issue with  %s (%s)" % (service, e.unit))
 
         except KeyError:
             pass
@@ -265,7 +270,10 @@ def preset_all(root):
         state = presets.state(service)
 
         if state == "enable" or state is None:
-            SystemdUnit(root, service).enable()
+            try:
+                SystemdUnit(root, service).enable()
+            except SystemdUnitNotFoundError:
+                sys.exit("Error: Systemctl preset_all issue in %s" % service)
 
     # If we populate the systemd links we also create /etc/machine-id, which
     # allows systemd to boot with the filesystem read-only before generating
@@ -282,7 +290,7 @@ def main():
         sys.exit("Python 3.4 or greater is required")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', nargs=1, choices=['enable', 'mask',
+    parser.add_argument('command', nargs='?', choices=['enable', 'mask',
                                                      'preset-all'])
     parser.add_argument('service', nargs=argparse.REMAINDER)
     parser.add_argument('--root')
@@ -300,13 +308,23 @@ def main():
         locations.append(BASE_LIBDIR / "systemd")
     locations.append(LIBDIR / "systemd")
 
-    command = args.command[0]
+    command = args.command
+    if not command:
+        parser.print_help()
+        return 0
+
     if command == "mask":
         for service in args.service:
-            SystemdUnit(root, service).mask()
+            try:
+                SystemdUnit(root, service).mask()
+            except SystemdUnitNotFoundError as e:
+                sys.exit("Error: Systemctl main mask issue in %s (%s)" % (service, e.unit))
     elif command == "enable":
         for service in args.service:
-            SystemdUnit(root, service).enable()
+            try:
+                SystemdUnit(root, service).enable()
+            except SystemdUnitNotFoundError as e:
+                sys.exit("Error: Systemctl main enable issue in %s (%s)" % (service, e.unit))
     elif command == "preset-all":
         if len(args.service) != 0:
             sys.exit("Too many arguments.")

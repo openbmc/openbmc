@@ -1,4 +1,4 @@
-From b0aeca35187983e22ec256a439cff4702dbde331 Mon Sep 17 00:00:00 2001
+From 60864efbe52cc12018efaafbc4e4c3c8b4af2b65 Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Thu, 5 Jul 2018 10:26:48 -0300
 Subject: [PATCH] Fail silently if system Qt installation is broken

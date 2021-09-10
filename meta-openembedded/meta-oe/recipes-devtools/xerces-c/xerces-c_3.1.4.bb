@@ -19,7 +19,7 @@ PACKAGECONFIG ??= "curl icu"
 PACKAGECONFIG[curl] = "--with-curl=${STAGING_DIR_TARGET}${prefix},--with-curl=no,curl"
 PACKAGECONFIG[icu] = "--with-icu=${STAGING_DIR_TARGET}${prefix},--with-icu=no,icu"
 
-do_install_prepend () {
+do_install:prepend () {
     sed -i -e 's:-L${STAGING_DIR}/lib:-L\$\{libdir\}:g' ${B}/xerces-c.pc
 }
 
@@ -30,15 +30,15 @@ PACKAGES = "libxerces-c \
     ${PN}-dbg \
 "
 
-RPROVIDES_${PN}-dbg += "libxerces-c-dbg xerces-c-samples-dbg"
+RPROVIDES:${PN}-dbg += "libxerces-c-dbg xerces-c-samples-dbg"
 
-FILES_libxerces-c = "${libdir}/libxerces-c-3.1.so"
-FILES_libxerces-c-dev = "${libdir}/lib*.la \
+FILES:libxerces-c = "${libdir}/libxerces-c-3.1.so"
+FILES:libxerces-c-dev = "${libdir}/lib*.la \
     ${libdir}/libxerces-c.so \
     ${libdir}/pkgconfig/xerces-c.pc \
     ${includedir}/xercesc \
 "
-FILES_xerces-c-samples = "${bindir}/*"
-FILES_libxerces-c-staticdev = "${libdir}/lib*.a"
+FILES:xerces-c-samples = "${bindir}/*"
+FILES:libxerces-c-staticdev = "${libdir}/lib*.a"
 
 BBCLASSEXTEND = "native"

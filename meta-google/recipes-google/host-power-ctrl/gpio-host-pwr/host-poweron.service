@@ -1,0 +1,10 @@
+[Unit]
+Description=Power on host
+After=firmware-updates.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/host_poweron.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -10,7 +10,8 @@ DEPENDS = "zlib"
 
 SRC_URI = "git://github.com/assimp/assimp.git;branch=assimp_5.0_release \
            file://0001-closes-https-github.com-assimp-assimp-issues-2733-up.patch \
-           file://0001-Use-ASSIMP_LIB_INSTALL_DIR-to-search-library.patch \
+           file://use-GNUInstallDirs-where-possible.patch \
+           file://0001-assimp-remove-shared-lib-from-_IMPORT_CHECK_TARGETS.patch \
            "
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>(\d+(\.\d+)+))"
 
@@ -21,3 +22,5 @@ S = "${WORKDIR}/git"
 inherit cmake
 
 EXTRA_OECMAKE = "-DASSIMP_BUILD_ASSIMP_TOOLS=OFF -DASSIMP_BUILD_TESTS=OFF -DASSIMP_LIB_INSTALL_DIR=${baselib}"
+
+BBCLASSEXTEND = "native nativesdk"

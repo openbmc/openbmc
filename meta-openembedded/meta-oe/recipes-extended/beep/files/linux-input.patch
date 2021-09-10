@@ -1,0 +1,155 @@
+# the diff between Alessandro Zummo's copy of beep.c and the original
+# one...
+
+--- beep-1.2.2/beep.c.orig	2006-01-29 12:13:36.994560551 -0800
++++ beep-1.2.2/beep.c	2006-01-29 12:35:02.950558713 -0800
+@@ -26,6 +26,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/types.h>
+ #include <linux/kd.h>
++#include <linux/input.h>
+ 
+ /* I don't know where this number comes from, I admit that freely.  A 
+    wonderful human named Raine M. Ekman used it in a program that played
+@@ -86,18 +87,28 @@ typedef struct beep_parms_t {
+   struct beep_parms_t *next;  /* in case -n/--new is used. */
+ } beep_parms_t;
+ 
++enum { BEEP_TYPE_CONSOLE, BEEP_TYPE_EVDEV };
++
+ /* Momma taught me never to use globals, but we need something the signal 
+    handlers can get at.*/
+ int console_fd = -1;
++int console_type = BEEP_TYPE_CONSOLE;
++char *console_device = NULL;
++
++void do_beep(int freq);
+ 
+ /* If we get interrupted, it would be nice to not leave the speaker beeping in
+    perpetuity. */
+ void handle_signal(int signum) {
++  
++  if(console_device)
++    free(console_device);
++    
+   switch(signum) {
+   case SIGINT:
+     if(console_fd >= 0) {
+       /* Kill the sound, quit gracefully */
+-      ioctl(console_fd, KIOCSOUND, 0);
++      do_beep(0);
+       close(console_fd);
+       exit(signum);
+     } else {
+@@ -110,7 +121,7 @@ void handle_signal(int signum) {
+ /* print usage and exit */
+ void usage_bail(const char *executable_name) {
+   printf("Usage:\n%s [-f freq] [-l length] [-r reps] [-d delay] "
+-	 "[-D delay] [-s] [-c]\n",
++	 "[-D delay] [-s] [-c] [-e device]\n",
+ 	 executable_name);
+   printf("%s [Options...] [-n] [--new] [Options...] ... \n", executable_name);
+   printf("%s [-h] [--help]\n", executable_name);
+@@ -141,11 +152,12 @@ void usage_bail(const char *executable_n
+ void parse_command_line(int argc, char **argv, beep_parms_t *result) {
+   int c;
+ 
+-  struct option opt_list[4] = {{"help", 0, NULL, 'h'},
++  struct option opt_list[] = {{"help", 0, NULL, 'h'},
+ 			       {"version", 0, NULL, 'V'},
+ 			       {"new", 0, NULL, 'n'},
++			       {"device", 1, NULL, 'e'},
+ 			       {0,0,0,0}};
+-  while((c = getopt_long(argc, argv, "f:l:r:d:D:schvVn", opt_list, NULL))
++  while((c = getopt_long(argc, argv, "f:l:r:d:D:schvVne:", opt_list, NULL))
+ 	!= EOF) {
+     int argval = -1;    /* handle parsed numbers for various arguments */
+     float argfreq = -1; 
+@@ -207,6 +219,9 @@ void parse_command_line(int argc, char *
+       result->next->next       = NULL;
+       result = result->next; /* yes, I meant to do that. */
+       break;
++    case 'e' : /* also --device */
++      console_device = strdup(optarg);
++      break;
+     case 'h' : /* notice that this is also --help */
+     default :
+       usage_bail(argv[0]);
+@@ -214,26 +229,61 @@ void parse_command_line(int argc, char *
+   }
+ }  
+ 
++void do_beep(int freq)
++{
++  if (console_type == BEEP_TYPE_CONSOLE)
++  {
++    if(ioctl(console_fd, KIOCSOUND, freq != 0
++      ? (int)(CLOCK_TICK_RATE/freq)
++      : freq) < 0) {
++      printf("\a");  /* Output the only beep we can, in an effort to fall back on usefulness */
++      perror("ioctl");
++    }
++  }
++  else
++  {
++     /* BEEP_TYPE_EVDEV */
++     struct input_event e;
++ 
++     e.type = EV_SND;
++     e.code = SND_TONE;
++     e.value = freq;
++  
++     write(console_fd, &e, sizeof(struct input_event));
++  }
++}
++
+ void play_beep(beep_parms_t parms) {
+   int i; /* loop counter */
+ 
+   /* try to snag the console */
+-  if((console_fd = open("/dev/console", O_WRONLY)) == -1) {
+-    fprintf(stderr, "Could not open /dev/console for writing.\n");
++
++  if(console_device)
++    console_fd = open(console_device, O_WRONLY);
++  else
++    if((console_fd = open("/dev/input/event0", O_WRONLY)) == -1)
++      if((console_fd = open("/dev/tty0", O_WRONLY)) == -1)
++        console_fd = open("/dev/vc/0", O_WRONLY);
++      
++  if(console_fd == -1) {
++    fprintf(stderr, "Could not open %s for writing\n",
++      console_device != NULL ? console_device : "/dev/tty0 or /dev/vc/0");
+     printf("\a");  /* Output the only beep we can, in an effort to fall back on usefulness */
+     perror("open");
+     exit(1);
+   }
+   
++  if (ioctl(console_fd, EVIOCGSND(0)) != -1)
++    console_type = BEEP_TYPE_EVDEV;
++  else
++    console_type = BEEP_TYPE_CONSOLE;
++  
+   /* Beep */
+   for (i = 0; i < parms.reps; i++) {                    /* start beep */
+-    if(ioctl(console_fd, KIOCSOUND, (int)(CLOCK_TICK_RATE/parms.freq)) < 0) {
+-      printf("\a");  /* Output the only beep we can, in an effort to fall back on usefulness */
+-      perror("ioctl");
+-    }
++    do_beep(parms.freq);
+     /* Look ma, I'm not ansi C compatible! */
+     usleep(1000*parms.length);                          /* wait...    */
+-    ioctl(console_fd, KIOCSOUND, 0);                    /* stop beep  */
++    do_beep(0);
+     if(parms.end_delay || (i+1 < parms.reps))
+        usleep(1000*parms.delay);                        /* wait...    */
+   }                                                     /* repeat.    */
+@@ -295,5 +345,8 @@ int main(int argc, char **argv) {
+     parms = next;
+   }
+ 
++  if(console_device)
++    free(console_device);
++    
+   return EXIT_SUCCESS;
+ }

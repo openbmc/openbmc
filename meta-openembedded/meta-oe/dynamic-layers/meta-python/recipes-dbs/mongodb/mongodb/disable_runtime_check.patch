@@ -1,0 +1,17 @@
+Lets use cached result for this otherwise runtime test, on qemuppc64
+when this test is run using gcc11, it returns 1, since we dont worry
+about older compilers here, we can cache the result and use it here
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/SConstruct
++++ b/SConstruct
+@@ -3904,7 +3904,7 @@ def doConfigure(myenv):
+ 
+         conf.AddTest('CheckAltivecVbpermqOutput', CheckAltivecVbpermqOutput)
+ 
+-        outputIndex = next((idx for idx in [0,1] if conf.CheckAltivecVbpermqOutput(idx)), None)
++        outputIndex = 1
+         if outputIndex is not None:
+             conf.env.SetConfigHeaderDefine("MONGO_CONFIG_ALTIVEC_VEC_VBPERMQ_OUTPUT_INDEX", outputIndex)
+         else:

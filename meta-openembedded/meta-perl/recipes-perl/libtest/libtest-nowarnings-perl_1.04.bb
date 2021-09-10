@@ -28,7 +28,7 @@ SRC_URI = "${CPAN_MIRROR}/authors/id/A/AD/${CPAN_AUTHOR}/${CPAN_PACKAGE}-${PV}.t
 SRC_URI[md5sum] = "682ed043f7d3e38f3dfd8745fd21c49a"
 SRC_URI[sha256sum] = "638a57658cb119af1fe5b15e73d47c2544dcfef84af0c6b1b2e97f08202b686c"
 
-RDEPENDS_${PN} += "perl-module-test-builder perl-module-test-more perl-module-test-tester"
+RDEPENDS:${PN} += "perl-module-test-builder perl-module-test-more perl-module-test-tester"
 
 S = "${WORKDIR}/${CPAN_PACKAGE}-${PV}"
 

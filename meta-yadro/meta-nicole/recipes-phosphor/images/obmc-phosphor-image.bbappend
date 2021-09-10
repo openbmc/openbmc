@@ -1,8 +1,8 @@
-OBMC_IMAGE_EXTRA_INSTALL_append = " \
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
     admin-account \
     first-boot-set-hostname \
-    first-boot-set-mac \
     mboxd \
     obmc-yadro-cli \
     openpower-fru-vpd \
 "
+IMAGE_FEATURES:remove:nicole = "obmc-user-mgmt-ldap"

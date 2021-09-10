@@ -14,7 +14,7 @@ diff --git a/contrib/test/Makefile.am b/contrib/test/Makefile.am
 index 0188fe2..dac07f3 100644
 --- a/contrib/test/Makefile.am
 +++ b/contrib/test/Makefile.am
-@@ -40,7 +40,7 @@ sdlcam_CFLAGS = -I../.. $(SDL2_CFLAGS)
+@@ -42,7 +42,7 @@ sdlcam_CFLAGS = -I../.. $(SDL2_CFLAGS)
  sdlcam_LDADD = ../../lib/libv4l2/libv4l2.la  ../../lib/libv4lconvert/libv4lconvert.la
  
  mc_nextgen_test_CFLAGS = $(LIBUDEV_CFLAGS)

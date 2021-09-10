@@ -2,15 +2,13 @@
 
 [![Build Status](https://openpower.xyz/buildStatus/icon?job=openbmc-build)](https://openpower.xyz/job/openbmc-build/)
 
-The OpenBMC project can be described as a Linux distribution for embedded
-devices that have a BMC; typically, but not limited to, things like servers,
-top of rack switches or RAID appliances. The OpenBMC stack uses technologies
-such as [Yocto](https://www.yoctoproject.org/),
+OpenBMC is a Linux distribution for management controllers used in devices such
+as servers, top of rack switches or RAID appliances. It uses
+[Yocto](https://www.yoctoproject.org/),
 [OpenEmbedded](https://www.openembedded.org/wiki/Main_Page),
 [systemd](https://www.freedesktop.org/wiki/Software/systemd/), and
 [D-Bus](https://www.freedesktop.org/wiki/Software/dbus/) to allow easy
-customization for your server platform.
-
+customization for your platform.
 
 ## Setting up your OpenBMC project
 
@@ -45,25 +43,33 @@ repository clone, and, if run without arguments, will display the list
 of supported hardware targets, see the following example:
 
 ```
-$ . setup
+$ . setup <machine> [build_dir]
 Target machine must be specified. Use one of:
 
-centriq2400-rep         nicole                     stardragon4800-rep2
-f0b                     olympus                    swift
-fp5280g2                olympus-nuvoton            tiogapass
-gsj                     on5263m5                   vesnin
-hr630                   palmetto                   witherspoon
-hr855xg2                qemuarm                    witherspoon-128
-lanyang                 quanta-q71l                witherspoon-tacoma
-mihawk                  rainier                    yosemitev2
-msn                     romulus                    zaius
-neptune                 s2600wf
+centriq2400-rep         f0b                     fp5280g2
+gsj                     hr630                   hr855xg2
+lanyang                 mihawk                  msn
+neptune                 nicole                  olympus
+olympus-nuvoton         on5263m5                p10bmc
+palmetto                qemuarm                 quanta-q71l
+romulus                 s2600wf                 stardragon4800-rep2
+swift                   tiogapass               vesnin
+witherspoon             witherspoon-tacoma      yosemitev2
+zaius
 ```
 
 Once you know the target (e.g. romulus), source the `setup` script as follows:
 
 ```
 . setup romulus
+```
+
+For evb-ast2500, please use the below command to specify the machine config,
+because the machine in `meta-aspeed` layer is in a BSP layer and does not
+build the openbmc image.
+
+```
+TEMPLATECONF=meta-evb/meta-evb-aspeed/meta-evb-ast2500/conf . openbmc-env
 ```
 
 ### 4) Build
@@ -83,7 +89,7 @@ to get up to speed on OpenBMC development out
 
 ## Build Validation and Testing
 Commits submitted by members of the OpenBMC GitHub community are compiled and
-tested via our [Jenkins](https://openpower.xyz/) server.  Commits are run
+tested via our [Jenkins](https://jenkins.openbmc.org/) server. Commits are run
 through two levels of testing.  At the repository level the makefile `make
 check` directive is run.  At the system level, the commit is built into a
 firmware image and run with an arm-softmmu QEMU model against a barrage of
@@ -120,9 +126,9 @@ For general questions, please use the openbmc tag on
 Please review the [discussion](https://meta.stackexchange.com/questions/272956/a-new-code-license-the-mit-this-time-with-attribution-required?cb=1)
 on Stack Overflow licensing before posting any code.
 
-For technical discussions, please see [contact info](#contact) below for IRC and
-mailing list information. Please don't file an issue to ask a question. You'll
-get faster results by using the mailing list or IRC.
+For technical discussions, please see [contact info](#contact) below for
+Discord and mailing list information. Please don't file an issue to ask a
+question. You'll get faster results by using the mailing list or Discord.
 
 ## Features of OpenBMC
 
@@ -162,9 +168,9 @@ The Technical Steering Committee (TSC) guides the project. Members are:
  * Sai Dasari, Facebook
  * James Mihm, Intel
  * Sagar Dharia, Microsoft
- * Supreeth Venkatesh, Arm
+ * Samer El-Haj-Mahmoud, Arm
 
 ## Contact
 - Mail: openbmc@lists.ozlabs.org [https://lists.ozlabs.org/listinfo/openbmc](https://lists.ozlabs.org/listinfo/openbmc)
-- IRC: #openbmc on freenode.net
-- Riot: [#openbmc:matrix.org](https://riot.im/app/#/room/#openbmc:matrix.org)
+- Discord: https://discord.gg/69Km47zH98
+

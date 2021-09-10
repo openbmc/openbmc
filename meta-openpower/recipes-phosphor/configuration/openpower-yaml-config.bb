@@ -25,11 +25,11 @@ do_install() {
         ${D}${datadir}/${BPN}/ipmi-occ-active-sensor-mrw.yaml
 }
 
-FILES_${PN}-dev = " \
+FILES:${PN}-dev = " \
     ${datadir}/${BPN}/ipmi-fru-properties-mrw.yaml \
     ${datadir}/${BPN}/ipmi-hostboot-fru-mrw.yaml \
     ${datadir}/${BPN}/ipmi-hostboot-volatile-sensor-mrw.yaml \
     ${datadir}/${BPN}/ipmi-occ-active-sensor-mrw.yaml \
     "
 
-ALLOW_EMPTY_${PN} = "1"
+ALLOW_EMPTY:${PN} = "1"

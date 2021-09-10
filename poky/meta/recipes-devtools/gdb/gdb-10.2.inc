@@ -1,0 +1,23 @@
+LICENSE = "GPLv2 & GPLv3 & LGPLv2 & LGPLv3"
+LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
+		    file://COPYING3;md5=d32239bcb673463ab874e80d47fae504 \
+		    file://COPYING3.LIB;md5=6a6a8e020838b23406c81b19c1d46df6 \
+		    file://COPYING.LIB;md5=9f604d8a4f8e74f4f5140845a21b6674"
+
+SRC_URI = "${GNU_MIRROR}/gdb/gdb-${PV}.tar.xz \
+           file://0001-make-man-install-relative-to-DESTDIR.patch \
+           file://0002-mips-linux-nat-Define-_ABIO32-if-not-defined.patch \
+           file://0003-ppc-ptrace-Define-pt_regs-uapi_pt_regs-on-GLIBC-syst.patch \
+           file://0004-Add-support-for-Renesas-SH-sh4-architecture.patch \
+           file://0005-Dont-disable-libreadline.a-when-using-disable-static.patch \
+           file://0006-use-asm-sgidefs.h.patch \
+           file://0008-Change-order-of-CFLAGS.patch \
+           file://0009-resolve-restrict-keyword-conflict.patch \
+           file://0010-Fix-invalid-sigprocmask-call.patch \
+           file://0011-gdbserver-ctrl-c-handling.patch \
+           file://0012-arc-Add-support-for-signal-handlers.patch \
+           file://0013-arc-Add-support-for-signal-frames-for-Linux-targets.patch \
+           file://0014-arc-Take-into-account-the-REGNUM-in-supply-collect-g.patch \
+           file://0015-gdb-Add-native-support-for-ARC-in-GNU-Linux.patch \
+           "
+SRC_URI[sha256sum] = "aaa1223d534c9b700a8bec952d9748ee1977513f178727e1bee520ee000b4f29"

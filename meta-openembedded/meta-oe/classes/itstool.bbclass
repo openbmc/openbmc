@@ -2,4 +2,4 @@
 
 inherit python3native
 
-DEPENDS_append = " itstool-native"
+DEPENDS:append = " itstool-native"

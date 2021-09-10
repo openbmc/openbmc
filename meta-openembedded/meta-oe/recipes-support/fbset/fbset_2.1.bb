@@ -9,12 +9,12 @@ SUMMARY = "The fbset console tool"
 HOMEPAGE = "http://users.telenet.be/geertu/Linux/fbdev/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://fbset.c;endline=19;md5=bf326f82cdfcac391af208f019c5603f"
-RRECOMMENDS_${PN} = "fbset-modes"
+RRECOMMENDS:${PN} = "fbset-modes"
 DEPENDS = "bison-native flex-native"
 
 PR = "r4"
 
-SRC_URI = "http://ftp.debian.org/debian/pool/main/f/fbset/fbset_2.1.orig.tar.gz \
+SRC_URI = "${DEBIAN_MIRROR}/main/f/fbset/fbset_2.1.orig.tar.gz \
            file://makefile.patch \
            file://fbset-2.1-fix-makefile-dep.patch \
            file://0001-fbset-including-asm-types.h-is-needed-on-all-linux-s.patch \
@@ -29,7 +29,7 @@ do_install() {
     install -m 0644 ${B}/*.8 ${D}${datadir}/man/man8
 }
 
-ALTERNATIVE_fbset = "fbset"
+ALTERNATIVE:fbset = "fbset"
 ALTERNATIVE_LINK_NAME[fbset] = "${sbindir}/fbset"
 ALTERNATIVE_TARGET[fbset] = "${sbindir}/fbset.real"
 ALTERNATIVE_PRIORITY[fbset] = "55"

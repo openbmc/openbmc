@@ -6,6 +6,6 @@ IMAGE_INSTALL += " \
 	kernel-modules \
 	"
 
-do_image_prepend() {
+do_image:prepend() {
     bb.warn("The image 'rpi-hwup-image' is deprecated, please use 'core-image-base' instead")
 }

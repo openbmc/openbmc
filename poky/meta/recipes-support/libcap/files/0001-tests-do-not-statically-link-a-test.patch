@@ -1,4 +1,4 @@
-From 24d59c99bcba065f1f40f49f870a5f6483b4b078 Mon Sep 17 00:00:00 2001
+From 897900f3f9084c5542097851323bba3f2691df20 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 15 Jan 2020 17:16:28 +0100
 Subject: [PATCH] tests: do not statically link a test
@@ -7,40 +7,46 @@ This fails on e.g. centos 7
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
-
 ---
- tests/Makefile | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ progs/Makefile | 2 +-
+ tests/Makefile | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/progs/Makefile b/progs/Makefile
+index 3e82862..48533f3 100644
+--- a/progs/Makefile
++++ b/progs/Makefile
+@@ -49,7 +49,7 @@ capsh: capsh.c capshdoc.h.cf $(DEPS)
+ 	$(CC) $(IPATH) $(CAPSH_SHELL) $(CFLAGS) -o $@ $< $(LIBCAPLIB) $(LDFLAGS)
+ 
+ tcapsh-static: capsh.c capshdoc.h.cf $(DEPS)
+-	$(CC) $(IPATH) $(CAPSH_SHELL) $(CFLAGS) -o $@ $< $(LIBCAPLIB) $(LDFLAGS) --static
++	$(CC) $(IPATH) $(CAPSH_SHELL) $(CFLAGS) -o $@ $< $(LIBCAPLIB) $(LDFLAGS)
+ 
+ uns_test: ../tests/uns_test.c
+ 	$(MAKE) -C ../tests uns_test
 diff --git a/tests/Makefile b/tests/Makefile
-index f9cec56..aa0d09b 100644
+index 4a5f2f9..4266d86 100644
 --- a/tests/Makefile
 +++ b/tests/Makefile
-@@ -29,23 +29,23 @@ psx_test_wrap: psx_test.c $(DEPS)
- run_libcap_psx_test: libcap_psx_test
+@@ -22,7 +22,7 @@ ifeq ($(PTHREADS),yes)
+ DEPS += ../libcap/libpsx.so
+ endif
+ else
+-LDFLAGS += --static
++LDFLAGS +=
+ DEPS=../libcap/libcap.a
+ ifeq ($(PTHREADS),yes)
+ DEPS +=  ../libcap/libpsx.a
+@@ -113,7 +113,7 @@ noexploit: exploit.o $(DEPS)
  
- libcap_psx_test: libcap_psx_test.c $(DEPS)
--	$(CC) $(CFLAGS) $(IPATH) $< -o $@ $(LIBCAPLIB) $(LIBPSXLIB) -Wl,-wrap,pthread_create --static
-+	$(CC) $(CFLAGS) $(IPATH) $< -o $@ $(LIBCAPLIB) $(LIBPSXLIB) -Wl,-wrap,pthread_create
- 
- run_libcap_launch_test: libcap_launch_test libcap_psx_launch_test noop
- 	sudo ./libcap_launch_test
- 	sudo ./libcap_psx_launch_test
- 
- libcap_launch_test: libcap_launch_test.c $(DEPS)
--	$(CC) $(CFLAGS) $(IPATH) $< -o $@ $(LIBCAPLIB) --static
-+	$(CC) $(CFLAGS) $(IPATH) $< -o $@ $(LIBCAPLIB)
- 
- # this varies only slightly from the above insofar as it currently
- # only links in the pthreads fork support. TODO() we need to change
- # the source to do something interesting with pthreads.
- libcap_psx_launch_test: libcap_launch_test.c $(DEPS)
--	$(CC) $(CFLAGS) $(IPATH) -DWITH_PTHREADS $< -o $@ $(LIBCAPLIB) $(LIBPSXLIB) -Wl,-wrap,pthread_create --static
-+	$(CC) $(CFLAGS) $(IPATH) -DWITH_PTHREADS $< -o $@ $(LIBCAPLIB) $(LIBPSXLIB) -Wl,-wrap,pthread_create
- 
+ # This one runs in a chroot with no shared library files.
  noop: noop.c
 -	$(CC) $(CFLAGS) $< -o $@ --static
 +	$(CC) $(CFLAGS) $< -o $@
  
  clean:
- 	rm -f psx_test psx_test_wrap libcap_psx_test libcap_launch_test *~
+ 	rm -f psx_test libcap_psx_test libcap_launch_test uns_test *~
+-- 
+2.25.1
+

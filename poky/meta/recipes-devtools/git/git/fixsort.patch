@@ -1,0 +1,31 @@
+[PATCH] generate-configlist.sh: Fix determinism issue
+
+Currently git binaries are not entirely reproducible, at least partly 
+due to config-list.h differing in order depending on the system's
+locale settings. Under different locales, the entries:
+
+"sendemail.identity",
+"sendemail.<identity>.*",
+
+would differ in order for example and this leads to differences in 
+the debug symbols for the binaries.
+
+This can be fixed by specifying the C locale for the sort in the
+shell script generating the header.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Upstream-Status: Submitted [https://public-inbox.org/git/f029a942dd3d50d85e60bd37d8e454524987842f.camel@linuxfoundation.org/T/#u]
+
+Index: git-2.30.0/generate-configlist.sh
+===================================================================
+--- git-2.30.0.orig/generate-configlist.sh
++++ git-2.30.0/generate-configlist.sh
+@@ -9,7 +9,7 @@ static const char *config_name_list[] =
+ EOF
+ 	grep -h '^[a-zA-Z].*\..*::$' Documentation/*config.txt Documentation/config/*.txt |
+ 	sed '/deprecated/d; s/::$//; s/,  */\n/g' |
+-	sort |
++	LC_ALL=C sort |
+ 	sed 's/^.*$/	"&",/'
+ 	cat <<EOF
+ 	NULL,

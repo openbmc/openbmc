@@ -11,14 +11,14 @@ export LDCXXSHARED  = "${CXX} -shared"
 export CCSHARED  = "-fPIC -DPIC"
 # LINKFORSHARED are the flags passed to the $(CC) command that links
 # the python executable
-export LINKFORSHARED = "{SECURITY_CFLAGS} -Xlinker -export-dynamic"
+export LINKFORSHARED = "${SECURITY_CFLAGS} -Xlinker -export-dynamic"
 
-FILES_${PN} += "${libdir}/* ${libdir}/${PYTHON_DIR}/*"
+FILES:${PN} += "${libdir}/* ${libdir}/${PYTHON_DIR}/*"
 
-FILES_${PN}-staticdev += "\
+FILES:${PN}-staticdev += "\
   ${PYTHON_SITEPACKAGES_DIR}/*.a \
 "
-FILES_${PN}-dev += "\
+FILES:${PN}-dev += "\
   ${datadir}/pkgconfig \
   ${libdir}/pkgconfig \
   ${PYTHON_SITEPACKAGES_DIR}/*.la \

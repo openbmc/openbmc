@@ -1,4 +1,4 @@
-From a64be7ff40bd6de2ac099c3f0091f14edfe57fe7 Mon Sep 17 00:00:00 2001
+From 4624c934d1a783968306e61ded4389c153e3d009 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 10 May 2017 06:39:34 +0000
 Subject: [PATCH] GLES2/gl2ext.h: Define GL_R8_EXT and GL_RG8_EXT

@@ -1,4 +1,4 @@
-From 8ca8e5cd78cbd37a713e1181f8f6641b57352aa8 Mon Sep 17 00:00:00 2001
+From add514edf4299d1bf540d85d0aa0bd5fe0d46b78 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:20:09 +0000
 Subject: [PATCH] Quote from bug 1443 which explains what the patch does :
@@ -44,7 +44,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/sysdeps/arm/dl-machine.h b/sysdeps/arm/dl-machine.h
-index 90856779b1..a29bb86c56 100644
+index ff5e09e207..d68bfe5cbe 100644
 --- a/sysdeps/arm/dl-machine.h
 +++ b/sysdeps/arm/dl-machine.h
 @@ -510,7 +510,7 @@ elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,

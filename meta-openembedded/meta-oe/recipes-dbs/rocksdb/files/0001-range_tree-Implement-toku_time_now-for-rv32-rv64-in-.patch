@@ -1,0 +1,44 @@
+From 89c032a9b4011385c0b504ea61e5df0db71f0ff5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 16 Jun 2021 19:06:02 -0700
+Subject: [PATCH] range_tree: Implement toku_time_now for rv32/rv64 in asm
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../range_tree/lib/portability/toku_time.h    | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h b/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
+index 4425a4a2e..4ac964f85 100644
+--- a/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
++++ b/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
+@@ -133,6 +133,25 @@ static inline tokutime_t toku_time_now(void) {
+   return result;
+ #elif defined(__powerpc__)
+   return __ppc_get_timebase();
++#elif defined(__riscv) // RISC-V
++#if __riscv_xlen == 32
++  uint32_t lo, hi0, hi1;
++  __asm __volatile__(
++      "rdcycleh %0\n"
++      "rdcycle %1\n"
++      "rdcycleh %2\n"
++      "sub %0, %0, %2\n"
++      "seqz %0, %0\n"
++      "sub %0, zero, %0\n"
++      "and %1, %1, %0\n"
++      : "=r"(hi0), "=r"(lo), "=r"(hi1));
++  return ((uint64_t)hi1 << 32) | lo;
++#else
++  uint64_t result;
++  __asm __volatile__("rdcycle %0" : "=r"(result));
++  return result;
++#endif
++
+ #else
+ #error No timer implementation for this platform
+ #endif
+-- 
+2.32.0
+

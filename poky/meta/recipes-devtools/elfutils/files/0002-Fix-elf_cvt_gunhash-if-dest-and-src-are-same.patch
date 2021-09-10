@@ -1,4 +1,4 @@
-From f8e4118b60a9b54950437006a82b4047f38f5347 Mon Sep 17 00:00:00 2001
+From 1643d793761216252bb654e28aaa5b8eb1536bca Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:13:59 +0800
 Subject: [PATCH] Fix elf_cvt_gunhash if dest and src are same.

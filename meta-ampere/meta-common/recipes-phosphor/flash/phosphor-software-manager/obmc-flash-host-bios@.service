@@ -1,0 +1,7 @@
+[Unit]
+Description=Ampere service for flashing the Host firmware image
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/ampere_flash_bios.sh /tmp/images/%I/*.img

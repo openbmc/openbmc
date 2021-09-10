@@ -11,11 +11,9 @@ Upstream-Status: Pending
  configure.ac | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/configure.ac b/configure.ac
-index 70b49a3..8154c5c 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -51,6 +51,8 @@ case "$host" in
+@@ -53,6 +53,8 @@ case "$host" in
     *-cygwin*) default_enable_heap_checker=no; default_enable_cpu_profiler=no;;
     *-freebsd*) default_enable_heap_checker=no;;
     *-darwin*) default_enable_heap_checker=no;;
@@ -23,4 +21,4 @@ index 70b49a3..8154c5c 100644
 +            default_enable_debugalloc=no; default_enable_libunwind=no;
  esac
  
- # Currently only backtrace works on s390.
+ # Currently only backtrace works on s390 and OSX.

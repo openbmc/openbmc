@@ -21,9 +21,9 @@ LIC_FILES_CHKSUM = "file://GPL-2;md5=eb723b61539feef013de476e68b5c50a"
 
 inherit autotools gettext update-rc.d
 
-FILES_${PN} += "/usr/share/misc/hddtemp.db"
+FILES:${PN} += "/usr/share/misc/hddtemp.db"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/usr/share/misc/
     install -m 0644 ${WORKDIR}/hddtemp.db ${D}/usr/share/misc/hddtemp.db
     install -d ${D}${sysconfdir}/init.d

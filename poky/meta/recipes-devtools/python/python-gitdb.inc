@@ -8,11 +8,11 @@ inherit pypi
 
 PYPI_PACKAGE = "gitdb"
 
-SRC_URI[sha256sum] = "6f0ecd46f99bb4874e5678d628c3a198e2b4ef38daea2756a2bfd8df7dd5c1a5"
+SRC_URI[sha256sum] = "96bf5c08b157a666fec41129e6d327235284cca4c81e92109260f353ba138005"
 
 DEPENDS = "${PYTHON_PN}-async ${PYTHON_PN}-setuptools-native ${PYTHON_PN}-smmap"
 
-RDEPENDS_${PN} += "${PYTHON_PN}-async \
+RDEPENDS:${PN} += "${PYTHON_PN}-async \
                    ${PYTHON_PN}-compression \
                    ${PYTHON_PN}-crypt \
                    ${PYTHON_PN}-io \

@@ -19,19 +19,19 @@ SRC_URI = "git://github.com/grondo/edac-utils \
 
 inherit autotools-brokensep systemd
 
-do_configure_prepend () {
+do_configure:prepend () {
     touch ${S}/ChangeLog
     ${S}/bootstrap
 }
 
-RDEPENDS_${PN}_x86 = "dmidecode"
-RDEPENDS_${PN}_x86-64 = "dmidecode"
-RDEPENDS_${PN}_arm = "dmidecode"
-RDEPENDS_${PN}_aarch64 = "dmidecode"
-RDEPENDS_${PN}_powerpc = "dmidecode"
-RDEPENDS_${PN}_powerpc64 = "dmidecode"
-RDEPENDS_${PN}_powerpc64le = "dmidecode"
-RDEPENDS_${PN}_append = " \
+RDEPENDS:${PN}:x86 = "dmidecode"
+RDEPENDS:${PN}:x86-64 = "dmidecode"
+RDEPENDS:${PN}:arm = "dmidecode"
+RDEPENDS:${PN}:aarch64 = "dmidecode"
+RDEPENDS:${PN}:powerpc = "dmidecode"
+RDEPENDS:${PN}:powerpc64 = "dmidecode"
+RDEPENDS:${PN}:powerpc64le = "dmidecode"
+RDEPENDS:${PN}:append = " \
     perl \
     perl-module-file-basename \
     perl-module-file-find \
@@ -42,11 +42,11 @@ RDEPENDS_${PN}_append = " \
     perl-module-file-glob \
 "
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${systemd_unitdir}/system
 	install -m 644 ${WORKDIR}/edac.service ${D}/${systemd_unitdir}/system
 	sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}/${systemd_unitdir}/system/edac.service
 }
 
-SYSTEMD_SERVICE_${PN} = "edac.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "disable"
+SYSTEMD_SERVICE:${PN} = "edac.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "disable"

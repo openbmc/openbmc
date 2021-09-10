@@ -15,7 +15,7 @@ SRC_URI = "http://nchc.dl.sourceforge.net/project/${BPN}/${BPN}/${PV}/${BPN}-${P
            file://0001-saaldump-atmdump-Include-linux-sockios.h-for-SIOCGST.patch \
 "
 
-SRC_URI_append_libc-musl = " file://musl-no-on_exit.patch"
+SRC_URI:append:libc-musl = " file://musl-no-on_exit.patch"
 
 SRC_URI[md5sum] = "d49499368c3cf15f73a05d9bce8824a8"
 SRC_URI[sha256sum] = "9645481a2b16476b59220aa2d6bc5bc41043f291326c9b37581018fbd16dd53a"
@@ -30,4 +30,4 @@ inherit autotools pkgconfig
 # The firmware is explicitly put under /lib when installed.
 #
 
-FILES_${PN} += "/lib/firmware"
+FILES:${PN} += "/lib/firmware"

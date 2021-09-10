@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = " \
 "
 
 DEPENDS = "alsa-lib jack dbus"
-DEPENDS_append_libc-musl = " libexecinfo"
+DEPENDS:append:libc-musl = " libexecinfo"
 
 SRCREV = "de37569c926c5886768f892c019e3f0468615038"
 SRC_URI = " \
@@ -21,8 +21,8 @@ inherit meson pkgconfig
 
 EXTRA_OEMESON = "-Db_lto=false"
 
-LDFLAGS_append_libc-musl = " -lexecinfo"
+LDFLAGS:append:libc-musl = " -lexecinfo"
 
 export LINKFLAGS="${LDFLAGS}"
 
-FILES_${PN} += "${datadir}/dbus-1/services"
+FILES:${PN} += "${datadir}/dbus-1/services"

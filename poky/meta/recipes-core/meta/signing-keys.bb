@@ -14,9 +14,9 @@ SYSROOT_DIRS += "${sysconfdir}/pki"
 
 PACKAGES =+ "${PN}-ipk ${PN}-rpm ${PN}-packagefeed"
 
-FILES_${PN}-rpm = "${sysconfdir}/pki/rpm-gpg"
-FILES_${PN}-ipk = "${sysconfdir}/pki/ipk-gpg"
-FILES_${PN}-packagefeed = "${sysconfdir}/pki/packagefeed-gpg"
+FILES:${PN}-rpm = "${sysconfdir}/pki/rpm-gpg"
+FILES:${PN}-ipk = "${sysconfdir}/pki/ipk-gpg"
+FILES:${PN}-packagefeed = "${sysconfdir}/pki/packagefeed-gpg"
 
 python do_get_public_keys () {
     from oe.gpg_sign import get_signer
@@ -67,8 +67,6 @@ do_deploy () {
     fi
 }
 do_deploy[sstate-outputdirs] = "${DEPLOY_DIR_RPM}"
-# cleandirs should possibly be in deploy.bbclass but we need it
-do_deploy[cleandirs] = "${DEPLOYDIR}"
 # clear stamp-extra-info since MACHINE_ARCH is normally put there by
 # deploy.bbclass
 do_deploy[stamp-extra-info] = ""

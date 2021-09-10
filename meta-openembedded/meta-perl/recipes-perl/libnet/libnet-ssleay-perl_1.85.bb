@@ -11,7 +11,7 @@ LICENSE = "Artistic-1.0 | GPL-1.0+"
 LIC_FILES_CHKSUM = "file://README;beginline=274;endline=294;md5=67d67095d83e339da538a082fad5f38e"
 
 DEPENDS = "openssl zlib openssl-native"
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     libssl \
     libcrypto \
     perl-module-carp \
@@ -19,6 +19,7 @@ RDEPENDS_${PN} += "\
     perl-module-extutils-makemaker \
     perl-module-mime-base64 \
     perl-module-socket \
+    perl-module-autoloader \
     zlib \
 "
 
@@ -42,6 +43,6 @@ do_install_ptest() {
     cp -r ${B}/t ${D}${PTEST_PATH}
 }
 
-FILES_${PN}-dbg =+ "${libdir}/perl/vendor_perl/*/auto/Net/SSLeay/.debug/"
+FILES:${PN}-dbg =+ "${libdir}/perl/vendor_perl/*/auto/Net/SSLeay/.debug/"
 
-RDEPENDS_${PN}-ptest = " perl"
+RDEPENDS:${PN}-ptest = " perl"

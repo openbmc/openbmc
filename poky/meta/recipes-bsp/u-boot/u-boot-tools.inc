@@ -2,27 +2,42 @@ SUMMARY = "U-Boot bootloader tools"
 DEPENDS += "openssl"
 
 PROVIDES = "${MLPREFIX}u-boot-mkimage ${MLPREFIX}u-boot-mkenvimage"
-PROVIDES_class-native = "u-boot-mkimage-native u-boot-mkenvimage-native"
+PROVIDES:class-native = "u-boot-mkimage-native u-boot-mkenvimage-native"
 
 PACKAGES += "${PN}-mkimage ${PN}-mkenvimage"
 
 # Required for backward compatibility with "u-boot-mkimage-xxx.bb"
-RPROVIDES_${PN}-mkimage = "u-boot-mkimage"
-RREPLACES_${PN}-mkimage = "u-boot-mkimage"
-RCONFLICTS_${PN}-mkimage = "u-boot-mkimage"
+RPROVIDES:${PN}-mkimage = "u-boot-mkimage"
+RREPLACES:${PN}-mkimage = "u-boot-mkimage"
+RCONFLICTS:${PN}-mkimage = "u-boot-mkimage"
 
-EXTRA_OEMAKE_class-target = 'CROSS_COMPILE="${TARGET_PREFIX}" CC="${CC} ${CFLAGS} ${LDFLAGS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" STRIP=true V=1'
-EXTRA_OEMAKE_class-native = 'CC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" STRIP=true V=1'
-EXTRA_OEMAKE_class-nativesdk = 'CROSS_COMPILE="${HOST_PREFIX}" CC="${CC} ${CFLAGS} ${LDFLAGS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" STRIP=true V=1'
+EXTRA_OEMAKE:class-target = 'CROSS_COMPILE="${TARGET_PREFIX}" CC="${CC} ${CFLAGS} ${LDFLAGS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" STRIP=true V=1'
+EXTRA_OEMAKE:class-native = 'CC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" STRIP=true V=1'
+EXTRA_OEMAKE:class-nativesdk = 'CROSS_COMPILE="${HOST_PREFIX}" CC="${CC} ${CFLAGS} ${LDFLAGS}" HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}" STRIP=true V=1'
 
 SED_CONFIG_EFI = '-e "s/CONFIG_EFI_LOADER=.*/# CONFIG_EFI_LOADER is not set/"'
-SED_CONFIG_EFI_x86 = ''
-SED_CONFIG_EFI_x86-64 = ''
-SED_CONFIG_EFI_arm = ''
-SED_CONFIG_EFI_armeb = ''
-SED_CONFIG_EFI_aarch64 = ''
+SED_CONFIG_EFI:x86 = ''
+SED_CONFIG_EFI:x86-64 = ''
+SED_CONFIG_EFI:arm = ''
+SED_CONFIG_EFI:armeb = ''
+SED_CONFIG_EFI:aarch64 = ''
 
 do_compile () {
+	# Yes, this is crazy. If you build on a system with git < 2.14 from scratch, the tree will
+	# be marked as "dirty" and the version will include "-dirty", leading to a reproducibility problem.
+	# The issue is the inode count for Licnses/README changing due to do_populate_lic hardlinking a
+	# copy of the file. We avoid this by ensuring the index is updated with a "git diff" before the
+	# u-boot machinery tries to determine the version.
+	#
+	# build$ ../git/scripts/setlocalversion ../git
+	# ""
+	# build$ ln ../git/
+	# build$ ln ../git/README ../foo
+	# build$ ../git/scripts/setlocalversion ../git
+	# ""-dirty
+	# (i.e. creating a hardlink dirties the index)
+	cd ${S}; git diff; cd ${B}
+
 	oe_runmake -C ${S} sandbox_defconfig O=${B}
 
 	# Disable CONFIG_CMD_LICENSE, license.h is not used by tools and
@@ -53,14 +68,14 @@ do_install () {
 	ln -sf uboot-fit_check_sign ${D}${bindir}/fit_check_sign
 }
 
-ALLOW_EMPTY_${PN} = "1"
-FILES_${PN} = ""
-FILES_${PN}-mkimage = "${bindir}/uboot-mkimage ${bindir}/mkimage ${bindir}/uboot-dumpimage ${bindir}/dumpimage ${bindir}/uboot-fit_check_sign ${bindir}/fit_check_sign"
-FILES_${PN}-mkenvimage = "${bindir}/uboot-mkenvimage ${bindir}/mkenvimage"
+ALLOW_EMPTY:${PN} = "1"
+FILES:${PN} = ""
+FILES:${PN}-mkimage = "${bindir}/uboot-mkimage ${bindir}/mkimage ${bindir}/uboot-dumpimage ${bindir}/dumpimage ${bindir}/uboot-fit_check_sign ${bindir}/fit_check_sign"
+FILES:${PN}-mkenvimage = "${bindir}/uboot-mkenvimage ${bindir}/mkenvimage"
 
-RDEPENDS_${PN}-mkimage += "dtc"
-RDEPENDS_${PN} += "${PN}-mkimage ${PN}-mkenvimage"
-RDEPENDS_${PN}_class-native = ""
+RDEPENDS:${PN}-mkimage += "dtc"
+RDEPENDS:${PN} += "${PN}-mkimage ${PN}-mkenvimage"
+RDEPENDS:${PN}:class-native = ""
 
 BBCLASSEXTEND = "native nativesdk"
 

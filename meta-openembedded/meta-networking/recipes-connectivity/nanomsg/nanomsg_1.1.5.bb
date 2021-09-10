@@ -22,7 +22,7 @@ inherit cmake pkgconfig
 EXTRA_OECMAKE = " -DNN_ENABLE_DOC=OFF "
 
 # we don't want nanomsg-tools to be renamed to libnanomsg-tools
-DEBIAN_NOAUTONAME_${PN}-tools = "1"
+DEBIAN_NOAUTONAME:${PN}-tools = "1"
 
 PACKAGES =+ "${PN}-tools"
-FILES_${PN}-tools = "${bindir}/*"
+FILES:${PN}-tools = "${bindir}/*"

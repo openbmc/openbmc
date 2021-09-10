@@ -1,0 +1,42 @@
+From 3b4ba29c7c5800df87eecd65214244619e01162b Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sun, 7 Feb 2021 16:02:36 +0800
+Subject: [PATCH] workaround error with autoconf 2.7
+
+While using autoconf 2.7, the AM_MISSING_PROG caused unexpected error:
+...
+configure.ac: error: required file 'missing' not found
+...
+
+Since these tools were explicitly added by autotools bbclass,
+remove the testing to workaround the error with autoconf 2.7
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 609efb104b..2d761cf62c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -693,14 +693,6 @@ fi
+ 
+ AC_PATH_PROG(RUSERS, rusers, /usr/bin/rusers)
+ 
+-dnl #
+-dnl #  FIXME This is truly gross.
+-dnl #
+-missing_dir=`cd $ac_aux_dir && pwd`
+-AM_MISSING_PROG(ACLOCAL, aclocal, $missing_dir)
+-AM_MISSING_PROG(AUTOCONF, autoconf, $missing_dir)
+-AM_MISSING_PROG(AUTOHEADER, autoheader, $missing_dir)
+-
+ AC_PATH_PROG(LOCATE,locate)
+ AC_PATH_PROG(DIRNAME,dirname)
+ AC_PATH_PROG(GREP,grep)
+-- 
+2.27.0
+

@@ -7,8 +7,8 @@ inherit packagegroup
 
 PACKAGES = "packagegroup-security-vtpm"
 
-SUMMARY_packagegroup-security-vtpm = "Security Software vTPM support"
-RDEPENDS_packagegroup-security-vtpm = " \
+SUMMARY:packagegroup-security-vtpm = "Security Software vTPM support"
+RDEPENDS:packagegroup-security-vtpm = " \
     libtpm \
     swtpm \
     "		

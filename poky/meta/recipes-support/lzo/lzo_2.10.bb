@@ -1,4 +1,6 @@
 SUMMARY = "Lossless data compression library"
+DESCRIPTION = "A portable lossless data compression library written in \
+ANSI C that offers pretty fast compression and *extremely* fast decompression. "
 HOMEPAGE = "http://www.oberhumer.com/opensource/lzo/"
 SECTION = "libs"
 LICENSE = "GPLv2+"
@@ -15,6 +17,8 @@ SRC_URI[md5sum] = "39d3f3f9c55c87b1e5d6888e1420f4b5"
 SRC_URI[sha256sum] = "c0f892943208266f9b6543b3ae308fab6284c5c90e627931446fb49b4221a072"
 
 inherit autotools ptest
+
+CVE_PRODUCT = "lzo oberhumer:lzo2"
 
 EXTRA_OECONF = "--enable-shared"
 

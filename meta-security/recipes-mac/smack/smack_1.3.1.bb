@@ -13,6 +13,11 @@ SRC_URI = " \
 
 PV = "1.3.1"
 
+# CVE-2014-0363, CVE-2014-0364, CVE-2016-10027 is valnerble for other product.
+CVE_CHECK_WHITELIST += "CVE-2014-0363"
+CVE_CHECK_WHITELIST += "CVE-2014-0364"
+CVE_CHECK_WHITELIST += "CVE-2016-10027"
+
 inherit autotools update-rc.d pkgconfig ptest
 inherit ${@bb.utils.contains('VIRTUAL-RUNTIME_init_manager','systemd','systemd','', d)}
 inherit features_check
@@ -23,15 +28,15 @@ REQUIRED_DISTRO_FEATURES = "smack"
 S = "${WORKDIR}/git"
 
 PACKAGECONFIG ??= ""
-PACKAGECONFIG_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
+PACKAGECONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
 
 PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}, --without-systemdsystemunitdir, systemd"
 
-do_compile_append () {
+do_compile:append () {
 	oe_runmake -C ${S}/tests generator
 }
 
-do_install_append () {
+do_install:append () {
 	install -d ${D}${sysconfdir}/init.d
 	install -d ${D}${sysconfdir}/smack
 	install -d ${D}${sysconfdir}/smack/accesses.d
@@ -50,10 +55,10 @@ INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME = "smack"
 INITSCRIPT_PARAMS = "start 16 2 3 4 5 . stop 35 0 1 6 ."
 
-FILES_${PN} += "${sysconfdir}/init.d/smack"
-FILES_${PN}-ptest += "generator"
+FILES:${PN} += "${sysconfdir}/init.d/smack"
+FILES:${PN}-ptest += "generator"
 
-RDEPENDS_${PN} += "coreutils python3-core"
-RDEPENDS_${PN}-ptest += "make bash bc"
+RDEPENDS:${PN} += "coreutils python3-core"
+RDEPENDS:${PN}-ptest += "make bash bc"
 
 BBCLASSEXTEND = "native"

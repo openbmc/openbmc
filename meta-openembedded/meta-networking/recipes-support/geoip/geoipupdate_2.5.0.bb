@@ -18,14 +18,14 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "\
 file://ChangeLog.md;md5=11d2e31df0de2be3ccc3e2286c4dafcb \
 "
-FILES_${PN} = "/usr/share/GeoIP \
+FILES:${PN} = "/usr/share/GeoIP \
               /etc/GeoIP.conf \
              /etc/cron.d/geoipupdate.cron \
              /usr/bin/geoipupdate \
 "
 inherit autotools
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/${sysconfdir}
     install -d ${D}/${sysconfdir}/cron.d
     install ${WORKDIR}/GeoIP.conf ${D}/${sysconfdir}/

@@ -19,7 +19,7 @@ def read_pkgdatafile(fn):
         import re
         with open(fn, 'r') as f:
             lines = f.readlines()
-        r = re.compile("([^:]+):\s*(.*)")
+        r = re.compile("(^.+?):\s+(.*)")
         for l in lines:
             m = r.match(l)
             if m:
@@ -45,14 +45,14 @@ def read_pkgdata(pn, d):
     return read_pkgdatafile(fn)
 
 #
-# Collapse FOO_pkg variables into FOO
+# Collapse FOO:pkg variables into FOO
 #
 def read_subpkgdata_dict(pkg, d):
     ret = {}
     subd = read_pkgdatafile(get_subpkgedata_fn(pkg, d))
     for var in subd:
-        newvar = var.replace("_" + pkg, "")
-        if newvar == var and var + "_" + pkg in subd:
+        newvar = var.replace(":" + pkg, "")
+        if newvar == var and var + ":" + pkg in subd:
             continue
         ret[newvar] = subd[var]
     return ret

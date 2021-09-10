@@ -19,7 +19,7 @@ S = "${WORKDIR}/Text-Diff-${PV}"
 
 inherit cpan
 
-RDEPENDS_${PN} = " libalgorithm-diff-perl \
+RDEPENDS:${PN} = " libalgorithm-diff-perl \
                    perl-module-extutils-makemaker \
                    perl-module-exporter \
 "

@@ -19,4 +19,4 @@ S = "${WORKDIR}/git"
 EXTRA_OECONF = " --with-systemdsystemunitdir=${systemd_unitdir}/system \
                  --disable-staticimages"
 
-FILES_${PN} += "${systemd_unitdir}/system/"
+FILES:${PN} += "${systemd_unitdir}/system/"

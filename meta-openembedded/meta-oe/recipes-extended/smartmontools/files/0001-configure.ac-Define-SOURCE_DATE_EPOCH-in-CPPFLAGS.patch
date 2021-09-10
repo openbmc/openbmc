@@ -1,0 +1,84 @@
+From b621a313e0bc67803abfba18e1ae15e7a8b9b59f Mon Sep 17 00:00:00 2001
+From: Oleksiy Obitotskyy <oobitots@cisco.com>
+Date: Mon, 22 Feb 2021 17:21:33 +0200
+Subject: [PATCH] smartmontools: Improve reproducibility
+
+Backport changes added to master smartmontools.
+https://github.com/smartmontools/smartmontools/commit/24838916b4c0e91f5c897d44fcdeedb22848f684
+
+Upstream-Status: Backported
+Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
+---
+ ChangeLog    |  8 ++++++++
+ configure.ac | 12 ++++++++++++
+ utility.cpp  | 10 ++++++++++
+ 3 files changed, 30 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index 39eac2d..6a3b4ee 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,13 @@
+ $Id: ChangeLog 5155 2020-12-30 16:49:18Z chrfranke $
+ 
++2021-02-07  Christian Franke  <franke@computer.org>
++
++	Improve reproducibility if SOURCE_DATE_EPOCH if set (GH pull/89).
++	configure.ac: Define SOURCE_DATE_EPOCH in CPPFLAGS.
++	utility.cpp: Print SOURCE_DATE_EPOCH value if specified.
++	Don't include configure arguments then.
++	cppcheck.sh: Silence related 'ConfigurationNotChecked' message.
++
+ 2020-12-30  Christian Franke  <franke@computer.org>
+ 
+ 	smartmontools 7.2
+diff --git a/configure.ac b/configure.ac
+index ee6f0e5..c37c9bc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -61,6 +61,18 @@ case "${host}" in
+     ;;
+ esac
+ 
++AC_MSG_CHECKING([whether reproducible build is selected (SOURCE_DATE_EPOCH)])
++res=no
++if test -n "$SOURCE_DATE_EPOCH"; then
++  res=yes
++  test -z "`echo "$SOURCE_DATE_EPOCH" | sed 's,[[0-9]]*,,'`" || res=error
++fi
++AC_MSG_RESULT([$res])
++case $res in
++  error) AC_MSG_ERROR([Malformed SOURCE_DATE_EPOCH]) ;;
++  yes) CPPFLAGS="${CPPFLAGS}${CPPFLAGS:+ }-DSOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH" ;;
++esac
++
+ # Check for SVN.
+ AC_MSG_CHECKING([whether this is a build from SVN])
+ is_svn_build=no
+diff --git a/utility.cpp b/utility.cpp
+index 0483c6f..8ab38c9 100644
+--- a/utility.cpp
++++ b/utility.cpp
+@@ -134,9 +134,19 @@ std::string format_version_info(const char * prog_name, bool full /*= false*/)
+ #endif
+                                                           "\n"
+     "smartmontools configure arguments:"
++#ifdef SOURCE_DATE_EPOCH
++                                      " [hidden in reproducible builds]\n"
++    "reproducible build SOURCE_DATE_EPOCH: "
++#endif
+   ;
++#ifdef SOURCE_DATE_EPOCH
++  char ts[32]; struct tm tmbuf;
++  strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", time_to_tm_local(&tmbuf, SOURCE_DATE_EPOCH));
++  info += strprintf("%u (%s)", (unsigned)SOURCE_DATE_EPOCH, ts);
++#else
+   info += (sizeof(SMARTMONTOOLS_CONFIGURE_ARGS) > 1 ?
+            SMARTMONTOOLS_CONFIGURE_ARGS : " [no arguments given]");
++#endif
+   info += '\n';
+ 
+   return info;
+-- 
+2.25.1
+

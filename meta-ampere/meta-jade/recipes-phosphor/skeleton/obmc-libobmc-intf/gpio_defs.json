@@ -1,0 +1,54 @@
+{
+    "gpio_configs": {
+
+        "power_config": {
+            "power_good_in": "PGOOD",
+            "power_up_outs": [
+               {"name": "BMC_SYS_PSON_L", "polarity": false},
+               {"name": "BMC_READY", "polarity": true}
+            ],
+            "reset_outs": [
+               {"name": "BMC_S0_SYSRESET_L", "polarity": false},
+               {"name": "BMC_S1_SYSRESET_L", "polarity": false}
+            ]
+        }
+    },
+
+    "gpio_definitions": [
+        {
+            "name": "PGOOD",
+            "pin": "F4",
+            "direction": "in"
+        },
+        {
+            "name": "BMC_SYS_PSON_L",
+            "pin": "F2",
+            "direction": "out"
+        },
+        {
+            "name": "BMC_S0_SYSRESET_L",
+            "pin": "L3",
+            "direction": "out"
+        },
+        {
+            "name": "BMC_S1_SYSRESET_L",
+            "pin": "L4",
+            "direction": "out"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "pin": "B4",
+            "direction": "both"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "pin": "R5",
+            "direction": "both"
+        },
+        {
+            "name": "BMC_READY",
+            "pin": "AC5",
+            "direction": "out"
+        }
+    ]
+}

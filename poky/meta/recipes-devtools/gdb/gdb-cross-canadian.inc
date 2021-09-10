@@ -11,16 +11,17 @@ DEPENDS = "nativesdk-ncurses nativesdk-expat nativesdk-gettext \
 GDBPROPREFIX = "--program-prefix='${TARGET_PREFIX}'"
 
 # Overrides PACKAGECONFIG variables in gdb-common.inc
-PACKAGECONFIG ??= "python readline"
+PACKAGECONFIG ??= "python readline ${@bb.utils.filter('DISTRO_FEATURES', 'debuginfod', d)}"
 PACKAGECONFIG[python] = "--with-python=${WORKDIR}/python,--without-python,nativesdk-python3, \
                          nativesdk-python3-core \
                          nativesdk-python3-codecs nativesdk-python3-netclient \
                          "
 PACKAGECONFIG[readline] = "--with-system-readline,--without-system-readline,nativesdk-readline"
+PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod, nativesdk-elfutils"
 
 SSTATE_DUPWHITELIST += "${STAGING_DATADIR}/gdb"
 
-do_configure_prepend() {
+do_configure:prepend() {
 cat > ${WORKDIR}/python << EOF
 #! /bin/sh
 case "\$2" in
@@ -36,7 +37,7 @@ EOF
 
 # we don't want gdb to provide bfd/iberty/opcodes, which instead will override the
 # right bits installed by binutils.
-do_install_append() {
+do_install:append() {
 	rm -rf ${D}${exec_prefix}/lib
 	cross_canadian_bindirlinks
 }

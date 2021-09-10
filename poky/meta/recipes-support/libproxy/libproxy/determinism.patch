@@ -1,0 +1,26 @@
+[PATCH] cmake/modules/config_sysconfig: Allow configuration of sysconfig module
+
+Checking whether the host system has /etc/sysconfig is not deterministic
+when cross compiling. Allow this to be disabled by adding a configure
+option for it. OpenEmbedded can set this and have deterministic build
+output independent of the host OS.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Upstream-Status: Submitted [https://github.com/libproxy/libproxy/pull/160]
+
+Index: libproxy-0.4.17/libproxy/cmake/modules/config_sysconfig.cmk
+===================================================================
+--- libproxy-0.4.17.orig/libproxy/cmake/modules/config_sysconfig.cmk
++++ libproxy-0.4.17/libproxy/cmake/modules/config_sysconfig.cmk
+@@ -1,5 +1,8 @@
+ if (NOT WIN32 AND NOT APPLE)
+-  if (EXISTS "/etc/sysconfig" AND IS_DIRECTORY "/etc/sysconfig")
+-    set(SYSCONFIG_FOUND 1)
++  option(WITH_SYSCONFIG "Build sysconfig module for /etc/sysconfig" ON)
++  if(WITH_SYSCONFIG)
++    if (EXISTS "/etc/sysconfig" AND IS_DIRECTORY "/etc/sysconfig")
++      set(SYSCONFIG_FOUND 1)
++    endif()
+   endif()
+ endif()
+\ No newline at end of file

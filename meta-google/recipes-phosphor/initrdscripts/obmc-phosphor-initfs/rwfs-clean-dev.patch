@@ -1,0 +1,29 @@
+diff --git a/meta-phosphor/recipes-phosphor/initrdscripts/files/obmc-init.sh b/meta-phosphor/recipes-phosphor/initrdscripts/files/obmc-init.sh
+index 62be89f039..689fbea5bf 100644
+--- a/obmc-init.sh
++++ b/obmc-init.sh
+@@ -275,6 +275,14 @@ then
+ 	fi
+ fi
+ 
++# Ensure that we clean our rwfs on version change
++if mount $rwdev $rwdir -t $rwfst -o $rwopts; then
++	if ! cmp "$rwdir"/os-release /etc/os-release 2>/dev/null; then
++		echo "RWFS from older BMC version, cleaning"
++		touch $trigger
++	fi
++	umount "$rwdir"
++fi
+ if grep -w clean-rwfs-filesystem $optfile
+ then
+ 	echo "Cleaning of read-write overlay filesystem requested."
+@@ -399,6 +407,9 @@ HERE
+ 	debug_takeover "$msg"
+ fi
+ 
++# Keep track of the last version to use this rwfs
++cp /etc/os-release "$rwdir"/os-release
++
+ rm -rf $work
+ mkdir -p $upper $work
+ 

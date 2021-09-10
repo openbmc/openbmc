@@ -21,12 +21,15 @@ SRC_URI = "${GNU_MIRROR}/libtool/libtool-${PV}.tar.gz \
            file://unwind-opt-parsing.patch \
            file://0001-libtool-Fix-support-for-NIOS2-processor.patch \
            file://0001-libtool-Check-for-static-libs-for-internal-compiler-.patch \
+           file://0001-Makefile.am-make-sure-autoheader-run-before-autoconf.patch \
+           file://0001-Makefile.am-make-sure-autoheader-run-before-automake.patch \
+           file://lto-prefix.patch \
           "
 
 SRC_URI[md5sum] = "addf44b646ddb4e3919805aa88fa7c5e"
 SRC_URI[sha256sum] = "e3bd4d5d3d025a36c21dd6af7ea818a2afcd4dfc1ea5a17b39d7854bcd0c06e3"
 
-do_compile_prepend () {
+do_compile:prepend () {
 	# Sometimes this file doesn't get rebuilt, force the issue
 	rm -f ${S}/build-aux/ltmain.sh
 	make build-aux/ltmain.sh
@@ -41,9 +44,9 @@ CACHED_CONFIGUREVARS += "ac_cv_path_GREP=grep"
 DEPENDS = "libtool-native"
 
 PACKAGES =+ "libltdl"
-FILES_${PN} += "${datadir}/aclocal"
+FILES:${PN} += "${datadir}/aclocal"
 
-FILES_${PN}-dev_remove = "${datadir}/aclocal"
-FILES_libltdl = "${libdir}/libltdl${SOLIBS}"
+FILES:${PN}-dev:remove = "${datadir}/aclocal"
+FILES:libltdl = "${libdir}/libltdl${SOLIBS}"
 
 export CONFIG_SHELL="/bin/bash"

@@ -1,1 +1,1 @@
-RDEPENDS_${PN}_append_df-openpower = " cf-fsi-firmware"
+RDEPENDS:${PN}:append:df-openpower = " cf-fsi-firmware"

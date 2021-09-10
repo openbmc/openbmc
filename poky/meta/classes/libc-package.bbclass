@@ -42,7 +42,7 @@ python __anonymous () {
 # try to fix disable charsets/locales/locale-code compile fail
 PACKAGE_NO_GCONV ?= "0"
 
-OVERRIDES_append = ":${TARGET_ARCH}-${TARGET_OS}"
+OVERRIDES:append = ":${TARGET_ARCH}-${TARGET_OS}"
 
 locale_base_postinst_ontarget() {
 localedef --inputfile=${datadir}/i18n/locales/%s --charmap=%s %s
@@ -129,9 +129,9 @@ python package_do_split_gconvs () {
                     deps.append(dp)
         f.close()
         if deps != []:
-            d.setVar('RDEPENDS_%s' % pkg, " ".join(deps))
+            d.setVar('RDEPENDS:%s' % pkg, " ".join(deps))
         if bpn != 'glibc':
-            d.setVar('RPROVIDES_%s' % pkg, pkg.replace(bpn, 'glibc'))
+            d.setVar('RPROVIDES:%s' % pkg, pkg.replace(bpn, 'glibc'))
 
     do_split_packages(d, gconv_libdir, file_regex=r'^(.*)\.so$', output_pattern=bpn+'-gconv-%s', \
         description='gconv module for character set %s', hook=calc_gconv_deps, \
@@ -151,9 +151,9 @@ python package_do_split_gconvs () {
                     deps.append(dp)
         f.close()
         if deps != []:
-            d.setVar('RDEPENDS_%s' % pkg, " ".join(deps))
+            d.setVar('RDEPENDS:%s' % pkg, " ".join(deps))
         if bpn != 'glibc':
-            d.setVar('RPROVIDES_%s' % pkg, pkg.replace(bpn, 'glibc'))
+            d.setVar('RPROVIDES:%s' % pkg, pkg.replace(bpn, 'glibc'))
 
     do_split_packages(d, charmap_dir, file_regex=r'^(.*)\.gz$', output_pattern=bpn+'-charmap-%s', \
         description='character map for %s encoding', hook=calc_charmap_deps, extra_depends='')
@@ -172,9 +172,9 @@ python package_do_split_gconvs () {
                     deps.append(dp)
         f.close()
         if deps != []:
-            d.setVar('RDEPENDS_%s' % pkg, " ".join(deps))
+            d.setVar('RDEPENDS:%s' % pkg, " ".join(deps))
         if bpn != 'glibc':
-            d.setVar('RPROVIDES_%s' % pkg, pkg.replace(bpn, 'glibc'))
+            d.setVar('RPROVIDES:%s' % pkg, pkg.replace(bpn, 'glibc'))
 
     do_split_packages(d, locales_dir, file_regex=r'(.*)', output_pattern=bpn+'-localedata-%s', \
         description='locale definition for %s', hook=calc_locale_deps, extra_depends='')
@@ -210,11 +210,11 @@ python package_do_split_gconvs () {
                 supported[locale] = charset
 
     def output_locale_source(name, pkgname, locale, encoding):
-        d.setVar('RDEPENDS_%s' % pkgname, '%slocaledef %s-localedata-%s %s-charmap-%s' % \
+        d.setVar('RDEPENDS:%s' % pkgname, '%slocaledef %s-localedata-%s %s-charmap-%s' % \
         (mlprefix, mlprefix+bpn, legitimize_package_name(locale), mlprefix+bpn, legitimize_package_name(encoding)))
-        d.setVar('pkg_postinst_ontarget_%s' % pkgname, d.getVar('locale_base_postinst_ontarget') \
+        d.setVar('pkg_postinst_ontarget:%s' % pkgname, d.getVar('locale_base_postinst_ontarget') \
         % (locale, encoding, locale))
-        d.setVar('pkg_postrm_%s' % pkgname, d.getVar('locale_base_postrm') % \
+        d.setVar('pkg_postrm:%s' % pkgname, d.getVar('locale_base_postrm') % \
         (locale, encoding, locale))
 
     def output_locale_binary_rdepends(name, pkgname, locale, encoding):
@@ -222,8 +222,8 @@ python package_do_split_gconvs () {
         lcsplit = d.getVar('GLIBC_SPLIT_LC_PACKAGES')
         if lcsplit and int(lcsplit):
             d.appendVar('PACKAGES', ' ' + dep)
-            d.setVar('ALLOW_EMPTY_%s' % dep, '1')
-        d.setVar('RDEPENDS_%s' % pkgname, mlprefix + dep)
+            d.setVar('ALLOW_EMPTY:%s' % dep, '1')
+        d.setVar('RDEPENDS:%s' % pkgname, mlprefix + dep)
 
     commands = {}
 
@@ -293,13 +293,13 @@ python package_do_split_gconvs () {
 
     def output_locale(name, locale, encoding):
         pkgname = d.getVar('MLPREFIX', False) + 'locale-base-' + legitimize_package_name(name)
-        d.setVar('ALLOW_EMPTY_%s' % pkgname, '1')
+        d.setVar('ALLOW_EMPTY:%s' % pkgname, '1')
         d.setVar('PACKAGES', '%s %s' % (pkgname, d.getVar('PACKAGES')))
         rprovides = ' %svirtual-locale-%s' % (mlprefix, legitimize_package_name(name))
         m = re.match(r"(.*)_(.*)", name)
         if m:
             rprovides += ' %svirtual-locale-%s' % (mlprefix, m.group(1))
-        d.setVar('RPROVIDES_%s' % pkgname, rprovides)
+        d.setVar('RPROVIDES:%s' % pkgname, rprovides)
 
         if use_bin == "compile":
             output_locale_binary_rdepends(name, pkgname, locale, encoding)
@@ -343,7 +343,7 @@ python package_do_split_gconvs () {
     def metapkg_hook(file, pkg, pattern, format, basename):
         name = basename.split('/', 1)[0]
         metapkg = legitimize_package_name('%s-binary-localedata-%s' % (mlprefix+bpn, name))
-        d.appendVar('RDEPENDS_%s' % metapkg, ' ' + pkg)
+        d.appendVar('RDEPENDS:%s' % metapkg, ' ' + pkg)
 
     if use_bin == "compile":
         makefile = oe.path.join(d.getVar("WORKDIR"), "locale-tree", "Makefile")
@@ -379,6 +379,6 @@ python package_do_split_gconvs () {
 
 # We want to do this indirection so that we can safely 'return'
 # from the called function even though we're prepending
-python populate_packages_prepend () {
+python populate_packages:prepend () {
     bb.build.exec_func('package_do_split_gconvs', d)
 }

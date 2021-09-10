@@ -1,4 +1,4 @@
-From e528861023bf69df0ad061a59fd4e527c9dde1ce Mon Sep 17 00:00:00 2001
+From 2d02ac91d5a5d72eaddba4894eaa6db3ed8fee62 Mon Sep 17 00:00:00 2001
 From: Otavio Salvador <otavio@ossystems.com.br>
 Date: Thu, 12 May 2011 15:36:03 +0000
 Subject: [PATCH] cmake: support OpenEmbedded Qt4 tool binary names

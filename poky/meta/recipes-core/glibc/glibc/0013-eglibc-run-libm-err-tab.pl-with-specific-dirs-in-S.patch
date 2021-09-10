@@ -1,4 +1,4 @@
-From 21509735678990760d5ebf9d0c65efa4b52b838d Mon Sep 17 00:00:00 2001
+From c5047b8f7d1a17324cfa02b99f07a70ebcec2cf2 Mon Sep 17 00:00:00 2001
 From: Ting Liu <b28495@freescale.com>
 Date: Wed, 19 Dec 2012 04:39:57 -0600
 Subject: [PATCH] eglibc: run libm-err-tab.pl with specific dirs in ${S}
@@ -18,7 +18,7 @@ Signed-off-by: Ting Liu <b28495@freescale.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/manual/Makefile b/manual/Makefile
-index c61e11dcd7..5d859e6f84 100644
+index e83444341e..aa2645bc55 100644
 --- a/manual/Makefile
 +++ b/manual/Makefile
 @@ -103,7 +103,8 @@ $(objpfx)stamp-libm-err: $(..)math/gen-libm-test.py \

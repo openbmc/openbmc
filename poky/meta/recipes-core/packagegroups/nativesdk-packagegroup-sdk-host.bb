@@ -9,7 +9,9 @@ inherit packagegroup nativesdk
 
 PACKAGEGROUP_DISABLE_COMPLEMENTARY = "1"
 
-RDEPENDS_${PN} = "\
+# autoconf pulls in nativesdk-perl but perl-module-integer is needed to 
+# build some recent linux kernels (5.14+) for arm
+RDEPENDS:${PN} = "\
     nativesdk-pkgconfig \
     nativesdk-qemu \
     nativesdk-qemu-helper \
@@ -27,9 +29,10 @@ RDEPENDS_${PN} = "\
     nativesdk-sdk-provides-dummy \
     nativesdk-bison \
     nativesdk-flex \
+    nativesdk-perl-module-integer \
     "
 
-RDEPENDS_${PN}_darwin = "\
+RDEPENDS:${PN}:darwin = "\
     nativesdk-pkgconfig \
     nativesdk-opkg \
     nativesdk-libtool \

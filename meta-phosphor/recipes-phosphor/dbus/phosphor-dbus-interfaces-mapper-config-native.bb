@@ -9,5 +9,5 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit phosphor-mapper
 inherit native
 
-PHOSPHOR_MAPPER_SERVICE_append = " xyz.openbmc_project"
-PHOSPHOR_MAPPER_INTERFACE_append = " xyz.openbmc_project org.freedesktop.DBus.ObjectManager"
+PHOSPHOR_MAPPER_SERVICE:append = " xyz.openbmc_project"
+PHOSPHOR_MAPPER_INTERFACE:append = " xyz.openbmc_project org.freedesktop.DBus.ObjectManager"

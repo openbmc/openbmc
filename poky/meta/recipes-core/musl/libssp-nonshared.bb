@@ -2,11 +2,12 @@
 # Released under the MIT license (see COPYING.MIT for the terms)
 
 SUMMARY = "Minimal libssp_nonshared.a must needed for ssp to work with gcc on musl"
-LICENSE = "GPL-3.0-with-GCC-exception"
-LIC_FILES_CHKSUM = "file://ssp-local.c;beginline=1;endline=32;md5=c06d391208c0cfcbc541a6728ed65cc4"
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://stack_chk.c;beginline=1;endline=30;md5=97e59d9deee678a9332c9ddb2ab6360d"
 SECTION = "libs"
 
-SRC_URI = "file://ssp-local.c"
+# Sourced from https://github.com/intel/linux-sgx/blob/master/sdk/compiler-rt/stack_chk.c
+SRC_URI = "file://stack_chk.c"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -19,8 +20,8 @@ do_configure[noexec] = "1"
 S = "${WORKDIR}"
 
 do_compile() {
-	${CC} ${CPPFLAGS} ${CFLAGS} -fPIE -c ssp-local.c -o ssp-local.o
-	${AR} r libssp_nonshared.a ssp-local.o
+	${CC} ${CPPFLAGS} ${CFLAGS} -fPIE -c stack_chk.c -o stack_chk.o
+	${AR} r libssp_nonshared.a stack_chk.o
 }
 do_install() {
 	install -Dm 0644 ${B}/libssp_nonshared.a ${D}${base_libdir}/libssp_nonshared.a
@@ -29,6 +30,6 @@ do_install() {
 # We will skip parsing for non-musl systems
 #
 COMPATIBLE_HOST = ".*-musl.*"
-RDEPENDS_${PN}-staticdev = ""
-RDEPENDS_${PN}-dev = ""
-RRECOMMENDS_${PN}-dbg = "${PN}-staticdev (= ${EXTENDPKGV})"
+RDEPENDS:${PN}-staticdev = ""
+RDEPENDS:${PN}-dev = ""
+RRECOMMENDS:${PN}-dbg = "${PN}-staticdev (= ${EXTENDPKGV})"

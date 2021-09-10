@@ -10,7 +10,9 @@ GCCPIE ?= "--enable-default-pie"
 
 # _FORTIFY_SOURCE requires -O1 or higher, so disable in debug builds as they use
 # -O0 which then results in a compiler warning.
-lcl_maybe_fortify ?= "${@oe.utils.conditional('DEBUG_BUILD','1','','-D_FORTIFY_SOURCE=2',d)}"
+OPTLEVEL = "${@bb.utils.filter('SELECTED_OPTIMIZATION', '-O0 -O1 -O2 -O3 -Ofast -Og -Os -Oz -O', d)}"
+
+lcl_maybe_fortify ?= "${@oe.utils.conditional('OPTLEVEL','-O0','','${OPTLEVEL} -D_FORTIFY_SOURCE=2',d)}"
 
 # Error on use of format strings that represent possible security problems
 SECURITY_STRINGFORMAT ?= "-Wformat -Wformat-security -Werror=format-security"
@@ -26,48 +28,44 @@ SECURITY_STACK_PROTECTOR ?= "-fstack-protector-strong"
 SECURITY_CFLAGS ?= "${SECURITY_STACK_PROTECTOR} ${SECURITY_PIE_CFLAGS} ${lcl_maybe_fortify} ${SECURITY_STRINGFORMAT}"
 SECURITY_NO_PIE_CFLAGS ?= "${SECURITY_STACK_PROTECTOR} ${lcl_maybe_fortify} ${SECURITY_STRINGFORMAT}"
 
-SECURITY_LDFLAGS ?= "${SECURITY_STACK_PROTECTOR} -Wl,-z,relro,-z,now"
-SECURITY_X_LDFLAGS ?= "${SECURITY_STACK_PROTECTOR} -Wl,-z,relro"
+SECURITY_LDFLAGS ?= "-Wl,-z,relro,-z,now"
+SECURITY_X_LDFLAGS ?= "-Wl,-z,relro"
 
 # powerpc does not get on with pie for reasons not looked into as yet
-GCCPIE_powerpc = ""
-GLIBCPIE_powerpc = ""
-SECURITY_CFLAGS_remove_powerpc = "${SECURITY_PIE_CFLAGS}"
-SECURITY_CFLAGS_pn-libgcc_powerpc = ""
+GCCPIE:powerpc = ""
+GLIBCPIE:powerpc = ""
+SECURITY_CFLAGS:remove:powerpc = "${SECURITY_PIE_CFLAGS}"
+SECURITY_CFLAGS:pn-libgcc:powerpc = ""
 
-SECURITY_CFLAGS_pn-glibc = ""
-SECURITY_CFLAGS_pn-glibc-testsuite = ""
-SECURITY_CFLAGS_pn-gcc-runtime = ""
-SECURITY_CFLAGS_pn-grub = ""
-SECURITY_CFLAGS_pn-grub-efi = ""
-SECURITY_CFLAGS_pn-grub-efi-native = ""
-SECURITY_CFLAGS_pn-grub-efi-x86-native = ""
-SECURITY_CFLAGS_pn-grub-efi-i586-native = ""
-SECURITY_CFLAGS_pn-grub-efi-x86-64-native = ""
-SECURITY_CFLAGS_pn-mkelfimage_x86 = ""
+SECURITY_CFLAGS:pn-glibc = ""
+SECURITY_CFLAGS:pn-glibc-testsuite = ""
+SECURITY_CFLAGS:pn-gcc-runtime = ""
+SECURITY_CFLAGS:pn-grub = ""
+SECURITY_CFLAGS:pn-grub-efi = ""
+SECURITY_CFLAGS:pn-mkelfimage:x86 = ""
 
-SECURITY_CFLAGS_pn-valgrind = "${SECURITY_NOPIE_CFLAGS}"
-SECURITY_LDFLAGS_pn-valgrind = ""
-SECURITY_CFLAGS_pn-sysklogd = "${SECURITY_NOPIE_CFLAGS}"
-SECURITY_LDFLAGS_pn-sysklogd = ""
+SECURITY_CFLAGS:pn-valgrind = "${SECURITY_NOPIE_CFLAGS}"
+SECURITY_LDFLAGS:pn-valgrind = ""
+SECURITY_CFLAGS:pn-sysklogd = "${SECURITY_NOPIE_CFLAGS}"
+SECURITY_LDFLAGS:pn-sysklogd = ""
 
 # Recipes which fail to compile when elevating -Wformat-security to an error
-SECURITY_STRINGFORMAT_pn-busybox = ""
-SECURITY_STRINGFORMAT_pn-gcc = ""
+SECURITY_STRINGFORMAT:pn-busybox = ""
+SECURITY_STRINGFORMAT:pn-gcc = ""
 
-TARGET_CC_ARCH_append_class-target = " ${SECURITY_CFLAGS}"
-TARGET_LDFLAGS_append_class-target = " ${SECURITY_LDFLAGS}"
-TARGET_CC_ARCH_append_class-cross-canadian = " ${SECURITY_CFLAGS}"
-TARGET_LDFLAGS_append_class-cross-canadian = " ${SECURITY_LDFLAGS}"
+TARGET_CC_ARCH:append:class-target = " ${SECURITY_CFLAGS}"
+TARGET_LDFLAGS:append:class-target = " ${SECURITY_LDFLAGS}"
+TARGET_CC_ARCH:append:class-cross-canadian = " ${SECURITY_CFLAGS}"
+TARGET_LDFLAGS:append:class-cross-canadian = " ${SECURITY_LDFLAGS}"
 
-SECURITY_STACK_PROTECTOR_pn-gcc-runtime = ""
-SECURITY_STACK_PROTECTOR_pn-glibc = ""
-SECURITY_STACK_PROTECTOR_pn-glibc-testsuite = ""
+SECURITY_STACK_PROTECTOR:pn-gcc-runtime = ""
+SECURITY_STACK_PROTECTOR:pn-glibc = ""
+SECURITY_STACK_PROTECTOR:pn-glibc-testsuite = ""
 # All xorg module drivers need to be linked this way as well and are
 # handled in recipes-graphics/xorg-driver/xorg-driver-common.inc
-SECURITY_LDFLAGS_pn-xserver-xorg = "${SECURITY_X_LDFLAGS}"
+SECURITY_LDFLAGS:pn-xserver-xorg = "${SECURITY_X_LDFLAGS}"
 
-TARGET_CC_ARCH_append_pn-binutils = " ${SELECTED_OPTIMIZATION}"
-TARGET_CC_ARCH_append_pn-gcc = " ${SELECTED_OPTIMIZATION}"
-TARGET_CC_ARCH_append_pn-gdb = " ${SELECTED_OPTIMIZATION}"
-TARGET_CC_ARCH_append_pn-perf = " ${SELECTED_OPTIMIZATION}"
+TARGET_CC_ARCH:append:pn-binutils = " ${SELECTED_OPTIMIZATION}"
+TARGET_CC_ARCH:append:pn-gcc = " ${SELECTED_OPTIMIZATION}"
+TARGET_CC_ARCH:append:pn-gdb = " ${SELECTED_OPTIMIZATION}"
+TARGET_CC_ARCH:append:pn-perf = " ${SELECTED_OPTIMIZATION}"

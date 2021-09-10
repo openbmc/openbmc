@@ -1,0 +1,42 @@
+From 3d19b0fb882c5e195362a9f0909c474e60070ca0 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@gmail.com>
+Date: Fri, 18 Jun 2021 11:10:36 -0400
+Subject: [PATCH] btrfs-progs: include linux/const.h to fix build with 5.12+
+ headers
+
+btrfs-tools compile fails with mips, musl and 5.12+ headers.
+
+The definition of __ALIGN_KERNEL has moved in 5.12+ kernels, so we
+add an explicit include of const.h to pickup the macro:
+
+  | make: *** [Makefile:595: mkfs.btrfs] Error 1
+  | make: *** Waiting for unfinished jobs....
+  | libbtrfs.a(volumes.o): in function `dev_extent_search_start':
+  | /usr/src/debug/btrfs-tools/5.12.1-r0/git/kernel-shared/volumes.c:464: undefined reference to `__ALIGN_KERNEL'
+  | collect2: error: ld returned 1 exit status
+
+This is safe for older kernel's as well, since the header still
+exists, and is valid to include.
+
+Upstream-status: OE Specific [mips64 + musl + libc-headers]
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ kerncompat.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/kerncompat.h b/kerncompat.h
+index df167fe6..254235bd 100644
+--- a/kerncompat.h
++++ b/kerncompat.h
+@@ -30,6 +30,7 @@
+ #include <linux/types.h>
+ #include <linux/kernel.h>
+ #include <stdint.h>
++#include <linux/const.h>
+ 
+ #include <features.h>
+ 
+-- 
+2.25.1
+

@@ -7,12 +7,12 @@
 # makeinfo from SANITY_REQUIRED_UTILITIES.
 
 TEXDEP = "${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', 'texinfo-replacement-native', 'texinfo-dummy-native', d)}"
-TEXDEP_class-native = "texinfo-dummy-native"
-TEXDEP_class-cross = "texinfo-dummy-native"
-TEXDEP_class-crosssdk = "texinfo-dummy-native"
-TEXDEP_class-cross-canadian = "texinfo-dummy-native"
-DEPENDS_append = " ${TEXDEP}"
+TEXDEP:class-native = "texinfo-dummy-native"
+TEXDEP:class-cross = "texinfo-dummy-native"
+TEXDEP:class-crosssdk = "texinfo-dummy-native"
+TEXDEP:class-cross-canadian = "texinfo-dummy-native"
+DEPENDS:append = " ${TEXDEP}"
 
 # libtool-cross doesn't inherit cross
-TEXDEP_pn-libtool-cross = "texinfo-dummy-native"
+TEXDEP:pn-libtool-cross = "texinfo-dummy-native"
 

@@ -23,4 +23,4 @@ CFLAGS += "-fPIC"
 DEPENDS = "libpng libglu zlib libxrandr libxinerama libxi libxcursor"
 REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
-COMPATIBLE_HOST_libc-musl = "null"
+COMPATIBLE_HOST:libc-musl = "null"

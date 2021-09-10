@@ -5,6 +5,7 @@ gzip are much higher compression and decompression speed at the cost of some \n\
 compression ratio. The lzop compression utility was designed with the goals \n\
 of reliability, speed, portability and with reasonable drop-in compatibility \n\
 to gzip."
+HOMEPAGE = "http://www.lzop.org/"
 DEPENDS += "lzo"
 
 LICENSE = "GPLv2+"
@@ -19,7 +20,7 @@ SRC_URI[sha256sum] = "7e72b62a8a60aff5200a047eea0773a8fb205caf7acbe1774d95147f30
 
 inherit autotools
 
-do_configure_prepend () {
+do_configure:prepend () {
     install -Dm 0644 ${WORKDIR}/acinclude.m4 ${S}/acinclude.m4
 }
 

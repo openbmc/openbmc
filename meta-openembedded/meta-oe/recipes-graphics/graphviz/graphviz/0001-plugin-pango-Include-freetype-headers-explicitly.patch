@@ -18,8 +18,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  plugin/pango/gvtextlayout_pango.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/plugin/pango/gvtextlayout_pango.c b/plugin/pango/gvtextlayout_pango.c
-index d620b29..b0da11c 100644
 --- a/plugin/pango/gvtextlayout_pango.c
 +++ b/plugin/pango/gvtextlayout_pango.c
 @@ -15,6 +15,10 @@
@@ -33,6 +31,3 @@ index d620b29..b0da11c 100644
  #include "gvplugin_render.h"
  #include "agxbuf.h"
  #include "utils.h"
--- 
-2.22.0
-

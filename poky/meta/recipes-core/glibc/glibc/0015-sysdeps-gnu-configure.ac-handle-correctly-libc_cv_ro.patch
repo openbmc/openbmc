@@ -1,4 +1,4 @@
-From c50cae36e90c41849301a9a668adf31e81e43a07 Mon Sep 17 00:00:00 2001
+From b4613f814ba7ba5db95d18116172f81a83ac8f5b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:27:10 +0000
 Subject: [PATCH] sysdeps/gnu/configure.ac: handle correctly

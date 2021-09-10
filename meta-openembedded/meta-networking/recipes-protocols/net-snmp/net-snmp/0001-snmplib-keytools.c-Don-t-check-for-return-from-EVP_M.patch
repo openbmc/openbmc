@@ -1,4 +1,4 @@
-From 89538a973119f1bf976b3a6df157ea940cf32eb5 Mon Sep 17 00:00:00 2001
+From f3ff99736b8cccbba77349b0d10a3cee366a4c87 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 18 Sep 2015 00:28:45 -0400
 Subject: [PATCH] snmplib/keytools.c: Don't check for return from
@@ -10,22 +10,25 @@ EVP_MD_CTX_init() API returns void, it fixes errors with new compilers
 snmplib/keytools.c: In function 'generate_Ku': error: invalid use of void expression
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
 
 ---
- snmplib/keytools.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ snmplib/keytools.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/snmplib/keytools.c b/snmplib/keytools.c
-index 2cf0240..50fd3ea 100644
+index 129a7c0..2fc1efc 100644
 --- a/snmplib/keytools.c
 +++ b/snmplib/keytools.c
-@@ -186,8 +186,7 @@ generate_Ku(const oid * hashtype, u_int hashtype_len,
+@@ -183,10 +183,7 @@ generate_Ku(const oid * hashtype, u_int hashtype_len,
      ctx = EVP_MD_CTX_create();
  #else
      ctx = malloc(sizeof(*ctx));
--    if (!EVP_MD_CTX_init(ctx))
--        return SNMPERR_GENERR;
+-    if (!EVP_MD_CTX_init(ctx)) {
+-        rval = SNMPERR_GENERR;
+-        goto generate_Ku_quit;
+-    }
 +    EVP_MD_CTX_init(ctx);
  #endif
-     if (!EVP_DigestInit(ctx, hashfn))
-         return SNMPERR_GENERR;
+     if (!EVP_DigestInit(ctx, hashfn)) {
+         rval = SNMPERR_GENERR;

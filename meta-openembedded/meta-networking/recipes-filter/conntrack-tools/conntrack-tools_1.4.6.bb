@@ -19,7 +19,7 @@ inherit autotools update-rc.d pkgconfig
 
 INITSCRIPT_NAME = "conntrackd"
 
-do_install_append() {
+do_install:append() {
     install -d ${D}/${sysconfdir}/conntrackd
     install -d ${D}/${sysconfdir}/init.d
     install -m 0644 ${S}/doc/sync/ftfw/conntrackd.conf ${D}/${sysconfdir}/conntrackd/conntrackd.conf.sample

@@ -1,0 +1,146 @@
+From ba70b41346a8d5c9c1a4435f70edbb06e117564d Mon Sep 17 00:00:00 2001
+From: Nagaraju <nmekala@xilinx.com>
+Date: Thu, 19 Dec 2019 12:22:04 +0530
+Subject: [PATCH 44/52] Correcting the register names from slr & shr to rslr &
+ rshr
+
+---
+ gdb/features/microblaze-core.xml               | 4 ++--
+ gdb/features/microblaze-stack-protect.xml      | 4 ++--
+ gdb/features/microblaze-with-stack-protect.c   | 4 ++--
+ gdb/features/microblaze.c                      | 4 ++--
+ gdb/features/microblaze64-core.xml             | 4 ++--
+ gdb/features/microblaze64-stack-protect.xml    | 4 ++--
+ gdb/features/microblaze64-with-stack-protect.c | 4 ++--
+ gdb/features/microblaze64.c                    | 4 ++--
+ gdb/microblaze-tdep.c                          | 2 +-
+ 9 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/gdb/features/microblaze-core.xml b/gdb/features/microblaze-core.xml
+index a87f0f2319..d1f2282fd1 100644
+--- a/gdb/features/microblaze-core.xml
++++ b/gdb/features/microblaze-core.xml
+@@ -64,6 +64,6 @@
+   <reg name="rtlbsx" bitsize="32"/>
+   <reg name="rtlblo" bitsize="32"/>
+   <reg name="rtlbhi" bitsize="32"/>
+-  <reg name="slr" bitsize="32"/>
+-  <reg name="shr" bitsize="32"/>
++  <reg name="rslr" bitsize="32"/>
++  <reg name="rshr" bitsize="32"/>
+ </feature>
+diff --git a/gdb/features/microblaze-stack-protect.xml b/gdb/features/microblaze-stack-protect.xml
+index 1a67f88c18..1b16223406 100644
+--- a/gdb/features/microblaze-stack-protect.xml
++++ b/gdb/features/microblaze-stack-protect.xml
+@@ -7,6 +7,6 @@
+ 
+ <!DOCTYPE feature SYSTEM "gdb-target.dtd">
+ <feature name="org.gnu.gdb.microblaze.stack-protect">
+-  <reg name="slr" bitsize="32"/>
+-  <reg name="shr" bitsize="32"/>
++  <reg name="rslr" bitsize="32"/>
++  <reg name="rshr" bitsize="32"/>
+ </feature>
+diff --git a/gdb/features/microblaze-with-stack-protect.c b/gdb/features/microblaze-with-stack-protect.c
+index 609934e2b4..ab162fd258 100644
+--- a/gdb/features/microblaze-with-stack-protect.c
++++ b/gdb/features/microblaze-with-stack-protect.c
+@@ -72,8 +72,8 @@ initialize_tdesc_microblaze_with_stack_protect (void)
+   tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
+ 
+   feature = tdesc_create_feature (result, "org.gnu.gdb.microblaze.stack-protect");
+-  tdesc_create_reg (feature, "slr", 57, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "shr", 58, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rslr", 57, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rshr", 58, 1, NULL, 32, "int");
+ 
+   tdesc_microblaze_with_stack_protect = result;
+ }
+diff --git a/gdb/features/microblaze.c b/gdb/features/microblaze.c
+index ceb98ca8b8..7919ac96e6 100644
+--- a/gdb/features/microblaze.c
++++ b/gdb/features/microblaze.c
+@@ -70,8 +70,8 @@ initialize_tdesc_microblaze (void)
+   tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
+-  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rslr", 57, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rshr", 58, 1, NULL, 64, "uint64");
+ 
+   tdesc_microblaze = result;
+ }
+diff --git a/gdb/features/microblaze64-core.xml b/gdb/features/microblaze64-core.xml
+index 96e99e2fb2..b9adadfade 100644
+--- a/gdb/features/microblaze64-core.xml
++++ b/gdb/features/microblaze64-core.xml
+@@ -64,6 +64,6 @@
+   <reg name="rtlbsx" bitsize="32"/>
+   <reg name="rtlblo" bitsize="32"/>
+   <reg name="rtlbhi" bitsize="32"/>
+-  <reg name="slr" bitsize="64"/>
+-  <reg name="shr" bitsize="64"/>
++  <reg name="rslr" bitsize="64"/>
++  <reg name="rshr" bitsize="64"/>
+ </feature>
+diff --git a/gdb/features/microblaze64-stack-protect.xml b/gdb/features/microblaze64-stack-protect.xml
+index 1bbf5fc3ce..9d7ea8b9fd 100644
+--- a/gdb/features/microblaze64-stack-protect.xml
++++ b/gdb/features/microblaze64-stack-protect.xml
+@@ -7,6 +7,6 @@
+ 
+ <!DOCTYPE feature SYSTEM "gdb-target.dtd">
+ <feature name="org.gnu.gdb.microblaze64.stack-protect">
+-  <reg name="slr" bitsize="64"/>
+-  <reg name="shr" bitsize="64"/>
++  <reg name="rslr" bitsize="64"/>
++  <reg name="rshr" bitsize="64"/>
+ </feature>
+diff --git a/gdb/features/microblaze64-with-stack-protect.c b/gdb/features/microblaze64-with-stack-protect.c
+index f448c9a749..249cb534da 100644
+--- a/gdb/features/microblaze64-with-stack-protect.c
++++ b/gdb/features/microblaze64-with-stack-protect.c
+@@ -72,8 +72,8 @@ initialize_tdesc_microblaze64_with_stack_protect (void)
+   tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
+ 
+   feature = tdesc_create_feature (result, "org.gnu.gdb.microblaze64.stack-protect");
+-  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
+-  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rslr", 57, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rshr", 58, 1, NULL, 64, "uint64");
+ 
+   tdesc_microblaze64_with_stack_protect = result;
+ }
+diff --git a/gdb/features/microblaze64.c b/gdb/features/microblaze64.c
+index 1aa37c4512..5d3e2c8cd9 100644
+--- a/gdb/features/microblaze64.c
++++ b/gdb/features/microblaze64.c
+@@ -70,8 +70,8 @@ initialize_tdesc_microblaze64 (void)
+   tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
+-  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rslr", 57, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rshr", 58, 1, NULL, 64, "uint64");
+ 
+   tdesc_microblaze64 = result;
+ }
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index f4ea3cc342..041ebf1fca 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -77,7 +77,7 @@ static const char *microblaze_register_names[] =
+   "rpvr0", "rpvr1", "rpvr2", "rpvr3", "rpvr4", "rpvr5", "rpvr6",
+   "rpvr7", "rpvr8", "rpvr9", "rpvr10", "rpvr11",
+   "redr", "rpid", "rzpr", "rtlbx", "rtlbsx", "rtlblo", "rtlbhi",
+-  "slr", "shr"
++  "rslr", "rshr"
+ };
+ 
+ #define MICROBLAZE_NUM_REGS ARRAY_SIZE (microblaze_register_names)
+-- 
+2.17.1
+

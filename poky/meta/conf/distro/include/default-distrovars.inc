@@ -8,9 +8,15 @@ IMAGE_LINGUAS ?= "en-us en-gb"
 ENABLE_BINARY_LOCALE_GENERATION ?= "1"
 LOCALE_UTF8_ONLY ?= "0"
 LOCALE_UTF8_IS_DEFAULT ?= "1"
-LOCALE_UTF8_IS_DEFAULT_class-nativesdk = "0"
+LOCALE_UTF8_IS_DEFAULT:class-nativesdk = "0"
 
-DISTRO_FEATURES_DEFAULT ?= "acl alsa argp bluetooth ext2 ipv4 ipv6 largefile pcmcia usbgadget usbhost wifi xattr nfs zeroconf pci 3g nfc x11 vfat"
+# seccomp is not yet ported to rv32
+DISTRO_FEATURES_DEFAULT:remove:riscv32 = "seccomp"
+
+# seccomp is not yet ported to ARC
+DISTRO_FEATURES_DEFAULT:remove:arc = "seccomp"
+
+DISTRO_FEATURES_DEFAULT ?= "acl alsa argp bluetooth debuginfod ext2 ipv4 ipv6 largefile pcmcia usbgadget usbhost wifi xattr nfs zeroconf pci 3g nfc x11 vfat seccomp"
 DISTRO_FEATURES ?= "${DISTRO_FEATURES_DEFAULT}"
 IMAGE_FEATURES ?= ""
 
@@ -39,8 +45,8 @@ GTK2DISTROFEATURES = "directfb x11"
 GTK3DISTROFEATURES = "x11 wayland"
 
 ARCH_DEFAULT_KERNELIMAGETYPE = "zImage"
-ARCH_DEFAULT_KERNELIMAGETYPE_x86 = "bzImage"
-ARCH_DEFAULT_KERNELIMAGETYPE_x86-64 = "bzImage"
+ARCH_DEFAULT_KERNELIMAGETYPE:x86 = "bzImage"
+ARCH_DEFAULT_KERNELIMAGETYPE:x86-64 = "bzImage"
 KERNEL_IMAGETYPE ??= "${ARCH_DEFAULT_KERNELIMAGETYPE}"
 KERNEL_IMAGETYPES ??= "${KERNEL_IMAGETYPE}"
 

@@ -1,0 +1,25 @@
+#!/bin/sh
+
+cd tests
+
+retval=0
+for t in mtest*
+do
+    mkdir testdb
+    ./$t > /dev/null && ./mdb_stat testdb > /dev/null
+    if [ $? -ne 0 ]; then
+            echo "FAIL: $t"
+            retval=$(( ${retval} + 1))
+    else
+            echo "PASS: $t"
+    fi
+    rm -rf testdb
+done
+
+if [ $retval -eq 0 ] ; then
+    echo "PASS: lmdb"
+else
+    echo "FAIL: lmdb"
+fi
+
+exit $retval

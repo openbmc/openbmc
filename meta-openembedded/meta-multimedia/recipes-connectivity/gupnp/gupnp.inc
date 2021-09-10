@@ -6,10 +6,10 @@ DEPENDS = "e2fsprogs gssdp libsoup-2.4 libxml2"
 
 inherit meson pkgconfig vala gobject-introspection
 
-FILES_${PN} = "${libdir}/*.so.*"
-FILES_${PN}-dev += "${bindir}/gupnp-binding-tool*"
+FILES:${PN} = "${libdir}/*.so.*"
+FILES:${PN}-dev += "${bindir}/gupnp-binding-tool*"
 
-RDEPENDS_${PN}-dev = "python3 python3-xml"
+RDEPENDS:${PN}-dev = "python3 python3-xml"
 
 SYSROOT_PREPROCESS_FUNCS += "gupnp_sysroot_preprocess"
 

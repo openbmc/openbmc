@@ -10,7 +10,7 @@ inherit allarch
 inherit obmc-phosphor-systemd
 inherit setuptools3
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
         python-netserver \
         python-json \
         python-dbus \
@@ -18,7 +18,7 @@ RDEPENDS_${PN} += " \
         pyphosphor-dbus \
         "
 
-SYSTEMD_SERVICE_${PN} += "rest-dbus.service rest-dbus.socket"
+SYSTEMD_SERVICE:${PN} += "rest-dbus.service rest-dbus.socket"
 
 SRC_URI += "git://github.com/openbmc/rest-dbus.git"
 

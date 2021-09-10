@@ -34,7 +34,7 @@ else
 fi
 }
 
-python populate_packages_append () {
+python populate_packages:append () {
     packages = d.getVar('PACKAGES').split()
     pkgdest =  d.getVar('PKGDEST')
     desktop_base = d.getVar('DESKTOPDIR')
@@ -59,16 +59,16 @@ python populate_packages_append () {
                         break
         if desktops_with_mime_found:
             bb.note("adding mime-xdg postinst and postrm scripts to %s" % pkg)
-            postinst = d.getVar('pkg_postinst_%s' % pkg)
+            postinst = d.getVar('pkg_postinst:%s' % pkg)
             if not postinst:
                 postinst = '#!/bin/sh\n'
             postinst += d.getVar('mime_xdg_postinst')
-            d.setVar('pkg_postinst_%s' % pkg, postinst)
-            postrm = d.getVar('pkg_postrm_%s' % pkg)
+            d.setVar('pkg_postinst:%s' % pkg, postinst)
+            postrm = d.getVar('pkg_postrm:%s' % pkg)
             if not postrm:
                 postrm = '#!/bin/sh\n'
             postrm += d.getVar('mime_xdg_postrm')
-            d.setVar('pkg_postrm_%s' % pkg, postrm)
+            d.setVar('pkg_postrm:%s' % pkg, postrm)
             bb.note("adding desktop-file-utils dependency to %s" % pkg)
-            d.appendVar('RDEPENDS_' + pkg, " " + d.getVar('MLPREFIX')+"desktop-file-utils")
+            d.appendVar('RDEPENDS:' + pkg, " " + d.getVar('MLPREFIX')+"desktop-file-utils")
 }

@@ -18,8 +18,8 @@ PE = "1"
 XORG_PN = "libXpm"
 
 PACKAGES =+ "sxpm cxpm"
-FILES_cxpm = "${bindir}/cxpm"
-FILES_sxpm = "${bindir}/sxpm"
+FILES:cxpm = "${bindir}/cxpm"
+FILES:sxpm = "${bindir}/sxpm"
 
 SRC_URI[md5sum] = "6f0ecf8d103d528cfc803aa475137afa"
 SRC_URI[sha256sum] = "9cd1da57588b6cb71450eff2273ef6b657537a9ac4d02d0014228845b935ac25"

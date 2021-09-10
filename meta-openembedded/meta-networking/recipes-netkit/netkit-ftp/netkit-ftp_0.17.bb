@@ -16,7 +16,7 @@ SRC_URI[archive.sha256sum] = "61c913299b81a4671ff089aac821329f7db9bc111aa812993d
 SRC_URI[patch31.md5sum] = "93d71e28ce70df69e080c7f90da63cac"
 SRC_URI[patch31.sha256sum] = "4edd46a32d70daa7ba00f0ebf0118dc5d17dff23d6e46aa21a2722be2e22d1c1"
 
-inherit autotools-brokensep
+inherit autotools-brokensep update-alternatives
 
 CLEANBROKEN = "1"
 
@@ -41,9 +41,13 @@ do_install () {
 }
 
 PACKAGES = "${PN} ${PN}-doc ${BPN}-dbg"
-FILES_${PN} = "${bindir}/*"
-FILES_${PN}-doc = "${mandir}"
-FILES_${PN}-dbg = "${prefix}/src/debug \
+FILES:${PN} = "${bindir}/*"
+FILES:${PN}-doc = "${mandir}"
+FILES:${PN}-dbg = "${prefix}/src/debug \
             ${bindir}/.debug"
 
-RDEPENDS_${PN} = "readline"
+RDEPENDS:${PN} = "readline"
+
+ALTERNATIVE_PRIORITY = "100"
+ALTERNATIVE:${PN} = "ftp"
+ALTERNATIVE_LINK_NAME[ftp] = "${bindir}/ftp"

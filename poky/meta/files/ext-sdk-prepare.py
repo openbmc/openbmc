@@ -44,6 +44,23 @@ def main():
         sdk_targets = []
     else:
         sdk_targets = ' '.join(sys.argv[2:]).split()
+
+    prserv = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'conf', 'prserv.inc')
+    if os.path.isfile(prserv):
+        with open(logfile, 'a') as logf:
+            logf.write('Importing PR data...\n')
+
+            ret = run_command_interruptible('bitbake-prserv-tool import %s' % prserv)
+
+            lastlog = get_last_consolelog()
+            if lastlog:
+                with open(lastlog, 'r') as f:
+                    for line in f:
+                        logf.write(line)
+            if ret:
+                print('ERROR: PR data import failed: error log written to %s' % logfile)
+                return ret
+
     if not sdk_targets:
         # Just do a parse so the cache is primed
         ret = run_command_interruptible('bitbake -p --quiet')

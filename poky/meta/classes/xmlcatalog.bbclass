@@ -4,7 +4,7 @@ DEPENDS = "libxml2-native"
 # "${sysconfdir}/xml/docbook-xml.xml".
 XMLCATALOGS ?= ""
 
-SYSROOT_PREPROCESS_FUNCS_append = " xmlcatalog_sstate_postinst"
+SYSROOT_PREPROCESS_FUNCS:append = " xmlcatalog_sstate_postinst"
 
 xmlcatalog_complete() {
 	ROOTCATALOG="${STAGING_ETCDIR_NATIVE}/xml/catalog"

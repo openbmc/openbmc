@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=8f3499d09ee74a050c0319391ff9d100"
 
 DEPENDS += "perl"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     perl-module-carp \
     perl-module-exporter \
     perl-module-scalar-util \
@@ -21,7 +21,7 @@ RDEPENDS_${PN} += " \
     perl-module-warnings \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     perl-module-base \
     perl-module-file-spec \
     perl-module-io-handle \
@@ -39,7 +39,7 @@ S = "${WORKDIR}/Error-${PV}"
 
 inherit cpan ptest-perl
 
-do_install_prepend() {
+do_install:prepend() {
 	# test requires "-T" (taint) command line option
 	rm -rf ${B}/t/pod-coverage.t
 }

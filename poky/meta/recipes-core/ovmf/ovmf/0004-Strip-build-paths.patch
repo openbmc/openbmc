@@ -1,0 +1,32 @@
+From b7cfe97895e0586d14403ba98e62a0cd9373da96 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Mon, 14 Jun 2021 19:55:08 +0200
+Subject: [PATCH 4/6] Strip build paths
+
+Pass --zero to GenFw in release builds so that the sections that link back to
+the intermediate binaries (containing build paths) are removed.
+
+Upstream-Status: Pending (discussion at https://bugzilla.tianocore.org/show_bug.cgi?id=3256)
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ OvmfPkg/OvmfPkgIa32.dsc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
+index 33fbd76790..06c6d5ce60 100644
+--- a/OvmfPkg/OvmfPkgIa32.dsc
++++ b/OvmfPkg/OvmfPkgIa32.dsc
+@@ -91,6 +91,8 @@
+ 
+ !include NetworkPkg/NetworkBuildOptions.dsc.inc
+ 
++  RELEASE_*_*_GENFW_FLAGS = --zero
++
+ [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
+   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
+   XCODE:*_*_*_DLINK_FLAGS = -seg1addr 0x1000 -segalign 0x1000
+-- 
+2.32.0
+

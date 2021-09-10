@@ -1,21 +1,32 @@
 SUMMARY = "Free peer-reviewed portable C++ source libraries"
+DESCRIPTION = "Provides free peer-reviewed portable C++ source libraries.  The emphasis is on libraries which work well with the C++ \
+Standard Library.  One goal is to establish 'existing practice' and \
+provide reference implementations so that the Boost libraries are suitable for eventual standardization.  Some of the libraries have already been proposed for inclusion in the C++ Standards Committee's \
+upcoming C++ Standard Library Technical Report."
 SECTION = "libs"
-DEPENDS = "bjam-native zlib bzip2"
+DEPENDS = "boost-build-native zlib bzip2"
 
 CVE_PRODUCT = "boost:boost"
 
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
+
+B = "${WORKDIR}/build"
+do_configure[cleandirs] = "${B}"
 
 BOOST_LIBS = "\
 	atomic \
 	chrono \
 	container \
+	context \
 	contract \
+	coroutine \
 	date_time \
 	exception \
+	fiber \
 	filesystem \
 	graph \
+	headers \
 	iostreams \
 	log \
 	math \
@@ -24,22 +35,12 @@ BOOST_LIBS = "\
 	regex \
 	serialization \
 	system \
-	timer \
 	test \
 	thread \
+	timer \
+	type_erasure \
 	wave \
 	"
-
-# only supported by x86 and powerpc
-BOOST_LIBS_append_x86 = " context coroutine"
-BOOST_LIBS_append_x86-64 = " context coroutine"
-BOOST_LIBS_append_powerpc = " context coroutine"
-BOOST_LIBS_append_arm = " context coroutine"
-BOOST_LIBS_append_aarch64 = " context coroutine"
-# need consistent settings for native builds (x86 override not applied for native)
-BOOST_LIBS_remove_class-native = " context coroutine"
-# does not compile
-BOOST_LIBS_remove_mips16e = "wave"
 
 # optional libraries
 PACKAGECONFIG ??= "locale python"
@@ -62,40 +63,43 @@ PACKAGES = "${PN}-dbg ${BOOST_PACKAGES}"
 python __anonymous () {
     packages = []
     extras = []
+    pn = d.getVar("PN")
     mlprefix = d.getVar("MLPREFIX")
     for lib in d.getVar('BOOST_LIBS').split():
         extras.append("--with-%s" % lib)
         pkg = "boost-%s" % (lib.replace("_", "-"))
+        if "-native" in pn:
+            pkg = pkg + "-native"
         packages.append(mlprefix + pkg)
-        if not d.getVar("FILES_%s" % pkg):
-                d.setVar("FILES_%s%s" % (mlprefix, pkg), "${libdir}/libboost_%s*.so.*" % lib)
+        if not d.getVar("FILES:%s" % pkg):
+                d.setVar("FILES:%s%s" % (mlprefix, pkg), "${libdir}/libboost_%s*.so.*" % lib)
         else:
-                d.setVar("FILES_%s%s" % (mlprefix, pkg), d.getVar("FILES_%s" % pkg))
+                d.setVar("FILES:%s%s" % (mlprefix, pkg), d.getVar("FILES:%s" % pkg))
 
     d.setVar("BOOST_PACKAGES", " ".join(packages))
     d.setVar("BJAM_EXTRA", " ".join(extras))
 }
 
 # Override the contents of specific packages
-FILES_${PN}-graph_parallel = "${libdir}/libboost_graph_parallel.so.*"
-FILES_${PN}-locale = "${libdir}/libboost_locale.so.*"
-FILES_${PN}-mpi = "${libdir}/mpi.so ${libdir}/libboost_mpi*.so.*"
-FILES_boost-serialization = "${libdir}/libboost_serialization*.so.* \
+FILES:${PN}-graph_parallel = "${libdir}/libboost_graph_parallel.so.*"
+FILES:${PN}-locale = "${libdir}/libboost_locale.so.*"
+FILES:${PN}-mpi = "${libdir}/mpi.so ${libdir}/libboost_mpi*.so.*"
+FILES:boost-serialization = "${libdir}/libboost_serialization*.so.* \
 	${libdir}/libboost_wserialization*.so.*"
-FILES_boost-test = "${libdir}/libboost_prg_exec_monitor*.so.* \
+FILES:boost-test = "${libdir}/libboost_prg_exec_monitor*.so.* \
 	${libdir}/libboost_unit_test_framework*.so.*"
 
 # -dev last to pick up the remaining stuff
 PACKAGES += "${PN}-dev ${PN}-staticdev"
-FILES_${PN}-dev = "${includedir} ${libdir}/libboost_*.so ${libdir}/cmake"
-FILES_${PN}-staticdev = "${libdir}/libboost_*.a"
+FILES:${PN}-dev = "${includedir} ${libdir}/libboost_*.so ${libdir}/cmake"
+FILES:${PN}-staticdev = "${libdir}/libboost_*.a"
 
 # "boost" is a metapackage which pulls in all boost librabries
 PACKAGES += "${PN}"
-FILES_${PN} = ""
-ALLOW_EMPTY_${PN} = "1"
-RRECOMMENDS_${PN} += "${BOOST_PACKAGES}"
-RRECOMMENDS_${PN}_class-native = ""
+FILES:${PN} = ""
+ALLOW_EMPTY:${PN} = "1"
+RRECOMMENDS:${PN} += "${BOOST_PACKAGES}"
+RRECOMMENDS:${PN}:class-native = ""
 
 # to avoid GNU_HASH QA errors added LDFLAGS to ARCH; a little bit dirty but at least it works
 TARGET_CC_ARCH += "${LDFLAGS}"
@@ -146,26 +150,27 @@ BOOST_PARALLEL_MAKE = "${@oe.utils.parallel_make_argument(d, '-j%d')}"
 BJAM_OPTS    = '${BOOST_PARALLEL_MAKE} -d+2 -q \
 		${BJAM_TOOLS} \
 		-sBOOST_BUILD_USER_CONFIG=${WORKDIR}/user-config.jam \
-		--build-dir=${S}/${TARGET_SYS} \
+		--build-dir=${B} \
 		--disable-icu \
 		${BJAM_EXTRA}'
 
 # Native compilation of bzip2 isn't working
-BJAM_OPTS_append_class-native = ' -sNO_BZIP2=1'
+BJAM_OPTS:append:class-native = ' -sNO_BZIP2=1'
 
 # Adjust the build for x32
-BJAM_OPTS_append_x86-x32 = " abi=x32 address-model=64"
+BJAM_OPTS:append:x86-x32 = " abi=x32 address-model=64"
 
 # cross compiling for arm fails to detect abi, so provide some help
-BJAM_OPTS_append_arm = " abi=aapcs architecture=arm"
-BJAM_OPTS_append_aarch64 = " abi=aapcs address-model=64 architecture=arm"
+BJAM_OPTS:append:arm = " abi=aapcs architecture=arm"
+BJAM_OPTS:append:aarch64 = " abi=aapcs address-model=64 architecture=arm"
 
 do_configure() {
+	cd ${S}
 	cp -f ${S}/boost/config/platform/linux.hpp ${S}/boost/config/platform/linux-gnueabi.hpp
 
 	# D2194:Fixing the failure of "error: duplicate initialization of gcc with the following parameters" during compilation.
 	rm -f ${WORKDIR}/user-config.jam
-	echo 'using gcc : 4.3.1 : ${CXX} : <cflags>"${CFLAGS}" <cxxflags>"${CXXFLAGS}" <linkflags>"${LDFLAGS}" ;' >> ${WORKDIR}/user-config.jam
+	echo 'using gcc : : ${CXX} : <cflags>"${CFLAGS}" <cxxflags>"${CXXFLAGS}" <linkflags>"${LDFLAGS}" ;' >> ${WORKDIR}/user-config.jam
 
 	# If we want Python then we need to tell Boost *exactly* where to find it
 	if ${@bb.utils.contains('BOOST_LIBS', 'python', 'true', 'false', d)}; then
@@ -176,7 +181,7 @@ do_configure() {
 		echo "using mpi : : <find-shared-library>mpi ;" >> ${WORKDIR}/user-config.jam
 	fi
 
-	CC="${BUILD_CC}" CFLAGS="${BUILD_CFLAGS}" ./bootstrap.sh --with-bjam=bjam --with-toolset=gcc
+	CC="${BUILD_CC}" CFLAGS="${BUILD_CFLAGS}" ./bootstrap.sh --with-bjam=b2 --with-toolset=gcc
 
 	# Boost can't be trusted to find Python on it's own, so remove any mention
 	# of it from the boost configuration
@@ -184,8 +189,9 @@ do_configure() {
 }
 
 do_compile() {
-	rm -rf ${S}/${TARGET_SYS}
-	bjam ${BJAM_OPTS} --prefix=${prefix} \
+	cd ${S}
+	b2 ${BJAM_OPTS} \
+		--prefix=${prefix} \
 		--exec-prefix=${exec_prefix} \
 		--libdir=${libdir} \
 		--includedir=${includedir} \
@@ -193,7 +199,8 @@ do_compile() {
 }
 
 do_install() {
-	bjam ${BJAM_OPTS} \
+	cd ${S}
+	b2 ${BJAM_OPTS} \
 		--libdir=${D}${libdir} \
 		--includedir=${D}${includedir} \
 		install

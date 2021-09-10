@@ -6,7 +6,7 @@ HOMEPAGE = "https://github.com/openbmc/ibm-logging"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 SRC_URI += "git://github.com/openbmc/ibm-logging"
-SRCREV = "29c2ec6dd67df321662c906711ec95a4635b372f"
+SRCREV = "1eb63675af793e9c183c89afdb6e0d5a428b727d"
 
 inherit autotools
 inherit pkgconfig
@@ -16,10 +16,11 @@ inherit obmc-phosphor-systemd
 inherit phosphor-dbus-yaml
 
 DEPENDS += " \
-         ibm-dbus-interfaces \
-         phosphor-logging \
-         nlohmann-json \
+         ${PYTHON_PN}-pyyaml-native \
          autoconf-archive-native \
+         phosphor-dbus-interfaces \
+         nlohmann-json \
+         phosphor-logging \
          sdbusplus \
          "
 
@@ -30,19 +31,19 @@ SRC_URI += "file://policyTable.json"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[policy-interface] = "--enable-policy-interface, --disable-policy-interface,,"
 
-PACKAGECONFIG_ibm-ac-server = "policy-interface"
-PACKAGECONFIG_mihawk = "policy-interface"
+PACKAGECONFIG:ibm-ac-server = "policy-interface"
+PACKAGECONFIG:mihawk = "policy-interface"
 
 SERVICE = "com.ibm.Logging.service"
-DBUS_SERVICE_${PN} += "${SERVICE}"
+DBUS_SERVICE:${PN} += "${SERVICE}"
 
 #The link is so that this service will restart if phosphor-logging restarts.
 #The BindsTo in the service will not do the restart, it will only do the
 #original start and a stop.
 LOG_FMT = "../${SERVICE}:xyz.openbmc_project.Logging.service.wants/${SERVICE}"
-SYSTEMD_LINK_${PN} += "${LOG_FMT}"
+SYSTEMD_LINK:${PN} += "${LOG_FMT}"
 
-do_install_append(){
+do_install:append(){
 
     install -d ${D}${datadir}/ibm-logging
 
@@ -58,20 +59,10 @@ do_report(){
 
     ${S}/create_error_reports.py \
         -p ${D}/${datadir}/ibm-logging/policy.json \
-        -y ${STAGING_DIR_NATIVE}${yaml_dir} \
+        -y ${STAGING_DIR_TARGET}${yaml_dir} \
         -e ${WORKDIR}/build/all_errors.json \
         -x ${WORKDIR}/build/policy_crosscheck.txt
 
 }
 
-addtask report
-
-#Collect all of the error YAML files into our recipe-sysroot-native dir.
-do_report[depends] = " \
-                     ibm-logging:do_install \
-                     phosphor-logging-error-logs-native:do_populate_sysroot \
-                     phosphor-dbus-interfaces-native:do_populate_sysroot \
-                     openpower-dbus-interfaces-native:do_populate_sysroot \
-                     openpower-occ-control-native:do_populate_sysroot  \
-                     openpower-debug-collector-native:do_populate_sysroot \
-                     "
+addtask report after do_install

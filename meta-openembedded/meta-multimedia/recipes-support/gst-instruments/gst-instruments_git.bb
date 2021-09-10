@@ -11,10 +11,10 @@ S = "${WORKDIR}/git"
 SRCREV = "3b862e52e5c53ad1023dc6808effa4cb75572c4b"
 SRC_URI = "git://github.com/kirushyk/gst-instruments.git;protocol=https;"
 
-FILES_${PN}-staticdev += "${libdir}/gstreamer-1.0/*a"
-FILES_${PN} += "${libdir}/*"
+FILES:${PN}-staticdev += "${libdir}/gstreamer-1.0/*a"
+FILES:${PN} += "${libdir}/*"
 
-INSANE_SKIP_${PN} = "dev-so"
+INSANE_SKIP:${PN} = "dev-so"
 
 inherit autotools pkgconfig
 

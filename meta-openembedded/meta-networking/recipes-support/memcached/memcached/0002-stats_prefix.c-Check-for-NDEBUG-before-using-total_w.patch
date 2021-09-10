@@ -1,0 +1,48 @@
+From d6294e9166e4875a0572349aabcc5e51acbd2e3c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 4 Jun 2021 11:33:12 -0700
+Subject: [PATCH] stats_prefix.c: Check for NDEBUG before using total_written
+ variable
+
+When using NDEBUG assert macro is ineffective which is caught by latest
+clang and reports that total_written is set but unused. Therefore check
+for NDEBUG to make sure assert is used only when its effective
+
+Fixes
+error: variable 'total_written' set but not used [-Werror,-Wunused-but-set-variable]
+    size_t size = 0, written = 0, total_written = 0;
+                                  ^
+Upstream-Status: Submitted [https://github.com/memcached/memcached/pull/792]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ stats_prefix.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/stats_prefix.c b/stats_prefix.c
+index 62f0d04..d72e514 100644
+--- a/stats_prefix.c
++++ b/stats_prefix.c
+@@ -127,8 +127,10 @@ char *stats_prefix_dump(int *length) {
+     PREFIX_STATS *pfs;
+     char *buf;
+     int i, pos;
+-    size_t size = 0, written = 0, total_written = 0;
+-
++    size_t size = 0, written = 0;
++#ifndef NDEBUG
++    size_t total_written = 0;
++#endif
+     /*
+      * Figure out how big the buffer needs to be. This is the sum of the
+      * lengths of the prefixes themselves, plus the size of one copy of
+@@ -154,8 +156,10 @@ char *stats_prefix_dump(int *length) {
+                            pfs->prefix, pfs->num_gets, pfs->num_hits,
+                            pfs->num_sets, pfs->num_deletes);
+             pos += written;
++#ifndef NDEBUG
+             total_written += written;
+             assert(total_written < size);
++#endif
+         }
+     }
+ 

@@ -116,9 +116,9 @@ class PackageTests(OESelftestTestCase):
 
     # Verify gdb to read symbols from separated debug hardlink file correctly
     def test_gdb_hardlink_debug(self):
-        features = 'IMAGE_INSTALL_append = " selftest-hardlink"\n'
-        features += 'IMAGE_INSTALL_append = " selftest-hardlink-dbg"\n'
-        features += 'IMAGE_INSTALL_append = " selftest-hardlink-gdb"\n'
+        features = 'IMAGE_INSTALL:append = " selftest-hardlink"\n'
+        features += 'IMAGE_INSTALL:append = " selftest-hardlink-dbg"\n'
+        features += 'IMAGE_INSTALL:append = " selftest-hardlink-gdb"\n'
         self.write_config(features)
         bitbake("core-image-minimal")
 
@@ -151,7 +151,7 @@ class PackageTests(OESelftestTestCase):
 
     def test_preserve_ownership(self):
         import os, stat, oe.cachedpath
-        features = 'IMAGE_INSTALL_append = " selftest-chown"\n'
+        features = 'IMAGE_INSTALL:append = " selftest-chown"\n'
         self.write_config(features)
         bitbake("core-image-minimal")
 
@@ -168,6 +168,7 @@ class PackageTests(OESelftestTestCase):
         with runqemu('core-image-minimal') as qemu:
             for path in [ sysconfdir + "/selftest-chown/file",
                           sysconfdir + "/selftest-chown/dir",
-                          sysconfdir + "/selftest-chown/symlink"]:
+                          sysconfdir + "/selftest-chown/symlink",
+                          sysconfdir + "/selftest-chown/fifotest/fifo"]:
                 if not check_ownership(qemu, "test", "test", path):
                     self.fail('Test ownership %s failed' % path)

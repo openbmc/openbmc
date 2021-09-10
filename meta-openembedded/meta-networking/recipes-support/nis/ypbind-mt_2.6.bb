@@ -21,8 +21,8 @@ DEPENDS = " \
            yp-tools \
            ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
           "
-DEPENDS_append_libc-musl = " bsd-headers nss"
-RDEPENDS_${PN} += "yp-tools"
+DEPENDS:append:libc-musl = " bsd-headers nss"
+RDEPENDS:${PN} += "yp-tools"
 
 # ypbind-mt now provides all the functionality of ypbind
 # and is used in place of it.
@@ -39,15 +39,15 @@ SRC_URI[sha256sum] = "0696c0263c4fd48a4ff2ce6c109f05f37aab0f71646d81cb22c7c28591
 
 inherit systemd update-rc.d
 
-SYSTEMD_SERVICE_${PN} = "ypbind.service"
+SYSTEMD_SERVICE:${PN} = "ypbind.service"
 INITSCRIPT_NAME = "ypbind"
 INITSCRIPT_PARAMS = "start 44 3 5 . stop 70 0 1 2 6 ."
 
 CACHED_CONFIGUREVARS = "ac_cv_prog_STRIP=/bin/true"
 
-CFLAGS_append = " -I${STAGING_INCDIR}/nss3 -I${STAGING_INCDIR}/nspr"
+CFLAGS:append = " -I${STAGING_INCDIR}/nss3 -I${STAGING_INCDIR}/nspr"
 
-do_install_append () {
+do_install:append () {
     install -d ${D}${sysconfdir}/init.d
     install -d ${D}${sysconfdir}/rcS.d
 
@@ -58,6 +58,6 @@ do_install_append () {
 }
 
 
-RPROVIDES_${PN} += "${PN}-systemd"
-RREPLACES_${PN} += "${PN}-systemd"
-RCONFLICTS_${PN} += "${PN}-systemd"
+RPROVIDES:${PN} += "${PN}-systemd"
+RREPLACES:${PN} += "${PN}-systemd"
+RCONFLICTS:${PN} += "${PN}-systemd"

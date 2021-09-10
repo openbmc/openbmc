@@ -1,11 +1,11 @@
 UPDATERCPN ?= "${PN}"
 
-DEPENDS_append_class-target = "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', ' update-rc.d initscripts', '', d)}"
+DEPENDS:append:class-target = "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', ' update-rc.d initscripts', '', d)}"
 
 UPDATERCD = "update-rc.d"
-UPDATERCD_class-cross = ""
-UPDATERCD_class-native = ""
-UPDATERCD_class-nativesdk = ""
+UPDATERCD:class-cross = ""
+UPDATERCD:class-native = ""
+UPDATERCD:class-nativesdk = ""
 
 INITSCRIPT_PARAMS ?= "defaults"
 
@@ -62,8 +62,8 @@ python __anonymous() {
     update_rc_after_parse(d)
 }
 
-PACKAGESPLITFUNCS_prepend = "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'populate_packages_updatercd ', '', d)}"
-PACKAGESPLITFUNCS_remove_class-nativesdk = "populate_packages_updatercd "
+PACKAGESPLITFUNCS:prepend = "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'populate_packages_updatercd ', '', d)}"
+PACKAGESPLITFUNCS:remove:class-nativesdk = "populate_packages_updatercd "
 
 populate_packages_updatercd[vardeps] += "updatercd_prerm updatercd_postrm updatercd_postinst"
 populate_packages_updatercd[vardepsexclude] += "OVERRIDES"
@@ -78,7 +78,7 @@ python populate_packages_updatercd () {
         statement = "grep -q -w '/etc/init.d/functions' %s" % path
         if subprocess.call(statement, shell=True) == 0:
             mlprefix = d.getVar('MLPREFIX') or ""
-            d.appendVar('RDEPENDS_' + pkg, ' %sinitd-functions' % (mlprefix))
+            d.appendVar('RDEPENDS:' + pkg, ' %sinitd-functions' % (mlprefix))
 
     def update_rcd_package(pkg):
         bb.debug(1, 'adding update-rc.d calls to postinst/prerm/postrm for %s' % pkg)
@@ -89,25 +89,25 @@ python populate_packages_updatercd () {
 
         update_rcd_auto_depend(pkg)
 
-        postinst = d.getVar('pkg_postinst_%s' % pkg)
+        postinst = d.getVar('pkg_postinst:%s' % pkg)
         if not postinst:
             postinst = '#!/bin/sh\n'
         postinst += localdata.getVar('updatercd_postinst')
-        d.setVar('pkg_postinst_%s' % pkg, postinst)
+        d.setVar('pkg_postinst:%s' % pkg, postinst)
 
-        prerm = d.getVar('pkg_prerm_%s' % pkg)
+        prerm = d.getVar('pkg_prerm:%s' % pkg)
         if not prerm:
             prerm = '#!/bin/sh\n'
         prerm += localdata.getVar('updatercd_prerm')
-        d.setVar('pkg_prerm_%s' % pkg, prerm)
+        d.setVar('pkg_prerm:%s' % pkg, prerm)
 
-        postrm = d.getVar('pkg_postrm_%s' % pkg)
+        postrm = d.getVar('pkg_postrm:%s' % pkg)
         if not postrm:
                 postrm = '#!/bin/sh\n'
         postrm += localdata.getVar('updatercd_postrm')
-        d.setVar('pkg_postrm_%s' % pkg, postrm)
+        d.setVar('pkg_postrm:%s' % pkg, postrm)
 
-        d.appendVar('RRECOMMENDS_' + pkg, " ${MLPREFIX}${UPDATERCD}")
+        d.appendVar('RRECOMMENDS:' + pkg, " ${MLPREFIX}${UPDATERCD}")
 
     # Check that this class isn't being inhibited (generally, by
     # systemd.bbclass) before doing any work.

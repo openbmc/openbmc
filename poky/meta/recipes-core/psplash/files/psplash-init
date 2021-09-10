@@ -7,6 +7,9 @@
 # Default-Stop:
 ### END INIT INFO
 
+. /etc/default/rcS
+export PSPLASH_FIFO_DIR
+
 if [ ! -e /dev/fb0 ]; then
     echo "Framebuffer /dev/fb0 not detected"
     echo "Boot splashscreen disabled"
@@ -23,7 +26,6 @@ for x in $CMDLINE; do
         esac
 done
 
-export PSPLASH_FIFO_DIR=/mnt/.psplash
 [ -d $PSPLASH_FIFO_DIR ] || mkdir -p $PSPLASH_FIFO_DIR
 if ! mountpoint -q $PSPLASH_FIFO_DIR; then
 	mount tmpfs -t tmpfs $PSPLASH_FIFO_DIR -o,size=40k

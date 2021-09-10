@@ -1,0 +1,162 @@
+/*
+    SPDX-License-Identifier: CC-BY-2.0-UK
+*/
+
+body {
+  font-family: Verdana, Sans, sans-serif;
+  margin:  0em auto;
+  color: #333;
+}
+
+h1,h2,h3,h4,h5,h6,h7 {
+  font-family: Arial, Sans;
+  color: #00557D;
+  clear: both;
+}
+
+h1 {
+  font-size: 2em;
+  text-align: left;
+  padding: 0em 0em 0em 0em;
+  margin: 2em 0em 0em 0em;
+}
+
+h2.subtitle {
+  margin: 0.10em 0em 3.0em 0em;
+  padding: 0em 0em 0em 0em;
+  font-size: 1.8em;
+  padding-left: 20%;
+  font-weight: normal;
+  font-style: italic;
+}
+
+h2 {
+  margin: 2em 0em 0.66em 0em;
+  padding: 0.5em 0em 0em 0em;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+h3.subtitle {
+  margin: 0em 0em 1em 0em;
+  padding: 0em 0em 0em 0em;
+  font-size: 142.14%;
+  text-align: right;
+}
+
+h3 {
+  margin: 1em 0em 0.5em 0em;
+  padding: 1em 0em 0em 0em;
+  font-size: 140%;
+  font-weight: bold;
+}
+
+h4 {
+  margin: 1em 0em 0.5em 0em;
+  padding: 1em 0em 0em 0em;
+  font-size: 120%;
+  font-weight: bold;
+}
+
+h5 {
+  margin: 1em 0em 0.5em 0em;
+  padding: 1em 0em 0em 0em;
+  font-size: 110%;
+  font-weight: bold;
+}
+
+h6 {
+  margin: 1em 0em 0em 0em;
+  padding: 1em 0em 0em 0em;
+  font-size: 110%;
+  font-weight: bold;
+}
+
+em {
+  font-weight: bold;
+}
+
+.pre {
+  font-size: medium;
+  font-family: Courier, monospace;
+}
+
+.wy-nav-content a {
+  text-decoration: underline;
+  color: #444;
+  background: transparent;
+}
+
+.wy-nav-content a:hover {
+  text-decoration: underline;
+  background-color: #dedede;
+}
+
+.wy-nav-content a:visited {
+  color: #444;
+}
+
+[alt='Permalink'] { color: #eee; }
+[alt='Permalink']:hover { color: black; }
+
+@media screen {
+    /* content column
+     *
+     * RTD theme's default is 800px as max width for the content, but we have
+     * tables with tons of columns, which need the full width of the view-port.
+     */
+
+    .wy-nav-content{max-width: none; }
+
+    /* inline literal: drop the borderbox, padding and red color */
+    code, .rst-content tt, .rst-content code {
+        color: inherit;
+        border: none;
+        padding: unset;
+        background: inherit;
+        font-size: 85%;
+    }
+
+    .rst-content tt.literal,.rst-content tt.literal,.rst-content code.literal {
+        color: inherit;
+    }
+
+    /* Admonition should be gray, not blue or green */
+    .rst-content .note .admonition-title,
+    .rst-content .tip .admonition-title,
+    .rst-content .warning .admonition-title,
+    .rst-content .caution .admonition-title,
+    .rst-content .important .admonition-title {
+        background: #f0f0f2;
+        color: #00557D;
+
+    }
+
+    .rst-content .note,
+    .rst-content .tip,
+    .rst-content .important,
+    .rst-content .warning,
+    .rst-content .caution  {
+        background: #f0f0f2;
+    }
+
+    /* Remove the icon in front of note/tip element, and before the logo */
+    .icon-home:before, .rst-content .admonition-title:before {
+        display: none
+    }
+
+    /* a custom informalexample container is used in some doc */
+    .informalexample {
+        border: 1px solid;
+        border-color: #aaa;
+        margin: 1em 0em;
+        padding: 1em;
+        page-break-inside: avoid;
+    }
+
+    /* Remove the blue background in the top left corner, around the logo */
+    .wy-side-nav-search {
+        background: inherit;
+    }
+
+}

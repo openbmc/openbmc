@@ -1,0 +1,12 @@
+[Unit]
+Description=Updating MAC Address Service From FRU inventory
+After=xyz.openbmc_project.Inventory.Manager.service
+
+[Service]
+ExecStart=/usr/sbin/ampere_update_mac.sh
+SyslogIdentifier=ampere_update_mac.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy={SYSTEMD_DEFAULT_TARGET}

@@ -1,1 +1,1 @@
-PACKAGECONFIG_append_gsj = " net-bridge reboot-update static-bmc"
+PACKAGECONFIG:append:gsj = " net-bridge reboot-update static-bmc"

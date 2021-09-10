@@ -1,0 +1,30 @@
+From 1c67250308a92d4991ed05d9d240090ab84accae Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Tue, 10 Nov 2020 17:13:50 +0000
+Subject: [PATCH 2/2] tests/util/piglit-shader.c: do not hardcode build path
+ into target binary
+
+This helps reproducibilty.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/util/piglit-shader.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/util/piglit-shader.c b/tests/util/piglit-shader.c
+index 4fd68d21e..c9ea8295e 100644
+--- a/tests/util/piglit-shader.c
++++ b/tests/util/piglit-shader.c
+@@ -73,7 +73,7 @@ piglit_compile_shader(GLenum target, const char *filename)
+ 
+ 	source_dir = getenv("PIGLIT_SOURCE_DIR");
+ 	if (source_dir == NULL) {
+-		source_dir = SOURCE_DIR;
++		source_dir = ".";
+ 	}
+ 
+ 	snprintf(filename_with_path, FILENAME_MAX - 1,
+-- 
+2.17.1
+

@@ -1,4 +1,4 @@
-From 526cb7e26f6dd96c9ee2ffa05ce0a358d3bfbfb3 Mon Sep 17 00:00:00 2001
+From 883feb43129dc39b491e492c7ccfe89aefe53c44 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 27 Nov 2014 14:04:29 +0000
 Subject: [PATCH] qemu: Add missing wacom HID descriptor
@@ -14,15 +14,17 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Upstream-Status: Submitted
 2014/11/27
 
+[update patch context]
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
 ---
  hw/usb/dev-wacom.c | 94 +++++++++++++++++++++++++++++++++++++++++++++-
  1 file changed, 93 insertions(+), 1 deletion(-)
 
-diff --git a/hw/usb/dev-wacom.c b/hw/usb/dev-wacom.c
-index 8ed57b3b..1502928b 100644
---- a/hw/usb/dev-wacom.c
-+++ b/hw/usb/dev-wacom.c
-@@ -74,6 +74,89 @@ static const USBDescStrings desc_strings = {
+Index: qemu-6.0.0/hw/usb/dev-wacom.c
+===================================================================
+--- qemu-6.0.0.orig/hw/usb/dev-wacom.c
++++ qemu-6.0.0/hw/usb/dev-wacom.c
+@@ -69,6 +69,89 @@ static const USBDescStrings desc_strings
      [STR_SERIALNUMBER]     = "1",
  };
  
@@ -112,16 +114,16 @@ index 8ed57b3b..1502928b 100644
  static const USBDescIface desc_iface_wacom = {
      .bInterfaceNumber              = 0,
      .bNumEndpoints                 = 1,
-@@ -91,7 +174,7 @@ static const USBDescIface desc_iface_wacom = {
+@@ -86,7 +169,7 @@ static const USBDescIface desc_iface_wac
                  0x00,          /*  u8  country_code */
                  0x01,          /*  u8  num_descriptors */
-                 0x22,          /*  u8  type: Report */
+                 USB_DT_REPORT, /*  u8  type: Report */
 -                0x6e, 0,       /*  u16 len */
-+                sizeof(qemu_tablet_hid_report_descriptor), 0, /*  u16 len */
++                sizeof(qemu_tablet_hid_report_descriptor), 0,       /*  u16 len */
              },
          },
      },
-@@ -271,6 +354,15 @@ static void usb_wacom_handle_control(USBDevice *dev, USBPacket *p,
+@@ -266,6 +349,15 @@ static void usb_wacom_handle_control(USB
      }
  
      switch (request) {

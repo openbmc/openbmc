@@ -18,7 +18,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=a85eb4ce24033adb6088dd1d6ffc5e5d"
 
 DEPENDS = "groff-native nss libqb kronosnet"
 
-SYSTEMD_SERVICE_${PN} = "corosync.service corosync-notifyd.service \
+SYSTEMD_SERVICE:${PN} = "corosync.service corosync-notifyd.service \
                          ${@bb.utils.contains('PACKAGECONFIG', 'qdevice', 'corosync-qdevice.service', '', d)} \
                          ${@bb.utils.contains('PACKAGECONFIG', 'qnetd', 'corosync-qnetd.service', '', d)} \
 "
@@ -37,12 +37,12 @@ PACKAGECONFIG[systemd] = "--enable-systemd --with-systemddir=${systemd_system_un
 EXTRA_OECONF = "ac_cv_path_BASHPATH=${base_bindir}/bash ap_cv_cc_pie=no"
 EXTRA_OEMAKE = "tmpfilesdir_DATA="
 
-#do_configure_prepend() {
+#do_configure:prepend() {
 #    ( cd ${S}
 #    ${S}/autogen.sh )
 #}
 
-do_install_append() {
+do_install:append() {
     install -D -m 0644 ${WORKDIR}/corosync.conf ${D}/${sysconfdir}/corosync/corosync.conf.example
     install -d ${D}${sysconfdir}/sysconfig/
     install -m 0644 ${S}/init/corosync.sysconfig.example ${D}${sysconfdir}/sysconfig/corosync
@@ -64,11 +64,11 @@ do_install_append() {
     fi
 }
 
-RDEPENDS_${PN} += "bash ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'sysvinit-pidof', 'procps', d)}"
+RDEPENDS:${PN} += "bash ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'sysvinit-pidof', 'procps', d)}"
 
-FILES_${PN}-dbg += "${libexecdir}/lcrso/.debug"
-FILES_${PN}-doc += "${datadir}/snmp/mibs/COROSYNC-MIB.txt"
+FILES:${PN}-dbg += "${libexecdir}/lcrso/.debug"
+FILES:${PN}-doc += "${datadir}/snmp/mibs/COROSYNC-MIB.txt"
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system coroqnetd"
-USERADD_PARAM_${PN} = "--system -d / -M -s /bin/nologin -c 'User for corosync-qnetd' -g coroqnetd coroqnetd"
+GROUPADD_PARAM:${PN} = "--system coroqnetd"
+USERADD_PARAM:${PN} = "--system -d / -M -s /bin/nologin -c 'User for corosync-qnetd' -g coroqnetd coroqnetd"

@@ -1,0 +1,29 @@
+Link libexecinfo if its found, this is needed for musl based systems
+
+Fixes
+ld: libglog.so.0.4.0: undefined reference to `backtrace'
+| collect2: error: ld returned 1 exit status
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -144,6 +144,7 @@ check_cxx_compiler_flag (-Wunnamed-type-
+ check_symbol_exists (snprintf cstdio HAVE_SNPRINTF)
+ 
+ check_library_exists (dbghelp UnDecorateSymbolName "" HAVE_DBGHELP)
++check_library_exists (execinfo backtrace "" HAVE_EXECINFO)
+ 
+ check_cxx_source_compiles ("
+ #include <cstdlib>
+@@ -584,6 +585,10 @@ if (Unwind_FOUND)
+   set (Unwind_DEPENDENCY "find_dependency (Unwind ${Unwind_VERSION})")
+ endif (Unwind_FOUND)
+ 
++if (HAVE_EXECINFO)
++  target_link_libraries (glog PUBLIC execinfo)
++endif (HAVE_EXECINFO)
++
+ if (HAVE_DBGHELP)
+    target_link_libraries (glog PUBLIC dbghelp)
+ endif (HAVE_DBGHELP)

@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 # Calculate the auxiliary firmware revision to be updated in the dev_id.json
 # file. It is calculated from the VERSION_ID field which currently has two
@@ -24,6 +24,9 @@ python do_patch() {
 
     # count from the commit version
     count = re.findall("-(\d{1,4})-", version_id)
+
+    if not count:
+        return
 
     release = re.findall("-r(\d{1,4})", version_id)
     if release:

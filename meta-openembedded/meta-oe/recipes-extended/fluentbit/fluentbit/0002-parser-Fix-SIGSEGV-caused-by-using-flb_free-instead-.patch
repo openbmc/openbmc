@@ -1,0 +1,82 @@
+From 7c3b1dfb174312594d3317c24ed71c60398f653f Mon Sep 17 00:00:00 2001
+From: Ramon Fried <ramon@neureality.ai>
+Date: Wed, 10 Feb 2021 04:23:36 +0200
+Subject: [PATCH] parser: Fix SIGSEGV caused by using flb_free instead of
+ mk_mem_free
+
+Upstream-Status: Backport (fix only for 1.3.5)
+Signed-off-by: Ramon Fried <ramon@neureality.ai>
+---
+ src/flb_parser.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/src/flb_parser.c b/src/flb_parser.c
+index d35c568..7c20e12 100644
+--- a/src/flb_parser.c
++++ b/src/flb_parser.c
+@@ -490,7 +490,7 @@ int flb_parser_conf_file(const char *file, struct flb_config *config)
+                                        MK_RCONF_STR);
+         if (str) {
+             time_keep = flb_utils_bool(str);
+-            flb_free(str);
++            mk_mem_free(str);
+         }
+         else {
+             time_keep = FLB_FALSE;
+@@ -522,23 +522,23 @@ int flb_parser_conf_file(const char *file, struct flb_config *config)
+ 
+         flb_debug("[parser] new parser registered: %s", name);
+ 
+-        flb_free(name);
+-        flb_free(format);
++        mk_mem_free(name);
++        mk_mem_free(format);
+ 
+         if (regex) {
+-            flb_free(regex);
++            mk_mem_free(regex);
+         }
+         if (time_fmt) {
+-            flb_free(time_fmt);
++            mk_mem_free(time_fmt);
+         }
+         if (time_key) {
+-            flb_free(time_key);
++            mk_mem_free(time_key);
+         }
+         if (time_offset) {
+-            flb_free(time_offset);
++            mk_mem_free(time_offset);
+         }
+         if (types_str) {
+-            flb_free(types_str);
++            mk_mem_free(types_str);
+         }
+ 
+         decoders = NULL;
+@@ -548,19 +548,19 @@ int flb_parser_conf_file(const char *file, struct flb_config *config)
+     return 0;
+ 
+  fconf_error:
+-    flb_free(name);
+-    flb_free(format);
++    mk_mem_free(name);
++    mk_mem_free(format);
+     if (regex) {
+-        flb_free(regex);
++        mk_mem_free(regex);
+     }
+     if (time_fmt) {
+-        flb_free(time_fmt);
++        mk_mem_free(time_fmt);
+     }
+     if (time_key) {
+-        flb_free(time_key);
++        mk_mem_free(time_key);
+     }
+     if (types_str) {
+-        flb_free(types_str);
++        mk_mem_free(types_str);
+     }
+     if (decoders) {
+         flb_parser_decoder_list_destroy(decoders);

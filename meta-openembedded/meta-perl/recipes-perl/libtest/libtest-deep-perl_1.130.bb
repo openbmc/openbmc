@@ -35,7 +35,7 @@ S = "${WORKDIR}/Test-Deep-${PV}"
 
 inherit cpan ptest-perl
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     perl-module-dynaloader \
     perl-module-exporter \
     perl-module-fcntl \
@@ -46,7 +46,7 @@ RDEPENDS_${PN} += " \
     perl-module-warnings \
 "
 
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     perl-module-if \
     perl-module-lib \
     perl-module-test-more \

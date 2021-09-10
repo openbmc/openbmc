@@ -1,0 +1,15 @@
+[Unit]
+Description=Decrease GBS fan failsafe speed on host shutdown
+PartOf=host-s5-state.target
+Requires=phosphor-pid-control.service
+After=phosphor-pid-control.service
+Wants=mapper-wait@-xyz-openbmc_project-settings-fanctrl.service
+After=mapper-wait@-xyz-openbmc_project-settings-fanctrl.service
+
+[Service]
+Type=oneshot
+# 102: 40% duty cycle
+ExecStart=/usr/bin/gbs-set-failsafe.sh 102
+
+[Install]
+WantedBy=host-s5-state.target

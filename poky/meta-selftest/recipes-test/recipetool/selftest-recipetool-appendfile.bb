@@ -10,7 +10,6 @@ SRC_URI = "file://installscript.sh \
            file://file1 \
            file://add-file.patch \
            file://subdir \
-           file://selftest-replaceme-src-glob* \
            file://selftest-replaceme-inst-globfile \
            file://selftest-replaceme-inst-todir-globfile \
            file://selftest-replaceme-inst-func"
@@ -27,7 +26,6 @@ do_install() {
 	install -m 0644 ${WORKDIR}/selftest-replaceme-todir ${D}${datadir}
 	install -m 0644 ${WORKDIR}/file1 ${D}${datadir}/selftest-replaceme-renamed
 	install -m 0644 ${WORKDIR}/subdir/fileinsubdir ${D}${datadir}/selftest-replaceme-subdir
-	install -m 0644 ${WORKDIR}/selftest-replaceme-src-globfile ${D}${datadir}/selftest-replaceme-src-globfile
 	cp ${WORKDIR}/selftest-replaceme-inst-glob* ${D}${datadir}/selftest-replaceme-inst-globfile
 	cp ${WORKDIR}/selftest-replaceme-inst-todir-glob* ${D}${datadir}
 	install -d ${D}${sysconfdir}
@@ -36,9 +34,9 @@ do_install() {
 	install_extrafunc
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 	echo "Test file installed by postinst" > $D${datadir}/selftest-replaceme-postinst
 }
 
-FILES_${PN} += "${datadir}"
+FILES:${PN} += "${datadir}"
 

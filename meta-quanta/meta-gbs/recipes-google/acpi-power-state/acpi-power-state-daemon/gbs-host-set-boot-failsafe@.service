@@ -1,0 +1,14 @@
+[Unit]
+Description=Set gBMC boot time failsafe
+Wants=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
+After=mapper-wait@-xyz-openbmc_project-state-chassis%i.service
+After=acpi-power-state.service
+Before=gbs-sysinit.service
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/gbs-set-boot-failsafe.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=gbs-host-ready.target

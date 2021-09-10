@@ -5,7 +5,7 @@ DESCRIPTION = "Grub might require different configuration file for \
 different machines."
 HOMEPAGE = "https://www.gnu.org/software/grub/manual/grub/grub.html#Configuration"
 
-RPROVIDES_${PN} += "virtual/grub-bootconf"
+RPROVIDES:${PN} += "virtual-grub-bootconf"
 
 inherit grub-efi-cfg
 
@@ -29,4 +29,4 @@ do_install() {
 	install grub-bootconf ${D}${EFI_FILES_PATH}/grub.cfg
 }
 
-FILES_${PN} = "${EFI_FILES_PATH}/grub.cfg"
+FILES:${PN} = "${EFI_FILES_PATH}/grub.cfg"

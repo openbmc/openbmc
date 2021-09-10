@@ -18,5 +18,5 @@ S = "${WORKDIR}/git"
 
 PACKAGES += "${PN}-tools"
 
-FILES_${PN} = "${libdir}"
-FILES_${PN}-tools = "${bindir}"
+FILES:${PN} = "${libdir}"
+FILES:${PN}-tools = "${bindir}"

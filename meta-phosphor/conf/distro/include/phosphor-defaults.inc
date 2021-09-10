@@ -52,7 +52,7 @@ VIRTUAL-RUNTIME_obmc-inventory-manager ?= "phosphor-inventory-manager"
 # obmc-led-manager
 #
 # Provides an implementation of the xyz.openbmc_project.ledmanager interface.
-VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager-ledmanager"
+VIRTUAL-RUNTIME_obmc-leds-manager ?= "phosphor-led-manager"
 
 # obmc-led-monitor
 #
@@ -226,9 +226,30 @@ OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
 # phosphor-ipmi-fru-whitelist-native recipe.
 VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
 
+# Set security headers on builds
+require conf/distro/include/security_flags.inc
+
+# Disable security on croserver.
+# Remove if https://github.com/open-power/eCMD/pull/433 is ever merged
+SECURITY_STRINGFORMAT:pn-croserver = ""
+# obmc-libobmc-intf doesn't compile with security flags enabled
+SECURITY_CFLAGS:pn-obmc-libobmc-intf = ""
+
+# remove when https://gerrit.openbmc-project.xyz/c/openbmc/pldm/+/39984
+# is merged and rev bumped
+SECURITY_CFLAGS:pn-pldm = ""
+
+# We generally want to enable LTO with meson
+EXTRA_OEMESON:append:class-target = " -Db_lto=true"
+
 # Set the root password to '0penBmc'
+# Override this in your local.conf
 inherit extrausers
 
-EXTRA_USERS_PARAMS_pn-obmc-phosphor-image = " \
-  usermod -p '\$1\$UGMqyqdG\$FZiylVFmRRfl9Z0Ue8G7e/' root; \
+# This is the default password for the OpenBMC root user account (0penBmc)
+# salted and hashed with SHA512 suitable for /etc/shadow or `usermod -p`.
+DEFAULT_OPENBMC_PASSWORD = "'\$6\$UGMqyqdG\$GqTb3tXPFx9AJlzTw/8X5RoW2Z.100dT.acuk8AFJfNQYr.ZRL8itMIgLqsdq46RNHgiv78XayOSl.IbR4DFU.'"
+
+EXTRA_USERS_PARAMS:pn-obmc-phosphor-image = " \
+  usermod -p ${DEFAULT_OPENBMC_PASSWORD} root; \
   "

@@ -1,0 +1,194 @@
+From f5f363cd879ea60cc8fb5507e8a01533fd0c55a9 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Fri, 27 Jul 2018 16:10:36 +0530
+Subject: [PATCH 06/11] MB-X intial commit
+
+---
+ libgloss/microblaze/crt0.S              | 2 +-
+ libgloss/microblaze/crt1.S              | 2 +-
+ libgloss/microblaze/crt2.S              | 2 +-
+ libgloss/microblaze/crt3.S              | 2 +-
+ libgloss/microblaze/crt4.S              | 2 +-
+ libgloss/microblaze/crtinit.S           | 4 ++--
+ libgloss/microblaze/pgcrtinit.S         | 4 ++--
+ libgloss/microblaze/sim-crtinit.S       | 4 ++--
+ libgloss/microblaze/sim-pgcrtinit.S     | 4 ++--
+ newlib/libc/machine/microblaze/strcmp.c | 8 ++++----
+ 10 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/libgloss/microblaze/crt0.S b/libgloss/microblaze/crt0.S
+index b39ea90b3..865a8c269 100644
+--- a/libgloss/microblaze/crt0.S
++++ b/libgloss/microblaze/crt0.S
+@@ -84,7 +84,7 @@ _vector_hw_exception:
+ _start1:
+ 	la	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+ 	la	r2, r0, _SDA2_BASE_
+-	la	r1, r0, _stack-16           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++	la	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+ 
+ 	brlid	r15, _crtinit               /* Initialize BSS and run program */
+ 	nop
+diff --git a/libgloss/microblaze/crt1.S b/libgloss/microblaze/crt1.S
+index 20323ff6d..a8bf74937 100644
+--- a/libgloss/microblaze/crt1.S
++++ b/libgloss/microblaze/crt1.S
+@@ -75,7 +75,7 @@ _vector_hw_exception:
+ _start:
+ 	la	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+ 	la	r2, r0, _SDA2_BASE_
+-	la	r1, r0, _stack-16           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++	la	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+ 
+ 	brlid	r15, _crtinit               /* Initialize BSS and run program */
+ 	nop
+diff --git a/libgloss/microblaze/crt2.S b/libgloss/microblaze/crt2.S
+index e3fb15b26..34d9f951d 100644
+--- a/libgloss/microblaze/crt2.S
++++ b/libgloss/microblaze/crt2.S
+@@ -73,7 +73,7 @@ _vector_hw_exception:
+ _start:
+ 	la	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+ 	la	r2, r0, _SDA2_BASE_
+-	la	r1, r0, _stack-16           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++	la	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+ 
+ 	brlid	r15, _crtinit               /* Initialize BSS and run program */
+ 	nop
+diff --git a/libgloss/microblaze/crt3.S b/libgloss/microblaze/crt3.S
+index 452ea5265..ebcf207f5 100644
+--- a/libgloss/microblaze/crt3.S
++++ b/libgloss/microblaze/crt3.S
+@@ -59,7 +59,7 @@
+ _start:
+ 	la	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+ 	la	r2, r0, _SDA2_BASE_
+-	la	r1, r0, _stack-16           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++	la	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+ 
+ 	brlid	r15, _crtinit               /* Initialize BSS and run program */
+ 	nop
+diff --git a/libgloss/microblaze/crt4.S b/libgloss/microblaze/crt4.S
+index 475acecfd..4cf0b01a4 100644
+--- a/libgloss/microblaze/crt4.S
++++ b/libgloss/microblaze/crt4.S
+@@ -59,7 +59,7 @@
+ _start:
+ 	la	r13, r0, _SDA_BASE_         /* Set the Small Data Anchors and the stack pointer */
+ 	la	r2, r0, _SDA2_BASE_
+-	la	r1, r0, _stack-16           /* 16 bytes (4 words are needed by crtinit for args and link reg */
++	la	r1, r0, _stack-32           /* 16 bytes (4 words are needed by crtinit for args and link reg */
+ 
+ 	brlid	r15, _crtinit               /* Initialize BSS and run program */
+ 	nop
+diff --git a/libgloss/microblaze/crtinit.S b/libgloss/microblaze/crtinit.S
+index 78eb76df6..86c6dfcb0 100644
+--- a/libgloss/microblaze/crtinit.S
++++ b/libgloss/microblaze/crtinit.S
+@@ -33,7 +33,7 @@
+ 	.ent _crtinit
+         .type _crtinit, @function
+ _crtinit:
+-	addi	r1, r1, -20               	/* Save Link register	 */
++	addi	r1, r1, -40               	/* Save Link register	 */
+ 	swi	r15, r1, 0
+ 
+     	addi	r6, r0, __sbss_start          	/* clear SBSS */
+@@ -82,6 +82,6 @@ _crtinit:
+ 
+         addik   r3, r19, 0                      /* Restore return value */
+ 	rtsd	r15, 8
+-    	addi	r1, r1, 20
++    	addi	r1, r1, 40
+ 	.end _crtinit
+ 
+diff --git a/libgloss/microblaze/pgcrtinit.S b/libgloss/microblaze/pgcrtinit.S
+index fca1bc45e..25930821c 100644
+--- a/libgloss/microblaze/pgcrtinit.S
++++ b/libgloss/microblaze/pgcrtinit.S
+@@ -33,7 +33,7 @@
+ 	.ent _crtinit
+ 
+ _crtinit:
+-	addi	r1, r1, -20               	/* Save Link register	 */
++	addi	r1, r1, -40               	/* Save Link register	 */
+ 	swi	r15, r1, 0
+ 
+ 	addi	r6, r0, __sbss_start          	/* clear SBSS */
+@@ -87,6 +87,6 @@ _crtinit:
+ 	lw	r15, r1, r0                     /* Return back to CRT */
+         addik   r3, r19, 0                      /* Restore return value */  
+ 	rtsd	r15, 8
+-    	addi	r1, r1, 20
++    	addi	r1, r1, 40
+ 	.end _crtinit
+ 
+diff --git a/libgloss/microblaze/sim-crtinit.S b/libgloss/microblaze/sim-crtinit.S
+index d2f59fe6d..74586d9a7 100644
+--- a/libgloss/microblaze/sim-crtinit.S
++++ b/libgloss/microblaze/sim-crtinit.S
+@@ -39,7 +39,7 @@
+ 	.ent _crtinit
+ 
+ _crtinit:
+-	addi	r1, r1, -20               	/* Save Link register	 */
++	addi	r1, r1, -40               	/* Save Link register	 */
+ 	swi	r15, r1, 0
+ 
+     	brlid	r15, _program_init              /* Initialize the program  */
+@@ -64,6 +64,6 @@ _crtinit:
+ 	lw	r15, r1, r0                     /* Return back to CRT   */
+         addik   r3, r19, 0                      /* Restore return value */
+ 	rtsd	r15, 8
+-    	addi	r1, r1, 20
++    	addi	r1, r1, 40
+ 	.end _crtinit
+ 
+diff --git a/libgloss/microblaze/sim-pgcrtinit.S b/libgloss/microblaze/sim-pgcrtinit.S
+index 3c6ba8371..82ebccad4 100644
+--- a/libgloss/microblaze/sim-pgcrtinit.S
++++ b/libgloss/microblaze/sim-pgcrtinit.S
+@@ -39,7 +39,7 @@
+ 	.ent _crtinit
+ 
+ _crtinit:
+-	addi	r1, r1, -20               	/* Save Link register	 */
++	addi	r1, r1, -40               	/* Save Link register	 */
+ 	swi	r15, r1, 0
+ 
+ 	brlid	r15, _program_init              /* Initialize the program */
+@@ -67,6 +67,6 @@ _crtinit:
+ 
+ 	lw	r15, r1, r0                     /* Return back to CRT */
+ 	rtsd	r15, 8
+-    	addi	r1, r1, 20
++    	addi	r1, r1, 40
+ 	.end _crtinit
+ 
+diff --git a/newlib/libc/machine/microblaze/strcmp.c b/newlib/libc/machine/microblaze/strcmp.c
+index 434195e2c..3119d82c5 100644
+--- a/newlib/libc/machine/microblaze/strcmp.c
++++ b/newlib/libc/machine/microblaze/strcmp.c
+@@ -96,15 +96,15 @@ strcmp (const char *s1,
+ 
+   return (*(unsigned char *) s1) - (*(unsigned char *) s2);
+ #else
+-  unsigned long *a1;
+-  unsigned long *a2;
++  unsigned int *a1;
++  unsigned int *a2;
+ 
+   /* If s1 or s2 are unaligned, then compare bytes. */
+   if (!UNALIGNED (s1, s2))
+     {  
+       /* If s1 and s2 are word-aligned, compare them a word at a time. */
+-      a1 = (unsigned long*)s1;
+-      a2 = (unsigned long*)s2;
++      a1 = (unsigned int*)s1;
++      a2 = (unsigned int*)s2;
+       while (*a1 == *a2)
+         {
+           /* To get here, *a1 == *a2, thus if we find a null in *a1,
+-- 
+2.17.1
+

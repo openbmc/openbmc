@@ -21,8 +21,8 @@ require gcc-configure-common.inc
 # gnu) will hit a QA failure.
 LINKER_HASH_STYLE ?= "sysv"
 
-EXTRA_OECONF += "--enable-poison-system-directories"
-EXTRA_OECONF_append_sh4 = " \
+EXTRA_OECONF += "--enable-poison-system-directories=error"
+EXTRA_OECONF:append:sh4 = " \
     --with-multilib-list= \
     --enable-incomplete-targets \
 "
@@ -31,9 +31,9 @@ EXTRA_OECONF += "\
     --with-system-zlib \
 "
 
-EXTRA_OECONF_append_libc-baremetal = " --without-headers"
-EXTRA_OECONF_remove_libc-baremetal = "--enable-threads=posix"
-EXTRA_OECONF_remove_libc-newlib = "--enable-threads=posix"
+EXTRA_OECONF:append:libc-baremetal = " --without-headers"
+EXTRA_OECONF:remove:libc-baremetal = "--enable-threads=posix"
+EXTRA_OECONF:remove:libc-newlib = "--enable-threads=posix"
 
 EXTRA_OECONF_PATHS = "\
     --with-gxx-include-dir=/not/exist${target_includedir}/c++/${BINV} \
@@ -44,7 +44,7 @@ EXTRA_OECONF_PATHS = "\
 ARCH_FLAGS_FOR_TARGET += "-isystem${STAGING_DIR_TARGET}${target_includedir}"
 
 
-do_configure_prepend () {
+do_configure:prepend () {
 	install -d ${RECIPE_SYSROOT}${target_includedir}
 	touch ${RECIPE_SYSROOT}${target_includedir}/limits.h
 }
@@ -83,6 +83,8 @@ INHIBIT_PACKAGE_STRIP = "1"
 
 # Compute how to get from libexecdir to bindir in python (easier than shell)
 BINRELPATH = "${@os.path.relpath(d.expand("${STAGING_DIR_NATIVE}${prefix_native}/bin/${TARGET_SYS}"), d.expand("${libexecdir}/gcc/${TARGET_SYS}/${BINV}"))}"
+# linker plugin path
+LIBRELPATH = "${@os.path.relpath(d.expand("${libexecdir}/gcc/${TARGET_SYS}/${BINV}"), d.expand("${STAGING_LIBDIR_NATIVE}/${TARGET_SYS}/bfd-plugins"))}"
 
 do_install () {
 	( cd ${B}/${TARGET_SYS}/libgcc; oe_runmake 'DESTDIR=${D}' install-unwind_h-forbuild install-unwind_h )
@@ -92,7 +94,7 @@ do_install () {
 	install -d ${D}${target_libdir}
 
 	# Link gfortran to g77 to satisfy not-so-smart configure or hard coded g77
-	# gfortran is fully backwards compatible. This is a safe and practical solution. 
+	# gfortran is fully backwards compatible. This is a safe and practical solution.
 	if [ -n "${@d.getVar('FORTRAN')}" ]; then
 		ln -sf ${STAGING_DIR_NATIVE}${prefix_native}/bin/${TARGET_PREFIX}gfortran ${STAGING_DIR_NATIVE}${prefix_native}/bin/${TARGET_PREFIX}g77 || true
 		fortsymlinks="g77 gfortran"
@@ -118,6 +120,10 @@ do_install () {
 	cp ${S}/libquadmath/quadmath_weak.h ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include/
 
 	find ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include-fixed -type f -not -name "README" -not -name limits.h -not -name syslimits.h | xargs rm -f
+
+	# install LTO linker plugins where binutils tools can find it
+	install -d ${D}${libdir}/bfd-plugins
+	ln -sf ${LIBRELPATH}/liblto_plugin.so ${D}${libdir}/bfd-plugins/liblto_plugin.so
 }
 
 do_package[noexec] = "1"

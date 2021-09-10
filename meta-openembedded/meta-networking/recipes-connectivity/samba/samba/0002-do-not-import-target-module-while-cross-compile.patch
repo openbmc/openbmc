@@ -1,0 +1,67 @@
+From 9ebea97a52e4f70e831dd6402b865c77753ce1cc Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 25 Jun 2019 14:25:08 +0800
+Subject: [PATCH] do not import target module while cross compile
+
+Some modules such as dynamic library maybe cann't be imported
+while cross compile, we just check whether does the module exist.
+
+Signed-off-by: Bian Naimeng <biannm@cn.fujitsu.com>
+
+update to version 4.10.5, and switch to python3
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ buildtools/wafsamba/samba_bundled.py | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/buildtools/wafsamba/samba_bundled.py b/buildtools/wafsamba/samba_bundled.py
+index 5f080dd..cdc115e 100644
+--- a/buildtools/wafsamba/samba_bundled.py
++++ b/buildtools/wafsamba/samba_bundled.py
+@@ -4,6 +4,7 @@ import sys
+ from waflib import Build, Options, Logs
+ from waflib.Configure import conf
+ from wafsamba import samba_utils
++import importlib.util, os
+ 
+ def PRIVATE_NAME(bld, name, private_extension, private_library):
+     '''possibly rename a library to include a bundled extension'''
+@@ -249,17 +250,27 @@ def CHECK_BUNDLED_SYSTEM_PYTHON(conf, libname, modulename, minversion='0.0.0'):
+     # versions
+     minversion = minimum_library_version(conf, libname, minversion)
+ 
+-    try:
+-        m = __import__(modulename)
+-    except ImportError:
+-        found = False
+-    else:
++    # Find module in PYTHONPATH
++    spec = importlib.util._find_spec_from_path(modulename, [os.environ["PYTHONPATH"]])
++    if spec:
+         try:
+-            version = m.__version__
+-        except AttributeError:
++            module = importlib.util.module_from_spec(spec)
++            spec.loader.load_module(module)
++        except ImportError:
+             found = False
++
++            if conf.env.CROSS_COMPILE:
++                # Some modules such as dynamic library maybe cann't be imported
++                # while cross compile, we just check whether the module exist
++                Logs.warn('Cross module[%s] has been found, but can not be loaded.' % (spec.name))
++                found = True
+         else:
+-            found = tuplize_version(version) >= tuplize_version(minversion)
++            try:
++                version = module.__version__
++            except AttributeError:
++                found = False
++            else:
++                found = tuplize_version(version) >= tuplize_version(minversion)
+     if not found and not conf.LIB_MAY_BE_BUNDLED(libname):
+         Logs.error('ERROR: Python module %s of version %s not found, and bundling disabled' % (libname, minversion))
+         sys.exit(1)
+-- 
+2.17.1
+

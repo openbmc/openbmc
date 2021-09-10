@@ -21,7 +21,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=56871e72a5c475289c0d5e4ba3f2ee3a \
                     file://src/oid_ops.c;beginline=378;endline=398;md5=e02c165cb8383e950214baca2fbd664b \
 "
 
-SRC_URI = "http://www.citi.umich.edu/projects/nfsv4/linux/${BPN}/${BP}.tar.gz \
+SRC_URI = "${DEBIAN_MIRROR}/main/libg/${BPN}/${BPN}_${PV}.orig.tar.bz2 \
            file://libgssglue-canon-name.patch  \
            file://libgssglue-gss-inq-cred.patch  \
            file://libgssglue-mglueP.patch \
@@ -29,15 +29,15 @@ SRC_URI = "http://www.citi.umich.edu/projects/nfsv4/linux/${BPN}/${BP}.tar.gz \
            file://libgssglue-fix-CVE-2011-2709.patch \
 "
 
-SRC_URI[md5sum] = "088797f3180702fa54e786496b32e750"
-SRC_URI[sha256sum] = "3f791a75502ba723e5e85e41e5e0c711bb89e2716b7c0ec6e74bd1df6739043a"
+SRC_URI[md5sum] = "5ce81940965fa68c7635c42dcafcddfe"
+SRC_URI[sha256sum] = "bb47b2de78409f461811d0db8595c66e6631a9879c3621a35e4434b104ee52f5"
 
 # gssglue can use krb5, spkm3... as gssapi library, configurable
-RRECOMMENDS_${PN} += "krb5"
+RRECOMMENDS:${PN} += "krb5"
 
 inherit autotools
 
-do_install_append() {
+do_install:append() {
     # install some docs
     install -d -m 0755 ${D}${docdir}/${BPN}
     install -m 0644 ${S}/AUTHORS ${S}/ChangeLog ${S}/NEWS ${S}/README ${D}${docdir}/${BPN}

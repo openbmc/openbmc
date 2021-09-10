@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 inherit texinfo update-alternatives
 
-ALTERNATIVE_${PN} = "time"
+ALTERNATIVE:${PN} = "time"
 ALTERNATIVE_PRIORITY = "100"
 
 BBCLASSEXTEND = "native nativesdk"

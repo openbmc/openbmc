@@ -1,0 +1,5 @@
+/xyz/openbmc_project/inventory/system/board/G220A:
+    eventReadingType: 111
+    offset: 2
+    sensorID: 251
+    sensorType: 18

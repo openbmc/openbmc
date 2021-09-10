@@ -1,0 +1,15 @@
+[Unit]
+Description=Enable Host Boot
+Wants=phosphor-ipmi-host.service
+After=phosphor-ipmi-host.service
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c "host-boot-enable.sh"
+SyslogIdentifier=host-boot-enable
+Restart=always
+RestartSec=5
+StartLimitInterval=0
+
+[Install]
+WantedBy=multi-user.target

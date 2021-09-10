@@ -1,0 +1,56 @@
+From 20ac1f939a8a97b03abec55d865050fdaa0f343a Mon Sep 17 00:00:00 2001
+From: Eugene Tarassov <eugenet@xilinx.com>
+Date: Tue, 8 Jan 2019 21:56:16 -0800
+Subject: [oe-core][PATCH 1/1] Fixed copyright messages
+
+Upstream-Status: Backport [https://git.eclipse.org/c/tcf/org.eclipse.tcf.agent.git/commit/?id=20ac1f939a8a97b03abec55d865050fdaa0f343a]
+
+Signed-off-by: Joe Slater <joe.slater@windriver.com>
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ agent/tcf/framework/channel_lws.c      |  2 +-
+ agent/tcf/framework/cpudefs-mdep-mux.h | 19 +++++++++++++------
+ 2 files changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/agent/tcf/framework/channel_lws.c b/agent/tcf/framework/channel_lws.c
+index 0cb9585..d9352f3 100644
+--- a/tcf/framework/channel_lws.c
++++ b/tcf/framework/channel_lws.c
+@@ -1,5 +1,5 @@
+ /*******************************************************************************
+- * Copyright (c) 2016-2017 Wind River Systems, Inc.
++ * Copyright (c) 2016-2018 Wind River Systems, Inc. and others.
+  * All rights reserved. This program and the accompanying materials
+  * are made available under the terms of the Eclipse Public License v1.0
+  * and Eclipse Distribution License v1.0 which accompany this distribution.
+diff --git a/agent/tcf/framework/cpudefs-mdep-mux.h b/agent/tcf/framework/cpudefs-mdep-mux.h
+index c9e0db7..0397a6a 100644
+--- a/tcf/framework/cpudefs-mdep-mux.h
++++ b/tcf/framework/cpudefs-mdep-mux.h
+@@ -1,10 +1,17 @@
+-/*
+- * Copyright (c) 2013 Wind River Systems, Inc.
++/*******************************************************************************
++ * Copyright (c) 2013 Wind River Systems, Inc. and others.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * and Eclipse Distribution License v1.0 which accompany this distribution.
++ * The Eclipse Public License is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ * and the Eclipse Distribution License is available at
++ * http://www.eclipse.org/org/documents/edl-v10.php.
++ * You may elect to redistribute this code under either of these licenses.
+  *
+- * The right to copy, distribute, modify or otherwise make use
+- * of this software may be licensed only pursuant to the terms
+- * of an applicable Wind River license agreement.
+- */
++ * Contributors:
++ *     Wind River Systems - initial API and implementation
++ *******************************************************************************/
+ 
+ #include <tcf/config.h>
+ 
+-- 
+2.7.4
+

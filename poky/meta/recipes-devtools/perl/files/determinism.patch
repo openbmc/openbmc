@@ -21,19 +21,6 @@ RP 2020/2/7
 Upstream-Status: Pending [75% submitted]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
 
-Index: perl-5.30.1/cnf/configure_mods.sh
-===================================================================
---- perl-5.30.1.orig/cnf/configure_mods.sh
-+++ perl-5.30.1/cnf/configure_mods.sh
-@@ -82,7 +82,7 @@ extonlyif() {
- }
- 
- definetrimspaces() {
--	v=`echo "$2" | sed -r -e 's/\s+/ /g' -e 's/^\s+//' -e 's/\s+$//'`
-+	v=`echo "$2" | sed -r -e 's/\s+/ /g' -e 's/^\s+//' -e 's/\s+$//' | xargs -n1 | LANG=C sort | xargs`
- 	define $1 "$v"
- }
- 
 Index: perl-5.30.1/cpan/Encode/Byte/Makefile.PL
 ===================================================================
 --- perl-5.30.1.orig/cpan/Encode/Byte/Makefile.PL
@@ -56,13 +43,3 @@ Index: perl-5.30.1/cpan/Encode/Byte/Makefile.PL
      {
          print FILELIST $self->catfile($dir,$file) . "\n";
      }
-Index: perl-5.30.1/cnf/configure
-===================================================================
---- perl-5.30.1.orig/cnf/configure
-+++ perl-5.30.1/cnf/configure
-@@ -1,4 +1,4 @@
--#!/bin/sh
-+#!/bin/bash
- 
- base=${0%/*}; test -z "$base" && base=.
- 

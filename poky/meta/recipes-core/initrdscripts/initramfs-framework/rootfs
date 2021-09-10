@@ -13,7 +13,7 @@ rootfs_run() {
 	C=0
 	delay=${bootparam_rootdelay:-1}
 	timeout=${bootparam_roottimeout:-5}
-	while [ ! -d $ROOTFS_DIR/dev ]; do
+	while ! mountpoint -q $ROOTFS_DIR; do
 		if [ $(( $C * $delay )) -gt $timeout ]; then
 			fatal "root '$bootparam_root' doesn't exist or does not contain a /dev."
 		fi
@@ -24,24 +24,13 @@ rootfs_run() {
 			if [ "`echo ${bootparam_root} | cut -c1-5`" = "UUID=" ]; then
 				root_uuid=`echo $bootparam_root | cut -c6-`
 				bootparam_root="/dev/disk/by-uuid/$root_uuid"
-			fi
-
-			if [ "`echo ${bootparam_root} | cut -c1-9`" = "PARTUUID=" ]; then
+			elif [ "`echo ${bootparam_root} | cut -c1-9`" = "PARTUUID=" ]; then
 				root_partuuid=`echo $bootparam_root | cut -c10-`
 				bootparam_root="/dev/disk/by-partuuid/$root_partuuid"
-			fi
-
-			if [ "`echo ${bootparam_root} | cut -c1-10`" = "PARTLABEL=" ]; then
+			elif [ "`echo ${bootparam_root} | cut -c1-10`" = "PARTLABEL=" ]; then
 				root_partlabel=`echo $bootparam_root | cut -c11-`
 				bootparam_root="/dev/disk/by-partlabel/$root_partlabel"
-			fi
-
-			if [ "`echo ${bootparam_root} | cut -c1-10`" = "PARTLABEL=" ]; then
-				root_partlabel=`echo $bootparam_root | cut -c11-`
-				bootparam_root="/dev/disk/by-partlabel/$root_partlabel"
-			fi
-
-			if [ "`echo ${bootparam_root} | cut -c1-6`" = "LABEL=" ]; then
+			elif [ "`echo ${bootparam_root} | cut -c1-6`" = "LABEL=" ]; then
 				root_label=`echo $bootparam_root | cut -c7-`
 				bootparam_root="/dev/disk/by-label/$root_label"
 			fi
@@ -61,14 +50,14 @@ rootfs_run() {
 					flags="$flags -t$bootparam_rootfstype"
 				fi
 				mount $flags $bootparam_root $ROOTFS_DIR
-				if [ -d $ROOTFS_DIR/dev ]; then
+				if mountpoint -q $ROOTFS_DIR; then
 					break
 				else
 					# It is unlikely to change, but keep trying anyway.
 					# Perhaps we pick a different device next time.
 					umount $ROOTFS_DIR
-					fi
 				fi
+			fi
 		fi
 		debug "Sleeping for $delay second(s) to wait root to settle..."
 		sleep $delay

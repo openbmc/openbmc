@@ -3,7 +3,7 @@
 #  DBUS_PACKAGES ?= "${PN}"
 #    The list of packages to which files should be added.
 #
-#  DBUS_SERVICE_${PN} += "org.openbmc.Foo.service"
+#  DBUS_SERVICE:${PN} += "org.openbmc.Foo.service"
 #    A list of dbus service names.  The class will look for a
 #    dbus configuration file with the same base name with .conf
 #    appended.  If one is found, it is added to the package
@@ -11,7 +11,7 @@
 #    (with very open permissions) is generated and used.
 #
 #    Additionally the class will instantiate obmc-phosphor-systemd
-#    with any SYSTEMD_SERVICE_%s variables translated appropriately.
+#    with any SYSTEMD_SERVICE:%s variables translated appropriately.
 #
 #    If a service begins with 'dbus-' DBus activation will be
 #    configured.  The class will look for an activation file
@@ -23,7 +23,7 @@
 inherit dbus-dir
 inherit obmc-phosphor-utils
 
-RDEPENDS_${PN}_append_class-target = " dbus-perms"
+RDEPENDS:${PN}:append:class-target = " dbus-perms"
 DBUS_PACKAGES ?= "${PN}"
 
 _INSTALL_DBUS_CONFIGS=""
@@ -95,12 +95,12 @@ python() {
         path = bb.utils.which(searchpaths, '%s.conf' % unit.base)
         if not os.path.isfile(path):
             user = get_user(d, unit.name, pkg)
-            set_append(d, '_DEFAULT_DBUS_CONFIGS', '%s:%s' % (
+            set_doappend(d, '_DEFAULT_DBUS_CONFIGS', '%s:%s' % (
                 unit.name, user))
         else:
-            set_append(d, 'SRC_URI', 'file://%s.conf' % unit.base)
-            set_append(d, '_INSTALL_DBUS_CONFIGS', '%s.conf' % unit.base)
-        set_append(d, 'FILES_%s' % pkg, '%s%s.conf' \
+            set_doappend(d, 'SRC_URI', 'file://%s.conf' % unit.base)
+            set_doappend(d, '_INSTALL_DBUS_CONFIGS', '%s.conf' % unit.base)
+        set_doappend(d, 'FILES:%s' % pkg, '%s%s.conf' \
             % (d.getVar('dbus_system_confdir', True), unit.base))
 
 
@@ -115,12 +115,12 @@ python() {
 
         if not os.path.isfile(path):
             user = get_user(d, unit.base, pkg)
-            set_append(d, '_DEFAULT_DBUS_ACTIVATIONS', '%s:%s' % (
+            set_doappend(d, '_DEFAULT_DBUS_ACTIVATIONS', '%s:%s' % (
                 unit.name, user))
         else:
-            set_append(d, 'SRC_URI', 'file://%s' % search_match)
-            set_append(d, '_INSTALL_DBUS_ACTIVATIONS', search_match)
-        set_append(d, 'FILES_%s' % pkg, '%s%s' \
+            set_doappend(d, 'SRC_URI', 'file://%s' % search_match)
+            set_doappend(d, '_INSTALL_DBUS_ACTIVATIONS', search_match)
+        set_doappend(d, 'FILES:%s' % pkg, '%s%s' \
             % (d.getVar('dbus_system_servicesdir', True), search_match))
 
 
@@ -131,9 +131,9 @@ python() {
 
     for pkg in listvar_to_list(d, 'DBUS_PACKAGES'):
         if pkg not in (d.getVar('SYSTEMD_PACKAGES', True) or ''):
-            set_append(d, 'SYSTEMD_PACKAGES', pkg)
+            set_doappend(d, 'SYSTEMD_PACKAGES', pkg)
 
-        svc = listvar_to_list(d, 'DBUS_SERVICE_%s' % pkg)
+        svc = listvar_to_list(d, 'DBUS_SERVICE:%s' % pkg)
         svc = [SystemdUnit(x) for x in svc]
         inst = [x for x in svc if x.is_instance]
         tmpl = [x.template for x in svc if x.is_instance]
@@ -142,20 +142,20 @@ python() {
         svc = [x for x in svc if not x.is_instance]
 
         for unit in inst:
-            set_append(
-                d, 'SYSTEMD_SERVICE_%s' % pkg, unit.name)
+            set_doappend(
+                d, 'SYSTEMD_SERVICE:%s' % pkg, unit.name)
 
         for unit in tmpl + svc:
             add_dbus_config(d, unit, pkg)
             add_dbus_activation(d, unit, pkg)
-            set_append(
-                d, 'SYSTEMD_SERVICE_%s' % pkg, unit.name)
-            set_append(d, 'SYSTEMD_SUBSTITUTIONS',
+            set_doappend(
+                d, 'SYSTEMD_SERVICE:%s' % pkg, unit.name)
+            set_doappend(d, 'SYSTEMD_SUBSTITUTIONS',
                 'BUSNAME:%s:%s' % (unit.base, unit.name))
 }
 
 
-do_install_append() {
+do_install:append() {
         # install the dbus configuration files
         [ -z "${_INSTALL_DBUS_CONFIGS}" ] && \
                 [ -z "${_DEFAULT_DBUS_CONFIGS}" ] || \

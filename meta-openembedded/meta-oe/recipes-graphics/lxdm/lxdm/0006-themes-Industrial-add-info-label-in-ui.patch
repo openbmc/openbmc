@@ -1,0 +1,124 @@
+From 8414d63343cc7909bc7a972941c678509d5d5be6 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Mon, 11 Jan 2021 10:15:45 +0800
+Subject: [PATCH 6/8] themes/Industrial: add info label in ui
+
+Adjust the layout and add a new label "info" under the labe "prompt" in
+themes/Industrial to tell user some useful information such as
+"Authentication failed" or "Invalid password".
+
+Upstream-Status: Submitted [https://sourceforge.net/p/lxdm/code/merge-requests/1/]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ data/themes/Industrial/greeter-gtk3.ui | 27 +++++++++++++++++++++++++-
+ data/themes/Industrial/greeter.ui      | 27 +++++++++++++++++++++++++-
+ data/themes/Industrial/gtk.css         |  5 +++++
+ 3 files changed, 57 insertions(+), 2 deletions(-)
+
+diff --git a/data/themes/Industrial/greeter-gtk3.ui b/data/themes/Industrial/greeter-gtk3.ui
+index 2f4e631..e59eee3 100644
+--- a/data/themes/Industrial/greeter-gtk3.ui
++++ b/data/themes/Industrial/greeter-gtk3.ui
+@@ -45,7 +45,12 @@
+                     <property name="xscale">0</property>
+                     <property name="yscale">0</property>
+                     <child>
+-                      <object class="GtkHBox" id="hbox3">
++                      <object class="GtkVBox" id="vbox3">
++                      <property name="visible">True</property>
++                      <property name="orientation">vertical</property>
++                      <property name="spacing">12</property>
++                      <child>
++                        <object class="GtkHBox" id="hbox3">
+                         <property name="visible">True</property>
+                         <property name="spacing">12</property>
+                         <child>
+@@ -91,6 +96,26 @@
+                           </packing>
+                         </child>
+                       </object>
++                      </child>
++                      <child>
++                        <object class="GtkHBox" id="hbox4">
++                        <property name="visible">True</property>
++                        <property name="spacing">12</property>
++                        <child>
++                          <object class="GtkLabel" id="info">
++                            <property name="visible">True</property>
++                            <property name="label" translatable="yes"></property>
++                            <property name="yalign">0.2</property>
++                          </object>
++                          <packing>
++                            <property name="expand">False</property>
++                            <property name="fill">False</property>
++                            <property name="position">0</property>
++                          </packing>
++                        </child>
++                        </object>
++                      </child>
++                      </object>
+                     </child>
+                   </object>
+                   <packing>
+diff --git a/data/themes/Industrial/greeter.ui b/data/themes/Industrial/greeter.ui
+index 3413922..6a02d8d 100644
+--- a/data/themes/Industrial/greeter.ui
++++ b/data/themes/Industrial/greeter.ui
+@@ -47,7 +47,12 @@
+                     <property name="xscale">0</property>
+                     <property name="yscale">0</property>
+                     <child>
+-                      <object class="GtkHBox" id="hbox3">
++                      <object class="GtkVBox" id="vbox3">
++                      <property name="visible">True</property>
++                      <property name="orientation">vertical</property>
++                      <property name="spacing">12</property>
++                      <child>
++                        <object class="GtkHBox" id="hbox3">
+                         <property name="visible">True</property>
+                         <property name="spacing">12</property>
+                         <child>
+@@ -93,6 +98,26 @@
+                           </packing>
+                         </child>
+                       </object>
++                      </child>
++                      <child>
++                        <object class="GtkHBox" id="hbox4">
++                        <property name="visible">True</property>
++                        <property name="spacing">12</property>
++                        <child>
++                          <object class="GtkLabel" id="info">
++                            <property name="visible">True</property>
++                            <property name="label" translatable="yes"></property>
++                            <property name="yalign">0.2</property>
++                          </object>
++                          <packing>
++                            <property name="expand">False</property>
++                            <property name="fill">False</property>
++                            <property name="position">0</property>
++                          </packing>
++                        </child>
++                        </object>
++                      </child>
++                      </object>
+                     </child>
+                   </object>
+                   <packing>
+diff --git a/data/themes/Industrial/gtk.css b/data/themes/Industrial/gtk.css
+index 7621345..be15f43 100644
+--- a/data/themes/Industrial/gtk.css
++++ b/data/themes/Industrial/gtk.css
+@@ -22,3 +22,8 @@
+ 	font: Sans 12;
+ 	color: #9E9D9B;
+ }
++
++#info {
++        font: Sans 14;
++        font-style: italic;
++}
+-- 
+2.25.1
+

@@ -1,0 +1,56 @@
+From dbcf296f84e5cef6a3ff0f1c469a4508f1e0fb15 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 15 Nov 2020 15:32:39 -0800
+Subject: [PATCH] numpy/core: Define RISCV-32 support
+
+Helps compile on riscv32
+
+Upstream-Status: Submitted [https://github.com/numpy/numpy/pull/17780]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ numpy/core/include/numpy/npy_cpu.h    | 9 +++++++--
+ numpy/core/include/numpy/npy_endian.h | 1 +
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/numpy/core/include/numpy/npy_cpu.h b/numpy/core/include/numpy/npy_cpu.h
+index 4dbf9d84e..bc41a7eda 100644
+--- a/numpy/core/include/numpy/npy_cpu.h
++++ b/numpy/core/include/numpy/npy_cpu.h
+@@ -18,6 +18,7 @@
+  *              NPY_CPU_ARCEL
+  *              NPY_CPU_ARCEB
+  *              NPY_CPU_RISCV64
++ *              NPY_CPU_RISCV32
+  *              NPY_CPU_WASM
+  */
+ #ifndef _NPY_CPUARCH_H_
+@@ -100,8 +101,12 @@
+     #define NPY_CPU_ARCEL
+ #elif defined(__arc__) && defined(__BIG_ENDIAN__)
+     #define NPY_CPU_ARCEB
+-#elif defined(__riscv) && defined(__riscv_xlen) && __riscv_xlen == 64
+-    #define NPY_CPU_RISCV64
++#elif defined(__riscv)
++    #if __riscv_xlen == 64
++	#define NPY_CPU_RISCV64
++    #elif __riscv_xlen == 32
++	#define NPY_CPU_RISCV32
++    #endif
+ #elif defined(__EMSCRIPTEN__)
+     /* __EMSCRIPTEN__ is defined by emscripten: an LLVM-to-Web compiler */
+     #define NPY_CPU_WASM
+diff --git a/numpy/core/include/numpy/npy_endian.h b/numpy/core/include/numpy/npy_endian.h
+index aa367a002..d59484573 100644
+--- a/numpy/core/include/numpy/npy_endian.h
++++ b/numpy/core/include/numpy/npy_endian.h
+@@ -49,6 +49,7 @@
+             || defined(NPY_CPU_PPC64LE)       \
+             || defined(NPY_CPU_ARCEL)         \
+             || defined(NPY_CPU_RISCV64)       \
++            || defined(NPY_CPU_RISCV32)       \
+             || defined(NPY_CPU_WASM)
+         #define NPY_BYTE_ORDER NPY_LITTLE_ENDIAN
+     #elif defined(NPY_CPU_PPC)                \
+-- 
+2.29.2
+

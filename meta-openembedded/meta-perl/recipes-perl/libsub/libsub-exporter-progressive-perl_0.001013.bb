@@ -21,7 +21,7 @@ S = "${WORKDIR}/Sub-Exporter-Progressive-${PV}"
 
 inherit cpan
 
-RDEPENDS_${PN} += " perl-module-carp \
+RDEPENDS:${PN} += " perl-module-carp \
                     perl-module-list-util \
 "
 

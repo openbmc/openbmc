@@ -21,6 +21,6 @@ class TestElf(TestCase):
         self.assertEqual(oe.qa.elf_machine_to_string(0xB7), "AArch64")
         self.assertEqual(oe.qa.elf_machine_to_string(0xF7), "BPF")
 
-        self.assertEqual(oe.qa.elf_machine_to_string(0x00), "Unknown (0)")
+        self.assertEqual(oe.qa.elf_machine_to_string(0x00), "Unset")
         self.assertEqual(oe.qa.elf_machine_to_string(0xDEADBEEF), "Unknown (3735928559)")
         self.assertEqual(oe.qa.elf_machine_to_string("foobar"), "Unknown ('foobar')")

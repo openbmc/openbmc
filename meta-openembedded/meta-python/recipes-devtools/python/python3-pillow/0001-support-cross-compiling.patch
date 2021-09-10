@@ -1,20 +1,21 @@
-From ae7c8d0336381dd4c10e809e9c8926f9deeafeb8 Mon Sep 17 00:00:00 2001
-From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Thu, 14 Mar 2019 03:48:10 -0400
+From cd09b6f68aa49c72e9a9bb0765e8c666238a7b7e Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 11 Jan 2021 13:25:12 +0000
 Subject: [PATCH] support cross compiling
 
 Upstream-Status: Inappropriate [oe specific]
 
-Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Suggested-by: Hongxu Jia <hongxu.jia@windriver.com>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
- setup.py | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ setup.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index 5ceae344..07863340 100755
+index cbc2641c..302bc6e7 100755
 --- a/setup.py
 +++ b/setup.py
-@@ -105,7 +105,7 @@ _LIB_IMAGING = (
+@@ -123,7 +123,7 @@ _LIB_IMAGING = (
      "codec_fd",
  )
  
@@ -23,39 +24,21 @@ index 5ceae344..07863340 100755
  
  
  class DependencyException(Exception):
-@@ -396,21 +396,16 @@ class pil_build_ext(build_ext):
+@@ -408,12 +408,12 @@ class pil_build_ext(build_ext):
                      _add_directory(library_dirs, match.group(1))
  
          # include, rpath, if set as environment variables:
 -        for k in ("C_INCLUDE_PATH", "CPATH", "INCLUDE"):
-+        for k in ('C_INCLUDE_PATH', 'CPATH', 'INCLUDE', 'STAGING_INCDIR'):
++        for k in ("C_INCLUDE_PATH", "CPATH", "INCLUDE", "STAGING_INCDIR"):
              if k in os.environ:
                  for d in os.environ[k].split(os.path.pathsep):
                      _add_directory(include_dirs, d)
  
 -        for k in ("LD_RUN_PATH", "LIBRARY_PATH", "LIB"):
-+        for k in ('LD_RUN_PATH', 'LIBRARY_PATH', 'LIB', 'STAGING_LIBDIR'):
++        for k in ("LD_RUN_PATH", "LIBRARY_PATH", "LIB", "STAGING_LIBDIR"):
              if k in os.environ:
                  for d in os.environ[k].split(os.path.pathsep):
                      _add_directory(library_dirs, d)
- 
--        prefix = sysconfig.get_config_var("prefix")
--        if prefix:
--            _add_directory(library_dirs, os.path.join(prefix, "lib"))
--            _add_directory(include_dirs, os.path.join(prefix, "include"))
--
-         #
-         # add platform directories
- 
-@@ -469,8 +464,6 @@ class pil_build_ext(build_ext):
-             or sys.platform.startswith("gnu")
-             or sys.platform.startswith("freebsd")
-         ):
--            for dirname in _find_library_dirs_ldconfig():
--                _add_directory(library_dirs, dirname)
-             if sys.platform.startswith("linux") and os.environ.get(
-                 "ANDROID_ROOT", None
-             ):
 -- 
-2.20.1
+2.17.1
 

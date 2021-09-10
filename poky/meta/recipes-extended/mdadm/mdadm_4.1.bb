@@ -1,5 +1,6 @@
 SUMMARY = "Tool for managing software RAID under Linux"
 HOMEPAGE = "http://www.kernel.org/pub/linux/utils/raid/mdadm/"
+DESCRIPTION = "mdadm is a Linux utility used to manage and monitor software RAID devices."
 
 # Some files are GPLv2+ while others are GPLv2.
 LICENSE = "GPLv2 & GPLv2+"
@@ -19,8 +20,8 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/raid/mdadm/${BPN}-${PV}.tar.xz \
            file://0001-fix-gcc-8-format-truncation-warning.patch \
            file://debian-no-Werror.patch \
            file://0001-Revert-tests-wait-for-complete-rebuild-in-integrity-.patch \
-	   file://mdadm.init \
-	   file://0001-mdadm-add-option-y-for-use-syslog-to-recive-event-re.patch \
+           file://mdadm.init \
+           file://0001-mdadm-add-option-y-for-use-syslog-to-recive-event-re.patch \
            file://include_sysmacros.patch \
            file://0001-mdadm-skip-test-11spare-migration.patch \
            "
@@ -30,23 +31,23 @@ SRC_URI[sha256sum] = "ab7688842908d3583a704d491956f31324c3a5fc9f6a04653cb75d19f1
 
 inherit autotools-brokensep ptest systemd
 
-SYSTEMD_SERVICE_${PN} = "mdmonitor.service mdmon@.service"
+SYSTEMD_SERVICE:${PN} = "mdmonitor.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-CFLAGS_append_toolchain-clang = " -Wno-error=address-of-packed-member"
+CFLAGS:append:toolchain-clang = " -Wno-error=address-of-packed-member"
 
 # PPC64 and MIPS64 uses long long for u64 in the kernel, but powerpc's asm/types.h
 # prevents 64-bit userland from seeing this definition, instead defaulting
 # to u64 == long in userspace. Define __SANE_USERSPACE_TYPES__ to get
 # int-ll64.h included
-CFLAGS_append_powerpc64 = ' -D__SANE_USERSPACE_TYPES__'
-CFLAGS_append_mipsarchn64 = ' -D__SANE_USERSPACE_TYPES__'
-CFLAGS_append_mipsarchn32 = ' -D__SANE_USERSPACE_TYPES__'
+CFLAGS:append:powerpc64 = ' -D__SANE_USERSPACE_TYPES__'
+CFLAGS:append:mipsarchn64 = ' -D__SANE_USERSPACE_TYPES__'
+CFLAGS:append:mipsarchn32 = ' -D__SANE_USERSPACE_TYPES__'
 
 EXTRA_OEMAKE = 'CHECK_RUN_DIR=0 CXFLAGS="${CFLAGS}" SYSTEMD_DIR=${systemd_unitdir}/system \
                 BINDIR="${base_sbindir}" UDEVDIR="${nonarch_base_libdir}/udev"'
 
-DEBUG_OPTIMIZATION_append = " -Wno-error"
+DEBUG_OPTIMIZATION:append = " -Wno-error"
 
 do_compile() {
 	oe_runmake SYSROOT="${STAGING_DIR_TARGET}"
@@ -57,14 +58,14 @@ do_install() {
 	autotools_do_install
 }
 
-do_install_append() {
+do_install:append() {
         install -d ${D}/${sysconfdir}/
         install -m 644 ${S}/mdadm.conf-example ${D}${sysconfdir}/mdadm.conf
         install -d ${D}/${sysconfdir}/init.d
         install -m 755 ${WORKDIR}/mdadm.init ${D}${sysconfdir}/init.d/mdmonitor
 }
 
-do_install_append() {
+do_install:append() {
         oe_runmake install-systemd DESTDIR=${D}
 }
 
@@ -92,8 +93,8 @@ do_install_ptest() {
 	done
 }
 
-RDEPENDS_${PN}-ptest += "bash e2fsprogs-mke2fs"
-RRECOMMENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += "bash e2fsprogs-mke2fs"
+RRECOMMENDS:${PN}-ptest += " \
     coreutils \
     util-linux \
     kernel-module-loop \
@@ -104,4 +105,4 @@ RRECOMMENDS_${PN}-ptest += " \
     kernel-module-raid456 \
 "
 
-FILES_${PN} += "${systemd_unitdir}/*"
+FILES:${PN} += "${systemd_unitdir}/*"

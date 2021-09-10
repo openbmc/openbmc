@@ -4,13 +4,13 @@ PR = "r1"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-FILESEXTRAPATHS_append := "${THISDIR}/files:"
+FILESEXTRAPATHS:append := "${THISDIR}/files:"
 
 inherit systemd
 
 DEPENDS += "systemd"
-RDEPENDS_${PN} += "libsystemd"
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "libsystemd"
+RDEPENDS:${PN} += "bash"
 
 SRC_URI +=  "file://init_once.sh \
              file://nvme_powermanager.sh \
@@ -33,4 +33,4 @@ do_install () {
 }
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "nvme_gpio.service nvme_powermanager.service"
+SYSTEMD_SERVICE:${PN} = "nvme_gpio.service nvme_powermanager.service"

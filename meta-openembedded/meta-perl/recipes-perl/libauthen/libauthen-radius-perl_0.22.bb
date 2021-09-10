@@ -27,14 +27,14 @@ do_install_ptest() {
     install -m 0755 ${S}/test.pl ${D}${PTEST_PATH}
 }
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
     libdata-hexdump-perl \
     perl-module-digest-md5 \
     perl-module-data-dumper \
     perl-module-io-select \
     perl-module-io-socket \
 "
-RDEPENDS_${PN}-ptest += " \
+RDEPENDS:${PN}-ptest += " \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'freeradius', '', d)} \
 "
 

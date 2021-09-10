@@ -2,7 +2,7 @@ require libtool-${PV}.inc
 
 SRC_URI += "file://multilib.patch file://debian-no_hostname.patch"
 
-RDEPENDS_${PN} += "bash"
+RDEPENDS:${PN} += "bash"
 
 #
 # We want the results of libtool-cross preserved - don't stage anything ourselves.
@@ -13,9 +13,9 @@ SYSROOT_DIRS_BLACKLIST += " \
     ${datadir}/libtool/build-aux \
 "
 
-ACLOCALEXTRAPATH_class-target = ""
+ACLOCALEXTRAPATH:class-target = ""
 
-do_install_append () {
+do_install:append () {
         sed -e 's@--sysroot=${STAGING_DIR_HOST}@@g' \
             -e "s@${DEBUG_PREFIX_MAP}@@g" \
             -e 's@${STAGING_DIR_HOST}@@g' \

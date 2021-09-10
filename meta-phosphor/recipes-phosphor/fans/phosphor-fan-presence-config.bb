@@ -1,7 +1,7 @@
 # Provides the config file for the phosphor-fan-presence application.
 # The default config file is empty.  To provide a real one,
 # append this recipe in a layer, add:
-# FILESEXTRAPATHS_prepend := "${THISDIR}/${BPN}:"
+# FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 # and provide a config file.
 
 SUMMARY = "Config file for phosphor-fan-presence"
@@ -21,4 +21,4 @@ do_install() {
         install -D config.yaml ${D}${presence_datadir}/config.yaml
 }
 
-FILES_${PN} += "${presence_datadir}/config.yaml"
+FILES:${PN} += "${presence_datadir}/config.yaml"

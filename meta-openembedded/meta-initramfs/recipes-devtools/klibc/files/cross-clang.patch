@@ -1,0 +1,24 @@
+--- a/scripts/Kbuild.klibc
++++ b/scripts/Kbuild.klibc
+@@ -113,10 +113,8 @@ KLIBCCPPFLAGS    := -nostdinc -iwithpref
+                     -I$(KLIBCINC)/arch/$(KLIBCARCHDIR)	\
+                     -I$(KLIBCINC)/bits$(KLIBCBITSIZE)	\
+                     -I$(KLIBCOBJ)/../include		\
+-                    -I$(KLIBCINC)
+-ifeq ($(cc-name),clang)
+-KLIBCCPPFLAGS    += -I$(shell $(KLIBCCC) $(KLIBCCFLAGS) --print-file-name=include)
+-endif
++                    -I$(KLIBCINC) \
++                    -I$(shell $(KLIBCCC) $(KLIBCCFLAGS) --print-file-name=include)
+ 
+ # kernel include paths
+ KLIBCKERNELSRC	 ?= $(srctree)
+@@ -137,7 +135,7 @@ KLIBCCFLAGS      += $(KLIBCCPPFLAGS) $(K
+ KLIBCAFLAGS      += -D__ASSEMBLY__ $(KLIBCCFLAGS)
+ KLIBCSTRIPFLAGS  += --strip-all -R .comment -R .note
+ 
+-KLIBCLIBGCC_DEF  := $(shell $(KLIBCCC) $(KLIBCCFLAGS) $(if $(filter gcc,$(cc-name)),--print-libgcc,--print-libgcc-file-name))
++KLIBCLIBGCC_DEF  := $(shell $(KLIBCCC) $(KLIBCCFLAGS) --print-libgcc-file-name)
+ KLIBCLIBGCC      ?= $(KLIBCLIBGCC_DEF)
+ KLIBCCRT0        := $(KLIBCOBJ)/arch/$(KLIBCARCHDIR)/crt0.o
+ KLIBCLIBC        := $(KLIBCOBJ)/libc.a

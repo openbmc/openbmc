@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/ajaxorg/ace-builds.git;protocol=https"
 PV = "02.07.17+git${SRCPV}"
 SRCREV = "812e2c56aed246931a667f16c28b096e34597016"
 
-FILES_${PN} = "${datadir}/ace-builds"
+FILES:${PN} = "${datadir}/ace-builds"
 
 S = "${WORKDIR}/git"
 

@@ -13,7 +13,7 @@ SRC_URI = "http://osdn.dl.sourceforge.jp/tomoyo/49693/${BPN}-${PV}-${DS}.tar.gz"
 SRC_URI[md5sum] = "eeee8eb96a7680bfa9c8f6de55502c44"
 SRC_URI[sha256sum] = "c358b80a2ea77a9dda79dc2a056dae3acaf3a72fcb8481cfb1cd1f16746324b4"
 
-S = "${WORKDIR}/${PN}"
+S = "${WORKDIR}/${BPN}"
 
 inherit features_check
 
@@ -29,17 +29,17 @@ do_install(){
 
 PACKAGE="${PN} ${PN}-dbg ${PN}-doc"
 
-FILES_${PN} = "\
+FILES:${PN} = "\
     ${sbindir}/* \
     ${base_sbindir}/* \
     ${libdir}/* \
 "
 
-FILES_${PN}-doc = "\
+FILES:${PN}-doc = "\
     ${mandir}/man8/* \
 "
 
-FILES_${PN}-dbg = "\
+FILES:${PN}-dbg = "\
     ${base_sbindir}/.debug/* \
     ${sbindir}/.debug/* \
     ${libdir}/.debug/* \

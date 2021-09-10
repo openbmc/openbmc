@@ -10,9 +10,9 @@ SUBSYSTEM=="net",				WAIT_FOR_SYSFS="address"
 SUBSYSTEM=="net", ENV{DRIVER}=="?*",		WAIT_FOR_SYSFS="device/driver"
 
 # devices needed to load the drivers providing them
-KERNEL=="tun",					OPTIONS+="ignore_remove"
-KERNEL=="ppp",					OPTIONS+="ignore_remove"
-KERNEL=="loop[0-9]*",				OPTIONS+="ignore_remove"
+KERNEL=="tun",					OPTIONS+="ignore:remove"
+KERNEL=="ppp",					OPTIONS+="ignore:remove"
+KERNEL=="loop[0-9]*",				OPTIONS+="ignore:remove"
 
 # default permissions for block devices
 SUBSYSTEM=="block",				GROUP="disk"

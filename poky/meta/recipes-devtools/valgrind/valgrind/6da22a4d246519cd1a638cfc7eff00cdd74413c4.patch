@@ -1,0 +1,43 @@
+From 6da22a4d246519cd1a638cfc7eff00cdd74413c4 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Fri, 16 Jul 2021 21:37:21 +0200
+Subject: [PATCH] gdbserver_tests: update filters for newer glibc/gdb
+
+With newer glibc/gdb we might see a __select call without anything
+following on the line. Also when gdb cannot find a file it might
+now print "Inappropriate ioctl for device" instead of the message
+"No such file or directory"
+
+Upstream-Status: Backport
+---
+ gdbserver_tests/filter_gdb  | 1 +
+ gdbserver_tests/filter_vgdb | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/gdbserver_tests/filter_gdb b/gdbserver_tests/filter_gdb
+index 3bcd26d86c..4a5b5d7a5b 100755
+--- a/gdbserver_tests/filter_gdb
++++ b/gdbserver_tests/filter_gdb
+@@ -111,6 +111,7 @@ s/\(0x........\) in ?? ()$/\1 in syscall .../
+ #         If select.c sources are present, we can also get a line containing:
+ #              return SYSCALL_CANCEL....
+ s/in __select .*/in syscall .../
++s/in __select$/in syscall .../
+ /exceptfds/d
+ /sysv\/linux\/select\.c/d
+ /return SYSCALL_CANCEL /d
+diff --git a/gdbserver_tests/filter_vgdb b/gdbserver_tests/filter_vgdb
+index f8028a39ad..679ca4b31c 100755
+--- a/gdbserver_tests/filter_vgdb
++++ b/gdbserver_tests/filter_vgdb
+@@ -18,6 +18,7 @@ sed -e '/relaying data between gdb and process/d'                        \
+     
+ # filter some debuginfo problems with ld.so and SLES11
+ sed -e '/^1	rtld.c: No such file or directory\./d' |
++sed -e '/rtld.c: Inappropriate ioctl for device\./d' |
+ 
+ # and filter out any remaining empty lines
+ sed -e '/^$/d'
+-- 
+2.27.0
+

@@ -5,19 +5,11 @@ inherit relocatable
 # no need for them to be a direct target of 'world'
 EXCLUDE_FROM_WORLD = "1"
 
-PACKAGES = ""
-PACKAGES_class-native = ""
-PACKAGES_DYNAMIC = ""
-PACKAGES_DYNAMIC_class-native = ""
 PACKAGE_ARCH = "${BUILD_ARCH}"
 
 # used by cmake class
 OECMAKE_RPATH = "${libdir}"
-OECMAKE_RPATH_class-native = "${libdir}"
-
-# When this class has packaging enabled, setting 
-# RPROVIDES becomes unnecessary.
-RPROVIDES = "${PN}"
+OECMAKE_RPATH:class-native = "${libdir}"
 
 TARGET_ARCH = "${BUILD_ARCH}"
 TARGET_OS = "${BUILD_OS}"
@@ -114,7 +106,7 @@ CLASSOVERRIDE = "class-native"
 MACHINEOVERRIDES = ""
 MACHINE_FEATURES = ""
 
-PATH_prepend = "${COREBASE}/scripts/native-intercept:"
+PATH:prepend = "${COREBASE}/scripts/native-intercept:"
 
 # This class encodes staging paths into its scripts data so can only be
 # reused if we manipulate the paths.
@@ -127,6 +119,7 @@ python native_virtclass_handler () {
     pn = e.data.getVar("PN")
     if not pn.endswith("-native"):
         return
+    bpn = e.data.getVar("BPN")
 
     # Set features here to prevent appends and distro features backfill
     # from modifying native distro features
@@ -138,9 +131,9 @@ python native_virtclass_handler () {
     if "native" not in classextend:
         return
 
-    def map_dependencies(varname, d, suffix = ""):
+    def map_dependencies(varname, d, suffix = "", selfref=True):
         if suffix:
-            varname = varname + "_" + suffix
+            varname = varname + ":" + suffix
         deps = d.getVar(varname)
         if not deps:
             return
@@ -148,22 +141,28 @@ python native_virtclass_handler () {
         newdeps = []
         for dep in deps:
             if dep == pn:
-                continue
+                if not selfref:
+                    continue
+                newdeps.append(dep)
             elif "-cross-" in dep:
                 newdeps.append(dep.replace("-cross", "-native"))
             elif not dep.endswith("-native"):
-                newdeps.append(dep + "-native")
+                # Replace ${PN} with ${BPN} in the dependency to make sure
+                # dependencies on, e.g., ${PN}-foo become ${BPN}-foo-native
+                # rather than ${BPN}-native-foo-native.
+                newdeps.append(dep.replace(pn, bpn) + "-native")
             else:
                 newdeps.append(dep)
-        d.setVar(varname, " ".join(newdeps))
+        d.setVar(varname, " ".join(newdeps), parsing=True)
 
-    map_dependencies("DEPENDS", e.data)
-    for pkg in [e.data.getVar("PN"), "", "${PN}"]:
+    map_dependencies("DEPENDS", e.data, selfref=False)
+    for pkg in e.data.getVar("PACKAGES", False).split():
         map_dependencies("RDEPENDS", e.data, pkg)
         map_dependencies("RRECOMMENDS", e.data, pkg)
         map_dependencies("RSUGGESTS", e.data, pkg)
         map_dependencies("RPROVIDES", e.data, pkg)
         map_dependencies("RREPLACES", e.data, pkg)
+    map_dependencies("PACKAGES", e.data)
 
     provides = e.data.getVar("PROVIDES")
     nprovides = []
@@ -171,7 +170,7 @@ python native_virtclass_handler () {
         if prov.find(pn) != -1:
             nprovides.append(prov)
         elif not prov.endswith("-native"):
-            nprovides.append(prov.replace(prov, prov + "-native"))
+            nprovides.append(prov + "-native")
         else:
             nprovides.append(prov)
     e.data.setVar("PROVIDES", ' '.join(nprovides))

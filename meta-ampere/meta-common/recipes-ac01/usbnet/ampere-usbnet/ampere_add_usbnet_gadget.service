@@ -1,0 +1,13 @@
+[Unit]
+Description=Ampere adds Ethernet over USB gadget device
+Wants=systemd-networkd.service
+Before=systemd-networkd.service
+After=phosphor-ipmi-host.service
+
+[Service]
+ExecStart=/usr/bin/env ampere_add_usbnet_gadget.sh
+SyslogIdentifier=ampere_add_usbnet_gadget.sh
+Type=oneshot
+
+[Install]
+WantedBy=systemd-networkd.service

@@ -1,0 +1,26 @@
+From 18671cd6028f996c138c6eb4282caf313f3fc605 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Nov 2020 15:25:18 -0800
+Subject: [PATCH] libheaptrack: Replace __pid_t with pid_t
+
+__pid_t is for internal libc use
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/track/libheaptrack.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/track/libheaptrack.cpp b/src/track/libheaptrack.cpp
+index e138bce..4120ecd 100644
+--- a/src/track/libheaptrack.cpp
++++ b/src/track/libheaptrack.cpp
+@@ -79,7 +79,7 @@ chrono::milliseconds elapsedTime()
+     return chrono::duration_cast<chrono::milliseconds>(clock::now() - startTime());
+ }
+ 
+-__pid_t gettid()
++pid_t gettid()
+ {
+     return syscall(SYS_gettid);
+ }

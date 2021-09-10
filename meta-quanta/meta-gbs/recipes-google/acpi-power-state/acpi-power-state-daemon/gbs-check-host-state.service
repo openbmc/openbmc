@@ -1,0 +1,10 @@
+[Unit]
+Description = Check Host State to set fan failsafe speed
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=/usr/bin/gbs-check-host-state.sh
+
+[Install]
+WantedBy=multi-user.target

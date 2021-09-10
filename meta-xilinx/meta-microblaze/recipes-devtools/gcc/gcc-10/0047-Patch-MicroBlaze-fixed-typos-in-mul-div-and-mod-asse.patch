@@ -1,0 +1,466 @@
+From 7cc6db7ad5bf2fac80a81711c70ac1147ab87b2c Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 17 Apr 2019 12:36:16 +0530
+Subject: [PATCH 47/54] [Patch,MicroBlaze]: fixed typos in mul,div and mod
+ assembly files.
+
+---
+ libgcc/config/microblaze/divsi3.S  | 47 ++++++++++++++++++++----
+ libgcc/config/microblaze/modsi3.S  | 40 ++++++++++++++++++---
+ libgcc/config/microblaze/mulsi3.S  | 33 ++++++++++++++++-
+ libgcc/config/microblaze/udivsi3.S | 54 +++++++++++++++++++++++++---
+ libgcc/config/microblaze/umodsi3.S | 58 +++++++++++++++++++++++++++---
+ 5 files changed, 212 insertions(+), 20 deletions(-)
+
+diff --git a/libgcc/config/microblaze/divsi3.S b/libgcc/config/microblaze/divsi3.S
+index 104243e35fe..5755e29fbb6 100644
+--- a/libgcc/config/microblaze/divsi3.S
++++ b/libgcc/config/microblaze/divsi3.S
+@@ -46,7 +46,7 @@
+ __divsi3:
+ 	.frame	r1,0,r15	
+ 
+-	ADDIK   r1,r1,-32
++	ADDLIK   r1,r1,-32
+ 	SLI     r28,r1,0
+ 	SLI     r29,r1,8
+ 	SLI     r30,r1,16
+@@ -61,13 +61,23 @@ __divsi3:
+ 	SWI     r30,r1,8
+ 	SWI     r31,r1,12
+ #endif
+-	BEQI    r6,$LaDiv_By_Zero       # Div_by_Zero   # Division Error
+-	BEQI    r5,$LaResult_Is_Zero    # Result is Zero 
+-	BGEID   r5,$LaR5_Pos 
++#ifdef __arch64__
++	BEAEQI    r6,$LaDiv_By_Zero       # Div_by_Zero   # Division Error
++	BEAEQI    r5,$LaResult_Is_Zero    # Result is Zero
++	BEAGEID   r5,$LaR5_Pos
++#else
++        BEQI    r6,$LaDiv_By_Zero       # Div_by_Zero   # Division Error
++        BEQI    r5,$LaResult_Is_Zero    # Result is Zero
++        BGEID   r5,$LaR5_Pos
++#endif
+ 	XOR     r28,r5,r6               # Get the sign of the result
+ 	RSUBI   r5,r5,0                 # Make r5 positive
+ $LaR5_Pos:
+-	BGEI    r6,$LaR6_Pos
++#ifdef __arch64__
++	BEAGEI    r6,$LaR6_Pos
++#else
++        BGEI    r6,$LaR6_Pos
++#endif
+ 	RSUBI   r6,r6,0                 # Make r6 positive
+ $LaR6_Pos:
+ 	ADDIK   r30,r0,0                # Clear mod
+@@ -76,26 +86,51 @@ $LaR6_Pos:
+ 
+         # First part try to find the first '1' in the r5
+ $LaDIV0: 
+-        BLTI    r5,$LaDIV2              # This traps r5 == 0x80000000 
++#ifdef __arch64__
++        BEALTI    r5,$LaDIV2              # This traps r5 == 0x80000000
++#else
++        BLTI    r5,$LaDIV2              # This traps r5 == 0x80000000
++#endif
+ $LaDIV1:
+ 	ADD     r5,r5,r5                # left shift logical r5
++#ifdef __arch64__
++        BEAGTID   r5,$LaDIV1
++#else
+ 	BGTID   r5,$LaDIV1       
++#endif
+ 	ADDIK   r29,r29,-1
+ $LaDIV2:
+ 	ADD     r5,r5,r5                # left shift logical  r5 get the '1' into the Carry
+ 	ADDC    r30,r30,r30             # Move that bit into the Mod register
+ 	RSUB    r31,r6,r30              # Try to subtract (r30 a r6)
++#ifdef __arch64__
++        BEALTI    r31,$LaMOD_TOO_SMALL
++#else
+ 	BLTI    r31,$LaMOD_TOO_SMALL
++#endif
+ 	OR      r30,r0,r31              # Move the r31 to mod since the result was positive
+ 	ADDIK   r3,r3,1
+ $LaMOD_TOO_SMALL:
+ 	ADDIK   r29,r29,-1
++#ifdef __arch64__
++        BEAEQi    r29,$LaLOOP_END
++#else
+ 	BEQi    r29,$LaLOOP_END
++#endif
+ 	ADD     r3,r3,r3                # Shift in the '1' into div
++#ifdef __arch64__
++        BREAI     $LaDIV2                 # Div2
++#else
+ 	BRI     $LaDIV2                 # Div2
++#endif
+ $LaLOOP_END:
++#ifdef __arch64__
++        BEAGEI    r28,$LaRETURN_HERE
++        BREAID    $LaRETURN_HERE
++#else
+ 	BGEI    r28,$LaRETURN_HERE
+ 	BRID    $LaRETURN_HERE
++#endif
+ 	RSUBI   r3,r3,0                 # Negate the result
+ $LaDiv_By_Zero:
+ $LaResult_Is_Zero:
+diff --git a/libgcc/config/microblaze/modsi3.S b/libgcc/config/microblaze/modsi3.S
+index 4dbb25900d9..b6129f5e822 100644
+--- a/libgcc/config/microblaze/modsi3.S
++++ b/libgcc/config/microblaze/modsi3.S
+@@ -62,40 +62,72 @@ __modsi3:
+ 	swi	r31,r1,12
+ #endif
+ 
++#ifdef __arch64__
++        BEAEQI    r6,$LaDiv_By_Zero       # Div_by_Zero   # Division Error
++        BEAEQI    r5,$LaResult_Is_Zero    # Result is Zero
++        BEAGEId   r5,$LaR5_Pos
++#else
+ 	BEQI	r6,$LaDiv_By_Zero       # Div_by_Zero   # Division Error
+ 	BEQI	r5,$LaResult_Is_Zero    # Result is Zero 
+ 	BGEId	r5,$LaR5_Pos 
++#endif
+ 	ADD	r28,r5,r0               # Get the sign of the result [ Depends only on the first arg]
+ 	RSUBI	r5,r5,0	                # Make r5 positive
+ $LaR5_Pos:
+-	BGEI	r6,$LaR6_Pos
++#ifdef __arch64__
++	BEAGEI	r6,$LaR6_Pos
++#else
++        BGEI    r6,$LaR6_Pos
++#endif
+ 	RSUBI	r6,r6,0	    # Make r6 positive
+ $LaR6_Pos:
+ 	ADDIK	r3,r0,0      # Clear mod
+ 	ADDIK	r30,r0,0     # clear div
+-	BLTId	r5,$LaDIV2   # If r5 is still negative (0x80000000), skip
++#ifdef __arch64__
++	BEALTId	r5,$LaDIV2   # If r5 is still negative (0x80000000), skip
+ 			     # the first bit search.
++#else
++        BLTId   r5,$LaDIV2   # If r5 is still negative (0x80000000), skip
++                             # the first bit search.
++#endif
+ 	ADDIK	r29,r0,32    # Initialize the loop count
+    # First part try to find the first '1' in the r5
+ $LaDIV1:
+ 	ADD	r5,r5,r5         # left shift logical r5
+-	BGEID	r5,$LaDIV1       #
++#ifdef __arch64__
++	BEAGEID	r5,$LaDIV1       #
++#else
++        BGEID   r5,$LaDIV1       #
++#endif
+ 	ADDIK	r29,r29,-1
+ $LaDIV2:
+ 	ADD	r5,r5,r5         # left shift logical  r5 get the '1' into the Carry
+ 	ADDC	r3,r3,r3         # Move that bit into the Mod register
+ 	rSUB	r31,r6,r3        # Try to subtract (r30 a r6)
++#ifdef __arch64__
++        BEALTi    r31,$LaMOD_TOO_SMALL
++#else
+ 	BLTi	r31,$LaMOD_TOO_SMALL
++#endif
+ 	OR	r3,r0,r31       # Move the r31 to mod since the result was positive
+ 	ADDIK	r30,r30,1
+ $LaMOD_TOO_SMALL:
+ 	ADDIK	r29,r29,-1
++#ifdef __arch64__
++        BEAEQi    r29,$LaLOOP_END
++        ADD     r30,r30,r30         # Shift in the '1' into div
++        BREAI     $LaDIV2          # Div2
++$LaLOOP_END:
++        BEAGEI    r28,$LaRETURN_HERE
++        BREAId    $LaRETURN_HERE
++#else
+ 	BEQi	r29,$LaLOOP_END
+ 	ADD	r30,r30,r30         # Shift in the '1' into div
+ 	BRI	$LaDIV2          # Div2
+ $LaLOOP_END:
+ 	BGEI	r28,$LaRETURN_HERE
+ 	BRId	$LaRETURN_HERE
++#endif
+ 	rsubi	r3,r3,0 # Negate the result
+ $LaDiv_By_Zero:
+ $LaResult_Is_Zero:
+@@ -108,7 +140,7 @@ $LaRETURN_HERE:
+ 	lli	r29,r1,8
+ 	lli	r30,r1,16
+ 	lli	r31,r1,24
+-	addik	r1,r1,32
++	addlik	r1,r1,32
+ 	rtsd	r15,8
+ 	nop
+ #else
+diff --git a/libgcc/config/microblaze/mulsi3.S b/libgcc/config/microblaze/mulsi3.S
+index 2044399db4a..95709d5bb01 100644
+--- a/libgcc/config/microblaze/mulsi3.S
++++ b/libgcc/config/microblaze/mulsi3.S
+@@ -43,7 +43,37 @@
+ 	.type	__mulsi3,@function
+ #ifdef __arch64__
+         .align 3
+-#endif
++__mulsi3:
++        .frame  r1,0,r15
++        add     r3,r0,r0
++        BEAEQI    r5,$L_Result_Is_Zero      # Multiply by Zero
++        BEAEQI    r6,$L_Result_Is_Zero      # Multiply by Zero
++        BEAGEId   r5,$L_R5_Pos
++        XOR     r4,r5,r6                  # Get the sign of the result
++        RSUBI   r5,r5,0                   # Make r5 positive
++$L_R5_Pos:
++        BEAGEI    r6,$L_R6_Pos
++        RSUBI   r6,r6,0                   # Make r6 positive
++$L_R6_Pos:
++        breai     $L1
++$L2:
++        add     r5,r5,r5
++$L1:
++        srl     r6,r6
++        addc    r7,r0,r0
++        beaeqi    r7,$L2
++        beaneid   r6,$L2
++        add     r3,r3,r5
++        bealti    r4,$L_NegateResult
++        rtsd    r15,8
++        nop
++$L_NegateResult:
++        rtsd    r15,8
++        rsub    r3,r3,r0
++$L_Result_Is_Zero:
++        rtsd    r15,8
++        addi    r3,r0,0
++#else
+ __mulsi3:
+ 	.frame	r1,0,r15
+ 	add	r3,r0,r0
+@@ -74,5 +104,6 @@ $L_NegateResult:
+ $L_Result_Is_Zero:
+ 	rtsd	r15,8
+ 	addi	r3,r0,0
++#endif
+ 	.end __mulsi3
+ 	.size	__mulsi3, . - __mulsi3
+diff --git a/libgcc/config/microblaze/udivsi3.S b/libgcc/config/microblaze/udivsi3.S
+index d2332bcfe62..687d5588801 100644
+--- a/libgcc/config/microblaze/udivsi3.S
++++ b/libgcc/config/microblaze/udivsi3.S
+@@ -59,52 +59,96 @@ __udivsi3:
+ 	SWI     r30,r1,4
+ 	SWI     r31,r1,8
+ #endif
++#ifdef __arch64__
++        BEAEQI    r6,$LaDiv_By_Zero           # Div_by_Zero   # Division Error
++        BEAEQID   r5,$LaResult_Is_Zero        # Result is Zero
++#else
+ 	BEQI    r6,$LaDiv_By_Zero           # Div_by_Zero   # Division Error
+ 	BEQID   r5,$LaResult_Is_Zero        # Result is Zero 
++#endif
+ 	ADDIK   r30,r0,0                    # Clear mod
+ 	ADDIK   r29,r0,32                   # Initialize the loop count
+ 
+         # Check if r6 and r5 are equal # if yes, return 1
+ 	RSUB 	r18,r5,r6
++#ifdef __arch64__
++        BEAEQID   r18,$LaRETURN_HERE
++#else
+ 	BEQID	r18,$LaRETURN_HERE
++#endif
+ 	ADDIK	r3,r0,1
+ 
+         # Check if (uns)r6 is greater than (uns)r5. In that case, just return 0
+ 	XOR	r18,r5,r6
+-	BGEID	r18,16
++#ifdef __arch64__
++	BEAGEID	r18,16
++#else
++        BGEID   r18,16
++#endif
+ 	ADD	r3,r0,r0                    # We would anyways clear r3
++#ifdef __arch64__
++        BEALTI    r6,$LaRETURN_HERE           # r6[bit 31 = 1] hence is greater
++        BREAI     $LCheckr6
++        RSUB    r18,r6,r5                   # MICROBLAZEcmp
++        BEALTI    r18,$LaRETURN_HERE
++#else
+ 	BLTI	r6,$LaRETURN_HERE           # r6[bit 31 = 1] hence is greater
+ 	BRI	$LCheckr6
+ 	RSUB	r18,r6,r5                   # MICROBLAZEcmp
+ 	BLTI	r18,$LaRETURN_HERE
+-
++#endif
+         # If r6 [bit 31] is set, then return result as 1
+ $LCheckr6:
+-	BGTI	r6,$LaDIV0
+-	BRID	$LaRETURN_HERE
++#ifdef __arch64__
++	BEAGTI	r6,$LaDIV0
++	BREAID	$LaRETURN_HERE
++#else
++        BGTI    r6,$LaDIV0
++        BRID    $LaRETURN_HERE
++#endif
+ 	ADDIK	r3,r0,1
+ 
+         # First part try to find the first '1' in the r5
+ $LaDIV0:
++#ifdef __arch64__
++        BEALTI    r5,$LaDIV2
++#else
+ 	BLTI    r5,$LaDIV2	
++#endif
+ $LaDIV1:
+ 	ADD     r5,r5,r5                    # left shift logical r5
++#ifdef __arch64__
++        BEAGTID   r5,$LaDIV1
++#else
+ 	BGTID   r5,$LaDIV1       
++#endif
+ 	ADDIK   r29,r29,-1
+ $LaDIV2:
+ 	ADD     r5,r5,r5                    # left shift logical  r5 get the '1' into the Carry
+ 	ADDC    r30,r30,r30                 # Move that bit into the Mod register
+ 	RSUB    r31,r6,r30                  # Try to subtract (r30 a r6)
++#ifdef __arch64__
++        BEALTI    r31,$LaMOD_TOO_SMALL
++#else
+     	BLTI    r31,$LaMOD_TOO_SMALL
++#endif
+ 	OR      r30,r0,r31                  # Move the r31 to mod since the result was positive
+ 	ADDIK   r3,r3,1
+ $LaMOD_TOO_SMALL:
+ 	ADDIK   r29,r29,-1
++#ifdef __arch64__
++        BEAEQi    r29,$LaLOOP_END
++        ADD     r3,r3,r3 # Shift in the '1' into div
++        BREAI     $LaDIV2   # Div2
++$LaLOOP_END:
++        BREAI     $LaRETURN_HERE
++#else
+ 	BEQi    r29,$LaLOOP_END
+ 	ADD     r3,r3,r3 # Shift in the '1' into div
+ 	BRI     $LaDIV2   # Div2
+ $LaLOOP_END:
+ 	BRI     $LaRETURN_HERE
++#endif
+ $LaDiv_By_Zero:
+ $LaResult_Is_Zero:
+ 	OR      r3,r0,r0 # set result to 0
+@@ -115,7 +159,7 @@ $LaRETURN_HERE:
+ 	LLI     r29,r1,0
+ 	LLI     r30,r1,8
+ 	LLI     r31,r1,16
+-	ADDIK   r1,r1,24
++	ADDLIK   r1,r1,24
+ 	RTSD    r15,8
+ 	NOP
+ #else
+diff --git a/libgcc/config/microblaze/umodsi3.S b/libgcc/config/microblaze/umodsi3.S
+index 2dd72aef68e..59646ce437f 100644
+--- a/libgcc/config/microblaze/umodsi3.S
++++ b/libgcc/config/microblaze/umodsi3.S
+@@ -46,7 +46,7 @@
+ __umodsi3:
+ 	.frame	r1,0,r15	
+ 
+-	addik	r1,r1,-24
++	addlik	r1,r1,-24
+ 	sli	r29,r1,0
+ 	sli	r30,r1,8
+ 	sli	r31,r1,16
+@@ -59,27 +59,77 @@ __umodsi3:
+ 	swi	r30,r1,4
+ 	swi	r31,r1,8
+ #endif
++#ifdef __arch64__
++        BEAEQI    r6,$LaDiv_By_Zero         # Div_by_Zero   # Division Error
++        BEAEQId   r5,$LaResult_Is_Zero     # Result is Zero
++#else
+ 	BEQI	r6,$LaDiv_By_Zero         # Div_by_Zero   # Division Error
+ 	BEQId	r5,$LaResult_Is_Zero     # Result is Zero 
++#endif
+ 	ADDIK 	r3,r0,0                  # Clear div
+ 	ADDIK 	r30,r0,0     	# clear mod
+ 	ADDIK 	r29,r0,32       # Initialize the loop count
+ 
+ # Check if r6 and r5 are equal # if yes, return 0
+ 	rsub 	r18,r5,r6
+-	beqi	r18,$LaRETURN_HERE
+ 
++#ifdef __arch64__
++	beaeqi    r18,$LaRETURN_HERE
++#else
++	beqi	r18,$LaRETURN_HERE
++#endif
+ # Check if (uns)r6 is greater than (uns)r5. In that case, just return r5
+ 	xor	r18,r5,r6
++#ifdef __arch64__
++        beageid   r18,16
++        addik   r3,r5,0
++        bealti    r6,$LaRETURN_HERE
++        breai     $LCheckr6
++        rsub    r18,r5,r6 # MICROBLAZEcmp
++        beagti    r18,$LaRETURN_HERE
++#else
+ 	bgeid	r18,16
+ 	addik	r3,r5,0
+ 	blti	r6,$LaRETURN_HERE
+ 	bri	$LCheckr6
+ 	rsub	r18,r5,r6 # MICROBLAZEcmp
+ 	bgti	r18,$LaRETURN_HERE
+-
++#endif
+ # If r6 [bit 31] is set, then return result as r5-r6
+ $LCheckr6:
++#ifdef __arch64__
++        beagtid   r6,$LaDIV0
++        addik   r3,r0,0
++        addik   r18,r0,0x7fffffff
++        and     r5,r5,r18
++        and     r6,r6,r18
++        breaid    $LaRETURN_HERE
++        rsub    r3,r6,r5
++# First part: try to find the first '1' in the r5
++$LaDIV0:
++        BEALTI    r5,$LaDIV2
++$LaDIV1:
++        ADD     r5,r5,r5     # left shift logical r5
++        BEAGEID   r5,$LaDIV1   #
++        ADDIK   r29,r29,-1
++$LaDIV2:
++        ADD     r5,r5,r5     # left shift logical  r5 get the '1' into the Carry
++        ADDC    r3,r3,r3     # Move that bit into the Mod register
++        rSUB    r31,r6,r3    # Try to subtract (r3 a r6)
++        BEALTi    r31,$LaMOD_TOO_SMALL
++        OR      r3,r0,r31    # Move the r31 to mod since the result was positive
++        ADDIK   r30,r30,1
++$LaMOD_TOO_SMALL:
++        ADDIK   r29,r29,-1
++        BEAEQi    r29,$LaLOOP_END
++        ADD     r30,r30,r30 # Shift in the '1' into div
++        BREAI     $LaDIV2     # Div2
++$LaLOOP_END:
++        BREAI     $LaRETURN_HERE
++$LaDiv_By_Zero:
++$LaResult_Is_Zero:
++        or      r3,r0,r0   # set result to 0
++#else
+ 	bgtid	r6,$LaDIV0
+ 	addik	r3,r0,0
+ 	addik	r18,r0,0x7fffffff
+@@ -111,7 +161,7 @@ $LaLOOP_END:
+ $LaDiv_By_Zero:
+ $LaResult_Is_Zero:
+ 	or 	r3,r0,r0   # set result to 0
+-
++#endif
+ #ifdef __arch64__
+ $LaRETURN_HERE:
+ # Restore values of CSRs and that of r3 and the divisor and the dividend
+-- 
+2.17.1
+

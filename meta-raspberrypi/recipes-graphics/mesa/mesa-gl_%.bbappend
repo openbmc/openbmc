@@ -1,6 +1,8 @@
-PACKAGECONFIG_append_rpi = " gbm"
-PROVIDES_append_rpi = " virtual/libgbm"
+PACKAGECONFIG:append:rpi = " gbm"
+PROVIDES:append:rpi = " virtual/libgbm"
 
-do_install_append_rpi() {
+GALLIUMDRIVERS:append:rpi = ",swrast"
+
+do_install:append:rpi() {
     rm -rf ${D}${includedir}/KHR/khrplatform.h
 }

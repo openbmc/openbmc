@@ -1,0 +1,28 @@
+From 1926700b367745e976dae9d9dc2236da21f4435b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 1 Sep 2021 10:07:48 -0700
+Subject: [PATCH] Workaround glibc 2.34 build failure by disabling dlsym
+ wrapper
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ wrappers/dlsym.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wrappers/dlsym.cpp b/wrappers/dlsym.cpp
+index 5ab8465b..d353bbf7 100644
+--- a/wrappers/dlsym.cpp
++++ b/wrappers/dlsym.cpp
+@@ -34,7 +34,7 @@
+ #include "os.hpp"
+ 
+ 
+-#if defined(__GLIBC__) && !defined(__UCLIBC__)
++#if defined(__GLIBC__) && !defined(__UCLIBC__) && !(__GLIBC__ == 2 && __GLIBC_MINOR__ >= 34)
+ 
+ 
+ #include <dlfcn.h>
+-- 
+2.33.0
+

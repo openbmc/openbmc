@@ -1,0 +1,39 @@
+From a31a014c5d98501074fde1acb5c00162c927c361 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 31 May 2021 15:47:58 +0800
+Subject: [PATCH] wscript_configure_system_gnutls: disable check gnutls
+ AES_CFB8/AES_CMAC
+
+The CHECK_VALUEOF() can not work on cross-compilation.
+
+Fixes configure error:
+  Checking value of GNUTLS_CIPHER_AES_128_CFB8: UNKNOWN
+  Checking value of GNUTLS_MAC_AES_CMAC_128: UNKNOWN
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ wscript_configure_system_gnutls | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/wscript_configure_system_gnutls b/wscript_configure_system_gnutls
+index 2ec217f..cd91b55 100644
+--- a/wscript_configure_system_gnutls
++++ b/wscript_configure_system_gnutls
+@@ -39,6 +39,7 @@ if (parse_version(gnutls_version) > parse_version('3.6.14')):
+ if conf.CHECK_FUNCS_IN('gnutls_get_system_config_file', 'gnutls'):
+     conf.DEFINE('HAVE_GNUTLS_CRYPTO_POLICIES', 1)
+ 
++"""
+ if conf.CHECK_VALUEOF('GNUTLS_CIPHER_AES_128_CFB8', headers='gnutls/gnutls.h'):
+     conf.DEFINE('HAVE_GNUTLS_AES_CFB8', 1)
+ else:
+@@ -48,3 +49,4 @@ if conf.CHECK_VALUEOF('GNUTLS_MAC_AES_CMAC_128', headers='gnutls/gnutls.h'):
+     conf.DEFINE('HAVE_GNUTLS_AES_CMAC', 1)
+ else:
+     Logs.warn('No gnutls support for AES CMAC')
++"""
+-- 
+2.17.1
+

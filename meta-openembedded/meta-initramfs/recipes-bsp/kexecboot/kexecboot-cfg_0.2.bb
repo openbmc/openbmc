@@ -8,7 +8,7 @@ SRC_URI = "file://icon.xpm"
 
 S = "${WORKDIR}"
 
-do_install_prepend () {
+do_install:prepend () {
 echo '# /boot/boot.cfg - KEXECBOOT configuration file.
 #
 # First kernel stanza.
@@ -55,7 +55,7 @@ do_install () {
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} += "/boot/*"
+FILES:${PN} += "/boot/*"
 
 CMDLINE ?= ""
 CMDLINE_DEBUG ?= "quiet"

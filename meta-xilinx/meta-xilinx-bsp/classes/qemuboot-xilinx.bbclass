@@ -2,13 +2,13 @@
 # enable the overrides for the context of the conf only
 OVERRIDES .= ":qemuboot-xilinx"
 
-# setup the target binary
-QB_SYSTEM_NAME_prepend = "qemu-xilinx/"
-
 # Default machine targets for Xilinx QEMU (FDT Generic)
-QB_MACHINE_aarch64 = "-machine arm-generic-fdt"
-QB_MACHINE_arm = "-machine arm-generic-fdt-7series"
-QB_MACHINE_microblaze = "-machine microblaze-generic-fdt-plnx"
+# Allow QB_MACHINE to be overridden by a BSP config
+QB_MACHINE ?= "${QB_MACHINE_XILINX}"
+QB_RNG=""
+QB_MACHINE_XILINX_aarch64 = "-machine arm-generic-fdt"
+QB_MACHINE_XILINX_arm = "-M arm-generic-fdt-7series"
+QB_MACHINE_XILINX_microblaze = "-M microblaze-fdt-plnx"
 
 # defaults
 QB_DEFAULT_KERNEL ?= "none"

@@ -1,0 +1,40 @@
+From b94a1e3d6b5c733ba24cfa0d35450d8659d48289 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 4 Jun 2021 13:07:28 -0700
+Subject: [PATCH] arena: Remove dead code
+
+Fixes clang warning
+arena.cpp:226:19: error: variable 'drained' set b
+ut not used [-Werror,-Wunused-but-set-variable]
+|     std::intptr_t drained = 0;
+|                   ^
+
+Upstream-Status: Submitted [https://github.com/oneapi-src/oneTBB/pull/429]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/tbb/arena.cpp | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/tbb/arena.cpp b/src/tbb/arena.cpp
+index 4a9c0f8a..c8ed4999 100644
+--- a/src/tbb/arena.cpp
++++ b/src/tbb/arena.cpp
+@@ -232,14 +232,13 @@ void arena::free_arena () {
+     __TBB_ASSERT( !my_global_concurrency_mode, NULL );
+ #endif
+     poison_value( my_guard );
+-    std::intptr_t drained = 0;
+     for ( unsigned i = 0; i < my_num_slots; ++i ) {
+         // __TBB_ASSERT( !my_slots[i].my_scheduler, "arena slot is not empty" );
+         // TODO: understand the assertion and modify
+         // __TBB_ASSERT( my_slots[i].task_pool == EmptyTaskPool, NULL );
+         __TBB_ASSERT( my_slots[i].head == my_slots[i].tail, NULL ); // TODO: replace by is_quiescent_local_task_pool_empty
+         my_slots[i].free_task_pool();
+-        drained += mailbox(i).drain();
++        mailbox(i).drain();
+         my_slots[i].my_default_task_dispatcher->~task_dispatcher();
+     }
+     __TBB_ASSERT(my_fifo_task_stream.empty(), "Not all enqueued tasks were executed");
+-- 
+2.31.1
+

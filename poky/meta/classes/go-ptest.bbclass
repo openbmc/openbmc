@@ -50,5 +50,5 @@ do_install_ptest_base() {
 	chown -R root:root ${D}${PTEST_PATH}
 }
 
-INSANE_SKIP_${PN}-ptest += "ldflags"
+INSANE_SKIP:${PN}-ptest += "ldflags"
 

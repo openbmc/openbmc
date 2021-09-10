@@ -22,14 +22,17 @@ SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/DirectFB-${PV}.tar.g
            file://fix-client-gfx_state-initialisation.patch \
            file://fix-tslib-version-check.patch \
            file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \
+           file://0001-os-linux-Fix-build-when-__NR_futex-is-not-available.patch \
            "
 
 S = "${WORKDIR}/DirectFB-${PV}"
 
-LDFLAGS_append = " -lm"
+LDFLAGS:append = " -lm"
+
+CXXFLAGS:append:toolchain-clang = " -Wno-error=dtor-typedef"
 
 # Workaround for linking issues seen with armv7a + gold
-LDFLAGS_append_arm = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
+LDFLAGS:append:arm = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
 
 BINCONFIG = "${bindir}/directfb-config"
 
@@ -59,18 +62,18 @@ EXTRA_OECONF = "\
 
 #Once -fno-omit-frame-pointer option of gcc is added into TARGET_CLFAGS as default
 #this will cause directfb build failure on x86 arch, so filter out it.
-TARGET_CFLAGS_remove_x86 = "-fno-omit-frame-pointer"
+TARGET_CFLAGS:remove:x86 = "-fno-omit-frame-pointer"
 
 #PACKAGES_DYNAMIC += "^directfb-inputdrivers-.*"
 #
-#python populate_packages_prepend () {
+#python populate_packages:prepend () {
 #    inputdrivers_libdir = d.expand('${libdir}/directfb-${RV}/inputdrivers')
 #    do_split_packages(d, inputdrivers_libdir, '*.so$', 'directfb-inputdrivers-%s', 'Directfb plugin for %s')
 #}
 
 # NOTE: monolithic packaging for now, should improve that eventually
 
-FILES_${PN}-dev += "\
+FILES:${PN}-dev += "\
   ${bindir}/directfb-config \
   ${libdir}/directfb-${RV}/systems/*.la \
   ${libdir}/directfb-${RV}/inputdrivers/*.la \
@@ -78,7 +81,7 @@ FILES_${PN}-dev += "\
   ${libdir}/directfb-${RV}/wm/*.la \
 "
 
-FILES_${PN} += "\
+FILES:${PN} += "\
   ${libdir}/directfb-${RV}/systems/*.so \
   ${libdir}/directfb-${RV}/inputdrivers/*.so \
   ${libdir}/directfb-${RV}/interfaces/*/*.so \

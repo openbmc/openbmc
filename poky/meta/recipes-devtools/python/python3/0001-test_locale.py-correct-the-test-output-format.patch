@@ -23,24 +23,24 @@ Before this patch:
 
 Upstream-Status: Submitted [https://github.com/python/cpython/pull/15132]
 
+
+Rebased for 3.9.4, still not accepted upstream Signed-off-by: Alejandro Hernandez <alejandro@enedino.org>
+
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
  Lib/test/test_locale.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Lib/test/test_locale.py b/Lib/test/test_locale.py
-index e2c2178..558d63c 100644
---- a/Lib/test/test_locale.py
-+++ b/Lib/test/test_locale.py
-@@ -527,7 +527,7 @@ class TestMiscellaneous(unittest.TestCase):
+Index: Python-3.9.4/Lib/test/test_locale.py
+===================================================================
+--- Python-3.9.4.orig/Lib/test/test_locale.py
++++ Python-3.9.4/Lib/test/test_locale.py
+@@ -562,7 +562,7 @@ class TestMiscellaneous(unittest.TestCas
              self.skipTest('test needs Turkish locale')
          loc = locale.getlocale(locale.LC_CTYPE)
          if verbose:
 -            print('testing with %a' % (loc,), end=' ', flush=True)
 +            print('testing with %a...' % (loc,), end=' ', flush=True)
-         locale.setlocale(locale.LC_CTYPE, loc)
-         self.assertEqual(loc, locale.getlocale(locale.LC_CTYPE))
- 
--- 
-2.7.4
-
+         try:
+             locale.setlocale(locale.LC_CTYPE, loc)
+         except locale.Error as exc:

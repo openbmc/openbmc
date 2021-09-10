@@ -1,0 +1,57 @@
+If we link against a newer glibc 2.34 and then try and our LD_PRELOAD is run against a
+binary on a host with an older libc, we see symbol errors since in glibc 2.34, pthread 
+and dl are merged into libc itself.
+
+We need to use the older form of linking so use glibc binaries from an older release
+to force this. We only use minimal symbols from these anyway.
+
+pthread_atfork is problematic, particularly on arm so use the internal glibc routine
+it maps too. This was always present in the main libc from 2.3.2 onwards.
+
+Yes this is horrible. Better solutions welcome.
+
+There is more info in the bug: [YOCTO #14521]
+
+Upstream-Status: Inappropriate [this patch is native and nativesdk]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Tweak library search order, make prebuilt lib ahead of recipe lib
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.in       | 2 +-
+ pseudo_wrappers.c | 5 ++++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -120,7 +120,7 @@ $(PSEUDODB): pseudodb.o $(SHOBJS) $(DBOBJS) pseudo_ipc.o | $(BIN)
+ libpseudo: $(LIBPSEUDO)
+ 
+ $(LIBPSEUDO): $(WRAPOBJS) pseudo_client.o pseudo_ipc.o $(SHOBJS) | $(LIB)
+-	$(CC) $(CFLAGS) $(CFLAGS_PSEUDO) -shared -o $(LIBPSEUDO) \
++	$(CC) $(CFLAGS)  -Lprebuilt/$(shell uname -m)-linux/lib/ $(CFLAGS_PSEUDO) -shared -o $(LIBPSEUDO) \
+ 		pseudo_client.o pseudo_ipc.o \
+ 		$(WRAPOBJS) $(SHOBJS) $(LDFLAGS) $(CLIENT_LDFLAGS)
+ 
+diff --git a/pseudo_wrappers.c b/pseudo_wrappers.c
+--- a/pseudo_wrappers.c
++++ b/pseudo_wrappers.c
+@@ -100,10 +100,13 @@ static void libpseudo_atfork_child(void)
+ 	pseudo_mutex_holder = 0;
+ }
+ 
++extern void *__dso_handle;
++extern int __register_atfork (void (*) (void), void (*) (void), void (*) (void), void *);
++
+ static void
+ _libpseudo_init(void) {
+ 	if (!_libpseudo_initted)
+-		pthread_atfork(NULL, NULL, libpseudo_atfork_child);
++		__register_atfork (NULL, NULL, libpseudo_atfork_child, &__dso_handle == NULL ? NULL : __dso_handle);
+ 
+ 	pseudo_getlock();
+ 	pseudo_antimagic();
+-- 
+2.27.0
+

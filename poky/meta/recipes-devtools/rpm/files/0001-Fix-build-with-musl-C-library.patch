@@ -11,29 +11,6 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  rpmio/digest_nss.c | 1 +
  2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/configure.ac b/configure.ac
-index c04a2e8d1..c9d9ac16d 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -255,6 +255,7 @@ AC_SEARCH_LIBS(dlopen, [dl])
- # Check for libelf library. Prefer external, otherwise none.
- WITH_LIBELF_LIB=
- AC_CHECK_HEADER([libelf.h])
-+AC_CHECK_HEADERS([error.h], [WITH_ERROR_H=yes])
- AC_CHECK_HEADERS([gelf.h], [
- 	AC_CHECK_LIB(elf, gelf_getvernaux, [
- 	    AC_DEFINE(HAVE_LIBELF, 1, [Define to 1 if you have the 'elf' library (-lelf).])
-@@ -263,7 +264,7 @@ AC_CHECK_HEADERS([gelf.h], [
- 	])
- ])
- AC_SUBST(WITH_LIBELF_LIB)
--AM_CONDITIONAL(LIBELF,[test "$WITH_LIBELF" = yes])
-+AM_CONDITIONAL(LIBELF,[test "$WITH_LIBELF" = yes && test "$WITH_ERROR_H" = yes])
- 
- AC_CHECK_HEADERS([dwarf.h], [
-   WITH_LIBDWARF=yes
-diff --git a/rpmio/digest_nss.c b/rpmio/digest_nss.c
-index 992d9acf6..e11920e3e 100644
 --- a/rpmio/digest_nss.c
 +++ b/rpmio/digest_nss.c
 @@ -1,5 +1,6 @@
@@ -43,6 +20,3 @@ index 992d9acf6..e11920e3e 100644
  #include <pthread.h>
  #include <nss.h>
  #include <sechash.h>
--- 
-2.14.2
-

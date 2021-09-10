@@ -8,7 +8,9 @@ inherit autotools
 
 # The project has moved from Sourceforge to Launchpad, to Github. Use the source tarball from
 # Launchpad until the next release is available from Github.
-SRC_URI = "https://launchpad.net/ubuntu/+archive/primary/+files/${BPN}_${PV}.orig.tar.gz"
+SRC_URI = "https://launchpad.net/ubuntu/+archive/primary/+files/${BPN}_${PV}.orig.tar.gz \
+           file://0001-Adding-volatile-modifier-to-tmp-variable-in-memory-t.patch \
+           "
 
 SRC_URI[md5sum] = "3a6d54fdd3fe002328e4458206392b9d"
 SRC_URI[sha256sum] = "83fa7464193e012c91254e595a89894d8e35b4a38324b52a5974777e3823ea9e"
@@ -21,6 +23,6 @@ PACKAGECONFIG[mysql] = "--with-mysql \
                         --with-mysql-libs=${STAGING_LIBDIR}, \
                         --without-mysql,mysql5"
 
-do_configure_prepend() {
+do_configure:prepend() {
     touch ${S}/NEWS ${S}/AUTHORS
 }

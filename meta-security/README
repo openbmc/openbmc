@@ -1,6 +1,24 @@
 Meta-security
 =============
 
+The bbappend files for some recipes (e.g. linux-yocto) in this layer need
+to have 'security' in DISTRO_FEATURES to have effect.
+To enable them, add in configuration file the following line.
+
+  DISTRO_FEATURES:append = " security"
+
+If meta-security is included, but security  is not enabled as a
+distro feature a warning is printed at parse time:
+
+    You have included the meta-security layer, but
+    'security' has not been enabled in your DISTRO_FEATURES. Some bbappend files
+    and preferred version setting may not take effect.
+
+If you know what you are doing, this warning can be disabled by setting the following
+variable in your configuration:
+
+  SKIP_META_SECURITY_SANITY_CHECK = 1
+
 This layer provides security tools, hardening tools for Linux kernels
 and libraries for implementing security mechanisms.
 
@@ -11,28 +29,19 @@ This layer depends on:
 
   URI: git://git.openembedded.org/openembedded-core
   branch: master
-  revision: HEAD
-  prio: default
 
   URI: git://git.openembedded.org/meta-openembedded/meta-oe
   branch: master
-  revision: HEAD
-  prio: default
 
   URI: git://git.openembedded.org/meta-openembedded/meta-perl
   branch: master
-  revision: HEAD
-  prio: default
 
   URI: git://git.openembedded.org/meta-openembedded/meta-python
   branch: master
-  revision: HEAD
-  prio: default
 
   URI: git://git.openembedded.org/meta-openembedded/meta-networking
   branch: master
-  revision: HEAD
-  prio: default
+
 
 Adding the security layer to your build
 ========================================
@@ -51,11 +60,23 @@ other layers needed. e.g.:
     /path/to/meta-openembedded/meta-perl \
     /path/to/meta-openembedded/meta-python \
     /path/to/meta-openembedded/meta-networking \
-    /path/to/layer/meta-security \
+    /path/to/layer/meta-security "
+
+Optional Rust dependancy
+======================================
+If you want to use the latest Suricata that needs rust, you will need to clone
+
+  URI: https://github.com/meta-rust/meta-rust.git
+  branch: master
+
+  BBLAYERS += "/path/to/layer/meta-rust"
+
+This will activate the dynamic-layer mechanism and pull in the newer suricata
+
 
 
 Maintenance
------------
+======================================
 
 Send pull requests, patches, comments or questions to yocto@lists.yoctoproject.org
 

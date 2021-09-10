@@ -42,9 +42,9 @@ do_install () {
 	install -v -m644 README RELEASE-NOTES* NEWS* ${D}${docdir}/${BPN}
 }
 
-RDEPENDS_${PN} += "perl"
-FILES_${PN} = "${datadir}/xml/* ${sysconfdir}/xml/docbook-xsl.xml"
-FILES_${PN}-doc = "${datadir}/doc/*"
+RDEPENDS:${PN} += "perl"
+FILES:${PN} = "${datadir}/xml/* ${sysconfdir}/xml/docbook-xsl.xml"
+FILES:${PN}-doc = "${datadir}/doc/*"
 
 XMLCATALOGS = "${datadir}/xml/docbook/xsl-stylesheets-${PV}/catalog.xml"
 

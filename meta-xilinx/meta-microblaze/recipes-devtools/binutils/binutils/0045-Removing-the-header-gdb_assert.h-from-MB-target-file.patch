@@ -1,0 +1,24 @@
+From 5fac707a9894ec9d0fcac14bbf0eb3ff631d0499 Mon Sep 17 00:00:00 2001
+From: Nagaraju <nmekala@xilinx.com>
+Date: Fri, 17 Jan 2020 15:45:48 +0530
+Subject: [PATCH 45/52] Removing the header "gdb_assert.h" from MB target file
+
+---
+ gdb/microblaze-linux-tdep.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
+index a37c4c86f4..68e73d2e56 100644
+--- a/gdb/microblaze-linux-tdep.c
++++ b/gdb/microblaze-linux-tdep.c
+@@ -37,7 +37,6 @@
+ #include "linux-tdep.h"
+ #include "glibc-tdep.h"
+ 
+-#include "gdb_assert.h"
+ 
+ #ifndef REGSET_H
+ #define REGSET_H 1
+-- 
+2.17.1
+

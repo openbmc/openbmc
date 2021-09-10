@@ -1,0 +1,118 @@
+From b3952bd5e28f2a4d86c7377de239db8fa7237e14 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 31 Oct 2020 22:14:05 -0700
+Subject: [PATCH] tools: Add error.h for non-glibc case
+
+error is glibc specific API, so this patch will mostly not accepted
+upstream given that elfutils has been closely tied to glibc
+
+Upstream-Status: Inappropriate [workaround for musl]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/debugedit.c      |  6 +++++-
+ tools/elfdeps.c        |  6 +++++-
+ tools/error.h          | 27 +++++++++++++++++++++++++++
+ tools/sepdebugcrcfix.c |  6 +++++-
+ 4 files changed, 42 insertions(+), 3 deletions(-)
+ create mode 100644 tools/error.h
+
+diff --git a/tools/debugedit.c b/tools/debugedit.c
+index 9f8dcd0fb..852f46073 100644
+--- a/tools/debugedit.c
++++ b/tools/debugedit.c
+@@ -26,7 +26,6 @@
+ #include <byteswap.h>
+ #include <endian.h>
+ #include <errno.h>
+-#include <error.h>
+ #include <limits.h>
+ #include <string.h>
+ #include <stdlib.h>
+@@ -40,6 +39,11 @@
+ 
+ #include <gelf.h>
+ #include <dwarf.h>
++#ifdef __GLIBC__
++#include <error.h>
++#else
++#include "error.h"
++#endif
+ 
+ 
+ /* Unfortunately strtab manipulation functions were only officially added
+diff --git a/tools/elfdeps.c b/tools/elfdeps.c
+index 6d9094874..f69e60997 100644
+--- a/tools/elfdeps.c
++++ b/tools/elfdeps.c
+@@ -5,10 +5,14 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <fcntl.h>
+-#include <error.h>
+ #include <errno.h>
+ #include <popt.h>
+ #include <gelf.h>
++#ifdef __GLIBC__
++#include <error.h>
++#else
++#include "error.h"
++#endif
+ 
+ #include <rpm/rpmstring.h>
+ #include <rpm/argv.h>
+diff --git a/tools/error.h b/tools/error.h
+new file mode 100644
+index 000000000..ef06827a0
+--- /dev/null
++++ b/tools/error.h
+@@ -0,0 +1,27 @@
++#ifndef _ERROR_H_
++#define _ERROR_H_
++
++#include <stdarg.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <errno.h>
++
++static unsigned int error_message_count = 0;
++
++static inline void error(int status, int errnum, const char* format, ...)
++{
++	va_list ap;
++	fprintf(stderr, "%s: ", program_invocation_name);
++	va_start(ap, format);
++	vfprintf(stderr, format, ap);
++	va_end(ap);
++	if (errnum)
++		fprintf(stderr, ": %s", strerror(errnum));
++	fprintf(stderr, "\n");
++	error_message_count++;
++	if (status)
++		exit(status);
++}
++
++#endif	/* _ERROR_H_ */
+diff --git a/tools/sepdebugcrcfix.c b/tools/sepdebugcrcfix.c
+index fba460014..2be9c1fd8 100644
+--- a/tools/sepdebugcrcfix.c
++++ b/tools/sepdebugcrcfix.c
+@@ -29,9 +29,13 @@
+ #include <endian.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+-#include <error.h>
+ #include <libelf.h>
+ #include <gelf.h>
++#ifdef __GLIBC__
++#include <error.h>
++#else
++#include "error.h"
++#endif
+ 
+ #ifndef _
+ #define _(x) x
+-- 
+2.29.2
+

@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
                     file://libdleyna/renderer/server.c;endline=21;md5=f51acd4757fb6a779a87122c43cf1346"
 
 DEPENDS = "glib-2.0 gssdp gupnp gupnp-av gupnp-dlna libsoup-2.4 dleyna-core"
-RDEPENDS_${PN} = "dleyna-connector-dbus"
+RDEPENDS:${PN} = "dleyna-connector-dbus"
 
 SRC_URI = "git://github.com/01org/${BPN}.git \
            file://0001-add-gupnp-1.2-API-support.patch \
@@ -21,5 +21,5 @@ inherit autotools pkgconfig
 
 CFLAGS += " -I${S}"
 
-FILES_${PN} += "${datadir}/dbus-1"
-FILES_${PN}-dev += "${libdir}/${PN}/*.so"
+FILES:${PN} += "${datadir}/dbus-1"
+FILES:${PN}-dev += "${libdir}/${PN}/*.so"

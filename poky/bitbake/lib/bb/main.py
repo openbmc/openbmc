@@ -119,178 +119,181 @@ warnings.filterwarnings("ignore", category=ImportWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="<string>$")
 warnings.filterwarnings("ignore", message="With-statements now directly support multiple context managers")
 
-class BitBakeConfigParameters(cookerdata.ConfigParameters):
 
-    def parseCommandLine(self, argv=sys.argv):
-        parser = optparse.OptionParser(
-            formatter=BitbakeHelpFormatter(),
-            version="BitBake Build Tool Core version %s" % bb.__version__,
-            usage="""%prog [options] [recipename/target recipe:do_task ...]
+def create_bitbake_parser():
+    parser = optparse.OptionParser(
+        formatter=BitbakeHelpFormatter(),
+        version="BitBake Build Tool Core version %s" % bb.__version__,
+        usage="""%prog [options] [recipename/target recipe:do_task ...]
 
     Executes the specified task (default is 'build') for a given set of target recipes (.bb files).
     It is assumed there is a conf/bblayers.conf available in cwd or in BBPATH which
     will provide the layer, BBFILES and other configuration information.""")
 
-        parser.add_option("-b", "--buildfile", action="store", dest="buildfile", default=None,
-                          help="Execute tasks from a specific .bb recipe directly. WARNING: Does "
-                               "not handle any dependencies from other recipes.")
+    parser.add_option("-b", "--buildfile", action="store", dest="buildfile", default=None,
+                      help="Execute tasks from a specific .bb recipe directly. WARNING: Does "
+                           "not handle any dependencies from other recipes.")
 
-        parser.add_option("-k", "--continue", action="store_false", dest="abort", default=True,
-                          help="Continue as much as possible after an error. While the target that "
-                               "failed and anything depending on it cannot be built, as much as "
-                               "possible will be built before stopping.")
+    parser.add_option("-k", "--continue", action="store_false", dest="abort", default=True,
+                      help="Continue as much as possible after an error. While the target that "
+                           "failed and anything depending on it cannot be built, as much as "
+                           "possible will be built before stopping.")
 
-        parser.add_option("-f", "--force", action="store_true", dest="force", default=False,
-                          help="Force the specified targets/task to run (invalidating any "
-                               "existing stamp file).")
+    parser.add_option("-f", "--force", action="store_true", dest="force", default=False,
+                      help="Force the specified targets/task to run (invalidating any "
+                           "existing stamp file).")
 
-        parser.add_option("-c", "--cmd", action="store", dest="cmd",
-                          help="Specify the task to execute. The exact options available "
-                               "depend on the metadata. Some examples might be 'compile'"
-                               " or 'populate_sysroot' or 'listtasks' may give a list of "
-                               "the tasks available.")
+    parser.add_option("-c", "--cmd", action="store", dest="cmd",
+                      help="Specify the task to execute. The exact options available "
+                           "depend on the metadata. Some examples might be 'compile'"
+                           " or 'populate_sysroot' or 'listtasks' may give a list of "
+                           "the tasks available.")
 
-        parser.add_option("-C", "--clear-stamp", action="store", dest="invalidate_stamp",
-                          help="Invalidate the stamp for the specified task such as 'compile' "
-                               "and then run the default task for the specified target(s).")
+    parser.add_option("-C", "--clear-stamp", action="store", dest="invalidate_stamp",
+                      help="Invalidate the stamp for the specified task such as 'compile' "
+                           "and then run the default task for the specified target(s).")
 
-        parser.add_option("-r", "--read", action="append", dest="prefile", default=[],
-                          help="Read the specified file before bitbake.conf.")
+    parser.add_option("-r", "--read", action="append", dest="prefile", default=[],
+                      help="Read the specified file before bitbake.conf.")
 
-        parser.add_option("-R", "--postread", action="append", dest="postfile", default=[],
-                          help="Read the specified file after bitbake.conf.")
+    parser.add_option("-R", "--postread", action="append", dest="postfile", default=[],
+                      help="Read the specified file after bitbake.conf.")
 
-        parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False,
-                          help="Enable tracing of shell tasks (with 'set -x'). "
-                               "Also print bb.note(...) messages to stdout (in "
-                               "addition to writing them to ${T}/log.do_<task>).")
+    parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False,
+                      help="Enable tracing of shell tasks (with 'set -x'). "
+                           "Also print bb.note(...) messages to stdout (in "
+                           "addition to writing them to ${T}/log.do_<task>).")
 
-        parser.add_option("-D", "--debug", action="count", dest="debug", default=0,
-                          help="Increase the debug level. You can specify this "
-                               "more than once. -D sets the debug level to 1, "
-                               "where only bb.debug(1, ...) messages are printed "
-                               "to stdout; -DD sets the debug level to 2, where "
-                               "both bb.debug(1, ...) and bb.debug(2, ...) "
-                               "messages are printed; etc. Without -D, no debug "
-                               "messages are printed. Note that -D only affects "
-                               "output to stdout. All debug messages are written "
-                               "to ${T}/log.do_taskname, regardless of the debug "
-                               "level.")
+    parser.add_option("-D", "--debug", action="count", dest="debug", default=0,
+                      help="Increase the debug level. You can specify this "
+                           "more than once. -D sets the debug level to 1, "
+                           "where only bb.debug(1, ...) messages are printed "
+                           "to stdout; -DD sets the debug level to 2, where "
+                           "both bb.debug(1, ...) and bb.debug(2, ...) "
+                           "messages are printed; etc. Without -D, no debug "
+                           "messages are printed. Note that -D only affects "
+                           "output to stdout. All debug messages are written "
+                           "to ${T}/log.do_taskname, regardless of the debug "
+                           "level.")
 
-        parser.add_option("-q", "--quiet", action="count", dest="quiet", default=0,
-                          help="Output less log message data to the terminal. You can specify this more than once.")
+    parser.add_option("-q", "--quiet", action="count", dest="quiet", default=0,
+                      help="Output less log message data to the terminal. You can specify this more than once.")
 
-        parser.add_option("-n", "--dry-run", action="store_true", dest="dry_run", default=False,
-                          help="Don't execute, just go through the motions.")
+    parser.add_option("-n", "--dry-run", action="store_true", dest="dry_run", default=False,
+                      help="Don't execute, just go through the motions.")
 
-        parser.add_option("-S", "--dump-signatures", action="append", dest="dump_signatures",
-                          default=[], metavar="SIGNATURE_HANDLER",
-                          help="Dump out the signature construction information, with no task "
-                               "execution. The SIGNATURE_HANDLER parameter is passed to the "
-                               "handler. Two common values are none and printdiff but the handler "
-                               "may define more/less. none means only dump the signature, printdiff"
-                               " means compare the dumped signature with the cached one.")
+    parser.add_option("-S", "--dump-signatures", action="append", dest="dump_signatures",
+                      default=[], metavar="SIGNATURE_HANDLER",
+                      help="Dump out the signature construction information, with no task "
+                           "execution. The SIGNATURE_HANDLER parameter is passed to the "
+                           "handler. Two common values are none and printdiff but the handler "
+                           "may define more/less. none means only dump the signature, printdiff"
+                           " means compare the dumped signature with the cached one.")
 
-        parser.add_option("-p", "--parse-only", action="store_true",
-                          dest="parse_only", default=False,
-                          help="Quit after parsing the BB recipes.")
+    parser.add_option("-p", "--parse-only", action="store_true",
+                      dest="parse_only", default=False,
+                      help="Quit after parsing the BB recipes.")
 
-        parser.add_option("-s", "--show-versions", action="store_true",
-                          dest="show_versions", default=False,
-                          help="Show current and preferred versions of all recipes.")
+    parser.add_option("-s", "--show-versions", action="store_true",
+                      dest="show_versions", default=False,
+                      help="Show current and preferred versions of all recipes.")
 
-        parser.add_option("-e", "--environment", action="store_true",
-                          dest="show_environment", default=False,
-                          help="Show the global or per-recipe environment complete with information"
-                               " about where variables were set/changed.")
+    parser.add_option("-e", "--environment", action="store_true",
+                      dest="show_environment", default=False,
+                      help="Show the global or per-recipe environment complete with information"
+                           " about where variables were set/changed.")
 
-        parser.add_option("-g", "--graphviz", action="store_true", dest="dot_graph", default=False,
-                          help="Save dependency tree information for the specified "
-                               "targets in the dot syntax.")
+    parser.add_option("-g", "--graphviz", action="store_true", dest="dot_graph", default=False,
+                      help="Save dependency tree information for the specified "
+                           "targets in the dot syntax.")
 
-        parser.add_option("-I", "--ignore-deps", action="append",
-                          dest="extra_assume_provided", default=[],
-                          help="Assume these dependencies don't exist and are already provided "
-                               "(equivalent to ASSUME_PROVIDED). Useful to make dependency "
-                               "graphs more appealing")
+    parser.add_option("-I", "--ignore-deps", action="append",
+                      dest="extra_assume_provided", default=[],
+                      help="Assume these dependencies don't exist and are already provided "
+                           "(equivalent to ASSUME_PROVIDED). Useful to make dependency "
+                           "graphs more appealing")
 
-        parser.add_option("-l", "--log-domains", action="append", dest="debug_domains", default=[],
-                          help="Show debug logging for the specified logging domains")
+    parser.add_option("-l", "--log-domains", action="append", dest="debug_domains", default=[],
+                      help="Show debug logging for the specified logging domains")
 
-        parser.add_option("-P", "--profile", action="store_true", dest="profile", default=False,
-                          help="Profile the command and save reports.")
+    parser.add_option("-P", "--profile", action="store_true", dest="profile", default=False,
+                      help="Profile the command and save reports.")
 
-        # @CHOICES@ is substituted out by BitbakeHelpFormatter above
-        parser.add_option("-u", "--ui", action="store", dest="ui",
-                          default=os.environ.get('BITBAKE_UI', 'knotty'),
-                          help="The user interface to use (@CHOICES@ - default %default).")
+    # @CHOICES@ is substituted out by BitbakeHelpFormatter above
+    parser.add_option("-u", "--ui", action="store", dest="ui",
+                      default=os.environ.get('BITBAKE_UI', 'knotty'),
+                      help="The user interface to use (@CHOICES@ - default %default).")
 
-        parser.add_option("", "--token", action="store", dest="xmlrpctoken",
-                          default=os.environ.get("BBTOKEN"),
-                          help="Specify the connection token to be used when connecting "
-                               "to a remote server.")
+    parser.add_option("", "--token", action="store", dest="xmlrpctoken",
+                      default=os.environ.get("BBTOKEN"),
+                      help="Specify the connection token to be used when connecting "
+                           "to a remote server.")
 
-        parser.add_option("", "--revisions-changed", action="store_true",
-                          dest="revisions_changed", default=False,
-                          help="Set the exit code depending on whether upstream floating "
-                               "revisions have changed or not.")
+    parser.add_option("", "--revisions-changed", action="store_true",
+                      dest="revisions_changed", default=False,
+                      help="Set the exit code depending on whether upstream floating "
+                           "revisions have changed or not.")
 
-        parser.add_option("", "--server-only", action="store_true",
-                          dest="server_only", default=False,
-                          help="Run bitbake without a UI, only starting a server "
-                               "(cooker) process.")
+    parser.add_option("", "--server-only", action="store_true",
+                      dest="server_only", default=False,
+                      help="Run bitbake without a UI, only starting a server "
+                           "(cooker) process.")
 
-        parser.add_option("-B", "--bind", action="store", dest="bind", default=False,
-                          help="The name/address for the bitbake xmlrpc server to bind to.")
+    parser.add_option("-B", "--bind", action="store", dest="bind", default=False,
+                      help="The name/address for the bitbake xmlrpc server to bind to.")
 
-        parser.add_option("-T", "--idle-timeout", type=float, dest="server_timeout",
-                          default=os.getenv("BB_SERVER_TIMEOUT"),
-                          help="Set timeout to unload bitbake server due to inactivity, "
-                                "set to -1 means no unload, "
-                                "default: Environment variable BB_SERVER_TIMEOUT.")
+    parser.add_option("-T", "--idle-timeout", type=float, dest="server_timeout",
+                      default=os.getenv("BB_SERVER_TIMEOUT"),
+                      help="Set timeout to unload bitbake server due to inactivity, "
+                           "set to -1 means no unload, "
+                           "default: Environment variable BB_SERVER_TIMEOUT.")
 
-        parser.add_option("", "--no-setscene", action="store_true",
-                          dest="nosetscene", default=False,
-                          help="Do not run any setscene tasks. sstate will be ignored and "
-                               "everything needed, built.")
+    parser.add_option("", "--no-setscene", action="store_true",
+                      dest="nosetscene", default=False,
+                      help="Do not run any setscene tasks. sstate will be ignored and "
+                           "everything needed, built.")
 
-        parser.add_option("", "--skip-setscene", action="store_true",
-                          dest="skipsetscene", default=False,
-                          help="Skip setscene tasks if they would be executed. Tasks previously "
-                               "restored from sstate will be kept, unlike --no-setscene")
+    parser.add_option("", "--skip-setscene", action="store_true",
+                      dest="skipsetscene", default=False,
+                      help="Skip setscene tasks if they would be executed. Tasks previously "
+                           "restored from sstate will be kept, unlike --no-setscene")
 
-        parser.add_option("", "--setscene-only", action="store_true",
-                          dest="setsceneonly", default=False,
-                          help="Only run setscene tasks, don't run any real tasks.")
+    parser.add_option("", "--setscene-only", action="store_true",
+                      dest="setsceneonly", default=False,
+                      help="Only run setscene tasks, don't run any real tasks.")
 
-        parser.add_option("", "--remote-server", action="store", dest="remote_server",
-                          default=os.environ.get("BBSERVER"),
-                          help="Connect to the specified server.")
+    parser.add_option("", "--remote-server", action="store", dest="remote_server",
+                      default=os.environ.get("BBSERVER"),
+                      help="Connect to the specified server.")
 
-        parser.add_option("-m", "--kill-server", action="store_true",
-                          dest="kill_server", default=False,
-                          help="Terminate any running bitbake server.")
+    parser.add_option("-m", "--kill-server", action="store_true",
+                      dest="kill_server", default=False,
+                      help="Terminate any running bitbake server.")
 
-        parser.add_option("", "--observe-only", action="store_true",
-                          dest="observe_only", default=False,
-                          help="Connect to a server as an observing-only client.")
+    parser.add_option("", "--observe-only", action="store_true",
+                      dest="observe_only", default=False,
+                      help="Connect to a server as an observing-only client.")
 
-        parser.add_option("", "--status-only", action="store_true",
-                          dest="status_only", default=False,
-                          help="Check the status of the remote bitbake server.")
+    parser.add_option("", "--status-only", action="store_true",
+                      dest="status_only", default=False,
+                      help="Check the status of the remote bitbake server.")
 
-        parser.add_option("-w", "--write-log", action="store", dest="writeeventlog",
-                          default=os.environ.get("BBEVENTLOG"),
-                          help="Writes the event log of the build to a bitbake event json file. "
-                               "Use '' (empty string) to assign the name automatically.")
+    parser.add_option("-w", "--write-log", action="store", dest="writeeventlog",
+                      default=os.environ.get("BBEVENTLOG"),
+                      help="Writes the event log of the build to a bitbake event json file. "
+                           "Use '' (empty string) to assign the name automatically.")
 
-        parser.add_option("", "--runall", action="append", dest="runall",
-                          help="Run the specified task for any recipe in the taskgraph of the specified target (even if it wouldn't otherwise have run).")
+    parser.add_option("", "--runall", action="append", dest="runall",
+                      help="Run the specified task for any recipe in the taskgraph of the specified target (even if it wouldn't otherwise have run).")
 
-        parser.add_option("", "--runonly", action="append", dest="runonly",
-                          help="Run only the specified task within the taskgraph of the specified targets (and any task dependencies those tasks may have).")
+    parser.add_option("", "--runonly", action="append", dest="runonly",
+                      help="Run only the specified task within the taskgraph of the specified targets (and any task dependencies those tasks may have).")
+    return parser
 
 
+class BitBakeConfigParameters(cookerdata.ConfigParameters):
+    def parseCommandLine(self, argv=sys.argv):
+        parser = create_bitbake_parser()
         options, targets = parser.parse_args(argv)
 
         if options.quiet and options.verbose:
@@ -344,8 +347,6 @@ def bitbake_main(configParams, configuration):
     except:
         pass
 
-    configuration.setConfigParameters(configParams)
-
     if configParams.server_only and configParams.remote_server:
             raise BBMainException("FATAL: The '--server-only' option conflicts with %s.\n" %
                                   ("the BBSERVER environment variable" if "BBSERVER" in os.environ \
@@ -357,13 +358,13 @@ def bitbake_main(configParams, configuration):
 
     if "BBDEBUG" in os.environ:
         level = int(os.environ["BBDEBUG"])
-        if level > configuration.debug:
-            configuration.debug = level
+        if level > configParams.debug:
+            configParams.debug = level
 
-    bb.msg.init_msgconfig(configParams.verbose, configuration.debug,
-                          configuration.debug_domains)
+    bb.msg.init_msgconfig(configParams.verbose, configParams.debug,
+                          configParams.debug_domains)
 
-    server_connection, ui_module = setup_bitbake(configParams, configuration)
+    server_connection, ui_module = setup_bitbake(configParams)
     # No server connection
     if server_connection is None:
         if configParams.status_only:
@@ -390,7 +391,7 @@ def bitbake_main(configParams, configuration):
 
     return 1
 
-def setup_bitbake(configParams, configuration, extrafeatures=None):
+def setup_bitbake(configParams, extrafeatures=None):
     # Ensure logging messages get sent to the UI as events
     handler = bb.event.LogHandler()
     if not configParams.status_only:
@@ -431,11 +432,11 @@ def setup_bitbake(configParams, configuration, extrafeatures=None):
                         logger.info("bitbake server is not running.")
                         lock.close()
                         return None, None
-                    # we start a server with a given configuration
+                    # we start a server with a given featureset
                     logger.info("Starting bitbake server...")
                     # Clear the event queue since we already displayed messages
                     bb.event.ui_queue = []
-                    server = bb.server.process.BitBakeServer(lock, sockname, configuration, featureset)
+                    server = bb.server.process.BitBakeServer(lock, sockname, featureset, configParams.server_timeout, configParams.xmlrpcinterface)
 
                 else:
                     logger.info("Reconnecting to bitbake server...")
@@ -458,15 +459,17 @@ def setup_bitbake(configParams, configuration, extrafeatures=None):
                     break
             except BBMainFatal:
                 raise
-            except (Exception, bb.server.process.ProcessTimeout) as e:
+            except (Exception, bb.server.process.ProcessTimeout, SystemExit) as e:
+                # SystemExit does not inherit from the Exception class, needs to be included explicitly
                 if not retries:
                     raise
                 retries -= 1
                 tryno = 8 - retries
-                if isinstance(e, (bb.server.process.ProcessTimeout, BrokenPipeError, EOFError)):
+                if isinstance(e, (bb.server.process.ProcessTimeout, BrokenPipeError, EOFError, SystemExit)):
                     logger.info("Retrying server connection (#%d)..." % tryno)
                 else:
                     logger.info("Retrying server connection (#%d)... (%s)" % (tryno, traceback.format_exc()))
+
             if not retries:
                 bb.fatal("Unable to connect to bitbake server, or start one (server startup failures would be in bitbake-cookerdaemon.log).")
             bb.event.print_ui_queue()

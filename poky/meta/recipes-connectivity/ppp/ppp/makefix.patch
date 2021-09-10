@@ -1,0 +1,40 @@
+We were seeing reproducibility issues where one host would use the internal 
+logwtmp wrapper, another would use the one in libutil. The issue was that in
+some cases the "\#include" was making it to CC, in others, "#include". The
+issue seems to be related to shell escaping.
+
+The root cause looks to be:
+http://git.savannah.gnu.org/cgit/make.git/commit/?id=c6966b323811c37acedff05b576b907b06aea5f4
+
+Instead of relying on shell quoting, use make to indirect the variable
+and avoid the problem.
+
+See https://github.com/paulusmack/ppp/issues/233
+
+Upstream-Status: Backport [https://github.com/paulusmack/ppp/commit/b4430f7092ececdff2504d5f3393a4c6528c3686]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: ppp-2.4.9/pppd/Makefile.linux
+===================================================================
+--- ppp-2.4.9.orig/pppd/Makefile.linux
++++ ppp-2.4.9/pppd/Makefile.linux
+@@ -80,7 +80,8 @@ PLUGIN=y
+ #USE_SRP=y
+ 
+ # Use libutil; test if logwtmp is declared in <utmp.h> to detect
+-ifeq ($(shell echo '\#include <utmp.h>' | $(CC) -E - 2>/dev/null | grep -q logwtmp && echo yes),yes)
++UTMPHEADER = "\#include <utmp.h>"
++ifeq ($(shell echo $(UTMPHEADER) | $(CC) -E - 2>/dev/null | grep -q logwtmp && echo yes),yes)
+ USE_LIBUTIL=y
+ endif
+ 
+@@ -143,7 +144,8 @@ CFLAGS   += -DHAS_SHADOW
+ #LIBS     += -lshadow $(LIBS)
+ endif
+ 
+-ifeq ($(shell echo '\#include <crypt.h>' | $(CC) -E - >/dev/null 2>&1 && echo yes),yes)
++CRYPTHEADER = "\#include <crypt.h>"
++ifeq ($(shell echo $(CRYPTHEADER) | $(CC) -E - >/dev/null 2>&1 && echo yes),yes)
+ CFLAGS  += -DHAVE_CRYPT_H=1
+ LIBS	+= -lcrypt
+ endif

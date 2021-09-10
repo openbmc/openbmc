@@ -1,4 +1,4 @@
-From fe9ff55dac403b148f229c865bf2826ea4edf447 Mon Sep 17 00:00:00 2001
+From c5969e5e5c50e2c9b32c6f945040a8e5763ba06c Mon Sep 17 00:00:00 2001
 From: Jeff Wannamaker <jeff_wannamaker@cable.comcast.com>
 Date: Sat, 27 Jan 2018 12:28:31 -0500
 Subject: [PATCH] Allow multiple wayland compositor state data per process

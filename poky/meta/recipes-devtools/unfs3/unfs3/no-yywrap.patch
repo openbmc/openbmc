@@ -1,0 +1,12 @@
+diff --git a/Config/exports.l b/Config/exports.l
+index 662603c..7e7c4fc 100644
+--- a/Config/exports.l
++++ b/Config/exports.l
+@@ -50,6 +50,7 @@ OLDNET {IP}"/"{IP}
+ 
+ %option nounput
+ %option noinput
++%option noyywrap
+ 
+ %%
+ 

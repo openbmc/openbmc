@@ -11,4 +11,4 @@ do_install() {
 }
 
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM_${PN} = "--system network"
+GROUPADD_PARAM:${PN} = "--system network"

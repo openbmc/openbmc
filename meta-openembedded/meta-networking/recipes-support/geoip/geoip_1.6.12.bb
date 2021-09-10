@@ -10,7 +10,7 @@ SECTION = "libdevel"
 
 GEOIP_DATABASE_VERSION = "20181205"
 
-SRC_URI = "git://github.com/maxmind/geoip-api-c.git \
+SRC_URI = "git://github.com/maxmind/geoip-api-c.git;branch=main \
            http://sources.openembedded.org/GeoIP.dat.${GEOIP_DATABASE_VERSION}.gz;apply=no;name=GeoIP-dat; \
            http://sources.openembedded.org/GeoIPv6.dat.${GEOIP_DATABASE_VERSION}.gz;apply=no;name=GeoIPv6-dat; \
            http://sources.openembedded.org/GeoLiteCity.dat.${GEOIP_DATABASE_VERSION}.gz;apply=no;name=GeoLiteCity-dat; \
@@ -54,12 +54,12 @@ do_install() {
 }
 
 PACKAGES =+ "${PN}-database"
-FILES_${PN}-database = ""
-FILES_${PN}-database += "${datadir}/GeoIP/*"
+FILES:${PN}-database = ""
+FILES:${PN}-database += "${datadir}/GeoIP/*"
 
 # We cannot do much looking up without databases.
 #
-RDEPENDS_${PN} += "${PN}-database"
+RDEPENDS:${PN} += "${PN}-database"
 
 inherit ptest
 

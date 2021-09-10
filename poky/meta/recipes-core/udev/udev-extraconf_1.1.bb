@@ -35,11 +35,11 @@ do_install() {
     install -m 0755 ${WORKDIR}/network.sh ${D}${sysconfdir}/udev/scripts
 }
 
-FILES_${PN} = "${sysconfdir}/udev"
-RDEPENDS_${PN} = "udev"
-CONFFILES_${PN} = "${sysconfdir}/udev/mount.blacklist"
+FILES:${PN} = "${sysconfdir}/udev"
+RDEPENDS:${PN} = "udev"
+CONFFILES:${PN} = "${sysconfdir}/udev/mount.blacklist"
 
 # to replace udev-extra-rules from meta-oe
-RPROVIDES_${PN} = "udev-extra-rules"
-RREPLACES_${PN} = "udev-extra-rules"
-RCONFLICTS_${PN} = "udev-extra-rules"
+RPROVIDES:${PN} = "udev-extra-rules"
+RREPLACES:${PN} = "udev-extra-rules"
+RCONFLICTS:${PN} = "udev-extra-rules"

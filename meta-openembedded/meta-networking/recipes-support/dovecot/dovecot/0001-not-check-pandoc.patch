@@ -1,0 +1,26 @@
+From 8c7d143ff28441c8b74b0f518dd2281239aede3d Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@cn.fujitsu.com>
+Date: Fri, 15 Jan 2021 11:10:22 +0900
+Subject: [PATCH] not check pandoc
+
+Signed-off-by: Wang Mingyu <wangmy@cn.fujitsu.com>
+---
+ m4/dovecot.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/m4/dovecot.m4 b/m4/dovecot.m4
+index 2b5d895..ece8489 100644
+--- a/m4/dovecot.m4
++++ b/m4/dovecot.m4
+@@ -447,7 +447,7 @@ AC_DEFUN([DC_PANDOC], [
+   dnl Optional tool for making documentation
+   AC_CHECK_PROGS(PANDOC, [pandoc], [true])
+ 
+-  AS_IF([test "$PANDOC" = "true"], [
++  AS_IF([test "$PANDOC" = "false"], [
+    AS_IF([test ! -e README], [
+      AC_MSG_ERROR([Cannot produce documentation without pandoc - disable with PANDOC=false ./configure])
+    ])
+-- 
+2.25.1
+

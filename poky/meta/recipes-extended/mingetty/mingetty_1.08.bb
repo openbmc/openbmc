@@ -1,6 +1,7 @@
 SUMMARY = "Compact getty terminal handler for virtual consoles only"
 SECTION = "console/utils"
 HOMEPAGE = "http://sourceforge.net/projects/mingetty/"
+DESCRIPTION = "This is a small Linux console getty that is started on the Linux text console, asks for a login name and then tranfers over to login directory. Is extended to allow automatic login and starting any app."
 LICENSE = "GPLv2"
 PR = "r3"
 
@@ -23,7 +24,7 @@ do_install(){
 
 inherit update-alternatives
 
-ALTERNATIVE_${PN} = "getty"
+ALTERNATIVE:${PN} = "getty"
 ALTERNATIVE_LINK_NAME[getty] = "${base_sbindir}/getty"
 ALTERNATIVE_TARGET[getty] = "${base_sbindir}/mingetty"
 ALTERNATIVE_PRIORITY = "10"

@@ -10,9 +10,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 SECTION = "libs"
 DEPENDS = "libtirpc"
 
-PV = "1.2.0+git${SRCPV}"
+PV = "2.0.0"
 
-SRCREV = "4a062cf4180d99371198951e4ea5b4550efd58a3"
+SRCREV = "82245c0c58add79a8e34ab0917358217a70e5100"
 
 SRC_URI = "git://github.com/thkukuk/libnsl \
           "

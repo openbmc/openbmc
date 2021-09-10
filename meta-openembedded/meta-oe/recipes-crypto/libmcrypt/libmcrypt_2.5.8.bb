@@ -13,3 +13,16 @@ UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/mcrypt/files/Libmcrypt/"
 UPSTREAM_CHECK_REGEX = "Libmcrypt/(?P<pver>\d+(\.\d+)+)/"
 
 inherit autotools-brokensep gettext binconfig
+
+do_configure() {
+        install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}
+        install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}
+        aclocal
+        libtoolize --automake --copy --force
+        autoconf
+        autoheader
+        automake -a
+        oe_runconf
+}
+
+CLEANBROKEN = "1"

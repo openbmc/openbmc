@@ -8,11 +8,12 @@ HOMEPAGE = "http://sourceforge.net/projects/${BPN}"
 SECTION = "admin"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
-RRECOMMENDS_${PN} = "kernel-module-aoe"
+RRECOMMENDS:${PN} = "kernel-module-aoe"
 
 SRC_URI = "http://sourceforge.net/projects/${BPN}/files/${BPN}/${BPN}-${PV}.tar.gz \
            file://aoe-stat-no-bashism.patch \
            file://makefile-add-ldflags.patch \
+           file://reproducible-build.patch \
         "
 SRC_URI[md5sum] = "bff30daa988a65f69d4448ce4726a6db"
 SRC_URI[sha256sum] = "fb5e2cd0de7644cc1ec04ee3aeb43211cf7445a0c19e13d6b3ed5a8fbdf215ff"

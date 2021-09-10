@@ -1,21 +1,23 @@
 # Note, we can probably remove the lzma option as it has be replaced with xz,
 # and I don't think the kernel supports it any more.
 SUMMARY = "Tools for manipulating SquashFS filesystems"
+HOMEPAGE = "https://github.com/plougher/squashfs-tools"
+DESCRIPTION = "Tools to create and extract Squashfs filesystems."
 SECTION = "base"
 LICENSE = "GPL-2"
 LIC_FILES_CHKSUM = "file://../COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-PV = "4.4"
-SRCREV = "52eb4c279cd283ed9802dd1ceb686560b22ffb67"
+PV = "4.5"
+SRCREV = "0496d7c3de3e09da37ba492081c86159806ebb07"
 SRC_URI = "git://github.com/plougher/squashfs-tools.git;protocol=https \
-           file://0001-squashfs-tools-fix-build-failure-against-gcc-10.patch;striplevel=2 \
-"
+           file://0001-Avoid-use-of-INSTALL_DIR-for-symlink-targets.patch \
+           "
 
 S = "${WORKDIR}/git/squashfs-tools"
 
 EXTRA_OEMAKE = "${PACKAGECONFIG_CONFARGS}"
 
-PACKAGECONFIG ??= "gzip xz lzo lz4 lzma xattr reproducible"
+PACKAGECONFIG ??= "gzip xz lzo lz4 lzma xattr zstd reproducible"
 PACKAGECONFIG[gzip] = "GZIP_SUPPORT=1,GZIP_SUPPORT=0,zlib"
 PACKAGECONFIG[xz] = "XZ_SUPPORT=1,XZ_SUPPORT=0,xz"
 PACKAGECONFIG[lzo] = "LZO_SUPPORT=1,LZO_SUPPORT=0,lzo"
@@ -30,12 +32,14 @@ do_compile() {
 }
 
 do_install() {
+	install -d "${D}${includedir}"
 	oe_runmake install INSTALL_DIR=${D}${sbindir}
+	install -m 0644 "${S}"/squashfs_fs.h "${D}${includedir}"
 }
 
-ARM_INSTRUCTION_SET_armv4 = "arm"
-ARM_INSTRUCTION_SET_armv5 = "arm"
-ARM_INSTRUCTION_SET_armv6 = "arm"
+ARM_INSTRUCTION_SET:armv4 = "arm"
+ARM_INSTRUCTION_SET:armv5 = "arm"
+ARM_INSTRUCTION_SET:armv6 = "arm"
 
 BBCLASSEXTEND = "native nativesdk"
 

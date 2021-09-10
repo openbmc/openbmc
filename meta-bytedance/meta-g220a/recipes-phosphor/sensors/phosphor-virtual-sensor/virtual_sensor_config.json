@@ -1,0 +1,396 @@
+[
+    {
+        "Desc":
+        {
+            "Name": "total_power",
+            "SensorType": "power"
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "PSU0_Input_Power",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "T1",
+                    "Desc":
+                    {
+                        "Name": "PSU1_Input_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "T0 + T1"
+    },
+    {
+        "Desc":
+        {
+            "Name": "P0_DIMM_VR_Pwr",
+            "SensorType": "power"
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "CPU0_DIMM_VR_0_Input_Power",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "T1",
+                    "Desc":
+                    {
+                        "Name": "CPU0_DIMM_VR_1_Input_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "T0 + T1"
+    },
+    {
+        "Desc":
+        {
+            "Name": "P1_DIMM_VR_Pwr",
+            "SensorType": "power"
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "CPU1_DIMM_VR_0_Input_Power",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "T1",
+                    "Desc":
+                    {
+                        "Name": "CPU1_DIMM_VR_1_Input_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "T0 + T1"
+    },
+    {
+        "Desc":
+        {
+            "Name": "CPU0_VR_Pwr",
+            "SensorType": "power"
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "CPU0_VR_0_Input_Power",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "T1",
+                    "Desc":
+                    {
+                        "Name": "CPU0_VR_1_Input_Power",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "T2",
+                    "Desc":
+                    {
+                        "Name": "CPU0_VR_2_Input_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "T0 + T1 + T2"
+    },
+    {
+        "Desc":
+        {
+            "Name": "CPU1_VR_Pwr",
+            "SensorType": "power"
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "CPU1_VR_0_Input_Power",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "T1",
+                    "Desc":
+                    {
+                        "Name": "CPU1_VR_1_Input_Power",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "T2",
+                    "Desc":
+                    {
+                        "Name": "CPU1_VR_2_Input_Power",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "T0 + T1 + T2"
+    },
+    {
+        "Desc":
+        {
+            "Name": "P0_DIMM_VR_Temp",
+            "SensorType": "temperature"
+        },
+		"Threshold" :
+		{
+			"CriticalHigh": 125,
+			"WarningHigh": 105
+		},
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "CPU0_DIMM_VR_0_Temperature",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "T1",
+                    "Desc":
+                    {
+                        "Name": "CPU0_DIMM_VR_1_Temperature",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(T0, T1)"
+    },
+    {
+        "Desc":
+        {
+            "Name": "P1_DIMM_VR_Temp",
+            "SensorType": "temperature"
+        },
+		"Threshold" :
+		{
+			"CriticalHigh": 125,
+			"WarningHigh": 105
+		},
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "CPU1_DIMM_VR_0_Temperature",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "T1",
+                    "Desc":
+                    {
+                        "Name": "CPU1_DIMM_VR_1_Temperature",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(T0, T1)"
+    },
+    {
+        "Desc":
+        {
+            "Name": "CPU0_VR_Temp",
+            "SensorType": "temperature"
+        },
+		"Threshold" :
+		{
+			"CriticalHigh": 125,
+			"WarningHigh": 105
+		},
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "CPU0_VR_0_Temperature",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "T1",
+                    "Desc":
+                    {
+                        "Name": "CPU0_VR_1_Temperature",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "T2",
+                    "Desc":
+                    {
+                        "Name": "CPU0_VR_2_Temperature",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(T0, T1, T2)"
+    },
+    {
+        "Desc":
+        {
+            "Name": "CPU1_VR_Temp",
+            "SensorType": "temperature"
+        },
+		"Threshold" :
+		{
+			"CriticalHigh": 125,
+			"WarningHigh": 105
+		},
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/G220A"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "CPU1_VR_0_Temperature",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "T1",
+                    "Desc":
+                    {
+                        "Name": "CPU1_VR_1_Temperature",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "T2",
+                    "Desc":
+                    {
+                        "Name": "CPU1_VR_2_Temperature",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(T0, T1, T2)"
+    }
+]

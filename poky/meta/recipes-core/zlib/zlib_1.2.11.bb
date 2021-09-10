@@ -17,7 +17,7 @@ SRC_URI[sha256sum] = "4ff941449631ace0d4d203e3483be9dbc9da454084111f97ea0a2114e1
 
 CFLAGS += "-D_REENTRANT"
 
-RDEPENDS_${PN}-ptest += "make"
+RDEPENDS:${PN}-ptest += "make"
 
 inherit ptest
 
@@ -39,7 +39,7 @@ do_install_ptest() {
 
 # Move zlib shared libraries for target builds to $base_libdir so the library
 # can be used in early boot before $prefix is mounted.
-do_install_append_class-target() {
+do_install:append:class-target() {
 	if [ ${base_libdir} != ${libdir} ]
 	then
 		mkdir -p ${D}/${base_libdir}

@@ -2,19 +2,15 @@
 
 inherit populate_sdk_base
 
-# NOTE: normally you cannot use task overrides for this kind of thing - this
-# only works because of get_sdk_ext_rdepends()
-
-TOOLCHAIN_HOST_TASK_task-populate-sdk-ext = " \
+# Used to override TOOLCHAIN_HOST_TASK in the eSDK case
+TOOLCHAIN_HOST_TASK_ESDK = " \
     meta-environment-extsdk-${MACHINE} \
     "
 
-TOOLCHAIN_TARGET_TASK_task-populate-sdk-ext = ""
-
-SDK_RELOCATE_AFTER_INSTALL_task-populate-sdk-ext = "0"
+SDK_RELOCATE_AFTER_INSTALL:task-populate-sdk-ext = "0"
 
 SDK_EXT = ""
-SDK_EXT_task-populate-sdk-ext = "-ext"
+SDK_EXT:task-populate-sdk-ext = "-ext"
 
 # Options are full or minimal
 SDK_EXT_TYPE ?= "full"
@@ -24,6 +20,7 @@ SDK_INCLUDE_NATIVESDK ?= "0"
 SDK_INCLUDE_BUILDTOOLS ?= '1'
 
 SDK_RECRDEP_TASKS ?= ""
+SDK_CUSTOM_TEMPLATECONF ?= "0"
 
 SDK_LOCAL_CONF_WHITELIST ?= ""
 SDK_LOCAL_CONF_BLACKLIST ?= "CONF_VERSION \
@@ -77,10 +74,10 @@ COREBASE_FILES ?= " \
     .templateconf \
 "
 
-SDK_DIR_task-populate-sdk-ext = "${WORKDIR}/sdk-ext"
-B_task-populate-sdk-ext = "${SDK_DIR}"
+SDK_DIR:task-populate-sdk-ext = "${WORKDIR}/sdk-ext"
+B:task-populate-sdk-ext = "${SDK_DIR}"
 TOOLCHAINEXT_OUTPUTNAME ?= "${SDK_NAME}-toolchain-ext-${SDK_VERSION}"
-TOOLCHAIN_OUTPUTNAME_task-populate-sdk-ext = "${TOOLCHAINEXT_OUTPUTNAME}"
+TOOLCHAIN_OUTPUTNAME:task-populate-sdk-ext = "${TOOLCHAINEXT_OUTPUTNAME}"
 
 SDK_EXT_TARGET_MANIFEST = "${SDK_DEPLOY}/${TOOLCHAINEXT_OUTPUTNAME}.target.manifest"
 SDK_EXT_HOST_MANIFEST = "${SDK_DEPLOY}/${TOOLCHAINEXT_OUTPUTNAME}.host.manifest"
@@ -117,9 +114,9 @@ python write_host_sdk_ext_manifest () {
                 f.write("%s %s %s\n" % (info[1], info[2], info[3]))
 }
 
-SDK_POSTPROCESS_COMMAND_append_task-populate-sdk-ext = "write_target_sdk_ext_manifest; write_host_sdk_ext_manifest; "    
+SDK_POSTPROCESS_COMMAND:append:task-populate-sdk-ext = "write_target_sdk_ext_manifest; write_host_sdk_ext_manifest; "    
 
-SDK_TITLE_task-populate-sdk-ext = "${@d.getVar('DISTRO_NAME') or d.getVar('DISTRO')} Extensible SDK"
+SDK_TITLE:task-populate-sdk-ext = "${@d.getVar('DISTRO_NAME') or d.getVar('DISTRO')} Extensible SDK"
 
 def clean_esdk_builddir(d, sdkbasepath):
     """Clean up traces of the fake build for create_filtered_tasklist()"""
@@ -146,15 +143,15 @@ def create_filtered_tasklist(d, sdkbasepath, tasklistfile, conf_initpath):
     try:
         with open(sdkbasepath + '/conf/local.conf', 'a') as f:
             # Force the use of sstate from the build system
-            f.write('\nSSTATE_DIR_forcevariable = "%s"\n' % d.getVar('SSTATE_DIR'))
-            f.write('SSTATE_MIRRORS_forcevariable = "file://universal/(.*) file://universal-4.9/\\1 file://universal-4.9/(.*) file://universal-4.8/\\1"\n')
+            f.write('\nSSTATE_DIR:forcevariable = "%s"\n' % d.getVar('SSTATE_DIR'))
+            f.write('SSTATE_MIRRORS:forcevariable = "file://universal/(.*) file://universal-4.9/\\1 file://universal-4.9/(.*) file://universal-4.8/\\1"\n')
             # Ensure TMPDIR is the default so that clean_esdk_builddir() can delete it
-            f.write('TMPDIR_forcevariable = "${TOPDIR}/tmp"\n')
-            f.write('TCLIBCAPPEND_forcevariable = ""\n')
+            f.write('TMPDIR:forcevariable = "${TOPDIR}/tmp"\n')
+            f.write('TCLIBCAPPEND:forcevariable = ""\n')
             # Drop uninative if the build isn't using it (or else NATIVELSBSTRING will
             # be different and we won't be able to find our native sstate)
             if not bb.data.inherits_class('uninative', d):
-                f.write('INHERIT_remove = "uninative"\n')
+                f.write('INHERIT:remove = "uninative"\n')
 
         # Unfortunately the default SDKPATH (or even a custom value) may contain characters that bitbake
         # will not allow in its COREBASE path, so we need to rename the directory temporarily
@@ -164,7 +161,7 @@ def create_filtered_tasklist(d, sdkbasepath, tasklistfile, conf_initpath):
             shutil.rmtree(temp_sdkbasepath)
         except FileNotFoundError:
             pass
-        os.rename(sdkbasepath, temp_sdkbasepath)
+        bb.utils.rename(sdkbasepath, temp_sdkbasepath)
         cmdprefix = '. %s .; ' % conf_initpath
         logfile = d.getVar('WORKDIR') + '/tasklist_bb_log.txt'
         try:
@@ -174,7 +171,7 @@ def create_filtered_tasklist(d, sdkbasepath, tasklistfile, conf_initpath):
             if 'attempted to execute unexpectedly and should have been setscened' in e.stdout:
                 msg += '\n----------\n\nNOTE: "attempted to execute unexpectedly and should have been setscened" errors indicate this may be caused by missing sstate artifacts that were likely produced in earlier builds, but have been subsequently deleted for some reason.\n'
             bb.fatal(msg)
-        os.rename(temp_sdkbasepath, sdkbasepath)
+        bb.utils.rename(temp_sdkbasepath, sdkbasepath)
         # Clean out residue of running bitbake, which check_sstate_task_list()
         # will effectively do
         clean_esdk_builddir(d, sdkbasepath)
@@ -198,6 +195,9 @@ python copy_buildsystem () {
     # Copy in all metadata layers + bitbake (as repositories)
     buildsystem = oe.copy_buildsystem.BuildSystem('extensible SDK', d)
     baseoutpath = d.getVar('SDK_OUTPUT') + '/' + d.getVar('SDKPATH')
+
+    #check if custome templateconf path is set
+    use_custom_templateconf = d.getVar('SDK_CUSTOM_TEMPLATECONF')
 
     # Determine if we're building a derivative extensible SDK (from devtool build-sdk)
     derivative = (d.getVar('SDK_DERIVATIVE') or '') == '1'
@@ -247,7 +247,9 @@ python copy_buildsystem () {
 
     # Create a layer for new recipes / appends
     bbpath = d.getVar('BBPATH')
-    bb.process.run(['devtool', '--bbpath', bbpath, '--basepath', baseoutpath, 'create-workspace', '--create-only', os.path.join(baseoutpath, 'workspace')])
+    env = os.environ.copy()
+    env['PYTHONDONTWRITEBYTECODE'] = '1'
+    bb.process.run(['devtool', '--bbpath', bbpath, '--basepath', baseoutpath, 'create-workspace', '--create-only', os.path.join(baseoutpath, 'workspace')], env=env)
 
     # Create bblayers.conf
     bb.utils.mkdirhier(baseoutpath + '/conf')
@@ -310,8 +312,9 @@ python copy_buildsystem () {
         if os.path.exists(builddir + '/conf/auto.conf'):
             with open(builddir + '/conf/auto.conf', 'r') as f:
                 oldlines += f.readlines()
-        with open(builddir + '/conf/local.conf', 'r') as f:
-            oldlines += f.readlines()
+        if os.path.exists(builddir + '/conf/local.conf'):
+            with open(builddir + '/conf/local.conf', 'r') as f:
+                oldlines += f.readlines()
         (updated, newlines) = bb.utils.edit_metadata(oldlines, varlist, handle_var)
 
         with open(baseoutpath + '/conf/local.conf', 'w') as f:
@@ -335,7 +338,7 @@ python copy_buildsystem () {
             f.write('CONF_VERSION = "%s"\n\n' % d.getVar('CONF_VERSION', False))
 
             # Some classes are not suitable for SDK, remove them from INHERIT
-            f.write('INHERIT_remove = "%s"\n' % d.getVar('SDK_INHERIT_BLACKLIST', False))
+            f.write('INHERIT:remove = "%s"\n' % d.getVar('SDK_INHERIT_BLACKLIST', False))
 
             # Bypass the default connectivity check if any
             f.write('CONNECTIVITY_CHECK_URIS = ""\n\n')
@@ -351,7 +354,7 @@ python copy_buildsystem () {
             f.write('SIGGEN_LOCKEDSIGS_TASKSIG_CHECK = "warn"\n\n')
 
             # We want to be able to set this without a full reparse
-            f.write('BB_HASHCONFIG_WHITELIST_append = " SIGGEN_UNLOCKED_RECIPES"\n\n')
+            f.write('BB_HASHCONFIG_WHITELIST:append = " SIGGEN_UNLOCKED_RECIPES"\n\n')
 
             # Set up whitelist for run on install
             f.write('BB_SETSCENE_ENFORCE_WHITELIST = "%:* *:do_shared_workdir *:do_rm_work wic-tools:* *:do_addto_recipe_sysroot"\n\n')
@@ -359,11 +362,18 @@ python copy_buildsystem () {
             # Hide the config information from bitbake output (since it's fixed within the SDK)
             f.write('BUILDCFG_HEADER = ""\n\n')
 
+            # Write METADATA_REVISION
+            f.write('METADATA_REVISION = "%s"\n\n' % d.getVar('METADATA_REVISION'))
+
             f.write('# Provide a flag to indicate we are in the EXT_SDK Context\n')
             f.write('WITHIN_EXT_SDK = "1"\n\n')
 
             # Map gcc-dependent uninative sstate cache for installer usage
             f.write('SSTATE_MIRRORS += " file://universal/(.*) file://universal-4.9/\\1 file://universal-4.9/(.*) file://universal-4.8/\\1"\n\n')
+
+            if d.getVar("PRSERV_HOST"):
+                # Override this, we now include PR data, so it should only point ot the local database
+                f.write('PRSERV_HOST = "localhost:0"\n\n')
 
             # Allow additional config through sdk-extra.conf
             fn = bb.cookerdata.findConfigFile('sdk-extra.conf', d)
@@ -383,13 +393,42 @@ python copy_buildsystem () {
             f.write('require conf/locked-sigs.inc\n')
             f.write('require conf/unlocked-sigs.inc\n')
 
+    # Copy multiple configurations if they exist in the users config directory
+    if d.getVar('BBMULTICONFIG') is not None:
+        bb.utils.mkdirhier(os.path.join(baseoutpath, 'conf', 'multiconfig'))
+        for mc in d.getVar('BBMULTICONFIG').split():
+            dest_stub = "/conf/multiconfig/%s.conf" % (mc,)
+            if os.path.exists(builddir + dest_stub):
+                shutil.copyfile(builddir + dest_stub, baseoutpath + dest_stub)
+
     if os.path.exists(builddir + '/cache/bb_unihashes.dat'):
         bb.parse.siggen.save_unitaskhashes()
         bb.utils.mkdirhier(os.path.join(baseoutpath, 'cache'))
         shutil.copyfile(builddir + '/cache/bb_unihashes.dat', baseoutpath + '/cache/bb_unihashes.dat')
 
+    # If PR Service is in use, we need to export this as well
+    bb.note('Do we have a pr database?')
+    if d.getVar("PRSERV_HOST"):
+        bb.note('Writing PR database...')
+        # Based on the code in classes/prexport.bbclass
+        import oe.prservice
+        #dump meta info of tables
+        localdata = d.createCopy()
+        localdata.setVar('PRSERV_DUMPOPT_COL', "1")
+        localdata.setVar('PRSERV_DUMPDIR', os.path.join(baseoutpath, 'conf'))
+        localdata.setVar('PRSERV_DUMPFILE', '${PRSERV_DUMPDIR}/prserv.inc')
+
+        bb.note('PR Database write to %s' % (localdata.getVar('PRSERV_DUMPFILE')))
+
+        retval = oe.prservice.prserv_dump_db(localdata)
+        if not retval:
+            bb.error("prexport_handler: export failed!")
+            return
+        (metainfo, datainfo) = retval
+        oe.prservice.prserv_export_tofile(localdata, metainfo, datainfo, True)
+
     # Use templateconf.cfg file from builddir if exists
-    if os.path.exists(builddir + '/conf/templateconf.cfg'):
+    if os.path.exists(builddir + '/conf/templateconf.cfg') and use_custom_templateconf == '1':
         shutil.copyfile(builddir + '/conf/templateconf.cfg', baseoutpath + '/conf/templateconf.cfg')
     else:
         # Write a templateconf.cfg
@@ -521,11 +560,20 @@ python copy_buildsystem () {
     # sdk_ext_postinst() below) thus the checksum we take here would always
     # be different.
     manifest_file_list = ['conf/*']
+    if d.getVar('BBMULTICONFIG') is not None:
+        manifest_file_list.append('conf/multiconfig/*')
+
+    esdk_manifest_excludes = (d.getVar('ESDK_MANIFEST_EXCLUDES') or '').split()
+    esdk_manifest_excludes_list = []
+    for exclude_item in esdk_manifest_excludes:
+        esdk_manifest_excludes_list += glob.glob(os.path.join(baseoutpath, exclude_item))
     manifest_file = os.path.join(baseoutpath, 'conf', 'sdk-conf-manifest')
     with open(manifest_file, 'w') as f:
         for item in manifest_file_list:
             for fn in glob.glob(os.path.join(baseoutpath, item)):
-                if fn == manifest_file:
+                if fn == manifest_file or os.path.isdir(fn):
+                    continue
+                if fn in esdk_manifest_excludes_list:
                     continue
                 chksum = bb.utils.sha256_file(fn)
                 f.write('%s\t%s\n' % (chksum, os.path.relpath(fn, baseoutpath)))
@@ -636,7 +684,7 @@ sdk_ext_preinst() {
 		EXTRA_TAR_OPTIONS="$EXTRA_TAR_OPTIONS --exclude=sstate-cache"
 	fi
 }
-SDK_PRE_INSTALL_COMMAND_task-populate-sdk-ext = "${sdk_ext_preinst}"
+SDK_PRE_INSTALL_COMMAND:task-populate-sdk-ext = "${sdk_ext_preinst}"
 
 # FIXME this preparation should be done as part of the SDK construction
 sdk_ext_postinst() {
@@ -653,7 +701,10 @@ sdk_ext_postinst() {
 
 		# Make sure when the user sets up the environment, they also get
 		# the buildtools-tarball tools in their path.
+		echo "# Save and reset OECORE_NATIVE_SYSROOT as buildtools may change it" >> $env_setup_script
+		echo "SAVED=\"\$OECORE_NATIVE_SYSROOT\"" >> $env_setup_script
 		echo ". $target_sdk_dir/buildtools/environment-setup*" >> $env_setup_script
+		echo "OECORE_NATIVE_SYSROOT=\"\$SAVED\"" >> $env_setup_script
 	fi
 
 	# Allow bitbake environment setup to be ran as part of this sdk.
@@ -676,7 +727,7 @@ sdk_ext_postinst() {
 		# current working directory when first ran, nor will it set $1 when
 		# sourcing a script. That is why this has to look so ugly.
 		LOGFILE="$target_sdk_dir/preparing_build_system.log"
-		sh -c ". buildtools/environment-setup* > $LOGFILE && cd $target_sdk_dir/`dirname ${oe_init_build_env_path}` && set $target_sdk_dir && . $target_sdk_dir/${oe_init_build_env_path} $target_sdk_dir >> $LOGFILE && python $target_sdk_dir/ext-sdk-prepare.py $LOGFILE '${SDK_INSTALL_TARGETS}'" || { echo "printf 'ERROR: this SDK was not fully installed and needs reinstalling\n'" >> $env_setup_script ; exit 1 ; }
+		sh -c ". buildtools/environment-setup* > $LOGFILE && cd $target_sdk_dir/`dirname ${oe_init_build_env_path}` && set $target_sdk_dir && . $target_sdk_dir/${oe_init_build_env_path} $target_sdk_dir >> $LOGFILE && python3 $target_sdk_dir/ext-sdk-prepare.py $LOGFILE '${SDK_INSTALL_TARGETS}'" || { echo "printf 'ERROR: this SDK was not fully installed and needs reinstalling\n'" >> $env_setup_script ; exit 1 ; }
 	fi
 	if [ -e $target_sdk_dir/ext-sdk-prepare.py ]; then
 		rm $target_sdk_dir/ext-sdk-prepare.py
@@ -684,9 +735,9 @@ sdk_ext_postinst() {
 	echo done
 }
 
-SDK_POST_INSTALL_COMMAND_task-populate-sdk-ext = "${sdk_ext_postinst}"
+SDK_POST_INSTALL_COMMAND:task-populate-sdk-ext = "${sdk_ext_postinst}"
 
-SDK_POSTPROCESS_COMMAND_prepend_task-populate-sdk-ext = "copy_buildsystem; install_tools; "
+SDK_POSTPROCESS_COMMAND:prepend:task-populate-sdk-ext = "copy_buildsystem; install_tools; "
 
 SDK_INSTALL_TARGETS = ""
 fakeroot python do_populate_sdk_ext() {
@@ -694,6 +745,15 @@ fakeroot python do_populate_sdk_ext() {
     # currently forces this upon us
     if d.getVar('SDK_ARCH') != d.getVar('BUILD_ARCH'):
         bb.fatal('The extensible SDK can currently only be built for the same architecture as the machine being built on - SDK_ARCH is set to %s (likely via setting SDKMACHINE) which is different from the architecture of the build machine (%s). Unable to continue.' % (d.getVar('SDK_ARCH'), d.getVar('BUILD_ARCH')))
+
+    # FIXME hopefully we can remove this restriction at some point, but the eSDK
+    # can only be built for the primary (default) multiconfig
+    if d.getVar('BB_CURRENT_MC') != 'default':
+        bb.fatal('The extensible SDK can currently only be built for the default multiconfig.  Currently trying to build for %s.' % d.getVar('BB_CURRENT_MC'))
+
+    # eSDK dependencies don't use the traditional variables and things don't work properly if they are set
+    d.setVar("TOOLCHAIN_HOST_TASK", "${TOOLCHAIN_HOST_TASK_ESDK}")
+    d.setVar("TOOLCHAIN_TARGET_TASK", "")
 
     d.setVar('SDK_INSTALL_TARGETS', get_sdk_install_targets(d))
     if d.getVar('SDK_INCLUDE_BUILDTOOLS') == '1':
@@ -740,12 +800,7 @@ do_sdk_depends[dirs] = "${WORKDIR}"
 do_sdk_depends[depends] = "${@get_ext_sdk_depends(d)} meta-extsdk-toolchain:do_populate_sysroot"
 do_sdk_depends[recrdeptask] = "${@d.getVarFlag('do_populate_sdk', 'recrdeptask', False)}"
 do_sdk_depends[recrdeptask] += "do_populate_lic do_package_qa do_populate_sysroot do_deploy ${SDK_RECRDEP_TASKS}"
-do_sdk_depends[rdepends] = "${@get_sdk_ext_rdepends(d)}"
-
-def get_sdk_ext_rdepends(d):
-    localdata = d.createCopy()
-    localdata.appendVar('OVERRIDES', ':task-populate-sdk-ext')
-    return localdata.getVarFlag('do_populate_sdk', 'rdepends')
+do_sdk_depends[rdepends] = "${@' '.join([x + ':do_package_write_${IMAGE_PKGTYPE} ' + x + ':do_packagedata' for x in d.getVar('TOOLCHAIN_HOST_TASK_ESDK').split()])}"
 
 do_populate_sdk_ext[dirs] = "${@d.getVarFlag('do_populate_sdk', 'dirs', False)}"
 
@@ -773,7 +828,7 @@ do_populate_sdk_ext[nostamp] = "1"
 SDKEXTDEPLOYDIR = "${WORKDIR}/deploy-${PN}-populate-sdk-ext"
 
 SSTATETASKS += "do_populate_sdk_ext"
-SSTATE_SKIP_CREATION_task-populate-sdk-ext = '1'
+SSTATE_SKIP_CREATION:task-populate-sdk-ext = '1'
 do_populate_sdk_ext[cleandirs] = "${SDKEXTDEPLOYDIR}"
 do_populate_sdk_ext[sstate-inputdirs] = "${SDKEXTDEPLOYDIR}"
 do_populate_sdk_ext[sstate-outputdirs] = "${SDK_DEPLOY}"

@@ -1,0 +1,165 @@
+From bd9b5060bc3b9581090d44f15b4e236566ea86a6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 4 Jun 2021 12:57:57 -0700
+Subject: [PATCH] Silence clang warnings
+
+Fixes
+glm/gtc/random.inl:25:17: error: implicit conversion loses integer precision: 'int' to 'unsigned char' [-Werror,-Wimplicit-int-conversion]
+|                                 std::rand() % std::numeric_limits<uint8>::max());
+|                                 ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+glm/gtc/../ext/quaternion_common.inl:76:87: error: unused parameter 'k' [-Werror,-Wunused-parameter]
+    GLM_FUNC_QUALIFIER qua<T, Q> slerp(qua<T, Q> const& x, qua<T, Q> const& y, T a, S k)
+                                                                                      ^
+
+and
+
+test/gtx/gtx_fast_trigonometry.cpp:135:9: error: variable 'result' set but not used [-Werror,-Wunused-but-set-variable]
+|                 float result = 0.f;
+|                       ^
+
+Upstream-Status: Submitted [https://github.com/g-truc/glm/pull/1055]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ glm/ext/quaternion_common.inl      |  2 +-
+ glm/gtc/random.inl                 |  2 +-
+ test/gtx/gtx_fast_trigonometry.cpp | 30 ++++++++++++------------------
+ 3 files changed, 14 insertions(+), 20 deletions(-)
+
+diff --git a/glm/ext/quaternion_common.inl b/glm/ext/quaternion_common.inl
+index 0e4a3bb2..6f99f52d 100644
+--- a/glm/ext/quaternion_common.inl
++++ b/glm/ext/quaternion_common.inl
+@@ -104,7 +104,7 @@ namespace glm
+         {
+             // Graphics Gems III, page 96
+             T angle = acos(cosTheta);
+-            T phi = angle + k * glm::pi<T>();
++            T phi = angle + static_cast<T>(k) * glm::pi<T>();
+             return (sin(angle - a * phi)* x + sin(a * phi) * z) / sin(angle);
+         }
+     }
+diff --git a/glm/gtc/random.inl b/glm/gtc/random.inl
+index 70485098..a4af2a06 100644
+--- a/glm/gtc/random.inl
++++ b/glm/gtc/random.inl
+@@ -22,7 +22,7 @@ namespace detail
+ 		GLM_FUNC_QUALIFIER static vec<1, uint8, P> call()
+ 		{
+ 			return vec<1, uint8, P>(
+-				std::rand() % std::numeric_limits<uint8>::max());
++				static_cast<uint8>(std::rand()) % std::numeric_limits<uint8>::max());
+ 		}
+ 	};
+ 
+diff --git a/test/gtx/gtx_fast_trigonometry.cpp b/test/gtx/gtx_fast_trigonometry.cpp
+index 8bf86ba0..ddaa708b 100644
+--- a/test/gtx/gtx_fast_trigonometry.cpp
++++ b/test/gtx/gtx_fast_trigonometry.cpp
+@@ -19,15 +19,14 @@ namespace fastCos
+ 	{
+ 		const float begin = -glm::pi<float>();
+ 		const float end = glm::pi<float>();
+-		float result = 0.f;
+ 
+ 		const std::clock_t timestamp1 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::fastCos(i);
++			glm::fastCos(i);
+ 
+ 		const std::clock_t timestamp2 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::cos(i);
++			glm::cos(i);
+ 
+ 		const std::clock_t timestamp3 = std::clock();
+ 		const std::clock_t time_fast = timestamp2 - timestamp1;
+@@ -53,15 +52,14 @@ namespace fastSin
+ 	{
+ 		const float begin = -glm::pi<float>();
+ 		const float end = glm::pi<float>();
+-		float result = 0.f;
+ 
+ 		const std::clock_t timestamp1 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::fastSin(i);
++			glm::fastSin(i);
+ 
+ 		const std::clock_t timestamp2 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::sin(i);
++			glm::sin(i);
+ 
+ 		const std::clock_t timestamp3 = std::clock();
+ 		const std::clock_t time_fast = timestamp2 - timestamp1;
+@@ -79,15 +77,14 @@ namespace fastTan
+ 	{
+ 		const float begin = -glm::pi<float>();
+ 		const float end = glm::pi<float>();
+-		float result = 0.f;
+ 
+ 		const std::clock_t timestamp1 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::fastTan(i);
++			glm::fastTan(i);
+ 
+ 		const std::clock_t timestamp2 = std::clock();
+ 		for (float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::tan(i);
++			glm::tan(i);
+ 
+ 		const std::clock_t timestamp3 = std::clock();
+ 		const std::clock_t time_fast = timestamp2 - timestamp1;
+@@ -105,15 +102,14 @@ namespace fastAcos
+ 	{
+ 		const float begin = -glm::pi<float>();
+ 		const float end = glm::pi<float>();
+-		float result = 0.f;
+ 
+ 		const std::clock_t timestamp1 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::fastAcos(i);
++			glm::fastAcos(i);
+ 
+ 		const std::clock_t timestamp2 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::acos(i);
++			glm::acos(i);
+ 
+ 		const std::clock_t timestamp3 = std::clock();
+ 		const std::clock_t time_fast = timestamp2 - timestamp1;
+@@ -132,13 +128,12 @@ namespace fastAsin
+ 	{
+ 		const float begin = -glm::pi<float>();
+ 		const float end = glm::pi<float>();
+-		float result = 0.f;
+ 		const std::clock_t timestamp1 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::fastAsin(i);
++			glm::fastAsin(i);
+ 		const std::clock_t timestamp2 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::asin(i);
++			glm::asin(i);
+ 		const std::clock_t timestamp3 = std::clock();
+ 		const std::clock_t time_fast = timestamp2 - timestamp1;
+ 		const std::clock_t time_default = timestamp3 - timestamp2;
+@@ -155,13 +150,12 @@ namespace fastAtan
+ 	{
+ 		const float begin = -glm::pi<float>();
+ 		const float end = glm::pi<float>();
+-		float result = 0.f;
+ 		const std::clock_t timestamp1 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::fastAtan(i);
++			glm::fastAtan(i);
+ 		const std::clock_t timestamp2 = std::clock();
+ 		for(float i = begin; i < end; i = NextFloat ? glm::nextFloat(i) : i += 0.1f)
+-			result = glm::atan(i);
++			glm::atan(i);
+ 		const std::clock_t timestamp3 = std::clock();
+ 		const std::clock_t time_fast = timestamp2 - timestamp1;
+ 		const std::clock_t time_default = timestamp3 - timestamp2;
+-- 
+2.31.1
+

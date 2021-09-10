@@ -1,0 +1,26 @@
+From 23ce2fe30e7485d48e2864bdd8276119fbb8cbd1 Mon Sep 17 00:00:00 2001
+From: Philip Balister <philip@balister.org>
+Date: Thu, 3 Dec 2020 09:22:50 -0500
+Subject: [PATCH] Enable use of external fmt library.
+
+Signed-off-by: Philip Balister <philip@balister.org>
+---
+ include/spdlog/tweakme.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/spdlog/tweakme.h b/include/spdlog/tweakme.h
+index 244bc3b3..2594a6fe 100644
+--- a/include/spdlog/tweakme.h
++++ b/include/spdlog/tweakme.h
+@@ -63,7 +63,7 @@
+ // In this case spdlog will try to include <fmt/format.h> so set your -I flag
+ // accordingly.
+ //
+-// #define SPDLOG_FMT_EXTERNAL
++#define SPDLOG_FMT_EXTERNAL
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+-- 
+2.28.0
+

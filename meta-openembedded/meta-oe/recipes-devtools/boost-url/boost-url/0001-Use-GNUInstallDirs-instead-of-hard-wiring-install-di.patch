@@ -1,0 +1,57 @@
+From 329e27c8ad30e76ab50c7949cc95ba8eb0efabd2 Mon Sep 17 00:00:00 2001
+From: Anton Blanchard <anton@ozlabs.org>
+Date: Tue, 17 Aug 2021 09:53:41 +1000
+Subject: [PATCH] Use GNUInstallDirs instead of hard wiring install directories
+
+On a multilib setup cmake files should go into lib64.
+
+Upstream-Status: Submitted [https://github.com/CPPAlliance/url/pull/38]
+---
+ CMakeLists.txt | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5b53f31..ebb7346 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -109,20 +109,22 @@ else()
+ endif()
+ 
+ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND NOT BOOST_URL_IN_BOOST_TREE)
++    include(GNUInstallDirs)
++
+     set_target_properties(boost_url PROPERTIES EXPORT_NAME url)
+     install(TARGETS boost_url EXPORT boost_url_targets)
+ 
+     install(EXPORT boost_url_targets
+         FILE boost_url-targets.cmake
+         NAMESPACE Boost::
+-        DESTINATION lib/cmake/boost_url
++        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/boost_url
+     )
+ 
+     include(CMakePackageConfigHelpers)
+ 
+     configure_package_config_file(cmake/config.cmake.in
+         ${CMAKE_CURRENT_BINARY_DIR}/boost_url-config.cmake
+-        INSTALL_DESTINATION lib/cmake/boost_url
++        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/boost_url
+     )
+ 
+     write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/boost_url-config-version.cmake
+@@ -132,10 +134,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND NOT BOOST_URL_IN_BOOST
+     install(FILES
+         ${CMAKE_CURRENT_BINARY_DIR}/boost_url-config.cmake
+         ${CMAKE_CURRENT_BINARY_DIR}/boost_url-config-version.cmake
+-        DESTINATION lib/cmake/boost_url
++        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/boost_url
+     )
+ 
+-    install(DIRECTORY include/ DESTINATION include)
++    install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+ endif()
+ 
+ if(BOOST_URL_BUILD_TESTS)
+-- 
+2.31.1
+

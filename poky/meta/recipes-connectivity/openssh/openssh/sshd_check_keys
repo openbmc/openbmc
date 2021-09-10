@@ -6,6 +6,7 @@ generate_key() {
     local DIR="$(dirname "$FILE")"
 
     mkdir -p "$DIR"
+    rm -f ${FILE}.tmp
     ssh-keygen -q -f "${FILE}.tmp" -N '' -t $TYPE
 
     # Atomically rename file public key

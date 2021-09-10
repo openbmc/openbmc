@@ -1,0 +1,129 @@
+[
+    {
+        "Desc": {
+            "Name": "i2cool_0",
+            "SensorType": "temperature",
+            "MaxValue": 127.0,
+            "MinValue": -128.0
+        },
+        "Threshold": {
+            "CriticalHigh": 35,
+            "CriticalLow": 0,
+            "WarningHigh": 35,
+            "WarningLow": 0
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "inlet",
+                    "Desc": {
+                        "Name": "inlet",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "fan0",
+                    "Desc": {
+                        "Name": "fan0",
+                        "SensorType": "fan_tach"
+                    }
+                },
+                {
+                    "ParamName": "fan1",
+                    "Desc": {
+                        "Name": "fan1",
+                        "SensorType": "fan_tach"
+                    }
+                }
+            ]
+        },
+        "Expression": "round(inlet - 1 - (1.8 * 3700 / avg(fan0, fan1)))"
+    },
+    {
+        "Desc": {
+            "Name": "i2cool_1",
+            "SensorType": "temperature",
+            "MaxValue": 127.0,
+            "MinValue": -128.0
+        },
+        "Threshold": {
+            "CriticalHigh": 75,
+            "CriticalLow": 0,
+            "WarningHigh": 70,
+            "WarningLow": 0
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "outlet_0",
+                    "Desc": {
+                        "Name": "outlet_0",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "fan0",
+                    "Desc": {
+                        "Name": "fan0",
+                        "SensorType": "fan_tach"
+                    }
+                },
+                {
+                    "ParamName": "fan1",
+                    "Desc": {
+                        "Name": "fan1",
+                        "SensorType": "fan_tach"
+                    }
+                }
+            ]
+        },
+        "Expression": "round(outlet_0 - if(avg(fan0, fan1) >= 7400, 3 * 9558 / avg(fan0, fan1), 7 * 3700 / avg(fan0, fan1) - 2))"
+    },
+    {
+        "Desc": {
+            "Name": "i2cool_2",
+            "SensorType": "temperature",
+            "MaxValue": 127.0,
+            "MinValue": -128.0
+        },
+        "Threshold": {
+            "CriticalHigh": 70,
+            "CriticalLow": 0,
+            "WarningHigh": 70,
+            "WarningLow": 0
+        },
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "outlet_1",
+                    "Desc": {
+                        "Name": "outlet_1",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "fb_fan0",
+                    "Desc": {
+                        "Name": "fb_fan0",
+                        "SensorType": "fan_tach"
+                    }
+                },
+                {
+                    "ParamName": "fb_fan1",
+                    "Desc": {
+                        "Name": "fb_fan1",
+                        "SensorType": "fan_tach"
+                    }
+                },
+                {
+                    "ParamName": "fb_fan2",
+                    "Desc": {
+                        "Name": "fb_fan2",
+                        "SensorType": "fan_tach"
+                    }
+                }
+            ]
+        },
+        "Expression": "round(outlet_1 - if(avg(fb_fan0, fb_fan1, fb_fan2) >= 7400, 1 * 9558 / avg(fb_fan0, fb_fan1, fb_fan2), 1))"
+    }
+]

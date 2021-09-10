@@ -2,7 +2,7 @@ HOMEPAGE = "https://github.com/openbmc/phosphor-psu-code-mgmt"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 SRC_URI += "git://github.com/openbmc/phosphor-psu-code-mgmt"
-SRCREV = "bfa8d16f364ca16bd0c8101ad285bd78bd54d751"
+SRCREV = "6d62ceb307409a3b5f1b0012558108bfbfa4300c"
 SUMMARY = "Phosphor PSU software manager"
 DESCRIPTION = "Providing PSU firmware version and upgrade"
 
@@ -24,8 +24,8 @@ DEPENDS = " \
 
 # The default config of this repo depends on utils from phosphor-power.
 # If your system does not depend on phosphor-power, please use
-# RDEPENDS_${PN}_remove to remove the dependency.
-RDEPENDS_${PN} += "phosphor-power"
+# RDEPENDS:${PN}:remove to remove the dependency.
+RDEPENDS:${PN} += "phosphor-power"
 
 # The below configs are expected to be overriden by machine layer
 
@@ -48,5 +48,5 @@ EXTRA_OEMESON = " \
         ${PSU_UPDATE_SERVICE} \
         "
 
-SYSTEMD_SERVICE_${PN} = "xyz.openbmc_project.Software.Psu.Updater.service"
-SYSTEMD_SERVICE_${PN} += "psu-update@.service"
+SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.Software.Psu.Updater.service"
+SYSTEMD_SERVICE:${PN} += "psu-update@.service"

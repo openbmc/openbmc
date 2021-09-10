@@ -1,0 +1,137 @@
+From 815c97ba0de02da9dace3fcfcbdf9b20e029f0d7 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@lge.com>
+Date: Fri, 1 Jun 2018 08:41:07 +0000
+Subject: [PATCH] Fix webkitgtk builds
+
+This is a partial revert of "linux-user: fix mmap/munmap/mprotect/mremap/shmat".
+
+This patch fixes qemu-i386 hangs during gobject-introspection in webkitgtk build
+when musl is used on qemux86. This is the same issue that
+0008-linux-user-Fix-webkitgtk-hangs-on-32-bit-x86-target.patch was
+fixing in the 2.11 release.
+
+This patch also fixes a build failure when building webkitgtk for
+qemumips. A QEMU assert is seen while building webkitgtk:
+page_check_range: Assertion `start < ((target_ulong)1 << L1_MAP_ADDR_SPACE_BITS)' failed.
+
+This reverts commit ebf9a3630c911d0cfc9c20f7cafe9ba4f88cf583.
+
+Upstream-Status: Pending
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+
+[update patch context]
+Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
+---
+ include/exec/cpu-all.h  |  6 +-----
+ include/exec/cpu_ldst.h |  5 ++++-
+ linux-user/mmap.c       | 17 ++++-------------
+ linux-user/syscall.c    |  5 +----
+ 4 files changed, 10 insertions(+), 23 deletions(-)
+
+Index: qemu-5.1.0/include/exec/cpu-all.h
+===================================================================
+--- qemu-5.1.0.orig/include/exec/cpu-all.h
++++ qemu-5.1.0/include/exec/cpu-all.h
+@@ -176,11 +176,8 @@ extern unsigned long reserved_va;
+  * avoid setting bits at the top of guest addresses that might need
+  * to be used for tags.
+  */
+-#define GUEST_ADDR_MAX_                                                 \
+-    ((MIN_CONST(TARGET_VIRT_ADDR_SPACE_BITS, TARGET_ABI_BITS) <= 32) ?  \
+-     UINT32_MAX : ~0ul)
+-#define GUEST_ADDR_MAX    (reserved_va ? reserved_va - 1 : GUEST_ADDR_MAX_)
+-
++#define GUEST_ADDR_MAX (reserved_va ? reserved_va : \
++                                     (1ul << TARGET_VIRT_ADDR_SPACE_BITS) - 1)
+ #else
+ 
+ #include "exec/hwaddr.h"
+Index: qemu-5.1.0/include/exec/cpu_ldst.h
+===================================================================
+--- qemu-5.1.0.orig/include/exec/cpu_ldst.h
++++ qemu-5.1.0/include/exec/cpu_ldst.h
+@@ -75,7 +75,10 @@ typedef uint64_t abi_ptr;
+ #if HOST_LONG_BITS <= TARGET_VIRT_ADDR_SPACE_BITS
+ #define guest_addr_valid(x) (1)
+ #else
+-#define guest_addr_valid(x) ((x) <= GUEST_ADDR_MAX)
++#define guest_addr_valid(x) ({ \
++    ((x) < (1ul << TARGET_VIRT_ADDR_SPACE_BITS)) && \
++    (!reserved_va || ((x) < reserved_va)); \
++})
+ #endif
+ #define h2g_valid(x) guest_addr_valid((unsigned long)(x) - guest_base)
+ 
+Index: qemu-5.1.0/linux-user/mmap.c
+===================================================================
+--- qemu-5.1.0.orig/linux-user/mmap.c
++++ qemu-5.1.0/linux-user/mmap.c
+@@ -71,7 +71,7 @@ int target_mprotect(abi_ulong start, abi
+         return -TARGET_EINVAL;
+     len = TARGET_PAGE_ALIGN(len);
+     end = start + len;
+-    if (!guest_range_valid(start, len)) {
++    if (end < start) {
+         return -TARGET_ENOMEM;
+     }
+     prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
+@@ -467,8 +467,8 @@ abi_long target_mmap(abi_ulong start, ab
+          * It can fail only on 64-bit host with 32-bit target.
+          * On any other target/host host mmap() handles this error correctly.
+          */
+-        if (end < start || !guest_range_valid(start, len)) {
+-            errno = ENOMEM;
++        if (end < start || ((unsigned long)start + len - 1 > (abi_ulong) -1)) {
++            errno = EINVAL;
+             goto fail;
+         }
+ 
+@@ -604,10 +604,8 @@ int target_munmap(abi_ulong start, abi_u
+     if (start & ~TARGET_PAGE_MASK)
+         return -TARGET_EINVAL;
+     len = TARGET_PAGE_ALIGN(len);
+-    if (len == 0 || !guest_range_valid(start, len)) {
++    if (len == 0)
+         return -TARGET_EINVAL;
+-    }
+-
+     mmap_lock();
+     end = start + len;
+     real_start = start & qemu_host_page_mask;
+@@ -662,13 +660,6 @@ abi_long target_mremap(abi_ulong old_add
+     int prot;
+     void *host_addr;
+ 
+-    if (!guest_range_valid(old_addr, old_size) ||
+-        ((flags & MREMAP_FIXED) &&
+-         !guest_range_valid(new_addr, new_size))) {
+-        errno = ENOMEM;
+-        return -1;
+-    }
+-
+     mmap_lock();
+ 
+     if (flags & MREMAP_FIXED) {
+Index: qemu-5.1.0/linux-user/syscall.c
+===================================================================
+--- qemu-5.1.0.orig/linux-user/syscall.c
++++ qemu-5.1.0/linux-user/syscall.c
+@@ -4336,9 +4336,6 @@ static inline abi_ulong do_shmat(CPUArch
+             return -TARGET_EINVAL;
+         }
+     }
+-    if (!guest_range_valid(shmaddr, shm_info.shm_segsz)) {
+-        return -TARGET_EINVAL;
+-    }
+ 
+     mmap_lock();
+ 
+@@ -7376,7 +7373,7 @@ static int open_self_maps(void *cpu_env,
+             const char *path;
+ 
+             max = h2g_valid(max - 1) ?
+-                max : (uintptr_t) g2h(GUEST_ADDR_MAX) + 1;
++                max : (uintptr_t) g2h(GUEST_ADDR_MAX);
+ 
+             if (page_check_range(h2g(min), max - min, flags) == -1) {
+                 continue;

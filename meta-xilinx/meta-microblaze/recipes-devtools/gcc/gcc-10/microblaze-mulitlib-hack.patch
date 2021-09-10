@@ -1,0 +1,58 @@
+Microblaze Mulitlib hack
+
+Based on the patch:
+
+From c2081c51db589471ea713870c72f13999abda815 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 Mar 2013 09:10:06 +0400
+Subject: [PATCH 04/36] 64-bit multilib hack.
+
+GCC has internal multilib handling code but it assumes a very specific rigid directory
+layout. The build system implementation of multilib layout is very generic and allows
+complete customisation of the library directories.
+
+This patch is a partial solution to allow any custom directories to be passed into gcc
+and handled correctly. It forces gcc to use the base_libdir (which is the current
+directory, "."). We need to do this for each multilib that is configured as we don't
+know which compiler options may be being passed into the compiler. Since we have a compiler
+per mulitlib at this point that isn't an issue.
+
+The one problem is the target compiler is only going to work for the default multlilib at
+this point. Ideally we'd figure out which multilibs were being enabled with which paths
+and be able to patch these entries with a complete set of correct paths but this we
+don't have such code at this point. This is something the target gcc recipe should do
+and override these platform defaults in its build config.
+
+Do same for riscv64 and aarch64
+
+RP 15/8/11
+
+Upstream-Status: Inappropriate[OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Elvis Dowson <elvis.dowson@gmail.com>
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+
+Index: gcc-9.2.0/gcc/config/microblaze/t-microblaze
+===================================================================
+--- gcc-9.2.0.orig/gcc/config/microblaze/t-microblaze
++++ gcc-9.2.0/gcc/config/microblaze/t-microblaze
+@@ -1,5 +1,6 @@
+ MULTILIB_OPTIONS = m64 mxl-barrel-shift mlittle-endian mno-xl-soft-mul mxl-multiply-high
+-MULTILIB_DIRNAMES = m64 bs le m mh
++#MULTILIB_DIRNAMES = m64 bs le m mh
++MULTILIB_DIRNAMES = . . . . .
+ MULTILIB_EXCEPTIONS = *m64/mxl-multiply-high mxl-multiply-high
+ MULTILIB_EXCEPTIONS += *m64
+ MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift
+Index: gcc-9.2.0/gcc/config/microblaze/t-microblaze-linux
+===================================================================
+--- gcc-9.2.0.orig/gcc/config/microblaze/t-microblaze-linux
++++ gcc-9.2.0/gcc/config/microblaze/t-microblaze-linux
+@@ -1,3 +1,4 @@
+ MULTILIB_OPTIONS = mxl-barrel-shift mno-xl-soft-mul mxl-multiply-high
+-MULTILIB_DIRNAMES = bs m mh
++#MULTILIB_DIRNAMES = bs m mh
++MULTILIB_DIRNAMES = . . .
+ MULTILIB_EXCEPTIONS = *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high

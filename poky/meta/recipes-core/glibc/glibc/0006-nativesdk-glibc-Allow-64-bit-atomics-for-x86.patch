@@ -1,4 +1,4 @@
-From a752857cc342ee5136c9a593037b6ee6ff8af8ee Mon Sep 17 00:00:00 2001
+From b30f380cd88ae181a4a6a3a4784206ffe3ccd19b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 14:35:35 -0800
 Subject: [PATCH] nativesdk-glibc: Allow 64 bit atomics for x86
@@ -17,11 +17,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/sysdeps/x86/atomic-machine.h b/sysdeps/x86/atomic-machine.h
-index bb49648374..aa08d3c0a7 100644
+index 695222e4fa..9d39bfdbd5 100644
 --- a/sysdeps/x86/atomic-machine.h
 +++ b/sysdeps/x86/atomic-machine.h
-@@ -58,15 +58,14 @@ typedef uintmax_t uatomic_max_t;
- #endif
+@@ -52,15 +52,14 @@ typedef uintmax_t uatomic_max_t;
+ #define LOCK_PREFIX "lock;"
  
  #define USE_ATOMIC_COMPILER_BUILTINS	1
 +# define __HAVE_64B_ATOMICS		1

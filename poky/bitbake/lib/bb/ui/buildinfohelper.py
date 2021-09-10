@@ -148,14 +148,14 @@ class ORMWrapper(object):
         buildrequest = None
         if brbe is not None:
             # Toaster-triggered build
-            logger.debug(1, "buildinfohelper: brbe is %s" % brbe)
+            logger.debug("buildinfohelper: brbe is %s" % brbe)
             br, _ = brbe.split(":")
             buildrequest = BuildRequest.objects.get(pk=br)
             prj = buildrequest.project
         else:
             # CLI build
             prj = Project.objects.get_or_create_default_project()
-            logger.debug(1, "buildinfohelper: project is not specified, defaulting to %s" % prj)
+            logger.debug("buildinfohelper: project is not specified, defaulting to %s" % prj)
 
         if buildrequest is not None:
             # reuse existing Build object
@@ -171,7 +171,7 @@ class ORMWrapper(object):
                 completed_on=now,
                 build_name='')
 
-        logger.debug(1, "buildinfohelper: build is created %s" % build)
+        logger.debug("buildinfohelper: build is created %s" % build)
 
         if buildrequest is not None:
             buildrequest.build = build
@@ -906,7 +906,7 @@ class BuildInfoHelper(object):
 
         self.project = None
 
-        logger.debug(1, "buildinfohelper: Build info helper inited %s" % vars(self))
+        logger.debug("buildinfohelper: Build info helper inited %s" % vars(self))
 
 
     ###################
@@ -1620,7 +1620,7 @@ class BuildInfoHelper(object):
             # if we have a backlog of events, do our best to save them here
             if len(self.internal_state['backlog']):
                 tempevent = self.internal_state['backlog'].pop()
-                logger.debug(1, "buildinfohelper: Saving stored event %s "
+                logger.debug("buildinfohelper: Saving stored event %s "
                              % tempevent)
                 self.store_log_event(tempevent,cli_backlog)
             else:

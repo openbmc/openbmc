@@ -12,4 +12,4 @@ HR855XG2_ITEMS += "iio-hwmon.conf"
 HR855XG2_ITEMS += "iio-hwmon-battery.conf"
 
 ENVS = "obmc/hwmon/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_hr855xg2 := "${@compose_list(d, 'ENVS', 'HR855XG2_ITEMS')}"
+SYSTEMD_ENVIRONMENT_FILE:${PN}_append_hr855xg2 := "${@compose_list(d, 'ENVS', 'HR855XG2_ITEMS')}"

@@ -7,6 +7,8 @@
 # Copyright (C) 2007-2011 Koen Kooi <koen@openembedded.org>
 #
 
+inherit image-artifact-names
+
 BUILDHISTORY_FEATURES ?= "image package sdk"
 BUILDHISTORY_DIR ?= "${TOPDIR}/buildhistory"
 BUILDHISTORY_DIR_IMAGE = "${BUILDHISTORY_DIR}/images/${MACHINE_ARCH}/${TCLIBC}/${IMAGE_BASENAME}"
@@ -41,15 +43,16 @@ BUILDHISTORY_COMMIT ?= "1"
 BUILDHISTORY_COMMIT_AUTHOR ?= "buildhistory <buildhistory@${DISTRO}>"
 BUILDHISTORY_PUSH_REPO ?= ""
 BUILDHISTORY_TAG ?= "build"
+BUILDHISTORY_PATH_PREFIX_STRIP ?= ""
 
-SSTATEPOSTINSTFUNCS_append = " buildhistory_emit_pkghistory"
+SSTATEPOSTINSTFUNCS:append = " buildhistory_emit_pkghistory"
 # We want to avoid influencing the signatures of sstate tasks - first the function itself:
 sstate_install[vardepsexclude] += "buildhistory_emit_pkghistory"
 # then the value added to SSTATEPOSTINSTFUNCS:
 SSTATEPOSTINSTFUNCS[vardepvalueexclude] .= "| buildhistory_emit_pkghistory"
 
 # Similarly for our function that gets the output signatures
-SSTATEPOSTUNPACKFUNCS_append = " buildhistory_emit_outputsigs"
+SSTATEPOSTUNPACKFUNCS:append = " buildhistory_emit_outputsigs"
 sstate_installpkgdir[vardepsexclude] += "buildhistory_emit_outputsigs"
 SSTATEPOSTUNPACKFUNCS[vardepvalueexclude] .= "| buildhistory_emit_outputsigs"
 
@@ -113,6 +116,9 @@ python buildhistory_emit_pkghistory() {
             self.packages = ""
             self.srcrev = ""
             self.layer = ""
+            self.license = ""
+            self.config = ""
+            self.src_uri = ""
 
 
     class PackageInfo:
@@ -214,6 +220,7 @@ python buildhistory_emit_pkghistory() {
     pv = d.getVar('PV')
     pr = d.getVar('PR')
     layer = bb.utils.get_file_layer(d.getVar('FILE'), d)
+    license = d.getVar('LICENSE')
 
     pkgdata_dir = d.getVar('PKGDATA_DIR')
     packages = ""
@@ -254,22 +261,20 @@ python buildhistory_emit_pkghistory() {
     rcpinfo.depends = sortlist(oe.utils.squashspaces(d.getVar('DEPENDS') or ""))
     rcpinfo.packages = packages
     rcpinfo.layer = layer
+    rcpinfo.license = license
+    rcpinfo.config = sortlist(oe.utils.squashspaces(d.getVar('PACKAGECONFIG') or ""))
+    rcpinfo.src_uri = oe.utils.squashspaces(d.getVar('SRC_URI') or "")
     write_recipehistory(rcpinfo, d)
 
-    pkgdest = d.getVar('PKGDEST')
-    for pkg in packagelist:
-        pkgdata = {}
-        with open(os.path.join(pkgdata_dir, 'runtime', pkg)) as f:
-            for line in f.readlines():
-                item = line.rstrip('\n').split(': ', 1)
-                key = item[0]
-                if key.endswith('_' + pkg):
-                    key = key[:-len(pkg)-1]
-                pkgdata[key] = item[1].encode('latin-1').decode('unicode_escape')
+    bb.build.exec_func("read_subpackage_metadata", d)
 
-        pkge = pkgdata.get('PKGE', '0')
-        pkgv = pkgdata['PKGV']
-        pkgr = pkgdata['PKGR']
+    for pkg in packagelist:
+        localdata = d.createCopy()
+        localdata.setVar('OVERRIDES', d.getVar("OVERRIDES", False) + ":" + pkg)
+
+        pkge = localdata.getVar("PKGE") or '0'
+        pkgv = localdata.getVar("PKGV")
+        pkgr = localdata.getVar("PKGR")
         #
         # Find out what the last version was
         # Make sure the version did not decrease
@@ -286,31 +291,31 @@ python buildhistory_emit_pkghistory() {
 
         pkginfo = PackageInfo(pkg)
         # Apparently the version can be different on a per-package basis (see Python)
-        pkginfo.pe = pkgdata.get('PE', '0')
-        pkginfo.pv = pkgdata['PV']
-        pkginfo.pr = pkgdata['PR']
-        pkginfo.pkg = pkgdata['PKG']
+        pkginfo.pe = localdata.getVar("PE") or '0'
+        pkginfo.pv = localdata.getVar("PV")
+        pkginfo.pr = localdata.getVar("PR")
+        pkginfo.pkg = localdata.getVar("PKG")
         pkginfo.pkge = pkge
         pkginfo.pkgv = pkgv
         pkginfo.pkgr = pkgr
-        pkginfo.rprovides = sortpkglist(oe.utils.squashspaces(pkgdata.get('RPROVIDES', "")))
-        pkginfo.rdepends = sortpkglist(oe.utils.squashspaces(pkgdata.get('RDEPENDS', "")))
-        pkginfo.rrecommends = sortpkglist(oe.utils.squashspaces(pkgdata.get('RRECOMMENDS', "")))
-        pkginfo.rsuggests = sortpkglist(oe.utils.squashspaces(pkgdata.get('RSUGGESTS', "")))
-        pkginfo.rreplaces = sortpkglist(oe.utils.squashspaces(pkgdata.get('RREPLACES', "")))
-        pkginfo.rconflicts = sortpkglist(oe.utils.squashspaces(pkgdata.get('RCONFLICTS', "")))
-        pkginfo.files = oe.utils.squashspaces(pkgdata.get('FILES', ""))
+        pkginfo.rprovides = sortpkglist(oe.utils.squashspaces(localdata.getVar("RPROVIDES") or ""))
+        pkginfo.rdepends = sortpkglist(oe.utils.squashspaces(localdata.getVar("RDEPENDS") or ""))
+        pkginfo.rrecommends = sortpkglist(oe.utils.squashspaces(localdata.getVar("RRECOMMENDS") or ""))
+        pkginfo.rsuggests = sortpkglist(oe.utils.squashspaces(localdata.getVar("RSUGGESTS") or ""))
+        pkginfo.replaces = sortpkglist(oe.utils.squashspaces(localdata.getVar("RREPLACES") or ""))
+        pkginfo.rconflicts = sortpkglist(oe.utils.squashspaces(localdata.getVar("RCONFLICTS") or ""))
+        pkginfo.files = oe.utils.squashspaces(localdata.getVar("FILES") or "")
         for filevar in pkginfo.filevars:
-            pkginfo.filevars[filevar] = pkgdata.get(filevar, "")
+            pkginfo.filevars[filevar] = localdata.getVar(filevar) or ""
 
         # Gather information about packaged files
-        val = pkgdata.get('FILES_INFO', '')
+        val = localdata.getVar('FILES_INFO') or ''
         dictval = json.loads(val)
         filelist = list(dictval.keys())
         filelist.sort()
         pkginfo.filelist = " ".join([shlex.quote(x) for x in filelist])
 
-        pkginfo.size = int(pkgdata['PKGSIZE'])
+        pkginfo.size = int(localdata.getVar('PKGSIZE') or '0')
 
         write_pkghistory(pkginfo, d)
 
@@ -368,6 +373,9 @@ def write_recipehistory(rcpinfo, d):
         f.write(u"DEPENDS = %s\n" %  rcpinfo.depends)
         f.write(u"PACKAGES = %s\n" %  rcpinfo.packages)
         f.write(u"LAYER = %s\n" %  rcpinfo.layer)
+        f.write(u"LICENSE = %s\n" %  rcpinfo.license)
+        f.write(u"CONFIG = %s\n" %  rcpinfo.config)
+        f.write(u"SRC_URI = %s\n" %  rcpinfo.src_uri)
 
     write_latest_srcrev(d, pkghistdir)
 
@@ -426,8 +434,8 @@ def buildhistory_list_installed(d, rootfs_type="image"):
     from oe.sdk import sdk_list_installed_packages
     from oe.utils import format_pkg_list
 
-    process_list = [('file', 'bh_installed_pkgs.txt'),\
-                    ('deps', 'bh_installed_pkgs_deps.txt')]
+    process_list = [('file', 'bh_installed_pkgs_%s.txt' % os.getpid()),\
+                    ('deps', 'bh_installed_pkgs_deps_%s.txt' % os.getpid())]
 
     if rootfs_type == "image":
         pkgs = image_list_installed_packages(d)
@@ -438,7 +446,7 @@ def buildhistory_list_installed(d, rootfs_type="image"):
         output_file_full = os.path.join(d.getVar('WORKDIR'), output_file)
 
         with open(output_file_full, 'w') as output:
-            output.write(format_pkg_list(pkgs, output_type))
+            output.write(format_pkg_list(pkgs, output_type, d.getVar('PKGDATA_DIR')))
 
 python buildhistory_list_installed_image() {
     buildhistory_list_installed(d)
@@ -457,9 +465,10 @@ buildhistory_get_installed() {
 
 	# Get list of installed packages
 	pkgcache="$1/installed-packages.tmp"
-	cat ${WORKDIR}/bh_installed_pkgs.txt | sort > $pkgcache && rm ${WORKDIR}/bh_installed_pkgs.txt
+	cat ${WORKDIR}/bh_installed_pkgs_${PID}.txt | sort > $pkgcache && rm ${WORKDIR}/bh_installed_pkgs_${PID}.txt
 
 	cat $pkgcache | awk '{ print $1 }' > $1/installed-package-names.txt
+
 	if [ -s $pkgcache ] ; then
 		cat $pkgcache | awk '{ print $2 }' | xargs -n1 basename > $1/installed-packages.txt
 	else
@@ -468,8 +477,8 @@ buildhistory_get_installed() {
 
 	# Produce dependency graph
 	# First, quote each name to handle characters that cause issues for dot
-	sed 's:\([^| ]*\):"\1":g' ${WORKDIR}/bh_installed_pkgs_deps.txt > $1/depends.tmp &&
-		rm ${WORKDIR}/bh_installed_pkgs_deps.txt
+	sed 's:\([^| ]*\):"\1":g' ${WORKDIR}/bh_installed_pkgs_deps_${PID}.txt > $1/depends.tmp &&
+		rm ${WORKDIR}/bh_installed_pkgs_deps_${PID}.txt
 	# Remove lines with rpmlib(...) and config(...) dependencies, change the
 	# delimiter from pipe to "->", set the style for recommend lines and
 	# turn versioned dependencies into edge labels.
@@ -478,6 +487,8 @@ buildhistory_get_installed() {
 	       -e 's:|: -> :' \
 	       -e 's:"\[REC\]":[style=dotted]:' \
 	       -e 's:"\([<>=]\+\)" "\([^"]*\)":[label="\1 \2"]:' \
+	       -e 's:"\([*]\+\)" "\([^"]*\)":[label="\2"]:' \
+	       -e 's:"\[RPROVIDES\]":[style=dashed]:' \
 		$1/depends.tmp
 	# Add header, sorted and de-duped contents and footer and then delete the temp file
 	printf "digraph depends {\n    node [shape=plaintext]\n" > $1/depends.dot
@@ -489,6 +500,11 @@ buildhistory_get_installed() {
 	oe-pkgdata-util -p ${PKGDATA_DIR} read-value "PKGSIZE" -n -f $pkgcache > $1/installed-package-sizes.tmp
 	cat $1/installed-package-sizes.tmp | awk '{print $2 "\tKiB\t" $1}' | sort -n -r > $1/installed-package-sizes.txt
 	rm $1/installed-package-sizes.tmp
+
+	# Produce package info: runtime_name, buildtime_name, recipe, version, size
+	oe-pkgdata-util -p ${PKGDATA_DIR} read-value "PACKAGE,PN,PV,PKGSIZE" -n -f $pkgcache > $1/installed-package-info.tmp
+	cat $1/installed-package-info.tmp | sort -n -r -k 5 > $1/installed-package-info.txt
+	rm $1/installed-package-info.tmp
 
 	# We're now done with the cache, delete it
 	rm $pkgcache
@@ -667,16 +683,19 @@ IMAGE_POSTPROCESS_COMMAND[vardepvalueexclude] .= "| buildhistory_get_imageinfo ;
 IMAGE_POSTPROCESS_COMMAND[vardepsexclude] += "buildhistory_get_imageinfo"
 
 # We want these to be the last run so that we get called after complementary package installation
-POPULATE_SDK_POST_TARGET_COMMAND_append = " buildhistory_list_installed_sdk_target;"
-POPULATE_SDK_POST_TARGET_COMMAND_append = " buildhistory_get_sdk_installed_target;"
+POPULATE_SDK_POST_TARGET_COMMAND:append = " buildhistory_list_installed_sdk_target;"
+POPULATE_SDK_POST_TARGET_COMMAND:append = " buildhistory_get_sdk_installed_target;"
 POPULATE_SDK_POST_TARGET_COMMAND[vardepvalueexclude] .= "| buildhistory_list_installed_sdk_target;| buildhistory_get_sdk_installed_target;"
+POPULATE_SDK_POST_TARGET_COMMAND[vardepsexclude] += "buildhistory_list_installed_sdk_target buildhistory_get_sdk_installed_target"
 
-POPULATE_SDK_POST_HOST_COMMAND_append = " buildhistory_list_installed_sdk_host;"
-POPULATE_SDK_POST_HOST_COMMAND_append = " buildhistory_get_sdk_installed_host;"
+POPULATE_SDK_POST_HOST_COMMAND:append = " buildhistory_list_installed_sdk_host;"
+POPULATE_SDK_POST_HOST_COMMAND:append = " buildhistory_get_sdk_installed_host;"
 POPULATE_SDK_POST_HOST_COMMAND[vardepvalueexclude] .= "| buildhistory_list_installed_sdk_host;| buildhistory_get_sdk_installed_host;"
+POPULATE_SDK_POST_HOST_COMMAND[vardepsexclude] += "buildhistory_list_installed_sdk_host buildhistory_get_sdk_installed_host"
 
-SDK_POSTPROCESS_COMMAND_append = " buildhistory_get_sdkinfo ; buildhistory_get_extra_sdkinfo; "
+SDK_POSTPROCESS_COMMAND:append = " buildhistory_get_sdkinfo ; buildhistory_get_extra_sdkinfo; "
 SDK_POSTPROCESS_COMMAND[vardepvalueexclude] .= "| buildhistory_get_sdkinfo ; buildhistory_get_extra_sdkinfo; "
+SDK_POSTPROCESS_COMMAND[vardepsexclude] += "buildhistory_get_sdkinfo buildhistory_get_extra_sdkinfo"
 
 python buildhistory_write_sigs() {
     if not "task" in (d.getVar('BUILDHISTORY_FEATURES') or "").split():
@@ -686,7 +705,7 @@ python buildhistory_write_sigs() {
     if hasattr(bb.parse.siggen, 'dump_siglist'):
         taskoutdir = os.path.join(d.getVar('BUILDHISTORY_DIR'), 'task')
         bb.utils.mkdirhier(taskoutdir)
-        bb.parse.siggen.dump_siglist(os.path.join(taskoutdir, 'tasksigs.txt'))
+        bb.parse.siggen.dump_siglist(os.path.join(taskoutdir, 'tasksigs.txt'), d.getVar("BUILDHISTORY_PATH_PREFIX_STRIP"))
 }
 
 def buildhistory_get_build_id(d):
@@ -851,7 +870,7 @@ END
 }
 
 python buildhistory_eventhandler() {
-    if e.data.getVar('BUILDHISTORY_FEATURES').strip():
+    if (e.data.getVar('BUILDHISTORY_FEATURES') or "").strip():
         reset = e.data.getVar("BUILDHISTORY_RESET")
         olddir = e.data.getVar("BUILDHISTORY_OLD_DIR")
         if isinstance(e, bb.event.BuildStarted):
@@ -864,7 +883,7 @@ python buildhistory_eventhandler() {
                 entries = [ x for x in os.listdir(rootdir) if not x.startswith('.') ]
                 bb.utils.mkdirhier(olddir)
                 for entry in entries:
-                    os.rename(os.path.join(rootdir, entry),
+                    bb.utils.rename(os.path.join(rootdir, entry),
                               os.path.join(olddir, entry))
         elif isinstance(e, bb.event.BuildCompleted):
             if reset:

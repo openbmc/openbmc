@@ -23,7 +23,11 @@ PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}"
 
 EXTRA_OECONF += "--disable-stripping"
 
-do_configure_prepend() {
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE:${PN} = "sysstat.service"
+SYSTEMD_AUTO_ENABLE = "enable"
+
+do_configure:prepend() {
     export sa_lib_dir=${libexecdir}/sa
 }
 
@@ -54,7 +58,7 @@ do_install() {
 	fi
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
 	if [  ! -n "$D" ]; then
 		if [ -e /etc/init.d/populate-volatile.sh ]; then
 			/etc/init.d/populate-volatile.sh update
@@ -62,6 +66,6 @@ pkg_postinst_${PN} () {
 	fi
 }
 
-FILES_${PN} += "${systemd_system_unitdir}"
+FILES:${PN} += "${systemd_system_unitdir} ${nonarch_base_libdir}/systemd"
 
 TARGET_CC_ARCH += "${LDFLAGS}"

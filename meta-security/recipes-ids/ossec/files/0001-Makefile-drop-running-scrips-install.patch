@@ -1,0 +1,37 @@
+From b948d36a8ca8e04794381f0f6eba29daf7e3fd01 Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster808@gmail.com>
+Date: Wed, 21 Apr 2021 00:56:53 +0000
+Subject: [PATCH 1/2] Makefile: drop running scrips @ install
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+---
+ src/Makefile | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 06a7094c..dfb8cb58 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -409,7 +409,6 @@ install-hybrid: install-server-generic
+ install-server: install-server-generic
+ 
+ install-common: build
+-	./init/adduser.sh ${OSSEC_USER} ${OSSEC_USER_MAIL} ${OSSEC_USER_REM} ${OSSEC_GROUP} ${PREFIX}
+ 	$(call INSTALL_CMD,0550,root,${OSSEC_GROUP}) -d ${PREFIX}/
+ 	$(call INSTALL_CMD,0750,${OSSEC_USER},${OSSEC_GROUP}) -d ${PREFIX}/logs
+ 	$(call INSTALL_CMD,0660,${OSSEC_USER},${OSSEC_GROUP}) /dev/null ${PREFIX}/logs/ossec.log
+@@ -485,9 +484,6 @@ endif
+ 	$(call INSTALL_CMD,0550,root,${OSSEC_GROUP}) -d ${PREFIX}/var
+ 	$(call INSTALL_CMD,0770,root,${OSSEC_GROUP}) -d ${PREFIX}/var/run
+ 
+-	./init/fw-check.sh execute
+-
+-
+ 
+ install-server-generic: install-common
+ 	$(call INSTALL_CMD,0660,${OSSEC_USER},${OSSEC_GROUP}) /dev/null ${PREFIX}/logs/active-responses.log
+-- 
+2.25.1
+

@@ -14,7 +14,7 @@ SECTION = "devel"
 LIC_FILES_CHKSUM = "file://license.terms;md5=fbf2de7e9102505b1439db06fc36ce5c"
 
 DEPENDS += "tcl"
-RDEPENDS_${PN} = "tcl"
+RDEPENDS:${PN} = "tcl"
 
 inherit autotools update-alternatives
 
@@ -35,7 +35,7 @@ UPSTREAM_CHECK_REGEX = "/Expect/(?P<pver>(\d+[\.\-_]*)+)/"
 
 S = "${WORKDIR}/${BPN}${PV}"
 
-do_install_append() {
+do_install:append() {
 	install -d ${D}${libdir}
         install -m 0755 ${D}${libdir}/expect${PV}/libexpect*.so   ${D}${libdir}/
         install -m 0755 ${S}/fixline1           ${D}${libdir}/expect${PV}/
@@ -47,7 +47,7 @@ do_install_append() {
 # Apparently the public Tcl headers are only in /usr/include/tcl8.6
 # when building for the target and nativesdk.
 TCL_INCLUDE_PATH = "--with-tclinclude=${STAGING_INCDIR}/tcl8.6"
-TCL_INCLUDE_PATH_class-native = ""
+TCL_INCLUDE_PATH:class-native = ""
 
 EXTRA_OECONF += "--with-tcl=${STAGING_LIBDIR} \
                  --enable-shared \
@@ -57,12 +57,12 @@ EXTRA_OECONF += "--with-tcl=${STAGING_LIBDIR} \
                 "
 EXTRA_OEMAKE_install = " 'SCRIPTS=' "
 
-ALTERNATIVE_${PN}  = "mkpasswd"
+ALTERNATIVE:${PN}  = "mkpasswd"
 ALTERNATIVE_LINK_NAME[mkpasswd] = "${bindir}/mkpasswd"
 # Use lower priority than busybox's mkpasswd (created when built with CONFIG_CRYPTPW)
 ALTERNATIVE_PRIORITY[mkpasswd] = "40"
 
-FILES_${PN}-dev = "${libdir_native}/expect${PV}/libexpect*.so \
+FILES:${PN}-dev = "${libdir_native}/expect${PV}/libexpect*.so \
                    ${includedir}/expect.h \
                    ${includedir}/expect_tcl.h \
                    ${includedir}/expect_comm.h \
@@ -70,7 +70,7 @@ FILES_${PN}-dev = "${libdir_native}/expect${PV}/libexpect*.so \
                    ${includedir}/*.h \
                   "
 
-FILES_${PN} += "${libdir}/libexpect${PV}.so \
+FILES:${PN} += "${libdir}/libexpect${PV}.so \
                 ${libdir}/expect${PV}/* \
                "
 
