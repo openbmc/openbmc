@@ -12,6 +12,8 @@ SRC_URI += " \
   file://-bmc-gbmcncsidhcp.network \
   file://50-gbmc-ncsi.rules.in \
   file://gbmc-ncsi-dhcrelay.service.in \
+  file://gbmc-ncsi-ip-from-ra.service.in \
+  file://gbmc-ncsi-ip-from-ra.sh.in \
   file://gbmc-ncsi-sslh.socket.in \
   file://gbmc-ncsi-sslh.service \
   file://gbmc-ncsi-nft.sh.in \
@@ -39,6 +41,7 @@ SYSTEMD_SERVICE:${PN} += " \
   gbmc-ncsi-sslh.service \
   gbmc-ncsi-sslh.socket \
   gbmc-ncsi-set-nicenabled.service \
+  gbmc-ncsi-ip-from-ra.service \
   "
 
 do_install:append() {
@@ -100,6 +103,14 @@ do_install:append() {
 
   sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-dhcrelay.service.in \
     >${D}${systemd_system_unitdir}/gbmc-ncsi-dhcrelay.service
+
+  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-ip-from-ra.service.in \
+    >${WORKDIR}/gbmc-ncsi-ip-from-ra.service
+  install -m0644 ${WORKDIR}/gbmc-ncsi-ip-from-ra.service ${D}${systemd_system_unitdir}
+  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-ip-from-ra.sh.in \
+    >${WORKDIR}/gbmc-ncsi-ip-from-ra.sh
+  install -d -m0755 ${D}${libexecdir}
+  install -m0755 ${WORKDIR}/gbmc-ncsi-ip-from-ra.sh ${D}${libexecdir}/
 }
 
 do_rm_work:prepend() {

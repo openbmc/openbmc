@@ -8,6 +8,7 @@ table inet filter {
     }
     chain ncsi_gbmc_br_pub_input {
         jump gbmc_br_pub_input
+        jump ncsi_legacy_input
         reject
     }
     chain gbmc_br_pub_input {
