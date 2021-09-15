@@ -35,6 +35,7 @@ gbmc_ncsi_nft_update() {
   fi
 
   local ip6="$gbmc_ncsi_nft_lastip6"
+  local pfx=
   if [ -n "$ip6" ]; then
     contents+="        ip6 daddr $ip6/128 goto ncsi_legacy_input"$'\n'
 
@@ -52,7 +53,7 @@ gbmc_ncsi_nft_update() {
     done
     if (( ${#ip_bytes[@]} != 0 )); then
       ip_bytes[8]=0xfd
-      local pfx="$(ip_bytes_to_str ip_bytes)"
+      pfx="$(ip_bytes_to_str ip_bytes)"
       contents+="        ip6 saddr != $pfx/72 ip6 daddr"
       contents+=" $pfx/72 goto ncsi_gbmc_br_pub_input"$'\n'
     fi
