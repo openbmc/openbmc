@@ -210,6 +210,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-kconfiglib \
     python3-keras-applications \
     python3-keras-preprocessing \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11 opengl", "python3-kivy", "", d)} \
     python3-kiwisolver \
     python3-langtable \
     python3-lazy-object-proxy \
@@ -277,6 +278,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-ply \
     python3-pocketsphinx \
     python3-polyline \
+    python3-portalocker \
     python3-prctl \
     python3-precise-runner \
     python3-pretend \
@@ -348,6 +350,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-pytest-html \
     python3-pytest-metadata \
     python3-pytest-runner \
+    python3-pytest-subtests \
     python3-pytest-tempdir \
     python3-pytest-timeout \
     python3-pythonping \

@@ -8,3 +8,5 @@ SRC_URI[sha256sum] = "51fda6bcc5ddbbb7063b2af7509e43bd84bfc32a4ff71349ec78477138
 PYPI_PACKAGE = "python-editor"
 
 inherit pypi setuptools3
+
+BBCLASSEXTEND = "native nativesdk"

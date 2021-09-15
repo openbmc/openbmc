@@ -1,4 +1,4 @@
-From 81e3512718f80965c26ccb1f9d694c91b121fea0 Mon Sep 17 00:00:00 2001
+From d9458227ddb4bbb8c63c607202a6854886d66090 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Wed, 4 Nov 2020 06:28:28 +0000
 Subject: [PATCH] configure.seed: fix host contamination
@@ -11,14 +11,14 @@ Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
- configure.seed | 47 +++++------------------------------------------
- 1 file changed, 5 insertions(+), 42 deletions(-)
+ configure.seed | 43 +++----------------------------------------
+ 1 file changed, 3 insertions(+), 40 deletions(-)
 
 diff --git a/configure.seed b/configure.seed
-index 03f9a31b0..58aebb5b8 100644
+index a148c530a..55bd49678 100644
 --- a/configure.seed
 +++ b/configure.seed
-@@ -79,31 +79,6 @@ fi
+@@ -144,31 +144,6 @@ fi
  #
  REVISION=`git log --pretty=oneline | wc -l`
  
@@ -50,7 +50,7 @@ index 03f9a31b0..58aebb5b8 100644
  SHORT_MACHINE=`uname -m | cut -b1-3`
  
  GIT_RELEASE="@GIT_RELEASE@"
-@@ -214,23 +189,11 @@ dnl> fi
+@@ -293,23 +268,11 @@ fi
  pkg-config --exists libssl
  if test "$?" -ne 1; then
    AC_DEFINE_UNQUOTED(NO_SSL_DL, 1, [has openssl])
@@ -62,7 +62,7 @@ index 03f9a31b0..58aebb5b8 100644
 -  if test -d "/usr/local/opt/openssl/lib"; then
 -    AC_DEFINE_UNQUOTED(NO_SSL_DL, 1, [has openssl])
 -    SSL_INC="-I/usr/local/opt/openssl/include"
--    SSL_LIB="-L/usr/local/opt/openssl/lib -lssl"
+-    SSL_LIB="-L/usr/local/opt/openssl/lib -lssl -lcrypto"
 -  dnl Workaround for FreeBSD
 -  elif test -f "/usr/lib/libssl.so"; then
 -    AC_DEFINE_UNQUOTED(NO_SSL_DL, 1, [has openssl])
@@ -78,5 +78,5 @@ index 03f9a31b0..58aebb5b8 100644
  
  AC_CHECK_LIB([gcrypt], [gcry_cipher_checktag], [LDFLAGS="${LDFLAGS} -lgcrypt"])
 -- 
-2.26.2
+2.17.1
 

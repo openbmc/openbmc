@@ -278,6 +278,7 @@ RDEPENDS:packagegroup-meta-oe-devtools ="\
     capnproto-compiler \
     mpich \
     msgpack-c \
+    msgpack-cpp \
     mercurial \
     nodejs \
     openocd \
@@ -305,10 +306,10 @@ RDEPENDS:packagegroup-meta-oe-devtools ="\
     json-schema-validator \
     poke \
 "
-RDEPENDS:packagegroup-meta-oe-devtools:append:x86 = " cpuid msr-tools pmtools"
-RDEPENDS:packagegroup-meta-oe-devtools:append:x86-64 = " cpuid msr-tools pcimem pmtools"
+RDEPENDS:packagegroup-meta-oe-devtools:append:x86 = " cpuid msr-tools pahole pmtools"
+RDEPENDS:packagegroup-meta-oe-devtools:append:x86-64 = " cpuid msr-tools pahole pcimem pmtools"
 RDEPENDS:packagegroup-meta-oe-devtools:append:arm = " pcimem"
-RDEPENDS:packagegroup-meta-oe-devtools:append:aarch64 = " pcimem"
+RDEPENDS:packagegroup-meta-oe-devtools:append:aarch64 = " pahole pcimem"
 RDEPENDS:packagegroup-meta-oe-devtools:append:libc-musl = " musl-nscd"
 
 RDEPENDS:packagegroup-meta-oe-devtools:remove:arm = "concurrencykit"
