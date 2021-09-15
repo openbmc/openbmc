@@ -69,6 +69,7 @@ DEPENDS = " \
     boost \
     i2c-tools \
     libgpiod \
+    liburing \
     nlohmann-json \
     phosphor-logging \
     sdbusplus \
