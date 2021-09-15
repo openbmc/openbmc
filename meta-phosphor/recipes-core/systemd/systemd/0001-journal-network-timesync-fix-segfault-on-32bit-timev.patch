@@ -1,0 +1,66 @@
+From 83676e4278cecb44316e6ae88e1365e6fcfdd4ff Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Wed, 15 Sep 2021 23:29:11 +0900
+Subject: [PATCH] journal,network,timesync: fix segfault on 32bit
+ timeval/timespec systems
+
+Fixes #20741.
+---
+ src/journal/journald-server.c       | 7 +++++--
+ src/libsystemd-network/icmp6-util.c | 3 ++-
+ src/timesync/timesyncd-manager.c    | 3 ++-
+ 3 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/src/journal/journald-server.c b/src/journal/journald-server.c
+index abd52f7c14..2d1d9e66d7 100644
+--- a/src/journal/journald-server.c
++++ b/src/journal/journald-server.c
+@@ -1275,11 +1275,14 @@ int server_process_datagram(
+         /* We use NAME_MAX space for the SELinux label here. The kernel currently enforces no limit, but
+          * according to suggestions from the SELinux people this will change and it will probably be
+          * identical to NAME_MAX. For now we use that, but this should be updated one day when the final
+-         * limit is known. */
++         * limit is known.
++         *
++         * Here, we need to explicitly initialize the buffer with zero, as glibc has a bug in
++         * __convert_scm_timestamps(), which assumes the buffer is initialized. See #20741. */
+         CMSG_BUFFER_TYPE(CMSG_SPACE(sizeof(struct ucred)) +
+                          CMSG_SPACE_TIMEVAL +
+                          CMSG_SPACE(sizeof(int)) + /* fd */
+-                         CMSG_SPACE(NAME_MAX) /* selinux label */) control;
++                         CMSG_SPACE(NAME_MAX) /* selinux label */) control = {};
+ 
+         union sockaddr_union sa = {};
+ 
+diff --git a/src/libsystemd-network/icmp6-util.c b/src/libsystemd-network/icmp6-util.c
+index 823be0f275..3832bbd920 100644
+--- a/src/libsystemd-network/icmp6-util.c
++++ b/src/libsystemd-network/icmp6-util.c
+@@ -148,8 +148,9 @@ int icmp6_send_router_solicitation(int s, const struct ether_addr *ether_addr) {
+ int icmp6_receive(int fd, void *buffer, size_t size, struct in6_addr *ret_dst,
+                   triple_timestamp *ret_timestamp) {
+ 
++        /* This needs to be initialized with zero. See #20741. */
+         CMSG_BUFFER_TYPE(CMSG_SPACE(sizeof(int)) + /* ttl */
+-                         CMSG_SPACE_TIMEVAL) control;
++                         CMSG_SPACE_TIMEVAL) control = {};
+         struct iovec iov = {};
+         union sockaddr_union sa = {};
+         struct msghdr msg = {
+diff --git a/src/timesync/timesyncd-manager.c b/src/timesync/timesyncd-manager.c
+index 648e804105..e37db1c570 100644
+--- a/src/timesync/timesyncd-manager.c
++++ b/src/timesync/timesyncd-manager.c
+@@ -412,7 +412,8 @@ static int manager_receive_response(sd_event_source *source, int fd, uint32_t re
+                 .iov_base = &ntpmsg,
+                 .iov_len = sizeof(ntpmsg),
+         };
+-        CMSG_BUFFER_TYPE(CMSG_SPACE_TIMESPEC) control;
++        /* This needs to be initialized with zero. See #20741. */
++        CMSG_BUFFER_TYPE(CMSG_SPACE_TIMESPEC) control = {};
+         union sockaddr_union server_addr;
+         struct msghdr msghdr = {
+                 .msg_iov = &iov,
+-- 
+2.33.0.309.g3052b89438-goog
+
