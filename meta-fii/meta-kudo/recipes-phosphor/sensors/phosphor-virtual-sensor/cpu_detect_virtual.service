@@ -1,0 +1,10 @@
+[Unit]
+Description=Detect CPUs to change config
+Before=phosphor-virtual-sensor.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-virtual-sensor/cpu_detect_virtual.sh
+
+[Install]
+WantedBy=multi-user.target
