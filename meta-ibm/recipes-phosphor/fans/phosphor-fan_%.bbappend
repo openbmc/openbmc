@@ -67,3 +67,7 @@ FAN_PACKAGES:append:p10bmc = " sensor-monitor"
 # file that's used for witherspoon type(including witherspoon-tacoma) machines
 SYSTEMD_SUBSTITUTIONS:witherspoon = "ADDR:100:phosphor-fan-control@.service"
 SYSTEMD_SUBSTITUTIONS:witherspoon-tacoma = "ADDR:200:phosphor-fan-control@.service"
+
+# Set the PKG_DEFAULT_MACHINE name to "witherspoon" for tacoma so witherspoon's
+# JSON config files are installed on tacoma machines (since they use the same ones)
+PKG_DEFAULT_MACHINE:witherspoon-tacoma = "witherspoon"
