@@ -27,6 +27,10 @@ SYSTEMD_SERVICE:${PN} += "op-vpd-parser.service"
 
 S = "${WORKDIR}/git"
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[ibm-parser] = "-Dibm-parser=enabled, -Dibm-parser=disabled, libgpiod nlohmann-json cli11"
+PACKAGECONFIG[vpd-manager] = "-Dvpd-manager=enabled, -Dvpd-manager=disabled"
+
 EXTRA_OEMESON = " \
              -Dtests=disabled \
              -DFRU_YAML=${STAGING_DIR_NATIVE}${vpdlayout_datadir}/layout.yaml \
