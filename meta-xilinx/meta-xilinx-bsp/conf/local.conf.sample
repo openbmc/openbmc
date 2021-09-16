@@ -86,7 +86,7 @@ DISTRO ?= "petalinux"
 #  - 'package_ipk' for ipk files are used by opkg (a debian style embedded package manager)
 #  - 'package_rpm' for rpm style packages
 # E.g.: PACKAGE_CLASSES ?= "package_rpm package_deb package_ipk"
-# We default to rpm:
+# We default to ipk:
 PACKAGE_CLASSES ?= "package_rpm"
 
 #
