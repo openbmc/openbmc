@@ -6,65 +6,67 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
-inherit autotools pkgconfig
-inherit obmc-phosphor-ipmiprovider-symlink
-inherit systemd
+inherit meson pkgconfig systemd
 
-DEPENDS += "autoconf-archive-native"
-DEPENDS += "phosphor-ipmi-blobs"
-DEPENDS += "phosphor-logging"
-DEPENDS += "sdbusplus"
-DEPENDS += "systemd"
-DEPENDS += "ipmi-blob-tool"
-DEPENDS += "pciutils"
-DEPENDS += "function2"
+DEPENDS += " \
+  phosphor-ipmi-blobs \
+  phosphor-logging \
+  sdbusplus \
+  systemd \
+  ipmi-blob-tool \
+  function2 \
+"
 
 PACKAGECONFIG ?= "cleanup-delete"
-PACKAGECONFIG[cleanup-delete] = "--enable-cleanup-delete, --disable-cleanup-delete"
+PACKAGECONFIG[cleanup-delete] = "-Dcleanup-delete=enabled,-Dcleanup-delete=disabled"
 # If using static-layout, reboot-update is a good option to handle updating.
 # To be able to track the update status, update-status option can be used.
 # Note that both reboot-update and update-status cannot be enabled at the same time.
-PACKAGECONFIG[reboot-update] = "--enable-reboot-update, --disable-reboot-update"
-PACKAGECONFIG[update-status] = "--enable-update-status, --disable-update-status"
+PACKAGECONFIG[reboot-update] = "-Dreboot-update=true,-Dreboot-update=false"
+PACKAGECONFIG[update-status] = "-Dupdate-status=true,-Dupdate-status=false"
 
 # Default options for supporting various flash types:
-PACKAGECONFIG[static-bmc] = "--enable-static-layout, --disable-static-layout"
-PACKAGECONFIG[ubitar-bmc] = "--enable-tarball-ubi, --disable-tarball-ubi"
-PACKAGECONFIG[host-bios] = "--enable-host-bios, --disable-host-bios"
+PACKAGECONFIG[static-bmc] = "-Dupdate-type=static-layout,-Dupdate-type=none"
+PACKAGECONFIG[ubitar-bmc] = "-Dupdate-type=tarball-ubi,-Dupdate-type=none"
+PACKAGECONFIG[host-bios] = "-Dhost-bios=true,-Dhost-bios=false"
 
 # Hardware options to enable transmitting the data from the host.
-PACKAGECONFIG[aspeed-p2a] = "--enable-aspeed-p2a, --disable-aspeed-p2a"
-PACKAGECONFIG[aspeed-lpc] = "--enable-aspeed-lpc, --disable-aspeed-lpc"
-PACKAGECONFIG[nuvoton-lpc] = "--enable-nuvoton-lpc, --disable-nuvoton-lpc"
-PACKAGECONFIG[nuvoton-p2a-vga] = "--enable-nuvoton-p2a-vga, --disable-nuvoton-p2a-vga"
-PACKAGECONFIG[nuvoton-p2a-mbox] = "--enable-nuvoton-p2a-mbox, --disable-nuvoton-p2a-mbox"
-PACKAGECONFIG[net-bridge] = "--enable-net-bridge, --disable-net-bridge"
+# Only one type of p2a or lpc can be enabled.
+PACKAGECONFIG[aspeed-p2a] = "-Dp2a-type=aspeed-p2a,,,,,aspeed-lpc nuvoton-lpc nuvoton-p2a-vga nuvoton-p2a-mbox"
+PACKAGECONFIG[aspeed-lpc] = "-Dlpc-type=aspeed-lpc,,,,,aspeed-p2a nuvoton-lpc nuvoton-p2a-vga nuvoton-p2a-mbox"
+PACKAGECONFIG[nuvoton-lpc] = "-Dlpc-type=nuvoton-lpc,,,,,aspeed-p2a aspeed-lpc nuvoton-p2a-vga nuvoton-p2a-mbox"
+PACKAGECONFIG[nuvoton-p2a-vga] = "-Dp2a-type=nuvoton-p2a-vga,,,,,aspeed-p2a aspeed-lpc nuvoton-lpc nuvoton-p2a-mbox"
+PACKAGECONFIG[nuvoton-p2a-mbox] = "-Dp2a-type=nuvoton-p2a-mbox,,,,,aspeed-p2a aspeed-lpc nuvoton-lpc nuvoton-p2a-vga"
+PACKAGECONFIG[net-bridge] = "-Dnet-bridge=true,-Dnet-bridge=false"
 
-EXTRA_OECONF = "--disable-tests --disable-build-host-tool"
+EXTRA_OEMESON = "-Dtests=disabled -Dhost-tool=disabled"
 
 # Set this variable in your recipe to set it instead of using MAPPED_ADDRESS directly.
 IPMI_FLASH_BMC_ADDRESS ?= "0"
-EXTRA_OECONF:append = " MAPPED_ADDRESS=${IPMI_FLASH_BMC_ADDRESS}"
+EXTRA_OEMESON:append = " -Dmapped-address=${IPMI_FLASH_BMC_ADDRESS}"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-flash"
 SRCREV = "0df4085097d8454a918de8fed76b0574bb2da9db"
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE:${PN} += "phosphor-ipmi-flash-bmc-prepare.target \
- phosphor-ipmi-flash-bmc-verify.target \
- phosphor-ipmi-flash-bmc-update.target"
+SYSTEMD_SERVICE:${PN} += " \
+  phosphor-ipmi-flash-bmc-prepare.target \
+  phosphor-ipmi-flash-bmc-verify.target \
+  phosphor-ipmi-flash-bmc-update.target \
+"
 
 # If they enabled host-bios, add those three extra targets.
-HOST_BIOS_TARGETS = "phosphor-ipmi-flash-bios-prepare.target \
- phosphor-ipmi-flash-bios-verify.target \
- phosphor-ipmi-flash-bios-update.target"
+HOST_BIOS_TARGETS = " \
+  phosphor-ipmi-flash-bios-prepare.target \
+  phosphor-ipmi-flash-bios-verify.target \
+  phosphor-ipmi-flash-bios-update.target \
+"
 
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'host-bios', '${HOST_BIOS_TARGETS}', '', d)}"
 
-FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
-FILES:${PN}:append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
-FILES:${PN}-dev:append = " ${libdir}/ipmid-providers/lib*${SOLIBSDEV} ${libdir}/ipmid-providers/*.la"
+FILES:${PN}:append = " ${libdir}/ipmid-providers"
+FILES:${PN}:append = " ${libdir}/blob-ipmid"
 FILES:${PN}:append = " ${libdir}/tmpfiles.d"
 
 BLOBIPMI_PROVIDER_LIBRARY += "libfirmwareblob.so"
