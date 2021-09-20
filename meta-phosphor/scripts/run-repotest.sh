@@ -73,7 +73,7 @@ files_diff=$(comm -23 $patch_files_tmp $allowed_patches_tmp)
 rm $allowed_patches_tmp
 rm $patch_files_tmp
 
-files_count=$(echo -n "$files_diff" | grep -c '^')
+files_count=$(echo -n "$files_diff" | grep -c '^' || true)
 if [[ $files_count -ne 0 ]]; then
   echo "Patch files found not in allow list"
   echo "$files_diff"
