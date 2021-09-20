@@ -2,18 +2,17 @@
 #
 # This script is used to get the MAC Address from FRU Inventory information
 
-ETHERNET_INTERFACE="eth0"
+ETHERNET_INTERFACE="eth1"
+ETHERNET_NCSI="eth0"
 ENV_ETH="eth1addr"
-ENV_MAC_ADDR=`fw_printenv`
+ENV_MAC_ADDR=`fw_printenv | grep $ENV_ETH`
 
-# Check if BMC MAC address is exported
-if [[ $ENV_MAC_ADDR =~ $ENV_ETH ]]; then
-    echo "WARNING: BMC MAC address already exist!"
-    exit 0
-fi
+# Workaround to dhcp NC-SI eth0 interface when BMC boot up
+ifconfig ${ETHERNET_NCSI} down
+ifconfig ${ETHERNET_NCSI} up
 
 # Read FRU Board Custom Field 1 to get the MAC address
-CUSTOM_FIELD_1=`busctl get-property xyz.openbmc_project.Inventory.Manager /xyz/openbmc_project/inventory/system/chassis/motherboard xyz.openbmc_project.Inventory.Item.NetworkInterface MACAddress`
+CUSTOM_FIELD_1=`busctl get-property xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice/Mt_Jade_Motherboard xyz.openbmc_project.FruDevice BOARD_INFO_AM1`
 MAC_ADDR=`echo $CUSTOM_FIELD_1 | cut -d "\"" -f 2`
 
 # Check if BMC MAC address is exported
@@ -21,6 +20,12 @@ if [ -z "${MAC_ADDR}" ]; then
     echo "ERROR: No BMC MAC address is detected from FRU Inventory information!"
     # Return 1 so that systemd knows the service failed to start
     exit 1
+fi
+
+# Check if BMC MAC address is exported
+if [[ $ENV_MAC_ADDR =~ $MAC_ADDR ]]; then
+    echo "WARNING: BMC MAC address already exist!"
+    exit 0
 fi
 
 # Request to update the MAC address
