@@ -1,0 +1,12 @@
+[Unit]
+Description = Mt.Jade Platform Initialization
+
+[Service]
+Restart=no
+RemainAfterExit=true
+Type=oneshot
+ExecStart=/usr/sbin/ampere_platform_init.sh
+StandardOutput=syslog
+
+[Install]
+WantedBy=sysinit.target
