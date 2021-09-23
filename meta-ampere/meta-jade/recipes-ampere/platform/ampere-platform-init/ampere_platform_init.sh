@@ -21,10 +21,10 @@ gpio_configure_input 144
 gpio_configure_input 145
 
 # GPIOY3 BMC_VGA_SEL
-gpio_direction_output 195 1
+gpio_configure_output 195 1
 
 # GPIO_BMC_READY
-gpio_direction_output 229 1
+gpio_configure_output 229 1
 
 # =======================================================
 # Below GPIOs are controlled by other services so just
@@ -32,10 +32,10 @@ gpio_direction_output 229 1
 cmdline=`cat /proc/cmdline`
 if [[ $cmdline == *resetreason=power* ]]; then
 	# BMC_GPIOR2_EXT_HIGHTEMP_L
-	gpio_direction_output 138 1
+	gpio_configure_output 138 1
 
 	# GPIOS5 GPIO_BMC_VR_PMBUS_SEL_L
-	gpio_direction_output 149 1
+	gpio_configure_output 149 1
 
 	# GPIOH7 GPIO_BMC_I2C6_RESET_L
 	gpio_configure_output 63 1
