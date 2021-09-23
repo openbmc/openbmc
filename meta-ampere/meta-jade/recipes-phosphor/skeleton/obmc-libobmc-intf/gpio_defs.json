@@ -4,8 +4,7 @@
         "power_config": {
             "power_good_in": "PGOOD",
             "power_up_outs": [
-               {"name": "BMC_SYS_PSON_L", "polarity": false},
-               {"name": "BMC_READY", "polarity": true}
+               {"name": "BMC_SYS_PSON_L", "polarity": false}
             ],
             "reset_outs": [
                {"name": "BMC_S0_SYSRESET_L", "polarity": false},
@@ -44,11 +43,6 @@
             "name": "RESET_BUTTON",
             "pin": "R5",
             "direction": "both"
-        },
-        {
-            "name": "BMC_READY",
-            "pin": "AC5",
-            "direction": "out"
         }
     ]
 }
