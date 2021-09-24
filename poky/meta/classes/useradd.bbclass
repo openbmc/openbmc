@@ -230,6 +230,10 @@ fakeroot python populate_packages:prepend () {
         preinst += 'perform_useradd () {\n%s}\n' % d.getVar('perform_useradd')
         preinst += 'perform_groupmems () {\n%s}\n' % d.getVar('perform_groupmems')
         preinst += d.getVar('useradd_preinst')
+        # Expand out the *_PARAM variables to the package specific versions
+        for rep in ["GROUPADD_PARAM", "USERADD_PARAM", "GROUPMEMS_PARAM"]:
+            val = d.getVar(rep + ":" + pkg) or ""
+            preinst = preinst.replace("${" + rep + "}", val)
         d.setVar('pkg_preinst:%s' % pkg, preinst)
 
         # RDEPENDS setup

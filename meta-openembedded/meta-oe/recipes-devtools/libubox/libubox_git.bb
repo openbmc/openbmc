@@ -24,7 +24,7 @@ PV = "1.0.1+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-inherit cmake
+inherit cmake pkgconfig
 
 DEPENDS = "json-c"
 

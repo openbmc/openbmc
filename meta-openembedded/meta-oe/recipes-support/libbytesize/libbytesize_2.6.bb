@@ -12,7 +12,7 @@ B = "${S}"
 SRCREV = "c9864f4dd03736839f40d225da494cb1eb64e654"
 SRC_URI = "git://github.com/rhinstaller/libbytesize;branch=master"
 
-inherit gettext autotools python3native
+inherit gettext autotools pkgconfig python3native
 
 DEPENDS += " \
     libpcre2 \

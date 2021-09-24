@@ -11,6 +11,5 @@ Yocto Project Board Support Package Developer's Guide
    :numbered:
 
    bsp
-   history
 
 .. include:: /boilerplate.rst

@@ -29,7 +29,7 @@ export LUA_LIB = "${STAGING_LIBDIR}/liblua.a"
 LDFLAGS:append:mipsarch = " -latomic"
 LDFLAGS:append:powerpc = " -latomic"
 LDFLAGS:append:riscv32 = " -latomic"
-inherit autotools-brokensep gettext systemd
+inherit autotools-brokensep gettext pkgconfig systemd
 
 do_install:append() {
     install -d ${D}${systemd_unitdir}/system/

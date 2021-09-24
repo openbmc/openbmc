@@ -21,12 +21,13 @@ SDKGCCVERSION ?= "${GCCVERSION}"
 BINUVERSION ?= "2.37%"
 GDBVERSION ?= "10.%"
 GLIBCVERSION ?= "2.34"
-LINUXLIBCVERSION ?= "5.13%"
+LINUXLIBCVERSION ?= "5.14%"
 QEMUVERSION ?= "6.0%"
 GOVERSION ?= "1.16%"
 # This can not use wildcards like 8.0.% since it is also used in mesa to denote
 # llvm version being used, so always bump it with llvm recipe version bump
 LLVMVERSION ?= "12.0.1"
+RUSTVERSION ?= "1.54.0"
 
 PREFERRED_VERSION_gcc ?= "${GCCVERSION}"
 PREFERRED_VERSION_gcc-cross-${TARGET_ARCH} ?= "${GCCVERSION}"
@@ -81,3 +82,15 @@ PREFERRED_VERSION_nativesdk-go-runtime ?= "${GOVERSION}"
 PREFERRED_VERSION_llvm = "${LLVMVERSION}"
 PREFERRED_VERSION_llvm-native = "${LLVMVERSION}"
 PREFERRED_VERSION_nativesdk-llvm = "${LLVMVERSION}"
+
+# Rust toolchain preferred versions:
+
+PREFERRED_VERSION_cargo ?= "${RUSTVERSION}"
+PREFERRED_VERSION_cargo-native ?= "${RUSTVERSION}"
+PREFERRED_VERSION_libstd-rs ?= "${RUSTVERSION}"
+PREFERRED_VERSION_rust ?= "${RUSTVERSION}"
+PREFERRED_VERSION_rust-cross-${TARGET_ARCH} ?= "${RUSTVERSION}"
+PREFERRED_VERSION_rust-llvm ?= "${RUSTVERSION}"
+PREFERRED_VERSION_rust-llvm-native ?= "${RUSTVERSION}"
+PREFERRED_VERSION_rust-native ?= "${RUSTVERSION}"
+

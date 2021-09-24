@@ -65,6 +65,7 @@ toolchain_create_sdk_env_script () {
 
 # This function creates an environment-setup-script in the TMPDIR which enables
 # a OE-core IDE to integrate with the build tree
+# Caller must ensure CONFIG_SITE is setup
 toolchain_create_tree_env_script () {
 	script=${TMPDIR}/environment-setup-${REAL_MULTIMACH_TARGET_SYS}
 	rm -f $script
@@ -73,7 +74,7 @@ toolchain_create_tree_env_script () {
 	echo 'export PATH=${STAGING_DIR_NATIVE}/usr/bin:${STAGING_BINDIR_TOOLCHAIN}:$PATH' >> $script
 	echo 'export PKG_CONFIG_SYSROOT_DIR=${PKG_CONFIG_SYSROOT_DIR}' >> $script
 	echo 'export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}' >> $script
-	echo 'export CONFIG_SITE="${@siteinfo_get_files(d)}"' >> $script
+	echo 'export CONFIG_SITE="${CONFIG_SITE}"' >> $script
 	echo 'export SDKTARGETSYSROOT=${STAGING_DIR_TARGET}' >> $script
 	echo 'export OECORE_NATIVE_SYSROOT="${STAGING_DIR_NATIVE}"' >> $script
 	echo 'export OECORE_TARGET_SYSROOT="${STAGING_DIR_TARGET}"' >> $script
@@ -161,7 +162,7 @@ EOF
 }
 
 #we get the cached site config in the runtime
-TOOLCHAIN_CONFIGSITE_NOCACHE = "${@siteinfo_get_files(d)}"
+TOOLCHAIN_CONFIGSITE_NOCACHE = "${@' '.join(siteinfo_get_files(d)[0])}"
 TOOLCHAIN_CONFIGSITE_SYSROOTCACHE = "${STAGING_DIR}/${MLPREFIX}${MACHINE}/${target_datadir}/${TARGET_SYS}_config_site.d"
 TOOLCHAIN_NEED_CONFIGSITE_CACHE ??= "virtual/${MLPREFIX}libc ncurses"
 DEPENDS += "${TOOLCHAIN_NEED_CONFIGSITE_CACHE}"

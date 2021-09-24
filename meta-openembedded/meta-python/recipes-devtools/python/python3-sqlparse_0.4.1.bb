@@ -1,7 +1,7 @@
 DESCRIPTION = "Non-validating SQL parser module"
 HOMEPAGE = "http://pypi.python.org/pypi/sqlparse"
 SECTION = "devel/python"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2b136f573f5386001ea3b7b9016222fc"
 
 SRC_URI += "file://0001-sqlparse-change-shebang-to-python3.patch \

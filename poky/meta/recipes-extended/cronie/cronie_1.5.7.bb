@@ -50,11 +50,11 @@ do_install:append () {
 	install -m 0755 ${WORKDIR}/crond.init ${D}${sysconfdir}/init.d/crond
 
 	# install systemd unit files
-	install -d ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/crond.service ${D}${systemd_unitdir}/system
+	install -d ${D}${systemd_system_unitdir}
+	install -m 0644 ${WORKDIR}/crond.service ${D}${systemd_system_unitdir}
 	sed -i -e 's,@BASE_BINDIR@,${base_bindir},g' \
 	       -e 's,@SBINDIR@,${sbindir},g' \
-	       ${D}${systemd_unitdir}/system/crond.service
+	       ${D}${systemd_system_unitdir}/crond.service
 
 	# below are necessary for a complete cron environment
 	install -d ${D}${localstatedir}/spool/cron

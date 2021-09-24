@@ -35,7 +35,7 @@ SRC_URI[sha256sum] = "060309d7a333d38d951bc27598c677af1796934dbd98e1024e7ad8de79
 # Issue only affects Debian/SUSE, not us
 CVE_CHECK_WHITELIST += "CVE-2021-26720"
 
-DEPENDS = "expat libcap libdaemon glib-2.0 intltool-native"
+DEPENDS = "expat libcap libdaemon glib-2.0"
 
 # For gtk related PACKAGECONFIGs: gtk, gtk3
 AVAHI_GTK ?= ""
@@ -67,7 +67,7 @@ EXTRA_OECONF = "--with-avahi-priv-access-group=adm \
 
 # The distro choice determines what init scripts are installed
 EXTRA_OECONF_SYSVINIT = "${@bb.utils.contains('DISTRO_FEATURES','sysvinit','--with-distro=debian','--with-distro=none',d)}"
-EXTRA_OECONF_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES','systemd','--with-systemdsystemunitdir=${systemd_unitdir}/system/','--without-systemdsystemunitdir',d)}"
+EXTRA_OECONF_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES','systemd','--with-systemdsystemunitdir=${systemd_system_unitdir}/','--without-systemdsystemunitdir',d)}"
 
 do_configure:prepend() {
     # This m4 file will get in the way of our introspection.m4 with special cross-compilation fixes

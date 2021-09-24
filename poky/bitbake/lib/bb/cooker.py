@@ -389,7 +389,12 @@ class BBCooker:
             if not self.hashserv:
                 dbfile = (self.data.getVar("PERSISTENT_DIR") or self.data.getVar("CACHE")) + "/hashserv.db"
                 self.hashservaddr = "unix://%s/hashserve.sock" % self.data.getVar("TOPDIR")
-                self.hashserv = hashserv.create_server(self.hashservaddr, dbfile, sync=False)
+                self.hashserv = hashserv.create_server(
+                    self.hashservaddr,
+                    dbfile,
+                    sync=False,
+                    upstream=self.data.getVar("BB_HASHSERVE_UPSTREAM") or None,
+                )
                 self.hashserv.serve_as_process()
             self.data.setVar("BB_HASHSERVE", self.hashservaddr)
             self.databuilder.origdata.setVar("BB_HASHSERVE", self.hashservaddr)

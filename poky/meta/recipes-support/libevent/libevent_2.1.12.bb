@@ -8,7 +8,7 @@ HOMEPAGE = "http://libevent.org/"
 BUGTRACKER = "https://github.com/libevent/libevent/issues"
 SECTION = "libs"
 
-LICENSE = "BSD & MIT"
+LICENSE = "BSD-3-Clause & MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=17f20574c0b154d12236d5fbe964f549"
 
 SRC_URI = "https://github.com/libevent/libevent/releases/download/release-${PV}-stable/${BP}-stable.tar.gz \

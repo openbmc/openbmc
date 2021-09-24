@@ -413,8 +413,8 @@ variables from BitBake's internal data dictionary, ``d``. The following
 lines select the values of a package name and its version number,
 respectively::
 
-   PN = "${@bb.parse.BBHandler.vars_from_file(d.getVar('FILE', False),d)[0] or 'defaultpkgname'}"
-   PV = "${@bb.parse.BBHandler.vars_from_file(d.getVar('FILE', False),d)[1] or '1.0'}"
+   PN = "${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[0] or 'defaultpkgname'}"
+   PV = "${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or '1.0'}"
 
 .. note::
 
@@ -1941,7 +1941,7 @@ Wildcard Support in Variables
 =============================
 
 Support for wildcard use in variables varies depending on the context in
-which it is used. For example, some variables and file names allow
+which it is used. For example, some variables and filenames allow
 limited use of wildcards through the "``%``" and "``*``" characters.
 Other variables or names support Python's
 `glob <https://docs.python.org/3/library/glob.html>`_ syntax,

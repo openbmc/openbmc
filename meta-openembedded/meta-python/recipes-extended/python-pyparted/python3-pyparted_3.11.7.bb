@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "\
 SRC_URI[md5sum] = "69284f943982f54ded76960c92098a02"
 SRC_URI[sha256sum] = "61cde7b096bccd69ddc75c85b17f8baed45c3687d404706d91403a319453b903"
 
-inherit pypi distutils3
+inherit pkgconfig pypi distutils3
 
 DEPENDS += "parted"
 

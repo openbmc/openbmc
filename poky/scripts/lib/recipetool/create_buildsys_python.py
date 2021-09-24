@@ -101,7 +101,7 @@ class PythonRecipeHandler(RecipeHandler):
         'License :: OSI Approved :: Apple Public Source License': 'APSL',
         'License :: OSI Approved :: Artistic License': 'Artistic',
         'License :: OSI Approved :: Attribution Assurance License': 'AAL',
-        'License :: OSI Approved :: BSD License': 'BSD',
+        'License :: OSI Approved :: BSD License': 'BSD-3-Clause',
         'License :: OSI Approved :: Common Public License': 'CPL',
         'License :: OSI Approved :: Eiffel Forum License': 'EFL',
         'License :: OSI Approved :: European Union Public Licence 1.0 (EUPL 1.0)': 'EUPL-1.0',

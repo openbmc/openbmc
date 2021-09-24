@@ -1,17 +1,19 @@
-HOMEPAGE = "https://github.com/firehol/netdata/"
+HOMEPAGE = "https://github.com/netdata/netdata/"
 SUMMARY = "Real-time performance monitoring"
+DESCRIPTION = "Netdata is high-fidelity infrastructure monitoring and troubleshooting. \
+               Open-source, free, preconfigured, opinionated, and always real-time."
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fc9b848046ef54b5eaee6071947abd24"
 
-SRC_URI = "git://github.com/firehol/netdata.git;protocol=https"
+SRC_URI:append = " git://github.com/firehol/netdata.git;protocol=https"
 SRCREV = "1be9200ba8e11dc81a2101d85a2725137d43f766"
 PV = "1.22.1"
 
 # default netdata.conf for netdata configuration
-SRC_URI += "file://netdata.conf"
+SRC_URI += " file://netdata.conf"
 
 # file for providing systemd service support
-SRC_URI += "file://netdata.service"
+SRC_URI += " file://netdata.service"
 
 S = "${WORKDIR}/git"
 
@@ -31,7 +33,7 @@ SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 #User specific
 USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM:${PN} = "--system netdata"
+USERADD_PARAM:${PN} = "--system --no-create-home --home-dir ${localstatedir}/run/netdata --user-group netdata"
 
 do_install:append() {
     #set S UID for plugins
@@ -50,6 +52,13 @@ do_install:append() {
     sed -i -e 's,@@sysconfdir,${sysconfdir},g' ${D}${sysconfdir}/netdata/netdata.conf
     sed -i -e 's,@@libdir,${libexecdir},g' ${D}${sysconfdir}/netdata/netdata.conf
     sed -i -e 's,@@datadir,${datadir},g' ${D}${sysconfdir}/netdata/netdata.conf
+
+    install --group netdata --owner netdata --directory ${D}${localstatedir}/cache/netdata
+    install --group netdata --owner netdata --directory ${D}${localstatedir}/lib/netdata
+
+    chown -R netdata:netdata ${D}${datadir}/netdata/web
 }
+
+FILES_${PN} += "${localstatedir}/cache/netdata/ ${localstatedir}/lib/netdata/"
 
 RDEPENDS:${PN} = "bash zlib"

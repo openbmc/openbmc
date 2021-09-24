@@ -176,17 +176,39 @@ python () {
         bb.fatal("Please add your architecture to siteinfo.bbclass")
 }
 
-def siteinfo_get_files(d, sysrootcache = False):
+# Layers with siteconfig need to add a replacement path to this variable so the
+# sstate isn't path specific
+SITEINFO_PATHVARS = "COREBASE"
+
+def siteinfo_get_files(d, sysrootcache=False):
     sitedata = siteinfo_data(d)
-    sitefiles = ""
+    sitefiles = []
+    searched = []
     for path in d.getVar("BBPATH").split(":"):
         for element in sitedata:
             filename = os.path.join(path, "site", element)
             if os.path.exists(filename):
-                sitefiles += filename + " "
+                searched.append(filename + ":True")
+                sitefiles.append(filename)
+            else:
+                searched.append(filename + ":False")
+
+    # Have to parameterise out hardcoded paths such as COREBASE for the main site files
+    for var in d.getVar("SITEINFO_PATHVARS").split():
+        searched2 = []
+        replace = os.path.normpath(d.getVar(var))
+        for s in searched:
+            searched2.append(s.replace(replace, "${" + var + "}"))
+        searched = searched2
+
+    if bb.data.inherits_class('native', d) or bb.data.inherits_class('cross', d) or bb.data.inherits_class('crosssdk', d):
+        # We need sstate sigs for native/cross not to vary upon arch so we can't depend on the site files.
+        # In future we may want to depend upon all site files?
+        # This would show up as breaking sstatetests.SStateTests.test_sstate_32_64_same_hash for example
+        searched = []
 
     if not sysrootcache:
-        return sitefiles
+        return sitefiles, searched
 
     # Now check for siteconfig cache files in sysroots
     path_siteconfig = d.getVar('SITECONFIG_SYSROOTCACHE')
@@ -195,8 +217,8 @@ def siteinfo_get_files(d, sysrootcache = False):
             if not i.endswith("_config"):
                 continue
             filename = os.path.join(path_siteconfig, i)
-            sitefiles += filename + " "
-    return sitefiles
+            sitefiles.append(filename)
+    return sitefiles, searched
 
 #
 # Make some information available via variables

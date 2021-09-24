@@ -151,6 +151,10 @@ do_install:append() {
         -i ${D}${bindir}/net-snmp-config
 
     oe_multilib_header net-snmp/net-snmp-config.h
+
+    if [ "${HAS_PERL}" = "1" ]; then
+        find ${D}${libdir}/ -type f -name "perllocal.pod" | xargs rm -f
+    fi
 }
 
 do_install_ptest() {

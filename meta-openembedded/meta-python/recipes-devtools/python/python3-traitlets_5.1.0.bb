@@ -1,7 +1,7 @@
 SUMMARY = "Traitlets Python config system"
 HOMEPAGE = "http://ipython.org"
 AUTHOR = "IPython Development Team <ipython-dev@scipy.org>"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING.md;md5=eec4de4d599518742e54e75954e33b46"
 
 PYPI_PACKAGE = "traitlets"

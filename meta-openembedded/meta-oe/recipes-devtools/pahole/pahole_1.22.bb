@@ -9,11 +9,12 @@ COMPATIBLE_HOST = "(x86_64|i.86|aarch64).*-linux"
 
 SRCREV = "f02af2553ea58ae1186226af0d0ec835a248358f"
 SRC_URI = "git://git.kernel.org/pub/scm/devel/pahole/pahole.git \
-           file://0001-CMakeList.txt-make-python-optional.patch"
+           file://0001-CMakeList.txt-make-python-optional.patch \
+           file://0002-Use-usr-bin-env-python3-instead-of-just-usr-bin-pyth.patch"
 
 S = "${WORKDIR}/git"
 
-inherit cmake
+inherit cmake pkgconfig
 
 PACKAGECONFIG[python3] = ",,python3-core,python3-core"
 

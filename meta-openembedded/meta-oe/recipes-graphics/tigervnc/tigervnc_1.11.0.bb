@@ -9,10 +9,10 @@ LIC_FILES_CHKSUM = "file://LICENCE.TXT;md5=75b02c2872421380bbd47781d2bd75d3"
 
 S = "${WORKDIR}/git"
 
-inherit features_check
+inherit autotools cmake features_check pkgconfig
+
 REQUIRED_DISTRO_FEATURES = "x11 pam"
 
-inherit autotools cmake
 B = "${S}"
 
 SRCREV = "540bfc3278e396321124d4b18a798ac2bc18b6ca"

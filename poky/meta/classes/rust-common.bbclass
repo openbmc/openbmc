@@ -176,5 +176,5 @@ do_rust_create_wrappers () {
 	${BUILD_CC} ${COREBASE}/meta/files/rust-ccld-wrapper.c -o ${RUST_TARGET_CCLD}
 }
 
-addtask rust_create_wrappers before do_configure after do_patch
+addtask rust_create_wrappers before do_configure after do_patch do_prepare_recipe_sysroot
 do_rust_create_wrappers[dirs] += "${WRAPPER_DIR}"

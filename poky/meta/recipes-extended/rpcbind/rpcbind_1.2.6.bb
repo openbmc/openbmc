@@ -35,7 +35,7 @@ USERADD_PARAM:${PN} = "--system --no-create-home --home-dir / \
                        --shell /bin/false --user-group rpc"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
-PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_unitdir}/system/, \
+PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir}/, \
                           --without-systemdsystemunitdir, \
                           systemd \
 "

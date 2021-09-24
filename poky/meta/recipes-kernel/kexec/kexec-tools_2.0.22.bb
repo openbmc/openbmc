@@ -54,8 +54,8 @@ do_install:append () {
 
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
                 install -D -m 0755 ${WORKDIR}/kdump ${D}${libexecdir}/kdump-helper
-                install -D -m 0644 ${WORKDIR}/kdump.service ${D}${systemd_unitdir}/system/kdump.service
-                sed -i -e 's,@LIBEXECDIR@,${libexecdir},g' ${D}${systemd_unitdir}/system/kdump.service
+                install -D -m 0644 ${WORKDIR}/kdump.service ${D}${systemd_system_unitdir}/kdump.service
+                sed -i -e 's,@LIBEXECDIR@,${libexecdir},g' ${D}${systemd_system_unitdir}/kdump.service
         fi
 }
 
@@ -69,7 +69,7 @@ FILES:kdump = "${sbindir}/kdump \
                ${sysconfdir}/sysconfig/kdump.conf \
                ${sysconfdir}/init.d/kdump \
                ${libexecdir}/kdump-helper \
-               ${systemd_unitdir}/system/kdump.service \
+               ${systemd_system_unitdir}/kdump.service \
 "
 
 FILES:vmcore-dmesg = "${sbindir}/vmcore-dmesg"

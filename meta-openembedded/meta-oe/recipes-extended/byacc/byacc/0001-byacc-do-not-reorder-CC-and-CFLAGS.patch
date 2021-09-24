@@ -18,16 +18,19 @@ Signed-off-by: Zheng Ruoqin <zhengrq.fnst@cn.fujitsu.com>
 
 Update for 20200910.
 Signed-off-by: Zang Ruochen <zangrc.fnst@cn.fujitsu.com>
+
+Update for 20210808.
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 ---
  aclocal.m4 |   1 -
  configure  | 259 -----------------------------------------------------
  2 files changed, 260 deletions(-)
 
 diff --git a/aclocal.m4 b/aclocal.m4
-index 1c6a3ee..2f7e9b5 100644
+index 7a9a8fb..108b6cc 100644
 --- a/aclocal.m4
 +++ b/aclocal.m4
-@@ -1317,7 +1317,6 @@ CF_GCC_VERSION
+@@ -1401,7 +1401,6 @@ CF_GCC_VERSION
  CF_ACVERSION_CHECK(2.52,
  	[AC_PROG_CC_STDC],
  	[CF_ANSI_CC_REQD])
@@ -36,20 +39,20 @@ index 1c6a3ee..2f7e9b5 100644
  dnl ---------------------------------------------------------------------------
  dnl CF_PROG_GROFF version: 3 updated: 2018/01/07 13:16:19
 diff --git a/configure b/configure
-index 378f27d..8f40229 100755
+index 5b98a03..e3a4237 100755
 --- a/configure
 +++ b/configure
-@@ -2066,265 +2066,6 @@ esac
+@@ -2146,265 +2146,6 @@ esac
  # This should have been defined by AC_PROG_CC
- : ${CC:=cc}
+ : "${CC:=cc}"
  
--echo "$as_me:2069: checking \$CFLAGS variable" >&5
+-echo "$as_me:2149: checking \$CFLAGS variable" >&5
 -echo $ECHO_N "checking \$CFLAGS variable... $ECHO_C" >&6
 -case "x$CFLAGS" in
 -(*-[IUD]*)
--	echo "$as_me:2073: result: broken" >&5
+-	echo "$as_me:2153: result: broken" >&5
 -echo "${ECHO_T}broken" >&6
--	{ echo "$as_me:2075: WARNING: your environment uses the CFLAGS variable to hold CPPFLAGS options" >&5
+-	{ echo "$as_me:2155: WARNING: your environment uses the CFLAGS variable to hold CPPFLAGS options" >&5
 -echo "$as_me: WARNING: your environment uses the CFLAGS variable to hold CPPFLAGS options" >&2;}
 -	cf_flags="$CFLAGS"
 -	CFLAGS=
@@ -63,19 +66,19 @@ index 378f27d..8f40229 100755
 -
 -for cf_add_cflags in $cf_arg
 -do
--case $cf_fix_cppflags in
+-case "$cf_fix_cppflags" in
 -(no)
--	case $cf_add_cflags in
+-	case "$cf_add_cflags" in
 -	(-undef|-nostdinc*|-I*|-D*|-U*|-E|-P|-C)
--		case $cf_add_cflags in
+-		case "$cf_add_cflags" in
 -		(-D*)
--			cf_tst_cflags=`echo ${cf_add_cflags} |sed -e 's/^-D[^=]*='\''\"[^"]*//'`
+-			cf_tst_cflags=`echo "${cf_add_cflags}" |sed -e 's/^-D[^=]*='\''\"[^"]*//'`
 -
 -			test "x${cf_add_cflags}" != "x${cf_tst_cflags}" \
 -				&& test -z "${cf_tst_cflags}" \
 -				&& cf_fix_cppflags=yes
 -
--			if test $cf_fix_cppflags = yes ; then
+-			if test "$cf_fix_cppflags" = yes ; then
 -
 -	test -n "$cf_new_extra_cppflags" && cf_new_extra_cppflags="$cf_new_extra_cppflags "
 -	cf_new_extra_cppflags="${cf_new_extra_cppflags}$cf_add_cflags"
@@ -94,7 +97,7 @@ index 378f27d..8f40229 100755
 -		(*$cf_add_cflags)
 -			;;
 -		(*)
--			case $cf_add_cflags in
+-			case "$cf_add_cflags" in
 -			(-D*)
 -				cf_tst_cppflags=`echo "x$cf_add_cflags" | sed -e 's/^...//' -e 's/=.*//'`
 -
@@ -124,7 +127,7 @@ index 378f27d..8f40229 100755
 -	test -n "$cf_new_extra_cppflags" && cf_new_extra_cppflags="$cf_new_extra_cppflags "
 -	cf_new_extra_cppflags="${cf_new_extra_cppflags}$cf_add_cflags"
 -
--	cf_tst_cflags=`echo ${cf_add_cflags} |sed -e 's/^[^"]*"'\''//'`
+-	cf_tst_cflags=`echo "${cf_add_cflags}" |sed -e 's/^[^"]*"'\''//'`
 -
 -	test "x${cf_add_cflags}" != "x${cf_tst_cflags}" \
 -		&& test -z "${cf_tst_cflags}" \
@@ -157,18 +160,18 @@ index 378f27d..8f40229 100755
 -	done
 -	;;
 -(*)
--	echo "$as_me:2183: result: ok" >&5
+-	echo "$as_me:2263: result: ok" >&5
 -echo "${ECHO_T}ok" >&6
 -	;;
 -esac
 -
--echo "$as_me:2188: checking \$CC variable" >&5
+-echo "$as_me:2268: checking \$CC variable" >&5
 -echo $ECHO_N "checking \$CC variable... $ECHO_C" >&6
 -case "$CC" in
 -(*[\ \	]-*)
--	echo "$as_me:2192: result: broken" >&5
+-	echo "$as_me:2272: result: broken" >&5
 -echo "${ECHO_T}broken" >&6
--	{ echo "$as_me:2194: WARNING: your environment uses the CC variable to hold CFLAGS/CPPFLAGS options" >&5
+-	{ echo "$as_me:2274: WARNING: your environment uses the CC variable to hold CFLAGS/CPPFLAGS options" >&5
 -echo "$as_me: WARNING: your environment uses the CC variable to hold CFLAGS/CPPFLAGS options" >&2;}
 -	# humor him...
 -	cf_prog=`echo "$CC" | sed -e 's/	/ /g' -e 's/[ ]* / /g' -e 's/[ ]*[ ]-[^ ].*//'`
@@ -186,19 +189,19 @@ index 378f27d..8f40229 100755
 -
 -for cf_add_cflags in $cf_arg
 -do
--case $cf_fix_cppflags in
+-case "$cf_fix_cppflags" in
 -(no)
--	case $cf_add_cflags in
+-	case "$cf_add_cflags" in
 -	(-undef|-nostdinc*|-I*|-D*|-U*|-E|-P|-C)
--		case $cf_add_cflags in
+-		case "$cf_add_cflags" in
 -		(-D*)
--			cf_tst_cflags=`echo ${cf_add_cflags} |sed -e 's/^-D[^=]*='\''\"[^"]*//'`
+-			cf_tst_cflags=`echo "${cf_add_cflags}" |sed -e 's/^-D[^=]*='\''\"[^"]*//'`
 -
 -			test "x${cf_add_cflags}" != "x${cf_tst_cflags}" \
 -				&& test -z "${cf_tst_cflags}" \
 -				&& cf_fix_cppflags=yes
 -
--			if test $cf_fix_cppflags = yes ; then
+-			if test "$cf_fix_cppflags" = yes ; then
 -
 -	test -n "$cf_new_extra_cppflags" && cf_new_extra_cppflags="$cf_new_extra_cppflags "
 -	cf_new_extra_cppflags="${cf_new_extra_cppflags}$cf_add_cflags"
@@ -217,7 +220,7 @@ index 378f27d..8f40229 100755
 -		(*$cf_add_cflags)
 -			;;
 -		(*)
--			case $cf_add_cflags in
+-			case "$cf_add_cflags" in
 -			(-D*)
 -				cf_tst_cppflags=`echo "x$cf_add_cflags" | sed -e 's/^...//' -e 's/=.*//'`
 -
@@ -247,7 +250,7 @@ index 378f27d..8f40229 100755
 -	test -n "$cf_new_extra_cppflags" && cf_new_extra_cppflags="$cf_new_extra_cppflags "
 -	cf_new_extra_cppflags="${cf_new_extra_cppflags}$cf_add_cflags"
 -
--	cf_tst_cflags=`echo ${cf_add_cflags} |sed -e 's/^[^"]*"'\''//'`
+-	cf_tst_cflags=`echo "${cf_add_cflags}" |sed -e 's/^[^"]*"'\''//'`
 -
 -	test "x${cf_add_cflags}" != "x${cf_tst_cflags}" \
 -		&& test -z "${cf_tst_cflags}" \
@@ -285,24 +288,24 @@ index 378f27d..8f40229 100755
 -	done
 -	test -n "$verbose" && echo "	resulting CC: '$CC'" 1>&6
 -
--echo "${as_me:-configure}:2311: testing resulting CC: '$CC' ..." 1>&5
+-echo "${as_me:-configure}:2391: testing resulting CC: '$CC' ..." 1>&5
 -
 -	test -n "$verbose" && echo "	resulting CFLAGS: '$CFLAGS'" 1>&6
 -
--echo "${as_me:-configure}:2315: testing resulting CFLAGS: '$CFLAGS' ..." 1>&5
+-echo "${as_me:-configure}:2395: testing resulting CFLAGS: '$CFLAGS' ..." 1>&5
 -
 -	test -n "$verbose" && echo "	resulting CPPFLAGS: '$CPPFLAGS'" 1>&6
 -
--echo "${as_me:-configure}:2319: testing resulting CPPFLAGS: '$CPPFLAGS' ..." 1>&5
+-echo "${as_me:-configure}:2399: testing resulting CPPFLAGS: '$CPPFLAGS' ..." 1>&5
 -
 -	;;
 -(*)
--	echo "$as_me:2323: result: ok" >&5
+-	echo "$as_me:2403: result: ok" >&5
 -echo "${ECHO_T}ok" >&6
 -	;;
 -esac
 -
- echo "$as_me:2328: checking whether ${MAKE-make} sets \${MAKE}" >&5
+ echo "$as_me:2408: checking whether ${MAKE-make} sets \${MAKE}" >&5
  echo $ECHO_N "checking whether ${MAKE-make} sets \${MAKE}... $ECHO_C" >&6
  set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y,./+-,__p_,'`
 -- 

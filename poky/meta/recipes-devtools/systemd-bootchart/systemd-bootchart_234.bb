@@ -38,7 +38,7 @@ do_configure:prepend() {
     rm -f ${S}/m4/intltool.m4
 }
 
-FILES:${PN} += "${systemd_unitdir}/systemd-bootchart"
+FILES:${PN} += "${systemd_system_unitdir}d-bootchart"
 
 EXTRA_OECONF = " --with-rootprefix=${root_prefix} \
                  --with-rootlibdir=${base_libdir}"

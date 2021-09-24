@@ -11,7 +11,7 @@ SRCREV = "1a032da198333ee77bdbe4be65e60eb4115ea73f"
 
 S = "${WORKDIR}/git"
 
-inherit meson gobject-introspection
+inherit meson gobject-introspection pkgconfig
 
 EXTRA_OEMESON = "-Dwith_py3=false -Dwith_docs=false -Drpmio=disabled -Dlibmagic=disabled -Dwith_manpages=disabled -Dgobject_overrides_dir_py3=${PYTHON_SITEPACKAGES_DIR}/gi/overrides"
 

@@ -10,7 +10,7 @@ DEPENDS = " \
     libpam \
 "
 
-REQUIRED_DISTRO_FEATURES = "x11 systemd pam"
+REQUIRED_DISTRO_FEATURES = "x11 systemd pam polkit"
 
 inherit gnomebase gsettings gobject-introspection gettext systemd useradd upstream-version-is-even features_check
 

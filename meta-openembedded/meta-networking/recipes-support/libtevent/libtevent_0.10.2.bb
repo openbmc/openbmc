@@ -15,7 +15,7 @@ LIC_FILES_CHKSUM = "file://tevent.h;endline=26;md5=4e458d658cb25e21efc16f720e78b
 SRC_URI[md5sum] = "105c7a4dbb96f1751eb27dfd05e7fa84"
 SRC_URI[sha256sum] = "f8427822e5b2878fb8b28d6f50d96848734f3f3130612fb574fdd2d2148a6696"
 
-inherit waf-samba
+inherit pkgconfig waf-samba
 
 PACKAGECONFIG ??= "\
     ${@bb.utils.filter('DISTRO_FEATURES', 'acl', d)} \

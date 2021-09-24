@@ -29,6 +29,13 @@ CMDLINE_LOGO ?= '${@oe.utils.conditional("DISABLE_RPI_BOOT_LOGO", "1", "logo.nol
 # to enable kernel debugging.
 CMDLINE_DEBUG ?= ""
 
+# Add RNDIS capabilities (must be after rootwait)
+# example: 
+# CMDLINE_RNDIS = "modules-load=dwc2,g_ether g_ether.host_addr=<some MAC 
+# address> g_ether.dev_addr=<some MAC address>"
+# if the MAC addresses are omitted, random values will be used
+CMDLINE_RNDIS ?= ""
+
 CMDLINE = " \
     ${CMDLINE_DWC_OTG} \
     ${CMDLINE_SERIAL} \
@@ -38,6 +45,7 @@ CMDLINE = " \
     ${CMDLINE_LOGO} \
     ${CMDLINE_PITFT} \
     ${CMDLINE_DEBUG} \
+    ${CMDLINE_RNDIS} \
     "
 
 do_compile() {

@@ -8,6 +8,7 @@ DEPENDS = "bison-native"
 
 SRC_URI[sha256sum] = "57127b7e97d91282c6ace556378d5455a9509898297e46e10443016ea1387164"
 
+PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux"
 # http://savannah.gnu.org/bugs/?27299
 CACHED_CONFIGUREVARS += "gl_cv_func_wcwidth_works=yes"
 

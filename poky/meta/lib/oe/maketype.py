@@ -10,12 +10,7 @@ the arguments of the type's factory for details.
 
 import inspect
 import oe.types as types
-try:
-    # Python 3.7+
-    from collections.abc import Callable
-except ImportError:
-    # Python < 3.7
-    from collections import Callable
+from collections.abc import Callable
 
 available_types = {}
 

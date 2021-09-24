@@ -441,6 +441,13 @@ Here are some example URLs::
 
 .. note::
 
+   When using ``git`` as the fetcher of the main source code of your software,
+   ``S`` should be set accordingly::
+
+       S = "${WORKDIR}/git"
+
+.. note::
+
    Specifying passwords directly in ``git://`` urls is not supported.
    There are several reasons: :term:`SRC_URI` is often written out to logs and
    other places, and that could easily leak passwords; it is also all too

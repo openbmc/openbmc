@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/LMDB/lmdb.git;nobranch=1 \
            file://0001-Makefile-use-libprefix-instead-of-libdir.patch \
            "
 
-SRCREV = "LMDB_${PV}"
+SRCREV = "8ad7be2510414b9506ec9f9e24f24d04d9b04a1a"
 
 inherit base ptest
 

@@ -4,7 +4,8 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 """Handling of build perf test reports"""
-from collections import OrderedDict, Mapping, namedtuple
+from collections import OrderedDict, namedtuple
+from collections.abc import Mapping
 from datetime import datetime, timezone
 from numbers import Number
 from statistics import mean, stdev, variance

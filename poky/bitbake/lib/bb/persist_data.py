@@ -12,14 +12,14 @@ currently, providing a key/value store accessed by 'domain'.
 #
 
 import collections
+import collections.abc
 import contextlib
 import functools
 import logging
 import os.path
 import sqlite3
 import sys
-import warnings
-from collections import Mapping
+from collections.abc import Mapping
 
 sqlversion = sqlite3.sqlite_version_info
 if sqlversion[0] < 3 or (sqlversion[0] == 3 and sqlversion[1] < 3):
@@ -29,7 +29,7 @@ if sqlversion[0] < 3 or (sqlversion[0] == 3 and sqlversion[1] < 3):
 logger = logging.getLogger("BitBake.PersistData")
 
 @functools.total_ordering
-class SQLTable(collections.MutableMapping):
+class SQLTable(collections.abc.MutableMapping):
     class _Decorators(object):
         @staticmethod
         def retry(*, reconnect=True):
@@ -237,55 +237,6 @@ class SQLTable(collections.MutableMapping):
 
     def has_key(self, key):
         return key in self
-
-
-class PersistData(object):
-    """Deprecated representation of the bitbake persistent data store"""
-    def __init__(self, d):
-        warnings.warn("Use of PersistData is deprecated.  Please use "
-                      "persist(domain, d) instead.",
-                      category=DeprecationWarning,
-                      stacklevel=2)
-
-        self.data = persist(d)
-        logger.debug("Using '%s' as the persistent data cache",
-                     self.data.filename)
-
-    def addDomain(self, domain):
-        """
-        Add a domain (pending deprecation)
-        """
-        return self.data[domain]
-
-    def delDomain(self, domain):
-        """
-        Removes a domain and all the data it contains
-        """
-        del self.data[domain]
-
-    def getKeyValues(self, domain):
-        """
-        Return a list of key + value pairs for a domain
-        """
-        return list(self.data[domain].items())
-
-    def getValue(self, domain, key):
-        """
-        Return the value of a key for a domain
-        """
-        return self.data[domain][key]
-
-    def setValue(self, domain, key, value):
-        """
-        Sets the value of a key for a domain
-        """
-        self.data[domain][key] = value
-
-    def delValue(self, domain, key):
-        """
-        Deletes a key/value pair
-        """
-        del self.data[domain][key]
 
 def persist(domain, d):
     """Convenience factory for SQLTable objects based upon metadata"""

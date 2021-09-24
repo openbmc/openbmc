@@ -73,25 +73,8 @@ am_cv_func_working_getline=${am_cv_func_working_getline=yes}
 #gcc
 ac_cv_lib_m_sin=${ac_cv_lib_m_sin=yes}
 
-#orbit
-libIDL_cv_long_long_format=ll
-
 # bash
 bash_cv_func_sigsetjmp=${bash_cv_func_sigsetjmp=present}
-
-# ORBit2
-ac_cv_alignof_CORBA_boolean=1
-ac_cv_alignof_CORBA_char=1
-ac_cv_alignof_CORBA_double=8
-ac_cv_alignof_CORBA_float=4
-ac_cv_alignof_CORBA_long=4
-ac_cv_alignof_CORBA_long_double=8
-ac_cv_alignof_CORBA_long_long=8
-ac_cv_alignof_CORBA_octet=1
-ac_cv_alignof_CORBA_pointer=8
-ac_cv_alignof_CORBA_short=2
-ac_cv_alignof_CORBA_struct=1
-ac_cv_alignof_CORBA_wchar=2
 
 lf_cv_sane_realloc=yes
 as_cv_unaligned_access=${as_cv_unaligned_access=yes}

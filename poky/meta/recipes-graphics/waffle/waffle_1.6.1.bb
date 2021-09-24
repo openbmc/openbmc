@@ -15,7 +15,7 @@ SRC_URI[sha256sum] = "31565649ff0e2d8dff1b8f7f2264ab7a78452063c7e04adfc4ce03e64b
 
 UPSTREAM_CHECK_URI = "http://www.waffle-gl.org/releases.html"
 
-inherit meson features_check lib_package bash-completion
+inherit meson features_check lib_package bash-completion pkgconfig
 
 DEPENDS:append = " python3"
 

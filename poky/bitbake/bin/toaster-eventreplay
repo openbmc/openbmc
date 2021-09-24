@@ -19,6 +19,8 @@ import sys
 import json
 import pickle
 import codecs
+import warnings
+warnings.simplefilter("default")
 
 from collections import namedtuple
 

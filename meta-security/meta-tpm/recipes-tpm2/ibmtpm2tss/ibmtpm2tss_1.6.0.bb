@@ -9,7 +9,7 @@ It also comes with a web based TPM interface, suitable for a demo to an \
 audience that is unfamiliar with TCG technology. It is also useful for \
 basic TPM management."
 HOMEPAGE = "http://ibmswtpm.sourceforge.net/ibmtss2.html"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 SECTION = "securty/tpm"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=1e023f61454ac828b4aa1bc4293f7d5f"
 

@@ -25,6 +25,5 @@ Yocto Project Reference Manual
    varlocality
    faq
    resources
-   history
 
 .. include:: /boilerplate.rst

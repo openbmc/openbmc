@@ -44,6 +44,7 @@ class OESSHTarget(OETarget):
             self.ssh = self.ssh + [ '-p', port ]
             self.scp = self.scp + [ '-P', port ]
         self._monitor_dumper = None
+        self.target_dumper = None
 
     def start(self, **kwargs):
         pass
@@ -102,7 +103,8 @@ class OESSHTarget(OETarget):
             if self.monitor_dumper:
                 self.monitor_dumper.dump_monitor()
         if status == 255:
-            self.target_dumper.dump_target()
+            if self.target_dumper:
+                self.target_dumper.dump_target()
             if self.monitor_dumper:
                 self.monitor_dumper.dump_monitor()
         return (status, output)

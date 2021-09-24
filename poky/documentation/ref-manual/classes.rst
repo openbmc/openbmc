@@ -543,7 +543,7 @@ which the OpenEmbedded build system places the generated objects built
 from the recipes. By default, the :term:`B` directory is set to the
 following, which is separate from the source directory (:term:`S`)::
 
-   ${WORKDIR}/${BPN}/{PV}/
+   ${WORKDIR}/${BPN}-{PV}/
 
 See these variables for more information:
 :term:`WORKDIR`, :term:`BPN`, and
@@ -1709,6 +1709,55 @@ are never actually used within OE-Core itself. The ``oelint`` class is
 one such example. However, being aware of this class can reduce the
 proliferation of different versions of similar classes across multiple
 layers.
+
+.. _ref-classes-overlayfs:
+
+``overlayfs.bbclass``
+=======================
+
+It's often desired in Embedded System design to have a read-only rootfs.
+But a lot of different applications might want to have read-write access to
+some parts of a filesystem. It can be especially useful when your update mechanism
+overwrites the whole rootfs, but you may want your application data to be preserved
+between updates. The :ref:`overlayfs <ref-classes-overlayfs>` class provides a way
+to achieve that by means of ``overlayfs`` and at the same time keeping the base
+rootfs read-only.
+
+To use this class, set a mount point for a partition ``overlayfs`` is going to use as upper
+layer in your machine configuration. The underlying file system can be anything that
+is supported by ``overlayfs``. This has to be done in your machine configuration::
+
+  OVERLAYFS_MOUNT_POINT[data] = "/data"
+
+.. note::
+
+  * QA checks fail to catch file existence if you redefine this variable in your recipe!
+  * Only the existence of the systemd mount unit file is checked, not its contents.
+  * To get more details on ``overlayfs``, its internals and supported operations, please refer
+    to the official documentation of the `Linux kernel <https://www.kernel.org/doc/html/latest/filesystems/overlayfs.html>`_.
+
+The class assumes you have a ``data.mount`` systemd unit defined elsewhere in your BSP
+(e.g. in ``systemd-machine-units`` recipe) and it's installed into the image.
+
+Then you can specify writable directories on a recipe basis (e.g. in my-application.bb)::
+
+  OVERLAYFS_WRITABLE_PATHS[data] = "/usr/share/my-custom-application"
+
+To support several mount points you can use a different variable flag. Assuming we
+want to have a writable location on the file system, but do not need that the data
+survives a reboot, then we could have a ``mnt-overlay.mount`` unit for a ``tmpfs`` file system.
+
+In your machine configuration::
+
+  OVERLAYFS_MOUNT_POINT[mnt-overlay] = "/mnt/overlay"
+
+and then in your recipe::
+
+  OVERLAYFS_WRITABLE_PATHS[mnt-overlay] = "/usr/share/another-application"
+
+.. note::
+
+   The class does not support the ``/etc`` directory itself, because ``systemd`` depends on it.
 
 .. _ref-classes-own-mirrors:
 

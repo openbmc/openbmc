@@ -138,7 +138,10 @@ python () {
     def extraimage_getdepends(task):
         deps = ""
         for dep in (d.getVar('EXTRA_IMAGEDEPENDS') or "").split():
-            deps += " %s:%s" % (dep, task)
+            if ":" in dep:
+                deps += " %s " % (dep)
+            else:
+                deps += " %s:%s" % (dep, task)
         return deps
 
     d.appendVarFlag('do_image_complete', 'depends', extraimage_getdepends('do_populate_sysroot'))

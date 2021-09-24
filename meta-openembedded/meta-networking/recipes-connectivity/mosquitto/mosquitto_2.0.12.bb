@@ -21,7 +21,7 @@ SRC_URI = "http://mosquitto.org/files/source/mosquitto-${PV}.tar.gz \
 
 SRC_URI[sha256sum] = "31cf0065cb431d6f4e57a5f4d56663e839c9d177362eff89582d7cfde191c933"
 
-inherit systemd update-rc.d useradd cmake
+inherit systemd update-rc.d useradd cmake pkgconfig
 
 PACKAGECONFIG ??= "ssl dlt websockets \
                   ${@bb.utils.filter('DISTRO_FEATURES','systemd', d)} \

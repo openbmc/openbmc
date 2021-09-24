@@ -51,9 +51,9 @@ do_install() {
 		# Unless both cron and systemd are enabled, install our own
 		# systemd unit file. Otherwise the package will install one.
 	        if ${@bb.utils.contains('PACKAGECONFIG', 'cron systemd', 'false', 'true', d)}; then
-			install -d ${D}${systemd_unitdir}/system
-			install -m 0644 ${WORKDIR}/sysstat.service ${D}${systemd_unitdir}/system
-			sed -i -e 's#@LIBEXECDIR@#${libexecdir}#g' ${D}${systemd_unitdir}/system/sysstat.service
+			install -d ${D}${systemd_system_unitdir}
+			install -m 0644 ${WORKDIR}/sysstat.service ${D}${systemd_system_unitdir}
+			sed -i -e 's#@LIBEXECDIR@#${libexecdir}#g' ${D}${systemd_system_unitdir}/sysstat.service
 	        fi
 	fi
 }

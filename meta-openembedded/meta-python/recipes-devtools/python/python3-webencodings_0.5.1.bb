@@ -1,5 +1,5 @@
 SUMMARY = "Character encoding aliases for legacy web content"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=8;endline=8;md5=e910b35b0ef4e1f665b9a75d6afb7709"
 
 SRC_URI[md5sum] = "32f6e261d52e57bf7e1c4d41546d15b8"

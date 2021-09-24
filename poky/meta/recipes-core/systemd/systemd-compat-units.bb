@@ -38,7 +38,7 @@ pkg_postinst:${PN} () {
 	fi
 
 	for i in ${SYSTEMD_DISABLED_SYSV_SERVICES} ; do
-		if [ -e $i -o -e $i.sh ]  &&   ! [ -e $D${sysconfdir}/systemd/system/$i.service -o -e $D${systemd_unitdir}/system/$i.service ] ; then
+		if [ -e $i -o -e $i.sh ]  &&   ! [ -e $D${sysconfdir}/systemd/system/$i.service -o -e $D${systemd_system_unitdir}/$i.service ] ; then
 			echo -n "$i: "
 			systemctl $OPTS mask $i.service
 		fi

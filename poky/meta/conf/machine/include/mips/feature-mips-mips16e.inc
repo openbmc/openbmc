@@ -11,7 +11,7 @@ MIPSPKGSFX_MIPS16E .= "${@bb.utils.contains('TUNE_FEATURES', 'mips16e', '-m16', 
 TUNEVALID[no-interlink-compressed] = "Disable mixing of standard and MIPS16e code"
 MIPS16_TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'no-interlink-compressed', ' -mno-interlink-compressed', ' -minterlink-compressed', d)}"
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'mips16e', ' ${MIPS16_TUNE_CCARGS}', '', d)}"
-OVERRIDES .= "${@bb.utils.contains('TUNE_FEATURES', 'mips16e', ':mips16e', '', d)}"
+MACHINEOVERRIDES =. "${@bb.utils.contains('TUNE_FEATURES', 'mips16e', 'mips16e:', '', d)}"
 
 # show status (if compiling in MIPS16e mode)
 BUILDCFG_VARS += "${@['', 'MIPS_INSTRUCTION_SET'][d.getVar('MIPS_INSTRUCTION_SET') == 'mips16e']}"

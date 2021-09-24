@@ -6,6 +6,7 @@
 import os
 import sys
 import warnings
+warnings.simplefilter("default")
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), 'lib'))
 from bb import fetch2
 import logging
@@ -513,9 +514,11 @@ except BaseException as e:
         import traceback
         sys.stderr.write(traceback.format_exc())
         sys.stderr.write(str(e))
-
-worker_thread_exit = True
-worker_thread.join()
+finally:
+    worker_thread_exit = True
+    worker_thread.join()
 
 workerlog_write("exiting")
+if not normalexit:
+    sys.exit(1)
 sys.exit(0)

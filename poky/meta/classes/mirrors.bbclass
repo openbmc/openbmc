@@ -70,7 +70,6 @@ ${CPAN_MIRROR}  http://search.cpan.org/CPAN/ \n \
 MIRRORS += "\
 git://salsa.debian.org/.*     git://salsa.debian.org/PATH;protocol=https \n \
 git://git.gnome.org/.*        git://gitlab.gnome.org/GNOME/PATH;protocol=https \n \
-git://git.savannah.gnu.org/.* git://git.savannah.gnu.org/git/PATH;protocol=https \n \
-git://git.yoctoproject.org/.* git://git.yoctoproject.org/git/PATH;protocol=https \n \
 git://.*/.*                   git://HOST/PATH;protocol=https \n \
+git://.*/.*                   git://HOST/git/PATH;protocol=https \n \
 "

@@ -10,7 +10,7 @@ DEPENDS = " \
     json-c \
 "
 
-inherit autotools gobject-introspection gettext python3native
+inherit autotools gobject-introspection gettext pkgconfig python3native
 
 SRC_URI = "git://github.com/mypaint/libmypaint.git;protocol=https;branch=libmypaint-v1 \
            file://0001-make-build-compatible-w.-autoconf-2.7.patch \

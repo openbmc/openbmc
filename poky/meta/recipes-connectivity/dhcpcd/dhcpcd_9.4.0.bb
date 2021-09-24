@@ -48,8 +48,8 @@ USERADD_PARAM:${PN} = "--system -d ${localstatedir}/lib/${BPN} -M -s /bin/false 
 
 do_install:append () {
     # install systemd unit files
-    install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/dhcpcd*.service ${D}${systemd_unitdir}/system
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${WORKDIR}/dhcpcd*.service ${D}${systemd_system_unitdir}
 
     chmod 700 ${D}${localstatedir}/lib/${BPN}
     chown dhcpcd:dhcpcd ${D}${localstatedir}/lib/${BPN}

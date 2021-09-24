@@ -744,6 +744,17 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
                                       % (wks_file, self.resultdir), ignore_status=True).status)
         os.remove(wks_file)
 
+    def test_extra_space(self):
+        """Test --extra-space wks option."""
+        extraspace = 1024**3
+        runCmd("wic create wictestdisk "
+                                   "--image-name core-image-minimal "
+                                   "--extra-space %i -o %s" % (extraspace ,self.resultdir))
+        wicout = glob(self.resultdir + "wictestdisk-*.direct")
+        self.assertEqual(1, len(wicout))
+        size = os.path.getsize(wicout[0])
+        self.assertTrue(size > extraspace)
+
 class Wic2(WicTestCase):
 
     def test_bmap_short(self):

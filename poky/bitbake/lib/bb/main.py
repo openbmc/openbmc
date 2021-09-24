@@ -112,13 +112,6 @@ def _showwarning(message, category, filename, lineno, file=None, line=None):
         warnlog.warning(s)
 
 warnings.showwarning = _showwarning
-warnings.filterwarnings("ignore")
-warnings.filterwarnings("default", module="(<string>$|(oe|bb)\.)")
-warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
-warnings.filterwarnings("ignore", category=ImportWarning)
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="<string>$")
-warnings.filterwarnings("ignore", message="With-statements now directly support multiple context managers")
-
 
 def create_bitbake_parser():
     parser = optparse.OptionParser(

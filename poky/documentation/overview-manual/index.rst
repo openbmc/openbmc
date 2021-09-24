@@ -14,6 +14,5 @@ Yocto Project Overview and Concepts Manual
    yp-intro
    development-environment
    concepts
-   history
 
 .. include:: /boilerplate.rst

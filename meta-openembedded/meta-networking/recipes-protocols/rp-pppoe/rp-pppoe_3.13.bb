@@ -26,6 +26,8 @@ SRC_URI[sha256sum] = "8cd6bc71ba46bd5f6eb4daf60220ccdcd991a8525111dee466501b1b97
 
 inherit autotools-brokensep update-rc.d systemd
 
+CACHED_CONFIGUREVARS += "${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'be', 'rpppoe_cv_pack_bitfields=normal', 'rpppoe_cv_pack_bitfields=rev', d)}"
+
 do_install:append() {
     install -d ${D}${systemd_unitdir}/system
     install -m 0644 ${WORKDIR}/pppoe-server.service ${D}${systemd_unitdir}/system

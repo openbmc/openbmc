@@ -32,4 +32,4 @@ FILES:${PN} += "\
        ${libdir}/gstreamer-1.0/libgstsharktracers.la \
 "
 
-inherit autotools gettext
+inherit autotools gettext pkgconfig

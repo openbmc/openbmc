@@ -14,4 +14,4 @@ SRC_URI = "git://github.com/apache/avro;branch=${BRANCH} \
 
 S = "${WORKDIR}/git/lang/c"
 
-inherit cmake
+inherit cmake pkgconfig

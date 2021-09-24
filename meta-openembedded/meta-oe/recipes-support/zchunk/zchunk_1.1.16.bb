@@ -17,6 +17,6 @@ DEPENDS = "\
 DEPENDS:append:libc-musl = " argp-standalone"
 LDFLAGS:append:libc-musl = " -largp"
 
-inherit meson
+inherit meson pkgconfig
 
 BBCLASSEXTEND = "native nativesdk"

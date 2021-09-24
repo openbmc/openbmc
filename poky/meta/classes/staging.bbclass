@@ -306,6 +306,7 @@ python extend_recipe_sysroot() {
     sstatetasks = d.getVar("SSTATETASKS").split()
     # Add recipe specific tasks referenced by setscene_depvalid()
     sstatetasks.append("do_stash_locale")
+    sstatetasks.append("do_deploy")
 
     def print_dep_tree(deptree):
         data = ""

@@ -90,12 +90,12 @@ For more Yocto Project-related mailing lists, see the
 Internet Relay Chat (IRC)
 =========================
 
-Two IRC channels on Freenode are available for the Yocto Project and
-Poky discussions:
+Two IRC channels on `Libera Chat <https://libera.chat/>`__
+are available for the Yocto Project and OpenEmbedded discussions:
 
 -  ``#yocto``
 
--  ``#poky``
+-  ``#oe``
 
 .. _resources-links-and-related-documentation:
 
@@ -187,9 +187,10 @@ Here is a list of resources you might find helpful:
    implementation of Bugzilla for logging and tracking Yocto Project
    defects.
 
--  *Internet Relay Chat (IRC):* Two IRC channels on Freenode are
-   available for Yocto Project and Poky discussions: ``#yocto`` and
-   ``#poky``, respectively.
+-  *Internet Relay Chat (IRC):* Two IRC channels on
+   `Libera Chat <https://libera.chat/>`__ are
+   available for Yocto Project and OpenEmbeddded discussions: ``#yocto`` and
+   ``#oe``, respectively.
 
 -  `Quick EMUlator (QEMU) <https://wiki.qemu.org/Index.html>`__\ *:* An
    open-source machine emulator and virtualizer.

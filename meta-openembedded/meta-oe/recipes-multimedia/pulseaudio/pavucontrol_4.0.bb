@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=751419260aa954499f7abaabaa882bbe"
 # mind when doing version upgrades).
 DEPENDS = "libxml-parser-perl-native intltool-native glib-2.0-native gtkmm3 libcanberra pulseaudio"
 
-inherit autotools features_check perlnative
+inherit autotools features_check perlnative pkgconfig
 
 REQUIRED_DISTRO_FEATURES = "x11"
 

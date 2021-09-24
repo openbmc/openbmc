@@ -49,8 +49,8 @@ class BBUIHelper:
             tid = event._fn + ":" + event._task
             removetid(event.pid, tid)
             self.failed_tasks.append( { 'title' : "%s %s" % (event._package, event._task)})
-        elif isinstance(event, bb.runqueue.runQueueTaskStarted):
-            self.tasknumber_current = event.stats.completed + event.stats.active + event.stats.failed + 1
+        elif isinstance(event, bb.runqueue.runQueueTaskStarted) or isinstance(event, bb.runqueue.sceneQueueTaskStarted):
+            self.tasknumber_current = event.stats.completed + event.stats.active + event.stats.failed + event.stats.setscene_active + 1
             self.tasknumber_total = event.stats.total
             self.needUpdate = True
         elif isinstance(event, bb.build.TaskProgress):

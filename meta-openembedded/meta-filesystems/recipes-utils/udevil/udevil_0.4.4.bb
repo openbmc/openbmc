@@ -11,7 +11,7 @@ RDEPENDS:${PN} = "udev bash"
 LICENSE = "GPL-3.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
-inherit autotools systemd
+inherit autotools pkgconfig systemd
 
 SRC_URI = "https://github.com/IgnorantGuru/udevil/raw/pkg/${PV}/udevil-${PV}.tar.xz \
     file://0001-udevil-0.4.3-fix-compile-with-gcc6.patch \

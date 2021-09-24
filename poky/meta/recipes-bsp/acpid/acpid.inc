@@ -32,7 +32,7 @@ do_install:append () {
 	install -d ${D}${sysconfdir}/acpi
 	install -d ${D}${sysconfdir}/acpi/events
 
-	install -d ${D}${systemd_unitdir}/system
-	install -m 0644 ${WORKDIR}/acpid.service ${D}${systemd_unitdir}/system
-	sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_unitdir}/system/acpid.service
+	install -d ${D}${systemd_system_unitdir}
+	install -m 0644 ${WORKDIR}/acpid.service ${D}${systemd_system_unitdir}
+	sed -i -e 's,@SBINDIR@,${sbindir},g' ${D}${systemd_system_unitdir}/acpid.service
 }
