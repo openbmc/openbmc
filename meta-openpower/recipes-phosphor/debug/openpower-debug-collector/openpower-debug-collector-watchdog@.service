@@ -1,6 +1,7 @@
 [Unit]
 Description=OpenPOWER debug data collector for host watchdog timeout
 Before=obmc-host-quiesce@%i.target
+After=op-stop-instructions@%i.service
 
 [Service]
 ExecStart=/usr/bin/env watchdog_timeout
