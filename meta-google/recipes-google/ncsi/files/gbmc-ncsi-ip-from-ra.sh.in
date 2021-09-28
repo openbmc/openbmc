@@ -25,15 +25,20 @@ while true; do
   while read line; do
     if [ -z "$line" ]; then
       pfx=
+      host=
     elif [[ "$line" =~ ^Prefix' '*:' '*(.*)/([0-9]+)$ ]]; then
       t_pfx="${BASH_REMATCH[1]}"
       t_pfx_len="${BASH_REMATCH[2]}"
       ip_to_bytes t_pfx_b "$t_pfx" || continue
       (( t_pfx_len == 76 && t_pfx_b[8] & 0xfd == 0xfd )) || continue
       (( t_pfx_b[9] |= 1 ))
+      hextet="fd$(printf '%02x' ${t_pfx_b[9]})"
       pfx="$(ip_bytes_to_str t_pfx_b)"
       (( t_pfx_b[9] &= 0xf0 ))
       stateless_pfx="$(ip_bytes_to_str t_pfx_b)"
+    elif [[ "$line" =~ ^'DNS search list'' '*:' '*([^.-]*)[^.]*[.](.*.google.com)$ ]]; then
+      host="${BASH_REMATCH[1]}"
+      domain="${BASH_REMATCH[2]}"
     elif [[ "$line" =~ ^from' '(.*)$ ]]; then
       rtr="${BASH_REMATCH[1]}"
       (( "${#pfx}" != 0 )) || continue
@@ -101,6 +106,11 @@ EOF
       printf '%s' "$contents" >"$rfile"
       systemctl reset-failed nftables
       systemctl --no-block restart nftables
+
+      # Set the machine hostname if discovered
+      if [ -n "$host" ]; then
+        hostnamectl set-hostname "$host-n$hextet.$domain"
+      fi
 
       old_pfx="$pfx"
       old_rtr="$rtr"
