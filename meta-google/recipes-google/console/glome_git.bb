@@ -15,7 +15,7 @@ DEPENDS += " \
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/google/glome.git"
-SRCREV = "b7084b5c60682a0b4f4ae3f2ec6048e65212c377"
+SRCREV = "02f7d2722a2eb303f1f02d0c2ce97a65f8273662"
 
 FILES_${PN} += "${libdir}/security"
 
