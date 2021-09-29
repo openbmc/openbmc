@@ -20,4 +20,4 @@ DEPENDS = " \
 
 RDEPENDS:${PN} = "phal-devtree"
 
-EXTRA_OECONF = "CHIP=p10"
+EXTRA_OECONF = "CHIP=p10 --enable-libphal"
