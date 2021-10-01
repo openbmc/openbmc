@@ -24,6 +24,7 @@ SRC_URI += " \
 S = "${WORKDIR}"
 
 RDEPENDS:${PN} += " \
+  bash \
   dhcp-relay \
   gbmc-ip-monitor \
   ncsid \
