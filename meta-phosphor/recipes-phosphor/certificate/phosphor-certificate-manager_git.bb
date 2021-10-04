@@ -43,4 +43,4 @@ SYSTEMD_SERVICE:${PN} = " \
         ${@bb.utils.contains('PACKAGECONFIG', 'bmcweb', 'phosphor-certificate-manager@bmcweb.service', '', d)} \
         "
 
-FILES:${PN}:append = " ${sysconfdir}/dbus-1 ${base_libdir} ${datadir} ${bindir}"
+FILES:${PN}:append = " ${systemd_system_unitdir}/*"
