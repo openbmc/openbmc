@@ -55,7 +55,7 @@ S = "${WORKDIR}/git"
 # 2. For each hwmon the script generates busconfig ACLs.
 pkg_postinst:${PN}() {
     hwmon_dir="$D/etc/default/obmc/hwmon"
-    dbus_dir="$D/etc/dbus-1/system.d"
+    dbus_dir="$D/${datadir}/dbus-1/system.d"
 
     if [ -n "$D" -a -d "${hwmon_dir}" ]; then
         # Remove existing links and replace with actual copy of the file to prevent
