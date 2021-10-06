@@ -14,12 +14,10 @@ The meta-python layer depends on:
 	URI: git://git.openembedded.org/openembedded-core
 	layers: meta
 	branch: master
-	revision: HEAD
 
 	URI: git://git.openembedded.org/meta-openembedded
 	layers: meta-oe
 	branch: master
-	revision: HEAD
 
 Please follow the recommended setup procedures of your OE distribution.
 For Angstrom that is:

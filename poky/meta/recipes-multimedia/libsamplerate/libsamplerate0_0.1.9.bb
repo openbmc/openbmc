@@ -10,6 +10,7 @@ PR = "r1"
 
 SRC_URI = "http://www.mega-nerd.com/SRC/libsamplerate-${PV}.tar.gz \
            file://0001-configure.ac-improve-alsa-handling.patch \
+           file://shared_version_info.patch \
 "
 
 SRC_URI[md5sum] = "2b78ae9fe63b36b9fbb6267fad93f259"

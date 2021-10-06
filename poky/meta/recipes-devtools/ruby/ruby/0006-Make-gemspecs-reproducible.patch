@@ -1,0 +1,67 @@
+From: Lucas Kanashiro <kanashiro@debian.org>
+Date: Fri, 1 Nov 2019 15:25:17 -0300
+Subject: Make gemspecs reproducible
+
+Without an explicit date, they will get the current date and make the
+build unreproducible
+
+Upstream-Status: Backport [debian]
+
+---
+ ext/bigdecimal/bigdecimal.gemspec | 1 +
+ ext/fiddle/fiddle.gemspec         | 1 +
+ ext/io/console/io-console.gemspec | 2 +-
+ lib/ipaddr.gemspec                | 1 +
+ lib/rdoc/rdoc.gemspec             | 1 +
+ 5 files changed, 5 insertions(+), 1 deletion(-)
+
+--- a/ext/bigdecimal/bigdecimal.gemspec
++++ b/ext/bigdecimal/bigdecimal.gemspec
+@@ -6,6 +6,7 @@
+   s.name          = "bigdecimal"
+   s.version       = bigdecimal_version
+   s.authors       = ["Kenta Murata", "Zachary Scott", "Shigeo Kobayashi"]
++  s.date          = RUBY_RELEASE_DATE
+   s.email         = ["mrkn@mrkn.jp"]
+
+   s.summary       = "Arbitrary-precision decimal floating-point number library."
+--- a/ext/fiddle/fiddle.gemspec
++++ b/ext/fiddle/fiddle.gemspec
+@@ -8,6 +8,7 @@
+ Gem::Specification.new do |spec|
+   spec.name          = "fiddle"
+   spec.version       = version_module::Fiddle::VERSION
++  spec.date          = RUBY_RELEASE_DATE
+   spec.authors       = ["Aaron Patterson", "SHIBATA Hiroshi"]
+   spec.email         = ["aaron@tenderlovemaking.com", "hsbt@ruby-lang.org"]
+
+--- a/ext/io/console/io-console.gemspec
++++ b/ext/io/console/io-console.gemspec
+@@ -4,6 +4,7 @@
+ Gem::Specification.new do |s|
+   s.name = "io-console"
+   s.version = _VERSION
++  s.date = RUBY_RELEASE_DATE
+   s.summary = "Console interface"
+   s.email = "nobu@ruby-lang.org"
+   s.description = "add console capabilities to IO instances."
+--- a/lib/ipaddr.gemspec
++++ b/lib/ipaddr.gemspec
+@@ -6,6 +6,7 @@
+ Gem::Specification.new do |spec|
+   spec.name          = "ipaddr"
+   spec.version       = "1.2.2"
++  spec.date          = RUBY_RELEASE_DATE
+   spec.authors       = ["Akinori MUSHA", "Hajimu UMEMOTO"]
+   spec.email         = ["knu@idaemons.org", "ume@mahoroba.org"]
+
+--- a/lib/rdoc/rdoc.gemspec
++++ b/lib/rdoc/rdoc.gemspec
+@@ -7,6 +7,7 @@
+
+ Gem::Specification.new do |s|
+   s.name = "rdoc"
++  s.date = RUBY_RELEASE_DATE
+   s.version = RDoc::VERSION
+
+   s.authors = [

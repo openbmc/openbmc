@@ -1,8 +1,8 @@
 DESCRIPTION = "Bluetooth library with attribute support"
 SECTION = "libs/network"
 
-LICENSE = "GPLv2+"
-LIC_FILES_CHKSUM = "file://CMakeLists.txt;beginline=1;endline=20;md5=8d5efeb9189b60866baff80ff791bf00"
+LICENSE = "GPL-2.0+ | BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://CMakeLists.txt;beginline=1;endline=6;md5=71fdd2be76b4e95fe28324a70d4981c5"
 
 DEPENDS = "bluez5 glib-2.0"
 DEPENDS += "glib-2.0-native"
@@ -11,11 +11,10 @@ PV = "0.2+git${SRCPV}"
 
 SRC_URI = "git://github.com/labapart/gattlib.git \
            file://dbus-avoid-strange-chars-from-the-build-dir.patch \
-           file://0001-cmake-Use-GNUInstallDirs.patch \
            "
 
 SRCBRANCH = "master"
-SRCREV = "5c7ee43bd70ee09a7170ddd55b9fdbdef69e9080"
+SRCREV = "fa54ae42ccb3d8f911e00b02ed1e581537e47f79"
 
 S = "${WORKDIR}/git"
 
@@ -29,4 +28,4 @@ EXTRA_OECMAKE += "-DGATTLIB_BUILD_DOCS=OFF"
 inherit pkgconfig cmake
 
 FILES:${PN} = "${libdir}/*"
-FILES:${PN}-dev = "${includedir}/*"
+FILES:${PN}-dev = "${includedir}/* ${libdir}/pkgconfig"

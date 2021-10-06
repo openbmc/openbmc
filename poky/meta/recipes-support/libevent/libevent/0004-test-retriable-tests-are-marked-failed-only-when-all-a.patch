@@ -1,0 +1,81 @@
+From 36ebd92fa53c0097f1e2f9ec5aa5b5c6ec1b411d Mon Sep 17 00:00:00 2001
+From: Thomas Perrot <thomas.perrot@bootlin.com>
+Date: Wed, 29 Sep 2021 13:50:35 +0200
+Subject: [PATCH] test: retriable tests are marked failed only when all
+ attempts have failed
+
+Fixes: #1193
+
+Upstream-status: Pending
+
+Signed-off-by: Thomas Perrot <thomas.perrot@bootlin.com>
+---
+ test/tinytest.c | 13 ++++++-------
+ test/tinytest.h |  2 +-
+ 2 files changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/test/tinytest.c b/test/tinytest.c
+index 85dfe74a720e..bf2882418eb6 100644
+--- a/test/tinytest.c
++++ b/test/tinytest.c
+@@ -310,7 +310,8 @@ testcase_run_forked_(const struct testgroup_t *group,
+ 
+ int
+ testcase_run_one(const struct testgroup_t *group,
+-		 const struct testcase_t *testcase)
++		 const struct testcase_t *testcase,
++		 const int test_attempts)
+ {
+ 	enum outcome outcome;
+ 
+@@ -348,7 +349,7 @@ testcase_run_one(const struct testgroup_t *group,
+ 		if (opt_verbosity>0 && !opt_forked)
+ 			puts("SKIPPED");
+ 	} else {
+-		if (!opt_forked)
++		if (!opt_forked && (testcase->flags & TT_RETRIABLE) && !test_attempts)
+ 			printf("\n  [%s FAILED]\n", testcase->name);
+ 	}
+ 
+@@ -525,22 +526,20 @@ tinytest_main(int c, const char **v, struct testgroup_t *groups)
+ 		struct testgroup_t *group = &groups[i];
+ 		for (j = 0; group->cases[j].name; ++j) {
+ 			struct testcase_t *testcase = &group->cases[j];
+-			int test_attempts = 3;
++			int test_attempts = (testcase->flags & TT_RETRIABLE) ? 3: 1;
+ 			int test_ret_err;
+ 
+ 			if (!(testcase->flags & TT_ENABLED_))
+ 				continue;
+ 
+ 			for (;;) {
+-				test_ret_err = testcase_run_one(group, testcase);
++				test_ret_err = testcase_run_one(group, testcase, test_attempts);
+ 
+ 				if (test_ret_err == OK)
+ 					break;
+-				if (!(testcase->flags & TT_RETRIABLE))
++				if (!--test_attempts)
+ 					break;
+ 				printf("\n  [RETRYING %s (%i)]\n", testcase->name, test_attempts);
+-				if (!test_attempts--)
+-					break;
+ 			}
+ 
+ 			switch (test_ret_err) {
+diff --git a/test/tinytest.h b/test/tinytest.h
+index d321dd467542..c276b5339331 100644
+--- a/test/tinytest.h
++++ b/test/tinytest.h
+@@ -92,7 +92,7 @@ char *tinytest_format_hex_(const void *, unsigned long);
+ 	tinytest_set_flag_(groups, named, 1, TT_SKIP)
+ 
+ /** Run a single testcase in a single group. */
+-int testcase_run_one(const struct testgroup_t *,const struct testcase_t *);
++int testcase_run_one(const struct testgroup_t *,const struct testcase_t *, const int test_attempts);
+ 
+ void tinytest_set_aliases(const struct testlist_alias_t *aliases);
+ 
+-- 
+2.31.1
+

@@ -1,13 +1,11 @@
 This layer depends on:
 
-URI: git://github.com/openembedded/oe-core.git
+URI: git://git.openembedded.org/openembedded-core
 branch: master
-revision: HEAD
 
-URI: git://github.com/openembedded/meta-oe.git
+URI: git://git.openembedded.org/meta-openembedded
 layers: meta-oe
 branch: master
-revision: HEAD
 
 Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-multimedia]' in the subject
 

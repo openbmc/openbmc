@@ -52,6 +52,7 @@ SRC_URI = "git://github.com/opencv/opencv.git;name=opencv \
            file://download.patch \
            file://0001-Make-ts-module-external.patch \
            file://0001-sfm-link-with-Glog_LIBS.patch;patchdir=../contrib \
+           file://0001-Use-the-one-argument-version-of-SetTotalBytesLimit.patch \
            "
 SRC_URI:append:riscv64 = " file://0001-Use-Os-to-compile-tinyxml2.cpp.patch;patchdir=../contrib"
 

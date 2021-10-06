@@ -1158,6 +1158,35 @@ class Wic2(WicTestCase):
             out = glob(self.resultdir + "%s-*.direct" % wksname)
             self.assertEqual(1, len(out))
 
+    @only_for_arch(['i586', 'i686', 'x86_64'])
+    def test_efi_plugin_unified_kernel_image_qemu(self):
+        """Test efi plugin's Unified Kernel Image feature in qemu"""
+        config = 'IMAGE_FSTYPES = "wic"\n'\
+                 'INITRAMFS_IMAGE = "core-image-minimal-initramfs"\n'\
+                 'WKS_FILE = "test_efi_plugin.wks"\n'\
+                 'MACHINE_FEATURES:append = " efi"\n'
+        self.append_config(config)
+        self.assertEqual(0, bitbake('core-image-minimal core-image-minimal-initramfs ovmf').status)
+        self.remove_config(config)
+
+        with runqemu('core-image-minimal', ssh=False,
+                     runqemuparams='ovmf', image_fstype='wic') as qemu:
+            # Check that /boot has EFI bootx64.efi (required for EFI)
+            cmd = "ls /boot/EFI/BOOT/bootx64.efi | wc -l"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
+            self.assertEqual(output, '1')
+            # Check that /boot has EFI/Linux/linux.efi (required for Unified Kernel Images auto detection)
+            cmd = "ls /boot/EFI/Linux/linux.efi | wc -l"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
+            self.assertEqual(output, '1')
+            # Check that /boot doesn't have loader/entries/boot.conf (Unified Kernel Images are auto detected by the bootloader)
+            cmd = "ls /boot/loader/entries/boot.conf 2&>/dev/null | wc -l"
+            status, output = qemu.run_serial(cmd)
+            self.assertEqual(1, status, 'Failed to run command "%s": %s' % (cmd, output))
+            self.assertEqual(output, '0')
+
     def test_fs_types(self):
         """Test filesystem types for empty and not empty partitions"""
         img = 'core-image-minimal'

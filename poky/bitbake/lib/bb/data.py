@@ -226,7 +226,7 @@ def emit_func(func, o=sys.__stdout__, d = init()):
         deps = newdeps
         seen |= deps
         newdeps = set()
-        for dep in deps:
+        for dep in sorted(deps):
             if d.getVarFlag(dep, "func", False) and not d.getVarFlag(dep, "python", False):
                emit_var(dep, o, d, False) and o.write('\n')
                newdeps |=  bb.codeparser.ShellParser(dep, logger).parse_shell(d.getVar(dep))

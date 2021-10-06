@@ -385,3 +385,10 @@ EOF
        chmod 0755 ${SYSROOT_DESTDIR}${bindir}/nativeperl
        cat ${SYSROOT_DESTDIR}${bindir}/nativeperl
 }
+
+SSTATE_HASHEQUIV_FILEMAP = " \
+    populate_sysroot:*/lib*/perl5/*/*/Config_heavy.pl:${TMPDIR} \
+    populate_sysroot:*/lib*/perl5/*/*/Config_heavy.pl:${COREBASE} \
+    populate_sysroot:*/lib*/perl5/config.sh:${TMPDIR} \
+    populate_sysroot:*/lib*/perl5/config.sh:${COREBASE} \
+    "

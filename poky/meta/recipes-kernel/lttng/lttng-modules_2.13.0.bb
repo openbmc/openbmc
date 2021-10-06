@@ -9,7 +9,10 @@ inherit module
 
 include lttng-platforms.inc
 
-SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2"
+SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
+           file://0001-fix-cpu-hotplug-Remove-deprecated-CPU-hotplug-functi.patch \
+           file://0002-fix-Revert-Makefile-Enable-Wimplicit-fallthrough-for.patch \
+          "
 # Use :append here so that the patch is applied also when using devupstream
 SRC_URI:append = " file://0001-src-Kbuild-change-missing-CONFIG_TRACEPOINTS-to-warn.patch"
 
@@ -38,7 +41,7 @@ LIC_FILES_CHKSUM:class-devupstream = "file://LICENSE;md5=0464cff101a009c403cd2ed
 DEFAULT_PREFERENCE:class-devupstream = "-1"
 SRC_URI:class-devupstream = "git://git.lttng.org/lttng-modules;branch=stable-2.13"
 
-SRCREV:class-devupstream = "f982b51a98a29cb4aaf607cb9bbf2b509d8e6933"
-PV:class-devupstream = "2.13.0-rc2+git${SRCPV}"
+SRCREV:class-devupstream = "c570be0da77e963d77bac099d468bc0cd5f1bd63"
+PV:class-devupstream = "2.13.0+git${SRCPV}"
 S:class-devupstream = "${WORKDIR}/git"
 SRCREV_FORMAT ?= "lttng_git"

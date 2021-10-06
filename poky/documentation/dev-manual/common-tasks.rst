@@ -3888,6 +3888,12 @@ Follow these steps to create an initramfs image:
 
    .. note::
 
+      Bundling the initramfs with the kernel conflates the code in the initramfs
+      with the GPLv2 licensed Linux kernel binary. Thus only GPLv2 compatible
+      software may be part of a bundled initramfs.
+
+   .. note::
+
       If you choose to not bundle the initramfs image with the kernel
       image, you are essentially using an
       `Initial RAM Disk (initrd) <https://en.wikipedia.org/wiki/Initrd>`__.

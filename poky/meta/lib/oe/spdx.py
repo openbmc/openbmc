@@ -2,6 +2,18 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+#
+# This library is intended to capture the JSON SPDX specification in a type
+# safe manner. It is not intended to encode any particular OE specific
+# behaviors, see the sbom.py for that.
+#
+# The documented SPDX spec document doesn't cover the JSON syntax for
+# particular configuration, which can make it hard to determine what the JSON
+# syntax should be. I've found it is actually much simpler to read the official
+# SPDX JSON schema which can be found here: https://github.com/spdx/spdx-spec
+# in schemas/spdx-schema.json
+#
+
 import hashlib
 import itertools
 import json
@@ -9,7 +21,16 @@ import json
 SPDX_VERSION = "2.2"
 
 
+#
+# The following are the support classes that are used to implement SPDX object
+#
+
 class _Property(object):
+    """
+    A generic SPDX object property. The different types will derive from this
+    class
+    """
+
     def __init__(self, *, default=None):
         self.default = default
 
@@ -19,6 +40,10 @@ class _Property(object):
 
 
 class _String(_Property):
+    """
+    A scalar string property for an SPDX object
+    """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -39,6 +64,10 @@ class _String(_Property):
 
 
 class _Object(_Property):
+    """
+    A scalar SPDX object property of a SPDX object
+    """
+
     def __init__(self, cls, **kwargs):
         super().__init__(**kwargs)
         self.cls = cls
@@ -62,6 +91,10 @@ class _Object(_Property):
 
 
 class _ListProperty(_Property):
+    """
+    A list of SPDX properties
+    """
+
     def __init__(self, prop, **kwargs):
         super().__init__(**kwargs)
         self.prop = prop
@@ -82,16 +115,28 @@ class _ListProperty(_Property):
 
 
 class _StringList(_ListProperty):
+    """
+    A list of strings as a property for an SPDX object
+    """
+
     def __init__(self, **kwargs):
         super().__init__(_String(), **kwargs)
 
 
 class _ObjectList(_ListProperty):
+    """
+    A list of SPDX objects as a property for an SPDX object
+    """
+
     def __init__(self, cls, **kwargs):
         super().__init__(_Object(cls), **kwargs)
 
 
 class MetaSPDXObject(type):
+    """
+    A metaclass that allows properties (anything derived from a _Property
+    class) to be defined for a SPDX object
+    """
     def __new__(mcls, name, bases, attrs):
         attrs["_properties"] = {}
 
@@ -105,6 +150,9 @@ class MetaSPDXObject(type):
 
 
 class SPDXObject(metaclass=MetaSPDXObject):
+    """
+    The base SPDX object; all SPDX spec classes must derive from this class
+    """
     def __init__(self, **d):
         self._spdx = {}
 
@@ -122,6 +170,21 @@ class SPDXObject(metaclass=MetaSPDXObject):
             return
         raise KeyError("%r is not a valid SPDX property" % name)
 
+#
+# These are the SPDX objects implemented from the spec. The *only* properties
+# that can be added to these objects are ones directly specified in the SPDX
+# spec, however you may add helper functions to make operations easier.
+#
+# Defaults should *only* be specified if the SPDX spec says there is a certain
+# required value for a field (e.g. dataLicense), or if the field is mandatory
+# and has some sane "this field is unknown" (e.g. "NOASSERTION")
+#
+
+class SPDXAnnotation(SPDXObject):
+    annotationDate = _String()
+    annotationType = _String()
+    annotator = _String()
+    comment = _String()
 
 class SPDXChecksum(SPDXObject):
     algorithm = _String()
@@ -164,6 +227,7 @@ class SPDXPackage(SPDXObject):
     packageVerificationCode = _Object(SPDXPackageVerificationCode)
     hasFiles = _StringList()
     packageFileName = _String()
+    annotations = _ObjectList(SPDXAnnotation)
 
 
 class SPDXFile(SPDXObject):

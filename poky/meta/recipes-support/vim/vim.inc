@@ -18,6 +18,7 @@ SRC_URI = "git://github.com/vim/vim.git \
            file://no-path-adjust.patch \
            file://racefix.patch \
            file://b7081e135a16091c93f6f5f7525a5c58fb7ca9f9.patch \
+          file://CVE-2021-3778.patch \
 "
 
 SRCREV = "98056533b96b6b5d8849641de93185dd7bcadc44"

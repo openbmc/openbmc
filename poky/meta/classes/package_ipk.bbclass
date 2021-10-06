@@ -230,8 +230,8 @@ def ipk_write_pkg(pkg, d):
                                 shell=True)
 
         if d.getVar('IPK_SIGN_PACKAGES') == '1':
-            ipkver = "%s-%s" % (d.getVar('PKGV'), d.getVar('PKGR'))
-            ipk_to_sign = "%s/%s_%s_%s.ipk" % (pkgoutdir, pkgname, ipkver, d.getVar('PACKAGE_ARCH'))
+            ipkver = "%s-%s" % (localdata.getVar('PKGV'), localdata.getVar('PKGR'))
+            ipk_to_sign = "%s/%s_%s_%s.ipk" % (pkgoutdir, pkgname, ipkver, localdata.getVar('PACKAGE_ARCH'))
             sign_ipk(d, ipk_to_sign)
 
     finally:

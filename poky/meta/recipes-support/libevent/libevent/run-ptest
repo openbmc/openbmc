@@ -1,14 +1,14 @@
 #!/bin/sh
 
 # run-ptest - 'ptest' test infrastructure shell script that
-#   wraps the libevent test scripts 
+#   wraps the libevent test scripts
 #
 # Trevor Gamblin <trevor.gamblin@windriver.com>
 ###############################################################
 LIBEVENTLIB=@libdir@/libevent
 LOG="${LIBEVENTLIB}/ptest/libevent_ptest_$(date +%Y%m%d-%H%M%S).log"
 
-cd ${LIBEVENTLIB}/ptest 
+cd ${LIBEVENTLIB}/ptest
 
 # Run only the libevent "regress" test. All other test scripts in the
 # libevent "test" folder are related to performance, e.g. read/write
@@ -16,9 +16,9 @@ cd ${LIBEVENTLIB}/ptest
 # in the ptest log.
 ./test/regress 2>&1| sed -e '/TESTS/d' -e '/tests/d' -e '/OK/ s/^/PASS: / ; /FAILED/ s/^/FAIL: / ; /SKIPPED/ s/^/SKIP: / ; /DISABLED/ s/^/SKIP: /' | cut -f1,2 -d ':' | tee -a ${LOG}
 
-passed=`grep PASS ${LOG}|wc -l`
-failed=`grep FAIL ${LOG}|wc -l`
-skipped=`grep -E SKIP ${LOG}|wc -l`
+passed=`grep PASS: ${LOG}|wc -l`
+failed=`grep FAIL: ${LOG}|wc -l`
+skipped=`grep -E SKIP: ${LOG}|wc -l`
 all=$((passed + failed + skipped))
 
 (   echo "=== Test Summary ==="

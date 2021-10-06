@@ -1,0 +1,35 @@
+From: Christian Hofstaedtler <zeha@debian.org>
+Date: Tue, 10 Oct 2017 15:04:34 -0300
+Subject: rdoc: build reproducible documentation
+
+- provide a fixed timestamp to the gzip compression
+
+Upstream-Status: Backport [debian]
+
+Signed-off-by: Antonio Terceiro <terceiro@debian.org>
+Signed-off-by: Christian Hofstaedtler <zeha@debian.org>
+---
+ lib/rdoc/generator/json_index.rb | 4 ++--
+ lib/rdoc/rdoc.rb                 | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+--- a/lib/rdoc/generator/json_index.rb
++++ b/lib/rdoc/generator/json_index.rb
+@@ -178,7 +178,7 @@
+     debug_msg "Writing gzipped search index to %s" % outfile
+
+     Zlib::GzipWriter.open(outfile) do |gz|
+-      gz.mtime = File.mtime(search_index_file)
++      gz.mtime = -1
+       gz.orig_name = search_index_file.basename.to_s
+       gz.write search_index
+       gz.close
+@@ -196,7 +196,7 @@
+         debug_msg "Writing gzipped file to %s" % outfile
+
+         Zlib::GzipWriter.open(outfile) do |gz|
+-          gz.mtime = File.mtime(dest)
++          gz.mtime = -1
+           gz.orig_name = dest.basename.to_s
+           gz.write data
+           gz.close

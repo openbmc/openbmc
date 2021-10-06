@@ -54,7 +54,7 @@ export OECMAKE_C_FLAGS += " -I${STAGING_INCDIR} -L ${RECIPE_SYSROOT}${nonarch_li
 
 do_install:append () {
     install -d ${D}/${sysconfdir}
-    install -d ${D}/${localstatedir}/lib/clamav
+    install -d -o ${CLAMAV_UID} -g ${CLAMAV_GID} ${D}/${localstatedir}/lib/clamav
     install -d ${D}${sysconfdir}/clamav ${D}${sysconfdir}/default/volatiles
 
     install -m 644 ${WORKDIR}/clamd.conf ${D}/${prefix}/${sysconfdir}
@@ -83,7 +83,6 @@ pkg_postinst:${PN} () {
         elif [ -e ${sysconfdir}/init.d/populate-volatile.sh ]; then
             ${sysconfdir}/init.d/populate-volatile.sh update
         fi
-        chown -R ${CLAMAV_UID}:${CLAMAV_GID} ${localstatedir}/lib/clamav
     fi
 }
 
@@ -149,5 +148,7 @@ SYSTEMD_PACKAGES  = "${PN}-daemon ${PN}-freshclam"
 SYSTEMD_SERVICE:${PN}-daemon = "clamav-daemon.service"
 SYSTEMD_SERVICE:${PN}-freshclam = "clamav-freshclam.service"
 
-RDEPENDS:${PN} = "openssl ncurses-libncurses libxml2 libbz2 ncurses-libtinfo curl libpcre2 clamav-freshclam clamav-libclamav"
-RDEPENDS:${PN}-daemon = "clamav"
+RDEPENDS:${PN} = "openssl ncurses-libncurses libxml2 libbz2 ncurses-libtinfo curl libpcre2 clamav-libclamav"
+RRECOMMENDS:${PN} = "clamav-freshclam"
+RDEPENDS:${PN}-freshclam = "clamav"
+RDEPENDS:${PN}-daemon = "clamav clamav-freshclam"

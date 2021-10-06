@@ -1,6 +1,6 @@
 require libtool-${PV}.inc
 
-SRC_URI += "file://multilib.patch file://debian-no_hostname.patch"
+SRC_URI += "file://multilib.patch"
 
 RDEPENDS:${PN} += "bash"
 

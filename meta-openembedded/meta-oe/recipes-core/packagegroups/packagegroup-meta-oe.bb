@@ -823,6 +823,7 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     remmina \
     neon \
     nmon \
+    libjs-jquery-icheck \
     libtinyxml \
     libusbg \
     libutempter \
@@ -874,6 +875,7 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     spitools \
     libsass \
     sassc \
+    smarty \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "synergy", "", d)} \
     syslog-ng \
     system-config-keyboard \

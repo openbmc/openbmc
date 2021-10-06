@@ -7,6 +7,10 @@ SRC_URI += " \
            file://run-ptest \
            file://0001-template-Makefile.in-do-not-write-host-cross-cc-item.patch \
            file://0002-template-Makefile.in-filter-out-f-prefix-map.patch \
+           file://0003-rdoc-build-reproducible-documentation.patch \
+           file://0004-lib-mkmf.rb-sort-list-of-object-files-in-generated-M.patch \
+           file://0005-Mark-Gemspec-reproducible-change-fixing-784225-too.patch \
+           file://0006-Make-gemspecs-reproducible.patch \
            "
 
 SRC_URI[sha256sum] = "5085dee0ad9f06996a8acec7ebea4a8735e6fac22f22e2d98c3f2bc3bef7e6f1"

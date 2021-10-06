@@ -34,7 +34,6 @@ SRC_URI[sha256sum] = "dc8d3e74ab209465e7f568e1b3bb9a5a142f8656e2b57d10049a73da2a
 
 # remove at next version upgrade or when output changes
 PR = "r1"
-HASHEQUIV_HASH_VERSION .= ".2"
 
 inherit autotools gettext ptest pkgconfig
 

@@ -161,6 +161,11 @@ do_install:append:class-native() {
 }
 
 do_install:append() {
+        for c in ${D}/${libdir}/python${PYTHON_MAJMIN}/_sysconfigdata*.py; do
+            python3 ${WORKDIR}/reformat_sysconfig.py $c
+        done
+        rm ${D}${libdir}/python${PYTHON_MAJMIN}/__pycache__/_sysconfigdata*.cpython*
+
         mkdir -p ${D}${libdir}/python-sysconfigdata
         sysconfigfile=`find ${D} -name _sysconfig*.py`
         cp $sysconfigfile ${D}${libdir}/python-sysconfigdata/_sysconfigdata.py
@@ -191,6 +196,14 @@ do_install:append:class-nativesdk () {
 }
 
 SSTATE_SCAN_FILES += "Makefile _sysconfigdata.py"
+SSTATE_HASHEQUIV_FILEMAP = " \
+    populate_sysroot:*/lib*/python3*/_sysconfigdata*.py:${TMPDIR} \
+    populate_sysroot:*/lib*/python3*/_sysconfigdata*.py:${COREBASE} \
+    populate_sysroot:*/lib*/python3*/config-*/Makefile:${TMPDIR} \
+    populate_sysroot:*/lib*/python3*/config-*/Makefile:${COREBASE} \
+    populate_sysroot:*/lib*/python-sysconfigdata/_sysconfigdata.py:${TMPDIR} \
+    populate_sysroot:*/lib*/python-sysconfigdata/_sysconfigdata.py:${COREBASE} \
+    "
 PACKAGE_PREPROCESS_FUNCS += "py_package_preprocess"
 
 py_package_preprocess () {

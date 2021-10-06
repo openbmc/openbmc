@@ -257,7 +257,7 @@ python mesa_populate_packages() {
     import re
     dri_drivers_root = oe.path.join(d.getVar('PKGD'), d.getVar('libdir'), "dri")
     if os.path.isdir(dri_drivers_root):
-        dri_pkgs = os.listdir(dri_drivers_root)
+        dri_pkgs = sorted(os.listdir(dri_drivers_root))
         lib_name = d.expand("${MLPREFIX}mesa-megadriver")
         for p in dri_pkgs:
             m = re.match(r'^(.*)_dri\.so$', p)

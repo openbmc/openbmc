@@ -1,0 +1,28 @@
+From 2d351c666f09cc1b9e368422653fb42ac8b86249 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 31 Aug 2021 10:37:05 +0200
+Subject: [PATCH] build/pack.c: do not insert payloadflags into .rpm metadata
+
+The flags look like '19T56' where 19 is the compression level
+(deterministic), and 56 is the amount of threads (varies from one
+host to the next and breaks reproducibility for .rpm).
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ build/pack.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/pack.c b/build/pack.c
+index 932cb213e..b45d0726f 100644
+--- a/build/pack.c
++++ b/build/pack.c
+@@ -328,7 +328,7 @@ static char *getIOFlags(Package pkg)
+ 	    headerPutString(pkg->header, RPMTAG_PAYLOADCOMPRESSOR, compr);
+ 	buf = xstrdup(rpmio_flags);
+ 	buf[s - rpmio_flags] = '\0';
+-	headerPutString(pkg->header, RPMTAG_PAYLOADFLAGS, buf+1);
++	headerPutString(pkg->header, RPMTAG_PAYLOADFLAGS, "");
+ 	free(buf);
+     }
+ exit:

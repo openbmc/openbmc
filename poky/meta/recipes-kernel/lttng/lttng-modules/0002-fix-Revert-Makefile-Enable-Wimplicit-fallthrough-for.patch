@@ -1,0 +1,829 @@
+From c570be0da77e963d77bac099d468bc0cd5f1bd63 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 13 Sep 2021 14:16:22 -0400
+Subject: [PATCH 2/2] fix: Revert "Makefile: Enable -Wimplicit-fallthrough for
+ Clang" (v5.15)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Starting with v5.15, "-Wimplicit-fallthrough=5" was added to the build
+flags which requires the use of "__attribute__((__fallthrough__))" to
+annotate fallthrough case statements.
+
+See upstream commit by the man himself:
+
+  commit d936eb23874433caa3e3d841cfa16f5434b85dcf
+  Author: Linus Torvalds <torvalds@linux-foundation.org>
+  Date:   Thu Jul 15 18:05:31 2021 -0700
+
+    Revert "Makefile: Enable -Wimplicit-fallthrough for Clang"
+
+    This reverts commit b7eb335e26a9c7f258c96b3962c283c379d3ede0.
+
+    It turns out that the problem with the clang -Wimplicit-fallthrough
+    warning is not about the kernel source code, but about clang itself, and
+    that the warning is unusable until clang fixes its broken ways.
+
+    In particular, when you enable this warning for clang, you not only get
+    warnings about implicit fallthroughs.  You also get this:
+
+       warning: fallthrough annotation in unreachable code [-Wimplicit-fallthrough]
+
+    which is completely broken becasue it
+
+     (a) doesn't even tell you where the problem is (seriously: no line
+         numbers, no filename, no nothing).
+
+     (b) is fundamentally broken anyway, because there are perfectly valid
+         reasons to have a fallthrough statement even if it turns out that
+         it can perhaps not be reached.
+
+    In the kernel, an example of that second case is code in the scheduler:
+
+                    switch (state) {
+                    case cpuset:
+                            if (IS_ENABLED(CONFIG_CPUSETS)) {
+                                    cpuset_cpus_allowed_fallback(p);
+                                    state = possible;
+                                    break;
+                            }
+                            fallthrough;
+                    case possible:
+
+    where if CONFIG_CPUSETS is enabled you actually never hit the
+    fallthrough case at all.  But that in no way makes the fallthrough
+    wrong.
+
+    So the warning is completely broken, and enabling it for clang is a very
+    bad idea.
+
+    In the meantime, we can keep the gcc option enabled, and make the gcc
+    build use
+
+        -Wimplicit-fallthrough=5
+
+    which means that we will at least continue to require a proper
+    fallthrough statement, and that gcc won't silently accept the magic
+    comment versions. Because gcc does this all correctly, and while the odd
+    "=5" part is kind of obscure, it's documented in [1]:
+
+      "-Wimplicit-fallthrough=5 doesn’t recognize any comments as
+       fallthrough comments, only attributes disable the warning"
+
+    so if clang ever fixes its bad behavior we can try enabling it there again.
+
+Upstream-Status: backport [https://git.lttng.org/?p=lttng-modules.git;a=commit;h=c190d76e8c7b44d62b3651ab845b765c1b1f8104]
+
+Change-Id: Iea69849592fb69ac04fb9bb28efcd6b8dce8ba88
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/counter/counter-api.h         |   4 +-
+ include/lttng/events-internal.h       |  11 ++-
+ include/wrapper/compiler_attributes.h |  34 +++++++
+ src/lib/counter/counter.c             |  13 ++-
+ src/lttng-abi.c                       |  91 ++++++++++++------
+ src/lttng-bytecode-interpreter.c      |   4 +-
+ src/lttng-bytecode-specialize.c       |   5 +-
+ src/lttng-events.c                    | 129 +++++++++++++++++---------
+ src/lttng-string-utils.c              |   3 +-
+ src/probes/lttng-kretprobes.c         |   7 +-
+ 10 files changed, 215 insertions(+), 86 deletions(-)
+ create mode 100644 include/wrapper/compiler_attributes.h
+
+diff --git a/include/counter/counter-api.h b/include/counter/counter-api.h
+index fbc65818..c9f2b141 100644
+--- a/include/counter/counter-api.h
++++ b/include/counter/counter-api.h
+@@ -15,6 +15,7 @@
+ #include <linux/bitops.h>
+ #include <counter/counter.h>
+ #include <counter/counter-internal.h>
++#include <wrapper/compiler_attributes.h>
+ #include <wrapper/limits.h>
+ 
+ /*
+@@ -256,7 +257,8 @@ static __always_inline int lttng_counter_add(const struct lib_counter_config *co
+ 				    const size_t *dimension_indexes, int64_t v)
+ {
+ 	switch (config->alloc) {
+-	case COUNTER_ALLOC_PER_CPU:	/* Fallthrough */
++	case COUNTER_ALLOC_PER_CPU:
++		lttng_fallthrough;
+ 	case COUNTER_ALLOC_PER_CPU | COUNTER_ALLOC_GLOBAL:
+ 		return __lttng_counter_add_percpu(config, counter, dimension_indexes, v);
+ 	case COUNTER_ALLOC_GLOBAL:
+diff --git a/include/lttng/events-internal.h b/include/lttng/events-internal.h
+index cd560de8..ca2190c4 100644
+--- a/include/lttng/events-internal.h
++++ b/include/lttng/events-internal.h
+@@ -8,6 +8,8 @@
+ #ifndef _LTTNG_EVENTS_INTERNAL_H
+ #define _LTTNG_EVENTS_INTERNAL_H
+ 
++#include <wrapper/compiler_attributes.h>
++
+ #include <lttng/events.h>
+ 
+ struct lttng_syscall_filter;
+@@ -561,9 +563,12 @@ static inline bool lttng_kernel_type_is_bytewise_integer(const struct lttng_kern
+ 	if (!type_integer)
+ 		return false;
+ 	switch (type_integer->size) {
+-	case 8:		/* Fall-through. */
+-	case 16:	/* Fall-through. */
+-	case 32:	/* Fall-through. */
++	case 8:
++		lttng_fallthrough;
++	case 16:
++		lttng_fallthrough;
++	case 32:
++		lttng_fallthrough;
+ 	case 64:
+ 		break;
+ 	default:
+diff --git a/include/wrapper/compiler_attributes.h b/include/wrapper/compiler_attributes.h
+new file mode 100644
+index 00000000..c2c96e76
+--- /dev/null
++++ b/include/wrapper/compiler_attributes.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: (GPL-2.0-only or LGPL-2.1-only)
++ *
++ * wrapper/compiler_attributes.h
++ *
++ * Copyright (C) 2021 Michael Jeanson <mjeanson@efficios.com>
++ */
++
++#ifndef _LTTNG_WRAPPER_COMPILER_ATTRIBUTES_H
++#define _LTTNG_WRAPPER_COMPILER_ATTRIBUTES_H
++
++#include <lttng/kernel-version.h>
++
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,20,0))
++#include <linux/compiler_attributes.h>
++#endif
++
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,4,0))
++
++/*
++ * Use the kernel provided fallthrough attribute macro.
++ */
++#define lttng_fallthrough fallthrough
++
++#else /* LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,4,0) */
++
++/*
++ * Fallback to the comment for kernels pre 5.15 that don't build with
++ * '-Wimplicit-fallthrough=5'.
++ */
++#define lttng_fallthrough do {} while (0)  /* fallthrough */
++
++#endif /* LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,4,0) */
++
++#endif /* _LTTNG_WRAPPER_COMPILER_ATTRIBUTES_H */
+diff --git a/src/lib/counter/counter.c b/src/lib/counter/counter.c
+index a4500a0e..bf038aac 100644
+--- a/src/lib/counter/counter.c
++++ b/src/lib/counter/counter.c
+@@ -11,6 +11,7 @@
+ #include <linux/cpumask.h>
+ #include <counter/counter.h>
+ #include <counter/counter-internal.h>
++#include <wrapper/compiler_attributes.h>
+ #include <wrapper/vmalloc.h>
+ #include <wrapper/limits.h>
+ 
+@@ -324,7 +325,8 @@ int lttng_counter_aggregate(const struct lib_counter_config *config,
+ 	*underflow = false;
+ 
+ 	switch (config->alloc) {
+-	case COUNTER_ALLOC_GLOBAL:	/* Fallthrough */
++	case COUNTER_ALLOC_GLOBAL:
++		lttng_fallthrough;
+ 	case COUNTER_ALLOC_PER_CPU | COUNTER_ALLOC_GLOBAL:
+ 		/* Read global counter. */
+ 		ret = lttng_counter_read(config, counter, dimension_indexes,
+@@ -342,7 +344,8 @@ int lttng_counter_aggregate(const struct lib_counter_config *config,
+ 	switch (config->alloc) {
+ 	case COUNTER_ALLOC_GLOBAL:
+ 		break;
+-	case COUNTER_ALLOC_PER_CPU | COUNTER_ALLOC_GLOBAL:	/* Fallthrough */
++	case COUNTER_ALLOC_PER_CPU | COUNTER_ALLOC_GLOBAL:
++		lttng_fallthrough;
+ 	case COUNTER_ALLOC_PER_CPU:
+ 		//TODO: integrate with CPU hotplug and online cpus
+ 		for (cpu = 0; cpu < num_possible_cpus(); cpu++) {
+@@ -448,7 +451,8 @@ int lttng_counter_clear(const struct lib_counter_config *config,
+ 	int cpu, ret;
+ 
+ 	switch (config->alloc) {
+-	case COUNTER_ALLOC_GLOBAL:	/* Fallthrough */
++	case COUNTER_ALLOC_GLOBAL:
++		lttng_fallthrough;
+ 	case COUNTER_ALLOC_PER_CPU | COUNTER_ALLOC_GLOBAL:
+ 		/* Clear global counter. */
+ 		ret = lttng_counter_clear_cpu(config, counter, dimension_indexes, -1);
+@@ -462,7 +466,8 @@ int lttng_counter_clear(const struct lib_counter_config *config,
+ 	switch (config->alloc) {
+ 	case COUNTER_ALLOC_GLOBAL:
+ 		break;
+-	case COUNTER_ALLOC_PER_CPU | COUNTER_ALLOC_GLOBAL:	/* Fallthrough */
++	case COUNTER_ALLOC_PER_CPU | COUNTER_ALLOC_GLOBAL:
++		lttng_fallthrough;
+ 	case COUNTER_ALLOC_PER_CPU:
+ 		//TODO: integrate with CPU hotplug and online cpus
+ 		for (cpu = 0; cpu < num_possible_cpus(); cpu++) {
+diff --git a/src/lttng-abi.c b/src/lttng-abi.c
+index cc453894..eac1afd1 100644
+--- a/src/lttng-abi.c
++++ b/src/lttng-abi.c
+@@ -34,6 +34,7 @@
+ #include <ringbuffer/vfs.h>
+ #include <ringbuffer/backend.h>
+ #include <ringbuffer/frontend.h>
++#include <wrapper/compiler_attributes.h>
+ #include <wrapper/poll.h>
+ #include <wrapper/file.h>
+ #include <wrapper/kref.h>
+@@ -1332,7 +1333,8 @@ long lttng_metadata_ring_buffer_ioctl(struct file *filp,
+ 		 */
+ 		return -ENOSYS;
+ 	}
+-	case LTTNG_KERNEL_ABI_RING_BUFFER_FLUSH_EMPTY:	/* Fall-through. */
++	case LTTNG_KERNEL_ABI_RING_BUFFER_FLUSH_EMPTY:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_RING_BUFFER_FLUSH:
+ 	{
+ 		struct lttng_metadata_stream *stream = filp->private_data;
+@@ -1441,7 +1443,8 @@ long lttng_metadata_ring_buffer_compat_ioctl(struct file *filp,
+ 		 */
+ 		return -ENOSYS;
+ 	}
+-	case LTTNG_KERNEL_ABI_RING_BUFFER_FLUSH_EMPTY:	/* Fall-through. */
++	case LTTNG_KERNEL_ABI_RING_BUFFER_FLUSH_EMPTY:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_RING_BUFFER_FLUSH:
+ 	{
+ 		struct lttng_metadata_stream *stream = filp->private_data;
+@@ -1758,8 +1761,10 @@ int lttng_abi_validate_event_param(struct lttng_kernel_abi_event *event_param)
+ 	switch (event_param->instrumentation) {
+ 	case LTTNG_KERNEL_ABI_SYSCALL:
+ 		switch (event_param->u.syscall.entryexit) {
+-		case LTTNG_KERNEL_ABI_SYSCALL_ENTRY:	/* Fall-through */
+-		case LTTNG_KERNEL_ABI_SYSCALL_EXIT:		/* Fall-through */
++		case LTTNG_KERNEL_ABI_SYSCALL_ENTRY:
++			lttng_fallthrough;
++		case LTTNG_KERNEL_ABI_SYSCALL_EXIT:
++			lttng_fallthrough;
+ 		case LTTNG_KERNEL_ABI_SYSCALL_ENTRYEXIT:
+ 			break;
+ 		default:
+@@ -1783,20 +1788,26 @@ int lttng_abi_validate_event_param(struct lttng_kernel_abi_event *event_param)
+ 		switch (event_param->u.kretprobe.entryexit) {
+ 		case LTTNG_KERNEL_ABI_SYSCALL_ENTRYEXIT:
+ 			break;
+-		case LTTNG_KERNEL_ABI_SYSCALL_ENTRY:	/* Fall-through */
+-		case LTTNG_KERNEL_ABI_SYSCALL_EXIT:		/* Fall-through */
++		case LTTNG_KERNEL_ABI_SYSCALL_ENTRY:
++			lttng_fallthrough;
++		case LTTNG_KERNEL_ABI_SYSCALL_EXIT:
++			lttng_fallthrough;
+ 		default:
+ 			return -EINVAL;
+ 		}
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_TRACEPOINT:	/* Fall-through */
+-	case LTTNG_KERNEL_ABI_KPROBE:	/* Fall-through */
++	case LTTNG_KERNEL_ABI_TRACEPOINT:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_UPROBE:
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:	/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -1830,18 +1841,23 @@ int lttng_abi_create_event(struct file *channel_file,
+ 	}
+ 
+ 	switch (event_param->instrumentation) {
+-	case LTTNG_KERNEL_ABI_TRACEPOINT:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_TRACEPOINT:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_SYSCALL:
+ 		fops = &lttng_event_recorder_enabler_fops;
+ 		break;
+-	case LTTNG_KERNEL_ABI_KPROBE:			/* Fall-through */
+-	case LTTNG_KERNEL_ABI_KRETPROBE:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_KRETPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_UPROBE:
+ 		fops = &lttng_event_recorder_event_fops;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:			/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:			/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -1867,7 +1883,8 @@ int lttng_abi_create_event(struct file *channel_file,
+ 		goto event_error;
+ 
+ 	switch (event_param->instrumentation) {
+-	case LTTNG_KERNEL_ABI_TRACEPOINT:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_TRACEPOINT:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_SYSCALL:
+ 	{
+ 		struct lttng_event_enabler *event_enabler;
+@@ -1887,8 +1904,10 @@ int lttng_abi_create_event(struct file *channel_file,
+ 		break;
+ 	}
+ 
+-	case LTTNG_KERNEL_ABI_KPROBE:			/* Fall-through */
+-	case LTTNG_KERNEL_ABI_KRETPROBE:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_KRETPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_UPROBE:
+ 	{
+ 		struct lttng_kernel_event_recorder *event;
+@@ -1908,8 +1927,10 @@ int lttng_abi_create_event(struct file *channel_file,
+ 		break;
+ 	}
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:			/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:			/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		ret = -EINVAL;
+ 		goto event_error;
+@@ -2043,18 +2064,23 @@ int lttng_abi_create_event_notifier(struct file *event_notifier_group_file,
+ 	}
+ 
+ 	switch (event_notifier_param->event.instrumentation) {
+-	case LTTNG_KERNEL_ABI_TRACEPOINT:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_TRACEPOINT:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_SYSCALL:
+ 		fops = &lttng_event_notifier_enabler_fops;
+ 		break;
+-	case LTTNG_KERNEL_ABI_KPROBE:			/* Fall-through */
+-	case LTTNG_KERNEL_ABI_KRETPROBE:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_KRETPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_UPROBE:
+ 		fops = &lttng_event_notifier_event_fops;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:			/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:			/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		ret = -EINVAL;
+ 		goto inval_instr;
+@@ -2086,7 +2112,8 @@ int lttng_abi_create_event_notifier(struct file *event_notifier_group_file,
+ 		goto event_notifier_error;
+ 
+ 	switch (event_notifier_param->event.instrumentation) {
+-	case LTTNG_KERNEL_ABI_TRACEPOINT:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_TRACEPOINT:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_SYSCALL:
+ 	{
+ 		struct lttng_event_notifier_enabler *enabler;
+@@ -2110,8 +2137,10 @@ int lttng_abi_create_event_notifier(struct file *event_notifier_group_file,
+ 		break;
+ 	}
+ 
+-	case LTTNG_KERNEL_ABI_KPROBE:			/* Fall-through */
+-	case LTTNG_KERNEL_ABI_KRETPROBE:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_KRETPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_UPROBE:
+ 	{
+ 		struct lttng_kernel_event_notifier *event_notifier;
+@@ -2135,8 +2164,10 @@ int lttng_abi_create_event_notifier(struct file *event_notifier_group_file,
+ 		break;
+ 	}
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:			/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:			/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		ret = -EINVAL;
+ 		goto event_notifier_error;
+diff --git a/src/lttng-bytecode-interpreter.c b/src/lttng-bytecode-interpreter.c
+index b46a23b7..a2a932c6 100644
+--- a/src/lttng-bytecode-interpreter.c
++++ b/src/lttng-bytecode-interpreter.c
+@@ -7,6 +7,7 @@
+  * Copyright (C) 2010-2016 Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+  */
+ 
++#include <wrapper/compiler_attributes.h>
+ #include <wrapper/uaccess.h>
+ #include <wrapper/objtool.h>
+ #include <wrapper/types.h>
+@@ -421,7 +422,8 @@ static int dynamic_get_index(struct lttng_kernel_probe_ctx *lttng_probe_ctx,
+ 		}
+ 		break;
+ 	case LOAD_ROOT_CONTEXT:
+-	case LOAD_ROOT_APP_CONTEXT:	/* Fall-through */
++		lttng_fallthrough;
++	case LOAD_ROOT_APP_CONTEXT:
+ 	{
+ 		ret = context_get_index(lttng_probe_ctx,
+ 				&stack_top->u.ptr,
+diff --git a/src/lttng-bytecode-specialize.c b/src/lttng-bytecode-specialize.c
+index c4b9d04b..f8b5f19d 100644
+--- a/src/lttng-bytecode-specialize.c
++++ b/src/lttng-bytecode-specialize.c
+@@ -8,6 +8,8 @@
+  */
+ 
+ #include <linux/slab.h>
++#include <wrapper/compiler_attributes.h>
++
+ #include <lttng/lttng-bytecode.h>
+ #include <lttng/align.h>
+ #include <lttng/events-internal.h>
+@@ -271,7 +273,8 @@ static int specialize_get_index(struct bytecode_runtime *runtime,
+ 		}
+ 		case OBJECT_TYPE_STRUCT:
+ 			/* Only generated by the specialize phase. */
+-		case OBJECT_TYPE_VARIANT:	/* Fall-through */
++		case OBJECT_TYPE_VARIANT:
++			lttng_fallthrough;
+ 		default:
+ 			printk(KERN_WARNING "LTTng: bytecode: Unexpected get index type %d",
+ 				(int) stack_top->load.object_type);
+diff --git a/src/lttng-events.c b/src/lttng-events.c
+index e785fe4d..230e3934 100644
+--- a/src/lttng-events.c
++++ b/src/lttng-events.c
+@@ -28,6 +28,7 @@
+ #include <linux/vmalloc.h>
+ #include <linux/dmi.h>
+ 
++#include <wrapper/compiler_attributes.h>
+ #include <wrapper/uuid.h>
+ #include <wrapper/vmalloc.h>	/* for wrapper_vmalloc_sync_mappings() */
+ #include <wrapper/random.h>
+@@ -659,12 +660,14 @@ int lttng_event_enable(struct lttng_kernel_event_common *event)
+ 		goto end;
+ 	}
+ 	switch (event->priv->instrumentation) {
+-	case LTTNG_KERNEL_ABI_TRACEPOINT:	/* Fall-through */
++	case LTTNG_KERNEL_ABI_TRACEPOINT:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_SYSCALL:
+ 		ret = -EINVAL;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_KPROBE:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_UPROBE:
+ 		WRITE_ONCE(event->enabled, 1);
+ 		break;
+@@ -673,8 +676,10 @@ int lttng_event_enable(struct lttng_kernel_event_common *event)
+ 		ret = lttng_kretprobes_event_enable_state(event, 1);
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		ret = -EINVAL;
+@@ -719,12 +724,14 @@ int lttng_event_disable(struct lttng_kernel_event_common *event)
+ 		goto end;
+ 	}
+ 	switch (event->priv->instrumentation) {
+-	case LTTNG_KERNEL_ABI_TRACEPOINT:	/* Fall-through */
++	case LTTNG_KERNEL_ABI_TRACEPOINT:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_SYSCALL:
+ 		ret = -EINVAL;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_KPROBE:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_UPROBE:
+ 		WRITE_ONCE(event->enabled, 0);
+ 		break;
+@@ -733,8 +740,10 @@ int lttng_event_disable(struct lttng_kernel_event_common *event)
+ 		ret = lttng_kretprobes_event_enable_state(event, 0);
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		ret = -EINVAL;
+@@ -873,15 +882,20 @@ struct lttng_kernel_event_recorder *_lttng_kernel_event_recorder_create(struct l
+ 		event_name = event_desc->event_name;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_KPROBE:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_UPROBE:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_KRETPROBE:	/* Fall-through */
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_UPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_KRETPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_SYSCALL:
+ 		event_name = event_param->name;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		ret = -EINVAL;
+@@ -1093,8 +1107,10 @@ struct lttng_kernel_event_recorder *_lttng_kernel_event_recorder_create(struct l
+ 		WARN_ON_ONCE(!ret);
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		ret = -EINVAL;
+@@ -1141,15 +1157,20 @@ struct lttng_kernel_event_notifier *_lttng_event_notifier_create(
+ 		event_name = event_desc->event_name;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_KPROBE:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_UPROBE:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_UPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_SYSCALL:
+ 		event_name = event_notifier_param->event.name;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_KRETPROBE:	/* Fall-through */
+-	case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KRETPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		ret = -EINVAL;
+@@ -1296,9 +1317,12 @@ struct lttng_kernel_event_notifier *_lttng_event_notifier_create(
+ 		WARN_ON_ONCE(!ret);
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_KRETPROBE:	/* Fall-through */
+-	case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KRETPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		ret = -EINVAL;
+@@ -1423,14 +1447,18 @@ void register_event(struct lttng_kernel_event_recorder *event_recorder)
+ 		ret = lttng_syscall_filter_enable_event(event_recorder->chan, event_recorder);
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_KPROBE:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_UPROBE:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_UPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_KRETPROBE:
+ 		ret = 0;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 	}
+@@ -1481,7 +1509,8 @@ int _lttng_event_unregister(struct lttng_kernel_event_recorder *event_recorder)
+ 		ret = 0;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_FUNCTION:	/* Fall-through */
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 	}
+@@ -1512,14 +1541,18 @@ void register_event_notifier(struct lttng_kernel_event_notifier *event_notifier)
+ 		ret = lttng_syscall_filter_enable_event_notifier(event_notifier);
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_KPROBE:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KPROBE:
++		lttng_fallthrough;
+ 	case LTTNG_KERNEL_ABI_UPROBE:
+ 		ret = 0;
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_KRETPROBE:	/* Fall-through */
+-	case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KRETPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 	}
+@@ -1559,9 +1592,12 @@ int _lttng_event_notifier_unregister(
+ 		ret = lttng_syscall_filter_disable_event_notifier(event_notifier);
+ 		break;
+ 
+-	case LTTNG_KERNEL_ABI_KRETPROBE:	/* Fall-through */
+-	case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-	case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++	case LTTNG_KERNEL_ABI_KRETPROBE:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_FUNCTION:
++		lttng_fallthrough;
++	case LTTNG_KERNEL_ABI_NOOP:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 	}
+@@ -1614,8 +1650,10 @@ void _lttng_event_destroy(struct lttng_kernel_event_common *event)
+ 			lttng_uprobes_destroy_event_private(event_recorder);
+ 			break;
+ 
+-		case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-		case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++		case LTTNG_KERNEL_ABI_FUNCTION:
++			lttng_fallthrough;
++		case LTTNG_KERNEL_ABI_NOOP:
++			lttng_fallthrough;
+ 		default:
+ 			WARN_ON_ONCE(1);
+ 		}
+@@ -1647,9 +1685,12 @@ void _lttng_event_destroy(struct lttng_kernel_event_common *event)
+ 			lttng_uprobes_destroy_event_notifier_private(event_notifier);
+ 			break;
+ 
+-		case LTTNG_KERNEL_ABI_KRETPROBE:	/* Fall-through */
+-		case LTTNG_KERNEL_ABI_FUNCTION:		/* Fall-through */
+-		case LTTNG_KERNEL_ABI_NOOP:		/* Fall-through */
++		case LTTNG_KERNEL_ABI_KRETPROBE:
++			lttng_fallthrough;
++		case LTTNG_KERNEL_ABI_FUNCTION:
++			lttng_fallthrough;
++		case LTTNG_KERNEL_ABI_NOOP:
++			lttng_fallthrough;
+ 		default:
+ 			WARN_ON_ONCE(1);
+ 		}
+@@ -2713,7 +2754,8 @@ void lttng_session_sync_event_enablers(struct lttng_kernel_session *session)
+ 		int nr_filters = 0;
+ 
+ 		switch (event_recorder_priv->parent.instrumentation) {
+-		case LTTNG_KERNEL_ABI_TRACEPOINT:	/* Fall-through */
++		case LTTNG_KERNEL_ABI_TRACEPOINT:
++			lttng_fallthrough;
+ 		case LTTNG_KERNEL_ABI_SYSCALL:
+ 			/* Enable events */
+ 			list_for_each_entry(enabler_ref,
+@@ -2807,7 +2849,8 @@ void lttng_event_notifier_group_sync_enablers(struct lttng_event_notifier_group
+ 		int nr_filters = 0, nr_captures = 0;
+ 
+ 		switch (event_notifier_priv->parent.instrumentation) {
+-		case LTTNG_KERNEL_ABI_TRACEPOINT:	/* Fall-through */
++		case LTTNG_KERNEL_ABI_TRACEPOINT:
++			lttng_fallthrough;
+ 		case LTTNG_KERNEL_ABI_SYSCALL:
+ 			/* Enable event_notifiers */
+ 			list_for_each_entry(enabler_ref,
+@@ -3877,7 +3920,7 @@ int print_escaped_ctf_string(struct lttng_kernel_session *session, const char *s
+ 			if (ret)
+ 				goto error;
+ 			/* We still print the current char */
+-			/* Fallthrough */
++			lttng_fallthrough;
+ 		default:
+ 			ret = lttng_metadata_printf(session, "%c", cur);
+ 			break;
+diff --git a/src/lttng-string-utils.c b/src/lttng-string-utils.c
+index d9447903..65946193 100644
+--- a/src/lttng-string-utils.c
++++ b/src/lttng-string-utils.c
+@@ -4,6 +4,7 @@
+  */
+ 
+ #include <linux/types.h>
++#include <wrapper/compiler_attributes.h>
+ 
+ #include <lttng/string-utils.h>
+ 
+@@ -302,7 +303,7 @@ retry:
+ 			p = pattern_get_char_at_cb(p_at,
+ 				pattern_get_char_at_cb_data);
+ 
+-			/* Fall-through. */
++			lttng_fallthrough;
+ 		default:
+ 			/*
+ 			 * Default case which will compare the escaped
+diff --git a/src/probes/lttng-kretprobes.c b/src/probes/lttng-kretprobes.c
+index 0fa6a1bf..1d0a5ecb 100644
+--- a/src/probes/lttng-kretprobes.c
++++ b/src/probes/lttng-kretprobes.c
+@@ -14,6 +14,7 @@
+ #include <lttng/events.h>
+ #include <lttng/events-internal.h>
+ #include <ringbuffer/frontend_types.h>
++#include <wrapper/compiler_attributes.h>
+ #include <wrapper/vmalloc.h>
+ #include <wrapper/irqflags.h>
+ #include <lttng/tracer.h>
+@@ -61,7 +62,8 @@ int _lttng_kretprobes_handler(struct kretprobe_instance *krpi,
+ 			return 0;
+ 		break;
+ 	}
+-	case LTTNG_KERNEL_EVENT_TYPE_NOTIFIER:	/* Fall-through. */
++	case LTTNG_KERNEL_EVENT_TYPE_NOTIFIER:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 	}
+@@ -90,7 +92,8 @@ int _lttng_kretprobes_handler(struct kretprobe_instance *krpi,
+ 		chan->ops->event_commit(&ctx);
+ 		break;
+ 	}
+-	case LTTNG_KERNEL_EVENT_TYPE_NOTIFIER:	/* Fall-through. */
++	case LTTNG_KERNEL_EVENT_TYPE_NOTIFIER:
++		lttng_fallthrough;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 	}
+-- 
+2.19.1
+

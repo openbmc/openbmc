@@ -1,0 +1,28 @@
+From d01a57a998798da977c470f3b8d6a457c1adb144 Mon Sep 17 00:00:00 2001
+From: Azat Khuzhin <azat@libevent.org>
+Date: Sun, 19 Sep 2021 00:57:31 +0300
+Subject: [PATCH] test: mark util/monotonic_prc_fallback as retriable
+
+Refs: #1193
+
+Upstream-status: Backported
+---
+ test/regress_util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/regress_util.c b/test/regress_util.c
+index 45caa2700a40..a9e80db20149 100644
+--- a/test/regress_util.c
++++ b/test/regress_util.c
+@@ -1672,7 +1672,7 @@ struct testcase_t util_testcases[] = {
+ 	{ "monotonic_res_fallback", test_evutil_monotonic_res, TT_OFF_BY_DEFAULT, &basic_setup, (void*)"fallback" },
+ 	{ "monotonic_prc", test_evutil_monotonic_prc, 0, &basic_setup, (void*)"" },
+ 	{ "monotonic_prc_precise", test_evutil_monotonic_prc, TT_RETRIABLE, &basic_setup, (void*)"precise" },
+-	{ "monotonic_prc_fallback", test_evutil_monotonic_prc, 0, &basic_setup, (void*)"fallback" },
++	{ "monotonic_prc_fallback", test_evutil_monotonic_prc, TT_RETRIABLE, &basic_setup, (void*)"fallback" },
+ 	{ "date_rfc1123", test_evutil_date_rfc1123, 0, NULL, NULL },
+ 	{ "evutil_v4addr_is_local", test_evutil_v4addr_is_local, 0, NULL, NULL },
+ 	{ "evutil_v6addr_is_local", test_evutil_v6addr_is_local, 0, NULL, NULL },
+-- 
+2.31.1
+

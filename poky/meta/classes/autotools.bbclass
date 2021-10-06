@@ -149,10 +149,7 @@ python autotools_aclocals () {
     d.setVar("CONFIG_SITE", " ".join(sitefiles))
 }
 
-python () {
-    sitefiles, searched = siteinfo_get_files(d, sysrootcache=False)
-    d.appendVarFlag("do_configure", "file-checksums", " " + " ".join(searched))
-}
+do_configure[file-checksums] += "${@' '.join(siteinfo_get_files(d, sysrootcache=False)[1])}"
 
 CONFIGURE_FILES = "${S}/configure.in ${S}/configure.ac ${S}/config.h.in ${S}/acinclude.m4 Makefile.am"
 
