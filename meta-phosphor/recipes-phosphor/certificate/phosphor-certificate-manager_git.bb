@@ -9,7 +9,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 SRC_URI = "git://github.com/openbmc/phosphor-certificate-manager"
-SRCREV = "ca1281170219b3027fd4f75a9c4e94a52fb16312"
+SRCREV = "71957992588d1b239c33ba25cf713b48b4014521"
 
 inherit autotools \
         pkgconfig \
@@ -17,7 +17,6 @@ inherit autotools \
 
 DEPENDS = " \
         autoconf-archive-native \
-        dbus \
         openssl \
         phosphor-dbus-interfaces \
         phosphor-logging \
@@ -43,4 +42,4 @@ SYSTEMD_SERVICE:${PN} = " \
         ${@bb.utils.contains('PACKAGECONFIG', 'bmcweb', 'phosphor-certificate-manager@bmcweb.service', '', d)} \
         "
 
-FILES:${PN}:append = " ${systemd_system_unitdir}/*"
+FILES:${PN}:append = " ${systemd_system_unitdir}/* ${datadir}/dbus-1"
