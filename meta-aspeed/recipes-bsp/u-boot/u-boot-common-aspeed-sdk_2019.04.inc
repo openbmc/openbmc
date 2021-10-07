@@ -9,9 +9,13 @@ PE = "1"
 # We use the revision in order to avoid having to fetch it from the
 # repo during parse
 SRCREV = "a570745a1a836e351bd4b1131f23a4fa5013d6dd"
-
 SRC_URI = "git://git@github.com/openbmc/u-boot.git;nobranch=1;protocol=https"
 
 S = "${WORKDIR}/git"
+B = "${WORKDIR}/build"
+do_configure[cleandirs] = "${B}"
+
+# We don't have 'u-boot-initial-env' target in our u-boot version
+UBOOT_INITIAL_ENV=""
 
 PV = "v2019.04+git${SRCPV}"
