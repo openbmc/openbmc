@@ -1,4 +1,7 @@
-PACKAGECONFIG:p10bmc = "hwmontempsensor"
+PACKAGECONFIG:p10bmc = " \
+    hwmontempsensor \
+    adcsensor \
+    "
 
 PACKAGECONFIG:genesis3 = " \
     hwmontempsensor \
