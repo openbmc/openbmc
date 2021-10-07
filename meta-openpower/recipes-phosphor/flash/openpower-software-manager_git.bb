@@ -34,7 +34,7 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'openpower-virtual-pnor', \
 PACKAGECONFIG[verify_pnor_signature] = "-Dverify-signature=enabled, -Dverify-signature=disabled"
 PACKAGECONFIG[ubifs_layout] = "-Ddevice-type=ubi,,,mtd-utils-ubifs"
 PACKAGECONFIG[mmc_layout] = "-Ddevice-type=mmc"
-PACKAGECONFIG[virtual_pnor] = "-Dvpnor=enabled, -Dvpnor=disabled"
+PACKAGECONFIG[virtual_pnor] = "-Dvpnor=enabled, -Dvpnor=disabled,,bash"
 
 EXTRA_OEMESON += " \
     -Dtests=disabled \
