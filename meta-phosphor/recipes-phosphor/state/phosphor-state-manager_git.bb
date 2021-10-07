@@ -54,6 +54,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "libcereal"
 DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
+DEPENDS += "libgpiod"
 
 RDEPENDS:${PN}-chassis += "bash"
 
@@ -186,6 +187,6 @@ SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERRO
 
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager"
-SRCREV = "4328479f43650b50dbec14abc55cf7a646ebad4a"
+SRCREV = "8583b3b93df7729b9246d369c6de4a42841bbc1d"
 
 S = "${WORKDIR}/git"
