@@ -1,0 +1,116 @@
+#!/bin/bash
+#BMC set time from host
+set -e
+
+echo "set-bmc-time-from-host is started"
+# Sync BMC's date with one of the four servers
+
+HOST_INSTANCES="HOST_INSTANCES_SED_REPLACEMENT_VALUE"
+MAX_RETRY_LIMIT=6
+
+check_NTP_status()
+{
+  timedatectl show --property=NTPSynchronized --value
+}
+
+get_single_host_time()
+{
+    for (( retry=1; retry<=5; retry++ ))
+    do
+        #request the single host time via ipmb command
+        # which will be set as bmc time
+        # 0x01 - me channel | 0x0a - storage net fn | 0x00 - lun
+        # 0x48 - get SEL time
+        ipmi_cmd_output=$(busctl call xyz.openbmc_project.Ipmi.Channel.Ipmb \
+        "/xyz/openbmc_project/Ipmi/Channel/Ipmb" org.openbmc.Ipmb sendRequest \
+        yyyyay 0x01 0x0a 0x00 0x48 0)
+        ipmb_result=$?
+        if [ "$ipmb_result" == "0" ];then
+            sleep 1
+            break
+        fi
+    done
+
+    if [ "$retry" == "$MAX_RETRY_LIMIT" ];then
+        exit 1
+    fi
+
+    echo "$ipmi_cmd_output"
+
+}
+
+get_multi_host_datetime()
+{
+    ipmbAddr=$1
+    for (( retry=1; retry<=5; retry++ ))
+    do
+        #request the multihost host time via ipmb command
+        # which will be set as bmc time
+        # 0x38 - oem net fn | 0x00 - lun | 0x02 - request to bridge ic cmd
+        # 0x6 - length | IANA id 0x15 0xA0 0x0 |0x48 - get SEL time
+
+        ipmi_cmd_output=$(busctl call xyz.openbmc_project.Ipmi.Channel.Ipmb \
+        /xyz/openbmc_project/Ipmi/Channel/Ipmb org.openbmc.Ipmb sendRequest \
+         yyyyay "$ipmbAddr" 0x38 0 0x2 6 0x15 0xA0 0x0 0x1 0x28 0x48)
+        ipmb_result=$?
+        if [ $ipmb_result == 0 ];then
+            break
+        fi
+        sleep 1
+    done
+
+    echo "$ipmi_cmd_output"
+}
+sync_multi_host_datetime()
+{
+    for index in $HOST_INSTANCES
+    do
+        ipmb_addr=$(((index-1)*4))
+        # Use standard IPMI command 'SendRequest method' to read RTC time
+        echo "chosen ipmb addr : "$ipmb_addr
+        multi_host_time_result=$(get_multi_host_datetime $ipmb_addr)
+
+        if [[ $(echo "$multi_host_time_result" | awk '{ print NF }') -eq 18 ]];
+        then
+            echo "syncing up host " $index " date time with bmc..."
+            date -s @$((0x$(echo "$multi_host_time_result" | \
+            awk '{printf "%02x%02x%02x%02x",$18,$17,$16,$15}')))
+            sync
+            break
+        fi
+    done
+
+}
+sync_single_host_datetime()
+{
+    single_host_time_result=$(get_single_host_time)
+
+    if [[ $(echo "$single_host_time_result" | awk '{ print NF }') -eq 11 ]];
+    then
+        echo "Syncing up host date time with bmc..."
+        date -s @$((0x$(echo "$single_host_time_result" | \
+        awk '{printf "%02x%02x%02x%02x",$11,$10,$9,$8}')))
+        sync
+    fi
+
+}
+
+#wait for the NTP server start if available.
+sleep 60
+
+NTP_STATUS=$(check_NTP_status)
+
+echo "NTP status :""$NTP_STATUS"
+
+if [ "$NTP_STATUS" == "yes" ]; then
+    echo "NTP is running and system clock is in sync.skiping host time sync..."
+    exit 0
+fi
+
+if [ "$HOST_INSTANCES" == "0" ]; then
+    echo "single host instance"
+    sync_single_host_datetime
+else
+    echo "multiple host instance"
+    sync_multi_host_datetime
+fi
