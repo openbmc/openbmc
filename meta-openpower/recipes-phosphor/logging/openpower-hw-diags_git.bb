@@ -31,5 +31,5 @@ RDEPENDS:${PN} += "openpower-libhei"
 
 # Conditionally pull in PHAL APIs, if available.
 PACKAGECONFIG ??= "${@bb.utils.filter('OBMC_MACHINE_FEATURES', 'phal', d)}"
-PACKAGECONFIG[phal] = "-Dphal=enabled, -Dphal=disabled, pdata"
+PACKAGECONFIG[phal] = "-Dphal=enabled, -Dphal=disabled, ipl pdata"
 
