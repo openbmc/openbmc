@@ -42,6 +42,32 @@ of_name_to_eeprom() {
   echo "$eeproms"
 }
 
+declare -A IPMI_FRU_EEPROM_FILE=()
+
+ipmi_fru_alloc() {
+  local name="$1"
+  local -n ret="$2"
+
+  # Pick the first free index to return as the allocated entry
+  for (( ret = 0; ret < "${#IPMI_FRU_EEPROM_FILE[@]}"; ++ret )); do
+    [ -n "${IPMI_FRU_EEPROM_FILE[@]+1}" ] || break
+  done
+
+  if [[ "$name" =~ ^of-name:(.*)$ || "$name" =~ ^([^:]*)$ ]]; then
+    local ofn="${BASH_REMATCH[1]}"
+    local file
+    file="$(of_name_to_eeprom "$ofn")" || return
+    IPMI_FRU_EEPROM_FILE["$ret"]="$file"
+  else
+    echo "Invalid IPMI FRU eeprom specification: $name" >&2
+    return 1
+  fi
+}
+
+ipmi_fru_free() {
+  unset 'IPMI_FRU_EEPROM_FILE[$1]'
+}
+
 checksum() {
   local -n checksum_arr="$1"
   local checksum=0
@@ -61,7 +87,7 @@ fix_checksum() {
 }
 
 read_bytes() {
-  local file="$1"
+  local file="${IPMI_FRU_EEPROM_FILE["$1"]-$1}"
   local offset="$2"
   local size="$3"
 
@@ -71,7 +97,7 @@ read_bytes() {
 }
 
 write_bytes() {
-  local file="$1"
+  local file="${IPMI_FRU_EEPROM_FILE["$1"]-$1}"
   local offset="$2"
   local -n bytes_arr="$3"
 
