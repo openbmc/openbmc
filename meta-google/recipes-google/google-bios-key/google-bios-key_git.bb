@@ -10,5 +10,17 @@ SRC_URI:append:gbmc = " \
      file://platforms_bringup.pem \
 "
 
-FILES:${PN} += "${WORKDIR}/platforms_secure.pem"
-FILES:${PN} += "${WORKDIR}/platforms_bringup.pem"
+
+FILES:${PN} += "${datadir}/google-bios-key/platforms_secure.pem"
+FILES:${PN} += "${datadir}/google-bios-key/platforms_bringup.pem"
+FILES:${PN} += "${datadir}/platforms_secure.pem"
+FILES:${PN} += "${datadir}/platforms_bringup.pem"
+
+do_install() {
+    install -d ${D}${datadir}/google-bios-key
+    install -m 0644 ${WORKDIR}/platforms_secure.pem ${D}${datadir}/google-bios-key
+    install -m 0644 ${WORKDIR}/platforms_bringup.pem ${D}${datadir}/google-bios-key
+
+    ln -s -r ${D}${datadir}/google-bios-key/platforms_secure.pem ${D}${datadir}/platforms_secure.pem
+    ln -s -r ${D}${datadir}/google-bios-key/platforms_bringup.pem ${D}${datadir}/platforms_bringup.pem
+}
