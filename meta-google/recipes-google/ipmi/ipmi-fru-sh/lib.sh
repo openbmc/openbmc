@@ -44,6 +44,33 @@ of_name_to_eeprom() {
 
 declare -A IPMI_FRU_EEPROM_FILE=()
 
+ipmi_fru_device_to_file() {
+  local fdn="$1"
+
+  local json
+  json="$(busctl -j call xyz.openbmc_project.FruDevice \
+    /xyz/openbmc_project/FruDevice/"$fdn" org.freedesktop.DBus.Properties \
+    GetAll s xyz.openbmc_project.FruDevice)" || return 80
+
+  local jqq='.data[0] | (.BUS.data | tostring) + " " + (.ADDRESS.data | tostring)'
+  local busaddr
+  busaddr="$(echo "$json" | jq -r "$jqq")" || return
+
+  # FRU 0 is hardcoded and FruDevice does not report the correct bus for it
+  # Hardcode a workaround for this specifically known bus
+  if [ "$busaddr" = '0 0' ]; then
+    echo "/etc/fru/baseboard.fru.bin"
+  else
+    local dev="$(printf '%d-%04x' $busaddr)"
+    local efile="/sys/bus/i2c/devices/$dev/eeprom"
+    # The at24 eeprom driver is not guaranteed to be bound
+    if [ ! -e "$efile" ]; then
+      echo "$dev" >/sys/bus/i2c/drivers/at24/bind || return
+    fi
+    echo "$efile"
+  fi
+}
+
 ipmi_fru_alloc() {
   local name="$1"
   local -n ret="$2"
@@ -57,6 +84,19 @@ ipmi_fru_alloc() {
     local ofn="${BASH_REMATCH[1]}"
     local file
     file="$(of_name_to_eeprom "$ofn")" || return
+    IPMI_FRU_EEPROM_FILE["$ret"]="$file"
+  elif [[ "$name" =~ ^frudev-name:(.*)$ ]]; then
+    local fdn="${BASH_REMATCH[1]}"
+    local start=$SECONDS
+    local file
+    while (( SECONDS - start < 60 )); do
+      local rc=0
+      file="$(ipmi_fru_device_to_file "$fdn")" || rc=$?
+      (( rc == 0 )) && break
+      # Immediately return any errors, 80 is special to signify retry
+      (( rc != 80 )) && return $rc
+      sleep 1
+    done
     IPMI_FRU_EEPROM_FILE["$ret"]="$file"
   else
     echo "Invalid IPMI FRU eeprom specification: $name" >&2
