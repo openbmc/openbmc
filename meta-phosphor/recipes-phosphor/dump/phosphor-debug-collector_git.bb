@@ -147,7 +147,7 @@ def install_dreport_user_script(script_path, d):
             bb.warn("Invalid format for config value =%s" % line)
             continue
         parse_value = revalue.group(0)
-        config_values = re.split('\W+', parse_value, 1)
+        config_values = re.split(r'\W+', parse_value, 1)
         if(len(config_values) != 2):
             bb.warn("Invalid config value=%s" % parse_value)
             break;
