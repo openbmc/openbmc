@@ -16,28 +16,29 @@ PROVIDES += "virtual/obmc-fan-mgmt"
 PROVIDES += "virtual/obmc-flash-mgmt"
 PROVIDES += "virtual/obmc-system-mgmt"
 
-RPROVIDES_${PN}-chassis += "virtual-obmc-chassis-mgmt"
-RPROVIDES_${PN}-fans += "virtual-obmc-fan-mgmt"
-RPROVIDES_${PN}-flash += "virtual-obmc-flash-mgmt"
-RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
+RPROVIDES:${PN}-chassis += "virtual-obmc-chassis-mgmt"
+RPROVIDES:${PN}-fans += "virtual-obmc-fan-mgmt"
+RPROVIDES:${PN}-flash += "virtual-obmc-flash-mgmt"
+RPROVIDES:${PN}-system += "virtual-obmc-system-mgmt"
 
-SUMMARY_${PN}-chassis = "Supermicro Chassis"
-RDEPENDS_${PN}-chassis = " \
+SUMMARY:${PN}-chassis = "Supermicro Chassis"
+RDEPENDS:${PN}-chassis = " \
         x86-power-control \
+        obmc-host-failure-reboots \
         "
 
-SUMMARY_${PN}-fans = "Supermicro Fans"
-RDEPENDS_${PN}-fans = " \
+SUMMARY:${PN}-fans = "Supermicro Fans"
+RDEPENDS:${PN}-fans = " \
         phosphor-pid-control \
         "
 
-SUMMARY_${PN}-flash = "Supermicro Flash"
-RDEPENDS_${PN}-flash = " \
-        phosphor-software-manager \
+SUMMARY:${PN}-flash = "Supermicro Flash"
+RDEPENDS:${PN}-flash = " \
+        obmc-control-bmc \
         "
 
-SUMMARY_${PN}-system = "Supermicro System"
-RDEPENDS_${PN}-system = " \
+SUMMARY:${PN}-system = "Supermicro System"
+RDEPENDS:${PN}-system = " \
         bmcweb \
         entity-manager \
         dbus-sensors \
