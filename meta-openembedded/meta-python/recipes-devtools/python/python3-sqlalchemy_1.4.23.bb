@@ -19,3 +19,5 @@ RDEPENDS:${PN} += " \
     ${PYTHON_PN}-compression \
     ${PYTHON_PN}-profile \
 "
+
+BBCLASSEXTEND = "native nativesdk"

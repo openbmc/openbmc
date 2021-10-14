@@ -62,6 +62,11 @@ do_compile_ptest () {
 	oe_runmake buildtest
 }
 
+do_install:prepend () {
+	# Ensure determinism as this counter increases for each make call
+	rm -f ${B}/.build
+}
+
 do_install:append () {
 	# Move /usr/bin/bash to /bin/bash, if need
 	if [ "${base_bindir}" != "${bindir}" ]; then

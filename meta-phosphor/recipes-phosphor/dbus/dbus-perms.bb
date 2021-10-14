@@ -10,6 +10,8 @@ inherit dbus-dir
 
 SRC_URI += "file://org.openbmc.conf"
 
+FILES:${PN}:append = " ${dbus_system_confdir}"
+
 do_install:append() {
         install -d ${D}${dbus_system_confdir}
         install -m 0644 ${WORKDIR}/org.openbmc.conf \

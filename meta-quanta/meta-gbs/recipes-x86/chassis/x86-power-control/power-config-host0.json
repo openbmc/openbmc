@@ -3,32 +3,38 @@
     {
         "Name" : "PostComplete",
         "LineName" : "POST_COMPLETE",
-        "Type" : "GPIO"
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
     },
     {
         "Name" : "PowerButton",
         "LineName" : "POWER_BUTTON",
-        "Type" : "GPIO"
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
     },
     {
         "Name" : "PowerOk",
         "LineName" : "PS_PWROK",
-        "Type" : "GPIO"
+        "Type" : "GPIO",
+        "Polarity" : "ActiveHigh"
     },
     {
         "Name" : "PowerOut",
         "LineName" : "POWER_OUT",
-        "Type" : "GPIO"
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
     },
     {
         "Name" : "ResetButton",
         "LineName" : "RESET_BUTTON",
-        "Type" : "GPIO"
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
     },
     {
         "Name" : "ResetOut",
         "LineName" : "RESET_OUT",
-        "Type" : "GPIO"
+        "Type" : "GPIO",
+        "Polarity" : "ActiveLow"
     }
   ]
 }

@@ -466,7 +466,7 @@ def uri_replace(ud, uri_find, uri_replace, replacements, d, mirrortarball=None):
                     # Kill parameters, they make no sense for mirror tarballs
                     uri_decoded[5] = {}
                 elif ud.localpath and ud.method.supports_checksum(ud):
-                    basename = os.path.basename(ud.localpath)
+                    basename = os.path.basename(uri_decoded[loc])
                 if basename and not result_decoded[loc].endswith(basename):
                     result_decoded[loc] = os.path.join(result_decoded[loc], basename)
         else:
@@ -754,6 +754,11 @@ def get_srcrev(d, method_name='sortable_revision'):
     that fetcher provides a method with the given name and the same signature as sortable_revision.
     """
 
+    recursion = d.getVar("__BBINSRCREV")
+    if recursion:
+        raise FetchError("There are recursive references in fetcher variables, likely through SRC_URI")
+    d.setVar("__BBINSRCREV", True)
+
     scms = []
     fetcher = Fetch(d.getVar('SRC_URI').split(), d)
     urldata = fetcher.ud
@@ -768,6 +773,7 @@ def get_srcrev(d, method_name='sortable_revision'):
         autoinc, rev = getattr(urldata[scms[0]].method, method_name)(urldata[scms[0]], d, urldata[scms[0]].names[0])
         if len(rev) > 10:
             rev = rev[:10]
+        d.delVar("__BBINSRCREV")
         if autoinc:
             return "AUTOINC+" + rev
         return rev
@@ -802,6 +808,7 @@ def get_srcrev(d, method_name='sortable_revision'):
     if seenautoinc:
         format = "AUTOINC+" + format
 
+    d.delVar("__BBINSRCREV")
     return format
 
 def localpath(url, d):
@@ -827,6 +834,7 @@ FETCH_EXPORT_VARS = ['HOME', 'PATH',
                      'DBUS_SESSION_BUS_ADDRESS',
                      'P4CONFIG',
                      'SSL_CERT_FILE',
+                     'AWS_PROFILE',
                      'AWS_ACCESS_KEY_ID',
                      'AWS_SECRET_ACCESS_KEY',
                      'AWS_DEFAULT_REGION']

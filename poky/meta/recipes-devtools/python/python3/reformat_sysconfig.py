@@ -16,6 +16,6 @@ with open(sys.argv[1], 'r') as f:
 with open(sys.argv[1], 'w') as f:
     for k in sorted(l.keys()):
         f.write('%s = ' % k)
-        pprint.pprint(l[k], stream=f, width=sys.maxsize)
+        pprint.pprint(l[k], stream=f, width=1)
         f.write('\n')
 

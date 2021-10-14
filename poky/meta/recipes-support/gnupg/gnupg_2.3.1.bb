@@ -31,6 +31,7 @@ EXTRA_OECONF = "--disable-ldap \
 		--with-zlib=${STAGING_LIBDIR}/.. \
 		--with-bzip2=${STAGING_LIBDIR}/.. \
 		--with-readline=${STAGING_LIBDIR}/.. \
+		--with-mailprog=${sbindir}/sendmail \
 		--enable-gpg-is-gpg2 \
                "
 

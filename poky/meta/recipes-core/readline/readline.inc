@@ -18,6 +18,7 @@ SRC_URI += "file://inputrc"
 inherit autotools texinfo
 
 EXTRA_AUTORECONF += "--exclude=autoheader"
+EXTRA_OECONF += "bash_cv_termcap_lib=ncurses"
 
 LEAD_SONAME = "libreadline.so"
 

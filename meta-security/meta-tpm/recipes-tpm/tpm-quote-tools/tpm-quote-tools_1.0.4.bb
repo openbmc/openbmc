@@ -15,9 +15,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=8ec30b01163d242ecf07d9cd84e3611f"
 
 DEPENDS = "libtspi tpm-tools"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/tpmquotetools/${PV}/${BP}.tar.gz"
+SRC_URI = "git://git.code.sf.net/p/tpmquotetools/tpm-quote-tools"
+SRCREV = "4511874d5c9b4504bb96e94f8a14bd6c39a36295"
 
-SRC_URI[md5sum] = "6e194f5bc534301bbaef53dc6d22c233"
-SRC_URI[sha256sum] = "10dc4eade02635557a9496b388360844cd18e7864e2eb882f5e45ab2fa405ae2"
-
+S = "${WORKDIR}/git"
 inherit autotools

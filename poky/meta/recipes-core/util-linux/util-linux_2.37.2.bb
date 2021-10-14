@@ -37,12 +37,13 @@ python util_linux_binpackages () {
                     continue
 
                 pkg = os.path.basename(os.readlink(file))
-                extras[pkg] = extras.get(pkg, '') + ' ' + file.replace(dvar, '', 1)
+                extras.setdefault(pkg, [])
+                extras[pkg].append(file.replace(dvar, '', 1))
 
     pn = d.getVar('PN')
     for pkg, links in extras.items():
         of = d.getVar('FILES:' + pn + '-' + pkg)
-        links = of + links
+        links = of + " " + " ".join(sorted(links))
         d.setVar('FILES:' + pn + '-' + pkg, links)
 }
 
@@ -73,7 +74,7 @@ EXTRA_OECONF = "\
     \
     --disable-bfs --disable-login \
     --disable-makeinstall-chown --disable-minix --disable-newgrp \
-    --disable-use-tty-group --disable-vipw \
+    --disable-use-tty-group --disable-vipw --disable-raw \
     \
     --without-udev \
     \

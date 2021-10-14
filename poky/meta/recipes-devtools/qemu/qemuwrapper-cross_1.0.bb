@@ -18,6 +18,7 @@ do_install () {
 
 	cat >> ${D}${bindir_crossscripts}/${MLPREFIX}qemuwrapper << EOF
 #!/bin/sh
+# Wrapper script to run binaries under qemu user-mode emulation
 set -x
 
 if [ ${@bb.utils.contains('MACHINE_FEATURES', 'qemu-usermode', 'True', 'False', d)} = False -a "${PN}" != "nativesdk-qemuwrapper-cross" ]; then

@@ -35,7 +35,7 @@ def volatile_systemd_services(d):
 
 SYSTEMD_SERVICE:${PN} = "${@volatile_systemd_services(d)}"
 
-FILES:${PN} += "${systemd_unitdir}/system/*.service ${servicedir}"
+FILES:${PN} += "${systemd_system_unitdir}/*.service ${servicedir}"
 
 do_compile () {
     while read spec mountpoint; do
@@ -67,9 +67,9 @@ do_install () {
     install -d ${D}${servicedir}
     install -m 0755 mount-copybind ${D}${base_sbindir}/
 
-    install -d ${D}${systemd_unitdir}/system
+    install -d ${D}${systemd_system_unitdir}
     for service in ${SYSTEMD_SERVICE:${PN}}; do
-        install -m 0644 $service ${D}${systemd_unitdir}/system/
+        install -m 0644 $service ${D}${systemd_system_unitdir}/
     done
 
     # Suppress attempts to process some tmpfiles that are not temporary.

@@ -15,7 +15,7 @@ SRC_URI = "\
 
 S = "${WORKDIR}/git"
 
-inherit cpan autotools-brokensep gettext python3native python3-dir systemd
+inherit cpan autotools-brokensep gettext pkgconfig python3native python3-dir systemd
 
 BBCLASSEXTEND = "native"
 

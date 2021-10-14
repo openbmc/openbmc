@@ -83,8 +83,10 @@ class BitbakeTests(OESelftestTestCase):
 
     def test_force_task_1(self):
         # test 1 from bug 5875
+        import uuid
         test_recipe = 'zlib'
-        test_data = "Microsoft Made No Profit From Anyone's Zunes Yo"
+        # Need to use uuid otherwise hash equivlance would change the workflow
+        test_data = "Microsoft Made No Profit From Anyone's Zunes Yo %s" % uuid.uuid1()
         bb_vars = get_bb_vars(['D', 'PKGDEST', 'mandir'], test_recipe)
         image_dir = bb_vars['D']
         pkgsplit_dir = bb_vars['PKGDEST']

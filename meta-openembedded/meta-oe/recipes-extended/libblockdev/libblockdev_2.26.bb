@@ -8,7 +8,7 @@ SECTION = "devel/lib"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c07cb499d259452f324bb90c3067d85c"
 
-inherit autotools gobject-introspection
+inherit autotools gobject-introspection pkgconfig
 
 SRC_URI = "git://github.com/storaged-project/libblockdev;branch=2.x-branch"
 SRCREV = "47ff12242c89e36a33259d18b7068b26c3bb1c64"

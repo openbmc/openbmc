@@ -16,7 +16,7 @@ SRC_URI = "git://github.com/kronosnet/kronosnet;protocol=https;branch=stable1"
 
 UPSTREAM_CHECK_URI = "https://github.com/kronosnet/kronosnet/releases"
 
-inherit autotools
+inherit autotools pkgconfig
 
 S = "${WORKDIR}/git"
 

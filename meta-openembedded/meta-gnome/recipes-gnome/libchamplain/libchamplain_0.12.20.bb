@@ -3,7 +3,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 DEPENDS = "glib-2.0 gtk+3 gdk-pixbuf clutter-1.0 clutter-gtk-1.0 libsoup-2.4"
 
-inherit features_check gobject-introspection meson
+inherit features_check gobject-introspection meson pkgconfig
 
 REQUIRED_DISTRO_FEATURES = "opengl"
 

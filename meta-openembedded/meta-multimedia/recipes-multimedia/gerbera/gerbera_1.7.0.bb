@@ -15,7 +15,7 @@ DEPENDS = "expat fmt spdlog pugixml libebml libmatroska zlib curl libupnp e2fspr
 
 SYSTEMD_SERVICE:${PN} = "gerbera.service"
 
-inherit cmake systemd
+inherit cmake pkgconfig systemd
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 PACKAGECONFIG[systemd] = "-DWITH_SYSTEMD=TRUE,-DWITH_SYSTEMD=FALSE,systemd"

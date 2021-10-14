@@ -15,3 +15,5 @@ RDEPENDS:${PN} += "\
     ${PYTHON_PN}-sqlalchemy \
     ${PYTHON_PN}-misc \
 "
+
+BBCLASSEXTEND = "native nativesdk"

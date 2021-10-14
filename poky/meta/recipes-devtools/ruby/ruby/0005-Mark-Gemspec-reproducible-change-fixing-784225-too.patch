@@ -1,0 +1,28 @@
+From: Christian Hofstaedtler <zeha@debian.org>
+Date: Tue, 10 Oct 2017 15:07:11 -0300
+Subject: Mark Gemspec-reproducible change fixing #784225, too
+
+I think the UTC date change will fix the Multi-Arch not-same file issue,
+too.
+
+Upstream-Status: Backport [debian]
+
+Signed-off-by: Antonio Terceiro <terceiro@debian.org>
+Signed-off-by: Christian Hofstaedtler <zeha@debian.org>
+---
+ lib/rubygems/specification.rb | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+--- a/lib/rubygems/specification.rb
++++ b/lib/rubygems/specification.rb
+@@ -1695,7 +1695,9 @@
+                 raise(Gem::InvalidSpecificationException,
+                       "invalid date format in specification: #{date.inspect}")
+               end
+-            when Time, DateLike then
++            when Time then
++              Time.utc(date.utc.year, date.utc.month, date.utc.day)
++            when DateLike then
+               Time.utc(date.year, date.month, date.day)
+             else
+               TODAY

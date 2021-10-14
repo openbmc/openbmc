@@ -4,7 +4,7 @@ and another function for converting Julian calendar dates to Julian dates are de
 Two functions for the reverse calculations are also defined."
 
 HOMEPAGE = "https://github.com/phn/jdcal"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://PKG-INFO;md5=bd236e1f590973467a427bb354be0f46"
 
 inherit pypi setuptools3 ptest

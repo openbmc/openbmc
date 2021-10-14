@@ -22,20 +22,6 @@ ac_cv_alignof_guint32=4
 ac_cv_alignof_guint64=8
 ac_cv_alignof_unsigned_long=8
 
-# ORBit2 (should be in meta-gnome/site/arm-64)
-#ac_cv_alignof_CORBA_boolean=1
-#ac_cv_alignof_CORBA_char=1
-#ac_cv_alignof_CORBA_double=8
-#ac_cv_alignof_CORBA_float=4
-#ac_cv_alignof_CORBA_long=4
-#ac_cv_alignof_CORBA_long_double=8
-#ac_cv_alignof_CORBA_long_long=8
-#ac_cv_alignof_CORBA_octet=1
-#ac_cv_alignof_CORBA_pointer=4
-#ac_cv_alignof_CORBA_short=2
-#ac_cv_alignof_CORBA_struct=1
-#ac_cv_alignof_CORBA_wchar=2
-
 # at-spi2-core
 ac_cv_alignof_dbind_pointer=8
 ac_cv_alignof_dbind_struct=1

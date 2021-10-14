@@ -2,11 +2,11 @@ SUMMARY = "General-purpose library specifically developed for the WPE-flavored p
 HOMEPAGE = "https://github.com/WebPlatformForEmbedded/libwpe"
 BUGTRACKER = "https://github.com/WebPlatformForEmbedded/libwpe/issues"
 
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=371a616eb4903c6cb79e9893a5f615cc"
 DEPENDS = "virtual/egl libxkbcommon"
 
-inherit cmake features_check
+inherit cmake features_check pkgconfig
 
 REQUIRED_DISTRO_FEATURES = "opengl"
 

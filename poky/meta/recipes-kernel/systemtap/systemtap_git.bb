@@ -35,7 +35,7 @@ inherit ${@bb.utils.contains('PACKAGECONFIG', 'python3-probes', 'distutils3-base
 PACKAGES =+ "${PN}-exporter"
 FILES:${PN}-exporter = "${sysconfdir}/stap-exporter/* \
                         ${sysconfdir}/sysconfig/stap-exporter \
-                        ${systemd_unitdir}/system/stap-exporter.service \
+                        ${systemd_system_unitdir}/stap-exporter.service \
                         ${sbindir}/stap-exporter"
 RDEPENDS:${PN}-exporter = "${PN} python3-core python3-netclient"
 SYSTEMD_SERVICE:${PN}-exporter = "stap-exporter.service"

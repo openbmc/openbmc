@@ -2,7 +2,7 @@ SUMMARY = "ISIC -- IP Stack Integrity Checker"
 DESCRIPTION = "ISIC is a suite of utilities to exercise the stability of an IP Stack and its component stacks (TCP, UDP, ICMP et. al.)"
 HOMEPAGE = "http://isic.sourceforge.net/"
 SECTION = "security"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d41d8cd98f00b204e9800998ecf8427e"
 
 DEPENDS = "libnet"

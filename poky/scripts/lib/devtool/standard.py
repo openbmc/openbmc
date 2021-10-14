@@ -318,10 +318,6 @@ def _check_compatible_recipe(pn, d):
         raise DevtoolError("The %s recipe is a packagegroup, and therefore is "
                            "not supported by this tool" % pn, 4)
 
-    if bb.data.inherits_class('meta', d):
-        raise DevtoolError("The %s recipe is a meta-recipe, and therefore is "
-                           "not supported by this tool" % pn, 4)
-
     if bb.data.inherits_class('externalsrc', d) and d.getVar('EXTERNALSRC'):
         # Not an incompatibility error per se, so we don't pass the error code
         raise DevtoolError("externalsrc is currently enabled for the %s "

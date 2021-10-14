@@ -6,7 +6,7 @@ has a definite Sendmail-ish flavor, but the inside is completely different."
 
 HOMEPAGE= "http://www.postfix.org"
 SECTION = "mail"
-DEPENDS = "db icu libpcre libnsl2 openssl postfix-native \
+DEPENDS = "db icu libpcre libnsl2 m4-native openssl postfix-native \
     ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', 'openldap', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'sasl', 'cyrus-sasl', '', d)} \
 "
@@ -20,7 +20,7 @@ CLEANBROKEN = "1"
 
 BBCLASSEXTEND = "native"
 
-inherit update-rc.d useradd update-alternatives systemd lib_package
+inherit pkgconfig update-rc.d useradd update-alternatives systemd lib_package
 
 INITSCRIPT_NAME = "postfix"
 INITSCRIPT_PARAMS = "start 58 3 4 5 . stop 13 0 1 6 ."

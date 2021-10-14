@@ -13,7 +13,7 @@ SRC_URI = " \
 SRCREV = "147dd722548358763a8b649b3e4b41dfffbcfbb6"
 S = "${WORKDIR}/git"
 
-inherit cmake
+inherit cmake pkgconfig
 
 PACKAGECONFIG ??= "alsa jack"
 PACKAGECONFIG[alsa] = ",,alsa-lib"

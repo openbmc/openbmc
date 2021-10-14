@@ -5,9 +5,11 @@
 # and pasting into another recipe ensure it is understood
 # what that means!
 
+OS_RELEASE_ROOTPATH ?= "${COREBASE}"
+
 def run_git(d, cmd):
     try:
-        oeroot = d.getVar('COREBASE', True)
+        oeroot = d.getVar('OS_RELEASE_ROOTPATH', True)
         return bb.process.run(("export PSEUDO_DISABLED=1; " +
                                "git --work-tree %s --git-dir %s/.git %s")
             % (oeroot, oeroot, cmd))[0].strip('\n')

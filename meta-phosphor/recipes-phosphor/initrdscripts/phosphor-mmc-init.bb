@@ -13,6 +13,7 @@ RDEPENDS:${PN} += " \
     e2fsprogs-e2fsck \
     e2fsprogs-mke2fs \
     gptfdisk \
+    libgpiod-tools \
     parted \
     udev \
 "

@@ -5,7 +5,6 @@ This layer depends on:
 
 URI: git://github.com/openembedded/openembedded-core.git
 branch: master
-revision: HEAD
 
 luajit recipe requires host compiler to be able to generate 32bit code when target is 32bit
 e.g. arm, so ensure that $CC -m32 is functional on build host, if building this recipe, needed
@@ -15,7 +14,7 @@ e.g. on archlinux based distributions install prerequisites like below
 pacman -S lib32-gcc-libs lib32-glibc
 
 Ubuntu
-sudo apt-get install gcc-multilib
+sudo apt-get install gcc-multilib linux-libc-dev:i386
 
 Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-oe]' in the subject'
 

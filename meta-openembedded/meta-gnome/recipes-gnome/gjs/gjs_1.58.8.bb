@@ -35,4 +35,8 @@ FILES:${PN} += "${datadir}/gjs-1.0/lsan"
 
 PACKAGES =+ "${PN}-valgrind"
 FILES:${PN}-valgrind = "${datadir}/gjs-1.0/valgrind"
-RSEPENDS_${PN}-valgrind += "valgrind"
+RDEPENDS:${PN}-valgrind += "valgrind"
+
+# Valgrind not yet available on rv32/rv64
+RDEPENDS:${PN}-valgrind:remove:riscv32 = "valgrind"
+RDEPENDS:${PN}-valgrind:remove:riscv64 = "valgrind"

@@ -10,3 +10,5 @@ SRC_URI[sha256sum] = "bd90c3eb96bee996206b83be7065c9ce19aef38c3f4fb53073ada0d0b6
 CVE_CHECK_WHITELIST += "CVE-2019-19242"
 # This is believed to be iOS specific (https://groups.google.com/g/sqlite-dev/c/U7OjAbZO6LA)
 CVE_CHECK_WHITELIST += "CVE-2015-3717"
+# Issue in an experimental extension we don't have/use. Fixed by https://sqlite.org/src/info/b1e0c22ec981cf5f
+CVE_CHECK_WHITELIST += "CVE-2021-36690"

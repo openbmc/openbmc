@@ -1,7 +1,9 @@
 [Unit]
 Description=Phosphor Fan Control Daemon
-Requires=max31785-hwmon-helper@ahb-apb-bus\x401e78a000-i2c\x2dbus\x40{ADDR}-max31785\x4052.service
-After=max31785-hwmon-helper@ahb-apb-bus\x401e78a000-i2c\x2dbus\x40{ADDR}-max31785\x4052.service
+Requires=xyz.openbmc_project.Hwmon@-ahb-apb-bus\x401e78a000-i2c\x2dbus\x40{ADDR}-max31785\x4052.service
+After=xyz.openbmc_project.Hwmon@-ahb-apb-bus\x401e78a000-i2c\x2dbus\x40{ADDR}-max31785\x4052.service
+Requires=phosphor-cooling-type@%i.service
+After=phosphor-cooling-type@%i.service
 
 [Service]
 Restart=on-failure

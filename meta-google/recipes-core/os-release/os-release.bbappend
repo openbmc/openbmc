@@ -7,4 +7,5 @@ python() {
         d.setVar("BUILD_MEMO", memo)
 }
 
-OS_RELEASE_FIELDS:append = " BUILD_MEMO"
+IMAGE_TYPE = "${GBMC_CONFIG}"
+OS_RELEASE_FIELDS:append = " BUILD_MEMO IMAGE_TYPE"

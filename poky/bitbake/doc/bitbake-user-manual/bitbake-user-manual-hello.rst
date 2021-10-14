@@ -216,7 +216,7 @@ Following is the complete "Hello World" example.
     use some editor to create the ``bitbake.conf`` so that it contains
     the following::
 
-       PN  = "${@bb.parse.BBHandler.vars_from_file(d.getVar('FILE', False),d)[0] or 'defaultpkgname'}"
+       PN  = "${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[0] or 'defaultpkgname'}"
 
        TMPDIR  = "${TOPDIR}/tmp"
        CACHE   = "${TMPDIR}/cache"

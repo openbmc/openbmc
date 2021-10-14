@@ -11,6 +11,7 @@ Release Series 3.3 (hardknott)
 - :yocto_docs:`3.3 Documentation </3.3>`
 - :yocto_docs:`3.3.1 Documentation </3.3.1>`
 - :yocto_docs:`3.3.2 Documentation </3.3.2>`
+- :yocto_docs:`3.3.2 Documentation </3.3.3>`
 
 *******************************
 Release Series 3.2 (gatesgarth)
@@ -37,6 +38,7 @@ Release Series 3.1 (dunfell)
 - :yocto_docs:`3.1.8 Documentation </3.1.8>`
 - :yocto_docs:`3.1.9 Documentation </3.1.9>`
 - :yocto_docs:`3.1.10 Documentation </3.1.10>`
+- :yocto_docs:`3.1.11 Documentation </3.1.11>`
 
 ==========================
  Outdated Release Manuals

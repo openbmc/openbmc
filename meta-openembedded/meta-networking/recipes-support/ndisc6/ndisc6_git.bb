@@ -5,11 +5,9 @@ HOMEPAGE = "http://www.remlab.net/ndisc6/"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-PV = "1.0.4+git${SRCPV}"
-SRCREV = "4c794b5512d23c649def1f94a684225dcbb6ac3e"
+PV = "1.0.5"
+SRCREV = "b706f5f01aa82aa0db678fffd15a1527f330c507"
 SRC_URI = "git://git.remlab.net/git/ndisc6.git;protocol=http \
-           file://0001-replace-VLAIS-with-malloc-free-pair.patch \
-           file://0002-Do-not-undef-_GNU_SOURCE.patch \
            file://0001-autogen-Do-not-symlink-gettext.h-from-build-host.patch \
            "
 
@@ -60,11 +58,11 @@ IPv4 world."
 DESCRIPTION:${PN}-rdisc6    = "ICMPv6 Router Discovery tool. \
 Queries IPv6 routers on the network for advertised prefixes. Can be used \
 to detect rogue IPv6 routers, monitor legitimate IPv6 routers."
-DESCRITPION_${PN}-tcpspray6    = "Performs bandwidth measurements of TCP \
+DESCRIPTION:${PN}-tcpspray6    = "Performs bandwidth measurements of TCP \
 sessions between the local system and a remote echo server in either IPv6 \
 or IPv4."
 
-DESCRITPION_${PN}-rdnssd       = "Daemon to autoconfigure the list of DNS \
+DESCRIPTION:${PN}-rdnssd       = "Daemon to autoconfigure the list of DNS \
 servers through slateless IPv6 autoconfiguration."
 
 # The tcptraceroute6 and tracert6 commands depend on rltraceroute6 to

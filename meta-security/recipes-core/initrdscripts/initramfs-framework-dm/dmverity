@@ -6,6 +6,7 @@ dmverity_enabled() {
 
 dmverity_run() {
     DATA_SIZE="__not_set__"
+    DATA_BLOCK_SIZE="__not_set__"
     ROOT_HASH="__not_set__"
 
     . /usr/share/misc/dm-verity.env
@@ -49,7 +50,7 @@ dmverity_run() {
     done
 
     veritysetup \
-        --data-block-size=1024 \
+        --data-block-size=${DATA_BLOCK_SIZE} \
         --hash-offset=${DATA_SIZE} \
         create rootfs \
         ${RDEV} \

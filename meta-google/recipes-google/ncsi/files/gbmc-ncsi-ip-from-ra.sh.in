@@ -1,0 +1,123 @@
+#!/bin/bash
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+source /usr/share/network/lib.sh || exit
+source /usr/libexec/ncsid_lib.sh || exit
+
+old_pfx=
+old_rtr=
+
+w=60
+while true; do
+  start=$SECONDS
+  while read line; do
+    if [ -z "$line" ]; then
+      pfx=
+      host=
+    elif [[ "$line" =~ ^Prefix' '*:' '*(.*)/([0-9]+)$ ]]; then
+      t_pfx="${BASH_REMATCH[1]}"
+      t_pfx_len="${BASH_REMATCH[2]}"
+      ip_to_bytes t_pfx_b "$t_pfx" || continue
+      (( t_pfx_len == 76 && t_pfx_b[8] & 0xfd == 0xfd )) || continue
+      (( t_pfx_b[9] |= 1 ))
+      hextet="fd$(printf '%02x' ${t_pfx_b[9]})"
+      pfx="$(ip_bytes_to_str t_pfx_b)"
+      (( t_pfx_b[9] &= 0xf0 ))
+      stateless_pfx="$(ip_bytes_to_str t_pfx_b)"
+    elif [[ "$line" =~ ^'DNS search list'' '*:' '*([^.-]*)[^.]*[.](.*.google.com)$ ]]; then
+      host="${BASH_REMATCH[1]}"
+      domain="${BASH_REMATCH[2]}"
+    elif [[ "$line" =~ ^from' '(.*)$ ]]; then
+      rtr="${BASH_REMATCH[1]}"
+      (( "${#pfx}" != 0 )) || continue
+      [[ "$pfx" != "$old_pfx" || "$old_rtr" != "$rtr" ]] || continue
+
+      echo "Found prefix $pfx from $rtr" >&2
+
+      # Delete any stale IP Addresses from the primary interface as we won't use them
+      UpdateIP xyz.openbmc_project.Network @NCSI_IF@ '0.0.0.0' '0'
+      UpdateIP xyz.openbmc_project.Network @NCSI_IF@ '::' '0'
+
+    read -r -d '' contents <<EOF
+[Network]
+Address=$pfx/128
+IPv6PrefixDelegation=yes
+[IPv6PrefixDelegation]
+RouterLifetimeSec=60
+[IPv6Prefix]
+Prefix=$stateless_pfx/80
+PreferredLifetimeSec=60
+ValidLifetimeSec=60
+[IPv6RoutePrefix]
+Route=$pfx/80
+LifetimeSec=60
+[Route]
+Destination=$stateless_pfx/76
+Type=unreachable
+Metric=1024
+EOF
+      for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/49-public-ra.conf; do
+        mkdir -p -m 755 "$(dirname "$file")"
+        printf '%s' "$contents" >"$file"
+      done
+
+      contents='[Network]'$'\n'
+      contents+="Address=$pfx/128"$'\n'
+      contents+="Gateway=$rtr"$'\n'
+      for file in /run/systemd/network/{00,}-bmc-@NCSI_IF@.network.d/49-public-ra.conf; do
+        mkdir -p -m 755 "$(dirname "$file")"
+        printf '%s' "$contents" >"$file"
+      done
+
+      # Ensure that systemd-networkd performs a reconfiguration as it doesn't
+      # currently check the mtime of drop-in files.
+      touch -c /lib/systemd/network/*-bmc-gbmcbr.network
+      touch -c /etc/systemd/network/*-bmc-@NCSI_IF@.network
+
+      if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
+        networkctl reload
+        networkctl reconfigure gbmcbr
+      fi
+
+    read -r -d '' contents <<EOF
+table inet filter {
+  chain ncsi_input {
+    ip6 saddr != $pfx/76 ip6 daddr $pfx/76 goto ncsi_gbmc_br_pub_input
+  }
+  chain ncsi_forward {
+    ip6 saddr != $pfx/76 ip6 daddr $pfx/76 accept
+  }
+}
+EOF
+      rfile=/run/nftables/40-gbmc-ncsi-ra.rules
+      mkdir -p -m 755 "$(dirname "$rfile")"
+      printf '%s' "$contents" >"$rfile"
+      systemctl reset-failed nftables
+      systemctl --no-block restart nftables
+
+      # Set the machine hostname if discovered
+      if [ -n "$host" ]; then
+        hostnamectl set-hostname "$host-n$hextet.$domain"
+      fi
+
+      old_pfx="$pfx"
+      old_rtr="$rtr"
+    fi
+  done < <(rdisc6 -d -m @NCSI_IF@ -w $(( w * 1000 )) 2>/dev/null)
+  # If rdisc6 exits early we still want to wait the full `w` time before
+  # starting again.
+  (( timeout = start + w - SECONDS ))
+  sleep $(( timeout < 0 ? 0 : timeout ))
+done

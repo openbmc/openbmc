@@ -151,7 +151,7 @@ Errors and Warnings
    occur if you add a path which contains a ``.debug`` directory and do
    not explicitly add the ``.debug`` directory to the ``-dbg`` package.
    If this is the case, add the ``.debug`` directory explicitly to
-   ``FILES_${PN}-dbg``. See :term:`FILES` for additional
+   ``FILES:${PN}-dbg``. See :term:`FILES` for additional
    information on :term:`FILES`.
 
     
@@ -435,7 +435,7 @@ Errors and Warnings
    (e.g. :term:`PN` happens to be the same as :term:`MACHINE`
    or :term:`DISTRO`), it can have unexpected
    consequences. For example, assignments such as
-   ``FILES_${PN} = "xyz"`` effectively turn into ``FILES = "xyz"``.
+   ``FILES:${PN} = "xyz"`` effectively turn into ``FILES = "xyz"``.
    Rename your recipe (or if :term:`PN` is being set explicitly, change the
    :term:`PN` value) so that the conflict does not occur. See
    :term:`FILES` for additional information.

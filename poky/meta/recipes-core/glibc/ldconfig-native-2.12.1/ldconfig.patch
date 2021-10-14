@@ -400,7 +400,7 @@ Index: ldconfig-native-2.12.1/ldconfig.c
    return 0;
  }
  
-+#define REPORT_BUGS_TO "mailing list : poky@yoctoproject.org"
++#define REPORT_BUGS_TO "mailing list : poky@lists.yoctoproject.org"
  /* Print bug-reporting information in the help message.  */
  static char *
  more_help (int key, const char *text, void *input)

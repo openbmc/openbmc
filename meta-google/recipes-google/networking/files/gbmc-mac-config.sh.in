@@ -15,7 +15,7 @@
 
 source /usr/share/ipmi-fru/lib.sh || exit
 
-eeprom="$(of_name_to_eeprom '@EEPROM@')" || exit
+ipmi_fru_alloc '@EEPROM@' eeprom || exit
 
 header=()
 read_header "$eeprom" header || exit

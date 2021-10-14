@@ -1,0 +1,38 @@
+--- a/setup.py
++++ b/setup.py
+@@ -695,7 +695,18 @@ def determine_gl_flags():
+         c_options['use_x11'] = True
+         c_options['use_egl'] = True
+     else:
+-        flags['libraries'] = ['GL']
++        if cross_sysroot:
++            flags['include_dirs'] = [cross_sysroot + '/usr/include']
++            flags['library_dirs'] = [cross_sysroot + '/usr/lib']
++
++        if c_options['use_opengl_es2']:
++            print("using GLESv2 libraries")
++            flags['libraries'] = ['GLESv2']
++        else:
++            flags['libraries'] = ['GL']
++
++
++    print("cross_sysroot: " + str(cross_sysroot))
+     return flags, base_flags
+ 
+ 
+@@ -723,14 +734,13 @@ def determine_sdl2():
+             sdl_inc = join(include, 'SDL2')
+             if isdir(sdl_inc):
+                 sdl2_paths.append(sdl_inc)
+-        sdl2_paths.extend(['/usr/local/include/SDL2', '/usr/include/SDL2'])
+ 
+     flags['include_dirs'] = sdl2_paths
+     flags['extra_link_args'] = []
+     flags['extra_compile_args'] = []
+     flags['library_dirs'] = (
+         sdl2_paths if sdl2_paths else
+-        ['/usr/local/lib/'])
++        [''])
+ 
+     if sdl2_flags:
+         flags = merge(flags, sdl2_flags)

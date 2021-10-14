@@ -25,7 +25,7 @@ SRC_URI = "git://github.com/MycroftAI/mimic1.git \
            file://0001-cmu_indic_lang-Make-cst_rx_not_indic-as-extern-decla.patch \
           "
 
-inherit autotools
+inherit autotools pkgconfig
 
 S = "${WORKDIR}/git"
 

@@ -93,7 +93,7 @@ EOF
         # from the target sysroot.
         cat > ${B}/g-ir-scanner-wrapper << EOF
 #!/bin/sh
-# This prevents g-ir-scanner from writing cache data to $HOME
+# This prevents g-ir-scanner from writing cache data to user's HOME dir
 export GI_SCANNER_DISABLE_CACHE=1
 
 g-ir-scanner --lib-dirs-envvar=GIR_EXTRA_LIBS_PATH --use-binary-wrapper=${STAGING_BINDIR}/g-ir-scanner-qemuwrapper --use-ldd-wrapper=${STAGING_BINDIR}/g-ir-scanner-lddwrapper --add-include-path=${STAGING_DATADIR}/gir-1.0 --add-include-path=${STAGING_LIBDIR}/gir-1.0 "\$@"

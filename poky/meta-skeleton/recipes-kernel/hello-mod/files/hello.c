@@ -19,15 +19,17 @@
 
 #include <linux/module.h>
 
-int init_module(void)
+static int __init hello_init(void)
 {
-	printk("Hello World!\n");
+	pr_info("Hello World!\n");
 	return 0;
 }
 
-void cleanup_module(void)
+static void __exit hello_exit(void)
 {
-	printk("Goodbye Cruel World!\n");
+	pr_info("Goodbye Cruel World!\n");
 }
 
+module_init(hello_init);
+module_exit(hello_exit);
 MODULE_LICENSE("GPL");

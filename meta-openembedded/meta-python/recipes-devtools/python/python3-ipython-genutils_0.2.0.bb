@@ -1,7 +1,7 @@
 SUMMARY = "Vestigial utilities from IPython"
 HOMEPAGE = "http://ipython.org"
 AUTHOR = "IPython Development Team <ipython-dev@scipy.org>"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING.md;md5=f7c3032c3ac398265224533a0a333a35"
 
 PYPI_PACKAGE = "ipython_genutils"

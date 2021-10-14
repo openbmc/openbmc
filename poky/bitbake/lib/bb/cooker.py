@@ -389,7 +389,12 @@ class BBCooker:
             if not self.hashserv:
                 dbfile = (self.data.getVar("PERSISTENT_DIR") or self.data.getVar("CACHE")) + "/hashserv.db"
                 self.hashservaddr = "unix://%s/hashserve.sock" % self.data.getVar("TOPDIR")
-                self.hashserv = hashserv.create_server(self.hashservaddr, dbfile, sync=False)
+                self.hashserv = hashserv.create_server(
+                    self.hashservaddr,
+                    dbfile,
+                    sync=False,
+                    upstream=self.data.getVar("BB_HASHSERVE_UPSTREAM") or None,
+                )
                 self.hashserv.serve_as_process()
             self.data.setVar("BB_HASHSERVE", self.hashservaddr)
             self.databuilder.origdata.setVar("BB_HASHSERVE", self.hashservaddr)
@@ -1062,6 +1067,11 @@ class BBCooker:
 
         if matches:
             bb.event.fire(bb.event.FilesMatchingFound(filepattern, matches), self.data)
+
+    def testCookerCommandEvent(self, filepattern):
+        # Dummy command used by OEQA selftest to test tinfoil without IO
+        matches = ["A", "B"]
+        bb.event.fire(bb.event.FilesMatchingFound(filepattern, matches), self.data)
 
     def findProviders(self, mc=''):
         return bb.providers.findProviders(self.databuilder.mcdata[mc], self.recipecaches[mc], self.recipecaches[mc].pkg_pn)

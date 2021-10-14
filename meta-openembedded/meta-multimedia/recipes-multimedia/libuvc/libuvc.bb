@@ -11,4 +11,4 @@ PV = "v0.0.6+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-inherit cmake
+inherit cmake pkgconfig

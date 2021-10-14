@@ -1,0 +1,28 @@
+From: Reiner Herrmann <reiner@reiner-h.de>
+Date: Tue, 10 Oct 2017 15:06:13 -0300
+Subject: lib/mkmf.rb: sort list of object files in generated Makefile
+
+Without sorting the list explicitly, its order is indeterministic,
+because readdir() is also not deterministic.
+When the list of object files varies between builds, they are linked
+in a different order, which results in an unreproducible build.
+
+Upstream-Status: Backport [debian]
+
+Signed-off-by: Antonio Terceiro <terceiro@debian.org>
+Signed-off-by: Reiner Herrmann <reiner@reiner-h.de>
+---
+ lib/mkmf.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/lib/mkmf.rb
++++ b/lib/mkmf.rb
+@@ -2315,7 +2315,7 @@
+ LIBS = #{$LIBRUBYARG} #{$libs} #{$LIBS}
+ ORIG_SRCS = #{orig_srcs.collect(&File.method(:basename)).join(' ')}
+ SRCS = $(ORIG_SRCS) #{(srcs - orig_srcs).collect(&File.method(:basename)).join(' ')}
+-OBJS = #{$objs.join(" ")}
++OBJS = #{$objs.sort.join(" ")}
+ HDRS = #{hdrs.map{|h| '$(srcdir)/' + File.basename(h)}.join(' ')}
+ LOCAL_HDRS = #{$headers.join(' ')}
+ TARGET = #{target}

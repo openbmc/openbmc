@@ -34,7 +34,7 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'openpower-virtual-pnor', \
 PACKAGECONFIG[verify_pnor_signature] = "-Dverify-signature=enabled, -Dverify-signature=disabled"
 PACKAGECONFIG[ubifs_layout] = "-Ddevice-type=ubi,,,mtd-utils-ubifs"
 PACKAGECONFIG[mmc_layout] = "-Ddevice-type=mmc"
-PACKAGECONFIG[virtual_pnor] = "-Dvpnor=enabled, -Dvpnor=disabled"
+PACKAGECONFIG[virtual_pnor] = "-Dvpnor=enabled, -Dvpnor=disabled,,bash"
 
 EXTRA_OEMESON += " \
     -Dtests=disabled \
@@ -61,7 +61,7 @@ S = "${WORKDIR}/git"
 
 SRC_URI += "git://github.com/openbmc/openpower-pnor-code-mgmt"
 
-SRCREV = "0ddd4fad455d4001a6b839cd201c31b9326b9bf1"
+SRCREV = "97a709b0c572eb203b9f0954d884cf0e8551eef6"
 
 DBUS_SERVICE:${PN} += "org.open_power.Software.Host.Updater.service"
 

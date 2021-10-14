@@ -4,7 +4,7 @@
 System Requirements
 *******************
 
-Welcome to the Yocto Project Reference Manual! This manual provides
+Welcome to the Yocto Project Reference Manual. This manual provides
 reference information for the current release of the Yocto Project, and
 is most effectively used after you have an understanding of the basics
 of the Yocto Project. The manual is neither meant to be read as a
@@ -277,7 +277,8 @@ installer and automatically installs the tools for you:
 1. Execute the ``install-buildtools`` script. Here is an example::
 
       $ cd poky
-      $ scripts/install-buildtools --without-extended-buildtools \
+      $ scripts/install-buildtools \
+        --without-extended-buildtools \
         --base-url &YOCTO_DL_URL;/releases/yocto \
         --release yocto-&DISTRO; \
         --installer-version &DISTRO;

@@ -30,7 +30,7 @@ install_concurrent_console_config() {
 SRC_URI:append:p10bmc = " file://client.2201.conf"
 SRC_URI:append:p10bmc = " file://server.ttyVUART1.conf"
 
-REGISTERED_SERVICES:${PN}:append:p10bmc = " obmc_console_guests:tcp:2201:"
+REGISTERED_SERVICES:${PN}:append:p10bmc = " obmc_console_hypervisor:tcp:2201:"
 
 SYSTEMD_SERVICE:${PN}:append:p10bmc = " obmc-console-ssh@2200.service \
 		obmc-console-ssh@2201.service \
@@ -48,7 +48,7 @@ do_install:append:p10bmc() {
 SRC_URI:append:witherspoon-tacoma = " file://client.2201.conf"
 SRC_URI:append:witherspoon-tacoma = " file://server.ttyVUART1.conf"
 
-REGISTERED_SERVICES:${PN}:append:witherspoon-tacoma = " obmc_console_guests:tcp:2201:"
+REGISTERED_SERVICES:${PN}:append:witherspoon-tacoma = " obmc_console_hypervisor:tcp:2201:"
 
 SYSTEMD_SERVICE:${PN}:append:witherspoon-tacoma = " obmc-console-ssh@2200.service \
 		obmc-console-ssh@2201.service \

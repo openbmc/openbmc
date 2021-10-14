@@ -9,6 +9,8 @@ import argparse
 import io
 import os
 import sys
+import warnings
+warnings.simplefilter("default")
 
 bindir = os.path.dirname(__file__)
 topdir = os.path.dirname(bindir)

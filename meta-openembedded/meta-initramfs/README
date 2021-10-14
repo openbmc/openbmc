@@ -11,9 +11,8 @@ Dependencies
 
 This layer depends on:
 
-URI: git://github.com/openembedded/oe-core.git
+URI: git://git.openembedded.org/meta-openembedded
 branch: master
-revision: HEAD
 
 
 Maintenance

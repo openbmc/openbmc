@@ -18,6 +18,7 @@ class BuildProject(metaclass=ABCMeta):
     def __init__(self, uri, foldername=None, tmpdir=None, dl_dir=None):
         self.uri = uri
         self.archive = os.path.basename(uri)
+        self.tempdirobj = None
         if not tmpdir:
             self.tempdirobj = tempfile.TemporaryDirectory(prefix='buildproject-')
             tmpdir = self.tempdirobj.name
@@ -57,6 +58,8 @@ class BuildProject(metaclass=ABCMeta):
         return self._run('cd %s; make install %s' % (self.targetdir, install_args))
 
     def clean(self):
+        if self.tempdirobj:
+            self.tempdirobj.cleanup()
         if not self.needclean:
              return
         self._run('rm -rf %s' % self.targetdir)

@@ -17,6 +17,7 @@ SRC_URI = "https://www.cpan.org/src/5.0/perl-${PV}.tar.gz;name=perl \
            file://perl-dynloader.patch \
            file://0002-Constant-Fix-up-shebang.patch \
            file://determinism.patch \
+           file://CVE-2021-36770.patch \
            "
 SRC_URI:append:class-native = " \
            file://perl-configpm-switch.patch \
@@ -384,3 +385,10 @@ EOF
        chmod 0755 ${SYSROOT_DESTDIR}${bindir}/nativeperl
        cat ${SYSROOT_DESTDIR}${bindir}/nativeperl
 }
+
+SSTATE_HASHEQUIV_FILEMAP = " \
+    populate_sysroot:*/lib*/perl5/*/*/Config_heavy.pl:${TMPDIR} \
+    populate_sysroot:*/lib*/perl5/*/*/Config_heavy.pl:${COREBASE} \
+    populate_sysroot:*/lib*/perl5/config.sh:${TMPDIR} \
+    populate_sysroot:*/lib*/perl5/config.sh:${COREBASE} \
+    "

@@ -1,5 +1,6 @@
 inherit cross-canadian
 inherit python3-dir
+inherit pkgconfig
 
 SUMMARY = "GNU debugger (cross-canadian gdb for ${TARGET_ARCH} target)"
 PN = "gdb-cross-canadian-${TRANSLATED_TARGET_ARCH}"

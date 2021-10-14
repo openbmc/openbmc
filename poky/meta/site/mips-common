@@ -15,20 +15,6 @@ screen_cv_sys_sockets_nofs=${screen_cv_sys_sockets_nofs=no}
 screen_cv_sys_sockets_usable=${screen_cv_sys_sockets_usable=yes}
 screen_cv_sys_terminfo_used=${screen_cv_sys_terminfo_used=yes}
 
-# ORBit2
-ac_cv_alignof_CORBA_octet=1
-ac_cv_alignof_CORBA_boolean=1
-ac_cv_alignof_CORBA_char=1
-ac_cv_alignof_CORBA_wchar=2
-ac_cv_alignof_CORBA_short=2
-ac_cv_alignof_CORBA_long=4
-ac_cv_alignof_CORBA_long_long=8
-ac_cv_alignof_CORBA_float=4
-ac_cv_alignof_CORBA_double=8
-ac_cv_alignof_CORBA_long_double=8
-ac_cv_alignof_CORBA_pointer=4
-ac_cv_alignof_CORBA_struct=1
-
 # apache
 ac_cv_sizeof_ssize_t=${ac_cv_sizeof_ssize_t=4}
 

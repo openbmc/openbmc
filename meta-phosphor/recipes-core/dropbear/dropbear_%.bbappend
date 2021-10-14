@@ -6,3 +6,7 @@ SRC_URI += "file://dropbearkey.service \
             file://localoptions.h \
             file://dropbear.default \
            "
+
+# pull in OpenSSH's /usr/libexec/sftp-server so we don't have to rely
+# on the crufty old scp protocol for file transfer
+RDEPENDS:${PN} += "openssh-sftp-server"

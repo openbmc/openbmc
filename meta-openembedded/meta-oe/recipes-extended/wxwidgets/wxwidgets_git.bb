@@ -10,7 +10,7 @@ LICENSE = "wxWidgets"
 LIC_FILES_CHKSUM = "file://docs/licence.txt;md5=981f50a934828620b08f44d75db557c6"
 
 inherit ${@bb.utils.contains('PACKAGECONFIG', 'qt', 'cmake_qt5', 'cmake', d)}
-inherit features_check lib_package binconfig
+inherit features_check lib_package binconfig pkgconfig
 
 # All toolkit-configs except 'no_gui' require x11 explicitly (see toolkit.cmake)
 REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('PACKAGECONFIG', 'no_gui', '', 'x11', d)}"

@@ -6,6 +6,7 @@
 import os
 import sys
 import warnings
+warnings.simplefilter("default")
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), 'lib'))
 from bb import fetch2
 import logging
@@ -16,6 +17,8 @@ import signal
 import pickle
 import traceback
 import queue
+import shlex
+import subprocess
 from multiprocessing import Lock
 from threading import Thread
 
@@ -145,6 +148,7 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
     # a fork() or exec*() activates PSEUDO...
 
     envbackup = {}
+    fakeroot = False
     fakeenv = {}
     umask = None
 
@@ -164,6 +168,7 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
 
     # We can't use the fakeroot environment in a dry run as it possibly hasn't been built
     if 'fakeroot' in taskdep and taskname in taskdep['fakeroot'] and not dry_run:
+        fakeroot = True
         envvars = (workerdata["fakerootenv"][fn] or "").split()
         for key, value in (var.split('=') for var in envvars):
             envbackup[key] = os.environ.get(key)
@@ -282,7 +287,11 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
             try:
                 if dry_run:
                     return 0
-                return bb.build.exec_task(fn, taskname, the_data, cfg.profile)
+                ret = bb.build.exec_task(fn, taskname, the_data, cfg.profile)
+                if fakeroot:
+                    fakerootcmd = shlex.split(the_data.getVar("FAKEROOTCMD"))
+                    subprocess.run(fakerootcmd + ['-S'], check=True, stdout=subprocess.PIPE)
+                return ret
             except:
                 os._exit(1)
         if not profiling:
@@ -513,9 +522,11 @@ except BaseException as e:
         import traceback
         sys.stderr.write(traceback.format_exc())
         sys.stderr.write(str(e))
-
-worker_thread_exit = True
-worker_thread.join()
+finally:
+    worker_thread_exit = True
+    worker_thread.join()
 
 workerlog_write("exiting")
+if not normalexit:
+    sys.exit(1)
 sys.exit(0)

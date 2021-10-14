@@ -14,5 +14,5 @@ Commons.
 To report any inaccuracies or problems with this (or any other Yocto Project)
 manual, or to send additions or changes, please send email/patches to the Yocto
 Project documentation mailing list at ``docs@lists.yoctoproject.org`` or
-log into the Freenode ``#yocto`` channel.
+log into the `Libera Chat <https://libera.chat/>`__ ``#yocto`` channel.
 

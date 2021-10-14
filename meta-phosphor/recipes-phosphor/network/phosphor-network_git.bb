@@ -11,7 +11,7 @@ inherit python3native
 inherit systemd
 
 SRC_URI += "git://github.com/openbmc/phosphor-networkd"
-SRCREV = "b108fd740fdde4a9f0fe63e63ccdee695f5b92e7"
+SRCREV = "bd649af91ed1fe74efd745e398d5640f4ab6e5af"
 
 DEPENDS += "systemd"
 DEPENDS += "sdbusplus ${PYTHON_PN}-sdbus++-native"

@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
 
+DEPENDS += "dbus"
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "sdbusplus"
 DEPENDS += "phosphor-logging"
@@ -31,10 +32,14 @@ FILES:phosphor-ldap += " \
         ${bindir}/phosphor-ldap-conf \
         ${bindir}/phosphor-ldap-mapper \
 "
+FILES:${PN} += " \
+        ${base_libdir}/systemd \
+        ${datadir}/phosphor-certificate-manager \
+"
 DBUS_SERVICE:phosphor-ldap = " \
         xyz.openbmc_project.Ldap.Config.service \
         xyz.openbmc_project.LDAP.PrivilegeMapper.service \
 "
 SRC_URI += "git://github.com/openbmc/phosphor-user-manager"
-SRCREV = "a260f187436837aec493baef0a5e7063fe11ee92"
+SRCREV = "d019e3d2ae739128635d36e1b6612df9bb49a3be"
 S = "${WORKDIR}/git"

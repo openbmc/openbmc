@@ -27,6 +27,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/net-snmp/net-snmp-${PV}.tar.gz \
            file://net-snmp-fix-for-disable-des.patch \
            file://reproducibility-have-printcap.patch \
            file://0001-ac_add_search_path.m4-keep-consistent-between-32bit.patch \
+           file://0001-snmpd-always-exit-after-displaying-usage.patch \
            "
 SRC_URI[sha256sum] = "eb7fd4a44de6cddbffd9a92a85ad1309e5c1054fb9d5a7dd93079c8953f48c3f"
 
@@ -150,6 +151,10 @@ do_install:append() {
         -i ${D}${bindir}/net-snmp-config
 
     oe_multilib_header net-snmp/net-snmp-config.h
+
+    if [ "${HAS_PERL}" = "1" ]; then
+        find ${D}${libdir}/ -type f -name "perllocal.pod" | xargs rm -f
+    fi
 }
 
 do_install_ptest() {

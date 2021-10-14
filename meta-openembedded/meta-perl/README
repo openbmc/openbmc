@@ -53,8 +53,6 @@ This layer depends on:
 
   URI: git://git.openembedded.org/openembedded-core
   branch: master
-  revision: HEAD
-  prio: default
 
 Adding the meta-perl layer to your build
 ---------------------------------------

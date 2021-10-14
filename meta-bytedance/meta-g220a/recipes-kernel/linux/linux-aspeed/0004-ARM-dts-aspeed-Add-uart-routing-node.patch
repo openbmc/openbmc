@@ -1,7 +1,7 @@
-From c12fc8a0f748358f76ff5a883a390301f86f079f Mon Sep 17 00:00:00 2001
+From 120b607efb7b4dbc86add041decf3253b8b5e1fe Mon Sep 17 00:00:00 2001
 From: John Wang <wangzhiqiang.bj@bytedance.com>
 Date: Wed, 30 Sep 2020 12:41:30 +0800
-Subject: [PATCH 4/5] ARM: dts: aspeed: Add uart-routing node
+Subject: [PATCH] ARM: dts: aspeed: Add uart-routing node
 
 Signed-off-by: John Wang <wangzhiqiang.bj@bytedance.com>
 ---
@@ -10,12 +10,12 @@ Signed-off-by: John Wang <wangzhiqiang.bj@bytedance.com>
  2 files changed, 12 insertions(+)
 
 diff --git a/arch/arm/boot/dts/aspeed-g5.dtsi b/arch/arm/boot/dts/aspeed-g5.dtsi
-index 19288495f41a..de9a8fd3933f 100644
+index 73ca1ec6fc24..39d128c0545b 100644
 --- a/arch/arm/boot/dts/aspeed-g5.dtsi
 +++ b/arch/arm/boot/dts/aspeed-g5.dtsi
-@@ -522,6 +522,12 @@ sio_regs: regs {
- 						compatible = "aspeed,bmc-misc";
- 					};
+@@ -503,6 +503,12 @@ ibt: ibt@140 {
+ 					interrupts = <8>;
+ 					status = "disabled";
  				};
 +
 +				uart_routing: uart_routing@9c {
@@ -25,12 +25,12 @@ index 19288495f41a..de9a8fd3933f 100644
 +				};
  			};
  
- 			peci: bus@1e78b000 {
+ 			uart2: serial@1e78d000 {
 diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
-index 97ca743363d7..9938b8f224f6 100644
+index ee171b3364fa..aac382367109 100644
 --- a/arch/arm/boot/dts/aspeed-g6.dtsi
 +++ b/arch/arm/boot/dts/aspeed-g6.dtsi
-@@ -311,6 +311,12 @@ pinctrl: pinctrl {
+@@ -317,6 +317,12 @@ pinctrl: pinctrl {
  					compatible = "aspeed,ast2600-pinctrl";
  				};
  
@@ -40,9 +40,9 @@ index 97ca743363d7..9938b8f224f6 100644
 +					status = "disabled";
 +				};
 +
- 				smp-memram@180 {
- 					compatible = "aspeed,ast2600-smpmem";
- 					reg = <0x180 0x40>;
+ 				silicon-id@14 {
+ 					compatible = "aspeed,ast2600-silicon-id", "aspeed,silicon-id";
+ 					reg = <0x14 0x4 0x5b0 0x8>;
 -- 
 2.25.1
 

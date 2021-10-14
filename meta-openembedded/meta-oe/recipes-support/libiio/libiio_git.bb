@@ -18,7 +18,6 @@ DISTUTILS_SETUP_PATH ?= "${B}/bindings/python/"
 
 DEPENDS = " \
     flex-native bison-native libaio \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \
 "
 
 inherit cmake python3native systemd setuptools3
@@ -31,14 +30,22 @@ EXTRA_OECMAKE = " \
 
 PACKAGECONFIG ??= "usb_backend network_backend serial_backend"
 
+NETWORK_BACKEND_DEPENDENCIES = "\
+    libxml2 \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'zeroconf', 'avahi', '', d)} \
+"
+
 PACKAGECONFIG[usb_backend] = "-DWITH_USB_BACKEND=ON,-DWITH_USB_BACKEND=OFF,libusb1 libxml2"
-PACKAGECONFIG[network_backend] = "-DWITH_NETWORK_BACKEND=ON,-DWITH_NETWORK_BACKEND=OFF,libxml2"
+PACKAGECONFIG[network_backend] = "-DWITH_NETWORK_BACKEND=ON,-DWITH_NETWORK_BACKEND=OFF, ${NETWORK_BACKEND_DEPENDENCIES}"
 PACKAGECONFIG[serial_backend] = "-DWITH_SERIAL_BACKEND=ON,-DWITH_SERIAL_BACKEND=off,libserialport libxml2"
 PACKAGECONFIG[libiio-python3] = "-DPYTHON_BINDINGS=ON,-DPYTHON_BINDINGS=OFF"
 
 PACKAGES =+ "${PN}-iiod ${PN}-tests ${PN}-${PYTHON_PN}"
 
-RDEPENDS:${PN}-${PYTHON_PN} = "${PN} ${PYTHON_PN}-ctypes ${PYTHON_PN}-stringold"
+# Inheriting setuptools3 incorrectly adds the dependency on ${PYTHON_PN}-core
+# to ${PN} instead of to ${PN}-${PYTHON_PN} where it belongs.
+RDEPENDS:${PN}:remove = "${PYTHON_PN}-core"
+RDEPENDS:${PN}-${PYTHON_PN} = "${PN} ${PYTHON_PN}-core ${PYTHON_PN}-ctypes ${PYTHON_PN}-stringold"
 
 FILES:${PN}-iiod = " \
     ${sbindir}/iiod \

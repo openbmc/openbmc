@@ -108,7 +108,6 @@ class SignatureGeneratorOEBasicHashMixIn(object):
         self.unlockedrecipes = (data.getVar("SIGGEN_UNLOCKED_RECIPES") or
                                 "").split()
         self.unlockedrecipes = { k: "" for k in self.unlockedrecipes }
-        self.buildarch = data.getVar('BUILD_ARCH')
         self._internal = False
         pass
 
@@ -147,13 +146,6 @@ class SignatureGeneratorOEBasicHashMixIn(object):
         self.dump_lockedsigs(sigfile)
         return super(bb.siggen.SignatureGeneratorBasicHash, self).dump_sigs(dataCache, options)
 
-    def prep_taskhash(self, tid, deps, dataCaches):
-        super().prep_taskhash(tid, deps, dataCaches)
-        if hasattr(self, "extramethod"):
-            (mc, _, _, fn) = bb.runqueue.split_tid_mcfn(tid)
-            inherits = " ".join(dataCaches[mc].inherits[fn])
-            if inherits.find("/native.bbclass") != -1 or inherits.find("/cross.bbclass") != -1:
-                self.extramethod[tid] = ":" + self.buildarch
 
     def get_taskhash(self, tid, deps, dataCaches):
         if tid in self.lockedhashes:
@@ -478,6 +470,8 @@ def OEOuthashBasic(path, sigfile, task, d):
     import stat
     import pwd
     import grp
+    import re
+    import fnmatch
 
     def update_hash(s):
         s = s.encode('utf-8')
@@ -487,16 +481,29 @@ def OEOuthashBasic(path, sigfile, task, d):
 
     h = hashlib.sha256()
     prev_dir = os.getcwd()
+    corebase = d.getVar("COREBASE")
+    tmpdir = d.getVar("TMPDIR")
     include_owners = os.environ.get('PSEUDO_DISABLED') == '0'
     if "package_write_" in task or task == "package_qa":
         include_owners = False
     include_timestamps = False
+    include_root = True
     if task == "package":
         include_timestamps = d.getVar('BUILD_REPRODUCIBLE_BINARIES') == '1'
+        include_root = False
     extra_content = d.getVar('HASHEQUIV_HASH_VERSION')
+
+    filemaps = {}
+    for m in (d.getVar('SSTATE_HASHEQUIV_FILEMAP') or '').split():
+        entry = m.split(":")
+        if len(entry) != 3 or entry[0] != task:
+            continue
+        filemaps.setdefault(entry[1], [])
+        filemaps[entry[1]].append(entry[2])
 
     try:
         os.chdir(path)
+        basepath = os.path.normpath(path)
 
         update_hash("OEOuthashBasic\n")
         if extra_content:
@@ -578,8 +585,13 @@ def OEOuthashBasic(path, sigfile, task, d):
                 else:
                     update_hash(" " * 9)
 
+                filterfile = False
+                for entry in filemaps:
+                    if fnmatch.fnmatch(path, entry):
+                        filterfile = True
+
                 update_hash(" ")
-                if stat.S_ISREG(s.st_mode):
+                if stat.S_ISREG(s.st_mode) and not filterfile:
                     update_hash("%10d" % s.st_size)
                 else:
                     update_hash(" " * 10)
@@ -588,9 +600,24 @@ def OEOuthashBasic(path, sigfile, task, d):
                 fh = hashlib.sha256()
                 if stat.S_ISREG(s.st_mode):
                     # Hash file contents
-                    with open(path, 'rb') as d:
-                        for chunk in iter(lambda: d.read(4096), b""):
+                    if filterfile:
+                        # Need to ignore paths in crossscripts and postinst-useradd files.
+                        with open(path, 'rb') as d:
+                            chunk = d.read()
+                            chunk = chunk.replace(bytes(basepath, encoding='utf8'), b'')
+                            for entry in filemaps:
+                                if not fnmatch.fnmatch(path, entry):
+                                    continue
+                                for r in filemaps[entry]:
+                                    if r.startswith("regex-"):
+                                        chunk = re.sub(bytes(r[6:], encoding='utf8'), b'', chunk)
+                                    else:
+                                        chunk = chunk.replace(bytes(r, encoding='utf8'), b'')
                             fh.update(chunk)
+                    else:
+                        with open(path, 'rb') as d:
+                            for chunk in iter(lambda: d.read(4096), b""):
+                                fh.update(chunk)
                     update_hash(fh.hexdigest())
                 else:
                     update_hash(" " * len(fh.hexdigest()))
@@ -603,7 +630,8 @@ def OEOuthashBasic(path, sigfile, task, d):
                 update_hash("\n")
 
             # Process this directory and all its child files
-            process(root)
+            if include_root or root != ".":
+                process(root)
             for f in files:
                 if f == 'fixmepath':
                     continue

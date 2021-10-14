@@ -1,6 +1,6 @@
 SUMMARY = "Toybox Inittab Configuration"
-LICENSE = "BSD-0-Clause"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD-0-Clause;md5=81eeb0083e31f11ab1e33ded846d521c"
+LICENSE = "0BSD"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/0BSD;md5=f667a3c3830a55a17ec3067709f4526c"
 
 # Unpack to ${S}/orig
 #

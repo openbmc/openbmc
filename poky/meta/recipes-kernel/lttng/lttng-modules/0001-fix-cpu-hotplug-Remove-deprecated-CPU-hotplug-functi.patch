@@ -1,0 +1,394 @@
+From 8be4c8a38ee1e297578e094a6e4c143ec5259aba Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 13 Sep 2021 12:00:38 -0400
+Subject: [PATCH 1/2] fix: cpu/hotplug: Remove deprecated CPU-hotplug
+ functions. (v5.15)
+
+The CPU-hotplug functions get|put_online_cpus() were deprecated in v4.13
+and removed in v5.15.
+
+See upstream commits :
+
+commit 8c854303ce0e38e5bbedd725ff39da7e235865d8
+Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date:   Tue Aug 3 16:16:21 2021 +0200
+
+    cpu/hotplug: Remove deprecated CPU-hotplug functions.
+
+    No users in tree use the deprecated CPU-hotplug functions anymore.
+
+    Remove them.
+
+Introduced in v4.13 :
+
+  commit 8f553c498e1772cccb39a114da4a498d22992758
+  Author: Thomas Gleixner <tglx@linutronix.de>
+  Date:   Wed May 24 10:15:12 2017 +0200
+
+    cpu/hotplug: Provide cpus_read|write_[un]lock()
+
+    The counting 'rwsem' hackery of get|put_online_cpus() is going to be
+    replaced by percpu rwsem.
+
+    Rename the functions to make it clear that it's locking and not some
+    refcount style interface. These new functions will be used for the
+    preparatory patches which make the code ready for the percpu rwsem
+    conversion.
+
+    Rename all instances in the cpu hotplug code while at it.
+
+Upstream-Status: backport [https://git.lttng.org/?p=lttng-modules.git;a=commit;h=ffcc873470121ef1ebb110df3d9038a38d9cb7cb]
+
+Change-Id: I5a37cf5afc075a402b7347989fac637dfa60a1ed
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+---
+ include/wrapper/cpu.h                     | 44 +++++++++++++++++++++++
+ src/lib/ringbuffer/ring_buffer_backend.c  |  8 ++---
+ src/lib/ringbuffer/ring_buffer_frontend.c | 17 ++++-----
+ src/lib/ringbuffer/ring_buffer_iterator.c | 15 ++++----
+ src/lttng-context-perf-counters.c         | 11 +++---
+ src/lttng-statedump-impl.c                |  6 ++--
+ 6 files changed, 74 insertions(+), 27 deletions(-)
+ create mode 100644 include/wrapper/cpu.h
+
+diff --git a/include/wrapper/cpu.h b/include/wrapper/cpu.h
+new file mode 100644
+index 00000000..cbee1962
+--- /dev/null
++++ b/include/wrapper/cpu.h
+@@ -0,0 +1,44 @@
++/* SPDX-License-Identifier: (GPL-2.0-only or LGPL-2.1-only)
++ *
++ * wrapper/cpu.h
++ *
++ * Copyright (C) 2021 Michael Jeanson <mjeanson@efficios.com>
++ */
++
++#ifndef _LTTNG_WRAPPER_CPU_H
++#define _LTTNG_WRAPPER_CPU_H
++
++#include <linux/cpu.h>
++#include <lttng/kernel-version.h>
++
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,13,0))
++
++static inline
++void lttng_cpus_read_lock(void)
++{
++	cpus_read_lock();
++}
++
++static inline
++void lttng_cpus_read_unlock(void)
++{
++	cpus_read_unlock();
++}
++
++#else /* LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,13,0) */
++
++static inline
++void lttng_cpus_read_lock(void)
++{
++	get_online_cpus();
++}
++
++static inline
++void lttng_cpus_read_unlock(void)
++{
++	put_online_cpus();
++}
++
++#endif /* LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,13,0) */
++
++#endif /* _LTTNG_WRAPPER_CPU_H */
+diff --git a/src/lib/ringbuffer/ring_buffer_backend.c b/src/lib/ringbuffer/ring_buffer_backend.c
+index 26efb2bc..9a339be0 100644
+--- a/src/lib/ringbuffer/ring_buffer_backend.c
++++ b/src/lib/ringbuffer/ring_buffer_backend.c
+@@ -12,10 +12,10 @@
+ #include <linux/delay.h>
+ #include <linux/errno.h>
+ #include <linux/slab.h>
+-#include <linux/cpu.h>
+ #include <linux/mm.h>
+ #include <linux/vmalloc.h>
+ 
++#include <wrapper/cpu.h>
+ #include <wrapper/mm.h>
+ #include <wrapper/vmalloc.h>	/* for wrapper_vmalloc_sync_mappings() */
+ #include <ringbuffer/config.h>
+@@ -445,14 +445,14 @@ int channel_backend_init(struct channel_backend *chanb,
+ 			chanb->cpu_hp_notifier.priority = 5;
+ 			register_hotcpu_notifier(&chanb->cpu_hp_notifier);
+ 
+-			get_online_cpus();
++			lttng_cpus_read_lock();
+ 			for_each_online_cpu(i) {
+ 				ret = lib_ring_buffer_create(per_cpu_ptr(chanb->buf, i),
+ 							 chanb, i);
+ 				if (ret)
+ 					goto free_bufs;	/* cpu hotplug locked */
+ 			}
+-			put_online_cpus();
++			lttng_cpus_read_unlock();
+ #else
+ 			for_each_possible_cpu(i) {
+ 				ret = lib_ring_buffer_create(per_cpu_ptr(chanb->buf, i),
+@@ -485,7 +485,7 @@ free_bufs:
+ 		 */
+ #else /* #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,10,0)) */
+ #ifdef CONFIG_HOTPLUG_CPU
+-		put_online_cpus();
++		lttng_cpus_read_unlock();
+ 		unregister_hotcpu_notifier(&chanb->cpu_hp_notifier);
+ #endif
+ #endif /* #else #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,10,0)) */
+diff --git a/src/lib/ringbuffer/ring_buffer_frontend.c b/src/lib/ringbuffer/ring_buffer_frontend.c
+index e9056118..87a575d0 100644
+--- a/src/lib/ringbuffer/ring_buffer_frontend.c
++++ b/src/lib/ringbuffer/ring_buffer_frontend.c
+@@ -48,6 +48,7 @@
+ #include <ringbuffer/iterator.h>
+ #include <ringbuffer/nohz.h>
+ #include <wrapper/atomic.h>
++#include <wrapper/cpu.h>
+ #include <wrapper/kref.h>
+ #include <wrapper/percpu-defs.h>
+ #include <wrapper/timer.h>
+@@ -724,7 +725,7 @@ static void channel_unregister_notifiers(struct lttng_kernel_ring_buffer_channel
+ 			int cpu;
+ 
+ #ifdef CONFIG_HOTPLUG_CPU
+-			get_online_cpus();
++			lttng_cpus_read_lock();
+ 			chan->cpu_hp_enable = 0;
+ 			for_each_online_cpu(cpu) {
+ 				struct lttng_kernel_ring_buffer *buf = per_cpu_ptr(chan->backend.buf,
+@@ -732,7 +733,7 @@ static void channel_unregister_notifiers(struct lttng_kernel_ring_buffer_channel
+ 				lib_ring_buffer_stop_switch_timer(buf);
+ 				lib_ring_buffer_stop_read_timer(buf);
+ 			}
+-			put_online_cpus();
++			lttng_cpus_read_unlock();
+ 			unregister_cpu_notifier(&chan->cpu_hp_notifier);
+ #else
+ 			for_each_possible_cpu(cpu) {
+@@ -772,14 +773,14 @@ void lib_ring_buffer_set_quiescent_channel(struct lttng_kernel_ring_buffer_chann
+ 	const struct lttng_kernel_ring_buffer_config *config = &chan->backend.config;
+ 
+ 	if (config->alloc == RING_BUFFER_ALLOC_PER_CPU) {
+-		get_online_cpus();
++		lttng_cpus_read_lock();
+ 		for_each_channel_cpu(cpu, chan) {
+ 			struct lttng_kernel_ring_buffer *buf = per_cpu_ptr(chan->backend.buf,
+ 							      cpu);
+ 
+ 			lib_ring_buffer_set_quiescent(buf);
+ 		}
+-		put_online_cpus();
++		lttng_cpus_read_unlock();
+ 	} else {
+ 		struct lttng_kernel_ring_buffer *buf = chan->backend.buf;
+ 
+@@ -794,14 +795,14 @@ void lib_ring_buffer_clear_quiescent_channel(struct lttng_kernel_ring_buffer_cha
+ 	const struct lttng_kernel_ring_buffer_config *config = &chan->backend.config;
+ 
+ 	if (config->alloc == RING_BUFFER_ALLOC_PER_CPU) {
+-		get_online_cpus();
++		lttng_cpus_read_lock();
+ 		for_each_channel_cpu(cpu, chan) {
+ 			struct lttng_kernel_ring_buffer *buf = per_cpu_ptr(chan->backend.buf,
+ 							      cpu);
+ 
+ 			lib_ring_buffer_clear_quiescent(buf);
+ 		}
+-		put_online_cpus();
++		lttng_cpus_read_unlock();
+ 	} else {
+ 		struct lttng_kernel_ring_buffer *buf = chan->backend.buf;
+ 
+@@ -899,7 +900,7 @@ struct lttng_kernel_ring_buffer_channel *channel_create(const struct lttng_kerne
+ 			chan->cpu_hp_notifier.priority = 6;
+ 			register_cpu_notifier(&chan->cpu_hp_notifier);
+ 
+-			get_online_cpus();
++			lttng_cpus_read_lock();
+ 			for_each_online_cpu(cpu) {
+ 				struct lttng_kernel_ring_buffer *buf = per_cpu_ptr(chan->backend.buf,
+ 								       cpu);
+@@ -909,7 +910,7 @@ struct lttng_kernel_ring_buffer_channel *channel_create(const struct lttng_kerne
+ 				spin_unlock(&per_cpu(ring_buffer_nohz_lock, cpu));
+ 			}
+ 			chan->cpu_hp_enable = 1;
+-			put_online_cpus();
++			lttng_cpus_read_unlock();
+ #else
+ 			for_each_possible_cpu(cpu) {
+ 				struct lttng_kernel_ring_buffer *buf = per_cpu_ptr(chan->backend.buf,
+diff --git a/src/lib/ringbuffer/ring_buffer_iterator.c b/src/lib/ringbuffer/ring_buffer_iterator.c
+index 25839af6..60c95ca6 100644
+--- a/src/lib/ringbuffer/ring_buffer_iterator.c
++++ b/src/lib/ringbuffer/ring_buffer_iterator.c
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <ringbuffer/iterator.h>
++#include <wrapper/cpu.h>
+ #include <wrapper/file.h>
+ #include <wrapper/uaccess.h>
+ #include <linux/jiffies.h>
+@@ -440,13 +441,13 @@ int channel_iterator_init(struct lttng_kernel_ring_buffer_channel *chan)
+ 			chan->hp_iter_notifier.priority = 10;
+ 			register_cpu_notifier(&chan->hp_iter_notifier);
+ 
+-			get_online_cpus();
++			lttng_cpus_read_lock();
+ 			for_each_online_cpu(cpu) {
+ 				buf = per_cpu_ptr(chan->backend.buf, cpu);
+ 				lib_ring_buffer_iterator_init(chan, buf);
+ 			}
+ 			chan->hp_iter_enable = 1;
+-			put_online_cpus();
++			lttng_cpus_read_unlock();
+ #else
+ 			for_each_possible_cpu(cpu) {
+ 				buf = per_cpu_ptr(chan->backend.buf, cpu);
+@@ -519,7 +520,7 @@ int channel_iterator_open(struct lttng_kernel_ring_buffer_channel *chan)
+ 	CHAN_WARN_ON(chan, config->output != RING_BUFFER_ITERATOR);
+ 
+ 	if (config->alloc == RING_BUFFER_ALLOC_PER_CPU) {
+-		get_online_cpus();
++		lttng_cpus_read_lock();
+ 		/* Allow CPU hotplug to keep track of opened reader */
+ 		chan->iter.read_open = 1;
+ 		for_each_channel_cpu(cpu, chan) {
+@@ -529,7 +530,7 @@ int channel_iterator_open(struct lttng_kernel_ring_buffer_channel *chan)
+ 				goto error;
+ 			buf->iter.read_open = 1;
+ 		}
+-		put_online_cpus();
++		lttng_cpus_read_unlock();
+ 	} else {
+ 		buf = channel_get_ring_buffer(config, chan, 0);
+ 		ret = lib_ring_buffer_iterator_open(buf);
+@@ -538,7 +539,7 @@ int channel_iterator_open(struct lttng_kernel_ring_buffer_channel *chan)
+ error:
+ 	/* Error should always happen on CPU 0, hence no close is required. */
+ 	CHAN_WARN_ON(chan, cpu != 0);
+-	put_online_cpus();
++	lttng_cpus_read_unlock();
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(channel_iterator_open);
+@@ -550,7 +551,7 @@ void channel_iterator_release(struct lttng_kernel_ring_buffer_channel *chan)
+ 	int cpu;
+ 
+ 	if (config->alloc == RING_BUFFER_ALLOC_PER_CPU) {
+-		get_online_cpus();
++		lttng_cpus_read_lock();
+ 		for_each_channel_cpu(cpu, chan) {
+ 			buf = channel_get_ring_buffer(config, chan, cpu);
+ 			if (buf->iter.read_open) {
+@@ -559,7 +560,7 @@ void channel_iterator_release(struct lttng_kernel_ring_buffer_channel *chan)
+ 			}
+ 		}
+ 		chan->iter.read_open = 0;
+-		put_online_cpus();
++		lttng_cpus_read_unlock();
+ 	} else {
+ 		buf = channel_get_ring_buffer(config, chan, 0);
+ 		lib_ring_buffer_iterator_release(buf);
+diff --git a/src/lttng-context-perf-counters.c b/src/lttng-context-perf-counters.c
+index b0227d47..372f05e0 100644
+--- a/src/lttng-context-perf-counters.c
++++ b/src/lttng-context-perf-counters.c
+@@ -16,6 +16,7 @@
+ #include <lttng/events.h>
+ #include <lttng/events-internal.h>
+ #include <ringbuffer/frontend_types.h>
++#include <wrapper/cpu.h>
+ #include <wrapper/vmalloc.h>
+ #include <wrapper/perf.h>
+ #include <lttng/tracer.h>
+@@ -97,10 +98,10 @@ void lttng_destroy_perf_counter_ctx_field(void *priv)
+ 	{
+ 		int cpu;
+ 
+-		get_online_cpus();
++		lttng_cpus_read_lock();
+ 		for_each_online_cpu(cpu)
+ 			perf_event_release_kernel(events[cpu]);
+-		put_online_cpus();
++		lttng_cpus_read_unlock();
+ #ifdef CONFIG_HOTPLUG_CPU
+ 		unregister_cpu_notifier(&perf_field->nb);
+ #endif
+@@ -304,7 +305,7 @@ int lttng_add_perf_counter_to_ctx(uint32_t type,
+ 		perf_field->nb.priority = 0;
+ 		register_cpu_notifier(&perf_field->nb);
+ #endif
+-		get_online_cpus();
++		lttng_cpus_read_lock();
+ 		for_each_online_cpu(cpu) {
+ 			events[cpu] = wrapper_perf_event_create_kernel_counter(attr,
+ 						cpu, NULL, overflow_callback);
+@@ -317,7 +318,7 @@ int lttng_add_perf_counter_to_ctx(uint32_t type,
+ 				goto counter_busy;
+ 			}
+ 		}
+-		put_online_cpus();
++		lttng_cpus_read_unlock();
+ 		perf_field->hp_enable = 1;
+ 	}
+ #endif /* #else #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,10,0)) */
+@@ -351,7 +352,7 @@ counter_error:
+ 			if (events[cpu] && !IS_ERR(events[cpu]))
+ 				perf_event_release_kernel(events[cpu]);
+ 		}
+-		put_online_cpus();
++		lttng_cpus_read_unlock();
+ #ifdef CONFIG_HOTPLUG_CPU
+ 		unregister_cpu_notifier(&perf_field->nb);
+ #endif
+diff --git a/src/lttng-statedump-impl.c b/src/lttng-statedump-impl.c
+index 4dfbca0b..2b42783a 100644
+--- a/src/lttng-statedump-impl.c
++++ b/src/lttng-statedump-impl.c
+@@ -23,7 +23,6 @@
+ #include <linux/file.h>
+ #include <linux/interrupt.h>
+ #include <linux/irqnr.h>
+-#include <linux/cpu.h>
+ #include <linux/netdevice.h>
+ #include <linux/inetdevice.h>
+ #include <linux/mm.h>
+@@ -34,6 +33,7 @@
+ 
+ #include <lttng/events.h>
+ #include <lttng/tracer.h>
++#include <wrapper/cpu.h>
+ #include <wrapper/irqdesc.h>
+ #include <wrapper/fdtable.h>
+ #include <wrapper/namespace.h>
+@@ -770,7 +770,7 @@ int do_lttng_statedump(struct lttng_kernel_session *session)
+ 	 * is to guarantee that each CPU has been in a state where is was in
+ 	 * syscall mode (i.e. not in a trap, an IRQ or a soft IRQ).
+ 	 */
+-	get_online_cpus();
++	lttng_cpus_read_lock();
+ 	atomic_set(&kernel_threads_to_run, num_online_cpus());
+ 	for_each_online_cpu(cpu) {
+ 		INIT_DELAYED_WORK(&cpu_work[cpu], lttng_statedump_work_func);
+@@ -778,7 +778,7 @@ int do_lttng_statedump(struct lttng_kernel_session *session)
+ 	}
+ 	/* Wait for all threads to run */
+ 	__wait_event(statedump_wq, (atomic_read(&kernel_threads_to_run) == 0));
+-	put_online_cpus();
++	lttng_cpus_read_unlock();
+ 	/* Our work is done */
+ 	trace_lttng_statedump_end(session);
+ 	return 0;
+-- 
+2.19.1
+

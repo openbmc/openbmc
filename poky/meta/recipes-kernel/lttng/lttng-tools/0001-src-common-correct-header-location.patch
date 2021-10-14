@@ -1,0 +1,41 @@
+From 790ef313364d1f1efb6f283705bb324eea2979ba Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Sun, 5 Sep 2021 10:13:08 +0200
+Subject: [PATCH] src/common: correct header location
+
+sys/unistd.h is not guaranteed to exist, and does not with
+e.g. musl C library.
+
+Upstream-Status: Pending
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/common/kernel-probe.c    | 2 +-
+ src/common/userspace-probe.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/common/kernel-probe.c b/src/common/kernel-probe.c
+index 2beb53f..44100bc 100644
+--- a/src/common/kernel-probe.c
++++ b/src/common/kernel-probe.c
+@@ -20,7 +20,7 @@
+ #include <lttng/kernel-probe.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
+-#include <sys/unistd.h>
++#include <unistd.h>
+ 
+ static
+ int lttng_kernel_probe_location_address_serialize(
+diff --git a/src/common/userspace-probe.c b/src/common/userspace-probe.c
+index 67b0ee6..66afc6f 100644
+--- a/src/common/userspace-probe.c
++++ b/src/common/userspace-probe.c
+@@ -20,7 +20,7 @@
+ #include <lttng/userspace-probe-internal.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
+-#include <sys/unistd.h>
++#include <unistd.h>
+ 
+ static
+ int lttng_userspace_probe_location_function_set_binary_fd_handle(

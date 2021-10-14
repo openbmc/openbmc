@@ -1,0 +1,4 @@
+[Match]
+Name=gbmcbrncsidhcp
+[Network]
+Bridge=gbmcbr

@@ -20,7 +20,7 @@ PERLLIBDIRS:class-native = "${libdir}/perl5"
 def cpan_upstream_check_pattern(d):
     for x in (d.getVar('SRC_URI') or '').split(' '):
         if x.startswith("https://cpan.metacpan.org"):
-            _pattern = x.split('/')[-1].replace(d.getVar('PV'), '(?P<pver>\d+.\d+)')
+            _pattern = x.split('/')[-1].replace(d.getVar('PV'), r'(?P<pver>\d+.\d+)')
             return _pattern
     return ''
 

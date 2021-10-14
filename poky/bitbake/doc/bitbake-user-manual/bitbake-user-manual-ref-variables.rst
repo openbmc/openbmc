@@ -339,7 +339,7 @@ overview of their function and contents.
    :term:`BB_LOGFMT`
       Specifies the name of the log files saved into
       ``${``\ :term:`T`\ ``}``. By default, the :term:`BB_LOGFMT`
-      variable is undefined and the log file names get created using the
+      variable is undefined and the log filenames get created using the
       following form::
 
          log.{task}.{pid}
@@ -393,7 +393,7 @@ overview of their function and contents.
    :term:`BB_RUNFMT`
       Specifies the name of the executable script files (i.e. run files)
       saved into ``${``\ :term:`T`\ ``}``. By default, the
-      :term:`BB_RUNFMT` variable is undefined and the run file names get
+      :term:`BB_RUNFMT` variable is undefined and the run filenames get
       created using the following form::
 
          run.{task}.{pid}

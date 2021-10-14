@@ -9,7 +9,7 @@ Advantages of this approach: \
 * Application software errors are easily reversed by simply removing the TPM state and starting over. \
 * Difficult crypto errors are quickly debugged by looking inside the TPM."
 HOMEPAGE = "http://ibmswtpm.sourceforge.net/ibmswtpm2.html"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 SECTION = "securty/tpm"
 LIC_FILES_CHKSUM = "file://../LICENSE;md5=1e023f61454ac828b4aa1bc4293f7d5f"
 

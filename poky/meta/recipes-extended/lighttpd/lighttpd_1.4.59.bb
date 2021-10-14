@@ -58,12 +58,12 @@ do_install:append() {
 	install -m 0644 ${WORKDIR}/lighttpd.conf ${D}${sysconfdir}/lighttpd
 	install -m 0644 ${WORKDIR}/index.html.lighttpd ${D}/www/pages/index.html
 
-	install -d ${D}${systemd_unitdir}/system
-	install -m 0644 ${S}/doc/systemd/lighttpd.service ${D}${systemd_unitdir}/system
+	install -d ${D}${systemd_system_unitdir}
+	install -m 0644 ${S}/doc/systemd/lighttpd.service ${D}${systemd_system_unitdir}
 	sed -i -e 's,@SBINDIR@,${sbindir},g' \
 		-e 's,@SYSCONFDIR@,${sysconfdir},g' \
 		-e 's,@BASE_BINDIR@,${base_bindir},g' \
-		${D}${systemd_unitdir}/system/lighttpd.service
+		${D}${systemd_system_unitdir}/lighttpd.service
 	#For FHS compliance, create symbolic links to /var/log and /var/tmp for logs and temporary data
 	ln -sf ${localstatedir}/log ${D}/www/logs
 	ln -sf ${localstatedir}/tmp ${D}/www/var

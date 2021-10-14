@@ -1,7 +1,8 @@
-From 321709837f412e2f590e36e3fe33571bb40036a7 Mon Sep 17 00:00:00 2001
+From 8515ceec5ba3e2fcdbc819b5bf10fe742d7c9d5d Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Thu, 27 Jun 2019 13:27:18 +0000
-Subject: [PATCH] Makefile.am: include descriptor.pb.cc when building libprotoc.so
+Subject: [PATCH] Makefile.am: include descriptor.pb.cc when building
+ libprotoc.so
 
 * otherwise plugin.pb.o has undefined symbol scc_info_FileDescriptorProto_google_2fprotobuf_2fdescriptor_2eproto
   and build with gold fails with:
@@ -10,19 +11,20 @@ Subject: [PATCH] Makefile.am: include descriptor.pb.cc when building libprotoc.s
 
 Upstream-Status: Pending
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+
 ---
  src/Makefile.am | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/src/Makefile.am b/src/Makefile.am
-index be18ba761..57e3daec1 100644
+index d4f11ce79..96d911746 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
-@@ -313,6 +313,7 @@ libprotoc_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libprotoc.map
+@@ -323,6 +323,7 @@ libprotoc_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libprotoc.map
  EXTRA_libprotoc_la_DEPENDENCIES = libprotoc.map
  endif
  libprotoc_la_SOURCES =                                         \
 +  google/protobuf/descriptor.pb.cc                             \
    google/protobuf/compiler/code_generator.cc                   \
    google/protobuf/compiler/command_line_interface.cc           \
-   google/protobuf/compiler/plugin.cc                           \
+   google/protobuf/compiler/cpp/cpp_enum.cc                     \

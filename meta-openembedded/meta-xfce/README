@@ -1,12 +1,11 @@
 This layer depends on:
 
-URI: git://github.com/openembedded/oe-core.git
+URI: git://git.openembedded.org/openembedded-core
 branch: master
-revision: HEAD
 
-URI: git://github.com/openembedded/meta-oe.git
+URI: git://git.openembedded.org/meta-openembedded
 branch: master
-revision: HEAD
+
 meta-xfce depends on meta-oe, meta-gnome and meta-multimedia in this repository.
 
 To avoid dependencies on meta-multimedia you need to mask recipes by adding

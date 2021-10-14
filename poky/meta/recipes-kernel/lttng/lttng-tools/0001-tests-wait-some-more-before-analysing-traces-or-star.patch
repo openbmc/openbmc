@@ -1,0 +1,88 @@
+From 8d9daede0882d239b0a47b0f7a6db68ba4934a7d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Sat, 4 Sep 2021 13:57:39 +0200
+Subject: [PATCH] tests: wait some more before analysing traces or starting
+ tracing
+
+Otherwise, there are sporadic race failures where lttng tracing
+is stopped before all expected events are collected or is started too soon, e.g.:
+
+PASS: tools/tracker/test_event_tracker 205 - Traced application stopped.
+PASS: tools/tracker/test_event_tracker 206 - Stop lttng tracing for session
+PASS: tools/tracker/test_event_tracker 207 - Destroy session tracker
+FAIL: tools/tracker/test_event_tracker 208 - Validate empty trace
+
+PASS: ust/namespaces/test_ns_contexts_change 42 - Stop lttng tracing for session mnt_ns
+PASS: ust/namespaces/test_ns_contexts_change 43 - Destroy session mnt_ns
+PASS: ust/namespaces/test_ns_contexts_change 44 - Wait after kill session daemon
+PASS: ust/namespaces/test_ns_contexts_change 45 - Validate trace for event mnt_ns = 4026531840, 1000 events
+PASS: ust/namespaces/test_ns_contexts_change 46 - Read a total of 1000 events, expected 1000
+PASS: ust/namespaces/test_ns_contexts_change 47 - Validate trace for event mnt_ns = 4026532303, 233 events
+FAIL: ust/namespaces/test_ns_contexts_change 48 - Read a total of 233 events, expected 1000
+
+This is a hack; issue should be fixed upstream with explicit syncs.
+It has been reported here: https://bugs.lttng.org/issues/1217
+
+Upstream-Status: Inappropriate [needs a real fix]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ tests/regression/tools/tracker/test_event_tracker       | 8 ++++++++
+ tests/regression/ust/namespaces/test_ns_contexts_change | 2 ++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/tests/regression/tools/tracker/test_event_tracker b/tests/regression/tools/tracker/test_event_tracker
+index feb3787..a0f2257 100755
+--- a/tests/regression/tools/tracker/test_event_tracker
++++ b/tests/regression/tools/tracker/test_event_tracker
+@@ -130,6 +130,8 @@ function test_event_vpid_tracker()
+ 
+ 	prepare_"$domain"_app
+ 
++sleep 5
++
+ 	start_lttng_tracing_ok
+ 
+ 	if [ "$expect_event" -eq 1 ]; then
+@@ -173,6 +175,8 @@ function test_event_pid_tracker()
+ 
+ 	prepare_"$domain"_app
+ 
++sleep 5
++
+ 	start_lttng_tracing_ok
+ 
+ 	if [ "$expect_event" -eq 1 ]; then
+@@ -275,6 +279,8 @@ function test_event_vpid_track_untrack()
+ 
+ 	prepare_"$domain"_app
+ 
++sleep 5
++
+ 	start_lttng_tracing_ok
+ 
+ 	lttng_track_"$domain"_ok "--vpid ${CHILD_PID}"
+@@ -315,6 +321,8 @@ function test_event_pid_track_untrack()
+ 
+ 	prepare_"$domain"_app
+ 
++sleep 5
++
+ 	start_lttng_tracing_ok
+ 
+ 	lttng_track_"$domain"_ok "--pid ${CHILD_PID}"
+diff --git a/tests/regression/ust/namespaces/test_ns_contexts_change b/tests/regression/ust/namespaces/test_ns_contexts_change
+index c0af15e..b111bfe 100755
+--- a/tests/regression/ust/namespaces/test_ns_contexts_change
++++ b/tests/regression/ust/namespaces/test_ns_contexts_change
+@@ -79,6 +79,8 @@ function test_ns()
+ 
+ 	touch "$file_sync_before_last"
+ 
++sleep 5
++
+ 	# stop and destroy
+ 	stop_lttng_tracing_ok "$session_name"
+ 	destroy_lttng_session_ok "$session_name"
+-- 
+2.20.1
+

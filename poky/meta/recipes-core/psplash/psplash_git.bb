@@ -109,9 +109,9 @@ do_install:append() {
 	fi
 
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-		install -d ${D}${systemd_unitdir}/system
-		install -m 644 ${WORKDIR}/psplash-start.service ${D}/${systemd_unitdir}/system
-		install -m 644 ${WORKDIR}/psplash-systemd.service ${D}/${systemd_unitdir}/system
+		install -d ${D}${systemd_system_unitdir}
+		install -m 644 ${WORKDIR}/psplash-start.service ${D}/${systemd_system_unitdir}
+		install -m 644 ${WORKDIR}/psplash-systemd.service ${D}/${systemd_system_unitdir}
 	fi
 
 	install -d ${D}${bindir}

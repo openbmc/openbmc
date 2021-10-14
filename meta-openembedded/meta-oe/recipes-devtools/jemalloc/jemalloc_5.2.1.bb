@@ -7,7 +7,7 @@ DESCRIPTION = "jemalloc is a general purpose malloc(3) implementation that empha
 fragmentation avoidance and scalable concurrency support."
 
 HOMEPAGE = "https://github.com/jemalloc/jemalloc"
-LICENSE = "BSD"
+LICENSE = "BSD-2-Clause"
 
 SECTION = "libs"
 

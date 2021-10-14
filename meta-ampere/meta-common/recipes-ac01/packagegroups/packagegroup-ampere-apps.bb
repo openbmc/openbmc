@@ -31,9 +31,11 @@ RDEPENDS:${PN}-chassis = " \
 
 SUMMARY:${PN}-system = "Ampere System"
 RDEPENDS:${PN}-system = " \
+        smbios-mdr \
         "
 
 SUMMARY:${PN}-flash = "Ampere Flash"
 RDEPENDS:${PN}-flash = " \
         ampere-flash-utils \
+        phosphor-software-manager \
         "

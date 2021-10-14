@@ -16,6 +16,7 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG:append:class-target = " ${@bb.utils.filter('DISTRO_FEATURES', 'acl', d)}"
 
 PACKAGECONFIG[acl] = "--with-posix-acls,--without-posix-acls,acl"
+PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux"
 
 EXTRA_OECONF += "DEFAULT_RMT_DIR=${sbindir}"
 
@@ -64,3 +65,4 @@ BBCLASSEXTEND = "native nativesdk"
 
 # These are both specific to the NPM package node-tar
 CVE_CHECK_WHITELIST += "CVE-2021-32803 CVE-2021-32804"
+CVE_CHECK_WHITELIST += "CVE-2021-37701 CVE-2021-37712 CVE-2021-37713"

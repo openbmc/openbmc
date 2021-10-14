@@ -19,23 +19,23 @@ EXTRA_OEMAKE:class-cross = 'HOSTCC="${CC} ${CFLAGS} ${LDFLAGS}" V=1'
 inherit uboot-config
 
 do_compile () {
-	oe_runmake ${UBOOT_MACHINE}
+	oe_runmake -C ${S} O=${B} ${UBOOT_MACHINE}
 	oe_runmake envtools
 }
 
 do_install () {
 	install -d ${D}${base_sbindir}
-	install -d ${D}${sysconfdir}
-	install -m 755 ${S}/tools/env/fw_printenv ${D}${base_sbindir}/fw_printenv
-	install -m 755 ${S}/tools/env/fw_printenv ${D}${base_sbindir}/fw_setenv
+	install -m 755 ${B}/tools/env/fw_printenv ${D}${base_sbindir}/fw_printenv
+	ln -sf fw_printenv ${D}${base_sbindir}/fw_setenv
 
+	install -d ${D}${sysconfdir}
 	install -m 644 ${WORKDIR}/${ENV_CONFIG_FILE} ${D}${sysconfdir}/fw_env.config
 }
 
 do_install:class-cross () {
 	install -d ${D}${bindir_cross}
-	install -m 755 ${S}/tools/env/fw_printenv ${D}${bindir_cross}/fw_printenv
-	install -m 755 ${S}/tools/env/fw_printenv ${D}${bindir_cross}/fw_setenv
+	install -m 755 ${B}/tools/env/fw_printenv ${D}${bindir_cross}/fw_printenv
+	ln -sf fw_printenv ${D}${bindir_cross}/fw_setenv
 }
 
 SYSROOT_DIRS:append:class-cross = " ${bindir_cross}"

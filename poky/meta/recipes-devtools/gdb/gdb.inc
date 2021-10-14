@@ -1,6 +1,6 @@
 require gdb-common.inc
 
-inherit gettext
+inherit gettext pkgconfig
 
 #LDFLAGS:append = " -s"
 #export CFLAGS:append=" -L${STAGING_LIBDIR}"

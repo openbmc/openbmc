@@ -8,15 +8,18 @@ Only use autogen.sh to generate configure.ac.
 Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
+refresh patch to 4.0
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- autogen.sh | 8 --------
- 1 file changed, 8 deletions(-)
+ autogen.sh | 9 ---------
+ 1 file changed, 9 deletions(-)
 
 diff --git a/autogen.sh b/autogen.sh
-index df734ce9..d7bbf8cb 100755
+index cf5d7057..cb73cf9d 100755
 --- a/autogen.sh
 +++ b/autogen.sh
-@@ -52,11 +52,3 @@ cat configure.seed | sed \
+@@ -52,12 +52,3 @@ cat configure.seed | sed \
      -e "s/@NDPI_VERSION_SHORT@/$NDPI_VERSION_SHORT/g" \
      -e "s/@FUZZY@/$FUZZY/g" \
      > configure.ac
@@ -25,6 +28,7 @@ index df734ce9..d7bbf8cb 100755
 -cat configure | sed "s/#define PACKAGE/#define NDPI_PACKAGE/g" | sed "s/#define VERSION/#define NDPI_VERSION/g"  > configure.tmp
 -cat configure.tmp > configure
 -
+-echo "./configure $@"
 -chmod +x configure
 -./configure $@
 -

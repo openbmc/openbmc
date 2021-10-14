@@ -13,7 +13,7 @@ LICENSE = "GPLv3"
 
 DEPENDS = "flex-native bison-native zlib-native gnu-config-native autoconf-native"
 
-inherit autotools gettext multilib_header texinfo
+inherit autotools gettext multilib_header pkgconfig texinfo
 
 FILES:${PN} = " \
 	${bindir}/${TARGET_PREFIX}* \

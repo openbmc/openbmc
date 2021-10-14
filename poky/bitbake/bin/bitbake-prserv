@@ -6,6 +6,8 @@
 import os
 import sys,logging
 import optparse
+import warnings
+warnings.simplefilter("default")
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)),'lib'))
 

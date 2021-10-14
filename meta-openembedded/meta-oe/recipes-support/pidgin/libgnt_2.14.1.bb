@@ -5,7 +5,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c9a1abacd0166f595a9fbe6afb1f0d5e"
 DEPENDS = "glib-2.0 ncurses libxml2 glib-2.0-native"
 
-inherit meson
+inherit meson pkgconfig
 
 # SRCREV = "0a44b1d01c41"
 # SRC_URI = "hg://keep.imfreedom.org/${BPN};module=${BPN}

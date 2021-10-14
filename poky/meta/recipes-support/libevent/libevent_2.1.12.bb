@@ -8,7 +8,7 @@ HOMEPAGE = "http://libevent.org/"
 BUGTRACKER = "https://github.com/libevent/libevent/issues"
 SECTION = "libs"
 
-LICENSE = "BSD & MIT"
+LICENSE = "BSD-3-Clause & MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=17f20574c0b154d12236d5fbe964f549"
 
 SRC_URI = "https://github.com/libevent/libevent/releases/download/release-${PV}-stable/${BP}-stable.tar.gz \
@@ -16,6 +16,8 @@ SRC_URI = "https://github.com/libevent/libevent/releases/download/release-${PV}-
            file://run-ptest \
            file://0001-test-regress_dns.c-patch-out-tests-that-require-a-wo.patch \
            file://0002-test-regress.h-Increase-default-timeval-tolerance-50.patch \
+           file://0003-test-mark-util-monotonic_prc_fallback-as-retriable.patch \
+           file://0004-test-retriable-tests-are-marked-failed-only-when-all-a.patch \
            "
 
 SRC_URI[sha256sum] = "92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb"
@@ -56,7 +58,7 @@ do_install_ptest() {
 	do
 		install -m 0755 $file ${D}${PTEST_PATH}/test
 	done
-        
+
         # handle multilib
         sed -i s:@libdir@:${libdir}:g ${D}${PTEST_PATH}/run-ptest
 }

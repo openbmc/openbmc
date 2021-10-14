@@ -12,17 +12,17 @@ PACKAGES = " \
 PROVIDES += "virtual/obmc-flash-mgmt"
 PROVIDES += "virtual/obmc-system-mgmt"
 
-RPROVIDES_${PN}-flash += "virtual-obmc-flash-mgmt"
-RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
+RPROVIDES:${PN}-flash += "virtual-obmc-flash-mgmt"
+RPROVIDES:${PN}-system += "virtual-obmc-system-mgmt"
 
-SUMMARY_${PN}-flash = "ASRock Flash"
-RDEPENDS_${PN}-flash = " \
+SUMMARY:${PN}-flash = "ASRock Flash"
+RDEPENDS:${PN}-flash = " \
 	obmc-control-bmc \
 	phosphor-ipmi-flash \
 	"
 
-SUMMARY_${PN}-system = "ASRock System"
-RDEPENDS_${PN}-system = " \
+SUMMARY:${PN}-system = "ASRock System"
+RDEPENDS:${PN}-system = " \
 	bmcweb \
 	entity-manager \
 	dbus-sensors \

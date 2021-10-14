@@ -22,6 +22,9 @@
 # is stored where it can be installed into associated initramfs rootfs.
 STAGING_VERITY_DIR ?= "${TMPDIR}/work-shared/${MACHINE}/dm-verity"
 
+# Define the data block size to use in veritysetup.
+DM_VERITY_IMAGE_DATA_BLOCK_SIZE ?= "1024"
+
 # Process the output from veritysetup and generate the corresponding .env
 # file. The output from veritysetup is not very machine-friendly so we need to
 # convert it to some better format. Let's drop the first line (doesn't contain
@@ -57,7 +60,7 @@ verity_setup() {
 
     # Let's drop the first line of output (doesn't contain any useful info)
     # and feed the rest to another function.
-    veritysetup --data-block-size=1024 --hash-offset=$SIZE format $OUTPUT $OUTPUT | tail -n +2 | process_verity
+    veritysetup --data-block-size=${DM_VERITY_IMAGE_DATA_BLOCK_SIZE} --hash-offset=$SIZE format $OUTPUT $OUTPUT | tail -n +2 | process_verity
 }
 
 VERITY_TYPES = "ext2.verity ext3.verity ext4.verity btrfs.verity"

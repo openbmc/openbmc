@@ -7,7 +7,7 @@ PYPI_PACKAGE = "systemd-python"
 DEPENDS += "systemd (<=234)"
 RDEPENDS:${PN} += "systemd ${PYTHON_PN}-syslog ${PYTHON_PN}-logging python3-syslog"
 REQUIRED_DISTRO_FEATURES = "systemd"
-inherit pypi features_check setuptools3
+inherit pypi features_check pkgconfig setuptools3
 
 SRC_URI[md5sum] = "5071ea5bcb976186e92a3f5e75df221d"
 SRC_URI[sha256sum] = "fd0e44bf70eadae45aadc292cb0a7eb5b0b6372cd1b391228047d33895db83e7"

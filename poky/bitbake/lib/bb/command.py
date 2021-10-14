@@ -667,6 +667,16 @@ class CommandsAsync:
         command.finishAsyncCommand()
     findFilesMatchingInDir.needcache = False
 
+    def testCookerCommandEvent(self, command, params):
+        """
+        Dummy command used by OEQA selftest to test tinfoil without IO
+        """
+        pattern = params[0]
+
+        command.cooker.testCookerCommandEvent(pattern)
+        command.finishAsyncCommand()
+    testCookerCommandEvent.needcache = False
+
     def findConfigFilePath(self, command, params):
         """
         Find the path of the requested configuration file

@@ -15,6 +15,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e \
 
 inherit autotools pkgconfig systemd update-rc.d update-alternatives
 
+CVE_PRODUCT = "connman connection_manager"
+
 DEPENDS  = "dbus glib-2.0 ppp"
 
 EXTRA_OECONF += "\
@@ -36,7 +38,7 @@ PACKAGECONFIG ??= "wispr iptables client\
 # local.conf or distro config
 # PACKAGECONFIG:append:pn-connman = " openvpn vpnc l2tp pptp"
 
-PACKAGECONFIG[systemd] = "--with-systemdunitdir=${systemd_unitdir}/system/ --with-tmpfilesdir=${sysconfdir}/tmpfiles.d/,--with-systemdunitdir='' --with-tmpfilesdir=''"
+PACKAGECONFIG[systemd] = "--with-systemdunitdir=${systemd_system_unitdir}/ --with-tmpfilesdir=${sysconfdir}/tmpfiles.d/,--with-systemdunitdir='' --with-tmpfilesdir=''"
 PACKAGECONFIG[wifi] = "--enable-wifi, --disable-wifi, wpa-supplicant, wpa-supplicant"
 PACKAGECONFIG[bluez] = "--enable-bluetooth, --disable-bluetooth, bluez5, bluez5"
 PACKAGECONFIG[3g] = "--enable-ofono, --disable-ofono, ofono, ofono"
@@ -173,13 +175,13 @@ VPN technogies are implemented using plug-ins."
 FILES:${PN}-vpn += "${sbindir}/connman-vpnd \
                     ${sysconfdir}/dbus-1/system.d/connman-vpn-dbus.conf \
                     ${datadir}/dbus-1/system-services/net.connman.vpn.service \
-                    ${systemd_unitdir}/system/connman-vpn.service"
+                    ${systemd_system_unitdir}/connman-vpn.service"
 
 SUMMARY:${PN}-wait-online = "A program that will return once ConnMan has connected to a network"
 DESCRIPTION:${PN}-wait-online = "A service that can be enabled so that \
 the system waits until a network connection is established."
 FILES:${PN}-wait-online += "${sbindir}/connmand-wait-online \
-                            ${systemd_unitdir}/system/connman-wait-online.service"
+                            ${systemd_system_unitdir}/connman-wait-online.service"
 
 SUMMARY:${PN}-plugin-vpn-openvpn = "An OpenVPN plugin for ConnMan VPN"
 DESCRIPTION:${PN}-plugin-vpn-openvpn = "The ConnMan OpenVPN plugin uses openvpn client \

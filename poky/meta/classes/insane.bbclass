@@ -780,7 +780,7 @@ def package_qa_check_rdepends(pkg, pkgdest, skip, taskdeps, packages, d):
             filerdepends = {}
             rdep_data = oe.packagedata.read_subpkgdata(pkg, d)
             for key in rdep_data:
-                if key.startswith("FILERDEPENDS_"):
+                if key.startswith("FILERDEPENDS:"):
                     for subkey in bb.utils.explode_deps(rdep_data[key]):
                         if subkey not in ignored_file_rdeps and \
                                 not subkey.startswith('perl('):

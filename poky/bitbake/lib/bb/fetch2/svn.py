@@ -57,7 +57,12 @@ class Svn(FetchMethod):
         if 'rev' in ud.parm:
             ud.revision = ud.parm['rev']
 
-        ud.localfile = d.expand('%s_%s_%s_%s_.tar.gz' % (ud.module.replace('/', '.'), ud.host, ud.path.replace('/', '.'), ud.revision))
+        # Whether to use the @REV peg-revision syntax in the svn command or not
+        ud.pegrevision = True
+        if 'nopegrevision' in ud.parm:
+            ud.pegrevision = False
+
+        ud.localfile = d.expand('%s_%s_%s_%s_%s.tar.gz' % (ud.module.replace('/', '.'), ud.host, ud.path.replace('/', '.'), ud.revision, ["0", "1"][ud.pegrevision]))
 
     def _buildsvncommand(self, ud, d, command):
         """
@@ -98,7 +103,8 @@ class Svn(FetchMethod):
 
             if ud.revision:
                 options.append("-r %s" % ud.revision)
-                suffix = "@%s" % (ud.revision)
+                if ud.pegrevision:
+                    suffix = "@%s" % (ud.revision)
 
             if command == "fetch":
                 transportuser = ud.parm.get("transportuser", "")

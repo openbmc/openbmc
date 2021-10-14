@@ -321,7 +321,7 @@ Project Build Host:
 
    -  gcc &MIN_GCC_VERSION; or greater.
 
-   If your build host does not meet any of these three listed version
+   If your build host does not meet any of these listed version
    requirements, you can take steps to prepare the system so that you
    can still use the Yocto Project. See the
    ":ref:`ref-manual/system-requirements:required git, tar, python and gcc versions`"

@@ -1,4 +1,4 @@
-From 65c15247d268566b79e4595b8e734b7e40679d75 Mon Sep 17 00:00:00 2001
+From 52953ab99c727a19e88243dda2702d6814f7974d Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Wed, 4 Nov 2020 08:55:10 +0000
 Subject: [PATCH] Makefile.in: don't use the internal lua
@@ -15,18 +15,18 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 2 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 143535746..fc06a5341 100755
+index e67623bec..99cb9f06e 100755
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -40,7 +40,6 @@ endif
- 
+@@ -31,7 +31,6 @@ MONGOOSE_INC=-I$(MONGOOSE_HOME)
+ LUA_PLATFORM=generi
  LUA_HOME=${PWD}/third-party/lua-5.3.5
  LUA_INC=-I$(LUA_HOME)/src
 -LUA_LIB=$(LUA_HOME)/src/liblua.a
  
- ######
- LIBRRDTOOL_HOME=${PWD}/third-party/rrdtool-1.4.8
-@@ -118,7 +117,6 @@ RPM_PKG = $(TARGET)-$(NTOPNG_VERSION)-@REVISION@.$(PLATFORM).rpm
+ ifeq ($(OS),Linux)
+ 	LUA_PLATFORM=linux
+@@ -123,7 +122,6 @@ RPM_PKG = $(TARGET)-$(NTOPNG_VERSION)-@REVISION@.$(PLATFORM).rpm
  RPM_DATA_PKG = $(TARGET)-data-$(NTOPNG_VERSION)-@REVISION@.noarch.rpm
  ######
  
@@ -35,5 +35,5 @@ index 143535746..fc06a5341 100755
  ifneq ($(HAS_ZEROMQ), 0)
  LIB_TARGETS += $(ZEROMQ_LIB)
 -- 
-2.26.2
+2.17.1
 

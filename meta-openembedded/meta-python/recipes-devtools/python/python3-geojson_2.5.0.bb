@@ -1,6 +1,6 @@
 SUMMARY = "Python bindings and utilities for GeoJSON"
 HOMEPAGE = "https://pypi.org/project/geojson/"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=f48972abe5cddee79e301574742ed745"
 
 SRC_URI[md5sum] = "14753ed28678828b1de73f68b04e2324"

@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "3c3481ae0599e1c2d30b7ed54ab45249127533ab2f20e768a0ae58d855
 
 DEPENDS = "gd "
 
-inherit autotools gettext
+inherit autotools gettext pkgconfig
 
 do_configure:prepend() {
 	sed -i "s#AC_PATH_PROG(GDLIB_CONFIG,gdlib-config)#AC_PATH_PROG([GDLIB_CONFIG],[gdlib-config], ,[${STAGING_BINDIR_CROSS}])#" ${S}/configure.ac

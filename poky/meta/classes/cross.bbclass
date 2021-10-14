@@ -72,10 +72,6 @@ libexecdir = "${exec_prefix}/libexec/${CROSS_TARGET_SYS_DIR}"
 do_populate_sysroot[sstate-inputdirs] = "${SYSROOT_DESTDIR}/${STAGING_DIR_NATIVE}/"
 do_packagedata[stamp-extra-info] = ""
 
-do_install () {
-	oe_runmake 'DESTDIR=${D}' install
-}
-
 USE_NLS = "no"
 
 export CC = "${BUILD_CC}"

@@ -1,5 +1,5 @@
 SUMMARY = "Send file to trash natively under Mac OS X, Windows and Linux"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a02659c2d5f4cc626e4dcf6504b865eb"
 
 inherit pypi setuptools3

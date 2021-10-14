@@ -346,6 +346,8 @@ def wic_init_parser_create(subparser):
                       default=False, help="output debug information")
     subparser.add_argument("-i", "--imager", dest="imager",
                       default="direct", help="the wic imager plugin")
+    subparser.add_argument("--extra-space", type=int, dest="extra_space",
+                      default=0, help="additional free disk space to add to the image")
     return
 
 

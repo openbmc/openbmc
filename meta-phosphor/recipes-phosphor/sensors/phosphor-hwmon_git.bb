@@ -45,7 +45,7 @@ RDEPENDS:max31785-msl = "${VIRTUAL-RUNTIME_base-utils} i2c-tools bash"
 
 SRC_URI += "git://github.com/openbmc/phosphor-hwmon"
 
-SRCREV = "04da055198fe03f119e53578ac80a6188461b748"
+SRCREV = "3a816147e3e1e1196e7da61b26ccbd01fdbbf6c2"
 
 S = "${WORKDIR}/git"
 
@@ -55,7 +55,7 @@ S = "${WORKDIR}/git"
 # 2. For each hwmon the script generates busconfig ACLs.
 pkg_postinst:${PN}() {
     hwmon_dir="$D/etc/default/obmc/hwmon"
-    dbus_dir="$D/etc/dbus-1/system.d"
+    dbus_dir="$D/${datadir}/dbus-1/system.d"
 
     if [ -n "$D" -a -d "${hwmon_dir}" ]; then
         # Remove existing links and replace with actual copy of the file to prevent

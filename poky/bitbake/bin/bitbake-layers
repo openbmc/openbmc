@@ -14,6 +14,8 @@ import logging
 import os
 import sys
 import argparse
+import warnings
+warnings.simplefilter("default")
 
 bindir = os.path.dirname(__file__)
 topdir = os.path.dirname(bindir)

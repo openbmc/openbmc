@@ -4,13 +4,10 @@ EXTRA_OEMESON:append:mihawk = "-Dnegative-errno-on-fail=true"
 
 SRC_URI:append:ibm-ac-server = " \
            file://70-hwmon.rules \
-           file://70-max31785-hwmon.rules \
-           file://start_max31785_hwmon.sh \
            "
 
 CHIPS:witherspoon = " \
-               bus@1e78a000/i2c-bus@100/max31785@52_air \
-               bus@1e78a000/i2c-bus@100/max31785@52_water \
+               bus@1e78a000/i2c-bus@100/max31785@52 \
                bus@1e78a000/i2c-bus@100/power-supply@68 \
                bus@1e78a000/i2c-bus@100/power-supply@69 \
                bus@1e78a000/i2c-bus@100/bmp280@77 \
@@ -22,8 +19,7 @@ CHIPS:witherspoon = " \
                bus@1e78a000/i2c-bus@380/tmp275@4a \
                "
 CHIPS:swift = " \
-               bus@1e78a000/i2c-bus@100/max31785@52_air \
-               bus@1e78a000/i2c-bus@100/max31785@52_water \
+               bus@1e78a000/i2c-bus@100/max31785@52 \
                bus@1e78a000/i2c-bus@100/power-supply@68 \
                bus@1e78a000/i2c-bus@100/power-supply@69 \
                bus@1e78a000/i2c-bus@440/tmp275@4a \
@@ -61,8 +57,7 @@ CHIPS:mihawk = " \
                "
 
 CHIPS:witherspoon-tacoma = " \
-               bus@1e78a000/i2c-bus@200/max31785@52_air \
-               bus@1e78a000/i2c-bus@200/max31785@52_water \
+               bus@1e78a000/i2c-bus@200/max31785@52 \
                bus@1e78a000/i2c-bus@200/power-supply@68 \
                bus@1e78a000/i2c-bus@200/power-supply@69 \
                bus@1e78a000/i2c-bus@200/bmp280@77 \
@@ -117,12 +112,3 @@ PACKAGECONFIG:append:ibm-ac-server = " max31785-msl"
 SYSTEMD_ENVIRONMENT_FILE:max31785-msl:append:ibm-ac-server = " obmc/hwmon-max31785/max31785.conf"
 SYSTEMD_LINK:max31785-msl:append:ibm-ac-server = " ../phosphor-max31785-msl@.service:multi-user.target.wants/phosphor-max31785-msl@${MACHINE}.service"
 
-SYSTEMD_SERVICE:${PN}:append:ibm-ac-server = " max31785-hwmon-helper@.service"
-
-do_install:append:ibm-ac-server() {
-    install -d ${D}/${nonarch_base_libdir}/udev/rules.d/
-    install -m 0644 ${WORKDIR}/70-max31785-hwmon.rules ${D}/${nonarch_base_libdir}/udev/rules.d/
-
-    install -d ${D}${bindir}
-    install -m 0755 ${WORKDIR}/start_max31785_hwmon.sh ${D}${bindir}
-}

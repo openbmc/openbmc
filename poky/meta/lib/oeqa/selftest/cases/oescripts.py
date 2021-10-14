@@ -150,7 +150,7 @@ class OEListPackageconfigTests(OEScriptTests):
         expected_endlines = []
         expected_endlines.append("RECIPE NAME                  PACKAGECONFIG FLAGS")
         expected_endlines.append("pinentry                     gtk2 libcap ncurses qt secret")
-        expected_endlines.append("tar                          acl")
+        expected_endlines.append("tar                          acl selinux")
 
         self.check_endlines(results, expected_endlines)
 

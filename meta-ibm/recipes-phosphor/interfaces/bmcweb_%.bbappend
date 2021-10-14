@@ -1,6 +1,7 @@
 EXTRA_OEMESON:append = " \
     -Dinsecure-tftp-update=enabled \
     -Dibm-management-console=enabled \
+    -Dredfish-new-powersubsystem-thermalsubsystem=enabled \
 "
 
 inherit obmc-phosphor-discovery-service

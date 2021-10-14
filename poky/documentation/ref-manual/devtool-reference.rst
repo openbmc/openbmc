@@ -78,7 +78,7 @@ has a number of sub-commands for each function. You can run
 
 As directed in the general help output, you can
 get more syntax on a specific command by providing the command name and
-using "--help"::
+using ``--help``::
 
    $ devtool add --help
    NOTE: Starting bitbake server...
@@ -284,10 +284,7 @@ is identified using the ``EDITOR`` variable, on the specified recipe.
 When you use the ``devtool edit-recipe`` command, you must supply the
 root name of the recipe (i.e. no version, paths, or extensions). Also,
 the recipe file itself must reside in the workspace as a result of the
-``devtool add`` or ``devtool upgrade`` commands. However, you can
-override that requirement by using the "-a" or "--any-recipe" option.
-Using either of these options allows you to edit any recipe regardless
-of its location.
+``devtool add`` or ``devtool upgrade`` commands.
 
 .. _devtool-updating-a-recipe:
 
@@ -331,23 +328,37 @@ Checking on the Upgrade Status of a Recipe
 Upstream recipes change over time. Consequently, you might find that you
 need to determine if you can upgrade a recipe to a newer version.
 
-To check on the upgrade status of a recipe, use the
-``devtool check-upgrade-status`` command. The command displays a table
-of your current recipe versions, the latest upstream versions, the email
-address of the recipe's maintainer, and any additional information such
-as commit hash strings and reasons you might not be able to upgrade a
-particular recipe.
+To check on the upgrade status of a recipe, you can use the
+``devtool latest-version recipe`` command, which quickly shows the current
+version and the latest version available upstream. To get a more global
+picture, use the ``devtool check-upgrade-status`` command, which takes a
+list of recipes as input, or no arguments, in which case it checks all
+available recipes. This command will only print the recipes for which
+a new upstream version is available. Each such recipe will have its current
+version and latest upstream version, as well as the email of the maintainer
+and any additional information such as the commit hash or reason for not
+being able to upgrade it, displayed in a table.
+
+This upgrade checking mechanism relies on the optional :term:`UPSTREAM_CHECK_URI`,
+:term:`UPSTREAM_CHECK_REGEX`, :term:`UPSTREAM_CHECK_GITTAGREGEX`,
+:term:`UPSTREAM_CHECK_COMMITS` and :term:`UPSTREAM_VERSION_UNKNOWN`
+variables in package recipes.
 
 .. note::
+
+   -  Most of the time, the above variables are unnecessary. They are only
+      required when upstream does something unusual, and default
+      mechanisms cannot find the new upstream versions.
 
    -  For the ``oe-core`` layer, recipe maintainers come from the
       :yocto_git:`maintainers.inc </poky/tree/meta/conf/distro/include/maintainers.inc>`
       file.
 
    -  If the recipe is using the :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-fetching:git fetcher (\`\`git://\`\`)`
-      rather than a
-      tarball, the commit hash points to the commit that matches the
-      recipe's latest version tag.
+      rather than a tarball, the commit hash points to the commit that matches
+      the recipe's latest version tag, or in the absence of suitable tags,
+      to the latest commit (when :term:`UPSTREAM_CHECK_COMMITS` set to ``1``
+      in the recipe).
 
 As with all ``devtool`` commands, you can get help on the individual
 command::
@@ -372,29 +383,25 @@ Following is a partial example table that reports on all the recipes.
 Notice the reported reason for not upgrading the ``base-passwd`` recipe.
 In this example, while a new version is available upstream, you do not
 want to use it because the dependency on ``cdebconf`` is not easily
-satisfied.
-
-.. note::
-
-   When a reason for not upgrading displays, the reason is usually
-   written into the recipe using the ``RECIPE_NO_UPDATE_REASON``
-   variable. See the
-   :yocto_git:`base-passwd.bb </poky/tree/meta/recipes-core/base-passwd/base-passwd_3.5.29.bb>`
-   recipe for an example.
+satisfied. Maintainers can explicit the reason that is shown by adding
+the :term:`RECIPE_NO_UPDATE_REASON` variable to the corresponding recipe.
+See :yocto_git:`base-passwd.bb </poky/tree/meta/recipes-core/base-passwd/base-passwd_3.5.29.bb>`
+for an example.
 
 ::
 
    $ devtool check-upgrade-status
    ...
-   NOTE: acpid 2.0.30 2.0.31 Ross Burton <ross.burton@intel.com>
-   NOTE: u-boot-fw-utils 2018.11 2019.01 Marek Vasut <marek.vasut@gmail.com> d3689267f92c5956e09cc7d1baa4700141662bff
-   NOTE: u-boot-tools 2018.11 2019.01 Marek Vasut <marek.vasut@gmail.com> d3689267f92c5956e09cc7d1baa4700141662bff
-   .
-   .
-   .
-   NOTE: base-passwd 3.5.29 3.5.45 Anuj Mittal <anuj.mittal@intel.com> cannot be updated due to: Version 3.5.38 requires cdebconf for update-passwd utility
-   NOTE: busybox 1.29.2 1.30.0 Andrej Valek <andrej.valek@siemens.com>
-   NOTE: dbus-test 1.12.10 1.12.12 Chen Qi <Qi.Chen@windriver.com>
+   INFO: bind                      9.16.20         9.16.21         Armin Kuster <akuster808@gmail.com>
+   INFO: inetutils                 2.1             2.2             Tom Rini <trini@konsulko.com>
+   INFO: iproute2                  5.13.0          5.14.0          Changhyeok Bae <changhyeok.bae@gmail.com>
+   INFO: openssl                   1.1.1l          3.0.0           Alexander Kanavin <alex.kanavin@gmail.com>
+   INFO: base-passwd               3.5.29          3.5.51          Anuj Mittal <anuj.mittal@intel.com>  cannot be updated due to: Version 3.5.38 requires cdebconf for update-passwd utility
+   ...
+
+Last but not least, you may set :term:`UPSTREAM_VERSION_UNKNOWN` to ``1``
+in a recipe when there's currently no way to determine its latest upstream
+version.
 
 .. _devtool-upgrading-a-recipe:
 
@@ -471,7 +478,7 @@ Use the ``devtool build`` command to build your recipe. The
 
 When you use the ``devtool build`` command, you must supply the root
 name of the recipe (i.e. do not provide versions, paths, or extensions).
-You can use either the "-s" or the "--disable-parallel-make" options to
+You can use either the ``-s`` or the ``--disable-parallel-make`` options to
 disable parallel makes during the build. Here is an example::
 
    $ devtool build recipe

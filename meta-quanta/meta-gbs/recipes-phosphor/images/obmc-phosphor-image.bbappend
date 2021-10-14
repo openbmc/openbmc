@@ -28,8 +28,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-hwmon"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-inventory-manager"
 # Required for obmc-bmcweb
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " bmcweb"
-OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-bmcweb-cert-config"
-OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-nslcd-authority-cert-config"
+OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-certificate-manager"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " phosphor-user-manager"
 # Required for LEDs. Part of obmc-leds
 OBMC_IMAGE_EXTRA_INSTALL:append:gbs = " ${VIRTUAL-RUNTIME_obmc-leds-manager}"

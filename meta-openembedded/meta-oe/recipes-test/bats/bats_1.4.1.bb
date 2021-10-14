@@ -14,6 +14,12 @@ SRCREV = "54e965fa9d269c2b3ff9036d81f32bac3df0edea"
 
 S = "${WORKDIR}/git"
 
+do_configure:prepend() {
+	sed -i 's:\$BATS_ROOT/lib:\$BATS_ROOT/${baselib}:g' ${S}/libexec/bats-core/bats
+	sed -i 's:\$BATS_ROOT/lib:\$BATS_ROOT/${baselib}:g' ${S}/libexec/bats-core/bats-exec-file
+	sed -i 's:\$BATS_ROOT/lib:\$BATS_ROOT/${baselib}:g' ${S}/libexec/bats-core/bats-exec-test
+}
+
 do_install() {
 	# Just a bunch of bash scripts to install
 	${S}/install.sh ${D}${prefix} ${baselib}

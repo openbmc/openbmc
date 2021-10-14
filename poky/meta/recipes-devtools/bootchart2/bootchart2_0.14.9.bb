@@ -129,7 +129,7 @@ do_install () {
     export DESTDIR="${D}"
     export LIBDIR="${base_libdir}"
     export PKGLIBDIR="${base_libdir}/bootchart"
-    export SYSTEMD_UNIT_DIR="${systemd_unitdir}/system"
+    export SYSTEMD_UNIT_DIR="${systemd_system_unitdir}"
 
     oe_runmake install
     install -d ${D}${sysconfdir}/init.d
