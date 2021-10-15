@@ -21,7 +21,9 @@ EXTRA_IBM_LOGGING_PKGS = ""
 EXTRA_IBM_LOGGING_PKGS:witherspoon = "ibm-logging"
 EXTRA_IBM_LOGGING_PKGS:witherspoon-tacoma = ""
 EXTRA_IBM_LOGGING_PKGS:mihawk = "ibm-logging"
-
+EXTRA_IBM_LOGGING_PKGS:p10bmc = " \
+    python3-sbe-log-parsers \
+"
 RDEPENDS:${PN}-inventory:append:ibm-ac-server = " openpower-fru-vpd openpower-occ-control phosphor-cooling-type virtual/obmc-gpio-presence"
 RDEPENDS:${PN}-inventory:append:p10bmc = " openpower-fru-vpd openpower-occ-control virtual/obmc-gpio-presence"
 RDEPENDS:${PN}-inventory:append:mihawk = " openpower-fru-vpd openpower-occ-control virtual/obmc-gpio-presence id-button phosphor-cooling-type"
