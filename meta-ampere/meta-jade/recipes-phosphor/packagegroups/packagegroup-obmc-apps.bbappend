@@ -2,6 +2,7 @@ RDEPENDS:${PN}-extras:append:mtjade = " \
                                        webui-vue \
                                        phosphor-image-signing \
                                        phosphor-virtual-sensor \
+                                       phosphor-misc-usb-ctrl \
                                      "
 
 RDEPENDS:${PN}-inventory:append:mtjade = " \
