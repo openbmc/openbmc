@@ -46,30 +46,26 @@ of supported hardware targets, see the following example:
 $ . setup <machine> [build_dir]
 Target machine must be specified. Use one of:
 
-centriq2400-rep         f0b                     fp5280g2
-gsj                     hr630                   hr855xg2
-lanyang                 mihawk                  msn
-neptune                 nicole                  olympus
-olympus-nuvoton         on5263m5                p10bmc
-palmetto                qemuarm                 quanta-q71l
-romulus                 s2600wf                 stardragon4800-rep2
-swift                   tiogapass               vesnin
-witherspoon             witherspoon-tacoma      yosemitev2
-zaius
+bletchley               hr630                   quanta-q71l
+centriq2400-rep         hr855xg2                romulus
+dl360poc                kudo                    s2600wf
+e3c246d4i               lanyang                 stardragon4800-rep2
+ethanolx                mihawk                  swift
+evb-ast2500             mtjade                  thor
+evb-ast2600             neptune                 tiogapass
+evb-npcm750             nicole                  transformers
+evb-zx3-pm3             olympus                 witherspoon
+f0b                     olympus-nuvoton         witherspoon-tacoma
+fp5280g2                on5263m5                x11spi
+g220a                   p10bmc                  yosemitev2
+gbs                     palmetto                zaius
+gsj                     qemuarm
 ```
 
 Once you know the target (e.g. romulus), source the `setup` script as follows:
 
 ```
 . setup romulus
-```
-
-For evb-ast2500, please use the below command to specify the machine config,
-because the machine in `meta-aspeed` layer is in a BSP layer and does not
-build the openbmc image.
-
-```
-TEMPLATECONF=meta-evb/meta-evb-aspeed/meta-evb-ast2500/conf . openbmc-env
 ```
 
 ### 4) Build
