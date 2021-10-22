@@ -91,7 +91,6 @@ DISTRO_FEATURES_OBMC = " \
         obmc-phosphor-chassis-mgmt \
         obmc-phosphor-fan-mgmt \
         obmc-phosphor-flash-mgmt \
-        obmc-phosphor-system-mgmt \
         "
 
 DISTRO_FEATURES_DEFAULT = " \
