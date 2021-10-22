@@ -1,6 +1,6 @@
 require conf/machine/include/facebook.inc
 
-OBMC_MACHINE_FEATURES += "\
+MACHINE_FEATURES += "\
         obmc-chassis-state-mgmt \
         obmc-host-ipmi \
         obmc-host-state-mgmt \

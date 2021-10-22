@@ -1,4 +1,4 @@
-OBMC_MACHINE_FEATURES += "\
+MACHINE_FEATURES += "\
         obmc-bmc-state-mgmt \
         obmc-phosphor-fan-mgmt \
         obmc-phosphor-flash-mgmt \
