@@ -24,7 +24,7 @@ S = "${WORKDIR}/git"
 APPS =  " \
         checkstop \
         watchdog \
-        ${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'phal', '', 'watchdog-timeout', d)} \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'phal', '', 'watchdog-timeout', d)} \
         "
 
 DEBUG_TMPL = "openpower-debug-collector-{0}@.service"

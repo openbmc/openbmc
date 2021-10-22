@@ -11,7 +11,7 @@ FILES:${PN}:append:p10bmc = " ${datadir}/phosphor-logging/pels/ibm,rainier-4u_de
 FILES:${PN}:append:p10bmc = " ${datadir}/phosphor-logging/pels/ibm,everest_dev_callouts.json"
 
 #Enable phal feature, if available.
-PACKAGECONFIG:append = " ${@bb.utils.filter('OBMC_MACHINE_FEATURES', 'phal', d)}"
+PACKAGECONFIG:append = " ${@bb.utils.filter('MACHINE_FEATURES', 'phal', d)}"
 PACKAGECONFIG[phal] = "-Dphal=enabled, -Dphal=disabled, pdata libekb pdbg"
 
 do_install:append:p10bmc() {

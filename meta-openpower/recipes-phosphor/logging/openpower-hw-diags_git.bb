@@ -30,6 +30,6 @@ DEPENDS = "boost libgpiod pdbg phosphor-logging sdbusplus openpower-libhei \
 RDEPENDS:${PN} += "openpower-libhei"
 
 # Conditionally pull in PHAL APIs, if available.
-PACKAGECONFIG ??= "${@bb.utils.filter('OBMC_MACHINE_FEATURES', 'phal', d)}"
+PACKAGECONFIG ??= "${@bb.utils.filter('MACHINE_FEATURES', 'phal', d)}"
 PACKAGECONFIG[phal] = "-Dphal=enabled, -Dphal=disabled, ipl pdata"
 

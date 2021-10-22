@@ -43,7 +43,7 @@ EXTRA_OEMESON = " \
              -Dyamldir=${STAGING_DATADIR_NATIVE}/${PN} \
              -Dps-derating-factor=${POWER_SUPPLY_DERATING_FACTOR} \
              "
-EXTRA_OEMESON:append = "${@bb.utils.contains('OBMC_MACHINE_FEATURES', 'i2c-occ', ' -Di2c-occ=enabled', '', d)}"
+EXTRA_OEMESON:append = "${@bb.utils.contains('MACHINE_FEATURES', 'i2c-occ', ' -Di2c-occ=enabled', '', d)}"
 
 OCC_ENABLE = "enable"
 OCC_DISABLE = "disable"
