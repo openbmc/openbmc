@@ -110,10 +110,6 @@ DISTRO_FEATURES += " \
         ${DISTRO_FEATURES_OBMC} \
         "
 
-MACHINE_FEATURES += " \
-        ${OBMC_MACHINE_FEATURES} \
-        "
-
 DISTRO_EXTRA_RDEPENDS:remove:qemuarm = "packagegroup-core-device-devel"
 
 include conf/distro/include/openbmc-phosphor/${MACHINE}.inc
