@@ -46,20 +46,17 @@ of supported hardware targets, see the following example:
 $ . setup <machine> [build_dir]
 Target machine must be specified. Use one of:
 
-bletchley               hr630                   quanta-q71l
-centriq2400-rep         hr855xg2                romulus
+bletchley               gsj                     romulus
 dl360poc                kudo                    s2600wf
-e3c246d4i               lanyang                 stardragon4800-rep2
-ethanolx                mihawk                  swift
-evb-ast2500             mtjade                  thor
-evb-ast2600             neptune                 tiogapass
-evb-npcm750             nicole                  transformers
-evb-zx3-pm3             olympus                 witherspoon
-f0b                     olympus-nuvoton         witherspoon-tacoma
-fp5280g2                on5263m5                x11spi
-g220a                   p10bmc                  yosemitev2
-gbs                     palmetto                zaius
-gsj                     qemuarm
+e3c246d4i               mihawk                  swift
+ethanolx                mtjade                  tiogapass
+evb-ast2500             nicole                  transformers
+evb-ast2600             olympus-nuvoton         witherspoon
+evb-npcm750             on5263m5                witherspoon-tacoma
+f0b                     p10bmc                  x11spi
+fp5280g2                palmetto                yosemitev2
+g220a                   qemuarm                 zaius
+gbs                     quanta-q71l
 ```
 
 Once you know the target (e.g. romulus), source the `setup` script as follows:
