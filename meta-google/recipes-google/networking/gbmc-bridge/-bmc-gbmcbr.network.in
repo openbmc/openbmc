@@ -7,3 +7,5 @@ IPv6AcceptRA=true
 LLMNR=true
 MulticastDNS=true
 LinkLocalAddressing=ipv6
+[IPv6AcceptRA]
+DHCPv6Client=false
