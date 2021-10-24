@@ -6,7 +6,7 @@ Wants=network-pre.target
 [Service]
 Restart=always
 Type=simple
-ExecStart=/usr/sbin/mstpd -d -v 3
+ExecStart=/usr/sbin/mstpd -d -v 2
 
 [Install]
 WantedBy=multi-user.target
