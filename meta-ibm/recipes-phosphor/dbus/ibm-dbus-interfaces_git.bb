@@ -15,7 +15,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "${PYTHON_PN}-sdbus++-native"
 
 SRC_URI += "git://github.com/openbmc/ibm-dbus-interfaces"
-SRCREV = "109271bb4de159b9cf13c56acded3eb79bff61fb"
+SRCREV = "89d04feb5d05a8ac01d734eed8889f6800324459"
 
 PACKAGECONFIG ??= "libibm_dbus"
 PACKAGECONFIG[libibm_dbus] = " \
