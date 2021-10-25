@@ -14,4 +14,4 @@ EXTRA_OECONF = "--disable-tests"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/ipmi-blob-tool"
-SRCREV = "2ca843c10ee5b26d1c2db41a54cb0feb967800d8"
+SRCREV = "f8c9f7a3fcf37a1e5b17ad4d0a45fa58efb42a5d"
