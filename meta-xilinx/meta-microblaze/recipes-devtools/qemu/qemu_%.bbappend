@@ -1,1 +1,0 @@
-include qemu-microblaze.inc

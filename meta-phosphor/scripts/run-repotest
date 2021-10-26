@@ -17,7 +17,6 @@ git -C "$obmc_dir" ls-files -- \
   '*.patch' \
   ':!:poky/**' \
   ':!:meta-security/**' \
-  ':!:meta-xilinx/**' \
   ':!:meta-raspberrypi/**' \
   ':!:meta-openembedded/**' \
   ':!:meta-phosphor/**' \
