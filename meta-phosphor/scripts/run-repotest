@@ -11,6 +11,7 @@ obmc_dir=${script_dir}/../../
 
 patch_files_tmp=$(mktemp)
 allowed_patches_tmp=$(mktemp)
+trap "rm $patch_files_tmp $allowed_patches_tmp" exit
 
 git -C "$obmc_dir" ls-files -- \
   '*.patch' \
@@ -64,11 +65,7 @@ meta-yadro/recipes-phosphor/ipmi/phosphor-ipmi-host/0002-Add-support-for-boot-in
 meta-yadro/recipes-phosphor/ipmi/phosphor-ipmi-host/0003-Fix-version-parsing-update-AUX-revision-info.patch
 " | sort > $allowed_patches_tmp
 
-
-
 files_diff=$(comm -23 $patch_files_tmp $allowed_patches_tmp)
-rm $allowed_patches_tmp
-rm $patch_files_tmp
 
 files_count=$(echo -n "$files_diff" | grep -c '^' || true)
 if [[ $files_count -ne 0 ]]; then
