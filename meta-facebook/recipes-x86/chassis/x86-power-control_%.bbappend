@@ -1,5 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-EXTRA_OECMAKE += "-DCHASSIS_SYSTEM_RESET=ON"
+EXTRA_OEMESON += "-Dchassis-system-reset=enabled"
 
 SRC_URI:append:yosemitev2 = " file://power-config-host1.json"
 SRC_URI:append:yosemitev2 = " file://power-config-host2.json"
