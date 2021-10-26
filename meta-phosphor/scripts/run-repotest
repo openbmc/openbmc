@@ -178,7 +178,6 @@ meta-quanta/meta-q71l/recipes-phosphor/quanta-powerctrl/files/init_once.sh
 meta-quanta/meta-q71l/recipes-phosphor/quanta-powerctrl/files/poweroff.sh
 meta-quanta/meta-q71l/recipes-phosphor/quanta-powerctrl/files/poweron.sh
 meta-yadro/meta-nicole/recipes-phosphor/chassis/avsbus-control/avsbus-control.sh
-setup
 "
 
 non_bbfiles=$(git ls-files -- \
