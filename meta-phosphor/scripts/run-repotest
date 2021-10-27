@@ -188,7 +188,9 @@ meta-quanta/meta-q71l/recipes-phosphor/quanta-powerctrl/files/poweron.sh
 meta-yadro/meta-nicole/recipes-phosphor/chassis/avsbus-control/avsbus-control.sh
 "
 
-types=(shell)
+types=(json shell)
+# shellcheck disable=SC2034
+check_json="eslint --resolve-plugins-relative-to /usr/local/lib/node_modules"
 # shellcheck disable=SC2034
 check_shell="shellcheck -x"
 
@@ -215,12 +217,19 @@ for f in $non_bbfiles; do
             file_type="shell"
             ;;
 
+        *JSON\ data*)
+            file_type="json"
+            ;;
+
         *)
             case $f in
                 *.sh)
                     file_type="shell"
                     ;;
 
+                *.json)
+                    file_type="json"
+                    ;;
             esac
     esac
 
