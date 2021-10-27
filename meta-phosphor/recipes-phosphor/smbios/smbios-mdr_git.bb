@@ -28,7 +28,7 @@ EXTRA_OECMAKE = "-DYOCTO=ON"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/smbios-mdr.git"
-SRCREV = "44533c83fe67952b8afe3c53db17fec39cf3b458"
+SRCREV = "800bb70054daacd910f1e5cc5d27ff3338d9161f"
 
 SYSTEMD_SERVICE:${PN} += "smbios-mdrv2.service"
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'cpuinfo', 'xyz.openbmc_project.cpuinfo.service', '', d)}"
