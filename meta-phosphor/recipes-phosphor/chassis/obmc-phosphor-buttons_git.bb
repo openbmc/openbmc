@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 S = "${WORKDIR}/git"
 SRC_URI += "git://github.com/openbmc/phosphor-buttons.git"
-SRCREV = "6d724ce88b150d0dde3ef2ea0bcd5c9f3fbb3af8"
+SRCREV = "8381d5aa3525e15f1e4bd1f3a5af815107716872"
 
 inherit cmake pkgconfig systemd
 
