@@ -20,16 +20,16 @@ set_gpio_to_bmc()
     echo "switch bios GPIO to bmc"
     if [ ! -d /sys/class/gpio/gpio$GPIO ]; then
         cd /sys/class/gpio
-        echo $GPIO > export
+        echo $GPIO > "export"
         cd gpio$GPIO
     else
         cd /sys/class/gpio/gpio$GPIO
     fi
-    direc=`cat direction`
-    if [ $direc == "in" ]; then
+    direc=$(cat direction)
+    if [ "$direc" == "in" ]; then
         echo "out" > direction
     fi
-    data=`cat value`
+    data=$(cat value)
     if [ "$data" == "0" ]; then
         echo 1 > value
     fi
@@ -41,16 +41,16 @@ set_gpio_to_pch()
     echo "switch bios GPIO to pch"
     if [ ! -d /sys/class/gpio/gpio$GPIO ]; then
         cd /sys/class/gpio
-        echo $GPIO > export
+        echo $GPIO > "export"
         cd gpio$GPIO
     else
         cd /sys/class/gpio/gpio$GPIO
     fi
-    direc=`cat direction`
-    if [ $direc == "in" ]; then
+    direc=$(cat direction)
+    if [ "$direc" == "in" ]; then
         echo "out" > direction
     fi
-    data=`cat value`
+    data=$(cat value)
     if [ "$data" == "1" ]; then
         echo 0 > value
     fi
@@ -65,17 +65,18 @@ echo "Bios upgrade started at $(date)"
 echo "Power off host server"
 $POWER_CMD off
 sleep 15
-if [ $($POWER_CMD status) != "off" ];
+if [ "$($POWER_CMD status)" != "off" ];
 then
     echo "Host server didn't power off"
     echo "Bios upgrade failed"
-    exit -1
+    exit 1
 fi
 echo "Host server powered off"
 
 #Set ME to recovery mode
 echo "Set ME to recovery mode"
-busctl call $IPMB_OBJ $IPMB_PATH $IPMB_INTF $IPMB_CALL $ME_CMD_RECOVER
+# shellcheck disable=SC2086
+busctl call "$IPMB_OBJ" "$IPMB_PATH" "$IPMB_INTF" $IPMB_CALL $ME_CMD_RECOVER
 sleep 5
 
 #Flip GPIO to access SPI flash used by host.
@@ -93,11 +94,10 @@ then
     echo "Bios image is $IMAGE_FILE"
     for d in mtd6 mtd7 ; do
         if [ -e "/dev/$d" ]; then
-            mtd=`cat /sys/class/mtd/$d/name`
-            if [ $mtd == "pnor" ]; then
+            mtd=$(cat /sys/class/mtd/$d/name)
+            if [ "$mtd" == "pnor" ]; then
                 echo "Flashing bios image to $d..."
-                flashcp -v $IMAGE_FILE /dev/$d
-                if [ $? -eq 0 ]; then
+                if flashcp -v "$IMAGE_FILE" /dev/$d; then
                     echo "bios updated successfully..."
                 else
                     echo "bios update failed..."
@@ -125,7 +125,8 @@ sleep 5
 
 #Reset ME to boot from new bios
 echo "Reset ME to boot from new bios"
-busctl call $IPMB_OBJ $IPMB_PATH $IPMB_INTF $IPMB_CALL $ME_CMD_RESET
+# shellcheck disable=SC2086
+busctl call "$IPMB_OBJ" "$IPMB_PATH" "$IPMB_INTF" $IPMB_CALL $ME_CMD_RESET
 sleep 10
 
 #Power on server
@@ -134,7 +135,7 @@ $POWER_CMD on
 sleep 5
 
 # Retry to power on once again if server didn't powered on
-if [ $($POWER_CMD status) != "on" ];
+if [ "$($POWER_CMD status)" != "on" ];
 then
     sleep 5
     echo "Powering on server again"

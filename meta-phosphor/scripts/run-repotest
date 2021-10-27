@@ -96,9 +96,6 @@ meta-ampere/meta-jade/recipes-phosphor/gpio/id-button/toggle_identify_led.sh
 meta-ampere/meta-jade/recipes-phosphor/gpio/psu-hotswap-reset/ampere_psu_reset_hotswap.sh
 meta-bytedance/meta-g220a/recipes-network/network/static-mac-addr/mac-check
 meta-bytedance/meta-g220a/recipes-phosphor/datetime/me-time-sync/me-time-sync.sh
-meta-facebook/recipes-fb/fb-powerctrl/files/power-util
-meta-facebook/recipes-fb/fb-powerctrl/files/setup_gpio.sh
-meta-facebook/recipes-phosphor/flash/phosphor-software-manager/bios-update.sh
 meta-fii/meta-kudo/recipes-kudo/host/files/ampere_power_util.sh
 meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-fw-ver.sh
 meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-fw.sh
