@@ -1,4 +1,4 @@
-From ae71bf2b97dc9d4760defd83463c1d305f332f22 Mon Sep 17 00:00:00 2001
+From 9770c5873836e702c2a58cf3b439198415c82c28 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 16:53:06 +0800
 Subject: [PATCH] test-json.c: define M_PIl

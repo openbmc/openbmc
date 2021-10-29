@@ -169,7 +169,7 @@ USE_NLS = "${SDKUSE_NLS}"
 # and not any particular tune that is enabled.
 TARGET_ARCH[vardepsexclude] = "TUNE_ARCH"
 
-PKGDATA_DIR = "${TMPDIR}/pkgdata/${SDK_SYS}"
+PKGDATA_DIR = "${PKGDATA_DIR_SDK}"
 # If MLPREFIX is set by multilib code, shlibs
 # points to the wrong place so force it
 SHLIBSDIRS = "${PKGDATA_DIR}/nativesdk-shlibs2"

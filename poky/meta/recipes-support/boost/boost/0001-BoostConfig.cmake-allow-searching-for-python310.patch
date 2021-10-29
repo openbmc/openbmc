@@ -1,0 +1,50 @@
+From e193f080c7d209516ac9b712fa0c50bb08026fa2 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Tue, 19 Oct 2021 12:24:31 +0000
+Subject: [PATCH] BoostConfig.cmake: allow searching for python310
+
+* accept double digits in Python3_VERSION_MINOR
+
+* if someone is using e.g.:
+  find_package(Python3 REQUIRED)
+  find_package(Boost REQUIRED python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR})
+
+  with python-3.10 then it currently fails with:
+
+  -- Found PythonLibs: /usr/lib/libpython3.10.so (found version "3.10.0")
+  -- Found Python3: -native/usr/bin/python3-native/python3 (found version "3.10.0") found components: Interpreter
+  CMake Error at /usr/lib/cmake/Boost-1.77.0/BoostConfig.cmake:141 (find_package):
+    Could not find a package configuration file provided by "boost_python310"
+    (requested version 1.77.0) with any of the following names:
+
+      boost_python310Config.cmake
+      boost_python310-config.cmake
+
+    Add the installation prefix of "boost_python310" to CMAKE_PREFIX_PATH or
+    set "boost_python310_DIR" to a directory containing one of the above files.
+    If "boost_python310" provides a separate development package or SDK, be
+    sure it has been installed.
+  Call Stack (most recent call first):
+    /usr/lib/cmake/Boost-1.77.0/BoostConfig.cmake:258 (boost_find_component)
+    /usr/share/cmake-3.21/Modules/FindBoost.cmake:594 (find_package)
+    CMakeLists.txt:18 (find_package)
+
+Upstream-Status: Submitted [https://github.com/boostorg/boost_install/pull/53]
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ tools/boost_install/BoostConfig.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/boost_install/BoostConfig.cmake b/tools/boost_install/BoostConfig.cmake
+index fd17821..5dffa58 100644
+--- a/tools/boost_install/BoostConfig.cmake
++++ b/tools/boost_install/BoostConfig.cmake
+@@ -113,7 +113,7 @@ macro(boost_find_component comp required quiet)
+     set(_BOOST_REQUIRED REQUIRED)
+   endif()
+ 
+-  if("${comp}" MATCHES "^(python|numpy|mpi_python)([1-9])([0-9])$")
++  if("${comp}" MATCHES "^(python|numpy|mpi_python)([1-9])([0-9][0-9]?)$")
+ 
+     # handle pythonXY and numpyXY versioned components for compatibility
+ 

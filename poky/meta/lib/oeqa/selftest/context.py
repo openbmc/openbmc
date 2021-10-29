@@ -39,7 +39,7 @@ class NonConcurrentTestSuite(unittest.TestSuite):
 
 def removebuilddir(d):
     delay = 5
-    while delay and os.path.exists(d + "/bitbake.lock"):
+    while delay and (os.path.exists(d + "/bitbake.lock") or os.path.exists(d + "/cache/hashserv.db-wal")):
         time.sleep(1)
         delay = delay - 1
     # Deleting these directories takes a lot of time, use autobuilder

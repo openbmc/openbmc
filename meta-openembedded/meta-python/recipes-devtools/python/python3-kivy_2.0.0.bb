@@ -56,7 +56,7 @@ DEPENDS += " \
     python3-cython-native \
 "
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     gstreamer1.0 \
     gstreamer1.0-python \
     libsdl2 \

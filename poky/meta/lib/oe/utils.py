@@ -508,7 +508,8 @@ class ThreadedWorker(Thread):
             try:
                 func(self, *args, **kargs)
             except Exception as e:
-                print(e)
+                # Eat all exceptions
+                bb.mainlogger.debug("Worker task raised %s" % e, exc_info=e)
             finally:
                 self.tasks.task_done()
 

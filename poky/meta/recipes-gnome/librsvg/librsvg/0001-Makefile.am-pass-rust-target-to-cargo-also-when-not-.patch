@@ -1,0 +1,47 @@
+From 95b2cd0169cb1b4694c2bce67169b1aa1d5e2be0 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 21 Sep 2021 16:27:14 +0200
+Subject: [PATCH] Makefile.am: pass rust target to cargo also when not cross
+ compiling
+
+Otherwise oe-core's native build doesn't work either.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ Makefile.am  | 2 --
+ configure.ac | 4 +---
+ 2 files changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index e93714e..effe5d3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -137,9 +137,7 @@ else
+ CARGO_RELEASE_ARGS=--release
+ endif
+ 
+-if CROSS_COMPILING
+ CARGO_TARGET_ARGS=--target=$(RUST_TARGET)
+-endif
+ 
+ CARGO_VERBOSE = $(cargo_verbose_$(V))
+ cargo_verbose_ = $(cargo_verbose_$(AM_DEFAULT_VERBOSITY))
+diff --git a/configure.ac b/configure.ac
+index 41590ca..84cd56b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -255,9 +255,7 @@ AC_ARG_VAR(RUST_TARGET, [Set rust target (default=$host)])
+ : ${RUST_TARGET:=$host}
+ 
+ AM_CONDITIONAL([CROSS_COMPILING], [test "x$cross_compiling" = xyes])
+-AS_IF([test "x$cross_compiling" = "xyes"], [
+-	RUST_TARGET_SUBDIR="$RUST_TARGET/$RUST_TARGET_SUBDIR"
+-])
++RUST_TARGET_SUBDIR="$RUST_TARGET/$RUST_TARGET_SUBDIR"
+ AC_SUBST([RUST_TARGET_SUBDIR])
+ 
+ dnl ===========================================================================
+-- 
+2.20.1
+

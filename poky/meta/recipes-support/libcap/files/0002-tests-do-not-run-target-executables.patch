@@ -1,4 +1,4 @@
-From 652071e430d5eea758965176b7648e79ad404daa Mon Sep 17 00:00:00 2001
+From 10212b6d4e8843feffbeab5336342d97f3a46bb2 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 20 Dec 2019 16:54:05 +0100
 Subject: [PATCH] tests: do not run target executables
@@ -11,20 +11,20 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 deletions(-)
 
 diff --git a/tests/Makefile b/tests/Makefile
-index fc39fee..3431df9 100644
+index ecb7d1b..8950c73 100644
 --- a/tests/Makefile
 +++ b/tests/Makefile
-@@ -59,13 +59,11 @@ endif
+@@ -61,13 +61,11 @@ endif
  
  # unprivileged
  run_psx_test: psx_test
 -	./psx_test
  
  psx_test: psx_test.c $(DEPS)
- 	$(CC) $(CFLAGS) $(IPATH) $< -o $@ $(LINKEXTRA) $(LIBPSXLIB) $(LDFLAGS)
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $< -o $@ $(LINKEXTRA) $(LIBPSXLIB)
  
  run_libcap_psx_test: libcap_psx_test
 -	./libcap_psx_test
  
  libcap_psx_test: libcap_psx_test.c $(DEPS)
- 	$(CC) $(CFLAGS) $(IPATH) $< -o $@ $(LINKEXTRA) $(LIBCAPLIB) $(LIBPSXLIB) $(LDFLAGS)
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $< -o $@ $(LINKEXTRA) $(LIBCAPLIB) $(LIBPSXLIB)

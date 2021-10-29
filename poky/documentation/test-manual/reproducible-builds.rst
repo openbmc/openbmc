@@ -53,7 +53,7 @@ things we do within the build system to ensure reproducibility include:
 
 -  Adding mappings to the compiler options to ensure debug filepaths are mapped
    to consistent target compatible paths. This is done through the
-   ``DEBUG_PREFIX_MAP`` variable which sets the ``-fmacro-prefix-map`` and
+   :term:`DEBUG_PREFIX_MAP` variable which sets the ``-fmacro-prefix-map`` and
    ``-fdebug-prefix-map`` compiler options correctly to map to target paths.
 -  Being explicit about recipe dependencies and their configuration (no floating
    configure options or host dependencies creeping in). In particular this means

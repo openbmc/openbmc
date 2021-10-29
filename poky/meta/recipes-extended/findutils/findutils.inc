@@ -6,9 +6,11 @@ HOMEPAGE = "http://www.gnu.org/software/findutils/"
 BUGTRACKER = "http://savannah.gnu.org/bugs/?group=findutils"
 SECTION = "console/utils"
 
-SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.xz"
+SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.xz \
+          file://run-ptest \
+          "
 
-inherit autotools gettext texinfo update-alternatives
+inherit autotools gettext texinfo update-alternatives ptest
 
 ALTERNATIVE:${PN} = "find xargs"
 ALTERNATIVE_PRIORITY = "100"

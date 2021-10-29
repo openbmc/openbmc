@@ -1,0 +1,71 @@
+From dc3652c0abcdf8573fd044907b19d8eda7ca1124 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Oct 2021 12:49:58 -0700
+Subject: [PATCH] [liftoff] Correct function signatures
+
+Fixes builds on mips where clang reports an error
+../deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h:661:5: error: no matching member function for call to 'Move'
+    Move(tmp, src, type.value_type());
+    ^~~~
+
+Upstream-Status: Submitted [https://chromium-review.googlesource.com/c/v8/v8/+/3235674]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/wasm/baseline/liftoff-assembler.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+--- a/deps/v8/src/wasm/baseline/liftoff-assembler.h
++++ b/deps/v8/src/wasm/baseline/liftoff-assembler.h
+@@ -613,7 +613,7 @@ class LiftoffAssembler : public TurboAss
+   void FinishCall(const ValueKindSig*, compiler::CallDescriptor*);
+ 
+   // Move {src} into {dst}. {src} and {dst} must be different.
+-  void Move(LiftoffRegister dst, LiftoffRegister src, ValueKind);
++  void Move(LiftoffRegister dst, LiftoffRegister src, ValueKind kind);
+ 
+   // Parallel register move: For a list of tuples <dst, src, kind>, move the
+   // {src} register of kind {kind} into {dst}. If {src} equals {dst}, ignore
+@@ -759,8 +759,8 @@ class LiftoffAssembler : public TurboAss
+   inline void MoveStackValue(uint32_t dst_offset, uint32_t src_offset,
+                              ValueKind);
+ 
+-  inline void Move(Register dst, Register src, ValueKind);
+-  inline void Move(DoubleRegister dst, DoubleRegister src, ValueKind);
++  inline void Move(Register dst, Register src, ValueKind kind);
++  inline void Move(DoubleRegister dst, DoubleRegister src, ValueKind kind);
+ 
+   inline void Spill(int offset, LiftoffRegister, ValueKind);
+   inline void Spill(int offset, WasmValue);
+--- a/deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h
++++ b/deps/v8/src/wasm/baseline/mips/liftoff-assembler-mips.h
+@@ -658,7 +658,7 @@ void LiftoffAssembler::Store(Register ds
+     pinned = pinned | LiftoffRegList::ForRegs(dst_op.rm(), src);
+     LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
+     // Save original value.
+-    Move(tmp, src, type.value_type());
++    Move(tmp, src, type.value_type().kind());
+ 
+     src = tmp;
+     pinned.set(tmp);
+--- a/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
++++ b/deps/v8/src/wasm/baseline/mips64/liftoff-assembler-mips64.h
+@@ -596,7 +596,7 @@ void LiftoffAssembler::Store(Register ds
+     pinned.set(dst_op.rm());
+     LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
+     // Save original value.
+-    Move(tmp, src, type.value_type());
++    Move(tmp, src, type.value_type().kind());
+ 
+     src = tmp;
+     pinned.set(tmp);
+--- a/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h
++++ b/deps/v8/src/wasm/baseline/riscv64/liftoff-assembler-riscv64.h
+@@ -580,7 +580,7 @@ void LiftoffAssembler::Store(Register ds
+     pinned.set(dst_op.rm());
+     LiftoffRegister tmp = GetUnusedRegister(src.reg_class(), pinned);
+     // Save original value.
+-    Move(tmp, src, type.value_type());
++    Move(tmp, src, type.value_type().kind());
+ 
+     src = tmp;
+     pinned.set(tmp);

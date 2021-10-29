@@ -1,7 +1,7 @@
-From c52fa7948ef109db1132fdc1aee0b68f8d767b4e Mon Sep 17 00:00:00 2001
+From f6411021856bafedd784748ec33494151e783b51 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 14 May 2013 15:00:26 -0700
-Subject: [PATCH 1/2] python3: Add target and native recipes
+Subject: [PATCH] python3: Add target and native recipes
 
 Upstream-Status: Inappropriate [embedded specific]
 
@@ -17,10 +17,10 @@ Signed-off-by: Alejandro Hernandez <alejandro.hernandez@linux.intel.com>
  1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index 4774e12..ccf7d58 100644
+index 3414a76..361d3a1 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -95,7 +95,9 @@ def get_python_inc(plat_specific=0, prefix=None):
+@@ -277,7 +277,9 @@ def get_python_inc(plat_specific=0, prefix=None):
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
@@ -31,7 +31,7 @@ index 4774e12..ccf7d58 100644
          prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
      if os.name == "posix":
          if python_build:
-@@ -138,7 +140,13 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -320,7 +322,13 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
@@ -46,7 +46,7 @@ index 4774e12..ccf7d58 100644
          if standard_lib:
              prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
          else:
-@@ -152,7 +160,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -334,7 +342,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
          else:
              # Pure Python
              libdir = "lib"
@@ -56,5 +56,5 @@ index 4774e12..ccf7d58 100644
          if standard_lib:
              return libpython
 -- 
-2.24.0
+2.20.1
 

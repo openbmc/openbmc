@@ -61,6 +61,7 @@ do_rust_setup_snapshot () {
 }
 addtask rust_setup_snapshot after do_unpack before do_configure
 do_rust_setup_snapshot[dirs] += "${WORKDIR}/rust-snapshot"
+do_rust_setup_snapshot[vardepsexclude] += "UNINATIVE_LOADER"
 
 python do_configure() {
     import json

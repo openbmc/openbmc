@@ -35,6 +35,17 @@ def get_doc_namespace(d, doc):
     namespace_uuid = uuid.uuid5(uuid.NAMESPACE_DNS, d.getVar("SPDX_UUID_NAMESPACE"))
     return "%s/%s-%s" % (d.getVar("SPDX_NAMESPACE_PREFIX"), doc.name, str(uuid.uuid5(namespace_uuid, doc.name)))
 
+def create_annotation(d, comment):
+    from datetime import datetime, timezone
+
+    creation_time = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    annotation = oe.spdx.SPDXAnnotation()
+    annotation.annotationDate = creation_time
+    annotation.annotationType = "OTHER"
+    annotation.annotator = "Tool: %s - %s" % (d.getVar("SPDX_TOOL_NAME"), d.getVar("SPDX_TOOL_VERSION"))
+    annotation.comment = comment
+    return annotation
+
 def recipe_spdx_is_native(d, recipe):
     return any(a.annotationType == "OTHER" and
       a.annotator == "Tool: %s - %s" % (d.getVar("SPDX_TOOL_NAME"), d.getVar("SPDX_TOOL_VERSION")) and
@@ -411,13 +422,8 @@ python do_create_spdx() {
     recipe.name = d.getVar("PN")
     recipe.versionInfo = d.getVar("PV")
     recipe.SPDXID = oe.sbom.get_recipe_spdxid(d)
-    if bb.data.inherits_class("native", d):
-        annotation = oe.spdx.SPDXAnnotation()
-        annotation.annotationDate = creation_time
-        annotation.annotationType = "OTHER"
-        annotation.annotator = "Tool: %s - %s" % (d.getVar("SPDX_TOOL_NAME"), d.getVar("SPDX_TOOL_VERSION"))
-        annotation.comment = "isNative"
-        recipe.annotations.append(annotation)
+    if bb.data.inherits_class("native", d) or bb.data.inherits_class("cross", d):
+        recipe.annotations.append(create_annotation(d, "isNative"))
 
     for s in d.getVar('SRC_URI').split():
         if not s.startswith("file://"):
@@ -608,7 +614,7 @@ python do_create_runtime_spdx() {
 
     deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
     spdx_deploy = Path(d.getVar("SPDXRUNTIMEDEPLOY"))
-    is_native = bb.data.inherits_class("native", d)
+    is_native = bb.data.inherits_class("native", d) or bb.data.inherits_class("cross", d)
 
     creation_time = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 

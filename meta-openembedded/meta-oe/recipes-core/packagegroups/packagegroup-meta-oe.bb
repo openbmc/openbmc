@@ -249,7 +249,6 @@ RDEPENDS:packagegroup-meta-oe-devtools ="\
     libparse-yapp-perl \
     libubox \
     ltrace \
-    lua \
     luajit \
     mcpp \
     memstat \
@@ -270,7 +269,6 @@ RDEPENDS:packagegroup-meta-oe-devtools ="\
     yajl \
     yajl \
     kconfig-frontends \
-    ldns \
     libgee \
     libsombok3 \
     lshw \
@@ -308,6 +306,7 @@ RDEPENDS:packagegroup-meta-oe-devtools ="\
 "
 RDEPENDS:packagegroup-meta-oe-devtools:append:x86 = " cpuid msr-tools pahole pmtools"
 RDEPENDS:packagegroup-meta-oe-devtools:append:x86-64 = " cpuid msr-tools pahole pcimem pmtools"
+RDEPENDS:packagegroup-meta-oe-devtools:append:riscv64 = " pcimem"
 RDEPENDS:packagegroup-meta-oe-devtools:append:arm = " pcimem"
 RDEPENDS:packagegroup-meta-oe-devtools:append:aarch64 = " pahole pcimem"
 RDEPENDS:packagegroup-meta-oe-devtools:append:libc-musl = " musl-nscd"
@@ -327,13 +326,10 @@ RDEPENDS:packagegroup-meta-oe-devtools:remove:x86 = "ply"
 
 RDEPENDS:packagegroup-meta-oe-extended ="\
     bitwise \
-    ${@bb.utils.contains("DISTRO_FEATURES", "x11 wayland opengl", "boinc-client", "", d)} \
     brotli \
     byacc \
     cmpi-bindings \
     collectd \
-    cfengine-masterfiles \
-    cfengine \
     ddrescue \
     dialog \
     enscript \
@@ -506,6 +502,7 @@ RDEPENDS:packagegroup-meta-oe-graphics ="\
     libsdl2-net \
     ${@bb.utils.contains("DISTRO_FEATURES", "opengl", "libsdl2-ttf", "", d)} \
     libsdl \
+    ${@bb.utils.contains("DISTRO_FEATURES", "wayland", "lv-drivers lvgl lv-lib-png", "", d)} \
     ttf-arphic-uming \
     ttf-droid-sans ttf-droid-sans-mono ttf-droid-sans-fallback ttf-droid-sans-japanese ttf-droid-serif \
     ttf-abyssinica \
@@ -717,6 +714,7 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     anthy \
     atop \
     ace-cloud-editor \
+    driverctl \
     frame \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "geis", "", d)} \
     grail \
@@ -766,6 +764,8 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     libestr \
     libfann \
     libftdi \
+    libjs-jquery-globalize \
+    libjs-jquery-cookie \
     ccid \
     zchunk \
     libgpiod \
@@ -910,7 +910,6 @@ RDEPENDS:packagegroup-meta-oe-support ="\
     nano \
     xdg-user-dirs \
     xmlsec1 \
-    ${@bb.utils.contains("DISTRO_FEATURES", "x11 pam", "xorgxrdp xrdp", "", d)} \
     usb-modeswitch-data \
     usb-modeswitch \
     liburing \
@@ -961,7 +960,6 @@ RDEPENDS:packagegroup-meta-oe-ptest-packages = "\
     zeromq-ptest \
     leveldb-ptest \
     psqlodbc-ptest \
-    lua-ptest \
     protobuf-ptest \
     rsyslog-ptest \
     oprofile-ptest \

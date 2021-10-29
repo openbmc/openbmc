@@ -1,4 +1,4 @@
-From 02a2772889d6cb08c9ca0561b52e7a9a80e50497 Mon Sep 17 00:00:00 2001
+From df2470912f3197aa441b6751feace1454c7d1f84 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:18:00 +0800
 Subject: [PATCH] Hide __start_BUS_ERROR_MAP and __stop_BUS_ERROR_MAP

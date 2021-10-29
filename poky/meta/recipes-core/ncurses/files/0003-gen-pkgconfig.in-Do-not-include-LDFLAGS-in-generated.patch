@@ -1,4 +1,4 @@
-From 3b3e87934bb6d8511261d7c3d6e39b4f71849272 Mon Sep 17 00:00:00 2001
+From 10cd0c12a6e14fb4f0498c299c1dd32720b710da Mon Sep 17 00:00:00 2001
 From: Nathan Rossi <nathan@nathanrossi.com>
 Date: Mon, 14 Dec 2020 13:39:02 +1000
 Subject: [PATCH] gen-pkgconfig.in: Do not include LDFLAGS in generated pc
@@ -10,19 +10,20 @@ includes build host specific paths and options (e.g. uninative and
 
 Upstream-Status: Inappropriate [OE Specific]
 Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+
 ---
  misc/gen-pkgconfig.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/misc/gen-pkgconfig.in b/misc/gen-pkgconfig.in
-index 8f00b824b9..009d215663 100644
+index a45dd54f..85273054 100644
 --- a/misc/gen-pkgconfig.in
 +++ b/misc/gen-pkgconfig.in
-@@ -80,7 +80,7 @@ if [ "$includedir" != "/usr/include" ]; then
+@@ -83,7 +83,7 @@ if [ "$includedir" != "/usr/include" ]; then
  fi
  
  lib_flags=
--for opt in -L$libdir @LDFLAGS@ @EXTRA_LDFLAGS@ @LIBS@
+-for opt in -L$libdir @EXTRA_PKG_LDFLAGS@ @LIBS@
 +for opt in -L$libdir @LIBS@
  do
  	case $opt in

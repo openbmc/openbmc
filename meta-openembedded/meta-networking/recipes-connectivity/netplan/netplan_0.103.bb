@@ -15,7 +15,9 @@ SRCREV = "51c872d856db80281ea810ebc02e05c09d5310fa"
 PV = "0.103"
 
 SRC_URI = "git://github.com/CanonicalLtd/netplan.git;branch=main \
-           file://0001-parse-nm-fix-32bit-format-string.patch"
+           file://0001-parse-nm-fix-32bit-format-string.patch \
+           file://0001-Makefile-do-not-use-Werror.patch \
+           "
 
 SRC_URI:append:libc-musl = " file://0001-don-t-fail-if-GLOB_BRACE-is-not-defined.patch"
 

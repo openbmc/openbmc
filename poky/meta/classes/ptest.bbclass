@@ -129,4 +129,4 @@ def package_qa_check_missing_ptest(pn, d, messages):
 
     enabled_ptests = " ".join([d.getVar('PTESTS_FAST'), d.getVar('PTESTS_SLOW'), d.getVar('PTESTS_PROBLEMS')]).split()
     if (pn + "-ptest").replace(d.getVar('MLPREFIX'), '') not in enabled_ptests:
-        package_qa_handle_error("missing-ptest", "supports ptests but is not included in oe-core's ptest-packagelists.inc", d)
+        oe.qa.handle_error("missing-ptest", "supports ptests but is not included in oe-core's ptest-packagelists.inc", d)

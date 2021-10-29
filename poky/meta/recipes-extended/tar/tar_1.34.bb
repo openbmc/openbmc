@@ -63,6 +63,6 @@ NATIVE_PACKAGE_PATH_SUFFIX = "/${PN}"
 
 BBCLASSEXTEND = "native nativesdk"
 
-# These are both specific to the NPM package node-tar
-CVE_CHECK_WHITELIST += "CVE-2021-32803 CVE-2021-32804"
-CVE_CHECK_WHITELIST += "CVE-2021-37701 CVE-2021-37712 CVE-2021-37713"
+# Avoid false positives from CVEs in node-tar package
+# For example CVE-2021-{32803,32804,37701,37712,37713}
+CVE_PRODUCT = "gnu:tar"

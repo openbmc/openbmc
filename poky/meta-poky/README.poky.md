@@ -3,7 +3,7 @@ Poky
 
 Poky is an integration of various components to form a pre-packaged
 build system and development environment which is used as a development and
-validation tool by the [Yocto Project](http://www.yoctoproject.org/). It
+validation tool by the [Yocto Project](https://www.yoctoproject.org/). It
 features support for building customised embedded style device images
 and custom containers. There are reference demo images ranging from X11/GTK+
  to Weston, commandline and more. The system supports cross-architecture
@@ -19,8 +19,8 @@ Many layers are available and can be found through the
 As an integration layer Poky consists of several upstream projects such as 
 [BitBake](https://git.openembedded.org/bitbake/),
 [OpenEmbedded-Core](https://git.openembedded.org/openembedded-core/),
-[Yocto documentation](http://git.yoctoproject.org/cgit.cgi/yocto-docs/),
-the '[meta-yocto](http://git.yoctoproject.org/cgit.cgi/meta-yocto/)' layer
+[Yocto documentation](https://git.yoctoproject.org/cgit.cgi/yocto-docs/),
+the '[meta-yocto](https://git.yoctoproject.org/cgit.cgi/meta-yocto/)' layer
 which has configuration and hardware support components. These components
 are all part of the Yocto Project and OpenEmbedded ecosystems.
 
@@ -29,7 +29,7 @@ reference manual which can be found at <https://docs.yoctoproject.org/>
 
 OpenEmbedded is the build architecture used by Poky and the Yocto project.
 For information about OpenEmbedded, see the 
-[OpenEmbedded website](http://www.openembedded.org/).
+[OpenEmbedded website](https://www.openembedded.org/).
 
 Contribution Guidelines
 -----------------------
@@ -42,7 +42,7 @@ who the maintainers are and where bugs should be reported.
 
 A guide to submitting patches to OpenEmbedded is available at:
 
-<http://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded>
+<https://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded>
 
 There is good documentation on how to write/format patches at:
 
@@ -72,7 +72,7 @@ Documentation (files in documentation/):
 
 meta-yocto (files in meta-poky/, meta-yocto-bsp/):
 
-- Git repository: <http://git.yoctoproject.org/cgit/cgit.cgi/meta-yocto>
+- Git repository: <https://git.yoctoproject.org/cgit/cgit.cgi/meta-yocto>
 - Mailing list: poky@lists.yoctoproject.org
 
 If in doubt, check the openembedded-core git repository for the content you

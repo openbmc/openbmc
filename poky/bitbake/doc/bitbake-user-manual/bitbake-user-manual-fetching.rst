@@ -74,7 +74,7 @@ handles that particular URL type. This behavior can be the source of
 some confusion when you are providing URLs for the :term:`SRC_URI` variable.
 Consider the following two URLs::
 
-   http://git.yoctoproject.org/git/poky;protocol=git
+   https://git.yoctoproject.org/git/poky;protocol=git
    git://git.yoctoproject.org/git/poky;protocol=http
 
 In the former case, the URL is passed to the ``wget`` fetcher, which does not

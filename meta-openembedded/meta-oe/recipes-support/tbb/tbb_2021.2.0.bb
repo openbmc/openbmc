@@ -45,6 +45,7 @@ ASNEEDED = ""
 
 LDFLAGS:append:mips = " -latomic"
 LDFLAGS:append:mipsel = " -latomic"
+LDFLAGS:append:riscv32:toolchain-clang = " -latomic"
 
 LDFLAGS:append:libc-musl = " -lucontext"
 

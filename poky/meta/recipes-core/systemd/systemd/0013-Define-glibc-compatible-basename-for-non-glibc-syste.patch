@@ -1,4 +1,4 @@
-From e07e9b998ad61b09555bc809aa15de9d2516787a Mon Sep 17 00:00:00 2001
+From 792f4718ebd5a156729be89a5b47e52dc4b62975 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 27 May 2018 08:36:44 -0700
 Subject: [PATCH] Define glibc compatible basename() for non-glibc systems

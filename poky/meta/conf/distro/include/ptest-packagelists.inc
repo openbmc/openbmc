@@ -40,6 +40,7 @@ PTESTS_FAST = "\
     libxml-sax-base-perl-ptest \
     libxml-simple-perl-ptest \
     libxml2-ptest \
+    lua-ptest \
     lzo-ptest \
     m4-ptest \
     nettle-ptest \
@@ -71,6 +72,7 @@ PTESTS_SLOW = "\
     coreutils-ptest \
     dbus-test-ptest \
     e2fsprogs-ptest \
+    findutils-ptest \
     glib-2.0-ptest \
     gstreamer1.0-ptest \
     libevent-ptest \

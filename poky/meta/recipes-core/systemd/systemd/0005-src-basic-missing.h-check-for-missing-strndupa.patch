@@ -1,4 +1,4 @@
-From db6551741a3654d8e75aff93ea00fbff579f7b02 Mon Sep 17 00:00:00 2001
+From 95c61768e1f8d76a7bd28355429fc4b7b428ad61 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 14:18:21 +0800
 Subject: [PATCH] src/basic/missing.h: check for missing strndupa
@@ -73,7 +73,7 @@ Signed-off-by: Luca Boccassi <luca.boccassi@microsoft.com>
  51 files changed, 62 insertions(+)
 
 diff --git a/meson.build b/meson.build
-index 1aa20b8246..aafee71eb4 100644
+index 11cf56efee..5bd6602e03 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -480,6 +480,7 @@ foreach ident : ['secure_getenv', '__secure_getenv']
@@ -109,7 +109,7 @@ index 1ff6160dc8..c9efd862a2 100644
  static int cg_enumerate_items(const char *controller, const char *path, FILE **_f, const char *item) {
          _cleanup_free_ char *fs = NULL;
 diff --git a/src/basic/env-util.c b/src/basic/env-util.c
-index 81b1e3f10e..8fedcfd1cd 100644
+index 1ca445dab4..1f5a212d4e 100644
 --- a/src/basic/env-util.c
 +++ b/src/basic/env-util.c
 @@ -18,6 +18,7 @@
@@ -165,7 +165,7 @@ index f91f8f7a08..fb31596216 100644
  int mkdir_safe_internal(
                  const char *path,
 diff --git a/src/basic/mountpoint-util.c b/src/basic/mountpoint-util.c
-index 8c836a1b74..2eb7e5a634 100644
+index e7a5a99551..3cc157f248 100644
 --- a/src/basic/mountpoint-util.c
 +++ b/src/basic/mountpoint-util.c
 @@ -11,6 +11,7 @@
@@ -273,7 +273,7 @@ index 84c3caf3a5..0fa84eaa38 100644
  BUS_DEFINE_PROPERTY_GET(bus_property_get_tasks_max, "t", TasksMax, tasks_max_resolve);
  
 diff --git a/src/core/dbus-execute.c b/src/core/dbus-execute.c
-index 50daef6702..1cc6d91e64 100644
+index 902e074bd2..ac15b944e6 100644
 --- a/src/core/dbus-execute.c
 +++ b/src/core/dbus-execute.c
 @@ -42,6 +42,7 @@
@@ -321,7 +321,7 @@ index a56f12f47f..6b8729ef67 100644
  #if HAVE_KMOD
  #include "module-util.h"
 diff --git a/src/core/service.c b/src/core/service.c
-index cb0a528f0d..740d305710 100644
+index 701c145565..4ddc20ed7e 100644
 --- a/src/core/service.c
 +++ b/src/core/service.c
 @@ -41,6 +41,7 @@
@@ -357,7 +357,7 @@ index ae1d43756a..24de98c9f3 100644
  #define PRIV_KEY_FILE CERTIFICATE_ROOT "/private/journal-remote.pem"
  #define CERT_FILE     CERTIFICATE_ROOT "/certs/journal-remote.pem"
 diff --git a/src/journal/journalctl.c b/src/journal/journalctl.c
-index c8fb726d42..858a425d12 100644
+index 3eac97510d..db6913bc7a 100644
 --- a/src/journal/journalctl.c
 +++ b/src/journal/journalctl.c
 @@ -72,6 +72,7 @@
@@ -429,7 +429,7 @@ index 13c08fe295..9aae83486e 100644
  #define MAX_SIZE (2*1024*1024)
  
 diff --git a/src/libsystemd/sd-journal/sd-journal.c b/src/libsystemd/sd-journal/sd-journal.c
-index 5728c537bc..94885b0bf6 100644
+index b3240177cb..7e3ae2d24f 100644
 --- a/src/libsystemd/sd-journal/sd-journal.c
 +++ b/src/libsystemd/sd-journal/sd-journal.c
 @@ -40,6 +40,7 @@

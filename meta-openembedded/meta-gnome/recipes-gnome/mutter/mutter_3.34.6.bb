@@ -73,7 +73,9 @@ do_install:append() {
     done
 }
 
-PACKAGES =+ "${PN}-tests"
+GSETTINGS_PACKAGE = "${PN}-gsettings"
+
+PACKAGES =+ "${PN}-tests ${PN}-gsettings"
 
 FILES:${PN} += " \
     ${datadir}/gnome-control-center \
@@ -93,5 +95,5 @@ FILES:${PN}-dev += " \
     ${libdir}/${MUTTER_API_NAME}/lib*.so \
 "
 
-RDEPENDS:${PN} += "zenity"
+RDEPENDS:${PN} += "zenity ${PN}-gsettings"
 

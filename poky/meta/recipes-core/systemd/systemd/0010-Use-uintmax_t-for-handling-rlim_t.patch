@@ -1,4 +1,4 @@
-From eeacb75025d8f537d54c35256c5730c9aab15cde Mon Sep 17 00:00:00 2001
+From cceb2bba69b371868e89d435c5406b67cdd84d57 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:12:41 +0800
 Subject: [PATCH] Use uintmax_t for handling rlim_t

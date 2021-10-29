@@ -1,4 +1,4 @@
-From 7019ba184b828ed7253750cf409fc5760ef90a54 Mon Sep 17 00:00:00 2001
+From bad7e6a625436402a01d03021fb9ccd58bc9930f Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 9 Jan 2020 17:44:05 +0100
 Subject: [PATCH] setup.py: pass missing libraries to Extension for
@@ -50,20 +50,21 @@ Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  setup.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/setup.py b/setup.py
-index ec3f2a4..b0f1541 100644
+index d92face..f42bcbb 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -1671,7 +1671,7 @@ class PyBuildExt(build_ext):
-                                    libraries=libs,
-                                    include_dirs=["Modules/_multiprocessing"]))
- 
+@@ -1836,7 +1836,7 @@ class PyBuildExt(build_ext):
+             if (sysconfig.get_config_var('HAVE_SEM_OPEN') and not
+                 sysconfig.get_config_var('POSIX_SEMAPHORES_NOT_ENABLED')):
+                 multiprocessing_srcs.append('_multiprocessing/semaphore.c')
 -        self.add(Extension('_multiprocessing', multiprocessing_srcs,
 +        self.add(Extension('_multiprocessing', multiprocessing_srcs, libraries=['pthread'],
                             include_dirs=["Modules/_multiprocessing"]))
  
-     def detect_uuid(self):
+         if (not MS_WINDOWS and

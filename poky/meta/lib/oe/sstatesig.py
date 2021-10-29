@@ -489,7 +489,7 @@ def OEOuthashBasic(path, sigfile, task, d):
     include_timestamps = False
     include_root = True
     if task == "package":
-        include_timestamps = d.getVar('BUILD_REPRODUCIBLE_BINARIES') == '1'
+        include_timestamps = True
         include_root = False
     extra_content = d.getVar('HASHEQUIV_HASH_VERSION')
 
@@ -552,21 +552,22 @@ def OEOuthashBasic(path, sigfile, task, d):
                 else:
                     add_perm(stat.S_IXUSR, 'x')
 
-                add_perm(stat.S_IRGRP, 'r')
-                add_perm(stat.S_IWGRP, 'w')
-                if stat.S_ISGID & s.st_mode:
-                    add_perm(stat.S_IXGRP, 's', 'S')
-                else:
-                    add_perm(stat.S_IXGRP, 'x')
-
-                add_perm(stat.S_IROTH, 'r')
-                add_perm(stat.S_IWOTH, 'w')
-                if stat.S_ISVTX & s.st_mode:
-                    update_hash('t')
-                else:
-                    add_perm(stat.S_IXOTH, 'x')
-
                 if include_owners:
+                    # Group/other permissions are only relevant in pseudo context
+                    add_perm(stat.S_IRGRP, 'r')
+                    add_perm(stat.S_IWGRP, 'w')
+                    if stat.S_ISGID & s.st_mode:
+                        add_perm(stat.S_IXGRP, 's', 'S')
+                    else:
+                        add_perm(stat.S_IXGRP, 'x')
+
+                    add_perm(stat.S_IROTH, 'r')
+                    add_perm(stat.S_IWOTH, 'w')
+                    if stat.S_ISVTX & s.st_mode:
+                        update_hash('t')
+                    else:
+                        add_perm(stat.S_IXOTH, 'x')
+
                     try:
                         update_hash(" %10s" % pwd.getpwuid(s.st_uid).pw_name)
                         update_hash(" %10s" % grp.getgrgid(s.st_gid).gr_name)

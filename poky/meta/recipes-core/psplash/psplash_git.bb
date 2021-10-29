@@ -6,7 +6,7 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://psplash.h;beginline=1;endline=8;md5=8f232c1e95929eacab37f00900580224"
 DEPENDS = "gdk-pixbuf-native"
 
-SRCREV = "0a902f7cd875ccf018456451be369f05fa55f962"
+SRCREV = "fdbd111d6bab2fbbae62a041123fc6b644aa97aa"
 PV = "0.1+git${SRCPV}"
 PR = "r15"
 

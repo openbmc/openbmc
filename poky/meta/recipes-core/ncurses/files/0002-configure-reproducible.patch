@@ -1,7 +1,7 @@
-From 2a53c03ffa90f0050a949fc5920f0df3e668ff42 Mon Sep 17 00:00:00 2001
+From ec87e53066a9942e9aaba817d71268342f5e83b9 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 16 Aug 2017 14:45:27 +0800
-Subject: [PATCH 2/2] configure: reproducible
+Subject: [PATCH] configure: reproducible
 
 "configure" enforces -U for ar flags, breaking deterministic builds.
 The flag was added to fix some vaguely specified "recent POSIX binutil
@@ -13,23 +13,21 @@ Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
 Rebase to 6.1
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  configure | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure b/configure
-index adead92..fa4fdb7 100755
+index 421cf859..a1b7840d 100755
 --- a/configure
 +++ b/configure
-@@ -4503,7 +4503,7 @@ if test "${cf_cv_ar_flags+set}" = set; then
- else
+@@ -5072,7 +5072,7 @@ else
+ 		;;
+ 	(*)
+ 		cf_cv_ar_flags=unknown
+-		for cf_ar_flags in -curvU -curv curv -crv crv -cqv cqv -rv rv
++		for cf_ar_flags in -curv curv -crv crv -cqv cqv -rv rv
+ 		do
  
- 	cf_cv_ar_flags=unknown
--	for cf_ar_flags in -curvU -curv curv -crv crv -cqv cqv -rv rv
-+	for cf_ar_flags in -curv curv -crv crv -cqv cqv -rv rv
- 	do
- 
- 		# check if $ARFLAGS already contains this choice
--- 
-1.8.3.1
-
+ 			# check if $ARFLAGS already contains this choice

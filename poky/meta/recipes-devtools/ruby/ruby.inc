@@ -37,3 +37,8 @@ do_configure:prepend() {
     sed -i "s#%%TARGET_CFLAGS%%#$CFLAGS#; s#%%TARGET_LDFLAGS%%#$LDFLAGS#" ${S}/common.mk
     rm -rf ${S}/ruby/
 }
+
+# Disable openssl extension until it becomes compatible with openssl 3
+do_configure:prepend() {
+    rm -rf ${S}/ext/openssl/extconf.rb
+}

@@ -1,5 +1,17 @@
+Introduction
+============
+
+This guide provides a list of the backwards-incompatible changes you
+might need to adapt to in your existing Yocto Project configuration
+when upgrading to a new release.
+
+If you are upgrading over multiple releases, you will need to follow
+the sections from the version following the one you were previously
+using up to the new version you are upgrading to.
+
+
 General Migration Considerations
-================================
+--------------------------------
 
 Some considerations are not tied to a specific Yocto Project release.
 This section presents information you should consider when migrating to
@@ -26,16 +38,17 @@ any new Yocto Project release.
 
    The better solution (where practical) is to use append files
    (``*.bbappend``) to capture any customizations you want to make to a
-   recipe. Doing so, isolates your changes from the main recipe making
+   recipe. Doing so isolates your changes from the main recipe, making
    them much more manageable. However, sometimes it is not practical to
    use an append file. A good example of this is when introducing a
    newer or older version of a recipe in another layer.
 
+
 -  *Updating Append Files*:
 
-   Since append files generally only contain
+   Since append (``.bbappend``) files generally only contain
    your customizations, they often do not need to be adjusted for new
-   releases. However, if the ``.bbappend`` file is specific to a
+   releases. However, if the append file is specific to a
    particular version of the recipe (i.e. its name does not use the %
    wildcard) and the version of the recipe to which it is appending has
    changed, then you will at a minimum need to rename the append file to
@@ -50,5 +63,10 @@ any new Yocto Project release.
    this is the case and assuming the patch is still needed, you must
    modify the patch file so that it does apply.
 
+ .. tip::
+
+   You can list all append files used in your configuration by running:
+
+     bitbake-layers show-appends
 
 

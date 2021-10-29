@@ -120,23 +120,23 @@ supported Ubuntu or Debian Linux distribution:
       its own custom ``/usr/include/linux/soundcard.h`` on the Debian
       system. If you run into this situation, try either of these solutions::
 
-         $ sudo apt-get build-dep qemu
-         $ sudo apt-get remove oss4-dev
+         $ sudo apt build-dep qemu
+         $ sudo apt remove oss4-dev
 
    -  For Debian-8, ``python3-git`` and ``pylint3`` are no longer
-      available via ``apt-get``.
+      available via ``apt``.
       ::
 
          $ sudo pip3 install GitPython pylint==1.9.5
 
 -  *Essentials:* Packages needed to build an image on a headless system::
 
-      $ sudo apt-get install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
+      $ sudo apt install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
 
 -  *Documentation:* Packages needed if you are going to build out the
    Yocto Project documentation manuals::
 
-      $ sudo apt-get install make python3-pip
+      $ sudo apt install make python3-pip
       &PIP3_HOST_PACKAGES_DOC;
 
    .. note::

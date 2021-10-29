@@ -3531,14 +3531,14 @@ terminal window.
    -  It is also worth noting that ``devshell`` still works over X11
       forwarding and similar situations.
 
-Using a Development Python Shell
+Using a Python Development Shell
 ================================
 
 Similar to working within a development shell as described in the
 previous section, you can also spawn and work within an interactive
 Python development shell. When debugging certain commands or even when
-just editing packages, ``devpyshell`` can be a useful tool. When you
-invoke the ``devpyshell`` task, all tasks up to and including
+just editing packages, ``pydevshell`` can be a useful tool. When you
+invoke the ``pydevshell`` task, all tasks up to and including
 :ref:`ref-tasks-patch` are run for the
 specified target. Then a new terminal is opened. Additionally, key
 Python objects and code are available in the same way they are to
@@ -3563,17 +3563,17 @@ system were executing them. Consequently, working this way can be
 helpful when debugging a build or preparing software to be used with the
 OpenEmbedded build system.
 
-Following is an example that uses ``devpyshell`` on a target named
+Following is an example that uses ``pydevshell`` on a target named
 ``matchbox-desktop``::
 
-   $ bitbake matchbox-desktop -c devpyshell
+   $ bitbake matchbox-desktop -c pydevshell
 
 This command spawns a terminal and places you in an interactive Python
 interpreter within the OpenEmbedded build environment. The
 :term:`OE_TERMINAL` variable
 controls what type of shell is opened.
 
-When you are finished using ``devpyshell``, you can exit the shell
+When you are finished using ``pydevshell``, you can exit the shell
 either by using Ctrl+d or closing the terminal window.
 
 Building
@@ -5874,7 +5874,7 @@ system image files much faster.
       use the tool without specifying ``PATH`` even from the root
       account::
 
-         $ sudo apt-get install bmap-tools
+         $ sudo apt install bmap-tools
 
    -  If you are unable to install the ``bmap-tools`` package, you will
       need to build Bmaptool before using it. Use the following command::
@@ -7066,7 +7066,7 @@ to fetch the repository information:
 
 .. code-block:: none
 
-  # apt-get update
+  $ sudo apt update
 
 After this step,
 ``apt`` is able to find, install, and upgrade packages from the
@@ -8249,7 +8249,7 @@ might be significant in human-readable form. Here is an example::
 
 
    Alternatively, you can install ``python3-git`` using the appropriate
-   distribution package manager (e.g. ``apt-get``, ``dnf``, or ``zipper``).
+   distribution package manager (e.g. ``apt``, ``dnf``, or ``zipper``).
 
 To see changes to the build history using a web interface, follow the
 instruction in the ``README`` file
@@ -9453,8 +9453,8 @@ log to ``${T}/log.do_``\ `task`, and can also log to standard output
 
       Calling this function does not cause the task to fail.
 
--  ``bb.fatal(``\ msg\ ``)``: This logging function is similar to
-   ``bb.error(``\ msg\ ``)`` but also causes the calling task to fail.
+-  ``bb.fatal(msg)``: This logging function is similar to
+   ``bb.error(msg)`` but also causes the calling task to fail.
 
    .. note::
 
@@ -11158,9 +11158,29 @@ this function, you have to follow the following steps:
 For more usage information refer to :yocto_git:`the meta-spdxscanner repository
 </meta-spdxscanner/>`.
 
+Compliance Limitations with Executables Built from Static Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Copying Licenses that Do Not Exist
-----------------------------------
+When package A is added to an image via the :term:`RDEPENDS` or :term:`RRECOMMENDS`
+mechanisms as well as explicitly included in the image recipe with
+:term:`IMAGE_INSTALL`, and depends on a static linked library recipe B
+(``DEPENDS += "B"``), package B will neither appear in the generated license
+manifest nor in the generated source tarballs.  This occurs as the
+:ref:`license <ref-classes-license>` and :ref:`archiver <ref-classes-archiver>`
+classes assume that only packages included via :term:`RDEPENDS` or :term:`RRECOMMENDS`
+end up in the image.
+
+As a result, potential obligations regarding license compliance for package B
+may not be met.
+
+The Yocto Project doesn't enable static libraries by default, in part because
+of this issue. Before a solution to this limitation is found, you need to
+keep in mind that if your root filesystem is built from static libraries,
+you will need to manually ensure that your deliveries are compliant
+with the licenses of these libraries.
+
+Copying Non Standard Licenses
+-----------------------------
 
 Some packages, such as the linux-firmware package, have many licenses
 that are not in any way common. You can avoid adding a lot of these

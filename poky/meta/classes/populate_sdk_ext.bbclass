@@ -550,7 +550,7 @@ python copy_buildsystem () {
     # We don't need sstate do_package files
     for root, dirs, files in os.walk(sstate_out):
         for name in files:
-            if name.endswith("_package.tgz"):
+            if name.endswith("_package.tar.zst"):
                 f = os.path.join(root, name)
                 os.remove(f)
 

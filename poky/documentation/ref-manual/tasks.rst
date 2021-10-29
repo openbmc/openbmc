@@ -516,17 +516,17 @@ scratch is guaranteed.
       $ bitbake -f -c do_cleansstate target
 
 
-.. _ref-tasks-devpyshell:
+.. _ref-tasks-pydevshell:
 
-``do_devpyshell``
+``do_pydevshell``
 -----------------
 
 Starts a shell in which an interactive Python interpreter allows you to
 interact with the BitBake build environment. From within this shell, you
 can directly examine and set bits from the data store and execute
-functions as if within the BitBake environment. See the ":ref:`dev-manual/common-tasks:using a development python shell`" section in
+functions as if within the BitBake environment. See the ":ref:`dev-manual/common-tasks:using a python development shell`" section in
 the Yocto Project Development Tasks Manual for more information about
-using ``devpyshell``.
+using ``pydevshell``.
 
 .. _ref-tasks-devshell:
 

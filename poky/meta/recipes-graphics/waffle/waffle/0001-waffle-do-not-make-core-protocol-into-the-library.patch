@@ -1,0 +1,56 @@
+From 7610ec4b572d3a54d30fca6798f0c406f3fd8a46 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 26 Oct 2021 08:52:17 +0200
+Subject: [PATCH] waffle: do not make core protocol into the library
+
+None of the consumers (which is just piglit) use it, and
+this avoids host contamination from pkg-config suggesting
+wayland.xml from the host.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ meson.build            | 4 ----
+ src/waffle/meson.build | 7 -------
+ 2 files changed, 11 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index ffc02ff..0bb6128 100644
+--- a/meson.build
++++ b/meson.build
+@@ -104,10 +104,6 @@ else
+   dep_wayland_client = dependency(
+     'wayland-client', version : '>= 1.10', required : get_option('wayland'),
+   )
+-  if dep_wayland_client.found()
+-    wayland_core_xml = join_paths(dep_wayland_client.get_pkgconfig_variable('pkgdatadir'),
+-    'wayland.xml')
+-  endif
+   dep_wayland_egl = dependency(
+     'wayland-egl', version : '>= 9.1', required : get_option('wayland'),
+   )
+diff --git a/src/waffle/meson.build b/src/waffle/meson.build
+index 01898c8..6245868 100644
+--- a/src/waffle/meson.build
++++ b/src/waffle/meson.build
+@@ -88,12 +88,6 @@ if build_surfaceless
+ endif
+ 
+ if build_wayland
+-  wl_core_proto_c = custom_target(
+-    'wl-core-proto.c',
+-    input: wayland_core_xml,
+-    output: 'wl-core-proto.c',
+-    command: [prog_wayland_scanner, 'private-code', '@INPUT@', '@OUTPUT@'],
+-  )
+   wl_xdg_shell_proto_c = custom_target(
+     'wl-xdg-shell-proto.c',
+     input: wayland_xdg_shell_xml,
+@@ -114,7 +108,6 @@ if build_wayland
+     'wayland/wayland_wrapper.c',
+   )
+   files_libwaffle += [
+-    wl_core_proto_c,
+     wl_xdg_shell_proto_c,
+     wl_xdg_shell_proto_h,
+   ]

@@ -1,4 +1,4 @@
-From acf26a385d17a59ccd4b767d6303ec3dbf78e788 Mon Sep 17 00:00:00 2001
+From b055bd199f9c40148334725a227796c0d7d14788 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 3 Feb 2020 17:06:27 -0800
 Subject: [PATCH] Enable THREADS_PREFER_PTHREAD_FLAG
@@ -20,11 +20,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 insertions(+)
 
 diff --git a/Source/cmake/OptionsGTK.cmake b/Source/cmake/OptionsGTK.cmake
-index f316f49..de81ce0 100644
+index 3cb5a495..dfba9900 100644
 --- a/Source/cmake/OptionsGTK.cmake
 +++ b/Source/cmake/OptionsGTK.cmake
-@@ -6,6 +6,7 @@ WEBKIT_OPTION_BEGIN()
- SET_PROJECT_VERSION(2 32 3)
+@@ -7,6 +7,7 @@ SET_PROJECT_VERSION(2 34 0)
+ 
  
  set(USER_AGENT_BRANDING "" CACHE STRING "Branding to add to user agent string")
 +set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -32,7 +32,7 @@ index f316f49..de81ce0 100644
  find_package(Cairo 1.14.0 REQUIRED)
  find_package(Fontconfig 2.8.0 REQUIRED)
 diff --git a/Source/cmake/OptionsJSCOnly.cmake b/Source/cmake/OptionsJSCOnly.cmake
-index 1066440..d9aca95 100644
+index e892b427..73bf9e4d 100644
 --- a/Source/cmake/OptionsJSCOnly.cmake
 +++ b/Source/cmake/OptionsJSCOnly.cmake
 @@ -1,3 +1,4 @@

@@ -13,11 +13,11 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
 Upstream-Status: Inappropriate [OE configuration specific]
 ---
- examples/sudo.conf.in | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ examples/sudo.conf.in | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/examples/sudo.conf.in b/examples/sudo.conf.in
-index 19e33ff..af78235 100644
+index 6535d3a..50afc8f 100644
 --- a/examples/sudo.conf.in
 +++ b/examples/sudo.conf.in
 @@ -4,7 +4,7 @@
@@ -29,7 +29,16 @@ index 19e33ff..af78235 100644
  #   fully qualified.
  # The plugin_name corresponds to a global symbol in the plugin
  #   that contains the plugin interface structure.
-@@ -50,7 +50,7 @@ Plugin sudoers_audit sudoers.so
+@@ -51,7 +51,7 @@
+ # The compiled-in value is usually sufficient and should only be changed
+ # if you rename or move the sudo_intercept.so file.
+ #
+-#Path intercept @plugindir@/sudo_intercept.so
++#Path intercept $plugindir/sudo_intercept.so
+ 
+ #
+ # Sudo noexec:
+@@ -65,7 +65,7 @@
  # The compiled-in value is usually sufficient and should only be changed
  # if you rename or move the sudo_noexec.so file.
  #
@@ -38,7 +47,7 @@ index 19e33ff..af78235 100644
  
  #
  # Sudo plugin directory:
-@@ -59,7 +59,7 @@ Plugin sudoers_audit sudoers.so
+@@ -74,7 +74,7 @@
  # The default directory to use when searching for plugins that are
  # specified without a fully qualified path name.
  #

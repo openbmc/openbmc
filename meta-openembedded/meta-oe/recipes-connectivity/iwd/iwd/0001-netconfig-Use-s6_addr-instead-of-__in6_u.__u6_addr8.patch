@@ -1,0 +1,38 @@
+From 36c74f974eba6f276ed4dd04c2077e6f23ebec37 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 17 Oct 2021 16:09:03 -0700
+Subject: [PATCH] netconfig: Use s6_addr instead of __in6_u.__u6_addr8
+
+Building fails with:
+
+../iwd-1.18/src/netconfig.c: In function 'netconfig_ipv6_to_string':
+../iwd-1.18/src/netconfig.c:188:25: error: 'struct in6_addr' has no member named '__in6_u'; did you mean '__in6_union'?
+  188 |         memcpy(in6_addr.__in6_u.__u6_addr8, addr, 16);
+      |                         ^~~~~~~
+      |                         __in6_union
+
+Can be fixed by changing &this_ip.__in6_u.__u6_addr8[0] with &this_ip.s6_addr[0].
+For references: in6_addr is declared in /usr/include/linux/in6.h
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/netconfig.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/netconfig.c b/src/netconfig.c
+index c748630..ab51c3d 100644
+--- a/src/netconfig.c
++++ b/src/netconfig.c
+@@ -185,7 +185,7 @@ static inline char *netconfig_ipv6_to_string(const uint8_t *addr)
+ 	struct in6_addr in6_addr;
+ 	char *addr_str = l_malloc(INET6_ADDRSTRLEN);
+ 
+-	memcpy(in6_addr.__in6_u.__u6_addr8, addr, 16);
++	memcpy(in6_addr.s6_addr, addr, 16);
+ 
+ 	if (L_WARN_ON(unlikely(!inet_ntop(AF_INET6, &in6_addr, addr_str,
+ 						INET6_ADDRSTRLEN)))) {
+-- 
+2.33.1
+

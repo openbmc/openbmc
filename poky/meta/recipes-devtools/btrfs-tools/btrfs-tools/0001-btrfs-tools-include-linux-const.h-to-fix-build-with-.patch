@@ -18,7 +18,7 @@ add an explicit include of const.h to pickup the macro:
 This is safe for older kernel's as well, since the header still
 exists, and is valid to include.
 
-Upstream-status: OE Specific [mips64 + musl + libc-headers]
+Upstream-Status: Inappropriate [mips64 + musl + libc-headers]
 
 Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
 ---

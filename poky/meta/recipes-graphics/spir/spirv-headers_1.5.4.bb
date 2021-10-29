@@ -7,7 +7,7 @@ HOMEPAGE = "https://www.khronos.org/registry/spir-v"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c938b85bceb8fb26c1a807f28a52ae2d"
 
-SRCREV = "bcf55210f13a4fa3c3d0963b509ff1070e434c79"
+SRCREV = "6cae8216a6ea19ff3f237af01e54378c1ff81fcd"
 SRC_URI = "git://github.com/KhronosGroup/SPIRV-Headers;protocol=https"
 UPSTREAM_CHECK_GITTAGREGEX = "^(?P<pver>\d+(\.\d+)+)$"
 S = "${WORKDIR}/git"

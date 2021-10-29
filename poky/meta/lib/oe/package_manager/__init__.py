@@ -321,7 +321,7 @@ class PackageManager(object, metaclass=ABCMeta):
         # TODO don't have sdk here but have a property on the superclass
         # (and respect in install_complementary)
         if sdk:
-            pkgdatadir = self.d.expand("${TMPDIR}/pkgdata/${SDK_SYS}")
+            pkgdatadir = self.d.getVar("PKGDATA_DIR_SDK")
         else:
             pkgdatadir = self.d.getVar("PKGDATA_DIR")
 

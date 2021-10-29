@@ -49,7 +49,7 @@ def open_wrap(
             raise ValueError("Argument 'newline' not supported in binary mode")
 
     file_mode = mode.replace("t", "")
-    if isinstance(filename, (str, bytes, os.PathLike)):
+    if isinstance(filename, (str, bytes, os.PathLike, int)):
         binary_file = cls(filename, file_mode, **kwargs)
     elif hasattr(filename, "read") or hasattr(filename, "write"):
         binary_file = cls(None, file_mode, fileobj=filename, **kwargs)

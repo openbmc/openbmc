@@ -1,0 +1,50 @@
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Subject: [PATCH 04/12] ltmain.sh: Fix sysroot paths being encoded into RPATHs
+
+There is a bug where RPATHs could end up containing sysroot values when
+cross compiling which is obviously incorrect. Strip out sysroot components
+from libdir when building RPATH values to avoid this.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/libtool-patches/2021-10/msg00009.html]
+
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -7569,9 +7569,11 @@ EOF
+ 	  test relink = "$opt_mode" || rpath=$compile_rpath$rpath
+ 	  for libdir in $rpath; do
+ 	    if test -n "$hardcode_libdir_flag_spec"; then
++		  func_replace_sysroot "$libdir"
++		  libdir=$func_replace_sysroot_result
++		  func_stripname '=' '' "$libdir"
++		  libdir=$func_stripname_result
+ 	      if test -n "$hardcode_libdir_separator"; then
+-		func_replace_sysroot "$libdir"
+-		libdir=$func_replace_sysroot_result
+ 		if test -z "$hardcode_libdirs"; then
+ 		  hardcode_libdirs=$libdir
+ 		else
+@@ -8301,6 +8303,10 @@ EOF
+       hardcode_libdirs=
+       for libdir in $compile_rpath $finalize_rpath; do
+ 	if test -n "$hardcode_libdir_flag_spec"; then
++	  func_replace_sysroot "$libdir"
++	  libdir=$func_replace_sysroot_result
++	  func_stripname '=' '' "$libdir"
++	  libdir=$func_stripname_result
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+ 	      hardcode_libdirs=$libdir
+@@ -8352,6 +8358,10 @@ EOF
+       hardcode_libdirs=
+       for libdir in $finalize_rpath; do
+ 	if test -n "$hardcode_libdir_flag_spec"; then
++	  func_replace_sysroot "$libdir"
++	  libdir=$func_replace_sysroot_result
++	  func_stripname '=' '' "$libdir"
++	  libdir=$func_stripname_result
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+ 	      hardcode_libdirs=$libdir

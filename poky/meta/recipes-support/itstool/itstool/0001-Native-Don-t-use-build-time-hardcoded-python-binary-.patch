@@ -1,4 +1,4 @@
-From 335ef14fc801c9dfbe7e5692dc71cfbe72049d2b Mon Sep 17 00:00:00 2001
+From c47820450ce7f55d22c672cf94d20a5f9fd208bf Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Sun, 27 Oct 2019 16:38:52 +0100
 Subject: [PATCH] Native: Don't use build time hardcoded python binary path.
@@ -16,12 +16,13 @@ don't support it [2]
 Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+
 ---
  itstool.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/itstool.in b/itstool.in
-index e64cd34..05d264f 100755
+index c21ad4b..daea177 100755
 --- a/itstool.in
 +++ b/itstool.in
 @@ -1,4 +1,4 @@
@@ -30,6 +31,3 @@ index e64cd34..05d264f 100755
  #
  # Copyright (c) 2010-2018 Shaun McCance <shaunm@gnome.org>
  #
--- 
-2.21.0
-

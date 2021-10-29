@@ -100,7 +100,7 @@ SSTATE_MIRRORS =  "file://.* file://%s/PATH"
     @classmethod
     def tearDownClass(cls):
         for i in range(0, 10):
-            if os.path.exists(os.path.join(cls.tmpdir_eSDKQA, 'bitbake.lock')):
+            if os.path.exists(os.path.join(cls.tmpdir_eSDKQA, 'bitbake.lock')) or os.path.exists(os.path.join(cls.tmpdir_eSDKQA, 'cache/hashserv.db-wal')):
                 time.sleep(1)
             else:
                 break

@@ -1,0 +1,24 @@
+keep nodejs compatible with c-ares 1.17.1
+
+Upstream-Status: Inappropriate [c-ares specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/src/cares_wrap.h
++++ b/src/cares_wrap.h
+@@ -22,7 +22,15 @@
+ # include <netdb.h>
+ #endif  // __POSIX__
+ 
+-# include <ares_nameser.h>
++#if defined(__ANDROID__) || \
++    defined(__MINGW32__) || \
++    defined(__OpenBSD__) || \
++    defined(_MSC_VER)
++
++# include <nameser.h>
++#else
++# include <arpa/nameser.h>
++#endif
+ 
+ namespace node {
+ namespace cares_wrap {

@@ -36,7 +36,7 @@ DEPENDS += "perlcross-native zlib virtual/crypt"
 
 PERL_LIB_VER = "${@'.'.join(d.getVar('PV').split('.')[0:2])}.0"
 
-PACKAGECONFIG ??= "bdb gdbm"
+PACKAGECONFIG ??= "gdbm"
 PACKAGECONFIG[bdb] = ",-Ui_db,db"
 PACKAGECONFIG[gdbm] = ",-Ui_gdbm,gdbm"
 

@@ -730,7 +730,7 @@ system and gives an overview of their function and contents.
       Each configuration file you
       use must reside in the :term:`Build Directory`
       ``conf/multiconfig`` directory (e.g.
-      build_directory\ ``/conf/multiconfig/configA.conf``).
+      ``build_directory/conf/multiconfig/configA.conf``).
 
       For information on how to use :term:`BBMULTICONFIG` in an environment
       that supports building targets with multiple configurations, see the
@@ -1581,6 +1581,23 @@ system and gives an overview of their function and contents.
          The bias provided by :term:`DEFAULT_PREFERENCE` is weak and is overridden
          by :term:`BBFILE_PRIORITY` if that variable is different between two
          layers that contain different versions of the same recipe.
+
+   :term:`DEBUG_PREFIX_MAP`
+      Allows to set C compiler options, such as ``-fdebug-prefix-map``,
+      ``-fmacro-prefix-map``, and ``-ffile-prefix-map``, which allow to
+      replace build-time paths by install-time ones in the debugging sections
+      of binaries.  This makes compiler output files location independent,
+      at the cost of having to pass an extra command to tell the debugger
+      where source files are.
+
+      This is used by the Yocto Project to guarantee
+      :doc:`/test-manual/reproducible-builds` even when the source code of
+      a package uses the ``__FILE__`` or ``assert()`` macros. See the
+      `reproducible-builds.org <https://reproducible-builds.org/docs/build-path/>`__
+      website for details.
+
+      This variable is set in the ``meta/conf/bitbake.conf`` file. It is
+      not intended to be user-configurable.
 
    :term:`DEFAULTTUNE`
       The default CPU and Application Binary Interface (ABI) tunings (i.e.
@@ -5364,7 +5381,7 @@ system and gives an overview of their function and contents.
       so one of two ways:
 
       -  *Append file:* Create an append file named
-         recipename\ ``.bbappend`` in your layer and override the value of
+         ``recipename.bbappend`` in your layer and override the value of
          :term:`PACKAGECONFIG`. You can either completely override the
          variable::
 
@@ -5838,10 +5855,10 @@ system and gives an overview of their function and contents.
       :term:`Build Directory`::
 
          PREMIRRORS:prepend = "\
-             git://.*/.* http://www.yoctoproject.org/sources/ \n \
-             ftp://.*/.* http://www.yoctoproject.org/sources/ \n \
-             http://.*/.* http://www.yoctoproject.org/sources/ \n \
-             https://.*/.* http://www.yoctoproject.org/sources/ \n"
+             git://.*/.* &YOCTO_DL_URL;/mirror/sources/ \n \
+             ftp://.*/.* &YOCTO_DL_URL;/mirror/sources/ \n \
+             http://.*/.* &YOCTO_DL_URL;/mirror/sources/ \n \
+             https://.*/.* &YOCTO_DL_URL;/mirror/sources/ \n"
 
       These changes cause the
       build system to intercept Git, FTP, HTTP, and HTTPS requests and
@@ -6907,6 +6924,23 @@ system and gives an overview of their function and contents.
 
       You will see this variable referenced in the default values of
       ``FILES:${PN}-dev``.
+
+   :term:`SOURCE_DATE_EPOCH`
+      This defines a date expressed in number of seconds since
+      the UNIX EPOCH (01 Jan 1970 00:00:00 UTC), which is used by
+      multiple build systems to force a timestamp in built binaries.
+      Many upstream projects already support this variable.
+
+      You will find more details in the `official specifications
+      <https://reproducible-builds.org/specs/source-date-epoch/>`__.
+
+      A value for each recipe is computed from the sources by
+      :oe_git:`meta/lib/oe/reproducible.py </openembedded-core/tree/meta/lib/oe/reproducible.py>`.
+
+      If a recipe wishes to override the default behavior, it should set its
+      own :term:`SOURCE_DATE_EPOCH` value::
+
+          SOURCE_DATE_EPOCH = "1613559011"
 
    :term:`SOURCE_MIRROR_FETCH`
       When you are fetching files to create a mirror of sources (i.e.
@@ -8141,6 +8175,15 @@ system and gives an overview of their function and contents.
       information on setting up a cross-development environment, see the
       :doc:`/sdk-manual/index` manual.
 
+      Note that this variable applies to building an SDK, not an eSDK,
+      in which case the term:`TOOLCHAIN_HOST_TASK_ESDK` setting should be
+      used instead.
+
+   :term:`TOOLCHAIN_HOST_TASK_ESDK`
+      This variable allows to extend what is installed in the host
+      portion of an eSDK. This is similar to :term:`TOOLCHAIN_HOST_TASK`
+      applying to SDKs.
+
    :term:`TOOLCHAIN_OUTPUTNAME`
       This variable defines the name used for the toolchain output. The
       :ref:`populate_sdk_base <ref-classes-populate-sdk-*>` class sets
@@ -8745,7 +8788,7 @@ system and gives an overview of their function and contents.
    :term:`WKS_FILE`
       Specifies the location of the Wic kickstart file that is used by the
       OpenEmbedded build system to create a partitioned image
-      (image\ ``.wic``). For information on how to create a partitioned
+      (``image.wic``). For information on how to create a partitioned
       image, see the
       ":ref:`dev-manual/common-tasks:creating partitioned images using wic`"
       section in the Yocto Project Development Tasks Manual. For details on

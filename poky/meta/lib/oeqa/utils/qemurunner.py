@@ -183,7 +183,7 @@ class QemuRunner:
         # then add in the site-packages path components and add that
         # to the python sys.path so qmp.py can be found.
         python_path = os.path.dirname(os.path.dirname(self.logfile))
-        python_path += "/recipe-sysroot-native/usr/lib/python3.9/site-packages"
+        python_path += "/recipe-sysroot-native/usr/lib/qemu-python"
         sys.path.append(python_path)
         importlib.invalidate_caches()
         try:

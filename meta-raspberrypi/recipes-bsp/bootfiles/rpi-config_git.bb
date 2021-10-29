@@ -278,6 +278,12 @@ do_deploy:append:raspberrypi3-64() {
     echo "dtparam=audio=on" >> $CONFIG
 }
 
+do_deploy:append() {
+    if grep -q -E '^.{80}.$' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt; then
+        bbwarn "config.txt contains lines longer than 80 characters, this is not supported"
+    fi
+}
+
 addtask deploy before do_build after do_install
 do_deploy[dirs] += "${DEPLOYDIR}/${BOOTFILES_DIR_NAME}"
 

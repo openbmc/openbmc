@@ -230,4 +230,8 @@ do_install:append() {
         sed -e 's@${STAGING_DIR_HOST}@@g' \
             -i ${D}${libdir}/cmake/opencv4/OpenCVModules.cmake
     fi
+    # remove setup_vars_opencv4.sh as its content is confusing and useless
+    if [ -f ${D}${bindir}/setup_vars_opencv4.sh ]; then
+        rm -rf ${D}${bindir}/setup_vars_opencv4.sh
+    fi
 }

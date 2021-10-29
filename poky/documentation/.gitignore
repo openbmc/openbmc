@@ -1,3 +1,5 @@
 _build/
 Pipfile.lock
 .vscode/
+*/svg/*.png
+*/svg/*.pdf

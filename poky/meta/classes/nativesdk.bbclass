@@ -31,7 +31,7 @@ PACKAGE_ARCHS = "${SDK_PACKAGE_ARCHS}"
 DEPENDS:append = " chrpath-replacement-native"
 EXTRANATIVEPATH += "chrpath-native"
 
-PKGDATA_DIR = "${TMPDIR}/pkgdata/${SDK_SYS}"
+PKGDATA_DIR = "${PKGDATA_DIR_SDK}"
 
 HOST_ARCH = "${SDK_ARCH}"
 HOST_VENDOR = "${SDK_VENDOR}"

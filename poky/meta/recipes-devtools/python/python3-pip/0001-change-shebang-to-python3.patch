@@ -1,4 +1,4 @@
-From baa85a4dab2e8d64eb25d1181b6420db25ce919a Mon Sep 17 00:00:00 2001
+From dca973830d4eee3e0f79e61237c44a9dd8201641 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <trevor.gamblin@windriver.com>
 Date: Tue, 22 Jun 2021 12:31:46 -0400
 Subject: [PATCH] change shebang to python3
@@ -10,8 +10,8 @@ to "python" instead of "python3", so patch them as needed to ensure that
 they correctly reference the python3 binary.
 
 Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
+
 ---
- src/pip/_vendor/appdirs.py                    | 2 +-
  src/pip/_vendor/chardet/langbulgarianmodel.py | 2 +-
  src/pip/_vendor/chardet/langgreekmodel.py     | 2 +-
  src/pip/_vendor/chardet/langhebrewmodel.py    | 2 +-
@@ -21,20 +21,10 @@ Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
  src/pip/_vendor/chardet/langturkishmodel.py   | 2 +-
  src/pip/_vendor/chardet/metadata/languages.py | 2 +-
  src/pip/_vendor/requests/certs.py             | 2 +-
- 10 files changed, 10 insertions(+), 10 deletions(-)
+ 9 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/src/pip/_vendor/appdirs.py b/src/pip/_vendor/appdirs.py
-index 33a3b7741..60b9ef5f7 100644
---- a/src/pip/_vendor/appdirs.py
-+++ b/src/pip/_vendor/appdirs.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- # -*- coding: utf-8 -*-
- # Copyright (c) 2005-2010 ActiveState Software Inc.
- # Copyright (c) 2013 Eddy Petrișor
 diff --git a/src/pip/_vendor/chardet/langbulgarianmodel.py b/src/pip/_vendor/chardet/langbulgarianmodel.py
-index e963a5097..97ea6cea8 100644
+index e963a50..97ea6ce 100644
 --- a/src/pip/_vendor/chardet/langbulgarianmodel.py
 +++ b/src/pip/_vendor/chardet/langbulgarianmodel.py
 @@ -1,4 +1,4 @@
@@ -44,7 +34,7 @@ index e963a5097..97ea6cea8 100644
  
  from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
 diff --git a/src/pip/_vendor/chardet/langgreekmodel.py b/src/pip/_vendor/chardet/langgreekmodel.py
-index d99528ede..4a127ea83 100644
+index d99528e..4a127ea 100644
 --- a/src/pip/_vendor/chardet/langgreekmodel.py
 +++ b/src/pip/_vendor/chardet/langgreekmodel.py
 @@ -1,4 +1,4 @@
@@ -54,7 +44,7 @@ index d99528ede..4a127ea83 100644
  
  from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
 diff --git a/src/pip/_vendor/chardet/langhebrewmodel.py b/src/pip/_vendor/chardet/langhebrewmodel.py
-index 484c652a4..676c1a711 100644
+index 484c652..676c1a7 100644
 --- a/src/pip/_vendor/chardet/langhebrewmodel.py
 +++ b/src/pip/_vendor/chardet/langhebrewmodel.py
 @@ -1,4 +1,4 @@
@@ -64,7 +54,7 @@ index 484c652a4..676c1a711 100644
  
  from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
 diff --git a/src/pip/_vendor/chardet/langhungarianmodel.py b/src/pip/_vendor/chardet/langhungarianmodel.py
-index bbc5cda64..042eae70a 100644
+index bbc5cda..042eae7 100644
 --- a/src/pip/_vendor/chardet/langhungarianmodel.py
 +++ b/src/pip/_vendor/chardet/langhungarianmodel.py
 @@ -1,4 +1,4 @@
@@ -74,7 +64,7 @@ index bbc5cda64..042eae70a 100644
  
  from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
 diff --git a/src/pip/_vendor/chardet/langrussianmodel.py b/src/pip/_vendor/chardet/langrussianmodel.py
-index 5594452b5..564b02e58 100644
+index 5594452..564b02e 100644
 --- a/src/pip/_vendor/chardet/langrussianmodel.py
 +++ b/src/pip/_vendor/chardet/langrussianmodel.py
 @@ -1,4 +1,4 @@
@@ -84,7 +74,7 @@ index 5594452b5..564b02e58 100644
  
  from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
 diff --git a/src/pip/_vendor/chardet/langthaimodel.py b/src/pip/_vendor/chardet/langthaimodel.py
-index 9a37db573..c97487959 100644
+index 9a37db5..c974879 100644
 --- a/src/pip/_vendor/chardet/langthaimodel.py
 +++ b/src/pip/_vendor/chardet/langthaimodel.py
 @@ -1,4 +1,4 @@
@@ -94,7 +84,7 @@ index 9a37db573..c97487959 100644
  
  from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
 diff --git a/src/pip/_vendor/chardet/langturkishmodel.py b/src/pip/_vendor/chardet/langturkishmodel.py
-index 43f4230ae..7e710c371 100644
+index 43f4230..7e710c3 100644
 --- a/src/pip/_vendor/chardet/langturkishmodel.py
 +++ b/src/pip/_vendor/chardet/langturkishmodel.py
 @@ -1,4 +1,4 @@
@@ -104,7 +94,7 @@ index 43f4230ae..7e710c371 100644
  
  from pip._vendor.chardet.sbcharsetprober import SingleByteCharSetModel
 diff --git a/src/pip/_vendor/chardet/metadata/languages.py b/src/pip/_vendor/chardet/metadata/languages.py
-index 3237d5abf..aa2ec7c35 100644
+index 3237d5a..aa2ec7c 100644
 --- a/src/pip/_vendor/chardet/metadata/languages.py
 +++ b/src/pip/_vendor/chardet/metadata/languages.py
 @@ -1,4 +1,4 @@
@@ -114,7 +104,7 @@ index 3237d5abf..aa2ec7c35 100644
  """
  Metadata about languages used by our model training code for our
 diff --git a/src/pip/_vendor/requests/certs.py b/src/pip/_vendor/requests/certs.py
-index 06a594e58..bfa7839a4 100644
+index 06a594e..bfa7839 100644
 --- a/src/pip/_vendor/requests/certs.py
 +++ b/src/pip/_vendor/requests/certs.py
 @@ -1,4 +1,4 @@
@@ -123,6 +113,3 @@ index 06a594e58..bfa7839a4 100644
  # -*- coding: utf-8 -*-
  
  """
--- 
-2.31.1
-

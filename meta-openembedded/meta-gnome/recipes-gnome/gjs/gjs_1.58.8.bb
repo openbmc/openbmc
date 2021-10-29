@@ -9,7 +9,7 @@ GNOMEBASEBUILDCLASS = "autotools"
 
 DEPENDS = "mozjs gtk+3"
 
-inherit gnomebase gsettings gobject-introspection vala gettext features_check upstream-version-is-even
+inherit gnomebase gsettings gobject-introspection vala gettext features_check upstream-version-is-even pkgconfig
 
 SRC_URI[archive.sha256sum] = "7fb3eb746c17363d9ee47f4a5d0bb048f0075611763eb0da11d85e0e57aff381"
 SRC_URI += "file://0001-Disable-tests-on-host.patch \

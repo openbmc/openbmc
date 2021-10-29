@@ -569,7 +569,6 @@ exit $ret
 def _task_data(fn, task, d):
     localdata = bb.data.createCopy(d)
     localdata.setVar('BB_FILENAME', fn)
-    localdata.setVar('BB_CURRENTTASK', task[3:])
     localdata.setVar('OVERRIDES', 'task-%s:%s' %
                      (task[3:].replace('_', '-'), d.getVar('OVERRIDES', False)))
     localdata.finalize()

@@ -1,4 +1,4 @@
-From 1e3bc870ded807cff0d3771dd89a850d020df032 Mon Sep 17 00:00:00 2001
+From 943b4258b870c65caaa56fe4dad0d9c7281fdb1d Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:03:47 +0800
 Subject: [PATCH] fix missing of __register_atfork for non-glibc builds

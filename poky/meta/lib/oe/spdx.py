@@ -196,6 +196,7 @@ class SPDXRelationship(SPDXObject):
     relatedSpdxElement = _String()
     relationshipType = _String()
     comment = _String()
+    annotations = _ObjectList(SPDXAnnotation)
 
 
 class SPDXExternalReference(SPDXObject):
@@ -300,7 +301,7 @@ class SPDXDocument(SPDXObject):
     def from_json(cls, f):
         return cls(**json.load(f))
 
-    def add_relationship(self, _from, relationship, _to, *, comment=None):
+    def add_relationship(self, _from, relationship, _to, *, comment=None, annotation=None):
         if isinstance(_from, SPDXObject):
             from_spdxid = _from.SPDXID
         else:
@@ -319,6 +320,9 @@ class SPDXDocument(SPDXObject):
 
         if comment is not None:
             r.comment = comment
+
+        if annotation is not None:
+            r.annotations.append(annotation)
 
         self.relationships.append(r)
 

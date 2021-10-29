@@ -286,8 +286,8 @@ develop, test, and submit changes to "contrib" areas for the maintainer
 to examine. The maintainer then chooses which changes are going to
 become a permanent part of the project.
 
-.. image:: figures/git-workflow.png
-   :align: center
+.. image:: svg/git-workflow.*
+   :width: 100%
 
 While each development environment is unique, there are some best
 practices or methods that help development run smoothly. The following

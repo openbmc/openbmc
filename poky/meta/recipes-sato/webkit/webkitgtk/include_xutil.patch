@@ -1,4 +1,4 @@
-From d95f46e149226f634830e76cc1f4f8e3ee04ff5a Mon Sep 17 00:00:00 2001
+From 2cc9d445b4c8eb70c2ab6c1723dfd208218f103e Mon Sep 17 00:00:00 2001
 From: Martin Jansa <Martin.Jansa@gmail.com>
 Date: Fri, 6 Nov 2020 04:38:13 +0100
 Subject: [PATCH] webkitgtk: fix build with x11 enabled
@@ -21,12 +21,12 @@ Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp b/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
-index 2d66b9cd..424fb5a1 100644
+index bad56eba..fc141f98 100644
 --- a/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
 +++ b/Source/WebCore/platform/graphics/x11/PlatformDisplayX11.cpp
-@@ -30,6 +30,7 @@
- 
+@@ -31,6 +31,7 @@
  #if PLATFORM(X11)
+ #include <X11/Xatom.h>
  #include <X11/Xlib.h>
 +#include <X11/Xutil.h>
  #include <X11/extensions/Xcomposite.h>

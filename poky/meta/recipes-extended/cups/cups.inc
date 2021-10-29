@@ -18,7 +18,7 @@ SRC_URI = "https://github.com/OpenPrinting/cups/releases/download/v${PV}/cups-${
            "
 
 UPSTREAM_CHECK_URI = "https://github.com/OpenPrinting/cups/releases"
-UPSTREAM_CHECK_REGEX = "cups-(?P<pver>.+)-source.tar"
+UPSTREAM_CHECK_REGEX = "cups-(?P<pver>(?!.+\d(b|rc)\d.+).+)-source.tar"
 
 # Issue only applies to MacOS
 CVE_CHECK_WHITELIST += "CVE-2008-1033"

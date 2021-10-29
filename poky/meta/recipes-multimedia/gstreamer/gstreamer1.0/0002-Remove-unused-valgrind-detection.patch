@@ -1,4 +1,4 @@
-From 598d108e2c438d8f2ecd3bf948fa3ebbd3681490 Mon Sep 17 00:00:00 2001
+From e275ba2bd854ac15a4b65a8f07d9f042021950da Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Tim-Philipp=20M=C3=BCller?= <tim@centricular.com>
 Date: Fri, 14 Aug 2020 16:38:26 +0100
 Subject: [PATCH 2/3] Remove unused valgrind detection
@@ -19,7 +19,7 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  3 files changed, 42 deletions(-)
 
 diff --git a/gst/gst_private.h b/gst/gst_private.h
-index eefd044d9..8252ede51 100644
+index eefd044..8252ede 100644
 --- a/gst/gst_private.h
 +++ b/gst/gst_private.h
 @@ -116,8 +116,6 @@ G_GNUC_INTERNAL  gboolean _priv_plugin_deps_env_vars_changed (GstPlugin * plugin
@@ -32,12 +32,12 @@ index eefd044d9..8252ede51 100644
  G_GNUC_INTERNAL  void  _priv_gst_quarks_initialize (void);
  G_GNUC_INTERNAL  void  _priv_gst_mini_object_initialize (void);
 diff --git a/gst/gstinfo.c b/gst/gstinfo.c
-index 5d317877b..097f8b20d 100644
+index eea1a21..d3035d6 100644
 --- a/gst/gstinfo.c
 +++ b/gst/gstinfo.c
 @@ -305,36 +305,6 @@ static gboolean pretty_tags = PRETTY_TAGS_DEFAULT;
- static volatile gint G_GNUC_MAY_ALIAS __default_level = GST_LEVEL_DEFAULT;
- static volatile gint G_GNUC_MAY_ALIAS __use_color = GST_DEBUG_COLOR_MODE_ON;
+ static gint G_GNUC_MAY_ALIAS __default_level = GST_LEVEL_DEFAULT;
+ static gint G_GNUC_MAY_ALIAS __use_color = GST_DEBUG_COLOR_MODE_ON;
  
 -/* FIXME: export this? */
 -gboolean
@@ -82,7 +82,7 @@ index 5d317877b..097f8b20d 100644
    env = g_getenv ("GST_DEBUG_OPTIONS");
    if (env != NULL) {
      if (strstr (env, "full_tags") || strstr (env, "full-tags"))
-@@ -2503,12 +2470,6 @@ gst_debug_construct_win_color (guint colorinfo)
+@@ -2505,12 +2472,6 @@ gst_debug_construct_win_color (guint colorinfo)
    return 0;
  }
  
@@ -96,7 +96,7 @@ index 5d317877b..097f8b20d 100644
  _gst_debug_dump_mem (GstDebugCategory * cat, const gchar * file,
      const gchar * func, gint line, GObject * obj, const gchar * msg,
 diff --git a/meson.build b/meson.build
-index ce1921aa4..7a84d0981 100644
+index 82a1728..42ae617 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -200,7 +200,6 @@ check_headers = [

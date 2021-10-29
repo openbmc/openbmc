@@ -15,7 +15,7 @@ SRC_URI = "git://gitosis.stanford.edu/openflow.git;protocol=git"
 
 DEPENDS = "virtual/libc"
 
-PACKAGECONFIG ??= "openssl"
+PACKAGECONFIG ??= ""
 PACKAGECONFIG[openssl] = "--enable-ssl,--disable-ssl, openssl openssl-native, libssl"
 
 EXTRA_OECONF += " \

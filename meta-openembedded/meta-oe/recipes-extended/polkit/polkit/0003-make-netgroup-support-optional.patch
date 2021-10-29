@@ -1,4 +1,4 @@
-From 21aa2747e8f0048759aab184b07dd6389666d5e6 Mon Sep 17 00:00:00 2001
+From 0c1debb380fee7f5b2bc62406e45856dc9c9e1a1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 22 May 2019 13:18:55 -0700
 Subject: [PATCH] make netgroup support optional
@@ -17,20 +17,23 @@ Fixes bug 50145.
 Closes polkit/polkit#14.
 Signed-off-by: A. Wilcox <AWilcox@Wilcox-Tech.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
 ---
  configure.ac                                     |  2 +-
  src/polkit/polkitidentity.c                      | 16 ++++++++++++++++
  src/polkit/polkitunixnetgroup.c                  |  3 +++
  .../polkitbackendinteractiveauthority.c          | 14 ++++++++------
- src/polkitbackend/polkitbackendjsauthority.cpp   |  2 ++
+ src/polkitbackend/polkitbackendjsauthority.cpp   |  3 +++
  test/polkit/polkitidentitytest.c                 |  9 ++++++++-
  test/polkit/polkitunixnetgrouptest.c             |  3 +++
  .../test-polkitbackendjsauthority.c              |  2 ++
- 8 files changed, 43 insertions(+), 8 deletions(-)
+ 8 files changed, 44 insertions(+), 8 deletions(-)
 
+diff --git a/configure.ac b/configure.ac
+index b625743..d807086 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -99,7 +99,7 @@ AC_CHECK_LIB(expat,XML_ParserCreate,[EXP
+@@ -100,7 +100,7 @@ AC_CHECK_LIB(expat,XML_ParserCreate,[EXPAT_LIBS="-lexpat"],
  	     [AC_MSG_ERROR([Can't find expat library. Please install expat.])])
  AC_SUBST(EXPAT_LIBS)
  
@@ -39,9 +42,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  if test "x$GCC" = "xyes"; then
    LDFLAGS="-Wl,--as-needed $LDFLAGS"
+diff --git a/src/polkit/polkitidentity.c b/src/polkit/polkitidentity.c
+index 3aa1f7f..10e9c17 100644
 --- a/src/polkit/polkitidentity.c
 +++ b/src/polkit/polkitidentity.c
-@@ -182,7 +182,15 @@ polkit_identity_from_string  (const gcha
+@@ -182,7 +182,15 @@ polkit_identity_from_string  (const gchar   *str,
      }
    else if (g_str_has_prefix (str, "unix-netgroup:"))
      {
@@ -57,7 +62,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
      }
  
    if (identity == NULL && (error != NULL && *error == NULL))
-@@ -344,6 +352,13 @@ polkit_identity_new_for_gvariant (GVaria
+@@ -344,6 +352,13 @@ polkit_identity_new_for_gvariant (GVariant  *variant,
        GVariant *v;
        const char *name;
  
@@ -71,7 +76,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
        v = lookup_asv (details_gvariant, "name", G_VARIANT_TYPE_STRING, error);
        if (v == NULL)
          {
-@@ -353,6 +368,7 @@ polkit_identity_new_for_gvariant (GVaria
+@@ -353,6 +368,7 @@ polkit_identity_new_for_gvariant (GVariant  *variant,
        name = g_variant_get_string (v, NULL);
        ret = polkit_unix_netgroup_new (name);
        g_variant_unref (v);
@@ -79,9 +84,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
      }
    else
      {
+diff --git a/src/polkit/polkitunixnetgroup.c b/src/polkit/polkitunixnetgroup.c
+index 8a2b369..83f8d4a 100644
 --- a/src/polkit/polkitunixnetgroup.c
 +++ b/src/polkit/polkitunixnetgroup.c
-@@ -194,6 +194,9 @@ polkit_unix_netgroup_set_name (PolkitUni
+@@ -194,6 +194,9 @@ polkit_unix_netgroup_set_name (PolkitUnixNetgroup *group,
  PolkitIdentity *
  polkit_unix_netgroup_new (const gchar *name)
  {
@@ -91,9 +98,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
    g_return_val_if_fail (name != NULL, NULL);
    return POLKIT_IDENTITY (g_object_new (POLKIT_TYPE_UNIX_NETGROUP,
                                         "name", name,
+diff --git a/src/polkitbackend/polkitbackendinteractiveauthority.c b/src/polkitbackend/polkitbackendinteractiveauthority.c
+index 056d9a8..36c2f3d 100644
 --- a/src/polkitbackend/polkitbackendinteractiveauthority.c
 +++ b/src/polkitbackend/polkitbackendinteractiveauthority.c
-@@ -2233,25 +2233,26 @@ get_users_in_net_group (PolkitIdentity
+@@ -2233,25 +2233,26 @@ get_users_in_net_group (PolkitIdentity                    *group,
    GList *ret;
  
    ret = NULL;
@@ -126,7 +135,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
        PolkitIdentity *user;
        GError *error = NULL;
  
-@@ -2282,6 +2283,7 @@ get_users_in_net_group (PolkitIdentity
+@@ -2282,6 +2283,7 @@ get_users_in_net_group (PolkitIdentity                    *group,
  
   out:
    endnetgrent ();
@@ -134,9 +143,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
    return ret;
  }
  
+diff --git a/src/polkitbackend/polkitbackendjsauthority.cpp b/src/polkitbackend/polkitbackendjsauthority.cpp
+index ca17108..41d8d5c 100644
 --- a/src/polkitbackend/polkitbackendjsauthority.cpp
 +++ b/src/polkitbackend/polkitbackendjsauthority.cpp
-@@ -1502,6 +1502,7 @@ js_polkit_user_is_in_netgroup (JSContext
+@@ -1520,6 +1520,7 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
  
    JS::CallArgs args = JS::CallArgsFromVp (argc, vp);
  
@@ -144,14 +155,17 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
    JS::RootedString usrstr (authority->priv->cx);
    usrstr = args[0].toString();
    user = JS_EncodeStringToUTF8 (cx, usrstr);
-@@ -1519,6 +1520,7 @@ js_polkit_user_is_in_netgroup (JSContext
+@@ -1535,6 +1536,8 @@ js_polkit_user_is_in_netgroup (JSContext  *cx,
+       is_in_netgroup =  true;
+     }
  
-   JS_free (cx, netgroup);
-   JS_free (cx, user);
 +#endif
- 
++
    ret = true;
  
+   args.rval ().setBoolean (is_in_netgroup);
+diff --git a/test/polkit/polkitidentitytest.c b/test/polkit/polkitidentitytest.c
+index e91967b..e829aaa 100644
 --- a/test/polkit/polkitidentitytest.c
 +++ b/test/polkit/polkitidentitytest.c
 @@ -19,6 +19,7 @@
@@ -162,7 +176,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #include "glib.h"
  #include <polkit/polkit.h>
  #include <polkit/polkitprivate.h>
-@@ -145,11 +146,15 @@ struct ComparisonTestData comparison_tes
+@@ -145,11 +146,15 @@ struct ComparisonTestData comparison_test_data [] = {
    {"unix-group:root", "unix-group:jane", FALSE},
    {"unix-group:jane", "unix-group:jane", TRUE},
  
@@ -193,6 +207,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
    add_comparison_tests ();
  
+diff --git a/test/polkit/polkitunixnetgrouptest.c b/test/polkit/polkitunixnetgrouptest.c
+index 3701ba1..e3352eb 100644
 --- a/test/polkit/polkitunixnetgrouptest.c
 +++ b/test/polkit/polkitunixnetgrouptest.c
 @@ -19,6 +19,7 @@
@@ -213,6 +229,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +#endif
    return g_test_run ();
  }
+diff --git a/test/polkitbackend/test-polkitbackendjsauthority.c b/test/polkitbackend/test-polkitbackendjsauthority.c
+index f97e0e0..fc52149 100644
 --- a/test/polkitbackend/test-polkitbackendjsauthority.c
 +++ b/test/polkitbackend/test-polkitbackendjsauthority.c
 @@ -137,12 +137,14 @@ test_get_admin_identities (void)

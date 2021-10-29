@@ -13,7 +13,7 @@ Folders exist for individual manuals as follows:
 Each folder is self-contained regarding content and figures.
 
 If you want to find HTML versions of the BitBake manuals on the web, 
-go to http://www.openembedded.org/wiki/Documentation. 
+go to https://www.openembedded.org/wiki/Documentation.
 
 Sphinx
 ======

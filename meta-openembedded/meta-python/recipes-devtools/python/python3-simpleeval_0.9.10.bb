@@ -17,7 +17,9 @@ SRC_URI += " \
 RDEPENDS:${PN}-ptest += " \
 	${PYTHON_PN}-pytest \
 "
-
+do_configure:prepend() {
+	sed -i -e "/use_2to3=True,/d" ${S}/setup.py
+}
 do_install_ptest() {
 	cp -f ${S}/test_simpleeval.py ${D}${PTEST_PATH}/
 }

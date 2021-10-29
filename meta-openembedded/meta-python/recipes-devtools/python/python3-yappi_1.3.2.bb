@@ -9,6 +9,7 @@ SRC_URI[sha256sum] = "a51d3e6e5563cc74b5bb82ed6e7bd44a9c1a7eae3d97e4d52e9465edb3
 SRC_URI += " \
     file://run-ptest \
     file://0001-Fix-imports-for-ptests.patch \
+    file://python310.patch \
 "
 
 inherit pypi setuptools3 ptest

@@ -1,0 +1,43 @@
+From f703b1184229796d504a2e833f72ace4cc605d15 Mon Sep 17 00:00:00 2001
+From: Ondrej Holy <oholy@redhat.com>
+Date: Wed, 12 May 2021 12:48:15 +0200
+Subject: [PATCH 1/2] Fix FIPS mode support and build with OpenSSL 3.0
+
+FreeRDP fails to build with OpenSSL 3.0 because of usage of the `FIPS_mode`
+and `FIPS_mode_set` functions, which were removed there. Just a note that
+the FIPS mode is not supported by OpenSSL 1.1.* although the mentioned
+functions are still there (see https://wiki.openssl.org/index.php/FIPS_modules).
+Let's make FreeRDP build with OpenSSL 3.0 and fix the FIPS mode support.
+
+See: https://bugzilla.redhat.com/show_bug.cgi?id=1952937
+Upstream-Status: Backport
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ winpr/libwinpr/utils/ssl.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/winpr/libwinpr/utils/ssl.c b/winpr/libwinpr/utils/ssl.c
+index 3a8590390..03b23af43 100644
+--- a/winpr/libwinpr/utils/ssl.c
++++ b/winpr/libwinpr/utils/ssl.c
+@@ -244,9 +244,17 @@ static BOOL winpr_enable_fips(DWORD flags)
+ #else
+ 		WLog_DBG(TAG, "Ensuring openssl fips mode is ENabled");
+ 
++#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
++		if (!EVP_default_properties_is_fips_enabled(NULL))
++#else
+ 		if (FIPS_mode() != 1)
++#endif
+ 		{
++#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
++			if (EVP_set_default_properties(NULL, "fips=yes"))
++#else
+ 			if (FIPS_mode_set(1))
++#endif
+ 				WLog_INFO(TAG, "Openssl fips mode ENabled!");
+ 			else
+ 			{
+-- 
+2.20.1
+

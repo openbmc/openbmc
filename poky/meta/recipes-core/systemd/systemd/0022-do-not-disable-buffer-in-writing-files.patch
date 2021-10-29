@@ -1,4 +1,4 @@
-From 3198690c2dbb4b457a04ef21914dc4d531540273 Mon Sep 17 00:00:00 2001
+From 26da484391e20b36eb65c98872d1145261028c7a Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Fri, 1 Mar 2019 15:22:15 +0800
 Subject: [PATCH] do not disable buffer in writing files
@@ -165,7 +165,7 @@ index 29530bb691..3ecf6a45a2 100644
                  STRV_FOREACH(f, files) {
                          k = apply_file(*f, true);
 diff --git a/src/core/main.c b/src/core/main.c
-index b32a19a1d8..4e1238853e 100644
+index c64c73883e..1ac185e946 100644
 --- a/src/core/main.c
 +++ b/src/core/main.c
 @@ -1402,7 +1402,7 @@ static int bump_unix_max_dgram_qlen(void) {
@@ -252,7 +252,7 @@ index cb01b25bc6..e92051268b 100644
                  log_error_errno(r, "Failed to move process: %m");
                  goto finish;
 diff --git a/src/nspawn/nspawn.c b/src/nspawn/nspawn.c
-index 90b12bb5bd..6a1dafa094 100644
+index ff08ed23cc..e7c4a874a9 100644
 --- a/src/nspawn/nspawn.c
 +++ b/src/nspawn/nspawn.c
 @@ -2751,7 +2751,7 @@ static int reset_audit_loginuid(void) {

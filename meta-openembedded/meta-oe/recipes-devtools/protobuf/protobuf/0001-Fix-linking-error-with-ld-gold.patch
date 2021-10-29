@@ -1,0 +1,69 @@
+From ddb9c5147883f8b27b4205450139e4a115d9961f Mon Sep 17 00:00:00 2001
+From: Kyungjik Min <dp.min@lge.com>
+Date: Mon, 28 Dec 2020 15:56:09 +0900
+Subject: [PATCH] Fix linking error with ld-gold
+
+:Release Notes:
+
+:Detailed Notes:
+https://github.com/protocolbuffers/protobuf/issues/6113
+There's a bug in the CMake build leading it to not use the version
+scripts, which hides the problem (because all symbols are now public)
+but doesn't solve it properly.
+
+:Testing Performed:
+
+:QA Notes:
+N/A
+
+:Issues Addressed:
+[PLAT-130467] Fix build error for libgoogleassistant with latest
+              protobuf-3.11.4
+---
+ src/libprotobuf-lite.map | 2 ++
+ src/libprotobuf.map      | 2 ++
+ src/libprotoc.map        | 2 ++
+ 3 files changed, 6 insertions(+)
+
+diff --git a/src/libprotobuf-lite.map b/src/libprotobuf-lite.map
+index 391554669..a1853ca6c 100644
+--- a/src/libprotobuf-lite.map
++++ b/src/libprotobuf-lite.map
+@@ -3,6 +3,8 @@
+     extern "C++" {
+       *google*;
+     };
++    scc_info_*;
++    descriptor_table_*;
+ 
+   local:
+     *;
+diff --git a/src/libprotobuf.map b/src/libprotobuf.map
+index 391554669..a1853ca6c 100644
+--- a/src/libprotobuf.map
++++ b/src/libprotobuf.map
+@@ -3,6 +3,8 @@
+     extern "C++" {
+       *google*;
+     };
++    scc_info_*;
++    descriptor_table_*;
+ 
+   local:
+     *;
+diff --git a/src/libprotoc.map b/src/libprotoc.map
+index 391554669..a1853ca6c 100644
+--- a/src/libprotoc.map
++++ b/src/libprotoc.map
+@@ -3,6 +3,8 @@
+     extern "C++" {
+       *google*;
+     };
++    scc_info_*;
++    descriptor_table_*;
+ 
+   local:
+     *;
+-- 
+2.17.1
+

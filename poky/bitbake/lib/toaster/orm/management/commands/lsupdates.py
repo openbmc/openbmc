@@ -21,7 +21,7 @@ import threading
 import time
 logger = logging.getLogger("toaster")
 
-DEFAULT_LAYERINDEX_SERVER = "http://layers.openembedded.org/layerindex/api/"
+DEFAULT_LAYERINDEX_SERVER = "https://layers.openembedded.org/layerindex/api/"
 
 # Add path to bitbake modules for layerindexlib
 # lib/toaster/orm/management/commands/lsupdates.py (abspath)

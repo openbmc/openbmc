@@ -24,6 +24,7 @@ EXTRA_OECONF = " \
     --disable-static \
     --disable-ctapi \
     --disable-doc \
+    --disable-strict \
 "
 EXTRA_OEMAKE = "DESTDIR=${D}"
 

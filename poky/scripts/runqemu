@@ -1350,7 +1350,7 @@ class BaseConfig(object):
 
         if self.sdl == True or self.gtk == True or self.egl_headless == True:
             self.set_dri_path()
-            self.qemu_opt += ' -vga virtio -display '
+            self.qemu_opt += ' -device virtio-vga-gl -display '
             if self.egl_headless == True:
                 self.qemu_opt += 'egl-headless,'
             else:
@@ -1412,7 +1412,7 @@ class BaseConfig(object):
         if not os.access(qemu_bin, os.X_OK):
             raise OEPathError("No QEMU binary '%s' could be found" % qemu_bin)
 
-        self.qemu_opt = "%s %s %s %s %s" % (qemu_bin, self.get('NETWORK_CMD'), self.get('QB_RNG'), self.get('ROOTFS_OPTIONS'), self.get('QB_OPT_APPEND'))
+        self.qemu_opt = "%s %s %s %s %s" % (qemu_bin, self.get('NETWORK_CMD'), self.get('QB_RNG'), self.get('ROOTFS_OPTIONS'), self.get('QB_OPT_APPEND').replace('@DEPLOY_DIR_IMAGE@', self.get('DEPLOY_DIR_IMAGE')))
 
         for ovmf in self.ovmf_bios:
             format = ovmf.rsplit('.', 1)[-1]

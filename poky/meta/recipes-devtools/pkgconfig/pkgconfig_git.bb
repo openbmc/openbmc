@@ -8,7 +8,7 @@ SECTION = "console/utils"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRCREV = "edf8e6f0ea77ede073f07bff0d2ae1fc7a38103b"
+SRCREV = "d97db4fae4c1cd099b506970b285dc2afd818ea2"
 PV = "0.29.2+git${SRCPV}"
 
 SRC_URI = "git://gitlab.freedesktop.org/pkg-config/pkg-config.git;branch=master;protocol=https \

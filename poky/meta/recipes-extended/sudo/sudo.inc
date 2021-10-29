@@ -4,7 +4,7 @@ HOMEPAGE = "http://www.sudo.ws"
 BUGTRACKER = "http://www.sudo.ws/bugs/"
 SECTION = "admin"
 LICENSE = "ISC & BSD-3-Clause & BSD-2-Clause & Zlib"
-LIC_FILES_CHKSUM = "file://doc/LICENSE;md5=fdff64d4fd19126330aa81b94d167173 \
+LIC_FILES_CHKSUM = "file://doc/LICENSE;md5=b969d389e79703121cbffc9f3ea18a8b \
                     file://plugins/sudoers/redblack.c;beginline=1;endline=46;md5=03e35317699ba00b496251e0dfe9f109 \
                     file://lib/util/reallocarray.c;beginline=3;endline=15;md5=397dd45c7683e90b9f8bf24638cf03bf \
                     file://lib/util/fnmatch.c;beginline=3;endline=27;md5=004d7d2866ba1f5b41174906849d2e0f \
@@ -30,15 +30,13 @@ EXTRA_OECONF = "--with-editor=${base_bindir}/vi --with-env-editor"
 
 EXTRA_OECONF:append:libc-musl = " --disable-hardening "
 
-# mksigname/mksiglist are used on build host to generate source files
 do_compile:prepend () {
-	# Remove build host references from sudo_usage.h
-	sed -i  \
-	    -e 's,--with-libtool-sysroot=${STAGING_DIR_TARGET},,g' \
-	    -e 's,--build=${BUILD_SYS},,g' \
-	    -e 's,--host=${HOST_SYS},,g' \
-	    ${B}/src/sudo_usage.h
-	oe_runmake SSP_CFLAGS="" SSP_LDFLAGS="" CC="$BUILD_CC" CFLAGS="$BUILD_CFLAGS" CPPFLAGS="$BUILD_CPPFLAGS -I${S}/include -I${S} -I${B}"  -C lib/util mksigname mksiglist
+       # Remove build host references from sudo_usage.h
+       sed -i  \
+           -e 's,--with-libtool-sysroot=${STAGING_DIR_TARGET},,g' \
+           -e 's,--build=${BUILD_SYS},,g' \
+           -e 's,--host=${HOST_SYS},,g' \
+           ${B}/src/sudo_usage.h
 }
 
 # Explicitly create ${localstatedir}/lib before do_install to ensure

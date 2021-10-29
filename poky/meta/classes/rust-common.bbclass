@@ -1,3 +1,5 @@
+inherit python3native
+
 # Common variables used by all Rust builds
 export rustlibdir = "${libdir}/rust"
 FILES:${PN} += "${rustlibdir}/*.so"
@@ -133,8 +135,12 @@ create_wrapper () {
 	shift
 
 	cat <<- EOF > "${file}"
-	#!/bin/sh
-	exec $@ "\$@"
+	#!/usr/bin/env python3
+	import os, sys
+	orig_binary = "$@"
+	binary = orig_binary.split()[0]
+	args = orig_binary.split() + sys.argv[1:]
+	os.execvp(binary, args)
 	EOF
 	chmod +x "${file}"
 }
@@ -169,11 +175,6 @@ do_rust_create_wrappers () {
 	# Yocto Target / Rust Target archiver
 	create_wrapper "${RUST_TARGET_AR}" "${WRAPPER_TARGET_AR}"
 
-	# Need to filter out LD_LIBRARY_PATH from the linker without using shell
-	mv ${RUST_BUILD_CCLD} ${RUST_BUILD_CCLD}.real
-	${BUILD_CC} ${COREBASE}/meta/files/rust-ccld-wrapper.c -o ${RUST_BUILD_CCLD}
-	mv ${RUST_TARGET_CCLD} ${RUST_TARGET_CCLD}.real
-	${BUILD_CC} ${COREBASE}/meta/files/rust-ccld-wrapper.c -o ${RUST_TARGET_CCLD}
 }
 
 addtask rust_create_wrappers before do_configure after do_patch do_prepare_recipe_sysroot

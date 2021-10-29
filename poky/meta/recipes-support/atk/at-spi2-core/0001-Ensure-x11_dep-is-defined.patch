@@ -1,0 +1,33 @@
+From 9e726133319298a835f724904c80e5adf78f475f Mon Sep 17 00:00:00 2001
+From: Tim Orling <timothy.t.orling@intel.com>
+Date: Fri, 15 Oct 2021 18:00:04 +0000
+Subject: [PATCH] Ensure x11_dep is defined
+
+bus/meson.build checks if x11_dep.found(), but this fails when
+-Dx11=no
+
+Upstream-Status: Submitted
+[https://gitlab.gnome.org/GNOME/at-spi2-core/-/merge_requests/60]
+
+References:
+  https://gitlab.gnome.org/GNOME/at-spi2-core/-/issues/42
+  https://mesonbuild.com/howtox.html#get-a-default-notfound-dependency
+
+Signed-off-by: Tim Orling <timothy.t.orling@intel.com>
+---
+ meson.build | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index b5104c8..85d7a0e 100644
+--- a/meson.build
++++ b/meson.build
+@@ -62,6 +62,8 @@ endif
+ 
+ x11_deps = []
+ x11_option = get_option('x11')
++# ensure x11_dep is defined for use in bus/meson.build
++x11_dep = dependency('', required: false)
+ if x11_option != 'no'
+   x11_dep = dependency('x11', required: false)
+ 

@@ -211,7 +211,7 @@ Be sure you meet the following requirements:
 
 -  If you are using Ubuntu, run the following::
 
-      $ sudo apt-get install apache2 libapache2-mod-wsgi-py3 mysql-server python3-pip libmysqlclient-dev
+      $ sudo apt install apache2 libapache2-mod-wsgi-py3 mysql-server python3-pip libmysqlclient-dev
 
 -  If you are using Fedora or a RedHat distribution, run the
    following::

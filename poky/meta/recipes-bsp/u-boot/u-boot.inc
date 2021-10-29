@@ -4,6 +4,7 @@ PROVIDES = "virtual/bootloader"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 DEPENDS += "kern-tools-native"
+DEPENDS += "${@bb.utils.contains('UBOOT_ENV_SUFFIX', 'scr', 'u-boot-mkimage-native', '', d)}"
 
 inherit uboot-config uboot-extlinux-config uboot-sign deploy cml1 python3native kernel-arch
 
@@ -105,6 +106,11 @@ do_compile () {
         if [ -n "${UBOOT_INITIAL_ENV}" ]; then
             oe_runmake -C ${S} O=${B} u-boot-initial-env
         fi
+    fi
+
+    if [ -n "${UBOOT_ENV}" ] && [ "${UBOOT_ENV_SUFFIX}" = "scr" ]
+    then
+        ${UBOOT_MKIMAGE} -C none -A ${UBOOT_ARCH} -T script -d ${WORKDIR}/${UBOOT_ENV_SRC} ${WORKDIR}/${UBOOT_ENV_BINARY}
     fi
 }
 

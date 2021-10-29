@@ -742,6 +742,7 @@ UBOOT_MKIMAGE_DTCOPTS = "-I dts -O dtb -p 2000"
 UBOOT_EXTLINUX = "0"
 FIT_GENERATE_KEYS = "1"
 KERNEL_IMAGETYPE_REPLACEMENT = "zImage"
+FIT_KERNEL_COMP_ALG = "none"
 FIT_HASH_ALG = "sha256"
 """
         self.write_config(config)
@@ -763,9 +764,8 @@ FIT_HASH_ALG = "sha256"
 
         kernel_load = str(get_bb_var('UBOOT_LOADADDRESS'))
         kernel_entry = str(get_bb_var('UBOOT_ENTRYPOINT'))
-        initramfs_bundle_format = str(get_bb_var('KERNEL_IMAGETYPE_REPLACEMENT'))
+        kernel_compression = str(get_bb_var('FIT_KERNEL_COMP_ALG'))
         uboot_arch = str(get_bb_var('UBOOT_ARCH'))
-        initramfs_bundle = "arch/" + uboot_arch + "/boot/" + initramfs_bundle_format + ".initramfs"
         fit_hash_alg = str(get_bb_var('FIT_HASH_ALG'))
 
         its_file = open(fitimage_its_path)
@@ -775,11 +775,11 @@ FIT_HASH_ALG = "sha256"
         exp_node_lines = [
             'kernel-1 {',
             'description = "Linux kernel";',
-            'data = /incbin/("' + initramfs_bundle + '");',
+            'data = /incbin/("linux.bin");',
             'type = "kernel";',
             'arch = "' + uboot_arch + '";',
             'os = "linux";',
-            'compression = "none";',
+            'compression = "' + kernel_compression + '";',
             'load = <' + kernel_load + '>;',
             'entry = <' + kernel_entry + '>;',
             'hash-1 {',

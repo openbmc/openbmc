@@ -6,7 +6,7 @@ Subject: [PATCH] test: retriable tests are marked failed only when all
 
 Fixes: #1193
 
-Upstream-status: Pending
+Upstream-Status: Accepted
 
 Signed-off-by: Thomas Perrot <thomas.perrot@bootlin.com>
 ---

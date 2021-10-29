@@ -287,7 +287,7 @@ python buildhistory_emit_pkghistory() {
             r = bb.utils.vercmp((pkge, pkgv, pkgr), (last_pkge, last_pkgv, last_pkgr))
             if r < 0:
                 msg = "Package version for package %s went backwards which would break package feeds (from %s:%s-%s to %s:%s-%s)" % (pkg, last_pkge, last_pkgv, last_pkgr, pkge, pkgv, pkgr)
-                package_qa_handle_error("version-going-backwards", msg, d)
+                oe.qa.handle_error("version-going-backwards", msg, d)
 
         pkginfo = PackageInfo(pkg)
         # Apparently the version can be different on a per-package basis (see Python)
@@ -321,6 +321,7 @@ python buildhistory_emit_pkghistory() {
 
     # Create files-in-<package-name>.txt files containing a list of files of each recipe's package
     bb.build.exec_func("buildhistory_list_pkg_files", d)
+    oe.qa.exit_if_errors(d)
 }
 
 python buildhistory_emit_outputsigs() {
@@ -442,11 +443,16 @@ def buildhistory_list_installed(d, rootfs_type="image"):
     else:
         pkgs = sdk_list_installed_packages(d, rootfs_type == "sdk_target")
 
+    if rootfs_type == "sdk_host":
+        pkgdata_dir = d.getVar('PKGDATA_DIR_SDK')
+    else:
+        pkgdata_dir = d.getVar('PKGDATA_DIR')
+
     for output_type, output_file in process_list:
         output_file_full = os.path.join(d.getVar('WORKDIR'), output_file)
 
         with open(output_file_full, 'w') as output:
-            output.write(format_pkg_list(pkgs, output_type, d.getVar('PKGDATA_DIR')))
+            output.write(format_pkg_list(pkgs, output_type, pkgdata_dir))
 
 python buildhistory_list_installed_image() {
     buildhistory_list_installed(d)
@@ -496,13 +502,19 @@ buildhistory_get_installed() {
 	echo "}" >>  $1/depends.dot
 	rm $1/depends.tmp
 
+	# Set correct pkgdatadir
+	pkgdatadir=${PKGDATA_DIR}
+	if [ "$2" == "sdk" ] && [ "$3" == "host" ]; then
+		pkgdatadir="${PKGDATA_DIR_SDK}"
+	fi
+
 	# Produce installed package sizes list
-	oe-pkgdata-util -p ${PKGDATA_DIR} read-value "PKGSIZE" -n -f $pkgcache > $1/installed-package-sizes.tmp
+	oe-pkgdata-util -p $pkgdatadir read-value "PKGSIZE" -n -f $pkgcache > $1/installed-package-sizes.tmp
 	cat $1/installed-package-sizes.tmp | awk '{print $2 "\tKiB\t" $1}' | sort -n -r > $1/installed-package-sizes.txt
 	rm $1/installed-package-sizes.tmp
 
 	# Produce package info: runtime_name, buildtime_name, recipe, version, size
-	oe-pkgdata-util -p ${PKGDATA_DIR} read-value "PACKAGE,PN,PV,PKGSIZE" -n -f $pkgcache > $1/installed-package-info.tmp
+	oe-pkgdata-util -p $pkgdatadir read-value "PACKAGE,PN,PV,PKGSIZE" -n -f $pkgcache > $1/installed-package-info.tmp
 	cat $1/installed-package-info.tmp | sort -n -r -k 5 > $1/installed-package-info.txt
 	rm $1/installed-package-info.tmp
 
@@ -542,7 +554,7 @@ buildhistory_get_sdk_installed() {
 		return
 	fi
 
-	buildhistory_get_installed ${BUILDHISTORY_DIR_SDK}/$1 sdk
+	buildhistory_get_installed ${BUILDHISTORY_DIR_SDK}/$1 sdk $1
 }
 
 buildhistory_get_sdk_installed_host() {
@@ -773,7 +785,7 @@ def buildhistory_get_imagevars(d):
 def buildhistory_get_sdkvars(d):
     if d.getVar('BB_WORKERCONTEXT') != '1':
         return ""
-    sdkvars = "DISTRO DISTRO_VERSION SDK_NAME SDK_VERSION SDKMACHINE SDKIMAGE_FEATURES BAD_RECOMMENDATIONS NO_RECOMMENDATIONS PACKAGE_EXCLUDE"
+    sdkvars = "DISTRO DISTRO_VERSION SDK_NAME SDK_VERSION SDKMACHINE SDKIMAGE_FEATURES TOOLCHAIN_HOST_TASK TOOLCHAIN_TARGET_TASK BAD_RECOMMENDATIONS NO_RECOMMENDATIONS PACKAGE_EXCLUDE"
     if d.getVar('BB_CURRENTTASK') == 'populate_sdk_ext':
         # Extensible SDK uses some additional variables
         sdkvars += " SDK_LOCAL_CONF_WHITELIST SDK_LOCAL_CONF_BLACKLIST SDK_INHERIT_BLACKLIST SDK_UPDATE_URL SDK_EXT_TYPE SDK_RECRDEP_TASKS SDK_INCLUDE_PKGDATA SDK_INCLUDE_TOOLCHAIN"

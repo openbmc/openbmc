@@ -884,7 +884,7 @@ def runfetchcmd(cmd, d, quiet=False, cleanup=None, log=None, workdir=None):
         (output, errors) = bb.process.run(cmd, log=log, shell=True, stderr=subprocess.PIPE, cwd=workdir)
         success = True
     except bb.process.NotFoundError as e:
-        error_message = "Fetch command %s" % (e.command)
+        error_message = "Fetch command %s not found" % (e.command)
     except bb.process.ExecutionError as e:
         if e.stdout:
             output = "output:\n%s\n%s" % (e.stdout, e.stderr)
@@ -1721,7 +1721,9 @@ class Fetch(object):
                     self.d.setVar("BB_NO_NETWORK", "1")
 
                 firsterr = None
-                verified_stamp = m.verify_donestamp(ud, self.d)
+                verified_stamp = False
+                if done:
+                    verified_stamp = m.verify_donestamp(ud, self.d)
                 if not done and (not verified_stamp or m.need_update(ud, self.d)):
                     try:
                         if not trusted_network(self.d, ud.url):
@@ -1780,7 +1782,11 @@ class Fetch(object):
 
     def checkstatus(self, urls=None):
         """
-        Check all urls exist upstream
+        Check all URLs exist upstream.
+
+        Returns None if the URLs exist, raises FetchError if the check wasn't
+        successful but there wasn't an error (such as file not found), and
+        raises other exceptions in error cases.
         """
 
         if not urls:

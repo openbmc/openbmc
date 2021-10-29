@@ -281,6 +281,62 @@ overview of their function and contents.
 
          BB_GENERATE_MIRROR_TARBALLS = "1"
 
+   :term:`BB_GENERATE_SHALLOW_TARBALLS`
+      Setting this variable to "1" when :term:`BB_GIT_SHALLOW` is also set to
+      "1" causes bitbake to generate shallow mirror tarballs when fetching git
+      repositories. The number of commits included in the shallow mirror
+      tarballs is controlled by :term:`BB_GIT_SHALLOW_DEPTH`.
+
+      If both :term:`BB_GIT_SHALLOW` and :term:`BB_GENERATE_MIRROR_TARBALLS` are
+      enabled, bitbake will generate shallow mirror tarballs by default for git
+      repositories. This separate variable exists so that shallow tarball
+      generation can be enabled without needing to also enable normal mirror
+      generation if it is not desired.
+
+      For example usage, see :term:`BB_GIT_SHALLOW`.
+
+   :term:`BB_GIT_SHALLOW`
+      Setting this variable to "1" enables the support for fetching, using and
+      generating mirror tarballs of `shallow git repositories <https://riptutorial.com/git/example/4584/shallow-clone>`_.
+      The external `git-make-shallow <https://git.openembedded.org/bitbake/tree/bin/git-make-shallow>`_
+      script is used for shallow mirror tarball creation.
+
+      When :term:`BB_GIT_SHALLOW` is enabled, bitbake will attempt to fetch a shallow
+      mirror tarball. If the shallow mirror tarball cannot be fetched, it will
+      try to fetch the full mirror tarball and use that.
+
+      When a mirror tarball is not available, a full git clone will be performed
+      regardless of whether this variable is set or not. Support for shallow
+      clones is not currently implemented as git does not directly support
+      shallow cloning a particular git commit hash (it only supports cloning
+      from a tag or branch reference).
+
+      See also :term:`BB_GIT_SHALLOW_DEPTH` and
+      :term:`BB_GENERATE_SHALLOW_TARBALLS`.
+
+      Example usage::
+
+         BB_GIT_SHALLOW ?= "1"
+
+         # Keep only the top commit
+         BB_GIT_SHALLOW_DEPTH ?= "1"
+
+         # This defaults to enabled if both BB_GIT_SHALLOW and
+         # BB_GENERATE_MIRROR_TARBALLS are enabled
+         BB_GENERATE_SHALLOW_TARBALLS ?= "1"
+
+   :term:`BB_GIT_SHALLOW_DEPTH`
+      When used with :term:`BB_GENERATE_SHALLOW_TARBALLS`, this variable sets
+      the number of commits to include in generated shallow mirror tarballs.
+      With a depth of 1, only the commit referenced in :term:`SRCREV` is
+      included in the shallow mirror tarball. Increasing the depth includes
+      additional parent commits, working back through the commit history.
+
+      If this variable is unset, bitbake will default to a depth of 1 when
+      generating shallow mirror tarballs.
+
+      For example usage, see :term:`BB_GIT_SHALLOW`.
+
    :term:`BB_HASHBASE_WHITELIST`
       Lists variables that are excluded from checksum and dependency data.
       Variables that are excluded can therefore change without affecting
@@ -538,7 +594,7 @@ overview of their function and contents.
 
       You can use this variable in combination with task overrides to raise
       or lower priorities of specific tasks. For example, on the `Yocto
-      Project <http://www.yoctoproject.org>`__ autobuilder, QEMU emulation
+      Project <https://www.yoctoproject.org>`__ autobuilder, QEMU emulation
       in images is given a higher priority as compared to build tasks to
       ensure that images do not suffer timeouts on loaded systems.
 
@@ -1123,10 +1179,10 @@ overview of their function and contents.
       your configuration::
 
          PREMIRRORS:prepend = "\
-         git://.*/.* http://www.yoctoproject.org/sources/ \n \
-         ftp://.*/.* http://www.yoctoproject.org/sources/ \n \
-         http://.*/.* http://www.yoctoproject.org/sources/ \n \
-         https://.*/.* http://www.yoctoproject.org/sources/ \n"
+         git://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n \
+         ftp://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n \
+         http://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n \
+         https://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n"
 
       These changes cause the build system to intercept Git, FTP, HTTP, and
       HTTPS requests and direct them to the ``http://`` sources mirror. You can

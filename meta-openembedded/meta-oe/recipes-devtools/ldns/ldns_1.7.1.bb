@@ -8,6 +8,7 @@ SRC_URI[md5sum] = "166262a46995d9972aba417fd091acd5"
 SRC_URI[sha256sum] = "8ac84c16bdca60e710eea75782356f3ac3b55680d40e1530d7cea474ac208229"
 
 DEPENDS = "openssl"
+PNBLACKLIST[ldns] ?= "Needs porting to openssl 3.x"
 
 inherit autotools-brokensep
 

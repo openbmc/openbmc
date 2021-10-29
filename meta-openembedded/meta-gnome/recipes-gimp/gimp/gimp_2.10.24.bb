@@ -51,6 +51,9 @@ EXTRA_OECONF = "--disable-python \
                 --disable-check-update \
                 --without-wmf"
 
+EXTRA_OECONF:append:toolchain-clang:riscv32 = " --disable-vector-icons"
+EXTRA_OECONF:append:toolchain-clang:mips = " --disable-vector-icons"
+
 do_configure:append() {
     find ${B} -name Makefile | xargs sed -i s:'-I$(includedir)':'-I.':g
     find ${B} -name Makefile | xargs sed -i s:'-I/usr/include':'-I${STAGING_INCDIR}':g

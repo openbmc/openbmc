@@ -21,6 +21,14 @@ add_weston_argument() {
 # Add openvt extra argument
 add_openvt_argument() {
 	openvt_args="$openvt_args $1"
+
+}
+## Add module to --modules argument
+add_weston_module() {
+	if [[ "x${weston_modules}" == "x" ]]; then
+		weston_modules="--modules "
+	fi;
+	weston_modules+="${1},"
 }
 
 if [ -n "$WAYLAND_DISPLAY" ]; then
@@ -68,6 +76,9 @@ if [ -d "$modules_dir" ]; then
 
 		# process module
 		. $m
+		if [[ x"{$weston_modules}" != "x" ]]; then
+			add_weston_argument "${weston_modules}"
+		fi;
 	done
 fi
 

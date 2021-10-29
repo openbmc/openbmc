@@ -1,34 +1,54 @@
-From 57e2c5e35732988c0b287289eb0997b4e9769371 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Fri, 29 Mar 2013 09:12:56 +0400
-Subject: [PATCH] optional libstdc
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Subject: [PATCH 3/5] gcc: Add --nostdlib++ option
 
-gcc-runtime builds libstdc++ separately from gcc-cross-*. Its configure tests using g++
+[gcc-runtime builds libstdc++ separately from gcc-cross-*. Its configure tests using g++
 will not run correctly since by default the linker will try to link against libstdc++
 which shouldn't exist yet. We need an option to disable -lstdc++
 option whilst leaving -lc, -lgcc and other automatic library dependencies added by gcc
-driver. This patch adds such an option which only disables the -lstdc++.
+driver. This patch adds such an option which only disables the -lstdc++.]
 
-A "standard" gcc build uses xgcc and hence avoids this. We should ask upstream how to
-do this officially, the likely answer is don't build libstdc++ separately.
+[A "standard" gcc build uses xgcc and hence avoids this. We should ask upstream how to
+do this officially, the likely answer is don't build libstdc++ separately.]
 
-RP 29/6/10
+OpenEmbedded/Yocto Project builds libgcc and the other gcc runtime libraries
+separately from the compiler and slightly differently to the standard gcc build.
 
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
+In general this works well but in trying to build them separately we run into
+an issue since we're using our gcc, not xgcc and there is no way to tell configure
+to use libgcc but not look for libstdc++.
 
-Upstream-Status: Inappropriate [embedded specific]
+This adds such an option allowing such configurations to work.
+
+2021-10-26 Richard Purdie <richard.purdie@linuxfoundation.org>
+
+gcc/c-family/ChangeLog:
+
+    * c.opt: Add --nostdlib++ option
+
+gcc/cp/ChangeLog:
+
+    * g++spec.c (lang_specific_driver): Add --nostdlib++ option
+
+gcc/ChangeLog:
+
+    * doc/invoke.texi: Document --nostdlib++ option
+    * gcc.c: Add --nostdlib++ option
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Submitted [https://gcc.gnu.org/pipermail/gcc-patches/2021-October/582724.html]
 ---
- gcc/c-family/c.opt  |  4 ++++
- gcc/cp/g++spec.c    |  1 +
- gcc/doc/invoke.texi | 32 +++++++++++++++++++++++++++++++-
- gcc/gcc.c           |  1 +
- 4 files changed, 37 insertions(+), 1 deletion(-)
+ gcc/c-family/c.opt  | 4 ++++
+ gcc/cp/g++spec.c    | 1 +
+ gcc/doc/invoke.texi | 8 +++++++-
+ gcc/gcc.c           | 1 +
+ 4 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/gcc/c-family/c.opt b/gcc/c-family/c.opt
-index 64e46e7573e..1824380f27a 100644
---- a/gcc/c-family/c.opt
-+++ b/gcc/c-family/c.opt
-@@ -2166,6 +2166,10 @@ nostdinc++
+Index: gcc-11.2.0/gcc/c-family/c.opt
+===================================================================
+--- gcc-11.2.0.orig/gcc/c-family/c.opt
++++ gcc-11.2.0/gcc/c-family/c.opt
+@@ -2153,6 +2153,10 @@ nostdinc++
  C++ ObjC++
  Do not search standard system include directories for C++.
  
@@ -39,11 +59,11 @@ index 64e46e7573e..1824380f27a 100644
  o
  C ObjC C++ ObjC++ Joined Separate
  ; Documented in common.opt
-diff --git a/gcc/cp/g++spec.c b/gcc/cp/g++spec.c
-index 3c9bd1490b4..818beb61cee 100644
---- a/gcc/cp/g++spec.c
-+++ b/gcc/cp/g++spec.c
-@@ -159,6 +159,7 @@ lang_specific_driver (struct cl_decoded_option **in_decoded_options,
+Index: gcc-11.2.0/gcc/cp/g++spec.c
+===================================================================
+--- gcc-11.2.0.orig/gcc/cp/g++spec.c
++++ gcc-11.2.0/gcc/cp/g++spec.c
+@@ -159,6 +159,7 @@ lang_specific_driver (struct cl_decoded_
        switch (decoded_options[i].opt_index)
  	{
  	case OPT_nostdlib:
@@ -51,21 +71,19 @@ index 3c9bd1490b4..818beb61cee 100644
  	case OPT_nodefaultlibs:
  	  library = -1;
  	  break;
-diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index 6659a903bf0..9ee63dbe52f 100644
---- a/gcc/doc/invoke.texi
-+++ b/gcc/doc/invoke.texi
-@@ -239,6 +239,9 @@ in the following sections.
+Index: gcc-11.2.0/gcc/doc/invoke.texi
+===================================================================
+--- gcc-11.2.0.orig/gcc/doc/invoke.texi
++++ gcc-11.2.0/gcc/doc/invoke.texi
+@@ -239,6 +239,7 @@ in the following sections.
  -fno-weak  -nostdinc++ @gol
  -fvisibility-inlines-hidden @gol
  -fvisibility-ms-compat @gol
-+-fvtable-verify=@r{[}std@r{|}preinit@r{|}none@r{]} @gol
-+-fvtv-counts -fvtv-debug @gol
 +-nostdlib++ @gol
  -fext-numeric-literals @gol
  -flang-info-include-translate@r{[}=@var{header}@r{]} @gol
  -flang-info-include-translate-not @gol
-@@ -632,7 +635,7 @@ Objective-C and Objective-C++ Dialects}.
+@@ -632,7 +633,7 @@ Objective-C and Objective-C++ Dialects}.
  -pie  -pthread  -r  -rdynamic @gol
  -s  -static  -static-pie  -static-libgcc  -static-libstdc++ @gol
  -static-libasan  -static-libtsan  -static-liblsan  -static-libubsan @gol
@@ -74,7 +92,7 @@ index 6659a903bf0..9ee63dbe52f 100644
  -T @var{script}  -Wl,@var{option}  -Xlinker @var{option} @gol
  -u @var{symbol}  -z @var{keyword}}
  
-@@ -15708,6 +15711,33 @@ Specify that the program entry point is @var{entry}.  The argument is
+@@ -15721,6 +15722,11 @@ Specify that the program entry point is
  interpreted by the linker; the GNU linker accepts either a symbol name
  or an address.
  
@@ -83,36 +101,14 @@ index 6659a903bf0..9ee63dbe52f 100644
 +Do not use the standard system C++ runtime libraries when linking.
 +Only the libraries you specify will be passed to the linker.
 +
-+@cindex @option{-lgcc}, use with @option{-nostdlib}
-+@cindex @option{-nostdlib} and unresolved references
-+@cindex unresolved references and @option{-nostdlib}
-+@cindex @option{-lgcc}, use with @option{-nodefaultlibs}
-+@cindex @option{-nodefaultlibs} and unresolved references
-+@cindex unresolved references and @option{-nodefaultlibs}
-+One of the standard libraries bypassed by @option{-nostdlib} and
-+@option{-nodefaultlibs} is @file{libgcc.a}, a library of internal subroutines
-+which GCC uses to overcome shortcomings of particular machines, or special
-+needs for some languages.
-+(@xref{Interface,,Interfacing to GCC Output,gccint,GNU Compiler
-+Collection (GCC) Internals},
-+for more discussion of @file{libgcc.a}.)
-+In most cases, you need @file{libgcc.a} even when you want to avoid
-+other standard libraries.  In other words, when you specify @option{-nostdlib}
-+or @option{-nodefaultlibs} you should usually specify @option{-lgcc} as well.
-+This ensures that you have no unresolved references to internal GCC
-+library subroutines.
-+(An example of such an internal subroutine is @code{__main}, used to ensure C++
-+constructors are called; @pxref{Collect2,,@code{collect2}, gccint,
-+GNU Compiler Collection (GCC) Internals}.)
-+
  @item -pie
  @opindex pie
  Produce a dynamically linked position independent executable on targets
-diff --git a/gcc/gcc.c b/gcc/gcc.c
-index 19c75b6e20d..be7630ffd8c 100644
---- a/gcc/gcc.c
-+++ b/gcc/gcc.c
-@@ -1162,6 +1162,7 @@ proper position among the other output files.  */
+Index: gcc-11.2.0/gcc/gcc.c
+===================================================================
+--- gcc-11.2.0.orig/gcc/gcc.c
++++ gcc-11.2.0/gcc/gcc.c
+@@ -1162,6 +1162,7 @@ proper position among the other output f
      %(mflib) " STACK_SPLIT_SPEC "\
      %{fprofile-arcs|fprofile-generate*|coverage:-lgcov} " SANITIZER_SPEC " \
      %{!nostdlib:%{!r:%{!nodefaultlibs:%(link_ssp) %(link_gcc_c_sequence)}}}\

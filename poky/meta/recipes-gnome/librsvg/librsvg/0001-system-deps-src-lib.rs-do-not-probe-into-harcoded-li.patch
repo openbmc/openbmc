@@ -1,0 +1,53 @@
+From 6d1f0740b111e86e99dcaf0222f3d1d67d3bf1e6 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 21 Sep 2021 16:54:23 +0200
+Subject: [PATCH] system-deps/src/lib.rs: do not probe into harcoded list of
+ targets
+
+Oe-core defines custom targets, and this probe fails.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ vendor/system-deps/.cargo-checksum.json |  2 +-
+ vendor/system-deps/src/lib.rs           | 16 +---------------
+ 2 files changed, 2 insertions(+), 16 deletions(-)
+
+diff --git a/vendor/system-deps/.cargo-checksum.json b/vendor/system-deps/.cargo-checksum.json
+index ecebb94..30d594e 100644
+--- a/vendor/system-deps/.cargo-checksum.json
++++ b/vendor/system-deps/.cargo-checksum.json
+@@ -1 +1 @@
+-{"files":{"Cargo.toml":"56ab5070dc9019b039c5e9904bb466b0879c33a7f69dd030b97abab321b7cc04","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3","README.md":"3fe7396637bf9233908f41c6001cfcb00a379225e06e36e508c8b3d7264a8aae","src/lib.rs":"015518f4337d80249d12c7e6c55e9063705a0b8805ebf46a445c89253edc5de0","src/metadata.rs":"4c8d6ac2c88646a5b97ecb50ed44b65e5b2865cce6897add85b29ca2ae08c2bb","src/test.rs":"1ec48d1e443a0a4ac8035a2b60ff0321543aa2fa998fee72cf7762a936bf5f8c","src/tests/testanotherlib.pc":"bb4fd942324e6d49ce3becd827aa5c948d1924ca6681904a3695c19b1424eb3c","src/tests/testdata.pc":"43f481e989c03674fed5ef78c6420b3f8d36a2ce001928d86c418d1844acd5e7","src/tests/testlib-2.0.pc":"152eb0c70c14c3d948118408f3d1fd3bb7531b02aa792db85bd957f7db90b45b","src/tests/testlib-3.0.pc":"cd39c2ef88f6828c9291150cc4b624e769abef484674eaebaa4f67979501315f","src/tests/testlib.pc":"75c0d8a5345f65794f583c83e1cf0dbf3385af6e6abea1d61bb86eef707a52db","src/tests/toml-missing-file/no-cargo-toml-here":"6ab4da4b56f15315df6538610cfcd2ba3d0f9a7a8414678ff00ab5a78f7d41fa"},"package":"480c269f870722b3b08d2f13053ce0c2ab722839f472863c3e2d61ff3a1c2fa6"}
+\ No newline at end of file
++{"files":{"Cargo.toml":"56ab5070dc9019b039c5e9904bb466b0879c33a7f69dd030b97abab321b7cc04","LICENSE-APACHE":"a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2","LICENSE-MIT":"23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3","README.md":"3fe7396637bf9233908f41c6001cfcb00a379225e06e36e508c8b3d7264a8aae","src/lib.rs":"594e5f14180590adc9ea0a8ba1cc35f9a8a260322d08de3037efac3ce1dc729b","src/metadata.rs":"4c8d6ac2c88646a5b97ecb50ed44b65e5b2865cce6897add85b29ca2ae08c2bb","src/test.rs":"1ec48d1e443a0a4ac8035a2b60ff0321543aa2fa998fee72cf7762a936bf5f8c","src/tests/testanotherlib.pc":"bb4fd942324e6d49ce3becd827aa5c948d1924ca6681904a3695c19b1424eb3c","src/tests/testdata.pc":"43f481e989c03674fed5ef78c6420b3f8d36a2ce001928d86c418d1844acd5e7","src/tests/testlib-2.0.pc":"152eb0c70c14c3d948118408f3d1fd3bb7531b02aa792db85bd957f7db90b45b","src/tests/testlib-3.0.pc":"cd39c2ef88f6828c9291150cc4b624e769abef484674eaebaa4f67979501315f","src/tests/testlib.pc":"75c0d8a5345f65794f583c83e1cf0dbf3385af6e6abea1d61bb86eef707a52db","src/tests/toml-missing-file/no-cargo-toml-here":"6ab4da4b56f15315df6538610cfcd2ba3d0f9a7a8414678ff00ab5a78f7d41fa"},"package":"480c269f870722b3b08d2f13053ce0c2ab722839f472863c3e2d61ff3a1c2fa6"}
+diff --git a/vendor/system-deps/src/lib.rs b/vendor/system-deps/src/lib.rs
+index a0d4f00..a666817 100644
+--- a/vendor/system-deps/src/lib.rs
++++ b/vendor/system-deps/src/lib.rs
+@@ -725,21 +725,7 @@ impl Config {
+     }
+ 
+     fn check_cfg(&self, cfg: &cfg_expr::Expression) -> Result<bool, Error> {
+-        use cfg_expr::{targets::get_builtin_target_by_triple, Predicate};
+-
+-        let target = self
+-            .env
+-            .get("TARGET")
+-            .expect("no TARGET env variable defined");
+-        let target = get_builtin_target_by_triple(&target)
+-            .unwrap_or_else(|| panic!("Invalid TARGET: {}", target));
+-
+-        let res = cfg.eval(|pred| match pred {
+-            Predicate::Target(tp) => Some(tp.matches(target)),
+-            _ => None,
+-        });
+-
+-        res.ok_or_else(|| Error::UnsupportedCfg(cfg.original().to_string()))
++        Ok(true)
+     }
+ }
+ 
+-- 
+2.20.1
+

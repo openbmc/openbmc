@@ -296,7 +296,7 @@ The following defines the releases when you create a new project:
       <field type="CharField" name="description">Yocto Project &DISTRO; "&DISTRO_NAME;"</field>
       <field rel="ManyToOneRel" to="orm.bitbakeversion" name="bitbake_version">1</field>
       <field type="CharField" name="branch_name">&DISTRO_NAME_NO_CAP;</field>
-      <field type="TextField" name="helptext">Toaster will run your builds using the tip of the <a href="http://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=&DISTRO_NAME_NO_CAP;">Yocto Project &DISTRO_NAME; branch</a>.</field>
+      <field type="TextField" name="helptext">Toaster will run your builds using the tip of the <a href="https://git.yoctoproject.org/cgit/cgit.cgi/poky/log/?h=&DISTRO_NAME_NO_CAP;">Yocto Project &DISTRO_NAME; branch</a>.</field>
    </object>
 
 The "pk" value must match the above respective BitBake version record.
@@ -333,9 +333,9 @@ that includes the layer. In general all releases include the layer.
       <field type="CharField" name="name">openembedded-core</field>
       <field type="CharField" name="layer_index_url"></field>
       <field type="CharField" name="vcs_url">git://git.yoctoproject.org/poky</field>
-      <field type="CharField" name="vcs_web_url">http://git.yoctoproject.org/cgit/cgit.cgi/poky</field>
-      <field type="CharField" name="vcs_web_tree_base_url">http://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/%path%?h=%branch%</field>
-      <field type="CharField" name="vcs_web_file_base_url">http://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/%path%?h=%branch%</field>
+      <field type="CharField" name="vcs_web_url">https://git.yoctoproject.org/cgit/cgit.cgi/poky</field>
+      <field type="CharField" name="vcs_web_tree_base_url">https://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/%path%?h=%branch%</field>
+      <field type="CharField" name="vcs_web_file_base_url">https://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/%path%?h=%branch%</field>
    </object>
    <object model="orm.layer_version" pk="1">
       <field rel="ManyToOneRel" to="orm.layer" name="layer">1</field>

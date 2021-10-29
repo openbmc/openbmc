@@ -219,7 +219,6 @@ class ReproducibleTests(OESelftestTestCase):
             bb.utils.remove(tmpdir, recurse=True)
 
         config = textwrap.dedent('''\
-            INHERIT += "reproducible_build"
             PACKAGE_CLASSES = "{package_classes}"
             INHIBIT_PACKAGE_STRIP = "1"
             TMPDIR = "{tmpdir}"

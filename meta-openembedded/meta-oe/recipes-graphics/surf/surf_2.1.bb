@@ -11,7 +11,8 @@ REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
 SRC_URI = "git://git.suckless.org/surf;branch=surf-webkit2 \
            file://0001-config.mk-Fix-compiler-and-linker.patch \
-"
+           file://0001-config.ml-make-compatible-with-webkitgtk-2.34.0.patch \
+           "
 SRCREV = "bcd7d74e613fb8af11b40c351f0a6c1a771b2d2b"
 
 S = "${WORKDIR}/git"

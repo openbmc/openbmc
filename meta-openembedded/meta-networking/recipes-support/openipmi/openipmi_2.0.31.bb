@@ -31,6 +31,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/openipmi/OpenIPMI-${PV}.tar.gz \
            file://include_sys_types.patch \
            file://openipmi-helper \
            file://ipmi.service \
+           file://0001-m4-ax_python_devel.m4-do-not-check-for-distutils.patch \
            "
 
 S = "${WORKDIR}/OpenIPMI-${PV}"

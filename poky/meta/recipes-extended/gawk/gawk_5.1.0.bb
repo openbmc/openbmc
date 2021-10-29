@@ -18,6 +18,7 @@ PACKAGECONFIG[mpfr] = "--with-mpfr,--without-mpfr, mpfr"
 SRC_URI = "${GNU_MIRROR}/gawk/gawk-${PV}.tar.gz \
            file://run-ptest \
            file://0001-Use-cross-AR-during-compile.patch \
+           file://test-time.patch \
 "
 
 SRC_URI[md5sum] = "f719bc9966df28e67fc6ebc405e7ea03"

@@ -1,4 +1,6 @@
-SSTATE_VERSION = "5"
+SSTATE_VERSION = "7"
+
+SSTATE_ZSTD_CLEVEL ??= "8"
 
 SSTATE_MANIFESTS ?= "${TMPDIR}/sstate-control"
 SSTATE_MANFILEPREFIX = "${SSTATE_MANIFESTS}/manifest-${SSTATE_MANMACH}-${PN}"
@@ -6,12 +8,12 @@ SSTATE_MANFILEPREFIX = "${SSTATE_MANIFESTS}/manifest-${SSTATE_MANMACH}-${PN}"
 def generate_sstatefn(spec, hash, taskname, siginfo, d):
     if taskname is None:
        return ""
-    extension = ".tgz"
+    extension = ".tar.zst"
     # 8 chars reserved for siginfo
     limit = 254 - 8
     if siginfo:
         limit = 254
-        extension = ".tgz.siginfo"
+        extension = ".tar.zst.siginfo"
     if not hash:
         hash = "INVALID"
     fn = spec + hash + "_" + taskname + extension
@@ -37,7 +39,7 @@ SSTATE_PKGNAME    = "${SSTATE_EXTRAPATH}${@generate_sstatefn(d.getVar('SSTATE_PK
 SSTATE_PKG        = "${SSTATE_DIR}/${SSTATE_PKGNAME}"
 SSTATE_EXTRAPATH   = ""
 SSTATE_EXTRAPATHWILDCARD = ""
-SSTATE_PATHSPEC   = "${SSTATE_DIR}/${SSTATE_EXTRAPATHWILDCARD}*/*/${SSTATE_PKGSPEC}*_${SSTATE_PATH_CURRTASK}.tgz*"
+SSTATE_PATHSPEC   = "${SSTATE_DIR}/${SSTATE_EXTRAPATHWILDCARD}*/*/${SSTATE_PKGSPEC}*_${SSTATE_PATH_CURRTASK}.tar.zst*"
 
 # explicitly make PV to depend on evaluated value of PV variable
 PV[vardepvalue] = "${PV}"
@@ -114,6 +116,9 @@ SSTATE_SIG_KEY ?= ""
 SSTATE_SIG_PASSPHRASE ?= ""
 # Whether to verify the GnUPG signatures when extracting sstate archives
 SSTATE_VERIFY_SIG ?= "0"
+# List of signatures to consider valid.
+SSTATE_VALID_SIGS ??= ""
+SSTATE_VALID_SIGS[vardepvalue] = ""
 
 SSTATE_HASHEQUIV_METHOD ?= "oe.sstatesig.OEOuthashBasic"
 SSTATE_HASHEQUIV_METHOD[doc] = "The fully-qualified function used to calculate \
@@ -370,7 +375,7 @@ def sstate_installpkg(ss, d):
             bb.warn("No signature file for sstate package %s, skipping acceleration..." % sstatepkg)
             return False
         signer = get_signer(d, 'local')
-        if not signer.verify(sstatepkg + '.sig'):
+        if not signer.verify(sstatepkg + '.sig', d.getVar("SSTATE_VALID_SIGS")):
             bb.warn("Cannot verify signature on sstate package %s, skipping acceleration..." % sstatepkg)
             return False
 
@@ -825,30 +830,31 @@ sstate_task_postfunc[dirs] = "${WORKDIR}"
 sstate_create_package () {
 	# Exit early if it already exists
 	if [ -e ${SSTATE_PKG} ]; then
-		[ ! -w ${SSTATE_PKG} ] || touch ${SSTATE_PKG}
+		touch ${SSTATE_PKG} 2>/dev/null || true
 		return
 	fi
 
 	mkdir --mode=0775 -p `dirname ${SSTATE_PKG}`
 	TFILE=`mktemp ${SSTATE_PKG}.XXXXXXXX`
 
-	# Use pigz if available
-	OPT="-czS"
-	if [ -x "$(command -v pigz)" ]; then
-		OPT="-I pigz -cS"
+	OPT="-cS"
+	ZSTD="zstd -${SSTATE_ZSTD_CLEVEL} -T${ZSTD_THREADS}"
+	# Use pzstd if available
+	if [ -x "$(command -v pzstd)" ]; then
+		ZSTD="pzstd -${SSTATE_ZSTD_CLEVEL} -p ${ZSTD_THREADS}"
 	fi
 
 	# Need to handle empty directories
 	if [ "$(ls -A)" ]; then
 		set +e
-		tar $OPT -f $TFILE *
+		tar -I "$ZSTD" $OPT -f $TFILE *
 		ret=$?
 		if [ $ret -ne 0 ] && [ $ret -ne 1 ]; then
 			exit 1
 		fi
 		set -e
 	else
-		tar $OPT --file=$TFILE --files-from=/dev/null
+		tar -I "$ZSTD" $OPT --file=$TFILE --files-from=/dev/null
 	fi
 	chmod 0664 $TFILE
 	# Skip if it was already created by some other process
@@ -859,7 +865,7 @@ sstate_create_package () {
 	else
 		rm $TFILE
 	fi
-	[ ! -w ${SSTATE_PKG} ] || touch ${SSTATE_PKG}
+	touch ${SSTATE_PKG} 2>/dev/null || true
 }
 
 python sstate_sign_package () {
@@ -887,7 +893,13 @@ python sstate_report_unihash() {
 # Will be run from within SSTATE_INSTDIR.
 #
 sstate_unpack_package () {
-	tar -xvzf ${SSTATE_PKG}
+	ZSTD="zstd -T${ZSTD_THREADS}"
+	# Use pzstd if available
+	if [ -x "$(command -v pzstd)" ]; then
+		ZSTD="pzstd -p ${ZSTD_THREADS}"
+	fi
+
+	tar -I "$ZSTD" -xvf ${SSTATE_PKG}
 	# update .siginfo atime on local/NFS mirror
 	[ -O ${SSTATE_PKG}.siginfo ] && [ -w ${SSTATE_PKG}.siginfo ] && [ -h ${SSTATE_PKG}.siginfo ] && touch -a ${SSTATE_PKG}.siginfo
 	# Use "! -w ||" to return true for read only files
@@ -900,8 +912,6 @@ BB_HASHCHECK_FUNCTION = "sstate_checkhashes"
 
 def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, **kwargs):
     found = set()
-    foundLocal = set()
-    foundNet = set()
     missed = set()
 
     def gethash(task):
@@ -932,14 +942,13 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
         sstatefile = d.expand("${SSTATE_DIR}/" + extrapath + generate_sstatefn(spec, gethash(tid), tname, siginfo, d))
 
         if os.path.exists(sstatefile):
-            bb.debug(2, "SState: Found valid sstate file %s" % sstatefile)
             found.add(tid)
-            foundLocal.add(tid)
-            continue
+            bb.debug(2, "SState: Found valid sstate file %s" % sstatefile)
         else:
             missed.add(tid)
             bb.debug(2, "SState: Looked for but didn't find file %s" % sstatefile)
 
+    foundLocal = len(found)
     mirrors = d.getVar("SSTATE_MIRRORS")
     if mirrors:
         # Copy the data object and override DL_DIR and SRC_URI
@@ -980,13 +989,13 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
                 fetcher.checkstatus()
                 bb.debug(2, "SState: Successful fetch test for %s" % srcuri)
                 found.add(tid)
-                foundNet.add(tid)
                 if tid in missed:
                     missed.remove(tid)
-            except:
+            except bb.fetch2.FetchError as e:
                 missed.add(tid)
-                bb.debug(2, "SState: Unsuccessful fetch test for %s" % srcuri)
-                pass
+                bb.debug(2, "SState: Unsuccessful fetch test for %s (%s)" % (srcuri, e))
+            except Exception as e:
+                bb.error("SState: cannot test %s: %s" % (srcuri, e))
             if len(tasklist) >= min_tasks:
                 bb.event.fire(bb.event.ProcessProgress(msg, len(tasklist) - thread_worker.tasks.qsize()), d)
 
@@ -1041,7 +1050,8 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
         match = 0
         if total:
             match = len(found) / total * 100
-        bb.plain("Sstate summary: Wanted %d Local %d Network %d Missed %d Current %d (%d%% match, %d%% complete)" % (total, len(foundLocal), len(foundNet),len(missed), currentcount, match, complete))
+        bb.plain("Sstate summary: Wanted %d Local %d Mirrors %d Missed %d Current %d (%d%% match, %d%% complete)" %
+            (total, foundLocal, len(found)-foundLocal, len(missed), currentcount, match, complete))
 
     if hasattr(bb.parse.siggen, "checkhashes"):
         bb.parse.siggen.checkhashes(sq_data, missed, found, d)

@@ -21,3 +21,5 @@ S = "${WORKDIR}/git"
 FILES:${PN} += "${libdir}/xorg/modules/*"
 
 INSANE_SKIP:${PN} += "xorg-driver-abi"
+
+PNBLACKLIST[xorgxrdp] ?= "Depends on xrdp which needs porting to openssl 3.x"
