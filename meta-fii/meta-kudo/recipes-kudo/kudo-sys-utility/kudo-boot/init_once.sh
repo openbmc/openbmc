@@ -64,3 +64,6 @@ if [[ $CPU1_STATUS_N == 1 ]]; then
     i2cset -y -a -f 16 0x6a 11 1 0x01 i
     i2cset -y -a -f 17 0x67 1 2 0x3f 0x0c i
 fi
+
+# Create /run/openbmc for system power files
+mkdir "/run/openbmc"
