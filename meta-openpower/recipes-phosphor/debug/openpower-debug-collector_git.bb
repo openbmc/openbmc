@@ -16,6 +16,7 @@ DEPENDS += " \
         phosphor-logging \
         ${PYTHON_PN}-sdbus++-native \
         cli11 \
+        ipl \
         "
 S = "${WORKDIR}/git"
 
@@ -34,4 +35,4 @@ SYSTEMD_SERVICE:${PN} += "${@compose_list(d, 'DEBUG_TMPL', 'APPS')}"
 DEPENDS:remove:class-native = "phosphor-logging"
 
 # Do not depend on phosphor-logging for native SDK build
-DEPENDS:remove:class-nativesdk = "phosphor-logging"
+DEPENDS:remove:class-nativesdk = "phosphor-logging ipl"
