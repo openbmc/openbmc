@@ -11,7 +11,7 @@ inherit meson obmc-phosphor-utils pkgconfig
 inherit systemd
 
 SRC_URI += "git://github.com/openbmc/openpower-proc-control"
-SRCREV = "ff27e3915cd29be50b50892eb302abd218b18553"
+SRCREV = "ad3ff0fdf8482231b8a793f17c401c6f501ca80e"
 
 DEPENDS += " \
         phosphor-logging \
