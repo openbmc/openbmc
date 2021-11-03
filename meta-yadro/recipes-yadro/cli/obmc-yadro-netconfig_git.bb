@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/YADRO-KNS/obmc-yadro-netconfig"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit meson
+inherit pkgconfig meson
 
 # License info
 LICENSE = "Apache-2.0"
