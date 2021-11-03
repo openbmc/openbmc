@@ -252,6 +252,28 @@
                 {
                     "types":
                     {
+                        "rType": "fault_inventory_object",
+                        "fType": "fault_led_group"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/led/groups/enclosure_fault"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "identify_inventory_object",
+                        "fType": "identify_led_group"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/led/groups/enclosure_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
                         "rType": "chassis",
                         "fType": "all_sensors"
                     },
