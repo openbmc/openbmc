@@ -29,6 +29,7 @@ IMAGE_FEATURES += " \
         obmc-net-ipmi \
         obmc-sensors \
         obmc-software \
+        obmc-system-mgmt \
         obmc-user-mgmt \
         obmc-user-mgmt-ldap \
         ${@bb.utils.contains('DISTRO_FEATURES', 'obmc-ubi-fs', 'read-only-rootfs', '', d)} \

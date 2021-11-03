@@ -12,9 +12,11 @@ PACKAGES = " \
     "
 
 PROVIDES += "virtual/obmc-chassis-mgmt"
+PROVIDES += "virtual/obmc-system-mgmt"
 PROVIDES += "virtual/obmc-fan-mgmt"
 
 RPROVIDES:${PN}-kudo-chassis += "virtual-obmc-chassis-mgmt"
+RPROVIDES:${PN}-kudo-system += "virtual-obmc-system-mgmt"
 RPROVIDES:${PN}-kudo-fw += "virtual-obmc-flash-mgmt"
 RPROVIDES:${PN}-fan-mgmt += "virtual-obmc-fan-mgmt"
 
