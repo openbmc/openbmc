@@ -4,7 +4,7 @@ DESCRIPTION = "Application to log error during host checkstop and watchdog timeo
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit meson \
+inherit pkgconfig meson \
         obmc-phosphor-systemd \
         python3native \
         phosphor-dbus-yaml

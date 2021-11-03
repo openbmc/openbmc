@@ -19,7 +19,7 @@ SRCREV = "39fcf65dce4d91601951c146a543bf85d68f6b3c"
 
 S = "${WORKDIR}/git"
 
-inherit meson systemd
+inherit pkgconfig meson systemd
 
 SYSTEMD_SERVICE:${PN} = "attn_handler.service"
 

@@ -13,7 +13,7 @@ include openpower-libhei-rev.inc
 
 S = "${WORKDIR}/git"
 
-inherit meson
+inherit pkgconfig meson
 inherit perlnative
 
 DEPENDS = "libxml2-native libxml-simple-perl-native libjson-perl-native"
