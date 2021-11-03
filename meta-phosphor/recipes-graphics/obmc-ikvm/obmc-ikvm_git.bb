@@ -14,4 +14,4 @@ SYSTEMD_SERVICE:${PN} += "start-ipkvm.service"
 
 S = "${WORKDIR}/git"
 
-inherit meson systemd
+inherit pkgconfig meson systemd

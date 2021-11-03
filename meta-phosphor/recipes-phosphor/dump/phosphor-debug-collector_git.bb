@@ -20,7 +20,7 @@ DBUS_PACKAGES = "${PN}-manager"
 
 SYSTEMD_PACKAGES = "${PN}-monitor"
 
-inherit meson \
+inherit pkgconfig meson \
         obmc-phosphor-dbus-service \
         python3native \
         phosphor-debug-collector

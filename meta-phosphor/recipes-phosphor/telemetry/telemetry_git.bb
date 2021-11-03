@@ -12,7 +12,7 @@ SRCREV = "e28aa53dc1492f09a64dc9f1dbfd5b6dba06e31f"
 
 S = "${WORKDIR}/git"
 
-inherit meson
+inherit pkgconfig meson
 inherit systemd
 
 DEPENDS = "boost \

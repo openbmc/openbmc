@@ -17,7 +17,7 @@ SRCREV = "37bbf98c8ba77196ba72864846ca3b4a4ff5be4b"
 
 S = "${WORKDIR}/git"
 
-inherit meson ptest
+inherit pkgconfig meson ptest
 
 SRC_URI += " \
     file://run-ptest \

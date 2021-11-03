@@ -16,7 +16,7 @@ DEPENDS = "boost \
            valijson"
 
 S = "${WORKDIR}/git"
-inherit meson systemd
+inherit pkgconfig meson systemd
 
 EXTRA_OEMESON = "-Dtests=disabled"
 

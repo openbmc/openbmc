@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/openbmc/phosphor-hostlogger"
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit meson
+inherit pkgconfig meson
 inherit systemd
 
 # License info

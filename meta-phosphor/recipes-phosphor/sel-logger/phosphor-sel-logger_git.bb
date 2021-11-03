@@ -9,7 +9,7 @@ DESCRIPTION = "Utility to write IPMI SEL records to the journal"
 #   SEL_LOGGER_MONITOR_THRESHOLD_EVENTS:
 #      Monitors and logs SEL records for threshold sensor events
 
-inherit meson systemd
+inherit pkgconfig meson systemd
 S = "${WORKDIR}/git"
 
 LICENSE = "Apache-2.0"
