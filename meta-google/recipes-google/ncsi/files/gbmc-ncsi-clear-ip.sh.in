@@ -1,0 +1,26 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[ -z "${gbmc_ncsi_clear_ip-}" ] || exit
+
+source /usr/libexec/ncsid_lib.sh || exit
+
+gbmc_ncsi_clear_ip_hook() {
+  UpdateIP xyz.openbmc_project.Network '@NCSI_IF@' '0.0.0.0' '0' || true
+  UpdateIP xyz.openbmc_project.Network '@NCSI_IF@' '::' '0' || true
+}
+
+GBMC_BR_DHCP_HOOKS+=(gbmc_ncsi_clear_ip_hook)
+
+gbmc_ncsi_clear_ip=1

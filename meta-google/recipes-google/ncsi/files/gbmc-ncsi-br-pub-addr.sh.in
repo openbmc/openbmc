@@ -63,6 +63,8 @@ Destination=$stateless_pfx/76
 Type=unreachable
 Metric=1024
 EOF
+    # Delete DHCP configured addresses if we have a host published address
+    rm -f /etc/systemd/network/{00,}-bmc-gbmcbr.network.d/50-public.conf
   fi
 
   local file

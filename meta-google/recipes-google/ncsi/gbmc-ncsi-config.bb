@@ -20,6 +20,7 @@ SRC_URI += " \
   file://gbmc-ncsi-br-pub-addr.sh.in \
   file://gbmc-ncsi-br-deprecated-ips.sh.in \
   file://gbmc-ncsi-set-nicenabled.service.in \
+  file://gbmc-ncsi-clear-ip.sh.in \
   "
 
 S = "${WORKDIR}"
@@ -36,6 +37,7 @@ RDEPENDS:${PN} += " \
   "
 
 FILES:${PN} += " \
+  ${datadir}/gbmc-br-dhcp \
   ${datadir}/gbmc-ip-monitor \
   ${systemd_unitdir} \
   "
@@ -104,6 +106,12 @@ do_install:append() {
   sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-br-deprecated-ips.sh.in \
     >${WORKDIR}/gbmc-ncsi-br-deprecated-ips.sh
   install -m644 ${WORKDIR}/gbmc-ncsi-br-deprecated-ips.sh $mondir
+
+  dhcpdir=${D}${datadir}/gbmc-br-dhcp/
+  install -d -m0755 $dhcpdir
+  sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-clear-ip.sh.in \
+    >${WORKDIR}/gbmc-ncsi-clear-ip.sh
+  install -m644 ${WORKDIR}/gbmc-ncsi-clear-ip.sh $dhcpdir
 
   sed "s,@NCSI_IF@,$if_name,g" ${WORKDIR}/gbmc-ncsi-set-nicenabled.service.in \
     >${D}${systemd_system_unitdir}/gbmc-ncsi-set-nicenabled.service
