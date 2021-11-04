@@ -1,3 +1,6 @@
+#!/bin/sh
+
+# shellcheck disable=SC2034
 # Index of GPIO device in gpioget/gpioset
 GPIO_CHIP0_IDX=0
 GPIO_CHIP1_IDX=1

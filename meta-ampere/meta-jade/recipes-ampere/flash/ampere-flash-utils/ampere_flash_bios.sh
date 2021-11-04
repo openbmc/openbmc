@@ -18,7 +18,7 @@ do_flash () {
         OFFSET=$1
 
 	# Check the PNOR partition available
-	HOST_MTD=$(cat /proc/mtd | grep "pnor" | sed -n 's/^\(.*\):.*/\1/p')
+	HOST_MTD=$(< /proc/mtd grep "pnor" | sed -n 's/^\(.*\):.*/\1/p')
 	if [ -z "$HOST_MTD" ];
 	then
 		# If the PNOR partition is not available, then bind again driver
@@ -26,7 +26,7 @@ do_flash () {
 		echo 1e630000.spi > /sys/bus/platform/drivers/aspeed-smc/bind
 		sleep 2
 
-		HOST_MTD=$(cat /proc/mtd | grep "pnor" | sed -n 's/^\(.*\):.*/\1/p')
+		HOST_MTD=$(< /proc/mtd grep "pnor" | sed -n 's/^\(.*\):.*/\1/p')
 		if [ -z "$HOST_MTD" ];
 		then
 			echo "Fail to probe Host SPI-NOR device"
@@ -35,18 +35,17 @@ do_flash () {
 	fi
 
 	echo "--- Flashing firmware to @/dev/$HOST_MTD offset=$OFFSET"
-	flashcp -v $IMAGE /dev/$HOST_MTD $OFFSET
+	flashcp -v "$IMAGE" /dev/"$HOST_MTD" "$OFFSET"
 }
 
 
 if [ $# -eq 0 ]; then
-	echo "Usage: $(basename $0) <BIOS image file>"
+	echo "Usage: $(basename "$0") <BIOS image file>"
 	exit 0
 fi
 
 IMAGE="$1"
-if [ ! -f $IMAGE ]; then
-	echo $IMAGE
+if [ ! -f "$IMAGE" ]; then
 	echo "The image file $IMAGE does not exist"
 	exit 1
 fi
@@ -70,9 +69,7 @@ fi
 
 # Switch the host SPI bus to BMC"
 echo "--- Switch the host SPI bus to BMC."
-gpioset 0 226=0
-
-if [[ $? -ne 0 ]]; then
+if ! gpioset 0 226=0; then
 	echo "ERROR: Switch the host SPI bus to BMC. Please check gpio state"
 	exit 1
 fi
@@ -82,9 +79,7 @@ do_flash 0x400000
 
 # Switch the host SPI bus to HOST."
 echo "--- Switch the host SPI bus to HOST."
-gpioset 0 226=1
-
-if [[ $? -ne 0 ]]; then
+if ! gpioset 0 226=1; then
 	echo "ERROR: Switch the host SPI bus to HOST. Please check gpio state"
 	exit 1
 fi

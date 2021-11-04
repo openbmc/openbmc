@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# shellcheck source=/dev/null
 source /usr/sbin/gpio-lib.sh
 
 # GPIOAC3 BMC_SPI0_BACKUP_SEL Boot from MAIN SPI-HOST
@@ -29,7 +30,7 @@ gpio_configure_output 229 1
 # =======================================================
 # Below GPIOs are controlled by other services so just
 # initialize in A/C power only.
-cmdline=`cat /proc/cmdline`
+cmdline=$(cat /proc/cmdline)
 if [[ $cmdline == *resetreason=power* ]]; then
 	# BMC_GPIOR2_EXT_HIGHTEMP_L
 	gpio_configure_output 138 1

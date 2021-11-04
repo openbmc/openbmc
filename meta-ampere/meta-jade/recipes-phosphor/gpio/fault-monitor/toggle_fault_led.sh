@@ -22,14 +22,14 @@ PROPERTY="Asserted"
 
 # Get current state
 object=$(busctl tree $SERVICE --list | grep system_fault)
-state=$(busctl get-property $SERVICE $object $INTERFACE $PROPERTY \
+state=$(busctl get-property $SERVICE "$object" $INTERFACE $PROPERTY \
 	  |  awk '{print $NF;}')
 
-if [ "$state" == "false" ]; then
-    target='true'
+if [ "$state" = "false" ]; then
+	target='true'
 else
-    target='false'
+	target='false'
 fi
 
 # Set target state
-busctl set-property $SERVICE $object $INTERFACE $PROPERTY b $target
+busctl set-property $SERVICE "$object" $INTERFACE $PROPERTY b $target

@@ -29,10 +29,10 @@ STATUS_MFR_SPECIFIC=0x80
 # $1 will be the name of the psu
 PSU=$1
 
-if [[ $PSU == 1 ]]; then
+if [ "$PSU" = 1 ]; then
 	HSC_PMBUS_NUM=$HSC1_PMBUS_NUM
 	HSC_SLAVE_ADDR=$HSC1_SLAVE_ADDR
-elif [[ $PSU == 2 ]]; then
+elif [ "$PSU" = 2 ]; then
 	HSC_PMBUS_NUM=$HSC2_PMBUS_NUM
 	HSC_SLAVE_ADDR=$HSC2_SLAVE_ADDR
 else
@@ -43,22 +43,20 @@ fi
 
 # Check HOST state
 chassisstate=$(obmcutil chassisstate | awk -F. '{print $NF}')
-if [[ "$chassisstate" == 'Off' ]]; then
+if [ "$chassisstate" = 'Off' ]; then
 	echo "HOST is being OFF, so can't access the i2c $HSC_PMBUS_NUM. Please Turn ON HOST !"
 	exit 1
 fi
 
 # Check FET health problems
-data=$(i2cget -f -y $HSC_PMBUS_NUM $HSC_SLAVE_ADDR $STATUS_MFR_SPECIFIC)
-
-if [[ $? -ne 0 ]]; then
+if ! data=$(i2cget -f -y $HSC_PMBUS_NUM $HSC_SLAVE_ADDR $STATUS_MFR_SPECIFIC); then
 	echo "ERROR: Can't access the i2c. Please check /dev/i2c-$HSC_PMBUS_NUM"
 	exit 1
 fi
 
 psu_sts=$(((data & 0x80) != 0))
 
-if [[ $psu_sts == 1 ]]; then
+if [ $psu_sts = 1 ]; then
 	echo "PSU $PSU: FET health problems have been detected"
 	echo "Reset Hot swap output on PSU $PSU"
 	# Disable Hot swap output

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2020 Ampere Computing LLC
+# Copyright (c) 2021 Ampere Computing LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,23 +19,12 @@
 #        <UARTx_MODE> of 1 sets CPU To HDR_CONN
 #        <UARTx_MODE> of 2 sets BMC to CPU (eg dropbear ssh server on port 2200)
 
+# shellcheck source=/dev/null
+source /usr/sbin/gpio-lib.sh
+
 if [ $# -lt 2 ]; then
 	exit 1
 fi
-
-function set_gpio_active_low() {
-  if [ $# -ne 2 ]; then
-    echo "set_gpio_active_low: need both GPIO# and initial level";
-    return;
-  fi
-
-  if [ ! -d /sys/class/gpio/gpio$1 ]; then
-    echo $1 > /sys/class/gpio/export
-  fi
-  echo $2 > /sys/class/gpio/gpio$1/direction
-}
-
-GPIO_BASE=$(cat /sys/class/gpio/gpio*/base)
 
 case "$1" in
 	1) GPIO_UARTx_MODE0=56
@@ -65,17 +54,17 @@ esac
 # of requested console port.
 # Example format:  Accepted: 1; Connected: 1;
 CONNECTED=$(systemctl --no-pager status obmc-console-ttyS${CONSOLE_PORT}-ssh.socket | grep -w Connected | cut -d ':' -f 3 | tr -d ' ;')
-if [ ! $CONNECTED -le 1 ]; then
+if [ ! "$CONNECTED" -le 1 ]; then
 	exit 0
 fi
 
 echo "Ampere UART MUX CTRL UART port $1 to mode $2"
 
 case "$2" in
-	1) set_gpio_active_low $((${GPIO_BASE} + ${GPIO_UARTx_MODE0})) low
+	1) gpio_configure_output "${GPIO_UARTx_MODE0}" 0
 	   exit 0
 	;;
-	2) set_gpio_active_low $((${GPIO_BASE} + ${GPIO_UARTx_MODE0})) high
+	2) gpio_configure_output "${GPIO_UARTx_MODE0}" 1
 	   exit 0
 	;;
 	*) echo "Invalid UART mode selection"
