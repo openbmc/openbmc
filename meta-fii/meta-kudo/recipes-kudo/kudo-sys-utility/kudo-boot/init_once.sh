@@ -35,10 +35,6 @@ if [[ $boardver -lt 64 ]]; then
     # Power control
     # S0_BMC_OK, GPIO 69
     set_gpio_ctrl 69 out 1
-
-    # MON_BMC_ALIVE, GPIO 10(EVT), GPIO137(DVT)
-    set_gpio_ctrl 137 out 0 # setting unused GPIO
-    set_gpio_ctrl 10 out 1
 else
     echo "DVT or PVT system"
     # sleep so that FRU and all ipmitool Devices are ready before HOST OS
@@ -49,11 +45,7 @@ else
     # Power control
     # S0_BMC_OK, GPIO 69
     set_gpio_ctrl 69 out 1
-
-    # MON_BMC_ALIVE GPIO137(DVT)
-    set_gpio_ctrl 10 out 0 # setting unused GPIO
-    set_gpio_ctrl 137 out 1
-fi 
+fi
 
 # Disable CPU 1 CLK when cpu not detected
 # echo init_once cpu $CPU1_STATUS > /dev/ttyS0
