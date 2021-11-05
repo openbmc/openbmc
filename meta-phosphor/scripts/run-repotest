@@ -35,9 +35,6 @@ git ls-files -- \
 echo "\
 meta-amd/meta-ethanolx/recipes-x86/chassis/x86-power-control/0001-Amd-power-control-modifications-for-EthanolX.patch
 meta-ampere/meta-common/recipes-devtools/mtd/mtd-utils/0001-flashcp-support-offset-option.patch
-meta-ampere/meta-jade/recipes-bsp/u-boot/u-boot-aspeed/0001-aspeed-scu-Switch-PWM-pin-to-GPIO-input-mode.patch
-meta-ampere/meta-jade/recipes-bsp/u-boot/u-boot-aspeed/0002-aspeed-Disable-internal-PD-resistors-for-GPIOs.patch
-meta-ampere/meta-jade/recipes-bsp/u-boot/u-boot-aspeed/0003-aspeed-support-passing-system-reset-status-to-kernel.patch
 meta-aspeed/recipes-bsp/u-boot/files/default-gcc.patch
 meta-bytedance/meta-g220a/recipes-kernel/linux/linux-aspeed/0005-ARM-dts-aspeed-Enable-g220a-uart-route.patch
 meta-bytedance/meta-g220a/recipes-phosphor/ipmi/phosphor-node-manager-proxy/0001-Remove-Total_Power-sensor.patch
@@ -76,7 +73,6 @@ fi
 
 lint_exempt="\
 meta-amd/recipes-amd/amd-fpga/files/ethanolx/fpgardu.sh
-meta-ampere/meta-common/recipes-ac01/usbnet/ampere-usbnet/ampere_add_usbnet_gadget.sh
 meta-bytedance/meta-g220a/recipes-network/network/static-mac-addr/mac-check
 meta-bytedance/meta-g220a/recipes-phosphor/datetime/me-time-sync/me-time-sync.sh
 meta-fii/meta-kudo/recipes-kudo/host/files/ampere_power_util.sh
