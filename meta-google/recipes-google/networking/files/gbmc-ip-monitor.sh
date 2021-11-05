@@ -44,6 +44,17 @@ gbmc_ip_monitor_generate_init() {
   echo '[INIT]'
 }
 
+GBMC_IP_MONITOR_DEFER_OUTSTANDING=
+gbmc_ip_monitor_defer_() {
+  sleep 1
+  printf '[DEFER]\n' >&$GBMC_IP_MONITOR_DEFER
+}
+gbmc_ip_monitor_defer() {
+  [ -z "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" ] || return 0
+  gbmc_ip_monitor_defer_ &
+  GBMC_IP_MONITOR_DEFER_OUTSTANDING=1
+}
+
 gbmc_ip_monitor_parse_line() {
   local line="$1"
   if [[ "$line" == '[INIT]'* ]]; then
@@ -98,10 +109,15 @@ gbmc_ip_monitor_parse_line() {
     read line || break
     data=($line)
     mac="${data[1]}"
+  elif [[ "$line" == '[DEFER]'* ]]; then
+    GBMC_IP_MONITOR_DEFER_OUTSTANDING=
+    change=defer
   else
     return 2
   fi
 }
+
+return 0 2>/dev/null
 
 cleanup() {
   local st="$?"
@@ -111,7 +127,10 @@ cleanup() {
 }
 trap cleanup HUP INT QUIT ABRT TERM EXIT
 
-return 0 2>/dev/null
+FIFODIR="$(mktemp -d)"
+mkfifo "$FIFODIR"/fifo
+exec {GBMC_IP_MONITOR_DEFER}<>"$FIFODIR"/fifo
+rm -rf "$FIFODIR"
 
 while read line; do
   gbmc_ip_monitor_parse_line "$line" || continue
@@ -119,4 +138,4 @@ while read line; do
   if [ "$change" = 'init' ]; then
     systemd-notify --ready
   fi
-done < <(gbmc_ip_monitor_generate_init; exec ip monitor link addr route label)
+done < <(gbmc_ip_monitor_generate_init; ip monitor link addr route label & cat <&$GBMC_IP_MONITOR_DEFER)
