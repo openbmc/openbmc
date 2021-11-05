@@ -1,3 +1,3 @@
-require conf/machine/include/facebook-compute.inc
+MACHINEOVERRIDES =. "fb-compute-singlehost:"
 
-OVERRIDES .= ":fb-compute-singlehost"
+require conf/machine/include/facebook-compute.inc

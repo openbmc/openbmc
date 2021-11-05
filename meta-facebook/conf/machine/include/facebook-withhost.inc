@@ -1,3 +1,5 @@
+MACHINEOVERRIDES =. "fb-withhost:"
+
 require conf/machine/include/facebook.inc
 
 MACHINE_FEATURES += "\
@@ -12,4 +14,3 @@ VIRTUAL-RUNTIME_obmc-chassis-state-manager ?= "x86-power-control"
 
 PREFERRED_PROVIDER_virtual/obmc-host-ipmi-hw ?= "phosphor-ipmi-kcs"
 
-OVERRIDES .= ":fb-withhost"

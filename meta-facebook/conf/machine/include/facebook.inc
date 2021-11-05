@@ -1,3 +1,5 @@
+DISTROOVERRIDES .= ":facebook"
+
 MACHINE_FEATURES += "\
         obmc-bmc-state-mgmt \
         obmc-phosphor-fan-mgmt \
@@ -14,4 +16,3 @@ PREFERRED_PROVIDER_virtual/obmc-system-mgmt = "packagegroup-fb-apps"
 
 IMAGE_FEATURES:remove = "obmc-ikvm"
 
-OVERRIDES .= ":facebook"

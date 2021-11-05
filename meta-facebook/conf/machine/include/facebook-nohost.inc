@@ -1,3 +1,3 @@
-require conf/machine/include/facebook.inc
+MACHINEOVERRIDES =. "fb-nohost:"
 
-OVERRIDES .= ":fb-nohost"
+require conf/machine/include/facebook.inc
