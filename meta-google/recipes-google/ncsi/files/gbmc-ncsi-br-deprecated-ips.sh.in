@@ -14,6 +14,8 @@
 
 [ -z "${gbmc_ncsi_br_deprecated_ips_lib-}" ] || return
 
+source /usr/share/network/lib.sh || exit
+
 gbmc_ncsi_br_deprecated_ips_init=
 gbmc_ncsi_br_deprecated_ips_confip=
 gbmc_ncsi_br_deprecated_ips_lastip=
