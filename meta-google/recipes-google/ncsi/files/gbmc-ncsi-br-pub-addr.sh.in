@@ -36,14 +36,14 @@ gbmc_ncsi_br_pub_addr_update() {
     done
   fi
 
-  local contents='[Network]'$'\n'
+  local contents=
   if (( ${#pfx_bytes[@]} != 0 )); then
     pfx_bytes[8]=0xfd
     local stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
     pfx_bytes[9]=0x01
     local ncsi_pfx="$(ip_bytes_to_str pfx_bytes)"
-    local here=
-    read -r -d '' here <<EOF
+    read -r -d '' contents <<EOF
+[Network]
 Address=$ncsi_pfx/128
 IPv6PrefixDelegation=yes
 [IPv6PrefixDelegation]
@@ -60,13 +60,16 @@ Destination=$stateless_pfx/76
 Type=unreachable
 Metric=1024
 EOF
-    contents+="$here"$'\n'
   fi
 
   local file
   for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-public.conf; do
     mkdir -p -m 755 "$(dirname "$file")"
-    printf '%s' "$contents" >"$file"
+    if [ -z "$contents" ]; then
+      rm -f "$file"
+    else
+      printf '%s' "$contents" >"$file"
+    fi
   done
 
   # Ensure that systemd-networkd performs a reconfiguration as it doesn't
