@@ -34,12 +34,17 @@ gbmc_ncsi_br_deprecated_ips_update() {
     ip_to_bytes pfx_bytes "$gbmc_ncsi_br_deprecated_ips_lastip"
 
     local pfx="$(ip_bytes_to_str pfx_bytes)"
+    (( pfx_bytes[9] &= 0xf0 ))
+    local stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
     pfx_bytes[8]=0
     pfx_bytes[9]=0
     local host_pfx="$(ip_bytes_to_str pfx_bytes)"
     read -r -d '' contents <<EOF
 [Address]
 Address=$pfx/128
+PreferredLifetime=0
+[Address]
+Address=$stateless_pfx/128
 PreferredLifetime=0
 [Address]
 Address=$host_pfx/128
