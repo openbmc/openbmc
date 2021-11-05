@@ -80,7 +80,8 @@ gbmc_ncsi_nft_hook() {
   if [ "$change" = 'init' ]; then
     gbmc_ncsi_nft_init=1
     gbmc_ncsi_nft_update
-  elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' -a "$scope" = 'global' ]; then
+  elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' -a "$scope" = 'global' ] &&
+     [[ "$flags" != *deprecated* ]]; then
     if [ "$fam" = 'inet6' ]; then
       local -n lastip='gbmc_ncsi_nft_lastip6'
     else

@@ -87,7 +87,8 @@ gbmc_ncsi_br_pub_addr_hook() {
     gbmc_ncsi_br_pub_addr_init=1
     gbmc_ncsi_br_pub_addr_update
   elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' ] &&
-     [ "$scope" = 'global' -a "$fam" = 'inet6' ]; then
+     [ "$scope" = 'global' -a "$fam" = 'inet6' ] &&
+     [[ "$flags" != *deprecated* ]]; then
     if [ "$action" = 'add' -a "$ip" != "$gbmc_ncsi_br_pub_addr_lastip" ]; then
       gbmc_ncsi_br_pub_addr_lastip="$ip"
       gbmc_ncsi_br_pub_addr_update
