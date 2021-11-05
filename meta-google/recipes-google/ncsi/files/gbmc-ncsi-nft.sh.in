@@ -54,15 +54,15 @@ gbmc_ncsi_nft_update() {
     if (( ${#ip_bytes[@]} != 0 )); then
       ip_bytes[8]=0xfd
       pfx="$(ip_bytes_to_str ip_bytes)"
-      contents+="        ip6 saddr != $pfx/72 ip6 daddr"
-      contents+=" $pfx/72 goto ncsi_gbmc_br_pub_input"$'\n'
+      contents+="        ip6 saddr != $pfx/76 ip6 daddr"
+      contents+=" $pfx/76 goto ncsi_gbmc_br_pub_input"$'\n'
     fi
   fi
 
   contents+='    }'$'\n'
   contents+='    chain ncsi_forward {'$'\n'
   if [ -n "$pfx" ]; then
-    contents+="        ip6 saddr != $pfx/72 ip6 daddr $pfx/72 accept"$'\n'
+    contents+="        ip6 saddr != $pfx/76 ip6 daddr $pfx/76 accept"$'\n'
   fi
   contents+='    }'$'\n'
   contents+='}'$'\n'

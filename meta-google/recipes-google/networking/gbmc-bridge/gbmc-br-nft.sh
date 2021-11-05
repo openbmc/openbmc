@@ -48,7 +48,7 @@ gbmc_br_nft_hook() {
     gbmc_br_nft_update
   # Match only global IP addresses on the bridge that match the BMC prefix
   # (<mpfx>:fdxx:). So 2002:af4:3480:2248:fd02:6345:3069:9186 would become
-  # a 2002:af4:3480:2248:fd00/72 rule.
+  # a 2002:af4:3480:2248:fd00/76 rule.
   elif [ "$change" = 'addr' -a "$intf" = 'gbmcbr' -a "$scope" = 'global' ] &&
        [[ "$fam" == 'inet6' && "$flags" != *tentative* ]]; then
     local ip_bytes=()
@@ -63,7 +63,7 @@ gbmc_br_nft_hook() {
     for (( i=9; i<16; i++ )); do
       ip_bytes[$i]=0
     done
-    pfx="$(ip_bytes_to_str ip_bytes)/72"
+    pfx="$(ip_bytes_to_str ip_bytes)/76"
     if [ "$action" = "add" -a "$pfx" != "$gbmc_br_nft_pfx" ]; then
       gbmc_br_nft_pfx="$pfx"
       gbmc_br_nft_update
