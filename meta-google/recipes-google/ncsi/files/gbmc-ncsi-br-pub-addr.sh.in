@@ -16,9 +16,12 @@
 
 gbmc_ncsi_br_pub_addr_init=
 gbmc_ncsi_br_pub_addr_lastip=
+gbmc_ncsi_br_pub_addr_confip=
 
 gbmc_ncsi_br_pub_addr_update() {
   [ -n "$gbmc_ncsi_br_pub_addr_init" ] || return
+  [ "$gbmc_ncsi_br_pub_addr_confip" != "$gbmc_ncsi_br_pub_addr_lastip" ] || return
+  gbmc_ncsi_br_pub_addr_confip="$gbmc_ncsi_br_pub_addr_lastip"
 
   printf 'gBMC Bridge Pub Addr from NCSI: %s\n' \
     "${gbmc_ncsi_br_pub_addr_lastip:-(deleted)}" >&2
@@ -85,17 +88,19 @@ EOF
 gbmc_ncsi_br_pub_addr_hook() {
   if [ "$change" = 'init' ]; then
     gbmc_ncsi_br_pub_addr_init=1
+    gbmc_ip_monitor_defer
+  elif [ "$change" = 'defer' ]; then
     gbmc_ncsi_br_pub_addr_update
   elif [ "$change" = 'addr' -a "$intf" = '@NCSI_IF@' ] &&
      [ "$scope" = 'global' -a "$fam" = 'inet6' ] &&
      [[ "$flags" != *deprecated* ]]; then
     if [ "$action" = 'add' -a "$ip" != "$gbmc_ncsi_br_pub_addr_lastip" ]; then
       gbmc_ncsi_br_pub_addr_lastip="$ip"
-      gbmc_ncsi_br_pub_addr_update
+      gbmc_ip_monitor_defer
     fi
     if [ "$action" = 'del' -a "$ip" = "$gbmc_ncsi_br_pub_addr_lastip" ]; then
       gbmc_ncsi_br_pub_addr_lastip=
-      gbmc_ncsi_br_pub_addr_update
+      gbmc_ip_monitor_defer
     fi
   fi
 }

@@ -67,26 +67,28 @@ gbmc_br_from_ra_update() {
 gbmc_br_from_ra_hook() {
   if [ "$change" = 'init' ]; then
     gbmc_br_from_ra_init=1
+    gbmc_ip_monitor_defer
+  elif [ "$change" = 'defer' ]; then
     gbmc_br_from_ra_update
   elif [[ "$change" == 'route' && "$route" != *' via '* ]] &&
        [[ "$route" =~ ^(.* dev gbmcbr proto ra .*)( +expires +([^ ]+)sec).*$ ]]; then
     pfx="${route%% *}"
     if [ "$action" = 'add' ]; then
       gbmc_br_from_ra_pfxs["$pfx"]="${BASH_REMATCH[3]}"
-      gbmc_br_from_ra_update
+      gbmc_ip_monitor_defer
     elif [ "$action" = 'del' ]; then
       gbmc_br_from_ra_pfxs["$pfx"]=0
-      gbmc_br_from_ra_update
+      gbmc_ip_monitor_defer
     fi
   elif [ "$change" = 'link' -a "$intf" = 'gbmcbr' ]; then
     rdisc6 -m gbmcbr -r 1 -w 100 >/dev/null 2>&1
     if [ "$action" = 'add' -a "$mac" != "$gbmc_br_from_ra_mac" ]; then
       gbmc_br_from_ra_mac="$mac"
-      gbmc_br_from_ra_update
+      gbmc_ip_monitor_defer
     fi
     if [ "$action" = 'del' -a "$mac" = "$gbmc_br_from_ra_mac" ]; then
       gbmc_br_from_ra_mac=
-      gbmc_br_from_ra_update
+      gbmc_ip_monitor_defer
     fi
   fi
 }
