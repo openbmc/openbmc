@@ -43,7 +43,7 @@ function fwbios() {
   # Disable LPI mode NV_SI_CPU_LPI_FREQ_DISABLE for SCP 1.06 and older.
   nvparm -s 0x1 -o 0x114090
   # Disable LPI mode NV_SI_CPU_LPI_FREQ_DISABLE for SCP 1.07 and newer
-  nvparm -s 0x1 -o 0x5F0638
+  nvparm -s 0x1 -o 0x02A8
   # TODO: Disabled toggling of SMPro heartbeat (require CPLD v 1.12.0.0+)
   # nvparm -s 0x1 -o 0x5F0638
   if [ $? -ne  0 ]; then
