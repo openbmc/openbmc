@@ -15,7 +15,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "${PYTHON_PN}-sdbus++-native"
 
 SRC_URI = "git://github.com/openbmc/intel-dbus-interfaces"
-SRCREV = "b5f2dd444c5d3808d005452417e4ae2ea28624ff"
+SRCREV = "2b1255c47fdaaee6fd2db8f38f32abc13a7edf05"
 
 PACKAGECONFIG ??= "libintel_dbus"
 PACKAGECONFIG[libintel_dbus] = " \
