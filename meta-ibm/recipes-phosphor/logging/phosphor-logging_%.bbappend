@@ -12,7 +12,7 @@ FILES:${PN}:append:p10bmc = " ${datadir}/phosphor-logging/pels/ibm,everest_dev_c
 
 #Enable phal feature, if available.
 PACKAGECONFIG:append = " ${@bb.utils.filter('MACHINE_FEATURES', 'phal', d)}"
-PACKAGECONFIG[phal] = "-Dphal=enabled, -Dphal=disabled, pdata libekb pdbg"
+PACKAGECONFIG[phal] = "-Dphal=enabled, -Dphal=disabled, pdata libekb pdbg ipl"
 
 do_install:append:p10bmc() {
     install -d ${D}/${datadir}/phosphor-logging/pels
