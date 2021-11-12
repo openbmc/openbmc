@@ -31,7 +31,7 @@
     {
         "Name" : "PowerOk",
         "DbusName" : "xyz.openbmc_project.IpmbSensor",
-        "Path" : "/xyz/openbmc_project/gpio/volt/1_CPU_Good",
+        "Path" : "/xyz/openbmc_project/gpio/ipmbGpioState/1_CPU_Good",
         "Interface" : "xyz.openbmc_project.Chassis.Control.Power",
         "Property" : "PGood",
         "Type" : "DBUS"

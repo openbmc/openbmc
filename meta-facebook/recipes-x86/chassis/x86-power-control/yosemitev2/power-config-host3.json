@@ -2,28 +2,28 @@
     "gpio_configs":[
     {
         "Name" : "PostComplete",
-        "LineName" : "POST_COMPLETE",
+        "LineName" : "POST_COMPLETE3",
         "Type" : "GPIO",
         "Polarity" : "ActiveLow"
     },
 
     {
         "Name" : "SlotPower",
-        "LineName" : "SLOT1_POWER",
+        "LineName" : "SLOT3_POWER",
         "Type" : "GPIO",
         "Polarity" : "ActiveLow"
     },
 
     {
         "Name" : "PowerOut",
-        "LineName" : "POWER_OUT1",
+        "LineName" : "POWER_OUT3",
         "Type" : "GPIO",
         "Polarity" : "ActiveLow"
     },
 
     {
         "Name" : "ResetOut",
-        "LineName" : "RESET_OUT1",
+        "LineName" : "RESET_OUT3",
         "Type" : "GPIO",
         "Polarity" : "ActiveLow"
     },
@@ -31,7 +31,7 @@
     {
         "Name" : "PowerOk",
         "DbusName" : "xyz.openbmc_project.IpmbSensor",
-        "Path" : "/xyz/openbmc_project/gpio/volt/3_CPU_Good",
+        "Path" : "/xyz/openbmc_project/gpio/ipmbGpioState/3_CPU_Good",
         "Interface" : "xyz.openbmc_project.Chassis.Control.Power",
         "Property" : "PGood",
         "Type" : "DBUS"
