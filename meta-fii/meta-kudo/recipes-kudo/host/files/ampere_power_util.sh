@@ -102,7 +102,7 @@ power_button() {
     elif [[ "$current_time" -ge "(($press_time + 5))" ]]; then
       power_off
     else
-      echo "Button press did not match interval.
+      echo "Button press did not match interval."
     fi
     rm "/run/openbmc/power-button"
   else
