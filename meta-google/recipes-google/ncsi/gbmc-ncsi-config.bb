@@ -28,8 +28,10 @@ RDEPENDS:${PN} += " \
   dhcp-relay \
   gbmc-ip-monitor \
   ncsid \
+  network-sh \
   nftables-systemd \
   sslh \
+  ndisc6-rdisc6 \
   "
 
 FILES:${PN} += " \
