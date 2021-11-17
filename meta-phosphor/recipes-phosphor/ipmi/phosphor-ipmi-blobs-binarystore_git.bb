@@ -15,9 +15,12 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "protobuf-native"
 DEPENDS += "protobuf"
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[blobtool] = ",--disable-blobtool"
+
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-blobs-binarystore"
-SRCREV = "c3abe753fca211f49eb68f7d34e37bfc9eb5d4c4"
+SRCREV = "d6f65a1b52d662dfe282ebddab840ce161be6c61"
 
 FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES:${PN}:append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
