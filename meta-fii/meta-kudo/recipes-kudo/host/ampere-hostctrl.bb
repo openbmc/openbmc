@@ -73,7 +73,7 @@ SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'CHASSIS_POWEROFF_FMT', 'OBMC_CHAS
 CHASSIS_POWERCYCLE_SVC = "ampere-chassis-powercycle.service"
 CHASSIS_POWERCYCLE_TGTFMT = "obmc-chassis-powercycle@{0}.target"
 CHASSIS_POWERCYCLE_FMT = "../${CHASSIS_POWERCYCLE_SVC}:${CHASSIS_POWERCYCLE_TGTFMT}.requires/${CHASSIS_POWERCYCLE_SVC}"
-SYSTEMD_LINK_${PN} += "${@compose_list_zip(d, 'CHASSIS_POWERCYCLE_FMT', 'OBMC_CHASSIS_INSTANCES')}"
+SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'CHASSIS_POWERCYCLE_FMT', 'OBMC_CHASSIS_INSTANCES')}"
 
 TMPL = "phosphor-gpio-monitor@.service"
 INSTFMT = "phosphor-gpio-monitor@{0}.service"
@@ -85,4 +85,3 @@ do_install() {
     install -d ${D}/usr/sbin
     install -m 0755 ${WORKDIR}/ampere_power_util.sh ${D}/${sbindir}/ampere_power_util.sh
 }
-
