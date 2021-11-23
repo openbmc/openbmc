@@ -10,13 +10,11 @@ inherit obmc-phosphor-systemd
 S = "${WORKDIR}"
 
 SRC_URI = "file://ampere-host-shutdown.service \
-          file://ampere-host-reset.service \
           file://ampere_power_util.sh \
           file://ampere-chassis-poweroff.service \
           file://ampere-chassis-poweron.service \
           file://ampere-chassis-powercycle.service \
           file://ampere-host-shutdown-ack.service \
-          file://ampere-host-force-reset.service \
           file://ampere-host-power-cycle.service \
           "
 
@@ -26,12 +24,10 @@ RDEPENDS:${PN} = "bash"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = " \
         ampere-host-shutdown.service \
-        ampere-host-reset.service \
         ampere-chassis-poweroff.service \
         ampere-chassis-poweron.service \
         ampere-chassis-powercycle.service \
         ampere-host-shutdown-ack.service \
-        ampere-host-force-reset.service \
         ampere-host-power-cycle.service \
         "
 # host power control
@@ -46,18 +42,6 @@ HOST_REBOOT_SVC = "ampere-host-power-cycle.service"
 HOST_REBOOT_SVC_TGTFMT = "obmc-host-reboot@{0}.target"
 HOST_REBOOT_SVC_FMT = "../${HOST_REBOOT_SVC}:${HOST_REBOOT_SVC_TGTFMT}.requires/${HOST_REBOOT_SVC}"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'HOST_REBOOT_SVC_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# overwrite the host reset to graceful reset
-HOST_WARM_REBOOT_SOFT_SVC = "ampere-host-reset.service"
-HOST_WARM_REBOOT_TGTFMT = "obmc-host-warm-reboot@{0}.target"
-HOST_WARM_REBOOT_SOFT_SVC_FMT = "../${HOST_WARM_REBOOT_SOFT_SVC}:${HOST_WARM_REBOOT_TGTFMT}.requires/${HOST_WARM_REBOOT_SOFT_SVC}"
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'HOST_WARM_REBOOT_SOFT_SVC_FMT', 'OBMC_HOST_INSTANCES')}"
-
-# overwrite force reboot
-HOST_WARM_REBOOT_FORCE_TGT = "ampere-host-force-reset.service"
-HOST_WARM_REBOOT_FORCE_TGTFMT = "obmc-host-force-warm-reboot@{0}.target"
-HOST_WARM_REBOOT_FORCE_TARGET_FMT = "../${HOST_WARM_REBOOT_FORCE_TGT}:${HOST_WARM_REBOOT_FORCE_TGTFMT}.requires/${HOST_WARM_REBOOT_FORCE_TGT}"
-SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'HOST_WARM_REBOOT_FORCE_TARGET_FMT', 'OBMC_HOST_INSTANCES')}"
 
 # chassis power control
 CHASSIS_POWERON_SVC = "ampere-chassis-poweron.service"
