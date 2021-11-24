@@ -4,5 +4,5 @@ Description=Watchdog power state power hotswap
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/usr/bin/env kudo.sh rst hotswap
+ExecStart=/usr/sbin/kudo.sh rst hotswap
 SyslogIdentifier=phosphor-watchdog

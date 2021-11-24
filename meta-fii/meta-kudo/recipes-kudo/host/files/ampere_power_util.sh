@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /usr/sbin/kudo-lib.sh
+source /usr/libexec/kudo-fw/kudo-lib.sh
 
 # Usage of this utility
 function usage() {

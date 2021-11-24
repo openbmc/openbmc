@@ -2,7 +2,7 @@
 
 devpath="/sys/bus/i2c/devices/13-0077/driver"
 
-source /usr/sbin/kudo-lib.sh
+source /usr/libexec/kudo-fw/kudo-lib.sh
 
 function fwbios() {
   KERNEL_FIU_ID="c0000000.spi"

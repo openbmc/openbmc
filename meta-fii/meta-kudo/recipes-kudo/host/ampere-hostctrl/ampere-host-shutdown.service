@@ -6,6 +6,5 @@ OnFailure=obmc-chassis-poweroff@0.target
 [Service]
 RemainAfterExit=no
 Type=oneshot
-ExecStart=/usr/bin/env ampere_power_util.sh mb graceful_shutdown
+ExecStart=/usr/libexec/ampere-hostctrl/ampere_power_util.sh mb graceful_shutdown
 SyslogIdentifier=ampere_power_util.sh
-

@@ -1,7 +1,7 @@
 #!/bin/bash
 # help information
 
-source /usr/sbin/kudo-lib.sh
+source /usr/libexec/kudo-fw/kudo-lib.sh
 
 function usage_rst() {
   echo " kudo rst [parameter]"

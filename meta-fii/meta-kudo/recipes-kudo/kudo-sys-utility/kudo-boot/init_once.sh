@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /usr/sbin/kudo-lib.sh
+source /usr/libexec/kudo-fw/kudo-lib.sh
 
 function set_mux_default(){
     # set all mux route to CPU before power on host

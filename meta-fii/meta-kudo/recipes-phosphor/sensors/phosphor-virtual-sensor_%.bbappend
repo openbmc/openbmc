@@ -14,7 +14,9 @@ FILES:${PN}:append:kudo = " ${bindir}/tla2024-enable.sh"
 do_install:append:kudo() {
     install -d ${D}${datadir}/${PN}
     install -m 0644 ${WORKDIR}/virtual_sensor_config.json ${D}${datadir}/${PN}/virtual_sensor_config.json
-    install -m 0755 ${WORKDIR}/tla2024-enable.sh ${D}${bindir}/tla2024-enable.sh
+
+    install -d ${D}${libexecdir}/${PN}
+    install -m 0755 ${WORKDIR}/tla2024-enable.sh ${D}${libexecdir}/${PN}/tla2024-enable.sh
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/tla2024-enable.service ${D}${systemd_system_unitdir}/tla2024-enable.service

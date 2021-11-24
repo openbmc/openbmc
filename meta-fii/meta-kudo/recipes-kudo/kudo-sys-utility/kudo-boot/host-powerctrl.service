@@ -9,7 +9,7 @@ After=kudo-bios-verify.service
 Restart=no
 RemainAfterExit=true
 Type=oneshot
-ExecStart=/usr/sbin/init_once.sh
+ExecStart=/usr/libexec/kudo-boot/init_once.sh
 StandardOutput=syslog
 
 [Install]

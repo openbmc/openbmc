@@ -18,8 +18,8 @@ SYSTEMD_SERVICE:${PN}:append = " usb_network.service"
 FILES:${PN} += "${sysconfdir_native}/systemd/network/00-bmc-usb0.network"
 
 do_install() {
-    install -d ${D}/${sbindir}
-    install -m 0755 ${WORKDIR}/usb_network.sh ${D}/${sbindir}
+    install -d ${D}${libexecdir}/${PN}
+    install -m 0755 ${WORKDIR}/usb_network.sh ${D}${libexecdir}/${PN}/usb_network.sh
 
     install -d ${D}${systemd_unitdir}/system/
     install -m 0644 ${WORKDIR}/usb_network.service ${D}${systemd_unitdir}/system

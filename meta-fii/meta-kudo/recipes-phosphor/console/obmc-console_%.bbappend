@@ -30,8 +30,8 @@ do_install:append() {
 
     # Overwrite base package's obmc-console@.service with our own
     install -m 0644 ${WORKDIR}/${BPN}@.service ${D}${systemd_unitdir}/system/${BPN}@.service
-    install -d ${D}/usr/sbin
-    install -m 0755 ${WORKDIR}/kudo_uart_mux_ctrl.sh ${D}/${sbindir}/kudo_uart_mux_ctrl.sh
+    install -d ${D}${libexecdir}/${PN}
+    install -m 0755 ${WORKDIR}/kudo_uart_mux_ctrl.sh ${D}${libexecdir}/${PN}/kudo_uart_mux_ctrl.sh
 
 }
 
@@ -39,3 +39,4 @@ pkg_postinst:${PN}:append () {
     systemctl --root=$D enable obmc-console@ttyS1.service
     systemctl --root=$D enable obmc-console@ttyS3.service
 }
+

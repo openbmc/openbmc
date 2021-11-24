@@ -8,5 +8,5 @@ After=kudo-bios-verify.service
 [Service]
 RemainAfterExit=no
 Type=oneshot
-ExecStart=/usr/bin/env ampere_power_util.sh mb host_reset
+ExecStart=/usr/libexec/ampere-hostctrl/ampere_power_util.sh mb host_reset
 SyslogIdentifier=ampere_power_util.sh

@@ -7,6 +7,5 @@ Conflicts=obmc-chassis-poweron@0.target
 [Service]
 RemainAfterExit=no
 Type=oneshot
-ExecStart=/usr/bin/env ampere_power_util.sh mb off
+ExecStart=/usr/libexec/ampere-hostctrl/ampere_power_util.sh mb off
 SyslogIdentifier=ampere_power_util.sh
-
