@@ -125,6 +125,7 @@ function fw_rev() {
 
   cmd=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x1 w);
   echo " SCP Firmware: ${cmd}"
+  get_scp_eeprom
 
   adm1266_ver  | grep REVISION
 
