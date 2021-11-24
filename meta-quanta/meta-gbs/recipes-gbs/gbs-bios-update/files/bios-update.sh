@@ -75,14 +75,14 @@ main() {
     fi
     echo "${KERNEL_FIU_ID}" > "${KERNEL_SYSFS_FIU}"/bind
 
-    # BIOS flash is labelled 'pnor'
-    pnor_mtd=$(findmtd pnor)
-    if [ -z "${pnor_mtd}" ]; then
+    # BIOS flash is labelled 'bios-primary'
+    bios_mtd=$(findmtd bios-primary)
+    if [ -z "${bios_mtd}" ]; then
         echo "Cannot find bios flash mtd partition!"
         exit 1
     fi
 
-    flashcp -v $IMAGE_FILE /dev/"${pnor_mtd}"
+    flashcp -v $IMAGE_FILE /dev/"${bios_mtd}"
     if [ $? -eq 0 ]; then
         echo "bios update successfully..."
     else
