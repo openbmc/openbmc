@@ -38,6 +38,8 @@ SYSTEMD_SERVICE:${PN} += "obmc-console-ssh@.service \
 
 FILES:${PN} += "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
 
+OBMC_CONSOLE_HOST_TTY ?= "ttyVUART0"
+
 do_install:append() {
         # Install the server configuration
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
@@ -47,15 +49,15 @@ do_install:append() {
                 # Install the old-style server configuration
                 install -m 0644 ${WORKDIR}/${BPN}.conf ${D}${sysconfdir}/
                 # Link the custom configuration to the required location
-                ln -sr ${D}${sysconfdir}/${BPN}.conf ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
-        elif test -f "${WORKDIR}/server.ttyVUART0.conf" ; then
+                ln -sr ${D}${sysconfdir}/${BPN}.conf ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_HOST_TTY}.conf
+        elif test -f "${WORKDIR}/server.${OBMC_CONSOLE_HOST_TTY}.conf" ; then
                 # Remove the upstream-provided server configuration
                 rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
                 # Install the package-provided new-style configuration
-                install -m 0644 ${WORKDIR}/server.ttyVUART0.conf ${D}${sysconfdir}/${BPN}/
+                install -m 0644 ${WORKDIR}/server.${OBMC_CONSOLE_HOST_TTY}.conf ${D}${sysconfdir}/${BPN}/
         else
                 # Otherwise, remove socket-id from the shipped configuration to
                 # align with the lack of a client configuration file
-                sed -ri '/^socket-id =/d' ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
+                sed -ri '/^socket-id =/d' ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_HOST_TTY}.conf
         fi
 }
