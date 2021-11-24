@@ -20,7 +20,7 @@ PACKAGECONFIG[blobtool] = ",--disable-blobtool"
 
 S = "${WORKDIR}/git"
 SRC_URI = "git://github.com/openbmc/phosphor-ipmi-blobs-binarystore"
-SRCREV = "d6f65a1b52d662dfe282ebddab840ce161be6c61"
+SRCREV = "a21027dcb1a0396e57347ab1066821c4d8ba30b2"
 
 FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"
 FILES:${PN}:append = " ${libdir}/blob-ipmid/lib*${SOLIBS}"
