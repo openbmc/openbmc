@@ -29,6 +29,7 @@ gbmc_ncsi_br_deprecated_ips_update() {
     "${gbmc_ncsi_br_deprecated_ips_lastip:-(deleted)}" >&2
 
   local contents=
+  local nfcontents=
   if [ -n "$gbmc_ncsi_br_deprecated_ips_lastip" ]; then
     local pfx_bytes=()
     ip_to_bytes pfx_bytes "$gbmc_ncsi_br_deprecated_ips_lastip"
@@ -50,6 +51,16 @@ PreferredLifetime=0
 Address=$host_pfx/128
 PreferredLifetime=0
 EOF
+    read -r -d '' nfcontents <<EOF
+table inet filter {
+  chain ncsi_input {
+    ip6 saddr != $pfx/76 ip6 daddr $pfx/76 goto ncsi_gbmc_br_pub_input
+  }
+  chain ncsi_forward {
+    ip6 saddr != $pfx/76 ip6 daddr $pfx/76 accept
+  }
+}
+EOF
   fi
 
   local file
@@ -70,19 +81,13 @@ EOF
     networkctl reload && networkctl reconfigure @NCSI_IF@
   fi
 
-  read -r -d '' contents <<EOF
-table inet filter {
-  chain ncsi_input {
-    ip6 saddr != $pfx/76 ip6 daddr $pfx/76 goto ncsi_gbmc_br_pub_input
-  }
-  chain ncsi_forward {
-    ip6 saddr != $pfx/76 ip6 daddr $pfx/76 accept
-  }
-}
-EOF
-  rfile=/run/nftables/40-gbmc-ncsi-br.rules
+  local rfile=/run/nftables/40-gbmc-ncsi-br.rules
   mkdir -p -m 755 "$(dirname "$rfile")"
-  printf '%s' "$contents" >"$rfile"
+  if [ -z "$nfcontents" ]; then
+    rm -f "$rfile"
+  else
+    printf '%s' "$nfcontents" >"$rfile"
+  fi
   systemctl reset-failed nftables && systemctl --no-block restart nftables || true
 }
 
