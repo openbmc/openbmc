@@ -1,0 +1,1 @@
+PACKAGECONFIG:remove = " cpusensor ipmbsensor"
