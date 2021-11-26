@@ -30,11 +30,12 @@ FAN_PACKAGES = " \
         ${PN}-presence-tach \
         ${PN}-control \
         ${PN}-monitor \
+        ${PN}-sensor-monitor \
 "
 
 ALLOW_EMPTY:${PN} = "1"
 PACKAGE_BEFORE_PN += "${FAN_PACKAGES}"
-PACKAGECONFIG ?= "presence control monitor"
+PACKAGECONFIG ?= "presence control monitor sensor-monitor"
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
 PKG_DEFAULT_MACHINE ??= "${MACHINE}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -161,6 +162,8 @@ PACKAGECONFIG[cooling-type] = "--enable-cooling-type,--disable-cooling-type,,"
 # --------------------------------------
 # ${PN}-sensor-monitor specific configuration
 PACKAGECONFIG[sensor-monitor] = "--enable-sensor-monitor, --disable-sensor-monitor"
+
+FAN_PACKAGES:append = "${@bb.utils.contains('PACKAGECONFIG', 'sensor-monitor', ' sensor-monitor', '', d)}"
 
 FILES:sensor-monitor += " ${bindir}/sensor-monitor"
 SYSTEMD_SERVICE:sensor-monitor += "sensor-monitor.service"
