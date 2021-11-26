@@ -1,0 +1,17 @@
+[Unit]
+Description=Enforce Static MAC addr mapping and hostname setting
+Wants=xyz.openbmc_project.FruDevice.service
+After=xyz.openbmc_project.FruDevice.service
+Wants=systemd-hostnamed.service
+After=systemd-hostnamed.service
+Before=xyz.openbmc_project.Network.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/env baseboard-fru-handler.sh
+SyslogIdentifier=baseboard-fru-handler
+
+[Install]
+WantedBy=network.target
+
