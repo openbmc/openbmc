@@ -67,3 +67,7 @@ fi
 
 # Create /run/openbmc for system power files
 mkdir "/run/openbmc"
+
+# Restart psusensor service to enusre that the VBAT sensor doesn't say "no reading" until
+# it's second query after a hotswap
+(sleep 45; systemctl restart xyz.openbmc_project.psusensor.service)&
