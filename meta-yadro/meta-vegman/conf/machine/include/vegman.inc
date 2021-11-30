@@ -13,6 +13,8 @@ FLASH_SIZE = "65536"
 
 IMAGE_FEATURES += "allow-root-login"
 
+PREFERRED_PROVIDER_virtual/phosphor-led-manager-config-native = "vegman-led-manager-config-native"
+
 PREFERRED_PROVIDER_virtual/bootloader = "u-boot-aspeed-sdk"
 PREFERRED_PROVIDER_u-boot = "u-boot-aspeed-sdk"
 PREFERRED_PROVIDER_u-boot-fw-utils = "u-boot-fw-utils-aspeed-sdk"
