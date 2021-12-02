@@ -20,18 +20,3 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-evb/meta-evb-aspeed \
   ##OEROOT##/meta-evb/meta-evb-aspeed/meta-evb-ast2500 \
   "
-BBLAYERS_NON_REMOVABLE ?= " \
-  ##OEROOT##/meta \
-  ##OEROOT##/meta-poky \
-  ##OEROOT##/meta-openembedded/meta-oe \
-  ##OEROOT##/meta-openembedded/meta-networking \
-  ##OEROOT##/meta-openembedded/meta-perl \
-  ##OEROOT##/meta-openembedded/meta-python \
-  ##OEROOT##/meta-openembedded/meta-webserver \
-  ##OEROOT##/meta-security \
-  ##OEROOT##/meta-phosphor \
-  ##OEROOT##/meta-aspeed \
-  ##OEROOT##/meta-evb \
-  ##OEROOT##/meta-evb/meta-evb-aspeed \
-  ##OEROOT##/meta-evb/meta-evb-aspeed/meta-evb-ast2500 \
-  "
