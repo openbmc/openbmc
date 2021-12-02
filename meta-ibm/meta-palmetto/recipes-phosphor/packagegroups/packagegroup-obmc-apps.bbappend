@@ -1,1 +1,1 @@
-RDEPENDS:${PN}-inventory:append:palmetto = " openpower-occ-control phosphor-webui"
+RDEPENDS:${PN}-inventory:append:palmetto = " openpower-occ-control webui-vue"
