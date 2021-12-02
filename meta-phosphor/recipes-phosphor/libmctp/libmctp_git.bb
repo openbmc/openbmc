@@ -26,6 +26,7 @@ PACKAGECONFIG[systemd] = "--with-systemdsystemunitdir=${systemd_system_unitdir},
                           --without-systemdsystemunitdir,systemd"
 
 PACKAGECONFIG[astlpc-raw-kcs] = "--enable-astlpc-raw-kcs,--disable-astlpc-raw-kcs,udev,udev"
+PACKAGECONFIG[pcap] = "--enable-capture,--disable-capture,libpcap,"
 
 CONFFILES:${PN} = "${sysconfdir}/default/mctp"
 
