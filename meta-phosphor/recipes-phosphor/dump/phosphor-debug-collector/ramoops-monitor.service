@@ -1,6 +1,6 @@
 [Unit]
 Description=Ramoops monitor.
-ConditionPathExists=/var/lib/systemd/pstore
+ConditionPathExistsGlob=/var/lib/systemd/pstore/dmesg-ramoops-*
 After=xyz.openbmc_project.Dump.Manager.service
 
 [Service]
