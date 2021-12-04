@@ -10,8 +10,11 @@ inherit obmc-phosphor-systemd
 PROVIDES += "virtual/bmc-update"
 RPROVIDES:${PN} += "virtual/bmc-update"
 
-RDEPENDS:${PN} += "google-key"
-RDEPENDS:${PN} += "bash"
+RDEPENDS:${PN} += " \
+  bash \
+  gbmc-update \
+  google-key \
+  "
 
 SRC_URI += " \
  file://config-bmc.json \
@@ -19,12 +22,14 @@ SRC_URI += " \
  file://inplace-gbmc-verify.sh \
  file://inplace-gbmc-version.service \
  file://inplace-gbmc-version.sh \
+ file://75-inplace-gbmc-upgrade.sh \
 "
 
 SYSTEMD_SERVICE:${PN} += "inplace-gbmc-verify.service"
 SYSTEMD_SERVICE:${PN} += "inplace-gbmc-version.service"
 
 FILES:${PN} += "${datadir}/phosphor-ipmi-flash"
+FILES:${PN} += "${datadir}/gbmc-br-dhcp"
 
 do_install() {
     sed -i 's,@ALLOW_DEV@,,' ${WORKDIR}/inplace-gbmc-verify.sh
@@ -37,6 +42,9 @@ do_install() {
 
     install -d ${D}${datadir}/phosphor-ipmi-flash
     install -m 0644 ${WORKDIR}/config-bmc.json ${D}${datadir}/phosphor-ipmi-flash
+
+    install -d ${D}${datadir}/gbmc-br-dhcp
+    install -m 0644 ${WORKDIR}/75-inplace-gbmc-upgrade.sh ${D}${datadir}/gbmc-br-dhcp/
 }
 
 do_install:prepend:dev() {
