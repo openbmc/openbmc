@@ -40,24 +40,50 @@ FILES:${PN} += "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket
 
 OBMC_CONSOLE_HOST_TTY ?= "ttyVUART0"
 
+# Support multiple TTY ports using space separated list.
+# Ex. OBMC_CONSOLE_TTYS = "ttyS1 ttyS2"
+OBMC_CONSOLE_TTYS ?= "${OBMC_CONSOLE_HOST_TTY}"
+
 do_install:append() {
         # Install the server configuration
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
-        if test -f "${WORKDIR}/${BPN}.conf"; then
-                # Remove the upstream-provided server configuration
+
+        # If the OBMC_CONSOLE_TTYS variable is used without the default OBMC_CONSOLE_HOST_TTY
+        # the port specific config file should be provided. If it is just OBMC_CONSOLE_HOST_TTY,
+        # use the old style which supports both port specific or obmc-console.conf method.
+        if [[ "${OBMC_CONSOLE_TTYS}" !=  "${OBMC_CONSOLE_HOST_TTY}" ]]; then
                 rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
-                # Install the old-style server configuration
-                install -m 0644 ${WORKDIR}/${BPN}.conf ${D}${sysconfdir}/
-                # Link the custom configuration to the required location
-                ln -sr ${D}${sysconfdir}/${BPN}.conf ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_HOST_TTY}.conf
-        elif test -f "${WORKDIR}/server.${OBMC_CONSOLE_HOST_TTY}.conf" ; then
-                # Remove the upstream-provided server configuration
-                rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
-                # Install the package-provided new-style configuration
-                install -m 0644 ${WORKDIR}/server.${OBMC_CONSOLE_HOST_TTY}.conf ${D}${sysconfdir}/${BPN}/
+
+                for CONSOLE in ${OBMC_CONSOLE_TTYS}
+                do
+                        if test -f "${WORKDIR}/server.${CONSOLE}.conf" ; then
+                                install -m 0644 ${WORKDIR}/server.${CONSOLE}.conf ${D}${sysconfdir}/${BPN}/
+                        else
+                                bberror "Must provide port specific config files when using OBMC_CONSOLE_TTYS" \
+                                        "Missing server.${CONSOLE}.conf"
+                        fi
+                done
         else
-                # Otherwise, remove socket-id from the shipped configuration to
-                # align with the lack of a client configuration file
-                sed -ri '/^socket-id =/d' ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_HOST_TTY}.conf
+                # Port specific config file is prioritized over generic conf file.
+                # If port specific config file is not present and generic "obmc-console.conf"
+                # exists, it will be used.
+                if test -f "${WORKDIR}/server.${OBMC_CONSOLE_TTYS}.conf" ; then
+                        # Remove the upstream-provided server configuration
+                        rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
+                        # Install the package-provided new-style configuration
+                        install -m 0644 ${WORKDIR}/server.${OBMC_CONSOLE_TTYS}.conf ${D}${sysconfdir}/${BPN}/
+                elif test -f "${WORKDIR}/${BPN}.conf"; then
+                        # Remove the upstream-provided server configuration
+                        rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
+                        # Install the old-style server configuration
+                        install -m 0644 ${WORKDIR}/${BPN}.conf ${D}${sysconfdir}/
+                        # Link the custom configuration to the required location
+                        ln -sr ${D}${sysconfdir}/${BPN}.conf ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_TTYS}.conf
+                else
+                        # Otherwise, remove socket-id from the shipped configuration to
+                        # align with the lack of a client configuration file
+                        sed -ri '/^socket-id =/d' ${D}${sysconfdir}/${BPN}/server.${OBMC_CONSOLE_TTYS}.conf
+                fi
         fi
+
 }
