@@ -56,4 +56,8 @@ RDEPENDS:${PN}-interface = " \
 SUMMARY:${PN}-cli = "CLI utils"
 RDEPENDS:${PN}-cli = " \
     ipmitool \
+    obmc-yadro-cli \
+    obmc-yadro-lssensors \
+    obmc-yadro-lsinventory \
+    obmc-yadro-netconfig \
 "
