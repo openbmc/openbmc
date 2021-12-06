@@ -40,6 +40,8 @@ RDEPENDS:${PN}-flash = " \
 SUMMARY:${PN}-system = "System software"
 RDEPENDS:${PN}-system = " \
     vegman-fru-handler \
+    fru-device \
+    entity-manager \
     ${PN}-interface \
     ${PN}-cli \
 "
