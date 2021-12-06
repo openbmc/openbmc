@@ -4,7 +4,7 @@ source /usr/sbin/kudo-lib.sh
 
 # Usage of this utility
 function usage() {
-  echo "usage: power-util mb [on|off|graceful_shutdown|force_reset|shutdown_ack|hotswap|power_button]";
+  echo "usage: power-util mb [on|off|graceful_shutdown|host_reset|host_cycle|shutdown_ack|hotswap|power_button]";
 }
 
 hotswap() {
@@ -70,7 +70,7 @@ graceful_shutdown() {
   fi
 }
 
-force_reset() {
+host_reset() {
   if [ $(host_status) == "on" ]; then
     echo "Triggering sysreset pin"
     busctl set-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog ExpireAction s xyz.openbmc_project.State.Watchdog.Action.None
@@ -80,6 +80,13 @@ force_reset() {
   else
     echo "Host is off, cannot reset."
   fi
+}
+
+host_cycle() {
+  echo "DC cycling host"
+  force_off
+  sleep 2
+  power_on
 }
 
 shutdown_ack() {
@@ -141,8 +148,10 @@ elif [[ $2 == "hotswap" ]]; then
   hotswap
 elif [[ $2 == "graceful_shutdown" ]]; then
   graceful_shutdown
-elif [ $2 == "force_reset" ]; then
-  force_reset
+elif [ $2 == "host_reset" ]; then
+  host_reset
+elif [ $2 == "host_cycle" ]; then
+  host_cycle
 elif [ $2 == "shutdown_ack" ]; then
   shutdown_ack
 elif [ $2 == "power_button" ]; then

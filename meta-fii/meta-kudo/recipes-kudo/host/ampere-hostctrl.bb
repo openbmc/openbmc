@@ -16,6 +16,7 @@ SRC_URI = "file://ampere-host-shutdown.service \
           file://ampere-chassis-powercycle.service \
           file://ampere-host-shutdown-ack.service \
           file://ampere-host-power-cycle.service \
+          file://ampere-host-reset.service \
           "
 
 DEPENDS = "systemd"
@@ -29,6 +30,7 @@ SYSTEMD_SERVICE:${PN} = " \
         ampere-chassis-powercycle.service \
         ampere-host-shutdown-ack.service \
         ampere-host-power-cycle.service \
+        ampere-host-reset.service \
         "
 # host power control
 # overwrite the host shutdown to graceful shutdown
