@@ -6,5 +6,5 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/env toggle_fault_led.sh
+ExecStart=/usr/bin/env toggle_fault_led.sh %i on
 SyslogIdentifier=fault-led

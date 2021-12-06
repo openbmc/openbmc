@@ -29,15 +29,15 @@ STATUS_MFR_SPECIFIC=0x80
 # $1 will be the name of the psu
 PSU=$1
 
-if [ "$PSU" = 1 ]; then
+if [ "$PSU" = 0 ]; then
 	HSC_PMBUS_NUM=$HSC1_PMBUS_NUM
 	HSC_SLAVE_ADDR=$HSC1_SLAVE_ADDR
-elif [ "$PSU" = 2 ]; then
+elif [ "$PSU" = 1 ]; then
 	HSC_PMBUS_NUM=$HSC2_PMBUS_NUM
 	HSC_SLAVE_ADDR=$HSC2_SLAVE_ADDR
 else
-	echo "Please choose PSU1 (1) or PSU2 (2)"
-	echo "Ex: ampere_psu_reset_hotswap.sh 1"
+	echo "Please choose PSU1 (0) or PSU2 (1)"
+	echo "Ex: ampere_psu_reset_hotswap.sh 0"
 	exit 0
 fi
 
