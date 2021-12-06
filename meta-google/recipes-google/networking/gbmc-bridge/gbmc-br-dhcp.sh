@@ -92,5 +92,10 @@ EOF
     networkctl reload && networkctl reconfigure gbmcbr
   fi
 
+  if [ -n "${fqdn-}" ]; then
+    echo "Using hostname $fqdn" >&2
+    hostnamectl set-hostname "$fqdn" || true
+  fi
+
   gbmc_br_dhcp_run_hooks
 fi

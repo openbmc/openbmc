@@ -7,7 +7,7 @@ StartLimitBurst=3
 [Service]
 Restart=always
 RestartSec=5
-ExecStart=/usr/bin/udhcpc6 -f -q -O bootfile_url -O bootfile_param -i gbmcbr -s /usr/libexec/gbmc-br-dhcp.sh
+ExecStart=/usr/bin/udhcpc6 -f -q -O fqdn -O bootfile_url -O bootfile_param -i gbmcbr -s /usr/libexec/gbmc-br-dhcp.sh
 
 [Install]
 WantedBy=multi-user.target
