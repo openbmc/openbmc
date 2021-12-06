@@ -43,3 +43,4 @@ RDEPENDS:${PN}-logging:append = " ${EXTRA_IBM_LOGGING_PKGS}"
 RDEPENDS:${PN}-leds:remove:witherspoon-tacoma = "phosphor-led-manager-faultmonitor"
 
 ${PN}-software-extras:append:ibm-ac-server = " phosphor-software-manager-sync"
+${PN}-software-extras:append:p10bmc = " phosphor-software-manager-usb"
