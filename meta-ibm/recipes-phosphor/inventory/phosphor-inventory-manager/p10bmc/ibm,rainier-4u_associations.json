@@ -310,6 +310,24 @@
             ]
         },
         {
+            "path": "system",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "fault_inventory_object",
+                        "fType": "fault_led_group"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/led/groups/partition_system_attention_indicator",
+                        "/xyz/openbmc_project/led/groups/platform_system_attention_indicator"
+                    ]
+                }
+            ]
+        },
+        {
             "path": "system/chassis/motherboard/powersupply0",
             "endpoints":
             [
