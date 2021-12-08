@@ -4,7 +4,7 @@ d-bus objects to represent various user settings."
 PR = "r1"
 PV = "1.0+git${SRCPV}"
 
-inherit autotools
+inherit autotools pkgconfig
 inherit obmc-phosphor-dbus-service
 inherit python3native
 inherit phosphor-settings-manager
