@@ -41,6 +41,9 @@ set_net() {
 
   echo "Found prefix $pfx from $rtr" >&2
 
+  # We no longer need NCSId if we are in this configuration
+  systemctl stop --no-block ncsid@"$NCSI_IF" || true
+
   # Delete any stale IP Addresses from the primary interface as we won't use them
   UpdateIP xyz.openbmc_project.Network "$NCSI_IF" '0.0.0.0' '0' || true
   UpdateIP xyz.openbmc_project.Network "$NCSI_IF" '::' '0' || true
