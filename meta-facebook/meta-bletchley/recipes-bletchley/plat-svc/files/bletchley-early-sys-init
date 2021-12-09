@@ -1,0 +1,82 @@
+#!/bin/bash -e
+
+set_gpio()
+{
+    NET_NAME=$1
+    OUT_VAL=$2
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "set_gpio: can not find gpio, $NET_NAME"
+        return 1
+    fi
+
+    echo -n "set_gpio: set $NET_NAME = $OUT_VAL"
+    if ! gpioset "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"="$OUT_VAL"; then
+        echo " failed"
+        return 1
+    fi
+
+    echo " success"
+    return 0
+}
+
+set_fan()
+{
+    FAN_ID=$1
+    FAN_DUTY=$2
+    SYSFA_PWM_PATH=""
+
+    for file in /sys/devices/platform/pwm-fan"$FAN_ID"/hwmon/hwmon*/pwm1
+    do
+        if [ -e "$file" ]; then
+            SYSFA_PWM_PATH="$file"
+            break
+        fi
+    done
+
+    if [ -z "$SYSFA_PWM_PATH" ]; then
+        echo "set_fan: pwm file not found, chekc fan id ($FAN_ID)"
+        return 1
+    fi
+
+    if [ "$FAN_DUTY" -lt 0 ] || [ "$FAN_DUTY" -gt 100 ]; then
+        echo "set_fan: incorrect fan duty, $FAN_DUTY"
+        return 1
+    fi
+
+    # convert duty (0-100) to pwm value (0-255)
+    PWM_VAL=$(printf "%.0f" $((FAN_DUTY*255/100)))
+
+    echo -n "set_fan: set fan$FAN_ID = $FAN_DUTY"
+    if ! echo "$PWM_VAL" > "$SYSFA_PWM_PATH"; then
+        echo " failed"
+        return 1
+    fi
+
+    echo " success"
+    return 0
+}
+
+# set initial value for GPIO output pins
+set_gpio SEL_SPI2_MUX       1
+set_gpio SPI2_MUX1          1
+set_gpio SPI2_MUX2          1
+set_gpio SPI2_MUX3          1
+set_gpio SWITCH_FRU_MUX     1
+set_gpio BAT_DETECT         1
+set_gpio BMC_BT_WP0         1
+set_gpio BMC_BT_WP1         1
+set_gpio USB2_SEL0_A        1
+set_gpio USB2_SEL1_A        1
+set_gpio USB2_SEL0_B        1
+set_gpio USB2_SEL1_B        1
+set_gpio RST_FRONT_IOEXP    1
+set_gpio BSM_FLASH_LATCH    1
+
+# set initial duty value for each fan
+set_fan 0   70
+set_fan 1   70
+set_fan 2   70
+set_fan 3   70
+
+exit 0;
