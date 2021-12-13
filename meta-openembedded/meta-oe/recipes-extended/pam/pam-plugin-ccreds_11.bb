@@ -11,7 +11,7 @@ REQUIRED_DISTRO_FEATURES = "pam"
 
 SRCREV = "e2145df09469bf84878e4729b4ecd814efb797d1"
 
-SRC_URI = "git://github.com/PADL/pam_ccreds"
+SRC_URI = "git://github.com/PADL/pam_ccreds;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

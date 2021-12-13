@@ -7,7 +7,7 @@ SECTION = "base"
 LICENSE = "GPLv2+ & LGPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
-SRC_URI = "git://github.com/linux-audit/${BPN}-userspace.git;branch=master \
+SRC_URI = "git://github.com/linux-audit/${BPN}-userspace.git;branch=master;protocol=https \
            file://Fixed-swig-host-contamination-issue.patch \
            file://auditd \
            file://auditd.service \

@@ -105,13 +105,17 @@ inherit qemuboot
 python(){
     # do_addto_recipe_sysroot doesnt exist for all recipes, but we need it to have
     # /usr/bin on recipe-sysroot (qemu) populated
+    # The do_addto_recipe_sysroot dependency is coming from EXTRA_IMAGDEPENDS now,
+    # we just need to add the logic to add its dependency to do_image.
     def extraimage_getdepends(task):
         deps = ""
         for dep in (d.getVar('EXTRA_IMAGEDEPENDS') or "").split():
         # Make sure we only add it for qemu
             if 'qemu' in dep:
-                deps += " %s:%s" % (dep, task)
+                if ":" in dep:
+                    deps += " %s " % (dep)
+                else:
+                    deps += " %s:%s" % (dep, task)
         return deps
-    d.appendVarFlag('do_image', 'depends', extraimage_getdepends('do_addto_recipe_sysroot'))
-    d.appendVarFlag('do_image', 'depends', extraimage_getdepends('do_populate_sysroot'))
+    d.appendVarFlag('do_image', 'depends', extraimage_getdepends('do_populate_sysroot')) 
 }

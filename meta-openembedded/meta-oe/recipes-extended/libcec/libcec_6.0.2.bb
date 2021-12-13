@@ -10,7 +10,7 @@ DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'libx11 libxrandr', '
 DEPENDS:append:rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '', ' userland', d)}"
 
 SRCREV = "29d82c80bcc62be2878a9ac080de7eb286c4beb9"
-SRC_URI = "git://github.com/Pulse-Eight/libcec.git;branch=release \
+SRC_URI = "git://github.com/Pulse-Eight/libcec.git;branch=release;protocol=https \
            file://0001-CheckPlatformSupport.cmake-Do-not-hardcode-lib-path.patch \
            file://0001-Enhance-reproducibility.patch \
            file://0001-Remove-buggy-test-confusing-host-and-target.patch \

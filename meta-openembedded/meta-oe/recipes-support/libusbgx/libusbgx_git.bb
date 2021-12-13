@@ -11,7 +11,7 @@ PV = "0.2.0+git${SRCPV}"
 SRCREV = "45c14ef4d5d7ced0fbf984208de44ced6d5ed898"
 SRCBRANCH = "master"
 SRC_URI = " \
-    git://github.com/libusbgx/libusbgx.git;branch=${SRCBRANCH} \
+    git://github.com/libusbgx/libusbgx.git;branch=${SRCBRANCH};protocol=https \
     file://gadget-start \
     file://usbgx.initd \
     file://usbgx.service \

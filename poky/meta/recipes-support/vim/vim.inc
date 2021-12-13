@@ -11,15 +11,19 @@ RSUGGESTS:${PN} = "diffutils"
 LICENSE = "vim"
 LIC_FILES_CHKSUM = "file://runtime/doc/uganda.txt;endline=287;md5=a19edd7ec70d573a005d9e509375a99a"
 
-SRC_URI = "git://github.com/vim/vim.git \
+SRC_URI = "git://github.com/vim/vim.git;branch=master;protocol=https \
            file://disable_acl_header_check.patch \
            file://vim-add-knob-whether-elf.h-are-checked.patch \
            file://0001-src-Makefile-improve-reproducibility.patch \
            file://no-path-adjust.patch \
            file://racefix.patch \
            file://b7081e135a16091c93f6f5f7525a5c58fb7ca9f9.patch \
-          file://CVE-2021-3778.patch \
-"
+           file://CVE-2021-3778.patch \
+           file://0002-patch-8.2.3428-using-freed-memory-when-replacing.patch \
+           file://0003-patch-8.2.3487-illegal-memory-access-if-buffer-name-.patch \
+           file://0004-patch-8.2.3489-ml_get-error-after-search-with-range.patch \
+           file://0005-patch-8.2.3564-invalid-memory-access-when-scrolling-.patch \
+           "
 
 SRCREV = "98056533b96b6b5d8849641de93185dd7bcadc44"
 

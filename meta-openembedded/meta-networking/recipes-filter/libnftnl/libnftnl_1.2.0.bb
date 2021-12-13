@@ -5,7 +5,7 @@ SECTION = "libs"
 DEPENDS = "libmnl"
 
 SRCREV = "d45be40eef72f0d42a1ba82efddbb0970d4c760a"
-SRC_URI = "git://git.netfilter.org/libnftnl \
+SRC_URI = "git://git.netfilter.org/libnftnl;branch=master \
            file://0001-avoid-naming-local-function-as-one-of-printf-family.patch \
            "
 

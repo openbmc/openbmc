@@ -9,7 +9,7 @@ inherit manpages
 MAN_PKG = "${PN}"
 
 SRCREV = "88410a7003c31993e79471e151b24662fc2a0d64"
-SRC_URI = "git://salsa.debian.org/debian/ifenslave.git;protocol=https"
+SRC_URI = "git://salsa.debian.org/debian/ifenslave.git;protocol=https;branch=main"
 
 S = "${WORKDIR}/git"
 

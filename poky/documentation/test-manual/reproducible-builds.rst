@@ -44,6 +44,18 @@ same.
    before finalizing your production images. It would be too late if you
    only address this issue when the first updates are required.
 
+================
+How to enable it
+================
+
+You can enable build reproducibility by inheriting the
+:ref:`reproducible-build <ref-classes-reproducible-build>` class
+in the configuration for your distribution.
+
+This is what the Poky reference distribution does::
+
+   INHERIT += "reproducible_build"
+
 ===================
 How we implement it
 ===================
@@ -53,7 +65,7 @@ things we do within the build system to ensure reproducibility include:
 
 -  Adding mappings to the compiler options to ensure debug filepaths are mapped
    to consistent target compatible paths. This is done through the
-   ``DEBUG_PREFIX_MAP`` variable which sets the ``-fmacro-prefix-map`` and
+   :term:`DEBUG_PREFIX_MAP` variable which sets the ``-fmacro-prefix-map`` and
    ``-fdebug-prefix-map`` compiler options correctly to map to target paths.
 -  Being explicit about recipe dependencies and their configuration (no floating
    configure options or host dependencies creeping in). In particular this means

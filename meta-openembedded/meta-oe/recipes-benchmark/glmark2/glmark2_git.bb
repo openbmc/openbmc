@@ -14,7 +14,7 @@ DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland-n
 PV = "2021.02+${SRCPV}"
 
 SRC_URI = " \
-    git://github.com/glmark2/glmark2.git;protocol=https \
+    git://github.com/glmark2/glmark2.git;protocol=https;branch=master \
     file://0001-fix-dispmanx-build.patch \
     file://0002-run-dispmanx-fullscreen.patch \
     "

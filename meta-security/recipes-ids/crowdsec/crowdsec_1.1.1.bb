@@ -3,7 +3,7 @@ SUMMARY = "CrowdSec is a free, modern & collaborative behavior detection engine,
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://src/import/LICENSE;md5=105e75b680b2ab82fa5718661b41f3bf"
 
-SRC_URI = "git://github.com/crowdsecurity/crowdsec.git;branch=master"
+SRC_URI = "git://github.com/crowdsecurity/crowdsec.git;branch=master;protocol=https"
 SRCREV = "73e0bbaf93070f4a640eb5a22212b5dcf26699de"
 
 DEPENDS = "jq-native"

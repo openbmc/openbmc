@@ -4,8 +4,8 @@
 
 The main communication tool in use is the Yocto Project mailing list:
 
-* <yocto@yoctoproject.org>
-* <https://lists.yoctoproject.org/listinfo/yocto>
+* <yocto@lists.yoctoproject.org>
+* <https://lists.yoctoproject.org/g/yocto>
 
 Feel free to ask any kind of questions but please always prepend your email
 subject with `[meta-raspberrypi]` as this is the global *Yocto* mailing
@@ -84,7 +84,7 @@ sure to use the following formatting for the message subject:
 
 Then, for sending patches to the mailing list, you may use this command:
 
-    git send-email --to yocto@yoctoproject.org <generated patch>
+    git send-email --to yocto@lists.yoctoproject.org <generated patch>
 
 ## GitHub issues
 

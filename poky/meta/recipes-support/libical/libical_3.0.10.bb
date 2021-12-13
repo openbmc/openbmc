@@ -19,7 +19,7 @@ UPSTREAM_CHECK_URI = "https://github.com/libical/libical/releases"
 
 inherit cmake pkgconfig
 
-DEPENDS:append:class-target = "libical-native"
+DEPENDS:append:class-target = " libical-native"
 
 PACKAGECONFIG ??= "icu glib"
 PACKAGECONFIG[bdb] = ",-DCMAKE_DISABLE_FIND_PACKAGE_BDB=True,db"

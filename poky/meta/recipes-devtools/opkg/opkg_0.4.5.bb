@@ -60,7 +60,7 @@ do_install_ptest () {
 	sed -i -e '/@PYTHONPATH=. $(PYTHON) $^/a\\t@if [ "$$?" != "0" ];then echo "FAIL:"$^;else echo "PASS:"$^;fi' ${D}${PTEST_PATH}/tests/Makefile
 }
 
-WARN_QA:append += "openssl-deprecation"
+WARN_QA:append = " openssl-deprecation"
 QAPKGTEST[openssl-deprecation] = "package_qa_check_openssl_deprecation"
 def package_qa_check_openssl_deprecation (package, d, messages):
     sane = True

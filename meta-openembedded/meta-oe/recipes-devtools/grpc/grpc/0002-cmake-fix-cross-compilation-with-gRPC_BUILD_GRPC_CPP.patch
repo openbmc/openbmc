@@ -1,0 +1,55 @@
+From 83a66aa45d63d79cbccc47a65998723a7d2d7637 Mon Sep 17 00:00:00 2001
+From: Thomas De Schampheleire <patrickdepinguin@gmail.com>
+Date: Wed, 23 Jun 2021 14:22:59 +0200
+Subject: [PATCH] cmake: fix cross-compilation with
+ gRPC_BUILD_GRPC_CPP_PLUGIN=OFF (#26292)
+
+* cmake: fix cross-compilation with gRPC_BUILD_GRPC_CPP_PLUGIN=OFF
+
+When cross-compiling gRPC, a _native_ version of 'grpc_cpp_plugin' is
+searched in the environment. For most use cases, a _cross_ version of this
+file is not needed and gRPC_BUILD_GRPC_CPP_PLUGIN can be set to OFF.
+
+However, when cross-building with -DgRPC_BUILD_GRPC_CPP_PLUGIN=OFF, there
+are some build errors, for example:
+
+make[3]: *** No rule to make target 'grpc_cpp_plugin', needed by 'gens/src/proto/grpc/reflection/v1alpha/reflection.grpc.pb.cc'.  Stop.
+
+This is because there is still a hard dependency on 'grpc_cpp_plugin' for
+these targets, not taking into account the cross-compilation case.
+
+Fix by depending on the variable gRPC_CPP_PLUGIN, which is set correctly for
+either cross or native case.
+
+* regenerate projects
+---
+ CMakeLists.txt                    | 2 +-
+ templates/CMakeLists.txt.template | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index eeaf0b43c7..c60a64917a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -319,7 +319,7 @@ function(protobuf_generate_grpc_cpp)
+            --plugin=protoc-gen-grpc=${_gRPC_CPP_PLUGIN}
+            ${_protobuf_include_path}
+            ${REL_FIL}
+-      DEPENDS ${ABS_FIL} ${_gRPC_PROTOBUF_PROTOC} grpc_cpp_plugin
++      DEPENDS ${ABS_FIL} ${_gRPC_PROTOBUF_PROTOC} ${_gRPC_CPP_PLUGIN}
+       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+       COMMENT "Running gRPC C++ protocol buffer compiler on ${FIL}"
+       VERBATIM)
+diff --git a/templates/CMakeLists.txt.template b/templates/CMakeLists.txt.template
+index cef2534cbd..f0afe5108e 100644
+--- a/templates/CMakeLists.txt.template
++++ b/templates/CMakeLists.txt.template
+@@ -389,7 +389,7 @@
+              --plugin=protoc-gen-grpc=<%text>${_gRPC_CPP_PLUGIN}</%text>
+              <%text>${_protobuf_include_path}</%text>
+              <%text>${REL_FIL}</%text>
+-        DEPENDS <%text>${ABS_FIL}</%text> <%text>${_gRPC_PROTOBUF_PROTOC}</%text> grpc_cpp_plugin
++        DEPENDS <%text>${ABS_FIL}</%text> <%text>${_gRPC_PROTOBUF_PROTOC}</%text> <%text>${_gRPC_CPP_PLUGIN}</%text>
+         WORKING_DIRECTORY <%text>${CMAKE_CURRENT_SOURCE_DIR}</%text>
+         COMMENT "Running gRPC C++ protocol buffer compiler on <%text>${FIL}</%text>"
+         VERBATIM)

@@ -8,7 +8,7 @@ When sending single patches, please use something like:
 
    git send-email -1 -M \
         --to openembedded-devel@lists.openembedded.org \
-        --subject-prefix='meta-networking][PATCH'
+        --subject-prefix='meta-networking][honister][PATCH'
 
 You may also contact the maintainers directly.
 
@@ -25,15 +25,4 @@ Please keep this list in alphabetical order.
 
 Maintainers List (try to look for most precise areas first)
 
-COMMON
-M:      Khem Raj <raj.khem@gmail.com>
-M:      "Joe MacDonald (backup)" <joe@deserted.net>
-L:      openembedded-devel@lists.openembedded.org
-Q:      https://patchwork.openembedded.org/project/oe/
-S:      Maintained
-F:      conf
-F:      recipes-*
-
-NETKIT
-M:      Armin Kuster <akuster808@gmail.com>
-F:      recipes-netkit
+Stable Branch maintainer: Armin Kuster <akuster808@gmail.com>

@@ -31,7 +31,7 @@ class RestApiPlugin(layerindexlib.plugin.IndexPlugin):
             The return value is a LayerIndexObj.
 
             url is the url to the rest api of the layer index, such as:
-            http://layers.openembedded.org/layerindex/api/
+            https://layers.openembedded.org/layerindex/api/
 
             Or a local file...
         """
@@ -138,7 +138,7 @@ class RestApiPlugin(layerindexlib.plugin.IndexPlugin):
             The return value is a LayerIndexObj.
 
             ud is the parsed url to the rest api of the layer index, such as:
-            http://layers.openembedded.org/layerindex/api/
+            https://layers.openembedded.org/layerindex/api/
         """
 
         def _get_json_response(apiurl=None, username=None, password=None, retry=True):

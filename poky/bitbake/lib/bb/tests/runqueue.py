@@ -361,7 +361,7 @@ class RunQueueTests(unittest.TestCase):
 
     def shutdown(self, tempdir):
         # Wait for the hashserve socket to disappear else we'll see races with the tempdir cleanup
-        while os.path.exists(tempdir + "/hashserve.sock"):
+        while (os.path.exists(tempdir + "/hashserve.sock") or os.path.exists(tempdir + "cache/hashserv.db-wal")):
             time.sleep(0.5)
 
 

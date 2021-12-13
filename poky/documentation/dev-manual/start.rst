@@ -670,7 +670,7 @@ Accessing Nightly Builds
 ------------------------
 
 Yocto Project maintains an area for nightly builds that contains tarball
-releases at https://autobuilder.yocto.io//pub/nightly/. These builds include Yocto
+releases at https://autobuilder.yocto.io/pub/nightly/. These builds include Yocto
 Project releases ("poky"), toolchains, and builds for supported
 machines.
 
@@ -678,7 +678,7 @@ Should you ever want to access a nightly build of a particular Yocto
 Project component, use the following procedure:
 
 1. *Locate the Index of Nightly Builds:* Open a browser and go to
-   https://autobuilder.yocto.io//pub/nightly/ to access the Nightly Builds.
+   https://autobuilder.yocto.io/pub/nightly/ to access the Nightly Builds.
 
 2. *Select a Date:* Click on the date in which you are interested. If
    you want the latest builds, use "CURRENT".

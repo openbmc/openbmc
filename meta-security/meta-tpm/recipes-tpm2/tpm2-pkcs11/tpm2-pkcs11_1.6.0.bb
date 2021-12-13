@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0fc19f620a102768d6dbd1e7166e78ab"
 
 DEPENDS = "autoconf-archive pkgconfig dstat sqlite3 openssl libtss2-dev tpm2-tools libyaml p11-kit python3-setuptools-native"
 
-SRC_URI = "git://github.com/tpm2-software/tpm2-pkcs11.git;branch=master \
+SRC_URI = "git://github.com/tpm2-software/tpm2-pkcs11.git;branch=master;protocol=https \
            file://bootstrap_fixup.patch \
            file://0001-remove-local-binary-checkes.patch \
            file://677.patch \

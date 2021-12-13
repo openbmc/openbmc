@@ -36,7 +36,10 @@ def find_patches(d,subdir):
             if subdir == patchdir:
                 patch_list.append(local)
         else:
-            patch_list.append(local)
+            # skip the patch if a patchdir was supplied, it won't be handled
+            # properly
+            if not patchdir:
+                patch_list.append(local)
 
     return patch_list
 

@@ -9,7 +9,7 @@ S = "${WORKDIR}/git"
 B = "${S}"
 
 SRCREV = "adb6bd69fb3cfa709265db66ddcee04c0b5e070f"
-SRC_URI = "git://github.com/storaged-project/blivet-gui.git"
+SRC_URI = "git://github.com/storaged-project/blivet-gui.git;branch=master;protocol=https"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "x11 systemd"

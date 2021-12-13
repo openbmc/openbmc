@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1c069be8dbbe48e89b580ab4ed86c127"
 SRCREV = "6e64a9e5b70a909ec439bc5a099e3fcf38c614b0"
 
 SRC_URI = "\
-	git://github.com/Tripwire/tripwire-open-source.git \
+	git://github.com/Tripwire/tripwire-open-source.git;branch=master;protocol=https \
 	file://tripwire.cron \
 	file://tripwire.sh \
 	file://tripwire.txt \

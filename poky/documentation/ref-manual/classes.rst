@@ -590,19 +590,25 @@ Here is an example that uses this class in an image recipe::
        "
 
 Here is an example that adds two users named "tester-jim" and "tester-sue" and assigns
-passwords::
+passwords. First on host, create the password hash::
+
+   mkpasswd -m sha256crypt tester01
+
+The resulting hash is set to a variable and used in ``useradd`` command parameters.
+Remember to escape the character ``$``::
 
    inherit extrausers
+   PASSWD = "\$X\$ABC123\$A-Long-Hash"
    EXTRA_USERS_PARAMS = "\
-       useradd -P tester01 tester-jim; \
-       useradd -P tester01 tester-sue; \
+       useradd -p '${PASSWD}' tester-jim; \
+       useradd -p '${PASSWD}' tester-sue; \
        "
 
-Finally, here is an example that sets the root password to "1876*18"::
+Finally, here is an example that sets the root password::
 
    inherit extrausers
    EXTRA_USERS_PARAMS = "\
-       usermod -P 1876*18 root; \
+       usermod -p '${PASSWD}' root; \
        "
 
 .. _ref-classes-features_check:
@@ -1494,15 +1500,6 @@ messages for various BitBake severity levels (i.e. ``bbplain``,
 This class is enabled by default since it is inherited by the ``base``
 class.
 
-.. _ref-classes-meta:
-
-``meta.bbclass``
-================
-
-The ``meta`` class is inherited by recipes that do not build any output
-packages themselves, but act as a "meta" target for building other
-recipes.
-
 .. _ref-classes-metadata_scm:
 
 ``metadata_scm.bbclass``
@@ -1600,7 +1597,7 @@ or other tools from the build host).
 You can create a recipe that builds tools that run natively on the host
 a couple different ways:
 
--  Create a myrecipe\ ``-native.bb`` recipe that inherits the ``native``
+-  Create a ``myrecipe-native.bb`` recipe that inherits the ``native``
    class. If you use this method, you must order the inherit statement
    in the recipe after all other inherit statements so that the
    ``native`` class is inherited last.
@@ -1642,7 +1639,7 @@ wish to build tools to run as part of an SDK (i.e. tools that run on
 You can create a recipe that builds tools that run on the SDK machine a
 couple different ways:
 
--  Create a ``nativesdk-``\ myrecipe\ ``.bb`` recipe that inherits the
+-  Create a ``nativesdk-myrecipe.bb`` recipe that inherits the
    ``nativesdk`` class. If you use this method, you must order the
    inherit statement in the recipe after all other inherit statements so
    that the ``nativesdk`` class is inherited last.
@@ -2217,6 +2214,18 @@ machine, distro, build system, target system, host distro, branch,
 commit, and log. From the information, report files using a JSON format
 are created and stored in
 ``${``\ :term:`LOG_DIR`\ ``}/error-report``.
+
+.. _ref-classes-reproducible-build:
+
+``reproducible_build.bbclass``
+==============================
+
+The ``reproducible_build.bbclass`` class enables
+:ref:`test-manual/reproducible-builds:reproducible builds` by computing
+a :term:`SOURCE_DATE_EPOCH` value in each component's build environment, so
+that the build is independent from the time when the component was built.
+
+Poky inherits this class by default since version 3.1.
 
 .. _ref-classes-rm-work:
 

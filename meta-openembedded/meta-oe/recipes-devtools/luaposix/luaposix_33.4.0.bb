@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=7dd2aad04bb7ca212e69127ba8d58f9f"
 
 DEPENDS += "lua-native lua"
 
-SRC_URI = "git://github.com/luaposix/luaposix.git;branch=release \
+SRC_URI = "git://github.com/luaposix/luaposix.git;branch=release;protocol=https \
            file://0001-fix-avoid-race-condition-between-test-and-mkdir.patch \
 "
 SRCREV = "8e4902ed81c922ed8f76a7ed85be1eaa3fd7e66d"

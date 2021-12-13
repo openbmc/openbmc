@@ -11,7 +11,7 @@ DEPENDS:append:libc-musl = " fts"
 
 S = "${WORKDIR}/git"
 
-SRC_URI = "git://github.com/pmem/pmdk.git"
+SRC_URI = "git://github.com/pmem/pmdk.git;branch=master;protocol=https"
 
 SRCREV = "1926ffb8f3f5f0617b3b3ed32029d437c272f187"
 

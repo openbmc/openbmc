@@ -9,7 +9,7 @@ LICENSE = "BSD-3-Clause & GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c7f0b161edbe52f5f345a3d1311d0b32 \
                     file://COPYING;md5=39bba7d2cf0ba1036f2a6e2be52fe3f0"
 
-SRC_URI = "git://github.com/facebook/zstd.git;branch=release \
+SRC_URI = "git://github.com/facebook/zstd.git;branch=release;protocol=https \
            file://0001-Makefile-sort-all-wildcard-file-list-expansions.patch \
            file://0001-MinGW-Build-Fixes.patch \
            "

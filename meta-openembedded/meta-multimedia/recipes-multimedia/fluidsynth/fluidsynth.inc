@@ -4,7 +4,7 @@ SECTION = "libs/multimedia"
 LICENSE = "LGPL-2.1"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fc178bcd425090939a8b634d1d6a9594"
 
-SRC_URI = "git://github.com/FluidSynth/fluidsynth.git"
+SRC_URI = "git://github.com/FluidSynth/fluidsynth.git;branch=master;protocol=https"
 SRCREV = "fc21d284dc7fcacdbc456f30228110a55e6e79f6"
 S = "${WORKDIR}/git"
 PV = "2.2.2"

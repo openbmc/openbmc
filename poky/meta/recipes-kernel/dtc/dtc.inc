@@ -5,7 +5,7 @@ SECTION = "bootloader"
 LICENSE = "GPLv2 | BSD-2-Clause"
 DEPENDS = "flex-native bison-native"
 
-SRC_URI = "git://git.kernel.org/pub/scm/utils/dtc/dtc.git \
+SRC_URI = "git://git.kernel.org/pub/scm/utils/dtc/dtc.git;branch=master \
            file://make_install.patch \
            file://0001-dtc-Fix-Makefile-to-add-CFLAGS-not-override.patch \
            "

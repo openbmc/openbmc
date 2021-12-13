@@ -6,7 +6,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 
 SRCREV = "063ec650960c2d79ac51f5c5f026cb05343a33e2"
-SRC_URI = "git://github.com/prpplague/fb-test-app.git"
+SRC_URI = "git://github.com/prpplague/fb-test-app.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

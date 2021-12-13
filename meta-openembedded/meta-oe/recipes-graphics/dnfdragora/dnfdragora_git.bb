@@ -3,7 +3,7 @@ LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d32239bcb673463ab874e80d47fae504 \
                    "
 
-SRC_URI = "git://github.com/manatools/dnfdragora.git \
+SRC_URI = "git://github.com/manatools/dnfdragora.git;branch=master;protocol=https \
            file://0001-disable-build-manpages.patch \
            file://0001-Do-not-set-PYTHON_INSTALL_DIR-by-running-python.patch \
            file://0001-To-fix-error-when-do_package.patch \

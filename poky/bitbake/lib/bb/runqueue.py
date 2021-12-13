@@ -926,38 +926,36 @@ class RunQueueData:
         #
         # Once all active tasks are marked, prune the ones we don't need.
 
-        delcount = {}
-        for tid in list(self.runtaskentries.keys()):
-            if tid not in runq_build:
-                delcount[tid] = self.runtaskentries[tid]
-                del self.runtaskentries[tid]
-
         # Handle --runall
         if self.cooker.configuration.runall:
             # re-run the mark_active and then drop unused tasks from new list
+            reduced_tasklist = set(self.runtaskentries.keys())
+            for tid in list(self.runtaskentries.keys()):
+                if tid not in runq_build:
+                   reduced_tasklist.remove(tid)
             runq_build = {}
 
             for task in self.cooker.configuration.runall:
                 if not task.startswith("do_"):
                     task = "do_{0}".format(task)
                 runall_tids = set()
-                for tid in list(self.runtaskentries):
+                for tid in reduced_tasklist:
                     wanttid = "{0}:{1}".format(fn_from_tid(tid), task)
-                    if wanttid in delcount:
-                        self.runtaskentries[wanttid] = delcount[wanttid]
                     if wanttid in self.runtaskentries:
                         runall_tids.add(wanttid)
 
                 for tid in list(runall_tids):
-                    mark_active(tid,1)
+                    mark_active(tid, 1)
                     if self.cooker.configuration.force:
                         invalidate_task(tid, False)
 
-            for tid in list(self.runtaskentries.keys()):
-                if tid not in runq_build:
-                    delcount[tid] = self.runtaskentries[tid]
-                    del self.runtaskentries[tid]
+        delcount = set()
+        for tid in list(self.runtaskentries.keys()):
+            if tid not in runq_build:
+                delcount.add(tid)
+                del self.runtaskentries[tid]
 
+        if self.cooker.configuration.runall:
             if len(self.runtaskentries) == 0:
                 bb.msg.fatal("RunQueue", "Could not find any tasks with the tasknames %s to run within the recipes of the taskgraphs of the targets %s" % (str(self.cooker.configuration.runall), str(self.targets)))
 
@@ -971,16 +969,16 @@ class RunQueueData:
             for task in self.cooker.configuration.runonly:
                 if not task.startswith("do_"):
                     task = "do_{0}".format(task)
-                runonly_tids = { k: v for k, v in self.runtaskentries.items() if taskname_from_tid(k) == task }
+                runonly_tids = [k for k in self.runtaskentries.keys() if taskname_from_tid(k) == task]
 
-                for tid in list(runonly_tids):
-                    mark_active(tid,1)
+                for tid in runonly_tids:
+                    mark_active(tid, 1)
                     if self.cooker.configuration.force:
                         invalidate_task(tid, False)
 
             for tid in list(self.runtaskentries.keys()):
                 if tid not in runq_build:
-                    delcount[tid] = self.runtaskentries[tid]
+                    delcount.add(tid)
                     del self.runtaskentries[tid]
 
             if len(self.runtaskentries) == 0:

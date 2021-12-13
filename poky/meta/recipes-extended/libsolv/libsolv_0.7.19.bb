@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=62272bd11c97396d4aaf1c41bc11f7d8"
 
 DEPENDS = "expat zlib"
 
-SRC_URI = "git://github.com/openSUSE/libsolv.git \
+SRC_URI = "git://github.com/openSUSE/libsolv.git;branch=master;protocol=https \
 "
 
 SRCREV = "c773294be6b0a2425f344a8999f173fb00cfd16f"

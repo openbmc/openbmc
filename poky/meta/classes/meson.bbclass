@@ -48,6 +48,7 @@ ar = ${@meson_array('AR', d)}
 nm = ${@meson_array('NM', d)}
 strip = ${@meson_array('STRIP', d)}
 readelf = ${@meson_array('READELF', d)}
+objcopy = ${@meson_array('OBJCOPY', d)}
 pkgconfig = 'pkg-config'
 llvm-config = 'llvm-config${LLVMVERSION}'
 cups-config = 'cups-config'
@@ -85,6 +86,7 @@ ar = ${@meson_array('BUILD_AR', d)}
 nm = ${@meson_array('BUILD_NM', d)}
 strip = ${@meson_array('BUILD_STRIP', d)}
 readelf = ${@meson_array('BUILD_READELF', d)}
+objcopy = ${@meson_array('BUILD_OBJCOPY', d)}
 pkgconfig = 'pkg-config-native'
 
 [built-in options]
@@ -102,6 +104,16 @@ meson_do_configure() {
     # Meson requires this to be 'bfd, 'lld' or 'gold' from 0.53 onwards
     # https://github.com/mesonbuild/meson/commit/ef9aeb188ea2bc7353e59916c18901cde90fa2b3
     unset LD
+
+    # sstate.bbclass no longer removes empty directories to avoid a race (see
+    # commit 4f94d929 "sstate/staging: Handle directory creation race issue").
+    # Unfortunately Python apparently treats an empty egg-info directory as if
+    # the version it previously contained still exists and fails if a newer
+    # version is required, which Meson does. To avoid this, make sure there are
+    # no empty egg-info directories from previous versions left behind. Ignore
+    # all errors from rmdir since the egg-info may be a file rather than a
+    # directory.
+    rmdir ${STAGING_LIBDIR_NATIVE}/${PYTHON_DIR}/site-packages/*.egg-info 2>/dev/null || :
 
     # Work around "Meson fails if /tmp is mounted with noexec #2972"
     mkdir -p "${B}/meson-private/tmp"

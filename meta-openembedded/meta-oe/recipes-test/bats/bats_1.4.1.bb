@@ -6,7 +6,7 @@ HOMEPAGE = "https://github.com/bats-core/bats-core"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=2970203aedf9e829edb96a137a4fe81b"
 
-SRC_URI = "git://github.com/bats-core/bats-core.git \
+SRC_URI = "git://github.com/bats-core/bats-core.git;branch=master;protocol=https \
            file://0001-install.sh-consider-multilib.patch \
           "
 # v1.4.1

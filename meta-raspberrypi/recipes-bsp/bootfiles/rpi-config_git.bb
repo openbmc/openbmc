@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 COMPATIBLE_MACHINE = "^rpi$"
 
 SRCREV = "648ffc470824c43eb0d16c485f4c24816b32cd6f"
-SRC_URI = "git://github.com/Evilpaul/RPi-config.git;protocol=git;branch=master \
+SRC_URI = "git://github.com/Evilpaul/RPi-config.git;protocol=https;branch=master \
           "
 
 S = "${WORKDIR}/git"
@@ -276,6 +276,12 @@ do_deploy:append:raspberrypi3-64() {
 
     echo "# Enable audio (loads snd_bcm2835)" >> $CONFIG
     echo "dtparam=audio=on" >> $CONFIG
+}
+
+do_deploy:append() {
+    if grep -q -E '^.{80}.$' ${DEPLOYDIR}/${BOOTFILES_DIR_NAME}/config.txt; then
+        bbwarn "config.txt contains lines longer than 80 characters, this is not supported"
+    fi
 }
 
 addtask deploy before do_build after do_install

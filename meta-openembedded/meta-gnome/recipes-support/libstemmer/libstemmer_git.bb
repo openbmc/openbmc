@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=19139aaf3c8c8fa1ca6edd59c072fb9f"
 DEPENDS:class-target = "${BPN}-native"
 
 SRC_URI = "\
-    git://github.com/snowballstem/snowball.git \
+    git://github.com/snowballstem/snowball.git;branch=master;protocol=https \
     file://0001-Build-so-lib.patch \
 "
 SRCREV = "4764395431c8f2a0b4fe18b816ab1fc966a45837"

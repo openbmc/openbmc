@@ -10,7 +10,7 @@ SRCREV = "94144b0a1dcef6e31845d6c319e9bd7357208eb9"
 PV = "0.3.15+git${SRCPV}"
 
 SRC_URI = " \
-	git://git.code.sf.net/p/trousers/trousers \
+	git://git.code.sf.net/p/trousers/trousers;branch=master \
     	file://trousers.init.sh \
     	file://trousers-udev.rules \
     	file://tcsd.service \

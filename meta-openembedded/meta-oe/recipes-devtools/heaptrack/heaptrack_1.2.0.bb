@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 DEPENDS = "zlib boost libunwind elfutils"
 
-SRC_URI = "git://github.com/KDE/heaptrack.git;protocol=https \
+SRC_URI = "git://github.com/KDE/heaptrack.git;protocol=https;branch=master \
            file://0001-libheaptrack-Replace-__pid_t-with-pid_t.patch \
            file://0002-heaptrack_inject-Include-dlfcn.h-for-dlopen-dlclose.patch \
            file://0003-heaptrack_preload-Make-noexcept-attribute-conditiona.patch \

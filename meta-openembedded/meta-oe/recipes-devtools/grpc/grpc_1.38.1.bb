@@ -13,12 +13,17 @@ DEPENDS:append:class-nativesdk = " grpc-native "
 PACKAGE_BEFORE_PN = "${PN}-compiler"
 
 RDEPENDS:${PN}-compiler = "${PN}"
-RDEPENDS:${PN}-dev += "${PN}-compiler"
+RDEPENDS:${PN}-dev:class_native += "${PN}-compiler"
+# Configuration above allows to cross-compile gRPC applications
+# In order to compile applications on the target, use the dependency below
+# Both dependencies are mutually exclusive
+# RDEPENDS:${PN}-dev += "${PN}-compiler"
 
 S = "${WORKDIR}/git"
 SRCREV_grpc = "96b73272eadc01afb5fb45b92b408c47e4387274"
 BRANCH = "v1.38.x"
 SRC_URI = "git://github.com/grpc/grpc.git;protocol=https;name=grpc;branch=${BRANCH} \
+           file://0002-cmake-fix-cross-compilation-with-gRPC_BUILD_GRPC_CPP.patch \
            "
 # Fixes build with older compilers 4.8 especially on ubuntu 14.04
 CXXFLAGS:append:class-native = " -Wl,--no-as-needed"
@@ -39,6 +44,7 @@ EXTRA_OECMAKE = " \
     "
 
 PACKAGECONFIG ??= "cpp shared"
+PACKAGECONFIG_class-target ?= "shared"
 PACKAGECONFIG[cpp] = "-DgRPC_BUILD_GRPC_CPP_PLUGIN=ON,-DgRPC_BUILD_GRPC_CPP_PLUGIN=OFF"
 PACKAGECONFIG[csharp] = "-DgRPC_BUILD_GRPC_CSHARP_PLUGIN=ON,-DgRPC_BUILD_GRPC_CSHARP_PLUGIN=OFF"
 PACKAGECONFIG[node] = "-DgRPC_BUILD_GRPC_NODE_PLUGIN=ON,-DgRPC_BUILD_GRPC_NODE_PLUGIN=OFF"

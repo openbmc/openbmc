@@ -13,7 +13,7 @@ SRCREV = "e82d1a653ca94aa4ed12441424da6ce780b1e530"
 
 DEPENDS = "ncurses bison-native"
 
-SRC_URI = "git://github.com/telmich/gpm;protocol=git \
+SRC_URI = "git://github.com/telmich/gpm;protocol=https;branch=master \
            file://init \
            file://gpm.service.in \
            "

@@ -12,19 +12,16 @@ PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'with-exte
                    ${@bb.utils.contains('PTEST_ENABLED', '1', 'with-tests', '', d)}"
 PACKAGECONFIG[with-builtin-libsystemd] = ",,sdbus-c++-libsystemd,libcap"
 PACKAGECONFIG[with-external-libsystemd] = ",,systemd,libsystemd"
-PACKAGECONFIG[with-tests] = "-DBUILD_TESTS=ON -DTESTS_INSTALL_PATH=${libdir}/${BPN}/tests,-DBUILD_TESTS=OFF"
+PACKAGECONFIG[with-tests] = "-DBUILD_TESTS=ON -DTESTS_INSTALL_PATH=${libdir}/${BPN}/tests,-DBUILD_TESTS=OFF,googletest gmock"
 
 DEPENDS += "expat"
 
 SRCREV = "6e8e5aadb674cccea5bdd55141db5dad887fbacd"
-SRCREV_gtest = "a3460d1aeeaa43fdf137a6adefef10ba0b59fe4b"
-SRCREV_FORMAT = "default_gtest"
 
 SRC_URI = "git://github.com/Kistler-Group/sdbus-cpp.git;protocol=https;branch=master \
-           git://github.com/google/googletest.git;protocol=https;branch=master;name=gtest;destsuffix=git/tests/googletest-src \
-           file://0001-Do-not-download-gtest-automatically.patch \
+    file://0001-Try-to-first-find-googletest-in-the-system-before-do.patch \
+    file://run-ptest \
 "
-SRC_URI += "file://run-ptest"
 
 EXTRA_OECMAKE = "-DBUILD_CODE_GEN=ON \
                  -DBUILD_DOC=ON \

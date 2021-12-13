@@ -8,7 +8,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "git://github.com/xelerance/xl2tpd.git"
+SRC_URI = "git://github.com/xelerance/xl2tpd.git;branch=master;protocol=https"
 SRCREV = "ba619c79c4790c78c033df0abde4a9a5de744a08"
 
 S = "${WORKDIR}/git"

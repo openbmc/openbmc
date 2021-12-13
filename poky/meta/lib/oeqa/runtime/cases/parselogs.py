@@ -32,7 +32,7 @@ common_errors = [
     "Failed to load module \"fbdev\"",
     "Failed to load module fbdev",
     "Failed to load module glx",
-    "[drm] Cannot find any crtc or sizes - going 1024x768",
+    "[drm] Cannot find any crtc or sizes",
     "_OSC failed (AE_NOT_FOUND); disabling ASPM",
     "Open ACPI failed (/var/run/acpid.socket) (No such file or directory)",
     "NX (Execute Disable) protection cannot be enabled: non-PAE kernel!",

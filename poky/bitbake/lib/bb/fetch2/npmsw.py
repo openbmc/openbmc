@@ -24,6 +24,7 @@ import bb
 from bb.fetch2 import Fetch
 from bb.fetch2 import FetchMethod
 from bb.fetch2 import ParameterError
+from bb.fetch2 import runfetchcmd
 from bb.fetch2 import URI
 from bb.fetch2.npm import npm_integrity
 from bb.fetch2.npm import npm_localfile
@@ -78,6 +79,7 @@ class NpmShrinkWrap(FetchMethod):
             extrapaths = []
             destsubdirs = [os.path.join("node_modules", dep) for dep in deptree]
             destsuffix = os.path.join(*destsubdirs)
+            unpack = True
 
             integrity = params.get("integrity", None)
             resolved = params.get("resolved", None)
@@ -148,7 +150,12 @@ class NpmShrinkWrap(FetchMethod):
 
                 url = str(uri)
 
-            # local tarball sources and local link sources are unsupported
+            # Handle local tarball and link sources
+            elif version.startswith("file"):
+                localpath = version[5:]
+                if not version.endswith(".tgz"):
+                    unpack = False
+
             else:
                 raise ParameterError("Unsupported dependency: %s" % name, ud.url)
 
@@ -157,6 +164,7 @@ class NpmShrinkWrap(FetchMethod):
                 "localpath": localpath,
                 "extrapaths": extrapaths,
                 "destsuffix": destsuffix,
+                "unpack": unpack,
             })
 
         try:
@@ -177,7 +185,7 @@ class NpmShrinkWrap(FetchMethod):
         # This fetcher resolves multiple URIs from a shrinkwrap file and then
         # forwards it to a proxy fetcher. The management of the donestamp file,
         # the lockfile and the checksums are forwarded to the proxy fetcher.
-        ud.proxy = Fetch([dep["url"] for dep in ud.deps], data)
+        ud.proxy = Fetch([dep["url"] for dep in ud.deps if dep["url"]], data)
         ud.needdonestamp = False
 
     @staticmethod
@@ -237,7 +245,16 @@ class NpmShrinkWrap(FetchMethod):
 
         for dep in manual:
             depdestdir = os.path.join(destdir, dep["destsuffix"])
-            npm_unpack(dep["localpath"], depdestdir, d)
+            if dep["url"]:
+                npm_unpack(dep["localpath"], depdestdir, d)
+            else:
+                depsrcdir= os.path.join(destdir, dep["localpath"])
+                if dep["unpack"]:
+                    npm_unpack(depsrcdir, depdestdir, d)
+                else:
+                    bb.utils.mkdirhier(depdestdir)
+                    cmd = 'cp -fpPRH "%s/." .' % (depsrcdir)
+                    runfetchcmd(cmd, d, workdir=depdestdir)
 
     def clean(self, ud, d):
         """Clean any existing full or partial download"""

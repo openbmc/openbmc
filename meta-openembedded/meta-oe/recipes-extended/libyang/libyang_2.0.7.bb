@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f3916d7d8d42a6508d0ea418cfff10ad"
 
 SRCREV = "69d9fff65abb58beb0bb6aa9ecacd572ca1dfc56"
 
-SRC_URI = "git://github.com/CESNET/libyang.git \
+SRC_URI = "git://github.com/CESNET/libyang.git;branch=master;protocol=https \
            file://libyang-skip-pcre2-config-add-stdint-h.patch \
            file://run-ptest \
            "

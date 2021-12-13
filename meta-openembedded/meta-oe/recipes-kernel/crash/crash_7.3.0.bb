@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://COPYING3;md5=d32239bcb673463ab874e80d47fae504"
 DEPENDS = "zlib readline coreutils-native ncurses-native"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/crash-utility/${BPN}.git \
+SRC_URI = "git://github.com/crash-utility/${BPN}.git;branch=master;protocol=https \
            ${GNU_MIRROR}/gdb/gdb-7.6.tar.gz;name=gdb;subdir=git \
            file://7001force_define_architecture.patch \
            file://7003cross_ranlib.patch \

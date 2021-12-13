@@ -3,7 +3,7 @@ HOMEPAGE = "http://cvxopt.org"
 LICENSE = "GPL-3.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=ba1a8a73d8ebea5c47a1173aaf476ddd"
 
-SRC_URI = "git://github.com/cvxopt/cvxopt;protocol=https"
+SRC_URI = "git://github.com/cvxopt/cvxopt;protocol=https;branch=master"
 
 SRCREV = "60fdb838e0bb2d8f32ba51129552c83b55acd2a7"
 

@@ -113,6 +113,10 @@ To install all required packages run:
 
  $ pip3 install sphinx sphinx_rtd_theme pyyaml
 
+Also install the "inkscape" package from your distribution.
+Inkscape is need to convert SVG graphics to PNG (for EPUB
+export) and to PDF (for PDF export).
+
 To build the documentation locally, run:
 
  $ cd documentation

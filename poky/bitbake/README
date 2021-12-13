@@ -7,7 +7,7 @@ One of BitBake's main users, OpenEmbedded, takes this core and builds embedded L
 stacks using a task-oriented approach.
 
 For information about Bitbake, see the OpenEmbedded website:
-    http://www.openembedded.org/
+    https://www.openembedded.org/
 
 Bitbake plain documentation can be found under the doc directory or its integrated
 html version at the Yocto Project website:
@@ -17,7 +17,7 @@ Contributing
 ------------
 
 Please refer to
-http://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded
+https://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded
 for guidelines on how to submit patches, just note that the latter documentation is intended
 for OpenEmbedded (and its core) not bitbake patches (bitbake-devel@lists.openembedded.org)
 but in general main guidelines apply. Once the commit(s) have been created, the way to send
@@ -28,11 +28,11 @@ branch, type:
 
 Mailing list:
 
-    http://lists.openembedded.org/mailman/listinfo/bitbake-devel
+    https://lists.openembedded.org/g/bitbake-devel
 
 Source code:
 
-    http://git.openembedded.org/bitbake/
+    https://git.openembedded.org/bitbake/
 
 Testing:
 

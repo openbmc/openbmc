@@ -538,7 +538,7 @@ overview of their function and contents.
 
       You can use this variable in combination with task overrides to raise
       or lower priorities of specific tasks. For example, on the `Yocto
-      Project <http://www.yoctoproject.org>`__ autobuilder, QEMU emulation
+      Project <https://www.yoctoproject.org>`__ autobuilder, QEMU emulation
       in images is given a higher priority as compared to build tasks to
       ensure that images do not suffer timeouts on loaded systems.
 

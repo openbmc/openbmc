@@ -16,7 +16,7 @@ SRC_URI = "git://gitlab.freedesktop.org/pipewire/pipewire.git;branch=master;prot
 
 S = "${WORKDIR}/git"
 
-inherit meson pkgconfig systemd manpages gettext useradd
+inherit meson pkgconfig systemd gettext useradd
 
 USERADD_PACKAGES = "${PN}"
 
@@ -27,6 +27,8 @@ USERADD_PARAM:${PN} = "--system --home / --no-create-home \
                        --gid pipewire --groups audio,video \
                        pipewire"
 
+SYSTEMD_PACKAGES = "${PN} ${PN}-media-session"
+
 # For "EVL", look up https://evlproject.org/ . It involves
 # a specially prepared kernel, and is currently unavailable
 # in Yocto.
@@ -36,11 +38,6 @@ USERADD_PARAM:${PN} = "--system --home / --no-create-home \
 # actual features.
 #
 # libcamera support currently does not build successfully.
-#
-# systemd user service files are disabled because per-user
-# PipeWire instances aren't really something that makes
-# much sense in an embedded environment. A system-wide
-# instance does.
 #
 # manpage generation requires xmltoman, which is not available.
 EXTRA_OEMESON += " \
@@ -57,7 +54,8 @@ EXTRA_OEMESON += " \
 
 PACKAGECONFIG ??= "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
-    ${@bb.utils.filter('DISTRO_FEATURES', 'alsa systemd', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd systemd-system-service', '', d)} \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'alsa', d)} \
     gstreamer jack sndfile pw-cat v4l2 \
 "
 
@@ -66,7 +64,6 @@ PACKAGECONFIG ??= "\
 # libjack.so* files, thus colliding with the libpack package. This
 # is why these two are marked in their respective packageconfigs
 # as being in conflict.
-
 PACKAGECONFIG[alsa] = "-Dalsa=enabled,-Dalsa=disabled,alsa-lib udev"
 PACKAGECONFIG[bluez] = "-Dbluez5=enabled,-Dbluez5=disabled,bluez5 sbc"
 PACKAGECONFIG[docs] = "-Ddocs=enabled,-Ddocs=disabled,doxygen-native"
@@ -74,7 +71,12 @@ PACKAGECONFIG[gstreamer] = "-Dgstreamer=enabled,-Dgstreamer=disabled,glib-2.0 gs
 PACKAGECONFIG[jack] = "-Djack=enabled,-Djack=disabled,jack,,,pipewire-jack"
 PACKAGECONFIG[sdl2] = "-Dsdl2=enabled,-Dsdl2=disabled,virtual/libsdl2"
 PACKAGECONFIG[sndfile] = "-Dsndfile=enabled,-Dsndfile=disabled,libsndfile1"
-PACKAGECONFIG[systemd] = "-Dsystemd=enabled -Dsystemd-system-service=enabled -Dsystemd-user-service=enabled,-Dsystemd=disabled -Dsystemd-system-service=disabled -Dsystemd-user-service=disabled,systemd"
+PACKAGECONFIG[systemd] = "-Dsystemd=enabled,-Dsystemd=disabled,systemd"
+PACKAGECONFIG[systemd-system-service] = "-Dsystemd-system-service=enabled,-Dsystemd-system-service=disabled,systemd"
+# "systemd-user-service" packageconfig  will only install service
+# files to rootfs but not enable them as systemd.bbclass
+# currently lacks the feature of enabling user services.
+PACKAGECONFIG[systemd-user-service] = "-Dsystemd-user-service=enabled,-Dsystemd-user-service=disabled,systemd"
 # pw-cat needs sndfile packageconfig to be enabled
 PACKAGECONFIG[pw-cat] = "-Dpw-cat=enabled,-Dpw-cat=disabled"
 PACKAGECONFIG[v4l2] = "-Dv4l2=enabled,-Dv4l2=disabled,udev"
@@ -189,7 +191,7 @@ PACKAGES =+ "\
 
 PACKAGES_DYNAMIC = "^${PN}-spa-plugins.* ^${PN}-modules.*"
 
-SYSTEMD_SERVICE:${PN} = "pipewire.service"
+SYSTEMD_SERVICE:${PN} = "${@bb.utils.contains('PACKAGECONFIG', 'systemd-system-service', 'pipewire.service', '', d)}"
 CONFFILES:${PN} += "${datadir}/pipewire/pipewire.conf"
 FILES:${PN} = " \
     ${datadir}/pipewire/pipewire.conf \
@@ -246,7 +248,7 @@ FILES:${PN}-jack = "\
 
 # Example session manager. Not intended for use in production.
 CONFFILES:${PN}-media-session = "${datadir}/pipewire/media-session.d/*"
-SYSTEMD_SERVICE:${PN}-media-session = "pipewire-media-session.service"
+SYSTEMD_SERVICE:${PN}-media-session = "${@bb.utils.contains('PACKAGECONFIG', 'systemd-system-service', 'pipewire-media-session.service', '', d)}"
 FILES:${PN}-media-session = " \
     ${bindir}/pipewire-media-session \
     ${datadir}/pipewire/media-session.d/* \

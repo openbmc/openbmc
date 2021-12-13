@@ -31,7 +31,7 @@ universal, the list includes them just in case:
          busybox_1.21.%.bbappend
 
       That append file
-      would match any ``busybox_1.21.``\ x\ ``.bb`` version of the recipe. So,
+      would match any ``busybox_1.21.x.bb`` version of the recipe. So,
       the append file would match any of the following recipe names:
 
       .. code-block:: shell

@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://../README.license;md5=60487bf0bf429d6b5aa72b6d37a0eb2
 
 PV .= "+git${SRCPV}"
 
-SRC_URI = "git://pagure.io/sanlock.git;protocol=http \
+SRC_URI = "git://pagure.io/sanlock.git;protocol=http;branch=master \
            file://0001-sanlock-Replace-cp-a-with-cp-R-no-dereference-preser.patch;patchdir=../ \
           "
 SRCREV = "a181e951376d49a82eef17920c8ebedec80b4823"

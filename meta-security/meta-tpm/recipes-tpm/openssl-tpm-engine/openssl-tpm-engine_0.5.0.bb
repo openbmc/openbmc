@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=11f0ee3af475c85b907426e285c9bb52"
 DEPENDS += "openssl trousers"
 
 SRC_URI = "\
-    git://github.com/mgerstner/openssl_tpm_engine.git \
+    git://github.com/mgerstner/openssl_tpm_engine.git;branch=master;protocol=https \
     file://0001-create-tpm-key-support-well-known-key-option.patch \
     file://0002-libtpm-support-env-TPM_SRK_PW.patch \
     file://0003-tpm-openssl-tpm-engine-parse-an-encrypted-tpm-SRK-pa.patch \

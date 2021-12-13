@@ -24,7 +24,7 @@ PACKAGES =+ "${PN}-tools"
 FILES:${PN}-tools = "${bindir}/*.pl"
 
 SRC_URI = "\
-    git://github.com/makedumpfile/makedumpfile;branch=${SRCBRANCH} \
+    git://github.com/makedumpfile/makedumpfile;branch=${SRCBRANCH};protocol=https \
     file://0001-makedumpfile-replace-hardcode-CFLAGS.patch \
     file://0002-mem_section-Support-only-46-bit-for-MAX_PHYSMEM_BITS.patch \
 "

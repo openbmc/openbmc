@@ -1,0 +1,72 @@
+CVE: CVE-2021-3875
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From b8968e26d7508e7d64bfc86808142818b0a9288c Mon Sep 17 00:00:00 2001
+From: Bram Moolenaar <Bram@vim.org>
+Date: Sat, 9 Oct 2021 13:58:55 +0100
+Subject: [PATCH] patch 8.2.3489: ml_get error after search with range
+
+Problem:    ml_get error after search with range.
+Solution:   Limit the line number to the buffer line count.
+---
+ src/ex_docmd.c              |  6 ++++--
+ src/testdir/test_search.vim | 17 +++++++++++++++++
+ src/version.c               |  2 ++
+ 3 files changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/src/ex_docmd.c b/src/ex_docmd.c
+index fb07450f8..fde726477 100644
+--- a/src/ex_docmd.c
++++ b/src/ex_docmd.c
+@@ -3586,8 +3586,10 @@ get_address(
+ 
+ 		    // When '/' or '?' follows another address, start from
+ 		    // there.
+-		    if (lnum != MAXLNUM)
+-			curwin->w_cursor.lnum = lnum;
++		    if (lnum > 0 && lnum != MAXLNUM)
++			curwin->w_cursor.lnum =
++				lnum > curbuf->b_ml.ml_line_count
++					   ? curbuf->b_ml.ml_line_count : lnum;
+ 
+ 		    // Start a forward search at the end of the line (unless
+ 		    // before the first line).
+diff --git a/src/testdir/test_search.vim b/src/testdir/test_search.vim
+index 187671305..e142c3547 100644
+--- a/src/testdir/test_search.vim
++++ b/src/testdir/test_search.vim
+@@ -1366,3 +1366,20 @@ func Test_searchdecl()
+ 
+   bwipe!
+ endfunc
++
++func Test_search_with_invalid_range()
++  new
++  let lines =<< trim END
++    /\%.v
++    5/
++    c
++  END
++  call writefile(lines, 'Xrangesearch')
++  source Xrangesearch
++
++  bwipe!
++  call delete('Xrangesearch')
++endfunc
++
++
++" vim: shiftwidth=2 sts=2 expandtab
+diff --git a/src/version.c b/src/version.c
+index 2b5de5ccf..092864bbb 100644
+--- a/src/version.c
++++ b/src/version.c
+@@ -742,6 +742,8 @@ static char *(features[]) =
+ 
+ static int included_patches[] =
+ {   /* Add new patch number below this line */
++/**/
++    3489,
+ /**/
+     3487,
+ /**/

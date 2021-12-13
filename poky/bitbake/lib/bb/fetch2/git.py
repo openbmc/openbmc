@@ -142,6 +142,10 @@ class Git(FetchMethod):
             ud.proto = 'file'
         else:
             ud.proto = "git"
+        if ud.host == "github.com" and ud.proto == "git":
+            # github stopped supporting git protocol
+            # https://github.blog/2021-09-01-improving-git-protocol-security-github/#no-more-unauthenticated-git
+            ud.proto = "https"
 
         if not ud.proto in ('git', 'file', 'ssh', 'http', 'https', 'rsync'):
             raise bb.fetch2.ParameterError("Invalid protocol type", ud.url)

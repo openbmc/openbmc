@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=4267f48fc738f50380cbeeb76f95cebc"
 DEPENDS = "libpcre zlib"
 
 SRC_URI = " \
-    git://github.com/pocoproject/poco.git;branch=master \
+    git://github.com/pocoproject/poco.git;branch=master;protocol=https \
     file://0001-fix-missing-expat-definition.patch \
     file://run-ptest \
    "

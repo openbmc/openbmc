@@ -9,7 +9,7 @@ PV = "${BASEPV}+git${SRCPV}"
 
 SRCREV = "90385aabe2b51f39fa130627d46b377569f82d4a"
 
-SRC_URI = "git://github.com/npat-efault/picocom \
+SRC_URI = "git://github.com/npat-efault/picocom;branch=master;protocol=https \
            file://0001-Fix-building-with-musl.patch \
            "
 

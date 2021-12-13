@@ -356,7 +356,7 @@ class Wget(FetchMethod):
                 except (TypeError, ImportError, IOError, netrc.NetrcParseError):
                     pass
 
-                with opener.open(r) as response:
+                with opener.open(r, timeout=30) as response:
                     pass
             except urllib.error.URLError as e:
                 if try_again:

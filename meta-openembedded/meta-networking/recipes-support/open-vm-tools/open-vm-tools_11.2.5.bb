@@ -25,7 +25,7 @@ LICENSE:modules/freebsd/vmxnet = "GPL-2.0"
 LICENSE:modules/linux = "GPL-2.0"
 LICENSE:modules/solaris = "CDDL-1.0"
 
-SRC_URI = "git://github.com/vmware/open-vm-tools.git;protocol=https \
+SRC_URI = "git://github.com/vmware/open-vm-tools.git;protocol=https;branch=master \
     file://tools.conf \
     file://vmtoolsd.service \
     file://vmtoolsd.init \

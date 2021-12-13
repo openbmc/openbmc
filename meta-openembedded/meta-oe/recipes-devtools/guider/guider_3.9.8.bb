@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2c1c00f9d3ed9e24fa69b932b7e7aff2"
 
 PV = "3.9.8+git${SRCPV}"
 
-SRC_URI = "git://github.com/iipeace/${BPN}"
+SRC_URI = "git://github.com/iipeace/${BPN};branch=master;protocol=https"
 SRCREV = "a502cd93b13235b7539557a91328de00b7c51bc3"
 
 S = "${WORKDIR}/git"

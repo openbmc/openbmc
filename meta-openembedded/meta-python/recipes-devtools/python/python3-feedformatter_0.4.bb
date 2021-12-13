@@ -4,7 +4,7 @@ SECTION = "devel/python"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=258e3f39e2383fbd011035d04311008d"
 
-SRC_URI = "git://github.com/marianoguerra/feedformatter.git"
+SRC_URI = "git://github.com/marianoguerra/feedformatter.git;branch=master;protocol=https"
 SRCREV = "7391193c83e10420b5a2d8ef846d23fc368c6d85"
 
 S = "${WORKDIR}/git"

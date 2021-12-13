@@ -99,7 +99,7 @@ discussion mailing list about the BitBake build tool.
 
    This example was inspired by and drew heavily from
    `Mailing List post - The BitBake equivalent of "Hello, World!"
-   <http://www.mail-archive.com/yocto@yoctoproject.org/msg09379.html>`_.
+   <https://www.mail-archive.com/yocto@yoctoproject.org/msg09379.html>`_.
 
 As stated earlier, the goal of this example is to eventually compile
 "Hello World". However, it is unknown what BitBake needs and what you
@@ -205,7 +205,7 @@ Following is the complete "Hello World" example.
     recipe files. For this example, you need to create the file in your
     project directory and define some key BitBake variables. For more
     information on the ``bitbake.conf`` file, see
-    http://git.openembedded.org/bitbake/tree/conf/bitbake.conf.
+    https://git.openembedded.org/bitbake/tree/conf/bitbake.conf.
 
     Use the following commands to create the ``conf`` directory in the
     project directory::

@@ -13,7 +13,7 @@ DEPENDS = "autoconf-archive dbus glib-2.0 tpm2-tss glib-2.0-native \
             libtss2 libtss2-mu libtss2-tcti-device libtss2-tcti-mssim"
 
 SRC_URI = "\
-    git://github.com/tpm2-software/tpm2-abrmd.git \
+    git://github.com/tpm2-software/tpm2-abrmd.git;branch=master;protocol=https \
     file://tpm2-abrmd-init.sh \
     file://tpm2-abrmd.default \
 "

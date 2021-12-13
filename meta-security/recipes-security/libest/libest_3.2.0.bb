@@ -6,7 +6,7 @@ LICENSE = "OpenSSL"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=ecb78acde8e3b795de8ef6b61aed5885"
 
 SRCREV = "4ca02c6d7540f2b1bcea278a4fbe373daac7103b"
-SRC_URI = "git://github.com/cisco/libest;branch=main"
+SRC_URI = "git://github.com/cisco/libest;branch=main;protocol=https"
 
 DEPENDS = "openssl"
 

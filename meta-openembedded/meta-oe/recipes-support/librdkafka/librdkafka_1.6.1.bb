@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = " \
 file://LICENSE;md5=2be8675acbfdac48935e73897af5f646 \
 "
 
-SRC_URI = "git://github.com/edenhill/librdkafka;protocol=https \
+SRC_URI = "git://github.com/edenhill/librdkafka;protocol=https;branch=master \
             file://0001_fix_absolute_path_usage.patch"
 SRCREV = "1a722553638bba85dbda5050455f7b9a5ef302de"
 

@@ -8,7 +8,7 @@ DEPENDS = "libnfnetlink libmnl"
 
 SRCREV = "601abd1c71ccdf90753cf294c120ad43fb25dc54"
 
-SRC_URI = "git://git.netfilter.org/libnetfilter_queue \
+SRC_URI = "git://git.netfilter.org/libnetfilter_queue;branch=master \
            file://0001-libnetfilter-queue-Declare-the-define-visivility-attribute-together.patch \
            "
 

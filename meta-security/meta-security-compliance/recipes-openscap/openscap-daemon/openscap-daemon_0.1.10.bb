@@ -9,7 +9,7 @@ LICENSE = "LGPL-2.1"
 DEPENDS = "python3-dbus"
 
 SRCREV = "f25b16afb6ac761fea13132ff406fba4cdfd2b76"
-SRC_URI = "git://github.com/OpenSCAP/openscap-daemon.git \
+SRC_URI = "git://github.com/OpenSCAP/openscap-daemon.git;branch=master;protocol=https \
            file://0001-Renamed-module-and-variables-to-get-rid-of-async.patch \
           "
 

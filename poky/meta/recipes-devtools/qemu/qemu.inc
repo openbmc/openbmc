@@ -9,7 +9,7 @@ LICENSE = "GPLv2 & LGPLv2.1"
 RDEPENDS:${PN}-ptest = "bash"
 
 require qemu-targets.inc
-inherit pkgconfig ptest
+inherit pkgconfig ptest python3-dir
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
                     file://COPYING.LIB;endline=24;md5=8c5efda6cf1e1b03dcfd0e6c0d271c7f"
@@ -122,7 +122,11 @@ do_configure:prepend:class-native() {
 }
 
 do_configure() {
-    ${S}/configure ${EXTRA_OECONF}
+	# This is taken from meson.bbclass to avoid errors when updating to a
+	# new version of meson.
+	rmdir ${STAGING_LIBDIR_NATIVE}/${PYTHON_DIR}/site-packages/*.egg-info 2>/dev/null || :
+
+	${S}/configure ${EXTRA_OECONF}
 }
 do_configure[cleandirs] += "${B}"
 
@@ -203,6 +207,8 @@ PACKAGECONFIG[vhost] = "--enable-vhost-net,--disable-vhost-net,,"
 PACKAGECONFIG[ust] = "--enable-trace-backend=ust,--enable-trace-backend=nop,lttng-ust,"
 PACKAGECONFIG[pie] = "--enable-pie,--disable-pie,,"
 PACKAGECONFIG[seccomp] = "--enable-seccomp,--disable-seccomp,libseccomp"
+# libnfs is currently provided by meta-kodi
+PACKAGECONFIG[libnfs] = "--enable-libnfs,--disable-libnfs,libnfs"
 
 INSANE_SKIP:${PN} = "arch"
 

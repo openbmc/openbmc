@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 PROVIDES += "cyassl"
 RPROVIDES:${PN} = "cyassl"
 
-SRC_URI = "git://github.com/wolfSSL/wolfssl.git;protocol=https \
+SRC_URI = "git://github.com/wolfSSL/wolfssl.git;protocol=https;branch=master \
 "
 SRCREV = "95b91d89133a712a3d0f389442924612c103da24"
 S = "${WORKDIR}/git"

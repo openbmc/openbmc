@@ -53,5 +53,5 @@ KERNEL_IMAGETYPES ??= "${KERNEL_IMAGETYPE}"
 # The CONNECTIVITY_CHECK_URIS are used to test whether we can succesfully
 # fetch from the network (and warn you if not). To disable the test set
 # the variable to be empty.
-# Git example url: git://git.yoctoproject.org/yocto-firewall-test;protocol=git;rev=master
+# Git example url: git://git.yoctoproject.org/yocto-firewall-test;protocol=git;rev=master;branch=master
 CONNECTIVITY_CHECK_URIS ?= "https://www.example.com/"

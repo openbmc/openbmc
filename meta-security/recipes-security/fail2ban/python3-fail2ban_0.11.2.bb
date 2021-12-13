@@ -9,10 +9,9 @@ HOMEPAGE = "http://www.fail2ban.org"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ecabc31e90311da843753ba772885d9f"
 
-SRCREV ="eea1881b734b73599a21df2bfbe58b11f78d0a46"
-SRC_URI = " git://github.com/fail2ban/fail2ban.git;branch=0.11 \
+SRCREV ="d6b884f3b72b8a42b21da863836569ef6836c2ea"
+SRC_URI = " git://github.com/fail2ban/fail2ban.git;branch=0.11;protocol=https \
         file://initd \
-        file://fail2ban_setup.py \
         file://run-ptest \
 "
 
@@ -20,13 +19,13 @@ inherit update-rc.d ptest setuptools3
 
 S = "${WORKDIR}/git"
 
-do_compile:prepend () {
-    cp ${WORKDIR}/fail2ban_setup.py ${S}/setup.py
+do_compile () {
     cd ${S}
     ./fail2ban-2to3
 }
 
 do_install:append () {
+    rm  -f ${D}/${bindir}/fail2ban-python
     install -d ${D}/${sysconfdir}/fail2ban
     install -d ${D}/${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/initd ${D}${sysconfdir}/init.d/fail2ban-server
@@ -38,6 +37,7 @@ do_install_ptest:append () {
     install -d ${D}${PTEST_PATH}/bin
     sed -i -e 's/##PYTHON##/${PYTHON_PN}/g' ${D}${PTEST_PATH}/run-ptest
     install -D ${S}/bin/* ${D}${PTEST_PATH}/bin
+    rm -f ${D}${PTEST_PATH}/bin/fail2ban-python
 }
 
 FILES:${PN} += "/run"

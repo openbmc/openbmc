@@ -8,7 +8,7 @@ inherit features_check gobject-introspection meson pkgconfig
 REQUIRED_DISTRO_FEATURES = "opengl"
 
 SRCREV = "145e417f32e507b63c21ad4e915b808a6174099e"
-SRC_URI = "git://github.com/gnome/libchamplain.git"
+SRC_URI = "git://github.com/gnome/libchamplain.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

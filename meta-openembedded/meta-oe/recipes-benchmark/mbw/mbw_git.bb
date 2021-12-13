@@ -4,7 +4,7 @@ SECTION = "console/tests"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://mbw.spec;beginline=1;endline=10;md5=bbb77813272134a5c461f71abe945bef"
 
-SRC_URI = "git://github.com/raas/${BPN}.git"
+SRC_URI = "git://github.com/raas/${BPN}.git;branch=master;protocol=https"
 
 SRCREV = "2a15026ff65160127204881263464b1740a57198"
 

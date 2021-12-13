@@ -80,7 +80,7 @@ distribution:
 
 .. code-block:: shell
 
-  $ sudo apt-get install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
+  $ sudo apt install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
 
 .. note::
 
@@ -256,7 +256,7 @@ an entire Linux distribution, including the toolchain, from source.
 
       The previous examples showed how to add sstate paths for Yocto Project
       &YOCTO_DOC_VERSION_MINUS_ONE;, &YOCTO_DOC_VERSION;, and a development
-      area. For a complete index of sstate locations, see http://sstate.yoctoproject.org/.
+      area. For a complete index of sstate locations, see :yocto_sstate:`/`.
 
 #. **Start the Build:** Continue with the following command to build an OS
    image for the target, which is ``core-image-sato`` in this example:

@@ -9,7 +9,7 @@ DEPENDS += "glib-2.0-native"
 
 PV = "0.2+git${SRCPV}"
 
-SRC_URI = "git://github.com/labapart/gattlib.git \
+SRC_URI = "git://github.com/labapart/gattlib.git;branch=master;protocol=https \
            file://dbus-avoid-strange-chars-from-the-build-dir.patch \
            "
 

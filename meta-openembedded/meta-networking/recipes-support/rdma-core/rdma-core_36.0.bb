@@ -5,7 +5,7 @@ SECTION = "libs"
 DEPENDS = "libnl"
 RDEPENDS:${PN} = "bash perl"
 
-SRC_URI = "git://github.com/linux-rdma/rdma-core.git"
+SRC_URI = "git://github.com/linux-rdma/rdma-core.git;branch=master;protocol=https"
 SRCREV = "d7a9dde2b164a1563c7a51e4ade8ea3b6cdea9ef"
 S = "${WORKDIR}/git"
 

@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://setup.py;beginline=2;endline=3;md5=c795d4924c5f739424
 
 inherit setuptools3
 
-SRC_URI = "git://github.com/robherring/dt-schema.git"
+SRC_URI = "git://github.com/robherring/dt-schema.git;branch=master;protocol=https"
 SRCREV = "5009e47c1c76e48871f5988e08dad61f3c91196b"
 PV = "0.1+git${SRCPV}"
 

@@ -18,7 +18,7 @@ to run the Yocto Project. To do this, follow the instructions in the
 the Yocto Project Development Tasks Manual. For Ubuntu/Debian, you might
 also need to do an additional install of pip3. ::
 
-   $ sudo apt-get install python3-pip
+   $ sudo apt install python3-pip
 
 Establishing Toaster System Dependencies
 ========================================

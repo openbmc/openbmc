@@ -55,8 +55,9 @@ Reproducible builds now enabled by default
 
 In order to avoid unnecessary differences in output files (aiding binary
 reproducibility), the Poky distribution configuration
-(``DISTRO = "poky"``) now inherits the ``reproducible_build`` class by
-default.
+(``DISTRO = "poky"``) now inherits the
+:ref:`reproducible-build <ref-classes-reproducible-build>` class
+by default.
 
 .. _migration-3.1-ptest-feature-impact:
 

@@ -18,7 +18,7 @@ PV = "0.14.1+git${SRCPV}"
 SRCREV = "e0ec178a72aa33e307ee5ac02b63bf336da921a5"
 
 SRC_URI = " \
-    git://anongit.freedesktop.org/spice/spice-protocol \
+    git://anongit.freedesktop.org/spice/spice-protocol;branch=master \
 "
 
 S = "${WORKDIR}/git"

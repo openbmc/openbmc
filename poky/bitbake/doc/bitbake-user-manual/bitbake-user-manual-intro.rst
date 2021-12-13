@@ -60,11 +60,11 @@ member Chris Larson split the project into two distinct pieces:
 -  OpenEmbedded, a metadata set utilized by BitBake
 
 Today, BitBake is the primary basis of the
-`OpenEmbedded <http://www.openembedded.org/>`__ project, which is being
+`OpenEmbedded <https://www.openembedded.org/>`__ project, which is being
 used to build and maintain Linux distributions such as the `Angstrom
 Distribution <http://www.angstrom-distribution.org/>`__, and which is
 also being used as the build tool for Linux projects such as the `Yocto
-Project <http://www.yoctoproject.org>`__.
+Project <https://www.yoctoproject.org>`__.
 
 Prior to BitBake, no other build tool adequately met the needs of an
 aspiring embedded Linux distribution. All of the build systems used by
@@ -319,7 +319,7 @@ You can obtain BitBake several different ways:
 
    The following example downloads a snapshot of BitBake version 1.17.0::
 
-     $ wget http://git.openembedded.org/bitbake/snapshot/bitbake-1.17.0.tar.gz
+     $ wget https://git.openembedded.org/bitbake/snapshot/bitbake-1.17.0.tar.gz
      $ tar zxpvf bitbake-1.17.0.tar.gz
 
    After extraction of the tarball using

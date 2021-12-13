@@ -5,7 +5,7 @@ LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4cf0188f02184e1e84b9586ac53c3f83"
 
 FILEEXTRAPATHS:prepend = "${THISDIR}/files"
-SRC_URI = "git://github.com/dbus-cxx/dbus-cxx.git;branch=master"
+SRC_URI = "git://github.com/dbus-cxx/dbus-cxx.git;branch=master;protocol=https"
 SRC_URI += "file://fix_build_musl.patch"
 SRCREV = "ea7f8e361d11dc7d41d9ae2c4128aed2cdadd84e"
 

@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1c94a9d191202a5552f381a023551396 \
                     file://LICENSE.gplv2;md5=eb723b61539feef013de476e68b5c50a \
                     file://LICENSE.bsd;md5=66a5cedaf62c4b2637025f049f9b826f \
                     "
-SRC_URI = "git://github.com/smuellerDD/jitterentropy-library.git \
+SRC_URI = "git://github.com/smuellerDD/jitterentropy-library.git;branch=master;protocol=https \
            file://0001-Makefile-restore-build-reproducibility.patch \
            "
 SRCREV = "409828cfccf4b3b07edc40a7840a821ce074e2c3"

@@ -22,46 +22,68 @@ ADDR_TYPE_TCP = 1
 # is necessary
 DEFAULT_MAX_CHUNK = 32 * 1024
 
-TABLE_DEFINITION = (
-    ("method", "TEXT NOT NULL"),
-    ("outhash", "TEXT NOT NULL"),
-    ("taskhash", "TEXT NOT NULL"),
-    ("unihash", "TEXT NOT NULL"),
-    ("created", "DATETIME"),
-
-    # Optional fields
-    ("owner", "TEXT"),
-    ("PN", "TEXT"),
-    ("PV", "TEXT"),
-    ("PR", "TEXT"),
-    ("task", "TEXT"),
-    ("outhash_siginfo", "TEXT"),
+UNIHASH_TABLE_DEFINITION = (
+    ("method", "TEXT NOT NULL", "UNIQUE"),
+    ("taskhash", "TEXT NOT NULL", "UNIQUE"),
+    ("unihash", "TEXT NOT NULL", ""),
 )
 
-TABLE_COLUMNS = tuple(name for name, _ in TABLE_DEFINITION)
+UNIHASH_TABLE_COLUMNS = tuple(name for name, _, _ in UNIHASH_TABLE_DEFINITION)
+
+OUTHASH_TABLE_DEFINITION = (
+    ("method", "TEXT NOT NULL", "UNIQUE"),
+    ("taskhash", "TEXT NOT NULL", "UNIQUE"),
+    ("outhash", "TEXT NOT NULL", "UNIQUE"),
+    ("created", "DATETIME", ""),
+
+    # Optional fields
+    ("owner", "TEXT", ""),
+    ("PN", "TEXT", ""),
+    ("PV", "TEXT", ""),
+    ("PR", "TEXT", ""),
+    ("task", "TEXT", ""),
+    ("outhash_siginfo", "TEXT", ""),
+)
+
+OUTHASH_TABLE_COLUMNS = tuple(name for name, _, _ in OUTHASH_TABLE_DEFINITION)
+
+def _make_table(cursor, name, definition):
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS {name} (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            {fields}
+            UNIQUE({unique})
+            )
+        '''.format(
+            name=name,
+            fields=" ".join("%s %s," % (name, typ) for name, typ, _ in definition),
+            unique=", ".join(name for name, _, flags in definition if "UNIQUE" in flags)
+    ))
+
 
 def setup_database(database, sync=True):
     db = sqlite3.connect(database)
     db.row_factory = sqlite3.Row
 
     with closing(db.cursor()) as cursor:
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS tasks_v2 (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                %s
-                UNIQUE(method, outhash, taskhash)
-                )
-            ''' % " ".join("%s %s," % (name, typ) for name, typ in TABLE_DEFINITION))
+        _make_table(cursor, "unihashes_v2", UNIHASH_TABLE_DEFINITION)
+        _make_table(cursor, "outhashes_v2", OUTHASH_TABLE_DEFINITION)
+
         cursor.execute('PRAGMA journal_mode = WAL')
         cursor.execute('PRAGMA synchronous = %s' % ('NORMAL' if sync else 'OFF'))
 
         # Drop old indexes
         cursor.execute('DROP INDEX IF EXISTS taskhash_lookup')
         cursor.execute('DROP INDEX IF EXISTS outhash_lookup')
+        cursor.execute('DROP INDEX IF EXISTS taskhash_lookup_v2')
+        cursor.execute('DROP INDEX IF EXISTS outhash_lookup_v2')
+
+        # TODO: Upgrade from tasks_v2?
+        cursor.execute('DROP TABLE IF EXISTS tasks_v2')
 
         # Create new indexes
-        cursor.execute('CREATE INDEX IF NOT EXISTS taskhash_lookup_v2 ON tasks_v2 (method, taskhash, created)')
-        cursor.execute('CREATE INDEX IF NOT EXISTS outhash_lookup_v2 ON tasks_v2 (method, outhash)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS taskhash_lookup_v3 ON unihashes_v2 (method, taskhash)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS outhash_lookup_v3 ON outhashes_v2 (method, outhash)')
 
     return db
 

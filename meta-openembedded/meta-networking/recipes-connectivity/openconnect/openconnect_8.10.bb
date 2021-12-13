@@ -3,7 +3,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING.LGPL;md5=243b725d71bb5df4a1e5920b344b86ad"
 
 SRC_URI = " \
-    git://git.infradead.org/users/dwmw2/openconnect.git \
+    git://git.infradead.org/users/dwmw2/openconnect.git;branch=master \
 "
 SRCREV = "9d287e40c57233190a51b6434ba7345370e36f38"
 

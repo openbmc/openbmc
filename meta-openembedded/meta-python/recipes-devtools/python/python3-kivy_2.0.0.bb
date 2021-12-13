@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f0c851d60495c7e27225a819e179208a"
 inherit setuptools3 pkgconfig features_check
 
 SRC_URI = "\
-    git://github.com/kivy/kivy.git;protocol=git;\
+    git://github.com/kivy/kivy.git;protocol=https;branch=master \
 "
 
 # Kivy's setup files only look for GLES libraries for Android, iOS, RPi,

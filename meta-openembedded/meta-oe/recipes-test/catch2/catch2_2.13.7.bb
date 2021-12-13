@@ -5,7 +5,7 @@ HOMEPAGE = "https://github.com/catchorg/Catch2"
 LICENSE = "BSL-1.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=e4224ccaecb14d942c71d31bef20d78c"
 
-SRC_URI = "git://github.com/catchorg/Catch2.git;branch=v2.x"
+SRC_URI = "git://github.com/catchorg/Catch2.git;branch=v2.x;protocol=https"
 SRCREV = "c4e3767e265808590986d5db6ca1b5532a7f3d13"
 
 S = "${WORKDIR}/git"

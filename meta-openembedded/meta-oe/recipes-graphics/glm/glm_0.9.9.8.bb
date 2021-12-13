@@ -9,7 +9,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://copying.txt;md5=462e4b97f73ef12f8171c3c546ce4e8d"
 
 SRC_URI = " \
-    git://github.com/g-truc/glm;branch=master \
+    git://github.com/g-truc/glm;branch=master;protocol=https \
     file://0001-Silence-clang-warnings.patch \
     file://glmConfig.cmake.in \
     file://glmConfigVersion.cmake.in \

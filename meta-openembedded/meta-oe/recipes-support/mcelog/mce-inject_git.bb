@@ -4,7 +4,7 @@ software level into a running Linux kernel. This is intended for \
 validation of the kernel machine check handler."
 SECTION = "System Environment/Base"
 
-SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mce-inject.git"
+SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mce-inject.git;branch=master"
 
 SRCREV = "4cbe46321b4a81365ff3aafafe63967264dbfec5"
 

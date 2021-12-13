@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=bb761279816b72be19d7ce646e4e2a14"
 
 DEPENDS = "libeigen glog"
 
-SRC_URI = "git://github.com/ceres-solver/ceres-solver.git"
+SRC_URI = "git://github.com/ceres-solver/ceres-solver.git;branch=master;protocol=https"
 SRCREV = "399cda773035d99eaf1f4a129a666b3c4df9d1b1"
 
 S = "${WORKDIR}/git"

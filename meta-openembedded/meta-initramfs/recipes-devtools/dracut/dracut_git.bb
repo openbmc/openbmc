@@ -9,7 +9,7 @@ PE = "1"
 PV = "051"
 
 SRCREV = "e473057ae1de303340dec297c786c4a701cc61bd"
-SRC_URI = "git://git.kernel.org/pub/scm/boot/dracut/dracut.git;protocol=http \
+SRC_URI = "git://git.kernel.org/pub/scm/boot/dracut/dracut.git;protocol=http;branch=master \
            file://0001-util.h-include-sys-reg.h-when-libc-glibc.patch \
            "
 

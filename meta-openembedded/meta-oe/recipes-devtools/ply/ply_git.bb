@@ -7,7 +7,7 @@ DEPENDS += "bison-native"
 
 PV = "2.1.1+git${SRCPV}"
 
-SRC_URI = "git://github.com/iovisor/ply"
+SRC_URI = "git://github.com/iovisor/ply;branch=master;protocol=https"
 SRCREV = "e25c9134b856cc7ffe9f562ff95caf9487d16b59"
 
 S = "${WORKDIR}/git"

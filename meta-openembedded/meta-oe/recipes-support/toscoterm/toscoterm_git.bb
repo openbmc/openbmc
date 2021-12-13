@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://main.c;start_line=5;end_line=16;md5=9ae4bf20caf291afa
 
 # 0.2 version
 SRCREV = "8586d617aed19fc75f5ae1e07270752c1b2f9a30"
-SRC_URI = "git://github.com/OSSystems/toscoterm.git"
+SRC_URI = "git://github.com/OSSystems/toscoterm.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

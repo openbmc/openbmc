@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1373274bc8d8001edc54933919f36f68"
 DEPENDS += "util-linux"
 
 SRCREV = "5b45cdd9a56ca9da35ee0f8845cb4e2603d245dc"
-SRC_URI = "git://github.com/graeme-hill/crossguid;protocol=https"
+SRC_URI = "git://github.com/graeme-hill/crossguid;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 

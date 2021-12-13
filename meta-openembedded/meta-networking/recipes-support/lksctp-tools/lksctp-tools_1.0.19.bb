@@ -14,7 +14,7 @@ PV .= "+git${SRCPV}"
 LK_REL = "1.0.19"
 
 SRC_URI = " \
-    git://github.com/sctp/lksctp-tools.git \
+    git://github.com/sctp/lksctp-tools.git;branch=master;protocol=https \
     file://run-ptest \
     file://v4test.sh \
     file://v6test.sh \

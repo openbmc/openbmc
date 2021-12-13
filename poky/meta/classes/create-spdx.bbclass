@@ -28,6 +28,8 @@ SPDX_NAMESPACE_PREFIX ??= "http://spdx.org/spdxdoc"
 
 SPDX_LICENSES ??= "${COREBASE}/meta/files/spdx-licenses.json"
 
+SPDX_ORG ??= "OpenEmbedded ()"
+
 do_image_complete[depends] = "virtual/kernel:do_create_spdx"
 
 def get_doc_namespace(d, doc):
@@ -35,15 +37,24 @@ def get_doc_namespace(d, doc):
     namespace_uuid = uuid.uuid5(uuid.NAMESPACE_DNS, d.getVar("SPDX_UUID_NAMESPACE"))
     return "%s/%s-%s" % (d.getVar("SPDX_NAMESPACE_PREFIX"), doc.name, str(uuid.uuid5(namespace_uuid, doc.name)))
 
+def create_annotation(d, comment):
+    from datetime import datetime, timezone
+
+    creation_time = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    annotation = oe.spdx.SPDXAnnotation()
+    annotation.annotationDate = creation_time
+    annotation.annotationType = "OTHER"
+    annotation.annotator = "Tool: %s - %s" % (d.getVar("SPDX_TOOL_NAME"), d.getVar("SPDX_TOOL_VERSION"))
+    annotation.comment = comment
+    return annotation
+
 def recipe_spdx_is_native(d, recipe):
     return any(a.annotationType == "OTHER" and
       a.annotator == "Tool: %s - %s" % (d.getVar("SPDX_TOOL_NAME"), d.getVar("SPDX_TOOL_VERSION")) and
       a.comment == "isNative" for a in recipe.annotations)
 
-def is_work_shared(d):
-    pn = d.getVar('PN')
-    return bb.data.inherits_class('kernel', d) or pn.startswith('gcc-source')
-
+def is_work_shared_spdx(d):
+    return bb.data.inherits_class('kernel', d) or ('work-shared' in d.getVar('WORKDIR'))
 
 python() {
     import json
@@ -81,7 +92,7 @@ def convert_license_to_spdx(lic, document, d, existing={}):
             extracted_info.extractedText = "Software released to the public domain"
         elif name in available_licenses:
             # This license can be found in COMMON_LICENSE_DIR or LICENSE_PATH
-            for directory in [d.getVar('COMMON_LICENSE_DIR')] + d.getVar('LICENSE_PATH').split():
+            for directory in [d.getVar('COMMON_LICENSE_DIR')] + (d.getVar('LICENSE_PATH') or '').split():
                 try:
                     with (Path(directory) / name).open(errors="replace") as f:
                         extracted_info.extractedText = f.read()
@@ -133,7 +144,6 @@ def convert_license_to_spdx(lic, document, d, existing={}):
     lic_split = lic.replace("(", " ( ").replace(")", " ) ").split()
 
     return ' '.join(convert(l) for l in lic_split)
-
 
 def process_sources(d):
     pn = d.getVar('PN')
@@ -404,20 +414,15 @@ python do_create_spdx() {
     doc.creationInfo.comment = "This document was created by analyzing recipe files during the build."
     doc.creationInfo.licenseListVersion = d.getVar("SPDX_LICENSE_DATA")["licenseListVersion"]
     doc.creationInfo.creators.append("Tool: OpenEmbedded Core create-spdx.bbclass")
-    doc.creationInfo.creators.append("Organization: OpenEmbedded ()")
+    doc.creationInfo.creators.append("Organization: %s" % d.getVar("SPDX_ORG"))
     doc.creationInfo.creators.append("Person: N/A ()")
 
     recipe = oe.spdx.SPDXPackage()
     recipe.name = d.getVar("PN")
     recipe.versionInfo = d.getVar("PV")
     recipe.SPDXID = oe.sbom.get_recipe_spdxid(d)
-    if bb.data.inherits_class("native", d):
-        annotation = oe.spdx.SPDXAnnotation()
-        annotation.annotationDate = creation_time
-        annotation.annotationType = "OTHER"
-        annotation.annotator = "Tool: %s - %s" % (d.getVar("SPDX_TOOL_NAME"), d.getVar("SPDX_TOOL_VERSION"))
-        annotation.comment = "isNative"
-        recipe.annotations.append(annotation)
+    if bb.data.inherits_class("native", d) or bb.data.inherits_class("cross", d):
+        recipe.annotations.append(create_annotation(d, "isNative"))
 
     for s in d.getVar('SRC_URI').split():
         if not s.startswith("file://"):
@@ -513,7 +518,7 @@ python do_create_spdx() {
             package_doc.creationInfo.comment = "This document was created by analyzing packages created during the build."
             package_doc.creationInfo.licenseListVersion = d.getVar("SPDX_LICENSE_DATA")["licenseListVersion"]
             package_doc.creationInfo.creators.append("Tool: OpenEmbedded Core create-spdx.bbclass")
-            package_doc.creationInfo.creators.append("Organization: OpenEmbedded ()")
+            package_doc.creationInfo.creators.append("Organization: %s" % d.getVar("SPDX_ORG"))
             package_doc.creationInfo.creators.append("Person: N/A ()")
             package_doc.externalDocumentRefs.append(recipe_ref)
 
@@ -608,7 +613,7 @@ python do_create_runtime_spdx() {
 
     deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
     spdx_deploy = Path(d.getVar("SPDXRUNTIMEDEPLOY"))
-    is_native = bb.data.inherits_class("native", d)
+    is_native = bb.data.inherits_class("native", d) or bb.data.inherits_class("cross", d)
 
     creation_time = datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -647,7 +652,7 @@ python do_create_runtime_spdx() {
             runtime_doc.creationInfo.comment = "This document was created by analyzing package runtime dependencies."
             runtime_doc.creationInfo.licenseListVersion = d.getVar("SPDX_LICENSE_DATA")["licenseListVersion"]
             runtime_doc.creationInfo.creators.append("Tool: OpenEmbedded Core create-spdx.bbclass")
-            runtime_doc.creationInfo.creators.append("Organization: OpenEmbedded ()")
+            runtime_doc.creationInfo.creators.append("Organization: %s" % d.getVar("SPDX_ORG"))
             runtime_doc.creationInfo.creators.append("Person: N/A ()")
 
             package_ref = oe.spdx.SPDXExternalDocumentRef()
@@ -668,6 +673,9 @@ python do_create_runtime_spdx() {
             seen_deps = set()
             for dep, _ in deps.items():
                 if dep in seen_deps:
+                    continue
+
+                if dep not in providers:
                     continue
 
                 dep = providers[dep]
@@ -739,7 +747,7 @@ def spdx_get_src(d):
 
     try:
         # The kernel class functions require it to be on work-shared, so we dont change WORKDIR
-        if not is_work_shared(d):
+        if not is_work_shared_spdx(d):
             # Change the WORKDIR to make do_unpack do_patch run in another dir.
             d.setVar('WORKDIR', spdx_workdir)
             # Restore the original path to recipe's native sysroot (it's relative to WORKDIR).
@@ -752,7 +760,7 @@ def spdx_get_src(d):
 
             bb.build.exec_func('do_unpack', d)
         # Copy source of kernel to spdx_workdir
-        if is_work_shared(d):
+        if is_work_shared_spdx(d):
             d.setVar('WORKDIR', spdx_workdir)
             d.setVar('STAGING_DIR_NATIVE', spdx_sysroot_native)
             src_dir = spdx_workdir + "/" + d.getVar('PN')+ "-" + d.getVar('PV') + "-" + d.getVar('PR')
@@ -768,7 +776,7 @@ def spdx_get_src(d):
                 shutils.rmtree(git_path)
 
         # Make sure gcc and kernel sources are patched only once
-        if not (d.getVar('SRC_URI') == "" or is_work_shared(d)):
+        if not (d.getVar('SRC_URI') == "" or is_work_shared_spdx(d)):
             bb.build.exec_func('do_patch', d)
 
         # Some userland has no source.
@@ -807,7 +815,7 @@ python image_combine_spdx() {
     doc.creationInfo.comment = "This document was created by analyzing the source of the Yocto recipe during the build."
     doc.creationInfo.licenseListVersion = d.getVar("SPDX_LICENSE_DATA")["licenseListVersion"]
     doc.creationInfo.creators.append("Tool: OpenEmbedded Core create-spdx.bbclass")
-    doc.creationInfo.creators.append("Organization: OpenEmbedded ()")
+    doc.creationInfo.creators.append("Organization: %s" % d.getVar("SPDX_ORG"))
     doc.creationInfo.creators.append("Person: N/A ()")
 
     image = oe.spdx.SPDXPackage()

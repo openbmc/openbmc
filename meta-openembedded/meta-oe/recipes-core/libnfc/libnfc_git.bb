@@ -11,7 +11,7 @@ PV = "1.8.0+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 SRCREV = "f02ff51449240102c27a97173dc495e8e7789046"
-SRC_URI = "git://github.com/nfc-tools/libnfc.git"
+SRC_URI = "git://github.com/nfc-tools/libnfc.git;branch=master;protocol=https"
 
 CFLAGS:append:libc-musl = " -D_GNU_SOURCE"
 DEPENDS = "libusb"

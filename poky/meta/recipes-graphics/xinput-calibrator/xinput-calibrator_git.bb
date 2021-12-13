@@ -12,7 +12,7 @@ inherit autotools pkgconfig features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
 SRCREV = "18ec53f1cada39f905614ebfaffed5c7754ecf46"
-SRC_URI = "git://github.com/kreijack/xinput_calibrator.git;branch=libinput \
+SRC_URI = "git://github.com/kreijack/xinput_calibrator.git;branch=libinput;protocol=https \
            file://30xinput_calibrate.sh \
            file://Allow-xinput_calibrator_pointercal.sh-to-be-run-as-n.patch \
            file://0001-calibrator.hh-Include-string-to-get-std-string.patch \

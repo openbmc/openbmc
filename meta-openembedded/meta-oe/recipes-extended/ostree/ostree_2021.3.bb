@@ -22,7 +22,7 @@ DEPENDS = " \
 PREMIRRORS = ""
 
 SRC_URI = " \
-    gitsm://github.com/ostreedev/ostree;branch=main \
+    gitsm://github.com/ostreedev/ostree;branch=main;protocol=https \
     file://run-ptest \
 "
 SRCREV = "38c14b374567f736533f7f515595208fe359819f"

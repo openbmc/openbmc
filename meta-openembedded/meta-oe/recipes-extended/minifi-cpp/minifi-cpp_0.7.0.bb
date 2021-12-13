@@ -11,7 +11,7 @@ DEPENDS = "virtual/crypt expat flex python3 bison-native libxml2 nettle lz4"
 RDEPENDS:${PN} = "python3-core"
 
 SRCREV = "aa42957a2e227df41510047cece3cd606dc1cb6a"
-SRC_URI = "git://github.com/apache/nifi-minifi-cpp.git \
+SRC_URI = "git://github.com/apache/nifi-minifi-cpp.git;branch=master;protocol=https \
             https://curl.haxx.se/download/curl-7.64.0.tar.bz2;name=curl;subdir=git/thirdparty \
             https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-2.8.3.tar.gz;name=libressl;subdir=git/thirdparty \
             ${DEBIAN_MIRROR}/main/o/ossp-uuid/ossp-uuid_1.6.2.orig.tar.gz;name=ossp-uuid;subdir=git/thirdparty \

@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=50bd1d7f135b50d7e218996ba28d0d88"
 
 SRCREV = "4b440a339979852d5a51fb11a822952712231c23"
 PV = "1.12+git${SRCPV}"
-SRC_URI = "git://github.com/civetweb/civetweb.git \
+SRC_URI = "git://github.com/civetweb/civetweb.git;branch=master;protocol=https \
            file://0001-Unittest-Link-librt-and-libm-using-l-option.patch \
            "
 

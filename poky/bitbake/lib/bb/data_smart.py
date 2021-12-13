@@ -492,7 +492,7 @@ class DataSmart(MutableMapping):
     def setVar(self, var, value, **loginfo):
         #print("var=" + str(var) + "  val=" + str(value))
 
-        if "_append" in var or "_prepend" in var or "_remove" in var:
+        if not var.startswith("__anon_") and ("_append" in var or "_prepend" in var or "_remove" in var):
             info = "%s" % var
             if "filename" in loginfo:
                 info += " file: %s" % loginfo[filename]

@@ -18,7 +18,7 @@ DEPENDS += " \
 "
 
 SRC_URI = " \
-    git://github.com/MusicPlayerDaemon/MPD;branch=v0.22.x \
+    git://github.com/MusicPlayerDaemon/MPD;branch=v0.22.x;protocol=https \
     file://0001-include-utility-for-std-forward.patch \
     file://mpd.conf.in \
 "

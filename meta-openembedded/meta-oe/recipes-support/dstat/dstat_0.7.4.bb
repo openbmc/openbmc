@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS += "asciidoc-native xmlto-native"
 
-SRC_URI = "git://github.com/dagwieers/dstat.git \
+SRC_URI = "git://github.com/dagwieers/dstat.git;branch=master;protocol=https \
            file://0001-change-dstat-to-python3.patch \
           "
 

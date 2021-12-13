@@ -198,7 +198,7 @@ The format of the indexURI:
 
   For example:
 
-  http://layers.openembedded.org/layerindex/api/;branch=master;desc=OpenEmbedded%20Layer%20Index
+  https://layers.openembedded.org/layerindex/api/;branch=master;desc=OpenEmbedded%20Layer%20Index
   cooker://
 '''
         if reload:
@@ -576,7 +576,7 @@ This function is used to implement debugging and provide the user info.
 #   index['config'] - configuration data for this index
 #   index['branches'] - dictionary of Branch objects, by id number
 #   index['layerItems'] - dictionary of layerItem objects, by id number
-#   ...etc...  (See: http://layers.openembedded.org/layerindex/api/)
+#   ...etc...  (See: https://layers.openembedded.org/layerindex/api/)
 #
 # The class needs to manage the 'index' entries and allow easily adding
 # of new items, as well as simply loading of the items.

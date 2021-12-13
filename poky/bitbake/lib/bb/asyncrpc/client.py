@@ -7,6 +7,7 @@ import asyncio
 import json
 import os
 import socket
+import sys
 from . import chunkify, DEFAULT_MAX_CHUNK
 
 
@@ -129,7 +130,7 @@ class Client(object):
         # required (but harmless) with it.
         asyncio.set_event_loop(self.loop)
 
-        self._add_methods('connect_tcp', 'close', 'ping')
+        self._add_methods('connect_tcp', 'ping')
 
     @abc.abstractmethod
     def _get_async_client(self):
@@ -163,3 +164,9 @@ class Client(object):
     @max_chunk.setter
     def max_chunk(self, value):
         self.client.max_chunk = value
+
+    def close(self):
+        self.loop.run_until_complete(self.client.close())
+        if sys.version_info >= (3, 6):
+            self.loop.run_until_complete(self.loop.shutdown_asyncgens())
+        self.loop.close()

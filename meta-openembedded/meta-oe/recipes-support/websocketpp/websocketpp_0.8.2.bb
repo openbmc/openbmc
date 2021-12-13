@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${S}/COPYING;md5=4d168d763c111f4ffc62249870e4e0ea"
 
 DEPENDS = " ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'openssl boost zlib', '', d)} "
 
-SRC_URI = "git://github.com/zaphoyd/websocketpp.git;protocol=https \
+SRC_URI = "git://github.com/zaphoyd/websocketpp.git;protocol=https;branch=master \
            file://0001-cmake-Use-GNUInstallDirs.patch \
            file://855.patch \
            file://857.patch \

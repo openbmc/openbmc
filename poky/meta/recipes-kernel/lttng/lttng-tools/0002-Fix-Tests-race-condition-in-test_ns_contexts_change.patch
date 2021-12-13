@@ -1,0 +1,46 @@
+From d284752e616dfc4c9288be3bb21c04ea78cdd967 Mon Sep 17 00:00:00 2001
+From: Francis Deslauriers <francis.deslauriers@efficios.com>
+Date: Wed, 8 Sep 2021 10:16:23 -0400
+Subject: [PATCH 2/2] Fix: Tests: race condition in test_ns_contexts_change
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Issue
+=====
+The test script doesn't wait for the test application to complete before
+stopping the tracing session. The race is that depending on the
+scheduling the application is not always done generating events when the
+session is stopped.
+
+Fix
+===
+Make the test script wait for the termination of the test app before
+stopping the session.
+
+Signed-off-by: Francis Deslauriers <francis.deslauriers@efficios.com>
+Signed-off-by: Jérémie Galarneau <jeremie.galarneau@efficios.com>
+Change-Id: I29d9b41d2a2ed60a6c42020509c2067442ae332c
+Upstream-Status: Backport
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ tests/regression/ust/namespaces/test_ns_contexts_change | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/regression/ust/namespaces/test_ns_contexts_change b/tests/regression/ust/namespaces/test_ns_contexts_change
+index c0af15e..8a4b62c 100755
+--- a/tests/regression/ust/namespaces/test_ns_contexts_change
++++ b/tests/regression/ust/namespaces/test_ns_contexts_change
+@@ -79,6 +79,9 @@ function test_ns()
+ 
+ 	touch "$file_sync_before_last"
+ 
++	# Wait for the test app to generate all expected events and exit.
++	wait $app_pid
++
+ 	# stop and destroy
+ 	stop_lttng_tracing_ok "$session_name"
+ 	destroy_lttng_session_ok "$session_name"
+-- 
+2.20.1
+

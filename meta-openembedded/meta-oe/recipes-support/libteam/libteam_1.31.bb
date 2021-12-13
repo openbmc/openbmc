@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 DEPENDS = "libnl libdaemon jansson"
 
-SRC_URI = "git://github.com/jpirko/libteam \
+SRC_URI = "git://github.com/jpirko/libteam;branch=master;protocol=https \
            file://0001-include-sys-select.h-for-fd_set-definition.patch \
            file://0002-teamd-Re-adjust-include-header-order.patch \
            file://0001-team_basic_test.py-disable-RedHat-specific-test.patch \
