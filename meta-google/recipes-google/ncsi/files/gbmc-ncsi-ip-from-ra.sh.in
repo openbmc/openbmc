@@ -83,6 +83,10 @@ EOF
   if [ "$(systemctl is-active systemd-networkd)" != 'inactive' ]; then
     networkctl reload && networkctl reconfigure gbmcbr "$NCSI_IF" || true
   fi
+
+  # DHCP Relay workaround until alternate source port is supported
+  # TODO: Remove this once internal relaying cleanups land
+  gbmc-ncsi-smartnic-wa.sh || true
 }
 
 w=60
