@@ -8,7 +8,7 @@ SRCREV = "cbc05de76fbd4dfff17b5626d5cfe9ec922b1f4a"
 
 S = "${WORKDIR}/git"
 
-inherit cmake
+inherit cmake pkgconfig
 
 FILES:${PN}-dev += "${libdir}/cmake/cJSON/*"
 
