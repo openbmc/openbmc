@@ -14,6 +14,7 @@ SOFTWARE_MGR_PACKAGES = " \
     ${PN}-updater-ubi \
     ${PN}-updater-mmc \
     ${PN}-sync \
+    ${PN}-usb \
 "
 PACKAGE_BEFORE_PN += "${SOFTWARE_MGR_PACKAGES}"
 ALLOW_EMPTY:${PN} = "1"
@@ -28,6 +29,7 @@ PACKAGECONFIG[verify_signature] = " \
     -Dverify-full-signature=enabled, \
     -Dverify-full-signature=disabled"
 PACKAGECONFIG[sync_bmc_files] = "-Dsync-bmc-files=enabled, -Dsync-bmc-files=disabled"
+PACKAGECONFIG[usb_code_update] = "-Dusb-code-update=enabled, -Dusb-code-update=disabled, cli11"
 PACKAGECONFIG[ubifs_layout] = "-Dbmc-layout=ubi"
 PACKAGECONFIG[mmc_layout] = "-Dbmc-layout=mmc"
 PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled, -Dhost-bios-upgrade=disabled"
@@ -67,6 +69,10 @@ FILES:${PN}-sync += " \
     ${bindir}/phosphor-sync-software-manager \
     ${sysconfdir}/synclist \
     "
+FILES:${PN}-usb += "\
+    ${base_libdir}/udev/rules.d/70-bmc-usb.rules \
+    ${bindir}/phosphor-usb-code-update \
+    "
 DBUS_SERVICE:${PN}-version += "xyz.openbmc_project.Software.Version.service"
 DBUS_SERVICE:${PN}-download-mgr += "xyz.openbmc_project.Software.Download.service"
 DBUS_SERVICE:${PN}-updater += "xyz.openbmc_project.Software.BMC.Updater.service"
@@ -81,6 +87,7 @@ SYSTEMD_SERVICE:${PN}-updater += " \
 "
 
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_bios', 'obmc-flash-host-bios@.service', '', d)}"
+SYSTEMD_SERVICE:${PN}-usb += "${@bb.utils.contains('PACKAGECONFIG', 'usb_code_update', 'usb-code-update@.service', '', d)}"
 
 S = "${WORKDIR}/git"
 
