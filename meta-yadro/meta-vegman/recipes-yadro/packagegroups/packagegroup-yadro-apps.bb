@@ -42,6 +42,7 @@ RDEPENDS:${PN}-system = " \
     vegman-fru-handler \
     fru-device \
     entity-manager \
+    smbios-mdr \
     ${PN}-interface \
     ${PN}-cli \
 "
