@@ -1,0 +1,11 @@
+[Unit]
+Description=Motor Initialize for sled%i
+
+[Service]
+ExecStart=/usr/libexec/motor-init sled%i
+SyslogIdentifier=Motor Initialize sled%i
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

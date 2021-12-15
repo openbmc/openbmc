@@ -1,0 +1,185 @@
+#!/bin/bash -e
+
+# Initialize for step motor of sled:
+#   Enable pwm and setup pwm duty
+#   Setup gpio pins for step motor control
+#   Moving step motor back to initial position
+
+export PATH=$PATH:/usr/libexec
+
+PWM_BASE_ADDR="0x1e61"
+DEV_FILE="/dev/mem"
+CALIBRATE_TIMEOUT=120
+
+#Get pwm register address for sledN
+function get_pwm_offset() {
+  local offset=0
+  case $1 in
+    0)
+      offset="0080"
+    ;;
+    1)
+      offset="0090"
+    ;;
+    2)
+      offset="00a0"
+    ;;
+    3)
+      offset="00b0"
+    ;;
+    4)
+      offset="00c0"
+    ;;
+    5)
+      offset="00d0"
+    ;;
+  esac
+
+  echo ${PWM_BASE_ADDR}${offset}
+}
+
+#Get pwm duty register address for sledN
+function get_duty_offset() {
+  local offset=0
+  case $1 in
+    0)
+      offset="0084"
+    ;;
+    1)
+      offset="0094"
+    ;;
+    2)
+      offset="00a4"
+    ;;
+    3)
+      offset="00b4"
+    ;;
+    4)
+      offset="00c4"
+    ;;
+    5)
+      offset="00d4"
+    ;;
+  esac
+
+  echo ${PWM_BASE_ADDR}${offset}
+}
+
+#Enable pwm for sledN
+function open_pwm() {
+    local SLED_NUM="$1"
+    echo "Open pwm of sled$SLED_NUM"
+    #enable BMC PWM
+    if [ ! -c "$DEV_FILE" ]; then
+       mknod /dev/mem c 1 1
+    fi
+
+    PWM_OFFSET=$(get_pwm_offset "$SLED_NUM")
+    DUTY_OFFSET=$(get_duty_offset "$SLED_NUM")
+    echo "setting ${PWM_OFFSET} to 0x000113F3"
+    echo "setting ${DUTY_OFFSET} to 0xFF006400"
+    devmem "$PWM_OFFSET"  32 0x000113F3
+    devmem "$DUTY_OFFSET" 32 0xFF006400
+}
+
+function set_gpio()
+{
+    NET_NAME=$1
+    OUT_VAL=$2
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "set_gpio: can not find gpio, $NET_NAME"
+        return 1
+    fi
+    echo -n "set_gpio: set $NET_NAME = $OUT_VAL"
+    if ! gpioset "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}"="$OUT_VAL"; then
+        echo " failed"
+        return 1
+    fi
+    echo " success"
+    return 0
+}
+
+function get_gpio()
+{
+    NET_NAME=$1
+    RET_VAL=2
+
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "get_gpio: can not find gpio, $NET_NAME" >&2
+        return 1
+    fi
+    if ! RET_VAL=$(gpioget "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}") ; then
+        echo "get_gpio: get ${NET_NAME} failed" >&2
+        return 1
+    fi
+    echo "${RET_VAL}"
+    return 0
+}
+
+#Init gpio pins for step motor control
+function init_gpios() {
+    echo "Init GPIOs:"
+    motor_ctrl_gpio_pins_names=(    "SLED${1}_MD_STBY_RESET"
+                                    "SLED${1}_MD_IOEXP_EN_FAULT"
+                                    "SLED${1}_MD_DIR"
+                                    "SLED${1}_MD_DECAY"
+                                    "SLED${1}_MD_MODE1"
+                                    "SLED${1}_MD_MODE2"
+                                    "SLED${1}_MD_MODE3" )
+
+    for  gpio_name in "${motor_ctrl_gpio_pins_names[@]}"; do
+        set_gpio "$gpio_name"   0
+    done
+}
+
+if [[ "$1" =~ ^(slot[0-5]{1})$ ]] || [[ "$1" =~ ^(sled[0-5]{1})$ ]]; then
+  SLED=$1
+  SLED_NUM=${SLED:4}
+else
+  #show_usage
+  echo "invalid sled name: ${1}"
+  exit 1;
+fi
+
+#Check if sled is present
+SLED_PRESENT=$(get_gpio "presence-sled${SLED_NUM}")
+if [ "$SLED_PRESENT" != 0 ];then
+    echo "${SLED} is not present, skip motor initialize"
+    exit 1
+fi
+
+#Init gpios
+init_gpios "$SLED_NUM"
+
+#enable pwm
+open_pwm "$SLED_NUM"
+
+#SLED{N}_MS_DETECT1  (initial position)
+DETECT_PIN1="SLED${SLED_NUM}_MS_DETECT1"
+INIT_POS=$(get_gpio "$DETECT_PIN1")
+
+if [ "$INIT_POS" -eq 1 ];then
+    time_count=0
+    echo "Making motor back to initial position..."
+    motor-ctrl "$SLED" r >/dev/null
+    while  [ "$INIT_POS" -eq 1 ]  ;do
+        INIT_POS=$(get_gpio "$DETECT_PIN1")
+        sleep 0.1
+        time_count=$(( time_count + 1 ))
+        if [  $time_count -gt $CALIBRATE_TIMEOUT ];then
+            echo "Error: Step motor run over 1 cycle but switch never triggered"
+            break
+        fi
+    done
+    motor-ctrl "$SLED" s >/dev/null
+fi
+
+if [ "$INIT_POS" -eq 0 ];then
+    echo "Motor calibrated to initial position."
+    exit 0
+else
+    echo "Find motor initial position failed"
+    exit 1
+fi

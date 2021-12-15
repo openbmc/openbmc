@@ -1,0 +1,10 @@
+[Unit]
+Description=Power off System in Sled%i by Step Motor
+Requires=motor-init-calibration@%i.service
+After=motor-init-calibration@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/power-ctrl sled%i off
+SyslogIdentifier=power-ctrl
+
