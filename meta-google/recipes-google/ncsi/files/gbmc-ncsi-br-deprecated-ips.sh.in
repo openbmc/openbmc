@@ -88,7 +88,7 @@ EOF
   else
     printf '%s' "$nfcontents" >"$rfile"
   fi
-  systemctl reset-failed nftables && systemctl --no-block restart nftables || true
+  systemctl reset-failed nftables && systemctl --no-block reload-or-restart nftables || true
 }
 
 gbmc_ncsi_br_deprecated_ips_hook() {

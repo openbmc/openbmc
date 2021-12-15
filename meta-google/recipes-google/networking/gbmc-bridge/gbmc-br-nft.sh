@@ -37,9 +37,7 @@ gbmc_br_nft_update() {
   mkdir -p -m 755 "$(dirname "$rfile")"
   printf '%s' "$contents" >"$rfile"
 
-  echo 'Restarting nftables' >&2
-  systemctl reset-failed nftables
-  systemctl --no-block restart nftables
+  systemctl reset-failed nftables && systemctl --no-block reload-or-restart nftables || true
 }
 
 gbmc_br_nft_hook() {
