@@ -101,8 +101,8 @@ do_install() {
   install -m0755 ${WORKDIR}/gbmc-br-ensure-ra.sh ${D}${libexecdir}/
   install -m0755 ${WORKDIR}/gbmc-br-dhcp.sh ${D}${libexecdir}/
   install -d -m0755 ${D}${systemd_system_unitdir}
-  install -m0755 ${WORKDIR}/gbmc-br-ensure-ra.service ${D}${systemd_system_unitdir}/
-  install -m0755 ${WORKDIR}/gbmc-br-dhcp.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${WORKDIR}/gbmc-br-ensure-ra.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${WORKDIR}/gbmc-br-dhcp.service ${D}${systemd_system_unitdir}/
 }
 
 do_rm_work:prepend() {
