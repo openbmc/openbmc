@@ -21,7 +21,7 @@ DEPENDS += " \
   systemd \
   "
 
-SRC_URI = "git://github.com/openbmc/phosphor-sel-logger.git;protocol=git"
+SRC_URI = "git://github.com/openbmc/phosphor-sel-logger.git;protocol=https"
 SRCREV = "87e3fcf439f2b943272365e1d294984f39bb52b8"
 
 PV = "0.1+git${SRCPV}"
