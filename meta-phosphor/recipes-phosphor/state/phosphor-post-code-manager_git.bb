@@ -4,7 +4,7 @@ interface /xyz/openbmc_project/state/boot/raw by snoopd daemon and save them \
 in a file under /var/lib for history."
 
 SRC_URI = "git://github.com/openbmc/phosphor-post-code-manager.git"
-SRCREV = "84855abe9efea81f2ed8cf025892a7400edc9d74"
+SRCREV = "de8d3a537fec2e0b36791cc53aeb963fc746d1da"
 
 S = "${WORKDIR}/git"
 
