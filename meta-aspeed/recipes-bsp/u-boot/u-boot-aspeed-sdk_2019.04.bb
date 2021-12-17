@@ -20,6 +20,7 @@ SOCSEC_SIGN_ALGO ?= "RSA4096_SHA512"
 SOCSEC_SIGN_EXTRA_OPTS ?= "--stack_intersects_verification_region=false --rsa_key_order=big"
 
 inherit socsec-sign
+inherit otptool
 
 UBOOT_ENV_SIZE:df-phosphor-mmc = "0x10000"
 UBOOT_ENV:df-phosphor-mmc = "u-boot-env"

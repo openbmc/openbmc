@@ -60,9 +60,19 @@ sign_spl() {
     fi
 }
 
+verify_spl_otp() {
+    socsec verify \
+        --sec_image ${DEPLOYDIR}/${SPL_IMAGE} \
+        --otp_image ${DEPLOYDIR}/otp-all.image
+
+    if [ $? -ne 0 ]; then
+        bbfatal "Verified OTP image failed."
+    fi
+}
 
 do_deploy:append() {
     if [ "${SOCSEC_SIGN_ENABLE}" = "1" -a -n "${SPL_BINARY}" ] ; then
         sign_spl
+        verify_spl_otp
     fi
 }
