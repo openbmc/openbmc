@@ -17,7 +17,7 @@ SRC_URI += " \
 
 SOCSEC_SIGN_KEY ?= "${WORKDIR}/rsa_oem_dss_key.pem"
 SOCSEC_SIGN_ALGO ?= "RSA4096_SHA512"
-SOCSEC_SIGN_EXTRA_OPTS ?= "--stack_intersects_verification_region=false"
+SOCSEC_SIGN_EXTRA_OPTS ?= "--stack_intersects_verification_region=false --rsa_key_order=big"
 
 inherit socsec-sign
 

@@ -12,7 +12,9 @@ SOCSEC_SIGN_HELPER ?= ""
 # intersects the stack. The parameter below can be used to instruct
 # socsec to work in either mode (ommitting it throws a warning), but
 # newer (post v00.03.03) u-boot-aspeed-sdk need this set to false
-SOCSEC_SIGN_EXTRA_OPTS ?= "--stack_intersects_verification_region=false"
+# A1 rsa order is little endian and A3 is big endian
+# Set big endian for A3 support
+SOCSEC_SIGN_EXTRA_OPTS ?= "--stack_intersects_verification_region=false --rsa_key_order=big"
 DEPENDS += '${@oe.utils.conditional("SOCSEC_SIGN_ENABLE", "1", " socsec-native", "", d)}'
 
 
