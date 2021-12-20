@@ -17,7 +17,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = \
 
 # Include these useful utilities for all gbmc platforms
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " ipmitool"
-OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " iotools"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " lrzsz"
 
 # Add gBMC update recipes
