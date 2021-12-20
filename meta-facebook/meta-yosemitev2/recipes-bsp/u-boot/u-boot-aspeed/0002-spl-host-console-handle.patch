@@ -1,6 +1,6 @@
-From 9c5a3784a68a456cd22e63719917ed79873d0801 Mon Sep 17 00:00:00 2001
+From 99fdec9719987ce93e4582d31cb7d08c5beb51ef Mon Sep 17 00:00:00 2001
 From: Logananth Sundararaj <logananth.s@hcl.com>
-Date: Fri, 3 Dec 2021 16:37:58 +0530
+Date: Mon, 20 Dec 2021 16:51:22 +0530
 Subject: [PATCH] spl-host-console-handle
 
 This patch adds four 1S server console through debug card
@@ -52,13 +52,13 @@ Signed-off-by: Logananth Sundararaj <logananth.s@hcl.com>
  1 file changed, 61 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm/mach-aspeed/platform_g5.S b/arch/arm/mach-aspeed/platform_g5.S
-index e1c17ae4a3..798b9c4337 100644
+index f14b5acc6b..340d7b2b91 100644
 --- a/arch/arm/mach-aspeed/platform_g5.S
 +++ b/arch/arm/mach-aspeed/platform_g5.S
-@@ -315,6 +315,59 @@ TIME_TABLE_DDR4_1600:
-     str r1, [r0]
-     .endm
-
+@@ -315,6 +315,59 @@ orr r1, r1, #0xC
+ str r1, [r0]
+ .endm
+ 
 +  .macro console_slot1
 +  ldr r0, =0x1e780024
 +  ldr r1, [r0]
@@ -113,7 +113,7 @@ index e1c17ae4a3..798b9c4337 100644
 +
 +
  .macro console_sel
-
+ 
    // Disable SoL UARTs[1-4]
 @@ -354,28 +407,28 @@ dbg_card_pres\@:
    ldr r1, =0x00
