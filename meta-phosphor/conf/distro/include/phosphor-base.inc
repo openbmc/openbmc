@@ -125,6 +125,9 @@ IMAGE_INSTALL:append = " dbus-broker libnss-systemd"
 BAD_RECOMMENDATIONS += "udev-hwdb"
 BAD_RECOMMENDATIONS += "shared-mime-info"
 
+# e2fsprogs isn't needed on a BMC without MMC, where it gets explicitly added
+BAD_RECOMMENDATIONS += "e2fsprogs-e2fsck"
+
 LAYER_CONF_VERSION ?= "8"
 
 KERNEL_CLASSES:append = " obmc-phosphor-kernel-version"
