@@ -13,10 +13,12 @@ DEPENDS = "boost \
            dbus \
            nlohmann-json \
            sdbusplus \
-           valijson"
+           valijson \
+           ${PYTHON_PN}-jsonschema-native \
+"
 
 S = "${WORKDIR}/git"
-inherit pkgconfig meson systemd
+inherit pkgconfig meson systemd python3native
 
 EXTRA_OEMESON = "-Dtests=disabled"
 
