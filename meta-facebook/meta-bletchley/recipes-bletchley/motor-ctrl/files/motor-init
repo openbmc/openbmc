@@ -7,79 +7,42 @@
 
 export PATH=$PATH:/usr/libexec
 
-PWM_BASE_ADDR="0x1e61"
-DEV_FILE="/dev/mem"
+PWM_CLASS_PATH="/sys/class/pwm/pwmchip0"
+#Sleld 0~5 using bmc pwm8~13 as motor driver stick
+PWM_NUM_OFFSET=8
+PWM_PERIOD=2500000 #400HZ
+PWM_DUTY=250000    #PWM_PERIOD X 10%
 CALIBRATE_TIMEOUT=120
-
-#Get pwm register address for sledN
-function get_pwm_offset() {
-  local offset=0
-  case $1 in
-    0)
-      offset="0080"
-    ;;
-    1)
-      offset="0090"
-    ;;
-    2)
-      offset="00a0"
-    ;;
-    3)
-      offset="00b0"
-    ;;
-    4)
-      offset="00c0"
-    ;;
-    5)
-      offset="00d0"
-    ;;
-  esac
-
-  echo ${PWM_BASE_ADDR}${offset}
-}
-
-#Get pwm duty register address for sledN
-function get_duty_offset() {
-  local offset=0
-  case $1 in
-    0)
-      offset="0084"
-    ;;
-    1)
-      offset="0094"
-    ;;
-    2)
-      offset="00a4"
-    ;;
-    3)
-      offset="00b4"
-    ;;
-    4)
-      offset="00c4"
-    ;;
-    5)
-      offset="00d4"
-    ;;
-  esac
-
-  echo ${PWM_BASE_ADDR}${offset}
-}
 
 #Enable pwm for sledN
 function open_pwm() {
     local SLED_NUM="$1"
     echo "Open pwm of sled$SLED_NUM"
-    #enable BMC PWM
-    if [ ! -c "$DEV_FILE" ]; then
-       mknod /dev/mem c 1 1
+    PWM_NUM=$(( SLED_NUM + PWM_NUM_OFFSET ))
+    PWM_PATH="${PWM_CLASS_PATH}/pwm${PWM_NUM}"
+    if [ ! -d "$PWM_PATH" ];then
+        echo "$PWM_NUM" > "${PWM_CLASS_PATH}/export"
     fi
+    if [ -d "$PWM_PATH" ];then
+        echo "set pwm period to $PWM_PERIOD ns"
+        if ! echo "$PWM_PERIOD" > "${PWM_PATH}/period"; then
+            echo "Error: set pwm period fail"
+            return 1
+        fi
 
-    PWM_OFFSET=$(get_pwm_offset "$SLED_NUM")
-    DUTY_OFFSET=$(get_duty_offset "$SLED_NUM")
-    echo "setting ${PWM_OFFSET} to 0x000113F3"
-    echo "setting ${DUTY_OFFSET} to 0xFF006400"
-    devmem "$PWM_OFFSET"  32 0x000113F3
-    devmem "$DUTY_OFFSET" 32 0xFF006400
+        if ! echo 1 > "${PWM_PATH}/enable"; then
+            echo "Error: set pwm enable fail"
+            return 1
+        fi
+
+        if ! echo "$PWM_DUTY" > "${PWM_PATH}/duty_cycle"; then
+            echo "Error: set pwm duty_cycle fail"
+            return 1
+        fi
+    else
+        echo "Error: ${PWM_PATH} not exist, export pwm${PWM_NUM} fail"
+        return 1
+    fi
 }
 
 function set_gpio()

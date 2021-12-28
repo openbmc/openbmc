@@ -28,7 +28,7 @@ function wait_for_switch() {
 
 function trigger_power_button() {
     local sled_num=$1
-    local  delay_time=$2
+    local delay_time=$2
 
     #SLED{N}_MS_DETECT1  (initial position)
     GPIO_DETECT_PIN1="SLED${sled_num}_MS_DETECT1"
@@ -45,7 +45,7 @@ function trigger_power_button() {
         echo "Press power key for Sled${1} ${delay_time} seconds..."
         sleep "$delay_time"
     else
-        echo "Power key switch not trigger, back motor to initail position"
+        echo "Power key switch not trigger, back motor to initial position"
     fi
 
     motor-ctrl "sled${sled_num}" r >/dev/null
@@ -54,7 +54,7 @@ function trigger_power_button() {
     if [ "$(get_gpio  "$GPIO_DETECT_PIN1")" -eq 0 ];then
         echo "Motor reverse to initial position successful"
     else
-        echo "Initail position switch not trigger, force stop motor"
+        echo "Initial position switch not trigger, force stop motor"
     fi
 }
 
