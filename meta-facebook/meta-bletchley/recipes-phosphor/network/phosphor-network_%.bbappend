@@ -1,7 +1,9 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 PACKAGECONFIG:append = " sync-mac"
-SRC_URI:append = " file://config.json "
+SRC_URI += " \
+    file://config.json \
+    "
 FILES:${PN} += "${datadir}/network/*.json"
 
 do_install:append() {
