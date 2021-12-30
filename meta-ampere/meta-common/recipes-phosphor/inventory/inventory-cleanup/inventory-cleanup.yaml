@@ -1,5 +1,5 @@
 description: >
-    Mt.Jade inventory fixups
+   Ampere inventory fixups
 
 events:
     - name: Add Chassis interface
