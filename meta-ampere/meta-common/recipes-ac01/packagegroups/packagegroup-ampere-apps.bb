@@ -26,7 +26,6 @@ RDEPENDS:${PN}-chassis = " \
         phosphor-hostlogger \
         phosphor-sel-logger \
         phosphor-logging \
-        virtual/obmc-gpio-presence \
         "
 
 SUMMARY:${PN}-system = "Ampere System"
