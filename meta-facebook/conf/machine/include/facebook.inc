@@ -15,6 +15,7 @@ PREFERRED_PROVIDER_virtual/obmc-inventory-data ?= "${VIRTUAL-RUNTIME_skeleton_wo
 PREFERRED_PROVIDER_virtual/obmc-system-mgmt = "packagegroup-fb-apps"
 
 IMAGE_FEATURES:remove = "obmc-ikvm"
+IMAGE_FEATURES:append = " allow-root-login"
 
 # Most of our hardware uses the default ttyS4 but at 57600.
 SERIAL_CONSOLES:facebook = "57600;ttyS4"
