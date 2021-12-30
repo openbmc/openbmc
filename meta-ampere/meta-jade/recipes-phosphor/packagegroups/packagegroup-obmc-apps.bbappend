@@ -6,6 +6,7 @@ RDEPENDS:${PN}-extras:append:mtjade = " \
                                        fault-monitor \
                                        id-button \
                                        psu-hotswap-reset \
+                                       tempevent-monitor \
                                       "
 
 RDEPENDS:${PN}-inventory:append:mtjade = " \

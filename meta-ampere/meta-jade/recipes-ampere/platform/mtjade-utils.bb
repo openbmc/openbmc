@@ -9,6 +9,7 @@ SRC_URI = " \
           file://gpio-lib.sh \
           file://ampere_power_util.sh \
           file://ampere_host_check.sh \
+          file://ampere_add_redfishevent.sh \
           "
 
 RDEPENDS:${PN} = "bash"
@@ -19,4 +20,5 @@ do_install() {
     install -m 0755 ${WORKDIR}/gpio-defs.sh ${D}/${sbindir}/
     install -m 0755 ${WORKDIR}/ampere_power_util.sh ${D}/${sbindir}/
     install -m 0755 ${WORKDIR}/ampere_host_check.sh ${D}/${sbindir}/
+    install -m 0755 ${WORKDIR}/ampere_add_redfishevent.sh ${D}/${sbindir}/
 }
