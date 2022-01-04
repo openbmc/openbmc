@@ -1,0 +1,106 @@
+[
+    {
+        "Desc":
+        {
+            "Name": "Virtual_CFM_Sensor",
+            "SensorType": "airflow"
+        },
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "fan0",
+                    "Desc":
+                    {
+                        "Name": "FAN0_TACH_IL",
+                        "SensorType": "fan_tach"
+                    }
+                },
+                {
+                    "ParamName": "fan1",
+                    "Desc":
+                    {
+                        "Name": "FAN1_TACH_IL",
+                        "SensorType": "fan_tach"
+                    }
+                },
+                {
+                    "ParamName": "fan2",
+                    "Desc":
+                    {
+                        "Name": "FAN2_TACH_IL",
+                        "SensorType": "fan_tach"
+                    }
+                },
+                {
+                    "ParamName": "fan3",
+                    "Desc":
+                    {
+                        "Name": "FAN3_TACH_IL",
+                        "SensorType": "fan_tach"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(0, (avg(fan0, fan1, fan2, fan3) * 0.0478) - 11.467)"
+    },
+    {
+        "Desc":
+        {
+            "Name": "Virtual_Inlet_Temp",
+            "SensorType": "temperature"
+        },
+        "Threshold":{
+            "CriticalHigh": 40,
+            "CriticalLow": 0
+        },
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "inlet_temp",
+                    "Desc":
+                    {
+                        "Name": "FRONT_PANEL_TEMP",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "fan0",
+                    "Desc":
+                    {
+                        "Name": "FAN0_TACH_IL",
+                        "SensorType": "fan_tach"
+                    }
+                },
+                {
+                    "ParamName": "fan1",
+                    "Desc":
+                    {
+                        "Name": "FAN1_TACH_IL",
+                        "SensorType": "fan_tach"
+                    }
+                },
+                {
+                    "ParamName": "fan2",
+                    "Desc":
+                    {
+                        "Name": "FAN2_TACH_IL",
+                        "SensorType": "fan_tach"
+                    }
+                },
+                {
+                    "ParamName": "fan3",
+                    "Desc":
+                    {
+                        "Name": "FAN3_TACH_IL",
+                        "SensorType": "fan_tach"
+                    }
+                }
+            ]
+        },
+        "Expression": "if(avg(fan0, fan1, fan2, fan3) > 0, inlet_temp - (((avg(fan0, fan1, fan2, fan3)^2) * (5e-8)) - (avg(fan0, fan1, fan2, fan3) * (6e-4)) + 1.5841), inlet_temp)"
+    }
+]
