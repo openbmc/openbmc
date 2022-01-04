@@ -8,8 +8,8 @@
 export PATH=$PATH:/usr/libexec
 
 PWM_CLASS_PATH="/sys/class/pwm/pwmchip0"
-#Sleld 0~5 using bmc pwm8~13 as motor driver stick
-PWM_NUM_OFFSET=8
+#Sleld 1~6 using bmc pwm8~13 as motor driver stick
+PWM_NUM_OFFSET=7
 PWM_PERIOD=2500000 #400HZ
 PWM_DUTY=250000    #PWM_PERIOD X 10%
 CALIBRATE_TIMEOUT=120
@@ -97,7 +97,7 @@ function init_gpios() {
     done
 }
 
-if [[ "$1" =~ ^(slot[0-5]{1})$ ]] || [[ "$1" =~ ^(sled[0-5]{1})$ ]]; then
+if [[ "$1" =~ ^(sled[1-6]{1})$ ]]; then
   SLED=$1
   SLED_NUM=${SLED:4}
 else
