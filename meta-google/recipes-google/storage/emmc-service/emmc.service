@@ -1,0 +1,10 @@
+[Unit]
+Description=Storage management daemon for eMMC
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/eStoraged -b /dev/mmcblk0
+
+[Install]
+WantedBy=multi-user.target
