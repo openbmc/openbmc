@@ -11,6 +11,7 @@ inherit systemd
 DEPENDS += "systemd"
 RDEPENDS:${PN} += "libsystemd"
 RDEPENDS:${PN} += "bash"
+RDEPENDS:${PN} += "iotools"
 
 SRC_URI +=  "file://init_once.sh \
              file://nvme_powermanager.sh \
