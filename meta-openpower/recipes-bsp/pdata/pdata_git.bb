@@ -13,7 +13,7 @@ inherit autotools \
         perlnative
 
 SRC_URI = "git://git@github.com/open-power/pdata;branch="main""
-SRCREV = "b2c92eff169e96a67db516f3ea29a4e9d601d89d"
+SRCREV = "c8d2d1cd7c08e960ad2786896c7d58001aca6635"
 
 DEPENDS = "pdbg \
            libxml-simple-perl-native \
