@@ -24,8 +24,6 @@ RDEPENDS:${PN}-flash = " \
 SUMMARY:${PN}-system = "ASRock System"
 RDEPENDS:${PN}-system = " \
 	bmcweb \
-	entity-manager \
-	dbus-sensors \
 	webui-vue \
 	phosphor-host-postd \
 	phosphor-ipmi-kcs \
