@@ -20,6 +20,23 @@ function set_gpio()
     return 0
 }
 
+function get_gpio()
+{
+    NET_NAME=$1
+    RET_VAL=2
+
+    mapfile -t -d " " GPIO_INFO < <(gpiofind "$NET_NAME")
+    if [ "${#GPIO_INFO[@]}" -ne 2 ]; then
+        echo "get_gpio: can not find gpio, $NET_NAME" >&2
+        return 1
+    fi
+    if ! RET_VAL=$(gpioget "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}") ; then
+        echo "get_gpio: get ${NET_NAME} failed" >&2
+        return 1
+    fi
+    echo "${RET_VAL}"
+    return 0
+}
 #######################################
 # Setting step motor control pins to start/stop motor
 # Arguments:
@@ -59,6 +76,13 @@ if [[ "$1" =~ ^(sled[1-6]{1})$ ]]; then
 else
      echo "invalid sled name: $1"
     exit 1;
+fi
+
+#Check if sled is present
+SLED_PRESENT=$(get_gpio "presence-sled${SLED_NUM}")
+if [ "$SLED_PRESENT" != 0 ];then
+    echo "${SLED} is not present!"
+    exit 1
 fi
 
 if [[ "$ACTION" == "s" ]]; then

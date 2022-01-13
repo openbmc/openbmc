@@ -1,11 +1,16 @@
 [Unit]
 Description=Motor Initialize for sled%i
+StartLimitIntervalSec=90
+StartLimitBurst=5
 
 [Service]
 ExecStart=/usr/libexec/motor-init sled%i
 SyslogIdentifier=Motor Initialize sled%i
 Type=oneshot
 RemainAfterExit=yes
+ExecStopPost=/usr/libexec/motor-ctrl sled%i s
+Restart=on-failure
+RestartSec=1
 
 [Install]
 WantedBy=multi-user.target
