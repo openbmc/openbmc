@@ -93,7 +93,7 @@ TMPL_CONTROL = "phosphor-fan-control@.service"
 INSTFMT_CONTROL = "phosphor-fan-control@{0}.service"
 FMT_CONTROL = "../${TMPL_CONTROL}:${FAN_CONTROL_TGT}.requires/${INSTFMT_CONTROL}"
 FMT_CONTROL_MUSR = "../${TMPL_CONTROL}:${MULTI_USR_TGT}.wants/${INSTFMT_CONTROL}"
-FMT_CONTROL_PWRON = "../${TMPL_CONTROL}:${POWERON_TGT}.requires/${INSTFMT_CONTROL}"
+FMT_CONTROL_PWRON = "../${TMPL_CONTROL}:${POWERON_TGT}.wants/${INSTFMT_CONTROL}"
 
 TMPL_CONTROL_INIT = "phosphor-fan-control-init@.service"
 INSTFMT_CONTROL_INIT = "phosphor-fan-control-init@{0}.service"
@@ -130,7 +130,7 @@ PACKAGECONFIG[monitor] = "--enable-monitor \
 TMPL_MONITOR = "phosphor-fan-monitor@.service"
 INSTFMT_MONITOR = "phosphor-fan-monitor@{0}.service"
 FMT_MONITOR_FANSREADY = "../${TMPL_MONITOR}:${FAN_CONTROL_TGT}.requires/${INSTFMT_MONITOR}"
-FMT_MONITOR_PWRON = "../${TMPL_MONITOR}:${POWERON_TGT}.requires/${INSTFMT_MONITOR}"
+FMT_MONITOR_PWRON = "../${TMPL_MONITOR}:${POWERON_TGT}.wants/${INSTFMT_MONITOR}"
 FMT_MONITOR_MUSR = "../${TMPL_MONITOR}:${MULTI_USR_TGT}.wants/${INSTFMT_MONITOR}"
 
 TMPL_MONITOR_INIT = "phosphor-fan-monitor-init@.service"
