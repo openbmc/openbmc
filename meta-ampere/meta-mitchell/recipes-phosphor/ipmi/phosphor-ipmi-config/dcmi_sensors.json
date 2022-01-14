@@ -15,6 +15,10 @@
 		{"instance": 6, "dbus": "/xyz/openbmc_project/sensors/temperature/AST2600CPUTemp", "record_id": 10}
 	],
 	"cpu": [
+		{ "instance": 8, "dbus": "/xyz/openbmc_project/sensors/temperature/S0_SOC_Pkg_Temp", "record_id": 159 },
+		{ "instance": 9, "dbus": "/xyz/openbmc_project/sensors/temperature/S0_ThrotOff_Temp", "record_id": 160 },
+		{ "instance": 11, "dbus": "/xyz/openbmc_project/sensors/temperature/S1_SOC_Pkg_Temp", "record_id": 215 },
+		{ "instance": 12, "dbus": "/xyz/openbmc_project/sensors/temperature/S1_ThrotOff_Temp", "record_id": 216 },
 		{ "instance": 13, "dbus": "/xyz/openbmc_project/sensors/temperature/S0_THDIODE_Temp", "record_id": 250 },
 		{ "instance": 14, "dbus": "/xyz/openbmc_project/sensors/temperature/S1_THDIODE_Temp", "record_id": 251 }
 	]

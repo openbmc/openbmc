@@ -447,6 +447,12 @@
             0xFF:
               type: double
 
+124:
+    <<: *VOLTAGE_DEFAULTS
+    entityInstance: 52
+    multiplierM: 10
+    path: /xyz/openbmc_project/sensors/voltage/S0_PCP_VR_Volt
+
 129: &current
     sensorType: 0x03
     path: /xyz/openbmc_project/sensors/current/S0_SOC_VR_Cur
@@ -467,6 +473,685 @@
             0xFF:
               type: double
 
+105:
+    <<: *power
+    entityID: 0x20
+    entityInstance: 1
+    multiplierM: 0xC8
+    path: /xyz/openbmc_project/sensors/power/S0_DRAM_Power
+106:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 2
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM0_Temp
+107:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 3
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM1_Temp
+108:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 4
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM2_Temp
+109:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 5
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM3_Temp
+110:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 6
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM4_Temp
+111:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 7
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM5_Temp
+112:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 8
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM6_Temp
+113:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 9
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM7_Temp
+114:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 10
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM8_Temp
+115:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 11
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM9_Temp
+116:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 12
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM10_Temp
+117:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 13
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM11_Temp
+118:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 14
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM12_Temp
+119:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 15
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM13_Temp
+120:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 16
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM14_Temp
+121:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 17
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMM15_Temp
+
+126:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 54
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_SOC_VR_Temp
+127:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 55
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S0_SOC_VR_Pwr
+128:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 56
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S0_SOC_VR_Volt
+125:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 53
+    multiplierM: 0xC8
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/current/S0_PCP_VR_Cur
+
+
+130:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 58
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DPHY_VR1_Temp
+131:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 59
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S0_DPHY_VR1_Pwr
+132:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 60
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S0_DPHY_VR1_Volt
+133:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 61
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/current/S0_DPHY_VR1_Cur
+
+134:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 62
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_DPHY_VR2_Temp
+135:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 63
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S0_DPHY_VR2_Pwr
+136:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 64
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S0_DPHY_VR2_Volt
+137:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 65
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/current/S0_DPHY_VR2_Cur
+
+138:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 66
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_D2D_VR_Temp
+139:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 67
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S0_D2D_VR_Pwr
+140:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 68
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S0_D2D_VR_Volt
+141:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 69
+    multiplierM: 0x7D
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/current/S0_D2D_VR_Cur
+
+142:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 70
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_IOC_VR1_Temp
+143:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 71
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S0_IOC_VR1_Pwr
+144:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 72
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S0_IOC_VR1_Volt
+145:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 73
+    multiplierM: 0x10
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/current/S0_IOC_VR1_Cur
+
+146:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 74
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_IOC_VR2_Temp
+147:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 75
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S0_IOC_VR2_Pwr
+148:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 76
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S0_IOC_VR2_Volt
+149:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 77
+    multiplierM: 0x10
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/current/S0_IOC_VR2_Cur
+
+150:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 78
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_PCI_D_VR_Temp
+151:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 79
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S0_PCI_D_VR_Pwr
+152:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 80
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S0_PCI_D_VR_Volt
+153:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 81
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/current/S0_PCI_D_VR_Cur
+
+154:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 82
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_PCI_A_VR_Temp
+155:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 83
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S0_PCI_A_VR_Pwr
+156:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 84
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S0_PCI_A_VR_Volt
+157:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 85
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/current/S0_PCI_A_VR_Cur
+
+158:
+    <<: *power
+    entityID: 0x3
+    entityInstance: 7
+    multiplierM: 0xC8
+    path: /xyz/openbmc_project/sensors/power/S0_SOC_Pkg_Pwr
+159:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x3
+    entityInstance: 8
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_SOC_Pkg_Temp
+160:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x3
+    entityInstance: 9
+    multiplierM: 1
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/S0_ThrotOff_Temp
+
+161:
+    <<: *power
+    entityID: 0x20
+    entityInstance: 18
+    multiplierM: 0xC8
+    path: /xyz/openbmc_project/sensors/power/S1_DRAM_Power
+162:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 19
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM0_Temp
+163:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 20
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM1_Temp
+164:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 21
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM2_Temp
+165:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 22
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM3_Temp
+166:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 23
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM4_Temp
+167:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 24
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM5_Temp
+168:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 25
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM6_Temp
+169:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 26
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM7_Temp
+170:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 27
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM8_Temp
+171:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 28
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM9_Temp
+172:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 29
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM10_Temp
+173:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 30
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM11_Temp
+174:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 31
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM12_Temp
+175:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 32
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM13_Temp
+176:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 33
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM14_Temp
+177:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 34
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMM15_Temp
+
+178:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 86
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_PCP_VR_Temp
+179:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 87
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S1_PCP_VR_Pwr
+180:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 88
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S1_PCP_VR_Volt
+181:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 89
+    multiplierM: 0xC8
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/current/S1_PCP_VR_Cur
+
+182:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 90
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_SOC_VR_Temp
+183:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 91
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S1_SOC_VR_Pwr
+184:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 92
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S1_SOC_VR_Volt
+185:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 93
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/current/S1_SOC_VR_Cur
+
+186:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 94
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DPHY_VR1_Temp
+187:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 95
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S1_DPHY_VR1_Pwr
+188:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 96
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S1_DPHY_VR1_Volt
+189:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 97
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/current/S1_DPHY_VR1_Cur
+
+190:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 98
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_DPHY_VR2_Temp
+191:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 99
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S1_DPHY_VR2_Pwr
+192:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 100
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S1_DPHY_VR2_Volt
+193:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 101
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/current/S1_DPHY_VR2_Cur
+
+194:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 102
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_D2D_VR_Temp
+195:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 103
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S1_D2D_VR_Pwr
+196:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 104
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S1_D2D_VR_Volt
+197:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 105
+    multiplierM: 0x7D
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/current/S1_D2D_VR_Cur
+
+198:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 106
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_IOC_VR1_Temp
+199:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 107
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S1_IOC_VR1_Pwr
+200:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 108
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S1_IOC_VR1_Volt
+201:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 109
+    multiplierM: 0x10
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/current/S1_IOC_VR1_Cur
+
+202:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 110
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_IOC_VR2_Temp
+203:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 111
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S1_IOC_VR2_Pwr
+204:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 112
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S1_IOC_VR2_Volt
+205:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 113
+    multiplierM: 0x10
+    rExp: -2
+    path: /xyz/openbmc_project/sensors/current/S1_IOC_VR2_Cur
+
+206:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 114
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_PCI_D_VR_Temp
+207:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 115
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S1_PCI_D_VR_Pwr
+208:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 116
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S1_PCI_D_VR_Volt
+209:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 117
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/current/S1_PCI_D_VR_Cur
+
+210:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x13
+    entityInstance: 118
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_PCI_A_VR_Temp
+211:
+    <<: *power
+    entityID: 0x13
+    entityInstance: 119
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/power/S1_PCI_A_VR_Pwr
+212:
+    <<: *VOLTAGE_DEFAULTS
+    entityID: 0x13
+    entityInstance: 120
+    multiplierM: 0x32
+    path: /xyz/openbmc_project/sensors/voltage/S1_PCI_A_VR_Volt
+213:
+    <<: *current
+    entityID: 0x13
+    entityInstance: 121
+    multiplierM: 0x50
+    path: /xyz/openbmc_project/sensors/current/S1_PCI_A_VR_Cur
+
+214:
+    <<: *power
+    entityID: 0x3
+    entityInstance: 10
+    multiplierM: 0xC8
+    path: /xyz/openbmc_project/sensors/power/S1_SOC_Pkg_Pwr
+215:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x3
+    entityInstance: 11
+    multiplierM: 1
+    path: /xyz/openbmc_project/sensors/temperature/S1_SOC_Pkg_Temp
+216:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x3
+    entityInstance: 12
+    multiplierM: 1
+    offsetB: -127
+    path: /xyz/openbmc_project/sensors/temperature/S1_ThrotOff_Temp
 230:
     <<: *VOLTAGE_DEFAULTS
     entityInstance: 74
@@ -569,3 +1254,103 @@
     entityID: 3
     entityInstance: 14
     path: /xyz/openbmc_project/sensors/temperature/S1_THDIODE_Temp
+217:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 1
+    path: /xyz/openbmc_project/sensors/temperature/S0_Die_0_Temp
+218:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 2
+    path: /xyz/openbmc_project/sensors/temperature/S0_Die_1_Temp
+219:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 3
+    path: /xyz/openbmc_project/sensors/temperature/S0_Die_2_Temp
+220:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 4
+    path: /xyz/openbmc_project/sensors/temperature/S0_Die_3_Temp
+221:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 5
+    path: /xyz/openbmc_project/sensors/temperature/S0_Die_4_Temp
+222:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 6
+    path: /xyz/openbmc_project/sensors/temperature/S0_Die_5_Temp
+223:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 7
+    path: /xyz/openbmc_project/sensors/temperature/S0_Die_6_Temp
+224:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 8
+    path: /xyz/openbmc_project/sensors/temperature/S0_Die_7_Temp
+225:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 9
+    path: /xyz/openbmc_project/sensors/temperature/S0_Die_8_Temp
+226:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 35
+    path: /xyz/openbmc_project/sensors/temperature/S0_DIMMG0_Temp
+227:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x20
+    entityInstance: 36
+    path: /xyz/openbmc_project/sensors/temperature/S1_DIMMG0_Temp
+30:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 10
+    path: /xyz/openbmc_project/sensors/temperature/S1_Die_0_Temp
+31:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 11
+    path: /xyz/openbmc_project/sensors/temperature/S1_Die_1_Temp
+32:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 12
+    path: /xyz/openbmc_project/sensors/temperature/S1_Die_2_Temp
+33:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 13
+    path: /xyz/openbmc_project/sensors/temperature/S1_Die_3_Temp
+34:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 14
+    path: /xyz/openbmc_project/sensors/temperature/S1_Die_4_Temp
+35:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 15
+    path: /xyz/openbmc_project/sensors/temperature/S1_Die_5_Temp
+36:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 16
+    path: /xyz/openbmc_project/sensors/temperature/S1_Die_6_Temp
+37:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 17
+    path: /xyz/openbmc_project/sensors/temperature/S1_Die_7_Temp
+38:
+    <<: *TEMP_DEFAULTS
+    entityID: 0x2d
+    entityInstance: 18
+    path: /xyz/openbmc_project/sensors/temperature/S1_Die_8_Temp
