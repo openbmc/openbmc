@@ -33,3 +33,6 @@ RDEPENDS:${PN} += "openpower-libhei"
 PACKAGECONFIG ??= "${@bb.utils.filter('MACHINE_FEATURES', 'phal', d)}"
 PACKAGECONFIG[phal] = "-Dphal=enabled, -Dphal=disabled, ipl pdata"
 
+# Don't build CI tests
+EXTRA_OEMESON = "-Dtests=disabled"
+

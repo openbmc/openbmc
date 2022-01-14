@@ -18,3 +18,6 @@ inherit perlnative
 
 DEPENDS = "libxml2-native libxml-simple-perl-native libjson-perl-native"
 
+# Don't build CI tests
+EXTRA_OEMESON = "-Dtests=disabled"
+
