@@ -6,6 +6,7 @@ Conflicts=obmc-fan-watchdog-takeover.target
 
 [Service]
 EnvironmentFile={envfiledir}/obmc/fan-watchdog/fan-watchdog.conf
+ExecStartPre=/bin/sh -c "echo V > ${{DEVICE}}"
 ExecStart=/sbin/watchdog -T ${{TIMEOUT}} -t ${{INTERVAL}} -F ${{DEVICE}}
 KillSignal=SIGKILL
 
