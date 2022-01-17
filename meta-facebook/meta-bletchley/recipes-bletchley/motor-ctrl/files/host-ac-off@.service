@@ -1,0 +1,7 @@
+[Unit]
+Description=Turn off AC at Sled%i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/power-ctrl sled%i ac-off
+SyslogIdentifier=power-ctrl

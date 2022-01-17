@@ -26,6 +26,8 @@ do_install() {
 MOTOR_INIT_INSTFMT= "motor-init-calibration@{0}.service"
 PWR_ON_INSTFMT="host-poweron@.service:host-poweron@{0}.service"
 PWR_OFF_INSTFMT="host-poweroff@.service:host-poweroff@{0}.service"
+AC_ON_INSTFMT="host-ac-on@{0}.service"
+AC_OFF_INSTFMT="host-ac-off@.service:host-ac-off@{0}.service"
 
 SYSTEMD_SERVICE:${PN} ="${@compose_list(d, 'MOTOR_INIT_INSTFMT', 'OBMC_HOST_INSTANCES')}"
 FILES:${PN}  += "${systemd_system_unitdir}/motor-init-calibration@.service"
@@ -35,3 +37,9 @@ SYSTEMD_LINK:${PN} += "${@compose_list(d, 'PWR_ON_INSTFMT', 'OBMC_HOST_INSTANCES
 
 SYSTEMD_SERVICE:${PN} +="host-poweroff@.service"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'PWR_OFF_INSTFMT', 'OBMC_HOST_INSTANCES')}"
+
+SYSTEMD_SERVICE:${PN} +="${@compose_list(d, 'AC_ON_INSTFMT', 'OBMC_HOST_INSTANCES')}"
+FILES:${PN}  += "${systemd_system_unitdir}/host-ac-#@.service"
+
+SYSTEMD_SERVICE:${PN} +="host-ac-off@.service"
+SYSTEMD_LINK:${PN} += "${@compose_list(d, 'AC_OFF_INSTFMT', 'OBMC_HOST_INSTANCES')}"
