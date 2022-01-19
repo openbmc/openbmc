@@ -14,13 +14,16 @@ table inet filter {
     chain gbmc_br_pub_input {
     }
     chain ncsi_legacy_input {
-        jump ncsi_brd_input
+        jump ncsi_any_input
         tcp dport 3959 accept
         udp dport 3959 accept
         tcp dport 3967 accept
         udp dport 3967 accept
     }
     chain ncsi_brd_input {
+        jump ncsi_any_input
+    }
+    chain ncsi_any_input {
         icmpv6 type nd-neighbor-advert accept
         icmpv6 type nd-neighbor-solicit accept
         icmpv6 type nd-router-advert accept
