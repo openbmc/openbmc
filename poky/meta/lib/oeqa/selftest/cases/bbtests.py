@@ -163,7 +163,7 @@ SSTATE_DIR = \"${TOPDIR}/download-selftest\"
 """)
         self.track_for_cleanup(os.path.join(self.builddir, "download-selftest"))
 
-        data = 'SRC_URI = "${GNU_MIRROR}/aspell/aspell-${PV}.tar.gz;downloadfilename=test-aspell.tar.gz"'
+        data = 'SRC_URI = "https://downloads.yoctoproject.org/mirror/sources/aspell-${PV}.tar.gz;downloadfilename=test-aspell.tar.gz"'
         self.write_recipeinc('aspell', data)
         result = bitbake('-f -c fetch aspell', ignore_status=True)
         self.delete_recipeinc('aspell')
@@ -300,3 +300,18 @@ INHERIT:remove = \"report-error\"
 
         test_recipe_summary_after = get_bb_var('SUMMARY', test_recipe)
         self.assertEqual(expected_recipe_summary, test_recipe_summary_after)
+
+    def test_git_patchtool(self):
+        """ PATCHTOOL=git should work with non-git sources like tarballs
+            test recipe for the test must NOT containt git:// repository in SRC_URI
+        """
+        test_recipe = "man-db"
+        self.write_recipeinc(test_recipe, 'PATCHTOOL=\"git\"')
+        src = get_bb_var("SRC_URI",test_recipe)
+        gitscm = re.search("git://", src)
+        self.assertFalse(gitscm, "test_git_patchtool pre-condition failed: {} test recipe contains git repo!".format(test_recipe))
+        result = bitbake('man-db -c patch', ignore_status=False)
+        fatal = re.search("fatal: not a git repository (or any of the parent directories)", result.output)
+        self.assertFalse(fatal, "Failed to patch using PATCHTOOL=\"git\"")
+        self.delete_recipeinc(test_recipe)
+        bitbake('-cclean man-db')

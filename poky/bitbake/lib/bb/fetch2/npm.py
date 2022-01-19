@@ -72,23 +72,19 @@ def npm_unpack(tarball, destdir, d):
     cmd += " --delay-directory-restore"
     cmd += " --strip-components=1"
     runfetchcmd(cmd, d, workdir=destdir)
-    runfetchcmd("chmod -R +X %s" % (destdir), d, quiet=True, workdir=destdir)
+    runfetchcmd("chmod -R +X '%s'" % (destdir), d, quiet=True, workdir=destdir)
 
 class NpmEnvironment(object):
     """
     Using a npm config file seems more reliable than using cli arguments.
     This class allows to create a controlled environment for npm commands.
     """
-    def __init__(self, d, configs=None, npmrc=None):
+    def __init__(self, d, configs=[], npmrc=None):
         self.d = d
 
-        if configs:
-            self.user_config = tempfile.NamedTemporaryFile(mode="w", buffering=1)
-            self.user_config_name = self.user_config.name
-            for key, value in configs:
-                self.user_config.write("%s=%s\n" % (key, value))
-        else:
-            self.user_config_name = "/dev/null"
+        self.user_config = tempfile.NamedTemporaryFile(mode="w", buffering=1)
+        for key, value in configs:
+            self.user_config.write("%s=%s\n" % (key, value))
 
         if npmrc:
             self.global_config_name = npmrc
@@ -109,7 +105,7 @@ class NpmEnvironment(object):
                 workdir = tmpdir
 
             def _run(cmd):
-                cmd = "NPM_CONFIG_USERCONFIG=%s " % (self.user_config_name) + cmd
+                cmd = "NPM_CONFIG_USERCONFIG=%s " % (self.user_config.name) + cmd
                 cmd = "NPM_CONFIG_GLOBALCONFIG=%s " % (self.global_config_name) + cmd
                 return runfetchcmd(cmd, d, workdir=workdir)
 

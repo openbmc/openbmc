@@ -17,6 +17,7 @@ SRC_URI = "http://www.openssl.org/source/openssl-${PV}.tar.gz \
            file://0001-buildinfo-strip-sysroot-and-debug-prefix-map-from-co.patch \
            file://afalg.patch \
            file://reproducible.patch \
+           file://reproducibility.patch \
            "
 
 SRC_URI:append:class-nativesdk = " \

@@ -23,12 +23,18 @@ SRC_URI = "git://github.com/vim/vim.git;branch=master;protocol=https \
            file://0003-patch-8.2.3487-illegal-memory-access-if-buffer-name-.patch \
            file://0004-patch-8.2.3489-ml_get-error-after-search-with-range.patch \
            file://0005-patch-8.2.3564-invalid-memory-access-when-scrolling-.patch \
+           file://0001-patch-8.2.3581-reading-character-past-end-of-line.patch \
+           file://0002-patch-8.2.3582-reading-uninitialized-memory-when-giv.patch \
+           file://0002-patch-8.2.3611-crash-when-using-CTRL-W-f-without-fin.patch \
            "
 
 SRCREV = "98056533b96b6b5d8849641de93185dd7bcadc44"
 
 # Do not consider .z in x.y.z, as that is updated with every commit
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.\d+)\.0"
+
+# CVE-2021-3968 is related to an issue which was introduced after 8.2, this can be removed after 8.3.
+CVE_CHECK_WHITELIST += "CVE-2021-3968"
 
 S = "${WORKDIR}/git"
 

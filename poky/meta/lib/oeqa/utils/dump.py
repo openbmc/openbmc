@@ -134,4 +134,4 @@ class MonitorDumper(BaseDumper):
                     output = self.runner.run_monitor(cmd_name)
                 self._write_dump(cmd_name, output)
             except Exception as e:
-                print("Failed to dump QMP CMD: %s with\nExecption: %s" % (cmd_name, e))
+                print("Failed to dump QMP CMD: %s with\nException: %s" % (cmd_name, e))

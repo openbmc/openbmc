@@ -2,7 +2,7 @@ SUMMARY = "A graphic library for file loading, saving, rendering, and manipulati
 
 HOMEPAGE = "https://sourceforge.net/projects/enlightenment/"
 SECTION = "libs"
-LICENSE = "MIT & BSD"
+LICENSE = "Imlib2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=344895f253c32f38e182dcaf30fe8a35"
 
 DEPENDS = "freetype "

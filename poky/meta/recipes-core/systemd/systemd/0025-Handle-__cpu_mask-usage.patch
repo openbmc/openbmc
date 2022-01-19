@@ -1,4 +1,4 @@
-From b04518c464b526f8b9adc9ce3c08b1881db47989 Mon Sep 17 00:00:00 2001
+From e4f9ef547fa342102db15188544daa18e71e9c66 Mon Sep 17 00:00:00 2001
 From: Scott Murray <scott.murray@konsulko.com>
 Date: Fri, 13 Sep 2019 19:26:27 -0400
 Subject: [PATCH] Handle __cpu_mask usage
@@ -38,7 +38,7 @@ index 3c63a58826..4c2d4347fc 100644
  typedef struct CPUSet {
          cpu_set_t *set;
 diff --git a/src/test/test-sizeof.c b/src/test/test-sizeof.c
-index e1a59d408c..c269ea6e8c 100644
+index 4403c0aa52..e7e4ae112d 100644
 --- a/src/test/test-sizeof.c
 +++ b/src/test/test-sizeof.c
 @@ -1,6 +1,5 @@

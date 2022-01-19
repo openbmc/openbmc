@@ -2,7 +2,7 @@ DESCRIPTION = "XML-RPC for C/C++ is programming libraries and related tools to h
 write an XML-RPC server or client in C or C++."
 
 HOMEPAGE = "http://xmlrpc-c.sourceforge.net/"
-LICENSE = "BSD & MIT"
+LICENSE = "BSD-3-Clause & MIT"
 LIC_FILES_CHKSUM = "file://doc/COPYING;md5=aefbf81ba0750f02176b6f86752ea951"
 
 SRC_URI = "git://github.com/mirror/xmlrpc-c.git;branch=master;protocol=https \

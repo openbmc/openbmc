@@ -4,9 +4,9 @@ libxslt libraries. It provides safe and convenient access to these \
 libraries using the ElementTree API. It extends the ElementTree API \
 significantly to offer support for XPath, RelaxNG, XML Schema, XSLT, \
 C14N and much more."
-HOMEPAGE = "http://codespeak.net/lxml"
+HOMEPAGE = "https://lxml.de/"
 SECTION = "devel/python"
-LICENSE = "BSD & GPLv2 & MIT & PSF"
+LICENSE = "BSD-3-Clause & GPLv2 & MIT & PSF"
 LIC_FILES_CHKSUM = "file://LICENSES.txt;md5=e4c045ebad958ead4b48008f70838403 \
                     file://doc/licenses/elementtree.txt;md5=eb34d036a6e3d56314ee49a6852ac891 \
                     file://doc/licenses/BSD.txt;md5=700a1fc17f4797d4f2d34970c8ee694b \

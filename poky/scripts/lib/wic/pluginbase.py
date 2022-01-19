@@ -9,9 +9,11 @@ __all__ = ['ImagerPlugin', 'SourcePlugin']
 
 import os
 import logging
+import types
 
 from collections import defaultdict
-from importlib.machinery import SourceFileLoader
+import importlib
+import importlib.util
 
 from wic import WicError
 from wic.misc import get_bitbake_var
@@ -54,7 +56,9 @@ class PluginMgr:
                             mname = fname[:-3]
                             mpath = os.path.join(ppath, fname)
                             logger.debug("loading plugin module %s", mpath)
-                            SourceFileLoader(mname, mpath).load_module()
+                            spec = importlib.util.spec_from_file_location(mname, mpath)
+                            module = importlib.util.module_from_spec(spec)
+                            spec.loader.exec_module(module)
 
         return PLUGINS.get(ptype)
 

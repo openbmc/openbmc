@@ -19,7 +19,15 @@ SRC_URI = "${XORG_MIRROR}/individual/xserver/${XORG_PN}-${PV}.tar.xz"
 
 UPSTREAM_CHECK_REGEX = "xorg-server-(?P<pver>\d+(\.(?!99)\d+)+)\.tar"
 
-CVE_PRODUCT = "xorg-server"
+CVE_PRODUCT = "xorg-server x_server"
+# This is specific to Debian's xserver-wrapper.c
+CVE_CHECK_WHITELIST += "CVE-2011-4613"
+# As per upstream, exploiting this flaw is non-trivial and it requires exact
+# timing on the behalf of the attacker. Many graphical applications exit if their
+# connection to the X server is lost, so a typical desktop session is either
+# impossible or difficult to exploit. There is currently no upstream patch
+# available for this flaw.
+CVE_CHECK_WHITELIST += "CVE-2020-25697"
 
 S = "${WORKDIR}/${XORG_PN}-${PV}"
 

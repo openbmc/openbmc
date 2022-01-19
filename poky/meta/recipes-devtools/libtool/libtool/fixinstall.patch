@@ -27,9 +27,9 @@ diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
  
 -	if test -n "$relink_command"; then
 +	if test "$fast_install" = no && test -n "$relink_command"; then
-       # Strip any trailing slash from the destination.
-       func_stripname '' '/' "$libdir"
-       destlibdir=$func_stripname_result
+ 	  # Strip any trailing slash from the destination.
+ 	  func_stripname '' '/' "$libdir"
+	  destlibdir=$func_stripname_result
 @@ -2394,7 +2394,7 @@ func_mode_install ()
  	  shift
  

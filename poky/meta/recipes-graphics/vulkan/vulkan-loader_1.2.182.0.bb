@@ -17,7 +17,7 @@ S = "${WORKDIR}/git"
 
 REQUIRED_DISTRO_FEATURES = "vulkan"
 
-inherit cmake features_check
+inherit cmake features_check pkgconfig
 ANY_OF_DISTRO_FEATURES = "x11 wayland"
 
 DEPENDS += "vulkan-headers"

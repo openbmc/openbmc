@@ -133,6 +133,9 @@ do_install:append:class-nativesdk() {
 do_install:append:class-target() {
     rm -rf ${D}/var
 }
+do_install:append:class-nativesdk() {
+    rm -rf ${D}${SDKPATHNATIVE}/var
+}
 
 do_install:append () {
 	sed -i -e 's:${HOSTTOOLS_DIR}/::g' \

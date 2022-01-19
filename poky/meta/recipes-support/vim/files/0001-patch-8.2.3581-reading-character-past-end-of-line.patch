@@ -1,0 +1,62 @@
+CVE: CVE-2021-3927
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From 93b427c6e729260d0700c3b2804ec153bc8284fa Mon Sep 17 00:00:00 2001
+From: Bram Moolenaar <Bram@vim.org>
+Date: Thu, 4 Nov 2021 15:10:11 +0000
+Subject: [PATCH] patch 8.2.3581: reading character past end of line
+
+Problem:    Reading character past end of line.
+Solution:   Correct the cursor column.
+---
+ src/ex_docmd.c           |  1 +
+ src/testdir/test_put.vim | 12 ++++++++++++
+ src/version.c            |  2 ++
+ 3 files changed, 15 insertions(+)
+
+diff --git a/src/ex_docmd.c b/src/ex_docmd.c
+index fde726477..59e245bee 100644
+--- a/src/ex_docmd.c
++++ b/src/ex_docmd.c
+@@ -6905,6 +6905,7 @@ ex_put(exarg_T *eap)
+ 	eap->forceit = TRUE;
+     }
+     curwin->w_cursor.lnum = eap->line2;
++    check_cursor_col();
+     do_put(eap->regname, eap->forceit ? BACKWARD : FORWARD, 1L,
+ 						       PUT_LINE|PUT_CURSLINE);
+ }
+diff --git a/src/testdir/test_put.vim b/src/testdir/test_put.vim
+index 225ebd1f3..922e5b269 100644
+--- a/src/testdir/test_put.vim
++++ b/src/testdir/test_put.vim
+@@ -113,3 +113,15 @@ func Test_put_p_indent_visual()
+   call assert_equal('select that text', getline(2))
+   bwipe!
+ endfunc
++
++func Test_put_above_first_line()
++  new
++  let @" = 'text'
++  silent! normal 0o00
++  0put
++  call assert_equal('text', getline(1))
++  bwipe!
++endfunc
++
++
++" vim: shiftwidth=2 sts=2 expandtab
+diff --git a/src/version.c b/src/version.c
+index a9e8be0e7..df4ec9a47 100644
+--- a/src/version.c
++++ b/src/version.c
+@@ -742,6 +742,8 @@ static char *(features[]) =
+ 
+ static int included_patches[] =
+ {   /* Add new patch number below this line */
++/**/
++    3581,
+ /**/
+     3564,
+ /**/

@@ -259,6 +259,8 @@ class DirectPlugin(ImagerPlugin):
             if part.mountpoint == "/":
                 if part.uuid:
                     return "PARTUUID=%s" % part.uuid
+                elif part.label:
+                    return "PARTLABEL=%s" % part.label
                 else:
                     suffix = 'p' if part.disk.startswith('mmcblk') else ''
                     return "/dev/%s%s%-d" % (part.disk, suffix, part.realnum)

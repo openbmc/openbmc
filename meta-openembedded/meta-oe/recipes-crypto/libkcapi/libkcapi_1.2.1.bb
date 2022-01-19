@@ -1,6 +1,6 @@
 SUMMARY = "Linux Kernel Crypto API User Space Interface Library"
 HOMEPAGE = "http://www.chronox.de/libkcapi.html"
-LICENSE = "BSD | GPL-2.0"
+LICENSE = "BSD-3-Clause | GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c78be93ed8d1637f2a3f4a83ff9d5f54"
 
 DEPENDS = "libtool"

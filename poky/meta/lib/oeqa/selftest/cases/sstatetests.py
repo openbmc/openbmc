@@ -347,7 +347,7 @@ TCLIBCAPPEND = \"\"
 MACHINE = \"qemuarm\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """
-        self.sstate_allarch_samesigs(configA, configB)
+        self.sstate_common_samesigs(configA, configB, allarch=True)
 
     def test_sstate_nativesdk_samesigs_multilib(self):
         """
@@ -371,9 +371,9 @@ require conf/multilib.conf
 MULTILIBS = \"\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """
-        self.sstate_allarch_samesigs(configA, configB)
+        self.sstate_common_samesigs(configA, configB)
 
-    def sstate_allarch_samesigs(self, configA, configB):
+    def sstate_common_samesigs(self, configA, configB, allarch=False):
 
         self.write_config(configA)
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash")
@@ -400,6 +400,13 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         files2 = get_files(self.topdir + "/tmp-sstatesamehash2/stamps/" + nativesdkdir)
         self.maxDiff = None
         self.assertEqual(files1, files2)
+
+        if allarch:
+            allarchdir = os.path.basename(glob.glob(self.topdir + "/tmp-sstatesamehash/stamps/all-*-linux")[0])
+
+            files1 = get_files(self.topdir + "/tmp-sstatesamehash/stamps/" + allarchdir)
+            files2 = get_files(self.topdir + "/tmp-sstatesamehash2/stamps/" + allarchdir)
+            self.assertEqual(files1, files2)
 
     def test_sstate_sametune_samesigs(self):
         """
