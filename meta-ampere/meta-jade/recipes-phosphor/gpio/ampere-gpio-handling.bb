@@ -17,7 +17,7 @@ SRC_URI += " \
            "
 
 AMPERE_MONITOR_INSTANCES = " \
-                            reboot_ack shutdown_ack id_button iS0_scp_auth_failure \
+                            reboot_ack shutdown_ack id_button S0_scp_auth_failure \
                             S0_overtemp S0_hightemp_start S0_hightemp_stop \
                             S1_overtemp S1_hightemp_start S1_hightemp_stop \
                             S0_fault_alert_start S0_fault_alert_stop \

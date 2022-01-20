@@ -12,8 +12,15 @@ ifconfig ${ETHERNET_NCSI} down
 ifconfig ${ETHERNET_NCSI} up
 
 # Read FRU Board Custom Field 1 to get the MAC address
-CUSTOM_FIELD_1=$(busctl get-property xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice/Mt_Jade_Motherboard xyz.openbmc_project.FruDevice BOARD_INFO_AM1)
-MAC_ADDR=$(echo "$CUSTOM_FIELD_1" | cut -d "\"" -f 2)
+for i in {1..10}; do
+	if CUSTOM_FIELD_1=$(busctl get-property xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice/Mt_Jade_Motherboard xyz.openbmc_project.FruDevice BOARD_INFO_AM1);
+	then
+		MAC_ADDR=$(echo "$CUSTOM_FIELD_1" | cut -d "\"" -f 2)
+		echo "mac-update: detect BMC MAC $MAC_ADDR at loop $i"
+		break
+	fi
+	sleep 2
+done
 
 # Check if BMC MAC address is exported
 if [ -z "${MAC_ADDR}" ]; then
@@ -29,9 +36,7 @@ if [[ $ENV_MAC_ADDR =~ $MAC_ADDR ]]; then
 fi
 
 # Request to update the MAC address
-fw_setenv ${ENV_ETH} "${MAC_ADDR}"
-
-if fw_setenv ${ENV_ETH} "${MAC_ADDR}";
+if ! fw_setenv ${ENV_ETH} "${MAC_ADDR}";
 then
 	echo "ERROR: Fail to set MAC address to ${ENV_ETH}"
 	exit 1
