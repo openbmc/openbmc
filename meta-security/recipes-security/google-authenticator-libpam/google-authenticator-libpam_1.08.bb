@@ -3,7 +3,7 @@ HOME_PAGE = "https://github.com/google/google-authenticator-libpam"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 LICENSE = "Apache-2.0"
 
-SRC_URI = "git://github.com/google/google-authenticator-libpam.git"
+SRC_URI = "git://github.com/google/google-authenticator-libpam.git;branch=master;protocol=https"
 SRCREV = "2c7415d950fb0b4a7f779f045910666447b100ef"
 
 DEPENDS = "libpam"

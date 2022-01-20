@@ -18,5 +18,4 @@ RDEPENDS:packagegroup-security-tpm2 = " \
     libtss2-tcti-mssim \
     tpm2-abrmd \
     tpm2-pkcs11 \
-    ibmswtpm2 \
     "

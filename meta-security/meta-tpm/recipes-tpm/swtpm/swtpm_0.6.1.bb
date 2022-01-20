@@ -3,14 +3,11 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fe8092c832b71ef20dfe4c6d3decb3a8"
 SECTION = "apps"
 
-DEPENDS = "libtasn1 coreutils-native expect socat glib-2.0 net-tools-native libtpm libtpm-native"
+# expect-native, socat-native, coreutils-native and net-tools-native are reportedly only required for the tests
+DEPENDS = "libtasn1 coreutils-native expect-native socat-native glib-2.0 net-tools-native libtpm json-glib"
 
-# configure checks for the tools already during compilation and
-# then swtpm_setup needs them at runtime
-DEPENDS:append = " tpm-tools-native expect-native socat-native python3-pip-native python3-cryptography-native"
-
-SRCREV = "e59c0c1a7b4c8d652dbb280fd6126895a7057464"
-SRC_URI = "git://github.com/stefanberger/swtpm.git;branch=stable-0.5 \
+SRCREV = "98187d24fe14851653a7c46eb16e9c5f0b9beaa1"
+SRC_URI = "git://github.com/stefanberger/swtpm.git;branch=stable-0.6;protocol=https \
            file://ioctl_h.patch \
            file://oe_configure.patch \
            "
@@ -19,7 +16,7 @@ PE = "1"
 S = "${WORKDIR}/git"
 
 PARALLEL_MAKE = ""
-inherit autotools pkgconfig python3native
+inherit autotools pkgconfig perlnative
 
 TSS_USER="tss"
 TSS_GROUP="tss"
@@ -28,7 +25,10 @@ PACKAGECONFIG ?= "openssl"
 PACKAGECONFIG += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)}"
 PACKAGECONFIG += "${@bb.utils.contains('BBFILE_COLLECTIONS', 'filesystems-layer', 'cuse', '', d)}"
 PACKAGECONFIG[openssl] = "--with-openssl, --without-openssl, openssl"
-PACKAGECONFIG[gnutls] = "--with-gnutls, --without-gnutls, gnutls"
+# expect, bash, tpm2-pkcs11-tools (tpm2_ptool), tpmtool and certtool is
+# used by swtpm-create-tpmca (the last two is provided by gnutls)
+# gnutls is required by: swtpm-create-tpmca, swtpm-localca and swtpm_cert
+PACKAGECONFIG[gnutls] = "--with-gnutls, --without-gnutls, gnutls, gnutls, expect bash tpm2-pkcs11-tools"
 PACKAGECONFIG[selinux] = "--with-selinux, --without-selinux, libselinux"
 PACKAGECONFIG[cuse] = "--with-cuse, --without-cuse, fuse"
 PACKAGECONFIG[seccomp] = "--with-seccomp, --without-seccomp, libseccomp"
@@ -41,14 +41,11 @@ USERADD_PARAM:${PN} = "--system -g ${TSS_GROUP} --home-dir  \
     --no-create-home  --shell /bin/false ${BPN}"
 
 
-PACKAGES =+ "${PN}-python"
-FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
-
 PACKAGE_BEFORE_PN = "${PN}-cuse"
 FILES:${PN}-cuse = "${bindir}/swtpm_cuse"
 
 INSANE_SKIP:${PN}   += "dev-so"
 
-RDEPENDS:${PN} = "libtpm expect socat bash tpm-tools python3 python3-cryptography python3-twisted"
+RDEPENDS:${PN} = "libtpm"
 
 BBCLASSEXTEND = "native nativesdk"

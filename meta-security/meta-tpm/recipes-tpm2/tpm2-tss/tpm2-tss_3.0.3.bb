@@ -15,7 +15,7 @@ inherit autotools pkgconfig systemd extrausers
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[oxygen] = ",--disable-doxygen-doc, "
-PACKAGECONFIG[fapi] = "--enable-fapi,--disable-fapi,json-c "
+PACKAGECONFIG[fapi] = "--enable-fapi,--disable-fapi,curl json-c "
 
 EXTRA_OECONF += "--enable-static --with-udevrulesdir=${nonarch_base_libdir}/udev/rules.d/"
 EXTRA_OECONF:remove = " --disable-static"
@@ -73,6 +73,11 @@ FILES:libtss2-dev = " \
     ${libdir}/libtss2*so"
 FILES:libtss2-staticdev = "${libdir}/libtss*a"
 
-FILES:${PN} = "${libdir}/udev ${nonarch_base_libdir}/udev"
+FILES:${PN} = "\
+    ${libdir}/udev \
+    ${nonarch_base_libdir}/udev \
+    ${sysconfdir}/tmpfiles.d \
+    ${sysconfdir}/tpm2-tss \
+    ${sysconfdir}/sysusers.d"
 
 RDEPENDS:libtss2 = "libgcrypt"

@@ -10,7 +10,7 @@ SRC_URI = "https://dist.opendnssec.org/source/opendnssec-${PV}.tar.gz \
            file://libdns_conf_fix.patch \
            "
 
-SRC_URI[sha256sum] = "6d1d466c8d7f507f3e665f4bfe4d16a68d6bff9d7c2ab65f852e2b2a821c28b5"
+SRC_URI[sha256sum] = "c0a8427de241118dccbf7abc508e4dd53fb75b45e9f386addbadae7ecc092756"
 
 inherit autotools pkgconfig perlnative
 
@@ -32,3 +32,5 @@ do_install:append () {
 }
 
 RDEPENDS:${PN} = "softhsm"
+
+PNBLACKLIST[opendnssec] ?= "Needs porting to openssl 3.x"
