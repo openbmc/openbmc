@@ -1,0 +1,24 @@
+# Chassis Control Capabilities set defaut value
+/xyz/openbmc_project/control/chassis_capabilities:
+    - Interface: xyz.openbmc_project.Control.ChassisCapabilities
+      Properties:
+          CapabilitiesFlags:
+              Default: 1
+          ChassisIntrusionEnabled:
+              Default: 'true'
+          ChassisFrontPanelLockoutEnabled:
+              Default: 'false'
+          ChassisNMIEnabled:
+              Default: 'false'
+          ChassisPowerInterlockEnabled:
+              Default: 'false'
+          FRUDeviceAddress:
+              Default: 32
+          SDRDeviceAddress:
+              Default: 32
+          SELDeviceAddress:
+              Default: 32
+          SMDeviceAddress:
+              Default: 32
+          BridgeDeviceAddress:
+              Default: 32
