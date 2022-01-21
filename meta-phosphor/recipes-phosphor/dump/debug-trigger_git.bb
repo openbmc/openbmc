@@ -15,7 +15,7 @@ inherit systemd
 
 PR = "r1"
 PV = "0.1+git${SRCPV}"
-SRCREV = "9c7783babcef53d80bf14dc268b72f61651009ad"
+SRCREV = "1161642d2288f71549f0c9f89d09807ca251b58f"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
 
