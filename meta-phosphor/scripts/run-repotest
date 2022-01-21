@@ -71,6 +71,37 @@ if [[ $files_count -ne 0 ]]; then
   exit 1
 fi
 
+# Now verify there are no kernel dts files being added in a patch
+# All dts files should be sent upstream and can be carried in the openbmc/linux
+# tree until they are accepted upstream
+dts_files_tmp=$(mktemp)
+allowed_dts_tmp=$(mktemp)
+trap 'rm $dts_files_tmp $allowed_dts_tmp' exit
+
+git ls-files -- \
+  '*.dts' \
+  ':!:poky/**' \
+  ':!:meta-security/**' \
+  ':!:meta-raspberrypi/**' \
+  ':!:meta-openembedded/**' \
+  | sort > "$dts_files_tmp"
+
+# There is a single dts currently in the tree that we will exempt for now
+echo "\
+meta-hpe/meta-dl360poc/recipes-kernel/linux/linux-obmc/gxp.dts
+" | sort > "$allowed_dts_tmp"
+
+files_diff=$(comm -23 "$dts_files_tmp" "$allowed_dts_tmp")
+
+files_count=$(echo -n "$files_diff" | grep -c '^' || true)
+if [[ $files_count -ne 0 ]]; then
+echo "Dts files found not in allow list"
+echo "$files_diff"
+echo "Dts files are not allowed on OpenBMC in these layers. Please upstream your changes and see \
+  https://github.com/openbmc/docs/blob/master/kernel-development.md"
+exit 1
+fi
+
 lint_exempt="\
 meta-amd/recipes-amd/amd-fpga/files/ethanolx/fpgardu.sh
 meta-bytedance/meta-g220a/recipes-network/network/static-mac-addr/mac-check
@@ -224,4 +255,3 @@ for f in $non_bbfiles; do
 done
 
 echo "Repo test passed"
-
