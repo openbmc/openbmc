@@ -8,7 +8,6 @@ ExecStart= i2cset -f -y 8 0x11 0xd9
 Restart=no
 Type=oneshot
 RemainAfterExit=true
-StandardOutput=syslog
 
 [Install]
 WantedBy=gbmc-psu-hardreset.target
