@@ -15,5 +15,6 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-nuvoton \
   ##OEROOT##/meta-google \
+  ##OEROOT##/meta-fii \
   ##OEROOT##/meta-fii/meta-kudo \
   "
