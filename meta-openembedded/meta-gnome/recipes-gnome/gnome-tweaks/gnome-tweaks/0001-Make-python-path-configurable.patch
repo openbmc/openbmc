@@ -16,14 +16,14 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  create mode 100644 meson_options.txt
 
 diff --git a/meson.build b/meson.build
-index b7da518..d58fb5b 100644
+index 5b824e9..a673d9c 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -13,7 +13,7 @@ bindir = join_paths(prefix, get_option('bindir'))
+@@ -18,7 +18,7 @@ bindir = join_paths(prefix, get_option('bindir'))
  datadir = join_paths(prefix, get_option('datadir'))
  libexecdir = join_paths(prefix, get_option('libexecdir'))
  localedir = join_paths(prefix, get_option('localedir'))
--pythondir = join_paths(prefix, python3.sysconfig_path('purelib'))
+-pythondir = join_paths(prefix, python3.get_path('purelib'))
 +pythondir = get_option('python_site_dir')
  
  pkgdatadir = join_paths(datadir, meson.project_name())

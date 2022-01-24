@@ -1,0 +1,45 @@
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From b0422e9e5a539164af75cddcaeb01bceca56bf12 Mon Sep 17 00:00:00 2001
+From: "Frank Ch. Eigler" <fche@redhat.com>
+Date: Thu, 13 Jan 2022 18:33:15 -0500
+Subject: [PATCH] PR28778: gcc warning tweak for sprintf precision parameter
+
+A precision=-1 sentinel value got interpreted as UINT_MAX in a
+context, leading to diagnostics like:
+
+/usr/share/systemtap/runtime/vsprintf.c:341:23: error: 'strnlen' specified bound 4294967295 may exceed maximum object size 2147483647 [-Werror=stringop-overread]
+
+Adding a clamp_t() around the parameter field to keep it limited to
+STP_BUFFER_SIZE (8K by default), which is apprx. the limit for a
+single printf.
+---
+ runtime/vsprintf.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/runtime/vsprintf.c b/runtime/vsprintf.c
+index cd31a938b..606f685e8 100644
+--- a/runtime/vsprintf.c
++++ b/runtime/vsprintf.c
+@@ -338,7 +338,7 @@ _stp_vsprint_memory(char * str, char * end, const char * ptr,
+ 	if (format == 's') {
+ 		if ((unsigned long)ptr < PAGE_SIZE)
+ 			ptr = "<NULL>";
+-		len = strnlen(ptr, precision);
++		len = strnlen(ptr, clamp_t(size_t, precision, 0, STP_BUFFER_SIZE));                
+ 	}
+ 	else if (precision > 0)
+ 		len = precision;
+@@ -410,7 +410,7 @@ _stp_vsprint_memory_size(const char * ptr, int width, int precision,
+ 	if (format == 's') {
+ 		if ((unsigned long)ptr < PAGE_SIZE)
+ 			ptr = "<NULL>";
+-		len = strnlen(ptr, precision);
++		len = strnlen(ptr, clamp_t(size_t, precision, 0, STP_BUFFER_SIZE));
+ 	}
+ 	else if (precision > 0)
+ 		len = precision;
+-- 
+2.25.1
+

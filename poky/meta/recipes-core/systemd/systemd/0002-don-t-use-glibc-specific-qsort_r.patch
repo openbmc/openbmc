@@ -1,4 +1,4 @@
-From 30bd749c6777701496124272b59e1283252c3267 Mon Sep 17 00:00:00 2001
+From 5d730902f47498a2866b46875352f6810a01d67c Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 13:41:41 +0800
 Subject: [PATCH] don't use glibc-specific qsort_r

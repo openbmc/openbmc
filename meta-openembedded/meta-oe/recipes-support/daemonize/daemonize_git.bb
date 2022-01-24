@@ -7,7 +7,7 @@ PV = "1.7.8"
 inherit autotools
 
 SRCREV = "18869a797dab12bf1c917ba3b4782fef484c407c"
-SRC_URI = "git://github.com/bmc/daemonize.git \
+SRC_URI = "git://github.com/bmc/daemonize.git;branch=master;protocol=https \
 "
 
 S = "${WORKDIR}/git"

@@ -1,12 +1,20 @@
+/*
+NOTE FOR RELEASE MAINTAINERS:
+This file only needs updating in the development release ("master" branch)
+When documentation for stable releases is built,
+the latest version from "master" is used
+by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-build
+*/
+
 (function() {
   'use strict';
 
   var all_versions = {
     'dev': 'dev (3.5)',
-    '3.4': '3.4',
-    '3.3.3': '3.3.3',
+    '3.4.1': '3.4.1',
+    '3.3.4': '3.3.4',
     '3.2.4': '3.2.4',
-    '3.1.11': '3.1.11',
+    '3.1.13': '3.1.13',
     '3.0.4': '3.0.4',
     '2.7.4': '2.7.4',
   };

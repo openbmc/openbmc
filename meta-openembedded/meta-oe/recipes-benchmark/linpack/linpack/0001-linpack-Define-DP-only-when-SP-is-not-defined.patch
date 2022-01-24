@@ -1,0 +1,32 @@
+From f092d4be22acd09e791187b8e9bff6d312721ce4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 10 Nov 2021 11:36:31 -0800
+Subject: [PATCH] linpack: Define DP only when SP is not defined
+
+This helps compiling two versions ( SP/FP ) of the benchmark just by
+passing -DSP on compile cmdline
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ linpacknew.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/linpacknew.c b/linpacknew.c
+index 17b2824..c656082 100644
+--- a/linpacknew.c
++++ b/linpacknew.c
+@@ -28,7 +28,9 @@
+ #include <time.h>
+ #include <float.h>
+ 
++#ifndef SP
+ #define DP
++#endif
+ 
+ #ifdef SP
+ #define ZERO        0.0
+-- 
+2.33.1
+

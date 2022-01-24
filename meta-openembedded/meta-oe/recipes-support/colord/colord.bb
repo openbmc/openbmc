@@ -4,7 +4,7 @@ inherit meson gobject-introspection gsettings gettext bash-completion systemd fe
 
 # polkit and gobject-introspection are mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "polkit gobject-introspection-data"
-UNKNOWN_CONFIGURE_WHITELIST:append = " introspection"
+GIR_MESON_OPTION = ""
 
 DEPENDS += " \
     ${BPN}-native \

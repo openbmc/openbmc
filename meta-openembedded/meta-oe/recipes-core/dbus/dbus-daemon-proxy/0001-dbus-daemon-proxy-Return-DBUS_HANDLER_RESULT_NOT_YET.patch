@@ -21,7 +21,7 @@ index 009e4fd..f3f0d80 100644
  
    if (!dbus_conn)
 -    return;
-+    DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
++    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
  
    if (verbose)
      g_print ("New message from server: type='%d' path='%s' iface='%s'"

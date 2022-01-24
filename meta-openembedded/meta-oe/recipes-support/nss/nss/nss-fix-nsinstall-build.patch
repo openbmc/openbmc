@@ -1,4 +1,4 @@
-From 2701905e689cf7c1ee7ca2d116f20b5bbc146431 Mon Sep 17 00:00:00 2001
+From f9b2b1c738576a17460aebd005f511f427aa1974 Mon Sep 17 00:00:00 2001
 From: Wenzong Fan <wenzong.fan@windriver.com>
 Date: Sat, 7 Mar 2020 08:34:02 -0800
 Subject: [PATCH] Fix nss multilib build on openSUSE 11.x 32bit

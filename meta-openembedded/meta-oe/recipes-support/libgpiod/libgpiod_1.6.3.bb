@@ -49,7 +49,11 @@ FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}/*.so"
 FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
 
 RRECOMMENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'python3', '${PN}-python', '', d)}"
-RRECOMMENDS:${PN}-ptest += "kernel-module-gpio-mockup"
+RRECOMMENDS:${PN}-ptest += " \
+    kernel-module-gpio-mockup \
+    coreutils \
+    ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'python3-unittest', '', d)} \
+"
 
 PACKAGECONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'tests', '', d)}"
 

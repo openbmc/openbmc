@@ -1,0 +1,40 @@
+From 0c1a66fc62cc321d307c94f962031283142eea69 Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe_macdonald@mentor.com>
+Date: Mon, 30 Oct 2017 13:37:48 -0400
+Subject: [PATCH] build: don't ignore CFLAGS from environment
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We need to take them into account so as to behave nicely towards
+build environments which expect to be able to set them, e.g. for
+optimisation flags, or debug options.
+
+Therefore they need to be added to the compiler command line of
+every source file, and in addition, the same CFLAGS that were
+used during compilation must also always be used during linking!
+
+Upstream-Status: Pending
+
+Signed-off-by: André Draszik <git@andred.net>
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+---
+ brctl/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/brctl/Makefile.in b/brctl/Makefile.in
+index e1956d6..eff260c 100644
+--- a/brctl/Makefile.in
++++ b/brctl/Makefile.in
+@@ -34,7 +34,7 @@ install: $(PROGRAMS)
+ 	$(INSTALL) -m 755 $(PROGRAMS) $(DESTDIR)$(sbindir)
+ 
+ brctl:	$(brctl_OBJECTS) ../libbridge/libbridge.a
+-	$(CC) $(LDFLAGS) $(brctl_OBJECTS) $(LIBS) -o brctl
++	$(CC) $(CFLAGS) $(LDFLAGS) $(brctl_OBJECTS) $(LIBS) -o brctl
+ 
+ %.o: %.c brctl.h
+ 	$(CC) $(CFLAGS) $(INCLUDE) -c $< 
+-- 
+2.17.1
+

@@ -3,6 +3,7 @@ From: Ross Burton <ross.burton@intel.com>
 Date: Thu, 12 Mar 2020 17:25:45 +0000
 Subject: [PATCH 6/7] autotest-automake-result-format.patch
 
+Upstream-Status: Inappropriate [oe specific]
 ---
  lib/autotest/general.m4 | 39 +++++++++++++++++++++++++++++----------
  1 file changed, 29 insertions(+), 10 deletions(-)

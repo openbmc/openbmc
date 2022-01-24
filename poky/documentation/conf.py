@@ -17,6 +17,7 @@ import sys
 import datetime
 
 current_version = "dev"
+bitbake_version = "" # Leave empty for development branch
 
 # String used in sidebar
 version = 'Version: ' + current_version
@@ -90,7 +91,7 @@ extlinks = {
 
 # Intersphinx config to use cross reference with Bitbake user manual
 intersphinx_mapping = {
-    'bitbake': ('https://docs.yoctoproject.org/bitbake/', None)
+    'bitbake': ('https://docs.yoctoproject.org/bitbake/' + bitbake_version, None)
 }
 
 # Suppress "WARNING: unknown mimetype for ..."

@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+#
+# Wrapper around 'ar' that defaults to deterministic archives
+
+import os
+import shutil
+import sys
+
+# calculate path to the real 'ar'
+path = os.environ['PATH']
+path = path.replace(os.path.dirname(sys.argv[0]), '')
+real_ar = shutil.which('ar', path=path)
+
+if len(sys.argv) == 1:
+    os.execl(real_ar, 'ar')
+
+# modify args to mimic 'ar' configured with --default-deterministic-archives
+argv = sys.argv
+if argv[1].startswith('--'):
+    # No modifier given
+    None
+else:
+    # remove the optional '-'
+    if argv[1][0] == '-':
+        argv[1] = argv[1][1:]
+    if 'U' in argv[1]:
+        sys.stderr.write("ar: non-deterministic mode requested\n")
+    else:
+        argv[1] = argv[1].replace('u', '')
+        argv[1] = 'D' + argv[1]
+
+os.execv(real_ar, argv)

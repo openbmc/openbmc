@@ -18,14 +18,14 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  1 file changed, 1 insertion(+), 6 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 2e7160d..f83677d 100644
+index cceefe0..df3fdd9 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -58,12 +58,7 @@ udev_dep = dependency('libudev', required: get_option('udev'))
+@@ -59,12 +59,7 @@ udev_dep = dependency('libudev', required: get_option('udev'))
  host_os = host_machine.system()
  host_cpu = host_machine.cpu()
  supported_os = ['linux']
--unsupported_cpus = ['alpha', 'ia64', 'm68k', 'riscv64', 'sh4', 'sparc', 'sparc64']
+-unsupported_cpus = ['alpha', 'ia64', 'm68k', 'sh4', 'sparc', 'sparc64']
 -if supported_os.contains(host_os) and not unsupported_cpus.contains(host_cpu)
 -  seccomp_dep = dependency('libseccomp')
 -else
@@ -36,5 +36,5 @@ index 2e7160d..f83677d 100644
  
  xkb_base = xkb_config_dep.get_pkgconfig_variable('xkb_base')
 -- 
-2.20.1
+2.31.1
 

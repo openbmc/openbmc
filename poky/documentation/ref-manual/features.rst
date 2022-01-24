@@ -219,6 +219,10 @@ Here are the image features available for all images:
 -  *empty-root-password:* Sets the root password to an empty string,
    which allows logins with a blank password.
 
+-  *overlayfs-etc:* Configures the ``/etc`` directory to be in ``overlayfs``.
+   This allows to store device specific information elsewhere, especially
+   if the root filesystem is configured to be read-only.
+
 -  *package-management:* Installs package management tools and preserves
    the package manager database.
 

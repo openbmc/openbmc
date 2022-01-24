@@ -11,7 +11,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=e66651809cac5da60c8b80e9e4e79e08"
 inherit autotools-brokensep pkgconfig bash-completion systemd
 
 SRCREV = "ea62d6d53bf6f806c4841e97a370201e18446860"
-SRC_URI = "git://github.com/pmem/ndctl.git"
+SRC_URI = "git://github.com/pmem/ndctl.git;branch=master;protocol=https"
+
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>v\d+(\.\d+)*)"
 
 DEPENDS = "kmod udev json-c keyutils"
 

@@ -1,7 +1,7 @@
-From 7e2af4de19be58bc9d551c41ce2750396d357f34 Mon Sep 17 00:00:00 2001
+From 56b830edecff1cac5f8a8a956e7a7eeef2aa7c17 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Tue, 27 Nov 2018 13:25:15 +0800
-Subject: [PATCH] PATCH] not check libperl under cross compiling
+Subject: [PATCH] not check libperl under cross compiling
 
 Upstream-Status: Inappropriate [configuration]
 
@@ -16,12 +16,14 @@ Signed-off-by: Roy Li <rongqing.li@windriver.com>
 update patch to version 11.1
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- configure.in | 2 +-
+ configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
---- a/configure.in
-+++ b/configure.in
-@@ -2206,7 +2206,7 @@ Use --without-tcl to disable building PL
+diff --git a/configure.ac b/configure.ac
+index fba79ee..7170f26 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2261,7 +2261,7 @@ Use --without-tcl to disable building PL/Tcl.])
  fi
  
  # check for <perl.h>
@@ -30,3 +32,6 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
    ac_save_CPPFLAGS=$CPPFLAGS
    CPPFLAGS="$CPPFLAGS $perl_includespec"
    AC_CHECK_HEADER(perl.h, [], [AC_MSG_ERROR([header file <perl.h> is required for Perl])],
+-- 
+2.34.1
+

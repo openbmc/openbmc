@@ -11,7 +11,7 @@ Since starting weston as root is a valid use case by itself, if
 PAM is not available, provide a default version of weston-launch
 without non-root-user support.
 
-Upstream-Status: Pending
+Upstream-Status: Denied [https://gitlab.freedesktop.org/wayland/weston/-/merge_requests/725]
 
 Signed-off-by: Tom Hochstein <tom.hochstein@nxp.com>
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>

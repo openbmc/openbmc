@@ -24,7 +24,7 @@ HOMEPAGE = "http://www.rpm.org"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c4eec0c20c6034b9407a09945b48a43f"
 
-SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.17.x \
+SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.17.x;protocol=https \
            file://environment.d-rpm.sh \
            file://0001-Do-not-add-an-unsatisfiable-dependency-when-building.patch \
            file://0001-Do-not-read-config-files-from-HOME.patch \
@@ -39,6 +39,9 @@ SRC_URI = "git://github.com/rpm-software-management/rpm;branch=rpm-4.17.x \
            file://0001-tools-Add-error.h-for-non-glibc-case.patch \
            file://0001-docs-do-not-build-manpages-requires-pandoc.patch \
            file://0001-build-pack.c-do-not-insert-payloadflags-into-.rpm-me.patch \
+           file://0001-CVE-2021-3521.patch \
+           file://0002-CVE-2021-3521.patch \
+           file://0003-CVE-2021-3521.patch \
            "
 
 PE = "1"
@@ -133,6 +136,9 @@ do_install:append:class-nativesdk() {
 # Rpm's make install creates var/tmp which clashes with base-files packaging
 do_install:append:class-target() {
     rm -rf ${D}/var
+}
+do_install:append:class-nativesdk() {
+    rm -rf ${D}${SDKPATHNATIVE}/var
 }
 
 do_install:append () {

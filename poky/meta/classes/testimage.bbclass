@@ -36,6 +36,7 @@ TESTIMAGE_AUTO ??= "0"
 # TEST_OVERALL_TIMEOUT can be used to set the maximum time in seconds the tests will be allowed to run (defaults to no limit).
 # TEST_QEMUPARAMS can be used to pass extra parameters to qemu, e.g. "-m 1024" for setting the amount of ram to 1 GB.
 # TEST_RUNQEMUPARAMS can be used to pass extra parameters to runqemu, e.g. "gl" to enable OpenGL acceleration.
+# QEMU_USE_KVM can be set to "" to disable the use of kvm (by default it is enabled if target_arch == build_arch or both of them are x86 archs)
 
 # TESTIMAGE_BOOT_PATTERNS can be used to override certain patterns used to communicate with the target when booting,
 # if a pattern is not specifically present on this variable a default will be used when booting the target.
@@ -60,7 +61,7 @@ BASICTESTSUITE = "\
     ping date df ssh scp python perl gi ptest parselogs \
     logrotate connman systemd oe_syslog pam stap ldd xorg \
     kernelmodule gcc buildcpio buildlzip buildgalculator \
-    dnf rpm opkg apt weston"
+    dnf rpm opkg apt weston go rust"
 
 DEFAULT_TEST_SUITES = "${BASICTESTSUITE}"
 
@@ -75,6 +76,7 @@ DEFAULT_TEST_SUITES:remove:qemumips64 = "${MIPSREMOVE}"
 
 TEST_SUITES ?= "${DEFAULT_TEST_SUITES}"
 
+QEMU_USE_KVM ?= "1"
 TEST_QEMUBOOT_TIMEOUT ?= "1000"
 TEST_OVERALL_TIMEOUT ?= ""
 TEST_TARGET ?= "qemu"
@@ -137,6 +139,7 @@ python do_testimage() {
 
 addtask testimage
 do_testimage[nostamp] = "1"
+do_testimage[network] = "1"
 do_testimage[depends] += "${TESTIMAGEDEPENDS}"
 do_testimage[lockfiles] += "${TESTIMAGELOCK}"
 

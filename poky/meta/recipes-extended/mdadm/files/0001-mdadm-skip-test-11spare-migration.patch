@@ -17,7 +17,7 @@ done
 "try" includes near 20 sub testcase, so there are nearly 80 subcases need to run,
 so it will take long time than ptest-runner timeout limit, skip it as workaround.
 
-Upstream-Status: Inappropriate[oe-specific]
+Upstream-Status: Inappropriate [oe-specific]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---

@@ -14,6 +14,10 @@ DISTUTILS_PYTHON:class-native = "nativepython3"
 
 DISTUTILS_SETUP_PATH ?= "${S}"
 
+python __anonymous() {
+    bb.warn("distutils3.bbclass is deprecated, please use setuptools3.bbclass instead")
+}
+
 distutils3_do_configure() {
     :
 }

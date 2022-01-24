@@ -26,7 +26,7 @@ def find_latest_numeric_release(url, d):
     maxstr=""
     for link in get_links_from_url(url, d):
         try:
-            # TODO use LooseVersion
+            # TODO use bb.utils.vercmp_string_op()
             release = float(link)
         except:
             release = 0

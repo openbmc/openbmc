@@ -34,15 +34,8 @@ SRC_URI =  "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://makedbs.sh \
            \
            ${NATIVESDKFIXES} \
-           file://0009-fsl-e500-e5500-e6500-603e-fsqrt-implementation.patch \
-           file://0010-ppc-sqrt-Fix-undefined-reference-to-__sqrt_finite.patch \
-           file://0011-__ieee754_sqrt-f-are-now-inline-functions-and-call-o.patch \
-           file://0012-Quote-from-bug-1443-which-explains-what-the-patch-do.patch \
-           file://0013-eglibc-run-libm-err-tab.pl-with-specific-dirs-in-S.patch \
-           file://0014-__ieee754_sqrt-f-are-now-inline-functions-and-call-o.patch \
            file://0015-sysdeps-gnu-configure.ac-handle-correctly-libc_cv_ro.patch \
            file://0016-yes-within-the-path-sets-wrong-config-variables.patch \
-           file://0017-timezone-re-written-tzselect-as-posix-sh.patch \
            file://0018-Remove-bash-dependency-for-nscd-init-script.patch \
            file://0019-eglibc-Cross-building-and-testing-instructions.patch \
            file://0020-eglibc-Help-bootstrap-cross-toolchain.patch \
@@ -58,6 +51,12 @@ SRC_URI =  "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0001-CVE-2021-38604.patch \
            file://0002-CVE-2021-38604.patch \
            file://0001-fix-create-thread-failed-in-unprivileged-process-BZ-.patch \
+           file://CVE-2021-43396.patch \
+           file://0001-Make-shell-interpreter-overridable-in-tzselect.ksh.patch \
+           file://0001-CVE-2022-23218.patch \
+           file://0002-CVE-2022-23218.patch \
+           file://0001-CVE-2022-23219.patch \
+           file://0002-CVE-2022-23219.patch \
            "
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build-${TARGET_SYS}"
@@ -89,7 +88,7 @@ EXTRA_OECONF = "--enable-kernel=${OLDEST_KERNEL} \
 
 EXTRA_OECONF += "${@get_libc_fpu_setting(bb, d)}"
 
-EXTRA_OECONF:append:x86 = " --enable-cet"
+EXTRA_OECONF:append:x86 = " ${@bb.utils.contains_any('TUNE_FEATURES', 'i586 c3', '--disable-cet', '--enable-cet', d)}"
 EXTRA_OECONF:append:x86-64 = " --enable-cet"
 
 PACKAGECONFIG ??= "nscd memory-tagging"

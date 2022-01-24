@@ -17,13 +17,16 @@ do_install:append() {
     install -d ${D}${sysconfdir}/lvm
     install -m 0644 ${WORKDIR}/lvm.conf ${D}${sysconfdir}/lvm/lvm.conf
     sed -i -e 's:@libdir@:${libdir}:g' ${D}${sysconfdir}/lvm/lvm.conf
-    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
-        oe_runmake 'DESTDIR=${D}' install install_systemd_units
-        sed -i -e 's:/usr/bin/true:${base_bindir}/true:g' ${D}${systemd_system_unitdir}/blk-availability.service
-    else
-        oe_runmake 'DESTDIR=${D}' install install_initscripts
-        mv ${D}${sysconfdir}/rc.d/init.d ${D}${sysconfdir}/init.d
-        rm -rf ${D}${sysconfdir}/rc.d
+    # We don't want init scripts/systemd units for native SDK utilities
+    if [ "${PN}" != "nativesdk-lvm2" ]; then
+        if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+            oe_runmake 'DESTDIR=${D}' install install_systemd_units
+            sed -i -e 's:/usr/bin/true:${base_bindir}/true:g' ${D}${systemd_system_unitdir}/blk-availability.service
+        else
+            oe_runmake 'DESTDIR=${D}' install install_initscripts
+            mv ${D}${sysconfdir}/rc.d/init.d ${D}${sysconfdir}/init.d
+            rm -rf ${D}${sysconfdir}/rc.d
+        fi
     fi
 }
 

@@ -2,10 +2,10 @@ DESCRIPTION = "XML-RPC for C/C++ is programming libraries and related tools to h
 write an XML-RPC server or client in C or C++."
 
 HOMEPAGE = "http://xmlrpc-c.sourceforge.net/"
-LICENSE = "BSD & MIT"
+LICENSE = "BSD-3-Clause & MIT"
 LIC_FILES_CHKSUM = "file://doc/COPYING;md5=aefbf81ba0750f02176b6f86752ea951"
 
-SRC_URI = "git://github.com/mirror/xmlrpc-c.git \
+SRC_URI = "git://github.com/mirror/xmlrpc-c.git;branch=master;protocol=https \
            file://0001-test-cpp-server_abyss-Fix-build-with-clang-libc.patch \
            file://0002-fix-formatting-issues.patch \
            file://0003-src-Makefile-Fix-Makefile-macro-error.patch \
@@ -15,8 +15,6 @@ SRC_URI = "git://github.com/mirror/xmlrpc-c.git \
 SRCREV = "86405c7e1bd4f70287204a28d242a1054daab520"
 
 S = "${WORKDIR}/git/stable"
-
-DEPENDS = "libxml2"
 
 inherit autotools-brokensep binconfig pkgconfig
 
@@ -32,13 +30,12 @@ EXTRA_OECONF += "--disable-libwww-client --disable-wininet-client"
 
 PACKAGECONFIG ??= "curl cplusplus"
 
-PACKAGECONFIG[abyss] = "--enable-abyss-server --enable-abyss-threads --enable-abyss-openssl,--disable-abyss-server --disable-abyss-threads --disable-abyss-openssl,openssl,"
-PACKAGECONFIG[cplusplus] = "--enable-cplusplus,--disable-cplusplus,,"
-PACKAGECONFIG[curl] = "--enable-curl-client,--disable-curl-client,curl,curl"
+PACKAGECONFIG[abyss] = "--enable-abyss-server --enable-abyss-threads --enable-abyss-openssl,--disable-abyss-server --disable-abyss-threads --disable-abyss-openssl,openssl"
+PACKAGECONFIG[cplusplus] = "--enable-cplusplus,--disable-cplusplus"
+PACKAGECONFIG[curl] = "--enable-curl-client,--disable-curl-client,curl"
 
 do_configure() {
-        install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}
-        install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.sub ${S}
+        gnu-configize --verbose --force ${S}
         autoconf
         oe_runconf
         # license is incompatible with lib/util/getoptx.*

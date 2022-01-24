@@ -1,2 +1,4 @@
 #!/bin/sh
-py.test
+if ./check-memfree.py; then
+    pytest -vvvv tests/
+fi

@@ -1,0 +1,23 @@
+From f3d399892e59a2e850be1d0de30c429417c78360 Mon Sep 17 00:00:00 2001
+From: Paolo Bacchilega <paobac@src.gnome.org>
+Date: Tue, 11 Jan 2022 12:30:44 +0100
+Subject: [PATCH] LINGUAS: removed duplicated entry
+
+Upstream-Status: Backport
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ help/LINGUAS | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/help/LINGUAS b/help/LINGUAS
+index 0e8a52d..fa1fc3e 100644
+--- a/help/LINGUAS
++++ b/help/LINGUAS
+@@ -8,7 +8,6 @@ eu
+ fr
+ hu
+ id
+-id
+ nl
+ oc
+ sl

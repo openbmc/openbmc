@@ -6,7 +6,7 @@ BUGTRACKER = "https://github.com/google/brotli/issues"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=941ee9cd1609382f946352712a319b4b"
 
-SRC_URI = "git://github.com/google/brotli.git \
+SRC_URI = "git://github.com/google/brotli.git;branch=master;protocol=https \
            file://838.patch "
 # tag 1.0.9
 SRCREV= "e61745a6b7add50d380cfd7d3883dd6c62fc2c71"

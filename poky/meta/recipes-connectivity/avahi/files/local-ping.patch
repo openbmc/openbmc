@@ -1,4 +1,5 @@
 CVE: CVE-2021-36217
+CVE: CVE-2021-3502
 Upstream-Status: Backport
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 

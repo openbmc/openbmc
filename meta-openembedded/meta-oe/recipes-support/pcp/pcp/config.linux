@@ -1,0 +1,13 @@
+sizeof_int=4
+sizeof_long=4
+sizeof_pointer=8
+sizeof_suseconds_t=8
+sizeof_time_t=8
+bit_field_scheme=2100
+enable_python3='yes'
+enable_python3='true'
+have_python_OrderedDict="true"
+have_python=python3
+printf_p_prefix=0x
+printf_fmt_int64=I64d
+strtoint64=strtoll

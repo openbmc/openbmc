@@ -50,7 +50,23 @@ do_install:append() {
         install -m 644 ${WORKDIR}/hiawatha.service ${D}/${systemd_unitdir}/system
     fi
 
-    rmdir --ignore-fail-on-non-empty "${D}${localstatedir}" "${D}${localstatedir}/run"
+    # /var/log/hiawatha and /var/lib/hiawatha needs to be created in runtime.
+    # Use rmdir to catch if upstream stops creating these dirs, or adds
+    # something else in /var/log.
+    rmdir ${D}${localstatedir}/log/${BPN} ${D}${localstatedir}/log
+    rmdir ${D}${localstatedir}/run
+    rmdir --ignore-fail-on-non-empty ${D}${localstatedir}
+
+    # Create /var/log/hiawatha at runtime.
+    if [ "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}" ]; then
+        install -d ${D}${nonarch_libdir}/tmpfiles.d
+        echo "d ${localstatedir}/log/${BPN} - - - -" > ${D}${nonarch_libdir}/tmpfiles.d/${BPN}.conf
+    fi
+    if [ "${@bb.utils.filter('DISTRO_FEATURES', 'sysvinit', d)}" ]; then
+        install -d ${D}${sysconfdir}/default/volatiles
+        echo "d root root 0755 ${localstatedir}/log/${BPN} none" > ${D}${sysconfdir}/default/volatiles/99_${BPN}
+    fi
+
 }
 
 CONFFILES:${PN} = " \
@@ -61,4 +77,5 @@ CONFFILES:${PN} = " \
     ${sysconfdir}/hiawatha/php-fcgi.conf \
 "
 
+FILES:${PN} += "${nonarch_libdir}/tmpfiles.d"
 FILES:${PN}-dev = "${libdir}/hiawatha/*${SOLIBSDEV}"

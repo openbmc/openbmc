@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 PV = "1.0.5"
 SRCREV = "b706f5f01aa82aa0db678fffd15a1527f330c507"
-SRC_URI = "git://git.remlab.net/git/ndisc6.git;protocol=http \
+SRC_URI = "git://git.remlab.net/git/ndisc6.git;protocol=http;branch=master \
            file://0001-autogen-Do-not-symlink-gettext.h-from-build-host.patch \
            "
 

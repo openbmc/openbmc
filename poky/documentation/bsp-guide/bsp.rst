@@ -1121,12 +1121,12 @@ list describes them in order of preference:
    how to use these variables.
 
    If you build as you normally would, without specifying any recipes in
-   the :term:`LICENSE_FLAGS_WHITELIST`, the build stops and provides you
-   with the list of recipes that you have tried to include in the image
-   that need entries in the :term:`LICENSE_FLAGS_WHITELIST`. Once you enter
-   the appropriate license flags into the whitelist, restart the build
-   to continue where it left off. During the build, the prompt will not
-   appear again since you have satisfied the requirement.
+   the :term:`LICENSE_FLAGS_WHITELIST` variable, the build stops and provides
+   you with the list of recipes that you have tried to include in the image
+   that need entries in the :term:`LICENSE_FLAGS_WHITELIST` variable. Once you
+   enter the appropriate license flags into it, restart the build to continue
+   where it left off. During the build, the prompt will not appear again since
+   you have satisfied the requirement.
 
    Once the appropriate license flags are on the white list in the
    :term:`LICENSE_FLAGS_WHITELIST` variable, you can build the encumbered

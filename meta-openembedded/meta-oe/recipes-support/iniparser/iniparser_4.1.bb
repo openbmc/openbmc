@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e02baf71c76e0650e667d7da133379ac"
 
 DEPENDS = "doxygen-native"
 
-SRC_URI = "git://github.com/ndevilla/iniparser.git;protocol=https \
+SRC_URI = "git://github.com/ndevilla/iniparser.git;protocol=https;branch=master \
 	   file://Add-CMake-support.patch"
 
 # tag 4.1

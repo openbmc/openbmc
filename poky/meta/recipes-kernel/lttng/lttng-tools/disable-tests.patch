@@ -1,0 +1,34 @@
+Upstream-Status: Inappropriate [need to root cause the test hangs]
+
+We keep seeing hangs in the tools/notifications tests on x86 and arm for
+a variety of distros. Exclude them for now to work out if this is the
+only place we see them and give SWAT/triage a break from the stream
+of them.
+
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=14263
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: lttng-tools-2.13.1/tests/regression/Makefile.am
+===================================================================
+--- lttng-tools-2.13.1.orig/tests/regression/Makefile.am
++++ lttng-tools-2.13.1/tests/regression/Makefile.am
+@@ -29,18 +29,6 @@ TESTS = tools/base-path/test_ust \
+ 	tools/crash/test_crash \
+ 	tools/regen-metadata/test_ust \
+ 	tools/regen-statedump/test_ust \
+-	tools/notification/test_notification_ust_error \
+-	tools/notification/test_notification_ust_buffer_usage \
+-	tools/notification/test_notification_ust_capture \
+-	tools/notification/test_notification_ust_event_rule_condition_exclusion \
+-	tools/notification/test_notification_kernel_error \
+-	tools/notification/test_notification_kernel_buffer_usage \
+-	tools/notification/test_notification_kernel_capture \
+-	tools/notification/test_notification_kernel_instrumentation \
+-	tools/notification/test_notification_kernel_syscall \
+-	tools/notification/test_notification_notifier_discarded_count \
+-	tools/notification/test_notification_kernel_userspace_probe \
+-	tools/notification/test_notification_multi_app \
+ 	tools/rotation/test_ust \
+ 	tools/rotation/test_kernel \
+ 	tools/rotation/test_save_load_mi \

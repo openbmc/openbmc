@@ -1,4 +1,8 @@
-Upstream-Status: Pending
+We need LDFLAGS to be respected otherwise there are QA warnings as the right
+flags don't get used.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
 
 From d92af0483c20365fd0af740d0baef8870b4aa374 Mon Sep 17 00:00:00 2001
 From: Abdur Rehman <abdur_rehman@mentor.com>

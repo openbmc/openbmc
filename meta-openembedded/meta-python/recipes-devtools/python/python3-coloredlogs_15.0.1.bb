@@ -20,4 +20,4 @@ RDEPENDS:${PN} += "\
     ${PYTHON_PN}-humanfriendly \
 "
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

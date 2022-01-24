@@ -11,14 +11,14 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
 DEPENDS = "libpng jpeg udev"
 DEPENDS:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland-native wayland-protocols', '', d)}"
 
-PV = "2021.02+${SRCPV}"
+PV = "2021.12"
 
 SRC_URI = " \
-    git://github.com/glmark2/glmark2.git;protocol=https \
+    git://github.com/glmark2/glmark2.git;protocol=https;branch=master \
     file://0001-fix-dispmanx-build.patch \
     file://0002-run-dispmanx-fullscreen.patch \
     "
-SRCREV = "4b2bbe803576d48f08367aa5441740f9319c21e7"
+SRCREV = "0858b450cd88c84a15b99dda9698d44e7f7e8c70"
 
 S = "${WORKDIR}/git"
 

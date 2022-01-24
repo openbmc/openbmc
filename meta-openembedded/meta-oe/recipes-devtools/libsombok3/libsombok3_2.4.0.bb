@@ -7,7 +7,7 @@ Cluster segmentation described in Annex #29 (UAX #29)."
 LICENSE = "Artistic-1.0 | GPLv1+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5b122a36d0f6dc55279a0ebc69f3c60b"
 
-SRC_URI = "git://github.com/hatukanezumi/sombok.git;protocol=https \
+SRC_URI = "git://github.com/hatukanezumi/sombok.git;protocol=https;branch=master \
            file://0001-configure.ac-fix-cross-compiling-issue.patch \
           "
 

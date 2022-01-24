@@ -12,7 +12,9 @@ do_configure[noexec] = "1"
 
 # Other valid fields: BUILD_ID ID_LIKE ANSI_COLOR CPE_NAME
 #                     HOME_URL SUPPORT_URL BUG_REPORT_URL
-OS_RELEASE_FIELDS = "ID ID_LIKE NAME VERSION VERSION_ID PRETTY_NAME"
+OS_RELEASE_FIELDS = "\
+    ID ID_LIKE NAME VERSION VERSION_ID PRETTY_NAME DISTRO_CODENAME \
+"
 OS_RELEASE_UNQUOTED_FIELDS = "ID VERSION_ID VARIANT_ID"
 
 ID = "${DISTRO}"
@@ -47,7 +49,7 @@ do_compile[vardeps] += "${OS_RELEASE_FIELDS}"
 do_install () {
     install -d ${D}${nonarch_libdir} ${D}${sysconfdir}
     install -m 0644 os-release ${D}${nonarch_libdir}/
-    lnr ${D}${nonarch_libdir}/os-release ${D}${sysconfdir}/os-release
+    ln -rs ${D}${nonarch_libdir}/os-release ${D}${sysconfdir}/os-release
 }
 
 FILES:${PN} += "${nonarch_libdir}/os-release"

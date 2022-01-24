@@ -1,4 +1,4 @@
-From 3a98c2eab187289dc8c55e36738c2c0f4216d906 Mon Sep 17 00:00:00 2001
+From 78dd1def953e18e7cda0325bb26d27c051bb6890 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 31 Jan 2019 16:46:30 +0100
 Subject: [PATCH] distutils/sysconfig: append
@@ -14,7 +14,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index a78c0b1..f5c5efe 100644
+index 40c6b3e..ac94cc7 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -474,6 +474,8 @@ def _init_posix(vars):

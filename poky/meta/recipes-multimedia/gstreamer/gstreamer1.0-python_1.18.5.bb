@@ -21,14 +21,6 @@ EXTRA_OEMESON += "-Dlibpython-dir=${libdir}"
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+GIR_MESON_OPTION = ""
 
-inherit meson pkgconfig distutils3-base upstream-version-is-even features_check
-
-# Generating introspection data depends on a combination of native and target
-# introspection tools, and qemu to run the target tools.
-DEPENDS:append:class-target = " gobject-introspection gobject-introspection-native qemu-native prelink-native"
-
-# Even though introspection is disabled on -native, gobject-introspection package is still
-# needed for m4 macros.
-DEPENDS:append:class-native = " gobject-introspection-native"
-DEPENDS:append:class-nativesdk = " gobject-introspection-native"
+inherit meson pkgconfig setuptools3-base upstream-version-is-even gobject-introspection features_check

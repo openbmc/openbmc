@@ -185,37 +185,6 @@ def raise_sanity_error(msg, d, network_error=False):
     
     %s""" % msg)
 
-# Check flags associated with a tuning.
-def check_toolchain_tune_args(data, tune, multilib, errs):
-    found_errors = False
-    if check_toolchain_args_present(data, tune, multilib, errs, 'CCARGS'):
-        found_errors = True
-    if check_toolchain_args_present(data, tune, multilib, errs, 'ASARGS'):
-        found_errors = True
-    if check_toolchain_args_present(data, tune, multilib, errs, 'LDARGS'):
-        found_errors = True
-
-    return found_errors
-
-def check_toolchain_args_present(data, tune, multilib, tune_errors, which):
-    args_set = (data.getVar("TUNE_%s" % which) or "").split()
-    args_wanted = (data.getVar("TUNEABI_REQUIRED_%s:tune-%s" % (which, tune)) or "").split()
-    args_missing = []
-
-    # If no args are listed/required, we are done.
-    if not args_wanted:
-        return
-    for arg in args_wanted:
-        if arg not in args_set:
-            args_missing.append(arg)
-
-    found_errors = False
-    if args_missing:
-        found_errors = True
-        tune_errors.append("TUNEABI for %s requires '%s' in TUNE_%s (%s)." %
-                       (tune, ' '.join(args_missing), which, ' '.join(args_set)))
-    return found_errors
-
 # Check a single tune for validity.
 def check_toolchain_tune(data, tune, multilib):
     tune_errors = []
@@ -247,17 +216,6 @@ def check_toolchain_tune(data, tune, multilib):
             bb.debug(2, "  %s: %s" % (feature, valid_tunes[feature]))
         else:
             tune_errors.append("Feature '%s' is not defined." % feature)
-    whitelist = localdata.getVar("TUNEABI_WHITELIST")
-    if whitelist:
-        tuneabi = localdata.getVar("TUNEABI:tune-%s" % tune)
-        if not tuneabi:
-            tuneabi = tune
-        if True not in [x in whitelist.split() for x in tuneabi.split()]:
-            tune_errors.append("Tuning '%s' (%s) cannot be used with any supported tuning/ABI." %
-                (tune, tuneabi))
-        else:
-            if not check_toolchain_tune_args(localdata, tuneabi, multilib, tune_errors):
-                bb.debug(2, "Sanity check: Compiler args OK for %s." % tune)
     if tune_errors:
         return "Tuning '%s' has the following errors:\n" % tune + '\n'.join(tune_errors)
 
@@ -462,13 +420,12 @@ def check_sanity_validmachine(sanity_data):
 # Patch before 2.7 can't handle all the features in git-style diffs.  Some
 # patches may incorrectly apply, and others won't apply at all.
 def check_patch_version(sanity_data):
-    from distutils.version import LooseVersion
     import re, subprocess
 
     try:
         result = subprocess.check_output(["patch", "--version"], stderr=subprocess.STDOUT).decode('utf-8')
         version = re.search(r"[0-9.]+", result.splitlines()[0]).group()
-        if LooseVersion(version) < LooseVersion("2.7"):
+        if bb.utils.vercmp_string_op(version, "2.7", "<"):
             return "Your version of patch is older than 2.7 and has bugs which will break builds. Please install a newer version of patch.\n"
         else:
             return None
@@ -478,7 +435,6 @@ def check_patch_version(sanity_data):
 # Unpatched versions of make 3.82 are known to be broken.  See GNU Savannah Bug 30612.
 # Use a modified reproducer from http://savannah.gnu.org/bugs/?30612 to validate.
 def check_make_version(sanity_data):
-    from distutils.version import LooseVersion
     import subprocess
 
     try:
@@ -486,7 +442,7 @@ def check_make_version(sanity_data):
     except subprocess.CalledProcessError as e:
         return "Unable to execute make --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[2]
-    if LooseVersion(version) == LooseVersion("3.82"):
+    if bb.utils.vercmp_string_op(version, "3.82", "=="):
         # Construct a test file
         f = open("makefile_test", "w")
         f.write("makefile_test.a: makefile_test_a.c makefile_test_b.c makefile_test.a( makefile_test_a.c makefile_test_b.c)\n")
@@ -530,7 +486,7 @@ def check_wsl(d):
             bb.warn("You are running bitbake under WSLv2, this works properly but you should optimize your VHDX file eventually to avoid running out of storage space")
     return None
 
-# Require at least gcc version 6.0.
+# Require at least gcc version 7.5.
 #
 # This can be fixed on CentOS-7 with devtoolset-6+
 # https://www.softwarecollections.org/en/scls/rhscl/devtoolset-6/
@@ -539,27 +495,25 @@ def check_wsl(d):
 # built buildtools-extended-tarball)
 #
 def check_gcc_version(sanity_data):
-    from distutils.version import LooseVersion
     import subprocess
     
     build_cc, version = oe.utils.get_host_compiler_version(sanity_data)
     if build_cc.strip() == "gcc":
-        if LooseVersion(version) < LooseVersion("6.0"):
-            return "Your version of gcc is older than 6.0 and will break builds. Please install a newer version of gcc (you could use the project's buildtools-extended-tarball or use scripts/install-buildtools).\n"
+        if bb.utils.vercmp_string_op(version, "7.5", "<"):
+            return "Your version of gcc is older than 7.5 and will break builds. Please install a newer version of gcc (you could use the project's buildtools-extended-tarball or use scripts/install-buildtools).\n"
     return None
 
 # Tar version 1.24 and onwards handle overwriting symlinks correctly
 # but earlier versions do not; this needs to work properly for sstate
 # Version 1.28 is needed so opkg-build works correctly when reproducibile builds are enabled
 def check_tar_version(sanity_data):
-    from distutils.version import LooseVersion
     import subprocess
     try:
         result = subprocess.check_output(["tar", "--version"], stderr=subprocess.STDOUT).decode('utf-8')
     except subprocess.CalledProcessError as e:
         return "Unable to execute tar --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[3]
-    if LooseVersion(version) < LooseVersion("1.28"):
+    if bb.utils.vercmp_string_op(version, "1.28", "<"):
         return "Your version of tar is older than 1.28 and does not have the support needed to enable reproducible builds. Please install a newer version of tar (you could use the project's buildtools-tarball from our last release or use scripts/install-buildtools).\n"
     return None
 
@@ -567,14 +521,13 @@ def check_tar_version(sanity_data):
 # The kernel tools assume git >= 1.8.3.1 (verified needed > 1.7.9.5) see #6162 
 # The git fetcher also had workarounds for git < 1.7.9.2 which we've dropped
 def check_git_version(sanity_data):
-    from distutils.version import LooseVersion
     import subprocess
     try:
         result = subprocess.check_output(["git", "--version"], stderr=subprocess.DEVNULL).decode('utf-8')
     except subprocess.CalledProcessError as e:
         return "Unable to execute git --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[2]
-    if LooseVersion(version) < LooseVersion("1.8.3.1"):
+    if bb.utils.vercmp_string_op(version, "1.8.3.1", "<"):
         return "Your version of git is older than 1.8.3.1 and has bugs which will break builds. Please install a newer version of git.\n"
     return None
 
@@ -796,9 +749,8 @@ def check_sanity_everybuild(status, d):
         status.addresult('The system requires at least Python 3.6 to run. Please update your Python interpreter.\n')
 
     # Check the bitbake version meets minimum requirements
-    from distutils.version import LooseVersion
     minversion = d.getVar('BB_MIN_VERSION')
-    if (LooseVersion(bb.__version__) < LooseVersion(minversion)):
+    if bb.utils.vercmp_string_op(bb.__version__, minversion, "<"):
         status.addresult('Bitbake version %s is required and version %s was found\n' % (minversion, bb.__version__))
 
     sanity_check_locale(d)

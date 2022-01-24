@@ -13,11 +13,12 @@ BINCONFIG = "${bindir}/ncurses5-config ${bindir}/ncursesw5-config \
 inherit autotools binconfig-disabled multilib_header pkgconfig
 
 # Upstream has useful patches at times at ftp://invisible-island.net/ncurses/
-SRC_URI = "git://salsa.debian.org/debian/ncurses.git;protocol=https"
+SRC_URI = "git://salsa.debian.org/debian/ncurses.git;protocol=https;branch=master"
 
 EXTRA_AUTORECONF = "-I m4"
 
 CACHED_CONFIGUREVARS = "cf_cv_func_nanosleep=yes"
+CACHED_CONFIGUREVARS:append:linux = " cf_cv_working_poll=yes"
 
 EXTRASITECONFIG = "CFLAGS='${CFLAGS} -I${SYSROOT_DESTDIR}${includedir}'"
 
@@ -98,10 +99,6 @@ ncurses_configure() {
 # patched autoconf213 to generate the configure script. This autoconf
 # is not available so that the shipped script will be used.
 do_configure() {
-        # check does not work with cross-compiling and is generally
-        # broken because it requires stdin to be pollable (which is
-        # not the case for /dev/null redirections)
-        export cf_cv_working_poll=yes
 	#Remove ${includedir} from CPPFLAGS, need for cross compile
 	sed -i 's#-I${cf_includedir}##g' ${S}/configure || die "sed CPPFLAGS"
 
@@ -242,10 +239,9 @@ do_install() {
             mv ${D}${libdir}/libtinfo.so.* ${D}${base_libdir}
             rm ${D}${libdir}/libtinfo.so
 
-            # Use lnr to ensure this is a relative link despite absolute paths
+            # Use ln -rs to ensure this is a relative link despite absolute paths
             # (as we can't know the relationship between base_libdir and libdir).
-            # At some point we can rely on coreutils 8.16 which has ln -r.
-            lnr ${D}${base_libdir}/libtinfo.so.5 ${D}${libdir}/libtinfo.so
+            ln -rs ${D}${base_libdir}/libtinfo.so.5 ${D}${libdir}/libtinfo.so
         fi
         if [ -d "${D}${includedir}/ncurses" ]; then
             for f in `find ${D}${includedir}/ncurses -name "*.h"`

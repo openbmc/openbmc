@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=e6a600fd5e1d9cbde2d983680233ad02"
 PV = "0.0.1+git${SRCPV}"
 
 SRCREV = "45863e849b39c4921d6553e6d27e267a96ac7d77"
-SRC_URI = "git://github.com/lib-cpp/${BPN}.git"
+SRC_URI = "git://github.com/lib-cpp/${BPN}.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

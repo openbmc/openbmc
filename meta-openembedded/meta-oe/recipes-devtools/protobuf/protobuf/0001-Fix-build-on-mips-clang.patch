@@ -1,0 +1,32 @@
+From 08e46feb6553af670754e65d94c3bb6fcd4e0cf9 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 31 Oct 2021 23:39:44 -0700
+Subject: [PATCH] Fix build on mips/clang
+
+clang13 crashes on mips, until its fixed upstream disable tailcall on
+mips
+
+https://bugs.llvm.org/show_bug.cgi?id=52367
+
+Upstream-Status: Inappropriate [Clang workaround]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/google/protobuf/port_def.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/google/protobuf/port_def.inc b/src/google/protobuf/port_def.inc
+index 71325c387..303475232 100644
+--- a/src/google/protobuf/port_def.inc
++++ b/src/google/protobuf/port_def.inc
+@@ -230,7 +230,7 @@
+ #error PROTOBUF_TAILCALL was previously defined
+ #endif
+ #if __has_cpp_attribute(clang::musttail) && \
+-  !defined(__arm__) && !defined(_ARCH_PPC) && !defined(__wasm__)
++  !defined(__arm__) && !defined(_ARCH_PPC) && !defined(__wasm__) && !defined(__mips__)
+ #  ifndef PROTO2_OPENSOURCE
+ // Compilation fails on ARM32: b/195943306
+ // Compilation fails on powerpc64le: b/187985113
+-- 
+2.33.1
+

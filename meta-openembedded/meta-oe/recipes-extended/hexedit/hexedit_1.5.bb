@@ -6,7 +6,7 @@ DEPENDS = "ncurses"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
-SRC_URI = "git://github.com/pixel/hexedit.git \
+SRC_URI = "git://github.com/pixel/hexedit.git;branch=master;protocol=https \
     "
 
 SRCREV = "baf45a289360a39a05253949fb9d1b50e4668d8a"

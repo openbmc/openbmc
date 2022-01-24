@@ -18,6 +18,15 @@ KEXECTOOLS:nios2 ?= ""
 KEXECTOOLS:riscv64 ?= ""
 KEXECTOOLS:riscv32 ?= ""
 
+# go does not support ppc32, only ppc64
+# https://github.com/golang/go/issues/22885
+# gccgo may do better
+GOTOOLS ?= "go-helloworld"
+GOTOOLS:powerpc ?= ""
+GOTOOLS:riscv32 ?= ""
+
+RUSTTOOLS ?= "rust-hello-world"
+
 GSTEXAMPLES ?= "gst-examples"
 GSTEXAMPLES:riscv64 = ""
 
@@ -49,4 +58,6 @@ RDEPENDS:${PN} = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', "${X11TOOLS}", "", d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11 opengl', "${X11GLTOOLS}", "", d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', '3g', "${3GTOOLS}", "", d)} \
+    ${GOTOOLS} \
+    ${RUSTTOOLS} \
     "

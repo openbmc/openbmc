@@ -32,12 +32,15 @@ if [ "$arch" = "aarch64" ]; then
    done
 fi
 
-echo "Run flaky tests using taskset to limit them to a single core."
+echo "Run non-deterministic tests using taskset to limit them to a single core."
 for i in `cat taskset_nondeterministic_tests`; do
-   taskset 0x00000001 perl tests/vg_regtest --valgrind=${VALGRIND_BIN} --valgrind-lib=${VALGRIND_LIBEXECDIR} --yocto-ptest $i 2>&1|tee -a ${LOG}
-   mv $i.vgtest $i.IGNORE
+   # The remove-for-aarch64 and taskset_nondeterministic_tests may overlap so 
+   # check if a file exist.
+   if test -f "${i}.vgtest"; then
+      taskset 0x00000001 perl tests/vg_regtest --valgrind=${VALGRIND_BIN} --valgrind-lib=${VALGRIND_LIBEXECDIR} --yocto-ptest $i 2>&1|tee -a ${LOG}
+      mv $i.vgtest $i.IGNORE
+   fi
 done
-
 
 cd ${VALGRIND_LIB}/ptest && ./tests/vg_regtest \
     --valgrind=${VALGRIND_BIN} \
@@ -51,6 +54,13 @@ cd ${VALGRIND_LIB}/ptest && \
     gdbserver_tests ${TOOLS} ${EXP_TOOLS} \
     2>&1|tee -a ${LOG}
 
+echo "Restore non-deterministic tests"
+for i in `cat taskset_nondeterministic_tests`; do
+   if test -f "${i}.vgtest.IGNORE"; then
+      mv $i.IGNORE $i.vgtest;
+   fi
+done
+
 if [ "$arch" = "aarch64" ]; then
    echo "Aarch64: Restore valgrind tests that result in defunct process and then out of memory"
    for i in `cat remove-for-aarch64`; do
@@ -60,11 +70,6 @@ fi
 
 echo "Restore valgrind tests that are non-deterministc"
 for i in `cat remove-for-all`; do
-   mv $i.IGNORE $i.vgtest;
-done
-
-echo "Restore flaky and other non-deterministic tests"
-for i in `cat taskset_nondeterministic_tests`; do
    mv $i.IGNORE $i.vgtest;
 done
 

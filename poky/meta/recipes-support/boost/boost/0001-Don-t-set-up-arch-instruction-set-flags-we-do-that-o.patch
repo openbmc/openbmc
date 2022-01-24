@@ -1,4 +1,4 @@
-From 8e1d30454afde37eaa3c593ec19d108cd5ed10d0 Mon Sep 17 00:00:00 2001
+From 4d2a8fc8117e56bc283349e5f7f889ebbfc55c71 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 18 Dec 2018 15:42:57 +0100
 Subject: [PATCH] Don't set up arch/instruction-set flags, we do that
@@ -10,14 +10,14 @@ Signed-off-by: Christopher Larson <chris_larson@mentor.com>
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---
- tools/build/src/tools/gcc.jam | 139 ----------------------------------
- 1 file changed, 139 deletions(-)
+ tools/build/src/tools/gcc.jam | 144 ----------------------------------
+ 1 file changed, 144 deletions(-)
 
 diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
-index ff3209f7b..70cbc39a5 100644
+index 47a113223..d77525724 100644
 --- a/tools/build/src/tools/gcc.jam
 +++ b/tools/build/src/tools/gcc.jam
-@@ -1217,142 +1217,3 @@ local rule cpu-flags ( toolset variable : architecture : instruction-set + :
+@@ -1122,147 +1122,3 @@ local rule cpu-flags ( toolset variable : architecture : instruction-set + :
          <architecture>$(architecture)/<instruction-set>$(instruction-set)
          : $(values) ;
  }
@@ -158,5 +158,10 @@ index ff3209f7b..70cbc39a5 100644
 -cpu-flags gcc OPTIONS : s390x : z13 : -march=z13 ;
 -cpu-flags gcc OPTIONS : s390x : z14 : -march=z14 ;
 -cpu-flags gcc OPTIONS : s390x : z15 : -march=z15 ;
+-# ARM
+-cpu-flags gcc OPTIONS : arm : cortex-a9+vfpv3 : -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard ;
+-cpu-flags gcc OPTIONS : arm : cortex-a53 : -mcpu=cortex-a53 ;
+-cpu-flags gcc OPTIONS : arm : cortex-r5 : -mcpu=cortex-r5 ;
+-cpu-flags gcc OPTIONS : arm : cortex-r5+vfpv3-d16 : -mcpu=cortex-r5 -mfpu=vfpv3-d16 -mfloat-abi=hard ;
 -# AIX variant of RS/6000 & PowerPC
 -toolset.flags gcc AROPTIONS <address-model>64/<target-os>aix : "-X64" ;

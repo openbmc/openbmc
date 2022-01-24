@@ -5,12 +5,12 @@ LICENSE="GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8c16666ae6c159876a0ba63099614381"
 
 BPV = "1.0.0"
-PV = "${BPV}"
-SRCREV = "f5d87954bd9e13689481700105efe2f42199d364"
+PV = "1.0.1"
+SRCREV = "87da3bfc03f3088e2e880b6b48195bb225fafeac"
 
 S = "${WORKDIR}/git"
 
-SRC_URI = "git://github.com/cpb-/spi-tools.git;protocol=git"
+SRC_URI = "git://github.com/cpb-/spi-tools.git;protocol=https;branch=master"
 
 
 inherit autotools

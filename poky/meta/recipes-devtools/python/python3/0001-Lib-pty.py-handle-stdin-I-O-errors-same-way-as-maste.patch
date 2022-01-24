@@ -1,4 +1,4 @@
-From d8521ee967937184eadc59fff1a30740ad181a98 Mon Sep 17 00:00:00 2001
+From 86061629f4a179e740a17e53dd2c98ab47af2fe2 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Thu, 16 Sep 2021 16:35:37 +0200
 Subject: [PATCH] Lib/pty.py: handle stdin I/O errors same way as master I/O
@@ -24,12 +24,13 @@ So let's treat both channels the same.
 
 Upstream-Status: Submitted [https://github.com/python/cpython/pull/28388]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
 ---
  Lib/pty.py | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/Lib/pty.py b/Lib/pty.py
-index 8d8ce40df5..35439c6b96 100644
+index 8d8ce40..35439c6 100644
 --- a/Lib/pty.py
 +++ b/Lib/pty.py
 @@ -154,7 +154,10 @@ def _copy(master_fd, master_read=_read, stdin_read=_read):
@@ -44,6 +45,3 @@ index 8d8ce40df5..35439c6b96 100644
              if not data:
                  fds.remove(STDIN_FILENO)
              else:
--- 
-2.20.1
-

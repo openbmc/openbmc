@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex@linutronix.de>
 Date: Mon, 25 Oct 2021 17:59:24 +0200
 Subject: [PATCH] staprun: address ncurses 6.3 failures
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [by email to smakarov@redhat.com,systemtap@sourceware.org]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 ---
  staprun/monitor.c | 24 ++++++++++++------------

@@ -1,4 +1,4 @@
-From 26da484391e20b36eb65c98872d1145261028c7a Mon Sep 17 00:00:00 2001
+From 0f9422780a569c79a4b28e44c79c70b4a354bd92 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Fri, 1 Mar 2019 15:22:15 +0800
 Subject: [PATCH] do not disable buffer in writing files
@@ -134,7 +134,7 @@ index 955b18bd2a..6d89c90176 100644
                  log_debug_errno(r, "Failed to turn off coredumps, ignoring: %m");
  }
 diff --git a/src/binfmt/binfmt.c b/src/binfmt/binfmt.c
-index 29530bb691..3ecf6a45a2 100644
+index 981218f52f..436aaaddb4 100644
 --- a/src/binfmt/binfmt.c
 +++ b/src/binfmt/binfmt.c
 @@ -48,7 +48,7 @@ static int delete_rule(const char *rule) {

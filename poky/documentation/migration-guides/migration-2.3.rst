@@ -50,7 +50,7 @@ Consider the following:
    post-installation script that is installed by a function added to
    :term:`SYSROOT_PREPROCESS_FUNCS`.
 
-   For an example, see the ``pixbufcache`` class in ``meta/classes/`` in
+   For an example, see the :ref:`pixbufcache <ref-classes-pixbufcache>` class in ``meta/classes/`` in
    the :ref:`overview-manual/development-environment:yocto project source repositories`.
 
    .. note::

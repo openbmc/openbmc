@@ -4,7 +4,7 @@ Date: Wed, 2 Jan 2019 17:55:35 +0100
 Subject: [PATCH] configure_path.sh: do not hardcode $prefix/lib as library
  path
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/arsv/perl-cross/pull/123]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---

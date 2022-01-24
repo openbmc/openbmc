@@ -5,18 +5,21 @@ LICENSE = "Apache-2.0"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=48aa35cefb768436223a6e7f18dc2a2a"
 
-SRC_URI = "gitsm://github.com/KhronosGroup/Vulkan-Samples.git \
+SRC_URI = "gitsm://github.com/KhronosGroup/Vulkan-Samples.git;branch=master;protocol=https \
            file://0001-CMakeLists.txt-do-not-hardcode-lib-as-installation-t.patch \
+           file://0001-framework-do-not-mix-plain-and-keyword-target_link_l.patch \
+           file://0001-framework-core-Add-explicit-static_cast-from-vk-Buff.patch \
            file://debugfix.patch \
            "
 
 UPSTREAM_CHECK_COMMITS = "1"
-SRCREV = "d2187278cb6632ce35920575832eb6f6e2b2e46c"
+SRCREV = "ae6e4a3712cebde49a29e5996a3bd2f403566890"
 
 UPSTREAM_CHECK_GITTAGREGEX = "These are not the releases you're looking for"
 S = "${WORKDIR}/git"
 
 REQUIRED_DISTRO_FEATURES = 'vulkan'
+COMPATIBLE_HOST = "(x86_64|aarch64|mips64|powerpc64|riscv64).*-linux"
 
 inherit cmake features_check
 

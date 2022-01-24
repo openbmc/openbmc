@@ -1,0 +1,38 @@
+From 321839cbd1d57f12d3d6695254d2003473d8dd1a Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 8 Dec 2021 16:58:55 +0800
+Subject: [PATCH] build/top.mk: unset STRIP_OPTS
+
+Unset STRIP_OPTS to disable strip to fix QA errors:
+
+ERROR: openldap-2.5.9-r0 do_package: QA Issue: File
+'/usr/bin/ldapcompare' from openldap was already stripped, this will
+prevent future debugging! [already-stripped]
+
+ERROR: openldap-2.5.9-r0 do_package: QA Issue: File
+'/usr/bin/ldapdelete' from openldap was already stripped, this will
+prevent future debugging! [already-stripped]
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ build/top.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/top.mk b/build/top.mk
+index 38ce146..6e9fe1f 100644
+--- a/build/top.mk
++++ b/build/top.mk
+@@ -60,7 +60,7 @@ INSTALL_PROGRAM = $(INSTALL)
+ INSTALL_DATA = $(INSTALL) -m 644
+ INSTALL_SCRIPT = $(INSTALL)
+ 
+-STRIP_OPTS = -s
++STRIP_OPTS =
+ 
+ LINT = lint
+ 5LINT = 5lint
+-- 
+2.17.1
+

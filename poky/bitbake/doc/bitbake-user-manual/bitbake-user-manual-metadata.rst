@@ -104,15 +104,15 @@ Line Joining
 
 Outside of :ref:`functions <bitbake-user-manual/bitbake-user-manual-metadata:functions>`,
 BitBake joins any line ending in
-a backslash character ("\") with the following line before parsing
-statements. The most common use for the "\" character is to split
+a backslash character ("\\") with the following line before parsing
+statements. The most common use for the "\\" character is to split
 variable assignments over multiple lines, as in the following example::
 
    FOO = "bar \
           baz \
           qaz"
 
-Both the "\" character and the newline
+Both the "\\" character and the newline
 character that follow it are removed when joining lines. Thus, no
 newline characters end up in the value of ``FOO``.
 
@@ -125,7 +125,7 @@ Consider this additional example where the two assignments both assign
 
 .. note::
 
-   BitBake does not interpret escape sequences like "\n" in variable
+   BitBake does not interpret escape sequences like "\\n" in variable
    values. For these to have an effect, the value must be passed to some
    utility that interprets escape sequences, such as
    ``printf`` or ``echo -n``.
@@ -159,7 +159,7 @@ behavior::
    C = "qux"
    *At this point, ${A} equals "qux bar baz"*
    B = "norf"
-   *At this point, ${A} equals "norf baz"\*
+   *At this point, ${A} equals "norf baz"*
 
 Contrast this behavior with the
 :ref:`bitbake-user-manual/bitbake-user-manual-metadata:immediate variable
@@ -894,7 +894,7 @@ Regardless of the type of function, you can only define them in class
 Shell Functions
 ---------------
 
-Functions written in shell script and executed either directly as
+Functions written in shell script are executed either directly as
 functions, tasks, or both. They can also be called by other shell
 functions. Here is an example shell function definition::
 
@@ -944,7 +944,7 @@ Running ``do_foo`` prints the following::
    Overrides and override-style operators can be applied to any shell
    function, not just :ref:`tasks <bitbake-user-manual/bitbake-user-manual-metadata:tasks>`.
 
-You can use the ``bitbake -e`` recipename command to view the final
+You can use the ``bitbake -e recipename`` command to view the final
 assembled function after all overrides have been applied.
 
 BitBake-Style Python Functions
@@ -996,7 +996,7 @@ Running ``do_foo`` prints the following::
    recipename do_foo: second
    recipename do_foo: third
 
-You can use the ``bitbake -e`` recipename command to view
+You can use the ``bitbake -e recipename`` command to view
 the final assembled function after all overrides have been applied.
 
 Python Functions
@@ -1920,12 +1920,6 @@ The following list describes related variables:
 -  :term:`BB_SETSCENE_DEPVALID`:
    Specifies a function BitBake calls that determines whether BitBake
    requires a setscene dependency to be met.
-
--  :term:`BB_STAMP_POLICY`: Defines the mode
-   for comparing timestamps of stamp files.
-
--  :term:`BB_STAMP_WHITELIST`: Lists stamp
-   files that are looked at when the stamp policy is "whitelist".
 
 -  :term:`BB_TASKHASH`: Within an executing task,
    this variable holds the hash of the task as returned by the currently

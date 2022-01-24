@@ -1,0 +1,31 @@
+From ec8d3f3c61280c8140b34ed1479baef5e706f064 Mon Sep 17 00:00:00 2001
+From: Tim Orling <tim.orling@konsulko.com>
+Date: Fri, 14 Jan 2022 22:02:25 -0800
+Subject: [PATCH] Cargo.toml: specify pem version
+
+pem = "1.0" is not resolving, specify the current
+pem = { version: "1.0.2"}
+
+Upstream-Status: Pending
+
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
+---
+ src/rust/Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/rust/Cargo.toml b/src/rust/Cargo.toml
+index 617167d0..174eaa80 100644
+--- a/src/rust/Cargo.toml
++++ b/src/rust/Cargo.toml
+@@ -9,7 +9,7 @@ publish = false
+ lazy_static = "1"
+ pyo3 = { version = "0.15.1" }
+ asn1 = { version = "0.8.7", default-features = false, features = ["derive"] }
+-pem = "1.0"
++pem = { version = "1.0.2" }
+ chrono = { version = "0.4", default-features = false, features = ["alloc", "clock"] }
+ ouroboros = "0.13"
+ 
+-- 
+2.30.2
+

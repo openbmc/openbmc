@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=00ea1e843a43c20d9b63a8112239b0d1"
 SRC_URI[sha256sum] = "f72f148f54442c6b056bf931dbc34f986fd0c3b0b6b5a58d013c9aef274d0c88"
 
 
-SRC_URI = "git://github.com/python-excel/xlrd.git \
+SRC_URI = "git://github.com/python-excel/xlrd.git;branch=master;protocol=https \
            file://run-ptest \
 "
 SRCREV = "b8d573e11ec149da695d695c81a156232b89a949"

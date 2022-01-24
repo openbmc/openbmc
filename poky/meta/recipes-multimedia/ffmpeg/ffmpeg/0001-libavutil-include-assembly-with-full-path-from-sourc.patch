@@ -1,4 +1,4 @@
-From 24a58d70cbb3997e471366bd5afe54be9007bfb1 Mon Sep 17 00:00:00 2001
+From 4a891e1eddbf63f32fe769b5bff289f6748abf45 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 10 Nov 2020 15:32:14 +0000
 Subject: [PATCH] libavutil: include assembly with full path from source root
@@ -6,8 +6,9 @@ Subject: [PATCH] libavutil: include assembly with full path from source root
 Otherwise nasm writes the full host-specific paths into .o
 output, which breaks binary reproducibility.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [http://ffmpeg.org/pipermail/ffmpeg-devel/2022-January/291781.html]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  libavutil/x86/cpuid.asm      | 2 +-
  libavutil/x86/emms.asm       | 2 +-
@@ -15,7 +16,8 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  libavutil/x86/float_dsp.asm  | 2 +-
  libavutil/x86/lls.asm        | 2 +-
  libavutil/x86/pixelutils.asm | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+ libavutil/x86/tx_float.asm   | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/libavutil/x86/cpuid.asm b/libavutil/x86/cpuid.asm
 index c3f7866..766f77f 100644
@@ -95,3 +97,16 @@ index 36c57c5..8b45ead 100644
  
  SECTION .text
  
+diff --git a/libavutil/x86/tx_float.asm b/libavutil/x86/tx_float.asm
+index 4d2283f..ea39f21 100644
+--- a/libavutil/x86/tx_float.asm
++++ b/libavutil/x86/tx_float.asm
+@@ -29,7 +29,7 @@
+ ;       replace some shuffles with vblends?
+ ;       avx512 split-radix
+ 
+-%include "x86util.asm"
++%include "libavutil/x86/x86util.asm"
+ 
+ %if ARCH_X86_64
+ %define ptr resq

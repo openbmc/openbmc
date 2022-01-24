@@ -5,6 +5,9 @@
 
 SUMMARY = "Essential build dependencies"
 
+# libstdc++ gets debian renamed
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
 inherit packagegroup
 
 RDEPENDS:packagegroup-core-buildessential = "\

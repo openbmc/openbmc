@@ -1,0 +1,45 @@
+From c3c20db4415e0f6c4a601d6f9da1f3746a96b301 Mon Sep 17 00:00:00 2001
+From: Claude Bing <cbing@cybernetics.com>
+Date: Tue, 9 Nov 2021 13:08:58 -0500
+Subject: [PATCH 08/11] ext/imap/config.m4: fix include paths
+
+Upstream-Status: Pending
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+
+update patch to version 8.0.12
+Signed-off-by: Claude Bing <cbing@cybernetics.com>
+---
+ ext/imap/config.m4 | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/ext/imap/config.m4 b/ext/imap/config.m4
+index 5086a312d0..0e938bd544 100644
+--- a/ext/imap/config.m4
++++ b/ext/imap/config.m4
+@@ -110,7 +110,7 @@ if test "$PHP_IMAP" != "no"; then
+     PHP_NEW_EXTENSION(imap, php_imap.c, $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
+     AC_DEFINE(HAVE_IMAP,1,[ ])
+ 
+-    for i in $PHP_IMAP /usr/local /usr; do
++    for i in $PHP_IMAP $PHP_IMAP/usr /usr/local /usr; do
+       IMAP_INC_CHK()
+       el[]IMAP_INC_CHK(/include/c-client)
+       el[]IMAP_INC_CHK(/include/imap)
+@@ -199,13 +199,7 @@ if test "$PHP_IMAP" != "no"; then
+       AC_MSG_ERROR(Cannot find rfc822.h. Please check your c-client installation.)
+     fi
+ 
+-    if test ! -r "$IMAP_DIR/c-client/libc-client.a" && test -r "$IMAP_DIR/c-client/c-client.a" ; then
+-      ln -s "$IMAP_DIR/c-client/c-client.a" "$IMAP_DIR/c-client/libc-client.a" >/dev/null 2>&1
+-    elif test ! -r "$IMAP_DIR/$PHP_LIBDIR/libc-client.a" && test -r "$IMAP_DIR/$PHP_LIBDIR/c-client.a"; then
+-      ln -s "$IMAP_DIR/$PHP_LIBDIR/c-client.a" "$IMAP_DIR/$PHP_LIBDIR/libc-client.a" >/dev/null 2>&1
+-    fi
+-
+-    for lib in c-client4 c-client imap; do
++    for lib in /usr/lib c-client4 c-client imap; do
+       IMAP_LIB=$lib
+       IMAP_LIB_CHK($PHP_LIBDIR)
+       IMAP_LIB_CHK(c-client)
+-- 
+2.25.1
+

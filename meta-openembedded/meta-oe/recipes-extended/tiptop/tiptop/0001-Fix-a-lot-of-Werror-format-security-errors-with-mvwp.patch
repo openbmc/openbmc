@@ -1,0 +1,31 @@
+From 42e99eb6c727df7c9d49586803a4bf9933a9796b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Oct 2021 10:52:42 -0700
+Subject: [PATCH] Fix a lot of -Werror=format-security errors with mvwprintw
+
+In all these places a non-constant is used as a format string which
+compiler complains about. Fix by using "%s" as format.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/helpwin.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/helpwin.c b/src/helpwin.c
+index 0d660f9..1623d9c 100644
+--- a/src/helpwin.c
++++ b/src/helpwin.c
+@@ -61,7 +61,7 @@ void show_help_win(WINDOW* win, screen_t* screen)
+     wattroff(win, A_REVERSE);
+ 
+   /* screen description */
+-  mvwprintw(win, 2, 1, screen->desc);
++  mvwprintw(win, 2, 1, "%s", screen->desc);
+ 
+   /* max size of column headers */
+   for(i = 0; i < n; i++) {
+-- 
+2.33.1
+

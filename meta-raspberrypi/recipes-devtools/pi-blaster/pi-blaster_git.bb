@@ -4,7 +4,7 @@ SECTION = "devel/libs"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://README.md;beginline=268;endline=292;md5=86d10e4bcf4b4014d306dde7c1d2a80d"
 
-SRC_URI = "git://github.com/sarfata/pi-blaster \
+SRC_URI = "git://github.com/sarfata/pi-blaster;branch=master;protocol=https \
            file://remove-initscript-lsb-dependency.patch \
            "
 

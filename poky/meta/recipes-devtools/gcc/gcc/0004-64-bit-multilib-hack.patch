@@ -23,7 +23,7 @@ Do same for riscv64, aarch64 & arc
 
 RP 15/8/11
 
-Upstream-Status: Inappropriate[OE-Specific]
+Upstream-Status: Inappropriate [OE-Specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Elvis Dowson <elvis.dowson@gmail.com>

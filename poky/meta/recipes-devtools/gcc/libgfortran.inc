@@ -5,6 +5,11 @@ EXTRA_OECONF_PATHS = "\
     --with-build-sysroot=${STAGING_DIR_TARGET} \
 "
 
+# An arm hard float target like raspberrypi4 won't build
+# as CFLAGS don't make it to the fortran compiler otherwise
+# (the configure script sets FC to $GFORTRAN unconditionally)
+export GFORTRAN = "${FC}"
+
 do_configure () {
 	for target in libbacktrace libgfortran
 	do

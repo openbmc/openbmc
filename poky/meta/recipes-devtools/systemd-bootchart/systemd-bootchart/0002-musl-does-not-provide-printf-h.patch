@@ -10,8 +10,8 @@ Original patch author: Emil Renner Berthing <systemd@esmil.dk>
 Includes work by: Khem Raj <raj.khem@gmail.com>
 
 Signed-off-by: Tim Orling <timothy.t.orling@linux.intel.com>
+Upstream-Status: Submitted [https://github.com/systemd/systemd-bootchart/pull/47]
 ---
-Upstream-Status: Pending
 
  Makefile.am               |   4 +
  configure.ac              |   3 +

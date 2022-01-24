@@ -5,7 +5,7 @@ HOMEPAGE = "http://corosync.github.io/corosync/"
 
 SECTION = "base"
 
-inherit autotools pkgconfig systemd useradd
+inherit autotools pkgconfig systemd
 
 SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/v${PV}/${BP}.tar.gz \
            file://corosync.conf \
@@ -18,10 +18,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=a85eb4ce24033adb6088dd1d6ffc5e5d"
 
 DEPENDS = "groff-native nss libqb kronosnet"
 
-SYSTEMD_SERVICE:${PN} = "corosync.service corosync-notifyd.service \
-                         ${@bb.utils.contains('PACKAGECONFIG', 'qdevice', 'corosync-qdevice.service', '', d)} \
-                         ${@bb.utils.contains('PACKAGECONFIG', 'qnetd', 'corosync-qnetd.service', '', d)} \
-"
+SYSTEMD_SERVICE:${PN} = "corosync.service corosync-notifyd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 INITSCRIPT_NAME = "corosync-daemon"
@@ -43,20 +40,16 @@ EXTRA_OEMAKE = "tmpfilesdir_DATA="
 #}
 
 do_install:append() {
-    install -D -m 0644 ${WORKDIR}/corosync.conf ${D}/${sysconfdir}/corosync/corosync.conf.example
+    install -D -m 0644 ${WORKDIR}/corosync.conf ${D}${sysconfdir}/corosync/corosync.conf.example
     install -d ${D}${sysconfdir}/sysconfig/
     install -m 0644 ${S}/init/corosync.sysconfig.example ${D}${sysconfdir}/sysconfig/corosync
     install -m 0644 ${S}/tools/corosync-notifyd.sysconfig.example ${D}${sysconfdir}/sysconfig/corosync-notifyd
 
-    rm -rf "${D}${localstatedir}/run"
+    rmdir ${D}${localstatedir}/log/cluster ${D}${localstatedir}/log
+    rmdir --ignore-fail-on-non-empty ${D}${localstatedir}
 
     install -d ${D}${sysconfdir}/default/volatiles
     echo "d root root 0755 ${localstatedir}/log/cluster none" > ${D}${sysconfdir}/default/volatiles/05_corosync
-
-    if [ ${@bb.utils.filter('PACKAGECONFIG', 'qnetd', d)} ]; then
-        chown -R coroqnetd:coroqnetd ${D}${sysconfdir}/${BPN}/qnetd
-        echo "d coroqnetd coroqnetd 0770 /var/run/corosync-qnetd none" >> ${D}${sysconfdir}/default/volatiles/05_corosync
-    fi
 
     if [ ${@bb.utils.filter('DISTRO_FEATURES','systemd',d)} ]; then
         install -d ${D}${sysconfdir}/tmpfiles.d
@@ -68,7 +61,3 @@ RDEPENDS:${PN} += "bash ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'sys
 
 FILES:${PN}-dbg += "${libexecdir}/lcrso/.debug"
 FILES:${PN}-doc += "${datadir}/snmp/mibs/COROSYNC-MIB.txt"
-
-USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM:${PN} = "--system coroqnetd"
-USERADD_PARAM:${PN} = "--system -d / -M -s /bin/nologin -c 'User for corosync-qnetd' -g coroqnetd coroqnetd"

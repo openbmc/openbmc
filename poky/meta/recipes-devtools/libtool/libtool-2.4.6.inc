@@ -24,6 +24,8 @@ SRC_URI = "${GNU_MIRROR}/libtool/libtool-${PV}.tar.gz \
            file://0010-Makefile.am-make-sure-autoheader-run-before-automake.patch \
            file://0011-ltmain.in-Handle-prefix-map-compiler-options-correct.patch \
            file://0012-libtool.m4-For-reproducibility-stop-encoding-hostnam.patch \
+           file://libool.m4-add-ARFLAGS-variable.patch \
+           file://ARFLAGS-use-cr-instead-of-cru-by-default.patch \
           "
 
 SRC_URI[md5sum] = "addf44b646ddb4e3919805aa88fa7c5e"

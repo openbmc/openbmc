@@ -1,4 +1,4 @@
-From 028ec9c7e9f7a6f083eec987f3ad7e7623398d9d Mon Sep 17 00:00:00 2001
+From 2ce67b1f4b1f582d556ae058da10698bbaa0edc1 Mon Sep 17 00:00:00 2001
 From: Ovidiu Panait <ovidiu.panait@windriver.com>
 Date: Mon, 13 Jul 2020 12:12:31 +0300
 Subject: [PATCH] nss: fix incorrect shebang of perl

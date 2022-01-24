@@ -9,9 +9,9 @@ Index: git/src/po/Makefile
 ===================================================================
 --- git.orig/src/po/Makefile
 +++ git/src/po/Makefile
-@@ -165,17 +165,16 @@ $(PACKAGE).pot: ../*.c ../if_perl.xs ../
- 		po/gvim.desktop.in po/vim.desktop.in
- 	mv -f ../$(PACKAGE).po $(PACKAGE).pot
+@@ -207,17 +207,16 @@ $(PACKAGE).pot: $(PO_INPUTLIST) $(PO_VIM
+ 	# Delete the temporary files
+ 	rm *.js
  
 -vim.desktop: vim.desktop.in $(POFILES)
 +LINGUAS:

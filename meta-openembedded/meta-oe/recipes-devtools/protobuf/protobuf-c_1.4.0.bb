@@ -12,12 +12,14 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=cb901168715f4782a2b06c3ddaefa558"
 
 DEPENDS = "protobuf-native protobuf"
 
-SRC_URI = "git://github.com/protobuf-c/protobuf-c.git"
+SRC_URI = "git://github.com/protobuf-c/protobuf-c.git;branch=master;protocol=https"
 SRCREV = "f224ab2eeb648a818eb20687d7150a285442c907"
 
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
+
+export PROTOC = "${STAGING_BINDIR_NATIVE}/protoc"
 
 # After several fix attempts there is still a race between generating
 # t.test-full.pb.h and compiling cxx_generate_packed_data.c despite

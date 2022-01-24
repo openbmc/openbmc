@@ -1,6 +1,6 @@
 DESCRIPTION = "nodeJS Evented I/O for V8 JavaScript"
 HOMEPAGE = "http://nodejs.org"
-LICENSE = "MIT & BSD & Artistic-2.0"
+LICENSE = "MIT & ISC & BSD-2-Clause & BSD-3-Clause & Artistic-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=12f6b053282af96a218353ae7aff7cd8"
 
 DEPENDS = "openssl"
@@ -24,6 +24,7 @@ SRC_URI = "http://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz \
            file://mips-less-memory.patch \
            file://system-c-ares.patch \
            file://0001-liftoff-Correct-function-signatures.patch \
+           file://0001-crypto-fix-build-without-scrypt.patch \
            "
 SRC_URI:append:class-target = " \
            file://0002-Using-native-binaries.patch \
@@ -150,49 +151,30 @@ do_configure () {
 
 do_compile () {
     export LD="${CXX}"
-    install -Dm 0755 ${B}/v8-qemu-wrapper.sh ${B}/out/Release/v8-qemu-wrapper.sh
+    install -D ${B}/v8-qemu-wrapper.sh ${B}/out/Release/v8-qemu-wrapper.sh
     oe_runmake BUILDTYPE=Release
 }
 
 do_install () {
     oe_runmake install DESTDIR=${D}
-
-    # wasn't updated since 2009 and is the only thing requiring python2 in runtime
-    # ERROR: nodejs-12.14.1-r0 do_package_qa: QA Issue: /usr/lib/node_modules/npm/node_modules/node-gyp/gyp/samples/samples contained in package nodejs-npm requires /usr/bin/python, but no providers found in RDEPENDS:nodejs-npm? [file-rdeps]
-    rm -f ${D}${exec_prefix}/lib/node_modules/npm/node_modules/node-gyp/gyp/samples/samples
 }
+
+BINARIES = " \
+    bytecode_builtins_list_generator \
+    ${@bb.utils.contains('PACKAGECONFIG', 'icu', 'gen-regexp-special-case', '', d)} \
+    mkcodecache \
+    node_mksnapshot \
+    torque \
+"
 
 do_install:append:class-native() {
-    # use node from PATH instead of absolute path to sysroot
-    # node-v0.10.25/tools/install.py is using:
-    # shebang = os.path.join(node_prefix, 'bin/node')
-    # update_shebang(link_path, shebang)
-    # and node_prefix can be very long path to bindir in native sysroot and
-    # when it exceeds 128 character shebang limit it's stripped to incorrect path
-    # and npm fails to execute like in this case with 133 characters show in log.do_install:
-    # updating shebang of /home/jenkins/workspace/build-webos-nightly/device/qemux86/label/open-webos-builder/BUILD-qemux86/work/x86_64-linux/nodejs-native/0.10.15-r0/image/home/jenkins/workspace/build-webos-nightly/device/qemux86/label/open-webos-builder/BUILD-qemux86/sysroots/x86_64-linux/usr/bin/npm to /home/jenkins/workspace/build-webos-nightly/device/qemux86/label/open-webos-builder/BUILD-qemux86/sysroots/x86_64-linux/usr/bin/node
-    # /usr/bin/npm is symlink to /usr/lib/node_modules/npm/bin/npm-cli.js
-    # use sed on npm-cli.js because otherwise symlink is replaced with normal file and
-    # npm-cli.js continues to use old shebang
-    sed "1s^.*^#\!/usr/bin/env node^g" -i ${D}${exec_prefix}/lib/node_modules/npm/bin/npm-cli.js
-
     # Install the native binaries to provide it within sysroot for the target compilation
     install -d ${D}${bindir}
-    install -m 0755 ${S}/out/Release/torque ${D}${bindir}/torque
-    install -m 0755 ${S}/out/Release/bytecode_builtins_list_generator ${D}${bindir}/bytecode_builtins_list_generator
-    if ${@bb.utils.contains('PACKAGECONFIG','icu','true','false',d)}; then
-        install -m 0755 ${S}/out/Release/gen-regexp-special-case ${D}${bindir}/gen-regexp-special-case
-    fi
-    install -m 0755 ${S}/out/Release/mkcodecache ${D}${bindir}/mkcodecache
-    install -m 0755 ${S}/out/Release/node_mksnapshot ${D}${bindir}/node_mksnapshot
-}
-
-do_install:append:class-target() {
-    sed "1s^.*^#\!${bindir}/env node^g" -i ${D}${exec_prefix}/lib/node_modules/npm/bin/npm-cli.js
+    (cd ${S}/out/Release && install ${BINARIES} ${D}${bindir})
 }
 
 PACKAGES =+ "${PN}-npm"
-FILES:${PN}-npm = "${exec_prefix}/lib/node_modules ${bindir}/npm ${bindir}/npx"
+FILES:${PN}-npm = "${nonarch_libdir}/node_modules ${bindir}/npm ${bindir}/npx"
 RDEPENDS:${PN}-npm = "bash python3-core python3-shell python3-datetime \
     python3-misc python3-multiprocessing"
 

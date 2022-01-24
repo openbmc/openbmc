@@ -1,4 +1,4 @@
-From 863c09f640a5dfd33ff22915b0d5fee7bc5df70a Mon Sep 17 00:00:00 2001
+From 788cd0464ee2b175493a0167ceee8c0045ce323c Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Sun, 16 Feb 2020 17:50:25 +0100
 Subject: [PATCH] configure.ac, setup.py: do not add a curses include path from
@@ -11,16 +11,17 @@ as dnf failures).
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
 ---
  configure.ac | 6 ------
  setup.py     | 2 --
  2 files changed, 8 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 915f475..c911011 100644
+index e5e3df8..bfdd987 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4828,12 +4828,6 @@ then
+@@ -5092,12 +5092,6 @@ then
    [Define if you have struct stat.st_mtimensec])
  fi
  
@@ -34,10 +35,10 @@ index 915f475..c911011 100644
  
  # On Solaris, term.h requires curses.h
 diff --git a/setup.py b/setup.py
-index b0f1541..7208cd0 100644
+index 62f0e18..c190002 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -973,8 +973,6 @@ class PyBuildExt(build_ext):
+@@ -1169,8 +1169,6 @@ class PyBuildExt(build_ext):
          panel_library = 'panel'
          if curses_library == 'ncursesw':
              curses_defines.append(('HAVE_NCURSESW', '1'))

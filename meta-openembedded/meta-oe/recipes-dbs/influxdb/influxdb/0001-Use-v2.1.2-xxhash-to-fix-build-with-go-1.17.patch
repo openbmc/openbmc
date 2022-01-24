@@ -1,0 +1,39 @@
+From 4ca405e9763fd0ba747ef00edd30648b66992fbb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 30 Nov 2021 15:14:39 -0800
+Subject: [PATCH] Use v2.1.2 xxhash to fix build with go 1.17
+
+Fixes
+| # github.com/cespare/xxhash
+| asm: xxhash_amd64.s:120: when dynamic linking, R15 is clobbered by a global variable access and is used here: 000
+92 (/mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux/influxdb/1.8.10-r0/build/pkg/mod/github.com/cespare/xxhash@
+v1.1.0/xxhash_amd64.s:120)        ADDQ    R15, AX
+| asm: assembly failed
+
+Upstream-Status: Backport [https://github.com/cespare/xxhash/commit/e7a6b52374f7e2abfb8abb27249d53a1997b09a7]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ go.mod | 3 ++-
+ go.sum | 2 ++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+--- a/go.mod
++++ b/go.mod
+@@ -55,3 +55,5 @@ require (
+ 	gonum.org/v1/gonum v0.6.0 // indirect
+ 	google.golang.org/grpc v1.26.0
+ )
++
++replace github.com/cespare/xxhash => github.com/kraj/xxhash v1.1.1-0.20211201014032-8254a11eab56
+--- a/go.sum
++++ b/go.sum
+@@ -188,6 +188,8 @@ github.com/kr/pretty v0.1.0/go.mod h1:dA
+ github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
+ github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
+ github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
++github.com/kraj/xxhash v1.1.1-0.20211201014032-8254a11eab56 h1:hCQ0jTkNInQ7PpNeGlSV9s+QMi6nUyyMuz37Bg3TduE=
++github.com/kraj/xxhash v1.1.1-0.20211201014032-8254a11eab56/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
+ github.com/lib/pq v1.0.0 h1:X5PMW56eZitiTeO7tKzZxFCSpbFZJtkMMooicw2us9A=
+ github.com/lib/pq v1.0.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
+ github.com/mattn/go-colorable v0.0.9 h1:UVL0vNpWh04HeJXV0KLcaT7r06gOH2l4OW6ddYRUIY4=

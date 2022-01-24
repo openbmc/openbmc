@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=52962875ab02c36df6cde47b1f463024"
 COMPATIBLE_HOST = "null"
 COMPATIBLE_HOST:rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', 'null', '(.*)', d)}"
 
-SRC_URI = "git://github.com/AndrewFromMelbourne/raspidmx;protocol=https \
+SRC_URI = "git://github.com/AndrewFromMelbourne/raspidmx;protocol=https;branch=master \
            file://0001-gitignore-add-archives-from-lib-directory.patch \
            file://0002-add-install-targets-to-Makefiles.patch \
            file://0003-switch-to-pkg-config.patch \

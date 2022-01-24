@@ -10,7 +10,7 @@ its 12-bytes here and libc has 16-bytes
 
 This can cause problems especially with 64bit time_t
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [as far as open source community is concerned, upstream is dead]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/dbinc/clock.h | 17 +----------------

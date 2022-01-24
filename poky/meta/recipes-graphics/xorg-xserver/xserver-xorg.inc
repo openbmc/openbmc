@@ -19,16 +19,24 @@ SRC_URI = "${XORG_MIRROR}/individual/xserver/${XORG_PN}-${PV}.tar.xz"
 
 UPSTREAM_CHECK_REGEX = "xorg-server-(?P<pver>\d+(\.(?!99)\d+)+)\.tar"
 
-CVE_PRODUCT = "xorg-server"
+CVE_PRODUCT = "xorg-server x_server"
+# This is specific to Debian's xserver-wrapper.c
+CVE_CHECK_WHITELIST += "CVE-2011-4613"
+# As per upstream, exploiting this flaw is non-trivial and it requires exact
+# timing on the behalf of the attacker. Many graphical applications exit if their
+# connection to the X server is lost, so a typical desktop session is either
+# impossible or difficult to exploit. There is currently no upstream patch
+# available for this flaw.
+CVE_CHECK_WHITELIST += "CVE-2020-25697"
 
 S = "${WORKDIR}/${XORG_PN}-${PV}"
 
-inherit autotools pkgconfig
+inherit meson pkgconfig
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "x11"
 
-LIB_DEPS = "pixman libxfont2 xtrans libxau libxext libxdmcp libdrm libxkbfile libpciaccess"
+LIB_DEPS = "pixman libxfont2 xtrans libxau libxext libxdmcp libdrm libxkbfile libpciaccess libxcvt libtirpc"
 DEPENDS = "xorgproto ${LIB_DEPS} font-util"
 
 # Split out some modules and extensions from the main package
@@ -78,7 +86,7 @@ RRECOMMENDS:${PN}-xwayland += "${XSERVER_RRECOMMENDS}"
 RDEPENDS:${PN}-xvfb += "xkeyboard-config"
 RDEPENDS:${PN}-module-exa = "${PN} (= ${EXTENDPKGV})"
 
-FILES:${PN} = "${bindir} ${libdir}/X11/Options ${libdir}/X11/Cards ${libdir}/X11/getconfig ${libdir}/X11/etc ${libdir}/modules/*.so ${libdir}/xorg/modules/*.so /etc/X11 ${libdir}/xorg/protocol.txt ${datadir}/X11/xorg.conf.d"
+FILES:${PN} = "${bindir} ${libdir}/X11/Options ${libdir}/X11/Cards ${libdir}/X11/getconfig ${libdir}/X11/etc ${libdir}/modules/*.so ${libdir}/xorg/modules/input/*.so ${libdir}/xorg/modules/*.so /etc/X11 ${libdir}/xorg/protocol.txt ${datadir}/X11/xorg.conf.d"
 FILES:${PN}-dev += "${libdir}/xorg/modules/*.la ${libdir}/xorg/modules/*/*.la"
 FILES:${PN}-doc += "${libdir}/X11/doc ${datadir}/X11/xkb/compiled/README.compiled ${localstatedir}/lib/xkb/README.compiled"
 FILES:${PN}-sdl = "${bindir}/Xsdl"
@@ -105,53 +113,38 @@ FILES:${PN}-module-libxf1bpp = "${libdir}/xorg/modules/libxf1bpp.so"
 FILES:${PN}-module-libxf4bpp = "${libdir}/xorg/modules/libxf4bpp.so"
 FILES:xf86-video-modesetting = "${libdir}/xorg/modules/drivers/modesetting_drv.so"
 
-EXTRA_OECONF += "--with-fop=no \
-                 --with-pic \
-                 --disable-static \
-                 --disable-record \
-                 --disable-dmx \
-                 --disable-xnest \
-                 --enable-xvfb \
-                 --enable-composite \
-                 --without-dtrace \
-                 --with-int10=x86emu \
-                 --sysconfdir=/etc/X11 \
-                 --localstatedir=/var \
-                 --with-xkb-output=/var/lib/xkb \
-                 --with-os-name=Linux \
+EXTRA_OEMESON += " \
+                 -Dxnest=false \
+                 -Dxvfb=true \
+                 -Ddtrace=false \
+                 -Dint10=x86emu \
+                 -Dxkb_output_dir=/var/lib/xkb \
 "
 
-OPENGL_PKGCONFIGS = "dri glx glamor dri3 xshmfence"
+OPENGL_PKGCONFIGS = "dri glx glamor dri3"
 PACKAGECONFIG ??= "dga dri2 udev ${XORG_CRYPTO} \
                    ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', '${OPENGL_PKGCONFIGS}', '', d)} \
-                   ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd systemd-logind', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-logind', '', d)} \
 "
 
-PACKAGECONFIG[udev] = "--enable-config-udev,--disable-config-udev,udev"
-PACKAGECONFIG[dga] = "--enable-dga,--disable-dga"
-PACKAGECONFIG[dri] = "--enable-dri,--disable-dri,virtual/mesa"
-PACKAGECONFIG[dri2] = "--enable-dri2,--disable-dri2"
-# DRI3 requires xshmfence to also be enabled
-PACKAGECONFIG[dri3] = "--enable-dri3,--disable-dri3"
-PACKAGECONFIG[glx] = "--enable-glx,--disable-glx,virtual/libgl virtual/libx11"
-PACKAGECONFIG[glamor] = "--enable-glamor,--disable-glamor,libepoxy virtual/libgbm,libegl"
-PACKAGECONFIG[unwind] = "--enable-libunwind,--disable-libunwind,libunwind"
-PACKAGECONFIG[xshmfence] = "--enable-xshmfence,--disable-xshmfence,libxshmfence"
-PACKAGECONFIG[xmlto] = "--with-xmlto, --without-xmlto, xmlto-native docbook-xml-dtd4-native docbook-xsl-stylesheets-native"
-PACKAGECONFIG[systemd-logind] = "--enable-systemd-logind=yes,--enable-systemd-logind=no,dbus,"
-PACKAGECONFIG[systemd] = "--with-systemd-daemon,--without-systemd-daemon,systemd"
-PACKAGECONFIG[xinerama] = "--enable-xinerama,--disable-xinerama"
-PACKAGECONFIG[xwayland] = "--enable-xwayland,--disable-xwayland,wayland wayland-native wayland-protocols libepoxy"
+PACKAGECONFIG[udev] = "-Dudev=true,-Dudev=false,udev"
+PACKAGECONFIG[dga] = "-Ddga=true,-Ddga=false"
+PACKAGECONFIG[dri] = "-Ddri1=true,-Ddri1=false,virtual/mesa"
+PACKAGECONFIG[dri2] = "-Ddri2=true,-Ddri2=false"
+PACKAGECONFIG[dri3] = "-Ddri3=true,-Ddri3=false"
+PACKAGECONFIG[glx] = "-Dglx=true,-Dglx=false,virtual/libgl virtual/libx11"
+PACKAGECONFIG[glamor] = "-Dglamor=true,-Dglamor=false,libepoxy virtual/libgbm,libegl"
+PACKAGECONFIG[unwind] = "-Dlibunwind=true,-Dlibunwind=false,libunwind"
+PACKAGECONFIG[systemd-logind] = "-Dsystemd_logind=true,-Dsystemd_logind=false,dbus,"
+PACKAGECONFIG[xinerama] = "-Dxinerama=true,-Dxinerama=false"
 
 # Xorg requires a SHA1 implementation, pick one
 XORG_CRYPTO ??= "openssl"
-PACKAGECONFIG[openssl] = "--with-sha1=libcrypto,,openssl"
-PACKAGECONFIG[nettle] = "--with-sha1=libnettle,,nettle"
-PACKAGECONFIG[gcrypt] = "--with-sha1=libgcrypt,,libgcrypt"
+PACKAGECONFIG[openssl] = "-Dsha1=libcrypto,,openssl"
+PACKAGECONFIG[nettle] = "-Dsha1=libnettle,,nettle"
+PACKAGECONFIG[gcrypt] = "-Dsha1=libgcrypt,,libgcrypt"
 
 do_install:append () {
-	# Its assumed base-files creates this for us
-	rmdir ${D}${localstatedir}/log/
         sed -i -e 's,${libdir}/xorg/modules,${prefix}/lib*/xorg/modules,' ${D}${mandir}/man5/xorg.conf.5
 }
 

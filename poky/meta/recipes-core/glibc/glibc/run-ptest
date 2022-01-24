@@ -1,0 +1,37 @@
+#!/bin/sh
+# ptest script for glibc - to run time related tests to
+# facilitate Y2038 validation
+# Run with 'ptest-runner glibc-tests'
+
+output() {
+  retcode=$?
+  if [ $retcode -eq 0 ]
+    then echo "PASS: $i"
+  elif [ $retcode -eq 77 ]
+    then echo "SKIP: $i"
+  else echo "FAIL: $i"
+  fi
+}
+
+# Allow altering time on the target
+export GLIBC_TEST_ALLOW_TIME_SETTING="1"
+
+tst_time64=$(ls -r ${PWD}/tests/glibc-ptest/*-time64)
+
+# Remove '-time64' suffix - those tests are also time
+# related
+tst_time_tmp=$(sed -e "s/-time64$//" <<< ${tst_time64})
+
+# Run tests supporting only 32 bit time
+for i in ${tst_time_tmp}
+do
+	$i >/dev/null 2>&1
+	output
+done
+
+# Run tests supporting only 64 bit time
+for i in ${tst_time64}
+do
+	$i >/dev/null 2>&1
+	output
+done

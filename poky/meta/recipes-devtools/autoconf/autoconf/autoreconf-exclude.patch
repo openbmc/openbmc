@@ -3,6 +3,7 @@ From: Ross Burton <ross.burton@intel.com>
 Date: Thu, 12 Mar 2020 17:25:23 +0000
 Subject: [PATCH 4/7] autoreconf-exclude.patch
 
+Upstream-Status: Inappropriate [oe specific]
 ---
  bin/autoreconf.in | 26 ++++++++++++++++++++++++++
  1 file changed, 26 insertions(+)

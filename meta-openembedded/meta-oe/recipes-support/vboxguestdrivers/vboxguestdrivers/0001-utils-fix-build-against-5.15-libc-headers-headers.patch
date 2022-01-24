@@ -1,0 +1,62 @@
+From 7213a5bfa3bd9f360d6be01e6dbd59d91095a0fd Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@gmail.com>
+Date: Thu, 4 Nov 2021 14:53:46 -0400
+Subject: [PATCH] utils: fix build against 5.15 libc-headers headers
+
+In kernel v5.15+ stdarg.h is part of the kernel source, and the
+upstream project has a change to prefer that stdarg.h to the
+c-library variant and hence includes it as <linux/stdarg.h>, which
+leads to the following build error:
+
+   | In file included from ../vboxsf/include/iprt/types.h:34,
+   |                  from ../vboxsf/include/iprt/string.h:33,
+   |                  from mount.vboxsf.c:53:
+   | ../vboxsf/include/iprt/stdarg.h:49:13: fatal error: linux/stdarg.h: No such file or directory
+   |    49 | #   include <linux/stdarg.h>
+   |       |             ^~~~~~~~~~~~~~~~
+
+If we modify our build of the vboxdrivers to have the kernel source
+directory on the include path (to find linux/stdarg.h, that leads
+to the following errors:
+
+   In file included from build/tmp/work/qemux86_64-poky-linux/vboxguestdrivers/6.1.28-r0/recipe-sysroot/usr/include/stdlib.h:394,
+   |                  from mount.vboxsf.c:36:
+   | build/tmp/work/qemux86_64-poky-linux/vboxguestdrivers/6.1.28-r0/recipe-sysroot/usr/include/sys/types.h:192:20: note: previous declaration of 'blkcnt_t' with type 'blkcnt_t' {aka 'long int'}
+   |   192 | typedef __blkcnt_t blkcnt_t;     /* Type to count number of disk blocks.  */
+   |       |                    ^~~~~~~~
+   | In file included from build/tmp/work-shared/qemux86-64/kernel-source/include/linux/time.h:5,
+   |                  from poky/build/tmp/work-shared/qemux86-64/kernel-source/include/linux/stat.h:19,
+   |                  from build/tmp/work/qemux86_64-poky-linux/vboxguestdrivers/6.1.28-r0/recipe-sysroot/usr/include/bits/statx.h:31,
+
+Our libc-headers are safe and don't lead to the potential conflicing
+information that the upstream commit is guarding against. The easiest
+solution is to revert the upstream change and trust our headers.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ vboxsf/include/iprt/stdarg.h | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/include/iprt/stdarg.h b/include/iprt/stdarg.h
+index c73093c..7bffde5 100644
+--- a/include/iprt/stdarg.h
++++ b/include/iprt/stdarg.h
+@@ -44,12 +44,7 @@
+ #   define __builtin_stdarg_start __builtin_va_start
+ #  endif
+ # elif defined(RT_OS_LINUX) && defined(IN_RING0)
+-#  include "linux/version.h"
+-#  if RTLNX_VER_MIN(5,15,0)
+-#   include <linux/stdarg.h>
+-#  else
+-#   include <stdarg.h>
+-#  endif
++#  include <stdarg.h>
+ # else
+ #  include <stdarg.h>
+ # endif
+-- 
+2.19.1
+

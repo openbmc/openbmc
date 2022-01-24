@@ -3,7 +3,7 @@ From: Alberto Garcia <berto@igalia.com>
 Date: Sun, 25 Apr 2021 18:45:13 +0000
 Subject: [PATCH] Reduce memory usage when not using the Gold linker
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://bugs.webkit.org/show_bug.cgi?id=232938]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---

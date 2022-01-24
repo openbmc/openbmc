@@ -4,7 +4,7 @@ PYTHON="${STAGING_BINDIR_NATIVE}/python3-native/python3"
 EXTRANATIVEPATH += "python3-native"
 DEPENDS:append = " python3-native "
 
-# python-config and other scripts are using distutils modules
+# python-config and other scripts are using sysconfig modules
 # which we patch to access these variables
 export STAGING_INCDIR
 export STAGING_LIBDIR

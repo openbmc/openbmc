@@ -7,9 +7,8 @@ Date:   Tue Feb 12 09:53:50 2013 -0500
     Added support for socklen_t type to len argument passed to socket related
     calls. This fixes a bug that causes tcp wrappers to fail when using sshd.
     
-    Upstream-Status: Pending
-    
-    Signed-off-by: farrah rashid <farrah.rashid@windriver.com>
+Upstream-Status: Pending
+Signed-off-by: farrah rashid <farrah.rashid@windriver.com>
 
 diff --git a/fix_options.c b/fix_options.c
 index 7473adf..fe2b442 100644

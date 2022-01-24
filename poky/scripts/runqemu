@@ -199,7 +199,7 @@ class BaseConfig(object):
         self.fsinfo = {}
         self.network_device = "-device e1000,netdev=net0,mac=@MAC@"
         self.cmdline_ip_slirp = "ip=dhcp"
-        self.cmdline_ip_tap = "ip=192.168.7.@CLIENT@::192.168.7.@GATEWAY@:255.255.255.0"
+        self.cmdline_ip_tap = "ip=192.168.7.@CLIENT@::192.168.7.@GATEWAY@:255.255.255.0::eth0:off:8.8.8.8"
         # Use different mac section for tap and slirp to avoid
         # conflicts, e.g., when one is running with tap, the other is
         # running with slirp.
@@ -474,6 +474,7 @@ class BaseConfig(object):
 
         if 'gl' not in sys.argv[1:] and 'gl-es' not in sys.argv[1:]:
             os.environ['SDL_RENDER_DRIVER'] = 'software'
+            os.environ['SDL_FRAMEBUFFER_ACCELERATION'] = 'false'
 
         unknown_arg = ""
         for arg in sys.argv[1:]:
@@ -1266,7 +1267,13 @@ class BaseConfig(object):
                 self.rootfs_options = vm_drive
                 if not self.fstype in self.vmtypes:
                     self.rootfs_options += ' -no-reboot'
-            self.kernel_cmdline = 'root=%s rw' % (self.get('QB_KERNEL_ROOT'))
+
+            # By default, ' rw' is appended to QB_KERNEL_ROOT unless either ro or rw is explicitly passed.
+            qb_kernel_root = self.get('QB_KERNEL_ROOT')
+            qb_kernel_root_l = qb_kernel_root.split()
+            if not ('ro' in qb_kernel_root_l or 'rw' in qb_kernel_root_l):
+                qb_kernel_root += ' rw'
+            self.kernel_cmdline = 'root=%s' % qb_kernel_root
 
         if self.fstype == 'nfs':
             self.rootfs_options = ''
@@ -1349,9 +1356,14 @@ class BaseConfig(object):
             raise RunQemuError('Option gl/gl-es needs gtk or sdl option.')
 
         if self.sdl == True or self.gtk == True or self.egl_headless == True:
-            self.set_dri_path()
-            self.qemu_opt += ' -device virtio-vga-gl -display '
+            if self.gl or self.gl_es or self.egl_headless:
+                self.qemu_opt += ' -device virtio-vga-gl '
+            else:
+                self.qemu_opt += ' -device virtio-vga '
+
+            self.qemu_opt += '-display '
             if self.egl_headless == True:
+                self.set_dri_path()
                 self.qemu_opt += 'egl-headless,'
             else:
                 if self.sdl == True:
@@ -1360,8 +1372,10 @@ class BaseConfig(object):
                     self.qemu_opt += 'gtk,'
 
                 if self.gl == True:
+                    self.set_dri_path()
                     self.qemu_opt += 'gl=on,'
                 elif self.gl_es == True:
+                    self.set_dri_path()
                     self.qemu_opt += 'gl=es,'
             self.qemu_opt += 'show-cursor=on'
 
@@ -1369,7 +1383,7 @@ class BaseConfig(object):
 
     def setup_serial(self):
         # Setup correct kernel command line for serial
-        if self.serialstdio == True or self.serialconsole == True or self.nographic == True or self.tcpserial_portnum:
+        if self.get('SERIAL_CONSOLES') and (self.serialstdio == True or self.serialconsole == True or self.nographic == True or self.tcpserial_portnum):
             for entry in self.get('SERIAL_CONSOLES').split(' '):
                 self.kernel_cmdline_script += ' console=%s' %entry.split(';')[1]
 
@@ -1580,7 +1594,8 @@ def main():
 
         def sigterm_handler(signum, frame):
             logger.info("SIGTERM received")
-            os.kill(config.qemupid, signal.SIGTERM)
+            if config.qemupid:
+                os.kill(config.qemupid, signal.SIGTERM)
             config.cleanup()
             # Deliberately ignore the return code of 'tput smam'.
             subprocess.call(["tput", "smam"])

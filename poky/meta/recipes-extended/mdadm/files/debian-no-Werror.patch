@@ -1,5 +1,7 @@
-From: martin f. krafft <madduck@debian.org>
-Subject: Remove -Werror from compiler flags
+From adb75f0bdec97dbe4aa15cc988d349775f7995ff Mon Sep 17 00:00:00 2001
+From: "martin f. krafft" <madduck@debian.org>
+Date: Mon, 3 Jan 2022 19:14:12 +0000
+Subject: [PATCH] Remove -Werror from compiler flags
 
 -Werror seems like a bad idea on released/packaged code because a toolchain
 update (introducing new warnings) could break the build. We'll let upstream
@@ -8,15 +10,18 @@ use it to beautify the code, but remove it for out builds.
 Signed-off-by: martin f. krafft <madduck@debian.org>
 
 Upstream-Status: Pending
----
- Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
 
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 716c97c..40354ea 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -48,7 +48,7 @@ endif
- 
- CC ?= $(CROSS_COMPILE)gcc
+@@ -50,7 +50,7 @@ ifeq ($(origin CC),default)
+ CC := $(CROSS_COMPILE)gcc
+ endif
  CXFLAGS ?= -ggdb
 -CWFLAGS = -Wall -Werror -Wstrict-prototypes -Wextra -Wno-unused-parameter
 +CWFLAGS = -Wall -Wstrict-prototypes -Wextra -Wno-unused-parameter

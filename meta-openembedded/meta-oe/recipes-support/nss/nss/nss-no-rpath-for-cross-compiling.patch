@@ -1,4 +1,4 @@
-From dc51214895bcd63fc8eb8d1fe7941cd3e5500620 Mon Sep 17 00:00:00 2001
+From 73edfbdf33fe4e41724e7e947033d8caeec8f3d0 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sat, 7 Mar 2020 08:34:02 -0800
 Subject: [PATCH] nss:no rpath for cross compiling

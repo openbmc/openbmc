@@ -86,11 +86,7 @@ get_tune_parameters[vardepsexclude] = "AVAILTUNES TUNE_CCARGS OVERRIDES TUNE_FEA
 DEBIANNAME:${MLPREFIX}libgcc = "libgcc1"
 
 MIRRORS =+ "\
-${GNU_MIRROR}/gcc    ftp://gcc.gnu.org/pub/gcc/releases/ \n \
-${GNU_MIRROR}/gcc	ftp://gd.tuwien.ac.at/gnu/gcc/ \n \
-${GNU_MIRROR}/gcc	http://mirrors.rcn.net/pub/sourceware/gcc/releases/ \n \
-${GNU_MIRROR}/gcc   http://gcc.get-software.com/releases/ \n \
-${GNU_MIRROR}/gcc	http://gcc.get-software.com/releases/ \n \
+    ${GNU_MIRROR}/gcc https://gcc.gnu.org/pub/gcc/releases/ \
 "
 #
 # Set some default values

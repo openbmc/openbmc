@@ -9,8 +9,12 @@ LIC_FILES_CHKSUM = "file://../COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 PV = "4.5"
 SRCREV = "0496d7c3de3e09da37ba492081c86159806ebb07"
-SRC_URI = "git://github.com/plougher/squashfs-tools.git;protocol=https \
+SRC_URI = "git://github.com/plougher/squashfs-tools.git;protocol=https;branch=master \
            file://0001-Avoid-use-of-INSTALL_DIR-for-symlink-targets.patch \
+           file://CVE-2021-41072-requisite-1.patch;striplevel=2 \
+           file://CVE-2021-41072-requisite-2.patch;striplevel=2 \
+           file://CVE-2021-41072-requisite-3.patch;striplevel=2 \
+           file://CVE-2021-41072.patch;striplevel=2 \
            "
 
 S = "${WORKDIR}/git/squashfs-tools"

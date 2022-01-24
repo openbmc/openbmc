@@ -1,0 +1,3 @@
+d ntp ntp 0755 @NTP_USER_HOME@ none
+d ntp ntp 0755 /var/log/ntpstats none
+f ntp ntp 0644 /var/log/ntpd.log none

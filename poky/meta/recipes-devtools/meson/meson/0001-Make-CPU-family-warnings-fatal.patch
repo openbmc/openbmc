@@ -11,30 +11,34 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
  mesonbuild/environment.py | 4 +---
  2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/mesonbuild/envconfig.py b/mesonbuild/envconfig.py
-index 307aac3..66fb7ec 100644
---- a/mesonbuild/envconfig.py
-+++ b/mesonbuild/envconfig.py
-@@ -267,7 +267,7 @@ class MachineInfo(HoldableObject):
+Index: meson-0.60.2/mesonbuild/envconfig.py
+===================================================================
+--- meson-0.60.2.orig/mesonbuild/envconfig.py
++++ meson-0.60.2/mesonbuild/envconfig.py
+@@ -266,8 +266,8 @@ class MachineInfo(HoldableObject):
+                 'but is missing {}.'.format(minimum_literal - set(literal)))
  
          cpu_family = literal['cpu_family']
-         if cpu_family not in known_cpu_families:
+-        if cpu_family not in known_cpu_families:
 -            mlog.warning(f'Unknown CPU family {cpu_family}, please report this at https://github.com/mesonbuild/meson/issues/new')
++        if cpu_family not in known_cpu_families and cpu_family != "riscv":
 +            raise EnvironmentException('Unknown CPU family {}, see https://wiki.yoctoproject.org/wiki/Meson/UnknownCPU for directions.'.format(cpu_family))
  
          endian = literal['endian']
          if endian not in ('little', 'big'):
-diff --git a/mesonbuild/environment.py b/mesonbuild/environment.py
-index 71286a5..179917e 100644
---- a/mesonbuild/environment.py
-+++ b/mesonbuild/environment.py
-@@ -352,9 +352,7 @@ def detect_cpu_family(compilers: CompilersDict) -> str:
+Index: meson-0.60.2/mesonbuild/environment.py
+===================================================================
+--- meson-0.60.2.orig/mesonbuild/environment.py
++++ meson-0.60.2/mesonbuild/environment.py
+@@ -354,10 +354,8 @@ def detect_cpu_family(compilers: Compile
+         if any_compiler_has_define(compilers, '__64BIT__'):
              trial = 'ppc64'
  
-     if trial not in known_cpu_families:
+-    if trial not in known_cpu_families:
 -        mlog.warning(f'Unknown CPU family {trial!r}, please report this at '
 -                     'https://github.com/mesonbuild/meson/issues/new with the '
 -                     'output of `uname -a` and `cat /proc/cpuinfo`')
++    if trial not in known_cpu_families and trail != "riscv":
 +        raise EnvironmentException('Unknown CPU family %s, see https://wiki.yoctoproject.org/wiki/Meson/UnknownCPU for directions.' % trial)
  
      return trial

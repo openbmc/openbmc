@@ -1,4 +1,4 @@
-From 62336285cba38017b35cb761c03f0c7e80a671a3 Mon Sep 17 00:00:00 2001
+From 5b0d1212d661e9a8a36738279fc9109f96eebd25 Mon Sep 17 00:00:00 2001
 From: Mark Hatle <mark.hatle@windriver.com>
 Date: Wed, 21 Sep 2011 20:55:33 -0500
 Subject: [PATCH] Lib/cgi.py: Update the script as mentioned in the comment
@@ -12,7 +12,7 @@ Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
  1 file changed, 1 insertion(+), 10 deletions(-)
 
 diff --git a/Lib/cgi.py b/Lib/cgi.py
-index 8cf6687..094c7b4 100755
+index 6cb8cf2..a873ff3 100755
 --- a/Lib/cgi.py
 +++ b/Lib/cgi.py
 @@ -1,13 +1,4 @@

@@ -150,7 +150,7 @@ contact us with other suggestions.
    need, which is advantageous because you are building for small devices when
    developing for embedded and IoT.
 
-#. **You will want to learn about and know what's packaged in rootfs.**
+#. **You will want to learn about and know what's packaged in the root filesystem.**
 
 #. **Create your own image recipe:**
    There are a number of ways to create your own image recipe.  We suggest you

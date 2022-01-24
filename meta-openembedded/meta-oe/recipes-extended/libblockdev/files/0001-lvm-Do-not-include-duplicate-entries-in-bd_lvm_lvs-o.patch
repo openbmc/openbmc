@@ -1,0 +1,100 @@
+From d10fb2c0ee60c97f4dfeab4506a347c26cb389df Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Tue, 7 Dec 2021 15:50:45 +0800
+Subject: [PATCH] lvm: Do not include duplicate entries in bd_lvm_lvs output
+
+We use "-o segtypes" for the "lvs" command which means multisegment
+LVs will be twice in the output.
+
+Signed-off-by: Vojtech Trefny <vtrefny@redhat.com>
+
+Upstream-Status: Backport [https://github.com/storaged-project/libblockdev/pull/671]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/plugins/lvm.c | 17 +++++++++++++++--
+ tests/lvm_test.py | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/lvm.c b/src/plugins/lvm.c
+index 2be1dbd..acd5b84 100644
+--- a/src/plugins/lvm.c
++++ b/src/plugins/lvm.c
+@@ -1810,8 +1810,21 @@ BDLVMLVdata** bd_lvm_lvs (const gchar *vg_name, GError **error) {
+         if (table && (num_items == 15)) {
+             /* valid line, try to parse and record it */
+             lvdata = get_lv_data_from_table (table, TRUE);
+-            if (lvdata)
+-                g_ptr_array_add (lvs, lvdata);
++            if (lvdata) {
++                /* ignore duplicate entries in lvs output, these are caused by multi segments LVs */
++                for (gsize i = 0; i < lvs->len; i++) {
++                    if (g_strcmp0 (((BDLVMLVdata *) g_ptr_array_index (lvs, i))->lv_name, lvdata->lv_name) == 0) {
++                        g_debug("Duplicate LV entry for '%s' found in lvs output",
++                                  lvdata->lv_name);
++                        bd_lvm_lvdata_free (lvdata);
++                        lvdata = NULL;
++                        break;
++                    }
++                }
++
++                if (lvdata)
++                    g_ptr_array_add (lvs, lvdata);
++            }
+         } else
+             if (table)
+                 g_hash_table_destroy (table);
+diff --git a/tests/lvm_test.py b/tests/lvm_test.py
+index eb94c91..ab0de21 100644
+--- a/tests/lvm_test.py
++++ b/tests/lvm_test.py
+@@ -915,6 +915,47 @@ class LvmTestLVs(LvmPVVGLVTestCase):
+         lvs = BlockDev.lvm_lvs("testVG")
+         self.assertEqual(len(lvs), 1)
+ 
++class LvmTestLVsMultiSegment(LvmPVVGLVTestCase):
++    def _clean_up(self):
++        try:
++            BlockDev.lvm_lvremove("testVG", "testLV2", True, None)
++        except:
++            pass
++
++        LvmPVVGLVTestCase._clean_up(self)
++
++    def test_lvs(self):
++        """Verify that it's possible to gather info about LVs"""
++
++        succ = BlockDev.lvm_pvcreate(self.loop_dev, 0, 0, None)
++        self.assertTrue(succ)
++
++        succ = BlockDev.lvm_vgcreate("testVG", [self.loop_dev], 0, None)
++        self.assertTrue(succ)
++
++        succ = BlockDev.lvm_lvcreate("testVG", "testLV", 10 * 1024**2)
++        self.assertTrue(succ)
++
++        lvs = BlockDev.lvm_lvs("testVG")
++        self.assertEqual(len(lvs), 1)
++        self.assertListEqual([lv.lv_name for lv in lvs], ["testLV"])
++
++        # add second LV
++        succ = BlockDev.lvm_lvcreate("testVG", "testLV2", 10 * 1024**2)
++        self.assertTrue(succ)
++
++        lvs = BlockDev.lvm_lvs("testVG")
++        self.assertEqual(len(lvs), 2)
++        self.assertListEqual([lv.lv_name for lv in lvs], ["testLV", "testLV2"])
++
++        # by resizing the first LV we will create two segments
++        succ = BlockDev.lvm_lvresize("testVG", "testLV", 20 * 1024**2, None)
++        self.assertTrue(succ)
++
++        lvs = BlockDev.lvm_lvs("testVG")
++        self.assertEqual(len(lvs), 2)
++        self.assertListEqual([lv.lv_name for lv in lvs], ["testLV", "testLV2"])
++
+ class LvmPVVGthpoolTestCase(LvmPVVGTestCase):
+     def _clean_up(self):
+         try:
+-- 
+2.27.0
+

@@ -152,6 +152,10 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
     fakeenv = {}
     umask = None
 
+    uid = os.getuid()
+    gid = os.getgid()
+
+
     taskdep = workerdata["taskdeps"][fn]
     if 'umask' in taskdep and taskname in taskdep['umask']:
         umask = taskdep['umask'][taskname]
@@ -256,6 +260,10 @@ def fork_off_task(cfg, data, databuilder, workerdata, fn, task, taskname, taskha
                 the_data.setVar('BB_UNIHASH', unihash)
 
                 bb.utils.set_process_name("%s:%s" % (the_data.getVar("PN"), taskname.replace("do_", "")))
+
+                if not the_data.getVarFlag(taskname, 'network', False):
+                    logger.debug("Attempting to disable network")
+                    bb.utils.disable_network(uid, gid)
 
                 # exported_vars() returns a generator which *cannot* be passed to os.environ.update() 
                 # successfully. We also need to unset anything from the environment which shouldn't be there 

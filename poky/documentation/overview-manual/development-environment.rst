@@ -163,9 +163,9 @@ these tarballs gives you a snapshot of the released files.
 
    -  Be sure to always work in matching branches for both the selected
       BSP repository and the Source Directory (i.e. ``poky``)
-      repository. For example, if you have checked out the "master"
+      repository. For example, if you have checked out the "&DISTRO_NAME_NO_CAP;"
       branch of ``poky`` and you are going to use ``meta-intel``, be
-      sure to checkout the "master" branch of ``meta-intel``.
+      sure to checkout the "&DISTRO_NAME_NO_CAP;" branch of ``meta-intel``.
 
 In summary, here is where you can get the project files needed for
 development:
@@ -233,8 +233,8 @@ all diverging functionality. Although there is no need to use Git, many
 open source projects do so.
 
 For the Yocto Project, a key individual called the "maintainer" is
-responsible for the integrity of the "master" branch of a given Git
-repository. The "master" branch is the "upstream" repository from which
+responsible for the integrity of the development branch of a given Git
+repository. The development branch is the "upstream" repository from which
 final or most recent builds of a project occur. The maintainer is
 responsible for accepting changes from other developers and for
 organizing the underlying branch structure to reflect release strategies
@@ -279,8 +279,8 @@ submitting patches and changes, see the
 ":ref:`dev-manual/common-tasks:submitting a change to the yocto project`"
 section in the Yocto Project Development Tasks Manual.
 
-In summary, there is a single point of entry for changes into a "master"
-or development branch of the Git repository, which is controlled by the
+In summary, there is a single point of entry for changes into the
+development branch of the Git repository, which is controlled by the
 project's maintainer. A set of developers independently
 develop, test, and submit changes to "contrib" areas for the maintainer
 to examine. The maintainer then chooses which changes are going to
@@ -311,7 +311,7 @@ Book <https://book.git-scm.com>`__.
    host. You can name these branches anything you like. It is helpful to
    give them names associated with the particular feature or change on
    which you are working. Once you are done with a feature or change and
-   have merged it into your local master branch, simply discard the
+   have merged it into your local development branch, simply discard the
    temporary branch.
 
 -  *Merge Changes:* The ``git merge`` command allows you to take the
@@ -348,7 +348,7 @@ Book <https://book.git-scm.com>`__.
 
 -  *Patch Workflow:* This workflow allows you to notify the maintainer
    through an email that you have a change (or patch) you would like
-   considered for the "master" branch of the Git repository. To send
+   considered for the development branch of the Git repository. To send
    this type of change, you format the patch and then send the email
    using the Git commands ``git format-patch`` and ``git send-email``.
    For information on how to use these scripts, see the
@@ -433,17 +433,12 @@ development branch in the repository. To help illustrate, consider the
 following example Git commands::
 
    $ cd ~
-   $ git clone git://git.yoctoproject.org/poky
-   $ cd poky
-   $ git checkout -b &DISTRO_NAME_NO_CAP; origin/&DISTRO_NAME_NO_CAP;
+   $ git clone git://git.yoctoproject.org/poky -b &DISTRO_NAME_NO_CAP;
 
 In the previous example
 after moving to the home directory, the ``git clone`` command creates a
-local copy of the upstream ``poky`` Git repository. By default, Git
-checks out the "master" branch for your work. After changing the working
-directory to the new local repository (i.e. ``poky``), the
-``git checkout`` command creates and checks out a local branch named
-"&DISTRO_NAME_NO_CAP;", which tracks the upstream
+local copy of the upstream ``poky`` Git repository and checks out a
+local branch named "&DISTRO_NAME_NO_CAP;", which tracks the upstream
 "origin/&DISTRO_NAME_NO_CAP;" branch. Changes you make while in this
 branch would ultimately affect the upstream "&DISTRO_NAME_NO_CAP;" branch
 of the ``poky`` repository.
@@ -558,9 +553,9 @@ descriptions and strategies on how to use these commands:
 -  *git pull --rebase:* Retrieves information from an upstream Git
    repository and places it in your local Git repository. You use this
    command to make sure you are synchronized with the repository from
-   which you are basing changes (.e.g. the "master" branch). The
-   "--rebase" option ensures that any local commits you have in your
-   branch are preserved at the top of your local branch.
+   which you are basing changes (e.g. the "&DISTRO_NAME_NO_CAP;"
+   branch). The "--rebase" option ensures that any local commits you
+   have in your branch are preserved at the top of your local branch.
 
 -  *git push repo-name local-branch:upstream-branch:* Sends
    all your committed local changes to the upstream Git repository that
@@ -571,13 +566,13 @@ descriptions and strategies on how to use these commands:
 
 -  *git merge:* Combines or adds changes from one local branch of
    your repository with another branch. When you create a local Git
-   repository, the default branch is named "master". A typical workflow
-   is to create a temporary branch that is based off "master" that you
-   would use for isolated work. You would make your changes in that
-   isolated branch, stage and commit them locally, switch to the
-   "master" branch, and then use the ``git merge`` command to apply the
+   repository, the default branch may be named "main". A typical
+   workflow is to create a temporary branch that is based off "main"
+   that you would use for isolated work. You would make your changes in
+   that isolated branch, stage and commit them locally, switch to the
+   "main" branch, and then use the ``git merge`` command to apply the
    changes from your isolated branch into the currently checked out
-   branch (e.g. "master"). After the merge is complete and if you are
+   branch (e.g. "main"). After the merge is complete and if you are
    done with working in that isolated branch, you can safely delete the
    isolated branch.
 

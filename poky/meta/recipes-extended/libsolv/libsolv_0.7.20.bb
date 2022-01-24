@@ -8,7 +8,8 @@ LIC_FILES_CHKSUM = "file://LICENSE.BSD;md5=62272bd11c97396d4aaf1c41bc11f7d8"
 
 DEPENDS = "expat zlib"
 
-SRC_URI = "git://github.com/openSUSE/libsolv.git \
+SRC_URI = "git://github.com/openSUSE/libsolv.git;branch=master;protocol=https \
+           file://0001-utils-Conside-musl-when-wrapping-qsort_r.patch \
 "
 
 SRCREV = "f618e6aae1d44be633b2ab91d4fd4f4f974f4d40"

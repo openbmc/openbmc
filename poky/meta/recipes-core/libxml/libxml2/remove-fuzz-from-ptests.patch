@@ -9,6 +9,7 @@ folder fuzz. These tests are not required for ptests of this package.
 This patch removes the fuzz testing targets from the Makefile.
 Otherwise, running the ptests will fail due to the invalid directory.
 
+Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Tony Tascioglu <tony.tascioglu@windriver.com>
 ---
  Makefile.am | 5 ++---

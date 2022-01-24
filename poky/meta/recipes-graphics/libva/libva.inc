@@ -27,3 +27,9 @@ UPSTREAM_CHECK_URI = "https://github.com/intel/libva/releases"
 DEPENDS = "libdrm"
 
 inherit meson pkgconfig
+
+PACKAGECONFIG[x11] = "-Dwith_x11=yes,-Dwith_x11=no,virtual/libx11 libxext libxfixes"
+PACKAGECONFIG[glx] = "-Dwith_glx=yes,-Dwith_glx=no,virtual/mesa"
+
+PACKAGECONFIG[wayland] = "-Dwith_wayland=yes,-Dwith_wayland=no,wayland-native wayland"
+

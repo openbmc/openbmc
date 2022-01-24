@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f81069e00c0cad249f20efe958276db1"
 
 DEPENDS += "lua-native lua virtual/crypt"
 
-SRC_URI = "git://github.com/luaposix/luaposix.git;branch=release-v${PV} \
+SRC_URI = "git://github.com/luaposix/luaposix.git;branch=release-v${PV};protocol=https \
 "
 SRCREV = "14043c5086ae738823a5dfbc9170d9e14193fbef"
 S = "${WORKDIR}/git"

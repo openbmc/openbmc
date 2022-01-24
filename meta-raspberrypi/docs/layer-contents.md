@@ -5,6 +5,7 @@
 * raspberrypi
 * raspberrypi0
 * raspberrypi0-wifi
+* raspberrypi0-2w-64
 * raspberrypi2
 * raspberrypi3
 * raspberrypi3-64 (64 bit kernel & userspace)

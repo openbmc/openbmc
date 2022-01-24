@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=ace63adfdac78400fc30fa22ee9c1bb1"
 
 DEPENDS = "freetype libpng jpeg zlib tiff"
 
-SRC_URI = "git://github.com/libgd/libgd.git;nobranch=1 \
+SRC_URI = "git://github.com/libgd/libgd.git;nobranch=1;protocol=https \
            "
 
 SRCREV = "b5319a41286107b53daa0e08e402aa1819764bdc"

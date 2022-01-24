@@ -402,24 +402,24 @@ def encodeurl(decoded):
 
     if not type:
         raise MissingParameterError('type', "encoded from the data %s" % str(decoded))
-    url = '%s://' % type
+    url = ['%s://' % type]
     if user and type != "file":
-        url += "%s" % user
+        url.append("%s" % user)
         if pswd:
-            url += ":%s" % pswd
-        url += "@"
+            url.append(":%s" % pswd)
+        url.append("@")
     if host and type != "file":
-        url += "%s" % host
+        url.append("%s" % host)
     if path:
         # Standardise path to ensure comparisons work
         while '//' in path:
             path = path.replace("//", "/")
-        url += "%s" % urllib.parse.quote(path)
+        url.append("%s" % urllib.parse.quote(path))
     if p:
         for parm in p:
-            url += ";%s=%s" % (parm, p[parm])
+            url.append(";%s=%s" % (parm, p[parm]))
 
-    return url
+    return "".join(url)
 
 def uri_replace(ud, uri_find, uri_replace, replacements, d, mirrortarball=None):
     if not ud.url or not uri_find or not uri_replace:
@@ -430,6 +430,7 @@ def uri_replace(ud, uri_find, uri_replace, replacements, d, mirrortarball=None):
     uri_replace_decoded = list(decodeurl(uri_replace))
     logger.debug2("For url %s comparing %s to %s" % (uri_decoded, uri_find_decoded, uri_replace_decoded))
     result_decoded = ['', '', '', '', '', {}]
+    # 0 - type, 1 - host, 2 - path, 3 - user,  4- pswd, 5 - params
     for loc, i in enumerate(uri_find_decoded):
         result_decoded[loc] = uri_decoded[loc]
         regexp = i
@@ -449,6 +450,9 @@ def uri_replace(ud, uri_find, uri_replace, replacements, d, mirrortarball=None):
                 for l in replacements:
                     uri_replace_decoded[loc][k] = uri_replace_decoded[loc][k].replace(l, replacements[l])
                 result_decoded[loc][k] = uri_replace_decoded[loc][k]
+        elif (loc == 3 or loc == 4) and uri_replace_decoded[loc]:
+            # User/password in the replacement is just a straight replacement
+            result_decoded[loc] = uri_replace_decoded[loc]
         elif (re.match(regexp, uri_decoded[loc])):
             if not uri_replace_decoded[loc]:
                 result_decoded[loc] = ""
@@ -466,9 +470,13 @@ def uri_replace(ud, uri_find, uri_replace, replacements, d, mirrortarball=None):
                     # Kill parameters, they make no sense for mirror tarballs
                     uri_decoded[5] = {}
                 elif ud.localpath and ud.method.supports_checksum(ud):
-                    basename = os.path.basename(uri_decoded[loc])
-                if basename and not result_decoded[loc].endswith(basename):
-                    result_decoded[loc] = os.path.join(result_decoded[loc], basename)
+                    basename = os.path.basename(ud.localpath)
+                if basename:
+                    uri_basename = os.path.basename(uri_decoded[loc])
+                    if uri_basename and basename != uri_basename and result_decoded[loc].endswith(uri_basename):
+                        result_decoded[loc] = result_decoded[loc].replace(uri_basename, basename)
+                    elif not result_decoded[loc].endswith(basename):
+                        result_decoded[loc] = os.path.join(result_decoded[loc], basename)
         else:
             return None
     result = encodeurl(result_decoded)
@@ -766,7 +774,7 @@ def get_srcrev(d, method_name='sortable_revision'):
         if urldata[u].method.supports_srcrev():
             scms.append(u)
 
-    if len(scms) == 0:
+    if not scms:
         raise FetchError("SRCREV was used yet no valid SCM was found in SRC_URI")
 
     if len(scms) == 1 and len(urldata[scms[0]].names) == 1:
@@ -1450,30 +1458,33 @@ class FetchMethod(object):
         cmd = None
 
         if unpack:
+            tar_cmd = 'tar --extract --no-same-owner'
+            if 'striplevel' in urldata.parm:
+                tar_cmd += ' --strip-components=%s' %  urldata.parm['striplevel']
             if file.endswith('.tar'):
-                cmd = 'tar x --no-same-owner -f %s' % file
+                cmd = '%s -f %s' % (tar_cmd, file)
             elif file.endswith('.tgz') or file.endswith('.tar.gz') or file.endswith('.tar.Z'):
-                cmd = 'tar xz --no-same-owner -f %s' % file
+                cmd = '%s -z -f %s' % (tar_cmd, file)
             elif file.endswith('.tbz') or file.endswith('.tbz2') or file.endswith('.tar.bz2'):
-                cmd = 'bzip2 -dc %s | tar x --no-same-owner -f -' % file
+                cmd = 'bzip2 -dc %s | %s -f -' % (file, tar_cmd)
             elif file.endswith('.gz') or file.endswith('.Z') or file.endswith('.z'):
                 cmd = 'gzip -dc %s > %s' % (file, efile)
             elif file.endswith('.bz2'):
                 cmd = 'bzip2 -dc %s > %s' % (file, efile)
             elif file.endswith('.txz') or file.endswith('.tar.xz'):
-                cmd = 'xz -dc %s | tar x --no-same-owner -f -' % file
+                cmd = 'xz -dc %s | %s -f -' % (file, tar_cmd)
             elif file.endswith('.xz'):
                 cmd = 'xz -dc %s > %s' % (file, efile)
             elif file.endswith('.tar.lz'):
-                cmd = 'lzip -dc %s | tar x --no-same-owner -f -' % file
+                cmd = 'lzip -dc %s | %s -f -' % (file, tar_cmd)
             elif file.endswith('.lz'):
                 cmd = 'lzip -dc %s > %s' % (file, efile)
             elif file.endswith('.tar.7z'):
-                cmd = '7z x -so %s | tar x --no-same-owner -f -' % file
+                cmd = '7z x -so %s | %s -f -' % (file, tar_cmd)
             elif file.endswith('.7z'):
                 cmd = '7za x -y %s 1>/dev/null' % file
             elif file.endswith('.tzst') or file.endswith('.tar.zst'):
-                cmd = 'zstd --decompress --stdout %s | tar x --no-same-owner -f -' % file
+                cmd = 'zstd --decompress --stdout %s | %s -f -' % (file, tar_cmd)
             elif file.endswith('.zst'):
                 cmd = 'zstd --decompress --stdout %s > %s' % (file, efile)
             elif file.endswith('.zip') or file.endswith('.jar'):
@@ -1506,7 +1517,7 @@ class FetchMethod(object):
                         raise UnpackError("Unable to unpack deb/ipk package - does not contain data.tar.* file", urldata.url)
                 else:
                     raise UnpackError("Unable to unpack deb/ipk package - could not list contents", urldata.url)
-                cmd = 'ar x %s %s && tar --no-same-owner -xpf %s && rm %s' % (file, datafile, datafile, datafile)
+                cmd = 'ar x %s %s && %s -p -f %s && rm %s' % (file, datafile, tar_cmd, datafile, datafile)
 
         # If 'subdir' param exists, create a dir and use it as destination for unpack cmd
         if 'subdir' in urldata.parm:
@@ -1632,7 +1643,7 @@ class Fetch(object):
         if localonly and cache:
             raise Exception("bb.fetch2.Fetch.__init__: cannot set cache and localonly at same time")
 
-        if len(urls) == 0:
+        if not urls:
             urls = d.getVar("SRC_URI").split()
         self.urls = urls
         self.d = d
@@ -1931,6 +1942,7 @@ from . import clearcase
 from . import npm
 from . import npmsw
 from . import az
+from . import crate
 
 methods.append(local.Local())
 methods.append(wget.Wget())
@@ -1951,3 +1963,4 @@ methods.append(clearcase.ClearCase())
 methods.append(npm.Npm())
 methods.append(npmsw.NpmShrinkWrap())
 methods.append(az.Az())
+methods.append(crate.Crate())

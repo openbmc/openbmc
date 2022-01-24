@@ -12,8 +12,8 @@ systemd/0013-comparison_fn_t-is-glibc-specific-use-raw-signature-.patch
 Based on work by: Khem Raj <raj.khem@gmail.com>
 
 Signed-off-by: Tim Orling <timothy.t.orling@linux.intel.com>
+Upstream-Status: Submitted [https://github.com/systemd/systemd-bootchart/pull/47]
 ---
-Upstream-Status: Pending
 
  src/util.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

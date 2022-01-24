@@ -7,7 +7,7 @@ Subject: [PATCH] Fix build on musl use realpath() API its available on all
 realpath() API doesnt work on systems with PATH_MAX set to be unlimited e.g. GNU/Hurd
 However for Linux it should always work
 
-Upstream-Status: Inappropriate[Linux specific]
+Upstream-Status: Inappropriate [Linux specific]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 

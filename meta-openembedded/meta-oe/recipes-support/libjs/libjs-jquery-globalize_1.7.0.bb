@@ -7,7 +7,8 @@ S = "${WORKDIR}/git"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4db68fb4d1d9986d736b35039f2ad9ea"
 
-SRC_URI = "git://github.com/globalizejs/globalize;tag=1.7.0;nobranch=1"
+SRCREV = "771061fb35f7fd8d7c2c37f5d5bb26115be382bc"
+SRC_URI = "git://github.com/globalizejs/globalize;protocol=https;nobranch=1"
 
 FILES:${PN} = "${datadir}/javascript/jquery-globalize"
 FILES:${PN}-doc += "${docdir}/${PN}"

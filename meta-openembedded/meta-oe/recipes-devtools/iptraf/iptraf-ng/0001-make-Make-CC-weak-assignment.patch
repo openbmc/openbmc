@@ -1,0 +1,44 @@
+From 223de708552b1ab00ac1a119e82e13deed573036 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 30 Oct 2021 10:22:38 -0700
+Subject: [PATCH] make: Make CC weak assignment
+
+This ensures that if environment overrrides it then its respected, this
+helps cross-compiling cases
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/Makefile
++++ b/Makefile
+@@ -18,14 +18,14 @@ VERSION-FILE: FORCE
+ 	@$(SHELL_PATH) ./GEN-VERSION-FILE
+ -include VERSION-FILE
+ 
+-CFLAGS = -g -O2 -Wall -W -Werror=format-security
+-LDFLAGS =
++CFLAGS += -g -O2 -Wall -W -Werror=format-security
++LDFLAGS ?=
+ IPTRAF_CFLAGS := -std=gnu99 -D_GNU_SOURCE
+ ALL_CFLAGS = $(CPPFLAGS) $(CFLAGS) $(IPTRAF_CFLAGS)
+ ALL_LDFLAGS = $(LDFLAGS)
+ STRIP ?= strip
+ 
+-prefix = $(HOME)
++prefix ?= $(HOME)
+ sbindir_relative = sbin
+ sbindir = $(prefix)/$(sbindir_relative)
+ mandir = $(prefix)/share/man
+@@ -39,7 +39,7 @@ pathsep = :
+ 
+ export prefix bindir sharedir sysconfdir gitwebdir localedir
+ 
+-CC = cc
++CC ?= cc
+ RM = rm -f
+ INSTALL = install
+ RPMBUILD = rpmbuild

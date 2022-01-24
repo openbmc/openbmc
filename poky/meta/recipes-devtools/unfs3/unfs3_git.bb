@@ -14,7 +14,7 @@ DEPENDS:append:class-nativesdk = " flex-nativesdk"
 ASNEEDED = ""
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/unfs3/unfs3.git;protocol=https \
+SRC_URI = "git://github.com/unfs3/unfs3.git;protocol=https;branch=master \
            file://unfs3_parallel_build.patch \
            file://alternate_rpc_ports.patch \
            file://fix_pid_race_parent_writes_child_pid.patch \

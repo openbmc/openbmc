@@ -60,7 +60,7 @@ def find_siginfo_task(bbhandler, pn, taskname, sig1=None, sig2=None):
 
     if sig1 and sig2:
         sigfiles = find_siginfo(bbhandler, pn, taskname, [sig1, sig2])
-        if len(sigfiles) == 0:
+        if not sigfiles:
             logger.error('No sigdata files found matching %s %s matching either %s or %s' % (pn, taskname, sig1, sig2))
             sys.exit(1)
         elif not sig1 in sigfiles:
@@ -86,7 +86,7 @@ def recursecb(key, hash1, hash2):
     hashfiles = find_siginfo(tinfoil, key, None, hashes)
 
     recout = []
-    if len(hashfiles) == 0:
+    if not hashfiles:
         recout.append("Unable to find matching sigdata for %s with hashes %s or %s" % (key, hash1, hash2))
     elif not hash1 in hashfiles:
         recout.append("Unable to find matching sigdata for %s with hash %s" % (key, hash1))

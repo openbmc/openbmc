@@ -80,7 +80,7 @@ task runs with the current working directory set to
 Recipes implementing this task should inherit the
 :ref:`deploy <ref-classes-deploy>` class and should write the output
 to ``${``\ :term:`DEPLOYDIR`\ ``}``, which is not to be
-confused with ``${DEPLOY_DIR}``. The ``deploy`` class sets up
+confused with ``${DEPLOY_DIR}``. The :ref:`deploy <ref-classes-deploy>` class sets up
 ``do_deploy`` as a shared state (sstate) task that can be accelerated
 through sstate use. The sstate mechanism takes care of copying the
 output from ``${DEPLOYDIR}`` to ``${DEPLOY_DIR_IMAGE}``.
@@ -102,7 +102,7 @@ Adding ``do_deploy`` after other tasks works the same way.
 .. note::
 
    You do not need to add ``before do_build`` to the ``addtask`` command
-   (though it is harmless), because the ``base`` class contains the following::
+   (though it is harmless), because the :ref:`base <ref-classes-base>` class contains the following::
 
            do_build[recrdeptask] += "do_deploy"
 
@@ -326,21 +326,19 @@ file as a patch file::
        file://file;apply=yes \
        "
 
-Conversely, if you have a directory full of patch files and you want to
-exclude some so that the ``do_patch`` task does not apply them during
-the patch phase, you can use the "apply=no" parameter with the
+Conversely, if you have a file whose file type is ``.patch`` or ``.diff``
+and you want to exclude it so that the ``do_patch`` task does not apply
+it during the patch phase, you can use the "apply=no" parameter with the
 :term:`SRC_URI` statement::
 
    SRC_URI = " \
        git://path_to_repo/some_package \
-       file://path_to_lots_of_patch_files \
-       file://path_to_lots_of_patch_files/patch_file5;apply=no \
+       file://file1.patch \
+       file://file2.patch;apply=no \
        "
 
-In the
-previous example, assuming all the files in the directory holding the
-patch files end with either ``.patch`` or ``.diff``, every file would be
-applied as a patch by default except for the ``patch_file5`` patch.
+In the previous example ``file1.patch`` would be applied as a patch by default
+while ``file2.patch`` would not be applied.
 
 You can find out more about the patching process in the
 ":ref:`overview-manual/concepts:patching`" section in
@@ -417,7 +415,7 @@ dependencies specified by :term:`DEPENDS`). See the
 
 Removes work files after the OpenEmbedded build system has finished with
 them. You can learn more by looking at the
-":ref:`rm_work.bbclass <ref-classes-rm-work>`" section.
+":ref:`ref-classes-rm-work`" section.
 
 .. _ref-tasks-unpack:
 

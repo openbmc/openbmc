@@ -22,7 +22,7 @@ DEPENDS += " \
 "
 
 SRC_URI = " \
-    git://github.com/wxWidgets/wxWidgets.git \
+    git://github.com/wxWidgets/wxWidgets.git;branch=master;protocol=https \
     file://0001-wx-config.in-Disable-cross-magic-it-does-not-work-fo.patch \
 "
 PV = "3.1.4"

@@ -16,7 +16,11 @@ def runstrip(arg):
     # 8 - shared library
     # 16 - kernel module
 
-    (file, elftype, strip) = arg
+    if len(arg) == 3:
+        (file, elftype, strip) = arg
+        extra_strip_sections = ''
+    else:
+        (file, elftype, strip, extra_strip_sections) = arg
 
     newmode = None
     if not os.access(file, os.W_OK) or os.access(file, os.R_OK):
@@ -40,6 +44,9 @@ def runstrip(arg):
     # shared or executable:
     elif elftype & 8 or elftype & 4:
         stripcmd.extend(["--remove-section=.comment", "--remove-section=.note"])
+        if extra_strip_sections != '':
+            for section in extra_strip_sections.split():
+                stripcmd.extend(["--remove-section=" + section])
 
     stripcmd.append(file)
     bb.debug(1, "runstrip: %s" % stripcmd)

@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://README.md;beginline=18;endline=21;md5=de4f705f12cdedb
 
 DEPENDS += "libbacktrace"
 
-SRC_URI = "gitsm://github.com/WuBingzheng/libleak;protocol=https \
+SRC_URI = "gitsm://github.com/WuBingzheng/libleak;protocol=https;branch=master \
            file://0001-respect-environment-variables.patch \
           "
 

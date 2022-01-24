@@ -1,0 +1,47 @@
+From 07f080184d067c1ebc3fec1b53dd4a06d1a2566a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Mon, 17 Jan 2022 23:24:34 +0100
+Subject: [PATCH] src: make compatible with efivar 38
+
+Upstream-Status: Backport
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/efibootdump.c | 2 +-
+ src/efibootmgr.c  | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/efibootdump.c b/src/efibootdump.c
+index eceffd6..09bd76e 100644
+--- a/src/efibootdump.c
++++ b/src/efibootdump.c
+@@ -69,7 +69,7 @@ print_boot_entry(efi_load_option *loadopt, size_t data_size)
+ 	text_path = alloca(text_path_len);
+ 	if (!text_path)
+ 		error(100, "Couldn't allocate memory");
+-	rc = efidp_format_device_path(text_path, text_path_len,
++	rc = efidp_format_device_path((unsigned char *)text_path, text_path_len,
+ 				      dp, pathlen);
+ 	if (rc < 0) {
+ 		printf("<bad device path>");
+diff --git a/src/efibootmgr.c b/src/efibootmgr.c
+index 4e1a680..b77b1fb 100644
+--- a/src/efibootmgr.c
++++ b/src/efibootmgr.c
+@@ -949,7 +949,7 @@ show_vars(const char *prefix)
+ 			pathlen = efi_loadopt_pathlen(load_option,
+ 						      boot->data_size);
+ 			dp = efi_loadopt_path(load_option, boot->data_size);
+-			rc = efidp_format_device_path(text_path, text_path_len,
++			rc = efidp_format_device_path((unsigned char *)text_path, text_path_len,
+ 						      dp, pathlen);
+ 			if (rc < 0)
+ 				error(18, "Could not parse device path");
+@@ -960,7 +960,7 @@ show_vars(const char *prefix)
+ 			if (!text_path)
+ 				error(19, "Could not parse device path");
+ 
+-			rc = efidp_format_device_path(text_path, text_path_len,
++			rc = efidp_format_device_path((unsigned char *)text_path, text_path_len,
+ 						      dp, pathlen);
+ 			if (rc < 0)
+ 				error(20, "Could not parse device path");

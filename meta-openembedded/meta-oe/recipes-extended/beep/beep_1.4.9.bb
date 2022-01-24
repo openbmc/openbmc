@@ -7,7 +7,7 @@ BUGTRACKER = "https://github.com/spkr-beep/beep/issues"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "git://github.com/spkr-beep/beep.git;protocol=https \
+SRC_URI = "git://github.com/spkr-beep/beep.git;protocol=https;branch=master \
            file://0001-Do-not-use-Werror-as-it-fails-with-newer-clang-11.patch \
 "
 SRCREV = "8b85ddd09f73b9fd7caa5679298781a57af194ac"

@@ -33,7 +33,7 @@ ld/
 (cherry picked from commit 5a98fb7513b559e20dfebdbaa2a471afda3b4742)
 (cherry picked from commit 7dc37e1e1209c80e0bab784df6b6bac335e836f2)
 
-Upstream-Status: Accepted[https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=1c611b40e6bfc8029bff7696814330b5bc0ee5c0]
+Upstream-Status: Accepted [https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=1c611b40e6bfc8029bff7696814330b5bc0ee5c0]
 ---
  bfd/plugin.c                       |  8 +++++++
  ld/testsuite/ld-plugin/lto.exp     | 34 ++++++++++++++++++++++++++++++

@@ -9,7 +9,7 @@ inherit autotools pkgconfig
 S = "${WORKDIR}/git"
 # v08112019
 SRCREV = "ad76c7b1dbd0403b0c9decf54164fcce271c590f"
-SRC_URI = "git://github.com/rurban/safeclib.git \
+SRC_URI = "git://github.com/rurban/safeclib.git;branch=master;protocol=https \
 "
 
 COMPATIBLE_HOST = '(x86_64|i.86|powerpc|powerpc64|arm|aarch64|mips).*-linux'

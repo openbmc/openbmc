@@ -1,6 +1,6 @@
 Update autotools infrastructure (including gettext) to modern versions.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [upstream hasn't been active since 1998]
 Signed-off-by: Phil Blundell <pb@pbcl.net>
 
 diff -uprN clean/lrzsz-0.12.20/configure.in lrzsz-0.12.20/configure.in

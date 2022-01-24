@@ -7,7 +7,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE-APACHE;md5=7b486c2338d225a1405d979ed2c15ce8 \
                     file://COPYING;md5=daa868b8e1ae17d03228a1145b4060da"
 
-SRC_URI = "git://github.com/teg/firmwared.git \
+SRC_URI = "git://github.com/teg/firmwared.git;branch=master;protocol=https \
            file://firmwared.service"
 
 PV = "0+git${SRCPV}"

@@ -14,7 +14,7 @@ and only declare the variables in the minicom.h header.
 This fixes linking with gcc 10 which uses -fno-common by default,
 disallowing multiple global variable definitions.
 
-Upstream-Status: Pending
+Upstream-Status: Backport [https://salsa.debian.org/minicom-team/minicom/-/commit/c8382374c5d340aa4115d527aed76e876ee5456b]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/minicom.h | 6 +++---

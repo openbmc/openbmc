@@ -2,7 +2,7 @@ docbook-xml: update catalog.xml
 
 Refer Ubuntu 13.04 to update catalog.xml
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [docbook 4.x development has ceased, docbook 5 is entirely different]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  docbook-4.0/catalog.xml   | 72 +++++++++++++++++++++++++++++++++++++++++++++++

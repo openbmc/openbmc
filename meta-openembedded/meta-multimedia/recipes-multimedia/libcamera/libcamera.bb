@@ -9,10 +9,10 @@ LIC_FILES_CHKSUM = "\
 "
 
 SRC_URI = " \
-        git://linuxtv.org/libcamera.git;protocol=git \
+        git://git.libcamera.org/libcamera/libcamera.git;protocol=https;branch=master \
 "
 
-SRCREV = "193ca8c353a42334f65ddfc988a105a47bca3547"
+SRCREV = "acf8d028edda0a59b10e15962c2606137a4940af"
 
 PV = "202105+git${SRCPV}"
 
@@ -35,7 +35,8 @@ do_configure:prepend() {
 }
 
 do_install:append() {
-    chrpath -d ${D}${libdir}/libcamera.so
+    chrpath -d ${D}${libdir}/libcamera.so.0.0.0
+    chrpath -d ${D}${libdir}/libcamera-base.so.0.0.0
 }
 
 addtask do_recalculate_ipa_signatures_package after do_package before do_packagedata
@@ -52,5 +53,10 @@ do_recalculate_ipa_signatures_package() {
 }
 
 FILES:${PN}-dev = "${includedir} ${libdir}/pkgconfig"
-FILES:${PN} += " ${libdir}/libcamera.so"
+FILES:${PN}-dev += " ${libdir}/libcamera.so"
+FILES:${PN}-dev += " ${libdir}/libcamera.so.0"
+FILES:${PN} += " ${libdir}/libcamera.so.0.0.0"
+FILES:${PN}-dev += " ${libdir}/libcamera-base.so"
+FILES:${PN}-dev += " ${libdir}/libcamera-base.so.0"
+FILES:${PN} += " ${libdir}/libcamera-base.so.0.0.0"
 FILES:${PN}-gst = "${libdir}/gstreamer-1.0/libgstlibcamera.so"

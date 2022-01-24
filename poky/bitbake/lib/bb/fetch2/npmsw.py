@@ -88,7 +88,11 @@ class NpmShrinkWrap(FetchMethod):
             version = params.get("version", None)
 
             # Handle registry sources
-            if is_semver(version) and resolved and integrity:
+            if is_semver(version) and integrity:
+                # Handle duplicate dependencies without url
+                if not resolved:
+                    return
+
                 localfile = npm_localfile(name, version)
 
                 uri = URI(resolved)
@@ -127,6 +131,8 @@ class NpmShrinkWrap(FetchMethod):
 
             # Handle git sources
             elif version.startswith("git"):
+                if version.startswith("github:"):
+                    version = "git+https://github.com/" + version[len("github:"):]
                 regex = re.compile(r"""
                     ^
                     git\+

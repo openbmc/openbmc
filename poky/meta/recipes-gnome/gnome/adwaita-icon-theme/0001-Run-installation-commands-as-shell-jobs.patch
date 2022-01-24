@@ -5,7 +5,7 @@ Subject: [PATCH] Run installation commands as shell jobs
 
 This greatly speeds up installation time on multi-core systems.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/adwaita-icon-theme/-/merge_requests/39]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---

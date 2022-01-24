@@ -1,7 +1,7 @@
 Don't forcibly strip the binaries.
 
 Signed-off-by: Ross Burton <ross.burton@intel.com>
-Upstream-Status: Pending
+Upstream-Status: Backport [d7693eea09ac76c67f5f3aa538bb911ce2291e2c]
 
 diff --git a/Makefile b/Makefile
 index 6a9803c..170c0ce 100644

@@ -24,7 +24,7 @@ The patch specifically:
    is used, else the output from "GenFw XXX.bin" differs from "GenFw /long/path/XXX.bin"
    with sufficiently long paths
 
-Upstream-Status: Pending [At least some of this might be interesting to upstream]
+Upstream-Status: Submitted [https://github.com/tianocore/edk2/pull/2176]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---

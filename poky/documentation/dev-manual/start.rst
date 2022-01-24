@@ -666,32 +666,6 @@ described in the ":ref:`dev-manual/start:accessing index of releases`" section.
    "DOWNLOADS" page, you can download tools or BSPs as well. Just scroll
    down the page and look for what you need.
 
-Accessing Nightly Builds
-------------------------
-
-Yocto Project maintains an area for nightly builds that contains tarball
-releases at https://autobuilder.yocto.io/pub/nightly/. These builds include Yocto
-Project releases ("poky"), toolchains, and builds for supported
-machines.
-
-Should you ever want to access a nightly build of a particular Yocto
-Project component, use the following procedure:
-
-1. *Locate the Index of Nightly Builds:* Open a browser and go to
-   https://autobuilder.yocto.io/pub/nightly/ to access the Nightly Builds.
-
-2. *Select a Date:* Click on the date in which you are interested. If
-   you want the latest builds, use "CURRENT".
-
-3. *Select a Build:* Choose the area in which you are interested. For
-   example, if you are looking for the most recent toolchains, select
-   the "toolchain" link.
-
-4. *Find the Tarball:* Drill down to find the associated tarball.
-
-5. *Download the Tarball:* Click the tarball to download and save a
-   snapshot of the given component.
-
 Cloning and Checking Out Branches
 =================================
 

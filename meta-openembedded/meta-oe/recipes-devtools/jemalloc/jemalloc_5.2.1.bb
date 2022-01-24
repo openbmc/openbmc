@@ -11,12 +11,15 @@ LICENSE = "BSD-2-Clause"
 
 SECTION = "libs"
 
-LIC_FILES_CHKSUM = "file://README;md5=6900e4a158982e4c4715bf16aa54fa10"
+LIC_FILES_CHKSUM = "file://COPYING;md5=ea061f8731d5e6a5761dfad951ef5f5f"
 
-SRC_URI = "git://github.com/jemalloc/jemalloc.git \
+SRC_URI = "git://github.com/jemalloc/jemalloc.git;branch=master;protocol=https \
            file://0001-Makefile.in-make-sure-doc-generated-before-install.patch \
            file://run-ptest \
 "
+
+# Workaround for https://github.com/llvm/llvm-project/issues/52765
+SRC_URI:append:libc-glibc:toolchain-clang = " file://0001-test-Disable-optimization-with-clang-for-aligned_all.patch "
 
 SRCREV = "ea6b3e973b477b8061e0076bb257dbd7f3faa756"
 

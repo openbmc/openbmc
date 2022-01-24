@@ -9,7 +9,7 @@ DEPENDS = "gnutls zlib"
 
 SRCREV = "fa8646daeb19dfd12c181f7d19de708d623704c0"
 SRC_URI = " \
-    git://git.ffmpeg.org/rtmpdump \
+    git://git.ffmpeg.org/rtmpdump;branch=master \
     file://fix-racing-build-issue.patch"
 
 S = "${WORKDIR}/git"

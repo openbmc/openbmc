@@ -13,9 +13,12 @@ Subject: [PATCH] makedumpfile: replace hardcode CFLAGS
 Upstream-Status: Inappropriate[oe specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
+[2021-11-18] Patch updated to use CFLAGS_COMMON for zstd
+Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
 ---
- Makefile | 45 +++++++++++++++++++++++----------------------
- 1 file changed, 23 insertions(+), 22 deletions(-)
+ Makefile |   47 ++++++++++++++++++++++++-----------------------
+ 1 file changed, 24 insertions(+), 23 deletions(-)
 
 --- a/Makefile
 +++ b/Makefile
@@ -94,7 +97,7 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  endif
  
  ifeq ($(USESNAPPY), on)
-@@ -65,7 +66,7 @@ LIBS := -lsnappy $(LIBS)
+@@ -65,12 +66,12 @@ LIBS := -lsnappy $(LIBS)
  ifneq ($(LINKTYPE), dynamic)
  LIBS := $(LIBS) -lstdc++
  endif
@@ -102,8 +105,14 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 +CFLAGS_COMMON += -DUSESNAPPY
  endif
  
- LIBS := $(LIBS) -lpthread
-@@ -90,14 +91,14 @@ LIBS := $(LIBS) $(call try-run,\
+ ifeq ($(USEZSTD), on)
+ LIBS := -lzstd $(LIBS)
+-CFLAGS += -DUSEZSTD
++CFLAGS_COMMON += -DUSEZSTD
+ endif
+ 
+ ifeq ($(DEBUG), on)
+@@ -104,14 +105,14 @@ LIBS := $(LIBS) $(call try-run,\
  all: makedumpfile
  
  $(OBJ_PART): $(SRC_PART)
@@ -120,7 +129,7 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  	echo .TH MAKEDUMPFILE 8 \"$(DATE)\" \"makedumpfile v$(VERSION)\" \"Linux System Administrator\'s Manual\" > temp.8
  	grep -v "^.TH MAKEDUMPFILE 8" $(VPATH)makedumpfile.8 >> temp.8
  	mv temp.8 makedumpfile.8
-@@ -108,7 +109,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(
+@@ -122,7 +123,7 @@ makedumpfile: $(SRC_BASE) $(OBJ_PART) $(
  	gzip -c ./makedumpfile.conf.5 > ./makedumpfile.conf.5.gz
  
  eppic_makedumpfile.so: extension_eppic.c

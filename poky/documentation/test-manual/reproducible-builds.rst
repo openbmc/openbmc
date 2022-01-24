@@ -33,10 +33,10 @@ need to rebuild to add a security fix. If this happens, only the components that
 have been modified should change at the binary level. This would lead to much
 easier and clearer bounds on where validation is needed.
 
-This also gives an additional benefit to the project builds themselves, our hash
-equivalence for :ref:`Shared State <overview-manual/concepts:Shared State>`
-object reuse works much more effectively when the binary output remains the
-same.
+This also gives an additional benefit to the project builds themselves, our
+:ref:`overview-manual/concepts:Hash Equivalence` for
+:ref:`overview-manual/concepts:Shared State` object reuse works much more
+effectively when the binary output remains the same.
 
 .. note::
 

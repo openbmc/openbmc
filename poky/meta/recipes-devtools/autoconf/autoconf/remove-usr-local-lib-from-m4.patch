@@ -3,6 +3,7 @@ From: Ross Burton <ross.burton@intel.com>
 Date: Thu, 12 Mar 2020 17:25:37 +0000
 Subject: [PATCH 1/7] remove-usr-local-lib-from-m4.patch
 
+Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 ---
  lib/autoconf/functions.m4 | 9 ---------

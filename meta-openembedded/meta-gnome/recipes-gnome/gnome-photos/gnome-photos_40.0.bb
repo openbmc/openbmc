@@ -30,6 +30,7 @@ def gnome_verdir(v):
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
+SRC_URI += " file://0001-meson-remove-incorrect-args-for-i18n.merge_file.patch"
 SRC_URI[archive.sha256sum] = "e02d73e138af8b2868b5cad7faa1bdd278aeade3b6c3c92836511a4e6f3af1af"
 
 do_install:append() {

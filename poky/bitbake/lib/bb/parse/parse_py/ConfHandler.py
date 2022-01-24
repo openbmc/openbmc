@@ -48,10 +48,7 @@ __unset_regexp__ = re.compile( r"unset\s+([a-zA-Z0-9\-_+.${}/~]+)$" )
 __unset_flag_regexp__ = re.compile( r"unset\s+([a-zA-Z0-9\-_+.${}/~]+)\[([a-zA-Z0-9\-_+.]+)\]$" )
 
 def init(data):
-    topdir = data.getVar('TOPDIR', False)
-    if not topdir:
-        data.setVar('TOPDIR', os.getcwd())
-
+    return
 
 def supports(fn, d):
     return fn[-5:] == ".conf"

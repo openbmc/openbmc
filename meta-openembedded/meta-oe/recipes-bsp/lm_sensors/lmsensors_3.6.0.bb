@@ -10,7 +10,7 @@ DEPENDS = " \
     virtual/libiconv \
 "
 
-SRC_URI = "git://github.com/lm-sensors/lm-sensors.git;protocol=https \
+SRC_URI = "git://github.com/lm-sensors/lm-sensors.git;protocol=https;branch=master \
            file://fancontrol.init \
            file://sensord.init \
            file://0001-Change-PIDFile-path-from-var-run-to-run.patch \

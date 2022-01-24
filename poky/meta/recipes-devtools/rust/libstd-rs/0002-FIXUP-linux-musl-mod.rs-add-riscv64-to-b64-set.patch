@@ -1,0 +1,31 @@
+From bd805ef63035ecefa03f67d5ab2e1d79f7daf9bc Mon Sep 17 00:00:00 2001
+From: Ralf Anton Beier <ralf_beier@me.com>
+Date: Sun, 8 Aug 2021 11:07:21 +0200
+Subject: [PATCH 2/4] FIXUP: linux/musl/mod.rs: add riscv64 to b64 set
+
+https://github.com/rust-lang/libc/pull/1994/commits/30070c822be2ef399b2ba38cdc1d72ac694d65a3
+
+Upstream-Status: Submitted [https://github.com/rust-lang/libc/pull/2537]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Ralf Anton Beier <ralf_beier@me.com>
+---
+ vendor/libc/src/unix/linux_like/linux/musl/mod.rs | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/vendor/libc/src/unix/linux_like/linux/musl/mod.rs b/vendor/libc/src/unix/linux_like/linux/musl/mod.rs
+index df596e968..1ab13a712 100644
+--- a/vendor/libc/src/unix/linux_like/linux/musl/mod.rs
++++ b/vendor/libc/src/unix/linux_like/linux/musl/mod.rs
+@@ -765,7 +765,8 @@ cfg_if! {
+                  target_arch = "aarch64",
+                  target_arch = "mips64",
+                  target_arch = "powerpc64",
+-                 target_arch = "s390x"))] {
++                 target_arch = "s390x",
++                 target_arch = "riscv64"))] {
+         mod b64;
+         pub use self::b64::*;
+     } else if #[cfg(any(target_arch = "x86",
+-- 
+2.20.1
+

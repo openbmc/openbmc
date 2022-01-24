@@ -43,7 +43,8 @@ The following :ref:`autotools <ref-classes-autotools>` class changes
 occurred:
 
 -  *A separate build directory is now used by default:* The
-   ``autotools`` class has been changed to use a directory for building
+   :ref:`autotools <ref-classes-autotools>` class has been
+   changed to use a directory for building
    (:term:`B`), which is separate from the source directory
    (:term:`S`). This is commonly referred to as ``B != S``, or
    an out-of-tree build.
@@ -54,7 +55,8 @@ occurred:
    manner, you will need to either patch the software so that it can
    build separately, or you will need to change the recipe to inherit
    the :ref:`autotools-brokensep <ref-classes-autotools>` class
-   instead of the ``autotools`` or ``autotools_stage`` classes.
+   instead of the :ref:`autotools <ref-classes-autotools>`
+   or ``autotools_stage`` classes.
 
 -  The ``--foreign`` option is no longer passed to ``automake`` when
    running ``autoconf``: This option tells ``automake`` that a

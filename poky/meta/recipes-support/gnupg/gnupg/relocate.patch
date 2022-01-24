@@ -1,4 +1,4 @@
-From 766d37fe9acd9fdaaff9c094635e06b50c5902d7 Mon Sep 17 00:00:00 2001
+From 1e34e1d477f843c0ee2f1a3fddc20201f0233e81 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Wed, 19 Sep 2018 14:44:40 +0100
 Subject: [PATCH] Allow the environment to override where gnupg looks for its
@@ -8,15 +8,16 @@ Upstream-Status: Inappropriate [OE-specific]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
 ---
  common/homedir.c | 14 +++++++-------
  1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/common/homedir.c b/common/homedir.c
-index 455c188..55049db 100644
+index 174d961..f4c25fb 100644
 --- a/common/homedir.c
 +++ b/common/homedir.c
-@@ -1155,7 +1155,7 @@ gnupg_socketdir (void)
+@@ -1161,7 +1161,7 @@ gnupg_socketdir (void)
    if (!name)
      {
        unsigned int dummy;
@@ -25,7 +26,7 @@ index 455c188..55049db 100644
        gpgrt_annotate_leaked_object (name);
      }
  
-@@ -1187,7 +1187,7 @@ gnupg_sysconfdir (void)
+@@ -1193,7 +1193,7 @@ gnupg_sysconfdir (void)
    if (dir)
      return dir;
    else
@@ -34,7 +35,7 @@ index 455c188..55049db 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
-@@ -1223,7 +1223,7 @@ gnupg_bindir (void)
+@@ -1229,7 +1229,7 @@ gnupg_bindir (void)
        return name;
      }
    else
@@ -43,7 +44,7 @@ index 455c188..55049db 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
-@@ -1250,7 +1250,7 @@ gnupg_libexecdir (void)
+@@ -1256,7 +1256,7 @@ gnupg_libexecdir (void)
        return name;
      }
    else
@@ -52,7 +53,7 @@ index 455c188..55049db 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
-@@ -1280,7 +1280,7 @@ gnupg_libdir (void)
+@@ -1286,7 +1286,7 @@ gnupg_libdir (void)
        return name;
      }
    else
@@ -61,7 +62,7 @@ index 455c188..55049db 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
-@@ -1311,7 +1311,7 @@ gnupg_datadir (void)
+@@ -1317,7 +1317,7 @@ gnupg_datadir (void)
        return name;
      }
    else
@@ -70,7 +71,7 @@ index 455c188..55049db 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
-@@ -1343,7 +1343,7 @@ gnupg_localedir (void)
+@@ -1349,7 +1349,7 @@ gnupg_localedir (void)
        return name;
      }
    else
@@ -79,6 +80,3 @@ index 455c188..55049db 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
--- 
-2.20.1
-

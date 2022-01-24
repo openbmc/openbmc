@@ -1,0 +1,46 @@
+From dbf0a3f6ea77a1d5f5e3c4dec7a22fcc09a49537 Mon Sep 17 00:00:00 2001
+From: Max Krummenacher <max.krummenacher@toradex.com>
+Date: Mon, 10 Jan 2022 21:52:02 +0000
+Subject: [PATCH] cmake: sdlchecks.cmake: pass cflags to the appropriate cmake
+ variable
+
+If egl.pc sets at least two macros as the i.MX Vivante driver does, e.g.:
+| Cflags: -I${includedir} -DLINUX -DWL_EGL_PLATFORM
+
+then we get the following error during configuration:
+
+| -- Performing Test HAVE_OPENGL_EGL
+| CMake Error: Parse error in command line argument: WL_EGL_PLATFORM
+|  Should be: VAR:type=value
+
+If one changes to add a value to the macro, e.g.
+| Cflags: -I${includedir} -DLINUX=1 -DWL_EGL_PLATFORM=1
+then cmake does not error out but the macro is not passed to the
+C compiler.
+
+CMAKE_REQUIRED_FLAGS is the wrong variable to pass the CFLAGS in,
+CMAKE_REQUIRED_DEFINITIONS should be used.
+
+Upstream-Status: Submitted [https://github.com/libsdl-org/SDL/pull/5209]
+Signed-off-by: Max Krummenacher <max.krummenacher@toradex.com>
+---
+ cmake/sdlchecks.cmake | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/cmake/sdlchecks.cmake b/cmake/sdlchecks.cmake
+index 32be19c..f61b8df 100644
+--- a/cmake/sdlchecks.cmake
++++ b/cmake/sdlchecks.cmake
+@@ -808,8 +808,7 @@ endmacro()
+ macro(CheckEGL)
+   if (SDL_OPENGL OR SDL_OPENGLES)
+     pkg_check_modules(EGL egl)
+-    string(REPLACE "-D_THREAD_SAFE;" "-D_THREAD_SAFE=1;" EGL_CFLAGS "${EGL_CFLAGS}")
+-    set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${EGL_CFLAGS}")
++    set(CMAKE_REQUIRED_DEFINITIONS "${CMAKE_REQUIRED_DEFINITIONS} ${EGL_CFLAGS}")
+     check_c_source_compiles("
+         #define EGL_API_FB
+         #define MESA_EGL_NO_X11_HEADERS
+-- 
+2.20.1
+

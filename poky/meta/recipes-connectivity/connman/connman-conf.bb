@@ -1,36 +1,19 @@
-SUMMARY = "Connman config to setup wired interface on qemu machines"
-DESCRIPTION = "This is the ConnMan configuration to set up a Wired \
-network interface for a qemu machine."
+SUMMARY = "Connman config to ignore wired interface on qemu machines"
+DESCRIPTION = "This is the ConnMan configuration to avoid touching wired \
+network interface inside qemu machines."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
-inherit systemd
-
-SRC_URI:append:qemuall = " file://wired.config \
-                           file://wired-setup \
-                           file://wired-connection.service \
-"
 PR = "r2"
 
 S = "${WORKDIR}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES:${PN} = "${localstatedir}/* ${datadir}/*"
+FILES:${PN} = "${sysconfdir}/*"
 
-do_install() {
-    #Configure Wired network interface in case of qemu* machines
-    if test -e ${WORKDIR}/wired.config &&
-       test -e ${WORKDIR}/wired-setup &&
-       test -e ${WORKDIR}/wired-connection.service; then
-        install -d ${D}${localstatedir}/lib/connman
-        install -m 0644 ${WORKDIR}/wired.config ${D}${localstatedir}/lib/connman
-        install -d ${D}${datadir}/connman
-        install -m 0755 ${WORKDIR}/wired-setup ${D}${datadir}/connman
-        install -d ${D}${systemd_system_unitdir}
-        install -m 0644 ${WORKDIR}/wired-connection.service ${D}${systemd_system_unitdir}
-        sed -i -e 's|@SCRIPTDIR@|${datadir}/connman|g' ${D}${systemd_system_unitdir}/wired-connection.service
-    fi
+# Kernel IP-Config is perfectly capable of setting up networking passed in via ip=
+do_install:append:qemuall() {
+    mkdir -p ${D}${sysconfdir}/default
+    echo "export EXTRA_PARAM=\"-I eth0\"" > ${D}${sysconfdir}/default/connman
 }
-
-SYSTEMD_SERVICE:${PN}:qemuall = "wired-connection.service"

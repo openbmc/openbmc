@@ -21,9 +21,10 @@ JIT:powerpc64 = ""
 DEPENDS += "libb64 lua${JIT} zlib c-ares grpc-native grpc curl ncurses jsoncpp tbb jq openssl elfutils protobuf protobuf-native jq-native"
 RDEPENDS:${PN} = "bash"
 
-SRC_URI = "git://github.com/draios/sysdig.git;branch=dev \
+SRC_URI = "git://github.com/draios/sysdig.git;branch=dev;protocol=https \
            file://0001-fix-build-with-LuaJIT-2.1-betas.patch \
            file://aarch64.patch \
+           file://0001-libsinsp-Fix-a-lot-of-Werror-format-security-errors-.patch \
           "
 SRCREV = "67833b2aca06bd9d11cff7cb29f04fbf4ef96cad"
 PV = "0.27.1"

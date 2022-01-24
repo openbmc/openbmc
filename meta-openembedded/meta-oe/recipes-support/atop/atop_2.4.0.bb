@@ -42,6 +42,10 @@ do_install() {
         rm -f ${D}${sysconfdir}/init.d/atopacct
     fi
 
+    # /var/log/atop will be created in runtime
+    rm -rf ${D}${localstatedir}/log
+    rmdir --ignore-fail-on-non-empty ${D}${localstatedir}
+
     # remove atopacct related files
     rm -rf ${D}${sbindir} ${D}${mandir}/man8
 }

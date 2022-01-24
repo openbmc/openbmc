@@ -12,6 +12,8 @@ ANY_OF_DISTRO_FEATURES = "${GTK2DISTROFEATURES}"
 
 DEPENDS += "intltool-native gtk+"
 
+# PV is 3.28 not 3.28.0, so the gnomebase SRC_URI isn't right.
+SRC_URI = "${GNOME_MIRROR}/${BPN}/${PV}/${BPN}-${PV}.tar.xz;name=archive"
 SRC_URI[archive.md5sum] = "f9f2c6c521948da427f702372e16f826"
 SRC_URI[archive.sha256sum] = "7c4ba0bff001f06d8983cfc105adaac42df1d1267a2591798a780bac557a5819"
 

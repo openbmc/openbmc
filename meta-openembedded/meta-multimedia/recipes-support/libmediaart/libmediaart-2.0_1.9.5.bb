@@ -18,6 +18,6 @@ S = "${WORKDIR}/libmediaart-${PV}"
 
 # gobject-introspection is mandatory and cannot be configured
 REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
-UNKNOWN_CONFIGURE_WHITELIST = "introspection"
+GIR_MESON_OPTION = ""
 
 EXTRA_OEMESON = "-Dimage_library=gdk-pixbuf"

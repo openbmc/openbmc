@@ -7,7 +7,6 @@ DEPENDS = "virtual/libusb0 pcsc-lite"
 RDEPENDS:${PN} = "pcsc-lite"
 
 SRC_URI = "https://ccid.apdu.fr/files/ccid-${PV}.tar.bz2 \
-    file://no-dep-on-libfl.patch \
     file://0001-Add-build-rule-for-README.patch \
 "
 

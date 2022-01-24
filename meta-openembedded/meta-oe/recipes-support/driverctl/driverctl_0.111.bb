@@ -7,7 +7,7 @@ REQUIRED_DISTRO_FEATURES = "systemd"
 DEPENDS = "systemd"
 RDEPENDS:${PN} += "bash bash-completion"
 
-SRC_URI = " git://gitlab.com/driverctl/driverctl.git"
+SRC_URI = " git://gitlab.com/driverctl/driverctl.git;branch=master"
 SRCREV = "fa9dce43d1a667d6e6e26895fbed01b3b04362c9"
 
 S = "${WORKDIR}/git"

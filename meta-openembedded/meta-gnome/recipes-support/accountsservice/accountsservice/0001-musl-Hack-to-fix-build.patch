@@ -1,10 +1,7 @@
-From 2a1c7103839c20df5ca9ce2fa863535d802f8f3a Mon Sep 17 00:00:00 2001
+From ff0718174faf1167fb4765ebe4bd280bbe8d2ac6 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Sun, 8 Dec 2019 23:42:00 +0100
 Subject: [PATCH] musl: Hack to fix configure
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
 ---
  meson.build | 10 ++++++++--
@@ -31,6 +28,3 @@ index 4465a26..726c9fe 100644
  endif
  
  # compiler flags
--- 
-2.21.0
-

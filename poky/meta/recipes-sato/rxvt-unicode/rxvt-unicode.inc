@@ -6,7 +6,7 @@ terminal emulator rxvt, modified to store text in Unicode \
 output. It also supports mixing multiple fonts at the \
 same time, including Xft fonts."
 HOMEPAGE = "https://rxvt.org/"
-DEPENDS = "virtual/libx11 libxt libxft gdk-pixbuf libxmu"
+DEPENDS = "virtual/libx11 libxt libxft gdk-pixbuf libxmu libptytty"
 
 SRC_URI = "http://dist.schmorp.de/rxvt-unicode/Attic/rxvt-unicode-${PV}.tar.bz2 \
 	   file://xwc.patch \
@@ -22,7 +22,6 @@ ALTERNATIVE_TARGET[x-terminal-emulator] = "${bindir}/rxvt"
 CFLAGS:append = " -fpermissive"
 
 EXTRA_OECONF = "--enable-xim \
-		--enable-utmp --enable-wtmp --enable-lastlog \
 		--with-term=rxvt --enable-keepscrolling \
 		--enable-xft --with-name=rxvt --enable-frills \
 		--enable-swapscreen --enable-transparency \
@@ -30,8 +29,6 @@ EXTRA_OECONF = "--enable-xim \
 		--enable-text-blink --enable-rxvt-scroll \
 		--enable-combining --disable-perl \
 		--with-x=${STAGING_DIR_HOST}${prefix}"
-
-EXTRA_OECONF:append:libc-musl = " --disable-wtmp --disable-lastlog"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[startup] = "--enable-startup-notification,--disable-startup-notification,startup-notification,"

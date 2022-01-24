@@ -1,0 +1,22 @@
+Using localtime() means the output can depend on the timezone of the build machine.
+Using gmtime() is safer. For complete reproducibility use SOURCE_DATE_EPOCH if set.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Upstream-Status: Pending [should be suitable]
+
+Index: openssl-3.0.1/apps/progs.pl
+===================================================================
+--- openssl-3.0.1.orig/apps/progs.pl
++++ openssl-3.0.1/apps/progs.pl
+@@ -21,7 +21,10 @@ die "Unrecognised option, must be -C or
+ my %commands     = ();
+ my $cmdre        = qr/^\s*int\s+([a-z_][a-z0-9_]*)_main\(\s*int\s+argc\s*,/;
+ my $apps_openssl = shift @ARGV;
+-my $YEAR         = [localtime()]->[5] + 1900;
++my $YEAR         = [gmtime()]->[5] + 1900;
++if (defined($ENV{SOURCE_DATE_EPOCH}) && $ENV{SOURCE_DATE_EPOCH} !~ /\D/) {
++    $YEAR = [gmtime($ENV{SOURCE_DATE_EPOCH})]->[5] + 1900;
++}
+ 
+ # because the program apps/openssl has object files as sources, and
+ # they then have the corresponding C files as source, we need to chain

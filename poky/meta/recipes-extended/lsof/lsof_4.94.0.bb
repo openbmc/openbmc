@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://00README;beginline=645;endline=679;md5=964df275d26429
 # https://people.freebsd.org/~abe/ ). http://www.mirrorservice.org seems to be
 # the most commonly used alternative.
 
-SRC_URI = "git://github.com/lsof-org/lsof \
+SRC_URI = "git://github.com/lsof-org/lsof;branch=master;protocol=https \
            file://lsof-remove-host-information.patch \
           "
 

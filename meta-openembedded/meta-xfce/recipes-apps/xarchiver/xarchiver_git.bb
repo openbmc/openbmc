@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "gtk+3 glib-2.0 xfce4-dev-tools-native intltool-native"
 
-SRC_URI = "git://github.com/ib/xarchiver.git"
+SRC_URI = "git://github.com/ib/xarchiver.git;branch=master;protocol=https"
 SRCREV = "9ab958a4023b62b43972c55a3143ff0722bd88a6"
 PV = "0.5.4.14"
 S = "${WORKDIR}/git"

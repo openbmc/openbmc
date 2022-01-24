@@ -1,0 +1,4 @@
+part /boot --active --source bootimg-biosplusefi --ondisk sda --sourceparams="loader=grub-efi" --align 1024
+part / --source rootfs --ondisk sda --fstype=ext4 --use-uuid --align 1024
+part --ondisk sda --fstype=ext4 --size=5 --align 1024
+bootloader --ptable gpt --timeout=1 --append="rootfstype=ext4 console=ttyS0,115200 console=tty0 ${OVERLAYFS_INIT_OPTION}"

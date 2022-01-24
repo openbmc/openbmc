@@ -3,7 +3,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=72d977d697c3c05830fdff00a7448931"
 SRCREV = "beb4650660179963a8ed5b5cbf2085cc1b34f608"
 PV = "1.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/hartkopp/can-isotp.git;protocol=https"
+SRC_URI = "git://github.com/hartkopp/can-isotp.git;protocol=https;branch=master"
 
 
 S = "${WORKDIR}/git"

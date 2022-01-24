@@ -9,13 +9,13 @@ defines from sys/cdefs.h is used
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- lmon16g.c | 4 ++--
+ lmon16m.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/lmon16g.c b/lmon16g.c
+diff --git a/lmon16m.c b/lmon16m.c
 index cb27e09..d2a11c5 100644
---- a/lmon16g.c
-+++ b/lmon16g.c
+--- a/lmon16m.c
++++ b/lmon16m.c
 @@ -63,7 +63,7 @@ static char *SccsId = "nmon " VERSION;
  #include <fcntl.h>
  #include <math.h>

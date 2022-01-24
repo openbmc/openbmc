@@ -284,36 +284,15 @@ def parse_recipe(bb_data, bbfile, appends, mc=''):
     Parse a recipe
     """
 
-    chdir_back = False
-
     bb_data.setVar("__BBMULTICONFIG", mc)
 
-    # expand tmpdir to include this topdir
-    bb_data.setVar('TMPDIR', bb_data.getVar('TMPDIR') or "")
     bbfile_loc = os.path.abspath(os.path.dirname(bbfile))
-    oldpath = os.path.abspath(os.getcwd())
     bb.parse.cached_mtime_noerror(bbfile_loc)
 
-    # The ConfHandler first looks if there is a TOPDIR and if not
-    # then it would call getcwd().
-    # Previously, we chdir()ed to bbfile_loc, called the handler
-    # and finally chdir()ed back, a couple of thousand times. We now
-    # just fill in TOPDIR to point to bbfile_loc if there is no TOPDIR yet.
-    if not bb_data.getVar('TOPDIR', False):
-        chdir_back = True
-        bb_data.setVar('TOPDIR', bbfile_loc)
-    try:
-        if appends:
-            bb_data.setVar('__BBAPPEND', " ".join(appends))
-        bb_data = bb.parse.handle(bbfile, bb_data)
-        if chdir_back:
-            os.chdir(oldpath)
-        return bb_data
-    except:
-        if chdir_back:
-            os.chdir(oldpath)
-        raise
-
+    if appends:
+        bb_data.setVar('__BBAPPEND', " ".join(appends))
+    bb_data = bb.parse.handle(bbfile, bb_data)
+    return bb_data
 
 
 class NoCache(object):

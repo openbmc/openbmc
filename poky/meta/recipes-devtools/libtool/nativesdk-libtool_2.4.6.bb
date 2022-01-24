@@ -2,7 +2,6 @@ require libtool-${PV}.inc
 
 FILESEXTRAPATHS =. "${FILE_DIRNAME}/libtool:"
 
-SRC_URI += "file://prefix.patch"
 SRC_URI += "file://fixinstall.patch"
 
 inherit nativesdk
@@ -20,12 +19,12 @@ do_configure:prepend () {
 do_install () {
 	autotools_do_install
 	install -d ${D}${bindir}/
-	install -m 0755 ${HOST_SYS}-libtool ${D}${bindir}/
+	install -m 0755 libtool ${D}${bindir}/
 }
 
 SYSROOT_PREPROCESS_FUNCS += "libtoolnativesdk_sysroot_preprocess"
 
 libtoolnativesdk_sysroot_preprocess () {
 	install -d ${SYSROOT_DESTDIR}${bindir_crossscripts}/
-	install -m 755 ${D}${bindir}/${HOST_SYS}-libtool ${SYSROOT_DESTDIR}${bindir_crossscripts}/${HOST_SYS}-libtool
+	install -m 755 ${D}${bindir}/libtool ${SYSROOT_DESTDIR}${bindir_crossscripts}/libtool
 }

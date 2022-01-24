@@ -1,4 +1,4 @@
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [need a new release]
 
 unix/Makefile: remove hard coded strip commands
 

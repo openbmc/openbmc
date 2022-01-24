@@ -12,7 +12,7 @@ SECTION = "net"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=411a48ac3c2e9e0911b8dd9aed26f754"
 
-SRC_URI = "git://github.com/jech/babeld.git;protocol=git"
+SRC_URI = "git://github.com/jech/babeld.git;protocol=https;branch=master"
 SRCREV = "dbb8799d1b5b3bfaf4387386c92369c847704480"
 
 UPSTREAM_CHECK_GITTAGREGEX = "babeld-(?P<pver>\d+(\.\d+)+)"

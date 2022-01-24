@@ -10,7 +10,7 @@ DEPENDS = "libjpeg-turbo mraa"
 SRCREV = "5cf20df96c6b35c19d5b871ba4e319e96b4df72d"
 PV = "2.0.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=http \
+SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=http;branch=master;protocol=https \
            file://0001-CMakeLists.txt-Use-SWIG_SUPPORT_FILES-to-find-the-li.patch \
            file://0001-Use-stdint-types.patch \
            file://0001-initialize-local-variables-before-use.patch \
@@ -25,7 +25,7 @@ S = "${WORKDIR}/git"
 # Depends on mraa which only supports x86 and ARM for now
 COMPATIBLE_HOST = "(x86_64.*|i.86.*|aarch64.*|arm.*)-linux"
 
-inherit distutils3-base cmake pkgconfig
+inherit setuptools3-base cmake pkgconfig
 
 EXTRA_OECMAKE += "-UPYTHON_EXECUTABLE -DWERROR=off"
 

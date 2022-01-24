@@ -16,19 +16,14 @@ Signed-off-by: Anuj Mittal <anuj.mittal@intel.com>
  src/tbb/scheduler_common.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/tbb/scheduler_common.h b/src/tbb/scheduler_common.h
-index ee13dbf9..49052001 100644
 --- a/src/tbb/scheduler_common.h
 +++ b/src/tbb/scheduler_common.h
-@@ -219,7 +219,7 @@ inline void prolonged_pause_impl() {
+@@ -220,7 +220,7 @@ inline void prolonged_pause_impl() {
  #endif
  
  inline void prolonged_pause() {
--#if __TBB_WAITPKG_INTRINSICS_PRESENT && (_WIN32 || _WIN64 || __linux__) && (__TBB_x86_32 || __TBB_x86_64)
+-#if __TBB_WAITPKG_INTRINSICS_PRESENT && (_WIN32 || _WIN64 || __unix__) && (__TBB_x86_32 || __TBB_x86_64)
 +#if 0
      if (governor::wait_package_enabled()) {
          std::uint64_t time_stamp = machine_time_stamp();
          // _tpause function directs the processor to enter an implementation-dependent optimized state
--- 
-2.29.0
-

@@ -18,6 +18,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 # gtk-icon-cache bbclass will take care of this for us.
 EXTRA_OEMESON = "-Dicon_update=false"
 
+SRC_URI += " file://0001-build-Fix-build-for-newer-versions-of-meson.patch"
 SRC_URI[archive.md5sum] = "d83faa54abaf64bb40b5313bc233e74e"
 SRC_URI[archive.sha256sum] = "6c949e52c8becc2054daacd604901f66ce5cf709a5fa91c4bb7cacc939b53ea9"
 

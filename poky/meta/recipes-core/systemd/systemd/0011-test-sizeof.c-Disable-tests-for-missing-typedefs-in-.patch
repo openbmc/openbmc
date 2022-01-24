@@ -1,4 +1,4 @@
-From c1ee5661fa24bf540a4880a9d528da8752be033b Mon Sep 17 00:00:00 2001
+From ad395dda5db9b1ae156be121cfc8a38960de6c55 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Wed, 28 Feb 2018 21:25:22 -0800
 Subject: [PATCH] test-sizeof.c: Disable tests for missing typedefs in musl

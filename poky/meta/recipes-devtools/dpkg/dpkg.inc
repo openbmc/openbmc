@@ -15,7 +15,7 @@ inherit autotools gettext perlnative pkgconfig perl-version update-alternatives
 
 PERL:class-native = "${STAGING_BINDIR_NATIVE}/perl-native/perl"
 
-export PERL_LIBDIR = "${libdir}/perl/${@get_perl_version(d)}"
+export PERL_LIBDIR = "${libdir}/perl5/${@get_perl_version(d)}"
 PERL_LIBDIR:class-native = "${libdir}/perl-native/perl/${@get_perl_version(d)}"
 
 EXTRA_OECONF = "\
@@ -49,9 +49,9 @@ do_install:append () {
 	if [ "${PN}" = "dpkg-native" ]; then
 		# update-alternatives doesn't have an offline mode
 		rm ${D}${bindir}/update-alternatives
-		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env nativeperl|' ${D}${bindir}/dpkg-*
+		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env nativeperl|' ${D}${bindir}/dpkg-* ${D}${sbindir}/dpkg-*
 	else
-		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env perl|' ${D}${bindir}/dpkg-*
+		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env perl|' ${D}${bindir}/dpkg-* ${D}${sbindir}/dpkg-*
 	fi
 }
 
@@ -61,12 +61,14 @@ PROV:class-nativesdk = ""
 
 PROVIDES += "${PROV}"
 
+FILES:${PN} += "${datadir}/zsh"
+
 PACKAGES =+ "update-alternatives-dpkg"
 FILES:update-alternatives-dpkg = "${bindir}/update-alternatives ${localstatedir}/lib/dpkg/alternatives ${sysconfdir}/alternatives"
 RPROVIDES:update-alternatives-dpkg += "update-alternatives"
 
 PACKAGES += "${PN}-perl"
-FILES:${PN}-perl = "${libdir}/perl/${@get_perl_version(d)}"
+FILES:${PN}-perl = "${libdir}/perl5/${@get_perl_version(d)}"
 
 RDEPENDS:${PN}-perl += "perl-module-carp perl-module-constant \
                         perl-module-cwd perl-module-digest \

@@ -5,7 +5,7 @@ LICENSE = "LGPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=155db86cdbafa7532b41f390409283eb \
                     file://src/polkit/polkit.h;beginline=1;endline=20;md5=0a8630b0133176d0504c87a0ded39db4"
 
-DEPENDS = "expat glib-2.0 intltool-native mozjs"
+DEPENDS = "expat glib-2.0 intltool-native mozjs-91"
 
 inherit autotools gtk-doc pkgconfig useradd systemd gobject-introspection features_check
 

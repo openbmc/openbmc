@@ -12,8 +12,8 @@ Secondly, dont set armv4 for march when no selection
 is made, since it is passed from cmdline
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Inappropriate [OE-Specific]
 ---
-Upstream-Status: Inappropriate[OE-Specific]
 
  configure.ac | 11 -----------
  1 file changed, 11 deletions(-)

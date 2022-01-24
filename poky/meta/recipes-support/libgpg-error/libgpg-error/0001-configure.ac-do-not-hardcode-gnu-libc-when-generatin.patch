@@ -6,7 +6,7 @@ Subject: [PATCH] configure.ac: do not hardcode gnu libc when generating
 
 This erroneously excluded e.g. musl libc.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [by email to gniibe@fsij.org,gnupg-devel@gnupg.org]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  configure.ac | 2 +-

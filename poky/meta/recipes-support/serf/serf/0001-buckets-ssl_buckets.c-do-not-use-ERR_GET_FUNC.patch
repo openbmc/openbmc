@@ -6,7 +6,7 @@ Subject: [PATCH] buckets/ssl_buckets.c: do not use ERR_GET_FUNC
 Upstream removed it in
 https://github.com/openssl/openssl/pull/16004
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [lastrelease: 2015, lastcommit: 2019]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 ---
  buckets/ssl_buckets.c | 3 +--

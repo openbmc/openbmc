@@ -5,9 +5,11 @@ LICENSE = "GPLv2"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4cc91856b08b094b4f406a29dc61db21"
 
-SRCREV = "a8658290b7914f67146a982671b09f2270ba1654"
+PV = "1.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/CodeConstruct/mctp;branch=main"
+SRCREV = "669740432af525c19a6a41cec777406fbbc24836"
+
+SRC_URI = "git://github.com/CodeConstruct/mctp;branch=main;protocol=https"
 
 S = "${WORKDIR}/git"
 
@@ -27,5 +29,13 @@ do_install:append () {
         install -d ${D}${systemd_system_unitdir}
         install -m 0644 ${S}/conf/mctpd.service \
                 ${D}${systemd_system_unitdir}/mctpd.service
+        install -d ${D}${datadir}/dbus-1/system.d
+        install -m 0644 ${S}/conf/mctpd-dbus.conf \
+                ${D}${datadir}/dbus-1/system.d/mctpd.conf
     fi
 }
+
+FILES:${PN} += " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', \
+            '${datadir}/dbus-1/system.d/mctpd.conf', '', d)} \
+"

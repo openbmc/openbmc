@@ -25,8 +25,6 @@ PACKAGECONFIG[gettext] = "--enable-gettext=yes,--enable-gettext=no,gettext"
 
 CFLAGS += "-D_FILE_OFFSET_BITS=64"
 
-EXTRA_OEMAKE += "'LIBTOOL=${HOST_SYS}-libtool' V=1"
-
 do_configure () {
     export DEBUG="-DNDEBUG"
     install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}

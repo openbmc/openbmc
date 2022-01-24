@@ -6,7 +6,12 @@ Subject: [PATCH] configure: Allow to disable demos which require GLEW or GLU
 * in some systems without X11 support we don't have GLEW, but
   mesa-demos are still useful
 
-Upstream-Status: Pending
+This isn't currently appropriate for upstream submission as glew has
+been replaced with glad there; glu situation would need to be re-assesed
+when upstream makes a new release, requested here:
+https://gitlab.freedesktop.org/mesa/demos/-/issues/22
+
+Upstream-Status: Inappropriate [see above]
 
 Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
 

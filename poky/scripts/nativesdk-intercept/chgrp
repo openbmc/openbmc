@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+#
+# Wrapper around 'chgrp' that redirects to root in all cases
+
+import os
+import shutil
+import sys
+
+# calculate path to the real 'chgrp'
+path = os.environ['PATH']
+path = path.replace(os.path.dirname(sys.argv[0]), '')
+real_chgrp = shutil.which('chgrp', path=path)
+
+args = list()
+
+found = False
+for i in sys.argv:
+    if i.startswith("-"):
+        args.append(i)
+        continue
+    if not found:
+        args.append("root")
+        found = True
+    else:
+        args.append(i)
+
+os.execv(real_chgrp, args)

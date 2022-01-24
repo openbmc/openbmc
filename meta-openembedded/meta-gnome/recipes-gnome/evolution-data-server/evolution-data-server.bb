@@ -2,11 +2,11 @@ require ${BPN}.inc
 
 DEPENDS = " \
     ${BPN}-native intltool-native gperf-native \
-    glib-2.0 gtk+3 libgdata \
+    glib-2.0 gtk+3 libgdata libxml2 icu \
     dbus db virtual/libiconv zlib libsoup-2.4 libical nss libsecret \
 "
 
-inherit gsettings gobject-introspection features_check cmake gtk-doc gettext perlnative
+inherit pkgconfig gsettings gobject-introspection features_check cmake gtk-doc gettext perlnative vala
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
@@ -21,23 +21,23 @@ SRC_URI += " \
 LKSTRFTIME = "HAVE_LKSTRFTIME=ON"
 LKSTRFTIME:libc-musl = "HAVE_LKSTRFTIME=OFF"
 
-# For arm qemu-arm runs at 100% CPU load and never returns - so disable introspection for now
-GI_DATA_ENABLED="False"
-
 EXTRA_OECMAKE = " \
     -DSYSCONF_INSTALL_DIR=${sysconfdir} \
     -DWITH_KRB5=OFF \
-    -DENABLE_GOA=OFF \
     -DENABLE_UOA=OFF \
     -DENABLE_GOOGLE_AUTH=OFF \
     -DENABLE_WEATHER=OFF \
-    -DENABLE_INTROSPECTION=${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'ON', 'OFF', d)} \
+    -DG_IR_COMPILER=${STAGING_BINDIR}/g-ir-compiler-wrapper \
+    -DG_IR_SCANNER=${STAGING_BINDIR}/g-ir-scanner-wrapper \
+    -DVAPIGEN=${STAGING_BINDIR_NATIVE}/vapigen \
+    ${@bb.utils.contains('GI_DATA_ENABLED', 'True', '-DENABLE_INTROSPECTION=ON -DENABLE_VALA_BINDINGS=ON', '-DENABLE_INTROSPECTION=OFF', d)} \
     -D${LKSTRFTIME} \
     -DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')} \
 "
 
 PACKAGECONFIG[canberra] = "-DENABLE_CANBERRA=ON,-DENABLE_CANBERRA=OFF,libcanberra"
 PACKAGECONFIG[oauth]    = "-DENABLE_OAUTH2=ON,-DENABLE_OAUTH2=OFF,webkitgtk json-glib"
+PACKAGECONFIG[goa]    = "-DENABLE_GOA=ON,-DENABLE_GOA=OFF,gnome-online-accounts"
 
 # BROKEN: due missing pkg-config in openldap eds' cmake finds host-libs when
 # searching for openldap-libs
@@ -48,17 +48,8 @@ LDFLAGS += "-lpthread -lgmodule-2.0 -lgthread-2.0"
 
 do_configure:append () {
     cp ${WORKDIR}/iconv-detect.h ${S}/src
-
-    # fix native perl shebang
-    sed -i 's:${STAGING_BINDIR_NATIVE}/perl-native:${bindir}:' ${B}/src/tools/addressbook-export/csv2vcard
-
-    # fix abs path for g-ir-scanner-wrapper
-    sed  -i ${B}/build.ninja \
-        -e 's: ${bindir}/g-ir-scanner-wrapper: ${STAGING_BINDIR}/g-ir-scanner-wrapper:g'
-}
-
-do_compile:prepend() {
-    export GIR_EXTRA_LIBS_PATH="${B}/camel/.libs:${B}/libedataserver/.libs"
+    # avoid writing perl-native path into csv2vcard shebang
+    sed -i "s|@PERL@|${bindir}/perl|" ${S}/src/tools/addressbook-export/csv2vcard.in
 }
 
 FILES:${PN} =+ " \

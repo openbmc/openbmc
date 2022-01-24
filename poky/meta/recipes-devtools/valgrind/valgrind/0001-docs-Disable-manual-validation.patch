@@ -1,0 +1,36 @@
+From 99fc6fe9b66becac3c94068129e84217330a71a6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Jan 2022 18:26:02 -0800
+Subject: [PATCH] docs: Disable manual validation
+
+validating manual and manpages, this task involves calling xmllint which
+accesses network and --nonet option also does not disable this,
+therefore disable it.
+
+Fixes
+| error : Resource temporarily unavailable
+| ../callgrind/docs/cl-manual.xml:4: warning: failed to load external entity "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
+|  <!ENTITY % vg-entities SYSTEM "../../docs/xml/vg-entities.xml"> %vg-entities; ]
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ docs/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/Makefile.am b/docs/Makefile.am
+index d4250e8..c500306 100644
+--- a/docs/Makefile.am
++++ b/docs/Makefile.am
+@@ -192,7 +192,7 @@ valid-manpages: $(MANPAGES_XML_FILES)
+ 	  touch $@; \
+ 	fi
+ 
+-check-local: valid-manual valid-manpages
++check-local:
+ 
+ # The text version of the FAQ.
+ FAQ.txt:
+-- 
+2.34.1
+

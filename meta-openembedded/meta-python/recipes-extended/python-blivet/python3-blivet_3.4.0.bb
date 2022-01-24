@@ -9,7 +9,7 @@ S = "${WORKDIR}/git"
 B = "${S}"
 
 SRCREV = "f7d9027e4fdad11187980e73726cd75a2dc962c2"
-SRC_URI = "git://github.com/storaged-project/blivet.git;branch=3.4-release \
+SRC_URI = "git://github.com/storaged-project/blivet.git;branch=3.4-release;protocol=https \
            file://0002-run_program-support-timeout.patch \
            file://0003-support-infinit-timeout.patch \
            file://0004-fix-new.roots-object-is-not-iterable.patch \

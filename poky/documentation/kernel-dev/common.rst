@@ -1578,13 +1578,11 @@ Maintaining format compatibility facilitates converging with linux-yocto
 on a future, mutually-supported kernel version.
 
 To help you use your own sources, the Yocto Project provides a
-linux-yocto custom recipe (``linux-yocto-custom.bb``) that uses
-``kernel.org`` sources and the Yocto Project Linux kernel tools for
-managing kernel Metadata. You can find this recipe in the ``poky`` Git
-repository of the Yocto Project :yocto_git:`Source Repository <>`
-at::
-
-   poky/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb
+linux-yocto custom recipe that uses ``kernel.org`` sources and
+the Yocto Project Linux kernel tools for managing kernel Metadata.
+You can find this recipe in the ``poky`` Git repository:
+:yocto_git:`meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb
+</poky/tree/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb>`.
 
 Here are some basic steps you can use to work with your own sources:
 
@@ -1729,11 +1727,9 @@ Linux kernel sources, if you need an external kernel module, the
 create your own out-of-tree Linux kernel module recipe.
 
 This template recipe is located in the ``poky`` Git repository of the
-Yocto Project :yocto_git:`Source Repository <>` at:
-
-.. code-block:: none
-
-   poky/meta-skeleton/recipes-kernel/hello-mod/hello-mod_0.1.bb
+Yocto Project:
+:yocto_git:`meta-skeleton/recipes-kernel/hello-mod/hello-mod_0.1.bb
+</poky/tree/meta-skeleton/recipes-kernel/hello-mod/hello-mod_0.1.bb>`.
 
 To get started, copy this recipe to your layer and give it a meaningful
 name (e.g. ``mymodule_1.0.bb``). In the same directory, create a new

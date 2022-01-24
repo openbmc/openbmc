@@ -3,6 +3,10 @@ From: Zhenhua Luo <zhenhua.luo@nxp.com>
 Date: Sat, 11 Jun 2016 22:08:29 -0500
 Subject: [PATCH] fix the incorrect assembling for ppc wait mnemonic
 
+The wait mnemonic for ppc targets is incorrectly assembled into 0x7c00003c due
+to duplicated address definition with waitasec instruction. The issue causes
+kernel boot calltrace for ppc targets when wait instruction is executed.
+
 Signed-off-by: Zhenhua Luo <zhenhua.luo@nxp.com>
 
 Upstream-Status: Pending

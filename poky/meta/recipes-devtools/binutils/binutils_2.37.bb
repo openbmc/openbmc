@@ -27,10 +27,6 @@ EXTRA_OECONF:class-native = "--enable-targets=all \
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'debuginfod', d)}"
 PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod, elfutils"
-# gcc9.0 end up mis-compiling libbfd.so with O2 which then crashes on target
-# So remove -O2 and use -Os as workaround
-SELECTED_OPTIMIZATION:remove:mipsarch = "-O2"
-SELECTED_OPTIMIZATION:append:mipsarch = " -Os"
 
 do_install:class-native () {
 	autotools_do_install

@@ -13,8 +13,7 @@ what the berkleydb driver already does.
 
 Also ensure that dsize is 0 if dptr == NULL.
 
-Upstream-Status: Backport[https://svn.apache.org/viewvc?
-view=revision&amp;revision=1825311]
+Upstream-Status: Backport [https://svn.apache.org/viewvc?view=revision&amp;revision=1825311]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---

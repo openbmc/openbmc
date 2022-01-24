@@ -8,6 +8,11 @@ SRC_URI[sha256sum] = "183524e3db4e2a1fea92e0ca3662a624ba44c9f3568da15679d7535ba6
 
 inherit pypi setuptools3
 
+# Workaround for network access issue during compile step
+# this needs to be fixed in the recipes buildsystem to move
+# this such that it can be accomplished during do_fetch task
+do_compile[network] = "1"
+
 DEPENDS += "\
     ${PYTHON_PN}-wheel-native \
     ${PYTHON_PN}-pip-native \

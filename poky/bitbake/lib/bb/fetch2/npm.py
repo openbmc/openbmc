@@ -72,7 +72,7 @@ def npm_unpack(tarball, destdir, d):
     cmd += " --delay-directory-restore"
     cmd += " --strip-components=1"
     runfetchcmd(cmd, d, workdir=destdir)
-    runfetchcmd("chmod -R +X %s" % (destdir), d, quiet=True, workdir=destdir)
+    runfetchcmd("chmod -R +X '%s'" % (destdir), d, quiet=True, workdir=destdir)
 
 class NpmEnvironment(object):
     """

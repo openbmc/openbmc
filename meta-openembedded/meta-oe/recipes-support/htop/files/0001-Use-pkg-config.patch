@@ -1,4 +1,4 @@
-From 14100c6fc2cce7260ca5ace81094aee0ae40dd07 Mon Sep 17 00:00:00 2001
+From 98ed72177c49a8015a443b3ec272fee3fb5a4eb3 Mon Sep 17 00:00:00 2001
 From: Paul Barker <pbarker@toganlabs.com>
 Date: Sun, 5 Nov 2017 22:07:30 +0000
 Subject: [PATCH] htop: Update to v2.0.2
@@ -17,32 +17,32 @@ Upstream-status: Inappropriate
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 115d894..0e0a1eb 100644
+index 0e69096..d20014f 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -205,10 +205,10 @@ AS_VAR_POPDEF([CACHEVAR])dnl
- 
- AC_ARG_ENABLE(unicode, [AS_HELP_STRING([--enable-unicode], [enable Unicode support])], ,enable_unicode="yes")
+@@ -322,10 +322,10 @@ AC_ARG_ENABLE([unicode],
+               [],
+               [enable_unicode=yes])
  if test "x$enable_unicode" = xyes; then
--   HTOP_CHECK_SCRIPT([ncursesw6], [addnwstr], [HAVE_LIBNCURSESW], "ncursesw6-config",
--    HTOP_CHECK_SCRIPT([ncursesw], [addnwstr], [HAVE_LIBNCURSESW], "ncursesw6-config",
--     HTOP_CHECK_SCRIPT([ncursesw], [addnwstr], [HAVE_LIBNCURSESW], "ncursesw5-config",
--      HTOP_CHECK_SCRIPT([ncurses], [addnwstr], [HAVE_LIBNCURSESW], "ncurses5-config",
-+   HTOP_CHECK_SCRIPT([ncursesw6], [addnwstr], [HAVE_LIBNCURSESW], "pkg-config ncursesw6",
-+    HTOP_CHECK_SCRIPT([ncursesw], [addnwstr], [HAVE_LIBNCURSESW], "pkg-config ncursesw6",
-+     HTOP_CHECK_SCRIPT([ncursesw], [addnwstr], [HAVE_LIBNCURSESW], "pkg-config ncursesw5",
-+      HTOP_CHECK_SCRIPT([ncurses], [addnwstr], [HAVE_LIBNCURSESW], "pkg-config ncurses5",
+-   HTOP_CHECK_SCRIPT([ncursesw6], [waddwstr], [HAVE_LIBNCURSESW], "ncursesw6-config",
+-    HTOP_CHECK_SCRIPT([ncursesw], [waddwstr], [HAVE_LIBNCURSESW], "ncursesw6-config",
+-     HTOP_CHECK_SCRIPT([ncursesw], [wadd_wch], [HAVE_LIBNCURSESW], "ncursesw5-config",
+-      HTOP_CHECK_SCRIPT([ncurses], [wadd_wch], [HAVE_LIBNCURSESW], "ncurses5-config",
++   HTOP_CHECK_SCRIPT([ncursesw6], [waddwstr], [HAVE_LIBNCURSESW], "pkg-config ncursesw6",
++    HTOP_CHECK_SCRIPT([ncursesw], [waddwstr], [HAVE_LIBNCURSESW], "pkg-config ncursesw6",
++     HTOP_CHECK_SCRIPT([ncursesw], [wadd_wch], [HAVE_LIBNCURSESW], "pkg-config ncursesw5",
++      HTOP_CHECK_SCRIPT([ncurses], [wadd_wch], [HAVE_LIBNCURSESW], "pkg-config ncurses5",
         HTOP_CHECK_LIB([ncursesw6], [addnwstr], [HAVE_LIBNCURSESW],
          HTOP_CHECK_LIB([ncursesw], [addnwstr], [HAVE_LIBNCURSESW],
           HTOP_CHECK_LIB([ncurses], [addnwstr], [HAVE_LIBNCURSESW],
-@@ -225,8 +225,8 @@ if test "x$enable_unicode" = xyes; then
+@@ -342,8 +342,8 @@ if test "x$enable_unicode" = xyes; then
     # (at this point we already link against a working ncurses library with wide character support)
     AC_SEARCH_LIBS([keypad], [tinfow tinfo])
  else
--   HTOP_CHECK_SCRIPT([ncurses6], [refresh], [HAVE_LIBNCURSES], "ncurses6-config",
--    HTOP_CHECK_SCRIPT([ncurses], [refresh], [HAVE_LIBNCURSES], "ncurses5-config",
-+   HTOP_CHECK_SCRIPT([ncurses6], [refresh], [HAVE_LIBNCURSES], "pkg-config ncurses6",
-+    HTOP_CHECK_SCRIPT([ncurses], [refresh], [HAVE_LIBNCURSES], "pkg-config ncurses5",
-      HTOP_CHECK_LIB([ncurses6],  [refresh], [HAVE_LIBNCURSES],
-       HTOP_CHECK_LIB([ncurses],  [refresh], [HAVE_LIBNCURSES],
-       missing_libraries="$missing_libraries libncurses"
+-   HTOP_CHECK_SCRIPT([ncurses6], [wnoutrefresh], [HAVE_LIBNCURSES], [ncurses6-config],
+-    HTOP_CHECK_SCRIPT([ncurses], [wnoutrefresh], [HAVE_LIBNCURSES], [ncurses5-config],
++   HTOP_CHECK_SCRIPT([ncurses6], [wnoutrefresh], [HAVE_LIBNCURSES], [pkg-config ncurses6],
++    HTOP_CHECK_SCRIPT([ncurses], [wnoutrefresh], [HAVE_LIBNCURSES], [pkg-config ncurses5],
+      HTOP_CHECK_LIB([ncurses6],  [doupdate], [HAVE_LIBNCURSES],
+       HTOP_CHECK_LIB([ncurses],  [doupdate], [HAVE_LIBNCURSES],
+        HTOP_CHECK_LIB([curses],  [doupdate], [HAVE_LIBNCURSES],

@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 29 Aug 2016 16:38:11 +0300
 Subject: [PATCH] Fix racy parallel build of WebKit2-4.0.gir
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://bugs.webkit.org/show_bug.cgi?id=232935]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 
 ---

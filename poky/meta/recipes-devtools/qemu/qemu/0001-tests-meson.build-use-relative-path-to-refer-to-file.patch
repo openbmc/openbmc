@@ -16,16 +16,19 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  tests/meson.build   | 2 +-
  1 files changed, 1 insertions(+), 1 deletion(-)
 
-Index: qemu-6.0.0/tests/unit/meson.build
+Index: qemu-6.2.0/tests/unit/meson.build
 ===================================================================
---- qemu-6.0.0.orig/tests/unit/meson.build
-+++ qemu-6.0.0/tests/unit/meson.build
-@@ -42,7 +42,7 @@ tests = {
+--- qemu-6.2.0.orig/tests/unit/meson.build
++++ qemu-6.2.0/tests/unit/meson.build
+@@ -44,9 +44,9 @@ tests = {
    'test-keyval': [testqapi],
    'test-logging': [],
    'test-uuid': [],
--  'ptimer-test': ['ptimer-test-stubs.c', meson.source_root() / 'hw/core/ptimer.c'],
+-  'ptimer-test': ['ptimer-test-stubs.c', meson.project_source_root() / 'hw/core/ptimer.c'],
 +  'ptimer-test': ['ptimer-test-stubs.c', '../../hw/core/ptimer.c'],
    'test-qapi-util': [],
+-  'test-smp-parse': [qom, meson.project_source_root() / 'hw/core/machine-smp.c'],
++  'test-smp-parse': [qom, '../../hw/core/machine-smp.c'],
  }
  
+ if have_system or have_tools

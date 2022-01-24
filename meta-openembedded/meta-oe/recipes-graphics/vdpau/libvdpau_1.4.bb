@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=83af8811a28727a13f04132cc33b7f58"
 DEPENDS = "virtual/libx11 libxext xorgproto"
 
 SRCREV = "c3d1a9dbafdfe6144ff474d0d523dc01b068750f"
-SRC_URI = "git://anongit.freedesktop.org/vdpau/libvdpau"
+SRC_URI = "git://anongit.freedesktop.org/vdpau/libvdpau;branch=master"
 
 S = "${WORKDIR}/git"
 

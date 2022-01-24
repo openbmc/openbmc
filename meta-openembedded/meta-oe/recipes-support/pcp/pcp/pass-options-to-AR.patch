@@ -1,0 +1,29 @@
+Do not pass cr option
+
+These options are already coming from builddefs
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/src/include/builddefs.in
++++ b/src/include/builddefs.in
+@@ -167,7 +167,7 @@ OBJECTS = $(ASFILES:.s=.o) \
+ 
+ #NB: don't override $(MAKE); gnumake sets it well, propagating -j etc.
+ #MAKE	= @make@
+-AR	= @ar@
++AR	= @ar@ cqs
+ CC	= @cc@
+ CXX	= @cxx@
+ LD	= @ld@
+--- a/src/include/buildrules
++++ b/src/include/buildrules
+@@ -93,7 +93,7 @@ $(STATICLIBTARGET) : $(SUBDIRS) $(OBJECT
+ ifeq ($(TARGET_OS), darwin)
+ 	libtool -static -o $(STATICLIBTARGET) $?
+ else
+-	$(AR) cr $(STATICLIBTARGET) $?
++	$(AR) $(STATICLIBTARGET) $?
+ endif
+ endif
+ 

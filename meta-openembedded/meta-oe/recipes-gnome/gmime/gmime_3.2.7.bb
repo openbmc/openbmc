@@ -5,7 +5,7 @@ SECTION = "libs"
 
 DEPENDS = "glib-2.0 zlib"
 
-inherit gnomebase gobject-introspection
+inherit gnomebase gobject-introspection vala
 
 SRC_URI += "file://iconv-detect.h \
             file://nodolt.patch"

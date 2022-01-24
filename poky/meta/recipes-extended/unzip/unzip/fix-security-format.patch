@@ -5,7 +5,7 @@ Fix security formatting issues related to sprintf parameters expeted.
 [YOCTO #9551]
 [https://bugzilla.yoctoproject.org/show_bug.cgi?id=9551]
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [need a new release]
 
 Signed-off-by: Edwin Plauchu <edwin.plauchu.camacho@intel.com>
 

@@ -1,7 +1,7 @@
-From 7a4fd5933cc795df85cdd85168fe54fbaec4dcec Mon Sep 17 00:00:00 2001
+From f2eae0af620925b3686410470fc6fbc66ec1dc52 Mon Sep 17 00:00:00 2001
 From: Christopher Larson <chris_larson@mentor.com>
 Date: Tue, 13 Dec 2016 09:50:34 -0700
-Subject: [PATCH 6/6] Fix for X32
+Subject: [PATCH] Fix for X32
 
 Apply patch to fix the X32 build from https://github.com/sjnewbury/x32.
 
@@ -13,10 +13,10 @@ Signed-off-by: Christopher Larson <chris_larson@mentor.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/x86_64/Gos-linux.c b/src/x86_64/Gos-linux.c
-index bd14234..be1cb5b 100644
+index b489329..0550005 100644
 --- a/src/x86_64/Gos-linux.c
 +++ b/src/x86_64/Gos-linux.c
-@@ -145,8 +145,8 @@ x86_64_sigreturn (unw_cursor_t *cursor)
+@@ -146,8 +146,8 @@ x86_64_sigreturn (unw_cursor_t *cursor)
  
    Debug (8, "resuming at ip=%llx via sigreturn(%p)\n",
               (unsigned long long) c->dwarf.ip, sc);
@@ -25,8 +25,5 @@ index bd14234..be1cb5b 100644
 +  __asm__ __volatile__ ("mov %q0, %%rsp;"
 +                        "mov %q1, %%rax;"
                          "syscall"
-                         :: "r"(sc), "i"(SYS_rt_sigreturn)
+                         :: "r"((uint64_t)sc), "i"(SYS_rt_sigreturn)
                          : "memory");
--- 
-2.20.1
-

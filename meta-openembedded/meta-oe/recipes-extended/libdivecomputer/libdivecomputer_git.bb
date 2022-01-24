@@ -11,7 +11,7 @@ inherit autotools pkgconfig
 PV = "0.7.0"
 
 SRCREV = "47cbed5355ffda7b952193a770a9a9fa9f89b25b"
-SRC_URI = "git://github.com/libdivecomputer/libdivecomputer.git;protocol=https \
+SRC_URI = "git://github.com/libdivecomputer/libdivecomputer.git;protocol=https;branch=master \
           "
 
 S = "${WORKDIR}/git"

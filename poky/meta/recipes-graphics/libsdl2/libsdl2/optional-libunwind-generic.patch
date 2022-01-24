@@ -1,0 +1,18 @@
+Do not error when libunwind-generic is not found, Not all
+implementations of libunwind will provide this library therefore
+do not make it hard error if its not found.
+
+Upstream-Status: Submitted [https://github.com/libsdl-org/SDL/pull/5194]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1358,7 +1358,7 @@ elseif(UNIX AND NOT APPLE AND NOT ANDROI
+       if(HAVE_LIBUNWIND_H)
+         # We've already found the header, so REQUIRE the lib to be present
+         pkg_search_module(UNWIND REQUIRED libunwind)
+-        pkg_search_module(UNWIND_GENERIC REQUIRED libunwind-generic)
++        pkg_search_module(UNWIND_GENERIC libunwind-generic)
+         list(APPEND EXTRA_LIBS ${UNWIND_LIBRARIES} ${UNWIND_GENERIC_LIBRARIES})
+       endif()
+     endif()

@@ -11,7 +11,7 @@ RDEPENDS:${PN} += "apache2"
 
 # Original (github.com/disconnect/apache-websocket) is dead since 2012, the
 # fork contains patches from the modules ML and fixes CVE compliance issues
-SRC_URI = "git://github.com/jchampio/apache-websocket.git"
+SRC_URI = "git://github.com/jchampio/apache-websocket.git;branch=master;protocol=https"
 
 SRCREV = "0ee34c77fc78ff08fd548706300b80a7bc7874e4"
 
@@ -21,8 +21,7 @@ S = "${WORKDIR}/git"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2ee41112a44fe7014dce33e26468ba93"
 
-EXTRA_OECONF = "APACHECTL=${STAGING_DIR_TARGET}${sbindir}/apachectl \
-                LIBTOOL=${STAGING_DIR_TARGET}${bindir_crossscripts}/${HOST_SYS}-libtool"
+EXTRA_OECONF = "APACHECTL=${STAGING_DIR_TARGET}${sbindir}/apachectl"
 
 do_install() {
     install -d ${D}${libexecdir}/apache2/modules

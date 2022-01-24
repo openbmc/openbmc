@@ -1,0 +1,12 @@
+[Unit]
+Description=Groups all overlays required by {PN} in one unit
+After={ALL_OVERLAYFS_UNITS}
+Requires={ALL_OVERLAYFS_UNITS}
+
+[Service]
+Type=oneshot
+ExecStart=/bin/true
+RemainAfterExit=true
+
+[Install]
+WantedBy=local-fs.target

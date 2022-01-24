@@ -5,7 +5,7 @@ SECTION = "devel/python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://../../LICENSE;md5=96cdecb41125f498958e09b72faf318e"
 
-SRC_URI = "git://github.com/RPi-Distro/RTIMULib.git;protocol=http;branch=master \
+SRC_URI = "git://github.com/RPi-Distro/RTIMULib.git;protocol=http;branch=master;protocol=https \
            file://0001-include-asm-ioctl.h-for-ioctl-define.patch;patchdir=../.. \
           "
 SRCREV = "b949681af69b45f0f7f4bb53b6770037b5b02178"

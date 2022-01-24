@@ -23,3 +23,6 @@ FILES:${PN}-dev += "\
   ${libdir}/pkgconfig \
   ${PYTHON_SITEPACKAGES_DIR}/*.la \
 "
+python __anonymous() {
+    bb.warn("distutils-common-base.bbclass is deprecated, please use setuptools3-base.bbclass instead")
+}

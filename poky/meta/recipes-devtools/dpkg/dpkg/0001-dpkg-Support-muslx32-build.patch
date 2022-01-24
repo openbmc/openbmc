@@ -3,7 +3,7 @@ From: sweeaun <swee.aun.khor@intel.com>
 Date: Sun, 10 Sep 2017 00:14:15 -0700
 Subject: [PATCH] dpkg: Support muslx32 build
 
-Upstream-Status: Pending.
+Upstream-Status: Pending
 Changes made on ostable and tupletable to enable muslx32 build.
 
 Signed-off-by: sweeaun <swee.aun.khor@intel.com>

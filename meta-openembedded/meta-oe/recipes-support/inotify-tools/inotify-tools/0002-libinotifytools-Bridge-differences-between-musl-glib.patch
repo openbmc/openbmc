@@ -1,0 +1,40 @@
+From 6c3ce01a281a9aa661494d24a862219fc9e2b460 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 16 Dec 2021 14:57:55 -0800
+Subject: [PATCH 2/2] libinotifytools: Bridge differences between
+ musl/glibc/kernel fnotify.h
+
+System detects to use sys/fnotify.h and then assumes glibc's definitions
+but musl has definitions of its own. perhaps portable thing would be to
+use linux/fnotify.h interface directly on linux irrespective of libc
+
+See the differences discussion here [1]
+
+[1] https://inbox.vuxu.org/musl/20191112220151.GC27331@x230/T/#ma8700992467200c8792e0fa8508eae656b81aeba
+
+Upstream-Status: Submitted [https://github.com/inotify-tools/inotify-tools/pull/154]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libinotifytools/src/inotifytools.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/libinotifytools/src/inotifytools.c b/libinotifytools/src/inotifytools.c
+index 902eac2..2b96395 100644
+--- a/libinotifytools/src/inotifytools.c
++++ b/libinotifytools/src/inotifytools.c
+@@ -55,6 +55,12 @@ struct fanotify_event_fid {
+ 	struct fanotify_event_info_fid info;
+ 	struct file_handle handle;
+ };
++
++#ifndef __GLIBC__
++#define val __val
++#define __kernel_fsid_t fsid_t
++#endif
++
+ #endif
+ 
+ /**
+-- 
+2.34.1
+

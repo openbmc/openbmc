@@ -4,7 +4,7 @@ Date: Wed, 18 Mar 2015 00:27:10 +0000
 Subject: [PATCH] sysdeps/gnu/configure.ac: handle correctly
  $libc_cv_rootsbindir
 
-Upstream-Status:Pending
+Upstream-Status: Pending
 
 Signed-off-by: Matthieu Crapet <Matthieu.Crapet@ingenico.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>

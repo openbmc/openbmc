@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/aoetools/files/vblade/"
 
 SRCREV = "5f1a0ba8b9815e3f08a3e2635a17f78bbf2a5b10"
-SRC_URI = "git://github.com/OpenAoE/vblade \
+SRC_URI = "git://github.com/OpenAoE/vblade;branch=master;protocol=https \
            file://cross.patch \
            file://makefile-add-ldflags.patch \
            file://${BPN}.conf \

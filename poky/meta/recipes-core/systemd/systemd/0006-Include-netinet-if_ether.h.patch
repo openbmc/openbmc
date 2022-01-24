@@ -1,4 +1,4 @@
-From f95192d87a46a2191cf4ebd47c64e04b138d7fac Mon Sep 17 00:00:00 2001
+From a3be3b7160856ffb8259ede9e2e0168d74bf126e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 26 Oct 2017 22:10:42 -0700
 Subject: [PATCH] Include netinet/if_ether.h
@@ -103,7 +103,7 @@ index 5ad396a57e..1dc007fe13 100644
 -#endif /* _UAPI_LINUX_IN6_H */
 +#endif /* _LINUX_IN6_H */
 diff --git a/src/libsystemd-network/sd-dhcp6-client.c b/src/libsystemd-network/sd-dhcp6-client.c
-index f99c12620b..4966d62656 100644
+index efbf7d7df3..86906332b6 100644
 --- a/src/libsystemd-network/sd-dhcp6-client.c
 +++ b/src/libsystemd-network/sd-dhcp6-client.c
 @@ -5,7 +5,6 @@
@@ -300,7 +300,7 @@ index 850b4f449e..6f85d41328 100644
  #include <netinet/in.h>
  #include <linux/netdevice.h>
 diff --git a/src/network/networkd-route.c b/src/network/networkd-route.c
-index 791fd64c39..a2825c920d 100644
+index eeba31c45d..0a2b0ed42b 100644
 --- a/src/network/networkd-route.c
 +++ b/src/network/networkd-route.c
 @@ -1,5 +1,6 @@

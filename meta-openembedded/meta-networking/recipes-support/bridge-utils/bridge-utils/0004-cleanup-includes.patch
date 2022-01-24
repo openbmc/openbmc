@@ -1,0 +1,149 @@
+From 1763c5b7f8f72d651d62337029c3bdfb269491e4 Mon Sep 17 00:00:00 2001
+From: Stephen Hemminger <sthemmin@microsoft.com>
+Date: Fri, 7 Jan 2022 08:44:19 -0800
+Subject: [PATCH] cleanup includes
+
+Use IWYU to only include necessary headers.
+Should resolve build issues for distros that need limits.h
+to find PATH_MAX.
+
+Upstream-Status: Backport
+[https://git.kernel.org/pub/scm/network/bridge/bridge-utils.git/commit/?h=main&id=1763c5b7f8f72d651d62337029c3bdfb269491e4]
+
+Signed-off-by: Stephen Hemminger <sthemmin@microsoft.com>
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ brctl/brctl.c               | 1 -
+ brctl/brctl_cmd.c           | 3 ++-
+ brctl/brctl_disp.c          | 1 -
+ libbridge/libbridge_devif.c | 5 ++++-
+ libbridge/libbridge_if.c    | 5 +----
+ libbridge/libbridge_init.c  | 4 +++-
+ libbridge/libbridge_misc.c  | 5 +----
+ 7 files changed, 11 insertions(+), 13 deletions(-)
+
+diff --git a/brctl/brctl.c b/brctl/brctl.c
+index 8855234..d2fa005 100644
+--- a/brctl/brctl.c
++++ b/brctl/brctl.c
+@@ -17,7 +17,6 @@
+  */
+ 
+ #include <stdio.h>
+-#include <stdlib.h>
+ #include <string.h>
+ #include <errno.h>
+ #include <getopt.h>
+diff --git a/brctl/brctl_cmd.c b/brctl/brctl_cmd.c
+index 81f7dfa..4167503 100644
+--- a/brctl/brctl_cmd.c
++++ b/brctl/brctl_cmd.c
+@@ -18,10 +18,11 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <string.h>
+ #include <sys/time.h>
+ #include <errno.h>
+-#include <asm/param.h>
++
+ #include "libbridge.h"
+ #include "brctl.h"
+ 
+diff --git a/brctl/brctl_disp.c b/brctl/brctl_disp.c
+index 3e81241..f6bf2af 100644
+--- a/brctl/brctl_disp.c
++++ b/brctl/brctl_disp.c
+@@ -17,7 +17,6 @@
+  */
+ 
+ #include <stdio.h>
+-#include <stdlib.h>
+ #include <string.h>
+ #include <sys/time.h>
+ 
+diff --git a/libbridge/libbridge_devif.c b/libbridge/libbridge_devif.c
+index 8b7d954..3aac0f9 100644
+--- a/libbridge/libbridge_devif.c
++++ b/libbridge/libbridge_devif.c
+@@ -18,12 +18,15 @@
+ 
+ 
+ #include <stdio.h>
+-#include <stdlib.h>
+ #include <unistd.h>
+ #include <errno.h>
+ #include <string.h>
+ #include <dirent.h>
+ #include <fcntl.h>
++#include <limits.h>
++
++#include <sys/ioctl.h>
++#include <linux/sockios.h>
+ 
+ #include "libbridge.h"
+ #include "libbridge_private.h"
+diff --git a/libbridge/libbridge_if.c b/libbridge/libbridge_if.c
+index 5f3aed1..96dda30 100644
+--- a/libbridge/libbridge_if.c
++++ b/libbridge/libbridge_if.c
+@@ -16,12 +16,9 @@
+  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+ 
+-#include <stdio.h>
+-#include <stdlib.h>
+ #include <errno.h>
+-#include <string.h>
+-#include <fcntl.h>
+ #include <sys/ioctl.h>
++#include <linux/sockios.h>
+ 
+ #include "libbridge.h"
+ #include "libbridge_private.h"
+diff --git a/libbridge/libbridge_init.c b/libbridge/libbridge_init.c
+index c914971..d572895 100644
+--- a/libbridge/libbridge_init.c
++++ b/libbridge/libbridge_init.c
+@@ -16,14 +16,16 @@
+  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+ 
++#include <limits.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <errno.h>
+ #include <string.h>
+ #include <dirent.h>
+-#include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/ioctl.h>
++#include <linux/sockios.h>
+ 
+ #include "libbridge.h"
+ #include "libbridge_private.h"
+diff --git a/libbridge/libbridge_misc.c b/libbridge/libbridge_misc.c
+index 9379e93..5b146fd 100644
+--- a/libbridge/libbridge_misc.c
++++ b/libbridge/libbridge_misc.c
+@@ -16,14 +16,11 @@
+  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+ 
+-#include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <sys/time.h>
+ #include <asm/param.h>
+-#include "libbridge.h"
+-#include "libbridge_private.h"
+ 
++#include "libbridge.h"
+ 
+ static const char *state_names[5] = {
+ 	[BR_STATE_DISABLED] = "disabled", 
+-- 
+2.17.1
+

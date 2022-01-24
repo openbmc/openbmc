@@ -43,14 +43,13 @@ BB_HASHBASE_WHITELIST += "WAFLOCK"
 
 python waf_preconfigure() {
     import subprocess
-    from distutils.version import StrictVersion
     subsrcdir = d.getVar('S')
     python = d.getVar('WAF_PYTHON')
     wafbin = os.path.join(subsrcdir, 'waf')
     try:
         result = subprocess.check_output([python, wafbin, '--version'], cwd=subsrcdir, stderr=subprocess.STDOUT)
         version = result.decode('utf-8').split()[1]
-        if StrictVersion(version) >= StrictVersion("1.8.7"):
+        if bb.utils.vercmp_string_op(version, "1.8.7", ">="):
             d.setVar("WAF_EXTRA_CONF", "--bindir=${bindir} --libdir=${libdir}")
     except subprocess.CalledProcessError as e:
         bb.warn("Unable to execute waf --version, exit code %d. Assuming waf version without bindir/libdir support." % e.returncode)

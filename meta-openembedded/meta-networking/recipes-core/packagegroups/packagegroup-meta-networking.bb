@@ -172,8 +172,6 @@ RDEPENDS:packagegroup-meta-networking-protocols = "\
     xl2tpd \
 "
 
-RDEPENDS:packagegroup-meta-networking-protocols:remove:libc-musl = "mdns"
-
 RDEPENDS:packagegroup-meta-networking-support = "\
     aoetools \
     arptables \
@@ -219,6 +217,7 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     yp-tools \
     mtr \
     ntp ntpdate sntp ntpdc ntpq ntp-tickadj ntp-utils \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "ntpsec", "", d)} \
     nbd-client \
     nbd-server \
     nbd-trdump \

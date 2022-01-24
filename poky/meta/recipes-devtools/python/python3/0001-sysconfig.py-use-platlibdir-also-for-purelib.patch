@@ -1,4 +1,4 @@
-From 93346d1a2f5d4f7085391bc7c1230d85ebe00606 Mon Sep 17 00:00:00 2001
+From 9162460d81ccc725fb04a14b27d0bf4afcfb69c9 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sun, 12 Sep 2021 21:44:36 +0200
 Subject: [PATCH] sysconfig.py: use platlibdir also for purelib
@@ -8,12 +8,13 @@ is not correct.
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
 ---
  Lib/sysconfig.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index b70d392..c418acd 100644
+index daf9f00..e64bcdc 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -27,7 +27,7 @@ _INSTALL_SCHEMES = {
@@ -25,6 +26,3 @@ index b70d392..c418acd 100644
          'platlib': '{platbase}/{platlibdir}/python{py_version_short}/site-packages',
          'include':
              '{installed_base}/include/python{py_version_short}{abiflags}',
--- 
-2.20.1
-

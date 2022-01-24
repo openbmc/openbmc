@@ -7,7 +7,7 @@ cd $ptestdir/tests
 
 for testbin in $testbins; do
 	if test -e ./$testbin; then
-		./$testbin > ./$testbin.out
+		./$testbin > ./$testbin.out 2>&1
 		if [ $? -ne 0 ]; then
 			echo "FAIL: $testbin"
 		else

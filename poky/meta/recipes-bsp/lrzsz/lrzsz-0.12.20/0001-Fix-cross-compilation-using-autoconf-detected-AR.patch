@@ -6,7 +6,7 @@ Subject: [PATCH] Fix cross compilation using autoconf detected AR
 currently its using 'ar' program from build host, which is not expected,
 we need to respect AR passed in environment
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [upstream hasn't been active since 1998]
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

@@ -131,6 +131,20 @@ concat_dtb_helper() {
 		elif [ -e "${DEPLOYDIR}/${UBOOT_NODTB_IMAGE}" -a -e "$deployed_uboot_dtb_binary" ]; then
 			cd ${DEPLOYDIR}
 			cat ${UBOOT_NODTB_IMAGE} $deployed_uboot_dtb_binary | tee ${B}/${CONFIG_B_PATH}/${UBOOT_BINARY} > ${UBOOT_IMAGE}
+
+			if [ -n "${UBOOT_CONFIG}" ]
+			then
+				for config in ${UBOOT_MACHINE}; do
+					i=$(expr $i + 1);
+					for type in ${UBOOT_CONFIG}; do
+						j=$(expr $j + 1);
+						if [ $j -eq $i ]
+						then
+							cp ${UBOOT_IMAGE} ${B}/${CONFIG_B_PATH}/u-boot-$type.${UBOOT_SUFFIX}
+						fi
+					done
+				done
+			fi
 		else
 			bbwarn "Failure while adding public key to u-boot binary. Verified boot won't be available."
 		fi
@@ -205,7 +219,7 @@ install_helper() {
 	fi
 }
 
-# Install SPL dtb and u-boot nodtb to datadir, 
+# Install SPL dtb and u-boot nodtb to datadir,
 install_spl_helper() {
 	if [ -f "${SPL_DIR}/${SPL_DTB_BINARY}" ]; then
 		install -Dm 0644 ${SPL_DIR}/${SPL_DTB_BINARY} ${D}${datadir}/${SPL_DTB_IMAGE}

@@ -5,7 +5,7 @@ Subject: [PATCH] lttng-ust-common: link with liburcu explicitly
 
 Otherwise linking errors are seen on x86-32.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [by email to lttng-dev, Francis, Jonathan]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 ---
  src/lib/lttng-ust-common/Makefile.am | 1 +

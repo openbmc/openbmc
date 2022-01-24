@@ -6,7 +6,7 @@ LICENSE = "GPLv2"
 DEPENDS = "glib-2.0 fuse3"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "git://github.com/libfuse/sshfs"
+SRC_URI = "git://github.com/libfuse/sshfs;branch=master;protocol=https"
 SRCREV = "9700b353700589dcc462205c638bcb40219a49c2"
 S = "${WORKDIR}/git"
 

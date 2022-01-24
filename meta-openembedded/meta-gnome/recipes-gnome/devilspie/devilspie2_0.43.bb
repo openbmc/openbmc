@@ -10,7 +10,7 @@ PV .= "+git${SRCPV}"
 
 SRCREV = "a3ee65b815a0247a0dbdaa39353444cef6f93499"
 
-SRC_URI = "git://github.com/dsalt/devilspie2;branch=master \
+SRC_URI = "git://github.com/dsalt/devilspie2;branch=master;protocol=https \
     file://default.lua \
     file://devilspie2.desktop \
 "

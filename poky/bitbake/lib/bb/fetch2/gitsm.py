@@ -163,7 +163,7 @@ class GitSM(Git):
         else:
             self.process_submodules(ud, ud.clonedir, need_update_submodule, d)
 
-        if len(need_update_list) > 0:
+        if need_update_list:
             logger.debug('gitsm: Submodules requiring update: %s' % (' '.join(need_update_list)))
             return True
 

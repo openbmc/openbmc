@@ -1,0 +1,33 @@
+From 203801ae47399569868aa468988e711ba3ddfa92 Mon Sep 17 00:00:00 2001
+From: Joe MacDonald <joe_macdonald@mentor.com>
+Date: Mon, 30 Oct 2017 13:18:20 -0400
+Subject: [PATCH] include missing kernel header
+
+Fixes errors like
+
+| /b/kraj/jlinux-next/poky/build/tmp-eglibc/sysroots/re-64b/usr/include/linux/if_bridge.h:172:20: error: field 'ip6' has incomplete type
+| In file included from ../libbridge/libbridge.h:24:0,
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Joe MacDonald <joe_macdonald@mentor.com>
+---
+ libbridge/libbridge.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libbridge/libbridge.h b/libbridge/libbridge.h
+index 962f316..422ec33 100644
+--- a/libbridge/libbridge.h
++++ b/libbridge/libbridge.h
+@@ -24,6 +24,7 @@
+ #include <sys/time.h>
+ #include <netinet/in.h>
+ 
++#include <linux/in6.h>
+ #include <linux/if.h>
+ #include <linux/if_bridge.h>
+ 
+-- 
+2.17.1
+

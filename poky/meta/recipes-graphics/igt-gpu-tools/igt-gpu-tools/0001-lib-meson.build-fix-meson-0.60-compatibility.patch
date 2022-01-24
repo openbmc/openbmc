@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex@linutronix.de>
 Date: Mon, 25 Oct 2021 18:18:15 +0200
 Subject: [PATCH] lib/meson.build: fix meson 0.60 compatibility
 
-Upstream-Status: Pending
+Upstream-Status: Backport [https://gitlab.freedesktop.org/drm/igt-gpu-tools/-/commit/963917a3565466832a3b2fc22e9285d34a0bf944]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 ---
  lib/meson.build | 2 +-

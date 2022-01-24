@@ -1,4 +1,4 @@
-From 820249ea8e38c568e6a36fbd9c852718c7665b56 Mon Sep 17 00:00:00 2001
+From 7401e682400df87f3258f795bb1d143f64a35a9f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Mon, 9 Dec 2019 00:12:08 +0100
 Subject: [PATCH] musl: add missing fgetspent_r
@@ -6,6 +6,7 @@ Subject: [PATCH] musl: add missing fgetspent_r
 Stolen from void-linux
 
 Upstream-Status: Inappropriate [musl-specific]
+
 ---
  src/daemon.c | 20 ++++++++++++++++++++
  1 file changed, 20 insertions(+)
@@ -41,6 +42,3 @@ index c52bda3..a7676fe 100644
  static struct passwd *
  entry_generator_fgetpwent (Daemon       *daemon,
                             GHashTable   *users,
--- 
-2.21.0
-

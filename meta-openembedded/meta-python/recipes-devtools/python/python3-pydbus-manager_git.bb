@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0fd5bb1dae91ba145745db55870be6a7"
 
 inherit setuptools3
 
-SRC_URI = "git://github.com/seebz/pydbus-manager.git"
+SRC_URI = "git://github.com/seebz/pydbus-manager.git;branch=master;protocol=https"
 SRCREV = "6b576b969cbda50521dca62a7df929167207f9fc"
 PV = "git${SRCPV}"
 

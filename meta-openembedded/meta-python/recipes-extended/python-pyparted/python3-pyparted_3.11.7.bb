@@ -9,10 +9,12 @@ LIC_FILES_CHKSUM = "\
     file://src/_pedmodule.c;beginline=10;endline=22;md5=9e53304db812b80d0939e11bb69dcab2 \
 "
 
+SRC_URI += "file://setuptools.patch"
+
 SRC_URI[md5sum] = "69284f943982f54ded76960c92098a02"
 SRC_URI[sha256sum] = "61cde7b096bccd69ddc75c85b17f8baed45c3687d404706d91403a319453b903"
 
-inherit pkgconfig pypi distutils3
+inherit pkgconfig pypi setuptools3
 
 DEPENDS += "parted"
 

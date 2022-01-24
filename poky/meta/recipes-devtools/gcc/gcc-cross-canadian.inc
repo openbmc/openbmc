@@ -45,6 +45,9 @@ export WINDRES_FOR_TARGET = "${TARGET_PREFIX}windres"
 export ARCH_FLAGS_FOR_TARGET = "--sysroot=${STAGING_DIR_TARGET}"
 
 do_configure () {
+        if [ ! -d ${RECIPE_SYSROOT}/${target_includedir} ]; then
+            mkdir -p ${RECIPE_SYSROOT}/${target_includedir}
+        fi
 	export CC_FOR_BUILD="${BUILD_CC}"
 	export CXX_FOR_BUILD="${BUILD_CXX}"
 	export CFLAGS_FOR_BUILD="${BUILD_CFLAGS}"
@@ -180,9 +183,6 @@ SYSTEMLIBS = "${target_base_libdir}/"
 SYSTEMLIBS1 = "${target_libdir}/"
 
 EXTRA_OECONF += "--enable-poison-system-directories"
-EXTRA_OECONF:remove:elf = "--with-sysroot=/not/exist"
-EXTRA_OECONF:remove:eabi = "--with-sysroot=/not/exist"
-EXTRA_OECONF:append:elf = " --without-headers --with-newlib"
-EXTRA_OECONF:append:eabi = " --without-headers --with-newlib"
+
 # gcc 4.7 needs -isystem
 export ARCH_FLAGS_FOR_TARGET = "--sysroot=${STAGING_DIR_TARGET} -isystem=${target_includedir}"

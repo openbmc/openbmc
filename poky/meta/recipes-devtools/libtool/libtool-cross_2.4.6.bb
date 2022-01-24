@@ -1,7 +1,6 @@
 require libtool-${PV}.inc
 
 PACKAGES = ""
-SRC_URI += "file://prefix.patch"
 SRC_URI += "file://fixinstall.patch"
 
 datadir = "${STAGING_DIR_TARGET}${target_datadir}"
@@ -22,15 +21,16 @@ do_configure:prepend () {
 # Find references to LTCC="ccache xxx-gcc" and CC="ccache xxx-gcc"
 #
 do_install () {
+	ln -s false ${D}
 	install -d ${D}${bindir_crossscripts}/
-	install -m 0755 ${HOST_SYS}-libtool ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
+	install -m 0755 libtool ${D}${bindir_crossscripts}/libtool
 	sed -e 's@^\(predep_objects="\).*@\1"@' \
 	    -e 's@^\(postdep_objects="\).*@\1"@' \
 	    -e 's@^CC="ccache.@CC="@' \
 	    -e 's@^LTCC="ccache.@LTCC="@' \
-	    -i ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
-	sed -i '/^archive_cmds=/s/\-nostdlib//g' ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
-	sed -i '/^archive_expsym_cmds=/s/\-nostdlib//g' ${D}${bindir_crossscripts}/${HOST_SYS}-libtool
+	    -i ${D}${bindir_crossscripts}/libtool
+	sed -i '/^archive_cmds=/s/\-nostdlib//g' ${D}${bindir_crossscripts}/libtool
+	sed -i '/^archive_expsym_cmds=/s/\-nostdlib//g' ${D}${bindir_crossscripts}/libtool
 	GREP='/bin/grep' SED='sed' ${S}/build-aux/inline-source libtoolize > ${D}${bindir_crossscripts}/libtoolize
 	chmod 0755 ${D}${bindir_crossscripts}/libtoolize
 	install -d ${D}${target_datadir}/libtool/build-aux/

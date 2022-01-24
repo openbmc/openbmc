@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 19 Nov 2019 13:46:09 +0100
 Subject: [PATCH] Look fo sphinx only if documentation is actually enabled
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/1383]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
  docs/hawkey/CMakeLists.txt | 20 +++++++++++---------

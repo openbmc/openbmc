@@ -1,4 +1,4 @@
-From cceb2bba69b371868e89d435c5406b67cdd84d57 Mon Sep 17 00:00:00 2001
+From 856010e268a6aca8e5f02502457afe289bd877f1 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 15:12:41 +0800
 Subject: [PATCH] Use uintmax_t for handling rlim_t
@@ -87,10 +87,10 @@ index 23d108d5df..3e6fb438d7 100644
          return 1;
  }
 diff --git a/src/core/execute.c b/src/core/execute.c
-index 2a64675c5f..dca1e0e3b6 100644
+index 515b2fe748..7693f2d9a0 100644
 --- a/src/core/execute.c
 +++ b/src/core/execute.c
-@@ -5391,9 +5391,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
+@@ -5395,9 +5395,9 @@ void exec_context_dump(const ExecContext *c, FILE* f, const char *prefix) {
          for (unsigned i = 0; i < RLIM_NLIMITS; i++)
                  if (c->rlimit[i]) {
                          fprintf(f, "%sLimit%s: " RLIM_FMT "\n",

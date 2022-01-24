@@ -1,12 +1,12 @@
-DISTRO : "3.4"
+DISTRO : "3.4.1"
 DISTRO_NAME_NO_CAP : "honister"
 DISTRO_NAME : "Honister"
 DISTRO_NAME_NO_CAP_MINUS_ONE : "hardknott"
 DISTRO_NAME_NO_CAP_LTS : "dunfell"
-YOCTO_DOC_VERSION : "3.4"
-YOCTO_DOC_VERSION_MINUS_ONE : "3.3.3"
-DISTRO_REL_TAG : "yocto-3.4"
-POKYVERSION : "26.0.0"
+YOCTO_DOC_VERSION : "3.4.1"
+YOCTO_DOC_VERSION_MINUS_ONE : "3.3.4"
+DISTRO_REL_TAG : "yocto-3.4.1"
+POKYVERSION : "26.0.1"
 YOCTO_POKY : "poky-&DISTRO_NAME_NO_CAP;-&POKYVERSION;"
 YOCTO_DL_URL : "https://downloads.yoctoproject.org"
 YOCTO_AB_URL : "https://autobuilder.yoctoproject.org"
@@ -30,7 +30,7 @@ CENTOS7_HOST_PACKAGES_ESSENTIAL : "-y epel-release
      \n\      $ sudo yum makecache
      \n\      $ sudo yum install gawk make wget tar bzip2 gzip python3 unzip perl patch \
      diffutils diffstat git cpp gcc gcc-c++ glibc-devel texinfo chrpath socat \
-     perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python36-pip xz \
+     perl-Data-Dumper perl-Text-ParseWords perl-Thread-Queue python3-pip xz \
      which SDL-devel xterm mesa-libGL-devel zstd lz4
      \n\      $ sudo pip3 install GitPython jinja2"
 CENTOS8_HOST_PACKAGES_ESSENTIAL : "-y epel-release

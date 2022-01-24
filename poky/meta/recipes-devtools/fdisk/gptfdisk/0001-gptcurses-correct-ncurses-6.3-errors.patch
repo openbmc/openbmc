@@ -3,7 +3,7 @@ From: Alexander Kanavin <alex@linutronix.de>
 Date: Mon, 25 Oct 2021 17:27:51 +0200
 Subject: [PATCH] gptcurses: correct ncurses 6.3 errors
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [by email to rodsmith@rodsbooks.com]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 ---
  gptcurses.cc | 28 ++++++++++++++--------------

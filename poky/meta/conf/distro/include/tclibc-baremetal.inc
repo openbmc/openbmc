@@ -27,7 +27,7 @@ BASEDEPENDS:remove:class-target = "virtual/${TARGET_PREFIX}compilerlibs"
 TARGET_OS = "elf"
 TARGET_OS:arm = "eabi"
 
-TOOLCHAIN_HOST_TASK ?= "packagegroup-cross-canadian-${MACHINE} nativesdk-qemu"
+TOOLCHAIN_HOST_TASK ?= "packagegroup-cross-canadian-${MACHINE} nativesdk-qemu nativesdk-sdk-provides-dummy"
 TOOLCHAIN_HOST_TASK_ATTEMPTONLY ?= ""
 TOOLCHAIN_TARGET_TASK ?= "libgcc-dev"
 TOOLCHAIN_NEED_CONFIGSITE_CACHE:remove = "virtual/${MLPREFIX}libc zlib ncurses"

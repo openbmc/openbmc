@@ -14,7 +14,7 @@ DEPENDS = " \
     udev \
 "
 
-SRC_URI = "git://salsa.debian.org/consolation-team/consolation.git"
+SRC_URI = "git://salsa.debian.org/consolation-team/consolation.git;branch=master"
 SRCREV = "4581eaece6e49fa2b687efbdbe23b2de452e7902"
 
 S = "${WORKDIR}/git"

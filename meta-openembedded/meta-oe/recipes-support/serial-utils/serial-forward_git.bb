@@ -6,7 +6,7 @@ SECTION = "console/devel"
 SRCREV = "07c6fdede0870edc37a8d51d033b6e7e29aa7c91"
 PV = "1.1+gitr${SRCPV}"
 
-SRC_URI = "git://github.com/freesmartphone/cornucopia.git \
+SRC_URI = "git://github.com/freesmartphone/cornucopia.git;branch=master;protocol=https \
            file://0001-serial_forward-Disable-default-static-linking.patch;striplevel=3 \
           "
 S = "${WORKDIR}/git/tools/serial_forward"

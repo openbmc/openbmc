@@ -1,0 +1,56 @@
+Port setup.py to setuptools.
+
+Upstream-Status: Submitted [https://github.com/ldo/dbussy/pull/53]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/setup.py b/setup.py
+index 4b9411e..da7ee7e 100644
+--- a/setup.py
++++ b/setup.py
+@@ -8,33 +8,9 @@
+ # Written by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
+ #-
+ 
+-import sys
+-import distutils.core
+-from distutils.command.build import \
+-    build as std_build
++import setuptools
+ 
+-class my_build(std_build) :
+-    "customization of build to perform additional validation."
+-
+-    def run(self) :
+-        try :
+-            exec \
+-              (
+-                "async def dummy() :\n"
+-                "    pass\n"
+-                "#end dummy\n"
+-              )
+-        except SyntaxError :
+-            sys.stderr.write("This module requires Python 3.5 or later.\n")
+-            sys.exit(-1)
+-        #end try
+-        super().run()
+-    #end run
+-
+-#end my_build
+-
+-distutils.core.setup \
+-  (
++setuptools.setup(
+     name = "DBussy",
+     version = "1.3",
+     description = "language bindings for libdbus, for Python 3.5 or later",
+@@ -43,9 +19,5 @@ distutils.core.setup \
+     author_email = "ldo@geek-central.gen.nz",
+     url = "https://github.com/ldo/dbussy",
+     license = "LGPL v2.1+",
+     py_modules = ["dbussy", "ravel"],
+-    cmdclass =
+-        {
+-            "build" : my_build,
+-        },
+-  )
++)

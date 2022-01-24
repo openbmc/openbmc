@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://PACKAGE-LICENSING;md5=4a0548e303dbc77f067335b4d688e745 \
                     "
 
-SRC_URI = "git://github.com/rpm-software-management/dnf.git \
+SRC_URI = "git://github.com/rpm-software-management/dnf.git;branch=master;protocol=https \
            file://0001-Corretly-install-tmpfiles.d-configuration.patch \
            file://0001-Do-not-hardcode-etc-and-systemd-unit-directories.patch \
            file://0005-Do-not-prepend-installroot-to-logdir.patch \
@@ -23,7 +23,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 
 S = "${WORKDIR}/git"
 
-inherit cmake gettext bash-completion distutils3-base systemd
+inherit cmake gettext bash-completion setuptools3-base systemd
 
 DEPENDS += "libdnf librepo libcomps python3-iniparse"
 
@@ -38,7 +38,6 @@ RDEPENDS:${PN} += " \
   python3-netclient \
   python3-email \
   python3-threading \
-  python3-distutils \
   python3-logging \
   python3-fcntl \
   librepo \
@@ -63,8 +62,8 @@ RRECOMMENDS:${PN}:class-target += "gnupg"
 # .spec file in dnf source tree does (and then Fedora and dnf documentation
 # says that dnf binary is plain 'dnf').
 do_install:append() {
-        lnr ${D}/${bindir}/dnf-3 ${D}/${bindir}/dnf
-        lnr ${D}/${bindir}/dnf-automatic-3 ${D}/${bindir}/dnf-automatic
+        ln -rs ${D}/${bindir}/dnf-3 ${D}/${bindir}/dnf
+        ln -rs ${D}/${bindir}/dnf-automatic-3 ${D}/${bindir}/dnf-automatic
 }
 
 # Direct dnf-native to read rpm configuration from our sysroot, not the one it was compiled in

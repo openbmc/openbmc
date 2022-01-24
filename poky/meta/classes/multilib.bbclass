@@ -92,6 +92,10 @@ multilib_virtclass_handler[eventmask] = "bb.event.RecipePreFinalise"
 
 python __anonymous () {
     if bb.data.inherits_class('image', d):
+        # set rpm preferred file color for 32-bit multilib image
+        if d.getVar("SITEINFO_BITS") == "32":
+            d.setVar("RPM_PREFER_ELF_ARCH", "1")
+
         variant = d.getVar("BBEXTENDVARIANT")
         import oe.classextend
 

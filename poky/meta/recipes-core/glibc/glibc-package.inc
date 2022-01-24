@@ -119,8 +119,8 @@ do_install() {
 		ln -s ${@oe.path.relative('${root_prefix}/lib', '${base_libdir}')}/${ARCH_DYNAMIC_LOADER} \
 				${D}${root_prefix}/lib/${ARCH_DYNAMIC_LOADER}
 	fi
-        lnr ${D}${base_libdir}/libpthread.so.0 ${D}${libdir}/libpthread.so
-        lnr ${D}${base_libdir}/librt.so.1 ${D}${libdir}/librt.so
+        ln -rs ${D}${base_libdir}/libpthread.so.0 ${D}${libdir}/libpthread.so
+        ln -rs ${D}${base_libdir}/librt.so.1 ${D}${libdir}/librt.so
 }
 
 def get_libc_fpu_setting(bb, d):

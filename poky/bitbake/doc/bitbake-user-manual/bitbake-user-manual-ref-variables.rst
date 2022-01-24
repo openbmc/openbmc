@@ -374,11 +374,34 @@ overview of their function and contents.
       Specifies the Hash Equivalence server to use.
 
       If set to ``auto``, BitBake automatically starts its own server
-      over a UNIX domain socket.
+      over a UNIX domain socket. An option is to connect this server
+      to an upstream one, by setting :term:`BB_HASHSERVE_UPSTREAM`.
 
-      If set to ``host:port``, BitBake will use a remote server on the
+      If set to ``unix://path``, BitBake will connect to an existing
+      hash server available over a UNIX domain socket.
+
+      If set to ``host:port``, BitBake will connect to a remote server on the
       specified host. This allows multiple clients to share the same
       hash equivalence data.
+
+      The remote server can be started manually through
+      the ``bin/bitbake-hashserv`` script provided by BitBake,
+      which supports UNIX domain sockets too. This script also allows
+      to start the server in read-only mode, to avoid accepting
+      equivalences that correspond to Share State caches that are
+      only available on specific clients.
+
+   :term:`BB_HASHSERVE_UPSTREAM`
+      Specifies an upstream Hash Equivalence server.
+
+      This optional setting is only useful when a local Hash Equivalence
+      server is started (setting :term:`BB_HASHSERVE` to ``auto``),
+      and you wish the local server to query an upstream server for
+      Hash Equivalence data.
+
+      Example usage::
+
+         BB_HASHSERVE_UPSTREAM = "typhoon.yocto.io:8687"
 
    :term:`BB_INVALIDCONF`
       Used in combination with the ``ConfigParsed`` event to trigger
@@ -525,29 +548,6 @@ overview of their function and contents.
 
       -  *clear* - Queries the source controls system every time. With this
          policy, there is no cache. The "clear" policy is the default.
-
-   :term:`BB_STAMP_POLICY`
-      Defines the mode used for how timestamps of stamp files are compared.
-      You can set the variable to one of the following modes:
-
-      -  *perfile* - Timestamp comparisons are only made between timestamps
-         of a specific recipe. This is the default mode.
-
-      -  *full* - Timestamp comparisons are made for all dependencies.
-
-      -  *whitelist* - Identical to "full" mode except timestamp
-         comparisons are made for recipes listed in the
-         :term:`BB_STAMP_WHITELIST` variable.
-
-      .. note::
-
-         Stamp policies are largely obsolete with the introduction of
-         setscene tasks.
-
-   :term:`BB_STAMP_WHITELIST`
-      Lists files whose stamp file timestamps are compared when the stamp
-      policy mode is set to "whitelist". For information on stamp policies,
-      see the :term:`BB_STAMP_POLICY` variable.
 
    :term:`BB_STRICT_CHECKSUM`
       Sets a more strict checksum mechanism for non-local URLs. Setting
@@ -1333,67 +1333,103 @@ overview of their function and contents.
       The list of source files - local or remote. This variable tells
       BitBake which bits to pull for the build and how to pull them. For
       example, if the recipe or append file needs to fetch a single tarball
-      from the Internet, the recipe or append file uses a :term:`SRC_URI` entry
-      that specifies that tarball. On the other hand, if the recipe or
-      append file needs to fetch a tarball and include a custom file, the
-      recipe or append file needs an :term:`SRC_URI` variable that specifies
-      all those sources.
+      from the Internet, the recipe or append file uses a :term:`SRC_URI`
+      entry that specifies that tarball. On the other hand, if the recipe or
+      append file needs to fetch a tarball, apply two patches, and include
+      a custom file, the recipe or append file needs an :term:`SRC_URI`
+      variable that specifies all those sources.
 
-      The following list explains the available URI protocols:
+      The following list explains the available URI protocols. URI
+      protocols are highly dependent on particular BitBake Fetcher
+      submodules. Depending on the fetcher BitBake uses, various URL
+      parameters are employed. For specifics on the supported Fetchers, see
+      the :ref:`bitbake-user-manual/bitbake-user-manual-fetching:fetchers`
+      section.
 
-      -  ``file://`` : Fetches files, which are usually files shipped
-         with the metadata, from the local machine. The path is relative to
-         the :term:`FILESPATH` variable.
+      -  ``az://`` : Fetches files from an Azure Storage account using HTTPS.
 
       -  ``bzr://`` : Fetches files from a Bazaar revision control
          repository.
 
-      -  ``git://`` : Fetches files from a Git revision control
+      -  ``ccrc://`` - Fetches files from a ClearCase repository.
+
+      -  ``cvs://`` : Fetches files from a CVS revision control
          repository.
 
-      -  ``osc://`` : Fetches files from an OSC (OpenSUSE Build service)
-         revision control repository.
+      -  ``file://`` - Fetches files, which are usually files shipped
+         with the Metadata, from the local machine.
+         The path is relative to the :term:`FILESPATH`
+         variable. Thus, the build system searches, in order, from the
+         following directories, which are assumed to be a subdirectories of
+         the directory in which the recipe file (``.bb``) or append file
+         (``.bbappend``) resides:
 
-      -  ``repo://`` : Fetches files from a repo (Git) repository.
+         -  ``${BPN}`` - The base recipe name without any special suffix
+            or version numbers.
 
-      -  ``http://`` : Fetches files from the Internet using HTTP.
+         -  ``${BP}`` - ``${BPN}-${PV}``. The base recipe name and
+            version but without any special package name suffix.
 
-      -  ``https://`` : Fetches files from the Internet using HTTPS.
+         -  *files -* Files within a directory, which is named ``files``
+            and is also alongside the recipe or append file.
 
       -  ``ftp://`` : Fetches files from the Internet using FTP.
 
-      -  ``cvs://`` : Fetches files from a CVS revision control
+      -  ``git://`` : Fetches files from a Git revision control
+         repository.
+
+      -  ``gitsm://`` : Fetches submodules from a Git revision control
          repository.
 
       -  ``hg://`` : Fetches files from a Mercurial (``hg``) revision
          control repository.
 
+      -  ``http://`` : Fetches files from the Internet using HTTP.
+
+      -  ``https://`` : Fetches files from the Internet using HTTPS.
+
+      -  ``npm://`` - Fetches JavaScript modules from a registry.
+
+      -  ``osc://`` : Fetches files from an OSC (OpenSUSE Build service)
+         revision control repository.
+
       -  ``p4://`` : Fetches files from a Perforce (``p4``) revision
          control repository.
+
+      -  ``repo://`` : Fetches files from a repo (Git) repository.
 
       -  ``ssh://`` : Fetches files from a secure shell.
 
       -  ``svn://`` : Fetches files from a Subversion (``svn``) revision
          control repository.
 
-      -  ``az://`` : Fetches files from an Azure Storage account using HTTPS.
-
       Here are some additional options worth mentioning:
 
-      -  ``unpack`` : Controls whether or not to unpack the file if it is
-         an archive. The default action is to unpack the file.
+      -  ``downloadfilename`` : Specifies the filename used when storing
+         the downloaded file.
+
+      -  ``name`` - Specifies a name to be used for association with
+         :term:`SRC_URI` checksums or :term:`SRCREV` when you have more than one
+         file or git repository specified in :term:`SRC_URI`. For example::
+
+            SRC_URI = "git://example.com/foo.git;name=first \
+                       git://example.com/bar.git;name=second \
+                       http://example.com/file.tar.gz;name=third"
+
+            SRCREV_first = "f1d2d2f924e986ac86fdf7b36c94bcdf32beec15"
+            SRCREV_second = "e242ed3bffccdf271b7fbaf34ed72d089537b42f"
+            SRC_URI[third.sha256sum] = "13550350a8681c84c861aac2e5b440161c2b33a3e4f302ac680ca5b686de48de"
 
       -  ``subdir`` : Places the file (or extracts its contents) into the
          specified subdirectory. This option is useful for unusual tarballs
          or other archives that do not have their files already in a
          subdirectory within the archive.
 
-      -  ``name`` : Specifies a name to be used for association with
-         :term:`SRC_URI` checksums when you have more than one file specified
-         in :term:`SRC_URI`.
+      -  ``subpath`` - Limits the checkout to a specific subpath of the
+         tree when using the Git fetcher is used.
 
-      -  ``downloadfilename`` : Specifies the filename used when storing
-         the downloaded file.
+      -  ``unpack`` : Controls whether or not to unpack the file if it is
+         an archive. The default action is to unpack the file.
 
    :term:`SRCDATE`
       The date of the source code used to build the package. This variable

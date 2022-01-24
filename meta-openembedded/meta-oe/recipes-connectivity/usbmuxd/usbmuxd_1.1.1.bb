@@ -11,7 +11,7 @@ inherit autotools pkgconfig gitpkgv systemd
 PKGV = "${GITPKGVTAG}"
 
 SRCREV = "79c8b38d1488a6b07e1e68f39d8caec3f1a45622"
-SRC_URI = "git://github.com/libimobiledevice/usbmuxd;protocol=https"
+SRC_URI = "git://github.com/libimobiledevice/usbmuxd;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 

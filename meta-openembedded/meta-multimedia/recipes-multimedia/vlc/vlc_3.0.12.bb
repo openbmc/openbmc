@@ -96,8 +96,6 @@ PACKAGECONFIG[vdpau] = "--enable-vdpau,--disable-vdpau,libvdpau"
 PACKAGECONFIG[wayland] = "--enable-wayland,--disable-wayland,wayland wayland-native"
 
 do_configure:append() {
-    sed -i -e s:'${top_builddir_slash}libtool':'${top_builddir_slash}'${TARGET_SYS}-libtool:g ${B}/doltlibtool
-
     # moc needs support: precreate build paths
     for qtpath in adapters components/epg components/playlist components/sout dialogs managers styles util/buttons; do
         mkdir -p "${B}/modules/gui/qt/$qtpath"

@@ -11,7 +11,7 @@ SRC_URI[sha256sum] = "92bdd1e68b45596c833307a5ff4b217ee6929a1502f5341bae28fd120a
 
 S = "${WORKDIR}/dbus-python-${PV}"
 
-inherit distutils3-base autotools pkgconfig
+inherit setuptools3-base autotools pkgconfig
 
 # documentation needs python3-sphinx, which is not in oe-core or meta-python for now
 # change to use PACKAGECONFIG when python3-sphinx is added to oe-core

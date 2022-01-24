@@ -9,7 +9,7 @@ HOMEPAGE = "http://lambda-diode.com/software/wipe/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://GPL;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
-SRC_URI = "git://github.com/berke/wipe.git;branch=master \
+SRC_URI = "git://github.com/berke/wipe.git;branch=master;protocol=https \
     file://support-cross-compile-for-linux.patch \
     file://makefile-add-ldflags.patch \
 "

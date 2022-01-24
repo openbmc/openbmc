@@ -17,7 +17,6 @@ SRC_URI = "https://mesa.freedesktop.org/archive/demos/${BPN}-${PV}.tar.bz2 \
            file://0008-glsl-perf-Add-few-missing-.glsl-.vert-.frag-files-to.patch \
            file://0009-glsl-perf-Install-.glsl-.vert-.frag-files.patch \
            file://0012-mesa-demos-OpenVG-demos-with-single-frame-need-eglSw.patch \
-           file://0013-only-build-GLX-demos-if-needed.patch \
            "
 SRC_URI[md5sum] = "6b65a02622765522176d00f553086fa3"
 SRC_URI[sha256sum] = "01e99c94a0184e63e796728af89bfac559795fb2a0d6f506fa900455ca5fff7d"
@@ -27,7 +26,7 @@ inherit autotools pkgconfig features_check
 REQUIRED_DISTRO_FEATURES = "opengl x11"
 
 PACKAGECONFIG ?= "drm osmesa freetype2 gbm egl gles1 gles2 \
-                  x11 glew glu glx"
+                  x11 glew glu"
 
 # The Wayland code doesn't work with Wayland 1.0, so disable it for now
 #${@bb.utils.filter('DISTRO_FEATURES', 'wayland', d)}"
@@ -47,7 +46,6 @@ PACKAGECONFIG[wayland] = "--enable-wayland,--disable-wayland,virtual/libgl wayla
 PACKAGECONFIG[x11] = "--enable-x11,--disable-x11,virtual/libx11"
 PACKAGECONFIG[glew] = "--enable-glew,--disable-glew,glew"
 PACKAGECONFIG[glu] = "--enable-glu,--disable-glu,virtual/libgl"
-PACKAGECONFIG[glx] = "--enable-glx-demos,--disable-glx-demos"
 
 do_install:append() {
 	# it can be completely empty when all PACKAGECONFIG options are disabled

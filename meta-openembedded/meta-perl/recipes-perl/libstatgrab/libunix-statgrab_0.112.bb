@@ -33,6 +33,8 @@ SRC_URI[sha256sum] = "16a29f7acaeec081bf0e7303ba5ee24fda1d21a1104669b837745f3ea6
 
 S = "${WORKDIR}/Unix-Statgrab-${PV}"
 
+export LD = "${CCLD}"
+
 inherit cpan pkgconfig ptest-perl
 
 BBCLASSEXTEND = "native"

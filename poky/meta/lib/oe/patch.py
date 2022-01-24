@@ -4,6 +4,7 @@
 
 import oe.path
 import oe.types
+import subprocess
 
 class NotFoundError(bb.BBHandledException):
     def __init__(self, path):
@@ -25,7 +26,6 @@ class CmdError(bb.BBHandledException):
 
 def runcmd(args, dir = None):
     import pipes
-    import subprocess
 
     if dir:
         olddir = os.path.abspath(os.curdir)
@@ -55,6 +55,7 @@ def runcmd(args, dir = None):
     finally:
         if dir:
             os.chdir(olddir)
+
 
 class PatchError(Exception):
     def __init__(self, msg):
@@ -298,6 +299,19 @@ class GitApplyTree(PatchTree):
         PatchTree.__init__(self, dir, d)
         self.commituser = d.getVar('PATCH_GIT_USER_NAME')
         self.commitemail = d.getVar('PATCH_GIT_USER_EMAIL')
+        if not self._isInitialized():
+            self._initRepo()
+
+    def _isInitialized(self):
+        cmd = "git rev-parse --show-toplevel"
+        (status, output) = subprocess.getstatusoutput(cmd.split())
+        ## Make sure repo is in builddir to not break top-level git repos
+        return status == 0 and os.path.samedir(output, self.dir)
+
+    def _initRepo(self):
+        runcmd("git init".split(), self.dir)
+        runcmd("git add .".split(), self.dir)
+        runcmd("git commit -a --allow-empty -m Patching_started".split(), self.dir)
 
     @staticmethod
     def extractPatchHeader(patchfile):

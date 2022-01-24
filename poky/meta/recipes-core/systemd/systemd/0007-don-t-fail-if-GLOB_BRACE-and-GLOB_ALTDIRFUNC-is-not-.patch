@@ -1,4 +1,4 @@
-From 9c0d0b61ffa4019b299e4c47f376ae823879dbf3 Mon Sep 17 00:00:00 2001
+From fb068403b25002156435350165ea418a6338a313 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 25 Feb 2019 14:56:21 +0800
 Subject: [PATCH] don't fail if GLOB_BRACE and GLOB_ALTDIRFUNC is not defined

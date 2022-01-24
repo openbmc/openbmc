@@ -92,6 +92,8 @@ SDK_HOST_MANIFEST = "${SDKDEPLOYDIR}/${TOOLCHAIN_OUTPUTNAME}.host.manifest"
 SDK_EXT_TARGET_MANIFEST = "${SDK_DEPLOY}/${TOOLCHAINEXT_OUTPUTNAME}.target.manifest"
 SDK_EXT_HOST_MANIFEST = "${SDK_DEPLOY}/${TOOLCHAINEXT_OUTPUTNAME}.host.manifest"
 
+SDK_PRUNE_SYSROOT_DIRS ?= "/dev"
+
 python write_target_sdk_manifest () {
     from oe.sdk import sdk_list_installed_packages
     from oe.utils import format_pkg_list
@@ -101,6 +103,12 @@ python write_target_sdk_manifest () {
         bb.utils.mkdirhier(sdkmanifestdir)
     with open(d.getVar('SDK_TARGET_MANIFEST'), 'w') as output:
         output.write(format_pkg_list(pkgs, 'ver'))
+}
+
+sdk_prune_dirs () {
+    for d in ${SDK_PRUNE_SYSROOT_DIRS}; do
+        rm -rf ${SDK_OUTPUT}${SDKTARGETSYSROOT}$d
+    done
 }
 
 python write_sdk_test_data() {
@@ -122,8 +130,9 @@ python write_host_sdk_manifest () {
 }
 
 POPULATE_SDK_POST_TARGET_COMMAND:append = " write_sdk_test_data ; "
-POPULATE_SDK_POST_TARGET_COMMAND:append:task-populate-sdk  = " write_target_sdk_manifest ; "
+POPULATE_SDK_POST_TARGET_COMMAND:append:task-populate-sdk  = " write_target_sdk_manifest; sdk_prune_dirs; "
 POPULATE_SDK_POST_HOST_COMMAND:append:task-populate-sdk = " write_host_sdk_manifest; "
+
 SDK_PACKAGING_COMMAND = "${@'${SDK_PACKAGING_FUNC};' if '${SDK_PACKAGING_FUNC}' else ''}"
 SDK_POSTPROCESS_COMMAND = " create_sdk_files; check_sdk_sysroots; archive_sdk; ${SDK_PACKAGING_COMMAND} "
 

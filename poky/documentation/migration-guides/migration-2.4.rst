@@ -273,7 +273,7 @@ The following are additional changes:
    a single commit per build rather than one commit per subdirectory in
    the repository. This behavior assumes the commits are enabled with
    :term:`BUILDHISTORY_COMMIT` = "1", which
-   is typical. Previously, the ``buildhistory`` class made one commit
+   is typical. Previously, the :ref:`buildhistory <ref-classes-buildhistory>` class made one commit
    per subdirectory in the repository in order to make it easier to see
    the changes for a particular subdirectory. To view a particular
    change, specify that subdirectory as the last parameter on the

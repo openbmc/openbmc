@@ -10,10 +10,11 @@ DEPENDS = "efivar popt"
 
 COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"
 
-SRC_URI = "git://github.com/rhinstaller/efibootmgr.git;protocol=https \
+SRC_URI = "git://github.com/rhinstaller/efibootmgr.git;protocol=https;branch=master \
            file://0001-remove-extra-decl.patch \
            file://97668ae0bce776a36ea2001dea63d376be8274ac.patch \
-          "
+           file://0001-src-make-compatible-with-efivar-38.patch \
+           "
 SRCREV = "e067160ecef8208e1944002e5d50b275733211fb"
 
 S = "${WORKDIR}/git"
@@ -33,3 +34,6 @@ do_install () {
 }
 
 CLEANBROKEN = "1"
+# https://github.com/rhboot/efivar/issues/202
+COMPATIBLE_HOST:libc-musl = 'null'
+

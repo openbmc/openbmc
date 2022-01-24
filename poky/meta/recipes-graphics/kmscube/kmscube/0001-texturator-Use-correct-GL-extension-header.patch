@@ -1,0 +1,33 @@
+From 2b74e0e32235f6ab2e3e42d53dea985a7ba6227f Mon Sep 17 00:00:00 2001
+From: Damian Hobson-Garcia <dhobsong@igel.co.jp>
+Date: Wed, 16 Dec 2020 11:08:25 +0900
+Subject: [PATCH] texturator: Use correct GL extension header
+
+gl2ext.h is the extenstion header for OpenGL ES 2.0 and all later
+versions according to the Khronos documentation [1].  gl3ext.h is either
+an empty stub, or may not even exist on some platforms.
+
+[1]: https://www.khronos.org/registry/OpenGL/index_es.php#headers
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/kmscube/-/merge_requests/26]
+Signed-off-by: Quentin Schulz <quentin.schulz@theobroma-systems.com>
+---
+ texturator.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/texturator.c b/texturator.c
+index d9335d7..6d97856 100644
+--- a/texturator.c
++++ b/texturator.c
+@@ -30,7 +30,7 @@
+ #include <math.h>
+ 
+ #include <GLES3/gl3.h>
+-#include <GLES3/gl3ext.h>
++#include <GLES2/gl2ext.h>
+ 
+ #ifdef HAVE_LIBPNG
+ #include <png.h>
+-- 
+2.33.1
+

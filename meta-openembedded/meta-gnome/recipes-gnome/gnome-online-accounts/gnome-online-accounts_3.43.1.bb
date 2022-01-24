@@ -11,16 +11,13 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 DEPENDS = "glib-2.0"
 
-SRC_URI += "\
-    file://0001-Use-GUri-instead-of-SoupURI.patch \
-    file://0002-Port-to-libsoup3.patch \
-"
+SRC_URI += "file://0001-Update-to-rest-1.0.patch"
 SRC_URI[archive.sha256sum] = "3bcb3663a12efd4482d9fdda3e171676267fc739eb6440a2b7109a0e87afb7e8"
 
 # backend is required for gnome-control-center
 PACKAGECONFIG = "backend other"
 
-PACKAGECONFIG[backend] = "--enable-backend,--disable-backend,gtk+3 webkitgtk libsoup json-glib libsecret rest libxml2"
+PACKAGECONFIG[backend] = "--enable-backend,--disable-backend,gtk+3 webkitgtk libsoup-2.4 json-glib libsecret rest libxml2"
 PACKAGECONFIG[krb5] = "--enable-kerberos, --disable-kerberos , krb5 gcr"
 
 # no extra dependencies!

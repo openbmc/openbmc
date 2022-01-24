@@ -537,7 +537,7 @@ current working directory:
 -  ``pn-buildlist``: Shows a simple list of targets that are to be
    built.
 
-To stop depending on common depends, use the "-I" depend option and
+To stop depending on common depends, use the ``-I`` depend option and
 BitBake omits them from the graph. Leaving this information out can
 produce more readable graphs. This way, you can remove from the graph
 :term:`DEPENDS` from inherited classes such as ``base.bbclass``.

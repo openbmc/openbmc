@@ -163,21 +163,21 @@ class Archiver(OESelftestTestCase):
         Test that the archiver works with `ARCHIVER_MODE[src] = "patched"`.
         """
 
-        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-patched.tar.gz')
+        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-patched.tar.xz')
 
     def test_archiver_mode_configured(self):
         """
         Test that the archiver works with `ARCHIVER_MODE[src] = "configured"`.
         """
 
-        self._test_archiver_mode('configured', 'selftest-ed-native-1.14.1-r0-configured.tar.gz')
+        self._test_archiver_mode('configured', 'selftest-ed-native-1.14.1-r0-configured.tar.xz')
 
     def test_archiver_mode_recipe(self):
         """
         Test that the archiver works with `ARCHIVER_MODE[recipe] = "1"`.
         """
 
-        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-recipe.tar.gz',
+        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-recipe.tar.xz',
                                  'ARCHIVER_MODE[recipe] = "1"\n')
 
     def test_archiver_mode_diff(self):
