@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 
 KCONFIG_MODE="--alldefconfig"
 
-KSRC ?= "git://github.com/openbmc/linux;protocol=git;branch=dev-4.17"
+KSRC ?= "git://github.com/openbmc/linux;protocol=https;branch=dev-4.17"
 SRC_URI = "${KSRC}"
 
 LINUX_VERSION_EXTENSION ?= "-${SRCREV}"

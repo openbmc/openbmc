@@ -18,5 +18,5 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "systemd"
 
 S = "${WORKDIR}/git"
-SRC_URI += "git://github.com/openbmc/btbridge"
+SRC_URI += "git://github.com/openbmc/btbridge;branch=master;protocol=https"
 SRCREV="713a5470b4a1327abf9857870ba7d9cbcd5a54d4"

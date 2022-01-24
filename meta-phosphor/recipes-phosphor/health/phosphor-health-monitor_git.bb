@@ -14,7 +14,7 @@ DEPENDS += "sdeventplus"
 DEPENDS += "phosphor-logging"
 DEPENDS += "nlohmann-json"
 
-SRC_URI = "git://github.com/openbmc/phosphor-health-monitor.git;protocol=https"
+SRC_URI = "git://github.com/openbmc/phosphor-health-monitor.git;protocol=https;branch=master"
 SRCREV = "a6cd704bda72e39e1b94652a9eb0733da8498791"
 S = "${WORKDIR}/git"
 

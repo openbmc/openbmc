@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 PR = "r1"
 PV = "0.1+git${SRCPV}"
 
-SRC_URI = "git://github.com/openbmc/openpower-hw-diags"
+SRC_URI = "git://github.com/openbmc/openpower-hw-diags;branch=master;protocol=https"
 SRCREV = "e90b85dc659b2a8224fd6a52110460e36277ba6d"
 
 S = "${WORKDIR}/git"

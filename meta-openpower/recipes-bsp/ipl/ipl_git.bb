@@ -11,7 +11,7 @@ inherit autotools pkgconfig
 
 S = "${WORKDIR}/git"
 
-SRC_URI = "git://git@github.com/open-power/ipl;branch="main""
+SRC_URI = "git://git@github.com/open-power/ipl;branch="main";protocol=https"
 SRCREV = "75b471c171b444e4daa9ec867e7e233f339149c4"
 
 DEPENDS = " \

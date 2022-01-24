@@ -13,7 +13,7 @@ DEPENDS += "autoconf-archive-native"
 DEPENDS += "phosphor-ipmi-host"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/google-ipmi-i2c"
+SRC_URI = "git://github.com/openbmc/google-ipmi-i2c;branch=master;protocol=https"
 SRCREV = "d78cbec9efb29526d913cc02d61e0b9bf5cff5ae"
 
 FILES:${PN}:append = " ${libdir}/ipmid-providers/lib*${SOLIBS}"

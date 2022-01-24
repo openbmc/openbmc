@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=9db4b73a55a3994384112efcdb37c01f"
 
 inherit cmake python3native
 
-SRC_URI = "git://github.com/nanopb/nanopb"
+SRC_URI = "git://github.com/nanopb/nanopb;branch=master;protocol=https"
 SRCREV = "f7e4140a27d9e63517b5d596bc117bd6d5248888"
 S = "${WORKDIR}/git"
 

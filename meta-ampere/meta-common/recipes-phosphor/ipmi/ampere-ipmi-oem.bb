@@ -15,7 +15,7 @@ EXTRA_OECMAKE="-DENABLE_TEST=0 -DYOCTO=1"
 LIBRARY_NAMES = "libzampoemcmds.so"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/ampere-ipmi-oem.git"
+SRC_URI = "git://github.com/openbmc/ampere-ipmi-oem.git;branch=master;protocol=https"
 SRCREV = "4c556399c7161d3742cad978fd64e8ad0fd0aa0a"
 
 HOSTIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"

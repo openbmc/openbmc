@@ -14,7 +14,7 @@ SYSTEMD_SERVICE:${PN} += "slpd-lite.service"
 DEPENDS += "systemd"
 DEPENDS += "autoconf-archive-native"
 
-SRC_URI += "git://github.com/openbmc/slpd-lite"
+SRC_URI += "git://github.com/openbmc/slpd-lite;branch=master;protocol=https"
 
 SRCREV = "ef078cd0d560b8c49061f0b855f0cb4450e69b3a"
 

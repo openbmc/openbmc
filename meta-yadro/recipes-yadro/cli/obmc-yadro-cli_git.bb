@@ -42,5 +42,5 @@ do_install() {
 
 # Source code repository
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-cli"
+SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-cli;branch=master;protocol=https"
 SRCREV = "ce70f4f732114b1989c63792907b84a3f6e91f84"

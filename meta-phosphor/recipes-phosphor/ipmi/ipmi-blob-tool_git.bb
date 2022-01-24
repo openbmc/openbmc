@@ -13,5 +13,5 @@ DEPENDS += "autoconf-archive-native"
 EXTRA_OECONF = "--disable-tests"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/ipmi-blob-tool"
+SRC_URI = "git://github.com/openbmc/ipmi-blob-tool;branch=master;protocol=https"
 SRCREV = "d46530fd76038ba22298155047e07f14f7f8793f"

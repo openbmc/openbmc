@@ -9,7 +9,7 @@ PE = "1"
 # repo during parse
 SRCREV = "7e035b9bf331426919aa993a6bb1de3c837e5d3c"
 UBRANCH = "v2020.10-gxp-openbmc"
-SRC_URI = "git://github.com/HewlettPackard/gxp-uboot.git;branch=${UBRANCH}"
+SRC_URI = "git://github.com/HewlettPackard/gxp-uboot.git;branch=${UBRANCH};protocol=https"
 
 S = "${WORKDIR}/git"
 

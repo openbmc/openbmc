@@ -13,5 +13,5 @@ S = "${WORKDIR}/git"
 
 SYSTEMD_SERVICE:${PN} += "pnorboot.service"
 
-SRC_URI += "git://github.com/shenki/aspeed-lpc-control"
+SRC_URI += "git://github.com/shenki/aspeed-lpc-control;branch=master;protocol=https"
 SRCREV = "af42b7ff01e71c0dd4c60214dd46ed487611f36d"

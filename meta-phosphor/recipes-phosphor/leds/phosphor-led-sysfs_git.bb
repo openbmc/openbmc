@@ -18,7 +18,7 @@ DBUS_SERVICE:${PN} += "xyz.openbmc_project.led.controller@.service"
 
 EXTRA_OEMESON:append = " -Dtests=disabled"
 
-SRC_URI += "git://github.com/openbmc/phosphor-led-sysfs"
+SRC_URI += "git://github.com/openbmc/phosphor-led-sysfs;branch=master;protocol=https"
 SRC_URI += "file://70-leds.rules"
 SRCREV = "1f2b932bb9ef88d97a6313f4dc087fb1f2eb399a"
 S = "${WORKDIR}/git"

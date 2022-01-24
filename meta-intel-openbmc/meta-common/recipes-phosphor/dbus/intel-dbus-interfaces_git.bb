@@ -14,7 +14,7 @@ inherit phosphor-dbus-yaml
 DEPENDS += "autoconf-archive-native"
 DEPENDS += "${PYTHON_PN}-sdbus++-native"
 
-SRC_URI = "git://github.com/openbmc/intel-dbus-interfaces"
+SRC_URI = "git://github.com/openbmc/intel-dbus-interfaces;branch=master;protocol=https"
 SRCREV = "2b1255c47fdaaee6fd2db8f38f32abc13a7edf05"
 
 PACKAGECONFIG ??= "libintel_dbus"

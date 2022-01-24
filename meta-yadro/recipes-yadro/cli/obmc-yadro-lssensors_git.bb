@@ -12,5 +12,5 @@ inherit pkgconfig meson
 DEPENDS += "sdbusplus"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-lssensors.git"
+SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-lssensors.git;branch=master;protocol=https"
 SRCREV  = "dcaac17c62c9dd21499c4c5e9eb8070f10786560"

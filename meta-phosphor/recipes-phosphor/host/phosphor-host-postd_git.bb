@@ -19,7 +19,7 @@ DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "systemd"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/phosphor-host-postd"
+SRC_URI = "git://github.com/openbmc/phosphor-host-postd;branch=master;protocol=https"
 SRCREV = "6a5e0a1cba979c3c793e794c41481221da9a4e33"
 
 SNOOP_DEVICE ?= "aspeed-lpc-snoop0"

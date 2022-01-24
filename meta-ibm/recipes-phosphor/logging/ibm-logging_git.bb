@@ -5,7 +5,7 @@ PV = "1.0+git${SRCPV}"
 HOMEPAGE = "https://github.com/openbmc/ibm-logging"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
-SRC_URI += "git://github.com/openbmc/ibm-logging"
+SRC_URI += "git://github.com/openbmc/ibm-logging;branch=master;protocol=https"
 SRCREV = "e841b05fc724c691c2f1bab0427de6168cd57f7a"
 
 inherit autotools

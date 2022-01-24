@@ -27,7 +27,7 @@ PACKAGECONFIG[smbios-ipmi-blob] = "-DIPMI_BLOB=ON,-DIPMI_BLOB=OFF,phosphor-ipmi-
 EXTRA_OECMAKE = "-DYOCTO=ON"
 
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/smbios-mdr.git"
+SRC_URI = "git://github.com/openbmc/smbios-mdr.git;branch=master;protocol=https"
 SRCREV = "bc924d0f9f590d7d420b9f7bc98bdb9b8688618e"
 
 SYSTEMD_SERVICE:${PN} += "smbios-mdrv2.service"
