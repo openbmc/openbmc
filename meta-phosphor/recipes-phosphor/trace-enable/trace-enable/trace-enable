@@ -1,0 +1,25 @@
+#!/bin/bash
+set -eu
+
+events=""
+
+while read -r line
+do
+	if echo "${line}" >> /sys/kernel/debug/tracing/set_event;
+	then
+		if [ -n "${events}" ]
+		then
+			events="${events},${line}"
+		else
+			events="${line}"
+		fi
+	fi
+done < "${1}"
+
+if [ -n "${events}" ]
+then
+	events="trace_events=${events}"
+	fw_setenv trace_args "${events}"
+else
+	fw_setenv trace_args
+fi
