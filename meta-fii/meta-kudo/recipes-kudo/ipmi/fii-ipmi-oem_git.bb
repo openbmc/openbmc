@@ -8,7 +8,7 @@ S = "${WORKDIR}/git"
 
 DEPENDS = "boost phosphor-ipmi-host phosphor-logging systemd libgpiod"
 
-inherit cmake obmc-phosphor-ipmiprovider-symlink
+inherit cmake pkgconfig obmc-phosphor-ipmiprovider-symlink
 
 EXTRA_OECMAKE="-DENABLE_TEST=0 -DYOCTO=1"
 
