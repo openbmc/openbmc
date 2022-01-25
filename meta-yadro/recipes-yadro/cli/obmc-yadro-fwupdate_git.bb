@@ -22,5 +22,5 @@ PACKAGECONFIG ??= " obmc-phosphor-image reboot-guard-support "
 PACKAGECONFIG:append_df-openpower = "openpower-support"
 
 SRC_URI = "git://github.com/YADRO-KNS/obmc-yadro-fwupdate;branch=master;protocol=https"
-SRCREV = "388f4a004e4fe29ee55b964527088714c55f8c70"
+SRCREV = "eea7cadf0a5b49b3b9eb304b67494516469e96af"
 S = "${WORKDIR}/git"
