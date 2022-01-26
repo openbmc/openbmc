@@ -411,7 +411,13 @@ HERE
 	debug_takeover "$msg"
 fi
 
-rm -rf $work
+# Empty workdir; do not remove workdir itself for it will fail to recreate it if
+# RWFS is full
+if [ -d $work ]
+then
+    find $work -maxdepth 1 -mindepth 1 -exec rm -rf '{}' +
+fi
+
 mkdir -p $upper $work
 
 mount -t overlay -o lowerdir=$rodir,upperdir=$upper,workdir=$work cow /root
