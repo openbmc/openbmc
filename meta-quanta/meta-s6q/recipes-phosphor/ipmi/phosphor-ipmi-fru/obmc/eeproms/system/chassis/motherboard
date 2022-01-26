@@ -1,0 +1,3 @@
+OF_NAME=mb_fru
+SYSFS_PATH=/sys/bus/i2c/devices/3-0051/eeprom
+FRUID=1

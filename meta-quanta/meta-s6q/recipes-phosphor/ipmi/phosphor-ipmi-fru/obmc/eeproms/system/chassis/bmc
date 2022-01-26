@@ -1,0 +1,3 @@
+OF_NAME=scm_fru
+SYSFS_PATH=/sys/bus/i2c/devices/14-0051/eeprom
+FRUID=0
