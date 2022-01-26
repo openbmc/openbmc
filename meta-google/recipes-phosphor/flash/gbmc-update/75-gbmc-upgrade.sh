@@ -31,8 +31,9 @@ gbmc_upgrade_hook() {
 gbmc_upgrade_fetch() (
   echo "Fetching $bootfile_url" >&2
 
-  # We only support tarballs at the moment
-  if [[ "$bootfile_url" != *.tar ]]; then
+  # We only support tarballs at the moment, our URLs will always denote
+  # this with a URI query param of `format=TAR`.
+  if ! [[ "$bootfile_url" =~ [\&?]format=TAR(&|$) ]]; then
     echo "Unknown upgrade unpack method: $bootfile_url" >&2
     return 1
   fi
@@ -40,7 +41,7 @@ gbmc_upgrade_fetch() (
   # Ensure some sane output file limit
   # Currently no BMC image is larger than 64M
   ulimit -H -f $((96 * 1024 * 1024)) || return
-  wget "$bootfile_url" | tar -xC "$tmpdir" || true
+  wget -q -O - "$bootfile_url" | tar -xC "$tmpdir" || true
 
   local sig
   sig="$(find "$tmpdir" -name 'image-*.sig')" || return
