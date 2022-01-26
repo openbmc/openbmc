@@ -159,7 +159,7 @@ The Technical Steering Committee (TSC) guides the project. Members are:
  * Brad Bishop (chair), IBM
  * Nancy Yuen, Google
  * Sai Dasari, Facebook
- * James Mihm, Intel
+ * Terry Duncan, Intel
  * Sagar Dharia, Microsoft
  * Samer El-Haj-Mahmoud, Arm
 
