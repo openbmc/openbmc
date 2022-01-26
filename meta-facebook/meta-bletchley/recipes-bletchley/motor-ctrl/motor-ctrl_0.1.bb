@@ -25,10 +25,11 @@ do_install() {
         install -m 0755 ${WORKDIR}/motor-init ${D}${libexecdir}
 }
 
-MOTOR_INIT_INSTFMT="motor-init-calibration@.service:motor-init-calibration@{0}.service"
+TGT = "${SYSTEMD_DEFAULT_TARGET}"
+MOTOR_INIT_INSTFMT="../motor-init-calibration@.service:${TGT}.wants/motor-init-calibration@{0}.service"
 PWR_ON_INSTFMT="host-poweron@.service:host-poweron@{0}.service"
 PWR_OFF_INSTFMT="host-poweroff@.service:host-poweroff@{0}.service"
-AC_ON_INSTFMT="host-ac-on@.service:host-ac-on@{0}.service"
+AC_ON_INSTFMT="../host-ac-on@.service:${TGT}.wants/host-ac-on@{0}.service"
 AC_OFF_INSTFMT="host-ac-off@.service:host-ac-off@{0}.service"
 
 SYSTEMD_SERVICE:${PN} += "motor-init-calibration@.service"
