@@ -76,7 +76,7 @@ machine() {
 		fi
 	done
 
-	[ -n "$target" ] && echo "No such machine!"
+	[ -n "$target" ] && echo "No such machine!" >&2 && return 1
 }
 
 if [ -z "$1" ]; then
