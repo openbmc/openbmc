@@ -9,8 +9,7 @@ POWER_SERVICE_PACKAGES_AC_SERVER = " \
 
 # P10 does not need/want the old PSU monitor
 POWER_SERVICE_PACKAGES_P10 = " \
-    phosphor-power-sequencer \
-    phosphor-power-systemd-links-sequencer \
+    phosphor-power-control \
     phosphor-power-utils \
     phosphor-power \
     phosphor-power-regulators \
@@ -24,6 +23,7 @@ EXTRA_IBM_LOGGING_PKGS:mihawk = "ibm-logging"
 EXTRA_IBM_LOGGING_PKGS:p10bmc = " \
     python3-sbe-log-parsers \
 "
+
 RDEPENDS:${PN}-inventory:append:ibm-ac-server = " openpower-fru-vpd openpower-occ-control phosphor-cooling-type virtual/obmc-gpio-presence"
 RDEPENDS:${PN}-inventory:append:p10bmc = " openpower-fru-vpd openpower-occ-control virtual/obmc-gpio-presence"
 RDEPENDS:${PN}-inventory:append:mihawk = " openpower-fru-vpd openpower-occ-control virtual/obmc-gpio-presence id-button phosphor-cooling-type"
