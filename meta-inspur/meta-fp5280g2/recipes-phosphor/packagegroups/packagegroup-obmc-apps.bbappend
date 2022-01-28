@@ -23,7 +23,7 @@ RDEPENDS:${PN}-extras:append:fp5280g2 = " \
                                           biosconfig-manager \
                                           srvcfg-manager \
                                           phosphor-sel-logger \
-                                          tzdata \
+                                          tzdata-core \
                                           webui-vue \
                                          "
 
