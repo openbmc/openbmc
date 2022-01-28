@@ -17,7 +17,6 @@ DEPENDS += "${PYTHON_PN}-pycryptodome-native"
 
 RDEPENDS:${PN} += "${PYTHON_PN}-bitarray"
 RDEPENDS:${PN} += "${PYTHON_PN}-core"
-RDEPENDS:${PN} += "${PYTHON_PN}-hexdump"
 RDEPENDS:${PN} += "${PYTHON_PN}-jsonschema"
 RDEPENDS:${PN} += "${PYTHON_PN}-jstyleson"
 RDEPENDS:${PN} += "${PYTHON_PN}-pycryptodome"
