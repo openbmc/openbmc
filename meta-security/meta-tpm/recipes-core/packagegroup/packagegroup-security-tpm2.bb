@@ -13,9 +13,6 @@ RDEPENDS:packagegroup-security-tpm2 = " \
     trousers \
     tpm2-tss \
     libtss2 \
-    libtss2-mu \
-    libtss2-tcti-device \
-    libtss2-tcti-mssim \
     tpm2-abrmd \
     tpm2-pkcs11 \
     "
