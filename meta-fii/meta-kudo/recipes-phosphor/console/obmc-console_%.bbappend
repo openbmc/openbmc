@@ -5,6 +5,8 @@ OBMC_CONSOLE_TTYS = "ttyS1 ttyS3"
 
 SRC_URI:append:kudo = " file://${BPN}@.service \
                         file://kudo_uart_mux_ctrl.sh \
+                        file://server.ttyS1.conf \
+                        file://server.ttyS3.conf \
                       "
 
 SYSTEMD_SERVICE:${PN}:append:kudo = " \
