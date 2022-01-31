@@ -10,3 +10,5 @@ SRCREV = "af46bea650b072b978619acfbfd7cc1b3aead30b"
 
 S = "${WORKDIR}/git/subprojects/${GOOGLE_MISC_PROJ}"
 inherit meson pkgconfig
+
+EXTRA_OEMESON += "-Dwerror=false"
