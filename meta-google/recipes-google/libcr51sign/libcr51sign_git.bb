@@ -6,6 +6,11 @@ require ../google-misc/google-misc.inc
 
 inherit pkgconfig
 
+# We need to suppress these warnings in OpenSSL 3.0+ until a fix is available
+CFLAGS += " \
+  -Wno-deprecated-declarations \
+"
+
 DEPENDS += " \
   openssl \
 "
