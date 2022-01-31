@@ -22,7 +22,6 @@ RPROVIDES:${PN}-fan-mgmt += "virtual-obmc-fan-mgmt"
 
 SUMMARY:${PN}-kudo-chassis = "kudo chassis"
 RDEPENDS:${PN}-kudo-chassis = " \
-    phosphor-hostlogger \
     obmc-op-control-power \
     "
 
