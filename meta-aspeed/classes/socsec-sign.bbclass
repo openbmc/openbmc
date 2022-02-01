@@ -23,10 +23,9 @@ sign_spl_helper() {
     signing_helper_args=""
 
     if [ "${SOC_FAMILY}" != "aspeed-g6" ] ; then
-        echo "Warning: SPL signing is only supported on AST2600 boards"
+        bbwarn "SPL signing is only supported on AST2600 boards"
     elif [ ! -e "${SOCSEC_SIGN_KEY}" ] ; then
-        echo "Error: Invalid socsec signing key: ${SOCSEC_SIGN_KEY}"
-        exit 1
+        bbfatal "Invalid socsec signing key: ${SOCSEC_SIGN_KEY}"
     else
         rm -f ${SPL_BINARY}.staged
 
