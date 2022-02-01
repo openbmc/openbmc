@@ -37,10 +37,10 @@ sign_spl_helper() {
             --algorithm ${SOCSEC_SIGN_ALGO} \
             --rsa_sign_key ${SOCSEC_SIGN_KEY} \
             --bl1_image ${DEPLOYDIR}/${SPL_IMAGE} \
-            ${signing_helper_args} \
+            $signing_helper_args \
             ${SOCSEC_SIGN_EXTRA_OPTS} \
             --output ${SPL_BINARY}.staged
-        cp -f ${SPL_BINARY}.staged ${B}/${CONFIG_B_PATH}/${SPL_BINARY}
+        cp -f ${SPL_BINARY}.staged ${B}/$CONFIG_B_PATH/${SPL_BINARY}
         mv -f ${SPL_BINARY}.staged ${DEPLOYDIR}/${SPL_IMAGE}
     fi
 }
@@ -49,8 +49,8 @@ sign_spl() {
     mkdir -p ${DEPLOYDIR}
     if [ -n "${UBOOT_CONFIG}" ]; then
         for config in ${UBOOT_MACHINE}; do
-            CONFIG_B_PATH="${config}"
-            cd ${B}/${config}
+            CONFIG_B_PATH="$config"
+            cd ${B}/$config
             sign_spl_helper
         done
     else
