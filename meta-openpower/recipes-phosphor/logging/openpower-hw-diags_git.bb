@@ -24,7 +24,7 @@ inherit pkgconfig meson systemd
 SYSTEMD_SERVICE:${PN} = "attn_handler.service"
 
 DEPENDS = "boost libgpiod pdbg phosphor-logging sdbusplus openpower-libhei \
-           nlohmann-json valijson"
+           nlohmann-json valijson fmt"
 
 # This is required so that libhei is installed with the chip data files.
 RDEPENDS:${PN} += "openpower-libhei"
