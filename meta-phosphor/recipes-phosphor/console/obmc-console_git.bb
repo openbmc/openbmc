@@ -51,7 +51,7 @@ do_install:append() {
         # If the OBMC_CONSOLE_TTYS variable is used without the default OBMC_CONSOLE_HOST_TTY
         # the port specific config file should be provided. If it is just OBMC_CONSOLE_HOST_TTY,
         # use the old style which supports both port specific or obmc-console.conf method.
-        if [[ "${OBMC_CONSOLE_TTYS}" !=  "${OBMC_CONSOLE_HOST_TTY}" ]]; then
+        if [ "${OBMC_CONSOLE_TTYS}" !=  "${OBMC_CONSOLE_HOST_TTY}" ]; then
                 rm -f ${D}${sysconfdir}/${BPN}/server.ttyVUART0.conf
 
                 for CONSOLE in ${OBMC_CONSOLE_TTYS}
