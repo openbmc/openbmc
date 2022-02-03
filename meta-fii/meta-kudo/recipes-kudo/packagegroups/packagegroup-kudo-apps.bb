@@ -23,6 +23,8 @@ RPROVIDES:${PN}-fan-mgmt += "virtual-obmc-fan-mgmt"
 SUMMARY:${PN}-kudo-chassis = "kudo chassis"
 RDEPENDS:${PN}-kudo-chassis = " \
     obmc-op-control-power \
+    obmc-phosphor-buttons-signals \
+    obmc-phosphor-buttons-handler \
     "
 
 SUMMARY:${PN}-kudo-system = "kudo System"

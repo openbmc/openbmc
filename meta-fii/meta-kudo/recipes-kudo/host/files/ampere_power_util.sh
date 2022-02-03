@@ -6,7 +6,7 @@ source /usr/libexec/kudo-fw/kudo-lib.sh
 
 # Usage of this utility
 function usage() {
-  echo "usage: power-util mb [on|off|graceful_shutdown|host_reset|host_cycle|shutdown_ack|hotswap|power_button]";
+  echo "usage: power-util mb [on|off|graceful_shutdown|host_reset|host_cycle|shutdown_ack|hotswap]";
 }
 
 hotswap() {
@@ -100,26 +100,6 @@ shutdown_ack() {
   fi
 }
 
-power_button() {
-  echo "Power button trigger event."
-  current_time="$(timestamp)"
-  if [ -f "/run/openbmc/power-button" ]; then
-    echo "Power button released"
-    press_time="$(cat /run/openbmc/power-button)"
-    if [[ "$current_time" -le "(($press_time + 1))" ]]; then
-      power_on
-    elif [[ "$current_time" -ge "(($press_time + 5))" ]]; then
-      power_off
-    else
-      echo "Button press did not match interval."
-    fi
-    rm "/run/openbmc/power-button"
-  else
-    echo "Power button pressed"
-    timestamp > "/run/openbmc/power-button"
-  fi
-}
-
 if [ $# -lt 2 ]; then
   echo "Total number of parameter=$#"
   echo "Insufficient parameter"
@@ -156,8 +136,6 @@ elif [ "$2" == "host_cycle" ]; then
   host_cycle
 elif [ "$2" == "shutdown_ack" ]; then
   shutdown_ack
-elif [ "$2" == "power_button" ]; then
-  power_button
 else
   echo "Invalid parameter2=$2"
   usage;

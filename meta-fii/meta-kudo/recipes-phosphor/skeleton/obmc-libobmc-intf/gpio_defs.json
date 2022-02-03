@@ -15,6 +15,16 @@
             "name": "PGOOD",
             "num": 200,
             "direction": "in"
+        },
+        {
+            "name": "POWER_BUTTON",
+            "num": 192,
+            "direction": "both"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "num": 13,
+            "direction": "both"
         }
     ]
 }
