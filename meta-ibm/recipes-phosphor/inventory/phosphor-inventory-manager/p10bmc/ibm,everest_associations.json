@@ -1289,6 +1289,18 @@
                     [
                         "/xyz/openbmc_project/led/groups/planar_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/temperature/PCIE_0_Temp",
+                        "/xyz/openbmc_project/sensors/temperature/PCIE_1_Temp"
+                    ]
                 }
             ]
         },
@@ -4344,33 +4356,48 @@
                 }
             ]
         },
-        {                                                              
+        {
             "path": "system/chassis/motherboard/dasd_backplane/panel0",
-            "endpoints":                                  
-            [                                             
-                {                                         
-                    "types":                              
-                    {                                                        
-                        "rType": "fault_inventory_object",                   
-                        "fType": "fault_led_group"                           
-                    },                                                       
-                    "paths":                                                 
-                    [                                                        
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "fault_inventory_object",
+                        "fType": "fault_led_group"
+                    },
+                    "paths":
+                    [
                         "/xyz/openbmc_project/led/groups/op_panel_base_fault"
-                    ]                                        
-                },                                           
-                {                                            
-                    "types":                                 
-                    {                                                           
-                        "rType": "identify_inventory_object",                   
-                        "fType": "identify_led_group"                           
-                    },                                                          
-                    "paths":                                                    
-                    [                                                           
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "identify_inventory_object",
+                        "fType": "identify_led_group"
+                    },
+                    "paths":
+                    [
                         "/xyz/openbmc_project/led/groups/op_panel_base_identify"
                     ]
-                }                                         
-            ]                                     
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/temperature/Ambient_0_Temp",
+                        "/xyz/openbmc_project/sensors/temperature/Ambient_1_Temp",
+                        "/xyz/openbmc_project/sensors/temperature/Ambient_2_Temp",
+                        "/xyz/openbmc_project/sensors/pressure/Station_Pressure",
+                        "/xyz/openbmc_project/sensors/humidity/Relative_Humidity"
+                    ]
+                }
+            ]
         }
-    ]                       
-}     
+    ]
+}

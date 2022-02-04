@@ -508,6 +508,18 @@
                     [
                         "/xyz/openbmc_project/led/groups/planar_identify"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/temperature/PCIE_0_Temp",
+                        "/xyz/openbmc_project/sensors/temperature/PCIE_1_Temp"
+                    ]
                 }
             ]
         },
@@ -535,6 +547,21 @@
                     "paths":
                     [
                         "/xyz/openbmc_project/led/groups/base_blyth_identify"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "inventory",
+                        "fType": "sensors"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/sensors/temperature/Ambient_0_Temp",
+                        "/xyz/openbmc_project/sensors/temperature/Ambient_1_Temp",
+                        "/xyz/openbmc_project/sensors/temperature/Ambient_2_Temp",
+                        "/xyz/openbmc_project/sensors/pressure/Station_Pressure",
+                        "/xyz/openbmc_project/sensors/humidity/Relative_Humidity"
                     ]
                 }
             ]
