@@ -80,8 +80,19 @@ ipmi_fru_device_alloc() {
     IPMI_FRU_EEPROM_FILE["$idx"]=/etc/fru/baseboard.fru.bin
   else
     local offset_bw=offset_2bw
-    local rsp
-    rsp=$(i2ctransfer -f -y ${busaddr[0]} $(offset_1bw ${busaddr[1]} 0) r1) || return
+    local last=0
+    local rsp=0x100
+    local start=$SECONDS
+    # Query the FRU multiple times to ensure the return value is stabilized
+    while (( last != rsp )); do
+      # It shouldn't take > 0.1s to stabilize, limit instability
+      if (( SECONDS - start >= 10 )); then
+        echo "Timed out determining offset for ${busaddr[0]}@${busaddr[1]}" >&2
+        return 1
+      fi
+      last=$rsp
+      rsp=$(i2ctransfer -f -y ${busaddr[0]} $(offset_1bw ${busaddr[1]} 0) r1) || return
+    done
     # FRUs never start with 0xff bytes, so we can figure out addressing mode
     if (( rsp != 0xff )); then
       offset_bw=offset_1bw
