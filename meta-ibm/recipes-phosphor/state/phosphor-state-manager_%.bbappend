@@ -9,3 +9,8 @@ RRECOMMENDS:${PN}-host += "${PN}-scheduled-host-transition"
 # in the needed package when the host state package is
 # included
 RRECOMMENDS:${PN}-host += "${PN}-hypervisor"
+
+# IBM systems want the chassis package to not allow a
+# system power on if chassis power is in a bad state
+RRECOMMENDS:${PN}-chassis = "${PN}-chassis-check-power-status"
+
