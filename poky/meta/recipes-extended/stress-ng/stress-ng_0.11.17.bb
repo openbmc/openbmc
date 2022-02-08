@@ -5,11 +5,12 @@ HOMEPAGE = "https://kernel.ubuntu.com/~cking/stress-ng/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "https://kernel.ubuntu.com/~cking/tarballs/${BPN}/${BP}.tar.xz \
+SRC_URI = "git://github.com/ColinIanKing/stress-ng.git;protocol=https;branch=master \
            file://0001-Do-not-preserve-ownership-when-installing-example-jo.patch \
+           file://0001-Makefile-do-not-write-the-timestamp-into-compressed-.patch \
            "
-SRC_URI[md5sum] = "7b89157c838f2bb4bdeba8f46e3c56ae"
-SRC_URI[sha256sum] = "860291dd3a18b985b3483190a627bbede2b5c52113766c1921001b3fb4b83af0"
+SRCREV = "e045bcd711178c11b7e797ef6b4c524658468596"
+S = "${WORKDIR}/git"
 
 DEPENDS = "coreutils-native"
 

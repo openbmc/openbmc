@@ -1,0 +1,90 @@
+From 99ee7596712cf0ea0a288b712bc898ecb2b35f9b Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 23 Apr 2020 12:00:38 +0300
+Subject: [PATCH 04/13] lib-mail: message-parser - Optimize appending new part
+ to linked list
+
+---
+ src/lib-mail/message-parser.c | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+Index: dovecot-2.2.36.4/src/lib-mail/message-parser.c
+===================================================================
+--- dovecot-2.2.36.4.orig/src/lib-mail/message-parser.c
++++ dovecot-2.2.36.4/src/lib-mail/message-parser.c
+@@ -1,7 +1,7 @@
+ /* Copyright (c) 2002-2018 Dovecot authors, see the included COPYING file */
+ 
+ #include "lib.h"
+-#include "buffer.h"
++#include "array.h"
+ #include "str.h"
+ #include "istream.h"
+ #include "rfc822-parser.h"
+@@ -34,6 +34,9 @@ struct message_parser_ctx {
+ 	const char *last_boundary;
+ 	struct message_boundary *boundaries;
+ 
++	struct message_part **next_part;
++	ARRAY(struct message_part **) next_part_stack;
++
+ 	size_t skip;
+ 	char last_chr;
+ 	unsigned int want_count;
+@@ -171,7 +174,7 @@ static void
+ message_part_append(struct message_parser_ctx *ctx)
+ {
+ 	struct message_part *parent = ctx->part;
+-	struct message_part *part, **list;
++	struct message_part *part;
+ 
+ 	i_assert(parent != NULL);
+ 	i_assert((parent->flags & (MESSAGE_PART_FLAG_MULTIPART |
+@@ -186,16 +189,27 @@ message_part_append(struct message_parse
+ 		parent->body_size.physical_size +
+ 		parent->header_size.physical_size;
+ 
+-	list = &part->parent->children;
+-	while (*list != NULL)
+-		list = &(*list)->next;
++	/* add to parent's linked list */
++	*ctx->next_part = part;
++	/* update the parent's end-of-linked-list pointer */
++	struct message_part **next_part = &part->next;
++	array_append(&ctx->next_part_stack, &next_part, 1);
++	/* This part is now the new parent for the next message_part_append()
++	   call. Its linked list begins with the children pointer. */
++	ctx->next_part = &part->children;
+ 
+-	*list = part;
+ 	ctx->part = part;
+ }
+ 
+ static void message_part_finish(struct message_parser_ctx *ctx)
+ {
++	struct message_part **const *parent_next_partp;
++	unsigned int count = array_count(&ctx->next_part_stack);
++	
++	parent_next_partp = array_idx(&ctx->next_part_stack, count-1);
++	array_delete(&ctx->next_part_stack, count-1, 1);
++	ctx->next_part = *parent_next_partp;
++
+ 	message_size_add(&ctx->part->parent->body_size, &ctx->part->body_size);
+ 	message_size_add(&ctx->part->parent->body_size, &ctx->part->header_size);
+ 	ctx->part->parent->children_count += 1 + ctx->part->children_count;
+@@ -1062,7 +1076,9 @@ message_parser_init(pool_t part_pool, st
+ 	ctx = message_parser_init_int(input, hdr_flags, flags);
+ 	ctx->part_pool = part_pool;
+ 	ctx->parts = ctx->part = p_new(part_pool, struct message_part, 1);
++	ctx->next_part = &ctx->part->children;
+ 	ctx->parse_next_block = parse_next_header_init;
++	p_array_init(&ctx->next_part_stack, ctx->parser_pool, 4);
+ 	return ctx;
+ }
+ 

@@ -1,0 +1,50 @@
+From 56001f023305ea99329e27141d6e6067596491a9 Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Mon, 17 May 2021 15:32:57 +0900
+Subject: [PATCH] network: also drop requests when link enters linger state
+
+Otherwise, if link is removed, several references to the link in remain
+exist in requests.
+
+Upstream-Status: Backport [https://github.com/systemd/systemd-stable/commit/56001f023305ea99329e27141d6e6067596491a9]
+Signed-off-by: Ranjitsinh Rathod <ranjitsinh.rathod@kpit.com>
+
+---
+ src/network/networkd-link.c | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
+index 67d01ac44d..b56c232eca 100644
+--- a/src/network/networkd-link.c
++++ b/src/network/networkd-link.c
+@@ -1771,6 +1771,18 @@ static void link_drop_from_master(Link *link, NetDev *netdev) {
+         link_unref(set_remove(master->slaves, link));
+ }
+ 
++static void link_drop_requests(Link *link) {
++        Request *req;
++        Iterator i;
++
++        assert(link);
++        assert(link->manager);
++
++        ORDERED_SET_FOREACH(req, link->manager->request_queue, i)
++                if (req->link == link)
++                        request_drop(req);
++}
++
+ void link_drop(Link *link) {
+         if (!link)
+                 return;
+@@ -1782,6 +1793,8 @@ void link_drop(Link *link) {
+         /* Drop all references from other links and manager. Note that async netlink calls may have
+          * references to the link, and they will be dropped when we receive replies. */
+ 
++        link_drop_requests(link);
++
+         link_free_carrier_maps(link);
+ 
+         if (link->network) {
+-- 
+2.17.1
+

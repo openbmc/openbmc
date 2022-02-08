@@ -5,7 +5,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://gpl_license.txt;md5=11c7b65c4a4acb9d5175f7e9bf99c403"
 
 SRCREV = "39276d14b659684c4c0612725ab83ea841c6ef99"
-SRC_URI = "git://github.com/arno-iptables-firewall/aif"
+SRC_URI = "git://github.com/arno-iptables-firewall/aif;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

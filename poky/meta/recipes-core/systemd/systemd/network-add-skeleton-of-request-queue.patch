@@ -1,0 +1,285 @@
+From 19d9a5adf0c1a6b5a243eea0390f6f6526d569de Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Fri, 7 May 2021 15:39:16 +0900
+Subject: [PATCH] network: add skeleton of request queue
+
+This will be used in later commits.
+
+Upstream-Status: Backport [https://github.com/systemd/systemd-stable/commit/19d9a5adf0c1a6b5a243eea0390f6f6526d569de]
+Signed-off-by: Ranjitsinh Rathod <ranjitsinh.rathod@kpit.com>
+
+---
+ src/network/meson.build        |   2 +
+ src/network/networkd-link.c    |  20 +++++-
+ src/network/networkd-manager.c |   7 ++
+ src/network/networkd-manager.h |   2 +
+ src/network/networkd-queue.c   | 121 +++++++++++++++++++++++++++++++++
+ src/network/networkd-queue.h   |  42 ++++++++++++
+ 6 files changed, 192 insertions(+), 2 deletions(-)
+ create mode 100644 src/network/networkd-queue.c
+ create mode 100644 src/network/networkd-queue.h
+
+diff --git a/src/network/meson.build b/src/network/meson.build
+index 4fca3106dc..a8b9232e64 100644
+--- a/src/network/meson.build
++++ b/src/network/meson.build
+@@ -105,6 +105,8 @@ sources = files('''
+         networkd-network.h
+         networkd-nexthop.c
+         networkd-nexthop.h
++        networkd-queue.c
++        networkd-queue.h
+         networkd-route.c
+         networkd-route.h
+         networkd-routing-policy-rule.c
+diff --git a/src/network/networkd-link.c b/src/network/networkd-link.c
+index 34359b2541..2f33305a27 100644
+--- a/src/network/networkd-link.c
++++ b/src/network/networkd-link.c
+@@ -30,6 +30,7 @@
+ #include "networkd-manager.h"
+ #include "networkd-ndisc.h"
+ #include "networkd-neighbor.h"
++#include "networkd-queue.h"
+ #include "networkd-radv.h"
+ #include "networkd-routing-policy-rule.h"
+ #include "networkd-wifi.h"
+
+@@ -2232,6 +2244,8 @@ static int link_reconfigure_internal(Link *link, sd_netlink_message *m, bool for
+         if (r < 0)
+                 return r;
+ 
++        link_drop_requests(link);
++
+         r = link_drop_config(link);
+         if (r < 0)
+                 return r;
+@@ -2664,6 +2678,8 @@ static int link_carrier_lost(Link *link) {
+                 return r;
+         }
+ 
++        link_drop_requests(link);
++
+         r = link_drop_config(link);
+         if (r < 0)
+                 return r;
+diff --git a/src/network/networkd-manager.c b/src/network/networkd-manager.c
+index 562ce5ca54..fd576169a9 100644
+--- a/src/network/networkd-manager.c
++++ b/src/network/networkd-manager.c
+@@ -34,6 +34,7 @@
+ #include "networkd-manager-bus.h"
+ #include "networkd-manager.h"
+ #include "networkd-network-bus.h"
++#include "networkd-queue.h"
+ #include "networkd-speed-meter.h"
+ #include "ordered-set.h"
+ #include "path-util.h"
+@@ -406,6 +407,10 @@ int manager_new(Manager **ret) {
+         if (r < 0)
+                 return r;
+ 
++        r = sd_event_add_post(m->event, NULL, manager_process_requests, m);
++        if (r < 0)
++                return r;
++
+         r = manager_connect_rtnl(m);
+         if (r < 0)
+                 return r;
+@@ -446,6 +451,8 @@ Manager* manager_free(Manager *m) {
+ 
+         free(m->state_file);
+ 
++        m->request_queue = ordered_set_free_with_destructor(m->request_queue, request_free);
++
+         while ((a = hashmap_first_key(m->dhcp6_prefixes)))
+                 (void) dhcp6_prefix_remove(m, a);
+         m->dhcp6_prefixes = hashmap_free(m->dhcp6_prefixes);
+diff --git a/src/network/networkd-manager.h b/src/network/networkd-manager.h
+index 301b97c1a1..26e8802871 100644
+--- a/src/network/networkd-manager.h
++++ b/src/network/networkd-manager.h
+@@ -91,6 +91,8 @@ struct Manager {
+         usec_t speed_meter_usec_old;
+ 
+         bool dhcp4_prefix_root_cannot_set_table;
++
++        OrderedSet *request_queue;
+ };
+ 
+ int manager_new(Manager **ret);
+diff --git a/src/network/networkd-queue.c b/src/network/networkd-queue.c
+new file mode 100644
+index 0000000000..24bb2c845d
+--- /dev/null
++++ b/src/network/networkd-queue.c
+@@ -0,0 +1,121 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
++
++#include "networkd-address.h"
++#include "networkd-manager.h"
++#include "networkd-neighbor.h"
++#include "networkd-nexthop.h"
++#include "networkd-route.h"
++#include "networkd-routing-policy-rule.h"
++#include "networkd-queue.h"
++
++static void request_free_object(RequestType type, void *object) {
++        switch(type) {
++        default:
++                assert_not_reached("invalid request type.");
++        }
++}
++
++Request *request_free(Request *req) {
++        if (!req)
++                return NULL;
++
++        if (req->on_free)
++                req->on_free(req);
++        if (req->consume_object)
++                request_free_object(req->type, req->object);
++        if (req->link && req->link->manager)
++                ordered_set_remove(req->link->manager->request_queue, req);
++        link_unref(req->link);
++
++        return mfree(req);
++}
++
++DEFINE_TRIVIAL_CLEANUP_FUNC(Request*, request_free);
++
++void request_drop(Request *req) {
++        if (req->message_counter)
++                (*req->message_counter)--;
++
++        request_free(req);
++}
++
++int link_queue_request(
++                Link *link,
++                RequestType type,
++                void *object,
++                bool consume_object,
++                unsigned *message_counter,
++                link_netlink_message_handler_t netlink_handler,
++                Request **ret) {
++
++        _cleanup_(request_freep) Request *req = NULL;
++        int r;
++
++        assert(link);
++        assert(link->manager);
++        assert(type >= 0 && type < _REQUEST_TYPE_MAX);
++        assert(object);
++        assert(netlink_handler);
++
++        req = new(Request, 1);
++        if (!req) {
++                if (consume_object)
++                        request_free_object(type, object);
++                return -ENOMEM;
++        }
++
++        *req = (Request) {
++                .link = link,
++                .type = type,
++                .object = object,
++                .consume_object = consume_object,
++                .message_counter = message_counter,
++                .netlink_handler = netlink_handler,
++        };
++
++        link_ref(link);
++
++        r = ordered_set_ensure_put(&link->manager->request_queue, NULL, req);
++        if (r < 0)
++                return r;
++
++        if (req->message_counter)
++                (*req->message_counter)++;
++
++        if (ret)
++                *ret = req;
++
++        TAKE_PTR(req);
++        return 0;
++}
++
++int manager_process_requests(sd_event_source *s, void *userdata) {
++        Manager *manager = userdata;
++        int r;
++
++        assert(manager);
++
++        for (;;) {
++                bool processed = false;
++                Request *req;
++                Iterator i;
++                ORDERED_SET_FOREACH(req, manager->request_queue, i) {
++                        switch(req->type) {
++                        default:
++                                return -EINVAL;
++                        }
++                        if (r < 0)
++                                link_enter_failed(req->link);
++                        if (r > 0) {
++                                ordered_set_remove(manager->request_queue, req);
++                                request_free(req);
++                                processed = true;
++                        }
++                }
++
++                if (!processed)
++                        break;
++        }
++
++        return 0;
++}
+diff --git a/src/network/networkd-queue.h b/src/network/networkd-queue.h
+new file mode 100644
+index 0000000000..4558ae548f
+--- /dev/null
++++ b/src/network/networkd-queue.h
+@@ -0,0 +1,42 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
++#pragma once
++
++#include "sd-event.h"
++
++#include "networkd-link.h"
++
++typedef struct Request Request;
++
++typedef int (*request_after_configure_handler_t)(Request*, void*);
++typedef void (*request_on_free_handler_t)(Request*);
++
++typedef enum RequestType {
++        _REQUEST_TYPE_MAX,
++        _REQUEST_TYPE_INVALID = -EINVAL,
++} RequestType;
++
++typedef struct Request {
++        Link *link;
++        RequestType type;
++        bool consume_object;
++        void *object;
++        void *userdata;
++        unsigned *message_counter;
++        link_netlink_message_handler_t netlink_handler;
++        request_after_configure_handler_t after_configure;
++        request_on_free_handler_t on_free;
++} Request;
++
++Request *request_free(Request *req);
++void request_drop(Request *req);
++
++int link_queue_request(
++                Link *link,
++                RequestType type,
++                void *object,
++                bool consume_object,
++                unsigned *message_counter,
++                link_netlink_message_handler_t netlink_handler,
++                Request **ret);
++
++int manager_process_requests(sd_event_source *s, void *userdata);

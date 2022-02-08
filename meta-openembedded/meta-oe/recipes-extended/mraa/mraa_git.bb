@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=91e7de50a8d3cf01057f318d72460acd"
 SRCREV = "e15ce6fbc76148ba8835adc92196b0d0a3f245e7"
 PV = "2.1.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=http \
+SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=http;branch=master;protocol=https \
            file://0001-cmake-Use-a-regular-expression-to-match-x86-architec.patch \
            "
 

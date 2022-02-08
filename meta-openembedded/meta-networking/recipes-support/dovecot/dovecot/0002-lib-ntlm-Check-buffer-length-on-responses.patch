@@ -1,0 +1,37 @@
+Backport of:
+
+From 1c6405d3026e5ceae3d214d63945bba85251af4c Mon Sep 17 00:00:00 2001
+From: Aki Tuomi <aki.tuomi@open-xchange.com>
+Date: Mon, 18 May 2020 12:33:39 +0300
+Subject: [PATCH 2/3] lib-ntlm: Check buffer length on responses
+
+Add missing check for buffer length.
+
+If this is not checked, it is possible to send message which
+causes read past buffer bug.
+
+Broken in c7480644202e5451fbed448508ea29a25cffc99c
+---
+ src/lib-ntlm/ntlm-message.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12673
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+--- a/src/lib-ntlm/ntlm-message.c
++++ b/src/lib-ntlm/ntlm-message.c
+@@ -184,6 +184,11 @@ static int ntlmssp_check_buffer(const st
+ 	if (length == 0 && space == 0)
+ 		return 1;
+ 
++	if (length > data_size) {
++		*error = "buffer length out of bounds";
++		return 0;
++	}
++
+ 	if (offset >= data_size) {
+ 		*error = "buffer offset out of bounds";
+ 		return 0;

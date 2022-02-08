@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=e4224ccaecb14d942c71d31bef20d78c"
 SRCREV = "d2acdb6c3c7612a6133cd03464ef941161258f4e"
 PV .= "+git${SRCPV}"
 
-SRC_URI += "gitsm://github.com/Naios/function2"
+SRC_URI += "gitsm://github.com/Naios/function2;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

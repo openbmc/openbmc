@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "\
 "
 
 SRC_URI = "\
-    git://github.com/RPi-Distro/pi-bluetooth \
+    git://github.com/RPi-Distro/pi-bluetooth;branch=master;protocol=https \
     file://0001-bthelper-correct-path-for-hciconfig-under-Yocto.patch \
 "
 SRCREV = "cbdbcb66bcc5b9af05f1a9fffe2254c872bb0ace"

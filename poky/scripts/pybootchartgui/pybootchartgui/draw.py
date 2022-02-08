@@ -267,7 +267,10 @@ def draw_chart(ctx, color, fill, chart_bounds, data, proc_tree, data_range):
     # avoid divide by zero
     if max_y == 0:
         max_y = 1.0
-    xscale = float (chart_bounds[2]) / (max_x - x_shift)
+    if (max_x - x_shift):
+        xscale = float (chart_bounds[2]) / (max_x - x_shift)
+    else:
+        xscale = float (chart_bounds[2])
     # If data_range is given, scale the chart so that the value range in
     # data_range matches the chart bounds exactly.
     # Otherwise, scale so that the actual data matches the chart bounds.

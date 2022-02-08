@@ -9,7 +9,7 @@ DEPENDS += "glib-2.0-native"
 
 PV = "0.2+git${SRCPV}"
 
-SRC_URI = "git://github.com/labapart/gattlib.git \
+SRC_URI = "git://github.com/labapart/gattlib.git;branch=master;protocol=https \
            file://dbus-avoid-strange-chars-from-the-build-dir.patch \
            file://0001-cmake-Use-GNUInstallDirs.patch \
            "
@@ -28,5 +28,5 @@ EXTRA_OECMAKE += "-DGATTLIB_BUILD_DOCS=OFF"
 
 inherit pkgconfig cmake
 
-FILES_${PN} = "${libdir}/* ${includedir}/*"
-FILES_${PN}-dev = "${includedir}/*"
+FILES_${PN} = "${libdir}/*"
+FILES_${PN}-dev = "${includedir}/* ${libdir}/pkgconfig"

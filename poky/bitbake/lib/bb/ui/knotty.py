@@ -380,14 +380,27 @@ _evt_list = [ "bb.runqueue.runQueueExitWait", "bb.event.LogExecTTY", "logging.Lo
               "bb.event.BuildBase", "bb.build.TaskStarted", "bb.build.TaskSucceeded", "bb.build.TaskFailedSilent",
               "bb.build.TaskProgress", "bb.event.ProcessStarted", "bb.event.ProcessProgress", "bb.event.ProcessFinished"]
 
+def drain_events_errorhandling(eventHandler):
+    # We don't have logging setup, we do need to show any events we see before exiting
+    event = True
+    logger = bb.msg.logger_create('bitbake', sys.stdout)
+    while event:
+        event = eventHandler.waitEvent(0)
+        if isinstance(event, logging.LogRecord):
+            logger.handle(event)
+
 def main(server, eventHandler, params, tf = TerminalFilter):
 
-    if not params.observe_only:
-        params.updateToServer(server, os.environ.copy())
+    try:
+        if not params.observe_only:
+            params.updateToServer(server, os.environ.copy())
 
-    includelogs, loglines, consolelogfile, logconfigfile = _log_settings_from_server(server, params.observe_only)
+        includelogs, loglines, consolelogfile, logconfigfile = _log_settings_from_server(server, params.observe_only)
 
-    loglevel, _ = bb.msg.constructLogOptions()
+        loglevel, _ = bb.msg.constructLogOptions()
+    except bb.BBHandledException:
+        drain_events_errorhandling(eventHandler)
+        return 1
 
     if params.options.quiet == 0:
         console_loglevel = loglevel

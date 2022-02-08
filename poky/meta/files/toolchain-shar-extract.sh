@@ -56,7 +56,8 @@ if ! xz -V > /dev/null 2>&1; then
 	exit 1
 fi
 
-DEFAULT_INSTALL_DIR="@SDKPATH@"
+SDK_BUILD_PATH="@SDKPATH@"
+DEFAULT_INSTALL_DIR="@SDKPATHINSTALL@"
 SUDO_EXEC=""
 EXTRA_TAR_OPTIONS=""
 target_sdk_dir=""

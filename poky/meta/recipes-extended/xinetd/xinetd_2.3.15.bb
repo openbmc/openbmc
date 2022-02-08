@@ -13,7 +13,7 @@ PR = "r2"
 # Blacklist a bogus tag in upstream check
 UPSTREAM_CHECK_GITTAGREGEX = "xinetd-(?P<pver>(?!20030122).+)"
 
-SRC_URI = "git://github.com/xinetd-org/xinetd.git;protocol=https \
+SRC_URI = "git://github.com/xinetd-org/xinetd.git;protocol=https;branch=master \
       file://xinetd.init \
       file://xinetd.conf \
       file://xinetd.default \

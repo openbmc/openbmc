@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=da2e9aa80962d54e7c726f232a2bd1e8"
 
 # Use 1.0.12 tag
 SRCREV = "17b1790fb9c8abbb3c0f7e083864a6a014191d56"
-SRC_URI = "git://github.com/lloyd/yajl;nobranch=1"
+SRC_URI = "git://github.com/lloyd/yajl;nobranch=1;protocol=https"
 
 inherit cmake lib_package
 

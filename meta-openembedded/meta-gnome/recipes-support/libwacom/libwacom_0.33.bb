@@ -9,6 +9,6 @@ DEPENDS = " \
 
 inherit autotools pkgconfig
 
-SRC_URI = "git://github.com/linuxwacom/libwacom.git"
+SRC_URI = "git://github.com/linuxwacom/libwacom.git;branch=master;protocol=https"
 SRCREV = "87cc710e21a6220e267dd08936bbec2932aa3658"
 S = "${WORKDIR}/git"

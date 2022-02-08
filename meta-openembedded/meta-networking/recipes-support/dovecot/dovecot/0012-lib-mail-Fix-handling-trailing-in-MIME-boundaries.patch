@@ -1,0 +1,133 @@
+From 0c9d56b41b992a868f299e05677a67c4d0495523 Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 2 Jul 2020 17:31:19 +0300
+Subject: [PATCH 12/13] lib-mail: Fix handling trailing "--" in MIME boundaries
+
+Broken by 5b8ec27fae941d06516c30476dcf4820c6d200ab
+---
+ src/lib-mail/message-parser.c      | 14 ++++++++----
+ src/lib-mail/test-message-parser.c | 46 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+), 4 deletions(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index 646307802..175d4b488 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -75,7 +75,7 @@ static int preparsed_parse_next_header_init(struct message_parser_ctx *ctx,
+ 
+ static struct message_boundary *
+ boundary_find(struct message_boundary *boundaries,
+-	      const unsigned char *data, size_t len)
++	      const unsigned char *data, size_t len, bool trailing_dashes)
+ {
+ 	struct message_boundary *best = NULL;
+ 
+@@ -89,7 +89,11 @@ boundary_find(struct message_boundary *boundaries,
+ 		    memcmp(boundaries->boundary, data, boundaries->len) == 0 &&
+ 		    (best == NULL || best->len < boundaries->len)) {
+ 			best = boundaries;
+-			if (best->len == len) {
++			/* If we see "foo--", it could either mean that there
++			   is a boundary named "foo" that ends now or there's
++			   a boundary "foo--" which continues. */
++			if (best->len == len ||
++			    (best->len == len-2 && trailing_dashes)) {
+ 				/* This is exactly the wanted boundary. There
+ 				   can't be a better one. */
+ 				break;
+@@ -319,6 +323,7 @@ boundary_line_find(struct message_parser_ctx *ctx,
+ 		return 0;
+ 	}
+ 	size_t find_size = size;
++	bool trailing_dashes = FALSE;
+ 
+ 	if (lf_pos != NULL) {
+ 		find_size = lf_pos - data;
+@@ -326,11 +331,12 @@ boundary_line_find(struct message_parser_ctx *ctx,
+ 			find_size--;
+ 		if (find_size > 2 && data[find_size-1] == '-' &&
+ 		    data[find_size-2] == '-')
+-			find_size -= 2;
++			trailing_dashes = TRUE;
+ 	} else if (find_size > BOUNDARY_END_MAX_LEN)
+ 		find_size = BOUNDARY_END_MAX_LEN;
+ 
+-	*boundary_r = boundary_find(ctx->boundaries, data, find_size);
++	*boundary_r = boundary_find(ctx->boundaries, data, find_size,
++				    trailing_dashes);
+ 	if (*boundary_r == NULL)
+ 		return -1;
+ 
+diff --git a/src/lib-mail/test-message-parser.c b/src/lib-mail/test-message-parser.c
+index 481d05942..113454ea0 100644
+--- a/src/lib-mail/test-message-parser.c
++++ b/src/lib-mail/test-message-parser.c
+@@ -510,6 +510,51 @@ static const char input_msg[] =
+ 	test_end();
+ }
+ 
++static void test_message_parser_trailing_dashes(void)
++{
++static const char input_msg[] =
++"Content-Type: multipart/mixed; boundary=\"a--\"\n"
++"\n"
++"--a--\n"
++"Content-Type: multipart/mixed; boundary=\"a----\"\n"
++"\n"
++"--a----\n"
++"Content-Type: text/plain\n"
++"\n"
++"body\n"
++"--a------\n"
++"Content-Type: text/html\n"
++"\n"
++"body2\n"
++"--a----";
++	struct message_parser_ctx *parser;
++	struct istream *input;
++	struct message_part *parts;
++	struct message_block block;
++	pool_t pool;
++	int ret;
++
++	test_begin("message parser trailing dashes");
++	pool = pool_alloconly_create("message parser", 10240);
++	input = test_istream_create(input_msg);
++
++	parser = message_parser_init(pool, input, 0, 0);
++	while ((ret = message_parser_parse_next_block(parser, &block)) > 0) ;
++	test_assert(ret < 0);
++	message_parser_deinit(&parser, &parts);
++
++	test_assert(parts->children_count == 2);
++	test_assert(parts->children->next == NULL);
++	test_assert(parts->children->children_count == 1);
++	test_assert(parts->children->children->next == NULL);
++	test_assert(parts->children->children->children_count == 0);
++
++	test_parsed_parts(input, parts);
++	i_stream_unref(&input);
++	pool_unref(&pool);
++	test_end();
++}
++
+ static void test_message_parser_continuing_mime_boundary(void)
+ {
+ static const char input_msg[] =
+@@ -777,6 +822,7 @@ int main(void)
+ 		test_message_parser_empty_multipart,
+ 		test_message_parser_duplicate_mime_boundary,
+ 		test_message_parser_garbage_suffix_mime_boundary,
++		test_message_parser_trailing_dashes,
+ 		test_message_parser_continuing_mime_boundary,
+ 		test_message_parser_continuing_truncated_mime_boundary,
+ 		test_message_parser_long_mime_boundary,
+-- 
+2.11.0
+

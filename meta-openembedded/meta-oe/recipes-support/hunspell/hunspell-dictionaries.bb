@@ -135,7 +135,7 @@ RDEPENDS_${PN} = "hunspell"
 
 PV = "0.0.0+git${SRCPV}"
 SRCREV = "820a65e539e34a3a8c2a855d2450b84745c624ee"
-SRC_URI = "git://github.com/wooorm/dictionaries.git"
+SRC_URI = "git://github.com/wooorm/dictionaries.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://README;beginline=1171;endline=1176;md5=3be2cb8159d094
 
 DEPENDS += "perl"
 
-SRC_URI = "git://github.com/makamaka/JSON.git;protocol=https"
+SRC_URI = "git://github.com/makamaka/JSON.git;protocol=https;branch=master"
 
 SRCREV = "42a6324df654e92419512cee80c0b49155d9e56d"
 

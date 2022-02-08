@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SRCREV = "6df40a2471737b27271bdd9b900ab5f3aec746c7"
 
-SRC_URI = "git://github.com/google/flatbuffers.git"
+SRC_URI = "git://github.com/google/flatbuffers.git;branch=master;protocol=https"
 
 # affects only flatbuffers rust crate
 CVE_CHECK_WHITELIST += "CVE-2020-35864"

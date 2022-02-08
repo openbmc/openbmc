@@ -43,6 +43,12 @@ class oeGoToolchainSelfTest(OESelftestTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        # Go creates file which are readonly
+        for dirpath, dirnames, filenames in os.walk(cls.tmpdir_SDKQA):
+            for filename in filenames + dirnames:
+                f = os.path.join(dirpath, filename)
+                if not os.path.islink(f):
+                    os.chmod(f, 0o775)
         shutil.rmtree(cls.tmpdir_SDKQA, ignore_errors=True)
         super(oeGoToolchainSelfTest, cls).tearDownClass()
 

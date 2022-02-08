@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://README.md;beginline=19;endline=32;md5=f8ff2391624f28e
 SRCREV = "5d9f16722e3df49dc618a9f361bd482559695db7"
 PV = "2.0.13+git${SRCPV}"
 
-SRC_URI = "git://github.com/numactl/numactl \
+SRC_URI = "git://github.com/numactl/numactl;branch=master;protocol=https \
     file://Fix-the-test-output-format.patch \
     file://Makefile \
     file://run-ptest \

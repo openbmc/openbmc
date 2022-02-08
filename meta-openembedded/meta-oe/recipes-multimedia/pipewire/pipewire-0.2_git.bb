@@ -11,7 +11,7 @@ DEPENDS = "alsa-lib dbus udev"
 SRCREV = "14c11c0fe4d366bad4cfecdee97b6652ff9ed63d"
 PV = "0.2.7"
 
-SRC_URI = "git://github.com/PipeWire/pipewire"
+SRC_URI = "git://github.com/PipeWire/pipewire;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

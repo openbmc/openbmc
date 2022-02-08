@@ -31,7 +31,6 @@ exclude_packages = [
 	'bootchart2-doc',
 	'epiphany',
 	'gcr',
-	'git',
 	'glide',
 	'go-dep',
 	'go-helloworld',
@@ -44,7 +43,6 @@ exclude_packages = [
 	'libcap-ng',
 	'libjson',
 	'libproxy',
-	'lsb-release',
 	'lttng-tools-dbg',
 	'lttng-tools-ptest',
 	'ltp',
@@ -55,14 +53,12 @@ exclude_packages = [
 	'pybootchartgui',
 	'qemu',
 	'quilt-ptest',
-	"rpm",
 	'rsync',
 	'ruby',
 	'stress-ng',
 	'systemd-bootchart',
 	'systemtap',
 	'valgrind-ptest',
-	'vim',
 	'webkitgtk',
 	]
 
@@ -143,6 +139,32 @@ def compare_file(reference, test, diffutils_sysroot):
 
     result.status = SAME
     return result
+
+def run_diffoscope(a_dir, b_dir, html_dir, **kwargs):
+    return runCmd(['diffoscope', '--no-default-limits', '--exclude-directory-metadata', 'yes', '--html-dir', html_dir, a_dir, b_dir],
+                **kwargs)
+
+class DiffoscopeTests(OESelftestTestCase):
+    diffoscope_test_files = os.path.join(os.path.dirname(os.path.abspath(__file__)), "diffoscope")
+
+    def test_diffoscope(self):
+        bitbake("diffoscope-native -c addto_recipe_sysroot")
+        diffoscope_sysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "diffoscope-native")
+
+        # Check that diffoscope doesn't return an error when the files compare
+        # the same (a general check that diffoscope is working)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_diffoscope('A', 'A', tmpdir,
+                native_sysroot=diffoscope_sysroot, cwd=self.diffoscope_test_files)
+
+        # Check that diffoscope generates an index.html file when the files are
+        # different
+        with tempfile.TemporaryDirectory() as tmpdir:
+            r = run_diffoscope('A', 'B', tmpdir,
+                native_sysroot=diffoscope_sysroot, ignore_status=True, cwd=self.diffoscope_test_files)
+
+            self.assertNotEqual(r.status, 0, msg="diffoscope was successful when an error was expected")
+            self.assertTrue(os.path.exists(os.path.join(tmpdir, 'index.html')), "HTML index not found!")
 
 class ReproducibleTests(OESelftestTestCase):
     # Test the reproducibility of whatever is built between sstate_targets and targets
@@ -321,7 +343,7 @@ class ReproducibleTests(OESelftestTestCase):
                 # Copy jquery to improve the diffoscope output usability
                 self.copy_file(os.path.join(jquery_sysroot, 'usr/share/javascript/jquery/jquery.min.js'), os.path.join(package_html_dir, 'jquery.js'))
 
-                runCmd(['diffoscope', '--no-default-limits', '--exclude-directory-metadata', '--html-dir', package_html_dir, 'reproducibleA', 'reproducibleB'],
+                run_diffoscope('reproducibleA', 'reproducibleB', package_html_dir,
                         native_sysroot=diffoscope_sysroot, ignore_status=True, cwd=package_dir)
 
         if fails:

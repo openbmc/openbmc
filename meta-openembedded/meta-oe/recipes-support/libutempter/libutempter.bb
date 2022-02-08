@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1"
 SRCREV = "3ef74fff310f09e2601e241b9f042cd39d591018"
 PV = "1.1.6-alt2+git${SRCPV}"
 
-SRC_URI = "git://git.altlinux.org/people/ldv/packages/libutempter.git \
+SRC_URI = "git://git.altlinux.org/people/ldv/packages/libutempter.git;branch=master \
            file://0001-Fix-macro-error.patch \
            file://0002-Proper-macro-path-generation.patch \
            file://libutempter-remove-glibc-assumption.patch \

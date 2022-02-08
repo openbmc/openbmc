@@ -12,6 +12,7 @@ SRC_URI = "http://snapshot.debian.org/archive/debian/20180828T214102Z/pool/main/
 	file://avoid-failure-on-symbol-provided-by-application.patch \
 	file://show-GNU-unique-symbols-as-provided-symbols.patch \
 	file://fix_cross_compile.patch \
+	file://remove-deprecated-exception-specification-cpp17.patch \
 "
 
 SRC_URI[md5sum] = "6b6eeb9b4016c6a7317acc28c89e32cc"

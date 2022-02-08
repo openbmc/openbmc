@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=55ea9d559f985fb4834317d8ed6b9e58"
 
 SRCREV = "fb72e5e5f0879231f38e0e826a98a6ca2d1ca38e"
 
-SRC_URI = "git://github.com/stressapptest/stressapptest \
+SRC_URI = "git://github.com/stressapptest/stressapptest;branch=master;protocol=https \
            file://libcplusplus-compat.patch \
            file://read_sysfs_for_cachesize.patch \
           "

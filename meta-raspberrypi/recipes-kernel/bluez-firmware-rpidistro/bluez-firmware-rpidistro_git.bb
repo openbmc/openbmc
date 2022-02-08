@@ -23,7 +23,7 @@ LIC_FILES_CHKSUM = "\
 # so that the license files will be copied from fetched source
 NO_GENERIC_LICENSE[Firmware-cypress-rpidistro] = "LICENCE.cypress-rpidistro"
 
-SRC_URI = "git://github.com/RPi-Distro/bluez-firmware"
+SRC_URI = "git://github.com/RPi-Distro/bluez-firmware;branch=master;protocol=https"
 SRCREV = "96eefffcccc725425fd83be5e0704a5c32b79e54"
 PV = "0.0+git${SRCPV}"
 

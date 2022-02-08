@@ -12,7 +12,7 @@ DEPENDS_append_rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', ''
 PV = "5.0.0"
 
 SRCREV = "43bc27fe7be491149e6f57d14110e02abdac2f24"
-SRC_URI = "git://github.com/Pulse-Eight/libcec.git;branch=release \
+SRC_URI = "git://github.com/Pulse-Eight/libcec.git;branch=release;protocol=https \
            file://0001-CheckPlatformSupport.cmake-Do-not-hardcode-lib-path.patch \
            file://0001-Enhance-reproducibility.patch \
           "

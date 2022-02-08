@@ -7,7 +7,8 @@ SECTION = "net"
 DEPENDS = "file"
 
 SRC_URI = "${GNU_MIRROR}/libmicrohttpd/${BPN}-${PV}.tar.gz \
-"
+           file://CVE-2021-3466.patch \
+           "
 SRC_URI[md5sum] = "dcd6045ecb4ea18c120afedccbd1da74"
 SRC_URI[sha256sum] = "90d0a3d396f96f9bc41eb0f7e8187796049285fabef82604acd4879590977307"
 

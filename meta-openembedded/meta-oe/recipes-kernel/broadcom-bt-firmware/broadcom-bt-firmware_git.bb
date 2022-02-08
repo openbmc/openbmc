@@ -9,7 +9,7 @@ LICENSE = "Firmware-Broadcom-WIDCOMM"
 NO_GENERIC_LICENSE[Firmware-Broadcom-WIDCOMM] = "LICENSE.broadcom_bcm20702"
 
 LIC_FILES_CHKSUM = "file://LICENSE.broadcom_bcm20702;md5=c0d5ea0502b00df74173d0f8a48b619d"
-SRC_URI = "git://github.com/winterheart/broadcom-bt-firmware.git"
+SRC_URI = "git://github.com/winterheart/broadcom-bt-firmware.git;branch=master;protocol=https"
 SRCREV = "c0bd928b8ae5754b6077c99afe6ef5c949a58f32"
 PE = "1"
 PV = "0.0+git${SRCPV}"

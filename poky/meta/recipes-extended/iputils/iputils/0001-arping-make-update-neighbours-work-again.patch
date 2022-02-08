@@ -1,0 +1,79 @@
+From 86ed08936d49e2c81ef49dfbd02aca1c74d0c098 Mon Sep 17 00:00:00 2001
+From: lac-0073 <61903197+lac-0073@users.noreply.github.com>
+Date: Mon, 26 Oct 2020 09:45:42 +0800
+Subject: [PATCH] arpping: make update neighbours work again
+
+The arping is using inconsistent sender_ip_addr and target_ip_addr in
+messages.  This causes the client receiving the arp message not to update
+the arp table entries.
+
+The specific performance is as follows:
+
+There is a machine 2 with IP 10.20.30.3 configured on eth0:0 that is in the
+same IP subnet as eth0.  This IP was originally used on another machine 1,
+and th IP needs to be changed back to the machine 1.  When using the arping
+command to announce what ethernet address has IP 10.20.30.3, the arp table
+on machine 3 is not updated.
+
+Machine 3 original arp table:
+
+    10.20.30.3  machine 2 eth0:0    00:00:00:00:00:02
+    10.20.30.2  machine 2 eth0      00:00:00:00:00:02
+    10.20.30.1  machine 1 eth0      00:00:00:00:00:01
+
+Create interface eth0:0 on machine 1, and use the arping command to send arp
+packets.  Expected outcome on machine 3:
+
+    10.20.30.3  machine 1 eth0:0    00:00:00:00:00:01
+    10.20.30.2  machine 2 eth0      00:00:00:00:00:02
+    10.20.30.1  machine 1 eth0      00:00:00:00:00:01
+
+Actual results on machine 3:
+
+    10.20.30.3  machine 2 eth0:0    00:00:00:00:00:02
+    10.20.30.2  machine 2 eth0      00:00:00:00:00:02
+    10.20.30.1  machine 1 eth0      00:00:00:00:00:01
+
+Fixes: https://github.com/iputils/iputils/issues/298
+Fixes: 68f12fc4a0dbef4ae4c404da24040d22c5a14339
+Signed-off-by: Aichun Li <liaichun@huawei.com>
+Upstream-Status: Backport [https://github.com/iputils/iputils/commit/86ed08936d49e2c81ef49dfbd02aca1c74d0c098]
+Signed-off-by: Visa Hankala <visa@hankala.org>
+---
+ arping.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/arping.c b/arping.c
+index a002786..53fdbb4 100644
+--- a/arping.c
++++ b/arping.c
+@@ -968,7 +968,7 @@ int main(int argc, char **argv)
+ 		}
+ 		memset(&saddr, 0, sizeof(saddr));
+ 		saddr.sin_family = AF_INET;
+-		if (!ctl.unsolicited && (ctl.source || ctl.gsrc.s_addr)) {
++		if (ctl.source || ctl.gsrc.s_addr) {
+ 			saddr.sin_addr = ctl.gsrc;
+ 			if (bind(probe_fd, (struct sockaddr *)&saddr, sizeof(saddr)) == -1)
+ 				error(2, errno, "bind");
+@@ -979,12 +979,14 @@ int main(int argc, char **argv)
+ 			saddr.sin_port = htons(1025);
+ 			saddr.sin_addr = ctl.gdst;
+ 
+-			if (setsockopt(probe_fd, SOL_SOCKET, SO_DONTROUTE, (char *)&on, sizeof(on)) == -1)
+-				error(0, errno, _("WARNING: setsockopt(SO_DONTROUTE)"));
+-			if (connect(probe_fd, (struct sockaddr *)&saddr, sizeof(saddr)) == -1)
+-				error(2, errno, "connect");
+-			if (getsockname(probe_fd, (struct sockaddr *)&saddr, &alen) == -1)
+-				error(2, errno, "getsockname");
++			if (!ctl.unsolicited) {
++				if (setsockopt(probe_fd, SOL_SOCKET, SO_DONTROUTE, (char *)&on, sizeof(on)) == -1)
++					error(0, errno, _("WARNING: setsockopt(SO_DONTROUTE)"));
++				if (connect(probe_fd, (struct sockaddr *)&saddr, sizeof(saddr)) == -1)
++					error(2, errno, "connect");
++				if (getsockname(probe_fd, (struct sockaddr *)&saddr, &alen) == -1)
++					error(2, errno, "getsockname");
++			}
+ 			ctl.gsrc = saddr.sin_addr;
+ 		}
+ 		close(probe_fd);

@@ -9,7 +9,7 @@ inherit autotools pkgconfig gitpkgv
 PKGV = "${GITPKGVTAG}"
 
 SRCREV = "78df9be5fc8222ed53846cb553de9b5d24c85c6c"
-SRC_URI = "git://github.com/libimobiledevice/libusbmuxd;protocol=https"
+SRC_URI = "git://github.com/libimobiledevice/libusbmuxd;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 

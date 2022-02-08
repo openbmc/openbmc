@@ -6,7 +6,7 @@ DEPENDS = "ncurses libnl pciutils autoconf-archive"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e"
 
-SRC_URI = "git://github.com/fenrus75/powertop;protocol=https \
+SRC_URI = "git://github.com/fenrus75/powertop;protocol=https;branch=master \
            file://0001-wakeup_xxx.h-include-limits.h.patch \
            file://0002-configure.ac-ax_add_fortify_source.patch \
            file://0003-configure-Use-AX_REQUIRE_DEFINED.patch \

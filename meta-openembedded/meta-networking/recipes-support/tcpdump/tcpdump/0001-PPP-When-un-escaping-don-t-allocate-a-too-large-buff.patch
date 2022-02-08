@@ -9,6 +9,7 @@ if we haven't captured all of it.
 
 (backported from commit e4add0b010ed6f2180dcb05a13026242ed935334)
 
+CVE: CVE-2020-8037
 Upstream-Status: Backport
 Signed-off-by: Stacy Gaikovaia <stacy.gaikovaia@windriver.com>
 

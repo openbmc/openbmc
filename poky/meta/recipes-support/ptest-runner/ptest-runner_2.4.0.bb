@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=751419260aa954499f7abaabaa882bbe"
 SRCREV = "834670317bd3f6e427e1ac461c07ada6b8936dfd"
 PV .= "+git${SRCPV}"
 
-SRC_URI = "git://git.yoctoproject.org/ptest-runner2 \
+SRC_URI = "git://git.yoctoproject.org/ptest-runner2;branch=master \
 "
 UPSTREAM_VERSION_UNKNOWN = "1"
 

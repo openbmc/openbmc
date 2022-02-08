@@ -21,8 +21,8 @@ SRCREV_spice-common = "4fc4c2db36c7f07b906e9a326a9d3dc0ae6a2671"
 SRCREV_FORMAT = "spice_spice-common"
 
 SRC_URI = " \
-    git://anongit.freedesktop.org/spice/spice;name=spice \
-    git://anongit.freedesktop.org/spice/spice-common;destsuffix=git/subprojects/spice-common;name=spice-common \
+    git://anongit.freedesktop.org/spice/spice;name=spice;branch=master \
+    git://anongit.freedesktop.org/spice/spice-common;destsuffix=git/subprojects/spice-common;name=spice-common;branch=master \
     file://0001-Convert-pthread_t-to-be-numeric.patch \
     file://0001-Fix-compile-errors-on-Linux-32bit-system.patch \
 "

@@ -19,6 +19,7 @@ SRCREV_libhardware = "be55eb1f4d840c82ffaf7c47460df17ff5bc4d9b"
 SRCREV_libselinux = "07e9e1339ad1ba608acfba9dce2d0f474b252feb"
 SRCREV_build = "16e987def3d7d8f7d30805eb95cef69e52a87dbc"
 
+SRCREV_FORMAT = "core_extras_libhardware_libselinux_build"
 SRC_URI = " \
     git://${ANDROID_MIRROR}/platform/system/core;name=core;protocol=https;nobranch=1;destsuffix=git/system/core \
     git://${ANDROID_MIRROR}/platform/system/extras;name=extras;protocol=https;nobranch=1;destsuffix=git/system/extras \

@@ -9,7 +9,7 @@ PV = "4.4+git${SRCPV}"
 
 SRCREV = "877613493ff44807888ce1928129574be393cbb0"
 
-SRC_URI = "git://github.com/jessek/hashdeep.git \
+SRC_URI = "git://github.com/jessek/hashdeep.git;branch=master;protocol=https \
            file://wrong-variable-expansion.patch \
            file://0001-Fix-literal-and-identifier-spacing-as-dictated-by-C-.patch \
            "

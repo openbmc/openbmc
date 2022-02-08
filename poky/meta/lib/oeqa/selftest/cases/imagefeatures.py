@@ -240,7 +240,7 @@ USERADD_GID_TABLES += "files/static-group"
     def test_no_busybox_base_utils(self):
         config = """
 # Enable x11
-DISTRO_FEATURES_append += "x11"
+DISTRO_FEATURES_append = " x11"
 
 # Switch to systemd
 DISTRO_FEATURES += "systemd"

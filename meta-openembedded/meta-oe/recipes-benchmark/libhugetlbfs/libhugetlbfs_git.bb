@@ -12,7 +12,7 @@ PE = "1"
 
 SRCREV = "e6499ff92b4a7dcffbd131d1f5d24933e48c3f20"
 SRC_URI = " \
-    git://github.com/libhugetlbfs/libhugetlbfs.git;protocol=https \
+    git://github.com/libhugetlbfs/libhugetlbfs.git;protocol=https;branch=master \
     file://skip-checking-LIB32-and-LIB64-if-they-point-to-the-s.patch \
     file://libhugetlbfs-avoid-search-host-library-path-for-cros.patch \
     file://tests-Makefile-install-static-4G-edge-testcases.patch \

@@ -3,7 +3,7 @@ SUMMARY = "Real-time performance monitoring"
 LICENSE = "GPLv3"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fc9b848046ef54b5eaee6071947abd24"
 
-SRC_URI = "git://github.com/firehol/netdata.git;protocol=https \
+SRC_URI = "git://github.com/firehol/netdata.git;protocol=https;branch=master \
            file://0002-Makefiles-does-not-build-contrib-dir.patch \
 "
 SRCREV = "588ce5a7b18999dfa66698cd3a2f005f7a3c31cf"

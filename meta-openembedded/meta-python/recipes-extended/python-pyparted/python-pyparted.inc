@@ -12,7 +12,7 @@ DEPENDS += "parted"
 
 # upstream only publishes releases in github archives which are discouraged
 SRCREV = "481510c10866851844b19f3d2ffcdaa37efc0cf8"
-SRC_URI = "git://github.com/rhinstaller/pyparted.git;protocol=https"
+SRC_URI = "git://github.com/rhinstaller/pyparted.git;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 

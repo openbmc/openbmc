@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a95aadbdfae7ed812bb2b7b86eb5981c \
                     file://COPYING.gplv2;md5=eb723b61539feef013de476e68b5c50a \
                     file://COPYING.bsd;md5=66a5cedaf62c4b2637025f049f9b826f \
                     "
-SRC_URI = "git://github.com/smuellerDD/jitterentropy-library.git \
+SRC_URI = "git://github.com/smuellerDD/jitterentropy-library.git;branch=master;protocol=https \
            file://0001-Makefile-cleanup-install-for-rebuilds.patch \
            file://0001-Make-man-pages-reproducible.patch"
 SRCREV = "933a44f33ed3d6612f7cfaa7ad1207c8da4886ba"

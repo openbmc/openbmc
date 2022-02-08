@@ -10,7 +10,7 @@ PV = "0.10+git${SRCPV}"
 
 #  iPhoneSDK-1.3.1 tag
 SRCREV = "67003d2a985b5f9627bee2d8e3e0b26d0c474b57"
-SRC_URI = "git://github.com/ZBar/Zbar \
+SRC_URI = "git://github.com/ZBar/Zbar;branch=master;protocol=https \
            file://0001-make-relies-GNU-extentions.patch \
 "
 S = "${WORKDIR}/git"

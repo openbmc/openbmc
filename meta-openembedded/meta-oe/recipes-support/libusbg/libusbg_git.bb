@@ -8,7 +8,7 @@ inherit autotools
 
 PV = "0.1.0"
 SRCREV = "a826d136e0e8fa53815f1ba05893e6dd74208c15"
-SRC_URI = "git://github.com/libusbg/libusbg.git \
+SRC_URI = "git://github.com/libusbg/libusbg.git;branch=master;protocol=https \
            file://0001-Fix-out-of-tree-builds.patch \
           "
 

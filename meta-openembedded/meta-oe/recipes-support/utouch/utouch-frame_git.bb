@@ -9,7 +9,7 @@ DEPENDS += "mtdev utouch-evemu"
 
 inherit autotools pkgconfig
 
-SRC_URI = "git://bitmath.org/git/frame.git;protocol=http \
+SRC_URI = "git://bitmath.org/git/frame.git;protocol=http;branch=master \
            file://remove-man-page-creation.patch \
            file://0001-include-sys-stat.h-for-fixing-build-issue-on-musl.patch \
            file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \

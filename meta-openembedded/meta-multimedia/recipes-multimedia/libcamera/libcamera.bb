@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "\
 "
 
 SRC_URI = " \
-        git://linuxtv.org/libcamera.git;protocol=git \
+        git://linuxtv.org/libcamera.git;protocol=git;branch=master \
 "
 
 SRCREV = "a8be6e94e79f602d543a15afd44ef60e378b138f"

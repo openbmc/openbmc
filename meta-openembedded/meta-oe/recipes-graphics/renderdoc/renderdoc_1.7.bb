@@ -5,7 +5,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=df7ea9e196efc7014c124747a0ef9772"
 
 SRCREV = "a56af589d94dc851809fd5344d0ae441da70c1f2"
-SRC_URI = "git://github.com/baldurk/${BPN}.git;protocol=http;branch=v1.x \
+SRC_URI = "git://github.com/baldurk/${BPN}.git;protocol=http;branch=v1.x;protocol=https \
 	   file://0001-renderdoc-use-xxd-instead-of-cross-compiling-shim-bi.patch \
 	   file://0001-Remove-glslang-pool_allocator-setAllocator.patch \
 "

@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "libsigc++-2.0 curl cppunit libtorrent ncurses"
 
-SRC_URI = "git://github.com/rakshasa/rtorrent \
+SRC_URI = "git://github.com/rakshasa/rtorrent;branch=master;protocol=https \
     file://don-t-run-code-while-configuring-package.patch \
 "
 # v0.9.8

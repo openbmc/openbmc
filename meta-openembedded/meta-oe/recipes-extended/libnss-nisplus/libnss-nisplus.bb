@@ -17,7 +17,7 @@ PV = "1.3+git${SRCPV}"
 
 SRCREV = "116219e215858f4af9370171d3ead63baca8fdb4"
 
-SRC_URI = "git://github.com/thkukuk/libnss_nisplus \
+SRC_URI = "git://github.com/thkukuk/libnss_nisplus;branch=master;protocol=https \
           "
 
 S = "${WORKDIR}/git"

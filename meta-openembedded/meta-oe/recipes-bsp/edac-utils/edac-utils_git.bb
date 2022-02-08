@@ -11,7 +11,7 @@ PV = "0.18+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-SRC_URI = "git://github.com/grondo/edac-utils \
+SRC_URI = "git://github.com/grondo/edac-utils;branch=master;protocol=https \
     file://make-init-script-be-able-to-automatically-load-EDAC-.patch \
     file://add-restart-to-initscript.patch \
     file://edac.service \

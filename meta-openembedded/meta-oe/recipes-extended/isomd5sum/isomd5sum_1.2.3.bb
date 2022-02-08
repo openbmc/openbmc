@@ -7,7 +7,7 @@ RDEPENDS_${BPN} = "openssl curl"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 
-SRC_URI = "git://github.com/rhinstaller/isomd5sum.git;branch=master \
+SRC_URI = "git://github.com/rhinstaller/isomd5sum.git;branch=master;protocol=https \
            file://0001-tweak-install-prefix.patch \
            file://0002-fix-parallel-error.patch \
 "

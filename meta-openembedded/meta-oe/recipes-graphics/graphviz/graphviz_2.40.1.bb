@@ -24,7 +24,7 @@ inherit autotools-brokensep pkgconfig gettext
 # https://github.com/ellson/MOTHBALLED-graphviz/releases/tag/stable_release_2.40.1
 # https://gitlab.com/graphviz/graphviz/-/commit/67cd2e5121379a38e0801cc05cce5033f8a2a609
 SRCREV = "67cd2e5121379a38e0801cc05cce5033f8a2a609"
-SRC_URI = "git://gitlab.com/${BPN}/${BPN}.git \
+SRC_URI = "git://gitlab.com/${BPN}/${BPN}.git;branch=master \
            file://0001-plugin-pango-Include-freetype-headers-explicitly.patch \
 "
 # Use native mkdefs

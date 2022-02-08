@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=930f8aa500a47c7dab0f8efb5a1c9a40"
 DEPENDS = "libgfortran"
 
 SRCREV = "6acc99d5f39130be7cec00fb835606042101a970"
-SRC_URI = "git://github.com/Reference-LAPACK/lapack.git;protocol=https"
+SRC_URI = "git://github.com/Reference-LAPACK/lapack.git;protocol=https;branch=master"
 S = "${WORKDIR}/git"
 
 EXTRA_OECMAKE = " -DBUILD_SHARED_LIBS=ON "

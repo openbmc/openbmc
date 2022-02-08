@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 PV = "1.0.4+git${SRCPV}"
 SRCREV = "4c794b5512d23c649def1f94a684225dcbb6ac3e"
-SRC_URI = "git://git.remlab.net/git/ndisc6.git;protocol=http \
+SRC_URI = "git://git.remlab.net/git/ndisc6.git;protocol=http;branch=master \
            file://0001-replace-VLAIS-with-malloc-free-pair.patch \
            file://0002-Do-not-undef-_GNU_SOURCE.patch \
            file://0001-autogen-Do-not-symlink-gettext.h-from-build-host.patch \

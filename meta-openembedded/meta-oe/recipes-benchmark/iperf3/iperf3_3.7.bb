@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f9088fe7ffdccd042f7645f1012d7f70"
 
 DEPENDS = "openssl"
 
-SRC_URI = "git://github.com/esnet/iperf.git \
+SRC_URI = "git://github.com/esnet/iperf.git;branch=master;protocol=https \
            file://0002-Remove-pg-from-profile_CFLAGS.patch \
            "
 

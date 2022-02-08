@@ -14,10 +14,10 @@ PV = "0.6.1"
 
 SRCREV_base = "c41a05cc9e2310c2f73eda4b4f0b4477bf4479c5"
 SRCREV_common = "88e512ca7197a45c4114f7fa993108f23245bf50"
-
+SRCREV_FORMAT = "base_common"
 SRC_URI = " \
     git://github.com/RidgeRun/gst-shark.git;protocol=https;branch=${SRCBRANCH};name=base \
-    git://gitlab.freedesktop.org/gstreamer/common.git;protocol=https;destsuffix=git/common;name=common; \
+    git://gitlab.freedesktop.org/gstreamer/common.git;protocol=https;destsuffix=git/common;name=common;branch=master \
     "
 
 S = "${WORKDIR}/git"

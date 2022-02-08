@@ -31,7 +31,7 @@ PACKAGECONFIG[outputs_screen] = "-Doutputs_screen=true,-Doutputs_screen=false"
 PACKAGECONFIG[chat_screen] = "-Dchat_screen=true,-Dchat_screen=false"
 
 SRC_URI = " \
-    git://github.com/MusicPlayerDaemon/ncmpc \
+    git://github.com/MusicPlayerDaemon/ncmpc;branch=master;protocol=https \
 "
 SRCREV = "79cf9905355f25bc5cc6d5a05d2846d75342f554"
 S = "${WORKDIR}/git"

@@ -11,7 +11,7 @@ LICENSE = "GPLv2"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=e870c934e2c3d6ccf085fd7cf0a1e2e2"
 
-SRC_URI = "git://gitosis.stanford.edu/openflow.git;protocol=git"
+SRC_URI = "git://gitosis.stanford.edu/openflow.git;protocol=git;branch=master"
 
 DEPENDS = "virtual/libc"
 

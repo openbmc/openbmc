@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS += "asciidoc-native xmlto-native"
 
-SRC_URI = "git://github.com/dagwieers/dstat.git \
+SRC_URI = "git://github.com/dagwieers/dstat.git;branch=master;protocol=https \
            file://0001-change-dstat-to-python3.patch \
           "
 
@@ -21,4 +21,4 @@ do_install() {
     oe_runmake 'DESTDIR=${D}' install
 }
 
-RDEPENDS_${PN} += "python3-core python3-misc python3-resource python3-shell python3-unixadmin"
+RDEPENDS_${PN} += "python3-core python3-misc python3-resource python3-shell python3-six python3-unixadmin"

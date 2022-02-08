@@ -1,0 +1,188 @@
+From df9e0d358ef86e3342525dcdefcf79dc2d749a30 Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 23 Apr 2020 16:59:40 +0300
+Subject: [PATCH 10/13] lib-mail: message-parser - Support limiting max number
+ of nested MIME parts
+
+The default is to allow 100 nested MIME parts. When the limit is reached,
+the innermost MIME part's body contains all the rest of the inner bodies
+until a parent MIME part is reached.
+---
+ src/lib-mail/message-parser.c      | 43 +++++++++++++++++++++++++++++++-------
+ src/lib-mail/test-message-parser.c | 31 +++++++++++++++++++++++++++
+ 2 files changed, 67 insertions(+), 7 deletions(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index 8970d8e0e..721615f76 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -13,6 +13,8 @@
+ #define BOUNDARY_STRING_MAX_LEN (70 + 10)
+ #define BOUNDARY_END_MAX_LEN (BOUNDARY_STRING_MAX_LEN + 2 + 2)
+ 
++#define MESSAGE_PARSER_DEFAULT_MAX_NESTED_MIME_PARTS 100
++
+ struct message_boundary {
+ 	struct message_boundary *next;
+ 
+@@ -28,9 +30,11 @@ struct message_parser_ctx {
+ 	struct istream *input;
+ 	struct message_part *parts, *part;
+ 	const char *broken_reason;
++	unsigned int nested_parts_count;
+ 
+ 	enum message_header_parser_flags hdr_flags;
+ 	enum message_parser_flags flags;
++	unsigned int max_nested_mime_parts;
+ 
+ 	char *last_boundary;
+ 	struct message_boundary *boundaries;
+@@ -206,6 +210,8 @@ message_part_append(struct message_parser_ctx *ctx)
+ 	ctx->next_part = &part->children;
+ 
+ 	ctx->part = part;
++	ctx->nested_parts_count++;
++	i_assert(ctx->nested_parts_count < ctx->max_nested_mime_parts);
+ }
+ 
+ static void message_part_finish(struct message_parser_ctx *ctx)
+@@ -213,8 +219,12 @@ static void message_part_finish(struct message_parser_ctx *ctx)
+ 	struct message_part **const *parent_next_partp;
+ 	unsigned int count = array_count(&ctx->next_part_stack);
+ 	
++	i_assert(ctx->nested_parts_count > 0);
++	ctx->nested_parts_count--;
++
+ 	parent_next_partp = array_idx(&ctx->next_part_stack, count-1);
+ 	array_delete(&ctx->next_part_stack, count-1, 1);
++
+ 	ctx->next_part = *parent_next_partp;
+ 
+ 	message_size_add(&ctx->part->parent->body_size, &ctx->part->body_size);
+@@ -592,6 +602,11 @@ static bool block_is_at_eoh(const struct message_block *block)
+ 	return FALSE;
+ }
+ 
++static bool parse_too_many_nested_mime_parts(struct message_parser_ctx *ctx)
++{
++	return ctx->nested_parts_count > ctx->max_nested_mime_parts;
++}
++
+ #define MUTEX_FLAGS \
+ 	(MESSAGE_PART_FLAG_MESSAGE_RFC822 | MESSAGE_PART_FLAG_MULTIPART)
+ 
+@@ -616,8 +631,12 @@ static int parse_next_header(struct message_parser_ctx *ctx,
+ 		   "\n--boundary" belongs to us or to a previous boundary.
+ 		   this is a problem if the boundary prefixes are identical,
+ 		   because MIME requires only the prefix to match. */
+-		parse_next_body_multipart_init(ctx);
+-		ctx->multipart = TRUE;
++		if (!parse_too_many_nested_mime_parts(ctx)) {
++			parse_next_body_multipart_init(ctx);
++			ctx->multipart = TRUE;
++		} else {
++			part->flags &= ~MESSAGE_PART_FLAG_MULTIPART;
++		}
+ 	}
+ 
+ 	/* before parsing the header see if we can find a --boundary from here.
+@@ -721,12 +740,16 @@ static int parse_next_header(struct message_parser_ctx *ctx,
+ 		i_assert(ctx->last_boundary == NULL);
+ 		ctx->multipart = FALSE;
+ 		ctx->parse_next_block = parse_next_body_to_boundary;
+-	} else if (part->flags & MESSAGE_PART_FLAG_MESSAGE_RFC822)
++	} else if ((part->flags & MESSAGE_PART_FLAG_MESSAGE_RFC822) != 0 &&
++		   !parse_too_many_nested_mime_parts(ctx)) {
+ 		ctx->parse_next_block = parse_next_body_message_rfc822_init;
+-	else if (ctx->boundaries != NULL)
+-		ctx->parse_next_block = parse_next_body_to_boundary;
+-	else
+-		ctx->parse_next_block = parse_next_body_to_eof;
++	} else {
++		part->flags &= ~MESSAGE_PART_FLAG_MESSAGE_RFC822;
++		if (ctx->boundaries != NULL)
++			ctx->parse_next_block = parse_next_body_to_boundary;
++		else
++			ctx->parse_next_block = parse_next_body_to_eof;
++	}
+ 
+ 	ctx->want_count = 1;
+ 
+@@ -1100,6 +1123,8 @@ message_parser_init_int(struct istream *input,
+ 	ctx = i_new(struct message_parser_ctx, 1);
+ 	ctx->hdr_flags = hdr_flags;
+ 	ctx->flags = flags;
++	ctx->max_nested_mime_parts =
++		MESSAGE_PARSER_DEFAULT_MAX_NESTED_MIME_PARTS;
+ 	ctx->input = input;
+ 	i_stream_ref(input);
+ 	return ctx;
+@@ -1159,6 +1184,10 @@ int message_parser_deinit_from_parts(struct message_parser_ctx **_ctx,
+ 	if (ctx->hdr_parser_ctx != NULL)
+ 		message_parse_header_deinit(&ctx->hdr_parser_ctx);
+ 	boundary_remove_until(ctx, NULL);
++	/* caller might have stopped the parsing early */
++	i_assert(ctx->nested_parts_count == 0 ||
++		 i_stream_have_bytes_left(ctx->input));
++
+ 	i_stream_unref(&ctx->input);
+ 	if (array_is_created(&ctx->next_part_stack))
+ 		array_free(&ctx->next_part_stack);
+diff --git a/src/lib-mail/test-message-parser.c b/src/lib-mail/test-message-parser.c
+index 94aa3eb7c..481d05942 100644
+--- a/src/lib-mail/test-message-parser.c
++++ b/src/lib-mail/test-message-parser.c
+@@ -166,6 +166,36 @@ static void test_message_parser_small_blocks(void)
+ 	test_end();
+ }
+ 
++static void test_message_parser_stop_early(void)
++{
++	struct message_parser_ctx *parser;
++	struct istream *input;
++	struct message_part *parts;
++	struct message_block block;
++	unsigned int i;
++	pool_t pool;
++	int ret;
++
++	test_begin("message parser stop early");
++	pool = pool_alloconly_create("message parser", 10240);
++	input = test_istream_create(test_msg);
++
++	test_istream_set_allow_eof(input, FALSE);
++	for (i = 1; i <= TEST_MSG_LEN+1; i++) {
++		i_stream_seek(input, 0);
++		test_istream_set_size(input, i);
++		parser = message_parser_init(pool, input, 0, 0);
++		while ((ret = message_parser_parse_next_block(parser,
++							      &block)) > 0) ;
++		test_assert(ret == 0);
++		message_parser_deinit(&parser, &parts);
++	}
++
++	i_stream_unref(&input);
++	pool_unref(&pool);
++	test_end();
++}
++
+ static void test_message_parser_truncated_mime_headers(void)
+ {
+ static const char input_msg[] =
+@@ -740,6 +770,7 @@ int main(void)
+ {
+ 	static void (*test_functions[])(void) = {
+ 		test_message_parser_small_blocks,
++		test_message_parser_stop_early,
+ 		test_message_parser_truncated_mime_headers,
+ 		test_message_parser_truncated_mime_headers2,
+ 		test_message_parser_truncated_mime_headers3,
+-- 
+2.11.0
+

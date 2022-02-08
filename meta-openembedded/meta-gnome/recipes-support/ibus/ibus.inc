@@ -10,7 +10,7 @@ PV = "1.5.22"
 DEPENDS = "unicode-ucd"
 
 SRC_URI = " \
-    git://github.com/ibus/ibus.git \
+    git://github.com/ibus/ibus.git;branch=master;protocol=https \
     file://0001-Do-not-try-to-start-dbus-we-do-not-have-dbus-lauch.patch \
 "
 SRCREV = "e3262f08b9e3efc57808700823b0622ec03a1b5f"

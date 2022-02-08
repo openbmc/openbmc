@@ -9,7 +9,7 @@ S = "${WORKDIR}/git"
 SRCREV = "5649050d201856bf06c8738b5d2aa1710c86ac2f"
 PV = "1.1.5"
 SRC_URI = " \
-    git://github.com/smuellerDD/libkcapi.git \
+    git://github.com/smuellerDD/libkcapi.git;branch=master;protocol=https \
     file://0001-kcapi-kdf-Move-code-to-fix.patch \
     file://0001-Use-__builtin_bswap32-on-Clang-if-supported.patch \
 "

@@ -6,7 +6,7 @@ SRCREV = "efae8949e31f8b2eb6290f377a28384cecaf105a"
 PV = "0.0.5+git${SRCPV}"
 
 SRC_URI = " \
-    git://git.netfilter.org/arptables \
+    git://git.netfilter.org/arptables;branch=master \
     file://0001-Use-ARPCFLAGS-for-package-specific-compiler-flags.patch \
     file://arptables-arpt-get-target-fix.patch \
     file://arptables.service \

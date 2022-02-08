@@ -12,7 +12,7 @@ DEPENDS = "libplist usbmuxd libusbmuxd libtasn1 gnutls libgcrypt"
 SRCREV = "fb71aeef10488ed7b0e60a1c8a553193301428c0"
 PV = "1.2.0+git${SRCPV}"
 SRC_URI = "\
-    git://github.com/libimobiledevice/libimobiledevice;protocol=https \
+    git://github.com/libimobiledevice/libimobiledevice;protocol=https;branch=master \
     file://configure-fix-largefile.patch \
 "
 

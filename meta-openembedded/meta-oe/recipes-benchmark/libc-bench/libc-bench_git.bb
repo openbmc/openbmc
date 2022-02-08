@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=9a825c63897c53f487ef900598c31527"
 SRCREV = "b6b2ce5f9f87a09b14499cb00c600c601f022634"
 PV = "20110206+git${SRCPV}"
 
-SRC_URI = "git://git.musl-libc.org/libc-bench \
+SRC_URI = "git://git.musl-libc.org/libc-bench;branch=master \
            "
 
 S = "${WORKDIR}/git"

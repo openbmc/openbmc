@@ -19,11 +19,10 @@ SRC_URI[sha256sum] = "41bd1c75a375b85c337b59783f5deb93dbb443fb0a52d257f403df7bd6
 
 UPSTREAM_CHECK_URI = "https://github.com/rockdaboot/libpsl/releases"
 
-DEPENDS = "libidn2"
-
 inherit autotools gettext gtk-doc manpages pkgconfig lib_package
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ?= "idn2"
 PACKAGECONFIG[manpages] = "--enable-man,--disable-man,libxslt-native"
-
+PACKAGECONFIG[icu] = "--enable-runtime=libicu --enable-builtin=libicu,,icu"
+PACKAGECONFIG[idn2] = "--enable-runtime=libidn2 --enable-builtin=libidn2,,libidn2 libunistring"
 BBCLASSEXTEND = "native nativesdk"

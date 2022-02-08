@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=628b867016631792781a8735a04760e5 \
 DEPENDS = "fuse virtual/libusb0"
 # v3.2p3
 SRCREV = "3744375dfaa350e31c9b360eb1e1a517bbeb5c47"
-SRC_URI = "git://github.com/owfs/owfs \
+SRC_URI = "git://github.com/owfs/owfs;branch=master;protocol=https \
            file://0001-Add-build-rule-for-README.patch \
            file://owhttpd \
            file://owserver \

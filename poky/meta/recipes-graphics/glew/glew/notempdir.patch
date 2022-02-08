@@ -1,0 +1,19 @@
+We don't use the dist-* targets and hence DIST_DIR isn't used. The current code
+creates a new temp directory in /tmp/ for every invocation of make. Lets
+not do that.
+
+Upstream-Status: Pending [a revised version would be needed for upstream]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: glew-2.2.0/Makefile
+===================================================================
+--- glew-2.2.0.orig/Makefile
++++ glew-2.2.0/Makefile
+@@ -56,7 +56,6 @@ DIST_SRC_ZIP ?= $(shell pwd)/$(DIST_NAME
+ DIST_SRC_TGZ ?= $(shell pwd)/$(DIST_NAME).tgz
+ DIST_WIN32   ?= $(shell pwd)/$(DIST_NAME)-win32.zip
+ 
+-DIST_DIR := $(shell mktemp -d /tmp/glew.XXXXXX)/$(DIST_NAME)
+ 
+ # To disable stripping of linked binaries either:
+ #   - use STRIP= on gmake command-line

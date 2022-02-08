@@ -18,11 +18,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/doveadm/Makefile.am | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/doveadm/Makefile.am b/src/doveadm/Makefile.am
-index c644646..6ae9144 100644
---- a/src/doveadm/Makefile.am
-+++ b/src/doveadm/Makefile.am
-@@ -180,8 +180,8 @@ test_libs = \
+Index: dovecot-2.2.36.4/src/doveadm/Makefile.am
+===================================================================
+--- dovecot-2.2.36.4.orig/src/doveadm/Makefile.am
++++ dovecot-2.2.36.4/src/doveadm/Makefile.am
+@@ -182,8 +182,8 @@ test_libs = \
  	../lib/liblib.la
  test_deps = $(noinst_LTLIBRARIES) $(test_libs)
  
@@ -33,6 +33,3 @@ index c644646..6ae9144 100644
  test_doveadm_util_DEPENDENCIES = $(test_deps)
  
  check: check-am check-test
--- 
-2.14.2
-

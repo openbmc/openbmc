@@ -20,7 +20,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=416ef1ca5167707fe381d7be33664a33"
 DEPENDS = "curl-native icu"
 
 SRCREV = "67e43bf0fa56008276b878ec3790aa5f32eb2a16"
-SRC_URI = "git://github.com/MycroftAI/mimic.git"
+SRC_URI = "git://github.com/MycroftAI/mimic.git;branch=master;protocol=https"
 
 inherit autotools
 

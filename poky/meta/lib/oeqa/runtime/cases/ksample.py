@@ -10,7 +10,7 @@ from oeqa.core.decorator.depends import OETestDepends
 from oeqa.core.decorator.data import skipIfNotFeature
 
 # need some kernel fragments
-# echo "KERNEL_FEATURES_append += \" features\/kernel\-sample\/kernel\-sample.scc\"" >> local.conf
+# echo "KERNEL_FEATURES_append = \" features\/kernel\-sample\/kernel\-sample.scc\"" >> local.conf
 class KSample(OERuntimeTestCase):
     def cmd_and_check(self, cmd='', match_string=''):
         status, output = self.target.run(cmd)

@@ -7,7 +7,7 @@ PV = "1.4.7+git${SRCPV}"
 # Exclude x.99.x versions from upstream checks
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>^\d+(\.(?!99)\d+)+)"
 
-SRC_URI = "git://github.com/clutter-project/mx.git;branch=mx-1.4 \
+SRC_URI = "git://github.com/clutter-project/mx.git;branch=mx-1.4;protocol=https \
 	   file://fix-test-includes.patch \
 	  "
 S = "${WORKDIR}/git"

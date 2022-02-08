@@ -8,9 +8,9 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=dcf473723faabf17baa9b5f2207599d0 \
 SRCREV_glm = "1ad55c5016339b83b7eec98c31007e0aee57d2bf"
 SRCREV_gli = "7da5f50931225e9819a26d5cb323c5f42da50bcd"
 
-SRC_URI = "git://github.com/SaschaWillems/Vulkan.git \
-           git://github.com/g-truc/glm;destsuffix=git/external/glm;name=glm \
-           git://github.com/g-truc/gli;destsuffix=git/external/gli;name=gli \
+SRC_URI = "git://github.com/SaschaWillems/Vulkan.git;branch=master;protocol=https \
+           git://github.com/g-truc/glm;destsuffix=git/external/glm;name=glm;branch=master;protocol=https \
+           git://github.com/g-truc/gli;destsuffix=git/external/gli;name=gli;branch=master;protocol=https \
            file://0001-Don-t-build-demos-with-questionably-licensed-data.patch \
            "
 UPSTREAM_CHECK_COMMITS = "1"

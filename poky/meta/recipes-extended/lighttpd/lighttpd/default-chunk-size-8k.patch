@@ -1,0 +1,35 @@
+From 2e08ee1d404e308f15551277e92b7605ddfa96a8 Mon Sep 17 00:00:00 2001
+From: Glenn Strauss <gstrauss@gluelogic.com>
+Date: Fri, 29 Nov 2019 18:18:52 -0500
+Subject: [PATCH] default chunk size 8k (was 4k)
+
+Upstream-Status: Backport
+Comment: No hunk refreshed
+https://git.lighttpd.net/lighttpd/lighttpd1.4/commit/304e46d4f808c46cbb025edfacf2913a30ce8855
+Signed-off-by: Purushottam Choudhary <Purushottam.Choudhary@kpit.com>
+---
+ src/chunk.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/chunk.c b/src/chunk.c
+index 09dd3f1..133308f 100644
+--- a/src/chunk.c
++++ b/src/chunk.c
+@@ -25,7 +25,7 @@
+ #define DEFAULT_TEMPFILE_SIZE (1 * 1024 * 1024)
+ #define MAX_TEMPFILE_SIZE (128 * 1024 * 1024)
+ 
+-static size_t chunk_buf_sz = 4096;
++static size_t chunk_buf_sz = 8192;
+ static chunk *chunks, *chunks_oversized;
+ static chunk *chunk_buffers;
+ static array *chunkqueue_default_tempdirs = NULL;
+@@ -33,7 +33,7 @@ static off_t chunkqueue_default_tempfile_size = DEFAULT_TEMPFILE_SIZE;
+ 
+ void chunkqueue_set_chunk_size (size_t sz)
+ {
+-    chunk_buf_sz = sz > 0 ? ((sz + 1023) & ~1023uL) : 4096;
++    chunk_buf_sz = sz > 0 ? ((sz + 1023) & ~1023uL) : 8192;
+ }
+ 
+ void chunkqueue_set_tempdirs_default_reset (void)

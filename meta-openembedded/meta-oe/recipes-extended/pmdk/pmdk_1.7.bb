@@ -11,7 +11,7 @@ DEPENDS_append_libc-musl = " fts"
 
 S = "${WORKDIR}/git"
 
-SRC_URI = "git://github.com/pmem/pmdk.git \
+SRC_URI = "git://github.com/pmem/pmdk.git;branch=master;protocol=https \
            file://0001-jemalloc-jemalloc.cfg-Specify-the-host-when-building.patch \
            file://0002-Makefile-Don-t-install-the-docs.patch \
            file://0001-os_posix-Use-__FreeBSD__-to-control-secure_getenv-de.patch \

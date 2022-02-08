@@ -1,0 +1,50 @@
+From 929396767d831bedbdec6392aaa835b045332fd3 Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 23 Apr 2020 14:53:27 +0300
+Subject: [PATCH 08/13] lib-mail: message-parser - Add boundary_remove_until()
+ helper function
+
+---
+ src/lib-mail/message-parser.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index c2934c761..028f74159 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -223,6 +223,13 @@ static void message_part_finish(struct message_parser_ctx *ctx)
+ 	ctx->part = ctx->part->parent;
+ }
+ 
++static void
++boundary_remove_until(struct message_parser_ctx *ctx,
++		      struct message_boundary *boundary)
++{
++	ctx->boundaries = boundary;
++}
++
+ static void parse_next_body_multipart_init(struct message_parser_ctx *ctx)
+ {
+ 	struct message_boundary *b;
+@@ -364,10 +371,10 @@ static int parse_part_finish(struct message_parser_ctx *ctx,
+ 
+ 	if (boundary->epilogue_found) {
+ 		/* this boundary isn't needed anymore */
+-		ctx->boundaries = boundary->next;
++		boundary_remove_until(ctx, boundary->next);
+ 	} else {
+ 		/* forget about the boundaries we possibly skipped */
+-		ctx->boundaries = boundary;
++		boundary_remove_until(ctx, boundary);
+ 	}
+ 
+ 	/* the boundary itself should already be in buffer. add that. */
+-- 
+2.11.0
+

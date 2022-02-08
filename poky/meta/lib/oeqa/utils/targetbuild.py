@@ -19,6 +19,7 @@ class BuildProject(metaclass=ABCMeta):
         self.d = d
         self.uri = uri
         self.archive = os.path.basename(uri)
+        self.tempdirobj = None
         if not tmpdir:
             tmpdir = self.d.getVar('WORKDIR')
             if not tmpdir:
@@ -71,9 +72,10 @@ class BuildProject(metaclass=ABCMeta):
         return self._run('cd %s; make install %s' % (self.targetdir, install_args))
 
     def clean(self):
+        if self.tempdirobj:
+            self.tempdirobj.cleanup()
         self._run('rm -rf %s' % self.targetdir)
         subprocess.check_call('rm -f %s' % self.localarchive, shell=True)
-        pass
 
 class TargetBuildProject(BuildProject):
 

@@ -20,6 +20,7 @@ SRC_URI = "https://www.webkitgtk.org/releases/${BPN}-${PV}.tar.xz \
            file://0001-Fix-build-with-musl.patch \
            file://include_array.patch \
            file://0001-clang-11-fix-build-errors-due-to-WWc-11-narrowing.patch \
+           file://0001-MiniBrowser-Fix-reproduciblity.patch \
            "
 SRC_URI[sha256sum] = "821952e8c9303ed752f1fb1d4283f612c25249d00d705d2b79c2db1bc49c9464"
 

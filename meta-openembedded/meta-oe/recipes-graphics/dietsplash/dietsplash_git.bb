@@ -8,7 +8,7 @@ PV = "0.3"
 PR = "r1"
 
 SRCREV = "ef2e1a390e768e21e6a6268977580ee129a96633"
-SRC_URI = "git://github.com/lucasdemarchi/dietsplash.git \
+SRC_URI = "git://github.com/lucasdemarchi/dietsplash.git;branch=master;protocol=https \
            file://0001-configure.ac-Do-not-demand-linker-hash-style.patch \
            "
 

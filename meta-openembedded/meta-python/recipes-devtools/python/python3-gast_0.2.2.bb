@@ -4,7 +4,7 @@ SECTION = "devel/python"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a3ad9b6802e713fc5e307e1230f1ea90"
 
-SRC_URI = "git://github.com/serge-sans-paille/gast.git"
+SRC_URI = "git://github.com/serge-sans-paille/gast.git;branch=master;protocol=https"
 SRCREV ?= "ed82e2a507505c6b18eb665d3738b6c0602da5e7"
 
 inherit setuptools3

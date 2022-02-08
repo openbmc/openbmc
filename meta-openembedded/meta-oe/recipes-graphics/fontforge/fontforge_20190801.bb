@@ -15,7 +15,7 @@ REQUIRED_DISTRO_FEATURES_append_class-target = " x11"
 
 # tag 20190801
 SRCREV = "ac635b818e38ddb8e7e2e1057330a32b4e25476e"
-SRC_URI = "git://github.com/${BPN}/${BPN}.git \
+SRC_URI = "git://github.com/${BPN}/${BPN}.git;branch=master;protocol=https \
            file://0001-include-sys-select-on-non-glibc-platforms.patch \
 "
 S = "${WORKDIR}/git"

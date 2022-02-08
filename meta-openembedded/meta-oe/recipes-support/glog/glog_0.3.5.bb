@@ -7,7 +7,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=dc9db360e0bbd4e46672f3fd91dd6c4b"
 
 SRC_URI = " \
-    git://github.com/google/glog.git;nobranch=1 \
+    git://github.com/google/glog.git;nobranch=1;protocol=https \
     file://0001-Rework-CMake-glog-VERSION-management.patch \
     file://0002-Find-Libunwind-during-configure.patch \
     file://0003-installation-path-fix.patch \

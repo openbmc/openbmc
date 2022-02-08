@@ -10,4 +10,5 @@ SRC_URI += "\
     file://CVE-2020-25685-2.patch \
     file://CVE-2020-25686-1.patch \
     file://CVE-2020-25686-2.patch \
+    file://CVE-2021-3448.patch \
 "

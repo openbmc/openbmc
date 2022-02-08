@@ -17,7 +17,7 @@ DEPENDS += " \
 "
 
 SRC_URI = " \
-    git://github.com/MusicPlayerDaemon/MPD;branch=v0.20.x \
+    git://github.com/MusicPlayerDaemon/MPD;branch=v0.20.x;protocol=https \
     file://mpd.conf.in \
     file://0001-StringBuffer-Include-cstddef-for-size_t.patch \
     file://0002-Include-stdexcept-for-runtime_error.patch \

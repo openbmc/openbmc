@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=c648878b4840d7babaade1303e7f108c"
 DEPENDS = "libpng tiff lcms zlib"
 
 SRC_URI = " \
-    git://github.com/uclouvain/openjpeg.git \
+    git://github.com/uclouvain/openjpeg.git;branch=master;protocol=https \
     file://0002-Do-not-ask-cmake-to-export-binaries-they-don-t-make-.patch \
     file://CVE-2020-6851.patch \
     file://CVE-2020-8112.patch \

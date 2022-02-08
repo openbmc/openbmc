@@ -331,22 +331,19 @@ file as a patch file:
        file://file;apply=yes \
        "
 
-Conversely, if you have a directory full of patch files and you want to
-exclude some so that the ``do_patch`` task does not apply them during
-the patch phase, you can use the "apply=no" parameter with the
-``SRC_URI`` statement:
-::
+Conversely, if you have a file whose file type is ``.patch`` or ``.diff``
+and you want to exclude it so that the ``do_patch`` task does not apply
+it during the patch phase, you can use the "apply=no" parameter with the
+:term:`SRC_URI` statement::
 
    SRC_URI = " \
        git://path_to_repo/some_package \
-       file://path_to_lots_of_patch_files \
-       file://path_to_lots_of_patch_files/patch_file5;apply=no \
+       file://file1.patch \
+       file://file2.patch;apply=no \
        "
 
-In the
-previous example, assuming all the files in the directory holding the
-patch files end with either ``.patch`` or ``.diff``, every file would be
-applied as a patch by default except for the ``patch_file5`` patch.
+In the previous example ``file1.patch`` would be applied as a patch by default
+while ``file2.patch`` would not be applied.
 
 You can find out more about the patching process in the
 ":ref:`patching-dev-environment`" section in

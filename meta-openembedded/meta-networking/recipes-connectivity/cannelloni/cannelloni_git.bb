@@ -2,7 +2,7 @@ SUMMARY = "a SocketCAN over Ethernet tunnel"
 HOMEPAGE = "https://github.com/mguentner/cannelloni"
 LICENSE = "GPLv2"
 
-SRC_URI = "git://github.com/mguentner/cannelloni.git;protocol=https \
+SRC_URI = "git://github.com/mguentner/cannelloni.git;protocol=https;branch=master \
            file://0001-Use-GNUInstallDirs-instead-of-hard-coding-paths.patch \
            file://0002-include-missing-stdexcept-for-runtime_error.patch \
           "

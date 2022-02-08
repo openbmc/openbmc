@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://COPYING.lgpl-3;md5=e6a600fd5e1d9cbde2d983680233ad02 \
     file://COPYING.lgpl-2.1;md5=4fbd65380cdd255951079008b364516c \
 "
 
-SRC_URI = "git://github.com/libyui/libyui-ncurses.git \
+SRC_URI = "git://github.com/libyui/libyui-ncurses.git;branch=master;protocol=https \
            file://0003-Simplify-ncurses-finding-module.patch \
           "
 

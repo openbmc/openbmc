@@ -9,7 +9,7 @@ HOMEPAGE = "https://github.com/libguestfs/nbdkit"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4332a97808994cf2133a65b6c6f33eaf"
 
-SRC_URI = "git://github.com/libguestfs/nbdkit.git;protocol=https \
+SRC_URI = "git://github.com/libguestfs/nbdkit.git;protocol=https;branch=master \
            file://0001-server-Fix-build-when-printf-is-a-macro.patch \
 "
 

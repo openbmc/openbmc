@@ -2,7 +2,7 @@ SUMMARY = "A library full of GTK+ widgets for mobile phones"
 LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
-SRC_URI = "git://source.puri.sm/Librem5/${BPN}.git;protocol=https"
+SRC_URI = "git://source.puri.sm/Librem5/${BPN}.git;protocol=https;branch=master"
 SRCREV = "ef7c4bf75ae239495141ada83d2fbaf034315563"
 S = "${WORKDIR}/git"
 PV = "0.0.12"

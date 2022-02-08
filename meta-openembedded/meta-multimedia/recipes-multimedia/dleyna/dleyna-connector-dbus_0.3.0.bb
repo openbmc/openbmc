@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 
 DEPENDS = "glib-2.0 dbus dleyna-core"
 
-SRC_URI = "git://github.com/01org/${BPN}.git"
+SRC_URI = "git://github.com/01org/${BPN}.git;branch=master;protocol=https"
 SRCREV = "de913c35e5c936e2d40ddbd276ee902cd802bd3a"
 S = "${WORKDIR}/git"
 

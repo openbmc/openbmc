@@ -18,7 +18,7 @@ JIT_riscv32 = ""
 DEPENDS += "lua${JIT} zlib c-ares grpc-native grpc curl ncurses jsoncpp tbb jq openssl elfutils protobuf protobuf-native jq-native"
 RDEPENDS_${PN} = "bash"
 
-SRC_URI = "git://github.com/draios/sysdig.git;branch=dev \
+SRC_URI = "git://github.com/draios/sysdig.git;branch=dev;protocol=https \
            file://0001-fix-build-with-LuaJIT-2.1-betas.patch \
            file://0001-Fix-build-with-musl-backtrace-APIs-are-glibc-specifi.patch \
            file://fix-uint64-const.patch \

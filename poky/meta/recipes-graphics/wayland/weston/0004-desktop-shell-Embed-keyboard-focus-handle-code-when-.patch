@@ -1,0 +1,99 @@
+From 899ad5a6a8a92f2c10e0694a45c982b7d878aed6 Mon Sep 17 00:00:00 2001
+From: Marius Vlad <marius.vlad@collabora.com>
+Date: Fri, 5 Mar 2021 21:44:26 +0200
+Subject: [PATCH 4/5] desktop-shell: Embed keyboard focus handle code when
+ activating
+
+We shouldn't be constrained by having a keyboard plugged-in, so avoid
+activating/de-activating the window/surface in the keyboard focus
+handler and embed it straight into the window activation part.
+
+Upstream-Status: Backport [f12697bb3e4c6eb85437ed905e7de44ae2a0ba69]
+Signed-off-by: Marius Vlad <marius.vlad@collabora.com>
+---
+ desktop-shell/shell.c | 41 +++++++++++++++++++++++++----------------
+ 1 file changed, 25 insertions(+), 16 deletions(-)
+
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index c4669f11..c6a4fe91 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -1885,22 +1885,7 @@ shell_surface_activate(struct shell_surface *shsurf)
+ static void
+ handle_keyboard_focus(struct wl_listener *listener, void *data)
+ {
+-	struct weston_keyboard *keyboard = data;
+-	struct shell_seat *seat = get_shell_seat(keyboard->seat);
+-
+-	if (seat->focused_surface) {
+-		struct shell_surface *shsurf = get_shell_surface(seat->focused_surface);
+-		if (shsurf)
+-			shell_surface_deactivate(shsurf);
+-	}
+-
+-	seat->focused_surface = weston_surface_get_main_surface(keyboard->focus);
+-
+-	if (seat->focused_surface) {
+-		struct shell_surface *shsurf = get_shell_surface(seat->focused_surface);
+-		if (shsurf)
+-			shell_surface_activate(shsurf);
+-	}
++	/* FIXME: To be removed later. */
+ }
+ 
+ /* The surface will be inserted into the list immediately after the link
+@@ -2438,6 +2423,7 @@ desktop_surface_removed(struct weston_desktop_surface *desktop_surface,
+ 	struct shell_surface *shsurf_child, *tmp;
+ 	struct weston_surface *surface =
+ 		weston_desktop_surface_get_surface(desktop_surface);
++	struct weston_seat *seat;
+ 
+ 	if (!shsurf)
+ 		return;
+@@ -2448,6 +2434,18 @@ desktop_surface_removed(struct weston_desktop_surface *desktop_surface,
+ 	}
+ 	wl_list_remove(&shsurf->children_link);
+ 
++	wl_list_for_each(seat, &shsurf->shell->compositor->seat_list, link) {
++		struct shell_seat *shseat = get_shell_seat(seat);
++		/* activate() controls the focused surface activation and
++		 * removal of a surface requires invalidating the
++		 * focused_surface to avoid activate() use a stale (and just
++		 * removed) surface when attempting to de-activate it. It will
++		 * also update the focused_surface once it has a chance to run.
++		 */
++		if (surface == shseat->focused_surface)
++			shseat->focused_surface = NULL;
++	}
++
+ 	wl_signal_emit(&shsurf->destroy_signal, shsurf);
+ 
+ 	if (shsurf->fullscreen.black_view)
+@@ -3836,6 +3834,7 @@ activate(struct desktop_shell *shell, struct weston_view *view,
+ 	struct workspace *ws;
+ 	struct weston_surface *old_es;
+ 	struct shell_surface *shsurf, *shsurf_child;
++	struct shell_seat *shseat = get_shell_seat(seat);
+ 
+ 	main_surface = weston_surface_get_main_surface(es);
+ 	shsurf = get_shell_surface(main_surface);
+@@ -3855,6 +3854,16 @@ activate(struct desktop_shell *shell, struct weston_view *view,
+ 
+ 	weston_view_activate(view, seat, flags);
+ 
++	if (shseat->focused_surface) {
++		struct shell_surface *current_focus =
++			get_shell_surface(shseat->focused_surface);
++		assert(current_focus);
++		shell_surface_deactivate(current_focus);
++	}
++
++	shseat->focused_surface = main_surface;
++	shell_surface_activate(shsurf);
++
+ 	state = ensure_focus_state(shell, seat);
+ 	if (state == NULL)
+ 		return;
+-- 
+2.34.1
+

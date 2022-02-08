@@ -14,7 +14,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fa2a23dd1dc6c139f35105379d76df2b"
 
 SRCREV = "d2e6a971f4544c55b8e3b25cf96db266971b778f"
-SRC_URI = "git://github.com/open-source-parsers/jsoncpp"
+SRC_URI = "git://github.com/open-source-parsers/jsoncpp;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

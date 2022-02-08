@@ -1,0 +1,42 @@
+From 44d2d6095246124c024230f89c1029794491839f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Fri, 30 Oct 2020 15:10:35 +0100
+Subject: [PATCH] Properly detect and compare Python version 3.10+ (#151)
+
+Upstream commit: https://github.com/asciidoc-py/asciidoc-py/commit/44d2d6095246124c024230f89c1029794491839f
+
+Slightly modified to cleanly apply to asciidoc 8.6.9:
+- VERSION and MIN_PYTHON_VERSION changed to reflect values in 8.6.9
+- line numbers corrected to eliminate offset warnings
+
+Upstream-Status: Backport
+Signed-off-by: Steve Sakoman <steve@sakoman.com>
+
+---
+ asciidoc.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/asciidoc.py b/asciidoc.py
+index f960e7d8..42868c4b 100755
+--- a/asciidoc.py
++++ b/asciidoc.py
+@@ -30,7 +30,7 @@
+ # Used by asciidocapi.py #
+ VERSION = '8.6.10'           # See CHANGELOG file for version history.
+ 
+-MIN_PYTHON_VERSION = '3.4'  # Require this version of Python or better.
++MIN_PYTHON_VERSION = (3, 4)  # Require this version of Python or better.
+ 
+ # ---------------------------------------------------------------------------
+ # Program constants.
+@@ -4704,8 +4704,8 @@ def init(self, cmd):
+         directory.
+         cmd is the asciidoc command or asciidoc.py path.
+         """
+-        if float(sys.version[:3]) < float(MIN_PYTHON_VERSION):
+-            message.stderr('FAILED: Python %s or better required' % MIN_PYTHON_VERSION)
++        if sys.version_info[:2] < MIN_PYTHON_VERSION:
++            message.stderr('FAILED: Python %d.%d or better required' % MIN_PYTHON_VERSION)
+             sys.exit(1)
+         if not os.path.exists(cmd):
+             message.stderr('FAILED: Missing asciidoc command: %s' % cmd)

@@ -10,7 +10,7 @@ PV = "049"
 
 # v048 tag
 SRCREV = "225e4b94cbdb702cf512490dcd2ad9ca5f5b22c1"
-SRC_URI = "git://git.kernel.org/pub/scm/boot/dracut/dracut.git;protocol=http \
+SRC_URI = "git://git.kernel.org/pub/scm/boot/dracut/dracut.git;protocol=http;branch=master \
            file://0001-util.h-include-sys-reg.h-when-libc-glibc.patch \
            file://0001-dracut.sh-improve-udevdir.patch \
            file://0001-set-viriable-_drv-not-local.patch \

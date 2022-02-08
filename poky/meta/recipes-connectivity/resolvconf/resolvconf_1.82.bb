@@ -11,7 +11,7 @@ AUTHOR = "Thomas Hood"
 HOMEPAGE = "http://packages.debian.org/resolvconf"
 RDEPENDS_${PN} = "bash"
 
-SRC_URI = "git://salsa.debian.org/debian/resolvconf.git;protocol=https \
+SRC_URI = "git://salsa.debian.org/debian/resolvconf.git;protocol=https;branch=master \
            file://fix-path-for-busybox.patch \
            file://99_resolvconf \
           "

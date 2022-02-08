@@ -120,6 +120,7 @@ drd/tests/tc19_shadowmem
 drd/tests/tc21_pthonce
 drd/tests/tc22_exit_w_lock
 drd/tests/tc23_bogus_condwait
+gdbserver_tests/hginfo
 helgrind/tests/annotate_rwlock
 helgrind/tests/annotate_smart_pointer
 helgrind/tests/bar_bad

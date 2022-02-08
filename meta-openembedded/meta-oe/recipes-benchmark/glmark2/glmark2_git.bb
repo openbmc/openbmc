@@ -14,7 +14,7 @@ PV = "20191226+${SRCPV}"
 
 COMPATIBLE_HOST_rpi  = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '.*-linux*', 'null', d)}"
 
-SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https \
+SRC_URI = "git://github.com/glmark2/glmark2.git;protocol=https;branch=master \
            file://python3.patch"
 SRCREV = "72dabc5d72b49c6d45badeb8a941ba4d829b0bd6"
 

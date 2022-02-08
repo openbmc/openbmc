@@ -1,0 +1,45 @@
+From e39c95b248917eb2b596ca55a957f3cbc7fd406f Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 23 Apr 2020 12:10:07 +0300
+Subject: [PATCH 05/13] lib-mail: message-parser - Minor code cleanup to
+ finding the end of boundary line
+
+---
+ src/lib-mail/message-parser.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index ff4e09e5a..6c6a680b5 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -260,17 +260,16 @@ boundary_line_find(struct message_parser_ctx *ctx,
+ 	}
+ 
+ 	/* need to find the end of line */
+-	if (memchr(data + 2, '\n', size - 2) == NULL &&
+-	    size < BOUNDARY_END_MAX_LEN &&
++	data += 2;
++	size -= 2;
++	if (memchr(data, '\n', size) == NULL &&
++	    size+2 < BOUNDARY_END_MAX_LEN &&
+ 	    !ctx->input->eof && !full) {
+ 		/* no LF found */
+ 		ctx->want_count = BOUNDARY_END_MAX_LEN;
+ 		return 0;
+ 	}
+ 
+-	data += 2;
+-	size -= 2;
+-
+ 	*boundary_r = boundary_find(ctx->boundaries, data, size);
+ 	if (*boundary_r == NULL)
+ 		return -1;
+-- 
+2.11.0
+

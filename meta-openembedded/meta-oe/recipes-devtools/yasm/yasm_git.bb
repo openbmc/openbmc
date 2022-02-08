@@ -9,7 +9,7 @@ DEPENDS += "flex-native bison-native xmlto-native"
 PV = "1.3.0+git${SRCPV}"
 # v1.3.0
 SRCREV = "ba463d3c26c0ece2e797b8d6381b161633b5971a"
-SRC_URI = "git://github.com/yasm/yasm.git"
+SRC_URI = "git://github.com/yasm/yasm.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

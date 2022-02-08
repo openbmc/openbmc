@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://src/thttpd.c;beginline=1;endline=26;md5=0c5762c2c34dc
 DEPENDS += "base-passwd virtual/crypt"
 
 SRCREV = "2845bf5bff2b820d2336c8c8061cbfc5f271e720"
-SRC_URI = "git://github.com/blueness/${BPN} \
+SRC_URI = "git://github.com/blueness/${BPN};branch=master;protocol=https \
            file://thttpd.service \
            file://thttpd.conf \
            file://init"

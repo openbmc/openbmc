@@ -44,7 +44,7 @@ FILES_libvncclient = "${libdir}/libvncclient.*"
 
 inherit cmake
 
-SRC_URI = "git://github.com/LibVNC/libvncserver"
+SRC_URI = "git://github.com/LibVNC/libvncserver;branch=master;protocol=https"
 SRCREV = "1354f7f1bb6962dab209eddb9d6aac1f03408110"
 PV .= "+git${SRCPV}"
 

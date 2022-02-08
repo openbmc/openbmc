@@ -67,6 +67,17 @@ SRC_URI =  "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0028-inject-file-assembly-directives.patch \
            file://0029-locale-prevent-maybe-uninitialized-errors-with-Os-BZ.patch \
            file://CVE-2020-29573.patch \
+           file://CVE-2021-33574_1.patch \
+           file://CVE-2021-33574_2.patch \
+           file://CVE-2021-38604.patch \
+           file://0030-elf-Refactor_dl_update-slotinfo-to-avoid-use-after-free.patch \
+           file://0031-elf-Fix-data-races-in-pthread_create-and-TLS-access-BZ-19329.patch \
+           file://0032-elf-Use-relaxed-atomics-for-racy-accesses-BZ-19329.patch \
+           file://0033-elf-Add-test-case-for-BZ-19329.patch \
+           file://0034-elf-Fix-DTV-gap-reuse-logic-BZ-27135.patch \
+           file://0035-x86_64-Avoid-lazy-relocation-of-tlsdesc-BZ-27137.patch \
+           file://0036-i386-Avoid-lazy-relocation-of-tlsdesc-BZ-27137.patch \
+           file://0037-Avoid-deadlock-between-pthread_create-and-ctors.patch \
            "
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build-${TARGET_SYS}"

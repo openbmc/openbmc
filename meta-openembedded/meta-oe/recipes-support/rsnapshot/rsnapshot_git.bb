@@ -25,7 +25,7 @@ RDEPENDS_${PN} = "rsync \
 SRCREV = "a9e29850fc33c503c289e245c7bad350eed746d9"
 PV = "1.4.3+git${SRCPV}"
 
-SRC_URI = "git://github.com/DrHyde/${BPN};branch=master;protocol=git \
+SRC_URI = "git://github.com/DrHyde/${BPN};branch=master;protocol=https \
            file://configure-fix-cmd_rsync.patch \
           "
 

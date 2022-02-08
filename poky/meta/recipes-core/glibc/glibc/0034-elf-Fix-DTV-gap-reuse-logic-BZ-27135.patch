@@ -1,0 +1,180 @@
+From ba33937be210da5d07f7f01709323743f66011ce Mon Sep 17 00:00:00 2001
+From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Date: Fri, 25 Jun 2021 10:54:12 -0300
+Subject: [PATCH] elf: Fix DTV gap reuse logic (BZ #27135)
+
+This is updated version of the 572bd547d57a (reverted by 40ebfd016ad2)
+that fixes the _dl_next_tls_modid issues.
+
+This issue with 572bd547d57a patch is the DTV entry will be only
+update on dl_open_worker() with the update_tls_slotinfo() call after
+all dependencies are being processed by _dl_map_object_deps().  However
+_dl_map_object_deps() itself might call _dl_next_tls_modid(), and since
+the _dl_tls_dtv_slotinfo_list::map is not yet set the entry will be
+wrongly reused.
+
+This patch fixes by renaming the _dl_next_tls_modid() function to
+_dl_assign_tls_modid() and by passing the link_map so it can set
+the slotinfo value so a subsequente _dl_next_tls_modid() call will
+see the entry as allocated.
+
+The intermediary value is cleared up on remove_slotinfo() for the case
+a library fails to load with RTLD_NOW.
+
+This patch fixes BZ #27135.
+
+Checked on x86_64-linux-gnu.
+
+Reviewed-by: Szabolcs Nagy <szabolcs.nagy@arm.com>
+---
+ elf/dl-close.c             |   8 +-
+ elf/dl-load.c              |   2 +-
+ elf/dl-open.c              |  10 --
+ elf/dl-tls.c               |  17 +--
+ elf/rtld.c                 |   2 +-
+ sysdeps/generic/ldsodefs.h |   4 +-
+ 6 files changed, 349 insertions(+), 33 deletions(-)
+---
+Upstream-Status: Backport [https://sourceware.org/git/?p=glibc.git;a=patch;h=ba33937be210da5d07f7f01709323743f66011ce]
+Comment: Removed hunks those were related to test. Hunk from elf/rtld.c is refreshed.
+Signed-off-by: Akash Hadke <akash.hadke@kpit.com>
+Signed-off-by: Akash Hadke <hadkeakash4@gmail.com>
+---
+diff --git a/elf/dl-close.c b/elf/dl-close.c
+index 3720e47dd1..f39001cab9 100644
+--- a/elf/dl-close.c
++++ b/elf/dl-close.c
+@@ -77,8 +77,6 @@ remove_slotinfo (size_t idx, struct dtv_slotinfo_list *listp, size_t disp,
+ 	 object that wasn't fully set up.  */
+       if (__glibc_likely (old_map != NULL))
+ 	{
+-	  assert (old_map->l_tls_modid == idx);
+-
+ 	  /* Mark the entry as unused.  These can be read concurrently.  */
+ 	  atomic_store_relaxed (&listp->slotinfo[idx - disp].gen,
+ 				GL(dl_tls_generation) + 1);
+@@ -88,7 +86,11 @@ remove_slotinfo (size_t idx, struct dtv_slotinfo_list *listp, size_t disp,
+       /* If this is not the last currently used entry no need to look
+ 	 further.  */
+       if (idx != GL(dl_tls_max_dtv_idx))
+-	return true;
++	{
++	  /* There is an unused dtv entry in the middle.  */
++	  GL(dl_tls_dtv_gaps) = true;
++	  return true;
++	}
+     }
+ 
+   while (idx - disp > (disp == 0 ? 1 + GL(dl_tls_static_nelem) : 0))
+diff --git a/elf/dl-load.c b/elf/dl-load.c
+index a08df001af..650e4edc35 100644
+--- a/elf/dl-load.c
++++ b/elf/dl-load.c
+@@ -1498,7 +1498,7 @@ cannot enable executable stack as shared object requires");
+ 	     not set up TLS data structures, so don't use them now.  */
+ 	  || __glibc_likely (GL(dl_tls_dtv_slotinfo_list) != NULL)))
+     /* Assign the next available module ID.  */
+-    l->l_tls_modid = _dl_next_tls_modid ();
++    _dl_assign_tls_modid (l);
+ 
+ #ifdef DL_AFTER_LOAD
+   DL_AFTER_LOAD (l);
+diff --git a/elf/dl-open.c b/elf/dl-open.c
+index a066f39bd0..d2240d8747 100644
+--- a/elf/dl-open.c
++++ b/elf/dl-open.c
+@@ -899,16 +899,6 @@ no more namespaces available for dlmopen()"));
+ 	 state if relocation failed, for example.  */
+       if (args.map)
+ 	{
+-	  /* Maybe some of the modules which were loaded use TLS.
+-	     Since it will be removed in the following _dl_close call
+-	     we have to mark the dtv array as having gaps to fill the
+-	     holes.  This is a pessimistic assumption which won't hurt
+-	     if not true.  There is no need to do this when we are
+-	     loading the auditing DSOs since TLS has not yet been set
+-	     up.  */
+-	  if ((mode & __RTLD_AUDIT) == 0)
+-	    GL(dl_tls_dtv_gaps) = true;
+-
+ 	  _dl_close_worker (args.map, true);
+ 
+ 	  /* All l_nodelete_pending objects should have been deleted
+diff --git a/elf/dl-tls.c b/elf/dl-tls.c
+index 2b5161d10a..423e380f7c 100644
+--- a/elf/dl-tls.c
++++ b/elf/dl-tls.c
+@@ -126,8 +126,8 @@ oom (void)
+ }
+ 
+ 
+-size_t
+-_dl_next_tls_modid (void)
++void
++_dl_assign_tls_modid (struct link_map *l)
+ {
+   size_t result;
+ 
+@@ -157,7 +157,11 @@ _dl_next_tls_modid (void)
+ 	      }
+ 
+ 	    if (result - disp < runp->len)
+-	      break;
++	      {
++		/* Mark the entry as used, so any dependency see it.  */
++		atomic_store_relaxed (&runp->slotinfo[result - disp].map, l);
++		break;
++	      }
+ 
+ 	    disp += runp->len;
+ 	  }
+@@ -184,17 +188,14 @@ _dl_next_tls_modid (void)
+       atomic_store_relaxed (&GL(dl_tls_max_dtv_idx), result);
+     }
+ 
+-  return result;
++  l->l_tls_modid = result;
+ }
+ 
+ 
+ size_t
+ _dl_count_modids (void)
+ {
+-  /* It is rare that we have gaps; see elf/dl-open.c (_dl_open) where
+-     we fail to load a module and unload it leaving a gap.  If we don't
+-     have gaps then the number of modids is the current maximum so
+-     return that.  */
++  /* The count is the max unless dlclose or failed dlopen created gaps.  */
+   if (__glibc_likely (!GL(dl_tls_dtv_gaps)))
+     return GL(dl_tls_max_dtv_idx);
+ 
+diff --git a/elf/rtld.c b/elf/rtld.c
+index e3fb2a5b2a..d733359eaf 100644
+--- a/elf/rtld.c
++++ b/elf/rtld.c
+@@ -1612,7 +1612,7 @@
+   /* Add the dynamic linker to the TLS list if it also uses TLS.  */
+   if (GL(dl_rtld_map).l_tls_blocksize != 0)
+     /* Assign a module ID.  Do this before loading any audit modules.  */
+-    GL(dl_rtld_map).l_tls_modid = _dl_next_tls_modid ();
++    _dl_assign_tls_modid (&GL(dl_rtld_map));
+ 
+   /* If we have auditing DSOs to load, do it now.  */
+   bool need_security_init = true;
+diff --git a/sysdeps/generic/ldsodefs.h b/sysdeps/generic/ldsodefs.h
+index 176394de4d..9c15259236 100644
+--- a/sysdeps/generic/ldsodefs.h
++++ b/sysdeps/generic/ldsodefs.h
+@@ -1171,8 +1171,8 @@ extern ElfW(Addr) _dl_sysdep_start (void **start_argptr,
+ extern void _dl_sysdep_start_cleanup (void) attribute_hidden;
+ 
+ 
+-/* Determine next available module ID.  */
+-extern size_t _dl_next_tls_modid (void) attribute_hidden;
++/* Determine next available module ID and set the L l_tls_modid.  */
++extern void _dl_assign_tls_modid (struct link_map *l) attribute_hidden;
+ 
+ /* Count the modules with TLS segments.  */
+ extern size_t _dl_count_modids (void) attribute_hidden;
+-- 
+2.27.0

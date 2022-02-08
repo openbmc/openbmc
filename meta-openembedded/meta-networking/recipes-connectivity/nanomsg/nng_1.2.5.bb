@@ -8,7 +8,7 @@ SECTION = "libs/networking"
 
 SRCREV = "53ae1a5ab37fdfc9ad5c236df3eaf4dd63f0fee9"
 
-SRC_URI = "git://github.com/nanomsg/nng.git;branch=v1.2.x"
+SRC_URI = "git://github.com/nanomsg/nng.git;branch=v1.2.x;protocol=https"
 
 S = "${WORKDIR}/git"
 

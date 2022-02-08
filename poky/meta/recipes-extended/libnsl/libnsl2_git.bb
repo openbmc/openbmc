@@ -14,7 +14,7 @@ PV = "1.2.0+git${SRCPV}"
 
 SRCREV = "4a062cf4180d99371198951e4ea5b4550efd58a3"
 
-SRC_URI = "git://github.com/thkukuk/libnsl \
+SRC_URI = "git://github.com/thkukuk/libnsl;branch=master;protocol=https \
           "
 
 S = "${WORKDIR}/git"

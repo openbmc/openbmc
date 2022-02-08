@@ -12,6 +12,7 @@ import math
 import os
 import signal
 import socket
+import sys
 import time
 from . import chunkify, DEFAULT_MAX_CHUNK
 
@@ -419,9 +420,14 @@ class Server(object):
         self._cleanup_socket = None
 
     def start_tcp_server(self, host, port):
-        self.server = self.loop.run_until_complete(
-            asyncio.start_server(self.handle_client, host, port, loop=self.loop)
-        )
+        if sys.version_info[0] == 3 and sys.version_info[1] < 6:
+            self.server = self.loop.run_until_complete(
+                asyncio.start_server(self.handle_client, host, port, loop=self.loop)
+            )
+        else:
+            self.server = self.loop.run_until_complete(
+                asyncio.start_server(self.handle_client, host, port)
+            )
 
         for s in self.server.sockets:
             logger.info('Listening on %r' % (s.getsockname(),))
@@ -444,9 +450,14 @@ class Server(object):
         try:
             # Work around path length limits in AF_UNIX
             os.chdir(os.path.dirname(path))
-            self.server = self.loop.run_until_complete(
-                asyncio.start_unix_server(self.handle_client, os.path.basename(path), loop=self.loop)
-            )
+            if sys.version_info[0] == 3 and sys.version_info[1] < 6:
+                self.server = self.loop.run_until_complete(
+                    asyncio.start_unix_server(self.handle_client, os.path.basename(path), loop=self.loop)
+                )
+            else:
+                self.server = self.loop.run_until_complete(
+                    asyncio.start_unix_server(self.handle_client, os.path.basename(path))
+                )
         finally:
             os.chdir(cwd)
 

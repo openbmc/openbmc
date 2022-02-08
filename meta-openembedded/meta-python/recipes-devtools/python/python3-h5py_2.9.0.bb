@@ -4,7 +4,7 @@ SECTION = "devel/python"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://setup.py;beginline=107;endline=107;md5=795ecad0d261c998cc526c84a822dff6"
 
-SRC_URI = "git://github.com/h5py/h5py.git \
+SRC_URI = "git://github.com/h5py/h5py.git;branch=master;protocol=https \
            file://0001-cross-compiling-support.patch \
           "
 SRCREV ?= "8d96a14c3508de1bde77aec5db302e478dc5dbc4"

@@ -81,6 +81,9 @@ class FlattenVisitor(LicenseVisitor):
     def visit_Str(self, node):
         self.licenses.append(node.s)
 
+    def visit_Constant(self, node):
+        self.licenses.append(node.value)
+
     def visit_BinOp(self, node):
         if isinstance(node.op, ast.BitOr):
             left = FlattenVisitor(self.choose_licenses)
@@ -233,6 +236,9 @@ class ListVisitor(LicenseVisitor):
 
     def visit_Str(self, node):
         self.licenses.add(node.s)
+
+    def visit_Constant(self, node):
+        self.licenses.add(node.value)
 
 def list_licenses(licensestr):
     """Simply get a list of all licenses mentioned in a license string.

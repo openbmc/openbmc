@@ -1,0 +1,76 @@
+From 667d353b0f217372e8cc43ea4fe13466689c7ed0 Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 23 Apr 2020 11:33:31 +0300
+Subject: [PATCH 01/13] lib-mail: message-parser - Add a message_part_finish()
+ helper function
+
+---
+ src/lib-mail/message-parser.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index b1de1950a..aaa8dd8b7 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -195,6 +195,13 @@ message_part_append(pool_t pool, struct message_part *parent)
+ 	return part;
+ }
+ 
++static void message_part_finish(struct message_parser_ctx *ctx)
++{
++	message_size_add(&ctx->part->parent->body_size, &ctx->part->body_size);
++	message_size_add(&ctx->part->parent->body_size, &ctx->part->header_size);
++	ctx->part = ctx->part->parent;
++}
++
+ static void parse_next_body_multipart_init(struct message_parser_ctx *ctx)
+ {
+ 	struct message_boundary *b;
+@@ -312,19 +319,16 @@ static int parse_part_finish(struct message_parser_ctx *ctx,
+ 			     struct message_boundary *boundary,
+ 			     struct message_block *block_r, bool first_line)
+ {
+-	struct message_part *part;
+ 	size_t line_size;
+ 
+ 	i_assert(ctx->last_boundary == NULL);
+ 
+ 	/* get back to parent MIME part, summing the child MIME part sizes
+ 	   into parent's body sizes */
+-	for (part = ctx->part; part != boundary->part; part = part->parent) {
+-		message_size_add(&part->parent->body_size, &part->body_size);
+-		message_size_add(&part->parent->body_size, &part->header_size);
++	while (ctx->part != boundary->part) {
++		message_part_finish(ctx);
++		i_assert(ctx->part != NULL);
+ 	}
+-	i_assert(part != NULL);
+-	ctx->part = part;
+ 
+ 	if (boundary->epilogue_found) {
+ 		/* this boundary isn't needed anymore */
+@@ -1132,13 +1136,8 @@ int message_parser_parse_next_block(struct message_parser_ctx *ctx,
+ 		i_assert(ctx->input->eof || ctx->input->closed ||
+ 			 ctx->input->stream_errno != 0 ||
+ 			 ctx->broken_reason != NULL);
+-		while (ctx->part->parent != NULL) {
+-			message_size_add(&ctx->part->parent->body_size,
+-					 &ctx->part->body_size);
+-			message_size_add(&ctx->part->parent->body_size,
+-					 &ctx->part->header_size);
+-			ctx->part = ctx->part->parent;
+-		}
++		while (ctx->part->parent != NULL)
++			message_part_finish(ctx);
+ 	}
+ 
+ 	if (block_r->size == 0) {
+-- 
+2.11.0
+

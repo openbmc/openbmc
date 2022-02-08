@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/commonmark/cmark"
 LICENSE = "BSD-2-Clause & MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=81f9cae6293cc0345a9144b78152ab62"
 
-SRC_URI = "git://github.com/commonmark/cmark.git"
+SRC_URI = "git://github.com/commonmark/cmark.git;branch=master;protocol=https"
 SRCREV = "8daa6b1495124f0b67e6034130e12d7be83e38bd"
 S = "${WORKDIR}/git"
 

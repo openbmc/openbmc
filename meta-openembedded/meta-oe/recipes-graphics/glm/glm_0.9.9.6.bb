@@ -9,7 +9,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://copying.txt;md5=4a735e33f271f57404fda17e80085411"
 
 SRC_URI = " \
-    git://github.com/g-truc/glm;branch=master \
+    git://github.com/g-truc/glm;branch=master;protocol=https \
     file://0001-Fix-Wimplicit-int-float-conversion-warnings-with-cla.patch \
     file://glmConfig.cmake.in \
     file://glmConfigVersion.cmake.in \

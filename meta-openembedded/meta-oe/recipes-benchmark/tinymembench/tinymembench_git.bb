@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://main.c;endline=22;md5=879b9bbb60851454885b5fa47eb6b34
 PV = "0.4.0+git${SRCPV}"
 
 SRCREV = "a2cf6d7e382e3aea1eb39173174d9fa28cad15f3"
-SRC_URI = "git://github.com/ssvb/tinymembench.git \
+SRC_URI = "git://github.com/ssvb/tinymembench.git;branch=master;protocol=https \
            file://0001-asm-Delete-.func-.endfunc-directives.patch \
            "
 

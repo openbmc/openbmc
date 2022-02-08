@@ -1,0 +1,71 @@
+From de0da7bc8df55521db8fa787f88e293618c96386 Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 23 Apr 2020 11:34:22 +0300
+Subject: [PATCH 02/13] lib-mail: message-parser - Change message_part_append()
+ to do all work internally
+
+---
+ src/lib-mail/message-parser.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index aaa8dd8b7..2edf3e7a6 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -167,16 +167,17 @@ static int message_parser_read_more(struct message_parser_ctx *ctx,
+ 	return 1;
+ }
+ 
+-static struct message_part *
+-message_part_append(pool_t pool, struct message_part *parent)
++static void
++message_part_append(struct message_parser_ctx *ctx)
+ {
++	struct message_part *parent = ctx->part;
+ 	struct message_part *p, *part, **list;
+ 
+ 	i_assert(parent != NULL);
+ 	i_assert((parent->flags & (MESSAGE_PART_FLAG_MULTIPART |
+ 				   MESSAGE_PART_FLAG_MESSAGE_RFC822)) != 0);
+ 
+-	part = p_new(pool, struct message_part, 1);
++	part = p_new(ctx->part_pool, struct message_part, 1);
+ 	part->parent = parent;
+ 	for (p = parent; p != NULL; p = p->parent)
+ 		p->children_count++;
+@@ -192,7 +193,7 @@ message_part_append(pool_t pool, struct message_part *parent)
+ 		list = &(*list)->next;
+ 
+ 	*list = part;
+-	return part;
++	ctx->part = part;
+ }
+ 
+ static void message_part_finish(struct message_parser_ctx *ctx)
+@@ -220,7 +221,7 @@ static void parse_next_body_multipart_init(struct message_parser_ctx *ctx)
+ static int parse_next_body_message_rfc822_init(struct message_parser_ctx *ctx,
+ 					       struct message_block *block_r)
+ {
+-	ctx->part = message_part_append(ctx->part_pool, ctx->part);
++	message_part_append(ctx);
+ 	return parse_next_header_init(ctx, block_r);
+ }
+ 
+@@ -270,7 +271,7 @@ boundary_line_find(struct message_parser_ctx *ctx,
+ static int parse_next_mime_header_init(struct message_parser_ctx *ctx,
+ 				       struct message_block *block_r)
+ {
+-	ctx->part = message_part_append(ctx->part_pool, ctx->part);
++	message_part_append(ctx);
+ 	ctx->part->flags |= MESSAGE_PART_FLAG_IS_MIME;
+ 
+ 	return parse_next_header_init(ctx, block_r);
+-- 
+2.11.0
+

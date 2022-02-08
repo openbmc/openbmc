@@ -1,0 +1,49 @@
+From a9800b436fcf1f9633c2b136a9c5cb7a486a8a52 Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 23 Apr 2020 11:36:48 +0300
+Subject: [PATCH 03/13] lib-mail: message-parser - Optimize updating
+ children_count
+
+---
+ src/lib-mail/message-parser.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index 2edf3e7a6..05768a058 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -171,7 +171,7 @@ static void
+ message_part_append(struct message_parser_ctx *ctx)
+ {
+ 	struct message_part *parent = ctx->part;
+-	struct message_part *p, *part, **list;
++	struct message_part *part, **list;
+ 
+ 	i_assert(parent != NULL);
+ 	i_assert((parent->flags & (MESSAGE_PART_FLAG_MULTIPART |
+@@ -179,8 +179,6 @@ message_part_append(struct message_parser_ctx *ctx)
+ 
+ 	part = p_new(ctx->part_pool, struct message_part, 1);
+ 	part->parent = parent;
+-	for (p = parent; p != NULL; p = p->parent)
+-		p->children_count++;
+ 
+ 	/* set child position */
+ 	part->physical_pos =
+@@ -200,6 +198,7 @@ static void message_part_finish(struct message_parser_ctx *ctx)
+ {
+ 	message_size_add(&ctx->part->parent->body_size, &ctx->part->body_size);
+ 	message_size_add(&ctx->part->parent->body_size, &ctx->part->header_size);
++	ctx->part->parent->children_count += 1 + ctx->part->children_count;
+ 	ctx->part = ctx->part->parent;
+ }
+ 
+-- 
+2.11.0
+

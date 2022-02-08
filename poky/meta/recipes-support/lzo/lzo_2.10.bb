@@ -18,6 +18,8 @@ SRC_URI[sha256sum] = "c0f892943208266f9b6543b3ae308fab6284c5c90e627931446fb49b42
 
 inherit autotools ptest
 
+CVE_PRODUCT = "lzo oberhumer:lzo2"
+
 EXTRA_OECONF = "--enable-shared"
 
 do_install_ptest() {

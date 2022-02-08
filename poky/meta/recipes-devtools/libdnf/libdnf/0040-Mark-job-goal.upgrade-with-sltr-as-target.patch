@@ -1,0 +1,58 @@
+From b4c5a3312287f31a2075a235db846ff611586d2c Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Tue, 3 Sep 2019 11:01:23 +0200
+Subject: [PATCH] Mark job goal.upgrade with sltr as targeted
+
+It allows to keep installed packages in upgrade set.
+
+It also prevents from reinstalling of modified packages with same NEVRA.
+
+
+Backport commit b4c5a3312287f31a2075a235db846ff611586d2c from
+https://github.com/rpm-software-management/libdnf
+
+This bug is present in oe-core's dnf
+
+Remove changes to spec file from upstream
+
+Upstream-Status: Backport
+Signed-off-by: Jate Sujjavanich <jatedev@gmail.com>
+---
+ libdnf.spec          | 4 ++--
+ libdnf/goal/Goal.cpp | 2 +-
+ libdnf/goal/Goal.hpp | 6 ++++--
+ 3 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/libdnf/goal/Goal.cpp b/libdnf/goal/Goal.cpp
+index b69be19..a38cbb4 100644
+--- a/libdnf/goal/Goal.cpp
++++ b/libdnf/goal/Goal.cpp
+@@ -767,7 +767,7 @@ void
+ Goal::upgrade(HySelector sltr)
+ {
+     pImpl->actions = static_cast<DnfGoalActions>(pImpl->actions | DNF_UPGRADE);
+-    sltrToJob(sltr, &pImpl->staging, SOLVER_UPDATE);
++    sltrToJob(sltr, &pImpl->staging, SOLVER_UPDATE|SOLVER_TARGETED);
+ }
+ 
+ void
+diff --git a/libdnf/goal/Goal.hpp b/libdnf/goal/Goal.hpp
+index f33dfa2..d701317 100644
+--- a/libdnf/goal/Goal.hpp
++++ b/libdnf/goal/Goal.hpp
+@@ -86,8 +86,10 @@ public:
+     /**
+     * @brief If selector ill formed, it rises std::runtime_error()
+     *
+-    * @param sltr p_sltr: It should contain only upgrades with obsoletes otherwise it can try to
+-    * reinstall installonly packages.
++    * @param sltr p_sltr: It contains upgrade-to packages and obsoletes. The presence of installed
++    * packages prevents reinstalling packages with the same NEVRA but changed contant. To honor repo
++    * priority all relevant packages must be present. To upgrade package foo from priority repo, all
++    * installed and available packages of the foo must be in selector plus obsoletes of foo.
+     */
+     void upgrade(HySelector sltr);
+     void userInstalled(DnfPackage *pkg);
+-- 
+2.7.4
+

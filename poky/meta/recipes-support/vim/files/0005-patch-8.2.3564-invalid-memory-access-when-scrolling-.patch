@@ -1,0 +1,97 @@
+CVE: CVE-2021-3903
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+From b15919c1fe0f7fc3d98ff5207ed2feb43c59009d Mon Sep 17 00:00:00 2001
+From: Bram Moolenaar <Bram@vim.org>
+Date: Mon, 25 Oct 2021 17:07:04 +0100
+Subject: [PATCH] patch 8.2.3564: invalid memory access when scrolling without
+ valid screen
+
+Problem:    Invalid memory access when scrolling without a valid screen.
+Solution:   Do not set VALID_BOTLINE in w_valid.
+---
+ src/move.c                  |  1 -
+ src/testdir/test_normal.vim | 23 ++++++++++++++++++++---
+ src/version.c               |  2 ++
+ 3 files changed, 22 insertions(+), 4 deletions(-)
+
+diff --git a/src/move.c b/src/move.c
+index 8e53d8bcb..10165ef4d 100644
+--- a/src/move.c
++++ b/src/move.c
+@@ -198,7 +198,6 @@ update_topline(void)
+     {
+ 	curwin->w_topline = curwin->w_cursor.lnum;
+ 	curwin->w_botline = curwin->w_topline;
+-	curwin->w_valid |= VALID_BOTLINE|VALID_BOTLINE_AP;
+ 	curwin->w_scbind_pos = 1;
+ 	return;
+     }
+diff --git a/src/testdir/test_normal.vim b/src/testdir/test_normal.vim
+index d45cf4159..ca87928f5 100644
+--- a/src/testdir/test_normal.vim
++++ b/src/testdir/test_normal.vim
+@@ -33,14 +33,14 @@ func CountSpaces(type, ...)
+   else
+     silent exe "normal! `[v`]y"
+   endif
+-  let g:a=strlen(substitute(@@, '[^ ]', '', 'g'))
++  let g:a = strlen(substitute(@@, '[^ ]', '', 'g'))
+   let &selection = sel_save
+   let @@ = reg_save
+ endfunc
+ 
+ func OpfuncDummy(type, ...)
+   " for testing operatorfunc
+-  let g:opt=&linebreak
++  let g:opt = &linebreak
+ 
+   if a:0  " Invoked from Visual mode, use gv command.
+     silent exe "normal! gvy"
+@@ -51,7 +51,7 @@ func OpfuncDummy(type, ...)
+   endif
+   " Create a new dummy window
+   new
+-  let g:bufnr=bufnr('%')
++  let g:bufnr = bufnr('%')
+ endfunc
+ 
+ fun! Test_normal00_optrans()
+@@ -718,6 +718,23 @@ func Test_normal17_z_scroll_hor2()
+   bw!
+ endfunc
+ 
++
++func Test_scroll_in_ex_mode()
++  " This was using invalid memory because w_botline was invalid.
++  let lines =<< trim END
++      diffsplit
++      norm os00(
++      call writefile(['done'], 'Xdone')
++      qa!
++  END
++  call writefile(lines, 'Xscript')
++  call assert_equal(1, RunVim([], [], '--clean -X -Z -e -s -S Xscript'))
++  call assert_equal(['done'], readfile('Xdone'))
++
++  call delete('Xscript')
++  call delete('Xdone')
++endfunc
++
+ func Test_normal18_z_fold()
+   " basic tests for foldopen/folddelete
+   if !has("folding")
+diff --git a/src/version.c b/src/version.c
+index 092864bbb..a9e8be0e7 100644
+--- a/src/version.c
++++ b/src/version.c
+@@ -742,6 +742,8 @@ static char *(features[]) =
+ 
+ static int included_patches[] =
+ {   /* Add new patch number below this line */
++/**/
++    3564,
+ /**/
+     3489,
+ /**/

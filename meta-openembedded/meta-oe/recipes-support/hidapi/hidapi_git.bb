@@ -8,7 +8,7 @@ DEPENDS = "libusb udev"
 PV = "0.7.99+0.8.0-rc1+git${SRCPV}"
 
 SRCREV = "d17db57b9d4354752e0af42f5f33007a42ef2906"
-SRC_URI = "git://github.com/signal11/hidapi.git"
+SRC_URI = "git://github.com/signal11/hidapi.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

@@ -1,0 +1,60 @@
+From c88a77198c0156e425c2725f30e481207de5162f Mon Sep 17 00:00:00 2001
+From: Jaroslav Mracek <jmracek@redhat.com>
+Date: Tue, 3 Sep 2019 11:01:51 +0200
+Subject: [PATCH] Keep installed packages in upgrade job
+ (RhBug:1728252,1644241,1741381)
+
+In combination with marking of job as TARGETED it prevents from
+reinstalling of modified packages with same NEVRA.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1728252
+https://bugzilla.redhat.com/show_bug.cgi?id=1644241
+https://bugzilla.redhat.com/show_bug.cgi?id=1741381
+
+Closes: #1474
+Approved by: m-blaha
+
+
+Backport to fix bug in dnf in oe-core
+from https://github.com/rpm-software-management/dnf
+
+Removed spec file portion of patch
+
+Upstream-Status: Backport
+Signed-off-by: Jate Sujjavanich <jatedev@gmail.com>
+---
+ dnf.spec                  | 4 ++--
+ dnf/base.py               | 3 ---
+ dnf/module/module_base.py | 2 +-
+ 3 files changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/dnf/base.py b/dnf/base.py
+index b2ced61..628c154 100644
+--- a/dnf/base.py
++++ b/dnf/base.py
+@@ -1968,9 +1968,6 @@ class Base(object):
+                 obsoletes=q.installed().union(q.upgrades()))
+             # add obsoletes into transaction
+             q = q.union(obsoletes)
+-        # provide only available packages to solver otherwise selection of available
+-        # possibilities will be ignored
+-        q = q.available()
+         if reponame is not None:
+             q.filterm(reponame=reponame)
+         q = self._merge_update_filters(q, pkg_spec=pkg_spec)
+diff --git a/dnf/module/module_base.py b/dnf/module/module_base.py
+index 976d730..ce70f63 100644
+--- a/dnf/module/module_base.py
++++ b/dnf/module/module_base.py
+@@ -214,7 +214,7 @@ class ModuleBase(object):
+ 
+             if not upgrade_package_set:
+                 logger.error(_("Unable to match profile in argument {}").format(spec))
+-            query = self.base.sack.query().available().filterm(name=upgrade_package_set)
++            query = self.base.sack.query().filterm(name=upgrade_package_set)
+             if query:
+                 sltr = dnf.selector.Selector(self.base.sack)
+                 sltr.set(pkg=query)
+-- 
+2.7.4
+

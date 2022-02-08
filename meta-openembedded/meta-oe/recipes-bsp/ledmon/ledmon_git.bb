@@ -16,7 +16,7 @@ inherit autotools systemd
 SYSTEMD_SERVICE_${PN} = "ledmon.service"
 
 # 0.93
-SRC_URI = "git://github.com/intel/ledmon;branch=master \
+SRC_URI = "git://github.com/intel/ledmon;branch=master;protocol=https \
            file://0002-include-sys-select.h-and-sys-types.h.patch \
            file://0001-Don-t-build-with-Werror-to-fix-compile-error.patch \
           "

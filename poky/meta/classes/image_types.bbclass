@@ -240,7 +240,7 @@ EXTRA_IMAGECMD_jffs2 ?= "--pad ${JFFS2_ENDIANNESS} --eraseblock=${JFFS2_ERASEBLO
 EXTRA_IMAGECMD_ext2 ?= "-i 4096"
 EXTRA_IMAGECMD_ext3 ?= "-i 4096"
 EXTRA_IMAGECMD_ext4 ?= "-i 4096"
-EXTRA_IMAGECMD_btrfs ?= "-n 4096"
+EXTRA_IMAGECMD_btrfs ?= "-n 4096 --shrink"
 EXTRA_IMAGECMD_f2fs ?= ""
 
 do_image_cpio[depends] += "cpio-native:do_populate_sysroot"

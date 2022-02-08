@@ -7,7 +7,7 @@ inherit cmake pkgconfig
 
 # openal-soft-1.19.1
 SRCREV = "6761218e51699f46bf25c377e65b3e9ea5e434b9"
-SRC_URI = "git://github.com/kcat/openal-soft \
+SRC_URI = "git://github.com/kcat/openal-soft;branch=master;protocol=https \
            file://0001-Use-BUILD_CC-to-compile-native-tools.patch \
            file://0002-makehrtf-Disable-Wstringop-truncation.patch \
            "

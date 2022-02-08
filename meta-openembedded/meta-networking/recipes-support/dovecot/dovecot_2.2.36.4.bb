@@ -10,6 +10,22 @@ SRC_URI = "http://dovecot.org/releases/2.2/dovecot-${PV}.tar.gz \
            file://dovecot.service \
            file://dovecot.socket \
            file://0001-doveadm-Fix-parallel-build.patch \
+           file://0001-lib-mail-message-parser-Add-a-message_part_finish-he.patch \
+           file://0002-lib-mail-message-parser-Change-message_part_append-t.patch \
+           file://0003-lib-mail-message-parser-Optimize-updating-children_c.patch \
+           file://0004-lib-mail-message-parser-Optimize-appending-new-part-.patch \
+           file://0005-lib-mail-message-parser-Minor-code-cleanup-to-findin.patch \
+           file://0006-lib-mail-message-parser-Truncate-excessively-long-MI.patch \
+           file://0007-lib-mail-message-parser-Optimize-boundary-lookups-wh.patch \
+           file://0008-lib-mail-message-parser-Add-boundary_remove_until-he.patch \
+           file://0009-lib-mail-message-parser-Don-t-use-memory-pool-for-pa.patch \
+           file://0010-lib-mail-message-parser-Support-limiting-max-number-.patch \
+           file://0011-lib-mail-message-parser-Support-limiting-max-number-.patch \
+           file://0012-lib-mail-Fix-handling-trailing-in-MIME-boundaries.patch \
+           file://0013-lib-mail-Fix-parse_too_many_nested_mime_parts.patch \
+           file://buffer_free_fix.patch \
+           file://0002-lib-ntlm-Check-buffer-length-on-responses.patch \
+           file://0001-auth-mech-rpa-Fail-on-zero-len-buffer.patch \
            "
 
 SRC_URI[md5sum] = "66c4d71858b214afee5b390ee602dee2"

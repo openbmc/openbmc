@@ -1,4 +1,4 @@
-From 7b24f81e04c9d00d96de7dbd250beade6d2c6e44 Mon Sep 17 00:00:00 2001
+From 12b658c0fe5771d16067baef933b7f34ed455def Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Jan 2016 06:31:09 +0000
 Subject: [PATCH] warn for uses of system directories when cross linking
@@ -59,8 +59,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  ld/ldfile.c     | 17 +++++++++++++++++
  ld/ldlex.h      |  2 ++
  ld/ldmain.c     |  2 ++
- ld/lexsup.c     | 15 +++++++++++++++
- 9 files changed, 85 insertions(+)
+ ld/lexsup.c     | 16 ++++++++++++++++
+ 9 files changed, 86 insertions(+)
 
 diff --git a/ld/config.in b/ld/config.in
 index d93c9b0830..5da2742bea 100644
@@ -77,10 +77,10 @@ index d93c9b0830..5da2742bea 100644
  #undef EXTRA_SHLIB_EXTENSION
  
 diff --git a/ld/configure b/ld/configure
-index 811134a503..f8c17c19ae 100755
+index f432f4637d..a9da3c115e 100755
 --- a/ld/configure
 +++ b/ld/configure
-@@ -826,6 +826,7 @@ with_lib_path
+@@ -830,6 +830,7 @@ with_lib_path
  enable_targets
  enable_64_bit_bfd
  with_sysroot
@@ -88,7 +88,7 @@ index 811134a503..f8c17c19ae 100755
  enable_gold
  enable_got
  enable_compressed_debug_sections
-@@ -1491,6 +1492,8 @@ Optional Features:
+@@ -1495,6 +1496,8 @@ Optional Features:
    --disable-largefile     omit support for large files
    --enable-targets        alternative target configurations
    --enable-64-bit-bfd     64-bit support (on hosts with narrower word sizes)
@@ -97,7 +97,7 @@ index 811134a503..f8c17c19ae 100755
    --enable-gold[=ARG]     build gold [ARG={default,yes,no}]
    --enable-got=<type>     GOT handling scheme (target, single, negative,
                            multigot)
-@@ -15788,6 +15791,19 @@ fi
+@@ -16624,6 +16627,19 @@ fi
  
  
  
@@ -222,10 +222,10 @@ index 5287f19a7f..55096e4fc9 100644
  
  /* The initial parser states.  */
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index da1ad17763..12d0b07d8a 100644
+index c4af10f4e9..95b56b2d2d 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
-@@ -274,6 +274,8 @@ main (int argc, char **argv)
+@@ -273,6 +273,8 @@ main (int argc, char **argv)
    command_line.warn_mismatch = TRUE;
    command_line.warn_search_mismatch = TRUE;
    command_line.check_section_addresses = -1;
@@ -235,7 +235,7 @@ index da1ad17763..12d0b07d8a 100644
    /* We initialize DEMANGLING based on the environment variable
       COLLECT_NO_DEMANGLE.  The gcc collect2 program will demangle the
 diff --git a/ld/lexsup.c b/ld/lexsup.c
-index 3d15cc491d..0e8b4f2b7a 100644
+index 3d15cc491d..6478821443 100644
 --- a/ld/lexsup.c
 +++ b/ld/lexsup.c
 @@ -550,6 +550,14 @@ static const struct ld_option ld_options[] =
@@ -253,10 +253,10 @@ index 3d15cc491d..0e8b4f2b7a 100644
  };
  
  #define OPTION_COUNT ARRAY_SIZE (ld_options)
-@@ -1603,6 +1611,13 @@ parse_args (unsigned argc, char **argv)
- 
+@@ -1604,6 +1612,14 @@ parse_args (unsigned argc, char **argv)
  	case OPTION_PRINT_MAP_DISCARDED:
  	  config.print_map_discarded = TRUE;
+ 	  break;
 +
 +	case OPTION_NO_POISON_SYSTEM_DIRECTORIES:
 +	  command_line.poison_system_directories = FALSE;
@@ -264,6 +264,6 @@ index 3d15cc491d..0e8b4f2b7a 100644
 +
 +	case OPTION_ERROR_POISON_SYSTEM_DIRECTORIES:
 +	  command_line.error_poison_system_directories = TRUE;
- 	  break;
++	  break;
  	}
      }

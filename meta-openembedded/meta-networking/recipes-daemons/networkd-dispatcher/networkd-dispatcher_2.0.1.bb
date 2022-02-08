@@ -13,7 +13,7 @@ RDEPENDS_${PN} = "python3-pygobject python3-dbus"
 REQUIRED_DISTRO_FEATURES = "systemd"
 
 SRCREV = "333ef1ed1d7c7c17264fcf7629e5c2f78ab4112c"
-SRC_URI = "git://gitlab.com/craftyguy/networkd-dispatcher;protocol=https"
+SRC_URI = "git://gitlab.com/craftyguy/networkd-dispatcher;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 

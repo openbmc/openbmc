@@ -1,4 +1,4 @@
-From e8331a76983e839a3d193446ab8ae9c1b09daa07 Mon Sep 17 00:00:00 2001
+From b55dfb4b62e507ae4f0814aec7597b56f9d6292a Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Wed, 10 Aug 2016 11:19:44 +0800
 Subject: [PATCH] Fix missing check for permission denied.

@@ -9,7 +9,7 @@ inherit autotools pkgconfig features_check
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 
-SRC_URI = "git://bitmath.org/git/mtview.git;protocol=http"
+SRC_URI = "git://bitmath.org/git/mtview.git;protocol=http;branch=master"
 SRCREV = "ad437c38dc111cf3990a03abf14efe1b5d89604b"
 
 DEPENDS += "mtdev utouch-frame utouch-evemu libx11"

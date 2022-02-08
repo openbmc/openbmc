@@ -1,0 +1,68 @@
+From 988ca784d4840c87509e770a21d5d22105af8668 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 5 Nov 2021 11:18:07 +0800
+Subject: [PATCH] bootchartd.in: make sure only one bootchartd process
+
+When boot with "init=/sbin/bootchartd" as below:
+ # runqemu qemux86 bootparams="init=/sbin/bootchartd"
+
+There are two bootchartd process after boot [1].
+ # ps -ef | grep bootchart
+root       101     1  0 03:27 ?        00:00:00 /bin/sh /sbin/bootchartd
+root       103   101  8 03:27 ?        00:00:02 /lib64/bootchart/bootchart-collector 50
+root       106     1  0 03:27 ?        00:00:00 /bin/sh /sbin/bootchartd
+root       792   106  0 03:27 ?        00:00:00 /lib64/bootchart/bootchart-collector --usleep 1000000
+root       794   725  0 03:27 ttyS0    00:00:00 grep bootchart
+
+ # /sbin/bootchartd stop
+[bootchart] bootchart-collector started as pid 596 with 2 args:
+[bootchart] '--dump'
+[bootchart] '/tmp/bootchart.3lXpVDAq3v'
+[bootchart] Extracting profile data from pid 204
+[bootchart] map 0xbed9a000 -> 0xbedbb000 size: 132k from 'bed9a000' 'bedbb000'
+[bootchart] read 135168 bytes of 135168
+[bootchart] reading 150 chunks (of 150) ...
+[bootchart] wrote 18760 kbB
+[bootchart] bootchart-collector pid: 596 unmounted proc / clean exit
+
+But there still one process exist after the above stop command finish.
+ # ps -ef | grep bootchartd
+root 202 1 0 09:09 ? 00:00:00 /bin/sh /sbin/bootchartd
+root 629 516 0 09:10 ? 00:00:00 grep bootchartd
+
+Remove the wait_boot which used to wait the boot process to finish to
+make sure only one bootchartd process and meanwhile we don't need the
+wait_boot logic because we either use "/sbin/bootchartd stop" to stop
+the bootchartd manually or install package bootchartd-stop-initscript
+altogether with bootchart2 to stop bootchartd automatically after boot.
+
+After patch:
+ # ps -ef | grep bootchart
+ root       101     1  0 03:36 ?        00:00:00 /bin/sh /sbin/bootchartd
+ root       103   101  6 03:36 ?        00:00:04 /lib64/bootchart/bootchart-collector 50
+ root       596   592  0 03:37 ttyS0    00:00:00 grep bootchart
+
+[1] https://github.com/xrmx/bootchart/issues/94
+
+Upstream-Status: Submitted [https://github.com/xrmx/bootchart/pull/95]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ bootchartd.in | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/bootchartd.in b/bootchartd.in
+index 7979ef9..f0e466d 100755
+--- a/bootchartd.in
++++ b/bootchartd.in
+@@ -183,7 +183,6 @@ if [ $$ -eq 1 ]; then
+ 	else # running inside the main system
+ 		echo "bootchart: no initrd used; starting"
+ 		start &
+-		wait_boot &
+ 		# wait a little, until the collector is going, before allowing
+ 		# the rest of the system to charge ahead, so we catch it
+ 		$USLEEP 250000
+-- 
+2.17.1
+

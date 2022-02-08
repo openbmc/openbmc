@@ -1,0 +1,32 @@
+From f77a2b6c3ffe2ea96f4a4b05ec38dc9d53266ecb Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Wed, 27 May 2020 11:35:55 +0300
+Subject: [PATCH 13/13] lib-mail: Fix parse_too_many_nested_mime_parts()
+
+This was originally correct, until it was "optimized" wrong and got merged.
+---
+ src/lib-mail/message-parser.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index 175d4b488..5b11772ff 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -621,7 +621,7 @@ static bool block_is_at_eoh(const struct message_block *block)
+ 
+ static bool parse_too_many_nested_mime_parts(struct message_parser_ctx *ctx)
+ {
+-	return ctx->nested_parts_count > ctx->max_nested_mime_parts;
++	return ctx->nested_parts_count+1 >= ctx->max_nested_mime_parts;
+ }
+ 
+ #define MUTEX_FLAGS \
+-- 
+2.11.0
+

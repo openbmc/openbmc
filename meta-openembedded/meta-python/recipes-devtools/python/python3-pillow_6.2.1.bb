@@ -5,7 +5,7 @@ HOMEPAGE = "https://pillow.readthedocs.io"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=55c0f320370091249c1755c0d2b48e89"
 
-SRC_URI = "git://github.com/python-pillow/Pillow.git;branch=6.2.x \
+SRC_URI = "git://github.com/python-pillow/Pillow.git;branch=6.2.x;protocol=https \
            file://0001-support-cross-compiling.patch \
            file://0001-explicitly-set-compile-options.patch \
 "

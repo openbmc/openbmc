@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=ac6c26e52aea428ee7f56dc2c56424c6"
 SRCREV = "cfa93aa19f81d85b63cd64da30c7499890d4c07d"
 PV = "3.20.2.2"
 
-SRC_URI = "git://github.com/rvoicilas/${BPN} \
+SRC_URI = "git://github.com/rvoicilas/${BPN};branch=master;protocol=https \
            file://0001-Makefile.am-add-build-rule-for-README.patch \
            "
 

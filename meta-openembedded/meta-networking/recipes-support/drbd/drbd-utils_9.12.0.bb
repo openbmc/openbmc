@@ -8,13 +8,14 @@ SECTION = "admin"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5574c6965ae5f583e55880e397fbb018"
 
-SRC_URI = "git://github.com/LINBIT/drbd-utils;name=drbd-utils \
-           git://github.com/LINBIT/drbd-headers;name=drbd-headers;destsuffix=git/drbd-headers \
+SRC_URI = "git://github.com/LINBIT/drbd-utils;name=drbd-utils;branch=master;protocol=https \
+           git://github.com/LINBIT/drbd-headers;name=drbd-headers;destsuffix=git/drbd-headers;branch=master;protocol=https \
            ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','file://0001-drbd-utils-support-usrmerge.patch','',d)} \
           "
 # v9.12.0
 SRCREV_drbd-utils = "91629a4cce49ca0d4f917fe0bffa25cfe8db3052"
 SRCREV_drbd-headers = "233006b4d26cf319638be0ef6d16ec7dee287b66"
+SRCREV_FORMAT = "drbd-utils_drbd-headers"
 
 S = "${WORKDIR}/git"
 

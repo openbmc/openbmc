@@ -10,7 +10,7 @@ DEPENDS = ""
 
 PV = "0.10+${SRCPV}"
 SRCREV = "19fa1bbfc26efb92147b5e85cc0ca02a0e837561"
-SRC_URI = "git://github.com/kaniini/libucontext \
+SRC_URI = "git://github.com/kaniini/libucontext;branch=master;protocol=https \
 "
 
 S = "${WORKDIR}/git"

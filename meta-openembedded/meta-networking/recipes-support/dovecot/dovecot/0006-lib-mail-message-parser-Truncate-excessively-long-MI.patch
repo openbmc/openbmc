@@ -1,0 +1,163 @@
+From aed125484a346b4893c1a169088c39fe7ced01f3 Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 23 Apr 2020 12:53:12 +0300
+Subject: [PATCH 06/13] lib-mail: message-parser - Truncate excessively long
+ MIME boundaries
+
+RFC 2046 requires that the boundaries are a maximum of 70 characters
+(excluding the "--" prefix and suffix). We allow 80 characters for a bit of
+extra safety. Anything longer than that is truncated and treated the same
+as if it was just 80 characters.
+---
+ src/lib-mail/message-parser.c      |  7 ++-
+ src/lib-mail/test-message-parser.c | 95 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 100 insertions(+), 2 deletions(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index 6c6a680b5..92f541b02 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -10,7 +10,8 @@
+ 
+ /* RFC-2046 requires boundaries are max. 70 chars + "--" prefix + "--" suffix.
+    We'll add a bit more just in case. */
+-#define BOUNDARY_END_MAX_LEN (70 + 2 + 2 + 10)
++#define BOUNDARY_STRING_MAX_LEN (70 + 10)
++#define BOUNDARY_END_MAX_LEN (BOUNDARY_STRING_MAX_LEN + 2 + 2)
+ 
+ struct message_boundary {
+ 	struct message_boundary *next;
+@@ -526,8 +527,10 @@ static void parse_content_type(struct message_parser_ctx *ctx,
+ 	rfc2231_parse(&parser, &results);
+ 	for (; *results != NULL; results += 2) {
+ 		if (strcasecmp(results[0], "boundary") == 0) {
++			/* truncate excessively long boundaries */
+ 			ctx->last_boundary =
+-				p_strdup(ctx->parser_pool, results[1]);
++				p_strndup(ctx->parser_pool, results[1],
++					  BOUNDARY_STRING_MAX_LEN);
+ 			break;
+ 		}
+ 	}
+diff --git a/src/lib-mail/test-message-parser.c b/src/lib-mail/test-message-parser.c
+index 1f1aa1437..94aa3eb7c 100644
+--- a/src/lib-mail/test-message-parser.c
++++ b/src/lib-mail/test-message-parser.c
+@@ -642,6 +642,100 @@ static void test_message_parser_no_eoh(void)
+ 	test_end();
+ }
+ 
++static void test_message_parser_long_mime_boundary(void)
++{
++	/* Close the boundaries in wrong reverse order. But because all
++	   boundaries are actually truncated to the same size (..890) it
++	   works the same as if all of them were duplicate boundaries. */
++static const char input_msg[] =
++"Content-Type: multipart/mixed; boundary=\"1234567890123456789012345678901234567890123456789012345678901234567890123456789012\"\n"
++"\n"
++"--1234567890123456789012345678901234567890123456789012345678901234567890123456789012\n"
++"Content-Type: multipart/mixed; boundary=\"123456789012345678901234567890123456789012345678901234567890123456789012345678901\"\n"
++"\n"
++"--123456789012345678901234567890123456789012345678901234567890123456789012345678901\n"
++"Content-Type: multipart/mixed; boundary=\"12345678901234567890123456789012345678901234567890123456789012345678901234567890\"\n"
++"\n"
++"--12345678901234567890123456789012345678901234567890123456789012345678901234567890\n"
++"Content-Type: text/plain\n"
++"\n"
++"1\n"
++"--1234567890123456789012345678901234567890123456789012345678901234567890123456789012\n"
++"Content-Type: text/plain\n"
++"\n"
++"22\n"
++"--123456789012345678901234567890123456789012345678901234567890123456789012345678901\n"
++"Content-Type: text/plain\n"
++"\n"
++"333\n"
++"--12345678901234567890123456789012345678901234567890123456789012345678901234567890\n"
++"Content-Type: text/plain\n"
++"\n"
++"4444\n";
++	struct message_parser_ctx *parser;
++	struct istream *input;
++	struct message_part *parts, *part;
++	struct message_block block;
++	pool_t pool;
++	int ret;
++
++	test_begin("message parser long mime boundary");
++	pool = pool_alloconly_create("message parser", 10240);
++	input = test_istream_create(input_msg);
++
++	parser = message_parser_init(pool, input, 0, 0);
++	while ((ret = message_parser_parse_next_block(parser, &block)) > 0) ;
++	test_assert(ret < 0);
++	message_parser_deinit(&parser, &parts);
++
++	part = parts;
++	test_assert(part->children_count == 6);
++	test_assert(part->flags == (MESSAGE_PART_FLAG_MULTIPART | MESSAGE_PART_FLAG_IS_MIME));
++	test_assert(part->header_size.lines == 2);
++	test_assert(part->header_size.physical_size == 126);
++	test_assert(part->header_size.virtual_size == 126+2);
++	test_assert(part->body_size.lines == 22);
++	test_assert(part->body_size.physical_size == 871);
++	test_assert(part->body_size.virtual_size == 871+22);
++
++	part = parts->children;
++	test_assert(part->children_count == 5);
++	test_assert(part->flags == (MESSAGE_PART_FLAG_MULTIPART | MESSAGE_PART_FLAG_IS_MIME));
++	test_assert(part->header_size.lines == 2);
++	test_assert(part->header_size.physical_size == 125);
++	test_assert(part->header_size.virtual_size == 125+2);
++	test_assert(part->body_size.lines == 19);
++	test_assert(part->body_size.physical_size == 661);
++	test_assert(part->body_size.virtual_size == 661+19);
++
++	part = parts->children->children;
++	test_assert(part->children_count == 4);
++	test_assert(part->flags == (MESSAGE_PART_FLAG_MULTIPART | MESSAGE_PART_FLAG_IS_MIME));
++	test_assert(part->header_size.lines == 2);
++	test_assert(part->header_size.physical_size == 124);
++	test_assert(part->header_size.virtual_size == 124+2);
++	test_assert(part->body_size.lines == 16);
++	test_assert(part->body_size.physical_size == 453);
++	test_assert(part->body_size.virtual_size == 453+16);
++
++	part = parts->children->children->children;
++	for (unsigned int i = 1; i <= 3; i++, part = part->next) {
++		test_assert(part->children_count == 0);
++		test_assert(part->flags == (MESSAGE_PART_FLAG_TEXT | MESSAGE_PART_FLAG_IS_MIME));
++		test_assert(part->header_size.lines == 2);
++		test_assert(part->header_size.physical_size == 26);
++		test_assert(part->header_size.virtual_size == 26+2);
++		test_assert(part->body_size.lines == 0);
++		test_assert(part->body_size.physical_size == i);
++		test_assert(part->body_size.virtual_size == i);
++	}
++
++	test_parsed_parts(input, parts);
++	i_stream_unref(&input);
++	pool_unref(&pool);
++	test_end();
++}
++
+ int main(void)
+ {
+ 	static void (*test_functions[])(void) = {
+@@ -654,6 +748,7 @@ int main(void)
+ 		test_message_parser_garbage_suffix_mime_boundary,
+ 		test_message_parser_continuing_mime_boundary,
+ 		test_message_parser_continuing_truncated_mime_boundary,
++		test_message_parser_long_mime_boundary,
+ 		test_message_parser_no_eoh,
+ 		NULL
+ 	};
+-- 
+2.11.0
+

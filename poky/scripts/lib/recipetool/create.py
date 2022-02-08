@@ -478,6 +478,9 @@ def create_recipe(args):
             storeTagName = params['tag']
             params['nobranch'] = '1'
             del params['tag']
+        # Assume 'master' branch if not set
+        if scheme in ['git', 'gitsm'] and 'branch' not in params and 'nobranch' not in params:
+            params['branch'] = 'master'
         fetchuri = bb.fetch2.encodeurl((scheme, network, path, user, passwd, params))
 
         tmpparent = tinfoil.config_data.getVar('BASE_WORKDIR')
@@ -527,10 +530,9 @@ def create_recipe(args):
             # Remove HEAD reference point and drop remote prefix
             get_branch = [x.split('/', 1)[1] for x in get_branch if not x.startswith('origin/HEAD')]
             if 'master' in get_branch:
-                # If it is master, we do not need to append 'branch=master' as this is default.
                 # Even with the case where get_branch has multiple objects, if 'master' is one
                 # of them, we should default take from 'master'
-                srcbranch = ''
+                srcbranch = 'master'
             elif len(get_branch) == 1:
                 # If 'master' isn't in get_branch and get_branch contains only ONE object, then store result into 'srcbranch'
                 srcbranch = get_branch[0]
@@ -543,8 +545,8 @@ def create_recipe(args):
         # Since we might have a value in srcbranch, we need to
         # recontruct the srcuri to include 'branch' in params.
         scheme, network, path, user, passwd, params = bb.fetch2.decodeurl(srcuri)
-        if srcbranch:
-            params['branch'] = srcbranch
+        if scheme in ['git', 'gitsm']:
+            params['branch'] = srcbranch or 'master'
 
         if storeTagName and scheme in ['git', 'gitsm']:
             # Check srcrev using tag and check validity of the tag
@@ -603,7 +605,7 @@ def create_recipe(args):
                     splitline = line.split()
                     if len(splitline) > 1:
                         if splitline[0] == 'origin' and scriptutils.is_src_url(splitline[1]):
-                            srcuri = reformat_git_uri(splitline[1])
+                            srcuri = reformat_git_uri(splitline[1]) + ';branch=master'
                             srcsubdir = 'git'
                             break
 

@@ -21,7 +21,7 @@ DEPENDS += " \
     tiff \
 "
 
-SRC_URI = "git://github.com/wxWidgets/wxWidgets.git"
+SRC_URI = "git://github.com/wxWidgets/wxWidgets.git;branch=master;protocol=https"
 PV = "3.1.3"
 SRCREV= "8a40d23b27ed1c80b5a2ca9f7e8461df4fbc1a31"
 S = "${WORKDIR}/git"

@@ -13,7 +13,7 @@ SECTION = "net"
 
 DEPENDS = "openssl"
 
-SRC_URI = "git://github.com/open-iscsi/open-isns"
+SRC_URI = "git://github.com/open-iscsi/open-isns;branch=master;protocol=https"
 
 SRCREV = "cfdbcff867ee580a71bc9c18c3a38a6057df0150"
 

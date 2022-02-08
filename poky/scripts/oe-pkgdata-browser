@@ -236,6 +236,8 @@ class PkgUi():
         update_deps("RPROVIDES", "Provides: ", self.provides_label, clickable=False)
 
     def load_recipes(self):
+        if not os.path.exists(pkgdata):
+            sys.exit("Error: Please ensure %s exists by generating packages before using this tool." % pkgdata)
         for recipe in sorted(os.listdir(pkgdata)):
             if os.path.isfile(os.path.join(pkgdata, recipe)):
                 self.recipe_iters[recipe] = self.recipe_store.append([recipe])

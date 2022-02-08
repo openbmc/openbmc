@@ -14,7 +14,7 @@ DEPENDS_append_libc-musl = " libexecinfo"
 
 S = "${WORKDIR}/git"
 SRCREV = "79c5cfa02c567efdc5bb18cdd584789e2e35aa23"
-SRC_URI = "git://github.com/rhboot/grubby.git;protocol=https; \
+SRC_URI = "git://github.com/rhboot/grubby.git;protocol=https;branch=master \
            file://grubby-rename-grub2-editenv-to-grub-editenv.patch \
            file://run-ptest \
            file://0001-Add-another-variable-LIBS-to-provides-libraries-from.patch \

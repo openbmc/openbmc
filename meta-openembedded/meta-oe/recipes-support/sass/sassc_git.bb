@@ -6,7 +6,7 @@ DEPENDS = "libsass"
 
 inherit autotools pkgconfig
 
-SRC_URI = "git://github.com/sass/sassc.git"
+SRC_URI = "git://github.com/sass/sassc.git;branch=master;protocol=https"
 SRCREV = "46748216ba0b60545e814c07846ca10c9fefc5b6"
 S = "${WORKDIR}/git"
 PV = "3.6.1"

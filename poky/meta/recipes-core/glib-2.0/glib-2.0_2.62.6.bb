@@ -18,6 +18,30 @@ SRC_URI = "${GNOME_MIRROR}/glib/${SHRT_VER}/glib-${PV}.tar.xz \
            file://0001-gio-tests-resources.c-comment-out-a-build-host-only-.patch \
            file://tzdata-update.patch \
            file://CVE-2020-35457.patch \
+           file://CVE-2021-27218.patch \
+           file://CVE-2021-27219-01.patch \
+           file://CVE-2021-27219-02.patch \
+           file://CVE-2021-27219-03.patch \
+           file://CVE-2021-27219-04.patch \
+           file://CVE-2021-27219-05.patch \
+           file://CVE-2021-27219-06.patch \
+           file://CVE-2021-27219-07.patch \
+           file://CVE-2021-27219-08.patch \
+           file://CVE-2021-27219-09.patch \
+           file://CVE-2021-27219-10.patch \
+           file://CVE-2021-27219-11.patch \
+           file://CVE-2021-27219-reg1-1.patch \
+           file://CVE-2021-27219-reg1-2.patch \
+           file://CVE-2021-27219-reg1-4.patch \
+           file://CVE-2021-27219-reg1-5.patch \
+           file://CVE-2021-27219-reg2-1.patch \
+           file://CVE-2021-27219-reg2-2.patch \
+           file://CVE-2021-27219-reg2-3.patch \
+           file://CVE-2021-28153-1.patch \
+           file://CVE-2021-28153-2.patch \
+           file://CVE-2021-28153-3.patch \
+           file://CVE-2021-28153-4.patch \
+           file://CVE-2021-28153-5.patch \
            "
 
 SRC_URI_append_class-native = " file://relocate-modules.patch"

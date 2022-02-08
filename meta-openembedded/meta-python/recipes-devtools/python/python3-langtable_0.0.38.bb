@@ -11,7 +11,7 @@ B = "${S}"
 
 SRCREV = "35687ca957b746f153a6872139462b1443f8cad1"
 PV = "0.0.38+git${SRCPV}"
-SRC_URI = "git://github.com/mike-fabian/langtable.git;branch=master \
+SRC_URI = "git://github.com/mike-fabian/langtable.git;branch=master;protocol=https \
 "
 
 inherit setuptools3 python3native

@@ -1,0 +1,23 @@
+libainstall installs python-config.py but the .pyc cache files are generated
+by the libinstall target. This means some builds may not generate the pyc files
+for python-config.py depending on the order things happen in. This means builds
+are not always reproducible.
+
+Add a dependency to avoid the race.
+
+Upstream-Status: Pending
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: Python-3.8.11/Makefile.pre.in
+===================================================================
+--- Python-3.8.11.orig/Makefile.pre.in
++++ Python-3.8.11/Makefile.pre.in
+@@ -1415,7 +1415,7 @@ LIBSUBDIRS=	tkinter tkinter/test tkinter
+ 		unittest unittest/test unittest/test/testmock \
+ 		venv venv/scripts venv/scripts/common venv/scripts/posix \
+ 		curses pydoc_data
+-libinstall:	build_all $(srcdir)/Modules/xxmodule.c
++libinstall:	build_all $(srcdir)/Modules/xxmodule.c libainstall
+ 	@for i in $(SCRIPTDIR) $(LIBDEST); \
+ 	do \
+ 		if test ! -d $(DESTDIR)$$i; then \

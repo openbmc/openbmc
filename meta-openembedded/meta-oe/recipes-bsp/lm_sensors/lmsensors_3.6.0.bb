@@ -10,7 +10,7 @@ DEPENDS = " \
     virtual/libiconv \
 "
 
-SRC_URI = "git://github.com/lm-sensors/lm-sensors.git;protocol=https \
+SRC_URI = "git://github.com/lm-sensors/lm-sensors.git;protocol=https;branch=master \
            file://fancontrol.init \
            file://sensord.init \
 "
@@ -95,7 +95,7 @@ RDEPENDS_${PN} += " \
     ${PN}-sensorsdetect \
     ${PN}-sensorsconfconvert \
     ${PN}-pwmconfig \
-    ${PN}-isatools \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'x86', '${PN}-isatools', '', d)} \
 "
 
 # libsensors packages

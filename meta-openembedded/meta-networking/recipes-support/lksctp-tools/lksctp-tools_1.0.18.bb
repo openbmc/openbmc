@@ -14,7 +14,7 @@ PV .= "+git${SRCPV}"
 LK_REL = "1.0.18"
 
 SRC_URI = " \
-    git://github.com/sctp/lksctp-tools.git \
+    git://github.com/sctp/lksctp-tools.git;branch=master;protocol=https \
     file://0001-withsctp-use-PACKAGE_VERSION-in-withsctp.h.patch \
     file://0001-configure.ac-add-CURRENT-REVISION-and-AGE-for-libsct.patch \
     file://0001-build-fix-netinet-sctp.h-not-to-be-installed.patch \

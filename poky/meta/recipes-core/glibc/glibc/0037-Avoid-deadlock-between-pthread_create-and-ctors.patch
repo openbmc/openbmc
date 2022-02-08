@@ -1,0 +1,276 @@
+From 83b5323261bb72313bffcf37476c1b8f0847c736 Mon Sep 17 00:00:00 2001
+From: Szabolcs Nagy <szabolcs.nagy@arm.com>
+Date: Wed, 15 Sep 2021 15:16:19 +0100
+Subject: [PATCH] elf: Avoid deadlock between pthread_create and ctors [BZ
+ #28357]
+
+The fix for bug 19329 caused a regression such that pthread_create can
+deadlock when concurrent ctors from dlopen are waiting for it to finish.
+Use a new GL(dl_load_tls_lock) in pthread_create that is not taken
+around ctors in dlopen.
+
+The new lock is also used in __tls_get_addr instead of GL(dl_load_lock).
+
+The new lock is held in _dl_open_worker and _dl_close_worker around
+most of the logic before/after the init/fini routines.  When init/fini
+routines are running then TLS is in a consistent, usable state.
+In _dl_open_worker the new lock requires catching and reraising dlopen
+failures that happen in the critical section.
+
+The new lock is reinitialized in a fork child, to keep the existing
+behaviour and it is kept recursive in case malloc interposition or TLS
+access from signal handlers can retake it.  It is not obvious if this
+is necessary or helps, but avoids changing the preexisting behaviour.
+
+The new lock may be more appropriate for dl_iterate_phdr too than
+GL(dl_load_write_lock), since TLS state of an incompletely loaded
+module may be accessed.  If the new lock can replace the old one,
+that can be a separate change.
+
+Fixes bug 28357.
+
+Reviewed-by: Adhemerval Zanella  <adhemerval.zanella@linaro.org>
+---
+ elf/dl-close.c                   |   6 ++
+ elf/dl-open.c                    |  35 ++++++++-
+ elf/dl-support.c                 |   7 ++
+ elf/dl-tls.c                     |  16 ++---
+ elf/rtld.c                       |   1 +
+ sysdeps/nptl/fork.c              |   3 +
+ sysdeps/generic/ldsodefs.h       |   9 ++-
+ 10 files changed, 235 insertions(+), 12 deletions(-)
+---
+Upstream-Status: Backport [https://sourceware.org/git/?p=glibc.git;a=patch;h=024a7640ab9ecea80e527f4e4d7f7a1868e952c5]
+Comment: This patch is refreshed for glibc 2.31. In upstream glibc 2.34 multiple src files are shuffled, updated this patch as per the code present in glibc 2.31. Removed test case.
+Signed-off-by: Akash Hadke <akash.hadke@kpit.com>
+Signed-off-by: Akash Hadke <hadkeakash4@gmail.com>
+---
+diff --git a/elf/dl-close.c b/elf/dl-close.c
+index 93ff5c96e9..cfe0f1c0c9 100644
+--- a/elf/dl-close.c
++++ b/elf/dl-close.c
+@@ -551,6 +551,9 @@
+   size_t tls_free_end;
+   tls_free_start = tls_free_end = NO_TLS_OFFSET;
+ 
++  /* Protects global and module specitic TLS state.  */
++  __rtld_lock_lock_recursive (GL(dl_load_tls_lock));
++
+   /* We modify the list of loaded objects.  */
+   __rtld_lock_lock_recursive (GL(dl_load_write_lock));
+ 
+@@ -786,6 +789,9 @@
+ 	GL(dl_tls_static_used) = tls_free_start;
+     }
+ 
++  /* TLS is cleaned up for the unloaded modules.  */
++  __rtld_lock_unlock_recursive (GL(dl_load_tls_lock));
++
+ #ifdef SHARED
+   /* Auditing checkpoint: we have deleted all objects.  */
+   if (__glibc_unlikely (do_audit))
+diff --git a/elf/dl-open.c b/elf/dl-open.c
+index 5295e931b0..6ea5dd2457 100644
+--- a/elf/dl-open.c
++++ b/elf/dl-open.c
+@@ -57,6 +57,9 @@
+      (non-negative).  */
+   unsigned int original_global_scope_pending_adds;
+ 
++  /* Set to true if the end of dl_open_worker_begin was reached.  */
++  bool worker_continue;
++
+   /* Original parameters to the program and the current environment.  */
+   int argc;
+   char **argv;
+@@ -473,7 +473,7 @@
+ }
+ 
+ static void
+-dl_open_worker (void *a)
++dl_open_worker_begin (void *a)
+ {
+   struct dl_open_args *args = a;
+   const char *file = args->file;
+@@ -747,6 +747,36 @@
+   if (mode & RTLD_GLOBAL)
+     add_to_global_resize (new);
+ 
++  args->worker_continue = true;
++}
++
++static void
++dl_open_worker (void *a)
++{
++  struct dl_open_args *args = a;
++
++  args->worker_continue = false;
++
++  {
++    /* Protects global and module specific TLS state.  */
++    __rtld_lock_lock_recursive (GL(dl_load_tls_lock));
++
++    struct dl_exception ex;
++    int err = _dl_catch_exception (&ex, dl_open_worker_begin, args);
++
++    __rtld_lock_unlock_recursive (GL(dl_load_tls_lock));
++
++    if (__glibc_unlikely (ex.errstring != NULL))
++      /* Reraise the error.  */
++      _dl_signal_exception (err, &ex, NULL);
++  }
++
++  if (!args->worker_continue)
++    return;
++
++  int mode = args->mode;
++  struct link_map *new = args->map;
++
+   /* Run the initializer functions of new objects.  Temporarily
+      disable the exception handler, so that lazy binding failures are
+      fatal.  */
+diff --git a/elf/dl-support.c b/elf/dl-support.c
+index 02e2ed72f5..d99c1f1d62 100644
+--- a/elf/dl-support.c
++++ b/elf/dl-support.c
+@@ -219,6 +219,13 @@
+    list of loaded objects while an object is added to or removed from
+    that list.  */
+ __rtld_lock_define_initialized_recursive (, _dl_load_write_lock)
++/* This lock protects global and module specific TLS related data.
++   E.g. it is held in dlopen and dlclose when GL(dl_tls_generation),
++   GL(dl_tls_max_dtv_idx) or GL(dl_tls_dtv_slotinfo_list) are
++   accessed and when TLS related relocations are processed for a
++   module.  It was introduced to keep pthread_create accessing TLS
++   state that is being set up.  */
++__rtld_lock_define_initialized_recursive (, _dl_load_tls_lock)
+ 
+ 
+ #ifdef HAVE_AUX_VECTOR
+diff --git a/elf/dl-tls.c b/elf/dl-tls.c
+index d554ae4497..9260d2d696 100644
+--- a/elf/dl-tls.c
++++ b/elf/dl-tls.c
+@@ -443,7 +443,7 @@
+   size_t maxgen = 0;
+ 
+   /* Protects global dynamic TLS related state.  */
+-  __rtld_lock_lock_recursive (GL(dl_load_lock));
++  __rtld_lock_lock_recursive (GL(dl_load_tls_lock));
+ 
+   /* Check if the current dtv is big enough.   */
+   if (dtv[-1].counter < GL(dl_tls_max_dtv_idx))
+@@ -517,7 +517,7 @@
+       listp = listp->next;
+       assert (listp != NULL);
+     }
+-  __rtld_lock_unlock_recursive (GL(dl_load_lock));
++  __rtld_lock_unlock_recursive (GL(dl_load_tls_lock));
+ 
+   /* The DTV version is up-to-date now.  */
+   dtv[0].counter = maxgen;
+@@ -656,7 +656,7 @@
+ 
+ 	 Here the dtv needs to be updated to new_gen generation count.
+ 
+-	 This code may be called during TLS access when GL(dl_load_lock)
++	 This code may be called during TLS access when GL(dl_load_tls_lock)
+ 	 is not held.  In that case the user code has to synchronize with
+ 	 dlopen and dlclose calls of relevant modules.  A module m is
+ 	 relevant if the generation of m <= new_gen and dlclose of m is
+@@ -778,11 +778,11 @@
+   if (__glibc_unlikely (the_map->l_tls_offset
+ 			!= FORCED_DYNAMIC_TLS_OFFSET))
+     {
+-      __rtld_lock_lock_recursive (GL(dl_load_lock));
++      __rtld_lock_lock_recursive (GL(dl_load_tls_lock));
+       if (__glibc_likely (the_map->l_tls_offset == NO_TLS_OFFSET))
+ 	{
+ 	  the_map->l_tls_offset = FORCED_DYNAMIC_TLS_OFFSET;
+-	  __rtld_lock_unlock_recursive (GL(dl_load_lock));
++	  __rtld_lock_unlock_recursive (GL(dl_load_tls_lock));
+ 	}
+       else if (__glibc_likely (the_map->l_tls_offset
+ 			       != FORCED_DYNAMIC_TLS_OFFSET))
+@@ -794,7 +794,7 @@
+ #else
+ # error "Either TLS_TCB_AT_TP or TLS_DTV_AT_TP must be defined"
+ #endif
+-	  __rtld_lock_unlock_recursive (GL(dl_load_lock));
++	  __rtld_lock_unlock_recursive (GL(dl_load_tls_lock));
+ 
+ 	  dtv[GET_ADDR_MODULE].pointer.to_free = NULL;
+ 	  dtv[GET_ADDR_MODULE].pointer.val = p;
+@@ -802,7 +802,7 @@
+ 	  return (char *) p + GET_ADDR_OFFSET;
+ 	}
+       else
+-	__rtld_lock_unlock_recursive (GL(dl_load_lock));
++	__rtld_lock_unlock_recursive (GL(dl_load_tls_lock));
+     }
+   struct dtv_pointer result = allocate_and_init (the_map);
+   dtv[GET_ADDR_MODULE].pointer = result;
+@@ -873,7 +873,7 @@
+     return NULL;
+ 
+   dtv_t *dtv = THREAD_DTV ();
+-  /* This may be called without holding the GL(dl_load_lock).  Reading
++  /* This may be called without holding the GL(dl_load_tls_lock).  Reading
+      arbitrary gen value is fine since this is best effort code.  */
+   size_t gen = atomic_load_relaxed (&GL(dl_tls_generation));
+   if (__glibc_unlikely (dtv[0].counter != gen))
+diff --git a/elf/rtld.c b/elf/rtld.c
+index 8d2bba3d43..9642eb9c92 100644
+--- a/elf/rtld.c
++++ b/elf/rtld.c
+@@ -283,6 +283,7 @@
+ #ifdef _LIBC_REENTRANT
+     ._dl_load_lock = _RTLD_LOCK_RECURSIVE_INITIALIZER,
+     ._dl_load_write_lock = _RTLD_LOCK_RECURSIVE_INITIALIZER,
++    ._dl_load_tls_lock = _RTLD_LOCK_RECURSIVE_INITIALIZER,
+ #endif
+     ._dl_nns = 1,
+     ._dl_ns =
+diff --git a/sysdeps/nptl/fork.c b/sysdeps/nptl/fork.c
+index c471f7b15f..021691b9b7 100644
+--- a/sysdeps/nptl/fork.c
++++ b/sysdeps/nptl/fork.c
+@@ -125,6 +125,9 @@
+       /* Reset the lock the dynamic loader uses to protect its data.  */
+       __rtld_lock_initialize (GL(dl_load_lock));
+ 
++      /* Reset the lock protecting dynamic TLS related data.  */
++      __rtld_lock_initialize (GL(dl_load_tls_lock));
++
+       /* Run the handlers registered for the child.  */
+       __run_fork_handlers (atfork_run_child, multiple_threads);
+     }
+diff --git a/sysdeps/generic/ldsodefs.h b/sysdeps/generic/ldsodefs.h
+index d49529da0d..9ec1511bb0 100644
+--- a/sysdeps/generic/ldsodefs.h
++++ b/sysdeps/generic/ldsodefs.h
+@@ -369,6 +369,13 @@
+      list of loaded objects while an object is added to or removed
+      from that list.  */
+   __rtld_lock_define_recursive (EXTERN, _dl_load_write_lock)
++  /* This lock protects global and module specific TLS related data.
++     E.g. it is held in dlopen and dlclose when GL(dl_tls_generation),
++     GL(dl_tls_max_dtv_idx) or GL(dl_tls_dtv_slotinfo_list) are
++     accessed and when TLS related relocations are processed for a
++     module.  It was introduced to keep pthread_create accessing TLS
++     state that is being set up.  */
++  __rtld_lock_define_recursive (EXTERN, _dl_load_tls_lock)
+ 
+   /* Incremented whenever something may have been added to dl_loaded.  */
+   EXTERN unsigned long long _dl_load_adds;
+@@ -1153,7 +1160,7 @@
+ 
+ /* Add module to slot information data.  If DO_ADD is false, only the
+    required memory is allocated.  Must be called with GL
+-   (dl_load_lock) acquired.  If the function has already been called
++   (dl_load_tls_lock) acquired.  If the function has already been called
+    for the link map L with !do_add, then this function will not raise
+    an exception, otherwise it is possible that it encounters a memory
+    allocation failure.  */
+-- 
+2.27.0

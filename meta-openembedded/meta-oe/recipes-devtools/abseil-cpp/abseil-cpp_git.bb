@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=df52c6edb7adc22e533b2bacc3bd3915"
 PV = "20190808+git${SRCPV}"
 SRCREV = "aa844899c937bde5d2b24f276b59997e5b668bde"
 BRANCH = "lts_2019_08_08"
-SRC_URI = "git://github.com/abseil/abseil-cpp;branch=${BRANCH}                \
+SRC_URI = "git://github.com/abseil/abseil-cpp;branch=${BRANCH};protocol=https \
            file://0001-Remove-maes-option-from-cross-compilation.patch        \
            file://0002-Add-forgotten-ABSL_HAVE_VDSO_SUPPORT-conditional.patch \
            file://0003-Add-fPIC-option.patch                                  \

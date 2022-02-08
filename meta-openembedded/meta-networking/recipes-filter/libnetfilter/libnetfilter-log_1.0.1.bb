@@ -8,7 +8,7 @@ DEPENDS = "libnfnetlink libmnl"
 SRCREV = "ba196a97e810746e5660fe3f57c87c0ed0f2b324"
 PV .= "+git${SRCPV}"
 
-SRC_URI = "git://git.netfilter.org/libnetfilter_log"
+SRC_URI = "git://git.netfilter.org/libnetfilter_log;branch=master"
 
 S = "${WORKDIR}/git"
 

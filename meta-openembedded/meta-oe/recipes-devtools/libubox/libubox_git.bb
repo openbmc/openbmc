@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "\
 "
 
 SRC_URI = "\
-    git://git.openwrt.org/project/libubox.git \
+    git://git.openwrt.org/project/libubox.git;branch=master \
     file://0001-version-libraries.patch \
     file://fix-libdir.patch \
     file://0001-blobmsg-fix-array-out-of-bounds-GCC-10-warning.patch \

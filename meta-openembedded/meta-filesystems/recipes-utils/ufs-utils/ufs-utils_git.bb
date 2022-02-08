@@ -8,7 +8,7 @@ BRANCH ?= "dev"
 
 SRCREV = "a3cf93b66f4606a46354cf884d24aa966661f848"
 
-SRC_URI = "git://github.com/westerndigitalcorporation/ufs-utils.git;protocol=git;branch=${BRANCH} \
+SRC_URI = "git://github.com/westerndigitalcorporation/ufs-utils.git;protocol=https;branch=${BRANCH} \
            file://0001-Replace-u_intXX_t-with-kernel-typedefs.patch \
 "
 

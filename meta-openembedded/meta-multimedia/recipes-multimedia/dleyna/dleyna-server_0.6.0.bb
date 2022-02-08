@@ -12,7 +12,7 @@ DEPENDS = "glib-2.0 gssdp gupnp gupnp-av gupnp-dlna libsoup-2.4 libxml2 dleyna-c
 RDEPENDS_${PN} = "dleyna-connector-dbus"
 
 PV .= "+git${SRCPV}"
-SRC_URI = "git://github.com/01org/${BPN}.git"
+SRC_URI = "git://github.com/01org/${BPN}.git;branch=master;protocol=https"
 SRCREV = "eb895ae82715e9889a948ffa810c0f828b4f4c76"
 S = "${WORKDIR}/git"
 

@@ -8,7 +8,7 @@ SECTION = "net"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://main.c;beginline=2;endline=24;md5=89db8e76f2951f3fad167e7aa9718a44"
 
-SRC_URI = "git://github.com/bsdphk/Ntimed \
+SRC_URI = "git://github.com/bsdphk/Ntimed;branch=master;protocol=https \
            file://use-ldflags.patch"
 
 PV = "0.0+git${SRCPV}"

@@ -1,0 +1,46 @@
+From 1f25dae3f38548bad32c5a3ebee4c07938d8c1b8 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 30 Dec 2021 10:35:57 +0800
+Subject: [PATCH] fix build with glibc 2.34
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The closefrom() function which is introduced in glibc 2.34 conflicts
+with the one provided by postfix.
+
+Fixes:
+| In file included from attr_clnt.c:88:
+| /usr/include/unistd.h:363:13: error: conflicting types for ‘closefrom’; have ‘void(int)’
+|   363 | extern void closefrom (int __lowfd) __THROW;
+|       |             ^~~~~~~~~
+| In file included from attr_clnt.c:87:
+| ./sys_defs.h:1506:12: note: previous declaration of ‘closefrom’ with type ‘int(int)’
+|  1506 | extern int closefrom(int);
+|       |            ^~~~~~~~~
+
+Upstream-Status: Backport
+[https://github.com/vdukhovni/postfix/commit/3d966d3bd5f95b2c918aefb864549fa9f0442e24]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/util/sys_defs.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/util/sys_defs.h b/src/util/sys_defs.h
+index 39daa16..5de5855 100644
+--- a/src/util/sys_defs.h
++++ b/src/util/sys_defs.h
+@@ -827,6 +827,9 @@ extern int initgroups(const char *, int);
+ #define HAVE_POSIX_GETPW_R
+ #endif
+ #endif
++#if HAVE_GLIBC_API_VERSION_SUPPORT(2, 34)
++#define HAS_CLOSEFROM
++#endif
+ 
+ #endif
+ 
+-- 
+2.17.1
+

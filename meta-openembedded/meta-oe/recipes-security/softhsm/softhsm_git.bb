@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=ef3f77a3507c3d91e75b9f2bdaee4210"
 DEPENDS = "openssl"
 PV = "2.5.0"
 
-SRC_URI = "git://github.com/opendnssec/SoftHSMv2.git;branch=master"
+SRC_URI = "git://github.com/opendnssec/SoftHSMv2.git;branch=master;protocol=https"
 SRCREV = "369df0383d101bc8952692c2a368ac8bc887d1b4"
 
 S = "${WORKDIR}/git"

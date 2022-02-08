@@ -6,7 +6,7 @@ DEPENDS = "redis"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=d84d659a35c666d23233e54503aaea51"
 SRCREV = "685030652cd98c5414ce554ff5b356dfe8437870"
-SRC_URI = "git://github.com/redis/hiredis;protocol=git \
+SRC_URI = "git://github.com/redis/hiredis;protocol=https;branch=master \
            file://0001-Makefile-remove-hardcoding-of-CC.patch"
 
 S = "${WORKDIR}/git"

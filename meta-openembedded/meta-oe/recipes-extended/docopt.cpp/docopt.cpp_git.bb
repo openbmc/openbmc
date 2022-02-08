@@ -18,7 +18,7 @@ SRCREV = "3dd23e3280f213bacefdf5fcb04857bf52e90917"
 PV = "0.6.2+git${SRCPV}"
 
 SRC_URI = "\
-    git://github.com/docopt/docopt.cpp.git;protocol=https \
+    git://github.com/docopt/docopt.cpp.git;protocol=https;branch=master \
     file://0001-Set-library-VERSION-and-SOVERSION.patch \
 "
 

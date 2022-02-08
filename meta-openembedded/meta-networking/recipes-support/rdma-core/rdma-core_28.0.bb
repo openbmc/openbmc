@@ -6,7 +6,7 @@ DEPENDS = "libnl"
 RDEPENDS_${PN} = "bash perl"
 
 BRANCH = "stable-v${@d.getVar('PV').split('.')[0]}"
-SRC_URI = "git://github.com/linux-rdma/rdma-core.git;branch=${BRANCH} \
+SRC_URI = "git://github.com/linux-rdma/rdma-core.git;branch=${BRANCH};protocol=https \
            file://0001-Remove-man-files-which-cant-be-built.patch \
            "
 SRCREV = "f12c953f0864691eacc9fcc4cda489b92ffd5a85"

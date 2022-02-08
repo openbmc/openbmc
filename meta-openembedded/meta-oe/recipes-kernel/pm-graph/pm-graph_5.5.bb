@@ -6,7 +6,7 @@ LICENSE  = "GPL-2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e"
 
 SRCREV = "cf59527dc24fdd2f314ae4dcaeb3d68a117988f6"
-SRC_URI = "git://github.com/intel/pm-graph.git \
+SRC_URI = "git://github.com/intel/pm-graph.git;branch=master;protocol=https \
            file://0001-Makefile-fix-multilib-build-failure.patch \
            file://0001-sleepgraph.py-use-python3.patch \
 "

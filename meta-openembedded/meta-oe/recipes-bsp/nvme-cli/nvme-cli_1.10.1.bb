@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=8264535c0c4e9c6c335635c4026a8022"
 DEPENDS = "util-linux"
 PV .= "+git${SRCPV}"
 
-SRC_URI = "git://github.com/linux-nvme/nvme-cli.git \
+SRC_URI = "git://github.com/linux-nvme/nvme-cli.git;branch=master;protocol=https \
            file://0001-fix-musl-compilation.patch \
 "
 SRCREV = "1d84d6ae0c7d7ceff5a73fe174dde8b0005f6108"

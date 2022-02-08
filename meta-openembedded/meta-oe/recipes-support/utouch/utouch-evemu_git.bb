@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=f27defe1e96c2e1ecd4e0c9be8967949"
 
 inherit autotools
 
-SRC_URI = "git://bitmath.org/git/evemu.git;protocol=http \
+SRC_URI = "git://bitmath.org/git/evemu.git;protocol=http;branch=master \
            file://0001-Fix-build-on-32bit-arches-with-64bit-time_t.patch \
            "
 SRCREV = "9752b50e922572e4cd214ac45ed95e4ee410fe24"

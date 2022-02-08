@@ -8,7 +8,7 @@ DEPENDS = "expat libxml2 libxml2-native neon neon-native"
 PV = "5.1.0+git${SRCPV}"
 
 SRCREV = "44c05779dd996035758f5ec426766aeedce29cc3"
-SRC_URI = "git://github.com/metabrainz/libmusicbrainz.git \
+SRC_URI = "git://github.com/metabrainz/libmusicbrainz.git;branch=master;protocol=https \
            file://allow-libdir-override.patch "
 
 S = "${WORKDIR}/git"

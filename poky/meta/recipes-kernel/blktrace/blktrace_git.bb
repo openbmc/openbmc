@@ -14,7 +14,7 @@ SRCREV = "cca113f2fe0759b91fd6a0e10fdcda2c28f18a7e"
 
 PV = "1.2.0+git${SRCPV}"
 
-SRC_URI = "git://git.kernel.dk/blktrace.git \
+SRC_URI = "git://git.kernel.dk/blktrace.git;branch=master \
            file://ldflags.patch \
            file://CVE-2018-10689.patch \
            file://make-btt-scripts-python3-ready.patch \

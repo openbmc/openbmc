@@ -115,7 +115,7 @@ class DirectPlugin(ImagerPlugin):
         updated = False
         for part in self.parts:
             if not part.realnum or not part.mountpoint \
-               or part.mountpoint == "/":
+               or part.mountpoint == "/" or not part.mountpoint.startswith('/'):
                 continue
 
             if part.use_uuid:

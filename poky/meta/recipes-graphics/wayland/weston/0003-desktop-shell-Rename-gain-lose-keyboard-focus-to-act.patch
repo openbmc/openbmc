@@ -1,0 +1,57 @@
+From edb31c456ae3da7ffffefb668a37ab88075c4b67 Mon Sep 17 00:00:00 2001
+From: Marius Vlad <marius.vlad@collabora.com>
+Date: Fri, 5 Mar 2021 21:40:22 +0200
+Subject: [PATCH 3/5] desktop-shell: Rename gain/lose keyboard focus to
+ activate/de-activate
+
+This way it better reflects that it handles activation rather that input
+focus.
+
+Upstream-Status: Backport [ab39e1d76d4f6715cb300bc37f5c2a0e2d426208]
+Signed-off-by: Marius Vlad <marius.vlad@collabora.com>
+---
+ desktop-shell/shell.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index 3791be25..c4669f11 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -1869,14 +1869,14 @@ handle_pointer_focus(struct wl_listener *listener, void *data)
+ }
+ 
+ static void
+-shell_surface_lose_keyboard_focus(struct shell_surface *shsurf)
++shell_surface_deactivate(struct shell_surface *shsurf)
+ {
+ 	if (--shsurf->focus_count == 0)
+ 		weston_desktop_surface_set_activated(shsurf->desktop_surface, false);
+ }
+ 
+ static void
+-shell_surface_gain_keyboard_focus(struct shell_surface *shsurf)
++shell_surface_activate(struct shell_surface *shsurf)
+ {
+ 	if (shsurf->focus_count++ == 0)
+ 		weston_desktop_surface_set_activated(shsurf->desktop_surface, true);
+@@ -1891,7 +1891,7 @@ handle_keyboard_focus(struct wl_listener *listener, void *data)
+ 	if (seat->focused_surface) {
+ 		struct shell_surface *shsurf = get_shell_surface(seat->focused_surface);
+ 		if (shsurf)
+-			shell_surface_lose_keyboard_focus(shsurf);
++			shell_surface_deactivate(shsurf);
+ 	}
+ 
+ 	seat->focused_surface = weston_surface_get_main_surface(keyboard->focus);
+@@ -1899,7 +1899,7 @@ handle_keyboard_focus(struct wl_listener *listener, void *data)
+ 	if (seat->focused_surface) {
+ 		struct shell_surface *shsurf = get_shell_surface(seat->focused_surface);
+ 		if (shsurf)
+-			shell_surface_gain_keyboard_focus(shsurf);
++			shell_surface_activate(shsurf);
+ 	}
+ }
+ 
+-- 
+2.34.1
+

@@ -1,0 +1,78 @@
+From 1f25c71d9d0b5fe6cf383c347dcebc2443a99fe1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Tue, 1 Sep 2020 12:42:35 +0200
+Subject: [PATCH] basic: pass allocation info for ordered_set_new() and
+ introduce ordered_set_ensure_put()
+
+Upstream-Status: Backport [https://github.com/systemd/systemd-stable/commit/1f25c71d9d0b5fe6cf383c347dcebc2443a99fe1]
+Signed-off-by: Ranjitsinh Rathod <ranjitsinh.rathod@kpit.com>
+
+---
+ src/basic/ordered-set.c | 21 +++++++++++++++++++++
+ src/basic/ordered-set.h | 18 +++++++-----------
+ 2 files changed, 28 insertions(+), 11 deletions(-)
+
+diff --git a/src/basic/ordered-set.c b/src/basic/ordered-set.c
+index 7fdb47e064..fb82c17b5a 100644
+--- a/src/basic/ordered-set.c
++++ b/src/basic/ordered-set.c
+@@ -4,6 +4,27 @@
+ #include "ordered-set.h"
+ #include "strv.h"
+ 
++int _ordered_set_ensure_allocated(OrderedSet **s, const struct hash_ops *ops  HASHMAP_DEBUG_PARAMS) {
++        if (*s)
++                return 0;
++
++        *s = _ordered_set_new(ops  HASHMAP_DEBUG_PASS_ARGS);
++        if (!*s)
++                return -ENOMEM;
++
++        return 0;
++}
++
++int _ordered_set_ensure_put(OrderedSet **s, const struct hash_ops *ops, void *p  HASHMAP_DEBUG_PARAMS) {
++        int r;
++
++        r = _ordered_set_ensure_allocated(s, ops  HASHMAP_DEBUG_PASS_ARGS);
++        if (r < 0)
++                return r;
++
++        return ordered_set_put(*s, p);
++}
++
+ int ordered_set_consume(OrderedSet *s, void *p) {
+         int r;
+ 
+diff --git a/src/basic/ordered-set.h b/src/basic/ordered-set.h
+index a42a57eb49..2c241a808b 100644
+--- a/src/basic/ordered-set.h
++++ b/src/basic/ordered-set.h
+@@ -7,20 +7,16 @@
+ 
+ typedef struct OrderedSet OrderedSet;
+ 
+-static inline OrderedSet* ordered_set_new(const struct hash_ops *ops) {
+-        return (OrderedSet*) ordered_hashmap_new(ops);
++static inline OrderedSet* _ordered_set_new(const struct hash_ops *ops  HASHMAP_DEBUG_PARAMS) {
++        return (OrderedSet*) internal_ordered_hashmap_new(ops  HASHMAP_DEBUG_PASS_ARGS);
+ }
++#define ordered_set_new(ops) _ordered_set_new(ops  HASHMAP_DEBUG_SRC_ARGS)
+ 
+-static inline int ordered_set_ensure_allocated(OrderedSet **s, const struct hash_ops *ops) {
+-        if (*s)
+-                return 0;
++int _ordered_set_ensure_allocated(OrderedSet **s, const struct hash_ops *ops  HASHMAP_DEBUG_PARAMS);
++#define ordered_set_ensure_allocated(s, ops) _ordered_set_ensure_allocated(s, ops  HASHMAP_DEBUG_SRC_ARGS)
+ 
+-        *s = ordered_set_new(ops);
+-        if (!*s)
+-                return -ENOMEM;
+-
+-        return 0;
+-}
++int _ordered_set_ensure_put(OrderedSet **s, const struct hash_ops *ops, void *p  HASHMAP_DEBUG_PARAMS);
++#define ordered_set_ensure_put(s, hash_ops, key) _ordered_set_ensure_put(s, hash_ops, key  HASHMAP_DEBUG_SRC_ARGS)
+ 
+ static inline OrderedSet* ordered_set_free(OrderedSet *s) {
+         return (OrderedSet*) ordered_hashmap_free((OrderedHashmap*) s);

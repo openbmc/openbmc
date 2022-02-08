@@ -152,7 +152,8 @@ class ProcessServer(multiprocessing.Process):
                 conn = newconnections.pop(-1)
                 fds.append(conn)
                 self.controllersock = conn
-            elif self.timeout is None and not ready:
+
+            elif not self.timeout and not ready:
                 print("No timeout, exiting.")
                 self.quit = True
 
@@ -347,7 +348,12 @@ class ServerCommunicator():
             logger.info("No reply from server in 30s")
             if not self.recv.poll(30):
                 raise ProcessTimeout("Timeout while waiting for a reply from the bitbake server (60s)")
-        return self.recv.get()
+        ret, exc = self.recv.get()
+        # Should probably turn all exceptions in exc back into exceptions?
+        # For now, at least handle BBHandledException
+        if exc and "BBHandledException" in exc:
+            raise bb.BBHandledException()
+        return ret, exc
 
     def updateFeatureSet(self, featureset):
         _, error = self.runCommand(["setFeatures", featureset])
@@ -586,7 +592,7 @@ class BBUIEventQueue:
         self.reader = ConnectionReader(readfd)
 
         self.t = threading.Thread()
-        self.t.setDaemon(True)
+        self.t.daemon = True
         self.t.run = self.startCallbackHandler
         self.t.start()
 

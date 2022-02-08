@@ -1,0 +1,36 @@
+[PATCH] generate-cmdlist.sh: Fix determinism issue
+
+Currently git binaries are not entirely reproducible, at least partly 
+due to config-list.h differing in order depending on the system's
+locale settings. Under different locales, the entries:
+
+"sendemail.identity",
+"sendemail.<identity>.*",
+
+would differ in order for example and this leads to differences in 
+the debug symbols for the binaries.
+
+This can be fixed by specifying the C locale for the sort in the
+shell script generating the header.
+
+Note: This is a backport of Richard Purdie's original patch for a more
+recent version of git. The offending code in this older version is
+in generate-cmdlist.sh. The upstream current version has this code
+in generate-configlist.sh.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+Signed-off-by: Steve Sakoman <steve@sakoman.com>
+Upstream-Status: Submitted [https://public-inbox.org/git/f029a942dd3d50d85e60bd37d8e454524987842f.camel@linuxfoundation.org/T/#u]
+
+index 71158f7..c137091 100755
+--- a/generate-cmdlist.sh
++++ b/generate-cmdlist.sh
+@@ -82,7 +82,7 @@ static const char *config_name_list[] = {
+ EOF
+ 	grep -h '^[a-zA-Z].*\..*::$' Documentation/*config.txt Documentation/config/*.txt |
+ 	sed '/deprecated/d; s/::$//; s/,  */\n/g' |
+-	sort |
++	LC_ALL=C sort |
+ 	while read line
+ 	do
+ 		echo "	\"$line\","

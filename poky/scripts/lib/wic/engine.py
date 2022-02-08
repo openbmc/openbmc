@@ -19,10 +19,10 @@ import os
 import tempfile
 import json
 import subprocess
+import shutil
 import re
 
 from collections import namedtuple, OrderedDict
-from distutils.spawn import find_executable
 
 from wic import WicError
 from wic.filemap import sparse_copy
@@ -245,7 +245,7 @@ class Disk:
             for path in pathlist.split(':'):
                 self.paths = "%s%s:%s" % (native_sysroot, path, self.paths)
 
-        self.parted = find_executable("parted", self.paths)
+        self.parted = shutil.which("parted", path=self.paths)
         if not self.parted:
             raise WicError("Can't find executable parted")
 
@@ -283,7 +283,7 @@ class Disk:
                     "resize2fs", "mkswap", "mkdosfs", "debugfs"):
             aname = "_%s" % name
             if aname not in self.__dict__:
-                setattr(self, aname, find_executable(name, self.paths))
+                setattr(self, aname, shutil.which(name, path=self.paths))
                 if aname not in self.__dict__ or self.__dict__[aname] is None:
                     raise WicError("Can't find executable '{}'".format(name))
             return self.__dict__[aname]

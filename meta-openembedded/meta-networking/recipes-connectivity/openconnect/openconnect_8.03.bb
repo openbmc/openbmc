@@ -3,7 +3,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING.LGPL;md5=243b725d71bb5df4a1e5920b344b86ad"
 
 SRC_URI = " \
-    git://git.infradead.org/users/dwmw2/openconnect.git \
+    git://git.infradead.org/users/dwmw2/openconnect.git;branch=master \
     file://0001-trojans-tncc-wrapper.py-convert-to-python3.patch \
 "
 SRCREV = "ea73851969ae7a6ea54fdd2d2b8c94776af24b2a"

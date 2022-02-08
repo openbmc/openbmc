@@ -10,7 +10,9 @@ PROVIDES_append_class-native = " git-replacement-native"
 SRC_URI = "${KERNELORG_MIRROR}/software/scm/git/git-${PV}.tar.gz;name=tarball \
            ${KERNELORG_MIRROR}/software/scm/git/git-manpages-${PV}.tar.gz;name=manpages \
 	   file://CVE-2021-21300.patch \
-"
+           file://fixsort.patch \
+           file://CVE-2021-40330.patch \
+           "
 
 S = "${WORKDIR}/git-${PV}"
 

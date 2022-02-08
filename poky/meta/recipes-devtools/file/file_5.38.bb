@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;beginline=2;md5=0251eaec1188b20d9a72c502ecfdd
 DEPENDS = "file-replacement-native"
 DEPENDS_class-native = "bzip2-replacement-native"
 
-SRC_URI = "git://github.com/file/file.git"
+SRC_URI = "git://github.com/file/file.git;branch=master;protocol=https"
 
 SRCREV = "ec41083645689a787cdd00cb3b5bf578aa79e46c"
 S = "${WORKDIR}/git"

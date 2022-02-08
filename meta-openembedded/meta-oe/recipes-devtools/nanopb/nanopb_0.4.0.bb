@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=9db4b73a55a3994384112efcdb37c01f"
 
 DEPENDS = "protobuf-native"
 
-SRC_URI = "git://github.com/nanopb/nanopb.git"
+SRC_URI = "git://github.com/nanopb/nanopb.git;branch=master;protocol=https"
 SRCREV = "70f0de9877b1ce12abc0229d5df84db6349fcbfc"
 
 S = "${WORKDIR}/git"

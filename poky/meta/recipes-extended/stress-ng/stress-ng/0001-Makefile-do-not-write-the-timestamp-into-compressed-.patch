@@ -1,0 +1,26 @@
+From 2386cd8f907b379ae5cc1ce2888abef7d30e709a Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Sat, 23 Oct 2021 20:20:59 +0200
+Subject: [PATCH] Makefile: do not write the timestamp into compressed manpage.
+
+This helps reproducibility.
+
+Upstream-Status: Submitted [https://github.com/ColinIanKing/stress-ng/pull/156]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 886018f9..f4290f9c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -412,7 +412,7 @@ git-commit-id.h:
+ $(OBJS): stress-ng.h Makefile
+ 
+ stress-ng.1.gz: stress-ng.1
+-	gzip -c $< > $@
++	gzip -n -c $< > $@
+ 
+ .PHONY: dist
+ dist:

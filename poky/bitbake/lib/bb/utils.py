@@ -16,7 +16,8 @@ import bb.msg
 import multiprocessing
 import fcntl
 import importlib
-from importlib import machinery
+import importlib.machinery
+import importlib.util
 import itertools
 import subprocess
 import glob
@@ -1584,7 +1585,9 @@ def load_plugins(logger, plugins, pluginpath):
         logger.debug(1, 'Loading plugin %s' % name)
         spec = importlib.machinery.PathFinder.find_spec(name, path=[pluginpath] )
         if spec:
-            return spec.loader.load_module()
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            return mod
 
     logger.debug(1, 'Loading plugins from %s...' % pluginpath)
 

@@ -11,7 +11,7 @@ RDEPENDS_${PN} += "apache2"
 
 # Original (github.com/disconnect/apache-websocket) is dead since 2012, the
 # fork contains patches from the modules ML and fixes CVE compliance issues
-SRC_URI = "git://github.com/jchampio/apache-websocket.git"
+SRC_URI = "git://github.com/jchampio/apache-websocket.git;branch=master;protocol=https"
 
 SRCREV = "6968083264b90b89b1b9597a4ca03ba29e7ea2e1"
 

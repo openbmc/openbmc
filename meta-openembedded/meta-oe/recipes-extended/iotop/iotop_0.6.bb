@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4325afd396febcb659c36b49533135d4"
 PV .= "+git${SRCPV}"
 
 SRCREV = "1bfb3bc70febb1ffb95146b6dcd65257228099a3"
-SRC_URI = "git://repo.or.cz/iotop.git"
+SRC_URI = "git://repo.or.cz/iotop.git;branch=master"
 
 S = "${WORKDIR}/git"
 

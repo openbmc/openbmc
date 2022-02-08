@@ -19,7 +19,7 @@ PV = "1.4+git${SRCPV}"
 
 SRCREV = "9bc3b5b785723cfff459b0c01b39d87d4bed975c"
 
-SRC_URI = "git://github.com/thkukuk/${BPN} \
+SRC_URI = "git://github.com/thkukuk/${BPN};branch=master;protocol=https \
            file://0001-Use-cross-compiled-rpcgen.patch \
           "
 

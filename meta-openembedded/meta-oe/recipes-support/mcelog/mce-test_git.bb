@@ -10,7 +10,7 @@ containment and recovery, ACPI/APEI support etc."
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3"
 
-SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mce-test.git;protocol=git \
+SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mce-test.git;protocol=git;branch=master \
            file://makefile-remove-ldflags.patch \
            file://0001-gcov_merge.py-scov_merge.py-switch-to-python3.patch \
           "

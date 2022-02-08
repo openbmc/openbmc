@@ -9,7 +9,7 @@ DEPENDS = "util-linux"
 
 # v1.13.0
 SRCREV = "284f77f0075a16a2ad1f3b0fb89b7f64a1bc755d"
-SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git \
+SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git;branch=master \
            file://0001-f2fs-tools-Use-srcdir-prefix-to-denote-include-path.patch \
            "
 S = "${WORKDIR}/git"

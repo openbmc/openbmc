@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://ui/mtr.c;beginline=5;endline=16;md5=00a894a39d53726a27386534d1c4e468"
 
 SRCREV = "304349bad86229aedbc62c07d5e98a8292967991"
-SRC_URI = "git://github.com/traviscross/mtr"
+SRC_URI = "git://github.com/traviscross/mtr;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

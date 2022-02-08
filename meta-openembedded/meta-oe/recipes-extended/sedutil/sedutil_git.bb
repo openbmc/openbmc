@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://Common/LICENSE.txt;md5=d32239bcb673463ab874e80d47fae5
 BASEPV = "1.15.1"
 PV = "${BASEPV}+git${SRCPV}"
 SRCREV = "358cc758948be788284d5faba46ccf4cc1813796"
-SRC_URI = "git://github.com/Drive-Trust-Alliance/sedutil.git \
+SRC_URI = "git://github.com/Drive-Trust-Alliance/sedutil.git;branch=master;protocol=https \
 	file://0001-Fix-build-on-big-endian-architectures.patch \
 "
 

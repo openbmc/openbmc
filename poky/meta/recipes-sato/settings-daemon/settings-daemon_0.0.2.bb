@@ -9,7 +9,7 @@ SECTION = "x11"
 
 # SRCREV tagged 0.0.2
 SRCREV = "b2e5da502f8c5ff75e9e6da771372ef8e40fd9a2"
-SRC_URI = "git://git.yoctoproject.org/xsettings-daemon \
+SRC_URI = "git://git.yoctoproject.org/xsettings-daemon;branch=master \
            file://addsoundkeys.patch \
            file://70settings-daemon.sh \
            "

@@ -355,7 +355,7 @@ python package_do_split_gconvs () {
                 m.write("\t@echo 'Progress %d/%d'\n" % (i, total))
                 m.write("\t" + makerecipe + "\n\n")
         d.setVar("EXTRA_OEMAKE", "-C %s ${PARALLEL_MAKE}" % (os.path.dirname(makefile)))
-        d.setVarFlag("oe_runmake", "progress", "outof:Progress\s(\d+)/(\d+)")
+        d.setVarFlag("oe_runmake", "progress", r"outof:Progress\s(\d+)/(\d+)")
         bb.note("Executing binary locale generation makefile")
         bb.build.exec_func("oe_runmake", d)
         bb.note("collecting binary locales from locale tree")

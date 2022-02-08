@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=f673270bfc350d9ce1efc8724c6c1873"
 DEPENDS_append_class-target = " swig-native sblim-cmpi-devel python3"
 DEPENDS_append_class-native = " cmpi-bindings-native"
 
-SRC_URI = "git://github.com/rnovacek/konkretcmpi.git \
+SRC_URI = "git://github.com/rnovacek/konkretcmpi.git;branch=master;protocol=https \
            file://0001-CMakeLists.txt-fix-lib64-can-not-be-shiped-in-64bit-.patch \
            file://0001-drop-including-rpath-cmake-module.patch \
            "

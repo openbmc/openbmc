@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://debian/copyright;md5=c3ea231a32635cbb5debedf3e88aa3df
 
 PV = "4.1+git${SRCPV}"
 
-SRC_URI = "git://github.com/Datera/lio-utils.git \
+SRC_URI = "git://github.com/Datera/lio-utils.git;branch=master;protocol=https \
            file://0001-Makefiles-Respect-environment-variables-and-add-LDFL.patch \
            "
 SRCREV = "0ac9091c1ff7a52d5435a4f4449e82637142e06e"

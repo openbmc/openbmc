@@ -29,7 +29,7 @@ SRC_URI[sha256sum] = "265eb46b55d7eaeb887fca7a1d51fe115658882dfe148164b6c49fccac
 
 S = "${WORKDIR}/newt-${PV}"
 
-inherit autotools-brokensep python3native python3-dir
+inherit autotools-brokensep python3native python3-dir python3targetconfig
 
 EXTRA_OECONF = "--without-tcl --with-python"
 

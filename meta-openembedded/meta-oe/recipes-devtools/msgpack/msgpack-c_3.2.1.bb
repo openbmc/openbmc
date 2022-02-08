@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://NOTICE;md5=7a858c074723608e08614061dc044352 \
 
 PV .= "+git${SRCPV}"
 
-SRC_URI = "git://github.com/msgpack/msgpack-c \
+SRC_URI = "git://github.com/msgpack/msgpack-c;branch=master;protocol=https \
            "
 # cpp-3.2.1
 SRCREV = "8085ab8721090a447cf98bb802d1406ad7afe420"

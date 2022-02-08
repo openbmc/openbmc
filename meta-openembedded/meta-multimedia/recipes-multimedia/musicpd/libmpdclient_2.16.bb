@@ -6,7 +6,7 @@ HOMEPAGE = "https://www.musicpd.org/libs/libmpdclient/"
 inherit meson
 
 SRC_URI = " \
-    git://github.com/MusicPlayerDaemon/libmpdclient \
+    git://github.com/MusicPlayerDaemon/libmpdclient;branch=master;protocol=https \
 "
 SRCREV = "4e8d990eb5239566ee948f1cd79b7248e008620a"
 S = "${WORKDIR}/git"

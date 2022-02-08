@@ -4,7 +4,7 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e7fe20c9be97be5579e3ab5d92d3a218"
 SECTION = "libs"
 
-SRC_URI = "git://github.com/projectNe10/Ne10.git \
+SRC_URI = "git://github.com/projectNe10/Ne10.git;branch=master;protocol=https \
            file://0001-CMakeLists.txt-Remove-mthumb-interwork.patch \
            file://0001-Dont-specify-march-explicitly.patch \
            "

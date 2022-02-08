@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=55aa8c9fcad0691cef0ecd420361e390"
 
 DEPENDS = "gnutls"
 
-SRC_URI = "git://github.com/iputils/iputils \
+SRC_URI = "git://github.com/iputils/iputils;branch=master;protocol=https \
            file://0001-ninfod-change-variable-name-to-avoid-colliding-with-.patch \
            file://0001-ninfod-fix-systemd-Documentation-url-error.patch \
            file://0001-rarpd-rdisc-Drop-PrivateUsers.patch \
@@ -20,6 +20,7 @@ SRC_URI = "git://github.com/iputils/iputils \
            file://0003-arping-Fix-comparison-of-different-signedness-warnin.patch \
            file://0004-arping-return-success-when-unsolicited-ARP-mode-dest.patch \
            file://0005-arping-use-additional-timerfd-to-control-when-timeou.patch \
+           file://0001-arping-make-update-neighbours-work-again.patch \
            "
 SRCREV = "13e00847176aa23683d68fce1d17ffb523510946"
 

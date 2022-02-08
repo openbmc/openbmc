@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM="file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 # v1.9.9
 SRCREV = "1283a65c541c4a83e152024a63faf7b267b9b1cd"
-SRC_URI = "git://github.com/jirka-h/haveged.git \
+SRC_URI = "git://github.com/jirka-h/haveged.git;branch=master;protocol=https \
 "
 S = "${WORKDIR}/git"
 

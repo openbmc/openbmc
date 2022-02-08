@@ -9,7 +9,7 @@ SRCREV = "ad7e646700d14b81413297bda02fb7fe96613c3f"
 
 PV = "1.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/ssvb/cpuburn-arm.git \
+SRC_URI = "git://github.com/ssvb/cpuburn-arm.git;branch=master;protocol=https \
            file://0001-cpuburn-a8.S-Remove-.func-.endfunc.patch \
            file://0002-burn.S-Add.patch \
            file://0003-burn.S-Remove-.func-.endfunc.patch \

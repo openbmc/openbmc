@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 PV = "6.10"
 
 SRCREV = "5ff5fc2ecc10353fd39ad508db5c2828fd2d8d9a"
-SRC_URI = "git://git.samba.org/cifs-utils.git"
+SRC_URI = "git://git.samba.org/cifs-utils.git;branch=master"
 
 S = "${WORKDIR}/git"
 DEPENDS += "libtalloc"

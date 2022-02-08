@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = " \
 "
 
 SRCREV = "4ddd8ed5ca6484b930b111aec50c2750a6119a0f"
-SRC_URI = "git://github.com/${BPN}/${BPN}.git"
+SRC_URI = "git://github.com/${BPN}/${BPN}.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

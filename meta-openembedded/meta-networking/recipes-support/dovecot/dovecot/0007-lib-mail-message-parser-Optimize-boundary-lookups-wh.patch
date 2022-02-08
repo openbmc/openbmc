@@ -1,0 +1,72 @@
+From 5f8de52fec3191a1aa68a399ee2068485737dc4f Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 23 Apr 2020 13:06:02 +0300
+Subject: [PATCH 07/13] lib-mail: message-parser - Optimize boundary lookups
+ when exact boundary is found
+
+When an exact boundary is found, there's no need to continue looking for
+more boundaries.
+---
+ src/lib-mail/message-parser.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index 92f541b02..c2934c761 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -80,8 +80,14 @@ boundary_find(struct message_boundary *boundaries,
+ 	while (boundaries != NULL) {
+ 		if (boundaries->len <= len &&
+ 		    memcmp(boundaries->boundary, data, boundaries->len) == 0 &&
+-		    (best == NULL || best->len < boundaries->len))
++		    (best == NULL || best->len < boundaries->len)) {
+ 			best = boundaries;
++			if (best->len == len) {
++				/* This is exactly the wanted boundary. There
++				   can't be a better one. */
++				break;
++			}
++		}
+ 
+ 		boundaries = boundaries->next;
+ 	}
+@@ -263,15 +269,27 @@ boundary_line_find(struct message_parser_ctx *ctx,
+ 	/* need to find the end of line */
+ 	data += 2;
+ 	size -= 2;
+-	if (memchr(data, '\n', size) == NULL &&
++	const unsigned char *lf_pos = memchr(data, '\n', size);
++	if (lf_pos == NULL &&
+ 	    size+2 < BOUNDARY_END_MAX_LEN &&
+ 	    !ctx->input->eof && !full) {
+ 		/* no LF found */
+ 		ctx->want_count = BOUNDARY_END_MAX_LEN;
+ 		return 0;
+ 	}
+-
+-	*boundary_r = boundary_find(ctx->boundaries, data, size);
++	size_t find_size = size;
++
++	if (lf_pos != NULL) {
++		find_size = lf_pos - data;
++		if (find_size > 0 && data[find_size-1] == '\r')
++			find_size--;
++		if (find_size > 2 && data[find_size-1] == '-' &&
++		    data[find_size-2] == '-')
++			find_size -= 2;
++	} else if (find_size > BOUNDARY_END_MAX_LEN)
++		find_size = BOUNDARY_END_MAX_LEN;
++
++	*boundary_r = boundary_find(ctx->boundaries, data, find_size);
+ 	if (*boundary_r == NULL)
+ 		return -1;
+ 
+-- 
+2.11.0
+

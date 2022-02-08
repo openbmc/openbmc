@@ -1,0 +1,32 @@
+From 5c74a0640e873694bf60a88eceb21f664cb4b8f7 Mon Sep 17 00:00:00 2001
+From: Marius Vlad <marius.vlad@collabora.com>
+Date: Fri, 5 Mar 2021 20:03:49 +0200
+Subject: [PATCH 2/5] desktop-shell: Remove no-op de-activation of the xdg
+ top-level surface
+
+The shsurf is calloc'ed so the surface count is always 0.  Not only
+that but the surface is not set as active by default, so there's no
+need to de-activate it.
+
+Upstream-Status: Backport [05bef4c18a3e82376a46a4a28d978389c4c0fd0f]
+Signed-off-by: Marius Vlad <marius.vlad@collabora.com>
+---
+ desktop-shell/shell.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index 442a625f..3791be25 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -2427,8 +2427,6 @@ desktop_surface_added(struct weston_desktop_surface *desktop_surface,
+ 	wl_list_init(&shsurf->children_link);
+ 
+ 	weston_desktop_surface_set_user_data(desktop_surface, shsurf);
+-	weston_desktop_surface_set_activated(desktop_surface,
+-					     shsurf->focus_count > 0);
+ }
+ 
+ static void
+-- 
+2.34.1
+

@@ -6,7 +6,7 @@ SECTION = "base"
 
 S = "${WORKDIR}/git"
 SRCREV = "40c5d226c7c0706f0176884e9b94b3886679c983"
-SRC_URI = "git://github.com/KhronosGroup/OpenCL-Headers.git"
+SRC_URI = "git://github.com/KhronosGroup/OpenCL-Headers.git;branch=master;protocol=https"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"

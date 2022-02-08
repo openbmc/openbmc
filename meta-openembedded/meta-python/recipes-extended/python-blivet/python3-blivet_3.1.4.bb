@@ -9,7 +9,7 @@ S = "${WORKDIR}/git"
 B = "${S}"
 
 SRCREV = "9b5ad2d5b5df159963e1c6c24523e1dfe1f71435"
-SRC_URI = "git://github.com/rhinstaller/blivet;branch=3.1-release \
+SRC_URI = "git://github.com/rhinstaller/blivet;branch=3.1-release;protocol=https \
            file://0001-comment-out-selinux.patch \
            file://0002-run_program-support-timeout.patch \
            file://0003-support-infinit-timeout.patch \

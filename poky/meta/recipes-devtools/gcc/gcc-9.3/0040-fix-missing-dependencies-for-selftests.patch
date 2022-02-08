@@ -1,0 +1,45 @@
+From b19d8aac15649f31a7588b2634411a1922906ea8 Mon Sep 17 00:00:00 2001
+From: Romain Naour <romain.naour@gmail.com>
+Date: Wed, 3 Jun 2020 12:30:57 -0600
+Subject: [PATCH] Fix missing dependencies for selftests which occasionally
+ causes failed builds.
+
+gcc/
+
+	* Makefile.in (SELFTEST_DEPS): Move before including language makefile
+	fragments.
+	
+Upstream-Status: Backport [https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=b19d8aac15649f31a7588b2634411a1922906ea8]
+Signed-off-by:Steve Sakoman <steve@sakoman.com>
+
+---
+ gcc/Makefile.in | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/gcc/Makefile.in b/gcc/Makefile.in
+index aab1dbba57b..be11311b60d 100644
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
+@@ -1735,6 +1735,10 @@ $(FULL_DRIVER_NAME): ./xgcc$(exeext)
+ 	$(LN_S) $< $@
+ 
+ #
++# SELFTEST_DEPS need to be set before including language makefile fragments.
++# Otherwise $(SELFTEST_DEPS) is empty when used from <LANG>/Make-lang.in.
++SELFTEST_DEPS = $(GCC_PASSES) stmp-int-hdrs $(srcdir)/testsuite/selftests
++
+ # Language makefile fragments.
+ 
+ # The following targets define the interface between us and the languages.
+@@ -2010,8 +2014,6 @@ DEVNULL=$(if $(findstring mingw,$(build)),nul,/dev/null)
+ SELFTEST_FLAGS = -nostdinc $(DEVNULL) -S -o $(DEVNULL) \
+ 	-fself-test=$(srcdir)/testsuite/selftests
+ 
+-SELFTEST_DEPS = $(GCC_PASSES) stmp-int-hdrs $(srcdir)/testsuite/selftests
+-
+ # Run the selftests during the build once we have a driver and the frontend,
+ # so that self-test failures are caught as early as possible.
+ # Use "s-selftest-FE" to ensure that we only run the selftests if the
+-- 
+2.27.0
+

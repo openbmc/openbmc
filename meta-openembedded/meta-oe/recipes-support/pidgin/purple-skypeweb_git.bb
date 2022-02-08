@@ -7,7 +7,7 @@ DEPENDS = "pidgin json-glib glib-2.0 zlib"
 
 inherit pkgconfig
 
-SRC_URI = "git://github.com/EionRobb/skype4pidgin;branch=master;protocol=git"
+SRC_URI = "git://github.com/EionRobb/skype4pidgin;branch=master;protocol=https"
 SRCREV = "14f1b69b6292bbdc98cca484b050ec8359394c4e"
 
 S = "${WORKDIR}/git"

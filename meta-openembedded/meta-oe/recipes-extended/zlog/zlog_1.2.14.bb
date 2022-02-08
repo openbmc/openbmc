@@ -4,7 +4,7 @@ LICENSE = "LGPLv2.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 SRCREV = "8fc78c3c65cb705953a2f3f9a813c3ef3c8b2270"
-SRC_URI = "git://github.com/HardySimpson/zlog"
+SRC_URI = "git://github.com/HardySimpson/zlog;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

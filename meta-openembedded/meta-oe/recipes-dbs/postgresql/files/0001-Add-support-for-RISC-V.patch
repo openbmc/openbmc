@@ -13,7 +13,7 @@ diff --git a/src/include/storage/s_lock.h b/src/include/storage/s_lock.h
 index 3fe29ce..7cd578f 100644
 --- a/src/include/storage/s_lock.h
 +++ b/src/include/storage/s_lock.h
-@@ -316,11 +316,12 @@ tas(volatile slock_t *lock)
+@@ -317,11 +317,12 @@ tas(volatile slock_t *lock)
  
  /*
   * On ARM and ARM64, we use __sync_lock_test_and_set(int *, int) if available.
@@ -27,7 +27,7 @@ index 3fe29ce..7cd578f 100644
  #ifdef HAVE_GCC__SYNC_INT32_TAS
  #define HAS_TEST_AND_SET
  
-@@ -337,7 +338,7 @@ tas(volatile slock_t *lock)
+@@ -338,7 +339,7 @@ tas(volatile slock_t *lock)
  #define S_UNLOCK(lock) __sync_lock_release(lock)
  
  #endif	 /* HAVE_GCC__SYNC_INT32_TAS */
@@ -35,7 +35,7 @@ index 3fe29ce..7cd578f 100644
 +#endif	 /* __arm__ || __arm || __aarch64__ || __aarch64 || __riscv */
  
  
- /* S/390 and S/390x Linux (32- and 64-bit zSeries) */
+ /*
 -- 
 2.9.3
 

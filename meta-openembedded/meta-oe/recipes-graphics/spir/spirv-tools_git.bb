@@ -8,11 +8,11 @@ SECTION = "graphics"
 
 S = "${WORKDIR}/git"
 DEST_DIR = "${S}/external" 
-SRC_URI = "git://github.com/KhronosGroup/SPIRV-Tools.git;name=spirv-tools \
-	git://github.com/KhronosGroup/SPIRV-Headers.git;name=spirv-headers;destsuffix=${DEST_DIR}/spirv-headers \
-	git://github.com/google/effcee.git;name=effcee;destsuffix=${DEST_DIR}/effcee \
-	git://github.com/google/re2.git;name=re2;destsuffix=${DEST_DIR}/re2 \
-	git://github.com/google/googletest.git;name=googletest;destsuffix=${DEST_DIR}/googletest \
+SRC_URI = "git://github.com/KhronosGroup/SPIRV-Tools.git;name=spirv-tools;branch=master;protocol=https \
+	git://github.com/KhronosGroup/SPIRV-Headers.git;name=spirv-headers;destsuffix=${DEST_DIR}/spirv-headers;branch=master;protocol=https \
+	git://github.com/google/effcee.git;name=effcee;destsuffix=${DEST_DIR}/effcee;branch=master;protocol=https \
+	git://github.com/google/re2.git;name=re2;destsuffix=${DEST_DIR}/re2;branch=master;protocol=https \
+	git://github.com/google/googletest.git;name=googletest;destsuffix=${DEST_DIR}/googletest;branch=master;protocol=https \
         file://0001-Respect-CMAKE_INSTALL_LIBDIR-in-installed-CMake-file.patch \
         file://0001-Avoid-pessimizing-std-move-3124.patch \
 "
@@ -21,6 +21,7 @@ SRCREV_spirv-headers = "af64a9e826bf5bb5fcd2434dd71be1e41e922563"
 SRCREV_effcee = "cd25ec17e9382f99a895b9ef53ff3c277464d07d"
 SRCREV_re2 = "5bd613749fd530b576b890283bfb6bc6ea6246cb"
 SRCREV_googletest = "f2fb48c3b3d79a75a88a99fba6576b25d42ec528"
+SRCREV_FORMAT = "spirv-ttols_spirv-headers_effcee_re2_googletest"
 
 inherit cmake python3native
 

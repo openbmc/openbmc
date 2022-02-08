@@ -3,7 +3,7 @@ HOMEPAGE = "http://git.breakpoint.cc/cgit/bigeasy/serialcheck.git/"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "git://git.breakpoint.cc/bigeasy/serialcheck.git \
+SRC_URI = "git://git.breakpoint.cc/bigeasy/serialcheck.git;branch=master \
            file://0001-Add-option-to-enable-internal-loopback.patch \
            file://0002-Restore-original-loopback-config.patch \
            file://0001-Makefile-Change-order-of-link-flags.patch \

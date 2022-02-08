@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4cfd939b1d7e6aba9fcefb7f6e2fd45d"
 
 DEPENDS = "libnl"
 
-SRC_URI = "git://github.com/linux-wpan/wpan-tools"
+SRC_URI = "git://github.com/linux-wpan/wpan-tools;branch=master;protocol=https"
 SRCREV = "a316ca2caa746d60817400e5bf646c2820f09273"
 
 S = "${WORKDIR}/git"

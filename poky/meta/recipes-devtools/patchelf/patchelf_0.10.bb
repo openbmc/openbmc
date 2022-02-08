@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/NixOS/patchelf"
 
 LICENSE = "GPLv3"
 
-SRC_URI = "git://github.com/NixOS/patchelf;protocol=https \
+SRC_URI = "git://github.com/NixOS/patchelf;protocol=https;branch=master \
            file://handle-read-only-files.patch \
            file://fix-adjusting-startPage.patch \
            file://fix-phdrs.patch \

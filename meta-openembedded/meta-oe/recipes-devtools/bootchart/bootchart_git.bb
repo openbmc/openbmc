@@ -8,7 +8,7 @@ PV = "1.17"
 PR = "r1"
 PE = "1"
 
-SRC_URI = "git://gitorious.org/meego-developer-tools/bootchart.git;protocol=https \
+SRC_URI = "git://gitorious.org/meego-developer-tools/bootchart.git;protocol=https;branch=master \
            file://0001-svg-add-rudimentary-support-for-ARM-cpuinfo.patch \
            file://0002-svg-open-etc-os-release-and-use-PRETTY_NAME-for-the-.patch \
 "

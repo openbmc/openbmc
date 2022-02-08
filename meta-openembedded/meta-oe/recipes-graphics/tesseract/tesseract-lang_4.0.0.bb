@@ -4,7 +4,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://COPYING;md5=9648bd7af63bd3cc4f5ac046d12c49e4"
 
 SRCREV = "590567f20dc044f6948a8e2c61afc714c360ad0e"
-SRC_URI = "git://github.com/tesseract-ocr/tessdata.git"
+SRC_URI = "git://github.com/tesseract-ocr/tessdata.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 

@@ -10,7 +10,7 @@ SRCREV = "551a110918493a19d11243f53408b97485de1411"
 SRCBRANCH = "6.6.fb"
 PV = "6.6.4"
 
-SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH} \
+SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH};protocol=https \
            file://0001-db-write_thread.cc-Initialize-state.patch \
            file://0001-cmake-Add-check-for-atomic-support.patch \
           "

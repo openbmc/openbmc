@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=18810669f13b87348459e611d31ab760 \
 
 PV = "0.5.9+git${SRCPV}"
 SRCREV = "3a3d622d9bb74c44fa67bc20573751a207514134"
-SRC_URI = "git://github.com/lcdproc/lcdproc \
+SRC_URI = "git://github.com/lcdproc/lcdproc;branch=master;protocol=https \
            file://0001-Fix-parallel-build-fix-port-internal-make-dependenci.patch \
            file://0002-Include-limits.h-for-PATH_MAX-definition.patch \
            file://0003-Fix-non-x86-platforms-on-musl.patch \

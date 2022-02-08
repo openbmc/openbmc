@@ -1,0 +1,30 @@
+From bd9d2fe7da833f0e4705a8280efc56930371806b Mon Sep 17 00:00:00 2001
+From: Aki Tuomi <aki.tuomi@open-xchange.com>
+Date: Wed, 6 May 2020 13:40:36 +0300
+Subject: [PATCH 1/3] auth: mech-rpa - Fail on zero len buffer
+
+---
+ src/auth/mech-rpa.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12674
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/auth/mech-rpa.c b/src/auth/mech-rpa.c
+index 08298ebdd6..2de8705b4f 100644
+--- a/src/auth/mech-rpa.c
++++ b/src/auth/mech-rpa.c
+@@ -224,7 +224,7 @@ rpa_read_buffer(pool_t pool, const unsigned char **data,
+ 		return 0;
+ 
+ 	len = *p++;
+-	if (p + len > end)
++	if (p + len > end || len == 0)
+ 		return 0;
+ 
+ 	*buffer = p_malloc(pool, len);
+-- 
+2.11.0

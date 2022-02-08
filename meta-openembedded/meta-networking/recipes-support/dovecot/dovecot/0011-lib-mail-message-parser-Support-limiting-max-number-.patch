@@ -1,0 +1,87 @@
+From d7bba401dd234802bcdb55ff27dfb99bffdab804 Mon Sep 17 00:00:00 2001
+From: Timo Sirainen <timo.sirainen@open-xchange.com>
+Date: Thu, 23 Apr 2020 17:09:33 +0300
+Subject: [PATCH 11/13] lib-mail: message-parser - Support limiting max number
+ of MIME parts
+
+The default is to allow 10000 MIME parts. When it's reached, no more
+MIME boundary lines will be recognized, so the rest of the mail belongs
+to the last added MIME part.
+---
+ src/lib-mail/message-parser.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+diff --git a/src/lib-mail/message-parser.c b/src/lib-mail/message-parser.c
+index 721615f76..646307802 100644
+--- a/src/lib-mail/message-parser.c
++++ b/src/lib-mail/message-parser.c
+@@ -14,6 +14,7 @@
+ #define BOUNDARY_END_MAX_LEN (BOUNDARY_STRING_MAX_LEN + 2 + 2)
+ 
+ #define MESSAGE_PARSER_DEFAULT_MAX_NESTED_MIME_PARTS 100
++#define MESSAGE_PARSER_DEFAULT_MAX_TOTAL_MIME_PARTS 10000
+ 
+ struct message_boundary {
+ 	struct message_boundary *next;
+@@ -31,10 +32,12 @@ struct message_parser_ctx {
+ 	struct message_part *parts, *part;
+ 	const char *broken_reason;
+ 	unsigned int nested_parts_count;
++	unsigned int total_parts_count;
+ 
+ 	enum message_header_parser_flags hdr_flags;
+ 	enum message_parser_flags flags;
+ 	unsigned int max_nested_mime_parts;
++	unsigned int max_total_mime_parts;
+ 
+ 	char *last_boundary;
+ 	struct message_boundary *boundaries;
+@@ -211,7 +214,9 @@ message_part_append(struct message_parser_ctx *ctx)
+ 
+ 	ctx->part = part;
+ 	ctx->nested_parts_count++;
++	ctx->total_parts_count++;
+ 	i_assert(ctx->nested_parts_count < ctx->max_nested_mime_parts);
++	i_assert(ctx->total_parts_count <= ctx->max_total_mime_parts);
+ }
+ 
+ static void message_part_finish(struct message_parser_ctx *ctx)
+@@ -296,6 +301,12 @@ boundary_line_find(struct message_parser_ctx *ctx,
+ 		return -1;
+ 	}
+ 
++	if (ctx->total_parts_count >= ctx->max_total_mime_parts) {
++		/* can't add any more MIME parts. just stop trying to find
++		   more boundaries. */
++		return -1;
++	}
++
+ 	/* need to find the end of line */
+ 	data += 2;
+ 	size -= 2;
+@@ -1125,6 +1136,8 @@ message_parser_init_int(struct istream *input,
+ 	ctx->flags = flags;
+ 	ctx->max_nested_mime_parts =
+ 		MESSAGE_PARSER_DEFAULT_MAX_NESTED_MIME_PARTS;
++	ctx->max_total_mime_parts =
++		MESSAGE_PARSER_DEFAULT_MAX_TOTAL_MIME_PARTS;
+ 	ctx->input = input;
+ 	i_stream_ref(input);
+ 	return ctx;
+@@ -1142,6 +1155,7 @@ message_parser_init(pool_t part_pool, struct istream *input,
+ 	ctx->parts = ctx->part = p_new(part_pool, struct message_part, 1);
+ 	ctx->next_part = &ctx->part->children;
+ 	ctx->parse_next_block = parse_next_header_init;
++	ctx->total_parts_count = 1;
+ 	i_array_init(&ctx->next_part_stack, 4);
+ 	return ctx;
+ }
+-- 
+2.11.0
+

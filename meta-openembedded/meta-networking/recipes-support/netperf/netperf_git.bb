@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a0ab17253e7a3f318da85382c7d5d5d6"
 
 PV = "2.7.0+git${SRCPV}"
 
-SRC_URI = "git://github.com/HewlettPackard/netperf.git \
+SRC_URI = "git://github.com/HewlettPackard/netperf.git;branch=master;protocol=https \
            file://cpu_set.patch \
            file://vfork.patch \
            file://init \

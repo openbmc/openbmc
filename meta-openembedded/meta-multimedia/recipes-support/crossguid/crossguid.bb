@@ -10,7 +10,7 @@ DEPENDS += "util-linux"
 PV = "0.0+git${SRCPV}"
 
 SRCREV = "b56957ac453575e91ca1b63a80c0077c2b0d011a"
-SRC_URI = "git://github.com/graeme-hill/crossguid;protocol=https"
+SRC_URI = "git://github.com/graeme-hill/crossguid;protocol=https;branch=master"
 
 S = "${WORKDIR}/git"
 

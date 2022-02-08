@@ -5,7 +5,7 @@ and should run on all Linux systems that need error handling."
 HOMEPAGE = "http://mcelog.org/"
 SECTION = "System Environment/Base"
 
-SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mcelog.git;protocol=http; \
+SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mcelog.git;protocol=http;branch=master \
     file://run-ptest \
 "
 

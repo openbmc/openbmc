@@ -8,7 +8,7 @@ inherit pkgconfig cmake
 
 S = "${WORKDIR}/git"
 SRCREV = "b342ff7b7f70a4b3f2cfc53215af8fa20adc3d86"
-SRC_URI = "git://github.com/KhronosGroup/OpenCL-ICD-Loader.git"
+SRC_URI = "git://github.com/KhronosGroup/OpenCL-ICD-Loader.git;branch=master;protocol=https"
 
 do_install () {
 	install -d ${D}${bindir}

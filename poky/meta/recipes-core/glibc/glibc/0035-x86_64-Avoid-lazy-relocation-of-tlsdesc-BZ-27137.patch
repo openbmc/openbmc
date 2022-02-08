@@ -1,0 +1,56 @@
+From 8f7e09f4dbdb5c815a18b8285fbc5d5d7bc17d86 Mon Sep 17 00:00:00 2001
+From: Szabolcs Nagy <szabolcs.nagy@arm.com>
+Date: Thu, 11 Feb 2021 11:29:23 +0000
+Subject: [PATCH] x86_64: Avoid lazy relocation of tlsdesc [BZ #27137]
+
+Lazy tlsdesc relocation is racy because the static tls optimization and
+tlsdesc management operations are done without holding the dlopen lock.
+
+This similar to the commit b7cf203b5c17dd6d9878537d41e0c7cc3d270a67
+for aarch64, but it fixes a different race: bug 27137.
+
+Another issue is that ld auditing ignores DT_BIND_NOW and thus tries to
+relocate tlsdesc lazily, but that does not work in a BIND_NOW module
+due to missing DT_TLSDESC_PLT. Unconditionally relocating tlsdesc at
+load time fixes this bug 27721 too.
+---
+ sysdeps/x86_64/dl-machine.h | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+---
+Upstream-Status: Backport [https://sourceware.org/git/?p=glibc.git;a=patch;h=8f7e09f4dbdb5c815a18b8285fbc5d5d7bc17d86]
+Signed-off-by: Akash Hadke <akash.hadke@kpit.com>
+Signed-off-by: Akash Hadke <hadkeakash4@gmail.com>
+---
+diff --git a/sysdeps/x86_64/dl-machine.h b/sysdeps/x86_64/dl-machine.h
+index 103eee6c3f..9a876a371e 100644
+--- a/sysdeps/x86_64/dl-machine.h
++++ b/sysdeps/x86_64/dl-machine.h
+@@ -570,12 +570,21 @@ elf_machine_lazy_rel (struct link_map *map,
+     }
+   else if (__glibc_likely (r_type == R_X86_64_TLSDESC))
+     {
+-      struct tlsdesc volatile * __attribute__((__unused__)) td =
+-	(struct tlsdesc volatile *)reloc_addr;
++      const Elf_Symndx symndx = ELFW (R_SYM) (reloc->r_info);
++      const ElfW (Sym) *symtab = (const void *)D_PTR (map, l_info[DT_SYMTAB]);
++      const ElfW (Sym) *sym = &symtab[symndx];
++      const struct r_found_version *version = NULL;
+ 
+-      td->arg = (void*)reloc;
+-      td->entry = (void*)(D_PTR (map, l_info[ADDRIDX (DT_TLSDESC_PLT)])
+-			  + map->l_addr);
++      if (map->l_info[VERSYMIDX (DT_VERSYM)] != NULL)
++	{
++	  const ElfW (Half) *vernum =
++	    (const void *)D_PTR (map, l_info[VERSYMIDX (DT_VERSYM)]);
++	  version = &map->l_versions[vernum[symndx] & 0x7fff];
++	}
++
++      /* Always initialize TLS descriptors completely at load time, in
++	 case static TLS is allocated for it that requires locking.  */
++      elf_machine_rela (map, reloc, sym, version, reloc_addr, skip_ifunc);
+     }
+   else if (__glibc_unlikely (r_type == R_X86_64_IRELATIVE))
+     {
+-- 
+2.27.0

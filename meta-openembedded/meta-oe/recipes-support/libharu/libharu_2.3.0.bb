@@ -6,7 +6,7 @@ DESCRIPTION = "libHaru is a library for generating PDF files. \
 LICENSE = "Zlib"
 LIC_FILES_CHKSUM = "file://README;md5=3ee6bc1f64d9cc7907f44840c8e50cb1"
 
-SRC_URI = "git://github.com/libharu/libharu.git;branch=2_3 \
+SRC_URI = "git://github.com/libharu/libharu.git;branch=2_3;protocol=https \
            file://libharu-RELEASE_2_3_0_cmake.patch \
 	   "
 

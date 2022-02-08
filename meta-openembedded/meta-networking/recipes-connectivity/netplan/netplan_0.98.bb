@@ -15,7 +15,7 @@ SRCREV = "5d22e9d22c4a3724d27b80b0cd9b898ae8f59d2b"
 PV = "0.98+git${SRCPV}"
 
 SRC_URI = " \
-        git://github.com/CanonicalLtd/netplan.git \
+        git://github.com/CanonicalLtd/netplan.git;branch=master;protocol=https \
 "
 
 DEPENDS = "glib-2.0 libyaml ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"

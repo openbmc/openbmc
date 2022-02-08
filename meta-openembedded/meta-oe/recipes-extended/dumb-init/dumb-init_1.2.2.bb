@@ -4,7 +4,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5940d39995ea6857d01b8227109c2e9c"
 
 SRCREV = "b1e978e486114797347deefcc03ab12629a13cc3"
-SRC_URI = "git://github.com/Yelp/dumb-init"
+SRC_URI = "git://github.com/Yelp/dumb-init;branch=master;protocol=https"
 S = "${WORKDIR}/git"
 
 EXTRA_OEMAKE = "CC='${CC}' CFLAGS='${CFLAGS} ${LDFLAGS}'"

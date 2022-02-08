@@ -1,0 +1,27 @@
+From 1a6ff0beebf0ab0c71081eaff1d5d7fd26015a94 Mon Sep 17 00:00:00 2001
+From: Josef 'Jeff' Sipek <jeff.sipek@dovecot.fi>
+Date: Tue, 19 Sep 2017 13:26:57 +0300
+Subject: [PATCH] lib: buffer_free(NULL) should be a no-op
+
+---
+ src/lib/buffer.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+Signed-off-by: Sana Kazi <Sana.Kazi@kpit.com>
+
+CVE: CVE-2020-12100
+Upstream-Status: Backport [http://archive.ubuntu.com/ubuntu/pool/main/d/dovecot/dovecot_2.2.33.2-1ubuntu4.7.debian.tar.xz]
+Comment: No change in any hunk
+
+--- a/src/lib/buffer.c
++++ b/src/lib/buffer.c
+@@ -148,6 +148,9 @@ void buffer_free(buffer_t **_buf)
+ {
+ 	struct real_buffer *buf = (struct real_buffer *)*_buf;
+ 
++	if (buf == NULL)
++		return;
++
+ 	*_buf = NULL;
+ 	if (buf->alloced)
+ 		p_free(buf->pool, buf->w_buffer);
