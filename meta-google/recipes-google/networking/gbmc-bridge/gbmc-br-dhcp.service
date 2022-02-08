@@ -5,7 +5,7 @@ StartLimitIntervalSec=10
 StartLimitBurst=3
 
 [Service]
-Restart=always
+Restart=on-failure
 RestartSec=5
 ExecStart=/usr/bin/udhcpc6 -f -q -O fqdn -O bootfile_url -O bootfile_param -i gbmcbr -s /usr/libexec/gbmc-br-dhcp.sh
 
