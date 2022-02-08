@@ -15,7 +15,7 @@ EXTRA_OECMAKE="-DENABLE_TEST=0 -DYOCTO=1"
 LIBRARY_NAMES = "libfiioemcmds.so"
 
 SRC_URI = "git://github.com/openbmc/foxconn-ipmi-oem.git;branch=master;protocol=https"
-SRCREV = "da2cf0d2b0f4cd56bc93575a435a5ee1c848f7b0"
+SRCREV = "9d6c4010b58049070afcb39ef4c2a965633e2e9c"
 
 HOSTIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
 NETIPMI_PROVIDER_LIBRARY += "${LIBRARY_NAMES}"
