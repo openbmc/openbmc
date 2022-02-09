@@ -30,7 +30,7 @@ boardver=$(printf '%d' "$(awk '{print $6}' /sys/bus/i2c/drivers/fiicpld/"${I2C_M
 
 # On EVT machines, the secondary SCP EEPROM is used.
 # Set BMC_I2C_BACKUP_SEL to secondary.
-if [[ $boardver -lt 64 ]]; then
+if [[ $boardver -lt $BOARDVER_EVT_LAST ]]; then
     echo "EVT system. Choosing secondary SCP EEPROM."
     set_gpio_ctrl BACKUP_SCP_SEL 0
     set_mux_default
@@ -55,7 +55,7 @@ fi
 CPU1_STATUS_N=$(get_gpio_ctrl S1_STATUS_N)
 if [[ $CPU1_STATUS_N == 1 ]]; then
     #Execute this only on DVT systems
-    if [[ $boardver -lt 64 ]]; then
+    if [[ $boardver -lt $BOARDVER_EVT_LAST ]]; then
         echo EVT system "$boardver"
     else
         echo DVT system "$boardver"
