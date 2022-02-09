@@ -1,0 +1,13 @@
+[Unit]
+Description=gBMC DHCP Client terminator
+After=network.target
+StartLimitIntervalSec=10
+StartLimitBurst=3
+
+[Service]
+Restart=on-failure
+RestartSec=5
+ExecStart=/usr/libexec/gbmc-br-dhcp-term.sh
+
+[Install]
+WantedBy=multi-user.target

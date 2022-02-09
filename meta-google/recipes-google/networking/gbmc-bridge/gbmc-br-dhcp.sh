@@ -37,6 +37,10 @@ gbmc_br_dhcp_run_hooks() {
 # shellcheck disable=SC1091
 source /usr/share/network/lib.sh || exit
 
+# Write out the current PID and cleanup when complete
+trap 'rm -f /run/gbmc-br-dhcp.pid' EXIT
+echo "$$" >/run/gbmc-br-dhcp.pid
+
 if [ "$1" = bound ]; then
   # Variable is from the environment via udhcpc6
   # shellcheck disable=SC2154
