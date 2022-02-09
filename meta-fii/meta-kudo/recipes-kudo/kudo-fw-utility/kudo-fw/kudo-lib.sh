@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Disable check for usage of the definitions within kudo-lib.sh
+# shellcheck disable=SC2034
+
 # get_gpio_num
 # Dynamically obtains GPIO number from chip base and I2C expanders through line name
 # line-name
@@ -36,3 +39,18 @@ function get_gpio_ctrl() {
     cat /sys/class/gpio/gpio"$GPIO_NUM"/value
     echo "$GPIO_NUM" > /sys/class/gpio/unexport
 }
+
+# I2C Definitions
+# The array is (<bus> <address>), where address is in hexadecimal.
+I2C_BMC_CPLD=(13 76)
+I2C_MB_CPLD=(34 76)
+I2C_S0_SMPRO=(2 4f)
+I2C_S1_SMPRO=(2 4e)
+I2C_FANCTRL=(18 2c)
+I2C_BMC_PWRSEQ=(14 59)
+I2C_MB_PWRSEQ1=(32 40)
+I2C_MB_PWRSEQ2=(32 41)
+I2C_CPU_EEPROM=(40 50)
+I2C_S1_CLKGEN=(37 68)
+I2C_S1_PCIE_CLKGEN1=(16 6a)
+I2C_S1_PCIE_CLKGEN2=(17 67)

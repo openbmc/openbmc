@@ -20,13 +20,13 @@ function set_mux_default(){
 
     # SPI control
     # Send command to CPLD to switch the bios spi interface to host
-    i2cset -y -f -a 13 0x76 0x10 0x00
+    i2cset -y -f -a "${I2C_BMC_CPLD[0]}" 0x"${I2C_BMC_CPLD[1]}" 0x10 0x00
 
 }
 
 # 0 - 63 EVT
 # 64 + DVT/PVT
-boardver=$(printf '%d' "$(awk '{print $6}' /sys/bus/i2c/drivers/fiicpld/34-0076/CMD00)")
+boardver=$(printf '%d' "$(awk '{print $6}' /sys/bus/i2c/drivers/fiicpld/"${I2C_MB_CPLD[0]}"-00"${I2C_MB_CPLD[1]}"/CMD00)")
 
 # On EVT machines, the secondary SCP EEPROM is used.
 # Set BMC_I2C_BACKUP_SEL to secondary.
@@ -59,12 +59,12 @@ if [[ $CPU1_STATUS_N == 1 ]]; then
         echo EVT system "$boardver"
     else
         echo DVT system "$boardver"
-        i2cset -y -a -f 37 0x68 0x05 0x03
+        i2cset -y -a -f "${I2C_S1_CLKGEN[0]}" 0x"${I2C_S1_CLKGEN[1]}" 0x05 0x03
     fi
     #These i2c deviecs are already installed on EVT systems
-    i2cset -y -a -f 16 0x6a 0 1 0xdf i
-    i2cset -y -a -f 16 0x6a 11 1 0x01 i
-    i2cset -y -a -f 17 0x67 1 2 0x3f 0x0c i
+    i2cset -y -a -f "${I2C_S1_PCIE_CLKGEN1[0]}" 0x"${I2C_S1_PCIE_CLKGEN1[1]}" 0 1 0xdf i
+    i2cset -y -a -f "${I2C_S1_PCIE_CLKGEN1[0]}" 0x"${I2C_S1_PCIE_CLKGEN1[1]}" 11 1 0x01 i
+    i2cset -y -a -f "${I2C_S1_PCIE_CLKGEN2[0]}" 0x"${I2C_S1_PCIE_CLKGEN2[1]}" 1 2 0x3f 0x0c i
 fi
 
 # Create /run/openbmc for system power files

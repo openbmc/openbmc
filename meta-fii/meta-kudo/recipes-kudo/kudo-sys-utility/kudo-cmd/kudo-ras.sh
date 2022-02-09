@@ -1,13 +1,17 @@
 #!/bin/bash
 
-powerState=$(i2cget -f -y 0x2 0x4f 0xe0 b)
+# Provide source directive to shellcheck.
+# shellcheck source=meta-fii/meta-kudo/recipes-kudo/kudo-fw-utility/kudo-fw/kudo-lib.sh
+source /usr/libexec/kudo-fw/kudo-lib.sh
+
+powerState=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0xe0 b)
 
 getGPISourceRegisters(){
-    REG60=$(i2cget -f -y 0x2 0x4f 0x60 w)       # GPI Data Set
-    REG61=$(i2cget -f -y 0x2 0x4f 0x61 w)       # GPI DATA Set #0
-    REG62=$(i2cget -f -y 0x2 0x4f 0x62 w)       # GPI DATA Set #1
-    REG63=$(i2cget -f -y 0x2 0x4f 0x63 w)       # GPI DATA Set #2
-    REG64=$(i2cget -f -y 0x2 0x4f 0x64 w)       # GPI DATA Set #3
+    REG60=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x60 w)       # GPI Data Set
+    REG61=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x61 w)       # GPI DATA Set #0
+    REG62=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x62 w)       # GPI DATA Set #1
+    REG63=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x63 w)       # GPI DATA Set #2
+    REG64=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x64 w)       # GPI DATA Set #3
     DS0Pres=$((REG60 & 0x0100))
     DS1Pres=$((REG60 & 0x0200))
     DS2Pres=$((REG60 & 0x0400))
@@ -15,14 +19,14 @@ getGPISourceRegisters(){
 }
 
 getErrorCount() {
-    MemCE=$(i2cget -f -y 0x2 0x4f 0x90 w)
-    MemUE=$(i2cget -f -y 0x2 0x4f 0x93 w)
-    CoreCE=$(i2cget -f -y 0x2 0x4f 0x80 w)
-    CoreUE=$(i2cget -f -y 0x2 0x4f 0x83 w)
-    PCIeCE=$(i2cget -f -y 0x2 0x4f 0xc0 w)
-    PCIeUE=$(i2cget -f -y 0x2 0x4f 0xc2 w)
-    OtherCE=$(i2cget -f -y 0x2 0x4f 0xd0 w)
-    OtherUE=$(i2cget -f -y 0x2 0x4f 0xd8 w)
+    MemCE=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x90 w)
+    MemUE=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x93 w)
+    CoreCE=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x80 w)
+    CoreUE=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x83 w)
+    PCIeCE=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0xc0 w)
+    PCIeUE=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0xc2 w)
+    OtherCE=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0xd0 w)
+    OtherUE=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0xd8 w)
 }
 
 getReg61Vals() {
@@ -64,14 +68,14 @@ getReg64Vals() {
 }
 
 getGPIStatusRegisters(){
-    REG70=$(i2cget -f -y 0x2 0x4f 0x70 w)       # Core, DIMM, SLC, PCIe, and Other errors
-    REG78=$(i2cget -f -y 0x2 0x4f 0x78 w)       # VRD Fault/Warning Error
-    REG79=$(i2cget -f -y 0x2 0x4f 0x79 w)       # VRD Hot
-    REG7A=$(i2cget -f -y 0x2 0x4f 0x7A w)       # DIMM Hot Error
-    REG7B=$(i2cget -f -y 0x2 0x4f 0x7B w)       # Boot #1 Error
-    REG7C=$(i2cget -f -y 0x2 0x4f 0x7C w)       # Boot #2 Error
-    REG7D=$(i2cget -f -y 0x2 0x4f 0x7D w)       # Watchdog/Other Status
-    REG7E=$(i2cget -f -y 0x2 0x4f 0x7E w)       # RAS internal error
+    REG70=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x70 w)       # Core, DIMM, SLC, PCIe, and Other errors
+    REG78=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x78 w)       # VRD Fault/Warning Error
+    REG79=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x79 w)       # VRD Hot
+    REG7A=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x7A w)       # DIMM Hot Error
+    REG7B=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x7B w)       # Boot #1 Error
+    REG7C=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x7C w)       # Boot #2 Error
+    REG7D=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x7D w)       # Watchdog/Other Status
+    REG7E=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x7E w)       # RAS internal error
 }
 
 getReg70Vals() {
@@ -175,11 +179,11 @@ getReg7EVals() {
 }
 
 getGPIMaskRegisters(){
-    REG50=$(i2cget -f -y 0x2 0x4f 0x50 w)       # GPI Control #0
-    REG51=$(i2cget -f -y 0x2 0x4f 0x51 w)       # GPI Control #1
-    REG52=$(i2cget -f -y 0x2 0x4f 0x52 w)       # GPI Control #2
-    REG53=$(i2cget -f -y 0x2 0x4f 0x53 w)       # GPI Control #3
-    REG54=$(i2cget -f -y 0x2 0x4f 0x54 w)       # GPI CE/UE Mask
+    REG50=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x50 w)       # GPI Control #0
+    REG51=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x51 w)       # GPI Control #1
+    REG52=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x52 w)       # GPI Control #2
+    REG53=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x53 w)       # GPI Control #3
+    REG54=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x54 w)       # GPI CE/UE Mask
 }
 
 getReg50Vals() {

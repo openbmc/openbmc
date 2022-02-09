@@ -113,8 +113,8 @@ function fw_rev() {
   echo " BMC: " ${MajorVersion}.${SubMajorVersion}.${MinorVersion}
 
   #BMC PWR Sequencer
-  i2cset -y -f -a 14 0x59 0xfe 0x0000 w
-  cmd=$(i2cget -y -f -a 14 0x59 0xfe i 2 | awk '{print substr($0,3)}')
+  i2cset -y -f -a "${I2C_BMC_PWRSEQ[0]}" 0x"${I2C_BMC_PWRSEQ[1]}" 0xfe 0x0000 w
+  cmd=$(i2cget -y -f -a "${I2C_BMC_PWRSEQ[0]}" 0x"${I2C_BMC_PWRSEQ[1]}" 0xfe i 2 | awk '{print substr($0,3)}')
   echo " BMC PowerSequencer : ${cmd}"
   #only display with smbios exists
   if [[ -e /var/lib/smbios/smbios2 ]]; then
@@ -123,7 +123,7 @@ function fw_rev() {
     echo " Bios: $cmd"
   fi
 
-  cmd=$(i2cget -f -y 2 0x4f 0x1 w);
+  cmd=$(i2cget -f -y "${I2C_S0_SMPRO[0]}" 0x"${I2C_S0_SMPRO[1]}" 0x1 w);
   echo " SCP Firmware: ${cmd}"
 
   adm1266_ver  | grep REVISION
@@ -202,7 +202,7 @@ function uartmux() {
 
 function ledtoggle() {
 
-    CurrentLED=$( i2cget -y -f -a 34 0x76 0x05 i 1 | cut -d ' ' -f 2)
+    CurrentLED=$( i2cget -y -f -a "${I2C_MB_CPLD[0]}" 0x"${I2C_MB_CPLD[1]}" 0x05 i 1 | cut -d ' ' -f 2)
   case $1 in
     boot)
         cmd=$(((CurrentLED & 0x40) != 0))
@@ -211,20 +211,20 @@ function ledtoggle() {
             #turn on LED
             if [[ $cmd -eq 0 ]]; then
                 setValue=$(( 0x40 + CurrentLED ))
-                i2cset -y -f -a 34 0x76 0x10 "$setValue"
+                i2cset -y -f -a "${I2C_MB_CPLD[0]}" 0x"${I2C_MB_CPLD[1]}" 0x10 $setValue
             fi
             ;;
          off)
             #turn off led
             if [[ $cmd -eq 1 ]]; then
                 setValue=$(( 0x80 & CurrentLED ))
-                i2cset -y -f -a 34 0x76 0x10 "$setValue"
+                i2cset -y -f -a "${I2C_MB_CPLD[0]}" 0x"${I2C_MB_CPLD[1]}" 0x10 $setValue
             fi
             ;;
         toggle)
             #turn on LED
                 setValue=$(( 0x40 ^ CurrentLED ))
-                i2cset -y -f -a 34 0x76 0x10 "$setValue"
+                i2cset -y -f -a "${I2C_MB_CPLD[0]}" 0x"${I2C_MB_CPLD[1]}" 0x10 $setValue
             ;;
          status)
             #displayLED status
@@ -246,20 +246,20 @@ function ledtoggle() {
             #turn on LED
             if [[ $cmd -eq 0 ]]; then
                 setValue=$(( 0x80 + CurrentLED ))
-                i2cset -y -f -a 34 0x76 0x10 "$setValue"
+                i2cset -y -f -a "${I2C_MB_CPLD[0]}" 0x"${I2C_MB_CPLD[1]}" 0x10 $setValue
             fi
             ;;
          off)
             #turn off led
             if [[ $cmd -eq 1 ]]; then
                  setValue=$(( 0x40 & CurrentLED ))
-                i2cset -y -f -a 34 0x76 0x10 "$setValue"
+                i2cset -y -f -a "${I2C_MB_CPLD[0]}" 0x"${I2C_MB_CPLD[1]}" 0x10 $setValue
             fi
             ;;
         toggle)
             #turn on LED
             setValue=$(( 0x80 ^ CurrentLED ))
-            i2cset -y -f -a 34 0x76 0x10 "$setValue"
+            i2cset -y -f -a "${I2C_MB_CPLD[0]}" 0x"${I2C_MB_CPLD[1]}" 0x10 $setValue
             ;;
          status)
             #displayLED status
