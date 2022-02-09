@@ -31,12 +31,11 @@ echo "Ampere UART MUX CTRL UART port $1 to mode" > /dev/ttyS0
 
 case "$1" in
   ttyS1)
-    set_gpio_ctrl 167 out 1
+    set_gpio_ctrl S0_UART0_BMC_SEL 1
     ;;
   ttyS3)
-    set_gpio_ctrl 161 out 1
-    set_gpio_ctrl 183 out 1 
-    set_gpio_ctrl 198 out 0
+    set_gpio_ctrl S0_UART1_BMC_SEL 1
+    set_gpio_ctrl S1_UART1_BMC_SEL 0
     ;;
   *)
     echo "Invalid tty passed to $0. Exiting!" > /dev/ttyS0

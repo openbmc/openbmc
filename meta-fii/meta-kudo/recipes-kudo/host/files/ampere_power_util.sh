@@ -16,9 +16,9 @@ hotswap() {
 force_off() {
   echo "Powering down Server"
 
-  set_gpio_ctrl 203 out 1
+  set_gpio_ctrl POWER_OUT 1
   sleep 6
-  set_gpio_ctrl 203 out 0
+  set_gpio_ctrl POWER_OUT 0
 }
 
 power_off() {
@@ -29,9 +29,9 @@ power_off() {
 power_on() {
   echo "Powering on Server"
 
-  set_gpio_ctrl 203 out 1
+  set_gpio_ctrl POWER_OUT 1
   sleep 1
-  set_gpio_ctrl 203 out 0
+  set_gpio_ctrl POWER_OUT 0
   busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.On
 }
 
@@ -45,8 +45,8 @@ power_status() {
 }
 
 host_status() {
-  BOOT_OK=$(get_gpio_ctrl 194)
-  S5_N=$(get_gpio_ctrl 204)
+  BOOT_OK=$(get_gpio_ctrl S0_FW_BOOT_OK)
+  S5_N=$(get_gpio_ctrl S0_SLPS5_N)
   if [ "$S5_N" == 1 ] || [ "$BOOT_OK" == 1 ]; then
     echo "on"
   else
@@ -66,9 +66,9 @@ graceful_shutdown() {
     echo "Triggering graceful shutdown"
     mkdir /run/openbmc
     timestamp > "/run/openbmc/host@0-shutdown-req-time"
-    set_gpio_ctrl 70 out 0
+    set_gpio_ctrl S0_SHD_REQ 0
     sleep 3
-    set_gpio_ctrl 70 out 1
+    set_gpio_ctrl S0_SHD_REQ 1
   fi
 }
 
@@ -76,9 +76,9 @@ host_reset() {
   if [ "$(host_status)" == "on" ]; then
     echo "Triggering sysreset pin"
     busctl set-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog ExpireAction s xyz.openbmc_project.State.Watchdog.Action.None
-    set_gpio_ctrl 65 out 0
+    set_gpio_ctrl S0_SYSRESET 0
     sleep 1
-    set_gpio_ctrl 65 out 1
+    set_gpio_ctrl S0_SYSRESET 1
   else
     echo "Host is off, cannot reset."
   fi

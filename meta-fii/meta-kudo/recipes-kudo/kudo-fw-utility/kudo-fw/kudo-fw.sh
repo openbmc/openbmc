@@ -74,23 +74,23 @@ function fwbios() {
 }
 
 function fwbmccpld() {
-  # BMC_JTAG_MUX_1 #218 0:BMC 1:MB
-  set_gpio_ctrl 218 out 0
+  # BMC_JTAG_MUX_1 0:BMC 1:MB
+  set_gpio_ctrl MB_JTAG_MUX_SEL 0
   if [ "$(loadsvf -d /dev/jtag0 -s $1 -m 0)" -ne  0 ]; then
     echo "BMC CPLD update failed" >&2
     return 1
   fi
   wait
-  set_gpio_ctrl 218 out 1
+  set_gpio_ctrl MB_JTAG_MUX_SEL 1
 
   return 0
 }
 
 function fwmbcpld() {
-  # BMC_JTAG_MUX_1 #218 0:BMC 1:MB
-  # BMC_JTAG_SEL #164 0:BMC 1:CPU
-  set_gpio_ctrl 218 out 1
-  set_gpio_ctrl 164 out 1
+  # BMC_JTAG_MUX_1 0:BMC 1:MB
+  # BMC_JTAG_SEL 0:BMC 1:CPU
+  set_gpio_ctrl MB_JTAG_MUX_SEL 1
+  set_gpio_ctrl BMC_JTAG_MUX_SEL  1
   if [ "$(loadsvf -d /dev/jtag0 -s $1 -m 0)" -ne  0 ]; then
     echo "Mobo CPLD update failed" >&2
     return 1
@@ -101,11 +101,11 @@ function fwmbcpld() {
 }
 
 function fwscp() {
-  # BMC_I2C_BACKUP_SEL #168 0:failover, 1:main
-  # BMC_CPU_EEPROM_I2C_SEL #85 0:BMC, 1:CPU
-  scp_eeprom_sel=$(get_gpio_ctrl 168)
-  set_gpio_ctrl 168 out 1
-  set_gpio_ctrl 85 out 0
+  # BMC_I2C_BACKUP_SEL 0:failover, 1:main
+  # BMC_CPU_EEPROM_I2C_SEL 0:BMC, 1:CPU
+  scp_eeprom_sel=$(get_gpio_ctrl BACKUP_SCP_SEL)
+  set_gpio_ctrl BACKUP_SCP_SEL 1
+  set_gpio_ctrl CPU_EEPROM_SEL 0
   #shellcheck disable=SC2010
   I2C_BUS_DEV=$(ls -l $devpath/"13-0077/" | grep channel-0 | awk '{ print $11}' | cut -c 8-)
   if [ "$(ampere_eeprom_prog -b $I2C_BUS_DEV -s 0x50 -p -f $1)" -ne  0 ]; then
@@ -113,18 +113,18 @@ function fwscp() {
     return 1
   fi
   wait
-  set_gpio_ctrl 85 out 1
-  set_gpio_ctrl 168 out "$scp_eeprom_sel"
+  set_gpio_ctrl CPU_EEPROM_SEL 1
+  set_gpio_ctrl BACKUP_SCP_SEL "$scp_eeprom_sel"
 
   return 0
 }
 
 function fwscpback() {
-  # BMC_I2C_BACKUP_SEL #168 0:failover, 1:main
-  # BMC_CPU_EEPROM_I2C_SEL #85 0:BMC, 1:CPU
-  scp_eeprom_sel=$(get_gpio_ctrl 168)
-  set_gpio_ctrl 168 out 0
-  set_gpio_ctrl 85 out 0
+  # BMC_I2C_BACKUP_SEL 0:failover, 1:main
+  # BMC_CPU_EEPROM_I2C_SEL 0:BMC, 1:CPU
+  scp_eeprom_sel=$(get_gpio_ctrl BACKUP_SCP_SEL)
+  set_gpio_ctrl BACKUP_SCP_SEL 0
+  set_gpio_ctrl CPU_EEPROM_SEL 0
   #shellcheck disable=SC2010
   I2C_BUS_DEV=$(ls -l $devpath/"13-0077/" | grep channel-0 | awk '{ print $11}' | cut -c 8-)
   if [ "$(ampere_eeprom_prog -b $I2C_BUS_DEV -s 0x50 -p -f $1)" -ne  0 ]; then
@@ -132,8 +132,8 @@ function fwscpback() {
     return 1
   fi
   wait
-  set_gpio_ctrl 85 out 1
-  set_gpio_ctrl 168 out "$scp_eeprom_sel"
+  set_gpio_ctrl CPU_EEPROM_SEL 1
+  set_gpio_ctrl BACKUP_SCP_SEL "$scp_eeprom_sel"
 
   return 0
 }

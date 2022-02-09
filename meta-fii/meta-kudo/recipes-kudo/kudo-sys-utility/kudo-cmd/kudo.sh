@@ -45,38 +45,38 @@ function usage() {
 function reset() {
   case $1 in
     hotswap)
-      # Virtual reset #94
-      set_gpio_ctrl 94 out 1
+      # Virtual reset
+      set_gpio_ctrl HOTSWAP 1
       ;;
     system)
-      # S0 system reset #65
-      set_gpio_ctrl 65 out 0
+      # S0 system reset
+      set_gpio_ctrl S0_SYSRESET 0
       sleep 1
-      set_gpio_ctrl 65 out 1
+      set_gpio_ctrl S0_SYSRESET 1
       ;;
     btn)
-      # power button #203
-      set_gpio_ctrl 203 out 1
+      # virtual power button
+      set_gpio_ctrl POWER_OUT 1
       sleep 1
-      set_gpio_ctrl 203 out 0
+      set_gpio_ctrl POWER_OUT 0
       ;;
     shutdown)
-      # BMC_CPU_SHD_REQ #70
-      set_gpio_ctrl 70 out 0
+      # BMC_CPU_SHD_REQ
+      set_gpio_ctrl S0_SHD_REQ 0
       sleep 3
-      set_gpio_ctrl 70 out 1
+      set_gpio_ctrl S0_SHD_REQ 1
       ;;
     forceOff)
-      # power button #203
-      set_gpio_ctrl 203 out 1
+      # virtual power button
+      set_gpio_ctrl POWER_OUT 1
       sleep 6
-      set_gpio_ctrl 203 out 0
+      set_gpio_ctrl POWER_OUT 0
       ;;
     display)
-      echo "Virtual reset   #94" "$(get_gpio_ctrl 94)"
-      echo "S0 System reset #65" "$(get_gpio_ctrl 65)"
-      echo "Power Button   #203" "$(get_gpio_ctrl 203)"
-      echo "BMC_CPU SHD Req #70" "$(get_gpio_ctrl 70)"
+      echo "Virtual reset   #$(get_gpio_num HOTSWAP)" "$(get_gpio_ctrl HOTSWAP)"
+      echo "S0 System reset #$(get_gpio_num S0_SYSRESET)" "$(get_gpio_ctrl S0_SYSRESET)"
+      echo "Power Button   #$(get_gpio_num POWER_OUT)" "$(get_gpio_ctrl POWER_OUT)"
+      echo "BMC_CPU SHD Req #$(get_gpio_num S0_SHD_REQ)" "$(get_gpio_ctrl S0_SHD_REQ)"
       ;;
     *)
       usage_rst
@@ -149,49 +149,49 @@ function uartmux() {
       fi
       ;;
     swhost)
-      set_gpio_ctrl 167 out 1
+      set_gpio_ctrl S0_UART0_BMC_SEL 1
       ;;
     swscp1)
-      set_gpio_ctrl 161 out 1
-      set_gpio_ctrl 177 out 1
-      set_gpio_ctrl 198 out 0
+      set_gpio_ctrl S0_UART1_BMC_SEL 1
+      set_gpio_ctrl S1_UART0_BMC_SEL 1
+      set_gpio_ctrl S1_UART1_BMC_SEL 0
       ;;
     swscp2)
-      set_gpio_ctrl 161 out 1
-      set_gpio_ctrl 177 out 1
-      set_gpio_ctrl 198 out 1
+      set_gpio_ctrl S0_UART1_BMC_SEL 1
+      set_gpio_ctrl S1_UART0_BMC_SEL 1
+      set_gpio_ctrl S1_UART1_BMC_SEL 1
       ;;
     swhosthr)
-      set_gpio_ctrl 167 out 0
+      set_gpio_ctrl S0_UART0_BMC_SEL 0
       ;;
     swscphr)
-      set_gpio_ctrl 161 out 0
-      set_gpio_ctrl 177 out 0
+      set_gpio_ctrl S0_UART1_BMC_SEL 0
+      set_gpio_ctrl S1_UART0_BMC_SEL 0
       ;;
     display)
-      if [ "$(get_gpio_ctrl 167)" -eq 1 ]; then
+      if [ "$(get_gpio_ctrl S0_UART0_BMC_SEL)" -eq 1 ]; then
         echo " CPU host to BMC console"
       else
         echo " CPU host to header"
       fi
-      if [ "$(get_gpio_ctrl 161)" -eq 1 ] && [ "$(get_gpio_ctrl 177)" -eq 1 ]; then
-        if [ "$(get_gpio_ctrl 198)" -eq 1 ]; then
+      if [ "$(get_gpio_ctrl S0_UART1_BMC_SEL)" -eq 1 ] && [ "$(get_gpio_ctrl S1_UART0_BMC_SEL)" -eq 1 ]; then
+        if [ "$(get_gpio_ctrl S1_UART1_BMC_SEL)" -eq 1 ]; then
           echo " SCP2 host to BMC console"
         else
           echo " SCP1 host to BMC console"
         fi
-      elif [ "$(get_gpio_ctrl 161)" -eq 0 ] && [ "$(get_gpio_ctrl 177)" -eq 0 ]; then
-        if [ "$(get_gpio_ctrl 198)" -eq 1 ]; then
+      elif [ "$(get_gpio_ctrl S0_UART1_BMC_SEL)" -eq 0 ] && [ "$(get_gpio_ctrl S1_UART0_BMC_SEL)" -eq 0 ]; then
+        if [ "$(get_gpio_ctrl S1_UART1_BMC_SEL)" -eq 1 ]; then
           echo " SCP2 host to Header"
         else
           echo " SCP1 host to Header"
         fi
       else
         echo "It's unknown status"
-        echo "167" "$(get_gpio_ctrl 167)"
-        echo "161" "$(get_gpio_ctrl 161)"
-        echo "177" "$(get_gpio_ctrl 177)"
-        echo "198" "$(get_gpio_ctrl 198)"
+        echo "S0_UART0_BMC_SEL $(get_gpio_ctrl S0_UART0_BMC_SEL)"
+        echo "S0_UART1_BMC_SEL $(get_gpio_ctrl S0_UART1_BMC_SEL)"
+        echo "S1_UART0_BMC_SEL $(get_gpio_ctrl S1_UART0_BMC_SEL)"
+        echo "S1_UART1_BMC_SEL $(get_gpio_ctrl S1_UART1_BMC_SEL)"
       fi
       ;;
     *)
