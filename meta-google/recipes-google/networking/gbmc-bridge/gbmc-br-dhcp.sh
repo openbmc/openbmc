@@ -29,7 +29,7 @@ done
 gbmc_br_dhcp_run_hooks() {
   local hook
   for hook in "${GBMC_BR_DHCP_HOOKS[@]}"; do
-    "$hook" || continue
+    "$hook" || return
   done
 }
 
@@ -97,5 +97,5 @@ EOF
     hostnamectl set-hostname "$fqdn" || true
   fi
 
-  gbmc_br_dhcp_run_hooks
+  gbmc_br_dhcp_run_hooks || exit
 fi
