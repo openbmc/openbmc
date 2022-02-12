@@ -33,6 +33,7 @@ FILES:${PN}:append = " \
 
 RDEPENDS:${PN}:append = " \
   bash \
+  dhcp-done \
   gbmc-ip-monitor \
   mstpd-mstpd \
   network-sh \

@@ -98,4 +98,8 @@ EOF
   fi
 
   gbmc_br_dhcp_run_hooks || exit
+
+  # Ensure that the installer knows we have completed processing DHCP by
+  # running a service that reports completion
+  systemctl start dhcp-done --no-block
 fi
