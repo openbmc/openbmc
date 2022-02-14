@@ -37,6 +37,10 @@ gbmc_ncsi_br_deprecated_ips_update() {
     local pfx="$(ip_bytes_to_str pfx_bytes)"
     (( pfx_bytes[9] &= 0xf0 ))
     local stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
+    local gbmcbr_mac="$(ip link show gbmcbr | tail -n 1 | awk '{print $2}')"
+    local gbmcbr_eui48="$(mac_to_eui48 "$gbmcbr_mac")"
+    local stateless_ip="$(ip_pfx_concat "$stateless_pfx/80" "$gbmcbr_eui48")"
+    stateless_ip="${stateless_ip%/*}"
     pfx_bytes[8]=0
     pfx_bytes[9]=0
     local host_pfx="$(ip_bytes_to_str pfx_bytes)"
@@ -46,6 +50,9 @@ Address=$pfx/128
 PreferredLifetime=0
 [Address]
 Address=$stateless_pfx/128
+PreferredLifetime=0
+[Address]
+Address=$stateless_ip/128
 PreferredLifetime=0
 [Address]
 Address=$host_pfx/128
