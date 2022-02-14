@@ -1,0 +1,8 @@
+[Match]
+Name=usb0
+[Network]
+DHCP=false
+LinkLocalAddressing=no
+IPv6AcceptRA=false
+[Address]
+Address=169.254.0.17/20
