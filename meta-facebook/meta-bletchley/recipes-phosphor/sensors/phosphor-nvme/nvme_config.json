@@ -1,33 +1,33 @@
 {
     "config": [
         {
-            "NVMeDriveIndex": 0,
+            "NVMeDriveIndex": 1,
             "NVMeDriveBusID": 0
         },
         {
-            "NVMeDriveIndex": 1,
+            "NVMeDriveIndex": 2,
             "NVMeDriveBusID": 1
         },
         {
-            "NVMeDriveIndex": 2,
+            "NVMeDriveIndex": 3,
             "NVMeDriveBusID": 2
         },
         {
-            "NVMeDriveIndex": 3,
+            "NVMeDriveIndex": 4,
             "NVMeDriveBusID": 3
         },
         {
-            "NVMeDriveIndex": 4,
+            "NVMeDriveIndex": 5,
             "NVMeDriveBusID": 4
         },
         {
-            "NVMeDriveIndex": 5,
+            "NVMeDriveIndex": 6,
             "NVMeDriveBusID": 5
         }
     ],
     "threshold": [
         {
-            "criticalHigh": 75,
+            "criticalHigh": 67,
             "criticalLow": 0,
             "maxValue": 127,
             "minValue": -127
