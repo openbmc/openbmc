@@ -32,6 +32,11 @@ FILES:${PN} += "${datadir}/www/*"
 
 EXTRA_OENPM ?= ""
 
+# Workaround 
+# Network access from task are disabled by default on Yocto 3.5
+# https://git.yoctoproject.org/poky/tree/documentation/migration-guides/migration-3.5.rst#n25
+do_compile[network] = "1"
+
 do_compile () {
     cd ${S}
     rm -rf node_modules
