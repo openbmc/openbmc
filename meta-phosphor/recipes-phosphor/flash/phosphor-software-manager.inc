@@ -1,5 +1,5 @@
 HOMEPAGE = "https://github.com/openbmc/phosphor-bmc-code-mgmt"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
-SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt"
+SRC_URI += "git://github.com/openbmc/phosphor-bmc-code-mgmt;branch=master;protocol=https"
 SRCREV = "24048b57f253f79d30f4a7bd248fd5b46471abe0"

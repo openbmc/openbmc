@@ -14,5 +14,5 @@ DEPENDS += "gpioplus"
 
 S = "${WORKDIR}/git"
 
-SRC_URI = "git://github.com/openbmc/phosphor-power-control"
+SRC_URI = "git://github.com/openbmc/phosphor-power-control;branch=master;protocol=https"
 SRCREV = "4d209a24588d112dfd61158b2e01dd973d99961e"

@@ -6,7 +6,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 S = "${WORKDIR}/git"
-SRC_URI += "git://github.com/openbmc/phosphor-buttons.git"
+SRC_URI += "git://github.com/openbmc/phosphor-buttons.git;branch=master;protocol=https"
 SRCREV = "5ed4cc0f0947e589c430618c29bd474f0fce32b3"
 
 inherit cmake pkgconfig systemd

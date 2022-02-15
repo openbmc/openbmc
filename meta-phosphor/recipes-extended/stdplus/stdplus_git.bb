@@ -13,7 +13,7 @@ EXTRA_OEMESON = " \
         -Dtests=disabled \
         "
 
-SRC_URI += "git://github.com/openbmc/stdplus"
+SRC_URI += "git://github.com/openbmc/stdplus;branch=master;protocol=https"
 SRCREV = "a2d67e20529a1f720c13586553ad2cec1451d5a8"
 
 S = "${WORKDIR}/git"

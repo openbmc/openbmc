@@ -14,7 +14,7 @@ DEPENDS += "phosphor-logging"
 
 S = "${WORKDIR}/git"
 
-SRC_URI += "git://github.com/openbmc/mboxbridge.git"
+SRC_URI += "git://github.com/openbmc/mboxbridge.git;branch=master;protocol=https"
 
 SRC_URI += "file://99-aspeed-lpc-ctrl.rules"
 
