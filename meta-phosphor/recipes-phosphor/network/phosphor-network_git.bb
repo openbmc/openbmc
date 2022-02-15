@@ -10,7 +10,7 @@ inherit meson pkgconfig
 inherit python3native
 inherit systemd
 
-SRC_URI += "git://github.com/openbmc/phosphor-networkd"
+SRC_URI += "git://github.com/openbmc/phosphor-networkd;branch=master;protocol=https"
 SRCREV = "afa4032d8fe2ba50a7e364ad7c5f58b6424cb17c"
 
 DEPENDS += "systemd"
