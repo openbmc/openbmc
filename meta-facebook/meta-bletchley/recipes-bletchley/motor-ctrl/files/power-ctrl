@@ -58,6 +58,46 @@ function trigger_power_button() {
     fi
 }
 
+function release_power_button() {
+    local sled_num=$1
+    GPIO_DETECT_PIN1="SLED${sled_num}_MS_DETECT1"
+
+    if [ "$(get_gpio  "$GPIO_DETECT_PIN1")" -eq 0 ]; then
+        echo "Motor at initial position already"
+        return 0
+    fi
+
+    motor-ctrl "sled${sled_num}" r >/dev/null
+    wait_for_switch "${GPIO_DETECT_PIN1}"
+    motor-ctrl "sled${sled_num}" s >/dev/null
+    if [ "$(get_gpio  "$GPIO_DETECT_PIN1")" -eq 0 ];then
+        echo "Motor reverse to initial position successful"
+        return 0
+    fi
+
+    echo "Error: Initial position switch not trigger"
+    return 1
+}
+
+function press_power_button() {
+    local sled_num=$1
+
+    GPIO_DETECT_PIN0="SLED${sled_num}_MS_DETECT0"
+
+    echo "Motor go forward to press Power button"
+    motor-ctrl "sled${sled_num}" f >/dev/null
+    wait_for_switch "${GPIO_DETECT_PIN0}"
+    motor-ctrl "sled${sled_num}" s >/dev/null
+
+    if [ "$(get_gpio  "$GPIO_DETECT_PIN0")" -eq 0 ];then
+        echo "Power button switch triggered"
+        return 0
+    fi
+
+    echo "Error: Power button switch not trigger"
+    return 1
+}
+
 #Get i2c bus number for sledN
 function get_bus_num() {
     SLED_NUM=$1
@@ -172,6 +212,35 @@ elif [[ "$ACTION" == "ac-on" ]];then
     set_gpio "power-host${SLED_NUM}" 1
 elif [[ "$ACTION" == "ac-off" ]];then
     set_gpio "power-host${SLED_NUM}" 0
+elif [[ "$ACTION" == "dfu" ]]; then
+    echo "Set host$SLED_NUM DFU mode"
+
+    # turn ac off
+    echo "SLED$SLED_NUM: turn ac-off"
+    set_gpio "power-host${SLED_NUM}" 0
+    sleep 1
+
+    # press power button, and hold for 10 seconds
+    echo "SLED$SLED_NUM: pressing power button"
+    if ! press_power_button "$SLED_NUM"; then
+        echo "SLED$SLED_NUM: press power button failed"
+        echo "SLED$SLED_NUM: releasing power button"
+        release_power_button "$SLED_NUM"
+        exit 1
+    fi
+    sleep 10
+
+    # turn ac on
+    echo "SLED$SLED_NUM: turn ac-on"
+    set_gpio "power-host${SLED_NUM}" 1
+    sleep 3
+
+    # release power button
+    echo "SLED$SLED_NUM: releasing host power button"
+    if ! release_power_button "$SLED_NUM"; then
+        echo "SLED$SLED_NUM: release power button failed"
+        exit 1
+    fi
 else
     echo "Unknown action: [ ${ACTION} ]"
     show_usage
