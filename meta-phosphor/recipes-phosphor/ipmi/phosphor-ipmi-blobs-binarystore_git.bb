@@ -25,3 +25,6 @@ FILES:${PN}:append = " ${libdir}/ipmid-providers"
 FILES:${PN}:append = " ${libdir}/blob-ipmid"
 
 BLOBIPMI_PROVIDER_LIBRARY += "libbinarystore.so"
+
+EXTRA_OEMESON:append = " -Dtests=disabled"
+
