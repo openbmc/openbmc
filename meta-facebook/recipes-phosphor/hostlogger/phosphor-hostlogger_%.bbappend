@@ -2,9 +2,9 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://ttyS2.conf"
 
-SRC_URI:append:yosemitev2 += "file://ttyS0.conf"
-SRC_URI:append:yosemitev2 += "file://ttyS1.conf"
-SRC_URI:append:yosemitev2 += "file://ttyS3.conf"
+SRC_URI:append:yosemitev2 = " file://ttyS0.conf"
+SRC_URI:append:yosemitev2 = " file://ttyS1.conf"
+SRC_URI:append:yosemitev2 = " file://ttyS3.conf"
 
 do_install:append() {
 

@@ -1,9 +1,9 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI:append:fb-withhost += "file://set-bmc-time-from-host"
+SRC_URI:append:fb-withhost = " file://set-bmc-time-from-host"
 
 
-RDEPENDS:${PN}:append:fb-withhost += "bash"
+RDEPENDS:${PN}:append:fb-withhost = " bash"
 
 do_install:append:fb-withhost(){
 

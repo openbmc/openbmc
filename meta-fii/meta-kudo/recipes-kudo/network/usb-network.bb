@@ -7,7 +7,7 @@ DEPENDS += "systemd"
 RDEPENDS:${PN} += "libsystemd"
 RDEPENDS:${PN} += "bash"
 
-SRC_URI:append += " \
+SRC_URI:append = " \
     file://usb_network.sh \
     file://usb_network.service \
     file://00-bmc-usb0.network \

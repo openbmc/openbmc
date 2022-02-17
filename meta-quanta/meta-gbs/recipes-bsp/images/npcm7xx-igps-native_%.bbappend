@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI:append += "file://BootBlockAndHeader_GBS.xml"
-SRC_URI:append += "file://UbootHeader_GBS.xml"
+SRC_URI:append = " file://BootBlockAndHeader_GBS.xml"
+SRC_URI:append = " file://UbootHeader_GBS.xml"
 
 # Prepare the Bootblock XMLs.
 do_gbs_prepare_xmls() {

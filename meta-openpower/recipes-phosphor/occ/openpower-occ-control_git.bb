@@ -77,7 +77,7 @@ DEPENDS:remove:class-native = " \
         sdbusplus \
         virtual/${PN}-config-native \
         "
-RDEPENDS:${PN}:remove:class-native += "phosphor-state-manager-obmc-targets"
+RDEPENDS:${PN}:remove:class-native = "phosphor-state-manager-obmc-targets"
 
 # Remove packages not required for native SDK build
 DEPENDS:remove:class-nativesdk = " \
@@ -86,7 +86,7 @@ DEPENDS:remove:class-nativesdk = " \
         sdbusplus \
         virtual/${PN}-config-native \
         "
-RDEPENDS:${PN}:remove:class-nativesdk += "phosphor-state-manager-obmc-targets"
+RDEPENDS:${PN}:remove:class-nativesdk = "phosphor-state-manager-obmc-targets"
 
 # Provide a means to enable/disable install_error_yaml feature
 PACKAGECONFIG ??= "install_error_yaml"

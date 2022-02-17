@@ -3,7 +3,7 @@ FILESEXTRAPATHS:append := "${THISDIR}/${BPN}:"
 FILESEXTRAPATHS:append := "${THISDIR}/u-boot-aspeed-sdk:"
 
 
-SRC_URI:append += "file://fw_env.config \
+SRC_URI:append = " file://fw_env.config \
                    file://transformers-ast2600.cfg \
                  "
 
