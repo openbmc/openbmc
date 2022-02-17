@@ -187,6 +187,6 @@ SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERRO
 
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager;branch=master;protocol=https"
-SRCREV = "ba2241c636735fbc12a870a316b8b0d9a850557e"
+SRCREV = "1fc48456ac9d156e5a6bbc5c65c89b6e3987d17f"
 
 S = "${WORKDIR}/git"
