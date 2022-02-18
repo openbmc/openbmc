@@ -10,3 +10,6 @@ IMAGE_FEATURES += "dev-pkgs tools-sdk \
 
 IMAGE_INSTALL += "kernel-devsrc"
 
+# Compiling stuff, specifically SystemTap probes, can require lots of memory
+# See https://bugzilla.yoctoproject.org/show_bug.cgi?id=14673
+QB_MEM = "-m 768"

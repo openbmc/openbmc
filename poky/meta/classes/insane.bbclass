@@ -945,7 +945,7 @@ def package_qa_check_empty_dirs(pkg, d, messages):
             recommendation = (d.getVar('QA_EMPTY_DIRS_RECOMMENDATION:' + dir) or
                               "but it is expected to be empty")
             msg = "%s installs files in %s, %s" % (pkg, dir, recommendation)
-            oe.qa.add_message(messages, "empty-dirs", msg)
+            package_qa_add_message(messages, "empty-dirs", msg)
 
 def package_qa_check_encoding(keys, encode, d):
     def check_encoding(key, enc):

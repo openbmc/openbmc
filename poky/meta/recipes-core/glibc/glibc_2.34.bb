@@ -59,6 +59,14 @@ SRC_URI =  "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0002-CVE-2021-38604.patch \
            file://0001-fix-create-thread-failed-in-unprivileged-process-BZ-.patch \
            file://CVE-2021-43396.patch \
+           file://0001-CVE-2022-23218.patch \
+           file://0002-CVE-2022-23218.patch \
+           file://0001-CVE-2022-23219.patch \
+           file://0002-CVE-2022-23219.patch \
+           file://0001-CVE-2021-3998.patch \
+           file://0002-CVE-2021-3998.patch \
+           file://0001-CVE-2021-3999.patch \
+           file://0002-CVE-2021-3999.patch \
            "
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build-${TARGET_SYS}"

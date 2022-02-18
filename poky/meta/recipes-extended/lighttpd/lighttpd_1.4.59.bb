@@ -14,6 +14,7 @@ RRECOMMENDS:${PN} = "lighttpd-module-access \
                      lighttpd-module-accesslog"
 
 SRC_URI = "http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${PV}.tar.xz \
+           file://0001-mod_extforward-fix-out-of-bounds-OOB-write-fixes-313.patch \
            file://index.html.lighttpd \
            file://lighttpd.conf \
            file://lighttpd \

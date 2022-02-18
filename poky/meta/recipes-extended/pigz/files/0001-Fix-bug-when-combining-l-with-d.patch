@@ -1,0 +1,50 @@
+From 65986f3d12d434b9bc428ceb6fcb1f6eeeb2c47d Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 17 Jan 2022 15:36:56 +0800
+Subject: [PATCH] Fix bug when combining -l with -d.
+
+Though it makes no sense to do pigz -ld, that is implicit when
+doing unpigz -l. This commit fixes a bug for that combination.
+
+Upstream-Status: Backport [https://github.com/madler/pigz/commit/326bba44aa102c707dd6ebcd2fc3f413b3119db0]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ pigz.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/pigz.c b/pigz.c
+index f90157f..d648216 100644
+--- a/pigz.c
++++ b/pigz.c
+@@ -4007,6 +4007,13 @@ local void process(char *path) {
+     }
+     SET_BINARY_MODE(g.ind);
+ 
++    // if requested, just list information about the input file
++    if (g.list && g.decode != 2) {
++        list_info();
++        load_end();
++        return;
++    }
++
+     // if decoding or testing, try to read gzip header
+     if (g.decode) {
+         in_init();
+@@ -4048,13 +4055,6 @@ local void process(char *path) {
+         }
+     }
+ 
+-    // if requested, just list information about input file
+-    if (g.list) {
+-        list_info();
+-        load_end();
+-        return;
+-    }
+-
+     // create output file out, descriptor outd
+     if (path == NULL || g.pipeout) {
+         // write to stdout
+-- 
+2.17.1
+

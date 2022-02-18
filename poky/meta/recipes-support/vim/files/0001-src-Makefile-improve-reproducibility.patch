@@ -16,11 +16,11 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  src/Makefile | 14 ++++----------
  1 file changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/src/Makefile b/src/Makefile
-index f2fafa4dc..7148d4bd9 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -2845,16 +2845,10 @@ auto/pathdef.c: Makefile auto/config.mk
+Index: git/src/Makefile
+===================================================================
+--- git.orig/src/Makefile
++++ git/src/Makefile
+@@ -3101,16 +3101,10 @@ auto/pathdef.c: Makefile auto/config.mk
  	-@echo '#include "vim.h"' >> $@
  	-@echo 'char_u *default_vim_dir = (char_u *)"$(VIMRCLOC)";' | $(QUOTESED) >> $@
  	-@echo 'char_u *default_vimruntime_dir = (char_u *)"$(VIMRUNTIMEDIR)";' | $(QUOTESED) >> $@
@@ -41,6 +41,3 @@ index f2fafa4dc..7148d4bd9 100644
  	-@sh $(srcdir)/pathdef.sh
  
  GUI_GTK_RES_INPUTS = \
--- 
-2.17.1
-
