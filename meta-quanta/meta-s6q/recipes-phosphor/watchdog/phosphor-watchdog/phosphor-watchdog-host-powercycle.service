@@ -1,0 +1,9 @@
+[Unit]
+Description=Power Cycle Host Server
+After=xyz.openbmc_project.Chassis.Control.Power.service
+
+[Service]
+Type=oneshot
+ExecStart=busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.PowerCycle
+ExecStart=busctl set-property xyz.openbmc_project.Control.Host.RestartCause /xyz/openbmc_project/control/host0/restart_cause xyz.openbmc_project.Control.Host.RestartCause RequestedRestartCause s xyz.openbmc_project.State.Host.RestartCause.WatchdogTimer
+SyslogIdentifier=phosphor-watchdog

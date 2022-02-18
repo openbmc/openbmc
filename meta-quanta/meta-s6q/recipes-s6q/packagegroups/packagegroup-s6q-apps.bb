@@ -45,4 +45,5 @@ RDEPENDS:${PN}-system = " \
     ipmitool \
     phosphor-post-code-manager \
     phosphor-host-postd \
+    phosphor-watchdog \
     "
