@@ -7,17 +7,19 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7ca
 inherit systemd
 inherit obmc-phosphor-systemd
 
+RDEPENDS:${PN} = "bash"
 S = "${WORKDIR}"
 
 SRC_URI = " \
-          file://ampere-host-force-reset@.service \
-          file://ampere-host-on-host-check@.service \
+           file://ampere-host-force-reset@.service \
+           file://ampere-host-on-host-check@.service \
+           file://ampere_host_check.sh \
           "
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = " \
-        ampere-host-force-reset@.service \
-        "
+                         ampere-host-force-reset@.service \
+                        "
 
 # append force reboot
 HOST_WARM_REBOOT_FORCE_TGT = "ampere-host-force-reset@.service"
@@ -33,3 +35,8 @@ HOST_ON_RESET_HOSTTGTFMT = "obmc-host-startmin@{0}.target"
 HOST_ON_RESET_HOSTFMT = "../${HOST_ON_RESET_HOSTTMPL}:${HOST_ON_RESET_HOSTTGTFMT}.requires/${HOST_ON_RESET_HOSTINSTMPL}"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'HOST_ON_RESET_HOSTFMT', 'OBMC_HOST_INSTANCES')}"
 SYSTEMD_SERVICE:${PN} += "${HOST_ON_RESET_HOSTTMPL}"
+
+do_install() {
+    install -d ${D}/usr/sbin
+    install -m 0755 ${WORKDIR}/ampere_host_check.sh ${D}/${sbindir}/
+}
