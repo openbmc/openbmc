@@ -86,6 +86,14 @@ pkg_postinst:${PN}-obmc-targets:append() {
     ln -s $TARGET $LINK
 }
 
+pkg_postinst:${PN}-chassis-check-power-status:append() {
+
+    mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@0.target.requires
+    LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.requires/phosphor-chassis-check-power-status@0.service"
+    TARGET="../phosphor-chassis-check-power-status@.service"
+    ln -s $TARGET $LINK
+}
+
 pkg_prerm:${PN}-obmc-targets:append() {
 
     LINK="$D$systemd_system_unitdir/multi-user.target.requires/obmc-host-reset@0.target"
@@ -140,5 +148,11 @@ pkg_prerm:${PN}-obmc-targets:append() {
     rm $LINK
 
     LINK="$D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.wants/phosphor-clear-one-time@0.service"
+    rm $LINK
+}
+
+pkg_prerm:${PN}-chassis-check-power-status:append() {
+
+    LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.requires/phosphor-chassis-check-power-status@0.service"
     rm $LINK
 }
