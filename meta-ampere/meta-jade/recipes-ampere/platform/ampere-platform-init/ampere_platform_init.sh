@@ -30,8 +30,8 @@ gpio_configure_output 229 1
 # =======================================================
 # Below GPIOs are controlled by other services so just
 # initialize in A/C power only.
-cmdline=$(cat /proc/cmdline)
-if [[ $cmdline == *resetreason=power* ]]; then
+bootstatus=$(cat /sys/class/watchdog/watchdog0/bootstatus)
+if [ "$bootstatus" == '32' ]; then
 	# BMC_GPIOR2_EXT_HIGHTEMP_L
 	gpio_configure_output 138 1
 
