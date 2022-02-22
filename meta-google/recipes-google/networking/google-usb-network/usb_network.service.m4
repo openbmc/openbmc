@@ -11,7 +11,6 @@ divert(0)dnl
 dnl
 [Unit]
 Description=USB Gadget
-After=phosphor-ipmi-host.service
 
 [Service]
 Type=oneshot
