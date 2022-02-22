@@ -4,7 +4,6 @@ Wants=mapper-wait@-xyz-openbmc_project-inventory.service
 After=mapper-wait@-xyz-openbmc_project-inventory.service
 Wants=obmc-host-reset-running@0.target
 After=obmc-host-reset-running@0.target
-After=fsi-scan@0.service
 
 [Service]
 ExecStart=/usr/bin/env openpower-occ-control
