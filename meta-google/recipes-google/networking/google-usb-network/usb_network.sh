@@ -57,9 +57,9 @@ gadget_start() {
     mkdir -p "${config_dir}"
     echo 100 > "${config_dir}/MaxPower"
     mkdir -p "${config_dir}/strings/0x409"
-    echo "ECM" > "${config_dir}/strings/0x409/configuration"
+    echo "EEM" > "${config_dir}/strings/0x409/configuration"
 
-    local func_dir="${gadget_dir}/functions/ecm.${IFACE_NAME}"
+    local func_dir="${gadget_dir}/functions/eem.${IFACE_NAME}"
     mkdir -p "${func_dir}"
 
     if [[ -n $HOST_MAC_ADDR ]]; then
@@ -77,11 +77,11 @@ gadget_start() {
 
 gadget_stop() {
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
-    rm -f ${gadget_dir}/configs/c.1/ecm.${IFACE_NAME}
+    rm -f ${gadget_dir}/configs/c.1/eem.${IFACE_NAME}
     rm -rf ${gadget_dir}/configs/c.1/strings/0x409
     rm -rf ${gadget_dir}/configs/c.1
     rm -rf ${gadget_dir}/strings/0x409
-    rm -rf ${gadget_dir}/functions/ecm.${IFACE_NAME}
+    rm -rf ${gadget_dir}/functions/eem.${IFACE_NAME}
     rm -rf ${gadget_dir}
 }
 

@@ -1,5 +1,5 @@
-SUMMARY = "Google USB ECM Gadget Configuration Script"
-DESCRIPTION = "Google USB ECM Gadget Configuration Script"
+SUMMARY = "Google USB EEM Gadget Configuration Script"
+DESCRIPTION = "Google USB EEM Gadget Configuration Script"
 PR = "r1"
 PV = "0.2"
 
@@ -42,11 +42,11 @@ do_compile() {
     test "X${BMC_USB_ECM_BIND_DEV}" != "X" || bberror "Please define BMC_USB_ECM_BIND_DEV"
 
     m4 \
-        -DM_BMC_USB_ECM_PRODUCT_ID="${BMC_USB_ECM_PRODUCT_ID}" \
-        -DM_BMC_USB_ECM_PRODUCT_NAME="${BMC_USB_ECM_PRODUCT_NAME}" \
-        -DM_BMC_USB_ECM_HOST_MAC="${BMC_USB_ECM_HOST_MAC}" \
-        -DM_BMC_USB_ECM_DEV_MAC="${BMC_USB_ECM_DEV_MAC}" \
-        -DM_BMC_USB_ECM_BIND_DEV="${BMC_USB_ECM_BIND_DEV}" \
+        -DM_BMC_USB_PRODUCT_ID="${BMC_USB_ECM_PRODUCT_ID}" \
+        -DM_BMC_USB_PRODUCT_NAME="${BMC_USB_ECM_PRODUCT_NAME}" \
+        -DM_BMC_USB_HOST_MAC="${BMC_USB_ECM_HOST_MAC}" \
+        -DM_BMC_USB_DEV_MAC="${BMC_USB_ECM_DEV_MAC}" \
+        -DM_BMC_USB_BIND_DEV="${BMC_USB_ECM_BIND_DEV}" \
         -DM_SCRIPT_INSTALL_DIR="${bindir}" \
         ${WORKDIR}/usb_network.service.m4 > ${S}/usb_network.service
 }
