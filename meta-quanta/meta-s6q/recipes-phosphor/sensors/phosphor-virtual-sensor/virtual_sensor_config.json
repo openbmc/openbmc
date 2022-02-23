@@ -1,0 +1,88 @@
+[
+    {
+        "Desc": {
+            "Name": "Temp_CPU0",
+            "SensorType": "temperature",
+            "MaxValue": 127.0,
+            "MinValue": -128.0
+        },
+        "Threshold": {
+            "CriticalHigh": 99,
+            "WarningHigh": 91
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/S6Q_MB"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T0",
+                    "Desc":
+                    {
+                        "Name": "DTS_CPU0",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "T1",
+                    "Desc":
+                    {
+                        "Name": "Die_CPU0",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(0,(T0 == T0) ? T0 : NULL,(T1 == T1) ? T1 : NULL)"
+    },
+    {
+        "Desc": {
+            "Name": "Temp_CPU1",
+            "SensorType": "temperature",
+            "MaxValue": 127.0,
+            "MinValue": -128.0
+        },
+        "Threshold": {
+            "CriticalHigh": 99,
+            "WarningHigh": 91
+        },
+        "Associations":
+        [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/S6Q_MB"
+            ]
+        ],
+        "Params":
+        {
+            "DbusParam":
+            [
+                {
+                    "ParamName": "T2",
+                    "Desc":
+                    {
+                        "Name": "DTS_CPU1",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "T3",
+                    "Desc":
+                    {
+                        "Name": "Die_CPU1",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "max(0,(T2 == T2) ? T2 : NULL,(T3 == T3) ? T3 : NULL)"
+    }
+]

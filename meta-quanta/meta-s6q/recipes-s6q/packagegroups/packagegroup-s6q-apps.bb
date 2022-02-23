@@ -46,4 +46,5 @@ RDEPENDS:${PN}-system = " \
     phosphor-post-code-manager \
     phosphor-host-postd \
     phosphor-watchdog \
+    phosphor-virtual-sensor \
     "
