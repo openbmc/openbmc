@@ -43,6 +43,20 @@ HELP
 }
 
 gadget_start() {
+    # Add the gbmcbr configuration if this is a relevant device
+    if (( ID_VENDOR == 0x18d1 && ID_PRODUCT == 0x22b )); then
+        mkdir -p /run/systemd/network
+        cat >/run/systemd/network/+-bmc-"${IFACE_NAME}".network <<EOF
+[Match]
+Name=${IFACE_NAME}
+[Network]
+Bridge=gbmcbr
+[Bridge]
+Cost=85
+EOF
+        networkctl reload || true
+    fi
+
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
     mkdir -p "${gadget_dir}"
     echo ${ID_VENDOR} > "${gadget_dir}/idVendor"
@@ -83,6 +97,9 @@ gadget_stop() {
     rm -rf ${gadget_dir}/strings/0x409
     rm -rf ${gadget_dir}/functions/eem.${IFACE_NAME}
     rm -rf ${gadget_dir}
+
+    rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".network
+    networkctl reload
 }
 
 opts=$(getopt \

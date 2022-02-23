@@ -1,5 +1,5 @@
 [Match]
-Name=usb*
+Property=ID_BUS=usb ID_VENDOR_ID=18d1 ID_MODEL_ID=0232
 [Network]
 Bridge=gbmcbr
 [Bridge]
