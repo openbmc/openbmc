@@ -36,6 +36,9 @@ gbmc_upgrade_internal() {
   systemctl start inplace-gbmc-verify || return
   echo 'Rebooting to perform update' >&2
   reboot || return
+  # Ensure that we don't "complete" the netboot process until
+  # after the update completes
+  exit 0
 }
 
 inplace_gbmc_upgrade=1
