@@ -71,6 +71,13 @@ pkg_postinst:${PN}() {
 		LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.wants/phal-export-devtree@0.service"
 		TARGET="../phal-export-devtree@.service"
 		ln -s $TARGET $LINK
+
+		mkdir -p $D$systemd_system_unitdir/obmc-host-start@0.target.wants
+		LINK="$D$systemd_system_unitdir/obmc-host-start@0.target.wants/phal-create-boottime-guard-indicator.service"
+		TARGET="../phal-create-boottime-guard-indicator.service"
+		ln -s $TARGET $LINK
+		LINK="$D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants/phal-create-boottime-guard-indicator.service"
+		ln -s $TARGET $LINK
 	fi
 
 	# If the memory preserving reboot feature is enabled, set it up
@@ -126,6 +133,11 @@ pkg_prerm:${PN}() {
 		rm $LINK
 
 		LINK="$D$systemd_system_unitdir/obmc-host-startmin@0.target.wants/phal-export-devtree@0.service"
+		rm $LINK
+
+		LINK="$D$systemd_system_unitdir/obmc-host-start@0.target.wants/phal-create-boottime-guard-indicator.service"
+		rm $LINK
+		LINK="$D$systemd_system_unitdir/obmc-host-quiesce@0.target.wants/phal-create-boottime-guard-indicator.service"
 		rm $LINK
 	fi
 
