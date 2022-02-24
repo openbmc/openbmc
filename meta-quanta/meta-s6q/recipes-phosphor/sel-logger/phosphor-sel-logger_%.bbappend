@@ -1,1 +1,1 @@
-PACKAGECONFIG:append:s6q = " log-threshold log-watchdog"
+PACKAGECONFIG:append:s6q = " log-threshold log-watchdog send-to-logger log-alarm"
