@@ -10,7 +10,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7becf906c8f8d03c237bad13bc3dac53"
 
 SRC_URI = "git://github.com/openbmc/service-config-manager;branch=master;protocol=https"
-SRCREV = "f2744893b77b9dd8903bb13113f4c3ef62c18f04"
+SRCREV = "25a0f634cd7dd209d58bf326a41d7bfd51a7eda3"
 
 inherit meson pkgconfig systemd
 
