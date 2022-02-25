@@ -9,6 +9,10 @@ pkg_postinst:${PN}-obmc-targets:append() {
     TARGET="../phosphor-discover-system-state@.service"
     ln -s $TARGET $LINK
 
+    LINK="$D$systemd_system_unitdir/obmc-bmc-service-quiesce@0.target"
+    TARGET="./obmc-bmc-service-quiesce@.target"
+    ln -s $TARGET $LINK
+
     mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants
     LINK="$D$systemd_system_unitdir/obmc-chassis-poweron@0.target.wants/phosphor-reset-host-recovery@0.service"
     TARGET="../phosphor-reset-host-recovery@.service"

@@ -75,7 +75,9 @@ DBUS_SERVICE:${PN}-chassis += "xyz.openbmc_project.State.Chassis.service"
 FILES:${PN}-chassis += "${bindir}/obmcutil"
 
 FILES:${PN}-bmc = "${bindir}/phosphor-bmc-state-manager"
+FILES:${PN}-bmc += "${sysconfdir}/phosphor-systemd-target-monitor/phosphor-service-monitor-default.json"
 DBUS_SERVICE:${PN}-bmc += "xyz.openbmc_project.State.BMC.service"
+DBUS_SERVICE:${PN}-bmc += "obmc-bmc-service-quiesce@.target"
 
 FILES:${PN}-hypervisor = "${bindir}/phosphor-hypervisor-state-manager"
 DBUS_SERVICE:${PN}-hypervisor += "xyz.openbmc_project.State.Hypervisor.service"
@@ -191,6 +193,6 @@ SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list(d, 'QUIESCE_FMT', 'HOST_ERRO
 
 
 SRC_URI += "git://github.com/openbmc/phosphor-state-manager;branch=master;protocol=https"
-SRCREV = "d93da7759068c558e93d94c36d7767fdf12f9928"
+SRCREV = "15cee5bd43a011f3d8c970dafaac86a8d70e503f"
 
 S = "${WORKDIR}/git"
